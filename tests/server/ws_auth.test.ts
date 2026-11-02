@@ -82,7 +82,7 @@ function baseChar(over: Partial<CharacterRow> = {}): CharacterRow {
 // spies may be reconfigured before construction too.
 function setup() {
   const ws = new FakeWs();
-  const session = { pid: 1, tag: 'fake-session' };
+  const session = { pid: 1, tag: 'fake-session', ws, linkdead: false };
   const generalChatRateLimitLiveState = new GeneralChatRateLimitLiveState();
   const chatModerationLiveState = new ChatModerationLiveState();
   const game = {
@@ -1115,6 +1115,27 @@ describe('createWsAuth: authenticateWebSocket accept path', () => {
     (session as { awaitingPong?: boolean }).awaitingPong = true;
     ws.emit('pong');
     expect((session as { awaitingPong?: boolean }).awaitingPong).toBe(true);
+  });
+
+  it('rejects buffered frames from the old transport after a session resumes', async () => {
+    const { ws, session, game, deps, req } = setup();
+    const auth = createWsAuth(deps);
+    await auth.authenticateWebSocket(asWs(ws), authRaw(), req);
+    ws.emit('message', 'before-logout');
+    expect(game.handleMessage).toHaveBeenCalledWith(session, 'before-logout');
+    game.handleMessage.mockClear();
+
+    const replacement = new FakeWs();
+    game.hasSessionForCharacter.mockReturnValue(true);
+    game.join.mockImplementation(() => {
+      session.ws = replacement;
+      return session;
+    });
+    await auth.authenticateWebSocket(asWs(replacement), authRaw(), req);
+    ws.emit('message', 'stale-command');
+    expect(game.handleMessage).not.toHaveBeenCalled();
+    replacement.emit('message', 'resumed-command');
+    expect(game.handleMessage).toHaveBeenCalledExactlyOnceWith(session, 'resumed-command');
   });
 
   it('snapshots the staff roles into isAdmin + expanded adminPermissions, and rides the CAPI attribution', async () => {

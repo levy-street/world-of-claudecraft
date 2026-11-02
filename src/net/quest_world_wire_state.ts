@@ -41,7 +41,8 @@ export type QuestWorldCommand =
   | { cmd: 'lance_brace' }
   | { cmd: 'lance_thrust' }
   | { cmd: 'lance_release' }
-  | { cmd: 'allied_hearthstone_attune'; npcId: number };
+  | { cmd: 'allied_hearthstone_attune'; npcId: number }
+  | { cmd: 'trick_or_treat'; npcId: number; boo?: true };
 
 /** Cold owner mirrors shared by quest snapshots and world-boss map state. */
 export class QuestWorldWireState {

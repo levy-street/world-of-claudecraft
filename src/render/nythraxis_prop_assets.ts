@@ -14,7 +14,6 @@
 
 import * as THREE from 'three';
 import { loadGltf, releaseGltf } from './assets/loader';
-import { registerDeferredPreload } from './assets/preload';
 import { GFX } from './gfx';
 
 export type NythraxisPropKind = 'cage';
@@ -46,24 +45,25 @@ export interface NythraxisPropAsset {
 const loadedSources = new Map<NythraxisPropKind, THREE.Object3D>();
 const preparedAssets = new Map<NythraxisPropKind, NythraxisPropAsset>();
 const failedKinds = new Set<NythraxisPropKind>();
+let nythraxisPropsPromise: Promise<void> | null = null;
 
-if (typeof window !== 'undefined') {
-  for (const [kind, def] of Object.entries(NYTHRAXIS_PROP_ASSET_DEFS) as [
-    NythraxisPropKind,
-    NythraxisPropAssetDef,
-  ][]) {
-    registerDeferredPreload(() =>
-      loadGltf(def.url)
-        .then((gltf) => {
-          loadedSources.set(kind, gltf.scene);
-        })
-        .catch(() => {
-          // A missing or broken model is not a broken fight: the painter keeps
-          // its procedural stand-in. The preload lane records the rejection.
-          failedKinds.add(kind);
-        }),
-    );
-  }
+export function ensureNythraxisPropAssets(): Promise<void> {
+  if (typeof window === 'undefined') return Promise.resolve();
+  nythraxisPropsPromise ??= Promise.all(
+    (Object.entries(NYTHRAXIS_PROP_ASSET_DEFS) as [NythraxisPropKind, NythraxisPropAssetDef][]).map(
+      ([kind, def]) =>
+        loadGltf(def.url)
+          .then((gltf) => {
+            loadedSources.set(kind, gltf.scene);
+          })
+          .catch(() => {
+            // A missing or broken model is not a broken fight: the painter keeps
+            // its procedural stand-in.
+            failedKinds.add(kind);
+          }),
+    ),
+  ).then(() => undefined);
+  return nythraxisPropsPromise;
 }
 
 // Meshopt-quantized GLBs arrive as normalized integer attributes; Three's

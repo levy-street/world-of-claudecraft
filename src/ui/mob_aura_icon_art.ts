@@ -9,6 +9,7 @@ const MOB_AURA_ICON_IDENTITIES: ReadonlyMap<string, string> = new Map([
   ['bleed_rift_thornback', 'mob_bleed'],
   ['bleed_wildheart_ravager', 'mob_bleed'],
   ['blind_crypt_carrion_crow', 'mob_blind'],
+  ['blind_gourdlight_crow', 'mob_blind'],
   ['blind_vale_bandit', 'mob_blind'],
   ['blood_frenzy', 'mob_frenzy_on_hit'],
   ['cinder_ironvein_sapper', 'mob_cinder'],

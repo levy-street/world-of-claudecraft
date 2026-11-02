@@ -9,6 +9,7 @@ import type { StoreMountSkinId } from '../sim/content/mount_skins';
 import { isStoreMountSkinId } from '../sim/content/mount_skins';
 import type { MountKey } from '../sim/content/mounts';
 import { MOUNTS } from '../sim/content/mounts';
+import type { RideGrip } from './characters/ride_grip_ik';
 
 /** A lit lamp carried on the mount's own skeleton. The renderer hangs a point
  *  light off `bone` so the flame tracks the lamp through every swing of the
@@ -102,6 +103,10 @@ export interface MountRideSpec {
   /** Optional left-side forearm target quaternion [x, y, z, w] (y and z
    *  mirrored on the right arm), placing the hands on a saddle horn or pommel. */
   lowerArm?: readonly [number, number, number, number];
+  /** Hands ON a handle ahead of the rider (a broom's grip): where the grip sits in the
+   *  rider's own frame, solved per body by a two-bone reach (characters/ride_grip_ik.ts).
+   *  Absent: the seated loop's own arms (every saddle or throne mount). */
+  grip?: RideGrip;
 }
 
 /** A seat carried on the mount's own skeleton, for mounts whose saddle MOVES
@@ -155,7 +160,7 @@ export interface MountVisualSpec {
   bobShape: 'hover' | 'hop';
   /** Ambient particle effect the renderer emits for this mount: the snail's
    *  slime path while moving, the hover cycle's aether exhaust. */
-  fx: 'slime' | 'exhaust' | 'pipes' | 'embers' | null;
+  fx: 'slime' | 'exhaust' | 'pipes' | 'sparks' | 'embers' | null;
   /** The ember sources for fx 'embers' (null for every other mount). */
   embers: MountEmberSpec | null;
   /** The burst when the mount is summoned: the shared shimmer every mount throws, or the
@@ -182,7 +187,7 @@ const spec = (
   rigged: boolean,
   bob?: { amp: number; hz: number; idle?: boolean; shape?: 'hover' | 'hop' },
   seatFwd = 0,
-  fx: 'slime' | 'exhaust' | 'pipes' | 'embers' | null = null,
+  fx: 'slime' | 'exhaust' | 'pipes' | 'sparks' | 'embers' | null = null,
   lamps: readonly MountLampSpec[] = [],
   seatBone: MountSeatSpec | null = null,
   // Two rarely-set fields ride an options bag rather than extending an already
@@ -249,6 +254,30 @@ const LENS_GLOW_R = [0.0733, 0.037, -0.0089] as const;
 /** Lens lateral radius is 0.066 model units; the halo carries a little past the
  *  rim so the glass reads as lit from within rather than painted. */
 const LENS_GLOW_RADIUS = 0.105;
+
+/** The broom lantern's candle, in its `Lantern` bone's frame (model units): the bone
+ *  hangs straight down the cord, so the carved pumpkin sits 0.2 along it. */
+const BROOM_LANTERN_OFFSET = [0, 0.2, 0] as const;
+
+/** Astride a broom handle: the legs close round a thin shaft (a small spread), the thighs
+ *  forward, the shins hanging back toward the stirrups, and the rider sitting up: the
+ *  pelvis plumb and only a breath of forward chest, so the torso reads near vertical and
+ *  relaxed while the grip reach brings the hands forward onto the handle. */
+const BROOM_RIDE: MountRideSpec = {
+  spread: 0.22,
+  thigh: 0.95,
+  knee: 2.15,
+  ankle: -0.55,
+  hips: 0.02,
+  // a rider leans in over the shaft (round 10: also brings a short-armed body's hands
+  // down onto the handle, ride_grip_ik.ts gripAlongHandle; round 11: a touch further, the
+  // shoulder roll in the grip solve covers the rest, so every body's fists stay ON it)
+  lean: 0.3,
+  // the grip's centre: the wrapped leather 0.82 m of model ahead of the broom's origin
+  // (1.0 at the drawn scale), the rider sitting 0.13 behind it; its height the handle's,
+  // 0.164 over the rider's root (the handle 0.584 over the broom's root, the seat 0.42)
+  grip: { forward: 0.66, up: 0.15, stagger: 0.22 },
+};
 
 /** Default colour of a carried lamp's point light: sodium-warm, matching the
  *  emissive `lantern_glow` material baked into the Lanternback's GLB. Lamps may
@@ -504,6 +533,46 @@ export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
         upperArm: [0.3201, 0.1239, -0.6185, 0.7069],
         lowerArm: [0.3042, 0.4618, 0.0173, 0.833],
       },
+    },
+  ),
+  // The Emberbristle Broom (Gourdlight Eve): it hovers a hand above the ground and the
+  // rider sits astride its handle, so the seat is the handle's height over the broom's
+  // root (the model's handle line sits 0.584 above its lowest point at the drawn scale;
+  // the hover lift carries broom and rider alike) less the seated hips' rise, and set a
+  // touch behind the origin, just ahead of the bristles. A slow hover bob carries
+  // broom and rider together, idle or moving; the bristles shed embers behind it (the
+  // 'sparks' trail), and the little pumpkin lantern on its crook is lit (a lamp on its
+  // own bone, so the light swings with it, plus a soft halo on the carved face).
+  emberbristle_broom: spec(
+    'mount_emberbristle_broom',
+    0.42,
+    true,
+    { amp: 0.07, hz: 0.75, idle: true, shape: 'hover' },
+    -0.13,
+    'sparks',
+    [
+      {
+        bone: 'Lantern',
+        offset: BROOM_LANTERN_OFFSET,
+        intensity: 2.6,
+        distance: 7,
+      },
+    ],
+    null,
+    {
+      groundLift: 0.72,
+      glows: [
+        {
+          bone: 'Lantern',
+          offset: BROOM_LANTERN_OFFSET,
+          radius: 0.17,
+          color: 0xffa040,
+          opacity: 0.75,
+          pulse: 0.3,
+          pulseHz: 1.3,
+        },
+      ],
+      ride: BROOM_RIDE,
     },
   ),
 };

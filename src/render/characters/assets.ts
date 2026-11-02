@@ -884,13 +884,12 @@ export function ensureCharacterUrl(url: string | null | undefined): void {
   void prepareCharacterUrl(url).catch(() => undefined);
 }
 
-/** iOS defers dungeon-only bodies until arrival; every file must settle before reveal. */
+/** Every host defers dungeon-only bodies until arrival; every file must settle before reveal. */
 export function dungeonCharacterBodiesResident(interior: string): boolean {
-  return !GFX.iosMemoryProfile || dungeonCharacterBodyUrls(interior).every(characterAssetResident);
+  return dungeonCharacterBodyUrls(interior).every(characterAssetResident);
 }
 
 export async function prepareDungeonCharacterBodies(interior: string): Promise<void> {
-  if (!GFX.iosMemoryProfile) return;
   await Promise.all(
     dungeonCharacterBodyUrls(interior).map((url) => prepareCharacterUrl(assetUrl(url))),
   );
@@ -2526,9 +2525,13 @@ function applyLowReadabilityLift(
   mat: THREE.MeshStandardMaterial | THREE.MeshLambertMaterial | THREE.MeshBasicMaterial,
   role: MaterialRole,
   authored: boolean,
+  selfIllumination = 0,
 ): void {
   const lift = role === 'weapon' ? 0.14 : 0.075;
-  const emissive = role === 'weapon' ? 0.075 : 0.045;
+  const emissive = Math.max(
+    role === 'weapon' ? 0.075 : 0.045,
+    role === 'body' ? selfIllumination : 0,
+  );
   mat.color.lerp(role === 'weapon' ? weaponHighlight : lowReadabilityWhite, lift);
   if ((mat as THREE.MeshLambertMaterial).isMeshLambertMaterial) {
     const lambert = mat as THREE.MeshLambertMaterial;
@@ -2549,7 +2552,7 @@ function applyLowReadabilityLift(
     // authored drops a touch warmer on this tier than on standard, where the
     // polish (and its cream lift) is skipped outright: deliberate, the tiers
     // trade colour accuracy for readability in different places.
-    if (authored && lambert.map) lambert.emissiveMap = lambert.map;
+    if ((authored || selfIllumination > 0) && lambert.map) lambert.emissiveMap = lambert.map;
     // An authored VERTEX-coloured held prop has no map to scale the floor through, and
     // three never multiplies emissive by vertex colour: the uniform floor would film a
     // dark authored surface grey. Its albedo lives in the vertices, so it takes no floor.
@@ -2863,7 +2866,7 @@ function buildTintedClone(
     if (envMapIntensity !== undefined) std.envMapIntensity = envMapIntensity;
     if (envSheen !== undefined) applyEnvSheen(std, envSheen);
   }
-  if (!GFX.standardMaterials) applyLowReadabilityLift(mat, role, authored);
+  if (!GFX.standardMaterials) applyLowReadabilityLift(mat, role, authored, selfIllumination);
   return mat;
 }
 

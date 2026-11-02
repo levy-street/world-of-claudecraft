@@ -22,7 +22,8 @@ export type MountKey =
   | 'wobbles_slime'
   | 'terrorspark_groundshaker'
   | 'nightwing_chimera'
-  | 'lantern_hall_destrier';
+  | 'lantern_hall_destrier'
+  | 'emberbristle_broom';
 
 export type MountRarity = 'common' | 'uncommon' | 'rare' | 'epic';
 
@@ -133,6 +134,16 @@ export const MOUNTS: Record<MountKey, MountDef> = {
     key: 'nightwing_chimera',
     name: 'Nightwing Chimaera',
     rarity: 'epic',
+  },
+  // Gourdlight Eve's broom (content/gourdlight_eve.ts GOURDLIGHT_BROOM_ID), sold by
+  // Hester for five of Old Thatchgrin's daily Emberwoven Sheaves. It hovers a hand's
+  // breadth over the ground (a ground mount like every other, it never flies) and its
+  // reins are permanent. Like every mount, its speed comes only from the rider's
+  // trained riding tier; the seasonal appearance grants no speed advantage.
+  emberbristle_broom: {
+    key: 'emberbristle_broom',
+    name: 'Emberbristle Broom',
+    rarity: 'common',
   },
   referral_tank: {
     key: 'referral_tank',

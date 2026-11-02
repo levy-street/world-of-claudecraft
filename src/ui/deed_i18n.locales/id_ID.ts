@@ -1407,4 +1407,49 @@ export const table: DeedLocaleTable = {
     desc: 'Dibeli dari Garrick Holt, pengurus perbekalan Balai Lentera, dengan 24 Segel Lentera.',
     title: 'dari Balai Lentera',
   },
+  feat_gourdlight_guise: {
+    name: 'Wujud Cahaya Labu',
+    desc: 'Miliki Kepala Labu Ukir yang diambil dari Si Tua Seringai Jerami di ladangnya melewati Padang Babi Hutan selama Malam Cahaya Labu.',
+  },
+  feat_old_thatchgrin: {
+    name: 'Jerami dan Abu',
+    desc: 'Bantu tumbangkan Si Tua Seringai Jerami di ladang labunya melewati Padang Babi Hutan selama Malam Cahaya Labu.',
+  },
+  feat_title_gourdlit: {
+    name: 'Si Bercahaya Labu',
+    desc: 'Baca Piagam Si Bercahaya Labu yang ditukar dari Hester Sumbu Labu dengan Permen Cahaya Labu selama Malam Cahaya Labu.',
+    title: 'Si Bercahaya Labu',
+  },
+  feat_title_trickster: {
+    name: 'Si Usil',
+    desc: 'Baca Piagam Si Usil yang ditukar dari Hester Sumbu Labu dengan Permen Cahaya Labu selama Malam Cahaya Labu.',
+    title: 'Si Usil',
+  },
+  feat_title_hollow_grinned: {
+    name: 'Si Seringai Hampa',
+    desc: 'Baca Piagam Seringai Hampa yang ditukar dari Hester Sumbu Labu dengan Permen Cahaya Labu selama Malam Cahaya Labu.',
+    title: 'Si Seringai Hampa',
+  },
+  feat_pumpkin_hunter: {
+    name: 'Pemburu Labu',
+    desc: 'Temukan setiap Labu Berhantu yang tersembunyi di seluruh dunia selama Malam Cahaya Labu.',
+    title: 'Si Hampa',
+  },
+  feat_gourdlight_doorsteps: {
+    name: 'Setiap Ambang Pintu',
+    desc: 'Mintalah permen atau keisengan kepada setiap warga yang membuka pintu di Eastbrook, Jembatan Rawa, dan Menara Pengawas selama Malam Cahaya Labu.',
+  },
+  feat_gourdlight_errands: {
+    name: 'Siap Melayani Hester',
+    desc: 'Selesaikan setiap tugas bergilir Malam Cahaya Labu dari Hester Sumbu Labu setidaknya sekali.',
+  },
+  feat_gourdlight_frights: {
+    name: 'Tiga Kota Terkejut',
+    desc: 'Pada tugas Huu! dari Hester, takuti seorang warga di masing-masing kota Eastbrook, Jembatan Rawa, dan Menara Pengawas.',
+  },
+  feat_gourdlight_eve_complete: {
+    name: 'Cahaya Labu, Awal hingga Akhir',
+    desc: 'Selesaikan seluruh Malam Cahaya Labu: tumbangkan Si Tua Seringai Jerami, temukan setiap Labu Berhantu, selesaikan setiap tugas Hester, ketuk setiap pintu, dan takuti seorang warga di masing-masing dari ketiga kota.',
+    title: 'Si Tersumpah Labu',
+  },
 };

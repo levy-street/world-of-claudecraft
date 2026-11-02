@@ -25593,4 +25593,222 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.stackUnavailable':
     'Hiện không thể thêm thời gian thành viên. Vui lòng thử lại sau ít phút.',
   'hudChrome.wocStore.subscription.tokenPrice': '{price} cho 30 ngày',
+  'errors.api.worldFightHold':
+    'Một nhân vật khác trên tài khoản này vẫn còn trong thế giới sau trận chiến. Hãy thử lại sau vài phút.',
+  'hudChrome.auraEffect.gourdlight.thatchbound':
+    'Lão Rơm Cười điều khiển bạn như con rối. Bạn không thể hành động: bạn bị đưa đến đồng minh gần nhất và đánh họ mỗi {every} giây, gây từ {min} đến {max} sát thương (tối đa gấp {mult} lần với đồng minh cấp {level}). Kết thúc sớm khi bạn chịu sát thương bằng {pct}% máu tối đa, hoặc khi đồng minh giải trừ hiệu ứng (Phép thuật).',
+  'hudChrome.auraEffect.seasonalCosmetic': 'Chỉ thay đổi ngoại hình: không ảnh hưởng chiến đấu',
+  'hudChrome.auraEffect.slumberNight':
+    'Treo bất động trên cọc đến khi màn đêm buông xuống. Không thể bị tấn công.',
+  'hudChrome.auraEffect.stilledMindCrit':
+    'Nứt Vỡ Tâm Trí hoặc Xé Toạc Hư Không tiếp theo chắc chắn gây chí mạng nếu trúng đích. Phép khác không tiêu hao hiệu ứng này. Xé Toạc Hư Không vẫn tiêu hao 3 điểm Thuế Bóng Tối. Phép bị kháng vẫn tiêu hao hiệu ứng.',
+  'hudChrome.mounts.desc_emberbristle_broom':
+    'Cây chổi mùa gặt buộc ruy băng cam, lơ lửng cách mặt đất một gang tay và rải than hồng từ lông chổi. Phần thưởng vĩnh viễn của Đêm Đèn Bí Ngô.',
+  'hudChrome.mounts.name_emberbristle_broom': 'Chổi Lông Than Hồng',
+  'hudChrome.priest.bombLabel': 'Bom Thập Phân',
+  'hudChrome.priest.bombReady': 'Sẵn sàng',
+  'hudChrome.priest.bombStatus': '{value} trên {max} điểm Bom Thập Phân',
+  'hudChrome.priest.bombTooltip':
+    'Bom Thập Phân: tạo 20 Thuế Bóng Tối để chuẩn bị một quả bom. Tiêu Thuế Bóng Tối không tăng tiến độ. Tiến độ được giữ giữa các trận chiến. Chết hoặc bắt đầu giao chiến với trùm đột kích sẽ đặt lại tiến độ. Hoàn tất niệm phép sẽ tiêu hao bom; hủy niệm phép sẽ giữ lại bom.',
+  'hudChrome.priest.chargeCount': '{value} / {max}',
+  'hudChrome.priest.gloomtitheLabel': 'Thuế Bóng Tối',
+  'hudChrome.priest.gloomtitheStatus': '{value} trên {max} Thuế Bóng Tối',
+  'hudChrome.priest.gloomtitheTooltip':
+    'Thuế Bóng Tối: tối đa 5 điểm có thể tiêu. Xé Toạc Hư Không tiêu 3; Chạm Hút Máu tiêu 2 để tăng 30% sát thương; Triệu Quỷ Thập Phân tiêu hết số điểm tích trữ. Tạo điểm cũng tích tiến độ Bom Thập Phân, ngay cả khi số điểm tích trữ đã đầy.',
+  'hudChrome.worldBoss.sleepUntilNightfall': '{name} ngủ đến khi màn đêm buông xuống.',
+  'entities.abilities.choir_of_deliverance.specNote_shadow':
+    'Trong 15 giây, chia lượng hồi máu bằng 20% máu kẻ địch mất do sát thương Bóng tối của bạn cho các thành viên tổ đội bị thương trong 30 thước, gồm cả bạn. Trong đội đột kích, chỉ nhóm nhỏ của bạn được hồi máu. Thi triển tức thì và tiếp tục tấn công trong Màn Chạng Vạng. Sát thương bị hấp thụ và sát thương vượt quá máu còn lại không tạo hồi máu.',
+  'entities.abilities.inner_focus.specNote_shadow':
+    'Đồng thời bảo đảm Nứt Vỡ Tâm Trí hoặc Xé Toạc Hư Không tiếp theo trong 60 giây sẽ chí mạng nếu trúng đích. Phép khác không tiêu hao hiệu ứng này. Xé Toạc Hư Không vẫn tiêu hao 3 điểm Thuế Bóng Tối. Phép bị kháng vẫn tiêu hao hiệu ứng bảo đảm chí mạng.',
+  'entities.abilities.spirit_bomb.description':
+    'Kích nổ bom linh hồn trên một kẻ địch, gây {damage} sát thương Bóng tối lên kẻ địch trong 8 thước quanh mục tiêu. Sát thương tăng theo Sức mạnh Phép thuật, có thể chí mạng và bị giảm khi vượt quá 5 mục tiêu. Tạo 20 Thuế Bóng Tối để chuẩn bị một quả bom. Vẫn tính lượng tạo ra khi đang giữ tối đa 5 Thuế Bóng Tối; không cần tiêu điểm và tiêu điểm không tăng tiến độ. Tiến độ được giữ giữa các trận chiến, tối đa một bom sẵn sàng. Chết sẽ xóa tiến độ và bom sẵn sàng. Hoàn tất niệm phép tiêu hao bom, kể cả khi bị kháng. Hủy hoặc bị ngắt niệm phép sẽ giữ lại bom. Bắt đầu giao chiến với trùm đột kích sẽ xóa tiến độ và bom sẵn sàng. Không thể dùng phép này để mở đầu giao chiến với trùm đột kích.',
+  'entities.abilities.spirit_bomb.name': 'Bom Thập Phân',
+  'entities.abilities.vampiric_touch.description':
+    'Gây {damage} sát thương Bóng tối trong 15 giây, mỗi 3 giây một lần. Sát thương tăng theo Sức mạnh Phép thuật và mỗi lần gây sát thương có thể chí mạng. Mỗi lần chia lượng hồi máu bằng 20% máu kẻ địch mất cho bạn và các thành viên tổ đội bị thương trong 30 thước; trong đội đột kích, chỉ nhóm nhỏ của bạn được hồi máu. Nếu có ít nhất 2 điểm Thuế Bóng Tối, áp dụng hiệu ứng này tiêu hao 2 điểm để tăng toàn bộ sát thương của nó thêm 30%.',
+  'entities.abilities.vampiric_touch.name': 'Chạm Hút Máu',
+  'entities.abilities.void_rupture.description':
+    'Tiêu hao 3 điểm Thuế Bóng Tối để xé toạc kẻ địch, gây {damage} sát thương Bóng tối. Sát thương tăng theo Sức mạnh Phép thuật và có thể chí mạng. Cần 3 điểm và vẫn tiêu hao khi bị kháng.',
+  'entities.abilities.void_rupture.name': 'Xé Toạc Hư Không',
+  'entities.items.batwing_draught.name': 'Thuốc Vỗ Cánh',
+  'entities.items.carved_pumpkin_head.name': 'Đầu Bí Ngô Chạm Khắc',
+  'entities.items.crabapple_chew.name': 'Kẹo Nhai Táo Dại',
+  'entities.items.cursed_candle_stub.name': 'Mẩu Nến Nguyền Rủa',
+  'entities.items.emberwoven_sheaf.name': 'Bó Lúa Dệt Than Hồng',
+  'entities.items.gourdlight_crow_feather.name': 'Lông Quạ Đèn Bí Ngô',
+  'entities.items.gourdlight_sweet.name': 'Kẹo Đèn Bí Ngô',
+  'entities.items.gourdlight_treat_pouch.name': 'Túi Kẹo Đèn Bí Ngô',
+  'entities.items.gourdseed_brittle.name': 'Kẹo Giòn Hạt Bí',
+  'entities.items.gurglegreen_cauldron.name': 'Vạc Xanh Sủi Bọt',
+  'entities.items.haunting_draught.name': 'Thuốc Ma Ám',
+  'entities.items.hearthroot_toffee.name': 'Kẹo Bơ Rễ Bếp',
+  'entities.items.jar_of_mischief.name': 'Lọ Nghịch Ngợm',
+  'entities.items.lantern_mint_drop.name': 'Kẹo Bạc Hà Đèn Lồng',
+  'entities.items.murmurwick_candle.name': 'Nến Bấc Thì Thầm',
+  'entities.items.owlwatch_fudge.name': 'Kẹo Mềm Cú Canh Đêm',
+  'entities.items.prankers_pumpkin.name': 'Bí Ngô Tinh Quái',
+  'entities.items.rattlebone_draught.name': 'Thuốc Xương Lạch Cạch',
+  'entities.items.reins_emberbristle_broom.name': 'Chổi Lông Than Hồng',
+  'entities.items.sack_of_startled_bats.name': 'Bao Dơi Hoảng Hốt',
+  'entities.items.strawling_charm.name': 'Bùa Người Rơm',
+  'entities.items.thatchgrin_patch_pumpkin.name': 'Bí Ngô Ruộng',
+  'entities.items.thatchgrin_sweet_sack.name': 'Bao Kẹo Của Lão Rơm Cười',
+  'entities.items.wanderwisp_lantern.name': 'Đèn Lồng Ma Trơi Lang Thang',
+  'entities.items.writ_of_the_gourdlit.name': 'Chứng Thư Ánh Bí Ngô',
+  'entities.items.writ_of_the_hollow_grin.name': 'Chứng Thư Nụ Cười Rỗng',
+  'entities.items.writ_of_the_trickster.name': 'Chứng Thư Kẻ Tinh Quái',
+  'entities.mobs.gourdlight_crow.name': 'Quạ Đèn Bí Ngô',
+  'entities.mobs.gourdlight_strawling.name': 'Người Rơm Nhỏ',
+  'entities.mobs.gourdlight_swelling_gourd.name': 'Bí Ngô Phình To',
+  'entities.mobs.gourdlight_thatchgrin.name': 'Lão Rơm Cười',
+  'entities.npcs.gourdlight_keeper.greeting':
+    'Bí ngô đã thắp sáng, đèn lồng đã treo lên, vậy là Đêm Đèn Bí Ngô đến rồi. Hãy gõ cửa người dân Đông Khê, Cầu Đầm và Vọng Đài Cao, rồi nói: cho kẹo hay bị ghẹo. Phần lớn sẽ cho con kẹo. Một vài người sẽ trêu con. Mang kẹo đến cho ta ở bất kỳ quầy nào của ta, ta sẽ đổi cho con thứ để mặc.',
+  'entities.npcs.gourdlight_keeper.name': 'Hester Bấc Bí Ngô',
+  'entities.npcs.gourdlight_keeper.title': 'Người Giữ Đèn Bí Ngô',
+  'entities.quests.q_gourdlight_daily_baskets.completion':
+    'Cả ba đã giao xong, ta nghe nói Marlow đã khóc. Lúc nào ông ấy cũng khóc. Đây là giỏ cho riêng con.',
+  'entities.quests.q_gourdlight_daily_baskets.objectives.0.label': 'Giỏ đã giao cho đầu bếp Marlow',
+  'entities.quests.q_gourdlight_daily_baskets.objectives.1.label':
+    'Giỏ đã giao cho thầy thuốc Yara',
+  'entities.quests.q_gourdlight_daily_baskets.objectives.2.label': 'Giỏ đã giao cho Sử Gia Caddis',
+  'entities.quests.q_gourdlight_daily_baskets.text':
+    'Mỗi Đêm Đèn Bí Ngô, ta chuẩn bị một giỏ kẹo cho người bạn cũ ở mỗi thị trấn, nhưng đầu gối ta không còn như xưa. Giao giúp ta nhé, {playerName}: đầu bếp Marlow ở Đông Khê, thầy thuốc Yara ở Cầu Đầm và Sử Gia Caddis trên Vọng Đài Cao.',
+  'entities.quests.q_gourdlight_daily_baskets.title': 'Giỏ Quà Cho Hàng Xóm',
+  'entities.quests.q_gourdlight_daily_boo.completion':
+    'Ba người ư? Ta nghe tiếng đầu bếp làm rơi chảo từ bên kia quảng trường. Giỏi lắm. Đây là phần của con.',
+  'entities.quests.q_gourdlight_daily_boo.objectives.0.label': 'Người dân bị dọa',
+  'entities.quests.q_gourdlight_daily_boo.text':
+    'Cả năm rồi không ai ở các thị trấn này được một phen sợ ra hồn, {playerName}, mà Đêm Đèn Bí Ngô không có trò dọa thì chỉ là đêm lạnh. Mặc bộ hóa trang vào, bộ nào của ta cũng được, hoặc đầu bí ngô nếu con đã kiếm được. Rồi lẻn đến ba người dân và hét thật to HÙ.',
+  'entities.quests.q_gourdlight_daily_boo.title': 'Hù!',
+  'entities.quests.q_gourdlight_daily_feathers.completion':
+    'Đen như cánh đồng không trăng, lại đã có mùi khói. Đống lửa đêm nay sẽ đẹp lắm. Cảm ơn con.',
+  'entities.quests.q_gourdlight_daily_feathers.objectives.0.label': 'Lông quạ',
+  'entities.quests.q_gourdlight_daily_feathers.text':
+    'Khi bị dồn ép, Lão Rơm Cười gọi quạ xuống tấn công kẻ đang đập vào rơm của lão. Lông chúng cháy xanh trong bếp, ta cần ba chiếc cho đống lửa tối nay. Tìm một trận đánh ở ruộng của lão, {playerName}, rồi nhổ lông từ lũ quạ.',
+  'entities.quests.q_gourdlight_daily_feathers.title': 'Lông Cho Đống Lửa',
+  'entities.quests.q_gourdlight_daily_patch.completion':
+    'Năm quả tròn, không quả nào bị cắn. Đủ làm bánh cho cả Thung Lũng. Đây, công của con.',
+  'entities.quests.q_gourdlight_daily_patch.objectives.0.label': 'Bí Ngô Ruộng',
+  'entities.quests.q_gourdlight_daily_patch.text':
+    'Ruộng của Lão Rơm Cười bên kia Đồng Cỏ Lợn Lòi đầy bí ngô, một nửa đã lăn ra ngoài đám rơm, nơi người cẩn thận có thể lấy được. Mang cho ta năm quả, {playerName}. Tránh xa lão bù nhìn. Lão đếm từng quả đấy.',
+  'entities.quests.q_gourdlight_daily_patch.title': 'Bí Ngô Từ Ruộng',
+  'entities.quests.q_gourdlight_daily_towns.completion':
+    'Ba thị trấn trong một đêm! Đôi giày của con xứng đáng nhận phần này hơn cả con.',
+  'entities.quests.q_gourdlight_daily_towns.objectives.0.label': 'Đã gõ cửa ở Đông Khê',
+  'entities.quests.q_gourdlight_daily_towns.objectives.1.label': 'Đã gõ cửa ở Cầu Đầm',
+  'entities.quests.q_gourdlight_daily_towns.objectives.2.label': 'Đã gõ cửa ở Vọng Đài Cao',
+  'entities.quests.q_gourdlight_daily_towns.text':
+    'Trẻ con bảo người đi Đèn Bí Ngô đích thực phải gõ cửa ở mọi thị trấn trước khi hết đêm. Chứng minh chúng nói đúng đi, {playerName}. Xin kẹo ở một cửa tại Đông Khê, một ở Cầu Đầm và một ở Vọng Đài Cao. Đèn lồng ven đường sẽ soi lối cho con.',
+  'entities.quests.q_gourdlight_daily_towns.title': 'Một Cánh Cửa Mỗi Thị Trấn',
+  'entities.quests.q_gourdlight_daily_wicks.completion':
+    'Sáu mẩu nến, lạnh như sương giá. Kẻ thắp chúng phải cố hơn thế. Cầm lấy, rồi rửa tay đi.',
+  'entities.quests.q_gourdlight_daily_wicks.objectives.0.label': 'Nến nguyền rủa đã dập',
+  'entities.quests.q_gourdlight_daily_wicks.text':
+    'Có kẻ đặt nến lửa xanh dưới chân cột đèn của chúng ta. Chúng cháy mà không chảy, lại thì thầm khi con quay lưng. Dập sáu cây giúp ta, {playerName}, ở bất kỳ thị trấn nào trong ba nơi, rồi mang mẩu nến về.',
+  'entities.quests.q_gourdlight_daily_wicks.title': 'Bấc Nến Hiểm Ác',
+  'entities.quests.q_gourdlight_rounds.completion':
+    'Năm cánh cửa mà các ngón tay vẫn còn nguyên. Đây, túi kẹo ăn trên đường về. Mai quay lại nhé, cửa sẽ mở lần nữa.',
+  'entities.quests.q_gourdlight_rounds.objectives.0.label': 'Cửa đã gõ',
+  'entities.quests.q_gourdlight_rounds.text':
+    'Mỗi Đêm Đèn Bí Ngô, trẻ em Thung Lũng lại đi quanh xin kẹo, và năm nay con sẽ đi cùng, {playerName}. Gõ năm cánh cửa trong các thị trấn, nói câu ấy rồi xem con được gì. Xong thì quay về gặp ta.',
+  'entities.quests.q_gourdlight_rounds.title': 'Vòng Quanh Đèn Bí Ngô',
+  'guide.interfacePage.framesGovernedPriest':
+    'Chỉnh sửa Khung cũng cho phép di chuyển huy hiệu Thuế Bóng Tối và Bom Thập Phân của tư tế Bóng tối.',
+  'guide.worldPvpPage.hillBodyTwoHour':
+    'Cứ hai giờ một lần, vào thời điểm không ai đoán trước được, toàn cõi được thông báo rằng một ngọn đồi sẽ nổi lên ở một vùng phía bắc sau mười lăm phút; vòng tròn nơi đồi xuất hiện được đánh dấu trên đất trống. Đồi tồn tại ba mươi phút rồi hạ xuống. Mỗi năm phút khi đồi còn đó, toàn cõi được báo vị trí và những nhóm đã giữ đồi lâu nhất. Tổ đội có nhiều người đứng trong vòng nhất sẽ tranh quyền kiểm soát; sau ba mươi giây chiếm ưu thế số lượng, đồi thuộc về họ. Tổ đội đối địch bước vào chỉ tạm dừng đếm giờ cho đến khi đội bạn lại dẫn trước; chỉ đặt lại từ đầu khi không còn ai trong đội bạn sống bên trong. Người chơi đơn được tính là tổ đội một người và vẫn giữ đồi khi lập tổ đội, nhưng thành viên đội đột kích không được tính. Khi tổ đội giữ đồi, mỗi thành viên đứng bên trong nhận cùng lượng Danh dự mỗi phút, bất kể đã giữ bao lâu. Vì thế, tổ đội đủ người giữ đồi không bị tranh chấp suốt thời gian tồn tại sẽ nhận khoảng bằng hai trận thắng chiến trường. Khi đồi hạ xuống, nếu nhóm giữ lâu nhất cộng dồn đã giữ ít nhất mười phút, mọi người từng đứng bên trong cho nhóm đó ít nhất một phút và vẫn còn trong nhóm sẽ nhận một trận thắng cho hàng PvP của Kho Báu Hàng Tuần. Thanh phía trên khu vực cho biết bên giữ đồi, số người hai bên và thời gian tranh chiếm; gõ /hill trong trò chuyện để biết vị trí.',
+  'seasonal.boo.already': '{name} đã bị dọa đủ hôm nay rồi.',
+  'seasonal.boo.flash': 'HÙ! {name} hoảng sợ!',
+  'seasonal.boo.frightenedHint': '{name} vẫn còn giật mình sau lần dọa trước. Hãy tìm người khác.',
+  'seasonal.boo.landed': 'Bạn nhảy ra trước {name} và hét HÙ! Họ thét lên, suýt làm rơi mọi thứ.',
+  'seasonal.boo.needsCostume':
+    'Hãy hóa trang trước: dùng thuốc hóa trang, trò dơi hoặc bộ xương, Bùa Người Rơm, Đầu Bí Ngô Chạm Khắc, hoặc uống một ngụm biến yêu tinh từ Vạc Xanh Sủi Bọt.',
+  'seasonal.boo.noCostume': 'Không có hóa trang, {name} chỉ cười bạn. Hãy mặc một bộ trước.',
+  'seasonal.boo.notOnErrand': 'Hester chưa nhờ bạn dọa ai hôm nay.',
+  'seasonal.boo.row': 'Hù!',
+  'seasonal.boo.rowAria': 'Nhảy ra trước {name} và hét hù',
+  'seasonal.boundItemGone': 'Đêm Đèn Bí Ngô đã kết thúc, {item} của bạn vụn ra thành rơm.',
+  'seasonal.costume': 'Bạn uống thuốc và biến hình: {trick}!',
+  'seasonal.event.gourdlight_eve.name': 'Đêm Đèn Bí Ngô',
+  'seasonal.guise': 'Bùa nổ lách tách, rơm phủ lên người bạn: {trick}!',
+  'seasonal.itemSource.pumpkinHead':
+    'Rơi từ Lão Rơm Cười ở ruộng bí bên kia Đồng Cỏ Lợn Lòi trong lần đầu bạn lấy chiến lợi phẩm từ lão. Không có người bán nào bán vật này.',
+  'seasonal.itemUse.broomSources':
+    'Mua từ Hester Bấc Bí Ngô với {count} Bó Lúa Dệt Than Hồng, hoặc hiếm khi rơi từ Lão Rơm Cười vào ngày bạn lấy chiến lợi phẩm từ lão. Cần kỹ năng cưỡi để sử dụng. Giữ vĩnh viễn và cưỡi được quanh năm.',
+  'seasonal.itemUse.costumeBat':
+    'Dùng: Biến thành dơi vỗ cánh trong {minutes} phút. Bị tiêu hao. Không dùng được trong chiến đấu, vào chiến đấu sẽ kết thúc hiệu ứng. Chỉ thay đổi ngoại hình.',
+  'seasonal.itemUse.costumeGhost':
+    'Dùng: Biến thành bóng ma lơ lửng trong {minutes} phút. Bị tiêu hao. Không dùng được trong chiến đấu, vào chiến đấu sẽ kết thúc hiệu ứng. Chỉ thay đổi ngoại hình.',
+  'seasonal.itemUse.costumeSkeleton':
+    'Dùng: Biến thành bộ xương lạch cạch trong {minutes} phút. Bị tiêu hao. Không dùng được trong chiến đấu, vào chiến đấu sẽ kết thúc hiệu ứng. Chỉ thay đổi ngoại hình.',
+  'seasonal.itemUse.pouch': 'Dùng: Mở để nhận {count} Kẹo Đèn Bí Ngô.',
+  'seasonal.itemUse.pumpkinHead':
+    'Dùng: Đội hoặc tháo quả bí chạm khắc được thắp sáng bên trong, đeo bên ngoài mũ giáp. Chỉ thay đổi ngoại hình.',
+  'seasonal.itemUse.sheaf':
+    'Lão Rơm Cười cho một bó mỗi ngày bạn lấy chiến lợi phẩm từ lão, cho đến khi bạn có Chổi Lông Than Hồng. Hester Bấc Bí Ngô đổi {count} bó lấy chổi tại các quầy ở Đông Khê, Cầu Đầm và Vọng Đài Cao. Bó chưa tiêu được giữ cho Đêm Đèn Bí Ngô kế tiếp.',
+  'seasonal.itemUse.strawlingCharm':
+    'Dùng: Biến thành một người rơm nhỏ của Lão Rơm Cười trong {seconds} giây. Ngoài chiến đấu. Không bao giờ bị tiêu hao. Chỉ thay đổi ngoại hình.',
+  'seasonal.itemUse.sweet':
+    'Kiếm được bằng trò cho kẹo hay bị ghẹo trong Đêm Đèn Bí Ngô. Hester Bấc Bí Ngô đổi chúng lấy vật phẩm ngoại hình tại các quầy ở Đông Khê, Cầu Đầm và Vọng Đài Cao.',
+  'seasonal.itemUse.titleWrit':
+    'Dùng: Nhận danh hiệu {title} cho nhân vật này, chọn đeo trong Sách Kỳ Công. Bị tiêu hao. Giữ lại nếu đã có danh hiệu.',
+  'seasonal.itemUse.toyBats':
+    'Dùng: Mở bao. Đàn dơi kêu chít chít bay ùa ra quanh bạn trong {seconds} giây. Không dùng được khi chiến đấu hoặc tàng hình. Không bao giờ bị tiêu hao: dùng lại sau {cooldown} giây. Giữ vĩnh viễn và dùng được quanh năm. Chỉ thay đổi ngoại hình.',
+  'seasonal.itemUse.toyCandleShadows':
+    'Dùng: Thắp nến trước mặt. Trong {seconds} giây, ngọn lửa hắt bóng mèo, dơi và phù thủy nhảy múa trên mặt đất xung quanh, ai ở gần cũng thấy được. Không dùng được khi chiến đấu hoặc tàng hình. Không bao giờ bị tiêu hao: dùng lại sau {cooldown} giây. Giữ vĩnh viễn và dùng được quanh năm. Chỉ thay đổi ngoại hình.',
+  'seasonal.itemUse.toyCauldron':
+    'Dùng: Đặt vạc lớn sủi bọt trước mặt. Vạc tồn tại {standing} giây; người chơi uống từ vạc sẽ bùng lên trong bong bóng xanh và biến thành yêu tinh trong {seconds} giây, thay thế bộ hóa trang đang mặc. Không thể đặt vạc hay uống khi chiến đấu hoặc tàng hình; vào chiến đấu sẽ kết thúc dạng yêu tinh. Không bao giờ bị tiêu hao: dùng lại sau {cooldown} giây. Giữ vĩnh viễn và dùng được quanh năm. Chỉ thay đổi ngoại hình.',
+  'seasonal.itemUse.toyLantern':
+    'Dùng: Đặt đèn lồng trước mặt. Một bóng ma nhỏ bay quanh bạn trong {seconds} giây. Không dùng được khi chiến đấu hoặc tàng hình. Không bao giờ bị tiêu hao: dùng lại sau {cooldown} giây. Giữ vĩnh viễn và dùng được quanh năm. Chỉ thay đổi ngoại hình.',
+  'seasonal.itemUse.toyPrank':
+    'Dùng: Ném vào người chơi khác nhìn thấy được trong {range} thước. Đầu họ biến thành đèn bí ngô phát sáng trong {seconds} giây; họ có thể nhấp chuột phải để bỏ. Cả hai phải ngoài chiến đấu và bạn không được tàng hình. Không bao giờ bị tiêu hao: dùng lại sau {cooldown} giây. Giữ vĩnh viễn và dùng được quanh năm. Chỉ thay đổi ngoại hình.',
+  'seasonal.itemUse.trickJar':
+    'Dùng: Gây một trò nghịch vô hại ngẫu nhiên lên bạn trong vài giây. Chỉ thay đổi ngoại hình.',
+  'seasonal.jarTrick': 'Lọ bật mở: {trick}!',
+  'seasonal.pumpkinHead.off': 'Bạn tháo Đầu Bí Ngô Chạm Khắc.',
+  'seasonal.pumpkinHead.on': 'Bạn đội Đầu Bí Ngô Chạm Khắc.',
+  'seasonal.pumpkins.flash': 'Đã tìm thấy Bí Ngô Ma Ám! {count}/{total}',
+  'seasonal.pumpkins.found':
+    'Bạn thắp sáng một Bí Ngô Ma Ám ở {zone}: {count}/{total}. Kẹo Đèn Bí Ngô nhận được: {sweets}.',
+  'seasonal.pumpkins.name': 'Bí Ngô Ma Ám',
+  'seasonal.pumpkins.progress': '{label}: {current}/{total}',
+  'seasonal.pumpkins.title': 'Những Quả Bí Ngô Ma Ám',
+  'seasonal.pumpkins.world': 'Thế giới',
+  'seasonal.thatchgrin.poleBound': 'Buộc Vào Cọc',
+  'seasonal.thatchgrin.sleepYell': 'Mặt trời lên rồi. Về cọc, về canh gác thôi.',
+  'seasonal.thatchgrin.wakeYell': 'ĐÊM buông xuống ruộng! Ai đi trong ruộng CỦA TA?',
+  'seasonal.titleGranted': 'Bạn đọc chứng thư. Nhận danh hiệu mới: {title}.',
+  'seasonal.titleKnown': 'Bạn đã có danh hiệu đó nên giữ lại chứng thư.',
+  'seasonal.tokenPrice': '{count} {item}',
+  'seasonal.toy.bats': 'Bạn mở bao, đàn dơi hoảng hốt ùa ra!',
+  'seasonal.toy.candleShadows': 'Bạn thắp nến, những cái bóng bắt đầu nhảy múa quanh ngọn lửa.',
+  'seasonal.toy.cauldron': 'Bạn đặt vạc xuống, vạc bắt đầu sủi bọt.',
+  'seasonal.toy.cauldronDrink':
+    'Bạn uống từ vạc, bùng lên trong bong bóng xanh và biến thành yêu tinh!',
+  'seasonal.toy.hidden': 'Hãy bước ra khỏi bóng tối trước: đồ chơi sẽ làm lộ bạn.',
+  'seasonal.toy.lantern': 'Bạn đặt đèn lồng xuống, một bóng ma nhỏ bay ra bầu bạn.',
+  'seasonal.toy.prank': 'Bạn ném quả bí. Nó vỡ bẹt lên {name}!',
+  'seasonal.toy.prankNeedsPlayer': 'Quả bí chỉ vỡ trên người chơi khác đang ngoài chiến đấu.',
+  'seasonal.toy.pranked':
+    '{name} ném vỡ bí ngô trên đầu bạn! Nhấp chuột phải để bỏ, hoặc đội thật tự hào.',
+  'seasonal.toy.prankedFlash': 'Bị {name} chơi khăm!',
+  'seasonal.trickOrTreat.alreadyKnocked': 'Hôm nay bạn đã xin kẹo hoặc ghẹo {name} rồi.',
+  'seasonal.trickOrTreat.knockedHint':
+    'Hôm nay bạn đã gõ cửa này. Cửa mở lại sau lần đặt lại hằng ngày.',
+  'seasonal.trickOrTreat.notActive': 'Đêm Đèn Bí Ngô hiện chưa diễn ra.',
+  'seasonal.trickOrTreat.row': 'Cho kẹo hay bị ghẹo!',
+  'seasonal.trickOrTreat.rowAria': 'Nói cho kẹo hay bị ghẹo với {name}',
+  'seasonal.trickOrTreat.tooFar': 'Đến gần hơn để gõ cửa.',
+  'seasonal.trickOrTreat.treat': '{name} đưa bạn một món kẹo.',
+  'seasonal.trickOrTreat.treatFlash.few': 'Kẹo! {count} Kẹo Đèn Bí Ngô',
+  'seasonal.trickOrTreat.treatFlash.many': 'Kẹo! {count} Kẹo Đèn Bí Ngô',
+  'seasonal.trickOrTreat.treatFlash.one': 'Kẹo! {count} Kẹo Đèn Bí Ngô',
+  'seasonal.trickOrTreat.treatFlash.other': 'Kẹo! {count} Kẹo Đèn Bí Ngô',
+  'seasonal.trickOrTreat.trick': '{name} trêu bạn: {trick}!',
+  'seasonal.trickOrTreat.trickFlash': 'Ghẹo! {trick}',
+  'seasonal.tricks.gourdlight_costume_bat': 'Trang Phục Dơi',
+  'seasonal.tricks.gourdlight_costume_ghost': 'Trang Phục Ma',
+  'seasonal.tricks.gourdlight_costume_skeleton': 'Trang Phục Bộ Xương',
+  'seasonal.tricks.gourdlight_trick_bat': 'Dơi Tinh Nghịch',
+  'seasonal.tricks.gourdlight_trick_fumes': 'Khói Xanh',
+  'seasonal.tricks.gourdlight_trick_skeleton': 'Xương Lạch Cạch',
+  'seasonal.tricks.gourdlight_trick_strawling': 'Dáng Người Rơm',
 };

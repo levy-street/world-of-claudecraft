@@ -1,6 +1,6 @@
 // King of the Hill: the system half, behind the SimContext seam.
 //
-// Once every HILL_WINDOW_SECONDS (three hours), at a moment drawn at random
+// Once every HILL_WINDOW_SECONDS (two hours), at a moment drawn at random
 // inside the window, the realm is warned that a hill will rise in one of the
 // northern zones (hill_zones.ts); HILL_WARNING_SECONDS later it rises,
 // a HILL_RADIUS circle on dry, open ground, clear of the water, the hub

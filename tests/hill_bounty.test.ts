@@ -137,7 +137,7 @@ describe('hill kills in the Sim', () => {
     [false, true],
     [true, true],
   ])(
-    'hill Honor takes priority with world bounties on killer=%s victim=%s',
+    'a victim world bounty doubles the hill bounty with killer=%s victim=%s',
     (killerBounty, victimBounty) => {
       const {
         sim,
@@ -155,7 +155,7 @@ describe('hill kills in the Sim', () => {
       }
       expect(ent(sim, a).bounty === true).toBe(killerBounty);
       expect(ent(sim, b).bounty === true).toBe(victimBounty);
-      expect(kill(sim, a, b)).toBe(20);
+      expect(kill(sim, a, b)).toBe(victimBounty ? 40 : 20);
       expect(ent(sim, b).bounty).toBeFalsy();
       expect(ent(sim, b).hillBounty).toBeUndefined();
     },

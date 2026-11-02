@@ -896,7 +896,7 @@ describe('real catalog integration', () => {
     // the world-boss branch's three.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 336.
     // 342 with Lantern Hall's six (three milestones plus the three title feats).
-    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(349);
+    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(359);
   });
 
   it('offers exactly the live catalog border deeds once they are earned', () => {

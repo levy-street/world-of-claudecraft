@@ -200,9 +200,11 @@ export function applyFoliageEdgeFade(root: {
       const fromBelow = !/^Leaves_dg_bloom/.test(mat.name);
       const fadeHook: CompileHook = (shader) =>
         injectFoliageEdgeFade(shader, range, snow, fromBelow);
+      const fadeKey = `woc-edge-fade:${range[0].toFixed(3)}:${range[1].toFixed(3)}:${snow ? 1 : 0}:${fromBelow ? 1 : 0}`;
       mat.userData.wocBaseCompile = fadeHook;
+      mat.userData.wocBaseCacheKey = fadeKey;
       mat.onBeforeCompile = fadeHook;
-      mat.customProgramCacheKey = () => `${mat.uuid}:woc-edge-fade`;
+      mat.customProgramCacheKey = () => fadeKey;
       n++;
     }
   });

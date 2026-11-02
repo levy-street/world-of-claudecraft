@@ -231,6 +231,22 @@ this jayson release.
 **Retire this entry when** `jayson` bumps its own `stream-json` dependency to
 `>=3.5.0` (adopting the v3 API surface) or drops `stream-json` entirely.
 
+### GHSA-gcqx-w48m-w2h4: deepmerge mergeObject() allows prototype poisoning of returned objects
+
+**Reviewed 2026-10-29. Severity** low. **Path**
+`@sveltejs/vite-plugin-svelte > deepmerge` (deepmerge 4.3.1).
+The [advisory](https://github.com/advisories/GHSA-gcqx-w48m-w2h4) affects
+`>=4.2.0 <=4.3.1` and lists no patched version (`patched_versions: <0.0.0`).
+
+**Not reachable here.** `@sveltejs/vite-plugin-svelte` is a build-time Vite
+plugin that invokes `deepmerge` only when merging trusted developer-controlled
+Vite and Svelte plugin configuration objects in `vite.config.ts` and
+`svelte.config.js`. It is never bundled into the client or loaded by the game
+server at runtime, and never merges untrusted user input.
+
+**Retire this entry when** a patched `deepmerge` release ships or
+`@sveltejs/vite-plugin-svelte` drops `deepmerge`.
+
 ## The re-mint chore any dependency change triggers
 
 `pnpm-lock.yaml` is a fingerprinted source input of the Eastbrook, Fenbridge,

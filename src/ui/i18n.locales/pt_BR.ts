@@ -25944,4 +25944,230 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.stackUnavailable':
     'Não é possível adicionar tempo de assinatura no momento. Tente novamente em breve.',
   'hudChrome.wocStore.subscription.tokenPrice': '{price} por 30 dias',
+  'errors.api.worldFightHold':
+    'Outro personagem desta conta ainda está no mundo após um combate. Tente novamente em alguns minutos.',
+  'hudChrome.auraEffect.gourdlight.thatchbound':
+    'Velho Thatchgrin puxa suas cordas. Você não pode agir: é levado até o aliado mais próximo e o ataca a cada {every} s, causando de {min} a {max} de dano (até {mult} vezes esse valor contra um aliado de nível {level}). Termina antes se você sofrer dano equivalente a {pct}% da sua vida máxima ou se um aliado dissipar o efeito (Magia).',
+  'hudChrome.auraEffect.seasonalCosmetic': 'Apenas cosmético: não afeta o combate',
+  'hudChrome.auraEffect.slumberNight':
+    'Fica pendurado sem vida em seu poste até anoitecer. Não pode ser atacado.',
+  'hudChrome.auraEffect.stilledMindCrit':
+    'Sua próxima Fratura Mental ou Ruptura do Vazio será um acerto crítico garantido se atingir o alvo. Outros feitiços não consomem este bônus. Ruptura do Vazio ainda consome 3 cargas de Dízimo sombrio. Um lançamento resistido consome o bônus.',
+  'hudChrome.mounts.desc_emberbristle_broom':
+    'Uma vassoura da colheita amarrada com uma fita laranja, que flutua a um palmo do chão e solta brasas de suas cerdas. Uma recompensa permanente da Noite das Abóboras.',
+  'hudChrome.mounts.name_emberbristle_broom': 'Vassoura de cerdas em brasa',
+  'hudChrome.worldBoss.sleepUntilNightfall': '{name} dorme até anoitecer.',
+  'hudChrome.priest.bombLabel': 'Bomba do dízimo',
+  'hudChrome.priest.bombReady': 'Pronta',
+  'hudChrome.priest.bombStatus': '{value} de {max} cargas de Bomba do dízimo',
+  'hudChrome.priest.bombTooltip':
+    'Bomba do dízimo: gere 20 cargas de Dízimo sombrio para preparar uma bomba. Gastar Dízimo sombrio não aumenta o progresso. O progresso persiste entre combates. Morrer ou iniciar um combate contra um chefe de raide o reinicia. Um lançamento concluído consome a bomba; cancelá-lo a preserva.',
+  'hudChrome.priest.chargeCount': '{value} / {max}',
+  'hudChrome.priest.gloomtitheLabel': 'Dízimo sombrio',
+  'hudChrome.priest.gloomtitheStatus': '{value} de {max} Dízimo sombrio',
+  'hudChrome.priest.gloomtitheTooltip':
+    'Dízimo sombrio: até 5 cargas para gastar. Ruptura do Vazio consome 3; Toque vampírico consome 2 para causar 30% a mais de dano; Invocar Demônio do Dízimo consome toda a sua reserva. Gerar cargas também preenche a Bomba do dízimo, mesmo com a reserva cheia.',
+  'entities.abilities.choir_of_deliverance.specNote_shadow':
+    'Por 15 s, distribui como cura 20% da vida que os inimigos perdem para seu dano de Sombra entre os membros feridos do grupo em um raio de 30 metros, incluindo você. Em raides, apenas seu subgrupo é curado. Lançamento instantâneo, permitindo continuar atacando na forma sombria. Dano absorvido e dano excedente à vida restante não geram cura.',
+  'entities.abilities.inner_focus.specNote_shadow':
+    'Também reserva um acerto crítico garantido para sua próxima Fratura Mental ou Ruptura do Vazio em até 60 s, se atingir o alvo. Outros feitiços não consomem este bônus. Ruptura do Vazio ainda consome 3 cargas de Dízimo sombrio. Um lançamento resistido consome o bônus de acerto crítico.',
+  'entities.abilities.spirit_bomb.description':
+    'Detona uma bomba espiritual em um inimigo, causando {damage} de dano de Sombra aos inimigos em um raio de 8 metros desse alvo. O dano aumenta com o poder mágico, pode causar acertos críticos e é reduzido quando há mais de 5 alvos. Gere 20 cargas de Dízimo sombrio para preparar uma bomba. A geração conta mesmo ao manter o máximo de 5 cargas; gastá-las não é necessário e não aumenta o progresso. O progresso persiste entre combates, até uma bomba preparada. Morrer elimina seu progresso e sua bomba preparada. Concluir o lançamento consome a bomba preparada, mesmo se houver resistência. Cancelar ou interromper o lançamento a preserva. Iniciar um confronto com um chefe de raide elimina seu progresso e sua bomba preparada. Não é possível iniciar um confronto com um chefe de raide usando este feitiço.',
+  'entities.abilities.spirit_bomb.name': 'Bomba do dízimo',
+  'entities.abilities.vampiric_touch.description':
+    'Causa {damage} de dano de Sombra ao longo de 15 s, com um efeito a cada 3 s. O dano aumenta com o poder mágico e os efeitos periódicos podem causar acertos críticos. Cada efeito distribui uma cura equivalente a 20% da vida perdida pelo inimigo entre você e os membros feridos do grupo em um raio de 30 metros; em raides, apenas seu subgrupo recebe essa cura. Se você tiver pelo menos 2 cargas de Dízimo sombrio, aplicar este efeito consome 2 para aumentar todo o dano dele em 30%.',
+  'entities.abilities.vampiric_touch.name': 'Toque vampírico',
+  'entities.abilities.void_rupture.description':
+    'Consome 3 cargas de Dízimo sombrio para dilacerar um inimigo e causar {damage} de dano de Sombra. O dano aumenta com o poder mágico e pode causar acertos críticos. Requer 3 cargas e as consome mesmo se houver resistência.',
+  'entities.abilities.void_rupture.name': 'Ruptura do Vazio',
+  'entities.items.batwing_draught.name': 'Poção esvoaçante',
+  'entities.items.carved_pumpkin_head.name': 'Cabeça de abóbora esculpida',
+  'entities.items.crabapple_chew.name': 'Bala mastigável de maçã silvestre',
+  'entities.items.cursed_candle_stub.name': 'Toco de vela amaldiçoada',
+  'entities.items.emberwoven_sheaf.name': 'Feixe entretecido de brasas',
+  'entities.items.gourdlight_crow_feather.name': 'Pena de corvo da Noite das Abóboras',
+  'entities.items.gourdlight_sweet.name': 'Doce da Noite das Abóboras',
+  'entities.items.gourdlight_treat_pouch.name': 'Saquinho de doces da Noite das Abóboras',
+  'entities.items.gourdseed_brittle.name': 'Crocante de sementes de abóbora',
+  'entities.items.gurglegreen_cauldron.name': 'Caldeirão Borbulhaverde',
+  'entities.items.haunting_draught.name': 'Poção assombrada',
+  'entities.items.hearthroot_toffee.name': 'Caramelo de raiz da lareira',
+  'entities.items.jar_of_mischief.name': 'Pote de travessuras',
+  'entities.items.lantern_mint_drop.name': 'Bala de hortelã da lanterna',
+  'entities.items.murmurwick_candle.name': 'Vela de pavio murmurante',
+  'entities.items.owlwatch_fudge.name': 'Doce cremoso da coruja vigia',
+  'entities.items.prankers_pumpkin.name': 'Abóbora do brincalhão',
+  'entities.items.rattlebone_draught.name': 'Poção de ossos chocalhantes',
+  'entities.items.reins_emberbristle_broom.name': 'Vassoura de cerdas em brasa',
+  'entities.items.sack_of_startled_bats.name': 'Saco de morcegos assustados',
+  'entities.items.strawling_charm.name': 'Amuleto do palhudo',
+  'entities.items.thatchgrin_patch_pumpkin.name': 'Abóbora da horta',
+  'entities.items.thatchgrin_sweet_sack.name': 'Saco de doces de Thatchgrin',
+  'entities.items.wanderwisp_lantern.name': 'Lanterna do fogo-fátuo errante',
+  'entities.items.writ_of_the_gourdlit.name': 'Escrito do Iluminado pelas Abóboras',
+  'entities.items.writ_of_the_hollow_grin.name': 'Escrito do Sorriso Oco',
+  'entities.items.writ_of_the_trickster.name': 'Escrito do Travesso',
+  'entities.mobs.gourdlight_crow.name': 'Corvo da Noite das Abóboras',
+  'entities.mobs.gourdlight_strawling.name': 'Palhudo',
+  'entities.mobs.gourdlight_swelling_gourd.name': 'Abóbora inchada',
+  'entities.mobs.gourdlight_thatchgrin.name': 'Velho Thatchgrin',
+  'entities.npcs.gourdlight_keeper.greeting':
+    'As abóboras estão acesas e as lanternas penduradas, então só pode ser a Noite das Abóboras. Bata às portas dos moradores de Eastbrook, Fenbridge e Highwatch e diga as palavras: doces ou travessuras. A maioria dará um doce. Alguns farão uma travessura com você. Traga os doces para mim, em qualquer uma das minhas barracas, e eu os trocarei por algo para vestir.',
+  'entities.npcs.gourdlight_keeper.name': 'Hester Gourdwick',
+  'entities.npcs.gourdlight_keeper.title': 'Guardiã da Noite das Abóboras',
+  'entities.quests.q_gourdlight_daily_baskets.completion':
+    'As três entregues, e ouvi dizer que Marlow chorou. Ele sempre chora. Aqui está uma cesta só sua.',
+  'entities.quests.q_gourdlight_daily_baskets.objectives.0.label':
+    'Cesta entregue ao cozinheiro Marlow',
+  'entities.quests.q_gourdlight_daily_baskets.objectives.1.label':
+    'Cesta entregue à Herbalista Yara',
+  'entities.quests.q_gourdlight_daily_baskets.objectives.2.label':
+    'Cesta entregue ao mestre do saber Caddis',
+  'entities.quests.q_gourdlight_daily_baskets.text':
+    'Toda Noite das Abóboras eu encho uma cesta de doces para um velho amigo em cada cidade, e meus joelhos já não são os mesmos. Entregue-as por mim, {playerName}: ao cozinheiro Marlow em Eastbrook, à Herbalista Yara em Fenbridge e ao mestre do saber Caddis lá em Highwatch.',
+  'entities.quests.q_gourdlight_daily_baskets.title': 'Cestas para os vizinhos',
+  'entities.quests.q_gourdlight_daily_boo.completion':
+    'Três? Ouvi o cozinheiro derrubar uma frigideira do outro lado da praça. Muito bem. Aqui está sua parte.',
+  'entities.quests.q_gourdlight_daily_boo.objectives.0.label': 'Moradores assustados',
+  'entities.quests.q_gourdlight_daily_boo.text':
+    'Ninguém nestas cidades levou um bom susto em um ano, {playerName}, e uma Noite das Abóboras sem sustos é só uma noite fria. Vista uma fantasia, qualquer uma das minhas serve, ou aquela cabeça de abóbora se você ganhou uma. Depois se aproxime de fininho de três moradores e dê um belo BU! bem alto.',
+  'entities.quests.q_gourdlight_daily_boo.title': 'Bu!',
+  'entities.quests.q_gourdlight_daily_feathers.completion':
+    'Negras como um campo sem lua, e já cheiram a fumaça. A fogueira será um espetáculo. Obrigada.',
+  'entities.quests.q_gourdlight_daily_feathers.objectives.0.label': 'Penas de corvo',
+  'entities.quests.q_gourdlight_daily_feathers.text':
+    'Quando o Velho Thatchgrin fica encurralado, chama seus corvos sobre quem estiver batendo em sua palha. As penas deles queimam com uma chama verde na lareira, e preciso de três para a fogueira desta noite. Encontre uma briga na horta dele, {playerName}, e arranque-as de seus corvos.',
+  'entities.quests.q_gourdlight_daily_feathers.title': 'Penas para o fogo',
+  'entities.quests.q_gourdlight_daily_patch.completion':
+    'Cinco bem redondas, sem uma única mordida. Vai ter torta para todo o Vale. Tome, pelo trabalho.',
+  'entities.quests.q_gourdlight_daily_patch.objectives.0.label': 'Abóboras da horta',
+  'entities.quests.q_gourdlight_daily_patch.text':
+    'A horta do Velho Thatchgrin além do Campo dos javalis está cheia de abóboras, e metade rolou para longe da palha dele, onde alguém cuidadoso pode alcançá-las. Traga cinco para mim, {playerName}. Mantenha distância do velho espantalho. Ele conta uma por uma.',
+  'entities.quests.q_gourdlight_daily_patch.title': 'Abóboras da horta',
+  'entities.quests.q_gourdlight_daily_towns.completion':
+    'Três cidades em uma noite! Suas botas mereceram isto mais do que você.',
+  'entities.quests.q_gourdlight_daily_towns.objectives.0.label': 'Uma porta visitada em Eastbrook',
+  'entities.quests.q_gourdlight_daily_towns.objectives.1.label': 'Uma porta visitada em Fenbridge',
+  'entities.quests.q_gourdlight_daily_towns.objectives.2.label': 'Uma porta visitada em Highwatch',
+  'entities.quests.q_gourdlight_daily_towns.text':
+    'As crianças dizem que um verdadeiro andarilho das Abóboras bate às portas de todas as cidades antes do fim da noite. Prove que elas estão certas, {playerName}. Peça doces ou travessuras em uma porta de Eastbrook, uma de Fenbridge e uma de Highwatch. As lanternas nas estradas iluminarão seu caminho.',
+  'entities.quests.q_gourdlight_daily_towns.title': 'Uma porta em cada cidade',
+  'entities.quests.q_gourdlight_daily_wicks.completion':
+    'Seis tocos, frios como geada. Quem os acendeu vai ter que se esforçar mais. Pegue isto e lave as mãos.',
+  'entities.quests.q_gourdlight_daily_wicks.objectives.0.label': 'Velas amaldiçoadas apagadas',
+  'entities.quests.q_gourdlight_daily_wicks.text':
+    'Alguém anda colocando velas de chamas verdes aos pés dos nossos postes. Elas queimam sem derreter e sussurram quando você vira as costas. Apague seis para mim, {playerName}, em qualquer uma das três cidades, e traga os tocos.',
+  'entities.quests.q_gourdlight_daily_wicks.title': 'Pavios perversos',
+  'entities.quests.q_gourdlight_rounds.completion':
+    'Cinco portas e você ainda tem todos os dedos. Tome, um saquinho de doces para a volta para casa. Volte amanhã, as portas abrirão de novo.',
+  'entities.quests.q_gourdlight_rounds.objectives.0.label': 'Portas visitadas',
+  'entities.quests.q_gourdlight_rounds.text':
+    'Toda Noite das Abóboras as crianças do Vale fazem sua ronda, e este ano você vai com elas, {playerName}. Bata em cinco portas nas nossas cidades, diga as palavras e veja o que recebe. Volte para falar comigo quando terminar.',
+  'entities.quests.q_gourdlight_rounds.title': 'Ronda da Noite das Abóboras',
+  'guide.interfacePage.framesGovernedPriest':
+    'Editar quadros também permite mover o medalhão de Dízimo sombrio e Bomba do dízimo do sacerdote de Sombra.',
+  'guide.worldPvpPage.hillBodyTwoHour':
+    'Uma vez a cada duas horas, em um momento imprevisível, todo o reino é avisado de que uma colina surgirá em uma das zonas do norte em quinze minutos, e o círculo onde ficará é marcado em terreno aberto. Ao surgir, ela permanece por trinta minutos e depois desaparece. Enquanto está presente, o reino recebe a cada cinco minutos sua localização e os grupos que a controlaram por mais tempo. O grupo com mais jogadores dentro do círculo disputa a colina e a conquista após trinta segundos de maioria. A entrada de um grupo rival apenas pausa a contagem até o seu grupo voltar à frente; ela só recomeça se nenhum integrante vivo do seu grupo permanecer dentro. Um jogador sozinho conta como um grupo de uma pessoa e mantém a colina ao formar um grupo, mas integrantes de raides não contam. Enquanto um grupo controla a colina, cada integrante dentro do círculo ganha a mesma quantidade de Honra por minuto, independentemente de há quanto tempo a controla. Assim, um grupo completo que a mantenha sem oposição durante toda a duração ganha aproximadamente o mesmo que em duas vitórias em campos de batalha. Quando a colina desaparece, se o grupo que a controlou por mais tempo no total a manteve por pelo menos dez minutos, todos que ficaram dentro para aquele grupo por pelo menos um minuto e ainda fazem parte dele ganham uma vitória para a linha JxJ do Cofre Semanal. Uma barra sobre o campo mostra quem a controla, seus números contra os adversários e o tempo de disputa; /hill no chat informa a localização.',
+  'seasonal.boo.already': '{name} já levou sustos suficientes por hoje.',
+  'seasonal.boo.flash': 'BU! {name} levou um susto!',
+  'seasonal.boo.frightenedHint':
+    '{name} ainda está assustado desde seu último susto. Procure outra pessoa.',
+  'seasonal.boo.landed':
+    'Você salta na frente de {name} com um BU! Um grito ecoa e quase tudo vai ao chão.',
+  'seasonal.boo.needsCostume':
+    'Vista uma fantasia primeiro: uma poção de fantasia, uma travessura de morcego ou esqueleto, o Amuleto do palhudo, a Cabeça de abóbora esculpida ou um gole de goblin do Caldeirão Borbulhaverde.',
+  'seasonal.boo.noCostume': 'Sem fantasia, {name} só ri de você. Vista uma primeiro.',
+  'seasonal.boo.notOnErrand': 'Hester não pediu para você assustar ninguém hoje.',
+  'seasonal.boo.row': 'Bu!',
+  'seasonal.boo.rowAria': 'Salte na frente de {name} e grite bu',
+  'seasonal.boundItemGone':
+    'A Noite das Abóboras acabou e seu item {item} se desfaz em palha novamente.',
+  'seasonal.costume': 'Você bebe a poção e se transforma: {trick}!',
+  'seasonal.event.gourdlight_eve.name': 'Noite das Abóboras',
+  'seasonal.guise': 'O amuleto crepita e a palha cobre você: {trick}!',
+  'seasonal.itemSource.pumpkinHead':
+    'Deixada pelo Velho Thatchgrin, em sua plantação de abóboras além do Campo dos javalis, na primeira vez que você o saqueia. Nenhum vendedor a vende.',
+  'seasonal.itemUse.broomSources':
+    'Comprada de Hester Gourdwick por {count} Feixes entretecidos de brasas ou, raramente, deixada pelo Velho Thatchgrin em um dia em que você o saqueia. Montá-la requer a habilidade de montaria. É mantida permanentemente e pode ser montada o ano inteiro.',
+  'seasonal.itemUse.costumeBat':
+    'Uso: transforma você em um morcego esvoaçante por {minutes} minutos. Consumida ao usar. Não pode ser usada em combate; entrar em combate encerra o efeito. Cosmética.',
+  'seasonal.itemUse.costumeGhost':
+    'Uso: transforma você em um fantasma flutuante por {minutes} minutos. Consumida ao usar. Não pode ser usada em combate; entrar em combate encerra o efeito. Cosmética.',
+  'seasonal.itemUse.costumeSkeleton':
+    'Uso: transforma você em um esqueleto chocalhante por {minutes} minutos. Consumida ao usar. Não pode ser usada em combate; entrar em combate encerra o efeito. Cosmética.',
+  'seasonal.itemUse.pouch': 'Uso: abra para receber {count} Doces da Noite das Abóboras.',
+  'seasonal.itemUse.pumpkinHead':
+    'Uso: coloque ou retire uma abóbora esculpida e iluminada por dentro, usada sobre o elmo. Cosmética.',
+  'seasonal.itemUse.sheaf':
+    'O Velho Thatchgrin dá um a cada dia em que você o saqueia, até você possuir a Vassoura de cerdas em brasa. Hester Gourdwick troca {count} pela vassoura em suas barracas em Eastbrook, Fenbridge e Highwatch. Os feixes não gastos são mantidos para a próxima Noite das Abóboras.',
+  'seasonal.itemUse.strawlingCharm':
+    'Uso: transforma você em um dos palhudos do Velho Thatchgrin por {seconds} segundos. Não pode ser usado em combate. Nunca é consumido. Cosmético.',
+  'seasonal.itemUse.sweet':
+    'Obtido ao pedir doces ou travessuras durante a Noite das Abóboras. Hester Gourdwick os troca por cosméticos em suas barracas em Eastbrook, Fenbridge e Highwatch.',
+  'seasonal.itemUse.titleWrit':
+    'Uso: concede o título {title} a este personagem, equipado pelo Livro dos Feitos. Consumido ao usar. Mantido se você já tiver o título.',
+  'seasonal.itemUse.toyBats':
+    'Uso: abra o saco. Um enxame de morcegos guinchantes sai e se espalha ao seu redor por {seconds} segundos. Não pode ser usado em combate ou em furtividade. Nunca é consumido: pode ser usado novamente após {cooldown} segundos. É mantido permanentemente e pode ser usado o ano inteiro. Cosmético.',
+  'seasonal.itemUse.toyCandleShadows':
+    'Uso: acenda a vela à sua frente. Por {seconds} segundos, suas chamas projetam sombras dançantes de um gato, um morcego e uma bruxa no chão ao redor, visíveis para todos por perto. Não pode ser usada em combate ou em furtividade. Nunca é consumida: pode ser usada novamente após {cooldown} segundos. É mantida permanentemente e pode ser usada o ano inteiro. Cosmética.',
+  'seasonal.itemUse.toyCauldron':
+    'Uso: coloque um grande caldeirão borbulhante à sua frente. Ele permanece por {standing} segundos, e qualquer jogador que beber dele explode em bolhas verdes e vira um goblin por {seconds} segundos, substituindo qualquer fantasia que esteja usando. Não é possível colocá-lo nem beber dele em combate ou em furtividade; entrar em combate encerra a forma de goblin. Nunca é consumido: pode ser usado novamente após {cooldown} segundos. É mantido permanentemente e pode ser usado o ano inteiro. Cosmético.',
+  'seasonal.itemUse.toyLantern':
+    'Uso: coloque a lanterna à sua frente. Um pequeno fantasma circula ao seu redor por {seconds} segundos. Não pode ser usada em combate ou em furtividade. Nunca é consumida: pode ser usada novamente após {cooldown} segundos. É mantida permanentemente e pode ser usada o ano inteiro. Cosmética.',
+  'seasonal.itemUse.toyPrank':
+    'Uso: jogue em outro jogador visível a até {range} metros. A cabeça dele vira uma abóbora iluminada por {seconds} segundos, e ele pode removê-la com o botão direito. Nenhum dos dois pode estar em combate e você não pode estar em furtividade. Nunca é consumida: pode ser usada novamente após {cooldown} segundos. É mantida permanentemente e pode ser usada o ano inteiro. Cosmética.',
+  'seasonal.itemUse.trickJar':
+    'Uso: faz uma travessura aleatória e inofensiva com você por alguns segundos. Cosmético.',
+  'seasonal.jarTrick': 'O pote se abre de repente: {trick}!',
+  'seasonal.pumpkinHead.off': 'Você tira a Cabeça de abóbora esculpida.',
+  'seasonal.pumpkinHead.on': 'Você coloca a Cabeça de abóbora esculpida.',
+  'seasonal.pumpkins.flash': 'Abóbora assombrada encontrada! {count}/{total}',
+  'seasonal.pumpkins.found':
+    'Você acende uma Abóbora assombrada em {zone}: {count}/{total}. Doces da Noite das Abóboras recebidos: {sweets}.',
+  'seasonal.pumpkins.name': 'Abóbora assombrada',
+  'seasonal.pumpkins.progress': '{label}: {current}/{total}',
+  'seasonal.pumpkins.title': 'Abóboras assombradas',
+  'seasonal.pumpkins.world': 'Mundo',
+  'seasonal.thatchgrin.poleBound': 'Preso ao poste',
+  'seasonal.thatchgrin.sleepYell': 'O sol nasceu. De volta ao poste, de volta à vigia.',
+  'seasonal.thatchgrin.wakeYell': 'A NOITE cai sobre a horta! Quem anda pelo MEU campo?',
+  'seasonal.titleGranted': 'Você lê o escrito. Novo título obtido: {title}.',
+  'seasonal.titleKnown': 'Você já possui esse título, então mantém o escrito.',
+  'seasonal.tokenPrice': '{count} {item}',
+  'seasonal.toy.bats': 'Você abre o saco e um enxame de morcegos assustados sai voando!',
+  'seasonal.toy.candleShadows':
+    'Você acende a vela e as sombras começam a dançar ao redor das chamas.',
+  'seasonal.toy.cauldron': 'Você coloca o caldeirão no chão e ele começa a borbulhar.',
+  'seasonal.toy.cauldronDrink':
+    'Você bebe do caldeirão, explode em bolhas verdes e vira um goblin!',
+  'seasonal.toy.hidden': 'Saia das sombras primeiro: um brinquedo entregaria você.',
+  'seasonal.toy.lantern':
+    'Você coloca a lanterna no chão e um pequeno fantasma sai flutuando para lhe fazer companhia.',
+  'seasonal.toy.prank': 'Você joga a abóbora. Ela se espatifa em {name}!',
+  'seasonal.toy.prankNeedsPlayer':
+    'A abóbora só se espatifa em outro jogador que não esteja em combate.',
+  'seasonal.toy.pranked':
+    '{name} espatifa uma abóbora na sua cabeça! Tire-a com o botão direito ou use com orgulho.',
+  'seasonal.toy.prankedFlash': '{name} fez uma travessura com você!',
+  'seasonal.trickOrTreat.alreadyKnocked': 'Você já pediu doces ou travessuras a {name} hoje.',
+  'seasonal.trickOrTreat.knockedHint':
+    'Você já bateu aqui hoje. A porta abre novamente após a reinicialização diária.',
+  'seasonal.trickOrTreat.notActive': 'A Noite das Abóboras não está acontecendo no momento.',
+  'seasonal.trickOrTreat.row': 'Doces ou travessuras!',
+  'seasonal.trickOrTreat.rowAria': 'Peça doces ou travessuras a {name}',
+  'seasonal.trickOrTreat.tooFar': 'Chegue mais perto para bater.',
+  'seasonal.trickOrTreat.treat': '{name} entrega um doce a você.',
+  'seasonal.trickOrTreat.treatFlash.few': 'Doces! {count} Doces da Noite das Abóboras',
+  'seasonal.trickOrTreat.treatFlash.many': 'Doces! {count} Doces da Noite das Abóboras',
+  'seasonal.trickOrTreat.treatFlash.one': 'Doces! {count} Doce da Noite das Abóboras',
+  'seasonal.trickOrTreat.treatFlash.other': 'Doces! {count} Doces da Noite das Abóboras',
+  'seasonal.trickOrTreat.trick': '{name} faz uma travessura com você: {trick}!',
+  'seasonal.trickOrTreat.trickFlash': 'Travessura! {trick}',
+  'seasonal.tricks.gourdlight_costume_bat': 'Fantasia de morcego',
+  'seasonal.tricks.gourdlight_costume_ghost': 'Fantasia de fantasma',
+  'seasonal.tricks.gourdlight_costume_skeleton': 'Fantasia de esqueleto',
+  'seasonal.tricks.gourdlight_trick_bat': 'Loucura de morcego',
+  'seasonal.tricks.gourdlight_trick_fumes': 'Vapores verdes',
+  'seasonal.tricks.gourdlight_trick_skeleton': 'Ossos chocalhantes',
+  'seasonal.tricks.gourdlight_trick_strawling': 'Disfarce de palhudo',
 };

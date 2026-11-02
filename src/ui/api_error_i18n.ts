@@ -395,6 +395,8 @@ export function userFacingApiError(err: unknown): string {
     return t('errors.api.vaultMailRecovering');
   if (normalized === 'too many characters on this account are already in the world')
     return t('errors.api.accountSessionLimit');
+  if (normalized === 'another character on this account is still in the world after a fight')
+    return t('errors.api.worldFightHold');
   if (normalized === 'character taken over') return t('errors.api.takenOver');
   if (normalized === 'this character must be renamed before entering the world.')
     return t('errors.api.renameBeforeEntering');

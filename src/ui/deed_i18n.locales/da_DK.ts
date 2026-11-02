@@ -1330,4 +1330,49 @@ export const table: DeedLocaleTable = {
     desc: 'Købes hos Garrick Holt, Lygtehallens kvartermester, for 24 lygtesegl.',
     title: 'fra Lygtehallen',
   },
+  feat_gourdlight_guise: {
+    name: 'Græskarlygternes forklædning',
+    desc: 'Ej et Udskåret græskarhoved taget fra Gamle Halmgrin på hans mark forbi Vildsvineengen under Græskarlygternes aften.',
+  },
+  feat_old_thatchgrin: {
+    name: 'Stubbe og aske',
+    desc: 'Hjælp med at besejre Gamle Halmgrin på hans græskarmark forbi Vildsvineengen under Græskarlygternes aften.',
+  },
+  feat_title_gourdlit: {
+    name: 'Den græskarlyste',
+    desc: 'Læs Græskarlystes brev, byttet hos Hester Græskarvæge for Græskarlygteslik under Græskarlygternes aften.',
+    title: 'den græskarlyste',
+  },
+  feat_title_trickster: {
+    name: 'Spøgefugl',
+    desc: 'Læs Spøgefuglens brev, byttet hos Hester Græskarvæge for Græskarlygteslik under Græskarlygternes aften.',
+    title: 'Spøgefugl',
+  },
+  feat_title_hollow_grinned: {
+    name: 'Den hult grinende',
+    desc: 'Læs Det Hule Grins brev, byttet hos Hester Græskarvæge for Græskarlygteslik under Græskarlygternes aften.',
+    title: 'den hult grinende',
+  },
+  feat_pumpkin_hunter: {
+    name: 'Græskarjæger',
+    desc: 'Find alle Hjemsøgte græskar, som er skjult rundt om i verden under Græskarlygternes aften.',
+    title: 'den hule',
+  },
+  feat_gourdlight_doorsteps: {
+    name: 'Hver eneste dørtærskel',
+    desc: 'Sig slik eller ballade til hver byboer, som åbner døren i Østbæk, Sumpbroen og Højvagten under Græskarlygternes aften.',
+  },
+  feat_gourdlight_errands: {
+    name: 'Til Hesters tjeneste',
+    desc: 'Gennemfør hvert af Hester Græskarvæges skiftende ærinder under Græskarlygternes aften mindst én gang.',
+  },
+  feat_gourdlight_frights: {
+    name: 'Tre forskrækkede byer',
+    desc: 'Under Hesters ærinde Bøh! skal du forskrække en byboer i hver af byerne Østbæk, Sumpbroen og Højvagten.',
+  },
+  feat_gourdlight_eve_complete: {
+    name: 'Græskarlygter fra start til slut',
+    desc: 'Gennemfør hele Græskarlygternes aften: besejr Gamle Halmgrin, find alle Hjemsøgte græskar, afslut alle Hesters ærinder, bank på alle døre, og forskræk en byboer i hver af de tre byer.',
+    title: 'den græskarsvorne',
+  },
 };

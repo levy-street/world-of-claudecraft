@@ -26166,4 +26166,230 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.stackUnavailable':
     "Al momento non è possibile aggiungere tempo all'abbonamento. Riprova tra poco.",
   'hudChrome.wocStore.subscription.tokenPrice': '{price} per 30 giorni',
+  'errors.api.worldFightHold':
+    'Un altro personaggio di questo account è ancora nel mondo dopo un combattimento. Riprova tra qualche minuto.',
+  'hudChrome.auraEffect.gourdlight.thatchbound':
+    'Vecchio Thatchgrin tira i tuoi fili. Non puoi agire: vieni condotto verso l’alleato più vicino e lo colpisci ogni {every} s, infliggendo da {min} a {max} danni (fino a {mult} volte tanto contro un alleato di livello {level}). Termina in anticipo se subisci danni pari al {pct}% della tua salute massima o se un alleato dissolve l’effetto (Magia).',
+  'hudChrome.auraEffect.seasonalCosmetic': 'Solo cosmetico: nessun effetto sul combattimento',
+  'hudChrome.auraEffect.slumberNight':
+    'Pende inerte dal suo palo fino al calare della notte. Non può essere attaccato.',
+  'hudChrome.auraEffect.stilledMindCrit':
+    'La tua prossima Frattura Mentale o Rottura del Vuoto infligge un colpo critico garantito se va a segno. Gli altri incantesimi non consumano questo bonus. Rottura del Vuoto consuma comunque 3 cariche di Decima oscura. Un lancio resistito consuma il bonus.',
+  'hudChrome.mounts.desc_emberbristle_broom':
+    'Una scopa del raccolto legata con un nastro arancione, che fluttua a un palmo dal suolo e sparge braci dalle setole. Una ricompensa permanente della Notte delle zucche.',
+  'hudChrome.mounts.name_emberbristle_broom': 'Scopa dalle setole ardenti',
+  'hudChrome.worldBoss.sleepUntilNightfall': '{name} dorme fino al calare della notte.',
+  'hudChrome.priest.bombLabel': 'Bomba della decima',
+  'hudChrome.priest.bombReady': 'Pronta',
+  'hudChrome.priest.bombStatus': '{value} cariche di Bomba della decima su {max}',
+  'hudChrome.priest.bombTooltip':
+    'Bomba della decima: genera 20 cariche di Decima oscura per preparare una bomba. Spendere Decima oscura non aggiunge progressi. I progressi persistono tra i combattimenti. Morire o iniziare uno scontro con un boss d’incursione li azzera. Un lancio completato consuma la bomba; annullarlo la conserva.',
+  'hudChrome.priest.chargeCount': '{value} / {max}',
+  'hudChrome.priest.gloomtitheLabel': 'Decima oscura',
+  'hudChrome.priest.gloomtitheStatus': '{value} cariche di Decima oscura su {max}',
+  'hudChrome.priest.gloomtitheTooltip':
+    'Decima oscura: fino a 5 cariche spendibili. Rottura del Vuoto ne consuma 3; Tocco vampirico ne consuma 2 per infliggere il 30% di danni in più; Evoca Demone della Decima consuma l’intera riserva. Generare cariche fa progredire anche la Bomba della decima, persino quando la riserva è piena.',
+  'entities.abilities.choir_of_deliverance.specNote_shadow':
+    'Per 15 s, distribuisce come cure il 20% della salute persa dai nemici a causa dei tuoi danni da Ombra tra i membri feriti del gruppo entro 30 metri, te compreso. Nelle incursioni cura solo il tuo sottogruppo. Lancio istantaneo: puoi continuare ad attaccare in forma d’Ombra. I danni assorbiti e quelli eccedenti la salute rimasta non generano cure.',
+  'entities.abilities.inner_focus.specNote_shadow':
+    'Riserva inoltre un colpo critico garantito per la tua prossima Frattura Mentale o Rottura del Vuoto entro 60 s, se va a segno. Gli altri incantesimi non consumano questo bonus. Rottura del Vuoto consuma comunque 3 cariche di Decima oscura. Un lancio resistito consuma il bonus al colpo critico.',
+  'entities.abilities.spirit_bomb.description':
+    'Fa esplodere una bomba spirituale su un nemico, infliggendo {damage} danni da Ombra ai nemici entro 8 metri da quel bersaglio. I danni aumentano con la potenza magica, possono essere critici e vengono ridotti oltre i 5 bersagli. Genera 20 cariche di Decima oscura per preparare una bomba. La generazione conta anche quando possiedi il massimo di 5 cariche; spenderle non è necessario e non aggiunge progressi. I progressi persistono tra i combattimenti, fino a una bomba preparata. Morire azzera i progressi ed elimina la bomba preparata. Completare il lancio consuma la bomba preparata, anche se l’incantesimo viene resistito. Annullare o interrompere il lancio la conserva. Iniziare uno scontro con un boss d’incursione azzera i progressi ed elimina la bomba preparata. Non puoi iniziare uno scontro con un boss d’incursione con questo incantesimo.',
+  'entities.abilities.spirit_bomb.name': 'Bomba della decima',
+  'entities.abilities.vampiric_touch.description':
+    'Infligge {damage} danni da Ombra nell’arco di 15 s, con un effetto ogni 3 s. I danni aumentano con la potenza magica e gli effetti periodici possono essere critici. Ogni effetto distribuisce cure pari al 20% della salute persa dal nemico tra te e i membri feriti del gruppo entro 30 metri; nelle incursioni riceve queste cure solo il tuo sottogruppo. Se possiedi almeno 2 cariche di Decima oscura, applicare questo effetto ne consuma 2 per aumentare tutti i suoi danni del 30%.',
+  'entities.abilities.vampiric_touch.name': 'Tocco vampirico',
+  'entities.abilities.void_rupture.description':
+    'Consuma 3 cariche di Decima oscura per squarciare un nemico e infliggergli {damage} danni da Ombra. I danni aumentano con la potenza magica e possono essere critici. Richiede 3 cariche e le consuma anche se l’incantesimo viene resistito.',
+  'entities.abilities.void_rupture.name': 'Rottura del Vuoto',
+  'entities.items.batwing_draught.name': 'Intruglio svolazzante',
+  'entities.items.carved_pumpkin_head.name': 'Testa di zucca intagliata',
+  'entities.items.crabapple_chew.name': 'Caramella gommosa alla mela selvatica',
+  'entities.items.cursed_candle_stub.name': 'Mozzicone di candela maledetta',
+  'entities.items.emberwoven_sheaf.name': 'Covone intessuto di braci',
+  'entities.items.gourdlight_crow_feather.name': 'Piuma di corvo della Notte delle zucche',
+  'entities.items.gourdlight_sweet.name': 'Dolcetto della Notte delle zucche',
+  'entities.items.gourdlight_treat_pouch.name': 'Sacchetto di dolcetti della Notte delle zucche',
+  'entities.items.gourdseed_brittle.name': 'Croccante ai semi di zucca',
+  'entities.items.gurglegreen_cauldron.name': 'Calderone Verdegorgoglio',
+  'entities.items.haunting_draught.name': 'Intruglio spettrale',
+  'entities.items.hearthroot_toffee.name': 'Caramella mou alla radice del focolare',
+  'entities.items.jar_of_mischief.name': 'Barattolo di dispetti',
+  'entities.items.lantern_mint_drop.name': 'Caramella alla menta della lanterna',
+  'entities.items.murmurwick_candle.name': 'Candela dallo stoppino sussurrante',
+  'entities.items.owlwatch_fudge.name': 'Dolcetto cremoso del gufo vigile',
+  'entities.items.prankers_pumpkin.name': 'Zucca del burlone',
+  'entities.items.rattlebone_draught.name': 'Intruglio di ossa tintinnanti',
+  'entities.items.reins_emberbristle_broom.name': 'Scopa dalle setole ardenti',
+  'entities.items.sack_of_startled_bats.name': 'Sacco di pipistrelli spaventati',
+  'entities.items.strawling_charm.name': 'Amuleto dell’omino di paglia',
+  'entities.items.thatchgrin_patch_pumpkin.name': 'Zucca dell’orto',
+  'entities.items.thatchgrin_sweet_sack.name': 'Sacco di dolci di Thatchgrin',
+  'entities.items.wanderwisp_lantern.name': 'Lanterna del fuoco fatuo errante',
+  'entities.items.writ_of_the_gourdlit.name': 'Pergamena dell’Illuminato dalle zucche',
+  'entities.items.writ_of_the_hollow_grin.name': 'Pergamena del Sorriso cavo',
+  'entities.items.writ_of_the_trickster.name': 'Pergamena del Burlone',
+  'entities.mobs.gourdlight_crow.name': 'Corvo della Notte delle zucche',
+  'entities.mobs.gourdlight_strawling.name': 'Omino di paglia',
+  'entities.mobs.gourdlight_swelling_gourd.name': 'Zucca rigonfia',
+  'entities.mobs.gourdlight_thatchgrin.name': 'Vecchio Thatchgrin',
+  'entities.npcs.gourdlight_keeper.greeting':
+    'Le zucche sono illuminate e le lanterne appese: dev’essere la Notte delle zucche. Bussa alle porte degli abitanti di Eastbrook, Fenbridge e Highwatch e pronuncia le parole: dolcetto o scherzetto. Quasi tutti ti daranno un dolce. Qualcuno ti farà uno scherzo. Portami i dolci a uno qualsiasi dei miei banchi e li scambierò con qualcosa da indossare.',
+  'entities.npcs.gourdlight_keeper.name': 'Hester Gourdwick',
+  'entities.npcs.gourdlight_keeper.title': 'Custode della Notte delle zucche',
+  'entities.quests.q_gourdlight_daily_baskets.completion':
+    'Consegnati tutti e tre, e ho sentito che Marlow ha pianto. Piange sempre. Ecco un cestino tutto per te.',
+  'entities.quests.q_gourdlight_daily_baskets.objectives.0.label':
+    'Cestino consegnato al cuoco Marlow',
+  'entities.quests.q_gourdlight_daily_baskets.objectives.1.label':
+    'Cestino consegnato all’erborista Yara',
+  'entities.quests.q_gourdlight_daily_baskets.objectives.2.label':
+    'Cestino consegnato al maestro del sapere Caddis',
+  'entities.quests.q_gourdlight_daily_baskets.text':
+    'Ogni Notte delle zucche riempio un cestino di dolci per un vecchio amico in ciascuna città, e le mie ginocchia non sono più quelle di una volta. Consegnali tu per me, {playerName}: al cuoco Marlow a Eastbrook, all’erborista Yara a Fenbridge e al maestro del sapere Caddis lassù a Highwatch.',
+  'entities.quests.q_gourdlight_daily_baskets.title': 'Cestini per i vicini',
+  'entities.quests.q_gourdlight_daily_boo.completion':
+    'Tre? Ho sentito il cuoco far cadere una padella dall’altra parte della piazza. Ben fatto. Ecco la tua parte.',
+  'entities.quests.q_gourdlight_daily_boo.objectives.0.label': 'Abitanti spaventati',
+  'entities.quests.q_gourdlight_daily_boo.text':
+    'Nessuno in queste città si prende un bello spavento da un anno, {playerName}, e una Notte delle zucche senza spaventi è solo una notte fredda. Mettiti un costume, uno qualsiasi dei miei andrà bene, oppure quella testa di zucca se te ne sei guadagnata una. Poi avvicinati di soppiatto a tre abitanti e fai loro un bel BU! a gran voce.',
+  'entities.quests.q_gourdlight_daily_boo.title': 'Bu!',
+  'entities.quests.q_gourdlight_daily_feathers.completion':
+    'Nere come un campo senza luna, e già odorano di fumo. Il falò sarà uno spettacolo. Grazie.',
+  'entities.quests.q_gourdlight_daily_feathers.objectives.0.label': 'Piume di corvo',
+  'entities.quests.q_gourdlight_daily_feathers.text':
+    'Quando il Vecchio Thatchgrin è alle strette, richiama i corvi su chi sta maltrattando la sua paglia. Le loro piume bruciano di verde nel camino, e me ne servono tre per il falò di stasera. Cerca uno scontro nel suo orto, {playerName}, e strappale ai suoi corvi.',
+  'entities.quests.q_gourdlight_daily_feathers.title': 'Piume per il fuoco',
+  'entities.quests.q_gourdlight_daily_patch.completion':
+    'Cinque belle tonde e neanche un morso. Ci sarà torta per tutta la Valle. Tieni, per il disturbo.',
+  'entities.quests.q_gourdlight_daily_patch.objectives.0.label': 'Zucche dell’orto',
+  'entities.quests.q_gourdlight_daily_patch.text':
+    'L’orto del Vecchio Thatchgrin oltre il Prato dei cinghiali trabocca di zucche, e metà sono rotolate oltre la portata della sua paglia, dove una persona prudente può raccoglierle. Portamene cinque, {playerName}. Stai alla larga dal vecchio spaventapasseri. Le conta tutte.',
+  'entities.quests.q_gourdlight_daily_patch.title': 'Zucche dall’orto',
+  'entities.quests.q_gourdlight_daily_towns.completion':
+    'Tre città in una notte! I tuoi stivali se lo sono meritato più di te.',
+  'entities.quests.q_gourdlight_daily_towns.objectives.0.label': 'Bussato a una porta di Eastbrook',
+  'entities.quests.q_gourdlight_daily_towns.objectives.1.label': 'Bussato a una porta di Fenbridge',
+  'entities.quests.q_gourdlight_daily_towns.objectives.2.label': 'Bussato a una porta di Highwatch',
+  'entities.quests.q_gourdlight_daily_towns.text':
+    'I bambini dicono che un vero viandante delle zucche bussa in ogni città prima che finisca la notte. Dimostra che hanno ragione, {playerName}. Chiedi dolcetto o scherzetto a una porta di Eastbrook, una di Fenbridge e una di Highwatch. Le lanterne sulle strade ti indicheranno il cammino.',
+  'entities.quests.q_gourdlight_daily_towns.title': 'Una porta in ogni città',
+  'entities.quests.q_gourdlight_daily_wicks.completion':
+    'Sei mozziconi, freddi come la brina. Chi li ha accesi dovrà impegnarsi di più. Prendi questo e lavati le mani.',
+  'entities.quests.q_gourdlight_daily_wicks.objectives.0.label': 'Candele maledette spente',
+  'entities.quests.q_gourdlight_daily_wicks.text':
+    'Qualcuno ha lasciato candele con fiamme verdi ai piedi dei nostri lampioni. Bruciano senza sciogliersi e sussurrano quando volti le spalle. Spegnine sei per me, {playerName}, in una qualsiasi delle tre città, e portami i mozziconi.',
+  'entities.quests.q_gourdlight_daily_wicks.title': 'Stoppini sinistri',
+  'entities.quests.q_gourdlight_rounds.completion':
+    'Cinque porte e hai ancora tutte le dita. Tieni, un sacchetto di dolci per tornare a casa. Ripassa domani, le porte si apriranno di nuovo.',
+  'entities.quests.q_gourdlight_rounds.objectives.0.label': 'Porte a cui hai bussato',
+  'entities.quests.q_gourdlight_rounds.text':
+    'Ogni Notte delle zucche i bambini della Valle fanno il loro giro, e quest’anno andrai con loro, {playerName}. Bussa a cinque porte nelle nostre città, pronuncia le parole e guarda cosa ti danno. Torna da me quando hai finito.',
+  'entities.quests.q_gourdlight_rounds.title': 'Il giro della Notte delle zucche',
+  'guide.interfacePage.framesGovernedPriest':
+    'Modifica riquadri permette anche di spostare il medaglione di Decima oscura e Bomba della decima del sacerdote Ombra.',
+  'guide.worldPvpPage.hillBodyTwoHour':
+    'Una volta ogni due ore, in un momento imprevedibile, tutto il reame viene avvisato che tra quindici minuti sorgerà una collina in una delle zone settentrionali, e il cerchio dove apparirà viene segnato in campo aperto. Rimane per trenta minuti, poi scompare. Mentre è presente, ogni cinque minuti il reame viene informato della sua posizione e dei gruppi che l’hanno controllata più a lungo. Il gruppo con più giocatori dentro il cerchio contende la collina e la conquista dopo trenta secondi di maggioranza. L’ingresso di un gruppo rivale mette solo in pausa il conteggio finché il tuo gruppo non torna in vantaggio; riparte da zero soltanto se non rimane nessun membro vivo del tuo gruppo all’interno. Un giocatore solo conta come un gruppo di una persona e mantiene la collina se forma un gruppo, ma i membri di un’incursione non contano affatto. Mentre un gruppo controlla la collina, ogni suo membro all’interno guadagna la stessa quantità di Onore ogni minuto, indipendentemente dalla durata del controllo. Un gruppo completo che la mantiene incontrastata per tutta la sua durata guadagna quindi circa quanto con due vittorie nei campi di battaglia. Quando scompare, se il gruppo che l’ha controllata più a lungo in totale l’ha tenuta per almeno dieci minuti, chiunque sia rimasto all’interno per quel gruppo per almeno un minuto e ne faccia ancora parte ottiene una vittoria per la riga PvP del forziere settimanale. Una barra sopra il campo mostra chi la controlla, i vostri numeri rispetto agli avversari e il tempo di contesa; /hill in chat ne indica la posizione.',
+  'seasonal.boo.already': '{name} ha avuto abbastanza spaventi per oggi.',
+  'seasonal.boo.flash': 'BU! {name} ha preso uno spavento!',
+  'seasonal.boo.frightenedHint':
+    '{name} sobbalza ancora per il tuo ultimo spavento. Cerca qualcun altro.',
+  'seasonal.boo.landed':
+    'Sbucando davanti a {name}, urli BU! Un grido squarcia l’aria e per poco non cade tutto.',
+  'seasonal.boo.needsCostume':
+    'Mettiti prima un costume: un intruglio da travestimento, uno scherzo da pipistrello o scheletro, l’Amuleto dell’omino di paglia, la Testa di zucca intagliata o un sorso da goblin dal Calderone Verdegorgoglio.',
+  'seasonal.boo.noCostume': 'Senza costume, {name} ti ride soltanto in faccia. Mettine uno prima.',
+  'seasonal.boo.notOnErrand': 'Hester non ti ha chiesto di spaventare nessuno oggi.',
+  'seasonal.boo.row': 'Bu!',
+  'seasonal.boo.rowAria': 'Sbuca davanti a {name} e urla bu',
+  'seasonal.boundItemGone':
+    'La Notte delle zucche è finita e il tuo oggetto {item} torna a sbriciolarsi in paglia.',
+  'seasonal.costume': 'Bevi l’intruglio e ti trasformi: {trick}!',
+  'seasonal.event.gourdlight_eve.name': 'Notte delle zucche',
+  'seasonal.guise': 'L’amuleto crepita e la paglia ti avvolge: {trick}!',
+  'seasonal.itemSource.pumpkinHead':
+    'Lasciata dal Vecchio Thatchgrin, nel suo campo di zucche oltre il Prato dei cinghiali, la prima volta che lo depredi. Nessun mercante la vende.',
+  'seasonal.itemUse.broomSources':
+    'Si acquista da Hester Gourdwick per {count} Covoni intessuti di braci oppure, raramente, si trova sul Vecchio Thatchgrin in un giorno in cui lo depredi. Per cavalcarla serve l’abilità di equitazione. Si conserva permanentemente e si può cavalcare tutto l’anno.',
+  'seasonal.itemUse.costumeBat':
+    'Uso: ti trasforma in un pipistrello svolazzante per {minutes} minuti. Si consuma. Non utilizzabile in combattimento; entrare in combattimento termina l’effetto. Cosmetico.',
+  'seasonal.itemUse.costumeGhost':
+    'Uso: ti trasforma in un fantasma fluttuante per {minutes} minuti. Si consuma. Non utilizzabile in combattimento; entrare in combattimento termina l’effetto. Cosmetico.',
+  'seasonal.itemUse.costumeSkeleton':
+    'Uso: ti trasforma in uno scheletro tintinnante per {minutes} minuti. Si consuma. Non utilizzabile in combattimento; entrare in combattimento termina l’effetto. Cosmetico.',
+  'seasonal.itemUse.pouch': 'Uso: aprilo per ricevere {count} Dolcetti della Notte delle zucche.',
+  'seasonal.itemUse.pumpkinHead':
+    'Uso: indossa o togli una zucca intagliata e illuminata dall’interno, portata sopra l’elmo. Cosmetico.',
+  'seasonal.itemUse.sheaf':
+    'Il Vecchio Thatchgrin ne dà uno ogni giorno in cui lo depredi, finché non possiedi la Scopa dalle setole ardenti. Hester Gourdwick ne scambia {count} con la scopa ai suoi banchi di Eastbrook, Fenbridge e Highwatch. I covoni non spesi si conservano per la prossima Notte delle zucche.',
+  'seasonal.itemUse.strawlingCharm':
+    'Uso: ti trasforma in uno degli omini di paglia del Vecchio Thatchgrin per {seconds} secondi. Non utilizzabile in combattimento. Non si consuma mai. Cosmetico.',
+  'seasonal.itemUse.sweet':
+    'Si ottiene chiedendo dolcetto o scherzetto durante la Notte delle zucche. Hester Gourdwick li scambia con oggetti cosmetici ai suoi banchi di Eastbrook, Fenbridge e Highwatch.',
+  'seasonal.itemUse.titleWrit':
+    'Uso: ottieni il titolo {title} per questo personaggio, da indossare dal Libro delle Imprese. Si consuma. Si conserva se possiedi già il titolo.',
+  'seasonal.itemUse.toyBats':
+    'Uso: apri il sacco. Uno sciame di pipistrelli stridenti ne esce e si disperde intorno a te per {seconds} secondi. Non utilizzabile in combattimento o in furtività. Non si consuma mai: riutilizzabile dopo {cooldown} secondi. Si conserva permanentemente ed è utilizzabile tutto l’anno. Cosmetico.',
+  'seasonal.itemUse.toyCandleShadows':
+    'Uso: accendi la candela davanti a te. Per {seconds} secondi le sue fiamme proiettano sul terreno circostante le ombre danzanti di un gatto, un pipistrello e una strega, visibili a chiunque sia nelle vicinanze. Non utilizzabile in combattimento o in furtività. Non si consuma mai: riutilizzabile dopo {cooldown} secondi. Si conserva permanentemente ed è utilizzabile tutto l’anno. Cosmetico.',
+  'seasonal.itemUse.toyCauldron':
+    'Uso: posa un grande calderone ribollente davanti a te. Rimane per {standing} secondi, e qualsiasi giocatore che vi beva esplode in bolle verdi e si trasforma in un goblin per {seconds} secondi, sostituendo l’eventuale costume indossato. Non puoi posarlo né berne in combattimento o in furtività; entrare in combattimento termina la forma di goblin. Non si consuma mai: riutilizzabile dopo {cooldown} secondi. Si conserva permanentemente ed è utilizzabile tutto l’anno. Cosmetico.',
+  'seasonal.itemUse.toyLantern':
+    'Uso: posa la lanterna davanti a te. Un piccolo fantasma ti gira intorno per {seconds} secondi. Non utilizzabile in combattimento o in furtività. Non si consuma mai: riutilizzabile dopo {cooldown} secondi. Si conserva permanentemente ed è utilizzabile tutto l’anno. Cosmetico.',
+  'seasonal.itemUse.toyPrank':
+    'Uso: lanciala contro un altro giocatore visibile entro {range} metri. La sua testa diventa una zucca luminosa per {seconds} secondi, rimovibile con un clic destro. Nessuno dei due può essere in combattimento e tu non puoi essere in furtività. Non si consuma mai: riutilizzabile dopo {cooldown} secondi. Si conserva permanentemente ed è utilizzabile tutto l’anno. Cosmetico.',
+  'seasonal.itemUse.trickJar':
+    'Uso: ti fa uno scherzo casuale e innocuo per alcuni secondi. Cosmetico.',
+  'seasonal.jarTrick': 'Il barattolo si apre di scatto: {trick}!',
+  'seasonal.pumpkinHead.off': 'Ti togli la Testa di zucca intagliata.',
+  'seasonal.pumpkinHead.on': 'Indossi la Testa di zucca intagliata.',
+  'seasonal.pumpkins.flash': 'Zucca infestata trovata! {count}/{total}',
+  'seasonal.pumpkins.found':
+    'Accendi una Zucca infestata in {zone}: {count}/{total}. Dolcetti della Notte delle zucche ricevuti: {sweets}.',
+  'seasonal.pumpkins.name': 'Zucca infestata',
+  'seasonal.pumpkins.progress': '{label}: {current}/{total}',
+  'seasonal.pumpkins.title': 'Zucche infestate',
+  'seasonal.pumpkins.world': 'Mondo',
+  'seasonal.thatchgrin.poleBound': 'Legato al palo',
+  'seasonal.thatchgrin.sleepYell': 'Il sole è sorto. Di nuovo sul palo, di nuovo di guardia.',
+  'seasonal.thatchgrin.wakeYell': 'La NOTTE cala sull’orto! Chi cammina nel MIO campo?',
+  'seasonal.titleGranted': 'Leggi la pergamena. Nuovo titolo ottenuto: {title}.',
+  'seasonal.titleKnown': 'Possiedi già questo titolo, quindi conservi la pergamena.',
+  'seasonal.tokenPrice': '{count} {item}',
+  'seasonal.toy.bats': 'Apri il sacco e ne esce uno sciame di pipistrelli spaventati!',
+  'seasonal.toy.candleShadows':
+    'Accendi la candela e le ombre iniziano a danzare attorno alle sue fiamme.',
+  'seasonal.toy.cauldron': 'Posi il calderone e inizia a ribollire.',
+  'seasonal.toy.cauldronDrink':
+    'Bevi dal calderone, esplodi in bolle verdi e ti trasformi in un goblin!',
+  'seasonal.toy.hidden': 'Esci prima dalle ombre: un giocattolo ti tradirebbe.',
+  'seasonal.toy.lantern':
+    'Posi la lanterna e un piccolo fantasma ne esce fluttuando per farti compagnia.',
+  'seasonal.toy.prank': 'Lanci la zucca. Si spiaccica su {name}!',
+  'seasonal.toy.prankNeedsPlayer':
+    'La zucca si spiaccica solo su un altro giocatore che non sia in combattimento.',
+  'seasonal.toy.pranked':
+    '{name} ti spiaccica una zucca in testa! Toglila con un clic destro o indossala con orgoglio.',
+  'seasonal.toy.prankedFlash': '{name} ti ha fatto uno scherzo!',
+  'seasonal.trickOrTreat.alreadyKnocked': 'Oggi hai già chiesto dolcetto o scherzetto a {name}.',
+  'seasonal.trickOrTreat.knockedHint':
+    'Oggi hai già bussato qui. La porta si riapre dopo il ripristino giornaliero.',
+  'seasonal.trickOrTreat.notActive': 'La Notte delle zucche non è attiva al momento.',
+  'seasonal.trickOrTreat.row': 'Dolcetto o scherzetto!',
+  'seasonal.trickOrTreat.rowAria': 'Chiedi dolcetto o scherzetto a {name}',
+  'seasonal.trickOrTreat.tooFar': 'Avvicinati per bussare.',
+  'seasonal.trickOrTreat.treat': '{name} ti porge un dolcetto.',
+  'seasonal.trickOrTreat.treatFlash.few': 'Dolcetto! {count} Dolcetti della Notte delle zucche',
+  'seasonal.trickOrTreat.treatFlash.many': 'Dolcetto! {count} Dolcetti della Notte delle zucche',
+  'seasonal.trickOrTreat.treatFlash.one': 'Dolcetto! {count} Dolcetto della Notte delle zucche',
+  'seasonal.trickOrTreat.treatFlash.other': 'Dolcetto! {count} Dolcetti della Notte delle zucche',
+  'seasonal.trickOrTreat.trick': '{name} ti fa uno scherzo: {trick}!',
+  'seasonal.trickOrTreat.trickFlash': 'Scherzetto! {trick}',
+  'seasonal.tricks.gourdlight_costume_bat': 'Costume da pipistrello',
+  'seasonal.tricks.gourdlight_costume_ghost': 'Costume da fantasma',
+  'seasonal.tricks.gourdlight_costume_skeleton': 'Costume da scheletro',
+  'seasonal.tricks.gourdlight_trick_bat': 'Follia di pipistrello',
+  'seasonal.tricks.gourdlight_trick_fumes': 'Fumi verdi',
+  'seasonal.tricks.gourdlight_trick_skeleton': 'Ossa tintinnanti',
+  'seasonal.tricks.gourdlight_trick_strawling': 'Aspetto da omino di paglia',
 };

@@ -7,6 +7,7 @@
 // stays in Hud because it needs Hud's private state; this module only renders
 // one panel and reports clicks back through the injected callbacks.
 
+import { ITEMS } from '../../../sim/data';
 import {
   FACTION_CURRENCY_IDS,
   factionCurrencyName,
@@ -22,6 +23,7 @@ import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
 import { focusedWithin, restoreFirstEnabled } from '../../focus_restore';
 import { formatMoney as formatLocalizedMoney, formatNumber, t } from '../../i18n';
+import { itemImageUrl } from '../../icons';
 import { itemNameColor } from '../../item_name_color';
 import type { PainterHostPresentation } from '../../painter_host';
 import { svgIcon } from '../../ui_icons';
@@ -88,6 +90,7 @@ function goodsPriceText(price: VendorPrice): string {
       `${formatNumber(price.factionMarks.amount, { maximumFractionDigits: 0 })} ${curName}`,
     );
   }
+  if (price.token) parts.push(tokenPriceText(price.token));
   return parts.join(' + ');
 }
 
@@ -121,6 +124,22 @@ function requirementText(row: VendorGoodsRow): string {
   });
 }
 
+/** The token item's painted icon, inline beside its count (decorative: the
+ *  text names the item). Nothing when the item ships no painting yet. */
+function tokenIconHtml(itemId: string): string {
+  const url = itemImageUrl(itemId);
+  return url ? `<img class="currency-inline" src="${esc(url)}" alt="" draggable="false">` : '';
+}
+
+/** A token price's text: "40 Gourdlight Sweet" (the item's localized name). */
+function tokenPriceText(token: NonNullable<VendorPrice['token']>): string {
+  const def = ITEMS[token.itemId];
+  return t('seasonal.tokenPrice', {
+    count: formatNumber(token.count, { maximumFractionDigits: 0 }),
+    item: def ? itemDisplayName(def) : '',
+  });
+}
+
 function goodsPriceHtml(row: VendorGoodsRow, deps: VendorWindowDeps): string {
   const parts: string[] = [];
   if (row.price.copper > 0) parts.push(deps.moneyHtml(row.price.copper));
@@ -135,6 +154,11 @@ function goodsPriceHtml(row: VendorGoodsRow, deps: VendorWindowDeps): string {
     const amountStr = formatNumber(row.price.factionMarks.amount, { maximumFractionDigits: 0 });
     parts.push(
       `<span class="faction-currency-price">${currencyIconHtml(curId)}<span>${amountStr} ${esc(curName)}</span></span>`,
+    );
+  }
+  if (row.price.token) {
+    parts.push(
+      `<span class="faction-currency-price token-price">${tokenIconHtml(row.price.token.itemId)}<span>${esc(tokenPriceText(row.price.token))}</span></span>`,
     );
   }
   return parts.join('<span aria-hidden="true"> + </span>');

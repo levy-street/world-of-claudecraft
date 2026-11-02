@@ -6386,6 +6386,91 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "renown": 0,
     "feat": true,
     "rewardTitle": "of Lantern Hall"
+  },
+  {
+    "id": "feat_gourdlight_guise",
+    "name": "Gourdlight Guise",
+    "category": "feat",
+    "renown": 0,
+    "feat": true,
+    "crest": "/ui/deeds/feat_gourdlight_guise.webp"
+  },
+  {
+    "id": "feat_old_thatchgrin",
+    "name": "Stubble and Ash",
+    "category": "feat",
+    "renown": 0,
+    "feat": true,
+    "crest": "/ui/deeds/feat_old_thatchgrin.webp"
+  },
+  {
+    "id": "feat_title_gourdlit",
+    "name": "The Gourdlit",
+    "category": "feat",
+    "renown": 0,
+    "feat": true,
+    "rewardTitle": "the Gourdlit",
+    "crest": "/ui/deeds/feat_title_gourdlit.webp"
+  },
+  {
+    "id": "feat_title_trickster",
+    "name": "Trickster",
+    "category": "feat",
+    "renown": 0,
+    "feat": true,
+    "rewardTitle": "Trickster",
+    "crest": "/ui/deeds/feat_title_trickster.webp"
+  },
+  {
+    "id": "feat_title_hollow_grinned",
+    "name": "The Hollow-Grinned",
+    "category": "feat",
+    "renown": 0,
+    "feat": true,
+    "rewardTitle": "the Hollow-Grinned",
+    "crest": "/ui/deeds/feat_title_hollow_grinned.webp"
+  },
+  {
+    "id": "feat_pumpkin_hunter",
+    "name": "Pumpkin Hunter",
+    "category": "feat",
+    "renown": 0,
+    "feat": true,
+    "rewardTitle": "the Hollow",
+    "crest": "/ui/deeds/feat_pumpkin_hunter.webp"
+  },
+  {
+    "id": "feat_gourdlight_doorsteps",
+    "name": "Every Doorstep",
+    "category": "feat",
+    "renown": 0,
+    "feat": true,
+    "crest": "/ui/deeds/feat_gourdlight_doorsteps.webp"
+  },
+  {
+    "id": "feat_gourdlight_errands",
+    "name": "At Hester's Beck and Call",
+    "category": "feat",
+    "renown": 0,
+    "feat": true,
+    "crest": "/ui/deeds/feat_gourdlight_errands.webp"
+  },
+  {
+    "id": "feat_gourdlight_frights",
+    "name": "Three Towns Startled",
+    "category": "feat",
+    "renown": 0,
+    "feat": true,
+    "crest": "/ui/deeds/feat_gourdlight_frights.webp"
+  },
+  {
+    "id": "feat_gourdlight_eve_complete",
+    "name": "Gourdlight, Start to Finish",
+    "category": "feat",
+    "renown": 0,
+    "feat": true,
+    "rewardTitle": "the Gourdsworn",
+    "crest": "/ui/deeds/feat_gourdlight_eve_complete.webp"
   }
 ];
 
@@ -7696,6 +7781,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "mount",
         "name": "Friendship Tank"
+      },
+      {
+        "kind": "mount",
+        "name": "Emberbristle Broom"
       }
     ]
   },
@@ -8066,6 +8155,26 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "title",
         "name": "Indomitable"
+      },
+      {
+        "kind": "title",
+        "name": "the Gourdlit"
+      },
+      {
+        "kind": "title",
+        "name": "Trickster"
+      },
+      {
+        "kind": "title",
+        "name": "the Hollow-Grinned"
+      },
+      {
+        "kind": "title",
+        "name": "the Hollow"
+      },
+      {
+        "kind": "title",
+        "name": "the Gourdsworn"
       }
     ]
   },

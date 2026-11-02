@@ -1038,14 +1038,14 @@ export const fr_FR: EnTranslations = {
       "fateThreadsSentenceReady": "Trois Fils du destin : Sentence peut les consommer pour 18% de dégâts supplémentaires."
     },
     "priest": {
-      "gloomtitheLabel": "Gloomtithe",
-      "bombLabel": "Tithe Bomb",
-      "gloomtitheStatus": "{value} of {max} Gloomtithe",
-      "bombStatus": "{value} of {max} Tithe Bomb charges",
-      "bombReady": "Ready",
+      "gloomtitheLabel": "Dîme sombre",
+      "bombLabel": "Bombe de dîme",
+      "gloomtitheStatus": "{value} charges de Dîme sombre sur {max}",
+      "bombStatus": "{value} charges de Bombe de dîme sur {max}",
+      "bombReady": "Prête",
       "chargeCount": "{value} / {max}",
-      "gloomtitheTooltip": "Gloomtithe: up to 5 spendable charges. Void Rupture consumes 3; Vampiric Touch consumes 2 for 30% more damage; Call Tithefiend consumes your bank. Generating charges also fills Tithe Bomb, even while this bank is full.",
-      "bombTooltip": "Tithe Bomb: generate 20 Gloomtithe to prepare one bomb. Spending Gloomtithe does not add progress. Progress lasts between fights. Dying or starting a raid boss resets it. A completed cast consumes the bomb; cancelling keeps it."
+      "gloomtitheTooltip": "Dîme sombre : jusqu’à 5 charges à dépenser. Rupture du Vide en consomme 3 ; Toucher vampirique en consomme 2 pour infliger 30% de dégâts supplémentaires ; Invoquer un Démon de dîme consomme toute votre réserve. Générer des charges fait aussi progresser la Bombe de dîme, même lorsque cette réserve est pleine.",
+      "bombTooltip": "Bombe de dîme : générez 20 charges de Dîme sombre pour préparer une bombe. Dépenser la Dîme sombre n’ajoute aucune progression. La progression persiste entre les combats. Mourir ou engager un boss de raid la réinitialise. Une incantation terminée consomme la bombe ; l’annuler la conserve."
     },
     "procOverlay": {
       "soulFragmentsMeter": "Fragments d'âme",
@@ -2600,6 +2600,7 @@ export const fr_FR: EnTranslations = {
       "name_lantern_hall_destrier": "Destrier du Hall de la Lanterne",
       "name_chimeglass_tortoise": "Tolliver le Chimeglass",
       "name_rickshaw_mount": "Rickshaw d'os liés",
+      "name_emberbristle_broom": "Balai aux brins de braise",
       "name_wobbles_slime": "Tremblote le limon",
       "name_nightwing_chimera": "Chimère Aile-de-nuit",
       "desc_valorsteed": "Un destrier robuste au pied sûr, équipé d'une selle en cuir.",
@@ -2623,7 +2624,8 @@ export const fr_FR: EnTranslations = {
       "desc_lantern_hall_destrier": "Le cheval de guerre du Hall de la Lanterne, bardé de chêne et de fer sous le bleu de la guilde, avec deux lanternes-tempête suspendues à sa selle pour éclairer le chemin du retour.",
       "desc_nightwing_chimera": "Une wyverne crépusculaire bicéphale venue des branches anciennes, perchée sur ses pattes arrière griffues au repos et rasant le sol sur des ailes gravées de runes arcaniques.",
       "desc_chimeglass_tortoise": "Une tortue des salines qui a dépassé trois générations de caravanes. Les bricoleurs lui ont arraché des lunettes en verre tempête et lui ont accroché une cloche de bronze à la gorge, pour que la route l'entende bien avant de le voir.",
-      "desc_rickshaw_mount": "Une carriole d'os bringuebalante, avec un soldat osseux attelé aux brancards, qui vous tire au pas de course."
+      "desc_rickshaw_mount": "Une carriole d'os bringuebalante, avec un soldat osseux attelé aux brancards, qui vous tire au pas de course.",
+      "desc_emberbristle_broom": "Un balai de moisson noué d’un ruban orange, qui flotte à une main du sol et sème des braises depuis ses brins. Une récompense permanente de la Veillée des courges."
     },
     "mountTraining": {
       "mountPrompt": "Appuyez sur {key} pour monter le Valorsteed d'entraînement.",
@@ -4672,7 +4674,10 @@ export const fr_FR: EnTranslations = {
       }
     },
     "auraEffect": {
-      "stilledMindCrit": "Your next Mindfracture or Void Rupture is a guaranteed critical strike if it hits. Other spells do not consume this bonus. Void Rupture still consumes 3 Gloomtithe charges. A resisted cast consumes the bonus.",
+      "gourdlight": {
+        "thatchbound": "Vieux Thatchgrin tire vos ficelles. Vous ne pouvez pas agir : il vous fait marcher vers votre allié le plus proche et le frapper toutes les {every} s pour {min} à {max} points de dégâts (jusqu’à {mult} fois plus contre un allié de niveau {level}). Prend fin prématurément si vous subissez des dégâts équivalents à {pct}% de votre maximum de points de vie ou si un allié dissipe cet effet (Magie)."
+      },
+      "stilledMindCrit": "Votre prochaine Fracture mentale ou Rupture du Vide inflige un coup critique garanti si elle touche. Les autres sorts ne consomment pas ce bonus. Rupture du Vide consomme toujours 3 charges de Dîme sombre. Une incantation résistée consomme le bonus.",
       "wildheart": {
         "packBond": "Subit {pct}% de dégâts en moins tant que son partenaire se tient près de lui. Éloignez le Maître des bêtes et son jaguar pour rompre cet effet.",
         "packBondFury": "Inflige {pct}% de dégâts supplémentaires tant que son partenaire se tient près de lui.",
@@ -4862,6 +4867,7 @@ export const fr_FR: EnTranslations = {
       "spellHaste": "Augmente la vitesse d'incantation de {pct}%",
       "sated": "Ne peut pas bénéficier d'un autre effet de hâte de groupe",
       "cauterizeFatigue": "Cautérisation ne peut pas empêcher un autre coup fatal",
+      "seasonalCosmetic": "Purement cosmétique : aucun effet sur le combat",
       "castShield": "L'incantation ne peut pas être interrompue ni retardée par les dégâts",
       "dmgDone": "Augmente les dégâts infligés de {pct} %",
       "dmgDoneReduce": "Réduit les dégâts infligés de {pct} %",
@@ -5009,6 +5015,7 @@ export const fr_FR: EnTranslations = {
       "dodgeReduce": "Réduit les chances d'esquive de {pct}%",
       "damageReduction": "Réduit tous les dégâts subis de {pct} %",
       "slumber": "Endormi jusqu'à l'aube. Ne peut pas être attaqué et ne s'éveillera pour personne.",
+      "slumberNight": "Il pend sans vie à son poteau jusqu’à la tombée de la nuit. Impossible de l’attaquer.",
       "guardianWard": "Le prochain coup ennemi fatal vous restaure à {pct} % de vos points de vie à la place",
       "armorFlat": "Réduit l'armure de {value}",
       "armorFlatStacks": "Réduit l'armure de {value} ({stacks} charges)",
@@ -5088,7 +5095,8 @@ export const fr_FR: EnTranslations = {
     "worldBoss": {
       "spawn": "{name} se dresse au-dessus de {zone} !",
       "wake": "{name} s'éveille au-dessus de {zone} !",
-      "sleep": "{name} dort jusqu'à l'aube."
+      "sleep": "{name} dort jusqu'à l'aube.",
+      "sleepUntilNightfall": "{name} dort jusqu’à la tombée de la nuit."
     },
     "auth": {
       "appleLoginCta": "Continuer avec Apple",
@@ -8616,6 +8624,107 @@ export const fr_FR: EnTranslations = {
       }
     }
   },
+  "seasonal": {
+    "pumpkins": {
+      "name": "Citrouille hantée",
+      "title": "Citrouilles hantées",
+      "world": "Monde",
+      "progress": "{label} : {current}/{total}",
+      "found": "Vous allumez une Citrouille hantée dans {zone} : {count}/{total}. Friandises de la Veillée des courges reçues : {sweets}.",
+      "flash": "Citrouille hantée trouvée ! {count}/{total}"
+    },
+    "event": {
+      "gourdlight_eve": {
+        "name": "Veillée des courges"
+      }
+    },
+    "trickOrTreat": {
+      "row": "Des bonbons ou un sort !",
+      "rowAria": "Demander des bonbons ou un sort à {name}",
+      "knockedHint": "Vous avez déjà frappé ici aujourd’hui. La porte rouvrira après la réinitialisation quotidienne.",
+      "treat": "{name} vous tend une friandise.",
+      "trick": "{name} vous joue un tour : {trick} !",
+      "alreadyKnocked": "Vous avez déjà demandé des bonbons ou un sort à {name} aujourd’hui.",
+      "notActive": "La Veillée des courges n’a pas lieu en ce moment.",
+      "tooFar": "Approchez-vous pour frapper.",
+      "treatFlash": {
+        "one": "Des bonbons ! {count} Friandise de la Veillée des courges",
+        "few": "Des bonbons ! {count} Friandises de la Veillée des courges",
+        "many": "Des bonbons ! {count} Friandises de la Veillée des courges",
+        "other": "Des bonbons ! {count} Friandises de la Veillée des courges"
+      },
+      "trickFlash": "Un sort ! {trick}"
+    },
+    "tricks": {
+      "gourdlight_trick_bat": "Folie de chauve-souris",
+      "gourdlight_trick_skeleton": "Os cliquetants",
+      "gourdlight_trick_fumes": "Vapeurs vertes",
+      "gourdlight_trick_strawling": "Apparence de créature de paille",
+      "gourdlight_costume_skeleton": "Costume de squelette",
+      "gourdlight_costume_ghost": "Costume de fantôme",
+      "gourdlight_costume_bat": "Costume de chauve-souris"
+    },
+    "pumpkinHead": {
+      "on": "Vous mettez la Tête de citrouille sculptée.",
+      "off": "Vous retirez la Tête de citrouille sculptée."
+    },
+    "jarTrick": "Le bocal s’ouvre d’un coup : {trick} !",
+    "guise": "Le charme crépite et la paille vous recouvre : {trick} !",
+    "costume": "Vous buvez le breuvage et vous transformez : {trick} !",
+    "titleGranted": "Vous lisez le brevet. Nouveau titre obtenu : {title}.",
+    "titleKnown": "Vous possédez déjà ce titre et conservez donc le brevet.",
+    "boundItemGone": "La Veillée des courges est terminée et votre objet {item} retombe en paille.",
+    "itemUse": {
+      "pumpkinHead": "Utilisation : mettez ou retirez une citrouille sculptée éclairée de l’intérieur, portée par-dessus votre casque. Cosmétique.",
+      "trickJar": "Utilisation : vous joue un tour aléatoire et inoffensif pendant quelques secondes. Cosmétique.",
+      "pouch": "Utilisation : ouvrez-le pour recevoir {count} Friandises de la Veillée des courges.",
+      "strawlingCharm": "Utilisation : vous transforme en l’une des créatures de paille du Vieux Thatchgrin pendant {seconds} secondes. Inutilisable en combat. Jamais consommé. Cosmétique.",
+      "sweet": "Obtenues en demandant des bonbons ou un sort pendant la Veillée des courges. Hester Gourdwick les échange contre des objets cosmétiques à ses étals d’Eastbrook, de Fenbridge et de Highwatch.",
+      "costumeSkeleton": "Utilisation : vous transforme en squelette cliquetant pendant {minutes} minutes. Consommé à l’usage. Inutilisable en combat ; entrer en combat met fin à l’effet. Cosmétique.",
+      "costumeGhost": "Utilisation : vous transforme en fantôme flottant pendant {minutes} minutes. Consommé à l’usage. Inutilisable en combat ; entrer en combat met fin à l’effet. Cosmétique.",
+      "costumeBat": "Utilisation : vous transforme en chauve-souris voletante pendant {minutes} minutes. Consommé à l’usage. Inutilisable en combat ; entrer en combat met fin à l’effet. Cosmétique.",
+      "toyPrank": "Utilisation : lancez-la sur un autre joueur visible à moins de {range} mètres. Sa tête devient une citrouille lumineuse pendant {seconds} secondes ; un clic droit lui permet de la retirer. Aucun de vous ne doit être en combat et vous ne devez pas être en camouflage. Jamais consommée : réutilisable après {cooldown} secondes. Conservée définitivement et utilisable toute l’année. Cosmétique.",
+      "toyLantern": "Utilisation : posez la lanterne devant vous. Un petit fantôme tourne autour de vous pendant {seconds} secondes. Inutilisable en combat ou en camouflage. Jamais consommée : réutilisable après {cooldown} secondes. Conservée définitivement et utilisable toute l’année. Cosmétique.",
+      "toyBats": "Utilisation : ouvrez le sac. Une nuée de chauves-souris piaillantes en jaillit et se disperse autour de vous pendant {seconds} secondes. Inutilisable en combat ou en camouflage. Jamais consommé : réutilisable après {cooldown} secondes. Conservé définitivement et utilisable toute l’année. Cosmétique.",
+      "toyCandleShadows": "Utilisation : allumez la chandelle devant vous. Pendant {seconds} secondes, ses flammes projettent les ombres dansantes d’un chat, d’une chauve-souris et d’une sorcière sur le sol alentour, visibles par tous les joueurs à proximité. Inutilisable en combat ou en camouflage. Jamais consommée : réutilisable après {cooldown} secondes. Conservée définitivement et utilisable toute l’année. Cosmétique.",
+      "toyCauldron": "Utilisation : posez devant vous un grand chaudron bouillonnant. Il reste {standing} secondes. Tout joueur qui y boit éclate en bulles vertes et se transforme en gobelin pendant {seconds} secondes, remplaçant son éventuel costume. Impossible de le poser ou d’y boire en combat ou en camouflage ; entrer en combat met fin à la forme de gobelin. Jamais consommé : réutilisable après {cooldown} secondes. Conservé définitivement et utilisable toute l’année. Cosmétique.",
+      "titleWrit": "Utilisation : accorde le titre {title} à ce personnage, à porter depuis le Livre des hauts faits. Consommé à l’usage. Conservé si vous possédez déjà le titre.",
+      "broomSources": "Acheté à Hester Gourdwick contre {count} Gerbes tissées de braises ou, rarement, obtenu sur le Vieux Thatchgrin un jour où vous le dépouillez. La compétence d’équitation est nécessaire pour le monter. Conservé définitivement et utilisable comme monture toute l’année.",
+      "sheaf": "Le Vieux Thatchgrin vous en donne une chaque jour où vous le dépouillez, jusqu’à ce que vous possédiez le Balai aux brins de braise. Hester Gourdwick en échange {count} contre le balai à ses étals d’Eastbrook, de Fenbridge et de Highwatch. Les gerbes non dépensées sont conservées pour la prochaine Veillée des courges."
+    },
+    "toy": {
+      "prank": "Vous lancez la citrouille. Elle s’écrase sur {name} !",
+      "lantern": "Vous posez la lanterne et un petit fantôme en sort en flottant pour vous tenir compagnie.",
+      "bats": "Vous ouvrez le sac et une nuée de chauves-souris affolées en jaillit !",
+      "candleShadows": "Vous allumez la chandelle et les ombres commencent à danser autour de ses flammes.",
+      "cauldron": "Vous posez le chaudron et il se met à bouillonner.",
+      "cauldronDrink": "Vous buvez au chaudron, éclatez en bulles vertes et vous transformez en gobelin !",
+      "pranked": "{name} vous écrase une citrouille sur la tête ! Retirez-la d’un clic droit ou portez-la fièrement.",
+      "prankedFlash": "{name} vous a joué un tour !",
+      "prankNeedsPlayer": "La citrouille ne peut s’écraser que sur un autre joueur qui n’est pas en combat.",
+      "hidden": "Sortez d’abord des ombres : un jouet vous trahirait."
+    },
+    "itemSource": {
+      "pumpkinHead": "Obtenue sur le Vieux Thatchgrin, dans son champ de citrouilles au-delà du Pré aux sangliers, la première fois que vous le dépouillez. Aucun marchand ne la vend."
+    },
+    "boo": {
+      "row": "Bouh !",
+      "rowAria": "Bondir devant {name} et crier bouh",
+      "needsCostume": "Enfilez d’abord un costume : un breuvage de déguisement, un tour de chauve-souris ou de squelette, le Charme de créature de paille, la Tête de citrouille sculptée ou une gorgée de gobelin du Chaudron Vertglouglou.",
+      "frightenedHint": "{name} sursaute encore depuis votre dernière farce. Trouvez quelqu’un d’autre.",
+      "landed": "Vous bondissez devant {name} en criant BOUH ! Un hurlement retentit et tout manque de tomber.",
+      "flash": "BOUH ! {name} a peur !",
+      "noCostume": "Sans costume, vous faites seulement rire {name}. Enfilez-en un d’abord.",
+      "already": "{name} a eu assez de frayeurs pour aujourd’hui.",
+      "notOnErrand": "Hester ne vous a demandé d’effrayer personne aujourd’hui."
+    },
+    "tokenPrice": "{count} {item}",
+    "thatchgrin": {
+      "poleBound": "Lié au poteau",
+      "wakeYell": "La NUIT tombe sur le potager ! Qui marche dans MON champ ?",
+      "sleepYell": "Le soleil est levé. Retour au poteau, retour à la garde."
+    }
+  },
   "dungeonGuide": {
     "drownedTemple": {
       "greet": {
@@ -9910,7 +10019,7 @@ export const fr_FR: EnTranslations = {
       "framesGovernedTalkingHead": "Modifier les cadres desserre également le panneau de dialogue, qui diffuse la ligne parlée d'un PNJ lorsque ce PNJ est hors de votre vue; il porte sa puce nominative lorsqu'il est en vrac.",
       "framesGovernedShardpike": "Modifier les cadres déverrouille aussi la barre de la Pique-éclat, la courte rangée d'actions d'outil de quête qui apparaît près de vos barres d'action uniquement lorsque vous portez la Pique-éclat elle-même ; elle affiche son étiquette de nom quand elle est déverrouillée, pour pouvoir la placer avant le combat.",
       "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
-      "framesGovernedPriest": "Edit Frames also lets you move the Shadow priest's Gloomtithe and Tithe Bomb medallion.",
+      "framesGovernedPriest": "Modifier les cadres permet aussi de déplacer le médaillon de Dîme sombre et de Bombe de dîme du prêtre Ombre.",
       "framesGovernedResourceAndHill": "Activez Détacher la barre de ressource dans l’onglet Cadres pour que Modifier les cadres déverrouille aussi votre barre de ressource : votre mana, votre énergie ou votre rage peut ainsi être placé séparément, où vous le souhaitez. Largeur de la barre de ressource et Hauteur de la barre de ressource, dans ce même onglet, règlent sa taille. Modifier les cadres déverrouille aussi la barre du Roi de la colline ; Opacité du fond du Roi de la colline, dans cet onglet, estompe son panneau sans nuire à la lisibilité du texte.",
       "barsTitle": "Barres, minuteries et texte de combat",
       "barsBody": "Votre barre d'incantation apparaît au milieu de l'écran, juste au-dessus de vos barres d'action, chaque fois que vous incantez ou canalisez, et affiche le nom du sort ainsi que le temps restant. Votre cible dispose de sa propre barre d'incantation sur son cadre, pour que vous puissiez voir ce qui arrive et y répondre.\n\nUne fine barre de cadence se trouve sous votre barre d'incantation et se remplit entre vos coups d'arme, pour qu'un attaquant au corps à corps ou à distance puisse voir quand le prochain coup automatique arrivera.\n\nVotre barre d'expérience s'étend sur toute la largeur sous vos barres d'action, graduée en segments, avec une portion plus claire montrant l'expérience reposée que vous avez accumulée.\n\nNagez sous l'eau et une barre de souffle bleue apparaît en haut de l'écran. Elle se vide tant que votre tête est immergée, clignote en rouge une fois épuisée quand vous commencez à vous noyer, puis se remplit rapidement dès que vous refaites surface. Espace vous fait remonter, et la touche Nager vers le bas, Ctrl par défaut, vous emmène plus profond.\n\nLes dégâts et les soins flottent au-dessus de ce qu'ils ont touché sous forme de petits nombres, pour que vous puissiez lire un combat sans lire de texte. L'onglet Combat de votre fenêtre de discussion conserve le relevé écrit complet.",
@@ -10815,6 +10924,7 @@ export const fr_FR: EnTranslations = {
       "hillBodyRamp": "Toutes les deux heures, une colline apparaît dans une des zones Les Terres du Dragon, Le Voile de Givre ou La Chute d'Ambre. Le royaume reçoit un avertissement quinze minutes avant et le cercle est marqué en terrain dégagé. La colline reste active trente minutes. Entrer dans le cercle actif lève votre drapeau JcJ mondial selon les conditions de niveau habituelles, même pour les membres d'un raid. Le groupe comptant le plus de joueurs admissibles à l'intérieur capture la colline après une minute de majorité ininterrompue ; un joueur seul compte comme un groupe d'une personne, mais les membres d'un raid et les joueurs sous le niveau requis pour le JcJ ne peuvent ni capturer ni gagner l'Honneur de la colline. Chaque détenteur à l'intérieur gagne de l'Honneur à un rythme croissant. Les versements et leur progression sont accélérés pour conserver l'Honneur total de l'ancien événement de quarante-cinq minutes. Un changement de détenteur réinitialise la progression. Sortir laisse votre drapeau levé ; /pvp off prend les cinq minutes habituelles et ne peut aboutir dans une colline active ni en combat. La barre affiche le contrôle, les effectifs et la progression de capture ; /hill indique l'emplacement.",
       "hillBodyPause": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls, and every five minutes while it stands the realm is told where it is and which groups have held it longest. The party with the most players standing inside contests the hill, and after thirty seconds of majority the hill is theirs. A rival party walking in only pauses that count until yours leads again; it starts over only if nobody from your party is left alive inside. A lone player counts as a party of one and keeps a hill they hold when they form a party, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns Honor every minute, and the longer the same party holds it, the more each minute pays: a full party holding an uncontested hill for its whole stand earns about as much as three battleground wins. When the hill changes hands, the new holders start the count from the beginning. When it falls, if the group that held it longest in total held it for at least ten minutes, everyone who stood inside for that group for at least a minute, and is still in that group, earns one win toward the PvP row of the Weekly Vault. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
       "hillBodyFlat": "Toutes les trois heures, à un moment imprévisible, le royaume entier apprend qu'une colline apparaîtra quinze minutes plus tard dans une des zones du nord. Son cercle est marqué sur un terrain dégagé. Elle reste quarante-cinq minutes, puis disparaît. Pendant ce temps, sa position et les groupes ayant cumulé les plus longues durées de contrôle sont annoncés toutes les cinq minutes. Le groupe comptant le plus de joueurs dans le cercle conteste la colline et la capture après trente secondes cumulées de supériorité numérique. L'arrivée d'un groupe adverse ne fait que suspendre le compteur jusqu'à ce que le vôtre reprenne l'avantage ; il ne repart de zéro que si aucun membre vivant de votre groupe ne reste à l'intérieur. Un joueur seul compte comme un groupe d'une personne et conserve sa colline lorsqu'il forme un groupe, mais les membres de raid ne comptent pas du tout. Chaque membre du groupe qui contrôle la colline et se tient dans le cercle reçoit autant d'Honneur chaque minute, quelle que soit la durée du contrôle. Un groupe complet qui la garde sans opposition pendant toute sa durée gagne environ autant que pour trois victoires sur un champ de bataille. À sa disparition, si le groupe au plus long contrôle cumulé a tenu au moins dix minutes, tous ceux qui sont restés dans le cercle au moins une minute pendant son contrôle et font encore partie de ce groupe reçoivent une victoire pour la rangée JcJ du Coffre hebdomadaire. Une barre au-dessus du terrain affiche le détenteur, les effectifs des deux camps et le compteur de capture ; /hill dans le chat indique sa position.",
+      "hillBodyTwoHour": "Une fois toutes les deux heures, à un instant imprévisible, tout le royaume apprend qu’une colline surgira dans l’une des zones du nord quinze minutes plus tard. Le cercle de son emplacement est alors marqué en terrain découvert. Elle reste trente minutes, puis disparaît. Tant qu’elle est présente, le royaume reçoit toutes les cinq minutes sa position et le nom des groupes qui l’ont contrôlée le plus longtemps. Le groupe comptant le plus de joueurs dans le cercle dispute la colline et la capture après trente secondes de majorité. L’arrivée d’un groupe rival ne fait que suspendre ce décompte jusqu’à ce que le vôtre reprenne l’avantage ; il ne repart de zéro que si aucun membre de votre groupe n’est encore vivant à l’intérieur. Un joueur seul compte comme un groupe d’une personne et conserve sa colline s’il crée un groupe, mais les membres d’un raid ne comptent pas. Tant qu’un groupe contrôle la colline, chacun de ses membres à l’intérieur gagne la même quantité d’Honneur chaque minute, quelle que soit la durée du contrôle. Un groupe complet qui la tient sans opposition pendant toute son apparition gagne ainsi environ autant qu’avec deux victoires en champ de bataille. Lorsqu’elle disparaît, si le groupe l’ayant contrôlée le plus longtemps au total l’a tenue au moins dix minutes, chaque personne restée à l’intérieur pour ce groupe pendant au moins une minute et en faisant toujours partie gagne une victoire pour la ligne JcJ du coffre hebdomadaire. Une barre au-dessus du terrain indique qui la contrôle, vos effectifs face aux leurs et le décompte de contestation ; /hill dans le chat indique sa position.",
       "limitsBodyRaids": "Vaincre le même joueur encore et encore rapporte de moins en moins puis bientôt plus rien, et votre compteur contre ce joueur ne repart de zéro qu'environ une heure après la première de ces victoires, si bien que camper une seule victime ne vaut jamais l'attente. Une cible très en dessous de votre niveau ne rapporte rien du tout. Les champs de bataille et les arènes suivent leurs propres règles tant que vous vous y trouvez, et ils rapportent plus d'Honneur que le monde ouvert, si bien que le JcJ en monde ouvert est la voie la plus lente vers le même marchand. Les raids ne gagnent rien des victoires en monde ouvert : un membre de raid ne reçoit ni Honneur ni or et ne réduit la part de personne d'autre, alors combattez en groupe pour être payé."
     },
     "thornhollowPage": {
@@ -15556,6 +15666,7 @@ export const fr_FR: EnTranslations = {
       "accountSuspended": "Ce compte est suspendu jusqu'au {date}.",
       "alreadyInWorld": "Le personnage est déjà dans le monde.",
       "accountSessionLimit": "Trop de personnages de ce compte sont déjà dans le monde.",
+      "worldFightHold": "Un autre personnage de ce compte est encore dans le monde après un combat. Réessayez dans quelques minutes.",
       "takenOver": "Votre personnage a été pris en main par une autre session.",
       "vaultMailRecovering": "Votre courrier des récompenses du coffre est en cours de restauration. Réessayez dans un moment.",
       "renameBeforeEntering": "Ce personnage doit être renommé avant d'entrer dans le monde.",
@@ -18449,16 +18560,16 @@ export const fr_FR: EnTranslations = {
         "description": "Canalise pendant 3 s, infligeant {damage} points de dégâts d'Ombre chaque seconde. Les dégâts augmentent avec la puissance des sorts."
       },
       "vampiric_touch": {
-        "name": "Vampiric Touch",
-        "description": "Deal {damage} Shadow damage over 15 sec, once every 3 sec. Damage increases with Spell Power and ticks can critically strike. Each tick shares healing equal to 20% of the health lost by the enemy among you and injured party members within 30 yards; in a raid, only your subgroup receives this healing. If you have at least 2 Gloomtithe charges, applying this effect consumes 2 to increase all its damage by 30%."
+        "name": "Toucher vampirique",
+        "description": "Inflige {damage} points de dégâts d’Ombre en 15 s, avec un effet toutes les 3 s. Les dégâts augmentent avec la puissance des sorts et chaque effet périodique peut être critique. Chaque effet répartit des soins équivalents à 20% des points de vie perdus par l’ennemi entre vous et les membres blessés du groupe à moins de 30 mètres ; en raid, seul votre sous-groupe reçoit ces soins. Si vous avez au moins 2 charges de Dîme sombre, appliquer cet effet en consomme 2 pour augmenter tous ses dégâts de 30%."
       },
       "void_rupture": {
-        "name": "Void Rupture",
-        "description": "Consume 3 Gloomtithe charges to rupture an enemy for {damage} Shadow damage. Damage increases with Spell Power and can critically strike. Requires 3 charges and consumes them even if resisted."
+        "name": "Rupture du Vide",
+        "description": "Consomme 3 charges de Dîme sombre pour déchirer un ennemi et lui infliger {damage} points de dégâts d’Ombre. Les dégâts augmentent avec la puissance des sorts et peuvent être critiques. Nécessite 3 charges et les consomme même si le sort est résisté."
       },
       "spirit_bomb": {
-        "name": "Tithe Bomb",
-        "description": "Detonate a spirit bomb on an enemy, dealing {damage} Shadow damage to enemies within 8 yards of that target. Damage increases with Spell Power, can critically strike, and is reduced beyond 5 targets. Generate 20 Gloomtithe to prepare one bomb. Generation counts even while holding the maximum 5 Gloomtithe; spending charges is not required and adds no progress. Progress lasts between fights, up to one prepared bomb. Dying clears your progress and prepared bomb. Completing the cast consumes the prepared bomb, even if resisted. Cancellation or interruption preserves it. Starting a raid boss encounter clears your progress and prepared bomb. Cannot open a raid boss encounter with this spell."
+        "name": "Bombe de dîme",
+        "description": "Fait exploser une bombe spirituelle sur un ennemi, infligeant {damage} points de dégâts d’Ombre aux ennemis à moins de 8 mètres de cette cible. Les dégâts augmentent avec la puissance des sorts, peuvent être critiques et sont réduits au-delà de 5 cibles. Générez 20 charges de Dîme sombre pour préparer une bombe. La génération compte même lorsque vous détenez le maximum de 5 charges ; les dépenser n’est pas nécessaire et n’ajoute aucune progression. La progression persiste entre les combats, jusqu’à une bombe préparée. Mourir efface votre progression et votre bombe préparée. Terminer l’incantation consomme la bombe préparée, même si le sort est résisté. L’annulation ou l’interruption la conserve. Engager un boss de raid efface votre progression et votre bombe préparée. Ce sort ne peut pas servir à engager un boss de raid."
       },
       "flash_heal": {
         "name": "Prière urgente",
@@ -19294,7 +19405,7 @@ export const fr_FR: EnTranslations = {
       "inner_focus": {
         "name": "Esprit apaisé",
         "description": "Rend votre prochain sort de prêtre gratuit et ininterruptible. Dure 60 s.",
-        "specNote_shadow": "Also reserves a guaranteed critical strike for your next Mindfracture or Void Rupture within 60 sec, if it hits. Other spells do not consume this bonus. Void Rupture still consumes 3 Gloomtithe charges. A resisted cast consumes the critical strike bonus."
+        "specNote_shadow": "Réserve aussi un coup critique garanti pour votre prochaine Fracture mentale ou Rupture du Vide dans les 60 s, si elle touche. Les autres sorts ne consomment pas ce bonus. Rupture du Vide consomme toujours 3 charges de Dîme sombre. Une incantation résistée consomme le bonus de coup critique."
       },
       "innervate": {
         "name": "Sève vitale",
@@ -19492,7 +19603,7 @@ export const fr_FR: EnTranslations = {
       "choir_of_deliverance": {
         "name": "Chœur de délivrance",
         "description": "Canalise pendant 6 s et soigne les membres du groupe dans un rayon de 30 mètres de {damage} toutes les 2 s. Le soin augmente avec la puissance des sorts.",
-        "specNote_shadow": "For 15 sec, share 20% of the health enemies lose to your Shadow damage as healing among injured party members within 30 yards, including yourself. In raids, only your subgroup is healed. Cast instantly and keep attacking in Shadowform. Absorbed damage and overkill do not add healing."
+        "specNote_shadow": "Pendant 15 s, répartit en soins 20% des points de vie que les ennemis perdent à cause de vos dégâts d’Ombre entre les membres blessés du groupe à moins de 30 mètres, vous compris. En raid, seul votre sous-groupe est soigné. Incantation instantanée, permettant de continuer à attaquer en forme d’Ombre. Les dégâts absorbés et ceux dépassant les points de vie restants ne génèrent pas de soins."
       },
       "bear_charge": {
         "name": "Ruée de Bruin",
@@ -24707,6 +24818,87 @@ export const fr_FR: EnTranslations = {
       "vanguard_pendant_of_mending": {
         "name": "Pendentif d'Avant-garde de Soins"
       },
+      "gourdlight_sweet": {
+        "name": "Friandise de la Veillée des courges"
+      },
+      "gourdlight_treat_pouch": {
+        "name": "Sachet de friandises de la Veillée des courges"
+      },
+      "carved_pumpkin_head": {
+        "name": "Tête de citrouille sculptée"
+      },
+      "jar_of_mischief": {
+        "name": "Bocal à malices"
+      },
+      "thatchgrin_sweet_sack": {
+        "name": "Sac de friandises de Thatchgrin"
+      },
+      "strawling_charm": {
+        "name": "Charme de créature de paille"
+      },
+      "rattlebone_draught": {
+        "name": "Breuvage aux os cliquetants"
+      },
+      "haunting_draught": {
+        "name": "Breuvage spectral"
+      },
+      "batwing_draught": {
+        "name": "Breuvage voletant"
+      },
+      "writ_of_the_gourdlit": {
+        "name": "Brevet de l’Illuminé des courges"
+      },
+      "writ_of_the_trickster": {
+        "name": "Brevet du Farceur"
+      },
+      "writ_of_the_hollow_grin": {
+        "name": "Brevet du Sourire creux"
+      },
+      "reins_emberbristle_broom": {
+        "name": "Balai aux brins de braise"
+      },
+      "hearthroot_toffee": {
+        "name": "Caramel à la racine du foyer"
+      },
+      "gourdseed_brittle": {
+        "name": "Nougatine aux graines de courge"
+      },
+      "crabapple_chew": {
+        "name": "Caramel à la pomme sauvage"
+      },
+      "owlwatch_fudge": {
+        "name": "Fondant de la chouette vigie"
+      },
+      "lantern_mint_drop": {
+        "name": "Pastille de menthe des lanternes"
+      },
+      "emberwoven_sheaf": {
+        "name": "Gerbe tissée de braises"
+      },
+      "prankers_pumpkin": {
+        "name": "Citrouille du farceur"
+      },
+      "wanderwisp_lantern": {
+        "name": "Lanterne du feu follet errant"
+      },
+      "sack_of_startled_bats": {
+        "name": "Sac de chauves-souris affolées"
+      },
+      "murmurwick_candle": {
+        "name": "Chandelle à mèche murmurante"
+      },
+      "gurglegreen_cauldron": {
+        "name": "Chaudron Vertglouglou"
+      },
+      "thatchgrin_patch_pumpkin": {
+        "name": "Citrouille du potager"
+      },
+      "cursed_candle_stub": {
+        "name": "Bout de chandelle maudite"
+      },
+      "gourdlight_crow_feather": {
+        "name": "Plume de corbeau de la Veillée des courges"
+      },
       "membership_staff": {
         "name": "Bâton du changement"
       },
@@ -26263,6 +26455,18 @@ export const fr_FR: EnTranslations = {
       "muster_effigy": {
         "name": "Contremaître de paille"
       },
+      "gourdlight_thatchgrin": {
+        "name": "Vieux Thatchgrin"
+      },
+      "gourdlight_crow": {
+        "name": "Corbeau de la Veillée des courges"
+      },
+      "gourdlight_strawling": {
+        "name": "Créature de paille"
+      },
+      "gourdlight_swelling_gourd": {
+        "name": "Courge gonflante"
+      },
       "stable_horse": {
         "name": "Cheval d'écurie"
       },
@@ -27416,6 +27620,11 @@ export const fr_FR: EnTranslations = {
         "name": "Hester Quillby",
         "title": "Cartographe",
         "greeting": "Toutes les cartes de ce marais que j'ai achetées étaient fausses en une saison. L'eau déplace les chemins et les chemins déplacent l'eau. Alors je dessine les miennes, et je reste ici au sec pendant que l'encre sèche."
+      },
+      "gourdlight_keeper": {
+        "name": "Hester Gourdwick",
+        "title": "Gardienne de la Veillée des courges",
+        "greeting": "Les courges brillent et les lanternes sont suspendues : c’est donc la Veillée des courges. Frappez aux portes des habitants d’Eastbrook, de Fenbridge et de Highwatch, puis dites les mots : des bonbons ou un sort. La plupart vous donneront une friandise. Quelques-uns vous joueront un tour. Apportez-moi les friandises à n’importe lequel de mes étals et je vous les échangerai contre quelque chose à porter."
       },
       "reeve_ottoline": {
         "name": "Prévôte Ottoline",
@@ -30048,6 +30257,88 @@ export const fr_FR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Soin efficace porté au mannequin de soins"
+          }
+        }
+      },
+      "q_gourdlight_rounds": {
+        "title": "Tournée de la Veillée des courges",
+        "text": "Chaque Veillée des courges, les enfants de la vallée font leur tournée, et cette année vous les accompagnez, {playerName}. Frappez à cinq portes de nos villes, dites les mots et voyez ce qu’on vous offre. Revenez me voir une fois votre tournée terminée.",
+        "completion": "Cinq portes, et vous avez encore tous vos doigts. Tenez, un sachet de friandises pour le retour. Revenez demain, les portes s’ouvriront à nouveau.",
+        "objectives": {
+          "0": {
+            "label": "Portes auxquelles vous avez frappé"
+          }
+        }
+      },
+      "q_gourdlight_daily_patch": {
+        "title": "Les citrouilles du potager",
+        "text": "Le potager du Vieux Thatchgrin, au-delà du Pré aux sangliers, regorge de citrouilles. La moitié ont roulé hors de portée de sa paille, là où une personne prudente peut les ramasser. Apportez-m’en cinq, {playerName}. Restez bien à l’écart du vieil épouvantail. Il les compte toutes.",
+        "completion": "Cinq bien rondes, sans la moindre morsure. De quoi faire de la tarte pour toute la vallée. Tenez, pour votre peine.",
+        "objectives": {
+          "0": {
+            "label": "Citrouilles du potager"
+          }
+        }
+      },
+      "q_gourdlight_daily_boo": {
+        "title": "Bouh !",
+        "text": "Personne dans ces villes n’a eu une bonne frayeur depuis un an, {playerName}, et sans cela, la Veillée des courges n’est qu’une nuit froide. Enfilez un costume, n’importe lequel des miens fera l’affaire, ou cette tête de citrouille si vous en avez gagné une. Puis approchez-vous discrètement de trois habitants et poussez un bon gros BOUH !",
+        "completion": "Trois ? J’ai entendu le cuisinier lâcher une poêle depuis l’autre bout de la place. Bien joué. Voici votre part.",
+        "objectives": {
+          "0": {
+            "label": "Habitants effrayés"
+          }
+        }
+      },
+      "q_gourdlight_daily_wicks": {
+        "title": "Méchantes mèches",
+        "text": "Quelqu’un dépose des chandelles aux flammes vertes au pied de nos réverbères. Elles brûlent sans fondre et murmurent dès qu’on leur tourne le dos. Éteignez-en six pour moi, {playerName}, dans n’importe laquelle des trois villes, et rapportez-moi les bouts.",
+        "completion": "Six bouts de chandelle, froids comme le givre. La personne qui les a allumés devra faire mieux que cela. Prenez ceci et lavez-vous les mains.",
+        "objectives": {
+          "0": {
+            "label": "Chandelles maudites éteintes"
+          }
+        }
+      },
+      "q_gourdlight_daily_towns": {
+        "title": "Une porte dans chaque ville",
+        "text": "Les enfants disent qu’un vrai promeneur des courges frappe aux portes de chaque ville avant la fin de la nuit. Donnez-leur raison, {playerName}. Demandez des bonbons ou un sort à une porte d’Eastbrook, une de Fenbridge et une de Highwatch. Les lanternes des routes éclaireront votre chemin.",
+        "completion": "Trois villes en une nuit ! Vos bottes ont davantage mérité ceci que vous.",
+        "objectives": {
+          "0": {
+            "label": "Une porte visitée à Eastbrook"
+          },
+          "1": {
+            "label": "Une porte visitée à Fenbridge"
+          },
+          "2": {
+            "label": "Une porte visitée à Highwatch"
+          }
+        }
+      },
+      "q_gourdlight_daily_feathers": {
+        "title": "Des plumes pour le feu",
+        "text": "Quand le Vieux Thatchgrin est acculé, il appelle ses corbeaux sur ceux qui malmènent sa paille. Leurs plumes brûlent d’une flamme verte dans l’âtre, et il m’en faut trois pour le feu de joie de ce soir. Trouvez un combat dans son potager, {playerName}, et prélevez-les sur ses corbeaux.",
+        "completion": "Noires comme un champ sans lune, et elles sentent déjà la fumée. Le feu de joie sera splendide. Merci.",
+        "objectives": {
+          "0": {
+            "label": "Plumes de corbeau"
+          }
+        }
+      },
+      "q_gourdlight_daily_baskets": {
+        "title": "Des corbeilles pour les voisins",
+        "text": "À chaque Veillée des courges, je remplis une corbeille de friandises pour un vieil ami dans chaque ville, et mes genoux ne sont plus ce qu’ils étaient. Distribuez-les pour moi, {playerName} : au cuisinier Marlow à Eastbrook, à Yara l’herboriste à Fenbridge et au maître du savoir Caddis, là-haut à Highwatch.",
+        "completion": "Les trois ont été livrées, et j’ai entendu dire que Marlow a pleuré. Il pleure toujours. Voici une corbeille pour vous.",
+        "objectives": {
+          "0": {
+            "label": "Corbeille remise au cuisinier Marlow"
+          },
+          "1": {
+            "label": "Corbeille remise à Yara l’herboriste"
+          },
+          "2": {
+            "label": "Corbeille remise au maître du savoir Caddis"
           }
         }
       },

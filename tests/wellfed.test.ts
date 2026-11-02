@@ -118,16 +118,21 @@ describe('well fed: the one aura id', () => {
     expect(bad.kind).toBe('drink');
   });
 
-  it('content pin: the well-fed carrier set is exactly the seven buff foods', () => {
+  it('content pin: the well-fed carrier set is exactly the seven buff foods and five candies', () => {
     const carriers = Object.values(ITEMS)
       .filter((def) => def.kind === 'food' && def.wellFed !== undefined)
       .map((def) => def.id)
       .sort();
     expect(carriers).toEqual([
+      'crabapple_chew',
       'eastbrook_glazed_carrots',
       'evergarden_braised_greens',
       'fenbridge_rice_pudding',
+      'gourdseed_brittle',
+      'hearthroot_toffee',
       'highwatch_barley_porridge',
+      'lantern_mint_drop',
+      'owlwatch_fudge',
       'sageleaf_chowder',
       'stonepot_stew',
       'warspice_skewers',
@@ -149,7 +154,14 @@ describe('well fed: the one aura id', () => {
     // union must stay exactly the set the shipped carriers use, so widening it
     // for a kind nothing carries, or a carrier appearing outside it, is a
     // deliberate change here and an audit of the strip.
-    const narrowed: readonly TimedStatBuffAuraKind[] = ['buff_ap', 'buff_int', 'buff_sta'];
+    const narrowed: readonly TimedStatBuffAuraKind[] = [
+      'buff_ap',
+      'buff_int',
+      'buff_sta',
+      'buff_str',
+      'buff_agi',
+      'buff_spi',
+    ];
     const carried = new Set<string>();
     for (const def of Object.values(ITEMS)) {
       if (def.elixir) carried.add(def.elixir.kind);
@@ -185,17 +197,30 @@ describe('well fed: the one aura id', () => {
       buff_sta: true,
       buff_ap: true,
       buff_int: true,
+      buff_str: true,
+      buff_agi: true,
+      buff_spi: true,
     };
     const sharedKinds: Record<TimedStatBuffAuraKind, true> = {
       buff_sta: true,
       buff_ap: true,
       buff_int: true,
+      buff_str: true,
+      buff_agi: true,
+      buff_spi: true,
     };
     expect(sameSet).toBe(true);
     expect(Object.keys(flaskKinds).sort()).toEqual(Object.keys(sharedKinds).sort());
     // ...and against the literal set, so re-spelling BOTH records the same
     // wrong way still reds (the pair compare alone would not see it).
-    expect(Object.keys(flaskKinds).sort()).toEqual(['buff_ap', 'buff_int', 'buff_sta']);
+    expect(Object.keys(flaskKinds).sort()).toEqual([
+      'buff_agi',
+      'buff_ap',
+      'buff_int',
+      'buff_spi',
+      'buff_sta',
+      'buff_str',
+    ]);
   });
 });
 
@@ -695,7 +720,7 @@ describe('well fed: the retired namespace is gone (the unification landed)', () 
       .filter((def) => def.kind === 'food' && def.wellFed !== undefined)
       .map((def) => def.id)
       .sort();
-    expect(carriers, 'the sweep really has carriers to eat').toHaveLength(7);
+    expect(carriers, 'the sweep really has carriers to eat').toHaveLength(12);
     for (const itemId of carriers) {
       const { sim, pid, p } = playerWorld();
       eatToCompletion(sim, pid, p, itemId);

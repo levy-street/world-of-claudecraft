@@ -39,14 +39,42 @@ export const HEMI_INTENSITY_FLAT = 0.4;
 export const LAMBERT_RIG_HEMI_INTENSITY = 0.9;
 export const LAMBERT_RIG_SUN_INTENSITY = 2.65;
 
-/** The Low preset's clearer fill uses the same light pair and shader programs.
- * Keep the legacy constants above for higher-tier Lambert terrain compensation. */
-export function lowHemiIntensity(profile: { readonly lowReadabilityLighting: boolean }): number {
-  return profile.lowReadabilityLighting ? 1.8 : LAMBERT_RIG_HEMI_INTENSITY;
+export interface LowNightGrade {
+  readonly fog?: string | readonly [number, number, number];
+  readonly nightAmt?: number;
 }
 
-export function lowSunIntensity(profile: { readonly lowReadabilityLighting: boolean }): number {
-  return profile.lowReadabilityLighting ? 2.25 : LAMBERT_RIG_SUN_INTENSITY;
+/** The Low preset's clearer fill uses the same light pair and shader programs.
+ * Keep the legacy constants above for higher-tier Lambert terrain compensation.
+ * By day (`nightAmt === 0`) the hemisphere and sun sit at 1.2 / 1.85 so peak
+ * noon does not wash out unshadowed Lambert surfaces; after dark (`nightAmt > 0`),
+ * realms whose night read relies on IBL fill on higher tiers (especially
+ * Drakelands' `ember` sky, which receives a 12.38x night IBL lift on Standard)
+ * get a compensating hemisphere and key lift on the IBL-free Low rig. */
+export function lowHemiIntensity(
+  profile: { readonly lowReadabilityLighting: boolean },
+  grade?: LowNightGrade,
+  biomeOverride?: string,
+): number {
+  if (!profile.lowReadabilityLighting) return LAMBERT_RIG_HEMI_INTENSITY;
+  const n = Math.max(0, Math.min(1, grade?.nightAmt ?? 0));
+  const biome = biomeOverride ?? (typeof grade?.fog === 'string' ? grade.fog : undefined);
+  const darkRealm =
+    biome === 'ember' || biome === 'volcano' || biome === 'hollow' || biome === 'marsh';
+  return 1.2 * (1 + n * (darkRealm ? 0.95 : 0.45));
+}
+
+export function lowSunIntensity(
+  profile: { readonly lowReadabilityLighting: boolean },
+  grade?: LowNightGrade,
+  biomeOverride?: string,
+): number {
+  if (!profile.lowReadabilityLighting) return LAMBERT_RIG_SUN_INTENSITY;
+  const n = Math.max(0, Math.min(1, grade?.nightAmt ?? 0));
+  const biome = biomeOverride ?? (typeof grade?.fog === 'string' ? grade.fog : undefined);
+  const darkRealm =
+    biome === 'ember' || biome === 'volcano' || biome === 'hollow' || biome === 'marsh';
+  return 1.85 * (1 + n * (darkRealm ? 0.65 : 0.25));
 }
 
 /** Hemisphere intensity the standard-materials rig runs at for `profile`. */

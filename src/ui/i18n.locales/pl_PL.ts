@@ -25846,4 +25846,232 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.stackUnavailable':
     'Dodawanie czasu członkostwa jest obecnie niedostępne. Spróbuj ponownie za chwilę.',
   'hudChrome.wocStore.subscription.tokenPrice': '{price} za 30 dni',
+  'errors.api.worldFightHold':
+    'Inna postać na tym koncie nadal pozostaje w świecie po walce. Spróbuj ponownie za kilka minut.',
+  'hudChrome.auraEffect.gourdlight.thatchbound':
+    'Stary Słomochichot pociąga za twoje sznurki. Nie możesz działać: podchodzisz do najbliższego sojusznika i uderzasz go co {every} s, zadając od {min} do {max} obrażeń (do {mult} razy więcej przeciw sojusznikowi na poziomie {level}). Efekt kończy się wcześniej, gdy otrzymasz obrażenia równe {pct}% maksymalnego zdrowia lub gdy sojusznik go rozproszy (magia).',
+  'hudChrome.auraEffect.seasonalCosmetic': 'Tylko wygląd: bez wpływu na walkę',
+  'hudChrome.auraEffect.slumberNight':
+    'Wisi bez życia na swoim palu aż do zmroku. Nie można go zaatakować.',
+  'hudChrome.auraEffect.stilledMindCrit':
+    'Twoje następne Roztrzaskanie umysłu lub Rozerwanie pustki zada gwarantowane trafienie krytyczne, jeśli trafi. Inne zaklęcia nie zużywają tej premii. Rozerwanie pustki nadal zużywa 3 ładunki Mrocznej dziesięciny. Odparcie zaklęcia zużywa premię.',
+  'hudChrome.mounts.desc_emberbristle_broom':
+    'Dożynkowa miotła przewiązana pomarańczową wstążką unosi się na dłoń nad ziemią, gubiąc żar ze szczeciny. Stała nagroda z Wigilii Dyniowych Świateł.',
+  'hudChrome.mounts.name_emberbristle_broom': 'Miotła żarzącej szczeciny',
+  'hudChrome.priest.bombLabel': 'Bomba dziesięciny',
+  'hudChrome.priest.bombReady': 'Gotowa',
+  'hudChrome.priest.bombStatus': '{value} z {max} ładunków Bomby dziesięciny',
+  'hudChrome.priest.bombTooltip':
+    'Bomba dziesięciny: wygeneruj 20 ładunków Mrocznej dziesięciny, aby przygotować jedną bombę. Wydawanie ładunków nie zwiększa postępu. Postęp utrzymuje się między walkami. Śmierć lub rozpoczęcie walki z bossem rajdu go zeruje. Ukończenie rzucania zużywa bombę; anulowanie ją zachowuje.',
+  'hudChrome.priest.chargeCount': '{value} / {max}',
+  'hudChrome.priest.gloomtitheLabel': 'Mroczna dziesięcina',
+  'hudChrome.priest.gloomtitheStatus': '{value} z {max} ładunków Mrocznej dziesięciny',
+  'hudChrome.priest.gloomtitheTooltip':
+    'Mroczna dziesięcina: do 5 ładunków do wykorzystania. Rozerwanie pustki zużywa 3; Wampiryczny dotyk zużywa 2, zwiększając obrażenia o 30%; Przyzwij Dziesięcinnika zużywa cały zapas. Generowanie ładunków napełnia też Bombę dziesięciny, nawet przy pełnym zapasie.',
+  'hudChrome.worldBoss.sleepUntilNightfall': '{name} śpi do zmroku.',
+  'entities.abilities.choir_of_deliverance.specNote_shadow':
+    'Przez 15 s rozdzielasz leczenie równe 20% zdrowia utraconego przez wrogów od twoich obrażeń Cienia między rannych członków drużyny w promieniu 30 jardów, wliczając siebie. W rajdzie leczenie obejmuje tylko twoją podgrupę. Rzucasz natychmiast i możesz dalej atakować w Zmierzchowej zasłonie. Pochłonięte obrażenia i obrażenia przekraczające pozostałe zdrowie nie zwiększają leczenia.',
+  'entities.abilities.inner_focus.specNote_shadow':
+    'Zapewnia też trafienie krytyczne następnego Roztrzaskania umysłu lub Rozerwania pustki w ciągu 60 s, jeśli trafi. Inne zaklęcia nie zużywają tej premii. Rozerwanie pustki nadal zużywa 3 ładunki Mrocznej dziesięciny. Odparcie zaklęcia zużywa premię do trafienia krytycznego.',
+  'entities.abilities.spirit_bomb.description':
+    'Detonujesz duchową bombę na wrogu, zadając {damage} obrażeń Cienia wrogom w promieniu 8 jardów od celu. Obrażenia rosną z mocą zaklęć, mogą być krytyczne i maleją powyżej 5 celów. Wygeneruj 20 ładunków Mrocznej dziesięciny, aby przygotować jedną bombę. Generowanie liczy się nawet przy maksymalnych 5 ładunkach; wydawanie nie jest konieczne i nie zwiększa postępu. Postęp utrzymuje się między walkami, a przygotowana może być najwyżej jedna bomba. Śmierć usuwa postęp i przygotowaną bombę. Ukończenie rzucania zużywa bombę, nawet jeśli cel się oprze. Anulowanie lub przerwanie zachowuje ją. Rozpoczęcie walki z bossem rajdu usuwa postęp i przygotowaną bombę. Tym zaklęciem nie można rozpocząć walki z bossem rajdu.',
+  'entities.abilities.spirit_bomb.name': 'Bomba dziesięciny',
+  'entities.abilities.vampiric_touch.description':
+    'Zadajesz {damage} obrażeń Cienia przez 15 s, raz na 3 s. Obrażenia rosną z mocą zaklęć, a kolejne impulsy mogą być krytyczne. Każdy impuls rozdziela leczenie równe 20% zdrowia utraconego przez wroga między ciebie i rannych członków drużyny w promieniu 30 jardów; w rajdzie otrzymuje je tylko twoja podgrupa. Jeśli masz co najmniej 2 ładunki Mrocznej dziesięciny, nałożenie efektu zużywa 2 i zwiększa wszystkie jego obrażenia o 30%.',
+  'entities.abilities.vampiric_touch.name': 'Wampiryczny dotyk',
+  'entities.abilities.void_rupture.description':
+    'Zużywasz 3 ładunki Mrocznej dziesięciny, by rozerwać wroga i zadać {damage} obrażeń Cienia. Obrażenia rosną z mocą zaklęć i mogą być krytyczne. Wymaga 3 ładunków i zużywa je nawet wtedy, gdy cel się oprze.',
+  'entities.abilities.void_rupture.name': 'Rozerwanie pustki',
+  'entities.items.batwing_draught.name': 'Trzepoczący eliksir',
+  'entities.items.carved_pumpkin_head.name': 'Rzeźbiona dyniowa głowa',
+  'entities.items.crabapple_chew.name': 'Cukierek z dzikiego jabłka',
+  'entities.items.cursed_candle_stub.name': 'Ogryzek przeklętej świecy',
+  'entities.items.emberwoven_sheaf.name': 'Snop przetykany żarem',
+  'entities.items.gourdlight_crow_feather.name': 'Pióro dyniowej wrony',
+  'entities.items.gourdlight_sweet.name': 'Dyniowy cukierek',
+  'entities.items.gourdlight_treat_pouch.name': 'Sakiewka dyniowych cukierków',
+  'entities.items.gourdseed_brittle.name': 'Chrupka z pestek dyni',
+  'entities.items.gurglegreen_cauldron.name': 'Zielonobulgoczący kocioł',
+  'entities.items.haunting_draught.name': 'Upiorny eliksir',
+  'entities.items.hearthroot_toffee.name': 'Karmel z korzenia paleniska',
+  'entities.items.jar_of_mischief.name': 'Słoik psot',
+  'entities.items.lantern_mint_drop.name': 'Latarniany miętusek',
+  'entities.items.murmurwick_candle.name': 'Świeca szepczącego knota',
+  'entities.items.owlwatch_fudge.name': 'Sowie krówki',
+  'entities.items.prankers_pumpkin.name': 'Dynia psotnika',
+  'entities.items.rattlebone_draught.name': 'Eliksir grzechoczących kości',
+  'entities.items.reins_emberbristle_broom.name': 'Miotła żarzącej szczeciny',
+  'entities.items.sack_of_startled_bats.name': 'Worek spłoszonych nietoperzy',
+  'entities.items.strawling_charm.name': 'Talizman słomiaka',
+  'entities.items.thatchgrin_patch_pumpkin.name': 'Dynia z poletka',
+  'entities.items.thatchgrin_sweet_sack.name': 'Worek słodyczy Słomochichota',
+  'entities.items.wanderwisp_lantern.name': 'Latarnia błędnego ognika',
+  'entities.items.writ_of_the_gourdlit.name': 'Akt Dyniowego Blasku',
+  'entities.items.writ_of_the_hollow_grin.name': 'Akt Pustego Uśmiechu',
+  'entities.items.writ_of_the_trickster.name': 'Akt Psotnika',
+  'entities.mobs.gourdlight_crow.name': 'Dyniowa wrona',
+  'entities.mobs.gourdlight_strawling.name': 'Słomiak',
+  'entities.mobs.gourdlight_swelling_gourd.name': 'Pęczniejąca dynia',
+  'entities.mobs.gourdlight_thatchgrin.name': 'Stary Słomochichot',
+  'entities.npcs.gourdlight_keeper.greeting':
+    'Dynie świecą, latarnie wiszą, więc nadeszła Wigilia Dyniowych Świateł. Zapukaj do mieszkańców Eastbrook, na Moście na Trzęsawisku i w Wysokiej Strażnicy i powiedz: cukierek albo psikus. Większość da ci słodycz. Kilkoro spłata ci figla. Przynieś mi cukierki do dowolnego z moich straganów, a wymienię je na coś do ubrania.',
+  'entities.npcs.gourdlight_keeper.name': 'Hester Dynioknot',
+  'entities.npcs.gourdlight_keeper.title': 'Strażniczka Dyniowych Świateł',
+  'entities.quests.q_gourdlight_daily_baskets.completion':
+    'Wszystkie trzy dostarczone, a podobno Marlow się popłakał. On zawsze płacze. Oto koszyk dla ciebie.',
+  'entities.quests.q_gourdlight_daily_baskets.objectives.0.label':
+    'Koszyk przekazany kucharzowi Marlowowi',
+  'entities.quests.q_gourdlight_daily_baskets.objectives.1.label':
+    'Koszyk przekazany zielarce Yarze',
+  'entities.quests.q_gourdlight_daily_baskets.objectives.2.label':
+    'Koszyk przekazany Mistrzowi Wiedzy Caddisowi',
+  'entities.quests.q_gourdlight_daily_baskets.text':
+    'W każdą Wigilię Dyniowych Świateł szykuję koszyk słodyczy dla starego przyjaciela w każdym mieście, ale moje kolana już nie te. Roznieś je za mnie, {playerName}: kucharzowi Marlowowi w Eastbrook, zielarce Yarze na Moście na Trzęsawisku i Mistrzowi Wiedzy Caddisowi w Wysokiej Strażnicy.',
+  'entities.quests.q_gourdlight_daily_baskets.title': 'Koszyki dla sąsiadów',
+  'entities.quests.q_gourdlight_daily_boo.completion':
+    'Troje? Przez cały plac usłyszałam, jak kucharz upuścił patelnię. Dobra robota. Oto twoja część.',
+  'entities.quests.q_gourdlight_daily_boo.objectives.0.label': 'Wystraszeni mieszkańcy',
+  'entities.quests.q_gourdlight_daily_boo.text':
+    'Nikt w tych miastach od roku porządnie się nie przestraszył, {playerName}, a Wigilia Dyniowych Świateł bez strachu to tylko zimna noc. Załóż kostium, którykolwiek z moich, albo dyniową głowę, jeśli już ją masz. Potem podkradnij się do trojga mieszkańców i krzyknij głośno BU!',
+  'entities.quests.q_gourdlight_daily_boo.title': 'Bu!',
+  'entities.quests.q_gourdlight_daily_feathers.completion':
+    'Czarne jak pole w bezksiężycową noc i już pachną dymem. Ognisko będzie wspaniałe. Dziękuję.',
+  'entities.quests.q_gourdlight_daily_feathers.objectives.0.label': 'Wronie pióra',
+  'entities.quests.q_gourdlight_daily_feathers.text':
+    'Gdy Stary Słomochichot ma kłopoty, zwołuje wrony na każdego, kto tłucze jego słomę. Ich pióra płoną w palenisku na zielono, a potrzebuję trzech na dzisiejsze ognisko. Znajdź walkę na jego poletku, {playerName}, i wyskub je jego wronom.',
+  'entities.quests.q_gourdlight_daily_feathers.title': 'Pióra do ognia',
+  'entities.quests.q_gourdlight_daily_patch.completion':
+    'Pięć okrągłych i żadnej nikt nie nadgryzł. Starczy na placek dla całej Doliny. Proszę, za fatygę.',
+  'entities.quests.q_gourdlight_daily_patch.objectives.0.label': 'Dynie z poletka',
+  'entities.quests.q_gourdlight_daily_patch.text':
+    'Poletko Starego Słomochichota za Łąką Dzików pęka od dyń, a połowa wytoczyła się poza jego słomę, gdzie ostrożna osoba zdoła ich dosięgnąć. Przynieś mi pięć, {playerName}. Samego starego stracha omijaj szerokim łukiem. Liczy każdą sztukę.',
+  'entities.quests.q_gourdlight_daily_patch.title': 'Dynie z poletka',
+  'entities.quests.q_gourdlight_daily_towns.completion':
+    'Trzy miasta w jedną noc! Twoje buty zasłużyły na to bardziej niż ty.',
+  'entities.quests.q_gourdlight_daily_towns.objectives.0.label': 'Zapukano do drzwi w Eastbrook',
+  'entities.quests.q_gourdlight_daily_towns.objectives.1.label':
+    'Zapukano do drzwi na Moście na Trzęsawisku',
+  'entities.quests.q_gourdlight_daily_towns.objectives.2.label':
+    'Zapukano do drzwi w Wysokiej Strażnicy',
+  'entities.quests.q_gourdlight_daily_towns.text':
+    'Dzieci mówią, że prawdziwy dyniowy wędrowiec zapuka w każdym mieście przed końcem nocy. Udowodnij im rację, {playerName}. Poproś o cukierek albo psikus przy jednych drzwiach w Eastbrook, jednych na Moście na Trzęsawisku i jednych w Wysokiej Strażnicy. Latarnie przy drogach rozświetlą ci trasę.',
+  'entities.quests.q_gourdlight_daily_towns.title': 'Drzwi w każdym mieście',
+  'entities.quests.q_gourdlight_daily_wicks.completion':
+    'Sześć ogryzków, zimnych jak szron. Kto je zapalił, będzie musiał bardziej się postarać. Weź to i umyj ręce.',
+  'entities.quests.q_gourdlight_daily_wicks.objectives.0.label': 'Zgaszone przeklęte świece',
+  'entities.quests.q_gourdlight_daily_wicks.text':
+    'Ktoś ustawia świece o zielonych płomieniach u stóp naszych latarni. Płoną, nie topiąc się, i szepczą, gdy odwrócisz wzrok. Zgaś dla mnie sześć, {playerName}, w dowolnym z trzech miast i przynieś mi ogryzki.',
+  'entities.quests.q_gourdlight_daily_wicks.title': 'Nikczemne knoty',
+  'entities.quests.q_gourdlight_rounds.completion':
+    'Pięcioro drzwi, a wszystkie palce na miejscu. Oto sakiewka słodyczy na drogę do domu. Wróć jutro, drzwi znów się otworzą.',
+  'entities.quests.q_gourdlight_rounds.objectives.0.label': 'Drzwi, do których zapukano',
+  'entities.quests.q_gourdlight_rounds.text':
+    'W każdą Wigilię Dyniowych Świateł dzieci z Doliny obchodzą domy, a w tym roku do nich dołączysz, {playerName}. Zapukaj do pięciorga drzwi w naszych miastach, wypowiedz te słowa i zobacz, co dostaniesz. Wróć do mnie po wszystkim.',
+  'entities.quests.q_gourdlight_rounds.title': 'Dyniowy obchód',
+  'guide.interfacePage.framesGovernedPriest':
+    'Edycja ramek pozwala też przenieść medalion kapłana Cienia z Mroczną dziesięciną i Bombą dziesięciny.',
+  'guide.worldPvpPage.hillBodyTwoHour':
+    'Raz na dwie godziny, w chwili, której nikt nie potrafi przewidzieć, cały świat gry dowiaduje się, że za piętnaście minut w jednej z północnych stref wyrośnie wzgórze. Na otwartym terenie pojawia się krąg oznaczający jego miejsce. Wzgórze stoi przez trzydzieści minut, potem opada, a co pięć minut świat gry otrzymuje wiadomość o jego położeniu i grupach, które utrzymywały je najdłużej. Drużyna z największą liczbą graczy wewnątrz walczy o wzgórze i przejmuje je po trzydziestu sekundach przewagi. Wejście rywali tylko zatrzymuje licznik do odzyskania przewagi; odliczanie zaczyna się od nowa wyłącznie wtedy, gdy wewnątrz nie zostanie nikt żywy z twojej drużyny. Samotny gracz liczy się jako jednoosobowa drużyna i zachowuje wzgórze po utworzeniu drużyny, lecz członkowie rajdu w ogóle się nie liczą. Gdy drużyna utrzymuje wzgórze, każdy jej członek stojący wewnątrz zdobywa co minutę tyle samo Honoru niezależnie od czasu utrzymania. Pełna drużyna trzymająca wzgórze bez przeciwników przez cały czas zdobywa więc mniej więcej tyle, co za dwa zwycięstwa na polu bitwy. Kiedy wzgórze opada, jeśli grupa utrzymująca je łącznie najdłużej miała je przez co najmniej dziesięć minut, każdy, kto stał w nim dla tej grupy co najmniej minutę i nadal do niej należy, zdobywa jedno zwycięstwo do wiersza PvP Tygodniowego skarbca. Pasek nad polem pokazuje właściciela, liczebność obu stron i czas przejmowania; komenda /hill na czacie podaje położenie.',
+  'seasonal.boo.already': '{name} ma już dość strachu na dziś.',
+  'seasonal.boo.flash': 'BU! {name} się przestraszył!',
+  'seasonal.boo.frightenedHint':
+    '{name} wciąż podskakuje po twoim ostatnim straszeniu. Znajdź kogoś innego.',
+  'seasonal.boo.landed':
+    'Wyskakujesz przed {name} z okrzykiem BU! Rozlega się wrzask i niemal wszystko wypada mu z rąk.',
+  'seasonal.boo.needsCostume':
+    'Najpierw załóż kostium: użyj eliksiru przebrania, nietoperzego lub szkieletowego psikusa, Talizmanu słomiaka, Rzeźbionej dyniowej głowy albo goblińskiego łyku z Zielonobulgoczącego kotła.',
+  'seasonal.boo.noCostume':
+    'Bez kostiumu {name} tylko się z ciebie śmieje. Najpierw się przebierz.',
+  'seasonal.boo.notOnErrand': 'Hester nie poprosiła cię dziś o straszenie kogokolwiek.',
+  'seasonal.boo.row': 'Bu!',
+  'seasonal.boo.rowAria': 'Wyskocz przed {name} i krzyknij bu',
+  'seasonal.boundItemGone':
+    'Wigilia Dyniowych Świateł dobiegła końca i twój przedmiot {item} rozpada się z powrotem w słomę.',
+  'seasonal.costume': 'Wypijasz eliksir i zmieniasz postać: {trick}!',
+  'seasonal.event.gourdlight_eve.name': 'Wigilia Dyniowych Świateł',
+  'seasonal.guise': 'Talizman trzeszczy, a słoma cię obrasta: {trick}!',
+  'seasonal.itemSource.pumpkinHead':
+    'Wypada ze Starego Słomochichota na jego dyniowym polu za Łąką Dzików przy pierwszym zabraniu łupu. Żaden handlarz jej nie sprzedaje.',
+  'seasonal.itemUse.broomSources':
+    'Do kupienia od Hester Dynioknot za {count} snopów przetykanych żarem albo jako rzadki łup ze Starego Słomochichota w dniu, kiedy go łupisz. Jazda wymaga umiejętności jeździectwa. Pozostaje na stałe i można na niej jeździć przez cały rok.',
+  'seasonal.itemUse.costumeBat':
+    'Użycie: Zmieniasz się w trzepoczącego nietoperza na {minutes} minut. Zużywa się. Nie można użyć w walce, a wejście do walki kończy efekt. Tylko wygląd.',
+  'seasonal.itemUse.costumeGhost':
+    'Użycie: Zmieniasz się w unoszącego się ducha na {minutes} minut. Zużywa się. Nie można użyć w walce, a wejście do walki kończy efekt. Tylko wygląd.',
+  'seasonal.itemUse.costumeSkeleton':
+    'Użycie: Zmieniasz się w grzechoczący szkielet na {minutes} minut. Zużywa się. Nie można użyć w walce, a wejście do walki kończy efekt. Tylko wygląd.',
+  'seasonal.itemUse.pouch': 'Użycie: Otwórz, aby otrzymać {count} dyniowych cukierków.',
+  'seasonal.itemUse.pumpkinHead':
+    'Użycie: Zakładasz lub zdejmujesz rzeźbioną dynię rozświetloną od środka, noszoną na hełmie. Tylko wygląd.',
+  'seasonal.itemUse.sheaf':
+    'Stary Słomochichot daje jeden każdego dnia, kiedy zbierzesz z niego łup, dopóki nie zdobędziesz Miotły żarzącej szczeciny. Hester Dynioknot wymienia {count} na miotłę przy swoich straganach w Eastbrook, na Moście na Trzęsawisku i w Wysokiej Strażnicy. Niewydane snopy zostają na następną Wigilię Dyniowych Świateł.',
+  'seasonal.itemUse.strawlingCharm':
+    'Użycie: Zmieniasz się w jednego ze słomiaków Starego Słomochichota na {seconds} sekund. Poza walką. Nigdy się nie zużywa. Tylko wygląd.',
+  'seasonal.itemUse.sweet':
+    'Zdobywane za cukierek albo psikus podczas Wigilii Dyniowych Świateł. Hester Dynioknot wymienia je na przedmioty kosmetyczne przy swoich straganach w Eastbrook, na Moście na Trzęsawisku i w Wysokiej Strażnicy.',
+  'seasonal.itemUse.titleWrit':
+    'Użycie: Zdobywasz dla tej postaci tytuł {title}, zakładany w Księdze Czynów. Zużywa się. Jeśli masz już tytuł, zachowujesz akt.',
+  'seasonal.itemUse.toyBats':
+    'Użycie: Otwierasz worek. Wypada z niego piszcząca chmara nietoperzy i krąży wokół ciebie przez {seconds} sekund. Nie można użyć w walce ani w ukryciu. Nigdy się nie zużywa: ponowne użycie po {cooldown} sekundach. Pozostaje na stałe i działa przez cały rok. Tylko wygląd.',
+  'seasonal.itemUse.toyCandleShadows':
+    'Użycie: Zapalasz przed sobą świecę. Przez {seconds} sekund jej płomienie rzucają na ziemię tańczące cienie kota, nietoperza i wiedźmy, widoczne dla wszystkich w pobliżu. Nie można użyć w walce ani w ukryciu. Nigdy się nie zużywa: ponowne użycie po {cooldown} sekundach. Pozostaje na stałe i działa przez cały rok. Tylko wygląd.',
+  'seasonal.itemUse.toyCauldron':
+    'Użycie: Stawiasz przed sobą wielki bulgoczący kocioł. Stoi przez {standing} sekund, a każdy gracz, który się napije, wybucha zielonymi bąbelkami i zmienia się w goblina na {seconds} sekund, zastępując dotychczasowy kostium. Ani stawianie, ani picie nie działa w walce lub w ukryciu, a wejście do walki kończy goblińską postać. Nigdy się nie zużywa: ponowne użycie po {cooldown} sekundach. Pozostaje na stałe i działa przez cały rok. Tylko wygląd.',
+  'seasonal.itemUse.toyLantern':
+    'Użycie: Stawiasz przed sobą latarnię. Mały duch krąży wokół ciebie przez {seconds} sekund. Nie można użyć w walce ani w ukryciu. Nigdy się nie zużywa: ponowne użycie po {cooldown} sekundach. Pozostaje na stałe i działa przez cały rok. Tylko wygląd.',
+  'seasonal.itemUse.toyPrank':
+    'Użycie: Rzucasz w innego widocznego gracza w zasięgu {range} jardów. Jego głowa zmienia się w świecącą dyniową latarnię na {seconds} sekund; może ją zdjąć prawym przyciskiem myszy. Żadne z was nie może być w walce, a ty nie możesz być w ukryciu. Nigdy się nie zużywa: ponowne użycie po {cooldown} sekundach. Pozostaje na stałe i działa przez cały rok. Tylko wygląd.',
+  'seasonal.itemUse.trickJar':
+    'Użycie: Płata ci losowego, nieszkodliwego figla na kilka sekund. Tylko wygląd.',
+  'seasonal.jarTrick': 'Słoik otwiera się z trzaskiem: {trick}!',
+  'seasonal.pumpkinHead.off': 'Zdejmujesz Rzeźbioną dyniową głowę.',
+  'seasonal.pumpkinHead.on': 'Zakładasz Rzeźbioną dyniową głowę.',
+  'seasonal.pumpkins.flash': 'Znaleziono nawiedzoną dynię! {count}/{total}',
+  'seasonal.pumpkins.found':
+    'Rozświetlasz nawiedzoną dynię w {zone}: {count}/{total}. Otrzymane dyniowe cukierki: {sweets}.',
+  'seasonal.pumpkins.name': 'Nawiedzona dynia',
+  'seasonal.pumpkins.progress': '{label}: {current}/{total}',
+  'seasonal.pumpkins.title': 'Nawiedzone dynie',
+  'seasonal.pumpkins.world': 'Świat',
+  'seasonal.thatchgrin.poleBound': 'Przywiązany do pala',
+  'seasonal.thatchgrin.sleepYell': 'Słońce wstało. Z powrotem na pal, z powrotem na wartę.',
+  'seasonal.thatchgrin.wakeYell': 'NOC zapada nad poletkiem! Kto chodzi po MOIM polu?',
+  'seasonal.titleGranted': 'Czytasz akt. Zdobyty nowy tytuł: {title}.',
+  'seasonal.titleKnown': 'Masz już ten tytuł, więc zachowujesz akt.',
+  'seasonal.tokenPrice': '{count} {item}',
+  'seasonal.toy.bats': 'Otwierasz worek i wylatuje z niego chmara spłoszonych nietoperzy!',
+  'seasonal.toy.candleShadows': 'Zapalasz świecę, a wokół jej płomieni zaczynają tańczyć cienie.',
+  'seasonal.toy.cauldron': 'Stawiasz kocioł, który zaczyna bulgotać.',
+  'seasonal.toy.cauldronDrink':
+    'Pijesz z kotła, wybuchasz zielonymi bąbelkami i zmieniasz się w goblina!',
+  'seasonal.toy.hidden': 'Najpierw wyjdź z cieni: zabawka zdradziłaby twoją obecność.',
+  'seasonal.toy.lantern':
+    'Stawiasz latarnię, z której wypływa mały duch, by dotrzymać ci towarzystwa.',
+  'seasonal.toy.prank': 'Rzucasz dynią. Rozbryzguje się na {name}!',
+  'seasonal.toy.prankNeedsPlayer':
+    'Dynia rozbryzguje się tylko na innym graczu, który nie jest w walce.',
+  'seasonal.toy.pranked':
+    '{name} rozbija ci dynię na głowie! Zdejmij ją prawym przyciskiem myszy albo noś z dumą.',
+  'seasonal.toy.prankedFlash': 'Psikus od {name}!',
+  'seasonal.trickOrTreat.alreadyKnocked': 'Dziś już proszono {name} o cukierek albo psikus.',
+  'seasonal.trickOrTreat.knockedHint':
+    'Dziś już tu pukano. Drzwi znów się otworzą po dziennym resecie.',
+  'seasonal.trickOrTreat.notActive': 'Wigilia Dyniowych Świateł obecnie nie trwa.',
+  'seasonal.trickOrTreat.row': 'Cukierek albo psikus!',
+  'seasonal.trickOrTreat.rowAria': 'Powiedz {name}: cukierek albo psikus',
+  'seasonal.trickOrTreat.tooFar': 'Podejdź bliżej, aby zapukać.',
+  'seasonal.trickOrTreat.treat': '{name} wręcza ci słodycz.',
+  'seasonal.trickOrTreat.treatFlash.few': 'Cukierek! {count} dyniowe cukierki',
+  'seasonal.trickOrTreat.treatFlash.many': 'Cukierek! {count} dyniowych cukierków',
+  'seasonal.trickOrTreat.treatFlash.one': 'Cukierek! {count} dyniowy cukierek',
+  'seasonal.trickOrTreat.treatFlash.other': 'Cukierek! {count} dyniowego cukierka',
+  'seasonal.trickOrTreat.trick': '{name} płata ci figla: {trick}!',
+  'seasonal.trickOrTreat.trickFlash': 'Psikus! {trick}',
+  'seasonal.tricks.gourdlight_costume_bat': 'Kostium nietoperza',
+  'seasonal.tricks.gourdlight_costume_ghost': 'Kostium ducha',
+  'seasonal.tricks.gourdlight_costume_skeleton': 'Kostium szkieletu',
+  'seasonal.tricks.gourdlight_trick_bat': 'Nietoperzowy odlot',
+  'seasonal.tricks.gourdlight_trick_fumes': 'Zielone opary',
+  'seasonal.tricks.gourdlight_trick_skeleton': 'Grzechoczące kości',
+  'seasonal.tricks.gourdlight_trick_strawling': 'Postać słomiaka',
 };

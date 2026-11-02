@@ -1524,4 +1524,49 @@ export const table: DeedLocaleTable = {
     desc: 'Comprado de Garrick Holt, intendente do Salão da Lanterna, por 24 selos da lanterna.',
     title: 'do Salão da Lanterna',
   },
+  feat_gourdlight_guise: {
+    name: 'Disfarce da Noite das Abóboras',
+    desc: 'Possua uma Cabeça de abóbora esculpida, obtida do Velho Thatchgrin em seu campo além do Campo dos javalis durante a Noite das Abóboras.',
+  },
+  feat_old_thatchgrin: {
+    name: 'Palha e cinzas',
+    desc: 'Ajude a derrotar o Velho Thatchgrin em sua plantação de abóboras além do Campo dos javalis durante a Noite das Abóboras.',
+  },
+  feat_title_gourdlit: {
+    name: 'O Iluminado pelas Abóboras',
+    desc: 'Leia um Escrito do Iluminado pelas Abóboras, trocado com Hester Gourdwick por Doces da Noite das Abóboras durante o evento.',
+    title: 'o Iluminado pelas Abóboras',
+  },
+  feat_title_trickster: {
+    name: 'Travesso',
+    desc: 'Leia um Escrito do Travesso, trocado com Hester Gourdwick por Doces da Noite das Abóboras durante o evento.',
+    title: 'Travesso',
+  },
+  feat_title_hollow_grinned: {
+    name: 'O Sorriso Oco',
+    desc: 'Leia um Escrito do Sorriso Oco, trocado com Hester Gourdwick por Doces da Noite das Abóboras durante o evento.',
+    title: 'do Sorriso Oco',
+  },
+  feat_pumpkin_hunter: {
+    name: 'Caçador de abóboras',
+    desc: 'Encontre todas as Abóboras assombradas escondidas pelo mundo durante a Noite das Abóboras.',
+    title: 'o Oco',
+  },
+  feat_gourdlight_doorsteps: {
+    name: 'Todas as soleiras',
+    desc: 'Peça doces ou travessuras a todos os moradores que atendem à porta em Eastbrook, Fenbridge e Highwatch durante a Noite das Abóboras.',
+  },
+  feat_gourdlight_errands: {
+    name: 'Às ordens de Hester',
+    desc: 'Conclua pelo menos uma vez cada uma das tarefas rotativas de Hester Gourdwick para a Noite das Abóboras.',
+  },
+  feat_gourdlight_frights: {
+    name: 'Três cidades assustadas',
+    desc: 'Na tarefa Bu! de Hester, assuste um morador em cada cidade: Eastbrook, Fenbridge e Highwatch.',
+  },
+  feat_gourdlight_eve_complete: {
+    name: 'Noite das Abóboras do início ao fim',
+    desc: 'Complete toda a Noite das Abóboras: derrote o Velho Thatchgrin, encontre todas as Abóboras assombradas, conclua todas as tarefas de Hester, bata a todas as portas e assuste um morador em cada uma das três cidades.',
+    title: 'o Juramentado das Abóboras',
+  },
 };

@@ -2600,6 +2600,7 @@ export const zh_TW: EnTranslations = {
       "name_lantern_hall_destrier": "燈火大廳戰馬",
       "name_chimeglass_tortoise": "鐘晶的托利弗",
       "name_rickshaw_mount": "白骨人力車",
+      "name_emberbristle_broom": "餘燼鬃毛掃帚",
       "name_wobbles_slime": "晃晃史萊姆",
       "name_nightwing_chimera": "夜翼奇美拉",
       "desc_valorsteed": "一匹堅韌穩健、配有皮革馬鞍的駿馬。",
@@ -2623,7 +2624,8 @@ export const zh_TW: EnTranslations = {
       "desc_lantern_hall_destrier": "燈火大廳的戰馬，在公會的藍色披布下披掛橡木與鐵製馬鎧，鞍邊搖曳的兩盞風燈照亮歸途。",
       "desc_nightwing_chimera": "來自古木枝頭的雙頭暮光飛龍，駐足時以利爪後肢佇立，行進時展動奧術銘紋雙翼掠地翱翔。",
       "desc_chimeglass_tortoise": "鹽原上的陸龜，走過了三代商隊。收留他的補鍋匠用暴風晶磨成眼鏡，又在他喉前掛上一枚青銅鈴——道路總是先聽見他，才看見他。",
-      "desc_rickshaw_mount": "一輛嘎吱作響的骸骨貨車，一具瘦骨嶙峋的雜兵被套在轅木間，拖著你狂奔向前。"
+      "desc_rickshaw_mount": "一輛嘎吱作響的骸骨貨車，一具瘦骨嶙峋的雜兵被套在轅木間，拖著你狂奔向前。",
+      "desc_emberbristle_broom": "一把繫著橙色緞帶的收穫掃帚，懸浮在離地一掌高的地方，鬃毛不斷灑落餘燼。南瓜燈之夜結束時，它會化回一堆稻草。"
     },
     "mountTraining": {
       "mountPrompt": "按 {key} 鍵騎上訓練用英勇戰馬。",
@@ -4672,6 +4674,9 @@ export const zh_TW: EnTranslations = {
       }
     },
     "auraEffect": {
+      "gourdlight": {
+        "thatchbound": "老稻草獰笑正在操縱你。你無法行動：你會被帶到最近的盟友身邊，每{every}秒對其造成{min}到{max}點傷害（對{level}級盟友最多{mult}倍）。當你受到相當於最大生命值{pct}%的傷害，或被盟友驅散（魔法）時提前結束。"
+      },
       "stilledMindCrit": "你的下一次裂心術或虛空破裂命中時必定造成致命一擊。其他法術不會消耗此加成。虛空破裂仍會消耗3層幽暗什一。施法被抵抗也會消耗此加成。",
       "wildheart": {
         "packBond": "夥伴靠近時受到的傷害降低{pct}%。將馴獸師和他的美洲豹拉開即可打破羈絆。",
@@ -4862,6 +4867,7 @@ export const zh_TW: EnTranslations = {
       "spellHaste": "施法速度提高 {pct}%",
       "sated": "無法再獲得團隊加速效果",
       "cauterizeFatigue": "灸灼無法再次阻止致命傷害",
+      "seasonalCosmetic": "僅為外觀：不影響戰鬥",
       "castShield": "施法不會因受到傷害而中斷或延遲",
       "dmgDone": "造成的傷害提高 {pct}%",
       "dmgDoneReduce": "造成的傷害降低 {pct}%",
@@ -5009,6 +5015,7 @@ export const zh_TW: EnTranslations = {
       "dodgeReduce": "閃避機率降低 {pct}%",
       "damageReduction": "受到的所有傷害降低 {pct}%",
       "slumber": "沉睡至黎明。無法被攻擊，任何人都無法將其喚醒。",
+      "slumberNight": "毫無生氣地掛在木樁上，直到夜幕降臨。無法被攻擊。",
       "guardianWard": "下一次敵人的致命攻擊會改為將你的生命值恢復至 {pct}%",
       "armorFlat": "護甲降低 {value}",
       "armorFlatStacks": "護甲降低 {value}（{stacks} 層）",
@@ -5088,7 +5095,8 @@ export const zh_TW: EnTranslations = {
     "worldBoss": {
       "spawn": "{name}在{zone}上空崛起！",
       "wake": "{name}在{zone}上空甦醒！",
-      "sleep": "{name}沉睡至黎明。"
+      "sleep": "{name}沉睡至黎明。",
+      "sleepUntilNightfall": "{name}沉睡至夜幕降臨。"
     },
     "auth": {
       "appleLoginCta": "透過 Apple 繼續",
@@ -8616,6 +8624,107 @@ export const zh_TW: EnTranslations = {
       }
     }
   },
+  "seasonal": {
+    "pumpkins": {
+      "name": "鬧鬼南瓜",
+      "title": "鬧鬼南瓜",
+      "world": "世界",
+      "progress": "{label}：{current}/{total}",
+      "found": "你點亮了{zone}的一隻鬧鬼南瓜：{count}/{total}。獲得南瓜燈糖：{sweets}。",
+      "flash": "找到鬧鬼南瓜！{count}/{total}"
+    },
+    "event": {
+      "gourdlight_eve": {
+        "name": "南瓜燈之夜"
+      }
+    },
+    "trickOrTreat": {
+      "row": "不給糖就搗蛋！",
+      "rowAria": "對{name}說「不給糖就搗蛋」",
+      "knockedHint": "你今天已經敲過這扇門了。每日重置後這扇門會再次打開。",
+      "treat": "{name}遞給你一份糖果。",
+      "trick": "{name}對你惡作劇：{trick}！",
+      "alreadyKnocked": "你今天已經向{name}討過糖了。",
+      "notActive": "南瓜燈之夜現在沒有舉行。",
+      "tooFar": "走近一點再敲門。",
+      "treatFlash": {
+        "one": "糖果！{count}顆南瓜燈糖",
+        "few": "糖果！{count}顆南瓜燈糖",
+        "many": "糖果！{count}顆南瓜燈糖",
+        "other": "糖果！{count}顆南瓜燈糖"
+      },
+      "trickFlash": "搗蛋！{trick}"
+    },
+    "tricks": {
+      "gourdlight_trick_bat": "變成蝙蝠",
+      "gourdlight_trick_skeleton": "骨頭喀喀",
+      "gourdlight_trick_fumes": "綠色煙霧",
+      "gourdlight_trick_strawling": "稻草人偽裝",
+      "gourdlight_costume_skeleton": "骷髏裝扮",
+      "gourdlight_costume_ghost": "幽靈裝扮",
+      "gourdlight_costume_bat": "蝙蝠裝扮"
+    },
+    "pumpkinHead": {
+      "on": "你戴上了雕刻南瓜頭。",
+      "off": "你摘下了雕刻南瓜頭。"
+    },
+    "jarTrick": "罐子砰地打開了：{trick}！",
+    "guise": "護符劈啪作響，稻草爬滿了你的全身：{trick}！",
+    "costume": "你喝下藥劑，模樣變了：{trick}！",
+    "titleGranted": "你讀完了令狀。獲得新頭銜：{title}。",
+    "titleKnown": "你已經擁有這個頭銜，令狀留在你身上。",
+    "boundItemGone": "南瓜燈之夜結束了，你的{item}化回了稻草。",
+    "itemUse": {
+      "pumpkinHead": "使用：戴上或摘下一顆從內部點亮的雕刻南瓜，套在頭盔之上。僅在南瓜燈之夜期間可用。純外觀。",
+      "trickJar": "使用：對你施加一個隨機的無害惡作劇，持續數秒。僅在南瓜燈之夜期間可用。純外觀。",
+      "pouch": "使用：打開後獲得{count}顆南瓜燈糖。",
+      "strawlingCharm": "使用：變成老稻草獰笑的稻草小人，持續{seconds}秒。戰鬥中無法使用，僅限南瓜燈之夜期間。不會消耗。僅外觀。",
+      "sweet": "在南瓜燈之夜期間討糖獲得。東溪的赫絲特·葫蘆芯會用外觀物品交換它們。",
+      "costumeSkeleton": "使用：變成一具喀喀作響的骷髏，持續{minutes}分鐘。使用後消耗。戰鬥中無法使用，進入戰鬥會結束效果。僅限南瓜燈之夜期間。純外觀。",
+      "costumeGhost": "使用：變成一個飄蕩的幽靈，持續{minutes}分鐘。使用後消耗。戰鬥中無法使用，進入戰鬥會結束效果。僅限南瓜燈之夜期間。純外觀。",
+      "costumeBat": "使用：變成一隻撲騰的蝙蝠，持續{minutes}分鐘。使用後消耗。戰鬥中無法使用，進入戰鬥會結束效果。僅限南瓜燈之夜期間。純外觀。",
+      "toyPrank": "使用：丟向{range}碼內另一名可見的玩家。對方的頭會變成發光的南瓜燈，持續{seconds}秒，對方可以右鍵點擊取下。你們雙方都不能處於戰鬥中，你也不能處於潛行狀態。不會消耗：{cooldown}秒後可再次使用。僅限南瓜燈之夜期間，活動結束後會從背包中消失。僅外觀。",
+      "toyLantern": "使用：把燈籠放在你面前。一個小幽靈會繞著你飄{seconds}秒。戰鬥中或潛行時無法使用。不會消耗：{cooldown}秒後可再次使用。僅限南瓜燈之夜期間，活動結束後會從背包中消失。僅外觀。",
+      "toyBats": "使用：打開袋子。一群吱吱叫的蝙蝠衝出來，在你周圍四散飛舞{seconds}秒。戰鬥中或潛行時無法使用。不會消耗：{cooldown}秒後可再次使用。僅限南瓜燈之夜期間，活動結束後會從背包中消失。僅外觀。",
+      "toyCandleShadows": "使用：在你面前點燃蠟燭。{seconds}秒內，燭火會在周圍地面上投下貓、蝙蝠和女巫的舞動影子，附近所有人都能看到。戰鬥中或潛行時無法使用。不會消耗：{cooldown}秒後可再次使用。僅限南瓜燈之夜期間，活動結束後從背包中消失。僅外觀。",
+      "toyCauldron": "使用：在你面前放下一口咕嘟冒泡的大坩堝。它會存在{standing}秒，任何喝下的玩家都會被綠色氣泡包圍，並在{seconds}秒內變成哥布林（身上的裝扮會被替換）。戰鬥中或潛行時無法放置或飲用，進入戰鬥會結束哥布林形態。不會消耗：{cooldown}秒後可再次使用。僅限南瓜燈之夜期間，活動結束後從背包中消失。僅外觀。",
+      "titleWrit": "使用：為這個角色獲得頭銜{title}，可在功績之書中佩戴。使用後消耗。僅限南瓜燈之夜期間。如果你已擁有該頭銜，令狀會保留。",
+      "broomSources": "向赫絲特·葫蘆芯用{count}個草束購買，或在你拾取老稻草獰笑戰利品的當天極少數情況下由其掉落。騎乘需要騎術技能。僅在南瓜燈之夜期間存在，結束時會化為稻草。",
+      "sheaf": "每天拾取老稻草獰笑的戰利品時獲得一個，直到你擁有餘燼鬃毛掃帚為止。赫絲特·葫蘆芯在東溪、芬橋和高望的攤位用{count}個交換掃帚。南瓜燈之夜結束時會化為稻草。"
+    },
+    "toy": {
+      "prank": "你扔出南瓜，啪地砸在了{name}身上！",
+      "lantern": "你放下提燈，一個小幽靈飄了出來陪著你。",
+      "bats": "你打開袋子，一群受驚的蝙蝠衝了出來！",
+      "candleShadows": "你點燃了蠟燭，影子開始在燭火周圍起舞。",
+      "cauldron": "你放下坩堝，它開始咕嘟冒泡。",
+      "cauldronDrink": "你喝了一口坩堝裡的東西，被綠色氣泡包圍，變成了一隻哥布林！",
+      "pranked": "{name}把一個南瓜砸在了你頭上！右鍵點擊取下，或者驕傲地戴著吧。",
+      "prankedFlash": "被{name}捉弄了！",
+      "prankNeedsPlayer": "南瓜只能砸向另一名不在戰鬥中的玩家。",
+      "hidden": "先從陰影裡出來：玩具會暴露你的位置。"
+    },
+    "itemSource": {
+      "pumpkinHead": "首次拾取野豬草甸外南瓜田裡老稻草獰笑的戰利品時掉落。沒有商人出售。"
+    },
+    "boo": {
+      "row": "哇！",
+      "rowAria": "跳到{name}面前大喊一聲哇",
+      "needsCostume": "先穿上裝扮：裝扮藥劑、蝙蝠或骷髏惡作劇、稻草小人護符，雕刻南瓜頭，或咕嘟綠坩堝裡一口變成地精的湯。",
+      "frightenedHint": "{name}還被你上次嚇得心驚膽戰。去找別人吧。",
+      "landed": "你跳到{name}面前大喊一聲哇！對方尖叫一聲，差點把東西全掉了。",
+      "flash": "哇！{name}被嚇到了！",
+      "noCostume": "沒穿裝扮，{name}只是衝你笑。先換上一套吧。",
+      "already": "{name}今天已經被嚇夠了。",
+      "notOnErrand": "赫絲特今天沒讓你去嚇唬誰。"
+    },
+    "tokenPrice": "{count}個{item}",
+    "thatchgrin": {
+      "poleBound": "縛於木樁",
+      "wakeYell": "夜幕降臨南瓜田！誰敢踏進我的田地？",
+      "sleepYell": "太陽出來了。回到木樁上，繼續看守。"
+    }
+  },
   "dungeonGuide": {
     "drownedTemple": {
       "greet": {
@@ -10815,6 +10924,7 @@ export const zh_TW: EnTranslations = {
       "hillBodyRamp": "每三小時，會在無法預料的時刻向全伺服器發出通告：十五分鐘後，某個自由混戰地帶將升起一座山丘，它所在的圓圈會預先在開闊地上標出。山丘升起後會屹立四十五分鐘，然後消失。圈內站著玩家最多的隊伍爭奪這座山丘，連續保持人數優勢一分鐘後，山丘便歸他們所有；單獨一人算作一支一人隊伍，但團隊成員完全不計入人數。一支隊伍佔據山丘期間，站在圈內的每名成員每分鐘都會獲得榮譽，同一支隊伍佔據得越久，每分鐘獲得的榮譽就越多。一支滿員隊伍在山丘屹立的全程不受爭奪地佔據它，所獲榮譽約相當於三場戰場勝利。山丘易手時，新的佔據者從頭開始累積。場地上方的橫條會顯示誰在佔據、你方與對方的人數以及爭奪計時；在聊天中輸入 /hill 可以得知它的位置。",
       "hillBodyPause": "每三小時，某個自由混戰地帶會出現一座山丘。山丘存在期間，每五分鐘全伺服器都會收到它的位置以及各隊伍佔據時長的排名。山丘消失時，若佔據總時長最長的隊伍累計佔據至少十分鐘，該隊伍成員會為每週寶庫的 PvP 進度獲得一場勝利，前提是該玩家在本隊佔據期間曾在圓圈內站滿至少一分鐘，並且結束時仍留在該隊伍中。",
       "hillBodyFlat": "每三小時，會在無法預料的時刻向全伺服器發出通告：十五分鐘後，某個北部地帶將升起一座山丘，它所在的圓圈會預先在開闊地上標出。山丘升起後會屹立四十五分鐘，然後消失。期間每五分鐘，全伺服器都會收到它的位置以及各隊伍佔據總時長的排名。圈內站著玩家最多的隊伍爭奪山丘，累計保持人數優勢三十秒後便能佔據它。敵方隊伍進入只會暫停計時，直到你方再次領先；只有你方在圈內沒有任何存活成員時，計時才會重置。單獨一人算作一支一人隊伍，組建隊伍時仍能保有已佔據的山丘，但團隊成員完全不計入人數。一支隊伍佔據山丘期間，站在圈內的每名成員每分鐘都會獲得同樣數量的榮譽，無論已經佔據了多久；滿員隊伍在山丘屹立全程不受爭奪地佔據它，所獲榮譽約相當於三場戰場勝利。山丘消失時，若佔據總時長最長的隊伍累計佔據至少十分鐘，該隊伍中在佔據期間曾在圈內站滿至少一分鐘、且結束時仍留在隊伍的每名玩家，都會為每週寶庫的 PvP 進度獲得一場勝利。場地上方的橫條會顯示誰在佔據、你方與對方的人數以及爭奪計時；在聊天中輸入 /hill 可以得知它的位置。",
+      "hillBodyTwoHour": "每兩小時，會在無法預料的時刻向全伺服器發出通告：十五分鐘後，某個北部地帶將升起一座山丘，它所在的圓圈會預先在開闊地上標出。山丘升起後會屹立三十分鐘，然後消失。期間每五分鐘，全伺服器都會收到它的位置以及各隊伍佔據總時長的排名。圈內站著玩家最多的隊伍爭奪山丘，累計保持人數優勢三十秒後便能佔據它。敵方隊伍進入只會暫停計時，直到你方再次領先；只有你方在圈內沒有任何存活成員時，計時才會重置。單獨一人算作一支一人隊伍，組建隊伍時仍能保有已佔據的山丘，但團隊成員完全不計入人數。一支隊伍佔據山丘期間，站在圈內的每名成員每分鐘都會獲得同樣數量的榮譽，無論已經佔據了多久；滿員隊伍在山丘屹立全程不受爭奪地佔據它，所獲榮譽約相當於兩場戰場勝利。山丘消失時，若佔據總時長最長的隊伍累計佔據至少十分鐘，該隊伍中在佔據期間曾在圈內站滿至少一分鐘、且結束時仍留在隊伍的每名玩家，都會為每週寶庫的 PvP 進度獲得一場勝利。場地上方的橫條會顯示誰在佔據、你方與對方的人數以及爭奪計時；在聊天中輸入 /hill 可以得知它的位置。",
       "limitsBodyRaids": "反覆擊敗同一名玩家，每次的收益都會減少並很快歸零，而你對那名玩家的計數要在首次擊殺約一小時之後才會重新開始，所以蹲守同一個目標永遠不值得等待。遠低於你等級的目標不會帶來任何收益。在戰場和競技場內部適用它們自己的規則，而且它們提供的榮譽比開放世界更多，因此世界 PvP 是通往同一位商人的較慢道路。團隊無法從世界擊殺中獲得任何收益：團隊成員既得不到榮譽也得不到金幣，也不會減少其他人的份額，所以想獲得報酬就以隊伍身分作戰。"
     },
     "thornhollowPage": {
@@ -15556,6 +15666,7 @@ export const zh_TW: EnTranslations = {
       "accountSuspended": "此帳號停權至 {date}。",
       "alreadyInWorld": "角色已在世界中。",
       "accountSessionLimit": "此帳號已有太多角色在世界中。",
+      "worldFightHold": "此帳號的另一個角色在戰鬥後仍留在世界中。請幾分鐘後再試。",
       "takenOver": "你的角色已被另一個工作階段接管。",
       "vaultMailRecovering": "寶庫獎勵郵件正在恢復中。請稍後再試。",
       "renameBeforeEntering": "此角色必須先更名才能進入世界。",
@@ -24707,6 +24818,87 @@ export const zh_TW: EnTranslations = {
       "vanguard_pendant_of_mending": {
         "name": "先鋒癒合墜飾"
       },
+      "gourdlight_sweet": {
+        "name": "南瓜燈糖"
+      },
+      "gourdlight_treat_pouch": {
+        "name": "南瓜燈糖果袋"
+      },
+      "carved_pumpkin_head": {
+        "name": "雕刻南瓜頭"
+      },
+      "jar_of_mischief": {
+        "name": "惡作劇之罐"
+      },
+      "thatchgrin_sweet_sack": {
+        "name": "稻草獰笑的糖果袋"
+      },
+      "strawling_charm": {
+        "name": "稻草小人護符"
+      },
+      "rattlebone_draught": {
+        "name": "骨響藥劑"
+      },
+      "haunting_draught": {
+        "name": "幽魂藥劑"
+      },
+      "batwing_draught": {
+        "name": "振翅藥劑"
+      },
+      "writ_of_the_gourdlit": {
+        "name": "南瓜燈輝令狀"
+      },
+      "writ_of_the_trickster": {
+        "name": "搗蛋鬼令狀"
+      },
+      "writ_of_the_hollow_grin": {
+        "name": "空洞笑臉令狀"
+      },
+      "reins_emberbristle_broom": {
+        "name": "餘燼鬃毛掃帚"
+      },
+      "hearthroot_toffee": {
+        "name": "爐根太妃糖"
+      },
+      "gourdseed_brittle": {
+        "name": "南瓜籽脆糖"
+      },
+      "crabapple_chew": {
+        "name": "海棠果軟糖"
+      },
+      "owlwatch_fudge": {
+        "name": "鴞望台軟糖"
+      },
+      "lantern_mint_drop": {
+        "name": "燈籠薄荷糖"
+      },
+      "emberwoven_sheaf": {
+        "name": "餘燼編織草束"
+      },
+      "prankers_pumpkin": {
+        "name": "搗蛋鬼的南瓜"
+      },
+      "wanderwisp_lantern": {
+        "name": "遊蕩鬼火提燈"
+      },
+      "sack_of_startled_bats": {
+        "name": "一袋受驚的蝙蝠"
+      },
+      "murmurwick_candle": {
+        "name": "低語燭芯蠟燭"
+      },
+      "gurglegreen_cauldron": {
+        "name": "咕嘟綠坩堝"
+      },
+      "thatchgrin_patch_pumpkin": {
+        "name": "南瓜田的南瓜"
+      },
+      "cursed_candle_stub": {
+        "name": "詛咒蠟燭殘頭"
+      },
+      "gourdlight_crow_feather": {
+        "name": "南瓜燈烏鴉羽毛"
+      },
       "membership_staff": {
         "name": "萬變法杖"
       },
@@ -26263,6 +26455,18 @@ export const zh_TW: EnTranslations = {
       "muster_effigy": {
         "name": "稻草工頭"
       },
+      "gourdlight_thatchgrin": {
+        "name": "老稻草獰笑"
+      },
+      "gourdlight_crow": {
+        "name": "南瓜燈烏鴉"
+      },
+      "gourdlight_strawling": {
+        "name": "稻草小人"
+      },
+      "gourdlight_swelling_gourd": {
+        "name": "膨脹巨瓜"
+      },
       "stable_horse": {
         "name": "廄馬"
       },
@@ -27416,6 +27620,11 @@ export const zh_TW: EnTranslations = {
         "name": "赫絲特·奎爾比",
         "title": "製圖師",
         "greeting": "我買過的每一張這片沼澤的地圖，不出一季就不準了。水會挪動小路，小路又會挪動水。所以我自己畫，趁墨跡未乾，就坐在這兒乾爽的地方。"
+      },
+      "gourdlight_keeper": {
+        "name": "赫絲特·葫蘆芯",
+        "title": "南瓜燈守護者",
+        "greeting": "南瓜點亮了，燈籠也掛起來了，那一定是南瓜燈之夜到了。去敲東溪、芬橋和高望城鎮民的門，說出那句話：不給糖就搗蛋。大多數人會給你一顆糖，少數人會對你惡作劇。把糖帶給我，我會跟你換些可以穿戴的東西。"
       },
       "reeve_ottoline": {
         "name": "鎮長奧托琳",
@@ -30048,6 +30257,88 @@ export const zh_TW: EnTranslations = {
         "objectives": {
           "0": {
             "label": "在治療假人身上打出一次有效治療"
+          }
+        }
+      },
+      "q_gourdlight_rounds": {
+        "title": "南瓜燈巡遊",
+        "text": "每到南瓜燈之夜，谷地的孩子們都會挨家挨戶巡遊，今年你也加入他們吧，{playerName}。在我們的城鎮裡敲五扇門，說出那句話，看看你會得到什麼。完成後回來找我。",
+        "completion": "敲了五扇門，手指還都在。拿著，這袋糖果讓你在回家路上吃。明天再來，門會再次打開。",
+        "objectives": {
+          "0": {
+            "label": "已敲的門"
+          }
+        }
+      },
+      "q_gourdlight_daily_patch": {
+        "title": "南瓜田裡的南瓜",
+        "text": "野豬草甸外，老稻草獰笑的南瓜田結滿了南瓜，有一半都滾出了他的稻草圈，小心些就能搆到。給我帶五個來，{playerName}。離那個老稻草人遠一點，他每一個都數著呢。",
+        "completion": "五個圓滾滾的，一口都沒被啃過。夠整個谷地做餡餅了。拿著，辛苦費。",
+        "objectives": {
+          "0": {
+            "label": "南瓜田的南瓜"
+          }
+        }
+      },
+      "q_gourdlight_daily_boo": {
+        "title": "哇！",
+        "text": "這幾個鎮子裡，一整年都沒人被好好嚇過一回了，{playerName}。沒有驚嚇的南瓜燈之夜，不過是個冷夜罷了。穿上裝扮，我的藥劑哪種都行，要是你贏到了那顆南瓜頭也可以。然後悄悄靠近三位鎮民，衝他們大喊一聲「哇！」",
+        "completion": "三個？我在廣場另一頭都聽見廚子把鍋掉地上了。做得好。這是你的那份。",
+        "objectives": {
+          "0": {
+            "label": "被嚇到的鎮民"
+          }
+        }
+      },
+      "q_gourdlight_daily_wicks": {
+        "title": "邪惡的燭芯",
+        "text": "有人在我們的路燈腳下放了燃著綠火的蠟燭。它們燒著卻不融化，你一轉身它們就低聲細語。去掐滅六根吧，{playerName}，三個鎮子哪裡都行，把殘頭帶回來給我。",
+        "completion": "六個殘頭，冷得像霜。點火的人還得再加把勁才行。拿著這個，去洗洗手。",
+        "objectives": {
+          "0": {
+            "label": "掐滅的詛咒蠟燭"
+          }
+        }
+      },
+      "q_gourdlight_daily_towns": {
+        "title": "每個鎮子敲一扇門",
+        "text": "孩子們說，真正的南瓜燈行者會在天亮前把每個鎮子的門都敲一遍。去證明他們說得對吧，{playerName}。在東溪、芬橋和高望各找一扇門說不給糖就搗蛋。路上的燈籠會為你照路。",
+        "completion": "一夜跑了三個鎮子！這份獎勵你的靴子比你更配得上。",
+        "objectives": {
+          "0": {
+            "label": "在東溪敲過的門"
+          },
+          "1": {
+            "label": "在芬橋敲過的門"
+          },
+          "2": {
+            "label": "在高望敲過的門"
+          }
+        }
+      },
+      "q_gourdlight_daily_feathers": {
+        "title": "為篝火取羽",
+        "text": "老稻草獰笑被逼急了，就會喚來烏鴉撲向敲打他稻草的人。牠們的羽毛在爐火裡會燒出綠焰，今晚的篝火我需要三根。去他的田裡參加一場戰鬥，{playerName}，從他的烏鴉身上拔下羽毛。",
+        "completion": "黑得像沒有月亮的田野，已經帶著煙味了。篝火一定很壯觀。謝謝你。",
+        "objectives": {
+          "0": {
+            "label": "烏鴉羽毛"
+          }
+        }
+      },
+      "q_gourdlight_daily_baskets": {
+        "title": "給鄰居的籃子",
+        "text": "每年南瓜燈之夜，我都會給每個鎮子的一位老朋友裝一籃糖果，可我的膝蓋大不如前了。替我送過去吧，{playerName}：東溪的Cook Marlow、芬橋的草藥師Yara，還有高望的Loremaster Caddis。",
+        "completion": "三籃都送到了，聽說Marlow還哭了。他每次都哭。來，這一籃是你的。",
+        "objectives": {
+          "0": {
+            "label": "交給Cook Marlow的籃子"
+          },
+          "1": {
+            "label": "交給草藥師Yara的籃子"
+          },
+          "2": {
+            "label": "交給Loremaster Caddis的籃子"
           }
         }
       },

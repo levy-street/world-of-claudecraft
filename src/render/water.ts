@@ -12,7 +12,7 @@ import {
 import type { ZoneDef } from '../sim/types';
 import { waterLevel } from '../sim/world';
 import { activeFarFieldPolicy } from './foliage_impostor';
-import { GFX, type GfxSettings, SUN_DIR } from './gfx';
+import { GFX, type GfxSettings, SUN_DIR, sharedUniforms } from './gfx';
 import { idleSlot, runIdleQueue } from './idle_queue';
 import {
   advanceWaterLiveness,
@@ -287,7 +287,7 @@ export function setWaterPalette(p: WaterPaletteHexes | null): void {
 // color multiplier ((1,1,1) = authored day), needed because this shader is
 // unlit (baked palette + fog) and would otherwise stay day-bright at night.
 const WATER_SUN_UNIFORM = { value: SUN_DIR.clone() };
-const WATER_DAYNIGHT_UNIFORM = { value: new THREE.Vector3(1, 1, 1) };
+const WATER_DAYNIGHT_UNIFORM = sharedUniforms.uDayNight;
 
 /** Point the water glints along the live key-light direction (sun by day,
  *  moon by night); the renderer calls this from its key-light update. */
@@ -1461,15 +1461,16 @@ function buildPhongWater(): WaterView {
         float wocDistW = smoothstep(14.0, 240.0, wocDist);
         float wocLane = sin(vWocWaterWPos.x * 0.045 + vWocWaterWPos.z * 0.038 + uWocWaterTime * 0.9)
           * cos(vWocWaterWPos.x * 0.028 - vWocWaterWPos.z * 0.052 - uWocWaterTime * 0.7) * 0.5 + 0.5;
-        vec3 wocSeaCol = mix(uWocShallow, uWocDeep, clamp(wocDistW * 0.72 + wocLane * 0.24, 0.0, 1.0));
-        wocSeaCol = mix(wocSeaCol, uWocSky, min(wocFresnel * 0.55, 0.38));
-        diffuseColor.rgb = mix(diffuseColor.rgb * wocSeaCol * 1.35, wocSeaCol, 0.68);
-        diffuseColor.a = clamp(mix(0.56, 0.88, clamp(wocDistW * 0.55 + wocFresnel * 0.45, 0.0, 1.0)), 0.0, 1.0);`,
+        vec3 wocShallowMuted = mix(uWocShallow * 0.72, uWocDeep, 0.34);
+        vec3 wocSeaCol = mix(wocShallowMuted, uWocDeep, clamp(wocDistW * 0.72 + wocLane * 0.22, 0.0, 1.0));
+        wocSeaCol = mix(wocSeaCol, uWocSky, min(wocFresnel * 0.48, 0.34));
+        diffuseColor.rgb = mix(diffuseColor.rgb * wocSeaCol * 1.22, wocSeaCol, 0.68);
+        diffuseColor.a = clamp(mix(0.46, 0.82, clamp(wocDistW * 0.55 + wocFresnel * 0.45, 0.0, 1.0)), 0.0, 1.0);`,
       )
       .replace(
         '#include <emissivemap_fragment>',
         `#include <emissivemap_fragment>
-        totalEmissiveRadiance += mix(uWocShallow, uWocDeep, wocDistW) * uDayNight * 0.22;
+        totalEmissiveRadiance += mix(wocShallowMuted, uWocDeep, wocDistW) * uDayNight * 0.11;
         vec3 wocWaveN = normalize(vec3(
           sin(vWocWaterWPos.x * 1.3 + uWocWaterTime * 2.2) * 0.08,
           1.0,

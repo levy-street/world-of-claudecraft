@@ -46,6 +46,36 @@ function session(): VehicleSession {
 }
 
 describe('existing animated cannon enemy models', () => {
+  it('does not walk parked rigs and refreshes a reused slot before its next draw', () => {
+    const pool = new CannonEnemyVisuals();
+    const s = session();
+    const commander = pool.root.getObjectByName('cannon-commander');
+    if (!commander) throw new Error('Commander slot was not built');
+    const walk = vi.spyOn(commander, 'updateMatrixWorld');
+    try {
+      pool.update(null, 0.05, () => 2);
+      pool.root.updateMatrixWorld(true);
+      expect(walk).not.toHaveBeenCalled();
+      s.encounter.enemies = [
+        { id: 1, kind: 'commander', hp: 800, x: 440, z: 1000, slowUntilTick: 0 },
+      ];
+      pool.update(s, 0.05, () => 2);
+      pool.root.updateMatrixWorld();
+      expect(commander.matrixWorld.elements.slice(12, 15)).toEqual([440, 2, 1000]);
+      pool.update(null, 0.05, () => 2);
+      walk.mockClear();
+      pool.root.updateMatrixWorld();
+      expect(walk).not.toHaveBeenCalled();
+      s.encounter.enemies[0].x = 470;
+      pool.update(s, 0.05, () => 4);
+      pool.root.updateMatrixWorld();
+      expect(walk).toHaveBeenCalledOnce();
+      expect(commander.matrixWorld.elements.slice(12, 15)).toEqual([470, 4, 1000]);
+    } finally {
+      pool.dispose();
+    }
+  });
+
   it('tips killed actors briefly but always gives the only commander slot to a living actor', () => {
     const pool = new CannonEnemyVisuals();
     const s = session();

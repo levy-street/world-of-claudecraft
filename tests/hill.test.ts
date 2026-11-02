@@ -1,5 +1,5 @@
-// King of the Hill (src/sim/pvp/hill.ts): the three-hour schedule (a random
-// warning inside each window, the rise fifteen minutes on, the fall 45 minutes
+// King of the Hill (src/sim/pvp/hill.ts): the two-hour schedule (a random
+// warning inside each window, the rise fifteen minutes on, the fall 30 minutes
 // after) and its realm announcements, the spot (dry, open, clear of the hub,
 // wholly inside a free-for-all zone, the same on every host, drawn from a
 // private rng, a retry searching new ground), the contest (a party as one
@@ -132,7 +132,7 @@ describe('opt-in hill participation', () => {
     expect(sim.hillInfoFor(low)?.standing).toBe('level');
   });
 
-  it('pays exactly 396 honor through the production event lifecycle in 45 minutes', () => {
+  it('pays exactly 261 honor through the production event lifecycle in 30 minutes', () => {
     const {
       sim,
       pids: [a],
@@ -140,13 +140,13 @@ describe('opt-in hill participation', () => {
     inside(sim, a);
     const hill = sim.hillState.active!;
     // Drive the real one-second system pass without unrelated world AI ticks.
-    for (let second = 1; second <= 2700; second++) {
+    for (let second = 1; second <= HILL_DURATION_SECONDS; second++) {
       jumpTo(sim, second);
       (sim as unknown as { tickCount: number }).tickCount = second * 20;
       updateHill(sim.ctx);
     }
-    expect(hill.honorPaid).toBe(396);
-    expect(sim.meta(a)!.honor).toBe(396);
+    expect(hill.honorPaid).toBe(261);
+    expect(sim.meta(a)!.honor).toBe(261);
     expect(sim.hillState.active).toBeNull();
     expect(ent(sim, a).pvpFlag).toBe(true);
   });
@@ -232,7 +232,7 @@ function hillWorld(names: string[]): { sim: Sim; pids: number[] } {
 }
 
 describe('the schedule and the announcements', () => {
-  it('warns the realm at a random moment in the window, rises 15 minutes on, falls 45 after', () => {
+  it('warns the realm at a random moment in the window, rises 15 minutes on, falls 30 after', () => {
     const sim = world();
     const a = addPlayer(sim, 'Aleph');
     const plan = hillPlanFor(sim.ctx, 0);
@@ -266,7 +266,7 @@ describe('the schedule and the announcements', () => {
     seen = tickSeconds(sim, 2);
     expect(hill.phase).toBe('active');
     expect(logLines(seen)).toContain(hillRiseLine(zone.name));
-    expect(sim.hillInfoFor(a)).toMatchObject({ phase: 'active', minutesLeft: 45 });
+    expect(sim.hillInfoFor(a)).toMatchObject({ phase: 'active', minutesLeft: 30 });
     // The fall.
     jumpTo(sim, plan.closesAt - 1);
     seen = tickSeconds(sim, 2);
@@ -314,7 +314,7 @@ describe('the schedule and the announcements', () => {
     expect(sim.hillInfoFor(a)).toMatchObject({ phase: 'warning', inside: false, contest: 0 });
   });
 
-  it('one hill per window, at independently seeded offsets every three hours, and none on a switched-off realm', () => {
+  it('one hill per window, at independently seeded offsets every two hours, and none on a switched-off realm', () => {
     const sim = world();
     const offsets = new Set<number>();
     for (let w = 0; w < 6; w++) {
@@ -941,10 +941,10 @@ describe('the readout and the chat arms', () => {
       (ev): ev is Extract<SimEvent, { type: 'error' }> => ev.type === 'error',
     );
     expect(errors.find((ev) => ev.pid === a)?.text).toBe(
-      'The hill stands in The Drakelands: your group holds it. It falls in 45 minutes.',
+      'The hill stands in The Drakelands: your group holds it. It falls in 30 minutes.',
     );
     expect(errors.find((ev) => ev.pid === b)?.text).toBe(
-      'The hill stands in The Drakelands: another group holds it. It falls in 45 minutes.',
+      'The hill stands in The Drakelands: another group holds it. It falls in 30 minutes.',
     );
     const quiet = world();
     const q = addPlayer(quiet, 'Quiet');

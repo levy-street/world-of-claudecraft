@@ -1038,14 +1038,14 @@ export const cs_CZ: EnTranslations = {
       "fateThreadsSentenceReady": "Tři Nitě osudu: Rozsudek je dokáže spotřebovat za 18% zvýšené poškození."
     },
     "priest": {
-      "gloomtitheLabel": "Gloomtithe",
-      "bombLabel": "Tithe Bomb",
-      "gloomtitheStatus": "{value} of {max} Gloomtithe",
-      "bombStatus": "{value} of {max} Tithe Bomb charges",
-      "bombReady": "Ready",
+      "gloomtitheLabel": "Desátek temnoty",
+      "bombLabel": "Desátková bomba",
+      "gloomtitheStatus": "{value} z {max} nábojů Desátku temnoty",
+      "bombStatus": "{value} z {max} nábojů Desátkové bomby",
+      "bombReady": "Připraveno",
       "chargeCount": "{value} / {max}",
-      "gloomtitheTooltip": "Gloomtithe: up to 5 spendable charges. Void Rupture consumes 3; Vampiric Touch consumes 2 for 30% more damage; Call Tithefiend consumes your bank. Generating charges also fills Tithe Bomb, even while this bank is full.",
-      "bombTooltip": "Tithe Bomb: generate 20 Gloomtithe to prepare one bomb. Spending Gloomtithe does not add progress. Progress lasts between fights. Dying or starting a raid boss resets it. A completed cast consumes the bomb; cancelling keeps it."
+      "gloomtitheTooltip": "Desátek temnoty: až 5 použitelných nábojů. Roztržení prázdnoty spotřebuje 3; Upíří dotek spotřebuje 2 a způsobí o 30% více poškození; Přivolej desátkového běsa spotřebuje celou zásobu. Vytváření nábojů také nabíjí Desátkovou bombu, i když je zásoba plná.",
+      "bombTooltip": "Desátková bomba: vytvoř 20 nábojů Desátku temnoty a připravíš jednu bombu. Utrácení nábojů nepřidává postup. Postup přetrvává mezi boji. Smrt nebo zahájení boje s nájezdovým bossem jej vynuluje. Dokončené seslání bombu spotřebuje; zrušení ji zachová."
     },
     "procOverlay": {
       "soulFragmentsMeter": "Úlomky duše",
@@ -2600,6 +2600,7 @@ export const cs_CZ: EnTranslations = {
       "name_lantern_hall_destrier": "Oř Lucernové síně",
       "name_chimeglass_tortoise": "Tolliver Chimeglass",
       "name_rickshaw_mount": "Kostipoutaná rikša",
+      "name_emberbristle_broom": "Koště žhavých štětin",
       "name_wobbles_slime": "Sliz Vikláček",
       "name_nightwing_chimera": "Chiméra Noční křídlo",
       "desc_valorsteed": "Odolný oř s jistým krokem a koženým sedlem.",
@@ -2623,7 +2624,8 @@ export const cs_CZ: EnTranslations = {
       "desc_lantern_hall_destrier": "Válečný kůň Lucernové síně, krytý dubem a železem v cechovní modři. Ze sedla se mu houpají dvě bouřkové lucerny, aby osvětlovaly cestu domů.",
       "desc_nightwing_chimera": "Dvouhlavá soumračná wyverna z prastarých korun. Při odpočinku sedí na zadních nohou s drápy a nad zemí klouže na křídlech s vyrytými tajemnými znaky.",
       "desc_chimeglass_tortoise": "Solná želva, která překonala tři generace karavanů. Tinkers mu vybrousil brýle z bouřkového skla a pověsil mu na hrdlo bronzový zvon, takže ho cesta slyší dlouho předtím, než ho uvidí.",
-      "desc_rickshaw_mount": "Chrastící kostěný vozík s kostnatým pěšákem zapřaženým do ojí, který tě veze tryskem."
+      "desc_rickshaw_mount": "Chrastící kostěný vozík s kostnatým pěšákem zapřaženým do ojí, který tě veze tryskem.",
+      "desc_emberbristle_broom": "Dožínkové koště svázané oranžovou stuhou se vznáší na dlaň nad zemí a z jeho štětin padají uhlíky. Trvalá odměna ze Svátku dýňových světel."
     },
     "mountTraining": {
       "mountPrompt": "Stiskni {key} pro nasednutí na cvičného Udatného oře.",
@@ -4672,7 +4674,10 @@ export const cs_CZ: EnTranslations = {
       }
     },
     "auraEffect": {
-      "stilledMindCrit": "Your next Mindfracture or Void Rupture is a guaranteed critical strike if it hits. Other spells do not consume this bonus. Void Rupture still consumes 3 Gloomtithe charges. A resisted cast consumes the bonus.",
+      "gourdlight": {
+        "thatchbound": "Starý Slamoškleb tahá za tvé nitky. Nemůžeš jednat: dovede tě k nejbližšímu spojenci, kterého každých {every} s udeříš za {min} až {max} poškození (až {mult}krát více proti spojenci na úrovni {level}). Účinek skončí dříve, když utrpíš poškození rovné {pct}% svého maximálního zdraví nebo když jej spojenec rozptýlí (magie)."
+      },
+      "stilledMindCrit": "Tvé příští Zlomení mysli nebo Roztržení prázdnoty při zásahu zaručeně kriticky zasáhne. Jiná kouzla tento bonus nespotřebují. Roztržení prázdnoty stále spotřebuje 3 náboje Desátku temnoty. Pokud cíl kouzlu odolá, bonus se spotřebuje.",
       "wildheart": {
         "packBond": "Utrpí o {pct}% méně poškození, dokud jeho druh stojí poblíž. Oddělte Pána šelem od jeho jaguára a pouto přerušíte.",
         "packBondFury": "Způsobuje o {pct}% více poškození, když partner stojí blízko.",
@@ -4862,6 +4867,7 @@ export const cs_CZ: EnTranslations = {
       "spellHaste": "Zvyšuje rychlost sesílání kouzel o {pct} %",
       "sated": "Nemůže těžit z dalšího skupinového efektu na rychlost",
       "cauterizeFatigue": "Vypálení nemůže zabránit dalšímu smrtelnému zásahu",
+      "seasonalCosmetic": "Pouze vzhled: bez vlivu na boj",
       "castShield": "Sesílání nelze přerušit ani zpozdit poškozením",
       "dmgDone": "Zvyšuje způsobené poškození o {pct} %",
       "dmgDoneReduce": "Snižuje způsobené poškození o {pct} %",
@@ -5009,6 +5015,7 @@ export const cs_CZ: EnTranslations = {
       "dodgeReduce": "Snižuje šanci na vyhnutí o {pct} %",
       "damageReduction": "Snižuje veškeré utrpěné poškození o {pct} %",
       "slumber": "Spí až do úsvitu. Nelze na něj zaútočit a pro nikoho se neprobudí.",
+      "slumberNight": "Až do setmění visí bez života na svém kůlu. Nelze na něj útočit.",
       "guardianWard": "Příští smrtící nepřátelský útok místo toho obnoví tvoje zdraví na {pct} %",
       "armorFlat": "Snižuje brnění o {value}",
       "armorFlatStacks": "Snižuje brnění o {value} ({stacks} stacků)",
@@ -5088,7 +5095,8 @@ export const cs_CZ: EnTranslations = {
     "worldBoss": {
       "spawn": "{name} povstává nad {zone}!",
       "wake": "{name} se probouzí nad {zone}!",
-      "sleep": "{name} spí až do úsvitu."
+      "sleep": "{name} spí až do úsvitu.",
+      "sleepUntilNightfall": "{name} spí až do setmění."
     },
     "auth": {
       "appleLoginCta": "Pokračovat přes Apple",
@@ -8616,6 +8624,107 @@ export const cs_CZ: EnTranslations = {
       }
     }
   },
+  "seasonal": {
+    "pumpkins": {
+      "name": "Strašidelná dýně",
+      "title": "Strašidelné dýně",
+      "world": "Svět",
+      "progress": "{label}: {current}/{total}",
+      "found": "Rozsvítíš strašidelnou dýni v oblasti {zone}: {count}/{total}. Získané dýňové sladkosti: {sweets}.",
+      "flash": "Nalezena strašidelná dýně! {count}/{total}"
+    },
+    "event": {
+      "gourdlight_eve": {
+        "name": "Svátek dýňových světel"
+      }
+    },
+    "trickOrTreat": {
+      "row": "Koledu, nebo neplechu!",
+      "rowAria": "Říct {name}: koledu, nebo neplechu",
+      "knockedHint": "Tady už jsi dnes klepal. Dveře se znovu otevřou po denním resetu.",
+      "treat": "{name} ti podává sladkost.",
+      "trick": "{name} tě napálí: {trick}!",
+      "alreadyKnocked": "U {name} jsi dnes už koledoval.",
+      "notActive": "Svátek dýňových světel právě neprobíhá.",
+      "tooFar": "Přistup blíž, abys mohl zaklepat.",
+      "treatFlash": {
+        "one": "Koleda! {count} dýňová sladkost",
+        "few": "Koleda! {count} dýňové sladkosti",
+        "many": "Koleda! {count} dýňových sladkostí",
+        "other": "Koleda! {count} dýňových sladkostí"
+      },
+      "trickFlash": "Neplecha! {trick}"
+    },
+    "tricks": {
+      "gourdlight_trick_bat": "Netopýří poblouznění",
+      "gourdlight_trick_skeleton": "Chrastící kosti",
+      "gourdlight_trick_fumes": "Zelené výpary",
+      "gourdlight_trick_strawling": "Podoba slaměnce",
+      "gourdlight_costume_skeleton": "Kostým kostlivce",
+      "gourdlight_costume_ghost": "Kostým ducha",
+      "gourdlight_costume_bat": "Netopýří kostým"
+    },
+    "pumpkinHead": {
+      "on": "Nasazuješ si Vyřezanou dýňovou hlavu.",
+      "off": "Sundáváš Vyřezanou dýňovou hlavu."
+    },
+    "jarTrick": "Sklenice se otevře s prásknutím: {trick}!",
+    "guise": "Talisman zapraská a obalí tě sláma: {trick}!",
+    "costume": "Vypiješ lektvar a proměníš se: {trick}!",
+    "titleGranted": "Přečteš listinu. Získaný nový titul: {title}.",
+    "titleKnown": "Tento titul už máš, takže si listinu ponecháš.",
+    "boundItemGone": "Svátek dýňových světel skončil a tvůj předmět {item} se rozpadá zpátky na slámu.",
+    "itemUse": {
+      "pumpkinHead": "Použití: Nasadíš nebo sundáš vyřezanou dýni osvětlenou zevnitř, která se nosí přes helmu. Pouze vzhled.",
+      "trickJar": "Použití: Na několik sekund na tobě provede náhodný neškodný žert. Pouze vzhled.",
+      "pouch": "Použití: Otevři a získej {count} dýňových sladkostí.",
+      "strawlingCharm": "Použití: Na {seconds} sekund se proměníš v jednoho ze Slamošklebových slaměnců. Mimo boj. Nikdy se nespotřebuje. Pouze vzhled.",
+      "sweet": "Získává se koledováním během Svátku dýňových světel. Hester Dýňoknotová je mění za kosmetické předměty u svých stánků v Eastbrooku, Fenbridge a Highwatchi.",
+      "costumeSkeleton": "Použití: Na {minutes} minut se proměníš v chrastícího kostlivce. Spotřebuje se. Nelze použít v boji a vstup do boje účinek ukončí. Pouze vzhled.",
+      "costumeGhost": "Použití: Na {minutes} minut se proměníš v plujícího ducha. Spotřebuje se. Nelze použít v boji a vstup do boje účinek ukončí. Pouze vzhled.",
+      "costumeBat": "Použití: Na {minutes} minut se proměníš v mávajícího netopýra. Spotřebuje se. Nelze použít v boji a vstup do boje účinek ukončí. Pouze vzhled.",
+      "toyPrank": "Použití: Hodíš ji po jiném viditelném hráči do {range} yardů. Jeho hlava se na {seconds} sekund změní ve svítící dýňovou lucernu; pravým kliknutím ji může sundat. Ani jeden z vás nesmí být v boji a ty nesmíš být v utajení. Nikdy se nespotřebuje: znovu lze použít po {cooldown} sekundách. Zůstává natrvalo a funguje celý rok. Pouze vzhled.",
+      "toyLantern": "Použití: Postavíš před sebe lucernu. Malý duch kolem tebe krouží {seconds} sekund. Nelze použít v boji ani v utajení. Nikdy se nespotřebuje: znovu lze použít po {cooldown} sekundách. Zůstává natrvalo a funguje celý rok. Pouze vzhled.",
+      "toyBats": "Použití: Otevřeš pytel. Vyletí z něj pištící hejno netopýrů a po dobu {seconds} sekund se rozletí kolem tebe. Nelze použít v boji ani v utajení. Nikdy se nespotřebuje: znovu lze použít po {cooldown} sekundách. Zůstává natrvalo a funguje celý rok. Pouze vzhled.",
+      "toyCandleShadows": "Použití: Zapálíš před sebou svíčku. Její plameny po dobu {seconds} sekund vrhají na zem tančící stíny kočky, netopýra a čarodějnice, viditelné všem poblíž. Nelze použít v boji ani v utajení. Nikdy se nespotřebuje: znovu lze použít po {cooldown} sekundách. Zůstává natrvalo a funguje celý rok. Pouze vzhled.",
+      "toyCauldron": "Použití: Postavíš před sebe velký bublající kotel. Stojí {standing} sekund a každý hráč, který se z něj napije, vybuchne v zelených bublinách a na {seconds} sekund se promění v goblina, čímž nahradí současný kostým. Kotel nelze postavit ani z něj pít v boji nebo v utajení a vstup do boje gobliní podobu ukončí. Nikdy se nespotřebuje: znovu lze použít po {cooldown} sekundách. Zůstává natrvalo a funguje celý rok. Pouze vzhled.",
+      "titleWrit": "Použití: Získáš pro tuto postavu titul {title}, který nasadíš v Knize skutků. Spotřebuje se. Pokud už titul máš, listina ti zůstane.",
+      "broomSources": "Prodává Hester Dýňoknotová za {count} snopů protkávaných žárem, nebo vzácně padá ze Starého Slamoškleba v den, kdy z něj vybereš kořist. K jízdě je nutná jezdecká dovednost. Zůstává natrvalo a lze na něm jezdit po celý rok.",
+      "sheaf": "Starý Slamoškleb ti dá jeden každý den, kdy z něj vybereš kořist, dokud nezískáš Koště žhavých štětin. Hester Dýňoknotová jich {count} vymění za koště u svých stánků v Eastbrooku, Fenbridge a Highwatchi. Neutracené snopy zůstanou na další Svátek dýňových světel."
+    },
+    "toy": {
+      "prank": "Hodíš dýni. Rozplácne se o {name}!",
+      "lantern": "Postavíš lucernu a vypluje z ní malý duch, aby ti dělal společnost.",
+      "bats": "Otevřeš pytel a vyletí z něj hejno vyplašených netopýrů!",
+      "candleShadows": "Zapálíš svíčku a kolem jejích plamenů začnou tančit stíny.",
+      "cauldron": "Postavíš kotel a ten začne bublat.",
+      "cauldronDrink": "Napiješ se z kotle, vybuchneš v zelených bublinách a proměníš se v goblina!",
+      "pranked": "{name} ti rozplácne dýni na hlavě! Sundej ji pravým kliknutím, nebo ji hrdě nos.",
+      "prankedFlash": "{name} tě napálil!",
+      "prankNeedsPlayer": "Dýně se rozplácne pouze o jiného hráče, který není v boji.",
+      "hidden": "Nejdřív vystup ze stínů: hračka by tě prozradila."
+    },
+    "itemSource": {
+      "pumpkinHead": "Padá ze Starého Slamoškleba na jeho dýňovém poli za Kančí loukou při prvním vybrání kořisti. Žádný obchodník ji neprodává."
+    },
+    "boo": {
+      "row": "Baf!",
+      "rowAria": "Vyskočit na {name} a zakřičet baf",
+      "needsCostume": "Nejdřív si obleč kostým: použij kostýmový lektvar, netopýří nebo kostlivý žert, Talisman slaměnce, Vyřezanou dýňovou hlavu nebo doušek ze Zelenobublavého kotle pro gobliní podobu.",
+      "frightenedHint": "{name} je po tvém posledním vystrašení pořád nervózní. Najdi někoho jiného.",
+      "landed": "Vyskočíš na {name} s výkřikem BAF! Vyděšeně vykřikne a málem všechno upustí.",
+      "flash": "BAF! {name} se lekl!",
+      "noCostume": "Bez kostýmu se ti {name} jen směje. Nejdřív si nějaký obleč.",
+      "already": "{name} už má dnes strašení dost.",
+      "notOnErrand": "Hester tě dnes neposlala nikoho strašit."
+    },
+    "tokenPrice": "{count} {item}",
+    "thatchgrin": {
+      "poleBound": "Připoutaný ke kůlu",
+      "wakeYell": "Na políčko padá NOC! Kdo chodí po MÉM poli?",
+      "sleepYell": "Slunce vyšlo. Zpátky na kůl, zpátky na hlídku."
+    }
+  },
   "dungeonGuide": {
     "drownedTemple": {
       "greet": {
@@ -9910,7 +10019,7 @@ export const cs_CZ: EnTranslations = {
       "framesGovernedTalkingHead": "Edit Frames také uvolní panel Dialogue, který nese mluvený řádek NPC, když je NPC mimo váš dohled; nosí svůj jmenný čip, zatímco je uvolněný.",
       "framesGovernedShardpike": "Upravit rámečky také uvolní lištu Střepové píky, krátkou řadu akcí úkolového nástroje vedle akčních lišt, která se objevuje jen při nesení samotné píky. Při uvolnění má vlastní jmenovku, takže ji můžeš umístit před bojem místo během něj.",
       "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
-      "framesGovernedPriest": "Edit Frames also lets you move the Shadow priest's Gloomtithe and Tithe Bomb medallion.",
+      "framesGovernedPriest": "Úprava rámečků také umožňuje přesunout medailon stínového kněze s Desátkem temnoty a Desátkovou bombou.",
       "framesGovernedResourceAndHill": "Zapni Oddělit lištu zdrojů na kartě Rámy. Volba Upravit rámečky pak uvolní i lištu zdrojů, takže manu, energii nebo zuřivost můžeš umístit samostatně kamkoli. Šířka lišty zdrojů a Výška lišty zdrojů na stejné kartě nastavují její velikost. Upravit rámečky uvolní také lištu Krále kopce. Krytí pozadí Krále kopce na stejné kartě zeslabí její panel, zatímco text zůstane dobře čitelný.",
       "barsTitle": "Lišty, časovače a bojový text",
       "barsBody": "Tvá lišta sesílání se objeví uprostřed obrazovky, těsně nad tvými akčními lištami, kdykoli sesíláš nebo kanáluješ kouzlo, a nese jméno kouzla a zbývající čas. Tvůj cíl má na svém rámu vlastní lištu sesílání, takže vidíš, co přichází, a můžeš na to zareagovat.\n\nPod tvou lištou sesílání sedí tenká lišta švihu, která se plní mezi švihy tvé zbraně, takže útočník na blízko nebo na dálku vidí, kdy dopadne další automatický zásah.\n\nTvá lišta zkušeností běží přes celou šířku pod akčními lištami, rozdělená do úseků, se světlejším pruhem, který ukazuje naspořené odpočaté zkušenosti.\n\nPlav pod vodou a nahoře na obrazovce se objeví modrá lišta dechu. Vyprazdňuje se, dokud máš hlavu pod hladinou, jakmile dojde, zabliká červeně a začneš se topit, a jakmile se vynoříš, rychle se doplní. Mezerník tě žene nahoru a klávesa Plavat dolů, ve výchozím stavu Ctrl, tě táhne hlouběji.\n\nPoškození a léčení vyplouvají nad tím, co zasáhly, jako malá čísla, takže boj přečteš, aniž bys musel číst text. Záložka Bojový záznam v tvém chatu drží úplný písemný záznam.",
@@ -10815,6 +10924,7 @@ export const cs_CZ: EnTranslations = {
       "hillBodyRamp": "Každé dvě hodiny se v Dračích zemích, Kraji Mrazivého závoje nebo Jantarovém pádu objeví kopec. Říše dostane varování patnáct minut předem a kruh je vyznačen na otevřeném prostranství. Kopec zůstává aktivní třicet minut. Vstup do aktivního kruhu zapne příznak světového PvP podle běžných pravidel úrovně, a to i členům nájezdu. Skupina s největším počtem způsobilých hráčů uvnitř získá kopec po minutě nepřerušené převahy; samotný hráč se počítá jako jednočlenná skupina, ale členové nájezdu a hráči pod požadovanou úrovní pro PvP nemohou kopec obsadit ani získávat Čest z kopce. Každý držitel uvnitř získává Čest stále rychleji. Odměny přicházejí častěji a jejich výše roste rychleji, takže celková Čest zůstává stejná jako při dřívější pětačtyřicetiminutové události. Změna držitele spustí růst odměn od začátku. Po opuštění kruhu zůstává příznak zapnutý; /pvp off používá běžnou pětiminutovou prodlevu a nemůže doběhnout uvnitř aktivního kopce ani během boje. Lišta kopce ukazuje držitele, počty hráčů a postup obsazování; /hill oznámí jeho polohu.",
       "hillBodyPause": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls, and every five minutes while it stands the realm is told where it is and which groups have held it longest. The party with the most players standing inside contests the hill, and after thirty seconds of majority the hill is theirs. A rival party walking in only pauses that count until yours leads again; it starts over only if nobody from your party is left alive inside. A lone player counts as a party of one and keeps a hill they hold when they form a party, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns Honor every minute, and the longer the same party holds it, the more each minute pays: a full party holding an uncontested hill for its whole stand earns about as much as three battleground wins. When the hill changes hands, the new holders start the count from the beginning. When it falls, if the group that held it longest in total held it for at least ten minutes, everyone who stood inside for that group for at least a minute, and is still in that group, earns one win toward the PvP row of the Weekly Vault. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
       "hillBodyFlat": "Jednou za tři hodiny se v nepředvídatelnou chvíli celé říši oznámí, že za patnáct minut v jedné ze severních zón vyroste kopec. Jeho kruh se vyznačí na otevřeném prostranství. Kopec vydrží čtyřicet pět minut a pak zmizí. Během této doby se každých pět minut oznamuje jeho poloha a skupiny s nejdelším celkovým držením. Skupina s nejvíce hráči v kruhu o kopec usiluje a po celkem třiceti sekundách početní převahy jej získá. Příchod soupeřů pouze pozastaví počítadlo, dokud vaše skupina znovu nezíská převahu; od začátku se počítá jen tehdy, když v kruhu nezůstane žádný živý člen vaší skupiny. Samotný hráč se počítá jako jednočlenná skupina a při založení skupiny si držený kopec ponechá, ale členové raidu se nepočítají vůbec. Každý člen držící skupiny stojící v kruhu získává každou minutu stejně Cti bez ohledu na délku držení. Plná skupina, která kopec nerušeně drží po celou jeho dobu, získá přibližně tolik jako za tři vítězství na bojištích. Když kopec zmizí a skupina s nejdelším celkovým držením jej držela alespoň deset minut, každý, kdo během jejího držení stál v kruhu alespoň minutu a stále je členem této skupiny, získá jedno vítězství do PvP řádku Týdenního trezoru. Lišta nad bojištěm ukazuje držitele, počty hráčů na obou stranách a počítadlo obsazování; /hill v chatu sdělí polohu.",
+      "hillBodyTwoHour": "Jednou za dvě hodiny, v okamžiku, který nikdo nedokáže předvídat, se celý realm dozví, že za patnáct minut v jedné ze severních oblastí vyroste kopec. Kruh, kde bude stát, se vyznačí na otevřeném prostranství. Kopec stojí třicet minut a pak zmizí. Každých pět minut dostane realm zprávu, kde je a které skupiny jej držely nejdéle. Družina s nejvíce hráči uvnitř bojuje o ovládnutí kopce a po třiceti sekundách převahy jej získá. Příchod soupeřící družiny odpočet pouze pozastaví, dokud tvá družina znovu nepovede; od začátku se počítá jen tehdy, když uvnitř nezůstane nikdo z tvé družiny naživu. Osamělý hráč se počítá jako jednočlenná družina a po vytvoření družiny si ovládaný kopec ponechá, ale členové nájezdu se nepočítají vůbec. Dokud družina kopec drží, každý její člen uvnitř získává každou minutu stejné množství cti bez ohledu na dobu držení. Plná družina držící kopec po celou dobu bez odporu tak získá přibližně tolik jako za dvě vítězství na bojišti. Když kopec zmizí a skupina, která jej držela celkově nejdéle, jej držela alespoň deset minut, každý, kdo pro ni stál uvnitř nejméně minutu a stále je jejím členem, získá jedno vítězství do PvP řádku Týdenního trezoru. Ukazatel nad polem zobrazuje držitele, počet tvých hráčů proti soupeřovým a časovač obsazování; příkaz /hill v chatu sdělí polohu.",
       "limitsBodyRaids": "Porážení stejného hráče znovu a znovu vyplácí pokaždé méně a brzy nic, a tvůj počet proti tomu hráči se resetuje až zhruba hodinu po prvním z těch zabití, takže čekání na jedné oběti se nikdy nevyplatí. Cíl hluboko pod tvou úrovní nevyplatí vůbec nic. Bojiště a Arény se řídí vlastními pravidly, dokud jsi uvnitř, a vyplácí víc Cti než otevřený svět, takže světové PvP je pomalejší cesta ke stejnému obchodníkovi. Výpravy nezískávají ze světových zabití nic: člen výpravy nedostane žádnou Čest ani zlato a nezmenší podíl nikoho jiného, takže boj jako skupina se vyplatí."
     },
     "thornhollowPage": {
@@ -15556,6 +15666,7 @@ export const cs_CZ: EnTranslations = {
       "accountSuspended": "Tento účet je pozastavený do {date}.",
       "alreadyInWorld": "Postava už je ve světě.",
       "accountSessionLimit": "Příliš mnoho postav na tomto účtu už je ve světě.",
+      "worldFightHold": "Jiná postava na tomto účtu je po boji stále ve světě. Zkus to znovu za pár minut.",
       "takenOver": "Tvoje postava byla převzata jinou relací.",
       "vaultMailRecovering": "Tvá odměna z trezoru se obnovuje. Zkus to za chvíli.",
       "renameBeforeEntering": "Tato postava musí být před vstupem do světa přejmenována.",
@@ -18449,16 +18560,16 @@ export const cs_CZ: EnTranslations = {
         "description": "Sesílá 3 s a každou vteřinu působí {damage} stínového poškození. Poškození roste se silou kouzel."
       },
       "vampiric_touch": {
-        "name": "Vampiric Touch",
-        "description": "Deal {damage} Shadow damage over 15 sec, once every 3 sec. Damage increases with Spell Power and ticks can critically strike. Each tick shares healing equal to 20% of the health lost by the enemy among you and injured party members within 30 yards; in a raid, only your subgroup receives this healing. If you have at least 2 Gloomtithe charges, applying this effect consumes 2 to increase all its damage by 30%."
+        "name": "Upíří dotek",
+        "description": "Způsobíš {damage} stínového poškození během 15 s, jednou za 3 s. Poškození roste se silou kouzel a jednotlivé tiky mohou kriticky zasáhnout. Každý tik rozdělí léčení rovné 20% zdraví, které nepřítel ztratil, mezi tebe a zraněné členy družiny do 30 yardů; v nájezdu léčí pouze tvou podskupinu. Máš-li alespoň 2 náboje Desátku temnoty, použití účinku spotřebuje 2 a zvýší veškeré jeho poškození o 30%."
       },
       "void_rupture": {
-        "name": "Void Rupture",
-        "description": "Consume 3 Gloomtithe charges to rupture an enemy for {damage} Shadow damage. Damage increases with Spell Power and can critically strike. Requires 3 charges and consumes them even if resisted."
+        "name": "Roztržení prázdnoty",
+        "description": "Spotřebuješ 3 náboje Desátku temnoty a roztrhneš nepřítele za {damage} stínového poškození. Poškození roste se silou kouzel a může kriticky zasáhnout. Vyžaduje 3 náboje a spotřebuje je, i když cíl odolá."
       },
       "spirit_bomb": {
-        "name": "Tithe Bomb",
-        "description": "Detonate a spirit bomb on an enemy, dealing {damage} Shadow damage to enemies within 8 yards of that target. Damage increases with Spell Power, can critically strike, and is reduced beyond 5 targets. Generate 20 Gloomtithe to prepare one bomb. Generation counts even while holding the maximum 5 Gloomtithe; spending charges is not required and adds no progress. Progress lasts between fights, up to one prepared bomb. Dying clears your progress and prepared bomb. Completing the cast consumes the prepared bomb, even if resisted. Cancellation or interruption preserves it. Starting a raid boss encounter clears your progress and prepared bomb. Cannot open a raid boss encounter with this spell."
+        "name": "Desátková bomba",
+        "description": "Odpálíš na nepříteli duchovní bombu a způsobíš nepřátelům do 8 yardů od cíle {damage} stínového poškození. Poškození roste se silou kouzel, může kriticky zasáhnout a nad 5 cílů se snižuje. Vytvořením 20 nábojů Desátku temnoty připravíš jednu bombu. Vytváření se počítá i při maximálních 5 nábojích; utrácení není nutné a nepřidává postup. Postup přetrvává mezi boji a můžeš mít nejvýše jednu připravenou bombu. Smrt smaže postup i připravenou bombu. Dokončení seslání bombu spotřebuje, i když cíl odolá. Zrušení nebo přerušení ji zachová. Zahájení boje s nájezdovým bossem smaže postup i připravenou bombu. Tímto kouzlem nelze zahájit boj s nájezdovým bossem."
       },
       "flash_heal": {
         "name": "Naléhavá modlitba",
@@ -19294,7 +19405,7 @@ export const cs_CZ: EnTranslations = {
       "inner_focus": {
         "name": "Ztišená mysl",
         "description": "Tvé další kouzlo kněze bude zdarma a nepřerušitelné. Trvá 60 s.",
-        "specNote_shadow": "Also reserves a guaranteed critical strike for your next Mindfracture or Void Rupture within 60 sec, if it hits. Other spells do not consume this bonus. Void Rupture still consumes 3 Gloomtithe charges. A resisted cast consumes the critical strike bonus."
+        "specNote_shadow": "Také zaručí kritický zásah příštího Zlomení mysli nebo Roztržení prázdnoty do 60 s, pokud zasáhne. Jiná kouzla tento bonus nespotřebují. Roztržení prázdnoty stále spotřebuje 3 náboje Desátku temnoty. Pokud cíl kouzlu odolá, bonus ke kritickému zásahu se spotřebuje."
       },
       "innervate": {
         "name": "Míza života",
@@ -19492,7 +19603,7 @@ export const cs_CZ: EnTranslations = {
       "choir_of_deliverance": {
         "name": "Sbor vysvobození",
         "description": "Kanalizuje po dobu 6 s a každé 2 s léčí členy skupiny do 30 yardů za {damage}. Léčení roste se silou kouzel.",
-        "specNote_shadow": "For 15 sec, share 20% of the health enemies lose to your Shadow damage as healing among injured party members within 30 yards, including yourself. In raids, only your subgroup is healed. Cast instantly and keep attacking in Shadowform. Absorbed damage and overkill do not add healing."
+        "specNote_shadow": "Po dobu 15 s rozdělíš 20% zdraví, které nepřátelé ztratí tvým stínovým poškozením, jako léčení mezi zraněné členy družiny do 30 yardů včetně sebe. V nájezdu léčíš pouze svou podskupinu. Seslání je okamžité a můžeš dál útočit v Soumračném závoji. Pohlcené poškození a poškození přesahující zbývající zdraví nepřidávají léčení."
       },
       "bear_charge": {
         "name": "Medvědí výpad",
@@ -24707,6 +24818,87 @@ export const cs_CZ: EnTranslations = {
       "vanguard_pendant_of_mending": {
         "name": "Předvojův přívěsek hojení"
       },
+      "gourdlight_sweet": {
+        "name": "Dýňová sladkost"
+      },
+      "gourdlight_treat_pouch": {
+        "name": "Váček dýňových sladkostí"
+      },
+      "carved_pumpkin_head": {
+        "name": "Vyřezaná dýňová hlava"
+      },
+      "jar_of_mischief": {
+        "name": "Sklenice rošťáren"
+      },
+      "thatchgrin_sweet_sack": {
+        "name": "Slamošklebův pytel sladkostí"
+      },
+      "strawling_charm": {
+        "name": "Talisman slaměnce"
+      },
+      "rattlebone_draught": {
+        "name": "Lektvar chrastících kostí"
+      },
+      "haunting_draught": {
+        "name": "Přízračný lektvar"
+      },
+      "batwing_draught": {
+        "name": "Třepotavý lektvar"
+      },
+      "writ_of_the_gourdlit": {
+        "name": "Listina dýňového světla"
+      },
+      "writ_of_the_trickster": {
+        "name": "Listina šprýmaře"
+      },
+      "writ_of_the_hollow_grin": {
+        "name": "Listina dutého úšklebku"
+      },
+      "reins_emberbristle_broom": {
+        "name": "Koště žhavých štětin"
+      },
+      "hearthroot_toffee": {
+        "name": "Krbový karamel"
+      },
+      "gourdseed_brittle": {
+        "name": "Dýňový krokant"
+      },
+      "crabapple_chew": {
+        "name": "Plané jablečné žvýkátko"
+      },
+      "owlwatch_fudge": {
+        "name": "Soví fondán"
+      },
+      "lantern_mint_drop": {
+        "name": "Lucernový mentolový bonbon"
+      },
+      "emberwoven_sheaf": {
+        "name": "Snop protkávaný žárem"
+      },
+      "prankers_pumpkin": {
+        "name": "Šprýmařova dýně"
+      },
+      "wanderwisp_lantern": {
+        "name": "Lucerna bludného světélka"
+      },
+      "sack_of_startled_bats": {
+        "name": "Pytel vyplašených netopýrů"
+      },
+      "murmurwick_candle": {
+        "name": "Svíčka šeptajícího knotu"
+      },
+      "gurglegreen_cauldron": {
+        "name": "Zelenobublavý kotel"
+      },
+      "thatchgrin_patch_pumpkin": {
+        "name": "Dýně z políčka"
+      },
+      "cursed_candle_stub": {
+        "name": "Zbytek prokleté svíčky"
+      },
+      "gourdlight_crow_feather": {
+        "name": "Pero dýňové vrány"
+      },
       "membership_staff": {
         "name": "Hůl proměny"
       },
@@ -26263,6 +26455,18 @@ export const cs_CZ: EnTranslations = {
       "muster_effigy": {
         "name": "Slaměný předák"
       },
+      "gourdlight_thatchgrin": {
+        "name": "Starý Slamoškleb"
+      },
+      "gourdlight_crow": {
+        "name": "Dýňová vrána"
+      },
+      "gourdlight_strawling": {
+        "name": "Slaměnec"
+      },
+      "gourdlight_swelling_gourd": {
+        "name": "Bobtnající dýně"
+      },
       "stable_horse": {
         "name": "Stájový kůň"
       },
@@ -27416,6 +27620,11 @@ export const cs_CZ: EnTranslations = {
         "name": "Hester Quillby",
         "title": "Kartografka map",
         "greeting": "Každá mapa této bažiny, kterou jsem kdy koupila, byla do sezóny špatně. Voda přesouvá cesty a cesty přesouvají vodu. Proto si kreslím vlastní a sedím tady v suchu, než inkoust zaschne."
+      },
+      "gourdlight_keeper": {
+        "name": "Hester Dýňoknotová",
+        "title": "Strážkyně dýňových světel",
+        "greeting": "Dýně svítí a lucerny visí, takže nastal Svátek dýňových světel. Zaklepej na dveře obyvatel Eastbrooku, Fenbridge a Highwatche a řekni: koledu, nebo neplechu. Většina ti dá sladkost. Někteří tě napálí. Přines mi sladkosti k libovolnému z mých stánků a vyměním je za něco na sebe."
       },
       "reeve_ottoline": {
         "name": "Rychtářka Ottoline",
@@ -30048,6 +30257,88 @@ export const cs_CZ: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Účinné léčení zasazeno do Léčicího cvičného terče"
+          }
+        }
+      },
+      "q_gourdlight_rounds": {
+        "title": "Dýňová koleda",
+        "text": "Každý Svátek dýňových světel děti z údolí chodí koledovat a letos se k nim přidáš i ty, {playerName}. Zaklepej na pět dveří v našich městech, řekni ta slova a uvidíš, co dostaneš. Až skončíš, vrať se za mnou.",
+        "completion": "Pět dveří a pořád máš všechny prsty. Tady máš váček sladkostí na cestu domů. Vrať se zítra, dveře se zase otevřou.",
+        "objectives": {
+          "0": {
+            "label": "Navštívené dveře"
+          }
+        }
+      },
+      "q_gourdlight_daily_patch": {
+        "title": "Dýně z políčka",
+        "text": "Slamošklebovo políčko za Kančí loukou se nadouvá dýněmi a polovina se odkutálela za jeho slámu, kde na ně opatrný člověk dosáhne. Přines mi jich pět, {playerName}. Samotnému starému strašákovi se vyhni obloukem. Počítá každou.",
+        "completion": "Pět kulatých a ani do jedné nikdo nekousl. To bude koláč pro celé údolí. Tady máš něco za námahu.",
+        "objectives": {
+          "0": {
+            "label": "Dýně z políčka"
+          }
+        }
+      },
+      "q_gourdlight_daily_boo": {
+        "title": "Baf!",
+        "text": "Nikdo v těchhle městech se už rok pořádně nelekl, {playerName}, a Svátek dýňových světel bez leknutí je jen studená noc. Obleč si kostým, klidně kterýkoli můj, nebo tu dýňovou hlavu, pokud už ji máš. Pak se přikradni ke třem obyvatelům a pořádně nahlas zařvi BAF.",
+        "completion": "Tři? Přes celé náměstí jsem slyšela, jak kuchař upustil pánev. Výborně. Tady je tvůj podíl.",
+        "objectives": {
+          "0": {
+            "label": "Vystrašení obyvatelé"
+          }
+        }
+      },
+      "q_gourdlight_daily_wicks": {
+        "title": "Zlověstné knoty",
+        "text": "Někdo staví k našim lampám svíčky se zeleným plamenem. Hoří, ale netají, a když se otočíš, šeptají. Zhasni mi jich šest, {playerName}, v kterémkoli z těch tří měst a přines mi zbytky.",
+        "completion": "Šest zbytků, studených jako mráz. Kdo je zapálil, bude se muset snažit víc. Vezmi si tohle a umyj si ruce.",
+        "objectives": {
+          "0": {
+            "label": "Zhasnuté prokleté svíčky"
+          }
+        }
+      },
+      "q_gourdlight_daily_towns": {
+        "title": "Dveře v každém městě",
+        "text": "Děti říkají, že pravý dýňový koledník zaklepe v každém městě, než skončí noc. Dej jim za pravdu, {playerName}. Koleduj u jedněch dveří v Eastbrooku, jedněch ve Fenbridge a jedněch v Highwatchi. Cestu ti osvětlí lucerny podél silnic.",
+        "completion": "Tři města za jednu noc! Tuhle odměnu si zasloužily spíš tvoje boty než ty.",
+        "objectives": {
+          "0": {
+            "label": "Zaklepání na dveře v Eastbrooku"
+          },
+          "1": {
+            "label": "Zaklepání na dveře ve Fenbridge"
+          },
+          "2": {
+            "label": "Zaklepání na dveře v Highwatchi"
+          }
+        }
+      },
+      "q_gourdlight_daily_feathers": {
+        "title": "Peří do ohně",
+        "text": "Když je Starý Slamoškleb v úzkých, povolá vrány na každého, kdo mu mlátí do slámy. Jejich peří hoří v krbu zeleně a já potřebuji tři pera na dnešní vatru. Najdi boj na jeho políčku, {playerName}, a vytrhni je jeho vránám.",
+        "completion": "Černá jako pole za bezměsíčné noci a už voní kouřem. To bude krásná vatra. Děkuji.",
+        "objectives": {
+          "0": {
+            "label": "Vraní pera"
+          }
+        }
+      },
+      "q_gourdlight_daily_baskets": {
+        "title": "Košíky pro sousedy",
+        "text": "Každý Svátek dýňových světel plním košík sladkostí pro starého přítele v každém městě, ale kolena už neslouží jako dřív. Roznes je za mě, {playerName}: kuchaři Marlowovi v Eastbrooku, bylinkářce Yaře ve Fenbridge a kronikáři Caddisovi nahoře v Highwatchi.",
+        "completion": "Všechny tři doručeny, a prý Marlow plakal. Ten pláče pokaždé. Tady máš vlastní košík.",
+        "objectives": {
+          "0": {
+            "label": "Košík předán kuchaři Marlowovi"
+          },
+          "1": {
+            "label": "Košík předán bylinkářce Yaře"
+          },
+          "2": {
+            "label": "Košík předán kronikáři Caddisovi"
           }
         }
       },

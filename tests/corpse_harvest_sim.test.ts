@@ -2567,7 +2567,10 @@ describe('a pick of nothing but unmapped families is refused, claim intact (#250
     // the six bosses of the Council and the guardians, and the final boss: 315.
     // The Guardian of the Heat's four untagged adds (Wellspawn, Wellkeeper,
     // Seedflame, Rolling Cinder): 319.
-    expect(Object.keys(MOBS).length - tagged.length).toBe(319);
+    // The Masterless Strength's four Splinters and the Hammer Council's Stone
+    // Prison block, untagged too: 324. The four Halloween encounter templates
+    // are untagged too: 328.
+    expect(Object.keys(MOBS).length - tagged.length).toBe(328);
     withMixedTemplates(() => {
       const mixed = mixedTemplates();
       expect(mixed.map(([id]) => id).sort()).toEqual(

@@ -1,0 +1,17 @@
+{
+  "note": "Gourdlight Eve (the autumn seasonal event): the city dressing kit (one GLB, a named mesh node per piece) and the wearable pumpkin head. The raw GLBs come from the deterministic Blender factory scripts/assets/gourdlight_eve/model.py, driven by export_gourdlight_eve.mjs, which runs this spec. Vertex-coloured, texture-free (no KTX2 step), original work with no reference image.",
+  "items": [
+    {
+      "src": "tmp/asset_src/gourdlight_eve/gourdlight_decor.glb",
+      "out": "models/props/gourdlight_decor.glb",
+      "type": "static",
+      "keepExtras": true
+    },
+    {
+      "src": "tmp/asset_src/gourdlight_eve/gourdlight_pumpkin_head.glb",
+      "out": "models/props/gourdlight_pumpkin_head.glb",
+      "type": "static",
+      "keepExtras": true
+    }
+  ]
+}

@@ -1442,6 +1442,51 @@ export const table: DeedLocaleTable = {
     desc: 'Comprado a Garrick Holt, intendente del Salón del Farol, por 24 sellos del farol.',
     title: 'del Salón del Farol',
   },
+  feat_gourdlight_guise: {
+    name: 'Disfraz de la Noche de las Calabazas',
+    desc: 'Posee una Cabeza de calabaza tallada, obtenida del Viejo Thatchgrin en su campo más allá del Prado de jabalíes durante la Noche de las Calabazas.',
+  },
+  feat_old_thatchgrin: {
+    name: 'Rastrojo y ceniza',
+    desc: 'Ayuda a derrotar al Viejo Thatchgrin en su huerto de calabazas más allá del Prado de jabalíes durante la Noche de las Calabazas.',
+  },
+  feat_title_gourdlit: {
+    name: 'El Iluminado por las Calabazas',
+    desc: 'Lee un Escrito del Iluminado por las Calabazas, obtenido de Hester Gourdwick a cambio de Dulces de la Noche de las Calabazas durante el evento.',
+    title: 'el Iluminado por las Calabazas',
+  },
+  feat_title_trickster: {
+    name: 'Bromista',
+    desc: 'Lee un Escrito del Bromista, obtenido de Hester Gourdwick a cambio de Dulces de la Noche de las Calabazas durante el evento.',
+    title: 'Bromista',
+  },
+  feat_title_hollow_grinned: {
+    name: 'El de la Sonrisa Hueca',
+    desc: 'Lee un Escrito de la Sonrisa Hueca, obtenido de Hester Gourdwick a cambio de Dulces de la Noche de las Calabazas durante el evento.',
+    title: 'el de la Sonrisa Hueca',
+  },
+  feat_pumpkin_hunter: {
+    name: 'Cazador de calabazas',
+    desc: 'Encuentra todas las Calabazas embrujadas escondidas por el mundo durante la Noche de las Calabazas.',
+    title: 'el Hueco',
+  },
+  feat_gourdlight_doorsteps: {
+    name: 'Cada umbral',
+    desc: 'Pide truco o trato a todos los vecinos que respondan a una llamada en Eastbrook, Fenbridge y Highwatch durante la Noche de las Calabazas.',
+  },
+  feat_gourdlight_errands: {
+    name: 'A las órdenes de Hester',
+    desc: 'Completa al menos una vez cada uno de los recados rotatorios de Hester Gourdwick durante la Noche de las Calabazas.',
+  },
+  feat_gourdlight_frights: {
+    name: 'Tres pueblos asustados',
+    desc: 'Durante el recado ¡Bu! de Hester, asusta a un vecino en cada uno de estos pueblos: Eastbrook, Fenbridge y Highwatch.',
+  },
+  feat_gourdlight_eve_complete: {
+    name: 'La Noche de las Calabazas de principio a fin',
+    desc: 'Completa toda la Noche de las Calabazas: derrota al Viejo Thatchgrin, encuentra todas las Calabazas embrujadas, completa cada recado de Hester, llama a todas las puertas y asusta a un vecino en cada uno de los tres pueblos.',
+    title: 'el Juramentado de las Calabazas',
+  },
 };
 
 // es_ES rides this base table plus the delve-vocabulary override layer

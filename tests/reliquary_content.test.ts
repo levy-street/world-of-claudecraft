@@ -493,7 +493,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 558.
     // Two referral reward mounts and nightwing_chimera join Horizons. Wobbles the
     // Slime (a developer mount, pending its route) takes one more slot: 567.
-    expect(full).toEqual({ owned: 575, total: 575 });
+    expect(full).toEqual({ owned: 581, total: 581 });
     // The Warfare Season 2 Vanguard Gallery (135 set pieces and four weapons)
     // is class-personal and sits outside completion, so it moves neither pair.
     const character = catalogCharacterCompletion({
@@ -530,7 +530,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 529;
     // 532 with the two referral reward mounts and nightwing_chimera; 537 with
     // Wobbles the Slime's character-scoped mount slot.
-    expect(character).toEqual({ owned: 545, total: 545 });
+    expect(character).toEqual({ owned: 551, total: 551 });
     // The Warfare Season 2 page is class-personal, outside completion.
   });
 
@@ -596,7 +596,7 @@ describe('Reliquary Conqueror catalog structure', () => {
       // +32 at the 2026-09-28 merge into feature/buried-hoards: the Buried Hoards page: 682.
       // +13 the Mirefen world boss page (seven relics, his staff and five trinkets): 695.
       // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 745.
-    ).toBe(771); // plus two referral reward mounts, nightwing_chimera and wobbles_slime
+    ).toBe(777); // plus two referral reward mounts, nightwing_chimera and wobbles_slime
     // Distinct mark ids: the 10 shipped before Phase 21, the 19 rare-slain
     // proofs of conquerors_rares_of_the_realm, the two craft masterwork
     // marks (masterwork:jewelcrafting, masterwork:inscription), and the
@@ -2338,8 +2338,27 @@ describe('Reliquary growth sweeps (new content must page or opt out)', () => {
       thunzharr_waking_peak: 'conquerors_thunzharr',
       balgath_cyclops: 'conquerors_balgath',
     };
+    // A world boss whose EVERY drop is a tool, or the reins of a mount the Horizons
+    // mount page already slots, has nothing a boss page would list (the token carve-out
+    // above): Gourdlight Eve's Old Thatchgrin pays event currency, a cosmetic toy and
+    // the Emberbristle Broom's reins, whose slot lives on horizons_mounts with his
+    // boss hint. Keyed on the drops, not on any flag, so a boss that drops even one
+    // piece of gear stays in the sweep, seasonal or not.
+    const pagedMountReins = (itemId: string) => {
+      const def = ITEMS[itemId];
+      return (
+        def?.kind === 'mount' && (RELIQUARY_HORIZON_MOUNTS as readonly string[]).includes(def.mount)
+      );
+    };
+    const nothingToPage = (m: (typeof MOBS)[string]) =>
+      m.loot.length > 0 &&
+      m.loot.every(
+        (e) =>
+          e.itemId !== undefined && (isRedemptionTokenId(e.itemId) || pagedMountReins(e.itemId)),
+      );
+    expect(nothingToPage(MOBS.gourdlight_thatchgrin)).toBe(true);
     const bossIds = Object.values(MOBS)
-      .filter((m) => m.worldBoss === true)
+      .filter((m) => m.worldBoss === true && !nothingToPage(m))
       .map((m) => m.id);
     // Keeps the worldBoss filter arm live (the repo's only world boss today).
     expect(bossIds).toContain('thunzharr_waking_peak');
@@ -2740,6 +2759,10 @@ describe('Reliquary Horizons shelf (Phase 8)', () => {
     expect(DEEDS.col_reliquary_complete.hidden).toBeFalsy();
     expect(RELIQUARY_HORIZON_TITLES).not.toContain('col_reliquary_complete');
     expect(ids).not.toContain('col_reliquary_complete');
+    expect(DEEDS.feat_pumpkin_hunter.reward).toEqual({ kind: 'title', text: 'the Hollow' });
+    expect(DEEDS.feat_pumpkin_hunter.feat).toBe(true);
+    // Seasonal Feat titles page like every other non-hidden title (the locked rule).
+    expect(ids).toContain('feat_pumpkin_hunter');
     for (const id of ids) {
       expect(DEEDS[id], id).toBeDefined();
       expect(DEEDS[id].reward?.kind).toBe('title');
@@ -3359,7 +3382,7 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   // absence resolves to nothing.
   // plus the referral-card reward activity, plus Lantern Hall's quartermaster (the guild's
   // horse, sold for Lantern Seals)
-  horizons_mounts: 15,
+  horizons_mounts: 17,
   // the account storefront, plus Lantern Hall's quartermaster for the guild's earned blade
   horizons_weapon_skins: 2,
   // Every title relic's source is its own deed, so the count tracks the page
@@ -3368,7 +3391,7 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   // Crucible raid's flawless title + the three faction standing Champion
   // titles + the Clue Scroll Treasure Hunter title + the Drowned Temple lore
   // guide's Witness of the Choir.
-  horizons_titles: 59, // +3 Lantern Hall's quartermaster titles
+  horizons_titles: 64, // +3 Lantern Hall's quartermaster titles
   // 29 = 27 distinct rift mobs across the ten rare multi-hints (eight theme
   // bosses + both citadel bosses + 17 trash carriers), plus the B and S rank
   // doors. The rift_first_clear activity left with the bands.

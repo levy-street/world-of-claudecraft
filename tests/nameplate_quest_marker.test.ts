@@ -161,9 +161,15 @@ function harness(knobs: {
   cadenceBlocked?: boolean;
   questIds?: string[];
   questStates?: Record<string, QuestState>;
+  /** The viewer's distance from the NPC (default 3, inside NPC_NAMEPLATE_RANGE). */
+  viewerZ?: number;
 }) {
   const orderId = knobs.orderId ?? WORK_ORDER.id;
-  const me = entity({ id: 1, name: 'Me', pos: { x: 0, y: 0, z: 3 } as Entity['pos'] });
+  const me = entity({
+    id: 1,
+    name: 'Me',
+    pos: { x: 0, y: 0, z: knobs.viewerZ ?? 3 } as Entity['pos'],
+  });
   const npc = entity({
     id: 2,
     kind: 'npc',
@@ -441,5 +447,42 @@ describe('nameplate quest marker ambient policy (real profession content)', () =
     mutable.questState = () => 'available';
     painter.update(false);
     expectMarker(painter, '', 'none');
+  });
+});
+
+describe('nameplate quest marker beyond the close NPC plate range', () => {
+  const order = { orderId: SYNTH_ORDER };
+  const plated = (painter: NameplatePainter) =>
+    (painter as unknown as PainterStateAccess & { anchorCount: number }).anchorCount;
+
+  it('draws only the marker for a far quest giver, then the full plate up close', () => {
+    const { painter, world } = harness({ ...order, state: 'available', viewerZ: 30 });
+    painter.update(true);
+    expectMarker(painter, '!', 'quest');
+    const far = stateOf(painter, 2);
+    expect([far.name, far.guild, far.guildLabel, far.title]).toEqual(['', '', '', '']);
+    expect(plated(painter)).toBe(1);
+
+    // Up close the full plate is back: the name and this trainer's role or title line.
+    world.player.pos.z = 3;
+    painter.update(false);
+    expectMarker(painter, '!', 'quest');
+    const near = stateOf(painter, 2);
+    expect(near.name).not.toBe('');
+    expect(near.guild + near.title).not.toBe('');
+
+    // Walking back out drops them on a throttled pass: 30 yd is outside
+    // NAMEPLATE_URGENT_RANGE, so only the markerOnly flip re-resolves it.
+    world.player.pos.z = 30;
+    painter.update(false);
+    expect([near.name, near.guild, near.guildLabel, near.title]).toEqual(['', '', '', '']);
+    expectMarker(painter, '!', 'quest');
+  });
+
+  it('draws nothing for a far NPC with no marker', () => {
+    const { painter } = harness({ ...order, state: 'unavailable', viewerZ: 30 });
+    painter.update(true);
+    expectMarker(painter, '', 'none');
+    expect(plated(painter)).toBe(0);
   });
 });

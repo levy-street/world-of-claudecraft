@@ -1369,4 +1369,49 @@ export const table: DeedLocaleTable = {
     desc: 'Zakoupeno od Garricka Holta, zásobovače Síně luceren, za 24 Lucernových pečetí.',
     title: 'ze Síně luceren',
   },
+  feat_gourdlight_guise: {
+    name: 'Dýňové přestrojení',
+    desc: 'Vlastni Vyřezanou dýňovou hlavu získanou ze Starého Slamoškleba na jeho poli za Kančí loukou během Svátku dýňových světel.',
+  },
+  feat_old_thatchgrin: {
+    name: 'Strniště a popel',
+    desc: 'Pomoz porazit Starého Slamoškleba na jeho dýňovém políčku za Kančí loukou během Svátku dýňových světel.',
+  },
+  feat_title_gourdlit: {
+    name: 'Dýňovým světlem ozářený',
+    desc: 'Přečti Listinu dýňového světla, vyměněnou u Hester Dýňoknotové za dýňové sladkosti během Svátku dýňových světel.',
+    title: 'Dýňovým světlem ozářený',
+  },
+  feat_title_trickster: {
+    name: 'Šprýmař',
+    desc: 'Přečti Listinu šprýmaře, vyměněnou u Hester Dýňoknotové za dýňové sladkosti během Svátku dýňových světel.',
+    title: 'Šprýmař',
+  },
+  feat_title_hollow_grinned: {
+    name: 'Dutý úšklebek',
+    desc: 'Přečti Listinu dutého úšklebku, vyměněnou u Hester Dýňoknotové za dýňové sladkosti během Svátku dýňových světel.',
+    title: 'S dutým úšklebkem',
+  },
+  feat_pumpkin_hunter: {
+    name: 'Lovec dýní',
+    desc: 'Najdi všechny strašidelné dýně ukryté po světě během Svátku dýňových světel.',
+    title: 'Dutý',
+  },
+  feat_gourdlight_doorsteps: {
+    name: 'Každý práh',
+    desc: 'Koleduj u všech obyvatel, kteří během Svátku dýňových světel otevřou na zaklepání v Eastbrooku, Fenbridge a Highwatchi.',
+  },
+  feat_gourdlight_errands: {
+    name: 'Hester k službám',
+    desc: 'Splň alespoň jednou každou z obměňovaných pochůzek Hester Dýňoknotové během Svátku dýňových světel.',
+  },
+  feat_gourdlight_frights: {
+    name: 'Tři vyděšená města',
+    desc: 'Při Hesteřině pochůzce Baf! vystraš jednoho obyvatele v Eastbrooku, jednoho ve Fenbridge a jednoho v Highwatchi.',
+  },
+  feat_gourdlight_eve_complete: {
+    name: 'Dýňová světla od začátku do konce',
+    desc: 'Zvládni celý Svátek dýňových světel: poraz Starého Slamoškleba, najdi všechny strašidelné dýně, splň každou Hesteřinu pochůzku, zaklepej na všechny dveře a vystraš jednoho obyvatele v každém ze tří měst.',
+    title: 'Dýním přísežný',
+  },
 };

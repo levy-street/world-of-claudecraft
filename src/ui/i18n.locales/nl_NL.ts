@@ -25964,4 +25964,234 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.stackUnavailable':
     'Lidmaatschapstijd toevoegen is momenteel niet mogelijk. Probeer het over even opnieuw.',
   'hudChrome.wocStore.subscription.tokenPrice': '{price} voor 30 dagen',
+  'errors.api.worldFightHold':
+    'Een ander personage op dit account is na een gevecht nog in de wereld. Probeer het over een paar minuten opnieuw.',
+  'hudChrome.auraEffect.gourdlight.thatchbound':
+    'Oude Thatchgrin trekt aan je touwtjes. Je kunt niets doen: je wordt naar je dichtstbijzijnde bondgenoot geleid en slaat die elke {every} sec. voor {min} tot {max} schade (tot {mult} keer zoveel tegen een bondgenoot van niveau {level}). Eindigt eerder als je schade gelijk aan {pct}% van je maximale gezondheid oploopt of als een bondgenoot het effect verdrijft (Magie).',
+  'hudChrome.auraEffect.seasonalCosmetic': 'Alleen cosmetisch: geen invloed op gevechten',
+  'hudChrome.auraEffect.slumberNight':
+    'Hangt levenloos aan zijn paal tot de nacht valt. Kan niet worden aangevallen.',
+  'hudChrome.auraEffect.stilledMindCrit':
+    'Je volgende Geestbreuk of Leegtescheuring is gegarandeerd een kritieke treffer als deze raakt. Andere spreuken verbruiken deze bonus niet. Leegtescheuring verbruikt nog steeds 3 ladingen Schemertiende. Een weerstane spreuk verbruikt de bonus.',
+  'hudChrome.mounts.desc_emberbristle_broom':
+    'Een oogstbezem met een oranje lint die een handbreedte boven de grond zweeft en sintels uit zijn borstelharen strooit. Een blijvende beloning van Pompoenlichtavond.',
+  'hudChrome.mounts.name_emberbristle_broom': 'Sintelborstelbezem',
+  'hudChrome.worldBoss.sleepUntilNightfall': '{name} slaapt tot de nacht valt.',
+  'hudChrome.priest.bombLabel': 'Tiendbom',
+  'hudChrome.priest.bombReady': 'Klaar',
+  'hudChrome.priest.bombStatus': '{value} van {max} Tiendbomladingen',
+  'hudChrome.priest.bombTooltip':
+    'Tiendbom: genereer 20 ladingen Schemertiende om één bom voor te bereiden. Schemertiende uitgeven voegt geen voortgang toe. Voortgang blijft tussen gevechten behouden. Sterven of een gevecht met een raidbaas beginnen zet de voortgang terug op nul. Een voltooide spreuk verbruikt de bom; annuleren behoudt hem.',
+  'hudChrome.priest.chargeCount': '{value} / {max}',
+  'hudChrome.priest.gloomtitheLabel': 'Schemertiende',
+  'hudChrome.priest.gloomtitheStatus': '{value} van {max} Schemertiende',
+  'hudChrome.priest.gloomtitheTooltip':
+    'Schemertiende: maximaal 5 besteedbare ladingen. Leegtescheuring verbruikt er 3; Vampieraanraking verbruikt er 2 voor 30% meer schade; Roep Tiendduivel op verbruikt je hele voorraad. Ladingen genereren vult ook de Tiendbom, zelfs als deze voorraad vol is.',
+  'entities.abilities.choir_of_deliverance.specNote_shadow':
+    'Verdeel gedurende 15 sec. 20% van de gezondheid die vijanden door jouw schaduwschade verliezen als genezing onder gewonde groepsleden binnen 30 meter, inclusief jezelf. In raids wordt alleen je subgroep genezen. Direct te gebruiken; je kunt in schaduwvorm blijven aanvallen. Geabsorbeerde schade en schade boven de resterende gezondheid leveren geen genezing op.',
+  'entities.abilities.inner_focus.specNote_shadow':
+    'Reserveert ook een gegarandeerde kritieke treffer voor je volgende Geestbreuk of Leegtescheuring binnen 60 sec., als deze raakt. Andere spreuken verbruiken deze bonus niet. Leegtescheuring verbruikt nog steeds 3 ladingen Schemertiende. Een weerstane spreuk verbruikt de bonus op kritieke treffers.',
+  'entities.abilities.spirit_bomb.description':
+    'Laat een geestenbom op een vijand ontploffen en breng {damage} schaduwschade toe aan vijanden binnen 8 meter van dat doelwit. De schade neemt toe met spreukkracht, kan kritisch treffen en wordt verlaagd bij meer dan 5 doelwitten. Genereer 20 ladingen Schemertiende om één bom voor te bereiden. Het genereren telt ook als je het maximum van 5 ladingen vasthoudt; ladingen uitgeven is niet nodig en voegt geen voortgang toe. De voortgang blijft tussen gevechten behouden, tot maximaal één voorbereide bom. Sterven verwijdert je voortgang en voorbereide bom. Een voltooide spreuk verbruikt de voorbereide bom, zelfs als de spreuk wordt weerstaan. Annuleren of onderbreken behoudt de bom. Een gevecht met een raidbaas beginnen verwijdert je voortgang en voorbereide bom. Je kunt met deze spreuk geen gevecht met een raidbaas beginnen.',
+  'entities.abilities.spirit_bomb.name': 'Tiendbom',
+  'entities.abilities.vampiric_touch.description':
+    'Breng {damage} schaduwschade toe gedurende 15 sec., eenmaal per 3 sec. De schade neemt toe met spreukkracht en de periodieke treffers kunnen kritisch treffen. Elke treffer verdeelt genezing gelijk aan 20% van de door de vijand verloren gezondheid onder jou en gewonde groepsleden binnen 30 meter; in een raid ontvangt alleen je subgroep deze genezing. Als je minstens 2 ladingen Schemertiende hebt, verbruikt het aanbrengen van dit effect er 2 om alle schade ervan met 30% te verhogen.',
+  'entities.abilities.vampiric_touch.name': 'Vampieraanraking',
+  'entities.abilities.void_rupture.description':
+    'Verbruik 3 ladingen Schemertiende om een vijand open te scheuren voor {damage} schaduwschade. De schade neemt toe met spreukkracht en kan kritisch treffen. Vereist 3 ladingen en verbruikt ze ook als de spreuk wordt weerstaan.',
+  'entities.abilities.void_rupture.name': 'Leegtescheuring',
+  'entities.items.batwing_draught.name': 'Fladderdrank',
+  'entities.items.carved_pumpkin_head.name': 'Uitgesneden pompoenhoofd',
+  'entities.items.crabapple_chew.name': 'Wildeappeltoffee',
+  'entities.items.cursed_candle_stub.name': 'Vervloekte kaarsstomp',
+  'entities.items.emberwoven_sheaf.name': 'Sintelweven schoof',
+  'entities.items.gourdlight_crow_feather.name': 'Pompoenlichtkraaienveer',
+  'entities.items.gourdlight_sweet.name': 'Pompoenlichtsnoepje',
+  'entities.items.gourdlight_treat_pouch.name': 'Zakje pompoenlichtsnoep',
+  'entities.items.gourdseed_brittle.name': 'Pompoenpittenkrokant',
+  'entities.items.gurglegreen_cauldron.name': 'Groenborrelketel',
+  'entities.items.haunting_draught.name': 'Spookdrank',
+  'entities.items.hearthroot_toffee.name': 'Haardworteltoffee',
+  'entities.items.jar_of_mischief.name': 'Pot kattenkwaad',
+  'entities.items.lantern_mint_drop.name': 'Lantaarnmuntje',
+  'entities.items.murmurwick_candle.name': 'Fluisterpitkaars',
+  'entities.items.owlwatch_fudge.name': 'Uilenwachtfudge',
+  'entities.items.prankers_pumpkin.name': 'Grappenmakerspompoen',
+  'entities.items.rattlebone_draught.name': 'Rammelbotdrank',
+  'entities.items.reins_emberbristle_broom.name': 'Sintelborstelbezem',
+  'entities.items.sack_of_startled_bats.name': 'Zak geschrokken vleermuizen',
+  'entities.items.strawling_charm.name': 'Strolingamulet',
+  'entities.items.thatchgrin_patch_pumpkin.name': 'Akkerpompoen',
+  'entities.items.thatchgrin_sweet_sack.name': 'Thatchgrins snoepzak',
+  'entities.items.wanderwisp_lantern.name': 'Dwaallichtlantaarn',
+  'entities.items.writ_of_the_gourdlit.name': 'Oorkonde van de Pompoenverlichte',
+  'entities.items.writ_of_the_hollow_grin.name': 'Oorkonde van de Holle Grijns',
+  'entities.items.writ_of_the_trickster.name': 'Oorkonde van de Grappenmaker',
+  'entities.mobs.gourdlight_crow.name': 'Pompoenlichtkraai',
+  'entities.mobs.gourdlight_strawling.name': 'Stroling',
+  'entities.mobs.gourdlight_swelling_gourd.name': 'Zwellende pompoen',
+  'entities.mobs.gourdlight_thatchgrin.name': 'Oude Thatchgrin',
+  'entities.npcs.gourdlight_keeper.greeting':
+    'De pompoenen branden en de lantaarns hangen, dus het moet Pompoenlichtavond zijn. Klop bij de inwoners van Eastbrook, Fenbridge en Highwatch aan en zeg de woorden: snoep of een streek. De meesten geven je een snoepje. Een paar halen een streek met je uit. Breng de snoepjes naar een van mijn kraampjes en ik ruil ze voor iets om te dragen.',
+  'entities.npcs.gourdlight_keeper.name': 'Hester Gourdwick',
+  'entities.npcs.gourdlight_keeper.title': 'Hoedster van het Pompoenlicht',
+  'entities.quests.q_gourdlight_daily_baskets.completion':
+    'Alle drie bezorgd, en ik hoor dat Marlow huilde. Hij huilt altijd. Hier is een mand voor jezelf.',
+  'entities.quests.q_gourdlight_daily_baskets.objectives.0.label': 'Mand bij kok Marlow bezorgd',
+  'entities.quests.q_gourdlight_daily_baskets.objectives.1.label':
+    'Mand bij Kruidenkundige Yara bezorgd',
+  'entities.quests.q_gourdlight_daily_baskets.objectives.2.label':
+    'Mand bij Verhalenmeester Caddis bezorgd',
+  'entities.quests.q_gourdlight_daily_baskets.text':
+    'Elke Pompoenlichtavond vul ik in elke stad een mand snoep voor een oude vriend, en mijn knieën zijn niet meer wat ze geweest zijn. Breng ze voor me rond, {playerName}: naar kok Marlow in Eastbrook, Kruidenkundige Yara in Fenbridge en Verhalenmeester Caddis daarboven in Highwatch.',
+  'entities.quests.q_gourdlight_daily_baskets.title': 'Manden voor de buren',
+  'entities.quests.q_gourdlight_daily_boo.completion':
+    'Drie? Ik hoorde de kok vanaf de andere kant van het plein een pan laten vallen. Goed gedaan. Hier is jouw deel.',
+  'entities.quests.q_gourdlight_daily_boo.objectives.0.label': 'Inwoners laten schrikken',
+  'entities.quests.q_gourdlight_daily_boo.text':
+    'Niemand in deze steden is in een jaar echt geschrokken, {playerName}, en een Pompoenlichtavond zonder schrik is gewoon een koude nacht. Trek een kostuum aan, een van de mijne is prima, of dat pompoenhoofd als je er een hebt verdiend. Besluip dan drie inwoners en roep lekker hard BOE!',
+  'entities.quests.q_gourdlight_daily_boo.title': 'Boe!',
+  'entities.quests.q_gourdlight_daily_feathers.completion':
+    'Zwart als een veld zonder maan, en ze ruiken al naar rook. Het vreugdevuur wordt prachtig. Bedankt.',
+  'entities.quests.q_gourdlight_daily_feathers.objectives.0.label': 'Kraaienveren',
+  'entities.quests.q_gourdlight_daily_feathers.text':
+    'Als Oude Thatchgrin in het nauw zit, stuurt hij zijn kraaien op iedereen af die op zijn stro slaat. Hun veren branden groen in een haard, en ik heb er drie nodig voor het vreugdevuur van vanavond. Zoek een gevecht op zijn akker, {playerName}, en pluk ze van zijn kraaien.',
+  'entities.quests.q_gourdlight_daily_feathers.title': 'Veren voor het vuur',
+  'entities.quests.q_gourdlight_daily_patch.completion':
+    'Vijf mooie ronde exemplaren, zonder één hap eruit. Dat wordt taart voor de hele vallei. Hier, voor je moeite.',
+  'entities.quests.q_gourdlight_daily_patch.objectives.0.label': 'Akkerpompoenen',
+  'entities.quests.q_gourdlight_daily_patch.text':
+    'De akker van Oude Thatchgrin voorbij de Everweide ligt vol pompoenen, en de helft is voorbij zijn stro gerold, waar iemand die voorzichtig is erbij kan. Breng me er vijf, {playerName}. Blijf ver van de oude vogelverschrikker zelf. Hij telt ze allemaal.',
+  'entities.quests.q_gourdlight_daily_patch.title': 'Pompoenen van de akker',
+  'entities.quests.q_gourdlight_daily_towns.completion':
+    'Drie steden in één nacht! Je laarzen hebben dit meer verdiend dan jij.',
+  'entities.quests.q_gourdlight_daily_towns.objectives.0.label':
+    'Bij een deur in Eastbrook aangeklopt',
+  'entities.quests.q_gourdlight_daily_towns.objectives.1.label':
+    'Bij een deur in Fenbridge aangeklopt',
+  'entities.quests.q_gourdlight_daily_towns.objectives.2.label':
+    'Bij een deur in Highwatch aangeklopt',
+  'entities.quests.q_gourdlight_daily_towns.text':
+    'De kinderen zeggen dat een echte Pompoenlichtwandelaar voor het einde van de nacht in elke stad aanklopt. Geef ze gelijk, {playerName}. Vraag om snoep of een streek bij één deur in Eastbrook, één in Fenbridge en één in Highwatch. De lantaarns langs de wegen wijzen je de weg.',
+  'entities.quests.q_gourdlight_daily_towns.title': 'Een deur in elke stad',
+  'entities.quests.q_gourdlight_daily_wicks.completion':
+    'Zes stompjes, koud als rijp. Wie ze heeft aangestoken, moet beter zijn best doen. Neem dit en was je handen.',
+  'entities.quests.q_gourdlight_daily_wicks.objectives.0.label': 'Vervloekte kaarsen gedoofd',
+  'entities.quests.q_gourdlight_daily_wicks.text':
+    'Iemand zet kaarsen met groene vlammen onder aan onze lantaarnpalen. Ze branden zonder te smelten en fluisteren als je je omdraait. Doof er zes voor me, {playerName}, in een van de drie steden, en breng me de stompjes.',
+  'entities.quests.q_gourdlight_daily_wicks.title': 'Boosaardige pitten',
+  'entities.quests.q_gourdlight_rounds.completion':
+    'Vijf deuren en nog al je vingers. Hier, een zakje snoep voor de terugweg. Kom morgen terug, dan gaan de deuren weer open.',
+  'entities.quests.q_gourdlight_rounds.objectives.0.label': 'Deuren waarbij aangeklopt is',
+  'entities.quests.q_gourdlight_rounds.text':
+    'Elke Pompoenlichtavond doen de kinderen van de vallei hun ronde, en dit jaar ga jij mee, {playerName}. Klop bij vijf deuren in onze steden aan, zeg de woorden en kijk wat je krijgt. Kom terug als je klaar bent.',
+  'entities.quests.q_gourdlight_rounds.title': 'Pompoenlichtronde',
+  'guide.interfacePage.framesGovernedPriest':
+    'Met Kaders bewerken kun je ook het medaillon voor Schemertiende en Tiendbom van de schaduwpriester verplaatsen.',
+  'guide.worldPvpPage.hillBodyTwoHour':
+    'Eens per twee uur krijgt het hele rijk op een onvoorspelbaar moment bericht dat er over vijftien minuten een heuvel in een van de noordelijke gebieden verrijst. De cirkel waar hij komt wordt op open terrein gemarkeerd. Na het verrijzen blijft de heuvel dertig minuten staan en verdwijnt daarna. Zolang hij er is, krijgt het rijk elke vijf minuten zijn locatie te horen en welke groepen hem het langst hebben vastgehouden. De groep met de meeste spelers in de cirkel betwist de heuvel en verovert hem na dertig seconden meerderheid. Als een rivaliserende groep binnenkomt, pauzeert die teller alleen totdat jouw groep weer voorstaat; hij begint pas opnieuw als er niemand van jouw groep levend in de cirkel achterblijft. Een speler alleen telt als een groep van één en houdt een veroverde heuvel als die een groep vormt, maar raidleden tellen helemaal niet mee. Zolang een groep de heuvel vasthoudt, verdient elk groepslid in de cirkel elke minuut evenveel Eer, ongeacht hoelang de groep hem al vasthoudt. Een volledige groep die de heuvel zijn hele duur onbetwist vasthoudt, verdient daardoor ongeveer evenveel als met twee slagveldoverwinningen. Als de heuvel verdwijnt en de groep met de langste totale bezetting hem minstens tien minuten vasthield, krijgt iedereen die voor die groep minstens één minuut in de cirkel stond en er nog steeds bij hoort één overwinning voor de PvP-rij van de Wekelijkse Kluis. Een balk boven het veld toont wie hem vasthoudt, jullie aantallen tegenover die van de tegenstander en de betwistingsteller; /hill in de chat geeft zijn locatie.',
+  'seasonal.boo.already': '{name} is voor vandaag vaak genoeg geschrokken.',
+  'seasonal.boo.flash': 'BOE! {name} schrikt!',
+  'seasonal.boo.frightenedHint':
+    '{name} is nog schrikachtig van je vorige grap. Zoek iemand anders.',
+  'seasonal.boo.landed':
+    'Je springt voor {name} tevoorschijn en roept BOE! Er klinkt een gil en bijna alles valt op de grond.',
+  'seasonal.boo.needsCostume':
+    'Trek eerst een kostuum aan: een kostuumdrank, een vleermuis- of skeletstreek, het Strolingamulet, het Uitgesneden pompoenhoofd of een goblinslok uit de Groenborrelketel.',
+  'seasonal.boo.noCostume':
+    'Zonder kostuum lacht {name} je alleen maar uit. Trek er eerst een aan.',
+  'seasonal.boo.notOnErrand': 'Hester heeft je vandaag niet gevraagd iemand te laten schrikken.',
+  'seasonal.boo.row': 'Boe!',
+  'seasonal.boo.rowAria': 'Spring voor {name} tevoorschijn en roep boe',
+  'seasonal.boundItemGone':
+    'Pompoenlichtavond is voorbij en je voorwerp {item} valt weer uiteen in stro.',
+  'seasonal.costume': 'Je drinkt de drank en verandert: {trick}!',
+  'seasonal.event.gourdlight_eve.name': 'Pompoenlichtavond',
+  'seasonal.guise': 'Het amulet knettert en stro kruipt over je heen: {trick}!',
+  'seasonal.itemSource.pumpkinHead':
+    'Buit van Oude Thatchgrin op zijn pompoenveld voorbij de Everweide, de eerste keer dat je hem plundert. Geen enkele verkoper verkoopt dit.',
+  'seasonal.itemUse.broomSources':
+    'Te koop bij Hester Gourdwick voor {count} Sintelweven schoven, of zelden als buit van Oude Thatchgrin op een dag dat je hem plundert. Berijden vereist de rijvaardigheid. Blijft permanent in bezit en is het hele jaar berijdbaar.',
+  'seasonal.itemUse.costumeBat':
+    'Gebruik: verander {minutes} minuten in een fladderende vleermuis. Wordt verbruikt. Niet bruikbaar in gevechten; een gevecht beginnen beëindigt het effect. Cosmetisch.',
+  'seasonal.itemUse.costumeGhost':
+    'Gebruik: verander {minutes} minuten in een zwevende geest. Wordt verbruikt. Niet bruikbaar in gevechten; een gevecht beginnen beëindigt het effect. Cosmetisch.',
+  'seasonal.itemUse.costumeSkeleton':
+    'Gebruik: verander {minutes} minuten in een rammelend skelet. Wordt verbruikt. Niet bruikbaar in gevechten; een gevecht beginnen beëindigt het effect. Cosmetisch.',
+  'seasonal.itemUse.pouch': 'Gebruik: open het om {count} Pompoenlichtsnoepjes te ontvangen.',
+  'seasonal.itemUse.pumpkinHead':
+    'Gebruik: zet een uitgesneden, van binnen verlichte pompoen over je helm op of neem hem af. Cosmetisch.',
+  'seasonal.itemUse.sheaf':
+    'Oude Thatchgrin geeft er één op elke dag dat je hem plundert, totdat je de Sintelborstelbezem bezit. Hester Gourdwick ruilt er {count} voor de bezem bij haar kraampjes in Eastbrook, Fenbridge en Highwatch. Ongebruikte schoven blijven bewaard tot de volgende Pompoenlichtavond.',
+  'seasonal.itemUse.strawlingCharm':
+    'Gebruik: word {seconds} seconden een van de strolingen van Oude Thatchgrin. Niet bruikbaar in gevechten. Wordt nooit verbruikt. Cosmetisch.',
+  'seasonal.itemUse.sweet':
+    'Verdiend door tijdens Pompoenlichtavond om snoep of een streek te vragen. Hester Gourdwick ruilt ze voor cosmetische voorwerpen bij haar kraampjes in Eastbrook, Fenbridge en Highwatch.',
+  'seasonal.itemUse.titleWrit':
+    'Gebruik: verdien de titel {title} voor dit personage, te dragen via het Boek der Daden. Wordt verbruikt. Blijft bewaard als je de titel al hebt.',
+  'seasonal.itemUse.toyBats':
+    'Gebruik: open de zak. Een piepende zwerm vleermuizen vliegt eruit en verspreidt zich {seconds} seconden om je heen. Niet bruikbaar in gevechten of tijdens sluipen. Wordt nooit verbruikt: na {cooldown} seconden opnieuw bruikbaar. Blijft permanent in bezit en is het hele jaar bruikbaar. Cosmetisch.',
+  'seasonal.itemUse.toyCandleShadows':
+    'Gebruik: steek de kaars voor je aan. Haar vlammen werpen {seconds} seconden dansende schaduwen van een kat, een vleermuis en een heks op de grond eromheen, zichtbaar voor iedereen in de buurt. Niet bruikbaar in gevechten of tijdens sluipen. Wordt nooit verbruikt: na {cooldown} seconden opnieuw bruikbaar. Blijft permanent in bezit en is het hele jaar bruikbaar. Cosmetisch.',
+  'seasonal.itemUse.toyCauldron':
+    'Gebruik: zet een grote borrelende ketel voor je neer. Hij blijft {standing} seconden staan. Elke speler die eruit drinkt, barst uiteen in groene bellen en verandert {seconds} seconden in een goblin, ter vervanging van het gedragen kostuum. Neerzetten en drinken werken niet in gevechten of tijdens sluipen; een gevecht beginnen beëindigt de goblinvorm. Wordt nooit verbruikt: na {cooldown} seconden opnieuw bruikbaar. Blijft permanent in bezit en is het hele jaar bruikbaar. Cosmetisch.',
+  'seasonal.itemUse.toyLantern':
+    'Gebruik: zet de lantaarn voor je neer. Een klein spook cirkelt {seconds} seconden om je heen. Niet bruikbaar in gevechten of tijdens sluipen. Wordt nooit verbruikt: na {cooldown} seconden opnieuw bruikbaar. Blijft permanent in bezit en is het hele jaar bruikbaar. Cosmetisch.',
+  'seasonal.itemUse.toyPrank':
+    'Gebruik: gooi hem naar een andere zichtbare speler binnen {range} meter. Diens hoofd wordt {seconds} seconden een lichtgevende pompoenlantaarn die met een rechtermuisklik kan worden verwijderd. Geen van beiden mag in gevecht zijn en jij mag niet sluipen. Wordt nooit verbruikt: na {cooldown} seconden opnieuw bruikbaar. Blijft permanent in bezit en is het hele jaar bruikbaar. Cosmetisch.',
+  'seasonal.itemUse.trickJar':
+    'Gebruik: haalt een paar seconden een willekeurige, onschuldige streek met je uit. Cosmetisch.',
+  'seasonal.jarTrick': 'De pot springt open: {trick}!',
+  'seasonal.pumpkinHead.off': 'Je zet het Uitgesneden pompoenhoofd af.',
+  'seasonal.pumpkinHead.on': 'Je zet het Uitgesneden pompoenhoofd op.',
+  'seasonal.pumpkins.flash': 'Spookpompoen gevonden! {count}/{total}',
+  'seasonal.pumpkins.found':
+    'Je steekt een Spookpompoen in {zone} aan: {count}/{total}. Ontvangen Pompoenlichtsnoepjes: {sweets}.',
+  'seasonal.pumpkins.name': 'Spookpompoen',
+  'seasonal.pumpkins.progress': '{label}: {current}/{total}',
+  'seasonal.pumpkins.title': 'Spookpompoenen',
+  'seasonal.pumpkins.world': 'Wereld',
+  'seasonal.thatchgrin.poleBound': 'Paalgebonden',
+  'seasonal.thatchgrin.sleepYell': 'De zon is op. Terug op de paal, terug op de uitkijk.',
+  'seasonal.thatchgrin.wakeYell': 'De NACHT valt over de akker! Wie loopt er op MIJN veld?',
+  'seasonal.titleGranted': 'Je leest de oorkonde. Nieuwe titel verdiend: {title}.',
+  'seasonal.titleKnown': 'Je hebt die titel al, dus je houdt de oorkonde.',
+  'seasonal.tokenPrice': '{count} {item}',
+  'seasonal.toy.bats': 'Je opent de zak en een zwerm geschrokken vleermuizen vliegt eruit!',
+  'seasonal.toy.candleShadows':
+    'Je steekt de kaars aan en schaduwen beginnen om haar vlammen te dansen.',
+  'seasonal.toy.cauldron': 'Je zet de ketel neer en hij begint te borrelen.',
+  'seasonal.toy.cauldronDrink':
+    'Je drinkt uit de ketel, barst uiteen in groene bellen en verandert in een goblin!',
+  'seasonal.toy.hidden': 'Stap eerst uit de schaduwen: speelgoed zou je verraden.',
+  'seasonal.toy.lantern':
+    'Je zet de lantaarn neer en een klein spook zweeft eruit om je gezelschap te houden.',
+  'seasonal.toy.prank': 'Je gooit de pompoen. Hij spat uiteen op {name}!',
+  'seasonal.toy.prankNeedsPlayer':
+    'De pompoen spat alleen uiteen op een andere speler die niet in gevecht is.',
+  'seasonal.toy.pranked':
+    '{name} smijt een pompoen op je hoofd! Verwijder hem met een rechtermuisklik of draag hem met trots.',
+  'seasonal.toy.prankedFlash': '{name} heeft je te pakken!',
+  'seasonal.trickOrTreat.alreadyKnocked':
+    'Je hebt vandaag al om snoep of een streek gevraagd bij {name}.',
+  'seasonal.trickOrTreat.knockedHint':
+    'Je hebt hier vandaag al aangeklopt. De deur opent weer na de dagelijkse reset.',
+  'seasonal.trickOrTreat.notActive': 'Pompoenlichtavond is momenteel niet actief.',
+  'seasonal.trickOrTreat.row': 'Snoep of een streek!',
+  'seasonal.trickOrTreat.rowAria': 'Vraag {name} om snoep of een streek',
+  'seasonal.trickOrTreat.tooFar': 'Kom dichterbij om aan te kloppen.',
+  'seasonal.trickOrTreat.treat': '{name} geeft je een snoepje.',
+  'seasonal.trickOrTreat.treatFlash.few': 'Snoep! {count} Pompoenlichtsnoepjes',
+  'seasonal.trickOrTreat.treatFlash.many': 'Snoep! {count} Pompoenlichtsnoepjes',
+  'seasonal.trickOrTreat.treatFlash.one': 'Snoep! {count} Pompoenlichtsnoepje',
+  'seasonal.trickOrTreat.treatFlash.other': 'Snoep! {count} Pompoenlichtsnoepjes',
+  'seasonal.trickOrTreat.trick': '{name} haalt een streek met je uit: {trick}!',
+  'seasonal.trickOrTreat.trickFlash': 'Een streek! {trick}',
+  'seasonal.tricks.gourdlight_costume_bat': 'Vleermuiskostuum',
+  'seasonal.tricks.gourdlight_costume_ghost': 'Spookkostuum',
+  'seasonal.tricks.gourdlight_costume_skeleton': 'Skeletkostuum',
+  'seasonal.tricks.gourdlight_trick_bat': 'Vleermuisgekte',
+  'seasonal.tricks.gourdlight_trick_fumes': 'Groene dampen',
+  'seasonal.tricks.gourdlight_trick_skeleton': 'Rammelende botten',
+  'seasonal.tricks.gourdlight_trick_strawling': 'Strolinggedaante',
 };

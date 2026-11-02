@@ -83,10 +83,35 @@ describeDb('account mount item projection (real Postgres)', () => {
 
   it('uses the account index with a grown unrelated character population and returns bounded projections', async () => {
     const { MOUNT_ITEM_IDS } = await import('../server/account_mount_items_core');
+    // Keep this load fixture stable as the live mount catalogue grows. Sixteen distinct
+    // mounts match the original workload, including long IDs and the seasonal reward.
+    const fixtureSkins = [
+      'valorsteed',
+      'grag_bear',
+      'stalkglider_snail',
+      'terrorspark_groundshaker',
+      'avian_strider',
+      'nightwing_chimera',
+      'stormfeather_griffin',
+      'lanternback_troll',
+      'wobbles_slime',
+      'emberbristle_broom',
+      'shadowjump_toad',
+      'thunderstrut_gobbler',
+      'aether_hover_cycle',
+      'referral_raptor',
+      'referral_tank',
+      'lantern_hall_destrier',
+    ];
+    const fixtureItems = fixtureSkins.map((skin) => `reins_${skin}`);
+    for (const item of fixtureItems) expect(MOUNT_ITEM_IDS).toContain(item);
     await db.pool.query('DELETE FROM characters WHERE account_id = 1');
     const slots = (length: number) =>
       Array.from({ length }, (_, index) => ({
-        itemId: index % 5 === 0 ? MOUNT_ITEM_IDS[index % MOUNT_ITEM_IDS.length] : 'non_mount_junk',
+        itemId:
+          index % 5 === 0
+            ? fixtureItems[Math.floor(index / 5) % fixtureItems.length]
+            : 'non_mount_junk',
         count: 1,
       }));
     // Ten characters per realm, full containers and incompressible unrelated
@@ -118,7 +143,10 @@ describeDb('account mount item projection (real Postgres)', () => {
     const projected = await mounts.loadAccountMountItems(1);
     const responseBytes = Buffer.byteLength(JSON.stringify(projected));
     expect(projected).toHaveLength(20);
-    expect(projected.every((row) => row.mountSkinIds.length <= MOUNT_ITEM_IDS.length)).toBe(true);
+    for (const row of projected) {
+      expect(Object.keys(row).sort()).toEqual(['characterId', 'mountSkinIds', 'version']);
+      expect([...row.mountSkinIds].sort()).toEqual([...fixtureSkins].sort());
+    }
     expect(responseBytes).toBeLessThan(8_000);
     console.log(
       'account mount item projection with 20 full target characters, 3200 slot rows, and 1000 unrelated characters:',

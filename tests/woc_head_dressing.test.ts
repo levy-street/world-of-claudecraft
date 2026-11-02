@@ -1440,6 +1440,25 @@ describe('WocHeadDressing: the drawn head', () => {
     expect(drawnHair(model)).toEqual([`WocHead_A_hair_${DEFAULT_HAIR}`]);
   });
 
+  it('a worn head (the seasonal pumpkin) draws none of the head, and every piece stays hung', () => {
+    const { model, dressing, forgotten } = liveDressing();
+    const pieces = [...hangedPieces(model).keys()];
+    expect(pieces.length).toBeGreaterThan(2);
+    expect(pieces.some((name) => visible(model, name))).toBe(true);
+    expect(dressing.setHeadless(true)).toBe(true);
+    // nothing of the face, the hair or the beard pokes through the pumpkin
+    for (const name of pieces) expect(visible(model, name), name).toBe(false);
+    expect(dressing.drawnNames.size).toBe(0);
+    // ...and nothing left the body: taking it off is a flag, never a re-hang
+    expect([...hangedPieces(model).keys()]).toEqual(pieces);
+    expect(forgotten).toEqual([]);
+    expect(dressing.setHeadless(true)).toBe(false);
+    expect(dressing.setHeadless(false)).toBe(true);
+    expect(visible(model, 'WocHead_A_base')).toBe(true);
+    expect(visible(model, `WocHead_A_hair_${DEFAULT_HAIR}`)).toBe(true);
+    expect(visible(model, `WocHead_A_beard_${DEFAULT_BEARD}`)).toBe(true);
+  });
+
   it('tints the beard with the HAIR colour, following every hair change in place', () => {
     const { model, dressing } = liveDressing();
     const beard = model.getObjectByName('WocHead_A_beard_boxed') as THREE.Mesh;

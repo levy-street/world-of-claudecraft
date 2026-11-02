@@ -2,7 +2,7 @@
 // standing (parties only, any level), the group key, the strict-maximum
 // leader, the majority verdict, the contest clocks (paused, never reset, by a
 // rival), the successor a hold follows across a group change, the spot probe, the
-// three-hour schedule and the circle test.
+// two-hour schedule and the circle test.
 import { describe, expect, it } from 'vitest';
 import {
   HILL_ACCRUAL_SECONDS,
@@ -35,11 +35,11 @@ import {
 describe('the tuning literals the copy and the docs quote', () => {
   it('pins the radius, the window, the warning, the stand, the capture length and the trickle', () => {
     expect(HILL_RADIUS).toBe(50);
-    expect(HILL_WINDOW_SECONDS).toBe(3 * 3_600);
+    expect(HILL_WINDOW_SECONDS).toBe(2 * 3_600);
     expect(HILL_WARNING_SECONDS).toBe(15 * 60);
-    expect(HILL_DURATION_SECONDS).toBe(45 * 60);
+    expect(HILL_DURATION_SECONDS).toBe(30 * 60);
     expect(HILL_FIRST_WINDOW_AT_SECONDS).toBe(120);
-    expect(HILL_LATEST_WARN_OFFSET_SECONDS).toBe(2 * 3_600);
+    expect(HILL_LATEST_WARN_OFFSET_SECONDS).toBe(75 * 60);
     expect(HILL_CAPTURE_SECONDS).toBe(30);
     expect(HILL_ACCRUAL_SECONDS).toBe(60);
     expect(HILL_HONOR_PER_PAYOUT).toBe(9);
@@ -254,24 +254,24 @@ describe('hillSpotIsOpen', () => {
     expect(hillSpotIsOpen(open({ blocked: (x) => x > 45 }), 'zone', 0, 0, 50)).toBe(true);
   });
 });
-describe('the three-hour schedule', () => {
-  it('opens the first window two minutes in and one every three hours after', () => {
+describe('the two-hour schedule', () => {
+  it('opens the first window two minutes in and one every two hours after', () => {
     expect(hillWindowAt(0)).toBe(-1);
     expect(hillWindowAt(119)).toBe(-1);
     expect(hillWindowAt(120)).toBe(0);
-    expect(hillWindowAt(120 + 10_799)).toBe(0);
-    expect(hillWindowAt(120 + 10_800)).toBe(1);
+    expect(hillWindowAt(120 + 7_199)).toBe(0);
+    expect(hillWindowAt(120 + 7_200)).toBe(1);
   });
 
-  it('warns at the offset, rises 15 minutes on, falls 45 after, always inside the window', () => {
-    expect(hillTimes(0, 0)).toEqual({ warnAt: 120, risesAt: 120 + 900, closesAt: 120 + 3_600 });
+  it('warns at the offset, rises 15 minutes on, falls 30 after, always inside the window', () => {
+    expect(hillTimes(0, 0)).toEqual({ warnAt: 120, risesAt: 120 + 900, closesAt: 120 + 2_700 });
     expect(hillTimes(2, 600)).toEqual({
-      warnAt: 120 + 21_600 + 600,
-      risesAt: 120 + 21_600 + 1_500,
-      closesAt: 120 + 21_600 + 4_200,
+      warnAt: 120 + 14_400 + 600,
+      risesAt: 120 + 14_400 + 1_500,
+      closesAt: 120 + 14_400 + 3_300,
     });
     // The latest offset ends exactly at the window's close; past it clamps.
-    expect(hillTimes(0, HILL_LATEST_WARN_OFFSET_SECONDS).closesAt).toBe(120 + 10_800);
+    expect(hillTimes(0, HILL_LATEST_WARN_OFFSET_SECONDS).closesAt).toBe(120 + 7_200);
     expect(hillTimes(0, 99_999)).toEqual(hillTimes(0, HILL_LATEST_WARN_OFFSET_SECONDS));
     expect(hillTimes(0, -5)).toEqual(hillTimes(0, 0));
     expect(hillWindowAt(hillTimes(4, 1234).closesAt - 1)).toBe(4);
@@ -320,14 +320,19 @@ function rampTotal(paidMinutes: number): number {
 }
 
 describe('HILL_HONOR_PER_PAYOUT: the flat rate', () => {
-  it("is the ramp's average minute over a full stand, to the nearest whole Honor", () => {
-    // Only complete held minutes pay after the inherited 30-second capture.
+  it("is the ramp's average minute over the old 45-minute stand, to the nearest whole Honor", () => {
+    // Owner tuning 2026-10-14 set the rate from the 45-minute stand: 44 paid
+    // minutes after the 30-second capture, which the ramp paid 388 for.
+    expect(rampTotal(44)).toBe(388);
+    expect(HILL_HONOR_PER_PAYOUT).toBe(Math.round(rampTotal(44) / 44));
+  });
+
+  it('pays 261 over the restored 30-minute stand', () => {
+    // Only complete held minutes pay after the 30-second capture.
     const paidMinutes = Math.floor(
       (HILL_DURATION_SECONDS - HILL_CAPTURE_SECONDS) / HILL_ACCRUAL_SECONDS,
     );
-    expect(paidMinutes).toBe(44);
-    expect(rampTotal(paidMinutes)).toBe(388);
-    expect(HILL_HONOR_PER_PAYOUT).toBe(Math.round(rampTotal(paidMinutes) / paidMinutes));
-    expect(paidMinutes * HILL_HONOR_PER_PAYOUT).toBe(396);
+    expect(paidMinutes).toBe(29);
+    expect(paidMinutes * HILL_HONOR_PER_PAYOUT).toBe(261);
   });
 });

@@ -25623,4 +25623,229 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.stackUnavailable':
     'Det er ikke muligt at tilføje medlemstid lige nu. Prøv igen om lidt.',
   'hudChrome.wocStore.subscription.tokenPrice': '{price} for 30 dage',
+  'errors.api.worldFightHold':
+    'En anden figur på denne konto er stadig i verden efter en kamp. Prøv igen om et par minutter.',
+  'hudChrome.auraEffect.gourdlight.thatchbound':
+    'Gamle Halmgrin trækker i dine snore. Du kan ikke handle: du føres til din nærmeste allierede og slår vedkommende hvert {every}. sek. for {min} til {max} skade (op til {mult} gange så meget mod en allieret på niveau {level}). Slutter tidligt, når du tager skade svarende til {pct}% af dit maksimale helbred, eller når en allieret ophæver effekten (magi).',
+  'hudChrome.auraEffect.seasonalCosmetic': 'Kun kosmetisk: påvirker ikke kamp',
+  'hudChrome.auraEffect.slumberNight':
+    'Hænger livløs på sin pæl indtil mørkets frembrud. Kan ikke angribes.',
+  'hudChrome.auraEffect.stilledMindCrit':
+    'Dit næste Sindsbrud eller Tomrumsbrud er garanteret et kritisk træf, hvis det rammer. Andre besværgelser bruger ikke denne bonus. Tomrumsbrud bruger stadig 3 ladninger af Mørketiende. En modstået besværgelse bruger bonussen.',
+  'hudChrome.mounts.desc_emberbristle_broom':
+    'En høstkost bundet med orange bånd, der svæver en håndsbredde over jorden og drysser gløder fra børsterne. En permanent belønning fra Græskarlygternes aften.',
+  'hudChrome.mounts.name_emberbristle_broom': 'Glødebørstekost',
+  'hudChrome.priest.bombLabel': 'Tiendebombe',
+  'hudChrome.priest.bombReady': 'Klar',
+  'hudChrome.priest.bombStatus': '{value} af {max} ladninger af Tiendebombe',
+  'hudChrome.priest.bombTooltip':
+    'Tiendebombe: generér 20 Mørketiende for at klargøre én bombe. At bruge Mørketiende giver ikke fremgang. Fremgangen bevares mellem kampe. Død eller starten på en raidbosskamp nulstiller den. En fuldført besværgelse bruger bomben; annullering bevarer den.',
+  'hudChrome.priest.chargeCount': '{value} / {max}',
+  'hudChrome.priest.gloomtitheLabel': 'Mørketiende',
+  'hudChrome.priest.gloomtitheStatus': '{value} af {max} Mørketiende',
+  'hudChrome.priest.gloomtitheTooltip':
+    'Mørketiende: op til 5 ladninger, som kan bruges. Tomrumsbrud bruger 3; Vampyrberøring bruger 2 for 30% mere skade; Tilkald Tiendedæmon bruger hele din beholdning. Generering af ladninger fylder også Tiendebombe, selv når beholdningen er fuld.',
+  'hudChrome.worldBoss.sleepUntilNightfall': '{name} sover indtil mørkets frembrud.',
+  'entities.abilities.choir_of_deliverance.specNote_shadow':
+    'I 15 sek. fordeles 20% af det helbred, fjender mister til din Skyggeskade, som helbredelse mellem sårede gruppemedlemmer inden for 30 yards, inklusive dig selv. I raids helbredes kun din undergruppe. Kastes øjeblikkeligt, og du kan fortsætte med at angribe i Tusmørkeslør. Absorberet skade og skade ud over resterende helbred giver ingen helbredelse.',
+  'entities.abilities.inner_focus.specNote_shadow':
+    'Reserverer også et garanteret kritisk træf til dit næste Sindsbrud eller Tomrumsbrud inden for 60 sek., hvis det rammer. Andre besværgelser bruger ikke denne bonus. Tomrumsbrud bruger stadig 3 ladninger af Mørketiende. En modstået besværgelse bruger bonussen til kritisk træf.',
+  'entities.abilities.spirit_bomb.description':
+    'Detonér en åndebombe på en fjende, som giver {damage} Skyggeskade til fjender inden for 8 yards af målet. Skaden stiger med besværgelseskraft, kan ramme kritisk og reduceres over 5 mål. Generér 20 Mørketiende for at klargøre én bombe. Generering tæller, selv når du holder maksimalt 5 Mørketiende; det er ikke nødvendigt at bruge ladninger, og det giver ingen fremgang. Fremgangen bevares mellem kampe, med højst én klargjort bombe. Død fjerner fremgangen og den klargjorte bombe. En fuldført besværgelse bruger bomben, selv hvis den modstås. Annullering eller afbrydelse bevarer den. Starten på en raidbosskamp fjerner fremgangen og den klargjorte bombe. Besværgelsen kan ikke indlede en raidbosskamp.',
+  'entities.abilities.spirit_bomb.name': 'Tiendebombe',
+  'entities.abilities.vampiric_touch.description':
+    'Giv {damage} Skyggeskade over 15 sek., én gang hvert 3. sek. Skaden stiger med besværgelseskraft, og hvert tik kan ramme kritisk. Hvert tik fordeler helbredelse svarende til 20% af fjendens tabte helbred mellem dig og sårede gruppemedlemmer inden for 30 yards; i et raid modtager kun din undergruppe denne helbredelse. Hvis du har mindst 2 ladninger af Mørketiende, bruger påføring af effekten 2 og øger al dens skade med 30%.',
+  'entities.abilities.vampiric_touch.name': 'Vampyrberøring',
+  'entities.abilities.void_rupture.description':
+    'Brug 3 ladninger af Mørketiende til at flænge en fjende for {damage} Skyggeskade. Skaden stiger med besværgelseskraft og kan ramme kritisk. Kræver 3 ladninger og bruger dem, selv hvis besværgelsen modstås.',
+  'entities.abilities.void_rupture.name': 'Tomrumsbrud',
+  'entities.items.batwing_draught.name': 'Flagredrik',
+  'entities.items.carved_pumpkin_head.name': 'Udskåret græskarhoved',
+  'entities.items.crabapple_chew.name': 'Vildæbletyggekaramel',
+  'entities.items.cursed_candle_stub.name': 'Forbandet lysstump',
+  'entities.items.emberwoven_sheaf.name': 'Glødevævet neg',
+  'entities.items.gourdlight_crow_feather.name': 'Græskarlygtekragens fjer',
+  'entities.items.gourdlight_sweet.name': 'Græskarlygteslik',
+  'entities.items.gourdlight_treat_pouch.name': 'Pose med græskarlygteslik',
+  'entities.items.gourdseed_brittle.name': 'Græskarkerneknas',
+  'entities.items.gurglegreen_cauldron.name': 'Grønboblekedel',
+  'entities.items.haunting_draught.name': 'Spøgelsesdrik',
+  'entities.items.hearthroot_toffee.name': 'Arnerodskaramel',
+  'entities.items.jar_of_mischief.name': 'Krukke med løjer',
+  'entities.items.lantern_mint_drop.name': 'Lygtemintpastil',
+  'entities.items.murmurwick_candle.name': 'Hviskevægens lys',
+  'entities.items.owlwatch_fudge.name': 'Uglevagtsfudge',
+  'entities.items.prankers_pumpkin.name': 'Spøgefuglens græskar',
+  'entities.items.rattlebone_draught.name': 'Knoglerasledrik',
+  'entities.items.reins_emberbristle_broom.name': 'Glødebørstekost',
+  'entities.items.sack_of_startled_bats.name': 'Sæk med forskrækkede flagermus',
+  'entities.items.strawling_charm.name': 'Halmvættens amulet',
+  'entities.items.thatchgrin_patch_pumpkin.name': 'Markgræskar',
+  'entities.items.thatchgrin_sweet_sack.name': 'Halmgrins sliksæk',
+  'entities.items.wanderwisp_lantern.name': 'Vandreåndens lygte',
+  'entities.items.writ_of_the_gourdlit.name': 'Græskarlystes brev',
+  'entities.items.writ_of_the_hollow_grin.name': 'Det Hule Grins brev',
+  'entities.items.writ_of_the_trickster.name': 'Spøgefuglens brev',
+  'entities.mobs.gourdlight_crow.name': 'Græskarlygtekrage',
+  'entities.mobs.gourdlight_strawling.name': 'Halmvætte',
+  'entities.mobs.gourdlight_swelling_gourd.name': 'Svulmende græskar',
+  'entities.mobs.gourdlight_thatchgrin.name': 'Gamle Halmgrin',
+  'entities.npcs.gourdlight_keeper.greeting':
+    'Græskarrene er tændt og lygterne hængt op, så det må være Græskarlygternes aften. Bank på hos byboerne i Østbæk, Sumpbroen og Højvagten, og sig ordene: slik eller ballade. De fleste giver dig noget sødt. Nogle få laver løjer med dig. Bring slikket til mig ved en af mine boder, så bytter jeg det for noget at tage på.',
+  'entities.npcs.gourdlight_keeper.name': 'Hester Græskarvæge',
+  'entities.npcs.gourdlight_keeper.title': 'Græskarlygternes vogter',
+  'entities.quests.q_gourdlight_daily_baskets.completion':
+    'Alle tre leveret, og jeg hører, at Marlow græd. Han græder altid. Her er en kurv til dig selv.',
+  'entities.quests.q_gourdlight_daily_baskets.objectives.0.label': 'Kurv afleveret hos Kok Marlow',
+  'entities.quests.q_gourdlight_daily_baskets.objectives.1.label':
+    'Kurv afleveret hos urtekenderen Yara',
+  'entities.quests.q_gourdlight_daily_baskets.objectives.2.label':
+    'Kurv afleveret hos Lærdomsmester Caddis',
+  'entities.quests.q_gourdlight_daily_baskets.text':
+    'Hver Græskarlygternes aften fylder jeg en slikkurv til en gammel ven i hver by, men mine knæ er ikke, hvad de var. Bring dem ud for mig, {playerName}: til Kok Marlow i Østbæk, urtekenderen Yara i Sumpbroen og Lærdomsmester Caddis oppe i Højvagten.',
+  'entities.quests.q_gourdlight_daily_baskets.title': 'Kurve til naboerne',
+  'entities.quests.q_gourdlight_daily_boo.completion':
+    'Tre? Jeg hørte kokken tabe en pande helt ovre fra den anden side af pladsen. Godt klaret. Her er din andel.',
+  'entities.quests.q_gourdlight_daily_boo.objectives.0.label': 'Forskrækkede byboere',
+  'entities.quests.q_gourdlight_daily_boo.text':
+    'Ingen i disse byer er blevet ordentligt forskrækket i et år, {playerName}, og Græskarlygternes aften uden et gys er bare en kold nat. Tag et kostume på, et hvilket som helst af mine duer, eller det græskarhoved, hvis du har fortjent et. Snig dig så ind på tre byboere, og råb et ordentligt højt BØH.',
+  'entities.quests.q_gourdlight_daily_boo.title': 'Bøh!',
+  'entities.quests.q_gourdlight_daily_feathers.completion':
+    'Sorte som en måneløs mark, og de lugter allerede af røg. Det bliver et flot bål. Tak.',
+  'entities.quests.q_gourdlight_daily_feathers.objectives.0.label': 'Kragefjer',
+  'entities.quests.q_gourdlight_daily_feathers.text':
+    'Når Gamle Halmgrin er presset, kalder han sine krager ned over den, der slår på hans halm. Deres fjer brænder grønt i ildstedet, og jeg skal bruge tre til aftenens bål. Find en kamp på hans mark, {playerName}, og pluk dem fra hans krager.',
+  'entities.quests.q_gourdlight_daily_feathers.title': 'Fjer til bålet',
+  'entities.quests.q_gourdlight_daily_patch.completion':
+    'Fem runde, og ikke en bid mangler i nogen af dem. Det er tærte til hele Dalen. Her, for besværet.',
+  'entities.quests.q_gourdlight_daily_patch.objectives.0.label': 'Markgræskar',
+  'entities.quests.q_gourdlight_daily_patch.text':
+    'Gamle Halmgrins mark forbi Vildsvineengen bugner af græskar, og halvdelen er rullet uden for hans halm, hvor en forsigtig sjæl kan nå dem. Bring mig fem, {playerName}. Hold dig langt fra selve det gamle fugleskræmsel. Han tæller hver eneste.',
+  'entities.quests.q_gourdlight_daily_patch.title': 'Græskar fra marken',
+  'entities.quests.q_gourdlight_daily_towns.completion':
+    'Tre byer på én nat! Dine støvler har fortjent det her mere end dig.',
+  'entities.quests.q_gourdlight_daily_towns.objectives.0.label': 'En dør banket på i Østbæk',
+  'entities.quests.q_gourdlight_daily_towns.objectives.1.label': 'En dør banket på i Sumpbroen',
+  'entities.quests.q_gourdlight_daily_towns.objectives.2.label': 'En dør banket på i Højvagten',
+  'entities.quests.q_gourdlight_daily_towns.text':
+    'Børnene siger, at en ægte græskarlygtevandrer banker på i hver by, før natten er omme. Vis dem, at de har ret, {playerName}. Sig slik eller ballade ved én dør i Østbæk, én i Sumpbroen og én i Højvagten. Lygterne langs vejene lyser for dig.',
+  'entities.quests.q_gourdlight_daily_towns.title': 'En dør i hver by',
+  'entities.quests.q_gourdlight_daily_wicks.completion':
+    'Seks stumper, kolde som frost. Den, der tændte dem, må prøve hårdere. Tag dette, og vask hænderne.',
+  'entities.quests.q_gourdlight_daily_wicks.objectives.0.label': 'Slukkede forbandede lys',
+  'entities.quests.q_gourdlight_daily_wicks.text':
+    'Nogen sætter lys med grønne flammer ved foden af vores lygtepæle. De brænder uden at smelte og hvisker, når du vender ryggen til. Sluk seks for mig, {playerName}, i hvilken som helst af de tre byer, og bring mig stumperne.',
+  'entities.quests.q_gourdlight_daily_wicks.title': 'Onde væger',
+  'entities.quests.q_gourdlight_rounds.completion':
+    'Fem døre, og du har stadig alle fingrene. Her er en slikpose til turen hjem. Kom igen i morgen, så åbner dørene igen.',
+  'entities.quests.q_gourdlight_rounds.objectives.0.label': 'Døre banket på',
+  'entities.quests.q_gourdlight_rounds.text':
+    'Hver Græskarlygternes aften går Dalens børn deres runde, og i år er du med, {playerName}. Bank på fem døre i vores byer, sig ordene, og se, hvad du får. Kom tilbage til mig, når du er færdig.',
+  'entities.quests.q_gourdlight_rounds.title': 'Græskarlygternes runde',
+  'guide.interfacePage.framesGovernedPriest':
+    'Rediger rammer lader dig også flytte Skyggepræstens medaljon for Mørketiende og Tiendebombe.',
+  'guide.worldPvpPage.hillBodyTwoHour':
+    'En gang hver anden time, på et tidspunkt ingen kan forudsige, får hele realmen besked om, at en bakke vil rejse sig i en af de nordlige zoner om femten minutter. Cirklen, hvor den vil stå, markeres på åben grund. Bakken står i tredive minutter og synker så igen. Hvert femte minut, mens den står, får realmen at vide, hvor den er, og hvilke grupper der har holdt den længst. Gruppen med flest spillere indenfor kæmper om bakken og får den efter tredive sekunders flertal. Når en rivaliserende gruppe går ind, sættes tællingen kun på pause, indtil din gruppe fører igen; den starter kun forfra, hvis ingen fra din gruppe er i live indenfor. En solospiller tæller som en gruppe på én og beholder sin bakke, når en gruppe dannes, men raidmedlemmer tæller slet ikke. Mens en gruppe holder bakken, tjener hvert medlem indenfor samme mængde Ære hvert minut, uanset hvor længe de har holdt den. En fuld gruppe, der holder bakken uforstyrret hele perioden, tjener derfor omtrent det samme som to slagmarkssejre. Når bakken synker, og gruppen, der samlet holdt den længst, har holdt den i mindst ti minutter, får alle, der stod indenfor for den gruppe i mindst ét minut og stadig er i den, én sejr til PvP-rækken i Ugens Skatkammer. En bjælke over feltet viser, hvem der holder bakken, jeres antal mod deres og erobringstiden; /hill i chatten fortæller, hvor den står.',
+  'seasonal.boo.already': '{name} er blevet forskrækket nok for i dag.',
+  'seasonal.boo.flash': 'BØH! {name} bliver forskrækket!',
+  'seasonal.boo.frightenedHint':
+    '{name} er stadig nervøs efter din sidste forskrækkelse. Find en anden.',
+  'seasonal.boo.landed':
+    'Du springer frem mod {name} med et BØH! Der lyder et skrig, og alt er lige ved at blive tabt.',
+  'seasonal.boo.needsCostume':
+    'Tag først et kostume på: en kostumedrik, et flagermus- eller skelettrick, Halmvættens amulet, Udskåret græskarhoved eller en goblinslurk fra Grønboblekedlen.',
+  'seasonal.boo.noCostume': 'Uden kostume griner {name} bare af dig. Tag et på først.',
+  'seasonal.boo.notOnErrand': 'Hester har ikke bedt dig forskrække nogen i dag.',
+  'seasonal.boo.row': 'Bøh!',
+  'seasonal.boo.rowAria': 'Spring frem mod {name}, og råb bøh',
+  'seasonal.boundItemGone':
+    'Græskarlygternes aften er slut, og din {item} smuldrer tilbage til halm.',
+  'seasonal.costume': 'Du drikker drikken og forvandles: {trick}!',
+  'seasonal.event.gourdlight_eve.name': 'Græskarlygternes aften',
+  'seasonal.guise': 'Amuletten knitrer, og halmen kryber op over dig: {trick}!',
+  'seasonal.itemSource.pumpkinHead':
+    'Tabes af Gamle Halmgrin på hans græskarmark forbi Vildsvineengen, første gang du plyndrer ham. Ingen forhandler sælger det.',
+  'seasonal.itemUse.broomSources':
+    'Købes af Hester Græskarvæge for {count} Glødevævede neg, eller tabes sjældent af Gamle Halmgrin på en dag, hvor du plyndrer ham. Kræver ridefærdighed at ride på. Beholdes permanent og kan rides året rundt.',
+  'seasonal.itemUse.costumeBat':
+    'Brug: Bliv til en flagrende flagermus i {minutes} minutter. Forbruges. Kan ikke bruges i kamp, og effekten slutter, når du går i kamp. Kosmetisk.',
+  'seasonal.itemUse.costumeGhost':
+    'Brug: Bliv til et svævende spøgelse i {minutes} minutter. Forbruges. Kan ikke bruges i kamp, og effekten slutter, når du går i kamp. Kosmetisk.',
+  'seasonal.itemUse.costumeSkeleton':
+    'Brug: Bliv til et raslende skelet i {minutes} minutter. Forbruges. Kan ikke bruges i kamp, og effekten slutter, når du går i kamp. Kosmetisk.',
+  'seasonal.itemUse.pouch': 'Brug: Åbn for at få {count} Græskarlygteslik.',
+  'seasonal.itemUse.pumpkinHead':
+    'Brug: Tag et udskåret græskar med lys indeni på eller af. Det bæres over hjelmen. Kosmetisk.',
+  'seasonal.itemUse.sheaf':
+    'Gamle Halmgrin giver ét hver dag, du plyndrer ham, indtil du ejer Glødebørstekosten. Hester Græskarvæge bytter {count} for kosten ved sine boder i Østbæk, Sumpbroen og Højvagten. Ubrugte neg gemmes til næste Græskarlygternes aften.',
+  'seasonal.itemUse.strawlingCharm':
+    'Brug: Bliv en af Gamle Halmgrins halmvætter i {seconds} sekunder. Ikke i kamp. Forbruges aldrig. Kosmetisk.',
+  'seasonal.itemUse.sweet':
+    'Optjenes ved slik eller ballade under Græskarlygternes aften. Hester Græskarvæge bytter dem for kosmetiske genstande ved sine boder i Østbæk, Sumpbroen og Højvagten.',
+  'seasonal.itemUse.titleWrit':
+    'Brug: Få titlen {title} til denne figur. Den vælges i Bedrifternes Bog. Forbruges. Beholdes, hvis du allerede har titlen.',
+  'seasonal.itemUse.toyBats':
+    'Brug: Åbn sækken. En pibende sværm af flagermus flyver ud og spreder sig omkring dig i {seconds} sekunder. Kan ikke bruges i kamp eller under snigen. Forbruges aldrig: kan bruges igen efter {cooldown} sekunder. Beholdes permanent og kan bruges året rundt. Kosmetisk.',
+  'seasonal.itemUse.toyCandleShadows':
+    'Brug: Tænd lyset foran dig. I {seconds} sekunder kaster flammerne dansende skygger af en kat, en flagermus og en heks på jorden omkring det, synlige for alle i nærheden. Kan ikke bruges i kamp eller under snigen. Forbruges aldrig: kan bruges igen efter {cooldown} sekunder. Beholdes permanent og kan bruges året rundt. Kosmetisk.',
+  'seasonal.itemUse.toyCauldron':
+    'Brug: Stil en stor boblende kedel foran dig. Den står i {standing} sekunder. Enhver spiller, der drikker af den, omgives af grønne bobler og bliver en goblin i {seconds} sekunder, hvilket erstatter vedkommendes kostume. Man kan hverken stille den frem eller drikke i kamp eller under snigen, og kamp afslutter goblinformen. Forbruges aldrig: kan bruges igen efter {cooldown} sekunder. Beholdes permanent og kan bruges året rundt. Kosmetisk.',
+  'seasonal.itemUse.toyLantern':
+    'Brug: Stil lygten foran dig. Et lille spøgelse kredser om dig i {seconds} sekunder. Kan ikke bruges i kamp eller under snigen. Forbruges aldrig: kan bruges igen efter {cooldown} sekunder. Beholdes permanent og kan bruges året rundt. Kosmetisk.',
+  'seasonal.itemUse.toyPrank':
+    'Brug: Kast den på en anden synlig spiller inden for {range} yards. Spillerens hoved bliver til en lysende græskarlygte i {seconds} sekunder, som kan fjernes med højreklik. Ingen af jer må være i kamp, og du må ikke snige dig. Forbruges aldrig: kan bruges igen efter {cooldown} sekunder. Beholdes permanent og kan bruges året rundt. Kosmetisk.',
+  'seasonal.itemUse.trickJar':
+    'Brug: Udsætter dig for et tilfældigt, harmløst trick i nogle sekunder. Kosmetisk.',
+  'seasonal.jarTrick': 'Krukken springer op: {trick}!',
+  'seasonal.pumpkinHead.off': 'Du tager Udskåret græskarhoved af.',
+  'seasonal.pumpkinHead.on': 'Du tager Udskåret græskarhoved på.',
+  'seasonal.pumpkins.flash': 'Hjemsøgt græskar fundet! {count}/{total}',
+  'seasonal.pumpkins.found':
+    'Du tænder et Hjemsøgt græskar i {zone}: {count}/{total}. Modtaget Græskarlygteslik: {sweets}.',
+  'seasonal.pumpkins.name': 'Hjemsøgt græskar',
+  'seasonal.pumpkins.progress': '{label}: {current}/{total}',
+  'seasonal.pumpkins.title': 'Hjemsøgte græskar',
+  'seasonal.pumpkins.world': 'Verden',
+  'seasonal.thatchgrin.poleBound': 'Bundet til pælen',
+  'seasonal.thatchgrin.sleepYell': 'Solen er oppe. Tilbage på pælen, tilbage på vagt.',
+  'seasonal.thatchgrin.wakeYell': 'NATTEN falder over marken! Hvem går på MIN mark?',
+  'seasonal.titleGranted': 'Du læser brevet. Ny titel opnået: {title}.',
+  'seasonal.titleKnown': 'Du har allerede den titel, så du beholder brevet.',
+  'seasonal.tokenPrice': '{count} {item}',
+  'seasonal.toy.bats': 'Du åbner sækken, og en sværm af forskrækkede flagermus flyver ud!',
+  'seasonal.toy.candleShadows': 'Du tænder lyset, og skygger begynder at danse omkring flammerne.',
+  'seasonal.toy.cauldron': 'Du stiller kedlen ned, og den begynder at boble.',
+  'seasonal.toy.cauldronDrink':
+    'Du drikker af kedlen, omgives af grønne bobler og bliver en goblin!',
+  'seasonal.toy.hidden': 'Træd ud af skyggerne først: et stykke legetøj ville afsløre dig.',
+  'seasonal.toy.lantern':
+    'Du stiller lygten ned, og et lille spøgelse svæver ud for at holde dig med selskab.',
+  'seasonal.toy.prank': 'Du kaster græskarret. Det splatter ud på {name}!',
+  'seasonal.toy.prankNeedsPlayer':
+    'Græskarret splatter kun på en anden spiller, som ikke er i kamp.',
+  'seasonal.toy.pranked':
+    '{name} splatter et græskar på dit hoved! Fjern det med højreklik, eller bær det stolt.',
+  'seasonal.toy.prankedFlash': '{name} har lavet løjer med dig!',
+  'seasonal.trickOrTreat.alreadyKnocked':
+    'Du har allerede sagt slik eller ballade til {name} i dag.',
+  'seasonal.trickOrTreat.knockedHint':
+    'Du har allerede banket på her i dag. Døren åbner igen efter den daglige nulstilling.',
+  'seasonal.trickOrTreat.notActive': 'Græskarlygternes aften er ikke i gang lige nu.',
+  'seasonal.trickOrTreat.row': 'Slik eller ballade!',
+  'seasonal.trickOrTreat.rowAria': 'Sig slik eller ballade til {name}',
+  'seasonal.trickOrTreat.tooFar': 'Gå nærmere for at banke på.',
+  'seasonal.trickOrTreat.treat': '{name} giver dig noget sødt.',
+  'seasonal.trickOrTreat.treatFlash.few': 'Slik! {count} Græskarlygteslik',
+  'seasonal.trickOrTreat.treatFlash.many': 'Slik! {count} Græskarlygteslik',
+  'seasonal.trickOrTreat.treatFlash.one': 'Slik! {count} Græskarlygteslik',
+  'seasonal.trickOrTreat.treatFlash.other': 'Slik! {count} Græskarlygteslik',
+  'seasonal.trickOrTreat.trick': '{name} laver løjer med dig: {trick}!',
+  'seasonal.trickOrTreat.trickFlash': 'Ballade! {trick}',
+  'seasonal.tricks.gourdlight_costume_bat': 'Flagermuskostume',
+  'seasonal.tricks.gourdlight_costume_ghost': 'Spøgelseskostume',
+  'seasonal.tricks.gourdlight_costume_skeleton': 'Skeletkostume',
+  'seasonal.tricks.gourdlight_trick_bat': 'Flagermustosset',
+  'seasonal.tricks.gourdlight_trick_fumes': 'Grønne dampe',
+  'seasonal.tricks.gourdlight_trick_skeleton': 'Raslende knogler',
+  'seasonal.tricks.gourdlight_trick_strawling': 'Halmvætteskikkelse',
 };

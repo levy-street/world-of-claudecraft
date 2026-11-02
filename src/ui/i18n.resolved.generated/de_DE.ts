@@ -1038,14 +1038,14 @@ export const de_DE: EnTranslations = {
       "fateThreadsSentenceReady": "Drei Schicksalsfäden: Schuldspruch kann sie für 18% erhöhten Schaden verbrauchen."
     },
     "priest": {
-      "gloomtitheLabel": "Gloomtithe",
-      "bombLabel": "Tithe Bomb",
-      "gloomtitheStatus": "{value} of {max} Gloomtithe",
-      "bombStatus": "{value} of {max} Tithe Bomb charges",
-      "bombReady": "Ready",
+      "gloomtitheLabel": "Düsterzehnt",
+      "bombLabel": "Zehntbombe",
+      "gloomtitheStatus": "{value} von {max} Düsterzehnt",
+      "bombStatus": "{value} von {max} Zehntbombenladungen",
+      "bombReady": "Bereit",
       "chargeCount": "{value} / {max}",
-      "gloomtitheTooltip": "Gloomtithe: up to 5 spendable charges. Void Rupture consumes 3; Vampiric Touch consumes 2 for 30% more damage; Call Tithefiend consumes your bank. Generating charges also fills Tithe Bomb, even while this bank is full.",
-      "bombTooltip": "Tithe Bomb: generate 20 Gloomtithe to prepare one bomb. Spending Gloomtithe does not add progress. Progress lasts between fights. Dying or starting a raid boss resets it. A completed cast consumes the bomb; cancelling keeps it."
+      "gloomtitheTooltip": "Düsterzehnt: bis zu 5 verbrauchbare Ladungen. Leerenriss verbraucht 3; Vampirberührung verbraucht 2 für 30% mehr Schaden; Zehntteufel rufen verbraucht deinen gesamten Vorrat. Das Erzeugen von Ladungen füllt auch die Zehntbombe, selbst bei vollem Vorrat.",
+      "bombTooltip": "Zehntbombe: Erzeuge 20 Ladungen Düsterzehnt, um eine Bombe vorzubereiten. Das Ausgeben von Düsterzehnt erhöht den Fortschritt nicht. Der Fortschritt bleibt zwischen Kämpfen erhalten. Sterben oder der Beginn eines Schlachtzugbosskampfes setzt ihn zurück. Ein abgeschlossener Zauber verbraucht die Bombe; ein Abbruch erhält sie."
     },
     "procOverlay": {
       "soulFragmentsMeter": "Seelenfragmente",
@@ -2600,6 +2600,7 @@ export const de_DE: EnTranslations = {
       "name_lantern_hall_destrier": "Streitross der Laternenhalle",
       "name_chimeglass_tortoise": "Tolliver das Chimeglass",
       "name_rickshaw_mount": "Knochengebundene Rikscha",
+      "name_emberbristle_broom": "Glutborstenbesen",
       "name_wobbles_slime": "Wackel der Schleim",
       "name_nightwing_chimera": "Nachtflügelchimäre",
       "desc_valorsteed": "Ein zähes, trittsicheres Ross mit einem Ledersattel.",
@@ -2623,7 +2624,8 @@ export const de_DE: EnTranslations = {
       "desc_lantern_hall_destrier": "Das Schlachtross der Laternenhalle, unter dem Blau der Gilde mit Eiche und Eisen gepanzert. Zwei Sturmlaternen schwingen an seinem Sattel, um den Heimweg zu erhellen.",
       "desc_nightwing_chimera": "Ein zweiköpfiger Dämmerungswyvern aus den uralten Ästen, der in Ruhe auf klauenbewehrten Hinterbeinen sitzt und auf arkan geätzten Flügeln über dem Boden gleitet.",
       "desc_chimeglass_tortoise": "Eine Salzschildkröte, die drei Generationen von Wohnwagen überholt hat. Kesselflicker haben ihm eine Brille aus Sturmglas geschliffen und ihm eine Bronzeglocke an den Hals gehängt, damit die Straße ihn hört, lange bevor sie ihn sieht.",
-      "desc_rickshaw_mount": "Ein klappernder Knochenkarren, an dessen Deichseln ein knochiger Scherge angeschirrt ist und Euch im vollen Lauf zieht."
+      "desc_rickshaw_mount": "Ein klappernder Knochenkarren, an dessen Deichseln ein knochiger Scherge angeschirrt ist und Euch im vollen Lauf zieht.",
+      "desc_emberbristle_broom": "Ein mit orangefarbenem Band gebundener Erntebesen, der eine Handbreit über dem Boden schwebt und Glut aus seinen Borsten streut. Eine dauerhafte Belohnung der Kürbislichtnacht."
     },
     "mountTraining": {
       "mountPrompt": "Drücke {key}, um das Übungs-Valorross zu besteigen.",
@@ -4672,7 +4674,10 @@ export const de_DE: EnTranslations = {
       }
     },
     "auraEffect": {
-      "stilledMindCrit": "Your next Mindfracture or Void Rupture is a guaranteed critical strike if it hits. Other spells do not consume this bonus. Void Rupture still consumes 3 Gloomtithe charges. A resisted cast consumes the bonus.",
+      "gourdlight": {
+        "thatchbound": "Alter Thatchgrin zieht deine Fäden. Du kannst nicht handeln: Du wirst zu deinem nächsten Verbündeten geführt und schlägst ihn alle {every} Sek. für {min} bis {max} Schaden (bis zum {mult}-Fachen gegen einen Verbündeten auf Stufe {level}). Endet vorzeitig, wenn du Schaden in Höhe von {pct}% deiner maximalen Gesundheit erleidest oder ein Verbündeter den Effekt bannt (Magie)."
+      },
+      "stilledMindCrit": "Dein nächster Geistesbruch oder Leerenriss ist bei einem Treffer garantiert kritisch. Andere Zauber verbrauchen diesen Bonus nicht. Leerenriss verbraucht weiterhin 3 Ladungen Düsterzehnt. Wird dem Zauber widerstanden, wird der Bonus verbraucht.",
       "wildheart": {
         "packBond": "Erleidet {pct}% weniger Schaden, solange sein Partner nahe steht. Ziehe den Bestienmeister und seinen Jaguar auseinander, um die Verbindung zu brechen.",
         "packBondFury": "Verursacht {pct}% mehr Schaden, solange sein Partner nahe steht.",
@@ -4862,6 +4867,7 @@ export const de_DE: EnTranslations = {
       "spellHaste": "Erhöht Zaubertempo um {pct}%",
       "sated": "Kann nicht von einem weiteren Gruppen-Tempo-Effekt profitieren",
       "cauterizeFatigue": "Kauterisieren kann keinen weiteren tödlichen Treffer verhindern",
+      "seasonalCosmetic": "Rein kosmetisch: kein Einfluss auf den Kampf",
       "castShield": "Der Zauber kann nicht durch Schaden unterbrochen oder verzögert werden",
       "dmgDone": "Erhöht den verursachten Schaden um {pct}%",
       "dmgDoneReduce": "Verringert den verursachten Schaden um {pct}%",
@@ -5009,6 +5015,7 @@ export const de_DE: EnTranslations = {
       "dodgeReduce": "Verringert Ausweichchance um {pct}%",
       "damageReduction": "Verringert allen erlittenen Schaden um {pct}%",
       "slumber": "Schläft bis zur Dämmerung. Kann nicht angegriffen werden und erwacht für niemanden.",
+      "slumberNight": "Hängt bis zum Einbruch der Nacht leblos an seinem Pfahl. Kann nicht angegriffen werden.",
       "guardianWard": "Der naechste todliche Feindtreffer stellt stattdessen {pct}% deiner Gesundheit wieder her",
       "armorFlat": "Verringert Rüstung um {value}",
       "armorFlatStacks": "Verringert Rüstung um {value} ({stacks} Stapel)",
@@ -5088,7 +5095,8 @@ export const de_DE: EnTranslations = {
     "worldBoss": {
       "spawn": "{name} erhebt sich über {zone}!",
       "wake": "{name} erwacht über {zone}!",
-      "sleep": "{name} schläft bis zur Dämmerung."
+      "sleep": "{name} schläft bis zur Dämmerung.",
+      "sleepUntilNightfall": "{name} schläft bis zum Einbruch der Nacht."
     },
     "auth": {
       "appleLoginCta": "Mit Apple fortfahren",
@@ -8616,6 +8624,107 @@ export const de_DE: EnTranslations = {
       }
     }
   },
+  "seasonal": {
+    "pumpkins": {
+      "name": "Spukkürbis",
+      "title": "Spukkürbisse",
+      "world": "Welt",
+      "progress": "{label}: {current}/{total}",
+      "found": "Du zündest einen Spukkürbis in {zone} an: {count}/{total}. Erhaltene Kürbislicht-Süßigkeiten: {sweets}.",
+      "flash": "Spukkürbis gefunden! {count}/{total}"
+    },
+    "event": {
+      "gourdlight_eve": {
+        "name": "Kürbislichtnacht"
+      }
+    },
+    "trickOrTreat": {
+      "row": "Süßes oder Saures!",
+      "rowAria": "Bei {name} Süßes oder Saures verlangen",
+      "knockedHint": "Du hast heute hier schon angeklopft. Nach der täglichen Zurücksetzung öffnet sich die Tür wieder.",
+      "treat": "{name} gibt dir eine Süßigkeit.",
+      "trick": "{name} spielt dir einen Streich: {trick}!",
+      "alreadyKnocked": "Du hast heute schon bei {name} Süßes oder Saures verlangt.",
+      "notActive": "Die Kürbislichtnacht findet gerade nicht statt.",
+      "tooFar": "Komm näher, um anzuklopfen.",
+      "treatFlash": {
+        "one": "Süßes! {count} Kürbislicht-Süßigkeit",
+        "few": "Süßes! {count} Kürbislicht-Süßigkeiten",
+        "many": "Süßes! {count} Kürbislicht-Süßigkeiten",
+        "other": "Süßes! {count} Kürbislicht-Süßigkeiten"
+      },
+      "trickFlash": "Saures! {trick}"
+    },
+    "tricks": {
+      "gourdlight_trick_bat": "Fledermausfieber",
+      "gourdlight_trick_skeleton": "Klapperknochen",
+      "gourdlight_trick_fumes": "Grüne Dämpfe",
+      "gourdlight_trick_strawling": "Strohlingsgestalt",
+      "gourdlight_costume_skeleton": "Skelettkostüm",
+      "gourdlight_costume_ghost": "Geisterkostüm",
+      "gourdlight_costume_bat": "Fledermauskostüm"
+    },
+    "pumpkinHead": {
+      "on": "Du setzt den Geschnitzten Kürbiskopf auf.",
+      "off": "Du nimmst den Geschnitzten Kürbiskopf ab."
+    },
+    "jarTrick": "Das Glas springt auf: {trick}!",
+    "guise": "Der Talisman knistert, und Stroh kriecht über dich: {trick}!",
+    "costume": "Du trinkst den Trunk und verwandelst dich: {trick}!",
+    "titleGranted": "Du liest die Urkunde. Neuer Titel erhalten: {title}.",
+    "titleKnown": "Du besitzt diesen Titel bereits und behältst daher die Urkunde.",
+    "boundItemGone": "Die Kürbislichtnacht ist vorbei, und dein Gegenstand {item} zerfällt wieder zu Stroh.",
+    "itemUse": {
+      "pumpkinHead": "Benutzen: Setze einen geschnitzten, von innen beleuchteten Kürbis über deinem Helm auf oder nimm ihn ab. Kosmetisch.",
+      "trickJar": "Benutzen: Spielt dir für ein paar Sekunden einen zufälligen, harmlosen Streich. Kosmetisch.",
+      "pouch": "Benutzen: Öffne ihn, um {count} Kürbislicht-Süßigkeiten zu erhalten.",
+      "strawlingCharm": "Benutzen: Werde für {seconds} Sekunden zu einem Strohling des Alten Thatchgrin. Nicht im Kampf benutzbar. Wird niemals verbraucht. Kosmetisch.",
+      "sweet": "Durch Süßes oder Saures während der Kürbislichtnacht verdient. Hester Gourdwick tauscht sie an ihren Ständen in Eastbrook, Fenbridge und Highwatch gegen kosmetische Gegenstände.",
+      "costumeSkeleton": "Benutzen: Verwandle dich für {minutes} Minuten in ein klapperndes Skelett. Wird verbraucht. Im Kampf nicht benutzbar; der Kampfbeginn beendet den Effekt. Kosmetisch.",
+      "costumeGhost": "Benutzen: Verwandle dich für {minutes} Minuten in einen schwebenden Geist. Wird verbraucht. Im Kampf nicht benutzbar; der Kampfbeginn beendet den Effekt. Kosmetisch.",
+      "costumeBat": "Benutzen: Verwandle dich für {minutes} Minuten in eine flatternde Fledermaus. Wird verbraucht. Im Kampf nicht benutzbar; der Kampfbeginn beendet den Effekt. Kosmetisch.",
+      "toyPrank": "Benutzen: Wirf ihn auf einen anderen sichtbaren Spieler innerhalb von {range} Metern. Sein Kopf wird für {seconds} Sekunden zu einer leuchtenden Kürbislaterne, die er per Rechtsklick entfernen kann. Keiner von euch darf im Kampf sein, und du darfst nicht in Verstohlenheit sein. Wird niemals verbraucht: nach {cooldown} Sekunden wieder benutzbar. Bleibt dauerhaft erhalten und ist ganzjährig benutzbar. Kosmetisch.",
+      "toyLantern": "Benutzen: Stelle die Laterne vor dir ab. Ein kleiner Geist kreist für {seconds} Sekunden um dich. Im Kampf oder in Verstohlenheit nicht benutzbar. Wird niemals verbraucht: nach {cooldown} Sekunden wieder benutzbar. Bleibt dauerhaft erhalten und ist ganzjährig benutzbar. Kosmetisch.",
+      "toyBats": "Benutzen: Öffne den Sack. Ein quietschender Fledermausschwarm bricht hervor und verteilt sich für {seconds} Sekunden um dich. Im Kampf oder in Verstohlenheit nicht benutzbar. Wird niemals verbraucht: nach {cooldown} Sekunden wieder benutzbar. Bleibt dauerhaft erhalten und ist ganzjährig benutzbar. Kosmetisch.",
+      "toyCandleShadows": "Benutzen: Zünde die Kerze vor dir an. Ihre Flammen werfen für {seconds} Sekunden tanzende Schatten einer Katze, einer Fledermaus und einer Hexe auf den Boden ringsum, sichtbar für alle in der Nähe. Im Kampf oder in Verstohlenheit nicht benutzbar. Wird niemals verbraucht: nach {cooldown} Sekunden wieder benutzbar. Bleibt dauerhaft erhalten und ist ganzjährig benutzbar. Kosmetisch.",
+      "toyCauldron": "Benutzen: Stelle einen großen blubbernden Kessel vor dir ab. Er bleibt {standing} Sekunden stehen. Jeder Spieler, der daraus trinkt, zerplatzt in grünen Blasen und verwandelt sich für {seconds} Sekunden in einen Goblin, wobei sein bisheriges Kostüm ersetzt wird. Weder Aufstellen noch Trinken ist im Kampf oder in Verstohlenheit möglich; der Kampfbeginn beendet die Goblingestalt. Wird niemals verbraucht: nach {cooldown} Sekunden wieder benutzbar. Bleibt dauerhaft erhalten und ist ganzjährig benutzbar. Kosmetisch.",
+      "titleWrit": "Benutzen: Verleiht diesem Charakter den Titel {title}, der im Buch der Taten angelegt wird. Wird verbraucht. Bleibt erhalten, wenn du den Titel bereits besitzt.",
+      "broomSources": "Für {count} Glutverwobene Garben bei Hester Gourdwick gekauft oder selten als Beute vom Alten Thatchgrin an einem Tag, an dem du ihn plünderst. Zum Reiten ist die Reitfertigkeit erforderlich. Bleibt dauerhaft erhalten und kann das ganze Jahr geritten werden.",
+      "sheaf": "Der Alte Thatchgrin gibt dir an jedem Tag, an dem du ihn plünderst, eine Garbe, bis du den Glutborstenbesen besitzt. Hester Gourdwick tauscht an ihren Ständen in Eastbrook, Fenbridge und Highwatch {count} davon gegen den Besen. Nicht ausgegebene Garben bleiben für die nächste Kürbislichtnacht erhalten."
+    },
+    "toy": {
+      "prank": "Du wirfst den Kürbis. Er zerplatzt auf {name}!",
+      "lantern": "Du stellst die Laterne ab, und ein kleiner Geist schwebt heraus, um dir Gesellschaft zu leisten.",
+      "bats": "Du öffnest den Sack, und ein Schwarm erschreckter Fledermäuse bricht hervor!",
+      "candleShadows": "Du zündest die Kerze an, und Schatten beginnen um ihre Flammen zu tanzen.",
+      "cauldron": "Du stellst den Kessel ab, und er beginnt zu blubbern.",
+      "cauldronDrink": "Du trinkst aus dem Kessel, zerplatzt in grünen Blasen und verwandelst dich in einen Goblin!",
+      "pranked": "{name} wirft dir einen Kürbis auf den Kopf! Entferne ihn per Rechtsklick oder trage ihn mit Stolz.",
+      "prankedFlash": "{name} hat dir einen Streich gespielt!",
+      "prankNeedsPlayer": "Der Kürbis trifft nur einen anderen Spieler, der nicht im Kampf ist.",
+      "hidden": "Tritt zuerst aus den Schatten: Ein Spielzeug würde dich verraten."
+    },
+    "itemSource": {
+      "pumpkinHead": "Beute vom Alten Thatchgrin auf seinem Kürbisfeld hinter der Eberwiese, wenn du ihn zum ersten Mal plünderst. Bei keinem Händler erhältlich."
+    },
+    "boo": {
+      "row": "Buh!",
+      "rowAria": "Vor {name} springen und Buh rufen",
+      "needsCostume": "Zieh zuerst ein Kostüm an: einen Kostümtrunk, einen Fledermaus- oder Skelettstreich, den Strohlingtalisman, den Geschnitzten Kürbiskopf oder einen Goblinschluck aus dem Grünblubberkessel.",
+      "frightenedHint": "{name} ist von deinem letzten Schrecken noch ganz schreckhaft. Suche jemand anderen.",
+      "landed": "Du springst vor {name} und rufst BUH! Ein Kreischen ertönt, und beinahe fällt alles zu Boden.",
+      "flash": "BUH! {name} ist erschrocken!",
+      "noCostume": "Ohne Kostüm lacht {name} dich nur aus. Zieh erst eines an.",
+      "already": "{name} hat für heute genug Schrecken erlebt.",
+      "notOnErrand": "Hester hat dich heute nicht gebeten, jemanden zu erschrecken."
+    },
+    "tokenPrice": "{count} {item}",
+    "thatchgrin": {
+      "poleBound": "Pfahlgebunden",
+      "wakeYell": "Die NACHT fällt auf den Acker! Wer geht über MEIN Feld?",
+      "sleepYell": "Die Sonne ist aufgegangen. Zurück auf den Pfahl, zurück auf Wache."
+    }
+  },
   "dungeonGuide": {
     "drownedTemple": {
       "greet": {
@@ -9910,7 +10019,7 @@ export const de_DE: EnTranslations = {
       "framesGovernedTalkingHead": "Durch Bearbeiten von Frames wird auch das Dialogfenster aufgelockert, das die gesprochene Zeile eines NPCs enthält, während sich dieser NPC außerhalb Ihrer Sicht befindet. Es trägt seinen Namenschip, solange es locker ist.",
       "framesGovernedShardpike": "Rahmen bearbeiten löst auch die Splitterpikenleiste: die kurze Reihe mit Aktionen des Questwerkzeugs, die neben deinen Aktionsleisten erscheint, solange du die Splitterpike selbst trägst. Während sie verschiebbar ist, trägt sie ihr Namensschild, damit du sie vor dem Kampf platzieren kannst.",
       "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
-      "framesGovernedPriest": "Edit Frames also lets you move the Shadow priest's Gloomtithe and Tithe Bomb medallion.",
+      "framesGovernedPriest": "Mit Rahmen bearbeiten kannst du auch das Medaillon für Düsterzehnt und Zehntbombe des Schattenpriesters verschieben.",
       "framesGovernedResourceAndHill": "Aktiviere Ressourcenleiste abtrennen im Reiter Rahmen. Dann gibt Rahmen bearbeiten auch deine Ressourcenleiste frei, sodass du Mana, Energie oder Wut unabhängig an einer beliebigen Stelle platzieren kannst. Breite der Ressourcenleiste und Höhe der Ressourcenleiste im selben Reiter passen ihre Größe an. Rahmen bearbeiten gibt auch die Leiste für König des Hügels frei. Hintergrunddeckkraft von König des Hügels im selben Reiter blendet deren Fläche aus, während der Text gut lesbar bleibt.",
       "barsTitle": "Leisten, Timer und Kampftext",
       "barsBody": "Deine Zauberleiste erscheint in der Mitte des Bildschirms, direkt über deinen Aktionsleisten, sobald du zauberst oder kanalisierst, und zeigt den Namen des Zaubers sowie die verbleibende Zeit. Dein Ziel bekommt eine eigene Zauberleiste auf seinem Fenster, sodass du siehst, was kommt, und darauf reagieren kannst.\n\nEine dünne Schwungleiste liegt unter deiner Zauberleiste und füllt sich zwischen deinen Waffenschwüngen, sodass ein Nah- oder Fernkämpfer sehen kann, wann der nächste automatische Treffer landet.\n\nDeine Erfahrungsleiste läuft über die volle Breite unter deinen Aktionsleisten, in Segmente unterteilt, mit einem helleren Abschnitt, der die ausgeruhte Erfahrung zeigt, die du angesammelt hast.\n\nSchwimme unter Wasser, und am oberen Bildschirmrand erscheint eine blaue Atemleiste. Sie leert sich, während dein Kopf unter Wasser ist, blinkt rot auf, sobald sie aufgebraucht ist und du zu ertrinken beginnst, und füllt sich schnell wieder, sobald du auftauchst. Die Leertaste lässt dich nach oben schwimmen, und die Taste zum Abtauchen, standardmäßig Strg, bringt dich tiefer.\n\nSchaden und Heilung schweben als kleine Zahlen über dem auf, was sie getroffen haben, sodass du einen Kampf lesen kannst, ohne Text lesen zu müssen. Der Kampf-Reiter in deinem Chatfenster führt das vollständige schriftliche Protokoll.",
@@ -10815,6 +10924,7 @@ export const de_DE: EnTranslations = {
       "hillBodyRamp": "Alle zwei Stunden erscheint ein Hügel in einem der Gebiete Die Drakenlande, Der Frostschleier oder Der Bernsteinfall. Der Realm erhält fünfzehn Minuten vorher eine Warnung, und der Kreis wird auf offenem Boden markiert. Der Hügel bleibt dreißig Minuten aktiv. Das Betreten des aktiven Kreises setzt nach den üblichen Stufenregeln die Welt-PvP-Flagge, auch bei Schlachtzugsmitgliedern. Die Gruppe mit den meisten berechtigten Spielern im Kreis erobert den Hügel nach einer Minute ununterbrochener Mehrheit. Ein Einzelspieler zählt als Einpersonengruppe; Schlachtzugsmitglieder und Spieler unter der PvP-Mindeststufe können weder erobern noch Hügelehre verdienen. Jedes Mitglied der haltenden Gruppe im Kreis erhält Ehre mit steigender Rate. Auszahlungen und ihre Steigerung erfolgen schneller, sodass die Gesamtehre des früheren fünfundvierzigminütigen Ereignisses erhalten bleibt. Ein Besitzerwechsel setzt die Steigerung zurück. Beim Verlassen bleibt die Flagge bestehen. /pvp off nutzt die üblichen fünf Minuten und kann innerhalb eines aktiven Hügels oder im Kampf nicht abgeschlossen werden. Die Hügelleiste zeigt Kontrolle, Spielerzahlen und Eroberungsfortschritt; /hill meldet den Standort.",
       "hillBodyPause": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls, and every five minutes while it stands the realm is told where it is and which groups have held it longest. The party with the most players standing inside contests the hill, and after thirty seconds of majority the hill is theirs. A rival party walking in only pauses that count until yours leads again; it starts over only if nobody from your party is left alive inside. A lone player counts as a party of one and keeps a hill they hold when they form a party, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns Honor every minute, and the longer the same party holds it, the more each minute pays: a full party holding an uncontested hill for its whole stand earns about as much as three battleground wins. When the hill changes hands, the new holders start the count from the beginning. When it falls, if the group that held it longest in total held it for at least ten minutes, everyone who stood inside for that group for at least a minute, and is still in that group, earns one win toward the PvP row of the Weekly Vault. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
       "hillBodyFlat": "Alle drei Stunden wird dem gesamten Reich zu einem unvorhersehbaren Zeitpunkt angekündigt, dass in fünfzehn Minuten in einem der nördlichen Gebiete ein Hügel erscheint. Sein Kreis wird auf offenem Boden markiert. Er bleibt fünfundvierzig Minuten bestehen und verschwindet dann. Währenddessen werden alle fünf Minuten sein Standort und die Gruppen mit den längsten gesamten Haltezeiten bekannt gegeben. Die Gruppe mit den meisten Spielern im Kreis bestreitet den Hügel und erobert ihn nach insgesamt dreißig Sekunden zahlenmäßiger Überlegenheit. Eine gegnerische Gruppe pausiert den Zähler nur, bis eure Gruppe wieder führt; er beginnt erst von vorn, wenn kein lebendes Mitglied eurer Gruppe im Kreis bleibt. Einzelspieler zählen als Gruppe aus einer Person und behalten ihren Hügel, wenn sie eine Gruppe bilden. Schlachtzugsmitglieder zählen überhaupt nicht. Jedes Mitglied der haltenden Gruppe, das im Kreis steht, erhält jede Minute gleich viel Ehre, unabhängig von der bisherigen Haltezeit. Eine volle Gruppe, die den Hügel seine ganze Dauer ungestört hält, erhält ungefähr so viel Ehre wie für drei Schlachtfeldsiege. Wenn der Hügel verschwindet und die Gruppe mit der längsten gesamten Haltezeit mindestens zehn Minuten gehalten hat, erhält jeder Spieler einen Sieg für die PvP-Reihe des Wöchentlichen Tresors, der während ihrer Haltezeit mindestens eine Minute im Kreis stand und noch zu dieser Gruppe gehört. Ein Balken über dem Feld zeigt den Besitzer, eure und ihre Spielerzahl sowie den Eroberungszähler; /hill im Chat nennt den Standort.",
+      "hillBodyTwoHour": "Einmal alle zwei Stunden wird zu einem unvorhersehbaren Zeitpunkt dem ganzen Realm angekündigt, dass in fünfzehn Minuten ein Hügel in einer der nördlichen Zonen erscheint. Sein Kreis wird auf offenem Gelände markiert. Der Hügel bleibt dreißig Minuten und verschwindet dann. Solange er da ist, erfährt der Realm alle fünf Minuten seinen Standort und welche Gruppen ihn am längsten gehalten haben. Die Gruppe mit den meisten Spielern im Kreis beansprucht den Hügel und erobert ihn nach dreißig Sekunden Mehrheit. Betritt eine rivalisierende Gruppe den Kreis, pausiert dieser Zähler nur, bis deine Gruppe wieder führt; er beginnt erst neu, wenn kein lebendes Mitglied deiner Gruppe mehr im Kreis steht. Ein Einzelspieler zählt als Ein-Personen-Gruppe und behält seinen Hügel, wenn er eine Gruppe gründet; Schlachtzugsmitglieder zählen dagegen überhaupt nicht. Solange eine Gruppe den Hügel hält, erhält jedes ihrer Mitglieder im Kreis jede Minute gleich viel Ehre, unabhängig von der bisherigen Haltedauer. Eine volle Gruppe, die ihn während seiner gesamten Dauer unangefochten hält, verdient daher etwa so viel wie bei zwei Schlachtfeldsiegen. Verschwindet der Hügel, und hat die Gruppe mit der längsten gesamten Haltedauer ihn mindestens zehn Minuten gehalten, erhält jeder, der für diese Gruppe mindestens eine Minute im Kreis stand und ihr weiterhin angehört, einen Sieg für die PvP-Zeile der Wöchentlichen Tresors. Eine Leiste über dem Feld zeigt den Besitzer, eure Anzahl im Vergleich zur gegnerischen und den Eroberungszähler; /hill im Chat nennt den Standort.",
       "limitsBodyRaids": "Denselben Spieler immer wieder zu besiegen zahlt jedes Mal weniger und bald nichts mehr, und deine Zählung gegen diesen Spieler beginnt erst etwa eine Stunde nach der ersten dieser Tötungen von Neuem, sodass das Campen eines einzelnen Opfers nie das Warten wert ist. Ein Ziel weit unter deiner Stufe zahlt überhaupt nichts. Schlachtfelder und Arenen folgen ihren eigenen Regeln, solange du dich darin befindest, und sie zahlen mehr Ehre als die offene Welt, sodass Welt-PvP der langsamere Weg zu demselben Händler ist. Schlachtzüge verdienen nichts an Welttötungen: Ein Schlachtzugsmitglied erhält keine Ehre oder kein Gold und verkleinert auch niemandes Anteil, kämpfe also als Gruppe, um bezahlt zu werden."
     },
     "thornhollowPage": {
@@ -15556,6 +15666,7 @@ export const de_DE: EnTranslations = {
       "accountSuspended": "Dieses Konto ist bis {date} suspendiert.",
       "alreadyInWorld": "Der Charakter ist bereits in der Welt.",
       "accountSessionLimit": "Zu viele Charaktere dieses Kontos sind bereits in der Welt.",
+      "worldFightHold": "Ein anderer Charakter dieses Kontos befindet sich nach einem Kampf noch in der Welt. Versuche es in ein paar Minuten erneut.",
       "takenOver": "Dein Charakter wurde von einer anderen Sitzung übernommen.",
       "vaultMailRecovering": "Deine Tresor-Belohnungspost wird wiederhergestellt. Versuche es in Kürze erneut.",
       "renameBeforeEntering": "Dieser Charakter muss vor dem Betreten der Welt umbenannt werden.",
@@ -18449,16 +18560,16 @@ export const de_DE: EnTranslations = {
         "description": "Kanalisiert 3 Sek. lang und verursacht jede Sekunde {damage} Schattenschaden. Der Schaden steigt mit der Zaubermacht."
       },
       "vampiric_touch": {
-        "name": "Vampiric Touch",
-        "description": "Deal {damage} Shadow damage over 15 sec, once every 3 sec. Damage increases with Spell Power and ticks can critically strike. Each tick shares healing equal to 20% of the health lost by the enemy among you and injured party members within 30 yards; in a raid, only your subgroup receives this healing. If you have at least 2 Gloomtithe charges, applying this effect consumes 2 to increase all its damage by 30%."
+        "name": "Vampirberührung",
+        "description": "Verursacht über 15 Sek. insgesamt {damage} Schattenschaden, einmal alle 3 Sek. Der Schaden steigt mit der Zaubermacht und die regelmäßigen Treffer können kritisch treffen. Jeder Treffer verteilt Heilung in Höhe von 20% der vom Gegner verlorenen Gesundheit auf dich und verletzte Gruppenmitglieder innerhalb von 30 Metern; in einem Schlachtzug erhält nur deine Untergruppe diese Heilung. Hast du mindestens 2 Ladungen Düsterzehnt, verbraucht das Anwenden dieses Effekts 2 davon und erhöht seinen gesamten Schaden um 30%."
       },
       "void_rupture": {
-        "name": "Void Rupture",
-        "description": "Consume 3 Gloomtithe charges to rupture an enemy for {damage} Shadow damage. Damage increases with Spell Power and can critically strike. Requires 3 charges and consumes them even if resisted."
+        "name": "Leerenriss",
+        "description": "Verbraucht 3 Ladungen Düsterzehnt, um einen Gegner aufzureißen und ihm {damage} Schattenschaden zuzufügen. Der Schaden steigt mit der Zaubermacht und kann kritisch treffen. Erfordert 3 Ladungen und verbraucht sie auch dann, wenn dem Zauber widerstanden wird."
       },
       "spirit_bomb": {
-        "name": "Tithe Bomb",
-        "description": "Detonate a spirit bomb on an enemy, dealing {damage} Shadow damage to enemies within 8 yards of that target. Damage increases with Spell Power, can critically strike, and is reduced beyond 5 targets. Generate 20 Gloomtithe to prepare one bomb. Generation counts even while holding the maximum 5 Gloomtithe; spending charges is not required and adds no progress. Progress lasts between fights, up to one prepared bomb. Dying clears your progress and prepared bomb. Completing the cast consumes the prepared bomb, even if resisted. Cancellation or interruption preserves it. Starting a raid boss encounter clears your progress and prepared bomb. Cannot open a raid boss encounter with this spell."
+        "name": "Zehntbombe",
+        "description": "Lässt eine Geisterbombe auf einem Gegner explodieren und fügt Gegnern innerhalb von 8 Metern um das Ziel {damage} Schattenschaden zu. Der Schaden steigt mit der Zaubermacht, kann kritisch treffen und wird bei mehr als 5 Zielen verringert. Erzeuge 20 Ladungen Düsterzehnt, um eine Bombe vorzubereiten. Die Erzeugung zählt auch bei den maximalen 5 gehaltenen Ladungen; Ladungen auszugeben ist nicht nötig und erhöht den Fortschritt nicht. Der Fortschritt bleibt zwischen Kämpfen erhalten, bis zu einer vorbereiteten Bombe. Sterben löscht deinen Fortschritt und deine vorbereitete Bombe. Ein abgeschlossener Zauber verbraucht die vorbereitete Bombe, auch wenn ihm widerstanden wird. Abbruch oder Unterbrechung erhält sie. Der Beginn eines Schlachtzugbosskampfes löscht deinen Fortschritt und deine vorbereitete Bombe. Mit diesem Zauber kannst du keinen Schlachtzugbosskampf eröffnen."
       },
       "flash_heal": {
         "name": "Dringendes Gebet",
@@ -19294,7 +19405,7 @@ export const de_DE: EnTranslations = {
       "inner_focus": {
         "name": "Stiller Geist",
         "description": "Euer nächster Priesterzauber kostet nichts und ist nicht unterbrechbar. Hält 60 Sek. lang an.",
-        "specNote_shadow": "Also reserves a guaranteed critical strike for your next Mindfracture or Void Rupture within 60 sec, if it hits. Other spells do not consume this bonus. Void Rupture still consumes 3 Gloomtithe charges. A resisted cast consumes the critical strike bonus."
+        "specNote_shadow": "Reserviert außerdem einen garantierten kritischen Treffer für deinen nächsten Geistesbruch oder Leerenriss innerhalb von 60 Sek., sofern er trifft. Andere Zauber verbrauchen diesen Bonus nicht. Leerenriss verbraucht weiterhin 3 Ladungen Düsterzehnt. Wird dem Zauber widerstanden, wird der Bonus auf kritische Treffer verbraucht."
       },
       "innervate": {
         "name": "Lebenssaft",
@@ -19492,7 +19603,7 @@ export const de_DE: EnTranslations = {
       "choir_of_deliverance": {
         "name": "Chor der Erlösung",
         "description": "Kanalisiert 6 Sek. lang und heilt Gruppenmitglieder im Umkreis von 30 Metern alle 2 Sek. um {damage}. Die Heilung steigt mit Zaubermacht.",
-        "specNote_shadow": "For 15 sec, share 20% of the health enemies lose to your Shadow damage as healing among injured party members within 30 yards, including yourself. In raids, only your subgroup is healed. Cast instantly and keep attacking in Shadowform. Absorbed damage and overkill do not add healing."
+        "specNote_shadow": "Verteilt 15 Sek. lang 20% der Gesundheit, die Gegner durch deinen Schattenschaden verlieren, als Heilung auf verletzte Gruppenmitglieder innerhalb von 30 Metern, dich eingeschlossen. In Schlachtzügen wird nur deine Untergruppe geheilt. Sofort gewirkt; du kannst in Schattengestalt weiter angreifen. Absorbierter Schaden und Schaden über die verbleibende Gesundheit hinaus erzeugen keine Heilung."
       },
       "bear_charge": {
         "name": "Bruin-Ansturm",
@@ -24707,6 +24818,87 @@ export const de_DE: EnTranslations = {
       "vanguard_pendant_of_mending": {
         "name": "Vorhut-Amulett der Heilung"
       },
+      "gourdlight_sweet": {
+        "name": "Kürbislicht-Süßigkeit"
+      },
+      "gourdlight_treat_pouch": {
+        "name": "Kürbislicht-Naschbeutel"
+      },
+      "carved_pumpkin_head": {
+        "name": "Geschnitzter Kürbiskopf"
+      },
+      "jar_of_mischief": {
+        "name": "Schabernackglas"
+      },
+      "thatchgrin_sweet_sack": {
+        "name": "Thatchgrins Süßigkeitensack"
+      },
+      "strawling_charm": {
+        "name": "Strohlingtalisman"
+      },
+      "rattlebone_draught": {
+        "name": "Klapperknochentrunk"
+      },
+      "haunting_draught": {
+        "name": "Spuktrunk"
+      },
+      "batwing_draught": {
+        "name": "Flattertrunk"
+      },
+      "writ_of_the_gourdlit": {
+        "name": "Urkunde des Kürbiserleuchteten"
+      },
+      "writ_of_the_trickster": {
+        "name": "Urkunde des Schelms"
+      },
+      "writ_of_the_hollow_grin": {
+        "name": "Urkunde des Hohlgrinsers"
+      },
+      "reins_emberbristle_broom": {
+        "name": "Glutborstenbesen"
+      },
+      "hearthroot_toffee": {
+        "name": "Herdwurzeltoffee"
+      },
+      "gourdseed_brittle": {
+        "name": "Kürbiskernkrokant"
+      },
+      "crabapple_chew": {
+        "name": "Wildapfelkaubonbon"
+      },
+      "owlwatch_fudge": {
+        "name": "Eulenwacht-Konfekt"
+      },
+      "lantern_mint_drop": {
+        "name": "Laternenminzbonbon"
+      },
+      "emberwoven_sheaf": {
+        "name": "Glutverwobene Garbe"
+      },
+      "prankers_pumpkin": {
+        "name": "Streichspielerkürbis"
+      },
+      "wanderwisp_lantern": {
+        "name": "Wanderlichtlaterne"
+      },
+      "sack_of_startled_bats": {
+        "name": "Sack erschreckter Fledermäuse"
+      },
+      "murmurwick_candle": {
+        "name": "Flüsterdochtkerze"
+      },
+      "gurglegreen_cauldron": {
+        "name": "Grünblubberkessel"
+      },
+      "thatchgrin_patch_pumpkin": {
+        "name": "Ackerkürbis"
+      },
+      "cursed_candle_stub": {
+        "name": "Verfluchter Kerzenstummel"
+      },
+      "gourdlight_crow_feather": {
+        "name": "Kürbislicht-Krähenfeder"
+      },
       "membership_staff": {
         "name": "Stab des Wandels"
       },
@@ -26263,6 +26455,18 @@ export const de_DE: EnTranslations = {
       "muster_effigy": {
         "name": "Strohvorarbeiter"
       },
+      "gourdlight_thatchgrin": {
+        "name": "Alter Thatchgrin"
+      },
+      "gourdlight_crow": {
+        "name": "Kürbislichtkrähe"
+      },
+      "gourdlight_strawling": {
+        "name": "Strohling"
+      },
+      "gourdlight_swelling_gourd": {
+        "name": "Anschwellender Kürbis"
+      },
       "stable_horse": {
         "name": "Stallpferd"
       },
@@ -27416,6 +27620,11 @@ export const de_DE: EnTranslations = {
         "name": "Hester Quillby",
         "title": "Kartenbauer",
         "greeting": "Jede Karte dieses Moors, die ich je gekauft habe, war schon nach einer Jahreszeit falsch. Das Wasser verlegt die Wege, und die Wege verlegen das Wasser. Also zeichne ich meine eigenen und sitze hier im Trockenen, während die Tinte trocknet."
+      },
+      "gourdlight_keeper": {
+        "name": "Hester Gourdwick",
+        "title": "Hüterin des Kürbislichts",
+        "greeting": "Die Kürbisse leuchten und die Laternen hängen, also muss Kürbislichtnacht sein. Klopfe bei den Leuten in Eastbrook, Fenbridge und Highwatch an und sage die Worte: Süßes oder Saures. Die meisten geben dir eine Süßigkeit. Einige spielen dir einen Streich. Bring die Süßigkeiten zu einem meiner Stände, und ich tausche sie gegen etwas zum Anziehen."
       },
       "reeve_ottoline": {
         "name": "Vogtin Ottoline",
@@ -30048,6 +30257,88 @@ export const de_DE: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Effektive Heilung an der Heilungsattrappe gewirkt"
+          }
+        }
+      },
+      "q_gourdlight_rounds": {
+        "title": "Kürbislichtrunde",
+        "text": "Jede Kürbislichtnacht ziehen die Kinder des Tals ihre Runden, und dieses Jahr begleitest du sie, {playerName}. Klopfe an fünf Türen in unseren Städten, sage die Worte und sieh, was du bekommst. Komm zu mir zurück, wenn du fertig bist.",
+        "completion": "Fünf Türen und noch alle Finger dran. Hier, ein Beutel Süßigkeiten für den Heimweg. Komm morgen wieder, dann öffnen sich die Türen erneut.",
+        "objectives": {
+          "0": {
+            "label": "An Türen angeklopft"
+          }
+        }
+      },
+      "q_gourdlight_daily_patch": {
+        "title": "Kürbisse vom Acker",
+        "text": "Der Acker des Alten Thatchgrin hinter der Eberwiese ist voller Kürbisse. Die Hälfte ist außerhalb der Reichweite seines Strohs gerollt, wo vorsichtige Leute sie erreichen können. Bring mir fünf, {playerName}. Halte dich von der alten Vogelscheuche selbst fern. Er zählt jeden einzelnen.",
+        "completion": "Fünf runde Exemplare und kein einziger Biss darin. Das gibt Kuchen fürs ganze Tal. Hier, für deine Mühe.",
+        "objectives": {
+          "0": {
+            "label": "Ackerkürbisse"
+          }
+        }
+      },
+      "q_gourdlight_daily_boo": {
+        "title": "Buh!",
+        "text": "Seit einem Jahr hat sich in diesen Städten niemand mehr richtig erschreckt, {playerName}, und eine Kürbislichtnacht ohne Schrecken ist nur eine kalte Nacht. Zieh ein Kostüm an, irgendeines von meinen genügt, oder den Kürbiskopf, falls du dir einen verdient hast. Dann schleiche dich an drei Stadtbewohner heran und rufe ein ordentlich lautes BUH!",
+        "completion": "Drei? Ich habe quer über den Platz gehört, wie der Koch eine Pfanne fallen ließ. Gut gemacht. Hier ist dein Anteil.",
+        "objectives": {
+          "0": {
+            "label": "Stadtbewohner erschreckt"
+          }
+        }
+      },
+      "q_gourdlight_daily_wicks": {
+        "title": "Böse Dochte",
+        "text": "Jemand stellt Kerzen mit grünen Flammen an den Fuß unserer Laternenpfähle. Sie brennen, ohne zu schmelzen, und flüstern, wenn man ihnen den Rücken zukehrt. Lösche sechs für mich, {playerName}, in einer beliebigen der drei Städte, und bring mir die Stummel.",
+        "completion": "Sechs Stummel, kalt wie Reif. Wer sie angezündet hat, muss sich mehr Mühe geben. Nimm das und wasch dir die Hände.",
+        "objectives": {
+          "0": {
+            "label": "Verfluchte Kerzen gelöscht"
+          }
+        }
+      },
+      "q_gourdlight_daily_towns": {
+        "title": "Eine Tür in jeder Stadt",
+        "text": "Die Kinder sagen, ein echter Kürbislichtwanderer klopft in jeder Stadt an, ehe die Nacht vorbei ist. Gib ihnen recht, {playerName}. Verlange Süßes oder Saures an je einer Tür in Eastbrook, Fenbridge und Highwatch. Die Laternen an den Straßen leuchten dir den Weg.",
+        "completion": "Drei Städte in einer Nacht! Deine Stiefel haben sich das mehr verdient als du.",
+        "objectives": {
+          "0": {
+            "label": "An einer Tür in Eastbrook angeklopft"
+          },
+          "1": {
+            "label": "An einer Tür in Fenbridge angeklopft"
+          },
+          "2": {
+            "label": "An einer Tür in Highwatch angeklopft"
+          }
+        }
+      },
+      "q_gourdlight_daily_feathers": {
+        "title": "Federn fürs Feuer",
+        "text": "Wenn der Alte Thatchgrin bedrängt wird, ruft er seine Krähen auf diejenigen herab, die auf sein Stroh einschlagen. Ihre Federn brennen im Herd grün, und ich brauche drei für das heutige Freudenfeuer. Suche einen Kampf auf seinem Acker, {playerName}, und zupfe sie seinen Krähen aus.",
+        "completion": "Schwarz wie ein Feld ohne Mond, und sie riechen schon nach Rauch. Das Freudenfeuer wird ein Anblick. Danke.",
+        "objectives": {
+          "0": {
+            "label": "Krähenfedern"
+          }
+        }
+      },
+      "q_gourdlight_daily_baskets": {
+        "title": "Körbe für die Nachbarn",
+        "text": "Jede Kürbislichtnacht fülle ich in jeder Stadt einen Korb Süßigkeiten für einen alten Freund, und meine Knie sind nicht mehr die besten. Bring sie für mich herum, {playerName}: zu Koch Marlow in Eastbrook, zu Kräuterkundige Yara in Fenbridge und zu Lehrmeister Caddis oben in Highwatch.",
+        "completion": "Alle drei abgeliefert, und ich höre, Marlow hat geweint. Er weint immer. Hier ist ein Korb für dich.",
+        "objectives": {
+          "0": {
+            "label": "Korb bei Koch Marlow abgegeben"
+          },
+          "1": {
+            "label": "Korb bei Kräuterkundige Yara abgegeben"
+          },
+          "2": {
+            "label": "Korb bei Lehrmeister Caddis abgegeben"
           }
         }
       },

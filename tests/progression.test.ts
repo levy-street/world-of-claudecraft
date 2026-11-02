@@ -6,6 +6,7 @@ import { describe, expect, it } from 'vitest';
 import { CHOICE_ROW_LEVELS, CHOICE_ROWS } from '../src/sim/content/choice_rows';
 import { FACTION_VENDOR_GATES } from '../src/sim/content/faction_vendors';
 import { FARM_CROPS } from '../src/sim/content/farm_crops';
+import { CURSED_CANDLE_ID, PATCH_PUMPKIN_ID } from '../src/sim/content/gourdlight_eve_dailies';
 import {
   ABILITIES,
   ALL_RECIPES,
@@ -35,7 +36,9 @@ import { terrainHeight, WATER_LEVEL } from '../src/sim/world';
 import { WORLD_BOSSES } from '../src/sim/world_boss';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
-const SCRIPTED_COLLECT_ITEMS = new Set(['the_codfather']);
+// Scripted sources: the Codfather's catch, and Gourdlight Eve's patch pumpkins and cursed
+// candles, which the open event lays out as ground objects (src/sim/seasonal/gourdlight_dailies.ts).
+const SCRIPTED_COLLECT_ITEMS = new Set(['the_codfather', PATCH_PUMPKIN_ID, CURSED_CANDLE_ID]);
 
 // The complete set of ways a collect-objective item can legitimately enter a
 // player's bags. The mob-loot / ground-object / scripted trio is the original
@@ -246,6 +249,8 @@ describe('content referential integrity', () => {
         else if (
           !ITEMS[itemId].buyValue &&
           !ITEMS[itemId].priceHonor &&
+          // a seasonal keeper's row is priced in the event's token (priceItem)
+          !((ITEMS[itemId].priceItem?.count ?? 0) > 0) &&
           !((FACTION_VENDOR_GATES[itemId]?.currencyCost ?? 0) > 0)
         )
           problems.push(`${npc.id}: vendor item ${itemId} has no purchase price`);

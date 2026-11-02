@@ -88,6 +88,8 @@ interface FloorVfxModule {
 
 /** Every module that draws floor-anchored VFX, and the band it belongs to. */
 const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
+  { file: 'src/render/scarecrow_fx.ts', layer: 'encounter', strict: true },
+  { file: 'src/render/seasonal_toys_fx.ts', layer: 'ground', strict: true },
   // the world's own marks
   { file: 'src/render/blob_shadows.ts', layer: 'ground', strict: true },
   { file: 'src/render/mob_night_glow.ts', layer: 'ground', strict: true },
@@ -437,6 +439,9 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
  * otherwise, so a floor mechanic cannot ship outside the ladder unnoticed.
  */
 const FLOOR_VFX_OUT_OF_SCOPE: readonly string[] = [
+  // the seasonal candle halos: camera-facing sprites at a candle's height, never on
+  // the floor (their ground pools take the floor ladder through floorVfxRenderOrder)
+  'src/render/seasonal_decor_lights.ts',
   // pooled ability VFX families that stand up from the ground
   'src/render/ability_vfx/flipbooks.ts',
   'src/render/ability_vfx/overlay_sprites.ts',

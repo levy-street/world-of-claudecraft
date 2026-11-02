@@ -2310,6 +2310,7 @@ export const gfxInternalsForTest = {
 // re-graded by the interior light rig (warm ember in the Ignivar forge).
 export const sharedUniforms = {
   uTime: { value: 0 },
+  uDayNight: { value: new THREE.Vector3(1, 1, 1) },
   uRimBoost: { value: 1 },
   uRimColor: { value: new THREE.Color(RIM_GLOW_DEFAULT_COLOR) },
   /** Hemisphere-irradiance multiplier for the Lambert terrain under the

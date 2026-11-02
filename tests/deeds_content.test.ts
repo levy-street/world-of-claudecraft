@@ -153,7 +153,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 346, 3810.
     // + Lantern Hall (the Highwatch guild): three contract milestones (5, 10, 25) and the
     // quartermaster's three zero-Renown title feats: 352, 3850.
-    expect(DEED_ORDER.length).toBe(359);
+    expect(DEED_ORDER.length).toBe(369);
     expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(4010);
   });
 
@@ -207,7 +207,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // +1 the release's ferry round trip (exp_harbor_to_harbor).
       exploration: 23,
       // +3 Lantern Hall's quartermaster titles (bought for Lantern Seals).
-      feat: 6,
+      feat: 16,
       hidden: 10,
     });
   });
@@ -478,6 +478,21 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'feat_guild_hallsworn',
       'feat_guild_of_lantern_hall',
       // The sixth lifetime-XP rung (10,000,000 lifetime XP, the Titan title).
+      // Gourdlight Eve's seasonal Feat (content/gourdlight_eve.ts).
+      // ...and its field boss's (content/gourdlight_eve_scarecrow.ts).
+      // ...and the three title writs Hester sells (GOURDLIGHT_TITLE_WRITS).
+      // ...and the Haunted Pumpkin hunt's completion Feat.
+      // ...and the whole-event checklist (round 12): three sections, then the meta.
+      'feat_gourdlight_guise',
+      'feat_old_thatchgrin',
+      'feat_title_gourdlit',
+      'feat_title_trickster',
+      'feat_title_hollow_grinned',
+      'feat_pumpkin_hunter',
+      'feat_gourdlight_doorsteps',
+      'feat_gourdlight_errands',
+      'feat_gourdlight_frights',
+      'feat_gourdlight_eve_complete',
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -861,7 +876,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     });
   });
 
-  it('ships exactly 46 titles and 4 borders', () => {
+  it('ships exactly 56 titles and 4 borders', () => {
     const titles = ALL.filter((d) => d.reward?.kind === 'title');
     const borders = ALL.filter((d) => d.reward?.kind === 'border');
     // Reliquary Curator ranks append 3 titles + 1 border, the WARFARE honor
@@ -876,11 +891,11 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // three more, and the Clue Scroll tenth-casket title (Treasure Hunter)
     // one more, and the Drowned Temple lore guide's Witness of the Choir
     // (dgn_drowned_temple_cantor) one more, and Lantern Hall's quartermaster three more.
-    expect(titles.length).toBe(61);
+    expect(titles.length).toBe(66);
     expect(borders.length).toBe(4);
     // Titles and border slugs are unique (one deed per cosmetic).
     const titleTexts = titles.map((d) => (d.reward as { text: string }).text);
-    expect(new Set(titleTexts).size).toBe(61);
+    expect(new Set(titleTexts).size).toBe(66);
     const borderSlugs = borders.map((d) => (d.reward as { slug: string }).slug);
     expect([...borderSlugs].sort()).toEqual([
       'curators_gilt',
@@ -1122,7 +1137,8 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // the auditable way (the 9e4d4f50... literal rotated down into PRE_APPEND_CATALOG_SHA256).
   // Release merge: retain the release catalogue first and append integration's
   // 33 deeds. Stripping them reproduces the release's frozen digest below.
-  const FROZEN_CATALOG_SHA256 = 'f0b1e522f87715f2ffbf812095ea6fb172aa9116d57c706a9fe65f945b1b482d';
+  // Main's frozen catalog is preserved as the prefix; Halloween appends ten feats.
+  const FROZEN_CATALOG_SHA256 = '6209fd36c03fe4f3d6c8a4ba2966d04b4ba0ba2c21128b82db589c50e24697b2';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -1204,41 +1220,18 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // The hard Wisp Maze deed now appends after the World PvP title ladder.
   // Stripping it reproduces the previous 325-deed mint.
   const PRE_APPEND_CATALOG_SHA256 =
-    '848807438e0f05d13e50dc1a90d48ec07ce80a4d3942b6e2ca8cf5a8ccde9575';
+    'f0b1e522f87715f2ffbf812095ea6fb172aa9116d57c706a9fe65f945b1b482d';
   const APPENDED_SINCE: readonly string[] = [
-    'cmb_balgath',
-    'cmb_balgath_ten',
-    'cmb_point_taken',
-    'dgn_olen_buttress',
-    'dgn_ossick_moored',
-    'dgn_vael_beacon',
-    'dgn_turretback',
-    'dgn_selthe_pitch',
-    'dgn_colossus_mirror',
-    'dgn_ysolei_high_and_dry',
-    'dgn_mere_hydra',
-    'dgn_crypt_knellwyrm',
-    'dgn_turnkey_cage',
-    'dgn_beastmaster_apart',
-    'dgn_gorgebloom_clean',
-    'dgn_zulgar_uncaught',
-    'dgn_great_saurian',
-    'dgn_korgath_all_chains',
-    'dgn_korgath_still_bound',
-    'dgn_velkhar_cold',
-    'dgn_korzul_thin_ice',
-    'dgn_sledge_tusker',
-    'dgn_drowned_temple_cantor',
-    'dgn_marrow_tidy',
-    'dgn_lady_nobody_hanging',
-    'dgn_ilvane_hush',
-    'dgn_morthen_candlelight',
-    'dgn_guild_first_contract',
-    'dgn_guild_ten_contracts',
-    'dgn_guild_fifty_contracts',
-    'feat_guild_writ_runner',
-    'feat_guild_hallsworn',
-    'feat_guild_of_lantern_hall',
+    'feat_gourdlight_guise',
+    'feat_old_thatchgrin',
+    'feat_title_gourdlit',
+    'feat_title_trickster',
+    'feat_title_hollow_grinned',
+    'feat_pumpkin_hunter',
+    'feat_gourdlight_doorsteps',
+    'feat_gourdlight_errands',
+    'feat_gourdlight_frights',
+    'feat_gourdlight_eve_complete',
   ];
 
   it('the catalog minus the ids appended since the previous mint reproduces the previous digest', () => {
@@ -1250,8 +1243,8 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
     // the ferry round trip. Pin the two predecessors too: an append into a known seat,
     // never a scattered insert or a retro-edit (the digest below proves it).
     expect(DEED_ORDER.slice(-2 - APPENDED_SINCE.length)).toEqual([
-      'pvp_flag_168h',
-      'exp_wisp_maze_hard',
+      'feat_guild_hallsworn',
+      'feat_guild_of_lantern_hall',
       ...APPENDED_SINCE,
     ]);
     const priorRows = DEED_ORDER.filter((id) => !appended.has(id)).map((id) => {
@@ -1482,11 +1475,12 @@ describe('table shape', () => {
     // Mirefen world-boss branch's three combat deeds, then (v0.45.0 integration) the
     // five-dungeon rework's 24, Morthen's Every Candle Lit, then Lantern Hall's six, the
     // quartermaster's third title last.
-    expect(DEED_ORDER[DEED_ORDER.length - 41]).toBe('exp_harbor_to_harbor');
-    expect(DEED_ORDER[DEED_ORDER.length - 32]).toBe('cmb_balgath_ten');
-    expect(DEED_ORDER[DEED_ORDER.length - 31]).toBe('cmb_point_taken');
-    expect(DEED_ORDER[DEED_ORDER.length - 7]).toBe('dgn_morthen_candlelight');
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('feat_guild_of_lantern_hall');
+    expect(DEED_ORDER[DEED_ORDER.length - 51]).toBe('exp_harbor_to_harbor');
+    expect(DEED_ORDER[DEED_ORDER.length - 42]).toBe('cmb_balgath_ten');
+    expect(DEED_ORDER[DEED_ORDER.length - 41]).toBe('cmb_point_taken');
+    expect(DEED_ORDER[DEED_ORDER.length - 17]).toBe('dgn_morthen_candlelight');
+    expect(DEED_ORDER[DEED_ORDER.length - 11]).toBe('feat_guild_of_lantern_hall');
+    expect(DEED_ORDER.at(-1)).toBe('feat_gourdlight_eve_complete');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {
@@ -1851,6 +1845,14 @@ describe('trigger references resolve against the real content tables', () => {
       'exp_clue_first_casket:Treasure Casket',
       'feat_brightwood_relic:Bramblehide Jerkin',
       "feat_brightwood_relic:Monarch's Crown",
+      // Reviewed at Gourdlight Eve: the seasonal Feat's trigger is exactly the
+      // carved_pumpkin_head item, so naming the Carved Pumpkin Head is right.
+      'feat_gourdlight_guise:Carved Pumpkin Head',
+      // Reviewed at Gourdlight Eve phase 3: each title Feat is granted by reading
+      // exactly the writ its desc names (GOURDLIGHT_TITLE_WRITS maps writ to deed).
+      'feat_title_gourdlit:Writ of the Gourdlit',
+      'feat_title_hollow_grinned:Writ of the Hollow Grin',
+      'feat_title_trickster:Writ of the Trickster',
       'hid_codfather:The Codfather',
       // Reviewed at masterwrought Phase 13: the promotion capstone's desc
       // names the Deed of Making, and resolvePerfectingAttempt's promotion branch really does

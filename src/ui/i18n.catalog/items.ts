@@ -3935,6 +3935,41 @@ const ITEM_ENTITY_IDS = [
   'vanguard_pendant_of_precision',
   'vanguard_pendant_of_focus',
   'vanguard_pendant_of_mending',
+  // Gourdlight Eve, the autumn seasonal event (content/gourdlight_eve.ts),
+  // appended under the same append-only contract, resolved BY KEY.
+  'gourdlight_sweet',
+  'gourdlight_treat_pouch',
+  'carved_pumpkin_head',
+  'jar_of_mischief',
+  // Old Thatchgrin's spoils (content/gourdlight_eve_scarecrow.ts).
+  'thatchgrin_sweet_sack',
+  'strawling_charm',
+  // Gourdlight Eve's shop additions and Old Thatchgrin's broom (content/gourdlight_eve.ts).
+  'rattlebone_draught',
+  'haunting_draught',
+  'batwing_draught',
+  'writ_of_the_gourdlit',
+  'writ_of_the_trickster',
+  'writ_of_the_hollow_grin',
+  'reins_emberbristle_broom',
+  // Gourdlight Eve's candy shelf (content/gourdlight_eve.ts GOURDLIGHT_CANDIES).
+  'hearthroot_toffee',
+  'gourdseed_brittle',
+  'crabapple_chew',
+  'owlwatch_fudge',
+  'lantern_mint_drop',
+  // Old Thatchgrin's daily broom token (content/gourdlight_eve.ts GOURDLIGHT_SHEAF_ID).
+  'emberwoven_sheaf',
+  // Hester's toys (content/gourdlight_eve.ts GOURDLIGHT_TOYS).
+  'prankers_pumpkin',
+  'wanderwisp_lantern',
+  'sack_of_startled_bats',
+  'murmurwick_candle',
+  'gurglegreen_cauldron',
+  // Gourdlight Eve's rotating dailies (content/gourdlight_eve_dailies.ts).
+  'thatchgrin_patch_pumpkin',
+  'cursed_candle_stub',
+  'gourdlight_crow_feather',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -3944,6 +3979,40 @@ type ItemEntityTranslation = { name: string };
 type ItemEntityTranslations = Record<ItemEntityId, ItemEntityTranslation>;
 
 const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
+  // Gourdlight Eve (content/gourdlight_eve.ts).
+  gourdlight_sweet: 'Gourdlight Sweet',
+  gourdlight_treat_pouch: 'Gourdlight Treat Pouch',
+  carved_pumpkin_head: 'Carved Pumpkin Head',
+  jar_of_mischief: 'Jar of Mischief',
+  // Old Thatchgrin (content/gourdlight_eve_scarecrow.ts).
+  thatchgrin_sweet_sack: "Thatchgrin's Sweet Sack",
+  strawling_charm: 'Strawling Charm',
+  // Gourdlight Eve's shop additions and the broom (content/gourdlight_eve.ts).
+  rattlebone_draught: 'Rattlebone Draught',
+  haunting_draught: 'Haunting Draught',
+  batwing_draught: 'Fluttering Draught',
+  writ_of_the_gourdlit: 'Writ of the Gourdlit',
+  writ_of_the_trickster: 'Writ of the Trickster',
+  writ_of_the_hollow_grin: 'Writ of the Hollow Grin',
+  reins_emberbristle_broom: 'Emberbristle Broom',
+  // Gourdlight Eve's candy shelf (content/gourdlight_eve.ts).
+  hearthroot_toffee: 'Hearthroot Toffee',
+  gourdseed_brittle: 'Gourdseed Brittle',
+  crabapple_chew: 'Crabapple Chew',
+  owlwatch_fudge: 'Owlwatch Fudge',
+  lantern_mint_drop: 'Lantern Mint Drop',
+  // Old Thatchgrin's daily broom token (content/gourdlight_eve.ts).
+  emberwoven_sheaf: 'Emberwoven Sheaf',
+  // Hester's toys (content/gourdlight_eve.ts GOURDLIGHT_TOYS).
+  prankers_pumpkin: "Pranker's Pumpkin",
+  wanderwisp_lantern: 'Wanderwisp Lantern',
+  sack_of_startled_bats: 'Sack of Startled Bats',
+  murmurwick_candle: 'Murmurwick Candle',
+  gurglegreen_cauldron: 'Gurglegreen Cauldron',
+  // Gourdlight Eve's rotating dailies (content/gourdlight_eve_dailies.ts).
+  thatchgrin_patch_pumpkin: 'Patch Pumpkin',
+  cursed_candle_stub: 'Cursed Candle Stub',
+  gourdlight_crow_feather: 'Gourdlight Crow Feather',
   // Mirefen world-boss spoils.
   foremans_barrowmaul: "Foreman's Barrowmaul",
   // The quest tool the world boss's level-spread mechanic runs on, not a spoil.

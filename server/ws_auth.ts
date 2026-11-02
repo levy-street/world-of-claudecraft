@@ -660,6 +660,7 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
         // against a clock it has not started.
         noteClientFrame(ws);
         ws.on('message', (data) => {
+          if (session.ws !== ws) return;
           noteClientFrame(ws);
           game.handleMessage(session, String(data));
         });

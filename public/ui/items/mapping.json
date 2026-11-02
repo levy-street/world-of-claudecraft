@@ -8498,6 +8498,110 @@
         "vanguard_pendant_of_might",
         "vanguard_pendant_of_precision"
       ]
+    },
+    {
+      "batchId": "gourdlight-eve-icons-2026-10-16",
+      "source": "Rendered in Blender 5.2 from the deterministic Gourdlight Eve factory (scripts/assets/gourdlight_eve/icons.py): the Carved Pumpkin Head is the shipped in-game model (model.py), the sweet, the treat pouch and the jar are modelled in the same script for their icons. No text-to-image generation, no reference art.",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleReference": "woc-item-icon-v1: centred subject on an opaque dark painted ground, top-left key light",
+      "provenanceRecord": "scripts/assets/gourdlight_eve/icons.py",
+      "itemIds": [
+        "carved_pumpkin_head",
+        "gourdlight_sweet",
+        "gourdlight_treat_pouch",
+        "jar_of_mischief"
+      ],
+      "commonPrompt": "Not a text-to-image prompt: a 512px Eevee render of the modelled subject, then scripts/convert_item_icons_webp.mjs to the 128px WebP."
+    },
+    {
+      "batchId": "gourdlight-eve-thatchgrin-icons-2026-10-17",
+      "source": "Rendered in Blender 5.2 from the deterministic Gourdlight Eve factory (scripts/assets/gourdlight_eve/icons.py): Old Thatchgrin's sweet sack (the treat pouch's sackcloth shape with the shipped sweets) and the Strawling Charm (a straw doll built from the scarecrow factory's own straw, scripts/assets/gourdlight_eve/scarecrow.py), modelled in the same script for their icons. No text-to-image generation, no reference art.",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleReference": "woc-item-icon-v1: centred subject on an opaque dark painted ground, top-left key light",
+      "provenanceRecord": "scripts/assets/gourdlight_eve/icons.py",
+      "itemIds": [
+        "strawling_charm",
+        "thatchgrin_sweet_sack"
+      ],
+      "commonPrompt": "Not a text-to-image prompt: a 512px Eevee render of the modelled subject, then scripts/convert_item_icons_webp.mjs to the 128px WebP."
+    },
+    {
+      "batchId": "gourdlight-eve-shop-and-broom-icons-2026-10-17",
+      "source": "Rendered in Blender 5.2 from the deterministic Gourdlight Eve factory (scripts/assets/gourdlight_eve/icons.py): the three costume draughts (a glass flask with a skull, wisp or bat charm), the three title writs (a sealed parchment roll) and the Emberbristle Broom's reins (the shipped broom model itself, appended from scripts/assets/gourdlight_eve/broom.py). No text-to-image generation, no reference art.",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleReference": "woc-item-icon-v1: centred subject on an opaque dark painted ground, top-left key light",
+      "provenanceRecord": "scripts/assets/gourdlight_eve/icons.py",
+      "itemIds": [
+        "batwing_draught",
+        "haunting_draught",
+        "rattlebone_draught",
+        "reins_emberbristle_broom",
+        "writ_of_the_gourdlit",
+        "writ_of_the_hollow_grin",
+        "writ_of_the_trickster"
+      ],
+      "commonPrompt": "Not a text-to-image prompt: a 512px Eevee render of the modelled subject, then scripts/convert_item_icons_webp.mjs to the 128px WebP."
+    },
+    {
+      "batchId": "gourdlight-eve-candy-icons-2026-10-18",
+      "source": "Rendered in Blender 5.2 from the deterministic Gourdlight Eve factory (scripts/assets/gourdlight_eve/icons.py with candies.py): Hester's five candies (a toffee stack on red paper, a seed brittle slab, a caramel crabapple on a twig, an owl-faced fudge square and a glowing mint drop), modelled for their icons only. No text-to-image generation, no reference art.",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleReference": "woc-item-icon-v1: centred subject on an opaque dark painted ground, top-left key light",
+      "provenanceRecord": "scripts/assets/gourdlight_eve/candies.py",
+      "itemIds": [
+        "crabapple_chew",
+        "gourdseed_brittle",
+        "hearthroot_toffee",
+        "lantern_mint_drop",
+        "owlwatch_fudge"
+      ],
+      "commonPrompt": "Not a text-to-image prompt: a 512px Eevee render of the modelled subject, then scripts/convert_item_icons_webp.mjs to the 128px WebP."
+    },
+    {
+      "batchId": "gourdlight-eve-sheaf-icon-2026-10-18",
+      "source": "Rendered in Blender 5.2 from the deterministic Gourdlight Eve factory (scripts/assets/gourdlight_eve/icons.py): the Emberwoven Sheaf, a bundle of straw built from the scarecrow factory's own straw (scripts/assets/gourdlight_eve/scarecrow.py), bound with the event's orange ribbon in a bow, embers caught in it and a glow kindled at its heart, modelled for its icon only. No text-to-image generation, no reference art.",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleReference": "woc-item-icon-v1: centred subject on an opaque dark painted ground, top-left key light",
+      "provenanceRecord": "scripts/assets/gourdlight_eve/icons.py",
+      "itemIds": [
+        "emberwoven_sheaf"
+      ],
+      "commonPrompt": "Not a text-to-image prompt: a 512px Eevee render of the modelled subject, then scripts/convert_item_icons_webp.mjs to the 128px WebP."
+    },
+    {
+      "batchId": "gourdlight-eve-daily-icons-2026-10-18",
+      "source": "Rendered in Blender 5.2 from the deterministic Gourdlight Eve factory (scripts/assets/gourdlight_eve/icons.py with daily_icons.py): a stray patch pumpkin built on the factory's own ribbed gourd with a vine, leaf and straw, a cursed candle stub of grey-green wax with a cold green flame on an iron dish, and a glossy black crow feather with an ember at its tip, each modelled for its icon only. No text-to-image generation, no reference art.",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleReference": "woc-item-icon-v1: centred subject on an opaque dark painted ground, top-left key light",
+      "provenanceRecord": "scripts/assets/gourdlight_eve/daily_icons.py",
+      "itemIds": [
+        "thatchgrin_patch_pumpkin",
+        "cursed_candle_stub",
+        "gourdlight_crow_feather"
+      ],
+      "commonPrompt": "Not a text-to-image prompt: a 512px Eevee render of the modelled subject, then scripts/convert_item_icons_webp.mjs to the 128px WebP."
+    },
+    {
+      "batchId": "gourdlight-eve-toy-icons-2026-10-18",
+      "source": "Rendered in Blender 5.2 from the deterministic Gourdlight Eve factory (scripts/assets/gourdlight_eve/icons.py with toy_icons.py): Hester's five toys, each modelled for its icon only: a small carved pumpkin with a fanged grin, a green bow and pulp on its chin; a little iron lantern with a tiny ghost inside its pale glass; a burlap sack with three bats bursting out; three green-flamed candles on an iron dish in a ring of mist; and (round 10, in place of the play broom) a squat iron cauldron brimming with a glowing green brew, steam curling up and embers beneath. No text-to-image generation, no reference art.",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleReference": "woc-item-icon-v1: centred subject on an opaque dark painted ground, top-left key light",
+      "provenanceRecord": "scripts/assets/gourdlight_eve/toy_icons.py",
+      "itemIds": [
+        "prankers_pumpkin",
+        "wanderwisp_lantern",
+        "sack_of_startled_bats",
+        "murmurwick_candle",
+        "gurglegreen_cauldron"
+      ],
+      "commonPrompt": "Not a text-to-image prompt: a 512px Eevee render of the modelled subject, then scripts/convert_item_icons_webp.mjs to the 128px WebP."
     }
   ]
 }

@@ -30,11 +30,14 @@ export const WORLD_PVP_BOUNTY_KILL_HONOR_MULT = 2;
 export const WORLD_PVP_BOUNTY_HOLDER_DR = [1.5, 1, 0.5, 0] as const;
 
 /** The honor pool one world kill splits among its contributors: doubled when
- *  the victim carried a bounty at the moment of death. */
-export function worldPvpKillHonorPool(victimHadBounty: boolean): number {
-  return victimHadBounty
-    ? WORLD_PVP_KILL_HONOR * WORLD_PVP_BOUNTY_KILL_HONOR_MULT
-    : WORLD_PVP_KILL_HONOR;
+ *  the victim carried a bounty at the moment of death. `base` is the pool
+ *  before the bounty: the plain world kill, or a hill kill's own bounty
+ *  (hill_bounty.ts), so the two bounties stack (owner call 2026-10-27). */
+export function worldPvpKillHonorPool(
+  victimHadBounty: boolean,
+  base: number = WORLD_PVP_KILL_HONOR,
+): number {
+  return victimHadBounty ? base * WORLD_PVP_BOUNTY_KILL_HONOR_MULT : base;
 }
 
 /** The per-pair multiplier for a bounty HOLDER who has already been paid

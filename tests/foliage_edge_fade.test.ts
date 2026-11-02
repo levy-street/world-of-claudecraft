@@ -107,4 +107,19 @@ describe('foliage edge fade', () => {
     // the toe is monotonic: d/dY of Y + L*(1 - Y/K)^2 stays positive
     expect(1 - (2 * FOLIAGE_DARK_LIFT) / FOLIAGE_DARK_KNEE).toBeGreaterThan(0);
   });
+
+  it('shares customProgramCacheKey across distinct materials with identical parameters', () => {
+    const a = scene('Leaves_dg_pine');
+    const b = scene('Leaves_dg_pine');
+    expect(a.mat.uuid).not.toBe(b.mat.uuid);
+    applyFoliageEdgeFade(a.root);
+    applyFoliageEdgeFade(b.root);
+    expect(a.mat.customProgramCacheKey()).toBe(b.mat.customProgramCacheKey());
+    attachPlacedTreeSway(a.root, 0, 10, 'tree');
+    attachPlacedTreeSway(b.root, 0, 10, 'tree');
+    expect(a.mat.customProgramCacheKey()).toBe(b.mat.customProgramCacheKey());
+    detachPlacedTreeSway(a.root);
+    detachPlacedTreeSway(b.root);
+    expect(a.mat.customProgramCacheKey()).toBe(b.mat.customProgramCacheKey());
+  });
 });

@@ -9,6 +9,7 @@ import {
   type TelegraphPaint,
 } from '../floor_telegraph';
 import { GFX, gfxTierAtLeast, sharedUniforms } from '../gfx';
+import { VisibleChildrenGroup } from '../visible_children_group';
 import { BastionGhostDischarge } from './bastion_ghost_discharge';
 import {
   GHOST_FX_SLOTS,
@@ -66,7 +67,7 @@ void main() {
 `;
 
 export class BastionGhostFx {
-  private readonly root = new THREE.Group();
+  private readonly root = new VisibleChildrenGroup();
   private readonly kit: TelegraphKit;
   private readonly lanes: LaneSlot[] = [];
   private readonly souls: SoulSlot[] = [];

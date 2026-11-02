@@ -1441,6 +1441,51 @@ export const table: DeedLocaleTable = {
     desc: "Acheté auprès de Garrick Holt, l'intendant du Hall de la Lanterne, pour 24 Sceaux de lanterne.",
     title: 'du Hall de la Lanterne',
   },
+  feat_gourdlight_guise: {
+    name: 'Déguisement de la Veillée des courges',
+    desc: 'Possédez une Tête de citrouille sculptée, prise au Vieux Thatchgrin dans son champ au-delà du Pré aux sangliers pendant la Veillée des courges.',
+  },
+  feat_old_thatchgrin: {
+    name: 'Chaume et cendres',
+    desc: 'Aidez à vaincre le Vieux Thatchgrin dans son potager de citrouilles au-delà du Pré aux sangliers pendant la Veillée des courges.',
+  },
+  feat_title_gourdlit: {
+    name: 'L’Illuminé des courges',
+    desc: 'Lisez un Brevet de l’Illuminé des courges, échangé auprès de Hester Gourdwick contre des Friandises de la Veillée des courges pendant l’événement.',
+    title: 'l’Illuminé des courges',
+  },
+  feat_title_trickster: {
+    name: 'Farceur',
+    desc: 'Lisez un Brevet du Farceur, échangé auprès de Hester Gourdwick contre des Friandises de la Veillée des courges pendant l’événement.',
+    title: 'Farceur',
+  },
+  feat_title_hollow_grinned: {
+    name: 'Le Sourire creux',
+    desc: 'Lisez un Brevet du Sourire creux, échangé auprès de Hester Gourdwick contre des Friandises de la Veillée des courges pendant l’événement.',
+    title: 'au Sourire creux',
+  },
+  feat_pumpkin_hunter: {
+    name: 'Chasseur de citrouilles',
+    desc: 'Trouvez toutes les Citrouilles hantées cachées dans le monde pendant la Veillée des courges.',
+    title: 'le Creux',
+  },
+  feat_gourdlight_doorsteps: {
+    name: 'Tous les seuils',
+    desc: 'Demandez des bonbons ou un sort à chaque habitant qui répond à la porte à Eastbrook, Fenbridge et Highwatch pendant la Veillée des courges.',
+  },
+  feat_gourdlight_errands: {
+    name: 'Aux petits soins de Hester',
+    desc: 'Terminez au moins une fois chacune des courses tournantes de Hester Gourdwick pour la Veillée des courges.',
+  },
+  feat_gourdlight_frights: {
+    name: 'Trois villes effrayées',
+    desc: 'Pendant la course Bouh ! de Hester, effrayez un habitant dans chacune des villes d’Eastbrook, de Fenbridge et de Highwatch.',
+  },
+  feat_gourdlight_eve_complete: {
+    name: 'La Veillée des courges de bout en bout',
+    desc: 'Accomplissez toute la Veillée des courges : vainquez le Vieux Thatchgrin, trouvez toutes les Citrouilles hantées, terminez chaque course de Hester, frappez à toutes les portes et effrayez un habitant dans chacune des trois villes.',
+    title: 'le Fidèle des courges',
+  },
 };
 
 // fr_CA rides this base table plus the delve-vocabulary override layer

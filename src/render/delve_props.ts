@@ -42,16 +42,12 @@ const STANDALONE_PROP_URL = {
 } as const;
 type StandalonePropKey = keyof typeof STANDALONE_PROP_URL;
 const loadedStandaloneProp = new Map<StandalonePropKey, THREE.Group>();
+let delvePropAssetsPromise: Promise<void> | null = null;
 
-if (typeof window !== 'undefined') {
-  // stoneMat below keys its material on the shared stone detail normal, and a
-  // texture SLOT is a program-cache-key input: a mass built while it is still
-  // null carries normalMap absent and links a second variant nothing warmed.
-  // The prepare memoizes, so registering it in THIS module's preload costs one
-  // resolved promise and makes the dependency explicit where the key is formed.
-  registerDeferredPreload(() => prepareStoneDetailProfileAssets(GFX));
-  for (const [key, url] of Object.entries(STANDALONE_PROP_URL) as [StandalonePropKey, string][]) {
-    registerDeferredPreload(() =>
+export function ensureDelvePropAssets(): Promise<void> {
+  if (typeof window === 'undefined') return Promise.resolve();
+  delvePropAssetsPromise ??= Promise.all(
+    (Object.entries(STANDALONE_PROP_URL) as [StandalonePropKey, string][]).map(([key, url]) =>
       loadGltf(url).then((gltf) => {
         // Per-view clones share this cached original's geometry and materials
         // by reference; tag both shared so the renderer's per-view disposal
@@ -66,8 +62,23 @@ if (typeof window !== 'undefined') {
         });
         loadedStandaloneProp.set(key, gltf.scene);
       }),
-    );
-  }
+    ),
+  )
+    .then(() => undefined)
+    .catch((err) => {
+      delvePropAssetsPromise = null;
+      throw err;
+    });
+  return delvePropAssetsPromise;
+}
+
+if (typeof window !== 'undefined') {
+  // stoneMat below keys its material on the shared stone detail normal, and a
+  // texture SLOT is a program-cache-key input: a mass built while it is still
+  // null carries normalMap absent and links a second variant nothing warmed.
+  // The prepare memoizes, so registering it in THIS module's preload costs one
+  // resolved promise and makes the dependency explicit where the key is formed.
+  registerDeferredPreload(() => prepareStoneDetailProfileAssets(GFX));
 }
 
 /** Test-only window into the preload asset set (mirrors props.ts). */
@@ -78,7 +89,10 @@ export const delvePropsPreloadInternalsForTest = { standalonePropUrl: STANDALONE
 // sit at y=0). Returns null if the asset has not finished preloading yet.
 function buildStandaloneGlb(key: StandalonePropKey, targetHeight: number): THREE.Group | null {
   const src = loadedStandaloneProp.get(key);
-  if (!src) return null;
+  if (!src) {
+    void ensureDelvePropAssets().catch(() => undefined);
+    return null;
+  }
   const inst = src.clone(true);
   inst.traverse((child) => {
     if (child instanceof THREE.Mesh) {

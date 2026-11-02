@@ -68,6 +68,19 @@ const DUNGEON_ENV_INTENSITY = 0.05;
 const DUNGEON_HEMI_INTENSITY = 0.22; // floor of readability, bosses crushed to black at 0.14
 // character rim glow scales up underground so silhouettes split from the murk
 const DUNGEON_RIM_BOOST = 2.4;
+const DUNGEON_SUN_COLOR = 0xe8dec8;
+const DUNGEON_HEMI_SKY_COLOR = 0x8a8298;
+const DUNGEON_HEMI_GROUND_COLOR = 0x2a2420;
+// Nythraxis's sanctum is a vast 100x100 vaulted raid hall whose columns sit well
+// outside the low-tier point-light budget; give it its own consistent twilight-violet
+// key and hemisphere fill so the arena floor and bosses stay readable at any world hour.
+const NYTHRAXIS_SUN_INTENSITY = 0.92;
+const NYTHRAXIS_HEMI_INTENSITY = 0.58;
+const NYTHRAXIS_ENV_INTENSITY = 0.16;
+const NYTHRAXIS_RIM_BOOST = 2.4;
+const NYTHRAXIS_SUN_COLOR = 0xd6deff;
+const NYTHRAXIS_HEMI_SKY_COLOR = 0x7c8ab8;
+const NYTHRAXIS_HEMI_GROUND_COLOR = 0x2c2440;
 // The authored Infernal Citadel is larger than a procedural floor and carries
 // real budgeted brazier lights. A stronger ambient floor preserves the black-red
 // infernal grade while keeping its loops, bosses, and doors readable between pools.
@@ -75,6 +88,9 @@ const INFERNAL_SUN_INTENSITY = 0.54;
 const INFERNAL_HEMI_INTENSITY = 0.32;
 const INFERNAL_ENV_INTENSITY = 0.1;
 const INFERNAL_RIM_BOOST = 2.15;
+const INFERNAL_SUN_COLOR = 0xffc49a;
+const INFERNAL_HEMI_SKY_COLOR = 0xa86448;
+const INFERNAL_HEMI_GROUND_COLOR = 0x381c14;
 // The Protect Yumi maze is a torch-lit NIGHT ARENA, not a crypt: a moon-key
 // plus a healthy hemisphere keep the whole competitive space readable, with
 // the braziers/torches adding warmth rather than carrying the scene alone.
@@ -82,6 +98,9 @@ const YUMI_MAZE_SUN_INTENSITY = 1.32;
 const YUMI_MAZE_HEMI_INTENSITY = 0.38;
 const YUMI_MAZE_ENV_INTENSITY = 0.25;
 const YUMI_MAZE_RIM_BOOST = 1.7;
+const YUMI_MAZE_SUN_COLOR = 0xd8e2ff;
+const YUMI_MAZE_HEMI_SKY_COLOR = 0x7480a8;
+const YUMI_MAZE_HEMI_GROUND_COLOR = 0x2c2824;
 // The Wildheart Basin: an OPEN-AIR jungle caldera on a humid gold-green
 // afternoon, under its own sky (render/wildheart_basin). The one sun is the
 // key light, warm gold and low in the south-west behind the Idol Maw (so the
@@ -245,6 +264,11 @@ export interface OutdoorLightLegs {
   envIntensity: number;
 }
 
+/** Fixed overhead-and-south key direction for enclosed dungeons, raids, castles,
+ *  and the maze/rift so indoor floors and south-facing mob fronts never rotate
+ *  into grazing dawn/dusk or north-backlit night moonlight with the world clock. */
+export const INTERIOR_KEY_LIGHT_DIRECTION = new THREE.Vector3(0.32, 0.86, -0.4).normalize();
+
 /** Copy the state's own key-light direction into `out` when it has one; the
  *  outdoor sun and moon keep theirs otherwise. Returns whether it did. */
 export function interiorKeyLightDirection(state: FogSceneState, out: THREE.Vector3): boolean {
@@ -288,9 +312,27 @@ export function interiorKeyLightDirection(state: FogSceneState, out: THREE.Vecto
     out.copy(GRAVEWYRM_SANCTUM_KEY_DIRECTION);
     return true;
   }
-  if (state !== 'wildheartBasin') return false;
-  out.copy(WILDHEART_KEY_LIGHT_DIRECTION);
-  return true;
+  if (state === 'wildheartBasin') {
+    out.copy(WILDHEART_KEY_LIGHT_DIRECTION);
+    return true;
+  }
+  if (
+    state === 'dungeon' ||
+    state === 'temple' ||
+    state === 'nythraxis' ||
+    state === 'ignivarApproach' ||
+    state === 'ignivar' ||
+    state === 'varkhul' ||
+    state === 'delve' ||
+    state === 'yumiMaze' ||
+    state === 'rift' ||
+    state === 'lastkeep' ||
+    state === 'dawnhold'
+  ) {
+    out.copy(INTERIOR_KEY_LIGHT_DIRECTION);
+    return true;
+  }
+  return false;
 }
 
 /**
@@ -312,11 +354,12 @@ export function applyInteriorLightRig(
   const sanctumDusk = state === 'gravewyrmSanctum';
   const keepHearth = state === 'lastkeep';
   const dawnholdDay = state === 'dawnhold';
+  const nythraxisSanctum = state === 'nythraxis';
   const ignivarForge = state === 'ignivarApproach' || state === 'ignivar' || state === 'varkhul';
   const underground =
     state === 'dungeon' ||
     state === 'temple' ||
-    state === 'nythraxis' ||
+    nythraxisSanctum ||
     ignivarForge ||
     state === 'delve';
   targets.sun.intensity = mazeNight
@@ -335,9 +378,11 @@ export function applyInteriorLightRig(
                 ? LASTKEEP_SUN_INTENSITY
                 : dawnholdDay
                   ? DAWNHOLD_SUN_INTENSITY
-                  : underground
-                    ? DUNGEON_SUN_INTENSITY
-                    : outdoor.sunIntensity;
+                  : nythraxisSanctum
+                    ? NYTHRAXIS_SUN_INTENSITY
+                    : underground
+                      ? DUNGEON_SUN_INTENSITY
+                      : outdoor.sunIntensity;
   targets.hemi.intensity = mazeNight
     ? YUMI_MAZE_HEMI_INTENSITY
     : cryptMoon
@@ -354,9 +399,11 @@ export function applyInteriorLightRig(
                 ? LASTKEEP_HEMI_INTENSITY
                 : dawnholdDay
                   ? DAWNHOLD_HEMI_INTENSITY
-                  : underground
-                    ? DUNGEON_HEMI_INTENSITY
-                    : outdoor.hemiIntensity;
+                  : nythraxisSanctum
+                    ? NYTHRAXIS_HEMI_INTENSITY
+                    : underground
+                      ? DUNGEON_HEMI_INTENSITY
+                      : outdoor.hemiIntensity;
   targets.scene.environmentIntensity = mazeNight
     ? YUMI_MAZE_ENV_INTENSITY
     : cryptMoon
@@ -373,9 +420,11 @@ export function applyInteriorLightRig(
                 ? LASTKEEP_ENV_INTENSITY
                 : dawnholdDay
                   ? DAWNHOLD_ENV_INTENSITY
-                  : underground
-                    ? DUNGEON_ENV_INTENSITY
-                    : outdoor.envIntensity;
+                  : nythraxisSanctum
+                    ? NYTHRAXIS_ENV_INTENSITY
+                    : underground
+                      ? DUNGEON_ENV_INTENSITY
+                      : outdoor.envIntensity;
   targets.rim.value = mazeNight
     ? YUMI_MAZE_RIM_BOOST
     : cryptMoon
@@ -392,9 +441,11 @@ export function applyInteriorLightRig(
                 ? LASTKEEP_RIM_BOOST
                 : dawnholdDay
                   ? DAWNHOLD_RIM_BOOST
-                  : underground
-                    ? DUNGEON_RIM_BOOST
-                    : 1;
+                  : nythraxisSanctum
+                    ? NYTHRAXIS_RIM_BOOST
+                    : underground
+                      ? DUNGEON_RIM_BOOST
+                      : 1;
   // The rim tint defaults cool everywhere; the forge applier below re-grades
   // it, and setting it first means leaving the raid restores it in the same
   // settle that restores the legs.
@@ -437,6 +488,10 @@ export function applyInteriorLightRig(
     targets.sun.color.setHex(DAWNHOLD_SUN_COLOR);
     targets.hemi.color.setHex(DAWNHOLD_HEMI_SKY_COLOR);
     targets.hemi.groundColor.setHex(DAWNHOLD_HEMI_GROUND_COLOR);
+  } else if (nythraxisSanctum) {
+    targets.sun.color.setHex(NYTHRAXIS_SUN_COLOR);
+    targets.hemi.color.setHex(NYTHRAXIS_HEMI_SKY_COLOR);
+    targets.hemi.groundColor.setHex(NYTHRAXIS_HEMI_GROUND_COLOR);
   } else if (ignivarForge) {
     applyIgnivarRaidLighting(state as IgnivarRaidFogState, targets);
   } else if (
@@ -471,6 +526,14 @@ export function applyInteriorLightRig(
     targets.hemi.color.setHex(L.hemiSky);
     targets.hemi.groundColor.setHex(L.hemiGround);
     targets.rimColor.value.setHex(L.rimColor);
+  } else if (mazeNight) {
+    targets.sun.color.setHex(YUMI_MAZE_SUN_COLOR);
+    targets.hemi.color.setHex(YUMI_MAZE_HEMI_SKY_COLOR);
+    targets.hemi.groundColor.setHex(YUMI_MAZE_HEMI_GROUND_COLOR);
+  } else if (underground) {
+    targets.sun.color.setHex(DUNGEON_SUN_COLOR);
+    targets.hemi.color.setHex(DUNGEON_HEMI_SKY_COLOR);
+    targets.hemi.groundColor.setHex(DUNGEON_HEMI_GROUND_COLOR);
   }
 }
 
@@ -485,4 +548,9 @@ export function applyRiftLightRig(authored: boolean, targets: InteriorLightTarge
   targets.rim.value = authored ? INFERNAL_RIM_BOOST : DUNGEON_RIM_BOOST;
   targets.rimColor.value.setHex(RIM_GLOW_DEFAULT_COLOR);
   sharedUniforms.uRoofDarkStrength.value = 0;
+  targets.sun.color.setHex(authored ? INFERNAL_SUN_COLOR : DUNGEON_SUN_COLOR);
+  targets.hemi.color.setHex(authored ? INFERNAL_HEMI_SKY_COLOR : DUNGEON_HEMI_SKY_COLOR);
+  targets.hemi.groundColor.setHex(
+    authored ? INFERNAL_HEMI_GROUND_COLOR : DUNGEON_HEMI_GROUND_COLOR,
+  );
 }

@@ -333,6 +333,8 @@ export function updateMountPresentation(
           running,
           groundY,
         );
+      } else if (spec.fx === 'sparks') {
+        input.vfx.mountBroomSparks(v.group.position, input.facing, dt, input.moving);
       } else if (spec.fx === 'pipes' && v.mountSuspension) {
         // Piped exhaust rides the chassis matrix, so it keeps its place through
         // the body's pitch, roll and landing squat.

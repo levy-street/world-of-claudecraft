@@ -53,6 +53,7 @@ vi.mock('../server/db', () => ({
 import { GameServer, INTEREST_DROP_RADIUS } from '../server/game';
 import { ENTITY_VIEW_DESTROY_RANGE } from '../src/render/renderer';
 import { MAX_AGGRO_RADIUS } from '../src/sim/mob/aggro_ranges';
+import { shouldSkipIdleMobTick } from '../src/sim/mob/idle_tick_skip';
 import { Sim } from '../src/sim/sim';
 import { type Entity, PLAYER_INTEREST_DROP_RADIUS } from '../src/sim/types';
 
@@ -117,7 +118,10 @@ describe('idle-mob distance culling is wired into the production server (#2703)'
     if (!idleMob) throw new Error('expected a cull-eligible idle mob');
 
     const gridQuery = vi.spyOn(sim.playerGrid, 'hasInRadius');
-    const culling = sim as unknown as { shouldSkipIdleMobTick(entity: Entity): boolean };
+    // the predicate moved whole to mob/idle_tick_skip.ts (Gourdlight Eve round 12)
+    const culling = {
+      shouldSkipIdleMobTick: (entity: Entity) => shouldSkipIdleMobTick(sim.ctx, entity),
+    };
 
     expect(culling.shouldSkipIdleMobTick(idleMob)).toBe(true);
     expect(gridQuery).not.toHaveBeenCalled();
@@ -152,7 +156,10 @@ describe('idle-mob distance culling is wired into the production server (#2703)'
     const iteratorScan = vi.spyOn(sim.players, Symbol.iterator);
     const forEachScan = vi.spyOn(sim.players, 'forEach');
     const rosterIterations = [valuesScan, keysScan, entriesScan, iteratorScan, forEachScan];
-    const culling = sim as unknown as { shouldSkipIdleMobTick(entity: Entity): boolean };
+    // the predicate moved whole to mob/idle_tick_skip.ts (Gourdlight Eve round 12)
+    const culling = {
+      shouldSkipIdleMobTick: (entity: Entity) => shouldSkipIdleMobTick(sim.ctx, entity),
+    };
 
     expect(culling.shouldSkipIdleMobTick(farMob)).toBe(true);
     expect(gridQuery).toHaveBeenCalledTimes(1);

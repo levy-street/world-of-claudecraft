@@ -1363,4 +1363,49 @@ export const table: DeedLocaleTable = {
     desc: "Fener Salonu levazım subayı Garrick Holt'tan 24 Fener Mührü karşılığında satın alındı.",
     title: 'Fener Salonundan',
   },
+  feat_gourdlight_guise: {
+    name: 'Kabak Işığı Görünümü',
+    desc: "Kabak Işığı Gecesi sürerken, Yaban Domuzu Çayırı'nın ötesindeki tarlasında Yaşlı Sırıtan Saman'dan alınan bir Oyulmuş Kabak Başlığı'na sahip ol.",
+  },
+  feat_old_thatchgrin: {
+    name: 'Anız ve Kül',
+    desc: "Kabak Işığı Gecesi sürerken, Yaban Domuzu Çayırı'nın ötesindeki kabak tarlasında Yaşlı Sırıtan Saman'ı devirmeye yardım et.",
+  },
+  feat_title_gourdlit: {
+    name: 'Kabak Işıklı',
+    desc: "Kabak Işığı Gecesi sürerken Hester Kabakfitil'den Kabak Işığı Şekerleri karşılığında alınan Kabak Işıklı'nın Fermanı'nı oku.",
+    title: 'Kabak Işıklı',
+  },
+  feat_title_trickster: {
+    name: 'Şakacı',
+    desc: "Kabak Işığı Gecesi sürerken Hester Kabakfitil'den Kabak Işığı Şekerleri karşılığında alınan Şakacı Fermanı'nı oku.",
+    title: 'Şakacı',
+  },
+  feat_title_hollow_grinned: {
+    name: 'Boş Sırıtan',
+    desc: "Kabak Işığı Gecesi sürerken Hester Kabakfitil'den Kabak Işığı Şekerleri karşılığında alınan Boş Sırıtış Fermanı'nı oku.",
+    title: 'Boş Sırıtan',
+  },
+  feat_pumpkin_hunter: {
+    name: 'Kabak Avcısı',
+    desc: 'Kabak Işığı Gecesi boyunca dünyaya gizlenmiş tüm Perili Kabakları bul.',
+    title: 'İçi Boş',
+  },
+  feat_gourdlight_doorsteps: {
+    name: 'Her Kapının Eşiği',
+    desc: "Kabak Işığı Gecesi boyunca Doğudere, Bataklık Köprüsü ve Yüksek Gözcü'de kapısını açan tüm kasabalılardan şeker ya da şaka iste.",
+  },
+  feat_gourdlight_errands: {
+    name: "Hester'ın Her Emrine Hazır",
+    desc: "Hester Kabakfitil'in dönüşümlü Kabak Işığı Gecesi işlerinin her birini en az bir kez tamamla.",
+  },
+  feat_gourdlight_frights: {
+    name: 'Üç Kasaba Ürktü',
+    desc: "Hester'ın Böö! işinde Doğudere, Bataklık Köprüsü ve Yüksek Gözcü'nün her birinde bir kasabalıyı korkut.",
+  },
+  feat_gourdlight_eve_complete: {
+    name: 'Baştan Sona Kabak Işığı',
+    desc: "Kabak Işığı Gecesi'nin tamamını yap: Yaşlı Sırıtan Saman'ı devir, tüm Perili Kabakları bul, Hester'ın tüm işlerini bitir, her kapıyı çal ve üç kasabanın her birinde bir kasabalıyı korkut.",
+    title: 'Kabağa Yeminli',
+  },
 };

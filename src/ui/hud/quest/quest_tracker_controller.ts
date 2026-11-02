@@ -1,11 +1,12 @@
 import { CLUE_HUNTS_BY_ID } from '../../../sim/content/clue_hunts';
 import { WISP_MAZE_QUEST_ID } from '../../../sim/content/world_quest_wisp_maze';
-import { QUESTS, WORLD_QUESTS_BY_ID } from '../../../sim/data';
+import { QUESTS, WORLD_QUESTS_BY_ID, zoneAt } from '../../../sim/data';
 import { questObjectiveRequired } from '../../../sim/types';
 import { wispMazeActionsLocked } from '../../../sim/wisp_maze_action_lock';
 import { positionInWorldQuestArea } from '../../../sim/world_quest_area';
 import type { IWorld } from '../../../world_api';
 import { esc } from '../../esc';
+import { HAUNTED_PUMPKIN_TRACKER_ID, hauntedPumpkinTrackerRow } from '../../haunted_pumpkin_view';
 import { formatNumber, t } from '../../i18n';
 import { ownEntry } from '../../known_item';
 import type { PainterHostWriters } from '../../painter_host';
@@ -50,7 +51,12 @@ export interface QuestTrackerControllerDeps {
   element: HTMLElement;
   document: Document;
   world(): Pick<IWorld, 'questLog' | 'cfg' | 'player' | 'worldQuestLog'> &
-    Partial<Pick<IWorld, 'abandonQuest' | 'clueHunt' | 'weeklyQuest'>>;
+    Partial<
+      Pick<
+        IWorld,
+        'abandonQuest' | 'clueHunt' | 'activeSeasonalEvent' | 'hauntedPumpkinsFound' | 'weeklyQuest'
+      >
+    >;
   /** Injectable tracking set; production leaves it out and shares the HUD's one. */
   tracking?: QuestTrackingState;
   settings: QuestTrackerSettingsPort;
@@ -281,6 +287,16 @@ export class QuestTrackerController {
     }
     const weeklyQuest = weeklyQuestTrackerRow(world.weeklyQuest);
     if (weeklyQuest) quests.push(weeklyQuest);
+    // The zone lookup only runs while an event is open: closed, the row is absent anyway
+    // and the per-frame update stays free of it.
+    const pumpkinRow = world.activeSeasonalEvent
+      ? hauntedPumpkinTrackerRow(
+          world.activeSeasonalEvent,
+          world.hauntedPumpkinsFound ?? [],
+          zoneAt(world.player.pos.x, world.player.pos.z).id,
+        )
+      : null;
+    if (pumpkinRow) quests.push(pumpkinRow);
     // A section with no rows paints no header, so a stale collapse there would
     // hide the next row to arrive behind a header the player never saw close:
     // clear it once, per section.

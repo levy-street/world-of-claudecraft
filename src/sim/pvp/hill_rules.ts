@@ -1,4 +1,4 @@
-// King of the Hill: the pure rules. Once every three hours, at a random
+// King of the Hill: the pure rules. Once every two hours, at a random
 // moment inside the window, a hill is announced somewhere in one of the
 // northern zones; it rises HILL_WARNING_SECONDS later as a HILL_RADIUS
 // circle on dry, open ground and stands for HILL_DURATION_SECONDS. The PARTY
@@ -19,13 +19,15 @@ import { WORLD_PVP_MIN_LEVEL } from './world_pvp_rules';
 
 /** The circle's radius in yards (owner spec). */
 export const HILL_RADIUS = 50;
-/** One hill per window of this length (owner spec: "once every 3 hours"). */
-export const HILL_WINDOW_SECONDS = 3 * 60 * 60;
+/** One hill per window of this length (owner spec: "once every 2 hours", the
+ *  v0.44.1 retune, restored 2026-10-27 after the v0.45 merge lost it). */
+export const HILL_WINDOW_SECONDS = 2 * 60 * 60;
 /** The realm is told where the hill will rise this long before it does
  *  (owner spec: a 15 minute warning), so parties can form and travel. */
 export const HILL_WARNING_SECONDS = 15 * 60;
-/** A risen hill stands this long, then falls (owner spec: 45 minutes). */
-export const HILL_DURATION_SECONDS = 45 * 60;
+/** A risen hill stands this long, then falls (owner spec: 30 minutes, the
+ *  v0.44.1 retune, restored 2026-10-27). */
+export const HILL_DURATION_SECONDS = 30 * 60;
 /** While a hill stands the realm is reminded where it is, and told the
  *  standings, this often (owner spec 2026-09-29: every 5 minutes). */
 export const HILL_NOTICE_SECONDS = 5 * 60;
@@ -46,9 +48,9 @@ export const HILL_CAPTURE_SECONDS = 30;
  *  payout of HILL_HONOR_PER_PAYOUT. The rate is FLAT: every paid minute is
  *  worth the same, however long the holding party has held the hill (owner
  *  tuning 2026-10-14, replacing the 2026-09-25 ramp of 2 a minute climbing to
- *  12). A full uncontested stand still pays about 390 each, the ramp's total,
- *  so King of the Hill stays a real road to Warfare gear. Only a party can
- *  hold, so a party's size is the payee cap. */
+ *  12). A full uncontested stand pays 261 each (29 paid minutes of the
+ *  30-minute stand), so King of the Hill stays a real road to Warfare gear.
+ *  Only a party can hold, so a party's size is the payee cap. */
 export const HILL_ACCRUAL_SECONDS = 60;
 /** The flat Honor paid for one held minute. */
 export const HILL_HONOR_PER_PAYOUT = 9;

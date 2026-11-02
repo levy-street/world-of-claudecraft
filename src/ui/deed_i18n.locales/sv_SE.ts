@@ -1483,4 +1483,49 @@ export const table: DeedLocaleTable = {
     desc: 'Köps hos Garrick Holt, Lykthallens kvartermästare, för 24 lyktsigill.',
     title: 'från Lykthallen',
   },
+  feat_gourdlight_guise: {
+    name: 'Pumplyktornas förklädnad',
+    desc: 'Äg ett Snidat pumpahuvud taget från Gamle Halmflin på hans åker bortom Vildsvinsängen under Pumplyktornas afton.',
+  },
+  feat_old_thatchgrin: {
+    name: 'Stubb och aska',
+    desc: 'Hjälp till att besegra Gamle Halmflin på hans pumpaåker bortom Vildsvinsängen under Pumplyktornas afton.',
+  },
+  feat_title_gourdlit: {
+    name: 'Den pumplyste',
+    desc: 'Läs Pumplystes brev, bytt hos Hester Pumpveke mot Pumplyktegodis under Pumplyktornas afton.',
+    title: 'den pumplyste',
+  },
+  feat_title_trickster: {
+    name: 'Busmakare',
+    desc: 'Läs Busmakarens brev, bytt hos Hester Pumpveke mot Pumplyktegodis under Pumplyktornas afton.',
+    title: 'Busmakare',
+  },
+  feat_title_hollow_grinned: {
+    name: 'Den hålflinande',
+    desc: 'Läs Hålflinets brev, bytt hos Hester Pumpveke mot Pumplyktegodis under Pumplyktornas afton.',
+    title: 'den hålflinande',
+  },
+  feat_pumpkin_hunter: {
+    name: 'Pumpjägare',
+    desc: 'Hitta alla Hemsökta pumpor som är gömda runt om i världen under Pumplyktornas afton.',
+    title: 'den ihålige',
+  },
+  feat_gourdlight_doorsteps: {
+    name: 'Varje dörrtröskel',
+    desc: 'Gå bus eller godis hos varje stadsbo som öppnar efter en knackning i Östbäck, Kärrbron och Högvakten under Pumplyktornas afton.',
+  },
+  feat_gourdlight_errands: {
+    name: 'Till Hesters tjänst',
+    desc: 'Slutför vart och ett av Hester Pumpvekes roterande ärenden under Pumplyktornas afton minst en gång.',
+  },
+  feat_gourdlight_frights: {
+    name: 'Tre skrämda städer',
+    desc: 'Under Hesters ärende Bu! ska du skrämma en stadsbo i vardera Östbäck, Kärrbron och Högvakten.',
+  },
+  feat_gourdlight_eve_complete: {
+    name: 'Pumplyktor från början till slut',
+    desc: 'Gör hela Pumplyktornas afton: besegra Gamle Halmflin, hitta alla Hemsökta pumpor, slutför alla Hesters ärenden, knacka på varje dörr och skräm en stadsbo i var och en av de tre städerna.',
+    title: 'den pumpsvurne',
+  },
 };

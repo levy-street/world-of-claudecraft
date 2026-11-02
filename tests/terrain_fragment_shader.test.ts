@@ -354,6 +354,7 @@ describe('lambert terrain fill under the standard-materials rig', () => {
     shader: FakeShader;
     boost: number;
     shared: THREE.IUniform;
+    sharedDayNight: THREE.IUniform;
     uniform: THREE.IUniform;
   }> {
     vi.resetModules();
@@ -377,6 +378,7 @@ describe('lambert terrain fill under the standard-materials rig', () => {
         shader,
         boost: shader.uniforms.uWocFillBoost.value as number,
         shared: gfxInternalsForTest.sharedUniforms().uTerrainFillBoost,
+        sharedDayNight: gfxInternalsForTest.sharedUniforms().uDayNight,
         uniform: shader.uniforms.uWocFillBoost,
       };
     } finally {
@@ -418,5 +420,20 @@ describe('lambert terrain fill under the standard-materials rig', () => {
     });
     expect(built.uniform).toBe(built.shared);
     expect(built.boost).toBe(1);
+  });
+
+  it('routes low-tier road and beach masks via vWocLowMask and restricts seabed tint below the waterline', async () => {
+    const { shader, sharedDayNight } = await compileLambert({
+      standardMaterials: false,
+      composer: false,
+      gradePass: false,
+    });
+    expect(shader.uniforms.uWocDayNight).toBe(sharedDayNight);
+    expect(shader.vertexShader).toContain('varying vec2 vWocLowMask;');
+    expect(shader.fragmentShader).toContain('diffuseColor *= texture2D( map, wocDetailUv );');
+    expect(shader.fragmentShader).toContain('float wocRoadRaw = clamp(vWocLowMask.x, 0.0, 1.0);');
+    expect(shader.fragmentShader).toContain('float wocSandRaw = clamp(vWocLowMask.y, 0.0, 1.0);');
+    expect(shader.fragmentShader).toContain('float wocSubW = smoothstep(-0.06, -1.65, wocRelY);');
+    expect(shader.fragmentShader).not.toContain('wocSurfFoam');
   });
 });

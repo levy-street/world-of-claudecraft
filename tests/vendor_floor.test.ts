@@ -11,6 +11,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { DELVE_SHOPS } from '../src/sim/content/delves';
+import { GOURDLIGHT_CANDIES } from '../src/sim/content/gourdlight_eve';
 import { HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
 import { ZONE2_MOBS } from '../src/sim/content/zone2';
@@ -515,11 +516,20 @@ describe('the classification is exhaustive over every vendor-stocked consumable'
   // hand-written pairing table alone lets a one-for-one stock swap (a
   // conjured-tier food traded in for a reagent row, say) bypass the ladder
   // with every other arm still green.
-  it('the vendor-stocked foodHp set is exactly the eight classified foods', () => {
+  // Gourdlight Eve's five candies are the one sweets-priced (never gold) food row:
+  // Hester's event shelf, each a verbatim copy of the cooking ladder's ENTRY rung
+  // (eastbrook_glazed_carrots: foodHp 90, Well Fed +2 for 600s), so they undercut no
+  // crafted dish and sit outside the gold ladder R23 measures.
+  it('the vendor-stocked foodHp set is exactly the eight classified foods and five candies', () => {
     expect(vendorStockedIdsBy(NPCS, (id) => liveMagnitude(id, 'foodHp') !== undefined)).toEqual([
       'baked_bread',
       'brightwood_venison',
+      'crabapple_chew',
       'fenbridge_rye',
+      'gourdseed_brittle',
+      'hearthroot_toffee',
+      'lantern_mint_drop',
+      'owlwatch_fudge',
       'roast_mountain_goat',
       'roasted_boar',
       'smoked_eel',
@@ -598,6 +608,8 @@ describe('the classification is exhaustive over every vendor-stocked consumable'
       'silvermist_cordial',
       'meltwater_flask',
       'glacier_melt',
+      // Gourdlight Eve's candy shelf: sweets-priced, entry-rung mirrors (see above).
+      ...GOURDLIGHT_CANDIES.map((c) => c.itemId),
     ]);
     expect(stocked).toEqual([...classified].sort());
   });
@@ -845,6 +857,13 @@ describe('stock rows: the phase 11n pulls', () => {
       // The Mirefen tavern's innkeeper (feature/walkable-tavern-aaa): bread and water
       // for the road and the marsh's own fare, six existing food and drink rows.
       innkeeper_maudie: 6,
+      // Gourdlight Eve's keeper (content/gourdlight_eve.ts): the pumpkin head and the
+      // Jar of Mischief, both priced in sweets, then (phase 3) the three costume
+      // draughts and the three title writs, then (phase 5) the five candies, then
+      // (round 7) the Emberbristle Broom, priced in Emberwoven Sheaves; (round 8) the
+      // pumpkin head left the shelf (Old Thatchgrin's first-kill drop is its one source);
+      // (round 9) Hester's five Gourdlight Eve toys joined it, 13 to 18.
+      gourdlight_keeper: 18,
     });
   });
 });

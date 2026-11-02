@@ -25652,4 +25652,227 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.stackUnavailable':
     'Det går inte att lägga till medlemstid just nu. Försök igen om en stund.',
   'hudChrome.wocStore.subscription.tokenPrice': '{price} för 30 dagar',
+  'errors.api.worldFightHold':
+    'En annan karaktär på det här kontot är fortfarande kvar i världen efter en strid. Försök igen om några minuter.',
+  'hudChrome.auraEffect.gourdlight.thatchbound':
+    'Gamle Halmflin drar i dina trådar. Du kan inte agera: du förs till din närmaste allierade och slår denne var {every} sek för {min} till {max} skada (upp till {mult} gånger så mycket mot en allierad på nivå {level}). Avslutas i förtid när du tar skada motsvarande {pct}% av din maximala hälsa, eller när en allierad skingrar effekten (magi).',
+  'hudChrome.auraEffect.seasonalCosmetic': 'Endast kosmetiskt: påverkar inte strid',
+  'hudChrome.auraEffect.slumberNight':
+    'Hänger livlös på sin påle tills mörkret faller. Kan inte attackeras.',
+  'hudChrome.auraEffect.stilledMindCrit':
+    'Din nästa Sinnessplittring eller Tomrumsbristning ger garanterat en kritisk träff om den träffar. Andra besvärjelser förbrukar inte bonusen. Tomrumsbristning förbrukar fortfarande 3 laddningar av Skymningstionde. En motstådd besvärjelse förbrukar bonusen.',
+  'hudChrome.mounts.desc_emberbristle_broom':
+    'En skördekvast med orange band som svävar en handsbredd över marken och fäller glöd från borsten. En permanent belöning från Pumplyktornas afton.',
+  'hudChrome.mounts.name_emberbristle_broom': 'Glödborstkvast',
+  'hudChrome.priest.bombLabel': 'Tiondebomb',
+  'hudChrome.priest.bombReady': 'Redo',
+  'hudChrome.priest.bombStatus': '{value} av {max} laddningar av Tiondebomb',
+  'hudChrome.priest.bombTooltip':
+    'Tiondebomb: generera 20 Skymningstionde för att förbereda en bomb. Att spendera Skymningstionde ger inga framsteg. Framsteg sparas mellan strider. De återställs när du dör eller inleder en raidbossstrid. En slutförd besvärjelse förbrukar bomben; avbryter du den behålls bomben.',
+  'hudChrome.priest.chargeCount': '{value} / {max}',
+  'hudChrome.priest.gloomtitheLabel': 'Skymningstionde',
+  'hudChrome.priest.gloomtitheStatus': '{value} av {max} Skymningstionde',
+  'hudChrome.priest.gloomtitheTooltip':
+    'Skymningstionde: upp till 5 laddningar att spendera. Tomrumsbristning förbrukar 3; Vampyrberöring förbrukar 2 för 30% mer skada; Frammana tiondedemon förbrukar hela ditt förråd. Att generera laddningar fyller även Tiondebomb, också när förrådet är fullt.',
+  'hudChrome.worldBoss.sleepUntilNightfall': '{name} sover tills mörkret faller.',
+  'entities.abilities.choir_of_deliverance.specNote_shadow':
+    'Under 15 sek fördelas 20% av den hälsa fiender förlorar av din skuggskada som läkning mellan skadade gruppmedlemmar inom 30 yards, inklusive dig själv. I raider läks bara din undergrupp. Besvärjelsen är omedelbar och du kan fortsätta attackera i Skymningsslöja. Absorberad skada och skada utöver återstående hälsa ger ingen läkning.',
+  'entities.abilities.inner_focus.specNote_shadow':
+    'Reserverar också en garanterad kritisk träff för din nästa Sinnessplittring eller Tomrumsbristning inom 60 sek, om den träffar. Andra besvärjelser förbrukar inte bonusen. Tomrumsbristning förbrukar fortfarande 3 laddningar av Skymningstionde. En motstådd besvärjelse förbrukar bonusen till kritisk träff.',
+  'entities.abilities.spirit_bomb.description':
+    'Detonera en andebomb på en fiende och orsaka {damage} skuggskada på fiender inom 8 yards från målet. Skadan ökar med besvärjelsekraft, kan träffa kritiskt och minskar över 5 mål. Generera 20 Skymningstionde för att förbereda en bomb. Generering räknas även när du har maximalt 5 Skymningstionde; du behöver inte spendera laddningar, och det ger inga framsteg. Framsteg sparas mellan strider, med högst en förberedd bomb. Döden tar bort dina framsteg och din förberedda bomb. Slutförd besvärjelse förbrukar bomben även om den motstås. Avbrott eller annullering bevarar den. Att inleda en raidbossstrid tar bort dina framsteg och din förberedda bomb. Besvärjelsen kan inte inleda en raidbossstrid.',
+  'entities.abilities.spirit_bomb.name': 'Tiondebomb',
+  'entities.abilities.vampiric_touch.description':
+    'Orsaka {damage} skuggskada under 15 sek, en gång var 3:e sek. Skadan ökar med besvärjelsekraft och tick kan träffa kritiskt. Varje tick fördelar läkning motsvarande 20% av den hälsa fienden förlorar mellan dig och skadade gruppmedlemmar inom 30 yards; i en raid läks bara din undergrupp. Om du har minst 2 laddningar av Skymningstionde förbrukas 2 när effekten läggs på, vilket ökar all dess skada med 30%.',
+  'entities.abilities.vampiric_touch.name': 'Vampyrberöring',
+  'entities.abilities.void_rupture.description':
+    'Förbruka 3 laddningar av Skymningstionde för att slita upp en fiende och orsaka {damage} skuggskada. Skadan ökar med besvärjelsekraft och kan träffa kritiskt. Kräver 3 laddningar och förbrukar dem även om besvärjelsen motstås.',
+  'entities.abilities.void_rupture.name': 'Tomrumsbristning',
+  'entities.items.batwing_draught.name': 'Fladderdryck',
+  'entities.items.carved_pumpkin_head.name': 'Snidat pumpahuvud',
+  'entities.items.crabapple_chew.name': 'Vildäppeltugg',
+  'entities.items.cursed_candle_stub.name': 'Förbannad ljusstump',
+  'entities.items.emberwoven_sheaf.name': 'Glödvävd kärve',
+  'entities.items.gourdlight_crow_feather.name': 'Pumplyktekråkans fjäder',
+  'entities.items.gourdlight_sweet.name': 'Pumplyktegodis',
+  'entities.items.gourdlight_treat_pouch.name': 'Påse med pumplyktegodis',
+  'entities.items.gourdseed_brittle.name': 'Pumpafröknäck',
+  'entities.items.gurglegreen_cauldron.name': 'Grönbubbelkittel',
+  'entities.items.haunting_draught.name': 'Spökdryck',
+  'entities.items.hearthroot_toffee.name': 'Härdrotskola',
+  'entities.items.jar_of_mischief.name': 'Busburk',
+  'entities.items.lantern_mint_drop.name': 'Lyktmintkaramell',
+  'entities.items.murmurwick_candle.name': 'Viskvekeljus',
+  'entities.items.owlwatch_fudge.name': 'Ugglevaktsfudge',
+  'entities.items.prankers_pumpkin.name': 'Busmakarens pumpa',
+  'entities.items.rattlebone_draught.name': 'Benrasseldryck',
+  'entities.items.reins_emberbristle_broom.name': 'Glödborstkvast',
+  'entities.items.sack_of_startled_bats.name': 'Säck med skrämda fladdermöss',
+  'entities.items.strawling_charm.name': 'Halmvättens amulett',
+  'entities.items.thatchgrin_patch_pumpkin.name': 'Åkerpumpa',
+  'entities.items.thatchgrin_sweet_sack.name': 'Halmflins godissäck',
+  'entities.items.wanderwisp_lantern.name': 'Vandrarlyktan',
+  'entities.items.writ_of_the_gourdlit.name': 'Pumplystes brev',
+  'entities.items.writ_of_the_hollow_grin.name': 'Hålflinets brev',
+  'entities.items.writ_of_the_trickster.name': 'Busmakarens brev',
+  'entities.mobs.gourdlight_crow.name': 'Pumplyktekråka',
+  'entities.mobs.gourdlight_strawling.name': 'Halmvätte',
+  'entities.mobs.gourdlight_swelling_gourd.name': 'Svällande pumpa',
+  'entities.mobs.gourdlight_thatchgrin.name': 'Gamle Halmflin',
+  'entities.npcs.gourdlight_keeper.greeting':
+    'Pumporna är tända och lyktorna upphängda, så det måste vara Pumplyktornas afton. Knacka på hos stadsborna i Östbäck, Kärrbron och Högvakten och säg orden: bus eller godis. De flesta ger dig en sötsak. Några busar med dig. Ta med godiset till mig vid något av mina stånd, så byter jag det mot något att ha på dig.',
+  'entities.npcs.gourdlight_keeper.name': 'Hester Pumpveke',
+  'entities.npcs.gourdlight_keeper.title': 'Pumplyktornas väktare',
+  'entities.quests.q_gourdlight_daily_baskets.completion':
+    'Alla tre levererade, och jag hör att Marlow grät. Det gör han alltid. Här är en egen korg åt dig.',
+  'entities.quests.q_gourdlight_daily_baskets.objectives.0.label': 'Korg lämnad hos Kocken Marlow',
+  'entities.quests.q_gourdlight_daily_baskets.objectives.1.label':
+    'Korg lämnad hos örtkunniga Yara',
+  'entities.quests.q_gourdlight_daily_baskets.objectives.2.label':
+    'Korg lämnad hos Läromästare Caddis',
+  'entities.quests.q_gourdlight_daily_baskets.text':
+    'Varje Pumplyktornas afton fyller jag en godiskorg åt en gammal vän i varje stad, men knäna är inte vad de en gång var. Kör ut dem åt mig, {playerName}: till Kocken Marlow i Östbäck, örtkunniga Yara i Kärrbron och Läromästare Caddis uppe i Högvakten.',
+  'entities.quests.q_gourdlight_daily_baskets.title': 'Korgar åt grannarna',
+  'entities.quests.q_gourdlight_daily_boo.completion':
+    'Tre stycken? Jag hörde kocken tappa en stekpanna tvärs över torget. Bra gjort. Här är din del.',
+  'entities.quests.q_gourdlight_daily_boo.objectives.0.label': 'Skrämda stadsbor',
+  'entities.quests.q_gourdlight_daily_boo.text':
+    'Ingen i de här städerna har blivit ordentligt skrämd på ett år, {playerName}, och Pumplyktornas afton utan en skrämsel är bara en kall natt. Ta på dig en dräkt, vilken som helst av mina duger, eller det där pumpahuvudet om du har förtjänat det. Smyg sedan fram till tre stadsbor och ropa ett riktigt högt BU.',
+  'entities.quests.q_gourdlight_daily_boo.title': 'Bu!',
+  'entities.quests.q_gourdlight_daily_feathers.completion':
+    'Svarta som ett månlöst fält, och de luktar redan rök. Det blir en ståtlig brasa. Tack.',
+  'entities.quests.q_gourdlight_daily_feathers.objectives.0.label': 'Kråkfjädrar',
+  'entities.quests.q_gourdlight_daily_feathers.text':
+    'När Gamle Halmflin är trängd kallar han ner sina kråkor över den som slår på hans halm. Deras fjädrar brinner grönt i härden, och jag behöver tre till kvällens brasa. Hitta en strid på hans åker, {playerName}, och plocka dem från hans kråkor.',
+  'entities.quests.q_gourdlight_daily_feathers.title': 'Fjädrar till elden',
+  'entities.quests.q_gourdlight_daily_patch.completion':
+    'Fem runda, och inte en enda tugga ur någon. Det blir paj åt hela dalen. Här, för besväret.',
+  'entities.quests.q_gourdlight_daily_patch.objectives.0.label': 'Åkerpumpor',
+  'entities.quests.q_gourdlight_daily_patch.text':
+    'Gamle Halmflins åker bortom Vildsvinsängen är full av pumpor, och hälften har rullat bortom hans halm där en försiktig själ kan nå dem. Hämta fem åt mig, {playerName}. Håll dig långt från den gamle fågelskrämman själv. Han räknar varenda en.',
+  'entities.quests.q_gourdlight_daily_patch.title': 'Pumpor från åkern',
+  'entities.quests.q_gourdlight_daily_towns.completion':
+    'Tre städer på en natt! Dina stövlar har förtjänat det här mer än du.',
+  'entities.quests.q_gourdlight_daily_towns.objectives.0.label': 'En dörr knackad på i Östbäck',
+  'entities.quests.q_gourdlight_daily_towns.objectives.1.label': 'En dörr knackad på i Kärrbron',
+  'entities.quests.q_gourdlight_daily_towns.objectives.2.label': 'En dörr knackad på i Högvakten',
+  'entities.quests.q_gourdlight_daily_towns.text':
+    'Barnen säger att en äkta pumplyktevandrare knackar på i varje stad innan natten är över. Visa att de har rätt, {playerName}. Gå bus eller godis vid en dörr i Östbäck, en i Kärrbron och en i Högvakten. Lyktorna längs vägarna lyser upp din väg.',
+  'entities.quests.q_gourdlight_daily_towns.title': 'En dörr i varje stad',
+  'entities.quests.q_gourdlight_daily_wicks.completion':
+    'Sex stumpar, kalla som frost. Den som tände dem får försöka lite hårdare. Ta det här och tvätta händerna.',
+  'entities.quests.q_gourdlight_daily_wicks.objectives.0.label': 'Släckta förbannade ljus',
+  'entities.quests.q_gourdlight_daily_wicks.text':
+    'Någon ställer ljus med gröna lågor vid foten av våra lyktstolpar. De brinner utan att smälta och viskar när du vänder ryggen till. Släck sex åt mig, {playerName}, i någon av de tre städerna och ta med stumparna.',
+  'entities.quests.q_gourdlight_daily_wicks.title': 'Onda vekar',
+  'entities.quests.q_gourdlight_rounds.completion':
+    'Fem dörrar, och du har alla fingrar kvar. Här, en godispåse till hemvägen. Kom tillbaka i morgon, då öppnas dörrarna igen.',
+  'entities.quests.q_gourdlight_rounds.objectives.0.label': 'Dörrar du knackat på',
+  'entities.quests.q_gourdlight_rounds.text':
+    'Varje Pumplyktornas afton går dalens barn sin runda, och i år följer du med, {playerName}. Knacka på fem dörrar i våra städer, säg orden och se vad du får. Kom tillbaka till mig när du är klar.',
+  'entities.quests.q_gourdlight_rounds.title': 'Pumplyktornas runda',
+  'guide.interfacePage.framesGovernedPriest':
+    'Redigera ramar låter dig också flytta skuggprästens medaljong för Skymningstionde och Tiondebomb.',
+  'guide.worldPvpPage.hillBodyTwoHour':
+    'En gång varannan timme, vid ett oförutsägbart ögonblick, får hela realmen veta att en kulle ska resa sig i en av de norra zonerna om femton minuter. Cirkeln där den ska stå markeras på öppen mark. När kullen reser sig står den i trettio minuter och sjunker sedan undan. Var femte minut medan den står får realmen veta var den finns och vilka grupper som hållit den längst. Gruppen med flest spelare inne i cirkeln tävlar om kullen, och efter trettio sekunders majoritet blir den deras. En rivaliserande grupp som går in pausar bara nedräkningen tills din grupp leder igen; den börjar om endast om ingen i din grupp längre är vid liv där inne. En ensam spelare räknas som en grupp på en och behåller sin kulle när en grupp bildas, men raidmedlemmar räknas inte alls. Medan en grupp håller kullen tjänar varje medlem som står inne lika mycket ära varje minut, oavsett hur länge de hållit den. En full grupp som håller kullen ostört under hela dess tid tjänar därför ungefär lika mycket som två segrar på slagfältet. När kullen sjunker undan får gruppen som hållit den längst sammanlagt en seger till PvP-raden i Veckovalvet, förutsatt att den hållit kullen i minst tio minuter. Segern går till alla som stått inne för den gruppen i minst en minut och fortfarande är med i den. En mätare över fältet visar vem som håller kullen, era antal mot deras och erövringstiden; /hill i chatten visar var den står.',
+  'seasonal.boo.already': '{name} har fått nog av skrämsel för i dag.',
+  'seasonal.boo.flash': 'BU! {name} blir rädd!',
+  'seasonal.boo.frightenedHint':
+    '{name} är fortfarande skärrad efter din förra skrämsel. Hitta någon annan.',
+  'seasonal.boo.landed':
+    'Du hoppar fram mot {name} och ropar BU! Ett skrik hörs och allt är nära att tappas.',
+  'seasonal.boo.needsCostume':
+    'Ta på dig en dräkt först: en dräktdryck, ett fladdermus- eller skelettbus, Halmvättens amulett, Snidat pumpahuvud eller en goblinklunk ur Grönbubbelkitteln.',
+  'seasonal.boo.noCostume': 'Utan dräkt skrattar {name} bara åt dig. Ta på dig en först.',
+  'seasonal.boo.notOnErrand': 'Hester har inte bett dig skrämma någon i dag.',
+  'seasonal.boo.row': 'Bu!',
+  'seasonal.boo.rowAria': 'Hoppa fram mot {name} och ropa bu',
+  'seasonal.boundItemGone':
+    'Pumplyktornas afton är över och din {item} faller sönder till halm igen.',
+  'seasonal.costume': 'Du dricker drycken och förvandlas: {trick}!',
+  'seasonal.event.gourdlight_eve.name': 'Pumplyktornas afton',
+  'seasonal.guise': 'Amuletten sprakar och halmen klättrar över dig: {trick}!',
+  'seasonal.itemSource.pumpkinHead':
+    'Släpps av Gamle Halmflin på hans pumpaåker bortom Vildsvinsängen första gången du plundrar honom. Ingen försäljare säljer det.',
+  'seasonal.itemUse.broomSources':
+    'Köps av Hester Pumpveke för {count} Glödvävda kärvar eller släpps, i sällsynta fall, av Gamle Halmflin en dag du plundrar honom. Kräver ridfärdighet för att användas som riddjur. Behålls permanent och går att rida året runt.',
+  'seasonal.itemUse.costumeBat':
+    'Använd: Förvandlas till en flaxande fladdermus i {minutes} minuter. Förbrukas. Kan inte användas i strid och avbryts när du går in i strid. Kosmetiskt.',
+  'seasonal.itemUse.costumeGhost':
+    'Använd: Förvandlas till ett svävande spöke i {minutes} minuter. Förbrukas. Kan inte användas i strid och avbryts när du går in i strid. Kosmetiskt.',
+  'seasonal.itemUse.costumeSkeleton':
+    'Använd: Förvandlas till ett rasslande skelett i {minutes} minuter. Förbrukas. Kan inte användas i strid och avbryts när du går in i strid. Kosmetiskt.',
+  'seasonal.itemUse.pouch': 'Använd: Öppna för att få {count} Pumplyktegodis.',
+  'seasonal.itemUse.pumpkinHead':
+    'Använd: Ta på eller av en snidad pumpa som lyser inifrån och bärs över hjälmen. Kosmetiskt.',
+  'seasonal.itemUse.sheaf':
+    'Gamle Halmflin ger en varje dag du plundrar honom, tills du äger Glödborstkvasten. Hester Pumpveke byter {count} mot kvasten vid sina stånd i Östbäck, Kärrbron och Högvakten. Oanvända kärvar sparas till nästa Pumplyktornas afton.',
+  'seasonal.itemUse.strawlingCharm':
+    'Använd: Bli en av Gamle Halmflins halmvättar i {seconds} sekunder. Inte i strid. Förbrukas aldrig. Kosmetiskt.',
+  'seasonal.itemUse.sweet':
+    'Fås genom bus eller godis under Pumplyktornas afton. Hester Pumpveke byter dem mot kosmetiska föremål vid sina stånd i Östbäck, Kärrbron och Högvakten.',
+  'seasonal.itemUse.titleWrit':
+    'Använd: Lås upp titeln {title} för den här karaktären. Den väljs i Bedrifternas bok. Förbrukas. Behålls om du redan har titeln.',
+  'seasonal.itemUse.toyBats':
+    'Använd: Öppna säcken. En pipande svärm av fladdermöss far ut och sprids runt dig i {seconds} sekunder. Kan inte användas i strid eller under smygande. Förbrukas aldrig: kan användas igen efter {cooldown} sekunder. Behålls permanent och kan användas året runt. Kosmetiskt.',
+  'seasonal.itemUse.toyCandleShadows':
+    'Använd: Tänd ljuset framför dig. I {seconds} sekunder kastar lågorna dansande skuggor av en katt, en fladdermus och en häxa på marken omkring det, synliga för alla i närheten. Kan inte användas i strid eller under smygande. Förbrukas aldrig: kan användas igen efter {cooldown} sekunder. Behålls permanent och kan användas året runt. Kosmetiskt.',
+  'seasonal.itemUse.toyCauldron':
+    'Använd: Ställ en stor bubblande kittel framför dig. Den står i {standing} sekunder. Spelare som dricker ur den omsluts av gröna bubblor och förvandlas till gobliner i {seconds} sekunder, vilket ersätter deras dräkt. Det går varken att ställa ut den eller dricka i strid eller under smygande, och goblinformen upphör vid strid. Förbrukas aldrig: kan användas igen efter {cooldown} sekunder. Behålls permanent och kan användas året runt. Kosmetiskt.',
+  'seasonal.itemUse.toyLantern':
+    'Använd: Ställ lyktan framför dig. Ett litet spöke kretsar runt dig i {seconds} sekunder. Kan inte användas i strid eller under smygande. Förbrukas aldrig: kan användas igen efter {cooldown} sekunder. Behålls permanent och kan användas året runt. Kosmetiskt.',
+  'seasonal.itemUse.toyPrank':
+    'Använd: Kasta den på en annan synlig spelare inom {range} yards. Spelarens huvud blir en lysande pumplykta i {seconds} sekunder och kan tas av med högerklick. Ingen av er får vara i strid, och du får inte smyga. Förbrukas aldrig: kan användas igen efter {cooldown} sekunder. Behålls permanent och kan användas året runt. Kosmetiskt.',
+  'seasonal.itemUse.trickJar':
+    'Använd: Utsätter dig för ett slumpmässigt, harmlöst bus i några sekunder. Kosmetiskt.',
+  'seasonal.jarTrick': 'Burken öppnas med en smäll: {trick}!',
+  'seasonal.pumpkinHead.off': 'Du tar av dig Snidat pumpahuvud.',
+  'seasonal.pumpkinHead.on': 'Du tar på dig Snidat pumpahuvud.',
+  'seasonal.pumpkins.flash': 'Hemsökt pumpa hittad! {count}/{total}',
+  'seasonal.pumpkins.found':
+    'Du tänder en Hemsökt pumpa i {zone}: {count}/{total}. Mottaget Pumplyktegodis: {sweets}.',
+  'seasonal.pumpkins.name': 'Hemsökt pumpa',
+  'seasonal.pumpkins.progress': '{label}: {current}/{total}',
+  'seasonal.pumpkins.title': 'Hemsökta pumpor',
+  'seasonal.pumpkins.world': 'Världen',
+  'seasonal.thatchgrin.poleBound': 'Bunden vid pålen',
+  'seasonal.thatchgrin.sleepYell': 'Solen är uppe. Tillbaka på pålen, tillbaka till vakten.',
+  'seasonal.thatchgrin.wakeYell': 'NATTEN faller över åkern! Vem går på MITT fält?',
+  'seasonal.titleGranted': 'Du läser brevet. Ny titel upplåst: {title}.',
+  'seasonal.titleKnown': 'Du har redan den titeln, så du behåller brevet.',
+  'seasonal.tokenPrice': '{count} {item}',
+  'seasonal.toy.bats': 'Du öppnar säcken och en svärm av skrämda fladdermöss far ut!',
+  'seasonal.toy.candleShadows': 'Du tänder ljuset och skuggor börjar dansa runt lågorna.',
+  'seasonal.toy.cauldron': 'Du ställer ner kitteln och den börjar bubbla.',
+  'seasonal.toy.cauldronDrink':
+    'Du dricker ur kitteln, omsluts av gröna bubblor och blir en goblin!',
+  'seasonal.toy.hidden': 'Kliv ur skuggorna först: en leksak skulle avslöja dig.',
+  'seasonal.toy.lantern':
+    'Du ställer ner lyktan och ett litet spöke svävar ut för att hålla dig sällskap.',
+  'seasonal.toy.prank': 'Du kastar pumpan. Den smetas ut på {name}!',
+  'seasonal.toy.prankNeedsPlayer': 'Pumpan träffar bara en annan spelare som inte är i strid.',
+  'seasonal.toy.pranked':
+    '{name} smetar ut en pumpa på ditt huvud! Högerklicka för att ta av den, eller bär den stolt.',
+  'seasonal.toy.prankedFlash': 'Busad med av {name}!',
+  'seasonal.trickOrTreat.alreadyKnocked': 'Du har redan gått bus eller godis hos {name} i dag.',
+  'seasonal.trickOrTreat.knockedHint':
+    'Du har redan knackat här i dag. Dörren öppnas igen efter den dagliga återställningen.',
+  'seasonal.trickOrTreat.notActive': 'Pumplyktornas afton pågår inte just nu.',
+  'seasonal.trickOrTreat.row': 'Bus eller godis!',
+  'seasonal.trickOrTreat.rowAria': 'Säg bus eller godis till {name}',
+  'seasonal.trickOrTreat.tooFar': 'Gå närmare för att knacka.',
+  'seasonal.trickOrTreat.treat': '{name} ger dig en sötsak.',
+  'seasonal.trickOrTreat.treatFlash.few': 'Godis! {count} Pumplyktegodisar',
+  'seasonal.trickOrTreat.treatFlash.many': 'Godis! {count} Pumplyktegodisar',
+  'seasonal.trickOrTreat.treatFlash.one': 'Godis! {count} Pumplyktegodis',
+  'seasonal.trickOrTreat.treatFlash.other': 'Godis! {count} Pumplyktegodisar',
+  'seasonal.trickOrTreat.trick': '{name} busar med dig: {trick}!',
+  'seasonal.trickOrTreat.trickFlash': 'Bus! {trick}',
+  'seasonal.tricks.gourdlight_costume_bat': 'Fladdermusdräkt',
+  'seasonal.tricks.gourdlight_costume_ghost': 'Spökdräkt',
+  'seasonal.tricks.gourdlight_costume_skeleton': 'Skelettdräkt',
+  'seasonal.tricks.gourdlight_trick_bat': 'Fladdertokig',
+  'seasonal.tricks.gourdlight_trick_fumes': 'Gröna ångor',
+  'seasonal.tricks.gourdlight_trick_skeleton': 'Rasslande ben',
+  'seasonal.tricks.gourdlight_trick_strawling': 'Halmvätteskepnad',
 };

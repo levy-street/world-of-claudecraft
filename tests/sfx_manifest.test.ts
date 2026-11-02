@@ -164,7 +164,7 @@ describe('buildManifest', () => {
     expect(manifest).toContain('cast_lightning_bolt');
   });
 
-  it('keeps release cues, Warrior recordings, hoard cues, the tavern bed, the destrier and three Smith Heart bosses in 439 keys', () => {
+  it('keeps release cues, Warrior recordings, hoard cues, the tavern bed, the destrier and three Smith Heart bosses and the Gourdlight Eve cues in 452 keys', () => {
     // Combine the release farming/crafting cues with the candidate mount cues.
     // Release inventory: 319 total, 92 UI, 34 mount. A mount may share
     // player footfalls or have several cues, so this is not a mount count.
@@ -185,9 +185,10 @@ describe('buildManifest', () => {
     // 413. Its Guardian of the Breath adds fifteen heart_breath_ cues
     // (src/game/smith_heart_breath_audio_core.ts): 428. Its Guardian of the
     // Quench adds eleven heart_quench_ cues
-    // (src/game/smith_heart_quench_audio_core.ts): 439.
+    // (src/game/smith_heart_quench_audio_core.ts): 439. Gourdlight Eve adds
+    // thirteen synthesized cues (scripts/sfx/gourdlight_sfx.mjs): 452.
     const keys = new Set(SFX.map((entry) => entry.key));
-    expect(keys.size).toBe(439);
+    expect(keys.size).toBe(452);
     expect([...keys].filter((key) => key.startsWith('heart_council_'))).toHaveLength(18);
     expect([...keys].filter((key) => key.startsWith('heart_breath_'))).toHaveLength(15);
     expect([...keys].filter((key) => key.startsWith('heart_quench_'))).toHaveLength(11);
@@ -208,7 +209,7 @@ describe('buildManifest', () => {
     expect(keys.has('piercing_howl')).toBe(true);
     expect([...keys].filter((key) => key.startsWith('ui_aura_'))).toHaveLength(20);
     expect([...keys].filter((key) => key.startsWith('ui_'))).toHaveLength(92);
-    expect([...keys].filter((key) => key.startsWith('mount_'))).toHaveLength(41);
+    expect([...keys].filter((key) => key.startsWith('mount_'))).toHaveLength(43);
     expect(keys.has('ui_craft_cast')).toBe(true);
     expect(keys.has('ui_farm_plant')).toBe(true);
     expect(keys.has('ui_farm_harvest')).toBe(true);
@@ -301,7 +302,7 @@ describe('buildManifest', () => {
     // purely filesystem-discovered.
     const mobFamilyKeys = [...keys].filter((key) => key.startsWith('mob_'));
     expect(mobFamilyKeys).toHaveLength(65); // 13 families x 5 actions
-    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(439);
+    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(452);
     expect([...SFX_FIXED_CATALOG_KEYS].sort()).toEqual([...keys].sort());
   });
 });

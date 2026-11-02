@@ -71,4 +71,39 @@ describe('material texture slots', () => {
     expect(collectObjectTextures(root, true, into)).toBe(into);
     expect(into).toEqual(new Set([hiddenOnly, shared]));
   });
+
+  it('skips staged prewarm subtrees during visibleOnly boot collection', () => {
+    const visibleTex = new THREE.Texture();
+    const prewarmCategoryTex = new THREE.Texture();
+    const prewarmNamedTex = new THREE.Texture();
+    const root = new THREE.Group();
+    root.add(
+      new THREE.Mesh(
+        new THREE.BufferGeometry(),
+        new THREE.MeshStandardMaterial({ map: visibleTex }),
+      ),
+    );
+    const catGroup = new THREE.Group();
+    catGroup.userData.renderCategory = 'prewarm';
+    catGroup.add(
+      new THREE.Mesh(
+        new THREE.BufferGeometry(),
+        new THREE.MeshStandardMaterial({ map: prewarmCategoryTex }),
+      ),
+    );
+    const namedGroup = new THREE.Group();
+    namedGroup.name = 'dungeon-material-prewarm';
+    namedGroup.add(
+      new THREE.Mesh(
+        new THREE.BufferGeometry(),
+        new THREE.MeshStandardMaterial({ map: prewarmNamedTex }),
+      ),
+    );
+    root.add(catGroup, namedGroup);
+
+    expect([...collectObjectTextures(root, true)]).toEqual([visibleTex]);
+    expect(new Set(collectObjectTextures(root, false))).toEqual(
+      new Set([visibleTex, prewarmCategoryTex, prewarmNamedTex]),
+    );
+  });
 });

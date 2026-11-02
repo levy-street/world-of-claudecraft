@@ -297,12 +297,15 @@ describe('nameplate_view - NPC plates (close range, name and role only)', () => 
   const npc = (z: number, overrides: Record<string, unknown> = {}) =>
     ent({ kind: 'npc', templateId: 'smith_haldren', pos: { x: 0, y: 0, z }, ...overrides });
 
-  it('shows an NPC plate only inside NPC_NAMEPLATE_RANGE', () => {
+  it('shows a full NPC plate only inside NPC_NAMEPLATE_RANGE, marker-only to NAMEPLATE_RANGE', () => {
     expect(NPC_NAMEPLATE_RANGE).toBe(10);
     expect(plan(npc(10)).hidden).toBe(false);
-    expect(plan(npc(10.01)).hidden).toBe(true);
-    expect(plan(npc(NPC_NAMEPLATE_RANGE - 0.5)).hidden).toBe(false);
-    expect(plan(npc(NPC_NAMEPLATE_RANGE + 0.5)).hidden).toBe(true);
+    expect(plan(npc(10)).markerOnly).toBe(false);
+    expect(plan(npc(10.01)).hidden).toBe(false);
+    expect(plan(npc(10.01)).markerOnly).toBe(true);
+    expect(plan(npc(NPC_NAMEPLATE_RANGE - 0.5)).markerOnly).toBe(false);
+    expect(plan(npc(NAMEPLATE_RANGE)).markerOnly).toBe(true);
+    expect(plan(npc(NAMEPLATE_RANGE + 0.5)).hidden).toBe(true);
     // a mob or player at the same distance keeps the normal range
     expect(plan(ent({ pos: { x: 0, y: 0, z: NPC_NAMEPLATE_RANGE + 0.5 } })).hidden).toBe(false);
     expect(
@@ -314,7 +317,7 @@ describe('nameplate_view - NPC plates (close range, name and role only)', () => 
   it('treats a friendly quest-giver mob as an NPC plate, but not a hostile one', () => {
     const giver = (z: number) => ent({ hostile: false, questIds: ['q1'], pos: { x: 0, y: 0, z } });
     expect(plan(giver(2)).nameOnly).toBe(true);
-    expect(plan(giver(NPC_NAMEPLATE_RANGE + 0.5)).hidden).toBe(true);
+    expect(plan(giver(NPC_NAMEPLATE_RANGE + 0.5)).markerOnly).toBe(true);
     const hostile = ent({ hostile: true, questIds: ['q1'], pos: { x: 0, y: 0, z: 2 } });
     expect(plan(hostile).nameOnly).toBe(false);
     expect(plan(ent({ hostile: false, questIds: [], pos: { x: 0, y: 0, z: 2 } })).nameOnly).toBe(
@@ -345,11 +348,18 @@ describe('nameplate_view - NPC plates (close range, name and role only)', () => 
     const out = plan(npc(NPC_NAMEPLATE_RANGE + 5), viewer(), 2, true, false, true, true);
     expect(out.hidden).toBe(false);
     expect(out.nameOnly).toBe(true);
+    expect(out.markerOnly).toBe(false);
   });
 
   it('keeps the close range for a targeted NPC too', () => {
     const p = viewer({ targetId: 2 });
-    expect(plan(npc(NPC_NAMEPLATE_RANGE + 0.5), p).hidden).toBe(true);
+    expect(plan(npc(NPC_NAMEPLATE_RANGE + 0.5), p).markerOnly).toBe(true);
+  });
+
+  it('never marks a mob or player plate marker-only', () => {
+    const far = { x: 0, y: 0, z: NPC_NAMEPLATE_RANGE + 5 };
+    expect(plan(ent({ pos: far })).markerOnly).toBe(false);
+    expect(plan(ent({ kind: 'player', id: 3, pos: far })).markerOnly).toBe(false);
   });
 
   it('marks an NPC plate name-only, with no threat tint or combo pips', () => {

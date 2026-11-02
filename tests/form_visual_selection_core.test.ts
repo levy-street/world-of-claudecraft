@@ -10,6 +10,7 @@ import {
   requestedCharacterForm,
   resolvedCharacterForm,
 } from '../src/render/characters/form_visual_selection_core';
+import { VISUALS } from '../src/render/characters/manifest';
 
 function maskFor(auras: ReadonlyArray<{ kind: string; id?: string }>): number {
   return auras.reduce((mask, aura) => mask | characterFormMaskForAura(aura), 0);
@@ -354,5 +355,51 @@ describe('character form readiness vs the compile gate (the stand-in invariant)'
   it('reports an unbuilt form as not ready whatever the pending token is', () => {
     expect(characterFormReadyMask(null, null, null, null, null, null, null)).toBe(0);
     expect(characterFormReadyMask(null, null, null, null, null, null, sheep.root)).toBe(0);
+  });
+});
+
+describe("Thatchbound's puppet bodies", () => {
+  const strawling = { kind: 'incapacitate', id: 'thatchbound_strawling' };
+  const crow = { kind: 'incapacitate', id: 'thatchbound_crow' };
+  it('ride the polymorph slot with their own rigs', () => {
+    expect(requestedCharacterForm(maskFor([strawling]))).toBe('sheep');
+    expect(requestedCharacterForm(maskFor([crow]))).toBe('sheep');
+    expect(characterFormAssetKey('form_sheep', [strawling])).toBe('form_puppet_strawling');
+    expect(characterFormAssetKey('form_sheep', [crow])).toBe('form_puppet_crow');
+  });
+  it('outrank a trick look, and a real polymorph outranks them', () => {
+    const trick = { kind: 'seasonal_cosmetic', id: 'gourdlight_costume_bat' };
+    expect(characterFormAssetKey('form_sheep', [trick, crow])).toBe('form_puppet_crow');
+    expect(
+      characterFormAssetKey('form_sheep', [crow, { kind: 'polymorph', id: 'polymorph' }]),
+    ).toBe('form_sheep');
+  });
+  it('an ordinary incapacitate (a gouge, a fear) wears no body', () => {
+    expect(maskFor([{ kind: 'incapacitate', id: 'fear_incap' }])).toBe(0);
+  });
+});
+
+describe('the Gurglegreen Cauldron goblin (round 11)', () => {
+  const goblin = { kind: 'seasonal_cosmetic', id: 'gourdlight_toy_gurglegreen' };
+  it("rides the polymorph slot as the treasure goblin's body, the costumes' seam", () => {
+    expect(requestedCharacterForm(maskFor([goblin]))).toBe('sheep');
+    expect(characterFormAssetKey('form_sheep', [goblin])).toBe('form_costume_goblin');
+    // a real polymorph and a puppet still outrank a cosmetic body
+    expect(
+      characterFormAssetKey('form_sheep', [goblin, { kind: 'polymorph', id: 'polymorph' }]),
+    ).toBe('form_sheep');
+    expect(
+      characterFormAssetKey('form_sheep', [
+        goblin,
+        { kind: 'incapacitate', id: 'thatchbound_crow' },
+      ]),
+    ).toBe('form_puppet_crow');
+  });
+  it("is the Coinsack Scurrier's own rig and clips, a head shorter than a player", () => {
+    const def = VISUALS.form_costume_goblin;
+    const scurrier = VISUALS.mob_hoard_coinsack_scurrier;
+    expect(def?.url).toBe(scurrier?.url);
+    expect(def?.clips).toBe(scurrier?.clips);
+    expect(def?.height).toBeLessThan(VISUALS.form_trick_skeleton?.height ?? 0);
   });
 });

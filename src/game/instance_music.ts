@@ -9,6 +9,7 @@ import {
   shouldResetMusicForDungeonEntry,
 } from './music';
 import { ALL_MUSIC_ZONES } from './music_zones';
+import { seasonalMusicZone } from './seasonal_music';
 import { smithHeartMusicZoneAt } from './smith_heart_music';
 
 export interface InstanceMusicEntity {
@@ -52,6 +53,10 @@ export interface InstanceMusicInput {
   // zone table, so a player walking across one heard the score churn through
   // whichever shipped zones its rect happened to overlap.
   mapMusic?: MapMusic | null;
+  // The seasonal event running now (IWorld activeSeasonalEvent), or null/absent. A
+  // running event may score its towns with its own theme (seasonal_music.ts); an
+  // authored map's own track and a rift floor are never swapped.
+  seasonalEvent?: string | null;
 }
 
 export interface InstanceMusicDecision {
@@ -159,12 +164,15 @@ export function instanceMusicDecision(input: InstanceMusicInput): InstanceMusicD
     ? riftMusicZoneForTheme(riftFloor.themeName)
     : (smithHeartZone ??
       mapZone ??
-      musicZoneForLocation(
-        input.zone.id,
-        input.zone.biome,
-        inHub,
-        input.inDungeon || inRaidArena,
-        scoredInstanceId,
+      seasonalMusicZone(
+        musicZoneForLocation(
+          input.zone.id,
+          input.zone.biome,
+          inHub,
+          input.inDungeon || inRaidArena,
+          scoredInstanceId,
+        ),
+        input.seasonalEvent ?? null,
       ));
   const musicInstanceId = riftFloor
     ? `rift:${riftFloor.instanceId}:${riftFloor.floorIndex}`

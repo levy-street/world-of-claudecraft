@@ -61,6 +61,10 @@ const QUEST_OBJECT_URLS: Record<string, string> = {
   ps_ferry_bell: '/models/props/marsh_bell_gallows.glb',
   leyline_cache: '/models/dungeon/chest.glb',
   confection_game_box: '/models/dungeon/chest.glb',
+  // Gourdlight Eve's dailies (content/gourdlight_eve_dailies.ts): a stray pumpkin from
+  // Old Thatchgrin's patch, and a green-flamed cursed candle at a town lamp's foot
+  thatchgrin_patch_pumpkin: '/models/dungeon/pumpkin_orange.glb',
+  cursed_candle_stub: '/models/dungeon/skull_candle.glb',
 };
 
 const QUEST_OBJECT_HEIGHTS: Record<string, number> = {
@@ -86,6 +90,8 @@ const QUEST_OBJECT_HEIGHTS: Record<string, number> = {
   ps_ferry_bell: 2.6,
   leyline_cache: 0.85,
   confection_game_box: 0.85,
+  thatchgrin_patch_pumpkin: 0.75,
+  cursed_candle_stub: 0.7,
 };
 
 const SCROLL_ITEM_IDS = new Set(['weathered_ledger_page', 'fen_muster_order', 'highwatch_summons']);
@@ -132,6 +138,8 @@ const ITEM_MAT_OVERRIDES: Record<
   morthen_grimoire: { emissive: 0x3a1850, emissiveIntensity: 0.12 },
   leyline_cache: { color: 0x4f8edc, emissive: 0x245fb0, emissiveIntensity: 0.18 },
   confection_game_box: { color: 0xc45a88, emissive: 0x8e2f63, emissiveIntensity: 0.12 },
+  // the cursed wick burns green, never warm: it reads apart from the event's own candles
+  cursed_candle_stub: { emissive: 0x3cff6e, emissiveIntensity: 0.45 },
 };
 
 const gltfByUrl = new Map<string, LoadedGltf>();

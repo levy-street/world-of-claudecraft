@@ -129,6 +129,8 @@ describe('remastered soundtrack catalog', () => {
       'town_fenbridge',
       'town_highwatch',
       'town_goldcrest',
+      // Gourdlight Eve's town theme (seasonal_music.ts swaps it in for the event cities)
+      'town_gourdlight',
       'vale',
       'vale_legacy',
       'marsh',

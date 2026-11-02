@@ -1038,14 +1038,14 @@ export const pt_BR: EnTranslations = {
       "fateThreadsSentenceReady": "Três Fios do Destino: Sentença pode consumi-los para 18% de dano aumentado."
     },
     "priest": {
-      "gloomtitheLabel": "Gloomtithe",
-      "bombLabel": "Tithe Bomb",
-      "gloomtitheStatus": "{value} of {max} Gloomtithe",
-      "bombStatus": "{value} of {max} Tithe Bomb charges",
-      "bombReady": "Ready",
+      "gloomtitheLabel": "Dízimo sombrio",
+      "bombLabel": "Bomba do dízimo",
+      "gloomtitheStatus": "{value} de {max} Dízimo sombrio",
+      "bombStatus": "{value} de {max} cargas de Bomba do dízimo",
+      "bombReady": "Pronta",
       "chargeCount": "{value} / {max}",
-      "gloomtitheTooltip": "Gloomtithe: up to 5 spendable charges. Void Rupture consumes 3; Vampiric Touch consumes 2 for 30% more damage; Call Tithefiend consumes your bank. Generating charges also fills Tithe Bomb, even while this bank is full.",
-      "bombTooltip": "Tithe Bomb: generate 20 Gloomtithe to prepare one bomb. Spending Gloomtithe does not add progress. Progress lasts between fights. Dying or starting a raid boss resets it. A completed cast consumes the bomb; cancelling keeps it."
+      "gloomtitheTooltip": "Dízimo sombrio: até 5 cargas para gastar. Ruptura do Vazio consome 3; Toque vampírico consome 2 para causar 30% a mais de dano; Invocar Demônio do Dízimo consome toda a sua reserva. Gerar cargas também preenche a Bomba do dízimo, mesmo com a reserva cheia.",
+      "bombTooltip": "Bomba do dízimo: gere 20 cargas de Dízimo sombrio para preparar uma bomba. Gastar Dízimo sombrio não aumenta o progresso. O progresso persiste entre combates. Morrer ou iniciar um combate contra um chefe de raide o reinicia. Um lançamento concluído consome a bomba; cancelá-lo a preserva."
     },
     "procOverlay": {
       "soulFragmentsMeter": "Fragmentos de Alma",
@@ -2600,6 +2600,7 @@ export const pt_BR: EnTranslations = {
       "name_lantern_hall_destrier": "Corcel do Salão da Lanterna",
       "name_chimeglass_tortoise": "Tolliver o Chimeglass",
       "name_rickshaw_mount": "Riquixá de Ossos Vinculados",
+      "name_emberbristle_broom": "Vassoura de cerdas em brasa",
       "name_wobbles_slime": "Balanço, o Limo",
       "name_nightwing_chimera": "Quimera de Asa Noturna",
       "desc_valorsteed": "Um corcel resistente de passos firmes com uma sela de couro.",
@@ -2623,7 +2624,8 @@ export const pt_BR: EnTranslations = {
       "desc_lantern_hall_destrier": "O cavalo de guerra do Salão da Lanterna, protegido em carvalho e ferro sob o azul da guilda, com duas lanternas de tempestade penduradas na sela para iluminar o caminho de casa.",
       "desc_nightwing_chimera": "Uma serpe alada crepuscular de duas cabeças dos galhos antigos, que descansa nas patas traseiras com garras e raspa o chão voando com asas gravadas em magia arcana.",
       "desc_chimeglass_tortoise": "Uma tartaruga das salinas que ultrapassou três gerações de caravanas. Os funileiros moeram-lhe óculos de vidro e penduraram um sino de bronze em sua garganta, para que a estrada o ouça muito antes de vê-lo.",
-      "desc_rickshaw_mount": "Uma carroça de ossos rangente, com um serviçal ossudo atrelado às varas, puxando você em disparada."
+      "desc_rickshaw_mount": "Uma carroça de ossos rangente, com um serviçal ossudo atrelado às varas, puxando você em disparada.",
+      "desc_emberbristle_broom": "Uma vassoura da colheita amarrada com uma fita laranja, que flutua a um palmo do chão e solta brasas de suas cerdas. Uma recompensa permanente da Noite das Abóboras."
     },
     "mountTraining": {
       "mountPrompt": "Pressione {key} para montar no Valorsteed de treinamento.",
@@ -4672,7 +4674,10 @@ export const pt_BR: EnTranslations = {
       }
     },
     "auraEffect": {
-      "stilledMindCrit": "Your next Mindfracture or Void Rupture is a guaranteed critical strike if it hits. Other spells do not consume this bonus. Void Rupture still consumes 3 Gloomtithe charges. A resisted cast consumes the bonus.",
+      "gourdlight": {
+        "thatchbound": "Velho Thatchgrin puxa suas cordas. Você não pode agir: é levado até o aliado mais próximo e o ataca a cada {every} s, causando de {min} a {max} de dano (até {mult} vezes esse valor contra um aliado de nível {level}). Termina antes se você sofrer dano equivalente a {pct}% da sua vida máxima ou se um aliado dissipar o efeito (Magia)."
+      },
+      "stilledMindCrit": "Sua próxima Fratura Mental ou Ruptura do Vazio será um acerto crítico garantido se atingir o alvo. Outros feitiços não consomem este bônus. Ruptura do Vazio ainda consome 3 cargas de Dízimo sombrio. Um lançamento resistido consome o bônus.",
       "wildheart": {
         "packBond": "Recebe {pct}% menos dano enquanto o parceiro está perto. Separe o Mestre das Feras do jaguar para romper.",
         "packBondFury": "Causa {pct}% mais dano enquanto o parceiro está perto.",
@@ -4862,6 +4867,7 @@ export const pt_BR: EnTranslations = {
       "spellHaste": "Aumenta a velocidade de conjuração em {pct}%",
       "sated": "Não pode se beneficiar de outro efeito de aceleração em grupo",
       "cauterizeFatigue": "Cauterizar não pode evitar outro acerto letal",
+      "seasonalCosmetic": "Apenas cosmético: não afeta o combate",
       "castShield": "A conjuração não pode ser interrompida ou atrasada por dano",
       "dmgDone": "Aumenta o dano causado em {pct}%",
       "dmgDoneReduce": "Reduz o dano causado em {pct}%",
@@ -5009,6 +5015,7 @@ export const pt_BR: EnTranslations = {
       "dodgeReduce": "Reduce la probabilidad de esquivar un {pct}%",
       "damageReduction": "Reduz em {pct}% o dano recebido",
       "slumber": "Adormecido até o amanhecer. Não pode ser atacado e não acordará por ninguém.",
+      "slumberNight": "Fica pendurado sem vida em seu poste até anoitecer. Não pode ser atacado.",
       "guardianWard": "O próximo golpe inimigo letal restaura sua vida para {pct}% em vez de matar",
       "armorFlat": "Reduce la armadura en {value}",
       "armorFlatStacks": "Reduce la armadura en {value} ({stacks} acumulaciones)",
@@ -5088,7 +5095,8 @@ export const pt_BR: EnTranslations = {
     "worldBoss": {
       "spawn": "{name} se ergue sobre {zone}!",
       "wake": "{name} despertou sobre {zone}!",
-      "sleep": "{name} dorme até o amanhecer."
+      "sleep": "{name} dorme até o amanhecer.",
+      "sleepUntilNightfall": "{name} dorme até anoitecer."
     },
     "auth": {
       "appleLoginCta": "Continuar com a Apple",
@@ -8616,6 +8624,107 @@ export const pt_BR: EnTranslations = {
       }
     }
   },
+  "seasonal": {
+    "pumpkins": {
+      "name": "Abóbora assombrada",
+      "title": "Abóboras assombradas",
+      "world": "Mundo",
+      "progress": "{label}: {current}/{total}",
+      "found": "Você acende uma Abóbora assombrada em {zone}: {count}/{total}. Doces da Noite das Abóboras recebidos: {sweets}.",
+      "flash": "Abóbora assombrada encontrada! {count}/{total}"
+    },
+    "event": {
+      "gourdlight_eve": {
+        "name": "Noite das Abóboras"
+      }
+    },
+    "trickOrTreat": {
+      "row": "Doces ou travessuras!",
+      "rowAria": "Peça doces ou travessuras a {name}",
+      "knockedHint": "Você já bateu aqui hoje. A porta abre novamente após a reinicialização diária.",
+      "treat": "{name} entrega um doce a você.",
+      "trick": "{name} faz uma travessura com você: {trick}!",
+      "alreadyKnocked": "Você já pediu doces ou travessuras a {name} hoje.",
+      "notActive": "A Noite das Abóboras não está acontecendo no momento.",
+      "tooFar": "Chegue mais perto para bater.",
+      "treatFlash": {
+        "one": "Doces! {count} Doce da Noite das Abóboras",
+        "few": "Doces! {count} Doces da Noite das Abóboras",
+        "many": "Doces! {count} Doces da Noite das Abóboras",
+        "other": "Doces! {count} Doces da Noite das Abóboras"
+      },
+      "trickFlash": "Travessura! {trick}"
+    },
+    "tricks": {
+      "gourdlight_trick_bat": "Loucura de morcego",
+      "gourdlight_trick_skeleton": "Ossos chocalhantes",
+      "gourdlight_trick_fumes": "Vapores verdes",
+      "gourdlight_trick_strawling": "Disfarce de palhudo",
+      "gourdlight_costume_skeleton": "Fantasia de esqueleto",
+      "gourdlight_costume_ghost": "Fantasia de fantasma",
+      "gourdlight_costume_bat": "Fantasia de morcego"
+    },
+    "pumpkinHead": {
+      "on": "Você coloca a Cabeça de abóbora esculpida.",
+      "off": "Você tira a Cabeça de abóbora esculpida."
+    },
+    "jarTrick": "O pote se abre de repente: {trick}!",
+    "guise": "O amuleto crepita e a palha cobre você: {trick}!",
+    "costume": "Você bebe a poção e se transforma: {trick}!",
+    "titleGranted": "Você lê o escrito. Novo título obtido: {title}.",
+    "titleKnown": "Você já possui esse título, então mantém o escrito.",
+    "boundItemGone": "A Noite das Abóboras acabou e seu item {item} se desfaz em palha novamente.",
+    "itemUse": {
+      "pumpkinHead": "Uso: coloque ou retire uma abóbora esculpida e iluminada por dentro, usada sobre o elmo. Cosmética.",
+      "trickJar": "Uso: faz uma travessura aleatória e inofensiva com você por alguns segundos. Cosmético.",
+      "pouch": "Uso: abra para receber {count} Doces da Noite das Abóboras.",
+      "strawlingCharm": "Uso: transforma você em um dos palhudos do Velho Thatchgrin por {seconds} segundos. Não pode ser usado em combate. Nunca é consumido. Cosmético.",
+      "sweet": "Obtido ao pedir doces ou travessuras durante a Noite das Abóboras. Hester Gourdwick os troca por cosméticos em suas barracas em Eastbrook, Fenbridge e Highwatch.",
+      "costumeSkeleton": "Uso: transforma você em um esqueleto chocalhante por {minutes} minutos. Consumida ao usar. Não pode ser usada em combate; entrar em combate encerra o efeito. Cosmética.",
+      "costumeGhost": "Uso: transforma você em um fantasma flutuante por {minutes} minutos. Consumida ao usar. Não pode ser usada em combate; entrar em combate encerra o efeito. Cosmética.",
+      "costumeBat": "Uso: transforma você em um morcego esvoaçante por {minutes} minutos. Consumida ao usar. Não pode ser usada em combate; entrar em combate encerra o efeito. Cosmética.",
+      "toyPrank": "Uso: jogue em outro jogador visível a até {range} metros. A cabeça dele vira uma abóbora iluminada por {seconds} segundos, e ele pode removê-la com o botão direito. Nenhum dos dois pode estar em combate e você não pode estar em furtividade. Nunca é consumida: pode ser usada novamente após {cooldown} segundos. É mantida permanentemente e pode ser usada o ano inteiro. Cosmética.",
+      "toyLantern": "Uso: coloque a lanterna à sua frente. Um pequeno fantasma circula ao seu redor por {seconds} segundos. Não pode ser usada em combate ou em furtividade. Nunca é consumida: pode ser usada novamente após {cooldown} segundos. É mantida permanentemente e pode ser usada o ano inteiro. Cosmética.",
+      "toyBats": "Uso: abra o saco. Um enxame de morcegos guinchantes sai e se espalha ao seu redor por {seconds} segundos. Não pode ser usado em combate ou em furtividade. Nunca é consumido: pode ser usado novamente após {cooldown} segundos. É mantido permanentemente e pode ser usado o ano inteiro. Cosmético.",
+      "toyCandleShadows": "Uso: acenda a vela à sua frente. Por {seconds} segundos, suas chamas projetam sombras dançantes de um gato, um morcego e uma bruxa no chão ao redor, visíveis para todos por perto. Não pode ser usada em combate ou em furtividade. Nunca é consumida: pode ser usada novamente após {cooldown} segundos. É mantida permanentemente e pode ser usada o ano inteiro. Cosmética.",
+      "toyCauldron": "Uso: coloque um grande caldeirão borbulhante à sua frente. Ele permanece por {standing} segundos, e qualquer jogador que beber dele explode em bolhas verdes e vira um goblin por {seconds} segundos, substituindo qualquer fantasia que esteja usando. Não é possível colocá-lo nem beber dele em combate ou em furtividade; entrar em combate encerra a forma de goblin. Nunca é consumido: pode ser usado novamente após {cooldown} segundos. É mantido permanentemente e pode ser usado o ano inteiro. Cosmético.",
+      "titleWrit": "Uso: concede o título {title} a este personagem, equipado pelo Livro dos Feitos. Consumido ao usar. Mantido se você já tiver o título.",
+      "broomSources": "Comprada de Hester Gourdwick por {count} Feixes entretecidos de brasas ou, raramente, deixada pelo Velho Thatchgrin em um dia em que você o saqueia. Montá-la requer a habilidade de montaria. É mantida permanentemente e pode ser montada o ano inteiro.",
+      "sheaf": "O Velho Thatchgrin dá um a cada dia em que você o saqueia, até você possuir a Vassoura de cerdas em brasa. Hester Gourdwick troca {count} pela vassoura em suas barracas em Eastbrook, Fenbridge e Highwatch. Os feixes não gastos são mantidos para a próxima Noite das Abóboras."
+    },
+    "toy": {
+      "prank": "Você joga a abóbora. Ela se espatifa em {name}!",
+      "lantern": "Você coloca a lanterna no chão e um pequeno fantasma sai flutuando para lhe fazer companhia.",
+      "bats": "Você abre o saco e um enxame de morcegos assustados sai voando!",
+      "candleShadows": "Você acende a vela e as sombras começam a dançar ao redor das chamas.",
+      "cauldron": "Você coloca o caldeirão no chão e ele começa a borbulhar.",
+      "cauldronDrink": "Você bebe do caldeirão, explode em bolhas verdes e vira um goblin!",
+      "pranked": "{name} espatifa uma abóbora na sua cabeça! Tire-a com o botão direito ou use com orgulho.",
+      "prankedFlash": "{name} fez uma travessura com você!",
+      "prankNeedsPlayer": "A abóbora só se espatifa em outro jogador que não esteja em combate.",
+      "hidden": "Saia das sombras primeiro: um brinquedo entregaria você."
+    },
+    "itemSource": {
+      "pumpkinHead": "Deixada pelo Velho Thatchgrin, em sua plantação de abóboras além do Campo dos javalis, na primeira vez que você o saqueia. Nenhum vendedor a vende."
+    },
+    "boo": {
+      "row": "Bu!",
+      "rowAria": "Salte na frente de {name} e grite bu",
+      "needsCostume": "Vista uma fantasia primeiro: uma poção de fantasia, uma travessura de morcego ou esqueleto, o Amuleto do palhudo, a Cabeça de abóbora esculpida ou um gole de goblin do Caldeirão Borbulhaverde.",
+      "frightenedHint": "{name} ainda está assustado desde seu último susto. Procure outra pessoa.",
+      "landed": "Você salta na frente de {name} com um BU! Um grito ecoa e quase tudo vai ao chão.",
+      "flash": "BU! {name} levou um susto!",
+      "noCostume": "Sem fantasia, {name} só ri de você. Vista uma primeiro.",
+      "already": "{name} já levou sustos suficientes por hoje.",
+      "notOnErrand": "Hester não pediu para você assustar ninguém hoje."
+    },
+    "tokenPrice": "{count} {item}",
+    "thatchgrin": {
+      "poleBound": "Preso ao poste",
+      "wakeYell": "A NOITE cai sobre a horta! Quem anda pelo MEU campo?",
+      "sleepYell": "O sol nasceu. De volta ao poste, de volta à vigia."
+    }
+  },
   "dungeonGuide": {
     "drownedTemple": {
       "greet": {
@@ -9910,7 +10019,7 @@ export const pt_BR: EnTranslations = {
       "framesGovernedTalkingHead": "Editar quadros também afrouxa o painel Diálogo, que carrega a linha falada de um NPC enquanto esse NPC está fora de sua vista; ele usa seu chip de nome enquanto está solto.",
       "framesGovernedShardpike": "Editar quadros também permite mover a barra do Pique de Estilhaços, a pequena fileira de ações de ferramenta de missão que aparece ao lado das barras de ações apenas enquanto você carrega o próprio pique. Ela mostra sua etiqueta de nome enquanto está solta para posicioná-la antes do combate, em vez de durante ele.",
       "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
-      "framesGovernedPriest": "Edit Frames also lets you move the Shadow priest's Gloomtithe and Tithe Bomb medallion.",
+      "framesGovernedPriest": "Editar quadros também permite mover o medalhão de Dízimo sombrio e Bomba do dízimo do sacerdote de Sombra.",
       "framesGovernedResourceAndHill": "Ative Separar barra de recursos na aba Quadros para que Editar Quadros também libere sua barra de recursos, permitindo posicionar mana, energia ou raiva separadamente onde quiser. Largura da barra de recursos e Altura da barra de recursos, na mesma aba, ajustam seu tamanho. Editar Quadros também libera a barra do Rei da Colina; Opacidade do fundo do Rei da Colina, nessa aba, esmaece o painel sem prejudicar a leitura do texto.",
       "barsTitle": "Barras, temporizadores e texto de combate",
       "barsBody": "Sua barra de conjuração aparece no meio da tela, logo acima das suas barras de ação, sempre que você conjura ou canaliza, e mostra o nome do feitiço e o tempo restante. Seu alvo tem sua própria barra de conjuração no quadro dele, para que você veja o que está por vir e possa reagir.\n\nUma fina barra de ataque fica sob sua barra de conjuração e se enche entre os golpes da sua arma, para que um combatente corpo a corpo ou à distância veja quando o próximo acerto automático vai acontecer.\n\nSua barra de experiência ocupa toda a largura sob suas barras de ação, dividida em segmentos, com um trecho mais claro mostrando a experiência de descanso que você acumulou.\n\nNade debaixo d'água e uma barra azul de fôlego aparece no topo da tela. Ela se esvazia enquanto sua cabeça estiver submersa, pisca em vermelho quando se esgota e você começa a se afogar, e se enche rapidamente assim que você emerge à superfície. Espaço faz você nadar para cima, e a tecla Nadar para Baixo, Ctrl por padrão, leva você mais fundo.\n\nO dano e a cura sobem, em forma de pequenos números, sobre quem os recebeu, para que você acompanhe uma luta sem precisar ler texto. A aba Combate na sua janela de chat mantém o registro escrito completo.",
@@ -10815,6 +10924,7 @@ export const pt_BR: EnTranslations = {
       "hillBodyRamp": "A cada duas horas, uma colina surge em Drakelands, nos Confins de Frostveil ou em Amberfall. O reino recebe um aviso com quinze minutos de antecedência, e o círculo é marcado em terreno aberto. A colina permanece ativa por trinta minutos. Entrar no círculo ativo ativa sua bandeira de PvP Mundial pelas regras normais de nível, inclusive para membros de raide. O grupo com mais jogadores elegíveis dentro do círculo conquista a colina após um minuto de maioria ininterrupta; um jogador sozinho conta como um grupo de um, mas membros de raide e jogadores abaixo do nível exigido para PvP não podem capturar a colina nem ganhar Honra por ela. Cada integrante do grupo que a controla e está dentro do círculo ganha Honra em ritmo crescente. Os pagamentos são mais frequentes e aumentam mais rápido, preservando a Honra total do antigo evento de quarenta e cinco minutos. Uma mudança de controle reinicia o aumento das recompensas. Sair do círculo mantém sua bandeira ligada; /pvp off usa o atraso normal de cinco minutos e não pode terminar dentro de uma colina ativa ou durante o combate. A barra da colina mostra o controle, os números de jogadores e o progresso de captura; /hill informa sua localização.",
       "hillBodyPause": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls, and every five minutes while it stands the realm is told where it is and which groups have held it longest. The party with the most players standing inside contests the hill, and after thirty seconds of majority the hill is theirs. A rival party walking in only pauses that count until yours leads again; it starts over only if nobody from your party is left alive inside. A lone player counts as a party of one and keeps a hill they hold when they form a party, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns Honor every minute, and the longer the same party holds it, the more each minute pays: a full party holding an uncontested hill for its whole stand earns about as much as three battleground wins. When the hill changes hands, the new holders start the count from the beginning. When it falls, if the group that held it longest in total held it for at least ten minutes, everyone who stood inside for that group for at least a minute, and is still in that group, earns one win toward the PvP row of the Weekly Vault. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
       "hillBodyFlat": "Uma vez a cada três horas, em um momento imprevisível, todo o reino é avisado de que uma colina surgirá em uma das zonas do norte em quinze minutos, e seu círculo é marcado em terreno aberto. Ela permanece por quarenta e cinco minutos e depois desaparece. Enquanto isso, a cada cinco minutos são anunciados sua localização e os grupos com os maiores tempos totais de controle. O grupo com mais jogadores dentro do círculo disputa a colina e a captura após acumular trinta segundos de superioridade numérica. A entrada de um grupo rival apenas pausa a contagem até o seu voltar à liderança; ela só recomeça do zero se não restar nenhum integrante vivo do seu grupo dentro do círculo. Um jogador sozinho conta como um grupo de uma pessoa e mantém a colina ao formar um grupo, mas integrantes de raide não contam. Cada membro do grupo que controla a colina e está dentro recebe a mesma quantidade de Honra por minuto, independentemente do tempo de controle. Um grupo completo que a mantenha sem oposição durante toda a sua existência ganha aproximadamente o mesmo que por três vitórias em campos de batalha. Quando ela desaparece, se o grupo com o maior tempo total de controle acumulou pelo menos dez minutos, todos que ficaram dentro por pelo menos um minuto durante o controle desse grupo e ainda fazem parte dele recebem uma vitória para a linha de PvP do Cofre Semanal. Uma barra sobre o campo mostra quem a controla, a quantidade de jogadores dos dois lados e a contagem de captura; /hill no chat informa onde ela está.",
+      "hillBodyTwoHour": "Uma vez a cada duas horas, em um momento imprevisível, todo o reino é avisado de que uma colina surgirá em uma das zonas do norte em quinze minutos, e o círculo onde ficará é marcado em terreno aberto. Ao surgir, ela permanece por trinta minutos e depois desaparece. Enquanto está presente, o reino recebe a cada cinco minutos sua localização e os grupos que a controlaram por mais tempo. O grupo com mais jogadores dentro do círculo disputa a colina e a conquista após trinta segundos de maioria. A entrada de um grupo rival apenas pausa a contagem até o seu grupo voltar à frente; ela só recomeça se nenhum integrante vivo do seu grupo permanecer dentro. Um jogador sozinho conta como um grupo de uma pessoa e mantém a colina ao formar um grupo, mas integrantes de raides não contam. Enquanto um grupo controla a colina, cada integrante dentro do círculo ganha a mesma quantidade de Honra por minuto, independentemente de há quanto tempo a controla. Assim, um grupo completo que a mantenha sem oposição durante toda a duração ganha aproximadamente o mesmo que em duas vitórias em campos de batalha. Quando a colina desaparece, se o grupo que a controlou por mais tempo no total a manteve por pelo menos dez minutos, todos que ficaram dentro para aquele grupo por pelo menos um minuto e ainda fazem parte dele ganham uma vitória para a linha JxJ do Cofre Semanal. Uma barra sobre o campo mostra quem a controla, seus números contra os adversários e o tempo de disputa; /hill no chat informa a localização.",
       "limitsBodyRaids": "Derrotar o mesmo jogador repetidamente paga cada vez menos e logo nada, e sua contagem contra aquele jogador só recomeça cerca de uma hora depois da primeira dessas mortes, então esperar de tocaia por uma única vítima nunca compensa a espera. Um alvo muito abaixo do seu nível não paga nada. Campos de Batalha e Arenas seguem suas próprias regras enquanto você está dentro deles, e pagam mais Honra que o mundo aberto, então o JcJ mundial é o caminho mais lento até o mesmo vendedor. Raides não ganham nada com mortes no mundo: um membro de raide não recebe Honra nem ouro e não reduz a parte de mais ninguém, então lute em grupo para ser pago."
     },
     "thornhollowPage": {
@@ -15556,6 +15666,7 @@ export const pt_BR: EnTranslations = {
       "accountSuspended": "Esta conta está suspensa até {date}.",
       "alreadyInWorld": "O personagem já está no mundo.",
       "accountSessionLimit": "Personagens demais desta conta já estão no mundo.",
+      "worldFightHold": "Outro personagem desta conta ainda está no mundo após um combate. Tente novamente em alguns minutos.",
       "takenOver": "Seu personagem foi assumido por outra sessão.",
       "vaultMailRecovering": "Seu correio de recompensa do cofre está sendo restaurado. Tente novamente em breve.",
       "renameBeforeEntering": "Este personagem precisa ser renomeado antes de entrar no mundo.",
@@ -18449,16 +18560,16 @@ export const pt_BR: EnTranslations = {
         "description": "Canaliza por 3 s, causando {damage} de dano das Sombras a cada segundo. O dano aumenta com o Poder Mágico."
       },
       "vampiric_touch": {
-        "name": "Vampiric Touch",
-        "description": "Deal {damage} Shadow damage over 15 sec, once every 3 sec. Damage increases with Spell Power and ticks can critically strike. Each tick shares healing equal to 20% of the health lost by the enemy among you and injured party members within 30 yards; in a raid, only your subgroup receives this healing. If you have at least 2 Gloomtithe charges, applying this effect consumes 2 to increase all its damage by 30%."
+        "name": "Toque vampírico",
+        "description": "Causa {damage} de dano de Sombra ao longo de 15 s, com um efeito a cada 3 s. O dano aumenta com o poder mágico e os efeitos periódicos podem causar acertos críticos. Cada efeito distribui uma cura equivalente a 20% da vida perdida pelo inimigo entre você e os membros feridos do grupo em um raio de 30 metros; em raides, apenas seu subgrupo recebe essa cura. Se você tiver pelo menos 2 cargas de Dízimo sombrio, aplicar este efeito consome 2 para aumentar todo o dano dele em 30%."
       },
       "void_rupture": {
-        "name": "Void Rupture",
-        "description": "Consume 3 Gloomtithe charges to rupture an enemy for {damage} Shadow damage. Damage increases with Spell Power and can critically strike. Requires 3 charges and consumes them even if resisted."
+        "name": "Ruptura do Vazio",
+        "description": "Consome 3 cargas de Dízimo sombrio para dilacerar um inimigo e causar {damage} de dano de Sombra. O dano aumenta com o poder mágico e pode causar acertos críticos. Requer 3 cargas e as consome mesmo se houver resistência."
       },
       "spirit_bomb": {
-        "name": "Tithe Bomb",
-        "description": "Detonate a spirit bomb on an enemy, dealing {damage} Shadow damage to enemies within 8 yards of that target. Damage increases with Spell Power, can critically strike, and is reduced beyond 5 targets. Generate 20 Gloomtithe to prepare one bomb. Generation counts even while holding the maximum 5 Gloomtithe; spending charges is not required and adds no progress. Progress lasts between fights, up to one prepared bomb. Dying clears your progress and prepared bomb. Completing the cast consumes the prepared bomb, even if resisted. Cancellation or interruption preserves it. Starting a raid boss encounter clears your progress and prepared bomb. Cannot open a raid boss encounter with this spell."
+        "name": "Bomba do dízimo",
+        "description": "Detona uma bomba espiritual em um inimigo, causando {damage} de dano de Sombra aos inimigos em um raio de 8 metros desse alvo. O dano aumenta com o poder mágico, pode causar acertos críticos e é reduzido quando há mais de 5 alvos. Gere 20 cargas de Dízimo sombrio para preparar uma bomba. A geração conta mesmo ao manter o máximo de 5 cargas; gastá-las não é necessário e não aumenta o progresso. O progresso persiste entre combates, até uma bomba preparada. Morrer elimina seu progresso e sua bomba preparada. Concluir o lançamento consome a bomba preparada, mesmo se houver resistência. Cancelar ou interromper o lançamento a preserva. Iniciar um confronto com um chefe de raide elimina seu progresso e sua bomba preparada. Não é possível iniciar um confronto com um chefe de raide usando este feitiço."
       },
       "flash_heal": {
         "name": "Prece Urgente",
@@ -19294,7 +19405,7 @@ export const pt_BR: EnTranslations = {
       "inner_focus": {
         "name": "Mente Serena",
         "description": "Torna vossa próxima magia de sacerdote gratuita e ininterrompível. Dura 60 s.",
-        "specNote_shadow": "Also reserves a guaranteed critical strike for your next Mindfracture or Void Rupture within 60 sec, if it hits. Other spells do not consume this bonus. Void Rupture still consumes 3 Gloomtithe charges. A resisted cast consumes the critical strike bonus."
+        "specNote_shadow": "Também reserva um acerto crítico garantido para sua próxima Fratura Mental ou Ruptura do Vazio em até 60 s, se atingir o alvo. Outros feitiços não consomem este bônus. Ruptura do Vazio ainda consome 3 cargas de Dízimo sombrio. Um lançamento resistido consome o bônus de acerto crítico."
       },
       "innervate": {
         "name": "Seiva Vital",
@@ -19492,7 +19603,7 @@ export const pt_BR: EnTranslations = {
       "choir_of_deliverance": {
         "name": "Coro da Libertação",
         "description": "Canaliza por 6 s, curando membros do grupo num raio de 30 metros em {damage} a cada 2 s. A cura aumenta com o poder mágico.",
-        "specNote_shadow": "For 15 sec, share 20% of the health enemies lose to your Shadow damage as healing among injured party members within 30 yards, including yourself. In raids, only your subgroup is healed. Cast instantly and keep attacking in Shadowform. Absorbed damage and overkill do not add healing."
+        "specNote_shadow": "Por 15 s, distribui como cura 20% da vida que os inimigos perdem para seu dano de Sombra entre os membros feridos do grupo em um raio de 30 metros, incluindo você. Em raides, apenas seu subgrupo é curado. Lançamento instantâneo, permitindo continuar atacando na forma sombria. Dano absorvido e dano excedente à vida restante não geram cura."
       },
       "bear_charge": {
         "name": "Investida de Bruin",
@@ -24707,6 +24818,87 @@ export const pt_BR: EnTranslations = {
       "vanguard_pendant_of_mending": {
         "name": "Pingente da Vanguarda de Cura"
       },
+      "gourdlight_sweet": {
+        "name": "Doce da Noite das Abóboras"
+      },
+      "gourdlight_treat_pouch": {
+        "name": "Saquinho de doces da Noite das Abóboras"
+      },
+      "carved_pumpkin_head": {
+        "name": "Cabeça de abóbora esculpida"
+      },
+      "jar_of_mischief": {
+        "name": "Pote de travessuras"
+      },
+      "thatchgrin_sweet_sack": {
+        "name": "Saco de doces de Thatchgrin"
+      },
+      "strawling_charm": {
+        "name": "Amuleto do palhudo"
+      },
+      "rattlebone_draught": {
+        "name": "Poção de ossos chocalhantes"
+      },
+      "haunting_draught": {
+        "name": "Poção assombrada"
+      },
+      "batwing_draught": {
+        "name": "Poção esvoaçante"
+      },
+      "writ_of_the_gourdlit": {
+        "name": "Escrito do Iluminado pelas Abóboras"
+      },
+      "writ_of_the_trickster": {
+        "name": "Escrito do Travesso"
+      },
+      "writ_of_the_hollow_grin": {
+        "name": "Escrito do Sorriso Oco"
+      },
+      "reins_emberbristle_broom": {
+        "name": "Vassoura de cerdas em brasa"
+      },
+      "hearthroot_toffee": {
+        "name": "Caramelo de raiz da lareira"
+      },
+      "gourdseed_brittle": {
+        "name": "Crocante de sementes de abóbora"
+      },
+      "crabapple_chew": {
+        "name": "Bala mastigável de maçã silvestre"
+      },
+      "owlwatch_fudge": {
+        "name": "Doce cremoso da coruja vigia"
+      },
+      "lantern_mint_drop": {
+        "name": "Bala de hortelã da lanterna"
+      },
+      "emberwoven_sheaf": {
+        "name": "Feixe entretecido de brasas"
+      },
+      "prankers_pumpkin": {
+        "name": "Abóbora do brincalhão"
+      },
+      "wanderwisp_lantern": {
+        "name": "Lanterna do fogo-fátuo errante"
+      },
+      "sack_of_startled_bats": {
+        "name": "Saco de morcegos assustados"
+      },
+      "murmurwick_candle": {
+        "name": "Vela de pavio murmurante"
+      },
+      "gurglegreen_cauldron": {
+        "name": "Caldeirão Borbulhaverde"
+      },
+      "thatchgrin_patch_pumpkin": {
+        "name": "Abóbora da horta"
+      },
+      "cursed_candle_stub": {
+        "name": "Toco de vela amaldiçoada"
+      },
+      "gourdlight_crow_feather": {
+        "name": "Pena de corvo da Noite das Abóboras"
+      },
       "membership_staff": {
         "name": "Cajado da mudança"
       },
@@ -26263,6 +26455,18 @@ export const pt_BR: EnTranslations = {
       "muster_effigy": {
         "name": "Capataz de Palha"
       },
+      "gourdlight_thatchgrin": {
+        "name": "Velho Thatchgrin"
+      },
+      "gourdlight_crow": {
+        "name": "Corvo da Noite das Abóboras"
+      },
+      "gourdlight_strawling": {
+        "name": "Palhudo"
+      },
+      "gourdlight_swelling_gourd": {
+        "name": "Abóbora inchada"
+      },
       "stable_horse": {
         "name": "Cavalo de estábulo"
       },
@@ -27416,6 +27620,11 @@ export const pt_BR: EnTranslations = {
         "name": "Hester Quillby",
         "title": "Cartógrafo",
         "greeting": "Todo mapa deste pântano que comprei ficou errado em menos de uma estação. A água move os caminhos e os caminhos movem a água. Então desenho os meus e fico aqui, onde é seco, enquanto a tinta assenta."
+      },
+      "gourdlight_keeper": {
+        "name": "Hester Gourdwick",
+        "title": "Guardiã da Noite das Abóboras",
+        "greeting": "As abóboras estão acesas e as lanternas penduradas, então só pode ser a Noite das Abóboras. Bata às portas dos moradores de Eastbrook, Fenbridge e Highwatch e diga as palavras: doces ou travessuras. A maioria dará um doce. Alguns farão uma travessura com você. Traga os doces para mim, em qualquer uma das minhas barracas, e eu os trocarei por algo para vestir."
       },
       "reeve_ottoline": {
         "name": "Prefeita Ottoline",
@@ -30048,6 +30257,88 @@ export const pt_BR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Cura efetiva aplicada ao Boneco de Cura"
+          }
+        }
+      },
+      "q_gourdlight_rounds": {
+        "title": "Ronda da Noite das Abóboras",
+        "text": "Toda Noite das Abóboras as crianças do Vale fazem sua ronda, e este ano você vai com elas, {playerName}. Bata em cinco portas nas nossas cidades, diga as palavras e veja o que recebe. Volte para falar comigo quando terminar.",
+        "completion": "Cinco portas e você ainda tem todos os dedos. Tome, um saquinho de doces para a volta para casa. Volte amanhã, as portas abrirão de novo.",
+        "objectives": {
+          "0": {
+            "label": "Portas visitadas"
+          }
+        }
+      },
+      "q_gourdlight_daily_patch": {
+        "title": "Abóboras da horta",
+        "text": "A horta do Velho Thatchgrin além do Campo dos javalis está cheia de abóboras, e metade rolou para longe da palha dele, onde alguém cuidadoso pode alcançá-las. Traga cinco para mim, {playerName}. Mantenha distância do velho espantalho. Ele conta uma por uma.",
+        "completion": "Cinco bem redondas, sem uma única mordida. Vai ter torta para todo o Vale. Tome, pelo trabalho.",
+        "objectives": {
+          "0": {
+            "label": "Abóboras da horta"
+          }
+        }
+      },
+      "q_gourdlight_daily_boo": {
+        "title": "Bu!",
+        "text": "Ninguém nestas cidades levou um bom susto em um ano, {playerName}, e uma Noite das Abóboras sem sustos é só uma noite fria. Vista uma fantasia, qualquer uma das minhas serve, ou aquela cabeça de abóbora se você ganhou uma. Depois se aproxime de fininho de três moradores e dê um belo BU! bem alto.",
+        "completion": "Três? Ouvi o cozinheiro derrubar uma frigideira do outro lado da praça. Muito bem. Aqui está sua parte.",
+        "objectives": {
+          "0": {
+            "label": "Moradores assustados"
+          }
+        }
+      },
+      "q_gourdlight_daily_wicks": {
+        "title": "Pavios perversos",
+        "text": "Alguém anda colocando velas de chamas verdes aos pés dos nossos postes. Elas queimam sem derreter e sussurram quando você vira as costas. Apague seis para mim, {playerName}, em qualquer uma das três cidades, e traga os tocos.",
+        "completion": "Seis tocos, frios como geada. Quem os acendeu vai ter que se esforçar mais. Pegue isto e lave as mãos.",
+        "objectives": {
+          "0": {
+            "label": "Velas amaldiçoadas apagadas"
+          }
+        }
+      },
+      "q_gourdlight_daily_towns": {
+        "title": "Uma porta em cada cidade",
+        "text": "As crianças dizem que um verdadeiro andarilho das Abóboras bate às portas de todas as cidades antes do fim da noite. Prove que elas estão certas, {playerName}. Peça doces ou travessuras em uma porta de Eastbrook, uma de Fenbridge e uma de Highwatch. As lanternas nas estradas iluminarão seu caminho.",
+        "completion": "Três cidades em uma noite! Suas botas mereceram isto mais do que você.",
+        "objectives": {
+          "0": {
+            "label": "Uma porta visitada em Eastbrook"
+          },
+          "1": {
+            "label": "Uma porta visitada em Fenbridge"
+          },
+          "2": {
+            "label": "Uma porta visitada em Highwatch"
+          }
+        }
+      },
+      "q_gourdlight_daily_feathers": {
+        "title": "Penas para o fogo",
+        "text": "Quando o Velho Thatchgrin fica encurralado, chama seus corvos sobre quem estiver batendo em sua palha. As penas deles queimam com uma chama verde na lareira, e preciso de três para a fogueira desta noite. Encontre uma briga na horta dele, {playerName}, e arranque-as de seus corvos.",
+        "completion": "Negras como um campo sem lua, e já cheiram a fumaça. A fogueira será um espetáculo. Obrigada.",
+        "objectives": {
+          "0": {
+            "label": "Penas de corvo"
+          }
+        }
+      },
+      "q_gourdlight_daily_baskets": {
+        "title": "Cestas para os vizinhos",
+        "text": "Toda Noite das Abóboras eu encho uma cesta de doces para um velho amigo em cada cidade, e meus joelhos já não são os mesmos. Entregue-as por mim, {playerName}: ao cozinheiro Marlow em Eastbrook, à Herbalista Yara em Fenbridge e ao mestre do saber Caddis lá em Highwatch.",
+        "completion": "As três entregues, e ouvi dizer que Marlow chorou. Ele sempre chora. Aqui está uma cesta só sua.",
+        "objectives": {
+          "0": {
+            "label": "Cesta entregue ao cozinheiro Marlow"
+          },
+          "1": {
+            "label": "Cesta entregue à Herbalista Yara"
+          },
+          "2": {
+            "label": "Cesta entregue ao mestre do saber Caddis"
           }
         }
       },

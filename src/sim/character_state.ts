@@ -164,6 +164,9 @@ export interface CharacterState extends ReferralRewardState {
   // The weekly emissary's pick. Optional and omitted while there is none, so
   // every pre-feature save loads with no charge taken.
   weeklyQuest?: WeeklyQuestProgress;
+  // Seasonal events (src/sim/seasonal/): today's trick-or-treat knocks and the
+  // worn pumpkin head. Written only when non-empty, so untouched saves stay byte-equal.
+  seasonal?: import('./seasonal/seasonal_state').SavedSeasonalState;
   // Legacy arenaRating/Wins/Losses are treated as 1v1 data. The explicit
   // 1v1 fields are written by new saves, while old saves fall back cleanly.
   arenaRating?: number;

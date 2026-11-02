@@ -899,7 +899,7 @@ describe('item-art consistency accepted-art provenance', () => {
     // All five referral rewards now own paintings; only the retired Phoenix remains pending.
     // Wobbles the Slime's reins (reins_wobbles_slime, a render of the shipped mount): 2,213.
     // + the sprite buddy's whistle (whistle_sprites): 2,214.
-    expect(Object.keys(ITEMS)).toHaveLength(2194);
+    expect(Object.keys(ITEMS)).toHaveLength(2221);
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
       1255,
     );
@@ -1134,12 +1134,12 @@ describe('item-art consistency accepted-art provenance', () => {
     // Icon backlog adds 135 Season 2 armour icons, five referral icons, the Horse Whistle, and Nightwing Chimaera.
     // Wobbles the Slime's reins (reins_wobbles_slime, a render of the shipped mount): 2,183.
     // + the sprite buddy's whistle: 2,184 owners / 2,214 items.
-    expect(new Set(currentOwnerIds).size).toBe(2164);
-    expect(shippingIds).toHaveLength(2164);
+    expect(new Set(currentOwnerIds).size).toBe(2191);
+    expect(shippingIds).toHaveLength(2191);
     // The restored legacy whistle and charm definitions add 36 item ids.
     // All five referral rewards now own paintings; only the retired Phoenix remains pending.
     // Wobbles the Slime's reins (reins_wobbles_slime, a render of the shipped mount): 2,213.
-    expect(Object.keys(ITEMS)).toHaveLength(2194);
+    expect(Object.keys(ITEMS)).toHaveLength(2221);
 
     const datedVerdict = readJson<FinalAuditVerdict>(CURRENT_VERDICT_PATH);
     const oldPassIds = sorted(datedVerdict.visualVerdict.passIds);
@@ -1413,6 +1413,16 @@ describe('item-art consistency accepted-art provenance', () => {
               'vanguard-jewelry-icons-2026-10-03',
               'lantern-hall-seal-2026-10-16',
               'lantern-hall-destrier-reins-2026-10-16',
+              // Gourdlight Eve's four event items (Blender renders)
+              'gourdlight-eve-icons-2026-10-16',
+              'gourdlight-eve-thatchgrin-icons-2026-10-17',
+              // ...and its later rounds: the shop's draughts, writs and broom, the candies,
+              // the broom's sheaf, the dailies' errand items and Hester's toys
+              'gourdlight-eve-shop-and-broom-icons-2026-10-17',
+              'gourdlight-eve-candy-icons-2026-10-18',
+              'gourdlight-eve-sheaf-icon-2026-10-18',
+              'gourdlight-eve-daily-icons-2026-10-18',
+              'gourdlight-eve-toy-icons-2026-10-18',
             ].includes(batchId ?? ''),
           )
           .flatMap(({ itemIds }) => itemIds),
@@ -1600,7 +1610,7 @@ describe('item-art consistency accepted-art provenance', () => {
     // The membership weapon batch (membership-weapon-2026-10-14, PR 4281): 60.
     // Backlog replacements consolidate old owners into a net 21 additional batches; Lantern
     // Hall's seal and its horse's reins add two: 83.
-    expect(mapping.generatedBatches).toHaveLength(83);
+    expect(mapping.generatedBatches).toHaveLength(90);
     const batch = mapping.generatedBatches.find(({ batchId }) => batchId === BATCH_ID);
     expect(batch).toBeDefined();
     expect(batch).toMatchObject({
@@ -1679,7 +1689,7 @@ describe('item-art consistency accepted-art provenance', () => {
     // Staff of Changing batch (PR 4281) adds one: 1510.
     // Backlog adds 141 files; replacements preserve the remaining owner count.
     // + the sprite buddy's whistle render (buddy-whistle-icons batch): 1,652.
-    expect(priorGeneratedIds).toHaveLength(1630);
+    expect(priorGeneratedIds).toHaveLength(1657);
     const allCurrentOwnerIds = [
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
@@ -1688,8 +1698,8 @@ describe('item-art consistency accepted-art provenance', () => {
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 2005 + Nightwing Chimaera mount: 2182.
     // Wobbles the Slime's reins (reins_wobbles_slime, a render of the shipped mount) adds one ordinary entry: 2,183.
     // + the sprite buddy's whistle render: 2,184.
-    expect(allCurrentOwnerIds).toHaveLength(2164);
-    expect(new Set(allCurrentOwnerIds).size).toBe(2164);
+    expect(allCurrentOwnerIds).toHaveLength(2191);
+    expect(new Set(allCurrentOwnerIds).size).toBe(2191);
     expect({
       entries: mapping.entries.length,
       priorGenerated: priorGeneratedIds.length,
@@ -1712,7 +1722,7 @@ describe('item-art consistency accepted-art provenance', () => {
       // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 1475.
       // Plus 34 restored buddy provenance owners, and the membership staff: 1510.
       // Restored feral staff and eight Season 2 jewelry paintings.
-      priorGenerated: 1630,
+      priorGenerated: 1657,
       historicalAudit: 274,
       masterwroughtCompletion: 165,
       crucibleProfessions: 46,
@@ -1812,6 +1822,14 @@ describe('item-art consistency accepted-art provenance', () => {
                 'quest-shield-icons-2026-10-23',
                 'warfare-season2-feral-staff-2026-09-29',
                 'vanguard-jewelry-icons-2026-10-03',
+                'gourdlight-eve-icons-2026-10-16',
+                'gourdlight-eve-thatchgrin-icons-2026-10-17',
+                // Gourdlight Eve's later rounds (shop and broom, candies, sheaf, dailies, toys)
+                'gourdlight-eve-shop-and-broom-icons-2026-10-17',
+                'gourdlight-eve-candy-icons-2026-10-18',
+                'gourdlight-eve-sheaf-icon-2026-10-18',
+                'gourdlight-eve-daily-icons-2026-10-18',
+                'gourdlight-eve-toy-icons-2026-10-18',
               ].includes(batchId),
           )
           .flatMap(({ itemIds }) => itemIds),
@@ -1991,9 +2009,9 @@ describe('item-art consistency accepted-art provenance', () => {
     // Plus the Mirefen world-boss branch and Balgath's loot (15 items) = 1890.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 2005.
     // Wobbles the Slime's reins: 2,183.
-    if (ownerIds.length !== 2164)
-      violations.push(`mapping owner count: ${ownerIds.length} != 2164`);
-    if (fileIds.length !== 2164) violations.push(`shipping WebP count: ${fileIds.length} != 2164`);
+    if (ownerIds.length !== 2191)
+      violations.push(`mapping owner count: ${ownerIds.length} != 2191`);
+    if (fileIds.length !== 2191) violations.push(`shipping WebP count: ${fileIds.length} != 2191`);
     for (const id of ids) {
       const ownerCount = ownerCountById.get(id) ?? 0;
       if (ownerCount !== 1) violations.push(`${id}: current owner count ${ownerCount} != 1`);

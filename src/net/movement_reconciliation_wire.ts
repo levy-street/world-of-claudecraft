@@ -1,8 +1,8 @@
 import type { FerryDeckMirror } from '../sim/types';
-import { GuildHallWireState } from './guild_hall_wire_state';
+import { SeasonalWireState } from './seasonal_wire_state';
 import { parseFerryDeck } from './transport_wire';
 
-export class ReconWireState extends GuildHallWireState {
+export class ReconWireState extends SeasonalWireState {
   reconAuthoritativeX: number | null = null;
   reconAuthoritativeY: number | null = null;
   reconAuthoritativeZ: number | null = null;

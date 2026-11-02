@@ -482,8 +482,13 @@ function weldCutRim(state: ChunkGeometryArrays): {
       // The rim's own arc-length UVs are dropped here on purpose: the terrain
       // material's detail maps are world-planar, so a band that maps the same
       // way reads as the same rock the cliffs around it are made of.
-      uvs[vi * 2] = (rim.positions[i * 3] + WORLD_MAX_X) / (WORLD_MAX_X * 2);
-      uvs[vi * 2 + 1] = (rim.positions[i * 3 + 2] - WORLD_MIN_Z) / worldDepth;
+      if (!GFX.terrainSplat) {
+        uvs[vi * 2] = 0;
+        uvs[vi * 2 + 1] = 0;
+      } else {
+        uvs[vi * 2] = (rim.positions[i * 3] + WORLD_MAX_X) / (WORLD_MAX_X * 2);
+        uvs[vi * 2 + 1] = (rim.positions[i * 3 + 2] - WORLD_MIN_Z) / worldDepth;
+      }
     }
   }
   if (clip) {
@@ -2445,6 +2450,7 @@ function buildLambertMaterial(brush: BrushUniforms): THREE.MeshLambertMaterial {
     Object.assign(sh.uniforms, brush);
     sh.uniforms.uWocFillBoost = sharedUniforms.uTerrainFillBoost;
     sh.uniforms.uWocTime = sharedUniforms.uTime;
+    sh.uniforms.uWocDayNight = sharedUniforms.uDayNight;
     sh.uniforms.uWocWaterLevel = { value: WATER_LEVEL };
     sh.vertexShader = sh.vertexShader
       .replace(
@@ -2452,14 +2458,20 @@ function buildLambertMaterial(brush: BrushUniforms): THREE.MeshLambertMaterial {
         `#include <common>
         varying vec3 vWocWPos;
         varying vec3 vWocWNorm;
-        varying float vWocCamDist;`,
+        varying float vWocCamDist;
+        varying vec2 vWocLowMask;`,
       )
       .replace(
         '#include <begin_vertex>',
         `#include <begin_vertex>
         vWocWPos = (modelMatrix * vec4(transformed, 1.0)).xyz;
         vWocWNorm = normalize(mat3(modelMatrix) * objectNormal);
-        vWocCamDist = length((modelViewMatrix * vec4(transformed, 1.0)).xyz);`,
+        vWocCamDist = length((modelViewMatrix * vec4(transformed, 1.0)).xyz);
+        #if defined( USE_UV ) || defined( USE_MAP )
+        vWocLowMask = uv;
+        #else
+        vWocLowMask = vec2(0.0);
+        #endif`,
       );
     sh.fragmentShader = sh.fragmentShader
       .replace(
@@ -2468,10 +2480,22 @@ function buildLambertMaterial(brush: BrushUniforms): THREE.MeshLambertMaterial {
         varying vec3 vWocWPos;
         varying vec3 vWocWNorm;
         varying float vWocCamDist;
+        varying vec2 vWocLowMask;
         uniform float uWocFillBoost;
         uniform float uWocTime;
+        uniform vec3 uWocDayNight;
         uniform float uWocWaterLevel;
         ${BRUSH_RING_GLSL}`,
+      )
+      .replace(
+        '#include <map_fragment>',
+        `#ifdef USE_MAP
+        vec2 wocDetailUv = vec2(
+          (vWocWPos.x + ${WORLD_MAX_X.toFixed(1)}) / ${(WORLD_MAX_X * 2).toFixed(1)},
+          (vWocWPos.z - ${WORLD_MIN_Z.toFixed(1)}) / ${(WORLD_MAX_Z - WORLD_MIN_Z).toFixed(1)}
+        ) * vec2(160.0, 480.0);
+        diffuseColor *= texture2D( map, wocDetailUv );
+        #endif`,
       )
       .replace(
         '#include <color_fragment>',
@@ -2479,11 +2503,18 @@ function buildLambertMaterial(brush: BrushUniforms): THREE.MeshLambertMaterial {
         vec3 wocLowN = normalize(vWocWNorm);
         float wocSlopeUp = clamp(wocLowN.y, 0.0, 1.0);
         float wocRelY = vWocWPos.y - uWocWaterLevel;
-        float wocLowRigCalib = mix(0.64, 1.0, clamp((uWocFillBoost - 1.0) * 0.5, 0.0, 1.0));
+        float wocDayLuma = clamp(dot(uWocDayNight, vec3(0.299, 0.587, 0.114)), 0.0, 1.0);
+        float wocNightLift = 1.0 - smoothstep(0.22, 0.75, wocDayLuma);
+        float wocLowBase = mix(0.66, 0.94, wocNightLift);
+        float wocLowRigCalib = mix(wocLowBase, 1.0, clamp((uWocFillBoost - 1.0) * 0.5, 0.0, 1.0));
         diffuseColor.rgb *= wocLowRigCalib;
         float wocDetailFade = 1.0 - smoothstep(32.0, 135.0, vWocCamDist);
+        float wocRoadRaw = clamp(vWocLowMask.x, 0.0, 1.0);
+        float wocSandRaw = clamp(vWocLowMask.y, 0.0, 1.0);
         float wocGrassW = smoothstep(0.005, 0.07, diffuseColor.g - diffuseColor.r * 1.01)
           * smoothstep(0.015, 0.10, diffuseColor.g - diffuseColor.b * 1.20)
+          * (1.0 - smoothstep(0.15, 0.45, wocRoadRaw))
+          * (1.0 - smoothstep(0.15, 0.45, wocSandRaw))
           * smoothstep(0.55, 0.80, wocSlopeUp)
           * smoothstep(-0.2, 0.9, wocRelY);
         float wocMWave = sin(vWocWPos.x * 0.14 + vWocWPos.z * 0.11)
@@ -2494,49 +2525,47 @@ function buildLambertMaterial(brush: BrushUniforms): THREE.MeshLambertMaterial {
         float wocBlade = sin(vWocWPos.x * 4.8 - vWocWPos.z * 3.9 + wocClump * 2.1)
           * cos(vWocWPos.x * 3.4 + vWocWPos.z * 5.2) * 0.5 + 0.5;
         float wocMeadowSweep = clamp(wocMWave * 0.62 + wocMMacro * 0.38, 0.0, 1.0);
-        vec3 wocGrassMod = mix(vec3(0.84, 0.95, 0.88), vec3(1.06, 1.12, 0.86), wocMeadowSweep);
+        vec3 wocGrassMod = mix(vec3(0.88, 0.94, 0.89), vec3(1.01, 1.03, 0.90), wocMeadowSweep);
         wocGrassMod *= mix(
           1.0,
-          0.86 + 0.22 * (wocClump * 0.62 + wocBlade * 0.38),
-          wocDetailFade * 0.85
+          0.90 + 0.16 * (wocClump * 0.62 + wocBlade * 0.38),
+          wocDetailFade * 0.80
         );
         diffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb * wocGrassMod, wocGrassW);
-        float wocBeachBand = smoothstep(3.1, 1.1, wocRelY)
-          * smoothstep(-1.8, -0.3, wocRelY)
-          * smoothstep(0.64, 0.84, wocSlopeUp);
-        float wocKhakiSand = smoothstep(0.10, 0.22, diffuseColor.b)
-          * (1.0 - smoothstep(0.02, 0.10, abs(diffuseColor.r - diffuseColor.g)))
-          * smoothstep(3.8, 1.4, wocRelY);
-        float wocSandW = clamp(max(wocBeachBand * (1.0 - wocGrassW * 0.75), wocKhakiSand), 0.0, 1.0);
-        float wocSandRip = sin(vWocWPos.x * 0.85 + vWocWPos.z * 0.65) * 0.022;
-        vec3 wocGenshinSand = vec3(0.56 + wocSandRip, 0.48 + wocSandRip * 0.8, 0.30 + wocSandRip * 0.5);
-        diffuseColor.rgb = mix(diffuseColor.rgb, wocGenshinSand, wocSandW * 0.78);
-        float wocWetSandW = wocSandW * smoothstep(1.15, 0.05, wocRelY) * smoothstep(-0.35, 0.02, wocRelY);
-        diffuseColor.rgb *= mix(vec3(1.0), vec3(0.82, 0.75, 0.64), wocWetSandW * 0.45);
-        float wocDirtW = smoothstep(-0.01, 0.05, diffuseColor.r - diffuseColor.g * 0.96)
-          * smoothstep(0.02, 0.10, diffuseColor.g - diffuseColor.b * 1.15)
-          * (1.0 - wocSandW)
-          * smoothstep(0.60, 0.82, wocSlopeUp);
-        float wocVergeW = clamp(wocDirtW * (1.0 - wocDirtW) * 4.0, 0.0, 1.0);
+        float wocSandW = wocSandRaw * smoothstep(0.55, 0.80, wocSlopeUp);
+        float wocSandRip = sin(vWocWPos.x * 0.85 + vWocWPos.z * 0.65) * 0.018;
+        vec3 wocBeachTone = mix(
+          diffuseColor.rgb,
+          vec3(0.50 + wocSandRip, 0.43 + wocSandRip * 0.8, 0.28 + wocSandRip * 0.5),
+          0.42
+        );
+        diffuseColor.rgb = mix(diffuseColor.rgb, wocBeachTone, wocSandW * 0.72);
+        float wocWetShoreW = smoothstep(0.55, -0.05, wocRelY) * smoothstep(-0.45, 0.02, wocRelY);
+        diffuseColor.rgb *= mix(vec3(1.0), vec3(0.80, 0.75, 0.68), wocWetShoreW * 0.40);
         float wocPebble = sin(vWocWPos.x * 3.2 + vWocWPos.z * 2.7)
           * cos(vWocWPos.x * 2.4 - vWocWPos.z * 3.6) * 0.5 + 0.5;
         float wocRut = sin(vWocWPos.x * 0.95 - vWocWPos.z * 0.85 + wocMWave * 1.8) * 0.5 + 0.5;
+        float wocEdgeN = (sin(vWocWPos.x * 0.58 + vWocWPos.z * 0.49)
+          * cos(vWocWPos.x * 0.41 - vWocWPos.z * 0.63)) * 0.11
+          + (wocPebble - 0.5) * 0.06;
+        float wocDirtW = smoothstep(0.24, 0.58, wocRoadRaw + wocEdgeN * smoothstep(0.04, 0.22, wocRoadRaw))
+          * (1.0 - wocSandW * 0.85)
+          * smoothstep(0.52, 0.76, wocSlopeUp);
+        float wocPathCore = smoothstep(0.56, 0.84, wocRoadRaw + wocEdgeN * 0.5) * wocDirtW;
+        float wocPathEdge = clamp(wocDirtW - wocPathCore, 0.0, 1.0);
         vec3 wocRoadTone = mix(
-          diffuseColor.rgb * vec3(0.88, 0.84, 0.76),
-          vec3(0.39, 0.32, 0.22),
-          0.42
+          diffuseColor.rgb * 1.16,
+          vec3(0.35, 0.29, 0.21),
+          0.38
         );
+        wocRoadTone *= 1.0 + wocPathCore * 0.10 - wocPathEdge * 0.08;
         wocRoadTone *= mix(
           1.0,
-          0.85 + 0.24 * (wocPebble * 0.65 + wocRut * 0.35),
-          wocDetailFade * 0.90
+          0.88 + 0.20 * (wocPebble * 0.65 + wocRut * 0.35),
+          wocDetailFade * 0.85
         );
-        diffuseColor.rgb = mix(diffuseColor.rgb, wocRoadTone, wocDirtW * 0.82);
-        diffuseColor.rgb = mix(
-          diffuseColor.rgb,
-          diffuseColor.rgb * vec3(0.66, 0.84, 0.64),
-          wocVergeW * 0.58
-        );
+        diffuseColor.rgb = mix(diffuseColor.rgb, wocRoadTone, wocDirtW * 0.88);
+        diffuseColor.rgb *= 1.0 - wocPathEdge * 0.09;
         float wocCliffW = 1.0 - smoothstep(0.55, 0.80, wocSlopeUp);
         float wocRockPatch = sin(vWocWPos.x * 0.11 + vWocWPos.z * 0.09 + sin(vWocWPos.z * 0.05 - vWocWPos.x * 0.06) * 1.6) * 0.5 + 0.5;
         float wocRockGrain = sin(vWocWPos.x * 0.42 + vWocWPos.z * 0.37) * cos(vWocWPos.x * 0.31 - vWocWPos.z * 0.46) * 0.5 + 0.5;
@@ -2550,19 +2579,14 @@ function buildLambertMaterial(brush: BrushUniforms): THREE.MeshLambertMaterial {
         float wocSlopeRelief = clamp((1.0 - wocSlopeUp) * 2.2, 0.0, 1.0);
         diffuseColor.rgb *= mix(1.0, clamp(0.76 + 0.34 * wocSunFace, 0.68, 1.12), wocSlopeRelief);
         float wocSubDepth = max(0.0, -wocRelY);
-        float wocSubW = smoothstep(0.12, -0.18, wocRelY);
+        float wocSubW = smoothstep(-0.06, -1.65, wocRelY);
         float wocCaust = max(0.0, sin(vWocWPos.x * 0.9 + uWocTime * 1.4) * cos(vWocWPos.z * 0.85 - uWocTime * 1.1));
         vec3 wocSeaBedCol = mix(
-          vec3(0.08, 0.48, 0.56) + vec3(0.05, 0.10, 0.09) * wocCaust,
-          vec3(0.02, 0.14, 0.30),
-          smoothstep(0.2, 4.2, wocSubDepth)
+          diffuseColor.rgb * vec3(0.76, 0.82, 0.84) + vec3(0.025, 0.05, 0.05) * wocCaust * wocDayLuma,
+          vec3(0.03, 0.14, 0.24),
+          smoothstep(0.25, 4.0, wocSubDepth)
         );
-        diffuseColor.rgb = mix(diffuseColor.rgb, wocSeaBedCol, wocSubW * 0.88);
-        float wocSurfWave = 0.12 * sin(vWocWPos.x * 0.75 + vWocWPos.z * 0.62 + uWocTime * 1.8)
-          + 0.08 * cos(vWocWPos.x * 1.35 - vWocWPos.z * 1.15 - uWocTime * 1.3);
-        float wocSurfDist = abs(wocRelY + 0.04 + wocSurfWave);
-        float wocSurfFoam = (1.0 - smoothstep(0.02, 0.28, wocSurfDist)) * smoothstep(0.50, 0.76, wocSlopeUp);
-        diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.76, 0.84, 0.88), wocSurfFoam * 0.82);`,
+        diffuseColor.rgb = mix(diffuseColor.rgb, wocSeaBedCol, wocSubW * 0.82);`,
       )
       .replace(
         '#include <lights_fragment_begin>',
@@ -2574,8 +2598,7 @@ function buildLambertMaterial(brush: BrushUniforms): THREE.MeshLambertMaterial {
       .replace(
         '#include <emissivemap_fragment>',
         `#include <emissivemap_fragment>
-        totalEmissiveRadiance += vec3(0.04, 0.24, 0.28) * wocSubW * (1.0 - smoothstep(0.0, 3.5, wocSubDepth))
-          + vec3(0.28, 0.34, 0.36) * wocSurfFoam;
+        totalEmissiveRadiance += vec3(0.02, 0.10, 0.12) * wocSubW * wocDayLuma * (1.0 - smoothstep(0.0, 3.2, wocSubDepth));
         totalEmissiveRadiance += wocBrushRing(vWocWPos.xz);`,
       );
   };

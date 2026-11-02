@@ -65,6 +65,10 @@ function authoredMaterialsOf(file: string): string[] {
  *  authored rig here instead of flagging it is a conscious choice, not the
  *  default: a new Tripo or Blender creature sets `authoredAtlas: true`. */
 const LEGACY_UNFLAGGED_DEFS = new Set([
+  // Old Thatchgrin: his colour is painted in the vertices; the sackcloth's map is a
+  // near-white burlap weave detail tile multiplied over it (burlap_weave.py), not an
+  // authored atlas, so the body keeps the kit polish and the uniform low-tier floor.
+  'mob_gourdlight_thatchgrin',
   // Retained buddies keep their existing low-tier material response.
   'buddy_horse',
   'buddy_crystal_lich',
@@ -128,6 +132,12 @@ const AUTHORED_ATLAS_DEFS = [
   // The sprite buddy: Blender-painted orb gradients.
   'buddy_sprites',
   'form_cat',
+  // Gourdlight Eve's trick bodies (seasonal_trick_looks.ts): resized copies of the
+  // swarmling bat and the skeleton minion, carrying their authored atlas with them.
+  'form_trick_bat',
+  'form_trick_skeleton',
+  // ...and the Gurglegreen Cauldron's goblin: the Coinsack Scurrier, resized the same way.
+  'form_costume_goblin',
   // The one authored PLAYER body: the WOC warrior (woc_warrior.glb, its own
   // baked Tripo atlases on the artist's rig, never a KayKit palette), which the
   // loop below exempts from the "never a player body" rule by its wocCharacter
@@ -207,6 +217,8 @@ const AUTHORED_ATLAS_DEFS = [
   // The Knucklebone of Balgath's Shape of the Foreman: his own authored stone body.
   'form_foreman',
   'mount_avian_strider',
+  // Gourdlight Eve's Blender-built Emberbristle Broom (its KTX2 BroomAtlas).
+  'mount_emberbristle_broom',
   'mount_lanternback_troll',
   'mount_nightwing_chimera',
   'mount_wobbles_slime',

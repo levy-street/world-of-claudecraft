@@ -28,7 +28,7 @@
       "tick": 3,
       "time": 0.15,
       "nextId": 1014,
-      "state": "405d7c31",
+      "state": "781b2aa3",
       "events": "54c1ac8e",
       "rng": {
         "draws": 2,
@@ -348,7 +348,7 @@
           "aiState": "idle",
           "combatTimer": 99,
           "comboUntil": -1,
-          "corpseTimer": 61.85,
+          "corpseTimer": 29.9,
           "critChance": 0.05,
           "dead": true,
           "detonateTimer": "Infinity",

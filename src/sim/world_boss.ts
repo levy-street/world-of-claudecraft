@@ -338,6 +338,16 @@ export function scaleWorldBossHp(ctx: SimContext, boss: Entity, def: WorldBossDe
 // contributor against the level of their own character, and a group NOBODY in the
 // roster qualifies for is still rolled for each of them (one draw, discarded) so the
 // rng draw order is a function of the roster alone, never of who is what level.
+/** Whether a contributor already keeps a copy of `itemId` (bags, bank, courier cargo):
+ *  the `unlessOwned` / `unlessOwnedItem` keepsake gates. Read only, draws nothing. */
+function holdsItem(meta: PlayerMeta, itemId: string): boolean {
+  return (
+    meta.inventory.some((s) => s.itemId === itemId) ||
+    meta.bank.inventory.some((s) => s.itemId === itemId) ||
+    !!meta.courier?.cargo.some((s) => s.itemId === itemId)
+  );
+}
+
 export function rollWorldBossLoot(ctx: SimContext, mob: Entity, contributors: PlayerMeta[]): void {
   const template = MOBS[mob.templateId];
   if (!template) return;
@@ -354,7 +364,9 @@ export function rollWorldBossLoot(ctx: SimContext, mob: Entity, contributors: Pl
     if (!isWorldBossLootEligible(meta, mob.templateId, ctx.lockoutNowMs())) continue;
     const level = ctx.entities.get(meta.entityId)?.level ?? Number.POSITIVE_INFINITY;
     const qualifies = (entry: LootEntry): boolean =>
-      entry.maxPlayerLevel === undefined || level <= entry.maxPlayerLevel;
+      (entry.maxPlayerLevel === undefined || level <= entry.maxPlayerLevel) &&
+      !(entry.unlessOwned && entry.itemId && holdsItem(meta, entry.itemId)) &&
+      !(entry.unlessOwnedItem && holdsItem(meta, entry.unlessOwnedItem));
     const rolledGroups = new Set<string>();
     // At most ONE roll-group (gear) item per contributor: no double gear drop (a glove
     // AND a belt) from a single kill. Every group is still ROLLED so the rng draw order

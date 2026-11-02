@@ -1423,4 +1423,49 @@ export const table: DeedLocaleTable = {
     desc: 'Mua từ Garrick Holt, quân nhu của Sảnh Đèn Lồng, với 24 Ấn Đèn Lồng.',
     title: 'Người Của Sảnh Đèn Lồng',
   },
+  feat_gourdlight_guise: {
+    name: 'Hóa Trang Đèn Bí Ngô',
+    desc: 'Sở hữu Đầu Bí Ngô Chạm Khắc lấy từ Lão Rơm Cười ở ruộng bên kia Đồng Cỏ Lợn Lòi trong Đêm Đèn Bí Ngô.',
+  },
+  feat_old_thatchgrin: {
+    name: 'Gốc Rạ Và Tro',
+    desc: 'Góp sức hạ Lão Rơm Cười tại ruộng bí bên kia Đồng Cỏ Lợn Lòi trong Đêm Đèn Bí Ngô.',
+  },
+  feat_title_gourdlit: {
+    name: 'Người Mang Ánh Bí Ngô',
+    desc: 'Đọc Chứng Thư Ánh Bí Ngô đổi từ Hester Bấc Bí Ngô bằng Kẹo Đèn Bí Ngô trong Đêm Đèn Bí Ngô.',
+    title: 'Người Mang Ánh Bí Ngô',
+  },
+  feat_title_trickster: {
+    name: 'Kẻ Tinh Quái',
+    desc: 'Đọc Chứng Thư Kẻ Tinh Quái đổi từ Hester Bấc Bí Ngô bằng Kẹo Đèn Bí Ngô trong Đêm Đèn Bí Ngô.',
+    title: 'Kẻ Tinh Quái',
+  },
+  feat_title_hollow_grinned: {
+    name: 'Kẻ Cười Rỗng',
+    desc: 'Đọc Chứng Thư Nụ Cười Rỗng đổi từ Hester Bấc Bí Ngô bằng Kẹo Đèn Bí Ngô trong Đêm Đèn Bí Ngô.',
+    title: 'Kẻ Cười Rỗng',
+  },
+  feat_pumpkin_hunter: {
+    name: 'Thợ Săn Bí Ngô',
+    desc: 'Tìm tất cả Bí Ngô Ma Ám ẩn khắp thế giới trong Đêm Đèn Bí Ngô.',
+    title: 'Kẻ Rỗng',
+  },
+  feat_gourdlight_doorsteps: {
+    name: 'Mọi Bậc Cửa',
+    desc: 'Xin kẹo hoặc ghẹo mọi người dân mở cửa ở Đông Khê, Cầu Đầm và Vọng Đài Cao trong Đêm Đèn Bí Ngô.',
+  },
+  feat_gourdlight_errands: {
+    name: 'Sẵn Sàng Phục Vụ Hester',
+    desc: 'Hoàn thành ít nhất một lần mỗi việc vặt luân phiên của Hester Bấc Bí Ngô trong Đêm Đèn Bí Ngô.',
+  },
+  feat_gourdlight_frights: {
+    name: 'Ba Thị Trấn Hoảng Hốt',
+    desc: 'Trong việc vặt Hù! của Hester, dọa một người dân ở mỗi nơi: Đông Khê, Cầu Đầm và Vọng Đài Cao.',
+  },
+  feat_gourdlight_eve_complete: {
+    name: 'Đèn Bí Ngô Từ Đầu Đến Cuối',
+    desc: 'Hoàn thành toàn bộ Đêm Đèn Bí Ngô: hạ Lão Rơm Cười, tìm tất cả Bí Ngô Ma Ám, làm mọi việc vặt của Hester, gõ mọi cánh cửa và dọa một người dân ở mỗi thị trấn trong ba nơi.',
+    title: 'Người Thề Với Bí Ngô',
+  },
 };

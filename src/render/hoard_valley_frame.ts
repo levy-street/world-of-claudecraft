@@ -7,11 +7,13 @@ import type * as THREE from 'three';
 import type { RiftFloorPlan } from '../sim/rift/types';
 import type { RiftFloorView } from '../world_api';
 import { GFX } from './gfx';
+import { ensureHoardCavernFoliageAssets } from './hoard_cavern_foliage';
 import { buildHoardValley, resolveHoardValleyEffectsProfile } from './hoard_valley';
 import {
   type HoardValleyEnvironment,
   resolveHoardValleyEnvironment,
 } from './hoard_valley_environment';
+import { prepareHoardValleyRocks } from './hoard_valley_rocks';
 import type { SkyView } from './sky';
 
 export {
@@ -31,24 +33,23 @@ export interface HoardValleyInteriorHost {
 
 /** Builds an outdoor (valley) hoard floor at its instance origin; the sky
  *  warm-up only runs on the standard-material tiers, as it always has. */
-export function buildInterior(
+export async function buildInterior(
   floor: RiftFloorPlan,
   origin: { x: number; z: number },
   valley: HoardValleyEnvironment | null,
   host: HoardValleyInteriorHost,
 ): Promise<THREE.Group> {
+  await Promise.all([prepareHoardValleyRocks(), ensureHoardCavernFoliageAssets()]);
   const sky = valley?.sky;
-  return Promise.resolve(
-    buildHoardValley({
-      scene: host.scene,
-      compileGate: host.compileGate,
-      plan: floor,
-      offset: { x: origin.x, y: 0, z: origin.z },
-      effectsProfile: resolveHoardValleyEffectsProfile(GFX.effectsTier),
-      prepareEnvironment:
-        sky && GFX.standardMaterials ? () => host.prepareSky(sky.x, sky.z) : undefined,
-    }).group,
-  );
+  return buildHoardValley({
+    scene: host.scene,
+    compileGate: host.compileGate,
+    plan: floor,
+    offset: { x: origin.x, y: 0, z: origin.z },
+    effectsProfile: resolveHoardValleyEffectsProfile(GFX.effectsTier),
+    prepareEnvironment:
+      sky && GFX.standardMaterials ? () => host.prepareSky(sky.x, sky.z) : undefined,
+  }).group;
 }
 
 /** Rides the sky dome along with the camera, except inside a hoard valley,

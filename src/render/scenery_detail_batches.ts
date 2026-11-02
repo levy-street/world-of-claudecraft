@@ -6,6 +6,9 @@ interface Pool {
   parent: THREE.Object3D;
   children: THREE.InstancedMesh[];
   owners: THREE.Object3D[];
+  ownerIndices: Int32Array;
+  hideAttrs: (THREE.InstancedBufferAttribute | undefined)[];
+  poolHide: THREE.InstancedBufferAttribute | undefined;
   selected: boolean[];
   versions: number[];
   frustumPass: (boolean | undefined)[];
@@ -21,6 +24,10 @@ function visible(object: THREE.Object3D): boolean {
  * changing shader inputs. Source parents remain the shadow/reveal owners. */
 export class SceneryDetailBatches {
   private pools: Pool[] = [];
+  private uniqueOwners: THREE.Object3D[] = [];
+  private ownerVisible: Uint8Array = new Uint8Array(0);
+  private ownerFrustumPass: Int8Array = new Int8Array(0);
+  private ownerSphereKey: Float64Array = new Float64Array(0);
   private frustum = new THREE.Frustum();
   private projection = new THREE.Matrix4();
   private lastProjection = new THREE.Matrix4();
@@ -51,6 +58,16 @@ export class SceneryDetailBatches {
       }
       return result;
     };
+    const ownerIndexMap = new Map<THREE.Object3D, number>();
+    const getOwnerIndex = (owner: THREE.Object3D): number => {
+      let idx = ownerIndexMap.get(owner);
+      if (idx === undefined) {
+        idx = this.uniqueOwners.length;
+        this.uniqueOwners.push(owner);
+        ownerIndexMap.set(owner, idx);
+      }
+      return idx;
+    };
     const groups = new Map<string, THREE.InstancedMesh[]>();
     for (const child of children) {
       const owner = owners.get(child);
@@ -76,20 +93,20 @@ export class SceneryDetailBatches {
       if (group) group.push(child);
       else groups.set(key, [child]);
     }
-    for (const children of groups.values()) {
-      if (children.length < 2) continue;
-      const source = children[0];
+    for (const groupChildren of groups.values()) {
+      if (groupChildren.length < 2) continue;
+      const source = groupChildren[0];
       const owner = owners.get(source)!;
-      const capacity = children.reduce((sum, child) => sum + child.instanceMatrix.count, 0);
+      const capacity = groupChildren.reduce((sum, child) => sum + child.instanceMatrix.count, 0);
       const geometry = new THREE.BufferGeometry();
       geometry.attributes = { ...source.geometry.attributes };
       geometry.index = source.geometry.index;
       geometry.userData.sharedRendererResource = true;
-      if (geometry.hasAttribute(GHOST_HIDE_ATTRIBUTE))
-        geometry.setAttribute(
-          GHOST_HIDE_ATTRIBUTE,
-          new THREE.InstancedBufferAttribute(new Float32Array(capacity), 1),
-        );
+      let poolHide: THREE.InstancedBufferAttribute | undefined;
+      if (geometry.hasAttribute(GHOST_HIDE_ATTRIBUTE)) {
+        poolHide = new THREE.InstancedBufferAttribute(new Float32Array(capacity), 1);
+        geometry.setAttribute(GHOST_HIDE_ATTRIBUTE, poolHide);
+      }
       const mesh = new THREE.InstancedMesh(geometry, source.material, capacity);
       mesh.name = 'scenery-batched';
       mesh.matrixAutoUpdate = false;
@@ -104,16 +121,31 @@ export class SceneryDetailBatches {
         mesh.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(capacity * 3), 3);
       mesh.count = 1;
       mesh.instanceMatrix.array.set(source.instanceMatrix.array.subarray(0, 16));
+      const poolOwners = groupChildren.map((child) => owners.get(child)!);
+      const ownerIndices = new Int32Array(poolOwners.map(getOwnerIndex));
+      const hideAttrs = groupChildren.map(
+        (child) =>
+          child.geometry.getAttribute(GHOST_HIDE_ATTRIBUTE) as
+            | THREE.InstancedBufferAttribute
+            | undefined,
+      );
       this.pools.push({
         mesh,
         parent: owner.parent!,
-        children,
-        owners: children.map((child) => owners.get(child)!),
+        children: groupChildren,
+        owners: poolOwners,
+        ownerIndices,
+        hideAttrs,
+        poolHide,
         selected: [],
         versions: [],
         frustumPass: [],
       });
     }
+    const ownerCount = this.uniqueOwners.length;
+    this.ownerVisible = new Uint8Array(ownerCount);
+    this.ownerFrustumPass = new Int8Array(ownerCount);
+    this.ownerSphereKey = new Float64Array(ownerCount * 4);
   }
 
   async prepare(gate: (root: THREE.Object3D) => Promise<unknown>): Promise<void> {
@@ -147,11 +179,24 @@ export class SceneryDetailBatches {
       this.lastProjection.copy(this.projection);
       this.hasLastProjection = true;
       this.frustum.setFromProjectionMatrix(this.projection);
+      this.ownerFrustumPass.fill(-1);
+    }
+    const uniqueOwners = this.uniqueOwners;
+    const ownerVisible = this.ownerVisible;
+    for (let o = 0; o < uniqueOwners.length; o++) {
+      ownerVisible[o] = visible(uniqueOwners[o]) ? 1 : 0;
     }
     for (const pool of this.pools) {
       if (cameraMoved) pool.frustumPass.length = 0;
       let changed = false;
       let count = 0;
+      const poolMaterial = pool.mesh.material;
+      const poolIndex = pool.mesh.geometry.index;
+      const poolPosition = pool.mesh.geometry.attributes.position;
+      const poolMatrix = pool.mesh.matrix;
+      const poolParent = pool.parent;
+      const ownerIndices = pool.ownerIndices;
+      const hideAttrs = pool.hideAttrs;
       for (let i = 0; i < pool.children.length; i++) {
         const child = pool.children[i];
         const owner = pool.owners[i];
@@ -165,18 +210,37 @@ export class SceneryDetailBatches {
           continue;
         }
         child.visible = child.count > 0;
+        const oIdx = ownerIndices[i];
         const compatible =
-          child.material === pool.mesh.material &&
-          child.geometry.index === pool.mesh.geometry.index &&
-          child.geometry.attributes.position === pool.mesh.geometry.attributes.position &&
-          owner.parent === pool.parent &&
-          owner.matrix.equals(pool.mesh.matrix);
-        let selected = compatible && child.count > 0 && visible(owner);
+          child.material === poolMaterial &&
+          child.geometry.index === poolIndex &&
+          child.geometry.attributes.position === poolPosition &&
+          owner.parent === poolParent &&
+          (owner.matrixAutoUpdate === false || owner.matrix.equals(poolMatrix));
+        let selected = compatible && child.count > 0 && ownerVisible[oIdx] === 1;
         if (selected && child.frustumCulled && child.boundingSphere) {
           let pass = pool.frustumPass[i];
           if (pass === undefined) {
-            this.sphere.copy(child.boundingSphere).applyMatrix4(owner.matrixWorld);
-            pass = this.frustum.intersectsSphere(this.sphere);
+            const bs = child.boundingSphere;
+            const kBase = oIdx * 4;
+            const cachedPass = this.ownerFrustumPass[oIdx];
+            if (
+              cachedPass !== -1 &&
+              this.ownerSphereKey[kBase] === bs.center.x &&
+              this.ownerSphereKey[kBase + 1] === bs.center.y &&
+              this.ownerSphereKey[kBase + 2] === bs.center.z &&
+              this.ownerSphereKey[kBase + 3] === bs.radius
+            ) {
+              pass = cachedPass === 1;
+            } else {
+              this.sphere.copy(bs).applyMatrix4(owner.matrixWorld);
+              pass = this.frustum.intersectsSphere(this.sphere);
+              this.ownerFrustumPass[oIdx] = pass ? 1 : 0;
+              this.ownerSphereKey[kBase] = bs.center.x;
+              this.ownerSphereKey[kBase + 1] = bs.center.y;
+              this.ownerSphereKey[kBase + 2] = bs.center.z;
+              this.ownerSphereKey[kBase + 3] = bs.radius;
+            }
             pool.frustumPass[i] = pass;
           }
           selected = pass;
@@ -184,11 +248,7 @@ export class SceneryDetailBatches {
         const version =
           child.instanceMatrix.version +
           (child.instanceColor?.version ?? 0) +
-          ((
-            child.geometry.getAttribute(GHOST_HIDE_ATTRIBUTE) as
-              | THREE.InstancedBufferAttribute
-              | undefined
-          )?.version ?? 0);
+          (hideAttrs[i]?.version ?? 0);
         changed ||= selected !== pool.selected[i] || version !== pool.versions[i];
         pool.selected[i] = selected;
         pool.versions[i] = version;
@@ -205,9 +265,7 @@ export class SceneryDetailBatches {
       pool.mesh.visible = count > 0;
       if (!changed || !count) continue;
       let offset = 0;
-      const hide = pool.mesh.geometry.getAttribute(GHOST_HIDE_ATTRIBUTE) as
-        | THREE.InstancedBufferAttribute
-        | undefined;
+      const hide = pool.poolHide;
       for (let i = 0; i < pool.children.length; i++) {
         if (!pool.selected[i]) continue;
         const child = pool.children[i];
@@ -220,13 +278,23 @@ export class SceneryDetailBatches {
             child.instanceColor.array.subarray(0, child.count * 3),
             offset * 3,
           );
-        const sourceHide = child.geometry.getAttribute(GHOST_HIDE_ATTRIBUTE);
+        const sourceHide = hideAttrs[i];
         if (hide && sourceHide) hide.array.set(sourceHide.array.subarray(0, child.count), offset);
         offset += child.count;
       }
+      pool.mesh.instanceMatrix.clearUpdateRanges();
+      pool.mesh.instanceMatrix.addUpdateRange(0, count * 16);
       pool.mesh.instanceMatrix.needsUpdate = true;
-      if (pool.mesh.instanceColor) pool.mesh.instanceColor.needsUpdate = true;
-      if (hide) hide.needsUpdate = true;
+      if (pool.mesh.instanceColor) {
+        pool.mesh.instanceColor.clearUpdateRanges();
+        pool.mesh.instanceColor.addUpdateRange(0, count * 3);
+        pool.mesh.instanceColor.needsUpdate = true;
+      }
+      if (hide) {
+        hide.clearUpdateRanges();
+        hide.addUpdateRange(0, count);
+        hide.needsUpdate = true;
+      }
     }
   }
 

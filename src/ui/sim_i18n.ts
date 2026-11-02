@@ -12,6 +12,13 @@
 // The S3 guard in tests/localization_fixes.test.ts parses src/sim/sim.ts, enumerates
 // every player-facing emit site, and fails if any is no longer recognized by a client
 // matcher — so a new unhandled sim string cannot ship silently.
+import {
+  CARVED_PUMPKIN_HEAD_ID,
+  GOURDLIGHT_COSTUMES,
+  GOURDLIGHT_TOYS,
+  GOURDLIGHT_TRICKS,
+} from '../sim/content/gourdlight_eve';
+import { STRAWLING_GUISE, THATCHGRIN_SLUMBER } from '../sim/content/gourdlight_eve_scarecrow';
 import { ABILITIES, CLASSES, DELVES, ITEMS, MOBS, ZONES } from '../sim/data';
 import {
   FACTION_IDS,
@@ -1878,6 +1885,19 @@ const baseEnTable = {
   'mechanic.balgathMoltenFen': 'Molten Fen',
   // The meteor volley the eruption calls down (mob/boss_starwake_meteors.ts).
   'mechanic.balgathStarDebris': 'Star Debris',
+  // Old Thatchgrin's pumpkin rain and the burning stubble it leaves, his Swelling Gourd's
+  // fuse and burst, and the ward, reel and opening it puts on him
+  // (seasonal/scarecrow_kit.ts, scarecrow_swell.ts, content/gourdlight_eve_scarecrow.ts).
+  'mechanic.thatchgrinGourdfall': 'Gourdfall',
+  'mechanic.thatchgrinSmolderingChaff': 'Smoldering Chaff',
+  'mechanic.thatchgrinRipening': 'Ripening',
+  'mechanic.thatchgrinGourdBurst': 'Gourd Burst',
+  'mechanic.thatchgrinHarvestWard': 'Harvest Ward',
+  'mechanic.thatchgrinUprooted': 'Uprooted',
+  'mechanic.thatchgrinSplitRind': 'Split Rind',
+  // Thatchbound, his mind control, and the puppet's swing (seasonal/scarecrow_puppet.ts).
+  'mechanic.thatchgrinThatchbound': 'Thatchbound',
+  'mechanic.thatchgrinPuppetsFlail': "Puppet's Flail",
   // The drill yard's effigy: its plank hide, and a player's own open window on it
   // (src/sim/muster_effigy.ts EFFIGY_WARD_NAME / EFFIGY_OPENED_NAME).
   'aura.effigyPlankHide': 'Plank Hide',
@@ -2300,6 +2320,15 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.unstuckSickness': 'Unstuck Sickness',
   },
   es: {
+    'mechanic.thatchgrinGourdBurst': "Estallido de calabaza",
+    'mechanic.thatchgrinGourdfall': "Lluvia de calabazas",
+    'mechanic.thatchgrinHarvestWard': "Protección de la cosecha",
+    'mechanic.thatchgrinPuppetsFlail': "Azote de marioneta",
+    'mechanic.thatchgrinRipening': "Maduración",
+    'mechanic.thatchgrinSmolderingChaff': "Paja humeante",
+    'mechanic.thatchgrinSplitRind': "Corteza partida",
+    'mechanic.thatchgrinThatchbound': "Atado a la paja",
+    'mechanic.thatchgrinUprooted': "Desarraigado",
     'log.advancedRidingLearned': "Has aprendido Equitación avanzada. La velocidad de tu montura aumenta un {speed}%.",
     'aura.templeBrokenVoice': "Voz quebrada",
     'aura.templeSpentVoice': "Voz agotada",
@@ -3640,6 +3669,15 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'worldPvp.spoilsOnBody': "Despoja el cadáver de {victim} para reclamar tu botín.",
 },
   es_ES: {
+    'mechanic.thatchgrinGourdBurst': "Estallido de calabaza",
+    'mechanic.thatchgrinGourdfall': "Lluvia de calabazas",
+    'mechanic.thatchgrinHarvestWard': "Protección de la cosecha",
+    'mechanic.thatchgrinPuppetsFlail': "Azote de marioneta",
+    'mechanic.thatchgrinRipening': "Maduración",
+    'mechanic.thatchgrinSmolderingChaff': "Paja humeante",
+    'mechanic.thatchgrinSplitRind': "Corteza partida",
+    'mechanic.thatchgrinThatchbound': "Atado a la paja",
+    'mechanic.thatchgrinUprooted': "Desarraigado",
     'log.advancedRidingLearned': "Has aprendido Equitación avanzada. La velocidad de tu montura aumenta un {speed}%.",
     'aura.templeBrokenVoice': "Voz quebrada",
     'aura.templeSpentVoice': "Voz agotada",
@@ -4991,6 +5029,15 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'worldPvp.spoilsOnBody': "Despoja el cadáver de {victim} para reclamar tu botín.",
 },
   fr_FR: {
+    'mechanic.thatchgrinGourdBurst': "Explosion de courge",
+    'mechanic.thatchgrinGourdfall': "Pluie de courges",
+    'mechanic.thatchgrinHarvestWard': "Protection des moissons",
+    'mechanic.thatchgrinPuppetsFlail': "Fléau de la marionnette",
+    'mechanic.thatchgrinRipening': "Maturation",
+    'mechanic.thatchgrinSmolderingChaff': "Balle fumante",
+    'mechanic.thatchgrinSplitRind': "Écorce fendue",
+    'mechanic.thatchgrinThatchbound': "Lié à la paille",
+    'mechanic.thatchgrinUprooted': "Déraciné",
     'log.advancedRidingLearned': "Vous avez appris l'équitation avancée. La vitesse de votre monture augmente de {speed}%.",
     'aura.templeBrokenVoice': "Voix brisée",
     'aura.templeSpentVoice': "Voix épuisée",
@@ -6447,6 +6494,15 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'worldPvp.spoilsOnBody': "Fouillez le corps de {victim} pour réclamer votre butin.",
 },
   fr_CA: {
+    'mechanic.thatchgrinGourdBurst': "Explosion de courge",
+    'mechanic.thatchgrinGourdfall': "Pluie de courges",
+    'mechanic.thatchgrinHarvestWard': "Protection des moissons",
+    'mechanic.thatchgrinPuppetsFlail': "Fléau de la marionnette",
+    'mechanic.thatchgrinRipening': "Maturation",
+    'mechanic.thatchgrinSmolderingChaff': "Balle fumante",
+    'mechanic.thatchgrinSplitRind': "Écorce fendue",
+    'mechanic.thatchgrinThatchbound': "Lié à la paille",
+    'mechanic.thatchgrinUprooted': "Déraciné",
     'log.advancedRidingLearned': "Vous avez appris l'équitation avancée. La vitesse de votre monture augmente de {speed}%.",
     'aura.templeBrokenVoice': "Voix brisée",
     'aura.templeSpentVoice': "Voix épuisée",
@@ -8137,6 +8193,15 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.wellFed': 'Well Fed',
   },
   it_IT: {
+    'mechanic.thatchgrinGourdBurst': "Esplosione di zucca",
+    'mechanic.thatchgrinGourdfall': "Pioggia di zucche",
+    'mechanic.thatchgrinHarvestWard': "Protezione del raccolto",
+    'mechanic.thatchgrinPuppetsFlail': "Flagello della marionetta",
+    'mechanic.thatchgrinRipening': "Maturazione",
+    'mechanic.thatchgrinSmolderingChaff': "Pula fumante",
+    'mechanic.thatchgrinSplitRind': "Scorza spaccata",
+    'mechanic.thatchgrinThatchbound': "Legato alla paglia",
+    'mechanic.thatchgrinUprooted': "Sradicato",
     'log.advancedRidingLearned': "Hai imparato Equitazione avanzata. La velocità della tua cavalcatura aumenta del {speed}%.",
     'aura.templeBrokenVoice': "Voce Spezzata",
     'aura.templeSpentVoice': "Voce Esausta",
@@ -9572,6 +9637,15 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'worldPvp.spoilsOnBody': "Depreda il corpo di {victim} per ottenere le tue spoglie.",
 },
   de_DE: {
+    'mechanic.thatchgrinGourdBurst': "Kürbisexplosion",
+    'mechanic.thatchgrinGourdfall': "Kürbisregen",
+    'mechanic.thatchgrinHarvestWard': "Ernteschutz",
+    'mechanic.thatchgrinPuppetsFlail': "Marionettenflegel",
+    'mechanic.thatchgrinRipening': "Reifung",
+    'mechanic.thatchgrinSmolderingChaff': "Glimmende Spreu",
+    'mechanic.thatchgrinSplitRind': "Gespaltene Schale",
+    'mechanic.thatchgrinThatchbound': "Strohgebunden",
+    'mechanic.thatchgrinUprooted': "Entwurzelt",
     'log.advancedRidingLearned': "Du hast Fortgeschrittenes Reiten gelernt. Dein Reittempo steigt um {speed}%.",
     'aura.templeBrokenVoice': "Gebrochene Stimme",
     'aura.templeSpentVoice': "Erschöpfte Stimme",
@@ -11014,6 +11088,15 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'worldPvp.spoilsOnBody': "Plündere die Leiche von {victim}, um deine Beute zu erhalten.",
 },
   zh_CN: {
+    'mechanic.thatchgrinGourdBurst': "南瓜爆裂",
+    'mechanic.thatchgrinGourdfall': "南瓜雨",
+    'mechanic.thatchgrinHarvestWard': "丰收结界",
+    'mechanic.thatchgrinPuppetsFlail': "傀儡乱舞",
+    'mechanic.thatchgrinRipening': "成熟",
+    'mechanic.thatchgrinSmolderingChaff': "阴燃谷壳",
+    'mechanic.thatchgrinSplitRind': "裂皮",
+    'mechanic.thatchgrinThatchbound': "稻草束缚",
+    'mechanic.thatchgrinUprooted': "连根拔起",
     'aura.templeBrokenVoice': "嗓音破碎",
     'aura.templeTheScore': "乐谱",
     'aura.wildheartIdolAwake': "神像苏醒",
@@ -12290,6 +12373,15 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'worldPvp.forfeitPaid': "退战赔偿已支付：来自{victim}的{money}。",
 },
   zh_TW: {
+    'mechanic.thatchgrinGourdBurst': "南瓜爆裂",
+    'mechanic.thatchgrinGourdfall': "南瓜雨",
+    'mechanic.thatchgrinHarvestWard': "豐收結界",
+    'mechanic.thatchgrinPuppetsFlail': "傀儡亂舞",
+    'mechanic.thatchgrinRipening': "成熟",
+    'mechanic.thatchgrinSmolderingChaff': "陰燃穀殼",
+    'mechanic.thatchgrinSplitRind': "裂皮",
+    'mechanic.thatchgrinThatchbound': "稻草束縛",
+    'mechanic.thatchgrinUprooted': "連根拔起",
     'aura.templeBrokenVoice': "嗓音破碎",
     'aura.templeTheScore': "樂譜",
     'aura.wildheartIdolAwake': "神像甦醒",
@@ -13566,6 +13658,15 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'worldPvp.forfeitPaid': "退戰賠償已支付：來自{victim}的{money}。",
 },
   ko_KR: {
+    'mechanic.thatchgrinGourdBurst': "호박 폭발",
+    'mechanic.thatchgrinGourdfall': "호박비",
+    'mechanic.thatchgrinHarvestWard': "수확의 보호막",
+    'mechanic.thatchgrinPuppetsFlail': "꼭두각시의 난타",
+    'mechanic.thatchgrinRipening': "무르익기",
+    'mechanic.thatchgrinSmolderingChaff': "그을리는 왕겨",
+    'mechanic.thatchgrinSplitRind': "갈라진 껍질",
+    'mechanic.thatchgrinThatchbound': "짚의 속박",
+    'mechanic.thatchgrinUprooted': "뿌리 뽑힘",
     'aura.templeBrokenVoice': "갈라진 목소리",
     'aura.templeTheScore': "악보",
     'aura.wildheartIdolAwake': "우상이 깨어나다",
@@ -14882,6 +14983,15 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'worldPvp.forfeitPaid': "이탈 대가 지급: {victim}에게서 {money}.",
 },
   ja_JP: {
+    'mechanic.thatchgrinGourdBurst': "カボチャ炸裂",
+    'mechanic.thatchgrinGourdfall': "カボチャの雨",
+    'mechanic.thatchgrinHarvestWard': "収穫の結界",
+    'mechanic.thatchgrinPuppetsFlail': "操り人形の乱打",
+    'mechanic.thatchgrinRipening': "熟成",
+    'mechanic.thatchgrinSmolderingChaff': "くすぶる籾殻",
+    'mechanic.thatchgrinSplitRind': "割れた皮",
+    'mechanic.thatchgrinThatchbound': "藁の呪縛",
+    'mechanic.thatchgrinUprooted': "根こそぎ",
     'aura.templeBrokenVoice': "砕けた声",
     'aura.templeTheScore': "楽譜",
     'aura.wildheartIdolAwake': "偶像の目覚め",
@@ -16202,6 +16312,15 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'worldPvp.forfeitPaid': "離脱の代償を受領：{victim}から{money}。",
 },
   pt_BR: {
+    'mechanic.thatchgrinGourdBurst': "Explosão de abóbora",
+    'mechanic.thatchgrinGourdfall': "Chuva de abóboras",
+    'mechanic.thatchgrinHarvestWard': "Proteção da colheita",
+    'mechanic.thatchgrinPuppetsFlail': "Flagelo da marionete",
+    'mechanic.thatchgrinRipening': "Amadurecimento",
+    'mechanic.thatchgrinSmolderingChaff': "Palha fumegante",
+    'mechanic.thatchgrinSplitRind': "Casca partida",
+    'mechanic.thatchgrinThatchbound': "Preso à palha",
+    'mechanic.thatchgrinUprooted': "Desenraizado",
     'log.advancedRidingLearned': "Você aprendeu Montaria avançada. A velocidade da sua montaria aumenta em {speed}%.",
     'aura.templeBrokenVoice': "Voz quebrada",
     'aura.templeSpentVoice': "Voz esgotada",
@@ -17627,6 +17746,15 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'worldPvp.spoilsOnBody': "Saqueie o corpo de {victim} para pegar seus despojos.",
 },
   ru_RU: {
+    'mechanic.thatchgrinGourdBurst': "Взрыв тыквы",
+    'mechanic.thatchgrinGourdfall': "Тыквопад",
+    'mechanic.thatchgrinHarvestWard': "Защита урожая",
+    'mechanic.thatchgrinPuppetsFlail': "Удары марионетки",
+    'mechanic.thatchgrinRipening': "Созревание",
+    'mechanic.thatchgrinSmolderingChaff': "Тлеющая мякина",
+    'mechanic.thatchgrinSplitRind': "Расколотая корка",
+    'mechanic.thatchgrinThatchbound': "Соломенные путы",
+    'mechanic.thatchgrinUprooted': "Вырванный с корнем",
     'log.advancedRidingLearned': 'Вы освоили продвинутую верховую езду. Скорость передвижения верхом повышена на {speed}%.',
     'aura.templeBrokenVoice': "Сорванный голос",
     'aura.templeTheScore': "Партитура",
@@ -19734,6 +19862,15 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'worldPvp.spoilsOnBody': "Pro získání kořisti prohledej tělo hráče {victim}.",
 },
   nl_NL: {
+    'mechanic.thatchgrinGourdBurst': "Pompoenuitbarsting",
+    'mechanic.thatchgrinGourdfall': "Pompoenregen",
+    'mechanic.thatchgrinHarvestWard': "Oogstbescherming",
+    'mechanic.thatchgrinPuppetsFlail': "Marionettenvlegel",
+    'mechanic.thatchgrinRipening': "Rijping",
+    'mechanic.thatchgrinSmolderingChaff': "Smeulend kaf",
+    'mechanic.thatchgrinSplitRind': "Gespleten schil",
+    'mechanic.thatchgrinThatchbound': "Strogebonden",
+    'mechanic.thatchgrinUprooted': "Ontworteld",
     'log.advancedRidingLearned': "Je hebt Gevorderd rijden geleerd. Je rijdier gaat {speed}% sneller.",
     'aura.templeBrokenVoice': "Gebroken stem",
     'aura.templeSpentVoice': "Uitgeputte stem",
@@ -26687,6 +26824,18 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Wake of the Fallen Star': 'mechanic.balgathStarwake',
   'Molten Fen': 'mechanic.balgathMoltenFen',
   'Star Debris': 'mechanic.balgathStarDebris',
+  // Old Thatchgrin's kit; byte-identical to the THATCHGRIN_KIT names (rain, chaff, and
+  // the swell's fuse, burst, ward, stagger and exposed).
+  Gourdfall: 'mechanic.thatchgrinGourdfall',
+  'Smoldering Chaff': 'mechanic.thatchgrinSmolderingChaff',
+  Ripening: 'mechanic.thatchgrinRipening',
+  'Gourd Burst': 'mechanic.thatchgrinGourdBurst',
+  'Harvest Ward': 'mechanic.thatchgrinHarvestWard',
+  Uprooted: 'mechanic.thatchgrinUprooted',
+  'Split Rind': 'mechanic.thatchgrinSplitRind',
+  // byte-identical to THATCHGRIN_KIT.puppet.name and .swing.name
+  Thatchbound: 'mechanic.thatchgrinThatchbound',
+  "Puppet's Flail": 'mechanic.thatchgrinPuppetsFlail',
   // The Straw Foreman's plank hide and a player's window on it (muster_effigy.ts);
   // byte-identical to EFFIGY_WARD_NAME and EFFIGY_OPENED_NAME.
   'Plank Hide': 'aura.effigyPlankHide',
@@ -27538,7 +27687,30 @@ const TRINKET_NAMED_AURA_ITEM_IDS: Readonly<Record<string, string>> = {
   'Muster Standard': 'muster_standard',
 };
 
+// Gourdlight Eve's cosmetic auras (src/sim/seasonal/seasonal_cosmetics.ts): each trick
+// by its id's catalog name, the worn head by its item's name.
+const SEASONAL_TRICK_AURA_IDS: ReadonlyMap<string, string> = new Map([
+  ...GOURDLIGHT_TRICKS.map((trick): [string, string] => [trick.name, trick.id]),
+  // the Strawling Charm's look (Old Thatchgrin's cosmetic)
+  [STRAWLING_GUISE.name, STRAWLING_GUISE.id],
+  // the costume draughts' looks
+  ...GOURDLIGHT_COSTUMES.map((costume): [string, string] => [costume.name, costume.auraId]),
+]);
+
+// Hester's toys' looks: each aura wears its toy's item name.
+const TOY_AURA_ITEM_IDS: ReadonlyMap<string, string> = new Map(
+  GOURDLIGHT_TOYS.map((toy): [string, string] => [toy.itemName, toy.itemId]),
+);
+
 export function localizeSimAuraName(name: string): string | null {
+  const trickId = SEASONAL_TRICK_AURA_IDS.get(name);
+  if (trickId) return t(`seasonal.tricks.${trickId}` as TranslationKey);
+  const toyItemId = TOY_AURA_ITEM_IDS.get(name);
+  if (toyItemId) return tEntity({ kind: 'item', id: toyItemId, field: 'name' });
+  if (name === 'Carved Pumpkin Head') {
+    return tEntity({ kind: 'item', id: CARVED_PUMPKIN_HEAD_ID, field: 'name' });
+  }
+  if (name === THATCHGRIN_SLUMBER.auraName) return t('seasonal.thatchgrin.poleBound');
   if (name === 'Friendship') return t('referralCards.friendshipAura');
   if (name === 'Protective Charm') return t('referralCards.protectiveCharm');
   const key = AURA_NAME_KEY[name];
@@ -29964,6 +30136,10 @@ const RULES: Rule[] = [
     build: (m) => t('hudChrome.worldBoss.sleep', { name: locMob(m[1]) }),
   },
   {
+    re: /^(.+) sleeps until nightfall\.$/,
+    build: (m) => t('hudChrome.worldBoss.sleepUntilNightfall', { name: locMob(m[1]) }),
+  },
+  {
     re: /^Fallen Captain Aldren yells, "None shall disturb the king's rest! For Thornpeak!"$/,
     build: () => tQuestExtra('aldrenYell', { name: locMob('Fallen Captain Aldren') }),
   },
@@ -31394,6 +31570,14 @@ export function localizeSimText(text: string): string | null {
   return null;
 }
 
+/** Old Thatchgrin's night-hours yells (content/gourdlight_eve_scarecrow.ts
+ *  THATCHGRIN_SLUMBER), keyed under seasonal.thatchgrin. */
+function localizeSeasonalYell(text: string): string | null {
+  if (text === THATCHGRIN_SLUMBER.wakeYell) return t('seasonal.thatchgrin.wakeYell');
+  if (text === THATCHGRIN_SLUMBER.sleepYell) return t('seasonal.thatchgrin.sleepYell');
+  return null;
+}
+
 export function localizeAuthoredYellText(
   text: string,
   speakerKind?: EntityKind,
@@ -31401,6 +31585,7 @@ export function localizeAuthoredYellText(
 ): string {
   if (speakerKind === 'player' || classId !== undefined) return text;
   return (
+    localizeSeasonalYell(text) ??
     localizeRiftBossYell(text) ??
     localizeWorldQuestFreightYell(text, getLanguage()) ??
     localizeSimText(text) ??

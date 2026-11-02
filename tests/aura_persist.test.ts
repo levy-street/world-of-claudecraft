@@ -57,9 +57,12 @@ describe('aura_persist: the content-derived allowlist', () => {
 
   it('lists the consumable buffs and the class maintenance buffs', () => {
     expect([...(allow.get(WELL_FED_AURA_ID) ?? [])].sort()).toEqual([
+      'buff_agi',
       'buff_ap',
       'buff_int',
+      'buff_spi',
       'buff_sta',
+      'buff_str',
     ]);
     expect(allow.get('elixir_buff_sta')?.has('buff_sta')).toBe(true);
     expect(allow.get('elixir_buff_ap')?.has('buff_ap')).toBe(true);

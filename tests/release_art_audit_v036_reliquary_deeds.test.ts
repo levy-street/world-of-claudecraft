@@ -212,8 +212,8 @@ describe('v0.36 release-audit Reliquary deed art', () => {
       'feat_guild_hallsworn',
       'feat_guild_of_lantern_hall',
     ]);
-    expect(DEED_ORDER).toHaveLength(359);
-    expect(DEED_IMAGE_IDS.size).toBe(346);
+    expect(DEED_ORDER).toHaveLength(369);
+    expect(DEED_IMAGE_IDS.size).toBe(356);
     expect(sorted(DEED_IMAGE_IDS)).toEqual(
       sorted(DEED_ORDER.filter((id) => !DEED_ART_PENDING.has(id))),
     );

@@ -241,6 +241,42 @@ function applyDrakelandsKitWarmth(mat: THREE.Material): void {
   }
 }
 
+const FORTRESS_WARMTH_APPLIED = 'wocFortressWarmth';
+
+/** The fortress/raid prop kit (`/models/dungeon/ignivar_prop_*.glb`) ships
+ *  with very dark basalt/iron base textures and an emissiveMap that lights
+ *  only the lava cracks, leaving the archway, walls, towers, stairs, and
+ *  floor plates near-black at night on the low rig (which has no ember IBL).
+ *  Lift the base colour to match the drakelands kit and add a diffuse-scaled
+ *  ember floor in the fragment shader without clobbering the lava-crack
+ *  emissive texture. */
+function applyIgnivarFortressWarmth(mat: THREE.Material): void {
+  if (mat.userData[FORTRESS_WARMTH_APPLIED]) return;
+  mat.userData[FORTRESS_WARMTH_APPLIED] = true;
+  const m = mat as THREE.MeshStandardMaterial;
+  if (m.color) m.color.multiply(new THREE.Color(1.4, 1.24, 1.1));
+  if ('emissive' in m && m.map && !m.emissiveMap) {
+    m.emissive = new THREE.Color(0x462314);
+    m.emissiveIntensity = 12;
+    m.emissiveMap = m.map;
+    return;
+  }
+  const prevCompile = mat.onBeforeCompile;
+  const prevKey = mat.customProgramCacheKey.bind(mat);
+  mat.onBeforeCompile = (sh, renderer) => {
+    prevCompile.call(mat, sh, renderer);
+    if (!sh.fragmentShader.includes('wocFortressEmberFloor')) {
+      sh.fragmentShader = sh.fragmentShader.replace(
+        '#include <emissivemap_fragment>',
+        `#include <emissivemap_fragment>
+        vec3 wocFortressEmberFloor = diffuseColor.rgb * vec3( 0.48, 0.18, 0.09 );
+        totalEmissiveRadiance += wocFortressEmberFloor;`,
+      );
+    }
+  };
+  mat.customProgramCacheKey = () => `fortress-warmth|${prevKey()}`;
+}
+
 export function prepareIgnivarEnvProps(): Promise<void> {
   // The in-flight task must win over the fast path: templates fill one by
   // one, so a size check alone would report complete after the FIRST asset
@@ -267,6 +303,8 @@ export function prepareIgnivarEnvProps(): Promise<void> {
           // emissive floor so shadowed faces keep the same warm read.
           // Keyed off the kit directory so a future drop joins by path.
           if (url.startsWith('/models/drakelands_kit/')) applyDrakelandsKitWarmth(baked.material);
+          else if (url.startsWith('/models/dungeon/ignivar_prop_'))
+            applyIgnivarFortressWarmth(baked.material);
           // The lift machinery moves in the vertex shader (single baked
           // meshes on the shared uTime clock): the spool turns whole in its
           // static mount (the owner's winch remake) and the beam's sheave
@@ -379,4 +417,5 @@ export const ignivarEnvPropsInternalsForTest = {
   shadowCasters: SHADOW_CASTERS,
   prepare: prepareIgnivarEnvProps,
   applyDrakelandsKitWarmth,
+  applyIgnivarFortressWarmth,
 };

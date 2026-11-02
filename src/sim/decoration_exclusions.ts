@@ -51,6 +51,14 @@ import type { BiomeId } from './types';
 /** Authored clearings remove only named scatter, never terrain anchors or heights.
  * Both collision and rendering consume this same deterministic placement gate. */
 const EXCLUSIONS = [
+  // Old Thatchgrin's relocated field at (119, -71): only the six named scatter
+  // obstacles inside its 22-yard camera clearance. No terrain or authored props move.
+  { x: 100.31774559617043, z: -80.03395270230249 },
+  { x: 110.32697276771069, z: -84.74764763750136 },
+  { x: 126.09467874607071, z: -89.99537067627534 },
+  { x: 128.3695881124586, z: -63.61396748945117 },
+  { x: 130.97732801781967, z: -76.77523497631773 },
+  { x: 139.9088388690725, z: -66.82203307189047 },
   // Wisp maze lawn: this ordinary tree overlaps the southeast trial corner.
   { x: 470.83139702072367, z: 1049.3634334169328 },
   { x: 430.56771796988323, z: 1058.3339893245138 },
