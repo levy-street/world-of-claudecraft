@@ -136,11 +136,11 @@ export const MOUNTS: Record<MountKey, MountDef> = {
     name: 'Nightwing Chimaera',
     rarity: 'epic',
   },
-  // A skeletal war horse raised from a battlefield ossuary, ghost-lit eye sockets
-  // under a rotted saddle. Under development: no acquisition path yet (DEVELOPER_MOUNTS).
+  // Wraith the Deadstrier: a skeletal war horse whose mane, tail and fetlocks burn
+  // with green ghostfire, under a rotted saddle. Under development: no acquisition path yet (DEVELOPER_MOUNTS).
   ossuary_charger: {
     key: 'ossuary_charger',
-    name: 'Ossuary Charger',
+    name: 'Wraith the Deadstrier',
     rarity: 'epic',
   },
   // Gourdlight Eve's broom (content/gourdlight_eve.ts GOURDLIGHT_BROOM_ID), sold by

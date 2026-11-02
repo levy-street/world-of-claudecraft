@@ -4122,7 +4122,7 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   gatherers_cache: "Gatherer's Cache",
   artisans_eye: "Artisan's Eye",
   reins_avian_strider: 'Reins of the Viridian Valestrider',
-  reins_ossuary_charger: 'Reins of the Ossuary Charger',
+  reins_ossuary_charger: 'Reins of Wraith the Deadstrier',
   reins_nightwing_chimera: 'Reins of the Nightwing Chimaera',
   reins_goblin_rocket_sled: 'Ignition Key: Goblin Rocket Sled',
   reins_rallycart_rxt: 'Ignition Key: Rallycart RXT',

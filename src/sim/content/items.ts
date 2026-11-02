@@ -425,7 +425,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // gains a player-facing acquisition path.
   reins_ossuary_charger: {
     id: 'reins_ossuary_charger',
-    name: 'Reins of the Ossuary Charger',
+    name: 'Reins of Wraith the Deadstrier',
     kind: 'mount',
     mount: 'ossuary_charger',
     quality: 'epic',

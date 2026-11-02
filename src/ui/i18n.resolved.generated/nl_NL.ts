@@ -2603,7 +2603,7 @@ export const nl_NL: EnTranslations = {
       "name_emberbristle_broom": "Sintelborstelbezem",
       "name_wobbles_slime": "Wobbles het Slijmwezen",
       "name_nightwing_chimera": "Nachtvleugelchimera",
-      "name_ossuary_charger": "Ossuary Charger",
+      "name_ossuary_charger": "Wraith the Deadstrier",
       "desc_valorsteed": "Een sterk, tredzeker ros met een leren zadel.",
       "desc_grag_bear": "Een sterke, tredzekere beer met een zwaar zadel.",
       "desc_stalkglider_snail": "Een stevige, rustige slak met een bemoste schelp.",
@@ -2627,7 +2627,7 @@ export const nl_NL: EnTranslations = {
       "desc_chimeglass_tortoise": "Een zoutvlakteschildpad die drie generaties karavanen is ontlopen. Tinkers hebben een bril van stormglas voor hem geslepen en een bronzen bel om zijn keel gehangen, zodat de weg hem lang hoort voordat hij hem ziet.",
       "desc_rickshaw_mount": "Een ratelende bottenkar met een benige handlanger aan de disselbomen, die je in volle vaart voortsleurt.",
       "desc_emberbristle_broom": "Een oogstbezem met een oranje lint die een handbreedte boven de grond zweeft en sintels uit zijn borstelharen strooit. Een blijvende beloning van Pompoenlichtavond.",
-      "desc_ossuary_charger": "A war horse long since picked to the bone, raised from a battlefield ossuary with a pale fire burning in its empty sockets and a rotted saddle still strapped to its spine."
+      "desc_ossuary_charger": "A war horse long since picked to the bone, its mane, tail and fetlocks burning with a ghostly green fire and a rotted saddle still strapped to its spine."
     },
     "mountTraining": {
       "mountPrompt": "Druk op {key} om op de trainings-Moedros te stijgen.",
@@ -20792,7 +20792,7 @@ export const nl_NL: EnTranslations = {
         "name": "Teugels van de Groene Valestrider"
       },
       "reins_ossuary_charger": {
-        "name": "Reins of the Ossuary Charger"
+        "name": "Reins of Wraith the Deadstrier"
       },
       "reins_nightwing_chimera": {
         "name": "Teugels van de Nachtvleugelchimera"

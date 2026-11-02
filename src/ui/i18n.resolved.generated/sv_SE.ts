@@ -2603,7 +2603,7 @@ export const sv_SE: EnTranslations = {
       "name_emberbristle_broom": "Glödborstkvast",
       "name_wobbles_slime": "Slemmet Vickis",
       "name_nightwing_chimera": "Nattvingad chimära",
-      "name_ossuary_charger": "Ossuary Charger",
+      "name_ossuary_charger": "Wraith the Deadstrier",
       "desc_valorsteed": "En tålig, stadig häst med lädersadel.",
       "desc_grag_bear": "En tålig, stadig björn med en tung sadel.",
       "desc_stalkglider_snail": "En härdig snigel med uthållig energi och ett mossigt skal.",
@@ -2627,7 +2627,7 @@ export const sv_SE: EnTranslations = {
       "desc_chimeglass_tortoise": "En saltplattsköldpadda som har gått ur tre generationer husvagnar. Tinkers malde honom glasögon från stormglas och hängde en bronsklocka i hans hals, så vägen hör honom långt innan den ser honom.",
       "desc_rickshaw_mount": "En skramlande benkärra med en benig hantlangare fastspänd vid skalmarna, som drar dig fram i språngmarsch.",
       "desc_emberbristle_broom": "En skördekvast med orange band som svävar en handsbredd över marken och fäller glöd från borsten. En permanent belöning från Pumplyktornas afton.",
-      "desc_ossuary_charger": "A war horse long since picked to the bone, raised from a battlefield ossuary with a pale fire burning in its empty sockets and a rotted saddle still strapped to its spine."
+      "desc_ossuary_charger": "A war horse long since picked to the bone, its mane, tail and fetlocks burning with a ghostly green fire and a rotted saddle still strapped to its spine."
     },
     "mountTraining": {
       "mountPrompt": "Tryck på {key} för att sitta upp på övnings-Tapperhetshästen.",
@@ -20792,7 +20792,7 @@ export const sv_SE: EnTranslations = {
         "name": "Tyglar till den gröna fågelsprångaren"
       },
       "reins_ossuary_charger": {
-        "name": "Reins of the Ossuary Charger"
+        "name": "Reins of Wraith the Deadstrier"
       },
       "reins_nightwing_chimera": {
         "name": "Nattvingad chimäras tyglar"

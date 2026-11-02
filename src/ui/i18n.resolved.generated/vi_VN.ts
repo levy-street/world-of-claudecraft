@@ -2603,7 +2603,7 @@ export const vi_VN: EnTranslations = {
       "name_emberbristle_broom": "Chổi Lông Than Hồng",
       "name_wobbles_slime": "Slime Lắc Lư",
       "name_nightwing_chimera": "Chimera Cánh Đêm",
-      "name_ossuary_charger": "Ossuary Charger",
+      "name_ossuary_charger": "Wraith the Deadstrier",
       "desc_valorsteed": "Một con tuấn mã khỏe, bước vững, mang yên da.",
       "desc_grag_bear": "Một con gấu khỏe, bước vững, mang yên nặng.",
       "desc_stalkglider_snail": "Một con ốc sên khỏe, sức bền dẻo dai, có vỏ phủ rêu.",
@@ -2627,7 +2627,7 @@ export const vi_VN: EnTranslations = {
       "desc_chimeglass_tortoise": "Một con rùa bằng muối đã vượt qua ba thế hệ đoàn lữ hành. Những người thợ hàn mài cho anh ta một cặp kính từ kính bão và treo một chiếc chuông đồng vào cổ anh ta, để con đường nghe thấy anh ta từ rất lâu trước khi nó nhìn thấy anh ta.",
       "desc_rickshaw_mount": "Một cỗ xe xương lọc cọc, với một tên lính xương xẩu bị buộc vào càng xe, kéo bạn lao đi hết tốc lực.",
       "desc_emberbristle_broom": "Cây chổi mùa gặt buộc ruy băng cam, lơ lửng cách mặt đất một gang tay và rải than hồng từ lông chổi. Phần thưởng vĩnh viễn của Đêm Đèn Bí Ngô.",
-      "desc_ossuary_charger": "A war horse long since picked to the bone, raised from a battlefield ossuary with a pale fire burning in its empty sockets and a rotted saddle still strapped to its spine."
+      "desc_ossuary_charger": "A war horse long since picked to the bone, its mane, tail and fetlocks burning with a ghostly green fire and a rotted saddle still strapped to its spine."
     },
     "mountTraining": {
       "mountPrompt": "Nhấn {key} để cưỡi Valorsteed huấn luyện.",
@@ -20792,7 +20792,7 @@ export const vi_VN: EnTranslations = {
         "name": "Dây Cương Bước Chim Xanh Valestrider"
       },
       "reins_ossuary_charger": {
-        "name": "Reins of the Ossuary Charger"
+        "name": "Reins of Wraith the Deadstrier"
       },
       "reins_nightwing_chimera": {
         "name": "Dây Cương Chimera Cánh Đêm"

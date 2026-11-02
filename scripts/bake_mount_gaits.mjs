@@ -14,8 +14,10 @@
 // bob (src/render/mount_visuals.ts) and are not touched here. The valorsteed
 // and thunderstrut_gobbler GLBs ship AUTHORED clips from their source models
 // (renamed to Idle/Walk/Run/Death at import), and the Drakemaw Raptor is rigged
-// and animated in Blender from scratch (scripts/assets/drakemaw_raptor/): none
-// of them may be baked over, so none has a RIGS entry.
+// and animated in Blender from scratch (scripts/assets/drakemaw_raptor/), and
+// Wraith the Deadstrier plays the valorsteed's authored clips retargeted onto its
+// rig (scripts/assets/ossuary_charger/retarget_valorsteed_gaits.mjs): none of
+// them may be baked over, so none has a RIGS entry.
 import { NodeIO } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import { MeshoptDecoder, MeshoptEncoder } from 'meshoptimizer';
@@ -100,21 +102,6 @@ const RIGS = {
       'tripo::Spine_2': { s: 0.75, footY: 0.07 },
       bone_7: { s: 0.75, footY: 0.07 },
     },
-    head: { bone: 'tripo::Head_0', amp: 3 },
-  },
-  ossuary_charger: {
-    root: 'tripo::Root',
-    fwd: -1,
-    // horse trot on diagonal pairs (FL+RR, FR+RL). The auto-rig left the
-    // front-left leg on a two-joint stub (bone_4 -> bone_5, which carries
-    // its skin weights) and the front-right shoulder on bone_6 above its
-    // limb chain, so those are the swinging joints for the front pair.
-    legs: [
-      ['bone_4', 'bone_5', 0, 0.85], // front left
-      ['bone_6', 'tripo::0_Right_Limb_1', 0.5, 0.85], // front right
-      ['tripo::1_Left_Limb_0', 'tripo::1_Left_Limb_2', 0.5, 0.85], // rear left
-      ['tripo::0_Left_Limb_0', 'tripo::0_Left_Limb_1', 0, 0.85], // rear right
-    ],
     head: { bone: 'tripo::Head_0', amp: 3 },
   },
   stormfeather_griffin: {

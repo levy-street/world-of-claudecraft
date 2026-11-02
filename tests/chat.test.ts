@@ -1239,7 +1239,7 @@ describe('chat module (direct, no Sim)', () => {
     // the only level that still matters in the mount flow (mounts themselves have
     // no per-mount level gate).
     expect(sim.entities.get(pid)?.level).toBe(20);
-    // 17 with Gourdlight Eve and the mounts already on main; 18 with the Ossuary Charger. Spelled as a literal on
+    // 17 with Gourdlight Eve and the mounts already on main; 18 with Wraith the Deadstrier. Spelled as a literal on
     // purpose rather than derived from MOUNT_KEYS.length: the row above already
     // proves ownership against the catalog, so deriving this one too would let a
     // catalog that silently lost a mount pass both.

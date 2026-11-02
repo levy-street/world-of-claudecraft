@@ -120,6 +120,11 @@ export interface MountSeatSpec {
   /** Where the rider's ROOT sits in that bone's local space, in MODEL units, so
    *  it survives any `height` the manifest normalizes the mount to. */
   offset: readonly [number, number, number];
+  /** Turn from the bone's own axes to the rider's (x, y, z, w), applied after
+   *  `offset`. Absent when the bone already stands upright facing forward at
+   *  rest (the raptor's Saddle); set it for a rig whose spine bone points
+   *  along the body, so the rider sits up instead of lying down the back. */
+  rot?: readonly [number, number, number, number];
 }
 
 /** Embers a lantern-bearing mount sheds (src/render/mount_embers.ts): sparks kicked off
@@ -361,9 +366,39 @@ export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
   // neck and drops a touch
   valorsteed: spec('mount_valorsteed', 2.4, true, undefined, 0.15),
   grag_bear: spec('mount_grag_bear', 3.35, true, undefined, -0.8),
-  // seat 0.1 under the saddle's dip (0.60 model units at height 3.8), the same gap the
-  // bear's seat keeps; the dip sits about 0.1 model units toward the tail
-  ossuary_charger: spec('mount_ossuary_charger', 2.66, true, undefined, -0.45),
+  // Wraith the Deadstrier plays the valorsteed's gallop, so its back rises and pitches under
+  // the rider: he rides the saddle's own bone (tripoSpine_1 carries the saddle) instead of a
+  // fixed lift. The seat is the saddle's dip, 0.598 model units over the hooves and 0.08 toward
+  // the tail, restated in that bone's frame; `seat`/`seatFwd` are the same point at height 4.35
+  // (the fallback and the nameplate anchor). He straddles the narrow bone barrel like the
+  // destrier's rider, thighs a little less open, with both hands on the reins. The Tripo
+  // spine bone points down the body, so `rot` undoes its Idle turn: he sits upright and then
+  // only pitches and rolls with the back's motion through the gait.
+  ossuary_charger: spec(
+    'mount_ossuary_charger',
+    2.61,
+    true,
+    undefined,
+    -0.35,
+    null,
+    [],
+    {
+      bone: 'tripoSpine_1',
+      offset: [0.062, -0.0506, 0.001],
+      rot: [-0.5142, -0.5285, 0.4729, -0.4824],
+    },
+    {
+      ride: {
+        spread: 0.55,
+        thigh: 0.32,
+        knee: 0.26,
+        shinSpread: 0.3,
+        ankle: 0.2,
+        hips: -0.05,
+        reins: true,
+      },
+    },
+  ),
   stalkglider_snail: spec('mount_stalkglider_snail', 2.65, false, undefined, -0.3, 'slime'),
   aether_hover_cycle: spec(
     'mount_aether_hover_cycle',

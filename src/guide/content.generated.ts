@@ -7776,7 +7776,7 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       },
       {
         "kind": "mount",
-        "name": "Ossuary Charger"
+        "name": "Wraith the Deadstrier"
       },
       {
         "kind": "mount",

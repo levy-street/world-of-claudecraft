@@ -2603,7 +2603,7 @@ export const en: EnTranslations = {
       "name_emberbristle_broom": "Emberbristle Broom",
       "name_wobbles_slime": "Wobbles the Slime",
       "name_nightwing_chimera": "Nightwing Chimaera",
-      "name_ossuary_charger": "Ossuary Charger",
+      "name_ossuary_charger": "Wraith the Deadstrier",
       "desc_valorsteed": "A hardy, sure-footed steed with a leather saddle.",
       "desc_grag_bear": "A hardy, sure-footed bear fitted with a heavy saddle.",
       "desc_stalkglider_snail": "A hearty, slow-burning snail with a mossy shell.",
@@ -2627,7 +2627,7 @@ export const en: EnTranslations = {
       "desc_chimeglass_tortoise": "A salt-flat tortoise who has outwalked three generations of caravans. Tinkers ground him spectacles from storm-glass and hung a bronze bell at his throat, so the road hears him long before it sees him.",
       "desc_rickshaw_mount": "A rattling bone-cart with a bony grunt harnessed to the shafts, hauling you along at a dead run.",
       "desc_emberbristle_broom": "A harvest broom bound with orange ribbon that hovers a hand above the ground, shedding embers from its bristles. A permanent reward from Gourdlight Eve.",
-      "desc_ossuary_charger": "A war horse long since picked to the bone, raised from a battlefield ossuary with a pale fire burning in its empty sockets and a rotted saddle still strapped to its spine."
+      "desc_ossuary_charger": "A war horse long since picked to the bone, its mane, tail and fetlocks burning with a ghostly green fire and a rotted saddle still strapped to its spine."
     },
     "mountTraining": {
       "mountPrompt": "Press {key} to mount the training Valorsteed.",
@@ -20792,7 +20792,7 @@ export const en: EnTranslations = {
         "name": "Reins of the Viridian Valestrider"
       },
       "reins_ossuary_charger": {
-        "name": "Reins of the Ossuary Charger"
+        "name": "Reins of Wraith the Deadstrier"
       },
       "reins_nightwing_chimera": {
         "name": "Reins of the Nightwing Chimaera"

@@ -903,7 +903,7 @@ describe('item-art audit builder', () => {
       // + the sprite buddy's whistle render: 2186 / 2215, re-measured with --verify-only.
       // Release adds five painted owners; measured with --verify-only on the combined tree.
       // Restored feral staff and eight jewelry paintings; measured with --verify-only.
-      // 2192 / 2221 with the Ossuary Charger's reins, re-measured with --verify-only.
+      // 2192 / 2221 with Wraith the Deadstrier's reins, re-measured with --verify-only.
       catalogSha256: '5f8e93b6d70304163cf0f6d97f9159de711f0ede323d37463c6193676a9d96db',
       catalogBytes: 1197519,
       rendererFingerprint: '41f5404c4d6d9643c8f03b9d88a8546e44564cc03a1baabdd4a72cb9258a2da7',

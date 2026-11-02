@@ -493,7 +493,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 558.
     // Two referral reward mounts and nightwing_chimera join Horizons. Wobbles the
     // Slime (a developer mount, pending its route) takes one more slot: 567.
-    // The Ossuary Charger (a developer mount, pending its route) takes one more: 582.
+    // Wraith the Deadstrier (a developer mount, pending its route) takes one more: 582.
     expect(full).toEqual({ owned: 582, total: 582 });
     // The Warfare Season 2 Vanguard Gallery (135 set pieces and four weapons)
     // is class-personal and sits outside completion, so it moves neither pair.
@@ -530,7 +530,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     // 466 + 13 with the Mirefen world boss page's relics, staff and trinkets: 479.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 529;
     // 532 with the two referral reward mounts and nightwing_chimera; 537 with
-    // Wobbles the Slime's character-scoped mount slot; 552 with the Ossuary Charger's.
+    // Wobbles the Slime's character-scoped mount slot; 552 with Wraith the Deadstrier's.
     expect(character).toEqual({ owned: 552, total: 552 });
     // The Warfare Season 2 page is class-personal, outside completion.
   });

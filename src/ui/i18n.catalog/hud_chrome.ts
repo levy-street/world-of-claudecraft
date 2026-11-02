@@ -2629,7 +2629,7 @@ export const hudChromeStrings = {
     name_emberbristle_broom: 'Emberbristle Broom',
     name_wobbles_slime: 'Wobbles the Slime',
     name_nightwing_chimera: 'Nightwing Chimaera',
-    name_ossuary_charger: 'Ossuary Charger',
+    name_ossuary_charger: 'Wraith the Deadstrier',
     desc_valorsteed: 'A hardy, sure-footed steed with a leather saddle.',
     desc_grag_bear: 'A hardy, sure-footed bear fitted with a heavy saddle.',
     desc_stalkglider_snail: 'A hearty, slow-burning snail with a mossy shell.',
@@ -2670,7 +2670,7 @@ export const hudChromeStrings = {
     desc_emberbristle_broom:
       'A harvest broom bound with orange ribbon that hovers a hand above the ground, shedding embers from its bristles. A permanent reward from Gourdlight Eve.',
     desc_ossuary_charger:
-      'A war horse long since picked to the bone, raised from a battlefield ossuary with a pale fire burning in its empty sockets and a rotted saddle still strapped to its spine.',
+      'A war horse long since picked to the bone, its mane, tail and fetlocks burning with a ghostly green fire and a rotted saddle still strapped to its spine.',
   },
   // The riding lesson at the Highwatch stables (q_riding_lessons): Stablemaster
   // Marla lends the player a training Valorsteed for the paddock race. Finishing

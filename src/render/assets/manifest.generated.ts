@@ -1542,7 +1542,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/mounts/lanternback_troll.glb": "/media/models/mounts/lanternback_troll.4aadd52ff035.glb",
   "models/mounts/mech_bird.glb": "/media/models/mounts/mech_bird.1b92ab1345d5.glb",
   "models/mounts/nightwing_chimera.glb": "/media/models/mounts/nightwing_chimera.e7a10ea71ebe.glb",
-  "models/mounts/ossuary_charger.glb": "/media/models/mounts/ossuary_charger.214dc31ec891.glb",
+  "models/mounts/ossuary_charger.glb": "/media/models/mounts/ossuary_charger.1743ed396a48.glb",
   "models/mounts/rallycart_rxt.glb": "/media/models/mounts/rallycart_rxt.adef62058848.glb",
   "models/mounts/rickshaw_mount.glb": "/media/models/mounts/rickshaw_mount.5f539e1f2ad4.glb",
   "models/mounts/shadowjump_toad.glb": "/media/models/mounts/shadowjump_toad.2811f4fadfda.glb",

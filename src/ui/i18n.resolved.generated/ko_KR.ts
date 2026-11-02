@@ -2603,7 +2603,7 @@ export const ko_KR: EnTranslations = {
       "name_emberbristle_broom": "잉걸갈기 빗자루",
       "name_wobbles_slime": "말랑이 슬라임",
       "name_nightwing_chimera": "밤날개 키메라",
-      "name_ossuary_charger": "납골당 군마",
+      "name_ossuary_charger": "죽음의 군마 레이스",
       "desc_valorsteed": "가죽 안장을 갖춘 튼튼하고 발걸음이 안정적인 말입니다.",
       "desc_grag_bear": "묵직한 안장을 갖춘 튼튼하고 발걸음이 안정적인 곰입니다.",
       "desc_stalkglider_snail": "이끼 낀 껍질을 지닌 끈기 있고 튼튼한 달팽이입니다.",
@@ -2627,7 +2627,7 @@ export const ko_KR: EnTranslations = {
       "desc_chimeglass_tortoise": "소금 평원의 육지거북. 대상 세 세대를 앞질러 걸었다. 그를 거둔 땜장이들이 폭풍유리를 갈아 안경을 만들고 목에 청동 종을 달아, 길은 그를 보기 전에 먼저 듣는다.",
       "desc_rickshaw_mount": "덜컹거리는 뼈 수레입니다. 뼈만 앙상한 잡졸이 채에 매인 채 전속력으로 당신을 끌고 달립니다.",
       "desc_emberbristle_broom": "주황색 리본을 감은 수확용 빗자루. 땅에서 한 뼘 위에 떠서 솔 끝으로 불씨를 흩뿌린다. 고드라이트 축제의 밤이 끝나면 다시 짚으로 부서진다.",
-      "desc_ossuary_charger": "뼈만 남을 때까지 썩어 버린 군마로, 전장의 납골당에서 되살아났다. 텅 빈 눈구멍에는 창백한 불꽃이 타오르고, 등뼈에는 썩은 안장이 아직 묶여 있다."
+      "desc_ossuary_charger": "오래전에 뼈만 남은 군마. 갈기와 꼬리, 발굽 위 털은 유령 같은 초록 불꽃으로 타오르고, 썩은 안장이 아직도 등뼈에 묶여 있다."
     },
     "mountTraining": {
       "mountPrompt": "{key} 키를 눌러 훈련용 발러스티드에 탑승한다.",
@@ -20792,7 +20792,7 @@ export const ko_KR: EnTranslations = {
         "name": "비리디안 베일스트라이더의 고삐"
       },
       "reins_ossuary_charger": {
-        "name": "납골당 군마의 고삐"
+        "name": "죽음의 군마 레이스의 고삐"
       },
       "reins_nightwing_chimera": {
         "name": "밤날개 키메라의 고삐"

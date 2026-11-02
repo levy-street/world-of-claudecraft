@@ -15448,9 +15448,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_nightwing_chimera': '夜翼奇美拉',
   'hudChrome.mounts.desc_nightwing_chimera':
     '來自古木枝頭的雙頭暮光飛龍，駐足時以利爪後肢佇立，行進時展動奧術銘紋雙翼掠地翱翔。',
-  'hudChrome.mounts.name_ossuary_charger': '藏骸所戰駒',
+  'hudChrome.mounts.name_ossuary_charger': '亡駒幽魂',
   'hudChrome.mounts.desc_ossuary_charger':
-    '一匹早已腐朽至只剩骨架的戰馬，從戰場的藏骸所中被喚起，空洞的眼窩裡燃著蒼白的火焰，脊骨上仍綁著一副腐爛的馬鞍。',
+    '一匹早已只剩白骨的戰馬。鬃毛、尾巴和蹄踝燃燒著幽靈般的綠色火焰，腐朽的馬鞍仍綁在牠的脊骨上。',
   'hudChrome.mounts.name_lanternback_troll': '提燈背者格倫博',
   'hudChrome.mounts.name_lantern_hall_destrier': '燈火大廳戰馬',
   'hudChrome.mounts.name_chimeglass_tortoise': '鐘晶的托利弗',
@@ -16429,7 +16429,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_terrorspark_groundshaker.name': '駭雷撼地者點火鑰匙',
   'entities.items.reins_avian_strider.name': '蒼翠谷行者的韁繩',
   'entities.items.reins_nightwing_chimera.name': '夜翼奇美拉的韁繩',
-  'entities.items.reins_ossuary_charger.name': '藏骸所戰駒的韁繩',
+  'entities.items.reins_ossuary_charger.name': '亡駒幽魂的韁繩',
   'entities.items.reins_lanternback_troll.name': '點燈人之軛：格倫博',
   'entities.items.reins_chimeglass_tortoise.name': '守道人的鈴帶：托利弗',
   'entities.items.reins_rickshaw_mount.name': '白骨人力車縛繩',

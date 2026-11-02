@@ -2603,7 +2603,7 @@ export const da_DK: EnTranslations = {
       "name_emberbristle_broom": "Glødebørstekost",
       "name_wobbles_slime": "Slimklumpen Vrikke",
       "name_nightwing_chimera": "Natvinget kimære",
-      "name_ossuary_charger": "Ossuary Charger",
+      "name_ossuary_charger": "Wraith the Deadstrier",
       "desc_valorsteed": "En hårdfør ganger med sikre skridt og lædersadel.",
       "desc_grag_bear": "En hårdfør bjørn med sikre skridt og en tung sadel.",
       "desc_stalkglider_snail": "En robust snegl med langvarig energi og en mosbegroet skal.",
@@ -2627,7 +2627,7 @@ export const da_DK: EnTranslations = {
       "desc_chimeglass_tortoise": "En salt-flad skildpadde, der har overgået tre generationer af campingvogne. Tindere knuste ham briller af stormglas og hængte en bronzeklokke i halsen på ham, så vejen hører ham længe før den ser ham.",
       "desc_rickshaw_mount": "En raslende knoglekærre med en knoklet håndlanger spændt for skafterne, der trækker dig af sted i fuldt firspring.",
       "desc_emberbristle_broom": "En høstkost bundet med orange bånd, der svæver en håndsbredde over jorden og drysser gløder fra børsterne. En permanent belønning fra Græskarlygternes aften.",
-      "desc_ossuary_charger": "A war horse long since picked to the bone, raised from a battlefield ossuary with a pale fire burning in its empty sockets and a rotted saddle still strapped to its spine."
+      "desc_ossuary_charger": "A war horse long since picked to the bone, its mane, tail and fetlocks burning with a ghostly green fire and a rotted saddle still strapped to its spine."
     },
     "mountTraining": {
       "mountPrompt": "Tryk på {key} for at stige op på trænings-Modgangeren.",
@@ -20792,7 +20792,7 @@ export const da_DK: EnTranslations = {
         "name": "Tøjler til Viridian Valestrider"
       },
       "reins_ossuary_charger": {
-        "name": "Reins of the Ossuary Charger"
+        "name": "Reins of Wraith the Deadstrier"
       },
       "reins_nightwing_chimera": {
         "name": "Natvinget kimæres tøjler"

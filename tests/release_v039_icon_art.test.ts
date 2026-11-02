@@ -535,7 +535,7 @@ describe('release v0.39 icon-art second-pass lineage', () => {
     // plus reins_nightwing_chimera, so all 138 live hotbar items are painted; none remain parked.
     // Wobbles the Slime's reins ship committed art (a render of the mount): 139.
     // Halloween adds 22 usable rewards with committed item art.
-    // The Ossuary Charger's reins ship committed art (a render of the mount): 276.
+    // Wraith the Deadstrier's reins ship committed art (a render of the mount): 276.
     expect(liveHotbarItemIds, 'production isHotbarItemId inventory').toHaveLength(276);
     expect(
       artSubjectHotbarItemIds,

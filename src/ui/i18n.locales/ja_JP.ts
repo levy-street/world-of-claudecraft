@@ -14520,9 +14520,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_nightwing_chimera': 'ナイトウィング・キマイラ',
   'hudChrome.mounts.desc_nightwing_chimera':
     '古の枝より降り立った双頭の黄昏ワイバーン。休む時は鉤爪の後脚で立ち、進む時は秘術の文様が刻まれた翼で地表を滑空する。',
-  'hudChrome.mounts.name_ossuary_charger': '納骨堂の軍馬',
+  'hudChrome.mounts.name_ossuary_charger': '死せる軍馬レイス',
   'hudChrome.mounts.desc_ossuary_charger':
-    '骨だけになるまで朽ち果てた軍馬。戦場の納骨堂から呼び起こされ、空ろな眼窩には青白い炎が燃え、背骨には朽ちた鞍が今も括り付けられている。',
+    '骨だけになって久しい軍馬。たてがみと尾と蹴爪毛は亡霊のような緑の炎に燃え、朽ちた鞍がいまも背骨に括りつけられている。',
   'hudChrome.mounts.name_lanternback_troll': 'ランタンバックのグルンボル',
   'hudChrome.mounts.name_lantern_hall_destrier': '燈火の館の軍馬',
   'hudChrome.mounts.name_chimeglass_tortoise': '鐘硝子のトリヴァー',
@@ -15552,7 +15552,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_terrorspark_groundshaker.name': 'ドレッドスパークの始動キー',
   'entities.items.reins_avian_strider.name': 'ヴィリジアン・ヴェイルストライダーの手綱',
   'entities.items.reins_nightwing_chimera.name': 'ナイトウィング・キマイラの手綱',
-  'entities.items.reins_ossuary_charger.name': '納骨堂の軍馬の手綱',
+  'entities.items.reins_ossuary_charger.name': '死せる軍馬レイスの手綱',
   'entities.items.reins_lanternback_troll.name': '点灯人の軛：グルンボル',
   'entities.items.reins_chimeglass_tortoise.name': '道守の鈴帯：トリヴァー',
   'entities.items.reins_rickshaw_mount.name': '縛りの手綱：骨縛りの人力車',

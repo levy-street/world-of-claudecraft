@@ -2603,7 +2603,7 @@ export const tr_TR: EnTranslations = {
       "name_emberbristle_broom": "Köz Kıllı Süpürge",
       "name_wobbles_slime": "Sallantı Balçık",
       "name_nightwing_chimera": "Gece Kanadı Kimera",
-      "name_ossuary_charger": "Ossuary Charger",
+      "name_ossuary_charger": "Wraith the Deadstrier",
       "desc_valorsteed": "Deri eyerli, dayanıklı ve sağlam adımlı bir küheylan.",
       "desc_grag_bear": "Ağır eyer takılmış, dayanıklı ve sağlam adımlı bir ayı.",
       "desc_stalkglider_snail": "Yosunlu kabuğu olan, dayanıklı ve enerjisini yavaş tüketen bir salyangoz.",
@@ -2627,7 +2627,7 @@ export const tr_TR: EnTranslations = {
       "desc_chimeglass_tortoise": "Üç nesildir karavanları geride bırakan, tuzla kaplı bir kaplumbağa. Tamirciler ona fırtına camından gözlük taktı ve boğazına bronz bir çan astı, böylece yol onu görmeden çok önce onu duyardı.",
       "desc_rickshaw_mount": "Sırıklarına kemikleri çıkmış bir avanenin koşulduğu, seni ölümüne bir koşuyla çeken takırdayan kemik arabası.",
       "desc_emberbristle_broom": "Turuncu kurdeleyle bağlanmış, yerden bir karış yüksekte süzülen ve kıllarından közler dökülen bir hasat süpürgesi. Kabak Işığı Gecesi etkinliğinden kalıcı bir ödül.",
-      "desc_ossuary_charger": "A war horse long since picked to the bone, raised from a battlefield ossuary with a pale fire burning in its empty sockets and a rotted saddle still strapped to its spine."
+      "desc_ossuary_charger": "A war horse long since picked to the bone, its mane, tail and fetlocks burning with a ghostly green fire and a rotted saddle still strapped to its spine."
     },
     "mountTraining": {
       "mountPrompt": "Eğitim Yiğit Küheylanına binmek için {key} tuşuna bas.",
@@ -20792,7 +20792,7 @@ export const tr_TR: EnTranslations = {
         "name": "Yeşil Değişimci'nin Dizginleri"
       },
       "reins_ossuary_charger": {
-        "name": "Reins of the Ossuary Charger"
+        "name": "Reins of Wraith the Deadstrier"
       },
       "reins_nightwing_chimera": {
         "name": "Gece Kanadı Kimera Dizginleri"
