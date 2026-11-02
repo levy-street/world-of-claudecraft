@@ -18017,7 +18017,7 @@ export const en: EnTranslations = {
       },
       "lava_burst": {
         "name": "Magma Burst",
-        "description": "Deal {damage} Fire damage. A hit grants 1 Thunder. Always critically strikes a target burning with your Cinder Jolt. A critical strike deals an extra 24% of the normal hit. Magma Surge: each Cinder Jolt tick has a 20% chance to reset this cooldown and make your next Magma Burst within 10 sec instant. Damage increases with Spell Power. (Thundercall)"
+        "description": "Deal {damage} Fire damage. A hit grants 1 Thunder. Always critically strikes a target burning with your Cinder Jolt. A critical strike deals an extra 24% of the normal hit. Magma Surge: each Cinder Jolt tick has a 20% chance to reset this cooldown and make your next Magma Burst within 12 sec instant. A surge during a Magma Burst cast also clears the cooldown of that cast, so you can follow it with the instant one. Damage increases with Spell Power. (Thundercall)"
       },
       "thunderstorm": {
         "name": "Stormbreak",
@@ -18559,7 +18559,7 @@ export const en: EnTranslations = {
         "description": "Your spells can arm Nature's Boon for 10 sec: the spell it names becomes free, 25% stronger, and castable in any form. A fresh proc refreshes the duration.",
         "specNote_feral": "Each landed melee auto-attack has a 1 in 15 chance to arm it for Sporemending, or for Oakhide while in Bruin Form.",
         "specNote_balance": "Each Wildbolt or Skyfall you cast has a 10% chance to arm it for Spore Burst, at most once every 10 sec.",
-        "specNote_restoration": "Each tick of your heal-over-time effects has a 10% chance to arm it for Spore Burst and reset the Spore Burst cooldown, at most once every 10 sec."
+        "specNote_restoration": "Each tick of your heal-over-time effects has a 10% chance to arm it for Spore Burst and take 15 sec off the Spore Burst cooldown, at most once every 20 sec. This Spore Burst is free but not stronger."
       },
       "overbloom": {
         "name": "Overbloom",
