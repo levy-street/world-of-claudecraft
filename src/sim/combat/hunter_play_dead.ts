@@ -7,6 +7,12 @@
 // a mob left with an empty hate table evades). This module then drops every
 // enemy player's target lock and lays the hunter down. While it lasts, mobs and
 // pets cannot perceive the hunter (threat.ts), so nothing re-acquires them.
+// Dropping the lock is not enough on its own: a cast already under way keeps its
+// own aim (castTargetId), so an enemy player's spell cast at the hunter or the
+// pet would still finish and hit the 'corpse'. Lying down therefore also
+// cancels every hostile player's cast aimed at them and drops a spell queued
+// on them (dropHostileCastsOn). Ground-aimed casts and projectiles already in
+// flight are untouched.
 //
 // It ends when the hunter recasts it, presses a movement key, starts an attack,
 // uses any other ability, or uses an item. Taking damage or being displaced (a
@@ -68,6 +74,7 @@ export function startPlayDead(
   hunter.vx = 0;
   hunter.vz = 0;
   dropTargetsOnStealth(ctx, hunter, alsoHidden);
+  dropHostileCastsOn(ctx, hunter, alsoHidden);
   ctx.applyAura(hunter, {
     id: PLAY_DEAD_ID,
     name,
@@ -79,6 +86,25 @@ export function startPlayDead(
     sourceId: hunter.id,
     school: 'physical',
   });
+}
+
+/** Cancels every hostile player's cast aimed at the hunter (or a hidden pet)
+ *  and drops a press queued on them, so no spell started before the hunter lay
+ *  down can finish on the 'corpse'. Draws no rng. */
+function dropHostileCastsOn(ctx: SimContext, hunter: Entity, alsoHidden: readonly number[]): void {
+  const hiddenIds = alsoHidden.length === 0 ? [hunter.id] : [hunter.id, ...alsoHidden];
+  for (const e of ctx.entities.values()) {
+    if (e.kind !== 'player' || e.id === hunter.id || e.dead) continue;
+    if (!ctx.isHostileTo(e, hunter)) continue;
+    if (e.castingAbility && e.castTargetId !== null && hiddenIds.includes(e.castTargetId)) {
+      ctx.cancelCast(e);
+    }
+    if (e.queuedCastTargetId !== null && hiddenIds.includes(e.queuedCastTargetId)) {
+      e.queuedCastAbility = null;
+      e.queuedCastAim = null;
+      e.queuedCastTargetId = null;
+    }
+  }
 }
 
 /**
