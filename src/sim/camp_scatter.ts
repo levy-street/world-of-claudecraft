@@ -20,6 +20,8 @@
 // so only spawn POSITIONS move (the whole point) while every downstream seed-stable
 // roll stays put.
 
+import type { CampDef } from './types';
+
 // Golden angle (radians): consecutive spiral points are offset by this angle, the
 // irrational rotation that yields the even, non-repeating sunflower packing.
 export const CAMP_GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5));
@@ -54,4 +56,40 @@ export function campSpawnOffset(
     x: Math.sin(baseAng) * baseR + Math.sin(jitterAngle) * jitterMag,
     z: Math.cos(baseAng) * baseR + Math.cos(jitterAngle) * jitterMag,
   };
+}
+
+// Where camp slot `index` lands in world space: its authored spot when the camp
+// pins one (CampDef.spots), else its scatter point about the camp center. The
+// caller draws the two jitter values for EVERY slot, pinned or not, so pinning
+// never changes the draw count.
+export function campSlotPoint(
+  camp: CampDef,
+  index: number,
+  jitterAngle: number,
+  jitterFrac: number,
+): { x: number; z: number } {
+  const spot = camp.spots?.[index];
+  if (spot) return { x: spot.x, z: spot.z };
+  const off = campSpawnOffset(index, camp.count, camp.radius, jitterAngle, jitterFrac);
+  return { x: camp.center.x + off.x, z: camp.center.z + off.z };
+}
+
+// Shared-stream draws one spawned camp slot makes in the Sim's camp loop, in
+// order: jitter angle, jitter fraction, level, facing, wander pause. Every Rng
+// method funnels through exactly one next() (src/sim/rng.ts).
+export const CAMP_SLOT_DRAWS = 5;
+
+/** Whether camp slot `index` is retired (CampDef.retiredSlots): it spawns nothing. */
+export function isRetiredCampSlot(camp: CampDef, index: number): boolean {
+  return index >= campSpawnedCount(camp);
+}
+
+/** Consume a retired slot's draws, so the stream after it is exactly as if it spawned. */
+export function drawRetiredCampSlot(rng: { next(): number }): void {
+  for (let i = 0; i < CAMP_SLOT_DRAWS; i++) rng.next();
+}
+
+/** Mobs the camp actually spawns: its slots less the retired ones. */
+export function campSpawnedCount(camp: CampDef): number {
+  return Math.max(0, camp.count - Math.max(0, Math.floor(camp.retiredSlots ?? 0)));
 }

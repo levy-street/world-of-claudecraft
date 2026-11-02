@@ -4827,6 +4827,20 @@ export interface CampDef {
   // pinned by tests/off_stream_rng.test.ts: zero shared draws at world build, and
   // spawn stability under camp reordering.
   offStream?: boolean;
+  /**
+   * Authored spawn points by slot: slot i spawns at spots[i] instead of its
+   * scatter point; a slot past the end scatters as usual. Each slot still
+   * draws exactly what it always drew (camp_scatter.ts campSlotPoint), so
+   * pinning a camp's mobs moves them without moving the shared stream.
+   */
+  spots?: readonly { x: number; z: number }[];
+  /**
+   * How many of the camp's LAST slots are retired: each still consumes its
+   * spawn draws and entity id, but spawns nothing. A shipped camp that lost
+   * mobs keeps `count` and retires the difference, so every later world draw
+   * (and every seeded roll) stays bit-identical (camp_scatter.ts).
+   */
+  retiredSlots?: number;
 }
 
 // Ground interactables (sparkle objects)

@@ -1668,6 +1668,22 @@ function sanitizeCamp(v: unknown): CampDef | null {
   const questNotes = str(c.questNotes, '').slice(0, MAX_AUTHORING_NOTES_LENGTH);
   if (aiNotes) camp.aiNotes = aiNotes;
   if (questNotes) camp.questNotes = questNotes;
+  // Authored per-slot spawn points and retired slots (CampDef.spots and
+  // retiredSlots): kept so a projected native camp spawns where it does in
+  // the built-in world. Bounded by the camp's own slot count.
+  if (Array.isArray(c.spots)) {
+    const spots = c.spots
+      .slice(0, camp.count)
+      .filter(
+        (p): p is { x: number; z: number } =>
+          !!p && typeof p === 'object' && finiteNum(p.x) && finiteNum(p.z),
+      )
+      .map((p) => ({ x: coord(p.x), z: coord(p.z) }));
+    if (spots.length) camp.spots = spots;
+  }
+  if (finiteNum(c.retiredSlots) && c.retiredSlots >= 1) {
+    camp.retiredSlots = clamp(Math.floor(c.retiredSlots), 1, camp.count);
+  }
   return camp;
 }
 

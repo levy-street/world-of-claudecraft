@@ -594,7 +594,16 @@ export const EVERGARDEN_CAMPS: CampDef[] = [
   { mobId: 'topiary_wolf', center: { x: 302, z: 898 }, radius: 6, count: 3 },
   { mobId: 'topiary_wolf', center: { x: 418, z: 1124 }, radius: 10, count: 3 },
   { mobId: 'hedge_gnome', center: { x: 268, z: 1002 }, radius: 10, count: 3 },
-  { mobId: 'hedge_gnome', center: { x: 467.29, z: 943.75 }, radius: 10, count: 1 },
+  {
+    mobId: 'hedge_gnome',
+    center: { x: 456, z: 942 },
+    radius: 10,
+    count: 2,
+    spots: [
+      { x: 467.29, z: 943.75 },
+      { x: 465.98, z: 927.09 },
+    ],
+  },
   { mobId: 'the_topiary_bull', center: { x: 360, z: 1016 }, radius: 5, count: 1 },
 ];
 

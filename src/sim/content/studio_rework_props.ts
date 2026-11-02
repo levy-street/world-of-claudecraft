@@ -65,8 +65,10 @@ export const STUDIO_REWORK_PROP_EDITS: readonly StudioPropEdit[] = [
   { table: 'decorProps', at: { x: -258, z: 473 }, remove: true },
   { table: 'decorProps', at: { x: -100, z: -33 }, to: { x: -116.72, z: -32.11, turn: 0 } },
   { table: 'decorProps', at: { x: -95.8, z: -62 }, to: { x: -96.978, z: -70.754, turn: 0 } },
-  { table: 'decorProps', at: { x: -95.5, z: -46.2 }, to: { x: -95.101, z: -45.478, turn: 0 } },
-  { table: 'decorProps', at: { x: -95.5, z: -44 }, to: { x: -95.025, z: -42.27, turn: 0 } },
+  // The two Eastbrook start crates keep their shipped x: the map's half-yard
+  // nudge east put them across the sight line north of the player start.
+  { table: 'decorProps', at: { x: -95.5, z: -46.2 }, to: { x: -95.5, z: -45.478, turn: 0 } },
+  { table: 'decorProps', at: { x: -95.5, z: -44 }, to: { x: -95.5, z: -42.27, turn: 0 } },
   { table: 'decorProps', at: { x: -95.4, z: -64 }, to: { x: -98.623, z: -70.976, turn: 0 } },
   { table: 'decorProps', at: { x: -89, z: -41 }, to: { x: -97.366, z: 1.488, turn: -1.4525 } },
   { table: 'decorProps', at: { x: -87.5, z: -44.5 }, to: { x: -99.863, z: -41.927, turn: 0 } },

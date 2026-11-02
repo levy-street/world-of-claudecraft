@@ -783,7 +783,13 @@ export const PROVING_SHORE_CAMPS: CampDef[] = [
   { mobId: 'training_effigy', center: { x: -336, z: -14 }, radius: 4, count: 1, offStream: true },
   { mobId: 'training_effigy', center: { x: -341, z: -17 }, radius: 4, count: 1, offStream: true },
   { mobId: 'training_effigy', center: { x: -331, z: -11 }, radius: 4, count: 1, offStream: true },
-  { mobId: 'training_effigy', center: { x: -330.63, z: -19.8 }, radius: 4, count: 1, offStream: true },
+  {
+    mobId: 'training_effigy',
+    center: { x: -330.63, z: -19.8 },
+    radius: 4,
+    count: 1,
+    offStream: true,
+  },
   { mobId: 'training_effigy', center: { x: -339, z: -9 }, radius: 4, count: 1, offStream: true },
   // The wreck line lives on the FAR strand past the practice yard (the path
   // from the yard leads straight to it), leaving the south strand nearest

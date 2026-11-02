@@ -498,7 +498,18 @@ export const WILLOWFEN_ITEMS: Record<string, ItemDef> = {
 export const WILLOWFEN_CAMPS: CampDef[] = [
   { mobId: 'bogtoad', center: { x: -430, z: 270 }, radius: 10, count: 3 },
   { mobId: 'bogtoad', center: { x: -284, z: 316 }, radius: 10, count: 3 },
-  { mobId: 'lily_wisp', center: { x: -437.63, z: 435.18 }, radius: 12, count: 4 },
+  {
+    mobId: 'lily_wisp',
+    center: { x: -426, z: 440 },
+    radius: 12,
+    count: 4,
+    spots: [
+      { x: -437.32, z: 436.96 },
+      { x: -432.8, z: 428.78 },
+      { x: -439.61, z: 442.12 },
+      { x: -440.8, z: 432.86 },
+    ],
+  },
   { mobId: 'willow_sprite', center: { x: -396, z: 376 }, radius: 10, count: 3 },
   { mobId: 'willow_sprite', center: { x: -316, z: 380 }, radius: 10, count: 2 },
   { mobId: 'drowsy_croaker', center: { x: -322, z: 496 }, radius: 5, count: 1 },

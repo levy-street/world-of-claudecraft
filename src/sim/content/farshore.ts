@@ -584,8 +584,26 @@ export const FARSHORE_CAMPS: CampDef[] = [
   { mobId: 'breach_wretch', center: { x: 400, z: 96 }, radius: 11, count: 3 }, // the north downs
   { mobId: 'riftspawn', center: { x: 452, z: 66 }, radius: 11, count: 3 }, // deep in the Riftfields
   { mobId: 'riftspawn', center: { x: 388, z: -44 }, radius: 11, count: 3 }, // above the Sundered Cliffs
-  { mobId: 'void_stalker', center: { x: 418, z: -30 }, radius: 12, count: 3 }, // the cliff approach
-  { mobId: 'void_stalker', center: { x: 449.67, z: 23.92 }, radius: 11, count: 2 }, // the east reach
+  {
+    mobId: 'void_stalker',
+    center: { x: 418, z: -30 },
+    radius: 12,
+    count: 2,
+    spots: [
+      { x: 410.85, z: -29.21 },
+      { x: 421.21, z: -20.7 },
+    ],
+  }, // the cliff approach
+  {
+    mobId: 'void_stalker',
+    center: { x: 462, z: 20 },
+    radius: 11,
+    count: 2,
+    spots: [
+      { x: 454.29, z: 27.2 },
+      { x: 445.05, z: 20.64 },
+    ],
+  }, // the east reach
   { mobId: 'sundered_horror', center: { x: 402, z: -78 }, radius: 6, count: 1 }, // the cliffs' great break
 ];
 export const FARSHORE_OBJECTS: GroundObjectDef[] = [

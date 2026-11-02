@@ -628,7 +628,17 @@ export const FROSTVEIL_CAMPS: CampDef[] = [
   { mobId: 'ice_wisp', center: { x: 30, z: 1745 }, radius: 12, count: 4 },
   { mobId: 'rime_elemental', center: { x: 66, z: 1622 }, radius: 9, count: 2 },
   { mobId: 'rime_elemental', center: { x: 10, z: 1800 }, radius: 10, count: 2 },
-  { mobId: 'fen_sprite', center: { x: -82.69, z: 1709.81 }, radius: 11, count: 3 },
+  {
+    mobId: 'fen_sprite',
+    center: { x: -84, z: 1738 },
+    radius: 11,
+    count: 3,
+    spots: [
+      { x: -84.15, z: 1714.84 },
+      { x: -78.94, z: 1709.1 },
+      { x: -84.98, z: 1705.5 },
+    ],
+  },
   { mobId: 'frostmane_yeti', center: { x: 96, z: 1816 }, radius: 6, count: 1 },
 ];
 export const FROSTVEIL_OBJECTS: GroundObjectDef[] = [

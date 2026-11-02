@@ -8,10 +8,11 @@ import {
   resolveMovement,
   streetlampPlacements,
 } from '../src/sim/colliders';
+import { FARM_PATCHES } from '../src/sim/content/farm_patches';
 import { GATHER_NODES } from '../src/sim/content/gather_nodes';
 import { MAILBOXES } from '../src/sim/content/mailboxes';
 import { NOTICEBOARDS } from '../src/sim/content/noticeboards';
-import { PRACTICE_ROW_X } from '../src/sim/content/practice_dummies';
+import { PRACTICE_ROW_MARKS } from '../src/sim/content/practice_dummies';
 import { STATIONS } from '../src/sim/content/professions';
 import { ZONE3_NPCS, ZONE3_PROPS, ZONE3_ROADS, ZONE3_ZONE } from '../src/sim/content/zone3';
 import { BUILTIN_WORLD, CAMPS } from '../src/sim/data';
@@ -193,16 +194,18 @@ describe('the Highwatch layout', () => {
       { id: 'gate fence west end', x: 14, z: 649, clearance: 1 },
       { id: 'Thornpeak Cairns', x: 15, z: 645, clearance: 1 },
       { id: 'cairn headstones', x: 19.4, z: 647.6, clearance: 1 },
-      { id: 'practice row', x: PRACTICE_ROW_X, z: 654, clearance: 3 },
+      ...Object.entries(PRACTICE_ROW_MARKS).map(([id, m]) => ({
+        id: `practice row ${id}`,
+        ...m,
+        clearance: 3,
+      })),
       // the farm's six beds
-      ...[
-        [-23, 685],
-        [-18, 685],
-        [-13, 685],
-        [-23, 690],
-        [-18, 690],
-        [-13, 690],
-      ].map(([x, z]) => ({ id: `bed ${x},${z}`, x, z, clearance: 3 })),
+      ...(FARM_PATCHES.find((p) => p.id === 'patch_thornpeak')?.beds ?? []).map((b) => ({
+        id: b.id,
+        x: b.x,
+        z: b.z,
+        clearance: 3,
+      })),
     ];
     // and every NPC that kept its spot
     for (const [id, npc] of Object.entries(ZONE3_NPCS)) {

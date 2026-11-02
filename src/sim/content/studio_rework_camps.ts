@@ -1,24 +1,20 @@
 import type { CampDef } from '../types';
 
 // Mob camps the Studio town rework added (the Eastbrook and Mirefen changes
-// map, #4593): spawns the map placed away from every shipped camp. Appended
-// LAST to CAMPS (data.ts), offStream so they draw from private sub-streams and
-// move no shipped camp's shared world-gen draws.
+// map, #4593): mobs the map placed beyond what the shipped camps near them
+// hold. Appended LAST to CAMPS (data.ts), offStream so they draw from private
+// sub-streams and move no shipped camp's shared world-gen draws; each mob
+// stands on its authored spot.
 export const STUDIO_REWORK_CAMPS: CampDef[] = [
-  { mobId: 'forest_wolf', center: { x: -33.36, z: 52.24 }, radius: 2, count: 1, offStream: true },
-  { mobId: 'forest_wolf', center: { x: -27.35, z: 35.44 }, radius: 7.9, count: 2, offStream: true },
-  {
-    mobId: 'webwood_spider',
-    center: { x: -78.14, z: 51.57 },
-    radius: 15.8,
-    count: 3,
-    offStream: true,
-  },
   {
     mobId: 'ridge_stalker',
     center: { x: 71.08, z: 580.07 },
     radius: 7.7,
     count: 2,
+    spots: [
+      { x: 75.41, z: 585.19 },
+      { x: 66.74, z: 574.94 },
+    ],
     offStream: true,
   },
   {
@@ -26,29 +22,69 @@ export const STUDIO_REWORK_CAMPS: CampDef[] = [
     center: { x: 41.35, z: 556.23 },
     radius: 5.1,
     count: 2,
+    spots: [
+      { x: 44.98, z: 554.23 },
+      { x: 37.71, z: 558.22 },
+    ],
+    offStream: true,
+  },
+  {
+    mobId: 'ridge_stalker',
+    center: { x: 45.17, z: 573.11 },
+    radius: 2,
+    count: 1,
+    spots: [{ x: 45.17, z: 573.11 }],
     offStream: true,
   },
   {
     mobId: 'thornpeak_ogre',
-    center: { x: -123.88, z: 715.5 },
-    radius: 7.1,
+    center: { x: -128.99, z: 718.92 },
+    radius: 2,
+    count: 1,
+    spots: [{ x: -128.99, z: 718.92 }],
+    offStream: true,
+  },
+  {
+    mobId: 'hedge_gnome',
+    center: { x: 459.63, z: 913.29 },
+    radius: 3,
     count: 2,
+    spots: [
+      { x: 458.63, z: 912.29 },
+      { x: 460.63, z: 914.29 },
+    ],
     offStream: true,
   },
   {
-    mobId: 'thornpeak_ogre',
-    center: { x: -132.54, z: 699.94 },
+    mobId: 'vale_bandit',
+    center: { x: 67.2, z: 40.95 },
     radius: 2,
     count: 1,
+    spots: [{ x: 67.2, z: 40.95 }],
     offStream: true,
   },
   {
-    mobId: 'ogre_crusher',
-    center: { x: -101.08, z: 744.35 },
+    mobId: 'restless_bones',
+    center: { x: 114.35, z: 72.74 },
     radius: 2,
     count: 1,
+    spots: [{ x: 114.35, z: 72.74 }],
     offStream: true,
   },
-  { mobId: 'hedge_gnome', center: { x: 459.63, z: 913.29 }, radius: 3, count: 2, offStream: true },
-  { mobId: 'hedge_gnome', center: { x: 465.98, z: 927.09 }, radius: 2, count: 1, offStream: true },
+  {
+    mobId: 'gloam_strider',
+    center: { x: -413.29, z: 1512.58 },
+    radius: 2,
+    count: 1,
+    spots: [{ x: -413.29, z: 1512.58 }],
+    offStream: true,
+  },
+  {
+    mobId: 'void_stalker',
+    center: { x: 424.71, z: -39.02 },
+    radius: 2,
+    count: 1,
+    spots: [{ x: 424.71, z: -39.02 }],
+    offStream: true,
+  },
 ];
