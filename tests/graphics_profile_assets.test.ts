@@ -116,6 +116,9 @@ vi.mock('../src/render/eastbrook_surface_atlas', () => ({
 vi.mock('../src/render/fireball_travel_visual', () => ({
   resetFireballTravelProfileCaches: mocks.reset,
 }));
+vi.mock('../src/render/magma_boulder_visual', () => ({
+  resetMagmaBoulderProfileCaches: mocks.reset,
+}));
 vi.mock('../src/render/frost_nova_root_visual', () => ({
   resetFrostNovaRootProfileCaches: mocks.reset,
 }));
@@ -256,6 +259,7 @@ describe('graphics profile derived-cache reset', () => {
       'door_portal',
       'wildheart_terrain',
       'fireball_travel_visual',
+      'magma_boulder_visual',
       'frost_nova_root_visual',
       'ice_block_visual',
       'temporal_hourglass_visual',

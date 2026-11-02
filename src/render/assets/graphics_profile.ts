@@ -26,6 +26,7 @@ import {
 } from '../harbor_route_markers';
 import { resetIceBlockProfileCaches } from '../ice_block_visual';
 import { resetJailSceneProfileCaches } from '../jail_scene';
+import { resetMagmaBoulderProfileCaches } from '../magma_boulder_visual';
 import { prepareMailboxProfileAssets, resetMailboxProfileCaches } from '../mailbox';
 import { prepareNoticeboardProfileAssets, resetNoticeboardProfileCaches } from '../noticeboard';
 import { resetPaladinAscensionProfileCaches } from '../paladin_ascension_visual';
@@ -96,6 +97,7 @@ const RESETTERS = [
   ['door_portal', resetDoorPortalProfileCaches],
   ['wildheart_terrain', resetWildheartTerrainProfileCaches],
   ['fireball_travel_visual', resetFireballTravelProfileCaches],
+  ['magma_boulder_visual', resetMagmaBoulderProfileCaches],
   ['frost_nova_root_visual', resetFrostNovaRootProfileCaches],
   ['ice_block_visual', resetIceBlockProfileCaches],
   ['temporal_hourglass_visual', resetTemporalHourglassProfileCaches],

@@ -849,8 +849,8 @@ export class AbilityVfx {
           this.spawned += 3;
           break;
         }
-        // Magma Burst: a molten orb on three twisting strands of lava, its
-        // impact stack held for the ARRIVAL (magma_burst.ts).
+        // Magma Burst: a cracking boulder that grows in flight, its impact
+        // stack held for the ARRIVAL (magma_burst.ts).
         if (
           ability === MAGMA_BURST_ABILITY &&
           playMagmaBurst(
@@ -864,7 +864,7 @@ export class AbilityVfx {
             this.quality,
           )
         ) {
-          // the orb, the braid, and the held impact stack
+          // the molten head, the boulder, and the held impact stack
           this.spawned += 3;
           if (!plan.whirl) {
             this.mobThrowFallback(ev.sourceId, ability);

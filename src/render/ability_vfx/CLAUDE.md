@@ -78,18 +78,25 @@ old look. Pinned by `tests/stepped_leader.test.ts` and
 
 Magma Burst (the Shaman's `lava_burst`) follows the same rider shape:
 `magma_burst.ts` routes its heavyBolt cue onto a molten-orb projectile head
-(`../vfx.ts` `moltenOrbProjectile`) ridden by two braided lava strands
-(`magma_braid.ts`, pure helix, growth and plan math in the registered
-`magma_braid_core.ts`). One flight progress drives the orb swelling from a
-bead to a full orb, the strands thinning as they pour into it, and the light
-growing with it; the strands draw in the same held ribbon pass (layer first,
-cores before glows), the crumble and the ring of fire run on the braid's own
-clock (never the shared delayed-burst pool: its slots are few and its delays
-cap at 0.2 s), and the light is the same `TrackedLightHost` slot. Unlike Arc Bolt it keeps the archetype sequencer: its
-class-owned spec (`../shaman_vfx_specs.ts`, registered) supplies the `orb`
-windup and an impact stack the braid starts with `awaitTravel` and fires at
-ARRIVAL (`AbilityVfxFx.magmaBraid` / `magmaBraidImpact`). Pinned by
-`tests/magma_braid.test.ts` and `tests/magma_braid_core.test.ts`.
+(`../vfx.ts` `moltenOrbProjectile`, drawn as a halo that grows with the rock)
+ridden by a cracking volcanic boulder (`magma_boulders.ts`, the pool; the rock
+itself is `../magma_boulder_visual.ts`; pure growth, crack, light, plate-split
+and plan math in the registered `magma_boulder_core.ts`). One flight progress
+drives the rock swelling from a pebble to a boulder, its crust plates drifting
+apart so the glowing cracks over the molten core open and widen, the drips, and
+the light growing with it; at arrival it shatters (debris and embers) and a
+ring of fire burns on the pool's own clock (never the shared delayed-burst
+pool: its slots are few and its delays cap at 0.2 s), and the light is the same
+`TrackedLightHost` slot. Unlike the ribbon riders the rock is real scene meshes:
+three visuals built once, hidden, on the two shared materials the boot manifest
+stages (`ABILITY_MATERIAL_SOURCES`, `magma-boulder`), and the pool lives OUTSIDE
+`AbilityVfxFx`, reached through `MagmaBoulderPort` closures so the cast-gate
+attribution walk never credits its meshes to an engine field. Unlike Arc Bolt it
+keeps the archetype sequencer: its class-owned spec (`../shaman_vfx_specs.ts`,
+registered) supplies the `orb` windup and an impact stack the boulder starts
+with `awaitTravel` and fires at ARRIVAL (`AbilityVfxFx.magmaBoulder` /
+`magmaBoulderImpact`). Pinned by `tests/magma_boulders.test.ts` and
+`tests/magma_boulder_core.test.ts`.
 
 `spirits.ts` (`SpiritApparitions`) discipline: do NOT imitate the naive gallery
 code it ports. One cached PUPPET per creature GLB, whose meshes all share ONE

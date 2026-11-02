@@ -3,15 +3,16 @@ import type { AbilityVfxFullSpec, AbilityVfxSpec } from './ability_vfx_core';
 // Magma Burst (lava_burst), the Elemental Shaman's molten nuke. Before this
 // spec it had no authored identity and drew the renderer's generic heavy bolt.
 // Prompt contract: "A molten orb swells between the Shaman's hands while
-// casting, then flies on two braided strands of lava that pour into it, so it
-// swells from a bead to a full orb, dripping as they go; the orb lands in a
-// fire flash with sparks, debris, smoke and a scorch, the strands drain and
-// crumble, and a ring of fire burns at the target's feet. It lights the world."
+// casting, then a cracking volcanic boulder leaves them as a pebble and swells
+// into a boulder in flight, its crust splitting so glowing lava cracks open
+// and widen as it grows, dripping lava and lighting the ground under it; it
+// shatters on the target in a fire flash with sparks, debris, smoke and a
+// scorch, and a ring of fire burns at the target's feet. It lights the world."
 //
-// The flight and the strands are bespoke (ability_vfx/magma_burst.ts and
-// magma_braid.ts ride the pooled projectile); this spec supplies the shared
+// The flight and the boulder are bespoke (ability_vfx/magma_burst.ts and
+// magma_boulders.ts ride the pooled projectile); this spec supplies the shared
 // sequencer's halves: the 'orb' windup ceremony during the cast and the impact
-// stack, which the braid fires at ARRIVAL (the sequence is held for travel).
+// stack, which the boulder fires at ARRIVAL (the sequence is held for travel).
 export const MAGMA_BURST_VFX_SPEC = {
   c: '#ff7a1a',
   p: 'fire',

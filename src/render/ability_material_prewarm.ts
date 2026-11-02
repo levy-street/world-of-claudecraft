@@ -36,6 +36,7 @@ import { buildFrozenOrbStandIn, frozenOrbStandInMaterials } from './frozen_orb_f
 import { IceBlockVisual, iceMaterials } from './ice_block_visual';
 import { buildGroundFireAoeStandIn, groundFireAoeMaterials } from './ignivar_fire_vfx';
 import { buildMeteorRockStandIn, meteorRockStandInMaterials } from './mage_ground_fx';
+import { buildMagmaBoulderStandIn, magmaBoulderMaterials } from './magma_boulder_visual';
 import {
   buildPaladinAscensionStandIn,
   paladinAscensionStandInMaterials,
@@ -113,6 +114,12 @@ export const ABILITY_MATERIAL_SOURCES: readonly AbilityMaterialSource[] = [
     module: 'fireball_travel_visual.ts',
     materials: () => Object.values(fireballMaterials()),
     build: () => new FireballTravelVisual().group,
+  },
+  {
+    id: 'magma-boulder',
+    module: 'magma_boulder_visual.ts',
+    materials: () => Object.values(magmaBoulderMaterials()),
+    build: () => buildMagmaBoulderStandIn(),
   },
   {
     // The ground fire AoE (Ignivar's waves, the mage meteor's burn, Varkhul's

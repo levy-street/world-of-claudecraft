@@ -3,6 +3,7 @@ import { ABILITIES, ITEMS } from '../sim/data';
 import type { IWorld } from '../world_api';
 import { AbilityVfx, AbilityVfxFx } from './ability_vfx';
 import { resumeActiveAbilityKit } from './ability_vfx/active_kit_prewarm';
+import { MagmaBoulders } from './ability_vfx/magma_boulders';
 import type { AbilityVfxDeps } from './ability_vfx/painter';
 import { isLivingWarriorAttentionSource } from './ability_vfx/warrior_attention_core';
 import { preparedAbilityAudio, type SpatialAudioSink } from './audio_sink';
@@ -86,6 +87,30 @@ export function createRendererAbilityPresentation(h: PresentationHost) {
   );
   // The Arc Bolt leader's moving light borrows a pulse-pool slot (no new light).
   fx.setTrackedLightHost(h.light);
+  // The Magma Burst boulders: scene meshes on the boot-staged rock materials
+  // (ABILITY_MATERIAL_SOURCES), owned here and handed to the engine as
+  // closures, lit through the same pulse-pool seam.
+  const boulders = new MagmaBoulders(h.scene, {
+    burst: (x, y, z, colorHex, count, power, kind, duration) =>
+      fx.burstAt(x, y, z, colorHex, count, power, kind, duration),
+    anchor: h.anchor,
+    groundY: (x, z) => h.ground(x, z),
+  });
+  boulders.setLightHost(h.light);
+  fx.setMagmaBoulderPort({
+    spawn: (sourceId, targetId, head, plan) => boulders.spawn(sourceId, targetId, head, plan),
+    impact: (handle, at) => {
+      boulders.impact(handle, at);
+    },
+    lost: (handle) => boulders.lost(handle),
+    advance: (dt, reducedMotion) => boulders.advance(dt, reducedMotion),
+    clear: () => boulders.clear(),
+    dispose: () => {
+      boulders.setLightHost(null);
+      boulders.dispose();
+    },
+    count: () => boulders.activeCount(),
+  });
   // The raid trinket relics' pooled scene objects, built hidden here so the
   // cast-VFX prewarm links them with the rest of the 'vfx' programs.
   const trinketRelics = new TrinketRelics({

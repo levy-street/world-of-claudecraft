@@ -97,6 +97,7 @@ const REGISTERED_MODULES = [
   'frozen_orb_fx.ts',
   'mage_ground_fx.ts',
   'warlock_meteor_fx.ts',
+  'magma_boulder_visual.ts',
   'coach_trail_materials.ts',
   'moonwing_adornment.ts',
   'gloamveil_veil.ts',
@@ -246,16 +247,17 @@ describe('the lazy-material sweep', () => {
     const hits = sweep();
     const files = hits.map((hit) => basename(hit.file));
     for (const module of REGISTERED_MODULES) expect(files).toContain(module);
-    // Vacuity floor, kept just under the real count. Bundles: the thirteen
-    // registered sources (four lazy spell-visual caches, the coach trail's
-    // guidance set, the ground fire AoE anchor, five per-instance pool
-    // stand-ins: Ring of Frost, Divine Ascension, Frostglobe, the mage and
-    // the warlock meteor rocks, plus the two rig-adornment stand-ins), the
-    // two excluded scenery bakes, and the rocket-sled plume pair. The
-    // battleground caches are the remaining non-bundle hit. Plus the World
-    // Quests branch's calligraphy guidance bundle: 18 / 17.
-    expect(hits.length).toBeGreaterThanOrEqual(18);
-    expect(hits.filter((hit) => hit.idiom === 'bundle')).toHaveLength(17);
+    // Vacuity floor, kept just under the real count. Bundles: the fourteen
+    // registered sources (five lazy spell-visual caches, the Magma Burst
+    // boulder among them, the coach trail's guidance set, the ground fire AoE
+    // anchor, five per-instance pool stand-ins: Ring of Frost, Divine
+    // Ascension, Frostglobe, the mage and the warlock meteor rocks, plus the
+    // two rig-adornment stand-ins), the two excluded scenery bakes, and the
+    // rocket-sled plume pair. The battleground caches are the remaining
+    // non-bundle hit. Plus the World Quests branch's calligraphy guidance
+    // bundle: 19 / 18.
+    expect(hits.length).toBeGreaterThanOrEqual(19);
+    expect(hits.filter((hit) => hit.idiom === 'bundle')).toHaveLength(18);
   });
 
   it('leaves no hit unregistered and unexcluded', () => {
