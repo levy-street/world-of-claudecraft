@@ -8,6 +8,7 @@ import {
   type ReferralCardContext,
   type ReferralCardState,
   type ReferralMilestone,
+  referralKillMinLevel,
   referralNextMilestone,
   referralStartError,
   transitionReferralCard,
@@ -272,6 +273,16 @@ describe('referral card milestone evidence', () => {
     );
   });
 
+  it('pins the kill level per stamp to the level its quest chain opens at', () => {
+    // Dungeon kills credit at the lower of the finder minimum and the quest chain's
+    // opening level, so any pair who could hold the quest is never refused.
+    expect(
+      Object.fromEntries(
+        REFERRAL_MILESTONES.filter((m) => m.dungeonId).map((m) => [m.id, referralKillMinLevel(m)]),
+      ),
+    ).toEqual({ hollow: 5, fogbinder: 12, gravewyrm: 18 });
+  });
+
   it('credits no kill stamp unless both characters meet the content minimum level', () => {
     const state = active();
     const clear = (dungeonId: string) =>
@@ -282,18 +293,50 @@ describe('referral card milestone evidence', () => {
       mobId: 'ignivar_herald_of_the_last_flame',
       eligibleCharacterIds: [101, 202],
     } as const;
-    // Finder normal minimums: Hollow 7, Bastion 12, Sanctum 19, raids 20.
-    for (const [event, min] of [
-      [clear('hollow_crypt'), 7],
-      [clear('sunken_bastion'), 12],
-      [clear('gravewyrm_sanctum'), 19],
-      [raid, 20],
+    for (const [event, min, bitValue] of [
+      [clear('hollow_crypt'), 5, 2],
+      [clear('sunken_bastion'), 12, 4],
+      [clear('gravewyrm_sanctum'), 18, 8],
+      [raid, 20, 16],
     ] as const) {
       expect(creditReferralCard(state, event, atLevel(min - 1)).state).toBe(state);
-      const carried = atLevel(min);
-      carried.characters[1].level = 1;
-      expect(creditReferralCard(state, event, carried).state).toBe(state);
-      expect(creditReferralCard(state, event, atLevel(min)).state).not.toBe(state);
+      for (const low of [0, 1]) {
+        const carried = atLevel(min);
+        carried.characters[low].level = 1;
+        expect(creditReferralCard(state, event, carried).state).toBe(state);
+      }
+      expect(
+        creditReferralCard(state, event, atLevel(min)).state.participants.map((p) => p.credited),
+      ).toEqual([bitValue, bitValue]);
+    }
+  });
+
+  it('a dungeon quest turn-in credits only the turner, with no kill level gate', () => {
+    const state = active();
+    const ctx = context(); // level 1: below every kill gate
+    for (const c of ctx.characters) c.completedQuestIds = ['q_hollow', 'q_gravewyrm'];
+    const turnIn = (questId: string) =>
+      ({ type: 'questTurnIn', characterId: 101, questId }) as const;
+    expect(
+      creditReferralCard(state, turnIn('q_hollow'), ctx).state.participants.map((p) => p.credited),
+    ).toEqual([2, 0]);
+    expect(
+      creditReferralCard(state, turnIn('q_gravewyrm'), ctx).state.participants.map(
+        (p) => p.credited,
+      ),
+    ).toEqual([8, 0]);
+  });
+
+  it('a kill credits nothing unless BOTH assigned characters were eligible', () => {
+    const state = active();
+    for (const ids of [[101], [202], []]) {
+      expect(
+        creditReferralCard(
+          state,
+          { type: 'dungeonClear', dungeonId: 'hollow_crypt', eligibleCharacterIds: ids },
+          atLevel(20),
+        ).state,
+      ).toBe(state);
     }
   });
 

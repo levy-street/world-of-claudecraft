@@ -20,10 +20,11 @@ feature is available in the game.
   `q_ps_set_sail` when starting. Both must accept. Declining requires confirmation;
   players can later start manually if eligible.
 - A dungeon stamp is earned on the kill: when both assigned characters are eligible
-  for the final boss kill of the stamp's dungeon and both are at least that
-  dungeon's finder minimum level, both earn it, whether or not either has the
-  quest. The raid stamp has the same level rule (the raid's finder minimum), so a
-  carried below-level pair earns nothing. Turning in the stamp's quest with the assigned friend in the party
+  for the final boss kill of the stamp's dungeon and both are at least the level the
+  stamp's quest chain opens at (`referralKillMinLevel`: the lower of the dungeon's
+  finder minimum and the highest `minLevel` along the quest's `requiresQuest` chain),
+  both earn it, whether or not either has the quest. The raid stamp requires the
+  raid's finder minimum level. A carried below-level pair earns nothing. Turning in the stamp's quest with the assigned friend in the party
   also earns it, for the player who turned it in.
 - Each participant can move their assignment and earned rewards to an eligible
   new character before redeeming their Fogbinder reward. Progress is preserved.
@@ -47,7 +48,7 @@ feature is available in the game.
 The tutorial quest has no associated dungeon. If it was turned in alone, the active
 card earns that stamp when both assigned characters have completed the quest and
 rejoin one another in a party. The later dungeon stamps are earned by defeating
-the matching dungeon's final boss together at its level, so a quest turned in alone
+the matching dungeon's final boss together at its quest level, so a quest turned in alone
 never blocks them. Trinket descriptions
 use the live content values for stamina, shield size, threshold, and cooldown.
 

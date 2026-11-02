@@ -1,4 +1,5 @@
 import { FINDER_ACTIVITIES, finderActivity } from './content/dungeon_finder';
+import { QUESTS } from './data';
 
 /** Stable keys and bit positions are persisted; append rather than reorder. */
 export const REFERRAL_MILESTONES = [
@@ -364,14 +365,33 @@ function redeem(
   return { state: next, intents };
 }
 
+/** The lowest level a dungeon milestone's final-boss kill credits at: the lower of the
+ * dungeon's finder minimum and the level its milestone quest chain opens at (the highest
+ * `minLevel` along `requiresQuest`), so a pair who can hold the quest is never refused. */
+export function referralKillMinLevel(milestone: (typeof REFERRAL_MILESTONES)[number]): number {
+  let level = Number.POSITIVE_INFINITY;
+  for (const a of FINDER_ACTIVITIES)
+    if (a.dungeonId === milestone.dungeonId) level = Math.min(level, a.minLevel);
+  let questLevel = 1;
+  const seen = new Set<string>();
+  for (let id: string | undefined = milestone.questId ?? undefined; id && !seen.has(id); ) {
+    seen.add(id);
+    const quest = QUESTS[id];
+    if (!quest) break;
+    questLevel = Math.max(questLevel, quest.minLevel ?? 1);
+    id = quest.requiresQuest;
+  }
+  return milestone.questId && QUESTS[milestone.questId] ? Math.min(level, questLevel) : level;
+}
+
 /** Called only for authoritative successful turn-ins, dungeon clears, and eligible boss kills.
  * A dungeon stamp is earned by the kill: when BOTH assigned characters are eligible for the
- * milestone dungeon's final boss kill and both are at least the dungeon's finder minimum
- * level, both are credited whether or not either holds or has turned in the milestone quest. A turn-in with the friend in the party still credits the
- * player who turned it in. Tutorial has no dungeon; the assigned pair's reunion recovers its
- * stamp once both have completed the final tutorial quest.
- * Raid evidence requires BOTH assigned characters to be eligible for that actual boss kill
- * and at least the raid's finder minimum level.
+ * milestone dungeon's final boss kill and both are at least `referralKillMinLevel`, both are
+ * credited whether or not either holds or has turned in the milestone quest. A turn-in with
+ * the friend in the party still credits the player who turned it in. Tutorial has no
+ * dungeon; the assigned pair's reunion recovers its stamp once both have completed the
+ * final tutorial quest. Raid evidence requires BOTH assigned characters to be eligible for
+ * that actual boss kill and at least the raid's finder minimum level.
  * Credit may arrive out of order; redemption remains in milestone order. */
 export function creditReferralCard(
   state: ReferralCardState,
@@ -396,8 +416,7 @@ export function creditReferralCard(
     let minLevel = Number.POSITIVE_INFINITY;
     if (event.type === 'dungeonClear') {
       milestone = REFERRAL_MILESTONES.findIndex((m) => m.dungeonId === event.dungeonId);
-      for (const a of FINDER_ACTIVITIES)
-        if (a.dungeonId === event.dungeonId) minLevel = Math.min(minLevel, a.minLevel);
+      if (milestone >= 0) minLevel = referralKillMinLevel(REFERRAL_MILESTONES[milestone]);
     } else {
       const activity = finderActivity(event.activityId);
       if (activity?.kind === 'raid' && activity.encounters.some((e) => e.mobId === event.mobId)) {
