@@ -19,6 +19,7 @@ import * as THREE from 'three';
 import type { SimEvent } from '../sim/types';
 import type { IWorld } from '../world_api';
 import type { HoardBossCueView, RiftBossDeathZoneView } from '../world_api/dungeons';
+import { type DrawnPositionLookup, installDrawnPositions } from './attached_fx_anchor';
 import { DeathBurstFx } from './death_burst_fx';
 import { TempleFx } from './drowned_temple/temple_fx';
 import { floorVfxRenderOrder } from './floor_vfx_layer';
@@ -225,6 +226,7 @@ export class RiftDeathZoneVisuals {
   private readonly councilBodies: CouncilBodies;
   // The Smith's Heart's seal moments felt in the camera.
   private readonly sealShake: SealShake;
+  private uninstallDrawnPositions: (() => void) | null = null;
 
   constructor(
     private readonly scene: THREE.Scene,
@@ -234,7 +236,10 @@ export class RiftDeathZoneVisuals {
     private readonly shake?: (amount: number) => void,
     private readonly reducedMotion?: () => boolean,
     private readonly playGesture?: (entityId: number, gesture: string) => void,
+    drawnPositions?: DrawnPositionLookup,
   ) {
+    // Effects pinned to a unit ride its drawn pose (attached_fx_anchor.ts).
+    if (drawnPositions) this.uninstallDrawnPositions = installDrawnPositions(drawnPositions);
     this.hoardGestures = new HoardBossGestures(world, playGesture);
     this.hoardPresentation = new HoardBossPresentation(world, shake);
     this.summonRise = new SummonRiseFx(playGesture);
@@ -622,6 +627,8 @@ export class RiftDeathZoneVisuals {
   dispose(): void {
     this.sync([]);
     this.disposed = true;
+    this.uninstallDrawnPositions?.();
+    this.uninstallDrawnPositions = null;
     this.activeScope = null;
     this.disposeScope();
     this.hammerFx.dispose();

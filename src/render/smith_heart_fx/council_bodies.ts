@@ -35,6 +35,7 @@ import * as THREE from 'three';
 import { resolveUiEffectsProfile } from '../../game/ui_effects_profile';
 import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
+import { fxAnchor } from '../attached_fx_anchor';
 import { wrapAngle } from '../facing_smooth';
 import { attachSceneGroupGated } from '../gated_scene_attach';
 import { GFX } from '../gfx';
@@ -492,8 +493,9 @@ export class CouncilBodies {
   // ---- the pose -------------------------------------------------------------------------
 
   private pose(rig: Rig, e: Entity, dt: number): void {
+    const eAt = fxAnchor(e);
     const plan = rig.plan;
-    rig.group.position.set(e.pos.x, e.pos.y, e.pos.z);
+    rig.group.position.set(eAt.x, eAt.y, eAt.z);
     if (e.dead) {
       this.poseDead(rig, e);
       return;
@@ -697,14 +699,15 @@ export class CouncilBodies {
 
   /** The motes over a song or a gathering Wrath (cosmetic, thinned low). */
   private cosmetics(rig: Rig, e: Entity, action: CouncilBodyAction, k: number, dt: number): void {
+    const eAt = fxAnchor(e);
     if (action !== 'sing' && action !== 'wrath' && action !== 'point') return;
     const rate = (action === 'wrath' ? 26 : 16) * (0.3 + k) * this.density;
     if (this.rand() >= dt * rate) return;
     const p = rig.joints[2];
     _a.set(p.x, p.y, p.z).applyAxisAngle(_up, rig.facing);
-    const x = e.pos.x + _a.x;
-    const y = e.pos.y + _a.y;
-    const z = e.pos.z + _a.z;
+    const x = eAt.x + _a.x;
+    const y = eAt.y + _a.y;
+    const z = eAt.z + _a.z;
     if (action === 'wrath') {
       // White-gold drawn in toward its chest.
       const a = this.rand() * Math.PI * 2;
@@ -741,9 +744,10 @@ export class CouncilBodies {
 
   /** The Slabwright's fists strike the floor ahead: dust, chips, a ring. */
   private slam(rig: Rig, e: Entity): void {
+    const eAt = fxAnchor(e);
     const reach = rig.plan.arm.upper + rig.plan.arm.fore;
-    const fx = e.pos.x + Math.sin(rig.facing) * reach * 0.7;
-    const fz = e.pos.z + Math.cos(rig.facing) * reach * 0.7;
+    const fx = eAt.x + Math.sin(rig.facing) * reach * 0.7;
+    const fz = eAt.z + Math.cos(rig.facing) * reach * 0.7;
     const y = this.groundY(fx, fz);
     this.particles.puff(fx, y + 0.3, fz, 14, {
       speed: 4,
@@ -771,6 +775,7 @@ export class CouncilBodies {
   // ---- the death ------------------------------------------------------------------------
 
   private poseDead(rig: Rig, e: Entity): void {
+    const eAt = fxAnchor(e);
     if (rig.deadAt < 0) {
       // First seen already dead: the fall settled long ago.
       rig.deadAt = rig.seenAlive ? this.clock : this.clock - COUNCIL_FALL.end - 1;
@@ -825,8 +830,8 @@ export class CouncilBodies {
       if (fall.landed && !p.landed) {
         p.landed = true;
         _a.copy(p.pos).applyAxisAngle(_up, rig.facing);
-        const x = e.pos.x + _a.x;
-        const z = e.pos.z + _a.z;
+        const x = eAt.x + _a.x;
+        const z = eAt.z + _a.z;
         const size = Math.max(p.def.size.x, p.def.size.y);
         this.particles.puff(x, this.groundY(x, z) + 0.2, z, Math.round(3 + size * 3), {
           speed: 1.6 + size,
@@ -854,8 +859,9 @@ export class CouncilBodies {
 
   /** The threads snapping: a flash of the vein's light and a spray of sparks. */
   private snap(rig: Rig, e: Entity): void {
-    const y = e.pos.y + rig.plan.height * 0.55;
-    this.particles.puff(e.pos.x, y, e.pos.z, 16, {
+    const eAt = fxAnchor(e);
+    const y = eAt.y + rig.plan.height * 0.55;
+    this.particles.puff(eAt.x, y, eAt.z, 16, {
       speed: 4,
       up: 1,
       life: 0.6,
@@ -865,8 +871,8 @@ export class CouncilBodies {
       pool: 'glow',
       radius: 1,
     });
-    this.particles.shockRing(e.pos.x, e.pos.z, COUNCIL_BODY_COLORS.ochre, 5, 0.6);
-    this.shakeNear(e.pos.x, e.pos.z, 0.35, 35);
+    this.particles.shockRing(eAt.x, eAt.z, COUNCIL_BODY_COLORS.ochre, 5, 0.6);
+    this.shakeNear(eAt.x, eAt.z, 0.35, 35);
   }
 
   dispose(): void {

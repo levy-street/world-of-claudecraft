@@ -28,6 +28,7 @@ import * as THREE from 'three';
 import { resolveUiEffectsProfile } from '../../game/ui_effects_profile';
 import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
+import { fxAnchor } from '../attached_fx_anchor';
 import {
   TELEGRAPH_THREAT_COLORS,
   type TelegraphFan,
@@ -540,8 +541,9 @@ export class BreathFx {
         this.endCharge(c);
         continue;
       }
-      c.x = e.pos.x;
-      c.z = e.pos.z;
+      const eAt = fxAnchor(e);
+      c.x = eAt.x;
+      c.z = eAt.z;
       c.y = this.groundY(c.x, c.z);
       const total =
         e.castTotal > 0 ? e.castTotal : c.kind === 'gust' ? this.sim.gustCast : this.sim.lanceCast;

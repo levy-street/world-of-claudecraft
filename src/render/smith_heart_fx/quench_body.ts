@@ -34,6 +34,7 @@ import { resolveUiEffectsProfile } from '../../game/ui_effects_profile';
 import { QUENCH_CASTS, QUENCH_CUES } from '../../sim/encounters/smith_heart/quench_ids';
 import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
+import { fxAnchor } from '../attached_fx_anchor';
 import { wrapAngle } from '../facing_smooth';
 import { attachSceneGroupGated } from '../gated_scene_attach';
 import { GFX } from '../gfx';
@@ -559,7 +560,8 @@ export class QuenchBody {
   // ---- the pose ------------------------------------------------------------------------------
 
   private pose(e: Entity, dt: number): void {
-    this.group.position.set(e.pos.x, e.pos.y, e.pos.z);
+    const eAt = fxAnchor(e);
+    this.group.position.set(eAt.x, eAt.y, eAt.z);
     if (e.dead) {
       this.poseDead(e);
       return;
@@ -770,12 +772,13 @@ export class QuenchBody {
     look: QuenchBodyLook,
     dt: number,
   ): void {
+    const eAt = fxAnchor(e);
     const maw = this.joints[QJ.maw];
     const sinY = Math.sin(this.yaw);
     const cosY = Math.cos(this.yaw);
-    const mxW = e.pos.x + maw.x * cosY + maw.z * sinY;
-    const mzW = e.pos.z - maw.x * sinY + maw.z * cosY;
-    const myW = e.pos.y + maw.y;
+    const mxW = eAt.x + maw.x * cosY + maw.z * sinY;
+    const mzW = eAt.z - maw.x * sinY + maw.z * cosY;
+    const myW = eAt.y + maw.y;
     if (look.breath > 0.05 && this.rand() < dt * 18 * look.breath * this.density) {
       this.particles.puff(mxW + sinY * 0.6, myW, mzW + cosY * 0.6, 2, {
         speed: 2 + look.breath * 12,
@@ -811,9 +814,9 @@ export class QuenchBody {
     if (action === 'wake' && this.rand() < dt * 30 * (0.2 + k) * this.density) {
       // The cold rising off it to the sky, glints in it.
       this.particles.puff(
-        e.pos.x + (this.rand() - 0.5) * 4,
-        e.pos.y + 1 + this.rand() * 5,
-        e.pos.z + (this.rand() - 0.5) * 4,
+        eAt.x + (this.rand() - 0.5) * 4,
+        eAt.y + 1 + this.rand() * 5,
+        eAt.z + (this.rand() - 0.5) * 4,
         1,
         {
           speed: 3,
@@ -830,8 +833,8 @@ export class QuenchBody {
       // The slam's ice dust off its fists.
       for (const w of [QJ.wristL, QJ.wristR]) {
         const j = this.joints[w];
-        const x = e.pos.x + j.x * cosY + j.z * sinY;
-        const z = e.pos.z - j.x * sinY + j.z * cosY;
+        const x = eAt.x + j.x * cosY + j.z * sinY;
+        const z = eAt.z - j.x * sinY + j.z * cosY;
         this.particles.puff(x, this.groundY(x, z) + 0.3, z, 4, {
           speed: 4,
           up: 2,
@@ -845,9 +848,9 @@ export class QuenchBody {
     if (this.rand() < dt * 3 * this.density) {
       // A low cold mist curling round its feet.
       this.particles.puff(
-        e.pos.x + (this.rand() - 0.5) * 3,
-        e.pos.y + 0.3,
-        e.pos.z + (this.rand() - 0.5) * 3,
+        eAt.x + (this.rand() - 0.5) * 3,
+        eAt.y + 0.3,
+        eAt.z + (this.rand() - 0.5) * 3,
         1,
         {
           speed: 0.6,
@@ -863,8 +866,9 @@ export class QuenchBody {
 
   /** The blades wake: the cold flares out of it, a ring over the lake. */
   private wakeBurst(e: Entity): void {
-    const y = e.pos.y + 4;
-    this.particles.puff(e.pos.x, y, e.pos.z, 32, {
+    const eAt = fxAnchor(e);
+    const y = eAt.y + 4;
+    this.particles.puff(eAt.x, y, eAt.z, 32, {
       speed: 11,
       up: 3,
       life: 1,
@@ -874,13 +878,14 @@ export class QuenchBody {
       pool: 'glow',
       radius: 1.5,
     });
-    this.particles.shockRing(e.pos.x, e.pos.z, 0xe8f9ff, 16, 0.8);
-    this.shakeNear(e.pos.x, e.pos.z, 0.5, 70);
+    this.particles.shockRing(eAt.x, eAt.z, 0xe8f9ff, 16, 0.8);
+    this.shakeNear(eAt.x, eAt.z, 0.5, 70);
   }
 
   // ---- the death -----------------------------------------------------------------------------
 
   private poseDead(e: Entity): void {
+    const eAt = fxAnchor(e);
     if (this.deadAt < 0) {
       this.deadAt = this.seenAlive ? this.clock : this.clock - QUENCH_FALL.end - 1;
       if (!this.seenAlive) {
@@ -900,7 +905,7 @@ export class QuenchBody {
         p.landed = !this.seenAlive;
       }
       if (this.seenAlive) {
-        this.particles.puff(e.pos.x, e.pos.y + 4, e.pos.z, 20, {
+        this.particles.puff(eAt.x, eAt.y + 4, eAt.z, 20, {
           speed: 6,
           up: 1,
           life: 0.7,
@@ -910,8 +915,8 @@ export class QuenchBody {
           pool: 'glow',
           radius: 1.2,
         });
-        this.particles.shockRing(e.pos.x, e.pos.z, QUENCH_BODY_COLORS.thread, 9, 0.8);
-        this.shakeNear(e.pos.x, e.pos.z, 0.5, 50);
+        this.particles.shockRing(eAt.x, eAt.z, QUENCH_BODY_COLORS.thread, 9, 0.8);
+        this.shakeNear(eAt.x, eAt.z, 0.5, 50);
       }
     }
     this.group.rotation.y = this.yaw;
@@ -932,8 +937,8 @@ export class QuenchBody {
       if (fall.landed && !p.landed) {
         p.landed = true;
         _a.copy(p.pos).applyAxisAngle(_up, this.yaw);
-        const x = e.pos.x + _a.x;
-        const z = e.pos.z + _a.z;
+        const x = eAt.x + _a.x;
+        const z = eAt.z + _a.z;
         const size = Math.max(p.def.size.x, p.def.size.z);
         this.particles.puff(x, this.groundY(x, z) + 0.2, z, Math.round(2 + size * 2), {
           speed: 1.5 + size,

@@ -23,6 +23,7 @@ import {
 } from '../../sim/encounters/smith_heart/breath_ids';
 import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
+import { fxAnchor } from '../attached_fx_anchor';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import type { EngineParticles } from '../trash_engine_fx/engine_particles';
 import {
@@ -678,12 +679,13 @@ export class BreathHeartFx {
       }
       const look = knotLook(liveFuse(of.fuse, now - k.changedAt));
       const held = of.state === 'held';
-      const floor = h.groundY(e.pos.x, e.pos.z);
+      const eAt = fxAnchor(e);
+      const floor = h.groundY(eAt.x, eAt.z);
       const y = floor + (held ? KNOT_CARRY_Y : KNOT_FLOAT_Y) + 0.15 * Math.sin(now * 3);
       const r = look.radius * (1 + 0.14 * look.throb * Math.sin(now * 14));
       k.crackle.value = look.crackle;
       k.turn += look.spin * dt;
-      k.shell.position.set(e.pos.x, y, e.pos.z);
+      k.shell.position.set(eAt.x, y, eAt.z);
       k.shell.scale.setScalar(r);
       k.core.position.copy(k.shell.position);
       k.core.scale.setScalar(r);
@@ -693,14 +695,14 @@ export class BreathHeartFx {
       k.shell.visible = true;
       k.core.visible = true;
       k.wind.visible = true;
-      k.ring.position.set(e.pos.x, floor + 0.1, e.pos.z);
+      k.ring.position.set(eAt.x, floor + 0.1, eAt.z);
       k.ring.scale.set(look.ringR, 1, look.ringR);
       k.ring.visible = true;
       k.ringColor.setHex(C.storm).lerp(_danger, look.danger);
       k.ringAlpha.value = 0.75 + 0.25 * look.throb * Math.sin(now * 14);
       k.load.visible = held;
       if (held) {
-        k.load.position.set(e.pos.x, floor + 0.12, e.pos.z);
+        k.load.position.set(eAt.x, floor + 0.12, eAt.z);
         k.load.scale.set(1.5, 1, 1.5);
       }
     }
@@ -712,14 +714,15 @@ export class BreathHeartFx {
       p.letter.visible = !!e;
       if (!e) continue;
       const r = e.scale > 0 ? e.scale : T.heartPortalR;
-      const floor = h.groundY(e.pos.x, e.pos.z);
+      const eAt = fxAnchor(e);
+      const floor = h.groundY(eAt.x, eAt.z);
       const open = Math.min(1, (now - p.bornAt) / 0.5);
       p.open.value = open;
-      p.disc.position.set(e.pos.x, floor + 0.08, e.pos.z);
+      p.disc.position.set(eAt.x, floor + 0.08, eAt.z);
       p.disc.scale.set(r * open, 1, r * open);
-      p.funnel.position.set(e.pos.x, floor + 0.05, e.pos.z);
+      p.funnel.position.set(eAt.x, floor + 0.05, eAt.z);
       p.funnel.scale.set(r * open, 6.5 * open, r * open);
-      p.letter.position.set(e.pos.x, floor + 0.1, e.pos.z);
+      p.letter.position.set(eAt.x, floor + 0.1, eAt.z);
       p.letter.scale.setScalar(r * 0.55 * open);
     }
     // The links of light within each pair: A to B a long flat beam at waist
@@ -747,11 +750,12 @@ export class BreathHeartFx {
       for (const side of HEART_SIDES) m.letter[side].visible = show && m.which === side;
       if (!e || !aura || !show) continue;
       m.fill.value = markFill(aura.remaining, aura.duration);
-      const floor = h.groundY(e.pos.x, e.pos.z);
-      m.ring.position.set(e.pos.x, floor + 0.11, e.pos.z);
+      const eAt = fxAnchor(e);
+      const floor = h.groundY(eAt.x, eAt.z);
+      m.ring.position.set(eAt.x, floor + 0.11, eAt.z);
       m.ring.scale.set(T.heartPortalR, 1, T.heartPortalR);
       const letter = m.letter[m.which];
-      letter.position.set(e.pos.x, e.pos.y + 3.6 + 0.12 * Math.sin(now * 4), e.pos.z);
+      letter.position.set(eAt.x, eAt.y + 3.6 + 0.12 * Math.sin(now * 4), eAt.z);
       letter.scale.setScalar(1.15);
     }
     // A throw going off into the void, trailing storm.

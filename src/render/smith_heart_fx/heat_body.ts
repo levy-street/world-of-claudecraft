@@ -36,6 +36,7 @@ import { resolveUiEffectsProfile } from '../../game/ui_effects_profile';
 import { HEAT_CUES } from '../../sim/encounters/smith_heart/heat_ids';
 import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
+import { fxAnchor } from '../attached_fx_anchor';
 import { wrapAngle } from '../facing_smooth';
 import { attachSceneGroupGated } from '../gated_scene_attach';
 import { GFX } from '../gfx';
@@ -632,7 +633,8 @@ export class HeatBody {
   // ---- the pose ------------------------------------------------------------------------------
 
   private pose(e: Entity, dt: number): void {
-    this.group.position.set(e.pos.x, e.pos.y, e.pos.z);
+    const eAt = fxAnchor(e);
+    this.group.position.set(eAt.x, eAt.y, eAt.z);
     if (e.dead) {
       this.poseDead(e);
       return;
@@ -662,7 +664,7 @@ export class HeatBody {
       if (this.stageSeen >= 0 && st.stage !== 0) this.splash(e, st.stage);
       this.stageSeen = st.stage;
     }
-    this.group.position.y = e.pos.y - look.sink * BS;
+    this.group.position.y = eAt.y - look.sink * BS;
     this.yaw += wrapAngle(e.facing - this.yaw) * Math.min(1, dt * 5);
     this.group.rotation.y = this.yaw;
     if (look.tremble > 0 && !this.reducedMotion()) {
@@ -859,12 +861,13 @@ export class HeatBody {
 
   /** A joint's world place (for the puffs). */
   private worldOf(e: Entity, j: THREE.Vector3, out: THREE.Vector3): THREE.Vector3 {
+    const eAt = fxAnchor(e);
     const sinY = Math.sin(this.yaw);
     const cosY = Math.cos(this.yaw);
     return out.set(
-      e.pos.x + (j.x * cosY + j.z * sinY) * BS,
+      eAt.x + (j.x * cosY + j.z * sinY) * BS,
       this.group.position.y + j.y * BS,
-      e.pos.z + (-j.x * sinY + j.z * cosY) * BS,
+      eAt.z + (-j.x * sinY + j.z * cosY) * BS,
     );
   }
 
@@ -877,6 +880,7 @@ export class HeatBody {
     look: HeatBodyLook,
     dt: number,
   ): void {
+    const eAt = fxAnchor(e);
     const d = this.density;
     const heat = Math.min(1, look.white + 0.2);
     // Tongues of the first flame licking up from its joints (the ones above
@@ -904,9 +908,9 @@ export class HeatBody {
     // The heat's haze rising off it (thin, shed on the low tier).
     if (d >= 1 && this.rand() < dt * 5 * look.haze) {
       this.particles.puff(
-        e.pos.x + (this.rand() - 0.5) * 3 * BS,
+        eAt.x + (this.rand() - 0.5) * 3 * BS,
         this.group.position.y + (3 + this.rand() * 3) * BS,
-        e.pos.z + (this.rand() - 0.5) * 3,
+        eAt.z + (this.rand() - 0.5) * 3,
         1,
         HAZE,
       );
@@ -929,9 +933,10 @@ export class HeatBody {
   /** It plunges into the wellspring, or heaves up out of it: the lava thrown
    *  up round it, a ring over the pool. */
   private splash(e: Entity, stage: number): void {
-    const y = this.groundY(e.pos.x, e.pos.z) + 0.4;
+    const eAt = fxAnchor(e);
+    const y = this.groundY(eAt.x, eAt.z) + 0.4;
     const big = stage === 1 ? 1.2 : 1;
-    this.particles.puff(e.pos.x, y, e.pos.z, Math.round(36 * big), {
+    this.particles.puff(eAt.x, y, eAt.z, Math.round(36 * big), {
       speed: 8 * big,
       up: 7,
       life: 1.1,
@@ -942,13 +947,14 @@ export class HeatBody {
       gravity: 14,
       radius: 7,
     });
-    this.particles.shockRing(e.pos.x, e.pos.z, HEAT_BODY_COLORS.fire, 16 * big, 1);
-    this.shakeNear(e.pos.x, e.pos.z, 0.5 * big, 60);
+    this.particles.shockRing(eAt.x, eAt.z, HEAT_BODY_COLORS.fire, 16 * big, 1);
+    this.shakeNear(eAt.x, eAt.z, 0.5 * big, 60);
   }
 
   // ---- the death -----------------------------------------------------------------------------
 
   private poseDead(e: Entity): void {
+    const eAt = fxAnchor(e);
     if (this.deadAt < 0) {
       this.deadAt = this.seenAlive ? this.clock : this.clock - HEAT_FALL.end - 1;
       if (!this.seenAlive) {
@@ -970,7 +976,7 @@ export class HeatBody {
       this.auraMat.opacity = 0;
       this.orbMat.opacity = 0;
       if (this.seenAlive) {
-        this.particles.puff(e.pos.x, e.pos.y + 4, e.pos.z, 24, {
+        this.particles.puff(eAt.x, eAt.y + 4, eAt.z, 24, {
           speed: 6,
           up: 2,
           life: 0.9,
@@ -980,8 +986,8 @@ export class HeatBody {
           pool: 'glow',
           radius: 1.4,
         });
-        this.particles.shockRing(e.pos.x, e.pos.z, HEAT_BODY_COLORS.fire, 10, 0.8);
-        this.shakeNear(e.pos.x, e.pos.z, 0.5, 50);
+        this.particles.shockRing(eAt.x, eAt.z, HEAT_BODY_COLORS.fire, 10, 0.8);
+        this.shakeNear(eAt.x, eAt.z, 0.5, 50);
       }
     }
     this.group.rotation.y = this.yaw;
@@ -1002,8 +1008,8 @@ export class HeatBody {
       if (fall.landed && !p.landed) {
         p.landed = true;
         _a.copy(p.pos).multiplyScalar(BS).applyAxisAngle(_up, this.yaw);
-        const x = e.pos.x + _a.x;
-        const z = e.pos.z + _a.z;
+        const x = eAt.x + _a.x;
+        const z = eAt.z + _a.z;
         const size = Math.max(p.def.size.x, p.def.size.z);
         // The flame sinking out of it in smoke.
         this.particles.puff(x, this.groundY(x, z) + 0.3, z, Math.round(2 + size * 2), {

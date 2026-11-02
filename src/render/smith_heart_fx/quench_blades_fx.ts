@@ -41,6 +41,7 @@ import {
 } from '../../sim/encounters/smith_heart/quench_ids';
 import type { Entity } from '../../sim/types';
 import type { IWorld } from '../../world_api';
+import { fxAnchor } from '../attached_fx_anchor';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { attachSceneGroupGated } from '../gated_scene_attach';
 import { GFX } from '../gfx';
@@ -484,6 +485,8 @@ export class QuenchBladesFx {
       b.placed = false;
       return;
     }
+    // The blade follows its drawn body (attached_fx_anchor.ts).
+    const eAt = fxAnchor(e);
     const state = bladeStateOf(e.templateId) ?? 'sunk';
     if (state !== b.state) {
       if (state === 'wake') b.burstDone = false;
@@ -506,12 +509,12 @@ export class QuenchBladesFx {
       speed = f.speed;
     } else {
       b.flying = false;
-      if (!b.placed || Math.hypot(e.pos.x - b.px, e.pos.z - b.pz) > BLADE_SNAP) {
-        b.px = e.pos.x;
-        b.pz = e.pos.z;
+      if (!b.placed || Math.hypot(eAt.x - b.px, eAt.z - b.pz) > BLADE_SNAP) {
+        b.px = eAt.x;
+        b.pz = eAt.z;
       } else {
-        b.px = followStep(b.px, e.pos.x, dt, BLADE_FOLLOW_RATE);
-        b.pz = followStep(b.pz, e.pos.z, dt, BLADE_FOLLOW_RATE);
+        b.px = followStep(b.px, eAt.x, dt, BLADE_FOLLOW_RATE);
+        b.pz = followStep(b.pz, eAt.z, dt, BLADE_FOLLOW_RATE);
       }
     }
     const fresh = !b.placed;
@@ -621,10 +624,11 @@ export class QuenchBladesFx {
     floor: number,
     dt: number,
   ): void {
+    const eAt = fxAnchor(e);
     if (state === 'wake') {
       // Ice dust and splinters off its foot as it tears free.
       if (this.rand() < dt * 30 * this.density * (0.3 + look.shake)) {
-        this.particles.puff(e.pos.x, floor + 0.3, e.pos.z, 2, {
+        this.particles.puff(eAt.x, floor + 0.3, eAt.z, 2, {
           speed: 3,
           up: 3 + 4 * look.upright,
           life: 0.9,
@@ -639,7 +643,7 @@ export class QuenchBladesFx {
       if (!b.burstDone && look.upright > 0.05) {
         // The lake bursts upward round it as it is wrenched out.
         b.burstDone = true;
-        this.particles.puff(e.pos.x, floor + 0.4, e.pos.z, 26, {
+        this.particles.puff(eAt.x, floor + 0.4, eAt.z, 26, {
           speed: 7,
           up: 9,
           life: 1.2,
@@ -650,7 +654,7 @@ export class QuenchBladesFx {
           gravity: 14,
           radius: 2,
         });
-        this.particles.puff(e.pos.x, floor + 0.6, e.pos.z, 10, {
+        this.particles.puff(eAt.x, floor + 0.6, eAt.z, 10, {
           speed: 3,
           up: 2,
           life: 1.8,
@@ -659,12 +663,12 @@ export class QuenchBladesFx {
           alpha: 0.42,
           radius: 2,
         });
-        this.particles.shockRing(e.pos.x, e.pos.z, 0xe0f4ff, 6, 0.6);
+        this.particles.shockRing(eAt.x, eAt.z, 0xe0f4ff, 6, 0.6);
       }
     } else if (state === 'float') {
       // Rime drifting off it, the cold falling from its point.
       if (this.rand() < dt * 2.5 * this.density) {
-        this.particles.puff(e.pos.x, floor + BLADE_FLOAT_LIFT - 0.6, e.pos.z, 1, {
+        this.particles.puff(eAt.x, floor + BLADE_FLOAT_LIFT - 0.6, eAt.z, 1, {
           speed: 0.4,
           life: 1.8,
           size: [0.6, 1.8],

@@ -46,6 +46,7 @@ import {
 } from '../../sim/encounters/smith_heart/final_ids';
 import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
+import { fxAnchor } from '../attached_fx_anchor';
 import { TelegraphKit, type TelegraphStyle, telegraphFillOf } from '../floor_telegraph';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { attachSceneGroupGated } from '../gated_scene_attach';
@@ -759,8 +760,9 @@ export class FinalKitFx {
       const kind = finalObjectKind(e.templateId) ?? info.kind;
       const age = this.clock - info.born;
       const r = e.scale || 1;
-      const x = e.pos.x;
-      const z = e.pos.z;
+      const eAt = fxAnchor(e);
+      const x = eAt.x;
+      const z = eAt.z;
       const y = this.groundY(x, z);
       switch (kind) {
         case 'whirlWarn':
@@ -978,8 +980,9 @@ export class FinalKitFx {
     for (const pid of this.playerIds) {
       const p = world.entities.get(pid);
       if (!p || p.dead) continue;
-      const x = p.pos.x;
-      const z = p.pos.z;
+      const pAt = fxAnchor(p);
+      const x = pAt.x;
+      const z = pAt.z;
       const y = this.groundY(x, z);
       for (const a of p.auras) {
         if (a.id === FINAL_AURAS.ember) {
@@ -1053,17 +1056,9 @@ export class FinalKitFx {
           boss.castRemaining,
           boss.castTotal > 0 ? boss.castTotal : T.boltCast,
         );
-        this.foot(
-          -(t.id * 8 + 3),
-          'bolt',
-          FINAL_FOOTPRINTS.bolt,
-          t.pos.x,
-          t.pos.z,
-          R.bolt,
-          fill,
-          true,
-        );
-        if (this.rand() < 0.7 * this.density) this.sparkAt(t.pos.x, t.pos.z, C.storm, 1, 1);
+        const tAt = fxAnchor(t);
+        this.foot(-(t.id * 8 + 3), 'bolt', FINAL_FOOTPRINTS.bolt, tAt.x, tAt.z, R.bolt, fill, true);
+        if (this.rand() < 0.7 * this.density) this.sparkAt(tAt.x, tAt.z, C.storm, 1, 1);
       }
     }
     let root: Entity['auras'][number] | undefined;
@@ -1072,8 +1067,9 @@ export class FinalKitFx {
       if (a.id === FINAL_AURAS.root) root = a;
       else if (a.id === FINAL_AURAS.unbound) unbound = a;
     }
-    const x = boss.pos.x;
-    const z = boss.pos.z;
+    const bossAt = fxAnchor(boss);
+    const x = bossAt.x;
+    const z = bossAt.z;
     const y = this.groundY(x, z);
     const rise = root ? rootRise(root.remaining) : 0;
     this.spikes.visible = rise > 0.01;
@@ -1110,20 +1106,21 @@ export class FinalKitFx {
       const s = world.entities.get(a.from);
       const t = world.entities.get(a.to);
       if (!s || !t) continue;
-      const sy = this.groundY(s.pos.x, s.pos.z) + (s.templateId === FINAL_BOSS ? 12 : 1.4);
-      const ty = this.groundY(t.pos.x, t.pos.z) + 1.4;
-      let px = s.pos.x;
+      // Both ends ride the drawn bodies.
+      const sa = fxAnchor(s);
+      const ta = fxAnchor(t);
+      const sy = this.groundY(sa.x, sa.z) + (s.templateId === FINAL_BOSS ? 12 : 1.4);
+      const ty = this.groundY(ta.x, ta.z) + 1.4;
+      let px = sa.x;
       let py = sy;
-      let pz = s.pos.z;
+      let pz = sa.z;
       const w = 0.09 * (1 - age / 0.35) + 0.03;
       for (let k = 1; k <= P.arcSegments; k++) {
         const f = k / P.arcSegments;
         const j = k === P.arcSegments ? 0 : 1.2;
-        const nx =
-          s.pos.x + (t.pos.x - s.pos.x) * f + (fxHash(a.seed + k, this.clock * 30) - 0.5) * j;
+        const nx = sa.x + (ta.x - sa.x) * f + (fxHash(a.seed + k, this.clock * 30) - 0.5) * j;
         const ny = sy + (ty - sy) * f + (fxHash(a.seed + k, 7) - 0.5) * j;
-        const nz =
-          s.pos.z + (t.pos.z - s.pos.z) * f + (fxHash(a.seed + k, this.clock * 31) - 0.5) * j;
+        const nz = sa.z + (ta.z - sa.z) * f + (fxHash(a.seed + k, this.clock * 31) - 0.5) * j;
         _v.set(nx - px, ny - py, nz - pz);
         const len = _v.length();
         _v.normalize();

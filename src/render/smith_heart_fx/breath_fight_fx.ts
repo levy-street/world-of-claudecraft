@@ -55,6 +55,7 @@ import {
 } from '../../sim/encounters/smith_heart/breath_ids';
 import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
+import { fxAnchor } from '../attached_fx_anchor';
 import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { type TelegraphFan, TelegraphKit } from '../floor_telegraph';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
@@ -1549,8 +1550,9 @@ export class BreathFightFx {
   // ---- the objects -----------------------------------------------------------------------
 
   private drape(s: FanSlot, e: Entity, r: number, fill: number, fade = 1, front?: number): void {
-    const y = this.groundY(e.pos.x, e.pos.z);
-    this.kit.drapeFan(s.fan, this.groundY, e.pos.x, y, e.pos.z, 0, r);
+    const eAt = fxAnchor(e);
+    const y = this.groundY(eAt.x, eAt.z);
+    this.kit.drapeFan(s.fan, this.groundY, eAt.x, y, eAt.z, 0, r);
     this.kit.paintFan(s.fan, { fill, clock: this.clock, range: r, fade, front });
   }
 
@@ -1626,29 +1628,24 @@ export class BreathFightFx {
       if (!e) f.mesh.visible = false;
       else {
         const r = e.scale > 0 ? e.scale : T.vortexR;
+        const eAt = fxAnchor(e);
         this.drape(s, e, r, 1, 0.85 + 0.15 * Math.sin(this.clock * 9));
         f.mesh.visible = true;
-        f.mesh.position.set(e.pos.x, this.groundY(e.pos.x, e.pos.z), e.pos.z);
+        f.mesh.position.set(eAt.x, this.groundY(eAt.x, eAt.z), eAt.z);
         f.mesh.scale.set(r * 0.8, VORTEX_FUNNEL.height, r * 0.8);
         f.mat.uniforms.uAlpha.value = this.detail ? 0.75 : 0.55;
         if (this.rand() < dt * 30 * this.density) {
           const a = this.rand() * Math.PI * 2;
-          this.particles.puff(
-            e.pos.x + Math.sin(a) * r,
-            e.pos.y + 0.3,
-            e.pos.z + Math.cos(a) * r,
-            1,
-            {
-              speed: 6,
-              up: 3,
-              life: 0.6,
-              size: [0.3, 0.15],
-              color: C.grit,
-              alpha: 0.8,
-              dir: [Math.cos(a), 0.6, -Math.sin(a)],
-              spread: 0.2,
-            },
-          );
+          this.particles.puff(eAt.x + Math.sin(a) * r, eAt.y + 0.3, eAt.z + Math.cos(a) * r, 1, {
+            speed: 6,
+            up: 3,
+            life: 0.6,
+            size: [0.3, 0.15],
+            color: C.grit,
+            alpha: 0.8,
+            dir: [Math.cos(a), 0.6, -Math.sin(a)],
+            spread: 0.2,
+          });
         }
       }
     }
@@ -1662,30 +1659,25 @@ export class BreathFightFx {
         continue;
       }
       const r = e.scale > 0 ? e.scale : T.galeR;
+      const eAt = fxAnchor(e);
       this.drape(s, e, r, 1, 0.9);
       f.mesh.visible = true;
-      f.mesh.position.set(e.pos.x, this.groundY(e.pos.x, e.pos.z), e.pos.z);
+      f.mesh.position.set(eAt.x, this.groundY(eAt.x, eAt.z), eAt.z);
       f.mesh.scale.set(r, GALE_COLUMN.height, r);
       f.mesh.rotation.y = this.clock * 2;
       f.mat.uniforms.uAlpha.value = this.detail ? 0.85 : 0.65;
       if (this.rand() < dt * 24 * this.density) {
         const a = this.rand() * Math.PI * 2;
-        this.particles.puff(
-          e.pos.x + Math.sin(a) * r,
-          e.pos.y + 0.5,
-          e.pos.z + Math.cos(a) * r,
-          1,
-          {
-            speed: 5,
-            up: 6,
-            life: 1,
-            size: [0.35, 0.2],
-            color: C.grit,
-            alpha: 0.85,
-            dir: [Math.cos(a), 0.8, -Math.sin(a)],
-            spread: 0.25,
-          },
-        );
+        this.particles.puff(eAt.x + Math.sin(a) * r, eAt.y + 0.5, eAt.z + Math.cos(a) * r, 1, {
+          speed: 5,
+          up: 6,
+          life: 1,
+          size: [0.35, 0.2],
+          color: C.grit,
+          alpha: 0.85,
+          dir: [Math.cos(a), 0.8, -Math.sin(a)],
+          spread: 0.25,
+        });
       }
     }
     // The strikes' spots, the charged ground, the cradle.
@@ -1751,7 +1743,8 @@ export class BreathFightFx {
             T.cradleHold)
           : T.cradleHold;
       const charge = s && s.id >= 0 ? cradleLook(this.clock - s.born, hold).charge : 0.6;
-      this.crown.position.set(lifted.pos.x, lifted.pos.y + 1.1, lifted.pos.z);
+      const liftedAt = fxAnchor(lifted);
+      this.crown.position.set(liftedAt.x, liftedAt.y + 1.1, liftedAt.z);
       this.crownMat.opacity = 0.5 + 0.5 * charge * (0.8 + 0.2 * Math.sin(this.clock * 17));
       for (let k = 0; k < this.crownSparks.length; k++) {
         const a = (k / this.crownSparks.length) * Math.PI * 2 + this.clock * (2 + charge * 3);
@@ -1763,7 +1756,7 @@ export class BreathFightFx {
         );
       }
       if (this.rand() < dt * 16 * this.density)
-        this.sparksAt(lifted.pos.x, lifted.pos.y + 1, lifted.pos.z, 3);
+        this.sparksAt(liftedAt.x, liftedAt.y + 1, liftedAt.z, 3);
     }
   }
 
@@ -1774,11 +1767,12 @@ export class BreathFightFx {
       if (m.id < 0) continue;
       const p = world.entities.get(m.id);
       if (!p) continue;
-      const y = this.groundY(p.pos.x, p.pos.z);
-      this.kit.drapeFan(m.fan, this.groundY, p.pos.x, y, p.pos.z, 0, 1.15);
+      const pAt = fxAnchor(p);
+      const y = this.groundY(pAt.x, pAt.z);
+      this.kit.drapeFan(m.fan, this.groundY, pAt.x, y, pAt.z, 0, 1.15);
       this.kit.paintFan(m.fan, { fill: 1, clock: this.clock, range: 1.15 });
       if (this.rand() < dt * 6 * this.density)
-        this.particles.puff(p.pos.x, y + 0.2, p.pos.z, 1, {
+        this.particles.puff(pAt.x, y + 0.2, pAt.z, 1, {
           speed: 0.2,
           up: 2.2,
           life: 1,
@@ -1796,15 +1790,16 @@ export class BreathFightFx {
       if (m.id < 0) continue;
       const p = world.entities.get(m.id);
       if (!p) continue;
-      const y = this.groundY(p.pos.x, p.pos.z);
-      this.kit.drapeFan(m.fan, this.groundY, p.pos.x, y, p.pos.z, yaw, PINNED_MARK.r);
+      const pAt = fxAnchor(p);
+      const y = this.groundY(pAt.x, pAt.z);
+      this.kit.drapeFan(m.fan, this.groundY, pAt.x, y, pAt.z, yaw, PINNED_MARK.r);
       this.kit.paintFan(m.fan, {
         fill: 0.6 + 0.4 * Math.abs(Math.sin(this.clock * 4)),
         clock: this.clock,
         range: PINNED_MARK.r,
       });
       if (this.rand() < dt * 20 * this.density)
-        this.particles.puff(p.pos.x + d.x * 0.6, y + 0.4, p.pos.z + d.z * 0.6, 2, {
+        this.particles.puff(pAt.x + d.x * 0.6, y + 0.4, pAt.z + d.z * 0.6, 2, {
           speed: 5,
           up: 2,
           life: 0.5,
@@ -1822,18 +1817,19 @@ export class BreathFightFx {
       if (m.id < 0) continue;
       const p = world.entities.get(m.id);
       if (!p) continue;
-      const y = this.groundY(p.pos.x, p.pos.z);
-      this.kit.drapeFan(m.fan, this.groundY, p.pos.x, y, p.pos.z, 0, 1.4);
+      const pAt = fxAnchor(p);
+      const y = this.groundY(pAt.x, pAt.z);
+      this.kit.drapeFan(m.fan, this.groundY, pAt.x, y, pAt.z, 0, 1.4);
       this.kit.paintFan(m.fan, { fill: 1, clock: this.clock, range: 1.4 });
       if (b < this.beacons.length) {
         const beacon = this.beacons[b];
         const glow = this.beaconGlows[b];
         beacon.mesh.visible = true;
-        beacon.mesh.position.set(p.pos.x, p.pos.y + 2.4, p.pos.z);
+        beacon.mesh.position.set(pAt.x, pAt.y + 2.4, pAt.z);
         beacon.mesh.scale.set(0.35, 14, 0.35);
         beacon.mat.uniforms.uAlpha.value = 0.55 + 0.45 * Math.abs(Math.sin(this.clock * 11));
         glow.visible = true;
-        glow.position.set(p.pos.x, p.pos.y + 2.6, p.pos.z);
+        glow.position.set(pAt.x, pAt.y + 2.6, pAt.z);
         b++;
       }
     }
@@ -1876,8 +1872,9 @@ export class BreathFightFx {
     }
     slot.fan.group.visible = true;
     const fill = g.castTotal > 0 ? Math.max(0, Math.min(1, 1 - g.castRemaining / g.castTotal)) : 1;
-    const y = this.groundY(target.pos.x, target.pos.z);
-    this.kit.drapeFan(slot.fan, this.groundY, target.pos.x, y, target.pos.z, 0, r);
+    const targetAt = fxAnchor(target);
+    const y = this.groundY(targetAt.x, targetAt.z);
+    this.kit.drapeFan(slot.fan, this.groundY, targetAt.x, y, targetAt.z, 0, r);
     this.kit.paintFan(slot.fan, { fill, clock: this.clock, range: r });
   }
 

@@ -46,6 +46,7 @@ import {
 } from '../../sim/encounters/smith_heart/final_phase_ids';
 import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
+import { fxAnchor } from '../attached_fx_anchor';
 import { TelegraphKit, type TelegraphStyle, telegraphFillOf } from '../floor_telegraph';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { attachSceneGroupGated } from '../gated_scene_attach';
@@ -765,8 +766,9 @@ export class FinalPhaseFx {
     }
     if (h.stage === 'none') return;
     this.hiddenClock += this.lastDt;
-    const x = boss.pos.x;
-    const z = boss.pos.z;
+    const bossAt = fxAnchor(boss);
+    const x = bossAt.x;
+    const z = bossAt.z;
     if (h.stage === 'rebirth') {
       const beats = heartRebirthBeats(this.hiddenClock);
       if (beats > this.hiddenBeats) {
@@ -975,8 +977,9 @@ export class FinalPhaseFx {
     }
     const stage = finalStageOf(phase?.value);
     this.paintHidden(boss);
-    const x = boss.pos.x;
-    const z = boss.pos.z;
+    const bossAt = fxAnchor(boss);
+    const x = bossAt.x;
+    const z = bossAt.z;
     const y = this.groundY(x, z);
     // Gathered Strength.
     if (shield) {
@@ -1053,8 +1056,9 @@ export class FinalPhaseFx {
       const vein = finalAddVein(e.templateId);
       if (!vein) continue;
       const L = SPLINTER_LOOKS[vein];
-      const x = e.pos.x;
-      const z = e.pos.z;
+      const eAt = fxAnchor(e);
+      const x = eAt.x;
+      const z = eAt.z;
       const y = this.groundY(x, z);
       const rising = e.auras.some((a) => a.id === A.rising);
       const s = this.sigils[sig++];
@@ -1099,19 +1103,21 @@ export class FinalPhaseFx {
         });
       } else if (e.castingAbility === C.pounce && e.castTargetId !== null) {
         const t = world.entities.get(e.castTargetId);
-        if (t)
+        if (t) {
+          const tAt = fxAnchor(t);
           this.foot(
             -(id * 8 + 2),
             'pounce',
             'storm',
             PHASE_FOOTPRINTS.pounce,
-            t.pos.x,
-            t.pos.z,
+            tAt.x,
+            tAt.z,
             0,
             R.pounce,
             360,
             telegraphFillOf(e.castRemaining, total),
           );
+        }
       }
       // The hunt: its quarry carries Wind-Tethered from it.
       if (vein === 'breath') {
@@ -1153,20 +1159,21 @@ export class FinalPhaseFx {
 
   /** A jittering storm tether from `from` to `to` (slot `k`). */
   private tetherTo(k: number, from: Entity, to: Entity): void {
-    const sy = this.groundY(from.pos.x, from.pos.z) + 3;
-    const ty = this.groundY(to.pos.x, to.pos.z) + 1.3;
-    let px = from.pos.x;
+    // Both ends ride the drawn bodies.
+    const fa = fxAnchor(from);
+    const ta = fxAnchor(to);
+    const sy = this.groundY(fa.x, fa.z) + 3;
+    const ty = this.groundY(ta.x, ta.z) + 1.3;
+    let px = fa.x;
     let py = sy;
-    let pz = from.pos.z;
+    let pz = fa.z;
     const seg = PL.tetherSegments;
     for (let i = 1; i <= seg; i++) {
       const f = i / seg;
       const j = i === seg ? 0 : 0.9;
-      const nx =
-        from.pos.x + (to.pos.x - from.pos.x) * f + (fxHash(k * 31 + i, this.clock * 24) - 0.5) * j;
+      const nx = fa.x + (ta.x - fa.x) * f + (fxHash(k * 31 + i, this.clock * 24) - 0.5) * j;
       const ny = sy + (ty - sy) * f + (fxHash(k * 17 + i, this.clock * 19) - 0.5) * j;
-      const nz =
-        from.pos.z + (to.pos.z - from.pos.z) * f + (fxHash(k * 13 + i, this.clock * 27) - 0.5) * j;
+      const nz = fa.z + (ta.z - fa.z) * f + (fxHash(k * 13 + i, this.clock * 27) - 0.5) * j;
       _v.set(nx - px, ny - py, nz - pz);
       const len = _v.length();
       _v.normalize();
@@ -1188,13 +1195,14 @@ export class FinalPhaseFx {
       for (const a of p.auras) {
         if (a.id !== A.coal) continue;
         const fill = a.duration > 0 ? 1 - a.remaining / a.duration : 1;
+        const pAt = fxAnchor(p);
         this.foot(
           -(pid * 8 + 6),
           'coal',
           'fire',
           PHASE_FOOTPRINTS.coal,
-          p.pos.x,
-          p.pos.z,
+          pAt.x,
+          pAt.z,
           0,
           R.coal,
           360,
@@ -1202,14 +1210,14 @@ export class FinalPhaseFx {
         );
         const m = this.coals[coal++];
         if (m) {
-          const y = this.groundY(p.pos.x, p.pos.z);
+          const y = this.groundY(pAt.x, pAt.z);
           const throb = 1 + 0.25 * fill + 0.12 * Math.sin(this.clock * (8 + 14 * fill));
-          m.position.set(p.pos.x, y + 3.2, p.pos.z);
+          m.position.set(pAt.x, y + 3.2, pAt.z);
           m.scale.setScalar(throb);
           m.rotation.y = this.clock * 2;
           m.visible = true;
           if (this.rand() < 0.7 * this.density)
-            this.particles.puff(p.pos.x, y + 3.2, p.pos.z, 1, {
+            this.particles.puff(pAt.x, y + 3.2, pAt.z, 1, {
               speed: 1,
               up: 2.5,
               life: 0.6,
@@ -1245,13 +1253,14 @@ export class FinalPhaseFx {
       r.u.uGapN.value = gaps.length;
       r.u.uFront.value = look.front;
       r.u.uAlpha.value = look.alpha;
-      r.mesh.position.set(e.pos.x, this.groundY(e.pos.x, e.pos.z) + 0.07, e.pos.z);
+      const eAt = fxAnchor(e);
+      r.mesh.position.set(eAt.x, this.groundY(eAt.x, eAt.z) + 0.07, eAt.z);
       r.mesh.visible = true;
       // Frost thrown up off its front (cosmetic).
       if (this.rand() < 0.8 * this.density) {
         const a = this.rand() * Math.PI * 2;
-        const fx = e.pos.x + Math.sin(a) * look.front;
-        const fz = e.pos.z + Math.cos(a) * look.front;
+        const fx = eAt.x + Math.sin(a) * look.front;
+        const fz = eAt.z + Math.cos(a) * look.front;
         this.particles.puff(fx, this.groundY(fx, fz) + 0.3, fz, 1, {
           speed: 1,
           up: 2,
@@ -1289,7 +1298,8 @@ export class FinalPhaseFx {
         b.mesh.visible = false;
         continue;
       }
-      const to = _v2.set(boss.pos.x, this.groundY(boss.pos.x, boss.pos.z) + 8, boss.pos.z);
+      const bossAt = fxAnchor(boss);
+      const to = _v2.set(bossAt.x, this.groundY(bossAt.x, bossAt.z) + 8, bossAt.z);
       _v.copy(to).sub(b.from);
       const len = _v.length();
       _v.normalize();

@@ -47,6 +47,7 @@ import {
 } from '../../sim/encounters/smith_heart/heat_ids';
 import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
+import { fxAnchor } from '../attached_fx_anchor';
 import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { TELEGRAPH_THREAT_COLORS, TelegraphKit } from '../floor_telegraph';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
@@ -939,11 +940,12 @@ export class HeatFightFx implements HeatFxHost {
       if (s.id < 0) continue;
       const e = world.entities.get(s.id);
       if (!e) continue;
+      const eAt = fxAnchor(e);
       const look = seedLook(this.clock - s.born, s.life, _seed);
       if (s.laid >= 0) this.seedMarks[s.laid].fill = look.fill;
-      const y = this.groundY(e.pos.x, e.pos.z);
+      const y = this.groundY(eAt.x, eAt.z);
       const size = 0.55 + 0.75 * look.size;
-      _v.set(e.pos.x, y + 1.1 + 0.15 * look.beat, e.pos.z);
+      _v.set(eAt.x, y + 1.1 + 0.15 * look.beat, eAt.z);
       _q.setFromAxisAngle(_up, this.clock * (1 + 4 * look.fill));
       _s.set(size, size * 1.5, size);
       this.seedOrbs.setMatrixAt(n, _m.compose(_v, _q, _s));
@@ -954,7 +956,7 @@ export class HeatFightFx implements HeatFxHost {
       glow.visible = true;
       n++;
       if (this.rand() < dt * (3 + 20 * look.fill) * this.density)
-        this.particles.puff(e.pos.x, y + 1, e.pos.z, 1, SEED_SPARK);
+        this.particles.puff(eAt.x, y + 1, eAt.z, 1, SEED_SPARK);
     }
     for (let i = n; i < P.seeds; i++) {
       this.seedOrbs.setMatrixAt(i, _zero);
@@ -1146,8 +1148,10 @@ export class HeatFightFx implements HeatFxHost {
         continue;
       }
       // Out of the guardian's chest (it stands sunk to its waist).
-      _v.set(src.pos.x, src.pos.y + 9, src.pos.z);
-      _w.set(dst.pos.x, dst.pos.y + 1.2, dst.pos.z);
+      const dstAt = fxAnchor(dst);
+      const srcAt = fxAnchor(src);
+      _v.set(srcAt.x, srcAt.y + 9, srcAt.z);
+      _w.set(dstAt.x, dstAt.y + 1.2, dstAt.z);
       _s.subVectors(_w, _v);
       const len = _s.length();
       if (len < 0.1) {
@@ -1171,10 +1175,11 @@ export class HeatFightFx implements HeatFxHost {
       if (n >= this.sigils.length) break;
       const p = world.entities.get(id);
       if (!p) continue;
+      const pAt = fxAnchor(p);
       let marked = false;
       for (const a of p.auras) if (a.id === HEAT_AURAS.kindling) marked = true;
       const s = this.sigils[n++];
-      s.position.set(p.pos.x, p.pos.y + (marked ? 3.2 : 1.2), p.pos.z);
+      s.position.set(pAt.x, pAt.y + (marked ? 3.2 : 1.2), pAt.z);
       const size = marked ? 2.2 + 0.4 * Math.sin(this.clock * 10) : 2.6;
       s.scale.set(size, size, 1);
       s.visible = true;

@@ -45,6 +45,7 @@ import { DUNGEONS, instanceOrigin, instanceSlotForZ } from '../../sim/data';
 import { FINAL_AURAS, FINAL_CUES, finalZoneOf } from '../../sim/encounters/smith_heart/final_ids';
 import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
+import { fxAnchor } from '../attached_fx_anchor';
 import { telegraphFillOf } from '../floor_telegraph';
 import { attachSceneGroupGated } from '../gated_scene_attach';
 import { GFX, sharedUniforms } from '../gfx';
@@ -752,9 +753,10 @@ export class FinalFx {
     }
     const cf = Math.cos(this.facing);
     const sf = Math.sin(this.facing);
-    const bx = boss.pos.x - this.originX;
-    const bz = boss.pos.z - this.originZ;
-    const by = this.groundY(boss.pos.x, boss.pos.z);
+    const bossAt = fxAnchor(boss);
+    const bx = bossAt.x - this.originX;
+    const bz = bossAt.z - this.originZ;
+    const by = this.groundY(bossAt.x, bossAt.z);
     return out.set(
       bx + x * cf + lz * sf,
       by + ly + colossusBreath(this.clock).bob,
