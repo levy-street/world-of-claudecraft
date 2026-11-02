@@ -88,6 +88,7 @@ import { dungeonReentryPoint } from './dungeon_checkpoints';
 import { nearestDungeonDoor } from './dungeon_door_selection';
 import { tickDungeonGates } from './dungeon_gates';
 import { applyDungeonSpawnMinibossTuning } from './dungeon_spawn_miniboss';
+import { encounterLockHoldsSpirit } from './encounter_lock';
 import {
   IGNIVAR_ENTRY_DENIED_NOTICE_SECONDS,
   ignivarRaidClaimsForKey,
@@ -576,6 +577,10 @@ export function enterDungeon(
   // claim. The selected difficulty applies only when claiming a new instance.
   let inst = ctx.instances.find((i) => i.dungeonId === dungeonId && i.partyKey === key);
   if (options.finderClaim && inst !== options.finderClaim) return false;
+  // Encounter in progress (instances/encounter_lock.ts): a spirit returning to
+  // its own claim waits outside while a boss fight there runs.
+  if (inst && encounterLockHoldsSpirit(ctx, inst, r.e, r.meta.entityId, !!options.preflightOnly))
+    return false;
   let devReplacementSlot: InstanceSlot | undefined;
   let devReplacementEnteredBy: number[] = [];
   // A dev teleport names an exact difficulty and is also the only supported way

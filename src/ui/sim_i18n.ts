@@ -1573,6 +1573,9 @@ const baseEnTable = {
     'A white-gold light runs out of the Hearth toward the heart seal.',
   'log.smithHeartClosed':
     'The cleft is choked with fallen rock. It is not open yet.',
+  // The "encounter in progress" door rule (src/sim/instances/encounter_lock.ts):
+  // a released spirit held outside while a boss fight of its claim runs.
+  'error.encounterInProgress': 'An encounter is in progress. You cannot enter until it ends.',
   // The Smith's Heart's sketch kits (content/smith_heart.ts): cast, swing
   // and cleave names. EXACT matcher through the mechanic reverse map.
   'mechanic.heartMountainsWrath': "Mountain's Wrath",
