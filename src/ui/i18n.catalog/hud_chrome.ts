@@ -6194,7 +6194,7 @@ export const hudChromeStrings = {
     formMoonkin:
       'Moonwing Form: spell damage increased by {pct}% and armor increased by {armorPct}%',
     formSporemender:
-      'Sporemender Form: healing done increased by {pct}%, armor increased by {armorPct}%, and movement speed reduced by {slowPct}%',
+      'Sporemender Form: healing done increased by {pct}%, armor increased by {armorPct}%, and movement speed reduced by {slowPct}% while on foot',
     formShadow: 'Gloamveil Form: Shadow damage increased by {pct}%',
     resourceCount: '{value} of {max}',
     formLich: 'Soul Lance also strikes up to {targets} nearby enemies for {pct}% damage',

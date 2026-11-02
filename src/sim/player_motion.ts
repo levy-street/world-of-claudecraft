@@ -307,10 +307,12 @@ export function moveSpeedMult(e: Entity, extraSpeedPct = 0): number {
   // Mounted travel: the active ground mount rides the entity mirror (mountKey,
   // synced over the wire like skin), so the online self-extrapolator predicts
   // mounted speed in lockstep with the server. Additive on top of the buff
-  // times form-passive product, like the Fiesta augment below (mounting strips
-  // every form, so in play the passive is 1 here). The whole expression is
-  // slow * (max(buffs) * formPassive + mountPct + extraSpeedPct); slows still
-  // bite multiplicatively.
+  // times form-passive product, like the Fiesta augment below (only Cat Form
+  // sets the passive and mounting strips it; the mount-safe forms in
+  // combat/forms.ts carry none, so in play the passive is 1 here). The whole
+  // expression is slow * (max(buffs) * formPassive + mountPct + extraSpeedPct)
+  // * cargo * formPace; slows still bite multiplicatively, and formPace is 1
+  // for a mounted rider.
   if (e.mountKey) speed += ridingMoveSpeedPct(e.ridingTier);
   // Fiesta move-speed augments (only ever non-zero inside a Fiesta bout).
   if (extraSpeedPct) speed += extraSpeedPct;

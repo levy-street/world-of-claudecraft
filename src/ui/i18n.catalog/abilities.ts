@@ -1668,7 +1668,7 @@ const classAbilityNamesEn = {
       [
         'sporemender_form',
         'Sporemender Form',
-        'Shapeshift into a Sporemender, increasing your healing done by 20% and your armor by 40%, but reducing your movement speed by 20% while on foot. All of your caster-form spells stay usable, and you can shift in and out while mounted. Lasts until you shift out. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form. (Groveheart signature)',
+        'Shapeshift into a Sporemender, increasing your healing done by 20% and your armor by 40%, but reducing your movement speed by 20% while on foot. All of your caster-form spells stay usable, and you can shift in and out while mounted. Lasts until you shift out. Shifting into any form while on foot grants Loping Stride, a short burst of movement speed. Cast again to return to caster form. (Groveheart signature)',
       ],
       [
         'spore_burst',
