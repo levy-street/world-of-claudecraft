@@ -66,7 +66,7 @@ import {
 } from '../src/sim/world_quests';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
-// East of Evergarden's x band, level with the watch ring's centre.
+// Off the map east of Evergarden (no zone there), level with the watch ring's centre.
 const EVERGARDEN_EAST_OUTSIDE_X = 600;
 
 function enterQuest(sim: Sim, quest: WorldQuestDef, level = quest.minLevel): void {

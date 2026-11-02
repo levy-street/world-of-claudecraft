@@ -10,8 +10,10 @@ import { onMobKilledForWorldQuests, updateWorldQuests } from '../src/sim/world_q
 const quest = WORLD_QUESTS_BY_ID.wq_evergarden_watch;
 // Evergarden's south-west corner: in the zone, well outside the watch's ring.
 const FAR_IN_ZONE = { x: 200, z: 720 };
-// East of Evergarden's x band, level with the ring centre.
+// Off the map east of Evergarden (no zone there), level with the ring centre.
 const OUT_OF_ZONE = { x: 600, z: 995 };
+// Wraithwood, the zone north of Evergarden in the same x band.
+const NEXT_ZONE = { x: 360, z: 1300 };
 let sim: Sim;
 beforeAll(() => {
   sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
@@ -193,6 +195,12 @@ describe('world quest authoritative party kill credit', () => {
     member.pos.z = quest.area.z;
     mob.pos.x = OUT_OF_ZONE.x;
     mob.pos.z = OUT_OF_ZONE.z;
+    onMobKilledForWorldQuests(sim.ctx, mob, memberMeta);
+    expect(memberMeta.worldQuestLog.get(quest.id)?.count).toBe(0);
+    // A real neighbouring zone (Wraithwood, north, same x band) is out too.
+    expect(zoneAt(NEXT_ZONE.x, NEXT_ZONE.z).id).toBe('wraithwood');
+    mob.pos.x = NEXT_ZONE.x;
+    mob.pos.z = NEXT_ZONE.z;
     onMobKilledForWorldQuests(sim.ctx, mob, memberMeta);
     expect(memberMeta.worldQuestLog.get(quest.id)?.count).toBe(0);
   });

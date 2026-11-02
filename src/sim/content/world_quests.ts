@@ -474,8 +474,9 @@ const PALMREACH_MATCH3_LEVELS = [
 
 /** One rotation candidate in every shipped overworld zone. Areas deliberately
  *  cover the authored targets (a kill quest's ring holds EVERY camp of its
- *  target in the zone, plus wander), so the marker and credit describe the
- *  same physical space in every host. */
+ *  target in the zone, plus wander), so the map marker shows where the hunt
+ *  is. A kill quest credits its whole zone as well as its ring
+ *  (src/sim/world_quest_area.ts); every other objective credits its ring. */
 export const WORLD_QUESTS: readonly WorldQuestDef[] = [
   {
     id: 'wq_eastbrook_bandits',
