@@ -25,6 +25,7 @@ import {
   type CouncilTelegraphKind,
   craterFade,
   craterHeat,
+  craterPit,
   ROCK_CRATER,
   rockCrescendo,
   rockShadowLook,
@@ -156,6 +157,20 @@ describe("the Falling Rock's approach: the shadow and the heat", () => {
     }
   });
 
+  it('the crater is dark from the impact frame: the shadow carried into a shrinking pit', () => {
+    const hit = craterPit(0);
+    // Full width and fully dark at the hit (no pale gap after the rock lands).
+    expect(hit.share).toBeGreaterThanOrEqual(1);
+    expect(hit.near).toBe(1);
+    const mid = craterPit(ROCK_CRATER.pitSeconds * 0.5);
+    expect(mid.share).toBeLessThan(hit.share);
+    expect(mid.share).toBeGreaterThan(0);
+    expect(mid.near).toBeLessThan(1);
+    expect(craterPit(ROCK_CRATER.pitSeconds).share).toBe(0);
+    expect(craterPit(-0.1).share).toBe(0);
+    expect(ROCK_CRATER.pitSeconds).toBeLessThan(ROCK_CRATER.seconds);
+  });
+
   it("the crater's fissures cool from white hot to nothing over its seconds", () => {
     expect(craterHeat(0)).toBe(1);
     expect(craterHeat(ROCK_CRATER.seconds * 0.5)).toBeGreaterThan(0);
@@ -254,6 +269,21 @@ describe('the dressing', () => {
     expect(d.kind).toBe('cradle');
     expect(fan.floor.material).toBe(char);
     expect(char.defines).toEqual(defines);
+  });
+
+  it('the charged ground lights by MAX (stacked patches never sum to white), the rest add', () => {
+    const { fan, materials } = dressOne('breath');
+    const paints = new BreathTelegraphs(BREATH_TELEGRAPH_GLOW_STEP, materials);
+    const d = paints.dress(fan, 'charged');
+    const glow = d.glow.material as THREE.ShaderMaterial;
+    expect(glow.blending).toBe(THREE.CustomBlending);
+    expect(glow.blendEquation).toBe(THREE.MaxEquation);
+    const other = dressOne('breath');
+    const bolt = new BreathTelegraphs(BREATH_TELEGRAPH_GLOW_STEP, other.materials).dress(
+      other.fan,
+      'strike',
+    );
+    expect((bolt.glow.material as THREE.ShaderMaterial).blending).toBe(THREE.AdditiveBlending);
   });
 
   it('the council paints split stone and rubble', () => {

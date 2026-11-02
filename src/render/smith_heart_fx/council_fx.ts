@@ -102,6 +102,7 @@ import {
   COUNCIL_TELEGRAPH_GLOW_STEP,
   craterFade,
   craterHeat,
+  craterPit,
   ROCK_CRATER,
   rockCrescendo,
 } from './painted_telegraph_core';
@@ -324,16 +325,17 @@ const ROCK_LIFT_DUST = {
 /** The impact's dust wall: rolling out low over the floor from the rim. */
 const _wallDir: [number, number, number] = [1, 0.12, 0];
 const ROCK_DUST_WALL = {
-  speed: 7,
-  life: 1.6,
-  size: [2.2, 5.5] as const,
-  color: [0.55, 0.45, 0.34] as const,
-  alpha: 0.6,
+  speed: 8,
+  life: 1.5,
+  size: [1.8, 4.5] as const,
+  color: [0.34, 0.25, 0.17] as const,
+  alpha: 0.65,
   drag: 2.2,
   dir: _wallDir as readonly [number, number, number],
   spread: 0.25,
 };
 const _cd = { left: 0, beacon: 0, shadow: 0, dark: 0, near: 0 };
+const _pit = { share: 0, near: 0 };
 
 /** An entity's aura by id (an indexed loop: no closure a frame). */
 function auraById(e: Entity | undefined, id: string): Aura | undefined {
@@ -1172,7 +1174,8 @@ export class CouncilFx {
         continue;
       }
       this.kit.paintFan(c.fan, { fill: 1, clock: this.clock, range: c.r, fade, front: 0 });
-      this.paints.live(c.paint, craterHeat(this.clock - c.born));
+      const pit = craterPit(this.clock - c.born, _pit);
+      this.paints.live(c.paint, craterHeat(this.clock - c.born), pit.share, pit.near);
     }
   }
 
@@ -1185,6 +1188,17 @@ export class CouncilFx {
     crater.r = radius * ROCK_CRATER.share;
     crater.fan.group.visible = true;
     this.kit.drapeFan(crater.fan, this.groundY, x, y, z, this.rand() * Math.PI * 2, crater.r);
+    // Dark from this very frame: the pit and the hot cores are painted now,
+    // not on the next update (the impact never reads as a pale flash).
+    this.kit.paintFan(crater.fan, {
+      fill: 1,
+      clock: this.clock,
+      range: crater.r,
+      fade: 1,
+      front: 0,
+    });
+    const pit = craterPit(0, _pit);
+    this.paints.live(crater.paint, craterHeat(0), pit.share, pit.near);
     for (const r of this.rocks) if (r.mesh.visible && r.playerId < 0) r.mesh.visible = false;
     const n = Math.round(40 * this.density * (this.reducedMotion() ? 0.5 : 1));
     for (let i = 0; i < n; i++) {
@@ -1200,15 +1214,26 @@ export class CouncilFx {
         0.3 + this.rand() * 0.8,
       );
     }
-    this.particles.shockRing(x, z, 0xfff0c8, radius * 0.9, 0.22);
-    this.particles.shockRing(x, z, 0x6a4426, radius * 1.9, 1.1);
-    this.particles.puff(x, y + 1.2, z, 8, {
-      speed: 5,
-      life: 0.3,
-      size: [3, 6],
-      color: [1, 0.66, 0.3],
-      alpha: 0.7,
+    // A brief hot flash at the core (orange white, small: never a pale wash
+    // over the zone), a hot ring racing out past the crater, a dust ring.
+    this.particles.shockRing(x, z, 0xff8a2a, radius * 1.25, 0.28);
+    this.particles.shockRing(x, z, 0x5a3820, radius * 2, 1.1);
+    this.particles.puff(x, y + 0.5, z, 4, {
+      speed: 2,
+      life: 0.14,
+      size: [1.6, 3],
+      color: [1, 0.78, 0.45],
+      alpha: 0.85,
       pool: 'glow',
+    });
+    this.particles.puff(x, y + 0.3, z, 5, {
+      speed: 3,
+      life: 0.3,
+      size: [1.2, 2.4],
+      color: [1, 0.42, 0.1],
+      alpha: 0.75,
+      pool: 'glow',
+      radius: radius * 0.25,
     });
     // Hot sparks off the split stone, and a wall of dust rolling out low.
     this.particles.puff(x, y + 0.6, z, 26, {
@@ -1227,19 +1252,22 @@ export class CouncilFx {
       const a = (i / wall) * Math.PI * 2 + this.rand() * 0.3;
       _wallDir[0] = Math.sin(a);
       _wallDir[2] = Math.cos(a);
-      const wx = x + Math.sin(a) * radius * 0.45;
-      const wz = z + Math.cos(a) * radius * 0.45;
+      const wx = x + Math.sin(a) * radius * 0.85;
+      const wz = z + Math.cos(a) * radius * 0.85;
       this.particles.puff(wx, this.groundY(wx, wz) + 0.5, wz, 1, ROCK_DUST_WALL);
     }
-    this.particles.puff(x, y + 0.6, z, 26, {
-      speed: 8,
-      up: 2.6,
-      life: 2.4,
-      size: [2.5, 7],
-      color: [0.52, 0.42, 0.32],
-      alpha: 0.65,
-      drag: 1.5,
-      radius: radius * 0.5,
+    // A dark plume of grit thrown up from the pit (narrow, rising: it leaves
+    // the crater's floor clear).
+    this.particles.puff(x, y + 1.2, z, 10, {
+      speed: 1.5,
+      up: 5,
+      life: 1.4,
+      size: [1.2, 3.2],
+      color: [0.3, 0.22, 0.16],
+      alpha: 0.6,
+      drag: 1.8,
+      dir: [0, 1, 0],
+      spread: 0.25,
     });
     this.shakeNear(x, z, 0.85, 45);
   }

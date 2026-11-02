@@ -8,8 +8,9 @@
 // radius, the fill, the front, the warning, the fade, the threat colour);
 // the dressing swaps the paint only: the fan's own mesh draws the CHAR pass (a
 // multiply) on its own rung, a child mesh on the same draped geometry draws
-// the GLOW pass (additive) on the owner's glow rung (above every char rung of
-// the owner, so the owner's marks blend commutatively whatever their order),
+// the GLOW pass (additive; the charged ground's a MAX, so stacked patches never
+// sum to white) on the owner's glow rung (above every char rung of the owner,
+// so the owner's marks blend commutatively whatever their order),
 // both reading the kit's own uniform objects, so every drape and paint call
 // reaches them. A fan wears one paint for life (its program is fixed at the
 // build); `setLook` moves it between that paint's kinds with uniform writes
@@ -114,6 +115,17 @@ class PaintedTelegraphs<K extends string> {
       defines: { [src.define]: '' },
       blending: THREE.AdditiveBlending,
     });
+    if (L.paint === 'charged') {
+      // The charged ground's light takes the brightest of what lies under it
+      // (a MAX blend, the program unchanged): patches the storm lays over one
+      // another stay one live blue net over their scorch instead of summing
+      // into a milky white disc. Its own char pass (a lower rung) has darkened
+      // the stone first, so the net still reads at full strength.
+      glowMat.blending = THREE.CustomBlending;
+      glowMat.blendEquation = THREE.MaxEquation;
+      glowMat.blendSrc = THREE.OneFactor;
+      glowMat.blendDst = THREE.OneFactor;
+    }
     this.materials.push(charMat, glowMat);
     f.floor.material = charMat;
     f.floor.name = `${this.prefix}Telegraph`;

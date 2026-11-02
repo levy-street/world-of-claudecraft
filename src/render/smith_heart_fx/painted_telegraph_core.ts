@@ -116,7 +116,9 @@ export const BREATH_TELEGRAPH_LOOKS: Readonly<Record<BreathTelegraphKind, Painte
   drawnMark: look('bolt', 0.4, 0.8, 1.4, 0.85, { rim: 0.9, curtain: false }),
   fork: look('bolt', 0.6, 0.85, 0.5, 0.8, { rim: 0.9, curtain: false }),
   lance: look('bolt', 0.65, 1, 0.8, 1),
-  cradle: look('bolt', 0.55, 0.9, 0.6, 0.9),
+  // The cradle goes without the kit's curtain: a pale shell over the lifted
+  // player that washed the storm out seen close.
+  cradle: look('bolt', 0.55, 0.9, 0.6, 0.9, { curtain: false }),
   charged: look('charged', 0.8, 1, 0.9, 1, { curtain: false }),
   vortex: look('wind', 0.55, 1, 0.5, 1, { spin: 1.4, flow: -1.2, curtain: false }),
   gale: look('wind', 0.5, 1, 0.8, 1, { spin: 2.6, flow: 0.25, curtain: false }),
@@ -136,7 +138,7 @@ export const COUNCIL_TELEGRAPH_LOOKS: Readonly<Record<CouncilTelegraphKind, Pain
     rise: look('quake', 0.74, 1, 0.55, 1),
     rubble: look('rubble', 0.55, 1, 1.1, 0.75),
     echo: look('quake', 0.62, 0.9, 0.3, 1),
-    slabGrind: look('quake', 0.32, 0.7, 0.5, 0.7, { rim: 0.85, curtain: false }),
+    slabGrind: look('quake', 0.45, 0.8, 0.5, 0.85, { rim: 0.85, curtain: false }),
     slabCrush: look('quake', 0.55, 1, 0.6, 1, { curtain: false }),
     song: look('quake', 0.22, 0.6, 0.45, 0.6, { rim: 0.85 }),
     crater: look('quake', 0.8, 1, 0.7, 1, { rim: 0.9, curtain: false }),
@@ -158,6 +160,8 @@ export const ROCK_CRATER = {
   /** Its radius as a share of the soak's. */
   share: 0.72,
   seconds: 4,
+  /** Seconds the dark pit (the rock's shadow, carried on) holds. */
+  pitSeconds: 1.8,
   /** The edge: a dark umber line, never a threat's hue. */
   color: 0x4a3018,
   accent: 0xffb35a,
@@ -170,6 +174,26 @@ export function craterFade(age: number): number {
   if (age < 0 || age >= T) return 0;
   const k = Math.max(0, (age - T * 0.5) / (T * 0.5));
   return 1 - k * k * (3 - 2 * k);
+}
+
+/** The crater's pit at `age` seconds: the falling rock's shadow carried on
+ *  into the crater from the very impact frame (so the hit reads dark and
+ *  heavy, never a pale flash over the floor), shrinking into the pit over
+ *  its first seconds. `share` of the crater's radius (0: gone), `near` its
+ *  darkness and edge (rockShadowLook). */
+export function craterPit(
+  age: number,
+  out: { share: number; near: number } = { share: 0, near: 0 },
+): { share: number; near: number } {
+  if (age < 0 || age >= ROCK_CRATER.pitSeconds) {
+    out.share = 0;
+    out.near = 0;
+    return out;
+  }
+  const t = age / ROCK_CRATER.pitSeconds;
+  out.share = 1.05 * (1 - t * t);
+  out.near = 1 - t;
+  return out;
 }
 
 /** The crater's fissures cooling: white hot at the impact, dull ember by

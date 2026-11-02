@@ -100,6 +100,8 @@ import { BREATH_TELEGRAPH_GLOW_STEP, type BreathTelegraphKind } from './painted_
 import { BreathTelegraphs, type PaintedFan } from './painted_telegraphs';
 
 const SCAN_SEC = 0.1;
+/** The conductor's beacon and the cradle's crown: a saturated storm blue. */
+const STORM_BLUE = 0x2f7dff;
 const BEAM_POINTS = 10;
 const T = BREATH_TUNING;
 
@@ -283,17 +285,21 @@ void main() {
 }
 `;
 /** A beam of light (the calm landing, the conductor's beacon): bright core,
- *  soft falling bands. */
+ *  soft falling bands. \`uHot\` (the conductor's) runs white hot pulses of
+ *  current down a saturated blue body (0: the calm's soft light, as ever). */
 const BEAM_FRAG = /* glsl */ `
 uniform float uAlpha;
 uniform float uTime;
+uniform float uHot;
 uniform vec3 uColor;
 varying vec2 vUv;
 void main() {
   float bands = 0.7 + 0.3 * sin(vUv.y * 22.0 + uTime * 9.0);
   float edge = 1.0 - abs(vUv.x * 2.0 - 1.0);
   float a = uAlpha * bands * (1.0 - smoothstep(0.7, 1.0, vUv.y)) * (0.6 + 0.4 * edge);
-  gl_FragColor = vec4(uColor * (1.2 + bands * 0.5), a);
+  float pulse = pow(0.5 + 0.5 * sin(vUv.y * 9.0 - uTime * 31.0), 8.0);
+  vec3 col = uColor * (1.2 + bands * 0.5) + vec3(0.85, 0.93, 1.0) * pulse * 1.6 * uHot;
+  gl_FragColor = vec4(col, a * (1.0 + 0.6 * pulse * uHot));
   #include <colorspace_fragment>
 }
 `;
@@ -809,6 +815,7 @@ export class BreathFightFx {
         uniforms: {
           uAlpha: { value: 0 },
           uTime: this.uTime,
+          uHot: { value: 0 },
           uColor: { value: new THREE.Color(color) },
         },
         vertexShader: FUNNEL_VERT,
@@ -876,27 +883,41 @@ export class BreathFightFx {
     const spentCarrier = new THREE.Sprite(this.seatSpentMat);
     spentCarrier.visible = false;
     this.root.add(spentCarrier);
+    // The conductor's beacon: a saturated electric blue column with white hot
+    // current running down it, a blue glow at its foot and a small white hot
+    // spark in it (crisp, never a milky blob over the marked player).
+    const beaconGlowMat = sprite(STORM_BLUE, 0.85, 'smithHeartBreathBeaconGlow');
+    const beaconCoreMat = sprite(0xf2f8ff, 0.95, 'smithHeartBreathBeaconCore');
     for (let i = 0; i < P.beacons; i++) {
-      const bm = beamMat('smithHeartBreathBeacon', C.accent);
+      const bm = beamMat('smithHeartBreathBeacon', STORM_BLUE);
+      bm.uniforms.uHot.value = 1;
       const mesh = new THREE.Mesh(beamGeo, bm);
       mesh.name = 'smithHeartBreathBeacon';
       mesh.visible = false;
       mesh.frustumCulled = false;
       this.root.add(mesh);
       this.beacons.push({ mesh, mat: bm });
-      const glow = new THREE.Sprite(sprite(0xe6faff, 0.9, 'smithHeartBreathBeaconGlow'));
-      glow.scale.set(2.6, 2.6, 1);
+      const glow = new THREE.Sprite(beaconGlowMat);
+      glow.name = 'smithHeartBreathBeaconGlow';
+      glow.scale.set(1.7, 1.7, 1);
       glow.visible = false;
+      const spark = new THREE.Sprite(beaconCoreMat);
+      spark.scale.set(0.45, 0.45, 1);
+      glow.add(spark);
       this.root.add(glow);
       this.beaconGlows.push(glow);
     }
-    // The Thunder's Cradle's crown over the lifted player.
-    this.crownMat = sprite(0xe6faff, 0.9, 'smithHeartBreathCrown');
+    // The Thunder's Cradle's crown over the lifted player: storm blue, its
+    // core small (it marks who is lifted without washing them out).
+    this.crownMat = sprite(STORM_BLUE, 0.9, 'smithHeartBreathCrown');
     this.crown.name = 'smithHeartBreathCrown';
     this.crown.visible = false;
     const core = new THREE.Sprite(this.crownMat);
-    core.scale.set(3.4, 3.4, 1);
+    core.scale.set(2.2, 2.2, 1);
     this.crown.add(core);
+    const crownHot = new THREE.Sprite(beaconCoreMat);
+    crownHot.scale.set(0.6, 0.6, 1);
+    this.crown.add(crownHot);
     for (let i = 0; i < 8; i++) {
       const s = new THREE.Sprite(this.crownMat);
       s.scale.set(0.8, 0.8, 1);
