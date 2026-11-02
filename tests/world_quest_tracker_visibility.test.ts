@@ -2,6 +2,7 @@
 // in the quest's area, with a grace period on leaving and on completion
 // (src/ui/hud/quest/world_quest_tracker_visibility.ts).
 import { describe, expect, it } from 'vitest';
+import { WORLD_QUESTS_BY_ID } from '../src/sim/data';
 import { positionInWorldQuestArea } from '../src/sim/world_quest_area';
 import {
   createWorldQuestTrackerVisibility,
@@ -62,7 +63,9 @@ describe('world quest tracker visibility', () => {
   });
 
   it('uses the sim area edge (one shared rule)', () => {
-    const quest = { area: { x: 10, z: 20, radius: 5 } };
+    // A ring quest (an interact board); kill quests use their whole zone instead
+    // (tests/world_quest_kill_credit.test.ts).
+    const quest = { ...WORLD_QUESTS_BY_ID.wq_frostveil_howlers, area: { x: 10, z: 20, radius: 5 } };
     expect(positionInWorldQuestArea({ x: 10, z: 25 }, quest)).toBe(true);
     expect(positionInWorldQuestArea({ x: 10, z: 25.01 }, quest)).toBe(false);
   });

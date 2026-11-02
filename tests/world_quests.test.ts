@@ -66,6 +66,9 @@ import {
 } from '../src/sim/world_quests';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
+// East of Evergarden's x band, level with the watch ring's centre.
+const EVERGARDEN_EAST_OUTSIDE_X = 600;
+
 function enterQuest(sim: Sim, quest: WorldQuestDef, level = quest.minLevel): void {
   sim.setPlayerLevel(level);
   sim.utcDay = '2026-08-31';
@@ -869,7 +872,7 @@ describe('world quest lifecycle', () => {
     expect(sim.worldQuestLog.size).toBe(0);
   });
 
-  it('credits only matching kills inside the active area', () => {
+  it("credits only matching kills inside the active area (a hunt's whole zone)", () => {
     const quest = WORLD_QUESTS_BY_ID.wq_evergarden_watch;
     const sim = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: true });
     enterQuest(sim, quest);
@@ -879,13 +882,20 @@ describe('world quest lifecycle', () => {
     onMobKilledForWorldQuests(sim.ctx, target, meta);
     expect(sim.worldQuestLog.get(quest.id)?.count).toBe(1);
     expect(meta.counters.questProgress).toBe(1);
+    // Beyond the authored ring but still in Evergarden: a hunt counts zone-wide.
     target.pos.x = quest.area.x + quest.area.radius + 1;
+    expect(zoneAt(target.pos.x, target.pos.z).id).toBe(quest.zoneId);
     onMobKilledForWorldQuests(sim.ctx, target, meta);
-    expect(sim.worldQuestLog.get(quest.id)?.count).toBe(1);
+    expect(sim.worldQuestLog.get(quest.id)?.count).toBe(2);
+    // Out of the zone: no credit.
+    target.pos.x = EVERGARDEN_EAST_OUTSIDE_X;
+    expect(zoneAt(target.pos.x, target.pos.z).id).not.toBe(quest.zoneId);
+    onMobKilledForWorldQuests(sim.ctx, target, meta);
+    expect(sim.worldQuestLog.get(quest.id)?.count).toBe(2);
     target.pos.x = quest.area.x;
     target.templateId = 'forest_wolf';
     onMobKilledForWorldQuests(sim.ctx, target, meta);
-    expect(sim.worldQuestLog.get(quest.id)?.count).toBe(1);
+    expect(sim.worldQuestLog.get(quest.id)?.count).toBe(2);
   });
 
   it('credits the three authored Willowfen ore nodes and completes the gather objective', () => {
@@ -1346,7 +1356,8 @@ describe('world quest lifecycle', () => {
     onMobKilledForWorldQuests(sim.ctx, targetFor(sim, quest), meta);
     sim.drainEvents();
 
-    sim.player.pos.x = quest.area.x + quest.area.radius + 20;
+    sim.player.pos.x = EVERGARDEN_EAST_OUTSIDE_X;
+    expect(zoneAt(sim.player.pos.x, sim.player.pos.z).id).not.toBe(quest.zoneId);
     sim.player.prevPos = { ...sim.player.pos };
     expect(sim.tick().some((event) => event.type === 'worldQuestStarted')).toBe(false);
     expect(sim.worldQuestLog.get(quest.id)?.count).toBe(1);
