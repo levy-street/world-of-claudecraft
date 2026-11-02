@@ -114,6 +114,7 @@ const REGISTERED_MODULES = [
   'warlock_meteor_fx.ts',
   'coach_trail_materials.ts',
   'moonwing_adornment.ts',
+  'spore_halo.ts',
   'balgath_ranged_fx.ts',
   'balgath_starwake_fx.ts',
   'effigy_rig.ts',
@@ -279,7 +280,7 @@ describe('the lazy-material sweep', () => {
     // now mints no lazy module cache: gloam_field.ts builds its three
     // materials in its constructor): 23, 22.
     expect(hits.length).toBeGreaterThanOrEqual(23);
-    expect(hits.filter((hit) => hit.idiom === 'bundle')).toHaveLength(22);
+    expect(hits.filter((hit) => hit.idiom === 'bundle')).toHaveLength(23);
   });
 
   it('leaves no hit unregistered and unexcluded', () => {

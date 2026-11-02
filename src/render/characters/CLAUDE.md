@@ -129,6 +129,9 @@ no procedural-rig path here anymore. Reads the world; never mutates the sim.
   from static `VisualDef` values to keep the cache keys bounded; `visual.ts`
   parents the mesh to the head bone and keeps it out of the shadow-caster
   sweeps (`tests/character_halo.test.ts`).
+- `spore_halo.ts`: Sporemender Form's crown (`VisualDef.sporeHalo`), stacked glow
+  planes on the `Head` bone, placed in model space through the bind matrix because
+  Tripo bone axes are not the world's (`tests/spore_halo.test.ts`).
 - `rig_merge.ts`: merges a KayKit rig's quantized body-part SkinnedMeshes into
   one draw per material (`assets.ts` `assembleModel` calls it). Read its
   header bind-pose proof before touching bone inverses.
