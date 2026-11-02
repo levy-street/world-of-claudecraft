@@ -494,7 +494,7 @@ describe('bank_window: search / sort / deposit-all', () => {
   });
 
   it('gates the deposit-all button on hasDepositableMaterials and plans + sends on click', () => {
-    expect(depositAllButton).toContain("t('hudChrome.bank.depositAll')");
+    expect(depositAllButton).toContain("'hudChrome.bank.depositAll'");
     expect(painter).toContain('hasDepositableMaterials(bags()');
     expect(painter).toMatch(
       /for \(const send of plan\.sends\) world\.bankDeposit\(send\.slot, send\.count\)/,
@@ -569,8 +569,10 @@ describe('bank_window: search / sort / deposit-all', () => {
     // SAME localized text as the title so sighted and assistive-tech users read
     // identical copy, and its id is wired to the button via aria-describedby.
     const src = depositAllButton;
-    expect(src).toContain("deposit.setAttribute('aria-describedby', 'bank-deposit-all-desc')");
-    expect(src).toContain("desc.id = 'bank-deposit-all-desc'");
+    // The Personal pane's id (the Vault pane passes its own).
+    expect(src).toContain("model.vaultPane?.descId ?? 'bank-deposit-all-desc'");
+    expect(src).toContain("deposit.setAttribute('aria-describedby', descId)");
+    expect(src).toContain('desc.id = descId');
     expect(src).toContain("desc.className = 'visually-hidden'");
     expect(src).toContain('desc.textContent = tooltip');
     expect(src).toContain('parent.appendChild(desc)');

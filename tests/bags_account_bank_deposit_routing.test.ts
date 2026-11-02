@@ -5,6 +5,7 @@
 // deposit-target gate, and the real BagsWindow dispatch.
 import { describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
+import { membershipBankTransferable } from '../src/sim/membership_bank';
 import type { InvSlot } from '../src/sim/types';
 import { accountBankDepositTarget } from '../src/ui/account_bank_view';
 import {
@@ -17,6 +18,7 @@ import {
 import { BagsWindow, type BagsWindowDeps } from '../src/ui/bags_window';
 import { t } from '../src/ui/i18n';
 import { ItemDragState } from '../src/ui/item_drag_state';
+import { tSim } from '../src/ui/sim_i18n';
 import type { IWorld } from '../src/world_api';
 import type { AccountBankInfo, BankInfo } from '../src/world_api/bank';
 
@@ -27,6 +29,9 @@ const plainId = Object.keys(ITEMS).find((id) => {
 const questId = Object.keys(ITEMS).find((id) => ITEMS[id].kind === 'quest') as string;
 const soulboundId = Object.keys(ITEMS).find(
   (id) => ITEMS[id].soulbound && ITEMS[id].kind !== 'quest',
+) as string;
+const noMarketId = Object.keys(ITEMS).find(
+  (id) => ITEMS[id].noMarketList && !ITEMS[id].soulbound && ITEMS[id].kind !== 'quest',
 ) as string;
 
 const ACCOUNT_MODE: BagMode = {
@@ -56,11 +61,39 @@ describe('account bank deposit ladder (pure)', () => {
     );
   });
 
+  it('refuses everything the server refuses (unlisted items, armed bind-on-trade)', () => {
+    // The server's rule is membershipBankTransferable: each copy it refuses
+    // must be refused in place, never sent to come back as a 'bound' error.
+    const cases: [InvSlot, boolean][] = [
+      [{ itemId: plainId, count: 1 }, true],
+      [{ itemId: noMarketId, count: 1 }, false],
+      [{ itemId: plainId, count: 1, instance: { bindOnTrade: true } }, false],
+      [{ itemId: plainId, count: 1, instance: { boundTo: 7 } }, false],
+      [{ itemId: plainId, count: 1, instance: { locked: true } }, false],
+      [{ itemId: questId, count: 1 }, false],
+      [{ itemId: soulboundId, count: 1 }, false],
+    ];
+    for (const [slot, movable] of cases) {
+      const label = `${slot.itemId} ${JSON.stringify(slot.instance ?? {})}`;
+      expect(membershipBankTransferable(slot), label).toBe(movable);
+      expect(bagItemAction(ITEMS[slot.itemId], ACCOUNT_MODE, slot.instance), label).toBe(
+        movable ? 'accountBankDeposit' : 'accountBankDepositBlocked',
+      );
+    }
+  });
+
   it('previews the same outcome on hover', () => {
     expect(bagTooltipHintKey(ITEMS[plainId], ACCOUNT_MODE)).toBe(
       'hudChrome.bank.accountDepositHint',
     );
     expect(bagTooltipHintKey(ITEMS[questId], ACCOUNT_MODE)).toBe('hudChrome.bank.accountBound');
+    expect(bagTooltipHintKey(ITEMS[plainId], ACCOUNT_MODE, { boundTo: 7 })).toBe(
+      'hudChrome.bank.accountBound',
+    );
+    expect(bagTooltipHintKey(ITEMS[plainId], ACCOUNT_MODE, { locked: true })).toBe(
+      'hudChrome.bank.accountBound',
+    );
+    expect(bagTooltipHintKey(ITEMS[noMarketId], ACCOUNT_MODE)).toBe('hudChrome.bank.accountBound');
   });
 
   it('offers nothing on a def-less cell and keeps destroy inert', () => {
@@ -155,7 +188,7 @@ function harness(inventory: InvSlot[], target: number | null) {
     tradeOfferHeadroom: () => 0,
     stageMarketSell: noop,
     stageMailParcel: noop,
-    insertItemChatLink: noop,
+    insertItemChatLink: (itemId: string) => other.push(`link:${itemId}`),
     showError: (text: string) => errors.push(text),
     setPendingPetFeed: noop,
     resetPetBarSig: noop,
@@ -176,12 +209,12 @@ function harness(inventory: InvSlot[], target: number | null) {
   return { root, calls, errors, other };
 }
 
-function clickCellFor(root: HTMLElement, itemId: string): void {
+function clickCellFor(root: HTMLElement, itemId: string, shiftKey = false): void {
   const cell = Array.from(root.querySelectorAll<HTMLElement>('button.bag-item')).find((c) =>
     c.getAttribute('aria-label')?.includes(ITEMS[itemId].name),
   );
   expect(cell, `no bag cell for ${itemId}`).toBeTruthy();
-  cell?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+  cell?.dispatchEvent(new MouseEvent('click', { bubbles: true, shiftKey }));
 }
 
 describe('bags click on the Other characters tab (real BagsWindow)', () => {
@@ -204,6 +237,24 @@ describe('bags click on the Other characters tab (real BagsWindow)', () => {
     expect(h.calls).toEqual([]);
     expect(h.other).toEqual([]);
     expect(h.errors).toEqual([t('hudChrome.bank.accountBound')]);
+  });
+
+  it('refuses a stale cell (its stack already left the bags) with the not-held line', () => {
+    const inventory: InvSlot[] = [{ itemId: plainId, count: 3 }];
+    const h = harness(inventory, 2);
+    // The painted cell still holds the old slot object; the bags moved on.
+    inventory[0] = { itemId: plainId, count: 3 };
+    clickCellFor(h.root, plainId);
+    expect(h.calls).toEqual([]);
+    expect(h.other).toEqual([]);
+    expect(h.errors).toEqual([tSim('error.noItem')]);
+  });
+
+  it('shift-click links the item in chat (no split: the account move is whole-stack)', () => {
+    const h = harness([{ itemId: plainId, count: 3 }], 2);
+    clickCellFor(h.root, plainId, true);
+    expect(h.calls).toEqual([]);
+    expect(h.other).toEqual([`link:${plainId}`]);
   });
 
   it('deposits nowhere while the selected bank is still loading', () => {

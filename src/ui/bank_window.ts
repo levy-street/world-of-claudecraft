@@ -37,7 +37,7 @@ import {
 import { bankBonusSectionHtml } from './bank_bonus_view';
 import { showBuyConfirmPrompt } from './bank_buy_prompt';
 import { type BankScrollOffsets, planBankScrollRestore } from './bank_chrome_layout_core';
-import { appendDepositAllButton, personalDepositAllToVault } from './bank_deposit_all_button';
+import { appendDepositAllButton } from './bank_deposit_all_button';
 import { filterBankSlots } from './bank_filter';
 import { annotateGuildFocusKeys, annotateVaultFocusKeys } from './bank_focus_keys';
 import { bankSlotDisplayName } from './bank_item_name_core';
@@ -99,7 +99,7 @@ import { storageRungRefusalTargets } from './storage_rung_echo_core';
 import { focusActiveTab, wireTabStrip } from './tab_strip_painter';
 import { svgIcon } from './ui_icons';
 import { unknownItemIconHtml } from './unknown_item_icon';
-import { hasVaultDepositable, vaultSpecialContentKey } from './vault_view';
+import { hasVaultDepositable, vaultDepositableUnits, vaultSpecialContentKey } from './vault_view';
 import { VAULT_PANEL_ID, VAULT_TAB_ID, VaultTab } from './vault_window';
 import { createWeeklyRewardsTab, type WeeklyRewardsTab } from './weekly_rewards_window';
 
@@ -909,11 +909,7 @@ export class BankWindow {
         v.upgrades,
         v.perMaterialCap,
         v.nextUpgradeCost,
-        // Personal too, but only while its vault-routed sweep awaits the echo
-        // (no other pane renders stock, so it never churns them otherwise).
-        this.tab === 'vault' || (this.tab === 'personal' && this.vaultPane.depositAllBusy)
-          ? Object.entries(v.stock).sort()
-          : null,
+        this.tab === 'vault' ? Object.entries(v.stock).sort() : null,
         this.tab === 'vault' ? vaultSpecialContentKey(v.special) : null,
         this.tab === 'vault' && v.nextUpgradeCost !== null
           ? this.deps.world().copper >= v.nextUpgradeCost
@@ -921,10 +917,13 @@ export class BankWindow {
         // The deposit-all button's enabled state reads the CARRIED bags, which
         // no other signature term covers: without this arm, looting a material
         // while the pane is open leaves the button stale-disabled until some
-        // other bank data happens to move. The personal tab's button reads it
-        // too while it routes to the vault.
-        this.tab === 'vault' || this.tab === 'personal'
+        // other bank data happens to move. Vault-pane-scoped like the purse term.
+        this.tab === 'vault'
           ? hasVaultDepositable(this.deps.world().inventory, vaultMaterialIds())
+          : null,
+        // Personal's vault sweep: carried units hold still from click to echo.
+        this.tab === 'personal' && this.vaultPane.unlocked
+          ? vaultDepositableUnits(this.deps.world().inventory, vaultMaterialIds())
           : null,
       ],
       g && [
@@ -1139,7 +1138,7 @@ export class BankWindow {
     // Deposit all materials: into the Materials Vault once it is unlocked
     // (the vault pane's own sweep), else every bank-fitting material stack.
     // Disabled only when nothing could move; a full store still reports.
-    const toVault = personalDepositAllToVault(this.deps.world().vaultInfo?.upgrades);
+    const toVault = this.vaultPane.unlocked;
     const bags = () => this.deps.world().inventory; // read only when not pending
     appendDepositAllButton(tools, {
       toVault,
@@ -1172,7 +1171,7 @@ export class BankWindow {
   // re-reading state mid-run, because the online mirror lags the authoritative world by
   // ~1 tick; sending against a mid-run mirror would double-count or mis-index.
   private onDepositAll(): void {
-    if (personalDepositAllToVault(this.deps.world().vaultInfo?.upgrades)) {
+    if (this.vaultPane.unlocked) {
       const summary = this.vaultPane.sweepAll();
       if (summary) {
         const text = t(summary.key, summary.params);

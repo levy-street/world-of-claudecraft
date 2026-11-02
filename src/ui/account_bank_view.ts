@@ -1,15 +1,24 @@
+import { isTransferLockedInstance } from '../sim/item_instance_transfer';
 import { isItemLocked } from '../sim/item_lock';
 import type { InvSlot, ItemDef, ItemInstancePayload } from '../sim/types';
 import type { AccountBankInfo } from '../world_api/bank';
 import type { TranslationKey } from './i18n';
 
-/** Only transferable copies can cross character ownership. The server rechecks.
- *  The one rule both the bank pane's grid and the bags' deposit click read. */
+/** Only transferable copies can cross character ownership. The server rechecks
+ *  (membershipBankTransferable in src/sim/membership_bank.ts); this mirrors it
+ *  so the bank pane's grid and the bags' deposit click never offer a move the
+ *  server refuses as bound. */
 export function accountBankItemMovable(
-  item: { kind: string; soulbound?: boolean },
+  item: { kind: string; soulbound?: boolean; noMarketList?: boolean },
   instance: ItemInstancePayload | undefined,
 ): boolean {
-  return !item.soulbound && !instance?.boundTo && !isItemLocked(instance) && item.kind !== 'quest';
+  return (
+    item.kind !== 'quest' &&
+    !item.soulbound &&
+    !item.noMarketList &&
+    !isTransferLockedInstance(instance) &&
+    !isItemLocked(instance)
+  );
 }
 
 export function accountBankTransferAllowed(slot: InvSlot, item: ItemDef | undefined): boolean {

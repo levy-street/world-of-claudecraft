@@ -387,6 +387,18 @@ export function hasVaultDepositable(
   return inventory.some((s) => isVaultDepositableSlot(s, materialIds));
 }
 
+/** Total carried units the vault sweep could take (headroom aside). The
+ *  Personal pane's repaint signature reads it: it holds still between a
+ *  vault-routed click and its echo, then moves when the sweep lands. */
+export function vaultDepositableUnits(
+  inventory: readonly InvSlot[],
+  materialIds: ReadonlySet<string>,
+): number {
+  let units = 0;
+  for (const s of inventory) if (isVaultDepositableSlot(s, materialIds)) units += s.count;
+  return units;
+}
+
 /** The five deposit-all summary lines, as t() keys so the painter stays a
  *  thin consumer and the arm CHOICE is unit-pinned here. */
 export type VaultDepositAllSummaryKey =

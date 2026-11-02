@@ -249,4 +249,36 @@ describe('other character banks', () => {
     expect(win.personalTabActive).toBe(true);
     win.close();
   });
+
+  it('arms the bags deposit target only on the Other characters tab with a ready bank', () => {
+    const { world, root, deps } = setup(true);
+    Object.assign(world, {
+      bankInfo: bank([]),
+      vaultInfo: null,
+      guildBankInfo: null,
+      bags: [null, null, null, null],
+      copper: 0,
+    });
+    const win = new BankWindow({
+      ...deps,
+      root: () => root,
+      closeOthers: vi.fn(),
+      captureFocus: () => null,
+      restoreFocus: vi.fn(),
+      onClosed: vi.fn(),
+      moneyHtml: () => '',
+    } as BankWindowDeps);
+    expect(win.accountDepositTarget).toBeNull(); // closed
+    win.open();
+    expect(win.accountDepositTarget).toBeNull(); // Personal tab: bag clicks bank instead
+    root.querySelector<HTMLButtonElement>('[data-tab="account"]')!.click();
+    expect(win.accountDepositTarget).toBe(2);
+    // The pane says where deposits come from now that it has no bags grid.
+    expect(root.textContent).toContain("Click an item in your bags to send it to <Alice>'s bank.");
+    Object.assign(world.accountBankInfo, { bank: null }); // reselecting: still opening
+    expect(win.accountDepositTarget).toBeNull();
+    Object.assign(world.accountBankInfo, { bank: bank([]) });
+    win.close();
+    expect(win.accountDepositTarget).toBeNull();
+  });
 });

@@ -1,18 +1,15 @@
-// The Personal pane's "Deposit all materials" control. Where the materials go
-// is the caller's decision (the Materials Vault once it is unlocked, else the
-// bank); this module only builds the button and its always-present description.
+// The "Deposit all materials" control both bank panes share (Personal and
+// Vault). Where the materials go is the caller's decision; this module only
+// builds the button and its always-present description.
 import { t } from './i18n';
 
 export interface DepositAllButtonModel {
-  /** True routes the sweep to the Materials Vault (its tooltip), false to the bank. */
+  /** True names the Materials Vault sweep in the tooltip, false the bank's. */
   toVault: boolean;
   disabled: boolean;
   onClick: () => void;
-}
-
-/** Which store the Personal pane's button feeds: the vault whenever it is unlocked. */
-export function personalDepositAllToVault(vaultUpgrades: number | undefined): boolean {
-  return (vaultUpgrades ?? 0) > 0;
+  /** The Vault pane's instance: its own label, class and description id. */
+  vaultPane?: { descId: string };
 }
 
 /** Append the button plus its description. The clarification (which items move
@@ -22,20 +19,23 @@ export function personalDepositAllToVault(vaultUpgrades: number | undefined): bo
  *  reader announces it on hover and keyboard focus, and reading it needs no
  *  pointer at all, so it also covers touch users who tap the button directly. */
 export function appendDepositAllButton(parent: HTMLElement, model: DepositAllButtonModel): void {
+  const descId = model.vaultPane?.descId ?? 'bank-deposit-all-desc';
   const deposit = document.createElement('button');
   deposit.type = 'button';
-  deposit.className = 'bank-deposit-all ui-btn';
-  deposit.textContent = t('hudChrome.bank.depositAll');
+  deposit.className = `bank-deposit-all ui-btn${model.vaultPane ? ' vault-deposit-all' : ''}`;
+  deposit.textContent = t(
+    model.vaultPane ? 'hudChrome.bank.vaultDepositAll' : 'hudChrome.bank.depositAll',
+  );
   const tooltip = t(
     model.toVault ? 'hudChrome.bank.vaultDepositAllTooltip' : 'hudChrome.bank.depositAllTooltip',
   );
   deposit.title = tooltip;
-  deposit.setAttribute('aria-describedby', 'bank-deposit-all-desc');
+  deposit.setAttribute('aria-describedby', descId);
   deposit.disabled = model.disabled;
   deposit.addEventListener('click', model.onClick);
   parent.appendChild(deposit);
   const desc = document.createElement('span');
-  desc.id = 'bank-deposit-all-desc';
+  desc.id = descId;
   desc.className = 'visually-hidden';
   desc.textContent = tooltip;
   parent.appendChild(desc);

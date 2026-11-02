@@ -1970,8 +1970,18 @@ export class BagsWindow {
         // has no split), the exact clicked copy by reference, and the snapshot
         // the server compares against so a stale click is refused, not misfiled.
         const characterId = this.deps.accountBankDepositTarget?.() ?? null;
+        if (characterId === null) {
+          // The selected bank stopped being ready between paint and click.
+          this.deps.showError(t('hudChrome.bank.cannotDepositNow'));
+          return;
+        }
         const index = bagStackIndex(this.deps.world().inventory, s);
-        if (characterId === null || index < 0) break;
+        if (index < 0) {
+          // A stale cell: the stack already left the bags (the settled
+          // stale-click rule voices the not-held line rather than going quiet).
+          this.deps.showError(tSim('error.noItem'));
+          return;
+        }
         this.deps
           .world()
           .accountBankTransfer(characterId, 'deposit', index, s.count, structuredClone(s));
@@ -2268,6 +2278,7 @@ export class BagsWindow {
       !mode.bankDeposit &&
       !mode.guildBankDeposit &&
       !mode.vaultDeposit &&
+      !mode.accountBankDeposit &&
       !mode.petFeed;
     return inDefaultMode && bagItemHasContextActions(item, itemId, instance, materialSources, true);
   }

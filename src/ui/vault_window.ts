@@ -31,6 +31,7 @@ import type { IWorld, VaultSpecialRef } from '../world_api';
 import { bagCornerMark, bagRimClasses } from './bag_corner_mark_view';
 import { bagInstanceGlyphKind } from './bag_instance_glyph_view';
 import { showBuyConfirmPrompt } from './bank_buy_prompt';
+import { appendDepositAllButton } from './bank_deposit_all_button';
 import { showQuantityPrompt } from './bank_quantity_prompt';
 import { appendBankStatusLine, type BankStatusAnnouncementState } from './bank_status_line';
 import { formatCount } from './count_format';
@@ -725,23 +726,14 @@ export class VaultTab {
     const row = document.createElement('div');
     row.className = 'bank-buy-row vault-footer';
 
-    const deposit = document.createElement('button');
-    deposit.type = 'button';
-    deposit.className = 'bank-deposit-all ui-btn vault-deposit-all';
-    deposit.textContent = t('hudChrome.bank.vaultDepositAll');
-    const tooltip = t('hudChrome.bank.vaultDepositAllTooltip');
-    deposit.title = tooltip;
-    deposit.setAttribute('aria-describedby', VAULT_DEPOSIT_ALL_DESC_ID);
-    deposit.disabled =
-      this.depositAllPending ||
-      !hasVaultDepositable(this.deps.world().inventory, vaultMaterialIds());
-    deposit.addEventListener('click', () => this.onDepositAll());
-    row.appendChild(deposit);
-    const desc = document.createElement('span');
-    desc.id = VAULT_DEPOSIT_ALL_DESC_ID;
-    desc.className = 'visually-hidden';
-    desc.textContent = tooltip;
-    row.appendChild(desc);
+    appendDepositAllButton(row, {
+      toVault: true,
+      disabled:
+        this.depositAllPending ||
+        !hasVaultDepositable(this.deps.world().inventory, vaultMaterialIds()),
+      onClick: () => this.onDepositAll(),
+      vaultPane: { descId: VAULT_DEPOSIT_ALL_DESC_ID },
+    });
 
     if (nextCost === null || nextCap === null) {
       const maxed = document.createElement('span');
@@ -814,7 +806,9 @@ export class VaultTab {
     world.vaultDepositAll();
     // While dead the sim silently no-ops the sweep (the town-service idiom):
     // the command still goes (server decides), but the predicted "Materials
-    // deposited: N." would be a false claim, so the summary stays quiet.
+    // deposited: N." would be a false claim, so the summary stays quiet (the
+    // Personal pane's bank-routed deposit-all makes the same false claim
+    // today; recorded family follow-up).
     if (dead) return null;
     if (prediction.items > 0) {
       audio.coin();
