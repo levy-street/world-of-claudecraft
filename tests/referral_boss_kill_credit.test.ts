@@ -118,17 +118,29 @@ function credit(evidence: ReferralEvidence): ReferralCardState {
 const bit = (id: string) => 1 << REFERRAL_MILESTONES.findIndex((m) => m.id === id);
 
 describe('referral stamps are earned on the real boss kill', () => {
-  it('Korzul in a claimed Sanctum credits the Gravewyrm stamp to both, no quest held', () => {
-    const { s, a, b } = pair();
-    for (const pid of [a, b]) expect(s.meta(pid)!.questsDone.has('q_gravewyrm')).toBe(false);
-    enter(s, ['gravewyrm_sanctum'], [a, b]);
-    const evidence = killBoss(s, 'korzul_the_gravewyrm', [a, b]);
-    expect(evidence).toHaveLength(1);
-    expect(evidence[0]).toMatchObject({ kind: 'boss', dungeonId: 'gravewyrm_sanctum' });
-    expect(credit(evidence[0]).participants.map((p) => p.credited)).toEqual([
-      bit('gravewyrm'),
-      bit('gravewyrm'),
-    ]);
+  it.each([
+    ['hollow_crypt', 'morthen', 'q_hollow', 2],
+    ['sunken_bastion', 'vael_the_mistcaller', 'q_mistcaller', 4],
+    ['gravewyrm_sanctum', 'korzul_the_gravewyrm', 'q_gravewyrm', 8],
+  ])(
+    'the %s final boss %s credits its stamp to both, no quest held',
+    (dungeonId, mobId, questId, stamp) => {
+      const { s, a, b } = pair();
+      for (const pid of [a, b]) expect(s.meta(pid)!.questsDone.has(questId)).toBe(false);
+      enter(s, [dungeonId], [a, b]);
+      const evidence = killBoss(s, mobId, [a, b]);
+      expect(evidence).toHaveLength(1);
+      expect(evidence[0]).toMatchObject({ kind: 'boss', dungeonId });
+      expect(credit(evidence[0]).participants.map((p) => p.credited)).toEqual([stamp, stamp]);
+    },
+  );
+
+  it('a bound friend who never entered the instance is not in the kill evidence', () => {
+    const { s, a } = pair();
+    enter(s, ['gravewyrm_sanctum'], [a]);
+    const evidence = killBoss(s, 'korzul_the_gravewyrm', [a]);
+    // The server drops evidence with fewer than two participants, so no card credits.
+    expect(evidence.flatMap((e) => e.participants.map((p) => p.characterId))).toEqual([101]);
   });
 
   it.each([
