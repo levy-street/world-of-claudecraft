@@ -1120,31 +1120,37 @@ export class BreathFightFx {
         FORK_BEAM_SECONDS,
         src && src.templateId === BREATH_GUARDIAN ? 4.5 : 1.3,
       );
-      this.sparksAt(dst.pos.x, dst.pos.y + 1.2, dst.pos.z, 10);
+      this.sparksAt(fxAnchor(dst).x, fxAnchor(dst).y + 1.2, fxAnchor(dst).z, 10);
     } else if (ev.ability === BREATH_CUES.anchor && src && dst) {
       this.beam(src, dst, ANCHOR_BEAM_SECONDS, 1.4, C.calm);
     } else if (ev.ability === BREATH_CUES.toss && dst) {
-      this.particles.puff(dst.pos.x, dst.pos.y + 0.6, dst.pos.z, Math.round(16 * this.density), {
-        speed: 9,
-        up: 4,
-        life: 0.8,
-        size: [0.5, 1.6],
-        color: C.grit,
-        alpha: 0.6,
-        drag: 1.2,
-        radius: 0.8,
-      });
-      this.particles.shockRing(dst.pos.x, dst.pos.z, C.control, 3.5, 0.45);
+      this.particles.puff(
+        fxAnchor(dst).x,
+        fxAnchor(dst).y + 0.6,
+        fxAnchor(dst).z,
+        Math.round(16 * this.density),
+        {
+          speed: 9,
+          up: 4,
+          life: 0.8,
+          size: [0.5, 1.6],
+          color: C.grit,
+          alpha: 0.6,
+          drag: 1.2,
+          radius: 0.8,
+        },
+      );
+      this.particles.shockRing(fxAnchor(dst).x, fxAnchor(dst).z, C.control, 3.5, 0.45);
     } else if (ev.ability === BREATH_CUES.swell && src) {
       // The storm swells: a ring rolling over the whole Cornice.
-      this.particles.shockRing(src.pos.x, src.pos.z, 0xbfefff, 46, 1.6);
-      this.particles.shockRing(src.pos.x, src.pos.z, 0x47b8ff, 30, 1.1);
-      this.sparksAt(src.pos.x, src.pos.y + 6, src.pos.z, 14);
+      this.particles.shockRing(fxAnchor(src).x, fxAnchor(src).z, 0xbfefff, 46, 1.6);
+      this.particles.shockRing(fxAnchor(src).x, fxAnchor(src).z, 0x47b8ff, 30, 1.1);
+      this.sparksAt(fxAnchor(src).x, fxAnchor(src).y + 6, fxAnchor(src).z, 14);
     } else if (ev.ability === BREATH_CUES.tear && src) {
       // The storm tears open (the body flies apart: breath_body.ts): the
       // floor takes the flash, a ring races to the rim.
-      this.particles.shockRing(src.pos.x, src.pos.z, 0xe6faff, 55, 1.4);
-      this.shakeNear(src.pos.x, src.pos.z, 0.6, 80);
+      this.particles.shockRing(fxAnchor(src).x, fxAnchor(src).z, 0xe6faff, 55, 1.4);
+      this.shakeNear(fxAnchor(src).x, fxAnchor(src).z, 0.6, 80);
     }
     return true;
   }

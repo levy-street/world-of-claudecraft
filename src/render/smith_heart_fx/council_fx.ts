@@ -1454,7 +1454,8 @@ export class CouncilFx {
     b.born = this.clock;
     b.sourceId = sourceId;
     b.targetId = targetId;
-    b.from.set(src.pos.x, this.groundY(src.pos.x, src.pos.z) + 4, src.pos.z);
+    const at = fxAnchor(src);
+    b.from.set(at.x, this.groundY(at.x, at.z) + 4, at.z);
     b.mesh.visible = true;
   }
 
@@ -1521,7 +1522,8 @@ export class CouncilFx {
     s.targetId = targetId;
     s.acc = 0;
     s.soul = soul;
-    s.from.set(src.pos.x, this.groundY(src.pos.x, src.pos.z) + 2.5, src.pos.z);
+    const at = fxAnchor(src);
+    s.from.set(at.x, this.groundY(at.x, at.z) + 2.5, at.z);
     // The beads take the stream's colour (one write per stream, not a frame).
     _beadColor.setHex(soul ? SOUL_COLORS[soul].hex : 0xffc070);
     const base = this.streams.indexOf(s) * BEADS;

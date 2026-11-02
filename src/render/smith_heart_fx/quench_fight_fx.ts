@@ -661,11 +661,13 @@ export class QuenchFightFx {
     }
     if (ev.type !== 'spellfx' || !quenchFightClaims(ev.ability)) return false;
     const dst = this.world.entities.get(ev.targetId);
-    if (ev.ability === QUENCH_CUES.plunge && dst) this.splash(dst.pos.x, dst.pos.z, 1.4);
-    else if (ev.ability === QUENCH_CUES.climb && dst) this.splash(dst.pos.x, dst.pos.z, 0.7);
+    if (ev.ability === QUENCH_CUES.plunge && dst)
+      this.splash(fxAnchor(dst).x, fxAnchor(dst).z, 1.4);
+    else if (ev.ability === QUENCH_CUES.climb && dst)
+      this.splash(fxAnchor(dst).x, fxAnchor(dst).z, 0.7);
     else if (ev.ability === QUENCH_CUES.freeze && dst) this.freezeBurst(dst);
     else if (ev.ability === QUENCH_CUES.rim && dst)
-      this.particles.shockRing(dst.pos.x, dst.pos.z, 0xe0f4ff, 40, 1.4);
+      this.particles.shockRing(fxAnchor(dst).x, fxAnchor(dst).z, 0xe0f4ff, 40, 1.4);
     else if (ev.ability === QUENCH_CUES.thaw && dst) this.thaw(dst);
     // The blades' waking is drawn by the blades and the body.
     return true;
@@ -1226,8 +1228,9 @@ export class QuenchFightFx {
   // ---- the moments ----------------------------------------------------------------------
 
   private freezeBurst(e: Entity): void {
-    const y = this.groundY(e.pos.x, e.pos.z);
-    this.particles.puff(e.pos.x, y + 1.2, e.pos.z, 14, {
+    const eAt = fxAnchor(e);
+    const y = this.groundY(eAt.x, eAt.z);
+    this.particles.puff(eAt.x, y + 1.2, eAt.z, 14, {
       speed: 2.5,
       life: 0.6,
       size: [0.28, 0.08],
@@ -1236,7 +1239,7 @@ export class QuenchFightFx {
       pool: 'glow',
       radius: 0.8,
     });
-    this.particles.puff(e.pos.x, y + 0.8, e.pos.z, 6, {
+    this.particles.puff(eAt.x, y + 0.8, eAt.z, 6, {
       speed: 1,
       up: 0.5,
       life: 1.4,
@@ -1338,9 +1341,10 @@ export class QuenchFightFx {
 
   /** The guardian fell: the lake refreezes whole, a wave of frost over it. */
   private thaw(e: Entity): void {
-    this.particles.shockRing(e.pos.x, e.pos.z, 0xe8f9ff, 34, 2.2);
-    this.particles.shockRing(e.pos.x, e.pos.z, 0x9ad8ff, 24, 1.6);
-    this.shakeNear(e.pos.x, e.pos.z, 0.4, 60);
+    const eAt = fxAnchor(e);
+    this.particles.shockRing(eAt.x, eAt.z, 0xe8f9ff, 34, 2.2);
+    this.particles.shockRing(eAt.x, eAt.z, 0x9ad8ff, 24, 1.6);
+    this.shakeNear(eAt.x, eAt.z, 0.4, 60);
   }
 
   dispose(): void {

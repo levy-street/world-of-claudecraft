@@ -500,12 +500,12 @@ export class FinalKitFx {
       const source = this.world.entities.get(ev.sourceId);
       if (ev.ability === FINAL_CUES.bolt || ev.ability === FINAL_CUES.arc) {
         this.addArc(ev.sourceId, ev.targetId);
-        if (target) this.sparkAt(target.pos.x, target.pos.z, C.storm, 10, 1.6);
+        if (target) this.sparkAt(fxAnchor(target).x, fxAnchor(target).z, C.storm, 10, 1.6);
         return true;
       }
       if (!target) return true;
-      const x = target.pos.x;
-      const z = target.pos.z;
+      const x = fxAnchor(target).x;
+      const z = fxAnchor(target).z;
       if (ev.ability === FINAL_CUES.whirl) this.sparkAt(x, z, C.fire, 14, 1.4);
       else if (ev.ability === FINAL_CUES.freeze) {
         this.sparkAt(x, z, C.frost, 22, 1.6);

@@ -615,8 +615,8 @@ export class BreathHeartFx {
       const p = world.entities.get(ev.targetId);
       if (p) {
         const tint = ev.ability === BREATH_CUES.portalHop ? TINT.b : TINT.d;
-        this.puff(p.pos.x, p.pos.y + 1, p.pos.z, 30, 8, tint, 1.5);
-        h.shakeNear(p.pos.x, p.pos.z, 0.2, 18);
+        this.puff(fxAnchor(p).x, fxAnchor(p).y + 1, fxAnchor(p).z, 30, 8, tint, 1.5);
+        h.shakeNear(fxAnchor(p).x, fxAnchor(p).z, 0.2, 18);
       }
       return true;
     }

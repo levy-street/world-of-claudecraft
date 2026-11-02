@@ -541,8 +541,8 @@ export class FinalPhaseFx {
       return true;
     }
     if (!target) return true;
-    const x = target.pos.x;
-    const z = target.pos.z;
+    const x = fxAnchor(target).x;
+    const z = fxAnchor(target).z;
     const vein = finalAddVein(target.templateId);
     switch (ev.ability) {
       case Q.shield:

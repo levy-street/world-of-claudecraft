@@ -677,21 +677,25 @@ export class HeatFightFx implements HeatFxHost {
         break;
       case HEAT_CUES.bolt:
         if (dst) {
-          this.particles.puff(dst.pos.x, dst.pos.y + 9, dst.pos.z, 8, BOLT);
-          this.particles.puff(dst.pos.x, dst.pos.y + 0.5, dst.pos.z, 10, SPARK);
+          this.particles.puff(fxAnchor(dst).x, fxAnchor(dst).y + 9, fxAnchor(dst).z, 8, BOLT);
+          this.particles.puff(fxAnchor(dst).x, fxAnchor(dst).y + 0.5, fxAnchor(dst).z, 10, SPARK);
         }
         break;
       case HEAT_CUES.kindling:
-        if (dst) this.particles.puff(dst.pos.x, dst.pos.y + 1.2, dst.pos.z, 12, SPARK);
+        if (dst)
+          this.particles.puff(fxAnchor(dst).x, fxAnchor(dst).y + 1.2, fxAnchor(dst).z, 12, SPARK);
         break;
       case HEAT_CUES.cinderKnock:
         if (dst) {
-          this.particles.puff(dst.pos.x, dst.pos.y + 2, dst.pos.z, 20, { ...SPARK, speed: 10 });
-          this.particles.shockRing(dst.pos.x, dst.pos.z, C.ring, 5, 0.5);
+          this.particles.puff(fxAnchor(dst).x, fxAnchor(dst).y + 2, fxAnchor(dst).z, 20, {
+            ...SPARK,
+            speed: 10,
+          });
+          this.particles.shockRing(fxAnchor(dst).x, fxAnchor(dst).z, C.ring, 5, 0.5);
         }
         break;
       case HEAT_CUES.settle:
-        if (src) this.particles.shockRing(src.pos.x, src.pos.z, C.ringGold, 30, 1.6);
+        if (src) this.particles.shockRing(fxAnchor(src).x, fxAnchor(src).z, C.ringGold, 30, 1.6);
         break;
       default:
         break;
@@ -760,7 +764,8 @@ export class HeatFightFx implements HeatFxHost {
     slot.to = to;
     slot.at = this.clock;
     const dst = this.world?.entities.get(to);
-    if (dst) this.particles.puff(dst.pos.x, dst.pos.y + 1.2, dst.pos.z, 12, SPARK);
+    if (dst)
+      this.particles.puff(fxAnchor(dst).x, fxAnchor(dst).y + 1.2, fxAnchor(dst).z, 12, SPARK);
   }
 
   // ---- the frame ------------------------------------------------------------------------
