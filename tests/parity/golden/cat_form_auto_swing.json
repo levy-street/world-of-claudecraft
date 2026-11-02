@@ -238,7 +238,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 1015,
-      "state": "019f4d9f",
+      "state": "9f96de1e",
       "events": "f3b27348",
       "rng": {
         "draws": 527,
@@ -249,7 +249,7 @@
       "tick": 105,
       "time": 5.25,
       "nextId": 1015,
-      "state": "067b7c46",
+      "state": "ee144a21",
       "events": "741638a5",
       "rng": {
         "draws": 587,
@@ -260,7 +260,7 @@
       "tick": 110,
       "time": 5.5,
       "nextId": 1015,
-      "state": "ba7308bb",
+      "state": "affeba5c",
       "events": "741638a5",
       "rng": {
         "draws": 640,
@@ -271,7 +271,7 @@
       "tick": 115,
       "time": 5.75,
       "nextId": 1015,
-      "state": "1882fb03",
+      "state": "36a98e14",
       "events": "741ce20f",
       "rng": {
         "draws": 698,
@@ -282,7 +282,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 1015,
-      "state": "d00bf2ec",
+      "state": "99484a49",
       "events": "741638a5",
       "rng": {
         "draws": 756,
@@ -293,7 +293,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 1015,
-      "state": "67b5eded",
+      "state": "0ab947de",
       "events": "741638a5",
       "rng": {
         "draws": 823,
@@ -304,7 +304,7 @@
       "tick": 130,
       "time": 6.5,
       "nextId": 1015,
-      "state": "62a4557b",
+      "state": "4e09df04",
       "events": "048b747f",
       "rng": {
         "draws": 869,
@@ -315,7 +315,7 @@
       "tick": 135,
       "time": 6.75,
       "nextId": 1015,
-      "state": "cadfadc5",
+      "state": "6e7753a8",
       "events": "741ce20f",
       "rng": {
         "draws": 925,
@@ -326,7 +326,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 1015,
-      "state": "cec1332c",
+      "state": "b0d310f7",
       "events": "741638a5",
       "rng": {
         "draws": 988,
@@ -337,7 +337,7 @@
       "tick": 145,
       "time": 7.25,
       "nextId": 1015,
-      "state": "f7270e36",
+      "state": "fc6535d7",
       "events": "741638a5",
       "rng": {
         "draws": 1053,
@@ -348,7 +348,7 @@
       "tick": 150,
       "time": 7.5,
       "nextId": 1015,
-      "state": "7127c763",
+      "state": "106cee8e",
       "events": "741638a5",
       "rng": {
         "draws": 1100,
@@ -359,7 +359,7 @@
       "tick": 155,
       "time": 7.75,
       "nextId": 1015,
-      "state": "c6962f63",
+      "state": "321734b2",
       "events": "741ce20f",
       "rng": {
         "draws": 1163,
@@ -370,7 +370,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 1015,
-      "state": "bfc0176a",
+      "state": "d9e176d9",
       "events": "048b747f",
       "rng": {
         "draws": 1232,
@@ -381,7 +381,7 @@
       "tick": 165,
       "time": 8.25,
       "nextId": 1015,
-      "state": "d7788fa7",
+      "state": "3025a29e",
       "events": "741638a5",
       "rng": {
         "draws": 1288,
@@ -392,7 +392,7 @@
       "tick": 170,
       "time": 8.5,
       "nextId": 1015,
-      "state": "7a92a890",
+      "state": "08613351",
       "events": "741638a5",
       "rng": {
         "draws": 1360,
@@ -403,7 +403,7 @@
       "tick": 170,
       "time": 8.5,
       "nextId": 1015,
-      "state": "7a92a890",
+      "state": "08613351",
       "events": "741638a5",
       "rng": {
         "draws": 1360,
@@ -750,7 +750,8 @@
               "name": "Nature's Boon",
               "remaining": 6.35,
               "school": "nature",
-              "sourceId": 1012
+              "sourceId": 1012,
+              "value": 1.25
             }
           ],
           "autoAttack": true,
@@ -918,7 +919,7 @@
       "tick": 175,
       "time": 8.75,
       "nextId": 1015,
-      "state": "c8a38594",
+      "state": "f07deb7d",
       "events": "741638a5",
       "rng": {
         "draws": 1420,
@@ -929,7 +930,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 1015,
-      "state": "9fb519cf",
+      "state": "3d95f754",
       "events": "741638a5",
       "rng": {
         "draws": 1493,
@@ -940,7 +941,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 1015,
-      "state": "9fb519cf",
+      "state": "3d95f754",
       "events": "741638a5",
       "rng": {
         "draws": 1493,
@@ -1285,7 +1286,8 @@
               "name": "Nature's Boon",
               "remaining": 5.85,
               "school": "nature",
-              "sourceId": 1012
+              "sourceId": 1012,
+              "value": 1.25
             }
           ],
           "combatTimer": 1.25,
