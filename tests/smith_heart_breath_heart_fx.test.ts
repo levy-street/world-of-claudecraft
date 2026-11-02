@@ -5,18 +5,26 @@
 import { describe, expect, it } from 'vitest';
 import {
   burstLook,
+  HEART_COLORS,
   HEART_FLOOR,
+  HEART_POOLS,
+  HEART_SIDES,
   heartObjectKind,
   heartRungs,
   knotLook,
+  LINK_Y,
   liveFuse,
   markFill,
+  markSideOf,
   portalLink,
+  portalSideLook,
+  portalSideOfKind,
   THROW_ARC,
   throwHeading,
   throwOffset,
 } from '../src/render/smith_heart_fx/breath_heart_fx_core';
 import {
+  BREATH_AURAS,
   BREATH_OBJECTS,
   knotTemplate,
   BREATH_TUNING as T,
@@ -27,6 +35,8 @@ describe('Knotted Gale: the look', () => {
     expect(heartObjectKind(knotTemplate('held', 3))).toBe('knot');
     expect(heartObjectKind(BREATH_OBJECTS.portalA)).toBe('portalA');
     expect(heartObjectKind(BREATH_OBJECTS.portalB)).toBe('portalB');
+    expect(heartObjectKind(BREATH_OBJECTS.portalC)).toBe('portalC');
+    expect(heartObjectKind(BREATH_OBJECTS.portalD)).toBe('portalD');
     expect(heartObjectKind(BREATH_OBJECTS.vortex)).toBeNull();
   });
 
@@ -78,5 +88,41 @@ describe('Knotted Gale: the look', () => {
     const b = burstLook(1);
     expect(b?.radius ?? 0).toBeGreaterThan(a?.radius ?? 0);
     expect(burstLook(5)).toBeNull();
+  });
+
+  it('the second pair reads apart from the first: colour, pattern, link and letter', () => {
+    const looks = HEART_SIDES.map((side) => portalSideLook(side));
+    // Four colours, none shared.
+    expect(new Set(looks.map((l) => l.color)).size).toBe(4);
+    expect(looks.map((l) => l.color)).toEqual([
+      HEART_COLORS.a,
+      HEART_COLORS.b,
+      HEART_COLORS.c,
+      HEART_COLORS.d,
+    ]);
+    // Neither second-pair colour is the load's gold or the fuse's red.
+    for (const c of [HEART_COLORS.c, HEART_COLORS.d]) {
+      expect(c).not.toBe(HEART_COLORS.load);
+      expect(c).not.toBe(HEART_COLORS.danger);
+    }
+    // Each pair one pattern: the second turns the other way, three arms, doubled rim.
+    expect(looks.map((l) => l.pair)).toEqual([0, 0, 1, 1]);
+    expect(looks.map((l) => l.slot)).toEqual([0, 1, 2, 3]);
+    for (const l of looks) {
+      expect(l.spin).toBe(l.pair === 0 ? 1 : -1);
+      expect(l.arms).toBe(l.pair === 0 ? 4 : 3);
+      expect(l.ring2).toBe(l.pair);
+    }
+    // The pools hold both pairs and both links; the braid rides above the beam.
+    expect(HEART_POOLS.portals).toBe(4);
+    expect(HEART_POOLS.links).toBe(2);
+    expect(HEART_POOLS.marks).toBeGreaterThanOrEqual(4);
+    expect(LINK_Y[1]).toBeGreaterThan(LINK_Y[0]);
+    // The objects and the marks name their side.
+    expect(portalSideOfKind('portalC')).toBe('C');
+    expect(portalSideOfKind('knot')).toBeNull();
+    expect(markSideOf(BREATH_AURAS.portalA)).toBe('A');
+    expect(markSideOf(BREATH_AURAS.portalD)).toBe('D');
+    expect(markSideOf(BREATH_AURAS.laden)).toBeNull();
   });
 });
