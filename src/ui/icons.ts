@@ -5810,6 +5810,7 @@ export const ITEM_IMAGE_IDS = new Set<string>([
   'reins_lanternback_troll',
   'reins_wobbles_slime',
   'reins_nightwing_chimera',
+  'reins_ossuary_charger',
   // trinkets (src/sim/content/trinkets.ts; opaque woc-item-icon-v1 paintings from the
   // trinket-slot-icons-2026-09-23 batch in mapping.json)
   'bastion_sigil',

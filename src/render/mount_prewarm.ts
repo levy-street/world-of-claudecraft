@@ -14,6 +14,7 @@ import { DEFAULT_MOUNT, type MountKey } from '../sim/content/mounts';
 import { type CharacterVisual, createMountVisual } from './characters';
 import { mountAssetsReady, preloadMountAssets } from './characters/assets';
 import { MOUNT_SKIN_VISUAL_SPECS, MOUNT_VISUAL_SPECS, type MountVisualSpec } from './mount_visuals';
+import { attachOssuaryFlames } from './ossuary_flames';
 import { setRenderCategory } from './renderer_diagnostics';
 import {
   attachRickshawPuller,
@@ -102,6 +103,8 @@ function createReadyMountPrewarmVisual(key: MountPrewarmKey): CharacterVisual | 
   if (!mountAssetsReady(visualKey) || (isRickshawMount(visualKey) && !rickshawPullerAssetsReady()))
     return null;
   const visual = createMountVisual(visualKey);
+  // Warm the live flame programs with the rig that draws them.
+  attachOssuaryFlames(visual.root, () => true);
   if (isRickshawMount(visualKey)) {
     const puller = createRickshawPullerVisual();
     puller.root.name = 'prewarm-mount:rickshaw-puller';

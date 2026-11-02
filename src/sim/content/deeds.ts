@@ -2872,8 +2872,9 @@ export const DEEDS: Record<string, DeedDef> = {
   // feat: true, uniquely off the feat_ prefix (pinned with rationale in
   // tests/deeds_content.test.ts): the capstone is a dynamic meta over a
   // growing catalog, the feat_book_complete class, and the flag is what
-  // keeps it OUT of BOOK_COMPLETE_REQUIREMENTS. Two catalog slots are
-  // owner-pended today (reins_lanternback_troll, reins_wobbles_slime;
+  // keeps it OUT of BOOK_COMPLETE_REQUIREMENTS. Three catalog slots are
+  // owner-pended today (reins_lanternback_troll, reins_wobbles_slime,
+  // reins_ossuary_charger;
   // reins_terrorspark_groundshaker left when the annual membership bundle
   // began granting it;
   // masterwork:engineering was the third until masterwrought Phase 11o's

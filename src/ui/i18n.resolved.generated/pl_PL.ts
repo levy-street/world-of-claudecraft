@@ -2603,6 +2603,7 @@ export const pl_PL: EnTranslations = {
       "name_emberbristle_broom": "Miotła żarzącej szczeciny",
       "name_wobbles_slime": "Chwiejka, Śluz",
       "name_nightwing_chimera": "Chimera Nocnego Skrzydła",
+      "name_ossuary_charger": "Wraith the Deadstrier",
       "desc_valorsteed": "Wytrzymały, pewnie stąpający rumak ze skórzanym siodłem.",
       "desc_grag_bear": "Wytrzymały, pewnie stąpający niedźwiedź z ciężkim siodłem.",
       "desc_stalkglider_snail": "Krzepki, niespieszny ślimak z omszałą muszlą.",
@@ -2625,7 +2626,8 @@ export const pl_PL: EnTranslations = {
       "desc_nightwing_chimera": "Dwugłowa wiwerna zmierzchu z pradawnych konarów, odpoczywająca na szponiastych tylnych nogach i sunąca nad ziemią na skrzydłach pokrytych tajemnymi rytami.",
       "desc_chimeglass_tortoise": "Żółw solny, który wyprzedził trzy pokolenia przyczep kempingowych. Druciarze zmielili mu okulary ze szkła burzowego i zawiesili mu na szyi dzwonek z brązu, tak że droga usłyszy go na długo, zanim go zobaczy.",
       "desc_rickshaw_mount": "Grzechoczący wózek z kości, z kościstym pachołkiem zaprzężonym do dyszli, ciągnącym cię w pełnym pędzie.",
-      "desc_emberbristle_broom": "Dożynkowa miotła przewiązana pomarańczową wstążką unosi się na dłoń nad ziemią, gubiąc żar ze szczeciny. Stała nagroda z Wigilii Dyniowych Świateł."
+      "desc_emberbristle_broom": "Dożynkowa miotła przewiązana pomarańczową wstążką unosi się na dłoń nad ziemią, gubiąc żar ze szczeciny. Stała nagroda z Wigilii Dyniowych Świateł.",
+      "desc_ossuary_charger": "A war horse long since picked to the bone, its mane, tail and fetlocks burning with a ghostly green fire and a rotted saddle still strapped to its spine."
     },
     "mountTraining": {
       "mountPrompt": "Naciśnij {key}, aby dosiąść treningowego Rumaka Męstwa.",
@@ -20788,6 +20790,9 @@ export const pl_PL: EnTranslations = {
       },
       "reins_avian_strider": {
         "name": "Wodze Zielonego Szybkobiegacza Ptaka"
+      },
+      "reins_ossuary_charger": {
+        "name": "Reins of Wraith the Deadstrier"
       },
       "reins_nightwing_chimera": {
         "name": "Wodze Chimery Nocnego Skrzydła"

@@ -443,6 +443,9 @@ const FLOOR_VFX_OUT_OF_SCOPE: readonly string[] = [
   'src/render/ice_block_visual.ts',
   'src/render/mage_barrier_visual.ts',
   'src/render/necromancy_army_portal_fx.ts',
+  // Wraith the Deadstrier's flames: opaque shells and their wisps, carried on
+  // the mount's body, never on the floor
+  'src/render/ossuary_flames.ts',
   'src/render/paladin_oath_chain_visual.ts',
   'src/render/weapon_vfx.ts',
   // Ignivar dressing that is not a floor mechanic

@@ -2603,6 +2603,7 @@ export const id_ID: EnTranslations = {
       "name_emberbristle_broom": "Sapu Bulu Bara",
       "name_wobbles_slime": "Wobbles sang Slime",
       "name_nightwing_chimera": "Kimera Nightwing",
+      "name_ossuary_charger": "Wraith the Deadstrier",
       "desc_valorsteed": "Kuda tangguh dengan pijakan mantap dan pelana kulit.",
       "desc_grag_bear": "Beruang tangguh dengan pijakan mantap dan pelana berat.",
       "desc_stalkglider_snail": "Siput kuat dengan tenaga tahan lama dan cangkang berlumut.",
@@ -2625,7 +2626,8 @@ export const id_ID: EnTranslations = {
       "desc_nightwing_chimera": "Wyvern senja berkepala dua dari dahan purba, bertengger pada kaki belakang bercakar saat istirahat dan melayang dekat tanah dengan sayap berukir arkana.",
       "desc_chimeglass_tortoise": "Kura-kura dataran garam yang telah melampaui tiga generasi karavan. Tinker memberinya kacamata dari kaca badai dan menggantungkan lonceng perunggu di tenggorokannya, sehingga jalan mendengarnya jauh sebelum jalan melihatnya.",
       "desc_rickshaw_mount": "Gerobak tulang yang berderak, dengan serdadu kurus bertulang diikat pada porosnya, menarikmu melaju kencang.",
-      "desc_emberbristle_broom": "Sapu panen berikat pita jingga yang melayang setelapak tangan di atas tanah, menebarkan bara dari bulunya. Hadiah permanen dari Malam Cahaya Labu."
+      "desc_emberbristle_broom": "Sapu panen berikat pita jingga yang melayang setelapak tangan di atas tanah, menebarkan bara dari bulunya. Hadiah permanen dari Malam Cahaya Labu.",
+      "desc_ossuary_charger": "A war horse long since picked to the bone, its mane, tail and fetlocks burning with a ghostly green fire and a rotted saddle still strapped to its spine."
     },
     "mountTraining": {
       "mountPrompt": "Tekan {key} untuk menaiki Valorsteed latihan.",
@@ -20788,6 +20790,9 @@ export const id_ID: EnTranslations = {
       },
       "reins_avian_strider": {
         "name": "Tali Kekang Pejalan Lembah Zamrud"
+      },
+      "reins_ossuary_charger": {
+        "name": "Reins of Wraith the Deadstrier"
       },
       "reins_nightwing_chimera": {
         "name": "Kekang Khimaira Sayap Malam"

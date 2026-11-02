@@ -2603,6 +2603,7 @@ export const cs_CZ: EnTranslations = {
       "name_emberbristle_broom": "Koště žhavých štětin",
       "name_wobbles_slime": "Sliz Vikláček",
       "name_nightwing_chimera": "Chiméra Noční křídlo",
+      "name_ossuary_charger": "Wraith the Deadstrier",
       "desc_valorsteed": "Odolný oř s jistým krokem a koženým sedlem.",
       "desc_grag_bear": "Odolný medvěd s jistým krokem a těžkým sedlem.",
       "desc_stalkglider_snail": "Statný, rozvážný hlemýžď s mechem porostlou ulitou.",
@@ -2625,7 +2626,8 @@ export const cs_CZ: EnTranslations = {
       "desc_nightwing_chimera": "Dvouhlavá soumračná wyverna z prastarých korun. Při odpočinku sedí na zadních nohou s drápy a nad zemí klouže na křídlech s vyrytými tajemnými znaky.",
       "desc_chimeglass_tortoise": "Solná želva, která překonala tři generace karavanů. Tinkers mu vybrousil brýle z bouřkového skla a pověsil mu na hrdlo bronzový zvon, takže ho cesta slyší dlouho předtím, než ho uvidí.",
       "desc_rickshaw_mount": "Chrastící kostěný vozík s kostnatým pěšákem zapřaženým do ojí, který tě veze tryskem.",
-      "desc_emberbristle_broom": "Dožínkové koště svázané oranžovou stuhou se vznáší na dlaň nad zemí a z jeho štětin padají uhlíky. Trvalá odměna ze Svátku dýňových světel."
+      "desc_emberbristle_broom": "Dožínkové koště svázané oranžovou stuhou se vznáší na dlaň nad zemí a z jeho štětin padají uhlíky. Trvalá odměna ze Svátku dýňových světel.",
+      "desc_ossuary_charger": "A war horse long since picked to the bone, its mane, tail and fetlocks burning with a ghostly green fire and a rotted saddle still strapped to its spine."
     },
     "mountTraining": {
       "mountPrompt": "Stiskni {key} pro nasednutí na cvičného Udatného oře.",
@@ -20788,6 +20790,9 @@ export const cs_CZ: EnTranslations = {
       },
       "reins_avian_strider": {
         "name": "Otěže Smaragdového údolochodce"
+      },
+      "reins_ossuary_charger": {
+        "name": "Reins of Wraith the Deadstrier"
       },
       "reins_nightwing_chimera": {
         "name": "Otěže Chiméry nočního křídla"

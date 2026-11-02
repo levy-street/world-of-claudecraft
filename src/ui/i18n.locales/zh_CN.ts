@@ -15449,6 +15449,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_nightwing_chimera': '夜翼奇美拉',
   'hudChrome.mounts.desc_nightwing_chimera':
     '来自古木枝头的双头暮光飞龙，驻足时以利爪后肢伫立，行进时展动奥术铭纹双翼掠地翱翔。',
+  'hudChrome.mounts.name_ossuary_charger': '亡驹幽魂',
+  'hudChrome.mounts.desc_ossuary_charger':
+    '一匹早已只剩白骨的战马。鬃毛、尾巴和蹄踝燃烧着幽灵般的绿色火焰，腐朽的马鞍仍绑在它的脊骨上。',
   'hudChrome.mounts.name_lanternback_troll': '提灯背者格伦博',
   'hudChrome.mounts.name_lantern_hall_destrier': '灯火大厅战马',
   'hudChrome.mounts.name_chimeglass_tortoise': '钟晶的托利弗',
@@ -16424,6 +16427,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_terrorspark_groundshaker.name': '骇雷撼地者点火钥匙',
   'entities.items.reins_avian_strider.name': '苍翠谷行者的缰绳',
   'entities.items.reins_nightwing_chimera.name': '夜翼奇美拉的缰绳',
+  'entities.items.reins_ossuary_charger.name': '亡驹幽魂的缰绳',
   'entities.items.reins_lanternback_troll.name': '点灯人之轭：格伦博',
   'entities.items.reins_chimeglass_tortoise.name': '守道人的铃带：托利弗',
   'entities.items.reins_rickshaw_mount.name': '白骨人力车缚绳',

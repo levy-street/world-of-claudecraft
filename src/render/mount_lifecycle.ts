@@ -21,6 +21,7 @@ import { GoblinRocketSledFx } from './goblin_rocket_sled_fx';
 import { attachMountGlows, disposeMountGlows, type MountGlows } from './mount_glow';
 import { attachMountLamps, disposeMountLamps, type MountLamps } from './mount_lamps';
 import type { MountVisualSpec } from './mount_visuals';
+import { attachOssuaryFlames } from './ossuary_flames';
 import {
   attachPullerIfRickshaw,
   preloadPullerIfRickshaw,
@@ -150,6 +151,8 @@ export function syncMountVisual(
   v.mountLamps = attachMountLamps(v.mountVisual.root, spec);
   if (v.mountLamps) host.reconcileViewLights(v);
   v.mountGlows = attachMountGlows(v.mountVisual.root, spec);
+  // Wraith the Deadstrier's live pyre flames (no-op for every other mount).
+  attachOssuaryFlames(v.mountVisual.root, prefersReducedMotion);
   // Built before the gate lists the rig's pieces, so the shared plume program
   // links behind it at the first sighting instead of in the first moving frame.
   if (spec.visualKey === 'mount_goblin_rocket_sled') {
@@ -158,10 +161,17 @@ export function syncMountVisual(
   gateMountSwapOnCompile(v, v.mountVisual.root, host.gateSwapFlagOnCompile);
 }
 
+function prefersReducedMotion(): boolean {
+  return typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
 const seatMatrix = /* @__PURE__ */ new THREE.Matrix4();
 const seatOffset = /* @__PURE__ */ new THREE.Matrix4();
 const groupInverse = /* @__PURE__ */ new THREE.Matrix4();
 const seatScale = /* @__PURE__ */ new THREE.Vector3();
+const seatPos = /* @__PURE__ */ new THREE.Vector3();
+const seatRot = /* @__PURE__ */ new THREE.Quaternion();
+const seatUnit = /* @__PURE__ */ new THREE.Vector3(1, 1, 1);
 
 /**
  * Sit the rider ON the mount's seat bone for this frame.
@@ -201,7 +211,10 @@ export function seatRiderOnBone(
   }
   bone.updateWorldMatrix(true, false);
   group.updateWorldMatrix(true, false);
-  seatOffset.makeTranslation(seat.offset[0], seat.offset[1], seat.offset[2]);
+  seatPos.set(seat.offset[0], seat.offset[1], seat.offset[2]);
+  if (seat.rot) seatRot.set(seat.rot[0], seat.rot[1], seat.rot[2], seat.rot[3]);
+  else seatRot.identity();
+  seatOffset.compose(seatPos, seatRot, seatUnit);
   seatMatrix.multiplyMatrices(bone.matrixWorld, seatOffset);
   groupInverse.copy(group.matrixWorld).invert();
   seatMatrix.premultiply(groupInverse);

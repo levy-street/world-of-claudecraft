@@ -2048,10 +2048,12 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // skull 42 + Titan 26 + PvP titles 138 + Hard maze 34 + skull bag 62
     // + vault retune 119 + quiver 66 + quest shields 68. No storage limit changes.
     // Advanced riding adds the sparse ridingTier scalar (+15, PR 4390).
-    expect(baselineBytes).toBe(261480);
+    // 261,504 with Wraith the Deadstrier's reins (`"reins_ossuary_charger",`, +24).
+    expect(baselineBytes).toBe(261504);
     expect(bytes - baselineBytes).toBe(8284);
     // 266,699 -> 266,721 with Wobbles the Slime's reins (+22, kept).
-    expect(bytes).toBe(269764);
+    // 269,788 with Wraith the Deadstrier's reins (+24).
+    expect(bytes).toBe(269788);
     // Keep the warning threshold unchanged: saves above it remain whole.
     expect(bytes).toBeGreaterThan(CHARACTER_BLOB_WARN_BYTES);
     process.stdout.write(
@@ -2441,7 +2443,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // (`"membership_staff",`, +19, PR 4281), isolated with membership below.
     // 249,984 -> 250,006 with Wobbles the Slime's reins (+22, kept).
     // Advanced riding adds the sparse ridingTier scalar (+15, PR 4390).
-    expect(beforeReferralBytes).toBe(250915);
+    // 250,939 with Wraith the Deadstrier's reins (`"reins_ossuary_charger",`, +24).
+    expect(beforeReferralBytes).toBe(250939);
     expect(bytes - gourdlightEveBytes - stampCardBytes - beforeReferralBytes).toBe(122);
     expect(
       fieldBytes(beforeStampCards, 'deedStats') - fieldBytes(withoutReferral, 'deedStats'),
@@ -2467,7 +2470,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     expect(membershipIds.size).toBe(9);
     const beforeMembershipBytes = Buffer.byteLength(JSON.stringify(withoutMembership), 'utf8');
     // 249,810 -> 249,832 with Wobbles the Slime's reins (+22, kept).
-    expect(beforeMembershipBytes).toBe(250741);
+    // 250,765 with Wraith the Deadstrier's reins (+24).
+    expect(beforeMembershipBytes).toBe(250765);
     expect(beforeReferralBytes - beforeMembershipBytes).toBe(174);
     expect(
       fieldBytes(withoutReferral, 'deedStats') - fieldBytes(withoutMembership, 'deedStats'),
@@ -2697,6 +2701,7 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       'reins_avian_strider',
       'reins_nightwing_chimera',
       'reins_wobbles_slime',
+      'reins_ossuary_charger',
     ] as const;
     function withoutDevMountReleaseContent(state: CharacterState): CharacterState {
       const copy = JSON.parse(JSON.stringify(state)) as CharacterState;
@@ -2710,10 +2715,11 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     const devMountReleaseDelta =
       fieldBytes(withoutFieldKit, 'deedStats') - fieldBytes(withoutDevMountRelease, 'deedStats');
     // 97 -> 119 with Wobbles the Slime's reins (`"reins_wobbles_slime",`, 22 bytes).
-    expect(devMountReleaseDelta).toBe(119);
+    // 119 -> 143 with Wraith the Deadstrier's reins (`"reins_ossuary_charger",`, 24 bytes).
+    expect(devMountReleaseDelta).toBe(143);
     expect(
       counterfactualBytes - Buffer.byteLength(JSON.stringify(withoutDevMountRelease), 'utf8'),
-    ).toBe(119);
+    ).toBe(143);
     // The Mirefen world boss (Balgath, the One-Eyed Foreman) and its quest
     // chain: the one content mover on this branch. Attributed exactly the way
     // withoutFieldKit, withoutBramblehideContent and withoutDevMountRelease
@@ -2876,8 +2882,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         1548 +
         50 +
         // 49 -> 71 with the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge) in the dev-mount isolation; 97 with reins_nightwing_chimera (+26); 119 with
-        // reins_wobbles_slime (+22).
-        119 +
+        // reins_wobbles_slime (+22); 143 with reins_ossuary_charger (+24).
+        143 +
         375 +
         358 +
         // Plus 17 at the weekly emissary rebase: the Emissary's Cache id in the
@@ -3147,7 +3153,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // The Staff of Changing's discovery id adds 19 (249,946, PR 4281); reins_nightwing_chimera adds 26 (249,972).
       // reins_wobbles_slime adds 22 (249,994).
       // Advanced riding contributes the same 15 bytes here.
-    ).toBe(250903);
+      // reins_ossuary_charger adds 24 (250,927).
+    ).toBe(250927);
     const priorContent = withoutCrucibleContent(withoutReferral);
     const contentDelta = Object.fromEntries(
       (['knownRecipes', 'deedStats', 'reliquary'] as const).map((key) => [
@@ -3296,8 +3303,11 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // Release composition: 250,982 bytes excluding referral cards; retain the 381-byte band.
     // RE-BASED for advanced riding: up exactly 15 for the sparse ridingTier
     // scalar (250,273). Same 381-byte band.
-    expect(bytes - gourdlightEveBytes - stampCardBytes, reMint).toBeGreaterThan(250657);
-    expect(bytes - gourdlightEveBytes - stampCardBytes, reMint).toBeLessThan(251038);
+    // RE-BASED for Wraith the Deadstrier (reins_ossuary_charger): 251,061 bytes, +24
+    // from its discovery id, isolated above in DEV_MOUNT_RELEASE_ITEM_IDS.
+    // Same 381-byte band: 250681..251062.
+    expect(bytes - gourdlightEveBytes - stampCardBytes, reMint).toBeGreaterThan(250681);
+    expect(bytes - gourdlightEveBytes - stampCardBytes, reMint).toBeLessThan(251062);
 
     // The Crucible database review approved 229,376 bytes (224 KiB), the first
     // 32-KiB step above the corrected 209,261-byte pre-field-kit fixture it was

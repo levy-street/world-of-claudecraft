@@ -912,6 +912,9 @@ const RENDER_PURE_CORES = [
   'src/render/mount_embers_core.ts',
   // the destrier's standing rear-up trigger and hop cancel (mount_presentation.ts)
   'src/render/mount_rear_core.ts',
+  // Wraith the Deadstrier's flame tail spring chain and its speed-to-length stretch
+  'src/render/ossuary_tail_chain_core.ts',
+  'src/render/ossuary_flame_stretch_core.ts',
   // the per-skin swing trail lookup (renderer.ts triggerAttack)
   'src/render/weapon_skin_trail_core.ts',
   // the ambient motes' fade around the local player (motes.ts)

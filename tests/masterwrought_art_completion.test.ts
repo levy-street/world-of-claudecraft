@@ -843,7 +843,8 @@ describe('Masterwrought art completion evidence', () => {
     // + the sprite buddy's whistle render: 2,184.
     // Restored feral staff and eight Season 2 jewelry paintings add nine owners.
     // Halloween adds 27 item-art owners outside the sealed historical set.
-    expect(currentOwnerIds).toHaveLength(2191);
+    // + Wraith the Deadstrier's reins owner: 2,192.
+    expect(currentOwnerIds).toHaveLength(2192);
     for (const id of datedIds) {
       expect(currentOwnerIds.includes(id), `${id} still has a current mapping owner`).toBe(true);
     }
@@ -1273,6 +1274,8 @@ describe('Masterwrought art completion evidence', () => {
         id !== 'reins_nightwing_chimera' &&
         // Wobbles the Slime's reins, additive the same way.
         id !== 'reins_wobbles_slime' &&
+        // Wraith the Deadstrier's reins, additive the same way.
+        id !== 'reins_ossuary_charger' &&
         // The World PvP trophy skull, additive the same way.
         id !== 'pvp_trophy_skull' &&
         id !== 'pvp_skull_bag' &&

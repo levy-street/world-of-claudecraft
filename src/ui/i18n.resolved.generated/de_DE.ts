@@ -2603,6 +2603,7 @@ export const de_DE: EnTranslations = {
       "name_emberbristle_broom": "Glutborstenbesen",
       "name_wobbles_slime": "Wackel der Schleim",
       "name_nightwing_chimera": "Nachtflügelchimäre",
+      "name_ossuary_charger": "Wraith the Deadstrier",
       "desc_valorsteed": "Ein zähes, trittsicheres Ross mit einem Ledersattel.",
       "desc_grag_bear": "Ein zäher, trittsicherer Bär mit einem schweren Sattel.",
       "desc_stalkglider_snail": "Eine robuste, gemächliche Schnecke mit moosigem Gehäuse.",
@@ -2625,7 +2626,8 @@ export const de_DE: EnTranslations = {
       "desc_nightwing_chimera": "Ein zweiköpfiger Dämmerungswyvern aus den uralten Ästen, der in Ruhe auf klauenbewehrten Hinterbeinen sitzt und auf arkan geätzten Flügeln über dem Boden gleitet.",
       "desc_chimeglass_tortoise": "Eine Salzschildkröte, die drei Generationen von Wohnwagen überholt hat. Kesselflicker haben ihm eine Brille aus Sturmglas geschliffen und ihm eine Bronzeglocke an den Hals gehängt, damit die Straße ihn hört, lange bevor sie ihn sieht.",
       "desc_rickshaw_mount": "Ein klappernder Knochenkarren, an dessen Deichseln ein knochiger Scherge angeschirrt ist und Euch im vollen Lauf zieht.",
-      "desc_emberbristle_broom": "Ein mit orangefarbenem Band gebundener Erntebesen, der eine Handbreit über dem Boden schwebt und Glut aus seinen Borsten streut. Eine dauerhafte Belohnung der Kürbislichtnacht."
+      "desc_emberbristle_broom": "Ein mit orangefarbenem Band gebundener Erntebesen, der eine Handbreit über dem Boden schwebt und Glut aus seinen Borsten streut. Eine dauerhafte Belohnung der Kürbislichtnacht.",
+      "desc_ossuary_charger": "A war horse long since picked to the bone, its mane, tail and fetlocks burning with a ghostly green fire and a rotted saddle still strapped to its spine."
     },
     "mountTraining": {
       "mountPrompt": "Drücke {key}, um das Übungs-Valorross zu besteigen.",
@@ -20788,6 +20790,9 @@ export const de_DE: EnTranslations = {
       },
       "reins_avian_strider": {
         "name": "Zügel des Viridischen Talschreiters"
+      },
+      "reins_ossuary_charger": {
+        "name": "Reins of Wraith the Deadstrier"
       },
       "reins_nightwing_chimera": {
         "name": "Zügel der Nachtflügelchimäre"

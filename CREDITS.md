@@ -531,6 +531,8 @@ If you are unsure whether you may use an asset, or you want permission for
 something this file marks as restricted, ask first: tony@levystreet.com.
 | Ley Beam Alignment celestial frame and crystal heart (`public/ui/minigames/ley-*-v1.webp`) | World of ClaudeCraft | Project art generated with OpenAI built-in image generation, optimized to WebP; [provenance and prompts](docs/screenshots/ley-beam-v1/art-provenance.md) | Project asset | With the project only |
 | Generated prop model (spore_burster) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D image-to-model from a project concept; cap spots baked into the texture locally) | Project asset | With the project only |
+| Wraith the Deadstrier mount model (`public/models/mounts/ossuary_charger.glb`) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI text-to-image concept, image-to-3D and quadruped auto-rig, owned under the Tripo paid-plan license); gait clips retargeted from the project's own valorsteed clips by `scripts/assets/ossuary_charger/retarget_valorsteed_gaits.mjs`; flame shells built procedurally by `scripts/assets/ossuary_charger/build_flames.mjs` | Project asset | With the project only |
+| Wraith the Deadstrier flame field (`src/render/ossuary_pyre_field.ts`: six frames of a torch simulation, summed to 32 x 64 side profiles) | the web-pyre authors | web-pyre fire simulation, exported and resampled for this game | MIT | Yes, attribution required |
 
 ### Orbital Lightning
 

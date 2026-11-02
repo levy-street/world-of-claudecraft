@@ -205,7 +205,8 @@ describe('profile page Reliquary pair + Curator rank lines', () => {
     // 532 with nightwing_chimera on Horizons mounts; 533 with wobbles_slime.
     // Halloween adds the broom and five title deeds
     // across the existing collection pages (six additional completion slots).
-    expect(catalogTotal).toBe(551);
+    // 552 with ossuary_charger on Horizons mounts.
+    expect(catalogTotal).toBe(552);
     // The Warfare Season 2 Vanguard Gallery is class-personal and sits outside
     // completion, so it moves nothing here.
   });

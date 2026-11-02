@@ -297,6 +297,7 @@ export const RELIQUARY_HORIZON_MOUNTS = [
   'wobbles_slime',
   'terrorspark_groundshaker',
   'nightwing_chimera',
+  'ossuary_charger',
   'referral_raptor',
   'referral_tank',
   // Gourdlight Eve's Emberbristle Broom: Hester's, for five of Old Thatchgrin's daily

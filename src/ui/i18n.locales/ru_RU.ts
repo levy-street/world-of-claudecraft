@@ -16504,6 +16504,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_nightwing_chimera': 'Ночнокрылая химера',
   'hudChrome.mounts.desc_nightwing_chimera':
     'Двуглавая сумеречная виверна с древних ветвей: в покое стоит на когтистых задних лапах, а в движении парит над землёй на крыльях с тайными рунами.',
+  'hudChrome.mounts.name_ossuary_charger': 'Призрак, Мёртвый скакун',
+  'hudChrome.mounts.desc_ossuary_charger':
+    'Боевой конь, давно обглоданный до костей: его грива, хвост и щётки над копытами горят призрачным зелёным огнём, а к хребту всё ещё привязано истлевшее седло.',
   'hudChrome.mounts.name_lanternback_troll': 'Грумбол Фонареносец',
   'hudChrome.mounts.name_lantern_hall_destrier': 'Боевой конь Зала Фонаря',
   'hudChrome.mounts.name_chimeglass_tortoise': 'Толливер Звонкостёкл',
@@ -17557,6 +17560,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_terrorspark_groundshaker.name': 'Ключ зажигания Ужасоискра',
   'entities.items.reins_avian_strider.name': 'Поводья изумрудного долинохода',
   'entities.items.reins_nightwing_chimera.name': 'Поводья ночнокрылой химеры',
+  'entities.items.reins_ossuary_charger.name': 'Поводья Призрака, Мёртвого скакуна',
   'entities.items.reins_lanternback_troll.name': 'Ярмо фонарщика: Грумбол',
   'entities.items.reins_chimeglass_tortoise.name': 'Колокольный ремень путеблюстителя: Толливер',
   'entities.items.reins_rickshaw_mount.name': 'Связанные поводья: Костяная рикша',

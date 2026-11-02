@@ -903,11 +903,13 @@ describe('item-art audit builder', () => {
       // + the sprite buddy's whistle render: 2186 / 2215, re-measured with --verify-only.
       // Release adds five painted owners; measured with --verify-only on the combined tree.
       // Restored feral staff and eight jewelry paintings; measured with --verify-only.
-      catalogSha256: '5ef9cee82541194673dc4768027c5f0b6f0667b11c63f251501db76473f75b58',
-      catalogBytes: 1196985,
+      // 2192 / 2221 with Wraith the Deadstrier's reins, re-measured with --verify-only
+      // (catalog +2 bytes for the longer reins name).
+      catalogSha256: 'd20d0bc5005b70f89397d5fe91ab1deb257e1273a62b614a166d505c87e35d21',
+      catalogBytes: 1197521,
       rendererFingerprint: '41f5404c4d6d9643c8f03b9d88a8546e44564cc03a1baabdd4a72cb9258a2da7',
-      catalogCount: 2191,
-      liveItemCount: 2220,
+      catalogCount: 2192,
+      liveItemCount: 2221,
       generatedHeroicDefinitions: 116,
       heroicDefinitionsWithOwnWebp: 86,
       heroicWeaponArtAliases: 30,
@@ -925,7 +927,7 @@ describe('item-art audit builder', () => {
         identity: 45,
       },
       sheetSetSha256: null,
-      shippingCatalogSha256: '1ce5db8bb37fa5ce649ebbe18dfc23033f71c30674578a65291856e750195d0b',
+      shippingCatalogSha256: 'c622dcb82429a4981536bdbd466f9d6cb8cead46b9fbf88a03640b063bc5e7d1',
       machineChecksPassed: true,
       verdict: null,
     });

@@ -14,8 +14,10 @@
 // bob (src/render/mount_visuals.ts) and are not touched here. The valorsteed
 // and thunderstrut_gobbler GLBs ship AUTHORED clips from their source models
 // (renamed to Idle/Walk/Run/Death at import), and the Drakemaw Raptor is rigged
-// and animated in Blender from scratch (scripts/assets/drakemaw_raptor/): none
-// of them may be baked over, so none has a RIGS entry.
+// and animated in Blender from scratch (scripts/assets/drakemaw_raptor/), and
+// Wraith the Deadstrier plays the valorsteed's authored clips retargeted onto its
+// rig (scripts/assets/ossuary_charger/retarget_valorsteed_gaits.mjs): none of
+// them may be baked over, so none has a RIGS entry.
 import { NodeIO } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import { MeshoptDecoder, MeshoptEncoder } from 'meshoptimizer';

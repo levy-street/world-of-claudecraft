@@ -3435,6 +3435,22 @@ export const VISUALS: Record<string, VisualDef> = {
     runRef: 13.4,
     lazyPreload: true,
   },
+  // Wraith the Deadstrier: a Tripo quadruped (asset pipeline creature lane) playing the
+  // valorsteed's authored gaits, retargeted onto its rig
+  // (scripts/assets/ossuary_charger/retarget_valorsteed_gaits.mjs). Its bones stand as tall
+  // as the valorsteed (3.8): the measured height includes the flames over its head (0.99
+  // model units posed at Idle, the bones alone 0.865), so the fit height is 3.8 * 0.99 / 0.865.
+  // Same clips, same cadence, so walkRef/runRef are the valorsteed's scaled by the leg
+  // length ratio (1.09: the retarget's leg scale, 0.545, at the two horses' normScales).
+  mount_ossuary_charger: {
+    url: `${MOUNTS_DIR}/ossuary_charger.glb`,
+    authoredAtlas: true,
+    height: 4.35,
+    clips: MOUNT_RIGGED,
+    walkRef: 2.51,
+    runRef: 13.1,
+    lazyPreload: true,
+  },
   mount_grag_bear: {
     url: `${MOUNTS_DIR}/grag_bear.glb`,
     height: 4.0,

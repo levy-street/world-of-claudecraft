@@ -661,6 +661,9 @@ describe('every point-light producer is a carrier source', () => {
       // and the reduced-motion switch into its own uniform, never a scene.
       'render/hollow_crypt_entrance.ts: mesh',
       'render/jail_scene.ts: swirl',
+      // Wraith the Deadstrier's flame shells: a mesh hook stepping the flames
+      // and writing their uniforms once per frame, never a scene.
+      'render/ossuary_flames.ts: mesh',
       // Studio mesh clocks, never a scene: the placed fire FX (lathe flame,
       // smoke puffs, sparks, the shared clock mesh) and the waterfall spray.
       'render/placed_assets.ts: clockMesh',

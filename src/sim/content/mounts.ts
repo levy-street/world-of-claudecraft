@@ -23,7 +23,8 @@ export type MountKey =
   | 'terrorspark_groundshaker'
   | 'nightwing_chimera'
   | 'lantern_hall_destrier'
-  | 'emberbristle_broom';
+  | 'emberbristle_broom'
+  | 'ossuary_charger';
 
 export type MountRarity = 'common' | 'uncommon' | 'rare' | 'epic';
 
@@ -135,6 +136,13 @@ export const MOUNTS: Record<MountKey, MountDef> = {
     name: 'Nightwing Chimaera',
     rarity: 'epic',
   },
+  // Wraith the Deadstrier: a skeletal war horse whose mane, tail and fetlocks burn
+  // with green ghostfire, under a rotted saddle. Under development: no acquisition path yet (DEVELOPER_MOUNTS).
+  ossuary_charger: {
+    key: 'ossuary_charger',
+    name: 'Wraith the Deadstrier',
+    rarity: 'epic',
+  },
   // Gourdlight Eve's broom (content/gourdlight_eve.ts GOURDLIGHT_BROOM_ID), sold by
   // Hester for five of Old Thatchgrin's daily Emberwoven Sheaves. It hovers a hand's
   // breadth over the ground (a ground mount like every other, it never flies) and its
@@ -170,7 +178,11 @@ export const MOUNT_KEYS = Object.keys(MOUNTS) as readonly MountKey[];
  *  the single source of truth: the catalog, the item table, and the acquisition
  *  tests all read it, so a fourth place can never disagree about which mounts
  *  are still under development. */
-export const DEVELOPER_MOUNTS: readonly MountKey[] = ['terrorspark_groundshaker', 'referral_tank'];
+export const DEVELOPER_MOUNTS: readonly MountKey[] = [
+  'terrorspark_groundshaker',
+  'referral_tank',
+  'ossuary_charger',
+];
 
 /** Paid annual-bundle mounts retain soulbound reins and outlive membership expiry. */
 export const MEMBERSHIP_REWARD_MOUNTS: readonly MountKey[] = ['nightwing_chimera'];

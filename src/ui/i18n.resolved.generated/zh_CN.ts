@@ -2603,6 +2603,7 @@ export const zh_CN: EnTranslations = {
       "name_emberbristle_broom": "余烬鬃毛扫帚",
       "name_wobbles_slime": "晃晃史莱姆",
       "name_nightwing_chimera": "夜翼奇美拉",
+      "name_ossuary_charger": "亡驹幽魂",
       "desc_valorsteed": "一匹坚韧稳健、配有皮革马鞍的骏马。",
       "desc_grag_bear": "一头坚韧稳健、配有厚重鞍具的巨熊。",
       "desc_stalkglider_snail": "一只坚毅耐久、背负苔藓外壳的蜗牛。",
@@ -2625,7 +2626,8 @@ export const zh_CN: EnTranslations = {
       "desc_nightwing_chimera": "来自古木枝头的双头暮光飞龙，驻足时以利爪后肢伫立，行进时展动奥术铭纹双翼掠地翱翔。",
       "desc_chimeglass_tortoise": "盐原上的陆龟，走过了三代商队。收留他的补锅匠用暴风晶磨成眼镜，又在他喉前挂上一枚青铜铃——道路总是先听见他，才看见他。",
       "desc_rickshaw_mount": "一辆嘎吱作响的骸骨货车，一具瘦骨嶙峋的杂兵被套在辕木间，拖着你狂奔向前。",
-      "desc_emberbristle_broom": "一把系着橙色丝带的收获扫帚，悬浮在离地一掌高的地方，鬃毛不断洒落余烬。南瓜灯之夜结束时，它会化回一堆稻草。"
+      "desc_emberbristle_broom": "一把系着橙色丝带的收获扫帚，悬浮在离地一掌高的地方，鬃毛不断洒落余烬。南瓜灯之夜结束时，它会化回一堆稻草。",
+      "desc_ossuary_charger": "一匹早已只剩白骨的战马。鬃毛、尾巴和蹄踝燃烧着幽灵般的绿色火焰，腐朽的马鞍仍绑在它的脊骨上。"
     },
     "mountTraining": {
       "mountPrompt": "按 {key} 键骑上训练用英勇战马。",
@@ -20788,6 +20790,9 @@ export const zh_CN: EnTranslations = {
       },
       "reins_avian_strider": {
         "name": "苍翠谷行者的缰绳"
+      },
+      "reins_ossuary_charger": {
+        "name": "亡驹幽魂的缰绳"
       },
       "reins_nightwing_chimera": {
         "name": "夜翼奇美拉的缰绳"
