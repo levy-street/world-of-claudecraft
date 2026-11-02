@@ -197,13 +197,16 @@ export const ZONE1_ZONE: ZoneDef = {
   lakes: [LAKE],
   pois: [
     { x: -14, z: -102, label: 'Eastbrook', id: 'eastbrook' },
-    { x: 2, z: -4, label: 'Wolf Run', id: 'wolf_run' },
+    // Studio town rework (#4593): over its mobs where the rework stood them
+    { x: -18, z: 28, label: 'Wolf Run', id: 'wolf_run' },
     // follows the boars to their new downs (round 6 swap, then the westward push)
     // pulled off the causeway's latitude: both labels sat at z -46 and the
     // world map drew them on the same line, overlapping
-    { x: 60, z: -64, label: 'Boar Meadow', id: 'boar_meadow' },
+    // Studio town rework (#4593): over its mobs where the rework stood them
+    { x: 72, z: -74, label: 'Boar Meadow', id: 'boar_meadow' },
     { x: -88, z: 82, label: 'Mirror Lake', id: 'mirror_lake' },
-    { x: -60, z: 4, label: 'Sableweb', id: 'sableweb' },
+    // Studio town rework (#4593): over its mobs where the rework stood them
+    { x: -70, z: 36, label: 'Sableweb', id: 'sableweb' },
     { x: -34, z: 142, label: 'Copper Dig', id: 'copper_dig' },
     // stays with Gorrak's camp, which did not move in the round 6 swap
     { x: 98, z: 28, label: 'Bandit Camp', id: 'bandit_camp' },

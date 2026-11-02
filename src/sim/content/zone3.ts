@@ -35,9 +35,11 @@ export const ZONE3_ZONE: ZoneDef = {
   lakes: [{ x: -70, z: 760, radius: 18 }],
   pois: [
     { x: 0, z: 660, label: 'Highwatch', id: 'highwatch' },
-    { x: -50, z: 590, label: 'Stalker Ridge', id: 'stalker_ridge' },
+    // Studio town rework (#4593): over its mobs where the rework stood them
+    { x: 46, z: 582, label: 'Stalker Ridge', id: 'stalker_ridge' },
     { x: 85, z: 615, label: 'Deeprock Burrows', id: 'deeprock_burrows' },
-    { x: -90, z: 700, label: 'Ogre Foothills', id: 'ogre_foothills' },
+    // Studio town rework (#4593): over its mobs where the rework stood them
+    { x: -100, z: 700, label: 'Ogre Foothills', id: 'ogre_foothills' },
     { x: -130, z: 740, label: "Drogmar's War-Camp", id: 'drogmars_war_camp' },
     { x: 110, z: 760, label: 'Stormcrag', id: 'stormcrag' },
     { x: -70, z: 770, label: 'The Glimmermere', id: 'the_glimmermere' },
