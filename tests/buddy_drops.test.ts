@@ -187,6 +187,60 @@ describe('boss pets: one independent roll per player', () => {
     expect(meta.buddies.pending.map((p) => p.key)).toContain('crystal_lich');
     expect(meta.buddies.pending[0].source).toBe('instance');
   });
+
+  it('is wired to the death site: a Normal claim kill attaches nothing', () => {
+    const sim = makeWorld();
+    const pid = join(sim);
+    const meta = sim.players.get(pid)!;
+    const player = sim.entities.get(pid)!;
+    const boss = bossAt(sim, NYTHRAXIS, player.pos.x + 3, player.pos.z);
+    boss.tappedById = pid;
+    const inst = sim.ctx.instances[0];
+    inst.partyKey = 'test-party';
+    inst.difficulty = 'normal';
+    inst.mobIds.push(boss.id);
+    vi.spyOn(sim.ctx.rng, 'chance').mockReturnValue(true);
+    sim.ctx.handleDeath(boss, player);
+    expect(meta.buddies.pending).toEqual([]);
+  });
+
+  it('the death site splits across the credited party only, never a bystander', () => {
+    const sim = makeWorld();
+    const leader = join(sim, 'Leader');
+    const member = join(sim, 'Member');
+    const outsider = join(sim, 'Outsider');
+    sim.partyInvite(member, leader);
+    sim.partyAccept(member);
+    sim.tick();
+    expect(sim.ctx.partyOf(leader)?.members).toContain(member);
+    const player = sim.entities.get(leader)!;
+    for (const id of [member, outsider]) {
+      const e = sim.entities.get(id)!;
+      e.pos.x = player.pos.x + 1;
+      e.pos.z = player.pos.z;
+    }
+    const boss = bossAt(sim, NYTHRAXIS, player.pos.x + 3, player.pos.z);
+    boss.tappedById = leader;
+    const inst = sim.ctx.instances[0];
+    inst.partyKey = 'test-party';
+    inst.difficulty = 'heroic';
+    inst.mobIds.push(boss.id);
+    // Record only the draws made from the buddy roll (other loot draws share
+    // the same rng and can use the same probabilities).
+    const buddyDraws: number[] = [];
+    vi.spyOn(sim.ctx.rng, 'chance').mockImplementation((p: number) => {
+      if (new Error().stack?.includes('rollBossBuddyDrops')) buddyDraws.push(p);
+      return true;
+    });
+    sim.ctx.handleDeath(boss, player);
+    // Two credited players: exactly two buddy draws, each at half of 1%.
+    expect(buddyDraws).toHaveLength(2);
+    for (const p of buddyDraws) expect(p).toBeCloseTo(0.005, 12);
+    for (const id of [leader, member]) {
+      expect(sim.players.get(id)!.buddies.pending.map((p) => p.key)).toEqual(['crystal_lich']);
+    }
+    expect(sim.players.get(outsider)!.buddies.pending).toEqual([]);
+  });
 });
 
 describe('the reveal: on the zone-out, or once the player walks away', () => {
