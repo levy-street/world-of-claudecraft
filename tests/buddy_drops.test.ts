@@ -116,6 +116,19 @@ describe('boss pets: one independent roll per player', () => {
     expect(chance.mock.calls[0][0]).toBeCloseTo(0.005, 12);
   });
 
+  it('Varkhul splits its half rate across a small group too', () => {
+    const sim = makeWorld();
+    const a = sim.players.get(join(sim, 'Alpha'))!;
+    const b = sim.players.get(join(sim, 'Beta'))!;
+    const varkhul = bossAt(sim, 'varkhul_forgefather_of_the_last_flame', 10, 10);
+    const chance = vi.spyOn(sim.ctx.rng, 'chance').mockReturnValue(false);
+    rollBossBuddyDrops(sim.ctx, varkhul, [a, b], { difficulty: 'normal' } as never);
+    expect(chance).not.toHaveBeenCalled();
+    rollBossBuddyDrops(sim.ctx, varkhul, [a, b], { difficulty: 'heroic' } as never);
+    expect(chance).toHaveBeenCalledTimes(2);
+    for (const call of chance.mock.calls) expect(call[0]).toBeCloseTo(0.0025, 12);
+  });
+
   it('a full group of ten or more rolls the flat per-player rate', () => {
     const sim = makeWorld();
     const metas = Array.from({ length: 12 }, (_, i) => sim.players.get(join(sim, `P${i}`))!);
@@ -152,7 +165,7 @@ describe('boss pets: one independent roll per player', () => {
     const player = sim.entities.get(pid)!;
     const boss = bossAt(sim, NYTHRAXIS, player.pos.x + 3, player.pos.z);
     boss.tappedById = pid;
-    const chance = vi.spyOn(sim.ctx.rng, 'chance').mockReturnValue(true);
+    vi.spyOn(sim.ctx.rng, 'chance').mockReturnValue(true);
     sim.ctx.handleDeath(boss, player);
     expect(meta.buddies.pending).toEqual([]);
   });

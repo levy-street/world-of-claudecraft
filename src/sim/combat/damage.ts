@@ -1995,7 +1995,7 @@ export function handleDeath(
     // independent roll per credited player, never a corpse item, then the
     // speed/dps looks for the same roster. World bosses roll on the
     // never-pruned contributor roster below instead. Draws rng ONLY for a
-    // boss that carries a companion row.
+    // Heroic-claim kill of a boss that carries a companion row.
     if (!template?.worldBoss) {
       rollBossBuddyDrops(ctx, e, heroicRewardRecipients, claimedInst);
     }

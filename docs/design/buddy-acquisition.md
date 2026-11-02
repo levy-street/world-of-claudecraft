@@ -14,13 +14,14 @@ are cleared when loaded.
 | Buddy | Normal gameplay source | Chance per eligible player |
 |---|---|---|
 | Tug, the Warhorse | Purchase directly from FURY (Eastbrook Vale) or Warmarshal Draven Kole (Highwatch) | 10,000 honor |
-| Crystal Lich | Defeat Heroic Nythraxis, Scourge of Thornpeak | 0.1% (1% per kill); no normal-mode drop |
-| Forgemaw The Molten | Defeat Ignivar or Varkhul in the heroic Crucible | 0.05% from each boss (0.5% per boss kill, 1% across a full clear); no normal-mode drop |
+| Crystal Lich | Defeat Heroic Nythraxis, Scourge of Thornpeak | 0.1% (1% per kill at ten or fewer players); no normal-mode drop |
+| Forgemaw The Molten | Defeat Ignivar or Varkhul in the heroic Crucible | 0.05% from each boss (0.5% per boss kill and 1% across a full clear, at ten or fewer players); no normal-mode drop |
 | Flicker and Glimmer | Help five referred friends complete their referral stamp cards | Guaranteed account-wide unlock |
 
 The rates live in `src/sim/content/buddy_sources.ts` (`BUDDY_BOSS_CHANCE`). Rolls are
 independent per eligible player, using the nearby kill-credit roster. The listed
-per-player rate applies to a group of `BUDDY_FULL_GROUP` (ten) or more. A smaller group
+per-player rate applies to a group of `BUDDY_FULL_GROUP` (ten) or more, so a larger group's total
+grows with it. A smaller group
 splits the same per-kill total evenly (`buddyChancePerPlayer`): on Nythraxis two players roll 0.5% each
 and a solo player rolls 1%. Forgemaw's rate is halved per Crucible boss
 (`FORGEMAW_PER_BOSS_CHANCE`), so clearing both bosses pays the same total. A successful boss roll creates a pending companion, rather than an item.

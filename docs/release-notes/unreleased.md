@@ -19,3 +19,7 @@
   Crystal Lich and Forgemaw remain boss rewards; Flicker and Glimmer remain the reward
   for five completed referrals. Sapling and the other retired companions are unavailable.
   Dismissing a companion in Cosmetics now keeps it dismissed after logging back in.
+- Boss companions are rarer and Heroic-only: Crystal Lich drops only from Heroic Nythraxis
+  at 0.1% per player, and Forgemaw at 0.05% per player from each Heroic Crucible boss. A
+  group of fewer than ten shares the full group's odds evenly (two players on Nythraxis
+  roll 0.5% each, a solo player 1%).
