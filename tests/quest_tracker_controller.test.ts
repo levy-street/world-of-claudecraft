@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
-import { QUESTS, WORLD_QUESTS, WORLD_QUESTS_BY_ID } from '../src/sim/data';
+import { QUESTS, WORLD_QUESTS, WORLD_QUESTS_BY_ID, zoneAt } from '../src/sim/data';
 import { createForgeWorkshop } from '../src/sim/minigames/forge_workshop';
 import { createGliderFlightState, scoreGliderFlight } from '../src/sim/minigames/glider_flight';
 import type { QuestProgress, WeeklyQuestProgress, WorldQuestProgress } from '../src/sim/types';
@@ -606,6 +606,27 @@ describe('QuestTrackerController', () => {
     expect(test.html()).toContain(worldQuestDisplayName(quest.id));
     test.controller.update(31_000 + 5_000);
     expect(test.html()).not.toContain(worldQuestDisplayName(quest.id));
+  });
+
+  it('lists a hunt anywhere in its zone, beyond its ring, and drops it in the next zone', () => {
+    const quest = WORLD_QUESTS_BY_ID.wq_evergarden_watch;
+    const entry: WorldQuestProgress = { questId: quest.id, count: 2, state: 'active' };
+    const test = harness([], [entry]);
+    const row = `${worldQuestObjectiveLabel(quest.id)}: 2/${quest.count}`;
+    // Evergarden's south-west corner, well outside the watch's ring.
+    test.playerPos.x = 200;
+    test.playerPos.z = 720;
+    expect(zoneAt(200, 720).id).toBe(quest.zoneId);
+    expect(Math.hypot(200 - quest.area.x, 720 - quest.area.z)).toBeGreaterThan(quest.area.radius);
+    test.controller.update(0);
+    expect(test.html()).toContain(row);
+    // Into Wraithwood, the zone north of it: gone once the grace runs out.
+    test.playerPos.x = 360;
+    test.playerPos.z = 1300;
+    expect(zoneAt(360, 1300).id).not.toBe(quest.zoneId);
+    test.controller.update(1_000);
+    test.controller.update(1_000 + 5_000);
+    expect(test.html()).not.toContain(row);
   });
 
   it('gives world quests their own "World Quests" section after the Quests section', () => {

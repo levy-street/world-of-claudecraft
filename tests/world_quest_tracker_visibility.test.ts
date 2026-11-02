@@ -62,7 +62,12 @@ describe('world quest tracker visibility', () => {
   });
 
   it('uses the sim area edge (one shared rule)', () => {
-    const quest = { area: { x: 10, z: 20, radius: 5 } };
+    // A ring quest; a kill quest also covers its zone (tests/world_quest_area.test.ts).
+    const quest = {
+      zoneId: 'eastbrook_vale',
+      area: { x: 10, z: 20, radius: 5 },
+      objective: { type: 'interact', targetObjectItemId: 'x' } as const,
+    };
     expect(positionInWorldQuestArea({ x: 10, z: 25 }, quest)).toBe(true);
     expect(positionInWorldQuestArea({ x: 10, z: 25.01 }, quest)).toBe(false);
   });

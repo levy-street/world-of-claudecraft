@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 import { dealDamage } from '../src/sim/combat/damage';
-import { MOBS, WORLD_QUESTS_BY_ID } from '../src/sim/data';
+import { MOBS, WORLD_QUESTS_BY_ID, zoneAt } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import { PARTY_XP_RANGE } from '../src/sim/types';
@@ -8,6 +8,12 @@ import { creditWorldQuestKills } from '../src/sim/world_quest_kill_credit';
 import { onMobKilledForWorldQuests, updateWorldQuests } from '../src/sim/world_quests';
 
 const quest = WORLD_QUESTS_BY_ID.wq_evergarden_watch;
+// Evergarden's south-west corner: in the zone, well outside the watch's ring.
+const FAR_IN_ZONE = { x: 200, z: 720 };
+// Off the map east of Evergarden (no zone there), level with the ring centre.
+const OUT_OF_ZONE = { x: 600, z: 995 };
+// Wraithwood, the zone north of Evergarden in the same x band.
+const NEXT_ZONE = { x: 360, z: 1300 };
 let sim: Sim;
 beforeAll(() => {
   sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
@@ -155,13 +161,46 @@ describe('world quest authoritative party kill credit', () => {
     expect(memberMeta.worldQuestLog.get(quest.id)?.count).toBe(0);
   });
 
-  it('keeps the player and mob area limits on an active quest', () => {
+  it('credits a hunt kill anywhere in the zone, far beyond the authored ring', () => {
     const { member, memberMeta, mob } = setup();
-    member.pos.x = quest.area.x + quest.area.radius + 1;
+    expect(zoneAt(FAR_IN_ZONE.x, FAR_IN_ZONE.z).id).toBe(quest.zoneId);
+    expect(Math.hypot(FAR_IN_ZONE.x - quest.area.x, FAR_IN_ZONE.z - quest.area.z)).toBeGreaterThan(
+      quest.area.radius,
+    );
+    member.pos.x = FAR_IN_ZONE.x;
+    member.pos.z = FAR_IN_ZONE.z;
+    mob.pos.x = FAR_IN_ZONE.x;
+    mob.pos.z = FAR_IN_ZONE.z;
+    onMobKilledForWorldQuests(sim.ctx, mob, memberMeta);
+    expect(memberMeta.worldQuestLog.get(quest.id)?.count).toBe(1);
+  });
+
+  it('starts a hunt when the player enters its zone, away from the ring', () => {
+    const { member, memberMeta } = setup(false);
+    member.pos.x = FAR_IN_ZONE.x;
+    member.pos.z = FAR_IN_ZONE.z;
+    updateWorldQuests(sim.ctx, memberMeta, member);
+    expect(memberMeta.worldQuestLog.get(quest.id)?.state).toBe('active');
+    expect(memberMeta.worldQuestAreas.has(quest.id)).toBe(true);
+  });
+
+  it('keeps the player and mob zone limits on an active quest', () => {
+    const { member, memberMeta, mob } = setup();
+    expect(zoneAt(OUT_OF_ZONE.x, OUT_OF_ZONE.z).id).not.toBe(quest.zoneId);
+    member.pos.x = OUT_OF_ZONE.x;
+    member.pos.z = OUT_OF_ZONE.z;
     onMobKilledForWorldQuests(sim.ctx, mob, memberMeta);
     expect(memberMeta.worldQuestLog.get(quest.id)?.count).toBe(0);
     member.pos.x = quest.area.x;
-    mob.pos.x = quest.area.x + quest.area.radius + 1;
+    member.pos.z = quest.area.z;
+    mob.pos.x = OUT_OF_ZONE.x;
+    mob.pos.z = OUT_OF_ZONE.z;
+    onMobKilledForWorldQuests(sim.ctx, mob, memberMeta);
+    expect(memberMeta.worldQuestLog.get(quest.id)?.count).toBe(0);
+    // A real neighbouring zone (Wraithwood, north, same x band) is out too.
+    expect(zoneAt(NEXT_ZONE.x, NEXT_ZONE.z).id).toBe('wraithwood');
+    mob.pos.x = NEXT_ZONE.x;
+    mob.pos.z = NEXT_ZONE.z;
     onMobKilledForWorldQuests(sim.ctx, mob, memberMeta);
     expect(memberMeta.worldQuestLog.get(quest.id)?.count).toBe(0);
   });
