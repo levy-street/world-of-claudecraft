@@ -2279,6 +2279,11 @@ export function initGfxTier(webgl: THREE.WebGLRenderer): GfxTier {
   return activated.settings.tier;
 }
 
+/** Refresh the boot guess after recovery and settings changes, before deferred assets. */
+export function refreshBootGfxProfile(): void {
+  activateGfxProfile(profileFromHints(runtimeHints(), false, 0));
+}
+
 export const gfxInternalsForTest = {
   settingsFor,
   sharedUniforms: () => sharedUniforms,
