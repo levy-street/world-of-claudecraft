@@ -2207,6 +2207,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.accountWithdrawLead': 'Нажмите на предмет, чтобы забрать его в сумки.',
   'hudChrome.bank.accountDepositLead':
     'Нажмите на предмет, чтобы отправить его в банк персонажа {name}.',
+  'hudChrome.bank.accountBagsDepositLead':
+    'Нажмите на предмет в сумках, чтобы отправить его в банк персонажа {name}.',
   'hudChrome.bank.accountBankEmpty': 'Этот банк пуст.',
   'hudChrome.bank.accountBagsEmpty': 'Ваши сумки пусты.',
   'hudChrome.wocStore.subscription.tokenTitle': 'Передаваемый жетон членства',

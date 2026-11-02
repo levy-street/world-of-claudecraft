@@ -201,6 +201,12 @@ function appendGrids(
   hint.className = 'account-bank-hint';
   hint.textContent = t('hudChrome.bank.accountWithdrawLead', { name });
   box.appendChild(hint);
+  // The deposit direction has no grid here, so say where it lives (touch
+  // players never see the bags' hover hint).
+  const depositHint = document.createElement('p');
+  depositHint.className = 'account-bank-hint';
+  depositHint.textContent = t('hudChrome.bank.accountBagsDepositLead', { name });
+  box.appendChild(depositHint);
   const grid = document.createElement('div');
   grid.className = 'bank-grid';
   if (model.empty) {

@@ -5804,6 +5804,7 @@ export const sv_SE: EnTranslations = {
       "accountSlots": "{used} / {total} platser",
       "accountWithdrawLead": "Klicka på ett föremål för att flytta det till dina väskor.",
       "accountDepositLead": "Klicka på ett föremål för att skicka det till {name}s bank.",
+      "accountBagsDepositLead": "Click an item in your bags to send it to {name}'s bank.",
       "accountBankEmpty": "Denna bank är tom.",
       "accountBagsEmpty": "Dina väskor är tomma.",
       "accountDepositHint": "Klicka för att sätta in denna stapel i den valda karaktärens bank.",

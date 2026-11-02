@@ -5804,6 +5804,7 @@ export const zh_CN: EnTranslations = {
       "accountSlots": "{used} / {total} 格",
       "accountWithdrawLead": "点击物品将其移入你的背包。",
       "accountDepositLead": "点击物品将其送入{name}的银行。",
+      "accountBagsDepositLead": "点击背包中的物品，将其送入{name}的银行。",
       "accountBankEmpty": "此银行是空的。",
       "accountBagsEmpty": "你的背包是空的。",
       "accountDepositHint": "点击将此堆物品存入所选角色的银行。",

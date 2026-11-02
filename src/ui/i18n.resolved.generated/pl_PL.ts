@@ -5804,6 +5804,7 @@ export const pl_PL: EnTranslations = {
       "accountSlots": "{used} / {total} miejsc",
       "accountWithdrawLead": "Kliknij przedmiot, aby przenieść go do swoich toreb.",
       "accountDepositLead": "Kliknij przedmiot, aby wysłać go do banku postaci {name}.",
+      "accountBagsDepositLead": "Click an item in your bags to send it to {name}'s bank.",
       "accountBankEmpty": "Ten bank jest pusty.",
       "accountBagsEmpty": "Twoje torby są puste.",
       "accountDepositHint": "Kliknij, aby wpłacić ten stos do banku wybranej postaci.",

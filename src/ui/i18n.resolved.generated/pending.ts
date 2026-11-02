@@ -9,25 +9,55 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.bank.accountBagsDepositLead"
+  ],
+  "es_ES": [
+    "hudChrome.bank.accountBagsDepositLead"
+  ],
+  "fr_FR": [
+    "hudChrome.bank.accountBagsDepositLead"
+  ],
+  "fr_CA": [
+    "hudChrome.bank.accountBagsDepositLead"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.bank.accountBagsDepositLead"
+  ],
+  "de_DE": [
+    "hudChrome.bank.accountBagsDepositLead"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.bank.accountBagsDepositLead"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.bank.accountBagsDepositLead"
+  ],
+  "nl_NL": [
+    "hudChrome.bank.accountBagsDepositLead"
+  ],
+  "pl_PL": [
+    "hudChrome.bank.accountBagsDepositLead"
+  ],
+  "id_ID": [
+    "hudChrome.bank.accountBagsDepositLead"
+  ],
+  "tr_TR": [
+    "hudChrome.bank.accountBagsDepositLead"
+  ],
+  "sv_SE": [
+    "hudChrome.bank.accountBagsDepositLead"
+  ],
+  "vi_VN": [
+    "hudChrome.bank.accountBagsDepositLead"
+  ],
+  "da_DK": [
+    "hudChrome.bank.accountBagsDepositLead"
+  ]
 };

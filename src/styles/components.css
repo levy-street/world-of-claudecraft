@@ -10668,8 +10668,8 @@
     flex: none;
     min-height: 40px;
   }
-  /* The selected bank and the player's bags as two framed sections, each
-     titled with whose items they hold, so a click's direction is never a guess. */
+  /* The selected bank as one framed section, titled with whose items it holds;
+     its lead lines say a click here withdraws and a click in the bags deposits. */
   .account-bank-section {
     margin-top: var(--spacing-sm);
     padding: var(--spacing-sm);

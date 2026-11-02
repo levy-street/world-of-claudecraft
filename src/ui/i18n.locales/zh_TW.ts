@@ -2044,6 +2044,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.accountSlots': '{used} / {total} 格',
   'hudChrome.bank.accountWithdrawLead': '點擊物品將其移入你的背包。',
   'hudChrome.bank.accountDepositLead': '點擊物品將其送入{name}的銀行。',
+  'hudChrome.bank.accountBagsDepositLead': '點擊背包中的物品，將其送入{name}的銀行。',
   'hudChrome.bank.accountBankEmpty': '此銀行是空的。',
   'hudChrome.bank.accountBagsEmpty': '你的背包是空的。',
   'hudChrome.wocStore.subscription.tokenTitle': '可交易會員代幣',

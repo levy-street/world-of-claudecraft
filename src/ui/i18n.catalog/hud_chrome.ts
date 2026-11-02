@@ -7684,6 +7684,9 @@ export const hudChromeStrings = {
     accountSlots: '{used} / {total} slots',
     accountWithdrawLead: 'Click an item to move it into your bags.',
     accountDepositLead: "Click an item to send it to {name}'s bank.",
+    // The Other characters pane under the selected bank: deposits come from
+    // clicking the docked bags window, never a grid in the pane itself.
+    accountBagsDepositLead: "Click an item in your bags to send it to {name}'s bank.",
     accountBankEmpty: 'This bank is empty.',
     accountBagsEmpty: 'Your bags are empty.',
     accountDepositHint: 'Click to deposit this stack into the selected character bank.',

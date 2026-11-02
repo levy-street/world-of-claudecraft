@@ -5804,6 +5804,7 @@ export const cs_CZ: EnTranslations = {
       "accountSlots": "{used} / {total} pozic",
       "accountWithdrawLead": "Kliknutím na předmět jej přesuň do svých brašen.",
       "accountDepositLead": "Kliknutím na předmět jej pošli do banky postavy {name}.",
+      "accountBagsDepositLead": "Click an item in your bags to send it to {name}'s bank.",
       "accountBankEmpty": "Tato banka je prázdná.",
       "accountBagsEmpty": "Tvé batohy jsou prázdné.",
       "accountDepositHint": "Kliknutím ulož tento stoh do banky vybrané postavy.",

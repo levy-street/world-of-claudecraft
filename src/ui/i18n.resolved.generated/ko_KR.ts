@@ -5804,6 +5804,7 @@ export const ko_KR: EnTranslations = {
       "accountSlots": "{used} / {total}칸",
       "accountWithdrawLead": "아이템을 클릭하면 내 가방으로 옮깁니다.",
       "accountDepositLead": "아이템을 클릭하면 {name}의 은행으로 보냅니다.",
+      "accountBagsDepositLead": "가방에 있는 아이템을 클릭하면 {name}의 은행으로 보냅니다.",
       "accountBankEmpty": "이 은행은 비어 있습니다.",
       "accountBagsEmpty": "가방이 비어 있습니다.",
       "accountDepositHint": "클릭하면 이 묶음을 선택한 캐릭터의 은행에 보관합니다.",
