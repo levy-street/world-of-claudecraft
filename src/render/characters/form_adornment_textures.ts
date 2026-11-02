@@ -123,3 +123,78 @@ export function crescentTexture(): THREE.Texture {
     ctx.drawImage(moon, 0, 0);
   });
 }
+
+/** Mulberry32: the crown's scatter is the same on every client. */
+function seededRandom(seed: number): () => number {
+  let a = seed;
+  return () => {
+    a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/** Painted edge of the crown textures, and the ring's radius on it. */
+const CROWN_SIZE = 256;
+const CROWN_RING_RADIUS = CROWN_SIZE * 0.32;
+
+function softDot(ctx: CanvasRenderingContext2D, x: number, y: number, radius: number): void {
+  const glow = ctx.createRadialGradient(x, y, 0, x, y, radius);
+  glow.addColorStop(0, 'rgba(255,255,255,1)');
+  glow.addColorStop(0.32, 'rgba(255,255,255,1)');
+  glow.addColorStop(0.5, 'rgba(255,255,255,0.3)');
+  glow.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = glow;
+  ctx.fillRect(x - radius, y - radius, radius * 2, radius * 2);
+}
+
+/** A point on or near the crown's ring, thinning out to either side of it. */
+function nearRing(random: () => number, spread: number): [number, number] {
+  const angle = random() * Math.PI * 2;
+  const radius = CROWN_RING_RADIUS + (random() + random() - 1) * spread;
+  return [CROWN_SIZE / 2 + Math.cos(angle) * radius, CROWN_SIZE / 2 + Math.sin(angle) * radius];
+}
+
+/** Moonwing's crown: the ring's plain white map (the ring itself is geometry). */
+export function sporeHaloRingTexture(): THREE.Texture {
+  return paintedTexture(4, 4, (ctx) => {
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, 4, 4);
+  });
+}
+
+/** Moonwing's crown: glowing spores in three sizes, heaviest on the ring. */
+export function sporeHaloScatterTexture(): THREE.Texture {
+  return paintedTexture(CROWN_SIZE, CROWN_SIZE, (ctx) => {
+    const random = seededRandom(0x5b0fe);
+    const sizes = [
+      { count: 44, spread: 42, radius: 5 },
+      { count: 14, spread: 32, radius: 9 },
+      { count: 5, spread: 12, radius: 14 },
+    ];
+    for (const { count, spread, radius } of sizes) {
+      for (let i = 0; i < count; i++) softDot(ctx, ...nearRing(random, spread), radius);
+    }
+  });
+}
+
+/** Moonwing's crown: a few small four-point stars among the spores. */
+export function sporeHaloStarsTexture(): THREE.Texture {
+  return paintedTexture(CROWN_SIZE, CROWN_SIZE, (ctx) => {
+    const random = seededRandom(0x57a125);
+    ctx.fillStyle = '#ffffff';
+    for (let i = 0; i < 9; i++) {
+      const [x, y] = nearRing(random, 40);
+      const size = 8 + random() * 5;
+      ctx.beginPath();
+      for (let k = 0; k < 8; k++) {
+        const angle = (k * Math.PI) / 4;
+        const reach = k % 2 ? size * 0.14 : size;
+        ctx.lineTo(x + Math.sin(angle) * reach, y - Math.cos(angle) * reach);
+      }
+      ctx.closePath();
+      ctx.fill();
+    }
+  });
+}

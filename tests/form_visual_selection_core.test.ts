@@ -7,6 +7,7 @@ import {
   characterFormReadyMask,
   characterFormShadowPlan,
   characterFormVisibility,
+  moonwingRigMask,
   requestedCharacterForm,
   resolvedCharacterForm,
 } from '../src/render/characters/form_visual_selection_core';
@@ -36,10 +37,12 @@ describe('character form visual selection', () => {
       travel: 8,
       metamorph: 16,
       sporemender: 32,
+      moonwing: 64,
     });
     expect(resolvedCharacterForm('metamorph', CHARACTER_FORM_READY.travel)).toBe('base');
     expect(resolvedCharacterForm('travel', CHARACTER_FORM_READY.metamorph)).toBe('base');
     expect(resolvedCharacterForm('sporemender', CHARACTER_FORM_READY.metamorph)).toBe('base');
+    expect(resolvedCharacterForm('moonwing', CHARACTER_FORM_READY.sporemender)).toBe('base');
   });
 
   it('maps both replicated Warlock form markers to the dedicated Metamorphosis visual', () => {
@@ -103,6 +106,7 @@ describe('character form visual selection', () => {
     ['travel', { kind: 'form_travel' }, CHARACTER_FORM_READY.travel],
     ['metamorph', { kind: 'form_lich' }, CHARACTER_FORM_READY.metamorph],
     ['sporemender', { kind: 'form_sporemender' }, CHARACTER_FORM_READY.sporemender],
+    ['moonwing', { kind: 'form_moonkin' }, CHARACTER_FORM_READY.moonwing],
   ] as const)('resolves the %s branch only when its visual is ready', (form, aura, ready) => {
     const requested = requestedCharacterForm(maskFor([aura]));
     expect(requested).toBe(form);
@@ -122,7 +126,35 @@ describe('character form visual selection', () => {
       travel: false,
       metamorph: false,
       sporemender: false,
+      moonwing: false,
     });
+  });
+
+  it('keeps a mounted Moonwing on the body and returns the rig on dismount', () => {
+    const mask = maskFor([{ kind: 'form_moonkin' }]);
+    expect(requestedCharacterForm(moonwingRigMask(mask, false))).toBe('moonwing');
+    expect(requestedCharacterForm(moonwingRigMask(mask, true))).toBe('base');
+    // Only the Moonwing bit yields: every other form keeps its rig on a saddle.
+    const cat = maskFor([{ kind: 'form_cat' }]);
+    expect(moonwingRigMask(cat, true)).toBe(cat);
+  });
+
+  it('swaps a druid to the Moonwing rig only once that rig is built and linked', () => {
+    const base = { root: { id: 'base-root' } };
+    const wing = { root: { id: 'wing-root' } };
+    const requested = requestedCharacterForm(maskFor([{ kind: 'form_moonkin' }]));
+    expect(requested).toBe('moonwing');
+    // Built but still behind its compile gate: the tinted body stands in.
+    let ready = characterFormReadyMask(null, null, null, null, null, null, wing, wing.root);
+    let resolved = resolvedCharacterForm(requested, ready);
+    expect(
+      activeCharacterFormVisual(resolved, base, null, null, null, null, null, null, wing),
+    ).toBe(base);
+    ready = characterFormReadyMask(null, null, null, null, null, null, wing, null);
+    resolved = resolvedCharacterForm(requested, ready);
+    expect(
+      activeCharacterFormVisual(resolved, base, null, null, null, null, null, null, wing),
+    ).toBe(wing);
   });
 
   it('swaps a druid to the Sporemender rig only once that rig is built and linked', () => {
@@ -131,17 +163,17 @@ describe('character form visual selection', () => {
     const requested = requestedCharacterForm(maskFor([{ kind: 'form_sporemender' }]));
     expect(requested).toBe('sporemender');
     // Built but still behind its compile gate: the base body stands in.
-    let ready = characterFormReadyMask(null, null, null, null, null, spore, spore.root);
+    let ready = characterFormReadyMask(null, null, null, null, null, spore, null, spore.root);
     let resolved = resolvedCharacterForm(requested, ready);
-    expect(activeCharacterFormVisual(resolved, base, null, null, null, null, null, spore)).toBe(
-      base,
-    );
-    ready = characterFormReadyMask(null, null, null, null, null, spore, null);
+    expect(
+      activeCharacterFormVisual(resolved, base, null, null, null, null, null, spore, null),
+    ).toBe(base);
+    ready = characterFormReadyMask(null, null, null, null, null, spore, null, null);
     resolved = resolvedCharacterForm(requested, ready);
     expect(resolved).toBe('sporemender');
-    expect(activeCharacterFormVisual(resolved, base, null, null, null, null, null, spore)).toBe(
-      spore,
-    );
+    expect(
+      activeCharacterFormVisual(resolved, base, null, null, null, null, null, spore, null),
+    ).toBe(spore);
   });
 
   it('keeps the base visual through a failed Lich build, then swaps after a later retry', () => {
@@ -150,24 +182,24 @@ describe('character form visual selection', () => {
     const requested = requestedCharacterForm(maskFor([{ kind: 'form_lich' }]));
     let metamorph: typeof lich | null = null;
 
-    let ready = characterFormReadyMask(null, null, null, null, metamorph, null, null);
+    let ready = characterFormReadyMask(null, null, null, null, metamorph, null, null, null);
     let resolved = resolvedCharacterForm(requested, ready);
-    expect(activeCharacterFormVisual(resolved, base, null, null, null, null, metamorph, null)).toBe(
-      base,
-    );
+    expect(
+      activeCharacterFormVisual(resolved, base, null, null, null, null, metamorph, null, null),
+    ).toBe(base);
 
     metamorph = lich;
-    ready = characterFormReadyMask(null, null, null, null, metamorph, null, null);
+    ready = characterFormReadyMask(null, null, null, null, metamorph, null, null, null);
     resolved = resolvedCharacterForm(requested, ready);
     expect(resolved).toBe('metamorph');
-    expect(activeCharacterFormVisual(resolved, base, null, null, null, null, metamorph, null)).toBe(
-      lich,
-    );
+    expect(
+      activeCharacterFormVisual(resolved, base, null, null, null, null, metamorph, null, null),
+    ).toBe(lich);
 
     resolved = resolvedCharacterForm(requestedCharacterForm(0), ready);
-    expect(activeCharacterFormVisual(resolved, base, null, null, null, null, metamorph, null)).toBe(
-      base,
-    );
+    expect(
+      activeCharacterFormVisual(resolved, base, null, null, null, null, metamorph, null, null),
+    ).toBe(base);
   });
 
   it.each([
@@ -178,6 +210,7 @@ describe('character form visual selection', () => {
     ['travel', 'travel'],
     ['metamorph', 'metamorph'],
     ['sporemender', 'sporemender'],
+    ['moonwing', 'moonwing'],
   ] as const)('makes only the %s root visible', (form, visibleKey) => {
     const visibility = characterFormVisibility(form);
     expect(visibility).toEqual({
@@ -188,6 +221,7 @@ describe('character form visual selection', () => {
       travel: visibleKey === 'travel',
       metamorph: visibleKey === 'metamorph',
       sporemender: visibleKey === 'sporemender',
+      moonwing: visibleKey === 'moonwing',
     });
     expect(Object.values(visibility).filter(Boolean)).toHaveLength(1);
   });
@@ -271,6 +305,7 @@ describe('character form visual selection', () => {
           travel: false,
           metamorph: true,
           sporemender: false,
+          moonwing: false,
         },
       },
       {
@@ -283,6 +318,7 @@ describe('character form visual selection', () => {
           travel: false,
           metamorph: false,
           sporemender: false,
+          moonwing: false,
         },
       },
       {
@@ -295,6 +331,7 @@ describe('character form visual selection', () => {
           travel: false,
           metamorph: true,
           sporemender: false,
+          moonwing: false,
         },
       },
     ]);
@@ -315,20 +352,20 @@ describe('character form readiness vs the compile gate (the stand-in invariant)'
   const requested = (kind: string) => requestedCharacterForm(maskFor([{ kind }]));
 
   it('holds a built-but-pending form at base, so the body stands in', () => {
-    const ready = characterFormReadyMask(sheep, null, null, null, null, null, sheep.root);
+    const ready = characterFormReadyMask(sheep, null, null, null, null, null, null, sheep.root);
     expect(ready & CHARACTER_FORM_READY.sheep).toBe(0);
     expect(resolvedCharacterForm(requested('polymorph'), ready)).toBe('base');
     expect(characterFormVisibility('base').base).toBe(true);
   });
 
   it('swaps to the form once its gate settles', () => {
-    const ready = characterFormReadyMask(sheep, null, null, null, null, null, null);
+    const ready = characterFormReadyMask(sheep, null, null, null, null, null, null, null);
     expect(ready & CHARACTER_FORM_READY.sheep).toBe(CHARACTER_FORM_READY.sheep);
     expect(resolvedCharacterForm(requested('polymorph'), ready)).toBe('sheep');
   });
 
   it('keys the pending token per root: another form linking never un-readies a settled one', () => {
-    const ready = characterFormReadyMask(sheep, bear, null, null, null, null, bear.root);
+    const ready = characterFormReadyMask(sheep, bear, null, null, null, null, null, bear.root);
     expect(ready & CHARACTER_FORM_READY.sheep).toBe(CHARACTER_FORM_READY.sheep);
     expect(ready & CHARACTER_FORM_READY.bear).toBe(0);
     expect(resolvedCharacterForm(requested('polymorph'), ready)).toBe('sheep');
@@ -337,7 +374,7 @@ describe('character form readiness vs the compile gate (the stand-in invariant)'
 
   it('leaves the ungated Metamorphosis rig ready (it is built without a gate)', () => {
     const metamorph = { root: { id: 'metamorph-root' } };
-    const ready = characterFormReadyMask(null, null, null, null, metamorph, null, null);
+    const ready = characterFormReadyMask(null, null, null, null, metamorph, null, null, null);
     expect(resolvedCharacterForm(requested('form_metamorph'), ready)).toBe('metamorph');
     // ...and a sibling form's pending token cannot reach it either.
     const withSibling = characterFormReadyMask(
@@ -347,14 +384,15 @@ describe('character form readiness vs the compile gate (the stand-in invariant)'
       null,
       metamorph,
       null,
+      null,
       sheep.root,
     );
     expect(resolvedCharacterForm(requested('form_metamorph'), withSibling)).toBe('metamorph');
   });
 
   it('reports an unbuilt form as not ready whatever the pending token is', () => {
-    expect(characterFormReadyMask(null, null, null, null, null, null, null)).toBe(0);
-    expect(characterFormReadyMask(null, null, null, null, null, null, sheep.root)).toBe(0);
+    expect(characterFormReadyMask(null, null, null, null, null, null, null, null)).toBe(0);
+    expect(characterFormReadyMask(null, null, null, null, null, null, null, sheep.root)).toBe(0);
   });
 });
 

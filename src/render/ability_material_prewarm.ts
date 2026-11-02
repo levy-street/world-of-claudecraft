@@ -31,6 +31,7 @@ import { balgathRangedMaterials, buildBalgathRangedStandIn } from './balgath_ran
 import { balgathStarwakeMaterials, buildBalgathStarwakeStandIn } from './balgath_starwake_fx';
 import { buildEffigyRigStandIn, effigyRigMaterials } from './characters/effigy_rig';
 import { buildMoonwingStandIn, moonwingMaterials } from './characters/moonwing_adornment';
+import { buildSporeHaloStandIn, sporeHaloMaterials } from './characters/spore_halo';
 import { buildCoachTrailStandIn, coachTrailMaterials } from './coach_trail_materials';
 import { FireballTravelVisual, fireballMaterials } from './fireball_travel_visual';
 import { FrostNovaRootVisual, frostRootMaterials } from './frost_nova_root_visual';
@@ -219,6 +220,14 @@ export const ABILITY_MATERIAL_SOURCES: readonly AbilityMaterialSource[] = [
     module: 'moonwing_adornment.ts',
     materials: () => moonwingMaterials(),
     build: () => buildMoonwingStandIn(),
+  },
+  {
+    // Moonwing Form's crown rides the form rig. It shares the rig glow program, but
+    // its painted maps must be resident before the first shift.
+    id: 'spore-halo',
+    module: 'spore_halo.ts',
+    materials: () => sporeHaloMaterials(),
+    build: () => buildSporeHaloStandIn(),
   },
 ];
 

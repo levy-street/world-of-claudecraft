@@ -1824,7 +1824,7 @@ describe('Guide model stills', () => {
   it('publishes exactly the four named druid forms (the gallery label map mirrors this)', () => {
     // models.ts labels forms through its FORM_NAME literal map; a fifth form added in
     // the generator would silently render as "Druid Forms" unless this pin reds first.
-    // Groveheart's Sporemender Form is the fourth (Moonwing has no model, so it is prose).
+    // Groveheart's Sporemender Form is the fourth (Moonwing stays prose on the class page).
     expect(GUIDE_DRUID_FORMS.map((d) => d.id)).toEqual([
       'form_bear',
       'form_cat',

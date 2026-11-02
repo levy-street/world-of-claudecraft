@@ -563,6 +563,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/creatures/leaping_fish.glb": "/media/models/creatures/leaping_fish.3df008156018.glb",
   "models/creatures/mech.glb": "/media/models/creatures/mech.9b80ce7abed4.glb",
   "models/creatures/mist_chanter.glb": "/media/models/creatures/mist_chanter.349158853550.glb",
+  "models/creatures/moonwing_form.glb": "/media/models/creatures/moonwing_form.51863b8a78c6.glb",
   "models/creatures/murloc_ability_anims.glb": "/media/models/creatures/murloc_ability_anims.71d64c63e2ca.glb",
   "models/creatures/mushroom_pixie.glb": "/media/models/creatures/mushroom_pixie.8186e2c99bf3.glb",
   "models/creatures/muster_effigy.glb": "/media/models/creatures/muster_effigy.1982752a896e.glb",

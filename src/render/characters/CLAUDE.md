@@ -129,6 +129,9 @@ no procedural-rig path here anymore. Reads the world; never mutates the sim.
   from static `VisualDef` values to keep the cache keys bounded; `visual.ts`
   parents the mesh to the head bone and keeps it out of the shadow-caster
   sweeps (`tests/character_halo.test.ts`).
+- `spore_halo.ts`: Moonwing Form's crown (`VisualDef.sporeHalo`), stacked glow
+  planes on the `Head` bone, placed in model space through the bind matrix because
+  Tripo bone axes are not the world's (`tests/spore_halo.test.ts`).
 - `rig_merge.ts`: merges a KayKit rig's quantized body-part SkinnedMeshes into
   one draw per material (`assets.ts` `assembleModel` calls it). Read its
   header bind-pose proof before touching bone inverses.
@@ -784,7 +787,7 @@ paragraph). No mob draws on a retired KayKit player rig (pinned in
 `tests/npc_looks.test.ts`); NPCs to the WOC def of
 their authored class and body type (`npcLookFor`, the next paragraph), and only
 an NPC with no authored look to its stock rig in `NPC_KEYS`. Forms
-(`form_sheep`/`form_bear`/`form_cat`/`form_travel`/`form_metamorph`/`form_sporemender`) are passed explicitly by the renderer;
+(`form_sheep`/`form_bear`/`form_cat`/`form_travel`/`form_metamorph`/`form_sporemender`/`form_moonwing`) are passed explicitly by the renderer;
 `characterFormAssetKey` (`form_visual_selection_core.ts`) then splits the shared cat slot at
 construction, so a shaman's `ghost_wolf` aura resolves to `form_ghost_wolf` (the tinted
 `wolf_basic.glb`) while the druid's `form_cat` loads its own `druid_cat_form.glb`. It

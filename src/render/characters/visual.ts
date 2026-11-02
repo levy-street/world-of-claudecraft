@@ -172,6 +172,7 @@ import {
   type SpiritVeilPalette,
   type SpiritVeilPolicy,
 } from './spirit_veil_palette_core';
+import { SporeHalo } from './spore_halo';
 import { stoneboundShellStyle } from './stonebound_shell_core';
 import {
   createStowTransition,
@@ -1487,6 +1488,8 @@ export class CharacterVisual {
   /** Moonwing's antlers, crescent and wings (form_adornments.ts).
    *  Built on the first form edge, so a rig that never shifts pays nothing. */
   private formAdornments: FormAdornments | null = null;
+  /** Moonwing Form's crown (VisualDef.sporeHalo). */
+  private sporeHalo: SporeHalo | null = null;
   private ferocityStage = 0;
   private presentationScale = 1;
   private ascended = false;
@@ -1660,6 +1663,7 @@ export class CharacterVisual {
           head.add(halo);
         }
       }
+      if (this.def.sporeHalo) this.sporeHalo = new SporeHalo(this.model);
       this.model.traverse((o) => {
         const mesh = o as THREE.Mesh;
         if (mesh.isMesh) this.originalMaterials.set(mesh, mesh.material);
@@ -1926,6 +1930,11 @@ export class CharacterVisual {
       dt,
       s.moving,
       s.casting,
+      reducedMotion,
+      this.root.visible && !farMeshShown(this.far, this.farMesh !== null, this.farCompilePending),
+    );
+    this.sporeHalo?.update(
+      dt,
       reducedMotion,
       this.root.visible && !farMeshShown(this.far, this.farMesh !== null, this.farCompilePending),
     );
@@ -5296,6 +5305,7 @@ export class CharacterVisual {
     this.templarsVerdictFx = null;
     this.templarsVerdictAction = null;
     this.formAdornments?.dispose();
+    this.sporeHalo?.dispose();
     // shared geometry and glow materials (seasonal_decor_assets.ts): only detach
     this.seasonalHead?.removeFromParent();
     this.seasonalHead = null;

@@ -1377,6 +1377,7 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // CPU-hygiene renderer leaf and the druid Cat Form renderer leaf compose in
 // one tree. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
+  // Re-minted for the Moonwing Form rig: the renderer leaf gained the Moonwing form-rig slot and its mounted hold. No capture was retaken.
   // Re-minted for Gourdlight Eve (feature/halloween-event): the seasonal decor's renderer wiring moved the renderer leaf, and again for its candle-light registry, for its field boss's effects layer, for its phase 3 rain and broom, for the Haunted Pumpkin hunt's renderer hooks, and for the polish pass's scarecrow audio sink. No capture was retaken.
   // Re-minted for the Studio town-dressing promotion: eastbrook_town.ts stands its micro batch
   // down under promotedScenery.authoredTownDressing. No capture was retaken.
@@ -1438,7 +1439,7 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // No capture was retaken.
   // Re-minted for v0.45.4 graphics and dungeon loading optimizations in renderer.ts.
   // No capture was retaken.
-  '4f474fa63f385a9500a579234fa54bb0347928db42b34bce32c8b908ea32f6db';
+  '3a8a9b32a792dc675a92e678ab48e65e2007224551fa256f88c5288a606af8c0';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Studio town-dressing promotion: eastbrook_town.ts stands its micro batch
   // down under promotedScenery.authoredTownDressing. No capture was retaken.
@@ -1496,7 +1497,7 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // No capture was retaken.
   // Re-minted for v0.45.4 graphics and dungeon loading optimizations in renderer.ts.
   // No capture was retaken.
-  'f79dd14b173b432d7056d797f2184116e645d03474c03ef9d8000cdeb5dd80b9';
+  '32dc01c19b824f7cabe17d7e877e8924d90e0af1e4deaffa849babf8d4ac2813';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2905,7 +2906,9 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // release/v0.45.3: recomputed from the swept evidence. No capture was retaken.
       // v0.45.4 graphics and dungeon loading optimizations in renderer.ts:
       // recomputed from the swept evidence. No capture was retaken.
-    ).toBe('cac822feca2db6382e3569357b7b23fab2f038db18acfc98cc07412512475032');
+      // The Moonwing Form rig in renderer.ts: recomputed from the swept evidence. No
+      // capture was retaken.
+    ).toBe('06e16654442c10086d34061b704c980a8057bd701763438d8eccc5b28746c9fa');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

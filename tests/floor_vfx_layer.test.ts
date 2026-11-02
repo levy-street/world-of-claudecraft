@@ -432,6 +432,7 @@ const FLOOR_VFX_OUT_OF_SCOPE: readonly string[] = [
   'src/render/burning_pact_markers.ts',
   'src/render/characters/moonwing_adornment.ts',
   'src/render/characters/paladin_templars_verdict_fx.ts',
+  'src/render/characters/spore_halo.ts',
   'src/render/characters/visual.ts',
   'src/render/drain_life_vfx.ts',
   'src/render/evil_eye_markers.ts',

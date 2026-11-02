@@ -699,6 +699,8 @@ export interface VisualDef {
    *  ring would clip. */
   haloUpOffset?: number;
   haloRadius?: number;
+  /** Moonwing Form's ring of spores over the head (spore_halo.ts). */
+  sporeHalo?: boolean;
   /** This GLB is a modular PART LIBRARY, not a finished character: every body
    *  part, hair style and armour slot piece rides one shared rig and the
    *  visible set is picked per entity (see modular.ts). assembleModel composes
@@ -3362,6 +3364,35 @@ export const VISUALS: Record<string, VisualDef> = {
   form_sporemender: {
     url: `${CREATURES}/sporemender_form.glb`,
     height: HUMANOID_H,
+    yaw: -Math.PI / 2,
+    authoredAtlas: true,
+    attackTimeScale: 6,
+    deathTimeScale: 3,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Cast'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+    },
+  },
+  // Moonwing Form on foot (a rider keeps the body: moonwingRigMask): the owner's Lunavore
+  // concepts mixed into a T-pose sheet (Tripo image-to-image), built by Smart Mesh P2 from
+  // three views and repainted from them, then auto-rigged and retargeted by Tripo. The rig
+  // was then post-processed: each clip's constant hip offset removed (Run sat about 1.7
+  // units ahead of the entity), feet and hands let go of the cloth, and the weights relaxed
+  // wherever an edge stretched past 1.5 times its rest length in any clip. Tripo bipeds
+  // face +X; timings are the Sporemender's. Its defeat preset only staggers, but form auras
+  // drop at death so a player never shows it. Auto-attack plays the Cast gesture and Jump
+  // is left out, also as Sporemender. Stands at the player body's height, so the shift
+  // neither grows nor shrinks the druid. The crown is spore_halo.ts; the rising spores
+  // are vfx.ts formAura.
+  form_moonwing: {
+    url: `${CREATURES}/moonwing_form.glb`,
+    height: HUMANOID_H * 1.1,
+    sporeHalo: true,
     yaw: -Math.PI / 2,
     authoredAtlas: true,
     attackTimeScale: 6,
