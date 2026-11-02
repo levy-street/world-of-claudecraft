@@ -17398,7 +17398,7 @@ export const en_CA: EnTranslations = {
       },
       "scatterbolt": {
         "name": "Scatterbolt",
-        "description": "Fire a spray of bolts in an 8-yard cone (90 degrees) in front of you, knocking enemies back up to 20 yards from you. Knockback-immune enemies are unaffected. Deals no damage."
+        "description": "Fire a spray of bolts in an 8-yard cone (90 degrees) in front of you, knocking enemies back up to 20 yards from you. Enemy players are thrown into the air in a straight line: knocked off a ledge, they keep going and take falling damage, and a fatal fall counts as your kill. Knockback-immune enemies are unaffected. Deals no damage."
       },
       "pack_rally": {
         "name": "Pack Rally",
