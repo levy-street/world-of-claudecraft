@@ -50,6 +50,7 @@ import { instanceHalfWidthOf } from '../../instances/instance_footprint';
 import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
 import { tickBreathGuardian } from './breath';
+import { noteSmithHeartKills } from './checkpoint_order';
 import { tickHammerCouncil } from './council';
 import { tickFinalBoss } from './final';
 import { tickHeatGuardian } from './heat';
@@ -301,6 +302,10 @@ export function tickSmithHeart(ctx: SimContext): void {
     tickHeatGuardian(ctx, inst);
     tickFinalBoss(ctx, inst);
     const value = tickSmithHeartSeal(ctx, inst);
+    // The kill order the death checkpoints read (checkpoint_order.ts): the
+    // markers' value carries the earned veins, the same mask the seal lit.
+    const mask = value !== null ? value & SMITH_HEART_SEAL_FULL : smithHeartEarnedMask(ctx, inst);
+    noteSmithHeartKills(inst, mask, SMITH_HEART_VEIN_BITS);
     if (value !== null) tickSmithHeartPortal(ctx, inst, smithHeartPortalBitSet(value));
   }
 }

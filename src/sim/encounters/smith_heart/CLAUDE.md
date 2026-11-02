@@ -11,6 +11,8 @@ Quench's, then the Heat's, then the Masterless Strength's, then the seal and the
 | `entry.ts` | The dev-only door while `SMITH_HEART_PLAYABLE` is false. |
 | `seal.ts` | The heart seal's veins, the portal bit and the arrival bit, derived every tick and carried on the seal markers' template ids; `smithHeartVeinWon` (the Hammer's vein waits on the whole council). |
 | `portal.ts` | The portal hop both ways. |
+| `checkpoint_order.ts` | Leaf: the death checkpoints' kill order (recorded by the seal's tick, keyed by the claim and its exit) and the pure rule (`smithHeartCheckpointRooms`: the last kill's room first, the Heart first once all four are down). |
+| `checkpoint.ts` | The death checkpoints' candidates for `instances/dungeon_checkpoints.ts` (its `ORDERED_CHECKPOINTS`): the rooms in that order, the points (`content/smith_heart_checkpoints.ts`), the Heart only while the portal is open. |
 | `council_ids.ts` | Leaf: the council's template, cast, aura, object and cue ids, the per-difficulty rules (`COUNCIL_DIFFICULTY`: the mythic seam), the SKETCH tuning (`COUNCIL_TUNING`), the pillar template helpers, the soak's pure split. The content, the renderer, the HUD and the tests key on it; it imports nothing. |
 | `council_state.ts` | Type-only: `CouncilFightState`, ONE object shared by the three members as `Entity.smithHeartFight`. |
 | `council_scope.ts` | The per-tick scope (claim, state, bodies, players on the Quarry floor, rules) and the plumbing every member module shares: the job holder (`jobHolder`: a member's own job, else its first living heir), the bars, the hashed marks, the damage rolls, the raid warnings (chat `raidWarning` with a `hudChrome.council.warn.*` key). |
@@ -97,7 +99,8 @@ Rules:
   `COUNCIL_DIFFICULTY` row, never a branch on a tier's name.
 - Player text: every raid warning carries its catalog key (`hudChrome.council.warn.*`); the
   damage and aura names are matched by `src/ui/sim_i18n.ts`.
-- Tests: `tests/smith_heart_council.test.ts` (on `tests/helpers/council_fight.ts`),
+- Tests: `tests/smith_heart_checkpoints.test.ts` (the death checkpoints);
+  `tests/smith_heart_council.test.ts` (on `tests/helpers/council_fight.ts`),
   `tests/smith_heart_council_ui.test.ts`, `tests/smith_heart_gating.test.ts`,
   `tests/smith_heart_pull.test.ts`, `tests/smith_heart_dev.test.ts`,
   `tests/smith_heart_council_mythic.test.ts` (the mythic row and Soul in the Stone),

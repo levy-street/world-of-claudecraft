@@ -217,10 +217,56 @@ than the veins' rock, and no line of sight crosses from any main-map eye into th
    **Arrival Terrace**, crosses the **Heart Bridge** to the **Anvil of the World** and
    the final boss. The exit portal opens there when it dies.
 
-Corpse run: a released spirit rises at the raid's entrance (the instance death model),
-walks the main map (Gallery, Quarry, Slab, Balcony, Grand Stair) to the portal, which
-stays open for the claim's life, and steps through. The return portal walks the raid
-back to the dais at any time.
+Corpse run: a released spirit rises at the graveyard outside (the instance death
+model), runs back and walks in through the raid's door, which resurrects it,
+penalty-free, at the raid's **death checkpoint** (section 3.3.1). Before any guardian
+falls that is the entrance: from there it walks the main map (Gallery, Quarry, Slab,
+Balcony, Grand Stair) to the portal, which stays open for the claim's life, and steps
+through. The return portal walks the raid back to the dais at any time.
+
+#### 3.3.1 Death and the run back: the checkpoints
+
+The five-mans' death checkpoints (`instances/dungeon_checkpoints.ts`), with the
+raid's own rule for WHICH room, because the three later guardians fall in any order
+and "the deepest room cleared" means nothing here:
+
+- **No guardian down yet:** the entrance (the Cleft).
+- **One or more down:** the room of the guardian the raid killed **last** (the most
+  recent kill in this claim). The Hammer counts once the whole council has fallen.
+- **All four down** (only the Masterless Strength left, or the raid cleared): the
+  Heart's **Arrival Terrace**, but only while the seal's portal stands open (all four
+  lit AND the Ring clear); with the Ring still alive it is the last guardian's room.
+- The point is the claim's, shared by the whole raid, never a player's own.
+- A point is offered only while it is safe, by the same door-side rules as the
+  five-mans: every gate on the walk from the Cleft to it is open, no idle mob could
+  pull the arrival, no lingering ground zone covers it, nothing blocks it, and no mob
+  of the claim is in a fight (a return during a pull gets the entrance). A refused
+  point gives way to the kill before it, then the entrance.
+
+Each point stands at its room's **door**, never on its fighting floor
+(`content/smith_heart_checkpoints.ts`):
+
+| Room | Point | Why there |
+|---|---|---|
+| Quarry (Hammer) | (-44, -188), just past the Pit Mouth on the Gallery's descent | 55 yd from the pit's middle, outside the council's reach (`COUNCIL_ARENA_R`) |
+| Storm Cornice (Breath) | (-68, 192), the climb's top just past the Cornice Mouth | west of the arena's line (`CLIMB_ARENA_X`), on the walled west side: no open lip near it |
+| Quench Basin | (183, -52), the shelf just past the Lake Mouth | off the lake's ice (its holes stay for the claim's life) and outside the shore ice's ring |
+| Hearth (Heat) | (-171.5, 0), the bridge just past the Hearth Mouth | short of the Hearth's floor and its fires |
+| The Heart | the Arrival Terrace (`HEART_ARRIVAL`) | where the portal sets the raid down, outside the Heart Bridge and the boss's reach, clear of the return portal |
+
+The kill order is the one fact the roster cannot answer (a corpse keeps no time of
+death), so the seal's tick records it (`encounters/smith_heart/checkpoint_order.ts`):
+a vein joins the order the first tick it is won, in vein order within one tick, and
+leaves it if its fight stands up again. It is keyed by the claim and its exit, so a
+fresh claim starts empty. No rng, no clock: identical on every host. Pinned by
+`tests/smith_heart_checkpoints.test.ts` (each order, the Heart, the portal's
+condition, the fallback, the fresh claim, the shared point, each point's clearance and
+route on the real colliders, and the same result through the server).
+
+To try it in a dev build: `/dev heart enter`, `/dev heart kill trash`,
+`/dev heart kill hammer`, then any guardians in any order (`/dev heart kill breath`,
+`quench`, `heat`), then `/dev die`, release the spirit, and `/dev heart enter` again
+(the dev door stands in for the walk back while the raid is a blockout).
 
 ### 3.4 Heights
 
@@ -2127,6 +2173,10 @@ on both difficulties (dungeon rework README, goal 4).
   mouth, no step over
   `MAX_STEP_HEIGHT`, 12 yd paths and gates, every floor within interest range of a
   seal marker, the Ring pack spacing, and the guardian rooms' size.
+- `tests/smith_heart_checkpoints.test.ts`: the death checkpoints (section 3.3.1): the
+  last kill's room in every order, the Heart once all four are down and the portal is
+  open, the fallbacks, the claim's reset, each point off its fight and behind exactly
+  its gates, offline and through the server alike.
 - `tests/smith_heart_gating.test.ts`: the seal value round trip (veins and the portal
   bit), a fresh claim shut and dark, the Hammer first, the other three in any order,
   the portal only with all four lit and the Ring clear (said once, staying open), the
