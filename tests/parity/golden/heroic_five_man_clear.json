@@ -772,9 +772,9 @@
     {
       "tick": 1,
       "time": 0.05,
-      "nextId": 1121,
-      "state": "ab109d0a",
-      "events": "47871878",
+      "nextId": 1113,
+      "state": "65909357",
+      "events": "db99f2b3",
       "rng": {
         "draws": 69,
         "digest": "0249f6ce"
@@ -2139,12 +2139,44 @@
             "phase": "slain",
             "plates": [
               {
+                "objectId": 1094,
+                "state": "sound"
+              },
+              {
+                "objectId": 1095,
+                "state": "broken"
+              },
+              {
+                "objectId": 1096,
+                "state": "sound"
+              },
+              {
+                "objectId": 1097,
+                "state": "sound"
+              },
+              {
+                "objectId": 1098,
+                "state": "sound"
+              },
+              {
+                "objectId": 1099,
+                "state": "sound"
+              },
+              {
+                "objectId": 1100,
+                "state": "sound"
+              },
+              {
+                "objectId": 1101,
+                "state": "sound"
+              },
+              {
                 "objectId": 1102,
                 "state": "sound"
               },
               {
                 "objectId": 1103,
-                "state": "broken"
+                "state": "sound"
               },
               {
                 "objectId": 1104,
@@ -2181,38 +2213,6 @@
               {
                 "objectId": 1112,
                 "state": "sound"
-              },
-              {
-                "objectId": 1113,
-                "state": "sound"
-              },
-              {
-                "objectId": 1114,
-                "state": "sound"
-              },
-              {
-                "objectId": 1115,
-                "state": "sound"
-              },
-              {
-                "objectId": 1116,
-                "state": "sound"
-              },
-              {
-                "objectId": 1117,
-                "state": "sound"
-              },
-              {
-                "objectId": 1118,
-                "state": "sound"
-              },
-              {
-                "objectId": 1119,
-                "state": "sound"
-              },
-              {
-                "objectId": 1120,
-                "state": "sound"
               }
             ],
             "quenchTick": 1,
@@ -2239,8 +2239,8 @@
     {
       "tick": 1,
       "time": 0.05,
-      "nextId": 1121,
-      "state": "ab109d0a",
+      "nextId": 1113,
+      "state": "65909357",
       "events": "741638a5",
       "rng": {
         "draws": 69,
@@ -3606,12 +3606,44 @@
             "phase": "slain",
             "plates": [
               {
+                "objectId": 1094,
+                "state": "sound"
+              },
+              {
+                "objectId": 1095,
+                "state": "broken"
+              },
+              {
+                "objectId": 1096,
+                "state": "sound"
+              },
+              {
+                "objectId": 1097,
+                "state": "sound"
+              },
+              {
+                "objectId": 1098,
+                "state": "sound"
+              },
+              {
+                "objectId": 1099,
+                "state": "sound"
+              },
+              {
+                "objectId": 1100,
+                "state": "sound"
+              },
+              {
+                "objectId": 1101,
+                "state": "sound"
+              },
+              {
                 "objectId": 1102,
                 "state": "sound"
               },
               {
                 "objectId": 1103,
-                "state": "broken"
+                "state": "sound"
               },
               {
                 "objectId": 1104,
@@ -3647,38 +3679,6 @@
               },
               {
                 "objectId": 1112,
-                "state": "sound"
-              },
-              {
-                "objectId": 1113,
-                "state": "sound"
-              },
-              {
-                "objectId": 1114,
-                "state": "sound"
-              },
-              {
-                "objectId": 1115,
-                "state": "sound"
-              },
-              {
-                "objectId": 1116,
-                "state": "sound"
-              },
-              {
-                "objectId": 1117,
-                "state": "sound"
-              },
-              {
-                "objectId": 1118,
-                "state": "sound"
-              },
-              {
-                "objectId": 1119,
-                "state": "sound"
-              },
-              {
-                "objectId": 1120,
                 "state": "sound"
               }
             ],
