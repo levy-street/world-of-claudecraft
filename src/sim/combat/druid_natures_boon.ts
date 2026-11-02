@@ -12,9 +12,14 @@
 // while Oakhide is cooling down can still be spent on it.
 //
 // Groveheart: every tick of a heal-over-time effect a committed restoration
-// druid owns has a 10% chance (behind a 10 sec internal cooldown, so the rate
-// holds near 2 per minute however many HoTs are out) to arm a caster window
-// covering Spore Burst: free, 25% stronger, and castable in any form.
+// druid owns has a 10% chance (behind a 20 sec internal cooldown, so the rate
+// holds near 3 per minute at most however many HoTs are out) to arm a caster
+// window covering Spore Burst: free and castable in any form, but NOT
+// stronger, and the proc takes 15 sec off Spore Burst's cooldown so the window
+// is spendable sooner. Tuned by a 10-seed Monte Carlo (5 healed allies, no
+// overheal): a full cooldown reset with the 25% roughly doubled Groveheart
+// healing; the cut, the plain-strength window and the 20 sec cooldown together
+// leave it about 20% above a Groveheart with no Nature's Boon.
 //
 // Moongrove: every completed Wildbolt or Skyfall cast has the same 10% chance
 // behind its own 10 sec internal cooldown to arm Spore Burst.
@@ -66,8 +71,14 @@ export function naturesBoonChanceAt(swingSeconds: number): number {
 export const NATURES_BOON_CHANCE = naturesBoonChanceAt(CAT_FORM_SWING_SPEED);
 /** Groveheart: per tick of an owned heal-over-time effect. */
 export const GROVEHEART_BOON_TICK_CHANCE = 0.1;
-/** Groveheart: no second proc for this long after one lands. */
-export const GROVEHEART_BOON_ICD = 10;
+/** Groveheart: no second proc for this long after one lands (Moongrove's is
+ *  10; see the header for why Groveheart's is longer). */
+export const GROVEHEART_BOON_ICD = 20;
+/** Seconds a Groveheart proc takes off Spore Burst's remaining cooldown. */
+export const GROVEHEART_BOON_COOLDOWN_CUT = 15;
+/** Groveheart's window carries no bonus: the free Spore Burst lands at its
+ *  ordinary strength (see the header). */
+export const GROVEHEART_BOON_POWER = 1;
 /** procState.icds key for the Groveheart internal cooldown. */
 export const GROVEHEART_BOON_ICD_KEY = 'dru_grove_natures_boon';
 /** Moongrove: per completed Wildbolt or Skyfall cast. */
@@ -125,6 +136,8 @@ interface BoonAura {
   id?: string;
   kind: string;
   empowerAbilities?: readonly string[];
+  /** The window's power multiplier (armNaturesBoon); 0 reads as the base. */
+  value?: number;
 }
 
 /** Does the druid's current form allow the window to pay for this ability?
@@ -150,7 +163,15 @@ export function naturesBoonFormAllows(
  *  stronger multiplier; every other member takes the base power. */
 export function naturesBoonPowerFor(auras: readonly BoonAura[], abilityId: string): number {
   if (!naturesBoonArmedFor(auras, abilityId)) return 1;
-  return abilityId === 'rejuvenation' ? NATURES_BOON_WILDBLOOM_POWER : NATURES_BOON_POWER;
+  if (abilityId === 'rejuvenation') return NATURES_BOON_WILDBLOOM_POWER;
+  // A caster window records its own power on the aura (armNaturesBoon): the
+  // Groveheart window is plain strength. 0 is a window armed before the field
+  // existed, which reads as the base power.
+  const window = auras.find(
+    (aura) => aura.id === NATURES_BOON_ID && aura.kind === 'next_cast_free',
+  );
+  const power = window?.value ?? 0;
+  return power > 0 ? power : NATURES_BOON_POWER;
 }
 
 /** Is a Nature's Boon window armed for this exact ability right now? The one
@@ -197,7 +218,12 @@ function isDruidOfSpec(ctx: SimContext, player: Entity, spec: string): boolean {
  *  the 10 sec rather than stacking). Both arms emit the proc flash: a refresh
  *  is a proc the player can see and act on (a fresh 10 sec), so a silent one
  *  would read as the window quietly outliving its timer. */
-function armNaturesBoon(ctx: SimContext, player: Entity, abilities: readonly string[]): void {
+function armNaturesBoon(
+  ctx: SimContext,
+  player: Entity,
+  abilities: readonly string[],
+  power = NATURES_BOON_POWER,
+): void {
   const existing = player.auras.find(
     (aura) => aura.id === NATURES_BOON_ID && aura.sourceId === player.id,
   );
@@ -206,6 +232,7 @@ function armNaturesBoon(ctx: SimContext, player: Entity, abilities: readonly str
     existing.remaining = NATURES_BOON_DURATION;
     existing.duration = NATURES_BOON_DURATION;
     existing.empowerAbilities = [...abilities];
+    existing.value = power;
   } else {
     ctx.applyAura(player, {
       id: NATURES_BOON_ID,
@@ -213,7 +240,8 @@ function armNaturesBoon(ctx: SimContext, player: Entity, abilities: readonly str
       kind: 'next_cast_free',
       remaining: NATURES_BOON_DURATION,
       duration: NATURES_BOON_DURATION,
-      value: 0,
+      // The window's power multiplier (naturesBoonPowerFor).
+      value: power,
       sourceId: player.id,
       school: 'nature',
       empowerAbilities: [...abilities],
@@ -247,12 +275,14 @@ function rollCasterBoon(
   icd: number,
   chance: number,
   abilities: readonly string[],
-): void {
-  if (player.procState?.icds[icdKey] !== undefined) return;
-  if (!ctx.rng.chance(chance)) return;
+  power = NATURES_BOON_POWER,
+): boolean {
+  if (player.procState?.icds[icdKey] !== undefined) return false;
+  if (!ctx.rng.chance(chance)) return false;
   if (!player.procState) player.procState = { counters: {}, icds: {} };
   player.procState.icds[icdKey] = icd;
-  armNaturesBoon(ctx, player, abilities);
+  armNaturesBoon(ctx, player, abilities, power);
+  return true;
 }
 
 /** The completed-cast hook (combat/talent_procs.ts onCastCompleted). A
@@ -274,16 +304,23 @@ export function naturesBoonOnCast(ctx: SimContext, player: Entity, abilityId: st
 /** The heal-over-time tick hook (combat/auras.ts). A committed restoration
  *  druid's own HoT tick rolls the Groveheart chance when the internal cooldown
  *  is clear; the gate and the cooldown check both pass BEFORE the roll, so no
- *  other player's stream moves and a druid inside the cooldown draws nothing. */
+ *  other player's stream moves and a druid inside the cooldown draws nothing.
+ *  A proc also takes GROVEHEART_BOON_COOLDOWN_CUT off Spore Burst's remaining
+ *  cooldown (draws nothing), ending it outright when less than that is left. */
 export function naturesBoonOnHotTick(ctx: SimContext, source: Entity | null, aura: Aura): void {
   if (!source || source.dead || aura.kind !== 'hot' || aura.sourceId !== source.id) return;
   if (!isDruidOfSpec(ctx, source, 'restoration')) return;
-  rollCasterBoon(
+  const procced = rollCasterBoon(
     ctx,
     source,
     GROVEHEART_BOON_ICD_KEY,
     GROVEHEART_BOON_ICD,
     GROVEHEART_BOON_TICK_CHANCE,
     GROVEHEART_BOON_ABILITIES,
+    GROVEHEART_BOON_POWER,
   );
+  if (!procced) return;
+  const left = source.cooldowns.get('spore_burst') ?? 0;
+  if (left <= GROVEHEART_BOON_COOLDOWN_CUT) source.cooldowns.delete('spore_burst');
+  else source.cooldowns.set('spore_burst', left - GROVEHEART_BOON_COOLDOWN_CUT);
 }

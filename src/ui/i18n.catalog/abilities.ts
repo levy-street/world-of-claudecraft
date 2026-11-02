@@ -1690,7 +1690,7 @@ const classAbilityNamesEn = {
           balance:
             'Each Wildbolt or Skyfall you cast has a 10% chance to arm it for Spore Burst, at most once every 10 sec.',
           restoration:
-            'Each tick of your heal-over-time effects has a 10% chance to arm it for Spore Burst, at most once every 10 sec.',
+            'Each tick of your heal-over-time effects has a 10% chance to arm it for Spore Burst and take 15 sec off the Spore Burst cooldown, at most once every 20 sec. This Spore Burst is free but not stronger.',
         },
       ],
       [
