@@ -4838,7 +4838,9 @@ export interface CampDef {
    * How many of the camp's LAST slots are retired: each still consumes its
    * spawn draws and entity id, but spawns nothing. A shipped camp that lost
    * mobs keeps `count` and retires the difference, so every later world draw
-   * (and every seeded roll) stays bit-identical (camp_scatter.ts).
+   * (and every seeded roll) stays bit-identical (camp_scatter.ts). Read only
+   * by the scattered-camp spawn path: a dummy or ambient camp (no scatter, no
+   * draws) ignores it.
    */
   retiredSlots?: number;
 }
@@ -6506,12 +6508,12 @@ export interface ZoneDef {
   biome: BiomeId;
   hub: { x: number; z: number; radius: number; name: string };
   /**
-   * The town's own footprint for its errands, when it has outgrown the hub
+   * More of the town's footprint for its errands, when it has outgrown the hub
    * circle (professions/focus.ts isInTownZone: the town quests and town
    * focus read it). `hub` also shapes the world (the terrain plateau, the
    * decoration keep-out, the town collider circle), so a town whose quest
    * givers and benches spread past it widens this instead of the hub.
-   * Absent: the hub circle is the town.
+   * The town is the union of the two circles; absent, the hub circle alone.
    */
   questHub?: { x: number; z: number; radius: number };
   graveyard: { x: number; z: number };

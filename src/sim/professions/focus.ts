@@ -147,12 +147,19 @@ export function applyFocusTierBonus(
 // hub circle IS the town-tag stand-in this feature uses: a lightweight
 // zone-tag check, not a real crafting-station build-out. A town that spread
 // past its hub (the Studio town rework, #4593) carries a wider `questHub`
-// circle, which wins; the hub keeps shaping the terrain either way.
+// circle as well: the town is the union of the two, so the hub's own ground
+// never stops counting as town. The hub keeps shaping the terrain either way.
 export function isInTownZone(pos: { x: number; z: number }, zone: ZoneDef): boolean {
-  const town = zone.questHub ?? zone.hub;
-  const dx = pos.x - town.x;
-  const dz = pos.z - town.z;
-  return dx * dx + dz * dz <= town.radius * town.radius;
+  return inCircle(pos, zone.hub) || (zone.questHub !== undefined && inCircle(pos, zone.questHub));
+}
+
+function inCircle(
+  pos: { x: number; z: number },
+  c: { x: number; z: number; radius: number },
+): boolean {
+  const dx = pos.x - c.x;
+  const dz = pos.z - c.z;
+  return dx * dx + dz * dz <= c.radius * c.radius;
 }
 
 export interface SetTownFocusResult {

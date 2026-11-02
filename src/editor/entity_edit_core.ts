@@ -19,6 +19,9 @@ interface RuntimeCamp {
 interface RuntimeCampMatch extends RuntimeCamp {
   center: Vec2;
   count: number;
+  // A camp's authored spots (CampDef.spots): a pinned mob spawns on its spot,
+  // which may sit outside the camp's radius.
+  spots?: readonly Vec2[];
 }
 
 interface RuntimeMobMatch {
@@ -46,7 +49,8 @@ export function findRuntimeCampIndex(
     );
     const visibleDistance = Math.hypot(mob.pos.x - camp.center.x, mob.pos.z - camp.center.z);
     const distance = camp.count === 1 ? Math.min(spawnDistance, visibleDistance) : spawnDistance;
-    if (distance <= camp.radius + 1 && distance < bestDistance) {
+    const owns = distance <= camp.radius + 1 || campHoldsSpawn(camp, mob.spawnPos);
+    if (owns && distance < bestDistance) {
       best = i;
       bestDistance = distance;
     }
@@ -88,15 +92,53 @@ export function splitCampIntoIndividuals<T extends RuntimeCamp & { center: Vec2;
   camp: T,
   positions: readonly Vec2[],
 ): T[] {
+  // The positions are the mobs that actually spawned, so a retired slot has
+  // none; each one-mob camp stands at its own position, never inheriting the
+  // group's pinned spots or retired slots (spots[0] would pin every one to
+  // the same point, and a retired slot would erase it).
+  const {
+    spots: _spots,
+    retiredSlots: _retired,
+    ...rest
+  } = camp as T & {
+    spots?: unknown;
+    retiredSlots?: unknown;
+  };
   return positions.slice(0, camp.count).map(
     (position) =>
       ({
-        ...camp,
+        ...rest,
         center: { x: position.x, z: position.z },
         radius: 0.5,
         count: 1,
-      }) as T,
+      }) as unknown as T,
   );
+}
+
+/** True when a spawn point belongs to the camp: inside its scatter disc, or on
+ *  one of its pinned spots (CampDef.spots), which can sit outside the disc. */
+export function campHoldsSpawn(
+  camp: { center: Vec2; radius: number; spots?: readonly Vec2[] },
+  spawn: Vec2,
+): boolean {
+  if (Math.hypot(spawn.x - camp.center.x, spawn.z - camp.center.z) <= camp.radius + 1) return true;
+  return (camp.spots ?? []).some((s) => Math.hypot(spawn.x - s.x, spawn.z - s.z) <= 0.75);
+}
+
+/** Move a camp's center, carrying its pinned spots by the same offset so the
+ *  camp moves as one group. */
+export function setCampCenter(
+  camp: { center: Vec2; spots?: readonly Vec2[] },
+  x: number,
+  z: number,
+): void {
+  const dx = x - camp.center.x;
+  const dz = z - camp.center.z;
+  if (camp.spots && (dx !== 0 || dz !== 0)) {
+    camp.spots = camp.spots.map((s) => ({ x: s.x + dx, z: s.z + dz }));
+  }
+  camp.center.x = x;
+  camp.center.z = z;
 }
 
 export function toggledMobSelection(

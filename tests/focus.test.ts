@@ -86,6 +86,22 @@ describe('isInTownZone: the town-tag stand-in (zone hub circle)', () => {
       false,
     );
   });
+
+  it('reads a town that outgrew its hub as the union of the hub and its quest hub', () => {
+    const zone = {
+      ...ZONE1,
+      hub: { x: 0, z: 0, radius: 20, name: 'Hub' },
+      questHub: { x: 0, z: 50, radius: 25 },
+    };
+    // inside the quest hub only: town
+    expect(isInTownZone({ x: 0, z: 70 }, zone)).toBe(true);
+    // inside the hub only (south of the quest hub): still town
+    expect(isInTownZone({ x: 0, z: -15 }, zone)).toBe(true);
+    // between neither circle: not town
+    expect(isInTownZone({ x: 40, z: 22 }, zone)).toBe(false);
+    // and without a quest hub the same point past the hub is out
+    expect(isInTownZone({ x: 0, z: 70 }, { ...zone, questHub: undefined })).toBe(false);
+  });
 });
 
 describe('setTownFocus: gated on town, budget-capped, rejects leave prior state untouched', () => {

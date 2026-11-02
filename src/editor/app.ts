@@ -433,6 +433,7 @@ import { buildCharacterVisualOptions, buildMobCatalogOptions } from './entity_au
 import {
   isMovableEntity,
   pickMovableEntity,
+  setCampCenter,
   splitCampIntoIndividuals,
   toggledMobSelection,
 } from './entity_edit_core';
@@ -3632,8 +3633,7 @@ export class EditorApp {
           drag.dx = dx;
           drag.dz = dz;
           for (const { camp, point } of drag.camps.values()) {
-            camp.center.x = point.x + dx;
-            camp.center.z = point.z + dz;
+            setCampCenter(camp, point.x + dx, point.z + dz);
           }
           this.entities = buildEntities(this.content);
           this.canvasDirty = true;
@@ -3808,8 +3808,7 @@ export class EditorApp {
               const dx = target.x - move.camp.center.x;
               const dz = target.z - move.camp.center.z;
               this.viewport3d?.moveRuntimeMobs(new Set([id]), dx, dz);
-              move.camp.center.x = target.x;
-              move.camp.center.z = target.z;
+              setCampCenter(move.camp, target.x, target.z);
             }
             this.entities = buildEntities(this.content);
             this.canvasDirty = true;
@@ -13923,8 +13922,7 @@ export class EditorApp {
     );
     state.applied = { dx, dz };
     for (const { camp, from } of state.camps.values()) {
-      camp.center.x = from.x + dx;
-      camp.center.z = from.z + dz;
+      setCampCenter(camp, from.x + dx, from.z + dz);
     }
     this.entities = buildEntities(this.content);
     this.syncSelectedMobRouteOverlay();
@@ -13963,8 +13961,7 @@ export class EditorApp {
         const dx = target.x - move.camp.center.x;
         const dz = target.z - move.camp.center.z;
         this.viewport3d?.moveRuntimeMobs(new Set([mid]), dx, dz);
-        move.camp.center.x = target.x;
-        move.camp.center.z = target.z;
+        setCampCenter(move.camp, target.x, target.z);
       }
       this.entities = buildEntities(this.content);
       this.canvasDirty = true;
@@ -14621,11 +14618,17 @@ export class EditorApp {
       authorVfx: camp.authorVfx ? { ...camp.authorVfx } : undefined,
       aiNotes: camp.aiNotes,
       questNotes: camp.questNotes,
+      spots: camp.spots,
+      retiredSlots: camp.retiredSlots,
     });
     const apply = (value: ReturnType<typeof capture>): void => {
       camp.mobId = value.mobId;
       camp.count = value.count;
       camp.radius = value.radius;
+      if (value.spots) camp.spots = value.spots;
+      else delete camp.spots;
+      if (value.retiredSlots !== undefined) camp.retiredSlots = value.retiredSlots;
+      else delete camp.retiredSlots;
       for (const key of ['levelMin', 'levelMax', 'authorVfx', 'aiNotes', 'questNotes'] as const) {
         delete camp[key];
       }
@@ -14644,6 +14647,10 @@ export class EditorApp {
     }
     if (change.count !== undefined) {
       camp.count = Math.max(1, Math.min(MAX_CAMP_COUNT, Math.round(change.count)));
+      // A recount makes the count what spawns: drop the retired slots and any
+      // spots past the new count (CampDef.retiredSlots, CampDef.spots).
+      delete camp.retiredSlots;
+      if (camp.spots) camp.spots = camp.spots.slice(0, camp.count);
     }
     if (change.radius !== undefined) {
       camp.radius = Math.max(1, Math.min(MAX_CAMP_RADIUS, change.radius));

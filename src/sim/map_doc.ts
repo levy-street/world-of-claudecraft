@@ -1845,6 +1845,26 @@ function fillZoneDefaults(v: unknown): ZoneDef {
   if (!finiteNum(hub.radius)) hub.radius = 20;
   else hub.radius = clamp(hub.radius, 1, 200);
   if (typeof hub.name !== 'string') hub.name = '';
+  // The optional wider town circle (ZoneDef.questHub): sanitized like the hub,
+  // dropped when malformed, so a stored map cannot make the whole map "town".
+  const qh = z.questHub as Record<string, unknown> | undefined;
+  if (qh !== undefined) {
+    if (
+      !qh ||
+      typeof qh !== 'object' ||
+      !finiteNum(qh.x) ||
+      !finiteNum(qh.z) ||
+      !finiteNum(qh.radius)
+    ) {
+      delete z.questHub;
+    } else {
+      z.questHub = {
+        x: coord(qh.x as number),
+        z: coord(qh.z as number),
+        radius: clamp(qh.radius as number, 1, 200),
+      };
+    }
+  }
   const gy = z.graveyard as Record<string, unknown> | undefined;
   if (!gy || !finiteNum(gy.x) || !finiteNum(gy.z)) {
     z.graveyard = { x: hub.x, z: hub.z };

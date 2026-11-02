@@ -83,6 +83,7 @@ import {
   placementsToRenderAssets,
 } from '../custom_map';
 import {
+  campHoldsSpawn,
   findRuntimeCampIndex,
   moveRuntimeMapEntity,
   moveRuntimeMobsById,
@@ -1341,8 +1342,7 @@ export class Editor3DViewport {
           candidate.kind === 'mob' &&
           candidate.ownerId === null &&
           candidate.templateId === camp.mobId &&
-          Math.hypot(candidate.spawnPos.x - camp.center.x, candidate.spawnPos.z - camp.center.z) <=
-            camp.radius + 1,
+          campHoldsSpawn(camp, candidate.spawnPos),
       )
       .sort((a, b) => {
         const ad = Math.hypot(a.spawnPos.x - camp.center.x, a.spawnPos.z - camp.center.z);

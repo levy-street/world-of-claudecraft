@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import {
+  campHoldsSpawn,
   findRuntimeCampIndex,
   moveRuntimeMapEntity,
   moveRuntimeMobsById,
   pickMovableEntity,
+  setCampCenter,
   setRuntimeNpcFacing,
   splitCampIntoIndividuals,
   toggledMobSelection,
@@ -147,6 +149,46 @@ describe('individual mob selection', () => {
       { mobId: 'boar', center: { x: 11, z: 9 }, radius: 0.5, count: 1 },
       { mobId: 'boar', center: { x: 14, z: 13 }, radius: 0.5, count: 1 },
     ]);
+  });
+
+  it('splits a camp with pinned spots and retired slots into plain one-mob camps', () => {
+    const camp = {
+      mobId: 'boar',
+      center: { x: 10, z: 10 },
+      radius: 12,
+      count: 3,
+      spots: [
+        { x: 40, z: 40 },
+        { x: 41, z: 41 },
+      ],
+      retiredSlots: 1,
+    };
+    expect(
+      splitCampIntoIndividuals(camp, [
+        { x: 40, z: 40 },
+        { x: 41, z: 41 },
+      ]),
+    ).toEqual([
+      { mobId: 'boar', center: { x: 40, z: 40 }, radius: 0.5, count: 1 },
+      { mobId: 'boar', center: { x: 41, z: 41 }, radius: 0.5, count: 1 },
+    ]);
+  });
+
+  it('owns a spawn on a pinned spot outside the disc, and moves spots with the center', () => {
+    const camp = { center: { x: 0, z: 0 }, radius: 5, spots: [{ x: 30, z: 0 }] };
+    expect(campHoldsSpawn(camp, { x: 3, z: 0 })).toBe(true);
+    expect(campHoldsSpawn(camp, { x: 30.5, z: 0 })).toBe(true);
+    expect(campHoldsSpawn(camp, { x: 20, z: 0 })).toBe(false);
+    setCampCenter(camp, 10, -4);
+    expect(camp.center).toEqual({ x: 10, z: -4 });
+    expect(camp.spots).toEqual([{ x: 40, z: -4 }]);
+    expect(
+      findRuntimeCampIndex([{ mobId: 'boar', ...camp, count: 2 }], {
+        templateId: 'boar',
+        pos: { x: 40, z: -4 },
+        spawnPos: { x: 40, z: -4 },
+      }),
+    ).toBe(0);
   });
 
   it('plain click selects one while Ctrl-click toggles a multi-selection', () => {

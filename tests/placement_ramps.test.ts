@@ -18,7 +18,7 @@ vi.mock('../src/sim/asset_collision', async (importOriginal) => {
   };
 });
 
-const { placementRampFloorAt } = await import('../src/sim/placement_ramps');
+const { decksMayStand, placementRampFloorAt } = await import('../src/sim/placement_ramps');
 
 // Detached placements read their frozen groundY, so the test never touches the
 // procedural terrain heightfield.
@@ -122,5 +122,18 @@ describe('per-placement ramp decks (Collision Master live sessions)', () => {
     const p = (content.placements as { ramps?: unknown }[])[0];
     p.ramps = [{ x: 0, z: 0, hx: 2, hz: 1, y0: 0, y1: 3 }];
     expect(placementRampFloorAt(content, 1, 102, 50)).toBeCloseTo(13, 4);
+  });
+});
+
+describe('the deck early-out', () => {
+  it('keeps one box per decked placement, so ground between two towns skips the deck scan', () => {
+    const one = contentWith('/models/props/test_ramp.glb').placements as unknown[];
+    const content = {
+      placements: [one[0], { ...(one[0] as object), x: 900, z: 650 }],
+    } as unknown as WorldContent;
+    expect(decksMayStand(content, 100, 50)).toBe(true);
+    expect(decksMayStand(content, 900, 650)).toBe(true);
+    // halfway between the two: inside one box round both, outside each own box
+    expect(decksMayStand(content, 500, 350)).toBe(false);
   });
 });

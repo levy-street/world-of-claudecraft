@@ -141,3 +141,31 @@ describe('the map document keeps spots and retired slots', () => {
     expect(camps[1].retiredSlots).toBe(2);
   });
 });
+
+describe('the map document keeps a sane quest hub', () => {
+  const docWith = (questHub: unknown) =>
+    sanitizeMapDoc({
+      version: 1,
+      meta: { name: 'quest hub' },
+      content: {
+        zones: [{ id: 'qh', name: 'QH', zMin: 500, zMax: 700, hub: { x: 600, z: 600 }, questHub }],
+      },
+    })?.content.zones[0];
+
+  it('keeps a valid quest hub and clamps its radius like the hub', () => {
+    expect(docWith({ x: 610, z: 620, radius: 40 })?.questHub).toEqual({
+      x: 610,
+      z: 620,
+      radius: 40,
+    });
+    expect(docWith({ x: 610, z: 620, radius: 9e9 })?.questHub?.radius).toBe(200);
+  });
+
+  it('drops a malformed quest hub instead of making the map one town', () => {
+    for (const bad of [null, 'x', { x: 1, z: 2 }, { x: Number.NaN, z: 2, radius: 3 }]) {
+      const zone = docWith(bad);
+      expect(zone, JSON.stringify(bad)).toBeDefined();
+      expect(zone?.questHub, JSON.stringify(bad)).toBeUndefined();
+    }
+  });
+});
