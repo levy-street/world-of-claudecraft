@@ -23,7 +23,7 @@ import {
   isFeigningDeath,
   movementInputWouldMove,
 } from './combat/cast_move_gate';
-import { isRooted, isStunned } from './combat/cc';
+import { isFacingLocked, isRooted, isStunned } from './combat/cc';
 import { SPOREMENDER_FORM_KIND, SPOREMENDER_MOVE_SPEED_MULT } from './combat/druid_sporemender';
 import { huntingMomentumSpeedMult } from './combat/hunting_momentum_speed';
 import { isVeilboundMarchActive } from './combat/paladin_veilbound_state';
@@ -388,7 +388,7 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
   // Convention: facing f points along (sin f, cos f); the camera sits behind
   // the player, so screen-right is the world vector (-cos f, sin f).
   // Turning right therefore DECREASES facing.
-  if (!isStunned(p)) {
+  if (!isFacingLocked(p)) {
     if (inp.turnLeft) p.facing = normAngle(p.facing + TURN_SPEED * DT);
     if (inp.turnRight) p.facing = normAngle(p.facing - TURN_SPEED * DT);
   }

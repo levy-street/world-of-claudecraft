@@ -60,6 +60,17 @@ export function isStunned(e: Entity): boolean {
   );
 }
 
+/** Facing is frozen: no turn key, mouselook or controller aim may rotate the
+ *  body. A stun (issue #2426) and Play Dead (combat/hunter_play_dead.ts, aura
+ *  kind `feign_death`), where a corpse that turned with the camera would tell
+ *  every enemy player at a glance that the hunter is only feigning. Every site
+ *  that writes a player's facing from input asks this one predicate: the
+ *  movement kernel, both server movement paths, and the offline and online
+ *  client loops. */
+export function isFacingLocked(e: Entity): boolean {
+  return isStunned(e) || e.auras.some((a) => a.kind === 'feign_death');
+}
+
 export function isInStasis(e: Entity): boolean {
   return e.auras.some((a) => a.kind === 'stasis');
 }
