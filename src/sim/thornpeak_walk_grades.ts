@@ -65,9 +65,10 @@ export function applyGardenwalkWestPass(x: number, z: number, h: number): number
 // altitude roughening still rides on top, so the finished ground inside rIn
 // sits within about 0.6yd of the surface (low frequency, and already part
 // of the ring the fit saw). To re-fit, fit finished terrainHeight on that
-// ring again. The surface falls east toward the practice row and rises
-// north, under 1.0 rise/run everywhere inside rIn, well below the 1.5 climb
-// gate.
+// ring again. The surface falls east and rises north, under 1.0 rise/run
+// everywhere inside rIn, well below the 1.5 climb gate. Re-fitted for the
+// Studio town rework (#4593): the practice row's calm pads (moved south of
+// the pocket) and the levelled house terrace east of it lowered the ring.
 //
 // SHIPPED SEED ONLY: the crest is an artifact of the WORLD_SEED noise, and on
 // any other seed (the RL env accepts arbitrary seeds) the same hillside sits
@@ -79,12 +80,12 @@ export const THORNPEAK_POCKET_GRADE = {
   z: 629,
   // the fitted hillside, in offsets (dx, dz) from the center above:
   // h = h0 + gx dx + gz dz + gxx dx^2 + gxz dx dz + gzz dz^2
-  h0: 23.8944,
-  gx: -0.69164,
-  gz: 0.39067,
-  gxx: 0.00521,
-  gxz: -0.02968,
-  gzz: -0.0017,
+  h0: 20.81346,
+  gx: -0.49079,
+  gz: 0.32747,
+  gxx: 0.00304,
+  gxz: -0.03396,
+  gzz: -0.0039,
   rIn: 5.5, // full surface out to here (the whole knot sits inside)...
   rOut: 11, // ...easing back onto the natural hillside by here
 } as const;

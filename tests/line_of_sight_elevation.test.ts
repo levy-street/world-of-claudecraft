@@ -100,7 +100,9 @@ describe('grounded line-of-sight elevation', () => {
     // reaches the square now, so the stall stands on the plat's own grade.
     // Re-pinned for the Studio town rework (#4593): its terrain edits lift the
     // market square here by about 0.19 yd (the ground stays level under it).
-    expect(terrainY).toBeCloseTo(-0.455);
+    // Re-pinned again when the stall followed the World Market's keeper to the
+    // bank's door (the same rework): it stands on the bank's -0.7 shelf now.
+    expect(terrainY).toBeCloseTo(-0.7);
     expect(canopyY).toBeCloseTo(terrainY + stall.height);
     const stallCollider = colliderInternalsForTest
       .staticWorldColliders(WORLD_SEED)

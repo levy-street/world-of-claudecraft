@@ -1,15 +1,15 @@
 {
   "version": 2,
   "meta": {
-    "id": "live-41047-21bfd4ab-95536f9b-e76e8-1f23361d-6f93feed",
+    "id": "live-4103c-d11d9989-c975f419-e7843-28643a0e-c892d41e",
     "name": "Live world",
     "description": "",
     "createdAt": 0,
     "updatedAt": 0,
     "seed": 20061,
     "parentId": "",
-    "overworldBase": "41047-21bfd4ab-95536f9b",
-    "overworldRevision": "e76e8-1f23361d-6f93feed"
+    "overworldBase": "4103c-d11d9989-c975f419",
+    "overworldRevision": "e7843-28643a0e-c892d41e"
   },
   "content": {
     "zones": [
@@ -5653,9 +5653,9 @@
         "title": "Parterre Gardener",
         "pos": {
           "x": 353.14,
-          "z": 863.59
+          "z": 866
         },
-        "facing": 2.356,
+        "facing": 0,
         "color": 8231772,
         "questIds": [],
         "greeting": "Mind the edging, $N, these beds are the pride of the parterre. Seed and compost are what I sell, and I will turn any withered husks you carry into more of it.",
@@ -70809,6 +70809,42 @@
       "mode": "level",
       "hardness": 0.45,
       "id": "e00000000a03"
+    },
+    {
+      "x": -59.5,
+      "z": 634,
+      "radius": 5.5,
+      "delta": 17.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "gx": -0.62,
+      "gz": 0,
+      "hardness": 0.35,
+      "id": "owner-thornpeak-ramp-0"
+    },
+    {
+      "x": -59.5,
+      "z": 637.5,
+      "radius": 5.5,
+      "delta": 17.675,
+      "falloff": "smooth",
+      "mode": "level",
+      "gx": -0.62,
+      "gz": 0,
+      "hardness": 0.35,
+      "id": "owner-thornpeak-ramp-1"
+    },
+    {
+      "x": -59.5,
+      "z": 641,
+      "radius": 5.5,
+      "delta": 17.85,
+      "falloff": "smooth",
+      "mode": "level",
+      "gx": -0.62,
+      "gz": 0,
+      "hardness": 0.35,
+      "id": "owner-thornpeak-ramp-2"
     }
   ],
   "placements": [

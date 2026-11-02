@@ -263,7 +263,9 @@ const GATHER_NODE_ROWS: GatherNodeDef[] = [
     // the harbor town on that basin), but the meadow spot above the ground
     // keeps 8.0yd of sea freeboard and 5.4yd across the whole harvest reach,
     // and the basin below is reserved construction ground now anyway.
-    pos: { x: 12, z: -63 },
+    // The Studio town rework (#4593) re-laid the road past (12, -63), so the
+    // patch stepped 2 yd east to keep its 5 yd road clearance.
+    pos: { x: 14, z: -63 },
     level: 4,
     tier: 1,
   },

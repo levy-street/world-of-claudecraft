@@ -300,8 +300,10 @@ describe('Highwatch training dummy', () => {
     expect(d.templateId).toBe('training_dummy');
     expect(d.name).toBe('Healing Dummy');
     expect(d.aiState).toBe('idle');
-    expect(Math.round(d.pos.x)).toBe(-34);
-    expect(Math.round(d.pos.z)).toBe(648);
+    // beside the practice row's friendly end, where the Studio town rework
+    // (#4593) moved the row (src/sim/hub_practice.ts)
+    expect(Math.round(d.pos.x)).toBe(-62);
+    expect(Math.round(d.pos.z)).toBe(616);
     sim.tick();
     sim.targetNearestFriendly(pid);
 

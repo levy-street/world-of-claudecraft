@@ -59,7 +59,7 @@ const FARMERS: readonly {
     id: 'farmer_verbena',
     patchId: 'patch_evergarden',
     zoneId: 'evergarden',
-    seat: { x: 353.14, z: 863.59 },
+    seat: { x: 353.14, z: 866 },
   },
 ];
 

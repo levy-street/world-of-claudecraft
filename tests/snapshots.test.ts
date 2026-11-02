@@ -6647,8 +6647,10 @@ describe('full self-state snapshot delta fixture', () => {
     // Re-pinned 2026-08 for the harbor move (d19aa33f76,
     // docs/design/eastbrook-revamp/site-plan.md): station_eastbrook_forge moved
     // with the smithy to (-5.80, -123.90); stand ~0.2yd from its center.
+    // Re-pinned for the Studio town rework (#4593): the forge followed
+    // Forgemistress Darva to (11.6, -61.36), beside the smithy's forge shelter.
     const player = server.sim.entities.get(session.pid)!;
-    player.pos = { ...player.pos, x: -6, z: -124 };
+    player.pos = { ...player.pos, x: 11.6, z: -61.2 };
     player.prevPos = { ...player.pos };
 
     broadcast(server);

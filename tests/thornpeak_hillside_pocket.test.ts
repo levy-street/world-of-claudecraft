@@ -12,6 +12,7 @@
 
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { isBlocked, queryOpenWorldColliders } from '../src/sim/colliders';
 import { Sim } from '../src/sim/sim';
 import { TERRAIN_APPLIER, TERRAIN_APPLIER_BOUNDS } from '../src/sim/terrain_region_index';
 import {
@@ -56,14 +57,19 @@ function makeWalker(spot: { x: number; z: number }) {
 }
 
 // Sixteen fixed headings (heading 4 is due east, straight downhill toward the
-// practice row), each a six-second walk from the same settled start. Returns
-// which headings carried the walker clear of the pocket.
-function escapingHeadings(spot: { x: number; z: number }): number[] {
+// house terrace), each a six-second walk from the same settled start. Returns
+// which headings carried the walker clear of the pocket, and where each walk
+// ended.
+function escapingHeadings(spot: { x: number; z: number }): {
+  out: number[];
+  ends: { x: number; z: number }[];
+} {
   const { sim, p, meta } = makeWalker(spot);
   const sx = p.pos.x;
   const sz = p.pos.z;
   const sy = p.pos.y;
   const out: number[] = [];
+  const ends: { x: number; z: number }[] = [];
   for (let d = 0; d < 16; d++) {
     p.pos.x = sx;
     p.pos.z = sz;
@@ -80,9 +86,10 @@ function escapingHeadings(spot: { x: number; z: number }): number[] {
       sim.tick();
     }
     meta.moveInput.forward = false;
+    ends.push({ x: p.pos.x, z: p.pos.z });
     if (Math.hypot(p.pos.x - sx, p.pos.z - sz) > 12) out.push(d);
   }
-  return out;
+  return { out, ends };
 }
 
 describe('the Thornpeak hillside pocket west of the Highwatch practice row', () => {
@@ -128,7 +135,7 @@ describe('the Thornpeak hillside pocket west of the Highwatch practice row', () 
   });
 
   it('leaves no sliver crest across the downhill line out of the pit', () => {
-    // due east from the pit down toward the practice row: every half-yard
+    // due east from the pit down toward the house terrace: every half-yard
     // step falls or rises gently, never the 1.5+ rise/run the crest carried
     let prev = groundHeight(PIT.x, PIT.z, SEED);
     for (let x = PIT.x + 0.5; x <= PIT.x + 10; x += 0.5) {
@@ -144,10 +151,20 @@ describe('the Thornpeak hillside pocket west of the Highwatch practice row', () 
     timeout: 90_000,
   }, () => {
     // ungraded, the reported spot let out 7 of 16 headings and the pit 3,
-    // due east (straight downhill) blocked from both
+    // due east (straight downhill) blocked from both. The Studio town rework
+    // (#4593) stood a house (house_c) on the terrace east of the pocket: from
+    // both spots heading 5 walks into its west tower, a wall rather than
+    // ground, so that one walk must end against the house instead
     const all = Array.from({ length: 16 }, (_, d) => d);
     for (const spot of [REPORTED, PIT]) {
-      expect(escapingHeadings(spot), `escaping headings from (${spot.x}, ${spot.z})`).toEqual(all);
+      const walk = escapingHeadings(spot);
+      expect(walk.out, `escaping headings from (${spot.x}, ${spot.z})`).toEqual(
+        all.filter((d) => d !== 5),
+      );
+      const end = walk.ends[5];
+      const nearby = queryOpenWorldColliders(SEED, end.x - 2, end.z - 2, end.x + 2, end.z + 2, []);
+      expect(nearby.some((c) => c.src?.includes('/highwatch/house_c.glb'))).toBe(true);
+      expect(isBlocked(SEED, end.x, end.z, 1.2), 'heading 5 stops against the house').toBe(true);
     }
   });
 });
@@ -214,9 +231,11 @@ describe('the pocket grade (thornpeak_walk_grades.ts)', () => {
         n++;
       }
     }
-    // measured at the fit: worst 0.90, mean -0.03 (the ring's own crag
-    // texture swings about 0.6 either way, so the worst arm cannot go tight)
-    expect(worst, 'worst ring residual (yd)').toBeLessThan(1.1);
+    // measured at the fit: worst 1.60, mean near 0 (the ring's own crag
+    // texture swings about 1.3 either way on the west arm since the Studio
+    // town rework (#4593) re-shaped the hillside, so the worst arm cannot go
+    // tight; the rim sweep above is what proves the fade builds no lip)
+    expect(worst, 'worst ring residual (yd)').toBeLessThan(1.75);
     expect(Math.abs(sum / n), 'mean ring residual (yd)').toBeLessThan(0.2);
   });
 });

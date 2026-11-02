@@ -33,9 +33,10 @@ import { type ClientSession, GameServer } from '../server/game';
 import type { PlayerMeta } from '../src/sim/sim';
 import type { SimEvent } from '../src/sim/types';
 
-// alchemy -> the Highwatch apothecary (station_highwatch_apothecary).
+// alchemy -> the Highwatch apothecary (station_highwatch_apothecary), which
+// followed Alchemist Verane off the square in the Studio town rework (#4593).
 const RECIPE_ID = 'recipe_volatile_flux_elixir';
-const APOTHECARY_POS = { x: 7, z: 660 };
+const APOTHECARY_POS = { x: -40, z: 690.5 };
 
 // A field spot far outside every station circle and clear of camp pulls.
 const FIELD_POS = { x: 0, z: 150 };

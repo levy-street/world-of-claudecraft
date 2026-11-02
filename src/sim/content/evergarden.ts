@@ -319,13 +319,16 @@ export const EVERGARDEN_NPCS: Record<string, NpcDef> = {
   // compost PLUS all four tier-4 seeds, each at buyValue 64, put there by
   // GATE 1 (Phase 11e). This header read "compost only ... seed-back and
   // market goods (D11)" until then, the same revert hazard as the Highwatch
-  // twin. tests/farmer_npc_placement.test.ts pins the seat.
+  // twin. tests/farmer_npc_placement.test.ts pins the seat. The Studio town
+  // rework (#4593) moved her to (353.14, 863.59) facing away from the beds;
+  // she stands 2.4 yd nearer them (inside the trade range) and keeps her
+  // shipped facing, looking up the rows.
   farmer_verbena: {
     id: 'farmer_verbena',
     name: 'Farmer Verbena',
     title: 'Parterre Gardener',
-    pos: { x: 353.14, z: 863.59 },
-    facing: 2.356,
+    pos: { x: 353.14, z: 866 },
+    facing: 0,
     color: 0x7d9b5c,
     questIds: [],
     // GATE 1's tier-4 half, the same one edit and the same convention as

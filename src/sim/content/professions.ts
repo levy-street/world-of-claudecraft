@@ -592,9 +592,11 @@ export const STATIONS: readonly StationDef[] = [
     type: 'apothecary',
     zoneId: ZONE3_ZONE.id,
     // Studio town rework (#4593): the map moved Alchemist Verane to
-    // (-36.67, 690.29), so the bench follows her, on the apothecary master's
-    // usual side of its cluster (town_props.ts: master at station +1.5, -2).
-    pos: { x: -38.17, z: 692.29 },
+    // (-36.67, 690.29), so the bench follows her. Her usual side (town_props.ts:
+    // master at station +1.5, -2) put the cluster's barrel in the counting
+    // house doorway, so the bench stands about 2 yd further south-west of her,
+    // clear of the house's porch.
+    pos: { x: -40, z: 690.5 },
     masterNpcId: 'alchemist_verane',
   },
 ];

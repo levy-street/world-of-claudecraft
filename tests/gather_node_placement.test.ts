@@ -379,8 +379,10 @@ const ON_A_DOCK_PLANK = dockSectionWorldCenter(PROPS.docks[0], 1);
 // inside the origin town's ring wall, and the move demolished the wall and
 // emptied that ground. This point sits just inside the relocated smithy's
 // west wall at the crafts district (smithy lot (-2,-122)), with standable
-// ground a yard away, the same shallow shape the old fixture had.
-const INSIDE_A_TOWN_COLLIDER = { x: -7, z: -123 };
+// ground a yard away, the same shallow shape the old fixture had. Re-staged
+// when the Studio town rework (#4593) moved the smithy to (-5.48, -75.12):
+// the point sits just inside its wall line, standable ground a yard away.
+const INSIDE_A_TOWN_COLLIDER = { x: -12, z: -77 };
 // Genuinely enclosed, not merely overlapping: the nearest ground a player
 // can hold is 4yd away, nearly three times the widest clearance a node's own
 // body can account for, and still inside the harvest reach the sweep

@@ -852,8 +852,8 @@ describe('Eastbrook authored gameplay data integration', () => {
         type: 'apothecary',
         zoneId: 'thornpeak_heights',
         // the Studio town rework (#4593) moved Alchemist Verane, and her bench
-        // follows her
-        pos: { x: -38.17, z: 692.29 },
+        // follows her, stood clear of the counting house's doorway and porch
+        pos: { x: -40, z: 690.5 },
         masterNpcId: 'alchemist_verane',
       },
     ]);

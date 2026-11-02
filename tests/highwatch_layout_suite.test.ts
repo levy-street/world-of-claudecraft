@@ -183,7 +183,9 @@ describe('the Highwatch layout', () => {
     const well = ZONE3_PROPS.wells.find((candidate) => candidate.x === 0 && candidate.z === 662);
     expect(well).toBeDefined();
     const station = STATIONS.find((candidate) => candidate.id === 'station_highwatch_apothecary');
-    expect(station?.pos).toEqual({ x: 7, z: 660 });
+    // the bench followed Alchemist Verane when the Studio town rework (#4593)
+    // moved her off the square (stations follow their masters)
+    expect(station?.pos).toEqual({ x: -40, z: 690.5 });
     expect(MAILBOXES).toContainEqual({ x: 6, z: 654 });
     const board = NOTICEBOARDS.find((candidate) => candidate.id === 'highwatch_noticeboard');
     expect(board).toMatchObject({ x: -5, z: 652 });
@@ -199,7 +201,7 @@ describe('the Highwatch layout', () => {
     const kept: { id: string; x: number; z: number; clearance: number }[] = [
       { id: 'hub centre', x: 0, z: 660, clearance: 8 },
       { id: 'well', x: 0, z: 662, clearance: 3 },
-      { id: 'station', x: 7, z: 660, clearance: 2 },
+      { id: 'station', x: -40, z: 690.5, clearance: 2 },
       { id: 'mailbox', x: 6, z: 654, clearance: 2 },
       { id: 'noticeboard reading spot', x: -5, z: 653.5, clearance: 2 },
       { id: 'quartermaster stall', x: -7.5, z: 667, clearance: 2.5 },
