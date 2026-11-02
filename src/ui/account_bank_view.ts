@@ -1,17 +1,29 @@
 import { isItemLocked } from '../sim/item_lock';
-import type { InvSlot, ItemDef } from '../sim/types';
+import type { InvSlot, ItemDef, ItemInstancePayload } from '../sim/types';
 import type { AccountBankInfo } from '../world_api/bank';
 import type { TranslationKey } from './i18n';
 
-/** Only transferable copies can cross character ownership. The server rechecks. */
+/** Only transferable copies can cross character ownership. The server rechecks.
+ *  The one rule both the bank pane's grid and the bags' deposit click read. */
+export function accountBankItemMovable(
+  item: { kind: string; soulbound?: boolean },
+  instance: ItemInstancePayload | undefined,
+): boolean {
+  return !item.soulbound && !instance?.boundTo && !isItemLocked(instance) && item.kind !== 'quest';
+}
+
 export function accountBankTransferAllowed(slot: InvSlot, item: ItemDef | undefined): boolean {
-  return (
-    !!item &&
-    !item.soulbound &&
-    !slot.instance?.boundTo &&
-    !isItemLocked(slot.instance) &&
-    item.kind !== 'quest'
-  );
+  return !!item && accountBankItemMovable(item, slot.instance);
+}
+
+/** The character a bag click deposits into: only while the selected bank is on
+ *  screen (stage ready), never while it loads, fails or awaits a choice. */
+export function accountBankDepositTarget(
+  info: AccountBankInfo | null,
+  membershipActive: boolean | undefined,
+): number | null {
+  const stage = accountBankStage(info, membershipActive);
+  return stage.kind === 'ready' ? stage.characterId : null;
 }
 
 /** What the Other characters pane shows before (or instead of) the two grids. */

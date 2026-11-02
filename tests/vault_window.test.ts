@@ -9,9 +9,10 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { vaultMaterialIds } from '../src/sim/materials_vault';
 import type { InvSlot } from '../src/sim/types';
 import { BankWindow, type BankWindowDeps } from '../src/ui/bank_window';
-import { ensureLocaleLoaded, setLanguage } from '../src/ui/i18n';
+import { ensureLocaleLoaded, setLanguage, t } from '../src/ui/i18n';
 import { vaultWithdrawFit, vaultWithdrawNotice } from '../src/ui/vault_view';
 import type { BankInfo, IWorld, VaultInfo, VaultSpecialRef } from '../src/world_api';
 
@@ -1607,5 +1608,40 @@ describe('the name search (the personal bank search, on the vault pane)', () => 
     type(searchBox(h) as HTMLInputElement, 'lotus');
     (h.root.querySelector('.vault-row') as HTMLElement).click();
     expect(h.calls).toEqual(['vaultWithdraw:frost_lotus']);
+  });
+});
+
+describe('the Personal pane deposit-all routes into the unlocked vault', () => {
+  const material = [...vaultMaterialIds()][0];
+  const personalButton = (h: Harness) =>
+    h.root.querySelector<HTMLButtonElement>('#bank-window .bank-deposit-all') as HTMLButtonElement;
+
+  it('sweeps into the vault (one command, no bank deposits) once the vault is unlocked', () => {
+    const h = harness(vaultInfo());
+    h.world.inventory.push({ itemId: material, count: 3 });
+    h.window.open(); // personal tab
+    expect(personalButton(h).title).toBe(t('hudChrome.bank.vaultDepositAllTooltip'));
+    personalButton(h).click();
+    expect(h.calls).toEqual(['vaultDepositAll']);
+    // The summary line shows on the Personal pane, and the button holds
+    // disabled until the echo moves the vault stock.
+    expect(h.root.querySelector('.bank-status')?.textContent).toContain('3');
+    expect(personalButton(h).disabled).toBe(true);
+    (h.world.vaultInfo as VaultInfo).stock[material] = 3;
+    h.world.inventory.length = 0;
+    h.world.inventory.push({ itemId: material, count: 1 });
+    h.window.refreshIfChanged();
+    expect(personalButton(h).disabled).toBe(false);
+  });
+
+  it('keeps banking the materials while the vault is locked or unavailable', () => {
+    for (const vault of [vaultInfo({ upgrades: 0 }), null]) {
+      const h = harness(vault);
+      h.world.inventory.push({ itemId: material, count: 3 });
+      h.window.open();
+      expect(personalButton(h).title).toBe(t('hudChrome.bank.depositAllTooltip'));
+      personalButton(h).click();
+      expect(h.calls).toEqual(['bankDeposit:0,3']);
+    }
   });
 });

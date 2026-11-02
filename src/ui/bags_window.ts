@@ -274,6 +274,10 @@ export interface BagsWindowDeps extends PainterHostPresentation {
    *  unlocked: a click deposits the material into the vault. The locked
    *  offer pane arms nothing (a purchase surface, the guild Log rule). */
   isVaultBankTab(): boolean;
+  /** The character whose bank the Other characters tab has on screen, or null
+   *  (another tab, or that bank still loading): a click sends the stack there.
+   *  Optional so rigs that never dock the account bank can omit it. */
+  accountBankDepositTarget?(): number | null;
   pendingPetFeed(): boolean;
   // Cross-window commands the bag click fans out to.
   closeVendor(): void;
@@ -1961,6 +1965,23 @@ export class BagsWindow {
       case 'vaultDepositBlockedNotMaterial':
         this.deps.showError(tSim('error.vaultOnlyMaterials'));
         return;
+      case 'accountBankDeposit': {
+        // The other-character twin: always the whole stack (the account move
+        // has no split), the exact clicked copy by reference, and the snapshot
+        // the server compares against so a stale click is refused, not misfiled.
+        const characterId = this.deps.accountBankDepositTarget?.() ?? null;
+        const index = bagStackIndex(this.deps.world().inventory, s);
+        if (characterId === null || index < 0) break;
+        this.deps
+          .world()
+          .accountBankTransfer(characterId, 'deposit', index, s.count, structuredClone(s));
+        this.deps.hideTooltip();
+        this.render();
+        break;
+      }
+      case 'accountBankDepositBlocked':
+        this.deps.showError(t('hudChrome.bank.accountBound'));
+        return;
       // The guild pipe's pre-empt denies, each voicing the exact line the sim
       // would refuse with (its established sim_i18n keys), sending nothing.
       case 'guildBankDepositBlockedQuest':
@@ -2193,6 +2214,7 @@ export class BagsWindow {
         this.deps.isPersonalBankTab() && hasOpenBankSocket(this.deps.world().bankInfo),
       guildBankDeposit: this.deps.isGuildBankTab(),
       vaultDeposit: this.deps.isVaultBankTab(),
+      accountBankDeposit: (this.deps.accountBankDepositTarget?.() ?? null) !== null,
       petFeed: this.deps.pendingPetFeed(),
     };
   }

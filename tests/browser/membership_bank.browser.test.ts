@@ -12,7 +12,7 @@ afterEach(async () => {
   await page.viewport(1280, 800);
 });
 
-it('keeps membership claim and every character tab reachable on a short landscape phone', async () => {
+it('keeps every character tab reachable on a short landscape phone', async () => {
   await page.viewport(844, 390);
   document.body.className = 'mobile-touch game-active';
   document.documentElement.style.setProperty('--app-width', '844px');
@@ -33,8 +33,7 @@ it('keeps membership claim and every character tab reachable on a short landscap
     },
   };
   renderAccountBank(root, stubDeps({ world: () => world as unknown as IWorld }), () => {});
-  const claim = root.querySelector<HTMLElement>('[data-focus-key="account-armour"]')!;
-  expect(claim.getBoundingClientRect().height).toBeGreaterThanOrEqual(40);
+  expect(root.querySelector('[data-focus-key="account-armour"]')).toBeNull();
   const tabs = root.querySelector<HTMLElement>('.account-bank-panel .bank-tabs')!;
   expect(getComputedStyle(tabs).overflowX).toBe('auto');
   expect(tabs.getBoundingClientRect().right).toBeLessThanOrEqual(

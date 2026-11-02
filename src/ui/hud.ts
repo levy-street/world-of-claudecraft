@@ -5238,6 +5238,7 @@ export class Hud {
     isPersonalBankTab: () => this.bankWindow.personalTabActive,
     isGuildBankTab: () => this.bankWindow.guildTabActive,
     isVaultBankTab: () => this.bankWindow.vaultTabActive,
+    accountBankDepositTarget: () => this.bankWindow.accountDepositTarget,
     pendingPetFeed: () => this.pendingPetFeed,
     closeVendor: () => this.closeVendor(),
     closeBank: () => this.closeBank(),

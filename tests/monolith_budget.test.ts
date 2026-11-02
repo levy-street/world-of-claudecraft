@@ -2676,7 +2676,10 @@ const MONOLITHS: MonolithRow[] = [
     // Held by extracting the pane tab model and markup to bank_tabs_view.
     // Weekly reward host binding now lives with the weekly pane.
     // Account panel eligibility and request guards moved beside its painter.
-    ceiling: 1782,
+    // Lowered when the bank's control-focus restore moved to bank_window_focus
+    // (paying for the account-bank deposit target getter), then again when the
+    // deposit-all button builder moved to bank_deposit_all_button. Exact count.
+    ceiling: 1773,
     seam: 'a pure view-core plus a thin painter sibling (src/ui/CLAUDE.md)',
   },
   {

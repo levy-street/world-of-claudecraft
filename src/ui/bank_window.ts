@@ -37,6 +37,7 @@ import {
 import { bankBonusSectionHtml } from './bank_bonus_view';
 import { showBuyConfirmPrompt } from './bank_buy_prompt';
 import { type BankScrollOffsets, planBankScrollRestore } from './bank_chrome_layout_core';
+import { appendDepositAllButton, personalDepositAllToVault } from './bank_deposit_all_button';
 import { filterBankSlots } from './bank_filter';
 import { annotateGuildFocusKeys, annotateVaultFocusKeys } from './bank_focus_keys';
 import { bankSlotDisplayName } from './bank_item_name_core';
@@ -67,13 +68,14 @@ import {
   hasDepositableMaterials,
   planDepositAllMaterials,
 } from './bank_view';
+import { restoreBankControlFocus } from './bank_window_focus';
 import type { ClaudiumPurchaseFacet } from './claudium_purchase_bridge';
 import { formatCount } from './count_format';
 import { depositAllStatusText } from './deposit_all_status_text';
 import { markDialogRoot } from './dialog_root';
 import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
-import { captureFocusKey, findFocusKey, focusedWithin, restoreFirstEnabled } from './focus_restore';
+import { captureFocusKey, focusedWithin } from './focus_restore';
 import {
   GUILD_PANEL_ID,
   GUILD_TAB_ID,
@@ -451,6 +453,11 @@ export class BankWindow {
     return this.opened && this.tab === 'vault' && this.vaultPane.unlocked;
   }
 
+  /** The bags route a click to this character's bank (Other characters pane). */
+  get accountDepositTarget(): number | null {
+    return accountBank.depositTarget(this.deps.world(), this.opened && this.tab === 'account');
+  }
+
   /** Observe raw authoritative refusals before Hud translates their text. */
   observeStorageText(text: string): string {
     const target = storageRungRefusalTargets(text);
@@ -678,14 +685,14 @@ export class BankWindow {
     if (this.tab === 'rewards') {
       this.weeklyPane.renderInto(el);
       this.restoreScroll(el, prevScroll);
-      if (hadFocus) this.restoreControlFocus(el, focusKey);
+      if (hadFocus) restoreBankControlFocus(el, focusKey);
       return;
     }
     if (this.tab === 'account') {
       accountBank.renderAccountBank(el, this.deps, () => this.render());
       el.querySelector('#bank-tab-account')?.setAttribute('aria-controls', 'account-bank-panel');
       this.restoreScroll(el, prevScroll);
-      if (hadFocus) this.restoreControlFocus(el, focusKey);
+      if (hadFocus) restoreBankControlFocus(el, focusKey);
       return;
     }
     if (this.tab === 'vault') {
@@ -700,7 +707,7 @@ export class BankWindow {
       this.restoreScroll(el, prevScroll);
       // The vault's name search shares `.bag-search`: every keystroke
       // rebuilds the pane, and the caret must land where it was.
-      if (!restoreSearchCaret(el, searchFocus) && hadFocus) this.restoreControlFocus(el, focusKey);
+      if (!restoreSearchCaret(el, searchFocus) && hadFocus) restoreBankControlFocus(el, focusKey);
       return;
     }
     if (this.tab === 'guild') {
@@ -716,7 +723,7 @@ export class BankWindow {
       this.restoreScroll(el, prevScroll);
       // The history view's search box shares `.bag-search`: every keystroke
       // rebuilds the pane, and the caret must land where it was.
-      if (!restoreSearchCaret(el, searchFocus) && hadFocus) this.restoreControlFocus(el, focusKey);
+      if (!restoreSearchCaret(el, searchFocus) && hadFocus) restoreBankControlFocus(el, focusKey);
       return;
     }
     if (model.kind === 'away') {
@@ -725,7 +732,7 @@ export class BankWindow {
       away.textContent = t('hudChrome.bank.tooFar');
       el.appendChild(away);
       this.lastRenderedTab = this.tab;
-      if (hadFocus) this.restoreControlFocus(el, focusKey);
+      if (hadFocus) restoreBankControlFocus(el, focusKey);
       return;
     }
     // The bag-socket row (Bank Storage phase 07) sits above the toolbar: one
@@ -777,18 +784,8 @@ export class BankWindow {
       // close button rather than dropping focus to <body>.
       (el.querySelector('[data-close]') as HTMLElement | null)?.focus();
     } else if (hadFocus) {
-      this.restoreControlFocus(el, focusKey);
+      restoreBankControlFocus(el, focusKey);
     }
-  }
-
-  // Re-land focus after a full rebuild: the control the user was on (resolved
-  // by its data-focus-key in the fresh tree, skipped when it came back
-  // disabled), else the always-present close button. Never <body> (WCAG 2.4.3).
-  private restoreControlFocus(el: HTMLElement, focusKey: string | null): void {
-    restoreFirstEnabled([
-      focusKey ? findFocusKey(el, focusKey) : null,
-      el.querySelector('[data-close]') as HTMLElement | null,
-    ]);
   }
 
   // Both candidate offsets, read off whichever elements exist right now; which
@@ -912,7 +909,11 @@ export class BankWindow {
         v.upgrades,
         v.perMaterialCap,
         v.nextUpgradeCost,
-        this.tab === 'vault' ? Object.entries(v.stock).sort() : null,
+        // Personal too, but only while its vault-routed sweep awaits the echo
+        // (no other pane renders stock, so it never churns them otherwise).
+        this.tab === 'vault' || (this.tab === 'personal' && this.vaultPane.depositAllBusy)
+          ? Object.entries(v.stock).sort()
+          : null,
         this.tab === 'vault' ? vaultSpecialContentKey(v.special) : null,
         this.tab === 'vault' && v.nextUpgradeCost !== null
           ? this.deps.world().copper >= v.nextUpgradeCost
@@ -920,10 +921,9 @@ export class BankWindow {
         // The deposit-all button's enabled state reads the CARRIED bags, which
         // no other signature term covers: without this arm, looting a material
         // while the pane is open leaves the button stale-disabled until some
-        // other bank data happens to move. Vault-pane-scoped like the purse
-        // term (the personal tab's twin button has the same pre-existing gap,
-        // recorded as a family follow-up).
-        this.tab === 'vault'
+        // other bank data happens to move. The personal tab's button reads it
+        // too while it routes to the vault.
+        this.tab === 'vault' || this.tab === 'personal'
           ? hasVaultDepositable(this.deps.world().inventory, vaultMaterialIds())
           : null,
       ],
@@ -969,7 +969,6 @@ export class BankWindow {
       this.deps.world().accountBankInfo,
       this.deps.world().player?.membershipActive,
       this.deps.world().player?.referralInviterName,
-      this.tab === 'account' ? this.deps.world().inventory : null,
     ]);
     if (sig === this.lastSig) return;
     this.lastSig = sig;
@@ -1137,38 +1136,19 @@ export class BankWindow {
       tools.appendChild(sort);
     }
 
-    // Deposit all materials: one click banks every material stack that fully fits.
-    // Disabled when the bags hold no material stack; a full bank is still actionable
-    // (the click reports it), so it does not disable here.
-    //
-    // The clarification (every item whose tooltip reads Material or Fine Material
-    // moves, the honest taxonomy in src/sim/material_taxonomy.ts, and everything
-    // else stays: gathering tools, quest items, consumables and gray items
-    // included; reworded at the Masterwrought 11l QA, which retired the old "junk
-    // moves too" claim) is exposed two ways so it reaches touch and keyboard
-    // users, not only a mouse-hover title: a `title` for desktop hover, PLUS a
-    // visually-hidden
-    // aria-describedby span the button always carries. A screen reader announces
-    // aria-describedby on both hover and keyboard focus, and reading it needs no
-    // pointer at all, so it also covers touch users who tap the button directly.
-    const deposit = document.createElement('button');
-    deposit.type = 'button';
-    deposit.className = 'bank-deposit-all ui-btn';
-    deposit.textContent = t('hudChrome.bank.depositAll');
-    const depositTooltip = t('hudChrome.bank.depositAllTooltip');
-    deposit.title = depositTooltip;
-    deposit.setAttribute('aria-describedby', 'bank-deposit-all-desc');
-    deposit.disabled =
-      this.depositAllPending ||
-      !hasDepositableMaterials(this.deps.world().inventory, (id) => knownItemDef(ITEMS, id));
-    deposit.addEventListener('click', () => this.onDepositAll());
-    tools.appendChild(deposit);
-
-    const depositDesc = document.createElement('span');
-    depositDesc.id = 'bank-deposit-all-desc';
-    depositDesc.className = 'visually-hidden';
-    depositDesc.textContent = depositTooltip;
-    tools.appendChild(depositDesc);
+    // Deposit all materials: into the Materials Vault once it is unlocked
+    // (the vault pane's own sweep), else every bank-fitting material stack.
+    // Disabled only when nothing could move; a full store still reports.
+    const toVault = personalDepositAllToVault(this.deps.world().vaultInfo?.upgrades);
+    const bags = () => this.deps.world().inventory; // read only when not pending
+    appendDepositAllButton(tools, {
+      toVault,
+      disabled: toVault
+        ? this.vaultPane.depositAllBusy || !hasVaultDepositable(bags(), vaultMaterialIds())
+        : this.depositAllPending ||
+          !hasDepositableMaterials(bags(), (id) => knownItemDef(ITEMS, id)),
+      onClick: () => this.onDepositAll(),
+    });
 
     bar.appendChild(tools);
     return bar;
@@ -1185,11 +1165,22 @@ export class BankWindow {
     }
   }
 
-  // Deposit every fully-fitting material stack in one go. The plan is computed against
+  // With the Materials Vault unlocked, the vault pane's one-command sweep runs
+  // instead (the summary line still shows here). Otherwise: deposit every
+  // fully-fitting material stack in one go. The plan is computed against
   // ONE snapshot (inventory + bank at click time) and every command is sent without
   // re-reading state mid-run, because the online mirror lags the authoritative world by
   // ~1 tick; sending against a mid-run mirror would double-count or mis-index.
   private onDepositAll(): void {
+    if (personalDepositAllToVault(this.deps.world().vaultInfo?.upgrades)) {
+      const summary = this.vaultPane.sweepAll();
+      if (summary) {
+        const text = t(summary.key, summary.params);
+        this.depositStatus = { text, at: performance.now() };
+      }
+      this.render();
+      return;
+    }
     const world = this.deps.world();
     const info = world.bankInfo;
     if (!info) return; // walked away between render and click
@@ -1710,7 +1701,7 @@ export class BankWindow {
     this.announceRung();
     const key = this.rungFocusReturnKey;
     this.rungFocusReturnKey = null;
-    if (key) this.restoreControlFocus(this.deps.root(), key);
+    if (key) restoreBankControlFocus(this.deps.root(), key);
   }
 
   // The shared quantity-prompt builder (bank_quantity_prompt.ts) owns the
