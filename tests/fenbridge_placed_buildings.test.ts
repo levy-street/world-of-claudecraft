@@ -15,8 +15,9 @@ import {
 import { rotY } from '../src/sim/collider_shapes';
 import { isBlocked, streetlampPlacements } from '../src/sim/colliders';
 import { ZONE2_PROPS } from '../src/sim/content/zone2';
-import { BASE_WORLD, setActiveWorldContent } from '../src/sim/data';
+import { BASE_WORLD, BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
 import { FENBRIDGE_LAYOUT, localToWorld, type Obb2 } from '../src/sim/fenbridge_layout';
+import { resolveFenbridgeLayout } from '../src/sim/fenbridge_touchup';
 import { HIGHWATCH_LAYOUT } from '../src/sim/highwatch_layout';
 import { JAIL_TERRAIN_EDITS } from '../src/sim/jail';
 import { loadPublishedMap, MAP_SEED } from '../src/sim/maps/eastbrook_rebuild.generated';
@@ -618,6 +619,13 @@ const REBUILD_MAP = JSON.parse(
   terrainEdits: Record<string, unknown>[];
 };
 
+/** The town the game stands: the live world's Fenbridge, the code layout with
+ *  the world touch-up's moves applied. The published Studio map follows it
+ *  (Studio town rework, #4593), so the map checks below read this, not the
+ *  code layout. */
+const LIVE_FENBRIDGE = resolveFenbridgeLayout(BUILTIN_WORLD.fenbridgeTouchup);
+const LIVE_BUILDINGS = LIVE_FENBRIDGE.buildings;
+
 /** The kit buildings the rebuild retired (their models stay shipped for Studio). */
 const RETIRED_KIT_BUILDING =
   /^props\/fenbridge_(warden_gatehouse|crooked_reed_inn|lantern_chapel|moonwort_apothecary|gilded_strongbox|hesk_tannery|scout_lodge)$/;
@@ -665,8 +673,10 @@ describe('Fenbridge in Studio', () => {
   });
 
   it('stands the rebuilt town in the published Studio map, with no kit building left over', () => {
+    // where the live world stands each building (its anchor and turn), at the
+    // converted placement's lift and scale (the touch-up moves, never resizes)
     const converted = authoredTownBuildingPlacements(WORLD_SEED);
-    for (const building of BUILDINGS) {
+    for (const building of LIVE_BUILDINGS) {
       const want = converted.find((p) => p.assetId === placementAssetIdOf(building));
       if (!want) throw new Error(`no Studio placement for ${building.id}`);
       const placed = REBUILD_MAP.placements.filter(
@@ -674,13 +684,13 @@ describe('Fenbridge in Studio', () => {
       );
       expect(placed, building.id).toHaveLength(1);
       expect(placed[0]).toMatchObject({
-        x: want.x,
-        z: want.z,
+        x: building.placement.x,
+        z: building.placement.z,
         y: want.y,
         collide: true,
         collisionMode: 'baked',
       });
-      expect(placed[0].rotY ?? 0, building.id).toBeCloseTo(want.rotY, 9);
+      expect(placed[0].rotY ?? 0, building.id).toBeCloseTo(building.placement.rotation, 9);
       expect(placed[0].scale ?? 1, building.id).toBeCloseTo(want.scale, 9);
     }
     const leftover = REBUILD_MAP.placements
@@ -690,25 +700,30 @@ describe('Fenbridge in Studio', () => {
   });
 
   it('stands the townsfolk and runs the streets in the Studio map where the game does', () => {
-    for (const npc of FENBRIDGE_LAYOUT.services.npcs) {
+    // the game is the live world (Studio town rework, #4593): its townsfolk
+    // stands and its streets, the touch-up's re-routed and added ones included
+    for (const npc of LIVE_FENBRIDGE.services.npcs) {
       const doc = REBUILD_MAP.content.npcs[npc.id];
       if (!doc) throw new Error(`the Studio map has no ${npc.id}`);
       expect(doc.pos.x, npc.id).toBeCloseTo(npc.position.x, 9);
       expect(doc.pos.z, npc.id).toBeCloseTo(npc.position.z, 9);
       expect(doc.facing ?? 0, npc.id).toBeCloseTo(npc.facing, 9);
+      expect(BUILTIN_WORLD.npcs[npc.id]?.pos, npc.id).toEqual(doc.pos);
     }
-    const hub = FENBRIDGE_LAYOUT.hub.center;
+    const hub = LIVE_FENBRIDGE.hub.center;
     const touchesTown = (road: readonly { x: number; z: number }[]) =>
       road.some((q) => Math.hypot(q.x - hub.x, q.z - hub.z) < 40);
-    const gameStreets = BASE_WORLD.roads.filter(touchesTown);
+    const gameStreets = BUILTIN_WORLD.roads.filter(touchesTown);
     expect(gameStreets.length).toBeGreaterThan(0);
     expect(REBUILD_MAP.content.roads.filter(touchesTown)).toEqual(gameStreets);
   });
 
   it('levels the Studio map ground under the grand buildings with the pads the game stamps', () => {
     // every pad, in the layout's own order, where the built-in world stamps
-    // them: straight after the moderation cage's
-    const pads = FENBRIDGE_LAYOUT.pads;
+    // them: straight after the moderation cage's. The live world's pads
+    // (Studio town rework, #4593): the touch-up's moved buildings and its
+    // added cottages each stand on their own
+    const pads = LIVE_FENBRIDGE.pads;
     expect(pads.length).toBeGreaterThan(0);
     const after = JAIL_TERRAIN_EDITS.length;
     const at = pads.map((pad) =>
@@ -724,7 +739,7 @@ describe('Fenbridge in Studio', () => {
       ),
     );
     expect(at).toEqual(pads.map((_, index) => after + index));
-    const builtIn = BASE_WORLD.terrainEdits ?? [];
+    const builtIn = BUILTIN_WORLD.terrainEdits ?? [];
     expect(builtIn.slice(after, after + pads.length)).toEqual([...pads]);
     // ...and no other stamp of the map reaches the town's ground, so the pads
     // have the last word there wherever they sit in the list
@@ -743,11 +758,17 @@ describe('Fenbridge in Studio', () => {
   });
 
   it('hands the game copy of the Studio map current town records, so its record walls stand down', () => {
+    // judged as the game copy plays: the published map is the active world,
+    // and the live town it carries (Studio town rework, #4593) is the one its
+    // records and its placements both stand at
     const world = loadPublishedMap();
     const collision = (world.assetCollision ?? {}) as Record<string, readonly unknown[]>;
-    for (const building of BUILDINGS) {
+    setActiveWorldContent(world);
+    for (const building of LIVE_BUILDINGS) {
       const record = world.props.buildings.find((candidate) => candidate.id === building.id);
       if (!record) throw new Error(`the published map has no ${building.id} record`);
+      expect(record.x, building.id).toBeCloseTo(building.placement.x, 9);
+      expect(record.z, building.id).toBeCloseTo(building.placement.z, 9);
       expect(isAuthoredTownBuildingDef(record), building.id).toBe(true);
       expect(promotedTownBuildingStandsDown(world.promotedScenery, record), building.id).toBe(true);
       expect(collision[building.assetId]?.length ?? 0, building.assetId).toBeGreaterThan(0);
@@ -756,7 +777,8 @@ describe('Fenbridge in Studio', () => {
 
   it('moves a building with its walls and rest area when a maker moves it, leaving nothing behind', () => {
     const world = loadPublishedMap();
-    const inn = BUILDINGS.find((building) => building.kind === 'inn');
+    // the map's inn stands where the live world stands it
+    const inn = LIVE_BUILDINGS.find((building) => building.kind === 'inn');
     if (!inn) throw new Error('no Fenbridge inn');
     const index = (world.placements ?? []).findIndex((p) => p.path === inn.assetId);
     expect(index).toBeGreaterThanOrEqual(0);

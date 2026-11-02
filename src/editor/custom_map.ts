@@ -539,6 +539,13 @@ export function customMapToWorldContent(map: CustomMap): WorldContent {
     biomePaint: map.biomePaint ? deepClone(map.biomePaint) : undefined,
     promotedScenery: promotedSceneryFor(map.propsMode, map.placements, map.promotedScenery),
   };
+  // The cloned built-in props carry the LIVE Fenbridge (the world touch-up
+  // moved its buildings, cistern and stall records): carry the touch-up with
+  // them, so every reader of the town layout (record walls, walk-in floors,
+  // the town's drawn civic pieces) resolves the same layout the records hold.
+  if (map.propsMode !== 'empty' && BUILTIN_WORLD.fenbridgeTouchup) {
+    world.fenbridgeTouchup = deepClone(BUILTIN_WORLD.fenbridgeTouchup);
+  }
   if (map.playerSpawnArea) world.playerSpawnArea = { ...map.playerSpawnArea };
   // The built-in gameplay objects this map moved (farm beds, practice dummies,
   // gather nodes, dungeon doors): the playtest and the published map read

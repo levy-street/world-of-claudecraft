@@ -1,4 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
+import { customMapToWorldContent, newCustomMap, newFlatCustomMap } from '../src/editor/custom_map';
+import { isAuthoredTownBuildingDef } from '../src/sim/authored_town_buildings';
 import { isBlocked } from '../src/sim/colliders';
 import { clonePropsWithoutEastbrookLayout } from '../src/sim/custom_world_props';
 import { BUILTIN_WORLD, getActiveWorldContent, setActiveWorldContent } from '../src/sim/data';
@@ -144,6 +146,26 @@ describe('custom-map terrain seam', () => {
     const board = activeFenbridgeLayout().civic.musterBoard;
     expect(customWorld.services?.musterBoards).toBeUndefined();
     expect(isBlocked(20_061, board.position.x, board.position.z, 0.2)).toBe(false);
+  });
+
+  it('carries the live Fenbridge touch-up with the built-in props a Studio map clones', () => {
+    // the cloned records stand where the world touch-up moved them, so the
+    // projected world must resolve the same layout: every record is still
+    // the town's own building (its walls stand down under a promoted town)
+    expect(BUILTIN_WORLD.fenbridgeTouchup).toBeDefined();
+    const world = customMapToWorldContent(newCustomMap('Fen', 'fen', 0));
+    expect(world.fenbridgeTouchup).toEqual(BUILTIN_WORLD.fenbridgeTouchup);
+    setActiveWorldContent(world);
+    const layout = activeFenbridgeLayout();
+    expect(layout.buildings.length).toBeGreaterThan(0);
+    for (const building of layout.buildings) {
+      const record = world.props.buildings.find((candidate) => candidate.id === building.id);
+      if (!record) throw new Error(`the projected world has no ${building.id} record`);
+      expect(isAuthoredTownBuildingDef(record), building.id).toBe(true);
+    }
+    // an empty-props map clones no records, so it carries no touch-up either
+    const flat = customMapToWorldContent(newFlatCustomMap('Flat', 'flat', 0));
+    expect(flat.fenbridgeTouchup).toBeUndefined();
   });
 
   it('ignores specialized muster-board collision in programmatic custom worlds', () => {
