@@ -1268,6 +1268,7 @@ export function runEffects(
           target,
           stunDrCategory(ability.id),
           eff.base + eff.perCombo * spentCombo,
+          ability.id,
         );
         if (dur === null) break;
         ctx.applyAura(target, {
@@ -2355,6 +2356,7 @@ export function runEffects(
           target,
           stunDrCategory(ability.id),
           eff.duration,
+          ability.id,
         );
         if (remaining === null) break;
         ctx.applyAura(target, {

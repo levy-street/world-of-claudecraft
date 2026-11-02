@@ -7005,15 +7005,10 @@ export class Sim {
     target: Entity,
     category: CrowdControlDrCategory,
     duration: number,
+    abilityId?: string,
   ): number | null {
-    return diminishedCrowdControlDurationImpl(
-      this.time,
-      this.isHostileToBound,
-      source,
-      target,
-      category,
-      duration,
-    );
+    const args = [source, target, category, duration, abilityId] as const;
+    return diminishedCrowdControlDurationImpl(this.time, this.isHostileToBound, ...args);
   }
 
   private hostilesInRadius(source: Entity, pos: Vec3, radius: number): Entity[] {

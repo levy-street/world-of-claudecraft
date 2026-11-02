@@ -689,6 +689,8 @@ export interface SimContextCallbacks {
     target: Entity,
     category: CrowdControlDrCategory,
     duration: number,
+    // The stunning ability: only a rogue stun's id puts a stun on the ladder.
+    abilityId?: string,
   ): number | null;
   hostilesInRadius(source: Entity, pos: Vec3, radius: number): Entity[];
   friendliesInRadius(source: Entity, pos: Vec3, radius: number): Entity[];
