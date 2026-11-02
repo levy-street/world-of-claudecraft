@@ -78,8 +78,11 @@ export function spawnStaticWorldObjects(world: WorldContent, deps: StaticObjectS
   // Mailboxes are authored civic furniture, so they spawn at their exact spot
   // and never consume RNG or run through safe-position relocation.
   for (const definition of world.services?.mailboxes ?? []) {
+    if (definition.entityId !== undefined && deps.entities.has(definition.entityId)) {
+      throw new Error(`Duplicate stable mailbox entity id: ${definition.entityId}`);
+    }
     const mailbox = createGroundObject(
-      deps.allocateEntityId(),
+      definition.entityId ?? deps.allocateEntityId(),
       '',
       'Mailbox',
       deps.groundPos(definition.x, definition.z),

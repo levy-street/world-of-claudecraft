@@ -25,6 +25,7 @@ import {
   STRIP_ZONES,
   zoneXBounds,
 } from '../sim/data';
+import { quarterWeightsAt } from '../sim/quartered_quarters';
 import { fbm2, hash2 } from '../sim/rng';
 import type { BiomeId, ZoneDef } from '../sim/types';
 import {
@@ -153,6 +154,7 @@ const FOREST_STIPPLE: Partial<Record<ReturnType<typeof zoneBiomeAt>, number>> = 
   jungle: 0.6, // wall-to-wall green
   garden: 0.34,
   gale: 0.12, // near-treeless downs
+  quartered: 0.16, // war-thinned: the Heavestone woods carry most of it
 };
 
 const CONTOUR_STEP = 6; // height units between contour lines
@@ -208,6 +210,17 @@ function biomeBaseColor(biome: BiomeId, x: number, z: number, out: [number, numb
       out[1] = 138;
       out[2] = 92;
       return;
+    case 'quartered': {
+      // the four war-scarred quarters, blended by the shared position field
+      // so the map's seams fall where the world's do: glacier shelf (south),
+      // scorched umber (east), ochre grassland (west), slate-green storm
+      // slopes (north)
+      const q = quarterWeightsAt(x, z);
+      out[0] = 196 * q.ice + 112 * q.fire + 166 * q.earth + 84 * q.wind;
+      out[1] = 210 * q.ice + 76 * q.fire + 136 * q.earth + 112 * q.wind;
+      out[2] = 222 * q.ice + 58 * q.fire + 70 * q.earth + 98 * q.wind;
+      return;
+    }
     case 'ember': {
       const sandT = Math.max(0, Math.min(1, (z - 1925) / 145));
       let r = 74 + 76 * sandT;
@@ -457,6 +470,14 @@ export function paintTerrainRows(
         r = 40;
         g = 84;
         b = 42;
+      } else if (biome === 'quartered' && h > 24) {
+        // the Gyre's storm-grey crags and the heaved stone of the high ground
+        r = 128;
+        g = 130;
+        b = 132;
+      } else if (biome === 'quartered') {
+        // below the crags the quarter tint carries (the generic mid-height
+        // bands would grey out Rivalmoot's hill and the heaved lowlands)
       } else if (biome === 'gale' && h > 20) {
         // salt-grey headland crags
         r = 118;

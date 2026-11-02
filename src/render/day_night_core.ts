@@ -184,6 +184,7 @@ export const REALM_SKY_IRRADIANCE: Record<BiomeId, number> = {
   fen: 0.9541, // fen_day
   frost: 0.3977, // frost_twilight
   gale: 0.6586, // galecrest_day
+  quartered: 0.6586, // aliases galecrest_day
   garden: 0.8111, // evergarden_day
   haunt: 0.3413, // wraithwood_gloom
   jungle: 0.8125, // palmreach_day
@@ -383,6 +384,7 @@ const REALM_NIGHT_RESISTANCE: Record<BiomeId, number> = {
   fen: 0,
   garden: 0,
   gale: 0,
+  quartered: 0,
   jungle: 0.08,
   // signature times of day, in increasing order of how fixed that time is
   frost: 0.46, // pale-blue day eases to a deep frozen-blue night

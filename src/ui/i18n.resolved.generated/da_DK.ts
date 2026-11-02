@@ -9342,6 +9342,8 @@ export const da_DK: EnTranslations = {
         "gardenBlurb": "Et hækkelabyrint-rige, som stadig klippes af ingen gartner nogen har set, hvor vejen ind går forbi Hækvig og dets fontænegårde.",
         "galeName": "Stormkammen",
         "galeBlurb": "Klipperige kyster og hylende højsletter, hvor vinden aldrig lægger sig, og Vighavn holder sine døre lukket i.",
+        "quarteredName": "The Quartered Isle",
+        "quarteredBlurb": "An island broken four ways by an old rivalry, where Rivalmoot keeps its hill above the ring every challenger comes to win.",
         "levelsCap": "Niveau {level}"
       },
       "group": {
@@ -10286,6 +10288,7 @@ export const da_DK: EnTranslations = {
       "nightBlurb": "Et rige af stjerneklar midnat, hvor blomster lyser stierne op, og Månero holder en stille vagt under en drømmende himmel.",
       "hauntBlurb": "En hjemsøgt skov under enorme kroner, hvor Gibbetmeres lanterner er det eneste ærlige lys på vejen.",
       "galeBlurb": "Havklipper og hylende bakker, hvor vinden aldrig hviler, Det Gamle Fyr aldrig slukkes, og Vighavn lukker sine døre tæt i.",
+      "quarteredBlurb": "An island torn into four quarters of ice, fire, stone and storm by an old rivalry, with the challengers of Rivalmoot keeping their town on the hill at its heart and their ring at its foot.",
       "jungleBlurb": "Et tropisk virvar af palmer, hvidt sand og larmende fugle, med strandbyen Drivhavn, der holder et bål tændt på stranden.",
       "gardenBlurb": "Et hækkelabyrint-haverige, stadig klippet af ingen gartner, nogen har set, betrådt forbi Hækvig og dens fontænegårde.",
       "valeGreeting": "Hold dit blad nært. Dalen er ikke, hvad den var.",
@@ -10310,6 +10313,8 @@ export const da_DK: EnTranslations = {
       "hauntGreeter": "Lygtemageren, Gibbetmere",
       "galeGreeting": "Vinden er aldrig stoppet her, og Det Gamle Fyr er aldrig slukket. Luk kroens dør bag dig.",
       "galeGreeter": "Fyrvogteren, Vighavn",
+      "quarteredGreeting": "Every party that climbs this hill swears it will be the one to hold the ring. Go down when the hill rises and prove it.",
+      "quarteredGreeter": "A challenger, Rivalmoot",
       "jungleGreeting": "Varmt sand, larmende fugle, og en jungle, der æder horisonten. Vi holder et bål tændt på stranden; prøv at komme tilbage til det.",
       "jungleGreeter": "Havnefogeden, Drivhavn",
       "gardenGreeting": "Nogen klipper stadig hækkene, selvom ingen gartner er set i hundrede år. Pas på labyrinten: den passer på dig igen.",
@@ -10325,6 +10330,7 @@ export const da_DK: EnTranslations = {
       "nightPlaceNotes": "Moonrest holder vagten. Natporten er vejen ind i midnatslandet, Månekilden holder stjernelys, du kan stå ved siden af, Skumringsmarken blomstrer i mørket, Den stående vagt holder øje uden nogensinde at flytte sig, og Den søvnløse gravhøj er det ene sted her, der aldrig drømmer.",
       "hauntPlaceNotes": "Gibbetmere klynger sig inde i sine lanterner. Krageporten er skovens dystre hoveddør, Enkens krat er spundet tykt med spind, Den hængende lysning og Sorgstenskapellet vogter skovens ældste sorger, og Jægerens lysning tilhører det, der stadig jager der.",
       "galePlaceNotes": "Vighavn læner sig ind i vinden. Vindvejen er klippevejen ind; De Hylende Bakker ruller træløst under kulingen; Det Gamle Fyr har brændt så langt tilbage som nogen kan huske; Klippeskæret falder lodret mod vandet; Vragmarkerne holder kysten ærlig; og Spejltjørnet er det ene stille sted i hele riget.",
+      "quarteredPlaceNotes": "Rivalmoot stands on the hill at the island's heart. The Hoarbridge carries the road over the strait from the Frostveil; the Hoarshelf lies white and cold below; the Challengers' Ring waits level at the hill's foot for the next King of the Hill; the Cinderscar smoulders toward the Drakelands; the Heavestone Wilds heave toward the Amberfall; and the Gyre turns its storm above the north shore.",
       "junglePlaceNotes": "Drivhavn holder sit bål på stranden. Filtmundingen er, hvor floden møder den grønne mur; Palmestranden løber hvid og varm langs brændingen; Smaragdfiltret og Rankefaldet opsluger det indre; Safirlagunen gløder klar og dyb; og Den Sunkne Afgud våger fra under vandet.",
       "gardenPlaceNotes": "Hækvig venter ved Havelågen. Parterrestien blomstrer i klippede farver; Daggryslottet eksercerer sine riddere bag nye mure; Kronbladdammen driver lyserødt året rundt; Den Gamle Mølle vender sine egne ringbede; Den Store Labyrint omordner sine gange for hver gæst, dens buer bevogtet af løvræve; Nordvagten holder udgangsvejen; Liljebassinet hviler bag det hele; og Fontænegården løber stadig klart i havens hjerte.",
       "gladeTitle": "Et stille hjørne: Brightwood Glade",
@@ -30381,6 +30387,33 @@ export const da_DK: EnTranslations = {
           },
           "4": {
             "label": "Gauntlet"
+          }
+        }
+      },
+      "quartered_isle": {
+        "name": "The Quartered Isle",
+        "welcome": "An old rivalry broke this island four ways. On the hill at its heart, Rivalmoot keeps watch over the ring below.",
+        "pois": {
+          "0": {
+            "label": "Rivalmoot"
+          },
+          "1": {
+            "label": "The Challengers' Ring"
+          },
+          "2": {
+            "label": "The Hoarbridge"
+          },
+          "3": {
+            "label": "The Hoarshelf"
+          },
+          "4": {
+            "label": "The Cinderscar"
+          },
+          "5": {
+            "label": "The Heavestone Wilds"
+          },
+          "6": {
+            "label": "The Gyre"
           }
         }
       },

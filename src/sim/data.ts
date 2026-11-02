@@ -168,6 +168,7 @@ import {
   LAST_KEEP_GRAVEYARD_ID,
   LAST_KEEP_SPIRIT_HEALER_ENTITY_ID,
   OVERWORLD_GRAVEYARDS,
+  RESERVED_SPIRIT_HEALER_ENTITY_IDS,
   SPIRIT_HEALER,
   SPIRIT_HEALER_NPC_ID,
 } from './content/graveyards';
@@ -236,6 +237,12 @@ import {
   PROVING_SHORE_ROADS,
   PROVING_SHORE_ZONE,
 } from './content/proving_shore';
+import {
+  QUARTERED_ISLE_PORTALS,
+  QUARTERED_ISLE_PROPS,
+  QUARTERED_ISLE_ROADS,
+  QUARTERED_ISLE_ZONE,
+} from './content/quartered_isle';
 import { QUEST_CHOICE_REWARDS } from './content/quest_choice_rewards';
 import { QUEST_LEVELING_GEAR_ITEMS } from './content/quest_leveling_gear';
 import {
@@ -614,6 +621,7 @@ export {
   LAST_KEEP_GRAVEYARD_ID,
   LAST_KEEP_SPIRIT_HEALER_ENTITY_ID,
   OVERWORLD_GRAVEYARDS,
+  RESERVED_SPIRIT_HEALER_ENTITY_IDS,
   SPIRIT_HEALER,
   SPIRIT_HEALER_NPC_ID,
 };
@@ -940,6 +948,7 @@ export const ROADS: { x: number; z: number }[][] = [
   ...GALECREST_ROADS,
   ...FARSHORE_ROADS,
   ...PROVING_SHORE_ROADS,
+  ...QUARTERED_ISLE_ROADS,
 ];
 
 // Paired overworld portals (src/sim/portals.ts checks these each tick).
@@ -955,6 +964,7 @@ export const PORTALS: PortalDef[] = [
   ...GALECREST_PORTALS,
   ...FARSHORE_PORTALS,
   ...PROVING_SHORE_PORTALS,
+  ...QUARTERED_ISLE_PORTALS,
 ];
 
 export const PROPS: ZonePropsDef = mergeProps([
@@ -974,6 +984,7 @@ export const PROPS: ZonePropsDef = mergeProps([
   GALECREST_PROPS,
   FARSHORE_PROPS,
   PROVING_SHORE_PROPS,
+  QUARTERED_ISLE_PROPS,
 ]);
 
 function mergeProps(sets: ZonePropsDef[]): ZonePropsDef {
@@ -1056,6 +1067,10 @@ export const ZONES: ZoneDef[] = [
   GALECREST_ZONE,
   FARSHORE_ZONE,
   PROVING_SHORE_ZONE,
+  // Appended LAST like every grid zone (append order is rng-stream order, not
+  // stack order): the strip's new north end, over the bay that used to drown
+  // the gap between the columns' shoulders.
+  QUARTERED_ISLE_ZONE,
 ];
 
 export const WORLD_SIZE = 360; // the original strip's width (one grid column)

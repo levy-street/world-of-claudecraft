@@ -1974,7 +1974,9 @@ class Sfx {
           ? 0.2
           : biome === 'gale'
             ? 0.24
-            : 0;
+            : biome === 'quartered'
+              ? 0.18 // the Gyre's storm wind carries across the whole isle
+              : 0;
     this.ambient('amb_wind_peaks', !inDungeon ? peaksBed : 0);
     this.ambient('amb_rain', precip === 'rain' ? 0.11 : 0); // sharp clip, kept very low
     this.ambient('amb_snow', precip === 'snow' ? 0.13 : 0);

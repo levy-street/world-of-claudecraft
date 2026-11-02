@@ -46,6 +46,7 @@ export function paintedTownReachCovers(x: number, z: number, pad: number): boole
 }
 
 import { inParterrePlot } from './garden_parterre_plots';
+import { CHALLENGERS_RING } from './quartered_isle_terrain';
 import type { BiomeId } from './types';
 
 /** Authored clearings remove only named scatter, never terrain anchors or heights.
@@ -180,6 +181,11 @@ function activeWorldExclusionPoints(): readonly { x: number; z: number }[] {
   return pts;
 }
 
+/** Inside the Challengers' Ring out to its bank's foot. */
+function challengersRingCovers(x: number, z: number): boolean {
+  return Math.hypot(x - CHALLENGERS_RING.x, z - CHALLENGERS_RING.z) < CHALLENGERS_RING.bankOuterR;
+}
+
 export function isExcludedDecoration(x: number, z: number): boolean {
   if (
     (mirefenTavernCovers(x, z, TAVERN_SCATTER_PAD) ||
@@ -191,6 +197,9 @@ export function isExcludedDecoration(x: number, z: number): boolean {
   }
   // the painted towns clear their whole ground, not named points (sim/painted_towns/)
   if (paintedTownReachCovers(x, z, PAINTED_TOWN_SCATTER_PAD)) return true;
+  // the Challengers' Ring is a cleared arena: no tree or rock stands on its
+  // floor or its bank, so a King of the Hill contest is fought in the open
+  if (challengersRingCovers(x, z) && isBuiltinWorldActive()) return true;
   if (activeWorldExclusionPoints().some((point) => Math.hypot(x - point.x, z - point.z) < 0.25)) {
     return true;
   }

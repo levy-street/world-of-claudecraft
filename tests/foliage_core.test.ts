@@ -31,7 +31,7 @@ describe('Eastbrook town grass exclusion', () => {
     // canonical def, so it enters the built-in service list and earns its
     // own grass exclusion like any other civic prop.
     // Includes the glider rankings sign at the mountain wharf.
-    expect(BUILTIN_NOTICEBOARDS).toHaveLength(16);
+    expect(BUILTIN_NOTICEBOARDS).toHaveLength(17);
     // Includes Eastbrook footprints plus Fenbridge rebuild aprons (see fenbridge_layout).
     // Re-pinned 2026-08: the harbor-move layout v3 retired the ring wall
     // (d19aa33f76, docs/design/eastbrook-revamp/site-plan.md), dropping the
@@ -87,7 +87,9 @@ describe('Eastbrook town grass exclusion', () => {
     const painted = PAINTED_TOWNS.flatMap((town) => town.buildings);
     // The 3 added north Fenbridge cottages (fenbridge_touchup.ts) also clear
     // their reach and service apron (two rows each, six more: 99 to 105; Lantern Hall adds two more).
-    expect(exclusions).toHaveLength(107 + tavernGroundsRects().length + 2 * painted.length);
+    // Rivalmoot's guild board (the Quartered Isle) adds its footprint and
+    // reading-spot exclusions like the 13 before it: 107 to 109.
+    expect(exclusions).toHaveLength(109 + tavernGroundsRects().length + 2 * painted.length);
     expect(tavernGroundsRects().length).toBe(25);
     for (const building of [...HIGHWATCH_LAYOUT.buildings, ...painted]) {
       expect(exclusions.some((item) => item.id === building.id)).toBe(true);

@@ -1,14 +1,14 @@
 {
   "version": 2,
   "meta": {
-    "id": "live-42722-5ac5a288-c5a98e78-157d-421e9565-e4972e75",
+    "id": "live-44323-f732d6f5-538c48c5-157d-421e9565-e4972e75",
     "name": "Live world",
     "description": "",
     "createdAt": 0,
     "updatedAt": 0,
     "seed": 20061,
     "parentId": "",
-    "overworldBase": "42722-5ac5a288-c5a98e78",
+    "overworldBase": "44323-f732d6f5-538c48c5",
     "overworldRevision": "157d-421e9565-e4972e75"
   },
   "content": {
@@ -1445,6 +1445,78 @@
         ],
         "welcome": "The Proving Shore asks nothing of you but time. Learn the camp, strike the effigies, walk the wreck line and, when you are ready, Ferryman Odo will see you across to the vale. You can also ring the bell to go to the vale directly.",
         "welcomeQuestId": "q_ps_the_gauntlet"
+      },
+      {
+        "id": "quartered_isle",
+        "name": "The Quartered Isle",
+        "zMin": 1960,
+        "zMax": 2420,
+        "levelRange": [20, 20],
+        "biome": "vale",
+        "southPassX": 22,
+        "waterSouthBorder": true,
+        "eastPassZ": 2080,
+        "westPassZ": 2274,
+        "hub": {
+          "x": 0,
+          "z": 2235,
+          "radius": 24,
+          "name": "Rivalmoot"
+        },
+        "graveyard": {
+          "x": -14,
+          "z": 2258
+        },
+        "lakes": [],
+        "hillArena": {
+          "x": -44,
+          "z": 2098
+        },
+        "pois": [
+          {
+            "x": 0,
+            "z": 2235,
+            "label": "Rivalmoot",
+            "id": "rivalmoot"
+          },
+          {
+            "x": -44,
+            "z": 2098,
+            "label": "The Challengers' Ring",
+            "id": "the_challengers_ring"
+          },
+          {
+            "x": 22,
+            "z": 1975,
+            "label": "The Hoarbridge",
+            "id": "the_hoarbridge"
+          },
+          {
+            "x": 20,
+            "z": 2040,
+            "label": "The Hoarshelf",
+            "id": "the_hoarshelf"
+          },
+          {
+            "x": 120,
+            "z": 2190,
+            "label": "The Cinderscar",
+            "id": "the_cinderscar"
+          },
+          {
+            "x": -120,
+            "z": 2200,
+            "label": "The Heavestone Wilds",
+            "id": "the_heavestone_wilds"
+          },
+          {
+            "x": 0,
+            "z": 2330,
+            "label": "The Gyre",
+            "id": "the_gyre"
+          }
+        ],
+        "welcome": "An old rivalry broke this island four ways. On the hill at its heart, Rivalmoot keeps watch over the ring below."
       }
     ],
     "camps": [
@@ -9016,6 +9088,162 @@
         {
           "x": -314,
           "z": 44
+        }
+      ],
+      [
+        {
+          "x": -2,
+          "z": 1866
+        },
+        {
+          "x": -4,
+          "z": 1880
+        },
+        {
+          "x": -4,
+          "z": 1905
+        },
+        {
+          "x": 4,
+          "z": 1930
+        },
+        {
+          "x": 12,
+          "z": 1946
+        },
+        {
+          "x": 22,
+          "z": 1962
+        }
+      ],
+      [
+        {
+          "x": 22,
+          "z": 1962
+        },
+        {
+          "x": 24,
+          "z": 2000
+        },
+        {
+          "x": 26,
+          "z": 2050
+        },
+        {
+          "x": 34,
+          "z": 2100
+        },
+        {
+          "x": 40,
+          "z": 2150
+        },
+        {
+          "x": 30,
+          "z": 2195
+        },
+        {
+          "x": 12,
+          "z": 2222
+        },
+        {
+          "x": 0,
+          "z": 2235
+        }
+      ],
+      [
+        {
+          "x": 30,
+          "z": 2082
+        },
+        {
+          "x": 15,
+          "z": 2097
+        }
+      ],
+      [
+        {
+          "x": 0,
+          "z": 2235
+        },
+        {
+          "x": 36,
+          "z": 2232
+        },
+        {
+          "x": 84,
+          "z": 2196
+        },
+        {
+          "x": 124,
+          "z": 2140
+        },
+        {
+          "x": 152,
+          "z": 2098
+        },
+        {
+          "x": 180,
+          "z": 2080
+        },
+        {
+          "x": 214,
+          "z": 2078
+        },
+        {
+          "x": 250,
+          "z": 2062
+        },
+        {
+          "x": 276,
+          "z": 2044
+        }
+      ],
+      [
+        {
+          "x": 0,
+          "z": 2235
+        },
+        {
+          "x": -36,
+          "z": 2246
+        },
+        {
+          "x": -86,
+          "z": 2262
+        },
+        {
+          "x": -136,
+          "z": 2272
+        },
+        {
+          "x": -180,
+          "z": 2274
+        },
+        {
+          "x": -225,
+          "z": 2262
+        },
+        {
+          "x": -272,
+          "z": 2226
+        }
+      ],
+      [
+        {
+          "x": 0,
+          "z": 2235
+        },
+        {
+          "x": -6,
+          "z": 2266
+        },
+        {
+          "x": 4,
+          "z": 2300
+        },
+        {
+          "x": 0,
+          "z": 2330
         }
       ]
     ]
@@ -17880,6 +18108,326 @@
       "mode": "level",
       "hardness": 0.6440044550969344,
       "id": "live-terrain-915"
+    },
+    {
+      "x": -19.75,
+      "z": 2208.7226666666666,
+      "radius": 12.646955679341254,
+      "delta": 21,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.44650711384760616,
+      "id": "live-terrain-916"
+    },
+    {
+      "x": -28.15,
+      "z": 2208.7226666666666,
+      "radius": 12.646955679341254,
+      "delta": 21,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.44650711384760616,
+      "id": "live-terrain-917"
+    },
+    {
+      "x": -19.75,
+      "z": 2216.272,
+      "radius": 12.646955679341254,
+      "delta": 21,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.44650711384760616,
+      "id": "live-terrain-918"
+    },
+    {
+      "x": -28.15,
+      "z": 2216.272,
+      "radius": 12.646955679341254,
+      "delta": 21,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.44650711384760616,
+      "id": "live-terrain-919"
+    },
+    {
+      "x": -19.75,
+      "z": 2223.8213333333333,
+      "radius": 12.646955679341254,
+      "delta": 21,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.44650711384760616,
+      "id": "live-terrain-920"
+    },
+    {
+      "x": -28.15,
+      "z": 2223.8213333333333,
+      "radius": 12.646955679341254,
+      "delta": 21,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.44650711384760616,
+      "id": "live-terrain-921"
+    },
+    {
+      "x": 15.21275,
+      "z": 2249.6753333333336,
+      "radius": 13.204347481694679,
+      "delta": 21,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4698715699731342,
+      "id": "live-terrain-922"
+    },
+    {
+      "x": 15.21275,
+      "z": 2257.746,
+      "radius": 13.204347481694679,
+      "delta": 21,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4698715699731342,
+      "id": "live-terrain-923"
+    },
+    {
+      "x": 15.21275,
+      "z": 2265.8166666666666,
+      "radius": 13.204347481694679,
+      "delta": 21,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4698715699731342,
+      "id": "live-terrain-924"
+    },
+    {
+      "x": 24.63825,
+      "z": 2249.6753333333336,
+      "radius": 13.204347481694679,
+      "delta": 21,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4698715699731342,
+      "id": "live-terrain-925"
+    },
+    {
+      "x": 24.63825,
+      "z": 2257.746,
+      "radius": 13.204347481694679,
+      "delta": 21,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4698715699731342,
+      "id": "live-terrain-926"
+    },
+    {
+      "x": 24.63825,
+      "z": 2265.8166666666666,
+      "radius": 13.204347481694679,
+      "delta": 21,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4698715699731342,
+      "id": "live-terrain-927"
+    },
+    {
+      "x": 1.2509999999999994,
+      "z": 2211.8500000000004,
+      "radius": 10.457746179405014,
+      "delta": 21,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4262626098330716,
+      "id": "live-terrain-928"
+    },
+    {
+      "x": 1.2510000000000003,
+      "z": 2205.75,
+      "radius": 10.457746179405014,
+      "delta": 21,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4262626098330716,
+      "id": "live-terrain-929"
+    },
+    {
+      "x": -5.251,
+      "z": 2211.8500000000004,
+      "radius": 10.457746179405014,
+      "delta": 21,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4262626098330716,
+      "id": "live-terrain-930"
+    },
+    {
+      "x": -5.251,
+      "z": 2205.75,
+      "radius": 10.457746179405014,
+      "delta": 21,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4262626098330716,
+      "id": "live-terrain-931"
+    },
+    {
+      "x": -19.75,
+      "z": 2208.7226666666666,
+      "radius": 9.646955679341254,
+      "delta": 21,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5853614204358881,
+      "id": "live-terrain-932"
+    },
+    {
+      "x": -28.15,
+      "z": 2208.7226666666666,
+      "radius": 9.646955679341254,
+      "delta": 21,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5853614204358881,
+      "id": "live-terrain-933"
+    },
+    {
+      "x": -19.75,
+      "z": 2216.272,
+      "radius": 9.646955679341254,
+      "delta": 21,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5853614204358881,
+      "id": "live-terrain-934"
+    },
+    {
+      "x": -28.15,
+      "z": 2216.272,
+      "radius": 9.646955679341254,
+      "delta": 21,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5853614204358881,
+      "id": "live-terrain-935"
+    },
+    {
+      "x": -19.75,
+      "z": 2223.8213333333333,
+      "radius": 9.646955679341254,
+      "delta": 21,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5853614204358881,
+      "id": "live-terrain-936"
+    },
+    {
+      "x": -28.15,
+      "z": 2223.8213333333333,
+      "radius": 9.646955679341254,
+      "delta": 21,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5853614204358881,
+      "id": "live-terrain-937"
+    },
+    {
+      "x": 15.21275,
+      "z": 2249.6753333333336,
+      "radius": 10.204347481694679,
+      "delta": 21,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6080102125907121,
+      "id": "live-terrain-938"
+    },
+    {
+      "x": 15.21275,
+      "z": 2257.746,
+      "radius": 10.204347481694679,
+      "delta": 21,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6080102125907121,
+      "id": "live-terrain-939"
+    },
+    {
+      "x": 15.21275,
+      "z": 2265.8166666666666,
+      "radius": 10.204347481694679,
+      "delta": 21,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6080102125907121,
+      "id": "live-terrain-940"
+    },
+    {
+      "x": 24.63825,
+      "z": 2249.6753333333336,
+      "radius": 10.204347481694679,
+      "delta": 21,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6080102125907121,
+      "id": "live-terrain-941"
+    },
+    {
+      "x": 24.63825,
+      "z": 2257.746,
+      "radius": 10.204347481694679,
+      "delta": 21,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6080102125907121,
+      "id": "live-terrain-942"
+    },
+    {
+      "x": 24.63825,
+      "z": 2265.8166666666666,
+      "radius": 10.204347481694679,
+      "delta": 21,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6080102125907121,
+      "id": "live-terrain-943"
+    },
+    {
+      "x": 1.2509999999999994,
+      "z": 2211.8500000000004,
+      "radius": 8.457746179405014,
+      "delta": 21,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5270607659354716,
+      "id": "live-terrain-944"
+    },
+    {
+      "x": 1.2510000000000003,
+      "z": 2205.75,
+      "radius": 8.457746179405014,
+      "delta": 21,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5270607659354716,
+      "id": "live-terrain-945"
+    },
+    {
+      "x": -5.251,
+      "z": 2211.8500000000004,
+      "radius": 8.457746179405014,
+      "delta": 21,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5270607659354716,
+      "id": "live-terrain-946"
+    },
+    {
+      "x": -5.251,
+      "z": 2205.75,
+      "radius": 8.457746179405014,
+      "delta": 21,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5270607659354716,
+      "id": "live-terrain-947"
     }
   ],
   "placements": [

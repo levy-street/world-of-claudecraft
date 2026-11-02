@@ -2124,7 +2124,10 @@ const MONOLITHS: MonolithRow[] = [
     // Merge of the four dungeon entrances (#4478): both parents' additions combine
     // (ours is the palm scatter's decoration exclusion check), exact merged count,
     // within the release/v0.45.0 ceiling the branch was held to.
-    ceiling: 5133,
+    // The Quartered Isle's coast hooks rode in with the Frostveil and Amberfall
+    // coast tables extracted to content/frost_coast.ts and content/amber_coast.ts
+    // (the ember_coast.ts pattern), so the file shrank: exact count.
+    ceiling: 5127,
     seam: 'zone/terrain data as content records; logic as sim sibling modules',
   },
   {

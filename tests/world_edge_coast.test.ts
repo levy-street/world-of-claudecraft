@@ -8,7 +8,8 @@
 //    map in sheer plateau walls (the report: the Drakelands' east shore, the
 //    Amberfall's west and north, the Reach's north headlands). The margin
 //    now shaves tall ground to a walkable bank rising from the beach, and
-//    the north bay's dry headlands taper into low spits.
+//    the north bay's dry headlands taper into low spits. The bay is now the
+//    strait between the Reach and the Quartered Isle.
 //
 // The dry-cliff sweep asserts the RIDDEN surface (water clamps a seabed
 // step): underwater canyons are invisible and legal; dry walls are not.
@@ -34,17 +35,24 @@ describe('the world edges end in coast, not cliff', () => {
     expect(bad, bad.slice(0, 8).join('\n')).toEqual([]);
   });
 
-  it('no dry land survives past the Reach north boundary (z = 1960)', () => {
-    // Land past the zone line stands in no-zone space, where zoneAt falls
-    // back to the Amberfall: the HUD shows the wrong realm and the map has
-    // no tiles there (the reported glitch). The Reach's north shore must end
-    // inside its own band; everything beyond is the bay's open water. The
-    // two isthmus crossings at z 1890 sit south of this sweep, untouched.
+  it('no dry land survives past the strip north end, and the strait is crossed only by the Hoarbridge', () => {
+    // Land past a zone line stands in no-zone space, where zoneAt falls back
+    // to a neighbour: the HUD shows the wrong realm and the map has no tiles
+    // there (the reported glitch). Since the Quartered Isle took the old north
+    // bay, the strip's north end is the isle's zMax (2420): nothing dry stands
+    // past it. The strait between the Reach and the isle stays open water
+    // except for the Hoarbridge's land bridge round its pass (x = 22).
     const bad: string[] = [];
     for (let x = -179; x <= 179; x += 1) {
-      for (let z = 1960; z <= 2100; z += 2) {
+      for (let z = 2420; z <= 2440; z += 2) {
         const h = groundHeight(x, z, SEED);
         if (h > WATER_LEVEL - 0.05) bad.push(`(${x}, ${z}): h ${h.toFixed(2)}`);
+      }
+      for (let z = 1962; z <= 1972; z += 2) {
+        const h = groundHeight(x, z, SEED);
+        if (h > WATER_LEVEL - 0.05 && Math.abs(x - 22) > 40) {
+          bad.push(`strait (${x}, ${z}): h ${h.toFixed(2)}`);
+        }
       }
     }
     expect(bad, bad.slice(0, 10).join('\n')).toEqual([]);
@@ -85,7 +93,9 @@ describe('the world edges end in coast, not cliff', () => {
     sweep('drake north', (d, x) => [x, 2420 - d], 190, 530);
     sweep('amber west', (d, z) => [-540 + d, z], 1830, 2370);
     sweep('amber north', (d, x) => [x, 2380 - d], -530, -190);
+    // the strait's two shores: the Reach's north coast and the isle's south one
     sweep('frost north bay', (d, x) => [x, 2040 - d], -170, 170);
+    sweep('isle north', (d, x) => [x, 2420 - d], -170, 170);
     expect(bad, bad.slice(0, 10).join('\n')).toEqual([]);
   });
 

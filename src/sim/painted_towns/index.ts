@@ -14,6 +14,7 @@ import { HEDGEWICK_LAYOUT } from './hedgewick';
 import { ICEMANTLE_LAYOUT } from './icemantle';
 import { LANTERNMERE_LAYOUT } from './lanternmere';
 import { MOONREST_LAYOUT } from './moonrest';
+import { RIVALMOOT_LAYOUT } from './rivalmoot';
 import type { PaintedTownLayout } from './types';
 import { WICKHARBOR_LAYOUT } from './wickharbor';
 
@@ -74,6 +75,7 @@ export {
   MOONREST_MOONSPRING_ROAD,
   MOONREST_NPC_PLACEMENTS_BY_ID,
 } from './moonrest';
+export { RIVALMOOT_BUILDINGS_BY_ID, RIVALMOOT_LAYOUT } from './rivalmoot';
 export type {
   PaintedTownId,
   PaintedTownLayout,
@@ -101,6 +103,7 @@ export const PAINTED_TOWNS: readonly PaintedTownLayout[] = Object.freeze([
   MOONREST_LAYOUT,
   GIBBETMERE_LAYOUT,
   ELDERSHINE_LAYOUT,
+  RIVALMOOT_LAYOUT,
 ]);
 
 /** A layout's buildings as the zone file's building records (the mapping

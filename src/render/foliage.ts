@@ -415,6 +415,7 @@ const PINE_TINT: Record<BiomeId, number> = {
   jungle: 0x3f9450, // deep tropical green
   garden: 0x58a852, // clipped evergreen
   gale: 0x68a862, // wind-hardened scrub
+  quartered: 0x6e9a62, // war-thinned pines, greener toward the earth quarter
 };
 const OAK_TINT: Record<BiomeId, number> = {
   vale: 0x64be4a,
@@ -434,6 +435,7 @@ const OAK_TINT: Record<BiomeId, number> = {
   jungle: 0x46b04e, // lush broadleaf canopy
   garden: 0x68bc58, // specimen-tree green
   gale: 0x78b464, // stunted wind-bent crowns
+  quartered: 0x9aa65a, // gold-touched crowns of the Heavestone woods
 };
 const ROCK_TINT: Record<BiomeId, number> = {
   vale: 0x989a94,
@@ -453,6 +455,7 @@ const ROCK_TINT: Record<BiomeId, number> = {
   jungle: 0x7e8a6a,
   garden: 0xa2a49c, // marble and pale stone
   gale: 0x929698, // salt-grey sea rock
+  quartered: 0x948c84, // heaved, weathered stone
 };
 const TRUNK_TINT: Record<BiomeId, number> = {
   vale: 0xecdfcc,
@@ -472,6 +475,7 @@ const TRUNK_TINT: Record<BiomeId, number> = {
   jungle: 0xd8c4a0,
   garden: 0xcfc4b0,
   gale: 0x9a8a74,
+  quartered: 0xa08a70,
 };
 // Per-biome grass accents, normalized against the vale entry at build time:
 // the per-instance tuft tint starts from the ground colour under the tuft,
@@ -494,6 +498,7 @@ const GRASS_TINT: Record<BiomeId, number> = {
   jungle: 0xc4ec96, // bright wet tropical grass
   garden: 0xd0eeb0, // mown lawn
   gale: 0xc0dc9e, // wind-silvered grass
+  quartered: 0xc8c890, // dry, war-trampled grass
 };
 // The cards are lit with up normals (see applyGrassShader), so no N.L
 // compensation is needed; match the 1.18 lift of the 3D blade carpet.
@@ -554,6 +559,7 @@ const DRESS_TINT: Record<BiomeId, number> = {
   jungle: 0x6cc064,
   garden: 0x78c864,
   gale: 0x80b86c,
+  quartered: 0xa8b07c,
 };
 // how far the authored-tint dressing path collapses toward white
 const DRESS_TINT_SOFTEN = 0.52;
@@ -2694,6 +2700,13 @@ function buildGrassRing(
       { p: [245, 195, 60], c: [150, 90, 20] },
       { p: [245, 195, 60], c: [150, 90, 20] },
     ],
+    // the Quartered Isle: sparse hardy blooms that survived the war, frost
+    // white, ember orange and Heavestone gold
+    quartered: [
+      { p: [240, 244, 250], c: [200, 214, 230] },
+      { p: [238, 128, 60], c: [140, 60, 24] },
+      { p: [236, 196, 72], c: [150, 96, 24] },
+    ],
   };
   const flowerMatCache = new Map<string, THREE.Material>();
   const flowerMatFor = (biome: BiomeId): THREE.Material => {
@@ -2724,6 +2737,7 @@ function buildGrassRing(
     'fen',
     'gale',
     'jungle',
+    'quartered',
   ] as BiomeId[]) {
     flowerMatFor(b);
   }

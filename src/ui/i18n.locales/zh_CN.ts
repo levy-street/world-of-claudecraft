@@ -9074,6 +9074,16 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.zones.galecrest.pois.5.label': '沉船滩',
   'entities.zones.galecrest.pois.6.label': '镜湖',
   'entities.zones.galecrest.pois.7.label': '疾风崖马厩',
+  'entities.zones.quartered_isle.name': '四分岛',
+  'entities.zones.quartered_isle.welcome':
+    '一场古老的争斗将此岛一分为四。岛心山丘上的争锋镇，守望着山下的竞技场。',
+  'entities.zones.quartered_isle.pois.0.label': '争锋镇',
+  'entities.zones.quartered_isle.pois.1.label': '挑战者竞技场',
+  'entities.zones.quartered_isle.pois.2.label': '霜桥',
+  'entities.zones.quartered_isle.pois.3.label': '白霜冰架',
+  'entities.zones.quartered_isle.pois.4.label': '烬痕',
+  'entities.zones.quartered_isle.pois.5.label': '隆岩荒野',
+  'entities.zones.quartered_isle.pois.6.label': '旋风峰',
   'entities.npcs.warden_coalfast.name': '守望者·煤耐',
   'entities.npcs.warden_coalfast.title': '堡垒指挥官',
   'entities.npcs.warden_coalfast.greeting':
@@ -11764,6 +11774,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '一片被巨大树冠笼罩的闹鬼森林，路上唯一可信的光亮，便是绞湖镇的灯笼。',
   'guide.worldPage.galeBlurb':
     '海崖与呼啸的丘陵，这里的风从不停歇，老灯塔的火从未熄灭，烛港的家家户户都把门关得严严实实。',
+  'guide.worldPage.quarteredBlurb':
+    '一座被古老争斗撕裂成冰、火、岩、风四块地域的岛屿。争锋镇的挑战者们把城镇建在岛心的山丘上，把竞技场设在山脚下。',
   'guide.worldPage.jungleBlurb':
     '棕榈、白沙与喧闹鸟鸣交织的热带丛林，海滨小镇漂流港在沙滩上燃着一堆长明的篝火。',
   'guide.worldPage.gardenBlurb':
@@ -11788,6 +11800,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.galeGreeting':
     '这里的风从未停过一刻，老灯塔的火也从未熄过一次。进来后记得随手关上旅店的门。',
   'guide.worldPage.galeGreeter': '守塔人，烛港',
+  'guide.worldPage.quarteredGreeting':
+    '每支登上这座山丘的队伍都发誓自己会守住竞技场。山丘升起时就下去，证明给我看。',
+  'guide.worldPage.quarteredGreeter': '一名挑战者，争锋镇',
   'guide.worldPage.jungleGreeting':
     '温暖的沙滩，喧闹的鸟鸣，还有吞没地平线的丛林。我们在海滩上留着一堆篝火；可要记得回到火边来。',
   'guide.worldPage.jungleGreeter': '港务长，漂流港',
@@ -11808,6 +11823,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '绞湖镇蜷缩在自己的灯笼之间。鸦门是这片森林阴森的正门；寡妇棘丛被蛛网织得密不透风；吊影林地与哀石礼拜堂承载着森林最古老的悲恸；而猎手林隙属于至今仍在那里狩猎的东西。',
   'guide.worldPage.galePlaceNotes':
     '烛港迎风而立。风道是进来的悬崖之路；啸风丘陵在狂风下光秃起伏；老灯塔燃烧的岁月已无人能说清；断崖直落入海；沉船滩让人不敢小看这段海岸；而镜湖是整个国度里唯一静止的东西。',
+  'guide.worldPage.quarteredPlaceNotes':
+    '争锋镇坐落在岛心的山丘上。霜桥把道路从霜幕之境跨过海峡引来；白霜冰架在下方又白又冷地铺开；挑战者竞技场在山脚静候下一位山丘之王；烬痕向着龙裔荒原阴燃；隆岩荒野朝琥珀秋境隆起；旋风峰则在北岸上空卷动风暴。',
   'guide.worldPage.junglePlaceNotes':
     '漂流港在海滩上燃着篝火。缠木隘口是大河汇入绿墙之处；棕榈长滩沿着浪缘铺展，洁白而温暖；翠绿丛林与垂藤林吞没了内陆；蓝宝石潟湖清澈而幽深地发着光；而沉没神像则在水下静静注视。',
   'guide.worldPage.gardenPlaceNotes':
@@ -18922,6 +18939,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '沙洲另一头的一座岛屿，天空在裂野之上撕裂开来，而鸥港为每一次破口鸣响它的钟。',
   'guide.home.world.farshoreName': '远岸',
   'guide.home.world.galeBlurb': '海崖与呼啸的丘陵，这里的风从不停歇，而烛港把门关得紧紧的。',
+  'guide.home.world.quarteredName': '四分岛',
+  'guide.home.world.quarteredBlurb':
+    '一座被古老争斗一分为四的岛屿，争锋镇在山丘上俯瞰着每个挑战者都想夺下的竞技场。',
   'guide.home.world.galeName': '疾风崖',
   'guide.home.world.gardenBlurb':
     '一片树篱迷宫般的国度，至今仍被谁也没见过的园丁修剪着，入口就在篱苑镇与它的喷泉庭院之后。',

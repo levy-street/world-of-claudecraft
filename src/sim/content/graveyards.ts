@@ -19,6 +19,19 @@ export const LAST_KEEP_GRAVEYARD_ID = 'gy_last_keep';
 // shift later player, dungeon, raid or boss ids in parity traces.
 export const LAST_KEEP_SPIRIT_HEALER_ENTITY_ID = 1_000_000_004;
 
+// Rivalmoot's yard on the Quartered Isle, reserved the same way.
+export const RIVALMOOT_GRAVEYARD_ID = 'gy_rivalmoot';
+export const RIVALMOOT_SPIRIT_HEALER_ENTITY_ID = 1_000_000_030;
+
+/** Every graveyard whose Pale Keeper spawns under a reserved id instead of the
+ *  ordinary nextId stream (spirit.ts spawnOverworldSpiritHealers): a yard
+ *  appended after the shipped ones takes a slot here so no later player,
+ *  dungeon, raid or boss id moves. */
+export const RESERVED_SPIRIT_HEALER_ENTITY_IDS: Readonly<Record<string, number>> = Object.freeze({
+  [LAST_KEEP_GRAVEYARD_ID]: LAST_KEEP_SPIRIT_HEALER_ENTITY_ID,
+  [RIVALMOOT_GRAVEYARD_ID]: RIVALMOOT_SPIRIT_HEALER_ENTITY_ID,
+});
+
 // One graveyard per existing headstone cluster (the ZonePropsDef.graveyards anchors
 // across all three zones), so every visible graveyard on the map gets an angel and
 // no overworld death is ever far from one.
@@ -82,6 +95,9 @@ export const OVERWORLD_GRAVEYARDS: GraveyardDef[] = [
   // record, so every death at the keep released at the Wyrmwatch cairns,
   // nearly 300 yd north across the zone. Appended last (see above).
   { id: LAST_KEEP_GRAVEYARD_ID, name: 'Last Keep Churchyard', x: 451, z: 2134 },
+  // Rivalmoot's yard on the hilltop, beside the town's headstones
+  // (QUARTERED_ISLE_PROPS.graveyards). Appended last, its keeper reserved.
+  { id: RIVALMOOT_GRAVEYARD_ID, name: 'Rivalmoot Rest', x: -14, z: 2258 },
 ];
 
 // The Spirit Healer NPC id (one shared template; every spawned angel carries this

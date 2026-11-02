@@ -2538,6 +2538,25 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
     "families": [
       "beast"
     ]
+  },
+  {
+    "id": "quartered_isle",
+    "name": "The Quartered Isle",
+    "min": 20,
+    "max": 20,
+    "biome": "quartered",
+    "hub": "Rivalmoot",
+    "pois": [
+      "Rivalmoot",
+      "The Challengers' Ring",
+      "The Hoarbridge",
+      "The Hoarshelf",
+      "The Cinderscar",
+      "The Heavestone Wilds",
+      "The Gyre"
+    ],
+    "welcome": "An old rivalry broke this island four ways. On the hill at its heart, Rivalmoot keeps watch over the ring below.",
+    "families": []
   }
 ];
 

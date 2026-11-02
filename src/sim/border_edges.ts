@@ -21,6 +21,24 @@ export interface BorderEdge {
   fullRow: boolean; // spans the whole world row: no end feather
   passAt: number; // pass coordinate along the span
   sealed: boolean;
+  /** No ridge rises along this edge: the border is open water (a strait the
+   *  north zone declares with waterSouthBorder). The pass still marks the
+   *  land bridge. Absent on every classic edge. */
+  water?: true;
+}
+
+/** The pass on a vertical edge between `a` (west) and `b` (east). A column
+ *  zone holds ONE crossing value per side, and since the Quartered Isle a
+ *  column's west side can face two strip zones (the Drakelands meet both the
+ *  Frostveil and the isle), so the east neighbour's westPassZ may belong to
+ *  the OTHER edge. The first candidate that lies inside this edge's span
+ *  wins; with none inside, the classic precedence holds unchanged (west side
+ *  first, then the east side, then the middle). */
+function verticalPassAt(a: ZoneDef, b: ZoneDef, lo: number, hi: number): number {
+  for (const passZ of [b.westPassZ, a.eastPassZ]) {
+    if (passZ !== undefined && passZ >= lo && passZ <= hi) return passZ;
+  }
+  return b.westPassZ ?? a.eastPassZ ?? (lo + hi) / 2;
 }
 
 /** All shared edges between adjacent zone rects (pure; exported for tests). */
@@ -50,6 +68,7 @@ export function computeBorderEdges(zones: readonly ZoneDef[]): BorderEdge[] {
             fullRow,
             passAt: b.southPassX ?? 0,
             sealed,
+            ...(b.waterSouthBorder && !sealed ? { water: true as const } : {}),
           });
         }
       }
@@ -64,7 +83,7 @@ export function computeBorderEdges(zones: readonly ZoneDef[]): BorderEdge[] {
             lo,
             hi,
             fullRow: false, // a column border never spans the world's full z
-            passAt: b.westPassZ ?? a.eastPassZ ?? (lo + hi) / 2,
+            passAt: verticalPassAt(a, b, lo, hi),
             sealed: false,
           });
         }

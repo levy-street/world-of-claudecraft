@@ -16,6 +16,7 @@ import { GALECREST_ZONE } from './galecrest';
 import { NIGHTBLOOM_ZONE } from './nightbloom';
 import { PALMREACH_ZONE } from './palmreach';
 import { PROVING_SHORE_ZONE } from './proving_shore';
+import { QUARTERED_ISLE_ZONE } from './quartered_isle';
 import { REALM_ZONE } from './realm';
 import { WILLOWFEN_ZONE } from './willowfen';
 import { WRAITHWOOD_ZONE } from './wraithwood';
@@ -50,4 +51,7 @@ export const MAILBOXES: MailboxDef[] = [
   // have put the Ravenpost perch in the shallows. Turned a half circle from
   // the pillars' default yaw so the slot faces the muster ground.
   { ...hubMailbox(PROVING_SHORE_ZONE, { x: -6, z: 6 }), facing: Math.PI },
+  // Rivalmoot, at the plaza's east edge by the Cinderscar road. Under a stable
+  // id (MailboxDef.entityId): appended after the allocator-numbered pillars.
+  { ...hubMailbox(QUARTERED_ISLE_ZONE, { x: 8, z: -6 }), entityId: 2_000_000_017 },
 ];

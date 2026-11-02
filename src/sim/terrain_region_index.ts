@@ -1,3 +1,5 @@
+import { QUARTERED_ARENA_BOUNDS, QUARTERED_SHAPING_BOUNDS } from './quartered_isle_terrain';
+
 export const TERRAIN_REGION_CELL_SIZE = 128;
 const MAX_APPLIERS = 64;
 const MAX_CELLS_PER_BOUND = 1_000_000;
@@ -61,6 +63,9 @@ export const TERRAIN_APPLIER = {
   provingMoat: 35,
   gardenwalkWestPass: 36,
   thornpeakPocketGrade: 37,
+  quarteredShaping: 38,
+  quarteredCoast: 39,
+  quarteredArena: 40,
 } as const;
 
 function bounds(minX: number, maxX: number, minZ: number, maxZ: number): TerrainRegionBounds {
@@ -125,6 +130,27 @@ export const TERRAIN_APPLIER_BOUNDS: readonly (readonly TerrainRegionBounds[] | 
   // rOut 11 disk around (-67.5, 629), exactly THORNPEAK_POCKET_GRADE_BOUNDS
   // (tests/thornpeak_hillside_pocket.test.ts pins the two against drift).
   [bounds(-78.5, -56.5, 618, 640)],
+  // quarteredShaping: Rivalmoot's hill and the Gyre's rise, their full feet
+  // (QUARTERED_SHAPING_BOUNDS in quartered_isle_terrain.ts)
+  [
+    bounds(
+      QUARTERED_SHAPING_BOUNDS.minX,
+      QUARTERED_SHAPING_BOUNDS.maxX,
+      QUARTERED_SHAPING_BOUNDS.minZ,
+      QUARTERED_SHAPING_BOUNDS.maxZ,
+    ),
+  ],
+  // quarteredCoast: the strip's north end, both seams' fades included
+  [bounds(-188, 188, 1952, 2428)],
+  // quarteredArena: the Challengers' Ring out to its bank's foot
+  [
+    bounds(
+      QUARTERED_ARENA_BOUNDS.minX,
+      QUARTERED_ARENA_BOUNDS.maxX,
+      QUARTERED_ARENA_BOUNDS.minZ,
+      QUARTERED_ARENA_BOUNDS.maxZ,
+    ),
+  ],
 ];
 
 interface MutableCell {

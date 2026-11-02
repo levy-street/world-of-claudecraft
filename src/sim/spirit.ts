@@ -36,10 +36,9 @@ import {
   dungeonAt,
   isDelvePos,
   isRiftPos,
-  LAST_KEEP_GRAVEYARD_ID,
-  LAST_KEEP_SPIRIT_HEALER_ENTITY_ID,
   OVERWORLD_GRAVEYARDS,
   PLAYER_START,
+  RESERVED_SPIRIT_HEALER_ENTITY_IDS,
   RIFT_REGION_HALF_X,
   RIFT_REGION_HALF_Z,
   riftInstanceOrigin,
@@ -658,7 +657,7 @@ interface SpiritHealerGraveyard {
 }
 
 function reservedOverworldSpiritHealerEntityId(graveyard: SpiritHealerGraveyard): number | null {
-  return graveyard.id === LAST_KEEP_GRAVEYARD_ID ? LAST_KEEP_SPIRIT_HEALER_ENTITY_ID : null;
+  return (graveyard.id && RESERVED_SPIRIT_HEALER_ENTITY_IDS[graveyard.id]) || null;
 }
 
 // Spawn one Spirit Healer at a world position, returning its entity id. Reused by

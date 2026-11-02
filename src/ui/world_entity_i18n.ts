@@ -889,6 +889,7 @@ const ZONE_IDS = [
   // Appended last, matching the ZONES order in sim/data.ts.
   'goldcrest_harbor',
   'proving_shore',
+  'quartered_isle',
 ] as const;
 const DUNGEON_IDS = [
   'hollow_crypt',

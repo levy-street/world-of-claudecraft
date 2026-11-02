@@ -9076,6 +9076,16 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.zones.galecrest.pois.5.label': '沉船灘',
   'entities.zones.galecrest.pois.6.label': '鏡湖',
   'entities.zones.galecrest.pois.7.label': '疾風崖馬廄',
+  'entities.zones.quartered_isle.name': '四分島',
+  'entities.zones.quartered_isle.welcome':
+    '一場古老的爭鬥將此島一分為四。島心山丘上的爭鋒鎮，守望著山下的競技場。',
+  'entities.zones.quartered_isle.pois.0.label': '爭鋒鎮',
+  'entities.zones.quartered_isle.pois.1.label': '挑戰者競技場',
+  'entities.zones.quartered_isle.pois.2.label': '霜橋',
+  'entities.zones.quartered_isle.pois.3.label': '白霜冰架',
+  'entities.zones.quartered_isle.pois.4.label': '燼痕',
+  'entities.zones.quartered_isle.pois.5.label': '隆岩荒野',
+  'entities.zones.quartered_isle.pois.6.label': '旋風峰',
   'entities.npcs.warden_coalfast.name': '守望者 煤堅',
   'entities.npcs.warden_coalfast.title': '堡壘指揮官',
   'entities.npcs.warden_coalfast.greeting':
@@ -11763,6 +11773,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.hauntBlurb': '巨大樹冠之下的一片鬧鬼森林，絞湖鎮的燈籠是路上唯一可信的光。',
   'guide.worldPage.galeBlurb':
     '海崖與呼嘯的丘陵，這裡的風從不停歇，老燈塔從不熄滅，燭港則緊閉門戶。',
+  'guide.worldPage.quarteredBlurb':
+    '一座被古老爭鬥撕裂成冰、火、岩、風四塊地域的島嶼。爭鋒鎮的挑戰者們把城鎮建在島心的山丘上，把競技場設在山腳下。',
   'guide.worldPage.jungleBlurb':
     '棕櫚、白沙與喧鬧群鳥交織的熱帶叢林，海濱小鎮漂流港在沙灘上燃著一堆火。',
   'guide.worldPage.gardenBlurb':
@@ -11787,6 +11799,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.galeGreeting':
     '這裡的風從未停過一次，老燈塔也從未熄過一次。進了旅店，記得隨手關上門。',
   'guide.worldPage.galeGreeter': '燈塔看守人，燭港',
+  'guide.worldPage.quarteredGreeting':
+    '每支登上這座山丘的隊伍都發誓自己會守住競技場。山丘升起時就下去，證明給我看。',
+  'guide.worldPage.quarteredGreeter': '一名挑戰者，爭鋒鎮',
   'guide.worldPage.jungleGreeting':
     '溫暖的沙、喧鬧的鳥，還有一片吞沒地平線的叢林。我們在海灘上燃著一堆火；盡量活著回到火邊來。',
   'guide.worldPage.jungleGreeter': '港務長，漂流港',
@@ -11807,6 +11822,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '絞湖鎮蜷縮在自己的燈籠之中。鴉門是這片森林陰森的正門；寡婦棘叢被蛛網織得密不透風；吊影林地與哀石禮拜堂守著森林最古老的悲慟；獵手林隙則屬於那仍在其中狩獵的東西。',
   'guide.worldPage.galePlaceNotes':
     '燭港迎著風而立。風道是進來的懸崖之路；嘯風丘陵在狂風下光禿起伏，寸樹不生；老燈塔燃燒了多久，沒有人說得清；斷崖筆直墜入水中；沉船灘讓這片海岸不敢說謊；鏡湖則是整個國度裡唯一靜止的事物。',
+  'guide.worldPage.quarteredPlaceNotes':
+    '爭鋒鎮坐落在島心的山丘上。霜橋把道路從霜幕之境跨過海峽引來；白霜冰架在下方又白又冷地鋪開；挑戰者競技場在山腳靜候下一位山丘之王；燼痕向著龍裔荒原陰燃；隆岩荒野朝琥珀秋境隆起；旋風峰則在北岸上空捲動風暴。',
   'guide.worldPage.junglePlaceNotes':
     '漂流港在海灘上燃著火堆。纏木隘口是河流與綠牆相會之處；棕櫚長灘沿著浪花鋪展，潔白而溫暖；翠綠叢林與垂藤林吞沒了內陸；藍寶石潟湖清澈幽深地發著光；沉沒神像則自水下注視著一切。',
   'guide.worldPage.gardenPlaceNotes':
@@ -18926,6 +18943,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '沙洲彼端的一座島嶼，天空在裂隙原野之上撕裂而開，而鷗港為每一道裂口敲響它的鐘。',
   'guide.home.world.farshoreName': '遠岸',
   'guide.home.world.galeBlurb': '海崖與呼嘯的丘原，這裡的風從不歇息，燭港則緊閉門扉。',
+  'guide.home.world.quarteredName': '四分島',
+  'guide.home.world.quarteredBlurb':
+    '一座被古老爭鬥一分為四的島嶼，爭鋒鎮在山丘上俯瞰著每個挑戰者都想奪下的競技場。',
   'guide.home.world.galeName': '疾風崖',
   'guide.home.world.gardenBlurb':
     '一座樹籬迷宮的國度，至今仍被修剪得整整齊齊，卻沒有人見過那位園丁；入口就在籬苑鎮與它的噴泉庭院之後。',

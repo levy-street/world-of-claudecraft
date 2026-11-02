@@ -43,6 +43,11 @@ import { generateDecorationsInBounds, roadDistance, waterLevel, zoneBiomeAt } fr
 import { groundPaletteFor, groundPaletteVersion } from './ground_palette_override_core';
 import { type ImpactCraterTerrainBlend, impactCraterTerrainBlend } from './impact_terrain';
 import { clamp01 } from './num_clamp';
+import {
+  makeQuarterGroundLinear,
+  quarteredBlendActive,
+  quarteredGroundAt,
+} from './quartered_ground_core';
 import { makeShoreProbe, type ShoreProbe, shoreWaterGate } from './shore_water_gate_core';
 import { buildCutClip, CUT_CELL_KEEP, type CutClipResult } from './terrain_cut_clip_core';
 import { buildCutRim, type CutRimArrays } from './terrain_cut_rim_core';
@@ -123,6 +128,28 @@ function syncZonePalettes(): void {
   }
 }
 
+// The Quartered Isle's ground is position-dependent: its four quarters blend
+// by the shared quarter field (quartered_ground_core.ts, which the far vista
+// reads too), so its strip palette is refilled per sample into this scratch.
+const quarteredLinear = makeQuarterGroundLinear();
+const quarteredPalette = {
+  grass: new THREE.Color(),
+  grassDark: new THREE.Color(),
+  grassYellow: new THREE.Color(),
+  dirt: new THREE.Color(),
+  sand: new THREE.Color(),
+};
+function quarteredPaletteAt(x: number, z: number): typeof quarteredPalette {
+  const q = quarteredGroundAt(x, z, quarteredLinear);
+  // linear triples straight into the linear working space (no sRGB decode)
+  quarteredPalette.grass.setRGB(q.grass[0], q.grass[1], q.grass[2]);
+  quarteredPalette.grassDark.setRGB(q.grassDark[0], q.grassDark[1], q.grassDark[2]);
+  quarteredPalette.grassYellow.setRGB(q.grassYellow[0], q.grassYellow[1], q.grassYellow[2]);
+  quarteredPalette.dirt.setRGB(q.dirt[0], q.dirt[1], q.dirt[2]);
+  quarteredPalette.sand.setRGB(q.sand[0], q.sand[1], q.sand[2]);
+  return quarteredPalette;
+}
+
 // An AUTHORED map is tinted by its own zone's biome. The strip cascade below
 // is the shipped world's z-band layout (vale, marsh, dusk, night ...): walked
 // on a maker's map it striped their unpainted ground, and all the land past
@@ -158,7 +185,9 @@ function paletteAt(x: number, z: number): void {
   }
   syncZonePalettes();
   const stripPalette = (zn: (typeof ZONES)[number]) =>
-    zonePalettes[ZONES.indexOf(zn)] ?? zonePalettes[0];
+    quarteredBlendActive(zn.id, zn.biome)
+      ? quarteredPaletteAt(x, z)
+      : (zonePalettes[ZONES.indexOf(zn)] ?? zonePalettes[0]);
   grassC.copy(stripPalette(STRIP_ZONES[0]).grass);
   grassDarkC.copy(stripPalette(STRIP_ZONES[0]).grassDark);
   grassYellowC.copy(stripPalette(STRIP_ZONES[0]).grassYellow);

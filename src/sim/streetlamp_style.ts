@@ -47,6 +47,7 @@ const STYLE_BY_BIOME: Readonly<Record<BiomeId, StreetlampStyleId>> = {
   jungle: 'palmreach_totem',
   garden: 'evergarden_flower',
   gale: 'galecrest_mast',
+  quartered: 'thornpeak_beacon', // Rivalmoot is a walled stone hill town
 };
 
 export const STREETLAMP_DEFAULT_STYLE: StreetlampStyleId = 'eastbrook_civic';

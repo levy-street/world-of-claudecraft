@@ -1,9 +1,12 @@
 import { applyLinkedMapTerrain, authoredSlateBase, inLinkedMapRect } from './authored_terrain_base';
 import { bgFieldHeightLocal } from './battleground_field';
 import { BORDER_EDGES } from './border_edges';
+import { AMBER_BAYS, AMBER_LAND_LOBES } from './content/amber_coast';
 import { EMBER_BAYS, EMBER_LAND_LOBES, forgefatherScatterExcluded } from './content/ember_coast';
+import { FROST_BAYS, FROST_LAND_LOBES } from './content/frost_coast';
 import { STABLE_FLAT, STABLE_PADDOCK } from './content/mounts';
 import { PALMREACH_PROPS } from './content/palmreach';
+import { QUARTERED_BAYS, QUARTERED_LAND_LOBES } from './content/quartered_coast';
 import { VALE_BAYS, VALE_LAND_LOBES } from './content/vale_coast';
 import {
   authoredMapActive,
@@ -51,6 +54,7 @@ import { instancedFieldHeight } from './instances/authored_field/registry';
 import { applyKeepSitePad, keepSitePadWeight } from './keep_site';
 import { decksMayStand, placementRampFloorAt, WALK_DECK_REACH } from './placement_ramps';
 import { planeFloorAt } from './plane_floor';
+import { applyChallengersRing, quarteredShapingOffset } from './quartered_isle_terrain';
 import { reachDeckClear, reachDeckSurface } from './reach_decks';
 import { fbm2, hash2, noise2 } from './rng';
 import { carveSeaChannels } from './sea_channels';
@@ -237,6 +241,9 @@ const BIOME_SHAPE: Record<
   garden: { hill: 9, base: 1.8, hubHeight: 2, crag: 0 },
   // the Galecrest: rolling wind-scoured headland downs over sea cliffs
   gale: { hill: 14, base: 2.4, hubHeight: 2.5, crag: 8 },
+  // the Quartered Isle: scarred rolling ground; Rivalmoot's hill and the
+  // arena floor are authored on top (quartered_isle_terrain.ts)
+  quartered: { hill: 14, base: 3, hubHeight: 3, crag: 8 },
   // Paint-only biomes (the editor's biome brush): never a zone band in the
   // built-in world, so these rows only shape painted cells on custom maps.
   beach: { hill: 5, base: -2.4, hubHeight: 0.8, crag: 0 },
@@ -476,56 +483,20 @@ export function emberLandness(x: number, z: number): number {
 // sea like the Hollow's does.
 // ---------------------------------------------------------------------------
 const FROST_ZMAX = 1960; // keep in sync with FROSTVEIL_ZONE.zMax (the strip's north end)
-const FROST_LAND_LOBES = [
-  { x: 0, z: 1460, r: 95 }, // the south rim: Heartfrost Cavern's shelf
-  { x: -120, z: 1475, r: 60 }, // western wall footing
-  { x: 120, z: 1475, r: 60 }, // eastern wall footing
-  { x: 0, z: 1500, r: 85 }, // the rim benches
-  { x: -40, z: 1630, r: 90 }, // the Icemantle massif
-  { x: -30, z: 1558, r: 45 }, // the town shelf under Icemantle itself
-  { x: 80, z: 1600, r: 75 }, // Glacier Tarn's shoulder
-  { x: 30, z: 1670, r: 65 }, // the inner valley joining the tarn to the Steps
-  { x: 20, z: 1750, r: 95 }, // the Aurora Steps
-  { x: -100, z: 1720, r: 70 }, // the Shiverfen shelf
-  { x: -68, z: 1806, r: 46 }, // the Goldmelt road's first shoulder off the Steps
-  { x: -120, z: 1820, r: 48 }, // the west shore's rise under the Goldmelt road
-  { x: -132, z: 1856, r: 40 }, // ...its mid rise
-  { x: -158, z: 1872, r: 44 }, // the Goldmelt's ice-side shoulder
-  { x: -162, z: 1930, r: 48 }, // the Palewater's north cap, ice side
-  { x: 120, z: 1790, r: 65 }, // the Howling Terraces
-  { x: 158, z: 1852, r: 44 }, // the Snowline's ice-side shoulder
-  { x: 116, z: 1744, r: 42 }, // the tarn road's eastern shoulder
-  { x: 0, z: 1870, r: 80 }, // the north crown
-  { x: 10, z: 1945, r: 50 }, // the Goldmelt corridor's south footing
-  { x: 146, z: 1700, r: 44 }, // the Snowline crossing's ice-side shoulder
-  { x: 108, z: 1700, r: 42 }, // ...rising onto the benches
-  { x: 54, z: 1638, r: 42 }, // the crossing road's bench shoulder
-  { x: 98, z: 1672, r: 40 }, // ...stepping down toward the border
-  { x: 86, z: 1824, r: 42 }, // the terrace road's north shoulder
-  { x: 42, z: 1674, r: 40 }, // the tarn road's southern loop
-  { x: 78, z: 1694, r: 38 }, // ...meeting the crossing shoulder
-  { x: 162, z: 1468, r: 48 }, // the Meltwater's south cap, ice side
-  { x: 162, z: 1930, r: 48 }, // the Meltwater's north cap, ice side
-  { x: 102, z: 1888, r: 46 }, // the shore between the Terraces and the crown, closing the cap
-  { x: -60, z: 1958, r: 40 }, // the north crown's headlands push into the bay...
-  { x: 44, z: 1962, r: 36 }, // ...and a second, so the north shore is lobed
-  { x: -30, z: 1452, r: 46 }, // the south shore's rise east of the Wyrmgate
-  { x: 70, z: 1450, r: 42 }, // ...and its east headland over the sound
-  { x: 52, z: 1974, r: 26 }, // a north-center headland east of the new cove
-] as const;
-const FROST_BAYS = [
-  { x: 165, z: 1660, r: 55 }, // the east sound
-  { x: -165, z: 1580, r: 50 }, // the west inlet
-  { x: 60, z: 1945, r: 50 }, // the north cove
-  { x: -108, z: 1952, r: 40 }, // ...and a second cove, west of the crown
-  { x: 8, z: 1470, r: 40 }, // a south cove biting the shore east of the Wyrmgate
-  { x: 24, z: 1976, r: 34 }, // a cove splitting the flat north-center headland
-] as const;
-
 const FROST_LAND_FIELD = boundedBlobs(FROST_LAND_LOBES);
 const FROST_BAY_FIELD = boundedBlobs(FROST_BAYS);
 export function frostLandness(x: number, z: number): number {
   return metaballLandness(FROST_LAND_FIELD, FROST_BAY_FIELD, x, z);
+}
+
+// The Quartered Isle: the strip's north end over the old north bay, its
+// tables in content/quartered_coast.ts, its hill and arena in
+// quartered_isle_terrain.ts.
+const QUARTERED_ZMAX = 2420; // keep in sync with QUARTERED_ISLE_ZONE.zMax
+const QUARTERED_LAND_FIELD = boundedBlobs(QUARTERED_LAND_LOBES);
+const QUARTERED_BAY_FIELD = boundedBlobs(QUARTERED_BAYS);
+export function quarteredLandness(x: number, z: number): number {
+  return metaballLandness(QUARTERED_LAND_FIELD, QUARTERED_BAY_FIELD, x, z);
 }
 
 // ---------------------------------------------------------------------------
@@ -535,36 +506,6 @@ export function frostLandness(x: number, z: number): number {
 // ---------------------------------------------------------------------------
 const AMBER_ZMIN = 1820; // keep in sync with AMBERFALL_ZONE.zMin (west column)
 const AMBER_ZMAX = 2380; // ...and zMax
-const AMBER_LAND_LOBES = [
-  { x: -350, z: 1850, r: 60 }, // the Goldmelt pass mouth
-  { x: -420, z: 1880, r: 70 }, // the arrival shelf west of the pass
-  { x: -340, z: 1910, r: 80 }, // the south weald
-  { x: -260, z: 1950, r: 65 }, // Harvest Hollow's shelf
-  { x: -305, z: 1985, r: 50 }, // the harvest road's field saddle
-  { x: -450, z: 2010, r: 75 }, // the Gilded Orchard
-  { x: -400, z: 1950, r: 55 }, // the Rootway road's meadow saddle
-  { x: -360, z: 2040, r: 90 }, // Lanternmere's shore
-  { x: -360, z: 2130, r: 95 }, // the Great Mere basin
-  { x: -440, z: 2210, r: 70 }, // Cindermaple Rise
-  { x: -265, z: 2220, r: 70 }, // the Monolith heath
-  { x: -360, z: 2300, r: 85 }, // the north crown
-  { x: -380, z: 2355, r: 55 }, // the Amberfen Steps' northern footing
-  { x: -268, z: 2232, r: 40 }, // the mere lurkers' reeded shore
-  { x: -306, z: 2160, r: 44 }, // the east mere road's shoulder
-  { x: -490, z: 1852, r: 48 }, // the Goldmelt Water's west cap, amber side
-  { x: -230, z: 1852, r: 48 }, // the Goldmelt Water's east cap, amber side
-  { x: -210, z: 1896, r: 46 }, // ...joined to Harvest Hollow's shelf
-  { x: -492, z: 2344, r: 50 }, // the Amber Broads' west cap, amber side
-  { x: -465, z: 2290, r: 46 }, // ...joined to the north crown and Cindermaple Rise
-  { x: -198, z: 2352, r: 50 }, // the southeast corner knot, amber quarter
-  { x: -225, z: 2280, r: 48 }, // ...joined to the Monolith heath
-] as const;
-const AMBER_BAYS = [
-  { x: -190, z: 2080, r: 55 }, // the east sound
-  { x: -530, z: 2120, r: 55 }, // the west reach
-  { x: -320, z: 2375, r: 45 }, // the north cove
-] as const;
-
 const AMBER_LAND_FIELD = boundedBlobs(AMBER_LAND_LOBES);
 const AMBER_BAY_FIELD = boundedBlobs(AMBER_BAYS);
 export function amberLandness(x: number, z: number): number {
@@ -1963,11 +1904,19 @@ function applyNorthBay(x: number, z: number, h: number): number {
   const widen = 12 * smoothstep(FROST_ZMAX - 14, FROST_ZMAX, z);
   const xWin = 1 - smoothstep(172 + widen, 188 + widen, ax);
   if (xWin <= 0) return h;
+  // ...except where the Quartered Isle stands: the bay is now only the sound
+  // between the Reach and the isle, crossed by the Hoarbridge
+  // (and only in the strait: north of it the isle's and the columns' own
+  // coasts shape every shore)
+  const isle =
+    (1 - smoothstep(0.1, 0.35, quarteredLandness(x, z))) *
+    (1 - smoothstep(FROST_ZMAX + 40, FROST_ZMAX + 80, z));
+  if (isle <= 0) return h;
   const wob = (fbm2(x * 0.03, 61.7, 9331, 2) - 0.5) * 14;
   const zShore = FROST_ZMAX - 12 + wob; // 1941 to 1955: strictly inside the band
   const bank = WATER_LEVEL - 0.2 + 0.65 * Math.max(0, zShore - z);
-  if (h > bank) h = h + (bank - h) * xWin;
-  const t = smoothstep(zShore, zShore + 24, z) * xWin;
+  if (h > bank) h = h + (bank - h) * xWin * isle;
+  const t = smoothstep(zShore, zShore + 24, z) * xWin * isle;
   if (t <= 0) return h;
   const sea = Math.min(h, WATER_LEVEL - 6);
   return h + (sea - h) * t;
@@ -2226,6 +2175,28 @@ function applyFrostCoast(x: number, z: number, h: number): number {
   // ...and the Goldmelt's east ramp, toward the autumn on the west border
   const passW = (1 - smoothstep(26, 52, Math.abs(z - 1890))) * (1 - smoothstep(-145, -100, x));
   if (passW > 0) out = out + (7 + (out - 7) * 0.15 - out) * passW;
+  return h + (out - h) * seam * zSeam;
+}
+
+// The Quartered Isle's coast: the same recipe, fading in across the Reach's
+// north line (the Hoarbridge carries the land over it) and out at the
+// world's north edge, where applyWorldEdgeSea takes over.
+function applyQuarteredCoast(x: number, z: number, h: number): number {
+  const zSeam =
+    smoothstep(FROST_ZMAX - 8, FROST_ZMAX + 8, z) *
+    (1 - smoothstep(QUARTERED_ZMAX - 8, QUARTERED_ZMAX + 8, z));
+  if (zSeam <= 0) return h;
+  const seam =
+    smoothstep(STRIP_MIN_X - 8, STRIP_MIN_X + 8, x) *
+    (1 - smoothstep(STRIP_MAX_X - 8, STRIP_MAX_X + 8, x));
+  if (seam <= 0) return h;
+  const land = quarteredLandness(x, z);
+  // a wider land ramp than the other coasts' (0.3): the isle's uplands stand
+  // close to its shores, so the beach climbs over twice the run
+  const t = smoothstep(0.02, 0.6, land);
+  const shelf = smoothstep(-0.4, 0.06, land);
+  const floor = HOLLOW_SEA_FLOOR + (WATER_LEVEL - 1.1 - HOLLOW_SEA_FLOOR) * shelf;
+  const out = floor + (h - floor) * t;
   return h + (out - h) * seam * zSeam;
 }
 
@@ -2891,13 +2862,21 @@ export function inHollowOpenSea(x: number, z: number): boolean {
         nightLandness(x, z),
         emberLandness(x, z),
         amberLandness(x, z),
+        quarteredLandness(x, z),
       ) < 0.02
     );
   }
   if (z <= DRAKE_ZMAX + 2) {
     // the north bay between the columns' shoulders, and their outer flanks
     if (Math.abs(x) < 188) {
-      return Math.max(frostLandness(x, z), emberLandness(x, z), amberLandness(x, z)) < 0.02;
+      return (
+        Math.max(
+          frostLandness(x, z),
+          emberLandness(x, z),
+          amberLandness(x, z),
+          quarteredLandness(x, z),
+        ) < 0.02
+      );
     }
     const dRim = Math.min(x - seaXb.min, seaXb.max - x);
     return dRim < 48 && Math.max(emberLandness(x, z), amberLandness(x, z)) < 0.02;
@@ -3995,6 +3974,7 @@ function borderSeaGate(x: number, z: number): number {
         reachLandness(x, z),
         gardenLandness(x, z),
         galeLandness(x, z),
+        quarteredLandness(x, z),
       ),
     );
   }
@@ -4023,6 +4003,8 @@ function borderSeaGate(x: number, z: number): number {
   land = Math.max(land, gardenLandness(x, z));
   if (land >= 0.06) return 1;
   land = Math.max(land, galeLandness(x, z));
+  if (land >= 0.06) return 1;
+  land = Math.max(land, quarteredLandness(x, z));
   return smoothstep(0.005, 0.06, land);
 }
 
@@ -4062,6 +4044,7 @@ function terrainHeightUnpadded(x: number, z: number, seed: number, skipEdits = f
   // lazily computed once per call: non-sealed ridges break at declared lakes
   let lakeGate = -1;
   for (const edge of BORDER_EDGES) {
+    if (edge.water) continue; // a strait border raises no range
     const sigma = edge.sealed ? SEALED_RIDGE_SIGMA : RIDGE_SIGMA;
     const dPerp = Math.abs((edge.kind === 'h' ? z : x) - edge.at);
     // The window used to cut hard at 3 sigma, but the gaussian tail there is
@@ -4197,6 +4180,9 @@ function terrainHeightUnpadded(x: number, z: number, seed: number, skipEdits = f
   if (terrainRegionHas(region, TERRAIN_APPLIER.emberShaping)) {
     h += emberShapingOffset(x, z, seed);
   }
+  if (terrainRegionHas(region, TERRAIN_APPLIER.quarteredShaping)) {
+    h += quarteredShapingOffset(x, z);
+  }
   if (terrainRegionHas(region, TERRAIN_APPLIER.frostMassif)) {
     h += frostMassifOffset(x, z);
   }
@@ -4217,6 +4203,9 @@ function terrainHeightUnpadded(x: number, z: number, seed: number, skipEdits = f
   }
   if (terrainRegionHas(region, TERRAIN_APPLIER.frostCoast)) {
     h = applyFrostCoast(x, z, h);
+  }
+  if (terrainRegionHas(region, TERRAIN_APPLIER.quarteredCoast)) {
+    h = applyQuarteredCoast(x, z, h);
   }
   if (terrainRegionHas(region, TERRAIN_APPLIER.amberCoast)) {
     h = applyAmberCoast(x, z, h);
@@ -4490,6 +4479,11 @@ function terrainHeightUnpadded(x: number, z: number, seed: number, skipEdits = f
   // pond and its top meets the road bench with no seam at either end.
   if (terrainRegionHas(region, TERRAIN_APPLIER.glacierTarnRamp)) {
     h = applyGlacierTarnRamp(x, z, h);
+  }
+  // The Challengers' Ring's level floor and bank, in finished height space
+  // like the tarn ramp: the King of the Hill circle stands on even ground.
+  if (terrainRegionHas(region, TERRAIN_APPLIER.quarteredArena)) {
+    h = applyChallengersRing(x, z, h);
   }
   // The Highwatch paddock is another authored level pull. It sits deep inside
   // Thornpeak, so it does not compete with a realm border or coast.
