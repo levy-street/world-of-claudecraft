@@ -28,6 +28,7 @@ import {
 import { DUNGEON_X_THRESHOLD } from '../data';
 import { instanceInfoAt } from '../instances/dungeons';
 import { forceDismount } from '../mounts';
+import { isWorldPvpFlagged } from '../pvp/world_pvp';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { type Aura, type Entity, MELEE_RANGE } from '../types';
@@ -428,16 +429,15 @@ function stoneHeartOf(
  * them at 1 health; returns that amount, or null when the Heart does not fire.
  *
  * It is the LAST save asked (damage.ts): a guardian ward, Cauterize and a talent's
- * deathward all get their turn first and leave nothing lethal for it. A duelist's killing
- * blow is clamped before any save is asked, and it never fires inside an arena match
- * (whatever the blow's source), so ranked play ends at the killing blow. It does fire in
- * battlegrounds and open-world PvP, like the deathward talent. Its internal cooldown is the trinket's use cooldown key, so it survives death
- * and relog and the 30 sec on-equip lockout (combat/trinkets.ts onTrinketEquipped) keeps
- * a swap from arming a fresh Heart mid-fight.
+ * deathward all get their turn first and leave nothing lethal for it. It never fires in
+ * PvP (barrowstoneSuppressed), whatever the blow's source, so every PvP fight ends at the
+ * killing blow. Its internal cooldown is the trinket's use cooldown key, so it survives
+ * death and relog and the 30 sec on-equip lockout (combat/trinkets.ts onTrinketEquipped)
+ * keeps a swap from arming a fresh Heart mid-fight.
  */
 export function barrowstoneSave(ctx: SimContext, target: Entity, amount: number): number | null {
   if (target.kind !== 'player' || target.dead || amount < target.hp) return null;
-  if (ctx.arenaMatches.has(target.id)) return null;
+  if (barrowstoneSuppressed(ctx, target)) return null;
   const heart = stoneHeartOf(ctx, target);
   if (!heart) return null;
   const itemId = ctx.players.get(target.id)?.equipment?.trinket;
@@ -470,6 +470,21 @@ export function barrowstoneSave(ctx: SimContext, target: Entity, amount: number)
     color: '#ffd100',
   });
   return Math.max(0, target.hp - 1);
+}
+
+/**
+ * True while the wearer is in any PvP context, where the Heart never fires: a duel, any
+ * arena-shaped match (ranked arena, Fiesta and Protect Yumi all register in
+ * arenaMatches), a battleground, or the open world with their World PvP flag raised (the
+ * King of the Hill raises that same flag). It holds against EVERY damage source there,
+ * a mob's included, so a flagged player cannot keep it as a safety net mid-fight. A
+ * suppressed Heart is not spent. Draws no rng.
+ */
+export function barrowstoneSuppressed(ctx: SimContext, target: Entity): boolean {
+  if (ctx.duels.has(target.id) || ctx.arenaMatches.has(target.id)) return true;
+  if (ctx.bgMatches.has(target.id)) return true;
+  const meta = ctx.players.get(target.id);
+  return meta !== undefined && isWorldPvpFlagged(meta);
 }
 
 /** The statue's end (auras.ts, its one tick): back on your feet at the Heart's share of

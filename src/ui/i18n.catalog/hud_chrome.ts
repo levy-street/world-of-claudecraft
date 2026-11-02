@@ -4413,7 +4413,7 @@ export const hudChromeStrings = {
       // Barrowstone Heart (Balgath, combat/balgath_trinkets.ts); {icd} is a formatted
       // cooldown ("3 min").
       stoneHeart:
-        'When a hit would kill you, you turn to stone for {statue} sec instead: you take no damage and cannot move or act, then return with {restore} health ({restorePct}% of your maximum health). Can occur once every {icd}. Never in duels or arena matches, which end at the killing blow.',
+        'When a hit would kill you, you turn to stone for {statue} sec instead: you take no damage and cannot move or act, then return with {restore} health ({restorePct}% of your maximum health). Can occur once every {icd}. Never works in PvP: not in duels, arenas, battlegrounds or other PvP matches, nor while your World PvP flag is up.',
     },
     // A damage range; `scaled` above appends what the viewer's power adds.
     range: '{min} to {max}',

@@ -132,7 +132,7 @@ const EXPECTED: Record<string, { equip?: string; use?: string }> = {
     use: 'Use: Channel for 3 sec: a beam 30 yd long bursts from you the way you face and deals 45 (+24) Arcane damage every 0.5 sec to up to 8 enemies in its path (414 to each over the full channel). Turn to sweep it; moving or casting ends it. Damage increases with Spell Power. (2 min cooldown)',
   },
   barrowstone_heart: {
-    equip: `Equip: When a hit would kill you, you turn to stone for 3 sec instead: you take no damage and cannot move or act, then return with ${n(1000)} health (20% of your maximum health). Can occur once every 3 min. Never in duels or arena matches, which end at the killing blow.`,
+    equip: `Equip: When a hit would kill you, you turn to stone for 3 sec instead: you take no damage and cannot move or act, then return with ${n(1000)} health (20% of your maximum health). Can occur once every 3 min. Never works in PvP: not in duels, arenas, battlegrounds or other PvP matches, nor while your World PvP flag is up.`,
   },
   muster_grapnel: {
     use: 'Use: Hook a party or raid member within 30 yd that you can see and haul them through the air to your side, healing them for 120 (+160) when they land. It cannot pull enemies, or allies in a vehicle, on a ship, turned to stone or held by an effect that cannot be broken. Healing increases with Healing Power. (90 sec cooldown)',
