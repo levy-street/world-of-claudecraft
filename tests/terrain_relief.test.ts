@@ -142,9 +142,12 @@ describe('the relief actually shapes the world', () => {
     // The peak floor sits at 36: the Studio town rework (#4593) cut the moved
     // Thornpeak farm and a moved Highwatch building into the crag at about
     // (-75, 650), which was this box's old 38.4 summit (now 29.5); the box
-    // still tops out at 37.3, far above the pre-relief 27.
+    // still tops out at 37.3, far above the pre-relief 27. The same rework
+    // moved the practice row's calm pads onto the hillside above Highwatch and
+    // levelled a house terrace there, which took the steep fraction to about
+    // 2.24%, so the floor sits at 2.2%.
     expect(maxH).toBeGreaterThan(36);
-    expect(steep / n).toBeGreaterThan(0.0225);
+    expect(steep / n).toBeGreaterThan(0.022);
   });
 
   it('the wetlands stay calm', () => {
