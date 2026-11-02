@@ -719,6 +719,9 @@ describe('Hammer Council mythic: the rock and Resonance never stop', () => {
   it('the stronger inheritances: 1.5 s rises, the song on four, a 30 s fill', () => {
     const f = pulled(undefined, 8);
     kill(f, 'slabwright');
+    // The Walking Slab's walk just took the floor (the floor gap): clear it,
+    // this test reads the heir's rise, not the spacing.
+    f.st.lastFloorAt = null;
     f.st.wakeTimer = 0;
     f.tick();
     expect(f.st.riseSpots.length).toBeGreaterThan(0);

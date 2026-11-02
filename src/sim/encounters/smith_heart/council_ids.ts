@@ -423,6 +423,10 @@ export const COUNCIL_TUNING = {
   /** Seconds of plain melee after a bar lands before the same body starts
    *  another (nothing chains bar into bar). */
   barGap: 1.2,
+  /** Seconds between the starts of two FLOOR mechanics (the Wrath, the Echo,
+   *  Wake the Stone, Falling Rock, the Walking Slab's start): one due sooner
+   *  waits (council_floor_gap.ts). */
+  floorGap: 4,
   // Mythic: Soul in the Stone (council_soul.ts).
   /** A soul pillar's pips. */
   soulPips: 3,

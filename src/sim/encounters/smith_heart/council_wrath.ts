@@ -21,6 +21,7 @@
 
 import { DT, type Entity } from '../../types';
 import { clearCastIf, dropAuraById, heavySwing } from '../sunken_bastion/claim';
+import { stampFloor } from './council_floor_gap';
 import {
   COUNCIL_AURAS,
   COUNCIL_CASTS,
@@ -79,6 +80,7 @@ export function startWrath(s: CouncilScope): boolean {
   const holder = jobHolder(s, 'wrath');
   if (!holder || s.st.energy < T.energyMax - 1e-6) return false;
   if (!memberFree(s, holder.role)) return false;
+  stampFloor(s.st);
   beginBar(
     s,
     holder.role,

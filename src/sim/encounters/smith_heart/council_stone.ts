@@ -29,6 +29,7 @@ import {
   dropEncounterObject,
   spawnEncounterObject,
 } from '../sunken_bastion/claim';
+import { stampFloor } from './council_floor_gap';
 import {
   COUNCIL_AURAS,
   COUNCIL_CASTS,
@@ -73,6 +74,7 @@ export function startWake(s: CouncilScope): boolean {
   if (!holder.heir) {
     if (!memberFree(s, holder.role)) return false;
     s.st.wakeTimer = T.wakeEvery;
+    stampFloor(s.st);
     beginBar(s, holder.role, COUNCIL_CASTS.wake, T.wakeCast, null, false);
     councilSay(s, holder.role, 'wake');
     return true;
@@ -81,6 +83,7 @@ export function startWake(s: CouncilScope): boolean {
   const marked = pickMarks(s, holder.body, count);
   if (marked.length === 0) return false;
   s.st.wakeTimer = T.wakeEvery;
+  stampFloor(s.st);
   s.st.casts++;
   const o = s.ctx.instanceOriginOf(s.inst);
   for (const p of marked) {
@@ -198,6 +201,7 @@ export function startRock(s: CouncilScope): boolean {
   const role = rockCaster(s);
   if (role === null || s.st.rock || !memberFree(s, role)) return false;
   s.st.rockTimer = T.rockEvery;
+  stampFloor(s.st);
   beginBar(s, role, COUNCIL_CASTS.rock, T.rockCast, null, role !== 'slabwright');
   if (role === 'slabwright') councilSay(s, role, 'rock');
   return true;
