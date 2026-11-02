@@ -13,8 +13,6 @@ import type { PaintedTownLayout } from './types';
 
 // The thatch look: old town colours, thatch roof, rubble walls, hewn beams.
 const LOOK = 'thatch' as const;
-const SOUTH_FACING = 0; // the door looks south (-z)
-const EAST_FACING = Math.PI / 2; // the door looks east (-x)
 const WEST_FACING = -Math.PI / 2; // the door looks west (+x)
 
 // The inn: west of the square on the rise, its long front and door on the
@@ -25,8 +23,8 @@ const INN = paintedTownBuilding({
   kind: 'inn',
   model: 'tavern',
   look: LOOK,
-  anchor: { x: -331.86, z: 2073.5 },
-  rotation: EAST_FACING,
+  anchor: { x: -337.24, z: 2070.74 },
+  rotation: 1.5708, // Studio town rework (#4593) // Studio town rework (#4593)
   scale: 1.2,
 });
 // The chapel: east of the square, its door facing the inn's across the well and
@@ -48,8 +46,8 @@ const HOUSE = paintedTownBuilding({
   kind: 'house',
   model: 'house_a',
   look: LOOK,
-  anchor: { x: -389.53, z: 2058.86 },
-  rotation: SOUTH_FACING,
+  anchor: { x: -383.19, z: 2057.22 },
+  rotation: 5.62, // Studio town rework (#4593) // Studio town rework (#4593)
   scale: 1.4,
 });
 

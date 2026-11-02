@@ -247,7 +247,7 @@ export const AMBERFALL_NPCS: Record<string, NpcDef> = {
     id: 'reeve_ottoline',
     name: 'Reeve Ottoline',
     title: 'Reeve of Lanternmere',
-    pos: { x: -358, z: 2070 },
+    pos: { x: -347.76, z: 2066.77 },
     facing: -0.6,
     color: 0xc08848,
     questIds: ['q_af_goldmelt_road', 'q_af_foxes_in_the_lamplight', 'q_af_orchard_call'],

@@ -51,7 +51,7 @@ export const WILLOWFEN_ZONE: ZoneDef = {
   biome: 'fen',
   eastPassZ: 440, // the Mirewalk: where the marsh road wades into the fen
   hub: { x: -360, z: 362, radius: 20, name: 'Bridgemere' },
-  graveyard: { x: -344, z: 306 },
+  graveyard: { x: -341, z: 305.5 },
   lakes: [
     ...MOAT,
     // the Lilymoors: three pools ringing a real dry islet at (-87,3247)
@@ -227,7 +227,7 @@ export const WILLOWFEN_NPCS: Record<string, NpcDef> = {
     name: 'Waykeeper Pell',
     title: 'Keeper of the Amberfen Steps',
     pos: { x: -377, z: 214 },
-    facing: 0.6,
+    facing: 6.098,
     color: 0xa8b878,
     questIds: ['q_wf_across_the_fenway'],
     greeting: 'Down the Steps and into the soft country. Mind where you plant your boots.',
@@ -265,7 +265,7 @@ export const WILLOWFEN_NPCS: Record<string, NpcDef> = {
     id: 'mother_sedge',
     name: 'Mother Sedge',
     title: 'Fen-Witch of Willowweep',
-    pos: { x: -414, z: 446 },
+    pos: { x: -418.35, z: 448.76 },
     facing: 1.2,
     color: 0x7d8a5a,
     questIds: ['q_wf_witch_of_willowweep', 'q_wf_wisplight_charms', 'q_wf_croakers_hush'],
@@ -498,7 +498,7 @@ export const WILLOWFEN_ITEMS: Record<string, ItemDef> = {
 export const WILLOWFEN_CAMPS: CampDef[] = [
   { mobId: 'bogtoad', center: { x: -430, z: 270 }, radius: 10, count: 3 },
   { mobId: 'bogtoad', center: { x: -284, z: 316 }, radius: 10, count: 3 },
-  { mobId: 'lily_wisp', center: { x: -426, z: 440 }, radius: 12, count: 4 },
+  { mobId: 'lily_wisp', center: { x: -437.63, z: 435.18 }, radius: 12, count: 4 },
   { mobId: 'willow_sprite', center: { x: -396, z: 376 }, radius: 10, count: 3 },
   { mobId: 'willow_sprite', center: { x: -316, z: 380 }, radius: 10, count: 2 },
   { mobId: 'drowsy_croaker', center: { x: -322, z: 496 }, radius: 5, count: 1 },

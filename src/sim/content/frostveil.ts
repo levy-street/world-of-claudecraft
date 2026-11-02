@@ -270,8 +270,8 @@ export const FROSTVEIL_NPCS: Record<string, NpcDef> = {
     id: 'warden_kaldra',
     name: 'Warden Kaldra',
     title: 'Warden of Icemantle',
-    pos: { x: -27, z: 1557 },
-    facing: 2.4,
+    pos: { x: -22.15, z: 1579.44 },
+    facing: 3.971,
     color: 0x9fb8cc,
     questIds: [
       'q_fv_snowline_report',
@@ -322,8 +322,8 @@ export const FROSTVEIL_NPCS: Record<string, NpcDef> = {
     id: 'trapper_brosk',
     name: 'Trapper Brosk',
     title: 'Shiverfen Trapper',
-    pos: { x: -82, z: 1744 },
-    facing: 1.6,
+    pos: { x: -76.83, z: 1740.68 },
+    facing: 3.171,
     color: 0x7d8a6a,
     questIds: ['q_fv_silent_trapline', 'q_fv_sprung_traps', 'q_fv_seeing_wren_home'],
     greeting: 'Fen took three of my lines this week. Fen never took a line in twenty years.',
@@ -628,7 +628,7 @@ export const FROSTVEIL_CAMPS: CampDef[] = [
   { mobId: 'ice_wisp', center: { x: 30, z: 1745 }, radius: 12, count: 4 },
   { mobId: 'rime_elemental', center: { x: 66, z: 1622 }, radius: 9, count: 2 },
   { mobId: 'rime_elemental', center: { x: 10, z: 1800 }, radius: 10, count: 2 },
-  { mobId: 'fen_sprite', center: { x: -84, z: 1738 }, radius: 11, count: 3 },
+  { mobId: 'fen_sprite', center: { x: -82.69, z: 1709.81 }, radius: 11, count: 3 },
   { mobId: 'frostmane_yeti', center: { x: 96, z: 1816 }, radius: 6, count: 1 },
 ];
 export const FROSTVEIL_OBJECTS: GroundObjectDef[] = [

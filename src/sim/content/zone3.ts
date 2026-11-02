@@ -17,7 +17,7 @@ import type {
 } from '../types';
 import { FERAL, HUNTER_ONLY } from './items';
 import { MOUNT_RACE_COURSE, STABLE_HORSE_TEMPLATE_ID, STABLE_PADDOCK } from './mounts';
-import { PRACTICE_ROW_CAMPFIRE } from './practice_dummies';
+import { PRACTICE_ROW_MARKS } from './practice_dummies';
 import { HONOR_VENDOR_STOCK } from './pvp_honor';
 
 export const ZONE3_ZONE: ZoneDef = {
@@ -28,7 +28,7 @@ export const ZONE3_ZONE: ZoneDef = {
   levelRange: [13, 20],
   biome: 'peaks',
   hub: { x: 0, z: 660, radius: 20, name: 'Highwatch' },
-  graveyard: { x: 15, z: 645 },
+  graveyard: { x: 12.8, z: 738.8 },
   lakes: [{ x: -70, z: 760, radius: 18 }],
   pois: [
     { x: 0, z: 660, label: 'Highwatch', id: 'highwatch' },
@@ -1162,8 +1162,8 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
     id: 'captain_thessaly',
     name: 'Captain Thessaly',
     title: 'Highwatch Captain',
-    pos: { x: 4, z: 664 },
-    facing: -2.0,
+    pos: { x: -27.4, z: 682.74 },
+    facing: -2,
     color: 0x85929e,
     questIds: [
       'q_highwatch_summons',
@@ -1228,7 +1228,7 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
     id: 'scout_maren_highwatch',
     name: 'Scout Maren',
     title: "Marshal's Scout",
-    pos: { x: 7, z: 670 },
+    pos: { x: 18.25, z: 674.63 },
     facing: -2.4,
     color: 0x6e8b3d,
     questIds: ['q_ogre_edges', 'q_ogre_totems', 'q_korgath'],
@@ -1239,7 +1239,7 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
     id: 'quartermaster_bree',
     name: 'Quartermaster Bree',
     title: 'Highwatch Quartermaster',
-    pos: { x: -5, z: 668 },
+    pos: { x: -28.91, z: 672.99 },
     facing: 1.6,
     color: 0xca8a2a,
     questIds: ['q_stalker_pelts', 'q_stalker_cloaks', 'q_glowing_wax'],
@@ -1291,7 +1291,7 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
     id: 'armorer_hode',
     name: 'Armorer Hode',
     title: 'Master Armorer',
-    pos: { x: -2, z: 672 },
+    pos: { x: -3.01, z: 673.61 },
     facing: 2.8,
     color: 0x717d7e,
     questIds: [],
@@ -1308,7 +1308,7 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
     id: 'heroic_quartermaster',
     name: 'Quartermaster Vex',
     title: 'Heroic Quartermaster',
-    pos: { x: -8, z: 665 },
+    pos: { x: -14.68, z: 656.45 },
     facing: 1.2,
     color: 0x8e44ad,
     questIds: [],
@@ -1350,7 +1350,7 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
     // the AUTHORED point, not the safe-position-nudged one) and far enough from
     // the apothecary station and the Thornpeak Cairns that no station prop or
     // headstone is vetoed out of existence by his NPC spot.
-    pos: { x: -11, z: 669 },
+    pos: { x: -7.17, z: 671.57 },
     facing: 2.26, // atan2(dx, dz) toward the square at (0, 660)
     color: 0x7d2f3f, // deep war-crimson steel, off every tint the visual manifest reserves
     questIds: [],
@@ -1408,8 +1408,8 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
     id: 'stablemaster_marla',
     name: 'Marla Hitchen',
     title: 'Stablemaster',
-    pos: { x: 367, z: 608 },
-    facing: Math.PI, // face -z, toward the race yard
+    pos: { x: 358.79, z: 617.57 },
+    facing: 1.571,
     color: 0x8b5a2b,
     questIds: ['q_riding_lessons'],
     // Marla sells Riding Training (the 80g skill purchase, a service entry that
@@ -1432,8 +1432,8 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
     // On the south road shoulder below the square, facing south over the road
     // up from Fenbridge (clear of the house footprint at {8,650}; nearest
     // authored neighbor ~15 units, she had been wedged into the gate cluster).
-    pos: { x: 2, z: 643 },
-    facing: 3.1,
+    pos: { x: 7.17, z: 636.64 },
+    facing: 5.456,
     color: 0x5a6fd6, // cool indigo: the chronicler tint is her identity (shared mage visual)
     questIds: [],
     greeting: 'The mountain forgets nothing, $N, and neither do I. Let us see what you have done.',
@@ -1445,7 +1445,7 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
     id: 'alchemist_verane',
     name: 'Alchemist Verane',
     title: 'Master of the Apothecary',
-    pos: { x: 8.5, z: 658 },
+    pos: { x: -36.67, z: 690.29 },
     facing: -0.4,
     color: 0x58b09c,
     // Professions 2.0: the Highwatch apothecary master runs the
@@ -1479,7 +1479,7 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
     id: 'farmer_hollis',
     name: 'Farmer Hollis',
     title: 'Highwatch Terrace Farmer',
-    pos: { x: -18, z: 695.5 },
+    pos: { x: -50.96, z: 652.48 },
     facing: Math.PI,
     color: 0x8c6a4a,
     questIds: [],
@@ -2263,24 +2263,30 @@ export const ZONE3_QUEST_ORDER = [
 
 export const ZONE3_CAMPS: CampDef[] = [
   // Training dummy: a single fixed practice target on the hill above Highwatch.
-  { mobId: 'training_dummy', center: { x: -40, z: 648 }, radius: 0, count: 1 },
+  // The practice row's original dummy (content/practice_dummies.ts marks).
+  {
+    mobId: 'training_dummy',
+    center: { ...PRACTICE_ROW_MARKS.training_dummy },
+    radius: 0,
+    count: 1,
+  },
   // Ridge stalkers: the ridge flanking the road from the pass
-  { mobId: 'ridge_stalker', center: { x: -50, z: 590 }, radius: 22, count: 7 },
+  { mobId: 'ridge_stalker', center: { x: 45.17, z: 573.11 }, radius: 8, count: 1 },
   { mobId: 'ridge_stalker', center: { x: 45, z: 600 }, radius: 20, count: 6 },
-  { mobId: 'old_cragmaw', center: { x: -82, z: 575 }, radius: 5, count: 1 },
+  { mobId: 'old_cragmaw', center: { x: -122.27, z: 548.87 }, radius: 5, count: 1 },
   // Kobolds: Deeprock Burrows, west
   { mobId: 'deeprock_kobold', center: { x: 75, z: 625 }, radius: 18, count: 8 },
   { mobId: 'deeprock_kobold', center: { x: 105, z: 600 }, radius: 14, count: 6 },
   { mobId: 'ironvein_foreman', center: { x: 100, z: 617 }, radius: 5, count: 1 },
   // Ogres: eastern foothills rising to Drogmar's war-camp
-  { mobId: 'thornpeak_ogre', center: { x: -90, z: 700 }, radius: 22, count: 7 },
-  { mobId: 'thornpeak_ogre', center: { x: -60, z: 730 }, radius: 18, count: 6 },
+  { mobId: 'thornpeak_ogre', center: { x: -101.04, z: 709.69 }, radius: 22, count: 5 },
+  { mobId: 'thornpeak_ogre', center: { x: -79.18, z: 729.88 }, radius: 18, count: 2 },
   // Quest capstone: the elite ogre chieftain for q_ogre_bounty.
-  { mobId: 'brakka_wallbreaker', center: { x: -78, z: 716 }, radius: 3, count: 1 },
-  { mobId: 'ogre_crusher', center: { x: -125, z: 740 }, radius: 18, count: 8 },
+  { mobId: 'brakka_wallbreaker', center: { x: -92.97, z: 732.41 }, radius: 3, count: 1 },
+  { mobId: 'ogre_crusher', center: { x: -125, z: 740 }, radius: 18, count: 7 },
   { mobId: 'warlord_drogmar', center: { x: -132, z: 748 }, radius: 2, count: 1 },
   // A lone rare ogre prowls the ridge north of the warband
-  { mobId: 'brutok_skullsmasher', center: { x: -45, z: 768 }, radius: 4, count: 1 },
+  { mobId: 'brutok_skullsmasher', center: { x: -114.45, z: 697.5 }, radius: 4, count: 1 },
   // Elementals: Stormcrag, far west
   { mobId: 'stormcrag_elemental', center: { x: 110, z: 760 }, radius: 20, count: 8 },
   { mobId: 'stormcrag_elemental', center: { x: 135, z: 795 }, radius: 16, count: 6 },
@@ -4488,10 +4494,6 @@ export const ZONE3_PROPS: ZonePropsDef = {
     [-136, 743],
     [52, 817],
     [28, 847],
-    // The practice row's single fire, 1.5 yards in front of the normal boss
-    // dummy. The mark is derived from the row itself (content/practice_dummies.ts)
-    // so it follows the row if the pitch is ever retuned.
-    PRACTICE_ROW_CAMPFIRE,
   ],
   mudHuts: [],
   marshReeds: [],

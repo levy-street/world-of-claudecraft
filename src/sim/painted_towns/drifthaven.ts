@@ -19,7 +19,6 @@ import {
   deepFreeze,
   indexById,
   levelTownPads,
-  localToWorld,
   makeTownNpc,
   type TownGround,
 } from '../placed_town_kit';
@@ -30,9 +29,6 @@ const LOOK = 'pantile' as const;
 
 // The models face local -Z (rotation PI turns the door north, +z; PI / 2
 // east, -x; -PI / 2 west, +x: this world's east is -x).
-const NORTH_FACING = Math.PI;
-const EAST_FACING = Math.PI / 2;
-const WEST_FACING = -Math.PI / 2;
 
 // The Wreck Line inn (tavern, 1.2: the door clears 5.3): the square's south
 // side, its long front on the square and its back to the strand, clear of
@@ -42,8 +38,8 @@ const INN = paintedTownBuilding({
   kind: 'inn',
   model: 'tavern',
   look: LOOK,
-  anchor: { x: -300.6, z: 791.04 },
-  rotation: NORTH_FACING,
+  anchor: { x: -298.51, z: 798.15 },
+  rotation: 3.1416, // Studio town rework (#4593) // Studio town rework (#4593)
   scale: 1.2,
 });
 // The provisioner's shop (shop_a, 1.5: the door clears 4.9): the square's
@@ -57,8 +53,8 @@ const SHOP = paintedTownBuilding({
   kind: 'house',
   model: 'shop_a',
   look: LOOK,
-  anchor: { x: -339, z: 821.4 },
-  rotation: WEST_FACING,
+  anchor: { x: -332.99, z: 829.32 },
+  rotation: 3.6826, // Studio town rework (#4593) // Studio town rework (#4593)
   scale: SHOP_SCALE,
 });
 // The strand house (house_a, 1.4, sealed): the square's west side, its door
@@ -69,8 +65,8 @@ const HOUSE = paintedTownBuilding({
   kind: 'house',
   model: 'house_a',
   look: LOOK,
-  anchor: { x: -275.51, z: 807.04 },
-  rotation: EAST_FACING,
+  anchor: { x: -280.71, z: 825.39 },
+  rotation: 1.309, // Studio town rework (#4593) // Studio town rework (#4593)
   scale: 1.4,
 });
 
@@ -80,17 +76,12 @@ const BUILDINGS = [INN, SHOP, HOUSE] as const;
 // Vaelen stands a stride in front of its boards, looking out at the square.
 const COUNTER = PAINTED_MODELS.shop_a.annexes?.find((annex) => annex.name === 'stall_counter');
 if (!COUNTER) throw new Error('shop_a has no stall counter');
-const COUNTER_STAND = localToWorld(
-  { x: SHOP.placement.x, z: SHOP.placement.z },
-  SHOP.rotation,
-  COUNTER.x * SHOP_SCALE,
-  (COUNTER.z - COUNTER.depth / 2) * SHOP_SCALE - 1.3,
-);
 const NPCS = [
   makeTownNpc(
     'npc_rift_watch_quartermaster',
-    COUNTER_STAND,
-    SHOP.frontFacing,
+    // Studio town rework stand (#4593)
+    { x: -319.92, z: 829.44 },
+    0.8,
     `${SHOP.id}_counter`,
   ),
 ] as const;

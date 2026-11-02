@@ -21,9 +21,6 @@ import type { PaintedTownLayout } from './types';
 
 // The diamond look: default colours, diamond slate roof, ashlar walls.
 const LOOK = 'diamond' as const;
-const NORTH_FACING = Math.PI; // the door looks north (+z)
-const EAST_FACING = Math.PI / 2; // the door looks east (-x)
-const WEST_FACING = -Math.PI / 2; // the door looks west (+x)
 
 // The inn: east of the tree between the north spoke and the Duskfall road (the
 // widest, flattest sector), its long front on the ring, door looking at the well.
@@ -32,8 +29,8 @@ const INN = paintedTownBuilding({
   kind: 'inn',
   model: 'tavern',
   look: LOOK,
-  anchor: { x: -69.14, z: 1036.76 },
-  rotation: WEST_FACING,
+  anchor: { x: -78.79, z: 1025.6 },
+  rotation: 6.0039, // Studio town rework (#4593) // Studio town rework (#4593)
   scale: 1.2,
 });
 // The shrine (the old hollow chapel): south of the tree, its door and bell tower
@@ -43,8 +40,8 @@ const SHRINE = paintedTownBuilding({
   kind: 'chapel',
   model: 'hall',
   look: LOOK,
-  anchor: { x: -37, z: 992.5 },
-  rotation: NORTH_FACING,
+  anchor: { x: 2.33, z: 968.41 },
+  rotation: 3.4208, // Studio town rework (#4593) // Studio town rework (#4593)
   scale: 1,
 });
 // The market (Fenna's stores): west of the tree between the west and south-west
@@ -54,8 +51,8 @@ const MARKET = paintedTownBuilding({
   kind: 'house',
   model: 'shop_a',
   look: LOOK,
-  anchor: { x: -1.65, z: 1017 },
-  rotation: EAST_FACING,
+  anchor: { x: 3.89, z: 1021.6 },
+  rotation: 2.9322, // Studio town rework (#4593) // Studio town rework (#4593)
   scale: 1.5,
 });
 // The smithy (the old forges): north of the inn, its door and forge shelter on
@@ -65,8 +62,8 @@ const SMITHY = paintedTownBuilding({
   kind: 'house',
   model: 'smithy',
   look: LOOK,
-  anchor: { x: -66.98, z: 1063.11 },
-  rotation: WEST_FACING,
+  anchor: { x: -58.58, z: 1061.97 },
+  rotation: 4.5379, // Studio town rework (#4593) // Studio town rework (#4593)
   scale: 1.3,
 });
 // A wayhouse on the Duskfall road, south of it, its door on the road (sealed).
@@ -75,8 +72,8 @@ const WAYHOUSE = paintedTownBuilding({
   kind: 'house',
   model: 'house_c',
   look: LOOK,
-  anchor: { x: -82, z: 991.9 },
-  rotation: NORTH_FACING,
+  anchor: { x: -91.6, z: 991.9 },
+  rotation: 2.5656, // Studio town rework (#4593) // Studio town rework (#4593)
   scale: 1.4,
 });
 
@@ -107,7 +104,8 @@ const SQUARE_RELEVEL: TownPadStamp = {
 // Loremother Bryn, the Voice of the Shrine, keeps the shrine's door (it stands
 // inside the hub circle, so her errands stay town quests).
 const NPCS = [
-  makeTownNpc('loremother_bryn', SHRINE.frontStandingPoint, SHRINE.frontFacing, SHRINE.id),
+  // Studio town rework stand (#4593)
+  makeTownNpc('loremother_bryn', { x: -34.52, z: 1050.16 }, 3.812, SHRINE.id),
 ];
 
 export const ELDERSHINE_LAYOUT: PaintedTownLayout = deepFreeze({

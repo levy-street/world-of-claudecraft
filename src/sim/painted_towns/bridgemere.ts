@@ -13,7 +13,6 @@
 // (sim/painted_towns/CLAUDE.md).
 import {
   deepFreeze,
-  facingToward,
   indexById,
   levelTownPads,
   makeTownNpc,
@@ -25,7 +24,6 @@ import type { PaintedTownLayout } from './types';
 
 // The shakes look: Fenrire moss colours, wooden shake roofs.
 const LOOK = 'shakes' as const;
-const SOUTH_FACING = 0; // the door looks south (-z)
 
 // The island inn: its walls on the level plateau (no pad: the plateau is
 // already level, and any stamp here would reach the moat), its door on the
@@ -40,8 +38,8 @@ const INN = paintedTownBuilding({
   kind: 'inn',
   model: 'tavern',
   look: LOOK,
-  anchor: { x: -364.25, z: 362 },
-  rotation: SOUTH_FACING,
+  anchor: { x: -360.21, z: 366.55 },
+  rotation: 0, // Studio town rework (#4593) // Studio town rework (#4593)
   scale: 1,
 });
 // The barrow chapel: across the bridge at the Willowfen Barrow, between the
@@ -55,8 +53,8 @@ const CHAPEL = paintedTownBuilding({
   kind: 'chapel',
   model: 'hall',
   look: LOOK,
-  anchor: { x: -332.95, z: 293.45 },
-  rotation: 2.356,
+  anchor: { x: -349.4, z: 300 },
+  rotation: 3.351, // Studio town rework (#4593) // Studio town rework (#4593)
   scale: 1,
 });
 
@@ -71,10 +69,11 @@ const GROUND: readonly TownGround[] = [
 // The forecourt's two townsfolk, both still inside the hub circle: the netter
 // by the moat's west edge, the bridgewright at the causeway's head watching
 // who comes over the bridge he keeps.
-const MARIS: Point2 = { x: -349.5, z: 352 };
-const ALDEN: Point2 = { x: -356.5, z: 346 };
+// Studio town rework stands (#4593).
+const MARIS: Point2 = { x: -356.4, z: 358.04 };
+const ALDEN: Point2 = { x: -364.06, z: 358.16 };
 const NPCS = [
-  makeTownNpc('netter_maris', MARIS, facingToward(MARIS, { x: -360, z: 344 }), INN.id),
+  makeTownNpc('netter_maris', MARIS, 3.912, INN.id),
   makeTownNpc('bridgewright_alden', ALDEN, 2.9, INN.id),
 ];
 

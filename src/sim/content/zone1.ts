@@ -1015,7 +1015,7 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     // the inn up the slope north of the beds; she keeps her spot: at the old
     // Studio rebuild map's (-17, -82) she would stand inside the 3 yd the beds
     // keep clear, and a customer beside her inside a bed's working reach)
-    pos: { x: -15.5, z: -81.5 },
+    pos: { x: -85.26, z: -71.07 },
     facing: -Math.PI / 2,
     color: 0xa8843a,
     questIds: ['q_farm_intro'],
@@ -1869,11 +1869,11 @@ export const ZONE1_CAMPS: CampDef[] = [
   // produced a run of mirrored quest directions; verify any direction claim
   // against that note, never against raw signs.
   // Wolves: north woods
-  { mobId: 'forest_wolf', center: { x: -10, z: 6 }, radius: 28.5, count: 6 },
-  { mobId: 'forest_wolf', center: { x: 12, z: 52 }, radius: 26, count: 5 },
+  { mobId: 'forest_wolf', center: { x: -7.31, z: 14.61 }, radius: 28.5, count: 3 },
+  { mobId: 'forest_wolf', center: { x: 15.67, z: 52.03 }, radius: 26, count: 4 },
   // Nudged north to stay ahead of the widened wolf runs (q_greyjaw sends the
   // player to "the deep woods north of the wolf runs").
-  { mobId: 'old_greyjaw', center: { x: 0, z: 100 }, radius: 8, count: 1 },
+  { mobId: 'old_greyjaw', center: { x: 20.01, z: 71.76 }, radius: 8, count: 1 },
   // Boars: west meadow
   // Round 6 (owner + team): the boar meadow and the bandit camp trade ground.
   // The bandits sat closest of any hostile camp to the town gate (disc edge 41
@@ -1899,11 +1899,11 @@ export const ZONE1_CAMPS: CampDef[] = [
   // its disc so the rare still patrols his boars. The A centre keeps the
   // vale-road probe at (30,-30) outside its flatten reach (50.5 vs 47.8),
   // the trap this corridor sprang once already this round.
-  { mobId: 'wild_boar', center: { x: 58, z: -72 }, radius: 26, count: 5 },
+  { mobId: 'wild_boar', center: { x: 72.41, z: -74.26 }, radius: 32.4, count: 5 },
   { mobId: 'wild_boar', center: { x: 97, z: -43 }, radius: 23.5, count: 4 },
-  { mobId: 'mogger', center: { x: 118, z: -26 }, radius: 5, count: 1 },
+  { mobId: 'mogger', center: { x: 108.07, z: -16.72 }, radius: 5, count: 1 },
   // Spiders: eastern woods
-  { mobId: 'webwood_spider', center: { x: -70, z: 2 }, radius: 28.5, count: 6 },
+  { mobId: 'webwood_spider', center: { x: -64.61, z: 25.35 }, radius: 28.5, count: 3 },
   // Murlocs: lake shore northeast, camp still straddles the waterline. This camp is
   // radius-capped by Mirror Lake, not by its neighbours: the terrain flatten disc is
   // radius * 1.8, so a radius wide enough for 11.5 yd spacing drags a 59 yd flatten
@@ -1916,30 +1916,30 @@ export const ZONE1_CAMPS: CampDef[] = [
   // lifts spacing from 4.95 to 6.71 yd. It is the one camp that cannot reach 11.5;
   // the documented exception and the lake guard live in
   // tests/eastbrook_camp_spacing.test.ts.
-  { mobId: 'mudfin_murloc', center: { x: -75, z: 57 }, radius: 15, count: 5 },
+  { mobId: 'mudfin_murloc', center: { x: -117.84, z: 49.02 }, radius: 15, count: 5 },
   // Kobolds: the Copper Dig, northeast of the Wolf Run on the Mirefen road
   // (phase 0b of the New Eastbrook program: the interim dig headland went
   // back to open sea for the ferry lane, and the whole cluster moved rigidly
   // +110,+230 to the rise past Mirror Lake). Keep-outs verified empirically:
   // 54yd to Old Greyjaw's prowl disc, 74yd+ to both wolf runs, the camp edge
   // stops 3yd inside the zone 1 band.
-  { mobId: 'tunnel_rat', center: { x: -32, z: 144 }, radius: 33, count: 8 },
+  { mobId: 'tunnel_rat', center: { x: -32, z: 144 }, radius: 33, count: 7 },
   // Bandits: southwest camp. Shifted off its own campfire collider and clear of the
   // boar meadow; the tents, crates and supply drops all stay inside the disc, and it
   // no longer merges with the outpost below.
   // The main bandit band takes the old boar meadow, a step north of where the
   // boars stood. Gorrak's own camp below stays put with the boss, so the
   // Bandit Camp landmark and the ringleader fight keep their ground.
-  { mobId: 'vale_bandit', center: { x: 80, z: 15 }, radius: 28.5, count: 6 },
+  { mobId: 'vale_bandit', center: { x: 77.57, z: 22.57 }, radius: 28.5, count: 7 },
   // Round 6b (owner): Gorrak's camp joins the main band. The two bandit
   // camps were 105 yd apart with the boar meadow sitting between them, so
   // half the vale bandits read as a separate population with no camp.
-  { mobId: 'vale_bandit', center: { x: 115, z: 42 }, radius: 16, count: 5 },
-  { mobId: 'gorrak', center: { x: 118, z: 45 }, radius: 2, count: 1 },
+  { mobId: 'vale_bandit', center: { x: 111.28, z: 44.86 }, radius: 20.5, count: 4 },
+  { mobId: 'gorrak', center: { x: 106.68, z: 39.93 }, radius: 2, count: 1 },
   // Undead: ruins northwest. The chapel guardians below are the same population, so
   // they may still flank the altar inside this disc.
-  { mobId: 'restless_bones', center: { x: 82, z: 78 }, radius: 28.5, count: 6 },
-  { mobId: 'captain_verlan', center: { x: 92, z: 90 }, radius: 4, count: 1 },
+  { mobId: 'restless_bones', center: { x: 95.3, z: 80.16 }, radius: 34.4, count: 7 },
+  { mobId: 'captain_verlan', center: { x: 89.85, z: 102.04 }, radius: 4, count: 1 },
 ];
 
 // Spawned LAST in the merged CAMPS array (see data.ts) so these appended draws
@@ -1949,8 +1949,8 @@ export const ZONE1_CAMPS: CampDef[] = [
 // content's deterministic spawn rolls, so fixed-seed tests stay stable.
 export const ZONE1_CHAPEL_CAMPS: CampDef[] = [
   // A pair of bone guardians flank the chapel's broken altar; their binder lurks within.
-  { mobId: 'restless_bones', center: { x: 88, z: 90 }, radius: 6, count: 2 },
-  { mobId: 'wraithbinder_maldrec', center: { x: 88, z: 92 }, radius: 3, count: 1 },
+  { mobId: 'restless_bones', center: { x: 91.96, z: 85.78 }, radius: 6, count: 1 },
+  { mobId: 'wraithbinder_maldrec', center: { x: 80.21, z: 79.66 }, radius: 3, count: 1 },
 ];
 
 export const ZONE1_OBJECTS: GroundObjectDef[] = [

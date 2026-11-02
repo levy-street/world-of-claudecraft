@@ -243,7 +243,7 @@ export const PALMREACH_NPCS: Record<string, NpcDef> = {
     id: 'salvage_boss_ryna',
     name: 'Salvage-Boss Ryna',
     title: 'Mistress of the Wreck Line',
-    pos: { x: -296, z: 816 },
+    pos: { x: -287.29, z: 816.55 },
     facing: -0.8,
     color: 0xb46a3c,
     questIds: [
@@ -259,7 +259,7 @@ export const PALMREACH_NPCS: Record<string, NpcDef> = {
     id: 'pearlmother_isha',
     name: 'Pearl-Mother Isha',
     title: 'Elder of the Divers',
-    pos: { x: -293, z: 810 },
+    pos: { x: -304.45, z: 807.95 },
     facing: 0.6,
     color: 0x8fb8b0,
     questIds: ['q_pr_boars_in_the_gardens', 'q_pr_the_man_who_went_in'],
@@ -276,8 +276,8 @@ export const PALMREACH_NPCS: Record<string, NpcDef> = {
     // t.r * (2.5..3.0) and its roots flare wider still: at z 1074 he showed
     // as a nameplate floating in the bark, and at z 1071.5 (8.7 yd out) he
     // still clipped the trunk. Keep him a full 12 yd clear.
-    pos: { x: -397, z: 1068 },
-    facing: -0.24, // atan2(dx, dz) toward the banyan he went in to
+    pos: { x: -396.71, z: 1066.89 },
+    facing: 2.902,
     color: 0x6f8a5a,
     questIds: [
       'q_pr_the_man_who_went_in',

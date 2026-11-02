@@ -38,8 +38,8 @@ const INN = paintedTownBuilding({
   kind: 'inn',
   model: 'tavern',
   look: LOOK,
-  anchor: { x: 332.92, z: 781.38 },
-  rotation: -2.88,
+  anchor: { x: 338.85, z: 782.26 },
+  rotation: 3.7001, // Studio town rework (#4593) // Studio town rework (#4593)
   scale: 1.2,
 });
 // The chapel (hall, 1.0: a five-yard portal already): where the hexagon church
@@ -51,21 +51,9 @@ const CHAPEL = paintedTownBuilding({
   kind: 'chapel',
   model: 'hall',
   look: LOOK,
-  anchor: { x: 293.14, z: 792.19 },
-  rotation: -1.833,
+  anchor: { x: 288.66, z: 789.75 },
+  rotation: 3.159, // Studio town rework (#4593) // Studio town rework (#4593)
   scale: 1,
-});
-// The smithy (smithy, 1.3, walk-in): where the hexagon blacksmith stood, the
-// wedge between the Gardenwalk and the Dawnhold road north-east of the green,
-// its door and forge shelter turned to the green.
-const SMITHY = paintedTownBuilding({
-  id: 'hedgewick_smithy',
-  kind: 'house',
-  model: 'smithy',
-  look: LOOK,
-  anchor: { x: 287.68, z: 821.98 },
-  rotation: -1.261,
-  scale: 1.3,
 });
 // The green house (house_b, 1.3, sealed): north of the green between the
 // Parterre road and the Dawnhold road, where the kit cottage, the hexagon home
@@ -75,8 +63,8 @@ const GREEN_HOUSE = paintedTownBuilding({
   kind: 'house',
   model: 'house_b',
   look: LOOK,
-  anchor: { x: 320.7, z: 837.9 },
-  rotation: 0.025,
+  anchor: { x: 317.37, z: 834.74 },
+  rotation: 1.1868, // Studio town rework (#4593) // Studio town rework (#4593)
   scale: 1.3,
 });
 // The pond house (house_a, 1.4, sealed): the wedge between the pond road and
@@ -87,12 +75,13 @@ const POND_HOUSE = paintedTownBuilding({
   kind: 'house',
   model: 'house_a',
   look: LOOK,
-  anchor: { x: 346.74, z: 828.03 },
-  rotation: 0.524,
+  anchor: { x: 344.91, z: 823.4 },
+  rotation: 5.9865, // Studio town rework (#4593) // Studio town rework (#4593)
   scale: 1.4,
 });
 
-const BUILDINGS = [INN, CHAPEL, SMITHY, GREEN_HOUSE, POND_HOUSE] as const;
+// The smithy was taken down in the Studio town rework (#4593).
+const BUILDINGS = [INN, CHAPEL, GREEN_HOUSE, POND_HOUSE] as const;
 
 // Level pads: the lawns are near flat, so each building stands on the ground
 // it already has (2.0 by the shore, rising to 2.6 by the pond road) with a
@@ -103,7 +92,6 @@ const BUILDINGS = [INN, CHAPEL, SMITHY, GREEN_HOUSE, POND_HOUSE] as const;
 const GROUND: readonly TownGround[] = [
   { building: INN, height: 2, columns: 3, rows: 2, taper: 4, apron: 6 },
   { building: CHAPEL, height: 2, columns: 2, rows: 3, taper: 4, apron: 6 },
-  { building: SMITHY, height: 2.2, columns: 3, rows: 2, taper: 4, apron: 6 },
   { building: GREEN_HOUSE, height: 2.4, columns: 2, rows: 2, taper: 4, apron: 6 },
   { building: POND_HOUSE, height: 2.6, columns: 2, rows: 2, taper: 4, apron: 6 },
 ];

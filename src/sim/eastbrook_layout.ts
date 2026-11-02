@@ -777,8 +777,8 @@ const BUILDINGS = [
     id: 'eastbrook_smithy',
     assetId: '/models/tidehold/smithy.glb',
     kind: 'house',
-    anchor: { x: -4.2, z: -75.2 },
-    rotation: 20 * DEGREE,
+    anchor: { x: -5.48, z: -75.12 },
+    rotation: 5.044, // Studio town rework (#4593)
     scale: STANDARD_SCALE,
     reach: { x: 3.4285, z: -0.295, width: 19.797, height: 12.7809, depth: 11.6901 },
     walls: { x: 0, z: 0, width: 11, depth: 9 },
@@ -845,8 +845,8 @@ const BUILDINGS = [
     id: 'eastbrook_quay_cottage',
     assetId: '/models/tidehold/house_b.glb',
     kind: 'house',
-    anchor: { x: -59.11, z: -51.35 },
-    rotation: 46 * DEGREE,
+    anchor: { x: -53.46, z: -47.24 },
+    rotation: 1.9548, // Studio town rework (#4593)
     scale: STANDARD_SCALE,
     reach: { x: -0.3041, z: 0, width: 15.0123, height: 15.9799, depth: 11.6997 },
     walls: { x: 0, z: 0, width: 12.7538, depth: 8.5538 },
@@ -1244,7 +1244,6 @@ const ROADS = [
 
 const BANK = buildingById('eastbrook_bank');
 const CHAPEL = buildingById('eastbrook_chapel');
-const SMITHY = buildingById('eastbrook_smithy');
 
 // The apothecary's shop took the loom yard at the crafts lane's west end, so
 // the loom stands across the lane's last bend, still in the yard south of the
@@ -1295,58 +1294,36 @@ function makeNpc(id: string, position: Point2, facing: number, anchorId: string)
   return { id, position, facing, anchorId, bodyRadius: 0.6 };
 }
 
-const MERCHANT_POSITION = localToWorld(
-  MARKET_STALLS[0].position,
-  MARKET_STALLS[0].rotation,
-  0,
-  MARKET_STALLS[0].depth / 2 + 0.8,
-);
 // Starter combat givers occupy the civic square with room between each stand.
 // Wilkes keeps his vendor service on the market edge; trades stay at their stations.
-const TRADER_POSITION = { x: -25, z: -94 } as const;
 // The apothecary keeps her shop: she stands out from its door toward the
 // square, looking up at it, so the starter combat givers still read as one
 // group round the square (each within 12 yd of another, and none more than
 // 18 yd off it, tests/eastbrook_combat_giver_visibility.test.ts).
-const APOTHECARY_POSITION = { x: -24.5, z: -112.5 } as const;
 // On the main street at the square's corner.
-const BRANDT_POSITION = { x: -22.3, z: -104.6 } as const;
 // On the open ground south-west of the square the Weekly Vault left (it
 // stands at the bank now), within a short walk of Marshal Redbrook: with the
 // apothecary's door down the crafts lane, he is the marshal's near neighbour.
-const ODELL_POSITION = { x: -3.5, z: -104.5 } as const;
 // Station cluster props sit at station + world-axis offsets (town_props.ts,
 // no rotation), so the cook's work point derives the same way.
 // Smith Haldren keeps the smithy: he stands at its door north of the square,
 // looking out of it. Forgemistress Darva keeps the crafting station in the
 // crafts lane south of the square.
-const SMITH_POSITION = SMITHY.frontStandingPoint;
 // Round 6b (owner): the forge and toolworks benches sit close together in the
 // crafts lane, so their masters stand out to OPPOSITE sides of their own
 // stations rather than both toward the middle. Each still works its bench;
 // they just stop reading as one huddle.
-const DARVA_POSITION = localToWorld(FORGE_STATION.position, FORGE_LOT.rotation, 4.2, 0);
 // Round 4: the cook works the prep side, a stride clear of the open flame
 // (the kitchens campfire, the town's only open fire, burns at station +
 // (-1.7, +0.9)). The prep offset holds z at -1.5 rather than the drafted
 // -1.4 so the cook also keeps the full anchor clearance (0.85) plus a body
 // radius (0.6) off the station point that service routes end on.
-const KITCHENS_FIRE_POINT = {
-  x: KITCHENS_STATION.position.x - 1.7,
-  z: KITCHENS_STATION.position.z + 0.9,
-} as const;
-const COOK_POSITION = {
-  x: KITCHENS_STATION.position.x + 0.2,
-  z: KITCHENS_STATION.position.z - 1.5,
-} as const;
 const WEAVER_POSITION = { x: -20.5, z: -117.5 } as const;
 const TINKER_POSITION = localToWorld(TOOLWORKS_STATION.position, TOOLWORKS_LOT.rotation, -3.2, 0);
-const SAUL_POSITION = { x: 10.2, z: -87.5 } as const;
 // Round 6b (owner): FURY is a service NPC (the honor quartermaster), so he
 // belongs on the town's edge rather than in the churchyard approach: a few
 // strides west of where the north road and the coast track leave the square
 // side by side.
-const FURY_POSITION = { x: 21, z: -83.5 } as const;
 
 // Marshal stands beside the noticeboard, a full INTERACT_RANGE clear of
 // both the board's body and its posting point so a player posting a notice
@@ -1357,73 +1334,27 @@ const FURY_POSITION = { x: 21, z: -83.5 } as const;
 // (the shop is down on the strand now; the Studio rebuild map has him a
 // hand's width further south, at z -95.5, which is inside the 2.5 yd the
 // givers keep off the civic link road).
-const MARSHAL_POSITION = { x: 1.5, z: -95.3 } as const;
 // The chapel's door looks across the coast track to the square; Brother
 // Aldric greets from the foot of its steps. The bursar and the card master
 // flank the bank's door, a few strides out from it and either side of its
 // line, looking out of it.
-const ALDRIC_POSITION = CHAPEL.frontStandingPoint;
-const BANK_DOOR_OUT = 4.16;
-const BANK_DOOR_SIDE = 4.5;
-const BURSAR_POSITION = localToWorld(
-  BANK.frontStandingPoint,
-  BANK.rotation,
-  BANK_DOOR_SIDE,
-  -BANK_DOOR_OUT,
-);
-const CARD_MASTER_POSITION = localToWorld(
-  BANK.frontStandingPoint,
-  BANK.rotation,
-  -BANK_DOOR_SIDE,
-  -BANK_DOOR_OUT,
-);
-const BANK_DOOR_FACING = BANK.frontFacing;
 
+// Stands from the Studio town rework (the Eastbrook and Mirefen changes map,
+// #4593): authored positions and facings, not derived from the lots above.
 const NPCS = [
-  makeNpc('the_merchant', MERCHANT_POSITION, MARKET_STALLS[0].rotation, MARKET_STALLS[0].id),
-  makeNpc(
-    'marshal_redbrook',
-    MARSHAL_POSITION,
-    facingToward(MARSHAL_POSITION, CIVIC_CENTER),
-    'eastbrook_noticeboard',
-  ),
-  makeNpc(
-    'trader_wilkes',
-    TRADER_POSITION,
-    facingToward(TRADER_POSITION, CIVIC_CENTER),
-    'eastbrook_civic_square',
-  ),
-  makeNpc(
-    'apothecary_lin',
-    APOTHECARY_POSITION,
-    facingToward(APOTHECARY_POSITION, CIVIC_CENTER),
-    'eastbrook_apothecary',
-  ),
-  makeNpc('brother_aldric', ALDRIC_POSITION, CHAPEL.frontFacing, CHAPEL.id),
-  // The smith looks OUT from his door, never at his own wall.
-  makeNpc('smith_haldren', SMITH_POSITION, SMITHY.frontFacing, 'eastbrook_smithy'),
-  makeNpc(
-    'fisherman_brandt',
-    BRANDT_POSITION,
-    facingToward(BRANDT_POSITION, CIVIC_CENTER),
-    'eastbrook_civic_square',
-  ),
-  makeNpc(
-    'foreman_odell',
-    ODELL_POSITION,
-    facingToward(ODELL_POSITION, CIVIC_CENTER),
-    'eastbrook_civic_square',
-  ),
-  makeNpc('bursar_fernando', BURSAR_POSITION, BANK_DOOR_FACING, BANK.id),
-  makeNpc('card_master', CARD_MASTER_POSITION, BANK_DOOR_FACING, BANK.id),
-  makeNpc('chronicler_saul', SAUL_POSITION, TOOLWORKS_LOT.rotation, 'mailbox_eastbrook'),
-  makeNpc('forgemistress_darva', DARVA_POSITION, FORGE_LOT.rotation, FORGE_STATION.id),
-  makeNpc(
-    'cook_marlow',
-    COOK_POSITION,
-    facingToward(COOK_POSITION, KITCHENS_FIRE_POINT),
-    KITCHENS_STATION.id,
-  ),
+  makeNpc('the_merchant', { x: -51.3, z: -113.66 }, 0.785, MARKET_STALLS[0].id),
+  makeNpc('marshal_redbrook', { x: -86.19, z: -44.37 }, 4.304, 'eastbrook_noticeboard'),
+  makeNpc('trader_wilkes', { x: -14.01, z: -121.93 }, 0, 'eastbrook_civic_square'),
+  makeNpc('apothecary_lin', { x: -31.95, z: -120.36 }, 0.785, 'eastbrook_apothecary'),
+  makeNpc('brother_aldric', { x: 18.5, z: -103.31 }, -0.96, CHAPEL.id),
+  makeNpc('smith_haldren', { x: -8.6, z: -122.54 }, 0, 'eastbrook_smithy'),
+  makeNpc('fisherman_brandt', { x: -19.16, z: -120.69 }, 0.75, 'eastbrook_civic_square'),
+  makeNpc('foreman_odell', { x: 0.06, z: -82.14 }, 1.937, 'eastbrook_civic_square'),
+  makeNpc('bursar_fernando', { x: -57.26, z: -107.07 }, 0.785, BANK.id),
+  makeNpc('card_master', { x: -38.16, z: -68.71 }, 3.124, BANK.id),
+  makeNpc('chronicler_saul', { x: -44.27, z: -118.01 }, 0.588, 'mailbox_eastbrook'),
+  makeNpc('forgemistress_darva', { x: 7.4, z: -62.86 }, 2.775, FORGE_STATION.id),
+  makeNpc('cook_marlow', { x: -25.09, z: -74.5 }, 3.77, KITCHENS_STATION.id),
   makeNpc(
     'weaver_ottilie',
     WEAVER_POSITION,
@@ -1431,7 +1362,7 @@ const NPCS = [
     LOOM_STATION.id,
   ),
   makeNpc('tinker_gizzel', TINKER_POSITION, TOOLWORKS_LOT.rotation, TOOLWORKS_STATION.id),
-  makeNpc('fury', FURY_POSITION, facingToward(FURY_POSITION, CIVIC_CENTER), 'eastbrook_chapel'),
+  makeNpc('fury', { x: 0.77, z: -123 }, 5.012, 'eastbrook_chapel'),
 ] as const;
 
 const BURSAR = NPCS.find((npc) => npc.id === 'bursar_fernando');
@@ -1478,7 +1409,8 @@ const GRAVEYARD_ANCHOR = { x: 37.5, z: -99.3 } as const;
 // Studio map's own spot its box ran 0.34 yd into the bank's wall, so it
 // stands half a yard further out along its own width; it stands on the
 // bank's shelf (EASTBROOK_LAYOUT.pads).
-const WEEKLY_VAULT = { x: -73.73, z: -103.4, rot: Math.PI / 4 } as const;
+// Studio town rework (#4593): the vault stands a yard up the quay.
+const WEEKLY_VAULT = { x: -72.98, z: -102.95, rot: Math.PI / 4 } as const;
 
 const SERVICES = {
   playerStart: {
@@ -1524,7 +1456,8 @@ const SERVICES = {
   graveyard: {
     id: 'gy_eastbrook',
     position: GRAVEYARD_ANCHOR,
-    legacyReleasePoint: { x: GRAVEYARD_ANCHOR.x + 2, z: GRAVEYARD_ANCHOR.z },
+    // the Studio town rework's graveyard point (#4593), at the churchyard gate
+    legacyReleasePoint: { x: 35, z: -96.5 },
     healerTemplateId: 'spirit_healer',
     healerFacing: Math.PI,
     // six stones on the props graveyard grid (2.2 yd apart in x, 2.6 in z)

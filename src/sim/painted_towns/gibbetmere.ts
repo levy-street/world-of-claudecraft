@@ -12,21 +12,8 @@ import type { PaintedTownLayout } from './types';
 
 // The shakes look: Fenrire moss colours, wooden shake roof, rubble walls.
 const LOOK = 'shakes' as const;
-const NORTH_FACING = Math.PI; // the door looks north (+z)
 const EAST_FACING = Math.PI / 2; // the door looks east (-x)
-const WEST_FACING = -Math.PI / 2; // the door looks west (+x)
 
-// The inn: east of the square, its long front and door on the square's open
-// east side.
-const INN = paintedTownBuilding({
-  id: 'gibbetmere_inn',
-  kind: 'inn',
-  model: 'tavern',
-  look: LOOK,
-  anchor: { x: 332.36, z: 1421.1 },
-  rotation: WEST_FACING,
-  scale: 1.2,
-});
 // The chapel: west of the square facing the inn across the well (the bells
 // the Sexton rings), its bell tower at the front's south corner over the
 // graves. It stands at 1.0 for the hamlet (its portal still clears 5 yd).
@@ -45,18 +32,18 @@ const SEXTON_HOUSE = paintedTownBuilding({
   kind: 'house',
   model: 'house_a',
   look: LOOK,
-  anchor: { x: 385, z: 1392 },
-  rotation: NORTH_FACING,
+  anchor: { x: 376.92, z: 1397.26 },
+  rotation: 1.3614, // Studio town rework (#4593) // Studio town rework (#4593)
   scale: 1.4,
 });
 
-const BUILDINGS = [INN, CHAPEL, SEXTON_HOUSE] as const;
+// The inn was taken down in the Studio town rework (#4593).
+const BUILDINGS = [CHAPEL, SEXTON_HOUSE] as const;
 
 // Each building's pad and its apron. The inn and the chapel stand at the
 // square's own height (2.5), so the square does not move; the house at 3.2 on
 // the rise south of the graves.
 const GROUND: readonly TownGround[] = [
-  { building: INN, height: 2.5, columns: 3, rows: 2, taper: 4, apron: 10 },
   { building: CHAPEL, height: 2.5, columns: 2, rows: 3, taper: 4, apron: 10 },
   { building: SEXTON_HOUSE, height: 3.2, columns: 2, rows: 2, taper: 4, apron: 8 },
 ];

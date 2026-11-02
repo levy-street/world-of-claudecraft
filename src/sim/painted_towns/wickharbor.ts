@@ -27,8 +27,6 @@ const LOOK = 'brick' as const;
 
 // The models face local -Z (rotation 0 turns the door south, -z; PI north,
 // +z; PI / 2 east, -x; -PI / 2 west, +x: this world's east is -x).
-const SOUTH_FACING = 0;
-const NORTH_FACING = Math.PI;
 
 // The harbour inn (tavern, 1.2: the door clears 5.3): the square's south side,
 // where the town hall stood, its long front and door on the square (the board
@@ -39,8 +37,8 @@ const INN = paintedTownBuilding({
   kind: 'inn',
   model: 'tavern',
   look: LOOK,
-  anchor: { x: 423, z: 333.04 },
-  rotation: NORTH_FACING,
+  anchor: { x: 431.77, z: 333.58 },
+  rotation: 3.6303, // Studio town rework (#4593) // Studio town rework (#4593)
   scale: 1.2,
 });
 // The smithy (smithy, 1.3, walk-in): the square's north-east corner, where
@@ -52,8 +50,8 @@ const SMITHY = paintedTownBuilding({
   kind: 'house',
   model: 'smithy',
   look: LOOK,
-  anchor: { x: 387.83, z: 370.64 },
-  rotation: -1.561,
+  anchor: { x: 382.88, z: 370.6 },
+  rotation: 0, // Studio town rework (#4593) // Studio town rework (#4593)
   scale: 1.3,
 });
 // The market hall (shop_a, 1.3, walk-in): the square's north-west corner,
@@ -66,8 +64,8 @@ const MARKET = paintedTownBuilding({
   kind: 'house',
   model: 'shop_a',
   look: LOOK,
-  anchor: { x: 434.62, z: 372.62 },
-  rotation: 0.349,
+  anchor: { x: 411.85, z: 391.84 },
+  rotation: 4.6949, // Studio town rework (#4593) // Studio town rework (#4593)
   scale: 1.3,
 });
 // The downs house (house_a, 1.4, sealed): beside the churchyard where the
@@ -77,8 +75,8 @@ const DOWNS_HOUSE = paintedTownBuilding({
   kind: 'house',
   model: 'house_a',
   look: LOOK,
-  anchor: { x: 385.04, z: 335.91 },
-  rotation: NORTH_FACING,
+  anchor: { x: 382.66, z: 338.3 },
+  rotation: 2.9322, // Studio town rework (#4593) // Studio town rework (#4593)
   scale: 1.4,
 });
 // The Windway house (house_a, 1.4, sealed): beyond the smithy where the kit
@@ -89,8 +87,8 @@ const WINDWAY_HOUSE = paintedTownBuilding({
   kind: 'house',
   model: 'house_a',
   look: LOOK,
-  anchor: { x: 368.96, z: 373.09 },
-  rotation: SOUTH_FACING,
+  anchor: { x: 342.34, z: 375.42 },
+  rotation: 0.2269, // Studio town rework (#4593) // Studio town rework (#4593)
   scale: 1.4,
 });
 
