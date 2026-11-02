@@ -150,6 +150,48 @@ describe('warlock class talent tree', () => {
     });
   });
 
+  it('Improved Abyssal Gag lands its full silence beside the lockout as one DR step in a duel', () => {
+    const { sim, player } = rig({ 8: 'wlk_r8_voidfeast' });
+    const mageId = sim.addPlayer('mage', 'Gagged Mage');
+    sim.setPlayerLevel(20, mageId);
+    const mage = sim.entities.get(mageId);
+    if (!mage) throw new Error('missing duel mage');
+    mage.pos = { ...player.pos, x: player.pos.x + 3 };
+    mage.prevPos = { ...mage.pos };
+    player.facing = Math.atan2(mage.pos.x - player.pos.x, mage.pos.z - player.pos.z);
+    sim.duelRequest(mageId, player.id);
+    sim.duelAccept(mageId);
+    for (let i = 0; i < 20 * 5 && sim.duelFor(player.id)?.state !== 'active'; i++) sim.tick();
+    expect(sim.duelFor(player.id)?.state).toBe('active');
+    sim.targetEntity(mageId, player.id);
+    sim.targetEntity(player.id, mageId);
+    const durations = () => ({
+      lockout: mage.auras.find((aura) => aura.id === 'spell_lock_lockout')?.duration,
+      silence: mage.auras.find((aura) => aura.id === 'spell_lock_silence')?.duration,
+    });
+    const gagMidCast = () => {
+      mage.resource = mage.maxResource;
+      player.resource = player.maxResource;
+      sim.castAbility('fireball', mageId);
+      expect(mage.castingAbility).toBe('fireball');
+      sim.castAbility('spell_lock', player.id);
+      tick(sim, 6);
+      expect(mage.castingAbility).toBeNull();
+    };
+
+    // Fresh target: the tooltip's 4 sec silence, not the 2 sec a second DR step left.
+    gagMidCast();
+    expect(durations()).toEqual({ lockout: 4, silence: 4 });
+    expect(mage.ccDr.get('lockout')?.stage).toBe(1);
+
+    // After the ladder resets, one earlier lockout halves BOTH halves together.
+    tick(sim, 20 * 25);
+    sim.ctx.diminishedCrowdControlDuration(player, mage, 'lockout', 4);
+    gagMidCast();
+    expect(durations()).toEqual({ lockout: 2, silence: 2 });
+    expect(mage.ccDr.get('lockout')?.stage).toBe(2);
+  });
+
   it('implements Sanguine Covenant', () => {
     const pact = rig({ 11: 'wlk_r11_fel_concentration' });
     const hpBefore = pact.player.hp;

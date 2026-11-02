@@ -168,13 +168,13 @@ describe('shaman redesign', () => {
     expect(p.auras.some((aura) => aura.kind === 'root')).toBe(false);
   });
 
-  it('the control row resolves a four-second interrupt or two-second root', () => {
+  it('the control row resolves a two-second interrupt or two-second root', () => {
     const { sim } = rig('shaman', 20, {
       11: 'sha_r11_ancestral_guidance',
     });
     expect(sim.resolvedAbility('earth_shock')?.effects).toContainEqual({
       type: 'interrupt',
-      lockout: 4,
+      lockout: 2,
     });
     expect(
       rig('shaman', 20, { 11: 'sha_r11_elemental_attunement' }).sim.resolvedAbility('frost_shock')

@@ -322,7 +322,7 @@ or respond automatically.
 
 | Choice | Starting effect | Player reason to choose it |
 |---|---|---|
-| Fault Rebuke | Earthen Jolt interrupts spellcasting and locks that school for 4 seconds. | Stops dangerous casts on demand. |
+| Fault Rebuke | Earthen Jolt interrupts spellcasting and locks that school for 2 seconds. | Stops dangerous casts on demand. |
 | Rime Lock | Rime Jolt roots its target for 2 seconds. | Stops one moving enemy through an existing action. |
 | Gripping Earth | Grants a target-centered Groundsnare with a 30-second cooldown. Enemies within 4 yards are rooted for 2 seconds and then slowed by 40% for 6 seconds. | Controls a group at a planned location. |
 

@@ -498,6 +498,11 @@ export function runEffects(
   // The resolved (pre-critical) amount of this cast's direct heal, read by a
   // later 'hot' effect that carries closingHealFromDirect (Second Bloom).
   let directHealAmount: number | undefined;
+  // The lockout-ladder outcome of this cast's interrupt, so a same-cast silence
+  // on the same target (Improved Abyssal Gag) rides that ONE step instead of
+  // stepping the shared 'lockout' ladder again. Unset until an interrupt cuts a
+  // cast; scale is null when the target was DR-immune.
+  let castLockoutDr: { targetId: number; scale: number | null } | undefined;
   // The cast-scoped heal multiplier the heal and hot arms below apply to the
   // WHOLE resolved amount: the caller's mark times the Nature's Boon power the
   // resolved copy carries (combat/druid_natures_boon.ts, stamped in
@@ -1772,6 +1777,10 @@ export function runEffects(
         )
           break;
         const remaining = ctx.diminishedCrowdControlDuration(p, target, 'lockout', eff.lockout);
+        castLockoutDr = {
+          targetId: target.id,
+          scale: remaining === null ? null : remaining / eff.lockout,
+        };
         ctx.cancelCast(target);
         if (eff.rageOnInterrupt && meta.cls === 'warrior' && p.resourceType === 'rage') {
           p.resource = Math.min(
@@ -1833,7 +1842,12 @@ export function runEffects(
       }
       case 'silence': {
         if (!target || target.dead) break;
-        const duration = ctx.diminishedCrowdControlDuration(p, target, 'lockout', eff.duration);
+        const sameCastDr = castLockoutDr?.targetId === target.id ? castLockoutDr : undefined;
+        const duration = sameCastDr
+          ? sameCastDr.scale === null
+            ? null
+            : eff.duration * sameCastDr.scale
+          : ctx.diminishedCrowdControlDuration(p, target, 'lockout', eff.duration);
         if (duration === null) break;
         ctx.applyAura(target, {
           id: `${ability.id}_silence`,

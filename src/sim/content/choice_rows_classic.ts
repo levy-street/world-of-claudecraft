@@ -1408,10 +1408,12 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'sha_r11_ancestral_guidance',
           name: 'Fault Rebuke',
-          description: 'Earthen Jolt interrupts spellcasting for a 4 sec school lockout.',
+          // PvP balance: on a 6 sec shock a 4 sec lockout was 40 lockout sec per
+          // minute from range, far past every other class; halved to 2 sec.
+          description: 'Earthen Jolt interrupts spellcasting for a 2 sec school lockout.',
           icon: 'earth_shock',
           effect: {
-            ability: [{ ability: 'earth_shock', addEffects: [{ type: 'interrupt', lockout: 4 }] }],
+            ability: [{ ability: 'earth_shock', addEffects: [{ type: 'interrupt', lockout: 2 }] }],
           },
         },
         {

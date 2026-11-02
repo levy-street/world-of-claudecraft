@@ -174,6 +174,71 @@ describe('Shaman v0.29 talent grid', () => {
     );
   });
 
+  it('Fault Rebuke cuts a cast on every jolt with a 2 sec lockout', () => {
+    const { sim, player } = shaman({ 11: SHAMAN_TALENT_IDS.faultRebuke });
+    const target = hostile(sim, player, 92_914);
+    sim.targetEntity(target.id, player.id);
+    const joltMidCast = () => {
+      target.castingAbility = 'fireball';
+      target.castRemaining = 30;
+      sim.castAbility('earth_shock', player.id);
+      advance(sim, 1);
+    };
+    const lockout = () => target.auras.find((aura) => aura.id === 'earth_shock_lockout');
+
+    joltMidCast();
+    expect(target.castingAbility).toBeNull();
+    expect(lockout()).toEqual(expect.objectContaining({ kind: 'lockout', duration: 2 }));
+
+    // The next shock (6 sec cooldown) interrupts again: no extra interrupt cooldown.
+    advance(sim, 5.1);
+    joltMidCast();
+    expect(target.castingAbility).toBeNull();
+    expect(lockout()).toEqual(expect.objectContaining({ duration: 2 }));
+  });
+
+  it('Fault Rebuke in a duel: 2 sec lockout on the PvP DR ladder, immune still cuts', () => {
+    const { sim, player } = shaman({ 11: SHAMAN_TALENT_IDS.faultRebuke });
+    const mageId = sim.addPlayer('mage', 'Duel Mage');
+    sim.setPlayerLevel(20, mageId);
+    const mage = sim.entities.get(mageId);
+    if (!mage) throw new Error('missing duel mage');
+    mage.pos = { ...player.pos, x: player.pos.x + 3 };
+    mage.prevPos = { ...mage.pos };
+    player.facing = Math.atan2(mage.pos.x - player.pos.x, mage.pos.z - player.pos.z);
+    sim.duelRequest(mageId, player.id);
+    sim.duelAccept(mageId);
+    for (let tick = 0; tick < 20 * 5 && sim.duelFor(player.id)?.state !== 'active'; tick++) {
+      sim.tick();
+    }
+    expect(sim.duelFor(player.id)?.state).toBe('active');
+    sim.targetEntity(mageId, player.id);
+    sim.targetEntity(player.id, mageId);
+
+    const cutAndRead = (): { cut: boolean; lockout: number | undefined } => {
+      mage.resource = mage.maxResource;
+      player.resource = player.maxResource;
+      sim.castAbility('fireball', mageId);
+      expect(mage.castingAbility).toBe('fireball');
+      sim.castAbility('earth_shock', player.id);
+      advance(sim, 0.3);
+      const cut = mage.castingAbility === null;
+      const lockout = mage.auras.find((aura) => aura.id === 'earth_shock_lockout')?.duration;
+      if (!cut) sim.ctx.cancelCast(mage);
+      return { cut, lockout };
+    };
+
+    // One jolt per 6 sec shock cooldown, each cutting the cast.
+    expect(cutAndRead()).toEqual({ cut: true, lockout: 2 });
+    advance(sim, 6);
+    expect(cutAndRead()).toEqual({ cut: true, lockout: 1 });
+    advance(sim, 6);
+    expect(cutAndRead()).toEqual({ cut: true, lockout: 0.5 });
+    // DR-immune: the cast is still cut, with no lockout.
+    advance(sim, 6);
+    expect(cutAndRead()).toEqual({ cut: true, lockout: undefined });
+  });
+
   it('Primal Exaltation creates the shared twelve-second throughput window', () => {
     const { sim, player } = shaman({ 17: SHAMAN_TALENT_IDS.primalExaltation });
     sim.castAbility('primal_exaltation', player.id);
