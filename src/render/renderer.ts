@@ -1602,6 +1602,8 @@ export class Renderer {
     farCadence: 1,
   };
   private tmpV2 = new THREE.Vector3();
+  private readonly shelfLeft = new THREE.Vector3();
+  private readonly shelfRight = new THREE.Vector3();
   // Group-level cull for both passes; character_cull_core.ts owns the rule.
   private readonly characterCull = createCharacterCullPass();
   private cullCharacters = false;
@@ -11009,6 +11011,13 @@ export class Renderer {
           } else if (hasMoonkin) this.vfx.formAura(e.id, 'moonkin', dt);
           else if (hasShadowform) this.vfx.gloam.wearer(e.id, active.gloamCue(), settled, d2, ay);
           if (spores) this.vfx.formAura(e.id, spores, dt);
+          if (
+            sporemenderForm &&
+            !this.reducedMotion() &&
+            v.sporemenderVisual?.shoulderShelfWorldPositions(this.shelfLeft, this.shelfRight)
+          ) {
+            this.vfx.sporeShelves(this.shelfLeft, this.shelfRight, dt);
+          }
           if (hasCharacterEffect(characterEffects, CHARACTER_EFFECT_SEASONAL_FUMES))
             this.vfx.fluidSmoke(ax, ay + 0.6, az, 0x7bdc4e, dt, 16); // a seasonal trick's fumes
           // orange worn-gear motes: STATIC-preset-gated sheddable prestige

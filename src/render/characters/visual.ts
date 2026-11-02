@@ -1484,6 +1484,7 @@ export class CharacterVisual {
    *  the first shift, so a rig that never takes the form pays nothing. */
   private gloam: GloamPresence | null = null;
   private moonkin = false;
+  private shoulderShelves: [THREE.Object3D | null, THREE.Object3D | null] | null = null;
   /** Moonwing's antlers, crescent and wings (form_adornments.ts).
    *  Built on the first form edge, so a rig that never shifts pays nothing. */
   private formAdornments: FormAdornments | null = null;
@@ -4003,6 +4004,21 @@ export class CharacterVisual {
     this.metamorphRightHand.updateWorldMatrix(true, false);
     this.metamorphLeftHand.getWorldPosition(left);
     this.metamorphRightHand.getWorldPosition(right);
+    return true;
+  }
+
+  /** Where Sporemender Form's shoulder shelves are now, for their spores. False on a rig
+   *  without them, or one that is not being drawn up close. */
+  shoulderShelfWorldPositions(left: THREE.Vector3, right: THREE.Vector3): boolean {
+    if (!this.root.visible || this.far) return false;
+    this.shoulderShelves ??= [
+      this.model.getObjectByName('L_ShoulderShelf') ?? null,
+      this.model.getObjectByName('R_ShoulderShelf') ?? null,
+    ];
+    const [leftShelf, rightShelf] = this.shoulderShelves;
+    if (!leftShelf || !rightShelf) return false;
+    leftShelf.getWorldPosition(left);
+    rightShelf.getWorldPosition(right);
     return true;
   }
 

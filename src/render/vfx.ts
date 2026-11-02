@@ -2381,6 +2381,32 @@ export class Vfx {
     }
   }
 
+  /** Green spores hovering around Sporemender Form's two shoulder shelves, each drifting
+   *  slowly its own way with no lift. Lives apart from formAura because it starts at the
+   *  shelves, not the feet. World space, so they trail a moving form. */
+  sporeShelves(left: THREE.Vector3, right: THREE.Vector3, dt: number): void {
+    for (const at of [left, right]) {
+      const n = this.emitCount(14, dt);
+      for (let k = 0; k < n; k++) {
+        const a = Math.random() * Math.PI * 2;
+        const r = 0.14 + Math.sqrt(Math.random()) * 0.34;
+        this.spawn(
+          at.x + Math.sin(a) * r,
+          at.y - 0.1 + Math.random() * 0.5,
+          at.z + Math.cos(a) * r,
+          (Math.random() - 0.5) * 0.16,
+          (Math.random() - 0.5) * 0.1,
+          (Math.random() - 0.5) * 0.16,
+          Math.random() < 0.3 ? 0xd4f59a : 0x9fe35a,
+          0.2 + Math.random() * 0.08,
+          2.2 + Math.random() * 1.2,
+          0,
+          SPR.flash,
+        );
+      }
+    }
+  }
+
   // Orange (promoted legendary) worn-gear identity: a sparse, constant drift
   // of molten-gold forge motes rising off a living wearer (continuous, called
   // per frame while any worn slot is legendary-rolled; the predicate and the

@@ -3348,20 +3348,31 @@ export const VISUALS: Record<string, VisualDef> = {
   },
   // Shaman Shadewolf keeps the original wolf and tint, drawn under the spirit
   // veil's wolf palette (its tint shows through the kept colours).
-  // Druid Sporemender Form (Groveheart): the owner's concept redrawn in T-pose
-  // (Tripo image-to-image) and built, auto-rigged and retargeted by Tripo, so
-  // the skeleton is fitted to this short-torso chibi (the KayKit rig put the
-  // shoulders at face height and folded the arms into the robe). The rig was
-  // then post-processed: arm-chain weight stripped from the robe and satchels,
-  // the cap and face bound rigidly to the head, and both upper arms spread 30
-  // degrees in every clip so the hands clear the satchels. Tripo bipeds face
-  // +X; its slash and defeat presets run long (the Lich form's time scales).
-  // Auto-attack plays the Cast gesture: the form fights with the wand, and the
-  // slash preset buries the face under the cap. Jump is left out the same way
-  // as the Lich (airborne frames hold Idle). Same height as the player bodies.
+  // Druid Sporemender Form (Groveheart): the owner's pick of two adult-scale concepts mixed
+  // through Tripo image-to-image, built by Smart Mesh P2 from three views and painted from
+  // them, then auto-rigged and retargeted by Tripo. Post-processing: loose beads and the
+  // thin sleeve flags cut, each clip's constant hip offset removed, the cap and censer each
+  // pinned to one bone (Head, Pelvis), the Tripo mantle replaced by a few authored bracket
+  // fungi skinned from the cap's and robe's own atlas art, riding L_ and R_ShoulderShelf:
+  // bones on the upper arms, baked level in every clip, so the arms cannot cut them. The
+  // robe (its own mesh piece) kept off the calf, foot and toe bones with the skirt hung
+  // from the pelvis, sleeve cloth kept on the upper arm so the forearm bends inside it,
+  // anything clear of a hand kept off that hand, weights relaxed where an edge stretched in
+  // any clip with seam twins welded. The atlas had the arms repainted as clean skin, the
+  // old mantle's orange turned to moss and the robe's roots mirrored across; a thread veil
+  // skinned to Head hangs from the brim, and the material is two-sided for the thin cloth.
+  // Tripo bipeds face +X; its defeat preset runs long (the Lich form's time scale) and only
+  // staggers, but form auras drop at death so a player never shows it. Auto-attack plays
+  // the Cast gesture and Jump is left out, as on the Lich. Stands at the player body's
+  // height. walkRef and runRef are measured off the clips (a planted foot slides backwards
+  // at body speed, scaled by height): the form moves at 0.8 speed, so a 5.6 run plays Run
+  // at 0.84 with the feet planted. The green spores hovering at the shoulders are
+  // vfx.sporeShelves, fed by CharacterVisual.shoulderShelfWorldPositions.
   form_sporemender: {
     url: `${CREATURES}/sporemender_form.glb`,
-    height: HUMANOID_H,
+    height: HUMANOID_H * 1.1,
+    walkRef: 2.07,
+    runRef: 6.7,
     yaw: -Math.PI / 2,
     authoredAtlas: true,
     attackTimeScale: 6,
