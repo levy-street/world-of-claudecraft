@@ -156,7 +156,7 @@ function nearRing(random: () => number, spread: number): [number, number] {
   return [CROWN_SIZE / 2 + Math.cos(angle) * radius, CROWN_SIZE / 2 + Math.sin(angle) * radius];
 }
 
-/** Sporemender's crown: the ring's plain white map (the ring itself is geometry). */
+/** Moonwing's crown: the ring's plain white map (the ring itself is geometry). */
 export function sporeHaloRingTexture(): THREE.Texture {
   return paintedTexture(4, 4, (ctx) => {
     ctx.fillStyle = '#ffffff';
@@ -164,7 +164,7 @@ export function sporeHaloRingTexture(): THREE.Texture {
   });
 }
 
-/** Sporemender's crown: glowing spores in three sizes, heaviest on the ring. */
+/** Moonwing's crown: glowing spores in three sizes, heaviest on the ring. */
 export function sporeHaloScatterTexture(): THREE.Texture {
   return paintedTexture(CROWN_SIZE, CROWN_SIZE, (ctx) => {
     const random = seededRandom(0x5b0fe);
@@ -179,7 +179,7 @@ export function sporeHaloScatterTexture(): THREE.Texture {
   });
 }
 
-/** Sporemender's crown: a few small four-point stars among the spores. */
+/** Moonwing's crown: a few small four-point stars among the spores. */
 export function sporeHaloStarsTexture(): THREE.Texture {
   return paintedTexture(CROWN_SIZE, CROWN_SIZE, (ctx) => {
     const random = seededRandom(0x57a125);

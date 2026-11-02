@@ -1,4 +1,4 @@
-// Sporemender Form's crown (VisualDef.sporeHalo): a thin ring tilted above the head with
+// Moonwing Form's crown (VisualDef.sporeHalo): a thin ring tilted above the head with
 // a loose scatter of spores and small stars turning through it. The ring is real geometry
 // and the scatter layers lean different ways, so the crown never goes edge-on at eye
 // level. It all draws in one glow program, the shared rig_fx.ts recipe, so the crown

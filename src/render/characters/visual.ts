@@ -1488,7 +1488,7 @@ export class CharacterVisual {
   /** Moonwing's antlers, crescent and wings (form_adornments.ts).
    *  Built on the first form edge, so a rig that never shifts pays nothing. */
   private formAdornments: FormAdornments | null = null;
-  /** Sporemender Form's crown (VisualDef.sporeHalo). */
+  /** Moonwing Form's crown (VisualDef.sporeHalo). */
   private sporeHalo: SporeHalo | null = null;
   private ferocityStage = 0;
   private presentationScale = 1;

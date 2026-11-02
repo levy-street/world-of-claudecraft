@@ -13,6 +13,7 @@ export const CHARACTER_FORM_FLAG = {
   fireball: 1 << 4,
   metamorph: 1 << 5,
   sporemender: 1 << 6,
+  moonwing: 1 << 7,
 } as const;
 
 export const CHARACTER_FORM_READY = {
@@ -22,6 +23,7 @@ export const CHARACTER_FORM_READY = {
   travel: 1 << 3,
   metamorph: 1 << 4,
   sporemender: 1 << 5,
+  moonwing: 1 << 6,
 } as const;
 
 export type CharacterFormVisual =
@@ -32,7 +34,8 @@ export type CharacterFormVisual =
   | 'travel'
   | 'fireball'
   | 'metamorph'
-  | 'sporemender';
+  | 'sporemender'
+  | 'moonwing';
 
 export interface CharacterFormVisibility {
   base: boolean;
@@ -42,6 +45,7 @@ export interface CharacterFormVisibility {
   travel: boolean;
   metamorph: boolean;
   sporemender: boolean;
+  moonwing: boolean;
 }
 
 export interface CharacterFormShadowPlan {
@@ -68,7 +72,8 @@ export type CharacterFormKey =
   | 'form_cat'
   | 'form_travel'
   | 'form_metamorph'
-  | 'form_sporemender';
+  | 'form_sporemender'
+  | 'form_moonwing';
 
 /** The polymorphs that wear a toad, not the sheep (the Sunbone Hexcaller's
  *  Toad Hex): still kind 'polymorph', so the one polymorph slot and its gate
@@ -174,6 +179,7 @@ export function characterFormMaskForAura(aura: AuraIdentity): number {
   }
   if (aura.kind === 'form_travel') return CHARACTER_FORM_FLAG.travel;
   if (aura.kind === 'form_sporemender') return CHARACTER_FORM_FLAG.sporemender;
+  if (aura.kind === 'form_moonkin') return CHARACTER_FORM_FLAG.moonwing;
   if (aura.kind === 'form_fireball') return CHARACTER_FORM_FLAG.fireball;
   // `form_lich` is the current Necromancy marker and `form_metamorph` is the
   // legacy Warlock marker. They intentionally share presentation only; their
@@ -187,6 +193,13 @@ export function characterFormMaskForAura(aura: AuraIdentity): number {
   return 0;
 }
 
+/** Moonwing is mount-safe (sim/combat/forms.ts): a rider stays in the form, but its
+ *  rig has no seated pose. So a mounted Moonwing keeps the body on the saddle with
+ *  the tint and adornments (form_adornments.ts), and the rig returns on dismount. */
+export function moonwingRigMask(mask: number, mounted: boolean): number {
+  return mounted ? mask & ~CHARACTER_FORM_FLAG.moonwing : mask;
+}
+
 export function requestedCharacterForm(mask: number): CharacterFormVisual {
   if (mask & CHARACTER_FORM_FLAG.sheep) return 'sheep';
   if (mask & CHARACTER_FORM_FLAG.bear) return 'bear';
@@ -195,6 +208,7 @@ export function requestedCharacterForm(mask: number): CharacterFormVisual {
   if (mask & CHARACTER_FORM_FLAG.fireball) return 'fireball';
   if (mask & CHARACTER_FORM_FLAG.metamorph) return 'metamorph';
   if (mask & CHARACTER_FORM_FLAG.sporemender) return 'sporemender';
+  if (mask & CHARACTER_FORM_FLAG.moonwing) return 'moonwing';
   return 'base';
 }
 
@@ -212,6 +226,8 @@ function readyFlagFor(form: CharacterFormVisual): number {
       return CHARACTER_FORM_READY.metamorph;
     case 'sporemender':
       return CHARACTER_FORM_READY.sporemender;
+    case 'moonwing':
+      return CHARACTER_FORM_READY.moonwing;
     default:
       return 0;
   }
@@ -240,6 +256,7 @@ export function characterFormReadyMask(
   travel: unknown,
   metamorph: unknown,
   sporemender: unknown,
+  moonwing: unknown,
   compilePending: unknown,
 ): number {
   let mask = 0;
@@ -249,6 +266,7 @@ export function characterFormReadyMask(
   if (formRigReady(travel, compilePending)) mask |= CHARACTER_FORM_READY.travel;
   if (formRigReady(metamorph, compilePending)) mask |= CHARACTER_FORM_READY.metamorph;
   if (formRigReady(sporemender, compilePending)) mask |= CHARACTER_FORM_READY.sporemender;
+  if (formRigReady(moonwing, compilePending)) mask |= CHARACTER_FORM_READY.moonwing;
   return mask;
 }
 
@@ -267,6 +285,7 @@ export function activeCharacterFormVisual<T>(
   travel: T | null,
   metamorph: T | null,
   sporemender: T | null,
+  moonwing: T | null,
 ): T {
   switch (resolved) {
     case 'sheep':
@@ -281,6 +300,8 @@ export function activeCharacterFormVisual<T>(
       return metamorph ?? base;
     case 'sporemender':
       return sporemender ?? base;
+    case 'moonwing':
+      return moonwing ?? base;
     default:
       return base;
   }
@@ -295,6 +316,7 @@ export function characterFormVisibility(resolved: CharacterFormVisual): Characte
     travel: resolved === 'travel',
     metamorph: resolved === 'metamorph',
     sporemender: resolved === 'sporemender',
+    moonwing: resolved === 'moonwing',
   };
 }
 

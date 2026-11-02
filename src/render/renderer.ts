@@ -238,6 +238,7 @@ import {
   characterFormReadyMask,
   characterFormShadowPlan,
   characterFormVisibility,
+  moonwingRigMask,
   requestedCharacterForm,
   resolvedCharacterForm,
 } from './characters/form_visual_selection_core';
@@ -1237,6 +1238,7 @@ export interface EntityView extends RickshawMountViewState, WorldQuestCarryViewS
   mountJumpPitch: number;
   metamorphVisual: CharacterVisual | null; // Necromancy Lich Form, built lazily
   sporemenderVisual: CharacterVisual | null; // druid Sporemender Form, built lazily
+  moonwingVisual: CharacterVisual | null; // druid Moonwing Form on foot, built lazily
   fireballTravelVisual: FireballTravelVisual | null; // Mage travel form, built lazily
   iceBlockVisual: IceBlockVisual | null; // Ice Block shell, built lazily on first stasis
   temporalHourglassVisual: TemporalHourglassVisual | null;
@@ -8084,6 +8086,7 @@ export class Renderer {
       riderAnchor,
       metamorphVisual: null,
       sporemenderVisual: null,
+      moonwingVisual: null,
       fireballTravelVisual: null,
       iceBlockVisual: null,
       temporalHourglassVisual: null,
@@ -9741,7 +9744,7 @@ export class Renderer {
         if (isPaladinWingAura(a)) hasPaladinWings = true;
         if (isOathChainAura(a) && oathChainSourceId === null) oathChainSourceId = a.sourceId;
       }
-      const requestedForm = requestedCharacterForm(formMask);
+      const requestedForm = requestedCharacterForm(moonwingRigMask(formMask, !!e.mountKey));
       const polyed = requestedForm === 'sheep';
       const bear = requestedForm === 'bear';
       const ghostWolf = requestedForm === 'cat' && hasGhostWolf;
@@ -9750,6 +9753,7 @@ export class Renderer {
       const fireballForm = requestedForm === 'fireball';
       const metamorphForm = requestedForm === 'metamorph';
       const sporemenderForm = requestedForm === 'sporemender';
+      const moonwingForm = requestedForm === 'moonwing';
       const hasSoulRend = hasCharacterEffect(characterEffects, CHARACTER_EFFECT_SOUL_REND);
       const hasRecklessness = hasCharacterEffect(characterEffects, CHARACTER_EFFECT_RECKLESSNESS);
       const spores = characterSporeAura(characterEffects, this.reducedMotion());
@@ -9834,7 +9838,8 @@ export class Renderer {
               !v.mountVisual &&
               !fireballForm &&
               !metamorphForm &&
-              !sporemenderForm,
+              !sporemenderForm &&
+              !moonwingForm,
           );
           // sheep/forms keep articulated shadows through the whole proxy band:
           // a frozen humanoid proxy silhouette would be wrong under a form
@@ -10231,6 +10236,7 @@ export class Renderer {
         v.travelVisual,
         v.metamorphVisual,
         v.sporemenderVisual,
+        v.moonwingVisual,
         v.formCompilePending,
       );
       const resolvedForm = resolvedCharacterForm(requestedForm, formReadyMask);
@@ -10272,6 +10278,7 @@ export class Renderer {
         v.travelVisual,
         v.metamorphVisual,
         v.sporemenderVisual,
+        v.moonwingVisual,
       );
       if (!e.templateId.startsWith('vision_')) {
         active.clickProxy.userData.entityId = e.id;
@@ -10297,9 +10304,10 @@ export class Renderer {
       active.setGhost(ghostLook !== null, ghostLook ?? 'spirit');
       active.setSoulRend(hasSoulRend);
       // Shadowform (Gloamveil) keeps the priest's rig and colours and climbs the dark up it
-      // (characters/gloam_climb.ts); Moonkin Form tints the base rig a bright violet.
+      // (characters/gloam_climb.ts); Moonkin Form tints the base rig a bright violet,
+      // the stand-in and the saddle look: on foot the form wears its own rig.
       active.setShadowform(hasShadowform);
-      active.setMoonkin(hasMoonkin);
+      active.setMoonkin(hasMoonkin && resolvedForm !== 'moonwing');
       // Metamorphosis is no longer a tint on the base rig: it has its own lazy
       // CharacterVisual driven by formVisibility.metamorph above.
       active.setAscended(veilboundState !== 'none');

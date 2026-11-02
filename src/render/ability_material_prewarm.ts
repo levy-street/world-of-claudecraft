@@ -222,7 +222,7 @@ export const ABILITY_MATERIAL_SOURCES: readonly AbilityMaterialSource[] = [
     build: () => buildMoonwingStandIn(),
   },
   {
-    // Sporemender Form's crown rides the form rig. It shares the rig glow program, but
+    // Moonwing Form's crown rides the form rig. It shares the rig glow program, but
     // its painted maps must be resident before the first shift.
     id: 'spore-halo',
     module: 'spore_halo.ts',

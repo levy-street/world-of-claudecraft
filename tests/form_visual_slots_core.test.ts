@@ -54,6 +54,7 @@ function allSlots(): FormVisualSlots<StubRig> {
     travelVisual: stub('travel'),
     metamorphVisual: stub('metamorph'),
     sporemenderVisual: stub('sporemender'),
+    moonwingVisual: stub('moonwing'),
   };
 }
 
@@ -66,6 +67,7 @@ describe('form visual slots', () => {
       'travelVisual',
       'metamorphVisual',
       'sporemenderVisual',
+      'moonwingVisual',
     ]);
   });
 

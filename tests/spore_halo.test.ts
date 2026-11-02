@@ -1,4 +1,4 @@
-// Sporemender Form's crown (characters/spore_halo.ts): worn only by that form, and held
+// Moonwing Form's crown (characters/spore_halo.ts): worn only by that form, and held
 // to the rig and prewarm contracts every rig-parented FX piece keeps.
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
@@ -9,12 +9,12 @@ import {
   sporeHaloMaterials,
 } from '../src/render/characters/spore_halo';
 
-describe('Sporemender crown', () => {
-  it('is worn by the Sporemender rig and no other', () => {
+describe('Moonwing crown', () => {
+  it('is worn by the Moonwing rig and no other', () => {
     const wearers = Object.entries(VISUALS)
       .filter(([, def]) => def.sporeHalo)
       .map(([key]) => key);
-    expect(wearers).toEqual(['form_sporemender']);
+    expect(wearers).toEqual(['form_moonwing']);
   });
 
   it('rides the Head bone as rig FX that casts no shadow', () => {

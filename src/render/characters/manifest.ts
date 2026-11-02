@@ -699,7 +699,7 @@ export interface VisualDef {
    *  ring would clip. */
   haloUpOffset?: number;
   haloRadius?: number;
-  /** Sporemender Form's ring of spores over the head (spore_halo.ts). */
+  /** Moonwing Form's ring of spores over the head (spore_halo.ts). */
   sporeHalo?: boolean;
   /** This GLB is a modular PART LIBRARY, not a finished character: every body
    *  part, hair style and armour slot piece rides one shared rig and the
@@ -3350,19 +3350,47 @@ export const VISUALS: Record<string, VisualDef> = {
   },
   // Shaman Shadewolf keeps the original wolf and tint, drawn under the spirit
   // veil's wolf palette (its tint shows through the kept colours).
-  // Druid Sporemender Form (Groveheart): the owner's Lunavore concepts mixed into a
-  // T-pose sheet (Tripo image-to-image), built by Smart Mesh P2 from three views and
-  // repainted from them, then auto-rigged and retargeted by Tripo. The rig was then
-  // post-processed: each clip's constant hip offset removed (Run sat about 1.7 units
-  // ahead of the entity), feet and hands let go of the cloth, and the weights relaxed
-  // wherever an edge stretched past 1.5 times its rest length in any clip. Tripo
-  // bipeds face +X; its defeat preset runs long (the Lich form's time scale), and it
-  // only staggers, but form auras drop at death so a player never shows it. Auto-attack
-  // plays the Cast gesture and Jump is left out, as on the Lich (airborne frames hold
-  // Idle). Stands at the player body's height, so the shift neither grows nor shrinks
-  // the druid. The crown is spore_halo.ts; the rising spores are vfx.ts formAura.
+  // Druid Sporemender Form (Groveheart): the owner's concept redrawn in T-pose
+  // (Tripo image-to-image) and built, auto-rigged and retargeted by Tripo, so
+  // the skeleton is fitted to this short-torso chibi (the KayKit rig put the
+  // shoulders at face height and folded the arms into the robe). The rig was
+  // then post-processed: arm-chain weight stripped from the robe and satchels,
+  // the cap and face bound rigidly to the head, and both upper arms spread 30
+  // degrees in every clip so the hands clear the satchels. Tripo bipeds face
+  // +X; its slash and defeat presets run long (the Lich form's time scales).
+  // Auto-attack plays the Cast gesture: the form fights with the wand, and the
+  // slash preset buries the face under the cap. Jump is left out the same way
+  // as the Lich (airborne frames hold Idle). Same height as the player bodies.
   form_sporemender: {
     url: `${CREATURES}/sporemender_form.glb`,
+    height: HUMANOID_H,
+    yaw: -Math.PI / 2,
+    authoredAtlas: true,
+    attackTimeScale: 6,
+    deathTimeScale: 3,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Cast'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+    },
+  },
+  // Moonwing Form on foot (a rider keeps the body: moonwingRigMask): the owner's Lunavore
+  // concepts mixed into a T-pose sheet (Tripo image-to-image), built by Smart Mesh P2 from
+  // three views and repainted from them, then auto-rigged and retargeted by Tripo. The rig
+  // was then post-processed: each clip's constant hip offset removed (Run sat about 1.7
+  // units ahead of the entity), feet and hands let go of the cloth, and the weights relaxed
+  // wherever an edge stretched past 1.5 times its rest length in any clip. Tripo bipeds
+  // face +X; timings are the Sporemender's. Its defeat preset only staggers, but form auras
+  // drop at death so a player never shows it. Auto-attack plays the Cast gesture and Jump
+  // is left out, also as Sporemender. Stands at the player body's height, so the shift
+  // neither grows nor shrinks the druid. The crown is spore_halo.ts; the rising spores
+  // are vfx.ts formAura.
+  form_moonwing: {
+    url: `${CREATURES}/moonwing_form.glb`,
     height: HUMANOID_H * 1.1,
     sporeHalo: true,
     yaw: -Math.PI / 2,

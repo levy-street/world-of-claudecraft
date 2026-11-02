@@ -50,6 +50,7 @@ describe('shapeshift-form compile gate (#2571)', () => {
       ['cat', 'catVisual'],
       ['travel', 'travelVisual'],
       ['sporemender', 'sporemenderVisual'],
+      ['moonwing', 'moonwingVisual'],
     ]) {
       expect(rigs, `${slot} gated build`).toContain(
         `${form}: { key: 'form_${form}', slot: '${slot}', gate: true }`,

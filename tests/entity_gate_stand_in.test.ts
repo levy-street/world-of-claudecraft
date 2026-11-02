@@ -129,6 +129,7 @@ function slots(overrides: Record<string, unknown> = {}) {
     travelVisual: null,
     metamorphVisual: null,
     sporemenderVisual: null,
+    moonwingVisual: null,
     fireballTravelVisual: null,
     ...overrides,
   } as never;
@@ -244,7 +245,16 @@ describe('entity gate stand-ins actually stand in', () => {
     const base = rig(true);
     const requested = requestedCharacterForm(1); // polymorph
     // Built but still linking: the readiness mask holds the resolved form at base.
-    const pendingMask = characterFormReadyMask(sheep, null, null, null, null, null, sheep.root);
+    const pendingMask = characterFormReadyMask(
+      sheep,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      sheep.root,
+    );
     const pending = characterFormVisibility(resolvedCharacterForm(requested, pendingMask));
     const view = slots({ visual: base, sheepVisual: sheep });
     applyCharacterFormVisibility(view, pending, false);
@@ -254,7 +264,7 @@ describe('entity gate stand-ins actually stand in', () => {
     expect(entityHasNoBody(false, true, true)).toBe(false);
 
     // ...and once it links the sheep takes over and the body steps back.
-    const readyMask = characterFormReadyMask(sheep, null, null, null, null, null, null);
+    const readyMask = characterFormReadyMask(sheep, null, null, null, null, null, null, null);
     const ready = characterFormVisibility(resolvedCharacterForm(requested, readyMask));
     applyCharacterFormVisibility(view, ready, false);
     expect(base.root.visible).toBe(false);

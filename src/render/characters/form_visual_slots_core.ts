@@ -17,6 +17,7 @@ export const FORM_VISUAL_SLOTS = [
   'travelVisual',
   'metamorphVisual',
   'sporemenderVisual',
+  'moonwingVisual',
 ] as const;
 
 export type FormVisualSlot = (typeof FORM_VISUAL_SLOTS)[number];
