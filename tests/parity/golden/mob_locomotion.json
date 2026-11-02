@@ -17,7 +17,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1011,
+      "nextId": 1023,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -31,9 +31,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1014,
-      "state": "96ac3d4d",
-      "events": "fc59ad47",
+      "nextId": 1026,
+      "state": "c48c1207",
+      "events": "d7aafd77",
       "rng": {
         "draws": 5,
         "digest": "b85de2ee"
@@ -82,7 +82,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1023,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -163,7 +163,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1012,
+          "entityId": 1024,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -218,7 +218,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1011
+              "sourceId": 1023
             }
           ],
           "blockChance": 0.05,
@@ -227,11 +227,10 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": -2,
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 999947,
-          "id": 1011,
+          "id": 1023,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -245,7 +244,6 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "potionCooldownUntil": -1,
@@ -253,7 +251,6 @@
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "spellPower": 5,
@@ -279,11 +276,10 @@
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "fallStartY": -2,
           "fiveSecondRule": 99,
           "healPower": 13,
           "hp": 999986,
-          "id": 1012,
+          "id": 1024,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -296,7 +292,6 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "potionCooldownUntil": -1,
@@ -304,7 +299,6 @@
           "resourceType": "mana",
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "spellPower": 13,
@@ -324,18 +318,17 @@
           }
         },
         {
-          "aggroTargetId": 1011,
+          "aggroTargetId": 1023,
           "aiState": "attack",
           "autoAttack": true,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1357,
-          "id": 1013,
+          "id": 1025,
           "inCombat": true,
           "kind": "mob",
           "level": 6,
@@ -347,14 +340,12 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "potionCooldownUntil": -1,
           "pulseTimer": 10,
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "stats": {
@@ -374,9 +365,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1015,
-      "state": "3ff302c8",
-      "events": "a55a00d1",
+      "nextId": 1027,
+      "state": "ca0b4aa3",
+      "events": "c3a8e6a4",
       "rng": {
         "draws": 10,
         "digest": "c8a57c95"
@@ -425,7 +416,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1023,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -506,7 +497,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1012,
+          "entityId": 1024,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -561,7 +552,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1011
+              "sourceId": 1023
             },
             {
               "duration": 1.5,
@@ -570,7 +561,7 @@
               "name": "Bone Rattle",
               "remaining": 1.5,
               "school": "physical",
-              "sourceId": 1014
+              "sourceId": 1026
             }
           ],
           "blockChance": 0.05,
@@ -579,11 +570,10 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": -2,
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 999953,
-          "id": 1011,
+          "id": 1023,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -597,7 +587,6 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "potionCooldownUntil": -1,
@@ -605,7 +594,6 @@
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "spellPower": 5,
@@ -635,18 +623,17 @@
               "name": "Bone Rattle",
               "remaining": 1.5,
               "school": "physical",
-              "sourceId": 1014
+              "sourceId": 1026
             }
           ],
           "comboUntil": -1,
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "fallStartY": -2,
           "fiveSecondRule": 99,
           "healPower": 13,
           "hp": 999988,
-          "id": 1012,
+          "id": 1024,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -659,7 +646,6 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "potionCooldownUntil": -1,
@@ -667,7 +653,6 @@
           "resourceType": "mana",
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "spellPower": 13,
@@ -687,18 +672,17 @@
           }
         },
         {
-          "aggroTargetId": 1011,
+          "aggroTargetId": 1023,
           "aiState": "attack",
           "autoAttack": true,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1357,
-          "id": 1013,
+          "id": 1025,
           "inCombat": true,
           "kind": "mob",
           "level": 6,
@@ -710,14 +694,12 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "potionCooldownUntil": -1,
           "pulseTimer": 10,
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "stats": {
@@ -733,18 +715,17 @@
           }
         },
         {
-          "aggroTargetId": 1011,
+          "aggroTargetId": 1023,
           "aiState": "attack",
           "autoAttack": true,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 570,
-          "id": 1014,
+          "id": 1026,
           "inCombat": true,
           "kind": "mob",
           "level": 8,
@@ -756,13 +737,11 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "stats": {
@@ -782,9 +761,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1016,
-      "state": "8817c61d",
-      "events": "a9db2371",
+      "nextId": 1028,
+      "state": "7ce24244",
+      "events": "20cbe372",
       "rng": {
         "draws": 13,
         "digest": "d051f004"
@@ -833,7 +812,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1023,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -914,7 +893,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1012,
+          "entityId": 1024,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -969,7 +948,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1011
+              "sourceId": 1023
             },
             {
               "duration": 1.5,
@@ -978,7 +957,7 @@
               "name": "Bone Rattle",
               "remaining": 1.5,
               "school": "physical",
-              "sourceId": 1014
+              "sourceId": 1026
             }
           ],
           "blockChance": 0.05,
@@ -987,11 +966,10 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": -2,
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 1000000,
-          "id": 1011,
+          "id": 1023,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -1005,7 +983,6 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "potionCooldownUntil": -1,
@@ -1013,7 +990,6 @@
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "spellPower": 5,
@@ -1043,7 +1019,7 @@
               "name": "Bone Rattle",
               "remaining": 1.5,
               "school": "physical",
-              "sourceId": 1014
+              "sourceId": 1026
             },
             {
               "breaksOnDamage": true,
@@ -1053,7 +1029,7 @@
               "name": "Keening Wail",
               "remaining": 3,
               "school": "shadow",
-              "sourceId": 1015,
+              "sourceId": 1027,
               "value": -0.564087
             }
           ],
@@ -1061,11 +1037,10 @@
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "fallStartY": -2,
           "fiveSecondRule": 99,
           "healPower": 13,
           "hp": 1000000,
-          "id": 1012,
+          "id": 1024,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -1078,7 +1053,6 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "potionCooldownUntil": -1,
@@ -1086,7 +1060,6 @@
           "resourceType": "mana",
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "spellPower": 13,
@@ -1106,18 +1079,17 @@
           }
         },
         {
-          "aggroTargetId": 1011,
+          "aggroTargetId": 1023,
           "aiState": "attack",
           "autoAttack": true,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1357,
-          "id": 1013,
+          "id": 1025,
           "inCombat": true,
           "kind": "mob",
           "level": 6,
@@ -1129,14 +1101,12 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "potionCooldownUntil": -1,
           "pulseTimer": 10,
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "stats": {
@@ -1152,18 +1122,17 @@
           }
         },
         {
-          "aggroTargetId": 1011,
+          "aggroTargetId": 1023,
           "aiState": "attack",
           "autoAttack": true,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 570,
-          "id": 1014,
+          "id": 1026,
           "inCombat": true,
           "kind": "mob",
           "level": 8,
@@ -1175,13 +1144,11 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "stats": {
@@ -1197,7 +1164,7 @@
           }
         },
         {
-          "aggroTargetId": 1011,
+          "aggroTargetId": 1023,
           "aiState": "attack",
           "autoAttack": true,
           "combatTimer": 99.05,
@@ -1205,11 +1172,10 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 2277,
-          "id": 1015,
+          "id": 1027,
           "inCombat": true,
           "kind": "mob",
           "level": 12,
@@ -1221,14 +1187,12 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "potionCooldownUntil": -1,
           "pulseTimer": 8.95,
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "stats": {
@@ -1248,8 +1212,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1017,
-      "state": "2f499e6a",
+      "nextId": 1029,
+      "state": "6d690f68",
       "events": "741638a5",
       "rng": {
         "draws": 15,
@@ -1299,7 +1263,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1023,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1380,7 +1344,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1012,
+          "entityId": 1024,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -1435,7 +1399,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1011
+              "sourceId": 1023
             },
             {
               "duration": 1.5,
@@ -1444,7 +1408,7 @@
               "name": "Bone Rattle",
               "remaining": 1.5,
               "school": "physical",
-              "sourceId": 1014
+              "sourceId": 1026
             }
           ],
           "blockChance": 0.05,
@@ -1453,11 +1417,10 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": -2,
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 1000000,
-          "id": 1011,
+          "id": 1023,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -1471,7 +1434,6 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "potionCooldownUntil": -1,
@@ -1479,7 +1441,6 @@
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "spellPower": 5,
@@ -1509,7 +1470,7 @@
               "name": "Bone Rattle",
               "remaining": 1.5,
               "school": "physical",
-              "sourceId": 1014
+              "sourceId": 1026
             },
             {
               "breaksOnDamage": true,
@@ -1519,7 +1480,7 @@
               "name": "Keening Wail",
               "remaining": 3,
               "school": "shadow",
-              "sourceId": 1015,
+              "sourceId": 1027,
               "value": -0.564087
             }
           ],
@@ -1527,11 +1488,10 @@
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "fallStartY": -2,
           "fiveSecondRule": 99,
           "healPower": 13,
           "hp": 1000000,
-          "id": 1012,
+          "id": 1024,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -1544,7 +1504,6 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "potionCooldownUntil": -1,
@@ -1552,7 +1511,6 @@
           "resourceType": "mana",
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "spellPower": 13,
@@ -1572,18 +1530,17 @@
           }
         },
         {
-          "aggroTargetId": 1011,
+          "aggroTargetId": 1023,
           "aiState": "attack",
           "autoAttack": true,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1357,
-          "id": 1013,
+          "id": 1025,
           "inCombat": true,
           "kind": "mob",
           "level": 6,
@@ -1595,14 +1552,12 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "potionCooldownUntil": -1,
           "pulseTimer": 10,
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "stats": {
@@ -1618,18 +1573,17 @@
           }
         },
         {
-          "aggroTargetId": 1011,
+          "aggroTargetId": 1023,
           "aiState": "attack",
           "autoAttack": true,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 570,
-          "id": 1014,
+          "id": 1026,
           "inCombat": true,
           "kind": "mob",
           "level": 8,
@@ -1641,13 +1595,11 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "stats": {
@@ -1663,7 +1615,7 @@
           }
         },
         {
-          "aggroTargetId": 1011,
+          "aggroTargetId": 1023,
           "aiState": "attack",
           "autoAttack": true,
           "combatTimer": 99.05,
@@ -1671,11 +1623,10 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 2277,
-          "id": 1015,
+          "id": 1027,
           "inCombat": true,
           "kind": "mob",
           "level": 12,
@@ -1687,14 +1638,12 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "potionCooldownUntil": -1,
           "pulseTimer": 8.95,
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "stats": {
@@ -1721,7 +1670,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
-          "id": 1016,
+          "id": 1028,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -1762,8 +1711,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1018,
-      "state": "1ea0ccca",
+      "nextId": 1030,
+      "state": "05b7b227",
       "events": "741638a5",
       "rng": {
         "draws": 16,
@@ -1813,7 +1762,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1023,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1894,7 +1843,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1012,
+          "entityId": 1024,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -1949,7 +1898,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1011
+              "sourceId": 1023
             },
             {
               "duration": 1.5,
@@ -1958,7 +1907,7 @@
               "name": "Bone Rattle",
               "remaining": 1.5,
               "school": "physical",
-              "sourceId": 1014
+              "sourceId": 1026
             }
           ],
           "blockChance": 0.05,
@@ -1967,11 +1916,10 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": -2,
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 1000000,
-          "id": 1011,
+          "id": 1023,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -1985,7 +1933,6 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "potionCooldownUntil": -1,
@@ -1993,7 +1940,6 @@
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "spellPower": 5,
@@ -2023,7 +1969,7 @@
               "name": "Bone Rattle",
               "remaining": 1.5,
               "school": "physical",
-              "sourceId": 1014
+              "sourceId": 1026
             },
             {
               "breaksOnDamage": true,
@@ -2033,7 +1979,7 @@
               "name": "Keening Wail",
               "remaining": 3,
               "school": "shadow",
-              "sourceId": 1015,
+              "sourceId": 1027,
               "value": -0.564087
             }
           ],
@@ -2041,11 +1987,10 @@
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "fallStartY": -2,
           "fiveSecondRule": 99,
           "healPower": 13,
           "hp": 1000000,
-          "id": 1012,
+          "id": 1024,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -2058,7 +2003,6 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "potionCooldownUntil": -1,
@@ -2066,7 +2010,6 @@
           "resourceType": "mana",
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "spellPower": 13,
@@ -2086,18 +2029,17 @@
           }
         },
         {
-          "aggroTargetId": 1011,
+          "aggroTargetId": 1023,
           "aiState": "attack",
           "autoAttack": true,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1357,
-          "id": 1013,
+          "id": 1025,
           "inCombat": true,
           "kind": "mob",
           "level": 6,
@@ -2109,14 +2051,12 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "potionCooldownUntil": -1,
           "pulseTimer": 10,
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "stats": {
@@ -2132,18 +2072,17 @@
           }
         },
         {
-          "aggroTargetId": 1011,
+          "aggroTargetId": 1023,
           "aiState": "attack",
           "autoAttack": true,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 570,
-          "id": 1014,
+          "id": 1026,
           "inCombat": true,
           "kind": "mob",
           "level": 8,
@@ -2155,13 +2094,11 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "stats": {
@@ -2177,7 +2114,7 @@
           }
         },
         {
-          "aggroTargetId": 1011,
+          "aggroTargetId": 1023,
           "aiState": "attack",
           "autoAttack": true,
           "combatTimer": 99.05,
@@ -2185,11 +2122,10 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 2277,
-          "id": 1015,
+          "id": 1027,
           "inCombat": true,
           "kind": "mob",
           "level": 12,
@@ -2201,14 +2137,12 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "potionCooldownUntil": -1,
           "pulseTimer": 8.95,
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "stats": {
@@ -2235,7 +2169,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
-          "id": 1016,
+          "id": 1028,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -2283,7 +2217,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
-          "id": 1017,
+          "id": 1029,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -2319,9 +2253,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1019,
-      "state": "ee05726b",
-      "events": "d6509a1f",
+      "nextId": 1031,
+      "state": "5eee3ce6",
+      "events": "f007c675",
       "rng": {
         "draws": 16,
         "digest": "b3c83c71"
@@ -2370,7 +2304,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1023,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -2451,7 +2385,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1012,
+          "entityId": 1024,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -2506,7 +2440,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1011
+              "sourceId": 1023
             },
             {
               "duration": 1.5,
@@ -2515,7 +2449,7 @@
               "name": "Bone Rattle",
               "remaining": 1.5,
               "school": "physical",
-              "sourceId": 1014
+              "sourceId": 1026
             }
           ],
           "blockChance": 0.05,
@@ -2524,11 +2458,10 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": -2,
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 1000000,
-          "id": 1011,
+          "id": 1023,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -2542,7 +2475,6 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "potionCooldownUntil": -1,
@@ -2550,7 +2482,6 @@
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "spellPower": 5,
@@ -2580,7 +2511,7 @@
               "name": "Bone Rattle",
               "remaining": 1.5,
               "school": "physical",
-              "sourceId": 1014
+              "sourceId": 1026
             },
             {
               "breaksOnDamage": true,
@@ -2590,7 +2521,7 @@
               "name": "Keening Wail",
               "remaining": 3,
               "school": "shadow",
-              "sourceId": 1015,
+              "sourceId": 1027,
               "value": -0.564087
             }
           ],
@@ -2598,11 +2529,10 @@
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "fallStartY": -2,
           "fiveSecondRule": 99,
           "healPower": 13,
           "hp": 1000000,
-          "id": 1012,
+          "id": 1024,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -2615,7 +2545,6 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "potionCooldownUntil": -1,
@@ -2623,7 +2552,6 @@
           "resourceType": "mana",
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "spellPower": 13,
@@ -2643,18 +2571,17 @@
           }
         },
         {
-          "aggroTargetId": 1011,
+          "aggroTargetId": 1023,
           "aiState": "attack",
           "autoAttack": true,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1357,
-          "id": 1013,
+          "id": 1025,
           "inCombat": true,
           "kind": "mob",
           "level": 6,
@@ -2666,14 +2593,12 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "potionCooldownUntil": -1,
           "pulseTimer": 10,
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "stats": {
@@ -2689,18 +2614,17 @@
           }
         },
         {
-          "aggroTargetId": 1011,
+          "aggroTargetId": 1023,
           "aiState": "attack",
           "autoAttack": true,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 570,
-          "id": 1014,
+          "id": 1026,
           "inCombat": true,
           "kind": "mob",
           "level": 8,
@@ -2712,13 +2636,11 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "stats": {
@@ -2734,7 +2656,7 @@
           }
         },
         {
-          "aggroTargetId": 1011,
+          "aggroTargetId": 1023,
           "aiState": "attack",
           "autoAttack": true,
           "combatTimer": 99.05,
@@ -2742,11 +2664,10 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 2277,
-          "id": 1015,
+          "id": 1027,
           "inCombat": true,
           "kind": "mob",
           "level": 12,
@@ -2758,14 +2679,12 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "potionCooldownUntil": -1,
           "pulseTimer": 8.95,
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "stats": {
@@ -2792,7 +2711,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
-          "id": 1016,
+          "id": 1028,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -2840,7 +2759,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
-          "id": 1017,
+          "id": 1029,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -2872,20 +2791,19 @@
           }
         },
         {
-          "aggroTargetId": 1011,
+          "aggroTargetId": 1023,
           "aiState": "flee",
           "combatTimer": 99.05,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": -2,
           "fiveSecondRule": 99,
           "fleeTimer": 5,
           "hasFled": true,
           "hostile": true,
           "hp": 20,
-          "id": 1018,
+          "id": 1030,
           "inCombat": true,
           "kind": "mob",
           "level": 6,
@@ -2897,13 +2815,11 @@
           "petMode": "defensive",
           "pos": {
             "x": -93,
-            "y": -2,
             "z": -57
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
             "x": -93,
-            "y": -2,
             "z": -57
           },
           "stats": {
@@ -2921,8 +2837,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1019,
-      "state": "38d34a08",
+      "nextId": 1031,
+      "state": "95bd5a03",
       "events": "741638a5",
       "rng": {
         "draws": 16,
@@ -2972,7 +2888,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1023,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -3053,7 +2969,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1012,
+          "entityId": 1024,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -3108,7 +3024,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1011
+              "sourceId": 1023
             },
             {
               "duration": 1.5,
@@ -3117,7 +3033,7 @@
               "name": "Bone Rattle",
               "remaining": 1.5,
               "school": "physical",
-              "sourceId": 1014
+              "sourceId": 1026
             }
           ],
           "blockChance": 0.05,
@@ -3126,11 +3042,10 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": -2,
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 1000000,
-          "id": 1011,
+          "id": 1023,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -3144,7 +3059,6 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "potionCooldownUntil": -1,
@@ -3152,7 +3066,6 @@
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "spellPower": 5,
@@ -3182,7 +3095,7 @@
               "name": "Bone Rattle",
               "remaining": 1.5,
               "school": "physical",
-              "sourceId": 1014
+              "sourceId": 1026
             },
             {
               "breaksOnDamage": true,
@@ -3192,7 +3105,7 @@
               "name": "Keening Wail",
               "remaining": 3,
               "school": "shadow",
-              "sourceId": 1015,
+              "sourceId": 1027,
               "value": -0.564087
             }
           ],
@@ -3200,11 +3113,10 @@
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "fallStartY": -2,
           "fiveSecondRule": 99,
           "healPower": 13,
           "hp": 1000000,
-          "id": 1012,
+          "id": 1024,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -3217,7 +3129,6 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "potionCooldownUntil": -1,
@@ -3225,7 +3136,6 @@
           "resourceType": "mana",
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "spellPower": 13,
@@ -3245,18 +3155,17 @@
           }
         },
         {
-          "aggroTargetId": 1011,
+          "aggroTargetId": 1023,
           "aiState": "attack",
           "autoAttack": true,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1357,
-          "id": 1013,
+          "id": 1025,
           "inCombat": true,
           "kind": "mob",
           "level": 6,
@@ -3268,14 +3177,12 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "potionCooldownUntil": -1,
           "pulseTimer": 10,
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "stats": {
@@ -3291,18 +3198,17 @@
           }
         },
         {
-          "aggroTargetId": 1011,
+          "aggroTargetId": 1023,
           "aiState": "attack",
           "autoAttack": true,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 570,
-          "id": 1014,
+          "id": 1026,
           "inCombat": true,
           "kind": "mob",
           "level": 8,
@@ -3314,13 +3220,11 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "stats": {
@@ -3336,7 +3240,7 @@
           }
         },
         {
-          "aggroTargetId": 1011,
+          "aggroTargetId": 1023,
           "aiState": "attack",
           "autoAttack": true,
           "combatTimer": 99.05,
@@ -3344,11 +3248,10 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 2277,
-          "id": 1015,
+          "id": 1027,
           "inCombat": true,
           "kind": "mob",
           "level": 12,
@@ -3360,14 +3263,12 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "potionCooldownUntil": -1,
           "pulseTimer": 8.95,
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "stats": {
@@ -3394,7 +3295,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
-          "id": 1016,
+          "id": 1028,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -3442,7 +3343,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
-          "id": 1017,
+          "id": 1029,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -3474,7 +3375,7 @@
           }
         },
         {
-          "aggroTargetId": 1011,
+          "aggroTargetId": 1023,
           "aiState": "flee",
           "combatTimer": 99.1,
           "comboUntil": -1,
@@ -3482,13 +3383,12 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "facing": 0.785398,
-          "fallStartY": -2,
           "fiveSecondRule": 99,
           "fleeTimer": 4.95,
           "hasFled": true,
           "hostile": true,
           "hp": 20,
-          "id": 1018,
+          "id": 1030,
           "inCombat": true,
           "kind": "mob",
           "level": 6,
@@ -3500,13 +3400,11 @@
           "petMode": "defensive",
           "pos": {
             "x": -92.839133,
-            "y": -2,
             "z": -56.839133
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
             "x": -93,
-            "y": -2,
             "z": -57
           },
           "stats": {
@@ -3524,8 +3422,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1019,
-      "state": "38d34a08",
+      "nextId": 1031,
+      "state": "95bd5a03",
       "events": "741638a5",
       "rng": {
         "draws": 16,
@@ -3575,7 +3473,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1023,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -3656,7 +3554,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1012,
+          "entityId": 1024,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -3711,7 +3609,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1011
+              "sourceId": 1023
             },
             {
               "duration": 1.5,
@@ -3720,7 +3618,7 @@
               "name": "Bone Rattle",
               "remaining": 1.5,
               "school": "physical",
-              "sourceId": 1014
+              "sourceId": 1026
             }
           ],
           "blockChance": 0.05,
@@ -3729,11 +3627,10 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": -2,
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 1000000,
-          "id": 1011,
+          "id": 1023,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -3747,7 +3644,6 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "potionCooldownUntil": -1,
@@ -3755,7 +3651,6 @@
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "spellPower": 5,
@@ -3785,7 +3680,7 @@
               "name": "Bone Rattle",
               "remaining": 1.5,
               "school": "physical",
-              "sourceId": 1014
+              "sourceId": 1026
             },
             {
               "breaksOnDamage": true,
@@ -3795,7 +3690,7 @@
               "name": "Keening Wail",
               "remaining": 3,
               "school": "shadow",
-              "sourceId": 1015,
+              "sourceId": 1027,
               "value": -0.564087
             }
           ],
@@ -3803,11 +3698,10 @@
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "fallStartY": -2,
           "fiveSecondRule": 99,
           "healPower": 13,
           "hp": 1000000,
-          "id": 1012,
+          "id": 1024,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -3820,7 +3714,6 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "potionCooldownUntil": -1,
@@ -3828,7 +3721,6 @@
           "resourceType": "mana",
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "spellPower": 13,
@@ -3848,18 +3740,17 @@
           }
         },
         {
-          "aggroTargetId": 1011,
+          "aggroTargetId": 1023,
           "aiState": "attack",
           "autoAttack": true,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1357,
-          "id": 1013,
+          "id": 1025,
           "inCombat": true,
           "kind": "mob",
           "level": 6,
@@ -3871,14 +3762,12 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "potionCooldownUntil": -1,
           "pulseTimer": 10,
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "stats": {
@@ -3894,18 +3783,17 @@
           }
         },
         {
-          "aggroTargetId": 1011,
+          "aggroTargetId": 1023,
           "aiState": "attack",
           "autoAttack": true,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 570,
-          "id": 1014,
+          "id": 1026,
           "inCombat": true,
           "kind": "mob",
           "level": 8,
@@ -3917,13 +3805,11 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "stats": {
@@ -3939,7 +3825,7 @@
           }
         },
         {
-          "aggroTargetId": 1011,
+          "aggroTargetId": 1023,
           "aiState": "attack",
           "autoAttack": true,
           "combatTimer": 99.05,
@@ -3947,11 +3833,10 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 2277,
-          "id": 1015,
+          "id": 1027,
           "inCombat": true,
           "kind": "mob",
           "level": 12,
@@ -3963,14 +3848,12 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "potionCooldownUntil": -1,
           "pulseTimer": 8.95,
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "stats": {
@@ -3997,7 +3880,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
-          "id": 1016,
+          "id": 1028,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -4045,7 +3928,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
-          "id": 1017,
+          "id": 1029,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -4077,7 +3960,7 @@
           }
         },
         {
-          "aggroTargetId": 1011,
+          "aggroTargetId": 1023,
           "aiState": "flee",
           "combatTimer": 99.1,
           "comboUntil": -1,
@@ -4085,13 +3968,12 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "facing": 0.785398,
-          "fallStartY": -2,
           "fiveSecondRule": 99,
           "fleeTimer": 4.95,
           "hasFled": true,
           "hostile": true,
           "hp": 20,
-          "id": 1018,
+          "id": 1030,
           "inCombat": true,
           "kind": "mob",
           "level": 6,
@@ -4103,13 +3985,11 @@
           "petMode": "defensive",
           "pos": {
             "x": -92.839133,
-            "y": -2,
             "z": -56.839133
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
             "x": -93,
-            "y": -2,
             "z": -57
           },
           "stats": {

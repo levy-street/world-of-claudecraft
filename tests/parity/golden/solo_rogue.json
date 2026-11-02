@@ -8,14 +8,14 @@
     "meleeSwing weaponStrike (sinister_strike via castAbility ~3736)",
     "combo points"
   ],
-  "draws": 249,
-  "drawDigest": "1567f635",
+  "draws": 240,
+  "drawDigest": "dd8afd0c",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1012,
-      "state": "c1c475ce",
+      "nextId": 1024,
+      "state": "1fa251cd",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -63,7 +63,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1004,
+          "entityId": 1016,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -113,11 +113,10 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0625,
           "dualWielding": true,
-          "fallStartY": -2,
           "fiveSecondRule": 99,
           "healPower": 6,
           "hp": 62,
-          "id": 1004,
+          "id": 1016,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -136,7 +135,6 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "potionCooldownUntil": -1,
@@ -144,7 +142,6 @@
           "resourceType": "energy",
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "spellPower": 6,
@@ -169,9 +166,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 1013,
-      "state": "2c2fbf30",
-      "events": "039bdf96",
+      "nextId": 1025,
+      "state": "f684a768",
+      "events": "5710cf37",
       "rng": {
         "draws": 12,
         "digest": "f30c489f"
@@ -180,9 +177,9 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 1013,
-      "state": "aa51bc95",
-      "events": "78b1cd2d",
+      "nextId": 1025,
+      "state": "590f71a3",
+      "events": "1cb0b4ce",
       "rng": {
         "draws": 19,
         "digest": "d68c35cb"
@@ -191,23 +188,23 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 1013,
-      "state": "2738f03e",
-      "events": "a7d0e1d7",
+      "nextId": 1025,
+      "state": "b51b7911",
+      "events": "83a58fff",
       "rng": {
-        "draws": 162,
-        "digest": "fe151d49"
+        "draws": 158,
+        "digest": "c470e3e8"
       }
     },
     {
       "tick": 72,
       "time": 3.6,
-      "nextId": 1013,
-      "state": "9e03e4f2",
+      "nextId": 1025,
+      "state": "3a529757",
       "events": "741638a5",
       "rng": {
-        "draws": 249,
-        "digest": "1567f635"
+        "draws": 240,
+        "digest": "dd8afd0c"
       },
       "label": "final",
       "players": [
@@ -238,15 +235,15 @@
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 104,
+            "damageDealt": 122,
             "damageTaken": 8
           },
           "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "crits": 1,
-              "damageDealt": 104
+              "crits": 2,
+              "damageDealt": 122
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -274,7 +271,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1004,
+          "entityId": 1016,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -329,11 +326,10 @@
           "dodgeChance": 0.076,
           "dualWielding": true,
           "facing": 1.570796,
-          "fallStartY": -2,
           "fiveSecondRule": 102.6,
           "healPower": 6,
           "hp": 49992,
-          "id": 1004,
+          "id": 1016,
           "inCombat": true,
           "kind": "player",
           "level": 10,
@@ -354,7 +350,6 @@
           "petMode": "defensive",
           "pos": {
             "x": -93.5,
-            "y": -2,
             "z": -58
           },
           "potionCooldownUntil": -1,
@@ -362,7 +357,6 @@
           "resourceType": "energy",
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "spellPower": 6,
@@ -375,7 +369,7 @@
             "str": 26
           },
           "swingTimer": 0.05,
-          "targetId": 1012,
+          "targetId": 1024,
           "templateId": "rogue",
           "weapon": {
             "dagger": true,
@@ -385,7 +379,7 @@
           }
         },
         {
-          "aggroTargetId": 1004,
+          "aggroTargetId": 1016,
           "aiState": "attack",
           "autoAttack": true,
           "combatTimer": 1.2,
@@ -394,16 +388,14 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "facing": -1.570796,
-          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 8896,
-          "id": 1012,
+          "hp": 8878,
+          "id": 1024,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
             "x": -92,
-            "y": -2,
             "z": -58
           },
           "level": 5,
@@ -415,26 +407,24 @@
           "petMode": "defensive",
           "pos": {
             "x": -92,
-            "y": -2,
             "z": -58
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
             "x": -92,
-            "y": -2,
             "z": -58
           },
           "stats": {
             "armor": 40
           },
           "swingTimer": 0.45,
-          "tappedById": 1004,
-          "targetId": 1004,
+          "tappedById": 1016,
+          "targetId": 1016,
           "templateId": "forest_wolf",
           "threat": [
             [
-              1004,
-              105
+              1016,
+              123
             ]
           ],
           "weapon": {

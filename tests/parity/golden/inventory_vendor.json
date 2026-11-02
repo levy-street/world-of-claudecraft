@@ -20,7 +20,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1011,
+      "nextId": 1023,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -34,8 +34,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1012,
-      "state": "79c0034c",
+      "nextId": 1024,
+      "state": "cefd750d",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -84,7 +84,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1023,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -136,7 +136,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1011
+              "sourceId": 1023
             }
           ],
           "blockChance": 0.05,
@@ -146,11 +146,11 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": -0.612396,
+          "fallStartY": -0.650177,
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 1011,
+          "id": 1023,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -162,15 +162,14 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -23,
-            "y": -0.612396,
-            "z": -94
+            "x": -12.6,
+            "y": -0.650177,
+            "z": -119.4
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "spellPower": 5,
@@ -194,9 +193,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1012,
-      "state": "e1a20831",
-      "events": "7b079d2f",
+      "nextId": 1024,
+      "state": "bff9d460",
+      "events": "c5e48677",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -246,7 +245,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1023,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -324,7 +323,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1011
+              "sourceId": 1023
             }
           ],
           "blockChance": 0.05,
@@ -334,11 +333,11 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": -0.612396,
+          "fallStartY": -0.650177,
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 1011,
+          "id": 1023,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -350,15 +349,14 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -23,
-            "y": -0.612396,
-            "z": -94
+            "x": -12.6,
+            "y": -0.650177,
+            "z": -119.4
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "spellPower": 5,
@@ -382,9 +380,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1012,
-      "state": "5b4624b7",
-      "events": "9b90e82d",
+      "nextId": 1024,
+      "state": "96672304",
+      "events": "ddca4c8c",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -436,7 +434,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1023,
           "equipment": {
             "chest": "recruit_tunic",
             "helmet": "cryptbone_helm",
@@ -526,7 +524,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1011
+              "sourceId": 1023
             }
           ],
           "blockChance": 0.05,
@@ -536,11 +534,11 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": -0.612396,
+          "fallStartY": -0.650177,
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 130,
-          "id": 1011,
+          "id": 1023,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -552,15 +550,14 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -23,
-            "y": -0.612396,
-            "z": -94
+            "x": -12.6,
+            "y": -0.650177,
+            "z": -119.4
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "spellPower": 5,
@@ -584,9 +581,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1012,
-      "state": "07f17e02",
-      "events": "7bb2d484",
+      "nextId": 1024,
+      "state": "213b9491",
+      "events": "6194f82d",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -638,7 +635,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1023,
           "equipment": {
             "chest": "recruit_tunic",
             "helmet": "roadwardens_helm",
@@ -728,7 +725,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1011
+              "sourceId": 1023
             }
           ],
           "blockChance": 0.05,
@@ -738,11 +735,11 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": -0.612396,
+          "fallStartY": -0.650177,
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 120,
-          "id": 1011,
+          "id": 1023,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -754,15 +751,14 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -23,
-            "y": -0.612396,
-            "z": -94
+            "x": -12.6,
+            "y": -0.650177,
+            "z": -119.4
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "spellPower": 5,
@@ -786,9 +782,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1012,
-      "state": "0e86f6f2",
-      "events": "bf50d54d",
+      "nextId": 1024,
+      "state": "dc895699",
+      "events": "61e4b328",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -840,7 +836,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1023,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -933,7 +929,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1011
+              "sourceId": 1023
             }
           ],
           "blockChance": 0.05,
@@ -943,11 +939,11 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": -0.612396,
+          "fallStartY": -0.650177,
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 1011,
+          "id": 1023,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -959,15 +955,14 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -23,
-            "y": -0.612396,
-            "z": -94
+            "x": -12.6,
+            "y": -0.650177,
+            "z": -119.4
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "spellPower": 5,
@@ -991,9 +986,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1012,
-      "state": "e258c033",
-      "events": "2d30819f",
+      "nextId": 1024,
+      "state": "6da742f4",
+      "events": "eed86a57",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1045,7 +1040,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1023,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1138,7 +1133,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1011
+              "sourceId": 1023
             }
           ],
           "blockChance": 0.05,
@@ -1160,11 +1155,11 @@
             "kind": "food",
             "remaining": 18
           },
-          "fallStartY": -0.612396,
+          "fallStartY": -0.650177,
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 1011,
+          "id": 1023,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1176,16 +1171,15 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -23,
-            "y": -0.612396,
-            "z": -94
+            "x": -12.6,
+            "y": -0.650177,
+            "z": -119.4
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "sitting": true,
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "spellPower": 5,
@@ -1209,9 +1203,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1012,
-      "state": "aa05a73a",
-      "events": "ec778e24",
+      "nextId": 1024,
+      "state": "d970990b",
+      "events": "2d7ce720",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1263,7 +1257,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1023,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1346,7 +1340,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1011
+              "sourceId": 1023
             }
           ],
           "blockChance": 0.05,
@@ -1368,11 +1362,11 @@
             "kind": "food",
             "remaining": 18
           },
-          "fallStartY": -0.612396,
+          "fallStartY": -0.650177,
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 1011,
+          "id": 1023,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1384,16 +1378,15 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -23,
-            "y": -0.612396,
-            "z": -94
+            "x": -12.6,
+            "y": -0.650177,
+            "z": -119.4
           },
           "potionCooldownUntil": 120,
           "resourceType": "rage",
           "sitting": true,
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "spellPower": 5,
@@ -1417,9 +1410,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1012,
-      "state": "99564366",
-      "events": "1a16079d",
+      "nextId": 1024,
+      "state": "b3c0d3e6",
+      "events": "28b5e7ab",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1472,7 +1465,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1023,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1555,7 +1548,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1011
+              "sourceId": 1023
             },
             {
               "duration": 900,
@@ -1564,7 +1557,7 @@
               "name": "Might of the Bear",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 1011,
+              "sourceId": 1023,
               "value": 12
             }
           ],
@@ -1587,11 +1580,11 @@
             "kind": "food",
             "remaining": 18
           },
-          "fallStartY": -0.612396,
+          "fallStartY": -0.650177,
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 220,
-          "id": 1011,
+          "id": 1023,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1603,16 +1596,15 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -23,
-            "y": -0.612396,
-            "z": -94
+            "x": -12.6,
+            "y": -0.650177,
+            "z": -119.4
           },
           "potionCooldownUntil": 120,
           "resourceType": "rage",
           "sitting": true,
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "spellPower": 5,
@@ -1636,9 +1628,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1012,
-      "state": "84a81cd5",
-      "events": "f769fd0b",
+      "nextId": 1024,
+      "state": "ffaacee9",
+      "events": "f97f8215",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1695,7 +1687,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1023,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1778,7 +1770,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1011
+              "sourceId": 1023
             },
             {
               "duration": 900,
@@ -1787,7 +1779,7 @@
               "name": "Might of the Serpent",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 1011,
+              "sourceId": 1023,
               "value": 12
             }
           ],
@@ -1810,11 +1802,11 @@
             "kind": "food",
             "remaining": 18
           },
-          "fallStartY": -0.612396,
+          "fallStartY": -0.650177,
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 220,
-          "id": 1011,
+          "id": 1023,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1826,16 +1818,15 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -23,
-            "y": -0.612396,
-            "z": -94
+            "x": -12.6,
+            "y": -0.650177,
+            "z": -119.4
           },
           "potionCooldownUntil": 120,
           "resourceType": "rage",
           "sitting": true,
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "spellPower": 5,
@@ -1859,9 +1850,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1012,
-      "state": "8f3b83c3",
-      "events": "b5f7ad8a",
+      "nextId": 1024,
+      "state": "ba0b4c9f",
+      "events": "9c352e4e",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1919,7 +1910,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1023,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -2012,7 +2003,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1011
+              "sourceId": 1023
             },
             {
               "duration": 900,
@@ -2021,7 +2012,7 @@
               "name": "Might of the Serpent",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 1011,
+              "sourceId": 1023,
               "value": 12
             }
           ],
@@ -2044,11 +2035,11 @@
             "kind": "food",
             "remaining": 18
           },
-          "fallStartY": -0.612396,
+          "fallStartY": -0.650177,
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 220,
-          "id": 1011,
+          "id": 1023,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -2060,16 +2051,15 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -23,
-            "y": -0.612396,
-            "z": -94
+            "x": -12.6,
+            "y": -0.650177,
+            "z": -119.4
           },
           "potionCooldownUntil": 120,
           "resourceType": "rage",
           "sitting": true,
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "spellPower": 5,
@@ -2093,9 +2083,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1012,
-      "state": "9df7ddc9",
-      "events": "86f491d4",
+      "nextId": 1024,
+      "state": "c9f2453d",
+      "events": "822f7e86",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -2153,7 +2143,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1023,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -2258,7 +2248,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1011
+              "sourceId": 1023
             },
             {
               "duration": 900,
@@ -2267,7 +2257,7 @@
               "name": "Might of the Serpent",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 1011,
+              "sourceId": 1023,
               "value": 12
             }
           ],
@@ -2290,11 +2280,11 @@
             "kind": "food",
             "remaining": 18
           },
-          "fallStartY": -0.612396,
+          "fallStartY": -0.650177,
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 220,
-          "id": 1011,
+          "id": 1023,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -2306,16 +2296,15 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -23,
-            "y": -0.612396,
-            "z": -94
+            "x": -12.6,
+            "y": -0.650177,
+            "z": -119.4
           },
           "potionCooldownUntil": 120,
           "resourceType": "rage",
           "sitting": true,
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "spellPower": 5,
@@ -2339,9 +2328,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1012,
-      "state": "a41039b8",
-      "events": "b5a00f90",
+      "nextId": 1024,
+      "state": "0a462a16",
+      "events": "a6b0276b",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -2400,7 +2389,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1023,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -2505,7 +2494,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1011
+              "sourceId": 1023
             },
             {
               "duration": 900,
@@ -2514,7 +2503,7 @@
               "name": "Might of the Serpent",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 1011,
+              "sourceId": 1023,
               "value": 12
             }
           ],
@@ -2537,11 +2526,11 @@
             "kind": "food",
             "remaining": 18
           },
-          "fallStartY": -0.612396,
+          "fallStartY": -0.650177,
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 220,
-          "id": 1011,
+          "id": 1023,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -2553,16 +2542,15 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -23,
-            "y": -0.612396,
-            "z": -94
+            "x": -12.6,
+            "y": -0.650177,
+            "z": -119.4
           },
           "potionCooldownUntil": 120,
           "resourceType": "rage",
           "sitting": true,
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "spellPower": 5,
@@ -2586,9 +2574,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1012,
-      "state": "b38fa9cf",
-      "events": "d30c5a4d",
+      "nextId": 1024,
+      "state": "29d99db5",
+      "events": "2327c717",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -2647,7 +2635,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1023,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -2740,7 +2728,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1011
+              "sourceId": 1023
             },
             {
               "duration": 900,
@@ -2749,7 +2737,7 @@
               "name": "Might of the Serpent",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 1011,
+              "sourceId": 1023,
               "value": 12
             }
           ],
@@ -2772,11 +2760,11 @@
             "kind": "food",
             "remaining": 18
           },
-          "fallStartY": -0.612396,
+          "fallStartY": -0.650177,
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 220,
-          "id": 1011,
+          "id": 1023,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -2788,16 +2776,15 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -23,
-            "y": -0.612396,
-            "z": -94
+            "x": -12.6,
+            "y": -0.650177,
+            "z": -119.4
           },
           "potionCooldownUntil": 120,
           "resourceType": "rage",
           "sitting": true,
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "spellPower": 5,
@@ -2821,8 +2808,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1012,
-      "state": "b38fa9cf",
+      "nextId": 1024,
+      "state": "29d99db5",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -2882,7 +2869,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1023,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -2975,7 +2962,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1011
+              "sourceId": 1023
             },
             {
               "duration": 900,
@@ -2984,7 +2971,7 @@
               "name": "Might of the Serpent",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 1011,
+              "sourceId": 1023,
               "value": 12
             }
           ],
@@ -3007,11 +2994,11 @@
             "kind": "food",
             "remaining": 18
           },
-          "fallStartY": -0.612396,
+          "fallStartY": -0.650177,
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 220,
-          "id": 1011,
+          "id": 1023,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -3023,16 +3010,15 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -23,
-            "y": -0.612396,
-            "z": -94
+            "x": -12.6,
+            "y": -0.650177,
+            "z": -119.4
           },
           "potionCooldownUntil": 120,
           "resourceType": "rage",
           "sitting": true,
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "spellPower": 5,

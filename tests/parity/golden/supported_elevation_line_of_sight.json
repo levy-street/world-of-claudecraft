@@ -9,13 +9,13 @@
     "airborne player elevation is rejected behind ordinary open-world cover",
     "shared Sim cast entry point and completion LOS recheck"
   ],
-  "draws": 363,
-  "drawDigest": "a438d31c",
+  "draws": 356,
+  "drawDigest": "06636d69",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1011,
+      "nextId": 1023,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -29,9 +29,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1013,
-      "state": "137db86a",
-      "events": "ca8fe89b",
+      "nextId": 1025,
+      "state": "ffa84084",
+      "events": "9b3e0926",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -78,7 +78,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1023,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -160,7 +160,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1012,
+          "entityId": 1024,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -205,7 +205,7 @@
           "aiState": "idle",
           "attackPower": 10,
           "castRemaining": 2,
-          "castTargetId": 1012,
+          "castTargetId": 1024,
           "castTotal": 2,
           "castingAbility": "lesser_heal",
           "combatTimer": 99,
@@ -213,12 +213,12 @@
           "critChance": 0.0555,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0555,
-          "fallStartY": 2.057629,
+          "fallStartY": 2,
           "fiveSecondRule": 99,
           "gcdRemaining": 1.5,
           "healPower": 12,
           "hp": 51,
-          "id": 1011,
+          "id": 1023,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -229,16 +229,15 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -20.5,
-            "y": 2.057629,
-            "z": -94
+            "x": -51.932968,
+            "y": 2,
+            "z": -114.294038
           },
           "potionCooldownUntil": -1,
           "resource": 175,
           "resourceType": "mana",
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "spellPower": 12,
@@ -268,7 +267,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1012
+              "sourceId": 1024
             }
           ],
           "blockChance": 0.05,
@@ -278,11 +277,11 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": -0.345482,
+          "fallStartY": 0.858835,
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 1,
-          "id": 1012,
+          "id": 1024,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -294,15 +293,14 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -20.5,
-            "y": -0.345482,
-            "z": -86
+            "x": -51.932968,
+            "y": 0.858835,
+            "z": -106.294038
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "spellPower": 5,
@@ -326,8 +324,8 @@
     {
       "tick": 10,
       "time": 0.5,
-      "nextId": 1013,
-      "state": "8ba91959",
+      "nextId": 1025,
+      "state": "338de1e9",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -337,9 +335,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 1013,
-      "state": "cc5440bd",
-      "events": "3f5a7a0c",
+      "nextId": 1025,
+      "state": "14209627",
+      "events": "772d6648",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -348,8 +346,8 @@
     {
       "tick": 30,
       "time": 1.5,
-      "nextId": 1013,
-      "state": "2bc859ac",
+      "nextId": 1025,
+      "state": "6beead18",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -359,9 +357,9 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 1013,
-      "state": "3d64c8d0",
-      "events": "c480a1f9",
+      "nextId": 1025,
+      "state": "4d303773",
+      "events": "67a3a2c6",
       "rng": {
         "draws": 2,
         "digest": "f56e9f11"
@@ -370,8 +368,8 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 1013,
-      "state": "3d64c8d0",
+      "nextId": 1025,
+      "state": "4d303773",
       "events": "741638a5",
       "rng": {
         "draws": 2,
@@ -415,15 +413,11 @@
               "baked_bread",
               "gnarled_staff",
               "spring_water"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:eastbrook",
-              "poi:eastbrook_vale:the_sowfield"
             ]
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1023,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -501,14 +495,11 @@
               "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1012,
+          "entityId": 1024,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -558,11 +549,11 @@
           "critChance": 0.0555,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0555,
-          "fallStartY": 2.057629,
+          "fallStartY": 2,
           "fiveSecondRule": 0.05,
           "healPower": 12,
           "hp": 51,
-          "id": 1011,
+          "id": 1023,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -573,16 +564,15 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -20.5,
-            "y": 2.057629,
-            "z": -94
+            "x": -51.932968,
+            "y": 2,
+            "z": -114.294038
           },
           "potionCooldownUntil": -1,
           "resource": 149,
           "resourceType": "mana",
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "spellPower": 12,
@@ -612,7 +602,7 @@
               "name": "Battle Stance",
               "remaining": 3598,
               "school": "physical",
-              "sourceId": 1012
+              "sourceId": 1024
             }
           ],
           "blockChance": 0.05,
@@ -622,11 +612,11 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": -0.345482,
+          "fallStartY": 0.858835,
           "fiveSecondRule": 101,
           "healPower": 5,
           "hp": 74,
-          "id": 1012,
+          "id": 1024,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -638,15 +628,14 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -20.5,
-            "y": -0.345482,
-            "z": -86
+            "x": -51.932968,
+            "y": 0.858835,
+            "z": -106.294038
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "spellPower": 5,
@@ -670,9 +659,9 @@
     {
       "tick": 41,
       "time": 2.05,
-      "nextId": 1013,
-      "state": "f2bee176",
-      "events": "ca8fe89b",
+      "nextId": 1025,
+      "state": "a0cfd803",
+      "events": "9b3e0926",
       "rng": {
         "draws": 6,
         "digest": "05c1975a"
@@ -715,15 +704,11 @@
               "baked_bread",
               "gnarled_staff",
               "spring_water"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:eastbrook",
-              "poi:eastbrook_vale:the_sowfield"
             ]
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1023,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -801,14 +786,11 @@
               "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1012,
+          "entityId": 1024,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -853,7 +835,7 @@
           "aiState": "idle",
           "attackPower": 10,
           "castRemaining": 2,
-          "castTargetId": 1012,
+          "castTargetId": 1024,
           "castTotal": 2,
           "castingAbility": "lesser_heal",
           "combatTimer": 101.05,
@@ -861,12 +843,12 @@
           "critChance": 0.0555,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0555,
-          "fallStartY": -0.345482,
+          "fallStartY": 0.858835,
           "fiveSecondRule": 0.1,
           "gcdRemaining": 1.5,
           "healPower": 12,
           "hp": 51,
-          "id": 1011,
+          "id": 1023,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -877,16 +859,15 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -20.5,
-            "y": -0.345482,
-            "z": -86
+            "x": -51.932968,
+            "y": 0.858835,
+            "z": -106.294038
           },
           "potionCooldownUntil": -1,
           "resource": 175,
           "resourceType": "mana",
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "spellPower": 12,
@@ -916,7 +897,7 @@
               "name": "Battle Stance",
               "remaining": 3597.95,
               "school": "physical",
-              "sourceId": 1012
+              "sourceId": 1024
             }
           ],
           "blockChance": 0.05,
@@ -926,11 +907,11 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": 2.057629,
+          "fallStartY": 2,
           "fiveSecondRule": 101.05,
           "healPower": 5,
           "hp": 1,
-          "id": 1012,
+          "id": 1024,
           "jumping": true,
           "kind": "player",
           "level": 1,
@@ -942,15 +923,14 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -20.5,
-            "y": 2.317629,
-            "z": -94
+            "x": -51.932968,
+            "y": 2.26,
+            "z": -114.294038
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "spellPower": 5,
@@ -974,56 +954,56 @@
     {
       "tick": 50,
       "time": 2.5,
-      "nextId": 1013,
-      "state": "9f92de4b",
+      "nextId": 1025,
+      "state": "381afdcf",
       "events": "741638a5",
       "rng": {
-        "draws": 68,
-        "digest": "67de50d8"
+        "draws": 66,
+        "digest": "178c81b8"
       }
     },
     {
       "tick": 60,
       "time": 3,
-      "nextId": 1013,
-      "state": "f07003f2",
+      "nextId": 1025,
+      "state": "efa9a434",
       "events": "741638a5",
       "rng": {
-        "draws": 158,
-        "digest": "85fd701d"
+        "draws": 156,
+        "digest": "6f3d7c3a"
       }
     },
     {
       "tick": 70,
       "time": 3.5,
-      "nextId": 1013,
-      "state": "5bfc07bd",
+      "nextId": 1025,
+      "state": "319c67e9",
       "events": "741638a5",
       "rng": {
-        "draws": 250,
-        "digest": "3d6c5d68"
+        "draws": 245,
+        "digest": "7b4a10fb"
       }
     },
     {
       "tick": 80,
       "time": 4,
-      "nextId": 1013,
-      "state": "f4f06cae",
+      "nextId": 1025,
+      "state": "82c93d8a",
       "events": "741638a5",
       "rng": {
-        "draws": 354,
-        "digest": "6f936d90"
+        "draws": 347,
+        "digest": "fd115848"
       }
     },
     {
       "tick": 81,
       "time": 4.05,
-      "nextId": 1013,
-      "state": "9b21260b",
-      "events": "645bcfaa",
+      "nextId": 1025,
+      "state": "c412aaeb",
+      "events": "67a3a2c6",
       "rng": {
-        "draws": 363,
-        "digest": "a438d31c"
+        "draws": 356,
+        "digest": "06636d69"
       },
       "label": "canopy-jump-heal-complete",
       "players": [
@@ -1063,15 +1043,11 @@
               "baked_bread",
               "gnarled_staff",
               "spring_water"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:eastbrook",
-              "poi:eastbrook_vale:the_sowfield"
             ]
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1023,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -1149,15 +1125,11 @@
               "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:eastbrook",
-              "poi:eastbrook_vale:the_sowfield"
             ]
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1012,
+          "entityId": 1024,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1207,11 +1179,11 @@
           "critChance": 0.0555,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0555,
-          "fallStartY": -0.345482,
+          "fallStartY": 0.858835,
           "fiveSecondRule": 0.05,
           "healPower": 12,
           "hp": 51,
-          "id": 1011,
+          "id": 1023,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1222,16 +1194,15 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -20.5,
-            "y": -0.345482,
-            "z": -86
+            "x": -51.932968,
+            "y": 0.858835,
+            "z": -106.294038
           },
           "potionCooldownUntil": -1,
           "resource": 145,
           "resourceType": "mana",
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "spellPower": 12,
@@ -1261,7 +1232,7 @@
               "name": "Battle Stance",
               "remaining": 3595.95,
               "school": "physical",
-              "sourceId": 1012
+              "sourceId": 1024
             }
           ],
           "blockChance": 0.05,
@@ -1271,11 +1242,11 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": 2.057629,
+          "fallStartY": 2,
           "fiveSecondRule": 103.05,
           "healPower": 5,
-          "hp": 79,
-          "id": 1012,
+          "hp": 74,
+          "id": 1024,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1287,15 +1258,14 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -20.5,
-            "y": 2.057629,
-            "z": -94
+            "x": -51.932968,
+            "y": 2,
+            "z": -114.294038
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "spellPower": 5,
@@ -1319,12 +1289,12 @@
     {
       "tick": 81,
       "time": 4.05,
-      "nextId": 1013,
-      "state": "a085cbde",
-      "events": "2d150004",
+      "nextId": 1025,
+      "state": "a05b5981",
+      "events": "af9efbf3",
       "rng": {
-        "draws": 363,
-        "digest": "a438d31c"
+        "draws": 356,
+        "digest": "06636d69"
       },
       "label": "airborne-cover-denied",
       "players": [
@@ -1364,15 +1334,11 @@
               "baked_bread",
               "gnarled_staff",
               "spring_water"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:eastbrook",
-              "poi:eastbrook_vale:the_sowfield"
             ]
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1023,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -1450,15 +1416,11 @@
               "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:eastbrook",
-              "poi:eastbrook_vale:the_sowfield"
             ]
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1012,
+          "entityId": 1024,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1512,7 +1474,7 @@
           "fiveSecondRule": 0.05,
           "healPower": 12,
           "hp": 51,
-          "id": 1011,
+          "id": 1023,
           "jumping": true,
           "kind": "player",
           "level": 1,
@@ -1532,7 +1494,6 @@
           "resourceType": "mana",
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "spellPower": 12,
@@ -1562,7 +1523,7 @@
               "name": "Battle Stance",
               "remaining": 3595.95,
               "school": "physical",
-              "sourceId": 1012
+              "sourceId": 1024
             }
           ],
           "blockChance": 0.05,
@@ -1576,7 +1537,7 @@
           "fiveSecondRule": 103.05,
           "healPower": 5,
           "hp": 1,
-          "id": 1012,
+          "id": 1024,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1596,7 +1557,6 @@
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "spellPower": 5,
@@ -1620,12 +1580,12 @@
     {
       "tick": 81,
       "time": 4.05,
-      "nextId": 1013,
-      "state": "a085cbde",
+      "nextId": 1025,
+      "state": "a05b5981",
       "events": "741638a5",
       "rng": {
-        "draws": 363,
-        "digest": "a438d31c"
+        "draws": 356,
+        "digest": "06636d69"
       },
       "label": "final",
       "players": [
@@ -1665,15 +1625,11 @@
               "baked_bread",
               "gnarled_staff",
               "spring_water"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:eastbrook",
-              "poi:eastbrook_vale:the_sowfield"
             ]
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1023,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -1751,15 +1707,11 @@
               "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:eastbrook",
-              "poi:eastbrook_vale:the_sowfield"
             ]
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1012,
+          "entityId": 1024,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1813,7 +1765,7 @@
           "fiveSecondRule": 0.05,
           "healPower": 12,
           "hp": 51,
-          "id": 1011,
+          "id": 1023,
           "jumping": true,
           "kind": "player",
           "level": 1,
@@ -1833,7 +1785,6 @@
           "resourceType": "mana",
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "spellPower": 12,
@@ -1863,7 +1814,7 @@
               "name": "Battle Stance",
               "remaining": 3595.95,
               "school": "physical",
-              "sourceId": 1012
+              "sourceId": 1024
             }
           ],
           "blockChance": 0.05,
@@ -1877,7 +1828,7 @@
           "fiveSecondRule": 103.05,
           "healPower": 5,
           "hp": 1,
-          "id": 1012,
+          "id": 1024,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1897,7 +1848,6 @@
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
-            "y": -2,
             "z": -58
           },
           "spellPower": 5,
