@@ -1138,6 +1138,7 @@ const RENDER_PURE_CORES = [
   'src/render/smith_heart/heart_quarters_core.ts',
   // Phase 2M: the wall landmarks' frame, spots, eruption and lightning.
   'src/render/smith_heart/heart_landmarks_core.ts',
+  'src/render/smith_heart_fx/final_body_core.ts',
   'src/render/smith_heart_fx/final_fx_core.ts',
   'src/render/smith_heart_fx/final_kit_fx_core.ts',
   'src/render/smith_heart_fx/final_phase_fx_core.ts',

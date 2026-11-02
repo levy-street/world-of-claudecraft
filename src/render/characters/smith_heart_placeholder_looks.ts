@@ -70,11 +70,12 @@ export const SMITH_HEART_PLACEHOLDER_LOOKS: Record<string, string> = {
   // Stone Prison's block: a bodyless target under the stone council_prison_fx.ts draws.
   heart_stone_prison: 'smith_heart_stone_prison',
   // ---- the final boss -----------------------------------------------------------
-  // Phase 2J: the Masterless Strength is a bodyless target; its body (the
-  // colossus of the Heart kit's rock pieces round the crystal heart) is drawn
-  // by smith_heart_fx/final_fx.ts. Final: its own model (the official
-  // pipeline), the same joints and timeline.
-  heart_masterless_strength: 'smith_heart_colossus',
+  // Its own model (phase 2O, smith_heart_boss_looks.ts): the Quadrant
+  // Guardian, one rigged body in four element looks the quarter it stands in
+  // picks (smith_heart_fx/final_body_fx.ts). The Heart kit's rock pieces
+  // still fly in for the arrival (smith_heart_fx/final_fx.ts) and lock into
+  // it under the shockwave.
+  heart_masterless_strength: 'smith_heart_masterless_strength',
   // Its Splinters (part 2, encounters/smith_heart/final_adds.ts): the
   // nearest existing bodies of each element, tinted by their entity colour
   // and drawn two and a half times a player's size; their element's light is

@@ -215,6 +215,7 @@ import { SANCTUM_BOSS_LOOKS, SANCTUM_BOSS_MOB_KEYS } from './sanctum_boss_looks'
 import { SANCTUM_MOB_KEYS, sanctumCreatureLooks } from './sanctum_creature_looks';
 import { seasonalTrickLooks } from './seasonal_trick_looks';
 import type { SeatClipSet } from './seat_clips';
+import { SMITH_HEART_BOSS_LOOKS } from './smith_heart_boss_looks';
 import { SMITH_HEART_PLACEHOLDER_LOOKS } from './smith_heart_placeholder_looks';
 import type { WeaponLoadout } from './weapon_loadout_core';
 import { WILDHEART_MOB_KEYS, wildheartPlaceholderLooks } from './wildheart_creature_looks';
@@ -4246,22 +4247,6 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.4,
   },
-  // The Masterless Strength (the Smith's Heart's final boss, phase 2J): a
-  // bodyless target, its click capsule, nameplate and bars over the colossus
-  // of rock pieces and crystal the raid's own effects draw
-  // (smith_heart_fx/final_fx.ts) until its own model ships. Bound off the
-  // goleling's rig (never seen); its height times the boss's scale (3.6) is
-  // the colossus's, so the nameplate rides over its head. Every Smith's Heart
-  // bodyless target binds ELEMENTAL_FLOATING, so each carries mob_elemental's
-  // Elemental_Attack donor (already loaded for the raid's elemental warders).
-  smith_heart_colossus: {
-    url: `${CREATURES}/golelingevolved.glb`,
-    height: 5.6,
-    clips: ELEMENTAL_FLOATING,
-    animUrls: [`${CREATURES}/elemental_ability_anims.glb`],
-    bodyless: true,
-    clickRadius: 4.4,
-  },
   // The Hammer Council's Slabwright and Seam Singer (the Smith's Heart's first
   // boss, design doc 7.1): bodyless targets, their click capsules, nameplates
   // and bars over the provisional rock-and-crystal bodies the raid's own
@@ -8287,6 +8272,8 @@ Object.assign(VISUALS, wildheartPlaceholderLooks(VISUALS));
 Object.assign(VISUALS, sanctumCreatureLooks(VISUALS));
 // The Gravewyrm Sanctum's three bosses (sanctum_boss_looks.ts).
 Object.assign(VISUALS, SANCTUM_BOSS_LOOKS);
+// The Smith's Heart's own boss models (smith_heart_boss_looks.ts).
+Object.assign(VISUALS, SMITH_HEART_BOSS_LOOKS);
 // Gourdlight Eve's trick bodies, the bat and the skeleton (seasonal_trick_looks.ts).
 Object.assign(VISUALS, seasonalTrickLooks(VISUALS));
 

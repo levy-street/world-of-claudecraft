@@ -24,9 +24,11 @@
 //    riding out over the whole Anvil on the trash engine's wave clock, a
 //    pulse a low ring of it (the bars themselves are the HUD's, the floor's
 //    light the room's);
-//  - the death: the threads snapping, every piece falling, crumbling to
-//    rubble or tumbling off the lip into the chasm, the heart flickering
-//    dark and sinking into its bed (the room goes dark with it:
+//  - its own model (phase 2O, final_body_fx.ts): the rigged Quadrant
+//    Guardian takes the pieces' place under the arrival's shockwave, wears
+//    the body of the quarter it drinks and transforms as it crosses;
+//  - the death: the model's fall, the heart rising out of its chest,
+//    flickering dark and sinking into its bed (the room goes dark with it:
 //    ../smith_heart/heart_final_core.ts).
 // Cosmetic layers thin on the low tier (particles) and under reduced
 // motion (the shake); the body, the telegraph and the timelines never do.
@@ -67,6 +69,8 @@ import { heartSealSlotKey, heartSealView, newHeartSealView } from '../smith_hear
 import { radialGlowTexture } from '../textures';
 import { EngineParticles } from '../trash_engine_fx/engine_particles';
 import { NOVA_WAVE_SECONDS, novaWave } from '../trash_engine_fx/trash_engine_fx_core';
+import { FINAL_BODY_HEIGHT, finalBodyPoint } from './final_body_core';
+import { FinalBodyFx } from './final_body_fx';
 import {
   ARRIVAL,
   ARRIVAL_END,
@@ -85,7 +89,6 @@ import {
   type ColossusPiece,
   colossusArmIk,
   colossusBreath,
-  colossusFallPhase,
   colossusFallPlan,
   colossusFlyPoint,
   colossusLiftHeight,
@@ -309,6 +312,12 @@ export class FinalFx {
   private readonly burstTint = new THREE.Color(C.seam);
   private fistImpactDue = -1;
   private bossHitAt = -99;
+  /** Its own model: the element bodies, the transformation, the auras. */
+  private readonly bodyFx: FinalBodyFx;
+  private readonly heartAt = { x: 0, y: 0, z: 0 };
+  private zone: ReturnType<typeof finalZoneOf> = 'ring';
+  private readonly diedHeart = new THREE.Vector3();
+  private diedHeartSet = false;
 
   constructor(
     scene: THREE.Scene,
@@ -317,6 +326,7 @@ export class FinalFx {
     compileGate?: (target: THREE.Object3D) => Promise<unknown>,
     private readonly reducedMotion: () => boolean = () => false,
     private readonly shakeSink?: (amount: number) => void,
+    playGesture?: (entityId: number, gesture: string) => void,
   ) {
     this.root.name = 'smith-heart-final-fx';
     setRenderCategory(this.root, 'ui3d');
@@ -477,6 +487,18 @@ export class FinalFx {
       const w = this.wrist[s < 0 ? 0 : 1];
       w.set(s * COLOSSUS_ARM.idle.x, COLOSSUS_ARM.idle.y, COLOSSUS_ARM.idle.z);
     }
+    this.bodyFx = new FinalBodyFx(
+      this.root,
+      {
+        particles: this.particles,
+        density: this.density,
+        flash: (x, y, z, size, span, color) => this.flash(x, y, z, size, span, color),
+        shakeNear: (x, z, amount, reach) => this.shakeNear(x, z, amount, reach),
+        rand: () => this.rand(),
+        groundY: (x, z) => this.groundY(x, z),
+      },
+      playGesture,
+    );
     this.readyForEntry = attachSceneGroupGated(scene, this.root, compileGate, () => this.disposed)
       .then(() => {})
       .catch(() => {});
@@ -602,6 +624,7 @@ export class FinalFx {
     }
     const boss = this.bossId >= 0 ? world.entities.get(this.bossId) : undefined;
     if (!boss) {
+      this.bodyFx.lost();
       this.body.visible = false;
       this.heartHalo.visible = false;
       this.riseBeam.visible = false;
@@ -682,6 +705,15 @@ export class FinalFx {
     this.updateThreads(t);
     this.updateFlashes();
     this.updateTint(boss, dt);
+    this.bodyFx.update({
+      boss,
+      zone: this.zone,
+      whole: t >= ARRIVAL_WAVE_AT,
+      dead: this.deadAt >= 0,
+      kneeling: heartCollapseView(this.slotKey)?.stage === 'kneel',
+      clock: this.clock,
+      dt,
+    });
     this.updateWrath();
     if (this.fistImpactDue > 0 && this.clock >= this.fistImpactDue) {
       this.fistImpactDue = -1;
@@ -928,6 +960,27 @@ export class FinalFx {
   private poseBody(boss: Entity, t: number, dt: number): void {
     this.slotPoses(boss, dt);
     const dead = this.deadAt >= 0;
+    // The model stands whole: the heart is the gem in its chest.
+    const modelWhole = dead || t >= ARRIVAL_WAVE_AT;
+    if (modelWhole) {
+      const at = fxAnchor(boss);
+      const h = finalBodyPoint(
+        'heart',
+        at.x - this.originX,
+        this.groundY(at.x, at.z) + this.body.position.y,
+        at.z - this.originZ,
+        boss.facing,
+        FINAL_BODY_HEIGHT * (boss.scale > 0 ? boss.scale : 1),
+        this.heartAt,
+      );
+      // Dead: the heart starts from the chest it stood in as it fell.
+      if (!dead || !this.diedHeartSet) {
+        this.diedHeart.set(h.x, h.y, h.z);
+        this.diedHeartSet = dead;
+      }
+      this.heartPos.copy(this.diedHeart);
+    }
+    if (!dead) this.diedHeartSet = false;
     const deathT = dead ? this.clock - this.deadAt : 0;
     // The heart.
     let heartLevel = 1;
@@ -1029,6 +1082,9 @@ export class FinalFx {
             ? 1
             : 1 - (t - ARRIVAL.riseEnd) / (ARRIVAL.glideEnd - ARRIVAL.riseEnd);
       this.heartMesh.scale.setScalar(1.5 + 1.3 * swell);
+      // The model's own gem is the heart while it stands; the crystal shows
+      // through the arrival and rises out of its chest at its death.
+      this.heartMesh.visible = !modelWhole || dead;
     }
     this.heartHalo.visible = true;
     // The halo is in the root's frame (world); the body's group is offset.
@@ -1044,8 +1100,10 @@ export class FinalFx {
     // Every piece.
     for (const p of this.pieces) {
       const h = p.holder;
-      if (dead) {
-        this.poseFallen(p, deathT, dt);
+      if (modelWhole) {
+        // The pieces have locked into the model under the shockwave.
+        if (h) h.visible = false;
+        if (p.rubble) p.rubble.visible = false;
         continue;
       }
       if (t < 0 || t < ARRIVAL_END) {
@@ -1241,6 +1299,15 @@ export class FinalFx {
 
   private updateThreads(t: number): void {
     const dead = this.deadAt >= 0;
+    if (dead || t >= ARRIVAL_WAVE_AT) {
+      // The model stands whole: no piece to stitch.
+      if (this.threads.visible) {
+        for (const p of this.pieces) this.threads.setMatrixAt(p.index, _m.makeScale(0, 0, 0));
+        this.threads.instanceMatrix.needsUpdate = true;
+        this.threads.visible = false;
+      }
+      return;
+    }
     const deathT = dead ? this.clock - this.deadAt : 0;
     const hx = this.originX + this.heartPos.x;
     const hz = this.originZ + this.heartPos.z;
@@ -1323,91 +1390,6 @@ export class FinalFx {
     }
   }
 
-  private poseFallen(p: PieceRig, t: number, _dt: number): void {
-    const h = p.holder;
-    const plan = p.fall;
-    if (!h || !plan) return;
-    const ph = colossusFallPhase(plan, t);
-    const land = plan.land;
-    if (ph.phase === 'held') {
-      h.visible = true;
-      h.position.copy(p.diedPos);
-      h.quaternion.copy(p.diedQuat);
-      return;
-    }
-    if (ph.phase === 'fall') {
-      h.visible = true;
-      const k = ph.k;
-      const x = p.diedPos.x + (land.x - p.diedPos.x) * k;
-      const z = p.diedPos.z + (land.z - p.diedPos.z) * k;
-      const ground = plan.chasm
-        ? land.y
-        : this.groundY(this.originX + land.x, this.originZ + land.z) + p.def.size * 0.2;
-      // Falling under gravity from where it hung, a little hop outward.
-      const y =
-        p.diedPos.y + (ground - p.diedPos.y) * k * k + Math.sin(Math.PI * k) * 2.5 * (1 - k);
-      h.position.set(x, y, z);
-      _e.set(k * 3.2 + p.index, k * 1.4, k * 2.1, 'XYZ');
-      _q.setFromEuler(_e);
-      h.quaternion.copy(p.diedQuat).multiply(_q);
-      return;
-    }
-    if (ph.phase === 'crumble') {
-      h.visible = true;
-      const s = p.def.scale * (1 - ph.k * 0.9);
-      h.scale.set(p.def.joint === 'shoulder' && p.def.side < 0 ? -s : s, s, s);
-      if (!p.landed) {
-        p.landed = true;
-        const wx = this.originX + h.position.x;
-        const wz = this.originZ + h.position.z;
-        const gy = this.groundY(wx, wz);
-        this.particles.puff(wx, gy + 0.6, wz, Math.round(14 + p.def.size * 3), {
-          speed: 4.5,
-          up: 2.5,
-          life: 1.8,
-          size: [1.4, 4.4],
-          color: C.dust,
-          alpha: 0.45,
-          drag: 1.1,
-          radius: p.def.size * 0.4,
-        });
-        this.particles.puff(wx, gy + 0.6, wz, 10, {
-          speed: 6,
-          up: 5,
-          life: 1.1,
-          size: [0.4, 0.2],
-          color: C.dustDark,
-          alpha: 1,
-          gravity: 18,
-        });
-        this.particles.shockRing(wx, wz, C.ring, p.def.size * 1.2, 0.5);
-        if (p.def.joint !== 'shard') this.shakeNear(wx, wz, 0.15 + p.def.size * 0.02);
-      }
-      if (p.rubble) {
-        p.rubble.position.set(
-          land.x,
-          this.groundY(this.originX + land.x, this.originZ + land.z),
-          land.z,
-        );
-        p.rubble.rotation.y = fxHash(19, p.index) * Math.PI * 2;
-        p.rubble.visible = true;
-      }
-      return;
-    }
-    h.visible = false;
-    const s0 = p.def.scale;
-    h.scale.set(p.def.joint === 'shoulder' && p.def.side < 0 ? -s0 : s0, s0, s0);
-    if (p.rubble && !plan.chasm) {
-      p.rubble.position.set(
-        land.x,
-        this.groundY(this.originX + land.x, this.originZ + land.z),
-        land.z,
-      );
-      p.rubble.rotation.y = fxHash(19, p.index) * Math.PI * 2;
-      p.rubble.visible = true;
-    }
-  }
-
   // ---- the quarter it drinks --------------------------------------------------------------
 
   /** The seams burn in the colour of the quarter it stands in (white-gold in
@@ -1421,6 +1403,7 @@ export class FinalFx {
         break;
       }
     const zone = finalZoneOf(state?.value);
+    this.zone = zone;
     if (zone === 'ring') this.seamTarget.setHex(C.seam);
     else this.seamTarget.setHex(SMITH_HEART_VEIN_COLORS[zone]);
     this.seamTint.lerp(this.seamTarget, Math.min(1, dt * 2.5));
@@ -1519,6 +1502,7 @@ export class FinalFx {
     this.disposed = true;
     this.root.removeFromParent();
     this.particles.dispose();
+    this.bodyFx.dispose();
     this.threads.dispose();
     for (const g of this.geometries) g.dispose();
     for (const m of this.materials) m.dispose();
