@@ -9,10 +9,11 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { vaultMaterialIds } from '../src/sim/materials_vault';
 import type { InvSlot } from '../src/sim/types';
 import { BankWindow, type BankWindowDeps } from '../src/ui/bank_window';
-import { ensureLocaleLoaded, setLanguage } from '../src/ui/i18n';
-import { vaultWithdrawFit, vaultWithdrawNotice } from '../src/ui/vault_view';
+import { ensureLocaleLoaded, setLanguage, t } from '../src/ui/i18n';
+import { vaultDepositableUnits, vaultWithdrawFit, vaultWithdrawNotice } from '../src/ui/vault_view';
 import type { BankInfo, IWorld, VaultInfo, VaultSpecialRef } from '../src/world_api';
 
 function personalInfo(): BankInfo {
@@ -1607,5 +1608,73 @@ describe('the name search (the personal bank search, on the vault pane)', () => 
     type(searchBox(h) as HTMLInputElement, 'lotus');
     (h.root.querySelector('.vault-row') as HTMLElement).click();
     expect(h.calls).toEqual(['vaultWithdraw:frost_lotus']);
+  });
+});
+
+describe('the Personal pane deposit-all routes into the unlocked vault', () => {
+  const material = [...vaultMaterialIds()][0];
+  const personalButton = (h: Harness) =>
+    h.root.querySelector<HTMLButtonElement>('#bank-window .bank-deposit-all') as HTMLButtonElement;
+
+  it('sweeps into the vault (one command, no bank deposits) once the vault is unlocked', () => {
+    const h = harness(vaultInfo());
+    h.world.inventory.push({ itemId: material, count: 3 });
+    h.window.open(); // personal tab
+    h.window.refreshIfChanged(); // steady state: lastSig synced on the Personal signature
+    expect(personalButton(h).title).toBe(t('hudChrome.bank.vaultDepositAllTooltip'));
+    personalButton(h).click();
+    expect(h.calls).toEqual(['vaultDepositAll']);
+    // The summary line shows on the Personal pane.
+    expect(h.root.querySelector('.bank-status')?.textContent).toContain('3');
+    expect(personalButton(h).disabled).toBe(true);
+    // The online mirror has NOT echoed yet: a poll with the world unchanged
+    // must keep the guard (a signature term keyed on the busy flag itself
+    // would flip here and re-enable the button a frame after the click).
+    h.window.refreshIfChanged();
+    h.window.refreshIfChanged();
+    expect(personalButton(h).disabled).toBe(true);
+    // The echo lands: the bags lose what the vault took (one unit left over).
+    (h.world.vaultInfo as VaultInfo).stock[material] = 2;
+    h.world.inventory[0] = { itemId: material, count: 1 };
+    h.window.refreshIfChanged();
+    expect(personalButton(h).disabled).toBe(false);
+  });
+
+  it('repaints the Personal button when looting a vault material, with no bank change', () => {
+    const h = harness(vaultInfo());
+    h.window.open();
+    h.window.refreshIfChanged();
+    expect(personalButton(h).disabled).toBe(true); // nothing to sweep
+    h.world.inventory.push({ itemId: material, count: 2 });
+    h.window.refreshIfChanged();
+    expect(personalButton(h).disabled).toBe(false);
+  });
+
+  it('keeps banking the materials while the vault is locked or unavailable', () => {
+    for (const vault of [vaultInfo({ upgrades: 0 }), null]) {
+      const h = harness(vault);
+      h.world.inventory.push({ itemId: material, count: 3 });
+      h.window.open();
+      expect(personalButton(h).title).toBe(t('hudChrome.bank.depositAllTooltip'));
+      personalButton(h).click();
+      expect(h.calls).toEqual(['bankDeposit:0,3']);
+    }
+  });
+});
+
+describe('the Personal deposit-all signature helper (pure)', () => {
+  it('counts only the carried units the vault sweep could take', () => {
+    const ids = new Set(['copper_ore', 'linen_cloth']);
+    expect(vaultDepositableUnits([], ids)).toBe(0);
+    expect(
+      vaultDepositableUnits(
+        [
+          { itemId: 'copper_ore', count: 4 },
+          { itemId: 'hearthstone', count: 1 },
+          { itemId: 'linen_cloth', count: 2 },
+        ],
+        ids,
+      ),
+    ).toBe(6);
   });
 });

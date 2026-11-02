@@ -443,6 +443,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.accountSlots': '{used} / {total} スロット',
   'hudChrome.bank.accountWithdrawLead': 'アイテムをクリックすると自分のバッグに移します。',
   'hudChrome.bank.accountDepositLead': 'アイテムをクリックすると{name}の銀行に送ります。',
+  'hudChrome.bank.accountBagsDepositLead':
+    'バッグ内のアイテムをクリックすると{name}の銀行に送ります。',
   'hudChrome.bank.accountBankEmpty': 'この銀行は空です。',
   'hudChrome.bank.accountBagsEmpty': 'バッグは空です。',
   'hudChrome.wocStore.subscription.tokenTitle': '取引可能なメンバーシップトークン',

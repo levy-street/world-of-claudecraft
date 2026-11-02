@@ -431,6 +431,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.accountSlots': '{used} / {total}칸',
   'hudChrome.bank.accountWithdrawLead': '아이템을 클릭하면 내 가방으로 옮깁니다.',
   'hudChrome.bank.accountDepositLead': '아이템을 클릭하면 {name}의 은행으로 보냅니다.',
+  'hudChrome.bank.accountBagsDepositLead':
+    '가방에 있는 아이템을 클릭하면 {name}의 은행으로 보냅니다.',
   'hudChrome.bank.accountBankEmpty': '이 은행은 비어 있습니다.',
   'hudChrome.bank.accountBagsEmpty': '가방이 비어 있습니다.',
   'hudChrome.wocStore.subscription.tokenTitle': '거래 가능한 멤버십 토큰',

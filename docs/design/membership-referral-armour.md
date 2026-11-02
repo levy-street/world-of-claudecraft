@@ -8,8 +8,9 @@ retroactively eligible; their historical membership state is unknown.
 Every character on the referred account can claim the seven soulbound pieces.
 Initial admission grants missing pieces automatically, overflowing full bags.
 Stamp card menu (Refer a Friend) > Claim friendship armour is the manual recovery action for missing
-pieces, using `createFriendshipArmourClaim`. The shared bank only offers membership
-gear recovery. Referral-screen wiring lives on the integration branch alongside
+pieces, using `createFriendshipArmourClaim`. The shared bank no longer offers a
+membership gear claim: membership gear is granted when membership activates
+(`setMembership` in `src/sim/membership.ts`), with no manual recovery button. Referral-screen wiring lives on the integration branch alongside
 that screen; the membership PR supplies the reusable control without importing
 the stamp-card feature. Claims never
 duplicate pieces already in equipment, bags (including overflow), bank or courier

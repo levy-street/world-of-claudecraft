@@ -5804,6 +5804,7 @@ export const tr_TR: EnTranslations = {
       "accountSlots": "{used} / {total} yuva",
       "accountWithdrawLead": "Bir eşyayı çantalarına taşımak için üzerine tıkla.",
       "accountDepositLead": "Bir eşyayı {name} adlı karakterin bankasına göndermek için üzerine tıkla.",
+      "accountBagsDepositLead": "Click an item in your bags to send it to {name}'s bank.",
       "accountBankEmpty": "Bu banka boş.",
       "accountBagsEmpty": "Çantaların boş.",
       "accountDepositHint": "Bu yığını seçili karakter bankasına yatırmak için tıkla.",

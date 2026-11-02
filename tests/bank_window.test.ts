@@ -15,6 +15,12 @@ import { SUPPORTED_LANGUAGES } from '../src/ui/i18n.resolved.generated/loaders';
 import { itemKindLabel } from '../src/ui/item_kind_label';
 
 const painter = readFileSync(new URL('../src/ui/bank_window.ts', import.meta.url), 'utf8');
+// The deposit-all control's builder (extracted from the painter; the painter
+// still decides its target and disabled state).
+const depositAllButton = readFileSync(
+  new URL('../src/ui/bank_deposit_all_button.ts', import.meta.url),
+  'utf8',
+);
 // The personal-bank grid CELL (icon/mark/aria/tooltip) was extracted out of
 // BankWindow into its own module; the quality-color fallback pin below lives
 // there now, not in the coordinator it was pulled out of.
@@ -416,8 +422,8 @@ describe('bank_window: search / sort / deposit-all', () => {
     expect(painter).toMatch(/private buildFilterBar\(bankEmpty: boolean\)/);
     expect(painter).toContain('if (!bankEmpty) {');
     expect(painter).toContain('\n      tools.appendChild(search);'); // 6 spaces: gated
-    expect(painter).toContain('\n    tools.appendChild(deposit);'); // 4 spaces: unconditional
-    expect(painter).toContain('bank-deposit-all');
+    expect(painter).toContain('\n    appendDepositAllButton(tools, {'); // 4 spaces: unconditional
+    expect(depositAllButton).toContain('bank-deposit-all');
   });
 
   it('persists category/sort under the bank-specific key; the search never enters storage', () => {
@@ -488,16 +494,16 @@ describe('bank_window: search / sort / deposit-all', () => {
   });
 
   it('gates the deposit-all button on hasDepositableMaterials and plans + sends on click', () => {
-    expect(painter).toContain("t('hudChrome.bank.depositAll')");
-    expect(painter).toContain('hasDepositableMaterials(this.deps.world().inventory');
+    expect(depositAllButton).toContain("'hudChrome.bank.depositAll'");
+    expect(painter).toContain('hasDepositableMaterials(bags()');
     expect(painter).toMatch(
       /for \(const send of plan\.sends\) world\.bankDeposit\(send\.slot, send\.count\)/,
     );
   });
 
   it('gives the deposit-all button a tooltip clarifying which items it moves (issue #2132)', () => {
-    expect(painter).toContain("const depositTooltip = t('hudChrome.bank.depositAllTooltip')");
-    expect(painter).toContain('deposit.title = depositTooltip');
+    expect(depositAllButton).toContain("'hudChrome.bank.depositAllTooltip'");
+    expect(depositAllButton).toContain('deposit.title = tooltip');
   });
 
   it('the deposit-all tooltip says what the sweep does: every Material moves, everything else stays', () => {
@@ -562,16 +568,18 @@ describe('bank_window: search / sort / deposit-all', () => {
     // touch user who taps the button directly. The visually-hidden span carries the
     // SAME localized text as the title so sighted and assistive-tech users read
     // identical copy, and its id is wired to the button via aria-describedby.
-    expect(painter).toContain("deposit.setAttribute('aria-describedby', 'bank-deposit-all-desc')");
-    expect(painter).toContain("depositDesc.id = 'bank-deposit-all-desc'");
-    expect(painter).toContain("depositDesc.className = 'visually-hidden'");
-    expect(painter).toContain('depositDesc.textContent = depositTooltip');
-    expect(painter).toContain("const depositTooltip = t('hudChrome.bank.depositAllTooltip')");
-    expect(painter).toContain('tools.appendChild(depositDesc)');
+    const src = depositAllButton;
+    // The Personal pane's id (the Vault pane passes its own).
+    expect(src).toContain("model.vaultPane?.descId ?? 'bank-deposit-all-desc'");
+    expect(src).toContain("deposit.setAttribute('aria-describedby', descId)");
+    expect(src).toContain('desc.id = descId');
+    expect(src).toContain("desc.className = 'visually-hidden'");
+    expect(src).toContain('desc.textContent = tooltip');
+    expect(src).toContain('parent.appendChild(desc)');
     // The description span must be appended AFTER the button so document order matches
     // the visual/DOM relationship the aria-describedby id lookup assumes.
-    const buttonIdx = painter.indexOf('tools.appendChild(deposit);');
-    const descIdx = painter.indexOf('tools.appendChild(depositDesc);');
+    const buttonIdx = src.indexOf('parent.appendChild(deposit);');
+    const descIdx = src.indexOf('parent.appendChild(desc);');
     expect(buttonIdx).toBeGreaterThan(0);
     expect(descIdx).toBeGreaterThan(buttonIdx);
   });
@@ -625,7 +633,7 @@ describe('bank_window: search / sort / deposit-all', () => {
     // Non-search focus re-lands via the key ladder (the focused control by its
     // data-focus-key, else [data-close]), never a blanket close-button yank.
     expect(body).toContain('} else if (hadFocus) {');
-    expect(body).toContain('this.restoreControlFocus(el, focusKey)');
+    expect(body).toContain('restoreBankControlFocus(el, focusKey)');
   });
 
   it('holds deposit-all disabled from send until the mirror echoes (double-click guard)', () => {
@@ -635,9 +643,7 @@ describe('bank_window: search / sort / deposit-all', () => {
     // a data-signature change in refreshIfChanged clears it (the echo arrived), and a
     // fallback timer plus the close() teardown ensure it can never wedge shut.
     expect(painter).toContain('this.depositAllPending = true;');
-    expect(painter).toMatch(
-      /deposit\.disabled =\s*\n\s*this\.depositAllPending \|\|\s*\n\s*!hasDepositableMaterials\(/,
-    );
+    expect(painter).toMatch(/: this\.depositAllPending \|\|\s*\n\s*!hasDepositableMaterials\(/);
     const refresh = painter.slice(
       painter.indexOf('refreshIfChanged(): void {'),
       painter.indexOf('private fmt('),

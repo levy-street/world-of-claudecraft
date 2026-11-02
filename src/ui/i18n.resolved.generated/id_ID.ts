@@ -5804,6 +5804,7 @@ export const id_ID: EnTranslations = {
       "accountSlots": "{used} / {total} slot",
       "accountWithdrawLead": "Klik barang untuk memindahkannya ke tasmu.",
       "accountDepositLead": "Klik barang untuk mengirimnya ke bank {name}.",
+      "accountBagsDepositLead": "Click an item in your bags to send it to {name}'s bank.",
       "accountBankEmpty": "Bank ini kosong.",
       "accountBagsEmpty": "Tasmu kosong.",
       "accountDepositHint": "Klik untuk menyimpan tumpukan ini ke bank karakter terpilih.",

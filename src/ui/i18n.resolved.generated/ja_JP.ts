@@ -5804,6 +5804,7 @@ export const ja_JP: EnTranslations = {
       "accountSlots": "{used} / {total} スロット",
       "accountWithdrawLead": "アイテムをクリックすると自分のバッグに移します。",
       "accountDepositLead": "アイテムをクリックすると{name}の銀行に送ります。",
+      "accountBagsDepositLead": "バッグ内のアイテムをクリックすると{name}の銀行に送ります。",
       "accountBankEmpty": "この銀行は空です。",
       "accountBagsEmpty": "バッグは空です。",
       "accountDepositHint": "クリックすると、このスタックを選択中のキャラクターの銀行に預けます。",

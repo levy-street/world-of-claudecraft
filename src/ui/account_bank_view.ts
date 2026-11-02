@@ -1,17 +1,38 @@
+import { isTransferLockedInstance } from '../sim/item_instance_transfer';
 import { isItemLocked } from '../sim/item_lock';
-import type { InvSlot, ItemDef } from '../sim/types';
+import type { InvSlot, ItemDef, ItemInstancePayload } from '../sim/types';
 import type { AccountBankInfo } from '../world_api/bank';
 import type { TranslationKey } from './i18n';
 
-/** Only transferable copies can cross character ownership. The server rechecks. */
-export function accountBankTransferAllowed(slot: InvSlot, item: ItemDef | undefined): boolean {
+/** Only transferable copies can cross character ownership. The server rechecks
+ *  (membershipBankTransferable in src/sim/membership_bank.ts); this mirrors it
+ *  so the bank pane's grid and the bags' deposit click never offer a move the
+ *  server refuses as bound. */
+export function accountBankItemMovable(
+  item: { kind: string; soulbound?: boolean; noMarketList?: boolean },
+  instance: ItemInstancePayload | undefined,
+): boolean {
   return (
-    !!item &&
+    item.kind !== 'quest' &&
     !item.soulbound &&
-    !slot.instance?.boundTo &&
-    !isItemLocked(slot.instance) &&
-    item.kind !== 'quest'
+    !item.noMarketList &&
+    !isTransferLockedInstance(instance) &&
+    !isItemLocked(instance)
   );
+}
+
+export function accountBankTransferAllowed(slot: InvSlot, item: ItemDef | undefined): boolean {
+  return !!item && accountBankItemMovable(item, slot.instance);
+}
+
+/** The character a bag click deposits into: only while the selected bank is on
+ *  screen (stage ready), never while it loads, fails or awaits a choice. */
+export function accountBankDepositTarget(
+  info: AccountBankInfo | null,
+  membershipActive: boolean | undefined,
+): number | null {
+  const stage = accountBankStage(info, membershipActive);
+  return stage.kind === 'ready' ? stage.characterId : null;
 }
 
 /** What the Other characters pane shows before (or instead of) the two grids. */

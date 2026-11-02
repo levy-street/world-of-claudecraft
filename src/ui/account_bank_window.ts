@@ -1,9 +1,9 @@
 import { ITEMS } from '../sim/data';
-import type { InvSlot } from '../sim/types';
 import type { IWorld } from '../world_api';
 import type { BankInfo } from '../world_api/bank';
 import {
   type AccountBankStage,
+  accountBankDepositTarget,
   accountBankStage,
   accountBankTransferAllowed,
 } from './account_bank_view';
@@ -34,6 +34,14 @@ export function request(world: IWorld, force = false, openFirst = false): void {
 export function openTab(world: IWorld): void {
   const info = world.accountBankInfo;
   request(world, !info || (info.selectedCharacterId === null && !info.error), true);
+}
+
+/** The character a docked bags click deposits into, or null when the pane
+ *  is not `onScreen` or its selected bank is not ready yet. */
+export function depositTarget(world: IWorld, onScreen: boolean): number | null {
+  return onScreen
+    ? accountBankDepositTarget(world.accountBankInfo, world.player?.membershipActive)
+    : null;
 }
 
 type AccountBankDeps = PersonalBankItemCellDeps & { world(): IWorld };
@@ -86,7 +94,7 @@ export function renderAccountBank(
         appendGrids(pane, deps, stage.characterId, name(stage.characterId), info.bank, repaint);
       break;
   }
-  pane.appendChild(footer(deps));
+  pane.appendChild(footer());
 }
 
 function notice(
@@ -170,111 +178,87 @@ function appendGrids(
   bank: BankInfo,
   repaint: () => void,
 ): void {
-  const section = (
-    direction: 'deposit' | 'withdraw',
-    slots: InvSlot[],
-    title: string,
-    showRoom: boolean,
-  ) => {
-    const box = document.createElement('section');
-    box.className = `account-bank-section account-bank-${direction}`;
-    const head = document.createElement('div');
-    head.className = 'account-bank-section-head';
-    const heading = document.createElement('h3');
-    heading.textContent = title;
-    head.appendChild(heading);
-    const model = buildBankView({ ...bank, slots }, (id) => knownItemDef(ITEMS, id));
-    if (model.kind === 'away') return;
-    if (showRoom) {
-      const meter = document.createElement('span');
-      meter.className = 'account-bank-count';
-      meter.textContent = t('hudChrome.bank.accountSlots', {
-        used: formatCount(model.meter.used),
-        total: formatCount(model.meter.total),
-      });
-      head.appendChild(meter);
-    }
-    box.appendChild(head);
-    const hint = document.createElement('p');
-    hint.className = 'account-bank-hint';
-    hint.textContent = t(
-      direction === 'withdraw'
-        ? 'hudChrome.bank.accountWithdrawLead'
-        : 'hudChrome.bank.accountDepositLead',
-      { name },
+  // Only the selected bank's grid: deposits come from clicking the docked bags
+  // window (bags_view's accountBankDeposit arm), not a second copy of the bags.
+  const box = document.createElement('section');
+  box.className = 'account-bank-section account-bank-withdraw';
+  const head = document.createElement('div');
+  head.className = 'account-bank-section-head';
+  const heading = document.createElement('h3');
+  heading.textContent = t('hudChrome.bank.accountBankTitle', { name });
+  head.appendChild(heading);
+  const model = buildBankView(bank, (id) => knownItemDef(ITEMS, id));
+  if (model.kind === 'away') return;
+  const meter = document.createElement('span');
+  meter.className = 'account-bank-count';
+  meter.textContent = t('hudChrome.bank.accountSlots', {
+    used: formatCount(model.meter.used),
+    total: formatCount(model.meter.total),
+  });
+  head.appendChild(meter);
+  box.appendChild(head);
+  const hint = document.createElement('p');
+  hint.className = 'account-bank-hint';
+  hint.textContent = t('hudChrome.bank.accountWithdrawLead', { name });
+  box.appendChild(hint);
+  // The deposit direction has no grid here, so say where it lives (touch
+  // players never see the bags' hover hint).
+  const depositHint = document.createElement('p');
+  depositHint.className = 'account-bank-hint';
+  depositHint.textContent = t('hudChrome.bank.accountBagsDepositLead', { name });
+  box.appendChild(depositHint);
+  const grid = document.createElement('div');
+  grid.className = 'bank-grid';
+  if (model.empty) {
+    grid.appendChild(notice('hudChrome.bank.accountBankEmpty'));
+  }
+  for (const slot of model.slots) {
+    const source = bank.slots[slot.slotIndex];
+    const allowed = accountBankTransferAllowed(source, knownItemDef(ITEMS, source.itemId));
+    const cell = buildPersonalBankItemCell(
+      deps,
+      slot,
+      formatCount(slot.count),
+      () => {
+        if (!allowed) return;
+        deps
+          .world()
+          .accountBankTransfer(
+            characterId,
+            'withdraw',
+            slot.slotIndex,
+            source.count,
+            structuredClone(source),
+          );
+        deps.onInventoryChanged();
+      },
+      repaint,
+      {
+        wholeStack: true,
+        hintKey: 'hudChrome.bank.accountWithdrawHint',
+      },
     );
-    box.appendChild(hint);
-    const grid = document.createElement('div');
-    grid.className = 'bank-grid';
-    if (model.empty) {
-      grid.appendChild(
-        notice(
-          direction === 'withdraw'
-            ? 'hudChrome.bank.accountBankEmpty'
-            : 'hudChrome.bank.accountBagsEmpty',
-        ),
-      );
-    }
-    for (const slot of model.slots) {
-      const source = slots[slot.slotIndex];
-      const allowed = accountBankTransferAllowed(source, knownItemDef(ITEMS, source.itemId));
-      const cell = buildPersonalBankItemCell(
-        deps,
-        slot,
-        formatCount(slot.count),
-        () => {
-          if (!allowed) return;
-          deps
-            .world()
-            .accountBankTransfer(
-              characterId,
-              direction,
-              slot.slotIndex,
-              source.count,
-              structuredClone(source),
-            );
-          deps.onInventoryChanged();
-        },
-        repaint,
-        {
-          wholeStack: true,
-          hintKey:
-            direction === 'deposit'
-              ? 'hudChrome.bank.accountDepositHint'
-              : 'hudChrome.bank.accountWithdrawHint',
-        },
-      );
-      (cell as HTMLButtonElement).disabled = !allowed;
-      cell.dataset.focusKey = `account-${direction}:${slot.slotIndex}`;
-      grid.appendChild(cell);
-    }
-    // Free squares make the selected bank's remaining room visible at a glance.
-    for (let i = 0; showRoom && !model.empty && i < model.emptyCells; i++) {
-      const cell = document.createElement('div');
-      cell.className = 'bank-item ui-socket ui-socket--bag empty';
-      cell.setAttribute('aria-hidden', 'true');
-      grid.appendChild(cell);
-    }
-    box.appendChild(grid);
-    pane.appendChild(box);
-  };
-  section('withdraw', bank.slots, t('hudChrome.bank.accountBankTitle', { name }), true);
-  section('deposit', deps.world().inventory, t('hudChrome.bank.accountBagsTitle'), false);
+    (cell as HTMLButtonElement).disabled = !allowed;
+    cell.dataset.focusKey = `account-withdraw:${slot.slotIndex}`;
+    grid.appendChild(cell);
+  }
+  // Free squares make the selected bank's remaining room visible at a glance.
+  for (let i = 0; !model.empty && i < model.emptyCells; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'bank-item ui-socket ui-socket--bag empty';
+    cell.setAttribute('aria-hidden', 'true');
+    grid.appendChild(cell);
+  }
+  box.appendChild(grid);
+  pane.appendChild(box);
 }
 
-function footer(deps: AccountBankDeps): HTMLElement {
+function footer(): HTMLElement {
   const foot = document.createElement('div');
   foot.className = 'account-bank-footer';
   const note = document.createElement('p');
   note.className = 'account-bank-note';
   note.textContent = t('hudChrome.bank.accountBound');
   foot.appendChild(note);
-  const claim = document.createElement('button');
-  claim.type = 'button';
-  claim.className = 'btn ui-btn account-bank-claim';
-  claim.textContent = t('hudChrome.bank.accountArmour');
-  claim.dataset.focusKey = 'account-armour';
-  claim.addEventListener('click', () => deps.world().claimMembershipArmour());
-  foot.appendChild(claim);
   return foot;
 }

@@ -5804,6 +5804,7 @@ export const en_XA: EnTranslations = {
       "accountSlots": "[{used} / {total} šļóţš]",
       "accountWithdrawLead": "[Çļíçķ áñ íţéɱ ţó ɱóʋé íţ íñţó ýóúŕ ƀáĝš.]",
       "accountDepositLead": "[Çļíçķ áñ íţéɱ ţó šéñð íţ ţó {name}'š ƀáñķ.]",
+      "accountBagsDepositLead": "[Çļíçķ áñ íţéɱ íñ ýóúŕ ƀáĝš ţó šéñð íţ ţó {name}'š ƀáñķ.]",
       "accountBankEmpty": "[Ţĥíš ƀáñķ íš éɱþţý.]",
       "accountBagsEmpty": "[Ýóúŕ ƀáĝš áŕé éɱþţý.]",
       "accountDepositHint": "[Çļíçķ ţó ðéþóšíţ ţĥíš šţáçķ íñţó ţĥé šéļéçţéð çĥáŕáçţéŕ ƀáñķ.]",

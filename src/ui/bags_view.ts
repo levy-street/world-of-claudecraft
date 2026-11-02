@@ -17,6 +17,7 @@ import type { Quality } from '../sim/loot_master';
 import { isMaterialItemId } from '../sim/material_ids';
 import { WORLD_PVP_SKULL_BAG_ITEM_ID } from '../sim/pvp/world_pvp_trophy';
 import type { InvSlot, ItemDef, ItemInstancePayload } from '../sim/types';
+import { accountBankItemMovable } from './account_bank_view';
 import {
   applyBagFilter,
   type BagFilterState,
@@ -104,6 +105,11 @@ export interface BagMode {
    *  active tab); the LOCKED vault pane arms none of them, so its clicks fall
    *  to the bankOpen no-target rung like the guild Log view's. */
   vaultDeposit: boolean;
+  /** The bank window is open ON ITS OTHER CHARACTERS TAB with a selected
+   *  character's bank on screen: a click sends the whole stack to that bank.
+   *  Exclusive with the three deposit modes above (one active tab). Optional
+   *  so surfaces that never dock the bank can omit it. */
+  accountBankDeposit?: boolean;
   /** Pet-feed cursor mode is armed. */
   petFeed: boolean;
 }
@@ -135,6 +141,9 @@ export type BagAction =
   | 'vaultDeposit'
   /** Not in the honest material set: the vault stores materials only. */
   | 'vaultDepositBlockedNotMaterial'
+  | 'accountBankDeposit'
+  /** Soulbound, bound, locked or quest: cannot cross character ownership. */
+  | 'accountBankDepositBlocked'
   | 'petFeed'
   | 'petFeedBlocked'
   | 'discardQuest'
@@ -160,6 +169,8 @@ export type BagTooltipHintKey =
   | 'hudChrome.bank.guildCannotDeposit'
   | 'hudChrome.bank.vaultDepositHint'
   | 'hudChrome.bank.vaultCannotDeposit'
+  | 'hudChrome.bank.accountDepositHint'
+  | 'hudChrome.bank.accountBound'
   | 'itemUi.tooltip.clickDestroy'
   | 'hudChrome.mounts.clickManage'
   | 'itemUi.tooltip.clickEquip'
@@ -186,9 +197,9 @@ export type BagTooltipHintKey =
 
 /** Decide what a click on a bag item does. Mirrors the original click handler's
  *  priority order exactly: trade > mail-attach > market-sell > vendor >
- *  guild-bank-deposit > bank-deposit > vault-deposit > bank-open-no-target >
- *  pet-feed > quest > use (the wiring sets at most one of the THREE bank
- *  deposit modes, keyed off the bank window's active tab).
+ *  guild-bank-deposit > bank-deposit > vault-deposit > account-bank-deposit >
+ *  bank-open-no-target > pet-feed > quest > use (the wiring sets at most one
+ *  of the FOUR bank deposit modes, keyed off the bank window's active tab).
  *  `instance` is the clicked SLOT's payload (issue 1165):
  *  a transfer-locked copy (bindOnTrade-armed or boundTo-bound,
  *  isTransferLockedInstance, the sim's pipe rule) blocks mail-attach and
@@ -262,6 +273,14 @@ export function bagItemAction(
     if (!item.vaultMaterial) return 'vaultDepositBlockedNotMaterial';
     return 'vaultDeposit';
   }
+  // The OTHER CHARACTERS tab: the account bank's one movability rule
+  // (accountBankItemMovable, the same one its withdraw grid reads); the server
+  // rechecks every move.
+  if (mode.accountBankDeposit) {
+    return accountBankItemMovable(item, instance)
+      ? 'accountBankDeposit'
+      : 'accountBankDepositBlocked';
+  }
   // The bank window is open but NEITHER grid is on screen to drop into (today:
   // its guild pane's Log view, a reading surface). This arm is stated
   // EXPLICITLY rather than left to fall out the bottom of the ladder, because
@@ -318,6 +337,8 @@ export function bagUnknownAction(mode: BagMode): 'bankDeposit' | 'none' {
   // material set is derived from THIS bundle's content tables, so a def-less
   // id is never a member and the sim would refuse the deposit anyway.
   if (mode.vaultDeposit) return 'none';
+  // The account bank refuses on item dimensions a def-less cell cannot judge.
+  if (mode.accountBankDeposit) return 'none';
   // bankOpen-with-no-target needs no arm of its own here: an unknown cell has
   // no use/equip ladder below it to fall into, so the closing 'none' is already
   // the right answer. The ITEM ladder needed an explicit rung; this one does not.
@@ -463,7 +484,8 @@ export function bagDestroyAction(item: BagItemInfo, mode: BagMode): BagDestroyAc
     mode.bankOpen ||
     mode.bankDeposit ||
     mode.guildBankDeposit ||
-    mode.vaultDeposit
+    mode.vaultDeposit ||
+    mode.accountBankDeposit
   )
     return 'none';
   if (item.noDiscard) return 'discardBlocked';
@@ -553,6 +575,12 @@ export function bagTooltipHintKey(
     return !item.vaultMaterial
       ? 'hudChrome.bank.vaultCannotDeposit'
       : 'hudChrome.bank.vaultDepositHint';
+  }
+  // Twin of bagItemAction's account arm: the hover names the refusal line.
+  if (mode.accountBankDeposit) {
+    return accountBankItemMovable(item, instance)
+      ? 'hudChrome.bank.accountDepositHint'
+      : 'hudChrome.bank.accountBound';
   }
   // Twin of bagItemAction's no-target rung: with the bank open and no grid on
   // screen, the hint must NOT fall through to the kind branch and advertise

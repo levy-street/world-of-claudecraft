@@ -5804,6 +5804,7 @@ export const ru_RU: EnTranslations = {
       "accountSlots": "Ячеек: {used} / {total}",
       "accountWithdrawLead": "Нажмите на предмет, чтобы забрать его в сумки.",
       "accountDepositLead": "Нажмите на предмет, чтобы отправить его в банк персонажа {name}.",
+      "accountBagsDepositLead": "Нажмите на предмет в сумках, чтобы отправить его в банк персонажа {name}.",
       "accountBankEmpty": "Этот банк пуст.",
       "accountBagsEmpty": "Ваши сумки пусты.",
       "accountDepositHint": "Нажмите, чтобы положить эту стопку в банк выбранного персонажа.",

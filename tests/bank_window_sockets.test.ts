@@ -645,7 +645,7 @@ describe('the meter aria and tooltip speak the per-pool truth', () => {
   });
 
   it('keyboard focus parked on the meter survives a mirror-driven rebuild', () => {
-    // restoreControlFocus resolves by data-focus-key, else the close button:
+    // restoreBankControlFocus resolves by data-focus-key, else the close button:
     // without bank:meter a parked reader was yanked to Close (and the tooltip
     // hidden) on every refreshIfChanged, defeating the tab stop's purpose.
     const h = harness(splitInfo());

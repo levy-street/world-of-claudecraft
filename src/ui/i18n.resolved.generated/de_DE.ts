@@ -5804,6 +5804,7 @@ export const de_DE: EnTranslations = {
       "accountSlots": "{used} / {total} Plätze",
       "accountWithdrawLead": "Klicke auf einen Gegenstand, um ihn in deine Taschen zu verschieben.",
       "accountDepositLead": "Klicke auf einen Gegenstand, um ihn zur Bank von {name} zu schicken.",
+      "accountBagsDepositLead": "Click an item in your bags to send it to {name}'s bank.",
       "accountBankEmpty": "Diese Bank ist leer.",
       "accountBagsEmpty": "Eure Taschen sind leer.",
       "accountDepositHint": "Klicken, um diesen Stapel in die gewählte Charakterbank einzulagern.",

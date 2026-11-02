@@ -13105,6 +13105,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.bags.unequipHint'
   | 'hudChrome.bags.unlockItem'
   | 'hudChrome.bank.accountArmour'
+  | 'hudChrome.bank.accountBagsDepositLead'
   | 'hudChrome.bank.accountBagsEmpty'
   | 'hudChrome.bank.accountBagsTitle'
   | 'hudChrome.bank.accountBankEmpty'

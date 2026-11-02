@@ -5804,6 +5804,7 @@ export const da_DK: EnTranslations = {
       "accountSlots": "{used} / {total} pladser",
       "accountWithdrawLead": "Klik på en genstand for at flytte den til dine tasker.",
       "accountDepositLead": "Klik på en genstand for at sende den til banken tilhørende {name}.",
+      "accountBagsDepositLead": "Click an item in your bags to send it to {name}'s bank.",
       "accountBankEmpty": "Denne bank er tom.",
       "accountBagsEmpty": "Dine tasker er tomme.",
       "accountDepositHint": "Klik for at indsætte denne stak i den valgte figurs bank.",

@@ -114,7 +114,7 @@ describe('other character banks', () => {
     expect(root.textContent).toContain('Create another character');
   });
 
-  it('keeps the grids under a refused move and marks both empty sides', () => {
+  it('keeps the bank grid under a refused move and marks it empty', () => {
     const { world, root, repaint, deps } = setup(true);
     Object.assign(world.accountBankInfo, { bank: bank([]), error: 'no_fit' });
     world.inventory.length = 0;
@@ -126,9 +126,6 @@ describe('other character banks', () => {
       'This bank is empty.',
     );
     expect(root.querySelector('.account-bank-withdraw .bank-item.empty')).toBeNull();
-    expect(root.querySelector('.account-bank-deposit')?.textContent).toContain(
-      'Your bags are empty.',
-    );
   });
 
   it('titles the selected bank and shows its free room', () => {
@@ -138,7 +135,11 @@ describe('other character banks', () => {
     expect(bankSection.querySelector('h3')?.textContent).toBe("<Alice>'s bank");
     expect(bankSection.querySelector('.account-bank-count')?.textContent).toBe('1 / 24 slots');
     expect(bankSection.querySelectorAll('.bank-item.empty').length).toBe(23);
-    expect(root.querySelector('.account-bank-deposit h3')?.textContent).toBe('Your bags');
+    // The player's own bags are NOT repeated under the bank: deposits come
+    // from clicking the docked bags window instead.
+    expect(root.querySelector('.account-bank-deposit')).toBeNull();
+    expect(root.querySelectorAll('.bank-grid').length).toBe(1);
+    expect(root.textContent).not.toContain('Your bags');
   });
 
   it('loads contents only after selecting a character and escapes account names', () => {
@@ -152,23 +153,22 @@ describe('other character banks', () => {
     expect(repaint).toHaveBeenCalledOnce();
   });
 
-  it('sends the displayed full-stack fingerprint with either transfer direction', () => {
+  it('sends the displayed full-stack fingerprint on withdraw', () => {
     const { world, root, repaint, deps } = setup(true);
     renderAccountBank(root, deps, repaint);
     root.querySelector<HTMLButtonElement>('[data-focus-key="account-withdraw:0"]')!.click();
-    root.querySelector<HTMLButtonElement>('[data-focus-key="account-deposit:0"]')!.click();
     expect(world.accountBankTransfer.mock.calls).toEqual([
       [2, 'withdraw', 0, 4, { itemId: 'copper_ore', count: 4 }],
-      [2, 'deposit', 0, 3, { itemId: 'copper_ore', count: 3 }],
     ]);
   });
 
-  it('blocks bound copies and offers armour claiming for members without another character', () => {
+  it('blocks bound copies and offers no gear claim (membership gear arrives on activation)', () => {
     const { world, root, repaint, deps } = setup(true);
-    world.inventory[0] = { itemId: 'copper_ore', count: 1, instance: { boundTo: 1 } } as InvSlot;
+    const banked = world.accountBankInfo.bank as BankInfo;
+    banked.slots[0] = { itemId: 'copper_ore', count: 1, instance: { boundTo: 1 } } as InvSlot;
     renderAccountBank(root, deps, repaint);
     expect(
-      root.querySelector<HTMLButtonElement>('[data-focus-key="account-deposit:0"]')!.disabled,
+      root.querySelector<HTMLButtonElement>('[data-focus-key="account-withdraw:0"]')!.disabled,
     ).toBe(true);
     expect(
       accountBankTransferAllowed(
@@ -176,11 +176,13 @@ describe('other character banks', () => {
         { ...ITEMS.copper_ore, soulbound: true },
       ),
     ).toBe(false);
+    expect(root.querySelector('[data-focus-key="account-armour"]')).toBeNull();
     world.accountBankInfo.characters = [];
     root.innerHTML = '';
     renderAccountBank(root, deps, repaint);
-    root.querySelector<HTMLButtonElement>('[data-focus-key="account-armour"]')!.click();
-    expect(world.claimMembershipArmour).toHaveBeenCalledOnce();
+    expect(root.querySelector('[data-focus-key="account-armour"]')).toBeNull();
+    expect(root.textContent).not.toContain('Claim membership gear');
+    expect(world.claimMembershipArmour).not.toHaveBeenCalled();
   });
   it('does not expose the shared bank to an entitled nonmember', () => {
     const { world, root, deps } = setup();
@@ -246,5 +248,37 @@ describe('other character banks', () => {
     expect(root.querySelector('#account-bank-panel')).toBeNull();
     expect(win.personalTabActive).toBe(true);
     win.close();
+  });
+
+  it('arms the bags deposit target only on the Other characters tab with a ready bank', () => {
+    const { world, root, deps } = setup(true);
+    Object.assign(world, {
+      bankInfo: bank([]),
+      vaultInfo: null,
+      guildBankInfo: null,
+      bags: [null, null, null, null],
+      copper: 0,
+    });
+    const win = new BankWindow({
+      ...deps,
+      root: () => root,
+      closeOthers: vi.fn(),
+      captureFocus: () => null,
+      restoreFocus: vi.fn(),
+      onClosed: vi.fn(),
+      moneyHtml: () => '',
+    } as BankWindowDeps);
+    expect(win.accountDepositTarget).toBeNull(); // closed
+    win.open();
+    expect(win.accountDepositTarget).toBeNull(); // Personal tab: bag clicks bank instead
+    root.querySelector<HTMLButtonElement>('[data-tab="account"]')!.click();
+    expect(win.accountDepositTarget).toBe(2);
+    // The pane says where deposits come from now that it has no bags grid.
+    expect(root.textContent).toContain("Click an item in your bags to send it to <Alice>'s bank.");
+    Object.assign(world.accountBankInfo, { bank: null }); // reselecting: still opening
+    expect(win.accountDepositTarget).toBeNull();
+    Object.assign(world.accountBankInfo, { bank: bank([]) });
+    win.close();
+    expect(win.accountDepositTarget).toBeNull();
   });
 });

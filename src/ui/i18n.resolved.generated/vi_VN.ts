@@ -5804,6 +5804,7 @@ export const vi_VN: EnTranslations = {
       "accountSlots": "{used} / {total} ô",
       "accountWithdrawLead": "Nhấp vật phẩm để chuyển vào túi.",
       "accountDepositLead": "Nhấp vật phẩm để gửi tới ngân hàng của {name}.",
+      "accountBagsDepositLead": "Click an item in your bags to send it to {name}'s bank.",
       "accountBankEmpty": "Ngân hàng này trống.",
       "accountBagsEmpty": "Túi của bạn đang trống.",
       "accountDepositHint": "Nhấp để gửi chồng này vào ngân hàng nhân vật đã chọn.",

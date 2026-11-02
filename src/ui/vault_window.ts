@@ -31,6 +31,7 @@ import type { IWorld, VaultSpecialRef } from '../world_api';
 import { bagCornerMark, bagRimClasses } from './bag_corner_mark_view';
 import { bagInstanceGlyphKind } from './bag_instance_glyph_view';
 import { showBuyConfirmPrompt } from './bank_buy_prompt';
+import { appendDepositAllButton } from './bank_deposit_all_button';
 import { showQuantityPrompt } from './bank_quantity_prompt';
 import { appendBankStatusLine, type BankStatusAnnouncementState } from './bank_status_line';
 import { formatCount } from './count_format';
@@ -725,23 +726,14 @@ export class VaultTab {
     const row = document.createElement('div');
     row.className = 'bank-buy-row vault-footer';
 
-    const deposit = document.createElement('button');
-    deposit.type = 'button';
-    deposit.className = 'bank-deposit-all ui-btn vault-deposit-all';
-    deposit.textContent = t('hudChrome.bank.vaultDepositAll');
-    const tooltip = t('hudChrome.bank.vaultDepositAllTooltip');
-    deposit.title = tooltip;
-    deposit.setAttribute('aria-describedby', VAULT_DEPOSIT_ALL_DESC_ID);
-    deposit.disabled =
-      this.depositAllPending ||
-      !hasVaultDepositable(this.deps.world().inventory, vaultMaterialIds());
-    deposit.addEventListener('click', () => this.onDepositAll());
-    row.appendChild(deposit);
-    const desc = document.createElement('span');
-    desc.id = VAULT_DEPOSIT_ALL_DESC_ID;
-    desc.className = 'visually-hidden';
-    desc.textContent = tooltip;
-    row.appendChild(desc);
+    appendDepositAllButton(row, {
+      toVault: true,
+      disabled:
+        this.depositAllPending ||
+        !hasVaultDepositable(this.deps.world().inventory, vaultMaterialIds()),
+      onClick: () => this.onDepositAll(),
+      vaultPane: { descId: VAULT_DEPOSIT_ALL_DESC_ID },
+    });
 
     if (nextCost === null || nextCap === null) {
       const maxed = document.createElement('span');
@@ -782,9 +774,25 @@ export class VaultTab {
   // mirror-lag tolerance). Never disabled by a full vault: the click reports
   // the outcome, the bank button's rule.
   private onDepositAll(): void {
+    const summary = this.sweepAll();
+    if (!summary) return;
+    this.setStatus(summary.key, summary.params);
+    this.deps.requestRender();
+  }
+
+  /** True while a sent sweep awaits its echo (the button stays disabled). */
+  get depositAllBusy(): boolean {
+    return this.depositAllPending;
+  }
+
+  /** Send the vault deposit-all sweep and return its summary line (null when
+   *  the vault is locked or gone, or the player is dead). Shared by this
+   *  pane's button and the Personal pane's, which routes materials here
+   *  whenever the vault is unlocked. */
+  sweepAll(): { key: TranslationKey; params?: Record<string, string> } | null {
     const world = this.deps.world();
     const info = world.vaultInfo;
-    if (!info || info.upgrades <= 0) return; // walked away or locked between paint and click
+    if (!info || info.upgrades <= 0) return null; // walked away or locked between paint and click
     // Predict BEFORE the send, without exception: offline, world.inventory is
     // the LIVE sim array and vaultDepositAll mutates it SYNCHRONOUSLY, so a
     // post-send replay would find the bags already swept and report "nothing
@@ -799,9 +807,9 @@ export class VaultTab {
     // While dead the sim silently no-ops the sweep (the town-service idiom):
     // the command still goes (server decides), but the predicted "Materials
     // deposited: N." would be a false claim, so the summary stays quiet (the
-    // personal bank's deposit-all makes the same false claim today; recorded
-    // family follow-up).
-    if (dead) return;
+    // Personal pane's bank-routed deposit-all makes the same false claim
+    // today; recorded family follow-up).
+    if (dead) return null;
     if (prediction.items > 0) {
       audio.coin();
       this.depositAllPending = true;
@@ -814,17 +822,16 @@ export class VaultTab {
       }, VAULT_STATUS_MS);
       this.deps.onInventoryChanged();
     }
-    const key = vaultDepositAllSummaryKey(prediction);
     const notableDef = prediction.notableItemId
       ? knownItemDef(ITEMS, prediction.notableItemId)
       : undefined;
-    this.setStatus(
-      key,
-      prediction.items === 0
-        ? undefined
-        : depositAllNotableParams(formatCount(prediction.items), notableDef),
-    );
-    this.deps.requestRender();
+    return {
+      key: vaultDepositAllSummaryKey(prediction),
+      params:
+        prediction.items === 0
+          ? undefined
+          : depositAllNotableParams(formatCount(prediction.items), notableDef),
+    };
   }
 
   private setStatus(key: TranslationKey, params?: Record<string, string>): void {

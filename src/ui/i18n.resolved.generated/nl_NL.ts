@@ -5804,6 +5804,7 @@ export const nl_NL: EnTranslations = {
       "accountSlots": "{used} / {total} plaatsen",
       "accountWithdrawLead": "Klik op een voorwerp om het naar je tassen te verplaatsen.",
       "accountDepositLead": "Klik op een voorwerp om het naar de bank van {name} te sturen.",
+      "accountBagsDepositLead": "Click an item in your bags to send it to {name}'s bank.",
       "accountBankEmpty": "Deze bank is leeg.",
       "accountBagsEmpty": "Je tassen zijn leeg.",
       "accountDepositHint": "Klik om deze stapel in de gekozen personagebank te storten.",
