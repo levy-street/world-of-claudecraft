@@ -1881,37 +1881,48 @@ export class BreathFightFx {
     sc.mesh.scale.set(r * 2, 1, r * 2);
     sc.mesh.rotation.y = this.rand() * Math.PI * 2;
     sc.mesh.visible = true;
-    this.sparksAt(x, y + 0.5, z, Math.round(12 * size));
+    this.sparksAt(x, y + 0.5, z, Math.round(22 * size));
     this.particles.puff(x, y + 0.4, z, Math.round(6 * size * this.density) + 2, {
       speed: 3,
       up: 1.4,
       life: 1.4,
       size: [1, 3],
-      color: [0.5, 0.55, 0.6],
-      alpha: 0.35,
+      color: [0.36, 0.4, 0.5],
+      alpha: 0.45,
       drag: 1.4,
       radius: r * 0.5,
     });
-    this.particles.shockRing(x, z, 0xd8f6ff, r * 1.2, 0.45);
-    // The strike's flash: a white burst on the stone and a ring of electric
-    // blue racing past the mark's edge (cosmetic: the scorch keeps the spot).
+    // The strike's flash: a blue white burst on the stone, a tight white hot
+    // ring, then rings of saturated storm blue racing past the mark's edge
+    // (cosmetic: the scorch keeps the spot).
     this.particles.puff(x, y + 0.8, z, Math.round(4 * size) + 2, {
       speed: 2,
-      life: 0.22,
+      life: 0.2,
       size: [r * 0.9, r * 1.6],
-      color: [0.85, 0.94, 1],
-      alpha: 0.9,
+      color: [0.62, 0.8, 1],
+      alpha: 0.95,
       pool: 'glow',
     });
-    this.particles.shockRing(x, z, 0x47b8ff, r * 2, 0.6);
-    this.shakeNear(x, z, 0.18 * size, 30);
+    this.particles.puff(x, y + 0.3, z, Math.round(5 * size) + 2, {
+      speed: 1,
+      life: 0.35,
+      size: [r * 0.5, r * 0.9],
+      color: [0.1, 0.4, 1],
+      alpha: 0.8,
+      pool: 'glow',
+      radius: r * 0.4,
+    });
+    this.particles.shockRing(x, z, 0xeef6ff, r * 0.9, 0.22);
+    this.particles.shockRing(x, z, 0x2a86ff, r * 1.5, 0.45);
+    this.particles.shockRing(x, z, 0x1446e0, r * 2.3, 0.75);
+    this.shakeNear(x, z, 0.22 * size, 30);
   }
 
   private sparksAt(x: number, y: number, z: number, n: number): void {
     this.particles.puff(x, y, z, Math.max(1, Math.round(n * this.density)), {
-      speed: 6,
-      up: 2,
-      life: 0.35,
+      speed: 9,
+      up: 3,
+      life: 0.45,
       size: [0.3, 0.06],
       color: C.spark,
       alpha: 1,

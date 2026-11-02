@@ -80,6 +80,12 @@ class PaintedTelegraphs<K extends string> {
       uSpin: { value: L.spin },
       uFlow: { value: L.flow },
       uSeed: { value: telegraphSeed(this.dressed++) },
+      // The live dressing an owner writes a frame (zero: none): the stone's
+      // heat (a rock's crescendo, a crater cooling), the rock's shadow (its
+      // radius share and its approach).
+      uHeat: { value: 0 },
+      uShadow: { value: 0 },
+      uShadowK: { value: 0 },
     };
     // The kit's own uniform objects (the spread copies the references), so
     // its drape and paint calls drive both passes.
@@ -134,7 +140,18 @@ class PaintedTelegraphs<K extends string> {
     d.look.uRimK.value = L.rim;
     d.look.uSpin.value = L.spin;
     d.look.uFlow.value = L.flow;
+    d.look.uHeat.value = 0;
+    d.look.uShadow.value = 0;
+    d.look.uShadowK.value = 0;
     if (d.fan.curtain) d.fan.curtain.visible = L.curtain;
+  }
+
+  /** The live dressing: the stone's `heat` 0..1, the rock's shadow (`share`
+   *  of the radius, 0 for none; `near` its approach 0..1). Uniform writes. */
+  live(d: PaintedFan<K>, heat: number, share = 0, near = 0): void {
+    d.look.uHeat.value = heat;
+    d.look.uShadow.value = share;
+    d.look.uShadowK.value = near;
   }
 }
 

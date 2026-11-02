@@ -24,7 +24,10 @@ import {
   COUNCIL_TELEGRAPH_LOOKS,
   type CouncilTelegraphKind,
   craterFade,
+  craterHeat,
   ROCK_CRATER,
+  rockCrescendo,
+  rockShadowLook,
   telegraphSeed,
 } from '../src/render/smith_heart_fx/painted_telegraph_core';
 import {
@@ -83,7 +86,9 @@ describe('the painted telegraphs: which paint each footprint wears', () => {
     ]) {
       expect(L.rim).toBeGreaterThanOrEqual(0.85);
       expect(L.crack).toBeGreaterThan(0);
-      expect(L.char).toBeLessThanOrEqual(0.7);
+      // The paint takes the stone, never blacks it out (the floor and the
+      // players on it stay readable through the multiply).
+      expect(L.char).toBeLessThanOrEqual(0.85);
     }
   });
 });
@@ -110,6 +115,53 @@ describe("the Falling Rock's crater", () => {
   it('is cosmetic: smaller than the soak and its edge no threat colour', () => {
     expect(ROCK_CRATER.share).toBeLessThan(1);
     for (const c of Object.values(TELEGRAPH_THREAT_COLORS)) expect(ROCK_CRATER.color).not.toBe(c);
+  });
+});
+
+describe("the Falling Rock's approach: the shadow and the heat", () => {
+  it('the shadow is soft and pale while the rock hangs, black and crisp as it lands', () => {
+    const high = rockShadowLook(0);
+    const low = rockShadowLook(1);
+    expect(low.dark).toBeGreaterThan(high.dark);
+    expect(low.soft).toBeLessThan(high.soft);
+    expect(low.dark).toBeLessThan(1);
+    expect(low.soft).toBeGreaterThan(0);
+    expect(rockShadowLook(-1)).toEqual(high);
+    expect(rockShadowLook(2)).toEqual(low);
+  });
+
+  it('the stone paint mirrors the shadow look', () => {
+    expect(COUNCIL_TELEGRAPH_FRAG).toContain('float soft = 0.55 - 0.47 * pow(k, 0.8);');
+    expect(COUNCIL_TELEGRAPH_FRAG).toContain('shDark = 0.55 + 0.4 * pow(k, 0.6);');
+    // Drawn by the char pass (a multiply under the glow), so the fissures'
+    // cores burn through it.
+    const char = COUNCIL_TELEGRAPH_FRAG.split('#ifdef PT_CHAR')[1]?.split('#else')[0] ?? '';
+    expect(COUNCIL_TELEGRAPH_FRAG.indexOf('if (uShadow > 0.0)')).toBeLessThan(
+      COUNCIL_TELEGRAPH_FRAG.indexOf('#ifdef PT_CHAR'),
+    );
+    expect(char.length).toBeGreaterThan(0);
+  });
+
+  it('the floor heats as the rock drops: a low ember hanging, full at the landing', () => {
+    expect(rockCrescendo(5, 1.2)).toBeCloseTo(0.12);
+    expect(rockCrescendo(1.2, 1.2)).toBeCloseTo(0.12);
+    expect(rockCrescendo(0.6, 1.2)).toBeGreaterThan(0.12);
+    expect(rockCrescendo(0.6, 1.2)).toBeLessThan(1);
+    expect(rockCrescendo(0, 1.2)).toBe(1);
+    let last = 0;
+    for (let r = 1.2; r >= 0; r -= 0.1) {
+      const h = rockCrescendo(r, 1.2);
+      expect(h).toBeGreaterThanOrEqual(last);
+      last = h;
+    }
+  });
+
+  it("the crater's fissures cool from white hot to nothing over its seconds", () => {
+    expect(craterHeat(0)).toBe(1);
+    expect(craterHeat(ROCK_CRATER.seconds * 0.5)).toBeGreaterThan(0);
+    expect(craterHeat(ROCK_CRATER.seconds * 0.5)).toBeLessThan(0.5);
+    expect(craterHeat(ROCK_CRATER.seconds)).toBe(0);
+    expect(craterHeat(-1)).toBe(0);
   });
 });
 
@@ -177,6 +229,12 @@ describe('the dressing', () => {
     expect(char.uniforms.uFill.value).toBe(0.4);
     expect(glow.uniforms.uFill).toBe(char.uniforms.uFill);
     expect(glow.uniforms.uRange.value).toBe(3.5);
+    // The live dressing starts empty and reaches both passes.
+    expect(char.uniforms.uShadow.value).toBe(0);
+    paints.live(d, 0.5, 0.4, 0.7);
+    expect(glow.uniforms.uHeat.value).toBe(0.5);
+    expect(char.uniforms.uShadow.value).toBe(0.4);
+    expect(glow.uniforms.uShadowK.value).toBe(0.7);
   });
 
   it('a look change inside the paint is uniforms only; another paint never relinks', () => {
@@ -185,8 +243,12 @@ describe('the dressing', () => {
     const d = paints.dress(fan, 'fork');
     const char = fan.floor.material as THREE.ShaderMaterial;
     const defines = { ...char.defines };
+    paints.live(d, 0.8, 0.5, 0.5);
     paints.setLook(d, 'cradle');
     expect(d.kind).toBe('cradle');
+    // A new kind starts with no live dressing left over.
+    expect(d.look.uHeat.value).toBe(0);
+    expect(d.look.uShadow.value).toBe(0);
     expect(d.look.uChar.value).toBe(BREATH_TELEGRAPH_LOOKS.cradle.char);
     paints.setLook(d, 'vortex');
     expect(d.kind).toBe('cradle');

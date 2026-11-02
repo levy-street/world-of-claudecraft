@@ -12,8 +12,8 @@
 // on every tier. The paint only changes what fills it:
 //   - bolt (the storm's strikes, Drawn Lightning, Leaping Bolt's reach, the
 //     Thunder's Cradle): the floor storm-scorched, branching lightning cracks
-//     racing out from the strike point with the fill, flickering, flaring white
-//     over the bar's last stretch;
+//     racing out from the strike point with the fill, flickering, surging and
+//     flashing blue over the bar's last stretch;
 //   - charged (the ground a strike leaves): blackened stone with arcs crawling
 //     over its cracks, re-striking;
 //   - wind (the vortex, the loose gales, the pinned, the exhale): pale air, a
@@ -22,8 +22,10 @@
 //     never a threat's flicker;
 //   - quake (the council's Wake the Stone, the heir's rising stone, the Falling
 //     Rock's soak, the Echo, the slab, the song): fissures splitting out from
-//     the middle with the fill, granite plates heaving, ochre light and dust in
-//     the splits;
+//     the middle with the fill, dark trenches with molten cores, granite
+//     plates heaving, dust in the splits; the soak's rock throws its shadow
+//     (black and crisp as it lands) and heats the cores as it drops, its
+//     crater cooling after;
 //   - rubble (a fallen pillar's footprint): broken stone and gravel, the cracks
 //     glowing faintly ochre.
 // The flicker, the motes, the fine cracks and the dust are the cosmetic layers
@@ -108,16 +110,16 @@ const look = (
  *  player go without a curtain; the exhale's ring is the whole Cornice, so its
  *  air is faint (the raid and the anchors read through it). */
 export const BREATH_TELEGRAPH_LOOKS: Readonly<Record<BreathTelegraphKind, PaintedTelegraphLook>> = {
-  strike: look('bolt', 0.7, 1, 0.85, 1),
-  drawnStrike: look('bolt', 0.7, 1, 0.85, 1),
-  drawnBar: look('bolt', 0.5, 0.9, 0.85, 0.9, { curtain: false }),
-  drawnMark: look('bolt', 0.3, 0.8, 1.4, 0.8, { rim: 0.9, curtain: false }),
-  fork: look('bolt', 0.35, 0.8, 0.5, 0.7, { rim: 0.9, curtain: false }),
-  lance: look('bolt', 0.55, 1, 0.8, 1),
-  cradle: look('bolt', 0.42, 0.9, 0.6, 0.8),
-  charged: look('charged', 0.62, 1, 0.9, 1, { curtain: false }),
-  vortex: look('wind', 0.45, 1, 0.5, 1, { spin: 1.4, flow: -1.2, curtain: false }),
-  gale: look('wind', 0.4, 1, 0.8, 1, { spin: 2.6, flow: 0.25, curtain: false }),
+  strike: look('bolt', 0.8, 1, 0.85, 1),
+  drawnStrike: look('bolt', 0.8, 1, 0.85, 1),
+  drawnBar: look('bolt', 0.62, 0.9, 0.85, 0.95, { curtain: false }),
+  drawnMark: look('bolt', 0.4, 0.8, 1.4, 0.85, { rim: 0.9, curtain: false }),
+  fork: look('bolt', 0.6, 0.85, 0.5, 0.8, { rim: 0.9, curtain: false }),
+  lance: look('bolt', 0.65, 1, 0.8, 1),
+  cradle: look('bolt', 0.55, 0.9, 0.6, 0.9),
+  charged: look('charged', 0.8, 1, 0.9, 1, { curtain: false }),
+  vortex: look('wind', 0.55, 1, 0.5, 1, { spin: 1.4, flow: -1.2, curtain: false }),
+  gale: look('wind', 0.5, 1, 0.8, 1, { spin: 2.6, flow: 0.25, curtain: false }),
   pinned: look('wind', 0.3, 0.9, 1.2, 0.9, { spin: 0, flow: 1.6, curtain: false }),
   gust: look('wind', 0.1, 0.6, 0.12, 0.55, { spin: 0.12, flow: 1.4 }),
   calm: look('calm', 0.12, 1, 0.6, 0.8),
@@ -129,15 +131,15 @@ export const BREATH_TELEGRAPH_LOOKS: Readonly<Record<BreathTelegraphKind, Painte
  *  floor it will land on, a pillar's rubble is broken stone. */
 export const COUNCIL_TELEGRAPH_LOOKS: Readonly<Record<CouncilTelegraphKind, PaintedTelegraphLook>> =
   {
-    wake: look('quake', 0.68, 0.9, 0.55, 1, { curtain: false }),
-    rock: look('quake', 0.6, 0.7, 0.42, 0.9, { curtain: false }),
-    rise: look('quake', 0.7, 1, 0.55, 1),
+    wake: look('quake', 0.72, 1, 0.55, 1, { curtain: false }),
+    rock: look('quake', 0.74, 1, 0.42, 1, { curtain: false }),
+    rise: look('quake', 0.74, 1, 0.55, 1),
     rubble: look('rubble', 0.55, 1, 1.1, 0.75),
     echo: look('quake', 0.62, 0.9, 0.3, 1),
     slabGrind: look('quake', 0.32, 0.7, 0.5, 0.7, { rim: 0.85, curtain: false }),
     slabCrush: look('quake', 0.55, 1, 0.6, 1, { curtain: false }),
     song: look('quake', 0.22, 0.6, 0.45, 0.6, { rim: 0.85 }),
-    crater: look('quake', 0.7, 1, 0.7, 1, { rim: 0.9, curtain: false }),
+    crater: look('quake', 0.8, 1, 0.7, 1, { rim: 0.9, curtain: false }),
   };
 
 /** The glow passes' encounter rungs, each over every char rung of its owner
@@ -154,8 +156,8 @@ export const COUNCIL_TELEGRAPH_GLOW_STEP = 17;
  *  settling for `seconds`. */
 export const ROCK_CRATER = {
   /** Its radius as a share of the soak's. */
-  share: 0.55,
-  seconds: 3.5,
+  share: 0.72,
+  seconds: 4,
   /** The edge: a dark umber line, never a threat's hue. */
   color: 0x4a3018,
   accent: 0xffb35a,
@@ -168,6 +170,34 @@ export function craterFade(age: number): number {
   if (age < 0 || age >= T) return 0;
   const k = Math.max(0, (age - T * 0.5) / (T * 0.5));
   return 1 - k * k * (3 - 2 * k);
+}
+
+/** The crater's fissures cooling: white hot at the impact, dull ember by
+ *  its end (the paint's `uHeat`). */
+export function craterHeat(age: number): number {
+  const T = ROCK_CRATER.seconds;
+  if (age < 0 || age >= T) return 0;
+  return (1 - age / T) ** 1.6;
+}
+
+/** The stone's crescendo as the Falling Rock drops (the paint's `uHeat`):
+ *  a low ember while it hangs, rising through its last fall of `fallSeconds`
+ *  to full at the landing. */
+export function rockCrescendo(remaining: number, fallSeconds: number): number {
+  if (remaining <= 0) return 1;
+  if (remaining >= fallSeconds) return 0.12;
+  const t = 1 - remaining / fallSeconds;
+  return 0.12 + 0.88 * t * t;
+}
+
+/** The rock's shadow under the soak, drawn by the stone paint's char pass
+ *  (so the fissures glow through it): its radius as a share of the soak's
+ *  (`share`, from soakCountdown) and `near` 0..1 (the rock's approach) to its
+ *  darkness and its edge, soft and pale while the rock hangs high, black and
+ *  crisp as it lands. Mirrored in council_telegraph_glsl.ts. */
+export function rockShadowLook(near: number): { dark: number; soft: number } {
+  const n = Math.max(0, Math.min(1, near));
+  return { dark: 0.55 + 0.4 * n ** 0.6, soft: 0.55 - 0.47 * n ** 0.8 };
 }
 
 /** How many times a second the lightning re-strikes (a new set of forks):

@@ -7,9 +7,10 @@
 //     bright head sweeping round to the end;
 //   - a beacon of gold light standing over the marked player, burning hotter to
 //     the end (the raid finds the soak from anywhere on the floor);
-//   - the rock's shadow on the floor growing and darkening as it comes down.
-// The rim and its countdown draw on every tier (they are the mechanic's own
-// time); the beacon and the shadow too (cheap, one mesh each). Built in the
+// The rock's shadow growing and darkening as it comes down is the stone
+// paint's (council_telegraph_glsl.ts, under the fissures' glow, so the split
+// floor burns through it). The rim and its countdown draw on every tier (they
+// are the mechanic's own time); the beacon too (cheap, one mesh). Built in the
 // constructor under the host's root (one gated attach), fixed pools, no light.
 
 import * as THREE from 'three';
@@ -38,6 +39,9 @@ uniform vec3 uColor;
 varying vec2 vXZ;
 void main() {
   float a = atan(vXZ.x, vXZ.y);
+  // Bevelled: brightest at the outer edge, fading inward (a hard gold line,
+  // not a flat gold band over the split floor).
+  float bevel = 0.35 + 0.65 * smoothstep(0.9, 0.99, length(vXZ));
   float t = fract(a / 6.2831853 + 0.5);
   float local = fract(t * uSegments);
   float gap = smoothstep(0.03, 0.08, local) * (1.0 - smoothstep(0.92, 0.97, local));
@@ -45,7 +49,7 @@ void main() {
   float head = 1.0 - smoothstep(0.0, 0.035, abs(t - uLeft));
   float pulse = 0.85 + 0.15 * sin(uTime * 9.0);
   vec3 col = uColor * mix(0.35, 1.6 * pulse, live) + vec3(1.0) * head * 0.9;
-  float alpha = uAlpha * gap * mix(0.35, 1.0, live) + head * uAlpha;
+  float alpha = (uAlpha * gap * mix(0.35, 1.0, live) + head * uAlpha) * bevel;
   gl_FragColor = vec4(col, min(1.0, alpha));
   #include <colorspace_fragment>
 }
@@ -64,21 +68,11 @@ uniform float uTime;
 uniform vec3 uColor;
 varying vec2 vUv;
 void main() {
-  float up = pow(1.0 - vUv.y, 1.5);
+  // Faded at its foot, so the rock's shadow and the split floor under the
+  // marked player read through it from above.
+  float up = pow(1.0 - vUv.y, 1.5) * smoothstep(0.0, 0.1, vUv.y);
   float flow = 0.7 + 0.3 * sin(vUv.y * 22.0 - uTime * 6.0 + vUv.x * 18.85);
   gl_FragColor = vec4(uColor, uAlpha * up * flow * 0.5);
-  #include <colorspace_fragment>
-}
-`;
-
-const SHADOW_VERT = RIM_VERT;
-const SHADOW_FRAG = /* glsl */ `
-uniform float uAlpha;
-varying vec2 vXZ;
-void main() {
-  float r = length(vXZ);
-  float a = uAlpha * (1.0 - smoothstep(0.55, 1.0, r));
-  gl_FragColor = vec4(0.04, 0.03, 0.03, a);
   #include <colorspace_fragment>
 }
 `;
@@ -88,11 +82,9 @@ interface Soak {
   rimMat: THREE.ShaderMaterial;
   beam: THREE.Mesh;
   beamMat: THREE.ShaderMaterial;
-  shadow: THREE.Mesh;
-  shadowMat: THREE.ShaderMaterial;
 }
 
-const _cd = { left: 0, beacon: 0, shadow: 0, dark: 0 };
+const _cd = { left: 0, beacon: 0, shadow: 0, dark: 0, near: 0 };
 
 export class CouncilSoakFx {
   private readonly soaks: Soak[] = [];
@@ -103,10 +95,9 @@ export class CouncilSoakFx {
     geometries: THREE.BufferGeometry[],
     materials: THREE.Material[],
   ) {
-    const rimGeo = new THREE.RingGeometry(0.85, 1.0, 96, 1).rotateX(-Math.PI / 2);
+    const rimGeo = new THREE.RingGeometry(0.88, 1.0, 96, 1).rotateX(-Math.PI / 2);
     const beamGeo = new THREE.CylinderGeometry(0.75, 1.1, 1, 20, 1, true).translate(0, 0.5, 0);
-    const discGeo = new THREE.CircleGeometry(1, 40).rotateX(-Math.PI / 2);
-    geometries.push(rimGeo, beamGeo, discGeo);
+    geometries.push(rimGeo, beamGeo);
     for (let i = 0; i < POOLS.rocks; i++) {
       const rimMat = new THREE.ShaderMaterial({
         name: 'smithHeartSoakRim',
@@ -144,24 +135,13 @@ export class CouncilSoakFx {
       });
       const beam = new THREE.Mesh(beamGeo, beamMat);
       beam.name = 'smithHeartSoakBeacon';
-      const shadowMat = new THREE.ShaderMaterial({
-        name: 'smithHeartSoakShadow',
-        uniforms: { uAlpha: { value: 0 } },
-        vertexShader: SHADOW_VERT,
-        fragmentShader: SHADOW_FRAG,
-        transparent: true,
-        depthWrite: false,
-      });
-      const shadow = new THREE.Mesh(discGeo, shadowMat);
-      shadow.name = 'smithHeartSoakShadow';
-      shadow.renderOrder = floorVfxRenderOrder('encounter', 26);
-      for (const m of [rim, beam, shadow]) {
+      for (const m of [rim, beam]) {
         m.visible = false;
         m.frustumCulled = false;
         root.add(m);
       }
-      materials.push(rimMat, beamMat, shadowMat);
-      this.soaks.push({ rim, rimMat, beam, beamMat, shadow, shadowMat });
+      materials.push(rimMat, beamMat);
+      this.soaks.push({ rim, rimMat, beam, beamMat });
     }
   }
 
@@ -187,12 +167,8 @@ export class CouncilSoakFx {
     s.beam.position.set(x, y, z);
     s.beam.scale.set(1, 26, 1);
     s.beamMat.uniforms.uAlpha.value = _cd.beacon;
-    s.shadow.position.set(x, y + 0.08, z);
-    s.shadow.scale.setScalar(radius * _cd.shadow);
-    s.shadowMat.uniforms.uAlpha.value = _cd.dark;
     s.rim.visible = true;
     s.beam.visible = true;
-    s.shadow.visible = true;
   }
 
   hide(i: number): void {
@@ -200,6 +176,5 @@ export class CouncilSoakFx {
     if (!s || !s.rim.visible) return;
     s.rim.visible = false;
     s.beam.visible = false;
-    s.shadow.visible = false;
   }
 }
