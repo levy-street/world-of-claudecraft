@@ -1,11 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import {
   applyStudioPropEdits,
+  editsReshapingGround,
   propRecordAnchor,
   STUDIO_REWORK_PROP_EDITS,
   unmatchedStudioPropEdits,
 } from '../src/sim/content/studio_rework_props';
-import { BUILTIN_WORLD, PROPS, SHIPPED_PROPS } from '../src/sim/data';
+import { BUILTIN_WORLD, GROUND_PROPS, PROPS, SHIPPED_PROPS } from '../src/sim/data';
+import { collectCalmAnchorPads } from '../src/sim/terrain_calm_anchors';
 import type { ZonePropsDef } from '../src/sim/types';
 
 const anchorsOf = (records: readonly unknown[]) =>
@@ -63,5 +65,31 @@ describe('Studio town rework prop edits', () => {
     const edits = [{ table: 'wells' as const, at: { x: 9, z: 9 }, remove: true as const }];
     expect(applyStudioPropEdits(props, edits).wells).toEqual(props.wells);
     expect(unmatchedStudioPropEdits(props, edits)).toEqual(edits);
+  });
+
+  it('a keepGround edit leaves its shipped record shaping the terrain', () => {
+    const kept = STUDIO_REWORK_PROP_EDITS.filter((edit) => edit.keepGround);
+    // the Wickharbor harbor and ferry wharf models' ground (scripts/assets/wickharbor_*)
+    expect(kept.length).toBeGreaterThan(0);
+    expect(editsReshapingGround()).toHaveLength(STUDIO_REWORK_PROP_EDITS.length - kept.length);
+    const pads = collectCalmAnchorPads();
+    for (const edit of kept) {
+      const label = `${edit.table} ${edit.at.x},${edit.at.z}`;
+      const shipped = anchorsOf(SHIPPED_PROPS[edit.table] as unknown[]);
+      const ground = anchorsOf(GROUND_PROPS[edit.table] as unknown[]);
+      const world = anchorsOf(PROPS[edit.table] as unknown[]);
+      const countAt = (list: { x: number; z: number }[]) =>
+        list.filter((a) => near(a, edit.at)).length;
+      // gone (or moved) in the world, still where it shipped for the terrain
+      expect(countAt(world), label).toBe(countAt(shipped) - 1);
+      expect(countAt(ground), label).toBe(countAt(shipped));
+      // decor rows pad from their own anchor (absent terrainCalm), so the pad is there
+      if (edit.table !== 'decorProps') {
+        expect(
+          pads.some((pad) => near(pad, edit.at)),
+          label,
+        ).toBe(true);
+      }
+    }
   });
 });

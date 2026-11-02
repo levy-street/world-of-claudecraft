@@ -1,7 +1,7 @@
 import { MEMBERSHIP_ITEMS } from './content/membership';
 import { REFERRAL_ITEMS } from './content/referral';
 import { STUDIO_REWORK_CAMPS } from './content/studio_rework_camps';
-import { applyStudioPropEdits } from './content/studio_rework_props';
+import { applyStudioPropEdits, editsReshapingGround } from './content/studio_rework_props';
 import { INVESTIGATION_MOB, INVESTIGATION_NPCS } from './content/world_quest_investigation';
 import { SHADOW_GUARDS, SHADOW_NPC_DEF } from './content/world_quest_shadow';
 import { bindFenbridgeActiveWorldGetter } from './fenbridge_touchup';
@@ -985,6 +985,12 @@ export const SHIPPED_PROPS: ZonePropsDef = mergeProps([
 // The Studio town rework's removed and moved scenery records apply last
 // (content/studio_rework_props.ts).
 export const PROPS: ZonePropsDef = applyStudioPropEdits(SHIPPED_PROPS);
+/** The props the terrain's calm pads read: PROPS, except that records an edit marks
+ *  `keepGround` keep the pad they shipped with (content/studio_rework_props.ts). */
+export const GROUND_PROPS: ZonePropsDef = applyStudioPropEdits(
+  SHIPPED_PROPS,
+  editsReshapingGround(),
+);
 
 function mergeProps(sets: ZonePropsDef[]): ZonePropsDef {
   return {

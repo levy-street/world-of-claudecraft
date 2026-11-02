@@ -15,6 +15,10 @@ export interface StudioPropEdit {
   remove?: true;
   /** New anchor, and the yaw added to the record's own rotation (radians). */
   to?: { x: number; z: number; turn: number };
+  /** The terrain keeps the calm pad the shipped record had (terrain_calm_anchors.ts reads
+   *  GROUND_PROPS): set on the edits round the Wickharbor harbor and ferry wharf, whose
+   *  models were built in Blender on the ground those pads shaped. */
+  keepGround?: true;
 }
 
 export const STUDIO_REWORK_PROP_EDITS: readonly StudioPropEdit[] = [
@@ -35,8 +39,8 @@ export const STUDIO_REWORK_PROP_EDITS: readonly StudioPropEdit[] = [
   { table: 'campfires', at: { x: 304, z: 66 }, to: { x: 300.315, z: 59.439, turn: 0 } },
   { table: 'campfires', at: { x: 324, z: 798 }, remove: true },
   { table: 'campfires', at: { x: 388, z: 716 }, to: { x: 383.237, z: 740.002, turn: 0 } },
-  { table: 'campfires', at: { x: 432, z: 361 }, remove: true },
-  { table: 'campfires', at: { x: 455, z: 363 }, remove: true },
+  { table: 'campfires', at: { x: 432, z: 361 }, remove: true, keepGround: true },
+  { table: 'campfires', at: { x: 455, z: 363 }, remove: true, keepGround: true },
   { table: 'crates', at: { x: -372.5, z: 351.5 }, remove: true },
   { table: 'crates', at: { x: -302, z: 816 }, to: { x: -288.047, z: 813.885, turn: 0 } },
   { table: 'crates', at: { x: -284, z: 1057 }, remove: true },
@@ -49,7 +53,7 @@ export const STUDIO_REWORK_PROP_EDITS: readonly StudioPropEdit[] = [
   { table: 'crates', at: { x: 300, z: 808 }, remove: true },
   { table: 'crates', at: { x: 308, z: 60 }, remove: true },
   { table: 'crates', at: { x: 357, z: 627 }, remove: true },
-  { table: 'crates', at: { x: 441, z: 359 }, remove: true },
+  { table: 'crates', at: { x: 441, z: 359 }, remove: true, keepGround: true },
   { table: 'decorProps', at: { x: -448, z: 452 }, remove: true },
   { table: 'decorProps', at: { x: -428, z: 417 }, remove: true },
   { table: 'decorProps', at: { x: -392, z: 232 }, remove: true },
@@ -130,27 +134,37 @@ export const STUDIO_REWORK_PROP_EDITS: readonly StudioPropEdit[] = [
   { table: 'decorProps', at: { x: 416.6, z: 751.4 }, remove: true },
   { table: 'decorProps', at: { x: 437.3, z: 755 }, remove: true },
   { table: 'decorProps', at: { x: 438, z: 638 }, remove: true },
-  { table: 'decorProps', at: { x: 443, z: 362 }, to: { x: 437, z: 372, turn: 0 } },
-  { table: 'decorProps', at: { x: 446, z: 383 }, remove: true },
+  {
+    table: 'decorProps',
+    at: { x: 443, z: 362 },
+    to: { x: 437, z: 372, turn: 0 },
+    keepGround: true,
+  },
+  { table: 'decorProps', at: { x: 446, z: 383 }, remove: true, keepGround: true },
   { table: 'decorProps', at: { x: 446, z: 581 }, remove: true },
   { table: 'decorProps', at: { x: 446, z: 592 }, remove: true },
-  { table: 'decorProps', at: { x: 447, z: 321 }, to: { x: 419.727, z: 359.623, turn: 0 } },
-  { table: 'decorProps', at: { x: 447, z: 362 }, remove: true },
+  {
+    table: 'decorProps',
+    at: { x: 447, z: 321 },
+    to: { x: 419.727, z: 359.623, turn: 0 },
+    keepGround: true,
+  },
+  { table: 'decorProps', at: { x: 447, z: 362 }, remove: true, keepGround: true },
   { table: 'decorProps', at: { x: 448, z: 558 }, remove: true },
   { table: 'decorProps', at: { x: 450, z: 576 }, remove: true },
   { table: 'decorProps', at: { x: 452, z: 938 }, remove: true },
   { table: 'decorProps', at: { x: 453, z: 570 }, remove: true },
-  { table: 'decorProps', at: { x: 457, z: 362 }, remove: true },
+  { table: 'decorProps', at: { x: 457, z: 362 }, remove: true, keepGround: true },
   { table: 'decorProps', at: { x: 458, z: 606 }, remove: true },
   { table: 'decorProps', at: { x: 460, z: 618 }, remove: true },
   { table: 'decorProps', at: { x: 460, z: 940 }, remove: true },
-  { table: 'decorProps', at: { x: 470, z: 310 }, remove: true },
+  { table: 'decorProps', at: { x: 470, z: 310 }, remove: true, keepGround: true },
   { table: 'decorProps', at: { x: 476, z: 634 }, remove: true },
-  { table: 'decorProps', at: { x: 477, z: 336 }, remove: true },
-  { table: 'decorProps', at: { x: 486, z: 340 }, remove: true },
+  { table: 'decorProps', at: { x: 477, z: 336 }, remove: true, keepGround: true },
+  { table: 'decorProps', at: { x: 486, z: 340 }, remove: true, keepGround: true },
   { table: 'decorProps', at: { x: 492, z: 744 }, remove: true },
   { table: 'decorProps', at: { x: 504, z: 760 }, remove: true },
-  { table: 'decorProps', at: { x: 515, z: 305 }, remove: true },
+  { table: 'decorProps', at: { x: 515, z: 305 }, remove: true, keepGround: true },
   { table: 'decorProps', at: { x: 516, z: 750 }, remove: true },
   { table: 'docks', at: { x: -286, z: 838 }, remove: true },
   { table: 'docks', at: { x: -277.3, z: -1.1 }, remove: true },
@@ -205,8 +219,8 @@ export const STUDIO_REWORK_PROP_EDITS: readonly StudioPropEdit[] = [
   { table: 'stalls', at: { x: 326, z: 802 }, remove: true },
   { table: 'stalls', at: { x: 356, z: 1426 }, remove: true },
   { table: 'stalls', at: { x: 419, z: 352 }, remove: true },
-  { table: 'stalls', at: { x: 452, z: 370 }, remove: true },
-  { table: 'stalls', at: { x: 464, z: 345 }, remove: true },
+  { table: 'stalls', at: { x: 452, z: 370 }, remove: true, keepGround: true },
+  { table: 'stalls', at: { x: 464, z: 345 }, remove: true, keepGround: true },
   { table: 'tents', at: { x: -506, z: 1039 }, remove: true },
   { table: 'tents', at: { x: -445, z: 1000 }, remove: true },
   { table: 'tents', at: { x: -411, z: 449 }, remove: true },
@@ -256,7 +270,7 @@ export const STUDIO_REWORK_PROP_EDITS: readonly StudioPropEdit[] = [
   { table: 'wells', at: { x: 324, z: 814 }, to: { x: 321.747, z: 810.12, turn: 0 } },
   { table: 'wells', at: { x: 375, z: 603 }, remove: true },
   { table: 'wells', at: { x: 419, z: 1891 }, remove: true },
-  { table: 'wells', at: { x: 427, z: 362 }, remove: true },
+  { table: 'wells', at: { x: 427, z: 362 }, remove: true, keepGround: true },
 ];
 
 const EPS = 1e-6;
@@ -300,6 +314,13 @@ function moved(record: unknown, to: { x: number; z: number; turn: number }): unk
 
 function sameAnchor(a: { x: number; z: number }, b: { x: number; z: number }): boolean {
   return Math.abs(a.x - b.x) < EPS && Math.abs(a.z - b.z) < EPS;
+}
+
+/** The edits whose shipped record still shapes the terrain (`keepGround`), left out. */
+export function editsReshapingGround(
+  edits: readonly StudioPropEdit[] = STUDIO_REWORK_PROP_EDITS,
+): StudioPropEdit[] {
+  return edits.filter((edit) => !edit.keepGround);
 }
 
 /** The props tables with every edit applied. Unmatched edits change nothing. */

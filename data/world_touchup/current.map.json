@@ -1,15 +1,15 @@
 {
   "version": 2,
   "meta": {
-    "id": "live-4103c-d11d9989-c975f419-e7843-28643a0e-c892d41e",
+    "id": "live-41467-ccda5d03-2b30573-e3d87-ddf59c92-95ed6c22",
     "name": "Live world",
     "description": "",
     "createdAt": 0,
     "updatedAt": 0,
     "seed": 20061,
     "parentId": "",
-    "overworldBase": "4103c-d11d9989-c975f419",
-    "overworldRevision": "e7843-28643a0e-c892d41e"
+    "overworldBase": "41467-ccda5d03-2b30573",
+    "overworldRevision": "e3d87-ddf59c92-95ed6c22"
   },
   "content": {
     "zones": [
@@ -50,14 +50,14 @@
             "id": "eastbrook"
           },
           {
-            "x": 2,
-            "z": -4,
+            "x": -18,
+            "z": 28,
             "label": "Wolf Run",
             "id": "wolf_run"
           },
           {
-            "x": 60,
-            "z": -64,
+            "x": 72,
+            "z": -74,
             "label": "Boar Meadow",
             "id": "boar_meadow"
           },
@@ -68,8 +68,8 @@
             "id": "mirror_lake"
           },
           {
-            "x": -60,
-            "z": 4,
+            "x": -70,
+            "z": 36,
             "label": "Sableweb",
             "id": "sableweb"
           },
@@ -263,8 +263,8 @@
             "id": "highwatch"
           },
           {
-            "x": -50,
-            "z": 590,
+            "x": 46,
+            "z": 582,
             "label": "Stalker Ridge",
             "id": "stalker_ridge"
           },
@@ -275,7 +275,7 @@
             "id": "deeprock_burrows"
           },
           {
-            "x": -90,
+            "x": -100,
             "z": 700,
             "label": "Ogre Foothills",
             "id": "ogre_foothills"
@@ -15492,61 +15492,61 @@
     {
       "x": 441.8749158192822,
       "z": 333.9830783115236,
-      "radius": 12.776346815209504,
+      "radius": 12.276346815209504,
       "delta": 2.5,
       "falloff": "smooth",
       "mode": "level",
-      "hardness": 0.5303821908734236,
+      "hardness": 0.5519839832819078,
       "id": "live-terrain-605"
     },
     {
       "x": 437.1425075781695,
       "z": 325.08303829816145,
-      "radius": 12.776346815209504,
+      "radius": 12.276346815209504,
       "delta": 2.5,
       "falloff": "smooth",
       "mode": "level",
-      "hardness": 0.5303821908734236,
+      "hardness": 0.5519839832819078,
       "id": "live-terrain-606"
     },
     {
       "x": 433.8761814453684,
       "z": 338.23623632123474,
-      "radius": 12.776346815209504,
+      "radius": 12.276346815209504,
       "delta": 2.5,
       "falloff": "smooth",
       "mode": "level",
-      "hardness": 0.5303821908734236,
+      "hardness": 0.5519839832819078,
       "id": "live-terrain-607"
     },
     {
       "x": 429.1437732042557,
       "z": 329.33619630787257,
-      "radius": 12.776346815209504,
+      "radius": 12.276346815209504,
       "delta": 2.5,
       "falloff": "smooth",
       "mode": "level",
-      "hardness": 0.5303821908734236,
+      "hardness": 0.5519839832819078,
       "id": "live-terrain-608"
     },
     {
       "x": 425.8774470714546,
       "z": 342.48939433094586,
-      "radius": 12.776346815209504,
+      "radius": 12.276346815209504,
       "delta": 2.5,
       "falloff": "smooth",
       "mode": "level",
-      "hardness": 0.5303821908734236,
+      "hardness": 0.5519839832819078,
       "id": "live-terrain-609"
     },
     {
       "x": 421.1450388303419,
       "z": 333.5893543175837,
-      "radius": 12.776346815209504,
+      "radius": 12.276346815209504,
       "delta": 2.5,
       "falloff": "smooth",
       "mode": "level",
-      "hardness": 0.5303821908734236,
+      "hardness": 0.5519839832819078,
       "id": "live-terrain-610"
     },
     {
@@ -15970,16 +15970,96 @@
       "id": "live-terrain-652"
     },
     {
-      "x": 347.20842206072285,
-      "z": 781.9573462666797,
-      "radius": 12.776346815209504,
-      "delta": 2,
+      "x": 428.9369807913977,
+      "z": 369.3619439285585,
+      "radius": 8.79507003322652,
+      "delta": 2.5,
       "falloff": "smooth",
       "mode": "level",
-      "hardness": 0.5303821908734236,
+      "hardness": 0.6588998167534279,
       "id": "live-terrain-653"
     },
     {
+      "x": 431.64870982055834,
+      "z": 376.81388499598563,
+      "radius": 8.79507003322652,
+      "delta": 2.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6588998167534279,
+      "id": "live-terrain-654"
+    },
+    {
+      "x": 436.88001699146514,
+      "z": 366.47150751091874,
+      "radius": 8.79507003322652,
+      "delta": 2.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6588998167534279,
+      "id": "live-terrain-655"
+    },
+    {
+      "x": 439.5917460206258,
+      "z": 373.92344857834587,
+      "radius": 8.79507003322652,
+      "delta": 2.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6588998167534279,
+      "id": "live-terrain-656"
+    },
+    {
+      "x": 428.9369807913977,
+      "z": 369.3619439285585,
+      "radius": 9.79507003322652,
+      "delta": 2.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5916313016209858,
+      "id": "live-terrain-657"
+    },
+    {
+      "x": 431.64870982055834,
+      "z": 376.81388499598563,
+      "radius": 9.79507003322652,
+      "delta": 2.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5916313016209858,
+      "id": "live-terrain-658"
+    },
+    {
+      "x": 436.88001699146514,
+      "z": 366.47150751091874,
+      "radius": 9.79507003322652,
+      "delta": 2.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5916313016209858,
+      "id": "live-terrain-659"
+    },
+    {
+      "x": 439.5917460206258,
+      "z": 373.92344857834587,
+      "radius": 9.79507003322652,
+      "delta": 2.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5916313016209858,
+      "id": "live-terrain-660"
+    },
+    {
+      "x": 347.20842206072285,
+      "z": 781.9573462666797,
+      "radius": 12.776346815209504,
+      "delta": 2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5303821908734236,
+      "id": "live-terrain-661"
+    },
+    {
       "x": 341.86681890223844,
       "z": 773.4090320646121,
       "radius": 12.776346815209504,
@@ -15987,7 +16067,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.5303821908734236,
-      "id": "live-terrain-654"
+      "id": "live-terrain-662"
     },
     {
       "x": 339.5257942810234,
@@ -15997,7 +16077,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.5303821908734236,
-      "id": "live-terrain-655"
+      "id": "live-terrain-663"
     },
     {
       "x": 334.184191122539,
@@ -16007,7 +16087,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.5303821908734236,
-      "id": "live-terrain-656"
+      "id": "live-terrain-664"
     },
     {
       "x": 331.843166501324,
@@ -16017,7 +16097,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.5303821908734236,
-      "id": "live-terrain-657"
+      "id": "live-terrain-665"
     },
     {
       "x": 326.5015633428396,
@@ -16027,7 +16107,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.5303821908734236,
-      "id": "live-terrain-658"
+      "id": "live-terrain-666"
     },
     {
       "x": 291.4917307585704,
@@ -16037,7 +16117,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.508371913451382,
-      "id": "live-terrain-659"
+      "id": "live-terrain-667"
     },
     {
       "x": 291.35124896309173,
@@ -16047,7 +16127,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.508371913451382,
-      "id": "live-terrain-660"
+      "id": "live-terrain-668"
     },
     {
       "x": 291.2107671676131,
@@ -16057,7 +16137,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.508371913451382,
-      "id": "live-terrain-661"
+      "id": "live-terrain-669"
     },
     {
       "x": 282.06765875979374,
@@ -16067,7 +16147,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.508371913451382,
-      "id": "live-terrain-662"
+      "id": "live-terrain-670"
     },
     {
       "x": 281.9271769643151,
@@ -16077,7 +16157,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.508371913451382,
-      "id": "live-terrain-663"
+      "id": "live-terrain-671"
     },
     {
       "x": 281.78669516883645,
@@ -16087,7 +16167,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.508371913451382,
-      "id": "live-terrain-664"
+      "id": "live-terrain-672"
     },
     {
       "x": 311.8685931334258,
@@ -16097,7 +16177,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.5076195767254587,
-      "id": "live-terrain-665"
+      "id": "live-terrain-673"
     },
     {
       "x": 318.9195774826057,
@@ -16107,7 +16187,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.5076195767254587,
-      "id": "live-terrain-666"
+      "id": "live-terrain-674"
     },
     {
       "x": 315.52421855388155,
@@ -16117,7 +16197,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.5076195767254587,
-      "id": "live-terrain-667"
+      "id": "live-terrain-675"
     },
     {
       "x": 322.57520290306144,
@@ -16127,7 +16207,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.5076195767254587,
-      "id": "live-terrain-668"
+      "id": "live-terrain-676"
     },
     {
       "x": 343.76276792347977,
@@ -16137,7 +16217,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.4717676516090896,
-      "id": "live-terrain-669"
+      "id": "live-terrain-677"
     },
     {
       "x": 341.7572336014154,
@@ -16147,7 +16227,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.4717676516090896,
-      "id": "live-terrain-670"
+      "id": "live-terrain-678"
     },
     {
       "x": 351.6371266637511,
@@ -16157,7 +16237,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.4717676516090896,
-      "id": "live-terrain-671"
+      "id": "live-terrain-679"
     },
     {
       "x": 349.6315923416867,
@@ -16167,7 +16247,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.4717676516090896,
-      "id": "live-terrain-672"
+      "id": "live-terrain-680"
     },
     {
       "x": 347.20842206072285,
@@ -16177,7 +16257,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6288166974772484,
-      "id": "live-terrain-673"
+      "id": "live-terrain-681"
     },
     {
       "x": 341.86681890223844,
@@ -16187,7 +16267,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6288166974772484,
-      "id": "live-terrain-674"
+      "id": "live-terrain-682"
     },
     {
       "x": 339.5257942810234,
@@ -16197,7 +16277,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6288166974772484,
-      "id": "live-terrain-675"
+      "id": "live-terrain-683"
     },
     {
       "x": 334.184191122539,
@@ -16207,7 +16287,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6288166974772484,
-      "id": "live-terrain-676"
+      "id": "live-terrain-684"
     },
     {
       "x": 331.843166501324,
@@ -16217,7 +16297,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6288166974772484,
-      "id": "live-terrain-677"
+      "id": "live-terrain-685"
     },
     {
       "x": 326.5015633428396,
@@ -16227,7 +16307,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6288166974772484,
-      "id": "live-terrain-678"
+      "id": "live-terrain-686"
     },
     {
       "x": 291.4917307585704,
@@ -16237,7 +16317,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6080102125907121,
-      "id": "live-terrain-679"
+      "id": "live-terrain-687"
     },
     {
       "x": 291.35124896309173,
@@ -16247,7 +16327,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6080102125907121,
-      "id": "live-terrain-680"
+      "id": "live-terrain-688"
     },
     {
       "x": 291.2107671676131,
@@ -16257,7 +16337,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6080102125907121,
-      "id": "live-terrain-681"
+      "id": "live-terrain-689"
     },
     {
       "x": 282.06765875979374,
@@ -16267,7 +16347,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6080102125907121,
-      "id": "live-terrain-682"
+      "id": "live-terrain-690"
     },
     {
       "x": 281.9271769643151,
@@ -16277,7 +16357,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6080102125907121,
-      "id": "live-terrain-683"
+      "id": "live-terrain-691"
     },
     {
       "x": 281.78669516883645,
@@ -16287,7 +16367,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6080102125907121,
-      "id": "live-terrain-684"
+      "id": "live-terrain-692"
     },
     {
       "x": 311.8685931334258,
@@ -16297,7 +16377,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.607292567146481,
-      "id": "live-terrain-685"
+      "id": "live-terrain-693"
     },
     {
       "x": 318.9195774826057,
@@ -16307,7 +16387,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.607292567146481,
-      "id": "live-terrain-686"
+      "id": "live-terrain-694"
     },
     {
       "x": 315.52421855388155,
@@ -16317,7 +16397,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.607292567146481,
-      "id": "live-terrain-687"
+      "id": "live-terrain-695"
     },
     {
       "x": 322.57520290306144,
@@ -16327,7 +16407,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.607292567146481,
-      "id": "live-terrain-688"
+      "id": "live-terrain-696"
     },
     {
       "x": 343.76276792347977,
@@ -16337,7 +16417,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.57258737644937,
-      "id": "live-terrain-689"
+      "id": "live-terrain-697"
     },
     {
       "x": 341.7572336014154,
@@ -16347,7 +16427,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.57258737644937,
-      "id": "live-terrain-690"
+      "id": "live-terrain-698"
     },
     {
       "x": 351.6371266637511,
@@ -16357,7 +16437,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.57258737644937,
-      "id": "live-terrain-691"
+      "id": "live-terrain-699"
     },
     {
       "x": 349.6315923416867,
@@ -16367,89 +16447,89 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.57258737644937,
-      "id": "live-terrain-692"
-    },
-    {
-      "x": -290.15716253354356,
-      "z": 802.3299358451313,
-      "radius": 14.776346815209504,
-      "delta": 2,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.4585941911051055,
-      "id": "live-terrain-693"
-    },
-    {
-      "x": -290.1572365853584,
-      "z": 792.2499358454033,
-      "radius": 14.776346815209504,
-      "delta": 2,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.4585941911051055,
-      "id": "live-terrain-694"
-    },
-    {
-      "x": -299.2163625332991,
-      "z": 802.3300023977307,
-      "radius": 14.776346815209504,
-      "delta": 2,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.4585941911051055,
-      "id": "live-terrain-695"
-    },
-    {
-      "x": -299.21643658511397,
-      "z": 792.2500023980027,
-      "radius": 14.776346815209504,
-      "delta": 2,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.4585941911051055,
-      "id": "live-terrain-696"
-    },
-    {
-      "x": -308.27556253305465,
-      "z": 802.3300689503301,
-      "radius": 14.776346815209504,
-      "delta": 2,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.4585941911051055,
-      "id": "live-terrain-697"
-    },
-    {
-      "x": -308.2756365848695,
-      "z": 792.2500689506021,
-      "radius": 14.776346815209504,
-      "delta": 2,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.4585941911051055,
-      "id": "live-terrain-698"
-    },
-    {
-      "x": -325.83578783915345,
-      "z": 831.7588779402821,
-      "radius": 14.68661926910752,
-      "delta": 2.6,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.45528648537736993,
-      "id": "live-terrain-699"
-    },
-    {
-      "x": -330.54803546389815,
-      "z": 823.9155863912521,
-      "radius": 14.68661926910752,
-      "delta": 2.6,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.45528648537736993,
       "id": "live-terrain-700"
     },
     {
+      "x": -290.15716253354356,
+      "z": 802.3299358451313,
+      "radius": 14.776346815209504,
+      "delta": 2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4585941911051055,
+      "id": "live-terrain-701"
+    },
+    {
+      "x": -290.1572365853584,
+      "z": 792.2499358454033,
+      "radius": 14.776346815209504,
+      "delta": 2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4585941911051055,
+      "id": "live-terrain-702"
+    },
+    {
+      "x": -299.2163625332991,
+      "z": 802.3300023977307,
+      "radius": 14.776346815209504,
+      "delta": 2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4585941911051055,
+      "id": "live-terrain-703"
+    },
+    {
+      "x": -299.21643658511397,
+      "z": 792.2500023980027,
+      "radius": 14.776346815209504,
+      "delta": 2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4585941911051055,
+      "id": "live-terrain-704"
+    },
+    {
+      "x": -308.27556253305465,
+      "z": 802.3300689503301,
+      "radius": 14.776346815209504,
+      "delta": 2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4585941911051055,
+      "id": "live-terrain-705"
+    },
+    {
+      "x": -308.2756365848695,
+      "z": 792.2500689506021,
+      "radius": 14.776346815209504,
+      "delta": 2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4585941911051055,
+      "id": "live-terrain-706"
+    },
+    {
+      "x": -325.83578783915345,
+      "z": 831.7588779402821,
+      "radius": 14.68661926910752,
+      "delta": 2.6,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.45528648537736993,
+      "id": "live-terrain-707"
+    },
+    {
+      "x": -330.54803546389815,
+      "z": 823.9155863912521,
+      "radius": 14.68661926910752,
+      "delta": 2.6,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.45528648537736993,
+      "id": "live-terrain-708"
+    },
+    {
       "x": -334.1959651591196,
       "z": 836.7816704084936,
       "radius": 14.68661926910752,
@@ -16457,7 +16537,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.45528648537736993,
-      "id": "live-terrain-701"
+      "id": "live-terrain-709"
     },
     {
       "x": -338.9082127838643,
@@ -16467,7 +16547,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.45528648537736993,
-      "id": "live-terrain-702"
+      "id": "live-terrain-710"
     },
     {
       "x": -284.01096460695436,
@@ -16477,7 +16557,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.4717676516090896,
-      "id": "live-terrain-703"
+      "id": "live-terrain-711"
     },
     {
       "x": -277.3847080038335,
@@ -16487,7 +16567,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.4717676516090896,
-      "id": "live-terrain-704"
+      "id": "live-terrain-712"
     },
     {
       "x": -281.8798470534744,
@@ -16497,7 +16577,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.4717676516090896,
-      "id": "live-terrain-705"
+      "id": "live-terrain-713"
     },
     {
       "x": -275.25359045035356,
@@ -16507,7 +16587,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.4717676516090896,
-      "id": "live-terrain-706"
+      "id": "live-terrain-714"
     },
     {
       "x": -290.15716253354356,
@@ -16517,7 +16597,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6288166974772484,
-      "id": "live-terrain-707"
+      "id": "live-terrain-715"
     },
     {
       "x": -290.1572365853584,
@@ -16527,7 +16607,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6288166974772484,
-      "id": "live-terrain-708"
+      "id": "live-terrain-716"
     },
     {
       "x": -299.2163625332991,
@@ -16537,7 +16617,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6288166974772484,
-      "id": "live-terrain-709"
+      "id": "live-terrain-717"
     },
     {
       "x": -299.21643658511397,
@@ -16547,7 +16627,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6288166974772484,
-      "id": "live-terrain-710"
+      "id": "live-terrain-718"
     },
     {
       "x": -308.27556253305465,
@@ -16557,7 +16637,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6288166974772484,
-      "id": "live-terrain-711"
+      "id": "live-terrain-719"
     },
     {
       "x": -308.2756365848695,
@@ -16567,7 +16647,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6288166974772484,
-      "id": "live-terrain-712"
+      "id": "live-terrain-720"
     },
     {
       "x": -325.83578783915345,
@@ -16577,7 +16657,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.625700149011292,
-      "id": "live-terrain-713"
+      "id": "live-terrain-721"
     },
     {
       "x": -330.54803546389815,
@@ -16587,7 +16667,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.625700149011292,
-      "id": "live-terrain-714"
+      "id": "live-terrain-722"
     },
     {
       "x": -334.1959651591196,
@@ -16597,7 +16677,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.625700149011292,
-      "id": "live-terrain-715"
+      "id": "live-terrain-723"
     },
     {
       "x": -338.9082127838643,
@@ -16607,7 +16687,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.625700149011292,
-      "id": "live-terrain-716"
+      "id": "live-terrain-724"
     },
     {
       "x": -284.01096460695436,
@@ -16617,7 +16697,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6410898501448976,
-      "id": "live-terrain-717"
+      "id": "live-terrain-725"
     },
     {
       "x": -277.3847080038335,
@@ -16627,7 +16707,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6410898501448976,
-      "id": "live-terrain-718"
+      "id": "live-terrain-726"
     },
     {
       "x": -281.8798470534744,
@@ -16637,7 +16717,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6410898501448976,
-      "id": "live-terrain-719"
+      "id": "live-terrain-727"
     },
     {
       "x": -275.25359045035356,
@@ -16647,89 +16727,89 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6410898501448976,
-      "id": "live-terrain-720"
-    },
-    {
-      "x": -344.9266879603017,
-      "z": 307.076693815553,
-      "radius": 10.204347481694679,
-      "delta": 1,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.6080102125907121,
-      "id": "live-terrain-721"
-    },
-    {
-      "x": -346.20776985801217,
-      "z": 299.10835085005493,
-      "radius": 10.204347481694679,
-      "delta": 1,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.6080102125907121,
-      "id": "live-terrain-722"
-    },
-    {
-      "x": -347.48885175572264,
-      "z": 291.14000788455684,
-      "radius": 10.204347481694679,
-      "delta": 1,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.6080102125907121,
-      "id": "live-terrain-723"
-    },
-    {
-      "x": -354.2326870460405,
-      "z": 308.57283260130424,
-      "radius": 10.204347481694679,
-      "delta": 1,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.6080102125907121,
-      "id": "live-terrain-724"
-    },
-    {
-      "x": -355.51376894375096,
-      "z": 300.60448963580615,
-      "radius": 10.204347481694679,
-      "delta": 1,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.6080102125907121,
-      "id": "live-terrain-725"
-    },
-    {
-      "x": -356.7948508414614,
-      "z": 292.63614667030805,
-      "radius": 10.204347481694679,
-      "delta": 1,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.6080102125907121,
-      "id": "live-terrain-726"
-    },
-    {
-      "x": -344.9266879603017,
-      "z": 307.076693815553,
-      "radius": 9.204347481694679,
-      "delta": 1,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.6740670638558239,
-      "id": "live-terrain-727"
-    },
-    {
-      "x": -346.20776985801217,
-      "z": 299.10835085005493,
-      "radius": 9.204347481694679,
-      "delta": 1,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.6740670638558239,
       "id": "live-terrain-728"
     },
     {
+      "x": -344.9266879603017,
+      "z": 307.076693815553,
+      "radius": 10.204347481694679,
+      "delta": 1,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6080102125907121,
+      "id": "live-terrain-729"
+    },
+    {
+      "x": -346.20776985801217,
+      "z": 299.10835085005493,
+      "radius": 10.204347481694679,
+      "delta": 1,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6080102125907121,
+      "id": "live-terrain-730"
+    },
+    {
+      "x": -347.48885175572264,
+      "z": 291.14000788455684,
+      "radius": 10.204347481694679,
+      "delta": 1,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6080102125907121,
+      "id": "live-terrain-731"
+    },
+    {
+      "x": -354.2326870460405,
+      "z": 308.57283260130424,
+      "radius": 10.204347481694679,
+      "delta": 1,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6080102125907121,
+      "id": "live-terrain-732"
+    },
+    {
+      "x": -355.51376894375096,
+      "z": 300.60448963580615,
+      "radius": 10.204347481694679,
+      "delta": 1,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6080102125907121,
+      "id": "live-terrain-733"
+    },
+    {
+      "x": -356.7948508414614,
+      "z": 292.63614667030805,
+      "radius": 10.204347481694679,
+      "delta": 1,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6080102125907121,
+      "id": "live-terrain-734"
+    },
+    {
+      "x": -344.9266879603017,
+      "z": 307.076693815553,
+      "radius": 9.204347481694679,
+      "delta": 1,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6740670638558239,
+      "id": "live-terrain-735"
+    },
+    {
+      "x": -346.20776985801217,
+      "z": 299.10835085005493,
+      "radius": 9.204347481694679,
+      "delta": 1,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6740670638558239,
+      "id": "live-terrain-736"
+    },
+    {
       "x": -347.48885175572264,
       "z": 291.14000788455684,
       "radius": 9.204347481694679,
@@ -16737,7 +16817,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6740670638558239,
-      "id": "live-terrain-729"
+      "id": "live-terrain-737"
     },
     {
       "x": -354.2326870460405,
@@ -16747,7 +16827,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6740670638558239,
-      "id": "live-terrain-730"
+      "id": "live-terrain-738"
     },
     {
       "x": -355.51376894375096,
@@ -16757,7 +16837,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6740670638558239,
-      "id": "live-terrain-731"
+      "id": "live-terrain-739"
     },
     {
       "x": -356.7948508414614,
@@ -16767,89 +16847,89 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6740670638558239,
-      "id": "live-terrain-732"
-    },
-    {
-      "x": -49.3737682321379,
-      "z": 1598.0957542382648,
-      "radius": 15.445216978033613,
-      "delta": 2.5,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.48204029691666345,
-      "id": "live-terrain-733"
-    },
-    {
-      "x": -52.36677588404234,
-      "z": 1607.306468447035,
-      "radius": 15.445216978033613,
-      "delta": 2.5,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.48204029691666345,
-      "id": "live-terrain-734"
-    },
-    {
-      "x": -55.35978353594678,
-      "z": 1616.5171826558053,
-      "radius": 15.445216978033613,
-      "delta": 2.5,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.48204029691666345,
-      "id": "live-terrain-735"
-    },
-    {
-      "x": -38.61683942310557,
-      "z": 1601.5912019860375,
-      "radius": 15.445216978033613,
-      "delta": 2.5,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.48204029691666345,
-      "id": "live-terrain-736"
-    },
-    {
-      "x": -41.60984707501001,
-      "z": 1610.8019161948077,
-      "radius": 15.445216978033613,
-      "delta": 2.5,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.48204029691666345,
-      "id": "live-terrain-737"
-    },
-    {
-      "x": -44.60285472691445,
-      "z": 1620.012630403578,
-      "radius": 15.445216978033613,
-      "delta": 2.5,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.48204029691666345,
-      "id": "live-terrain-738"
-    },
-    {
-      "x": -19.329260705283076,
-      "z": 1571.8162626415133,
-      "radius": 14.68661926910752,
-      "delta": 1.5,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.45528648537736993,
-      "id": "live-terrain-739"
-    },
-    {
-      "x": -10.180646382179871,
-      "z": 1571.6570270703905,
-      "radius": 14.68661926910752,
-      "delta": 1.5,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.45528648537736993,
       "id": "live-terrain-740"
     },
     {
+      "x": -49.3737682321379,
+      "z": 1598.0957542382648,
+      "radius": 15.445216978033613,
+      "delta": 2.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.48204029691666345,
+      "id": "live-terrain-741"
+    },
+    {
+      "x": -52.36677588404234,
+      "z": 1607.306468447035,
+      "radius": 15.445216978033613,
+      "delta": 2.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.48204029691666345,
+      "id": "live-terrain-742"
+    },
+    {
+      "x": -55.35978353594678,
+      "z": 1616.5171826558053,
+      "radius": 15.445216978033613,
+      "delta": 2.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.48204029691666345,
+      "id": "live-terrain-743"
+    },
+    {
+      "x": -38.61683942310557,
+      "z": 1601.5912019860375,
+      "radius": 15.445216978033613,
+      "delta": 2.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.48204029691666345,
+      "id": "live-terrain-744"
+    },
+    {
+      "x": -41.60984707501001,
+      "z": 1610.8019161948077,
+      "radius": 15.445216978033613,
+      "delta": 2.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.48204029691666345,
+      "id": "live-terrain-745"
+    },
+    {
+      "x": -44.60285472691445,
+      "z": 1620.012630403578,
+      "radius": 15.445216978033613,
+      "delta": 2.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.48204029691666345,
+      "id": "live-terrain-746"
+    },
+    {
+      "x": -19.329260705283076,
+      "z": 1571.8162626415133,
+      "radius": 14.68661926910752,
+      "delta": 1.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.45528648537736993,
+      "id": "live-terrain-747"
+    },
+    {
+      "x": -10.180646382179871,
+      "z": 1571.6570270703905,
+      "radius": 14.68661926910752,
+      "delta": 1.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.45528648537736993,
+      "id": "live-terrain-748"
+    },
+    {
       "x": -19.498990161584906,
       "z": 1562.064739636789,
       "radius": 14.68661926910752,
@@ -16857,7 +16937,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.45528648537736993,
-      "id": "live-terrain-741"
+      "id": "live-terrain-749"
     },
     {
       "x": -10.350375838481702,
@@ -16867,7 +16947,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.45528648537736993,
-      "id": "live-terrain-742"
+      "id": "live-terrain-750"
     },
     {
       "x": -42.6940920602896,
@@ -16877,7 +16957,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.4456795411964578,
-      "id": "live-terrain-743"
+      "id": "live-terrain-751"
     },
     {
       "x": -52.45255389970723,
@@ -16887,7 +16967,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.4456795411964578,
-      "id": "live-terrain-744"
+      "id": "live-terrain-752"
     },
     {
       "x": -47.29613694582384,
@@ -16897,7 +16977,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.4456795411964578,
-      "id": "live-terrain-745"
+      "id": "live-terrain-753"
     },
     {
       "x": -57.054598785241474,
@@ -16907,7 +16987,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.4456795411964578,
-      "id": "live-terrain-746"
+      "id": "live-terrain-754"
     },
     {
       "x": -49.3737682321379,
@@ -16917,7 +16997,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6505090285595237,
-      "id": "live-terrain-747"
+      "id": "live-terrain-755"
     },
     {
       "x": -52.36677588404234,
@@ -16927,7 +17007,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6505090285595237,
-      "id": "live-terrain-748"
+      "id": "live-terrain-756"
     },
     {
       "x": -55.35978353594678,
@@ -16937,7 +17017,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6505090285595237,
-      "id": "live-terrain-749"
+      "id": "live-terrain-757"
     },
     {
       "x": -38.61683942310557,
@@ -16947,7 +17027,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6505090285595237,
-      "id": "live-terrain-750"
+      "id": "live-terrain-758"
     },
     {
       "x": -41.60984707501001,
@@ -16957,7 +17037,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6505090285595237,
-      "id": "live-terrain-751"
+      "id": "live-terrain-759"
     },
     {
       "x": -44.60285472691445,
@@ -16967,7 +17047,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6505090285595237,
-      "id": "live-terrain-752"
+      "id": "live-terrain-760"
     },
     {
       "x": -19.329260705283076,
@@ -16977,7 +17057,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.625700149011292,
-      "id": "live-terrain-753"
+      "id": "live-terrain-761"
     },
     {
       "x": -10.180646382179871,
@@ -16987,7 +17067,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.625700149011292,
-      "id": "live-terrain-754"
+      "id": "live-terrain-762"
     },
     {
       "x": -19.498990161584906,
@@ -16997,7 +17077,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.625700149011292,
-      "id": "live-terrain-755"
+      "id": "live-terrain-763"
     },
     {
       "x": -10.350375838481702,
@@ -17007,7 +17087,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.625700149011292,
-      "id": "live-terrain-756"
+      "id": "live-terrain-764"
     },
     {
       "x": -42.6940920602896,
@@ -17017,7 +17097,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6440044550969344,
-      "id": "live-terrain-757"
+      "id": "live-terrain-765"
     },
     {
       "x": -52.45255389970723,
@@ -17027,7 +17107,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6440044550969344,
-      "id": "live-terrain-758"
+      "id": "live-terrain-766"
     },
     {
       "x": -47.29613694582384,
@@ -17037,7 +17117,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6440044550969344,
-      "id": "live-terrain-759"
+      "id": "live-terrain-767"
     },
     {
       "x": -57.054598785241474,
@@ -17047,89 +17127,89 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6440044550969344,
-      "id": "live-terrain-760"
-    },
-    {
-      "x": -341.83996792260007,
-      "z": 2079.472818733287,
-      "radius": 12.776346815209504,
-      "delta": 3,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.5303821908734236,
-      "id": "live-terrain-761"
-    },
-    {
-      "x": -331.7599679226681,
-      "z": 2079.4727817073795,
-      "radius": 12.776346815209504,
-      "delta": 3,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.5303821908734236,
-      "id": "live-terrain-762"
-    },
-    {
-      "x": -341.84000119889976,
-      "z": 2070.4136187333484,
-      "radius": 12.776346815209504,
-      "delta": 3,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.5303821908734236,
-      "id": "live-terrain-763"
-    },
-    {
-      "x": -331.76000119896776,
-      "z": 2070.4135817074407,
-      "radius": 12.776346815209504,
-      "delta": 3,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.5303821908734236,
-      "id": "live-terrain-764"
-    },
-    {
-      "x": -341.84003447519945,
-      "z": 2061.3544187334096,
-      "radius": 12.776346815209504,
-      "delta": 3,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.5303821908734236,
-      "id": "live-terrain-765"
-    },
-    {
-      "x": -331.7600344752675,
-      "z": 2061.354381707502,
-      "radius": 12.776346815209504,
-      "delta": 3,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.5303821908734236,
-      "id": "live-terrain-766"
-    },
-    {
-      "x": -384.5353333333333,
-      "z": 2073.7127499999997,
-      "radius": 12.204347481694679,
-      "delta": 3,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.508371913451382,
-      "id": "live-terrain-767"
-    },
-    {
-      "x": -392.606,
-      "z": 2073.7127499999997,
-      "radius": 12.204347481694679,
-      "delta": 3,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.508371913451382,
       "id": "live-terrain-768"
     },
     {
+      "x": -341.83996792260007,
+      "z": 2079.472818733287,
+      "radius": 12.776346815209504,
+      "delta": 3,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5303821908734236,
+      "id": "live-terrain-769"
+    },
+    {
+      "x": -331.7599679226681,
+      "z": 2079.4727817073795,
+      "radius": 12.776346815209504,
+      "delta": 3,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5303821908734236,
+      "id": "live-terrain-770"
+    },
+    {
+      "x": -341.84000119889976,
+      "z": 2070.4136187333484,
+      "radius": 12.776346815209504,
+      "delta": 3,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5303821908734236,
+      "id": "live-terrain-771"
+    },
+    {
+      "x": -331.76000119896776,
+      "z": 2070.4135817074407,
+      "radius": 12.776346815209504,
+      "delta": 3,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5303821908734236,
+      "id": "live-terrain-772"
+    },
+    {
+      "x": -341.84003447519945,
+      "z": 2061.3544187334096,
+      "radius": 12.776346815209504,
+      "delta": 3,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5303821908734236,
+      "id": "live-terrain-773"
+    },
+    {
+      "x": -331.7600344752675,
+      "z": 2061.354381707502,
+      "radius": 12.776346815209504,
+      "delta": 3,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5303821908734236,
+      "id": "live-terrain-774"
+    },
+    {
+      "x": -384.5353333333333,
+      "z": 2073.7127499999997,
+      "radius": 12.204347481694679,
+      "delta": 3,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.508371913451382,
+      "id": "live-terrain-775"
+    },
+    {
+      "x": -392.606,
+      "z": 2073.7127499999997,
+      "radius": 12.204347481694679,
+      "delta": 3,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.508371913451382,
+      "id": "live-terrain-776"
+    },
+    {
       "x": -400.6766666666667,
       "z": 2073.7127499999997,
       "radius": 12.204347481694679,
@@ -17137,7 +17217,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.508371913451382,
-      "id": "live-terrain-769"
+      "id": "live-terrain-777"
     },
     {
       "x": -384.5353333333333,
@@ -17147,7 +17227,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.508371913451382,
-      "id": "live-terrain-770"
+      "id": "live-terrain-778"
     },
     {
       "x": -392.606,
@@ -17157,7 +17237,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.508371913451382,
-      "id": "live-terrain-771"
+      "id": "live-terrain-779"
     },
     {
       "x": -400.6766666666667,
@@ -17167,7 +17247,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.508371913451382,
-      "id": "live-terrain-772"
+      "id": "live-terrain-780"
     },
     {
       "x": -384.91612232366714,
@@ -17177,7 +17257,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.4717676516090896,
-      "id": "live-terrain-773"
+      "id": "live-terrain-781"
     },
     {
       "x": -389.13934484568273,
@@ -17187,7 +17267,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.4717676516090896,
-      "id": "live-terrain-774"
+      "id": "live-terrain-782"
     },
     {
       "x": -378.42736117620603,
@@ -17197,7 +17277,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.4717676516090896,
-      "id": "live-terrain-775"
+      "id": "live-terrain-783"
     },
     {
       "x": -382.6505836982216,
@@ -17207,7 +17287,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.4717676516090896,
-      "id": "live-terrain-776"
+      "id": "live-terrain-784"
     },
     {
       "x": -341.83996792260007,
@@ -17217,7 +17297,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6288166974772484,
-      "id": "live-terrain-777"
+      "id": "live-terrain-785"
     },
     {
       "x": -331.7599679226681,
@@ -17227,7 +17307,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6288166974772484,
-      "id": "live-terrain-778"
+      "id": "live-terrain-786"
     },
     {
       "x": -341.84000119889976,
@@ -17237,7 +17317,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6288166974772484,
-      "id": "live-terrain-779"
+      "id": "live-terrain-787"
     },
     {
       "x": -331.76000119896776,
@@ -17247,7 +17327,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6288166974772484,
-      "id": "live-terrain-780"
+      "id": "live-terrain-788"
     },
     {
       "x": -341.84003447519945,
@@ -17257,7 +17337,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6288166974772484,
-      "id": "live-terrain-781"
+      "id": "live-terrain-789"
     },
     {
       "x": -331.7600344752675,
@@ -17267,7 +17347,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6288166974772484,
-      "id": "live-terrain-782"
+      "id": "live-terrain-790"
     },
     {
       "x": -384.5353333333333,
@@ -17277,7 +17357,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6080102125907121,
-      "id": "live-terrain-783"
+      "id": "live-terrain-791"
     },
     {
       "x": -392.606,
@@ -17287,7 +17367,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6080102125907121,
-      "id": "live-terrain-784"
+      "id": "live-terrain-792"
     },
     {
       "x": -400.6766666666667,
@@ -17297,7 +17377,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6080102125907121,
-      "id": "live-terrain-785"
+      "id": "live-terrain-793"
     },
     {
       "x": -384.5353333333333,
@@ -17307,7 +17387,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6080102125907121,
-      "id": "live-terrain-786"
+      "id": "live-terrain-794"
     },
     {
       "x": -392.606,
@@ -17317,7 +17397,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6080102125907121,
-      "id": "live-terrain-787"
+      "id": "live-terrain-795"
     },
     {
       "x": -400.6766666666667,
@@ -17327,7 +17407,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6080102125907121,
-      "id": "live-terrain-788"
+      "id": "live-terrain-796"
     },
     {
       "x": -384.91612232366714,
@@ -17337,7 +17417,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.57258737644937,
-      "id": "live-terrain-789"
+      "id": "live-terrain-797"
     },
     {
       "x": -389.13934484568273,
@@ -17347,7 +17427,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.57258737644937,
-      "id": "live-terrain-790"
+      "id": "live-terrain-798"
     },
     {
       "x": -378.42736117620603,
@@ -17357,7 +17437,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.57258737644937,
-      "id": "live-terrain-791"
+      "id": "live-terrain-799"
     },
     {
       "x": -382.6505836982216,
@@ -17367,89 +17447,89 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.57258737644937,
-      "id": "live-terrain-792"
-    },
-    {
-      "x": -333.10508418071777,
-      "z": 1394.9430783115235,
-      "radius": 12.776346815209504,
-      "delta": 2,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.5303821908734236,
-      "id": "live-terrain-793"
-    },
-    {
-      "x": -337.83749242183046,
-      "z": 1386.0430382981613,
-      "radius": 12.776346815209504,
-      "delta": 2,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.5303821908734236,
-      "id": "live-terrain-794"
-    },
-    {
-      "x": -341.1038185546316,
-      "z": 1399.1962363212347,
-      "radius": 12.776346815209504,
-      "delta": 2,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.5303821908734236,
-      "id": "live-terrain-795"
-    },
-    {
-      "x": -345.83622679574427,
-      "z": 1390.2961963078724,
-      "radius": 12.776346815209504,
-      "delta": 2,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.5303821908734236,
-      "id": "live-terrain-796"
-    },
-    {
-      "x": -349.1025529285454,
-      "z": 1403.4493943309458,
-      "radius": 12.776346815209504,
-      "delta": 2,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.5303821908734236,
-      "id": "live-terrain-797"
-    },
-    {
-      "x": -353.8349611696581,
-      "z": 1394.5493543175835,
-      "radius": 12.776346815209504,
-      "delta": 2,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.5303821908734236,
-      "id": "live-terrain-798"
-    },
-    {
-      "x": -379.0364781458145,
-      "z": 1403.802869341079,
-      "radius": 14.204347481694679,
-      "delta": 1.8,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.4367921504096052,
-      "id": "live-terrain-799"
-    },
-    {
-      "x": -385.3085104556273,
-      "z": 1398.7237679294997,
-      "radius": 14.204347481694679,
-      "delta": 1.8,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.4367921504096052,
       "id": "live-terrain-800"
     },
     {
+      "x": -333.10508418071777,
+      "z": 1394.9430783115235,
+      "radius": 12.776346815209504,
+      "delta": 2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5303821908734236,
+      "id": "live-terrain-801"
+    },
+    {
+      "x": -337.83749242183046,
+      "z": 1386.0430382981613,
+      "radius": 12.776346815209504,
+      "delta": 2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5303821908734236,
+      "id": "live-terrain-802"
+    },
+    {
+      "x": -341.1038185546316,
+      "z": 1399.1962363212347,
+      "radius": 12.776346815209504,
+      "delta": 2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5303821908734236,
+      "id": "live-terrain-803"
+    },
+    {
+      "x": -345.83622679574427,
+      "z": 1390.2961963078724,
+      "radius": 12.776346815209504,
+      "delta": 2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5303821908734236,
+      "id": "live-terrain-804"
+    },
+    {
+      "x": -349.1025529285454,
+      "z": 1403.4493943309458,
+      "radius": 12.776346815209504,
+      "delta": 2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5303821908734236,
+      "id": "live-terrain-805"
+    },
+    {
+      "x": -353.8349611696581,
+      "z": 1394.5493543175835,
+      "radius": 12.776346815209504,
+      "delta": 2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5303821908734236,
+      "id": "live-terrain-806"
+    },
+    {
+      "x": -379.0364781458145,
+      "z": 1403.802869341079,
+      "radius": 14.204347481694679,
+      "delta": 1.8,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4367921504096052,
+      "id": "live-terrain-807"
+    },
+    {
+      "x": -385.3085104556273,
+      "z": 1398.7237679294997,
+      "radius": 14.204347481694679,
+      "delta": 1.8,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4367921504096052,
+      "id": "live-terrain-808"
+    },
+    {
       "x": -391.5805427654401,
       "z": 1393.6446665179203,
       "radius": 14.204347481694679,
@@ -17457,7 +17537,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.4367921504096052,
-      "id": "live-terrain-801"
+      "id": "live-terrain-809"
     },
     {
       "x": -384.9682149318927,
@@ -17467,7 +17547,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.4367921504096052,
-      "id": "live-terrain-802"
+      "id": "live-terrain-810"
     },
     {
       "x": -391.2402472417055,
@@ -17477,7 +17557,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.4367921504096052,
-      "id": "live-terrain-803"
+      "id": "live-terrain-811"
     },
     {
       "x": -397.5122795515183,
@@ -17487,7 +17567,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.4367921504096052,
-      "id": "live-terrain-804"
+      "id": "live-terrain-812"
     },
     {
       "x": -384.7653856337381,
@@ -17497,7 +17577,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.5466941195964198,
-      "id": "live-terrain-805"
+      "id": "live-terrain-813"
     },
     {
       "x": -388.0937540229273,
@@ -17507,7 +17587,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.5466941195964198,
-      "id": "live-terrain-806"
+      "id": "live-terrain-814"
     },
     {
       "x": -376.2209399174393,
@@ -17517,7 +17597,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.5466941195964198,
-      "id": "live-terrain-807"
+      "id": "live-terrain-815"
     },
     {
       "x": -379.5493083066285,
@@ -17527,7 +17607,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.5466941195964198,
-      "id": "live-terrain-808"
+      "id": "live-terrain-816"
     },
     {
       "x": -333.10508418071777,
@@ -17537,7 +17617,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6288166974772484,
-      "id": "live-terrain-809"
+      "id": "live-terrain-817"
     },
     {
       "x": -337.83749242183046,
@@ -17547,7 +17627,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6288166974772484,
-      "id": "live-terrain-810"
+      "id": "live-terrain-818"
     },
     {
       "x": -341.1038185546316,
@@ -17557,7 +17637,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6288166974772484,
-      "id": "live-terrain-811"
+      "id": "live-terrain-819"
     },
     {
       "x": -345.83622679574427,
@@ -17567,7 +17647,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6288166974772484,
-      "id": "live-terrain-812"
+      "id": "live-terrain-820"
     },
     {
       "x": -349.1025529285454,
@@ -17577,7 +17657,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6288166974772484,
-      "id": "live-terrain-813"
+      "id": "live-terrain-821"
     },
     {
       "x": -353.8349611696581,
@@ -17587,7 +17667,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6288166974772484,
-      "id": "live-terrain-814"
+      "id": "live-terrain-822"
     },
     {
       "x": -379.0364781458145,
@@ -17597,7 +17677,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6080102125907121,
-      "id": "live-terrain-815"
+      "id": "live-terrain-823"
     },
     {
       "x": -385.3085104556273,
@@ -17607,7 +17687,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6080102125907121,
-      "id": "live-terrain-816"
+      "id": "live-terrain-824"
     },
     {
       "x": -391.5805427654401,
@@ -17617,7 +17697,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6080102125907121,
-      "id": "live-terrain-817"
+      "id": "live-terrain-825"
     },
     {
       "x": -384.9682149318927,
@@ -17627,7 +17707,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6080102125907121,
-      "id": "live-terrain-818"
+      "id": "live-terrain-826"
     },
     {
       "x": -391.2402472417055,
@@ -17637,7 +17717,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6080102125907121,
-      "id": "live-terrain-819"
+      "id": "live-terrain-827"
     },
     {
       "x": -397.5122795515183,
@@ -17647,7 +17727,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6080102125907121,
-      "id": "live-terrain-820"
+      "id": "live-terrain-828"
     },
     {
       "x": -384.7653856337381,
@@ -17657,7 +17737,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6440044550969344,
-      "id": "live-terrain-821"
+      "id": "live-terrain-829"
     },
     {
       "x": -388.0937540229273,
@@ -17667,7 +17747,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6440044550969344,
-      "id": "live-terrain-822"
+      "id": "live-terrain-830"
     },
     {
       "x": -376.2209399174393,
@@ -17677,7 +17757,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6440044550969344,
-      "id": "live-terrain-823"
+      "id": "live-terrain-831"
     },
     {
       "x": -379.5493083066285,
@@ -17687,89 +17767,89 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6440044550969344,
-      "id": "live-terrain-824"
-    },
-    {
-      "x": 380.0353333333333,
-      "z": 1436.2872499999999,
-      "radius": 16.20434748169468,
-      "delta": 2.5,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.3828816611531844,
-      "id": "live-terrain-825"
-    },
-    {
-      "x": 388.106,
-      "z": 1436.2872499999999,
-      "radius": 16.20434748169468,
-      "delta": 2.5,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.3828816611531844,
-      "id": "live-terrain-826"
-    },
-    {
-      "x": 396.1766666666667,
-      "z": 1436.2872499999999,
-      "radius": 16.20434748169468,
-      "delta": 2.5,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.3828816611531844,
-      "id": "live-terrain-827"
-    },
-    {
-      "x": 380.0353333333333,
-      "z": 1426.86175,
-      "radius": 16.20434748169468,
-      "delta": 2.5,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.3828816611531844,
-      "id": "live-terrain-828"
-    },
-    {
-      "x": 388.106,
-      "z": 1426.86175,
-      "radius": 16.20434748169468,
-      "delta": 2.5,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.3828816611531844,
-      "id": "live-terrain-829"
-    },
-    {
-      "x": 396.1766666666667,
-      "z": 1426.86175,
-      "radius": 16.20434748169468,
-      "delta": 2.5,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.3828816611531844,
-      "id": "live-terrain-830"
-    },
-    {
-      "x": 372.7715372103962,
-      "z": 1400.2803869033244,
-      "radius": 13.358637952175908,
-      "delta": 3.2,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.40113655084896366,
-      "id": "live-terrain-831"
-    },
-    {
-      "x": 379.4816913366062,
-      "z": 1401.706371336096,
-      "radius": 13.358637952175908,
-      "delta": 3.2,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.40113655084896366,
       "id": "live-terrain-832"
     },
     {
+      "x": 380.0353333333333,
+      "z": 1436.2872499999999,
+      "radius": 16.20434748169468,
+      "delta": 2.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.3828816611531844,
+      "id": "live-terrain-833"
+    },
+    {
+      "x": 388.106,
+      "z": 1436.2872499999999,
+      "radius": 16.20434748169468,
+      "delta": 2.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.3828816611531844,
+      "id": "live-terrain-834"
+    },
+    {
+      "x": 396.1766666666667,
+      "z": 1436.2872499999999,
+      "radius": 16.20434748169468,
+      "delta": 2.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.3828816611531844,
+      "id": "live-terrain-835"
+    },
+    {
+      "x": 380.0353333333333,
+      "z": 1426.86175,
+      "radius": 16.20434748169468,
+      "delta": 2.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.3828816611531844,
+      "id": "live-terrain-836"
+    },
+    {
+      "x": 388.106,
+      "z": 1426.86175,
+      "radius": 16.20434748169468,
+      "delta": 2.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.3828816611531844,
+      "id": "live-terrain-837"
+    },
+    {
+      "x": 396.1766666666667,
+      "z": 1426.86175,
+      "radius": 16.20434748169468,
+      "delta": 2.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.3828816611531844,
+      "id": "live-terrain-838"
+    },
+    {
+      "x": 372.7715372103962,
+      "z": 1400.2803869033244,
+      "radius": 13.358637952175908,
+      "delta": 3.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.40113655084896366,
+      "id": "live-terrain-839"
+    },
+    {
+      "x": 379.4816913366062,
+      "z": 1401.706371336096,
+      "radius": 13.358637952175908,
+      "delta": 3.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.40113655084896366,
+      "id": "live-terrain-840"
+    },
+    {
       "x": 374.4831550555691,
       "z": 1392.2261478230582,
       "radius": 13.358637952175908,
@@ -17777,7 +17857,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.40113655084896366,
-      "id": "live-terrain-833"
+      "id": "live-terrain-841"
     },
     {
       "x": 381.1933091817791,
@@ -17787,7 +17867,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.40113655084896366,
-      "id": "live-terrain-834"
+      "id": "live-terrain-842"
     },
     {
       "x": 380.0353333333333,
@@ -17797,7 +17877,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6080102125907121,
-      "id": "live-terrain-835"
+      "id": "live-terrain-843"
     },
     {
       "x": 388.106,
@@ -17807,7 +17887,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6080102125907121,
-      "id": "live-terrain-836"
+      "id": "live-terrain-844"
     },
     {
       "x": 396.1766666666667,
@@ -17817,7 +17897,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6080102125907121,
-      "id": "live-terrain-837"
+      "id": "live-terrain-845"
     },
     {
       "x": 380.0353333333333,
@@ -17827,7 +17907,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6080102125907121,
-      "id": "live-terrain-838"
+      "id": "live-terrain-846"
     },
     {
       "x": 388.106,
@@ -17837,7 +17917,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6080102125907121,
-      "id": "live-terrain-839"
+      "id": "live-terrain-847"
     },
     {
       "x": 396.1766666666667,
@@ -17847,7 +17927,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6080102125907121,
-      "id": "live-terrain-840"
+      "id": "live-terrain-848"
     },
     {
       "x": 372.7715372103962,
@@ -17857,7 +17937,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.57258737644937,
-      "id": "live-terrain-841"
+      "id": "live-terrain-849"
     },
     {
       "x": 379.4816913366062,
@@ -17867,7 +17947,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.57258737644937,
-      "id": "live-terrain-842"
+      "id": "live-terrain-850"
     },
     {
       "x": 374.4831550555691,
@@ -17877,7 +17957,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.57258737644937,
-      "id": "live-terrain-843"
+      "id": "live-terrain-851"
     },
     {
       "x": 381.1933091817791,
@@ -17887,7 +17967,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.57258737644937,
-      "id": "live-terrain-844"
+      "id": "live-terrain-852"
     },
     {
       "x": -85.77851713319643,
@@ -17897,7 +17977,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.4039226709992691,
-      "id": "live-terrain-845"
+      "id": "live-terrain-853"
     },
     {
       "x": -88.55725781690151,
@@ -17907,7 +17987,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.4039226709992691,
-      "id": "live-terrain-846"
+      "id": "live-terrain-854"
     },
     {
       "x": -77.07033665301736,
@@ -17917,7 +17997,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.4039226709992691,
-      "id": "live-terrain-847"
+      "id": "live-terrain-855"
     },
     {
       "x": -79.84907733672244,
@@ -17927,7 +18007,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.4039226709992691,
-      "id": "live-terrain-848"
+      "id": "live-terrain-856"
     },
     {
       "x": -68.36215617283831,
@@ -17937,7 +18017,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.4039226709992691,
-      "id": "live-terrain-849"
+      "id": "live-terrain-857"
     },
     {
       "x": -71.14089685654339,
@@ -17947,7 +18027,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.4039226709992691,
-      "id": "live-terrain-850"
+      "id": "live-terrain-858"
     },
     {
       "x": 2.70353782339921,
@@ -17957,7 +18037,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.3828816611531844,
-      "id": "live-terrain-851"
+      "id": "live-terrain-859"
     },
     {
       "x": 0.4793123075000883,
@@ -17967,7 +18047,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.3828816611531844,
-      "id": "live-terrain-852"
+      "id": "live-terrain-860"
     },
     {
       "x": -1.744913208399034,
@@ -17977,7 +18057,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.3828816611531844,
-      "id": "live-terrain-853"
+      "id": "live-terrain-861"
     },
     {
       "x": -6.356952060754408,
@@ -17987,7 +18067,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.3828816611531844,
-      "id": "live-terrain-854"
+      "id": "live-terrain-862"
     },
     {
       "x": -8.58117757665353,
@@ -17997,7 +18077,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.3828816611531844,
-      "id": "live-terrain-855"
+      "id": "live-terrain-863"
     },
     {
       "x": -10.805403092552652,
@@ -18007,7 +18087,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.3828816611531844,
-      "id": "live-terrain-856"
+      "id": "live-terrain-864"
     },
     {
       "x": 7.459558947625096,
@@ -18017,7 +18097,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.4007174348063826,
-      "id": "live-terrain-857"
+      "id": "live-terrain-865"
     },
     {
       "x": 9.361531547137643,
@@ -18027,7 +18107,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.4007174348063826,
-      "id": "live-terrain-858"
+      "id": "live-terrain-866"
     },
     {
       "x": -2.08040960602618,
@@ -18037,7 +18117,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.4007174348063826,
-      "id": "live-terrain-859"
+      "id": "live-terrain-867"
     },
     {
       "x": -0.1784370065136327,
@@ -18047,7 +18127,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.4007174348063826,
-      "id": "live-terrain-860"
+      "id": "live-terrain-868"
     },
     {
       "x": -54.574584689422764,
@@ -18057,7 +18137,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.36427182346898135,
-      "id": "live-terrain-861"
+      "id": "live-terrain-869"
     },
     {
       "x": -62.05770437713534,
@@ -18067,7 +18147,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.36427182346898135,
-      "id": "live-terrain-862"
+      "id": "live-terrain-870"
     },
     {
       "x": -56.06388904766936,
@@ -18077,7 +18157,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.36427182346898135,
-      "id": "live-terrain-863"
+      "id": "live-terrain-871"
     },
     {
       "x": -63.54700873538194,
@@ -18087,7 +18167,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.36427182346898135,
-      "id": "live-terrain-864"
+      "id": "live-terrain-872"
     },
     {
       "x": -57.55319340591596,
@@ -18097,7 +18177,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.36427182346898135,
-      "id": "live-terrain-865"
+      "id": "live-terrain-873"
     },
     {
       "x": -65.03631309362854,
@@ -18107,7 +18187,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.36427182346898135,
-      "id": "live-terrain-866"
+      "id": "live-terrain-874"
     },
     {
       "x": -91.38169601139634,
@@ -18117,7 +18197,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.47493109952877577,
-      "id": "live-terrain-867"
+      "id": "live-terrain-875"
     },
     {
       "x": -85.18076488973261,
@@ -18127,7 +18207,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.47493109952877577,
-      "id": "live-terrain-868"
+      "id": "live-terrain-876"
     },
     {
       "x": -98.8748843432544,
@@ -18137,7 +18217,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.47493109952877577,
-      "id": "live-terrain-869"
+      "id": "live-terrain-877"
     },
     {
       "x": -92.67395322159066,
@@ -18147,7 +18227,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.47493109952877577,
-      "id": "live-terrain-870"
+      "id": "live-terrain-878"
     },
     {
       "x": -40,
@@ -18157,7 +18237,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.8421052631578947,
-      "id": "live-terrain-871"
+      "id": "live-terrain-879"
     },
     {
       "x": -85.77851713319643,
@@ -18167,7 +18247,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6288166974772484,
-      "id": "live-terrain-872"
+      "id": "live-terrain-880"
     },
     {
       "x": -88.55725781690151,
@@ -18177,7 +18257,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6288166974772484,
-      "id": "live-terrain-873"
+      "id": "live-terrain-881"
     },
     {
       "x": -77.07033665301736,
@@ -18187,7 +18267,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6288166974772484,
-      "id": "live-terrain-874"
+      "id": "live-terrain-882"
     },
     {
       "x": -79.84907733672244,
@@ -18197,7 +18277,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6288166974772484,
-      "id": "live-terrain-875"
+      "id": "live-terrain-883"
     },
     {
       "x": -68.36215617283831,
@@ -18207,7 +18287,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6288166974772484,
-      "id": "live-terrain-876"
+      "id": "live-terrain-884"
     },
     {
       "x": -71.14089685654339,
@@ -18217,7 +18297,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6288166974772484,
-      "id": "live-terrain-877"
+      "id": "live-terrain-885"
     },
     {
       "x": 2.70353782339921,
@@ -18227,7 +18307,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6080102125907121,
-      "id": "live-terrain-878"
+      "id": "live-terrain-886"
     },
     {
       "x": 0.4793123075000883,
@@ -18237,7 +18317,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6080102125907121,
-      "id": "live-terrain-879"
+      "id": "live-terrain-887"
     },
     {
       "x": -1.744913208399034,
@@ -18247,7 +18327,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6080102125907121,
-      "id": "live-terrain-880"
+      "id": "live-terrain-888"
     },
     {
       "x": -6.356952060754408,
@@ -18257,7 +18337,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6080102125907121,
-      "id": "live-terrain-881"
+      "id": "live-terrain-889"
     },
     {
       "x": -8.58117757665353,
@@ -18267,7 +18347,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6080102125907121,
-      "id": "live-terrain-882"
+      "id": "live-terrain-890"
     },
     {
       "x": -10.805403092552652,
@@ -18277,7 +18357,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6080102125907121,
-      "id": "live-terrain-883"
+      "id": "live-terrain-891"
     },
     {
       "x": 7.459558947625096,
@@ -18287,7 +18367,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.625700149011292,
-      "id": "live-terrain-884"
+      "id": "live-terrain-892"
     },
     {
       "x": 9.361531547137643,
@@ -18297,7 +18377,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.625700149011292,
-      "id": "live-terrain-885"
+      "id": "live-terrain-893"
     },
     {
       "x": -2.08040960602618,
@@ -18307,7 +18387,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.625700149011292,
-      "id": "live-terrain-886"
+      "id": "live-terrain-894"
     },
     {
       "x": -0.1784370065136327,
@@ -18317,7 +18397,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.625700149011292,
-      "id": "live-terrain-887"
+      "id": "live-terrain-895"
     },
     {
       "x": -54.574584689422764,
@@ -18327,7 +18407,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.5889000280722397,
-      "id": "live-terrain-888"
+      "id": "live-terrain-896"
     },
     {
       "x": -62.05770437713534,
@@ -18337,7 +18417,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.5889000280722397,
-      "id": "live-terrain-889"
+      "id": "live-terrain-897"
     },
     {
       "x": -56.06388904766936,
@@ -18347,7 +18427,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.5889000280722397,
-      "id": "live-terrain-890"
+      "id": "live-terrain-898"
     },
     {
       "x": -63.54700873538194,
@@ -18357,7 +18437,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.5889000280722397,
-      "id": "live-terrain-891"
+      "id": "live-terrain-899"
     },
     {
       "x": -57.55319340591596,
@@ -18367,7 +18447,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.5889000280722397,
-      "id": "live-terrain-892"
+      "id": "live-terrain-900"
     },
     {
       "x": -65.03631309362854,
@@ -18377,7 +18457,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.5889000280722397,
-      "id": "live-terrain-893"
+      "id": "live-terrain-901"
     },
     {
       "x": -91.38169601139634,
@@ -18387,7 +18467,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6440044550969344,
-      "id": "live-terrain-894"
+      "id": "live-terrain-902"
     },
     {
       "x": -85.18076488973261,
@@ -18397,7 +18477,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6440044550969344,
-      "id": "live-terrain-895"
+      "id": "live-terrain-903"
     },
     {
       "x": -98.8748843432544,
@@ -18407,7 +18487,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6440044550969344,
-      "id": "live-terrain-896"
+      "id": "live-terrain-904"
     },
     {
       "x": -92.67395322159066,
@@ -18417,7 +18497,7 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.6440044550969344,
-      "id": "live-terrain-897"
+      "id": "live-terrain-905"
     },
     {
       "x": 28.629133821325645,
@@ -28770,188 +28850,6 @@
       "id": "e2605bd01bd0"
     },
     {
-      "x": 7.2598768532115585,
-      "z": 385.30367492808386,
-      "radius": 2.8,
-      "delta": -1.148854341462178,
-      "falloff": "smooth",
-      "mode": "level",
-      "gx": -0.0961866226238502,
-      "gz": 0.009752961556595099,
-      "strength": 0.05,
-      "hardness": 0.55,
-      "id": "916aaa1b75e8"
-    },
-    {
-      "x": 7.460564392294437,
-      "z": 386.6945676409885,
-      "radius": 2.8,
-      "delta": -1.1353533153121453,
-      "falloff": "smooth",
-      "mode": "level",
-      "gx": -0.09696480296665108,
-      "gz": 0.021576544419463786,
-      "strength": 0.05,
-      "hardness": 0.55,
-      "id": "8567a269372b"
-    },
-    {
-      "x": 7.553983940072442,
-      "z": 388.09223074760376,
-      "radius": 2.8,
-      "delta": -1.0934376334060116,
-      "falloff": "smooth",
-      "mode": "level",
-      "gx": -0.09329769427110693,
-      "gz": 0.028800806291699475,
-      "strength": 0.05,
-      "hardness": 0.55,
-      "id": "1417422cddaa"
-    },
-    {
-      "x": 7.798797653832491,
-      "z": 389.68671177952933,
-      "radius": 2.8,
-      "delta": -1.047821791140309,
-      "falloff": "smooth",
-      "mode": "level",
-      "gx": -0.08629269945926572,
-      "gz": 0.03265167603492433,
-      "strength": 0.05,
-      "hardness": 0.55,
-      "id": "e70e1a15298b"
-    },
-    {
-      "x": 8.141580202863391,
-      "z": 392.03455053373705,
-      "radius": 2.8,
-      "delta": -0.9662451722821482,
-      "falloff": "smooth",
-      "mode": "level",
-      "gx": -0.0676930843517955,
-      "gz": 0.025196296689743814,
-      "strength": 0.05,
-      "hardness": 0.55,
-      "id": "620bb502baa0"
-    },
-    {
-      "x": 8.569525716715063,
-      "z": 393.9475197702262,
-      "radius": 2.8,
-      "delta": -0.9375988624185563,
-      "falloff": "smooth",
-      "mode": "level",
-      "gx": -0.05403367736359128,
-      "gz": 0.005748483392189431,
-      "strength": 0.05,
-      "hardness": 0.55,
-      "id": "09264e29feec"
-    },
-    {
-      "x": 8.668776790881164,
-      "z": 395.4528215857351,
-      "radius": 2.8,
-      "delta": -0.9578806890135914,
-      "falloff": "smooth",
-      "mode": "level",
-      "gx": -0.05145143870564315,
-      "gz": -0.020239535241614814,
-      "strength": 0.05,
-      "hardness": 0.55,
-      "id": "c599e680c921"
-    },
-    {
-      "x": 8.970303526247253,
-      "z": 396.9019008779575,
-      "radius": 2.8,
-      "delta": -1.0509589768979395,
-      "falloff": "smooth",
-      "mode": "level",
-      "gx": -0.04795892327920405,
-      "gz": -0.04899272335939714,
-      "strength": 0.05,
-      "hardness": 0.55,
-      "id": "029210c271e9"
-    },
-    {
-      "x": 9.229988366784841,
-      "z": 398.5829279241608,
-      "radius": 2.8,
-      "delta": -1.232379413259992,
-      "falloff": "smooth",
-      "mode": "level",
-      "gx": -0.04697454339937952,
-      "gz": -0.09058321731460915,
-      "strength": 0.05,
-      "hardness": 0.55,
-      "id": "d5ed36d48171"
-    },
-    {
-      "x": 9.808949475349078,
-      "z": 400.96901832116686,
-      "radius": 2.8,
-      "delta": -1.6207237594399517,
-      "falloff": "smooth",
-      "mode": "level",
-      "gx": -0.054675508838260625,
-      "gz": -0.14931699982358182,
-      "strength": 0.05,
-      "hardness": 0.55,
-      "id": "751038c4c0fe"
-    },
-    {
-      "x": 10.453546609161254,
-      "z": 403.1872954673438,
-      "radius": 2.8,
-      "delta": -2.012699476838611,
-      "falloff": "smooth",
-      "mode": "level",
-      "gx": -0.04297572810398351,
-      "gz": -0.1291536174742632,
-      "strength": 0.05,
-      "hardness": 0.55,
-      "id": "1c755cd21472"
-    },
-    {
-      "x": 10.733287727700471,
-      "z": 404.5686315886527,
-      "radius": 2.8,
-      "delta": -2.2152764791016493,
-      "falloff": "smooth",
-      "mode": "level",
-      "gx": -0.03472615999824353,
-      "gz": -0.11039371309926164,
-      "strength": 0.05,
-      "hardness": 0.55,
-      "id": "a52cbd8967f2"
-    },
-    {
-      "x": 11.238089693183188,
-      "z": 407.1906680338304,
-      "radius": 2.8,
-      "delta": -2.5178036236625805,
-      "falloff": "smooth",
-      "mode": "level",
-      "gx": -0.018645567785655365,
-      "gz": -0.06546405374694059,
-      "strength": 0.05,
-      "hardness": 0.55,
-      "id": "d203ce54570f"
-    },
-    {
-      "x": 11.65495506684217,
-      "z": 409.57089537737835,
-      "radius": 2.8,
-      "delta": -2.679781808008712,
-      "falloff": "smooth",
-      "mode": "level",
-      "gx": -0.0068239616292564455,
-      "gz": -0.017316233316960233,
-      "strength": 0.05,
-      "hardness": 0.55,
-      "id": "edfed32ece0b"
-    },
-    {
       "x": 11.851798447959933,
       "z": 411.20527509789565,
       "radius": 2.8,
@@ -29355,292 +29253,6 @@
       "id": "c066246d1903"
     },
     {
-      "x": 9.235193165839306,
-      "z": 440.36366628770145,
-      "radius": 2.8,
-      "delta": -1.4031616586219138,
-      "falloff": "smooth",
-      "mode": "level",
-      "gx": 0.07332445096006207,
-      "gz": -0.06821578796868194,
-      "strength": 0.05,
-      "hardness": 0.55,
-      "id": "bd256c9969c6"
-    },
-    {
-      "x": 8.853421266642155,
-      "z": 437.1456635095159,
-      "radius": 2.8,
-      "delta": -1.2307299817910742,
-      "falloff": "smooth",
-      "mode": "level",
-      "gx": 0.07583809794765559,
-      "gz": -0.02707838124556547,
-      "strength": 0.05,
-      "hardness": 0.55,
-      "id": "14c9f0690cfb"
-    },
-    {
-      "x": 8.482183630855687,
-      "z": 434.6681121744814,
-      "radius": 2.8,
-      "delta": -1.2622240930743338,
-      "falloff": "smooth",
-      "mode": "level",
-      "gx": 0.07351211448557565,
-      "gz": 0.036863108055932695,
-      "strength": 0.05,
-      "hardness": 0.55,
-      "id": "1b6959b89665"
-    },
-    {
-      "x": 8.156020594586419,
-      "z": 432.39473461173174,
-      "radius": 2.8,
-      "delta": -1.4499800598338366,
-      "falloff": "smooth",
-      "mode": "level",
-      "gx": 0.06090967639783331,
-      "gz": 0.09050654953489452,
-      "strength": 0.05,
-      "hardness": 0.55,
-      "id": "767c2d65d4ca"
-    },
-    {
-      "x": 8.010093069960654,
-      "z": 430.3318053765711,
-      "radius": 2.8,
-      "delta": -1.6882388254992728,
-      "falloff": "smooth",
-      "mode": "level",
-      "gx": 0.03907831602261232,
-      "gz": 0.10179783100771128,
-      "strength": 0.05,
-      "hardness": 0.55,
-      "id": "a51f270c4ca7"
-    },
-    {
-      "x": 7.9651093230381775,
-      "z": 428.7892663381281,
-      "radius": 2.8,
-      "delta": -1.861083897336764,
-      "falloff": "smooth",
-      "mode": "level",
-      "gx": 0.021793879045388494,
-      "gz": 0.0862956012211627,
-      "strength": 0.05,
-      "hardness": 0.55,
-      "id": "793565a30fd6"
-    },
-    {
-      "x": 7.800309088942015,
-      "z": 426.70521120117274,
-      "radius": 2.8,
-      "delta": -2.056905824581246,
-      "falloff": "smooth",
-      "mode": "level",
-      "gx": 0.00498841779592738,
-      "gz": 0.05152067884667769,
-      "strength": 0.05,
-      "hardness": 0.55,
-      "id": "2699a825dab2"
-    },
-    {
-      "x": 7.469189380098765,
-      "z": 424.5129590760108,
-      "radius": 2.8,
-      "delta": -2.1806150794048977,
-      "falloff": "smooth",
-      "mode": "level",
-      "gx": -0.0016399716399337829,
-      "gz": 0.010341522838967733,
-      "strength": 0.05,
-      "hardness": 0.55,
-      "id": "87f9fdee3229"
-    },
-    {
-      "x": 7.211139537569597,
-      "z": 422.0934231297061,
-      "radius": 2.8,
-      "delta": -2.2070825128094507,
-      "falloff": "smooth",
-      "mode": "level",
-      "gx": -0.0024322339908530877,
-      "gz": 0.0009472097404840056,
-      "strength": 0.05,
-      "hardness": 0.55,
-      "id": "4f2e4511a196"
-    },
-    {
-      "x": 6.821420220390056,
-      "z": 419.7045426320091,
-      "radius": 2.8,
-      "delta": -2.2047481360605543,
-      "falloff": "smooth",
-      "mode": "level",
-      "gx": -0.01212233150806263,
-      "gz": 0.006010464688755613,
-      "strength": 0.05,
-      "hardness": 0.55,
-      "id": "174e05ba86e7"
-    },
-    {
-      "x": 6.713144345118742,
-      "z": 418.0313588292848,
-      "radius": 2.8,
-      "delta": -2.2348009391803507,
-      "falloff": "smooth",
-      "mode": "level",
-      "gx": -0.023494924630003345,
-      "gz": 0.01722898832392,
-      "strength": 0.05,
-      "hardness": 0.55,
-      "id": "1e33543f6659"
-    },
-    {
-      "x": 6.441149949566501,
-      "z": 416.2064213881091,
-      "radius": 2.8,
-      "delta": -2.290145513477638,
-      "falloff": "smooth",
-      "mode": "level",
-      "gx": -0.04780642819674963,
-      "gz": 0.032072345009627155,
-      "strength": 0.05,
-      "hardness": 0.55,
-      "id": "93c020195b9e"
-    },
-    {
-      "x": 6.301881376215192,
-      "z": 414.4317811732409,
-      "radius": 2.8,
-      "delta": -2.3549561679979525,
-      "falloff": "smooth",
-      "mode": "level",
-      "gx": -0.07071798137119197,
-      "gz": 0.03537594769463855,
-      "strength": 0.05,
-      "hardness": 0.55,
-      "id": "a7e1c2e8f835"
-    },
-    {
-      "x": 5.864716834538502,
-      "z": 411.35878246996356,
-      "radius": 2.8,
-      "delta": -2.3956022251368734,
-      "falloff": "smooth",
-      "mode": "level",
-      "gx": -0.0794016240232932,
-      "gz": -0.0008168460562622491,
-      "strength": 0.05,
-      "hardness": 0.55,
-      "id": "d9c590e29871"
-    },
-    {
-      "x": 5.518238964217563,
-      "z": 408.24992432786047,
-      "radius": 2.8,
-      "delta": -2.269075894334718,
-      "falloff": "smooth",
-      "mode": "level",
-      "gx": -0.08191376289827301,
-      "gz": -0.0557016128629323,
-      "strength": 0.05,
-      "hardness": 0.55,
-      "id": "01824d758a5a"
-    },
-    {
-      "x": 5.2557659729953485,
-      "z": 406.1049409173893,
-      "radius": 2.8,
-      "delta": -2.084490450301092,
-      "falloff": "smooth",
-      "mode": "level",
-      "gx": -0.07296132309527542,
-      "gz": -0.08799490252465551,
-      "strength": 0.05,
-      "hardness": 0.55,
-      "id": "a68e5b3d038b"
-    },
-    {
-      "x": 4.923484475007577,
-      "z": 403.23064074982904,
-      "radius": 2.8,
-      "delta": -1.7563287388769915,
-      "falloff": "smooth",
-      "mode": "level",
-      "gx": -0.04730115929824708,
-      "gz": -0.11905091690024405,
-      "strength": 0.05,
-      "hardness": 0.55,
-      "id": "597ec198f1d5"
-    },
-    {
-      "x": 4.63909251590843,
-      "z": 400.18577499619965,
-      "radius": 2.8,
-      "delta": -1.3184511851848844,
-      "falloff": "smooth",
-      "mode": "level",
-      "gx": -0.021002032027014644,
-      "gz": -0.13217481864675248,
-      "strength": 0.05,
-      "hardness": 0.55,
-      "id": "4c5fa451f60a"
-    },
-    {
-      "x": 4.335356109955452,
-      "z": 397.1454368277143,
-      "radius": 2.8,
-      "delta": -0.9297723328605035,
-      "falloff": "smooth",
-      "mode": "level",
-      "gx": -0.011287783240639337,
-      "gz": -0.08041745870792684,
-      "strength": 0.05,
-      "hardness": 0.55,
-      "id": "5ac6b7eeefc2"
-    },
-    {
-      "x": 4.202853292496815,
-      "z": 394.8521315560403,
-      "radius": 2.8,
-      "delta": -0.7495298186603802,
-      "falloff": "smooth",
-      "mode": "level",
-      "gx": -0.025875996521783653,
-      "gz": -0.04729691487063872,
-      "strength": 0.05,
-      "hardness": 0.55,
-      "id": "9d49ff723949"
-    },
-    {
-      "x": 4.140413193787051,
-      "z": 392.8787654025658,
-      "radius": 2.8,
-      "delta": -0.6872933331113179,
-      "falloff": "smooth",
-      "mode": "level",
-      "gx": -0.05371443168079882,
-      "gz": -0.01245627370812262,
-      "strength": 0.05,
-      "hardness": 0.55,
-      "id": "f18907cc10a3"
-    },
-    {
-      "x": 4.318011433338349,
-      "z": 391.4867056364657,
-      "radius": 2.8,
-      "delta": -0.7028590996044757,
-      "falloff": "smooth",
-      "mode": "level",
-      "gx": -0.06031776576717732,
-      "gz": 0.009735022798228294,
-      "strength": 0.05,
-      "hardness": 0.55,
-      "id": "b230e23e2a25"
-    },
-    {
       "x": 7.301571776607162,
       "z": 373.2435667464981,
       "radius": 2.8,
@@ -29721,136 +29333,6 @@
       "id": "a6507b376dd5"
     },
     {
-      "x": 7.55893537805823,
-      "z": 387.3917208610336,
-      "radius": 2.8,
-      "delta": -0.7921109845043754,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "aec7ed90df1e"
-    },
-    {
-      "x": 7.238985217777021,
-      "z": 388.88459954181417,
-      "radius": 2.8,
-      "delta": -0.5321222187316124,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "749305ae81f7"
-    },
-    {
-      "x": 7.201038522539871,
-      "z": 390.30800994022377,
-      "radius": 2.8,
-      "delta": -0.32413120611340196,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "4a681c756cbd"
-    },
-    {
-      "x": 7.770275310458857,
-      "z": 393.38351205735546,
-      "radius": 2.8,
-      "delta": -0.6140754878759773,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "aefa161528ee"
-    },
-    {
-      "x": 8.003784473863096,
-      "z": 395.1013739203623,
-      "radius": 2.8,
-      "delta": -0.4046823943992398,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "434d2929ed24"
-    },
-    {
-      "x": 9.101798783456132,
-      "z": 398.9143358409235,
-      "radius": 2.8,
-      "delta": -0.9040374950527671,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "04e8d8213def"
-    },
-    {
-      "x": 10.01991567875956,
-      "z": 402.4878143625952,
-      "radius": 2.8,
-      "delta": -1.4093916026299462,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "ee0267cf5fef"
-    },
-    {
-      "x": 9.901077610418987,
-      "z": 400.9591237027615,
-      "radius": 2.8,
-      "delta": -1.025946713232069,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "9d40635dd71f"
-    },
-    {
-      "x": 9.44433288392985,
-      "z": 397.86112628280614,
-      "radius": 2.8,
-      "delta": -0.6216634271703257,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "4b0717a5c0d5"
-    },
-    {
-      "x": 8.825558700309848,
-      "z": 394.2747157379347,
-      "radius": 2.8,
-      "delta": -0.22217934664750394,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "cbe5721dbba3"
-    },
-    {
-      "x": 8.426450982768532,
-      "z": 390.6838850033989,
-      "radius": 2.8,
-      "delta": -0.15794376539977129,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "88a05ed36f2f"
-    },
-    {
-      "x": 8.025493771916189,
-      "z": 388.19954218849455,
-      "radius": 2.8,
-      "delta": -0.22911351142498954,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "adfb92bd6c96"
-    },
-    {
-      "x": 7.883355439203822,
-      "z": 385.93322590870696,
-      "radius": 2.8,
-      "delta": -0.3604936904271,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "14e38c82eb74"
-    },
-    {
       "x": 7.45529642735486,
       "z": 383.57539119912934,
       "radius": 2.8,
@@ -29859,76 +29341,6 @@
       "mode": "level",
       "hardness": 0.55,
       "id": "236ef328f2f3"
-    },
-    {
-      "x": 8.50091721455534,
-      "z": 387.07939322637526,
-      "radius": 2.8,
-      "delta": -0.18682838346979208,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "abd62d2cd159"
-    },
-    {
-      "x": 8.786816232840373,
-      "z": 389.8236246880745,
-      "radius": 2.8,
-      "delta": -0.07564410092694757,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "9eb06ab3dc0f"
-    },
-    {
-      "x": 9.241837362454643,
-      "z": 393.18598323521974,
-      "radius": 2.8,
-      "delta": -0.07366865940956241,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "c9cc187de17e"
-    },
-    {
-      "x": 9.429824767816022,
-      "z": 394.99945949790015,
-      "radius": 2.8,
-      "delta": 0.027324401993688074,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "1f650ace6cf8"
-    },
-    {
-      "x": 10.082164113519145,
-      "z": 398.2591984238479,
-      "radius": 2.8,
-      "delta": -0.39576417286437265,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "1344db330950"
-    },
-    {
-      "x": 10.522959488933864,
-      "z": 400.8845532082386,
-      "radius": 2.8,
-      "delta": -0.7023970156957431,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "d29fc4e21517"
-    },
-    {
-      "x": 11.777956378664562,
-      "z": 406.14451791357067,
-      "radius": 2.8,
-      "delta": -1.8488806156322635,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "d358cac32afb"
     },
     {
       "x": 12.163035204185803,
@@ -30021,196 +29433,6 @@
       "id": "e3a74527dd97"
     },
     {
-      "x": 11.022054051779907,
-      "z": 415.8845076936243,
-      "radius": 2.8,
-      "delta": -1.582222492862876,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "621e651d0617"
-    },
-    {
-      "x": 10.464468178903946,
-      "z": 411.63117962690023,
-      "radius": 2.8,
-      "delta": -1.883829561424704,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "95a3428bcef7"
-    },
-    {
-      "x": 9.649804383492661,
-      "z": 407.13082261799,
-      "radius": 2.8,
-      "delta": -1.7296681541944796,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "9caef0318466"
-    },
-    {
-      "x": 8.140443274578761,
-      "z": 400.43393455839356,
-      "radius": 2.8,
-      "delta": -0.6585641107814082,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "2d2f7c9355ee"
-    },
-    {
-      "x": 7.675836086791566,
-      "z": 397.5150172556987,
-      "radius": 2.8,
-      "delta": -0.3951036928432651,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "fea347f28e8f"
-    },
-    {
-      "x": 7.2534933356627675,
-      "z": 395.99350273356674,
-      "radius": 2.8,
-      "delta": -0.21420048893133514,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "82b6a04f74e5"
-    },
-    {
-      "x": 7.8636210422910935,
-      "z": 399.91362042648274,
-      "radius": 2.8,
-      "delta": -0.37633418917951594,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "8959f17ca3f3"
-    },
-    {
-      "x": 8.83886974846866,
-      "z": 406.45149756196565,
-      "radius": 2.8,
-      "delta": -1.2821679544836957,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "1fd17ee4d962"
-    },
-    {
-      "x": 9.435962044232184,
-      "z": 411.1378962745385,
-      "radius": 2.8,
-      "delta": -1.4054970802678755,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "75c67f0b70a8"
-    },
-    {
-      "x": 9.74232115130447,
-      "z": 414.3551366239693,
-      "radius": 2.8,
-      "delta": -1.395954974594028,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "5ee3f7e3fdbb"
-    },
-    {
-      "x": 10.374116963619336,
-      "z": 418.8736853163043,
-      "radius": 2.8,
-      "delta": -1.753499318001695,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "156a6607e54f"
-    },
-    {
-      "x": 10.607598207782068,
-      "z": 421.5162435330946,
-      "radius": 2.8,
-      "delta": -1.5541523428734567,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "e8d47c76b577"
-    },
-    {
-      "x": 10.523123422643401,
-      "z": 422.94886183694143,
-      "radius": 2.8,
-      "delta": -1.1417553054268774,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "c5e668df9d0b"
-    },
-    {
-      "x": 11.096480326785318,
-      "z": 426.37172111017065,
-      "radius": 2.8,
-      "delta": -1.5025362928864374,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "ea887678102b"
-    },
-    {
-      "x": 11.173189071098204,
-      "z": 429.0801011264498,
-      "radius": 2.8,
-      "delta": -1.3219487667013974,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "18619dcb5cd6"
-    },
-    {
-      "x": 10.938121066594078,
-      "z": 430.5620401138176,
-      "radius": 2.8,
-      "delta": -0.95599244448923,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "3cb16cfefaaf"
-    },
-    {
-      "x": 10.916071116072203,
-      "z": 432.9495440893369,
-      "radius": 2.8,
-      "delta": -0.8305703519300633,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "4b637b9ce5cf"
-    },
-    {
-      "x": 10.648260260821495,
-      "z": 435.57206501278614,
-      "radius": 2.8,
-      "delta": -0.734936151242478,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "4e435b61e2ce"
-    },
-    {
-      "x": 10.909073973519732,
-      "z": 439.3673946275804,
-      "radius": 2.8,
-      "delta": -0.83631299560242,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "f72d340a2642"
-    },
-    {
       "x": 11.034242355930612,
       "z": 442.6219148786783,
       "radius": 2.8,
@@ -30219,376 +29441,6 @@
       "mode": "level",
       "hardness": 0.55,
       "id": "77e90f855a2a"
-    },
-    {
-      "x": 10.074637274912313,
-      "z": 439.612356064358,
-      "radius": 2.8,
-      "delta": -0.567483827610048,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "4eb14a37bd65"
-    },
-    {
-      "x": 9.219088283317927,
-      "z": 435.5886338927761,
-      "radius": 2.8,
-      "delta": -0.48638235212209446,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "b5f2532d67dd"
-    },
-    {
-      "x": 8.974980861029561,
-      "z": 432.4094834789222,
-      "radius": 2.8,
-      "delta": -0.7013905124275635,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "94f75e3635ae"
-    },
-    {
-      "x": 8.821361892898317,
-      "z": 429.69413470607907,
-      "radius": 2.8,
-      "delta": -1.00867864826562,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "7ae8d66440d3"
-    },
-    {
-      "x": 8.75328934372844,
-      "z": 426.7823548227293,
-      "radius": 2.8,
-      "delta": -1.4218234962504275,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "fa223992e36c"
-    },
-    {
-      "x": 8.48046848233567,
-      "z": 422.06399650417524,
-      "radius": 2.8,
-      "delta": -1.1588881718750534,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "b03c976f8ff4"
-    },
-    {
-      "x": 8.450159833350892,
-      "z": 419.5966576309902,
-      "radius": 2.8,
-      "delta": -1.3352994286144253,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "ecab17046e5b"
-    },
-    {
-      "x": 8.642037533716149,
-      "z": 417.02046681702996,
-      "radius": 2.8,
-      "delta": -1.641241907736938,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "e11eca25ce87"
-    },
-    {
-      "x": 8.214869432216151,
-      "z": 413.25815478448897,
-      "radius": 2.8,
-      "delta": -1.148168610447607,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "8c94ba4e7530"
-    },
-    {
-      "x": 7.991384701069315,
-      "z": 410.85248709889163,
-      "radius": 2.8,
-      "delta": -0.9771294367927453,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "4b0dd4d8420f"
-    },
-    {
-      "x": 7.889817397910729,
-      "z": 408.9776096003799,
-      "radius": 2.8,
-      "delta": -0.8782226460806323,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "b3b7d761d4b8"
-    },
-    {
-      "x": 7.620575927714498,
-      "z": 406.96547744698165,
-      "radius": 2.8,
-      "delta": -0.7096409011308659,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "760076099482"
-    },
-    {
-      "x": 7.512897609086728,
-      "z": 405.17510228060826,
-      "radius": 2.8,
-      "delta": -0.5248080414819885,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "30f32200363e"
-    },
-    {
-      "x": 7.29578911230605,
-      "z": 403.4176911830619,
-      "radius": 2.8,
-      "delta": -0.41639470560920916,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "c272e328feb5"
-    },
-    {
-      "x": 7.190005591060888,
-      "z": 401.70785903344324,
-      "radius": 2.8,
-      "delta": -0.23243109338921142,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "b0ebf2cf0d8e"
-    },
-    {
-      "x": 7.493109285028375,
-      "z": 404.27765927712846,
-      "radius": 2.8,
-      "delta": -0.2204143325150603,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "dd938bb81d1c"
-    },
-    {
-      "x": 7.922888401602091,
-      "z": 409.701084694962,
-      "radius": 2.8,
-      "delta": -0.6004454140661336,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "df982b8f2e0f"
-    },
-    {
-      "x": 8.635223959023776,
-      "z": 417.6717631835019,
-      "radius": 2.8,
-      "delta": -1.2114269573176624,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "960cae6f57d6"
-    },
-    {
-      "x": 8.932089430616376,
-      "z": 422.4253138249102,
-      "radius": 2.8,
-      "delta": -0.8255439686281548,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "a4ee7f66689d"
-    },
-    {
-      "x": 9.504158415087026,
-      "z": 426.63455892588286,
-      "radius": 2.8,
-      "delta": -1.035892228128454,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "48833086e525"
-    },
-    {
-      "x": 9.3141806265285,
-      "z": 423.0305803528431,
-      "radius": 2.8,
-      "delta": -0.5588686060306359,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "e84eb1321033"
-    },
-    {
-      "x": 9.379913469247008,
-      "z": 420.4857314790143,
-      "radius": 2.8,
-      "delta": -0.6428679852645182,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "ec2d09063616"
-    },
-    {
-      "x": 9.655432476758538,
-      "z": 417.2703031379989,
-      "radius": 2.8,
-      "delta": -0.8675749969822419,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "d16a5e965c1f"
-    },
-    {
-      "x": 9.643215679317414,
-      "z": 413.65822735545765,
-      "radius": 2.8,
-      "delta": -0.8169683194861976,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "6153a118ba9c"
-    },
-    {
-      "x": 9.301455945218756,
-      "z": 409.0681236744783,
-      "radius": 2.8,
-      "delta": -0.3787897623810189,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "36cfbd7118fd"
-    },
-    {
-      "x": 9.521564064813965,
-      "z": 406.67116109097844,
-      "radius": 2.8,
-      "delta": -0.456354909225115,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "3084e5aef807"
-    },
-    {
-      "x": 9.302354269850422,
-      "z": 403.750684253719,
-      "radius": 2.8,
-      "delta": -0.13708172977044727,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "c8439a209828"
-    },
-    {
-      "x": 9.307143577841732,
-      "z": 401.6588291698697,
-      "radius": 2.8,
-      "delta": -0.08397661792739733,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "8e05d6ccb958"
-    },
-    {
-      "x": 9.317578123459906,
-      "z": 399.6517902886425,
-      "radius": 2.8,
-      "delta": -0.038202580960005256,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "832afd24140a"
-    },
-    {
-      "x": 9.299470803075902,
-      "z": 397.5899909217513,
-      "radius": 2.8,
-      "delta": -0.03154091477349033,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "2567a98de24c"
-    },
-    {
-      "x": 9.270706883127861,
-      "z": 395.97839423607525,
-      "radius": 2.8,
-      "delta": 0.0749670658529132,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "94f9ec0428f3"
-    },
-    {
-      "x": 9.146939753647164,
-      "z": 394.06466539069754,
-      "radius": 2.8,
-      "delta": 0.15261319407686508,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "049ab53d6a88"
-    },
-    {
-      "x": 8.944741533601931,
-      "z": 392.6519735100809,
-      "radius": 2.8,
-      "delta": 0.22365712413337996,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "9293ea988911"
-    },
-    {
-      "x": 8.757230826656283,
-      "z": 390.93746845419116,
-      "radius": 2.8,
-      "delta": 0.2665933527697766,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "41be934bcf8a"
-    },
-    {
-      "x": 8.442307817173294,
-      "z": 389.1577187783681,
-      "radius": 2.8,
-      "delta": 0.2830825704900136,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "b47609296966"
-    },
-    {
-      "x": 8.233685003550612,
-      "z": 387.41845111192896,
-      "radius": 2.8,
-      "delta": 0.3009023574566633,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "a3f53cb496f2"
-    },
-    {
-      "x": 7.9147034077017295,
-      "z": 385.26032327015514,
-      "radius": 2.8,
-      "delta": 0.14211545543865683,
-      "falloff": "smooth",
-      "mode": "level",
-      "hardness": 0.55,
-      "id": "de599bd77d25"
     },
     {
       "x": 7.600665677833419,
@@ -75938,8 +74790,8 @@
         "z": 272.40535416144263
       },
       {
-        "x": 1.316960787487354,
-        "z": 629.3381594372017
+        "x": 1.2239798852246238,
+        "z": 629.504501418314
       },
       {
         "x": -10.389077532507383,
@@ -76947,18 +75799,6 @@
         {
           "x": 0,
           "z": 320
-        },
-        {
-          "x": 0.32,
-          "z": 323.89
-        },
-        {
-          "x": -0.04,
-          "z": 329.29
-        },
-        {
-          "x": 1.09,
-          "z": 332.18
         },
         {
           "x": 10,
