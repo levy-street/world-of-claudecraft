@@ -95,6 +95,9 @@ import { CouncilShoulderFx } from './council_shoulder_fx';
 import { CouncilSoakFx } from './council_soak_fx';
 import { CouncilSoulFx } from './council_soul_fx';
 import { chunkGeometry, Rubble } from './hammer_fx';
+import type { CouncilTelegraphKind } from './painted_telegraph_core';
+import { COUNCIL_TELEGRAPH_GLOW_STEP, craterFade, ROCK_CRATER } from './painted_telegraph_core';
+import { CouncilTelegraphs, type PaintedFan } from './painted_telegraphs';
 
 /** What a soul pillar is to the council's sound. */
 const SOUL_SOUND = { guardian: 'echo', slabwright: 'slab', singer: 'song' } as const;
@@ -159,6 +162,8 @@ interface MarkSlot {
   playerId: number;
   auraId: string;
   fan: TelegraphFan;
+  /** The fan's stone paint (Wake the Stone's split, or the rock's). */
+  paint: PaintedFan<CouncilTelegraphKind>;
   ghost: THREE.Mesh;
   ghostMat: THREE.ShaderMaterial;
   seen: boolean;
@@ -320,6 +325,8 @@ export class CouncilFx {
   private readonly particles: EngineParticles;
   private readonly debris: Rubble;
   private readonly kit: TelegraphKit;
+  /** The kit's fans dressed in the stone (painted_telegraphs.ts). */
+  private readonly paints: CouncilTelegraphs;
   private readonly geometries: THREE.BufferGeometry[] = [];
   private readonly materials: THREE.Material[] = [];
   private readonly pillarsFx: CouncilPillarsFx;
@@ -341,6 +348,8 @@ export class CouncilFx {
   private readonly marks: MarkSlot[] = [];
   private readonly spots: SpotSlot[] = [];
   private readonly rocks: RockSlot[] = [];
+  /** The craters the rocks leave (split stone settling, cosmetic). */
+  private readonly craters: { fan: TelegraphFan; born: number; r: number }[] = [];
   private readonly rings: RingSlot[] = [];
   private readonly weights: WeightSlot[] = [];
   private readonly bolts: BoltSlot[] = [];
@@ -394,6 +403,8 @@ export class CouncilFx {
       () => this.rand(),
     );
     this.kit = new TelegraphKit(this.root, this.detail);
+    this.paints = new CouncilTelegraphs(COUNCIL_TELEGRAPH_GLOW_STEP, this.materials);
+    const paints = this.paints;
     // A one-triangle carrier for every material that waits on a kit's piece.
     const carrier = new THREE.BufferGeometry();
     carrier.setAttribute('position', new THREE.BufferAttribute(new Float32Array(9), 3));
@@ -410,6 +421,7 @@ export class CouncilFx {
       particles: this.particles,
       debris: this.debris,
       kit: this.kit,
+      paints,
       groundY: (x, z) => this.groundY(x, z),
       rand: () => this.rand(),
       now: () => this.clock,
@@ -458,6 +470,7 @@ export class CouncilFx {
     for (let i = 0; i < POOLS.marks; i++) {
       const fan = this.kit.fan(14);
       fan.group.visible = false;
+      const paint = paints.dress(fan, 'wake');
       const gm = ghostMat('smithHeartWakeGhost', C.ochre);
       const ghost = new THREE.Mesh(bandGeo, gm);
       ghost.name = 'smithHeartWakeGhost';
@@ -469,6 +482,7 @@ export class CouncilFx {
         playerId: -1,
         auraId: '',
         fan,
+        paint,
         ghost,
         ghostMat: gm,
         seen: false,
@@ -480,6 +494,7 @@ export class CouncilFx {
       const fan = this.kit.fan(14);
       this.kit.layOutFan(fan, 360, { color: RISE_SPOT_SPEC.color, accent: RISE_SPOT_SPEC.accent });
       fan.group.visible = false;
+      paints.dress(fan, 'rise');
       const gm = ghostMat('smithHeartRiseGhost', C.ochre);
       const ghost = new THREE.Mesh(bandGeo, gm);
       ghost.name = 'smithHeartRiseGhost';
@@ -498,6 +513,13 @@ export class CouncilFx {
         y: 0,
         z: 0,
       });
+    }
+    for (let i = 0; i < POOLS.rocks; i++) {
+      const fan = this.kit.fan(12);
+      this.kit.layOutFan(fan, 360, { color: ROCK_CRATER.color, accent: ROCK_CRATER.accent });
+      fan.group.visible = false;
+      paints.dress(fan, 'crater');
+      this.craters.push({ fan, born: -99, r: 1 });
     }
     // ---- the falling rocks (a boulder of the rock kit once it lands) ----
     for (let i = 0; i < POOLS.rocks; i++) {
@@ -768,6 +790,7 @@ export class CouncilFx {
     this.updateMarks(world);
     this.updateSpots();
     this.updateRocks(world);
+    this.updateCraters();
     this.updateRings(world);
     this.updateWeights(world);
     this.updateDrops(world);
@@ -910,6 +933,7 @@ export class CouncilFx {
       m.playerId = e.id;
       m.auraId = auraId;
       this.kit.layOutFan(m.fan, 360, { color: spec.color, accent: spec.accent });
+      this.paints.setLook(m.paint, auraId === COUNCIL_AURAS.rockMark ? 'rock' : 'wake');
       m.fan.group.visible = true;
       m.ghost.visible = auraId === COUNCIL_AURAS.wakeMark;
     }
@@ -1050,8 +1074,27 @@ export class CouncilFx {
     }
   }
 
+  private updateCraters(): void {
+    for (const c of this.craters) {
+      if (!c.fan.group.visible) continue;
+      const fade = craterFade(this.clock - c.born);
+      if (fade <= 0) {
+        c.fan.group.visible = false;
+        continue;
+      }
+      this.kit.paintFan(c.fan, { fill: 1, clock: this.clock, range: c.r, fade, front: 0 });
+    }
+  }
+
   private rockImpact(x: number, z: number, radius: number): void {
     const y = this.groundY(x, z);
+    // The crater: the floor split where the rock came down.
+    let crater = this.craters[0];
+    for (const c of this.craters) if (c.born < crater.born) crater = c;
+    crater.born = this.clock;
+    crater.r = radius * ROCK_CRATER.share;
+    crater.fan.group.visible = true;
+    this.kit.drapeFan(crater.fan, this.groundY, x, y, z, this.rand() * Math.PI * 2, crater.r);
     for (const r of this.rocks) if (r.mesh.visible && r.playerId < 0) r.mesh.visible = false;
     const n = Math.round(40 * this.density * (this.reducedMotion() ? 0.5 : 1));
     for (let i = 0; i < n; i++) {

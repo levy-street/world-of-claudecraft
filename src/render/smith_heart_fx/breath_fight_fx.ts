@@ -96,6 +96,8 @@ import {
 } from './breath_fight_fx_core';
 import { BreathHeartFx } from './breath_heart_fx';
 import { BreathWindStreaks } from './breath_wind_streaks';
+import { BREATH_TELEGRAPH_GLOW_STEP, type BreathTelegraphKind } from './painted_telegraph_core';
+import { BreathTelegraphs, type PaintedFan } from './painted_telegraphs';
 
 const SCAN_SEC = 0.1;
 const BEAM_POINTS = 10;
@@ -530,6 +532,10 @@ export class BreathFightFx {
   private readonly chargedFans: FanSlot[] = [];
   private readonly cradleFans: FanSlot[] = [];
   private readonly barFans: FanSlot[] = [];
+  /** The bar's footprint dressed in the storm (its kind follows the bar). */
+  private barPaint: PaintedFan<BreathTelegraphKind> | null = null;
+  /** Every footprint's element paint (painted_telegraphs.ts). */
+  private readonly paints: BreathTelegraphs;
   /** The object footprint pools, in one list (built once, walked by assign). */
   private readonly footprintPools: readonly FanSlot[][] = [
     this.calmFans,
@@ -618,6 +624,7 @@ export class BreathFightFx {
     );
     this.glowTex = hasDom ? radialGlowTexture() : null;
     this.kit = new TelegraphKit(this.root, this.detail);
+    this.paints = new BreathTelegraphs(BREATH_TELEGRAPH_GLOW_STEP, this.materials);
     this.local.name = 'smithHeartBreathLocal';
     this.local.visible = false;
     this.root.add(this.local);
@@ -712,39 +719,45 @@ export class BreathFightFx {
     }
 
     // ---- the footprints (every tier) ----
-    const fans = (n: number, order: number, out: FanSlot[]) => {
+    // Each dressed in its element (painted_telegraphs.ts): the strikes and
+    // the bars' marks in lightning, the charged ground arcing, the vortex,
+    // the gales and the pinned in wind, the calm still and mint.
+    const fans = (n: number, order: number, out: FanSlot[], kind: BreathTelegraphKind) => {
       for (let i = 0; i < n; i++) {
         const fan = this.kit.fan(order);
         fan.group.visible = false;
+        const painted = this.paints.dress(fan, kind);
+        if (out === this.barFans) this.barPaint = painted;
         out.push({ fan, id: -1, born: 0, template: '' });
       }
     };
-    fans(P.calm, 6, this.calmFans);
-    fans(P.vortex, 10, this.vortexFans);
-    fans(P.gales, 10, this.galeFans);
-    fans(P.strikes, 12, this.strikeFans);
-    fans(P.charged, 8, this.chargedFans);
-    fans(P.cradles, 9, this.cradleFans);
-    fans(1, 11, this.barFans);
+    fans(P.calm, 6, this.calmFans, 'calm');
+    fans(P.vortex, 10, this.vortexFans, 'vortex');
+    fans(P.gales, 10, this.galeFans, 'gale');
+    fans(P.strikes, 12, this.strikeFans, 'strike');
+    fans(P.charged, 8, this.chargedFans, 'charged');
+    fans(P.cradles, 9, this.cradleFans, 'cradle');
+    fans(1, 11, this.barFans, 'fork');
     for (const s of this.calmFans) this.layOut(s, 360, C.calm, C.calmEdge);
     for (const s of this.vortexFans) this.layOut(s, 360, C.danger, C.accent);
     for (const s of this.galeFans) this.layOut(s, 360, C.control, C.accent);
     for (const s of this.strikeFans) this.layOut(s, 360, C.danger, C.accent);
     for (const s of this.chargedFans) this.layOut(s, 360, C.danger, C.accent);
     for (const s of this.cradleFans) this.layOut(s, 360, C.soak, C.accent);
-    const markFans = (n: number, arc: number, color: number) => {
+    const markFans = (n: number, arc: number, color: number, kind: BreathTelegraphKind) => {
       const out: TelegraphFan[] = [];
       for (let i = 0; i < n; i++) {
         const f = this.kit.fan(13);
         this.kit.layOutFan(f, arc, { color, accent: C.accent });
         f.group.visible = false;
+        this.paints.dress(f, kind);
         out.push(f);
       }
       return out;
     };
-    this.anchorMarks = new MarkPool(markFans(6, 360, C.calm));
-    this.pinnedMarks = new MarkPool(markFans(10, PINNED_MARK.arcDeg, C.danger));
-    this.drawnMarks = new MarkPool(markFans(2, 360, C.lethal));
+    this.anchorMarks = new MarkPool(markFans(6, 360, C.calm, 'anchor'));
+    this.pinnedMarks = new MarkPool(markFans(10, PINNED_MARK.arcDeg, C.danger, 'pinned'));
+    this.drawnMarks = new MarkPool(markFans(2, 360, C.lethal, 'drawnMark'));
 
     // ---- funnels, beams, domes ----
     const funnelMat = (name: string, spin: number) =>
@@ -1834,6 +1847,11 @@ export class BreathFightFx {
       const color =
         id === BREATH_CASTS.fork ? C.danger : id === BREATH_CASTS.cradle ? C.soak : C.lethal;
       this.kit.layOutFan(slot.fan, 360, { color, accent: C.accent });
+      if (this.barPaint)
+        this.paints.setLook(
+          this.barPaint,
+          id === BREATH_CASTS.fork ? 'fork' : id === BREATH_CASTS.cradle ? 'cradle' : 'drawnBar',
+        );
     }
     slot.fan.group.visible = true;
     const fill = g.castTotal > 0 ? Math.max(0, Math.min(1, 1 - g.castRemaining / g.castTotal)) : 1;
@@ -1875,6 +1893,17 @@ export class BreathFightFx {
       radius: r * 0.5,
     });
     this.particles.shockRing(x, z, 0xd8f6ff, r * 1.2, 0.45);
+    // The strike's flash: a white burst on the stone and a ring of electric
+    // blue racing past the mark's edge (cosmetic: the scorch keeps the spot).
+    this.particles.puff(x, y + 0.8, z, Math.round(4 * size) + 2, {
+      speed: 2,
+      life: 0.22,
+      size: [r * 0.9, r * 1.6],
+      color: [0.85, 0.94, 1],
+      alpha: 0.9,
+      pool: 'glow',
+    });
+    this.particles.shockRing(x, z, 0x47b8ff, r * 2, 0.6);
     this.shakeNear(x, z, 0.18 * size, 30);
   }
 

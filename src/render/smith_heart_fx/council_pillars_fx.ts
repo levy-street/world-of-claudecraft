@@ -50,6 +50,7 @@ import { CouncilPipSockets } from './council_pip_sockets';
 import { CouncilSlabRigs } from './council_slab_fx';
 import type { Rubble } from './hammer_fx';
 import { fxHash } from './hammer_fx_core';
+import type { CouncilTelegraphs } from './painted_telegraphs';
 
 const SMITH_HEART = 'smith_heart';
 const _slab = { lurch: 0, rock: 0, heading: 0 };
@@ -113,6 +114,8 @@ export interface CouncilFxHost {
   particles: EngineParticles;
   debris: Rubble;
   kit: TelegraphKit;
+  /** The kit's fans dressed in the stone's paint (painted_telegraphs.ts). */
+  paints: CouncilTelegraphs;
   groundY: (x: number, z: number) => number;
   rand: () => number;
   now: () => number;
@@ -457,6 +460,7 @@ export class CouncilPillarsFx {
       const fan = this.h.kit.fan(12);
       this.h.kit.layOutFan(fan, 360, { color: C.danger, accent: C.ochre });
       fan.group.visible = false;
+      this.h.paints.dress(fan, 'rubble');
       this.rubble.push({
         id: -1,
         group,

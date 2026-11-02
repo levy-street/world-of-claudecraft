@@ -419,6 +419,10 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   // Hammer's granite, the Heat's molten basalt): char, glow and curtain on
   // the kit's own rungs (FINAL_KIT_FLOOR).
   { file: 'src/render/smith_heart_fx/final_telegraphs.ts', layer: 'encounter', strict: true },
+  // The Breath's and the Hammer Council's painted telegraphs (lightning, wind,
+  // the calm, split stone, rubble): each glow pass on its owner's glow rung,
+  // over every char rung of that owner (painted_telegraph_core.ts).
+  { file: 'src/render/smith_heart_fx/painted_telegraphs.ts', layer: 'encounter', strict: true },
   // the player's own ground aim guide (additive: it brightens what lies under it)
   { file: 'src/render/ground_aim_reticle_visual.ts', layer: 'reticle', strict: true },
 ];
