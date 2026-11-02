@@ -22,6 +22,13 @@ function context(): ReferralCardContext {
   };
 }
 
+/** A pair at the given level: kill credit is gated on the content's finder minimum. */
+function atLevel(level: number): ReferralCardContext {
+  const ctx = context();
+  for (const c of ctx.characters) c.level = level;
+  return ctx;
+}
+
 type WithoutRevision<T> = T extends unknown ? Omit<T, 'expectedRevision'> : never;
 
 function command(
@@ -219,7 +226,7 @@ describe('referral card milestone evidence', () => {
 
   it('credits a dungeon stamp to both on the matching shared boss kill, quest or not', () => {
     const state = active();
-    const ctx = context();
+    const ctx = atLevel(20);
     const event = {
       type: 'dungeonClear',
       dungeonId: 'hollow_crypt',
@@ -252,7 +259,7 @@ describe('referral card milestone evidence', () => {
   });
 
   it('a shared clear completes the stamp a friend already earned by turn-in', () => {
-    const ctx = context();
+    const ctx = atLevel(20);
     const state = active();
     state.participants[1].credited = 1 << 3;
     const event = {
@@ -263,6 +270,31 @@ describe('referral card milestone evidence', () => {
     expect(creditReferralCard(state, event, ctx).state.participants.map((p) => p.credited)).toEqual(
       [8, 8],
     );
+  });
+
+  it('credits no kill stamp unless both characters meet the content minimum level', () => {
+    const state = active();
+    const clear = (dungeonId: string) =>
+      ({ type: 'dungeonClear', dungeonId, eligibleCharacterIds: [101, 202] }) as const;
+    const raid = {
+      type: 'raidBossKill',
+      activityId: 'ignivar_raid_arena_normal',
+      mobId: 'ignivar_herald_of_the_last_flame',
+      eligibleCharacterIds: [101, 202],
+    } as const;
+    // Finder normal minimums: Hollow 7, Bastion 12, Sanctum 19, raids 20.
+    for (const [event, min] of [
+      [clear('hollow_crypt'), 7],
+      [clear('sunken_bastion'), 12],
+      [clear('gravewyrm_sanctum'), 19],
+      [raid, 20],
+    ] as const) {
+      expect(creditReferralCard(state, event, atLevel(min - 1)).state).toBe(state);
+      const carried = atLevel(min);
+      carried.characters[1].level = 1;
+      expect(creditReferralCard(state, event, carried).state).toBe(state);
+      expect(creditReferralCard(state, event, atLevel(min)).state).not.toBe(state);
+    }
   });
 
   it.each([
@@ -279,10 +311,10 @@ describe('referral card milestone evidence', () => {
       eligibleCharacterIds: [101, 202],
     } as const;
     expect(
-      creditReferralCard(state, event, context()).state.participants.map((p) => p.credited),
+      creditReferralCard(state, event, atLevel(20)).state.participants.map((p) => p.credited),
     ).toEqual([16, 16]);
     expect(
-      creditReferralCard(state, { ...event, eligibleCharacterIds: [101] }, context()).state,
+      creditReferralCard(state, { ...event, eligibleCharacterIds: [101] }, atLevel(20)).state,
     ).toBe(state);
   });
 
@@ -297,7 +329,7 @@ describe('referral card milestone evidence', () => {
         creditReferralCard(
           state,
           { type: 'raidBossKill', activityId, mobId, eligibleCharacterIds: [101, 202] },
-          context(),
+          atLevel(20),
         ).state,
       ).toBe(state);
     }
