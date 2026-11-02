@@ -145,4 +145,20 @@ describe('referral stamps are earned on the real boss kill', () => {
       bit('raid'),
     ]);
   });
+
+  it('a level-20 carry of a below-level bound pair through the Sanctum credits nothing', () => {
+    const { sim, s, a, b } = pair();
+    const carrier = sim.addPlayer('warrior', 'Carry', { characterId: 303 });
+    sim.meta(carrier)!.accountId = 30;
+    sim.partyInvite(carrier, a);
+    sim.partyAccept(carrier);
+    sim.entities.get(carrier)!.level = 20;
+    for (const pid of [a, b]) sim.entities.get(pid)!.level = 1;
+    enter(s, ['gravewyrm_sanctum'], [a, b, carrier]);
+    // Only the carrier stands at the boss; the pair is merely inside the claim.
+    const evidence = killBoss(s, 'korzul_the_gravewyrm', [carrier]);
+    expect(evidence).toHaveLength(1);
+    expect(evidence[0].participants.map((p) => p.characterId).sort()).toEqual([101, 202, 303]);
+    expect(credit(evidence[0]).participants.map((p) => p.credited)).toEqual([0, 0]);
+  });
 });

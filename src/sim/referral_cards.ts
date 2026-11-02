@@ -1,4 +1,4 @@
-import { finderActivity } from './content/dungeon_finder';
+import { FINDER_ACTIVITIES, finderActivity } from './content/dungeon_finder';
 
 /** Stable keys and bit positions are persisted; append rather than reorder. */
 export const REFERRAL_MILESTONES = [
@@ -366,11 +366,12 @@ function redeem(
 
 /** Called only for authoritative successful turn-ins, dungeon clears, and eligible boss kills.
  * A dungeon stamp is earned by the kill: when BOTH assigned characters are eligible for the
- * milestone dungeon's final boss kill, both are credited whether or not either holds or has
- * turned in the milestone quest. A turn-in with the friend in the party still credits the
+ * milestone dungeon's final boss kill and both are at least the dungeon's finder minimum
+ * level, both are credited whether or not either holds or has turned in the milestone quest. A turn-in with the friend in the party still credits the
  * player who turned it in. Tutorial has no dungeon; the assigned pair's reunion recovers its
  * stamp once both have completed the final tutorial quest.
- * Raid evidence requires BOTH assigned characters to be eligible for that actual boss kill.
+ * Raid evidence requires BOTH assigned characters to be eligible for that actual boss kill
+ * and at least the raid's finder minimum level.
  * Credit may arrive out of order; redemption remains in milestone order. */
 export function creditReferralCard(
   state: ReferralCardState,
@@ -392,13 +393,22 @@ export function creditReferralCard(
   } else {
     if (!context.characters.every((c) => event.eligibleCharacterIds.includes(c.characterId)))
       return result(state);
+    let minLevel = Number.POSITIVE_INFINITY;
     if (event.type === 'dungeonClear') {
       milestone = REFERRAL_MILESTONES.findIndex((m) => m.dungeonId === event.dungeonId);
+      for (const a of FINDER_ACTIVITIES)
+        if (a.dungeonId === event.dungeonId) minLevel = Math.min(minLevel, a.minLevel);
     } else {
       const activity = finderActivity(event.activityId);
-      if (activity?.kind === 'raid' && activity.encounters.some((e) => e.mobId === event.mobId))
+      if (activity?.kind === 'raid' && activity.encounters.some((e) => e.mobId === event.mobId)) {
         milestone = 4;
+        minLevel = activity.minLevel;
+      }
     }
+    // A kill credits only a pair at the content's own level: instance entry and
+    // in-claim kill eligibility are not level gated, so this blocks carries.
+    if (milestone >= 0 && !context.characters.every((c) => c.level >= minLevel))
+      return result(state);
   }
   if (milestone < 0) return result(state);
   const bit = 1 << milestone;

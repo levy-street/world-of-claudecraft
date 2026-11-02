@@ -66,7 +66,7 @@ export const en_CA: EnTranslations = {
     "redeem": "Redeem reward",
     "previous": "Redeem earlier stamps first.",
     "playTogether": "Complete milestones in a party with the characters on this card.",
-    "fallback": "Already completed a milestone quest alone? Rejoin your friend in a party for the Tutorial Island stamp. For later quest stamps, clear the matching dungeon together.",
+    "fallback": "Already completed the Tutorial Island quest alone? Rejoin your friend in a party for that stamp. Dungeon stamps are earned when you both defeat the final boss together, at the dungeon's level or higher.",
     "questGroup": "Stamp card quests",
     "questWithFriend": "{quest} with {friend}",
     "browseCards": "Browse all stamp card pages",
