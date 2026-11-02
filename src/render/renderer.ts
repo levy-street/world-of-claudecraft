@@ -544,7 +544,6 @@ import {
 } from './mage_barrier_visual';
 import { handleMageGroundSpellfxEvent, MageGroundFx } from './mage_ground_fx';
 import { buildMailboxPillar } from './mailbox';
-import { collectObjectTextures } from './material_texture_slots';
 import { type MeleeContactHost, presentMeleeContact } from './melee_contact_present';
 import { meteorLandingBurst } from './meteor_landing_burst';
 import { buildMobNightGlow, type MobNightGlowView } from './mob_night_glow';
@@ -673,11 +672,7 @@ import {
   submitPrewarmCompileUnit,
 } from './prewarm_compile_submission_core';
 import { type PrewarmManifestEntry, runStartedPrewarmEntry } from './prewarm_entry';
-import {
-  boundedPrewarmVisibility,
-  runBackgroundPrewarm,
-  withHiddenPrewarmGroups,
-} from './prewarm_pass';
+import { boundedPrewarmVisibility, withHiddenPrewarmGroups } from './prewarm_pass';
 import {
   compileGroupRunsBeforeInitialPaint,
   mandatoryLandmarkViewsReady,
@@ -701,6 +696,7 @@ import {
   skyAssetInlineWaitMs,
   withRestoredPrewarmState,
 } from './prewarm_policy';
+import { freezePrewarmProgramRoot } from './prewarm_program_anchors';
 import {
   type PrewarmResumeEntry,
   type PrewarmResumeUnit,
@@ -971,6 +967,7 @@ import {
   type ZonePrewarmStats,
   type ZoneStreamingStats,
 } from './zone_prepare_stats';
+import { runZoneBackgroundPrewarm, runZonePrewarmTask } from './zone_prewarm';
 import {
   buildEntityPrewarmGroup,
   buildNpcPrewarmGroup,
@@ -1053,10 +1050,6 @@ const VFX_PREWARM_BURST_OFFSETS: readonly (readonly [number, number])[] = [
 // cancelled, so the target remains hidden and the serial gate remains occupied
 // until the driver settles instead of overlapping first-draw or later links.
 const VIEW_COMPILE_GATE_MAX_MS = 1500;
-// Textures per zone-prewarm upload unit: small enough that one grant's
-// decode+upload stays well under a frame, large enough not to double the
-// idle-slot count for texture-light children.
-const PREWARM_TEXTURE_UNIT_BATCH = 2;
 // Reserve at the tail of the view-build budget so the compile + final-frame
 // steps always start before the prewarm deadline (runEntry skips late entries).
 const PREWARM_BUILD_RESERVE_MS = 1000;
@@ -2676,17 +2669,9 @@ export class Renderer {
     // The light budget must exist BEFORE any attachZoneFeature call: a static
     // feature that ships glowLights pushes into it during the loop below.
     this.fireLights = props.fireLights;
-    // World-spanning modeled dressing, all static: the Duskfall cave mouths
-    // plus static_world_features.ts (lake flora, the Farshore's palm strand,
-    // the Sanctum's Seal Gate). Attached like the per-zone features so the
-    // distance cull applies: the gates and the palm strand have compact
-    // footprints, and water flora registers one cull child per zone.
     this.hollowGates = buildHollowGates(this.sim.cfg.seed);
-    for (const staticFeature of [
-      this.hollowGates,
-      ...buildStaticWorldFeatures(this.sim.cfg.seed),
-    ]) {
-      this.attachZoneFeature(staticFeature);
+    for (const f of [this.hollowGates, ...buildStaticWorldFeatures(this.sim.cfg.seed)]) {
+      this.attachZoneFeature(f);
     }
     this.flames = props.flames;
     this.windmillFans = props.windmillFans;
@@ -3616,14 +3601,17 @@ export class Renderer {
 
   isZonePreparedAt(x: number, z: number): boolean {
     const dungeon = dungeonAt(x);
-    if (dungeon) return dungeonCharacterBodiesResident(dungeon.interior);
+    if (dungeon)
+      return (
+        dungeonCharacterBodiesResident(dungeon.interior) &&
+        (this.staticInteriors?.isDungeonSettled(dungeon, z) ?? true)
+      );
     const id = this.zoneIdAt(x, z);
     return id === null || this.preparedZones.has(id);
   }
 
   isZoneReadyAt(x: number, z: number): boolean {
-    const dungeon = dungeonAt(x);
-    if (dungeon) return dungeonCharacterBodiesResident(dungeon.interior);
+    if (dungeonAt(x)) return Renderer.prototype.isZonePreparedAt.call(this, x, z);
     const id = this.zoneIdAt(x, z);
     if (id === null) return true;
     // Sky residency is part of arrival readiness: a false routes the arrival
@@ -3737,7 +3725,10 @@ export class Renderer {
     if (this.shutdownStarted) return Promise.resolve();
     const dungeon = dungeonAt(x);
     if (dungeon) {
-      return prepareDungeonCharacterBodies(dungeon.interior).then(() => onProgress?.(1, 1));
+      return (
+        this.staticInteriors?.prepareDungeon(dungeon, z, onProgress) ??
+        prepareDungeonCharacterBodies(dungeon.interior).then(() => onProgress?.(1, 1))
+      );
     }
     const zoneId = this.zoneIdAt(x, z);
     if (zoneId === null || this.preparedZones.has(zoneId)) {
@@ -3895,133 +3886,91 @@ export class Renderer {
 
   async prewarmZoneAt(x: number, z: number, opts?: { background?: boolean }): Promise<void> {
     if (this.shutdownStarted) return;
-    const zoneId = this.zoneIdAt(x, z);
+    const dungeon = dungeonAt(x);
+    const zoneId = dungeon ? `dungeon:${dungeon.interior}` : this.zoneIdAt(x, z);
     if (zoneId === null || this.prewarmedZonePrograms.has(zoneId)) return;
-    const pending = this.pendingZonePrewarms.get(zoneId);
-    if (pending) return pending;
-    const task = (async () => {
-      const zone = zoneAt(x, z);
-      const deadline = performance.now() + 5000;
-      const t0 = performance.now();
-      const mobPrewarm = buildEntityPrewarmGroup(this.zonePrewarmHost(), zone);
-      const npcPrewarm = buildNpcPrewarmGroup(this.zonePrewarmHost(), zone, deadline);
-      const mobGroup = mobPrewarm.group;
-      const npcGroup = npcPrewarm.group;
-      // Hide before scene attachment. The shared GPU queue may be occupied by
-      // sky/feature work for many frames before runBackgroundPrewarm starts.
-      mobGroup.visible = false;
-      npcGroup.visible = false;
-      this.scene.add(mobGroup, npcGroup);
-      const tBuild = performance.now();
-      let tCompile = tBuild;
-      try {
-        // A background prewarm (the visible-zone streaming lane) links the new
-        // programs off-thread BEFORE the warm pass renders with them, so the
-        // pass never compiles inside a live gameplay frame. Compile the PREWARM
-        // GROUPS, one idle slot apart, never the whole scene: compileAsync's
-        // synchronous prologue walks and re-initializes every material it is
-        // handed, and a full-scene walk was a measured multi-hundred-ms stall
-        // per streamed zone. Live frames keep rendering across that whole
-        // awaited window, so runBackgroundPrewarm keeps both groups invisible
-        // between its bounded child uploads (a visible group is a grid of T-posed
-        // rigs stacked next to the player). The gating path (behind the loading
-        // screen) keeps render-first, which also covers renderers without
-        // KHR_parallel_shader_compile.
-        if (opts?.background) {
-          await runBackgroundPrewarm([mobGroup, npcGroup], {
-            supportsAsyncCompile: this.asyncCompileSupported,
-            idleSlot: () =>
-              idleSlot(IDLE_PREWARM_TIMEOUT_MS, {
-                maxTimeoutDeferrals: 2,
-              }),
-            compileChild: async (child) => {
-              const childRoot = child as THREE.Object3D;
-              await warmRootBeforeLink(this.compileArms, childRoot, {
-                priority: GPU_WORK_PRIORITY.VISIBLE_PREWARM,
-                label: `zone-prewarm-warm:${childRoot.name || childRoot.type}`,
-                run: (work, priority, label) => this.backgroundGpuWork.run(work, priority, label),
-                includeOffscreenVariant: true,
-              });
-              await this.backgroundGpuWork.run(
-                () => this.compilePrewarmColorPrograms(childRoot, true),
-                GPU_WORK_PRIORITY.VISIBLE_PREWARM,
-                `zone-prewarm-color:${childRoot.name || childRoot.type}`,
-              );
-              await this.backgroundGpuWork.run(
-                () => this.compileShadowPrograms(childRoot),
-                GPU_WORK_PRIORITY.VISIBLE_PREWARM,
-                `zone-prewarm-shadow:${childRoot.name || childRoot.type}`,
-              );
-            },
-            prepareChildAssets: (child) => {
-              this.prewarmObjectTextures(child as THREE.Object3D);
-            },
-            // Decomposed upload: a whole-child bounded render was a measured
-            // 100-345ms main-thread unit (texture decode+upload dominating).
-            // Pre-upload the child's textures in small batches through their
-            // own arbiter units, then the bounded render only pays geometry
-            // upload plus the raster warm.
-            warmChildUnits: (groupLike, child) => {
-              const group = groupLike as THREE.Group;
-              const childRoot = child as THREE.Object3D;
-              const units: { label: string; run: () => void }[] = [];
-              const textures = [...collectObjectTextures(childRoot, false)];
-              for (let i = 0; i < textures.length; i += PREWARM_TEXTURE_UNIT_BATCH) {
-                const batch = textures.slice(i, i + PREWARM_TEXTURE_UNIT_BATCH);
-                units.push({
-                  label: 'zone-prewarm-tex',
-                  run: () => {
-                    for (const texture of batch) this.webgl.initTexture(texture);
-                  },
-                });
-              }
-              units.push({
-                label: `zone-prewarm-render:${childRoot.name || childRoot.type}`,
-                run: () => this.renderBoundedPrewarmRoot(group, childRoot),
-              });
-              return units;
-            },
-            renderWarmPass: () => {
-              tCompile = performance.now();
-              this.renderPrewarmPass(1 / 60, { offscreen: true });
-            },
-            runUpload: (work, label) =>
-              this.backgroundGpuWork.run(
-                work,
-                GPU_WORK_PRIORITY.VISIBLE_PREWARM,
-                label ?? 'zone-prewarm-upload',
-              ),
-          });
-          tCompile = performance.now();
-        } else {
-          mobGroup.visible = true;
-          npcGroup.visible = true;
-          tCompile = performance.now();
-          this.renderPrewarmPass(1 / 60);
-          // The gating path compiles after the pass, exactly as before.
-          if (this.asyncCompileSupported) {
-            await this.compilePrewarmColorPrograms(this.scene, false);
+    return runZonePrewarmTask(
+      this.pendingZonePrewarms,
+      zoneId,
+      opts?.background === true,
+      async (pacing) => {
+        const zone = dungeon ? ({ ...zoneAt(x, z), id: zoneId } as ZoneDef) : zoneAt(x, z);
+        const deadline = performance.now() + 5000;
+        const t0 = performance.now();
+        const mobPrewarm = buildEntityPrewarmGroup(this.zonePrewarmHost(), zone);
+        const npcPrewarm = buildNpcPrewarmGroup(this.zonePrewarmHost(), zone, deadline);
+        const mobGroup = mobPrewarm.group;
+        const npcGroup = npcPrewarm.group;
+        // Hide before scene attachment. The shared GPU queue may be occupied by
+        // sky/feature work for many frames before runBackgroundPrewarm starts.
+        mobGroup.visible = false;
+        npcGroup.visible = false;
+        this.scene.add(mobGroup, npcGroup);
+        const tBuild = performance.now();
+        let tCompile = tBuild;
+        try {
+          // A background prewarm (the visible-zone streaming lane) links the new
+          // programs off-thread BEFORE the warm pass renders with them, so the
+          // pass never compiles inside a live gameplay frame. Compile the PREWARM
+          // GROUPS, one idle slot apart, never the whole scene: compileAsync's
+          // synchronous prologue walks and re-initializes every material it is
+          // handed, and a full-scene walk was a measured multi-hundred-ms stall
+          // per streamed zone. Live frames keep rendering across that whole
+          // awaited window, so runBackgroundPrewarm keeps both groups invisible
+          // between its bounded child uploads (a visible group is a grid of T-posed
+          // rigs stacked next to the player). The gating path (behind the loading
+          // screen) keeps render-first, which also covers renderers without
+          // KHR_parallel_shader_compile.
+          if (opts?.background) {
+            await runZoneBackgroundPrewarm(
+              [mobGroup, npcGroup],
+              {
+                supportsAsyncCompile: this.asyncCompileSupported,
+                arms: this.compileArms,
+                queue: this.backgroundGpuWork,
+                compileColor: (root) => this.compilePrewarmColorPrograms(root, true),
+                compileShadow: (root) => this.compileShadowPrograms(root),
+                prepareAssets: (root) => this.prewarmObjectTextures(root),
+                uploadTexture: (texture) => {
+                  this.webgl.initTexture(texture);
+                },
+                renderRoot: (group, child) => this.renderBoundedPrewarmRoot(group, child),
+                renderWarmPass: () => {
+                  tCompile = performance.now();
+                  this.renderPrewarmPass(1 / 60, { offscreen: true });
+                },
+              },
+              pacing,
+            );
+            tCompile = performance.now();
+          } else {
+            mobGroup.visible = true;
+            npcGroup.visible = true;
+            tCompile = performance.now();
+            this.renderPrewarmPass(1 / 60);
+            // The gating path compiles after the pass, exactly as before.
+            if (this.asyncCompileSupported) {
+              await this.compilePrewarmColorPrograms(this.scene, false);
+            }
           }
+          this.prewarmedZonePrograms.add(zoneId);
+        } finally {
+          mobGroup.removeFromParent();
+          npcGroup.removeFromParent();
+          // Only publish visuals to the live pool after the warm pass. Background
+          // gameplay can otherwise take one out of its T-pose grid while the
+          // prewarm awaits idle compile slots, leaving its shadow variant cold.
+          for (const item of mobPrewarm.pooled) this.pooledVisuals.store(item.key, item.visual);
+          for (const item of npcPrewarm.pooled) this.pooledVisuals.store(item.key, item.visual);
+          this.lastZonePrewarmStats = {
+            zoneId,
+            buildMs: Math.round(tBuild - t0),
+            compileMs: Math.round(tCompile - tBuild),
+            passMs: Math.round(performance.now() - tCompile),
+          };
         }
-        this.prewarmedZonePrograms.add(zoneId);
-      } finally {
-        mobGroup.removeFromParent();
-        npcGroup.removeFromParent();
-        // Only publish visuals to the live pool after the warm pass. Background
-        // gameplay can otherwise take one out of its T-pose grid while the
-        // prewarm awaits idle compile slots, leaving its shadow variant cold.
-        for (const item of mobPrewarm.pooled) this.pooledVisuals.store(item.key, item.visual);
-        for (const item of npcPrewarm.pooled) this.pooledVisuals.store(item.key, item.visual);
-        this.lastZonePrewarmStats = {
-          zoneId,
-          buildMs: Math.round(tBuild - t0),
-          compileMs: Math.round(tCompile - tBuild),
-          passMs: Math.round(performance.now() - tCompile),
-        };
-      }
-    })().finally(() => this.pendingZonePrewarms.delete(zoneId));
-    this.pendingZonePrewarms.set(zoneId, task);
-    return task;
+      },
+    );
   }
 
   /** Blocking-path neighborhood prepare for a teleport ARRIVAL (the rift exit):
@@ -5955,6 +5904,7 @@ export class Renderer {
       }
       if (propMaterialPrewarmGroup) this.scene.remove(propMaterialPrewarmGroup);
       ghostVariantSlot.cleanup();
+      if (abilityMaterialSlot.group) freezePrewarmProgramRoot(abilityMaterialSlot.group);
       if (foliagePrewarmGroup) this.scene.remove(foliagePrewarmGroup);
       if (greatTreePrewarmGroup) this.scene.remove(greatTreePrewarmGroup);
       // Removed, never disposed: disposing a material releases its linked
@@ -6124,6 +6074,7 @@ export class Renderer {
         priority: 32,
         required: false,
         run: async () => {
+          if (p.pos.x <= DUNGEON_X_THRESHOLD) return;
           interiorPrewarmGroup = await this.ensureDungeons().buildPrewarmGroup();
           this.scene.add(interiorPrewarmGroup);
         },

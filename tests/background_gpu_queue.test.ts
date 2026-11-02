@@ -1437,7 +1437,13 @@ describe('createBackgroundGpuQueue', () => {
     );
     expect(sky).toContain('this.backgroundGpuWork.run(');
     expect(features).toContain('this.backgroundGpuWork.run(');
-    expect(archetypes).toContain('this.backgroundGpuWork.run(');
+    expect(archetypes).toContain('queue: this.backgroundGpuWork,');
+    expect(archetypes).toContain('runZoneBackgroundPrewarm(');
+    const zonePrewarm = readFileSync(
+      new URL('../src/render/zone_prewarm.ts', import.meta.url),
+      'utf8',
+    );
+    expect(zonePrewarm).toContain('host.queue.run(');
     expect(texture).toContain('this.host.queue.run(');
     expect(
       method('private readonly textureResidency = new TextureResidencyLedger({', '});'),

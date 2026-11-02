@@ -18,7 +18,6 @@
 
 import * as THREE from 'three';
 import { type LoadedGltf, loadGltf } from './assets/loader';
-import { registerDeferredPreload } from './assets/preload';
 import { markSharedGeometry } from './shared_resource';
 
 const MODEL_URLS = [1, 2, 3].map((index) => `models/foliage/rock_${index}.glb`);
@@ -126,5 +125,3 @@ export function hoardValleyRockVariants(): readonly THREE.BufferGeometry[] | nul
   if (!variants) void prepareHoardValleyRocks();
   return variants;
 }
-
-registerDeferredPreload(() => prepareHoardValleyRocks());

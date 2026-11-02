@@ -181,7 +181,9 @@ export function attachPlacedTreeSway(
             ${shimmer}`,
           );
       };
-      mat.customProgramCacheKey = () => `${mat.uuid}:woc-tree-sway`;
+      const baseKey = (mat.userData.wocBaseCacheKey as string | undefined) ?? '';
+      const swayKey = `${baseKey}:woc-tree-sway:${minY.toFixed(3)}:${span.toFixed(3)}:${amp.toFixed(4)}:${leaf.toFixed(4)}`;
+      mat.customProgramCacheKey = () => swayKey;
       // Force a recompile. On a first attach the material has not been built
       // yet and this is redundant, but on a RE-attach (the maker switching sway
       // back on, or undoing the switch-off) it is the whole fix: the material
@@ -211,7 +213,9 @@ export function detachPlacedTreeSway(object: THREE.Object3D): void {
       // back to the base hook (the foliage edge fade), not to nothing
       mat.onBeforeCompile =
         (mat.userData.wocBaseCompile as typeof mat.onBeforeCompile | undefined) ?? (() => {});
-      mat.customProgramCacheKey = () => `${mat.uuid}:woc-no-sway`;
+      const baseKey = (mat.userData.wocBaseCacheKey as string | undefined) ?? '';
+      const noSwayKey = `${baseKey}:woc-no-sway`;
+      mat.customProgramCacheKey = () => noSwayKey;
       mat.needsUpdate = true;
     }
   });
@@ -572,6 +576,8 @@ interface Entry {
   fireFx: THREE.Group | null;
   // Distance-culled this frame (model kept, just hidden).
   lodHidden: boolean;
+  // True once updateLod has evaluated this resolved entry at least once.
+  lodSettled?: boolean;
   // Fire VFX culled this frame by FIRE_FX_RANGE (independent of lodHidden).
   fireHidden: boolean;
   // Smoke/embers/core dropped this frame by FIRE_DETAIL_RANGE; tongues stay.
@@ -2802,24 +2808,30 @@ export class PlacedAssetsView {
   /** Cull an entry: clones snap off, batched entries and stand-ins dither
    *  out then release their slots ("when models phase out they should pop out
    *  gentle"). */
-  private beginHide(entry: Entry): void {
+  private beginHide(entry: Entry, immediate = false): void {
     if (!entry.model) return;
     entry.lodHidden = true;
     entry.model.visible = false; // a batched proxy has no geometry: this only ends its picking
     if (entry.fireFx) entry.fireFx.visible = false;
     const level = entry.lodLevel ?? 0;
     if (!entry.batched && level === 0) return;
+    if (immediate) {
+      this.fades.delete(entry.index);
+      this.detachRep(entry, level);
+      return;
+    }
     this.fades.set(entry.index, { inRep: null, outRep: level, t: 0 });
   }
 
   /** Cross-fade an entry between two of its tiers. A clone's own geometry
    *  cannot dither and would share every face with its twin mid-fade (a
    *  shimmer), so a step to or from a clone is instant. */
-  private beginSwitch(entry: Entry, level: PlacedLodLevel): void {
+  private beginSwitch(entry: Entry, level: PlacedLodLevel, immediate = false): void {
     const from = entry.lodLevel ?? 0;
     if (from === level) return;
     entry.lodLevel = level;
-    if (!entry.batched && (from === 0 || level === 0)) {
+    if (immediate || (!entry.batched && (from === 0 || level === 0))) {
+      this.fades.delete(entry.index);
       this.attachRep(entry, level, 1);
       this.detachRep(entry, from);
       return;
@@ -2981,12 +2993,22 @@ export class PlacedAssetsView {
     }
     const keys = this.lodKeys;
     if (keys.length === 0) return;
-    const budget = Math.min(keys.length, LOD_BUDGET_PER_FRAME);
+    let hasUnsettled = false;
+    for (let i = 0; i < keys.length; i++) {
+      const e = this.entries.get(keys[i]);
+      if (e?.model && !e.lodSettled) {
+        hasUnsettled = true;
+        break;
+      }
+    }
+    const budget = hasUnsettled ? keys.length : Math.min(keys.length, LOD_BUDGET_PER_FRAME);
     let switches = 0;
     for (let n = 0; n < budget; n++) {
       this.lodCursor = (this.lodCursor + 1) % keys.length;
       const entry = this.entries.get(keys[this.lodCursor]);
       if (!entry?.model) continue;
+      const immediate = !entry.lodSettled;
+      entry.lodSettled = true;
       const p = entry.placement;
       // The selected object never LOD-culls: while being placed or moved it can
       // sit far from the camera (dragging it across the map), and it must stay
@@ -3040,7 +3062,11 @@ export class PlacedAssetsView {
       const dz = p.z - camZ;
       const d2 = dx * dx + dz * dz;
       const limit = entry.lodHidden ? range : range * LOD_HYSTERESIS;
-      const hide = d2 > limit * limit;
+      const geoLimit = entry.lodHidden ? geoRange : geoRange * LOD_HYSTERESIS;
+      let hide = d2 > limit * limit;
+      if (!hide && d2 > geoLimit * geoLimit && this.wantedLevel(entry, d2) === 0) {
+        hide = true;
+      }
       // Fire VFX ride the same strided sweep on their own, much shorter
       // range. Flipping `visible` on the emitter root is enough: three skips
       // the whole subtree, so all 8 submissions and their material switches
@@ -3067,16 +3093,20 @@ export class PlacedAssetsView {
       // camera from flapping in the first place).
       if (!this.fades.has(entry.index)) {
         if (hide !== entry.lodHidden) {
-          if (hide) this.beginHide(entry);
-          else this.beginShow(entry, d2);
-        } else if (!hide && (entry.batched || building) && switches < LOD_SWITCH_BUDGET_PER_FRAME) {
+          if (hide) this.beginHide(entry, immediate);
+          else this.beginShow(entry, d2, immediate);
+        } else if (
+          !hide &&
+          (entry.batched || building) &&
+          (immediate || switches < LOD_SWITCH_BUDGET_PER_FRAME)
+        ) {
           // The sprite tier: past PLACED_IMPOSTER_DIST a batched placement
           // cross-fades to its baked sprite (a strip bakes on first demand,
           // one per frame), and back to geometry inside the hysteresis band.
           const level: PlacedLodLevel = this.wantedLevel(entry, d2);
           if (level !== (entry.lodLevel ?? 0)) {
-            switches++;
-            this.beginSwitch(entry, level);
+            if (!immediate) switches++;
+            this.beginSwitch(entry, level, immediate);
           }
         }
       }

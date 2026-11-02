@@ -33,6 +33,7 @@ import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { sharedUniforms } from '../gfx';
 import { radialGlowTexture } from '../textures';
+import { VisibleChildrenGroup } from '../visible_children_group';
 import { bastionSlotOrigin, CROWN } from './bastion_boss_fx_core';
 import { BastionParticles } from './bastion_particles';
 import {
@@ -187,7 +188,7 @@ interface SweepSlot {
 }
 
 export class BastionVaelStageFx {
-  private readonly root = new THREE.Group();
+  private readonly root = new VisibleChildrenGroup();
   private readonly fx: BastionParticles;
   private readonly geometries: THREE.BufferGeometry[] = [];
   private readonly materials: THREE.Material[] = [];

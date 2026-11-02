@@ -264,12 +264,13 @@ describe('the two lanes follow what each kind of content spawns', () => {
 });
 
 describe('the stream plan per profile', () => {
-  it('keeps every non-iOS profile exactly as before: bodies gated, skins on demand', () => {
+  it('keeps overworld bodies gated on non-iOS while deferring dungeon, Rift, Hoard, and skin assets', () => {
     expect(other.postEntry).toEqual([]);
-    expect(other.onDemand).toEqual([]);
-    expect(other.rift).toEqual([]);
-    expect(other.hoard).toEqual([]);
-    expect(other.streamed).toEqual(preload.filter((url) => skins.has(url)));
+    expect(other.onDemand).toEqual(ios.onDemand);
+    expect(other.rift).toEqual(ios.rift);
+    expect(other.hoard).toEqual(ios.hoard);
+    const deferredNonIos = new Set([...skins, ...other.onDemand, ...other.rift, ...other.hoard]);
+    expect(other.streamed).toEqual(preload.filter((url) => deferredNonIos.has(url)));
   });
 
   it('assigns every iOS body exactly once to a stream or demand lane', () => {
@@ -428,7 +429,7 @@ describe('the lanes are paced behind the post-entry stream', () => {
 
   it('has nothing to do on a profile whose lanes are empty', () => {
     const lanes = new RiftBodyLanes(fakeHost().host);
-    lanes.setUrls(other.rift, other.hoard);
+    lanes.setUrls([], []);
     expect(lanes.pending()).toBe(false);
   });
 });

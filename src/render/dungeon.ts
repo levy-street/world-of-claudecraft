@@ -44,11 +44,11 @@ import {
 } from '../sim/rift/authored';
 import { ARENA_WATER_NAVE_HALF_X, arenaWaterBands } from './arena_water_band_core';
 import { type LoadedGltf, loadGltf, releaseGltf } from './assets/loader';
-import { registerDeferredPreload } from './assets/preload';
 import { fitAuthoredWallSegment } from './authored_walls_core';
 import { hash2, stackDaisBlocks } from './dais_blocks_core';
 import { buildDawnholdDressing, ensureDawnholdDressing } from './dawnhold_dressing';
 import {
+  ensureDelveMarshDressingAssets,
   placeLitanyMarshDressing,
   placeMarshBlackwaterPools,
   placeMarshClutter,
@@ -56,6 +56,7 @@ import {
   placeMarshTombs,
   placeMarshWallDressing,
 } from './delve_marsh_dressing';
+import { ensureDelvePropAssets } from './delve_props';
 import {
   type DungeonPlacementRecord,
   type PendingArenaWall,
@@ -115,6 +116,7 @@ import {
 } from './interior_resource_lifecycle';
 import { buildLastKeepDressing, ensureLastKeepDressing } from './lastkeep_dressing';
 import { cloneMaterialWithHooks } from './material_clone_hooks';
+import { ensureNythraxisPropAssets } from './nythraxis_prop_assets';
 import { type OccluderFadeMat, occluderFadeMat } from './occluder_fade';
 import { OPEN_AIR_FIELDS, OpenAirFieldRoster } from './open_air_fields';
 import type { FireLightSink } from './point_light_budget';
@@ -416,13 +418,6 @@ export function loadKitModules(names: readonly string[]): Promise<void> {
   ).then(() => undefined);
 }
 
-// Fold the dungeon GLBs into the boot preload (like terrain/foliage/props/sky)
-// instead of fetching them lazily on first dungeon approach. Without this the
-// kit + Halloween-bits modules stream in (and their shaders compile) the moment
-// the camera nears a dungeon door, which is the on-approach freeze at the Fallen
-// Chapel. assetsReady() now genuinely covers everything buildInterior needs.
-if (typeof window !== 'undefined') registerDeferredPreload(() => ensureDungeonAssets());
-
 // ---------------------------------------------------------------------------
 // Deterministic placement helpers
 // ---------------------------------------------------------------------------
@@ -632,23 +627,29 @@ export class DungeonInteriors {
       captureOnly?: boolean;
     },
   ): Promise<THREE.Group> {
-    if (!opts?.captureOnly) {
-      await ensureDungeonAssets();
-      await ensureIgnivarRaidDressingAssets(interior);
-      await ensureIgnivarTileAssets(interior, loadModuleAsset);
-    }
-    // Snapshot AFTER the asset awaits: the kit build below is synchronous (an
-    // open-air field's own builder may await, so a keyed field build must not
-    // race another build; the editor builds one at a time).
-    const track = keyedBuildTracker(this.builtByKey, opts?.key, () => this.keyedRegistries());
     const field = OPEN_AIR_FIELDS[interior];
     if (field) {
       // Open-air fields: their own builders, same deps and compile gate.
+      const track = keyedBuildTracker(this.builtByKey, opts?.key, () => this.keyedRegistries());
       const deps = { lowGfx: this.lowGfx, flames: this.flames, fireLights: this.fireLights };
       const group = await this.openAirFields.build(field, deps, ox, oz);
       await attachSceneGroupGated(this.scene, group, this.compileGate);
       return track(group);
     }
+    const variant = opts?.style?.kit ?? opts?.variant ?? this.variantFor(interior, ox, oz);
+    if (!opts?.captureOnly) {
+      await ensureDungeonAssets();
+      await ensureIgnivarRaidDressingAssets(interior);
+      await ensureIgnivarTileAssets(interior, loadModuleAsset);
+      if (interior === 'nythraxis') await ensureNythraxisPropAssets();
+      if (isDelveVariant(variant)) await ensureDelvePropAssets();
+      if (variant === 'delve_marsh' || variant === 'delve_marsh_apse')
+        await ensureDelveMarshDressingAssets();
+    }
+    // Snapshot AFTER the asset awaits: the kit build below is synchronous (an
+    // open-air field's own builder may await, so a keyed field build must not
+    // race another build; the editor builds one at a time).
+    const track = keyedBuildTracker(this.builtByKey, opts?.key, () => this.keyedRegistries());
     // Delve modules pass an explicit per-module layout so render geometry matches
     // the SAME layout sim/colliders.ts derives collision from (what you see is
     // what you collide with). Without it, every module fell back to CRYPT_LAYOUT
@@ -679,7 +680,6 @@ export class DungeonInteriors {
                     : interior === 'ignivar'
                       ? IGNIVAR_LAYOUT
                       : (INTERIOR_LAYOUTS[interior] ?? CRYPT_LAYOUT));
-    const variant = opts?.style?.kit ?? opts?.variant ?? this.variantFor(interior, ox, oz);
     const torch = opts?.style?.torch ?? TORCH_COLORS[variant];
     const daisRaised = opts?.style?.daisRaised;
     const group = new THREE.Group();

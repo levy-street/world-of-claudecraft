@@ -54,6 +54,7 @@ import {
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { GFX, sharedUniforms } from '../gfx';
 import { radialGlowTexture } from '../textures';
+import { VisibleChildrenGroup } from '../visible_children_group';
 import {
   BRINE_DRAWN_RADIUS,
   BRINE_WELL_SECONDS,
@@ -273,7 +274,7 @@ function auraOf(e: EntityView, id: string) {
 }
 
 export class BastionOlenFx {
-  private readonly root = new THREE.Group();
+  private readonly root = new VisibleChildrenGroup();
   private readonly geometries: THREE.BufferGeometry[] = [];
   private readonly materials: THREE.Material[] = [];
   private readonly fx: BastionParticles;

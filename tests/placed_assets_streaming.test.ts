@@ -4,6 +4,7 @@
 // hosts (rebuildAll) never stream.
 import { describe, expect, it } from 'vitest';
 import { PlacedAssetsView } from '../src/render/placed_assets';
+import { GRASS_PATCH_PATH } from '../src/sim/map_doc';
 import type { PlacedAsset } from '../src/sim/types';
 
 function fakePlacement(x: number, z: number): PlacedAsset {
@@ -61,5 +62,28 @@ describe('placed-asset residency streaming', () => {
       streamAround: { x: 0, z: 0 },
     });
     expect(residentCount(view)).toBe(2);
+  });
+
+  it('settles all resolved placements immediately on the first updateLod pass', () => {
+    const placements: PlacedAsset[] = Array.from({ length: 600 }, (_, i) => ({
+      path: GRASS_PATCH_PATH,
+      x: i === 0 ? 0 : 2000 + i * 5,
+      z: 0,
+      rotY: 0,
+      scale: 1,
+    }));
+    const view = new PlacedAssetsView(placements, 1);
+    view.updateLod(0, 0, 240, 500, 1200);
+    const internals = view as unknown as {
+      entries: Map<number, { lodHidden: boolean; model: { visible: boolean } | null }>;
+      fades: Map<number, unknown>;
+    };
+    expect(internals.fades.size).toBe(0);
+    expect(internals.entries.get(0)?.lodHidden).toBe(false);
+    for (let i = 1; i < 600; i++) {
+      expect(internals.entries.get(i)?.lodHidden).toBe(true);
+      expect(internals.entries.get(i)?.model?.visible).toBe(false);
+    }
+    view.dispose();
   });
 });

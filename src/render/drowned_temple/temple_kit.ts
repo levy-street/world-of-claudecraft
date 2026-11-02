@@ -11,7 +11,6 @@
 
 import * as THREE from 'three';
 import { loadGltf, releaseGltf } from '../assets/loader';
-import { registerDeferredPreload } from '../assets/preload';
 import { GFX } from '../gfx';
 import { markSharedGeometry, markSharedMaterial } from '../shared_resource';
 import { planTempleKitPlacements, type TempleKitPlacement } from './temple_kit_plan_core';
@@ -93,10 +92,6 @@ function startKitLoad(): Promise<void> {
     });
   return loading;
 }
-
-// World content: fetched on the deferred lane once the game starts, so the
-// first approach to the Temple usually finds the kit already baked.
-if (typeof window !== 'undefined') registerDeferredPreload(() => startKitLoad());
 
 /** Fetch and bake the kit once. Never rejects; resolves within the wait cap
  *  (a later arrival upgrades the stand-ins in place, see buildTempleKit). */

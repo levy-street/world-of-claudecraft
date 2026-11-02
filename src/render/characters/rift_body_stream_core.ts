@@ -115,9 +115,9 @@ export function dungeonAndBuddyBodyUrls(): ReadonlySet<string> {
 }
 
 /** The destination's static actors and encounter summons, loaded behind arrival cover. */
-const dungeonUrlsByInterior = new Map<string, readonly string[]>();
-export function dungeonCharacterBodyUrls(interior: string): readonly string[] {
-  const cached = dungeonUrlsByInterior.get(interior);
+const dungeonMobsByInterior = new Map<string, readonly string[]>();
+export function dungeonMobTemplateIds(interior: string): readonly string[] {
+  const cached = dungeonMobsByInterior.get(interior);
   if (cached) return cached;
   const ids = new Set(Object.keys(INTERIOR_MOBS[interior] ?? {}));
   for (const dungeon of DUNGEON_LIST)
@@ -132,7 +132,20 @@ export function dungeonCharacterBodyUrls(interior: string): readonly string[] {
   };
   // Set iteration visits newly discovered summons too, with no recursive mob cycles.
   for (const id of ids) visitSummons(MOBS[id]);
-  const urls = [...new Set([...ids].flatMap((id) => defUrls(VISUALS[mobVisualKeyFor(id)])))];
+  const list = [...ids];
+  dungeonMobsByInterior.set(interior, list);
+  return list;
+}
+
+const dungeonUrlsByInterior = new Map<string, readonly string[]>();
+export function dungeonCharacterBodyUrls(interior: string): readonly string[] {
+  const cached = dungeonUrlsByInterior.get(interior);
+  if (cached) return cached;
+  const urls = [
+    ...new Set(
+      dungeonMobTemplateIds(interior).flatMap((id) => defUrls(VISUALS[mobVisualKeyFor(id)])),
+    ),
+  ];
   dungeonUrlsByInterior.set(interior, urls);
   return urls;
 }
@@ -200,11 +213,11 @@ export interface CharacterStreamPlan {
 }
 
 /**
- * Split the character preload set. `onDemandUrls` (the weapon-skin cosmetics)
- * leave the gate on every host and load on demand only. The iOS memory profile
- * also carves out every streamed body folder: the Rift-only bodies into their
- * lane, dungeon-only actors and buddies onto demand, the rest into the post-entry stream. Any other profile gates every
- * body, so every lane is empty there.
+ * Split the character preload set. `onDemandUrls` (the weapon-skin cosmetics),
+ * Rift-only and Buried Hoard-only bodies, dungeon-only actors, and cosmetic
+ * buddies leave the world-entry gate on every host and load on demand or on
+ * destination arrival. The iOS memory profile additionally moves overworld
+ * streamed bodies into the post-entry stream.
  */
 export function characterStreamPlan(
   preloadUrls: readonly string[],
@@ -212,6 +225,7 @@ export function characterStreamPlan(
   iosMemoryProfile: boolean,
 ): CharacterStreamPlan {
   const lanes = riftOnlyBodyLanes();
+  const demandBodies = dungeonAndBuddyBodyUrls();
   const plan: CharacterStreamPlan = {
     streamed: [],
     postEntry: [],
@@ -220,13 +234,13 @@ export function characterStreamPlan(
     hoard: [],
   };
   for (const url of preloadUrls) {
-    const body = iosMemoryProfile && isStreamedBodyUrl(url);
-    if (!body && !onDemandUrls.has(url)) continue;
+    const lane = isStreamedBodyUrl(url)
+      ? (lanes.get(url) ??
+        (demandBodies.has(url) ? 'onDemand' : iosMemoryProfile ? 'postEntry' : null))
+      : null;
+    if (!lane && !onDemandUrls.has(url)) continue;
     plan.streamed.push(url);
-    if (!body) continue;
-    plan[lanes.get(url) ?? (dungeonAndBuddyBodyUrls().has(url) ? 'onDemand' : 'postEntry')].push(
-      url,
-    );
+    if (lane) plan[lane].push(url);
   }
   return plan;
 }

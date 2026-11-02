@@ -12,6 +12,7 @@ import { MAGE_PET_MOBS } from '../sim/content/mage_pets';
 import { WARLOCK_PET_MOBS } from '../sim/content/warlock_pets';
 import { ABILITIES, CAMPS, DUNGEON_X_THRESHOLD, MOBS, NPCS, QUESTS, zoneAt } from '../sim/data';
 import type { WorldContent } from '../sim/types';
+import { dungeonMobTemplateIds } from './characters/rift_body_stream_core';
 
 export interface ZonePrewarmEntity {
   kind: string;
@@ -56,6 +57,11 @@ export function zonePrewarmTemplateIds(
   // build then reports as an error every session.
   world?: Pick<WorldContent, 'camps' | 'npcs'> | null,
 ): string[] {
+  if (zoneId.startsWith('dungeon:')) {
+    if (kind === 'npc') return [];
+    const interior = zoneId.slice('dungeon:'.length);
+    return [...new Set([...dungeonMobTemplateIds(interior), ...summonableTemplateIds()])].sort();
+  }
   const ids = new Set<string>();
   const camps = world?.camps ?? CAMPS;
   const npcs = world?.npcs ?? NPCS;

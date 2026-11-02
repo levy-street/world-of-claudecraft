@@ -13,7 +13,6 @@ import {
   ignivarArenaPointInLava,
 } from '../sim/ignivar_arena';
 import { loadTexture } from './assets/loader';
-import { registerDeferredPreload } from './assets/preload';
 import { CAMERA_RELATIVE_GLSL } from './camera_relative_glsl';
 import { floorVfxRenderOrder } from './floor_vfx_layer';
 import { sharedUniforms } from './gfx';
@@ -47,10 +46,6 @@ export function ensureIgnivarLavaMoatAssets(): Promise<IgnivarLavaMoatTextures> 
       throw error;
     });
   return assetTask;
-}
-
-if (typeof window !== 'undefined') {
-  registerDeferredPreload(() => ensureIgnivarLavaMoatAssets());
 }
 
 let lavaGeometry: THREE.ShapeGeometry | null = null;

@@ -884,13 +884,12 @@ export function ensureCharacterUrl(url: string | null | undefined): void {
   void prepareCharacterUrl(url).catch(() => undefined);
 }
 
-/** iOS defers dungeon-only bodies until arrival; every file must settle before reveal. */
+/** Every host defers dungeon-only bodies until arrival; every file must settle before reveal. */
 export function dungeonCharacterBodiesResident(interior: string): boolean {
-  return !GFX.iosMemoryProfile || dungeonCharacterBodyUrls(interior).every(characterAssetResident);
+  return dungeonCharacterBodyUrls(interior).every(characterAssetResident);
 }
 
 export async function prepareDungeonCharacterBodies(interior: string): Promise<void> {
-  if (!GFX.iosMemoryProfile) return;
   await Promise.all(
     dungeonCharacterBodyUrls(interior).map((url) => prepareCharacterUrl(assetUrl(url))),
   );
