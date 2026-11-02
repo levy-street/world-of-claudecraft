@@ -30,6 +30,7 @@ import {
   toggleWatchedId,
   watchedAuraProcDefs,
 } from './aura_watchlist_core';
+import { hudOverlayHost } from './hud_overlay_host';
 import type { PainterHostWriters } from './painter_host';
 import { createReadyGlowPlan, type ReadyGlowSignal } from './proc_ready_glow_core';
 import {
@@ -133,7 +134,7 @@ export class AuraOverlayController {
     this.root.addEventListener('pointerdown', (event) => this.selectCrescent(event));
     this.painter = new AuraOverlayPainter(deps.writers, this.targets);
     this.syncLoadout();
-    doc.body.appendChild(this.root);
+    hudOverlayHost(doc).appendChild(this.root);
   }
 
   private config(id: AuraOverlayProcId): AuraOverlayConfig {

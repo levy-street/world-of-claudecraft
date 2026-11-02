@@ -108,6 +108,16 @@ function rig(opts: { inCombat?: boolean; extra?: string[] } = {}) {
   };
 }
 
+describe('CooldownManagerController mount point', () => {
+  it('mounts inside the #ui HUD stacking context so open windows cover it', () => {
+    const ui = document.createElement('div');
+    ui.id = 'ui';
+    document.body.appendChild(ui);
+    const { layer } = rig();
+    expect(layer().parentElement).toBe(ui);
+  });
+});
+
 describe('CooldownManagerController', () => {
   it('dismisses a hovered tooltip when its icon is hidden or rebuilt', () => {
     const { controller, hooks, snapshot, layer, hideTooltip } = rig();

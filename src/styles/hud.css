@@ -14455,8 +14455,11 @@
     z-index: 31;
     pointer-events: none;
   }
+  /* Mounted inside #ui (hud_overlay_host.ts) beside #perf-overlay: at rest it
+     sits under the window band (50 to 89) and the Options scrim, and placement
+     raises it over the Options window exactly like #perf-overlay.placing. */
   #aura-overlays.placement {
-    z-index: 34;
+    z-index: 96;
     pointer-events: auto;
   }
   .aura-overlay-frame {
@@ -14712,8 +14715,10 @@
     z-index: 30;
     pointer-events: none;
   }
+  /* Same layering as #aura-overlays: inside #ui, under windows at rest, over
+     the Options window while placing. */
   #cooldown-manager.placement {
-    z-index: 34;
+    z-index: 96;
   }
   .cdm-group {
     position: absolute;
