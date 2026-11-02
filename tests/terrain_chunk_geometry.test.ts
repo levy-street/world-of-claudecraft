@@ -432,8 +432,10 @@ describe('generated chunk geometry is stable', () => {
     // smithy, quay cottage and weekly vault, the authored NPC stands and the
     // new placements, pads, re-placed stations and nodes move their calm
     // pads with them. Measured twice in
-    // separate processes on the branch tree, identical both times.
-    expect(digestOf(inRect)).toBe('452c5a76bcb151918dd104df8d55199a');
+    // separate processes on the branch tree, identical both times. Re-minted
+    // again as the Wolf Run, Boar Meadow and Sableweb POIs follow their camps
+    // (their calm pads move with them).
+    expect(digestOf(inRect)).toBe('351621fe4ed397e7030eb132583f5a38');
     // The gap super-chunk digest pin is gone with the gap chunks themselves
     // (the island claims the old vale gap cells); gapFill.length above pins
     // their absence.

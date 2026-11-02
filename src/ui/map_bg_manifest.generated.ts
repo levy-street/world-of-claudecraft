@@ -15,7 +15,7 @@ export const BAKED_MAP_BG = {
   "mirefen_marsh": {
     "w": 480,
     "h": 480,
-    "rowHash": "cd277b6e"
+    "rowHash": "e0ec38eb"
   },
   "thornpeak_heights": {
     "w": 480,
