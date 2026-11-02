@@ -224,7 +224,8 @@ export class FinalBodyFx {
     this.resendIn -= f.dt;
     const resend = this.resendIn <= 0;
     if (resend) this.resendIn = RESEND_SEC;
-    const next = finalBodyElement(f.zone);
+    // A corpse keeps the body it died in (its state aura is gone with it).
+    const next = f.dead && this.shown ? this.shown : finalBodyElement(f.zone);
     const showBody = f.whole || f.dead;
     // The transformation starts on a quarter change of a body seen whole.
     if (
@@ -361,8 +362,8 @@ export class FinalBodyFx {
       });
     }
     // The heart swells: a growing glow at the chest, a low thrum in the camera.
-    if (this.host.rand() < dt * 8) {
-      this.host.flash(heart.x, heart.y, heart.z, H * (0.35 + 0.6 * k), 0.25, look.light);
+    if (this.host.rand() < dt * 4) {
+      this.host.flash(heart.x, heart.y, heart.z, H * (0.12 + 0.18 * k), 0.2, look.light);
     }
     if (k > 0.55 && this.host.rand() < dt * 6)
       this.host.shakeNear(this.bx, this.bz, 0.08 + 0.12 * k);
@@ -379,9 +380,9 @@ export class FinalBodyFx {
     const hy = heart.y;
     const hz = heart.z;
     // The flash: the element's colour round a white-hot core, seen from across the Anvil.
-    this.host.flash(hx, hy, hz, H * 2.5, 0.8, look.light);
-    this.host.flash(hx, hy, hz, H * 1.5, 0.35, look.core);
-    this.host.flash(this.bx, this.by + H * 0.5, this.bz, H * 1.8, 0.5, look.light);
+    // A short, capped peak: the body stays readable through it.
+    this.host.flash(hx, hy, hz, H * 1.2, 0.3, look.light);
+    this.host.flash(hx, hy, hz, H * 0.45, 0.15, look.core);
     // The shockwave over the floor: the element's ring and a slower wake.
     p.shockRing(this.bx, this.bz, look.light, H * 2.6, 0.9);
     p.shockRing(this.bx, this.bz, look.core, H * 1.5, 0.55);
@@ -551,7 +552,7 @@ export class FinalBodyFx {
     const k = st.stage === 'crown' ? st.k : 1;
     const c = this.point('crown', _p);
     if (this.host.rand() < dt * 14)
-      this.host.flash(c.x, c.y, c.z, H * (0.5 - 0.3 * k), 0.22, look.light);
+      this.host.flash(c.x, c.y, c.z, H * (0.18 - 0.08 * k), 0.2, look.light);
     if (this.host.rand() < dt * 50 * this.host.density) {
       this.host.particles.puff(c.x, c.y - H * 0.04, c.z, 2, {
         speed: H * 0.08,

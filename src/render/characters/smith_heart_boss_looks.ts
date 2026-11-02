@@ -108,7 +108,7 @@ export const SMITH_HEART_BOSS_LOOKS: Record<string, VisualDef> = {
       // The shell cracking before the element bursts out (final_body_core
       // FINAL_SHIFT.burst), the new body still white-hot after it.
       pulses: [
-        { gesture: FINAL_BODY_GESTURES.charge, rise: 0.7, hold: 0.25, fall: 1.4, peak: 3.6 },
+        { gesture: FINAL_BODY_GESTURES.charge, rise: 0.6, hold: 0.1, fall: 0.6, peak: 1.8 },
       ],
       deathFade: 3,
     },

@@ -1093,8 +1093,11 @@ export class FinalFx {
       this.heartPos.y,
       this.originZ + this.heartPos.z,
     );
+    // The model's gem carries its own light: the halo only warms it.
     const halo =
-      (14 + flare * 30 + (t >= 0 && t < ARRIVAL.glideEnd ? 16 : 0)) * Math.max(0.15, heartLevel);
+      (14 + flare * (modelWhole && !dead ? 12 : 30) + (t >= 0 && t < ARRIVAL.glideEnd ? 16 : 0)) *
+      Math.max(0.15, heartLevel) *
+      (modelWhole && !dead ? 0.5 : 1);
     this.heartHalo.scale.set(halo, halo, 1);
     (this.heartHalo.material as THREE.SpriteMaterial).opacity = 0.55 * Math.max(0.1, heartLevel);
     // Every piece.
