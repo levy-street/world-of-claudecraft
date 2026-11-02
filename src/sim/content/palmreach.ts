@@ -277,7 +277,8 @@ export const PALMREACH_NPCS: Record<string, NpcDef> = {
     // as a nameplate floating in the bark, and at z 1071.5 (8.7 yd out) he
     // still clipped the trunk. Keep him a full 12 yd clear.
     pos: { x: -396.71, z: 1066.89 },
-    facing: 2.902,
+    // Studio town rework (#4593): the map turned him 180 degrees; he faces the tree again
+    facing: -0.24,
     color: 0x6f8a5a,
     questIds: [
       'q_pr_the_man_who_went_in',

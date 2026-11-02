@@ -32,8 +32,9 @@ describe('Eastbrook independent stone vault', () => {
     // ground at (21, -119) onto the green south of the civic square. Re-pinned
     // again for the World of ClaudeCraft Studio map's arrangement: it stands
     // against the bank's harbour-side flank, half a yard off its wall. The
-    // Studio town rework (#4593) then stood it a yard up the quay.
-    expect({ x: hall.x, z: hall.z }).toEqual({ x: -72.98, z: -102.95 });
+    // Studio town rework (#4593) then stood it a yard up the quay, a tenth of
+    // a yard further out along its width than the map, clear of the bank.
+    expect({ x: hall.x, z: hall.z }).toEqual({ x: -73.08, z: -102.85 });
     expect(ZONE1_PROPS.buildings.at(-1)?.id).toBe(hall.id);
     expect(ZONE1_NPCS.eastbrook_vault_keeper.banker).toBeUndefined();
     expect(ZONE1_NPCS.eastbrook_vault_keeper.pos).toEqual(hall.keeper);

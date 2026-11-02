@@ -297,14 +297,15 @@ describe('the six placed Eastbrook buildings', () => {
     const back = toModelAxes(inn, { x: tavern.x, z: tavern.z });
     expect(Math.abs(back.x)).toBeLessThan(0.01);
     expect(back.z).toBeCloseTo(-3.5, 1);
-    // the rework stands the vault a yard up the quay from that map's spot
+    // the rework stands the vault a yard up the quay from that map's spot, and
+    // a tenth of a yard further out along its width, clear of the bank's box
     const vault = theirs('tidehold/vault');
     expect(
       Math.hypot(
         EASTBROOK_LAYOUT.weeklyVault.x - vault.x,
         EASTBROOK_LAYOUT.weeklyVault.z - vault.z,
       ),
-    ).toBeCloseTo(0.89, 2);
+    ).toBeCloseTo(0.95, 2);
     expect(EASTBROOK_LAYOUT.weeklyVault.rot).toBeCloseTo(vault.rotY ?? 0, 9);
   });
 
@@ -376,11 +377,13 @@ describe('the six placed Eastbrook buildings', () => {
 
   it('keeps the Weekly Vault where that map stands it', () => {
     // The Studio town rework (#4593) stands the vault a yard up the quay from
-    // the rebuild map's spot, at the rework map's anchor; the turn is unchanged.
+    // the rebuild map's spot, near the rework map's anchor (-72.98, -102.95):
+    // a tenth of a yard further out along its own width, where its box clears
+    // the bank's. The turn is unchanged.
     const placed = REBUILD_MAP.placements.find((p) => p.assetId === 'tidehold/vault');
     expect(placed).toBeDefined();
-    expect(EASTBROOK_LAYOUT.weeklyVault.x).toBe(-72.98);
-    expect(EASTBROOK_LAYOUT.weeklyVault.z).toBe(-102.95);
+    expect(EASTBROOK_LAYOUT.weeklyVault.x).toBe(-73.08);
+    expect(EASTBROOK_LAYOUT.weeklyVault.z).toBe(-102.85);
     expect(EASTBROOK_LAYOUT.weeklyVault.rot).toBe(placed?.rotY);
   });
 
@@ -768,9 +771,10 @@ describe('the ground under the placed buildings', () => {
       expect(pad.falloff).toBe('smooth');
     }
     // the shelf heights: the harbour end at the main street's height, the
-    // chapel on the plat, the rise north of the square a little above it
+    // chapel on the plat, and the rise north of the square where the Studio
+    // town rework (#4593) sculpted it: the quay cottage, the inn and the smithy
     expect([...new Set(pads.map((pad) => pad.delta))].sort((a, b) => a - b)).toEqual([
-      -0.9, -0.7, 0.5,
+      -0.9, -0.7, 1.29, 2.17, 2.54,
     ]);
     // The Studio town rework (#4593) ships its whole terrain edit list through
     // the live touch-up, which replaces the built-in list (and so the rebuild
@@ -813,9 +817,9 @@ describe('the ground under the placed buildings', () => {
 
   it('leaves the quay and the ground a new character first stands on exactly as they were', () => {
     expect(PLAYER_START).toEqual({ x: -94, z: -58 });
-    // the Studio town rework's (#4593) quay stamps raised the start from -2 to
-    // the quay's new deck height
-    expect(terrainHeight(PLAYER_START.x, PLAYER_START.z, WORLD_SEED)).toBeCloseTo(-0.006, 3);
+    // the Studio town rework (#4593) raised the quay from -2 to 0, and its
+    // native pad (zone1.ts EASTBROOK_QUAY_TERRAIN_EDITS) stands there now
+    expect(terrainHeight(PLAYER_START.x, PLAYER_START.z, WORLD_SEED)).toBeCloseTo(0, 6);
     for (const pad of EASTBROOK_BUILDING_PAD_TERRAIN_EDITS) {
       expect(
         Math.hypot(pad.x - PLAYER_START.x, pad.z - PLAYER_START.z),

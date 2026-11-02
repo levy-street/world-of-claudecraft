@@ -26,7 +26,31 @@ export const EASTBROOK_HARBOR_DECKS: GaleDeckDef[] = [
   { x: -97.5, z: -54, rot: 0, hl: 16, hw: 1.5, ax: -94, az: -54 },
   // the ferry berth: the long middle pier, reaching the cove's deep water
   // (the Eastbrook ferry moors across its T-head, content/zone1.ts)
-  { x: -107, z: -54, rot: -Math.PI / 2, hl: 10, hw: 2.2, ax: -94, az: -54 },
+  // The Studio town rework (#4593) raised the quay to 0, so the berth is two
+  // planes: a ramp off the quay lip, then a level berth at the height the
+  // ferry's gangplank meets (2.64 above the water, as it always stood).
+  {
+    x: -101,
+    z: -54,
+    rot: -Math.PI / 2,
+    hl: 4,
+    hw: 2.2,
+    ax: -94,
+    az: -54,
+    nearAboveWater: 4.64,
+    farAboveWater: 2.64,
+  },
+  {
+    x: -111,
+    z: -54,
+    rot: -Math.PI / 2,
+    hl: 6,
+    hw: 2.2,
+    ax: -94,
+    az: -54,
+    nearAboveWater: 2.64,
+    farAboveWater: 2.64,
+  },
   // Round 6 (owner + team): the two working piers re-laid square to the quay on
   // an even 14 yd pitch (roots at z -40, -54, -68) and run out to 8 yd. They
   // used to sit 10.6 yd off the ferry berth and fan at 0.12 rad, which left no

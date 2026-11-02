@@ -21,7 +21,7 @@ function world(state = 'active'): WolvesGuideReader {
 describe('wolves guidance geometry and visibility', () => {
   it('resolves the authored forest wolf camp (a content rename degrades to no route, never a throw)', () => {
     expect(WOLF_RUN_CAMP).not.toBeNull();
-    expect(WOLVES_ROUTE.length).toBe(8);
+    expect(WOLVES_ROUTE.length).toBe(3);
   });
 
   it('answers a finished quest from questsDone before the zone scan or any questState read', () => {
@@ -93,15 +93,13 @@ describe('wolves guidance geometry and visibility', () => {
     // north road round its east end. Re-pinned for the World of ClaudeCraft
     // Studio map's arrangement: the smithy stands on that line now, so the
     // trail follows the north road's swing round its forge shelter's west end
-    // and back over the rise behind it, west of the road's lamp.
+    // and back over the rise behind it, west of the road's lamp. Re-pinned for
+    // the Studio town rework (#4593): Marshal greets the ferry at the quay now,
+    // so the trail leaves his stand north-east past the quay cottage and
+    // crosses the open ground below Sableweb onto the Wolf Run.
     expect(WOLVES_ROUTE).toEqual([
       EASTBROOK_NPC_PLACEMENTS_BY_ID.marshal_redbrook.position,
-      { x: 13.5, z: -93.5 },
-      { x: 16.3, z: -83 },
-      { x: 17.5, z: -76 },
-      { x: 14, z: -69 },
-      { x: 7.5, z: -61.5 },
-      { x: 5, z: -52 },
+      { x: -49.2, z: -31.5 },
       WOLF_RUN_CAMP,
     ]);
     expect(outbound.areaRing).toEqual(WOLF_RUN_CAMP);

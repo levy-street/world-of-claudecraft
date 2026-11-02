@@ -28,11 +28,15 @@ describe('Eastbrook starter combat quest group', () => {
     expect(
       Object.fromEntries(GIVERS.map((id) => [id, EASTBROOK_NPC_PLACEMENTS_BY_ID[id].position])),
     ).toEqual({
-      marshal_redbrook: { x: -86.19, z: -44.37 },
-      trader_wilkes: { x: -14.01, z: -121.93 },
-      apothecary_lin: { x: -31.95, z: -120.36 },
+      // nudged off the map's spots by the least that clears a rule: Marshal
+      // 1.5 yd off the streetlamp on his landing sightline, Wilkes off the
+      // crafts lane, Lin out of her shop's eaves, Brandt off the lane's end
+      // and a stride clear of the loom bench
+      marshal_redbrook: { x: -86.67, z: -42.95 },
+      trader_wilkes: { x: -14.6, z: -119.4 },
+      apothecary_lin: { x: -31.3, z: -119.3 },
       foreman_odell: { x: 0.06, z: -82.14 },
-      fisherman_brandt: { x: -19.16, z: -120.69 },
+      fisherman_brandt: { x: -21.3, z: -120.6 },
     });
     // The one pair the rework leaves close: Wilkes and Brandt share a market
     // corner. Every other giver keeps the old 7 yd minimum to its nearest.
@@ -54,11 +58,14 @@ describe('Eastbrook starter combat quest group', () => {
         roadDistance(position.x, position.z),
         `${id} keeps the road clear`,
       ).toBeGreaterThanOrEqual(2.5);
+      // The rework stands Wilkes and Brandt on the crafts lane among its
+      // benches on purpose; they keep 4.5 yd off every bench (a bench master's
+      // working reach), every other giver the old 7.
       for (const station of EASTBROOK_LAYOUT.services.stations) {
         expect(
           Math.hypot(position.x - station.position.x, position.z - station.position.z),
           `${id} / ${station.id}`,
-        ).toBeGreaterThanOrEqual(7);
+        ).toBeGreaterThanOrEqual(id === 'trader_wilkes' || id === 'fisherman_brandt' ? 4.5 : 7);
       }
     }
   });

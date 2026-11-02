@@ -64,7 +64,7 @@ const MARKET = paintedTownBuilding({
   kind: 'house',
   model: 'shop_a',
   look: LOOK,
-  anchor: { x: 411.85, z: 391.84 },
+  anchor: { x: 411.5, z: 392.19 }, // Studio town rework (#4593): nudged off the road band
   rotation: 4.6949, // Studio town rework (#4593)
   scale: 1.3,
 });

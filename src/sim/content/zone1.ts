@@ -58,27 +58,35 @@ export const TOWN_PLAT_TERRAIN_EDITS: HeightStamp[] = [
 // flank so the walk onto the pad never exceeds the movement slope gate.
 // The flat stamps stop at x -99; the cove's water starts near x -102, so
 // no wet cell is lifted (the Mirror Lake lesson).
+// Studio town rework (#4593): the map raised the quay's middle from -2 to 0
+// and its sculpt wins, so the whole pad stands at 0 (the map's strokes on it
+// are dropped from the touch-up, so the two agree). At -2 beside the map's 0
+// it left a 2 yd wall and trench along x -88 to -86 that bodies stuck in; the
+// approach blend from the flank eases to -0.6, between the quay and the
+// ground east of it, and the shoulders round the flat cores hold their full
+// pull out past the cores' edge (hardness 0.6), so the flat cores never end
+// in a lip above the shoulders.
 export const EASTBROOK_QUAY_TERRAIN_EDITS: HeightStamp[] = [
-  { x: -84, z: -54, radius: 18, delta: -1.9, falloff: 'smooth', mode: 'level' },
-  { x: -92, z: -46, radius: 13, delta: -2.0, falloff: 'smooth', mode: 'level' },
-  { x: -92, z: -54, radius: 13, delta: -2.0, falloff: 'smooth', mode: 'level' },
-  { x: -92, z: -62, radius: 13, delta: -2.0, falloff: 'smooth', mode: 'level' },
-  { x: -88, z: -67, radius: 10, delta: -2.0, falloff: 'smooth', mode: 'level' },
-  { x: -92, z: -46, radius: 7, delta: -2.0, falloff: 'flat', mode: 'level' },
-  { x: -92, z: -54, radius: 7, delta: -2.0, falloff: 'flat', mode: 'level' },
-  { x: -92, z: -62, radius: 7, delta: -2.0, falloff: 'flat', mode: 'level' },
+  { x: -84, z: -54, radius: 18, delta: -0.6, falloff: 'smooth', mode: 'level' },
+  { x: -92, z: -46, radius: 13, delta: 0, falloff: 'smooth', mode: 'level', hardness: 0.6 },
+  { x: -92, z: -54, radius: 13, delta: 0, falloff: 'smooth', mode: 'level', hardness: 0.6 },
+  { x: -92, z: -62, radius: 13, delta: 0, falloff: 'smooth', mode: 'level', hardness: 0.6 },
+  { x: -88, z: -67, radius: 10, delta: 0, falloff: 'smooth', mode: 'level', hardness: 0.6 },
+  { x: -92, z: -46, radius: 7, delta: 0, falloff: 'flat', mode: 'level' },
+  { x: -92, z: -54, radius: 7, delta: 0, falloff: 'flat', mode: 'level' },
+  { x: -92, z: -62, radius: 7, delta: 0, falloff: 'flat', mode: 'level' },
   // Round 6: a narrow graded strip under the quay boardwalk itself. A berm ran
   // along x -99 and punched up THROUGH the planks (groundHeight takes the max
   // of terrain and deck surface, so the player walked over a dirt hump in the
   // middle of the boardwalk and the boards drew underground). Radius 4.5 keeps
   // every stamp east of x -103.5, clear of the cove water near x -104, so no
   // wet cell is lifted.
-  { x: -98.5, z: -40, radius: 4, delta: -2.0, falloff: 'flat', mode: 'level' },
-  { x: -98.5, z: -46, radius: 4, delta: -2.0, falloff: 'flat', mode: 'level' },
-  { x: -98.5, z: -52, radius: 4, delta: -2.0, falloff: 'flat', mode: 'level' },
-  { x: -98.5, z: -58, radius: 4, delta: -2.0, falloff: 'flat', mode: 'level' },
-  { x: -98.5, z: -64, radius: 4, delta: -2.0, falloff: 'flat', mode: 'level' },
-  { x: -98.5, z: -70, radius: 4, delta: -2.0, falloff: 'flat', mode: 'level' },
+  { x: -98.5, z: -40, radius: 4, delta: 0, falloff: 'flat', mode: 'level' },
+  { x: -98.5, z: -46, radius: 4, delta: 0, falloff: 'flat', mode: 'level' },
+  { x: -98.5, z: -52, radius: 4, delta: 0, falloff: 'flat', mode: 'level' },
+  { x: -98.5, z: -58, radius: 4, delta: 0, falloff: 'flat', mode: 'level' },
+  { x: -98.5, z: -64, radius: 4, delta: 0, falloff: 'flat', mode: 'level' },
+  { x: -98.5, z: -70, radius: 4, delta: 0, falloff: 'flat', mode: 'level' },
 ];
 
 // Sandy shoreline around the harbor cove's rims near the town (owner
@@ -177,6 +185,14 @@ export const ZONE1_ZONE: ZoneDef = {
   levelRange: [1, 7],
   biome: 'vale',
   hub: { x: -14, z: -100, radius: TOWN_RADIUS, name: 'Eastbrook' },
+  // Studio town rework (#4593): Marshal Redbrook greets the ferry at the
+  // quay, Apothecary Lin keeps her shop on the strand and the smithy's yard
+  // and the inn lane hold their masters, all past the 26 yd hub (which also
+  // shapes the terrain, so it stays). The town's errands read this wider
+  // circle instead: it holds every town quest giver and every bench and its
+  // master, and keeps Brother Aldric's chapel errands (66 yd off its centre)
+  // their own, as they always were.
+  questHub: { x: -43, z: -78, radius: 58 },
   graveyard: GRAVEYARD_POS,
   lakes: [LAKE],
   pois: [
@@ -1015,8 +1031,10 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     // the inn up the slope north of the beds; she keeps her spot: at the old
     // Studio rebuild map's (-17, -82) she would stand inside the 3 yd the beds
     // keep clear, and a customer beside her inside a bed's working reach)
+    // Studio town rework (#4593): she keeps the allotment the map moved west,
+    // turned to face its beds (at the shipped -PI/2 she looked away from them).
     pos: { x: -85.26, z: -71.07 },
-    facing: -Math.PI / 2,
+    facing: 2.655,
     color: 0xa8843a,
     questIds: ['q_farm_intro'],
     vendorItems: [
@@ -2114,7 +2132,8 @@ export const ZONE1_OBJECTS: GroundObjectDef[] = [
       { x: 72, z: 15 },
       { x: 82, z: 22 },
       { x: 106, z: 40 },
-      { x: 110, z: 48 },
+      // Studio town rework (#4593): a muster tent now stands on (110, 48).
+      { x: 108.5, z: 48 },
       { x: 116, z: 37 },
     ],
   },

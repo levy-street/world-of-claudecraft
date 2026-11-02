@@ -11,6 +11,7 @@ import { describe, expect, it } from 'vitest';
 import { isBlocked } from '../src/sim/colliders';
 import {
   HUB_HEALING_DUMMY_ID,
+  HUB_HEALING_DUMMY_POS,
   HUB_PRACTICE_NPCS,
   HUB_SPARRING_MASTER_POS,
 } from '../src/sim/content/practice_dummies';
@@ -77,10 +78,10 @@ describe('the hub healing dummy is a level-5 template of its own', () => {
 
 describe('placement: near Hale, clear of the road and every quay neighbour', () => {
   it('stands on dry, unblocked ground beside the damage dummy', () => {
-    // The Studio town rework (#4593) mark, as a literal: the touch-up's object
-    // move, which the spawn resolves over HUB_HEALING_DUMMY_POS.
-    expect(HUB_HEALING_DUMMY_MARK.x).toBeCloseTo(-77.6001, 4);
-    expect(HUB_HEALING_DUMMY_MARK.z).toBeCloseTo(-3.1671, 4);
+    // The Studio town rework (#4593) mark, as a literal: the map's spot, the
+    // native HUB_HEALING_DUMMY_POS now (no touch-up object move rides over it).
+    expect(HUB_HEALING_DUMMY_MARK).toEqual({ x: -77.6, z: -3.17 });
+    expect(HUB_HEALING_DUMMY_MARK).toBe(HUB_HEALING_DUMMY_POS);
     const { x, z } = HUB_HEALING_DUMMY_MARK;
     expect(isBlocked(SEED, x, z, 0.5)).toBe(false);
     expect(groundHeight(x, z, SEED)).toBeGreaterThan(waterLevelAt(x, z, SEED));

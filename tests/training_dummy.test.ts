@@ -17,7 +17,7 @@ type RebucketSim = Sim & {
 // This suite only ever targets the fixed Highwatch training-dummy camp entry
 // (zone3.ts: { mobId: 'training_dummy', center: PRACTICE_ROW_MARKS.training_dummy,
 // radius:0, count:1 }; the Studio town rework (#4593) moved it from (-40, 648)
-// to the far end of the diagonal practice row at (-80.97, 599.53))
+// to the far end of the diagonal practice row at (-80.04, 598.23))
 // plus the hardcoded healer practice dummy (spawnHealerPracticeDummy, gated only on
 // noPlayer+devCommands, spawned unconditionally regardless of cfg.world). No other
 // camp, npc, or ground object is ever targeted or asserted on, so the full built-in
@@ -102,8 +102,8 @@ describe('Highwatch training dummy', () => {
     expect(d.hostile).toBe(true); // attackable
     expect(d.aiState).toBe('idle');
     // The Studio town rework (#4593) mark, as a literal.
-    expect(d.pos.x).toBeCloseTo(-80.97, 6);
-    expect(d.pos.z).toBeCloseTo(599.53, 6);
+    expect(d.pos.x).toBeCloseTo(-80.04, 6);
+    expect(d.pos.z).toBeCloseTo(598.23, 6);
     expect(d.maxHp).toBeGreaterThan(100000); // near-immortal
   });
 

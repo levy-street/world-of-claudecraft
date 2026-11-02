@@ -38,8 +38,11 @@ const INN = paintedTownBuilding({
   kind: 'inn',
   model: 'tavern',
   look: LOOK,
-  anchor: { x: -360.21, z: 366.55 },
-  rotation: 0, // Studio town rework (#4593)
+  // Studio town rework (#4593): the map moved it to (-360.21, 366.55), onto
+  // the plateau's east rim, where the ground round it was too steep to walk;
+  // it keeps its shipped spot, and the two townsfolk at its door step clear.
+  anchor: { x: -364.25, z: 362 },
+  rotation: 0,
   scale: 1,
 });
 // The barrow chapel: across the bridge at the Willowfen Barrow, between the
@@ -53,8 +56,8 @@ const CHAPEL = paintedTownBuilding({
   kind: 'chapel',
   model: 'hall',
   look: LOOK,
-  anchor: { x: -349.4, z: 300 },
-  rotation: 3.351, // Studio town rework (#4593)
+  anchor: { x: -349, z: 299.3 }, // Studio town rework (#4593): nudged off the road band
+  rotation: 3.301, // Studio town rework (#4593), turned 3 degrees off the road
   scale: 1,
 });
 
@@ -69,9 +72,10 @@ const GROUND: readonly TownGround[] = [
 // The forecourt's two townsfolk, both still inside the hub circle: the netter
 // by the moat's west edge, the bridgewright at the causeway's head watching
 // who comes over the bridge he keeps.
-// Studio town rework stands (#4593).
-const MARIS: Point2 = { x: -356.4, z: 358.04 };
-const ALDEN: Point2 = { x: -364.06, z: 358.16 };
+// Studio town rework stands (#4593), each stepped out of the inn's shipped
+// walls: Maris from (-356.4, 358.04), Alden from (-364.06, 358.16).
+const MARIS: Point2 = { x: -351.6, z: 358.04 };
+const ALDEN: Point2 = { x: -361.5, z: 352.4 };
 const NPCS = [
   makeTownNpc('netter_maris', MARIS, 3.912, INN.id),
   makeTownNpc('bridgewright_alden', ALDEN, 2.9, INN.id),

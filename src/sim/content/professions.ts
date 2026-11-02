@@ -544,11 +544,12 @@ export const STATION_TYPE_BY_CRAFT: Readonly<Record<string, StationType>> = {
 };
 
 // The six stations. `pos` values are final guard-safe town placements: each
-// sits inside its hosting hub circle, its master NPC stands 1 to 3 units
+// sits inside its hosting town circle, its master NPC stands 1 to 4.5 units
 // beside it, and every spot clears the strictest camp-safety margin any
 // pre-existing town NPC satisfies (about 11.2 units beyond camp radius plus
 // aggro radius; the bar is pinned in tests/professions_station_placement.test.ts). The
-// zone-1 forge shares smith_haldren's forge. `masterNpcId` values name the
+// zone-1 forge stands with Forgemistress Darva by the smithy's yard (the
+// Studio town rework, #4593). `masterNpcId` values name the
 // resident master each station belongs to (NpcDefs in the zone modules).
 export const STATIONS: readonly StationDef[] = [
   {
@@ -590,8 +591,10 @@ export const STATIONS: readonly StationDef[] = [
     id: 'station_highwatch_apothecary',
     type: 'apothecary',
     zoneId: ZONE3_ZONE.id,
-    // East of the Highwatch well, between it and the loremaster.
-    pos: { x: 7, z: 660 },
+    // Studio town rework (#4593): the map moved Alchemist Verane to
+    // (-36.67, 690.29), so the bench follows her, on the apothecary master's
+    // usual side of its cluster (town_props.ts: master at station +1.5, -2).
+    pos: { x: -38.17, z: 692.29 },
     masterNpcId: 'alchemist_verane',
   },
 ];

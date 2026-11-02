@@ -52,18 +52,21 @@ export const MOUNT_TRAIN_MIN_LEVEL = 20;
 export const MOUNT_TRAIN_FEE_COPPER = 1_000_000; // 100 gold (legacy)
 // Riding skill purchase from Marla: 80 gold.
 export const RIDING_SKILL_FEE_COPPER = BASIC_RIDING_FEE_COPPER;
-// The lesson's play area: the paddock rect plus a small margin (which also covers
-// Marla, who stands just north of the fence at z=708). Straying beyond it during
-// the lesson abandons the attempt. This replaces the old fixed radius around
-// Marla, since the show-jumping course now fills the whole (enlarged) paddock.
+// The lesson's play area: the paddock rect plus a small margin, and on the north
+// side a wider one that takes in Marla's yard (the Studio town rework, #4593,
+// stood her at z 617.6, about 12 yd north of the fence at z 606). Straying beyond
+// it during the lesson abandons the attempt. This replaces the old fixed radius
+// around Marla, since the show-jumping course now fills the whole (enlarged)
+// paddock.
 const LESSON_MARGIN = 4;
+const LESSON_NORTH_MARGIN = 16;
 
 function outsideLessonBounds(e: Entity): boolean {
   return (
     e.pos.x < STABLE_PADDOCK.x1 - LESSON_MARGIN ||
     e.pos.x > STABLE_PADDOCK.x2 + LESSON_MARGIN ||
     e.pos.z < STABLE_PADDOCK.z1 - LESSON_MARGIN ||
-    e.pos.z > STABLE_PADDOCK.z2 + LESSON_MARGIN
+    e.pos.z > STABLE_PADDOCK.z2 + LESSON_NORTH_MARGIN
   );
 }
 

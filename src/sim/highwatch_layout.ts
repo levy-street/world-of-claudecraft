@@ -271,28 +271,33 @@ const STORMCRAG_ROAD = [
 // Level pads under the buildings (terrain edits, applied after the built-in
 // world's other stamps): each building stands on level ground across its
 // whole reach, and the taper beyond carries the grade change into the
-// streets. The shelf is a disc of level ground at y 9; the inn and the
-// counting house stand at its height, cut into the rising ground behind them,
-// the chapel and the watch house a little lower where the road falls toward
-// the gate, the smithy on its terrace above. Each building gets a row of
-// stamps along its long axis rather than one circle (placed_town_kit.ts
+// streets. Studio town rework (#4593): each pad stands at the height the
+// map sculpted round its building (read off the map with every stroke
+// applied), so the map's ground and the pad agree: the square and the inn
+// on the shelf at about 11, the watch house a little lower where the road
+// falls toward the gate, the counting house and the smithy on the terraces
+// at about 15.7 and the chapel up the slope at 20.7. Each building gets a row
+// of stamps along its long axis rather than one circle (placed_town_kit.ts
 // padsAlong), so the level ground hugs its walls instead of spilling across
 // the square.
 
-// The Stormcrag road climbs out of the square's north-west corner between the
-// inn (level with the square) and the smithy's terrace: three tilted stamps
-// along it grade the lane from the one to the other, applied over the aprons
-// and before the pads, so the buildings' own pads keep their ground.
-const INN_HEIGHT = 9;
+// The Stormcrag road climbs out of the square's north-west corner past the
+// inn's north end: three tilted stamps along it grade the lane from the inn's
+// shelf up to the terrace the map sculpted north of it (the Studio town
+// rework moved the smithy that stood there across town), applied over the
+// aprons and before the pads, so the buildings' own pads keep their ground.
+const INN_HEIGHT = 11.33;
 // the guild's pad, the old stable yard's own height; a short apron (the yard is all but level
 // already, and the elementals' ground lies a little way north)
 const GUILD_HEIGHT = 9;
 const GUILD_APRON = 8;
-const SMITHY_HEIGHT = 10.6;
+const SMITHY_HEIGHT = 15.7;
 const INN_NORTH_Z = INN.reach.center.z + INN.reach.halfWidth;
-const SMITHY_SOUTH_Z = SMITHY.reach.center.z - SMITHY.reach.halfDepth;
-// smithy terrace over inn shelf, across the lane
-const ROAD_GRADE_FALL = (SMITHY_HEIGHT - INN_HEIGHT) / (SMITHY_SOUTH_Z - INN_NORTH_Z);
+// the map's terrace north of the lane, and where its level ground begins
+const LANE_NORTH_HEIGHT = 13.1;
+const LANE_NORTH_Z = 694;
+// inn shelf under the north terrace, across the lane
+const ROAD_GRADE_FALL = (LANE_NORTH_HEIGHT - INN_HEIGHT) / (LANE_NORTH_Z - INN_NORTH_Z);
 const ROAD_GRADE = [14, 22, 30].map((x) => {
   const z = 689 + ((x - 11) / 22) * 2.5;
   return {
@@ -313,19 +318,21 @@ const ROAD_GRADE = [14, 22, 30].map((x) => {
 // height, before any pad: the hill eases down to it (and the fill out from it)
 // at a walkable grade, and the pads, applied after every apron, still level
 // each reach exactly. The counting house and the smithy cut deepest into the
-// hill, so theirs reach furthest.
+// hill, so theirs reach furthest, and the chapel's knoll (Studio town rework,
+// #4593) stands 12 yd over the valley east of it, so its apron is as wide.
 const GROUND = [
   { building: INN, height: INN_HEIGHT, columns: 4, rows: 3, taper: 5, apron: 15 },
-  { building: COUNTING_HOUSE, height: 8.8, columns: 2, rows: 2, taper: 4, apron: 14 },
-  { building: CHAPEL, height: 8.8, columns: 2, rows: 3, taper: 5, apron: 10 },
-  { building: WATCH_HOUSE, height: 7.6, columns: 2, rows: 3, taper: 4, apron: 10 },
+  { building: COUNTING_HOUSE, height: 15.7, columns: 2, rows: 2, taper: 4, apron: 14 },
+  { building: CHAPEL, height: 20.7, columns: 2, rows: 3, taper: 5, apron: 22 },
+  { building: WATCH_HOUSE, height: 8.5, columns: 2, rows: 3, taper: 4, apron: 10 },
   { building: SMITHY, height: SMITHY_HEIGHT, columns: 3, rows: 2, taper: 4, apron: 13 },
   { building: GUILD, height: GUILD_HEIGHT, columns: 4, rows: 5, taper: 4, apron: GUILD_APRON },
 ] as const;
 
 // The aprons reach into the square: this sets the shelf back at its own height
-// (level out to 14 yd from the hub) before the road and the pads go down.
-const SQUARE_HEIGHT = 9;
+// (level out to 14 yd from the hub) before the road and the pads go down, at
+// the height the map sculpted the square to (Studio town rework, #4593).
+const SQUARE_HEIGHT = 11;
 const SQUARE_FLAT = 14;
 const SQUARE_RELEVEL = {
   x: HUB_CENTER.x,

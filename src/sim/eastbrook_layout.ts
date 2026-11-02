@@ -867,16 +867,16 @@ function buildingById(id: string) {
  * The crafts lane's benches and their masters stand where the kit workshops'
  * doors were. Those workshops are gone (the placed smithy took their trade),
  * but the stations are the lane now, an open yard south of the square, and
- * the forge, the toolworks and the kitchens, their routes, master stands and
- * yard fence are still measured from the same workshop lots and the old inn
- * door. The loom left its lot to the apothecary's shop (LOOM_POSITION).
+ * the toolworks bench and its master stand, and the yard fence, are still
+ * measured from the same workshop lots. The loom left its lot to the
+ * apothecary's shop (LOOM_POSITION); the forge and the kitchens left the lane
+ * with their masters in the Studio town rework (#4593, STATIONS below).
  */
 function lotFront(position: Point2, rotation: number, depth: number, across = 0): Point2 {
   return localToWorld(position, rotation, across, depth / 2 + FRONT_CLEARANCE);
 }
 const FORGE_LOT = { position: { x: -2, z: -122 }, rotation: -2.0344439357957027, depth: 6.6 };
 const TOOLWORKS_LOT = { position: { x: -16, z: -128 }, rotation: 0.5880026035475675, depth: 5.6 };
-const KITCHENS_LOT = { position: { x: -38, z: -88 }, rotation: -2.5535900500422257, depth: 6.9 };
 
 function makeObbPlacement(
   id: string,
@@ -1003,11 +1003,23 @@ const BENCHES = [
   ),
 ];
 
+// Studio town rework (#4593): the World Market's keeper stands by the bank's
+// door now, so his stall stands with him, 1.9 yd behind him and its public
+// face turned the way he looks. He stands a yard further out toward the
+// square than the map has him (-51.3, -113.66), where the stall clears the
+// bank's wall.
+const MERCHANT_STAND = { x: -50.59, z: -112.95 } as const;
+const MERCHANT_FACING = 0.785;
 const MARKET_STALL_SPECS = [
   // Round 6b (owner): the two stalls stood 9 yd apart on one line, which put
   // their keepers 6 yd apart, the tightest pair in town. Opened out across the
   // square instead, so the market reads as a square rather than a queue.
-  ['eastbrook_market_stall_world_market', 'gold', { x: -20.5, z: -94 }, 2.4805494847391065],
+  [
+    'eastbrook_market_stall_world_market',
+    'gold',
+    pointAtYaw(MERCHANT_STAND, MERCHANT_FACING, -1.9),
+    MERCHANT_FACING,
+  ],
   ['eastbrook_market_stall_provisions', 'green', { x: -19, z: -108 }, 0.6610431688506869],
 ] as const;
 const MARKET_STALLS = MARKET_STALL_SPECS.map(([id, canopyVariant, position, rotation]) => {
@@ -1127,18 +1139,22 @@ const ROADS = [
     existingRoadPoint: { x: 12.5, z: -71 },
     gateId: null,
     halfWidth: 1.5,
-    // Swung west round the smithy's forge shelter, which stands on the old
-    // line, so it leaves the square beside the coast track (the two run as
-    // one wide way for a dozen yards) before turning back along the smithy's
-    // north wall onto the old line, the silverleaf patch on the meadow above
-    // (herb_eastbrook_4) left off the verge.
+    // It leaves the square beside the coast track (the two run as one wide
+    // way for a dozen yards). Studio town rework (#4593): the smithy turned
+    // and its forge shelter stands across the old line, so the road keeps
+    // east of the smithy yard and rejoins the old line north of it, where the
+    // map lays it (a fifth of a yard further east past the shelter's corner,
+    // where a body clears it).
     points: [
       { x: 14.6, z: -88.6 },
       { x: 15.8, z: -83 },
       { x: 17, z: -76 },
       { x: 12.5, z: -71 },
-      { x: 4, z: -67 },
-      { x: 0, z: -58 },
+      { x: 7.8, z: -69.03 },
+      { x: 7.6, z: -61.62 },
+      { x: 5.38, z: -56.12 },
+      { x: 3.88, z: -55.12 },
+      { x: -0.55, z: -54.72 },
     ],
   },
   {
@@ -1251,22 +1267,30 @@ const CHAPEL = buildingById('eastbrook_chapel');
 // loom master stands at station -2, -1).
 const LOOM_POSITION = { x: -18.5, z: -116.5 } as const;
 
+// Studio town rework (#4593): the map moved Forgemistress Darva beside the
+// smithy's forge shelter and Cook Marlow up the inn lane, and their benches
+// follow them. Darva keeps the forge master's usual side of her cluster
+// (town_props.ts: station -2, -1.5); the map stood her on the north road's
+// centreline (7.4, -62.86), so she stands 2.2 yd east of it, off the lane
+// with her bench. The cook's usual side is walled in where he stands, so his
+// bench stands in front of him, where he looks.
+const DARVA_STAND = { x: 9.6, z: -62.86 } as const;
+const MARLOW_STAND = { x: -25.09, z: -74.5 } as const;
+
 const STATIONS = [
   {
     id: 'station_eastbrook_forge',
     type: 'forge',
     masterNpcId: 'forgemistress_darva',
-    position: lotFront(FORGE_LOT.position, FORGE_LOT.rotation, FORGE_LOT.depth),
+    position: { x: DARVA_STAND.x + 2, z: DARVA_STAND.z + 1.5 },
     interactionRadius: 20,
   },
   {
     id: 'station_eastbrook_kitchens',
     type: 'kitchens',
     masterNpcId: 'cook_marlow',
-    // The tavern's kitchen yard, beside the inn lane where it meets the main
-    // street (the World of ClaudeCraft Studio map keeps it there as the inn
-    // moves up the slope).
-    position: lotFront(KITCHENS_LOT.position, KITCHENS_LOT.rotation, KITCHENS_LOT.depth, 2.5),
+    // The tavern's kitchen yard, below the inn on its lane.
+    position: { x: MARLOW_STAND.x, z: MARLOW_STAND.z - 1.5 },
     interactionRadius: 20,
   },
   {
@@ -1341,20 +1365,26 @@ const TINKER_POSITION = localToWorld(TOOLWORKS_STATION.position, TOOLWORKS_LOT.r
 
 // Stands from the Studio town rework (the Eastbrook and Mirefen changes map,
 // #4593): authored positions and facings, not derived from the lots above.
+// A few are nudged off the map's spot by the least that clears a rule:
+// Marshal 1.5 yd off the streetlamp on his sightline to the ferry landing,
+// the World Market's keeper and Forgemistress Darva (see their stands above),
+// Apothecary Lin out of her shop's eaves, the card master off the inn's front
+// bench, and Trader Wilkes and Fisherman Brandt off the crafts lane, Brandt
+// also a stride clear of the loom bench.
 const NPCS = [
-  makeNpc('the_merchant', { x: -51.3, z: -113.66 }, 0.785, MARKET_STALLS[0].id),
-  makeNpc('marshal_redbrook', { x: -86.19, z: -44.37 }, 4.304, 'eastbrook_noticeboard'),
-  makeNpc('trader_wilkes', { x: -14.01, z: -121.93 }, 0, 'eastbrook_civic_square'),
-  makeNpc('apothecary_lin', { x: -31.95, z: -120.36 }, 0.785, 'eastbrook_apothecary'),
+  makeNpc('the_merchant', MERCHANT_STAND, MERCHANT_FACING, MARKET_STALLS[0].id),
+  makeNpc('marshal_redbrook', { x: -86.67, z: -42.95 }, 4.304, 'eastbrook_noticeboard'),
+  makeNpc('trader_wilkes', { x: -14.6, z: -119.4 }, 0, 'eastbrook_civic_square'),
+  makeNpc('apothecary_lin', { x: -31.3, z: -119.3 }, 0.785, 'eastbrook_apothecary'),
   makeNpc('brother_aldric', { x: 18.5, z: -103.31 }, -0.96, CHAPEL.id),
   makeNpc('smith_haldren', { x: -8.6, z: -122.54 }, 0, 'eastbrook_smithy'),
-  makeNpc('fisherman_brandt', { x: -19.16, z: -120.69 }, 0.75, 'eastbrook_civic_square'),
+  makeNpc('fisherman_brandt', { x: -21.3, z: -120.6 }, 0.75, 'eastbrook_civic_square'),
   makeNpc('foreman_odell', { x: 0.06, z: -82.14 }, 1.937, 'eastbrook_civic_square'),
   makeNpc('bursar_fernando', { x: -57.26, z: -107.07 }, 0.785, BANK.id),
-  makeNpc('card_master', { x: -38.16, z: -68.71 }, 3.124, BANK.id),
+  makeNpc('card_master', { x: -38.05, z: -68.85 }, 3.124, BANK.id),
   makeNpc('chronicler_saul', { x: -44.27, z: -118.01 }, 0.588, 'mailbox_eastbrook'),
-  makeNpc('forgemistress_darva', { x: 7.4, z: -62.86 }, 2.775, FORGE_STATION.id),
-  makeNpc('cook_marlow', { x: -25.09, z: -74.5 }, 3.77, KITCHENS_STATION.id),
+  makeNpc('forgemistress_darva', DARVA_STAND, 2.775, FORGE_STATION.id),
+  makeNpc('cook_marlow', MARLOW_STAND, 3.77, KITCHENS_STATION.id),
   makeNpc(
     'weaver_ottilie',
     WEAVER_POSITION,
@@ -1409,8 +1439,10 @@ const GRAVEYARD_ANCHOR = { x: 37.5, z: -99.3 } as const;
 // Studio map's own spot its box ran 0.34 yd into the bank's wall, so it
 // stands half a yard further out along its own width; it stands on the
 // bank's shelf (EASTBROOK_LAYOUT.pads).
-// Studio town rework (#4593): the vault stands a yard up the quay.
-const WEEKLY_VAULT = { x: -72.98, z: -102.95, rot: Math.PI / 4 } as const;
+// Studio town rework (#4593): the vault stands a yard up the quay, and a
+// tenth of a yard further out along its own width than the map has it, where
+// its box clears the bank's (at the map's spot they overlapped by 0.06 yd).
+const WEEKLY_VAULT = { x: -73.08, z: -102.85, rot: Math.PI / 4 } as const;
 
 const SERVICES = {
   playerStart: {
@@ -1598,19 +1630,30 @@ function padsOver(
 // The ground under the placed buildings: each stands on a level shelf that
 // covers its whole reach (porch, stair and eaves), so nothing grows up
 // through a floor and no footing hangs over a dip, eased into the streets
-// round it. The shelves keep to the town's grade: the bank, the vault on its
-// flank and the apothecary's shop on the strand's lip at the main street's
-// height (-0.7), the chapel on the plat beside the coast track (-0.9), and
-// the smithy, the inn and the quay cottage on the rise north of the square
-// (0.5), cut into it, each with a long taper so the banks behind them stay
-// climbable. Neighbours share a height wherever their tapers overlap, so one
-// pad never tilts another building's floor; the coastal ones keep a short
-// taper that ends on the dry strand (no ground crosses the sea surface). In
-// the built-in world they are the last stamps on their ground (data.ts), the
-// Studio rebuild map carries the same list.
+// round it. The bank, the vault on its flank and the apothecary's shop keep
+// the strand's lip at the main street's height (-0.7) and the chapel the plat
+// beside the coast track (-0.9). Studio town rework (#4593): the map sculpted
+// the rise north of the square higher, and its sculpt wins there, so the
+// smithy stands at 2.54, the inn up the slope at 2.17 and the quay cottage at
+// 1.29, the heights the map levelled those lots to (its strokes over each
+// reach are dropped from the touch-up, so the two agree). The map also
+// levelled the bank's lot to 1.24, but that shelf cannot stand there: the
+// bank's reach comes within 1.6 yd of the apothecary's shop on the strand
+// (-0.7) and its seaward eaves within a few yards of the water, so its floor
+// could not be level without a bank too steep to climb at both; it keeps the
+// strand's height, and the touch-up drops the map's strokes on its lot.
+// Shelves of different heights never share a taper over another's reach:
+// the inn's long taper is laid first, then the cottage's and the smithy's
+// shorter ones (the cottage stands 4.3 yd off the inn, the smithy 5 yd), so
+// each floor stays level. The coastal ones keep a short taper that ends on
+// the dry strand (no ground crosses the sea surface). In the built-in world
+// they are the last stamps on their ground (data.ts), the Studio rebuild map
+// carries the same list.
 const BANK_SHELF = -0.7;
 const CHAPEL_SHELF = -0.9;
-const RISE_SHELF = 0.5;
+const SMITHY_SHELF = 2.54;
+const INN_SHELF = 2.17;
+const COTTAGE_SHELF = 1.29;
 const PADS: EastbrookPad[] = [
   ...padsOver(buildingById('eastbrook_bank').reach, BANK_SHELF, 5, 5, 4),
   // the vault and the apron before its door, on the bank's shelf
@@ -1626,13 +1669,15 @@ const PADS: EastbrookPad[] = [
     2,
     4,
   ),
-  ...padsOver(buildingById('eastbrook_smithy').reach, RISE_SHELF, 3, 2, 5),
-  ...padsOver(buildingById('eastbrook_inn').reach, RISE_SHELF, 3, 3, 9),
+  ...padsOver(buildingById('eastbrook_inn').reach, INN_SHELF, 3, 3, 9),
+  // finer grids for the two short tapers, so each shelf hugs its reach and
+  // its whole ease is spent before the inn's
+  ...padsOver(buildingById('eastbrook_quay_cottage').reach, COTTAGE_SHELF, 4, 4, 3),
+  ...padsOver(buildingById('eastbrook_smithy').reach, SMITHY_SHELF, 6, 4, 3.8),
   ...padsOver(buildingById('eastbrook_chapel').reach, CHAPEL_SHELF, 3, 4, 4),
   // a finer grid, so the shelf hugs the shop's seaward eaves and its taper is
   // spent before the strand reaches the water
   ...padsOver(buildingById('eastbrook_apothecary').reach, BANK_SHELF, 4, 4, 4),
-  ...padsOver(buildingById('eastbrook_quay_cottage').reach, RISE_SHELF, 2, 2, 8),
 ];
 
 export const EASTBROOK_LAYOUT = deepFreeze({

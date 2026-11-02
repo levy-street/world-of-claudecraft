@@ -6505,6 +6505,15 @@ export interface ZoneDef {
   worldPvp?: 'sanctuary' | 'ffa';
   biome: BiomeId;
   hub: { x: number; z: number; radius: number; name: string };
+  /**
+   * The town's own footprint for its errands, when it has outgrown the hub
+   * circle (professions/focus.ts isInTownZone: the town quests and town
+   * focus read it). `hub` also shapes the world (the terrain plateau, the
+   * decoration keep-out, the town collider circle), so a town whose quest
+   * givers and benches spread past it widens this instead of the hub.
+   * Absent: the hub circle is the town.
+   */
+  questHub?: { x: number; z: number; radius: number };
   graveyard: { x: number; z: number };
   lakes: { x: number; z: number; radius: number }[];
   // id is the PERSISTED identity of a point of interest (deed visit marks key on

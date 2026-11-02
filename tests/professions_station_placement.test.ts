@@ -72,6 +72,14 @@ function distTo(a: { x: number; z: number }, b: { x: number; z: number }): numbe
 
 const MASTER_IDS = new Set(STATIONS.map((s) => s.masterNpcId));
 
+// The town's own circle: its quest hub where the town has outgrown the hub
+// circle (ZoneDef.questHub, the Studio town rework, #4593, for Eastbrook),
+// else the hub circle itself (professions/focus.ts isInTownZone reads it the
+// same way).
+function townCircle(zone: typeof ZONE1_ZONE): { x: number; z: number; radius: number } {
+  return zone.questHub ?? zone.hub;
+}
+
 // The pre-existing town NPCs the safety bar is derived from: statically
 // placed (non-dynamic) NPCs standing inside their zone's hub circle,
 // excluding the six station masters themselves (the bar must be what the
@@ -81,7 +89,7 @@ function townNpcs(entry: ZoneContent): NpcDef[] {
     (npc) =>
       !npc.dynamic &&
       !MASTER_IDS.has(npc.id) &&
-      distTo(npc.pos, entry.zone.hub) <= entry.zone.hub.radius,
+      distTo(npc.pos, townCircle(entry.zone)) <= townCircle(entry.zone).radius,
   );
 }
 
@@ -111,7 +119,10 @@ function safetyBuffer(): number {
 // loom station 27.80, tinker_gizzel 26.05; the forge pair and both
 // out-of-zone stations sit inside their bare hub radii. A pad of 7 bounds
 // the worst by 1.15 yd, tight enough that a lot drifting one district
-// further out reds here.
+// further out reds here. Re-pinned for the Studio town rework (#4593): the
+// rework spread Eastbrook's benches and their masters past even that pad (the
+// forge by the smithy's yard 46 yd off the hub), so the bar reads the town's
+// own circle (townCircle above, its quest hub), the pad unchanged.
 const DISTRICT_PAD = 7;
 
 describe('station and master placement safety (derived from content)', () => {
@@ -156,13 +167,13 @@ describe('station and master placement safety (derived from content)', () => {
       expect(distTo(master.pos, station.pos), `${station.masterNpcId} strayed`).toBeLessThanOrEqual(
         4.5,
       );
-      expect(distTo(station.pos, entry.zone.hub), `${station.id} outside hub`).toBeLessThanOrEqual(
-        entry.zone.hub.radius + DISTRICT_PAD,
+      const town = townCircle(entry.zone);
+      expect(distTo(station.pos, town), `${station.id} outside hub`).toBeLessThanOrEqual(
+        town.radius + DISTRICT_PAD,
       );
-      expect(
-        distTo(master.pos, entry.zone.hub),
-        `${station.masterNpcId} outside hub`,
-      ).toBeLessThanOrEqual(entry.zone.hub.radius + DISTRICT_PAD);
+      expect(distTo(master.pos, town), `${station.masterNpcId} outside hub`).toBeLessThanOrEqual(
+        town.radius + DISTRICT_PAD,
+      );
       expect(STATION_RADIUS).toBeGreaterThan(3);
     }
   });

@@ -104,7 +104,7 @@ describe('the Highwatch practice row', () => {
   it('stands every dummy exactly on its authored mark', () => {
     expect(PRACTICE_ROW_MARKS).toEqual({
       [FRIENDLY_PLAYER_DUMMY_ID]: { x: -65.95, z: 611.4 },
-      training_dummy: { x: -80.97, z: 599.53 },
+      training_dummy: { x: -80.04, z: 598.23 },
       [NORMAL_BOSS_DUMMY_ID]: { x: -70.82, z: 606.36 },
       [HEROIC_BOSS_DUMMY_ID]: { x: -75.65, z: 602.33 },
     });

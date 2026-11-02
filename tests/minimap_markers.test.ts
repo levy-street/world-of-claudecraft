@@ -1205,8 +1205,11 @@ describe('station markers (Professions 2.0)', () => {
   // Re-pinned 2026-08 for the Eastbrook harbor move (d19aa33f76,
   // docs/design/eastbrook-revamp/site-plan.md): the square is now the harbor
   // market at the civic center (-14,-102); the four re-seated stations sit
-  // 23-31 yards out, inside the rim.
-  const VIEW_POS = { x: -14, z: -102 };
+  // 23-31 yards out, inside the rim. Re-pinned for the Studio town rework
+  // (#4593): the forge followed its master to the smithy's yard, 48 yd off
+  // the civic center and just past the rim, so the viewer stands on the main
+  // street a little north-east of the square, 24 to 39 yd from all four.
+  const VIEW_POS = { x: -10, z: -94 };
 
   function makeStationWorld(
     shape: 'sim' | 'client',

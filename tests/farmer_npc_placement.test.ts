@@ -53,7 +53,7 @@ const FARMERS: readonly {
     id: 'farmer_hollis',
     patchId: 'patch_thornpeak',
     zoneId: 'thornpeak_heights',
-    seat: { x: -50.96, z: 652.48 },
+    seat: { x: -50.5, z: 651.5 },
   },
   {
     id: 'farmer_verbena',

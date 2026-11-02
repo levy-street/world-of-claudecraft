@@ -39,7 +39,7 @@ export const NIGHTBLOOM_ZONE: ZoneDef = {
   biome: 'night',
   southPassX: -330, // the Nightgate: where the jungle road climbs into the dark
   hub: { x: -370, z: 1420, radius: 18, name: 'Moonrest' },
-  graveyard: { x: -390.1, z: 1407.6 },
+  graveyard: { x: -392.7, z: 1414.6 },
   lakes: [
     { x: -290, z: 1380, radius: 14 }, // the Moonspring: a round mirror tarn
     // the Gloamfield pools, scattered through the flower downs

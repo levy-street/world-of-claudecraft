@@ -931,12 +931,14 @@ describe('authoritative Eastbrook replacement plan', () => {
         id: 'eastbrook_market_stall_world_market',
         assetId: '/models/props/eastbrook_market_stall.glb',
         canopyVariant: 'gold',
-        radiusFromCivic: 10.307764064044152,
-        position: { x: -20.5, z: -94 },
+        // the Studio town rework (#4593) stood its keeper by the bank's door,
+        // and the stall stands with him
+        radiusFromCivic: 39.87547382428577,
+        position: { x: -51.9329678441002, z: -114.29403771141769 },
         width: 2.8,
         depth: 2.2,
-        rotation: 2.4805494847391065,
-        frontStandingPoint: { x: -19.517695018376127, z: -95.26296354780212 },
+        rotation: 0.785,
+        frontStandingPoint: { x: -50.802047554331615, z: -113.16221648075016 },
       },
       {
         id: 'eastbrook_market_stall_provisions',
@@ -1184,14 +1186,14 @@ describe('wall and road geometry', () => {
             x: 12.5,
             z: -71,
           },
-          {
-            x: 4,
-            z: -67,
-          },
-          {
-            x: 0,
-            z: -58,
-          },
+          // the Studio town rework (#4593) lays it east of the turned smithy's
+          // forge shelter, on the map's line (a fifth of a yard east past the
+          // shelter's corner)
+          { x: 7.8, z: -69.03 },
+          { x: 7.6, z: -61.62 },
+          { x: 5.38, z: -56.12 },
+          { x: 3.88, z: -55.12 },
+          { x: -0.55, z: -54.72 },
         ],
       },
       {
@@ -1489,7 +1491,8 @@ describe('layout clearance and service anchors', () => {
     // character arrives at the ferry landing, which is why the givers moved
     // toward the quay side of the square rather than toward this spawn.
     // Re-pinned for the Studio town rework (#4593): every NPC but the weaver
-    // and the tinker stands at an authored literal from that map now.
+    // and the tinker stands at an authored literal from that map now, a few
+    // nudged off it by the least that clears a rule (eastbrook_layout.ts NPCS).
     // Re-pinned 2026-10 for the Tidehold rebuild: the stands that hung off a
     // kit shell moved with the six placed buildings. apothecary_lin keeps her
     // shop now and stands at its door looking out over the square (anchored
@@ -1622,20 +1625,16 @@ describe('layout clearance and service anchors', () => {
         id: 'station_eastbrook_forge',
         type: 'forge',
         masterNpcId: 'forgemistress_darva',
-        position: {
-          x: -6.293250516799596,
-          z: -124.1466252583998,
-        },
+        // the Studio town rework (#4593): the forge and the kitchens follow
+        // their moved masters
+        position: { x: 11.6, z: -61.36 },
         interactionRadius: 20,
       },
       {
         id: 'station_eastbrook_kitchens',
         type: 'kitchens',
         masterNpcId: 'cook_marlow',
-        position: {
-          x: -42.82589170715949,
-          z: -90.73189846640925,
-        },
+        position: { x: -25.09, z: -76 },
         interactionRadius: 20,
       },
       {
@@ -1669,18 +1668,18 @@ describe('layout clearance and service anchors', () => {
         npc.anchorId,
       ]),
     ).toEqual([
-      ['the_merchant', -51.3, -113.66, 0.785, 'eastbrook_market_stall_world_market'],
-      ['marshal_redbrook', -86.19, -44.37, 4.304, 'eastbrook_noticeboard'],
-      ['trader_wilkes', -14.01, -121.93, 0, 'eastbrook_civic_square'],
-      ['apothecary_lin', -31.95, -120.36, 0.785, 'eastbrook_apothecary'],
+      ['the_merchant', -50.59, -112.95, 0.785, 'eastbrook_market_stall_world_market'],
+      ['marshal_redbrook', -86.67, -42.95, 4.304, 'eastbrook_noticeboard'],
+      ['trader_wilkes', -14.6, -119.4, 0, 'eastbrook_civic_square'],
+      ['apothecary_lin', -31.3, -119.3, 0.785, 'eastbrook_apothecary'],
       ['brother_aldric', 18.5, -103.31, -0.96, 'eastbrook_chapel'],
       ['smith_haldren', -8.6, -122.54, 0, 'eastbrook_smithy'],
-      ['fisherman_brandt', -19.16, -120.69, 0.75, 'eastbrook_civic_square'],
+      ['fisherman_brandt', -21.3, -120.6, 0.75, 'eastbrook_civic_square'],
       ['foreman_odell', 0.06, -82.14, 1.937, 'eastbrook_civic_square'],
       ['bursar_fernando', -57.26, -107.07, 0.785, 'eastbrook_bank'],
-      ['card_master', -38.16, -68.71, 3.124, 'eastbrook_bank'],
+      ['card_master', -38.05, -68.85, 3.124, 'eastbrook_bank'],
       ['chronicler_saul', -44.27, -118.01, 0.588, 'mailbox_eastbrook'],
-      ['forgemistress_darva', 7.4, -62.86, 2.775, 'station_eastbrook_forge'],
+      ['forgemistress_darva', 9.6, -62.86, 2.775, 'station_eastbrook_forge'],
       ['cook_marlow', -25.09, -74.5, 3.77, 'station_eastbrook_kitchens'],
       ['weaver_ottilie', -20.5, -117.5, 1.1071487177940904, 'station_eastbrook_loom'],
       [

@@ -51,7 +51,7 @@ export const WILLOWFEN_ZONE: ZoneDef = {
   biome: 'fen',
   eastPassZ: 440, // the Mirewalk: where the marsh road wades into the fen
   hub: { x: -360, z: 362, radius: 20, name: 'Bridgemere' },
-  graveyard: { x: -341, z: 305.5 },
+  graveyard: { x: -338.8, z: 301.6 },
   lakes: [
     ...MOAT,
     // the Lilymoors: three pools ringing a real dry islet at (-87,3247)

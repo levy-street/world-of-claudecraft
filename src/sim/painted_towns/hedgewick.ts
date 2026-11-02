@@ -38,7 +38,7 @@ const INN = paintedTownBuilding({
   kind: 'inn',
   model: 'tavern',
   look: LOOK,
-  anchor: { x: 338.85, z: 782.26 },
+  anchor: { x: 337.1, z: 782.26 }, // Studio town rework (#4593): nudged off the road band
   rotation: 3.7001, // Studio town rework (#4593)
   scale: 1.2,
 });
@@ -51,7 +51,7 @@ const CHAPEL = paintedTownBuilding({
   kind: 'chapel',
   model: 'hall',
   look: LOOK,
-  anchor: { x: 288.66, z: 789.75 },
+  anchor: { x: 288.56, z: 789.26 }, // Studio town rework (#4593): nudged off the road band
   rotation: 3.159, // Studio town rework (#4593)
   scale: 1,
 });
@@ -75,7 +75,7 @@ const POND_HOUSE = paintedTownBuilding({
   kind: 'house',
   model: 'house_a',
   look: LOOK,
-  anchor: { x: 344.91, z: 823.4 },
+  anchor: { x: 346.41, z: 823.4 }, // Studio town rework (#4593): nudged off the road band
   rotation: 5.9865, // Studio town rework (#4593)
   scale: 1.4,
 });

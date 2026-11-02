@@ -106,11 +106,10 @@ describe('Drillmaster Hale stands beside the hub dummy', () => {
     const dz = start.z - hale.pos.z;
     const approachDot =
       (Math.sin(hale.facing) * dx + Math.cos(hale.facing) * dz) / Math.hypot(dx, dz);
-    // The Studio town rework (#4593) authored his turn as 2.788 from the
-    // Sableweb practice ground, about 19 degrees off the bearing to the
-    // player start 53 yards south: still facing the arrival, never the
-    // watchtower behind him.
-    expect(hale.facing).toBeCloseTo(2.788, 6);
+    // The Studio town rework (#4593) moved him to the Sableweb practice
+    // ground; he stands in front of the two dummies there, turned straight to
+    // the player start 52 yards south, so the dummies stand behind him.
+    expect(hale.facing).toBeCloseTo(-2.78823, 5);
     expect(approachDot).toBeGreaterThan(0.9);
     expect(hale.prevFacing).toBe(hale.facing);
   });
@@ -125,8 +124,9 @@ describe('Drillmaster Hale stands beside the hub dummy', () => {
   });
 
   it('on his authored mark, on dry ground, clear of every neighbour', () => {
-    // The Studio town rework (#4593) mark, as a literal.
-    expect(HUB_SPARRING_MASTER_POS).toEqual({ x: -95.38, z: -5.41 });
+    // The Studio town rework (#4593) mark, as a literal: in front of the
+    // dummies, on the town side (the map stood him 18 to 24 yd west of them).
+    expect(HUB_SPARRING_MASTER_POS).toEqual({ x: -75.96, z: -9.09 });
     const { x, z } = HUB_SPARRING_MASTER_POS;
     expect(isBlocked(SEED, x, z, 0.5)).toBe(false);
     expect(groundHeight(x, z, SEED)).toBeGreaterThan(waterLevelAt(x, z, SEED));

@@ -741,9 +741,11 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // Re-minted for v0.45.4 graphics and dungeon loading optimizations in renderer.ts.
   // No capture was retaken.
   // Re-minted for the Studio town rework (#4593), which moved the smithy, the
-  // quay cottage, the vault and the town's NPC stands in eastbrook_layout.ts.
+  // quay cottage, the vault and the town's NPC stands in eastbrook_layout.ts,
+  // and again for its town fixes there (the benches follow their masters, the
+  // lots' shelves stand at the map's heights, a few stands nudged).
   // No capture was retaken.
-  'f79dd14b173b432d7056d797f2184116e645d03474c03ef9d8000cdeb5dd80b9';
+  '581abc857a61a7bd361e0c807217c360bc8f807795f4a535c62d6d181036bfe1';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
@@ -1171,9 +1173,11 @@ describe('Eastbrook polish capture contract', () => {
         camera: { x: -49.32, y: 7, z: -101.42 },
         target: { x: -54.98, y: 3.2, z: -111.32 },
       },
+      // the Studio town rework (#4593) turned the smithy: its door looks
+      // south-east now, and the view re-aims onto it
       'smithy-and-forge': {
-        camera: { x: -12, y: 7, z: -93.65 },
-        target: { x: -8.28, y: 3, z: -81.86 },
+        camera: { x: 11.58, y: 7, z: -85.18 },
+        target: { x: 1.25, y: 3, z: -79.09 },
       },
       'inn-and-kitchens': {
         camera: { x: -46, y: 9, z: -93 },
@@ -1187,9 +1191,10 @@ describe('Eastbrook polish capture contract', () => {
         camera: { x: -11, y: 7, z: -120 },
         target: { x: -13.614789156231515, y: 5, z: -124.42218373434727 },
       },
+      // the Studio town rework (#4593) stood the stall by the bank's door
       'stall-world-market': {
-        camera: { x: -16, y: 6, z: -93 },
-        target: { x: -19.517695018376127, y: 2.5, z: -95.26296354780212 },
+        camera: { x: -47.83, y: 6, z: -110.19 },
+        target: { x: -50.802047554331615, y: 2.5, z: -113.16221648075016 },
       },
     });
     expect(EASTBROOK_TOWN_POLISH_MATCHED_CAPTURE_VIEWS).toHaveLength(23);
@@ -1541,22 +1546,25 @@ describe('Eastbrook polish capture contract', () => {
     // stands between the square and her shop down on the strand, and FURY
     // stepped off the north road's new swing round the smithy, so both rows
     // follow them (Lin's camera still 5 yd out on her public side, FURY's
-    // still 4.47). Saul did not move.
+    // still 4.47). Saul did not move. Re-aimed for the Studio town rework
+    // (#4593): all three moved (Lin to her shop on the strand, Saul to the
+    // bank's quay end, FURY to the chapel's strand), and each row follows its
+    // NPC, the camera out along the NPC's facing.
     const expectedViews = {
       'apothecary-lin': {
         subject: 'apothecary_lin',
-        camera: { x: -20.96, y: 6, z: -108.96 },
-        target: { x: -24.5, y: 2.5, z: -112.5 },
+        camera: { x: -27.77, y: 6, z: -115.76 },
+        target: { x: -31.3, y: 2.5, z: -119.3 },
       },
       'ravenpost-chronicler': {
         subject: 'chronicler_saul',
-        camera: { x: 10.5, y: 6.5, z: -85 },
-        target: { x: 10.2, y: 2.5, z: -87.5 },
+        camera: { x: -42.61, y: 6.5, z: -115.51 },
+        target: { x: -44.27, y: 2.5, z: -118.01 },
       },
       'west-wall-quartermaster': {
         subject: 'fury',
-        camera: { x: 17.05, y: 6, z: -85.59 },
-        target: { x: 21, y: 2.5, z: -83.5 },
+        camera: { x: -3.5, y: 6, z: -121.68 },
+        target: { x: 0.77, y: 2.5, z: -123 },
       },
     };
     for (const [name, expected] of Object.entries(expectedViews)) {

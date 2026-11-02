@@ -351,11 +351,14 @@ export const EASTBROOK_TOWN_PERF_SCENARIOS = Object.freeze([
 // road's new swing round the smithy, so their two portraits follow them;
 // every other subject holds its point.
 export const EASTBROOK_TOWN_POLISH_CAPTURE_VIEWS = Object.freeze([
+  // Studio town rework (#4593): the World Market's keeper stands by the
+  // bank's door and his stall stands with him; the target follows its front
+  // standing point and the camera stands 4.2 yd out on its public side.
   Object.freeze({
     name: 'stall-world-market',
     subject: 'eastbrook_market_stall_world_market',
-    camera: Object.freeze({ x: -16, y: 6, z: -93 }),
-    target: Object.freeze({ x: -19.517695018376127, y: 2.5, z: -95.26296354780212 }),
+    camera: Object.freeze({ x: -47.83, y: 6, z: -110.19 }),
+    target: Object.freeze({ x: -50.802047554331615, y: 2.5, z: -113.16221648075016 }),
   }),
   Object.freeze({
     name: 'stall-provisions',
@@ -369,11 +372,14 @@ export const EASTBROOK_TOWN_POLISH_CAPTURE_VIEWS = Object.freeze([
   // (-24.5, -112.5) between the square and her shop down on the strand,
   // facing the square. The target is her stand; the camera holds its 5 yd on
   // her public-facing side, toward the square.
+  // Studio town rework (#4593): she stands at her shop on the strand now,
+  // (-31.3, -119.3), facing the square; the camera keeps its 5 yd out along
+  // her facing.
   Object.freeze({
     name: 'apothecary-lin',
     subject: 'apothecary_lin',
-    camera: Object.freeze({ x: -20.96, y: 6, z: -108.96 }),
-    target: Object.freeze({ x: -24.5, y: 2.5, z: -112.5 }),
+    camera: Object.freeze({ x: -27.77, y: 6, z: -115.76 }),
+    target: Object.freeze({ x: -31.3, y: 2.5, z: -119.3 }),
   }),
   Object.freeze({
     name: 'ravenpost-mailbox',
@@ -400,11 +406,13 @@ export const EASTBROOK_TOWN_POLISH_CAPTURE_VIEWS = Object.freeze([
     camera: Object.freeze({ x: -8, y: 6, z: -110 }),
     target: Object.freeze({ x: -12.05, y: 4.5, z: -105.2 }),
   }),
+  // Studio town rework (#4593): Saul stands by the bank's quay end at
+  // (-44.27, -118.01); the camera stands 3 yd out along his facing.
   Object.freeze({
     name: 'ravenpost-chronicler',
     subject: 'chronicler_saul',
-    camera: Object.freeze({ x: 10.5, y: 6.5, z: -85 }),
-    target: Object.freeze({ x: 10.2, y: 2.5, z: -87.5 }),
+    camera: Object.freeze({ x: -42.61, y: 6.5, z: -115.51 }),
+    target: Object.freeze({ x: -44.27, y: 2.5, z: -118.01 }),
   }),
   // Re-aimed for owner round 6b's world wave: FURY is a service NPC (the honor
   // quartermaster), so he left the chapel step for the town's eastern edge at
@@ -414,12 +422,14 @@ export const EASTBROOK_TOWN_POLISH_CAPTURE_VIEWS = Object.freeze([
   // collision-clear at camera height. Re-seated again for the World of
   // ClaudeCraft Studio map's arrangement: the north road swings round the
   // smithy over his old stand, so he stands at (21, -83.5) and the camera
-  // keeps its 4.47 yd on his public-facing side.
+  // keeps its 4.47 yd on his public-facing side. Studio town rework (#4593):
+  // he stands by the chapel's strand at (0.77, -123) now, the camera still
+  // 4.47 yd out along his facing.
   Object.freeze({
     name: 'west-wall-quartermaster',
     subject: 'fury',
-    camera: Object.freeze({ x: 17.05, y: 6, z: -85.59 }),
-    target: Object.freeze({ x: 21, y: 2.5, z: -83.5 }),
+    camera: Object.freeze({ x: -3.5, y: 6, z: -121.68 }),
+    target: Object.freeze({ x: 0.77, y: 2.5, z: -123 }),
   }),
 ]);
 
@@ -458,13 +468,13 @@ export const EASTBROOK_TOWN_POLISH_MATCHED_VIEW_OVERRIDES = Object.freeze({
     camera: Object.freeze({ x: -49.32, y: 7, z: -101.42 }),
     target: Object.freeze({ x: -54.98, y: 3.2, z: -111.32 }),
   }),
-  // The smithy stands north of the square on the old chapel rise, its door
-  // looking down to the square; the camera stands 12 yd out, a step toward
-  // the forge shelter at its west end, so the shelter is in frame with the
+  // The smithy stands north of the square on the old chapel rise. Studio town
+  // rework (#4593): it turned, its door looking south-east; the target is its
+  // front standing point and the camera stands 12 yd out straight from the
   // door.
   'smithy-and-forge': Object.freeze({
-    camera: Object.freeze({ x: -12, y: 7, z: -93.65 }),
-    target: Object.freeze({ x: -8.28, y: 3, z: -81.86 }),
+    camera: Object.freeze({ x: 11.58, y: 7, z: -85.18 }),
+    target: Object.freeze({ x: 1.25, y: 3, z: -79.09 }),
   }),
   // The inn stands up the slope north of the farm plots; its kitchen yard
   // keeps its old ground beside the inn lane, so the camera stands down the
@@ -497,10 +507,11 @@ export const EASTBROOK_TOWN_POLISH_MATCHED_VIEW_OVERRIDES = Object.freeze({
   }),
   // Moved in lockstep with the polish view above for owner round 6b: this entry
   // has always mirrored that view exactly, and a matched shot aimed at the
-  // stall's vacated ground would photograph empty square.
+  // stall's vacated ground would photograph empty square (the Studio town
+  // rework, #4593, moved it again).
   'stall-world-market': Object.freeze({
-    camera: Object.freeze({ x: -16, y: 6, z: -93 }),
-    target: Object.freeze({ x: -19.517695018376127, y: 2.5, z: -95.26296354780212 }),
+    camera: Object.freeze({ x: -47.83, y: 6, z: -110.19 }),
+    target: Object.freeze({ x: -50.802047554331615, y: 2.5, z: -113.16221648075016 }),
   }),
 });
 

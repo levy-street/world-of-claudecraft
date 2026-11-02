@@ -25,7 +25,7 @@ const CHAPEL = paintedTownBuilding({
   kind: 'chapel',
   model: 'hall',
   look: LOOK,
-  anchor: { x: -52.68, z: 1607.43 },
+  anchor: { x: -49.28, z: 1608.63 }, // Studio town rework (#4593): nudged off the road band
   rotation: 5.969, // Studio town rework (#4593)
   scale: 1.2,
 });
@@ -36,7 +36,8 @@ const TRADE_HALL = paintedTownBuilding({
   kind: 'house',
   model: 'shop_a',
   look: LOOK,
-  anchor: { x: -13.64, z: 1573.14 },
+  // Studio town rework (#4593): 6 yd south, off the road band and the caravan start
+  anchor: { x: -13.64, z: 1566.84 },
   rotation: 1.5882, // Studio town rework (#4593)
   scale: 1.5,
 });
@@ -47,7 +48,7 @@ const SHELF_HOUSE = paintedTownBuilding({
   kind: 'house',
   model: 'house_c',
   look: LOOK,
-  anchor: { x: -49.12, z: 1555.48 },
+  anchor: { x: -49.32, z: 1555.38 }, // Studio town rework (#4593): nudged off the road band
   rotation: 4.1713, // Studio town rework (#4593)
   scale: 1.4,
 });
@@ -62,7 +63,8 @@ const BUILDINGS = [CHAPEL, TRADE_HALL, SHELF_HOUSE] as const;
 const GROUND: readonly TownGround[] = [
   { building: CHAPEL, height: 2.5, columns: 2, rows: 3, taper: 4, apron: 8 },
   { building: TRADE_HALL, height: 1.5, columns: 2, rows: 2, taper: 4, apron: 8 },
-  { building: SHELF_HOUSE, height: 5.5, columns: 2, rows: 2, taper: 4, apron: 6 },
+  // Studio town rework (#4593): a wider apron eases the bank west of its new site
+  { building: SHELF_HOUSE, height: 5.5, columns: 2, rows: 2, taper: 4, apron: 9 },
 ];
 
 // Hearthkeeper Maeve keeps the lodge (her old spot was the kit lodge's door): a

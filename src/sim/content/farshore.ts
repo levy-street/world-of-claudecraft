@@ -46,7 +46,7 @@ export const FARSHORE_ZONE: ZoneDef = {
   levelRange: [3, 7],
   biome: 'vale',
   hub: { x: 305, z: 70, radius: 15, name: 'Gullhaven' },
-  graveyard: { x: 296.4, z: 91.1 },
+  graveyard: { x: 295.2, z: 90.6 },
   lakes: [
     { x: 388, z: 26, radius: 8 }, // the Hilltop Spring, under the Watch Meadow
     // Gull Mere, the fishing town's actual water (the packet review's R55).

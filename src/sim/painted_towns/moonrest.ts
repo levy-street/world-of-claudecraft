@@ -33,7 +33,7 @@ const INN = paintedTownBuilding({
   kind: 'inn',
   model: 'tavern',
   look: LOOK,
-  anchor: { x: -343.21, z: 1395.14 },
+  anchor: { x: -343.21, z: 1394.54 }, // Studio town rework (#4593): nudged off the road band
   rotation: 3.6303, // Studio town rework (#4593) HUB),
   scale: 1.2,
 });
@@ -58,7 +58,7 @@ const HOUSE = paintedTownBuilding({
   kind: 'house',
   model: 'house_c',
   look: LOOK,
-  anchor: { x: -380.76, z: 1445.52 },
+  anchor: { x: -382.58, z: 1449.91 }, // Studio town rework (#4593): nudged off the road band
   rotation: 5.9865, // Studio town rework (#4593) HUB),
   scale: 1.4,
 });

@@ -28,6 +28,9 @@ export const ZONE3_ZONE: ZoneDef = {
   levelRange: [13, 20],
   biome: 'peaks',
   hub: { x: 0, z: 660, radius: 20, name: 'Highwatch' },
+  // The Studio town rework (#4593) stood quest givers beyond the hub circle;
+  // the town's quest and focus circle widens to hold them (professions/focus.ts).
+  questHub: { x: -1, z: 697, radius: 39 },
   graveyard: { x: 12.8, z: 738.8 },
   lakes: [{ x: -70, z: 760, radius: 18 }],
   pois: [
@@ -1228,7 +1231,9 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
     id: 'scout_maren_highwatch',
     name: 'Scout Maren',
     title: "Marshal's Scout",
-    pos: { x: 18.25, z: 674.63 },
+    // Studio town rework (#4593): stood on the map's spot, a step off the
+    // inn's porch so her body clears its collision
+    pos: { x: 17.5, z: 674.63 },
     facing: -2.4,
     color: 0x6e8b3d,
     questIds: ['q_ogre_edges', 'q_ogre_totems', 'q_korgath'],
@@ -1239,7 +1244,10 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
     id: 'quartermaster_bree',
     name: 'Quartermaster Bree',
     title: 'Highwatch Quartermaster',
-    pos: { x: -28.91, z: 672.99 },
+    // Studio town rework (#4593): the map's spot, nudged 2.6 yd south-west so
+    // her gated stock stays out of harvest reach of herb_thornpeak_2 and she
+    // stays on the hub's plateau
+    pos: { x: -29.5, z: 670.5 },
     facing: 1.6,
     color: 0xca8a2a,
     questIds: ['q_stalker_pelts', 'q_stalker_cloaks', 'q_glowing_wax'],
@@ -1479,7 +1487,9 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
     id: 'farmer_hollis',
     name: 'Farmer Hollis',
     title: 'Highwatch Terrace Farmer',
-    pos: { x: -50.96, z: 652.48 },
+    // Studio town rework (#4593): the map's spot, nudged a yard toward the
+    // beds so the nearest one is inside trade reach
+    pos: { x: -50.5, z: 651.5 },
     facing: Math.PI,
     color: 0x8c6a4a,
     questIds: [],

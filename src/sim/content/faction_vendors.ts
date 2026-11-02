@@ -996,7 +996,8 @@ export const FACTION_VENDOR_NPCS: Record<string, NpcDef> = {
     name: 'Taskmaster Kaelen',
     title: 'World Quest Taskmaster',
     pos: { x: -72.33, z: -94.12 },
-    facing: 1.042,
+    // Studio town rework (#4593): the shipped facing (the map turned him 180 degrees)
+    facing: -2.1,
     color: 0x8a6a50,
     questIds: [],
     worldQuestBoard: true,

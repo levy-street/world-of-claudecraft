@@ -390,12 +390,14 @@ describe('the Highwatch layout', () => {
     expect(start).toBeGreaterThan(0);
     expect(live.slice(start, start + pads.length)).toEqual([...pads]);
     expect(live.length).toBeGreaterThan(start + pads.length + after);
+    // the Studio town rework (#4593) set each pad to the height the map
+    // sculpted round its building
     const expected: Record<string, number> = {
-      highwatch_summit_inn: 9,
-      highwatch_gate_chapel: 8.8,
-      highwatch_counting_house: 8.8,
-      highwatch_watch_house: 7.6,
-      highwatch_smithy: 10.6,
+      highwatch_summit_inn: 11.33,
+      highwatch_gate_chapel: 20.7,
+      highwatch_counting_house: 15.7,
+      highwatch_watch_house: 8.5,
+      highwatch_smithy: 15.7,
       highwatch_guild: 9,
     };
     for (const building of BUILDINGS) {
@@ -406,14 +408,14 @@ describe('the Highwatch layout', () => {
         );
       }
     }
-    // the square stays the shelf it was
+    // the square stays a level shelf, at the map's height for it (11)
     for (const point of [
       { x: 0, z: 660 },
       { x: 6, z: 654 },
       { x: -5, z: 668 },
       { x: 0, z: 672 },
     ]) {
-      expect(terrainHeight(point.x, point.z, SEED), `${point.x},${point.z}`).toBeCloseTo(9, 1);
+      expect(terrainHeight(point.x, point.z, SEED), `${point.x},${point.z}`).toBeCloseTo(11, 1);
     }
   });
 
@@ -446,10 +448,12 @@ describe('the Highwatch layout', () => {
 
   it('stands no street lamp on a building, and drops the one that stood on the watch house', () => {
     const lamps = streetlampPlacements(SEED);
-    // the town's roads keep their lamps
+    // the town's roads keep their lamps (eight since the Studio town rework,
+    // #4593: its re-drawn Fenbridge road plans one more on the watch house's
+    // corner, which the live touch-up excludes)
     expect(
       lamps.filter((lamp) => Math.hypot(lamp.x, lamp.z - 660) < 90).length,
-    ).toBeGreaterThanOrEqual(9);
+    ).toBeGreaterThanOrEqual(8);
     for (const building of BUILDINGS) {
       for (const lamp of lamps) {
         expect(distancePointToObb(lamp, building.reach), `${building.id} lamp`).toBeGreaterThan(

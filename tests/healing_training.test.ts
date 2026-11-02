@@ -297,6 +297,12 @@ describe('Healing Training Ground: Chronomancer mechanics', () => {
     );
     expect(combatDummy).toBeDefined();
     if (!combatDummy) return;
+    // The Studio town rework (#4593) made the hub dummy's Sableweb mark its
+    // native one, 31 yd from this retired ground, so this mechanics check
+    // stands it back on its old quay mark beside the ground, in casting range.
+    combatDummy.pos = sim.groundPos(-86, -50);
+    combatDummy.prevPos = { ...combatDummy.pos };
+    sim.rebucket(combatDummy);
 
     // Apply Temporal Echo on the healing dummy
     sim.targetEntity(scout.id);

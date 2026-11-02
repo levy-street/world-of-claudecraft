@@ -40,7 +40,7 @@ const SHRINE = paintedTownBuilding({
   kind: 'chapel',
   model: 'hall',
   look: LOOK,
-  anchor: { x: 2.33, z: 968.41 },
+  anchor: { x: -2.27, z: 970.55 }, // Studio town rework (#4593): nudged off the treant camp
   rotation: 3.4208, // Studio town rework (#4593)
   scale: 1,
 });
@@ -62,7 +62,7 @@ const SMITHY = paintedTownBuilding({
   kind: 'house',
   model: 'smithy',
   look: LOOK,
-  anchor: { x: -58.58, z: 1061.97 },
+  anchor: { x: -59.41, z: 1061.41 }, // Studio town rework (#4593): nudged off the road band
   rotation: 4.5379, // Studio town rework (#4593)
   scale: 1.3,
 });
@@ -72,7 +72,7 @@ const WAYHOUSE = paintedTownBuilding({
   kind: 'house',
   model: 'house_c',
   look: LOOK,
-  anchor: { x: -91.6, z: 991.9 },
+  anchor: { x: -91.75, z: 991.16 }, // Studio town rework (#4593): nudged off the road band
   rotation: 2.5656, // Studio town rework (#4593)
   scale: 1.4,
 });

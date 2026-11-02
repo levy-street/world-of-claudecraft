@@ -95,10 +95,10 @@ describe('Eastbrook hub training dummy', () => {
   });
 
   it('stands on its authored mark, on dry standable ground, north of the player start', () => {
-    // The Studio town rework (#4593) mark, as a literal: the touch-up's object
-    // move, which the spawn resolves over the content constant.
-    expect(HUB_TRAINING_DUMMY_MARK.x).toBeCloseTo(-71.1953, 4);
-    expect(HUB_TRAINING_DUMMY_MARK.z).toBeCloseTo(-6.5587, 4);
+    // The Studio town rework (#4593) mark, as a literal: the map's spot, the
+    // native content constant now (no touch-up object move rides over it).
+    expect(HUB_TRAINING_DUMMY_MARK).toEqual({ x: -71.2, z: -6.56 });
+    expect(HUB_TRAINING_DUMMY_MARK).toBe(HUB_TRAINING_DUMMY_POS);
     const { x, z } = HUB_TRAINING_DUMMY_MARK;
     // Ground the sim can spawn on: not inside a prop or building, above water.
     expect(isBlocked(SEED, x, z, 0.5)).toBe(false);

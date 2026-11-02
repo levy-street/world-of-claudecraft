@@ -145,11 +145,14 @@ export function applyFocusTierBonus(
 // Eastbrook/Fenbridge/Highwatch), the same footprint the world generator
 // flattens into a plateau and the road/prop generation treats as town. That
 // hub circle IS the town-tag stand-in this feature uses: a lightweight
-// zone-tag check, not a real crafting-station build-out.
+// zone-tag check, not a real crafting-station build-out. A town that spread
+// past its hub (the Studio town rework, #4593) carries a wider `questHub`
+// circle, which wins; the hub keeps shaping the terrain either way.
 export function isInTownZone(pos: { x: number; z: number }, zone: ZoneDef): boolean {
-  const dx = pos.x - zone.hub.x;
-  const dz = pos.z - zone.hub.z;
-  return dx * dx + dz * dz <= zone.hub.radius * zone.hub.radius;
+  const town = zone.questHub ?? zone.hub;
+  const dx = pos.x - town.x;
+  const dz = pos.z - town.z;
+  return dx * dx + dz * dz <= town.radius * town.radius;
 }
 
 export interface SetTownFocusResult {

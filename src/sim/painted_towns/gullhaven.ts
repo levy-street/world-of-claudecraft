@@ -62,7 +62,7 @@ const WATCH_HOUSE = paintedTownBuilding({
   kind: 'house',
   model: 'house_a',
   look: LOOK,
-  anchor: { x: 303.8, z: 51.33 },
+  anchor: { x: 304.28, z: 50.18 }, // Studio town rework (#4593): nudged off the road band
   rotation: 3.1416, // Studio town rework (#4593)
   scale: 1.4,
 });

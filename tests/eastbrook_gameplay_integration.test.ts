@@ -732,10 +732,11 @@ describe('Eastbrook authored gameplay data integration', () => {
     // here as the non-layout Eastbrook placement; the world-side proof (never
     // nudged, beside the beds, off the road) lives in
     // tests/farmer_npc_placement.test.ts. The Studio town rework (#4593)
-    // moved her with the allotments to the ground west of the bank quay.
+    // moved her with the allotments to the ground west of the bank quay, and
+    // she turns to face their beds there.
     expect(ZONE1_NPCS.farmer_jessica).toMatchObject({
       pos: { x: -85.26, z: -71.07 },
-      facing: -Math.PI / 2,
+      facing: 2.655,
       farmer: true,
     });
     expect(ZONE1_NPCS.farmer_jessica.dynamic).toBeUndefined();
@@ -850,7 +851,9 @@ describe('Eastbrook authored gameplay data integration', () => {
         id: 'station_highwatch_apothecary',
         type: 'apothecary',
         zoneId: 'thornpeak_heights',
-        pos: { x: 7, z: 660 },
+        // the Studio town rework (#4593) moved Alchemist Verane, and her bench
+        // follows her
+        pos: { x: -38.17, z: 692.29 },
         masterNpcId: 'alchemist_verane',
       },
     ]);

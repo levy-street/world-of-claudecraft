@@ -58,17 +58,20 @@ export const OVERWORLD_GRAVEYARDS: GraveyardDef[] = [
   // the nearest, so death in any new realm returns you locally, not to a far-off
   // strip graveyard across a sealed border.
   { id: 'gy_veiled_hollow', name: 'Eldershine Rest', x: -53.1, z: 1009.1 },
-  { id: 'gy_farshore', name: 'Gullhaven Rest', x: 296.4, z: 91.1 },
+  // Studio town rework (#4593): each moved yard nudged clear of the moved
+  // buildings (Gullhaven inn, Bridgemere barrow chapel, Moonrest shrine) and,
+  // at Dawnrest, up off the waterline. Each zone's graveyard field agrees.
+  { id: 'gy_farshore', name: 'Gullhaven Rest', x: 295.2, z: 90.6 },
   // At the zone's own graveyard field (willowfen.ts): the old (-346, 338) spot
   // sits inside Bridgemere's moat ring, below WATER_LEVEL, and the Pale Keeper
   // spawned underwater there.
-  { id: 'gy_willowfen', name: 'Willowfen Barrow', x: -341, z: 305.5 },
+  { id: 'gy_willowfen', name: 'Willowfen Barrow', x: -338.8, z: 301.6 },
   { id: 'gy_galecrest', name: 'Galecrest Rest', x: 406.9, z: 343.7 },
   { id: 'gy_palmreach', name: 'Palmreach Rest', x: -318, z: 802 },
   // inside Hedgewick's churchyard, east of the chapel so the Pale Keeper
   // hovers over the headstones clear of the chapel's collider
   { id: 'gy_evergarden', name: 'Evergarden Rest', x: 316, z: 801.7 },
-  { id: 'gy_nightbloom', name: 'Nightbloom Rest', x: -390.1, z: 1407.6 },
+  { id: 'gy_nightbloom', name: 'Nightbloom Rest', x: -392.7, z: 1414.6 },
   { id: 'gy_wraithwood', name: 'Wraithwood Graves', x: 378, z: 1412 },
   { id: 'gy_frostveil', name: 'Frostveil Barrow', x: -34, z: 1576 },
   { id: 'gy_drakelands', name: 'Drakelands Cairns', x: 422, z: 1885 },
@@ -76,7 +79,7 @@ export const OVERWORLD_GRAVEYARDS: GraveyardDef[] = [
   // The Proving Shore (tutorial island). Appended LAST: spirit healers spawn
   // in this array's order, so a mid-array insert would renumber every later
   // healer's entity id for no reason (the camps append-last discipline).
-  { id: 'gy_proving_shore', name: 'Dawnrest Graves', x: -317.1, z: 62.7 },
+  { id: 'gy_proving_shore', name: 'Dawnrest Graves', x: -320.1, z: 59.7 },
   // The Last Keep churchyard (Drakelands). The rebuilt keep's headstone
   // cluster south of its chapel (DRAKELANDS_PROPS.graveyards) had stones but no
   // record, so every death at the keep released at the Wyrmwatch cairns,
