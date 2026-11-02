@@ -365,9 +365,11 @@ function redeem(
 }
 
 /** Called only for authoritative successful turn-ins, dungeon clears, and eligible boss kills.
- * Each player's quest credit is personal. A later shared dungeon clear catches up a quest
- * they already turned in alone. Tutorial has no dungeon; the assigned pair's
- * reunion recovers its stamp once both have completed the final tutorial quest.
+ * A dungeon stamp is earned by the kill: when BOTH assigned characters are eligible for the
+ * milestone dungeon's final boss kill, both are credited whether or not either holds or has
+ * turned in the milestone quest. A turn-in with the friend in the party still credits the
+ * player who turned it in. Tutorial has no dungeon; the assigned pair's reunion recovers its
+ * stamp once both have completed the final tutorial quest.
  * Raid evidence requires BOTH assigned characters to be eligible for that actual boss kill.
  * Credit may arrive out of order; redemption remains in milestone order. */
 export function creditReferralCard(
@@ -405,7 +407,9 @@ export function creditReferralCard(
   for (let i = 0; i < 2; i++) {
     const character = context.characters[i];
     if (event.type === 'questTurnIn' && event.characterId !== character.characterId) continue;
-    if (questId && !character.completedQuestIds.includes(questId)) continue;
+    // The boss kill itself is the dungeon milestone; only turn-in credit reads the quest log.
+    if (event.type === 'questTurnIn' && questId && !character.completedQuestIds.includes(questId))
+      continue;
     next.participants[i].credited |= bit;
   }
   if (next.participants.every((p, i) => p.credited === state.participants[i].credited))
