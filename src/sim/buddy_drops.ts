@@ -2,7 +2,9 @@
 // turns a pending companion into an owned one once the player walks out.
 //
 // The roll is INDIVIDUAL: every eligible player draws their own chance for
-// every companion the boss carries (content/buddy_sources.ts), so nobody
+// every companion the boss carries (content/buddy_sources.ts). The per-player
+// chance grows when fewer than BUDDY_FULL_GROUP players share the kill, so the
+// kill's total odds stay fixed (buddyChancePerPlayer). Nobody
 // loses a roll to a party member and there is no corpse item to need/greed.
 // A win attaches as a PENDING buddy with a presence line (buddies.ts
 // attachPendingBuddy); the sweep below reveals it on the zone-out (instance
@@ -23,6 +25,7 @@ import {
   BUDDY_DEED_REWARDS,
   BUDDY_WORLD_REVEAL_DISTANCE,
   buddyBossDropsFor,
+  buddyChancePerPlayer,
 } from './content/buddy_sources';
 import { spawnBuddyEntity } from './pet/buddy_ai';
 import type { InstanceSlot, PlayerMeta } from './sim';
@@ -30,8 +33,8 @@ import type { SimContext } from './sim_context';
 import { dist2d, type Entity } from './types';
 
 /** Roll the boss's companions for every recipient. `inst` is the claim the
- *  boss died inside (null for an open-world boss); it decides the heroic rate
- *  and whether the reveal waits for a zone-out or for distance. */
+ *  boss died inside (null for an open-world boss); it decides whether a
+ *  heroic-only row rolls and whether the reveal waits for a zone-out or for distance. */
 export function rollBossBuddyDrops(
   ctx: SimContext,
   boss: Entity,
@@ -45,7 +48,8 @@ export function rollBossBuddyDrops(
   for (const meta of recipients) {
     for (const row of rows) {
       if (row.heroicOnly && !heroic) continue;
-      const chance = heroic ? (row.heroicChance ?? row.chance) : row.chance;
+      // A group under BUDDY_FULL_GROUP splits the full group's total odds.
+      const chance = buddyChancePerPlayer(row.chance, recipients.length);
       // Draw even for a companion this player already has: the draw count
       // per (player, row) stays fixed across a party whatever each member
       // owns, so one collector cannot shift another's stream.
