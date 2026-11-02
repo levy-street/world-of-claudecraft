@@ -4,7 +4,8 @@ import { describe, expect, it, vi } from 'vitest';
 // (ClientWorld): the ball, its fuse and its radius, both portals, the marks and the
 // load, the load's speed as the client's own motion kernel reads it, the crossing
 // bumping the movement epoch (how the client reconciles a teleport), the throw through
-// the ordinary interact command. Db is mocked (mirrors smith_heart_breath_wire.test.ts).
+// the ordinary interact command; then phase 2's round, its second pair (C and D)
+// mirrored and crossing C to D. Db is mocked (mirrors smith_heart_breath_wire.test.ts).
 vi.mock('../server/db', () => ({
   pool: { query: vi.fn(async () => ({ rows: [] })) },
   saveCharacterState: vi.fn(async () => {}),
@@ -142,5 +143,45 @@ describe('the Knotted Gale over the wire', () => {
     expect([...client.entities.values()].some((e: Any) => e.templateId === BREATH_GUARDIAN)).toBe(
       true,
     );
+
+    // Phase 2's round over the wire: two balls, both pairs of portals mirrored, and
+    // the second pair carries C to D (never to A or B), bumping the epoch too.
+    sim.chat('/dev heart breath heart 2', a.pid);
+    run(0.5);
+    expect(objects(BREATH_OBJECTS.knotPrefix)).toHaveLength(2);
+    expect(mirror().auras.some((x: Any) => x.id === BREATH_AURAS.portalA)).toBe(true);
+    run(T.heartMark);
+    for (const o of ['portalA', 'portalB', 'portalC', 'portalD'] as const)
+      expect(objects(BREATH_OBJECTS[o]), o).toHaveLength(1);
+    const at = (o: 'portalA' | 'portalB' | 'portalC' | 'portalD') =>
+      sim.entities.get(objects(BREATH_OBJECTS[o])[0].id);
+    const C = at('portalC');
+    const D = at('portalD');
+    // Off every mouth first.
+    serverMe.pos.x = (C.pos.x + D.pos.x) / 2 + T.heartPortalR * 3;
+    serverMe.pos.z = (C.pos.z + D.pos.z) / 2;
+    run(0.2);
+    const epoch2 = a.session.movementOverrideEpoch;
+    serverMe.pos.x = C.pos.x;
+    serverMe.pos.z = C.pos.z;
+    run(0.2);
+    // Empty-handed, the wind may nudge him a step after the landing: still in D's mouth.
+    expect(Math.hypot(serverMe.pos.x - D.pos.x, serverMe.pos.z - D.pos.z)).toBeLessThan(
+      T.heartPortalR,
+    );
+    expect(a.session.movementOverrideEpoch).toBeGreaterThan(epoch2);
+    expect(Math.hypot(mirror().pos.x - D.pos.x, mirror().pos.z - D.pos.z)).toBeLessThan(
+      T.heartPortalR,
+    );
+    for (const o of ['portalA', 'portalB'] as const) {
+      const p = at(o);
+      expect(Math.hypot(serverMe.pos.x - p.pos.x, serverMe.pos.z - p.pos.z)).toBeGreaterThan(
+        T.heartPortalR,
+      );
+    }
+    sim.chat('/dev heart breath reset', a.pid);
+    run(0.2);
+    for (const o of ['portalA', 'portalB', 'portalC', 'portalD'] as const)
+      expect(objects(BREATH_OBJECTS[o]), o).toHaveLength(0);
   });
 });

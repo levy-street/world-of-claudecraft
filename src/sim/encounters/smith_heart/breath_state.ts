@@ -84,18 +84,33 @@ export interface BreathKnot {
   carrierId: number | null;
 }
 
+/** Mythic: one open portal of the Knotted Gale (instance-local place). */
+export interface BreathPortal {
+  objectId: number;
+  x: number;
+  z: number;
+}
+
 /** Mythic: one round of the Knotted Gale (breath_heart.ts). */
 export interface BreathHeart {
   knots: BreathKnot[];
+  /** How many pairs of portals this round opens: 1 (A and B, phase 1's one
+   *  ball) or 2 (A and B, C and D, phase 2's two balls). */
+  pairs: 1 | 2;
   /** Seconds left on the portal marks (0: they have ended). */
   mark: number;
   /** Who wears each mark (null: none, or a dev force opened it). */
   markA: number | null;
   markB: number | null;
+  markC: number | null;
+  markD: number | null;
   /** Who may not take a ball this round (the marks' players). */
   bearers: number[];
-  portalA: { objectId: number; x: number; z: number } | null;
-  portalB: { objectId: number; x: number; z: number } | null;
+  /** The portals: A links to B only, C to D only. */
+  portalA: BreathPortal | null;
+  portalB: BreathPortal | null;
+  portalC: BreathPortal | null;
+  portalD: BreathPortal | null;
   /** The last spot on the floor of each marked player and carrier: where a
    *  portal opens or a ball drops when its body has left the floor. */
   floorSpots: Record<number, { x: number; z: number }>;

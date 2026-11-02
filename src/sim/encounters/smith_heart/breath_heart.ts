@@ -6,11 +6,13 @@
 //                 bursts and wipes the raid.
 //   The portals   two non-tanks are marked; after 5 s Portal A and Portal B open
 //                 exactly where each stands (a body that fell through a gap
-//                 opens it at the lip it left). No second chance.
+//                 opens it at the lip it left). No second chance. Phase 2's
+//                 two-ball round marks four: a second pair, Portal C and
+//                 Portal D, opens the same way, so the raid works both balls.
 //   The carrier   a third player walks onto the ball and takes it up: a crawl,
 //                 and no wind, pull, blast or throw moves them (heldFast).
-//   The crossing  anyone walking into either portal comes out at the other, ball
-//                 or no ball: the carrier may go out empty-handed for a far ball
+//   The crossing  anyone walking into a portal comes out at its partner (A and
+//                 B, C and D; never A to C), ball or no ball: the carrier may go out empty-handed for a far ball
 //                 and come back with it. Once per walk in: a body must step clear
 //                 before it can cross again.
 //   The throw     the interact press at the lip of ANY gap ends that ball (the
@@ -19,13 +21,17 @@
 //   A dead carrier drops it where they fell, still ticking, for anyone but the
 //                 marked to take up.
 //   When          phase 1: up to three times, a start waiting out the indrawn
-//                 breath; phase 2: two balls, still one pair of portals, about
+//                 breath; phase 2: two balls and two pairs of portals, about
 //                 every 60 s, never during the barrage. Thessaly's circles do
 //                 not change: an anchored player still walks through a portal.
 //
 // A group too small to spare a third player (a dev run alone) may carry on a
 // marked player's back, and a missing Portal B opens at the nearest lip, so the
-// round can still be played: a raid never meets either rule.
+// round can still be played. The second pair falls back the same way: a
+// missing Portal D opens at the lip nearest Portal C, and with nobody left to
+// wear Portal C either, C opens where the second ball fell and D at the lip
+// nearest it (never on a lip the first pair already holds while another is
+// free). A raid never meets any of these rules.
 //
 // Deterministic: zero rng (the picks are hashed). Every visible state rides the
 // wire as it is: the balls and portals are objects, the fuse is in the ball's
@@ -66,11 +72,41 @@ import {
   raidWarn,
   spawnBreathObject,
 } from './breath_scope';
-import type { BreathFightState, BreathHeart, BreathKnot } from './breath_state';
+import type { BreathFightState, BreathHeart, BreathKnot, BreathPortal } from './breath_state';
 
-type Side = 'A' | 'B';
+type Side = 'A' | 'B' | 'C' | 'D';
 
-const MARK_AURA = { A: BREATH_AURAS.portalA, B: BREATH_AURAS.portalB } as const;
+/** Every side in order: the first pair, then the second. */
+const SIDES: readonly Side[] = ['A', 'B', 'C', 'D'];
+const FIRST_PAIR: readonly Side[] = ['A', 'B'];
+/** Each portal's one partner: A and B, C and D; never across the pairs. */
+const PARTNER: Readonly<Record<Side, Side>> = { A: 'B', B: 'A', C: 'D', D: 'C' };
+const MARK_AURA = {
+  A: BREATH_AURAS.portalA,
+  B: BREATH_AURAS.portalB,
+  C: BREATH_AURAS.portalC,
+  D: BREATH_AURAS.portalD,
+} as const;
+const MARK_KEY = { A: 'markA', B: 'markB', C: 'markC', D: 'markD' } as const;
+const PORTAL_KEY = { A: 'portalA', B: 'portalB', C: 'portalC', D: 'portalD' } as const;
+const PORTAL_OBJECT = {
+  A: BREATH_OBJECTS.portalA,
+  B: BREATH_OBJECTS.portalB,
+  C: BREATH_OBJECTS.portalC,
+  D: BREATH_OBJECTS.portalD,
+} as const;
+const PORTAL_NAME = {
+  A: BREATH_NAMES.portalA,
+  B: BREATH_NAMES.portalB,
+  C: BREATH_NAMES.portalC,
+  D: BREATH_NAMES.portalD,
+} as const;
+const secondPair = (side: Side) => side === 'C' || side === 'D';
+
+/** The sides this round opens: A and B, plus C and D in a two-pair round. */
+function sidesOf(heart: BreathHeart): readonly Side[] {
+  return heart.pairs === 2 ? SIDES : FIRST_PAIR;
+}
 
 // ---- the round's start --------------------------------------------------------------------
 
@@ -92,7 +128,8 @@ function cue(s: BreathScope, ability: string, lx: number, lz: number, r: number)
   });
 }
 
-/** A round now: `count` balls and the two marks. Exported for the dev trigger. */
+/** A round now: `count` balls and their marks (one pair of portals for one
+ *  ball, two pairs for two). Exported for the dev trigger. */
 export function startHeart(s: BreathScope, count: number): boolean {
   const st = s.st;
   if (st.heart || s.players.length === 0) return false;
@@ -100,15 +137,23 @@ export function startHeart(s: BreathScope, count: number): boolean {
   const busy = new Set<number>();
   if (st.cradle) busy.add(st.cradle.playerId);
   if (st.drawn) busy.add(st.drawn.playerId);
-  const [a, b] = pickMarks(s, 2, busy);
+  const pairs = count >= 2 ? 2 : 1;
+  // The hashed pick in order: its first two are phase 1's A and B exactly.
+  const marked = pickMarks(s, pairs * 2, busy);
+  const [a, b, c, d] = marked;
   const heart: BreathHeart = {
     knots: [],
+    pairs,
     mark: T.heartMark,
     markA: a?.id ?? null,
     markB: b?.id ?? null,
-    bearers: [a, b].flatMap((p) => (p ? [p.id] : [])),
+    markC: c?.id ?? null,
+    markD: d?.id ?? null,
+    bearers: marked.map((p) => p.id),
     portalA: null,
     portalB: null,
+    portalC: null,
+    portalD: null,
     floorSpots: {},
     crossed: [],
     presses: [],
@@ -136,8 +181,10 @@ export function startHeart(s: BreathScope, count: number): boolean {
     cue(s, BREATH_CUES.knotLand, at.x, at.z, T.heartPickR);
   }
   st.lastKnots = dropped;
-  if (a) putMarker(a, BREATH_AURAS.portalA, BREATH_NAMES.portalA, T.heartMark, s.boss.id);
-  if (b) putMarker(b, BREATH_AURAS.portalB, BREATH_NAMES.portalB, T.heartMark, s.boss.id);
+  marked.forEach((p, i) => {
+    const side = SIDES[i];
+    putMarker(p, MARK_AURA[side], PORTAL_NAME[side], T.heartMark, s.boss.id);
+  });
   raidWarn(
     s,
     s.boss,
@@ -149,25 +196,31 @@ export function startHeart(s: BreathScope, count: number): boolean {
       a: a.name,
       b: b.name,
     });
+  if (c && d)
+    raidWarn(s, s.boss, 'knotPortals2', `Portal C on ${c.name}, Portal D on ${d.name}!`, {
+      c: c.name,
+      d: d.name,
+    });
   return true;
 }
 
 // ---- the portals --------------------------------------------------------------------------
 
 function openPortal(s: BreathScope, heart: BreathHeart, side: Side, at: { x: number; z: number }) {
-  const key = side === 'A' ? 'portalA' : 'portalB';
+  const key = PORTAL_KEY[side];
   dropBreathObject(s.ctx, s.inst, heart[key]?.objectId ?? null);
   const e = spawnBreathObject(
     s.ctx,
     s.inst,
-    side === 'A' ? BREATH_OBJECTS.portalA : BREATH_OBJECTS.portalB,
-    side === 'A' ? BREATH_NAMES.portalA : BREATH_NAMES.portalB,
+    PORTAL_OBJECT[side],
+    PORTAL_NAME[side],
     at.x,
     at.z,
     T.heartPortalR,
   );
   heart[key] = { objectId: e.id, x: at.x, z: at.z };
-  cue(s, BREATH_CUES.portalOpen, at.x, at.z, T.heartPortalR);
+  const open = secondPair(side) ? BREATH_CUES.portalOpenPair2 : BREATH_CUES.portalOpen;
+  cue(s, open, at.x, at.z, T.heartPortalR);
   // Whoever it opened under (its own marked player) has not walked in.
   for (const p of s.players) {
     const here = local(s.ctx, s.inst, p);
@@ -175,25 +228,31 @@ function openPortal(s: BreathScope, heart: BreathHeart, side: Side, at: { x: num
   }
 }
 
-function inPortal(at: { x: number; z: number }, portal: BreathHeart['portalA']): boolean {
+function inPortal(at: { x: number; z: number }, portal: BreathPortal | null): boolean {
   return portal !== null && Math.hypot(at.x - portal.x, at.z - portal.z) < T.heartPortalR;
 }
 
-/** Everyone on the floor walking into an open portal comes out at the other. */
+/** The first open portal (in side order) a spot stands in, or null. */
+function portalUnder(heart: BreathHeart, at: { x: number; z: number }): Side | null {
+  for (const side of SIDES) if (inPortal(at, heart[PORTAL_KEY[side]])) return side;
+  return null;
+}
+
+/** Everyone on the floor walking into an open portal comes out at its
+ *  partner (A and B, C and D), once both of the pair are open. */
 function stepPortals(s: BreathScope, heart: BreathHeart): void {
-  const A = heart.portalA;
-  const B = heart.portalB;
-  if (!A || !B) return;
+  if (SIDES.every((side) => heart[PORTAL_KEY[side]] === null)) return;
   for (const p of s.players) {
     const at = local(s.ctx, s.inst, p);
-    const inA = inPortal(at, A);
-    if (!inA && !inPortal(at, B)) {
+    const side = portalUnder(heart, at);
+    if (side === null) {
       heart.crossed = heart.crossed.filter((id) => id !== p.id);
       continue;
     }
+    const to = heart[PORTAL_KEY[PARTNER[side]]];
+    if (!to) continue;
     if (heart.crossed.includes(p.id) || !onFloor(p, at) || p.carriedBy !== undefined) continue;
     heart.crossed.push(p.id);
-    const to = inA ? B : A;
     const o = s.ctx.instanceOriginOf(s.inst);
     displacePlayer(s.ctx, p, { x: o.x + to.x, z: o.z + to.z, facing: p.facing }, KNOT_HOP_TEXT);
     s.ctx.emit({
@@ -202,14 +261,20 @@ function stepPortals(s: BreathScope, heart: BreathHeart): void {
       targetId: p.id,
       school: 'nature',
       fx: 'nova',
-      ability: BREATH_CUES.portalHop,
+      ability: secondPair(side) ? BREATH_CUES.portalHopPair2 : BREATH_CUES.portalHop,
     });
   }
 }
 
 /** Where a mark's portal opens: at its player's feet; if they have left the
- *  floor, the last spot they stood on it (the lip they fell from). */
-function markSpot(s: BreathScope, heart: BreathHeart, id: number | null): { x: number; z: number } {
+ *  floor, the last spot they stood on it (the lip they fell from); with no
+ *  trace of them, `home`. */
+function markSpot(
+  s: BreathScope,
+  heart: BreathHeart,
+  id: number | null,
+  home: { x: number; z: number } = firstBall(heart),
+): { x: number; z: number } {
   const p = id === null ? undefined : s.ctx.entities.get(id);
   if (p) {
     const at = local(s.ctx, s.inst, p);
@@ -217,7 +282,24 @@ function markSpot(s: BreathScope, heart: BreathHeart, id: number | null): { x: n
   }
   const last = id === null ? undefined : heart.floorSpots[id];
   if (last) return last;
+  return home;
+}
+
+function firstBall(heart: BreathHeart): { x: number; z: number } {
   return { x: heart.knots[0]?.x ?? BREATH.cornice.x, z: heart.knots[0]?.z ?? BREATH.cornice.z };
+}
+
+/** Where the round's second ball fell (the second pair's fallback home). */
+function secondDrop(s: BreathScope, heart: BreathHeart): { x: number; z: number } {
+  return s.st.lastKnots[1] ?? s.st.lastKnots[0] ?? firstBall(heart);
+}
+
+/** Every open portal's spot (a fallback lip keeps clear of them). */
+function openSpots(heart: BreathHeart): { x: number; z: number }[] {
+  return SIDES.flatMap((side) => {
+    const o = heart[PORTAL_KEY[side]];
+    return o ? [{ x: o.x, z: o.z }] : [];
+  });
 }
 
 /** Every marked player's and carrier's last spot on the floor. */
@@ -229,18 +311,16 @@ function noteFloorSpots(s: BreathScope, heart: BreathHeart): void {
     const at = local(s.ctx, s.inst, p);
     if (onFloor(p, at)) heart.floorSpots[id] = at;
   };
-  note(heart.markA);
-  note(heart.markB);
+  for (const side of SIDES) note(heart[MARK_KEY[side]]);
   for (const k of heart.knots) note(k.carrierId);
 }
 
 function endMarks(s: BreathScope, heart: BreathHeart): void {
-  const sideOf = (side: Side, id: number | null) => {
+  for (const side of SIDES) {
+    const id = heart[MARK_KEY[side]];
     const p = id === null ? undefined : s.ctx.entities.get(id);
     if (p) dropAura(p, MARK_AURA[side]);
-  };
-  sideOf('A', heart.markA);
-  sideOf('B', heart.markB);
+  }
   if (!heart.portalA) openPortal(s, heart, 'A', markSpot(s, heart, heart.markA));
   if (!heart.portalB) {
     if (heart.markB !== null) openPortal(s, heart, 'B', markSpot(s, heart, heart.markB));
@@ -250,8 +330,22 @@ function endMarks(s: BreathScope, heart: BreathHeart): void {
       openPortal(s, heart, 'B', nearestLipSpot(a.x, a.z));
     }
   }
-  heart.markA = null;
-  heart.markB = null;
+  if (heart.pairs === 2) {
+    // The second pair, the same rules. Nobody left for C (a group of two or
+    // three): C where the second ball fell, the carry's start.
+    const drop = secondDrop(s, heart);
+    if (!heart.portalC) openPortal(s, heart, 'C', markSpot(s, heart, heart.markC, drop));
+    if (!heart.portalD) {
+      if (heart.markD !== null) openPortal(s, heart, 'D', markSpot(s, heart, heart.markD, drop));
+      else {
+        // Nobody left for D: the lip nearest C, clear of the open mouths.
+        const c = heart.portalC as { x: number; z: number };
+        const taken = openSpots(heart);
+        openPortal(s, heart, 'D', nearestLipSpot(c.x, c.z, taken, T.heartPortalR * 2));
+      }
+    }
+  }
+  for (const side of SIDES) heart[MARK_KEY[side]] = null;
 }
 
 // ---- the ball -----------------------------------------------------------------------------
@@ -490,11 +584,9 @@ export function clearHeart(ctx: SimContext, inst: InstanceSlot, st: BreathFightS
   if (!heart) return;
   st.heart = null;
   for (const k of heart.knots) dropBreathObject(ctx, inst, k.objectId);
-  dropBreathObject(ctx, inst, heart.portalA?.objectId ?? null);
-  dropBreathObject(ctx, inst, heart.portalB?.objectId ?? null);
+  for (const side of SIDES) dropBreathObject(ctx, inst, heart[PORTAL_KEY[side]]?.objectId ?? null);
   for (const p of corniceListeners(ctx, inst)) {
-    dropAura(p, BREATH_AURAS.portalA);
-    dropAura(p, BREATH_AURAS.portalB);
+    for (const side of SIDES) dropAura(p, MARK_AURA[side]);
     dropAura(p, BREATH_AURAS.laden);
   }
   // A carrier gone from the Cornice's reach (a hearth) loses the load too.
@@ -520,7 +612,8 @@ export function tryThrowKnot(ctx: SimContext, p: Entity): boolean {
 
 // ---- dev ----------------------------------------------------------------------------------
 
-/** `/dev heart breath heart [2|portal a|portal b|carry|burst]`: the reply. */
+/** `/dev heart breath heart [2|portal a|b|c|d|carry|burst]`: the reply
+ *  (`2` starts phase 2's round: two balls, two pairs of portals). */
 export function heartDevTrigger(
   s: BreathScope,
   words: readonly string[],
@@ -533,7 +626,7 @@ export function heartDevTrigger(
     if (st.heart) clearHeart(s.ctx, s.inst, st);
     const count = step === undefined ? 1 : 2;
     return startHeart(s, count)
-      ? `${count === 1 ? 'A Knotted Gale falls' : 'Two Knotted Gales fall'}; the marks open in ${T.heartMark} s.`
+      ? `${count === 1 ? 'A Knotted Gale falls; Portals A and B open' : 'Two Knotted Gales fall; Portals A to D open'} in ${T.heartMark} s.`
       : 'Nobody on the Cornice to mark.';
   }
   const heart = st.heart;
@@ -545,9 +638,11 @@ export function heartDevTrigger(
   if (!me) return 'That step needs a player.';
   const at = local(s.ctx, s.inst, me);
   if (step === 'portal') {
-    const which: Side | null = side === 'a' ? 'A' : side === 'b' ? 'B' : null;
-    if (!which) return 'portal a or portal b.';
-    const key = which === 'A' ? 'markA' : 'markB';
+    const which = SIDES.find((x) => x.toLowerCase() === side) ?? null;
+    if (!which) return 'portal a, b, c or d.';
+    if (!sidesOf(heart).includes(which))
+      return 'This round has one pair (portal a or b); /dev heart breath heart 2 for two.';
+    const key = MARK_KEY[which];
     const marked = heart[key];
     const wearer = marked === null ? undefined : s.ctx.entities.get(marked);
     if (wearer) dropAura(wearer, MARK_AURA[which]);
@@ -561,17 +656,14 @@ export function heartDevTrigger(
     const free = heart.knots.find((k) => k.carrierId === null);
     if (!free) return 'Every ball is carried.';
     heart.bearers = heart.bearers.filter((id) => id !== me.id);
-    if (heart.markA === me.id) {
-      dropAura(me, BREATH_AURAS.portalA);
-      heart.markA = null;
-    }
-    if (heart.markB === me.id) {
-      dropAura(me, BREATH_AURAS.portalB);
-      heart.markB = null;
+    for (const which of SIDES) {
+      if (heart[MARK_KEY[which]] !== me.id) continue;
+      dropAura(me, MARK_AURA[which]);
+      heart[MARK_KEY[which]] = null;
     }
     freeKnot(s, free, undefined, { ...free, ...at });
     takeKnot(s, free, me);
     return 'You take up the Knotted Gale.';
   }
-  return 'heart [2|portal a|portal b|carry|burst].';
+  return 'heart [2|portal a|b|c|d|carry|burst].';
 }

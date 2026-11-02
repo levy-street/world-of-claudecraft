@@ -1,8 +1,9 @@
 // The Guardian of the Breath's Knotted Gale (Mythic) over a REAL Sim claim: the ball
 // and its fuse, the two portals opened at their marked players' feet (the fall too),
-// the carrier's load, the one-way crossing, the throw at any gap, a dead carrier, phase
-// 2's two balls and one pair, the clock's holds, the reset, determinism and the player
-// text. The online path: tests/smith_heart_breath_heart_wire.test.ts.
+// the carrier's load, the crossing to a portal's partner, the throw at any gap (2 yd
+// from its edge), a dead carrier, phase 2's two balls and two pairs (A to B, C to D,
+// never across; the small-group fallbacks), the clock's holds, the reset, determinism
+// and the player text. The online path: tests/smith_heart_breath_heart_wire.test.ts.
 
 import { describe, expect, it } from 'vitest';
 import {
@@ -80,15 +81,26 @@ function third(f: BreathFight): Entity {
   if (!p) throw new Error('no third');
   return p;
 }
-/** A floor spot at gap `g`'s lip. */
+/** A floor spot at gap `g`'s lip: a yard off its edge, well inside the throw's
+ *  reach (`T.heartLipReach`, 2 yd since Jose's playtest). */
 function lip(g: (typeof CORNICE_GAPS)[number]): { x: number; z: number } {
   for (let k = 0; k < 40; k++) {
     const a = (k / 40) * Math.PI * 2;
-    const x = g.x + Math.sin(a) * (g.r + 2);
-    const z = g.z + Math.cos(a) * (g.r + 2);
+    const x = g.x + Math.sin(a) * (g.r + 1);
+    const z = g.z + Math.cos(a) * (g.r + 1);
     if (inBreathArena(x, z) && atGapLip(x, z) && gapDistance(x, z) > 0.5) return { x, z };
   }
   throw new Error(`no lip at ${g.deg}`);
+}
+/** A floor spot `d` yards off gap `g`'s edge, as far from every gap. */
+function nearGap(g: (typeof CORNICE_GAPS)[number], d: number): { x: number; z: number } {
+  for (let k = 0; k < 40; k++) {
+    const a = (k / 40) * Math.PI * 2;
+    const x = g.x + Math.sin(a) * (g.r + d);
+    const z = g.z + Math.cos(a) * (g.r + d);
+    if (inBreathArena(x, z) && Math.abs(gapDistance(x, z) - d) < 1e-6) return { x, z };
+  }
+  throw new Error(`no floor ${d} yd off ${g.deg}`);
 }
 /** A spot off the floor just past gap `g`'s throat. */
 function overVoid(g: (typeof CORNICE_GAPS)[number]): { x: number; z: number } {
@@ -214,6 +226,17 @@ describe('Knotted Gale: the round', () => {
     expect(Math.hypot((h.portalB?.x ?? 0) - atB.x, (h.portalB?.z ?? 0) - atB.z)).toBeLessThan(3);
     expect(f.objects(BREATH_OBJECTS.portalA)).toHaveLength(1);
     expect(f.objects(BREATH_OBJECTS.portalB)[0].scale).toBe(T.heartPortalR);
+    // Phase 1 stays one pair: no C, no D, no third or fourth mark.
+    expect(h.pairs).toBe(1);
+    expect(h.portalC).toBeNull();
+    expect(h.portalD).toBeNull();
+    expect(h.bearers).toHaveLength(2);
+    expect(f.objects(BREATH_OBJECTS.portalC)).toHaveLength(0);
+    expect(f.objects(BREATH_OBJECTS.portalD)).toHaveLength(0);
+    for (const e of f.players) {
+      expect(has(e, BREATH_AURAS.portalC)).toBe(false);
+      expect(has(e, BREATH_AURAS.portalD)).toBe(false);
+    }
   });
 
   it('a Portal B player who falls through a gap opens it at the lip they left', () => {
@@ -376,6 +399,14 @@ describe('Knotted Gale: the round', () => {
       const away = f.tick(1);
       expect(away.some((e) => e.type === 'error' && e.text === KNOT_NOT_AT_LIP_ERROR)).toBe(true);
       expect(h.knots).toContain(knot);
+      // Jose's playtest: three yards back from the edge is no longer the lip.
+      const near = nearGap(g, T.heartLipReach + 1);
+      f.put(p, near.x, near.z);
+      f.tick();
+      f.sim.interact(p.id);
+      const back = f.tick(1);
+      expect(back.some((e) => e.type === 'error' && e.text === KNOT_NOT_AT_LIP_ERROR)).toBe(true);
+      expect(h.knots).toContain(knot);
       const spot = lip(g);
       f.put(p, spot.x, spot.z);
       f.sim.interact(p.id);
@@ -523,8 +554,8 @@ describe('Knotted Gale: when', () => {
     expect(st.heart).not.toBeNull();
   });
 
-  it('phase 2: two balls apart, one pair of portals, never during the barrage', () => {
-    const f = mythic();
+  it('phase 2: two balls apart, two pairs of portals, never during the barrage', () => {
+    const f = mythic(8);
     const st = f.state();
     if (!st) throw new Error('no fight');
     f.dev('/dev heart breath phase2');
@@ -541,14 +572,40 @@ describe('Knotted Gale: when', () => {
     expect(h.knots).toHaveLength(2);
     const [k1, k2] = h.knots;
     expect(Math.hypot(k1.x - k2.x, k1.z - k2.z)).toBeGreaterThanOrEqual(T.heartApart - 15);
-    // Two carriers, one A: both cross by the same pair, and only both thrown ends it.
-    const c1 = third(f);
-    carry(f, c1, 0);
-    const c2 = third(f);
-    carry(f, c2, 1);
+    // Four marks, a pair each ball: only both thrown ends it.
+    expect(h.pairs).toBe(2);
+    expect(new Set([h.markA, h.markB, h.markC, h.markD]).size).toBe(4);
+    // The raid's start may already stand on a ball: whoever took one keeps it.
+    const held = h.knots.map((k) => (k.carrierId === null ? null : entity(f, k.carrierId)));
+    for (const p of held) if (p) expect(h.bearers).not.toContain(p.id);
+    const c1 = held[0] ?? third(f);
+    const c2 =
+      held[1] ??
+      (f.players.find(
+        (e) =>
+          e !== c1 &&
+          !h.bearers.includes(e.id) &&
+          !held.includes(e) &&
+          e.id !== f.boss().aggroTargetId,
+      ) as Entity);
+    // Nobody else stands on a ball (the raid's start may sit on one).
+    const aside = [
+      { x: -10, z: 190 },
+      { x: 10, z: 190 },
+      { x: 0, z: 202 },
+      { x: -20, z: 200 },
+      { x: 20, z: 200 },
+    ].sort(
+      (u, v) =>
+        Math.min(...h.knots.map((k) => Math.hypot(v.x - k.x, v.z - k.z))) -
+        Math.min(...h.knots.map((k) => Math.hypot(u.x - k.x, u.z - k.z))),
+    )[0];
+    for (const e of f.players) if (e !== c1 && e !== c2) f.put(e, aside.x, aside.z);
+    if (!held[0]) carry(f, c1, 0);
+    if (!held[1]) carry(f, c2, 1);
     f.tick(ticks(T.heartMark));
-    expect(f.objects(BREATH_OBJECTS.portalA)).toHaveLength(1);
-    expect(f.objects(BREATH_OBJECTS.portalB)).toHaveLength(1);
+    for (const o of ['portalA', 'portalB', 'portalC', 'portalD'] as const)
+      expect(f.objects(BREATH_OBJECTS[o]), o).toHaveLength(1);
     const spot = lip(CORNICE_GAPS[0]);
     f.put(c1, spot.x, spot.z);
     f.sim.interact(c1.id);
@@ -576,23 +633,29 @@ describe('Knotted Gale: when', () => {
     expect(f.objects(BREATH_OBJECTS.knotPrefix)).toHaveLength(0);
     expect(f.objects(BREATH_OBJECTS.portalA)).toHaveLength(0);
     expect(f.objects(BREATH_OBJECTS.portalB)).toHaveLength(0);
+    expect(f.objects(BREATH_OBJECTS.portalC)).toHaveLength(0);
+    expect(f.objects(BREATH_OBJECTS.portalD)).toHaveLength(0);
     for (const e of f.players) {
       expect(has(e, BREATH_AURAS.laden)).toBe(false);
-      expect(has(e, BREATH_AURAS.portalA)).toBe(false);
-      expect(has(e, BREATH_AURAS.portalB)).toBe(false);
+      for (const id of [
+        BREATH_AURAS.portalA,
+        BREATH_AURAS.portalB,
+        BREATH_AURAS.portalC,
+        BREATH_AURAS.portalD,
+      ])
+        expect(has(e, id)).toBe(false);
     }
   });
 
   it('is deterministic: the same seed, the same balls and marks', () => {
     const trace = () => {
-      const f = mythic(6, 41);
+      const f = mythic(8, 41);
       const h = round(f, ' 2');
       f.tick(ticks(T.heartMark) + 1);
       return JSON.stringify({
         k: h.knots.map((k) => [k.x, k.z, k.fuse]),
         b: h.bearers,
-        a: h.portalA,
-        c: h.portalB,
+        p: [h.portalA, h.portalB, h.portalC, h.portalD],
       });
     };
     expect(trace()).toBe(trace());
@@ -638,9 +701,209 @@ describe('Knotted Gale: when', () => {
   });
 });
 
+describe('Knotted Gale: phase 2 two pairs of portals', () => {
+  type P = { x: number; z: number };
+  const near = (a: P, b: P | null, r = 0.5) => b !== null && Math.hypot(a.x - b.x, a.z - b.z) < r;
+
+  it('marks four distinct non-tanks A, B, C, D and opens each at its feet', () => {
+    const f = mythic(8);
+    const h = round(f, ' 2');
+    expect(h.pairs).toBe(2);
+    const ids = [h.markA, h.markB, h.markC, h.markD];
+    expect(new Set(ids).size).toBe(4);
+    expect(h.bearers).toEqual(ids);
+    const auras = [
+      BREATH_AURAS.portalA,
+      BREATH_AURAS.portalB,
+      BREATH_AURAS.portalC,
+      BREATH_AURAS.portalD,
+    ];
+    ids.forEach((id, i) => {
+      const p = entity(f, id);
+      expect(p.id).not.toBe(f.boss().aggroTargetId);
+      // Each wears its own mark, and only its own.
+      for (let j = 0; j < auras.length; j++) expect(has(p, auras[j]), `${i}/${j}`).toBe(i === j);
+    });
+    // Phase 1's pick is phase 2's first pair: the same hashed order.
+    const g = mythic(8);
+    const one = round(g);
+    expect([one.markA, one.markB]).toEqual([h.markA, h.markB]);
+    // Each mark's player stands somewhere of its own; the portal opens there.
+    const spots: P[] = [
+      { x: -14, z: 186 },
+      { x: 14, z: 186 },
+      { x: -14, z: 200 },
+      { x: 14, z: 200 },
+    ];
+    for (let i = 0; i < ids.length; i++) f.put(entity(f, ids[i]), spots[i].x, spots[i].z);
+    const at = ids.map((id) => f.local(entity(f, id)));
+    f.tick(ticks(T.heartMark) + 1);
+    const portals = [h.portalA, h.portalB, h.portalC, h.portalD];
+    for (let i = 0; i < portals.length; i++)
+      expect(near(at[i], portals[i], 1), String(i)).toBe(true);
+    for (const id of ids) for (const aura of auras) expect(has(entity(f, id), aura)).toBe(false);
+    for (const o of ['portalA', 'portalB', 'portalC', 'portalD'] as const)
+      expect(f.objects(BREATH_OBJECTS[o]), o).toHaveLength(1);
+  });
+
+  it('A links to B and C to D only: never across the pairs', () => {
+    const f = mythic(8);
+    const h = round(f, ' 2');
+    const spots: P[] = [
+      { x: -14, z: 186 },
+      { x: 14, z: 186 },
+      { x: -14, z: 200 },
+      { x: 14, z: 200 },
+    ];
+    const marks = [h.markA, h.markB, h.markC, h.markD];
+    for (let i = 0; i < marks.length; i++) f.put(entity(f, marks[i]), spots[i].x, spots[i].z);
+    f.tick(ticks(T.heartMark) + 1);
+    const A = h.portalA as P;
+    const B = h.portalB as P;
+    const C = h.portalC as P;
+    const D = h.portalD as P;
+    const walker = third(f);
+    const clear = { x: 0, z: 193 };
+    const hop = (from: P): ReturnType<typeof f.tick> => {
+      f.put(walker, clear.x, clear.z);
+      f.tick(1);
+      f.put(walker, from.x, from.z);
+      return f.tick(1);
+    };
+    const cases: [P, P, readonly P[]][] = [
+      [A, B, [C, D]],
+      [B, A, [C, D]],
+      [C, D, [A, B]],
+      [D, C, [A, B]],
+    ];
+    for (const [from, to, never] of cases) {
+      const evs = hop(from);
+      const here = f.local(walker);
+      expect(near(here, to)).toBe(true);
+      for (const o of never) expect(near(here, o, T.heartPortalR)).toBe(false);
+      const second = from === C || from === D;
+      expect(
+        evs.some(
+          (e) =>
+            e.type === 'spellfx' &&
+            e.ability === (second ? BREATH_CUES.portalHopPair2 : BREATH_CUES.portalHop),
+        ),
+      ).toBe(true);
+    }
+    // The ball rides through the second pair as through the first.
+    const p = third(f);
+    carry(f, p, 1);
+    f.put(p, C.x, C.z);
+    f.tick(1);
+    expect(near(f.local(p), D)).toBe(true);
+    expect(near(h.knots[1], D)).toBe(true);
+  });
+
+  it('the raid warning names all four, each re-localized through the catalog', () => {
+    const f = mythic(8);
+    f.tick(1);
+    const h2 = round(f, ' 2');
+    // The start's warnings ride out with the next tick's events.
+    const warns = f
+      .tick(1)
+      .flatMap((e) => (e.type === 'chat' && e.channel === 'raidWarning' ? [e] : []));
+    const name = (id: number | null) => entity(f, id).name;
+    const pair2 = warns.find((w) => w.textKey === 'hudChrome.breathGuardian.warn.knotPortals2');
+    expect(pair2?.text).toBe(`Portal C on ${name(h2.markC)}, Portal D on ${name(h2.markD)}!`);
+    expect(warns.some((w) => w.textKey === 'hudChrome.breathGuardian.warn.knotPortals')).toBe(true);
+    for (const w of warns) expect(t(w.textKey as never, w.textValues)).toBe(w.text);
+  });
+
+  it('a group too small for four marks still plays the round', () => {
+    // Alone: A on me, B at the lip nearest A, C where the second ball fell, D at
+    // the lip nearest C, never on a lip the first pair holds.
+    const solo = mythic(1);
+    const h1 = round(solo, ' 2');
+    const me = solo.players[0];
+    expect(h1.markA).toBe(me.id);
+    expect([h1.markB, h1.markC, h1.markD]).toEqual([null, null, null]);
+    const drop2 = { x: h1.knots[1].x, z: h1.knots[1].z };
+    solo.put(me, -10, 190);
+    solo.tick(ticks(T.heartMark) + 1);
+    expect(near(drop2, h1.portalC, 0.01)).toBe(true);
+    expect(atGapLip(h1.portalB?.x ?? 0, h1.portalB?.z ?? 0)).toBe(true);
+    expect(atGapLip(h1.portalD?.x ?? 0, h1.portalD?.z ?? 0)).toBe(true);
+    expect(near(h1.portalB as P, h1.portalD, T.heartPortalR * 2)).toBe(false);
+    // Alone, the marked carries both balls, the second through C to D.
+    carry(solo, me, 1);
+    const C = h1.portalC as P;
+    solo.put(me, C.x + T.heartPortalR * 3, C.z);
+    solo.tick(1);
+    solo.put(me, C.x, C.z);
+    solo.tick(1);
+    expect(near(solo.local(me), h1.portalD)).toBe(true);
+
+    // Three of us (a tank and two): A and B marked, the second pair falls back.
+    const three = mythic(3);
+    const h3 = round(three, ' 2');
+    expect(h3.markA).not.toBeNull();
+    expect(h3.markB).not.toBeNull();
+    expect(h3.markC).toBeNull();
+    expect(h3.markD).toBeNull();
+    const drop3 = { x: h3.knots[1].x, z: h3.knots[1].z };
+    three.tick(ticks(T.heartMark) + 1);
+    expect(near(drop3, h3.portalC, 0.01)).toBe(true);
+    expect(atGapLip(h3.portalD?.x ?? 0, h3.portalD?.z ?? 0)).toBe(true);
+
+    // Four (a tank and three): A, B and C marked; D at the lip nearest C.
+    const four = mythic(4);
+    const h4 = round(four, ' 2');
+    expect(h4.markC).not.toBeNull();
+    expect(h4.markD).toBeNull();
+    const c = entity(four, h4.markC);
+    four.put(c, 12, 196);
+    const atC = four.local(c);
+    four.tick(ticks(T.heartMark) + 1);
+    expect(near(atC, h4.portalC, 1)).toBe(true);
+    expect(atGapLip(h4.portalD?.x ?? 0, h4.portalD?.z ?? 0)).toBe(true);
+    // The tank, the one free player, carries; the marked wait while it is free.
+    const marked = entity(four, h4.bearers[0]);
+    four.put(marked, h4.knots[0].x, h4.knots[0].z);
+    four.tick(2);
+    expect(h4.knots[0].carrierId).toBeNull();
+  });
+
+  it('dev: portal c and d open the second pair; a one-pair round refuses them', () => {
+    const f = mythic(1);
+    round(f);
+    const me = f.players[0];
+    const st = f.state();
+    if (!st?.heart) throw new Error('no round');
+    expect(heartDevTrigger).toBeTypeOf('function');
+    f.dev('/dev heart breath heart portal c');
+    expect(st.heart.portalC).toBeNull();
+    f.dev('/dev heart breath heart 2');
+    const h = st.heart;
+    if (!h) throw new Error('no round');
+    expect(h.pairs).toBe(2);
+    f.put(me, -12, 186);
+    f.tick(1);
+    f.dev('/dev heart breath heart portal c');
+    expect(near(f.local(me), h.portalC, 1)).toBe(true);
+    f.put(me, 12, 200);
+    f.tick(1);
+    f.dev('/dev heart breath heart portal d');
+    expect(near(f.local(me), h.portalD, 1)).toBe(true);
+    expect(f.objects(BREATH_OBJECTS.portalC)).toHaveLength(1);
+    expect(f.objects(BREATH_OBJECTS.portalD)).toHaveLength(1);
+  });
+});
+
 describe('Knotted Gale: the player text', () => {
   it('names, warnings, hop and error all resolve through the catalog', () => {
-    for (const n of [BREATH_NAMES.knot, BREATH_NAMES.laden, BREATH_NAMES.portalA])
+    for (const n of [
+      BREATH_NAMES.knot,
+      BREATH_NAMES.laden,
+      BREATH_NAMES.portalA,
+      BREATH_NAMES.portalB,
+      BREATH_NAMES.portalC,
+      BREATH_NAMES.portalD,
+    ])
       expect(localizeSimAuraName(n)).toBe(n);
     expect(localizeSimText(KNOT_HOP_TEXT)).toBe(KNOT_HOP_TEXT);
     expect(localizeSimText(KNOT_NOT_AT_LIP_ERROR)).toBe(KNOT_NOT_AT_LIP_ERROR);
@@ -660,7 +923,13 @@ describe('Knotted Gale: the player text', () => {
   });
 
   it('each aura says its rule; the load with the live walk', () => {
-    for (const id of [BREATH_AURAS.portalA, BREATH_AURAS.portalB, BREATH_AURAS.laden]) {
+    for (const id of [
+      BREATH_AURAS.portalA,
+      BREATH_AURAS.portalB,
+      BREATH_AURAS.portalC,
+      BREATH_AURAS.portalD,
+      BREATH_AURAS.laden,
+    ]) {
       const d = auraEffectDescriptor({ id, kind: 'internal_cd', value: T.heartWalkMult });
       const text = t(d?.key as never, d?.nums as never);
       expect(text).not.toMatch(/\{\w+\}/);
@@ -681,6 +950,18 @@ describe('Knotted Gale: the player text', () => {
       auras: [{ id: BREATH_AURAS.portalB, remaining: 2.5, duration: 5 }],
     });
     expect(b.visible && b.kind === 'portalB').toBe(true);
+    // The second pair: its own kinds (its own colours), titles and lines.
+    for (const [id, kind, letter] of [
+      [BREATH_AURAS.portalC, 'portalC', 'C'],
+      [BREATH_AURAS.portalD, 'portalD', 'D'],
+    ] as const) {
+      const v = buildKnotAlertView({ ...base, auras: [{ id, remaining: 2.5, duration: 5 }] });
+      expect(v.visible && v.kind === kind && !v.pressable).toBe(true);
+      if (v.visible) {
+        expect(v.title).toBe(`You are Portal ${letter}!`);
+        expect(v.line).not.toMatch(/\{\w+\}/);
+      }
+    }
     const c = buildKnotAlertView({
       ...base,
       auras: [{ id: BREATH_AURAS.laden, remaining: 10, duration: 20 }],

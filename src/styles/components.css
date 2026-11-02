@@ -19243,7 +19243,8 @@
      Ember Mark in the fire tone, Drawn Lightning in the storm's violet,
      Crushed in the Hammer's gold. */
   /* The Knotted Gale (Mythic, knot_alert_view.ts): Portal A in the storm's teal,
-     Portal B in its violet (the floor's colours), the load in gold, the lip in
+     Portal B in its violet, Portal C in spring green, Portal D in rose (the
+     floor's colours), the load in gold, the lip in
      the hostile tone. The panel is the throw's button while the player carries. */
   #heart-knot-alert {
     position: absolute;
@@ -19270,6 +19271,13 @@
   }
   #heart-knot-alert.is-portalB {
     border-color: var(--color-debuff-shadow);
+  }
+  /* Phase 2's second pair: Portal C in spring green, Portal D in rose. */
+  #heart-knot-alert.is-portalC {
+    border-color: var(--color-knot-portal-c);
+  }
+  #heart-knot-alert.is-portalD {
+    border-color: var(--color-knot-portal-d);
   }
   #heart-knot-alert.is-carry {
     border-color: var(--color-gold-300);

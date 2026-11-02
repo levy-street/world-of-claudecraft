@@ -209,18 +209,25 @@ export function knotSpot(
   return { x: C.x, z: C.z };
 }
 
-/** The lip nearest (x, z): the floor just inside a gap's reach. */
-export function nearestLipSpot(x: number, z: number): { x: number; z: number } {
-  let best: (typeof CORNICE_GAPS)[number] = CORNICE_GAPS[0];
-  let bestD = Number.POSITIVE_INFINITY;
-  for (const g of CORNICE_GAPS) {
-    const d = Math.hypot(x - g.x, z - g.z);
-    if (d < bestD) {
-      best = g;
-      bestD = d;
-    }
+/** The lip nearest (x, z): the floor just inside a gap's reach. A lip within
+ *  `clear` yards of any spot in `avoid` is passed over for the next nearest
+ *  (the Knotted Gale's second pair never opens on the first pair's mouth);
+ *  with every lip taken, the nearest whatever. */
+export function nearestLipSpot(
+  x: number,
+  z: number,
+  avoid: readonly { x: number; z: number }[] = [],
+  clear = 0,
+): { x: number; z: number } {
+  // Nearest first; a tie keeps the layout's order (a stable sort).
+  const lips = CORNICE_GAPS.map((g) => ({ d: Math.hypot(x - g.x, z - g.z), g })).sort(
+    (a, b) => a.d - b.d,
+  );
+  for (const { g } of lips) {
+    const spot = voidCorpseSpot(g.x, g.z);
+    if (avoid.every((o) => Math.hypot(spot.x - o.x, spot.z - o.z) >= clear)) return spot;
   }
-  return voidCorpseSpot(best.x, best.z);
+  return voidCorpseSpot(lips[0].g.x, lips[0].g.z);
 }
 
 /** Loose gale `k`'s place `t` seconds into its run (heroic): a slow, wide,
