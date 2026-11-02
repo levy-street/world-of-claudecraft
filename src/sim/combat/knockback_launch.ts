@@ -32,21 +32,16 @@
 
 import { ABILITIES } from '../data';
 import { knockbackDistanceAfterGuards } from '../knockback';
-import { PLAYER_BODY_RADIUS } from '../pathfind';
-import { floorHeightAt } from '../physics';
-import { GRAVITY, isSwimming, JUMP_VELOCITY } from '../player_motion';
+import { isSwimming } from '../player_motion';
 import type { SimContext } from '../sim_context';
 import { type DamageEventKind, DT, type Entity } from '../types';
 import { isFearAura } from './cc';
-import { trailbreakArcFor, trailbreakFlatTicks } from './hunter_trailbreak_arc';
+import { trailbreakLaunchFor } from './hunter_trailbreak_arc';
 
 /** The longest a throw stays live, in seconds of the victim's own movement
  *  steps: a long drop off a cliff is airborne for a few seconds, so past this
  *  the body has long since landed somewhere and any later fall is its own. */
 export const LAUNCH_FALL_CREDIT_SECONDS = 10;
-/** Sample spacing and floor margin for the flat-hop clearance check. */
-const LAUNCH_SWEEP_STEP = 0.5;
-const LAUNCH_CLEARANCE = 0.05;
 
 /** Can this body take the airborne arc, or must it take the grounded shove? */
 function launchable(ctx: SimContext, target: Entity): boolean {
@@ -91,60 +86,22 @@ export function applyLaunchKnockback(
   // Airborne BEFORE the plan, as Trailbreak does: the sweep resolves the body
   // with the mantle lift the kernel grants a flying body.
   target.onGround = false;
-  const arc = trailbreakArcFor(ctx, target, yards, facing);
-  const dirX = -Math.sin(facing);
-  const dirZ = -Math.cos(facing);
-  const speed = yards / (trailbreakFlatTicks() * DT);
-  if (
-    arc.distance >= yards - 1e-6 &&
-    arc.landing.y <= target.pos.y &&
-    flatHopClears(ctx.cfg.seed, target, dirX, dirZ, speed, yards)
-  ) {
-    // Clear line over level or falling ground: the fixed flat-hop launch, not
-    // the planner's aimed arc. The planner would slow the throw to land it
-    // exactly `yards` out on the low ground; a real shove keeps its speed, so
-    // a victim thrown off a ledge sails on past it in the same straight line
-    // and drops the full height.
-    target.vx = dirX * speed;
-    target.vz = dirZ * speed;
-    target.vy = JUMP_VELOCITY;
-  } else {
-    // Rising ground or a wall in the way: the planner's lifted or shortened
-    // arc, so the throw carries up the slope or stops at the face.
-    target.vx = arc.vx;
-    target.vz = arc.vz;
-    target.vy = arc.vy;
-  }
+  // Trailbreak's own launch (hunter_trailbreak_arc.ts planTrailbreakLaunch):
+  // the fixed flat hop over level or falling ground, so a victim thrown off a
+  // ledge keeps its speed and sails on past it in the same straight line and
+  // drops the full height; the planner's lifted or shortened arc where rising
+  // ground or a wall is in the way.
+  const launch = trailbreakLaunchFor(ctx, target, yards, facing);
+  target.vx = launch.vx;
+  target.vz = launch.vz;
+  target.vy = launch.vy;
   target.jumping = true;
   target.fallStartY = target.pos.y;
   target.launchedBy = {
     sourceId: source.id,
     ticksLeft: Math.round(LAUNCH_FALL_CREDIT_SECONDS / DT),
   };
-  return arc.distance;
-}
-
-/** Does the fixed flat hop (JUMP_VELOCITY up, `speed` along the line) pass
- *  over every floor between the feet and `yards` out? A bump or a prop top
- *  above that path means the planner's lifted arc is needed instead. */
-function flatHopClears(
-  seed: number,
-  target: Entity,
-  dirX: number,
-  dirZ: number,
-  speed: number,
-  yards: number,
-): boolean {
-  for (let d = LAUNCH_SWEEP_STEP; d < yards; d += LAUNCH_SWEEP_STEP) {
-    const t = d / speed;
-    const hopY = target.pos.y + JUMP_VELOCITY * t - (GRAVITY * t * t) / 2;
-    const x = target.pos.x + dirX * d;
-    const z = target.pos.z + dirZ * d;
-    if (floorHeightAt(seed, x, z, PLAYER_BODY_RADIUS, hopY) > hopY - LAUNCH_CLEARANCE) {
-      return false;
-    }
-  }
-  return true;
+  return launch.distance;
 }
 
 /**

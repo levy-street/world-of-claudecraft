@@ -8,6 +8,7 @@ import { describe, expect, it } from 'vitest';
 import { MANTLE_REACH } from '../src/sim/colliders';
 import {
   planTrailbreakArc,
+  planTrailbreakLaunch,
   type TrailbreakSweepDeps,
   trailbreakFlatTicks,
   trailbreakMaxTicks,
@@ -306,5 +307,58 @@ describe('planTrailbreakArc', () => {
     const speed = Math.hypot(arc.vx, arc.vz);
     expect(arc.vx / speed).toBeCloseTo(-Math.sin(facing), 12);
     expect(arc.vz / speed).toBeCloseTo(-Math.cos(facing), 12);
+  });
+});
+
+describe('planTrailbreakLaunch: off a roof or a cliff edge', () => {
+  const flatSpeed = DISTANCE / ((2 * JUMP_VELOCITY) / GRAVITY);
+  // A roof (a standable prop top at the feet) ending 4 yd behind the hunter,
+  // with the street 12 yd below; and the same drop as a terrain cliff edge.
+  const roof: Ground = { terrain: () => -12, prop: (d) => (d < 4 ? 0 : undefined) };
+  const cliff: Ground = { terrain: (d) => (d < 4 ? 0 : -12) };
+
+  for (const [label, ground] of [
+    ['roof', roof],
+    ['cliff edge', cliff],
+  ] as const) {
+    it(`leaves the ${label} level at full speed and falls past the leap distance`, () => {
+      // The planner alone aims a slow glide down to the low landing seat.
+      const arc = planTrailbreakArc(deps(ground), FROM, FACING, DISTANCE);
+      expect(arc.lifted).toBe(true);
+      expect(arc.vx).toBeLessThan(flatSpeed * 0.75);
+
+      const launch = planTrailbreakLaunch(deps(ground), FROM, FACING, DISTANCE);
+      expect(launch.flat).toBe(true);
+      expect(launch.vy).toBe(JUMP_VELOCITY);
+      expect(launch.vx).toBeCloseTo(flatSpeed, 12);
+      expect(launch.vz).toBeCloseTo(0, 12);
+      // Kept speed off the edge: it lands farther out than the aimed glide.
+      const sailed = fly(ground, launch);
+      const glided = fly(ground, arc);
+      expect(sailed.y).toBeCloseTo(-12, 6);
+      expect(sailed.x).toBeGreaterThan(glided.x + 3);
+      expect(sailed.x).toBeGreaterThan(DISTANCE);
+    });
+  }
+
+  it('is the planner arc on level ground and up a slope', () => {
+    const level = planTrailbreakLaunch(deps({ terrain: () => 0 }), FROM, FACING, DISTANCE);
+    const levelArc = planTrailbreakArc(deps({ terrain: () => 0 }), FROM, FACING, DISTANCE);
+    expect([level.vx, level.vy, level.vz]).toEqual([levelArc.vx, levelArc.vy, levelArc.vz]);
+
+    const slope: Ground = { terrain: (d) => d * 0.3 };
+    const up = planTrailbreakLaunch(deps(slope), FROM, FACING, DISTANCE);
+    const upArc = planTrailbreakArc(deps(slope), FROM, FACING, DISTANCE);
+    expect(up.flat).toBe(false);
+    expect([up.vx, up.vy, up.vz]).toEqual([upArc.vx, upArc.vy, upArc.vz]);
+  });
+
+  it('keeps the planner arc when a wall cuts the leap short on the roof', () => {
+    const walled: Ground = { ...roof, wallAt: 3 };
+    const launch = planTrailbreakLaunch(deps(walled), FROM, FACING, DISTANCE);
+    const arc = planTrailbreakArc(deps(walled), FROM, FACING, DISTANCE);
+    expect(launch.flat).toBe(false);
+    expect(launch.distance).toBeLessThan(3);
+    expect([launch.vx, launch.vy, launch.vz]).toEqual([arc.vx, arc.vy, arc.vz]);
   });
 });
