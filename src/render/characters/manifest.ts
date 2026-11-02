@@ -3356,8 +3356,9 @@ export const VISUALS: Record<string, VisualDef> = {
   // fungi skinned from the cap's and robe's own atlas art, riding L_ and R_ShoulderShelf:
   // bones on the upper arms, baked level in every clip, so the arms cannot cut them. The
   // robe (its own mesh piece) kept off the calf, foot and toe bones with the skirt hung
-  // from the pelvis, sleeve cloth kept on the upper arm so the forearm bends inside it,
-  // anything clear of a hand kept off that hand, weights relaxed where an edge stretched in
+  // from the pelvis, sleeve cloth above the elbow kept on the upper arm so its hem cannot
+  // fold, everything past the elbow kept off it so the arm can bend, anything clear of a
+  // hand kept off that hand, weights relaxed where an edge stretched in
   // any clip with seam twins welded. The atlas had the arms repainted as clean skin, the
   // old mantle's orange turned to moss and the robe's roots mirrored across; a thread veil
   // skinned to Head hangs from the brim, and the material is two-sided for the thin cloth.
