@@ -13,7 +13,9 @@ import {
   NPC_DROP_RADIUS,
   NPC_INTEREST_RADIUS,
   type StealthObservationWorld,
+  SUMMON_COMBAT_REVEAL_SECONDS,
   stealthSubject,
+  summonIsFighting,
 } from '../server/interest_policy';
 import { battlegroundOrigin } from '../src/sim/data';
 import type { Entity } from '../src/sim/types';
@@ -93,7 +95,14 @@ describe('stealth observation (players and the summons they own)', () => {
   // ids: 1 the sneak, 2 their pet, 3 a hostile viewer, 4 a neutral viewer,
   // 5 a party mate, 6 a wild mob
   const sneak = ent({ id: 1, level: 20, stealthed: true, pos: { x: 0, y: 0, z: 0 } });
-  const pet = ent({ id: 2, kind: 'mob', ownerId: 1, inCombat: false, pos: { x: 2, y: 0, z: 0 } });
+  const pet = ent({
+    id: 2,
+    kind: 'mob',
+    ownerId: 1,
+    inCombat: false,
+    combatTimer: 99,
+    pos: { x: 2, y: 0, z: 0 },
+  });
   const foe = ent({ id: 3, level: 20, pos: { x: 5, y: 0, z: 0 } });
   const neutral = ent({ id: 4, level: 20, pos: { x: 10, y: 0, z: 0 } });
   const mate = ent({ id: 5, level: 20, pos: { x: 80, y: 0, z: 0 } });
@@ -119,6 +128,16 @@ describe('stealth observation (players and the summons they own)', () => {
     expect(stealthSubject(pet, roster(shown, pet))).toBeNull();
     // a fighting pet is never concealed, whatever its owner does
     expect(stealthSubject(ent({ ...pet, inCombat: true }), w.entities)).toBeNull();
+    // a pet struck (or striking) inside the reveal window is never concealed...
+    expect(SUMMON_COMBAT_REVEAL_SECONDS).toBe(5);
+    expect(stealthSubject(ent({ ...pet, combatTimer: 4.95 }), w.entities)).toBeNull();
+    // ...and conceals again once the window has passed
+    expect(stealthSubject(ent({ ...pet, combatTimer: 5 }), w.entities)).toBe(sneak);
+    // a guardian is an attack summon: never concealed, even before its first hit
+    const guardian = ent({ ...pet, guardianState: {} as Entity['guardianState'] });
+    expect(summonIsFighting(guardian)).toBe(true);
+    expect(stealthSubject(guardian, w.entities)).toBeNull();
+    expect(summonIsFighting(pet)).toBe(false);
     // an owner who left the roster conceals nothing
     expect(stealthSubject(pet, roster(pet))).toBeNull();
   });

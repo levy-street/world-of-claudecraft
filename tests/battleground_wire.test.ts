@@ -524,7 +524,7 @@ describe('match-scoped interest: own team and field objects, never enemy players
     });
   });
 
-  it("a stealthed enemy's pet hides with them, and reappears once it fights", () => {
+  it("a stealthed enemy's pet hides with them, and reappears once it is struck", () => {
     // A pet left at an invisible owner's heel would leak the owner's position by
     // proxy, so the summon inherits its owner's concealment (stealthSubject in
     // server/interest_policy.ts). A pet that is fighting stays visible.
@@ -544,6 +544,7 @@ describe('match-scoped interest: own team and field objects, never enemy players
       if (!pet) return;
       placeAt(server, pet.id, foe.pos.x + 2, foe.pos.z);
       pet.inCombat = false;
+      pet.combatTimer = 99; // idle: no hit dealt or taken recently
       // visible first: owner and pet both ship to the enemy viewer
       snapshotBroadcaster(server).broadcastSnapshots();
       expect(presentIds(bg.wsA.sent)).toContain(bg.foeC.pid);
@@ -554,13 +555,21 @@ describe('match-scoped interest: own team and field objects, never enemy players
       expect(presentIds(bg.wsA.sent)).not.toContain(bg.foeC.pid);
       expect(presentIds(bg.wsA.sent)).not.toContain(pet.id);
       // ...but the owner's own teammate still tracks both
-      placeAt(server, bg.foeD.pid, mine.x + 5, mine.z + toward * 30);
+      // 40yd off: beyond the 22.5yd same-level detection radius, so only the
+      // shared-party arm can explain the teammate still seeing both
+      placeAt(server, bg.foeD.pid, mine.x + 40, mine.z + toward * 30);
       foe.stealthed = true;
       snapshotBroadcaster(server).broadcastSnapshots();
       expect(presentIds(bg.wsD.sent)).toContain(bg.foeC.pid);
       expect(presentIds(bg.wsD.sent)).toContain(pet.id);
-      // a pet that is fighting is never invisible to the side it can hit
-      pet.inCombat = true;
+      // a pet that is struck is never invisible to the side hitting it: a real
+      // hit through the sim's damage path, which resets the pet's combat clock
+      const ally = server.sim.entities.get(bg.allyA.pid);
+      if (!ally) throw new Error('expected the ally entity');
+      server.sim.dealDamage(ally, pet, 1, false, 'physical', null, 'hit');
+      expect(pet.combatTimer).toBe(0);
+      expect(pet.inCombat).toBe(true);
+      pet.inCombat = false; // isolate the combat-clock arm from the AI flag
       snapshotBroadcaster(server).broadcastSnapshots();
       expect(presentIds(bg.wsA.sent)).not.toContain(bg.foeC.pid);
       expect(presentIds(bg.wsA.sent)).toContain(pet.id);

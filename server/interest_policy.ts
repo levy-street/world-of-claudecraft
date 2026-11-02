@@ -94,16 +94,32 @@ export interface StealthObservationWorld {
   duelFor(pid: number): { readonly a: number; readonly b: number } | null;
 }
 
+// How long after its last hit, dealt OR taken, a summon still counts as fighting:
+// the same five-second window a player's own combat flag uses (Sim's
+// `combatTimer < 5`). Every hit resets combatTimer through enterCombat, and the
+// mob tick advances it for pets, so a passive pet that is being struck is visible.
+export const SUMMON_COMBAT_REVEAL_SECONDS = 5;
+
+// Whether a summon is engaged and therefore never concealed: its AI holds a
+// target (inCombat), it struck or was struck inside the window above, or it is a
+// guardian (Stampede beasts, the Tithefiend: short-lived attack summons whose
+// whole purpose is hitting enemies, and whose AI never sets inCombat).
+export function summonIsFighting(e: Entity): boolean {
+  return (
+    e.inCombat || e.combatTimer < SUMMON_COMBAT_REVEAL_SECONDS || e.guardianState !== undefined
+  );
+}
+
 // The stealthed PLAYER whose concealment decides whether `e` ships, or null when
 // stealth does not apply to `e`. A player answers for themselves. A summoned mob
-// (pet, demon, elemental, undead, guardian, totem) answers for its stealthed
-// OWNER: a pet left standing at an invisible owner's heel would leak the owner's
-// position by proxy (the same reasoning bgWideInterestApplies uses). A summon
-// that is fighting (inCombat: it holds a live target) stays visible, so an enemy
-// can always see, target and answer whatever is hitting them.
+// (pet, demon, elemental, undead) answers for its stealthed OWNER: a pet left
+// standing at an invisible owner's heel would leak the owner's position by proxy
+// (the same reasoning bgWideInterestApplies uses). A summon that is fighting
+// (summonIsFighting) stays visible, so an enemy can always see, target and answer
+// whatever is hitting them or whatever they are hitting.
 export function stealthSubject(e: Entity, entities: ReadonlyMap<number, Entity>): Entity | null {
   if (e.kind === 'player') return isStealthed(e) ? e : null;
-  if (e.ownerId === null || e.inCombat) return null;
+  if (e.ownerId === null || summonIsFighting(e)) return null;
   const owner = entities.get(e.ownerId);
   if (owner === undefined || owner.kind !== 'player' || !isStealthed(owner)) return null;
   return owner;
