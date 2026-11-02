@@ -35,6 +35,10 @@ export function councilBodyKindOf(templateId: string): CouncilBodyKind | null {
   return null;
 }
 
+/** The kinds that wear a shipped model now (characters/manifest.ts): their provisional
+ *  pieces never build or draw, and the pose still runs for their dust and rings. */
+export const COUNCIL_MODELLED: ReadonlySet<CouncilBodyKind> = new Set(['slabwright']);
+
 /** The kits the pieces come from (render/smith_heart/heart_kit.ts urls). */
 export const COUNCIL_BODY_KITS = {
   hammer: '/models/props/smith_heart_hammer_kit.glb',

@@ -4182,12 +4182,52 @@ export const VISUALS: Record<string, VisualDef> = {
     bodyless: true,
     clickRadius: 4.4,
   },
-  // The Hammer Council's Slabwright and Seam Singer (the Smith's Heart's first
+  // The Hammer Vein Warder (the Smith's Heart's first trash, design doc section 4), the
+  // raid's first body of its own: Tripo P2 from the concept sheet, one UV island per rock on a
+  // 1024 ETC1S atlas painted over in ChatGPT, and a stone rig built in Blender (every rock rigid to
+  // one bone, the bend kept in the crevices between rocks). Attack is the right fist slammed
+  // into the floor, Attack2 a wide left hook, Cleave (Stone Sweep, the template's arcCleave,
+  // through its brood_cleave cue) both fists swept low across the front. All three land at
+  // 1.0 s, the longest a contact is held (../contact_queue.ts CONTACT_HOLD_MAX_SEC), and play
+  // at 1x. walkRef and runRef are the planted-foot readings of scripts/anim/measure_gait.mjs at
+  // the drawn height and the template's scale of 2.04. The template chases at 4.2 yd/s, which
+  // Run covers at about 1.35x, so the gait lets Run in below the default threshold: that speed
+  // would otherwise play Walk, whose rate cap cannot reach it. Death kneels, then topples, also
+  // at 1x. Height is the measured mid-idle height.
+  smith_heart_hammer_warder: {
+    url: `${CREATURES}/heart_hammer_warder.glb`,
+    height: 2.17,
+    clips: {
+      idle: 'Idle',
+      idleVariants: ['IdleFidget'],
+      idleVariantCadence: { everySec: 18, jitterSec: 12 },
+      combatIdle: 'CombatIdle',
+      stunned: 'Stunned',
+      turn: 'Turn',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack', 'Attack2'],
+      attackByAbility: { brood_cleave: 'Cleave' },
+      contacts: { Attack: [1.0], Attack2: [1.0], Cleave: [1.0] },
+      hit: ['Hit', 'Hit2'],
+      death: 'Death',
+      flourish: 'Awaken',
+    },
+    attackTimeScale: 1,
+    deathTimeScale: 1,
+    turnRate: 3,
+    walkRef: 1.35,
+    runRef: 3.1,
+    gait: { runEnter: 3.2, runExit: 2.6 },
+    gaitWindDown: true,
+    authoredAtlas: true,
+  },
+  // The Hammer Council's Stone Prison and Seam Singer (the Smith's Heart's first
   // boss, design doc 7.1): bodyless targets, their click capsules, nameplates
-  // and bars over the provisional rock-and-crystal bodies the raid's own
-  // effects draw (smith_heart_fx/council_bodies.ts) until their own models
-  // ship. Bound off the goleling's rig (never seen); height times the
-  // template's scale is the body's (about 2 to 2.5 times a player).
+  // and bars over the provisional bodies the raid's own effects draw
+  // (smith_heart_fx/council_bodies.ts) until their own models ship. Bound off the
+  // goleling's rig (never seen); height times the template's scale is the body's
+  // (about 2 to 2.5 times a player).
   smith_heart_stone_prison: {
     url: `${CREATURES}/golelingevolved.glb`,
     height: 2.4,
@@ -4196,12 +4236,46 @@ export const VISUALS: Record<string, VisualDef> = {
     bodyless: true,
     clickRadius: 1.6,
   },
+  // The Slabwright, the Council's first body of its own: Tripo P2, one UV island per rock on a
+  // painted 1024 atlas in ETC1S, a stone rig built in Blender (every rock rigid to one bone; the
+  // tracks that only hold the rest pose are dropped at build, see the spec). Melee lands at
+  // 1.0 s, inside its 2.8 s swing. Wake the Stone and Falling Rock come down at 78 percent of their
+  // 1.2 s bars (where council_bodies.ts plays their dust and ring), Stone Prison claps at the end
+  // of its 1.5 s bar, Mountain's Wrath is built for the heirs' 3 s bar, and each finishes its
+  // recovery after the bar. It hovers, so no foot can slide: runRef is the template's 7 yd/s at 1x.
+  // smith_heart_fx/council_bodies.ts still plays its dust and rings (COUNCIL_MODELLED).
   smith_heart_slabwright: {
-    url: `${CREATURES}/golelingevolved.glb`,
+    url: `${CREATURES}/heart_slabwright.glb`,
     height: 2.15,
-    clips: ELEMENTAL_FLOATING,
-    animUrls: [`${CREATURES}/elemental_ability_anims.glb`],
-    bodyless: true,
+    clips: {
+      idle: 'Idle',
+      idleVariants: ['IdleFidget'],
+      idleVariantCadence: { everySec: 18, jitterSec: 12 },
+      combatIdle: 'CombatIdle',
+      turn: 'Turn',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack', 'Attack2'],
+      contacts: { Attack: [1.0], Attack2: [1.0] },
+      cast: 'CastWake',
+      castByAbility: {
+        heart_wake_the_stone: 'CastWake',
+        heart_falling_rock: 'CastRock',
+        heart_stone_prison: 'CastPrison',
+        heart_mountains_wrath: 'CastWrath',
+      },
+      castPlayOut: ['CastWake', 'CastRock', 'CastPrison', 'CastWrath'],
+      hit: ['Hit', 'Hit2'],
+      death: 'Death',
+      flourish: 'Awaken',
+    },
+    attackTimeScale: 1,
+    deathTimeScale: 1,
+    turnRate: 3,
+    walkRef: 3.5,
+    runRef: 7,
+    gaitWindDown: true,
+    authoredAtlas: true,
     clickRadius: 1.4,
   },
   smith_heart_seam_singer: {

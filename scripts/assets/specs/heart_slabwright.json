@@ -1,0 +1,31 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/heart_slabwright_woc.glb",
+      "out": "models/creatures/heart_slabwright.glb",
+      "type": "character",
+      "keepClips": [
+        "Idle",
+        "IdleFidget",
+        "CombatIdle",
+        "Walk",
+        "Run",
+        "Turn",
+        "Attack",
+        "Attack2",
+        "CastWake",
+        "CastRock",
+        "CastPrison",
+        "CastWrath",
+        "Hit",
+        "Hit2",
+        "Awaken",
+        "Death"
+      ],
+      "resampleTolerance": 0.005,
+      "dropStillChannels": true,
+      "materialName": "heart_slabwright",
+      "maxTex": 1024
+    }
+  ]
+}

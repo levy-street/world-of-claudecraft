@@ -244,13 +244,12 @@ function councilWrath(
 
 export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
   // ---- trash -------------------------------------------------------------------
-  heart_hammer_warder: warder(
-    'heart_hammer_warder',
-    'Hammer Vein Warder',
-    'Stone Sweep',
-    0x8a6430,
-    1.7,
-  ),
+  heart_hammer_warder: {
+    ...warder('heart_hammer_warder', 'Hammer Vein Warder', 'Stone Sweep', 0x8a6430, 2.04),
+    // Slow stone: the pace its drawn run keeps its feet on the floor at
+    // (tests/smith_heart_hammer_warder_body.test.ts).
+    moveSpeed: 4.2,
+  },
   heart_ring_warder: warder('heart_ring_warder', 'Ring Forge Warder', 'Forge Sweep', 0x6a6460, 1.8),
   heart_breath_warder: warder(
     'heart_breath_warder',

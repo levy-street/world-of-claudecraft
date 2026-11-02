@@ -217,13 +217,14 @@ describe('CouncilBodies', () => {
     const shown = () =>
       root?.children.filter((c) => c.name.startsWith('smithHeartCouncilBody:') && c.visible)
         .length ?? 0;
-    expect(shown()).toBe(2);
+    // The Slabwright wears its model (COUNCIL_MODELLED): only the Singer's pieces show.
+    expect(shown()).toBe(1);
     // Outside the raid nobody new is dressed (no walk of the open world).
     const away = body(9, 'heart_slabwright', 30);
     entities.set(away.id, away);
     me.pos = { x: 0, y: 0, z: 0 };
     fx.update(0.2);
-    expect(shown()).toBe(2);
+    expect(shown()).toBe(1);
     entities.delete(away.id);
     me.pos = { x: o.x - 10, y: 0, z: o.z };
     // A swing, a raise ending in the slam, a song.
@@ -254,11 +255,12 @@ describe('CouncilBodies', () => {
     // The Singer dies: it stays drawn (as rubble) while its corpse lies.
     singer.dead = true;
     for (let i = 0; i < 90; i++) fx.update(1 / 30);
-    expect(shown()).toBe(2);
+    expect(shown()).toBe(1);
     // A body leaving the world frees its rig.
     entities.delete(slab.id);
+    entities.delete(singer.id);
     fx.update(0.2);
-    expect(shown()).toBe(1);
+    expect(shown()).toBe(0);
     fx.dispose();
     expect(scene.getObjectByName('smith-heart-council-bodies')).toBeUndefined();
   });

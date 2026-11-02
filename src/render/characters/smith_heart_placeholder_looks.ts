@@ -13,8 +13,8 @@
 
 export const SMITH_HEART_PLACEHOLDER_LOOKS: Record<string, string> = {
   // ---- trash ---------------------------------------------------------------
-  // Final: a squat stone warder with an ochre vein-glow in its cracks.
-  heart_hammer_warder: 'mob_elemental',
+  // Its own model now, the first row phase 2 replaced (manifest.ts).
+  heart_hammer_warder: 'smith_heart_hammer_warder',
   // Final: a bronze-and-granite forge construct, the Ring's sentinel.
   heart_ring_warder: 'skel_golem',
   // Final: a wind-scoured stone warder trailing storm-blue gusts.
@@ -35,10 +35,11 @@ export const SMITH_HEART_PLACEHOLDER_LOOKS: Record<string, string> = {
   // ---- the four guardians -----------------------------------------------------
   // Final: a stone titan half-fused with the Pit's floor, a great hammer arm.
   heart_hammer_guardian: 'skel_golem',
-  // The Hammer Council's other two: bodyless targets; their provisional
-  // bodies of the Heart kit's rock and crystal are drawn by
+  // The Hammer Council's other two. The Slabwright has its own model now
+  // (manifest.ts). The Singer is still a bodyless target: its provisional body
+  // of the Heart kit's rock and crystal is drawn by
   // smith_heart_fx/council_bodies.ts (the Masterless Strength's pattern).
-  // Final: their own models (the official pipeline), the same joints.
+  // Final: its own model (the official pipeline), the same joints.
   heart_slabwright: 'smith_heart_slabwright',
   heart_seam_singer: 'smith_heart_seam_singer',
   // The Guardian of the Breath: a bodyless target; its provisional body (a

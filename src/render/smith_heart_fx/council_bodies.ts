@@ -1,6 +1,7 @@
-// The Hammer Council's two provisional bodies (plan: council_bodies_core.ts),
-// hosted by ../rift_death_zone.ts beside the raid's other fx. The Slabwright
-// and the Seam Singer are bodyless targets (characters/manifest.ts
+// The Hammer Council's provisional bodies (plan: council_bodies_core.ts), hosted
+// by ../rift_death_zone.ts beside the raid's other fx. A kind in COUNCIL_MODELLED
+// (the Slabwright) wears its shipped model and keeps only this module's dust,
+// rings and shakes. The others are bodyless targets (characters/manifest.ts
 // smith_heart_slabwright, smith_heart_seam_singer): their click capsules,
 // nameplates and bars come from the ordinary entity view, and this module
 // draws the bodies over them, read from IWorld (each body's position, facing,
@@ -57,6 +58,7 @@ import {
   COUNCIL_EMBER_JOINTS,
   COUNCIL_EMBER_SIZE,
   COUNCIL_FALL,
+  COUNCIL_MODELLED,
   COUNCIL_RAISE_SLAM_AT,
   COUNCIL_RIG_JOINTS,
   COUNCIL_SWING_SECONDS,
@@ -325,6 +327,7 @@ export class CouncilBodies {
   private buildRig(rig: Rig): void {
     if (rig.built) return;
     rig.built = true;
+    if (COUNCIL_MODELLED.has(rig.kind)) return;
     rig.plan.pieces.forEach((def, index) => {
       const kit = heartKitMeshes(COUNCIL_BODY_KITS[def.kit], def.node);
       const holder = new THREE.Group();
@@ -480,7 +483,7 @@ export class CouncilBodies {
       rig.swingAt = -99;
       rig.lastAction = 'idle';
       rig.lastFill = 0;
-      rig.group.visible = true;
+      rig.group.visible = !COUNCIL_MODELLED.has(kind);
     }
   }
 

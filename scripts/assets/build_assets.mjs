@@ -12,6 +12,10 @@
 //                      "bone": "handslot.r" }],    //   parented under a named bone
 //   "maxTex": 512,                                 // optional: clamp texture dimension
 //   "keepExtras": true                             // optional: retain extras-bearing leaf nodes
+//   "resampleTolerance": 0.002                     // optional: drop more keys (lossy; default 1e-4)
+//   "dropStillChannels": true                      // optional: drop tracks that only hold the rest pose
+//   "materialName": "my_body"                      // optional: rename the first material (without the
+//                                                  //   tripo_ prefix its atlas takes the smaller ETC1S)
 // } ] }
 //
 // Bulk mode: instead of `src`/`out`, an item may use `srcDir`/`outDir` to convert
@@ -179,6 +183,39 @@ function dropMeshIslands(root, opts, outName) {
   console.log(`  dropIslands: removed ${dropped} island(s) from ${outName}`);
 }
 
+/** Drop every animation track that only ever holds its node's rest pose: a mixer holds the rest
+ *  pose for a node no track drives, and each track costs its own JSON entries (a rig of rigid
+ *  rocks spends most of its file on them). */
+function dropStillChannels(doc) {
+  const near = (a, b) => a.every((v, i) => Math.abs(v - b[i]) < 1e-4);
+  for (const anim of doc.getRoot().listAnimations()) {
+    for (const channel of anim.listChannels()) {
+      const sampler = channel.getSampler();
+      const node = channel.getTargetNode();
+      const out = sampler?.getOutput()?.getArray();
+      const path = channel.getTargetPath();
+      if (!node || !out || !['translation', 'rotation', 'scale'].includes(path)) continue;
+      const rest =
+        path === 'translation'
+          ? node.getTranslation()
+          : path === 'rotation'
+            ? node.getRotation()
+            : node.getScale();
+      const size = rest.length;
+      let still = sampler.getInterpolation() !== 'CUBICSPLINE';
+      for (let i = 0; still && i < out.length; i += size) {
+        const key = Array.from(out.subarray(i, i + size));
+        const flipped = key.map((v) => -v);
+        still = near(key, rest) || (path === 'rotation' && near(flipped, rest));
+      }
+      if (still) {
+        channel.dispose();
+        sampler.dispose();
+      }
+    }
+  }
+}
+
 async function processModel(io, item, outputRoot) {
   const srcPath = resolveSrc(item.src);
   const outPath = resolveOutput(outputRoot, item.out);
@@ -283,7 +320,15 @@ async function processModel(io, item, outputRoot) {
     if (missing.length) console.warn(`  WARN ${item.out}: missing clips ${missing.join(', ')}`);
   }
 
-  const transforms = [resample(), prune({ keepExtras: item.keepExtras === true }), dedup()];
+  const transforms = [
+    resample(item.resampleTolerance ? { tolerance: item.resampleTolerance } : {}),
+    ...(item.dropStillChannels ? [dropStillChannels] : []),
+    ...(item.materialName
+      ? [(d) => d.getRoot().listMaterials()[0].setName(item.materialName)]
+      : []),
+    prune({ keepExtras: item.keepExtras === true }),
+    dedup(),
+  ];
   if (item.maxTex) {
     transforms.push(
       textureCompress({
