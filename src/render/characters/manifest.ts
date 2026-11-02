@@ -3367,8 +3367,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // the Cast gesture and Jump is left out, as on the Lich. Stands at the player body's
   // height. walkRef and runRef are measured off the clips (a planted foot slides backwards
   // at body speed, scaled by height): the form moves at 0.8 speed, so a 5.6 run plays Run
-  // at 0.84 with the feet planted. The green spores hovering at the shoulders are
-  // vfx.sporeShelves, fed by CharacterVisual.shoulderShelfWorldPositions.
+  // at 0.84 with the feet planted.
   form_sporemender: {
     url: `${CREATURES}/sporemender_form.glb`,
     height: HUMANOID_H * 1.1,

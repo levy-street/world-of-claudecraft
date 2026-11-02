@@ -2351,10 +2351,12 @@ export class Vfx {
     }
     if (form === 'sporemender' || form === 'sporemending') {
       // Small spores shaken loose at the druid's feet, rising slowly and
-      // gathering speed as they climb past the cap toward the sky; most are
-      // pale cream specks, a few glow a soft spring green. A HoT target gets a
-      // sparser, shorter drift: a raid can carry the HoT on every member.
+      // gathering speed as they climb past the cap toward the sky. The form
+      // wears them green through its wandering motes; a HoT target gets a
+      // sparser, shorter drift of mostly pale cream specks, a few a soft spring
+      // green: a raid can carry the HoT on every member.
       const hot = form === 'sporemending';
+      if (!hot) this.sporemenderMotes(entityId, dt);
       const n = this.emitCount(hot ? 9 : 26, dt);
       if (!n) return;
       const at = this.anchor(entityId, 0.03);
@@ -2370,7 +2372,7 @@ export class Vfx {
           (Math.random() - 0.5) * 0.14,
           0.5 + Math.random() * 0.4,
           (Math.random() - 0.5) * 0.14,
-          glow ? 0xc8f77a : 0xf6efcf,
+          hot ? (glow ? 0xc8f77a : 0xf6efcf) : glow ? 0xd4f59a : 0x9fe35a,
           glow ? 0.36 + Math.random() * 0.1 : 0.22 + Math.random() * 0.08,
           (hot ? 2.2 : 2.8) + Math.random() * (hot ? 0.8 : 1.2),
           -0.3,
@@ -2381,29 +2383,28 @@ export class Vfx {
     }
   }
 
-  /** Green spores hovering around Sporemender Form's two shoulder shelves, each drifting
-   *  slowly its own way with no lift. Lives apart from formAura because it starts at the
-   *  shelves, not the feet. World space, so they trail a moving form. */
-  sporeShelves(left: THREE.Vector3, right: THREE.Vector3, dt: number): void {
-    for (const at of [left, right]) {
-      const n = this.emitCount(14, dt);
-      for (let k = 0; k < n; k++) {
-        const a = Math.random() * Math.PI * 2;
-        const r = 0.14 + Math.sqrt(Math.random()) * 0.34;
-        this.spawn(
-          at.x + Math.sin(a) * r,
-          at.y - 0.1 + Math.random() * 0.5,
-          at.z + Math.cos(a) * r,
-          (Math.random() - 0.5) * 0.16,
-          (Math.random() - 0.5) * 0.1,
-          (Math.random() - 0.5) * 0.16,
-          Math.random() < 0.3 ? 0xd4f59a : 0x9fe35a,
-          0.2 + Math.random() * 0.08,
-          2.2 + Math.random() * 1.2,
-          0,
-          SPR.flash,
-        );
-      }
+  /** About twenty small green motes around a Sporemender, each wandering its own way. */
+  private sporemenderMotes(entityId: number, dt: number): void {
+    const n = this.emitCount(8, dt);
+    if (!n) return;
+    const at = this.anchor(entityId, 0.03);
+    if (!at) return;
+    for (let k = 0; k < n; k++) {
+      const a = Math.random() * Math.PI * 2;
+      const r = 0.4 + Math.random() * 0.9;
+      this.spawn(
+        at.x + Math.sin(a) * r,
+        at.y + 0.2 + Math.random() * 2.6,
+        at.z + Math.cos(a) * r,
+        (Math.random() - 0.5) * 0.3,
+        (Math.random() - 0.5) * 0.2,
+        (Math.random() - 0.5) * 0.3,
+        0x9fe35a,
+        0.26 + Math.random() * 0.1,
+        2.2 + Math.random() * 0.8,
+        0,
+        SPR.flash,
+      );
     }
   }
 
