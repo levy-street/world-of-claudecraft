@@ -19,8 +19,10 @@ feature is available in the game.
 - Both assigned characters must be below level 5 and must not have completed
   `q_ps_set_sail` when starting. Both must accept. Declining requires confirmation;
   players can later start manually if eligible.
-- A reward quest completed with the assigned friend in the party earns its stamp.
-  Completing a later associated dungeon together recovers a quest turned in alone.
+- A dungeon stamp is earned on the kill: when both assigned characters are eligible
+  for the final boss kill of the stamp's dungeon, both earn it, whether or not either
+  has the quest. Turning in the stamp's quest with the assigned friend in the party
+  also earns it, for the player who turned it in.
 - Each participant can move their assignment and earned rewards to an eligible
   new character before redeeming their Fogbinder reward. Progress is preserved.
   Fogbinder redemption requires two acknowledgements and permanently locks that
@@ -42,8 +44,9 @@ feature is available in the game.
 
 The tutorial quest has no associated dungeon. If it was turned in alone, the active
 card earns that stamp when both assigned characters have completed the quest and
-rejoin one another in a party. Later quest stamps
-can be recovered by clearing the matching dungeon together. Trinket descriptions
+rejoin one another in a party. The later dungeon stamps are earned by defeating
+the matching dungeon's final boss together, so a quest turned in alone never blocks
+them. Trinket descriptions
 use the live content values for stamina, shield size, threshold, and cooldown.
 
 Inviter rewards are: raptor-model mount at one completed friend; 20 bank slots

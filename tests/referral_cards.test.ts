@@ -217,28 +217,52 @@ describe('referral card milestone evidence', () => {
     expect(creditReferralCard(state, event, ctx).error).toBe('wrongCharacter');
   });
 
-  it('catches up solo dungeon quests only on the matching shared clear with both eligible', () => {
+  it('credits a dungeon stamp to both on the matching shared boss kill, quest or not', () => {
     const state = active();
     const ctx = context();
-    ctx.characters[0].completedQuestIds = ['q_hollow', 'q_ps_set_sail'];
     const event = {
       type: 'dungeonClear',
       dungeonId: 'hollow_crypt',
       eligibleCharacterIds: [101, 202],
     } as const;
+    // Neither character holds or has turned in q_hollow: the kill alone is the milestone.
+    expect(ctx.characters.every((c) => !c.completedQuestIds.includes('q_hollow'))).toBe(true);
     expect(creditReferralCard(state, { ...event, eligibleCharacterIds: [101] }, ctx).state).toBe(
       state,
     );
-    expect(creditReferralCard(state, { ...event, dungeonId: 'sunken_bastion' }, ctx).state).toBe(
+    expect(creditReferralCard(state, { ...event, dungeonId: 'drowned_temple' }, ctx).state).toBe(
       state,
     );
     const credited = creditReferralCard(state, event, ctx).state;
-    expect(credited.participants.map((p) => p.credited)).toEqual([2, 0]);
+    expect(credited.participants.map((p) => p.credited)).toEqual([2, 2]);
     expect(referralNextMilestone(credited.participants[0])).toBe('tutorial');
-    ctx.characters[1].completedQuestIds = ['q_hollow'];
-    expect(
-      creditReferralCard(credited, event, ctx).state.participants.map((p) => p.credited),
-    ).toEqual([2, 2]);
+    // A repeat clear is idempotent.
+    expect(creditReferralCard(credited, event, ctx).state).toBe(credited);
+    // Every authored dungeon milestone maps its own clear to its own bit.
+    for (const [i, m] of REFERRAL_MILESTONES.entries()) {
+      if (!m.dungeonId) continue;
+      expect(
+        creditReferralCard(state, { ...event, dungeonId: m.dungeonId }, ctx).state.participants.map(
+          (p) => p.credited,
+        ),
+      ).toEqual([1 << i, 1 << i]);
+    }
+    ctx.characters[1].partyId = 8;
+    expect(creditReferralCard(state, event, ctx).error).toBe('notTogether');
+  });
+
+  it('a shared clear completes the stamp a friend already earned by turn-in', () => {
+    const ctx = context();
+    const state = active();
+    state.participants[1].credited = 1 << 3;
+    const event = {
+      type: 'dungeonClear',
+      dungeonId: 'gravewyrm_sanctum',
+      eligibleCharacterIds: [101, 202],
+    } as const;
+    expect(creditReferralCard(state, event, ctx).state.participants.map((p) => p.credited)).toEqual(
+      [8, 8],
+    );
   });
 
   it.each([
