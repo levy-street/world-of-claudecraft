@@ -349,7 +349,30 @@ describe('live-world touch-up pipeline', () => {
 
     // 3. Added north cottages, Streetlamp 17, and 12 Fenbridge foliage placements exist and level terrain.
     const placements = WORLD_TOUCHUP.changes.placements ?? [];
-    expect(placements).toHaveLength(16);
+    // The Fenbridge reconstruction's 16 placements survive later touch-ups (the
+    // Eastbrook and Mirefen carry-over adds placements elsewhere).
+    const sourceUids = new Set((WORLD_TOUCHUP_SOURCE?.placements ?? []).map((p) => p.uid));
+    for (const uid of [
+      'd4a2522da25a',
+      'a1f743dc0b53',
+      '97310fe05757',
+      '9b84f15efc51',
+      '00daf0610cf4',
+      '2284d68c3995',
+      '0b83a79def32',
+      '4b285ede32df',
+      'e9cd7d44f4cd',
+      'eb1fa93f17aa',
+      'b9b9621cbb2f',
+      'fd579745c134',
+      '95e5b0b5d376',
+      'd8c7d33ebe17',
+      '068c46142301',
+      'ccd96fa4dcc1',
+    ]) {
+      expect(sourceUids.has(uid), uid).toBe(true);
+    }
+    expect(placements).toHaveLength(WORLD_TOUCHUP_SOURCE?.placements.length ?? 0);
     const sourceCottages = (WORLD_TOUCHUP_SOURCE?.placements ?? []).filter(
       (p) => p.assetId === 'tidehold/fenrire/house_a' && p.z > 340,
     );
