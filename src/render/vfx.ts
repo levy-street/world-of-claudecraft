@@ -2289,8 +2289,8 @@ export class Vfx {
   // Shapeshift-form aura (continuous, called per frame while the form aura is
   // on). Each form reads distinctly at a glance: metamorph = flame tongues +
   // stray embers, moonkin = drifting star motes, shadowform = gloom wisps +
-  // smoke curls, sporemender = tiny spores lifting off the ground into the sky,
-  // sporemending = the same spores, sparser, on a Sporemending HoT target.
+  // smoke curls, sporemender = green motes wandering around the body,
+  // sporemending = tiny spores lifting off the ground on a Sporemending HoT target.
   formAura(
     entityId: number,
     form: 'metamorph' | 'moonkin' | 'sporemender' | 'sporemending',
@@ -2349,15 +2349,16 @@ export class Vfx {
       }
       return;
     }
-    if (form === 'sporemender' || form === 'sporemending') {
-      // Small spores shaken loose at the druid's feet, rising slowly and
-      // gathering speed as they climb past the cap toward the sky. The form
-      // wears them green through its wandering motes; a HoT target gets a
-      // sparser, shorter drift of mostly pale cream specks, a few a soft spring
-      // green: a raid can carry the HoT on every member.
-      const hot = form === 'sporemending';
-      if (!hot) this.sporemenderMotes(entityId, dt);
-      const n = this.emitCount(hot ? 9 : 26, dt);
+    if (form === 'sporemender') {
+      this.sporemenderMotes(entityId, dt);
+      return;
+    }
+    if (form === 'sporemending') {
+      // Small spores shaken loose at the target's feet, rising slowly and
+      // gathering speed as they climb: a sparse, short drift of mostly pale
+      // cream specks, a few a soft spring green, since a raid can carry the
+      // HoT on every member.
+      const n = this.emitCount(9, dt);
       if (!n) return;
       const at = this.anchor(entityId, 0.03);
       if (!at) return;
@@ -2372,9 +2373,9 @@ export class Vfx {
           (Math.random() - 0.5) * 0.14,
           0.5 + Math.random() * 0.4,
           (Math.random() - 0.5) * 0.14,
-          hot ? (glow ? 0xc8f77a : 0xf6efcf) : glow ? 0xd4f59a : 0x9fe35a,
+          glow ? 0xc8f77a : 0xf6efcf,
           glow ? 0.36 + Math.random() * 0.1 : 0.22 + Math.random() * 0.08,
-          (hot ? 2.2 : 2.8) + Math.random() * (hot ? 0.8 : 1.2),
+          2.2 + Math.random() * 0.8,
           -0.3,
           SPR.flash,
         );
