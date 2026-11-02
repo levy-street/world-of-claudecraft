@@ -1201,8 +1201,7 @@ export class CouncilFx {
       );
     }
     this.particles.shockRing(x, z, 0xfff0c8, radius * 0.9, 0.22);
-    this.particles.shockRing(x, z, C.soak, radius * 1.15, 0.5);
-    this.particles.shockRing(x, z, 0x8a5a32, radius * 1.9, 1.1);
+    this.particles.shockRing(x, z, 0x6a4426, radius * 1.9, 1.1);
     this.particles.puff(x, y + 1.2, z, 8, {
       speed: 5,
       life: 0.3,
