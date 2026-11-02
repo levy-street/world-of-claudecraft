@@ -4935,6 +4935,7 @@ export const cs_CZ: EnTranslations = {
       "armorFlatStacks": "Snižuje brnění o {value} ({stacks} stacků)",
       "armorPct": "Snižuje brnění o {pct} %",
       "armorPctStacks": "Snižuje brnění o {pct} % ({stacks} stacků)",
+      "witchlightPct": "Ranged weapon attacks treat armor as {pct}% lower, and spells deal the matching extra damage",
       "mortalWound": "Snižuje přijaté léčení o {pct} %",
       "vulnerability": "Zvyšuje obdržené poškození o {pct} %",
       "physVuln": "Zvyšuje obdržené fyzické poškození o {pct} %",
@@ -18468,7 +18469,7 @@ export const cs_CZ: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Čarodějné světlo",
-        "description": "Snižuje zbroj cíle o {damage} % na 40 s."
+        "description": "Označí cíl na 40 s. Útoky zbraní na dálku počítají s jeho zbrojí o {damage} % nižší a kouzla proti němu získají stejné zvýšení poškození, jaké toto snížení dává útoku na dálku. Útoky na blízko ovlivněny nejsou, takže se sčítá se Seřezáním zbroje."
       },
       "hibernate": {
         "name": "Dřímota",

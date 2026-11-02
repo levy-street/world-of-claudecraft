@@ -4935,6 +4935,7 @@ export const vi_VN: EnTranslations = {
       "armorFlatStacks": "Reduce la armadura en {value} ({stacks} acumulaciones)",
       "armorPct": "Giảm giáp đi {pct}%",
       "armorPctStacks": "Giảm giáp đi {pct}% ({stacks} tích trữ)",
+      "witchlightPct": "Ranged weapon attacks treat armor as {pct}% lower, and spells deal the matching extra damage",
       "mortalWound": "Reduce la sanación recibida un {pct}%",
       "vulnerability": "Aumenta el daño recibido un {pct}%",
       "physVuln": "Aumenta el daño físico recibido un {pct}%",
@@ -18468,7 +18469,7 @@ export const vi_VN: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Ánh Ma Trơi",
-        "description": "Giảm giáp của mục tiêu {damage}% trong 40 giây."
+        "description": "Đánh dấu mục tiêu trong 40 giây. Đòn tấn công bằng vũ khí tầm xa coi giáp của mục tiêu thấp hơn {damage}%, và phép thuật lên mục tiêu được tăng sát thương bằng đúng mức mà mức giảm đó mang lại cho một đòn tầm xa. Đòn cận chiến không bị ảnh hưởng, nên hiệu ứng này cộng dồn với Xẻ Giáp."
       },
       "hibernate": {
         "name": "Giấc Ngủ Sâu",

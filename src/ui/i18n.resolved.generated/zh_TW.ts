@@ -4935,6 +4935,7 @@ export const zh_TW: EnTranslations = {
       "armorFlatStacks": "護甲降低 {value}（{stacks} 層）",
       "armorPct": "護甲降低 {pct}%",
       "armorPctStacks": "護甲降低 {pct}%（{stacks} 層）",
+      "witchlightPct": "遠程武器攻擊視護甲降低 {pct}%，法術造成相應的額外傷害",
       "mortalWound": "受到的治療降低 {pct}%",
       "vulnerability": "受到的傷害提高 {pct}%",
       "physVuln": "受到的物理傷害提高 {pct}%",
@@ -18468,7 +18469,7 @@ export const zh_TW: EnTranslations = {
       },
       "faerie_fire": {
         "name": "巫光",
-        "description": "將目標的護甲降低 {damage}%，持續 40 秒。"
+        "description": "標記目標，持續 40 秒。遠程武器攻擊視其護甲降低 {damage}%，對其施放的法術獲得與該降低給遠程攻擊帶來的相同傷害提升。不影響近戰攻擊，因此可與削甲疊加。"
       },
       "hibernate": {
         "name": "沉眠",

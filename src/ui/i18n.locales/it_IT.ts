@@ -17405,7 +17405,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.expose_armor.description':
     'Mossa finale che espone il bersaglio per 30 sec: ogni punto combo speso riduce la sua armatura del 2% (5 punti combo: {damage}%).',
   'entities.abilities.faerie_fire.description':
-    "Riduce l'armatura del bersaglio del {damage}% per 40 sec.",
+    'Marchia il bersaglio per 40 sec. Gli attacchi con armi a distanza considerano la sua armatura inferiore del {damage}%, e gli incantesimi contro di esso ottengono lo stesso aumento di danno che quella riduzione dà a un attacco a distanza. Gli attacchi in mischia non sono influenzati, quindi si somma a Trancia Armatura.',
   'entities.abilities.ferocious_bite.description':
     'Mossa finale che infligge {damage}. Solo Forma del Gatto.',
   'entities.abilities.ferocious_bite.specNote_feral':

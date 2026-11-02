@@ -4935,6 +4935,7 @@ export const da_DK: EnTranslations = {
       "armorFlatStacks": "Verringert Rüstung um {value} ({stacks} Stapel)",
       "armorPct": "Reducerer rustning med {pct}%",
       "armorPctStacks": "Reducerer rustning med {pct}% ({stacks} stakke)",
+      "witchlightPct": "Ranged weapon attacks treat armor as {pct}% lower, and spells deal the matching extra damage",
       "mortalWound": "Verringert erhaltene Heilung um {pct}%",
       "vulnerability": "Erhöht erlittenen Schaden um {pct}%",
       "physVuln": "Erhöht erlittenen physischen Schaden um {pct}%",
@@ -18468,7 +18469,7 @@ export const da_DK: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Hekselys",
-        "description": "Reducerer målets rustning med {damage}% i 40 sek."
+        "description": "Mærker målet i 40 sek. Afstandsvåbenangreb behandler dets rustning som {damage}% lavere, og besværgelser mod det får samme skadeforøgelse, som den nedsættelse giver et afstandsangreb. Nærkampsangreb påvirkes ikke, så den stables med Rustningsskær."
       },
       "hibernate": {
         "name": "Slummer",

@@ -4935,6 +4935,7 @@ export const id_ID: EnTranslations = {
       "armorFlatStacks": "Reduce la armadura en {value} ({stacks} acumulaciones)",
       "armorPct": "Mengurangi zirah sebesar {pct}%",
       "armorPctStacks": "Mengurangi zirah sebesar {pct}% ({stacks} tumpukan)",
+      "witchlightPct": "Ranged weapon attacks treat armor as {pct}% lower, and spells deal the matching extra damage",
       "mortalWound": "Reduce la sanación recibida un {pct}%",
       "vulnerability": "Aumenta el daño recibido un {pct}%",
       "physVuln": "Aumenta el daño físico recibido un {pct}%",
@@ -18468,7 +18469,7 @@ export const id_ID: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Cahaya Sihir",
-        "description": "Mengurangi zirah target sebesar {damage}% selama 40 detik."
+        "description": "Menandai target selama 40 detik. Serangan senjata jarak jauh menganggap zirahnya {damage}% lebih rendah, dan mantra terhadapnya mendapat kenaikan kerusakan yang sama dengan yang diberikan pengurangan itu pada serangan jarak jauh. Serangan jarak dekat tidak terpengaruh, jadi efek ini bertumpuk dengan Robek Zirah."
       },
       "hibernate": {
         "name": "Lelap",

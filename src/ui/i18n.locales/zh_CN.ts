@@ -7740,7 +7740,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bash.name': '震荡击',
   'entities.abilities.bash.description': '昏迷目标 2 秒。仅限巨熊形态。',
   'entities.abilities.faerie_fire.name': '巫光',
-  'entities.abilities.faerie_fire.description': '将目标的护甲降低 {damage}%，持续 40 秒。',
+  'entities.abilities.faerie_fire.description':
+    '标记目标，持续 40 秒。远程武器攻击视其护甲降低 {damage}%，对其施放的法术获得与该降低给远程攻击带来的相同伤害提升。不影响近战攻击，因此可与削甲叠加。',
   'entities.abilities.hibernate.name': '沉眠',
   'entities.abilities.hibernate.description':
     '使目标陷入深度睡眠，最多持续8秒。任何伤害都会将其唤醒。对玩家使用时，18秒内每次重复的持续时间都减半，第4次无效。',
@@ -12487,6 +12488,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.increasePct.allStats': '所有属性提高 {pct}%',
   'hudChrome.auraEffect.armorPct': '护甲降低 {pct}%',
   'hudChrome.auraEffect.armorPctStacks': '护甲降低 {pct}%（{stacks} 层）',
+  'hudChrome.auraEffect.witchlightPct': '远程武器攻击视护甲降低 {pct}%，法术造成相应的额外伤害',
   'hudChrome.auraEffect.physVuln': '受到的物理伤害提高 {pct}%',
   'hudChrome.auraEffect.mortalWound': '受到的治疗降低 {pct}%',
   'hudChrome.auraEffect.vulnerability': '受到的伤害提高 {pct}%',

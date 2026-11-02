@@ -13242,7 +13242,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hud.core.mobileSettings': 'Nastavení',
   'hud.core.riftLabel': '{name}',
   'hud.core.riftLabelRanked': '{name} ({rank})',
-  'entities.abilities.faerie_fire.description': 'Snižuje zbroj cíle o {damage} % na 40 s.',
+  'entities.abilities.faerie_fire.description':
+    'Označí cíl na 40 s. Útoky zbraní na dálku počítají s jeho zbrojí o {damage} % nižší a kouzla proti němu získají stejné zvýšení poškození, jaké toto snížení dává útoku na dálku. Útoky na blízko ovlivněny nejsou, takže se sčítá se Seřezáním zbroje.',
   'abilityUi.tooltip.selfOnly': 'Pouze na sebe',
   'itemUi.lootRoll.rolled': '{answered}/{total} hodilo',
   'entities.items.ashwood_log.name': 'Jasanová kláda',

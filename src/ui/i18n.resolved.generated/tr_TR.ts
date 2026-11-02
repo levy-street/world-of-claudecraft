@@ -4935,6 +4935,7 @@ export const tr_TR: EnTranslations = {
       "armorFlatStacks": "Reduce la armadura en {value} ({stacks} acumulaciones)",
       "armorPct": "Zırhı %{pct} azaltır",
       "armorPctStacks": "Zırhı %{pct} azaltır ({stacks} istif)",
+      "witchlightPct": "Ranged weapon attacks treat armor as {pct}% lower, and spells deal the matching extra damage",
       "mortalWound": "Reduce la sanación recibida un {pct}%",
       "vulnerability": "Aumenta el daño recibido un {pct}%",
       "physVuln": "Aumenta el daño físico recibido un {pct}%",
@@ -18468,7 +18469,7 @@ export const tr_TR: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Cadı Işığı",
-        "description": "Hedefin zırhını 40 sn boyunca %{damage} azaltır."
+        "description": "Hedefi 40 sn boyunca işaretler. Menzilli silah saldırıları hedefin zırhını %{damage} daha düşük sayar ve hedefe karşı büyüler, bu düşüşün menzilli bir saldırıya sağladığı hasar artışının aynısını kazanır. Yakın dövüş saldırıları etkilenmez, bu yüzden Zırh Kesme ile birikir."
       },
       "hibernate": {
         "name": "Derin Uyku",

@@ -89,6 +89,7 @@ import { onCastCompleted, onMeleeSwing } from './talent_procs';
 import { applyThornsReaction } from './thorns_charge';
 import { onTrinketAvoidance } from './trinkets';
 import { warriorMeleeDefense } from './warrior_hit_table';
+import { rangedArmorOf } from './witchlight';
 
 // Fraction of the mainhand weapon's damage a hunter's Auto Shot deals. There is no
 // dedicated ranged-weapon slot, so the mainhand doubles as the "bow"; a full melee
@@ -496,7 +497,8 @@ export function rangedSwing(
     const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, atk) ? 1 : critChance);
     if (crit) dmg *= 2 + atk.critDmgPhysBonus;
     // wand bolts are magic — armor doesn't apply; physical auto shot is mitigated
-    if (!ranged.wand) dmg *= 1 - armorReduction(ctx.effectiveArmor(tgt), atk.level);
+    // by the ranged armor view, which Witchlight lowers (combat/witchlight.ts)
+    if (!ranged.wand) dmg *= 1 - armorReduction(rangedArmorOf(ctx, tgt), atk.level);
     ctx.dealDamage(
       atk,
       tgt,

@@ -12941,6 +12941,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.auraEffect.wildheart.warySlows'
   | 'hudChrome.auraEffect.wildheart.waryStuns'
   | 'hudChrome.auraEffect.wintersChill'
+  | 'hudChrome.auraEffect.witchlightPct'
   | 'hudChrome.auraEffect.wolfForm'
   | 'hudChrome.auraOverlay.allOff'
   | 'hudChrome.auraOverlay.allOn'

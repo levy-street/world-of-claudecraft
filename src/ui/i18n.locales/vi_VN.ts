@@ -16556,7 +16556,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Đánh trúng đòn này với 4 điểm liên hoàn trở lên sẽ kích hoạt Redline trong 8 giây: Nhát Chém Gian Tà trở thành Đòn Trời Giáng và nút này trở thành Tắt Lịm (45 cộng 35 mỗi điểm liên hoàn, đánh mạnh hơn 25% cho mỗi nấc Redline tích được, hồi 25 năng lượng). Hãy dùng nó trước khi Redline kết thúc.',
   'entities.abilities.expose_armor.description':
     'Chiêu kết liễu phơi bày mục tiêu trong 30 giây: mỗi điểm liên hoàn tiêu hao giảm giáp của nó 2% (5 điểm liên hoàn: {damage}%).',
-  'entities.abilities.faerie_fire.description': 'Giảm giáp của mục tiêu {damage}% trong 40 giây.',
+  'entities.abilities.faerie_fire.description':
+    'Đánh dấu mục tiêu trong 40 giây. Đòn tấn công bằng vũ khí tầm xa coi giáp của mục tiêu thấp hơn {damage}%, và phép thuật lên mục tiêu được tăng sát thương bằng đúng mức mà mức giảm đó mang lại cho một đòn tầm xa. Đòn cận chiến không bị ảnh hưởng, nên hiệu ứng này cộng dồn với Xẻ Giáp.',
   'entities.abilities.ferocious_bite.description': 'Đòn kết liễu gây {damage}. Chỉ trong Hình Mèo.',
   'entities.abilities.ferocious_bite.specNote_feral':
     'Mỗi đòn đánh trúng thêm 1 Huyết Cổ; ở 3 Huyết Cổ, nút này trở thành Thu Hoạch Đỏ, tiêu Huyết Cổ cho một cú cắn mạnh hơn, đồng thời lập tức gây toàn bộ sát thương còn lại của Lóc Xé và Xé Rách, và hồi năng lượng.',

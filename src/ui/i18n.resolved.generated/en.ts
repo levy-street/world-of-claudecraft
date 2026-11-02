@@ -4935,6 +4935,7 @@ export const en: EnTranslations = {
       "armorFlatStacks": "Reduces armor by {value} ({stacks} stacks)",
       "armorPct": "Reduces armor by {pct}%",
       "armorPctStacks": "Reduces armor by {pct}% ({stacks} stacks)",
+      "witchlightPct": "Ranged weapon attacks treat armor as {pct}% lower, and spells deal the matching extra damage",
       "mortalWound": "Reduces healing received by {pct}%",
       "vulnerability": "Increases damage taken by {pct}%",
       "physVuln": "Increases physical damage taken by {pct}%",
@@ -18468,7 +18469,7 @@ export const en: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Witchlight",
-        "description": "Decreases the target's armor by {damage}% for 40 sec."
+        "description": "Mark the target for 40 sec. Ranged weapon attacks treat its armor as {damage}% lower, and spells against it gain the same damage increase that cut gives a ranged attack. Melee attacks are not affected, so it stacks with Armor Shear."
       },
       "hibernate": {
         "name": "Slumber",

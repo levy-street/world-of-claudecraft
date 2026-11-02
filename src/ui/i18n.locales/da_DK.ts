@@ -16435,7 +16435,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'At lande dette med 4 eller flere combopoint starter Redline i 8 sek.: Ondsindet Hug bliver til Kropsstød, og denne knap bliver til Knockoutstød (45 plus 35 pr. combopoint, der rammer 25% hårdere for hvert opbygget Redline-hak, og gendanner 25 energi). Brug det, før Redline slutter.',
   'entities.abilities.expose_armor.description':
     'Afsluttende manøvre, der blotter målet i 30 sek.: hvert brugt combopoint reducerer dets rustning med 2% (5 combopoint: {damage}%).',
-  'entities.abilities.faerie_fire.description': 'Reducerer målets rustning med {damage}% i 40 sek.',
+  'entities.abilities.faerie_fire.description':
+    'Mærker målet i 40 sek. Afstandsvåbenangreb behandler dets rustning som {damage}% lavere, og besværgelser mod det får samme skadeforøgelse, som den nedsættelse giver et afstandsangreb. Nærkampsangreb påvirkes ikke, så den stables med Rustningsskær.',
   'entities.abilities.ferocious_bite.description':
     'Afsluttende manøvre, der giver {damage}. Kun i Katteform.',
   'entities.abilities.ferocious_bite.specNote_feral':

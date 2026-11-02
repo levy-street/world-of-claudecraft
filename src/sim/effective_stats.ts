@@ -4,15 +4,16 @@
 // non-player (mob/pet) ones plus the debuffs every target takes. No SimContext,
 // no rng: tests/effective_stats.test.ts drives both with plain entities.
 
-import { type Entity, FAERIE_FIRE_ARMOR_PCT, SUNDER_ARMOR_PCT_PER_STACK } from './types';
+import { type Entity, SUNDER_ARMOR_PCT_PER_STACK } from './types';
 
 export function effectiveArmorOf(e: Entity): number {
   let armor = e.stats.armor;
   // Player/rogue armor debuffs are PERCENTAGES that do NOT stack with each other:
-  // Sunder Armor (2% per stack, up to 10% at 5 stacks) and Faerie Fire (a flat 10%)
-  // max-combine, so a fully-stacked Sunder and a Faerie Fire are redundant rather
-  // than additive. Mob corrosion (kind 'corrode') is a separate FLAT shred that
-  // subtracts value*stacks before the percent debuffs apply.
+  // Sunder Armor (2% per stack, up to 10% at 5 stacks) and Melting Acid
+  // max-combine. Witchlight (aura kind 'faerie_fire') is deliberately NOT here:
+  // it only softens ranged attacks and spells, on top of this value
+  // (combat/witchlight.ts). Mob corrosion (kind 'corrode') is a separate FLAT
+  // shred that subtracts value*stacks before the percent debuffs apply.
   let reductionPct = 0;
   const baseArmor = e.stats.armor;
   for (const a of e.auras) {
@@ -25,7 +26,6 @@ export function effectiveArmorOf(e: Entity): number {
     if (a.kind === 'corrode') armor -= a.value * (a.stacks ?? 1);
     else if (a.kind === 'sunder')
       reductionPct = Math.max(reductionPct, SUNDER_ARMOR_PCT_PER_STACK * (a.stacks ?? 1));
-    else if (a.kind === 'faerie_fire') reductionPct = Math.max(reductionPct, FAERIE_FIRE_ARMOR_PCT);
     // Melting Acid carries its own fraction on the aura (0.05), so a future
     // rank or talent scales the value rather than a constant here.
     else if (a.kind === 'melting_acid') reductionPct = Math.max(reductionPct, a.value);

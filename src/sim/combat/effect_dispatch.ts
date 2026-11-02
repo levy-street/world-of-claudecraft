@@ -291,6 +291,7 @@ import { applyTemporalHourglass } from './temporal_hourglass';
 import { warlockFearBreakThreshold } from './warlock_fear';
 import { applyBlacktideReturnSpeed } from './warlock_talents';
 import { placeOrRecallUmbralAnchor } from './warlock_utility';
+import { physicalHitArmor } from './witchlight';
 
 export { SWEEP_MULT } from './area_echo';
 
@@ -971,7 +972,7 @@ export function runEffects(
             // Lava Flows (combat/shaman_thundercall_kit.ts): Magma Burst only.
             magmaBurstCritBonus(ctx, p, ability.id);
         if (isSpell) dmg *= spellDamageMultFromAuras(p);
-        if (!isSpell) dmg *= 1 - armorReduction(ctx.effectiveArmor(target), p.level);
+        if (!isSpell) dmg *= 1 - armorReduction(physicalHitArmor(ctx, target, ability), p.level);
         // Aether Surge (Chronomancy Phase 3): each held Arcane Charge scales the
         // FULL post-spell-power, post-crit damage. The extra damage feeds more
         // Temporal Echo healing before Chronomancy applies its individual-mark
@@ -2067,8 +2068,9 @@ export function runEffects(
         break;
       }
       case 'faerieFire': {
-        // Fixed-percent armor-reduction debuff (see effectiveArmor); does not stack
-        // with Sunder Armor. The percent is a constant, so the aura value is unused.
+        // Witchlight: softens ranged weapon attacks and spells against the target
+        // (combat/witchlight.ts) and stacks with Sunder Armor. The percent is a
+        // constant, so the aura value is unused.
         if (!target || target.dead) break;
         ctx.applyAura(target, {
           id: ability.id,
@@ -2643,7 +2645,7 @@ export function runEffects(
           // Armor only mitigates physical damage, mirroring the single-target
           // path above - spell-school AoE (Arcane Explosion, Consecration) is
           // not reduced by the target's armor.
-          if (!isSpell) dmg *= 1 - armorReduction(ctx.effectiveArmor(m), p.level);
+          if (!isSpell) dmg *= 1 - armorReduction(physicalHitArmor(ctx, m, ability), p.level);
           // Soft-cap scale (Revenge above 5 targets): applied after the roll and
           // armor so the total, not any single hit, is what the cap bounds.
           dmg *= capScale * primaryDamageMult;
@@ -2784,7 +2786,8 @@ export function runEffects(
               dealImpact: (landedTarget, hopIndex) => {
                 let dmg = baseAmount * eff.falloff ** (hopIndex - 1);
                 if (isSpell) dmg *= spellDamageMultFromAuras(p);
-                else dmg *= 1 - armorReduction(ctx.effectiveArmor(landedTarget), p.level);
+                else
+                  dmg *= 1 - armorReduction(physicalHitArmor(ctx, landedTarget, ability), p.level);
                 const hpBefore = landedTarget.hp;
                 ctx.dealDamage(
                   p,
@@ -2855,7 +2858,7 @@ export function runEffects(
           });
           let dmg = baseAmount * eff.falloff ** i;
           if (isSpell) dmg *= spellDamageMultFromAuras(p);
-          else dmg *= 1 - armorReduction(ctx.effectiveArmor(m), p.level);
+          else dmg *= 1 - armorReduction(physicalHitArmor(ctx, m, ability), p.level);
           const hpBefore = m.hp;
           if (i === 0) firstChainHit = Math.max(1, Math.round(dmg));
           const chainLanded = ctx.dealDamage(
@@ -3687,7 +3690,7 @@ export function runEffects(
           if (sureCrit) sureCritRolled = true;
           if (crit)
             dmg *= (isSpell ? 1.5 : 2) + (isSpell ? p.critDmgSpellBonus : p.critDmgPhysBonus);
-          if (!isSpell) dmg *= 1 - armorReduction(ctx.effectiveArmor(target), p.level);
+          if (!isSpell) dmg *= 1 - armorReduction(physicalHitArmor(ctx, target, ability), p.level);
           if (isSpell) noteSpellHit(ctx, p, crit, ability.id);
           ctx.dealDamage(
             p,

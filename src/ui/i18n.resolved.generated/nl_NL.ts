@@ -4935,6 +4935,7 @@ export const nl_NL: EnTranslations = {
       "armorFlatStacks": "Verringert Rüstung um {value} ({stacks} Stapel)",
       "armorPct": "Vermindert pantser met {pct}%",
       "armorPctStacks": "Vermindert pantser met {pct}% ({stacks} stapels)",
+      "witchlightPct": "Ranged weapon attacks treat armor as {pct}% lower, and spells deal the matching extra damage",
       "mortalWound": "Verringert erhaltene Heilung um {pct}%",
       "vulnerability": "Erhöht erlittenen Schaden um {pct}%",
       "physVuln": "Erhöht erlittenen physischen Schaden um {pct}%",
@@ -18468,7 +18469,7 @@ export const nl_NL: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Heksenlicht",
-        "description": "Vermindert het pantser van het doelwit met {damage}% gedurende 40 sec."
+        "description": "Markeert het doelwit gedurende 40 sec. Afstandswapenaanvallen behandelen zijn pantser als {damage}% lager, en spreuken tegen het doelwit krijgen dezelfde schadeverhoging die die verlaging een afstandsaanval geeft. Melee-aanvallen worden niet beïnvloed, dus het stapelt met Pantserscheur."
       },
       "hibernate": {
         "name": "Sluimer",

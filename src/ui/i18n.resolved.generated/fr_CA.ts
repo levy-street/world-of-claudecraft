@@ -4935,6 +4935,7 @@ export const fr_CA: EnTranslations = {
       "armorFlatStacks": "Diminue l'armure de {value} ({stacks} charges)",
       "armorPct": "Réduit l'armure de {pct}%",
       "armorPctStacks": "Réduit l'armure de {pct}% ({stacks} charges)",
+      "witchlightPct": "Ranged weapon attacks treat armor as {pct}% lower, and spells deal the matching extra damage",
       "mortalWound": "Diminue les soins reçus de {pct}%",
       "vulnerability": "Accroît les dégâts subis de {pct}%",
       "physVuln": "Accroît les dégâts physiques subis de {pct}%",
@@ -18468,7 +18469,7 @@ export const fr_CA: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Lumière de sorcière",
-        "description": "Réduit l'armure de la cible de {damage}% pendant 40 s."
+        "description": "Marque la cible pendant 40 s. Les attaques d'armes à distance considèrent son armure comme réduite de {damage}%, et les sorts contre elle gagnent la même hausse de dégâts que cette réduction apporte à une attaque à distance. Les attaques de mêlée ne sont pas affectées, cet effet se cumule donc avec Cisaillement d'armure."
       },
       "hibernate": {
         "name": "Sommeil",

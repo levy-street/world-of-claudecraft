@@ -4935,6 +4935,7 @@ export const it_IT: EnTranslations = {
       "armorFlatStacks": "Riduce l'armatura di {value} ({stacks} accumuli)",
       "armorPct": "Riduce l'armatura del {pct}%",
       "armorPctStacks": "Riduce l'armatura del {pct}% ({stacks} accumuli)",
+      "witchlightPct": "Ranged weapon attacks treat armor as {pct}% lower, and spells deal the matching extra damage",
       "mortalWound": "Riduce le cure ricevute del {pct}%",
       "vulnerability": "Aumenta i danni subiti del {pct}%",
       "physVuln": "Aumenta i danni fisici subiti del {pct}%",
@@ -18468,7 +18469,7 @@ export const it_IT: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Luce Stregata",
-        "description": "Riduce l'armatura del bersaglio del {damage}% per 40 sec."
+        "description": "Marchia il bersaglio per 40 sec. Gli attacchi con armi a distanza considerano la sua armatura inferiore del {damage}%, e gli incantesimi contro di esso ottengono lo stesso aumento di danno che quella riduzione dà a un attacco a distanza. Gli attacchi in mischia non sono influenzati, quindi si somma a Trancia Armatura."
       },
       "hibernate": {
         "name": "Sopore",

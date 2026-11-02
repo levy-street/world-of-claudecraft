@@ -6332,7 +6332,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bash.name': '뇌진탕',
   'entities.abilities.bash.description': '대상을 2초 동안 기절시킵니다. 큰곰 변신 전용.',
   'entities.abilities.faerie_fire.name': '마녀불빛',
-  'entities.abilities.faerie_fire.description': '대상의 방어도를 40초 동안 {damage}% 낮춥니다.',
+  'entities.abilities.faerie_fire.description':
+    '대상을 40초 동안 표시합니다. 원거리 무기 공격은 대상의 방어도를 {damage}% 낮은 것으로 취급하며, 대상에게 가하는 주문은 그 감소가 원거리 공격에 주는 것과 같은 만큼 피해가 증가합니다. 근접 공격에는 영향을 주지 않으므로 방어구 절단과 중첩됩니다.',
   'entities.abilities.hibernate.name': '깊은 잠',
   'entities.abilities.hibernate.description':
     '대상을 최대 8초 동안 깊은 잠에 빠뜨립니다. 피해를 받으면 깨어납니다. 플레이어에게는 18초 내 반복할 때마다 지속 시간이 이전의 절반이 되며 네 번째는 실패합니다.',
@@ -11275,6 +11276,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.increasePct.allStats': '모든 능력치를 {pct}% 증가시킵니다',
   'hudChrome.auraEffect.armorPct': '방어도를 {pct}% 감소시킵니다',
   'hudChrome.auraEffect.armorPctStacks': '방어도를 {pct}% 감소시킵니다 ({stacks}중첩)',
+  'hudChrome.auraEffect.witchlightPct':
+    '원거리 무기 공격은 방어도를 {pct}% 낮은 것으로 취급하고, 주문은 그에 맞는 추가 피해를 줍니다',
   'hudChrome.auraEffect.physVuln': '받는 물리 피해를 {pct}% 증가시킵니다',
   'hudChrome.auraEffect.mortalWound': '받는 치유량을 {pct}% 감소시킵니다',
   'hudChrome.auraEffect.vulnerability': '받는 피해를 {pct}% 증가시킵니다',

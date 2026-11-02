@@ -4935,6 +4935,7 @@ export const ja_JP: EnTranslations = {
       "armorFlatStacks": "防御力を{value}低下させる({stacks}スタック)",
       "armorPct": "防御力を{pct}%低下させる",
       "armorPctStacks": "防御力を{pct}%低下させる({stacks}スタック)",
+      "witchlightPct": "遠隔武器攻撃は防御力を{pct}%低いものとして扱い、呪文はそれに見合う追加ダメージを与える",
       "mortalWound": "受ける回復量を{pct}%低下させる",
       "vulnerability": "受けるダメージを{pct}%増加させる",
       "physVuln": "受ける物理ダメージを{pct}%増加させる",
@@ -18468,7 +18469,7 @@ export const ja_JP: EnTranslations = {
       },
       "faerie_fire": {
         "name": "魔女火",
-        "description": "対象の防御力を40秒間{damage}%下げます。"
+        "description": "対象を40秒間マークします。遠隔武器攻撃は対象の防御力を{damage}%低いものとして扱い、対象への呪文は、その低下が遠隔攻撃に与えるのと同じだけダメージが増加します。近接攻撃には影響しないため、装甲切断と重複します。"
       },
       "hibernate": {
         "name": "微睡み",

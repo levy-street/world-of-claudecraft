@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { rangedArmorOf } from '../src/sim/combat/witchlight';
 import { ABILITIES, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
@@ -318,7 +319,7 @@ describe('percent armor debuffs (Sunder / Faerie Fire / corrode)', () => {
     return mob;
   };
 
-  it('Sunder is a percent reduction that Faerie Fire does not stack with', () => {
+  it('Sunder is a percent reduction that Witchlight stacks on top of for ranged hits only', () => {
     const sim = makeWorld();
     const mob = spawnMob(sim);
     const base = (sim as any).effectiveArmor(mob);
@@ -338,8 +339,8 @@ describe('percent armor debuffs (Sunder / Faerie Fire / corrode)', () => {
     });
     expect((sim as any).effectiveArmor(mob)).toBe(500 * (1 - 2 * SUNDER_ARMOR_PCT_PER_STACK));
 
-    // Add Faerie Fire (flat 10%). It does NOT stack with Sunder: the larger percent
-    // wins (max-combine), so effective reduction is 10%, not 4% + 10%.
+    // Add Witchlight. It no longer touches the shared (melee) armor read; it cuts a
+    // further 10% only for ranged weapon attacks, on top of Sunder.
     mob.auras.push({
       id: 'faerie_fire',
       name: 'Witchlight',
@@ -350,7 +351,11 @@ describe('percent armor debuffs (Sunder / Faerie Fire / corrode)', () => {
       sourceId: 1,
       school: 'nature',
     });
-    expect((sim as any).effectiveArmor(mob)).toBe(500 * (1 - FAERIE_FIRE_ARMOR_PCT));
+    expect((sim as any).effectiveArmor(mob)).toBe(500 * (1 - 2 * SUNDER_ARMOR_PCT_PER_STACK));
+    expect(rangedArmorOf(sim.ctx, mob)).toBeCloseTo(
+      500 * (1 - 2 * SUNDER_ARMOR_PCT_PER_STACK) * (1 - FAERIE_FIRE_ARMOR_PCT),
+      9,
+    );
   });
 
   it('mob corrosion stays a separate FLAT shred, applied before the percent debuffs', () => {

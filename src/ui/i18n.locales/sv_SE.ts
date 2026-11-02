@@ -16490,7 +16490,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Att landa denna med 4 eller fler kombopoäng startar Röd linje i 8 sek: Ondsint hugg blir Kroppsslag och denna knapp blir Knockoutslag (45 plus 35 per kombopoäng, som slår 25% hårdare för varje uppbyggd Röd linje, återställer 25 energi). Förbruka den innan Röd linje tar slut.',
   'entities.abilities.expose_armor.description':
     'Avslutande drag som exponerar målet i 30 sek: varje förbrukat kombopoäng minskar dess rustning med 2% (5 kombopoäng: {damage}%).',
-  'entities.abilities.faerie_fire.description': 'Minskar målets rustning med {damage}% i 40 sek.',
+  'entities.abilities.faerie_fire.description':
+    'Märker målet i 40 sek. Avståndsvapenattacker behandlar dess rustning som {damage}% lägre, och besvärjelser mot det får samma skadeökning som den sänkningen ger en avståndsattack. Närstridsattacker påverkas inte, så den staplas med Rustningsklipp.',
   'entities.abilities.ferocious_bite.description':
     'Avslutande drag som orsakar {damage}. Endast i Kattform.',
   'entities.abilities.ferocious_bite.specNote_feral':

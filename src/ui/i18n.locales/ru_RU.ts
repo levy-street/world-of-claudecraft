@@ -8205,7 +8205,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bash.name': 'Контузия',
   'entities.abilities.bash.description': 'Оглушает цель на 2 сек. Только в облике бурого.',
   'entities.abilities.faerie_fire.name': 'Ведьмин огонь',
-  'entities.abilities.faerie_fire.description': 'Снижает броню цели на {damage}% на 40 сек.',
+  'entities.abilities.faerie_fire.description':
+    'Помечает цель на 40 сек. Атаки оружием дальнего боя считают её броню на {damage}% ниже, а заклинания против неё получают такое же повышение урона, какое это снижение даёт атаке дальнего боя. На атаки ближнего боя не влияет, поэтому складывается со Срезом брони.',
   'entities.abilities.hibernate.name': 'Дремота',
   'entities.abilities.hibernate.description':
     'Погружает цель в глубокий сон на срок до 8 сек. Любой урон пробуждает её. Против игроков каждое повторение в течение 18 сек. длится вдвое меньше предыдущего, а четвёртое не действует.',
@@ -13273,6 +13274,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.increasePct.allStats': 'Повышает все характеристики на {pct}%',
   'hudChrome.auraEffect.armorPct': 'Снижает броню на {pct}%',
   'hudChrome.auraEffect.armorPctStacks': 'Снижает броню на {pct}% ({stacks} зарядов)',
+  'hudChrome.auraEffect.witchlightPct':
+    'Атаки оружием дальнего боя считают броню на {pct}% ниже, а заклинания наносят соответствующий дополнительный урон',
   'hudChrome.auraEffect.physVuln': 'Увеличивает получаемый физический урон на {pct}%',
   'hudChrome.auraEffect.mortalWound': 'Снижает получаемое исцеление на {pct}%',
   'hudChrome.auraEffect.vulnerability': 'Увеличивает получаемый урон на {pct}%',

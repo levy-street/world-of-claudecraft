@@ -16606,7 +16606,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Trafienie tym przy 4 lub więcej punktach combo rozpoczyna Redline na 8 sekund: Nikczemne cięcie zmienia się w Cios w korpus, a ten przycisk w Cios nokautujący (45 plus 35 za punkt combo, trafiając o 25% mocniej za każdą zbudowaną kreskę Redline, przywraca 25 energii). Wykorzystaj go, zanim Redline się zakończy.',
   'entities.abilities.expose_armor.description':
     'Umiejętność kończąca, która obnaża cel na 30 sekund: każdy wydany punkt combo zmniejsza jego pancerz o 2% (5 punktów combo: {damage}%).',
-  'entities.abilities.faerie_fire.description': 'Zmniejsza pancerz celu o {damage}% na 40 sekund.',
+  'entities.abilities.faerie_fire.description':
+    'Oznacza cel na 40 sekund. Ataki bronią dystansową traktują jego pancerz jako niższy o {damage}%, a zaklęcia przeciw niemu zyskują taki sam wzrost obrażeń, jaki to obniżenie daje atakowi dystansowemu. Ataki wręcz nie są objęte efektem, więc kumuluje się z Rozdarciem pancerza.',
   'entities.abilities.ferocious_bite.description':
     'Umiejętność kończąca, która zadaje {damage}. Tylko w Postaci kota.',
   'entities.abilities.ferocious_bite.specNote_feral':

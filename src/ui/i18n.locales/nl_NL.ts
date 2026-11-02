@@ -16661,7 +16661,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.expose_armor.description':
     'Afmaakactie die het doelwit blootstelt gedurende 30 sec: elk besteed combopunt vermindert zijn pantser met 2% (5 combopunten: {damage}%).',
   'entities.abilities.faerie_fire.description':
-    'Vermindert het pantser van het doelwit met {damage}% gedurende 40 sec.',
+    'Markeert het doelwit gedurende 40 sec. Afstandswapenaanvallen behandelen zijn pantser als {damage}% lager, en spreuken tegen het doelwit krijgen dezelfde schadeverhoging die die verlaging een afstandsaanval geeft. Melee-aanvallen worden niet beïnvloed, dus het stapelt met Pantserscheur.',
   'entities.abilities.ferocious_bite.description':
     'Afmaakactie die {damage} veroorzaakt. Alleen in Katgedaante.',
   'entities.abilities.ferocious_bite.specNote_feral':

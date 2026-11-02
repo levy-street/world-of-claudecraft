@@ -6216,9 +6216,12 @@ export const hudChromeStrings = {
     guardianWard: 'The next lethal enemy hit restores you to {pct}% health instead',
     armorFlat: 'Reduces armor by {value}',
     armorFlatStacks: 'Reduces armor by {value} ({stacks} stacks)',
-    // Sunder Armor / Faerie Fire: percent armor reductions (Sunder stacks).
+    // Sunder Armor / Melting Acid: percent armor reductions (Sunder stacks).
     armorPct: 'Reduces armor by {pct}%',
     armorPctStacks: 'Reduces armor by {pct}% ({stacks} stacks)',
+    // Witchlight: the ranged-and-spell mirror of Sunder Armor (melee unaffected).
+    witchlightPct:
+      'Ranged weapon attacks treat armor as {pct}% lower, and spells deal the matching extra damage',
     mortalWound: 'Reduces healing received by {pct}%',
     vulnerability: 'Increases damage taken by {pct}%',
     physVuln: 'Increases physical damage taken by {pct}%',

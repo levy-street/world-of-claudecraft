@@ -16681,7 +16681,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.expose_armor.description':
     'Jurus penutup yang membuka pertahanan target selama 30 detik: setiap poin combo yang dipakai mengurangi zirahnya sebesar 2% (5 poin combo: {damage}%).',
   'entities.abilities.faerie_fire.description':
-    'Mengurangi zirah target sebesar {damage}% selama 40 detik.',
+    'Menandai target selama 40 detik. Serangan senjata jarak jauh menganggap zirahnya {damage}% lebih rendah, dan mantra terhadapnya mendapat kenaikan kerusakan yang sama dengan yang diberikan pengurangan itu pada serangan jarak jauh. Serangan jarak dekat tidak terpengaruh, jadi efek ini bertumpuk dengan Robek Zirah.',
   'entities.abilities.ferocious_bite.description':
     'Jurus penutup yang menyebabkan {damage}. Hanya dalam Wujud Kucing.',
   'entities.abilities.ferocious_bite.specNote_feral':
