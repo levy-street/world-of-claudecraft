@@ -40,6 +40,7 @@ import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
 import { DT, type Entity } from '../../types';
 import { WIND_DRIFT_AURA, WIND_PULL_AURA } from '../../wind_drift';
+import { windBlowing } from './breath_gale';
 import { atGapLip, gapDistance, inBreathArena, knotSpot, nearestLipSpot } from './breath_geometry';
 import {
   BREATH_AURAS,
@@ -114,10 +115,14 @@ export function startHeart(s: BreathScope, count: number): boolean {
   };
   st.heart = heart;
   st.heartRuns++;
-  let first: { x: number; z: number } | null = null;
+  // Never where the last round's balls fell, nor on Thessaly's live circle,
+  // nor on this round's other ball.
+  const avoid: { x: number; z: number }[] = [...st.lastKnots];
+  if (st.calm) avoid.push({ x: st.calm.x, z: st.calm.z });
+  const dropped: { x: number; z: number }[] = [];
   for (let k = 0; k < count; k++) {
-    const at = knotSpot(s.boss.id * 31 + st.casts * 7 + k, first);
-    first = first ?? at;
+    const at = knotSpot(s.boss.id * 31 + st.casts * 7 + k, [...avoid, ...dropped]);
+    dropped.push(at);
     const e = spawnBreathObject(
       s.ctx,
       s.inst,
@@ -130,6 +135,7 @@ export function startHeart(s: BreathScope, count: number): boolean {
     heart.knots.push({ objectId: e.id, x: at.x, z: at.z, fuse: T.heartFuse, carrierId: null });
     cue(s, BREATH_CUES.knotLand, at.x, at.z, T.heartPickR);
   }
+  st.lastKnots = dropped;
   if (a) putMarker(a, BREATH_AURAS.portalA, BREATH_NAMES.portalA, T.heartMark, s.boss.id);
   if (b) putMarker(b, BREATH_AURAS.portalB, BREATH_NAMES.portalB, T.heartMark, s.boss.id);
   raidWarn(
@@ -282,6 +288,23 @@ function takeKnot(s: BreathScope, k: BreathKnot, p: Entity): void {
   raidWarn(s, s.boss, 'knotTaken', `${p.name} takes up the Knotted Gale!`, { player: p.name });
 }
 
+/** The wind never moves a carrier, but with it at their back (a blow or a
+ *  gust blowing within `heartTailCone` of where they face) the load walks a
+ *  little faster (Jose's playtest). The pace rides the load aura's value,
+ *  which the wire mirrors and the shared motion kernel reads, so the online
+ *  client predicts it. */
+function tailwind(s: BreathScope, p: Entity): void {
+  const load = auraOf(p, BREATH_AURAS.laden);
+  if (!load) return;
+  let pace: number = T.heartWalkMult;
+  if (windBlowing(s.st)) {
+    const heading = (s.st.wind.bearing * Math.PI) / 180;
+    const off = Math.abs(Math.atan2(Math.sin(p.facing - heading), Math.cos(p.facing - heading)));
+    if (off <= (T.heartTailCone * Math.PI) / 180) pace = T.heartTailMult;
+  }
+  if (load.value !== pace) load.value = pace;
+}
+
 /** Each carrier's tick: dead, gone or over a lip, else the ball rides with them
  *  (through a portal too: stepPortals has already moved them). */
 function stepCarriers(s: BreathScope, heart: BreathHeart): void {
@@ -312,6 +335,7 @@ function stepCarriers(s: BreathScope, heart: BreathHeart): void {
       } else freeKnot(s, k, p, last ? { ...k, ...last } : undefined);
       continue;
     }
+    tailwind(s, p);
     const now = local(s.ctx, s.inst, p);
     if (now.x !== k.x || now.z !== k.z) {
       k.x = now.x;

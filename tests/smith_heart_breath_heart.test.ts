@@ -5,10 +5,16 @@
 // text. The online path: tests/smith_heart_breath_heart_wire.test.ts.
 
 import { describe, expect, it } from 'vitest';
+import {
+  type NearbyInteractionHud,
+  type NearbyInteractionWorld,
+  tryNearbyInteraction,
+} from '../src/game/nearby_interaction';
 import { carriesLoad, movesCaster } from '../src/sim/combat/carried_load';
 import { CORNICE_GAPS } from '../src/sim/content/smith_heart_layout';
 import {
   atGapLip,
+  circleClear,
   gapDistance,
   inBreathArena,
   knotGrid,
@@ -687,5 +693,118 @@ describe('Knotted Gale: the player text', () => {
         auras: [{ id: BREATH_AURAS.laden, remaining: 10, duration: 20 }],
       }).visible,
     ).toBe(false);
+  });
+});
+
+// Jose's playtest (2026-11-02): every ball fell beside Thessaly, every circle in
+// the same place, the throw press never left the client (he walked into the void
+// instead), and the wind at a carrier's back did nothing for them.
+describe("Knotted Gale: Jose's playtest of 2026-11-02", () => {
+  it('no round drops a ball where the last one fell, and the drops reach past the climb', () => {
+    const f = mythic();
+    const spots: { x: number; z: number }[] = [];
+    let last: { x: number; z: number }[] = [];
+    for (let r = 0; r < 6; r++) {
+      const h = round(f, r % 2 === 0 ? '' : ' 2');
+      const now = h.knots.map((k) => ({ x: k.x, z: k.z }));
+      for (const k of now) {
+        expect(gapDistance(k.x, k.z)).toBeGreaterThanOrEqual(T.heartFar);
+        for (const o of last)
+          expect(Math.hypot(k.x - o.x, k.z - o.z)).toBeGreaterThanOrEqual(T.heartApart);
+      }
+      if (now.length === 2)
+        expect(Math.hypot(now[0].x - now[1].x, now[0].z - now[1].z)).toBeGreaterThanOrEqual(
+          T.heartApart,
+        );
+      spots.push(...now);
+      last = now;
+    }
+    // Not all at Thessaly's post (the old bar left only that patch).
+    expect(spots.some((k) => Math.hypot(k.x - -56, k.z - 194.4) > 25)).toBe(true);
+  });
+
+  it('a ball never drops on the live circle of calm', () => {
+    const f = mythic();
+    f.dev('/dev heart breath circle');
+    const calm = f.state()?.calm;
+    if (!calm) throw new Error('no circle');
+    for (let r = 0; r < 4; r++) {
+      const h = round(f);
+      for (const k of h.knots)
+        expect(Math.hypot(k.x - calm.x, k.z - calm.z)).toBeGreaterThanOrEqual(T.heartApart);
+    }
+  });
+
+  it('the wind at the carrier back quickens the load; facing into it, or no wind, does not', () => {
+    const f = mythic();
+    round(f);
+    const p = third(f);
+    const free = moveSpeedMult({ ...p, auras: p.auras.filter((a) => a.id !== BREATH_AURAS.laden) });
+    carry(f, p);
+    const load = () => p.auras.find((a) => a.id === BREATH_AURAS.laden)?.value;
+    // Bearing 90 blows east: heading (sin, cos) = (1, 0), a facing of pi/2.
+    f.dev('/dev heart breath blow 90');
+    p.facing = Math.PI / 2 + 0.5;
+    f.tick(2);
+    expect(load()).toBe(T.heartTailMult);
+    expect(moveSpeedMult(p)).toBeCloseTo(free * T.heartTailMult, 5);
+    expect(has(p, WIND_DRIFT_AURA)).toBe(false);
+    p.facing = -Math.PI / 2;
+    f.tick(2);
+    expect(load()).toBe(T.heartWalkMult);
+    p.facing = Math.PI;
+    f.tick(2);
+    expect(load()).toBe(T.heartWalkMult);
+    f.dev('/dev heart breath calm');
+    p.facing = Math.PI / 2;
+    f.tick(2);
+    expect(load()).toBe(T.heartWalkMult);
+  });
+});
+
+describe("Captain Thessaly's circle: Jose's playtest of 2026-11-02", () => {
+  it('lands somewhere new each time, whole on the floor and clear of the gaps', () => {
+    const f = breathFight(4);
+    f.dev('/dev heart breath pull');
+    const st = f.state();
+    if (!st) throw new Error('no fight');
+    st.circleTimer = 999;
+    const seen: { x: number; z: number }[] = [];
+    for (let i = 0; i < 8; i++) {
+      f.dev('/dev heart breath circle');
+      const c = st.calm;
+      if (!c) throw new Error('no circle');
+      expect(circleClear(c.x, c.z, T.circleR)).toBe(true);
+      const prev = seen[seen.length - 1];
+      if (prev)
+        expect(Math.hypot(c.x - prev.x, c.z - prev.z)).toBeGreaterThanOrEqual(T.circleApart);
+      seen.push({ x: c.x, z: c.z });
+      f.tick(ticks(3) + i);
+    }
+    // More than one distance from the guardian: not one fixed reach.
+    const g = f.local(f.boss());
+    const reaches = new Set(seen.map((c) => Math.round(Math.hypot(c.x - g.x, c.z - g.z) / 4)));
+    expect(reaches.size).toBeGreaterThan(1);
+  });
+});
+
+describe('the interact key while carrying a Knotted Gale', () => {
+  it('sends the throw press straight to the world, never a scan of the room', () => {
+    let presses = 0;
+    let scanned = false;
+    const world = {
+      player: { auras: [{ id: BREATH_AURAS.laden, sourceId: 7 }] },
+      interact: () => {
+        presses++;
+      },
+      get entities() {
+        scanned = true;
+        return new Map();
+      },
+    } as unknown as NearbyInteractionWorld;
+    const hud = { showError: () => {} } as unknown as NearbyInteractionHud;
+    expect(tryNearbyInteraction(world, hud, 'away', 'nothing')).toBe(true);
+    expect(presses).toBe(1);
+    expect(scanned).toBe(false);
   });
 });

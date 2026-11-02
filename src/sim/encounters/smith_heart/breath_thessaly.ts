@@ -50,7 +50,14 @@ export function plantCalm(s: BreathScope): boolean {
   if (!thessaly || s.st.half !== 'wind') return false;
   clearCalm(s.ctx, s.inst, s.st);
   const bearing = windBlowing(s.st) ? s.st.wind.bearing : nextBearing(s.st);
-  const at = calmCircleSpot(local(s.ctx, s.inst, s.boss), bearing);
+  // Salted by the fight clock's tick, not `casts`: the other picks keep theirs.
+  const at = calmCircleSpot(
+    local(s.ctx, s.inst, s.boss),
+    bearing,
+    s.boss.id * 13 + Math.round(s.st.clock / DT),
+    s.st.lastCalm,
+  );
+  s.st.lastCalm = at;
   const e = spawnBreathObject(
     s.ctx,
     s.inst,

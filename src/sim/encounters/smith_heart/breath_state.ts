@@ -125,6 +125,10 @@ export interface BreathFightState {
   /** Phase 1: the next circle of calm. */
   circleTimer: number;
   calm: BreathCalm | null;
+  /** Where the last circle stood (the next lands elsewhere), and the last
+   *  round's balls (the next round's drop elsewhere): instance-local. */
+  lastCalm: { x: number; z: number } | null;
+  lastKnots: { x: number; z: number }[];
   /** Seconds each pinned player has been pressed since its last hit. */
   pinned: Record<number, number>;
   /** Players gone over an open lip this pull (each said once). */

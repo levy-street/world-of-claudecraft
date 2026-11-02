@@ -269,8 +269,14 @@ export const BREATH_TUNING = {
   circleR: 3.5,
   /** At most this many take its anchor. */
   circleSeats: 3,
-  /** How far upwind of the guardian it lands (yards). */
+  /** How far upwind of the guardian it lands when no hashed spot fits (yards). */
   circleReach: 12,
+  /** The hashed spots: these reaches upwind, these offsets sideways (yards),
+   *  each circle at least `circleApart` from the one before (Jose's playtest:
+   *  one fixed reach put every circle in the same place). */
+  circleReaches: [8, 14, 20, 26] as readonly number[],
+  circleSides: [-14, -7, 0, 7, 14] as readonly number[],
+  circleApart: 12,
   anchorSeconds: 15,
   /** Heroic: no circle anchors the same player again for this long. */
   spentSeconds: 60,
@@ -387,10 +393,17 @@ export const BREATH_TUNING = {
   heartPortalR: 2.5,
   /** How far from a gap's reach the lip still counts for the throw (yards). */
   heartLipReach: 4,
-  /** A ball drops at least this far from every gap, and the second this far
-   *  from the first, both relaxed step by step if the floor cannot give it. */
-  heartFar: 26,
-  heartApart: 18,
+  /** A ball drops at least this far from every gap, and this far from the
+   *  round's other ball, the last round's balls and Thessaly's circle, both
+   *  relaxed step by step if the floor cannot give it. 26 left one patch, by
+   *  Thessaly's post, so every ball fell there (Jose's playtest); 16 opens the
+   *  middle of the Cornice too and still asks a 12 yd crawl. */
+  heartFar: 16,
+  heartApart: 20,
+  /** The carrier's walk with the wind at their back (facing within
+   *  `heartTailCone` degrees of where it blows): the load rides it a little. */
+  heartTailMult: 0.45,
+  heartTailCone: 60,
 } as const;
 
 // ---- pure helpers ---------------------------------------------------------------------

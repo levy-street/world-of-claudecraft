@@ -105,9 +105,13 @@ describe('the Knotted Gale over the wire', () => {
     run(0.2);
     const load = mirror().auras.find((x: Any) => x.id === BREATH_AURAS.laden);
     expect(load).toBeDefined();
-    expect(load.value).toBe(T.heartWalkMult);
+    // The crawl, or the quicker pace with the wind at his back (whichever the
+    // server set this tick): the mirror carries the server's value exactly.
+    const serverLoad = serverMe.auras.find((x: Any) => x.id === BREATH_AURAS.laden);
+    expect([T.heartWalkMult, T.heartTailMult]).toContain(load.value);
+    expect(load.value).toBe(serverLoad?.value);
     expect(moveSpeedMult(mirror())).toBeCloseTo(moveSpeedMult(serverMe), 6);
-    expect(moveSpeedMult(mirror())).toBeLessThanOrEqual(T.heartWalkMult + 1e-6);
+    expect(moveSpeedMult(mirror())).toBeLessThanOrEqual(T.heartTailMult + 1e-6);
     expect(knotOf(objects(BREATH_OBJECTS.knotPrefix)[0].templateId)?.state).toBe('held');
 
     // The crossing: a discontinuity, so the client's prediction is told to snap.

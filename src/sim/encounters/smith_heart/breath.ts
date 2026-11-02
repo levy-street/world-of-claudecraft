@@ -142,6 +142,8 @@ function freshState(boss: Entity, difficulty: BreathDifficulty): BreathFightStat
     inhaleTimer: T.inhaleFirst,
     circleTimer: T.circleFirst,
     calm: null,
+    lastCalm: null,
+    lastKnots: [],
     pinned: {},
     overLip: [],
     floorSpot: null,
