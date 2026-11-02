@@ -87,7 +87,11 @@ apart so the glowing cracks over the molten core open and widen, the drips, and
 the light growing with it; at arrival it shatters (debris and embers) and a
 ring of fire burns on the pool's own clock (never the shared delayed-burst
 pool: its slots are few and its delays cap at 0.2 s), and the light is the same
-`TrackedLightHost` slot. Unlike the ribbon riders the rock is real scene meshes:
+`TrackedLightHost` slot, lit like the world's lava (the core's `LAVA_*` figures
+are the Drakelands lava pools' own colour, level and reach, pinned against
+`../ember_features.ts`); when an ordinary pulse takes that slot (the cast flash
+on the one-light tier) the pool claims one back as soon as one is free, never by
+stealing. Unlike the ribbon riders the rock is real scene meshes:
 three visuals built once, hidden, on the two shared materials the boot manifest
 stages (`ABILITY_MATERIAL_SOURCES`, `magma-boulder`), and the pool lives OUTSIDE
 `AbilityVfxFx`, reached through `MagmaBoulderPort` closures so the cast-gate

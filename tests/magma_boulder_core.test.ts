@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import {
@@ -9,11 +10,21 @@ import {
   CRAG_AMP,
   crackGap,
   FIRE_RING_S,
+  FLIGHT_LAVA_RADIUS,
+  flightLavaLight,
   flightLightScale,
   flightProgress,
+  IMPACT_LAVA_RADIUS,
+  IMPACT_RING_GAIN,
+  impactLavaLight,
   impactLightGain,
+  LAVA_LIGHT_COLOR,
+  LAVA_POOL_INTENSITY,
+  LAVA_REACH_PER_RADIUS,
+  type LavaLight,
   magmaBurstPlan,
   PLATE_SEEDS,
+  RING_LAVA_GAIN,
   RING_WAVES,
   ringWaveAt,
   splitIntoPlates,
@@ -125,5 +136,41 @@ describe('magmaBurstPlan: what each budget tier and quality draws', () => {
       fireRing: true,
     });
     expect(magmaBurstPlan(0, 0)).not.toBeNull();
+  });
+});
+
+describe("lit like the world's lava", () => {
+  const light = (): LavaLight => ({ intensity: 0, range: 0 });
+
+  it("uses the Drakelands lava pools' own colour, level and reach", () => {
+    const src = readFileSync('src/render/ember_features.ts', 'utf8');
+    const hex = `0x${LAVA_LIGHT_COLOR.toString(16)}`;
+    expect(src).toContain(
+      `new THREE.PointLight(${hex}, ${LAVA_POOL_INTENSITY}, pool.r * ${LAVA_REACH_PER_RADIUS}, 2)`,
+    );
+  });
+
+  it('at full size the rock lights as far as a crater pool, brighter than one', () => {
+    const full = flightLavaLight(1, light());
+    expect(full.range).toBeCloseTo(LAVA_REACH_PER_RADIUS * FLIGHT_LAVA_RADIUS);
+    expect(full.range).toBeGreaterThan(20);
+    expect(full.intensity).toBeGreaterThan(LAVA_POOL_INTENSITY);
+    const pebble = flightLavaLight(0, light());
+    expect(pebble.intensity).toBeLessThan(full.intensity / 2);
+    expect(pebble.range).toBeLessThan(full.range / 2);
+  });
+
+  it("the burst floods a lava pool's reach, and the ring of fire glows at a pool's level", () => {
+    const burst = impactLavaLight(0, light());
+    expect(burst.range).toBeCloseTo(LAVA_REACH_PER_RADIUS * IMPACT_LAVA_RADIUS);
+    expect(burst.range).toBeGreaterThan(flightLavaLight(1, light()).range);
+    expect(burst.intensity).toBeGreaterThan(flightLavaLight(1, light()).intensity * 2);
+    // just after the burst has fallen away, the ring alone burns as
+    // RING_LAVA_GAIN lava pools, fading as it burns out
+    const ringPeak = impactLavaLight(0.5, light()).intensity;
+    expect(RING_LAVA_GAIN).toBeGreaterThanOrEqual(1);
+    expect(ringPeak).toBeCloseTo(LAVA_POOL_INTENSITY * RING_LAVA_GAIN * (1 - 0.5 / FIRE_RING_S), 5);
+    expect(IMPACT_RING_GAIN).toBeGreaterThan(0.2);
+    expect(impactLavaLight(FIRE_RING_S, light()).intensity).toBe(0);
   });
 });

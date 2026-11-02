@@ -21,6 +21,24 @@ export const CRACK_GAP_END = 0.26;
 export const FIRE_RING_S = 1.3;
 export const FIRE_RING_RADIUS = 2.2;
 export const RING_WAVES = 4;
+/** The world's lava light (ember_features.ts, the Drakelands lava pools: a
+ * 0xff5a18 point light of intensity 8 reaching 3.4 times the pool's radius,
+ * decay 2). The boulder is lit as a piece of that same lava: its colour, its
+ * level and its reach per yard of lava. */
+export const LAVA_LIGHT_COLOR = 0xff5a18;
+export const LAVA_POOL_INTENSITY = 8;
+export const LAVA_REACH_PER_RADIUS = 3.4;
+/** The lava pool the boulder reads as: in flight at full size, a small crater
+ * pool (radius 7); its burst, a mid lava pool (radius 11). */
+export const FLIGHT_LAVA_RADIUS = 7;
+export const IMPACT_LAVA_RADIUS = 11;
+/** Flight light at full size, the burst peak and the ring of fire, as
+ * multiples of one lava pool's level. A pool's brightness mostly comes from
+ * its own glowing surface and its neighbours' lights, so one rock lit at a
+ * single pool's level barely reads on daylit ground: it carries several. */
+export const FLIGHT_LAVA_GAIN = 3;
+export const IMPACT_LAVA_GAIN = 8;
+export const RING_LAVA_GAIN = 2;
 /** Crust radial jitter: a craggy rock, not a ball. */
 export const CRAG_AMP = 0.16;
 
@@ -50,13 +68,38 @@ export function flightLightScale(progress: number): number {
 }
 
 /** Light gain after impact: full at the burst, a quick fall, then the ring of
- * fire's low glow until it burns out. */
+ * fire's glow (RING_LAVA_GAIN pools, IMPACT_RING_GAIN of the burst) until it
+ * burns out. */
 export function impactLightGain(since: number): number {
   if (since < 0 || since >= FIRE_RING_S) return 0;
   if (since < 0.08) return 1;
   const burst = Math.max(0, 1 - (since - 0.08) / 0.4);
-  const ring = 0.22 * (1 - since / FIRE_RING_S);
+  const ring = IMPACT_RING_GAIN * (1 - since / FIRE_RING_S);
   return Math.max(burst * burst, ring);
+}
+
+/** The ring of fire's glow as a share of the burst peak. */
+export const IMPACT_RING_GAIN = RING_LAVA_GAIN / IMPACT_LAVA_GAIN;
+
+export interface LavaLight {
+  intensity: number;
+  range: number;
+}
+
+/** The travelling light at a flight progress: a lava pool's colour and level
+ * scaled by the rock's growth, reaching as far as that pool would. */
+export function flightLavaLight(progress: number, out: LavaLight): LavaLight {
+  const grow = flightLightScale(progress) / flightLightScale(1);
+  out.intensity = LAVA_POOL_INTENSITY * FLIGHT_LAVA_GAIN * grow;
+  out.range = LAVA_REACH_PER_RADIUS * FLIGHT_LAVA_RADIUS * grow;
+  return out;
+}
+
+/** The burst and ring-of-fire light `since` seconds after impact. */
+export function impactLavaLight(since: number, out: LavaLight): LavaLight {
+  out.intensity = LAVA_POOL_INTENSITY * IMPACT_LAVA_GAIN * impactLightGain(since);
+  out.range = LAVA_REACH_PER_RADIUS * IMPACT_LAVA_RADIUS;
+  return out;
 }
 
 /** When each ring-of-fire wave fires, seconds after the burst. */

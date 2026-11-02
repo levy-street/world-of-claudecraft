@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Vfx's sprite atlas loads through the asset loader; the contract tests below
 // build a real Vfx, so stub the loader the way stepped_leader.test.ts does.
@@ -12,6 +12,7 @@ vi.mock('../src/render/assets/preload', () => ({
   registerDeferredPreload: vi.fn(),
 }));
 
+import type { GraphicsSettingsSnapshot } from '../src/game/graphics_rebuild_core';
 import { AbilityVfxFx } from '../src/render/ability_vfx/fx';
 import {
   BOULDER_RADIUS,
@@ -24,7 +25,15 @@ import { MagmaBoulders } from '../src/render/ability_vfx/magma_boulders';
 import { MAGMA_BURST_ABILITY, playMagmaBurst } from '../src/render/ability_vfx/magma_burst';
 import { AbilityVfx } from '../src/render/ability_vfx/painter';
 import { abilityVfxFullSpec } from '../src/render/ability_vfx_registry';
-import type { TrackedLightHost } from '../src/render/light_pulses';
+import {
+  activateGfxProfile,
+  GFX,
+  type GfxCapabilities,
+  type GfxProfile,
+  getActiveGfxProfile,
+  resolveGfxProfile,
+} from '../src/render/gfx';
+import { LightPulses, type TrackedLightHost } from '../src/render/light_pulses';
 import { buildMagmaBoulderStandIn, MagmaBoulderVisual } from '../src/render/magma_boulder_visual';
 import { MAGMA_BURST_VFX_FULL_SPEC } from '../src/render/shaman_vfx_specs';
 import { Vfx } from '../src/render/vfx';
@@ -322,6 +331,74 @@ describe('MagmaBoulders: the light grows with the rock and floods the impact', (
     const handle = bare.boulders.spawn(1, 2, head2, FULL);
     flyTo(bare.boulders, head2, bare.anchors.get(2) as THREE.Vector3);
     expect(bare.boulders.impact(handle, head2.clone())).toBe(true);
+  });
+});
+
+describe('MagmaBoulders: the light survives the one-light tier', () => {
+  // The stepped_leader.test.ts rig: a desktop capability set, the low tier
+  // forced through the URL (no composer, so the pulse pool is ONE light).
+  const capabilities: GfxCapabilities = Object.freeze({
+    deviceMemory: 8,
+    hardwareConcurrency: 12,
+    maxTouchPoints: 0,
+    coarsePointer: false,
+    narrowViewport: false,
+    gpuRenderer: 'ANGLE (NVIDIA, NVIDIA GeForce RTX 4080)',
+    nativeApp: false,
+    tightMemory: false,
+    platform: 'other',
+    softwareRendering: false,
+  });
+  const preferences: GraphicsSettingsSnapshot = {
+    graphicsPreset: 2,
+    terrainDetail: 1,
+    foliageDensity: 1,
+    surfaceDetail: 1,
+    effectsQuality: 1,
+    shadowQuality: 1,
+    antiAliasing: 1,
+    bloomQuality: 1,
+    ambientOcclusion: 1,
+    viewDistance: 1,
+    waterQuality: 1,
+    characterDetail: 1,
+    dynamicLights: 1,
+    particleEffects: 1,
+    ghostFade: 0,
+  };
+  let restore: GfxProfile | null = null;
+  beforeEach(() => {
+    restore = getActiveGfxProfile();
+  });
+  afterEach(() => {
+    if (restore) activateGfxProfile(restore);
+    restore = null;
+  });
+
+  it('when the cast flash takes the only light, the rock claims it back once the flash fades', () => {
+    activateGfxProfile(resolveGfxProfile(capabilities, preferences, '?gfx=low'));
+    expect(GFX.composer).toBe(false);
+    const lp = new LightPulses(new THREE.Scene());
+    expect(lp.lights.length).toBe(1);
+    const h = harness(lp);
+    const head = new THREE.Vector3(0, 1.5, 0);
+    h.boulders.spawn(1, 2, head, FULL);
+    h.boulders.advance(DT, true);
+    expect(lp.lights[0].color.getHex()).toBe(0xff5a18);
+    // the release flash (an ordinary pulse) takes the one slot
+    lp.pulse(new THREE.Vector3(), 'fire', 6, 0.3, 7);
+    let reclaimed = -1;
+    for (let f = 0; f < 60; f++) {
+      head.x += 0.2;
+      lp.update(DT);
+      h.boulders.advance(DT, true);
+      if (reclaimed < 0 && lp.lights[0].color.getHex() === 0xff5a18 && lp.lights[0].intensity > 0)
+        reclaimed = f;
+    }
+    // not during the flash, but well before the rock lands
+    expect(reclaimed).toBeGreaterThan(5);
+    expect(reclaimed).toBeLessThan(40);
+    expect(lp.lights[0].position.x).toBeCloseTo(head.x);
   });
 });
 

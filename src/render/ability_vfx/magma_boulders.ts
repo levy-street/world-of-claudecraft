@@ -10,9 +10,11 @@ import {
   crackGap,
   FIRE_RING_RADIUS,
   FIRE_RING_S,
-  flightLightScale,
+  flightLavaLight,
   flightProgress,
-  impactLightGain,
+  impactLavaLight,
+  LAVA_LIGHT_COLOR,
+  type LavaLight,
   type MagmaBurstPlan,
   RING_WAVES,
   ringWaveAt,
@@ -40,12 +42,6 @@ const SLOTS = 3;
 const MAX_FLIGHT_S = 3.3; // the projectile's ttl is 3 s: past this it is an orphan
 const DRIP_EVERY_S = 0.07;
 const RING_POINTS = 14;
-const LIGHT_FLIGHT = 0xff8a3a;
-const LIGHT_IMPACT = 0xffb060;
-const FLIGHT_INTENSITY = 10;
-const FLIGHT_RANGE = 10;
-const IMPACT_INTENSITY = 24;
-const IMPACT_RANGE = 15;
 const LIGHT_RELEASE_FADE = 0.15;
 const SHORT_TAIL_S = 0.6;
 const SPIN_X = 2.6; // radians per second of tumble
@@ -93,6 +89,7 @@ export class MagmaBoulders {
   private slots: BoulderSlot[] = [];
   private lights: TrackedLightHost | null = null;
   private readonly aim = new THREE.Vector3();
+  private readonly lava: LavaLight = { intensity: 0, range: 0 };
   private disposed = false;
 
   constructor(
@@ -267,17 +264,10 @@ export class MagmaBoulders {
         }
         this.place(s);
         if (s.plan.drips) this.drip(s, dt);
-        const grow = flightLightScale(s.progress);
+        // lit like the world's lava: its colour, level and reach (core)
+        const lava = flightLavaLight(s.progress, this.lava);
         const gain = flightLightGain(reducedMotion ? 1 : Math.random());
-        this.light(
-          s,
-          head.x,
-          head.y,
-          head.z,
-          FLIGHT_INTENSITY * gain * grow,
-          LIGHT_FLIGHT,
-          FLIGHT_RANGE * grow,
-        );
+        this.light(s, head.x, head.y, head.z, lava.intensity * gain, LAVA_LIGHT_COLOR, lava.range);
         continue;
       }
       s.since += dt;
@@ -293,15 +283,8 @@ export class MagmaBoulders {
         continue;
       }
       const l = s.lightAt;
-      this.light(
-        s,
-        l.x,
-        l.y,
-        l.z,
-        IMPACT_INTENSITY * impactLightGain(s.since),
-        LIGHT_IMPACT,
-        IMPACT_RANGE,
-      );
+      const lava = impactLavaLight(s.since, this.lava);
+      this.light(s, l.x, l.y, l.z, lava.intensity, LAVA_LIGHT_COLOR, lava.range);
     }
   }
 
@@ -335,7 +318,12 @@ export class MagmaBoulders {
     color: number,
     range: number,
   ): void {
-    if (!this.lights || s.light < 0) return;
+    if (!this.lights) return;
+    // An ordinary pulse may take the slot (the cast's release flash on the
+    // one-light tier); claim one back as soon as one is free, so the rock keeps
+    // lighting the world for the rest of its life. track() never steals.
+    if (s.light < 0) s.light = this.lights.track();
+    if (s.light < 0) return;
     if (!this.lights.setTracked(s.light, x, y, z, intensity, color, range)) s.light = -1;
   }
 
