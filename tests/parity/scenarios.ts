@@ -67,6 +67,7 @@ import {
 import { NYTHRAXIS_GRAVE_ERUPTION_TELEGRAPH_SECONDS } from '../../src/sim/nythraxis_grave_eruption';
 import { PLAYER_BODY_RADIUS } from '../../src/sim/pathfind';
 import type { PlotState } from '../../src/sim/professions/farm_projection';
+import { isFarmerNpcEntity } from '../../src/sim/professions/farmer_npcs';
 import { convertHusks, harvestCrop, plantCrop } from '../../src/sim/professions/farming';
 
 // The 41-tick window the farming session used to spend riding out the plant
@@ -196,8 +197,13 @@ function requireEntity(sim: AnySim, id: number, context: string): AnyEntity {
 // belonged) and no assertion watched. Deriving the position still moves the
 // golden when content moves, since position is sampled, and that is the gate
 // doing its job; what it buys is that the HARVEST stays a harvest.
+//
+// The node is resolved through the sim's own object moves (the same lookup
+// harvestNode gates on), because a Studio map may move a node without touching
+// its content row: the Studio town rework (#4593) moved wood_eastbrook_1 from
+// its row's (-62, 8) to about (-22.4, 68.0) that way.
 function standOnNode(sim: AnySim, e: AnyEntity, nodeId: string): void {
-  const node = gatherNodeById(nodeId);
+  const node = gatherNodeById(nodeId, sim.ctx.objectMoves);
   if (!node) throw new Error(`parity scenario: no gather node ${nodeId}`);
   teleport(sim, e, node.pos.x, node.pos.z);
 }
@@ -5312,7 +5318,7 @@ function professionsGather(seed = 1): Scenario {
       // proficiency ceiling (zero common weight), so the rolled tier plus the
       // signed-or-fungible grant shape land in the state sample.
       meta.gatheringProficiency.logging = 100;
-      teleport(sim, p, -62, 8); // wood_eastbrook_1
+      standOnNode(sim, p, 'wood_eastbrook_1'); // derived: #4593 moved it off (-62, 8)
       sim.harvestNode('wood_eastbrook_1', undefined, pid);
       rec.tick(castTicks);
       rec.snapshot('harvest-wood-max-proficiency');
@@ -6157,6 +6163,17 @@ function professionsFarmingSession(seed = 1): Scenario {
 
       // HUSK CONVERSION: the withered beat above paid exactly 2 husks, one
       // batch, so this trades them into exactly one compost. Zero draws.
+      // The trade needs a farmer in reach (farmer_npcs.ts nearFarmerNpc), so
+      // the drive stands on the live Eastbrook farmer, read from the roster
+      // rather than a literal: the pair midpoint used to be in reach of her,
+      // but the Studio town rework (#4593) moved the allotment and her apart
+      // (about 10.7 yd, past FARMER_TRADE_RANGE), which turned this beat into
+      // a quiet no_farmer denial.
+      const farmer = [...(sim.entities as Map<number, AnyEntity>).values()].find(
+        (e) => isFarmerNpcEntity(e) && e.templateId === 'farmer_jessica',
+      );
+      if (!farmer) throw new Error('farming_session: no live farmer_jessica');
+      teleport(sim, p, farmer.pos.x, farmer.pos.z);
       convertHusks(sim.ctx, p, meta);
       rec.snapshot('husks-converted');
 
@@ -6849,10 +6866,14 @@ function catFormAutoSwing(): Scenario {
 // the fixture way (hand-killed trash, hand-solved puzzle), then the descent is
 // walked through the real trigger; the boss floor kill lets the tick pre-pass
 // stamp the death and the sweep pay the clear. Dev entry (no portal) wins the
-// claim by design, so the payout runs without race scaffolding. Seed 4332 is
+// claim by design, so the payout runs without race scaffolding. Seed 4349 is
 // chosen so the 8% pattern roll (draw 6) SUCCEEDS in-window: the golden pins
 // not only every chance() position but the rng.int pick over the sorted
-// RIFT_PATTERN_ITEM_IDS (pattern_forgefold_legguards on this seed). The boss is
+// RIFT_PATTERN_ITEM_IDS (pattern_sunspun_leggings on this seed). It was 4332
+// until the Studio town rework (#4593): the reworked open-world roster ticks
+// during the run and spend the shared stream differently, so 4332's draw 6
+// became a miss and the seed was re-hunted (the first in-window hit at or after
+// 4332; the rift itself and the ctor stream are unchanged). The boss is
 // tracked, so the corpse loot (guaranteed heroic epic + the pattern + the
 // A-rank coin bonus) is in the state digest, not just the draw digest.
 //
@@ -6866,14 +6887,14 @@ function catFormAutoSwing(): Scenario {
 //
 // baseLevel picks the rank through the shipped inverse map
 // (RIFT_RANK_BASE_LEVEL: C 20, B 22, A 25, S 28), so the ranks here are derived
-// from content rather than restated. The A row keeps the original scenario NAME
-// and its original SEED, so its committed golden does not move for the rename.
-// Each rank carries its OWN seed because the pattern draw is a 0.08 chance and
-// a golden that pins the rng.int pick position is worth far more than one that
-// records a miss: the B and S seeds were hunted for an in-window pattern hit
+// from content rather than restated. The A row keeps the original scenario NAME,
+// so its committed golden keeps its file. Each rank carries its OWN seed
+// because the pattern draw is a 0.08 chance and a golden that pins the
+// rng.int pick position is worth far more than one that records a miss: the
+// B and S seeds were hunted for an in-window pattern hit
 // (about 1 in 12 seeds). C needs no hunt because its arm RETURNS after draw 0
 // and never reaches the pattern roll at all.
-function riftClearRewards(baseLevel = 25, seed = 4332): Scenario {
+function riftClearRewards(baseLevel = 25, seed = 4349): Scenario {
   const rank = riftRankForBaseLevel(baseLevel);
   // Per-rank coverage: what each rank's arm actually reaches in the numbered
   // ladder, so a reader can see the four rows tile it between them.
@@ -8096,14 +8117,17 @@ export const SCENARIOS: Scenario[] = [
   riftClearRewards(),
   // The three sibling ranks (masterwrought Phase 11f, closing the residual the
   // A row used to record). Seeds: C keeps 4332 because its arm returns after
-  // draw 0 and has no chance() to land in-window; B 4353 and S 4333 were HUNTED
+  // draw 0 and has no chance() to land in-window; B 4355 and S 4349 were HUNTED
   // for an in-window pattern hit on draw 6, so all three of the ranks that
   // reach that draw pin the rng.int pick position rather than recording a miss.
-  // The hunt measured 3 B hits and 4 S hits in 40 consecutive seeds, which is
-  // the 0.08 rate showing up where it should.
+  // The Studio town rework (#4593) re-hunted them (and A) from the old 4353 and
+  // 4333, whose draw 6 became a miss once the reworked open-world roster spent
+  // the shared stream differently during the run: each new seed is the first
+  // in-window hit at or after the old one. Over seeds 4330 to 4373 the re-hunt
+  // saw 4 B hits and 4 S hits, about the 0.08 rate, as it should be.
   riftClearRewards(20, 4332),
-  riftClearRewards(22, 4353),
-  riftClearRewards(28, 4333),
+  riftClearRewards(22, 4355),
+  riftClearRewards(28, 4349),
   // The heroic claim on the raid boss (masterwrought Phase 11f, closing the
   // sibling residual the base table's own append comment records). Appended
   // last, so it lands in the final shard automatically like every other
