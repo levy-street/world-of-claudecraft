@@ -350,6 +350,12 @@ describe('v0.26 winning Warrior authored row and mastery runtime', () => {
     const sim = warriorAtCap(2629);
     expect(sim.selectTalentRow(20, 'war_row_bladestorm')).toBe(true);
     const player = sim.player;
+    // Open, level ground north-east of the Eastbrook quay, so the strafe below
+    // runs free. The player start no longer serves: the Studio town rework
+    // (#4593) raised the quay pad, leaving a two yard step a few yards east of
+    // the start that the strafe runs into.
+    player.pos = sim.groundPos(-30, 2);
+    player.prevPos = { ...player.pos };
     player.resource = player.maxResource;
     const spawnDummy = (x: number, z: number): Entity => {
       const dummy = createMob(sim.nextId++, MOBS.training_dummy, 20, {

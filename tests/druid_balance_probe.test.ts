@@ -169,17 +169,31 @@ const FERAL_LOADOUT = {
 // (the healer pieces' extra Spirit and Stamina are gone), still 7 payoffs.
 // RE-MEASURED 2026-10-14 after the v0.45 integration stack: moongrove kept
 // its damage/threat/payoff trace, while incoming settled back to 214.
+// RE-MEASURED 2026-11-02 for all three arms and the tank probe's two incoming
+// figures, at the Studio town rework (#4593). No druid, combat or tuning code
+// moved: its world content (reworked camps that retire mobs, moved NPCs and
+// buildings) re-rolls the shared stream, so this seed's whole trace re-rolls.
+// Moongrove 6839/237/6840/7 to 6186/260/6187/7, wildfang 6389/213/7486.7135/10
+// to 6680/216/7827.62/12, bruin 3254/159/12206.51375/6 to 3259/130/
+// 12168.97625/6. The neighbouring seeds on this tree, 42421 to 42428:
+// moongrove 6021 to 6560 damage, 175 to 284 incoming, 7 payoffs on every one;
+// wildfang 6333 to 7496 damage, 159 to 214 incoming, 12 payoffs on seven of
+// the eight and 10 on the eighth (the 10-or-12 split the rows above record);
+// bruin 3138 to 3756 damage, 114 to 155 incoming, 6 payoffs on every one. The
+// tank probe at 42920 re-rolls the same way: wolf incoming 216 to 246, bear
+// 139 to 155 (37 percent less, inside the 30 to 42 percent bounds); its threat
+// product (214.5) and Marrowbreak snap (1012.44) stayed in band.
 const LIVE_MOB_MEASURED = {
   // Release merge: the caster picker excludes healer gear; Bruin gains its new
   // double-swing/rage cadence. Authored-world wander also changes shared RNG.
   // Re-measured at 42420 with the unchanged 8% bands and exact payoff counts.
-  moongrove: { damage: 6839, incomingDamage: 237, threat: 6840, payoffs: 7 },
-  wildfang: { damage: 6389, incomingDamage: 213, threat: 7486.7135, payoffs: 10 },
-  bruin: { damage: 3254, incomingDamage: 159, threat: 12206.51375, payoffs: 6 },
+  moongrove: { damage: 6186, incomingDamage: 260, threat: 6187, payoffs: 7 },
+  wildfang: { damage: 6680, incomingDamage: 216, threat: 7827.62, payoffs: 12 },
+  bruin: { damage: 3259, incomingDamage: 130, threat: 12168.97625, payoffs: 6 },
 } as const;
 const BRUIN_TANK_MEASURED = {
-  wolfIncomingDamage: 216,
-  bruinIncomingDamage: 139,
+  wolfIncomingDamage: 246,
+  bruinIncomingDamage: 155,
   bruinMitigationPct: 0.35,
   bruinThreatFrom100Damage: 214.5,
   marrowbreakSnapThreat: 990.99,
@@ -290,7 +304,8 @@ describe('Druid v0.29 balance and live-mob harness', () => {
     // the 2026-09-08 measurement (wolf 220, bear 143, 35 percent less),
     // re-measured 2026-10-15 for the Fenbridge rebuild (wolf 262, bear 157)
     // and 2026-10-20 for the solid Mirefen mudfin huts (wolf 212, bear 126),
-    // then 2026-10-21 for the wander fix around them (wolf 216, bear 139):
+    // then 2026-10-21 for the wander fix around them (wolf 216, bear 139),
+    // then 2026-11-02 for the Studio town rework, #4593 (wolf 246, bear 155):
     // the drift the audit read (bear +12 percent) reds on the bear figure.
     const [wolfLo, wolfHi] = within(BRUIN_TANK_MEASURED.wolfIncomingDamage);
     expect(result.wolfIncomingDamage).toBeGreaterThanOrEqual(wolfLo);

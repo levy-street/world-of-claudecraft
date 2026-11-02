@@ -518,10 +518,14 @@ describe('station reagent sourcing (prog_tools_of_the_trade completability)', ()
     for (const id of GATHERED_PREMIUM_REAGENTS) {
       expect(bree.vendorItems, `${id} must no longer be on Bree's counter`).not.toContain(id);
     }
-    // Bree's counter stays inside the Highwatch hub circle, so what she does
-    // still sell is one stop (crafting then happens at the recipe's own station).
+    // Bree's counter stays in Highwatch, so what she does still sell is one
+    // stop (crafting then happens at the recipe's own station). The Studio
+    // town rework (#4593) moved her west to (-28.91, 672.99), past the hub's
+    // 20 yard core circle but still on the town's levelled plateau, which
+    // reaches hub.radius * 1.6 (world.ts baseHeight's hub blend).
+    expect(bree.pos).toEqual({ x: -28.91, z: 672.99 });
     const distToHub = Math.hypot(bree.pos.x - ZONE3_ZONE.hub.x, bree.pos.z - ZONE3_ZONE.hub.z);
-    expect(distToHub).toBeLessThanOrEqual(ZONE3_ZONE.hub.radius);
+    expect(distToHub).toBeLessThanOrEqual(ZONE3_ZONE.hub.radius * 1.6);
   });
 
   it('all six premium reagents keep their price literals (the economy basis)', () => {

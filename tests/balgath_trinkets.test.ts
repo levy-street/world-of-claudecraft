@@ -69,6 +69,19 @@ function run(sim: Sim, seconds: number): SimEvent[] {
 
 const auraOf = (e: Entity, id: string) => e.auras.find((a) => a.id === id);
 
+/** Plant a body on the ground at (x, z), with no relocation for the mover to read. */
+function standOn(sim: Sim, e: Entity, x: number, z: number): void {
+  e.pos = sim.groundPos(x, z);
+  e.prevPos = { ...e.pos };
+}
+
+// Open, level, dry ground north-east of the Eastbrook quay with no collider for
+// sixty yards along +x. The player start itself no longer serves: the Studio
+// town rework (#4593) raised the quay pad, leaving a two yard step and a pitted
+// strip of ground just east of it, and stood a building across the line east.
+const OPEN_RUN_START = { x: -52, z: -2 } as const;
+const OPEN_HAUL_CENTRE = { x: -30, z: 2 } as const;
+
 // ---- the catalog -------------------------------------------------------------------------
 
 describe("Balgath's trinkets in the catalog", () => {
@@ -304,6 +317,10 @@ describe('Muster Standard: walking melee guardians', () => {
 
   it('fights your target wherever you take the fight, not only near the standard', () => {
     const sim = wearing('muster_standard');
+    // The Studio town rework (#4593) stood a building across the run east of the
+    // player start, so the 50 yard run starts on the open meadow north-east of
+    // the quay instead, where the line and the fight beside it are clear.
+    standOn(sim, sim.player, OPEN_RUN_START.x, OPEN_RUN_START.z);
     sim.useItem('muster_standard');
     run(sim, 0.5);
     const use = TRINKET_SPECS.muster_standard.use as Use<'musterStandard'>;
@@ -569,9 +586,11 @@ describe('Muster Grapnel: the haul', () => {
     h.cooldowns.delete(trinketCooldownKey('muster_grapnel'));
     const a = sim.entities.get(ally) as Entity;
     const s = sim.entities.get(stranger) as Entity;
-    // Open fen ground, twenty yards apart.
-    a.pos = { ...h.pos, x: h.pos.x + 20 };
-    s.pos = { ...h.pos, x: h.pos.x - 20 };
+    // Open ground, twenty yards apart (OPEN_HAUL_CENTRE: the player start's
+    // own surroundings stop a haul short since the Studio town rework, #4593).
+    standOn(sim, h, OPEN_HAUL_CENTRE.x, OPEN_HAUL_CENTRE.z);
+    standOn(sim, a, OPEN_HAUL_CENTRE.x + 20, OPEN_HAUL_CENTRE.z);
+    standOn(sim, s, OPEN_HAUL_CENTRE.x - 20, OPEN_HAUL_CENTRE.z);
     return { sim, h, a, s };
   }
 
@@ -848,7 +867,8 @@ describe('Balgath trinket tooltips print the damage and healing that land', () =
       const a = sim.entities.get(ally) as Entity;
       h.cooldowns.delete(trinketCooldownKey('muster_grapnel'));
       h.healPower = healPower;
-      a.pos = { ...h.pos, x: h.pos.x + 20 };
+      standOn(sim, h, OPEN_HAUL_CENTRE.x, OPEN_HAUL_CENTRE.z);
+      standOn(sim, a, OPEN_HAUL_CENTRE.x + 20, OPEN_HAUL_CENTRE.z);
       a.hp = Math.round(a.maxHp / 2);
       const text = trinketTooltipLineTexts('muster_grapnel', {
         attackPower: h.attackPower,

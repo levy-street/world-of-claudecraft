@@ -3666,7 +3666,11 @@ describe('convertHusks: the husk trade, draw-free on every path', () => {
     // The go-live kept the no-busy-gate rationale: standing beside the farmer
     // (nowhere near a bed's working reach), mid-cast, the trade still lands.
     // The bed-free half of the old permissive arm; the LOCATION half flipped
-    // into the range describe below.
+    // into the range describe below. The customer stands on Jessica's far
+    // (west) side: the Studio town rework (#4593) moved her and the Eastbrook
+    // beds, and her east side now sits 4.99 yd from bed_eastbrook_3, a hair
+    // inside the 5 yd working reach this arm must stay out of.
+    standByNpc(h.sim, 'farmer_jessica', -1);
     giveSeeds(h);
     h.sim.addItem(FARM_WITHERED_HUSK_ITEM_ID, FARM_HUSKS_PER_COMPOST, h.pid);
     h.sim.player.castingAbility = FISHING_CAST_ID;

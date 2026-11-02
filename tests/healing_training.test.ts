@@ -27,6 +27,23 @@ const EMPTY_WORLD: WorldContent = {
   services: undefined,
 };
 
+// The Studio town rework (#4593) deleted the Healing Training Ground from the
+// shipped world: the live touch-up marks all five dummies' object moves
+// `removed` (sim/moved_objects.ts), so sim/healing_training.ts skips them.
+// The ground itself stays in the codebase (templates, reserved ids, the spawn
+// hook, `/dev healing`), so the mechanics below run on the built-in world with
+// every practice dummy move undone: the five allies back on their content
+// marks, and the hub damage dummy back beside them (the rework also moved it
+// about 31 yards north, past Aether Surge's 30 yard reach from `/dev healing`).
+const HEALING_GROUND_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  objectMoves: Object.fromEntries(
+    Object.entries(BUILTIN_WORLD.objectMoves ?? {}).filter(
+      ([key]) => !key.startsWith('practiceDummy:'),
+    ),
+  ),
+};
+
 function livingHealingDummies(sim: Sim) {
   return [...sim.entities.values()].filter(
     (e) => e.templateId?.startsWith('healing_dummy_') && !e.dead,
@@ -75,8 +92,19 @@ describe('Healing Training Ground: templates and placement', () => {
     }
   });
 
-  it('spawns all 5 healing training dummies in a real Sim with low starting HP', () => {
+  it('the shipped world spawns none of them: the rework deleted the ground', () => {
+    for (const id of HEALING_DUMMY_IDS) {
+      expect(BUILTIN_WORLD.objectMoves?.[`practiceDummy:${id}`]?.removed).toBe(true);
+    }
     const sim = new Sim({ seed: SEED, playerClass: 'priest', world: BUILTIN_WORLD });
+    expect(livingHealingDummies(sim)).toHaveLength(0);
+    for (const id of HEALING_DUMMY_IDS) {
+      expect(sim.entities.has(HEALING_TRAINING_ENTITY_IDS[id])).toBe(false);
+    }
+  });
+
+  it('spawns all 5 healing training dummies in a real Sim with low starting HP', () => {
+    const sim = new Sim({ seed: SEED, playerClass: 'priest', world: HEALING_GROUND_WORLD });
     for (const spawn of HEALING_TRAINING_GROUND_SPAWNS) {
       const dummy = [...sim.entities.values()].find((e) => e.templateId === spawn.mobId && !e.dead);
       expect(dummy).toBeDefined();
@@ -111,7 +139,12 @@ describe('Healing Training Ground: templates and placement', () => {
 
 describe('Healing Training Ground: priest healing mechanics', () => {
   it('a priest can target a healing dummy and heal it with single-target heals', () => {
-    const sim = new Sim({ seed: SEED, playerClass: 'priest', devCommands: true });
+    const sim = new Sim({
+      seed: SEED,
+      playerClass: 'priest',
+      world: HEALING_GROUND_WORLD,
+      devCommands: true,
+    });
     sim.setPlayerLevel(20);
 
     const scout = [...sim.entities.values()].find(
@@ -144,7 +177,12 @@ describe('Healing Training Ground: priest healing mechanics', () => {
   });
 
   it('a priest can cast prayer_of_healing (Choirmend) to heal all nearby dummies in AoE', () => {
-    const sim = new Sim({ seed: SEED, playerClass: 'priest', devCommands: true });
+    const sim = new Sim({
+      seed: SEED,
+      playerClass: 'priest',
+      world: HEALING_GROUND_WORLD,
+      devCommands: true,
+    });
     sim.setPlayerLevel(20);
     sim.setSpec('holy');
     sim.player.pos = sim.groundPos(-82, -36);
@@ -173,7 +211,12 @@ describe('Healing Training Ground: priest healing mechanics', () => {
   });
 
   it('a priest can apply renew (Lingering Grace) to heal over time', () => {
-    const sim = new Sim({ seed: SEED, playerClass: 'priest', devCommands: true });
+    const sim = new Sim({
+      seed: SEED,
+      playerClass: 'priest',
+      world: HEALING_GROUND_WORLD,
+      devCommands: true,
+    });
     sim.setPlayerLevel(20);
     sim.player.pos = sim.groundPos(-82, -36);
     sim.player.facing = 0;
@@ -192,7 +235,7 @@ describe('Healing Training Ground: priest healing mechanics', () => {
   });
 
   it('sheds healing back toward resting HP under repeated ticks', () => {
-    const sim = new Sim({ seed: SEED, playerClass: 'priest' });
+    const sim = new Sim({ seed: SEED, playerClass: 'priest', world: HEALING_GROUND_WORLD });
     const tank = [...sim.entities.values()].find(
       (e) => e.templateId === HEALING_DUMMY_TANK_ID && !e.dead,
     );
@@ -214,7 +257,12 @@ describe('Healing Training Ground: priest healing mechanics', () => {
   });
 
   it('/dev healing teleports the player to the healing training ground at level 20', () => {
-    const sim = new Sim({ seed: SEED, playerClass: 'priest', devCommands: true });
+    const sim = new Sim({
+      seed: SEED,
+      playerClass: 'priest',
+      world: HEALING_GROUND_WORLD,
+      devCommands: true,
+    });
     expect(sim.player.level).toBe(1);
 
     handleDevChat(sim.ctx, '/dev healing', sim.player.id);
@@ -232,7 +280,7 @@ describe('Healing Training Ground: Chronomancer mechanics', () => {
     const sim = new Sim({
       seed: SEED,
       playerClass: 'mage',
-      world: BUILTIN_WORLD,
+      world: HEALING_GROUND_WORLD,
       devCommands: true,
     });
     handleDevChat(sim.ctx, '/dev healing', sim.player.id);
@@ -305,7 +353,7 @@ describe('Healing Training Ground: Chronomancer mechanics', () => {
     const sim = new Sim({
       seed: SEED,
       playerClass: 'mage',
-      world: BUILTIN_WORLD,
+      world: HEALING_GROUND_WORLD,
       devCommands: true,
     });
     handleDevChat(sim.ctx, '/dev healing', sim.player.id);

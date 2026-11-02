@@ -12,7 +12,10 @@
 //     The radius discrimination itself is carried by the first-tick visit-count pin
 //     (15, not 35): rng/state neutrality alone would also hold at the former radius.
 //
-// The camp sits at FAR (outside the 360-yd world). Every player is trivial (level 30 vs
+// The camp sits at FAR, past the Galecrest coast and clear of every world spawn (the
+// guard below). The Studio town rework (#4593) pinned the second Wickharbor shoal
+// scuttler camp to authored spots near (455, 487), inside 60 yd of the old (500, 500)
+// mark, so FAR moved out to (540, 540), about 97 yd from the nearest one. Every player is trivial (level 30 vs
 // the level-5 wolves) so no player is ever detected however far a wolf wanders, and the
 // wolves wander freely across K ticks (crossing several idle wander-timer draws), so the
 // sampled state and the draw stream really move.
@@ -38,7 +41,7 @@ const seedOf = (sim: Sim): number => (sim as unknown as { cfg: { seed: number } 
 
 const SEED = 1337;
 const K = 100; // ticks: enough to cross several idle wander-timer draws per wolf
-const FAR = { x: 500, z: 500 };
+const FAR = { x: 540, z: 540 };
 
 const WOLVES = 5;
 const WOLF_RING = 1; // wolves within 1 yd of the camp center

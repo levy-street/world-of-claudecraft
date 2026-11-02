@@ -98,7 +98,9 @@ describe('grounded line-of-sight elevation', () => {
     // under the apothecary's shop lifted the ground here by 0.08 yd. Re-pinned
     // for the World of ClaudeCraft Studio map's arrangement: no building pad
     // reaches the square now, so the stall stands on the plat's own grade.
-    expect(terrainY).toBeCloseTo(-0.642);
+    // Re-pinned for the Studio town rework (#4593): its terrain edits lift the
+    // market square here by about 0.19 yd (the ground stays level under it).
+    expect(terrainY).toBeCloseTo(-0.455);
     expect(canopyY).toBeCloseTo(terrainY + stall.height);
     const stallCollider = colliderInternalsForTest
       .staticWorldColliders(WORLD_SEED)

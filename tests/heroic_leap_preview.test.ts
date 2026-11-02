@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 import { computeHeroicLeapLanding } from '../src/sim/combat/heroic_leap';
-import { PLAYER_START } from '../src/sim/data';
 import { PLAYER_SWIM_DEPTH } from '../src/sim/pathfind';
 import { Sim } from '../src/sim/sim';
 import { MAX_LEVEL } from '../src/sim/types';
@@ -9,6 +8,7 @@ import { WORLD_SEED } from '../src/sim/world_seed';
 import { bareClient } from './helpers/bare_client';
 
 const EPSILON_DIGITS = 6;
+const OPEN_GROUND = { x: -30, z: 2 } as const;
 
 describe('Heroic Leap placement preview', () => {
   const groundedFrom = (x: number, z: number) => ({
@@ -19,12 +19,12 @@ describe('Heroic Leap placement preview', () => {
   });
 
   it('keeps an open-ground target unchanged', () => {
-    const target = { x: PLAYER_START.x + 8, z: PLAYER_START.z };
-    const landing = computeHeroicLeapLanding(
-      WORLD_SEED,
-      groundedFrom(PLAYER_START.x, PLAYER_START.z),
-      target,
-    );
+    // Open, level ground north-east of the Eastbrook quay. The player start
+    // itself no longer serves: the Studio town rework (#4593) raised the quay
+    // pad, so eight yards east of the start now crosses a two yard step.
+    const from = OPEN_GROUND;
+    const target = { x: from.x + 8, z: from.z };
+    const landing = computeHeroicLeapLanding(WORLD_SEED, groundedFrom(from.x, from.z), target);
 
     expect(landing.x).toBeCloseTo(target.x, EPSILON_DIGITS);
     expect(landing.z).toBeCloseTo(target.z, EPSILON_DIGITS);

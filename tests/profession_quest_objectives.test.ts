@@ -3,7 +3,7 @@
 // nonmatching actions never advance quest state.
 
 import { afterEach, describe, expect, it } from 'vitest';
-import { GATHER_NODES, QUESTS } from '../src/sim/data';
+import { GATHER_NODES, gatherNodesInActiveWorld, QUESTS } from '../src/sim/data';
 import { nodeMaterialFor } from '../src/sim/professions/gathering';
 import { TIER2_TOOL_WIELD_PROFICIENCY } from '../src/sim/professions/wield_gate';
 import { Sim } from '../src/sim/sim';
@@ -49,8 +49,11 @@ function trackedSim(objectives: QuestObjective[]): { sim: Sim; pid: number; qp: 
   return { sim, pid, qp };
 }
 
+// The node where the live world stands it: the Studio town rework (#4593)
+// moved some veins (the Eastbrook woodpiles among them) through objectMoves,
+// so the raw table's coordinates can sit yards from the real node.
 function teleportOntoNode(sim: Sim, pid: number, nodeId: string): void {
-  const node = GATHER_NODES.find((candidate) => candidate.id === nodeId)!;
+  const node = gatherNodesInActiveWorld().find((candidate) => candidate.id === nodeId)!;
   const player = sim.entities.get(pid)!;
   player.pos.x = node.pos.x;
   player.pos.z = node.pos.z;

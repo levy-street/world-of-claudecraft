@@ -60,12 +60,14 @@ const PRIORITY: Readonly<Record<PaladinSpec, readonly string[]>> = {
 // Dropping the Evergarden's undrawn scatter (the generator now skips the
 // pines and bed-side decorations the renderer never drew, so their trunk
 // colliders are gone) forks it once more: protection 40.15 to 38.65; holy
-// and retribution unmoved.
+// and retribution unmoved. The Studio town rework (#4593) forks it once more
+// (its world content, retired camp mobs among it, re-rolls the shared stream):
+// protection 41.7 to 43.3, retribution 52.45 to 57.8; holy unmoved.
 // The wide 35-65s design band still holds.
 const EXPECTED_SECONDS: Readonly<Record<PaladinSpec, number>> = {
   holy: 43,
-  protection: 41.7,
-  retribution: 52.45,
+  protection: 43.3,
+  retribution: 57.8,
 };
 
 function addDummy(sim: Sim): Entity {

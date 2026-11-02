@@ -25,12 +25,14 @@ type AnyEntity = ReturnType<typeof createMob> & Record<string, any>;
 const ctxOf = (sim: Sim): SimContext => (sim as unknown as { ctx: SimContext }).ctx;
 const seedOf = (sim: Sim): number => (sim as unknown as { cfg: { seed: number } }).cfg.seed;
 
-// WORLD_SIZE is 360 (x spans [-180, 180]; src/sim/data.ts), so (500, 500) sits well
-// outside the playable world: there are no world-spawned camps or mobs anywhere near
-// it (asserted below as 0 entities within 60 units). Running the aggro scan there
+// (540, 540) sits past the Galecrest coast, with no world-spawned camps or mobs
+// anywhere near it (asserted below as 0 entities within 60 units; the nearest, a
+// Wickharbor shoal scuttler, is about 97 away). The Studio town rework (#4593) pinned
+// that scuttler camp to authored spots near (455, 487), inside 60 of the old (500, 500)
+// mark, so FAR moved out here. Running the aggro scan there
 // isolates the counter to exactly the players this test places, so the visit totals
 // are exact integer literals rather than "at least".
-const FAR = { x: 500, z: 500 };
+const FAR = { x: 540, z: 540 };
 
 function noPlayerSim(): Sim {
   return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });

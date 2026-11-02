@@ -3,6 +3,7 @@
 // or retaliates; it drops combat and heals to full a few seconds after the last hit,
 // and respawns on its own short timer if somehow felled.
 import { describe, expect, it } from 'vitest';
+import { PRACTICE_ROW_MARKS } from '../src/sim/content/practice_dummies';
 import { BUILTIN_WORLD } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import type { WorldContent } from '../src/sim/types';
@@ -14,7 +15,9 @@ type RebucketSim = Sim & {
 };
 
 // This suite only ever targets the fixed Highwatch training-dummy camp entry
-// (zone3.ts: { mobId: 'training_dummy', center: {x:-40,z:648}, radius:0, count:1 })
+// (zone3.ts: { mobId: 'training_dummy', center: PRACTICE_ROW_MARKS.training_dummy,
+// radius:0, count:1 }; the Studio town rework (#4593) moved it from (-40, 648)
+// to the far end of the diagonal practice row at (-80.97, 599.53))
 // plus the hardcoded healer practice dummy (spawnHealerPracticeDummy, gated only on
 // noPlayer+devCommands, spawned unconditionally regardless of cfg.world). No other
 // camp, npc, or ground object is ever targeted or asserted on, so the full built-in
@@ -22,11 +25,14 @@ type RebucketSim = Sim & {
 // Two `training_dummy` camps exist (the Highwatch hill and the Eastbrook hub,
 // content/practice_dummies.ts HUB_PRACTICE_DUMMY_CAMPS); this world keeps only
 // the Highwatch one so dummyOf() cannot pick up the hub's.
-const HIGHWATCH_DUMMY_Z = 648;
+const HIGHWATCH_DUMMY_MARK = PRACTICE_ROW_MARKS.training_dummy;
 const TRAINING_DUMMY_TEST_WORLD: WorldContent = {
   ...BUILTIN_WORLD,
   camps: BUILTIN_WORLD.camps.filter(
-    (camp) => camp.mobId === 'training_dummy' && camp.center.z === HIGHWATCH_DUMMY_Z,
+    (camp) =>
+      camp.mobId === 'training_dummy' &&
+      camp.center.x === HIGHWATCH_DUMMY_MARK.x &&
+      camp.center.z === HIGHWATCH_DUMMY_MARK.z,
   ),
   npcs: {},
   groundObjects: [],
@@ -95,8 +101,9 @@ describe('Highwatch training dummy', () => {
     const d = dummyOf(sim);
     expect(d.hostile).toBe(true); // attackable
     expect(d.aiState).toBe('idle');
-    expect(Math.round(d.pos.x)).toBe(-40);
-    expect(Math.round(d.pos.z)).toBe(648);
+    // The Studio town rework (#4593) mark, as a literal.
+    expect(d.pos.x).toBeCloseTo(-80.97, 6);
+    expect(d.pos.z).toBeCloseTo(599.53, 6);
     expect(d.maxHp).toBeGreaterThan(100000); // near-immortal
   });
 

@@ -46,8 +46,18 @@ const HUB_DUMMY_WORLD = {
   groundObjects: [],
 };
 
+// The Studio town rework (#4593) moved the yard about 55 yards north of the
+// player start, past every low-level heal's range, so the healer walks up to
+// the dummy first: five yards west of it, as a player arriving from Hale's
+// side would stand.
 function makeHealSim(cls: PlayerClass): Sim {
-  return new Sim({ seed: SEED, playerClass: cls, autoEquip: true, world: HUB_DUMMY_WORLD });
+  const sim = new Sim({ seed: SEED, playerClass: cls, autoEquip: true, world: HUB_DUMMY_WORLD });
+  const d = healingDummyOf(sim);
+  const p = sim.player;
+  p.pos = sim.groundPos(d.pos.x - 5, d.pos.z);
+  p.prevPos = { ...p.pos };
+  (sim as unknown as { rebucket(e: Entity): void }).rebucket(p);
+  return sim;
 }
 
 function healingDummyOf(sim: Sim): Entity {
