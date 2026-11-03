@@ -85,8 +85,8 @@ export const SMITH_HEART_HEART_KIT_PIECES = [
   // The rubble a crumbled piece leaves on the platform (the torn pieces'
   // sockets are carved into the quarters since phase 2L).
   'RubbleScatter',
-  // Mythic's Walking Slab (the Slabwright's soul dragging its pillar,
-  // src/render/smith_heart_fx/council_slab_fx.ts): its claws, its collar, its face.
+  // The prototype's mythic Walking Slab (its claws, its collar, its face):
+  // kept in the kit, drawn by nothing since the council's two-boss rework.
   'SlabClaw',
   'SlabCollar',
   'SlabFace',

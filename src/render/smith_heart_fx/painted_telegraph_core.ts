@@ -61,8 +61,8 @@ export type CouncilTelegraphKind =
   | 'rise'
   | 'rubble'
   | 'echo'
-  | 'slabGrind'
-  | 'slabCrush'
+  | 'rush'
+  | 'resonance'
   | 'song'
   | 'crater';
 
@@ -130,7 +130,9 @@ export const BREATH_TELEGRAPH_LOOKS: Readonly<Record<BreathTelegraphKind, Painte
 
 /** Per kind. Wake the Stone's throw and the heir's rising stone split the
  *  floor from the middle (a pillar coming up), the soak's rock cracks the
- *  floor it will land on, a pillar's rubble is broken stone. */
+ *  floor it will land on, a pillar's rubble is broken stone; Mountain's
+ *  Rush's mark and lane split the stone the charge will tear through,
+ *  Resonance's spread ring only scores it lightly (a ring to keep out of). */
 export const COUNCIL_TELEGRAPH_LOOKS: Readonly<Record<CouncilTelegraphKind, PaintedTelegraphLook>> =
   {
     wake: look('quake', 0.72, 1, 0.55, 1, { curtain: false }),
@@ -138,8 +140,8 @@ export const COUNCIL_TELEGRAPH_LOOKS: Readonly<Record<CouncilTelegraphKind, Pain
     rise: look('quake', 0.74, 1, 0.55, 1),
     rubble: look('rubble', 0.55, 1, 1.1, 0.75),
     echo: look('quake', 0.62, 0.9, 0.3, 1),
-    slabGrind: look('quake', 0.45, 0.8, 0.5, 0.85, { rim: 0.85, curtain: false }),
-    slabCrush: look('quake', 0.55, 1, 0.6, 1, { curtain: false }),
+    rush: look('quake', 0.66, 1, 0.5, 1, { curtain: false }),
+    resonance: look('quake', 0.3, 0.7, 0.9, 0.8, { rim: 0.9, curtain: false }),
     song: look('quake', 0.22, 0.6, 0.45, 0.6, { rim: 0.85 }),
     crater: look('quake', 0.8, 1, 0.7, 1, { rim: 0.9, curtain: false }),
   };
@@ -147,8 +149,7 @@ export const COUNCIL_TELEGRAPH_LOOKS: Readonly<Record<CouncilTelegraphKind, Pain
 /** The glow passes' encounter rungs, each over every char rung of its owner
  *  (BreathFightFx's fans 6 to 13, BreathFx's exhale ring 10, CouncilFx's
  *  rubble 12, marks and spots 14, the Echo's and the Song's outer ring 16), so
- *  an owner's multiplies all land before its sums and crossing marks commute.
- *  The council's sits under the slab's crush ring (18) and its gouges (19). */
+ *  an owner's multiplies all land before its sums and crossing marks commute. */
 export const BREATH_TELEGRAPH_GLOW_STEP = 14;
 export const BREATH_GUST_GLOW_STEP = 15;
 export const COUNCIL_TELEGRAPH_GLOW_STEP = 17;

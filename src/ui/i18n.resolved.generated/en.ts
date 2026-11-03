@@ -4749,11 +4749,13 @@ export const en: EnTranslations = {
       "council": {
         "wakeMark": "When this ends, a pillar bursts out of the floor where you stand, dealing {min} to {max} damage to everyone within {radius} yd and throwing them back. Stand where the raid needs cover. Heroic and Mythic: {heroic}% more damage.",
         "rockMark": "When this ends, a rock falls on you: {total} damage shared between everyone within {radius} yd. With fewer than {soakers} under it, each takes {penalty}% more and the whole raid takes {tremorMin} to {tremorMax}. Every pillar within {radius} yd loses a piece, so share it away from cover. Mythic: a soul pillar within {soulReach} yd loses a soul pip instead, and breaks at none. Heroic and Mythic: {heroic}% more damage.",
-        "resonance": "Standing within {reach} yd of a pillar for {seconds} sec in a row knocks a piece off it, and again every {seconds} sec you stay. Nothing removes it: wait out the Wrath by the most damaged pillar and keep off the whole ones. Mythic: by a soul pillar the same wait strikes off a soul pip instead ({singerSeconds} sec by the Seam Singer's), and it breaks at none.",
+        "resonance": "Every {every} sec you ring, dealing {min} to {max} Nature damage to each ally within {radius} yd of you. Move away from everyone until it ends. Heroic and Mythic: {heroic}% more damage.",
+        "rushMark": "When this ends, the Guardian of the Hammer charges in a straight line at you and stops at the first pillar on its line. Lead it into the Cursed Pillar: the pillar shatters, the Guardian is stunned for {stun} sec and takes {exposed}% more damage for {exposedSeconds} sec. A sheltering pillar in the way is destroyed instead. With no pillar on the line, you and everyone in its path take {min} to {max} damage and are thrown back. Mythic: a charge that hits no pillar starts the Quarry collapsing until the Cursed Pillar breaks.",
+        "rushExposed": "Takes {pct}% more damage: Mountain's Rush shattered the Cursed Pillar.",
+        "bond": "Takes {pct}% less damage while the other member of the Hammer Council stands within {reach} yd. Every {every} sec the bond deals {min} to {max} damage to the whole raid, {growth}% more each time. Pull them apart.",
+        "collapse": "The Quarry is collapsing: every {every} sec you take {min} to {max} damage for each stack, and a stack is added each time. It ends when the Cursed Pillar breaks.",
         "memory": "Deals {pct}% more damage: {per}% for each fallen member of the Hammer Council.",
-        "prisoned": "Shut in a block of stone: you cannot act. Your allies must break the block before this ends, or it crushes you.",
-        "pillarLimit": "Each pillar shields at most {limit} players from Mountain's Wrath. With more behind it, each of them takes {share}% of the blast.",
-        "shouldered": "Takes {pct}% less damage while another living member of the Hammer Council stands within {reach} yd. Pull the Slabwright away from them."
+        "pillarLimit": "Each pillar shields at most {limit} players from Mountain's Wrath. With more behind it, each of them takes {share}% of the blast."
       },
       "breathGuardian": {
         "portalA": "When this ends, Portal A opens exactly where you stand. Stand near the Knotted Gale. You cannot carry it this round.",
@@ -7294,45 +7296,44 @@ export const en: EnTranslations = {
     "council": {
       "warn": {
         "wrath": "Mountain's Wrath! Hide behind a pillar!",
-        "shoulder": "The Slabwright hardens beside its kin: pull it away!",
+        "columnsGone": "The carved columns are gone! From now on only the stone Wake the Stone raises can hide you.",
         "crowded": "Too many behind one pillar! It could not shield them all.",
-        "prison": "Stone Prison on {players}! Break them out!",
+        "rush": "Mountain's Rush on {player}! Lead the charge into the cursed pillar!",
+        "rushCursed": "The Guardian shatters the cursed pillar and reels! Strike now!",
+        "rushPillar": "The Rush broke a sheltering pillar! The cursed pillar still stands.",
+        "rushMiss": "Mountain's Rush tramples {players}!",
+        "collapse": "The Quarry begins to collapse! Lead the next Rush into the cursed pillar!",
+        "bond": "Bond of the Stone! Pull the Guardian and the Seam Singer apart!",
+        "wakeCast": "The Seam Singer wakes the stone! Let her finish: a kick raises no pillar.",
+        "wakeKicked": "Wake the Stone was interrupted! No stone rises from it.",
         "enrage": "The mountain's anger quickens! Mountain's Wrath comes much sooner now.",
         "weight": "Hammer's Weight on {player}: swap tanks!",
         "wake": "Wake the Stone: pillars rise under {players}! Stand where the cover should go.",
         "wakeHeir": "The stone wakes under {players}: move!",
         "rock": "Falling Rock on {player}! Share the blow, away from your cover!",
         "song": "Song of the Seam! Interrupt it!",
-        "resonance": "Resonance on {players}: crack the weakest pillar, keep off the whole ones!",
-        "fell_guardian": "The Guardian of the Hammer falls. Its wrath passes into the stone that remains!",
-        "fell_slabwright": "The Slabwright falls. Now the stone rises where it will!",
-        "fell_singer": "The Seam Singer falls. Its song passes on, and no one can stop it now!",
+        "resonance": "Resonance on {players}: move away from everyone until it ends!",
+        "fell_guardian": "The Guardian of the Hammer falls. Its wrath passes to the Seam Singer!",
+        "fell_singer": "The Seam Singer falls. Now the Guardian raises the stone where it will!",
         "soul_guardian": "The Guardian's soul takes the stone! Its Echo of Wrath will strike from the pillar.",
-        "soul_slabwright": "The Slabwright's soul takes the stone! The Walking Slab drags itself after you.",
         "soul_singer": "The Seam Singer's soul takes the stone! Its Endless Song grows with every pulse.",
         "echo": "Echo of Wrath! Put another pillar between you and the soul pillar!",
         "soulBreak_guardian": "The Guardian's soul pillar breaks! Its Echo falls silent.",
-        "soulBreak_slabwright": "The Slabwright's soul pillar breaks! The Walking Slab is still.",
         "soulBreak_singer": "The Seam Singer's soul pillar breaks! The Endless Song falls silent."
       },
       "say": {
         "guardian_pull": "Strangers in the Quarry. The Hammer's strength does not yield to flesh.",
         "guardian_wrath": "The mountain answers me! Hide, if the stone will have you!",
+        "guardian_rush": "Stand in my path, then. The mountain does not turn aside.",
         "guardian_death": "My strength... I give it to the stone.",
         "guardian_remember": "The stone remembers. What was theirs is mine.",
         "guardian_soul": "I am the stone now. My wrath has no body left to fail.",
         "guardian_wipe": "Dust. As all flesh becomes.",
         "guardian_defeat": "The Hammer's strength... is yours to carry.",
-        "slabwright_pull": "More stone for the wall. Hold still, and I will set you in it.",
-        "slabwright_wake": "Stand there. The stone rises where you stand!",
-        "slabwright_rock": "Look up, little ones! The mountain is falling!",
-        "slabwright_death": "The slab... splits...",
-        "slabwright_remember": "The stone remembers. I will finish the work.",
-        "slabwright_soul": "No hands left, but I will drag this stone to you.",
-        "slabwright_wipe": "Set, and buried. Good work.",
-        "slabwright_defeat": "The Quarry... falls quiet.",
         "singer_pull": "Hear the seam sing? It has waited so long for your voices.",
         "singer_song": "Sing with me, and break!",
+        "singer_wake": "Wake, sleeping stone. Rise where they stand!",
+        "singer_rock": "Look up, little ones! The mountain is falling!",
         "singer_death": "My song... runs into the rock...",
         "singer_remember": "The stone remembers. Listen, it still sings.",
         "singer_soul": "Listen. In the stone, my song never ends.",
@@ -7345,11 +7346,10 @@ export const en: EnTranslations = {
         "rockTitle": "Falling Rock!",
         "rockLine": "Gather at least three allies on you, away from the pillars",
         "resonanceTitle": "Resonance",
-        "resonanceLine": "Near a pillar you crack it: wait by the most damaged one",
-        "resonanceCracking": "Cracking a pillar: move away to spare it",
+        "resonanceLine": "You hurt every ally near you: move away from the group until it ends",
+        "rushTitle": "Mountain's Rush!",
+        "rushLine": "The Guardian charges you: put the cursed pillar between you and him",
         "rockLineSoul": "Gather at least three allies on you, away from cover and beside a soul pillar",
-        "resonanceLineSoul": "Wait by a soul pillar to break its soul pips, never by the whole pillars",
-        "resonanceBreaking": "Breaking a soul pip: stay by the soul pillar",
         "weightTitle": "Hammer's Weight",
         "weightLine": "You take double physical damage: the other tank must take the Guardian",
         "timeAria": "{seconds} seconds left"
@@ -16959,12 +16959,11 @@ export const en: EnTranslations = {
       "heart_rime_bolt": "Rime Bolt",
       "heart_ember_bolt": "Ember Bolt",
       "heart_hammers_weight": "Hammer's Weight",
+      "heart_mountains_rush": "Mountain's Rush",
       "heart_wake_the_stone": "Wake the Stone",
       "heart_falling_rock": "Falling Rock",
-      "heart_stone_prison": "Stone Prison",
       "heart_seam_bolt": "Seam Bolt",
       "heart_song_of_the_seam": "Song of the Seam",
-      "heart_song_of_the_seam_unbroken": "Song of the Seam",
       "heart_echo_of_wrath": "Echo of Wrath",
       "heart_endless_song": "Endless Song",
       "heart_breath_inhale": "Indrawn Breath",
@@ -26935,9 +26934,6 @@ export const en: EnTranslations = {
       "heart_hammer_guardian": {
         "name": "Guardian of the Hammer"
       },
-      "heart_slabwright": {
-        "name": "The Slabwright"
-      },
       "heart_seam_singer": {
         "name": "The Seam Singer"
       },
@@ -26964,9 +26960,6 @@ export const en: EnTranslations = {
       },
       "heart_heat_rolling_cinder": {
         "name": "Rolling Cinder"
-      },
-      "heart_stone_prison": {
-        "name": "Stone Prison"
       },
       "heart_final_splinter_heat": {
         "name": "Splinter of the Heat"

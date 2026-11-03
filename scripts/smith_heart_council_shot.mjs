@@ -1,7 +1,7 @@
 // Evidence captures for the Smith's Heart's Hammer Council (docs/design/raid/
-// smith_heart.md sections 5.18 and 7.1): the three on the Quarry floor, a
+// smith_heart.md sections 5.18 and 7.1): the two on the Quarry floor, a
 // Mountain's Wrath with the raid hiding behind the pillars, Wake the Stone
-// raising a pillar, a Resonance cracking one, a Falling Rock soak, and the
+// raising a pillar, a Resonance spread ring, a Falling Rock soak, and the
 // inheritance's light when one of them falls. A small raid of dev-only
 // stand-in players is added to the offline world so the marks have someone
 // to fall on. Evidence tooling, not a repo test. Needs a dev Vite serving the
@@ -160,7 +160,7 @@ try {
       const w = window.__game.world;
       const tank = w.entities.get(window.__raid[0]);
       for (const e of w.entities.values())
-        if (/^heart_(hammer_guardian|slabwright|seam_singer)$/.test(e.templateId) && !e.dead)
+        if (/^heart_(hammer_guardian|seam_singer)$/.test(e.templateId) && !e.dead)
           w.ctx.aggroMob(e, tank, false);
     });
     await sleep(800);
@@ -266,7 +266,7 @@ try {
       await chat('/dev heart council wake', 0);
       await sleep(1200 + 5000 + 230);
     },
-    // Resonance cracking a pillar: its ring, the thread, the pillar humming.
+    // Resonance's spread: the danger ring round its carrier, its shimmer.
     async '04_resonancia'() {
       await reset();
       await pull();
@@ -324,19 +324,19 @@ try {
         await sleep(25);
       }
     },
-    // The stone remembers: the Slabwright falls and its light flows on.
+    // The stone remembers: the Seam Singer falls and its light flows on.
     async '06_herencia'() {
       await reset();
       await pull();
       for (let i = 1; i < 8; i++) await raider(i, MID.x - 12 - i, MID.z - 12 + i);
       await place([MID.x - 22, MID.z + 2], [MID.x, MID.z - 4], 0.0, 0.32, 18);
       await sleep(800);
-      // The Slabwright a few strides from its siblings, so its light arcs to them.
+      // The Singer a few strides from the Guardian, so its light arcs to it.
       await page.evaluate(
         ([ox, oz, x, z]) => {
           const w = window.__game.world;
           for (const e of w.entities.values()) {
-            if (e.templateId !== 'heart_slabwright' || e.dead) continue;
+            if (e.templateId !== 'heart_seam_singer' || e.dead) continue;
             const g = w.ctx.groundPos(ox + x, oz + z);
             e.pos = { ...g };
             e.prevPos = { ...g };
@@ -345,12 +345,12 @@ try {
         },
         [O.x, O.z, MID.x - 2, MID.z - 15],
       );
-      await chat('/dev heart kill slabwright', 0);
+      await chat('/dev heart kill singer', 0);
       await sleep(1000);
     },
     // Mythic (SHOT_MYTHIC=1): Soul in the Stone. The soul flowing into its
-    // pillar, the Echo of Wrath with the raid hiding, the Walking Slab
-    // dragging after the group, the Endless Song grown loud.
+    // pillar, the Echo of Wrath with the raid hiding, the Endless Song grown
+    // loud.
     async m1_alma() {
       await reset();
       await pull();
@@ -397,24 +397,6 @@ try {
       await setSoul({ timer: 0.05 });
       await sleep(2300);
     },
-    async m3_losa() {
-      await reset();
-      await pull();
-      const g = [MID.x - 12, MID.z - 6];
-      for (let i = 1; i < 8; i++)
-        await raider(i, g[0] + (i % 3) * 1.5 - 1.5, g[1] + Math.floor(i / 3) * 1.5 - 1.5);
-      await chat('/dev heart council soul slabwright', 600);
-      await sleep(4200);
-      const at = await soulAt();
-      if (at) {
-        const d = Math.hypot(g[0] - at[0], g[1] - at[1]) || 1;
-        const ux = (g[0] - at[0]) / d;
-        const uz = (g[1] - at[1]) / d;
-        if (process.env.SHOT_TOP === '1') await place(g, at, 0, 1.2, 30);
-        else await place([g[0] + ux * 4 + uz * 4, g[1] + uz * 4 - ux * 4], at, 0.3, 0.72, 22);
-      }
-      await sleep(1600);
-    },
     async m4_canto() {
       await reset();
       await pull();
@@ -436,8 +418,7 @@ try {
       await sleep(380);
     },
     // Polish (SHOT_MYTHIC=1 for the soul ones): the Echo's safe shadows from a
-    // player's own camera at ground level, the Walking Slab's own look, the
-    // Falling Rock's countdown, the council's nameplates round a shared tank.
+    // player's own camera at ground level, the Falling Rock's countdown, the council's nameplates round a shared tank.
     async p1_eco_suelo() {
       await reset();
       await pull();
@@ -482,23 +463,6 @@ try {
       await chat('/dev heart council wrath', 0);
       await sleep(2400);
     },
-    async p3_losa() {
-      await reset();
-      await pull();
-      const g = [MID.x - 14, MID.z - 8];
-      for (let i = 1; i < 8; i++)
-        await raider(i, g[0] + (i % 3) * 1.5 - 1.5, g[1] + Math.floor(i / 3) * 1.5 - 1.5);
-      await chat('/dev heart council soul slabwright', 600);
-      await sleep(5200);
-      const at = await soulAt();
-      if (at) {
-        const d = Math.hypot(g[0] - at[0], g[1] - at[1]) || 1;
-        const ux = (g[0] - at[0]) / d;
-        const uz = (g[1] - at[1]) / d;
-        await place([at[0] + ux * 9 - uz * 7, at[1] + uz * 9 + ux * 7], at, 0.0, 0.3, 11);
-      }
-      await sleep(1300);
-    },
     async p4_roca() {
       await reset();
       await pull();
@@ -540,8 +504,7 @@ try {
           const w = window.__game.world;
           let k = 0;
           for (const e of w.entities.values()) {
-            if (!/^heart_(hammer_guardian|slabwright|seam_singer)$/.test(e.templateId) || e.dead)
-              continue;
+            if (!/^heart_(hammer_guardian|seam_singer)$/.test(e.templateId) || e.dead) continue;
             const g = w.ctx.groundPos(ox + x + (k - 1) * 3.2, oz + z + (k % 2) * 1.5);
             e.pos = { ...g };
             e.prevPos = { ...g };

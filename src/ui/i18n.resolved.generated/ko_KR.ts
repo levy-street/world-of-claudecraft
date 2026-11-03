@@ -4749,11 +4749,13 @@ export const ko_KR: EnTranslations = {
       "council": {
         "wakeMark": "효과가 끝나면 서 있는 자리의 바닥에서 기둥이 솟구쳐 {radius}야드 안의 모두에게 {min}에서 {max}의 피해를 주고 밀쳐냅니다. 공격대에 엄폐물이 필요한 곳에 서세요. 영웅·신화: 피해 {heroic}% 증가.",
         "rockMark": "효과가 끝나면 바위가 떨어집니다: {total}의 피해를 {radius}야드 안의 모두가 나눠 받습니다. {soakers}명 미만이면 각자 {penalty}% 더 받고 공격대 전체가 {tremorMin}에서 {tremorMax}의 피해를 받습니다. {radius}야드 안의 모든 기둥이 한 조각씩 깨지니 엄폐물에서 떨어져 나눠 맞으세요. 신화: {soulReach}야드 안의 영혼의 기둥은 대신 영혼 표식을 하나 잃고, 표식이 없어지면 부서집니다. 영웅·신화: 피해 {heroic}% 증가.",
-        "resonance": "기둥에서 {reach}야드 안에 {seconds}초 동안 계속 서 있으면 기둥이 한 조각 깨지고, 머무는 동안 {seconds}초마다 다시 깨집니다. 제거할 수 없습니다: 가장 손상된 기둥 옆에서 산의 분노를 버티고 멀쩡한 기둥에서는 떨어지세요. 신화: 영혼의 기둥 옆에서 같은 시간을 버티면 대신 영혼 표식이 하나 사라지고(광맥의 노래꾼의 기둥은 {singerSeconds}초), 표식이 없어지면 부서집니다.",
+        "resonance": "Every {every} sec you ring, dealing {min} to {max} Nature damage to each ally within {radius} yd of you. Move away from everyone until it ends. Heroic and Mythic: {heroic}% more damage.",
+        "rushMark": "When this ends, the Guardian of the Hammer charges in a straight line at you and stops at the first pillar on its line. Lead it into the Cursed Pillar: the pillar shatters, the Guardian is stunned for {stun} sec and takes {exposed}% more damage for {exposedSeconds} sec. A sheltering pillar in the way is destroyed instead. With no pillar on the line, you and everyone in its path take {min} to {max} damage and are thrown back. Mythic: a charge that hits no pillar starts the Quarry collapsing until the Cursed Pillar breaks.",
+        "rushExposed": "Takes {pct}% more damage: Mountain's Rush shattered the Cursed Pillar.",
+        "bond": "Takes {pct}% less damage while the other member of the Hammer Council stands within {reach} yd. Every {every} sec the bond deals {min} to {max} damage to the whole raid, {growth}% more each time. Pull them apart.",
+        "collapse": "The Quarry is collapsing: every {every} sec you take {min} to {max} damage for each stack, and a stack is added each time. It ends when the Cursed Pillar breaks.",
         "memory": "주는 피해가 {pct}% 증가합니다: 쓰러진 망치 의회 구성원 1명당 {per}%.",
-        "prisoned": "Shut in a block of stone: you cannot act. Your allies must break the block before this ends, or it crushes you.",
-        "pillarLimit": "Each pillar shields at most {limit} players from Mountain's Wrath. With more behind it, each of them takes {share}% of the blast.",
-        "shouldered": "Takes {pct}% less damage while another living member of the Hammer Council stands within {reach} yd. Pull the Slabwright away from them."
+        "pillarLimit": "Each pillar shields at most {limit} players from Mountain's Wrath. With more behind it, each of them takes {share}% of the blast."
       },
       "breathGuardian": {
         "portalA": "When this ends, Portal A opens exactly where you stand. Stand near the Knotted Gale. You cannot carry it this round.",
@@ -7294,45 +7296,44 @@ export const ko_KR: EnTranslations = {
     "council": {
       "warn": {
         "wrath": "산의 분노! 기둥 뒤에 숨으세요!",
-        "shoulder": "The Slabwright hardens beside its kin: pull it away!",
+        "columnsGone": "The carved columns are gone! From now on only the stone Wake the Stone raises can hide you.",
         "crowded": "Too many behind one pillar! It could not shield them all.",
-        "prison": "Stone Prison on {players}! Break them out!",
+        "rush": "Mountain's Rush on {player}! Lead the charge into the cursed pillar!",
+        "rushCursed": "The Guardian shatters the cursed pillar and reels! Strike now!",
+        "rushPillar": "The Rush broke a sheltering pillar! The cursed pillar still stands.",
+        "rushMiss": "Mountain's Rush tramples {players}!",
+        "collapse": "The Quarry begins to collapse! Lead the next Rush into the cursed pillar!",
+        "bond": "Bond of the Stone! Pull the Guardian and the Seam Singer apart!",
+        "wakeCast": "The Seam Singer wakes the stone! Let her finish: a kick raises no pillar.",
+        "wakeKicked": "Wake the Stone was interrupted! No stone rises from it.",
         "enrage": "산의 분노가 빨라집니다! 이제 산의 분노가 훨씬 빨리 옵니다.",
         "weight": "{player}에게 망치의 무게: 탱커 교대!",
         "wake": "돌 깨우기: {players} 아래에서 기둥이 솟아오릅니다! 엄폐물이 필요한 곳에 서세요.",
         "wakeHeir": "{players} 아래에서 돌이 깨어납니다: 움직이세요!",
         "rock": "{player}에게 낙석! 엄폐물에서 떨어져 함께 나눠 맞으세요!",
         "song": "광맥의 노래! 차단하세요!",
-        "resonance": "{players}에게 공명: 가장 손상된 기둥을 깨고, 멀쩡한 기둥에서는 떨어지세요!",
-        "fell_guardian": "망치의 수호자가 쓰러졌습니다. 그 분노가 남은 돌에게 넘어갑니다!",
-        "fell_slabwright": "석판장이가 쓰러졌습니다. 이제 돌이 제멋대로 솟아오릅니다!",
-        "fell_singer": "광맥의 노래꾼이 쓰러졌습니다. 그 노래가 이어지며, 이제 아무도 막을 수 없습니다!",
+        "resonance": "Resonance on {players}: move away from everyone until it ends!",
+        "fell_guardian": "The Guardian of the Hammer falls. Its wrath passes to the Seam Singer!",
+        "fell_singer": "The Seam Singer falls. Now the Guardian raises the stone where it will!",
         "soul_guardian": "수호자의 영혼이 돌에 깃들었습니다! 그 기둥에서 분노의 메아리가 터져 나옵니다.",
-        "soul_slabwright": "석판장이의 영혼이 돌에 깃들었습니다! 걷는 석판이 여러분을 향해 끌려옵니다.",
         "soul_singer": "광맥의 노래꾼의 영혼이 돌에 깃들었습니다! 끝없는 노래가 울릴 때마다 커집니다.",
         "echo": "분노의 메아리! 영혼의 기둥과 자신 사이에 다른 기둥을 두세요!",
         "soulBreak_guardian": "수호자의 영혼의 기둥이 부서졌습니다! 메아리가 잠잠해집니다.",
-        "soulBreak_slabwright": "석판장이의 영혼의 기둥이 부서졌습니다! 걷는 석판이 멈춥니다.",
         "soulBreak_singer": "광맥의 노래꾼의 영혼의 기둥이 부서졌습니다! 끝없는 노래가 그칩니다."
       },
       "say": {
         "guardian_pull": "채석장에 낯선 자들이라. 망치의 힘은 살덩이에 굴하지 않는다.",
         "guardian_wrath": "산이 내게 응답한다! 돌이 받아 준다면 숨어 보아라!",
+        "guardian_rush": "Stand in my path, then. The mountain does not turn aside.",
         "guardian_death": "나의 힘을... 돌에 맡긴다.",
         "guardian_remember": "돌은 기억한다. 그들의 것은 이제 나의 것이다.",
         "guardian_soul": "이제 나는 돌이다. 나의 분노에는 쓰러질 몸이 없다.",
         "guardian_wipe": "먼지로다. 모든 살덩이가 그러하듯.",
         "guardian_defeat": "망치의 힘은... 이제 너희가 짊어져라.",
-        "slabwright_pull": "벽에 쓸 돌이 더 필요하지. 가만히 있어라, 너희를 쌓아 넣어 주마.",
-        "slabwright_wake": "거기 서라. 네가 선 자리에서 돌이 솟는다!",
-        "slabwright_rock": "위를 봐라, 꼬맹이들! 산이 무너진다!",
-        "slabwright_death": "석판이... 갈라진다...",
-        "slabwright_remember": "돌은 기억한다. 일은 내가 마무리하마.",
-        "slabwright_soul": "손은 남지 않았지만, 이 돌을 너희에게 끌고 가겠다.",
-        "slabwright_wipe": "쌓고, 묻었다. 잘된 일이다.",
-        "slabwright_defeat": "채석장이... 조용해진다.",
         "singer_pull": "광맥의 노래가 들리나요? 너무 오래 당신들의 목소리를 기다렸어요.",
         "singer_song": "나와 함께 노래하고, 부서지세요!",
+        "singer_wake": "Wake, sleeping stone. Rise where they stand!",
+        "singer_rock": "Look up, little ones! The mountain is falling!",
         "singer_death": "나의 노래가... 바위로 흘러들어...",
         "singer_remember": "돌은 기억해요. 들어 봐요, 아직 노래하고 있어요.",
         "singer_soul": "들어 봐요. 돌 속에서 나의 노래는 끝나지 않아요.",
@@ -7345,11 +7346,10 @@ export const ko_KR: EnTranslations = {
         "rockTitle": "낙석!",
         "rockLine": "기둥에서 떨어져 최소 세 명의 아군을 모으세요",
         "resonanceTitle": "공명",
-        "resonanceLine": "기둥 근처에 있으면 기둥을 깹니다: 가장 손상된 기둥 옆에서 기다리세요",
-        "resonanceCracking": "기둥을 깨는 중: 지키려면 멀어지세요",
+        "resonanceLine": "You hurt every ally near you: move away from the group until it ends",
+        "rushTitle": "Mountain's Rush!",
+        "rushLine": "The Guardian charges you: put the cursed pillar between you and him",
         "rockLineSoul": "엄폐물에서 떨어져 영혼의 기둥 옆에 아군을 3명 이상 모으세요",
-        "resonanceLineSoul": "영혼의 기둥 옆에서 기다려 영혼 표식을 깨세요. 멀쩡한 기둥 옆에는 가지 마세요",
-        "resonanceBreaking": "영혼 표식을 깨는 중: 영혼의 기둥 옆에 머무세요",
         "weightTitle": "망치의 무게",
         "weightLine": "받는 물리 피해가 두 배가 됩니다: 다른 탱커가 수호자를 맡아야 합니다",
         "timeAria": "{seconds}초 남음"
@@ -16959,12 +16959,11 @@ export const ko_KR: EnTranslations = {
       "heart_rime_bolt": "Rime Bolt",
       "heart_ember_bolt": "잔불 화살",
       "heart_hammers_weight": "망치의 무게",
+      "heart_mountains_rush": "Mountain's Rush",
       "heart_wake_the_stone": "돌 깨우기",
       "heart_falling_rock": "낙석",
-      "heart_stone_prison": "Stone Prison",
       "heart_seam_bolt": "광맥 화살",
       "heart_song_of_the_seam": "광맥의 노래",
-      "heart_song_of_the_seam_unbroken": "광맥의 노래",
       "heart_echo_of_wrath": "분노의 메아리",
       "heart_endless_song": "끝없는 노래",
       "heart_breath_inhale": "들이쉬는 숨",
@@ -26935,9 +26934,6 @@ export const ko_KR: EnTranslations = {
       "heart_hammer_guardian": {
         "name": "망치의 수호자"
       },
-      "heart_slabwright": {
-        "name": "석판장이"
-      },
       "heart_seam_singer": {
         "name": "광맥의 노래꾼"
       },
@@ -26964,9 +26960,6 @@ export const ko_KR: EnTranslations = {
       },
       "heart_heat_rolling_cinder": {
         "name": "구르는 잉걸불"
-      },
-      "heart_stone_prison": {
-        "name": "Stone Prison"
       },
       "heart_final_splinter_heat": {
         "name": "열기의 파편"

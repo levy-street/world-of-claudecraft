@@ -227,6 +227,9 @@ describe("the Smith's Heart: encounter in progress", () => {
     tank.prevPos = { ...tank.pos };
     sim.ctx.rebucket(tank);
     expect(sim.ctx.aggroMob(mob, tank, false)).toBe(true);
+    // A raid-level tank: a level-1 body dies to one critical swing, and which
+    // swing crits follows the claim's ids (the test reads the door).
+    sim.setPlayerLevel(20, tankId);
     die(sim, pid);
     for (let i = 0; i < 100; i++) {
       tank.hp = tank.maxHp;
@@ -297,11 +300,11 @@ describe("the Smith's Heart: encounter in progress", () => {
     for (const mob of council) engage(mob);
     die(sim, pid);
     expect(enterDungeon(sim.ctx, SMITH_HEART_DUNGEON, pid)).toBe(false);
-    // Two down, one still fighting: still held.
+    // One down, the other still fighting: still held.
+    expect(council.length).toBe(2);
     slay(sim, pid, council[0]);
-    slay(sim, pid, council[1]);
     expect(enterDungeon(sim.ctx, SMITH_HEART_DUNGEON, pid)).toBe(false);
-    slay(sim, pid, council[2]);
+    slay(sim, pid, council[1]);
     sim.tick();
     expect(encounterInProgress(sim.ctx, inst)).toBe(false);
     expect(enterDungeon(sim.ctx, SMITH_HEART_DUNGEON, pid)).toBe(true);

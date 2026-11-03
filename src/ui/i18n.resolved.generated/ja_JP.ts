@@ -4749,11 +4749,13 @@ export const ja_JP: EnTranslations = {
       "council": {
         "wakeMark": "効果が切れると、立っている場所の床から柱が突き出し、{radius}ヤード以内の全員に{min}から{max}のダメージを与えて吹き飛ばす。レイドが遮蔽物を必要とする場所に立とう。ヒロイック・ミシック：ダメージ{heroic}%増加。",
         "rockMark": "効果が切れると岩が落ちてくる：{total}のダメージを{radius}ヤード以内の全員で分け合う。{soakers}人未満だと各自が{penalty}%多く受け、レイド全体が{tremorMin}から{tremorMax}を受ける。{radius}ヤード以内の柱はすべて欠けるので、遮蔽物から離れて受けよう。ミシック：{soulReach}ヤード以内の魂の柱は代わりに魂の印を一つ失い、印がなくなると砕ける。ヒロイック・ミシック：ダメージ{heroic}%増加。",
-        "resonance": "柱から{reach}ヤード以内に{seconds}秒続けて立つと柱が一つ欠け、そこにいる限り{seconds}秒ごとにまた欠ける。解除はできない：一番傷んだ柱のそばで山の怒りをやり過ごし、無傷の柱には近づかないこと。ミシック：魂の柱のそばで同じだけ待つと代わりに魂の印が一つ消え（鉱脈の歌い手の柱なら{singerSeconds}秒）、印がなくなると砕ける。",
+        "resonance": "Every {every} sec you ring, dealing {min} to {max} Nature damage to each ally within {radius} yd of you. Move away from everyone until it ends. Heroic and Mythic: {heroic}% more damage.",
+        "rushMark": "When this ends, the Guardian of the Hammer charges in a straight line at you and stops at the first pillar on its line. Lead it into the Cursed Pillar: the pillar shatters, the Guardian is stunned for {stun} sec and takes {exposed}% more damage for {exposedSeconds} sec. A sheltering pillar in the way is destroyed instead. With no pillar on the line, you and everyone in its path take {min} to {max} damage and are thrown back. Mythic: a charge that hits no pillar starts the Quarry collapsing until the Cursed Pillar breaks.",
+        "rushExposed": "Takes {pct}% more damage: Mountain's Rush shattered the Cursed Pillar.",
+        "bond": "Takes {pct}% less damage while the other member of the Hammer Council stands within {reach} yd. Every {every} sec the bond deals {min} to {max} damage to the whole raid, {growth}% more each time. Pull them apart.",
+        "collapse": "The Quarry is collapsing: every {every} sec you take {min} to {max} damage for each stack, and a stack is added each time. It ends when the Cursed Pillar breaks.",
         "memory": "与えるダメージが{pct}%増加：槌の評議会の倒れた仲間1人につき{per}%。",
-        "prisoned": "Shut in a block of stone: you cannot act. Your allies must break the block before this ends, or it crushes you.",
-        "pillarLimit": "Each pillar shields at most {limit} players from Mountain's Wrath. With more behind it, each of them takes {share}% of the blast.",
-        "shouldered": "Takes {pct}% less damage while another living member of the Hammer Council stands within {reach} yd. Pull the Slabwright away from them."
+        "pillarLimit": "Each pillar shields at most {limit} players from Mountain's Wrath. With more behind it, each of them takes {share}% of the blast."
       },
       "breathGuardian": {
         "portalA": "When this ends, Portal A opens exactly where you stand. Stand near the Knotted Gale. You cannot carry it this round.",
@@ -7294,45 +7296,44 @@ export const ja_JP: EnTranslations = {
     "council": {
       "warn": {
         "wrath": "山の怒り！柱の陰に隠れろ！",
-        "shoulder": "The Slabwright hardens beside its kin: pull it away!",
+        "columnsGone": "The carved columns are gone! From now on only the stone Wake the Stone raises can hide you.",
         "crowded": "Too many behind one pillar! It could not shield them all.",
-        "prison": "Stone Prison on {players}! Break them out!",
+        "rush": "Mountain's Rush on {player}! Lead the charge into the cursed pillar!",
+        "rushCursed": "The Guardian shatters the cursed pillar and reels! Strike now!",
+        "rushPillar": "The Rush broke a sheltering pillar! The cursed pillar still stands.",
+        "rushMiss": "Mountain's Rush tramples {players}!",
+        "collapse": "The Quarry begins to collapse! Lead the next Rush into the cursed pillar!",
+        "bond": "Bond of the Stone! Pull the Guardian and the Seam Singer apart!",
+        "wakeCast": "The Seam Singer wakes the stone! Let her finish: a kick raises no pillar.",
+        "wakeKicked": "Wake the Stone was interrupted! No stone rises from it.",
         "enrage": "山の怒りが速まった！山の怒りがずっと早く来る。",
         "weight": "{player}に槌の重み：タンク交代！",
         "wake": "石の目覚め：{players}の足元に柱がせり上がる！遮蔽物が必要な場所に立て。",
         "wakeHeir": "{players}の足元で石が目覚める：動け！",
         "rock": "{player}に落石！遮蔽物から離れて一緒に受けろ！",
         "song": "鉱脈の歌！詠唱を止めろ！",
-        "resonance": "{players}に共鳴：一番傷んだ柱を割れ、無傷の柱には近づくな！",
-        "fell_guardian": "槌の守護者が倒れた。その怒りは残された石へと移る！",
-        "fell_slabwright": "石板の匠が倒れた。これからは石が好きな場所にせり上がる！",
-        "fell_singer": "鉱脈の歌い手が倒れた。その歌は受け継がれ、もう誰にも止められない！",
+        "resonance": "Resonance on {players}: move away from everyone until it ends!",
+        "fell_guardian": "The Guardian of the Hammer falls. Its wrath passes to the Seam Singer!",
+        "fell_singer": "The Seam Singer falls. Now the Guardian raises the stone where it will!",
         "soul_guardian": "守護者の魂が石に宿った！その柱から怒りの残響が放たれる。",
-        "soul_slabwright": "石板の匠の魂が石に宿った！歩む石板が君たちを追って這い寄る。",
         "soul_singer": "鉱脈の歌い手の魂が石に宿った！終わらぬ歌は脈打つたびに強まる。",
         "echo": "怒りの残響！魂の柱との間に別の柱を挟め！",
         "soulBreak_guardian": "守護者の魂の柱が砕けた！残響が静まる。",
-        "soulBreak_slabwright": "石板の匠の魂の柱が砕けた！歩む石板が止まる。",
         "soulBreak_singer": "鉱脈の歌い手の魂の柱が砕けた！終わらぬ歌が途絶える。"
       },
       "say": {
         "guardian_pull": "採石場によそ者か。槌の力は肉などに屈しはせぬ。",
         "guardian_wrath": "山が我に応える！石が匿ってくれるなら隠れるがいい！",
+        "guardian_rush": "Stand in my path, then. The mountain does not turn aside.",
         "guardian_death": "我が力を……石に託す。",
         "guardian_remember": "石は覚えている。あの者のものは、今や我がものだ。",
         "guardian_soul": "我はもはや石そのもの。我が怒りには、朽ちる体などない。",
         "guardian_wipe": "塵だ。肉はすべてそうなる。",
         "guardian_defeat": "槌の力は……お前たちが担え。",
-        "slabwright_pull": "壁に石が足りん。じっとしていろ、お前たちを積み込んでやる。",
-        "slabwright_wake": "そこに立て。お前の足元から石がせり上がる！",
-        "slabwright_rock": "上を見ろ、ちびども！山が落ちてくるぞ！",
-        "slabwright_death": "石板が……割れる……",
-        "slabwright_remember": "石は覚えている。仕事は俺が仕上げる。",
-        "slabwright_soul": "手はもうない。だがこの石をお前たちのもとへ引きずっていくぞ。",
-        "slabwright_wipe": "据えて、埋めた。いい仕事だ。",
-        "slabwright_defeat": "採石場が……静まる。",
         "singer_pull": "鉱脈の歌が聞こえる？ずっとあなたたちの声を待っていたの。",
         "singer_song": "一緒に歌って、そして砕けなさい！",
+        "singer_wake": "Wake, sleeping stone. Rise where they stand!",
+        "singer_rock": "Look up, little ones! The mountain is falling!",
         "singer_death": "私の歌が……岩へと流れていく……",
         "singer_remember": "石は覚えている。聞いて、まだ歌っている。",
         "singer_soul": "聞いて。石の中で、私の歌は終わらない。",
@@ -7345,11 +7346,10 @@ export const ja_JP: EnTranslations = {
         "rockTitle": "落石！",
         "rockLine": "柱から離れ、少なくとも3人の味方を集めよう",
         "resonanceTitle": "共鳴",
-        "resonanceLine": "柱の近くにいると割ってしまう：一番傷んだ柱のそばで待とう",
-        "resonanceCracking": "柱を割っている：守るなら離れよう",
+        "resonanceLine": "You hurt every ally near you: move away from the group until it ends",
+        "rushTitle": "Mountain's Rush!",
+        "rushLine": "The Guardian charges you: put the cursed pillar between you and him",
         "rockLineSoul": "遮蔽物から離れ、魂の柱のそばで少なくとも3人の味方を集めよう",
-        "resonanceLineSoul": "魂の柱のそばで待って魂の印を砕こう、無傷の柱には近づかないこと",
-        "resonanceBreaking": "魂の印を砕いている：魂の柱のそばにとどまろう",
         "weightTitle": "槌の重み",
         "weightLine": "物理ダメージが倍になる：もう一人のタンクが守護者を引き受けよう",
         "timeAria": "残り{seconds}秒"
@@ -16959,12 +16959,11 @@ export const ja_JP: EnTranslations = {
       "heart_rime_bolt": "Rime Bolt",
       "heart_ember_bolt": "残り火の矢",
       "heart_hammers_weight": "槌の重み",
+      "heart_mountains_rush": "Mountain's Rush",
       "heart_wake_the_stone": "石の目覚め",
       "heart_falling_rock": "落石",
-      "heart_stone_prison": "Stone Prison",
       "heart_seam_bolt": "鉱脈の矢",
       "heart_song_of_the_seam": "鉱脈の歌",
-      "heart_song_of_the_seam_unbroken": "鉱脈の歌",
       "heart_echo_of_wrath": "怒りの残響",
       "heart_endless_song": "終わらぬ歌",
       "heart_breath_inhale": "吸い込む息",
@@ -26935,9 +26934,6 @@ export const ja_JP: EnTranslations = {
       "heart_hammer_guardian": {
         "name": "槌の守護者"
       },
-      "heart_slabwright": {
-        "name": "石板の匠"
-      },
       "heart_seam_singer": {
         "name": "鉱脈の歌い手"
       },
@@ -26964,9 +26960,6 @@ export const ja_JP: EnTranslations = {
       },
       "heart_heat_rolling_cinder": {
         "name": "転がる燃え殻"
-      },
-      "heart_stone_prison": {
-        "name": "Stone Prison"
       },
       "heart_final_splinter_heat": {
         "name": "熱の欠片"

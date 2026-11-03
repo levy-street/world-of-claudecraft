@@ -4749,11 +4749,13 @@ export const ru_RU: EnTranslations = {
       "council": {
         "wakeMark": "Когда эффект закончится, из пола под вами вырвется колонна: от {min} до {max} урона всем в пределах {radius} м и отбрасывание. Встаньте там, где рейду нужно укрытие. Героический и мифический режимы: урон выше на {heroic}%.",
         "rockMark": "Когда эффект закончится, на вас упадёт камень: {total} урона делится между всеми в пределах {radius} м. Если под ним меньше {soakers}, каждый получает на {penalty}% больше, а весь рейд получает от {tremorMin} до {tremorMax}. Каждая колонна в пределах {radius} м теряет кусок, так что делите удар подальше от укрытий. Мифический режим: колонна души в пределах {soulReach} м вместо этого теряет метку души и рушится, когда их не останется. Героический и мифический режимы: урон выше на {heroic}%.",
-        "resonance": "Если простоять в пределах {reach} м от колонны {seconds} с подряд, от неё откалывается кусок, и снова каждые {seconds} с, пока вы рядом. Снять нельзя: переждите Гнев горы у самой повреждённой колонны и держитесь подальше от целых. Мифический режим: у колонны души то же ожидание снимает с неё метку души ({singerSeconds} с у колонны Певца Жилы), и без меток она рушится.",
+        "resonance": "Every {every} sec you ring, dealing {min} to {max} Nature damage to each ally within {radius} yd of you. Move away from everyone until it ends. Heroic and Mythic: {heroic}% more damage.",
+        "rushMark": "When this ends, the Guardian of the Hammer charges in a straight line at you and stops at the first pillar on its line. Lead it into the Cursed Pillar: the pillar shatters, the Guardian is stunned for {stun} sec and takes {exposed}% more damage for {exposedSeconds} sec. A sheltering pillar in the way is destroyed instead. With no pillar on the line, you and everyone in its path take {min} to {max} damage and are thrown back. Mythic: a charge that hits no pillar starts the Quarry collapsing until the Cursed Pillar breaks.",
+        "rushExposed": "Takes {pct}% more damage: Mountain's Rush shattered the Cursed Pillar.",
+        "bond": "Takes {pct}% less damage while the other member of the Hammer Council stands within {reach} yd. Every {every} sec the bond deals {min} to {max} damage to the whole raid, {growth}% more each time. Pull them apart.",
+        "collapse": "The Quarry is collapsing: every {every} sec you take {min} to {max} damage for each stack, and a stack is added each time. It ends when the Cursed Pillar breaks.",
         "memory": "Наносит на {pct}% больше урона: по {per}% за каждого павшего члена Совета Молота.",
-        "prisoned": "Shut in a block of stone: you cannot act. Your allies must break the block before this ends, or it crushes you.",
-        "pillarLimit": "Each pillar shields at most {limit} players from Mountain's Wrath. With more behind it, each of them takes {share}% of the blast.",
-        "shouldered": "Takes {pct}% less damage while another living member of the Hammer Council stands within {reach} yd. Pull the Slabwright away from them."
+        "pillarLimit": "Each pillar shields at most {limit} players from Mountain's Wrath. With more behind it, each of them takes {share}% of the blast."
       },
       "breathGuardian": {
         "portalA": "When this ends, Portal A opens exactly where you stand. Stand near the Knotted Gale. You cannot carry it this round.",
@@ -7294,45 +7296,44 @@ export const ru_RU: EnTranslations = {
     "council": {
       "warn": {
         "wrath": "Гнев горы! Спрячьтесь за колонной!",
-        "shoulder": "The Slabwright hardens beside its kin: pull it away!",
+        "columnsGone": "The carved columns are gone! From now on only the stone Wake the Stone raises can hide you.",
         "crowded": "Too many behind one pillar! It could not shield them all.",
-        "prison": "Stone Prison on {players}! Break them out!",
+        "rush": "Mountain's Rush on {player}! Lead the charge into the cursed pillar!",
+        "rushCursed": "The Guardian shatters the cursed pillar and reels! Strike now!",
+        "rushPillar": "The Rush broke a sheltering pillar! The cursed pillar still stands.",
+        "rushMiss": "Mountain's Rush tramples {players}!",
+        "collapse": "The Quarry begins to collapse! Lead the next Rush into the cursed pillar!",
+        "bond": "Bond of the Stone! Pull the Guardian and the Seam Singer apart!",
+        "wakeCast": "The Seam Singer wakes the stone! Let her finish: a kick raises no pillar.",
+        "wakeKicked": "Wake the Stone was interrupted! No stone rises from it.",
         "enrage": "Гнев горы нарастает! Теперь Гнев горы приходит гораздо чаще.",
         "weight": "Тяжесть Молота на {player}: смена танков!",
         "wake": "Пробуждение камня: колонны поднимутся под {players}! Встаньте там, где нужно укрытие.",
         "wakeHeir": "Камень просыпается под {players}: двигайтесь!",
         "rock": "Камнепад на {player}! Разделите удар, подальше от укрытий!",
         "song": "Песнь жилы! Прервите её!",
-        "resonance": "Резонанс на {players}: раскалывайте самую повреждённую колонну, держитесь подальше от целых!",
-        "fell_guardian": "Страж Молота пал. Его гнев переходит в оставшийся камень!",
-        "fell_slabwright": "Плитотёс пал. Теперь камень поднимается где захочет!",
-        "fell_singer": "Певец Жилы пал. Его песнь продолжается, и теперь её не остановить!",
+        "resonance": "Resonance on {players}: move away from everyone until it ends!",
+        "fell_guardian": "The Guardian of the Hammer falls. Its wrath passes to the Seam Singer!",
+        "fell_singer": "The Seam Singer falls. Now the Guardian raises the stone where it will!",
         "soul_guardian": "Душа Стража вселяется в камень! Эхо гнева ударит из колонны.",
-        "soul_slabwright": "Душа Плитотёса вселяется в камень! Шагающая плита ползёт за вами.",
         "soul_singer": "Душа Певца Жилы вселяется в камень! Бесконечная песнь крепнет с каждым ударом.",
         "echo": "Эхо гнева! Встаньте так, чтобы между вами и колонной души была другая колонна!",
         "soulBreak_guardian": "Колонна души Стража рушится! Его эхо смолкает.",
-        "soulBreak_slabwright": "Колонна души Плитотёса рушится! Шагающая плита замирает.",
         "soulBreak_singer": "Колонна души Певца Жилы рушится! Бесконечная песнь смолкает."
       },
       "say": {
         "guardian_pull": "Чужаки в Каменоломне. Сила Молота не склонится перед плотью.",
         "guardian_wrath": "Гора отвечает мне! Прячьтесь, если камень вас примет!",
+        "guardian_rush": "Stand in my path, then. The mountain does not turn aside.",
         "guardian_death": "Моя сила... я отдаю её камню.",
         "guardian_remember": "Камень помнит. Что было их, теперь моё.",
         "guardian_soul": "Теперь я камень. У моего гнева нет тела, что может пасть.",
         "guardian_wipe": "Прах. Как и всякая плоть.",
         "guardian_defeat": "Сила Молота... теперь ваша ноша.",
-        "slabwright_pull": "Стене нужно больше камня. Не шевелитесь, я вложу вас в неё.",
-        "slabwright_wake": "Стой там. Камень встанет там, где ты стоишь!",
-        "slabwright_rock": "Гляньте вверх, мелюзга! Гора падает!",
-        "slabwright_death": "Плита... раскалывается...",
-        "slabwright_remember": "Камень помнит. Я закончу работу.",
-        "slabwright_soul": "Рук больше нет, но я дотащу этот камень до вас.",
-        "slabwright_wipe": "Уложено и засыпано. Хорошая работа.",
-        "slabwright_defeat": "Каменоломня... затихает.",
         "singer_pull": "Слышите, как поёт жила? Она так долго ждала ваших голосов.",
         "singer_song": "Пойте со мной и разбейтесь!",
+        "singer_wake": "Wake, sleeping stone. Rise where they stand!",
+        "singer_rock": "Look up, little ones! The mountain is falling!",
         "singer_death": "Моя песнь... уходит в скалу...",
         "singer_remember": "Камень помнит. Слушайте, он всё ещё поёт.",
         "singer_soul": "Слушайте. В камне моя песнь не кончается.",
@@ -7345,11 +7346,10 @@ export const ru_RU: EnTranslations = {
         "rockTitle": "Камнепад!",
         "rockLine": "Соберите рядом с собой хотя бы трёх союзников, подальше от колонн",
         "resonanceTitle": "Резонанс",
-        "resonanceLine": "Рядом с колонной вы её раскалываете: ждите у самой повреждённой",
-        "resonanceCracking": "Вы раскалываете колонну: отойдите, чтобы её сберечь",
+        "resonanceLine": "You hurt every ally near you: move away from the group until it ends",
+        "rushTitle": "Mountain's Rush!",
+        "rushLine": "The Guardian charges you: put the cursed pillar between you and him",
         "rockLineSoul": "Соберите рядом хотя бы трёх союзников, подальше от укрытий и у колонны души",
-        "resonanceLineSoul": "Ждите у колонны души, чтобы снять её метки, и не подходите к целым колоннам",
-        "resonanceBreaking": "Вы снимаете метку души: оставайтесь у колонны души",
         "weightTitle": "Тяжесть Молота",
         "weightLine": "Вы получаете двойной физический урон: другой танк должен забрать Стража",
         "timeAria": "Осталось {seconds} с"
@@ -16959,12 +16959,11 @@ export const ru_RU: EnTranslations = {
       "heart_rime_bolt": "Rime Bolt",
       "heart_ember_bolt": "Угольная стрела",
       "heart_hammers_weight": "Тяжесть Молота",
+      "heart_mountains_rush": "Mountain's Rush",
       "heart_wake_the_stone": "Пробуждение камня",
       "heart_falling_rock": "Камнепад",
-      "heart_stone_prison": "Stone Prison",
       "heart_seam_bolt": "Стрела жилы",
       "heart_song_of_the_seam": "Песнь жилы",
-      "heart_song_of_the_seam_unbroken": "Песнь жилы",
       "heart_echo_of_wrath": "Эхо гнева",
       "heart_endless_song": "Бесконечная песнь",
       "heart_breath_inhale": "Вдох",
@@ -26935,9 +26934,6 @@ export const ru_RU: EnTranslations = {
       "heart_hammer_guardian": {
         "name": "Страж Молота"
       },
-      "heart_slabwright": {
-        "name": "Плитотёс"
-      },
       "heart_seam_singer": {
         "name": "Певец Жилы"
       },
@@ -26964,9 +26960,6 @@ export const ru_RU: EnTranslations = {
       },
       "heart_heat_rolling_cinder": {
         "name": "Катящийся уголь"
-      },
-      "heart_stone_prison": {
-        "name": "Stone Prison"
       },
       "heart_final_splinter_heat": {
         "name": "Осколок Жара"

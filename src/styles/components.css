@@ -19117,13 +19117,13 @@
     animation: bce-throb 0.9s ease-in-out infinite alternate;
   }
   #heart-council-alert.is-weight,
-  #heart-council-alert.is-cracking {
+  #heart-council-alert.is-rush {
     border-color: var(--color-hostile);
   }
   #heart-council-alert.is-weight .fa-title,
-  #heart-council-alert.is-cracking .fa-title,
+  #heart-council-alert.is-rush .fa-title,
   #heart-council-alert.is-weight .fa-fill,
-  #heart-council-alert.is-cracking .fa-fill {
+  #heart-council-alert.is-rush .fa-fill {
     color: var(--color-hostile);
     --bar-color: var(--color-hostile);
   }

@@ -17,7 +17,6 @@ import {
   COUNCIL_SFX_KEYS,
   type CouncilSound,
   ROCK_FALL_SOUND,
-  SLAB_GRIND_SOUND,
   songPulseSound,
 } from './smith_heart_council_audio_core';
 
@@ -35,7 +34,7 @@ export interface CouncilAudioSink {
 }
 
 /** What a watched entity is to the sound. */
-export type CouncilWatchKind = 'member' | 'echo' | 'slab' | 'song' | 'rock';
+export type CouncilWatchKind = 'member' | 'echo' | 'song' | 'rock';
 
 interface Watch {
   id: number;
@@ -46,14 +45,9 @@ interface Watch {
   barTotal: number;
   /** The rock's fall already played for this mark. */
   fell: boolean;
-  /** The slab: where it was last frame, and how long since it moved. */
-  x: number;
-  z: number;
-  still: number;
-  grinding: boolean;
 }
 
-/** Three members, three soul pillars, and the rock's few marked players. */
+/** Two members, two soul pillars, and the rock's few marked players. */
 const MAX_WATCH = 12;
 
 const _song: CouncilSound = { key: '', gain: 1, rate: 1, cooldown: 0, at: 'source' };
@@ -77,10 +71,6 @@ export class CouncilAudio {
         bar: '',
         barTotal: 0,
         fell: false,
-        x: 0,
-        z: 0,
-        still: 0,
-        grinding: false,
       });
   }
 
@@ -158,10 +148,6 @@ export class CouncilAudio {
     free.barTotal = e.castTotal;
     const rock = kind === 'rock' ? auraOf(e, COUNCIL_AURAS.rockMark) : null;
     free.fell = rock !== null && rock.remaining <= ROCK_FALL_SOUND.lead;
-    free.x = e.pos.x;
-    free.z = e.pos.z;
-    free.still = 0;
-    free.grinding = false;
     this.preload();
   }
 
@@ -170,14 +156,11 @@ export class CouncilAudio {
   }
 
   private free(w: Watch): void {
-    if (w.grinding) this.sink.unloop(`heart-slab-${w.id}`, 0.5);
     w.id = -1;
-    w.grinding = false;
   }
 
-  /** One frame: the bars starting, the rock coming into view, the slab's
-   *  grind. */
-  update(dt: number, entityOf: (id: number) => Entity | undefined): void {
+  /** One frame: the bars starting, the rock coming into view. */
+  update(_dt: number, entityOf: (id: number) => Entity | undefined): void {
     for (const w of this.watches) {
       if (w.id < 0) continue;
       const e = entityOf(w.id);
@@ -211,23 +194,6 @@ export class CouncilAudio {
             jitter: false,
           });
       }
-      if (w.kind !== 'slab') continue;
-      const moved = Math.hypot(e.pos.x - w.x, e.pos.z - w.z);
-      w.x = e.pos.x;
-      w.z = e.pos.z;
-      w.still = moved > SLAB_GRIND_SOUND.moving ? 0 : w.still + dt;
-      const grinding = w.still < SLAB_GRIND_SOUND.hold;
-      if (grinding)
-        this.sink.loop(
-          `heart-slab-${w.id}`,
-          SLAB_GRIND_SOUND.key,
-          SLAB_GRIND_SOUND.gain,
-          e.pos.x,
-          e.pos.y + 1,
-          e.pos.z,
-        );
-      else if (w.grinding) this.sink.unloop(`heart-slab-${w.id}`, 0.6);
-      w.grinding = grinding;
     }
   }
 

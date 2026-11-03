@@ -12,7 +12,7 @@ import {
 } from './smith_heart';
 
 export const ENCOUNTER_LOCK_BOSSES: Readonly<Record<string, readonly string[]>> = {
-  // The Hammer Council's three (one fight), the other three guardians, and the
+  // The Hammer Council's two (one fight), the other three guardians, and the
   // Masterless Strength.
   [SMITH_HEART_DUNGEON]: [
     ...SMITH_HEART_COUNCIL,

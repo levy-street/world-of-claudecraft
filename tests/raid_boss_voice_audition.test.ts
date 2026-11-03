@@ -160,7 +160,6 @@ describe('Hammer Council voice audition prompts', () => {
     const { COUNCIL_LINES } = await import('../src/sim/encounters/smith_heart/council_voice');
     const byRole = {
       'heart-guardian': 'guardian',
-      'heart-slabwright': 'slabwright',
       'heart-singer': 'singer',
     } as const;
     expect(HAMMER_COUNCIL_VOICE_PROMPTS.map((p: { npcId: string }) => p.npcId)).toEqual(

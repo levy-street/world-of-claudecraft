@@ -10,7 +10,7 @@ export interface Circle extends Point {
 export interface PillarState {
   integrity: number;
   risen: boolean;
-  soul: 'guardian' | 'slabwright' | 'singer' | null;
+  soul: 'guardian' | 'singer' | null;
   r: number;
 }
 
@@ -29,8 +29,6 @@ export const COUNCIL_REACH: {
   readonly riseGap: number;
   readonly riseClearOfBodies: number;
   readonly riseKnock: number;
-  readonly slabCrush: number;
-  readonly slabGrind: number;
   readonly wrath: number;
 };
 

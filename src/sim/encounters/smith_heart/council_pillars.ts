@@ -1,8 +1,12 @@
 // The Hammer Council's pillars (docs/design/raid/smith_heart.md section 7.1):
 // the quarry's five carved columns (the claim's own objects, spawned with it
-// from content/smith_heart.ts at QUARRY_PILLAR_SPOTS) and the pillars the
-// Slabwright raises during the fight, at most COUNCIL_TUNING.pillarCap
-// standing at once.
+// from content/smith_heart.ts at QUARRY_PILLAR_SPOTS) and the pillars Wake
+// the Stone raises during the fight, at most COUNCIL_TUNING.pillarCap
+// standing at once. Mountain's Wrath shatters every one of them (the first
+// Wrath takes the columns for the rest of the pull) and Mountain's Rush the
+// first one on its line. The cursed pillar (COUNCIL_CURSED, one at a time,
+// raised with each Rush) is listed here too: it shelters nobody, the rock and
+// Resonance never touch it, only the Rush (or a Wrath) breaks it.
 //
 //   Integrity    3 whole, 2 cracked, 1 about to fall, carried in the object's
 //                template id (councilPillarTemplate), so every client mirrors
@@ -13,10 +17,12 @@
 //                (net/combat_wall_wire.ts mirrors it from the entity).
 //   Collapse     at 0 a pillar falls: its wall goes the same tick, a patch of
 //                rubble lies where it stood for a few seconds and hurts whoever
-//                stands in it, then it is gone.
+//                stands in it, then it is gone. A pillar the Wrath or the Rush
+//                takes whole leaves rubble that only looks the part (it never
+//                bites the players it just hid).
 //   Reset        a wipe stands the five columns whole again and the risen ones
-//                go; the council's fall sinks the risen ones and leaves the
-//                columns as the fight left them.
+//                go; the council's fall sinks the risen ones and stands the
+//                columns back in their sockets (the Quarry as it was built).
 //
 // Zero rng in every pick (distance and roster order); the only draws are the
 // damage rolls of the rise's shove and the rubble, in claim-player order.
@@ -31,6 +37,7 @@ import { DT, type Entity } from '../../types';
 import { dropEncounterObject, spawnEncounterObject } from '../sunken_bastion/claim';
 import {
   COUNCIL_CUES,
+  COUNCIL_CURSED,
   COUNCIL_NAMES,
   COUNCIL_RUBBLE,
   type CouncilRole,
@@ -58,6 +65,8 @@ export interface CouncilPillar {
    *  pillar's `integrity` is its pips; nothing but a soul's own rules strikes
    *  them (crackPillar refuses it). */
   soul: CouncilRole | null;
+  /** The Guardian's cursed pillar (council_rush.ts): no shelter, no crack. */
+  cursed: boolean;
 }
 
 /** The claim's standing pillars, in object-roster order. */
@@ -74,7 +83,12 @@ export function councilPillars(ctx: SimContext, inst: InstanceSlot): CouncilPill
         risen: p.risen,
         r: councilPillarRadius(p.risen),
         soul: null,
+        cursed: false,
       });
+      continue;
+    }
+    if (e.templateId === COUNCIL_CURSED) {
+      out.push({ e, integrity: 1, risen: true, r: T.cursedR, soul: null, cursed: true });
       continue;
     }
     const soul = councilSoulOf(e.templateId);
@@ -85,6 +99,7 @@ export function councilPillars(ctx: SimContext, inst: InstanceSlot): CouncilPill
         risen: soul.risen,
         r: councilPillarRadius(soul.risen),
         soul: soul.role,
+        cursed: false,
       });
   }
   return out;
@@ -123,13 +138,14 @@ function spawnPillar(
   lz: number,
   facing: number,
   risen: boolean,
+  cursed = false,
 ): Entity {
   const o = ctx.instanceOriginOf(inst);
   return spawnKitObject(
     ctx,
     inst,
-    councilPillarTemplate(councilPillarFull(risen), risen),
-    'Pillar',
+    cursed ? COUNCIL_CURSED : councilPillarTemplate(councilPillarFull(risen), risen),
+    cursed ? COUNCIL_NAMES.cursed : 'Pillar',
     o.x + lx,
     o.z + lz,
     1,
@@ -180,7 +196,8 @@ export function restorePillars(ctx: SimContext, inst: InstanceSlot): void {
 }
 
 /** The council's fall: the risen pillars sink back into the floor (the walk
- *  to the Slab is the quarry's own again); the columns stay as they are. */
+ *  to the Slab is the quarry's own again) and the carved columns the Wraths
+ *  shattered stand in their sockets again. */
 export function settlePillars(ctx: SimContext, inst: InstanceSlot): void {
   for (const p of councilPillars(ctx, inst)) {
     if (!p.risen) continue;
@@ -195,7 +212,7 @@ export function settlePillars(ctx: SimContext, inst: InstanceSlot): void {
     });
     dropKitObject(ctx, inst, p.e.id);
   }
-  syncPillarWalls(ctx, inst);
+  restorePillars(ctx, inst);
 }
 
 /** Drop every rubble patch (a reset or the council's fall). */
@@ -204,12 +221,14 @@ export function clearRubble(ctx: SimContext, inst: InstanceSlot, st: CouncilFigh
   st.rubble = [];
 }
 
-/** A pillar falls: its wall goes this tick and a patch of rubble lies there. */
+/** A pillar falls: its wall goes this tick and a patch of rubble lies there
+ *  (`bites` false: the stone was taken whole, the rubble only a look). */
 export function collapsePillar(
   ctx: SimContext,
   inst: InstanceSlot,
   st: CouncilFightState,
   p: CouncilPillar,
+  bites = true,
 ): void {
   const at = local(ctx, inst, p.e);
   const r = p.r + T.rubblePad;
@@ -233,6 +252,7 @@ export function collapsePillar(
     r,
     remaining: T.rubbleSeconds,
     tick: T.rubbleTick,
+    bites,
   });
 }
 
@@ -244,8 +264,9 @@ export function crackPillar(
   st: CouncilFightState,
   p: CouncilPillar,
 ): boolean {
-  // A soul pillar takes no normal blow (council_soul.ts strikes its pips).
-  if (p.soul) return false;
+  // A soul pillar takes no normal blow (council_soul.ts strikes its pips);
+  // the cursed pillar only the Rush or a Wrath breaks.
+  if (p.soul || p.cursed) return false;
   const left = p.integrity - 1;
   if (left <= 0) {
     collapsePillar(ctx, inst, st, p);
@@ -337,14 +358,16 @@ export function raisePillar(
   damageMult: number,
   /** A soul's host (council_soul.ts): never refused by the cap. */
   force = false,
+  /** The Guardian's cursed pillar (council_rush.ts): outside the cap. */
+  cursed = false,
 ): Entity | null {
   const standing = councilPillars(ctx, inst);
-  if (!force && standing.length >= T.pillarCap) return null;
+  if (!force && !cursed && standing.filter((p) => !p.cursed).length >= T.pillarCap) return null;
   const pillarSpots = standing.map((p) => local(ctx, inst, p.e));
   const bodySpots = bodies.filter((b) => !b.dead).map((b) => local(ctx, inst, b));
   const spot = nearestRiseSpot(pillarSpots, bodySpots, x, z);
   if (!spot) return null;
-  const pillar = spawnPillar(ctx, inst, spot.x, spot.z, 0, true);
+  const pillar = spawnPillar(ctx, inst, spot.x, spot.z, 0, true, cursed);
   syncPillarWalls(ctx, inst);
   ctx.emit({
     type: 'spellfx',
@@ -352,7 +375,7 @@ export function raisePillar(
     targetId: pillar.id,
     school: 'physical',
     fx: 'nova',
-    ability: COUNCIL_CUES.rise,
+    ability: cursed ? COUNCIL_CUES.cursedRise : COUNCIL_CUES.rise,
   });
   const shove = { ...source, pos: { ...pillar.pos } } as Entity;
   for (const p of players) {
@@ -399,24 +422,6 @@ export function pillarBetween<P extends { e: { pos: { x: number; z: number } }; 
   return best;
 }
 
-/** The standing pillar nearest a player within `reach` of its face, or null
- *  (ties to the earlier in the roster). */
-export function pillarNear(
-  pillars: readonly CouncilPillar[],
-  at: { x: number; z: number },
-  reach: number,
-): CouncilPillar | null {
-  let best: CouncilPillar | null = null;
-  let bestD = Number.POSITIVE_INFINITY;
-  for (const p of pillars) {
-    const d = Math.hypot(p.e.pos.x - at.x, p.e.pos.z - at.z) - p.r;
-    if (d > reach || d >= bestD) continue;
-    bestD = d;
-    best = p;
-  }
-  return best;
-}
-
 /** One tick of the rubble: it bites whoever stands in it once a second, and
  *  is gone when its time is up. */
 export function stepRubble(
@@ -434,6 +439,7 @@ export function stepRubble(
     r.tick -= DT;
     if (r.tick > 1e-9) continue;
     r.tick += T.rubbleTick;
+    if (!r.bites) continue;
     for (const p of players) {
       if (p.dead || Math.hypot(p.pos.x - o.x - r.x, p.pos.z - o.z - r.z) > r.r) continue;
       const amount = Math.max(1, Math.round(ctx.rng.range(T.rubbleMin, T.rubbleMax) * damageMult));
@@ -456,8 +462,9 @@ export function pulsePillars(
 ): number {
   let hits = 0;
   for (const p of councilPillars(ctx, inst)) {
-    // A soul pillar keeps to its soul's behaviour (council_soul.ts).
-    if (p.soul) continue;
+    // A soul pillar keeps to its soul's behaviour (council_soul.ts); the
+    // cursed one has its own pulse (council_rush.ts).
+    if (p.soul || p.cursed) continue;
     ctx.emit({
       type: 'spellfx',
       sourceId: p.e.id,

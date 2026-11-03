@@ -1,27 +1,35 @@
-// The Slabwright's job in the Hammer Council (docs/design/raid/smith_heart.md
-// section 7.1): it makes the pillars and drops the rock.
+// The Seam Singer's stone in the Hammer Council (docs/design/raid/
+// smith_heart.md section 7.1): she wakes the pillars and drops the rock.
 //
-//   Wake the Stone  every 30 s a short bar, then 2 players (3 on heroic) wear
-//                   a ground circle for 5 s; when it runs out a fresh pillar
-//                   bursts out of the floor where each one STANDS (the players
-//                   choose where the cover goes), throwing back anyone within
-//                   3 yd. Never more pillars than the cap.
+//   Wake the Stone  a 2.5 s KICKABLE bar (every 30 s, first at 20, and 6 s
+//                   after each Wrath lands, so every Wrath cycle has one),
+//                   then 2 players (3 on heroic and mythic, never more than
+//                   the cap allows) wear a ground circle for 5 s; when it runs
+//                   out a fresh pillar bursts out of the floor where each one
+//                   STANDS (the players choose where the cover goes), throwing
+//                   back anyone within 3 yd. A kick raises NOTHING: the raid
+//                   that kicks it by habit loses its cover (her bolt and her
+//                   song are the casts to kick). Normal: its marks never run
+//                   into a Wrath (council_floor.ts holds it until it lands).
 //   Falling Rock    every 25 s a short bar, then one player wears the soak
 //                   circle for 5 s; the rock lands on them and its blow is
 //                   split between everyone within 6 yd (fewer than 3 under it:
 //                   each takes half as much again and the whole raid feels the
 //                   tremor), and every pillar within 6 yd loses a piece, so the
 //                   raid soaks AWAY from its cover.
-//   Heir            the Slabwright fallen, a survivor keeps raising pillars,
-//                   but under RANDOM players with only a 2 s warning on a
-//                   locked spot (nobody chooses); the rock stops with it.
-//                   Mythic: a 1.5 s warning, and a survivor keeps the rock
-//                   too (with Resonance it is all that breaks a soul pillar).
+//   Heir            the Singer fallen, the Guardian raises the pillars itself,
+//                   less often (its own 45 s clock; a Wrath's landing still
+//                   brings one due), under RANDOM players with only a 2 s
+//                   warning on a locked spot (nobody chooses, nobody kicks);
+//                   the rock stops with her. Mythic: a 1.5 s warning, and the
+//                   Guardian keeps the rock too (with Resonance it is all that
+//                   breaks a soul pillar).
 //   Soul pillars    a rock landing within 6 yd of one strikes a soul pip off
 //                   (council_soul.ts) instead of a piece.
 //
 // Zero rng in every pick (hashed marks); the draws are the damage rolls.
 
+import { isLockedOut } from '../../combat/cc';
 import { DT, type Entity } from '../../types';
 import {
   clearCastIf,
@@ -35,10 +43,10 @@ import {
   COUNCIL_CASTS,
   COUNCIL_CUES,
   COUNCIL_NAMES,
+  COUNCIL_ROLES,
   type CouncilRole,
   councilRiseSpotTemplate,
   fallingRockShare,
-  JOB_HEIRS,
   COUNCIL_TUNING as T,
 } from './council_ids';
 import { councilPillars, crackPillar, raisePillar } from './council_pillars';
@@ -59,12 +67,12 @@ import { councilSay } from './council_voice';
 
 /** Free pillar places under the cap (marks never outnumber them). */
 function freePlaces(s: CouncilScope): number {
-  const standing = councilPillars(s.ctx, s.inst).length;
+  const standing = councilPillars(s.ctx, s.inst).filter((p) => !p.cursed).length;
   const coming = s.st.wakeMarks.length + s.st.riseSpots.length;
   return Math.max(0, T.pillarCap - standing - coming);
 }
 
-/** Wake the Stone comes due: the Slabwright's bar, or the heir's locked
+/** Wake the Stone comes due: the Singer's kickable bar, or the heir's locked
  *  spots. Exported for the dev trigger. */
 export function startWake(s: CouncilScope): boolean {
   const holder = jobHolder(s, 'pillars');
@@ -73,16 +81,25 @@ export function startWake(s: CouncilScope): boolean {
   if (count <= 0) return false;
   if (!holder.heir) {
     if (!memberFree(s, holder.role)) return false;
+    // A kick's silence and lockout hold her Wake too.
+    if (s.st.quiet > 0 || isLockedOut(holder.body, 'nature')) return false;
     s.st.wakeTimer = T.wakeEvery;
     stampFloor(s.st);
     beginBar(s, holder.role, COUNCIL_CASTS.wake, T.wakeCast, null, false);
+    s.st.kickable = COUNCIL_CASTS.wake;
+    raidWarn(
+      s,
+      holder.body,
+      'wakeCast',
+      'The Seam Singer wakes the stone! Let her finish: a kick raises no pillar.',
+    );
     councilSay(s, holder.role, 'wake');
     return true;
   }
   // The heir: no bar, no choice. The spots lock under random players now.
   const marked = pickMarks(s, holder.body, count);
   if (marked.length === 0) return false;
-  s.st.wakeTimer = T.wakeEvery;
+  s.st.wakeTimer = T.heirWakeEvery;
   stampFloor(s.st);
   s.st.casts++;
   const o = s.ctx.instanceOriginOf(s.inst);
@@ -108,7 +125,12 @@ export function startWake(s: CouncilScope): boolean {
   return true;
 }
 
-/** The Slabwright's Wake the Stone bar ran out: the marks go on. */
+/** A kick cut Wake the Stone: no marks, no pillars (the raid is told). */
+export function wakeKicked(s: CouncilScope, singer: Entity): void {
+  raidWarn(s, singer, 'wakeKicked', 'Wake the Stone was interrupted! No stone rises from it.');
+}
+
+/** The Singer's Wake the Stone bar ran out: the marks go on. */
 export function landWake(s: CouncilScope, caster: Entity): void {
   const count = Math.min(s.rules.wakeMarks, freePlaces(s));
   const busy = new Set(s.st.wakeMarks.map((m) => m.playerId));
@@ -144,9 +166,7 @@ export function landWake(s: CouncilScope, caster: Entity): void {
 export function stepRises(s: CouncilScope): void {
   const holder = jobHolder(s, 'pillars');
   const source = holder?.body ?? null;
-  const bodies = [s.bodies.guardian, s.bodies.slabwright, s.bodies.singer].filter(
-    (b): b is Entity => b !== null,
-  );
+  const bodies = COUNCIL_ROLES.map((r) => s.bodies[r]).filter((b): b is Entity => b !== null);
   const o = s.ctx.instanceOriginOf(s.inst);
   if (s.st.wakeMarks.length > 0) {
     for (const m of s.st.wakeMarks) m.remaining -= DT;
@@ -186,24 +206,23 @@ export function stepRises(s: CouncilScope): void {
   }
 }
 
-/** Who drops the rock: the Slabwright; once it has fallen, nobody, or on
- *  mythic its first living heir (the rock outlives it there). */
+/** Who drops the rock: the Seam Singer; once she has fallen, nobody, or on
+ *  mythic the Guardian (the rock outlives her there). */
 export function rockCaster(s: CouncilScope): CouncilRole | null {
-  if (living(s.bodies.slabwright)) return 'slabwright';
-  if (!s.rules.rockOutlivesSlabwright) return null;
-  for (const r of JOB_HEIRS.pillars) if (living(s.bodies[r])) return r;
+  if (living(s.bodies.singer)) return 'singer';
+  if (s.rules.rockOutlivesSinger && living(s.bodies.guardian)) return 'guardian';
   return null;
 }
 
-/** Falling Rock: the Slabwright's own (it stops when the Slabwright falls,
- *  but on mythic). */
+/** Falling Rock: the Singer's own (it stops when she falls, but on
+ *  mythic). */
 export function startRock(s: CouncilScope): boolean {
   const role = rockCaster(s);
   if (role === null || s.st.rock || !memberFree(s, role)) return false;
   s.st.rockTimer = T.rockEvery;
   stampFloor(s.st);
-  beginBar(s, role, COUNCIL_CASTS.rock, T.rockCast, null, role !== 'slabwright');
-  if (role === 'slabwright') councilSay(s, role, 'rock');
+  beginBar(s, role, COUNCIL_CASTS.rock, T.rockCast, null, role !== 'singer');
+  if (role === 'singer') councilSay(s, role, 'rock');
   return true;
 }
 
@@ -240,9 +259,8 @@ export function stepRock(s: CouncilScope): number {
   const target = s.ctx.entities.get(rock.playerId);
   if (target) dropAuraById(target, COUNCIL_AURAS.rockMark);
   const source =
-    (living(s.bodies.slabwright) ? s.bodies.slabwright : null) ??
-    [s.bodies.guardian, s.bodies.singer].find(living) ??
-    null;
+    (living(s.bodies.singer) ? s.bodies.singer : null) ??
+    (living(s.bodies.guardian) ? s.bodies.guardian : null);
   if (!target || !source) return 0;
   const at = { x: target.pos.x, z: target.pos.z };
   s.ctx.emit({

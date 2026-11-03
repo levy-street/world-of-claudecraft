@@ -9,31 +9,30 @@
 //                 its 3 soul pips (councilSoulTemplate), so every client draws
 //                 it with no wire change.
 //   Immune        nothing cracks it (council_pillars.ts crackPillar refuses
-//                 it); only a Falling Rock landing within 6 yd of its face and
-//                 a Resonance carrier standing by it for 3 s (the Singer's
-//                 soul: 1.5 s) strike a pip off (council_stone.ts,
-//                 council_song.ts call strikeSoulPip). It shields nobody from
-//                 Mountain's Wrath or the Echo, but its wall still stands.
+//                 it, a Wrath leaves it standing); only a Falling Rock landing
+//                 within 6 yd of its face strikes a pip off (council_stone.ts
+//                 calls strikeSoulPip; Resonance is a spread now and never
+//                 touches a pillar). A living member always drops the rock on
+//                 mythic (the Guardian keeps it once the Singer has fallen).
+//                 It shields nobody from Mountain's Wrath or the Echo, but its
+//                 wall still stands.
 //   At 0 pips     it bursts and leaves the usual rubble; its behaviour stops.
 //                 Nothing else: the survivors keep their Memory of Stone and
 //                 their mythic inheritance.
 //   The last kill every soul pillar crumbles with the council.
 //
-// What it does is whose soul it holds:
+// What it does is whose soul it holds (two souls, one per member: the
+// Slabwright's Walking Slab left with it in the two-boss rework):
 //   Guardian      Echo of Wrath: every 20 s the pillar's own 3 s bar, then 60
 //                 percent of a Wrath on every player with no other pillar
 //                 between them and it; a pillar that shields someone loses a
 //                 piece, like the Wrath.
-//   Slabwright    the Walking Slab: it drags itself (1.5 yd a second, its
-//                 wall with it) toward the largest group, re-picked every 3 s;
-//                 a player under it is struck hard and thrown, anyone near it
-//                 grinds each second.
 //   Seam Singer   the Endless Song: a raid-wide pulse every 3 s, each 12
 //                 percent louder than the first, capped at 4 times it (the
 //                 pulse count is a stack of an aura on the pillar).
 //
-// Deterministic: every pick is ordered (integrity, distance, entity id; the
-// group by roster order); the only rng draws are the damage rolls, in
+// Deterministic: every pick is ordered (integrity, distance, entity id); the
+// only rng draws are the damage rolls, in
 // claim-player order. Zero draws off mythic (no soul ever stands there).
 
 import { HAMMER_PIT } from '../../content/smith_heart_layout';
@@ -69,20 +68,13 @@ import type { CouncilSoul } from './council_state';
 /** The lines the raid reads (raid warnings, `hudChrome.council.warn.*`). */
 const TAKE_LINES: Readonly<Record<CouncilRole, string>> = {
   guardian: "The Guardian's soul takes the stone! Its Echo of Wrath will strike from the pillar.",
-  slabwright: "The Slabwright's soul takes the stone! The Walking Slab drags itself after you.",
   singer: "The Seam Singer's soul takes the stone! Its Endless Song grows with every pulse.",
 };
 const BREAK_LINES: Readonly<Record<CouncilRole, string>> = {
   guardian: "The Guardian's soul pillar breaks! Its Echo falls silent.",
-  slabwright: "The Slabwright's soul pillar breaks! The Walking Slab is still.",
   singer: "The Seam Singer's soul pillar breaks! The Endless Song falls silent.",
 };
 const ECHO_LINE = 'Echo of Wrath! Put another pillar between you and the soul pillar!';
-
-/** Seconds a Resonance carrier must stand by a soul pillar to strike a pip. */
-export function soulResonanceSeconds(role: CouncilRole): number {
-  return role === 'singer' ? T.singerSoulResonanceSeconds : T.soulResonanceSeconds;
-}
 
 /** The soul a pillar holds, by its entity id. */
 export function soulOfPillar(s: CouncilScope, pillarId: number): CouncilSoul | undefined {
@@ -125,7 +117,7 @@ export function soulHost(
   let best: CouncilPillar | null = null;
   let bestD = 0;
   for (const p of pillars) {
-    if (p.soul) continue;
+    if (p.soul || p.cursed) continue;
     const d = Math.hypot(p.e.pos.x - from.x, p.e.pos.z - from.z);
     if (
       !best ||
@@ -176,13 +168,9 @@ export function takeSoul(s: CouncilScope, role: CouncilRole, from: Entity): Enti
   s.st.souls.push({
     role,
     pillarId: e.id,
-    timer: role === 'guardian' ? T.echoFirst : role === 'singer' ? T.songPulseFirst : 0,
+    timer: role === 'guardian' ? T.echoFirst : T.songPulseFirst,
     echo: null,
     pulses: 0,
-    goal: null,
-    retarget: 0,
-    grind: T.slabGrindEvery,
-    crushed: {},
   });
   s.ctx.emit({
     type: 'spellfx',
@@ -223,13 +211,8 @@ function burstSoul(s: CouncilScope, p: CouncilPillar, rubble: boolean): void {
     raidWarn(s, speaker, `soulBreak_${soul.role}`, BREAK_LINES[soul.role]);
 }
 
-/** A Falling Rock or a Resonance carrier strikes one soul pip off (the only
- *  two things that can). Returns true when the pillar burst. */
-export function strikeSoulPip(
-  s: CouncilScope,
-  p: CouncilPillar,
-  _cause: 'rock' | 'resonance' | 'dev',
-): boolean {
+/** A Falling Rock strikes one soul pip off (the only thing that can). Returns true when the pillar burst. */
+export function strikeSoulPip(s: CouncilScope, p: CouncilPillar, _cause: 'rock' | 'dev'): boolean {
   if (!p.soul || !s.ctx.entities.has(p.e.id)) return false;
   s.ctx.emit({
     type: 'spellfx',
@@ -264,7 +247,7 @@ export function landEcho(s: CouncilScope, pillar: Entity, source: Entity): numbe
     fx: 'nova',
     ability: COUNCIL_CUES.echoBlast,
   });
-  const cover = councilPillars(ctx, inst).filter((p) => !p.soul);
+  const cover = councilPillars(ctx, inst).filter((p) => !p.soul && !p.cursed);
   const shields = new Set<number>();
   let struck = 0;
   for (const p of s.players) {
@@ -334,159 +317,6 @@ export function startEcho(s: CouncilScope): boolean {
   return true;
 }
 
-// ---- the Slabwright's soul: the Walking Slab ------------------------------------------------
-
-/** The largest group of players: the one with the most others within the
- *  group reach of it (roster order breaks a tie), as its group's centre.
- *  Pure over the list (entity-id order). */
-export function largestGroup(players: readonly Entity[]): { x: number; z: number } | null {
-  let best: Entity | null = null;
-  let bestN = 0;
-  for (const p of players) {
-    if (p.dead) continue;
-    let n = 0;
-    for (const q of players) {
-      if (!q.dead && Math.hypot(q.pos.x - p.pos.x, q.pos.z - p.pos.z) <= T.slabGroupR) n++;
-    }
-    if (n > bestN) {
-      best = p;
-      bestN = n;
-    }
-  }
-  if (!best) return null;
-  let x = 0;
-  let z = 0;
-  let n = 0;
-  for (const q of players) {
-    if (q.dead || Math.hypot(q.pos.x - best.pos.x, q.pos.z - best.pos.z) > T.slabGroupR) continue;
-    x += q.pos.x;
-    z += q.pos.z;
-    n++;
-  }
-  return { x: x / n, z: z / n };
-}
-
-/** Headings the slab tries when the straight line is blocked (radians off
- *  the line, nearest first). */
-const SLAB_SWERVE = [0, 0.6, -0.6, 1.2, -1.2] as const;
-
-function stepSlab(s: CouncilScope, soul: CouncilSoul, p: CouncilPillar, source: Entity): void {
-  const { ctx, inst } = s;
-  const e = p.e;
-  // Standing still until its walk starts through the floor gap (startSlab);
-  // once walking it re-picks the largest group on its own clock.
-  if (soul.goal) {
-    soul.retarget -= DT;
-    if (soul.retarget <= 1e-9) {
-      soul.retarget = T.slabRetarget;
-      const g = largestGroup(s.players);
-      const o = ctx.instanceOriginOf(inst);
-      soul.goal = g ? { x: g.x - o.x, z: g.z - o.z } : null;
-    }
-  }
-  if (soul.goal) {
-    const o = ctx.instanceOriginOf(inst);
-    const at = local(s, e);
-    const dx = soul.goal.x - at.x;
-    const dz = soul.goal.z - at.z;
-    const d = Math.hypot(dx, dz);
-    if (d > T.slabArrive) {
-      const step = Math.min(d - T.slabArrive, T.slabSpeed * DT);
-      const heading = Math.atan2(dx, dz);
-      const others = councilPillars(ctx, inst).filter((q) => q.e.id !== e.id);
-      for (const off of SLAB_SWERVE) {
-        const a = heading + off;
-        const nx = at.x + Math.sin(a) * step;
-        const nz = at.z + Math.cos(a) * step;
-        if (!onQuarryFloor(nx, nz)) continue;
-        const blocked =
-          others.some(
-            (q) => Math.hypot(q.e.pos.x - o.x - nx, q.e.pos.z - o.z - nz) < q.r + p.r + 0.3,
-          ) ||
-          // Round the council's own bodies too (a wall never closes on a boss).
-          COUNCIL_ROLES.some((r) => {
-            const b = s.bodies[r];
-            return (
-              living(b) &&
-              Math.hypot(b.pos.x - o.x - nx, b.pos.z - o.z - nz) < p.r + T.slabClearOfBodies &&
-              Math.hypot(b.pos.x - o.x - nx, b.pos.z - o.z - nz) <
-                Math.hypot(b.pos.x - o.x - at.x, b.pos.z - o.z - at.z)
-            );
-          });
-        if (blocked) continue;
-        e.prevPos.x = e.pos.x;
-        e.prevPos.y = e.pos.y;
-        e.prevPos.z = e.pos.z;
-        const g = ctx.groundPos(o.x + nx, o.z + nz);
-        e.pos.x = g.x;
-        e.pos.y = g.y;
-        e.pos.z = g.z;
-        e.facing = a;
-        ctx.rebucket(e);
-        syncPillarWalls(ctx, inst);
-        break;
-      }
-    }
-  }
-  // Under it: a heavy hit and a throw (once per player a breath); near it,
-  // the grind each second.
-  const clock = s.st.clock;
-  let shove: Entity | null = null;
-  for (const pl of s.players) {
-    if (pl.dead) continue;
-    const face = Math.hypot(pl.pos.x - e.pos.x, pl.pos.z - e.pos.z) - p.r;
-    if (face > T.slabCrushReach) continue;
-    const last = soul.crushed[pl.id];
-    if (last !== undefined && clock - last < T.slabCrushEvery - 1e-9) continue;
-    soul.crushed[pl.id] = clock;
-    ctx.emit({
-      type: 'spellfx',
-      sourceId: e.id,
-      targetId: pl.id,
-      school: 'physical',
-      fx: 'nova',
-      ability: COUNCIL_CUES.slabCrush,
-    });
-    const amount = roll(s, source, T.slabCrushMin, T.slabCrushMax);
-    ctx.dealDamage(source, pl, amount, false, 'physical', COUNCIL_NAMES.slab, 'hit', true);
-    shove ??= { ...source, pos: { ...e.pos } } as Entity;
-    if (!pl.dead) ctx.applyKnockback(shove, pl, T.slabCrushKnockback);
-  }
-  soul.grind -= DT;
-  if (soul.grind > 1e-9) return;
-  soul.grind += T.slabGrindEvery;
-  for (const pl of s.players) {
-    if (pl.dead) continue;
-    const face = Math.hypot(pl.pos.x - e.pos.x, pl.pos.z - e.pos.z) - p.r;
-    if (face > T.slabGrindReach) continue;
-    const amount = roll(s, source, T.slabGrindMin, T.slabGrindMax);
-    ctx.dealDamage(source, pl, amount, false, 'physical', COUNCIL_NAMES.grind, 'hit', true);
-  }
-}
-
-/** The Slabwright's soul stands still with somewhere to walk: its walk is
- *  due to start. */
-export function walkingSlabWaiting(s: CouncilScope): boolean {
-  const soul = s.st.souls.find((q) => q.role === 'slabwright');
-  if (!soul || soul.goal || !firstLiving(s)) return false;
-  if (!councilPillars(s.ctx, s.inst).some((q) => q.e.id === soul.pillarId)) return false;
-  return largestGroup(s.players) !== null;
-}
-
-/** The Walking Slab sets off toward the largest group (a floor mechanic: the
- *  floor gap calls it, council_floor.ts; the dev `soul slabwright` directly). */
-export function startSlab(s: CouncilScope): boolean {
-  if (!walkingSlabWaiting(s)) return false;
-  const soul = s.st.souls.find((q) => q.role === 'slabwright');
-  const g = largestGroup(s.players);
-  if (!soul || !g) return false;
-  const o = s.ctx.instanceOriginOf(s.inst);
-  soul.goal = { x: g.x - o.x, z: g.z - o.z };
-  soul.retarget = T.slabRetarget;
-  stampFloor(s.st);
-  return true;
-}
-
 // ---- the Seam Singer's soul: the Endless Song -----------------------------------------------
 
 function stepSong(s: CouncilScope, soul: CouncilSoul, pillar: Entity, source: Entity): void {
@@ -551,7 +381,6 @@ export function stepSouls(s: CouncilScope): void {
       continue;
     }
     if (soul.role === 'guardian') stepEcho(s, soul, p.e, source);
-    else if (soul.role === 'slabwright') stepSlab(s, soul, p, source);
     else stepSong(s, soul, p.e, source);
   }
 }
@@ -621,14 +450,12 @@ export function soulDevTrigger(
 ): string | null {
   if (verb === 'soul') {
     const role = COUNCIL_ROLES.find((r) => r === arg);
-    if (!role) return 'Name a soul: /dev heart council soul guardian|slabwright|singer.';
+    if (!role) return 'Name a soul: /dev heart council soul guardian|singer.';
     const body = s.bodies[role];
     if (!body) return 'That member is missing from this run.';
     if (s.st.souls.some((q) => q.role === role))
       return `The ${role}'s soul already holds a pillar.`;
     if (!takeSoul(s, role, body)) return 'No pillar could hold the soul.';
-    // A dev line forces it: the slab walks now, past the floor gap.
-    if (role === 'slabwright') startSlab(s);
     return `The ${role}'s soul takes the stone.`;
   }
   if (verb === 'soulpip') {

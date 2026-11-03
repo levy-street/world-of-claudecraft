@@ -13,6 +13,7 @@ import {
   COUNCIL_NAMES,
   COUNCIL_TUNING as T,
 } from '../src/sim/encounters/smith_heart';
+import { raisePillar } from '../src/sim/encounters/smith_heart/council_pillars';
 import type { Entity, SimEvent } from '../src/sim/types';
 import { auraEffectDescriptor } from '../src/ui/aura_effect';
 import { t } from '../src/ui/i18n';
@@ -33,6 +34,7 @@ function pulled(n: number, tier?: 'heroic' | 'mythic'): CouncilFight {
   st.rockTimer = 999;
   st.boltTimer = 999;
   st.songTimer = 999;
+  st.rushTimer = 999;
   st.songDue = null;
   return f;
 }
@@ -68,18 +70,65 @@ function land(f: CouncilFight): SimEvent[] {
 }
 
 describe('Hammer Council: Narrow Shelter', () => {
-  it('the limits: Normal none, Heroic 4, Mythic 3', () => {
-    expect(COUNCIL_DIFFICULTY.normal.pillarLimit).toBeNull();
+  it('the limits: Normal 5, Heroic 4, Mythic 3', () => {
+    expect(COUNCIL_DIFFICULTY.normal.pillarLimit).toBe(5);
     expect(COUNCIL_DIFFICULTY.heroic.pillarLimit).toBe(4);
     expect(COUNCIL_DIFFICULTY.mythic.pillarLimit).toBe(3);
   });
 
-  it('normal: any number hide behind one pillar', () => {
-    const f = pulled(6);
-    const behind = hide(f, 6);
+  it('normal: five are safe, a sixth and all six take part of the blast', () => {
+    const f = pulled(5);
+    const behind = hide(f, 5);
     const ev = land(f);
     for (const p of behind) expect(wrathOn(ev, p)).toEqual([]);
+    const g = pulled(6);
+    const six = hide(g, 6);
+    const ev6 = land(g);
+    for (const p of six) {
+      const hits = wrathOn(ev6, p);
+      expect(hits.length).toBe(1);
+      expect(hits[0].amount).toBeLessThanOrEqual(Math.ceil(T.wrathMax * T.crowdShare));
+    }
   });
+
+  for (const [tier, limit] of [
+    ['normal', 5],
+    ['heroic', 4],
+    ['mythic', 3],
+  ] as const) {
+    it(`${tier}: ${limit} players fit side by side in one risen pillar's shadow`, () => {
+      const f = pulled(limit + 1, tier === 'normal' ? undefined : tier);
+      const g = f.bodies().guardian as Entity;
+      const w = f.world(MID.x, MID.z);
+      g.pos.x = w.x;
+      g.pos.z = w.z;
+      g.pos.y = f.sim.ctx.groundPos(w.x, w.z).y;
+      g.prevPos = { ...g.pos };
+      f.sim.ctx.rebucket(g);
+      // Only a risen pillar stands, 14 yd out toward column 0.
+      for (const p of f.pillars()) f.sim.ctx.dropEntity(p.e.id);
+      f.inst.objectIds = f.inst.objectIds.filter((id) => f.sim.ctx.entities.has(id));
+      const col = QUARRY_PILLAR_SPOTS[0];
+      const ux = (col.x - MID.x) / Math.hypot(col.x - MID.x, col.z - MID.z);
+      const uz = (col.z - MID.z) / Math.hypot(col.x - MID.x, col.z - MID.z);
+      const at = { x: MID.x + ux * 14, z: MID.z + uz * 14 };
+      const risen = raisePillar(f.sim.ctx, f.inst, g, [g], [], at.x, at.z, 1);
+      expect(risen).not.toBeNull();
+      const pl = f.pillars()[0];
+      const pr = f.local(pl.e);
+      // The players in a row across the shadow, a stride behind the stone,
+      // spaced a body apart (0.8 yd): the row is the limit wide.
+      const behind = f.players.slice(1, 1 + limit);
+      const back = { x: pr.x + ux * (pl.r + 1.2), z: pr.z + uz * (pl.r + 1.2) };
+      behind.forEach((p, i) => {
+        const off = (i - (limit - 1) / 2) * 0.8;
+        f.put(p, back.x - uz * off, back.z + ux * off);
+      });
+      f.put(f.players[0], MID.x + 3, MID.z);
+      const ev = land(f);
+      for (const p of behind) expect(wrathOn(ev, p), p.name).toEqual([]);
+    });
+  }
 
   it('heroic: four are safe', () => {
     const f = pulled(4, 'heroic');
@@ -125,10 +174,11 @@ describe('Hammer Council: Narrow Shelter', () => {
     expect(limit()?.value2).toBe(4);
     f.tick(Math.ceil(T.wrathCast * 20) + 2);
     expect(limit()).toBeUndefined();
+    // Normal wears its own limit too.
     const n = pulled(2);
     expect(n.dev('/dev heart council wrath')).toBe(true);
     const ng = n.bodies().guardian as Entity;
-    expect(ng.auras.some((a) => a.id === COUNCIL_AURAS.pillarLimit)).toBe(false);
+    expect(ng.auras.find((a) => a.id === COUNCIL_AURAS.pillarLimit)?.value2).toBe(5);
   });
 
   it('a reset takes the limit off the caster', () => {

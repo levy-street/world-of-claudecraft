@@ -5,14 +5,19 @@
 //                     energy bar (its resource: the target frame draws it, and
 //                     it rides the snapshot like any mob's resource).
 //   Mountain's Wrath  at 100: a 4 s bar, then everyone in the Quarry with no
-//                     pillar between them and the caster is struck; every
-//                     pillar that shielded at least one player loses a piece.
+//                     pillar between them and the caster is struck, and then
+//                     EVERY pillar in the Quarry shatters (carved columns and
+//                     risen stone alike; a mythic soul pillar alone stands).
+//                     The carved columns teach the first Wrath; after it the
+//                     only cover is the stone Wake the Stone raises (the raid
+//                     is warned), so each landing brings the next Wake due.
 //                     After the 4th Wrath the energy fills much faster.
 //   Hammer's Weight   every 18 s: a 1.5 s bar at the tank, a heavy blow and
 //                     +100 percent physical damage taken for 25 s (swap).
-//   Heir              the Guardian fallen, a survivor takes the energy and
-//                     casts a shorter Wrath (fills in 35 s, a 3 s bar);
-//                     Hammer's Weight dies with the Guardian.
+//   Heir              the Guardian fallen, the Seam Singer takes the energy
+//                     and casts a shorter, lighter Wrath (fills in 35 s, a 3 s
+//                     bar); Hammer's Weight and Mountain's Rush die with the
+//                     Guardian.
 //
 // The Wrath's readable telegraph is the trash engine's sight field (its
 // declaration is the templates' encounter-driven `trashKit.nova`); the hit is
@@ -26,11 +31,12 @@ import {
   COUNCIL_AURAS,
   COUNCIL_CASTS,
   COUNCIL_NAMES,
-  type CouncilRole,
+  COUNCIL_ROLES,
   councilFillSeconds,
   COUNCIL_TUNING as T,
 } from './council_ids';
-import { councilPillars, crackPillar, pillarBetween } from './council_pillars';
+import { collapsePillar, councilPillars, pillarBetween } from './council_pillars';
+import { breakCursed } from './council_rush';
 import {
   beginBar,
   type CouncilScope,
@@ -46,7 +52,7 @@ import { councilSay } from './council_voice';
  *  fills (an empty bar on the others says the stone could take it up). */
 export function syncEnergyBars(s: CouncilScope): void {
   const holder = jobHolder(s, 'wrath');
-  for (const r of ['guardian', 'slabwright', 'singer'] as CouncilRole[]) {
+  for (const r of COUNCIL_ROLES) {
     const b = s.bodies[r];
     if (!b) continue;
     b.resourceType = 'energy';
@@ -116,8 +122,9 @@ function wearPillarLimit(s: CouncilScope, caster: Entity): void {
   });
 }
 
-/** The Wrath lands: who it strikes, which pillars took it for whom. Returns
- *  how many it struck (the tests read it). */
+/** The Wrath lands: who it strikes (whoever no pillar hides), then every
+ *  pillar but a soul's shatters. Returns how many it struck (the tests read
+ *  it). */
 export function landWrath(s: CouncilScope, caster: Entity, heir: boolean): number {
   const { ctx, inst, st } = s;
   st.energy = 0;
@@ -132,10 +139,12 @@ export function landWrath(s: CouncilScope, caster: Entity, heir: boolean): numbe
     ability: COUNCIL_CASTS.wrath,
   });
   const all = councilPillars(ctx, inst);
-  // A soul pillar shields nobody (mythic, council_soul.ts): its wall still
-  // stands in the sight line, so a player it alone hides is struck anyway.
-  const pillars = all.some((p) => p.soul) ? all.filter((p) => !p.soul) : all;
-  const souls = pillars === all ? null : all.filter((p) => p.soul);
+  // A soul pillar (mythic, council_soul.ts) and the cursed pillar
+  // (council_rush.ts) shield nobody: their walls still stand in the sight
+  // line, so a player one of them alone hides is struck anyway.
+  const bare = (p: (typeof all)[number]) => p.soul !== null || p.cursed;
+  const pillars = all.some(bare) ? all.filter((p) => !bare(p)) : all;
+  const souls = pillars === all ? null : all.filter(bare);
   const shields = new Map<number, Entity[]>();
   let struck = 0;
   for (const p of s.players) {
@@ -161,8 +170,8 @@ export function landWrath(s: CouncilScope, caster: Entity, heir: boolean): numbe
       else shields.set(cover.e.id, [p]);
     }
   }
-  // Each pillar that shielded someone takes the blast for them, once.
-  // One too many behind it (Narrow Shelter) and each of them takes a share too.
+  // One too many behind a pillar (Narrow Shelter) and each of them takes a
+  // share of the blast.
   const limit = s.rules.pillarLimit;
   let crowded = false;
   for (const pl of pillars) {
@@ -187,10 +196,28 @@ export function landWrath(s: CouncilScope, caster: Entity, heir: boolean): numbe
         struck++;
       }
     }
-    crackPillar(ctx, inst, st, pl);
+  }
+  // Then the mountain's anger brings every pillar down, the cursed one too (a
+  // soul's stands): the stone breaks clean, its rubble a look, never a hazard
+  // under the hidden.
+  let columns = 0;
+  for (const pl of all) {
+    if (pl.soul) continue;
+    if (!pl.risen) columns++;
+    if (pl.cursed) breakCursed(s, pl);
+    else collapsePillar(ctx, inst, st, pl, false);
   }
   if (crowded)
     raidWarn(s, caster, 'crowded', 'Too many behind one pillar! It could not shield them all.');
+  if (columns > 0)
+    raidWarn(
+      s,
+      caster,
+      'columnsGone',
+      'The carved columns are gone! From now on only the stone Wake the Stone raises can hide you.',
+    );
+  // The next cover is never more than a breath after the Wrath.
+  st.wakeTimer = Math.min(st.wakeTimer, T.wakeAfterWrath);
   // Normal: the song is owed now, so its Resonance runs out before the next.
   if (s.rules.songAfterWrath) st.songDue = T.songAfterWrath;
   if (st.wraths === T.enrageAfterWraths)
@@ -245,6 +272,6 @@ export function landWeight(s: CouncilScope, g: Entity, targetId: number | null):
 
 /** Clear the job's bars off a body (a reset, a death). */
 export function clearWrathBars(b: Entity): void {
-  clearCastIf(b, COUNCIL_CASTS.wrath, COUNCIL_CASTS.weight);
+  clearCastIf(b, COUNCIL_CASTS.wrath, COUNCIL_CASTS.weight, COUNCIL_CASTS.rush);
   dropAuraById(b, COUNCIL_AURAS.pillarLimit);
 }

@@ -35,11 +35,10 @@ export const SMITH_HEART_PLACEHOLDER_LOOKS: Record<string, string> = {
   // ---- the four guardians -----------------------------------------------------
   // Final: a stone titan half-fused with the Pit's floor, a great hammer arm.
   heart_hammer_guardian: 'skel_golem',
-  // The Hammer Council's other two: bodyless targets; their provisional
-  // bodies of the Heart kit's rock and crystal are drawn by
+  // The Hammer Council's other member: a bodyless target; its provisional
+  // body of the Heart kit's rock and crystal is drawn by
   // smith_heart_fx/council_bodies.ts (the Masterless Strength's pattern).
-  // Final: their own models (the official pipeline), the same joints.
-  heart_slabwright: 'smith_heart_slabwright',
+  // Final: its own model (the official pipeline), the same joints.
   heart_seam_singer: 'smith_heart_seam_singer',
   // The Guardian of the Breath: a bodyless target; its provisional body (a
   // living bellows of storm granite, crystal and lightning, its phase-2 storm
@@ -67,8 +66,6 @@ export const SMITH_HEART_PLACEHOLDER_LOOKS: Record<string, string> = {
   // The Rolling Cinder: a bodyless target under the ball of the first flame
   // smith_heart_fx/heat_cinder_fx.ts draws.
   heart_heat_rolling_cinder: 'smith_heart_rolling_cinder',
-  // Stone Prison's block: a bodyless target under the stone council_prison_fx.ts draws.
-  heart_stone_prison: 'smith_heart_stone_prison',
   // ---- the final boss -----------------------------------------------------------
   // Its own model (phase 2O, smith_heart_boss_looks.ts): the Quadrant
   // Guardian, one rigged body in four element looks the quarter it stands in

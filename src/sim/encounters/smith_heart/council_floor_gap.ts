@@ -2,15 +2,16 @@
 // every mechanic that paints the Quarry floor with something the raid must
 // react to (a FLOOR mechanic) keeps its start at least `floorGap` seconds after
 // the last floor start, so the rock, the rising stone, the Wrath's sight field,
-// the Echo and the Walking Slab never land on the floor at once.
+// the Echo and the Rush's lane never land on the floor at once.
 //
 //   The list      Mountain's Wrath (its sight field), the Echo of Wrath (its
 //                 ring), Wake the Stone (its circles; an heir's rise spots),
-//                 Falling Rock (its soak circle) and the Walking Slab's start.
-//                 Seam Bolt, the song, Hammer's Weight and Stone Prison paint
+//                 Mountain's Rush (its lane and mark) and Falling Rock (its
+//                 soak circle). Seam Bolt, the song and Hammer's Weight paint
 //                 no floor and keep their own clocks untouched.
 //   The order     due together, they go in FLOOR_PRIORITY (the Wrath first,
-//                 the slab last), one per gap; each still fires: a start
+//                 the cover before the Rush that spends it, the rock last),
+//                 one per gap; each still fires: a start
 //                 resets its own clock to 20 s or more, so a waiting mechanic
 //                 waits at most one gap per other floor mechanic.
 //   The rhythm    the seconds a mechanic waited on the gap (`floorHeld`) come
@@ -18,18 +19,18 @@
 //                 starts stay on the cadence they had: delays never pile up.
 //                 The Wrath's carry is energy: it lands with the waited
 //                 seconds' worth already filled.
-//   Dev           `/dev heart council wrath|wake|rock` and `soul slabwright`
-//                 call the start functions directly: they bypass the gate but
+//   Dev           `/dev heart council wrath|wake|rush|rock` call the start
+//                 functions directly: they bypass the gate but
 //                 still stamp it, so the fight's own floor starts space after.
 //
 // This leaf holds the pure rule (the tests and every start function import
 // it); council_floor.ts wires it to the council. Imports nothing. Zero rng:
 // the order is a fixed list, the clock is the fight's own.
 
-export type FloorMechanic = 'wrath' | 'echo' | 'wake' | 'rock' | 'slab';
+export type FloorMechanic = 'wrath' | 'echo' | 'wake' | 'rush' | 'rock';
 
 /** The stable order floor mechanics due on one tick take the floor in. */
-export const FLOOR_PRIORITY: readonly FloorMechanic[] = ['wrath', 'echo', 'wake', 'rock', 'slab'];
+export const FLOOR_PRIORITY: readonly FloorMechanic[] = ['wrath', 'echo', 'wake', 'rush', 'rock'];
 
 /** The fight-state slice the gate reads and writes. */
 export interface FloorGapState {

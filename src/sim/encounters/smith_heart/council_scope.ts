@@ -1,7 +1,7 @@
-// The Hammer Council's per-tick scope: the claim, the shared state, the three
+// The Hammer Council's per-tick scope: the claim, the shared state, the two
 // bodies, the players on the Quarry floor, the difficulty's rules and the bar
 // plumbing every member module uses. A leaf the council's member modules
-// (council_wrath.ts, council_stone.ts, council_song.ts) and the coordinator
+// (council_wrath.ts, council_rush.ts, council_stone.ts, council_song.ts) and the coordinator
 // (council.ts) share, so none of them reaches into another. Zero rng.
 
 import { HAMMER_PIT } from '../../content/smith_heart_layout';
@@ -11,6 +11,7 @@ import type { Entity } from '../../types';
 import { pickMarkTargets, startBar } from '../sunken_bastion/claim';
 import {
   COUNCIL_DIFFICULTY,
+  COUNCIL_ROLES,
   type CouncilDifficultyRules,
   type CouncilJob,
   type CouncilRole,
@@ -77,6 +78,8 @@ export function memberFree(s: CouncilScope, role: CouncilRole): boolean {
   if (!living(b)) return false;
   if (s.st.bars[role] || b.castingAbility !== null) return false;
   if (s.st.gaps[role] > 0) return false;
+  // The Guardian mid-Rush begins nothing else.
+  if (role === 'guardian' && s.st.rush !== null) return false;
   return !s.ctx.isStunned(b);
 }
 
@@ -101,6 +104,16 @@ export function beginBar(
   }
 }
 
+/** The players any living council member is fighting (the tanks). */
+export function councilTanks(s: Pick<CouncilScope, 'bodies'>): Set<number> {
+  const tanks = new Set<number>();
+  for (const r of COUNCIL_ROLES) {
+    const b = s.bodies[r];
+    if (living(b) && b.aggroTargetId !== null) tanks.add(b.aggroTargetId);
+  }
+  return tanks;
+}
+
 /** The players a mark takes: hashed among the living non-tanks of the floor
  *  (the tank only when nobody else is free). Zero rng. */
 export function pickMarks(
@@ -110,11 +123,7 @@ export function pickMarks(
   busy: ReadonlySet<number> = new Set(),
 ): Entity[] {
   // Never the one any council member is fighting while anyone else stands.
-  const tanks = new Set<number>();
-  for (const r of ['guardian', 'slabwright', 'singer'] as const) {
-    const b = s.bodies[r];
-    if (living(b) && b.aggroTargetId !== null) tanks.add(b.aggroTargetId);
-  }
+  const tanks = councilTanks(s);
   const salt = s.st.casts * 11 + 3;
   const out = pickMarkTargets(
     hasher,

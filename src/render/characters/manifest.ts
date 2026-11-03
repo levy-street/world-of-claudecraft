@@ -4247,28 +4247,12 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.4,
   },
-  // The Hammer Council's Slabwright and Seam Singer (the Smith's Heart's first
-  // boss, design doc 7.1): bodyless targets, their click capsules, nameplates
-  // and bars over the provisional rock-and-crystal bodies the raid's own
-  // effects draw (smith_heart_fx/council_bodies.ts) until their own models
-  // ship. Bound off the goleling's rig (never seen); height times the
-  // template's scale is the body's (about 2 to 2.5 times a player).
-  smith_heart_stone_prison: {
-    url: `${CREATURES}/golelingevolved.glb`,
-    height: 2.4,
-    clips: ELEMENTAL_FLOATING,
-    animUrls: [`${CREATURES}/elemental_ability_anims.glb`],
-    bodyless: true,
-    clickRadius: 1.6,
-  },
-  smith_heart_slabwright: {
-    url: `${CREATURES}/golelingevolved.glb`,
-    height: 2.15,
-    clips: ELEMENTAL_FLOATING,
-    animUrls: [`${CREATURES}/elemental_ability_anims.glb`],
-    bodyless: true,
-    clickRadius: 1.4,
-  },
+  // The Hammer Council's Seam Singer (the Smith's Heart's first boss, design
+  // doc 7.1): a bodyless target, its click capsule, nameplate and bars over the
+  // provisional rock-and-crystal body the raid's own effects draw
+  // (smith_heart_fx/council_bodies.ts) until its own model ships. Bound off
+  // the goleling's rig (never seen); height times the template's scale is the
+  // body's (about 2.5 times a player).
   smith_heart_seam_singer: {
     url: `${CREATURES}/golelingevolved.glb`,
     height: 2.5,

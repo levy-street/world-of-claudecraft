@@ -19,7 +19,7 @@ import {
   BREATH_TUNING,
   breathWindTemplate,
 } from '../encounters/smith_heart/breath_ids';
-import { COUNCIL_PRISON, COUNCIL_TUNING } from '../encounters/smith_heart/council_ids';
+import { COUNCIL_TUNING } from '../encounters/smith_heart/council_ids';
 import {
   FINAL_ADD_MOBS,
   FINAL_PHASE_NAMES,
@@ -293,17 +293,18 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
   ),
   // ---- the four guardians ------------------------------------------------------------
   // The Hammer Council (design doc 7.1, encounters/smith_heart/council.ts):
-  // three stone beings sharing the Hammer's strength, one pull, one wipe, one
+  // two stone beings sharing the Hammer's strength, one pull, one wipe, one
   // kill. Every number is a SKETCH (unmeasured): the pools split about 137,000
   // (after the elite factor) for a 4 to 5 minute fight at a planning raid DPS
-  // of about 600. Each carries the Wrath's declaration (`nova`,
+  // of about 600 (the prototype's third member's share went to the two). Each carries the Wrath's declaration (`nova`,
   // encounter-driven: the council casts it, never the trash engine), so the
   // sight field draws for whichever of them holds the Wrath.
   // The Guardian of the Hammer: a stone titan half-fused with the floor, the
-  // tank boss (energy, Mountain's Wrath, Hammer's Weight). Hammerfall, its
+  // melee tank boss (energy, Mountain's Wrath, Hammer's Weight, Mountain's
+  // Rush). Hammerfall, its
   // frontal arc, stays: it reads well and keeps the raid off the tank's side.
   heart_hammer_guardian: {
-    ...boss('heart_hammer_guardian', 'Guardian of the Hammer', 22000, 0x8a6430, 3.2),
+    ...boss('heart_hammer_guardian', 'Guardian of the Hammer', 32000, 0x8a6430, 3.2),
     ccImmune: true,
     slowImmune: true,
     arcCleave: { every: 3, arcDeg: 110, range: 9, mult: 0.7, name: 'Hammerfall' },
@@ -315,27 +316,12 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
       ),
     },
   },
-  // The Slabwright: broad and blocky, slab shoulders; it makes the pillars
-  // (Wake the Stone) and drops the rock (Falling Rock).
-  heart_slabwright: {
-    ...boss('heart_slabwright', 'The Slabwright', 19500, 0x9a7a52, 2.2),
-    ccImmune: true,
-    slowImmune: true,
-    dmgBase: 34,
-    dmgPerLevel: 7,
-    attackSpeed: 2.8,
-    trashKit: {
-      nova: councilWrath(
-        COUNCIL_TUNING.heirWrathCast,
-        COUNCIL_TUNING.heirWrathMin,
-        COUNCIL_TUNING.heirWrathMax,
-      ),
-    },
-  },
   // The Seam Singer: tall and slender, ochre seam crystals; the caster (Seam
-  // Bolt, Song of the Seam). A light melee: its pressure is its bars.
+  // Bolt, Song of the Seam, Wake the Stone, Falling Rock). A light melee: her
+  // pressure is her bars. She carries the heir's Wrath declaration (the
+  // Guardian fallen, she takes the Wrath).
   heart_seam_singer: {
-    ...boss('heart_seam_singer', 'The Seam Singer', 18000, 0xd8a24a, 2.0),
+    ...boss('heart_seam_singer', 'The Seam Singer', 27500, 0xd8a24a, 2.0),
     ccImmune: true,
     slowImmune: true,
     dmgBase: 24,
@@ -549,30 +535,6 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
     scale: 2.4,
     color: 0xfff2c0,
   },
-  // Stone Prison's block (encounters/smith_heart/council_prison.ts): a real target
-  // round a player, walked and timed by the encounter. Health a SKETCH: two of
-  // them a few seconds of the raid's whole damage.
-  [COUNCIL_PRISON]: {
-    id: COUNCIL_PRISON,
-    name: 'Stone Prison',
-    minLevel: 20,
-    maxLevel: 20,
-    family: 'elemental',
-    hpBase: 1000,
-    hpPerLevel: 0,
-    dmgBase: 1,
-    dmgPerLevel: 0,
-    attackSpeed: 60,
-    armorPerLevel: 0,
-    moveSpeed: 0,
-    aggroRadius: 0,
-    ccImmune: true,
-    slowImmune: true,
-    xpMult: 0,
-    loot: [],
-    scale: 1,
-    color: 0x7a6a58,
-  },
   // ---- the final boss ------------------------------------------------------------
   // The strength without its master (design doc 7.5). Its fight is the
   // encounter's (encounters/smith_heart/final*.ts): the four quarters' rules
@@ -655,25 +617,23 @@ function guardian(mobId: string, at: { x: number; z: number }, facing: number): 
   return { mobId, x: at.x, z: at.z, facing, idleStationary: true };
 }
 
-/** The Hammer Council's three, facing the Pit Mouth, held as one pack. */
+/** The Hammer Council's two, facing the Pit Mouth, held as one pack. */
 function councilSpawns(): DungeonSpawn[] {
   const facing = toward(HAMMER_PIT.x, HAMMER_PIT.z, -35, -179);
   return [
     { ...guardian(SMITH_HEART_GUARDIANS.hammer, SMITH_HEART_BOSS_SPOTS.hammer, facing) },
-    { ...guardian('heart_slabwright', SMITH_HEART_BOSS_SPOTS.slabwright, facing) },
     { ...guardian('heart_seam_singer', SMITH_HEART_BOSS_SPOTS.seamSinger, facing) },
   ].map((sp) => ({ ...sp, packId: SMITH_HEART_COUNCIL_PACK }));
 }
 
 /** The council's authored pack id (no gate waits on it as a pack: the Slab
- *  waits on its three bosses). */
+ *  waits on its two bosses). */
 export const SMITH_HEART_COUNCIL_PACK = 'council';
 
-/** The council's three, in role order (the Slab, the seal and every credit
- *  wait on all three). */
+/** The council's two, in role order (the Slab, the seal and every credit
+ *  wait on both). */
 export const SMITH_HEART_COUNCIL: readonly string[] = [
   'heart_hammer_guardian',
-  'heart_slabwright',
   'heart_seam_singer',
 ];
 
@@ -685,7 +645,7 @@ export const SMITH_HEART_SPAWNS: DungeonSpawn[] = [
   ...pack('h1', G.h1.x, G.h1.z, HAMMER_TRIO, toward(G.h1.x, G.h1.z, CLEFT.x, CLEFT.z)),
   ...pack('h2', G.h2.x, G.h2.z, HAMMER_TRIO, toward(G.h2.x, G.h2.z, G.h1.x, G.h1.z)),
   ...pack('h3', G.h3.x, G.h3.z, HAMMER_TRIO, toward(G.h3.x, G.h3.z, G.h2.x, G.h2.z)),
-  // The Hammer Council: one authored pack, so pulling one pulls all three.
+  // The Hammer Council: one authored pack, so pulling one pulls both.
   ...councilSpawns(),
   // ---- The Ring: two packs between each pair of vein mouths -------------------------
   ...RING_PACK_DEGREES.flatMap((deg, i) => {
@@ -742,8 +702,8 @@ export const SMITH_HEART_GATES: DungeonGateDef[] = [
     rot: across(19, 18),
     packs: [...SMITH_HEART_PACKS.hammer],
     sealWhileEngaged: SMITH_HEART_GUARDIANS.hammer,
-    // The Hammer Council: sealed while any of the three fights.
-    sealWithBodies: ['heart_slabwright', 'heart_seam_singer'],
+    // The Hammer Council: sealed while either of the two fights.
+    sealWithBodies: ['heart_seam_singer'],
   },
   {
     id: 'the_slab',

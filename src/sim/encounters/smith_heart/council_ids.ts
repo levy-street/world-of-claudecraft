@@ -8,27 +8,27 @@
 // players) and the level-20 cloth reference, to be calibrated with the meters
 // harness before the raid ships.
 
-/** The three stone beings of the council (template ids; the Guardian's is
+/** The two stone beings of the council (template ids; the Guardian's is
  *  the shipped, frozen one, content/smith_heart.ts SMITH_HEART_GUARDIANS). A
- *  leaf: the content imports these, never the other way. */
+ *  leaf: the content imports these, never the other way. (The prototype's
+ *  third member, the Slabwright, left the encounter in the two-boss rework:
+ *  its pillars and its rock went to the Seam Singer.) */
 export const COUNCIL_GUARDIAN = 'heart_hammer_guardian';
-export const COUNCIL_SLABWRIGHT = 'heart_slabwright';
 export const COUNCIL_SEAM_SINGER = 'heart_seam_singer';
-/** Stone Prison's block round a player: a real target (never a member). */
-export const COUNCIL_PRISON = 'heart_stone_prison';
 
-/** A council member's role (its original job). */
-export type CouncilRole = 'guardian' | 'slabwright' | 'singer';
-/** The three council jobs: the Guardian's energy and Wrath, the
- *  Slabwright's pillars, the Seam Singer's Resonance. */
-export type CouncilJob = 'wrath' | 'pillars' | 'resonance';
+/** A council member's role (its original job): the Guardian the melee tank
+ *  boss, the Seam Singer the caster. */
+export type CouncilRole = 'guardian' | 'singer';
+/** The council's inheritable jobs: the Guardian's energy and Wrath, the
+ *  Seam Singer's pillars (Wake the Stone). Mountain's Rush, Hammer's Weight,
+ *  the Singer's bolt, song and rock have no heir (the rock but on mythic). */
+export type CouncilJob = 'wrath' | 'pillars';
 
 /** The roles in roster order (the council's own iteration order). */
-export const COUNCIL_ROLES: readonly CouncilRole[] = ['guardian', 'slabwright', 'singer'];
+export const COUNCIL_ROLES: readonly CouncilRole[] = ['guardian', 'singer'];
 
 export const COUNCIL_TEMPLATES: Readonly<Record<CouncilRole, string>> = {
   guardian: COUNCIL_GUARDIAN,
-  slabwright: COUNCIL_SLABWRIGHT,
   singer: COUNCIL_SEAM_SINGER,
 };
 
@@ -40,15 +40,15 @@ export const COUNCIL_TEMPLATE_IDS: readonly string[] = COUNCIL_ROLES.map(
 /** The role whose own job each is. */
 export const JOB_OWNER: Readonly<Record<CouncilJob, CouncilRole>> = {
   wrath: 'guardian',
-  pillars: 'slabwright',
-  resonance: 'singer',
+  pillars: 'singer',
 };
 
-/** Who takes up a fallen member's job: the first survivor in this order. */
+/** Who takes up a fallen member's job (a weaker form of it): the Singer the
+ *  Wrath (a shorter, lighter one), the Guardian the pillars (random players,
+ *  a locked spot, about once a Wrath cycle). */
 export const JOB_HEIRS: Readonly<Record<CouncilJob, readonly CouncilRole[]>> = {
-  wrath: ['slabwright', 'singer'],
-  pillars: ['guardian', 'singer'],
-  resonance: ['guardian', 'slabwright'],
+  wrath: ['singer'],
+  pillars: ['guardian'],
 };
 
 /** The role a template plays in the council, or null. Pure. */
@@ -66,18 +66,18 @@ export const COUNCIL_CASTS = {
   wrath: 'heart_mountains_wrath',
   /** The tank buster. */
   weight: 'heart_hammers_weight',
-  /** The Slabwright marks the players a pillar will rise under. */
+  /** The Guardian marks a player and charges the line to them (its bar's
+   *  target is the marked player: the client draws the lane from it). */
+  rush: 'heart_mountains_rush',
+  /** The Seam Singer marks the players a pillar will rise under. Kickable:
+   *  a kick raises nothing (the trap). */
   wake: 'heart_wake_the_stone',
-  /** The Slabwright marks the player the rock falls on. */
+  /** The Seam Singer marks the player the rock falls on. */
   rock: 'heart_falling_rock',
-  /** The Slabwright shuts players in blocks of stone. */
-  prison: 'heart_stone_prison',
   /** The Seam Singer's kickable bolt. */
   bolt: 'heart_seam_bolt',
   /** The Seam Singer's kickable song (Resonance on three, one if kicked). */
   song: 'heart_song_of_the_seam',
-  /** The same song sung by an heir: no kick table lists it. */
-  songUnbroken: 'heart_song_of_the_seam_unbroken',
   /** Mythic: the Guardian's soul in a pillar casts its own Wrath (the
    *  pillar's own bar, never kicked). */
   echo: 'heart_echo_of_wrath',
@@ -87,11 +87,13 @@ export const COUNCIL_CASTS = {
 } as const;
 
 /** The interruptible ones (spread into mob/healer_channel.ts
- *  SCRIPTED_INTERRUPTIBLE_CHANNELS). Wrath, Weight, Wake, Rock and the heir's
- *  song are never kicked. */
+ *  SCRIPTED_INTERRUPTIBLE_CHANNELS): the Singer's three. Kicking the bolt or
+ *  the song is the play; kicking Wake the Stone loses the raid its cover.
+ *  Wrath, Weight, the Rush and the rock are never kicked. */
 export const COUNCIL_KICK_SCHOOLS: Readonly<Record<string, { school: 'nature' }>> = {
   [COUNCIL_CASTS.bolt]: { school: 'nature' },
   [COUNCIL_CASTS.song]: { school: 'nature' },
+  [COUNCIL_CASTS.wake]: { school: 'nature' },
 };
 
 /** The auras the council puts on players and on itself. */
@@ -102,19 +104,28 @@ export const COUNCIL_AURAS = {
   wakeMark: 'heart_wake_mark',
   /** The rock falls on this player when it runs out: share it. */
   rockMark: 'heart_falling_rock_mark',
-  /** A pillar this player stands near for 3 s loses a piece. value = the
-   *  share of those 3 s already stood (tenths), value2 = the pillar's id. */
+  /** The Guardian charges at this player when it runs out: put a pillar on
+   *  the line (value2 = the lane's half width). */
+  rushMark: 'heart_mountains_rush_mark',
+  /** Resonance: every second this player rings, hurting each ally within
+   *  the ring (value2 = its radius): spread out. */
   resonance: 'heart_resonance',
   /** On a council member: one stack per fallen member, more damage dealt. */
   memory: 'heart_memory_of_stone',
-  /** Mythic: on the Slabwright while another living member stands
-   *  within reach, far less damage taken (council_shoulder.ts). */
-  shouldered: 'heart_shouldered_stone',
   /** Heroic and Mythic: on the Wrath's caster through its bar: value2 = how
    *  many players one pillar can shield (what the client's runes read). */
   pillarLimit: 'heart_narrow_shelter',
-  /** Shut in a block of stone: stunned until it breaks or crushes them. */
-  prisoned: 'heart_stone_prison',
+  /** Bond of the Stone: on both members while they stand within reach of
+   *  each other, far less damage taken (stacks = the raid pulses it has
+   *  sung, value2 = the next pulse's multiplier in tenths). */
+  bond: 'heart_bond_of_the_stone',
+  /** Mountain's Rush broke the cursed pillar: the Guardian reels (a stun)
+   *  and takes more damage for a while. */
+  rushStunned: 'heart_rush_shattered',
+  rushExposed: 'heart_rush_exposed',
+  /** Mythic: the Quarry is collapsing (a Rush missed every pillar): a
+   *  stacking raid-wide blow until the cursed pillar breaks (stacks). */
+  collapse: 'heart_quarry_collapse',
   /** Mythic: on the Seam Singer's soul pillar, one stack per pulse the
    *  Endless Song has sung (value = the next pulse's multiplier). The
    *  pillar is an object: the sim never ticks it, the council sets it. */
@@ -126,6 +137,10 @@ export const COUNCIL_AURAS = {
  *  (instances/combat_wall_state.ts COMBAT_WALL_SHAPES). */
 export const COUNCIL_PILLAR_PREFIX = 'sh_council_pillar_';
 export const COUNCIL_RISEN_PREFIX = 'sh_council_risen_';
+/** The cursed pillar the Guardian raises with each Mountain's Rush (one at
+ *  a time): it pulses on the whole raid while it stands, shelters nobody, and
+ *  only the Rush (or a Wrath) breaks it. A round combat wall. */
+export const COUNCIL_CURSED = 'sh_council_cursed';
 /** The rubble a fallen pillar leaves (scale = its radius). */
 export const COUNCIL_RUBBLE = 'sh_council_rubble';
 /** An heir's rising pillar: the 2 s spot locked under a random player
@@ -181,9 +196,21 @@ export const COUNCIL_CUES = {
   echoBlast: 'heart_echo_of_wrath_blast',
   /** Mythic: the Endless Song pulses (spellfx 'nova' on the pillar). */
   songPulse: 'heart_endless_song_pulse',
-  /** Mythic: the Walking Slab crushes a player under it (spellfx 'nova'
-   *  from the pillar on the player). */
-  slabCrush: 'heart_walking_slab_crush',
+  /** Mountain's Rush ends (spellfxAt 'burst' where the Guardian stops,
+   *  radius = the lane's half width). */
+  rushImpact: 'heart_mountains_rush_impact',
+  /** The cursed pillar rises, pulses, breaks (spellfx 'nova' on it;
+   *  spellfxAt 'burst' as it breaks). */
+  cursedRise: 'heart_cursed_pillar_rise',
+  cursedPulse: 'heart_cursed_pillar_pulse',
+  cursedBreak: 'heart_cursed_pillar_break',
+  /** Bond of the Stone pulses (spellfx 'beam' from one member to the other). */
+  bondPulse: 'heart_bond_of_the_stone_pulse',
+  /** Resonance rings on its player (spellfx 'nova' on them). */
+  resonancePulse: 'heart_resonance_pulse',
+  /** Mythic: the Quarry's ceiling sheds a blow (spellfxAt 'burst' on each
+   *  player). */
+  quarryCollapse: 'heart_quarry_collapse',
 } as const;
 
 /** The damage names (combat log and floating text; re-localized by
@@ -194,18 +221,19 @@ export const COUNCIL_NAMES = {
   wake: 'Wake the Stone',
   rock: 'Falling Rock',
   rockTremor: 'Rockfall Tremor',
+  rush: "Mountain's Rush",
+  cursed: 'Cursed Pillar',
+  rushStunned: 'Shattered Charge',
+  bond: 'Bond of the Stone',
+  collapse: 'Quarry Collapse',
   bolt: 'Seam Bolt',
   song: 'Song of the Seam',
   resonance: 'Resonance',
   memory: 'Memory of Stone',
-  shouldered: 'Shouldered Stone',
   pillarLimit: 'Narrow Shelter',
-  prison: 'Stone Prison',
   rubble: 'Crumbled Stone',
   pulse: 'Restless Stone',
   echo: 'Echo of Wrath',
-  slab: 'Walking Slab',
-  grind: 'Stone Drag',
   endlessSong: 'Endless Song',
 } as const;
 
@@ -220,6 +248,9 @@ export type CouncilDifficulty = 'normal' | 'heroic' | 'mythic';
 export interface CouncilDifficultyRules {
   /** How many players Wake the Stone marks (and the heir's random rise). */
   wakeMarks: number;
+  /** Wake the Stone's marks and Mountain's Rush never run into a Wrath (they
+   *  wait until it lands); false: they may (heroic). */
+  floorAvoidsWrath: boolean;
   /** The song waits for a Wrath to land and its Resonance runs out before
    *  the next one (normal); false: the song keeps its own clock and the two
    *  overlap (heroic). */
@@ -230,102 +261,87 @@ export interface CouncilDifficultyRules {
   damageMult: number;
   /** The heir's random rise: seconds of warning on its locked spot. */
   heirRiseWarn: number;
-  /** The heir's unbroken song: how many players it rings on. */
-  heirSongMarks: number;
   /** The Wrath's heir: seconds its energy takes to fill. */
   heirFillSeconds: number;
-  /** A survivor keeps casting Falling Rock once the Slabwright has fallen
+  /** The Guardian keeps casting Falling Rock once the Seam Singer has fallen
    *  (mythic: the rock and Resonance are the only things that break a soul
-   *  pillar, so a living member always supplies both). */
-  rockOutlivesSlabwright: boolean;
+   *  pillar, so a living member always supplies one of them). */
+  rockOutlivesSinger: boolean;
   /** Soul in the Stone: a fallen member's soul takes a pillar
    *  (council_soul.ts). */
   soulInTheStone: boolean;
-  /** Shouldered Stone: the Slabwright hardens beside another member
-   *  (council_shoulder.ts). */
-  slabwrightShoulders: boolean;
   /** Narrow Shelter: how many players one pillar shields from the Wrath, or
    *  null for no limit (council_wrath.ts landWrath). */
   pillarLimit: number | null;
-  /** Stone Prison: how many it shuts in, the seconds to break them out, and how
-   *  much tougher than its template each block stands. */
-  prisonMarks: number;
-  prisonSeconds: number;
-  prisonHpMult: number;
+  /** The cursed pillar's raid pulse (before damageMult): low on normal (a
+   *  reminder), the real pressure on heroic and mythic. */
+  cursedPulseMin: number;
+  cursedPulseMax: number;
+  /** A Rush that hits no pillar sets the Quarry collapsing (mythic) until
+   *  the cursed pillar breaks. */
+  missCollapse: boolean;
 }
 
 export const COUNCIL_DIFFICULTY: Readonly<Record<CouncilDifficulty, CouncilDifficultyRules>> = {
   normal: {
-    wakeMarks: 1,
+    wakeMarks: 2,
+    floorAvoidsWrath: true,
     songAfterWrath: true,
     pillarPulse: false,
     damageMult: 1,
     heirRiseWarn: 2,
-    heirSongMarks: 3,
     heirFillSeconds: 35,
-    rockOutlivesSlabwright: false,
+    rockOutlivesSinger: false,
     soulInTheStone: false,
-    slabwrightShoulders: false,
-    pillarLimit: null,
-    prisonMarks: 2,
-    prisonSeconds: 10,
-    prisonHpMult: 1,
+    pillarLimit: 5,
+    cursedPulseMin: 14,
+    cursedPulseMax: 18,
+    missCollapse: false,
   },
   heroic: {
-    wakeMarks: 2,
+    wakeMarks: 3,
+    floorAvoidsWrath: false,
     songAfterWrath: false,
     pillarPulse: true,
     damageMult: 1.25,
     heirRiseWarn: 2,
-    heirSongMarks: 3,
     heirFillSeconds: 35,
-    rockOutlivesSlabwright: false,
+    rockOutlivesSinger: false,
     soulInTheStone: false,
-    slabwrightShoulders: false,
     pillarLimit: 4,
-    prisonMarks: 2,
-    prisonSeconds: 10,
-    prisonHpMult: 1,
+    cursedPulseMin: 40,
+    cursedPulseMax: 48,
+    missCollapse: false,
   },
   // Everything heroic has, the inheritances stronger, and the souls.
   mythic: {
-    wakeMarks: 2,
+    wakeMarks: 3,
+    floorAvoidsWrath: false,
     songAfterWrath: false,
     pillarPulse: true,
     damageMult: 1.25,
     heirRiseWarn: 1.5,
-    heirSongMarks: 4,
     heirFillSeconds: 30,
-    rockOutlivesSlabwright: true,
+    rockOutlivesSinger: true,
     soulInTheStone: true,
-    slabwrightShoulders: true,
     pillarLimit: 3,
-    prisonMarks: 3,
-    prisonSeconds: 8,
-    prisonHpMult: 1.2,
+    cursedPulseMin: 48,
+    cursedPulseMax: 56,
+    missCollapse: true,
   },
 };
 
 // ---- tuning (SKETCH, unmeasured) ------------------------------------------------------
 
 export const COUNCIL_TUNING = {
-  // Shouldered Stone (Mythic): its reach (yards, body to body), the
-  // share of damage it stops, and the least time between two raid warnings.
-  shoulderReach: 10,
-  shoulderWard: 0.8,
-  shoulderWarnGap: 20,
   // Narrow Shelter: the share of the Wrath everyone behind a crowded pillar takes.
   crowdShare: 0.5,
-  // Stone Prison: its first bar, the time between two, and the bar itself.
-  prisonFirst: 20,
-  prisonEvery: 40,
-  prisonCast: 1.5,
   // The pillars.
   pillarCap: 7,
   /** The most integrity any pillar template carries. */
   integrity: 3,
-  /** A carved column takes two blows; a risen pillar is one use (Jose's
-   *  playtest: risen cover is spent first, the columns saved for the end). */
+  /** A carved column takes two blows (the rock, Resonance); a risen pillar
+   *  one. Mountain's Wrath and Mountain's Rush take a pillar whole. */
   columnIntegrity: 2,
   risenIntegrity: 1,
   /** A carved column's radius and a risen pillar's (the combat wall rows). */
@@ -360,10 +376,57 @@ export const COUNCIL_TUNING = {
   weightSeconds: 25,
   /** Physical damage taken while it holds (+100 percent). */
   weightTaken: 1,
-  // Wake the Stone.
-  wakeFirst: 14,
+  // Mountain's Rush (the Guardian's charge): its first bar, the time between
+  // two, the bar (the mark's warning), the lane's half width, the dash's
+  // speed (yards a second), the blow and the throw on everyone in its path.
+  rushFirst: 16,
+  rushEvery: 24,
+  rushCast: 3,
+  rushHalfWidth: 2,
+  rushSpeed: 40,
+  rushMin: 480,
+  rushMax: 560,
+  rushKnockback: 10,
+  /** The cursed pillar: how far from the Quarry's middle it rises, its
+   *  radius, its pulse's clock. */
+  cursedRing: 15,
+  cursedR: 2.2,
+  cursedPulseEvery: 2,
+  /** The Rush broken on the cursed pillar: the Guardian's stun, and the
+   *  extra damage it takes for a while. */
+  rushStunSeconds: 5,
+  rushExposedSeconds: 12,
+  rushExposed: 0.5,
+  /** Mythic: the Quarry collapsing after a miss: every 2 s a blow on every
+   *  player, one more stack each time (the blow is per stack), capped. */
+  collapseEvery: 2,
+  collapseMin: 30,
+  collapseMax: 36,
+  collapseCap: 10,
+  /** Normal: a Wake's marks or a Rush must be over this long before the
+   *  Wrath's bar begins (floorAvoidsWrath). */
+  wrathGuardPad: 2,
+  // Bond of the Stone: within this of each other (body to body) both take
+  // this much less, and every few seconds a raid-wide pulse that grows each
+  // time while they stay together (capped); a raid warning at most this often.
+  bondReach: 20,
+  bondWard: 0.8,
+  bondPulseEvery: 3,
+  bondPulseMin: 40,
+  bondPulseMax: 48,
+  bondPulseGrowth: 0.25,
+  bondPulseCap: 6,
+  bondWarnGap: 15,
+  // Wake the Stone (the Seam Singer's, kickable: a kick raises nothing).
+  wakeFirst: 20,
   wakeEvery: 30,
-  wakeCast: 1.2,
+  /** Each Wrath landing brings the next Wake due this soon after it (never
+   *  later than its own clock): every Wrath cycle has its Wake. */
+  wakeAfterWrath: 6,
+  /** The Guardian's inherited rise (the Singer fallen): its own clock, so
+   *  about once a Wrath cycle (the Wrath's landing brings it due too). */
+  heirWakeEvery: 45,
+  wakeCast: 2.5,
   wakeMarkSeconds: 5,
   /** The heir's rise: random players, the spot locked, this warning. */
   heirRiseWarn: 2,
@@ -409,10 +472,13 @@ export const COUNCIL_TUNING = {
   songEvery: 24,
   songMarks: 3,
   songKickedMarks: 1,
-  resonanceSeconds: 15,
-  /** A marked player within this of a pillar's face is cracking it. */
-  resonanceReach: 3.5,
-  resonanceCrackSeconds: 3,
+  /** Resonance: a spread. Its seconds, its ring (yards round the carrier),
+   *  its pulse's clock and its blow on each ally inside (never the carrier). */
+  resonanceSeconds: 6,
+  resonanceRadius: 7,
+  resonanceEvery: 1,
+  resonanceMin: 150,
+  resonanceMax: 180,
   // The stone remembers.
   memoryPerFallen: 0.15,
   // Heroic: the pillars pulse.
@@ -424,19 +490,14 @@ export const COUNCIL_TUNING = {
    *  another (nothing chains bar into bar). */
   barGap: 1.2,
   /** Seconds between the starts of two FLOOR mechanics (the Wrath, the Echo,
-   *  Wake the Stone, Falling Rock, the Walking Slab's start): one due sooner
-   *  waits (council_floor_gap.ts). */
+   *  Wake the Stone, Mountain's Rush, Falling Rock): one due sooner waits
+   *  (council_floor_gap.ts). */
   floorGap: 4,
   // Mythic: Soul in the Stone (council_soul.ts).
   /** A soul pillar's pips. */
   soulPips: 3,
   /** A Falling Rock landing within this of its face strikes a pip off. */
   soulRockReach: 6,
-  /** A Resonance-marked player this close to its face for this long strikes
-   *  a pip off (the Seam Singer's soul: twice as fast). */
-  soulResonanceReach: 3.5,
-  soulResonanceSeconds: 3,
-  singerSoulResonanceSeconds: 1.5,
   // The Guardian's soul: Echo of Wrath.
   echoFirst: 12,
   echoEvery: 20,
@@ -444,28 +505,6 @@ export const COUNCIL_TUNING = {
   echoRadius: 45,
   /** A share of Mountain's Wrath's own roll. */
   echoShare: 0.6,
-  // The Slabwright's soul: the Walking Slab.
-  slabSpeed: 1.5,
-  /** Seconds between two picks of the largest group. */
-  slabRetarget: 3,
-  /** A player within this of another counts toward its group. */
-  slabGroupR: 8,
-  /** It stops this far (centre) from the spot it walks to. */
-  slabArrive: 1,
-  /** It keeps this far past its own face from a living council body. */
-  slabClearOfBodies: 1.6,
-  /** Under it (this far past its face): a heavy hit and a throw, once per
-   *  player in this many seconds. */
-  slabCrushReach: 1.5,
-  slabCrushMin: 380,
-  slabCrushMax: 440,
-  slabCrushKnockback: 9,
-  slabCrushEvery: 1.5,
-  /** Near it (this far past its face): light damage each second. */
-  slabGrindReach: 4,
-  slabGrindMin: 70,
-  slabGrindMax: 85,
-  slabGrindEvery: 1,
   // The Seam Singer's soul: the Endless Song.
   songPulseFirst: 3,
   songPulseEvery: 3,
@@ -558,6 +597,14 @@ export const COUNCIL_SOUL_TEMPLATES: readonly string[] = COUNCIL_ROLES.flatMap((
     ),
   ),
 );
+
+/** Bond of the Stone's multiplier on its `pulse`-th pulse (0 the first). */
+export function bondPulseMult(pulse: number): number {
+  return Math.min(
+    COUNCIL_TUNING.bondPulseCap,
+    1 + COUNCIL_TUNING.bondPulseGrowth * Math.max(0, pulse),
+  );
+}
 
 /** The Endless Song's multiplier on its `pulse`-th pulse (0 the first). */
 export function endlessSongMult(pulse: number): number {

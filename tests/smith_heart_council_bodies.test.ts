@@ -1,8 +1,7 @@
 // The Hammer Council's provisional bodies (src/render/smith_heart_fx/
-// council_bodies_core.ts and council_bodies.ts): both plans stand about 2 to
-// 2.5 times a player, with distinct silhouettes (the Slabwright broad, its slab
-// shoulders the widest thing on it; the Seam Singer tall and slender), every
-// piece is a real node of its kit, the arms reach every pose's target and every
+// council_bodies_core.ts and council_bodies.ts): the Seam Singer's plan stands
+// about 2 to 2.5 times a player, tall and slender, every piece is a real node
+// of its kit, the arms reach every pose's target and every
 // pose and fall is finite, the casts map to their motions; and CouncilBodies
 // over a fake world finds the bodies, never claims an event, falls with a dead
 // body, and disposes.
@@ -35,17 +34,13 @@ import type { Entity, SimEvent } from '../src/sim/types';
 import type { IWorld } from '../src/world_api';
 
 const PLAYER = 1.9;
-const KINDS: CouncilBodyKind[] = ['slabwright', 'singer'];
+const KINDS: CouncilBodyKind[] = ['singer'];
 const ACTIONS: CouncilBodyAction[] = ['idle', 'swing', 'raise', 'sing', 'point', 'wrath'];
 const finite = (p: { x: number; y: number; z: number }) =>
   Number.isFinite(p.x) && Number.isFinite(p.y) && Number.isFinite(p.z);
 
 describe('council_bodies_core: the plans', () => {
   it('stand 2 to 2.5 times a player, matching the manifest and the template', () => {
-    expect(COUNCIL_BODY_HEIGHTS.slabwright).toBeCloseTo(
-      (VISUALS.smith_heart_slabwright?.height ?? 0) *
-        (SMITH_HEART_MOBS.heart_slabwright?.scale ?? 0),
-    );
     expect(COUNCIL_BODY_HEIGHTS.singer).toBeCloseTo(
       (VISUALS.smith_heart_seam_singer?.height ?? 0) *
         (SMITH_HEART_MOBS.heart_seam_singer?.scale ?? 0),
@@ -59,20 +54,10 @@ describe('council_bodies_core: the plans', () => {
     }
   });
 
-  it('read apart: the Slabwright broad as it is tall, the Singer slender', () => {
-    const slab = COUNCIL_BODY_PLANS.slabwright;
+  it('the Singer reads slender', () => {
     const singer = COUNCIL_BODY_PLANS.singer;
-    const slabWidth = councilPlanWidth(slab);
     const singerWidth = councilPlanWidth(singer);
-    expect(slabWidth / slab.height).toBeGreaterThan(1);
     expect(singerWidth / singer.height).toBeLessThan(0.6);
-    expect(singerWidth).toBeLessThan(slabWidth * 0.5);
-    expect(singer.height).toBeGreaterThan(slab.height);
-    // The slab shoulders are the widest thing on the Slabwright.
-    const shoulders = slab.pieces.filter((p) => p.joint === 'shoulder');
-    expect(shoulders.map((p) => p.node)).toEqual(['Kit_CutBlockB', 'Kit_CutBlockB']);
-    const reach = Math.max(...shoulders.map((p) => slab.slots.shoulder.x + p.at.x + p.size.x / 2));
-    expect(reach * 2).toBeCloseTo(slabWidth, 5);
     // The Singer's crystals glow: its shoulders, back, crown and heart.
     const crystals = singer.pieces.filter((p) => p.light === 'crystal').map((p) => p.id);
     for (const id of ['shoulderL', 'shoulderR', 'back', 'crown', 'heart'])
@@ -134,17 +119,15 @@ describe('council_bodies_core: the poses', () => {
   });
 
   it('maps each council cast to its motion', () => {
-    expect(councilCastAction('slabwright', 'heart_wake_the_stone')).toBe('raise');
-    expect(councilCastAction('slabwright', 'heart_falling_rock')).toBe('raise');
+    // The Singer took up the pillars and the rock: it raises and slams.
+    expect(councilCastAction('singer', 'heart_wake_the_stone')).toBe('raise');
+    expect(councilCastAction('singer', 'heart_falling_rock')).toBe('raise');
     expect(councilCastAction('singer', 'heart_song_of_the_seam')).toBe('sing');
-    expect(councilCastAction('singer', 'heart_song_of_the_seam_unbroken')).toBe('sing');
-    expect(councilCastAction('slabwright', 'heart_song_of_the_seam_unbroken')).toBe('sing');
     expect(councilCastAction('singer', 'heart_seam_bolt')).toBe('point');
     expect(councilCastAction('singer', 'heart_mountains_wrath')).toBe('wrath');
-    expect(councilCastAction('slabwright', 'heart_mountains_wrath')).toBe('wrath');
+    expect(councilCastAction('singer', 'heart_mountains_rush')).toBeNull();
     expect(councilCastAction('singer', null)).toBeNull();
-    expect(councilCastAction('singer', 'heart_wake_the_stone')).toBeNull();
-    expect(councilBodyKindOf('heart_slabwright')).toBe('slabwright');
+    expect(councilBodyKindOf('heart_slabwright')).toBeNull();
     expect(councilBodyKindOf('heart_seam_singer')).toBe('singer');
     expect(councilBodyKindOf('heart_hammer_guardian')).toBeNull();
   });
@@ -192,10 +175,11 @@ describe('CouncilBodies', () => {
     } as unknown as Entity;
   }
 
-  it('finds both bodies, poses them through their casts, never claims, falls, disposes', () => {
+  it('finds the bodies, poses them through their casts, never claims, falls, disposes', () => {
     const entities = new Map<number, Entity>();
     const me = { ...body(1, 'warrior', -10), kind: 'player' } as Entity;
-    const slab = body(2, 'heart_slabwright', 0);
+    // Two Singers (two rigs of the one kind): one raises, one sings.
+    const slab = body(2, 'heart_seam_singer', 0);
     const singer = body(3, 'heart_seam_singer', 6);
     for (const e of [me, slab, singer]) entities.set(e.id, e);
     const world = { entities, player: me, playerId: me.id } as unknown as IWorld;
@@ -219,7 +203,7 @@ describe('CouncilBodies', () => {
         .length ?? 0;
     expect(shown()).toBe(2);
     // Outside the raid nobody new is dressed (no walk of the open world).
-    const away = body(9, 'heart_slabwright', 30);
+    const away = body(9, 'heart_seam_singer', 30);
     entities.set(away.id, away);
     me.pos = { x: 0, y: 0, z: 0 };
     fx.update(0.2);
@@ -251,7 +235,7 @@ describe('CouncilBodies', () => {
     slab.castingAbility = null;
     fx.update(1 / 30);
     expect(shaken).toBeGreaterThan(0);
-    // The Singer dies: it stays drawn (as rubble) while its corpse lies.
+    // A Singer dies: it stays drawn (as rubble) while its corpse lies.
     singer.dead = true;
     for (let i = 0; i < 90; i++) fx.update(1 / 30);
     expect(shown()).toBe(2);

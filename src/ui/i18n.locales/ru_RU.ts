@@ -24714,14 +24714,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.heart_forge_pour': 'Литьё горна',
   'abilityUi.cast.heart_ember_bolt': 'Угольная стрела',
   // The Smith's Heart's Hammer Council (M16 fills).
-  'entities.mobs.heart_slabwright.name': 'Плитотёс',
   'entities.mobs.heart_seam_singer.name': 'Певец Жилы',
   'abilityUi.cast.heart_hammers_weight': 'Тяжесть Молота',
   'abilityUi.cast.heart_wake_the_stone': 'Пробуждение камня',
   'abilityUi.cast.heart_falling_rock': 'Камнепад',
   'abilityUi.cast.heart_seam_bolt': 'Стрела жилы',
   'abilityUi.cast.heart_song_of_the_seam': 'Песнь жилы',
-  'abilityUi.cast.heart_song_of_the_seam_unbroken': 'Песнь жилы',
   'hudChrome.council.warn.wrath': 'Гнев горы! Спрячьтесь за колонной!',
   'hudChrome.council.warn.enrage': 'Гнев горы нарастает! Теперь Гнев горы приходит гораздо чаще.',
   'hudChrome.council.warn.weight': 'Тяжесть Молота на {player}: смена танков!',
@@ -24730,13 +24728,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.council.warn.wakeHeir': 'Камень просыпается под {players}: двигайтесь!',
   'hudChrome.council.warn.rock': 'Камнепад на {player}! Разделите удар, подальше от укрытий!',
   'hudChrome.council.warn.song': 'Песнь жилы! Прервите её!',
-  'hudChrome.council.warn.resonance':
-    'Резонанс на {players}: раскалывайте самую повреждённую колонну, держитесь подальше от целых!',
-  'hudChrome.council.warn.fell_guardian':
-    'Страж Молота пал. Его гнев переходит в оставшийся камень!',
-  'hudChrome.council.warn.fell_slabwright': 'Плитотёс пал. Теперь камень поднимается где захочет!',
-  'hudChrome.council.warn.fell_singer':
-    'Певец Жилы пал. Его песнь продолжается, и теперь её не остановить!',
   'hudChrome.council.alert.wakeTitle': 'Пробуждение камня!',
   'hudChrome.council.alert.wakeLine':
     'Колонна поднимется там, где вы стоите: поставьте укрытие туда, где оно нужно рейду',
@@ -24744,10 +24735,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.council.alert.rockLine':
     'Соберите рядом с собой хотя бы трёх союзников, подальше от колонн',
   'hudChrome.council.alert.resonanceTitle': 'Резонанс',
-  'hudChrome.council.alert.resonanceLine':
-    'Рядом с колонной вы её раскалываете: ждите у самой повреждённой',
-  'hudChrome.council.alert.resonanceCracking':
-    'Вы раскалываете колонну: отойдите, чтобы её сберечь',
   'hudChrome.council.alert.weightTitle': 'Тяжесть Молота',
   'hudChrome.council.alert.weightLine':
     'Вы получаете двойной физический урон: другой танк должен забрать Стража',
@@ -24756,8 +24743,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Когда эффект закончится, из пола под вами вырвется колонна: от {min} до {max} урона всем в пределах {radius} м и отбрасывание. Встаньте там, где рейду нужно укрытие. Героический и мифический режимы: урон выше на {heroic}%.',
   'hudChrome.auraEffect.council.rockMark':
     'Когда эффект закончится, на вас упадёт камень: {total} урона делится между всеми в пределах {radius} м. Если под ним меньше {soakers}, каждый получает на {penalty}% больше, а весь рейд получает от {tremorMin} до {tremorMax}. Каждая колонна в пределах {radius} м теряет кусок, так что делите удар подальше от укрытий. Мифический режим: колонна души в пределах {soulReach} м вместо этого теряет метку души и рушится, когда их не останется. Героический и мифический режимы: урон выше на {heroic}%.',
-  'hudChrome.auraEffect.council.resonance':
-    'Если простоять в пределах {reach} м от колонны {seconds} с подряд, от неё откалывается кусок, и снова каждые {seconds} с, пока вы рядом. Снять нельзя: переждите Гнев горы у самой повреждённой колонны и держитесь подальше от целых. Мифический режим: у колонны души то же ожидание снимает с неё метку души ({singerSeconds} с у колонны Певца Жилы), и без меток она рушится.',
   'hudChrome.auraEffect.council.memory':
     'Наносит на {pct}% больше урона: по {per}% за каждого павшего члена Совета Молота.',
   // The Hammer Council's mythic, Soul in the Stone (M16 fills).
@@ -24765,22 +24750,15 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.heart_endless_song': 'Бесконечная песнь',
   'hudChrome.council.warn.soul_guardian':
     'Душа Стража вселяется в камень! Эхо гнева ударит из колонны.',
-  'hudChrome.council.warn.soul_slabwright':
-    'Душа Плитотёса вселяется в камень! Шагающая плита ползёт за вами.',
   'hudChrome.council.warn.soul_singer':
     'Душа Певца Жилы вселяется в камень! Бесконечная песнь крепнет с каждым ударом.',
   'hudChrome.council.warn.echo':
     'Эхо гнева! Встаньте так, чтобы между вами и колонной души была другая колонна!',
   'hudChrome.council.warn.soulBreak_guardian': 'Колонна души Стража рушится! Его эхо смолкает.',
-  'hudChrome.council.warn.soulBreak_slabwright':
-    'Колонна души Плитотёса рушится! Шагающая плита замирает.',
   'hudChrome.council.warn.soulBreak_singer':
     'Колонна души Певца Жилы рушится! Бесконечная песнь смолкает.',
   'hudChrome.council.alert.rockLineSoul':
     'Соберите рядом хотя бы трёх союзников, подальше от укрытий и у колонны души',
-  'hudChrome.council.alert.resonanceLineSoul':
-    'Ждите у колонны души, чтобы снять её метки, и не подходите к целым колоннам',
-  'hudChrome.council.alert.resonanceBreaking': 'Вы снимаете метку души: оставайтесь у колонны души',
   'hudChrome.council.say.guardian_pull':
     'Чужаки в Каменоломне. Сила Молота не склонится перед плотью.',
   'hudChrome.council.say.guardian_wrath': 'Гора отвечает мне! Прячьтесь, если камень вас примет!',
@@ -24790,15 +24768,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Теперь я камень. У моего гнева нет тела, что может пасть.',
   'hudChrome.council.say.guardian_wipe': 'Прах. Как и всякая плоть.',
   'hudChrome.council.say.guardian_defeat': 'Сила Молота... теперь ваша ноша.',
-  'hudChrome.council.say.slabwright_pull':
-    'Стене нужно больше камня. Не шевелитесь, я вложу вас в неё.',
-  'hudChrome.council.say.slabwright_wake': 'Стой там. Камень встанет там, где ты стоишь!',
-  'hudChrome.council.say.slabwright_rock': 'Гляньте вверх, мелюзга! Гора падает!',
-  'hudChrome.council.say.slabwright_death': 'Плита... раскалывается...',
-  'hudChrome.council.say.slabwright_remember': 'Камень помнит. Я закончу работу.',
-  'hudChrome.council.say.slabwright_soul': 'Рук больше нет, но я дотащу этот камень до вас.',
-  'hudChrome.council.say.slabwright_wipe': 'Уложено и засыпано. Хорошая работа.',
-  'hudChrome.council.say.slabwright_defeat': 'Каменоломня... затихает.',
   'hudChrome.council.say.singer_pull': 'Слышите, как поёт жила? Она так долго ждала ваших голосов.',
   'hudChrome.council.say.singer_song': 'Пойте со мной и разбейтесь!',
   'hudChrome.council.say.singer_death': 'Моя песнь... уходит в скалу...',

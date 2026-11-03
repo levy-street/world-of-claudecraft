@@ -677,7 +677,7 @@ try {
 
   // ---- the Hammer Council --------------------------------------------------------------
   await scene('consejo_cuerpo', async () => {
-    await faceBody('heart_slabwright', 290, 14, 0.06, 9);
+    await faceBody('heart_seam_singer', 290, 14, 0.06, 9);
     await sleep(3000);
   });
   await scene('consejo_mecanica', async () => {

@@ -22550,14 +22550,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.heart_forge_pour': '炉の注ぎ',
   'abilityUi.cast.heart_ember_bolt': '残り火の矢',
   // The Smith's Heart's Hammer Council (M16 fills).
-  'entities.mobs.heart_slabwright.name': '石板の匠',
   'entities.mobs.heart_seam_singer.name': '鉱脈の歌い手',
   'abilityUi.cast.heart_hammers_weight': '槌の重み',
   'abilityUi.cast.heart_wake_the_stone': '石の目覚め',
   'abilityUi.cast.heart_falling_rock': '落石',
   'abilityUi.cast.heart_seam_bolt': '鉱脈の矢',
   'abilityUi.cast.heart_song_of_the_seam': '鉱脈の歌',
-  'abilityUi.cast.heart_song_of_the_seam_unbroken': '鉱脈の歌',
   'hudChrome.council.warn.wrath': '山の怒り！柱の陰に隠れろ！',
   'hudChrome.council.warn.enrage': '山の怒りが速まった！山の怒りがずっと早く来る。',
   'hudChrome.council.warn.weight': '{player}に槌の重み：タンク交代！',
@@ -22566,21 +22564,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.council.warn.wakeHeir': '{players}の足元で石が目覚める：動け！',
   'hudChrome.council.warn.rock': '{player}に落石！遮蔽物から離れて一緒に受けろ！',
   'hudChrome.council.warn.song': '鉱脈の歌！詠唱を止めろ！',
-  'hudChrome.council.warn.resonance': '{players}に共鳴：一番傷んだ柱を割れ、無傷の柱には近づくな！',
-  'hudChrome.council.warn.fell_guardian': '槌の守護者が倒れた。その怒りは残された石へと移る！',
-  'hudChrome.council.warn.fell_slabwright':
-    '石板の匠が倒れた。これからは石が好きな場所にせり上がる！',
-  'hudChrome.council.warn.fell_singer':
-    '鉱脈の歌い手が倒れた。その歌は受け継がれ、もう誰にも止められない！',
   'hudChrome.council.alert.wakeTitle': '石の目覚め！',
   'hudChrome.council.alert.wakeLine':
     '立っている場所に柱がせり上がる：レイドが必要な場所に遮蔽物を置こう',
   'hudChrome.council.alert.rockTitle': '落石！',
   'hudChrome.council.alert.rockLine': '柱から離れ、少なくとも3人の味方を集めよう',
   'hudChrome.council.alert.resonanceTitle': '共鳴',
-  'hudChrome.council.alert.resonanceLine':
-    '柱の近くにいると割ってしまう：一番傷んだ柱のそばで待とう',
-  'hudChrome.council.alert.resonanceCracking': '柱を割っている：守るなら離れよう',
   'hudChrome.council.alert.weightTitle': '槌の重み',
   'hudChrome.council.alert.weightLine':
     '物理ダメージが倍になる：もう一人のタンクが守護者を引き受けよう',
@@ -22589,8 +22578,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '効果が切れると、立っている場所の床から柱が突き出し、{radius}ヤード以内の全員に{min}から{max}のダメージを与えて吹き飛ばす。レイドが遮蔽物を必要とする場所に立とう。ヒロイック・ミシック：ダメージ{heroic}%増加。',
   'hudChrome.auraEffect.council.rockMark':
     '効果が切れると岩が落ちてくる：{total}のダメージを{radius}ヤード以内の全員で分け合う。{soakers}人未満だと各自が{penalty}%多く受け、レイド全体が{tremorMin}から{tremorMax}を受ける。{radius}ヤード以内の柱はすべて欠けるので、遮蔽物から離れて受けよう。ミシック：{soulReach}ヤード以内の魂の柱は代わりに魂の印を一つ失い、印がなくなると砕ける。ヒロイック・ミシック：ダメージ{heroic}%増加。',
-  'hudChrome.auraEffect.council.resonance':
-    '柱から{reach}ヤード以内に{seconds}秒続けて立つと柱が一つ欠け、そこにいる限り{seconds}秒ごとにまた欠ける。解除はできない：一番傷んだ柱のそばで山の怒りをやり過ごし、無傷の柱には近づかないこと。ミシック：魂の柱のそばで同じだけ待つと代わりに魂の印が一つ消え（鉱脈の歌い手の柱なら{singerSeconds}秒）、印がなくなると砕ける。',
   'hudChrome.auraEffect.council.memory':
     '与えるダメージが{pct}%増加：槌の評議会の倒れた仲間1人につき{per}%。',
   // The Hammer Council's mythic, Soul in the Stone (M16 fills).
@@ -22598,19 +22585,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.heart_endless_song': '終わらぬ歌',
   'hudChrome.council.warn.soul_guardian':
     '守護者の魂が石に宿った！その柱から怒りの残響が放たれる。',
-  'hudChrome.council.warn.soul_slabwright':
-    '石板の匠の魂が石に宿った！歩む石板が君たちを追って這い寄る。',
   'hudChrome.council.warn.soul_singer':
     '鉱脈の歌い手の魂が石に宿った！終わらぬ歌は脈打つたびに強まる。',
   'hudChrome.council.warn.echo': '怒りの残響！魂の柱との間に別の柱を挟め！',
   'hudChrome.council.warn.soulBreak_guardian': '守護者の魂の柱が砕けた！残響が静まる。',
-  'hudChrome.council.warn.soulBreak_slabwright': '石板の匠の魂の柱が砕けた！歩む石板が止まる。',
   'hudChrome.council.warn.soulBreak_singer': '鉱脈の歌い手の魂の柱が砕けた！終わらぬ歌が途絶える。',
   'hudChrome.council.alert.rockLineSoul':
     '遮蔽物から離れ、魂の柱のそばで少なくとも3人の味方を集めよう',
-  'hudChrome.council.alert.resonanceLineSoul':
-    '魂の柱のそばで待って魂の印を砕こう、無傷の柱には近づかないこと',
-  'hudChrome.council.alert.resonanceBreaking': '魂の印を砕いている：魂の柱のそばにとどまろう',
   'hudChrome.council.say.guardian_pull': '採石場によそ者か。槌の力は肉などに屈しはせぬ。',
   'hudChrome.council.say.guardian_wrath': '山が我に応える！石が匿ってくれるなら隠れるがいい！',
   'hudChrome.council.say.guardian_death': '我が力を……石に託す。',
@@ -22618,16 +22599,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.council.say.guardian_soul': '我はもはや石そのもの。我が怒りには、朽ちる体などない。',
   'hudChrome.council.say.guardian_wipe': '塵だ。肉はすべてそうなる。',
   'hudChrome.council.say.guardian_defeat': '槌の力は……お前たちが担え。',
-  'hudChrome.council.say.slabwright_pull':
-    '壁に石が足りん。じっとしていろ、お前たちを積み込んでやる。',
-  'hudChrome.council.say.slabwright_wake': 'そこに立て。お前の足元から石がせり上がる！',
-  'hudChrome.council.say.slabwright_rock': '上を見ろ、ちびども！山が落ちてくるぞ！',
-  'hudChrome.council.say.slabwright_death': '石板が……割れる……',
-  'hudChrome.council.say.slabwright_remember': '石は覚えている。仕事は俺が仕上げる。',
-  'hudChrome.council.say.slabwright_soul':
-    '手はもうない。だがこの石をお前たちのもとへ引きずっていくぞ。',
-  'hudChrome.council.say.slabwright_wipe': '据えて、埋めた。いい仕事だ。',
-  'hudChrome.council.say.slabwright_defeat': '採石場が……静まる。',
   'hudChrome.council.say.singer_pull': '鉱脈の歌が聞こえる？ずっとあなたたちの声を待っていたの。',
   'hudChrome.council.say.singer_song': '一緒に歌って、そして砕けなさい！',
   'hudChrome.council.say.singer_death': '私の歌が……岩へと流れていく……',

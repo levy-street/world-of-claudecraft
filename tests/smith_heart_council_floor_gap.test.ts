@@ -1,15 +1,22 @@
 // The Hammer Council's floor gap (src/sim/encounters/smith_heart/
 // council_floor_gap.ts and council_floor.ts): the pure rule, then a REAL Sim
 // claim where two floor mechanics come due together and start a gap apart,
-// the delayed one's cadence kept, the dev triggers bypassing the gap, and the
-// same seed giving the same fight.
+// the delayed one's cadence kept, the dev triggers bypassing the gap, the
+// Wrath guard (normal: Wake the Stone and Mountain's Rush never run into a
+// Wrath; heroic: they may), and the same seed giving the same fight.
 
 import { describe, expect, it } from 'vitest';
 import {
   COUNCIL_CASTS,
   type CouncilFightState,
+  councilScopeForDev,
   COUNCIL_TUNING as T,
 } from '../src/sim/encounters/smith_heart';
+import {
+  clearOfWrath,
+  RUSH_FLOOR_SECONDS,
+  wakeSeconds,
+} from '../src/sim/encounters/smith_heart/council_floor';
 import {
   FLOOR_PRIORITY,
   type FloorCandidate,
@@ -28,7 +35,7 @@ const GAP = T.floorGap;
 describe('the floor gap rule (pure)', () => {
   it('is tuned at 4 s and lists the floor mechanics, the Wrath first', () => {
     expect(GAP).toBe(4);
-    expect(FLOOR_PRIORITY).toEqual(['wrath', 'echo', 'wake', 'rock', 'slab']);
+    expect(FLOOR_PRIORITY).toEqual(['wrath', 'echo', 'wake', 'rush', 'rock']);
   });
 
   it('opens with no floor start yet, and a gap after the last one', () => {
@@ -70,8 +77,8 @@ describe('the floor gap rule (pure)', () => {
   }
 
   it('spaces mechanics due together by a gap each, in the stable order, and every one fires', () => {
-    const log = drive({ rock: 1, wake: 1, wrath: 1, echo: 1, slab: 1 }, 30);
-    expect(log.map((l) => l.key)).toEqual(['wrath', 'echo', 'wake', 'rock', 'slab']);
+    const log = drive({ rock: 1, wake: 1, wrath: 1, echo: 1, rush: 1 }, 30);
+    expect(log.map((l) => l.key)).toEqual(['wrath', 'echo', 'wake', 'rush', 'rock']);
     for (let i = 1; i < log.length; i++) {
       expect(log[i].clock - log[i - 1].clock).toBeGreaterThanOrEqual(GAP - 1e-9);
       expect(log[i].clock - log[i - 1].clock).toBeLessThan(GAP + DT + 1e-9);
@@ -123,7 +130,7 @@ function quiet(st: CouncilFightState): void {
   st.songTimer = 999;
   st.songDue = null;
   st.pulseTimer = 999;
-  st.prisonTimer = 999;
+  st.rushTimer = 999;
   st.energy = 0;
 }
 
@@ -150,7 +157,7 @@ function untilBar(f: Fight, who: () => Entity | null, cast: string, maxTicks: nu
 describe('the floor gap over a real claim', () => {
   it('Wake the Stone and Falling Rock due on one tick start a gap apart, the wake first', () => {
     const f = pulled();
-    const slab = () => f.bodies().slabwright;
+    const slab = () => f.bodies().singer;
     f.st.wakeTimer = DT / 2;
     f.st.rockTimer = DT / 2;
     f.tick();
@@ -158,7 +165,7 @@ describe('the floor gap over a real claim', () => {
     expect(slab()?.castingAbility).toBe(COUNCIL_CASTS.wake);
     expect(f.st.lastFloorAt).toBeCloseTo(t0, 9);
     // Without the gap the rock would start after the wake's bar and its
-    // 1.2 s breath (2.4 s); the gap holds it to 4 s.
+    // 1.2 s breath (3.7 s); the gap holds it to 4 s.
     const t1 = untilBar(f, slab, COUNCIL_CASTS.rock, 200);
     expect(t1).not.toBeNull();
     expect((t1 as number) - t0).toBeGreaterThanOrEqual(GAP - 1e-6);
@@ -172,8 +179,8 @@ describe('the floor gap over a real claim', () => {
     f.tick();
     const t0 = f.st.clock;
     expect(f.bodies().guardian?.castingAbility).toBe(COUNCIL_CASTS.wrath);
-    expect(f.bodies().slabwright?.castingAbility).toBeNull();
-    const t1 = untilBar(f, () => f.bodies().slabwright, COUNCIL_CASTS.rock, 200);
+    expect(f.bodies().singer?.castingAbility).toBeNull();
+    const t1 = untilBar(f, () => f.bodies().singer, COUNCIL_CASTS.rock, 200);
     expect(t1).not.toBeNull();
     expect((t1 as number) - t0).toBeGreaterThanOrEqual(GAP - 1e-6);
     expect((t1 as number) - t0).toBeLessThan(GAP + 2 * DT);
@@ -181,7 +188,7 @@ describe('the floor gap over a real claim', () => {
 
   it("the delayed rock's next start stays on its own cadence (no drift)", () => {
     const f = pulled();
-    const slab = () => f.bodies().slabwright;
+    const slab = () => f.bodies().singer;
     f.st.wakeTimer = DT / 2;
     f.st.rockTimer = DT / 2;
     f.tick();
@@ -226,7 +233,7 @@ describe('the floor gap over a real claim', () => {
     f.st.rockTimer = DT / 2;
     f.tick();
     const t0 = f.st.clock;
-    expect(f.bodies().slabwright?.castingAbility).toBe(COUNCIL_CASTS.rock);
+    expect(f.bodies().singer?.castingAbility).toBe(COUNCIL_CASTS.rock);
     f.tick(10);
     // Half a second in: the gap is closed, the dev Wrath goes anyway.
     f.dev('/dev heart council wrath');
@@ -235,7 +242,7 @@ describe('the floor gap over a real claim', () => {
     const stamp = f.st.lastFloorAt as number;
     // And Wake the Stone (cutting the rock's bar) the same.
     f.dev('/dev heart council wake');
-    expect(f.bodies().slabwright?.castingAbility).toBe(COUNCIL_CASTS.wake);
+    expect(f.bodies().singer?.castingAbility).toBe(COUNCIL_CASTS.wake);
     expect(f.st.lastFloorAt).toBe(stamp);
   });
 
@@ -271,5 +278,79 @@ describe('the floor gap over a real claim', () => {
     for (let i = 1; i < a.starts.length; i++) {
       expect(a.starts[i] - a.starts[i - 1]).toBeGreaterThanOrEqual(GAP - 1e-3);
     }
+  });
+});
+
+describe('the Wrath guard: normal keeps the Wake and the Rush clear of a Wrath', () => {
+  /** Energy that puts the next Wrath bar `seconds` away on the Guardian's fill. */
+  const energyFor = (seconds: number) =>
+    T.energyMax - (seconds * T.energyMax) / T.energyFillSeconds;
+
+  it('normal: neither starts when its floor time would run into the Wrath bar, and both wait for it to land', () => {
+    const f = pulled();
+    const s = councilScopeForDev(f.sim.ctx, f.inst);
+    if (!s) throw new Error('scope');
+    // Plenty of time: both clear.
+    f.st.energy = energyFor(30);
+    expect(clearOfWrath(s, wakeSeconds(s))).toBe(true);
+    expect(clearOfWrath(s, RUSH_FLOOR_SECONDS)).toBe(true);
+    // The Wrath's bar 5 s away: the Wake (7.5 s of marks) is held, the Rush too.
+    f.st.energy = energyFor(5);
+    expect(clearOfWrath(s, wakeSeconds(s))).toBe(false);
+    expect(clearOfWrath(s, RUSH_FLOOR_SECONDS)).toBe(false);
+    // Over a real fight: due now, they wait for the Wrath to land.
+    f.st.wakeTimer = DT / 2;
+    f.st.rushTimer = DT / 2;
+    let wrathStart: number | null = null;
+    let wrathLand: number | null = null;
+    let wake: number | null = null;
+    let rush: number | null = null;
+    for (let i = 0; i < 20 * 25; i++) {
+      f.tick();
+      const g = f.bodies().guardian;
+      const c = f.bodies().singer;
+      if (wrathStart === null && g?.castingAbility === COUNCIL_CASTS.wrath) wrathStart = f.st.clock;
+      if (wrathLand === null && f.st.wraths > 0) wrathLand = f.st.clock;
+      if (wake === null && c?.castingAbility === COUNCIL_CASTS.wake) wake = f.st.clock;
+      if (rush === null && g?.castingAbility === COUNCIL_CASTS.rush) rush = f.st.clock;
+    }
+    expect(wrathStart).not.toBeNull();
+    expect(wrathLand).not.toBeNull();
+    expect(wake).not.toBeNull();
+    expect(rush).not.toBeNull();
+    expect(wake as number).toBeGreaterThanOrEqual(wrathLand as number);
+    expect(rush as number).toBeGreaterThanOrEqual(wrathLand as number);
+    // And the gap still holds between the two.
+    expect(Math.abs((rush as number) - (wake as number))).toBeGreaterThanOrEqual(GAP - 1e-6);
+  });
+
+  it('heroic: they may run into a Wrath', () => {
+    const f = pulled();
+    f.dev('/dev heart council heroic on');
+    const s = councilScopeForDev(f.sim.ctx, f.inst);
+    if (!s) throw new Error('scope');
+    f.st.energy = energyFor(3);
+    expect(clearOfWrath(s, wakeSeconds(s))).toBe(true);
+    expect(clearOfWrath(s, RUSH_FLOOR_SECONDS)).toBe(true);
+  });
+
+  it('a whole normal fight: no Wake mark and no Rush mark is up while a Wrath bar runs', () => {
+    const f = councilFight(8, 29);
+    f.dev('/dev heart council pull');
+    let overlaps = 0;
+    let wraths = 0;
+    for (let i = 0; i < 20 * 200; i++) {
+      f.tick();
+      const st = f.state();
+      if (!st) break;
+      const g = f.bodies().guardian;
+      if (g?.castingAbility !== COUNCIL_CASTS.wrath) continue;
+      wraths++;
+      if (st.wakeMarks.length > 0 || st.rush !== null) overlaps++;
+      if (f.players.some((p) => p.auras.some((a) => a.id === 'heart_mountains_rush_mark')))
+        overlaps++;
+    }
+    expect(wraths).toBeGreaterThan(0);
+    expect(overlaps).toBe(0);
   });
 });

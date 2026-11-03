@@ -29,9 +29,7 @@ export * from './council_ids';
 export { councilPillars, nearestRiseSpot, onQuarryFloor, pillarBetween } from './council_pillars';
 export {
   landEcho,
-  largestGroup,
   soulHost,
-  soulResonanceSeconds,
   strikeSoulPip,
   takeSoul,
 } from './council_soul';

@@ -4749,11 +4749,13 @@ export const zh_TW: EnTranslations = {
       "council": {
         "wakeMark": "結束時，一根石柱會從你腳下的地面衝出，對{radius}碼內的所有人造成{min}到{max}點傷害並將其擊退。站到團隊需要掩體的位置。英雄和傳奇難度：傷害提高{heroic}%。",
         "rockMark": "結束時，一塊巨石砸向你：{total}點傷害由{radius}碼內的所有人分擔。若不足{soakers}人分擔，每人多受{penalty}%傷害，且全團受到{tremorMin}到{tremorMax}點傷害。{radius}碼內的每根石柱都會損失一塊，所以要遠離掩體分擔。傳奇難度：{soulReach}碼內的靈魂石柱改為失去一個靈魂印記，印記耗盡時碎裂。英雄和傳奇難度：傷害提高{heroic}%。",
-        "resonance": "在石柱{reach}碼內連續站立{seconds}秒會震落它的一塊，之後每多待{seconds}秒再震落一塊。無法移除：在最破損的石柱旁躲過山岳之怒，遠離完好的石柱。傳奇難度：在靈魂石柱旁等待同樣的時間會改為擊碎它的一個靈魂印記（礦脈歌者的石柱為{singerSeconds}秒），印記耗盡時碎裂。",
+        "resonance": "Every {every} sec you ring, dealing {min} to {max} Nature damage to each ally within {radius} yd of you. Move away from everyone until it ends. Heroic and Mythic: {heroic}% more damage.",
+        "rushMark": "When this ends, the Guardian of the Hammer charges in a straight line at you and stops at the first pillar on its line. Lead it into the Cursed Pillar: the pillar shatters, the Guardian is stunned for {stun} sec and takes {exposed}% more damage for {exposedSeconds} sec. A sheltering pillar in the way is destroyed instead. With no pillar on the line, you and everyone in its path take {min} to {max} damage and are thrown back. Mythic: a charge that hits no pillar starts the Quarry collapsing until the Cursed Pillar breaks.",
+        "rushExposed": "Takes {pct}% more damage: Mountain's Rush shattered the Cursed Pillar.",
+        "bond": "Takes {pct}% less damage while the other member of the Hammer Council stands within {reach} yd. Every {every} sec the bond deals {min} to {max} damage to the whole raid, {growth}% more each time. Pull them apart.",
+        "collapse": "The Quarry is collapsing: every {every} sec you take {min} to {max} damage for each stack, and a stack is added each time. It ends when the Cursed Pillar breaks.",
         "memory": "造成的傷害提高{pct}%：重錘議會每倒下一名成員提高{per}%。",
-        "prisoned": "Shut in a block of stone: you cannot act. Your allies must break the block before this ends, or it crushes you.",
-        "pillarLimit": "Each pillar shields at most {limit} players from Mountain's Wrath. With more behind it, each of them takes {share}% of the blast.",
-        "shouldered": "Takes {pct}% less damage while another living member of the Hammer Council stands within {reach} yd. Pull the Slabwright away from them."
+        "pillarLimit": "Each pillar shields at most {limit} players from Mountain's Wrath. With more behind it, each of them takes {share}% of the blast."
       },
       "breathGuardian": {
         "portalA": "When this ends, Portal A opens exactly where you stand. Stand near the Knotted Gale. You cannot carry it this round.",
@@ -7294,45 +7296,44 @@ export const zh_TW: EnTranslations = {
     "council": {
       "warn": {
         "wrath": "山岳之怒！躲到石柱後面！",
-        "shoulder": "The Slabwright hardens beside its kin: pull it away!",
+        "columnsGone": "The carved columns are gone! From now on only the stone Wake the Stone raises can hide you.",
         "crowded": "Too many behind one pillar! It could not shield them all.",
-        "prison": "Stone Prison on {players}! Break them out!",
+        "rush": "Mountain's Rush on {player}! Lead the charge into the cursed pillar!",
+        "rushCursed": "The Guardian shatters the cursed pillar and reels! Strike now!",
+        "rushPillar": "The Rush broke a sheltering pillar! The cursed pillar still stands.",
+        "rushMiss": "Mountain's Rush tramples {players}!",
+        "collapse": "The Quarry begins to collapse! Lead the next Rush into the cursed pillar!",
+        "bond": "Bond of the Stone! Pull the Guardian and the Seam Singer apart!",
+        "wakeCast": "The Seam Singer wakes the stone! Let her finish: a kick raises no pillar.",
+        "wakeKicked": "Wake the Stone was interrupted! No stone rises from it.",
         "enrage": "山岳的怒火加速了！山岳之怒會來得更快。",
         "weight": "{player}受到重錘之壓：換坦克！",
         "wake": "喚醒岩石：石柱將在{players}腳下升起！站到需要掩體的地方。",
         "wakeHeir": "岩石在{players}腳下甦醒：快移動！",
         "rock": "落石砸向{player}！遠離掩體，一起分擔！",
         "song": "礦脈之歌！打斷它！",
-        "resonance": "{players}獲得共鳴：去震裂最破損的石柱，遠離完好的石柱！",
-        "fell_guardian": "重錘守護者倒下了。它的怒火傳入了剩下的岩石！",
-        "fell_slabwright": "石板匠倒下了。現在岩石會隨意升起！",
-        "fell_singer": "礦脈歌者倒下了。它的歌聲被傳承下去，再也無法打斷！",
+        "resonance": "Resonance on {players}: move away from everyone until it ends!",
+        "fell_guardian": "The Guardian of the Hammer falls. Its wrath passes to the Seam Singer!",
+        "fell_singer": "The Seam Singer falls. Now the Guardian raises the stone where it will!",
         "soul_guardian": "守護者之魂附入了岩石！怒火迴響將從那根石柱中爆發。",
-        "soul_slabwright": "石板匠之魂附入了岩石！行走石板正拖著身軀向你們逼近。",
         "soul_singer": "礦脈歌者之魂附入了岩石！無盡之歌每一次脈動都更加響亮。",
         "echo": "怒火迴響！讓另一根石柱擋在你和靈魂石柱之間！",
         "soulBreak_guardian": "守護者的靈魂石柱碎裂了！它的迴響歸於沉寂。",
-        "soulBreak_slabwright": "石板匠的靈魂石柱碎裂了！行走石板停了下來。",
         "soulBreak_singer": "礦脈歌者的靈魂石柱碎裂了！無盡之歌歸於沉寂。"
       },
       "say": {
         "guardian_pull": "採石場來了外人。鐵鎚之力絕不向血肉屈服。",
         "guardian_wrath": "群山回應了我！若岩石肯收留你們，就躲起來吧！",
+        "guardian_rush": "Stand in my path, then. The mountain does not turn aside.",
         "guardian_death": "我的力量……交給岩石。",
         "guardian_remember": "岩石銘記。它們的一切，如今歸我。",
         "guardian_soul": "如今我即是岩石。我的怒火再無會倒下的軀體。",
         "guardian_wipe": "塵土。一切血肉終歸如此。",
         "guardian_defeat": "鐵鎚之力……由你們來承擔。",
-        "slabwright_pull": "牆還缺石頭。別動，我把你們砌進去。",
-        "slabwright_wake": "站在那兒。岩石會從你腳下升起！",
-        "slabwright_rock": "抬頭看，小傢伙們！山要塌了！",
-        "slabwright_death": "石板……裂開了……",
-        "slabwright_remember": "岩石銘記。這活兒我來幹完。",
-        "slabwright_soul": "我已沒有雙手，但我會把這塊石頭拖到你們面前。",
-        "slabwright_wipe": "砌好，埋好。幹得漂亮。",
-        "slabwright_defeat": "採石場……安靜了。",
         "singer_pull": "聽見礦脈在歌唱嗎？它等你們的聲音等了好久。",
         "singer_song": "與我同唱，然後碎裂吧！",
+        "singer_wake": "Wake, sleeping stone. Rise where they stand!",
+        "singer_rock": "Look up, little ones! The mountain is falling!",
         "singer_death": "我的歌……流入了岩石……",
         "singer_remember": "岩石銘記。聽，它仍在歌唱。",
         "singer_soul": "聽啊。在岩石之中，我的歌永不終結。",
@@ -7345,11 +7346,10 @@ export const zh_TW: EnTranslations = {
         "rockTitle": "落石！",
         "rockLine": "遠離石柱，讓至少三名隊友站到你身邊",
         "resonanceTitle": "共鳴",
-        "resonanceLine": "靠近石柱就會震裂它：在最破損的石柱旁等待",
-        "resonanceCracking": "正在震裂石柱：離開它以保住它",
+        "resonanceLine": "You hurt every ally near you: move away from the group until it ends",
+        "rushTitle": "Mountain's Rush!",
+        "rushLine": "The Guardian charges you: put the cursed pillar between you and him",
         "rockLineSoul": "遠離掩體，在靈魂石柱旁聚集至少三名隊友",
-        "resonanceLineSoul": "在靈魂石柱旁等待以擊碎靈魂印記，不要靠近完好的石柱",
-        "resonanceBreaking": "正在擊碎靈魂印記：留在靈魂石柱旁",
         "weightTitle": "重錘之壓",
         "weightLine": "你受到雙倍物理傷害：另一名坦克必須接手守護者",
         "timeAria": "剩餘{seconds}秒"
@@ -16959,12 +16959,11 @@ export const zh_TW: EnTranslations = {
       "heart_rime_bolt": "Rime Bolt",
       "heart_ember_bolt": "餘燼箭",
       "heart_hammers_weight": "重錘之壓",
+      "heart_mountains_rush": "Mountain's Rush",
       "heart_wake_the_stone": "喚醒岩石",
       "heart_falling_rock": "落石",
-      "heart_stone_prison": "Stone Prison",
       "heart_seam_bolt": "礦脈箭",
       "heart_song_of_the_seam": "礦脈之歌",
-      "heart_song_of_the_seam_unbroken": "礦脈之歌",
       "heart_echo_of_wrath": "怒火迴響",
       "heart_endless_song": "無盡之歌",
       "heart_breath_inhale": "深吸之息",
@@ -26935,9 +26934,6 @@ export const zh_TW: EnTranslations = {
       "heart_hammer_guardian": {
         "name": "重錘守護者"
       },
-      "heart_slabwright": {
-        "name": "石板匠"
-      },
       "heart_seam_singer": {
         "name": "礦脈歌者"
       },
@@ -26964,9 +26960,6 @@ export const zh_TW: EnTranslations = {
       },
       "heart_heat_rolling_cinder": {
         "name": "滾動餘燼"
-      },
-      "heart_stone_prison": {
-        "name": "Stone Prison"
       },
       "heart_final_splinter_heat": {
         "name": "熾熱碎片"

@@ -2,15 +2,13 @@
 // smith_heart.md 5.18 and 7.1, Mythic), a part of CouncilFx (council_fx.ts,
 // which owns the root, the particles, the debris and the floor telegraph and
 // hands them in as the host). The soul pillar itself (its lit cracks, its
-// sheath of light, its soul pips, the Walking Slab's drag) is the pillars'
+// sheath of light, its soul pips) is the pillars'
 // part (council_pillars_fx.ts); this part draws what each soul DOES:
 //  - the Guardian's Echo of Wrath: while the pillar's own bar runs, a lethal
 //    ring out to the Echo's reach filling with it and a dark shelter wedge
 //    behind every other pillar (the only cover: a soul pillar casts none),
 //    the pillar drawing embers in; on landing, rings racing out, dust, a
 //    flash and a shake;
-//  - the Slabwright's Walking Slab: its two footprints riding with it, the
-//    crush (lethal) and the grind (danger); a crush's impact on its player;
 //  - the Seam Singer's Endless Song: a ring on the floor round the pillar
 //    that widens and brightens with every pulse sung, a clock ring closing
 //    on the pillar until the next one, and the pulse's sound rings racing out
@@ -25,8 +23,6 @@ import {
   COUNCIL_AURAS,
   COUNCIL_CASTS,
   type CouncilRole,
-  councilPillarRadius,
-  COUNCIL_TUNING as T,
 } from '../../sim/encounters/smith_heart/council_ids';
 import type { Entity } from '../../sim/types';
 import type { TelegraphFan } from '../floor_telegraph';
@@ -42,8 +38,6 @@ import {
 } from './council_fx_core';
 import type { CouncilFxHost, CouncilPillarsFx } from './council_pillars_fx';
 import type { CouncilShelters } from './council_shelter_fx';
-import type { CouncilTelegraphKind } from './painted_telegraph_core';
-import type { PaintedFan } from './painted_telegraphs';
 
 const RING_VERT = /* glsl */ `
 varying vec2 vXZ;
@@ -73,12 +67,8 @@ interface SoulSlot {
   pillarId: number;
   role: CouncilRole | null;
   seen: boolean;
-  /** The Echo's ring (guardian) or the grind's (slabwright). */
+  /** The Echo's ring (guardian). */
   outer: TelegraphFan;
-  /** The outer ring's stone paint (the Echo's, or the slab's grind). */
-  outerPaint: PaintedFan<CouncilTelegraphKind>;
-  /** The crush's ring (slabwright). */
-  inner: TelegraphFan;
   /** The song's ring on the floor and its clock (singer). */
   floor: THREE.Mesh;
   floorMat: THREE.ShaderMaterial;
@@ -86,9 +76,6 @@ interface SoulSlot {
   clockMat: THREE.ShaderMaterial;
   /** The Echo's bar this slot last laid out (its start, the host clock). */
   echoAt: number;
-  /** Where the slab's fans were last draped (NaN: not yet). */
-  drapedX: number;
-  drapedZ: number;
   embers: number;
 }
 
@@ -176,11 +163,8 @@ export class CouncilSoulFx {
     };
     for (let i = 0; i < POOLS.souls; i++) {
       const outer = this.h.kit.fan(16);
-      const inner = this.h.kit.fan(18);
       outer.group.visible = false;
-      inner.group.visible = false;
-      const outerPaint = this.h.paints.dress(outer, 'echo');
-      this.h.paints.dress(inner, 'slabCrush');
+      this.h.paints.dress(outer, 'echo');
       const floorMat = ringMat('smithHeartSongFloor', 18, 0.04);
       const floor = new THREE.Mesh(ringGeo, floorMat);
       floor.name = 'smithHeartSongFloor';
@@ -200,15 +184,11 @@ export class CouncilSoulFx {
         role: null,
         seen: false,
         outer,
-        outerPaint,
-        inner,
         floor,
         floorMat,
         clock,
         clockMat,
         echoAt: -99,
-        drapedX: Number.NaN,
-        drapedZ: Number.NaN,
         embers: 0,
       });
     }
@@ -227,21 +207,7 @@ export class CouncilSoulFx {
       s.pillarId = e.id;
       s.role = role;
       s.echoAt = -99;
-      s.drapedX = Number.NaN;
-      s.drapedZ = Number.NaN;
-      this.h.paints.setLook(s.outerPaint, role === 'slabwright' ? 'slabGrind' : 'echo');
-      if (role === 'slabwright') {
-        this.h.kit.layOutFan(s.outer, 360, {
-          color: TELEGRAPH_THREAT_COLORS.danger,
-          accent: SOUL_COLORS.slabwright.hex,
-        });
-        this.h.kit.layOutFan(s.inner, 360, {
-          color: TELEGRAPH_THREAT_COLORS.lethal,
-          accent: SOUL_COLORS.slabwright.hex,
-        });
-        s.outer.group.visible = true;
-        s.inner.group.visible = true;
-      } else if (role === 'guardian') {
+      if (role === 'guardian') {
         this.h.kit.layOutFan(s.outer, 360, { color: ECHO_SPEC.color, accent: ECHO_SPEC.accent });
       } else {
         (s.floorMat.uniforms.uColor.value as THREE.Color).setHex(SOUL_COLORS.singer.hex);
@@ -262,7 +228,6 @@ export class CouncilSoulFx {
     s.pillarId = -1;
     s.role = null;
     s.outer.group.visible = false;
-    s.inner.group.visible = false;
     s.floor.visible = false;
     s.clock.visible = false;
   }
@@ -285,7 +250,6 @@ export class CouncilSoulFx {
       const at = this.pillars.standing(s.pillarId);
       if (!e || !at) continue;
       if (s.role === 'guardian') this.updateEcho(s, e, at, clock, dt);
-      else if (s.role === 'slabwright') this.updateSlab(s, e, at, clock);
       else this.updateSong(s, e, at, clock);
     }
   }
@@ -343,33 +307,6 @@ export class CouncilSoulFx {
         );
       }
     }
-  }
-
-  private updateSlab(
-    s: SoulSlot,
-    e: Entity,
-    at: { x: number; y: number; z: number; radius: number },
-    clock: number,
-  ): void {
-    // The sim's own footprint (its wall's radius), never the model's: a
-    // walking soul pillar's template ends in its pips, its kind before them.
-    const r = councilPillarRadius(e.templateId.charAt(e.templateId.length - 3) !== 'c');
-    const grind = r + T.slabGrindReach;
-    const crush = r + T.slabCrushReach;
-    // Re-drape once it has walked a stride; between, the fans ride along.
-    if (!(Math.abs(at.x - s.drapedX) <= 0.6 && Math.abs(at.z - s.drapedZ) <= 0.6)) {
-      this.h.kit.drapeFan(s.outer, this.h.groundY, at.x, at.y, at.z, 0, grind);
-      this.h.kit.drapeFan(s.inner, this.h.groundY, at.x, at.y, at.z, 0, crush);
-      s.drapedX = at.x;
-      s.drapedZ = at.z;
-    } else {
-      s.outer.group.position.x = at.x;
-      s.outer.group.position.z = at.z;
-      s.inner.group.position.x = at.x;
-      s.inner.group.position.z = at.z;
-    }
-    this.h.kit.paintFan(s.outer, paint(1, clock, grind, 0.8));
-    this.h.kit.paintFan(s.inner, paint(1, clock, crush));
   }
 
   private updateSong(
@@ -459,37 +396,5 @@ export class CouncilSoulFx {
       radius: at.radius,
     });
     this.h.shakeNear(at.x, at.z, 0.08 + 0.12 * look.bright, 50);
-  }
-
-  /** `heart_walking_slab_crush`: the slab runs a player down. */
-  slabCrush(targetId: number): void {
-    const p = this.h.entity(targetId);
-    if (!p) return;
-    const y = this.h.groundY(p.pos.x, p.pos.z);
-    const n = Math.round(30 * this.h.density);
-    for (let i = 0; i < n; i++) {
-      const a = this.h.rand() * Math.PI * 2;
-      const sp = 3 + this.h.rand() * 7;
-      this.h.debris.throw(
-        p.pos.x,
-        y + 0.8,
-        p.pos.z,
-        Math.sin(a) * sp,
-        3 + this.h.rand() * 5,
-        Math.cos(a) * sp,
-        0.2 + this.h.rand() * 0.5,
-      );
-    }
-    this.h.particles.shockRing(p.pos.x, p.pos.z, TELEGRAPH_THREAT_COLORS.lethal, 3.5, 0.35);
-    this.h.particles.puff(p.pos.x, y + 0.8, p.pos.z, 14, {
-      speed: 4,
-      up: 1,
-      life: 1.4,
-      size: [1.5, 4],
-      color: C.dust,
-      alpha: 0.5,
-    });
-    // A heavy stone running a player down: the ground itself jolts.
-    this.h.shakeNear(p.pos.x, p.pos.z, 0.75, 30);
   }
 }

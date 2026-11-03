@@ -36,19 +36,19 @@
 //                                    sim/dev/smith_heart_final_dev.ts
 //   /dev heart reset                 free the run and claim a fresh one
 //   /dev heart council               the Hammer Council's readout
-//   /dev heart council <what>        pull (all three onto you), reset (whole
+//   /dev heart council <what>        pull (both onto you), reset (whole
 //                                    again, the five columns too), heroic
 //                                    [on|off] or mythic [on|off] (this run's
 //                                    council; one tier at a time), energy <n>,
-//                                    wrath, weight, wake, rock, bolt, song,
-//                                    resonance [n] (force one mechanic now),
-//                                    soul guardian|slabwright|singer (that
+//                                    wrath, weight, rush, wake, rock, bolt,
+//                                    song, resonance [n] (force one mechanic
+//                                    now), soul guardian|singer (that
 //                                    member's soul takes a pillar now),
 //                                    soulpip <n> (leave every soul pillar at
 //                                    n pips; 0 bursts them)
-//   /dev heart kill guardian|slabwright|singer|council
-//                                    one council member (to test each order of
-//                                    the inheritance) or all three (= hammer)
+//   /dev heart kill guardian|singer|council
+//                                    one council member (to test each kill
+//                                    order) or both (= hammer)
 //   /dev heart breath                the Guardian of the Breath's readout
 //   /dev heart breath <what>         pull (onto the Cornice and pull it),
 //                                    reset (whole again, the wind still),
@@ -165,7 +165,6 @@ export const SMITH_HEART_DEV_AREAS: Readonly<Record<string, { x: number; z: numb
 const BOSS_ALIASES: Readonly<Record<string, string>> = {
   ...SMITH_HEART_GUARDIANS,
   guardian: SMITH_HEART_GUARDIANS.hammer,
-  slabwright: 'heart_slabwright',
   singer: 'heart_seam_singer',
   final: SMITH_HEART_FINAL_BOSS,
 };
@@ -178,7 +177,7 @@ const GUARDIAN_IDS: ReadonlySet<string> = new Set([
 const COUNCIL_IDS: ReadonlySet<string> = new Set(COUNCIL_TEMPLATE_IDS);
 
 const HELP =
-  '[dev] /dev heart enter [normal] | tp <cleft|gallery|pit|hammer|balcony|ring|ringse|ringsw|breath|bridge|cornice|breathboss|quench|ice|lake|quenchboss|heat|forge|anvil|heatboss|heart|portal|heartroom|final> | kill <hammer|guardian|slabwright|singer|council|breath|quench|heat|final|guardians|pack <id>|trash|all> | gates | portal | seal | arrival | final [pull|reset|normal|heroic|mythic|quarter <breath|quench|hammer|heat|ring>|fill [vein|all] [pct]|burst|shock|root|unroot|fist|whirl|embers|freeze|cold <n>|ice|wind [deg]|bolt|drawn|orbs|tremor|anvil|shell] | reset | council [pull|reset|heroic [on|off]|mythic [on|off]|energy <n>|wrath|weight|wake|rock|bolt|song|resonance [n]|soul <guardian|slabwright|singer>|soulpip <n>] | breath [pull|reset|heroic [on|off]|mythic [on|off]|phase2|blow [deg|n|e|s|w]|calm|circle|inhale|chain|eye|conductor|tornado|gust [deg]|heart [2|portal a|b|c|d|carry|burst]] | quench [pull|reset|heroic [on|off]|mythic [on|off]|phase2|blades|cold <n>|burst|hole|crack|breath|echo [strike]|dance] | heat [pull|reset|heroic [on|off]|mythic [on|off]|phase <1-3>|intermission|fist|flare|seeds|zones|ember]';
+  '[dev] /dev heart enter [normal] | tp <cleft|gallery|pit|hammer|balcony|ring|ringse|ringsw|breath|bridge|cornice|breathboss|quench|ice|lake|quenchboss|heat|forge|anvil|heatboss|heart|portal|heartroom|final> | kill <hammer|guardian|singer|council|breath|quench|heat|final|guardians|pack <id>|trash|all> | gates | portal | seal | arrival | final [pull|reset|normal|heroic|mythic|quarter <breath|quench|hammer|heat|ring>|fill [vein|all] [pct]|burst|shock|root|unroot|fist|whirl|embers|freeze|cold <n>|ice|wind [deg]|bolt|drawn|orbs|tremor|anvil|shell] | reset | council [pull|reset|heroic [on|off]|mythic [on|off]|energy <n>|wrath|weight|rush|wake|rock|bolt|song|resonance [n]|soul <guardian|singer>|soulpip <n>] | breath [pull|reset|heroic [on|off]|mythic [on|off]|phase2|blow [deg|n|e|s|w]|calm|circle|inhale|chain|eye|conductor|tornado|gust [deg]|heart [2|portal a|b|c|d|carry|burst]] | quench [pull|reset|heroic [on|off]|mythic [on|off]|phase2|blades|cold <n>|burst|hole|crack|breath|echo [strike]|dance] | heat [pull|reset|heroic [on|off]|mythic [on|off]|phase <1-3>|intermission|fist|flare|seeds|zones|ember]';
 
 /** Where `/dev heart breath pull` sets the player down: on the Cornice, a
  *  few strides west of the guardian. */
@@ -229,7 +228,7 @@ export function killSmithHeartMatching(
   let what = named;
   const packArg = /^pack\s+(\S+)$/.exec(what);
   const packId = packArg ? packArg[1] : null;
-  // The Hammer's vein is its whole fight: `hammer` kills the three.
+  // The Hammer's vein is its whole fight: `hammer` kills both.
   if (what === 'hammer') what = 'council';
   const boss = BOSS_ALIASES[what];
   const spawns = DUNGEONS[SMITH_HEART_DUNGEON].spawns;
@@ -379,7 +378,7 @@ export function handleSmithHeartDevChat(ctx: SimContext, raw: string, pid: numbe
       const bodies = councilBodies(ctx, inst);
       if (!me || !bodies) return 0;
       let n = 0;
-      for (const b of [bodies.guardian, bodies.slabwright, bodies.singer]) {
+      for (const b of [bodies.guardian, bodies.singer]) {
         if (b && !b.dead && ctx.aggroMob(b, me, false)) n++;
       }
       return n;

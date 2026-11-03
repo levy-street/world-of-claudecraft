@@ -83,8 +83,8 @@ export const COMBAT_WALL_SHAPES: Readonly<Record<string, CombatWallShape>> = {
   // its Ice Block Toss landed (gravewyrm_sanctum.ts).
   sanctum_ice_slab: { hw: 2.1, hd: 1.6, height: 3.4 },
   // The Smith's Heart's Hammer Council pillars (encounters/smith_heart/
-  // council_pillars.ts): the quarry's carved columns and the pillars the
-  // Slabwright raises, one template per integrity left (3 whole, 2 cracked,
+  // council_pillars.ts): the quarry's carved columns and the pillars Wake
+  // the Stone raises, one template per integrity left (3 whole, 2 cracked,
   // 1 about to fall). Sizes match content/smith_heart_layout.ts
   // QUARRY_PILLAR_R and QUARRY_PILLAR_H (pinned by the council tests).
   sh_council_pillar_3: { hw: 2.6, hd: 2.6, height: 13, round: true, ownLook: true },
@@ -93,6 +93,9 @@ export const COMBAT_WALL_SHAPES: Readonly<Record<string, CombatWallShape>> = {
   sh_council_risen_3: { hw: 2.2, hd: 2.2, height: 10, round: true, ownLook: true },
   sh_council_risen_2: { hw: 2.2, hd: 2.2, height: 10, round: true, ownLook: true },
   sh_council_risen_1: { hw: 2.2, hd: 2.2, height: 10, round: true, ownLook: true },
+  // The cursed pillar the Guardian raises with each Mountain's Rush
+  // (council_rush.ts): a risen pillar's size (COUNCIL_TUNING.cursedR).
+  sh_council_cursed: { hw: 2.2, hd: 2.2, height: 10, round: true, ownLook: true },
   // Mythic: a pillar holding a fallen member's soul (encounters/smith_heart/
   // council_soul.ts, council_ids.ts councilSoulTemplate), by soul, kind (c a
   // carved column, r a risen pillar) and pips left; the column's or the
@@ -114,16 +117,13 @@ export const COMBAT_WALL_SHAPES: Readonly<Record<string, CombatWallShape>> = {
 /** The soul pillars' rows: `sh_council_soul_<role>_<c|r>_<pips>`. */
 function soulPillarShapes(): Record<string, CombatWallShape> {
   const out: Record<string, CombatWallShape> = {};
-  for (const role of ['guardian', 'slabwright', 'singer'])
+  for (const role of ['guardian', 'singer'])
     for (const kind of ['c', 'r'])
       for (const pips of [1, 2, 3])
-        out[`sh_council_soul_${role}_${kind}_${pips}`] = {
-          ...(kind === 'c'
+        out[`sh_council_soul_${role}_${kind}_${pips}`] =
+          kind === 'c'
             ? { hw: 2.6, hd: 2.6, height: 13, round: true, ownLook: true }
-            : { hw: 2.2, hd: 2.2, height: 10, round: true, ownLook: true }),
-          // The Slabwright's soul walks (council_soul.ts stepSlab).
-          ...(role === 'slabwright' ? { anchorStep: 0.5 } : {}),
-        };
+            : { hw: 2.2, hd: 2.2, height: 10, round: true, ownLook: true };
   return out;
 }
 

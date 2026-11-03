@@ -226,8 +226,8 @@ describe('interior collider cell index', () => {
   });
 
   it('a slot whose walls move re-files only the walls, exactly as a full rebuild would', () => {
-    // The Smith's Heart's Quarry with the mythic Walking Slab dragging past
-    // two standing pillars: the walled list is the base plus its walls
+    // The Smith's Heart's Quarry with a soul pillar shifting past two
+    // standing pillars: the walled list is the base plus its walls
     // (instances/combat_wall_state.ts), indexed as the base's cells with the
     // walls filed over them, never a rebuild of the field.
     const id = 'smith_heart';
@@ -251,7 +251,7 @@ describe('interior collider cell index', () => {
         setCombatWalls(o.x, o.z, [
           wall(1, 'sh_council_pillar_3', 14, -182),
           wall(2, 'sh_council_risen_1', 0, -166),
-          wall(3, 'sh_council_soul_slabwright_c_3', sx, -172),
+          wall(3, 'sh_council_soul_guardian_c_3', sx, -172),
           wall(4, 'sanctum_ice_slab', -2, -190),
         ]);
         const walled = interiorCollidersFor(id, interior, o.x, o.z);

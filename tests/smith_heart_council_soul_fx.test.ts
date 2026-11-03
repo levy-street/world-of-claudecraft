@@ -1,10 +1,9 @@
 // Soul in the Stone's look (src/render/smith_heart_fx/council_soul_fx.ts, the
 // soul pillar in council_pillars_fx.ts, the plan in council_fx_core.ts): the
 // souls' colours told apart, a soul pillar's lit cracks, the Echo's shelter
-// wedges never wider than the sim's cover, the slab's footprints off the
-// sim's own reach, the song's look growing and capping with the sim's
-// multiplier, and a smoke run over a fake world (every soul cue claimed, each
-// soul pillar drawn with its sheath and pips, the moving slab followed).
+// wedges never wider than the sim's cover, the song's look growing and
+// capping with the sim's multiplier, and a smoke run over a fake world (every
+// soul cue claimed, each soul pillar drawn with its sheath and pips).
 
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
@@ -17,13 +16,8 @@ import {
   ROCK_FALL_SECONDS,
   rockFall,
   SHELTER_PAD,
-  SLAB_BITE_PHASE,
-  SLAB_CLAWS,
   SOUL_COLORS,
   shadowPoint,
-  slabPull,
-  slabReach,
-  slabTalon,
   soakCountdown,
   songLook,
   songPulsesOf,
@@ -45,7 +39,7 @@ import type { IWorld } from '../src/world_api';
 describe('council_fx_core: Soul in the Stone', () => {
   it("gives each soul its own hue, none of them a mark's", () => {
     const hexes = Object.values(SOUL_COLORS).map((c) => c.hex);
-    expect(new Set(hexes).size).toBe(3);
+    expect(new Set(hexes).size).toBe(2);
     for (const h of hexes) {
       expect(h).not.toBe(TELEGRAPH_THREAT_COLORS.control);
       expect(h).not.toBe(0xffc94a);
@@ -62,28 +56,6 @@ describe('council_fx_core: Soul in the Stone', () => {
     expect(charged.heat).toBeGreaterThan(whole.heat);
     const out = { crack: 0, heat: 0, glow: 0 };
     expect(soulPillarLook(2, 1, 0.5, out)).toBe(out);
-  });
-
-  it('the Walking Slab reaches, bites and hauls; still, it rests', () => {
-    expect(SLAB_CLAWS.filter((c) => c.ahead).length).toBe(2);
-    const at = (p: number, d = 1) => ({ ...slabPull(p, d) });
-    // The front claws reach up and out, then dig in once they have bitten.
-    expect(at(0.3).front).toBeGreaterThan(0.2);
-    expect(at(SLAB_BITE_PHASE + 0.05).front).toBeLessThan(0);
-    // The haul: the column surges ahead and rocks forward mid-pull.
-    expect(at(0.75).lurch).toBeGreaterThan(at(0.2).lurch);
-    expect(at(0.75).rock).toBeGreaterThan(0);
-    // One pull is a cycle.
-    expect(at(1.3).front).toBeCloseTo(at(0.3).front);
-    for (const p of [0, 0.3, 0.6, 0.9]) {
-      const still = at(p, 0);
-      expect(
-        Math.abs(still.front) + Math.abs(still.rear) + Math.abs(still.rock) + Math.abs(still.lurch),
-      ).toBe(0);
-    }
-    const t = slabTalon(10, 20, 0, 0, 1);
-    expect(t.x).toBeCloseTo(10);
-    expect(t.z).toBeGreaterThan(25);
   });
 
   it('the soak counts down and its rock hangs over it for the whole mark', () => {
@@ -145,11 +117,7 @@ describe('council_fx_core: Soul in the Stone', () => {
     expect(coverShadow(0, 0, 0, 1, R, T.echoRadius, sh)).toBeNull();
   });
 
-  it("reads the slab's footprints and the song's growth off the sim", () => {
-    expect(slabReach(T.risenR)).toEqual({
-      crush: T.risenR + T.slabCrushReach,
-      grind: T.risenR + T.slabGrindReach,
-    });
+  it("reads the song's growth off the sim", () => {
     expect(songLook(0).mult).toBe(1);
     expect(songLook(0).rings).toBe(1);
     expect(songLook(500).mult).toBe(endlessSongMult(500));
@@ -167,7 +135,6 @@ describe('council_fx_core: Soul in the Stone', () => {
       COUNCIL_CUES.soulBurst,
       COUNCIL_CUES.echoBlast,
       COUNCIL_CUES.songPulse,
-      COUNCIL_CUES.slabCrush,
     ])
       expect(councilClaims(id), id).toBe(true);
   });
@@ -199,16 +166,15 @@ describe('CouncilFx: soul pillars over a fake world', () => {
     } as unknown as Entity;
   }
 
-  it('draws each soul, follows the slab, claims and plays every soul moment', () => {
+  it('draws each soul, claims and plays every soul moment', () => {
     const entities = new Map<number, Entity>();
     const me = entity(1, 'player', 'warrior', 8, -160);
     const dead = entity(5, 'mob', 'heart_hammer_guardian', 6, -168);
     dead.dead = true;
     const echo = entity(10, 'object', councilSoulTemplate('guardian', false, 3), 16, -147);
-    const slab = entity(11, 'object', councilSoulTemplate('slabwright', true, 2), -6, -170);
     const song = entity(12, 'object', councilSoulTemplate('singer', false, 1), -12, -183);
     const plain = entity(13, 'object', 'sh_council_pillar_2', -11, -155);
-    for (const e of [me, dead, echo, slab, song, plain]) entities.set(e.id, e);
+    for (const e of [me, dead, echo, song, plain]) entities.set(e.id, e);
     echo.castingAbility = COUNCIL_CASTS.echo;
     echo.castTotal = T.echoCast;
     echo.castRemaining = 1.5;
@@ -247,30 +213,13 @@ describe('CouncilFx: soul pillars over a fake world', () => {
       });
       return n;
     };
-    expect(shown('smithHeartCouncilPillar')).toBe(4);
-    expect(shown('smithHeartPillarPips')).toBe(4);
-    expect(shown('smithHeartSoulGlow')).toBe(3);
+    expect(shown('smithHeartCouncilPillar')).toBe(3);
+    expect(shown('smithHeartPillarPips')).toBe(3);
+    expect(shown('smithHeartSoulGlow')).toBe(2);
     expect(shown('smithHeartSongFloor')).toBe(1);
     expect(shown('smithHeartSongClock')).toBe(1);
     // The Echo's real shadow behind the one soulless pillar in its reach.
     expect(shown('smithHeartShelter:echo')).toBe(1);
-    // The slab walks: its drawn stone follows it.
-    const holderAt = () => {
-      let x = Number.NaN;
-      root?.traverse((c) => {
-        if (
-          c.name === 'smithHeartCouncilPillar' &&
-          c.visible &&
-          Math.abs(c.position.z - slab.pos.z) < 6
-        )
-          if (Math.abs(c.position.x - (o.x - 6)) < 6) x = c.position.x;
-      });
-      return x;
-    };
-    const x0 = holderAt();
-    slab.pos.x += 2;
-    for (let i = 0; i < 30; i++) fx.update(1 / 30);
-    expect(holderAt() - x0).toBeGreaterThan(1.5);
     const ev = (ability: string, sourceId: number, targetId = sourceId): SimEvent =>
       ({
         type: 'spellfx',
@@ -281,10 +230,9 @@ describe('CouncilFx: soul pillars over a fake world', () => {
         ability,
       }) as SimEvent;
     expect(fx.handleEvent(ev(COUNCIL_CUES.soulTake, dead.id, echo.id))).toBe(true);
-    expect(fx.handleEvent(ev(COUNCIL_CUES.soulPip, slab.id))).toBe(true);
+    expect(fx.handleEvent(ev(COUNCIL_CUES.soulPip, echo.id))).toBe(true);
     expect(fx.handleEvent(ev(COUNCIL_CUES.echoBlast, echo.id))).toBe(true);
     expect(fx.handleEvent(ev(COUNCIL_CUES.songPulse, song.id))).toBe(true);
-    expect(fx.handleEvent(ev(COUNCIL_CUES.slabCrush, slab.id, me.id))).toBe(true);
     for (let i = 0; i < 90; i++) fx.update(1 / 30);
     // The song's soul bursts: its stone goes, the others stand.
     entities.delete(song.id);
@@ -299,7 +247,7 @@ describe('CouncilFx: soul pillars over a fake world', () => {
     } as SimEvent;
     expect(fx.handleEvent(burst)).toBe(true);
     for (let i = 0; i < 120; i++) fx.update(1 / 30);
-    expect(shown('smithHeartSoulGlow')).toBe(2);
+    expect(shown('smithHeartSoulGlow')).toBe(1);
     expect(shown('smithHeartSongFloor')).toBe(0);
     fx.dispose();
   });

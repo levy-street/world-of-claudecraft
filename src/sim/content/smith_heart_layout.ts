@@ -366,7 +366,6 @@ export const SMITH_HEART_BOSS_SPOTS = {
   /** The Hammer Council's other two (section 7.1): the Slabwright and the
    *  Seam Singer flank the Guardian a little behind it, well inside the
    *  ring of columns. */
-  slabwright: { x: HAMMER_PIT.x + 3, z: HAMMER_PIT.z - 9 },
   seamSinger: { x: HAMMER_PIT.x + 3, z: HAMMER_PIT.z + 9 },
 } as const;
 

@@ -1,10 +1,11 @@
 // The Hammer Council's mythic prototype (src/sim/encounters/smith_heart/
 // council_soul.ts and the COUNCIL_DIFFICULTY mythic row) over a REAL Sim claim:
-// the dev switch, the stronger inheritances, the rock and Resonance that a
-// living member always supplies, and Soul in the Stone: which pillar a soul
-// takes, its immunity, the two things that strike its pips, its burst, the
-// Echo of Wrath's cover, the Walking Slab, the Endless Song, two souls at
-// once, the last kill and the wipe, normal and heroic untouched, determinism.
+// the dev switch, the stronger inheritances, the rock that a living member
+// always supplies, and Soul in the Stone (two souls now, one per member):
+// which pillar a soul takes, its immunity (the Wrath shatters every other
+// pillar and leaves it), the one thing that strikes its pips (the rock), its
+// burst, the Echo of Wrath's cover, the Endless Song, two souls at once (a dev
+// line), the last kill and the wipe, normal and heroic untouched, determinism.
 
 import { describe, expect, it } from 'vitest';
 import {
@@ -27,7 +28,6 @@ import {
   councilSoulOf,
   councilSoulTemplate,
   endlessSongMult,
-  largestGroup,
   pillarBetween,
   soulHost,
   COUNCIL_TUNING as T,
@@ -42,7 +42,7 @@ import type { Entity } from '../src/sim/types';
 import { type CouncilFight, councilFight, hitsOf } from './helpers/council_fight';
 
 const MID = { x: HAMMER_PIT.x, z: HAMMER_PIT.z };
-const ROLES: CouncilRole[] = ['guardian', 'slabwright', 'singer'];
+const ROLES: CouncilRole[] = ['guardian', 'singer'];
 
 function quiet(st: CouncilFightState): void {
   st.weightTimer = 999;
@@ -52,6 +52,7 @@ function quiet(st: CouncilFightState): void {
   st.songTimer = 999;
   st.songDue = null;
   st.pulseTimer = 999;
+  st.rushTimer = 999;
   st.energy = 0;
 }
 
@@ -148,12 +149,12 @@ describe('Hammer Council mythic: the switch', () => {
     expect(m.pillarPulse).toBe(true);
     expect(m.damageMult).toBe(h.damageMult);
     expect(m.heirRiseWarn).toBe(1.5);
-    expect(m.heirSongMarks).toBe(4);
     expect(m.heirFillSeconds).toBe(30);
-    expect(m.rockOutlivesSlabwright && m.soulInTheStone).toBe(true);
+    expect(m.rockOutlivesSinger && m.soulInTheStone && m.missCollapse).toBe(true);
     for (const tier of ['normal', 'heroic'] as const) {
       expect(COUNCIL_DIFFICULTY[tier].soulInTheStone).toBe(false);
-      expect(COUNCIL_DIFFICULTY[tier].rockOutlivesSlabwright).toBe(false);
+      expect(COUNCIL_DIFFICULTY[tier].rockOutlivesSinger).toBe(false);
+      expect(COUNCIL_DIFFICULTY[tier].missCollapse).toBe(false);
     }
   });
 
@@ -167,10 +168,12 @@ describe('Hammer Council mythic: the switch', () => {
       expect(shape?.round).toBe(true);
       expect(shape?.hw).toBe(soul.risen ? T.risenR : T.columnR);
     }
-    expect(COUNCIL_SOUL_TEMPLATES.length).toBe(3 * 2 * T.soulPips);
-    // Only the walking soul's wall anchors on a grid; every other wall is exact.
-    expect(wallAnchor(councilSoulTemplate('slabwright', true, 2), 3.3)).toBe(3.5);
+    // Two souls (the Slabwright's Walking Slab left with it), two kinds, the pips.
+    expect(COUNCIL_SOUL_TEMPLATES.length).toBe(2 * 2 * T.soulPips);
+    expect(COUNCIL_SOUL_TEMPLATES.some((t) => t.includes('slabwright'))).toBe(false);
+    // No soul walks any more: every soul wall is exact.
     expect(wallAnchor(councilSoulTemplate('guardian', true, 2), 3.3)).toBe(3.3);
+    expect(wallAnchor(councilSoulTemplate('singer', false, 2), 3.3)).toBe(3.3);
     expect(wallAnchor('sh_council_pillar_2', 3.3)).toBe(3.3);
     // The heir's rise spot keeps its shipped id at 2 s and carries any other.
     expect(councilRiseSpotTemplate(2)).toBe('sh_council_rise_spot');
@@ -186,7 +189,8 @@ describe('Hammer Council mythic: switched mid-fight, applied whole', () => {
   it('off mythic every live soul leaves its pillar: plain, whole, quiet, standing where it was', () => {
     const g = pulled();
     kill(g, 'guardian');
-    kill(g, 'singer');
+    // The Singer still fights; a dev line puts her soul in a pillar too.
+    g.dev('/dev heart council soul singer');
     g.tick(20 * 13); // the Echo's bar and the song's clock both running
     const held = souls(g);
     expect(held.map((p) => p.soul).sort()).toEqual(['guardian', 'singer']);
@@ -221,7 +225,7 @@ describe('Hammer Council mythic: switched mid-fight, applied whole', () => {
 
   it('heroic on over mythic releases the souls the same way', () => {
     const g = pulled();
-    kill(g, 'slabwright');
+    kill(g, 'singer');
     expect(souls(g).length).toBe(1);
     g.dev('/dev heart council heroic on');
     expect(g.st.difficulty).toBe('heroic');
@@ -231,75 +235,36 @@ describe('Hammer Council mythic: switched mid-fight, applied whole', () => {
   it('onto mythic every member already fallen takes its soul now, in the order they fell', () => {
     const g = pulled('normal');
     kill(g, 'singer');
-    kill(g, 'guardian');
     expect(souls(g)).toEqual([]);
     g.dev('/dev heart council mythic on');
     expect(g.st.difficulty).toBe('mythic');
-    expect(g.st.souls.map((q) => q.role)).toEqual(['singer', 'guardian']);
-    expect(souls(g).length).toBe(2);
-    // Whole mythic: the souls act and the rock outlives nobody yet.
-    const ev = g.tick(20 * (T.echoFirst + T.echoCast + 0.5));
+    expect(g.st.souls.map((q) => q.role)).toEqual(['singer']);
+    expect(souls(g).length).toBe(1);
+    // Whole mythic: the soul acts.
+    const ev = g.tick(20 * (T.songPulseFirst + 0.5));
     expect(hitsOf(ev, COUNCIL_NAMES.endlessSong).length).toBeGreaterThan(0);
-    // Off and on again: the released souls stand again, a burst one never.
+    // Off and on again: the released soul stands again, a burst one never.
     g.dev('/dev heart council soulpip 0');
-    expect(g.st.soulsSpent.sort()).toEqual(['guardian', 'singer']);
+    expect(g.st.soulsSpent).toEqual(['singer']);
     g.dev('/dev heart council mythic off');
     g.dev('/dev heart council mythic on');
     expect(souls(g)).toEqual([]);
   });
 });
 
-describe('Hammer Council mythic: the Walking Slab is cheap to move', () => {
-  it('its collider republishes only as its half-yard anchor moves, never every tick', () => {
-    const f = pulled(undefined, 6);
-    onlyWhole(f, 0);
-    kill(f, 'slabwright');
-    const slab = souls(f)[0];
-    expect(slab?.soul).toBe('slabwright');
-    const s0 = QUARRY_PILLAR_SPOTS[0];
-    const group = { x: s0.x + (MID.x - s0.x) * 0.6, z: s0.z + (MID.z - s0.z) * 0.6 };
-    for (const p of f.players.slice(1)) f.put(p, group.x, group.z);
-    const o = f.world(0, 0);
-    let last = combatWallsAt(o.x, o.z);
-    let publishes = 0;
-    const start = { ...slab.e.pos };
-    const ticks = 20 * 4;
-    for (let i = 0; i < ticks; i++) {
-      f.tick();
-      const now = combatWallsAt(o.x, o.z);
-      if (now !== last) publishes++;
-      last = now;
-    }
-    const walked = Math.hypot(slab.e.pos.x - start.x, slab.e.pos.z - start.z);
-    expect(walked).toBeGreaterThan(T.slabSpeed * 4 * 0.8);
-    // About one publish per anchor step crossed on each axis (half a yard),
-    // well under one a tick.
-    expect(publishes).toBeLessThanOrEqual(Math.ceil((walked / 0.5) * 2) + 2);
-    expect(publishes).toBeLessThan(ticks / 4);
-    // The wall still stands within half an anchor step of the stone.
-    const wall = last.find(
-      (w) =>
-        w.type === 'circle' &&
-        Math.hypot(w.x - (slab.e.pos.x - o.x), w.z - (slab.e.pos.z - o.z)) < 0.36,
-    );
-    expect(wall).toBeDefined();
-  });
-});
-
 describe('Hammer Council: normal and heroic never hold a soul', () => {
   for (const tier of ['normal', 'heroic'] as const) {
-    it(`${tier}: every fall leaves the pillars plain and the rock gone with the Slabwright`, () => {
+    it(`${tier}: every fall leaves the pillars plain and the rock gone with the Singer`, () => {
       const f = pulled(tier);
-      kill(f, 'slabwright');
+      kill(f, 'singer');
       expect(souls(f)).toEqual([]);
       f.dev('/dev heart council rock');
       f.tick(Math.ceil((T.rockCast + 0.2) * 20));
       expect(f.st.rock).toBeNull();
-      kill(f, 'guardian');
       f.tick(20 * 10);
       expect(souls(f)).toEqual([]);
       expect(f.st.souls).toEqual([]);
-      kill(f, 'singer');
+      kill(f, 'guardian');
       expect(souls(f)).toEqual([]);
       expect(f.state()?.finished).toBe(true);
     });
@@ -331,7 +296,14 @@ describe('Soul in the Stone: the host', () => {
     expect(souls(f)[0]?.e.id).toBe(column(f, 1)?.e.id);
     // The pure pick: the same integrity and distance go to the lower id.
     const mk = (id: number, integrity: number, x: number) =>
-      ({ e: { id, pos: { x, y: 0, z: 0 } }, integrity, risen: false, r: 2, soul: null }) as never;
+      ({
+        e: { id, pos: { x, y: 0, z: 0 } },
+        integrity,
+        risen: false,
+        r: 2,
+        soul: null,
+        cursed: false,
+      }) as never;
     expect(soulHost([mk(9, 2, 5), mk(4, 2, -5), mk(2, 1, 0)], { x: 0, z: 0 })?.e.id).toBe(4);
     expect(soulHost([mk(9, 2, 5), mk(4, 2, 7)], { x: 0, z: 0 })?.e.id).toBe(9);
     expect(soulHost([mk(9, 1, 1), mk(4, 2, 30)], { x: 0, z: 0 })?.e.id).toBe(4);
@@ -343,8 +315,8 @@ describe('Soul in the Stone: the host', () => {
     f.inst.objectIds = f.inst.objectIds.filter((id) => f.sim.ctx.entities.has(id));
     parkRaid(f, 0);
     const at = { x: MID.x + 12, z: MID.z + 10 };
-    plant(f, f.bodies().slabwright as Entity, at.x, at.z);
-    kill(f, 'slabwright');
+    plant(f, f.bodies().singer as Entity, at.x, at.z);
+    kill(f, 'singer');
     const s = souls(f);
     expect(s.length).toBe(1);
     expect(s[0].risen).toBe(true);
@@ -375,7 +347,7 @@ describe('Soul in the Stone: the host', () => {
 });
 
 describe('Soul in the Stone: the pips', () => {
-  it('nothing but its own rules cracks it: no Wrath cover, no pulse, no crack', () => {
+  it('nothing but its own rules cracks it: no Wrath cover, the Wrath leaves it standing, no pulse, no crack', () => {
     const f = pulled();
     onlyWhole(f, 0);
     kill(f, 'singer');
@@ -401,7 +373,9 @@ describe('Soul in the Stone: the pips', () => {
     f.dev('/dev heart council wrath');
     const ev = f.tick(Math.ceil(T.wrathCast * 20) + 2);
     expect(hitsOf(ev, COUNCIL_NAMES.wrath, hidden.id).length).toBe(1);
+    // The Wrath shatters every other pillar; the soul pillar alone stands whole.
     expect(souls(f)[0]?.integrity).toBe(T.soulPips);
+    expect(f.pillars().filter((p) => p.soul === null).length).toBe(0);
     // Mythic's pillar pulse passes it by.
     expect(hitsOf(ev, COUNCIL_NAMES.pulse, hidden.id).length).toBe(0);
   });
@@ -424,74 +398,54 @@ describe('Soul in the Stone: the pips', () => {
     expect(souls(f)[0]?.integrity).toBe(T.soulPips - 1);
   });
 
-  it('a Resonance carrier by it for 3 s strikes one pip, and the 3 s start again', () => {
+  it('Resonance (a spread) never strikes a pip, however long its carrier stands by it', () => {
     const f = pulled();
     onlyWhole(f, 2);
     kill(f, 'guardian');
     f.st.souls[0].timer = 999;
     parkRaid(f, 1);
     f.dev('/dev heart council resonance 1');
-    const r = f.st.resonance[0];
-    const marked = f.sim.ctx.entities.get(r.playerId) as Entity;
-    const at = beforeColumn(2, 1.5);
-    f.put(marked, at.x, at.z);
-    f.tick(Math.ceil(T.soulResonanceSeconds * 20) - 4);
-    expect(souls(f)[0]?.integrity).toBe(T.soulPips);
-    f.tick(6);
-    expect(souls(f)[0]?.integrity).toBe(T.soulPips - 1);
-    f.tick(Math.ceil(T.soulResonanceSeconds * 20) - 6);
-    expect(souls(f)[0]?.integrity).toBe(T.soulPips - 1);
-    f.tick(8);
-    expect(souls(f)[0]?.integrity).toBe(T.soulPips - 2);
-  });
-
-  it("by the Seam Singer's soul, Resonance strikes twice as fast", () => {
-    const f = pulled();
-    onlyWhole(f, 2);
-    kill(f, 'singer');
-    f.st.souls[0].timer = 999;
-    parkRaid(f, 1);
-    f.dev('/dev heart council resonance 1');
     const marked = f.sim.ctx.entities.get(f.st.resonance[0].playerId) as Entity;
     const at = beforeColumn(2, 1.5);
     f.put(marked, at.x, at.z);
-    f.tick(Math.ceil(T.singerSoulResonanceSeconds * 20) + 2);
-    expect(souls(f)[0]?.integrity).toBe(T.soulPips - 1);
-    expect(T.singerSoulResonanceSeconds * 2).toBe(T.soulResonanceSeconds);
+    f.tick(20 * (T.resonanceSeconds + 1));
+    expect(souls(f)[0]?.integrity).toBe(T.soulPips);
   });
 
-  it('at 0 it bursts into rubble, its behaviour stops, the survivors keep every stack', () => {
+  it('at 0 it bursts into rubble, its behaviour stops, the survivor keeps every stack', () => {
     const f = pulled();
     onlyWhole(f, 1);
     kill(f, 'guardian');
     const pillarId = souls(f)[0]?.e.id;
     f.dev('/dev heart council soulpip 1');
     expect(souls(f)[0]?.integrity).toBe(1);
-    f.dev('/dev heart council resonance 1');
-    const marked = f.sim.ctx.entities.get(f.st.resonance[0].playerId) as Entity;
-    const at = beforeColumn(1, 1.5);
-    f.put(marked, at.x, at.z);
     f.st.souls[0].timer = 999;
-    const ev = f.tick(Math.ceil(T.soulResonanceSeconds * 20) + 2);
+    parkRaid(f, 1);
+    f.dev('/dev heart council rock');
+    f.tick(Math.ceil((T.rockCast + 0.2) * 20));
+    const rock = f.st.rock;
+    expect(rock).not.toBeNull();
+    if (!rock) return;
+    const marked = f.sim.ctx.entities.get(rock.playerId) as Entity;
+    const at = beforeColumn(1, T.soulRockReach - 1);
+    f.put(marked, at.x, at.z);
+    const ev = f.tick(Math.ceil(T.rockMarkSeconds * 20) + 2);
     expect(souls(f)).toEqual([]);
     expect(f.sim.ctx.entities.has(pillarId as number)).toBe(false);
     expect(f.st.souls).toEqual([]);
-    expect(f.st.rubble.length).toBe(1);
+    expect(f.st.rubble.length).toBeGreaterThanOrEqual(1);
     expect(ev.some((e) => e.type === 'spellfxAt' && e.ability === 'heart_council_soul_burst')).toBe(
       true,
     );
     // No Echo ever again; the stacks and the Wrath's heir stay.
     const ev2 = f.tick(20 * (T.echoEvery + T.echoCast + 1));
     expect(hitsOf(ev2, COUNCIL_NAMES.echo).length).toBe(0);
-    for (const r of ['slabwright', 'singer'] as const) {
-      expect(f.bodies()[r]?.auras.find((a) => a.id === COUNCIL_AURAS.memory)?.stacks).toBe(1);
-    }
+    expect(f.bodies().singer?.auras.find((a) => a.id === COUNCIL_AURAS.memory)?.stacks).toBe(1);
+    quiet(f.st);
     f.st.energy = T.energyMax;
     f.tick(2);
-    const heir = (['slabwright', 'singer'] as const)
-      .map((r) => f.bodies()[r])
-      .find((b) => b?.castingAbility === COUNCIL_CASTS.wrath);
-    expect(heir?.castTotal).toBe(T.heirWrathCast);
+    expect(f.bodies().singer?.castingAbility).toBe(COUNCIL_CASTS.wrath);
+    expect(f.bodies().singer?.castTotal).toBe(T.heirWrathCast);
   });
 });
 
@@ -552,64 +506,6 @@ describe("Soul in the Stone: the Guardian's Echo of Wrath", () => {
   });
 });
 
-describe("Soul in the Stone: the Slabwright's Walking Slab", () => {
-  it('picks the largest group (roster order on a tie)', () => {
-    const at = (id: number, x: number, z: number) =>
-      ({ id, dead: false, pos: { x, y: 0, z } }) as Entity;
-    const g = largestGroup([at(1, 0, 0), at(2, 30, 0), at(3, 31, 0), at(4, 32, 0)]);
-    expect(g?.x).toBeCloseTo(31);
-    expect(largestGroup([at(1, 0, 0), at(2, 30, 0)])?.x).toBe(0);
-  });
-
-  it('drags itself toward the group with its wall, crushes and throws who is under it', () => {
-    const f = pulled(undefined, 6);
-    onlyWhole(f, 0);
-    kill(f, 'slabwright');
-    const slab = souls(f)[0];
-    expect(slab?.soul).toBe('slabwright');
-    if (!slab) return;
-    const s0 = QUARRY_PILLAR_SPOTS[0];
-    const ux = (MID.x - s0.x) / 24;
-    const uz = (MID.z - s0.z) / 24;
-    // Four together toward the Quarry's middle, one alone far away.
-    const group = { x: s0.x + ux * 14, z: s0.z + uz * 14 };
-    const [tank, a, b, c, d, lone] = f.players;
-    for (const p of [a, b, c, d]) f.put(p, group.x, group.z);
-    f.put(lone, MID.x - 20, MID.z - 10);
-    f.put(tank, MID.x - 18, MID.z - 12);
-    const dist = () => {
-      const l = f.local(slab.e);
-      return Math.hypot(l.x - group.x, l.z - group.z);
-    };
-    const before = dist();
-    f.tick(20 * 3);
-    const moved = before - dist();
-    expect(moved).toBeGreaterThan(T.slabSpeed * 3 * 0.85);
-    expect(moved).toBeLessThan(T.slabSpeed * 3 * 1.05);
-    // Its wall walks with it.
-    const o = f.world(0, 0);
-    const wall = combatWallsAt(o.x, o.z).find(
-      (w) =>
-        w.type === 'circle' &&
-        // On its half-yard anchor grid (wallAnchor), both worlds alike.
-        Math.hypot(w.x - (slab.e.pos.x - o.x), w.z - (slab.e.pos.z - o.z)) < 0.36,
-    );
-    expect(wall).toBeDefined();
-    // Under it: struck hard and thrown back; near it: the grind.
-    const front = {
-      x: f.local(slab.e).x + ux * (slab.r + 0.6),
-      z: f.local(slab.e).z + uz * (slab.r + 0.6),
-    };
-    f.put(a, front.x, front.z);
-    const ev = f.tick(20 * 2);
-    expect(hitsOf(ev, COUNCIL_NAMES.slab, a.id).length).toBeGreaterThanOrEqual(1);
-    expect(hitsOf(ev, COUNCIL_NAMES.grind).length).toBeGreaterThanOrEqual(1);
-    const face = Math.hypot(a.pos.x - slab.e.pos.x, a.pos.z - slab.e.pos.z) - slab.r;
-    expect(face).toBeGreaterThan(T.slabCrushReach);
-    expect(hitsOf(ev, COUNCIL_NAMES.slab, lone.id).length).toBe(0);
-  });
-});
-
 describe("Soul in the Stone: the Seam Singer's Endless Song", () => {
   it('grows by 12 percent a pulse and caps at 4 times the first', () => {
     expect(endlessSongMult(0)).toBe(1);
@@ -649,14 +545,14 @@ describe("Soul in the Stone: the Seam Singer's Endless Song", () => {
 });
 
 describe('Soul in the Stone: many souls, the end, the wipe', () => {
-  it('a second fall takes a second pillar; the last crumbles them all', () => {
+  it('two souls (a dev line) take two pillars; the last kill crumbles them all', () => {
     const f = pulled();
     kill(f, 'guardian');
-    kill(f, 'singer');
+    f.dev('/dev heart council soul singer');
     const s = souls(f);
     expect(s.map((p) => p.soul).sort()).toEqual(['guardian', 'singer']);
     expect(new Set(s.map((p) => p.e.id)).size).toBe(2);
-    kill(f, 'slabwright');
+    kill(f, 'singer');
     expect(souls(f)).toEqual([]);
     expect(f.state()?.finished).toBe(true);
     expect(f.pillars().some((p) => p.risen)).toBe(false);
@@ -665,9 +561,8 @@ describe('Soul in the Stone: many souls, the end, the wipe', () => {
   it('a wipe stands the five columns whole again, every soul gone', () => {
     const f = pulled();
     kill(f, 'guardian');
-    kill(f, 'slabwright');
+    f.dev('/dev heart council soul singer');
     expect(souls(f).length).toBe(2);
-    // Let the slab walk off its socket first.
     f.tick(20 * 4);
     for (const p of f.players) f.sim.ctx.handleDeath(p, null);
     for (let i = 0; i < 20 * 60 && f.state(); i++) f.sim.tick();
@@ -680,61 +575,38 @@ describe('Soul in the Stone: many souls, the end, the wipe', () => {
   });
 });
 
-describe('Hammer Council mythic: the rock and Resonance never stop', () => {
-  const orders: CouncilRole[][] = [
-    ['guardian', 'slabwright', 'singer'],
-    ['guardian', 'singer', 'slabwright'],
-    ['slabwright', 'guardian', 'singer'],
-    ['slabwright', 'singer', 'guardian'],
-    ['singer', 'guardian', 'slabwright'],
-    ['singer', 'slabwright', 'guardian'],
-  ];
+describe('Hammer Council mythic: the rock never stops', () => {
   const supplies = (f: Fight) => {
-    // Falling Rock: a living member drops it.
     for (const r of ROLES) f.st.gaps[r] = 0;
     f.dev('/dev heart council rock');
     f.tick(Math.ceil((T.rockCast + 0.2) * 20));
     expect(f.st.rock).not.toBeNull();
     f.tick(Math.ceil(T.rockMarkSeconds * 20) + 2);
     quiet(f.st);
-    // Resonance: a living member sings it.
-    f.st.resonance = [];
-    f.dev('/dev heart council song');
-    f.tick(Math.ceil(T.songCast * 20) + 2);
-    expect(f.st.resonance.length).toBeGreaterThan(0);
-    quiet(f.st);
   };
-  for (const order of orders) {
-    it(`order ${order.join(' > ')}`, () => {
+  for (const order of [
+    ['guardian', 'singer'],
+    ['singer', 'guardian'],
+  ] as CouncilRole[][]) {
+    it(`order ${order.join(' > ')}: the survivor drops the rock, the last kill finishes`, () => {
       const f = pulled(undefined, 8);
       kill(f, order[0]);
       supplies(f);
       kill(f, order[1]);
-      supplies(f);
-      kill(f, order[2]);
       expect(f.state()?.finished).toBe(true);
     });
   }
 
-  it('the stronger inheritances: 1.5 s rises, the song on four, a 30 s fill', () => {
+  it('the stronger inheritances: 1.5 s rises and a 30 s fill', () => {
     const f = pulled(undefined, 8);
-    kill(f, 'slabwright');
-    // The Walking Slab's walk just took the floor (the floor gap): clear it,
-    // this test reads the heir's rise, not the spacing.
+    kill(f, 'singer');
     f.st.lastFloorAt = null;
     f.st.wakeTimer = 0;
     f.tick();
     expect(f.st.riseSpots.length).toBeGreaterThan(0);
     expect(f.st.riseSpots[0].remaining).toBeCloseTo(1.5, 5);
-    // The spot's template carries the shorter warning to every client.
     const spot = f.sim.ctx.entities.get(f.st.riseSpots[0].objectId);
     expect(councilRiseSpotSeconds(spot?.templateId ?? '')).toBe(1.5);
-    quiet(f.st);
-    kill(f, 'singer');
-    f.st.resonance = [];
-    f.dev('/dev heart council song');
-    f.tick(Math.ceil(T.songCast * 20) + 2);
-    expect(f.st.resonance.length).toBe(4);
     const g = pulled(undefined, 4);
     kill(g, 'guardian');
     g.st.energy = 0;
@@ -751,14 +623,12 @@ describe('Hammer Council mythic: determinism', () => {
       f.dev('/dev heart council mythic on');
       f.dev('/dev heart council pull');
       let ev = f.tick(20 * 30);
-      f.sim.ctx.handleDeath(f.bodies().slabwright as Entity, f.players[0]);
-      ev = ev.concat(f.tick(20 * 25));
       f.sim.ctx.handleDeath(f.bodies().singer as Entity, f.players[0]);
-      ev = ev.concat(f.tick(20 * 25));
+      ev = ev.concat(f.tick(20 * 45));
       const st = f.state();
       return JSON.stringify({
         casts: st?.casts,
-        souls: st?.souls.map((q) => [q.role, q.pulses, q.goal]),
+        souls: st?.souls.map((q) => [q.role, q.pulses]),
         pillars: f.pillars().map((p) => [p.e.templateId, Math.round(p.e.pos.x * 10)]),
         hits: ev
           .filter((e) => e.type === 'damage')

@@ -821,14 +821,13 @@ const mergeStringsEn = {
       heart_rime_bolt: 'Rime Bolt',
       heart_ember_bolt: 'Ember Bolt',
       // The Hammer Council (encounters/smith_heart/council_ids.ts COUNCIL_CASTS).
-      // Seam Bolt and Song of the Seam can be kicked; an heir's song cannot.
+      // Seam Bolt, Song of the Seam and Wake the Stone can be kicked.
       heart_hammers_weight: "Hammer's Weight",
+      heart_mountains_rush: "Mountain's Rush",
       heart_wake_the_stone: 'Wake the Stone',
       heart_falling_rock: 'Falling Rock',
-      heart_stone_prison: 'Stone Prison',
       heart_seam_bolt: 'Seam Bolt',
       heart_song_of_the_seam: 'Song of the Seam',
-      heart_song_of_the_seam_unbroken: 'Song of the Seam',
       // Mythic: a soul pillar's own bars (council_soul.ts), never kicked.
       heart_echo_of_wrath: 'Echo of Wrath',
       heart_endless_song: 'Endless Song',

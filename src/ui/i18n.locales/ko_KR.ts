@@ -22522,14 +22522,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.heart_forge_pour': '화로 붓기',
   'abilityUi.cast.heart_ember_bolt': '잔불 화살',
   // The Smith's Heart's Hammer Council (M16 fills).
-  'entities.mobs.heart_slabwright.name': '석판장이',
   'entities.mobs.heart_seam_singer.name': '광맥의 노래꾼',
   'abilityUi.cast.heart_hammers_weight': '망치의 무게',
   'abilityUi.cast.heart_wake_the_stone': '돌 깨우기',
   'abilityUi.cast.heart_falling_rock': '낙석',
   'abilityUi.cast.heart_seam_bolt': '광맥 화살',
   'abilityUi.cast.heart_song_of_the_seam': '광맥의 노래',
-  'abilityUi.cast.heart_song_of_the_seam_unbroken': '광맥의 노래',
   'hudChrome.council.warn.wrath': '산의 분노! 기둥 뒤에 숨으세요!',
   'hudChrome.council.warn.enrage': '산의 분노가 빨라집니다! 이제 산의 분노가 훨씬 빨리 옵니다.',
   'hudChrome.council.warn.weight': '{player}에게 망치의 무게: 탱커 교대!',
@@ -22538,23 +22536,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.council.warn.wakeHeir': '{players} 아래에서 돌이 깨어납니다: 움직이세요!',
   'hudChrome.council.warn.rock': '{player}에게 낙석! 엄폐물에서 떨어져 함께 나눠 맞으세요!',
   'hudChrome.council.warn.song': '광맥의 노래! 차단하세요!',
-  'hudChrome.council.warn.resonance':
-    '{players}에게 공명: 가장 손상된 기둥을 깨고, 멀쩡한 기둥에서는 떨어지세요!',
-  'hudChrome.council.warn.fell_guardian':
-    '망치의 수호자가 쓰러졌습니다. 그 분노가 남은 돌에게 넘어갑니다!',
-  'hudChrome.council.warn.fell_slabwright':
-    '석판장이가 쓰러졌습니다. 이제 돌이 제멋대로 솟아오릅니다!',
-  'hudChrome.council.warn.fell_singer':
-    '광맥의 노래꾼이 쓰러졌습니다. 그 노래가 이어지며, 이제 아무도 막을 수 없습니다!',
   'hudChrome.council.alert.wakeTitle': '돌 깨우기!',
   'hudChrome.council.alert.wakeLine':
     '서 있는 곳에서 기둥이 솟아오릅니다: 공격대에 필요한 곳에 엄폐물을 만드세요',
   'hudChrome.council.alert.rockTitle': '낙석!',
   'hudChrome.council.alert.rockLine': '기둥에서 떨어져 최소 세 명의 아군을 모으세요',
   'hudChrome.council.alert.resonanceTitle': '공명',
-  'hudChrome.council.alert.resonanceLine':
-    '기둥 근처에 있으면 기둥을 깹니다: 가장 손상된 기둥 옆에서 기다리세요',
-  'hudChrome.council.alert.resonanceCracking': '기둥을 깨는 중: 지키려면 멀어지세요',
   'hudChrome.council.alert.weightTitle': '망치의 무게',
   'hudChrome.council.alert.weightLine':
     '받는 물리 피해가 두 배가 됩니다: 다른 탱커가 수호자를 맡아야 합니다',
@@ -22563,8 +22550,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '효과가 끝나면 서 있는 자리의 바닥에서 기둥이 솟구쳐 {radius}야드 안의 모두에게 {min}에서 {max}의 피해를 주고 밀쳐냅니다. 공격대에 엄폐물이 필요한 곳에 서세요. 영웅·신화: 피해 {heroic}% 증가.',
   'hudChrome.auraEffect.council.rockMark':
     '효과가 끝나면 바위가 떨어집니다: {total}의 피해를 {radius}야드 안의 모두가 나눠 받습니다. {soakers}명 미만이면 각자 {penalty}% 더 받고 공격대 전체가 {tremorMin}에서 {tremorMax}의 피해를 받습니다. {radius}야드 안의 모든 기둥이 한 조각씩 깨지니 엄폐물에서 떨어져 나눠 맞으세요. 신화: {soulReach}야드 안의 영혼의 기둥은 대신 영혼 표식을 하나 잃고, 표식이 없어지면 부서집니다. 영웅·신화: 피해 {heroic}% 증가.',
-  'hudChrome.auraEffect.council.resonance':
-    '기둥에서 {reach}야드 안에 {seconds}초 동안 계속 서 있으면 기둥이 한 조각 깨지고, 머무는 동안 {seconds}초마다 다시 깨집니다. 제거할 수 없습니다: 가장 손상된 기둥 옆에서 산의 분노를 버티고 멀쩡한 기둥에서는 떨어지세요. 신화: 영혼의 기둥 옆에서 같은 시간을 버티면 대신 영혼 표식이 하나 사라지고(광맥의 노래꾼의 기둥은 {singerSeconds}초), 표식이 없어지면 부서집니다.',
   'hudChrome.auraEffect.council.memory':
     '주는 피해가 {pct}% 증가합니다: 쓰러진 망치 의회 구성원 1명당 {per}%.',
   // The Hammer Council's mythic, Soul in the Stone (M16 fills).
@@ -22572,22 +22557,15 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.heart_endless_song': '끝없는 노래',
   'hudChrome.council.warn.soul_guardian':
     '수호자의 영혼이 돌에 깃들었습니다! 그 기둥에서 분노의 메아리가 터져 나옵니다.',
-  'hudChrome.council.warn.soul_slabwright':
-    '석판장이의 영혼이 돌에 깃들었습니다! 걷는 석판이 여러분을 향해 끌려옵니다.',
   'hudChrome.council.warn.soul_singer':
     '광맥의 노래꾼의 영혼이 돌에 깃들었습니다! 끝없는 노래가 울릴 때마다 커집니다.',
   'hudChrome.council.warn.echo': '분노의 메아리! 영혼의 기둥과 자신 사이에 다른 기둥을 두세요!',
   'hudChrome.council.warn.soulBreak_guardian':
     '수호자의 영혼의 기둥이 부서졌습니다! 메아리가 잠잠해집니다.',
-  'hudChrome.council.warn.soulBreak_slabwright':
-    '석판장이의 영혼의 기둥이 부서졌습니다! 걷는 석판이 멈춥니다.',
   'hudChrome.council.warn.soulBreak_singer':
     '광맥의 노래꾼의 영혼의 기둥이 부서졌습니다! 끝없는 노래가 그칩니다.',
   'hudChrome.council.alert.rockLineSoul':
     '엄폐물에서 떨어져 영혼의 기둥 옆에 아군을 3명 이상 모으세요',
-  'hudChrome.council.alert.resonanceLineSoul':
-    '영혼의 기둥 옆에서 기다려 영혼 표식을 깨세요. 멀쩡한 기둥 옆에는 가지 마세요',
-  'hudChrome.council.alert.resonanceBreaking': '영혼 표식을 깨는 중: 영혼의 기둥 옆에 머무세요',
   'hudChrome.council.say.guardian_pull':
     '채석장에 낯선 자들이라. 망치의 힘은 살덩이에 굴하지 않는다.',
   'hudChrome.council.say.guardian_wrath': '산이 내게 응답한다! 돌이 받아 준다면 숨어 보아라!',
@@ -22596,15 +22574,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.council.say.guardian_soul': '이제 나는 돌이다. 나의 분노에는 쓰러질 몸이 없다.',
   'hudChrome.council.say.guardian_wipe': '먼지로다. 모든 살덩이가 그러하듯.',
   'hudChrome.council.say.guardian_defeat': '망치의 힘은... 이제 너희가 짊어져라.',
-  'hudChrome.council.say.slabwright_pull':
-    '벽에 쓸 돌이 더 필요하지. 가만히 있어라, 너희를 쌓아 넣어 주마.',
-  'hudChrome.council.say.slabwright_wake': '거기 서라. 네가 선 자리에서 돌이 솟는다!',
-  'hudChrome.council.say.slabwright_rock': '위를 봐라, 꼬맹이들! 산이 무너진다!',
-  'hudChrome.council.say.slabwright_death': '석판이... 갈라진다...',
-  'hudChrome.council.say.slabwright_remember': '돌은 기억한다. 일은 내가 마무리하마.',
-  'hudChrome.council.say.slabwright_soul': '손은 남지 않았지만, 이 돌을 너희에게 끌고 가겠다.',
-  'hudChrome.council.say.slabwright_wipe': '쌓고, 묻었다. 잘된 일이다.',
-  'hudChrome.council.say.slabwright_defeat': '채석장이... 조용해진다.',
   'hudChrome.council.say.singer_pull':
     '광맥의 노래가 들리나요? 너무 오래 당신들의 목소리를 기다렸어요.',
   'hudChrome.council.say.singer_song': '나와 함께 노래하고, 부서지세요!',
