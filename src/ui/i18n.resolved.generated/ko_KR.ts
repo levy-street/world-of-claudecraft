@@ -6422,6 +6422,7 @@ export const ko_KR: EnTranslations = {
       "toolEffectRechargeFull": "{effect}은(는) 이미 완전히 충전되어 있습니다.",
       "toolEffectRechargeToolCapped": "{effect}을(를) 더 충전하려면 더 좋은 {profession} 도구가 필요합니다.",
       "toolEffectRechargeMaterials": "{effect} 재충전에는 {material} x{count}이(가) 필요합니다.",
+      "toolEffectRechargeLocked": "Recharging {effect} needs {material} x{count}, but your copies are locked. Unlock them in your bags.",
       "craftingProgress": "제작 중: {total}초 중 {remaining}초 남음.",
       "disenchantingProgress": "분해 중: {total}초 중 {remaining}초 남음.",
       "enchantingProgress": "마법부여 중: {total}초 중 {remaining}초 남음.",

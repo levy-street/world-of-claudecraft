@@ -9,25 +9,65 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.professions.toolEffectRechargeLocked"
+  ],
+  "es_ES": [
+    "hudChrome.professions.toolEffectRechargeLocked"
+  ],
+  "fr_FR": [
+    "hudChrome.professions.toolEffectRechargeLocked"
+  ],
+  "fr_CA": [
+    "hudChrome.professions.toolEffectRechargeLocked"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
-  "pt_BR": [],
-  "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "it_IT": [
+    "hudChrome.professions.toolEffectRechargeLocked"
+  ],
+  "de_DE": [
+    "hudChrome.professions.toolEffectRechargeLocked"
+  ],
+  "zh_CN": [
+    "hudChrome.professions.toolEffectRechargeLocked"
+  ],
+  "zh_TW": [
+    "hudChrome.professions.toolEffectRechargeLocked"
+  ],
+  "ko_KR": [
+    "hudChrome.professions.toolEffectRechargeLocked"
+  ],
+  "ja_JP": [
+    "hudChrome.professions.toolEffectRechargeLocked"
+  ],
+  "pt_BR": [
+    "hudChrome.professions.toolEffectRechargeLocked"
+  ],
+  "ru_RU": [
+    "hudChrome.professions.toolEffectRechargeLocked"
+  ],
+  "cs_CZ": [
+    "hudChrome.professions.toolEffectRechargeLocked"
+  ],
+  "nl_NL": [
+    "hudChrome.professions.toolEffectRechargeLocked"
+  ],
+  "pl_PL": [
+    "hudChrome.professions.toolEffectRechargeLocked"
+  ],
+  "id_ID": [
+    "hudChrome.professions.toolEffectRechargeLocked"
+  ],
+  "tr_TR": [
+    "hudChrome.professions.toolEffectRechargeLocked"
+  ],
+  "sv_SE": [
+    "hudChrome.professions.toolEffectRechargeLocked"
+  ],
+  "vi_VN": [
+    "hudChrome.professions.toolEffectRechargeLocked"
+  ],
+  "da_DK": [
+    "hudChrome.professions.toolEffectRechargeLocked"
+  ]
 };

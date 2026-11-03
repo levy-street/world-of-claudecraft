@@ -20,18 +20,21 @@ import {
   RECHARGE_CHARGES_PER_MATERIAL,
   rarityLadderIndex,
   startingDurabilityFor,
+  type ToolEffectSlot,
 } from '../src/sim/professions/tools';
 import {
   bestWieldableGatherToolTierOrNone,
   TIER4_TOOL_WIELD_PROFICIENCY,
 } from '../src/sim/professions/wield_gate';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
-import type { SimEvent } from '../src/sim/types';
-import { runRecharge } from './helpers/enchant_family_cast';
+import { type Entity, type SimEvent, TOOL_RECHARGE_CAST_ID } from '../src/sim/types';
+import { completeEnchantFamilyCast, runRecharge } from './helpers/enchant_family_cast';
 import { reagentUnitValue } from './helpers/reagent_unit_value';
 
 const makeSim = (seed = 11) => new Sim({ seed, playerClass: 'warrior', autoEquip: false });
 const metaOf = (sim: Sim): PlayerMeta => sim.meta(sim.playerId) as PlayerMeta;
+const entityOf = (sim: Sim): Entity =>
+  (sim as unknown as { entities: Map<number, Entity> }).entities.get(sim.playerId) as Entity;
 
 /** Slot a self-crafted charm onto mining with the given pick carried. */
 function simWithSlot(pickId = 'copper_mining_pick'): Sim {
@@ -640,5 +643,68 @@ describe('the R39 economics inequality: a fresh mint always out-costs a generic 
         `${reagent.itemId} must stay off the copper counters`,
       ).toBe(false);
     }
+  });
+});
+
+describe('the recharge command: locked materials (Discord report)', () => {
+  /** A depleted self-crafted mining slot whose only dust stack is locked. */
+  function simWithLockedDust(): { sim: Sim; slot: ToolEffectSlot } {
+    const sim = simWithSlot();
+    const slot = metaOf(sim).toolEffectSlots?.mining;
+    if (!slot) throw new Error('slot minted');
+    slot.durability = 0;
+    sim.addItem('arcane_dust', 10);
+    const idx = metaOf(sim).inventory.findIndex((s) => s.itemId === 'arcane_dust');
+    sim.setItemLocked('arcane_dust', true, sim.playerId, idx);
+    return { sim, slot };
+  }
+
+  it('refuses to start when every held copy of the material is locked, naming locked', () => {
+    const { sim, slot } = simWithLockedDust();
+    sim.rechargeToolEffect('mining');
+    const events = sim.tick();
+    expect(lastToolEffectResult(events)).toMatchObject({
+      action: 'recharge',
+      ok: false,
+      reason: 'locked',
+      materialItemId: 'arcane_dust',
+      count: 1,
+    });
+    // Nothing filled, nothing spent, and no cast started.
+    expect(slot.durability).toBe(0);
+    expect(sim.countItem('arcane_dust')).toBe(10);
+    expect(entityOf(sim).castingAbility).toBeNull();
+  });
+
+  it('a stack locked mid-cast refuses at completion instead of filling for free', () => {
+    const sim = simWithSlot();
+    const slot = metaOf(sim).toolEffectSlots?.mining;
+    if (!slot) throw new Error('slot minted');
+    slot.durability = 0;
+    sim.addItem('arcane_dust', 10);
+    sim.rechargeToolEffect('mining');
+    sim.tick();
+    const idx = metaOf(sim).inventory.findIndex((s) => s.itemId === 'arcane_dust');
+    sim.setItemLocked('arcane_dust', true, sim.playerId, idx);
+    expect(entityOf(sim).castingAbility).toBe(TOOL_RECHARGE_CAST_ID);
+    completeEnchantFamilyCast(sim);
+    const events = sim.tick();
+    expect(lastToolEffectResult(events)).toMatchObject({ ok: false, reason: 'locked' });
+    expect(slot.durability).toBe(0);
+    expect(sim.countItem('arcane_dust')).toBe(10);
+  });
+
+  it('spends only unlocked copies when an unlocked spare exists beside a locked stack', () => {
+    const { sim, slot } = simWithLockedDust();
+    sim.addItem('arcane_dust', 1);
+    const meta = metaOf(sim);
+    // Grants never merge into a locked stack, so the spare is its own slot.
+    expect(meta.inventory.filter((s) => s.itemId === 'arcane_dust')).toHaveLength(2);
+    runRecharge(sim, 'mining');
+    sim.tick();
+    expect(slot.durability).toBe(20);
+    const locked = meta.inventory.find((s) => s.itemId === 'arcane_dust' && s.instance?.locked);
+    expect(locked?.count).toBe(10);
+    expect(sim.countItem('arcane_dust')).toBe(10);
   });
 });

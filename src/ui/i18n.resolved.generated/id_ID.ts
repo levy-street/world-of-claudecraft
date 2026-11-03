@@ -6422,6 +6422,7 @@ export const id_ID: EnTranslations = {
       "toolEffectRechargeFull": "{effect} sudah terisi penuh.",
       "toolEffectRechargeToolCapped": "Bawa alat {profession} yang lebih baik untuk mengisi {effect} lebih jauh.",
       "toolEffectRechargeMaterials": "Mengisi ulang {effect} membutuhkan {material} x{count}.",
+      "toolEffectRechargeLocked": "Recharging {effect} needs {material} x{count}, but your copies are locked. Unlock them in your bags.",
       "craftingProgress": "Kamu sedang membuat: {remaining} dtk dari {total} dtk tersisa.",
       "disenchantingProgress": "Kamu sedang menghancurkan pemantraan: {remaining} dtk dari {total} dtk tersisa.",
       "enchantingProgress": "Kamu sedang memantrai: {remaining} dtk dari {total} dtk tersisa.",

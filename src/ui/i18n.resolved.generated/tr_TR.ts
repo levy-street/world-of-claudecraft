@@ -6422,6 +6422,7 @@ export const tr_TR: EnTranslations = {
       "toolEffectRechargeFull": "{effect} zaten tam şarjlı.",
       "toolEffectRechargeToolCapped": "{effect} etkisini daha fazla şarj etmek için daha iyi bir {profession} aleti taşıyın.",
       "toolEffectRechargeMaterials": "{effect} şarjı için {material} x{count} gerekir.",
+      "toolEffectRechargeLocked": "Recharging {effect} needs {material} x{count}, but your copies are locked. Unlock them in your bags.",
       "craftingProgress": "Üretim yapıyorsun: {total}sn üzerinden {remaining}sn kaldı.",
       "disenchantingProgress": "Büyü bozuyorsun: {total}sn üzerinden {remaining}sn kaldı.",
       "enchantingProgress": "Büyülüyorsun: {total}sn üzerinden {remaining}sn kaldı.",

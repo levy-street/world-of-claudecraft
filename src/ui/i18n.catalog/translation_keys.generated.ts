@@ -17121,6 +17121,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.professions.toolEffectNoTool'
   | 'hudChrome.professions.toolEffectRechargeButton'
   | 'hudChrome.professions.toolEffectRechargeFull'
+  | 'hudChrome.professions.toolEffectRechargeLocked'
   | 'hudChrome.professions.toolEffectRechargeMaterials'
   | 'hudChrome.professions.toolEffectRechargeNoSlot'
   | 'hudChrome.professions.toolEffectRechargePrice'

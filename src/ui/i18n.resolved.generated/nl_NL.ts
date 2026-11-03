@@ -6422,6 +6422,7 @@ export const nl_NL: EnTranslations = {
       "toolEffectRechargeFull": "{effect} is al volledig opgeladen.",
       "toolEffectRechargeToolCapped": "Draag beter {profession}-gereedschap om {effect} verder op te laden.",
       "toolEffectRechargeMaterials": "Het opladen van {effect} vereist {material} x{count}.",
+      "toolEffectRechargeLocked": "Recharging {effect} needs {material} x{count}, but your copies are locked. Unlock them in your bags.",
       "craftingProgress": "Je bent aan het vervaardigen: {remaining}s van {total}s resterend.",
       "disenchantingProgress": "Je bent aan het onbetoveren: {remaining}s van {total}s resterend.",
       "enchantingProgress": "Je bent aan het betoveren: {remaining}s van {total}s resterend.",

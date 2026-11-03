@@ -6422,6 +6422,7 @@ export const zh_TW: EnTranslations = {
       "toolEffectRechargeFull": "{effect}已充滿能量。",
       "toolEffectRechargeToolCapped": "攜帶更好的{profession}工具才能繼續為{effect}充能。",
       "toolEffectRechargeMaterials": "為{effect}充能需要{material}x{count}。",
+      "toolEffectRechargeLocked": "Recharging {effect} needs {material} x{count}, but your copies are locked. Unlock them in your bags.",
       "craftingProgress": "正在製作：還剩{remaining}秒，共{total}秒。",
       "disenchantingProgress": "正在分解：還剩{remaining}秒，共{total}秒。",
       "enchantingProgress": "正在附魔：還剩{remaining}秒，共{total}秒。",
