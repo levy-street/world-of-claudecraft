@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { onCastCompleted } from '../src/sim/combat/talent_procs';
 import { WARLOCK_CHOICE_ROWS } from '../src/sim/content/choice_rows_classic';
+import { ABILITIES } from '../src/sim/content/classes';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
@@ -175,10 +176,10 @@ describe('warlock wave 2 choice rows', () => {
       (option) => option.id === 'wlk_r20_grimoire_of_haste',
     );
     expect(unbrokenRitual?.description).toBe(
-      'Each second spent casting or channeling reduces the remaining cooldown of your Warlock class and specialization abilities by 0.5 sec. Does not affect capstone talents.',
+      'Each second spent casting or channeling reduces the remaining cooldown of your Warlock class and specialization abilities by 0.5 sec. Does not affect capstone talents. Affects Umbral Anchor, Abyssal Gag, Dread Chorus, Sanguine Covenant and Soulwell; Hexcraft: Evil Eye, Hex of Violence, Litany of Guilt, Cruel Pact, Vicarious Suffering, Possess the Evil Eye, Hour of Judgment and Coven; Necromancy: Raise Graveguard, Soul Lance, Corpse Explosion, Reaping Command, Ossuary Mark, Sacrifice Undead, Bone Armor, Unholy Command, Army of the Dead and Lich Form; Ruination: Duskfire, Conflagrate, Ruinous Brand, Cinderhide and Summon Pyre Colossus.',
     );
     expect(forbiddenReflection?.description).toBe(
-      'The first Warlock class or specialization ability with a cooldown that you use, except Soulwell and Army of the Dead, creates a forbidden reflection. You may use that same ability once more within 10 sec for its normal cost without starting another cooldown. This effect can occur once every 60 sec.',
+      'The first Warlock class or specialization ability with a cooldown that you use, except Soulwell and Army of the Dead, creates a forbidden reflection. You may use that same ability once more within 10 sec for its normal cost without starting another cooldown. This effect can occur once every 60 sec. Affects Umbral Anchor, Abyssal Gag, Dread Chorus and Sanguine Covenant; Hexcraft: Evil Eye, Hex of Violence, Litany of Guilt, Cruel Pact, Vicarious Suffering, Possess the Evil Eye, Hour of Judgment and Coven; Necromancy: Raise Graveguard, Soul Lance, Corpse Explosion, Reaping Command, Ossuary Mark, Sacrifice Undead, Bone Armor, Unholy Command and Lich Form; Ruination: Duskfire, Conflagrate, Ruinous Brand, Cinderhide and Summon Pyre Colossus.',
     );
     expect(`${unbrokenRitual?.description} ${forbiddenReflection?.description}`).not.toMatch(
       /\bshared\b/i,
@@ -193,6 +194,36 @@ describe('warlock wave 2 choice rows', () => {
     ] as const) {
       const { sim } = rig('warlock', 20, { 17: 'wlk_r17_death_coil' }, spec);
       expect(sim.resolvedAbility(ability)?.cooldown, spec).toBe(cooldown);
+    }
+  });
+
+  it('names every cooldown the Warlock capstones touch, per specialization', () => {
+    const capstones = WARLOCK_CHOICE_ROWS.rows.find((row) => row.level === 20)?.options ?? [];
+    const affects = (id: string) => {
+      const description = capstones.find((option) => option.id === id)?.description ?? '';
+      return description.slice(description.indexOf('Affects '));
+    };
+    const ritual = affects('wlk_r20_chaos_bolt');
+    const reflection = affects('wlk_r20_grimoire_of_haste');
+    for (const spec of ['affliction', 'demonology', 'destruction']) {
+      // Both optional actives (Dread Chorus row 8, Sanguine Covenant row 11).
+      const { sim } = rig(
+        'warlock',
+        20,
+        { 8: 'wlk_r8_howl_of_terror', 11: 'wlk_r11_fel_concentration' },
+        spec,
+      );
+      for (const def of Object.values(ABILITIES)) {
+        if (def.class !== 'warlock' || def.passive || def.hiddenFromPlayer) continue;
+        if (def.id === 'abyssal_rift') continue;
+        if ((sim.resolvedAbility(def.id)?.cooldown ?? 0) <= 0) continue;
+        expect(ritual, `${spec} ${def.name}`).toContain(def.name);
+        if (def.id === 'soulwell' || def.id === 'army_of_the_dead') {
+          expect(reflection, `${spec} ${def.name}`).not.toContain(def.name);
+        } else {
+          expect(reflection, `${spec} ${def.name}`).toContain(def.name);
+        }
+      }
     }
   });
 
