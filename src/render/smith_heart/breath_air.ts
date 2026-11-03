@@ -2,9 +2,7 @@
 // streaks and the grit it carries over every Breath walk, the storm's cloud
 // banks rolling past under the Cornice's rim and through the bridge's chasm,
 // the Wind Bridge's gusts (a band of wind sweeping down its ramp, a curtain
-// riding its front, the bridge's streaks surging with it) and the lightning
-// striking the Cornice's rods in turn (the bolt from the cloud, the crown's
-// flash). One draw per system, every motion in the vertex shader on the
+// riding its front, the bridge's streaks surging with it). One draw per system, every motion in the vertex shader on the
 // shared clock (no per-frame CPU), ribbons and billboards built in view space
 // from the camera-relative model-view. Cosmetic: the low tier builds a third
 // of the particles; nothing here is a telegraph. Built with the interior, so
@@ -13,13 +11,7 @@
 import * as THREE from 'three';
 import { BREATH, WIND_BRIDGE } from '../../sim/content/smith_heart_layout';
 import { sharedUniforms } from '../gfx';
-import {
-  BREATH_GUST,
-  BREATH_STRIKE,
-  BREATH_WIND,
-  type BreathAirPlan,
-  planBreathAir,
-} from './breath_air_core';
+import { BREATH_GUST, BREATH_WIND, type BreathAirPlan, planBreathAir } from './breath_air_core';
 import { type HeartAirV3, type HeartAirV4, heartQuadGeometry } from './heart_air_quads';
 import { heartHash } from './heart_plan_core';
 
@@ -254,86 +246,6 @@ void main() {
 }
 `;
 
-/** A strike's bolt: segments of a jagged path from the cloud to a crown,
- *  shown only while that rod's strike flashes. */
-const BOLT_VERT = /* glsl */ `
-uniform float uTime;
-uniform float uRods;
-attribute vec3 aOther;
-attribute vec2 aCorner;
-attribute vec4 aParams; // rod, width, along (0 crown .. 1 cloud), branch
-varying float vShow;
-varying vec2 vCorner;
-float fr(float v) { return v - floor(v); }
-void main() {
-  float k = floor(uTime / ${BREATH_STRIKE.cell.toFixed(2)});
-  float at = k * ${BREATH_STRIKE.cell.toFixed(2)} + fr(k * 0.618) * ${(BREATH_STRIKE.cell - 1).toFixed(2)};
-  float since = uTime - at;
-  float rod = mod(k * ${BREATH_STRIKE.stride.toFixed(1)} + 2.0, uRods);
-  float on = step(abs(rod - aParams.x), 0.5) * step(0.0, since) * step(since, ${BREATH_STRIKE.flash.toFixed(2)});
-  // It grows down from the cloud in the first twentieth of a second, then
-  // flickers twice.
-  float grown = step(1.0 - since / 0.05, aParams.z + 0.001);
-  float flick = since < 0.12 ? 1.0 : (since > 0.2 && since < 0.3 ? 0.8 : 0.25);
-  vShow = on * grown * flick * (aParams.w > 0.5 ? 0.6 : 1.0);
-  vec4 a = modelViewMatrix * vec4(position, 1.0);
-  vec4 b = modelViewMatrix * vec4(aOther, 1.0);
-  vec2 d = b.xy - a.xy;
-  float dl = length(d);
-  d = dl > 1e-4 ? d / dl : vec2(0.0, 1.0);
-  vec4 mv = mix(a, b, aCorner.x * 0.5 + 0.5);
-  mv.xy += vec2(-d.y, d.x) * aCorner.y * aParams.y;
-  vCorner = aCorner;
-  gl_Position = vShow > 0.0 ? projectionMatrix * mv : vec4(0.0, 0.0, 2.0, 1.0);
-}
-`;
-const BOLT_FRAG = /* glsl */ `
-uniform vec3 uColor;
-varying float vShow;
-varying vec2 vCorner;
-void main() {
-  float core = 1.0 - smoothstep(0.0, 0.45, abs(vCorner.y));
-  float glow = 1.0 - abs(vCorner.y);
-  gl_FragColor = vec4(mix(uColor, vec3(1.0), core) * (core * 2.0 + glow * 0.6), glow * vShow);
-  #include <colorspace_fragment>
-}
-`;
-
-/** A rod crown's halo: dim always, a great white-teal flash on its strike. */
-const HALO_VERT = /* glsl */ `
-uniform float uTime;
-uniform float uRods;
-attribute vec2 aCorner;
-attribute vec4 aParams; // rod, size
-varying vec2 vCorner;
-varying float vGlow;
-float fr(float v) { return v - floor(v); }
-void main() {
-  float k = floor(uTime / ${BREATH_STRIKE.cell.toFixed(2)});
-  float at = k * ${BREATH_STRIKE.cell.toFixed(2)} + fr(k * 0.618) * ${(BREATH_STRIKE.cell - 1).toFixed(2)};
-  float since = uTime - at;
-  float rod = mod(k * ${BREATH_STRIKE.stride.toFixed(1)} + 2.0, uRods);
-  float hit = step(abs(rod - aParams.x), 0.5) * step(0.0, since) * exp(-max(0.0, since) * 3.5);
-  vGlow = 0.22 + 0.1 * sin(uTime * 1.3 + aParams.x * 2.0) + hit * 2.4;
-  vec4 mv = modelViewMatrix * vec4(position, 1.0);
-  mv.xy += aCorner * aParams.y * (1.0 + hit * 2.2);
-  vCorner = aCorner;
-  gl_Position = projectionMatrix * mv;
-}
-`;
-const HALO_FRAG = /* glsl */ `
-uniform vec3 uColor;
-varying vec2 vCorner;
-varying float vGlow;
-void main() {
-  float d = length(vCorner);
-  if (d > 1.0) discard;
-  float a = (1.0 - d) * (1.0 - d) * vGlow;
-  gl_FragColor = vec4(uColor * a, a);
-  #include <colorspace_fragment>
-}
-`;
-
 function airMaterial(
   name: string,
   vert: string,
@@ -431,56 +343,8 @@ function gustSheet(): THREE.BufferGeometry {
   return g;
 }
 
-/** Each rod's bolt: a jagged path from the cloud base down to its crown,
- *  and a branch off it, as segments. */
-function boltSegments(plan: BreathAirPlan): { a: V3[]; b: V3[]; p: V4[] } {
-  const a: V3[] = [];
-  const b: V3[] = [];
-  const p: V4[] = [];
-  plan.crowns.forEach((c, rod) => {
-    const top = c.y + 70;
-    const segs = 14;
-    let x = c.x + (heartHash(rod, 1) - 0.5) * 30;
-    let z = c.z + (heartHash(rod, 2) - 0.5) * 30;
-    const pts: [number, number, number][] = [];
-    for (let i = 0; i <= segs; i++) {
-      const t = i / segs;
-      const y = top + (c.y - top) * t;
-      const pull = t * t;
-      const jx = (heartHash(rod * 31 + i, 3) - 0.5) * 7 * (1 - t);
-      const jz = (heartHash(rod * 31 + i, 4) - 0.5) * 7 * (1 - t);
-      pts.push([x + (c.x - x) * pull + jx, y, z + (c.z - z) * pull + jz]);
-    }
-    x = c.x;
-    z = c.z;
-    for (let i = 0; i < segs; i++) {
-      const along = 1 - (i + 0.5) / segs;
-      a.push(pts[i]);
-      b.push(pts[i + 1]);
-      p.push([rod, 0.5 + 0.35 * (1 - along), along, 0]);
-    }
-    // A branch off its upper third.
-    const r0 = pts[4];
-    let bx = r0[0];
-    let by = r0[1];
-    let bz = r0[2];
-    for (let i = 0; i < 5; i++) {
-      const nx = bx + (heartHash(rod, 10 + i) - 0.3) * 6;
-      const ny = by - 4 - heartHash(rod, 20 + i) * 3;
-      const nz = bz + (heartHash(rod, 30 + i) - 0.5) * 6;
-      a.push([bx, by, bz]);
-      b.push([nx, ny, nz]);
-      p.push([rod, 0.3, 1 - (4 + i) / segs, 1]);
-      bx = nx;
-      by = ny;
-      bz = nz;
-    }
-  });
-  return { a, b, p };
-}
-
 /** The Breath's air and weather, instance-local (cosmetic: the low tier
- *  builds a third of the particles; the strikes and the gusts stay). */
+ *  builds a third of the particles; the gusts stay). */
 export function buildBreathAir(lowGfx: boolean): THREE.Group {
   const group = new THREE.Group();
   group.name = 'smithHeartBreathAir';
@@ -537,25 +401,6 @@ export function buildBreathAir(lowGfx: boolean): THREE.Group {
       uAcross: { value: new THREE.Vector2((hi.z - lo.z) / run, -(hi.x - lo.x) / run) },
     }),
     8,
-  );
-  const rods = { value: Math.max(1, plan.crowns.length) };
-  const bolts = boltSegments(plan);
-  add(
-    'smithHeartBreathBolts',
-    quadGeometry(bolts.a, bolts.p, bolts.b),
-    airMaterial('smithHeartBreathBolts', BOLT_VERT, BOLT_FRAG, 0x9fe4ff, 1, true, { uRods: rods }),
-    9,
-  );
-  add(
-    'smithHeartBreathCrownHalos',
-    quadGeometry(
-      plan.crowns.map((c) => [c.x, c.y, c.z] as V3),
-      plan.crowns.map((_, i) => [i, 2.4, 0, 0] as V4),
-    ),
-    airMaterial('smithHeartBreathCrownHalos', HALO_VERT, HALO_FRAG, 0x8fd8f4, 1, true, {
-      uRods: rods,
-    }),
-    9,
   );
   return group;
 }
