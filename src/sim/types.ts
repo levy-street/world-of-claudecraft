@@ -66,8 +66,9 @@ export const TURN_SPEED = Math.PI; // rad/sec keyboard turning
 export const MELEE_RANGE = 5; // yards
 
 /** The heavy slams a template's `launch` can opt into (mob/boss_slams.ts launchFromSlam):
- *  the gapped ring (aoePulse), the circle stomp, the aimed hammer, the frontal cleave, the
- *  thrown boulder, and the warpath arrival slam. */
+ *  the ring (aoePulse), the circle stomp, the aimed hammer, the frontal cleave, the thrown
+ *  boulder, and the warpath arrival slam. `'smash'` tags EVERY aoePulse detonation, gapped
+ *  or not, so opt into it only for a ring melee can dodge (a `safeGap`, as Balgath's has). */
 export type SlamLaunchMechanic = 'smash' | 'stomp' | 'hammer' | 'cleave' | 'boulder' | 'wreck';
 export const MELEE_ARC = 2.2; // radians half-arc within which melee swings connect
 export const INTERACT_RANGE = 5;

@@ -460,7 +460,7 @@ describe('the aimed slams in a live fight', () => {
     expect(r.hit, 'standing in a 120-degree arc cost nothing').toBe(true);
   });
 
-  it('holds his knockback proc for the whole cleave windup, so a jump is never undone', () => {
+  it('opens the escape window for the whole cleave windup, so a jump is never undone', () => {
     // An on-hit knockback proc shoves AND grounds its victim. Landing one on a player
     // mid-jump in the arc turned a correct read into a hit. The windup opens the same escape
     // window his telegraphed rings already open (rift_escape_window.ts): the proc's roll is

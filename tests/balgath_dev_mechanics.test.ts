@@ -321,6 +321,61 @@ describe('/dev balgath <mechanic> forces the real telegraph for a solo tester', 
   });
 });
 
+describe('which of his slams throw the player they land on', () => {
+  // Owner feedback (too many knockbacks): a slam may throw you only if a melee player can
+  // dodge it. Each landing below runs through its REAL call site, so a slam that tags
+  // itself as the wrong mechanic (content launch.mechanics, mob/boss_slams.ts) fails here.
+  // `gap` puts the tester inside each blast: the smash's solid disc ends at 4.8 yards and
+  // the stomp is 7, the rest reach the 8 yards the default tester stands at.
+  const CASES: {
+    verb: BalgathDevMechanic;
+    gap: number;
+    radius?: number;
+    ability?: string;
+    punts: boolean;
+  }[] = [
+    { verb: 'hammer', gap: 8, ability: HAMMER_ABILITY, punts: true },
+    { verb: 'boulder', gap: 8, ability: BOULDER_ABILITY, punts: true },
+    { verb: 'cleave', gap: 8, ability: CLEAVE_ABILITY, punts: true },
+    { verb: 'smash', gap: 3, radius: MOBS[BALGATH]?.aoePulse?.radius, punts: true },
+    { verb: 'stomp', gap: 3, radius: MOBS[BALGATH]?.stomp?.radius, punts: false },
+    { verb: 'wreck', gap: 8, radius: MOBS[BALGATH]?.warpath?.wreck.radius, punts: false },
+  ];
+  for (const c of CASES) {
+    it(`${c.verb} ${c.punts ? 'throws' : 'does not throw'} the player it lands on`, () => {
+      const { sim, me } = world(true, c.gap);
+      // Mortal, topped up each tick: a godded target takes no damage event at all
+      // (combat/damage.ts), and the hit is half of what this pins.
+      (sim as unknown as Internals).setGm(me.id, false);
+      expect(errors(force(sim, c.verb))).toEqual([]);
+      let landed = false;
+      let hit = false;
+      for (let i = 0; i < 20 * 6 && !landed; i++) {
+        const evs = [...sim.tick(), ...sim.drainEvents()];
+        me.hp = me.maxHp;
+        landed = fxAt(evs, 'nova').some((e) =>
+          c.ability !== undefined
+            ? (e as { ability?: string }).ability === c.ability
+            : e.radius === c.radius,
+        );
+        hit ||= evs.some(
+          (e) => e.type === 'damage' && (e as { targetId?: number }).targetId === me.id,
+        );
+      }
+      expect(landed, `the ${c.verb} never landed`).toBe(true);
+      // It reached him (so "not thrown" is never a slam that simply missed).
+      expect(hit, `the ${c.verb} never hit the tester`).toBe(true);
+      if (c.punts) {
+        expect(me.vy).toBeGreaterThan(0);
+        expect(me.onGround).toBe(false);
+      } else {
+        expect(me.vy).toBeLessThanOrEqual(0);
+        expect(me.onGround).toBe(true);
+      }
+    });
+  }
+});
+
 describe('a forced cast keeps the natural spacing rules', () => {
   it('refuses a second telegraph while the first is on the ground', () => {
     const { sim, boss } = world();
