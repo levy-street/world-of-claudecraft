@@ -121,6 +121,8 @@ const PILLAR_DUST = {
   spread: 0.55,
   radius: 1.5,
 };
+/** The bar's lane is never painted fainter than this fill. */
+export const RUSH_LANE_FLOOR = 0.55;
 /** Seconds between two strides' thuds through the run. */
 const STRIDE = 0.26;
 
@@ -281,11 +283,14 @@ export class CouncilRushFx {
       this.drapedTZ = ta.z;
     }
     const fill = markFill(g.castRemaining, g.castTotal);
-    _paint.fill = fill;
+    // The band reads whole from the bar's first moment (a long lane across
+    // the Quarry seen from a raid camera washed out at a low fill), the bar's
+    // progress still rising in it; the cracks split open as it fills.
+    _paint.fill = RUSH_LANE_FLOOR + (1 - RUSH_LANE_FLOOR) * fill;
     _paint.clock = this.h.now();
     _paint.range = lane.length;
     this.h.kit.paintLane(this.lane, _paint);
-    this.h.paints.live(this.lanePaint, 0.6 * fill * fill);
+    this.h.paints.live(this.lanePaint, 0.45 + 0.55 * fill);
     this.lane.group.visible = true;
   }
 
@@ -340,7 +345,7 @@ export class CouncilRushFx {
         r.fromZ,
         Math.atan2(r.dirX, r.dirZ),
         Math.max(1, r.length),
-        T.rushHalfWidth,
+        T.rushHalfWidth + T.rushBody,
         { color: C.rush, accent: C.ochre },
       );
       this.lockedDrape = true;

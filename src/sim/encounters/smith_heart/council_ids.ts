@@ -393,6 +393,9 @@ export const COUNCIL_TUNING = {
   rushEvery: 24,
   rushCast: 3,
   rushHalfWidth: 2,
+  /** A body is struck within the half width plus this (its own girth): the
+   *  lane on the floor is drawn to the two together. */
+  rushBody: 0.5,
   rushWindup: 0.8,
   rushSpeed: 22,
   rushMin: 480,

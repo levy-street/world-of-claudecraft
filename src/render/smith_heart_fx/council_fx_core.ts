@@ -343,7 +343,7 @@ export function resonancePulseLook(clock: number): number {
  *  player (tx, tz): its bearing (sim yaw), its length (the player's distance,
  *  or `reach` when that runs further: the line goes on to the Quarry's edge,
  *  `rushLaneReach`), its half width (the sim's own, the mark's value2 when it
- *  rides). Null when the two stand together. Fills `out`. */
+ *  rides, plus a body's girth: the hit's whole reach). Null when the two stand together. Fills `out`. */
 export function rushLane(
   gx: number,
   gz: number,
@@ -359,7 +359,9 @@ export function rushLane(
   if (len < 0.5) return null;
   out.yaw = Math.atan2(dx, dz);
   out.length = Math.max(len, reach);
-  out.half = half > 0 ? half : T.rushHalfWidth;
+  // Drawn to where a body is struck (the half width plus its girth), so the
+  // band on the floor is the whole hit: stand off it and the charge misses.
+  out.half = (half > 0 ? half : T.rushHalfWidth) + T.rushBody;
   return out;
 }
 

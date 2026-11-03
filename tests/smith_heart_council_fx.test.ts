@@ -139,16 +139,18 @@ describe('council_fx_core: integrity on the model', () => {
     expect(markRadius(res, undefined)).toBe(T.resonanceRadius);
   });
 
-  it("the Rush's lane runs from the Guardian to its mark at the sim's width", () => {
+  it("the Rush's lane runs from the Guardian to its mark at the hit's whole width", () => {
     const out = { yaw: 0, length: 0, half: 0 };
     const lane = rushLane(0, 0, 0, 12, 0, out);
     expect(lane).toBe(out);
     expect(out.yaw).toBeCloseTo(0);
     expect(out.length).toBeCloseTo(12);
-    expect(out.half).toBe(T.rushHalfWidth);
+    // Drawn to the hit's whole reach: the half width and a body's girth.
+    expect(out.half).toBe(T.rushHalfWidth + T.rushBody);
+    expect(out.half * 2).toBeGreaterThanOrEqual(5);
     rushLane(0, 0, 5, 0, 3, out);
     expect(out.yaw).toBeCloseTo(Math.PI / 2);
-    expect(out.half).toBe(3);
+    expect(out.half).toBe(3 + T.rushBody);
     expect(rushLane(1, 1, 1.1, 1, 2, out)).toBeNull();
   });
 

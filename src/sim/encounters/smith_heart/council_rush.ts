@@ -303,7 +303,7 @@ export function stepRush(s: CouncilScope): RushOutcome | null {
   const b = { x: g.pos.x, z: g.pos.z };
   for (const p of s.players) {
     if (p.dead || r.struck.includes(p.id)) continue;
-    if (segmentDistance(p.pos, a, b) > T.rushHalfWidth + 0.5) continue;
+    if (segmentDistance(p.pos, a, b) > T.rushHalfWidth + T.rushBody) continue;
     r.struck.push(p.id);
     const amount = roll(s, g, T.rushMin, T.rushMax);
     s.ctx.dealDamage(g, p, amount, false, 'physical', COUNCIL_NAMES.rush, 'hit', true);
