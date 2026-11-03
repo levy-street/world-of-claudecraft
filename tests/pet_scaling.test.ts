@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { SET_GREYJAW_STALKER } from '../src/sim/content/item_sets';
 import { ITEMS, MOBS } from '../src/sim/data';
 import { createMob, type PlayerEquipment, recalcPlayerStats } from '../src/sim/entity';
-import { applyPetOwnerScaling } from '../src/sim/pet/pet_ai';
+import { applyPetOwnerScaling, updatePet } from '../src/sim/pet/pet_ai';
 import {
   abandonPet,
   completeTame,
@@ -19,7 +19,14 @@ import {
   petOwnerScaling,
 } from '../src/sim/pet/pet_scaling';
 import { Sim } from '../src/sim/sim';
-import { DT, type Entity, type ItemDef, RUN_SPEED, type Vec3 } from '../src/sim/types';
+import {
+  DT,
+  type Entity,
+  type ItemDef,
+  RUN_SPEED,
+  swingMissChance,
+  type Vec3,
+} from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 
 // A hunter pet used to be frozen at tame time: its health and damage came only
@@ -501,3 +508,21 @@ function place(e: AnyEntity, x: number, z: number): void {
 function dist(a: Vec3, b: Vec3): number {
   return Math.hypot(a.x - b.x, a.z - b.z);
 }
+
+describe('pet_scaling: owner hit rating', () => {
+  it("attacks with its owner's hit chance and follows a gear change", () => {
+    const { sim, hunter, pet } = tamedWolf();
+    // Two levels up, a level-20 swing misses 13% with no hit.
+    const boss = spawnWolf(sim, hunter, pet.level + 2);
+
+    hunter.hitBonus = 0.155;
+    updatePet(sim.ctx, pet);
+    expect(pet.hitBonus).toBe(0.155);
+    expect(swingMissChance(pet, boss)).toBe(0);
+
+    hunter.hitBonus = 0.085;
+    updatePet(sim.ctx, pet);
+    expect(pet.hitBonus).toBe(0.085);
+    expect(swingMissChance(pet, boss)).toBeCloseTo(0.045, 10);
+  });
+});

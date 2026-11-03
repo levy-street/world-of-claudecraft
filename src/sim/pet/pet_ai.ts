@@ -116,6 +116,10 @@ export function updatePet(ctx: SimContext, pet: Entity): void {
     ctx.despawnPet(pet);
     return;
   }
+  // Every player pet (beast, demon, undead, elemental) attacks with its owner's hit
+  // chance, so a hit-capped owner's pet stops missing too. Read live each tick, so
+  // a gear swap follows on the next one. No rng.
+  pet.hitBonus = owner.hitBonus;
   // Ahead of the channel/stun early-outs so a gear swap reaches the pet on the very
   // next tick. Idempotent and rng-free, so it costs a few arithmetic ops when the
   // owner's stats have not moved.
