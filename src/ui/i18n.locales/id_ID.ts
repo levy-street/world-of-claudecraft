@@ -7400,6 +7400,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.levelFamily': '{family} Level {level}',
   'hudChrome.mobTooltip.elite': 'Elite',
   'hudChrome.mobTooltip.boss': 'Bos',
+  'hudChrome.mobTooltip.buddyOwner': 'Teman milik {owner}',
   'hudChrome.options.aurasOnPlayerFrame': 'Buff pada Bingkai Pemain',
   'hudChrome.options.playerFrameScale': 'Skala Bingkai Pemain',
   'hudChrome.options.showDailyRewardsChest': 'Tampilkan Peti Hadiah Harian',

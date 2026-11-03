@@ -5086,7 +5086,8 @@ export const sv_SE: EnTranslations = {
       "hostile": "Fientlig",
       "friendly": "Vänlig",
       "elite": "Elit",
-      "boss": "Boss"
+      "boss": "Boss",
+      "buddyOwner": "Följeslagare till {owner}"
     },
     "playerTooltip": {
       "guild": "<{guild}>",

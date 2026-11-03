@@ -16216,6 +16216,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.meters.windowScale'
   | 'hudChrome.meters.windowScaleDesc'
   | 'hudChrome.mobTooltip.boss'
+  | 'hudChrome.mobTooltip.buddyOwner'
   | 'hudChrome.mobTooltip.elite'
   | 'hudChrome.mobTooltip.familyDemon'
   | 'hudChrome.mobTooltip.friendly'

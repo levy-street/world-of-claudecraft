@@ -5086,7 +5086,8 @@ export const tr_TR: EnTranslations = {
       "hostile": "Düşman",
       "friendly": "Dost",
       "elite": "Seçkin",
-      "boss": "Patron"
+      "boss": "Patron",
+      "buddyOwner": "Yoldaş sahibi: {owner}"
     },
     "playerTooltip": {
       "guild": "<{guild}>",

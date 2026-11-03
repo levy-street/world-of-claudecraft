@@ -5086,7 +5086,8 @@ export const cs_CZ: EnTranslations = {
       "hostile": "Nepřátelský",
       "friendly": "Přátelský",
       "elite": "Elita",
-      "boss": "Boss"
+      "boss": "Boss",
+      "buddyOwner": "Společník hráče {owner}"
     },
     "playerTooltip": {
       "guild": "<{guild}>",

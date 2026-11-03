@@ -3121,6 +3121,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.friendly': '味方',
   'hudChrome.mobTooltip.elite': 'エリート',
   'hudChrome.mobTooltip.boss': 'ボス',
+  'hudChrome.mobTooltip.buddyOwner': '{owner}のバディ',
   'hudChrome.targetFrame.unlock': 'ターゲットフレームを移動',
   'hudChrome.targetFrame.lock': 'ターゲットフレームを固定',
   'hudChrome.playerFrame.unlock': 'プレイヤーフレームを移動',

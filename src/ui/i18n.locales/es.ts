@@ -7400,6 +7400,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.friendly': 'Amistoso',
   'hudChrome.mobTooltip.elite': 'Élite',
   'hudChrome.mobTooltip.boss': 'Jefe',
+  'hudChrome.mobTooltip.buddyOwner': 'Compañero de {owner}',
   'hud.core.mapCanvasLabel': 'Mapa',
   'hud.core.mapSummary': 'Mapa de {zone}.',
   'hud.core.mapMarkerDescription': '{area}. {markers}',

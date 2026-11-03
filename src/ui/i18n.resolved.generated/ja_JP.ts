@@ -5086,7 +5086,8 @@ export const ja_JP: EnTranslations = {
       "hostile": "敵対",
       "friendly": "味方",
       "elite": "エリート",
-      "boss": "ボス"
+      "boss": "ボス",
+      "buddyOwner": "{owner}のバディ"
     },
     "playerTooltip": {
       "guild": "<{guild}>",

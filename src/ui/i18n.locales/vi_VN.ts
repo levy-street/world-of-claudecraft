@@ -7408,6 +7408,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.levelFamily': '{family} cấp {level}',
   'hudChrome.mobTooltip.elite': 'Tinh Anh',
   'hudChrome.mobTooltip.boss': 'Boss',
+  'hudChrome.mobTooltip.buddyOwner': 'Bạn đồng hành của {owner}',
   'hudChrome.mobile.hotbarPage': 'Kỹ Năng',
   'hudChrome.mobile.hotbarPageAria': 'Hiện bộ kỹ năng tiếp theo',
   'hudChrome.options.aurasOnPlayerFrame': 'Hiệu Ứng Có Lợi Trên Khung Người Chơi',

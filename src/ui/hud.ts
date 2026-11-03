@@ -6316,7 +6316,11 @@ export class Hud {
     const questKey = mobQuests
       .map((q) => `${q.questId}#${q.objectiveIndex}:${q.current}/${q.total}`)
       .join(',');
-    const key = `mob:${entity.id}:${entity.name}:${entity.level}:${entity.hostile ? 1 : 0}:${this.sim.player.level}:${questKey}`;
+    const buddyOwner =
+      isBuddyMob(entity) && entity.ownerId !== null
+        ? (this.sim.entities.get(entity.ownerId)?.name ?? null)
+        : null;
+    const key = `mob:${entity.id}:${entity.name}:${entity.level}:${entity.hostile ? 1 : 0}:${this.sim.player.level}:${questKey}:${buddyOwner ?? ''}`;
     if (key === this.lastHoverTooltipId) return;
     this.lastHoverTooltipId = key;
     const template = MOBS[entity.templateId];
@@ -6332,6 +6336,7 @@ export class Hud {
         : t(`guide.family.${template.family}.name` as TranslationKey);
     const model: MobTooltipModel = {
       ...mobHoverIdentity(entity),
+      ...(buddyOwner ? { buddyOwner } : {}),
       level: entity.level,
       familyLabel,
       color: mobTooltipConColor(diff, entity.dead, friendlyPet),

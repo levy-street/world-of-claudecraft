@@ -5086,7 +5086,8 @@ export const en_XA: EnTranslations = {
       "hostile": "[Ĥóšţíļé]",
       "friendly": "[Ƒŕíéñðļý]",
       "elite": "[Éļíţé]",
-      "boss": "[Ɓóšš]"
+      "boss": "[Ɓóšš]",
+      "buddyOwner": "[{owner}'š Ɓúððý]"
     },
     "playerTooltip": {
       "guild": "[<{guild}>]",

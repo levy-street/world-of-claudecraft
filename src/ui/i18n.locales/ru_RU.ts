@@ -4916,6 +4916,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.friendly': 'Дружественный',
   'hudChrome.mobTooltip.elite': 'Элита',
   'hudChrome.mobTooltip.boss': 'Босс',
+  'hudChrome.mobTooltip.buddyOwner': 'Спутник игрока {owner}',
   'hudChrome.targetFrame.unlock': 'Переместить рамку цели',
   'hudChrome.targetFrame.lock': 'Закрепить рамку цели',
   'hudChrome.playerFrame.unlock': 'Переместить рамку игрока',

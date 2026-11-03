@@ -4638,6 +4638,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.friendly': '友方',
   'hudChrome.mobTooltip.elite': '精英',
   'hudChrome.mobTooltip.boss': '首领',
+  'hudChrome.mobTooltip.buddyOwner': '{owner}的伙伴',
   'hudChrome.targetFrame.unlock': '移动目标框',
   'hudChrome.targetFrame.lock': '锁定目标框',
   'hudChrome.playerFrame.unlock': '移动玩家框',

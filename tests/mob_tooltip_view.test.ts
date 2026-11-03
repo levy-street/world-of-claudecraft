@@ -54,6 +54,17 @@ describe('mobTooltipHtml', () => {
     expect(html).not.toContain('hudChrome.mobTooltip.hostile');
   });
 
+  it("names a buddy's owner under its name, escaped, and only for a buddy", () => {
+    const html = mobTooltipHtml(
+      model({ name: 'Sir Oats', buddyType: 'Pocket Drake', buddyOwner: '<b>Fury</b>' }),
+      deps,
+    );
+    expect(html).toContain(
+      '<div class="tt-sub">Pocket Drake</div><div class="tt-sub">hudChrome.mobTooltip.buddyOwner(owner=&lt;b&gt;Fury&lt;/b&gt;)</div>',
+    );
+    expect(mobTooltipHtml(model(), deps)).not.toContain('buddyOwner');
+  });
+
   it('escapes HTML in the name and family label', () => {
     const html = mobTooltipHtml(model({ name: '<script>alert(1)</script>' }), deps);
     expect(html).not.toContain('<script>');

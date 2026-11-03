@@ -7238,6 +7238,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.levelFamily': 'Nivå {level} {family}',
   'hudChrome.mobTooltip.elite': 'Elit',
   'hudChrome.mobTooltip.boss': 'Boss',
+  'hudChrome.mobTooltip.buddyOwner': 'Följeslagare till {owner}',
   'hudChrome.options.aurasOnPlayerFrame': 'Förstärkningar på spelarramen',
   'hudChrome.options.playerFrameScale': 'Spelarramens skala',
   'hudChrome.options.showDailyRewardsChest': 'Visa kistan för dagliga belöningar',

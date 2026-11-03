@@ -5086,7 +5086,8 @@ export const es: EnTranslations = {
       "hostile": "Hostil",
       "friendly": "Amistoso",
       "elite": "Élite",
-      "boss": "Jefe"
+      "boss": "Jefe",
+      "buddyOwner": "Compañero de {owner}"
     },
     "playerTooltip": {
       "guild": "<{guild}>",

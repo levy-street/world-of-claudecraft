@@ -5086,7 +5086,8 @@ export const nl_NL: EnTranslations = {
       "hostile": "Vijandig",
       "friendly": "Vriendelijk",
       "elite": "Elite",
-      "boss": "Baas"
+      "boss": "Baas",
+      "buddyOwner": "Metgezel van {owner}"
     },
     "playerTooltip": {
       "guild": "<{guild}>",

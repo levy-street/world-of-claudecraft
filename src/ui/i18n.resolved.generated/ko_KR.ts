@@ -5086,7 +5086,8 @@ export const ko_KR: EnTranslations = {
       "hostile": "적대",
       "friendly": "아군",
       "elite": "정예",
-      "boss": "우두머리"
+      "boss": "우두머리",
+      "buddyOwner": "{owner}의 버디"
     },
     "playerTooltip": {
       "guild": "<{guild}>",

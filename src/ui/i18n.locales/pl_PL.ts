@@ -7439,6 +7439,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.levelFamily': 'Poziom {level}: {family}',
   'hudChrome.mobTooltip.elite': 'Elita',
   'hudChrome.mobTooltip.boss': 'Boss',
+  'hudChrome.mobTooltip.buddyOwner': 'Towarzysz gracza {owner}',
   'hudChrome.options.aurasOnPlayerFrame': 'Wzmocnienia na ramce gracza',
   'hudChrome.options.playerFrameScale': 'Skala ramki gracza',
   'hudChrome.options.showDailyRewardsChest': 'Pokaż skrzynię codziennych nagród',

@@ -7404,6 +7404,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.levelFamily': '{family} de nível {level}',
   'hudChrome.mobTooltip.elite': 'Elite',
   'hudChrome.mobTooltip.boss': 'Chefe',
+  'hudChrome.mobTooltip.buddyOwner': 'Companheiro de {owner}',
   'hudChrome.options.aurasOnPlayerFrame': 'Benefícios no Quadro do Jogador',
   'hudChrome.options.playerFrameScale': 'Escala do Quadro do Jogador',
   'hudChrome.options.showDailyRewardsChest': 'Mostrar Baú de Recompensas Diárias',

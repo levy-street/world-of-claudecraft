@@ -6476,6 +6476,8 @@ export const hudChromeStrings = {
     // "lite" run); "Boss" is not.
     elite: 'Elite',
     boss: 'Boss',
+    // Under a buddy's name: whose companion it is.
+    buddyOwner: "{owner}'s Buddy",
   },
   // The player mouseover tooltip (player_tooltip_view.ts): the classic
   // <Guild> line and the chosen specialization with its role, both slots

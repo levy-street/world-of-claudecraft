@@ -5086,7 +5086,8 @@ export const zh_TW: EnTranslations = {
       "hostile": "敵對",
       "friendly": "友方",
       "elite": "精英",
-      "boss": "首領"
+      "boss": "首領",
+      "buddyOwner": "{owner}的夥伴"
     },
     "playerTooltip": {
       "guild": "<{guild}>",

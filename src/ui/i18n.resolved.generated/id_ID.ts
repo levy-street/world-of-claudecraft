@@ -5086,7 +5086,8 @@ export const id_ID: EnTranslations = {
       "hostile": "Bermusuhan",
       "friendly": "Ramah",
       "elite": "Elite",
-      "boss": "Bos"
+      "boss": "Bos",
+      "buddyOwner": "Teman milik {owner}"
     },
     "playerTooltip": {
       "guild": "<{guild}>",

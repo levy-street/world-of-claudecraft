@@ -5086,7 +5086,8 @@ export const vi_VN: EnTranslations = {
       "hostile": "Thù Địch",
       "friendly": "Thân Thiện",
       "elite": "Tinh Anh",
-      "boss": "Boss"
+      "boss": "Boss",
+      "buddyOwner": "Bạn đồng hành của {owner}"
     },
     "playerTooltip": {
       "guild": "<{guild}>",
