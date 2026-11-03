@@ -117,11 +117,14 @@ class BreathPiece(SPiece):
     lichen and its pale rosettes only on the tops, no dust; crisp where the
     rock breaks, soft over a swell."""
 
-    def __init__(self, name, seed=0, lichen=1.0, **kw):
+    def __init__(self, name, seed=0, lichen=1.0, hang=0.0, **kw):
         kw.setdefault('ao', 0.75)
         kw.setdefault('dust', 0.0)
         super().__init__(name, seed=seed, **kw)
         self.lichen = lichen
+        # A hanging piece (an isle's crag): its stone darkens and cools
+        # toward its lowest point, this much at the very bottom.
+        self.hang = hang
 
     def finish(self, materials, parent):
         import bmesh
@@ -183,6 +186,13 @@ class BreathPiece(SPiece):
                     k = tone * bed * foot * under * wear
                     col = tuple(ch * k for ch in col)
                     col = mix(col, STORM_COOL, max(0.0, -c) * 0.35)
+                    if self.hang > 0.0 and p.z < 0.0 and floor < 0.0:
+                        deep = min(1.0, p.z / floor) ** 1.3
+                        col = mix(col, STORM_DEEP, self.hang * deep)
+                        # Its strata: soft bands of paler and darker beds,
+                        # warped so no band is a level line.
+                        band = math.sin(p.z * 1.05 + _fbm(p.x * 0.12, p.y * 0.12, p.z * 0.05) * 4.0)
+                        col = tuple(ch * (1.0 + 0.11 * band * min(1.0, -p.z * 0.4)) for ch in col)
                     if len(oh) and abs(n.z) < 0.6:
                         dx = oh[:, 0] - p.x
                         dy = oh[:, 1] - p.y
@@ -820,9 +830,12 @@ def wind_groove():
 # on). Frame: the floor's centre at the origin, the walk flat at z 0 out to
 # ISLE_WALK_R (past the sim's rim, so no foot stands over air), the craggy
 # lip, the wind-rune stones and the rim's crystals outside it; the underside
-# an inverted crag of strata stepping in as it hangs, ending in a point with
-# the vein's crystal growing out of it; roots and vines hanging in the wind,
-# a broken chain of carved stone links trailing from the old moorings.
+# (what the raid sees, looking up from the Cornice) an inverted crag of torn
+# columns leaning in with its taper, warped strata, the stone darkening to
+# the point with the vein's crystal growing out of it and out of its flanks;
+# thick roots clinging down the rock then hanging (a few forking), vines over
+# the lip, a broken chain of carved stone links trailing from the old
+# moorings, a few torn stones drifting under the point.
 ISLE_WALK_R = 9.7
 ISLE_RUNE_R = 6.6
 ROOT = (0.33, 0.26, 0.2)
@@ -852,7 +865,7 @@ def wind_isle(bpy, variant):
     21 deep, its walk flat."""
     from gwkit import chain_link, hull
     S = ISLE_SPECS[variant]
-    p = BP('WindIsle' + variant, seed=S['seed'], ao=0.7, ao_dist=3.0, lichen=1.5)
+    p = BP('WindIsle' + variant, seed=S['seed'], ao=0.7, ao_dist=3.0, lichen=1.5, hang=0.55)
     rng = np.random.default_rng(S['seed'])
     D = S['depth']
     f = Sculpt((-14.5, -14.5, -D - 3.0), (14.5, 14.5, 3.0), 0.2)
@@ -869,45 +882,88 @@ def wind_isle(bpy, variant):
                                                (s, s * 0.85, 3.4), cuts=12, chamfer=(0.8, 0.95),
                                                R=rot(rz=a + float(rng.uniform(-0.4, 0.4)),
                                                      rx=float(rng.uniform(-0.25, 0.25)))), 0.5)
-    # The hang: beds stepping in as they fall, each its own grey, the whole
-    # leaning one way (a crag torn from the mountain, never a cone).
-    beds = 7
-    for k in range(beds):
-        t = (k + 1) / beds
-        z = -3.4 - t * (D - 5.0)
-        w = 8.6 * (1.0 - t) ** 1.55 + 0.9
-        cx = lx * t * t * 3.0 + float(rng.uniform(-0.5, 0.5))
-        cy = ly * t * t * 3.0 + float(rng.uniform(-0.5, 0.5))
-        f.put(('g1', 'g4', 'g3', 'g0', 'g1', 'g3', 'g4')[k], block(
-            rng, (cx, cy, z), (w * 2.1, w * 2.0 * S['aspect'], (D - 4.0) / beds * 1.5), cuts=16,
-            chamfer=(0.78, 0.95), R=rot(rz=float(rng.uniform(0, TAU)))), 0.55)
+    # The hang (the owner's look from the Cornice, 2026-11-03: the old beds
+    # read as a stack of plates): a leaning inverted crag, its core a
+    # tapered spine, its flanks a ring of tall torn columns stepping in as
+    # they fall (vertical faces the eye reads as rock torn from the
+    # mountain, never a pancake), their feet staggered so no bed is one
+    # level ring; the stone darkens toward the point (the piece's `hang`).
     tip = (lx * 3.2, ly * 3.2, -D)
-    f.put('g3', Polyline([(lx * 1.6, ly * 1.6, -D * 0.62), (tip[0] * 0.9, tip[1] * 0.9, -D + 2.4), tip],
-                         [2.6, 1.3, 0.25]), 0.6)
-    # The hanging lobes: lesser crags dripping off the hang.
+
+    def hang_r(z):
+        """The hang's radius at depth z (0 under the crown, the point at -D)."""
+        t = min(1.0, max(0.0, (-z - 2.0) / (D - 2.0)))
+        return 9.4 * (1.0 - t) ** 1.25 + 0.5
+
+    def hang_c(z):
+        """The hang's leaning axis at depth z."""
+        t = min(1.0, max(0.0, (-z - 2.0) / (D - 2.0)))
+        return lx * t * t * 3.2, ly * t * t * 3.2
+
+    spine = []
+    for k in range(7):
+        z = -2.0 - (D - 2.0) * (k / 6) ** 0.9
+        cx, cy = hang_c(z)
+        spine.append((cx, cy, z))
+    f.put('g1', Polyline(spine, [hang_r(q[2]) * 0.86 for q in spine[:-1]] + [0.35]), 0.9)
+    # The columns: tiers round the hang, each column leaning in with the
+    # taper (its top out under the crown, its foot in toward the point),
+    # torn at its own height so the feet stagger down the crag.
+    slope = math.atan(9.4 * 1.25 / (D - 2.0))
+    tiers = ((-5.0, 8.0, 12, ('g4', 'g0', 'g1')), (-9.0, 7.5, 11, ('g1', 'g4', 'g3')),
+             (-13.0, 6.5, 9, ('g3', 'g1', 'deep')), (-16.5, 5.0, 6, ('g3', 'deep')))
+    for (z0, h, n, tones) in tiers:
+        if -z0 > D - 2.0:
+            continue
+        off = float(rng.uniform(0, TAU))
+        for j in range(n):
+            a = off + TAU * j / n + float(rng.uniform(-0.22, 0.22))
+            z = z0 + float(rng.uniform(-1.4, 1.4))
+            hh = h * float(rng.uniform(0.75, 1.25))
+            r = hang_r(z) * float(rng.uniform(0.7, 0.84))
+            cx, cy = hang_c(z)
+            w = max(1.3, hang_r(z) * float(rng.uniform(0.36, 0.5)))
+            f.put(tones[j % len(tones)], block(
+                rng, (cx + math.cos(a) * r, cy + math.sin(a) * r * S['aspect'], z),
+                (w, w * 0.78, hh), cuts=10, chamfer=(0.72, 0.93),
+                R=rot(rz=a + float(rng.uniform(-0.25, 0.25)), ry=slope * float(rng.uniform(0.8, 1.1)),
+                      rx=float(rng.uniform(-0.1, 0.1)))), 0.45)
+    # The point: a dark spike torn long, the vein's crystal out of it.
+    f.put('deep', Polyline([(lx * 1.6, ly * 1.6, -D * 0.6), (tip[0] * 0.9, tip[1] * 0.9, -D + 2.4), tip],
+                           [2.4, 1.2, 0.25]), 0.6)
+    # The hanging lobes: lesser crags dripping off the hang, a column apiece.
     for (ox, oy, oz) in S['lobes']:
-        f.put('g4', Polyline([(ox * 0.7, oy * 0.7, -4.0), (ox, oy, (oz - 4.0) / 2), (ox * 1.1, oy * 1.1, oz)],
-                             [2.6, 1.7, 0.3]), 0.7)
-    # Spalls broken out of the flanks.
-    for _ in range(5):
+        f.put('g3', Polyline([(ox * 0.7, oy * 0.7, -4.0), (ox, oy, (oz - 4.0) / 2), (ox * 1.1, oy * 1.1, oz)],
+                             [2.4, 1.6, 0.3]), 0.7)
+        f.put('deep', block(rng, (ox * 1.05, oy * 1.05, oz * 0.8), (1.8, 1.5, 4.5), cuts=8,
+                            chamfer=(0.72, 0.93), R=rot(rz=float(rng.uniform(0, TAU)))), 0.4)
+    # Spalls broken out of the flanks (the torn faces' hollows).
+    for _ in range(7):
         a = float(rng.uniform(0, TAU))
-        z = float(rng.uniform(-D * 0.55, -4.5))
-        r = 8.6 * (1 + z / D) ** 1.55 + 1.6
-        f.sub(Ellipsoid((math.cos(a) * r, math.sin(a) * r, z), (1.8, 1.4, 1.1), rot(rz=a)), 0.4)
-    # The wind's flutes running down the hang, a craggy swell under them.
-    _scour(f, S['seed'], amp=0.32, scale=0.24, band=0.9, along=(0.0, 0.0, 1.0), flutes=0.55)
+        z = float(rng.uniform(-D * 0.7, -4.5))
+        cx, cy = hang_c(z)
+        r = hang_r(z) + 0.9
+        f.sub(Ellipsoid((cx + math.cos(a) * r, cy + math.sin(a) * r, z), (1.7, 1.3, 1.6), rot(rz=a)), 0.4)
+    # The wind's flutes running DOWN the hang (its grain vertical), a
+    # craggy swell under them.
+    _scour(f, S['seed'], amp=0.42, scale=0.26, band=1.0, along=(0.0, 0.0, 1.0), flutes=0.6)
     _isle_rim(f)
     # The outcrops on the lip the wind-rune stones stand on.
     for a in S['stones']:
         f.put('g2', block(rng, (math.cos(a) * 10.6, math.sin(a) * 10.6, -0.3), (2.6, 2.2, 1.8), cuts=9,
                           chamfer=(0.76, 0.93), R=rot(rz=a)), 0.3)
-    # The beds' joints read from across the void: a groove round the hang
-    # at each bed.
-    for k in range(1, 5):
-        z = -3.4 - (k / beds) * (D - 5.0) + 0.6
-        w = 8.6 * (1.0 - k / beds) ** 1.55 + 0.9
-        ring = [(math.cos(a) * w * 1.1, math.sin(a) * w * 1.1, z) for a in np.linspace(0, TAU, 41)]
-        _carve(f, ring, 0.2, 0.14)
+    # The strata: thin beds read across the void, each a tilted, broken
+    # line (never a level ring), cut round part of the hang.
+    for k in range(4):
+        z = -4.0 - k * (D - 7.0) / 4.0
+        tilt = float(rng.uniform(-0.12, 0.12))
+        a0 = float(rng.uniform(0, TAU))
+        cx, cy = hang_c(z)
+        arc = []
+        for a in np.linspace(a0, a0 + TAU * 0.7, 30):
+            w = hang_r(z) * 1.08
+            arc.append((cx + math.cos(a) * w, cy + math.sin(a) * w, z + tilt * w * math.cos(a - a0)))
+        _carve(f, arc, 0.22, 0.16)
     # The walk's carved circle (where the wind runes burn, isleRuneRing) and
     # four strokes of the Smith's wind sign inside it.
     ring = [(math.cos(a) * ISLE_RUNE_R, math.sin(a) * ISLE_RUNE_R, 0.0) for a in np.linspace(0, TAU, 73)]
@@ -917,7 +973,7 @@ def wind_isle(bpy, variant):
         f.groove(Polyline([(math.cos(a) * 2.2, math.sin(a) * 2.2, 0.0),
                            (math.cos(a + 0.35) * 4.6, math.sin(a + 0.35) * 4.6, 0.0)], 0.02), 0.06, 0.12)
     f.cut_below(-D - 2.0)
-    _mesh(bpy, p, f, 'WindIsle' + variant, 3300)
+    _mesh(bpy, p, f, 'WindIsle' + variant, 3700)
     prng = p.rng
     # The vein's crystal: a cluster out of the point (the isle's heart, its
     # light pointing down into the void), more out of the hang's flanks and
@@ -932,11 +988,13 @@ def wind_isle(bpy, variant):
             facet_crystal(p, (point[0], point[1], point[2] + 1.2), d, prng.uniform(3.0, 5.0) if j else 6.8,
                           prng.uniform(0.38, 0.55) if j else 0.72,
                           BREATH_CORE if j == 0 else p.vary(BREATH_GLOW, 0.05))
-        for c in range(7):
-            a = TAU * c / 7 + prng.uniform(-0.4, 0.4)
-            z = prng.uniform(-D * 0.6, -5.0)
-            r = 8.6 * (1 + z / D) ** 1.55 + 0.6
-            at = _on_surface(f, [(math.cos(a) * (r + 2.0), math.sin(a) * (r + 2.0), z)])[0]
+        for c in range(8):
+            a = TAU * c / 8 + prng.uniform(-0.4, 0.4)
+            z = prng.uniform(-D * 0.8, -5.0)
+            cx, cy = hang_c(z)
+            r = hang_r(z) + 2.0
+            # Seated a little into the rock (the cluster grows out of it).
+            at = _on_surface(f, [(cx + math.cos(a) * r, cy + math.sin(a) * r, z)], lift=-0.25)[0]
             for j in range(3):
                 b = a + prng.uniform(-0.6, 0.6)
                 d = (math.cos(b), math.sin(b), prng.uniform(-0.9, 0.1))
@@ -974,30 +1032,45 @@ def wind_isle(bpy, variant):
             facet_crystal(p, (x + math.cos(a) * h * lean, y + math.sin(a) * h * lean, h + 0.05),
                           (math.cos(a) * 0.3, math.sin(a) * 0.3, 1.0), prng.uniform(1.0, 1.4), 0.22,
                           p.vary(BREATH_GLOW, 0.05))
-    # The roots: out of the crown's underside, curling out and hanging down
-    # in the wind, thick at their foot.
-    for k in range(16):
-        a = TAU * k / 16 + prng.uniform(-0.2, 0.2)
-        r0 = prng.uniform(7.0, 9.4)
-        z0 = prng.uniform(-6.5, -5.0)
-        # Snapped up from under the crown (never onto the walk above it).
-        start = _on_surface(f, [(math.cos(a) * r0, math.sin(a) * r0, z0)])[0]
+    # The roots: out from under the crown and the hang's flanks, clinging
+    # down the rock a way, then hanging free in the wind; thick at the foot,
+    # a few forking (a body of wood, never a whisker).
+    for k in range(14):
+        a = TAU * k / 14 + prng.uniform(-0.2, 0.2)
+        z0 = prng.uniform(-8.5, -4.0) if k % 3 else prng.uniform(-13.0, -9.0)
+        cx, cy = hang_c(z0)
+        r0 = hang_r(z0) + 1.5
+        start = _on_surface(f, [(cx + math.cos(a) * r0, cy + math.sin(a) * r0, z0)], lift=0.1)[0]
         if start[2] > -1.0:
             continue
-        L = prng.uniform(3.0, 8.5)
-        pts = []
+        L = prng.uniform(4.5, 9.0)
+        # Clinging: two steps down the rock, snapped onto it.
+        cling = []
+        for i in (1, 2):
+            zz = start[2] - i * 1.1
+            ccx, ccy = hang_c(zz)
+            rr = hang_r(zz) + 1.5
+            cling.append((ccx + math.cos(a) * rr, ccy + math.sin(a) * rr, zz))
+        pts = [start] + _on_surface(f, cling, lift=0.12)
         sway = prng.uniform(-0.6, 0.6)
-        kink = prng.uniform(0.5, 1.1)
-        for i in range(11):
-            t = i / 10
-            out = 1.0 + t * 2.6
-            # A root's wander: out from the rock, then a lazy S as it hangs.
-            wig = math.sin(t * math.pi * 1.6 + k) * kink * t
-            pts.append((start[0] + math.cos(a + sway * t) * out * t * 1.4 - math.sin(a) * wig,
-                        start[1] + math.sin(a + sway * t) * out * t * 1.4 + math.cos(a) * wig,
-                        start[2] - L * t ** 1.25))
+        kink = prng.uniform(0.4, 0.9)
+        q0 = pts[-1]
+        for i in range(1, 6):
+            t = i / 5
+            wig = math.sin(t * math.pi * 1.4 + k) * kink * t
+            pts.append((q0[0] + math.cos(a + sway * t) * t * 1.6 - math.sin(a) * wig,
+                        q0[1] + math.sin(a + sway * t) * t * 1.6 + math.cos(a) * wig,
+                        q0[2] - L * t ** 1.2))
+        col = p.vary(ROOT if k % 3 else ROOT_PALE, 0.06)
         with p.as_kind(PAINT):
-            p.sweep(pts, prng.uniform(0.17, 0.3), 0.04, p.vary(ROOT if k % 3 else ROOT_PALE, 0.06), sides=5)
+            p.sweep(pts, prng.uniform(0.4, 0.58), 0.06, col, sides=6)
+            if k % 3 == 0:
+                # A fork from the root's knee.
+                kq = pts[4]
+                fa = a + (0.9 if prng.uniform(0.0, 1.0) < 0.5 else -0.9)
+                fork = [kq] + [(kq[0] + math.cos(fa) * t * 1.4, kq[1] + math.sin(fa) * t * 1.4,
+                                kq[2] - 3.2 * t ** 1.3) for t in (0.35, 0.7, 1.0)]
+                p.sweep(fork, 0.22, 0.04, col, sides=5)
     # The vines over the lip, hanging down the flank with a few leaves.
     for k in range(9):
         a = TAU * k / 9 + 0.3 + prng.uniform(-0.2, 0.2)
@@ -1008,12 +1081,25 @@ def wind_isle(bpy, variant):
             rr = 10.2 + 0.6 * math.sin(t * 2.2) - t * 1.4
             pts.append((math.cos(a) * rr, math.sin(a) * rr, 0.25 - L * t * t * 1.05))
         with p.as_kind(PAINT):
-            p.sweep(pts, 0.13, 0.06, p.vary(VINE, 0.07), sides=4)
-            for i in range(2, 8, 2):
+            p.sweep(pts, 0.2, 0.08, p.vary(VINE, 0.07), sides=4)
+            for i in (3, 6):
                 q = pts[i]
-                crystal(p, (q[0] + math.cos(a) * 0.15, q[1] + math.sin(a) * 0.15, q[2]), (0.42, 0.42, 0.1),
+                crystal(p, (q[0] + math.cos(a) * 0.2, q[1] + math.sin(a) * 0.2, q[2]), (0.5, 0.5, 0.12),
                         p.vary(LEAF, 0.08), n=8, boxy=0.0, jitter=0.25, yaw=prng.uniform(0, TAU),
                         pitch=prng.uniform(0.8, 1.3))
+    # A few stones torn off with it, drifting under the point (they ride
+    # the isle's bob, a step of void between each and the rock).
+    for j in range(4):
+        a = TAU * j / 4 + prng.uniform(-0.4, 0.4)
+        r = prng.uniform(3.0, 5.5)
+        z = -D - prng.uniform(2.5, 7.0)
+        sz = prng.uniform(0.9, 1.6)
+        with p.as_kind(RAW):
+            c = (tip[0] + math.cos(a) * r, tip[1] + math.sin(a) * r, z)
+            # Torn, not cut: a rounded hull broken by a deep jitter, longer
+            # than it is wide, tipped as it tumbles.
+            crystal(p, c, (sz * 1.1, sz * 0.9, sz * 1.7), p.vary(STORM_COOL, 0.06), n=18, boxy=0.95,
+                    jitter=0.42, yaw=prng.uniform(0, TAU), pitch=prng.uniform(-0.5, 0.5))
     # The old moorings: a broken chain of carved stone links trailing from
     # under the lip (the Breath has no metal: the Smith cut these in stone).
     a = S['stones'][1] + 1.6
