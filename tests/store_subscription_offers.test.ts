@@ -152,6 +152,28 @@ describe('membership plan badges', () => {
     }
   });
 
+  it('keeps Manage subscription when an ended subscription is refused a new checkout', () => {
+    // The badges then send the player to Manage subscription (billingBlocked), so the
+    // button has to be there.
+    for (const status of ['none', 'canceled', 'incomplete_expired'] as const) {
+      const state = {
+        ...SUBSCRIPTION_OFF,
+        available: true,
+        status,
+        plan: 'game_monthly' as const,
+        plans,
+        trialEligible: false,
+        trialDays: 7 as const,
+        canCheckout: false,
+        canManage: true,
+      };
+      expect(showsManageSubscription(state)).toBe(true);
+      const html = subscriptionOffersHtml(state, false, false, false, false, '', NOW);
+      expect(html).toContain('Update your payment details in Manage subscription');
+      expect(html).toContain('data-subscription-action="portal"');
+    }
+  });
+
   it('keeps Manage subscription for every live or unresolved subscription', () => {
     for (const status of [
       'active',

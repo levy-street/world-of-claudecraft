@@ -157,10 +157,12 @@ const NO_SUBSCRIPTION_STATUSES: readonly SubscriptionSnapshot['status'][] = [
 ];
 
 /** Whether the Memberships tab offers Manage subscription. A live or unresolved subscription
- *  (active, trialing, past_due, unpaid, paused, incomplete) keeps it, since the billing note
- *  sends those members to it to fix their payment details. */
+ *  (active, trialing, past_due, unpaid, paused, incomplete) keeps it, and so does an ended one
+ *  the service refuses a new checkout: in both cases the badges show the billing note
+ *  (subscriptionPurchase 'billing') that sends the player to Manage subscription. */
 export function showsManageSubscription(state: SubscriptionSnapshot): boolean {
-  return state.canManage && !NO_SUBSCRIPTION_STATUSES.includes(state.status);
+  if (!state.canManage) return false;
+  return !NO_SUBSCRIPTION_STATUSES.includes(state.status) || !state.canCheckout;
 }
 
 function statusLine(state: SubscriptionSnapshot): string {
