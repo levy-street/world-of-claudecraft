@@ -50,7 +50,15 @@ const REFLECTION_LOCK = 60;
 const BLACKTIDE_SPEED_ID = 'wlk_blacktide_speed';
 const BLACKTIDE_SPEED_DURATION = 4;
 const LEVEL_20_ABILITY_IDS = new Set(['abyssal_rift']);
-const FORBIDDEN_REFLECTION_EXCLUDED_IDS = new Set(['soulwell', 'army_of_the_dead']);
+// Soulwell and Army of the Dead are too strong to repeat. Evil Eye (1 sec) and
+// Raise Graveguard (3 sec) come back before the 10 sec window could matter, so
+// letting them arm the reflection would only burn the 60 sec lockout.
+const FORBIDDEN_REFLECTION_EXCLUDED_IDS = new Set([
+  'soulwell',
+  'army_of_the_dead',
+  'evil_eye',
+  'raise_graveguard',
+]);
 
 function warlockMods(ctx: SimContext, player: Entity) {
   const meta = ctx.players.get(player.id);

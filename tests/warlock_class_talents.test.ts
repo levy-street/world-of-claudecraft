@@ -4,7 +4,10 @@ import { dealDamage } from '../src/sim/combat/damage';
 import { gainRuin, spendRuin } from '../src/sim/combat/destruction';
 import { consumeFreeCostFor } from '../src/sim/combat/empower_next';
 import { onCastCompleted } from '../src/sim/combat/talent_procs';
-import { canUseForbiddenReflection } from '../src/sim/combat/warlock_talents';
+import {
+  armForbiddenReflection,
+  canUseForbiddenReflection,
+} from '../src/sim/combat/warlock_talents';
 import { ABILITIES } from '../src/sim/content/classes';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
@@ -351,6 +354,26 @@ describe('warlock class talent tree', () => {
     expect(player.cooldowns.has('soulwell')).toBe(true);
     expect(player.auras.some((aura) => aura.id === 'wlk_forbidden_reflection')).toBe(false);
     expect(player.auras.some((aura) => aura.id === 'wlk_forbidden_reflection_lock')).toBe(false);
+  });
+
+  it('does not waste Forbidden Reflection on Evil Eye or Raise Graveguard', () => {
+    for (const [spec, id] of [
+      ['affliction', 'evil_eye'],
+      ['demonology', 'raise_graveguard'],
+    ] as const) {
+      const { sim, player } = rig({ 20: 'wlk_r20_grimoire_of_haste' }, spec);
+      const meta = sim.ctx.players.get(player.id);
+      if (!meta) throw new Error('missing player meta');
+      armForbiddenReflection(sim.ctx, player, meta, ABILITIES[id], ABILITIES[id].cooldown);
+      expect(
+        player.auras.some((aura) => aura.id === 'wlk_forbidden_reflection'),
+        id,
+      ).toBe(false);
+      expect(
+        player.auras.some((aura) => aura.id === 'wlk_forbidden_reflection_lock'),
+        id,
+      ).toBe(false);
+    }
   });
 
   it('does not let Forbidden Reflection duplicate Army of the Dead', () => {
