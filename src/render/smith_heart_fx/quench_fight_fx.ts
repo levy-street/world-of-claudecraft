@@ -78,6 +78,7 @@ import {
   type WarmBody,
   warmthLinks,
 } from './quench_fight_fx_core';
+import { QuenchFrostFx } from './quench_frost_fx';
 
 const SCAN_SEC = 0.1;
 
@@ -321,6 +322,8 @@ export class QuenchFightFx {
   private readonly geometries: THREE.BufferGeometry[] = [];
   private readonly materials: THREE.Material[] = [];
   private readonly audio = new QuenchAudio(sfx);
+  /** The frost pass on the bodies (quench_frost_fx.ts). */
+  private readonly frost: QuenchFrostFx;
   // The footprints (every tier).
   private readonly crackFans: FanSlot[] = [];
   private readonly splashFans: FanSlot[] = [];
@@ -342,14 +345,14 @@ export class QuenchFightFx {
   // The scan's findings (ids, reused arrays).
   private readonly candidateIds: number[] = [];
   private readonly objectIds: number[] = [];
-  private readonly coldIds: number[] = [];
-  private readonly warmIds: number[] = [];
-  private readonly frozenIds: number[] = [];
+  readonly coldIds: number[] = [];
+  readonly warmIds: number[] = [];
+  readonly frozenIds: number[] = [];
   private readonly trappedIds: number[] = [];
   private readonly warmBodies: WarmBody[] = [];
   private readonly linkPairs = new Int16Array(P.links * 2);
   /** When each frozen player was first seen frozen (id to clock). */
-  private readonly frozenSince = new Map<number, number>();
+  readonly frozenSince = new Map<number, number>();
   private guardianId = -1;
   private rosterSeen = Number.NaN;
   private origin: { x: number; z: number } | null = null;
@@ -385,6 +388,15 @@ export class QuenchFightFx {
       hasDom ? getFlameTex() : null,
     );
     this.kit = new TelegraphKit(this.root, this.detail);
+    this.frost = new QuenchFrostFx(
+      this.root,
+      this.uTime,
+      this.particles,
+      (x, z) => this.groundY(x, z),
+      this.density,
+      () => this.rand(),
+      this.detail,
+    );
     const fans = (n: number, order: number, out: FanSlot[], arc: number, color: number) => {
       for (let i = 0; i < n; i++) {
         const fan = this.kit.fan(order);
@@ -651,6 +663,7 @@ export class QuenchFightFx {
   handleEvent(ev: SimEvent): boolean {
     if (!this.world || this.disposed) return false;
     this.audio.event(ev, this.lookup, this.groundAt);
+    this.frost.event(ev, this.world, this.clock);
     if (ev.type === 'spellfxAt') {
       if (!quenchFightClaims(ev.ability)) return false;
       const r = ev.radius ?? 3;
@@ -692,6 +705,7 @@ export class QuenchFightFx {
     }
     this.paintObjects(world);
     this.paintBodies(world, dt);
+    this.frost.frame(world, this, dt, this.clock);
     this.paintRim(world);
     this.particles.update(this.clock);
     const guardian = this.guardianId >= 0 ? (world.entities.get(this.guardianId) ?? null) : null;
@@ -857,6 +871,7 @@ export class QuenchFightFx {
       s.template = '';
     }
     this.rimFalling = -1;
+    this.frost.clear();
     for (const mesh of [
       this.holes,
       this.cracks,
@@ -1246,7 +1261,9 @@ export class QuenchFightFx {
       size: [1, 2.6],
       color: C.mist,
       alpha: 0.42,
-    });
+    }); // The rime slamming shut: a ring of frost racing over the ice.
+    this.particles.shockRing(eAt.x, eAt.z, 0xd8f4ff, 3, 0.4);
+    this.shakeNear(eAt.x, eAt.z, 0.18, 14);
   }
 
   private shatterAt(x: number, z: number, r: number): void {
@@ -1352,6 +1369,7 @@ export class QuenchFightFx {
     this.disposed = true;
     this.root.removeFromParent();
     this.particles.dispose();
+    this.frost.dispose();
     this.kit.dispose();
     for (const g of this.geometries) g.dispose();
     for (const m of this.materials) m.dispose();

@@ -99,6 +99,7 @@ const CLAIMED: ReadonlySet<string> = new Set([
   QUENCH_CUES.cross,
   QUENCH_CUES.rim,
   QUENCH_CUES.thaw,
+  QUENCH_CUES.bite,
 ]);
 
 export function quenchFightClaims(ability: string | null | undefined): boolean {

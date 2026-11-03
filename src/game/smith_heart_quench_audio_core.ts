@@ -47,6 +47,8 @@ export const QUENCH_CUE_SOUNDS: Readonly<Record<string, QuenchSound>> = {
   [QUENCH_CUES.cross]: S('cross', 1, 'point', 1, 0.5),
   [QUENCH_CUES.rim]: S('rim', 0.9, 'source', 1, 1),
   [QUENCH_CUES.thaw]: S('rim', 0.7, 'source', 0.85, 1),
+  // The rime cracking an immunity: the shatter's crack, smaller and higher.
+  [QUENCH_CUES.bite]: S('shatter', 0.7, 'target', 1.35, 0.3),
 };
 
 /** Is this event's ability one the fight's sound plays (the HUD's generic
