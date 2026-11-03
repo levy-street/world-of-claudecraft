@@ -1,12 +1,12 @@
 // The "encounter in progress" lock (instances/encounter_lock.ts, opted in per
 // dungeon by content/encounter_lock.ts): while a boss of a Smith's Heart claim
-// is in its fight, a released spirit whose body lies in that claim cannot walk
-// back in through the door, so it is not set down inside and not revived. It
-// waits outside, told why (throttled: the walk-in trigger fires at 20 Hz),
+// is in its fight, nobody from outside enters it, living or released spirit
+// (the Ignivar door's rule). A spirit is not set down inside and not revived;
+// it waits outside, told why (throttled: the walk-in trigger fires at 20 Hz),
 // until the fight ends (a wipe's reset or the kill), when the death checkpoints
 // (tests/smith_heart_checkpoints.test.ts) apply as before, or until someone
-// raises its body. Trash fights, living entrants and five-man dungeons keep
-// today's door.
+// raises its body. Bodies already inside, trash fights and five-man dungeons
+// keep today's rules; a lockout's refusal outranks this one.
 
 import { beforeEach, describe, expect, it } from 'vitest';
 import { handleDeath } from '../src/sim/combat/damage';
@@ -22,13 +22,14 @@ import {
 import { SMITH_HEART_CHECKPOINTS } from '../src/sim/content/smith_heart_checkpoints';
 import { BUILTIN_WORLD, DUNGEONS, instanceOrigin } from '../src/sim/data';
 import { clearDungeonGateStateForTest } from '../src/sim/instances/dungeon_gate_state';
-import { enterDungeon } from '../src/sim/instances/dungeons';
+import { enterDungeon, heroicLockoutId } from '../src/sim/instances/dungeons';
 import {
   ENCOUNTER_IN_PROGRESS_TEXT,
   ENCOUNTER_LOCK_NOTICE_SECONDS,
   encounterInProgress,
 } from '../src/sim/instances/encounter_lock';
 import { type InstanceSlot, Sim } from '../src/sim/sim';
+import { revivePlayerAt } from '../src/sim/spirit';
 import type { Entity, SimEvent, WorldContent } from '../src/sim/types';
 import { localizeSimText } from '../src/ui/sim_i18n';
 
@@ -95,6 +96,13 @@ function die(sim: Sim, pid: number) {
 
 function inClaim(sim: Sim, inst: InstanceSlot, e: Entity): boolean {
   return sim.ctx.instanceClaimIdAt(e.pos) === inst.exitId;
+}
+
+/** Walk out of the claim, alive. */
+function stepOutside(sim: Sim, player: Entity) {
+  player.pos = sim.ctx.groundPos(0, 0);
+  player.prevPos = { ...player.pos };
+  sim.ctx.rebucket(player);
 }
 
 function local(inst: InstanceSlot, e: Entity) {
@@ -323,21 +331,90 @@ describe("the Smith's Heart: encounter in progress", () => {
     expect(at.z).toBeCloseTo(DUNGEONS[SMITH_HEART_DUNGEON].entry.z, 6);
   });
 
-  it('a living player walks in during the fight as before', () => {
+  it('a living player from outside is held during the fight, then walks in after the wipe', () => {
+    const { sim, pid, inst, player } = setup();
+    const mob = boss(sim, inst, SMITH_HEART_FINAL_BOSS);
+    engage(mob);
+    stepOutside(sim, player);
+    sim.drainEvents();
+    expect(enterDungeon(sim.ctx, SMITH_HEART_DUNGEON, pid)).toBe(false);
+    expect(notices(sim.drainEvents())).toBe(1);
+    expect(inClaim(sim, inst, player)).toBe(false);
+    reset(mob);
+    expect(enterDungeon(sim.ctx, SMITH_HEART_DUNGEON, pid)).toBe(true);
+    expect(inClaim(sim, inst, player)).toBe(true);
+  });
+
+  it('a living player from outside walks in after the kill', () => {
+    const { sim, pid, inst, player } = setup();
+    const mob = boss(sim, inst, SMITH_HEART_GUARDIANS.quench);
+    engage(mob);
+    stepOutside(sim, player);
+    expect(enterDungeon(sim.ctx, SMITH_HEART_DUNGEON, pid)).toBe(false);
+    slay(sim, pid, mob);
+    expect(enterDungeon(sim.ctx, SMITH_HEART_DUNGEON, pid)).toBe(true);
+    expect(inClaim(sim, inst, player)).toBe(true);
+  });
+
+  it("the Spirit Healer's revive outside does not get round it, and its first refusal speaks", () => {
+    const { sim, pid, inst, player } = setup();
+    die(sim, pid);
+    engage(boss(sim, inst, SMITH_HEART_GUARDIANS.breath));
+    sim.drainEvents();
+    expect(enterDungeon(sim.ctx, SMITH_HEART_DUNGEON, pid)).toBe(false);
+    expect(notices(sim.drainEvents())).toBe(1);
+    // Revived outside inside the same notice window: a new life speaks afresh.
+    revivePlayerAt(sim.ctx, pid, { ...player.pos });
+    expect(player.dead).toBe(false);
+    expect(player.encounterLockNoticeAt).toBeUndefined();
+    expect(enterDungeon(sim.ctx, SMITH_HEART_DUNGEON, pid)).toBe(false);
+    expect(notices(sim.drainEvents())).toBe(1);
+    expect(inClaim(sim, inst, player)).toBe(false);
+  });
+
+  it('a new death inside the window speaks afresh too', () => {
+    const { sim, pid, inst, player } = setup();
+    const mob = boss(sim, inst, SMITH_HEART_GUARDIANS.heat);
+    engage(mob);
+    stepOutside(sim, player);
+    sim.drainEvents();
+    expect(enterDungeon(sim.ctx, SMITH_HEART_DUNGEON, pid)).toBe(false);
+    expect(notices(sim.drainEvents())).toBe(1);
+    die(sim, pid);
+    expect(player.encounterLockNoticeAt).toBeUndefined();
+    expect(enterDungeon(sim.ctx, SMITH_HEART_DUNGEON, pid)).toBe(false);
+    expect(notices(sim.drainEvents())).toBe(1);
+  });
+
+  it('a lockout refusal outranks it', () => {
+    const { sim, pid, inst, player } = setup();
+    inst.difficulty = 'heroic';
+    sim.players
+      .get(pid)
+      ?.raidLockouts.set(heroicLockoutId(SMITH_HEART_DUNGEON), Number.MAX_SAFE_INTEGER);
+    engage(boss(sim, inst, SMITH_HEART_GUARDIANS.heat));
+    stepOutside(sim, player);
+    sim.drainEvents();
+    expect(enterDungeon(sim.ctx, SMITH_HEART_DUNGEON, pid)).toBe(false);
+    const events = sim.drainEvents();
+    expect(notices(events)).toBe(0);
+    expect(JSON.stringify(events)).toContain(
+      `You are locked to Heroic ${DUNGEONS[SMITH_HEART_DUNGEON].name}.`,
+    );
+  });
+
+  it('bodies already inside are untouched by the fight', () => {
     const { sim, pid, inst, player } = setup();
     engage(boss(sim, inst, SMITH_HEART_FINAL_BOSS));
-    // Step outside alive, then come back in.
-    player.pos = sim.ctx.groundPos(0, 0);
-    player.prevPos = { ...player.pos };
-    sim.ctx.rebucket(player);
-    expect(inClaim(sim, inst, player)).toBe(false);
     sim.drainEvents();
+    // The lock never moves or tells a body inside, and a door call from inside
+    // (moving within the claim) is not refused.
     expect(enterDungeon(sim.ctx, SMITH_HEART_DUNGEON, pid)).toBe(true);
     expect(notices(sim.drainEvents())).toBe(0);
     expect(inClaim(sim, inst, player)).toBe(true);
   });
 
-  it('a party member can still raise the body during the fight', () => {
+  it('a party member raises the body during the fight, and the raised body is not barred', () => {
     const { sim, pid, inst, player } = setup();
     const corpseAt = { ...player.pos };
     die(sim, pid);
@@ -352,6 +429,13 @@ describe("the Smith's Heart: encounter in progress", () => {
     respondToResurrection(sim.ctx, true, pid);
     expect(player.dead).toBe(false);
     expect(player.ghost).toBe(false);
+    expect(inClaim(sim, inst, player)).toBe(true);
+    // Through the door path while the fight still runs: the raised body is
+    // inside, so the lock lets it be.
+    sim.drainEvents();
+    expect(encounterInProgress(sim.ctx, inst)).toBe(true);
+    expect(enterDungeon(sim.ctx, SMITH_HEART_DUNGEON, pid)).toBe(true);
+    expect(notices(sim.drainEvents())).toBe(0);
     expect(inClaim(sim, inst, player)).toBe(true);
   });
 });

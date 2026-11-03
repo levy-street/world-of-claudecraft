@@ -886,7 +886,12 @@ describe('the boss-room seal delay: every sealing gate of every dungeon', () => 
     // Every file under src/sim/encounters that assigns a spawnPos. Each was
     // read for this suite: only korzul_emerge.ts moves a SEALING boss's home
     // (covered above); the rest re-home adds, shackles and raid bosses that
-    // have no sealing gate. A file that joins this list has not been read yet.
+    // have no sealing gate. The Smith's Heart's four: council_prison.ts,
+    // final_adds.ts and heat_scope.ts home freshly raised adds (Stone Prison
+    // blocks, the Splinters, the Heat's adds) where they rise; final.ts reHome
+    // sets the sealing final boss's home back to its authored spawn (HEART_ROOM,
+    // the spawn the check above already reads), never a new spot. A file that
+    // joins this list has not been read yet.
     const root = join(dirname(fileURLToPath(import.meta.url)), '..', 'src', 'sim', 'encounters');
     const writers: string[] = [];
     const walk = (dir: string): void => {
@@ -907,6 +912,10 @@ describe('the boss-room seal delay: every sealing gate of every dungeon', () => 
       'hollow_crypt/knellwyrm.ts',
       'ignivar.ts',
       'nythraxis.ts',
+      'smith_heart/council_prison.ts',
+      'smith_heart/final.ts',
+      'smith_heart/final_adds.ts',
+      'smith_heart/heat_scope.ts',
       'varkhul.ts',
     ]);
     // And none of the others is a sealing boss's own module by another name:
