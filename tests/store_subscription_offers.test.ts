@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { GAME_SUBSCRIPTION_PLANS, SUBSCRIPTION_OFF } from '../src/subscription_contract';
 import {
   addMonthsSeconds,
+  showsManageSubscription,
   subscriptionOffersHtml,
   subscriptionPurchase,
 } from '../src/ui/store_subscription_offers';
@@ -133,6 +134,40 @@ describe('membership plan badges', () => {
     expect(html).not.toContain('data-subscription-action="checkout"');
     expect(html).toContain('Update your payment details in Manage subscription');
     expect(html).toContain('data-subscription-action="portal"');
+  });
+
+  it('hides Manage subscription when the account has no subscription', () => {
+    for (const status of ['none', 'canceled', 'incomplete_expired'] as const) {
+      const state = {
+        ...SUBSCRIPTION_OFF,
+        available: true,
+        status,
+        canCheckout: true,
+        canManage: true,
+      };
+      expect(showsManageSubscription(state)).toBe(false);
+      const html = subscriptionOffersHtml(state, false, false, false, false, '', NOW);
+      expect(html).not.toContain('data-subscription-action="portal"');
+      expect(html).not.toContain('Manage subscription');
+    }
+  });
+
+  it('keeps Manage subscription for every live or unresolved subscription', () => {
+    for (const status of [
+      'active',
+      'trialing',
+      'past_due',
+      'unpaid',
+      'paused',
+      'incomplete',
+    ] as const) {
+      const state = { ...SUBSCRIPTION_OFF, available: true, status, canManage: true };
+      expect(showsManageSubscription(state)).toBe(true);
+      expect(subscriptionOffersHtml(state, false, false, false, false, '', NOW)).toContain(
+        'data-subscription-action="portal"',
+      );
+      expect(showsManageSubscription({ ...state, canManage: false })).toBe(false);
+    }
   });
 
   it('keeps the annual mount collection and the token badge in the same tab', () => {
