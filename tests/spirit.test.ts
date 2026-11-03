@@ -11,6 +11,7 @@ import {
   OVERWORLD_GRAVEYARDS,
   SPIRIT_HEALER_NPC_ID,
 } from '../src/sim/data';
+import { recalcPlayerStats } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import {
   CORPSE_REZ_RANGE,
@@ -93,6 +94,49 @@ describe('spirit: release to ghost', () => {
     // moved to a graveyard, where a Spirit Healer hovers
     expect(dist2d(p.pos, deathPos)).toBeGreaterThan(1);
     expect(healerInRange(sim, p.pos)).toBe(true);
+  });
+
+  it('a stat recalc during the corpse run keeps the full greyed ghost bar', () => {
+    // Discord bug: a released ghost read 0 / max HP after any mid-run stat pass
+    // (aura change, loadout swap, gear change, vitality toggle), because the
+    // recalc zeroed hp for every `dead` player and a ghost stays `dead`.
+    const sim = makeSim();
+    sim.setPlayerLevel(10);
+    const p = sim.player as AnyEntity;
+    p.hp = 1;
+    p.dead = true;
+    sim.releaseSpirit();
+    expect(p.hp).toBe(p.maxHp);
+
+    const r = sim.ctx.resolve(sim.playerId)!;
+    recalcPlayerStats(
+      p,
+      r.meta.cls,
+      r.meta.equipment,
+      sim.ctx.playerMods(r.meta),
+      r.meta.equipmentInstance,
+    );
+    expect(p.dead).toBe(true);
+    expect(p.ghost).toBe(true);
+    expect(p.hp).toBe(p.maxHp);
+  });
+
+  it('a stat recalc on an unreleased corpse still reads 0 hp', () => {
+    const sim = makeSim();
+    sim.setPlayerLevel(10);
+    const p = sim.player as AnyEntity;
+    p.hp = 0;
+    p.dead = true;
+    const r = sim.ctx.resolve(sim.playerId)!;
+    recalcPlayerStats(
+      p,
+      r.meta.cls,
+      r.meta.equipment,
+      sim.ctx.playerMods(r.meta),
+      r.meta.equipmentInstance,
+    );
+    expect(p.ghost).toBe(false);
+    expect(p.hp).toBe(0);
   });
 
   it('a ghost runs faster and ignores slows', () => {
