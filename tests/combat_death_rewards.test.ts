@@ -25,10 +25,28 @@ function bossParty(playerClass: 'mage' | 'warlock' = 'mage') {
     z: player.pos.z,
   });
   sim.ctx.addEntity(boss);
+  // Boss companions roll only on a Heroic claim (content/buddy_sources.ts), and
+  // the per-player Crystal Lich draw is the once-per-life marker these tests count.
+  const inst = sim.ctx.instances[0];
+  inst.partyKey = 'test-party';
+  inst.difficulty = 'heroic';
+  inst.mobIds.push(boss.id);
   boss.tappedById = player.id;
   boss.hp = 100;
   sim.drainEvents();
   return { sim, player, ally, boss };
+}
+
+/** Spy on rng.chance (always false) and also return the probabilities drawn
+ *  from the boss-companion roll alone: Heroic loot shares the rng and can use
+ *  the same probability, so the draws are told apart by their call site. */
+function spyChance(sim: Sim) {
+  const buddyDraws: number[] = [];
+  const chance = vi.spyOn(sim.ctx.rng, 'chance').mockImplementation((p: number) => {
+    if (new Error().stack?.includes('rollBossBuddyDrops')) buddyDraws.push(p);
+    return false;
+  });
+  return { chance, buddyDraws };
 }
 
 describe('combat death rewards settle once per life', () => {
@@ -43,7 +61,7 @@ describe('combat death rewards settle once per life', () => {
     sim.useItem('echoing_lens');
     expect(player.auras.some((aura) => aura.id === TRINKET_AURA.echo)).toBe(true);
     sim.drainEvents();
-    const chance = vi.spyOn(sim.ctx.rng, 'chance').mockReturnValue(false);
+    const { buddyDraws } = spyChance(sim);
     const loot = vi.spyOn(sim.ctx, 'rollLoot');
 
     sim.ctx.dealDamage(player, boss, hit, false, 'arcane', 'Arcane Blast', 'hit');
@@ -58,8 +76,8 @@ describe('combat death rewards settle once per life', () => {
     ).toHaveLength(1);
     expect(loot).toHaveBeenCalledTimes(1);
     expect(sim.players.get(player.id)!.counters.kills).toBe(1);
-    // Other loot chances share the RNG; 0.005 is the normal Crystal Lich roll.
-    expect(chance.mock.calls.filter(([probability]) => probability === 0.005)).toHaveLength(2);
+    // One Heroic Crystal Lich draw per party member, at 1% split two ways.
+    expect(buddyDraws).toEqual([0.005, 0.005]);
     expect(sim.players.get(player.id)!.buddies.pending).toEqual([]);
     expect(sim.players.get(ally.id)!.buddies.pending).toEqual([]);
   });
@@ -82,7 +100,7 @@ describe('combat death rewards settle once per life', () => {
       applyOrDetonateOssuaryMark(sim.ctx, owner, target, 15, 0.2, 0.5, 6);
       recordOssuaryMarkDamage(owner, target, 1000, null);
     }
-    const chance = vi.spyOn(sim.ctx.rng, 'chance').mockReturnValue(false);
+    const { buddyDraws } = spyChance(sim);
     const loot = vi.spyOn(sim.ctx, 'rollLoot');
     sim.drainEvents();
 
@@ -96,12 +114,12 @@ describe('combat death rewards settle once per life', () => {
       ).toHaveLength(1);
       expect(loot.mock.calls.filter(([corpse]) => corpse.id === target.id)).toHaveLength(1);
     }
-    expect(chance.mock.calls.filter(([probability]) => probability === 0.005)).toHaveLength(2);
+    expect(buddyDraws).toEqual([0.005, 0.005]);
   });
 
   it('ignores another death call for a corpse but pays again after a real respawn', () => {
     const { sim, player, boss } = bossParty();
-    const chance = vi.spyOn(sim.ctx.rng, 'chance').mockReturnValue(false);
+    const { chance, buddyDraws } = spyChance(sim);
     const loot = vi.spyOn(sim.ctx, 'rollLoot');
     sim.ctx.dealDamage(player, boss, 100, false, 'physical', null, 'hit');
     sim.drainEvents();
@@ -119,6 +137,6 @@ describe('combat death rewards settle once per life', () => {
     sim.ctx.dealDamage(player, boss, 100, false, 'physical', null, 'hit');
     expect(loot).toHaveBeenCalledTimes(2);
     expect(sim.players.get(player.id)!.counters.kills).toBe(2);
-    expect(chance.mock.calls.filter(([probability]) => probability === 0.005)).toHaveLength(4);
+    expect(buddyDraws).toEqual([0.005, 0.005, 0.005, 0.005]);
   });
 });

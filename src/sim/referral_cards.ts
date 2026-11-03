@@ -1,4 +1,5 @@
-import { finderActivity } from './content/dungeon_finder';
+import { FINDER_ACTIVITIES, finderActivity } from './content/dungeon_finder';
+import { QUESTS } from './data';
 
 /** Stable keys and bit positions are persisted; append rather than reorder. */
 export const REFERRAL_MILESTONES = [
@@ -364,11 +365,33 @@ function redeem(
   return { state: next, intents };
 }
 
+/** The lowest level a dungeon milestone's final-boss kill credits at: the lower of the
+ * dungeon's finder minimum and the level its milestone quest chain opens at (the highest
+ * `minLevel` along `requiresQuest`), so a pair who can hold the quest is never refused. */
+export function referralKillMinLevel(milestone: (typeof REFERRAL_MILESTONES)[number]): number {
+  let level = Number.POSITIVE_INFINITY;
+  for (const a of FINDER_ACTIVITIES)
+    if (a.dungeonId === milestone.dungeonId) level = Math.min(level, a.minLevel);
+  let questLevel = 1;
+  const seen = new Set<string>();
+  for (let id: string | undefined = milestone.questId ?? undefined; id && !seen.has(id); ) {
+    seen.add(id);
+    const quest = QUESTS[id];
+    if (!quest) break;
+    questLevel = Math.max(questLevel, quest.minLevel ?? 1);
+    id = quest.requiresQuest;
+  }
+  return milestone.questId && QUESTS[milestone.questId] ? Math.min(level, questLevel) : level;
+}
+
 /** Called only for authoritative successful turn-ins, dungeon clears, and eligible boss kills.
- * Each player's quest credit is personal. A later shared dungeon clear catches up a quest
- * they already turned in alone. Tutorial has no dungeon; the assigned pair's
- * reunion recovers its stamp once both have completed the final tutorial quest.
- * Raid evidence requires BOTH assigned characters to be eligible for that actual boss kill.
+ * A dungeon stamp is earned by the kill: when BOTH assigned characters are eligible for the
+ * milestone dungeon's final boss kill and both are at least `referralKillMinLevel`, both are
+ * credited whether or not either holds or has turned in the milestone quest. A turn-in with
+ * the friend in the party still credits the player who turned it in. Tutorial has no
+ * dungeon; the assigned pair's reunion recovers its stamp once both have completed the
+ * final tutorial quest. Raid evidence requires BOTH assigned characters to be eligible for
+ * that actual boss kill and at least the raid's finder minimum level.
  * Credit may arrive out of order; redemption remains in milestone order. */
 export function creditReferralCard(
   state: ReferralCardState,
@@ -390,13 +413,21 @@ export function creditReferralCard(
   } else {
     if (!context.characters.every((c) => event.eligibleCharacterIds.includes(c.characterId)))
       return result(state);
+    let minLevel = Number.POSITIVE_INFINITY;
     if (event.type === 'dungeonClear') {
       milestone = REFERRAL_MILESTONES.findIndex((m) => m.dungeonId === event.dungeonId);
+      if (milestone >= 0) minLevel = referralKillMinLevel(REFERRAL_MILESTONES[milestone]);
     } else {
       const activity = finderActivity(event.activityId);
-      if (activity?.kind === 'raid' && activity.encounters.some((e) => e.mobId === event.mobId))
+      if (activity?.kind === 'raid' && activity.encounters.some((e) => e.mobId === event.mobId)) {
         milestone = 4;
+        minLevel = activity.minLevel;
+      }
     }
+    // A kill credits only a pair at the content's own level: instance entry and
+    // in-claim kill eligibility are not level gated, so this blocks carries.
+    if (milestone >= 0 && !context.characters.every((c) => c.level >= minLevel))
+      return result(state);
   }
   if (milestone < 0) return result(state);
   const bit = 1 << milestone;
@@ -405,7 +436,9 @@ export function creditReferralCard(
   for (let i = 0; i < 2; i++) {
     const character = context.characters[i];
     if (event.type === 'questTurnIn' && event.characterId !== character.characterId) continue;
-    if (questId && !character.completedQuestIds.includes(questId)) continue;
+    // The boss kill itself is the dungeon milestone; only turn-in credit reads the quest log.
+    if (event.type === 'questTurnIn' && questId && !character.completedQuestIds.includes(questId))
+      continue;
     next.participants[i].credited |= bit;
   }
   if (next.participants.every((p, i) => p.credited === state.participants[i].credited))

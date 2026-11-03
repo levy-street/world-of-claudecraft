@@ -1984,7 +1984,7 @@ export function handleDeath(
       // clears, and the encounter skill tasks that resolve at this death.
       deedsMod.onMobKillCreditForDeeds(ctx, e, killer, meta, eligible);
       if (e.templateId !== 'nythraxis_scourge_of_thornpeak')
-        emitReferralBossEvidence(ctx, e, eligible);
+        emitReferralBossEvidence(ctx, e, eligible, claimedInst?.dungeonId);
     }
     // Settle the heroic reward and its realm-reset lockout together. This runs
     // even without player credit so the owning group cannot dodge the lockout;
@@ -1995,7 +1995,7 @@ export function handleDeath(
     // independent roll per credited player, never a corpse item, then the
     // speed/dps looks for the same roster. World bosses roll on the
     // never-pruned contributor roster below instead. Draws rng ONLY for a
-    // boss that carries a companion row.
+    // Heroic-claim kill of a boss that carries a companion row.
     if (!template?.worldBoss) {
       rollBossBuddyDrops(ctx, e, heroicRewardRecipients, claimedInst);
     }
