@@ -5981,6 +5981,7 @@ export const hudChromeStrings = {
       riding:
         'The wind carries you over the void on a fixed path: you cannot act until it sets you down.',
       windworn: 'Worn out by the wind: no Gale Path will carry you to the isles until this ends.',
+      thrown: 'Thrown by the Summit Roar: you cannot move until the throw sets you down.',
       stormForm:
         'Torn open into a body of lightning: the Storm half of the fight, until the Guardian of the Breath falls.',
       swell:

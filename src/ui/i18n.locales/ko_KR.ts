@@ -22644,6 +22644,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '바람이 정해진 길을 따라 공허 위로 당신을 실어 갑니다: 내려놓을 때까지 행동할 수 없습니다.',
   'hudChrome.auraEffect.breathGuardian.windworn':
     '바람에 지쳤습니다: 이 효과가 끝날 때까지 질풍의 길이 당신을 섬으로 데려가지 않습니다.',
+  'hudChrome.auraEffect.breathGuardian.thrown':
+    '정상의 포효에 날아갔습니다: 착지할 때까지 움직일 수 없습니다.',
   'hudChrome.auraEffect.breathGuardian.portalA':
     '효과가 끝나면 당신이 선 자리에 포털 A가 열립니다. 얽힌 질풍 가까이에 서세요. 이번 라운드에는 그것을 나를 수 없습니다.',
   'hudChrome.auraEffect.breathGuardian.portalB':

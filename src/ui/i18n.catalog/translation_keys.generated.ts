@@ -12748,6 +12748,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.auraEffect.breathGuardian.spent'
   | 'hudChrome.auraEffect.breathGuardian.stormForm'
   | 'hudChrome.auraEffect.breathGuardian.swell'
+  | 'hudChrome.auraEffect.breathGuardian.thrown'
   | 'hudChrome.auraEffect.breathGuardian.wind'
   | 'hudChrome.auraEffect.breathGuardian.windworn'
   | 'hudChrome.auraEffect.bruinRushWindow'

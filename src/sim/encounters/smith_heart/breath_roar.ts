@@ -9,11 +9,16 @@
 // that carries a body past an open lip leaves it in the air over the void
 // (throwPlayer), the rest of the throw its flight as it falls. The anchored and the
 // Knotted Gale's carrier keep their feet (throwPlayer), yet the blow lands.
+// While a throw slides its body wears an unbreakable root (BREATH_AURAS.thrown):
+// the server's movement override stays active through the slide, so the online
+// client stands its prediction down once and draws the slide, instead of a
+// server-driven step every tick bumping the override epoch (a jerky throw).
 // Zero rng but the damage rolls (in player order, as each is struck).
 
-import { DT } from '../../types';
-import { BREATH_CUES, BREATH_NAMES, BREATH_TUNING as T } from './breath_ids';
-import { type BreathScope, livePlayers, roll, throwPlayer } from './breath_scope';
+import { DT, type Entity } from '../../types';
+import { BREATH_AURAS, BREATH_CUES, BREATH_NAMES, BREATH_TUNING as T } from './breath_ids';
+import { type BreathScope, heldFast, livePlayers, roll, throwPlayer } from './breath_scope';
+import { dropAura } from './fight_kit';
 
 /** Seconds the wave's front takes to reach `distance` yards. */
 export function roarArrival(distance: number): number {
@@ -74,6 +79,7 @@ export function stepRoar(s: BreathScope): void {
       const throwYards = s.rules.gustThrow;
       const steps = Math.max(1, Math.round(T.roarSlide / DT));
       w.slides.push({ id: p.id, ux: dx, uz: dz, left: throwYards, step: throwYards / steps });
+      holdThrown(s, p);
     }
   }
   for (let i = w.slides.length - 1; i >= 0; i--) {
@@ -82,6 +88,7 @@ export function stepRoar(s: BreathScope): void {
     // Only a living body still in the fight's scope slides (a teleport, a
     // wipe home or a hearth ends it).
     if (!p || p.dead || !s.players.includes(p)) {
+      if (p) dropAura(p, BREATH_AURAS.thrown);
       w.slides.splice(i, 1);
       continue;
     }
@@ -94,11 +101,34 @@ export function stepRoar(s: BreathScope): void {
       const secs = Math.max(DT, (sl.left / sl.step) * DT);
       p.vx = (sl.ux * sl.left) / secs;
       p.vz = (sl.uz * sl.left) / secs;
+      dropAura(p, BREATH_AURAS.thrown);
       w.slides.splice(i, 1);
       continue;
     }
     // Done: thrown its whole way, or stopped (a wall, an anchor).
-    if (sl.left <= 1e-6 || moved <= 0) w.slides.splice(i, 1);
+    if (sl.left <= 1e-6 || moved <= 0) {
+      dropAura(p, BREATH_AURAS.thrown);
+      w.slides.splice(i, 1);
+    }
   }
   if (w.r >= w.reach && w.slides.length === 0) s.st.roar = null;
+}
+
+/** The throw's hold: an unbreakable root for the slide's seconds (dropped as
+ *  the slide ends). The anchored and the Knotted Gale's carrier keep their
+ *  feet, so they are never held. */
+function holdThrown(s: BreathScope, p: Entity): void {
+  if (heldFast(p)) return;
+  s.ctx.applyAura(p, {
+    id: BREATH_AURAS.thrown,
+    name: BREATH_NAMES.gust,
+    kind: 'root',
+    remaining: T.roarSlide + 0.5,
+    duration: T.roarSlide + 0.5,
+    value: 0,
+    sourceId: s.boss.id,
+    school: 'nature',
+    unbreakableControl: true,
+    undispellable: true,
+  });
 }

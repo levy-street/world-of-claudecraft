@@ -22665,6 +22665,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '風が決まった道筋で虚空の上をあなたを運んでいる：降ろされるまで行動できない。',
   'hudChrome.auraEffect.breathGuardian.windworn':
     '風に疲れ果てた：これが切れるまで、疾風の道はあなたを浮島へ運ばない。',
+  'hudChrome.auraEffect.breathGuardian.thrown':
+    '頂の咆哮に吹き飛ばされた：着地するまで動けない。',
   'hudChrome.auraEffect.breathGuardian.portalA':
     '効果が切れると、あなたの立つ場所にポータルAが開く。結ばれた疾風の近くに立とう。このラウンドはそれを運べない。',
   'hudChrome.auraEffect.breathGuardian.portalB':

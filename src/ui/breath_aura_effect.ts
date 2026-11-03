@@ -112,6 +112,8 @@ export function breathAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescri
       return { key: `${KEY}.riding` };
     case ISLE_AURAS.windworn:
       return { key: `${KEY}.windworn` };
+    case BREATH_AURAS.thrown:
+      return { key: `${KEY}.thrown` };
     case BREATH_AURAS.stormForm:
       return { key: `${KEY}.stormForm` };
     case BREATH_AURAS.swell:

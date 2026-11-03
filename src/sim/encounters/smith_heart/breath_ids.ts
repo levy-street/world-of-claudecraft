@@ -85,6 +85,10 @@ export const BREATH_AURAS = {
   /** Mythic: carrying a Knotted Gale (value: the walk's factor; its life is
    *  the fuse). No wind, pull, blast or throw moves this body either. */
   laden: 'heart_breath_laden',
+  /** Thrown by the Summit Roar: an unbreakable root while the throw slides
+   *  (breath_roar.ts), so the online client draws the server's slide
+   *  instead of predicting steps the player cannot take. */
+  thrown: 'heart_breath_roar_thrown',
 } as const;
 
 /** The fight's object templates (their radius rides `scale`). */
