@@ -4,6 +4,9 @@
 // state. Keeping the draw dimensions here prevents the visible bar and its hit
 // target from drifting apart.
 
+import { buddyUnselectableBy } from '../sim/pet/buddy_ai';
+import type { Entity } from '../sim/types';
+
 export const NAMEPLATE_BASE_WIDTH = 80;
 export const NAMEPLATE_BOSS_WIDTH = 100;
 export const NAMEPLATE_HEALTH_HEIGHT = 4;
@@ -20,6 +23,16 @@ export interface NameplatePickCandidate {
   castVisible: boolean;
   boss: boolean;
   pickable: boolean;
+}
+
+/** Whether a drawn plate may take a click: never the viewer's own plate or a
+ *  corpse's, and never another player's buddy (visible but not interactable,
+ *  src/sim/pet/buddy_ai.ts). The owner may still click their own buddy. */
+export function nameplateAnchorPickable(
+  entity: Pick<Entity, 'id' | 'dead' | 'ownerId' | 'templateId'>,
+  viewerId: number,
+): boolean {
+  return entity.id !== viewerId && !entity.dead && !buddyUnselectableBy(entity, viewerId);
 }
 
 export function nameplateHealthBarWidth(boss: boolean): number {

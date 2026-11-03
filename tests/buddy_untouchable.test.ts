@@ -1,11 +1,21 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { nameplateAnchorPickable } from '../src/render/nameplate_pick_core';
 import { grantBuddy } from '../src/sim/buddies';
 import { dealDamage } from '../src/sim/combat/damage';
 import { applyHeal } from '../src/sim/combat/heal';
+import { BUDDY_TEMPLATE_IDS, buddyTemplateId } from '../src/sim/content/buddy_mobs';
+import { MOBS } from '../src/sim/data';
+import { nythraxisTransitionStunTargets } from '../src/sim/encounters/nythraxis';
+import { createMob } from '../src/sim/entity';
 import { buddyOf, buddyUnselectableBy } from '../src/sim/pet/buddy_ai';
 import { Sim } from '../src/sim/sim';
 import type { Entity, SimEvent } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
+import { stripComments } from './helpers/strip_comments';
+
+/** Any real, non-buddy mob template, for controls. */
+const NON_BUDDY_TEMPLATE = Object.keys(MOBS).find((id) => !BUDDY_TEMPLATE_IDS.has(id))!;
 
 // A buddy (src/sim/pet/buddy_ai.ts) is visible but never interactable: no
 // heal, buff, chain-heal jump, or damage ever lands on it from anyone (its
@@ -74,16 +84,27 @@ describe('buddies are visible but never interactable', () => {
     }
   });
 
-  it('friendly Tab and nearest-friendly never select a buddy', () => {
-    const { sim, healer, healerE, ownerE, buddy } = setup();
-    // Move the owner out of range so the buddy would be the only candidate.
-    place(sim, ownerE, 200, -40);
-    place(sim, buddy, 3, -40);
+  // The buddy stands closer than its owner, so a selector that still admitted
+  // it would pick the buddy; landing on the owner proves the buddy was skipped,
+  // not that nothing was selectable.
+  it('friendly Tab skips a closer buddy for the real ally behind it', () => {
+    const { sim, healer, owner, healerE, ownerE, buddy } = setup();
+    place(sim, buddy, 2, -40);
+    place(sim, ownerE, 10, -40);
     healerE.targetId = null;
     sim.friendlyTabTarget(healer);
-    expect(healerE.targetId).toBeNull();
+    expect(healerE.targetId).toBe(owner);
+    sim.friendlyTabTarget(healer);
+    expect(healerE.targetId).toBe(owner);
+  });
+
+  it('nearest-friendly skips a closer buddy for the real ally behind it', () => {
+    const { sim, healer, owner, healerE, ownerE, buddy } = setup();
+    place(sim, buddy, 2, -40);
+    place(sim, ownerE, 10, -40);
+    healerE.targetId = null;
     sim.targetNearestFriendly(healer);
-    expect(healerE.targetId).toBeNull();
+    expect(healerE.targetId).toBe(owner);
   });
 
   it('only the owner may select their buddy', () => {
@@ -91,6 +112,8 @@ describe('buddies are visible but never interactable', () => {
     healerE.targetId = null;
     sim.targetEntity(buddy.id, healer);
     expect(healerE.targetId).toBeNull();
+    // Selecting it never keeps a swing going, even with auto-attack running.
+    ownerE.autoAttack = true;
     sim.targetEntity(buddy.id, owner);
     expect(ownerE.targetId).toBe(buddy.id);
     expect(ownerE.autoAttack).toBe(false);
@@ -107,7 +130,7 @@ describe('buddies are visible but never interactable', () => {
     expect(sim.entities.has(buddy.id)).toBe(true);
   });
 
-  it('no aura (buff, stun, or debuff) ever lands on a buddy through applyAura', () => {
+  it('no aura (buff, stun, or dot) ever lands on a buddy through applyAura', () => {
     const { sim, ownerE, healerE, buddy } = setup();
     buddy.auras.length = 0;
     const base = { remaining: 5, duration: 5, value: 0, school: 'physical' as const };
@@ -123,6 +146,13 @@ describe('buddies are visible but never interactable', () => {
       id: 't_buff',
       name: 'Buff',
       kind: 'buff_ap',
+      sourceId: healerE.id,
+    });
+    sim.ctx.applyAura(buddy, {
+      ...base,
+      id: 't_dot',
+      name: 'Dot',
+      kind: 'dot',
       sourceId: healerE.id,
     });
     expect(buddy.auras).toEqual([]);
@@ -146,5 +176,50 @@ describe('buddies are visible but never interactable', () => {
     expect(buddyUnselectableBy({ ownerId: null, templateId: buddy.templateId }, healer)).toBe(
       false,
     );
+  });
+
+  it('the Nythraxis transition stun list leaves a buddy out', () => {
+    const { sim, owner, ownerE, buddy } = setup();
+    const pet = createMob(sim.ctx.nextId++, MOBS[NON_BUDDY_TEMPLATE], 18, { ...ownerE.pos });
+    pet.ownerId = owner;
+    sim.ctx.addEntity(pet);
+    const boss = { ...ownerE, spawnPos: { ...ownerE.pos } } as Entity;
+    const ids = nythraxisTransitionStunTargets(sim.ctx, boss).map((e) => e.id);
+    expect(ids).toContain(owner);
+    expect(ids).toContain(pet.id);
+    expect(ids).not.toContain(buddy.id);
+  });
+});
+
+describe("client picking skips other players' buddies", () => {
+  const viewer = 7;
+  const otherBuddy = { id: 40, dead: false, ownerId: 9, templateId: buddyTemplateId('horse') };
+  const ownBuddy = { ...otherBuddy, id: 41, ownerId: viewer };
+  const mob = { id: 42, dead: false, ownerId: null, templateId: NON_BUDDY_TEMPLATE };
+
+  it("nameplate anchors: never another player's buddy, still the owner's own and a mob", () => {
+    expect(nameplateAnchorPickable(otherBuddy, viewer)).toBe(false);
+    expect(nameplateAnchorPickable(ownBuddy, viewer)).toBe(true);
+    expect(nameplateAnchorPickable(mob, viewer)).toBe(true);
+    expect(nameplateAnchorPickable({ ...mob, dead: true }, viewer)).toBe(false);
+    expect(nameplateAnchorPickable({ ...mob, id: viewer }, viewer)).toBe(false);
+  });
+
+  it('nameplate painter routes both anchor branches through nameplateAnchorPickable', () => {
+    const src = stripComments(readFileSync('src/render/nameplate_painter.ts', 'utf8'));
+    expect(
+      src.match(/pickable\s*[:=]\s*nameplateAnchorPickable\(entity, player\.id\)/g),
+    ).toHaveLength(2);
+  });
+
+  it('world picking gates both the direct-hit and the sloppy path on buddyUnselectableBy', () => {
+    const src = stripComments(readFileSync('src/render/world_picking.ts', 'utf8'));
+    const direct = src.slice(
+      src.indexOf('pickDirect(clientX: number'),
+      src.indexOf('pickSloppy(clientX: number'),
+    );
+    const sloppy = src.slice(src.indexOf('pickSloppy(clientX: number'));
+    expect(direct).toMatch(/buddyUnselectableBy\(e, sim\.playerId\)\) break;/);
+    expect(sloppy).toMatch(/buddyUnselectableBy\(e, sim\.playerId\)\)\s*continue;/);
   });
 });

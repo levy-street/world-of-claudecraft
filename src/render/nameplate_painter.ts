@@ -10,7 +10,7 @@ import { isPlayingDead } from '../sim/combat/hunter_play_dead';
 import { corpseIndicatorFor } from '../sim/corpse_loot_state';
 import { ABILITIES, MOBS, QUESTS } from '../sim/data';
 import { specialRoleColor } from '../sim/discord_roles';
-import { buddyUnselectableBy, isBuddyMob } from '../sim/pet/buddy_ai';
+import { isBuddyMob } from '../sim/pet/buddy_ai';
 import { isQuestGatedEntityHidden } from '../sim/quest_gated_entity';
 import { ambientNpcQuestMarkerKind } from '../sim/quests/ambient_quest_marker';
 import { type QuestMarkerKind, strongerQuestMarker } from '../sim/quests/quest_marker_kind';
@@ -63,6 +63,7 @@ import { nameplateSubRowsLift } from './nameplate_heraldry_core';
 import { NameplatePaintGate } from './nameplate_paint_gate_core';
 import {
   type NameplatePickCandidate,
+  nameplateAnchorPickable,
   pickNameplateHealthBarAt,
   raiseNameplateCandidate,
 } from './nameplate_pick_core';
@@ -448,8 +449,7 @@ export class NameplatePainter {
         anchor.hpVisible = state.hpVisible;
         anchor.castVisible = state.castVisible;
         anchor.boss = state.frame === 'boss';
-        anchor.pickable =
-          id !== player.id && !entity.dead && !buddyUnselectableBy(entity, player.id);
+        anchor.pickable = nameplateAnchorPickable(entity, player.id);
       } else {
         this.anchorScratch.push({
           id,
@@ -458,7 +458,7 @@ export class NameplatePainter {
           hpVisible: state.hpVisible,
           castVisible: state.castVisible,
           boss: state.frame === 'boss',
-          pickable: id !== player.id && !entity.dead && !buddyUnselectableBy(entity, player.id),
+          pickable: nameplateAnchorPickable(entity, player.id),
         });
       }
       this.anchorCount++;
