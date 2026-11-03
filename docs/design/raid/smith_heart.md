@@ -1554,6 +1554,47 @@ Stone, Echo of Wrath and Endless Song returned no game use (CLEAR; the nearest w
 
 ### 7.2 Guardian of the Breath
 
+**The rework of 2026-11-03 (the team's feedback, approved by the owner).** Where it and the
+table below disagree, this block wins. Every number stays a SKETCH (unmeasured).
+
+- **The open Cornice.** No wall, rail, rod, horn or cheek stone stands round the Cornice any
+  more: the whole rim is an open lip (the layout's `CORNICE_OPEN_RIM`, plus the six channel
+  throats `CORNICE_GAPS`), so a body blown or thrown off ANY edge falls and dies, on every
+  difficulty. Only the climb's head in the west keeps its wall (`CORNICE_WALLED_BEARINGS`), so
+  the walk up and the corpse run never pass an open lip; Pressed to the Rim lives there alone.
+  The renderer draws the whole rim's lethal lip in eight stretches, each flaring when the wind
+  blows its way.
+- **The indrawn breath and the Summit Roar.** The pull draws everyone toward the guardian at
+  5.5 yd a second (a run is 7); then the Summit Roar (Bellows Gust's id, renamed) throws
+  everyone 26 yd away from it (30 on heroic and mythic): tanked near the edge, the raid goes
+  over it. `breath_gale.ts`; the streams into the maw `breath_inhale_streams.ts`.
+- **Thunder's Cradle, channeled.** The 1.5 s bar, then the guardian CHANNELS the cradle for its
+  6 s hold (`heart_breath_cradle_channel`): planted, no swing, no other bar. Heroic and mythic
+  lift three players (the marked one and two hashed), each over its own circle wanting 3
+  under it (1,900 each); normal one (2,600, wanting 4). `breath_cradle.ts`.
+- **The Islands of the Wind** (the owner's idea; a floating-isles concept only as
+  inspiration). Two floating isles off the south rim (`BREATH_ISLES`, hidden field floors the
+  fight draws). At each mark of the tier (`isleAt`: normal 70; heroic and mythic 80 and 60)
+  the guardian stops, roots itself and raises the Gale Bulwark: an absorb of 7 percent of its
+  health on a channel bar. Normal wakes one isle (hashed), heroic and mythic both; each woken
+  isle raises a Gale Sentinel (1,700) and a Gale Mender (1,150). While any of the round's adds
+  lives the Bulwark regrows 5 percent of its whole a second, and every 9 s the Mender channels
+  Mending Gale (3 s, kickable) for a third of its whole. A Gale Path on the Cornice by the rim
+  facing each woken isle carries whoever steps in on a FIXED scripted arc (3.2 s, 11 yd over
+  the higher end, `rideArc`: carried, stunned, no physics) to the isle; when the isle's last
+  add falls, a Homeward Gale rises there and carries its riders back beside the path. Heroic:
+  the same group may ride again. Mythic: a rider set down home is Windworn for 90 s (no Gale
+  Path takes them), so two groups are needed. Broken, the round ends (any add left dissolves);
+  held 75 s it bursts over the Cornice (480 to 560) and ends the same way, so a raid that
+  never rides (the bots) still finishes the fight. A wipe brings every rider and every body on
+  an isle home. `breath_isles.ts`, `breath_isle_geometry.ts`, `breath_isle_ids.ts`.
+- **No raid warning banner.** The fight calls none (the owner's rule: the screen filled with
+  messages): every mechanic reads in the world, with the boss's and Thessaly's yells in chat
+  and the personal alerts (the Knotted Gale's marks).
+- **Phase 2** is unchanged (the team plays the new version before "more chaos").
+- **Mythic** keeps the Knotted Gale; its throw is now at any open lip, the carrier's walk a
+  fifth of a run (`heartWalkMult`), since every lip came nearer.
+
 The Storm Cornice's boss (`heart_breath_guardian`, id frozen: its death lights the Breath
 vein and the seal's quarter exactly as before), one body and two halves, with Captain
 Thessaly fighting beside the raid. Designed with the owner (2026-10-26) and built as a
@@ -1642,6 +1683,47 @@ no plates broken by the boss's fire (Korzul: here the RAID breaks the ice, in ro
 | The Blades Hunt (Mythic) | Once, at a quarter health, a 20 s bar: the guardian stands with its arms raised, past all harm and striking no one, while the four blades cross the lake: a slash every 1.5 s at first and every second by the end, each down a line through a player (the tank too), fixed where it is drawn, 1 s before the blade flies, the same hit with no cold. The cold does not rise (a huddle still warms), the ice does not strain and the cold does not deepen while it lasts | `quench_flurry.ts` |
 
 ### 7.2 Guardian of the Breath
+
+**The rework of 2026-11-03 (the team's feedback, approved by the owner).** Where it and the
+table below disagree, this block wins. Every number stays a SKETCH (unmeasured).
+
+- **The open Cornice.** No wall, rail, rod, horn or cheek stone stands round the Cornice any
+  more: the whole rim is an open lip (the layout's `CORNICE_OPEN_RIM`, plus the six channel
+  throats `CORNICE_GAPS`), so a body blown or thrown off ANY edge falls and dies, on every
+  difficulty. Only the climb's head in the west keeps its wall (`CORNICE_WALLED_BEARINGS`), so
+  the walk up and the corpse run never pass an open lip; Pressed to the Rim lives there alone.
+  The renderer draws the whole rim's lethal lip in eight stretches, each flaring when the wind
+  blows its way.
+- **The indrawn breath and the Summit Roar.** The pull draws everyone toward the guardian at
+  5.5 yd a second (a run is 7); then the Summit Roar (Bellows Gust's id, renamed) throws
+  everyone 26 yd away from it (30 on heroic and mythic): tanked near the edge, the raid goes
+  over it. `breath_gale.ts`; the streams into the maw `breath_inhale_streams.ts`.
+- **Thunder's Cradle, channeled.** The 1.5 s bar, then the guardian CHANNELS the cradle for its
+  6 s hold (`heart_breath_cradle_channel`): planted, no swing, no other bar. Heroic and mythic
+  lift three players (the marked one and two hashed), each over its own circle wanting 3
+  under it (1,900 each); normal one (2,600, wanting 4). `breath_cradle.ts`.
+- **The Islands of the Wind** (the owner's idea; a floating-isles concept only as
+  inspiration). Two floating isles off the south rim (`BREATH_ISLES`, hidden field floors the
+  fight draws). At each mark of the tier (`isleAt`: normal 70; heroic and mythic 80 and 60)
+  the guardian stops, roots itself and raises the Gale Bulwark: an absorb of 7 percent of its
+  health on a channel bar. Normal wakes one isle (hashed), heroic and mythic both; each woken
+  isle raises a Gale Sentinel (1,700) and a Gale Mender (1,150). While any of the round's adds
+  lives the Bulwark regrows 5 percent of its whole a second, and every 9 s the Mender channels
+  Mending Gale (3 s, kickable) for a third of its whole. A Gale Path on the Cornice by the rim
+  facing each woken isle carries whoever steps in on a FIXED scripted arc (3.2 s, 11 yd over
+  the higher end, `rideArc`: carried, stunned, no physics) to the isle; when the isle's last
+  add falls, a Homeward Gale rises there and carries its riders back beside the path. Heroic:
+  the same group may ride again. Mythic: a rider set down home is Windworn for 90 s (no Gale
+  Path takes them), so two groups are needed. Broken, the round ends (any add left dissolves);
+  held 75 s it bursts over the Cornice (480 to 560) and ends the same way, so a raid that
+  never rides (the bots) still finishes the fight. A wipe brings every rider and every body on
+  an isle home. `breath_isles.ts`, `breath_isle_geometry.ts`, `breath_isle_ids.ts`.
+- **No raid warning banner.** The fight calls none (the owner's rule: the screen filled with
+  messages): every mechanic reads in the world, with the boss's and Thessaly's yells in chat
+  and the personal alerts (the Knotted Gale's marks).
+- **Phase 2** is unchanged (the team plays the new version before "more chaos").
+- **Mythic** keeps the Knotted Gale; its throw is now at any open lip, the carrier's walk a
+  fifth of a run (`heartWalkMult`), since every lip came nearer.
 
 The Storm Cornice's boss (`heart_breath_guardian`, id frozen: its death lights the Breath
 vein and the seal's quarter exactly as before), one body and two halves, with Captain
@@ -2228,10 +2310,15 @@ on both difficulties (dungeon rework README, goal 4).
 | `/dev heart breath reset` | the guardian whole, home and out of its fight; the wind still |
 | `/dev heart breath heroic [on, off]`, `mythic [on, off]` | this run's tier for the fight (mythic is heroic whole for now); a live fight takes it at once |
 | `/dev heart breath phase2` | the storm breaks now (the guardian set to half health) |
-| `/dev heart breath blow [deg, n, ne, e, se, s, sw, w, nw]` | a 10 s blow toward that bearing now (the six gaps sit at 22, 78, 128, 182, 228 and 332) |
+| `/dev heart breath blow [deg, n, ne, e, se, s, sw, w, nw]` | a 10 s blow toward that bearing now (the whole rim is an open lip but the climb's head; the six channel throats sit at 22, 78, 128, 182, 228 and 332) |
 | `/dev heart breath calm` | the wind falls calm now |
 | `/dev heart breath circle` | Captain Thessaly plants a circle of calm now (refused once the storm has broken) |
-| `/dev heart breath inhale` | the indrawn breath now (then Bellows Gust) |
+| `/dev heart breath inhale` (`roar`) | the indrawn breath now (then the Summit Roar) |
+| `/dev heart breath isles [0, 1]` | the Gale Bulwark and the tier's isles now (`0` the south-east isle alone, `1` the south-west) |
+| `/dev heart breath ride [0, 1]`, `home` | you ride the gale to that isle now, or home from the isle you stand on |
+| `/dev heart breath killisle` | every add of the round falls (the Homeward Gales rise) |
+| `/dev heart breath bulwark` | the Gale Bulwark breaks now (the round ends) |
+| `/dev heart breath windworn off` | your Windworn goes |
 | `/dev heart breath tornado` (`gale`) | three loose gales now, on any tier |
 | `/dev heart breath gust [deg]` | a phase-2 storm gust now, on any tier; in the Wind half it plays (telegraph, gust), then the blow cycle resumes from a calm without spending a turn |
 | `/dev heart breath chain` (`fork`), `eye` (`cradle`), `conductor` (`drawn`) | the Leaping Bolt, the Thunder's Cradle or Drawn Lightning now, on a hashed player |
