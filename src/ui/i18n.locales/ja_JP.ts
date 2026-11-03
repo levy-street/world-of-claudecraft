@@ -22506,7 +22506,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.heart_heat_seedflame.name': '種火の精',
   'entities.mobs.heart_heat_rolling_cinder.name': '転がる燃え殻',
   'abilityUi.cast.heart_mountains_wrath': '山の怒り',
-  'abilityUi.cast.heart_bellows_gust': 'ふいごの突風',
+  'abilityUi.cast.heart_bellows_gust': '頂の咆哮',
   'abilityUi.cast.heart_storm_lance': '嵐の槍',
   'abilityUi.cast.heart_quenching_breath': '焼き入れの息吹',
   'hudChrome.auraEffect.heatGuardian.statePhase1':
@@ -22537,6 +22537,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.heatGuardian.warn.seeds': '炉床の種が降ってくる！まとめて落として走れ！',
   'hudChrome.heatGuardian.warn.zones': '目覚めの炎！炉床が帯ごとに燃え上がる：外へ出ろ！',
   'hudChrome.heatGuardian.warn.cinder': '転がる燃え殻が落ちてきた！獲物に届く前に打ち返せ！',
+  'hudChrome.heatGuardian.warn.wheel': '炉床が回る！ 暗い区画へ移れ！',
   'hudChrome.heatGuardian.say.fist': '石の落ちる場所に立て。そしてその一部となれ。',
   'hudChrome.heatGuardian.say.sink': '湧泉がお前たちを迎えに昇る！',
   'hudChrome.heatGuardian.say.sinkAgain': '再び炉床はあふれる。再びお前たちは燃える。',
@@ -22604,6 +22605,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '槌の評議会のもう一人が{reach}ヤード以内にいる間、受けるダメージが{pct}%減少。{every}秒ごとに石の絆がレイド全体に{min}から{max}のダメージを与え、そのたびに{growth}%増加する。二人を引き離そう。',
   'hudChrome.auraEffect.council.collapse':
     '採石場が崩落している：{every}秒ごとにスタック1つにつき{min}から{max}のダメージを受け、そのたびにスタックが1つ増える。呪われた柱が砕けると終わる。',
+  'hudChrome.auraEffect.council.pillarLimit':
+    '各柱が山の怒りから守れるのは最大{limit}人まで。それより多く隠れると、全員が爆発の{share}%を受ける。',
   'hudChrome.council.alert.resonanceLine':
     '近くの味方全員を傷つける：効果が切れるまで集団から離れよう',
   'hudChrome.council.alert.rushTitle': '山の突進！',
@@ -22612,16 +22615,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.council.say.singer_wake': '目覚めなさい、眠れる石よ。彼らの足元から立ち上がれ！',
   'hudChrome.council.say.singer_rock': '上を見て、おちびさんたち！山が落ちてくるわ！',
   // The Smith's Heart's Guardian of the Breath and Captain Thessaly (M16 fills).
-  'hudChrome.breathGuardian.warn.inhale': '守護者が息を吸い込む！口の前の渦に入るな！',
-  'hudChrome.breathGuardian.warn.gust': 'ふいごの突風！衝撃に備えろ！',
-  'hudChrome.breathGuardian.warn.gales': 'はぐれ旋風が岩棚を駆け巡る！近づくな！',
-  'hudChrome.breathGuardian.warn.circle': 'テサリー隊長が凪の円を置いた！入れるのは{seats}人まで。',
-  'hudChrome.breathGuardian.warn.fell': '{player}が虚空へ吹き飛ばされた！',
-  'hudChrome.breathGuardian.warn.storm': '嵐が裂ける！岩棚じゅうに雷が落ちてくる！',
-  'hudChrome.breathGuardian.warn.fork': '{player}に跳ねる雷撃！散開しろ！',
-  'hudChrome.breathGuardian.warn.cradle': '{player}が嵐の中へ持ち上げられた！その真下に集まれ！',
-  'hudChrome.breathGuardian.warn.drawn': '{player}に招雷！落雷を縁へ導け！',
-  'hudChrome.breathGuardian.warn.stormGust': '嵐の突風が集まる！風に備えろ！',
   'hudChrome.breathGuardian.say.guardian_pull':
     '山の頂まで登り、その息吹を盗みに来たか？ならば我と共に息をせよ。',
   'hudChrome.breathGuardian.say.guardian_blow': '風が向きを変えるのを感じよ。縁は思うより近いぞ。',
@@ -22633,7 +22626,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.breathGuardian.say.guardian_wipe': '吹き飛ばされた。頂の塵のように。',
   'hudChrome.breathGuardian.say.guardian_death': '息吹は……山へ……還る……',
   'hudChrome.breathGuardian.say.thessaly_pull':
-    'ハイウォッチは共に戦う！壁の裂け目に気をつけろ、風に押し出されるぞ！',
+    'ハイウォッチはお前たちと共にある！ ここには壁がない、風に縁から放り出されるぞ！',
   'hudChrome.breathGuardian.say.thessaly_circle_a': '急げ、私の凪の中へ！入れるのは三人までだ！',
   'hudChrome.breathGuardian.say.thessaly_circle_b': 'ここだ！私と並べ、風をこの身で受け止める！',
   'hudChrome.breathGuardian.say.thessaly_circle_c': '石の上に凪を！三人、今すぐ！',
@@ -22643,10 +22636,15 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.breathGuardian.say.thessaly_victory':
     '息吹は解き放たれた。ハイウォッチはこの登攀を忘れない。',
   'hudChrome.breathGuardian.say.thessaly_wipe': '下がって息を整えろ。もう一度行くぞ。',
+  'hudChrome.breathGuardian.say.guardian_isles': '風よ、我を囲め！ 浮島が我が息を守るだろう。',
+  'hudChrome.breathGuardian.say.guardian_bulwark':
+    '我が盾が……引き裂かれた。ならば再び疾風を味わえ！',
+  'hudChrome.breathGuardian.say.thessaly_isles':
+    'あの盾は浮島から力を得ている！ 風に乗って渡り、癒し手を倒して戻ってこい！',
   'hudChrome.auraEffect.breathGuardian.wind':
-    '息吹の守護者の風が、吹く方向へ毎秒{speed}ヤードあなたを運ぶ。風に逆らって歩けば踏みとどまれ、詠唱は中断されない。縁の壁に押しつけられると毎秒{pinMin}から{pinMax}のダメージを受ける。壁が崩れた場所では止めるものがなく、虚空へ落ちる。',
+    '息吹の守護者の風が、吹く方向へ毎秒{speed}ヤードあなたを運ぶ。風に逆らって歩けば踏みとどまれ、詠唱は中断されない。岩棚の周りに壁はない：縁から運び出されれば虚空へ落ちる。壁が残るのは登り口の上だけで、そこに押しつけられると毎秒{pinMin}から{pinMax}のダメージを受ける。',
   'hudChrome.auraEffect.breathGuardian.draw':
-    '守護者が息を吸い込み、あなたを毎秒{speed}ヤード引き寄せる。口の前の渦は、そこに立つ者に{tick}秒ごとに{min}から{max}のダメージを与える。その後、ふいごの突風が岩棚の全員に{gustMin}から{gustMax}のダメージを与え、{throw}ヤード外へ吹き飛ばす。',
+    '守護者が息を吸い込み、あなたを毎秒{speed}ヤード引き寄せる。口の前の渦は、そこに立つ者に{tick}秒ごとに{min}から{max}のダメージを与える。その後、頂の咆哮が岩棚の全員に{gustMin}から{gustMax}のダメージを与え、守護者から{throw}ヤード（ヒロイックでは{heroicThrow}ヤード）吹き飛ばす：守護者が縁の近くにいれば、レイドは岩棚の外へ放り出される。',
   'hudChrome.auraEffect.breathGuardian.pinned':
     '風で縁の壁に押しつけられている：風が凪ぐか壁から離れるまで、毎秒{min}から{max}のダメージ。',
   'hudChrome.auraEffect.breathGuardian.anchor':
@@ -22656,11 +22654,27 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.breathGuardian.drawn':
     '{every}秒ごとに足元へ雷が落ちる：{warn}秒後、{radius}ヤード以内の全員に{min}から{max}のダメージを与え、{charged}秒間毎秒{cmin}から{cmax}のダメージを与える帯電した地面を残す。動き続け、落雷を味方から離れた縁へ導こう。',
   'hudChrome.auraEffect.breathGuardian.cradled':
-    '嵐の中へ持ち上げられ、{hold}秒間拘束される。その後の放電は{total}のダメージで、あなたと真下{radius}ヤード以内の全員で分け合う。分け合う人数が{soakers}人未満（ヒロイックでは{heroicSoakers}人）だと各自が{penalty}%多く受け、岩棚の全員が{bmin}から{bmax}を受ける。',
+    '嵐の中へ持ち上げられ、守護者がゆりかごを維持する{hold}秒間拘束される。その間、守護者は他に何も唱えない。その後の放電は{total}のダメージで、あなたと真下{radius}ヤード以内の全員で分け合う。分け合う人数が{soakers}人未満だと各自が{penalty}%多く受け、岩棚の全員が{bmin}から{bmax}を受ける。ヒロイック：{heroicCount}人が同時に持ち上げられ、各放電は{heroicTotal}で{heroicSoakers}人を必要とする。レイドは分かれて受け止めよう。',
   'hudChrome.auraEffect.breathGuardian.stormForm':
     '裂けて雷の体となった：息吹の守護者が倒れるまで続く、戦いの嵐の後半。',
   'hudChrome.auraEffect.breathGuardian.swell':
     '{every}秒ごとに膨れ上がる嵐が岩棚の全員に{min}から{max}のダメージを与え、前の脈動ごとに{growth}%ずつ強くなる：これまでに{stacks}回。',
+  'hudChrome.auraEffect.breathGuardian.bulwark':
+    '風の盾があと{left}のダメージを吸収する。浮島の疾風の哨兵か疾風の癒し手が一体でも生きている間、毎秒その全体の{regrow}%が回復し、癒しの疾風のたびに{mend}%回復する。疾風の道に乗って浮島へ渡り、彼らを倒せ。{max}秒保たれると、岩棚の上で炸裂し{bmin}から{bmax}のダメージを与える。',
+  'hudChrome.auraEffect.breathGuardian.riding':
+    '風が決まった道筋で虚空の上をあなたを運んでいる：降ろされるまで行動できない。',
+  'hudChrome.auraEffect.breathGuardian.windworn':
+    '風に疲れ果てた：これが切れるまで、疾風の道はあなたを浮島へ運ばない。',
+  'hudChrome.auraEffect.breathGuardian.portalA':
+    '効果が切れると、あなたの立つ場所にポータルAが開く。結ばれた疾風の近くに立とう。このラウンドはそれを運べない。',
+  'hudChrome.auraEffect.breathGuardian.portalB':
+    '効果が切れると、あなたの立つ場所にポータルBが開く。岩棚の縁に立とう。このラウンドは結ばれた疾風を運べない。',
+  'hudChrome.auraEffect.breathGuardian.portalC':
+    '効果が切れると、あなたの立つ場所にポータルCが開く。ポータルDとだけつながる。もう一つの結ばれた疾風の近くに立とう。このラウンドはそれを運べない。',
+  'hudChrome.auraEffect.breathGuardian.portalD':
+    '効果が切れると、あなたの立つ場所にポータルDが開く。ポータルCとだけつながる。ポータルBから離れた岩棚の縁に立とう。このラウンドは結ばれた疾風を運べない。',
+  'hudChrome.auraEffect.breathGuardian.laden':
+    '結ばれた疾風を運んでいる：歩く速さは{walk}%になり、ブリンク・突進・跳躍はできず、風も吸引も爆風も吹き飛ばしもあなたを動かせない。各ポータルは対になるポータルへ運ぶ：AからB、CからD。岩棚の縁でインタラクトを押すと虚空へ投げ込む。これが切れると炸裂し、岩棚の全員が死ぬ。',
   'abilityUi.cast.heart_breath_inhale': '吸い込む息',
   'abilityUi.cast.heart_breath_storm_break': '嵐の決壊',
   'abilityUi.cast.heart_breath_forking_bolt': '跳ねる雷撃',
@@ -25815,6 +25829,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.heart_final_shearing_blow': '断ち割る一撃',
   'abilityUi.cast.heart_final_gale_pounce': '疾風の飛びかかり',
   'abilityUi.cast.heart_final_rime_toll': '霧氷の鐘',
+  'abilityUi.cast.heart_breath_cradle_channel': '雷のゆりかご',
+  'abilityUi.cast.heart_breath_gale_bulwark': '疾風の防壁',
+  'abilityUi.cast.heart_breath_mending_gale': '癒しの疾風',
   'entities.mobs.heart_final_splinter_heat.name': '熱の欠片',
   'entities.mobs.heart_final_splinter_quench.name': '焼き入れの欠片',
   'entities.mobs.heart_final_splinter_breath.name': '息吹の欠片',
@@ -26081,4 +26098,23 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'seasonal.thatchgrin.wakeYell': '夜が畑に降りたぞ！ わしの畑を歩くのは誰だ？',
   'seasonal.thatchgrin.sleepYell': '日が昇った。柱に戻って、また見張りだ。',
   'seasonal.pumpkins.progress': '{label}：{current}/{total}',
+  'entities.mobs.heart_gale_sentinel.name': '疾風の哨兵',
+  'entities.mobs.heart_gale_mender.name': '疾風の癒し手',
+  'hudChrome.knotAlert.aTitle': 'あなたはポータルA！',
+  'hudChrome.knotAlert.aLine': '{seconds}秒後に足元に開く。結ばれた疾風の近くに立とう。',
+  'hudChrome.knotAlert.bTitle': 'あなたはポータルB！',
+  'hudChrome.knotAlert.bLine': '{seconds}秒後に足元に開く。岩棚の縁に立とう。',
+  'hudChrome.knotAlert.cTitle': 'あなたはポータルC！',
+  'hudChrome.knotAlert.cLine': '{seconds}秒後に足元に開く。もう一つの結ばれた疾風の近くに立とう。',
+  'hudChrome.knotAlert.dTitle': 'あなたはポータルD！',
+  'hudChrome.knotAlert.dLine': '{seconds}秒後に足元に開く。ポータルBから離れた縁に立とう。',
+  'hudChrome.knotAlert.carryTitle': '結ばれた疾風を運んでいる！',
+  'hudChrome.knotAlert.carryLine':
+    '各ポータルは対へ運ぶ：AからB、CからD。岩棚の縁から投げ込め。{seconds}秒後に炸裂する。',
+  'hudChrome.knotAlert.lipTitle': '今だ、投げろ！',
+  'hudChrome.knotAlert.lipLine': '縁に立っている。{seconds}秒後に炸裂する。',
+  'hudChrome.knotAlert.throwKey': '縁で{key}を押して投げる',
+  'hudChrome.knotAlert.throwTap': '縁でここをタップして投げる',
+  'hudChrome.knotAlert.throwClick': '縁でここをクリックして投げる',
+  'hudChrome.knotAlert.throwAria': '結ばれた疾風を虚空へ投げ込む',
 };

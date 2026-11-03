@@ -58,7 +58,8 @@ export interface BreathGale {
   tossed: Record<number, number>;
 }
 
-/** Phase 2: the Thunder's Cradle in flight. */
+/** Phase 2: one of the Thunder's Cradle's lifted players (the guardian
+ *  channels them all at once). */
 export interface BreathCradle {
   playerId: number;
   objectId: number;
@@ -73,6 +74,50 @@ export interface BreathDrawn {
   remaining: number;
   /** Seconds to the next strike at their feet. */
   next: number;
+}
+
+/** A body riding the gale to an isle or home (breath_isles.ts): its
+ *  carrier object, the arc's ends (instance-local, y the floor heights) and
+ *  its clock. */
+export interface BreathRide {
+  playerId: number;
+  objectId: number;
+  isle: number;
+  dir: 'out' | 'home';
+  from: { x: number; y: number; z: number };
+  to: { x: number; y: number; z: number };
+  t: number;
+  total: number;
+}
+
+/** One add of the isles' round. */
+export interface BreathIsleAdd {
+  id: number;
+  isle: number;
+  role: 'sentinel' | 'mender';
+  /** The Mender's next channel (seconds), and its channel's planted spot. */
+  next: number;
+  at: { x: number; y: number; z: number } | null;
+}
+
+/** The Islands of the Wind (breath_isles.ts). */
+export interface BreathIsles {
+  /** The next threshold (an index into the tier's `isleAt`). */
+  next: number;
+  /** The round in flight: the Bulwark up, the woken isles, its clock. */
+  round: {
+    isles: number[];
+    whole: number;
+    elapsed: number;
+    at: { x: number; y: number; z: number };
+  } | null;
+  adds: BreathIsleAdd[];
+  /** The Gale Paths on the Cornice and the Homeward Gales on the isles. */
+  paths: { isle: number; objectId: number }[];
+  homes: { isle: number; objectId: number }[];
+  rides: BreathRide[];
+  /** Bodies a ride set down, to the fight clock their grace ends at. */
+  grace: Record<number, number>;
 }
 
 /** Mythic: one Knotted Gale (instance-local place; held, the carrier's). */
@@ -166,7 +211,9 @@ export interface BreathFightState {
   swellTimer: number;
   swellPulses: number;
   gustTimer: number;
-  cradle: BreathCradle | null;
+  /** The Thunder's Cradle's lifted (all held by one channel). */
+  cradles: BreathCradle[];
+  isles: BreathIsles;
   drawn: BreathDrawn | null;
   /** Mythic: the Knotted Gale's round, its clock and the rounds so far. */
   heart: BreathHeart | null;

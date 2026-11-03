@@ -412,6 +412,9 @@ const MOB_IDS = [
   'heart_ring_warder',
   'heart_breath_warder',
   'heart_breath_caller',
+  // The Islands of the Wind's adds (encounters/smith_heart/breath_isles.ts).
+  'heart_gale_sentinel',
+  'heart_gale_mender',
   'heart_quench_warder',
   'heart_quench_caller',
   'heart_heat_warder',

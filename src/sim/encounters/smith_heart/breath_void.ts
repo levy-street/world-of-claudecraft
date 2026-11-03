@@ -33,13 +33,13 @@ import type { Entity } from '../../types';
 import { thessalyOf } from './breath_gale';
 import {
   fellFromCornice,
-  gapAt,
   inBreathArena,
+  lipDistance,
   onCorniceApproach,
   voidCorpseSpot,
 } from './breath_geometry';
 import { BREATH_CUES } from './breath_ids';
-import { type BreathScope, corniceListeners, raidWarn, voidCandidates } from './breath_scope';
+import { type BreathScope, corniceListeners, voidCandidates } from './breath_scope';
 import { breathSay } from './breath_voice';
 
 /** How far under the Cornice's floor a body counts as off it (yards): the
@@ -68,7 +68,6 @@ export function stepOverLip(s: Pick<BreathScope, 'ctx' | 'inst' | 'st' | 'boss'>
       radius: 2,
       ability: BREATH_CUES.fall,
     });
-    raidWarn(s, s.boss, 'fell', `${p.name} is swept into the void!`, { player: p.name });
     breathSay(s, thessalyOf(s.ctx, s.inst), 'thessaly', 'fall');
   }
 }
@@ -174,8 +173,8 @@ export function tetherGuardian(s: Pick<BreathScope, 'ctx' | 'inst' | 'st' | 'bos
   }
 }
 
-/** Is (x, z) by a gap (a body leaving the floor here went over its lip)? */
+/** Is (x, z) by an open lip (a body leaving the floor here went over it)?
+ *  Since the open rim, anywhere along the Cornice's edge but the climb. */
 function gapNear(x: number, z: number): boolean {
-  for (const dx of [-3, 0, 3]) for (const dz of [-3, 0, 3]) if (gapAt(x + dx, z + dz)) return true;
-  return false;
+  return lipDistance(x, z) <= 4 && !onCorniceApproach(x, z);
 }

@@ -35,6 +35,8 @@ export type BreathMoment =
   | 'fall'
   | 'wipe'
   | 'death'
+  | 'isles'
+  | 'bulwark'
   | 'victory';
 
 /** Every line, by speaker and moment (English source; the catalog's
@@ -48,11 +50,15 @@ export const BREATH_LINES: Readonly<Record<BreathSpeaker, Partial<Record<BreathM
       storm: 'Enough breath. Now the storm!',
       cradle: 'Rise, little one. Let them catch you.',
       drawn: 'The sky has chosen you. Run, and it follows.',
+      isles: 'Winds, wall me in! The isles will keep my breath whole.',
+      bulwark: 'My shield... torn open. Then feel the gale again!',
       wipe: 'Blown away, like dust from the summit.',
       death: 'The Breath... goes back... to the mountain...',
     },
     thessaly: {
-      pull: 'Highwatch stands with you! Mind the gaps in the wall: the wind will throw you through them!',
+      pull: 'Highwatch stands with you! There is no wall up here: the wind will throw you off the edge!',
+      isles:
+        'Its shield feeds on the isles! Ride the gale out there, cut the menders down and come back!',
       circle_a: 'Into my calm, quickly! It holds three, no more!',
       circle_b: 'Here! Stand with me and let the wind break on us!',
       circle_c: 'Calm on the stone! Three of you, now!',
@@ -79,6 +85,8 @@ export const THESSALY_PULL_DELAY = 4;
 const REPEATING: ReadonlySet<BreathMoment> = new Set([
   'inhale',
   'cradle',
+  'isles',
+  'bulwark',
   'drawn',
   'circle_a',
   'circle_b',

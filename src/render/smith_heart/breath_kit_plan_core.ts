@@ -2,17 +2,17 @@
 // build_smith_heart_breath_kit.py, painted by breath_kit.ts): where every
 // Kit_* piece of the Breath stands, from its mouth up to the Storm Cornice.
 //
-//   - the Cornice's lightning rods (a strike's scar of fused glass at each
-//     foot), its two great stone wind-horns (their bells open to the rim),
-//     and the wind bridge's shelters, on the layout's props and colliders;
+//   - the wind bridge's shelters, on the layout's props and colliders (the
+//     Cornice itself stands bare since the open rim of 2026-11-03: no rods,
+//     horns or cheek stones; the floating isles are the fight's own,
+//     smith_heart_fx/breath_isles_fx.ts);
 //   - the Wind Bridge's natural arch under its ramp (the field then draws
 //     only a shallow keel under the deck, `BREATH_KIT_SHALLOW`);
 //   - the low walls along every Breath walk over the void (the shared lip
 //     planner's modules, lip_walls_core.ts: past the lip over the drop, never
 //     over a walk);
-//   - each wind channel (the notches in the Cornice's rim) flanked by two
-//     cheek stones past its mouth's corners, the groove the Smith cut leading
-//     the updraft in from it across the floor;
+//   - each wind channel's groove the Smith cut leading the updraft in from
+//     its notch across the floor;
 //   - wind-carved standing stones past the landings' rims, and the cracked
 //     plateau's fissures (flat inlays every telegraph draws over).
 //
@@ -37,13 +37,7 @@ import { heartHash, heartPropBase } from './heart_plan_core';
 import { lipWallClear, planLipWalls } from './lip_walls_core';
 
 /** The layout prop kinds the kit draws in place of their placeholders. */
-export const BREATH_KIT_KINDS: ReadonlySet<string> = new Set([
-  'sh_lightning_rod',
-  'sh_broken_bellows',
-  'sh_wind_shelter',
-  'sh_channel_jamb',
-  'sh_storm_stone',
-]);
+export const BREATH_KIT_KINDS: ReadonlySet<string> = new Set(['sh_wind_shelter', 'sh_storm_stone']);
 
 /** Every walked floor of the Breath (their lips over the void take the
  *  low walls). */
@@ -87,25 +81,6 @@ function corniceAt(deg: number, inset: number): { x: number; z: number } {
   return { x: C.x + Math.sin(a) * (C.rx - inset), z: C.z + Math.cos(a) * (C.rz - inset) };
 }
 
-/** The channel nearest (x, z) on the Cornice: the stone's compass bearing
- *  and which side of the channel's line it stands (+1: the channel lies
- *  clockwise of it). */
-function nearestChannel(x: number, z: number): { at: number; side: number } {
-  const C = BREATH.cornice;
-  const at = ((((Math.atan2(x - C.x, z - C.z) * 180) / Math.PI) % 360) + 360) % 360;
-  let best = CORNICE_CHANNELS[0];
-  let off = 999;
-  for (const ch of CORNICE_CHANNELS) {
-    let d = ch.deg - at;
-    d = ((d + 540) % 360) - 180;
-    if (Math.abs(d) < Math.abs(off)) {
-      off = d;
-      best = ch;
-    }
-  }
-  return { at: best.deg - off, side: off > 0 ? 1 : -1 };
-}
-
 function nearestLanding(x: number, z: number): { x: number; z: number } {
   let best: { x: number; z: number } = BREATH.b1;
   for (const c of [BREATH.b1, BREATH.b2, BREATH.b3])
@@ -117,43 +92,10 @@ function nearestLanding(x: number, z: number): { x: number; z: number } {
  *  scars), the horns (each bell turned to the rim) and the shelters. */
 export function planBreathProps(): HeartKitPlacement[] {
   const out: HeartKitPlacement[] = [];
-  const C = BREATH.cornice;
   for (const p of F.props) {
     if (!BREATH_KIT_KINDS.has(p.kind)) continue;
     const y = heartPropBase(p.x, p.z);
-    if (p.kind === 'sh_lightning_rod') {
-      // The fork's opening (local X) across the bearing: the crown's
-      // crystal faces the Cornice's middle.
-      const rot = Math.atan2(C.x - p.x, C.z - p.z);
-      out.push({ piece: 'Kit_StormRod', x: p.x, y, z: p.z, rot });
-      out.push({
-        piece: 'Kit_StrikeScar',
-        x: p.x,
-        y: y + 0.02,
-        z: p.z,
-        rot: heartHash(Math.round(p.x), Math.round(p.z)) * Math.PI * 2,
-        noShadow: true,
-        cosmetic: true,
-      });
-    } else if (p.kind === 'sh_broken_bellows') {
-      // The collider box is symmetric: turn the bell (local +Z) to whichever
-      // end faces out to the rim.
-      const ox = p.x - C.x;
-      const oz = p.z - C.z;
-      const facesOut = Math.sin(p.rot) * ox + Math.cos(p.rot) * oz > 0;
-      out.push({
-        piece: 'Kit_WindHorn',
-        x: p.x,
-        y,
-        z: p.z,
-        rot: facesOut ? p.rot : p.rot + Math.PI,
-      });
-    } else if (p.kind === 'sh_channel_jamb') {
-      // The blade leans (local +X) out over its channel's line.
-      const ch = nearestChannel(p.x, p.z);
-      const a = (ch.at * Math.PI) / 180;
-      out.push({ piece: 'Kit_ChannelJamb', x: p.x, y, z: p.z, rot: ch.side > 0 ? a : a + Math.PI });
-    } else if (p.kind === 'sh_storm_stone') {
+    if (p.kind === 'sh_storm_stone') {
       // Its scalloped windward face (local +Z) out to the gale past the rim.
       const c = nearestLanding(p.x, p.z);
       out.push({

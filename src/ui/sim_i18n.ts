@@ -1579,7 +1579,7 @@ const baseEnTable = {
   // The Smith's Heart's sketch kits (content/smith_heart.ts): cast, swing
   // and cleave names. EXACT matcher through the mechanic reverse map.
   'mechanic.heartMountainsWrath': "Mountain's Wrath",
-  'mechanic.heartBellowsGust': 'Bellows Gust',
+  'mechanic.heartBellowsGust': 'Summit Roar',
   'mechanic.heartStormLance': 'Storm Lance',
   'mechanic.heartQuenchingBreath': 'Quenching Breath',
   'mechanic.heartForgeWrath': 'Forge Wrath',
@@ -1633,7 +1633,7 @@ const baseEnTable = {
   'aura.heartPortalC': 'Portal C',
   'aura.heartPortalD': 'Portal D',
   'log.heartKnotHop': 'The portal tears you across the Cornice, gale and all.',
-  'error.heartKnotNotAtLip': 'You must stand at the lip of a gap to throw the Knotted Gale.',
+  'error.heartKnotNotAtLip': 'You must stand at the edge of the Cornice to throw the Knotted Gale.',
   'mechanic.heartLooseGale': 'Loose Gale',
   'mechanic.heartBreakingStorm': 'Breaking Storm',
   'mechanic.heartLeapingBolt': 'Leaping Bolt',
@@ -1642,6 +1642,15 @@ const baseEnTable = {
   'mechanic.heartDrawnLightning': 'Drawn Lightning',
   'aura.heartStormUnbound': 'Storm Unbound',
   'mechanic.heartSwellingStorm': 'Swelling Storm',
+  // The Islands of the Wind (encounters/smith_heart/breath_isle_ids.ts
+  // ISLE_NAMES).
+  'aura.heartGaleBulwark': 'Gale Bulwark',
+  'mechanic.heartBulwarkBurst': 'Bulwark Burst',
+  'mechanic.heartMendingGale': 'Mending Gale',
+  'aura.heartRidingTheGale': 'Riding the Gale',
+  'aura.heartWindworn': 'Windworn',
+  'mechanic.heartGalePath': 'Gale Path',
+  'mechanic.heartHomewardGale': 'Homeward Gale',
   // The Guardian of the Quench (encounters/smith_heart/quench_ids.ts
   // QUENCH_NAMES): its damage and aura names. EXACT through the mechanic
   // reverse map (Quenching Breath and Tempering Strike keep their keys).
@@ -27110,7 +27119,7 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Rime Breath': 'mechanic.sanctumRimeBreath',
   // The Smith's Heart's sketch kits (content/smith_heart.ts).
   "Mountain's Wrath": 'mechanic.heartMountainsWrath',
-  'Bellows Gust': 'mechanic.heartBellowsGust',
+  'Summit Roar': 'mechanic.heartBellowsGust',
   'Storm Lance': 'mechanic.heartStormLance',
   'Quenching Breath': 'mechanic.heartQuenchingBreath',
   'Forge Wrath': 'mechanic.heartForgeWrath',
@@ -27164,6 +27173,13 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Drawn Lightning': 'mechanic.heartDrawnLightning',
   'Storm Unbound': 'aura.heartStormUnbound',
   'Swelling Storm': 'mechanic.heartSwellingStorm',
+  'Gale Bulwark': 'aura.heartGaleBulwark',
+  'Bulwark Burst': 'mechanic.heartBulwarkBurst',
+  'Mending Gale': 'mechanic.heartMendingGale',
+  'Riding the Gale': 'aura.heartRidingTheGale',
+  Windworn: 'aura.heartWindworn',
+  'Gale Path': 'mechanic.heartGalePath',
+  'Homeward Gale': 'mechanic.heartHomewardGale',
   'Quenching Cold': 'aura.heartQuenchingCold',
   'Huddled Warmth': 'aura.heartHuddledWarmth',
   'Encased in Rime': 'aura.heartEncasedInRime',

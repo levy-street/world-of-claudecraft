@@ -5,7 +5,12 @@
 // strikes' spots. Instance-local yards throughout. No SimContext, no rng (the
 // picks are hashed), so the raid bots' tactics (scripts/lib) can reuse it.
 
-import { BREATH, CORNICE_GAPS, SMITH_HEART_FIELD } from '../../content/smith_heart_layout';
+import {
+  BREATH,
+  CORNICE_GAPS,
+  CORNICE_OPEN_RIM,
+  SMITH_HEART_FIELD,
+} from '../../content/smith_heart_layout';
 import { authoredFieldSurfaceAt } from '../../instances/authored_field';
 import { BREATH_TUNING as T } from './breath_ids';
 
@@ -53,7 +58,7 @@ export function inClaimBand(z: number): boolean {
  *  spot of its floor clear of every gap, walking in from (x, z) toward the
  *  Cornice's middle (so a corpse is never left in the void, where a
  *  resurrection would drop it straight back into it). */
-export function voidCorpseSpot(x: number, z: number): { x: number; z: number } {
+export function voidCorpseSpot(x: number, z: number, inset = 3): { x: number; z: number } {
   const dx = C.x - x;
   const dz = C.z - z;
   const d = Math.hypot(dx, dz);
@@ -61,7 +66,9 @@ export function voidCorpseSpot(x: number, z: number): { x: number; z: number } {
   for (let t = 0; t <= d; t += 1) {
     const px = x + (dx / d) * t;
     const pz = z + (dz / d) * t;
-    if (inBreathArena(px, pz) && !gapAt(px, pz)) return { x: px, z: pz };
+    // A little in from the open lip, so a body raised there stands on rock.
+    if (inBreathArena(px, pz) && !gapAt(px, pz) && lipDistance(px, pz) >= inset)
+      return { x: px, z: pz };
   }
   return { x: C.x, z: C.z };
 }
@@ -71,6 +78,25 @@ export function voidCorpseSpot(x: number, z: number): { x: number; z: number } {
  *  fell is the fight's to count. */
 export function nearCornice(x: number, z: number): boolean {
   return Math.hypot((x - C.x) / (C.rx + 30), (z - C.z) / (C.rz + 30)) <= 1;
+}
+
+/** Is (x, z) inside one of the field's breaks in the wall (the open rim, a
+ *  channel's throat): a lip a body falls off? */
+export function openLipAt(x: number, z: number): boolean {
+  for (const o of F.lipOpenings ?? [])
+    if ((x - o.x) ** 2 + (z - o.z) ** 2 <= o.r * o.r) return true;
+  return false;
+}
+
+/** About how far (x, z) lies in from the Cornice's nearest open lip (yards;
+ *  0 at it): the rim's openings stand on its edge (CORNICE_OPEN_RIM, a disc
+ *  every 5 degrees), the channels' throats inside their notches. Within a
+ *  couple of yards: cheap enough for every tick. */
+export function lipDistance(x: number, z: number): number {
+  let d = Number.POSITIVE_INFINITY;
+  for (const o of CORNICE_OPEN_RIM) d = Math.min(d, Math.hypot(x - o.x, z - o.z) - 1);
+  for (const g of CORNICE_GAPS) d = Math.min(d, Math.hypot(x - g.x, z - g.z) - g.r);
+  return Math.max(0, d);
 }
 
 /** The gap whose throat (x, z) lies in, or null. */
@@ -87,7 +113,8 @@ export function pinnedAgainstRim(x: number, z: number, heading: number): boolean
   const px = x + Math.sin(heading) * T.pinReach;
   const pz = z + Math.cos(heading) * T.pinReach;
   if (authoredFieldSurfaceAt(F, px, pz)) return false;
-  return gapAt(px, pz) === null && gapAt(x, z) === null;
+  // Since the open rim (2026-11-03) only the climb's head keeps a wall.
+  return !openLipAt(px, pz) && !openLipAt(x, z);
 }
 
 /** Has a body at (x, z, local height y) gone over the Cornice's lip and come
@@ -158,17 +185,16 @@ export function circleClear(x: number, z: number, r: number): boolean {
     if (!inBreathArena(px, pz)) return false;
   }
   for (const g of CORNICE_GAPS) if (Math.hypot(x - g.x, z - g.z) < g.r + r + 2) return false;
-  return true;
+  return lipDistance(x, z) >= r + 2;
 }
 
-/** How far (x, z) lies from the nearest gap's reach (yards; 0 inside one). */
+/** How far (x, z) lies from the nearest open lip (yards; 0 at it): since the
+ *  open rim the whole edge is a gap (lipDistance). */
 export function gapDistance(x: number, z: number): number {
-  let d = Number.POSITIVE_INFINITY;
-  for (const g of CORNICE_GAPS) d = Math.min(d, Math.hypot(x - g.x, z - g.z) - g.r);
-  return Math.max(0, d);
+  return lipDistance(x, z);
 }
 
-/** Is (x, z) on the floor at the lip of a gap (the Knotted Gale's throw)? */
+/** Is (x, z) on the floor at an open lip (the Knotted Gale's throw)? */
 export function atGapLip(x: number, z: number): boolean {
   return inBreathArena(x, z) && gapDistance(x, z) <= T.heartLipReach;
 }
@@ -224,10 +250,10 @@ export function nearestLipSpot(
     (a, b) => a.d - b.d,
   );
   for (const { g } of lips) {
-    const spot = voidCorpseSpot(g.x, g.z);
+    const spot = voidCorpseSpot(g.x, g.z, 1);
     if (avoid.every((o) => Math.hypot(spot.x - o.x, spot.z - o.z) >= clear)) return spot;
   }
-  return voidCorpseSpot(lips[0].g.x, lips[0].g.z);
+  return voidCorpseSpot(lips[0].g.x, lips[0].g.z, 1);
 }
 
 /** Loose gale `k`'s place `t` seconds into its run (heroic): a slow, wide,

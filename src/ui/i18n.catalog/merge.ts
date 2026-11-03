@@ -804,7 +804,7 @@ const mergeStringsEn = {
       // The Smith's Heart raid blockout's sketch kits (content/smith_heart.ts).
       // None of these bars can be kicked.
       heart_mountains_wrath: "Mountain's Wrath",
-      heart_bellows_gust: 'Bellows Gust',
+      heart_bellows_gust: 'Summit Roar',
       heart_storm_lance: 'Storm Lance',
       heart_quenching_breath: 'Quenching Breath',
       heart_forge_wrath: 'Forge Wrath',
@@ -837,6 +837,11 @@ const mergeStringsEn = {
       heart_breath_forking_bolt: 'Leaping Bolt',
       heart_breath_thunders_cradle: "Thunder's Cradle",
       heart_breath_drawn_lightning: 'Drawn Lightning',
+      heart_breath_cradle_channel: "Thunder's Cradle",
+      // The Islands of the Wind (breath_isle_ids.ts ISLE_CASTS): the guardian's
+      // Bulwark is never kicked; the Gale Mender's Mending Gale can be.
+      heart_breath_gale_bulwark: 'Gale Bulwark',
+      heart_breath_mending_gale: 'Mending Gale',
       // The Guardian of the Quench's awakening (encounters/smith_heart/quench_ids.ts).
       heart_quench_blades_wake: 'The Blades Wake',
       heart_quench_blades_hunt: 'The Blades Hunt',

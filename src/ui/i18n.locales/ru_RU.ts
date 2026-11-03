@@ -24667,7 +24667,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.heart_heat_seedflame.name': 'Огнесемя',
   'entities.mobs.heart_heat_rolling_cinder.name': 'Катящийся уголь',
   'abilityUi.cast.heart_mountains_wrath': 'Гнев горы',
-  'abilityUi.cast.heart_bellows_gust': 'Порыв мехов',
+  'abilityUi.cast.heart_bellows_gust': 'Рёв вершины',
   'abilityUi.cast.heart_storm_lance': 'Грозовое копьё',
   'abilityUi.cast.heart_quenching_breath': 'Дыхание закалки',
   'hudChrome.auraEffect.heatGuardian.statePhase1':
@@ -24701,6 +24701,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Пробуждённый огонь! Очаг загорается кольцо за кольцом: уходите!',
   'hudChrome.heatGuardian.warn.cinder':
     'Падает Катящийся уголь! Отбейте его, пока он не настиг свою жертву!',
+  'hudChrome.heatGuardian.warn.wheel': 'Очаг поворачивается! Встаньте на тёмный сектор!',
   'hudChrome.heatGuardian.say.fist': 'Встаньте там, куда падает камень, и станьте его частью.',
   'hudChrome.heatGuardian.say.sink': 'Источник поднимается вам навстречу!',
   'hudChrome.heatGuardian.say.sinkAgain': 'Снова Очаг переполняется. Снова вы горите.',
@@ -24771,6 +24772,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Получает на {pct}% меньше урона, пока другой член Совета Молота находится в пределах {reach} м. Каждые {every} с Узы камня наносят всему рейду от {min} до {max} урона, каждый раз на {growth}% больше. Разведите их.',
   'hudChrome.auraEffect.council.collapse':
     'Каменоломня обрушивается: каждые {every} с вы получаете от {min} до {max} урона за каждый заряд, и каждый раз добавляется новый заряд. Эффект закончится, когда Проклятая колонна разрушится.',
+  'hudChrome.auraEffect.council.pillarLimit': 'Каждая колонна защищает от Гнева горы не больше {limit} игроков. Если за ней больше, каждый из них получает {share}% удара.',
   'hudChrome.council.alert.resonanceLine':
     'Вы раните всех союзников рядом: отойдите от группы, пока эффект не закончится',
   'hudChrome.council.alert.rushTitle': 'Натиск горы!',
@@ -24780,18 +24782,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.council.say.singer_wake': 'Проснись, спящий камень. Восстань там, где они стоят!',
   'hudChrome.council.say.singer_rock': 'Посмотрите наверх, малыши! Гора падает!',
   // The Smith's Heart's Guardian of the Breath and Captain Thessaly (M16 fills).
-  'hudChrome.breathGuardian.warn.inhale': 'Страж делает вдох! Не стойте в вихре перед его пастью!',
-  'hudChrome.breathGuardian.warn.gust': 'Порыв мехов! Приготовьтесь к удару!',
-  'hudChrome.breathGuardian.warn.gales':
-    'По Карнизу носятся блуждающие вихри! Держитесь от них подальше!',
-  'hudChrome.breathGuardian.warn.circle':
-    'Капитан Тессали ставит круг затишья! В нём поместятся {seats}.',
-  'hudChrome.breathGuardian.warn.fell': '{player} уносит в пустоту!',
-  'hudChrome.breathGuardian.warn.storm': 'Буря разражается! Молнии падают по всему Карнизу!',
-  'hudChrome.breathGuardian.warn.fork': 'Скачущая молния на {player}! Рассредоточьтесь!',
-  'hudChrome.breathGuardian.warn.cradle': '{player} поднят в бурю! Соберитесь под ним!',
-  'hudChrome.breathGuardian.warn.drawn': 'Притянутая молния на {player}! Уводите удары к краю!',
-  'hudChrome.breathGuardian.warn.stormGust': 'Собирается штормовой порыв! Держитесь против ветра!',
   'hudChrome.breathGuardian.say.guardian_pull':
     'Вы взобрались на вершину горы, чтобы украсть её дыхание? Тогда дышите вместе со мной.',
   'hudChrome.breathGuardian.say.guardian_blow':
@@ -24803,8 +24793,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Небо выбрало тебя. Беги, и оно последует за тобой.',
   'hudChrome.breathGuardian.say.guardian_wipe': 'Сдуты, как пыль с вершины.',
   'hudChrome.breathGuardian.say.guardian_death': 'Дыхание... возвращается... в гору...',
-  'hudChrome.breathGuardian.say.thessaly_pull':
-    'Хайвотч с вами! Берегитесь проломов в стене: ветер выбросит вас через них!',
+  'hudChrome.breathGuardian.say.thessaly_pull': 'Хайвотч с вами! Здесь нет стены: ветер сбросит вас с края!',
   'hudChrome.breathGuardian.say.thessaly_circle_a':
     'В моё затишье, быстрее! Оно вмещает троих, не больше!',
   'hudChrome.breathGuardian.say.thessaly_circle_b':
@@ -24818,10 +24807,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.breathGuardian.say.thessaly_victory':
     'Дыхание свободно. Хайвотч не забудет этого восхождения.',
   'hudChrome.breathGuardian.say.thessaly_wipe': 'Отходим и переводим дух. Попробуем снова.',
-  'hudChrome.auraEffect.breathGuardian.wind':
-    'Ветер Стража Дыхания несёт вас туда, куда дует, со скоростью {speed} ярда в секунду. Идите против него, чтобы устоять: он не прерывает заклинания. Прижатые к стене края, вы получаете от {pinMin} до {pinMax} урона каждую секунду. Там, где стена разрушена, ничто вас не удержит: вы падаете в пустоту.',
-  'hudChrome.auraEffect.breathGuardian.draw':
-    'Страж делает вдох и тянет вас к себе со скоростью {speed} ярда в секунду. Его вихрь наносит от {min} до {max} урона каждые {tick} сек. всем, кто стоит перед его пастью. Затем Порыв мехов наносит от {gustMin} до {gustMax} урона всем на Карнизе и отбрасывает их на {throw} ярдов наружу.',
+  'hudChrome.breathGuardian.say.guardian_isles': 'Ветра, окружите меня! Острова сберегут моё дыхание.',
+  'hudChrome.breathGuardian.say.guardian_bulwark': 'Мой щит... разорван. Тогда снова почувствуйте шквал!',
+  'hudChrome.breathGuardian.say.thessaly_isles': 'Его щит питается от островов! Летите туда на ветре, сразите целителей и возвращайтесь!',
+  'hudChrome.auraEffect.breathGuardian.wind': 'Ветер Стража Дыхания несёт вас туда, куда дует, со скоростью {speed} ярда в секунду. Идите против него, чтобы устоять: он не прерывает заклинания. Вокруг Карниза нет стены: вынесенные за край, вы падаете в пустоту. Стена осталась только у верха подъёма, и прижатые к ней вы получаете от {pinMin} до {pinMax} урона каждую секунду.',
+  'hudChrome.auraEffect.breathGuardian.draw': 'Страж делает вдох и тянет вас к себе со скоростью {speed} ярда в секунду. Его вихрь наносит от {min} до {max} урона каждые {tick} сек. тем, кто стоит перед пастью. Затем Рёв вершины наносит от {gustMin} до {gustMax} урона всем на Карнизе и отбрасывает их на {throw} ярдов от Стража ({heroicThrow} на героическом уровне): если Страж стоит у края, рейд улетает с Карниза.',
   'hudChrome.auraEffect.breathGuardian.pinned':
     'Ветер прижал вас к стене края: от {min} до {max} урона каждую секунду, пока ветер не стихнет или вы не отойдёте от стены.',
   'hudChrome.auraEffect.breathGuardian.anchor':
@@ -24830,12 +24820,19 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Ваша опора иссякла: пока действует этот эффект, круг затишья капитана Тессали не может снова удержать вас.',
   'hudChrome.auraEffect.breathGuardian.drawn':
     'Каждые {every} сек. туда, где вы стоите, бьёт молния: через {warn} сек. она наносит от {min} до {max} урона всем в радиусе {radius} ярдов и оставляет заряженную землю, наносящую от {cmin} до {cmax} урона каждую секунду в течение {charged} сек. Не стойте на месте и уводите удары к краю, подальше от рейда.',
-  'hudChrome.auraEffect.breathGuardian.cradled':
-    'Вас подняли в бурю и держат {hold} сек. Затем разряд наносит {total} урона, поделённого между вами и всеми, кто стоит в радиусе {radius} ярдов под вами. Если делят меньше {soakers} (на героическом уровне {heroicSoakers}), каждый получает на {penalty}% больше, а все на Карнизе получают от {bmin} до {bmax} урона.',
+  'hudChrome.auraEffect.breathGuardian.cradled': 'Вас подняли в бурю и держат {hold} сек., пока Страж поддерживает колыбель; всё это время он больше ничего не применяет. Затем разряд наносит {total} урона, поделённого между вами и всеми, кто стоит в радиусе {radius} ярдов под вами. Если делят меньше {soakers}, каждый получает на {penalty}% больше, а все на Карнизе получают от {bmin} до {bmax} урона. Героический уровень: поднимают сразу {heroicCount} игроков, каждый разряд наносит {heroicTotal} и требует {heroicSoakers} человек, так что рейд делится между ними.',
   'hudChrome.auraEffect.breathGuardian.stormForm':
     'Разорван и обращён в тело из молний: штормовая половина боя, пока Страж Дыхания не падёт.',
   'hudChrome.auraEffect.breathGuardian.swell':
     'Каждые {every} сек. разрастающаяся буря наносит от {min} до {max} урона всем на Карнизе, на {growth}% больше за каждый предыдущий импульс: уже {stacks}.',
+  'hudChrome.auraEffect.breathGuardian.bulwark': 'Щит ветра поглотит ещё {left} урона. Пока жив хоть один Часовой шквала или Целитель шквала на парящих островах, он восстанавливает {regrow}% своей прочности в секунду, а каждый Целящий шквал возвращает {mend}%. Летите по Пути шквала на острова и сразите их. Если щит продержится {max} сек., он взорвётся над Карнизом, нанеся от {bmin} до {bmax} урона.',
+  'hudChrome.auraEffect.breathGuardian.riding': 'Ветер несёт вас над пустотой по заданному пути: вы не можете действовать, пока он вас не опустит.',
+  'hudChrome.auraEffect.breathGuardian.windworn': 'Измотан ветром: пока эффект не закончится, Путь шквала не перенесёт вас на острова.',
+  'hudChrome.auraEffect.breathGuardian.portalA': 'Когда эффект закончится, Портал A откроется точно там, где вы стоите. Встаньте рядом с Узлом бури. В этом раунде вы не можете его нести.',
+  'hudChrome.auraEffect.breathGuardian.portalB': 'Когда эффект закончится, Портал B откроется точно там, где вы стоите. Встаньте у края Карниза. В этом раунде вы не можете нести Узел бури.',
+  'hudChrome.auraEffect.breathGuardian.portalC': 'Когда эффект закончится, Портал C откроется точно там, где вы стоите. Он связан только с Порталом D. Встаньте рядом со вторым Узлом бури. В этом раунде вы не можете его нести.',
+  'hudChrome.auraEffect.breathGuardian.portalD': 'Когда эффект закончится, Портал D откроется точно там, где вы стоите. Он связан только с Порталом C. Встаньте у края Карниза, подальше от Портала B. В этом раунде вы не можете нести Узел бури.',
+  'hudChrome.auraEffect.breathGuardian.laden': 'Вы несёте Узел бури: вы идёте со скоростью {walk}%, не можете перемещаться скачком, совершать рывок или прыжок, и ни ветер, ни притяжение, ни взрыв, ни отбрасывание не сдвинут вас. Каждый портал переносит к своей паре: из A в B, из C в D. Нажмите «Взаимодействие» у края Карниза, чтобы бросить его в пустоту. Когда эффект закончится, он взорвётся и убьёт всех на Карнизе.',
   'abilityUi.cast.heart_breath_inhale': 'Вдох',
   'abilityUi.cast.heart_breath_storm_break': 'Разрыв бури',
   'abilityUi.cast.heart_breath_forking_bolt': 'Скачущая молния',
@@ -26275,6 +26272,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.heart_final_shearing_blow': 'Рассекающий удар',
   'abilityUi.cast.heart_final_gale_pounce': 'Прыжок шквала',
   'abilityUi.cast.heart_final_rime_toll': 'Звон инея',
+  'abilityUi.cast.heart_breath_cradle_channel': 'Колыбель грома',
+  'abilityUi.cast.heart_breath_gale_bulwark': 'Бастион бури',
+  'abilityUi.cast.heart_breath_mending_gale': 'Целящий шквал',
   'entities.mobs.heart_final_splinter_heat.name': 'Осколок Жара',
   'entities.mobs.heart_final_splinter_quench.name': 'Осколок Закалки',
   'entities.mobs.heart_final_splinter_breath.name': 'Осколок Дыхания',
@@ -26528,4 +26528,22 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'seasonal.thatchgrin.sleepYell': 'Солнце встало. Обратно на шест, снова сторожить.',
   'seasonal.pumpkins.progress': "{label}: {current}/{total}",
 
+  'entities.mobs.heart_gale_sentinel.name': 'Часовой шквала',
+  'entities.mobs.heart_gale_mender.name': 'Целитель шквала',
+  'hudChrome.knotAlert.aTitle': 'Вы Портал A!',
+  'hudChrome.knotAlert.aLine': 'Он откроется у ваших ног через {seconds} сек. Встаньте рядом с Узлом бури.',
+  'hudChrome.knotAlert.bTitle': 'Вы Портал B!',
+  'hudChrome.knotAlert.bLine': 'Он откроется у ваших ног через {seconds} сек. Встаньте у края Карниза.',
+  'hudChrome.knotAlert.cTitle': 'Вы Портал C!',
+  'hudChrome.knotAlert.cLine': 'Он откроется у ваших ног через {seconds} сек. Встаньте рядом со вторым Узлом бури.',
+  'hudChrome.knotAlert.dTitle': 'Вы Портал D!',
+  'hudChrome.knotAlert.dLine': 'Он откроется у ваших ног через {seconds} сек. Встаньте у края, подальше от Портала B.',
+  'hudChrome.knotAlert.carryTitle': 'Вы несёте Узел бури!',
+  'hudChrome.knotAlert.carryLine': 'Каждый портал переносит к своей паре: из A в B, из C в D. Бросьте его с края Карниза. Он взорвётся через {seconds} сек.',
+  'hudChrome.knotAlert.lipTitle': 'Бросайте сейчас!',
+  'hudChrome.knotAlert.lipLine': 'Вы стоите у края. Взрыв через {seconds} сек.',
+  'hudChrome.knotAlert.throwKey': 'Нажмите {key} у края, чтобы бросить',
+  'hudChrome.knotAlert.throwTap': 'Коснитесь здесь у края, чтобы бросить',
+  'hudChrome.knotAlert.throwClick': 'Щёлкните здесь у края, чтобы бросить',
+  'hudChrome.knotAlert.throwAria': 'Бросить Узел бури в пустоту',
 };

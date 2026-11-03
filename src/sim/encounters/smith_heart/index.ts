@@ -12,6 +12,8 @@ export {
 export * from './breath_geometry';
 export { heartDevTrigger, startHeart, tryThrowKnot } from './breath_heart';
 export * from './breath_ids';
+export * from './breath_isle_geometry';
+export * from './breath_isle_ids';
 export type { BreathFightState } from './breath_state';
 
 export {

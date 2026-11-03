@@ -36,7 +36,6 @@ import {
   livePlayers,
   local,
   putMarker,
-  raidWarn,
   spawnBreathObject,
 } from './breath_scope';
 import type { BreathFightState } from './breath_state';
@@ -78,13 +77,6 @@ export function plantCalm(s: BreathScope): boolean {
   s.st.circleTimer = T.circleEvery;
   const n = Math.round(s.st.clock / T.circleEvery);
   breathSay(s, thessaly, 'thessaly', circleMoment(n));
-  raidWarn(
-    s,
-    thessaly,
-    'circle',
-    `Captain Thessaly plants a circle of calm! ${T.circleSeats} may stand in it.`,
-    { seats: String(T.circleSeats) },
-  );
   return true;
 }
 

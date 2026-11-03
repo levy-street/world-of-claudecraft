@@ -51,6 +51,9 @@ export const BREATH_CASTS = {
   fork: 'heart_breath_forking_bolt',
   /** Phase 2: a player lifted into the storm (the raid gathers under them). */
   cradle: 'heart_breath_thunders_cradle',
+  /** The guardian's channel that holds the lifted up (nothing else is cast
+   *  while it runs). */
+  cradleHold: 'heart_breath_cradle_channel',
   /** Phase 2: a player marked to draw the lightning to their feet. */
   drawn: 'heart_breath_drawn_lightning',
 } as const;
@@ -162,7 +165,7 @@ export const BREATH_NAMES = {
   pull: 'Indrawn Breath',
   pinned: 'Pressed to the Rim',
   vortex: 'Breath Vortex',
-  gust: 'Bellows Gust',
+  gust: 'Summit Roar',
   anchor: 'Anchored in Calm',
   spent: 'Calm Spent',
   gale: 'Loose Gale',
@@ -189,7 +192,7 @@ export const BREATH_NAMES = {
 export const KNOT_HOP_TEXT = 'The portal tears you across the Cornice, gale and all.';
 /** The error a throw away from any gap reads (same matcher). */
 export const KNOT_NOT_AT_LIP_ERROR =
-  'You must stand at the lip of a gap to throw the Knotted Gale.';
+  'You must stand at the edge of the Cornice to throw the Knotted Gale.';
 
 // ---- difficulty -----------------------------------------------------------------------
 
@@ -214,8 +217,19 @@ export interface BreathDifficultyRules {
   looseGales: boolean;
   /** Short gusts return in phase 2. */
   stormGusts: boolean;
-  /** The Thunder's Cradle wants at least this many under it. */
+  /** The Thunder's Cradle: how many players it traps at once (the
+   *  marked one, then the rest: the raid splits to share each), how many
+   *  each circle wants under it, and each one's discharge. */
+  cradleCount: number;
   cradleSoakers: number;
+  cradleTotal: number;
+  /** The Islands of the Wind (breath_isles.ts): the health fractions the
+   *  guardian raises its Gale Bulwark at, how many isles each round wakes. */
+  isleAt: readonly number[];
+  isleCount: number;
+  /** Windworn: a body that rode home may not ride again for this long (0:
+   *  never worn: the same group may go again). */
+  windwornSeconds: number;
   /** The Knotted Gale (breath_heart.ts): its balls, portals and carriers. */
   stormHeart: boolean;
 }
@@ -223,33 +237,49 @@ export interface BreathDifficultyRules {
 export const BREATH_DIFFICULTY: Readonly<Record<BreathDifficulty, BreathDifficultyRules>> = {
   normal: {
     windSpeed: 3.2,
-    gustThrow: 18,
+    gustThrow: 26,
     damageMult: 1,
     calmSpent: false,
     looseGales: false,
     stormGusts: false,
+    cradleCount: 1,
     cradleSoakers: 4,
+    cradleTotal: 2600,
+    isleAt: [0.7],
+    isleCount: 1,
+    windwornSeconds: 0,
     stormHeart: false,
   },
   heroic: {
     windSpeed: 4.4,
-    gustThrow: 22,
+    gustThrow: 30,
     damageMult: 1.25,
     calmSpent: true,
     looseGales: true,
     stormGusts: true,
-    cradleSoakers: 5,
+    cradleCount: 3,
+    cradleSoakers: 3,
+    cradleTotal: 1900,
+    isleAt: [0.8, 0.6],
+    isleCount: 2,
+    windwornSeconds: 0,
     stormHeart: false,
   },
-  // Heroic whole (the circle rule included), plus the Knotted Gale.
+  // Heroic whole (the circle rule included), plus the Knotted Gale and
+  // Windworn (one ride per player per round of isles: two groups).
   mythic: {
     windSpeed: 4.4,
-    gustThrow: 22,
+    gustThrow: 30,
     damageMult: 1.25,
     calmSpent: true,
     looseGales: true,
     stormGusts: true,
-    cradleSoakers: 5,
+    cradleCount: 3,
+    cradleSoakers: 3,
+    cradleTotal: 1900,
+    isleAt: [0.8, 0.6],
+    isleCount: 2,
+    windwornSeconds: 90,
     stormHeart: true,
   },
 };
@@ -297,7 +327,8 @@ export const BREATH_TUNING = {
   inhaleFirst: 38,
   inhaleEvery: 45,
   inhaleCast: 5,
-  pullSpeed: 4,
+  /** The pull toward the guardian (a run is 7: walking away barely holds). */
+  pullSpeed: 5.5,
   /** The vortex: this far before the mouth, this wide, this often. */
   vortexAhead: 7,
   vortexR: 4.5,
@@ -340,12 +371,13 @@ export const BREATH_TUNING = {
   cradleFirst: 16,
   cradleEvery: 40,
   cradleCast: 1.5,
-  /** The lifted player hangs this long, this high, over a gather circle of
-   *  this radius; then the discharge splits between everyone under it. */
+  /** The lifted players hang this long (the guardian CHANNELS it: nothing
+   *  else is cast meanwhile), this high, over gather circles of this radius;
+   *  then each discharge splits between everyone under it (each tier's
+   *  whole: BREATH_DIFFICULTY cradleTotal). */
   cradleHold: 6,
   cradleLift: 5,
   cradleR: 6,
-  cradleTotal: 2600,
   /** Short of the difficulty's soakers: each share this much heavier, and
    *  the whole Cornice takes the backlash. */
   cradlePenaltyMult: 1.6,
@@ -400,7 +432,8 @@ export const BREATH_TUNING = {
    *  portal (the Cornice is too small; tests/smith_heart_breath_heart.test.ts
    *  pins the walk's length). A quarter makes a badly placed portal the burst
    *  the design asks for. */
-  heartWalkMult: 0.25,
+  // The open rim (2026-11-03) brought every lip nearer: a fifth now.
+  heartWalkMult: 0.2,
   /** How near a ball a player takes it up, and a portal's mouth (yards). */
   heartPickR: 2.5,
   heartPortalR: 2.5,
@@ -452,7 +485,7 @@ export function swellMult(pulse: number): number {
 export function cradleShare(
   soakers: number,
   need: number,
-  total: number = BREATH_TUNING.cradleTotal,
+  total: number = BREATH_DIFFICULTY.normal.cradleTotal,
 ): { each: number; backlash: boolean } {
   const n = Math.max(1, soakers);
   const short = n < need;

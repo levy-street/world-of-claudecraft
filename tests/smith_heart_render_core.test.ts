@@ -855,7 +855,7 @@ describe('heart_plan_core: the props and the lights', () => {
     };
     // A body is about two yards tall.
     expect(tallest('sh_quarry_colossus')).toBeGreaterThan(20);
-    expect(tallest('sh_lightning_rod')).toBeGreaterThan(18);
+    // The Breath reads by its floating isles (smith_heart_fx/breath_isles_fx.ts).
     expect(tallest('sh_sunk_blade')).toBeGreaterThan(10);
     expect(tallest('sh_great_hearth')).toBeGreaterThan(20);
     expect(tallest('sh_giant_anvil')).toBeGreaterThan(8);

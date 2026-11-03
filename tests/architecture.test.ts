@@ -1144,6 +1144,7 @@ const RENDER_PURE_CORES = [
   'src/render/smith_heart_fx/final_phase_fx_core.ts',
   'src/render/smith_heart/heart_collapse_core.ts',
   'src/render/smith_heart_fx/council_fx_core.ts',
+  'src/render/smith_heart_fx/breath_isles_fx_core.ts',
   'src/render/smith_heart_fx/council_bodies_core.ts',
   // Bond of the Stone's tether and Mountain's Rush's wind-up, run and scar.
   'src/render/smith_heart_fx/council_mechanic_look_core.ts',

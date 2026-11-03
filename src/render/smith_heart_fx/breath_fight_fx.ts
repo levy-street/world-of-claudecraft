@@ -14,8 +14,9 @@
 //    rolling front of dust as a blow gathers (with the guardian turning and
 //    the gather's sound), full through the blow, dying in the calm, drawn
 //    inward to the guardian while it draws breath and as the storm breaks;
-//  - the six gaps' lips, burning the lethal red at all times, flaring when
-//    the wind blows their way;
+//  - the open rim's lethal lip (all round since 2026-11-03: no wall stands),
+//    a low red glow at all times, each stretch flaring when the wind blows
+//    its way;
 //  - through the shared floor telegraph, at each object's exact radius:
 //    Thessaly's circle (the calm's mint: filling as it lands, held, its free
 //    seats as pips on its rim, dimming when spent), the vortex (danger), the
@@ -249,7 +250,8 @@ void main() {
     k = (1.0 - smoothstep(0.05, 1.0, vUv.y)) * (0.45 + 0.55 * rise) * pulse;
   }
   vec3 col = mix(uColor, uGlow, g * 0.6 + 0.2);
-  float a = clamp(k * (0.6 + 0.4 * g), 0.0, 1.0);
+  // The whole rim is open: quiet it reads as a warning, never a wall.
+  float a = clamp(k * (0.34 + 0.66 * g), 0.0, 1.0);
   gl_FragColor = vec4(col * (1.0 + g), a);
   #include <colorspace_fragment>
 }

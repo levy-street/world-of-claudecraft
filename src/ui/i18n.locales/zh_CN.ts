@@ -23020,7 +23020,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.heart_heat_seedflame.name': '籽焰',
   'entities.mobs.heart_heat_rolling_cinder.name': '滚动余烬',
   'abilityUi.cast.heart_mountains_wrath': '山岳之怒',
-  'abilityUi.cast.heart_bellows_gust': '风箱狂风',
+  'abilityUi.cast.heart_bellows_gust': '巅峰咆哮',
   'abilityUi.cast.heart_storm_lance': '风暴长枪',
   'abilityUi.cast.heart_quenching_breath': '淬火吐息',
   'hudChrome.auraEffect.heatGuardian.statePhase1':
@@ -23049,6 +23049,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.heatGuardian.warn.seeds': '炉心火种落下了！集中放下然后快跑！',
   'hudChrome.heatGuardian.warn.zones': '苏醒之火！炉心一圈接一圈地燃起：快出去！',
   'hudChrome.heatGuardian.warn.cinder': '滚动余烬落下了！在它追上猎物之前把它打退！',
+  'hudChrome.heatGuardian.warn.wheel': '炉心转动了！快到暗色的扇区去！',
   'hudChrome.heatGuardian.say.fist': '站在岩石落下的地方，成为它的一部分。',
   'hudChrome.heatGuardian.say.sink': '涌泉升起来迎接你们了！',
   'hudChrome.heatGuardian.say.sinkAgain': '炉心再次满溢。你们再次燃烧。',
@@ -23111,6 +23112,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '重锤议会的另一名成员在{reach}码内时，受到的伤害降低{pct}%。岩石之契每{every}秒对全团造成{min}到{max}点伤害，每次提高{growth}%。把他们拉开。',
   'hudChrome.auraEffect.council.collapse':
     '采石场正在坍塌：每{every}秒，你每层受到{min}到{max}点伤害，且每次增加一层。诅咒石柱碎裂时结束。',
+  'hudChrome.auraEffect.council.pillarLimit':
+    '每根石柱最多只能为{limit}名玩家挡住山岳之怒。躲在后面的人更多时，每人承受冲击的{share}%。',
   'hudChrome.council.alert.resonanceLine': '你会伤害身边的每名盟友：在效果结束前远离团队',
   'hudChrome.council.alert.rushTitle': '山岳冲锋！',
   'hudChrome.council.alert.rushLine': '守护者将冲向你：让诅咒石柱挡在你和他之间',
@@ -23118,16 +23121,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.council.say.singer_wake': '醒来吧，沉睡的岩石。在他们脚下升起！',
   'hudChrome.council.say.singer_rock': '抬头看，小家伙们！山要塌下来了！',
   // The Smith's Heart's Guardian of the Breath and Captain Thessaly (M16 fills).
-  'hudChrome.breathGuardian.warn.inhale': '守护者正在吸气！别站在它嘴前的漩涡里！',
-  'hudChrome.breathGuardian.warn.gust': '风箱狂风！准备承受冲击！',
-  'hudChrome.breathGuardian.warn.gales': '游荡的狂风横扫崖台！离它们远点！',
-  'hudChrome.breathGuardian.warn.circle': '瑟萨莉队长布下了宁静之环！最多可容{seats}人。',
-  'hudChrome.breathGuardian.warn.fell': '{player}被卷入了虚空！',
-  'hudChrome.breathGuardian.warn.storm': '风暴爆发了！闪电将落满整个崖台！',
-  'hudChrome.breathGuardian.warn.fork': '跳跃雷击落在{player}身上！散开！',
-  'hudChrome.breathGuardian.warn.cradle': '{player}被举入了风暴！到他的下方集合！',
-  'hudChrome.breathGuardian.warn.drawn': '引雷落在{player}身上！把落雷引向边缘！',
-  'hudChrome.breathGuardian.warn.stormGust': '风暴阵风正在聚集！顶住风！',
   'hudChrome.breathGuardian.say.guardian_pull':
     '你们爬上山巅，是来偷走它的气息吗？那就与我一同呼吸吧。',
   'hudChrome.breathGuardian.say.guardian_blow': '感受风向的转变。边缘比你想的更近。',
@@ -23138,7 +23131,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.breathGuardian.say.guardian_wipe': '被吹散了，就像山巅的尘埃。',
   'hudChrome.breathGuardian.say.guardian_death': '气息……回归……群山……',
   'hudChrome.breathGuardian.say.thessaly_pull':
-    '高望与你们并肩！当心墙上的缺口：风会把你们从那里扔出去！',
+    '高望与你们同在！这上面没有墙：风会把你们从边缘吹下去！',
   'hudChrome.breathGuardian.say.thessaly_circle_a': '快进我的宁静之中！最多三人，不能再多！',
   'hudChrome.breathGuardian.say.thessaly_circle_b': '这里！站在我身边，让风撞碎在我们身上！',
   'hudChrome.breathGuardian.say.thessaly_circle_c': '石上的宁静！三个人，现在就来！',
@@ -23147,10 +23140,13 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.breathGuardian.say.thessaly_fall': '抓紧岩石！',
   'hudChrome.breathGuardian.say.thessaly_victory': '气息自由了。高望会记住这次攀登。',
   'hudChrome.breathGuardian.say.thessaly_wipe': '退后，喘口气。我们再来一次。',
+  'hudChrome.breathGuardian.say.guardian_isles': '风啊，将我围起！浮岛会护住我的气息。',
+  'hudChrome.breathGuardian.say.guardian_bulwark': '我的护盾……被撕开了。那就再尝尝狂风吧！',
+  'hudChrome.breathGuardian.say.thessaly_isles': '它的护盾靠浮岛供能！乘风飞过去，干掉愈者再回来！',
   'hudChrome.auraEffect.breathGuardian.wind':
-    '气息守护者的风以每秒{speed}码的速度将你带往它吹去的方向。逆风而行便能站稳，它不会打断你的施法。被压在边缘的墙上时，你每秒受到{pinMin}到{pinMax}点伤害。墙壁破损处没有任何阻挡：你会坠入虚空。',
+    '气息守护者的风以每秒{speed}码的速度将你带往它吹去的方向。逆风而行便能站稳，它不会打断你的施法。崖台四周没有墙：被吹出边缘，你会坠入虚空。只有攀登路口还立着墙，被压在墙上时每秒受到{pinMin}到{pinMax}点伤害。',
   'hudChrome.auraEffect.breathGuardian.draw':
-    '守护者吸气，以每秒{speed}码的速度将你拉向它。它嘴前的漩涡每{tick}秒对站在其中的人造成{min}到{max}点伤害。随后风箱狂风对崖台上的所有人造成{gustMin}到{gustMax}点伤害，并将他们向外击飞{throw}码。',
+    '守护者深吸一口气，以每秒{speed}码的速度将你拉向它。它嘴前的漩涡每{tick}秒对站在其中的人造成{min}到{max}点伤害。随后巅峰咆哮对崖台上的所有人造成{gustMin}到{gustMax}点伤害，并将他们从守护者身边吹飞{throw}码（英雄难度为{heroicThrow}码）：守护者靠近边缘时，团队会被吹出崖台。',
   'hudChrome.auraEffect.breathGuardian.pinned':
     '被风压在边缘的墙上：在风停歇或你离开墙边之前，每秒受到{min}到{max}点伤害。',
   'hudChrome.auraEffect.breathGuardian.anchor':
@@ -23160,11 +23156,27 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.breathGuardian.drawn':
     '每{every}秒会有一道闪电落在你所站之处：{warn}秒后对{radius}码内的所有人造成{min}到{max}点伤害，并留下带电的地面，在{charged}秒内每秒造成{cmin}到{cmax}点伤害。保持移动，把落雷引向远离团队的边缘。',
   'hudChrome.auraEffect.breathGuardian.cradled':
-    '被举入风暴，持续{hold}秒。随后的放电造成{total}点伤害，由你和你下方{radius}码内的所有人分担。分担人数少于{soakers}人（英雄难度为{heroicSoakers}人）时，每人多承受{penalty}%，且崖台上的所有人受到{bmin}到{bmax}点伤害。',
+    '被举入风暴，在守护者引导摇篮的{hold}秒内被定住；其间守护者不会施放其他任何技能。随后的放电造成{total}点伤害，由你和你下方{radius}码内的所有人分担。分担人数少于{soakers}人时，每人多承受{penalty}%，且崖台上的所有人受到{bmin}到{bmax}点伤害。英雄难度：同时举起{heroicCount}名玩家，每次放电{heroicTotal}点，需要{heroicSoakers}人分担，团队要分头承受。',
   'hudChrome.auraEffect.breathGuardian.stormForm':
     '撕裂为闪电之躯：战斗的风暴后半段，直到气息守护者倒下。',
   'hudChrome.auraEffect.breathGuardian.swell':
     '每{every}秒，膨胀的风暴对崖台上的所有人造成{min}到{max}点伤害，之前每次脉动使其增强{growth}%：目前已有{stacks}次。',
+  'hudChrome.auraEffect.breathGuardian.bulwark':
+    '风之护盾还能吸收{left}点伤害。只要浮岛上还有任一狂风哨兵或狂风愈者存活，它每秒恢复总量的{regrow}%，每次愈合之风恢复{mend}%。乘狂风之路飞往浮岛，消灭它们。维持{max}秒后，它会在崖台上爆裂，造成{bmin}到{bmax}点伤害。',
+  'hudChrome.auraEffect.breathGuardian.riding':
+    '风沿着固定的路线带你越过虚空：在被放下之前你无法行动。',
+  'hudChrome.auraEffect.breathGuardian.windworn':
+    '被风耗尽了力气：效果结束前，狂风之路不会带你前往浮岛。',
+  'hudChrome.auraEffect.breathGuardian.portalA':
+    '效果结束时，传送门A会在你所站的位置打开。站在结风附近。本轮你无法携带它。',
+  'hudChrome.auraEffect.breathGuardian.portalB':
+    '效果结束时，传送门B会在你所站的位置打开。站在崖台边缘。本轮你无法携带结风。',
+  'hudChrome.auraEffect.breathGuardian.portalC':
+    '效果结束时，传送门C会在你所站的位置打开。它只与传送门D相连。站在另一团结风附近。本轮你无法携带它。',
+  'hudChrome.auraEffect.breathGuardian.portalD':
+    '效果结束时，传送门D会在你所站的位置打开。它只与传送门C相连。站在远离传送门B的崖台边缘。本轮你无法携带结风。',
+  'hudChrome.auraEffect.breathGuardian.laden':
+    '你正携带结风：移动速度变为{walk}%，无法闪现、冲锋或跳跃，风、拉扯、冲击和击飞都无法移动你。每个传送门都会把你送到它的另一端：A到B，C到D。在崖台边缘按下交互键，把它扔进虚空。效果结束时它会爆裂，杀死崖台上的所有人。',
   'abilityUi.cast.heart_breath_inhale': '深吸之息',
   'abilityUi.cast.heart_breath_storm_break': '风暴破裂',
   'abilityUi.cast.heart_breath_forking_bolt': '跳跃雷击',
@@ -24476,6 +24488,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.heart_final_shearing_blow': '劈裂重击',
   'abilityUi.cast.heart_final_gale_pounce': '疾风扑击',
   'abilityUi.cast.heart_final_rime_toll': '霜凇钟鸣',
+  'abilityUi.cast.heart_breath_cradle_channel': '雷霆摇篮',
+  'abilityUi.cast.heart_breath_gale_bulwark': '狂风壁垒',
+  'abilityUi.cast.heart_breath_mending_gale': '愈合之风',
   'entities.mobs.heart_final_splinter_heat.name': '炽热碎片',
   'entities.mobs.heart_final_splinter_quench.name': '淬火碎片',
   'entities.mobs.heart_final_splinter_breath.name': '吐息碎片',
@@ -24733,4 +24748,23 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'seasonal.thatchgrin.wakeYell': '夜幕降临南瓜田！谁敢踏进我的田地？',
   'seasonal.thatchgrin.sleepYell': '太阳出来了。回到木桩上，继续看守。',
   'seasonal.pumpkins.progress': '{label}：{current}/{total}',
+  'entities.mobs.heart_gale_sentinel.name': '狂风哨兵',
+  'entities.mobs.heart_gale_mender.name': '狂风愈者',
+  'hudChrome.knotAlert.aTitle': '你是传送门A！',
+  'hudChrome.knotAlert.aLine': '{seconds}秒后在你脚下打开。站在结风附近。',
+  'hudChrome.knotAlert.bTitle': '你是传送门B！',
+  'hudChrome.knotAlert.bLine': '{seconds}秒后在你脚下打开。站在崖台边缘。',
+  'hudChrome.knotAlert.cTitle': '你是传送门C！',
+  'hudChrome.knotAlert.cLine': '{seconds}秒后在你脚下打开。站在另一团结风附近。',
+  'hudChrome.knotAlert.dTitle': '你是传送门D！',
+  'hudChrome.knotAlert.dLine': '{seconds}秒后在你脚下打开。站在远离传送门B的边缘。',
+  'hudChrome.knotAlert.carryTitle': '你正携带结风！',
+  'hudChrome.knotAlert.carryLine':
+    '每个传送门都通往另一端：A到B，C到D。在崖台边缘把它扔出去。{seconds}秒后爆裂。',
+  'hudChrome.knotAlert.lipTitle': '现在扔！',
+  'hudChrome.knotAlert.lipLine': '你站在边缘。{seconds}秒后爆裂。',
+  'hudChrome.knotAlert.throwKey': '在边缘按{key}投掷',
+  'hudChrome.knotAlert.throwTap': '在边缘点按此处投掷',
+  'hudChrome.knotAlert.throwClick': '在边缘点击此处投掷',
+  'hudChrome.knotAlert.throwAria': '将结风扔进虚空',
 };

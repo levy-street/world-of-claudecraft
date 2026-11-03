@@ -10,17 +10,19 @@
 //                          kernel's wind aura (src/sim/wind_drift.ts): both
 //                          hosts step the same drift, a player walks against
 //                          it and keeps casting while it carries them.
-//   The rim                where the wall stands, a body pressed against it
-//                          takes a hit each second (Pressed to the Rim); at a
-//                          gap there is no wall: the body walks off the lip
-//                          and falls (the field's lipOpenings), on every
-//                          difficulty. Anyone who has gone over is the void's.
+//   The rim                open all round since 2026-11-03 (the field's
+//                          lipOpenings): a body carried off any edge falls,
+//                          on every difficulty. Only the climb's head keeps
+//                          a wall, where a body pressed against it takes a
+//                          hit each second (Pressed to the Rim).
 //   The indrawn breath     about every 45 s (between blows): a 5 s bar, the
 //                          wind turns and draws everyone toward the guardian
 //                          (the kernel's pull aura), a vortex before its mouth
-//                          bites whoever stands in it; then Bellows Gust (its
-//                          old id), a 1.5 s bar and a blast that hurts and
-//                          throws everyone outward (the anchored stay put).
+//                          bites whoever stands in it; then the Summit Roar
+//                          (Bellows Gust's id), a 1.5 s bar and a blast that
+//                          hurts and throws everyone far from the guardian (26
+//                          yd, 30 on heroic: tanked by the edge, the raid goes
+//                          over it; the anchored stay put).
 //   Heroic                 three loose gales wander the Cornice after each
 //                          exhale, tossing whoever they touch (a throw can
 //                          carry a body out through a gap); in phase 2, short
@@ -61,7 +63,6 @@ import {
   local,
   moveBreathObject,
   putMarker,
-  raidWarn,
   roll,
   spawnBreathObject,
   throwPlayer,
@@ -166,7 +167,6 @@ function stepStormGusts(s: BreathScope): void {
   if (s.st.gustTimer > 1e-9) return;
   s.st.gustTimer = T.gustEvery;
   setWind(s, 'gustgather', T.gustGather, nextBearing(s.st));
-  raidWarn(s, s.boss, 'stormGust', 'A storm gust gathers! Brace against the wind!');
 }
 
 // ---- the push, the rim, the void -----------------------------------------------------------
@@ -332,7 +332,6 @@ export function startInhale(s: BreathScope, force = false): boolean {
   );
   v.facing = b.facing;
   s.st.vortex = { objectId: v.id, x: vx, z: vz, tick: T.vortexTick };
-  raidWarn(s, b, 'inhale', 'The Guardian draws breath! Keep out of the vortex before its mouth!');
   breathSay(s, b, 'guardian', 'inhale');
   breathSay(s, thessalyOf(s.ctx, s.inst), 'thessaly', 'inhale');
   return true;
@@ -367,7 +366,6 @@ export function landInhale(s: BreathScope): void {
   s.st.vortex = null;
   beginBar(s, BREATH_CASTS.gust, T.gustCast, null);
   setWind(s, 'exhale', T.gustCast, s.st.wind.bearing);
-  raidWarn(s, s.boss, 'gust', 'Bellows Gust! Brace for the blast!');
 }
 
 /** Bellows Gust lands: everyone on the Cornice is struck and thrown outward
@@ -427,7 +425,6 @@ export function startGales(s: BreathScope): void {
     );
     s.st.gales.push({ objectId: e.id, k: k + s.st.casts, t: 0, tossed: {} });
   }
-  raidWarn(s, s.boss, 'gales', 'Loose gales tear across the Cornice! Keep clear of them!');
 }
 
 function stepGales(s: BreathScope): void {

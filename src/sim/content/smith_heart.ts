@@ -19,6 +19,7 @@ import {
   BREATH_TUNING,
   breathWindTemplate,
 } from '../encounters/smith_heart/breath_ids';
+import { ISLE_MOBS } from '../encounters/smith_heart/breath_isle_ids';
 import { COUNCIL_TUNING } from '../encounters/smith_heart/council_ids';
 import {
   FINAL_ADD_MOBS,
@@ -267,6 +268,20 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
     'nature',
     0x5ab8e8,
   ),
+  // The Islands of the Wind's adds (encounters/smith_heart/breath_isles.ts):
+  // a warden and a caster on each woken isle; their health is set as they
+  // rise (ISLE_TUNING), the Mender's Mending Gale is encounter-driven.
+  [ISLE_MOBS.sentinel]: {
+    ...warder(ISLE_MOBS.sentinel, 'Gale Sentinel', 'Gale Sweep', 0x4f9fc8, 1.9),
+    aggroRadius: 10,
+    xpMult: 0,
+  },
+  [ISLE_MOBS.mender]: {
+    ...caster(ISLE_MOBS.mender, 'Gale Mender', C.galeBolt, 'Gale Bolt', 'nature', 0x8fe0ff),
+    aggroRadius: 10,
+    xpMult: 0,
+    scale: 1.6,
+  },
   heart_quench_warder: warder(
     'heart_quench_warder',
     'Quench Vein Warder',
@@ -352,7 +367,7 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
     trashKit: {
       wingGust: {
         castId: C.breathGust,
-        name: 'Bellows Gust',
+        name: 'Summit Roar',
         castTime: BREATH_TUNING.gustCast,
         every: 999,
         first: 999,

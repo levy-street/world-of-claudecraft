@@ -288,27 +288,21 @@ describe('Smith Heart Breath kit: the plan', () => {
     const props = F.props.filter((p) => BREATH_KIT_KINDS.has(p.kind));
     const plan = planBreathProps();
     const of = (piece: string) => plan.filter((p) => p.piece === piece).length;
-    const rods = F.props.filter((p) => p.kind === 'sh_lightning_rod').length;
-    expect(of('Kit_StormRod')).toBe(rods);
-    expect(of('Kit_StrikeScar')).toBe(rods);
-    expect(of('Kit_WindHorn')).toBe(2);
+    // The Cornice stands bare since the open rim (2026-11-03): no rod, horn
+    // or cheek stone.
+    for (const piece of ['Kit_StormRod', 'Kit_StrikeScar', 'Kit_WindHorn', 'Kit_ChannelJamb'])
+      expect(of(piece), piece).toBe(0);
     expect(of('Kit_WindShelter')).toBe(2);
-    expect(of('Kit_ChannelJamb')).toBe(CORNICE_CHANNELS.length * 2);
     expect(of('Kit_StormStone')).toBe(6);
     expect(of('Kit_WindBridge')).toBe(1);
-    expect(props.length).toBe(rods + 2 + 2 + CORNICE_CHANNELS.length * 2 + 6);
-    // The cheek stones and the standing stones stand on their colliders, on
-    // Breath floors.
+    expect(props.length).toBe(2 + 6);
+    // The standing stones stand on their colliders, on Breath floors.
     for (const p of F.props) {
-      if (p.kind !== 'sh_channel_jamb' && p.kind !== 'sh_storm_stone') continue;
+      if (p.kind !== 'sh_storm_stone') continue;
       expect(p.r ?? 0).toBeGreaterThan(1);
       const s = authoredFieldSurfaceAt(F, p.x, p.z);
       expect(BREATH_WALK_SURFACES.has(s?.id ?? ''), `${p.kind} on ${s?.id}`).toBe(true);
     }
-    // The horns' bells open to the rim.
-    const C = BREATH.cornice;
-    for (const h of plan.filter((p) => p.piece === 'Kit_WindHorn'))
-      expect(Math.sin(h.rot) * (h.x - C.x) + Math.cos(h.rot) * (h.z - C.z)).toBeGreaterThan(0);
     // The arch at the ramp's foot, its run along the ramp.
     const b = plan.find((p) => p.piece === 'Kit_WindBridge');
     const f = windBridgeFrame();
@@ -330,9 +324,11 @@ describe('Smith Heart Breath kit: the plan', () => {
             id,
         ),
       ).length;
-    // The bridge, the Cornice and every landing have their walls.
-    for (const id of ['wind_bridge', 'storm_cornice', 'breath_b1', 'breath_b2', 'breath_b3'])
+    // The bridge and every landing have their walls; the Cornice's rim is
+    // open but for the climb's head (2026-11-03).
+    for (const id of ['wind_bridge', 'breath_b1', 'breath_b2', 'breath_b3'])
       expect(near(id), id).toBeGreaterThan(1);
+    expect(near('storm_cornice')).toBeLessThanOrEqual(4);
     for (const w of walls)
       expect(wallClear(w.x, w.z, w.rot, w.stretch ?? 1), `${w.x} ${w.z}`).toBe(true);
   });

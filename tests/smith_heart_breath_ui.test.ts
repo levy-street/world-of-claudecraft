@@ -24,7 +24,7 @@ import { breathFight } from './helpers/breath_fight';
 type Chat = Extract<SimEvent, { type: 'chat' }>;
 
 describe('Guardian of the Breath: what the raid reads', () => {
-  it('every warning and every line resolves its key to the English the sim sent', () => {
+  it('calls no banner; every line resolves its key to the English the sim sent', () => {
     const f = breathFight(6);
     const events: SimEvent[] = [];
     f.dev('/dev heart breath pull');
@@ -40,14 +40,9 @@ describe('Guardian of the Breath: what the raid reads', () => {
       events.push(...f.tick(20 * 8));
     }
     const mine = events.filter((e): e is Chat => e.type === 'chat' && e.pid === f.pids[0]);
-    const warns = mine.filter((c) => c.channel === 'raidWarning');
-    const keys = new Set(warns.map((w) => w.textKey));
-    for (const k of ['circle', 'inhale', 'gust', 'gales', 'storm', 'fork', 'cradle', 'drawn'])
-      expect(keys, k).toContain(`hudChrome.breathGuardian.warn.${k}`);
-    for (const w of warns) {
-      expect(w.textKey?.startsWith('hudChrome.breathGuardian.warn.')).toBe(true);
-      expect(t(w.textKey as never, w.textValues)).toBe(w.text);
-    }
+    // No raid warning banner in the whole fight (the owner's rule of
+    // 2026-11-03): the mechanics read in the world, the yells stay.
+    expect(mine.filter((c) => c.channel === 'raidWarning')).toEqual([]);
     const yells = mine.filter((c) => c.channel === 'yell');
     expect(yells.length).toBeGreaterThan(5);
     for (const y of yells) expect(t(y.textKey as never)).toBe(y.text);
@@ -83,14 +78,15 @@ describe('Guardian of the Breath: tooltips and names', () => {
       value: 0,
       value3: T.pullSpeed,
     });
-    expect(say(draw)).toContain(`${BREATH_DIFFICULTY.normal.gustThrow} yd outward`);
+    expect(say(draw)).toContain(`${BREATH_DIFFICULTY.normal.gustThrow} yd away`);
+    expect(say(draw)).toContain(`${BREATH_DIFFICULTY.heroic.gustThrow} on Heroic`);
     const anchor = auraEffectDescriptor({ id: BREATH_AURAS.anchor, kind: 'internal_cd', value: 0 });
     expect(say(anchor)).toContain('Damage still lands');
     const drawn = auraEffectDescriptor({ id: BREATH_AURAS.drawn, kind: 'internal_cd', value: 0 });
     expect(say(drawn)).toContain(`every ${T.drawnStrikeEvery} sec`);
     const cradled = auraEffectDescriptor({ id: BREATH_AURAS.cradled, kind: 'stun', value: 0 });
     const text = say(cradled);
-    expect(text).toContain(String(T.cradleTotal));
+    expect(text).toContain(String(BREATH_DIFFICULTY.normal.cradleTotal));
     expect(text).toContain(`fewer than ${BREATH_DIFFICULTY.normal.cradleSoakers}`);
     const swell = auraEffectDescriptor({
       id: BREATH_AURAS.swell,

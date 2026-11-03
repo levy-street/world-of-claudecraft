@@ -169,7 +169,7 @@ describe('the Guardian of the Breath over the wire', () => {
     const cradle = objects(BREATH_OBJECTS.cradlePrefix)[0];
     expect(cradle?.scale).toBe(T.cradleR);
     const st = sim.entities.get(boss.id).smithHeartBreath;
-    const lifted = client.entities.get(st.cradle.playerId);
+    const lifted = client.entities.get(st.cradles[0].playerId);
     expect(lifted.pos.y).toBeGreaterThan(cradle.pos.y + T.cradleLift - 0.6);
     expect(lifted.auras.some((x: Any) => x.id === BREATH_AURAS.cradled)).toBe(true);
     const swell = boss.auras.find((x: Any) => x.id === BREATH_AURAS.swell);
