@@ -6422,6 +6422,7 @@ export const it_IT: EnTranslations = {
       "toolEffectRechargeFull": "{effect} è già a piena carica.",
       "toolEffectRechargeToolCapped": "Porta uno strumento da {profession} migliore per caricare ancora {effect}.",
       "toolEffectRechargeMaterials": "Per ricaricare {effect} servono {material} x{count}.",
+      "toolEffectRechargeLocked": "Recharging {effect} needs {material} x{count}, but your copies are locked. Unlock them in your bags.",
       "craftingProgress": "Stai creando: {remaining}s su {total}s rimanenti.",
       "disenchantingProgress": "Stai disincantando: {remaining}s su {total}s rimanenti.",
       "enchantingProgress": "Stai incantando: {remaining}s su {total}s rimanenti.",

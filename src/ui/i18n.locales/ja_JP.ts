@@ -15726,6 +15726,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectRechargeFull': '{effect}はすでに完全に充填されている。',
   'hudChrome.professions.toolEffectRechargeMaterials':
     '{effect}の再充填には{material}x{count}が必要だ。',
+  'hudChrome.professions.toolEffectRechargeLocked':
+    '{effect}の再充填には{material}x{count}が必要だが、所持品がロックされている。バッグでロックを解除しよう。',
   'hudChrome.professions.craftingProgress': '製作中：残り{remaining}秒（全{total}秒）。',
   'hudChrome.professions.disenchantingProgress': '分解中：残り{remaining}秒（全{total}秒）。',
   'hudChrome.professions.enchantingProgress': '付与中：残り{remaining}秒（全{total}秒）。',

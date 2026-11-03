@@ -6422,6 +6422,7 @@ export const vi_VN: EnTranslations = {
       "toolEffectRechargeFull": "{effect} đã được nạp đầy rồi.",
       "toolEffectRechargeToolCapped": "Hãy mang công cụ {profession} tốt hơn để nạp thêm cho {effect}.",
       "toolEffectRechargeMaterials": "Nạp lại {effect} cần {material} x{count}.",
+      "toolEffectRechargeLocked": "Recharging {effect} needs {material} x{count}, but your copies are locked. Unlock them in your bags.",
       "craftingProgress": "Bạn đang chế tác: còn {remaining} giây trên tổng {total} giây.",
       "disenchantingProgress": "Bạn đang hủy pháp khắc: còn {remaining} giây trên tổng {total} giây.",
       "enchantingProgress": "Bạn đang pháp khắc: còn {remaining} giây trên tổng {total} giây.",

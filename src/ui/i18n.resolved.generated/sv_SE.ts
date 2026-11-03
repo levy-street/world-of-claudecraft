@@ -6422,6 +6422,7 @@ export const sv_SE: EnTranslations = {
       "toolEffectRechargeFull": "{effect} är redan fulladdad.",
       "toolEffectRechargeToolCapped": "Bär ett bättre verktyg för {profession} för att ladda {effect} vidare.",
       "toolEffectRechargeMaterials": "Att ladda om {effect} kräver {material} x{count}.",
+      "toolEffectRechargeLocked": "Recharging {effect} needs {material} x{count}, but your copies are locked. Unlock them in your bags.",
       "craftingProgress": "Du tillverkar: {remaining}s av {total}s återstår.",
       "disenchantingProgress": "Du avförtrollar: {remaining}s av {total}s återstår.",
       "enchantingProgress": "Du förtrollar: {remaining}s av {total}s återstår.",

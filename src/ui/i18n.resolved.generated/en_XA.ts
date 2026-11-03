@@ -6422,6 +6422,7 @@ export const en_XA: EnTranslations = {
       "toolEffectRechargeFull": "[{effect} íš áļŕéáðý ƒúļļý çĥáŕĝéð.]",
       "toolEffectRechargeToolCapped": "[Çáŕŕý á ƀéţţéŕ {profession} ţóóļ ţó çĥáŕĝé {effect} ƒúŕţĥéŕ.]",
       "toolEffectRechargeMaterials": "[Ŕéçĥáŕĝíñĝ {effect} ñééðš {material} ẋ{count}.]",
+      "toolEffectRechargeLocked": "[Ŕéçĥáŕĝíñĝ {effect} ñééðš {material} ẋ{count}, ƀúţ ýóúŕ çóþíéš áŕé ļóçķéð. Úñļóçķ ţĥéɱ íñ ýóúŕ ƀáĝš.]",
       "craftingProgress": "[Ýóú áŕé çŕáƒţíñĝ: {remaining}š óƒ {total}š ŕéɱáíñíñĝ.]",
       "disenchantingProgress": "[Ýóú áŕé ðíšéñçĥáñţíñĝ: {remaining}š óƒ {total}š ŕéɱáíñíñĝ.]",
       "enchantingProgress": "[Ýóú áŕé éñçĥáñţíñĝ: {remaining}š óƒ {total}š ŕéɱáíñíñĝ.]",

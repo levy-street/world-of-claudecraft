@@ -17739,6 +17739,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectRechargeFull': '{effect} уже полностью заряжен.',
   'hudChrome.professions.toolEffectRechargeMaterials':
     'Для перезарядки {effect} нужно {material} x{count}.',
+  'hudChrome.professions.toolEffectRechargeLocked':
+    'Для перезарядки {effect} нужно {material} x{count}, но эти предметы заблокированы. Разблокируйте их в сумках.',
   'hudChrome.professions.craftingProgress':
     'Вы создаете предмет: осталось {remaining} с из {total} с.',
   'hudChrome.professions.disenchantingProgress':

@@ -6422,6 +6422,7 @@ export const cs_CZ: EnTranslations = {
       "toolEffectRechargeFull": "Efekt {effect} je už plně nabit.",
       "toolEffectRechargeToolCapped": "K dalšímu nabití efektu {effect} potřebuješ lepší nástroj pro {profession}.",
       "toolEffectRechargeMaterials": "Dobití efektu {effect} vyžaduje {material} x{count}.",
+      "toolEffectRechargeLocked": "Recharging {effect} needs {material} x{count}, but your copies are locked. Unlock them in your bags.",
       "craftingProgress": "Probíhá výroba: zbývá {remaining} s z {total} s.",
       "disenchantingProgress": "Probíhá rozzačarování: zbývá {remaining} s z {total} s.",
       "enchantingProgress": "Probíhá okouzlování: zbývá {remaining} s z {total} s.",

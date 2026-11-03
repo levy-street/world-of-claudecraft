@@ -8808,6 +8808,10 @@ export const hudChromeStrings = {
     // rather than claiming the slot is full.
     toolEffectRechargeToolCapped: 'Carry a better {profession} tool to charge {effect} further.',
     toolEffectRechargeMaterials: 'Recharging {effect} needs {material} x{count}.',
+    // The owner holds enough of the material, but only in stacks they locked
+    // (item_lock.ts): locked copies are never spent, so the line names the fix.
+    toolEffectRechargeLocked:
+      'Recharging {effect} needs {material} x{count}, but your copies are locked. Unlock them in your bags.',
     // In-progress readouts for the four crafting/gathering-service actions plus
     // tool-effect recharging (social/chat_readouts.ts describeActiveAction):
     // countdown chat lines shown while the action channels.

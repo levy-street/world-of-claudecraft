@@ -56,6 +56,7 @@ export const TOOL_EFFECT_DENY_KEY_BY_REASON: Record<ToolEffectDenyReason, Transl
   already_full: 'hudChrome.professions.toolEffectRechargeFull',
   tool_capped: 'hudChrome.professions.toolEffectRechargeToolCapped',
   insufficient_materials: 'hudChrome.professions.toolEffectRechargeMaterials',
+  locked: 'hudChrome.professions.toolEffectRechargeLocked',
   busy: 'hudChrome.crafting.busy',
   throttled: 'hudChrome.crafting.busy',
 };
@@ -73,6 +74,7 @@ const PARAMS_BY_KEY: Record<string, readonly (keyof ToolEffectResultNames)[]> = 
   'hudChrome.professions.toolEffectRechargeFull': ['effect'],
   'hudChrome.professions.toolEffectRechargeToolCapped': ['effect', 'profession'],
   'hudChrome.professions.toolEffectRechargeMaterials': ['effect', 'material', 'count'],
+  'hudChrome.professions.toolEffectRechargeLocked': ['effect', 'material', 'count'],
   'hudChrome.crafting.busy': [],
   [SLOT_INVALID]: ['effect'],
 };

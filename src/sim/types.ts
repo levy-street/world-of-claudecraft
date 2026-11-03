@@ -10741,6 +10741,10 @@ export type SimEvent = { pid?: number } & (
         | 'already_full'
         | 'tool_capped'
         | 'insufficient_materials'
+        // Recharge only: the raw held count would pay the price but the owner
+        // locked those copies (item_lock.ts), so none of them may be spent.
+        // Carries materialItemId/count like insufficient_materials.
+        | 'locked'
         | 'busy'
         // Historical: shared action throttle retired in Craft Cast System Phase 5.
         | 'throttled';

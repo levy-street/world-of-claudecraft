@@ -6422,6 +6422,7 @@ export const da_DK: EnTranslations = {
       "toolEffectRechargeFull": "{effect} er allerede fuldt opladet.",
       "toolEffectRechargeToolCapped": "Bær et bedre {profession}-værktøj for at oplade {effect} yderligere.",
       "toolEffectRechargeMaterials": "Genopladning af {effect} kræver {material} x{count}.",
+      "toolEffectRechargeLocked": "Recharging {effect} needs {material} x{count}, but your copies are locked. Unlock them in your bags.",
       "craftingProgress": "Du fremstiller: {remaining}s af {total}s tilbage.",
       "disenchantingProgress": "Du affortryller: {remaining}s af {total}s tilbage.",
       "enchantingProgress": "Du fortryller: {remaining}s af {total}s tilbage.",

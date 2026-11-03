@@ -41,6 +41,7 @@ import {
 } from '../content/professions';
 import { ITEMS } from '../data';
 import { refusedWhileDead } from '../dead_gate';
+import { countUnlockedItem, removeUnlockedFromSlots } from '../item_lock';
 import { forceDismount } from '../mounts';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -278,6 +279,38 @@ function emitRechargeDeny(
 }
 
 /**
+ * The recharge price gate, shared by admission and completion so the two can
+ * never disagree. Sufficiency counts UNLOCKED copies only (item_lock.ts): a
+ * stack the owner locked is never spent, so counting it would admit a recharge
+ * whose spend then takes nothing (the free-recharge Discord report). A
+ * shortfall the raw held count WOULD cover denies as 'locked', a real one as
+ * 'insufficient_materials'; both carry the price so the player learns the
+ * cost from the refusal itself. True when it refused (event emitted).
+ */
+function refusedForMaterials(
+  ctx: SimContext,
+  r: NonNullable<ReturnType<SimContext['resolve']>>,
+  professionId: string,
+  effectId: string,
+  resolved: { materialItemId: string; count: number },
+): boolean {
+  if (countUnlockedItem(r.meta, resolved.materialItemId) >= resolved.count) return false;
+  const lockOnly = ctx.countItem(resolved.materialItemId, r.meta.entityId) >= resolved.count;
+  ctx.emit({
+    type: 'toolEffectResult',
+    action: 'recharge',
+    ok: false,
+    professionId,
+    effectId,
+    reason: lockOnly ? 'locked' : 'insufficient_materials',
+    materialItemId: resolved.materialItemId,
+    count: resolved.count,
+    pid: r.meta.entityId,
+  });
+  return true;
+}
+
+/**
  * Pre-consume admission for a tool-recharge cast: true when the cast may
  * start; on false the deny event was already emitted. No side effects. The
  * completion re-resolves slot and price from scratch (resolveRechargeBody),
@@ -309,22 +342,7 @@ function evaluateRechargeAdmission(
     emitRechargeDeny(ctx, r.meta.entityId, professionId, resolved.reason, slot.effectId);
     return false;
   }
-  if (ctx.countItem(resolved.materialItemId, r.meta.entityId) < resolved.count) {
-    // insufficient_materials is the one surface that carries the price so the
-    // player learns the cost from the refusal itself.
-    ctx.emit({
-      type: 'toolEffectResult',
-      action: 'recharge',
-      ok: false,
-      professionId,
-      effectId: slot.effectId,
-      reason: 'insufficient_materials',
-      materialItemId: resolved.materialItemId,
-      count: resolved.count,
-      pid: r.meta.entityId,
-    });
-    return false;
-  }
+  if (refusedForMaterials(ctx, r, professionId, slot.effectId, resolved)) return false;
   return true;
 }
 
@@ -384,21 +402,11 @@ function resolveRechargeBody(
     emitRechargeDeny(ctx, r.meta.entityId, professionId, resolved.reason, slot.effectId);
     return;
   }
-  if (ctx.countItem(resolved.materialItemId, r.meta.entityId) < resolved.count) {
-    ctx.emit({
-      type: 'toolEffectResult',
-      action: 'recharge',
-      ok: false,
-      professionId,
-      effectId: slot.effectId,
-      reason: 'insufficient_materials',
-      materialItemId: resolved.materialItemId,
-      count: resolved.count,
-      pid: r.meta.entityId,
-    });
-    return;
-  }
-  ctx.removeItem(resolved.materialItemId, resolved.count, r.meta.entityId);
+  if (refusedForMaterials(ctx, r, professionId, slot.effectId, resolved)) return;
+  // Lock-aware spend: the same walk the gate above counted, so a locked stack
+  // is never a victim (craft reagents and feasts spend the same way).
+  removeUnlockedFromSlots(r.meta.inventory, resolved.materialItemId, resolved.count);
+  ctx.onInventoryChangedForQuests(r.meta);
   // The fill is the R30 re-derive (the tool held right now); the ceiling is
   // the R47 high-water mark, raised by a better tool and never lowered by a
   // lesser one, which is what keeps the price rung from resetting on every

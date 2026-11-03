@@ -15679,6 +15679,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectRechargeFull': '{effect}은(는) 이미 완전히 충전되어 있습니다.',
   'hudChrome.professions.toolEffectRechargeMaterials':
     '{effect} 재충전에는 {material} x{count}이(가) 필요합니다.',
+  'hudChrome.professions.toolEffectRechargeLocked':
+    '{effect} 재충전에는 {material} x{count}이(가) 필요하지만, 해당 아이템이 잠겨 있습니다. 가방에서 잠금을 해제하세요.',
   'hudChrome.professions.craftingProgress': '제작 중: {total}초 중 {remaining}초 남음.',
   'hudChrome.professions.disenchantingProgress': '분해 중: {total}초 중 {remaining}초 남음.',
   'hudChrome.professions.enchantingProgress': '마법부여 중: {total}초 중 {remaining}초 남음.',

@@ -9,25 +9,55 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.professions.toolEffectRechargeLocked"
+  ],
+  "es_ES": [
+    "hudChrome.professions.toolEffectRechargeLocked"
+  ],
+  "fr_FR": [
+    "hudChrome.professions.toolEffectRechargeLocked"
+  ],
+  "fr_CA": [
+    "hudChrome.professions.toolEffectRechargeLocked"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.professions.toolEffectRechargeLocked"
+  ],
+  "de_DE": [
+    "hudChrome.professions.toolEffectRechargeLocked"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.professions.toolEffectRechargeLocked"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.professions.toolEffectRechargeLocked"
+  ],
+  "nl_NL": [
+    "hudChrome.professions.toolEffectRechargeLocked"
+  ],
+  "pl_PL": [
+    "hudChrome.professions.toolEffectRechargeLocked"
+  ],
+  "id_ID": [
+    "hudChrome.professions.toolEffectRechargeLocked"
+  ],
+  "tr_TR": [
+    "hudChrome.professions.toolEffectRechargeLocked"
+  ],
+  "sv_SE": [
+    "hudChrome.professions.toolEffectRechargeLocked"
+  ],
+  "vi_VN": [
+    "hudChrome.professions.toolEffectRechargeLocked"
+  ],
+  "da_DK": [
+    "hudChrome.professions.toolEffectRechargeLocked"
+  ]
 };

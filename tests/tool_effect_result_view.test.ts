@@ -55,6 +55,11 @@ describe('toolEffectResultLine', () => {
       'hudChrome.professions.toolEffectRechargeMaterials',
       { effect: 'Keen Edge', material: '[Shard]', count: '3' },
     ],
+    [
+      'locked',
+      'hudChrome.professions.toolEffectRechargeLocked',
+      { effect: 'Keen Edge', material: '[Shard]', count: '3' },
+    ],
     ['busy', 'hudChrome.crafting.busy', {}],
     // The old-server wire reason (retired emit) renders the busy copy, never
     // the wrong slot-invalid line.

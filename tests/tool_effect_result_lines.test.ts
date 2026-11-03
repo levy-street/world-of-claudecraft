@@ -149,6 +149,16 @@ describe('the toolEffectResult chat arm', () => {
           count: 5,
         },
       ],
+      [
+        'locked',
+        {
+          action: 'recharge',
+          professionId: 'mining',
+          effectId: 'gatherers_cache',
+          materialItemId: 'arcane_essence',
+          count: 1,
+        },
+      ],
       // Phase 5: concurrent-cast busy replaces the retired throttle deny.
       ['busy', { action: 'recharge', professionId: 'mining', effectId: 'gatherers_cache' }],
     ];
@@ -169,7 +179,8 @@ describe('the toolEffectResult chat arm', () => {
       [5, 'already fully charged'], // already_full
       [6, 'Carry a better'], // tool_capped
       [7, 'Recharging'], // insufficient_materials
-      [8, 'busy'], // busy (Phase 5 concurrent cast)
+      [8, 'copies are locked'], // locked
+      [9, 'busy'], // busy (Phase 5 concurrent cast)
     ];
     for (const [index, anchor] of anchors) {
       expect(rendered[index], `line for ${denies[index][0]}`).toContain(anchor);
@@ -178,6 +189,8 @@ describe('the toolEffectResult chat arm', () => {
     // The price-carrying deny states the cost (the R46 legibility rule).
     expect(rendered[7]).toContain('[Chime Shard]');
     expect(rendered[7]).toContain('5');
+    // The locked deny names the material too, so the player knows what to unlock.
+    expect(rendered[8]).toContain('[Chime Essence]');
   });
 
   it('an unknown effect id renders RAW rather than as an empty name or a crash', () => {
