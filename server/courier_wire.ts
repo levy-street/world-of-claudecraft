@@ -237,7 +237,10 @@ export function courierBankExchangeFor(
   const trip = courierVaultTripFor(sim.ctx, pid);
   if (trip?.vaultCargo?.length || trip?.vaultWithdrawals?.length) {
     vaultBefore = courierVaultInfoFor(sim.ctx, pid);
-    if (vaultBefore) vaultRowBound = courierVaultLedgerRowBound(vaultBefore, trip);
+    // A vault leg without a readable vault could never be ledgered: settle
+    // without mutations so its cargo returns home rather than retrying forever.
+    if (!vaultBefore) return true;
+    vaultRowBound = courierVaultLedgerRowBound(vaultBefore, trip);
   }
   // One reservation covers both legs: the session journal hands each open
   // reservation every remaining byte, so a second concurrent one (the vault
@@ -248,7 +251,9 @@ export function courierBankExchangeFor(
   const reservation = owner.bankVaultLedgerGuard.admission.tryReserve(
     rowBound + vaultRowBound,
     0,
-    'personal',
+    // The surface only routes a projection-failure incident; a trip with a
+    // vault leg keeps reporting its failures on the vault incident counter.
+    vaultRowBound ? 'vault' : 'personal',
   );
   if (!reservation) return false;
   try {

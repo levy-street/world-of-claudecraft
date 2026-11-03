@@ -227,6 +227,7 @@ describe('courier vault wire', () => {
       expect(ok).toBe(true);
       if (oversized) {
         expect(live.stock).toEqual({ linen_scrap: 4 });
+        expect(admission.tryReserve).not.toHaveBeenCalled();
         expect(rows).toEqual([]);
         return;
       }
@@ -236,7 +237,7 @@ describe('courier vault wire', () => {
       expect(admission.tryReserve).toHaveBeenCalledWith(
         bankVaultLedgerMaxRows('courier_dispatch') + 2,
         0,
-        'personal',
+        'vault',
       );
       expect(rows).toHaveLength(1);
       expect(rows[0].batch).toMatchObject([
@@ -289,6 +290,7 @@ describe('courier vault wire', () => {
       bankVaultLedgerGuard: runtime,
     } as unknown as StorageAdmissionSession;
     const deposit = vi.fn(() => {
+      bank.slots.push({ itemId: 'healing_potion', count: 2 });
       live.stock.copper_ore = 3;
     });
     const withdraw = vi.fn(() => {
@@ -300,7 +302,80 @@ describe('courier vault wire', () => {
     expect(live.stock).toEqual({ copper_ore: 3 });
     // Both legs landed in the one outbox, and no reservation is left behind.
     expect(journal.outbox.usage).toMatchObject({ reservedRows: 0, reservedEncodedBytes: 0 });
-    expect(journal.outbox.usage.queuedRows).toBe(2);
+    // One batch carries the personal bank row and both vault rows, in order.
+    expect(journal.outbox.usage.queuedRows).toBe(3);
+    const queued = journal.outbox.snapshot().batches.flatMap((b) => b.rows);
+    expect(queued).toMatchObject([
+      { op: 'deposit', itemId: 'healing_potion', count: 2 },
+      { op: 'deposit', itemId: 'copper_ore', count: 3, container: 'vault' },
+      { op: 'withdraw', itemId: 'linen_scrap', count: 4, container: 'vault' },
+    ]);
+    expect(queued[0].container).not.toBe('vault');
+  });
+
+  // Both legs share the account's row burst: a combined bound over it settles
+  // unchanged (the cargo rides home) instead of retrying at the banker forever,
+  // and a vault leg with no readable vault never mutates without its rows.
+  it.each([
+    { label: 'exactly at the burst', extra: 0, admitted: true },
+    { label: 'one over the burst', extra: 1, admitted: false },
+    { label: 'with no readable vault', extra: 0, admitted: false, noVault: true },
+  ])('combined courier ledger bound $label', ({ extra, admitted, noVault }) => {
+    const floor = bankVaultLedgerMaxRows('courier_dispatch');
+    // Each distinct material is one vault row, plus one for the withdrawal.
+    const materials = BANK_VAULT_LEDGER_ROW_BURST - floor - 1 + extra;
+    const live = { stock: { linen_scrap: 4 } as Record<string, number>, special: [], upgrades: 1 };
+    const meta = {
+      vault: noVault ? undefined : live,
+      courier: {
+        vaultCargo: Array.from({ length: materials }, (_, i) => ({
+          itemId: `material_${i}`,
+          count: 1,
+        })),
+        vaultWithdrawals: [{ itemId: 'linen_scrap', count: 4 }],
+      },
+    };
+    const host = {
+      ...sim(info()),
+      courierBankInfoFor: () =>
+        ({ slots: [], purchasedSlots: 0, nextExpansionCost: 500 }) as unknown as BankInfo,
+      ctx: {
+        players: new Map([[17, meta]]),
+        resolve: () => (noVault ? null : { meta }),
+        storagePrices: { vaultUpgrades: [20000, 50000, 100000, 200000, 400000] },
+      } as never,
+    };
+    const admission = {
+      tryReserve: vi.fn(() => ({
+        commit: () => true,
+        cancel: vi.fn(() => true),
+        failAfterMutation: vi.fn(),
+      })),
+    };
+    const session = {
+      pid: 17,
+      characterId: 10,
+      accountId: 20,
+      left: false,
+      escrowQuarantined: false,
+      bankLedgerJournal: { outbox: { owner: { characterId: 10, accountId: 20 } } },
+      bankVaultLedgerGuard: createBankVaultLedgerGuardCoordinator(() => 0).createRuntime(
+        20,
+        admission as never,
+        vi.fn(),
+      ),
+    } as unknown as StorageAdmissionSession;
+    const deposit = vi.fn();
+    const withdraw = vi.fn();
+    expect(courierBankExchangeFor(host, session, 17, deposit, withdraw)).toBe(true);
+    if (admitted) {
+      expect(admission.tryReserve).toHaveBeenCalledWith(BANK_VAULT_LEDGER_ROW_BURST, 0, 'vault');
+      expect(deposit).toHaveBeenCalledOnce();
+    } else {
+      expect(admission.tryReserve).not.toHaveBeenCalled();
+      expect(deposit).not.toHaveBeenCalled();
+      expect(withdraw).not.toHaveBeenCalled();
+    }
   });
 
   it('reads the other-character leg strictly and round-trips it on courierStores', () => {
