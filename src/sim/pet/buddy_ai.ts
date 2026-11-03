@@ -15,8 +15,11 @@
 //    the owner's own position exactly as before.
 //  - It carries zero combat: spawned hostile:false/idle and never dispatched
 //    through updatePet's combat arm, so it never acquires a target, swings,
-//    or takes threat. Nothing ever targets a non-hostile owned entity, so it
-//    needs no threat-table cleanup on despawn either (contrast
+//    or takes threat. It is visible but never interactable: no heal, aura or
+//    damage lands on it from anyone (isFriendlyTo/isHostileTo in sim.ts, plus
+//    the applyHeal, dealDamage and auraGuarded backstops), and only its owner
+//    may select it (buddyUnselectableBy below), for the rename/autoloot menu.
+//    So it needs no threat-table cleanup on despawn either (contrast
 //    despawnPersistentPet in pet_commands.ts).
 //
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports (enforced by
@@ -70,6 +73,20 @@ export function buddyFollowTarget(owner: Entity): Vec3 {
  *  predicate too, instead of reimplementing the BUDDY_TEMPLATE_IDS check. */
 export function isBuddyMob(mob: Pick<Entity, 'ownerId' | 'templateId'>): boolean {
   return mob.ownerId !== null && BUDDY_TEMPLATE_IDS.has(mob.templateId);
+}
+
+/** True when `viewerId` may not select `e`: a buddy is visible to everyone but
+ *  selectable only by its own owner, and only to open the rename/autoloot menu
+ *  (ui/hud/buddy_menu.ts). No heal, aura, or damage ever lands on it, the owner
+ *  included: isHostileTo/isFriendlyTo (sim.ts) and the applyHeal, dealDamage
+ *  and auraGuarded backstops refuse it for every caster. Same narrowed pick as
+ *  isBuddyMob, so client picking, nameplates and ClientWorld.targetEntity share
+ *  this rule with the sim select command. */
+export function buddyUnselectableBy(
+  e: Pick<Entity, 'ownerId' | 'templateId'>,
+  viewerId: number | null,
+): boolean {
+  return isBuddyMob(e) && e.ownerId !== viewerId;
 }
 
 /** The owner's live buddy entity, or null. Scoped to buddy templateIds only

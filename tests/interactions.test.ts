@@ -9,6 +9,7 @@ import {
   isAttackHoverTarget,
   shouldApproachPickedEntity,
 } from '../src/game/interactions';
+import { buddyTemplateId } from '../src/sim/content/buddy_mobs';
 import { type Entity, INTERACT_RANGE } from '../src/sim/types';
 import type { BgInfo, BgMatchInfo, BgPlayerInfo } from '../src/world_api/battleground';
 
@@ -435,6 +436,31 @@ describe('activePvpOpponentIds', () => {
     expect(isAttackableEntity(wildWolf, 1, ids)).toBe(true); // wild-hostile, as before
     expect(hoverCursorKind(enemyDemon, 1, new Set(), ids)).toBe('attack');
     expect(hoverCursorKind(allyDemon, 1, new Set(), ids)).toBe('default');
+  });
+
+  it("never includes an enemy's buddy (visible but not interactable)", () => {
+    const player = stubEntity({ id: 1, kind: 'player' });
+    const rivalPet = stubEntity({ id: 20, kind: 'mob', ownerId: 2, hostile: false });
+    const rivalBuddy = stubEntity({
+      id: 21,
+      kind: 'mob',
+      ownerId: 2,
+      hostile: false,
+      templateId: buddyTemplateId('horse'),
+    });
+    const entities = new Map<number, Entity>([
+      [1, player],
+      [20, rivalPet],
+      [21, rivalBuddy],
+    ]);
+    const ids = activePvpOpponentIds({
+      playerId: 1,
+      player,
+      entities,
+      duelInfo: { otherPid: 2, otherName: 'Duelist', state: 'active' },
+    });
+    expect([...ids].sort((a, b) => a - b)).toEqual([2, 20]);
+    expect(isAttackableEntity(rivalBuddy, 1, ids)).toBe(false);
   });
 
   it('includes a duel / arena opponent pet too (same owner resolution)', () => {

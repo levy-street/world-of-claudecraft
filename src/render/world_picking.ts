@@ -5,6 +5,7 @@
 // the drawn views, never writes either.
 
 import * as THREE from 'three';
+import { buddyUnselectableBy } from '../sim/pet/buddy_ai';
 import type { IWorld } from '../world_api';
 import { resolveGatherNodePick } from './gather_nodes';
 import { isProjectedNameplateAnchorVisible } from './nameplate_projection';
@@ -136,6 +137,9 @@ export class WorldPicking {
           // click-pickable either (the capsule proxy ignores `visible`): skip it
           // unless the local player is a released spirit.
           if (e?.templateId === 'spirit_healer' && !sim.player?.ghost) break;
+          // Someone else's buddy is visible but never interactable: the click
+          // falls through to whatever stands behind it (sim/pet/buddy_ai.ts).
+          if (e && buddyUnselectableBy(e, sim.playerId)) break;
           directHitIds.push(id);
           break;
         }
@@ -171,7 +175,8 @@ export class WorldPicking {
     for (const [id, v] of this.host.views()) {
       if (id === sim.playerId || !v.visual || !v.group.visible) continue;
       const e = sim.entities.get(id);
-      if (!e || (e.kind === 'mob' && e.dead && !e.lootable)) continue;
+      if (!e || (e.kind === 'mob' && e.dead && !e.lootable) || buddyUnselectableBy(e, sim.playerId))
+        continue;
       // A lying corpse (dead + lootable) has no upright body: collapse its sloppy
       // column to a ground-level point so a near-eye click above/behind the flat
       // body no longer snaps to it (issue 1486). Like the flattened pick proxy, this

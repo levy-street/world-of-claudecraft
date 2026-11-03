@@ -25,6 +25,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { ClientWorld } from '../src/net/online';
 import { TARGET_ECHO_SNAPSHOT_BUDGET } from '../src/net/target_echo';
+import { buddyTemplateId } from '../src/sim/content/buddy_mobs';
 
 // --- harness: a real ClientWorld, DOM/network-free (mirrors account_flair_client.test.ts) ---
 
@@ -394,5 +395,50 @@ describe('ClientWorld pending-target echo protection', () => {
     // shadow the spectated player's target for the budget window.
     wire.applySnapshot(snap(null, 0));
     expect(selfTarget(world)).toBeNull();
+  });
+});
+
+// A buddy is visible but never interactable (src/sim/pet/buddy_ai.ts): the
+// optimistic write must never show someone else's buddy on the target frame,
+// while the owner can still select their own (the rename/autoloot menu).
+describe('ClientWorld.targetEntity on buddies', () => {
+  const buddyWire = (id: number, own: number): unknown => ({
+    id,
+    k: 'mob',
+    tid: buddyTemplateId('horse'),
+    nm: 'Buddy',
+    lv: 1,
+    x: 0,
+    y: 0,
+    z: 0,
+    f: 0,
+    hp: 10,
+    mhp: 10,
+    own,
+  });
+
+  function buddyWorld() {
+    const { world, wire } = makeWorld();
+    wire.applySnapshot({
+      t: 'snap',
+      ents: [playerWire(77, 'Rival'), buddyWire(500, 77), buddyWire(501, 1)],
+      self: playerWire(1, 'Me', { target: null }),
+    });
+    expect(world.entities.get(500)?.ownerId).toBe(77);
+    return world;
+  }
+
+  it("refuses someone else's buddy locally", () => {
+    const world = buddyWorld();
+    world.targetEntity(500);
+    expect(selfTarget(world)).toBeNull();
+  });
+
+  it('still lets the owner select their own buddy, and a normal player', () => {
+    const world = buddyWorld();
+    world.targetEntity(501);
+    expect(selfTarget(world)).toBe(501);
+    world.targetEntity(77);
+    expect(selfTarget(world)).toBe(77);
   });
 });

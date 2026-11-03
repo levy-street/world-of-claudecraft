@@ -8963,7 +8963,8 @@ export class Sim {
   }
 
   private isFriendlyTo(caster: Entity, target: Entity): boolean {
-    if (gmHiddenFrom(this.entities, caster, target)) return false; // /visible off
+    // /visible off, or a buddy (pet/buddy_ai.ts: visible, never interactable)
+    if (gmHiddenFrom(this.entities, caster, target) || isBuddyMob(target)) return false;
     if (target.kind === 'player') return !this.isHostileTo(caster, target);
     // A Protect Yumi cat is heal/shield-targetable only by its own team.
     if (target.kind === 'mob' && yumiMod.isYumiCat(target))

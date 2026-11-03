@@ -6,6 +6,7 @@ import { isShadowNpc, SHADOW_NPC_ID } from '../sim/content/world_quest_shadow';
 import { isLootableBody } from '../sim/corpse_loot_state';
 import { ESCORTS } from '../sim/data';
 import { kitUsableNow } from '../sim/mob/trash_kit/encounter_use';
+import { isBuddyMob } from '../sim/pet/buddy_ai';
 import { isQuestGatedEntityHidden } from '../sim/quest_gated_entity';
 import {
   dist2d,
@@ -111,10 +112,12 @@ export function activePvpOpponentIds(
   }
   // Enemy-owned pets, resolved AFTER every player arm above so the owner set is
   // complete. Iterating the map allocates nothing, which the per-frame hover
-  // caller relies on.
+  // caller relies on. A buddy never joins: it is visible but not interactable
+  // (sim/pet/buddy_ai.ts), and the sim's isHostileTo refuses it.
   if (ids.size > 0 && world.entities) {
     for (const e of world.entities.values()) {
-      if (e.kind === 'mob' && e.ownerId !== null && ids.has(e.ownerId)) ids.add(e.id);
+      if (e.kind === 'mob' && e.ownerId !== null && ids.has(e.ownerId) && !isBuddyMob(e))
+        ids.add(e.id);
     }
   }
   return ids;

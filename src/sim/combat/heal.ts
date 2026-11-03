@@ -27,6 +27,7 @@
 
 import { recordQueueHealing } from '../instances/queue_participation';
 import { questGateBlocksAggro } from '../mob/quest_gated_aggro';
+import { isBuddyMob } from '../pet/buddy_ai';
 import { worldPvpOnPlayerAided } from '../pvp';
 import type { SimContext } from '../sim_context';
 import { addThreat, HEAL_THREAT_FACTOR } from '../threat';
@@ -125,7 +126,9 @@ export function applyHeal(
   // the same number emitted). Callers that ignore it are unaffected; Power Echo
   // reads it to repeat a direct heal at a fraction of the resolved amount.
 ): number {
-  if (target.dead) return 0;
+  // A buddy (pet/buddy_ai.ts) is never healed: isFriendlyTo already keeps it
+  // out of every ally scan, and this backstops any caller that skips that.
+  if (target.dead || isBuddyMob(target)) return 0;
   const crit = !alreadyResolved && canCrit ? ctx.rng.chance(ctx.spellCrit(source)) : false;
   let healDone = 0;
   for (const aura of source.auras) if (aura.kind === 'buff_heal_done') healDone += aura.value;
