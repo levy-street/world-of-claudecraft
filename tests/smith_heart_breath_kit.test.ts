@@ -410,7 +410,10 @@ describe('Smith Heart Breath kit: the Islands of the Wind', () => {
     const a = shape('Kit_WindIsleA');
     const b = shape('Kit_WindIsleB');
     expect(Math.abs(a.min[1] - b.min[1])).toBeGreaterThan(2);
-    expect(Math.abs(a.triangles - b.triangles)).toBeGreaterThan(20);
+    // Their crags reach out differently (never one shape turned).
+    const reachA = [a.max[0] - a.min[0], a.max[2] - a.min[2]].sort((x, y) => x - y);
+    const reachB = [b.max[0] - b.min[0], b.max[2] - b.min[2]].sort((x, y) => x - y);
+    expect(Math.abs(reachA[0] - reachB[0]) + Math.abs(reachA[1] - reachB[1])).toBeGreaterThan(0.5);
   });
 });
 
