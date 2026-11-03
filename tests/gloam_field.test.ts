@@ -230,19 +230,23 @@ describe('GloamField: who is tracked', () => {
 });
 
 describe('GloamField: the entry and the tiers', () => {
-  it('erupts on a shift seen happening: the ring, the smoke column, the glints', () => {
+  it.each([0, 0.999])('erupts once on entry with random draw %s', (draw) => {
     onTier('high');
     const { scene, field, bodies, glints } = rig();
+    const random = vi.spyOn(Math, 'random').mockReturnValue(draw);
+    restores.push(() => random.mockRestore());
     bodies.set(1, { x: 0, y: 0, z: 0 });
     field.wearer(1, GLOAM_CUE_ENTER, true, 0, feetOf(bodies, 1));
-    field.update(1 / 60, false);
+    // Observe entry before advancing ambient animation: a bubble in the same
+    // frame would add four sparkles to the entry's exact count.
+    field.update(0, false);
     expect(shown(scene, 'gloam_ring').length).toBe(1);
-    // 46 column puffs and 20 skirt puffs, plus this frame's ambient smoke.
-    expect(field.stats().puffs).toBeGreaterThanOrEqual(66);
+    // 46 column puffs and 20 skirt puffs, with no ambient smoke yet.
+    expect(field.stats().puffs).toBe(66);
     // One soft glow, one flash, 28 sparkles (the host's own atlas cells).
     expect(glints.filter((sprite) => sprite === 20).length).toBe(1);
     expect(glints.filter((sprite) => sprite === 30).length).toBe(28);
-    expect(glints.filter((sprite) => sprite === 10).length).toBeGreaterThanOrEqual(1);
+    expect(glints.filter((sprite) => sprite === 10).length).toBe(1);
     // The ring passes; the entry is not replayed by staying in the form.
     for (let i = 0; i < 90; i++) {
       field.wearer(1, GLOAM_CUE_PRESENT, true, 0, feetOf(bodies, 1));
