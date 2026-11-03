@@ -17403,7 +17403,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Aumenta a velocidade de movimento em 35%, mas sacrifica 2% da sua vida máxima a cada segundo. Lance de novo para cancelar. Desativa-se automaticamente com 20% de vida.',
   'entities.abilities.sacrilegious_march.name': 'Marcha Sacrílega',
   'entities.abilities.sentence.description':
-    'Consome toda a Condenação e os Fios do Destino para executar a sentença sobre o inimigo. Cada Fio aumenta o dano em 6%. Efeitos adicionais escalam em 20, 50, 80 e 100 de Condenação. Sua escala de dano se estabiliza após o nível 16.',
+    'Consome toda a Condenação e os Fios do Destino para executar a sentença sobre o inimigo. Requer pelo menos 20 de Condenação. O dano aumenta com a Condenação consumida, e cada Fio o aumenta em 6%. Com 50 de Condenação, também cura você em 20% do dano causado. Com 80, também atinge inimigos num raio de 8 m do alvo com 35% do seu dano. Com 100, também causa 5% a mais de dano a jogadores e chefes, e mata instantaneamente um inimigo normal abaixo de 20% de vida. Sua escala de dano se estabiliza após o nível 16.',
   'entities.abilities.sentence.name': 'Sentença',
   'entities.abilities.sinister_strike.description':
     'Um golpe instantâneo por dano da arma mais {damage}. Concede 1 ponto de combo.',

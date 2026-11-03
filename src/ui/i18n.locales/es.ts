@@ -5400,7 +5400,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Perfora al enemigo e inflige {damage} de daño de las Sombras. Genera {needleDoom} de Condena si porta tu Mal de ojo; si no existe ninguno, primero marca al objetivo.',
   'entities.abilities.sentence.name': 'Sentencia',
   'entities.abilities.sentence.description':
-    'Consume toda la Condena y los Hilos del destino para sentenciar al enemigo. Cada Hilo aumenta el daño un 6%. Los efectos adicionales aumentan con 20, 50, 80 y 100 de Condena. El escalado de daño se aplana después del nivel 16.',
+    'Consume toda la Condena y los Hilos del destino para sentenciar al enemigo. Requiere al menos 20 de Condena. El daño aumenta con la Condena consumida y cada Hilo lo aumenta un 6%. Con 50 de Condena, además te cura un 20% del daño infligido. Con 80, además golpea a los enemigos en un radio de 8 m del objetivo con el 35% de su daño. Con 100, además inflige un 5% más de daño a jugadores y jefes, y mata al instante a un enemigo normal con menos del 20% de salud. El escalado de daño se aplana después del nivel 16.',
   'entities.abilities.cursed_accomplice.name': 'Cómplice maldito',
   'entities.abilities.cursed_accomplice.description':
     'Si no seleccionas a un jugador aliado, enlaza tu ojo maléfico y hace que su Mirada genere 2 de Condena. Al enlazar a un aliado, su daño al objetivo de Mal de ojo genera 3. Solo puede activarse una vez cada 2 s.',

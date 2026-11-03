@@ -18281,7 +18281,7 @@ export const pl_PL: EnTranslations = {
       },
       "sentence": {
         "name": "Wyrok",
-        "description": "Zużywa całe Potępienie i Nici Przeznaczenia, aby wydać wyrok na wroga. Każda Nić zwiększa obrażenia o 6%. Dodatkowe efekty eskalują przy 20, 50, 80 i 100 Potępienia. Skalowanie jego obrażeń spłaszcza się po 16 poziomie."
+        "description": "Zużywa całe Potępienie i Nici Przeznaczenia, aby wydać wyrok na wroga. Wymaga co najmniej 20 Potępienia. Obrażenia rosną wraz ze zużytym Potępieniem, a każda Nić zwiększa je o 6%. Przy 50 Potępienia dodatkowo leczy cię o 20% zadanych obrażeń. Przy 80 dodatkowo trafia wrogów w promieniu 8 m od celu za 35% swoich obrażeń. Przy 100 dodatkowo zadaje graczom i bossom o 5% więcej obrażeń oraz natychmiast zabija zwykłego wroga poniżej 20% zdrowia. Skalowanie jego obrażeń spłaszcza się po 16 poziomie."
       },
       "life_tap": {
         "name": "Trudny targ",

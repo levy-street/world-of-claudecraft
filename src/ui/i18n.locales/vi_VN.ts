@@ -16642,7 +16642,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Tăng 35% tốc độ di chuyển, nhưng hy sinh 2% máu tối đa của bạn mỗi giây. Thi triển lại để hủy. Tự động tắt khi máu ở mức 20%.',
   'entities.abilities.sacrilegious_march.name': 'Cuộc Hành Quân Phạm Thượng',
   'entities.abilities.sentence.description':
-    'Tiêu thụ toàn bộ Kết Án và Sợi Định Mệnh để tuyên án kẻ địch. Mỗi Sợi tăng 6% sát thương. Các hiệu ứng bổ sung leo thang ở 20, 50, 80, và 100 Kết Án. Mức tăng sát thương của nó chững lại sau cấp 16.',
+    'Tiêu thụ toàn bộ Kết Án và Sợi Định Mệnh để tuyên án kẻ địch. Cần ít nhất 20 Kết Án. Sát thương tăng theo lượng Kết Án đã tiêu thụ, và mỗi Sợi tăng thêm 6%. Ở 50 Kết Án, còn hồi cho bạn 20% sát thương gây ra. Ở 80, còn đánh trúng kẻ địch trong bán kính 8 thước quanh mục tiêu với 35% sát thương. Ở 100, còn gây thêm 5% sát thương lên người chơi và trùm, đồng thời hạ gục ngay một kẻ địch thường dưới 20% máu. Mức tăng sát thương của nó chững lại sau cấp 16.',
   'entities.abilities.sentence.name': 'Phán Quyết',
   'entities.abilities.sinister_strike.description':
     'Một đòn đánh tức thời gây sát thương vũ khí cộng thêm {damage}. Nhận 1 điểm liên hoàn.',

@@ -16770,7 +16770,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Meningkatkan kecepatan gerak sebesar 35%, tetapi mengorbankan 2% dari nyawa maksimummu setiap detik. Rapal lagi untuk membatalkan. Efek ini nonaktif secara otomatis pada 20% nyawa.',
   'entities.abilities.sacrilegious_march.name': 'Barisan Penodaan',
   'entities.abilities.sentence.description':
-    'Mengonsumsi semua Kecaman dan Benang Takdir untuk menjatuhkan vonis kepada musuh. Setiap Benang meningkatkan kerusakan sebesar 6%. Efek tambahan meningkat pada 20, 50, 80, dan 100 Kecaman. Skala kerusakannya mendatar setelah level 16.',
+    'Mengonsumsi semua Kecaman dan Benang Takdir untuk menjatuhkan vonis kepada musuh. Membutuhkan setidaknya 20 Kecaman. Kerusakan meningkat sesuai Kecaman yang dikonsumsi, dan setiap Benang meningkatkannya sebesar 6%. Pada 50 Kecaman, juga memulihkanmu sebesar 20% dari kerusakan yang diberikan. Pada 80, juga mengenai musuh dalam radius 8 yard dari target sebesar 35% kerusakannya. Pada 100, juga memberikan 5% kerusakan lebih besar kepada pemain dan bos, serta langsung membunuh musuh biasa di bawah 20% kesehatan. Skala kerusakannya mendatar setelah level 16.',
   'entities.abilities.sentence.name': 'Vonis',
   'entities.abilities.sinister_strike.description':
     'Serangan seketika sebesar kerusakan senjata ditambah {damage}. Memberi 1 poin combo.',

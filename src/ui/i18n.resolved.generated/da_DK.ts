@@ -18281,7 +18281,7 @@ export const da_DK: EnTranslations = {
       },
       "sentence": {
         "name": "Dom",
-        "description": "Forbruger al Fordømmelse og alle Skæbnetråde for at afsige dom over fjenden. Hver Tråd øger skaden med 6%. Ekstra effekter eskalerer ved 20, 50, 80 og 100 Fordømmelse. Dens skadesskalering flader ud efter niveau 16."
+        "description": "Forbruger al Fordømmelse og alle Skæbnetråde for at afsige dom over fjenden. Kræver mindst 20 Fordømmelse. Skaden stiger med den forbrugte Fordømmelse, og hver Tråd øger den med 6%. Ved 50 Fordømmelse heler den dig desuden for 20% af den påførte skade. Ved 80 rammer den desuden fjender inden for 8 m af målet for 35% af sin skade. Ved 100 gør den desuden 5% mere skade på spillere og bosser og dræber øjeblikkeligt en almindelig fjende under 20% helbred. Dens skadesskalering flader ud efter niveau 16."
       },
       "life_tap": {
         "name": "Hård Handel",

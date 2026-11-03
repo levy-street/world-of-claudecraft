@@ -17052,7 +17052,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Erhöht das Bewegungstempo um 35%, opfert aber jede Sekunde 2% Eurer maximalen Gesundheit. Erneut wirken, um abzubrechen. Schaltet sich bei 20% Gesundheit automatisch ab.',
   'entities.abilities.sacrilegious_march.name': 'Frevelhafter Marsch',
   'entities.abilities.sentence.description':
-    'Verbraucht alle Verdammnis und Schicksalsfäden, um über den Gegner das Urteil zu fällen. Jeder Faden erhöht den Schaden um 6%. Zusätzliche Effekte eskalieren bei 20, 50, 80 und 100 Verdammnis. Seine Schadensskalierung flacht nach Stufe 16 ab.',
+    'Verbraucht alle Verdammnis und Schicksalsfäden, um über den Gegner das Urteil zu fällen. Benötigt mindestens 20 Verdammnis. Der Schaden steigt mit der verbrauchten Verdammnis, und jeder Faden erhöht ihn um 6%. Bei 50 Verdammnis wirst du zusätzlich um 20% des verursachten Schadens geheilt. Bei 80 erleiden zusätzlich Gegner im Umkreis von 8 m um das Ziel 35% des Schadens. Bei 100 steigt der Schaden gegen Spieler und Bosse zusätzlich um 5%, und ein normaler Gegner unter 20% Gesundheit wird sofort getötet. Seine Schadensskalierung flacht nach Stufe 16 ab.',
   'entities.abilities.sentence.name': 'Schuldspruch',
   'entities.abilities.sinister_strike.description':
     'Ein sofortiger Schlag für Waffenschaden plus {damage}. Gewährt 1 Combopunkt.',

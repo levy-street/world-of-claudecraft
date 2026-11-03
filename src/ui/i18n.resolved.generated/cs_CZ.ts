@@ -18281,7 +18281,7 @@ export const cs_CZ: EnTranslations = {
       },
       "sentence": {
         "name": "Rozsudek",
-        "description": "Spotřebuje veškeré Odsouzení a Nitě osudu, aby na nepříteli vynesla rozsudek. Každá Nit zvýší poškození o 6 %. Přidané efekty eskalují při 20, 50, 80 a 100 Odsouzení. Škálování jeho poškození se po úrovni 16 zplošťuje."
+        "description": "Spotřebuje veškeré Odsouzení a Nitě osudu, aby na nepříteli vynesla rozsudek. Vyžaduje alespoň 20 Odsouzení. Poškození roste se spotřebovaným Odsouzením a každá Nit ho zvýší o 6 %. Při 50 Odsouzení vás navíc vyléčí o 20 % způsobeného poškození. Při 80 navíc zasáhne nepřátele do 8 yardů od cíle za 35 % svého poškození. Při 100 navíc způsobí hráčům a bossům o 5 % vyšší poškození a okamžitě zabije běžného nepřítele pod 20 % zdraví. Škálování jeho poškození se po úrovni 16 zplošťuje."
       },
       "life_tap": {
         "name": "Tvrdý obchod",

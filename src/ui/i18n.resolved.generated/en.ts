@@ -18281,7 +18281,7 @@ export const en: EnTranslations = {
       },
       "sentence": {
         "name": "Sentence",
-        "description": "Consumes all Condemnation and Fate Threads to pass sentence on the enemy. Each Thread increases damage by 6%. Added effects escalate at 20, 50, 80, and 100 Condemnation. Its damage scaling flattens after level 16."
+        "description": "Consumes all Condemnation and Fate Threads to pass sentence on the enemy. Requires at least 20 Condemnation. Damage grows with the Condemnation consumed, and each Thread increases it by 6%. At 50 Condemnation it also heals you for 20% of the damage dealt. At 80 it also hits enemies within 8 yd of the target for 35% of its damage. At 100 it also deals 5% more damage to players and bosses, and instantly kills a normal enemy below 20% health. Its damage scaling flattens after level 16."
       },
       "life_tap": {
         "name": "Hard Bargain",

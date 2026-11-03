@@ -18281,7 +18281,7 @@ export const nl_NL: EnTranslations = {
       },
       "sentence": {
         "name": "Vonnis",
-        "description": "Verbruikt alle Verdoemenis en Lotsdraden om vonnis te vellen over de vijand. Elke Draad verhoogt de schade met 6%. Extra effecten schalen op bij 20, 50, 80 en 100 Verdoemenis. De schaalvergroting van zijn schade vlakt af na niveau 16."
+        "description": "Verbruikt alle Verdoemenis en Lotsdraden om vonnis te vellen over de vijand. Vereist minstens 20 Verdoemenis. De schade groeit met de verbruikte Verdoemenis, en elke Draad verhoogt die met 6%. Bij 50 Verdoemenis geneest het je bovendien voor 20% van de toegebrachte schade. Bij 80 raakt het bovendien vijanden binnen 8 yard van het doelwit voor 35% van de schade. Bij 100 doet het bovendien 5% meer schade aan spelers en bazen, en doodt het direct een normale vijand onder 20% gezondheid. De schaalvergroting van zijn schade vlakt af na niveau 16."
       },
       "life_tap": {
         "name": "Zware Koop",

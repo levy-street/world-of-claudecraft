@@ -16578,7 +16578,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     "Hareket hızını %35 artırır, ama her saniye azami canının %2'sini feda eder. İptal etmek için tekrar oku. %20 canda kendiliğinden kapanır.",
   'entities.abilities.sacrilegious_march.name': 'Günahkâr Yürüyüş',
   'entities.abilities.sentence.description':
-    "Düşmana hüküm giydirmek için tüm Mahkûmiyeti ve Kader İpliklerini tüketir. Her İplik hasarı %6 artırır. Ek etkiler 20, 50, 80 ve 100 Mahkûmiyette artar. Hasar ölçeklenmesi seviye 16'dan sonra düzleşir.",
+    "Düşmana hüküm giydirmek için tüm Mahkûmiyeti ve Kader İpliklerini tüketir. En az 20 Mahkûmiyet gerektirir. Hasar tüketilen Mahkûmiyetle artar ve her İplik hasarı %6 artırır. 50 Mahkûmiyette ayrıca verilen hasarın %20'si kadar seni iyileştirir. 80'de ayrıca hedefin 8 yarda içindeki düşmanlara hasarının %35'i kadar vurur. 100'de ayrıca oyunculara ve patronlara %5 daha fazla hasar verir ve sağlığı %20'nin altındaki sıradan bir düşmanı anında öldürür. Hasar ölçeklenmesi seviye 16'dan sonra düzleşir.",
   'entities.abilities.sentence.name': 'Hüküm',
   'entities.abilities.sinister_strike.description':
     'Silah hasarı artı {damage} veren anlık bir vuruş. 1 kombo puanı kazandırır.',

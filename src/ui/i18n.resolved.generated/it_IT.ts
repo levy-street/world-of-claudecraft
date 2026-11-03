@@ -18281,7 +18281,7 @@ export const it_IT: EnTranslations = {
       },
       "sentence": {
         "name": "Sentenza",
-        "description": "Consuma tutta la Condanna e i Filamenti del Fato per pronunciare la sentenza sul nemico. Ogni Filamento aumenta i danni del 6%. Gli effetti aggiuntivi si intensificano a 20, 50, 80 e 100 Condanna. La sua scalatura dei danni si appiattisce dopo il livello 16."
+        "description": "Consuma tutta la Condanna e i Filamenti del Fato per pronunciare la sentenza sul nemico. Richiede almeno 20 Condanna. I danni aumentano con la Condanna consumata e ogni Filamento li aumenta del 6%. A 50 Condanna ti cura anche del 20% dei danni inflitti. A 80 colpisce anche i nemici entro 8 metri dal bersaglio per il 35% dei suoi danni. A 100 infligge anche il 5% di danni in più a giocatori e boss, e uccide all'istante un nemico normale sotto il 20% di salute. La sua scalatura dei danni si appiattisce dopo il livello 16."
       },
       "life_tap": {
         "name": "Patto Amaro",

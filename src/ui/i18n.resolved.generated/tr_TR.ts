@@ -18281,7 +18281,7 @@ export const tr_TR: EnTranslations = {
       },
       "sentence": {
         "name": "Hüküm",
-        "description": "Düşmana hüküm giydirmek için tüm Mahkûmiyeti ve Kader İpliklerini tüketir. Her İplik hasarı %6 artırır. Ek etkiler 20, 50, 80 ve 100 Mahkûmiyette artar. Hasar ölçeklenmesi seviye 16'dan sonra düzleşir."
+        "description": "Düşmana hüküm giydirmek için tüm Mahkûmiyeti ve Kader İpliklerini tüketir. En az 20 Mahkûmiyet gerektirir. Hasar tüketilen Mahkûmiyetle artar ve her İplik hasarı %6 artırır. 50 Mahkûmiyette ayrıca verilen hasarın %20'si kadar seni iyileştirir. 80'de ayrıca hedefin 8 yarda içindeki düşmanlara hasarının %35'i kadar vurur. 100'de ayrıca oyunculara ve patronlara %5 daha fazla hasar verir ve sağlığı %20'nin altındaki sıradan bir düşmanı anında öldürür. Hasar ölçeklenmesi seviye 16'dan sonra düzleşir."
       },
       "life_tap": {
         "name": "Ağır Pazarlık",

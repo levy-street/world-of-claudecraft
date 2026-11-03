@@ -18281,7 +18281,7 @@ export const es_ES: EnTranslations = {
       },
       "sentence": {
         "name": "Sentencia",
-        "description": "Consume toda la Condena y los Hilos del destino para sentenciar al enemigo. Cada Hilo aumenta el daño un 6%. Los efectos adicionales aumentan con 20, 50, 80 y 100 de Condena. El escalado de daño se aplana después del nivel 16."
+        "description": "Consume toda la Condena y los Hilos del destino para sentenciar al enemigo. Requiere al menos 20 de Condena. El daño aumenta con la Condena consumida y cada Hilo lo aumenta un 6%. Con 50 de Condena, además te cura un 20% del daño infligido. Con 80, además golpea a los enemigos en un radio de 8 m del objetivo con el 35% de su daño. Con 100, además inflige un 5% más de daño a jugadores y jefes, y mata al instante a un enemigo normal con menos del 20% de salud. El escalado de daño se aplana después del nivel 16."
       },
       "life_tap": {
         "name": "Trato Amargo",

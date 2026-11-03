@@ -18281,7 +18281,7 @@ export const vi_VN: EnTranslations = {
       },
       "sentence": {
         "name": "Phán Quyết",
-        "description": "Tiêu thụ toàn bộ Kết Án và Sợi Định Mệnh để tuyên án kẻ địch. Mỗi Sợi tăng 6% sát thương. Các hiệu ứng bổ sung leo thang ở 20, 50, 80, và 100 Kết Án. Mức tăng sát thương của nó chững lại sau cấp 16."
+        "description": "Tiêu thụ toàn bộ Kết Án và Sợi Định Mệnh để tuyên án kẻ địch. Cần ít nhất 20 Kết Án. Sát thương tăng theo lượng Kết Án đã tiêu thụ, và mỗi Sợi tăng thêm 6%. Ở 50 Kết Án, còn hồi cho bạn 20% sát thương gây ra. Ở 80, còn đánh trúng kẻ địch trong bán kính 8 thước quanh mục tiêu với 35% sát thương. Ở 100, còn gây thêm 5% sát thương lên người chơi và trùm, đồng thời hạ gục ngay một kẻ địch thường dưới 20% máu. Mức tăng sát thương của nó chững lại sau cấp 16."
       },
       "life_tap": {
         "name": "Mặc Cả Nghiệt Ngã",

@@ -16578,7 +16578,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Ökar förflyttningshastigheten med 35%, men offrar 2% av din maximala hälsa varje sekund. Kasta igen för att avbryta. Den stängs av vid 20% hälsa.',
   'entities.abilities.sacrilegious_march.name': 'Vanhelgande marsch',
   'entities.abilities.sentence.description':
-    'Förbrukar all Fördömelse och alla Ödestrådar för att fälla dom över fienden. Varje Tråd ökar skadan med 6%. Extra effekter trappas upp vid 20, 50, 80 och 100 Fördömelse. Dess skalning av skada planar ut efter nivå 16.',
+    'Förbrukar all Fördömelse och alla Ödestrådar för att fälla dom över fienden. Kräver minst 20 Fördömelse. Skadan växer med den förbrukade Fördömelsen, och varje Tråd ökar den med 6%. Vid 50 Fördömelse helar den dig dessutom för 20% av den utdelade skadan. Vid 80 träffar den dessutom fiender inom 8 meter från målet för 35% av sin skada. Vid 100 gör den dessutom 5% mer skada mot spelare och bossar och dödar omedelbart en vanlig fiende under 20% hälsa. Dess skalning av skada planar ut efter nivå 16.',
   'entities.abilities.sentence.name': 'Dom',
   'entities.abilities.sinister_strike.description':
     'Ett omedelbart slag för vapenskada plus {damage}. Ger 1 kombopoäng.',

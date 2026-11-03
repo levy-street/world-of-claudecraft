@@ -18281,7 +18281,7 @@ export const id_ID: EnTranslations = {
       },
       "sentence": {
         "name": "Vonis",
-        "description": "Mengonsumsi semua Kecaman dan Benang Takdir untuk menjatuhkan vonis kepada musuh. Setiap Benang meningkatkan kerusakan sebesar 6%. Efek tambahan meningkat pada 20, 50, 80, dan 100 Kecaman. Skala kerusakannya mendatar setelah level 16."
+        "description": "Mengonsumsi semua Kecaman dan Benang Takdir untuk menjatuhkan vonis kepada musuh. Membutuhkan setidaknya 20 Kecaman. Kerusakan meningkat sesuai Kecaman yang dikonsumsi, dan setiap Benang meningkatkannya sebesar 6%. Pada 50 Kecaman, juga memulihkanmu sebesar 20% dari kerusakan yang diberikan. Pada 80, juga mengenai musuh dalam radius 8 yard dari target sebesar 35% kerusakannya. Pada 100, juga memberikan 5% kerusakan lebih besar kepada pemain dan bos, serta langsung membunuh musuh biasa di bawah 20% kesehatan. Skala kerusakannya mendatar setelah level 16."
       },
       "life_tap": {
         "name": "Tawar Getir",

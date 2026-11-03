@@ -17176,7 +17176,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Augmente la vitesse de déplacement de 35%, mais sacrifie 2% de vos points de vie maximum chaque seconde. Relancez pour annuler. Se désactive à 20% de points de vie.',
   'entities.abilities.sacrilegious_march.name': 'Marche sacrilège',
   'entities.abilities.sentence.description':
-    "Consomme toute la Condamnation et les Fils du destin pour prononcer la sentence sur l'ennemi. Chaque Fil augmente les dégâts de 6%. Des effets supplémentaires s'ajoutent à 20, 50, 80 et 100 Condamnation. Sa montée en dégâts se stabilise après le niveau 16.",
+    "Consomme toute la Condamnation et les Fils du destin pour prononcer la sentence sur l'ennemi. Nécessite au moins 20 Condamnation. Les dégâts augmentent avec la Condamnation consommée, et chaque Fil les augmente de 6%. À 50 Condamnation, vous rend aussi 20% des dégâts infligés en points de vie. À 80, touche aussi les ennemis dans un rayon de 8 m autour de la cible pour 35% de ses dégâts. À 100, inflige aussi 5% de dégâts supplémentaires aux joueurs et aux boss, et tue instantanément un ennemi normal sous 20% de points de vie. Sa montée en dégâts se stabilise après le niveau 16.",
   'entities.abilities.sentence.name': 'Sentence',
   'entities.abilities.sinister_strike.description':
     "Une frappe instantanée pour les dégâts de l'arme plus {damage}. Confère 1 point de combo.",
