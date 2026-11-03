@@ -298,6 +298,32 @@ describe('the /pvp flag lifecycle', () => {
     expect(seen).toContain('World PvP disabled.');
   });
 
+  it('a world PvP hit dealt or taken during the countdown restarts it from five minutes', () => {
+    const sim = world();
+    const a = addFighter(sim, 'Aleph');
+    const b = addFighter(sim, 'Beth');
+    standTogether(sim, [a, b]);
+    flag(sim, a);
+    flag(sim, b);
+    flag(sim, a, false);
+    advanceClock(sim, 200);
+    expect(sim.worldPvpInfoFor(a)!.disarmRemaining).toBeLessThanOrEqual(100);
+
+    hit(sim, a, b);
+    expect(sim.worldPvpInfoFor(a)!.disarmRemaining).toBe(WORLD_PVP_DISARM_SECONDS);
+    expect(logLines(sim, a)).toContain(
+      'You fought in World PvP: its switch-off countdown starts over.',
+    );
+
+    // Being hit is fighting too.
+    advanceClock(sim, 60);
+    hit(sim, b, a);
+    expect(sim.worldPvpInfoFor(a)!.disarmRemaining).toBe(WORLD_PVP_DISARM_SECONDS);
+    // The other side never asked to switch off, so its flag has no countdown.
+    expect(sim.worldPvpInfoFor(b)!.disarmRemaining).toBeNull();
+    expect(ent(sim, a).pvpFlag).toBe(true);
+  });
+
   it('reports the countdown in whole seconds so the self wire elides it between seconds', () => {
     const sim = world();
     const a = addFighter(sim, 'Aleph');

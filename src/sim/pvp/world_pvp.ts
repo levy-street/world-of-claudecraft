@@ -297,6 +297,26 @@ function emitKillFeed(
 /** The disarm delay in whole minutes, for the notice line. */
 export const WORLD_PVP_DISARM_MINUTES = Math.round(WORLD_PVP_DISARM_SECONDS / 60);
 
+/** At most one countdown-restart notice per this many seconds of fighting, so a
+ *  fight under /pvp off prints a line now and then, not one per hit. */
+const WORLD_PVP_DISARM_RESET_NOTICE_GAP = 30;
+
+/**
+ * A world PvP action (a hit dealt or taken, or aid to someone in a world fight)
+ * by a player whose flag is switching off restarts the full countdown, so
+ * /pvp off can never run out in the middle of a fight. A no-op for anyone not
+ * in the countdown. No rng.
+ */
+function resetWorldPvpDisarm(ctx: SimContext, e: Entity): void {
+  const state = ctx.players.get(e.id)?.worldPvp;
+  if (!state?.flagged || state.disarmAt === null) return;
+  const restarted = ctx.time + WORLD_PVP_DISARM_SECONDS;
+  if (restarted - state.disarmAt >= WORLD_PVP_DISARM_RESET_NOTICE_GAP) {
+    notice(ctx, e.id, 'You fought in World PvP: its switch-off countdown starts over.');
+  }
+  state.disarmAt = restarted;
+}
+
 function raiseFlag(ctx: SimContext, e: Entity, meta: PlayerMeta, text: string): void {
   const state = ensureState(meta);
   state.flagged = true;
@@ -659,6 +679,8 @@ export function worldPvpOnPlayerDamaged(ctx: SimContext, victim: Entity, source:
   noteRecent(books.recentDamage, victim.id, attacker.id, ctx.time);
   books.lastFightAt.set(victim.id, ctx.time);
   books.lastFightAt.set(attacker.id, ctx.time);
+  resetWorldPvpDisarm(ctx, attacker);
+  resetWorldPvpDisarm(ctx, victim);
   if (worldPvpHitMarksAttacker(attacker, victim)) {
     const meta = autoRaiseTarget(ctx, attacker);
     if (meta) raiseFlag(ctx, attacker, meta, WORLD_PVP_MARKED_LINE);
@@ -677,9 +699,10 @@ export function worldPvpOnOwnedPetDamaged(ctx: SimContext, pet: Entity, source: 
   const owner = controllerOf(ctx, pet);
   const attacker = controllerOf(ctx, source);
   if (!owner || !attacker || attacker.id === owner.id) return;
-  if (!isWorldPvpHostile(ctx, attacker, owner) || !worldPvpHitMarksAttacker(attacker, owner)) {
-    return;
-  }
+  if (!isWorldPvpHostile(ctx, attacker, owner)) return;
+  resetWorldPvpDisarm(ctx, attacker);
+  resetWorldPvpDisarm(ctx, owner);
+  if (!worldPvpHitMarksAttacker(attacker, owner)) return;
   const meta = autoRaiseTarget(ctx, attacker);
   if (meta) raiseFlag(ctx, attacker, meta, WORLD_PVP_MARKED_LINE);
 }
@@ -715,6 +738,7 @@ export function worldPvpOnPlayerAided(ctx: SimContext, target: Entity, source: E
     raiseFlag(ctx, helper, meta, WORLD_PVP_AIDED_LINE);
   }
   noteRecent(ctx.worldPvpBooks.recentSupport, target.id, helper.id, ctx.time);
+  if (isEngagedInWorldPvp(ctx, target)) resetWorldPvpDisarm(ctx, helper);
 }
 
 /** The DR book's key: the two rename-proof identities (pvp_identity.ts). */
