@@ -1,8 +1,8 @@
 // Pure plan of the Islands of the Wind's look (breath_isles_fx.ts paints it;
 // the sim: encounters/smith_heart/breath_isles.ts). Three-free, DOM-free,
-// deterministic (a hash, never rng): what a floating isle IS (its carved top,
-// its underside of storm granite hanging to a point, its strata, its crystal
-// clusters, its hanging roots, its ring of wind runes, its drifting stones),
+// deterministic (a hash, never rng): which Blender sculpt each floating isle
+// is (the Breath kit's Kit_WindIsleA and B), its bob in the wind, its ring
+// of wind runes, its drifting stones,
 // the Gale Path's and the Homeward Gale's circles and the route of wind each
 // draws to where it carries, a rider's ribbons, the Gale Bulwark round the
 // guardian and the Gale Mender's stream into it, read off the sim's own
@@ -12,7 +12,7 @@
 // Mender's stream draw on EVERY tier (the raid acts on them); the drifting
 // stones, the mist and the motes thin on the low tier.
 
-import { BREATH_ISLES, SMITH_HEART_FIELD } from '../../sim/content/smith_heart_layout';
+import { BREATH_ISLES } from '../../sim/content/smith_heart_layout';
 import { isleSpots, rideArc } from '../../sim/encounters/smith_heart/breath_isle_geometry';
 import {
   ISLE_OBJECTS,
@@ -20,7 +20,6 @@ import {
   isleCircleOf,
   rideOf,
 } from '../../sim/encounters/smith_heart/breath_isle_ids';
-import { authoredFieldSurfaceAt } from '../../sim/instances/authored_field';
 
 /** The palette: the vein's storm teal and white for the wind, a pale gold
  *  for the way home, the crystals' cold blue, the granite's warm grey. */
@@ -57,6 +56,8 @@ export const ISLE_RGB = {
   ribbon: rgb(ISLE_COLORS.ribbon),
   bulwarkEdge: rgb(ISLE_COLORS.bulwarkEdge),
   dust: rgb(0xd6dde2),
+  mendCore: rgb(0xd8fff2),
+  path: rgb(ISLE_COLORS.path),
 } as const;
 
 /** Pool sizes (fixed: no allocation in a fight). */
@@ -87,245 +88,47 @@ export function isleObjectKind(templateId: string): IsleObjectKind | null {
   return c ? c.kind : null;
 }
 
-// ---- the rock --------------------------------------------------------------------------
+// ---- the isles ------------------------------------------------------------------------
 
-/** One isle's rock mesh, instance-local: its top (a carved disc at the
- *  floor's own outline, so what you see is what you stand on), a broken lip
- *  just under it, then the underside hanging to a jagged point, banded in
- *  strata. Vertex colours; triangle lists. */
-export interface IsleRock {
-  positions: number[];
-  colors: number[];
-  indices: number[];
-}
-
-const RING = 40;
-
-/** Push an rgb mix of `a` and `b` (k 0..1). */
-function mixHex(a: number, b: number, k: number, out: number[]): void {
-  const t = Math.max(0, Math.min(1, k));
-  out.push(
-    (((a >> 16) & 255) * (1 - t) + ((b >> 16) & 255) * t) / 255,
-    (((a >> 8) & 255) * (1 - t) + ((b >> 8) & 255) * t) / 255,
-    ((a & 255) * (1 - t) + (b & 255) * t) / 255,
-  );
-}
-
-/** The isle's outline radius at angle step `k`: the field's own carved
- *  floor's edge along that bearing (marched), a hand inside it, so the rock
- *  drawn never overhangs the walkable edge. Cached per isle. */
-const rimCache = new Map<number, number[]>();
-export function isleRimRadius(i: number, k: number): number {
-  let radii = rimCache.get(i);
-  if (!radii) {
-    const isle = BREATH_ISLES[i];
-    radii = [];
-    for (let s = 0; s < RING; s++) {
-      const a = (s / RING) * Math.PI * 2;
-      let edge = 0;
-      for (let d = 0; d <= isle.r + 1; d += 0.1) {
-        const id = authoredFieldSurfaceAt(
-          SMITH_HEART_FIELD,
-          isle.x + Math.sin(a) * d,
-          isle.z + Math.cos(a) * d,
-        )?.id;
-        if (id !== isle.id) break;
-        edge = d;
-      }
-      radii.push(Math.max(1, edge - 0.3));
-    }
-    rimCache.set(i, radii);
-  }
-  return radii[((k % RING) + RING) % RING];
-}
+/** Each isle's Blender sculpt in the Breath kit (docs/design/raid/kit/
+ *  breath_pieces.py wind_isle: the walk flat at its origin out past the sim's
+ *  rim, the craggy lip, the wind-rune stones, the crag hanging under it with
+ *  roots, vines, crystal and a broken stone chain), its turn (three's
+ *  rotation.y) and how deep its crag hangs under the floor (yards, its
+ *  crystal point past that). */
+export const ISLE_KIT: readonly { piece: string; rot: number; depth: number }[] = [
+  { piece: 'Kit_WindIsleA', rot: 0.6, depth: 21 },
+  { piece: 'Kit_WindIsleB', rot: 2.4, depth: 18 },
+];
+/** The stone that drifts round the isles (the kit's Kit_IsleShard). */
+export const ISLE_SHARD = 'Kit_IsleShard';
 
 /** How deep an isle hangs under its floor (yards). */
 export function isleDepth(i: number): number {
-  return BREATH_ISLES[i].r * 2.6;
+  return ISLE_KIT[i % ISLE_KIT.length].depth;
 }
 
-export function isleRock(i: number): IsleRock {
-  const isle = BREATH_ISLES[i];
-  const C = ISLE_COLORS;
-  const positions: number[] = [];
-  const colors: number[] = [];
-  const indices: number[] = [];
-  const cx = isle.x;
-  const cz = isle.z;
-  const top = isle.h;
-  // The top: the floor you stand on, three rings deep (so its paint can
-  // vary): worn granite, moss in its hollows, pale scoured streaks.
-  positions.push(cx, top + 0.02, cz);
-  mixHex(C.granite, C.moss, 0.25, colors);
-  const topRings = [0.34, 0.68, 1];
-  for (const f of topRings) {
-    for (let k = 0; k < RING; k++) {
-      const a = (k / RING) * Math.PI * 2;
-      const r = isleRimRadius(i, k) * f;
-      positions.push(cx + Math.sin(a) * r, top - (f === 1 ? 0.06 : 0), cz + Math.cos(a) * r);
-      const moss = isleHash(k * 3 + Math.round(f * 10), 5 + i);
-      const streak = isleHash(k, 17 + Math.round(f * 7));
-      const tmp: number[] = [];
-      mixHex(
-        C.granite,
-        moss > 0.72 ? C.moss : C.graniteLight,
-        moss > 0.72 ? 0.7 : streak * 0.6,
-        tmp,
-      );
-      colors.push(tmp[0], tmp[1], tmp[2]);
-    }
-  }
-  for (let k = 0; k < RING; k++) indices.push(0, 1 + k, 1 + ((k + 1) % RING));
-  for (let ring = 1; ring < topRings.length; ring++) {
-    const a0 = 1 + (ring - 1) * RING;
-    const b0 = 1 + ring * RING;
-    for (let k = 0; k < RING; k++) {
-      const k1 = (k + 1) % RING;
-      indices.push(a0 + k, b0 + k, a0 + k1, a0 + k1, b0 + k, b0 + k1);
-    }
-  }
-  // The underside: a lip that swells out just under the floor's edge, then
-  // the mass hanging in lumps and strata, tapering to a jagged point.
-  const depth = isleDepth(i);
-  const rings = 14;
-  let prev = 1 + (topRings.length - 1) * RING;
-  for (let j = 1; j <= rings; j++) {
-    const t = j / rings;
-    const base = positions.length / 3;
-    for (let k = 0; k < RING; k++) {
-      const a = (k / RING) * Math.PI * 2 + (j % 2) * 0.04;
-      const lip = j === 1 ? 1.07 : j === 2 ? 1.03 : 1;
-      const taper = (1 - t) ** 1.05 * (1 + 0.22 * Math.sin(t * Math.PI * 0.9));
-      // Lumps: a few big bulges round it, plus a fine jag.
-      const lump = 0.16 * Math.sin(a * 3 + i * 2.3 + t * 4) + 0.1 * Math.sin(a * 7 - t * 9);
-      const jag = 1 + lump + (isleHash(k * 7 + j, 31 + i) - 0.5) * (0.12 + 0.3 * t);
-      const r = Math.max(0.15, isleRimRadius(i, k) * taper * jag * lip);
-      const y = top - 0.3 - depth * t ** 1.15 - isleHash(k + j * 3, 47 + i) * 0.9 * t;
-      positions.push(cx + Math.sin(a) * r, y, cz + Math.cos(a) * r);
-      // Strata: bands of warmer and darker stone, darkening to the point.
-      const band = Math.sin(y * 1.9 + isleHash(j, 3 + i) * 3) * 0.5 + 0.5;
-      const tmp: number[] = [];
-      mixHex(C.granite, C.strata, 0.25 + band * 0.55, tmp);
-      const dark = Math.min(0.92, 0.18 + 0.85 * t);
-      const d = [
-        (C.graniteDark >> 16) / 255,
-        ((C.graniteDark >> 8) & 255) / 255,
-        (C.graniteDark & 255) / 255,
-      ];
-      colors.push(
-        tmp[0] * (1 - dark) + d[0] * dark,
-        tmp[1] * (1 - dark) + d[1] * dark,
-        tmp[2] * (1 - dark) + d[2] * dark,
-      );
-    }
-    for (let k = 0; k < RING; k++) {
-      const a0 = prev + k;
-      const a1 = prev + ((k + 1) % RING);
-      const b0 = base + k;
-      const b1 = base + ((k + 1) % RING);
-      indices.push(a0, b0, a1, a1, b0, b1);
-    }
-    prev = base;
-  }
-  // The point.
-  const tip = positions.length / 3;
-  positions.push(
-    cx + (isleHash(i, 9) - 0.5) * 2,
-    top - depth - 3,
-    cz + (isleHash(i, 11) - 0.5) * 2,
-  );
-  mixHex(C.graniteDark, 0x000000, 0.4, colors);
-  for (let k = 0; k < RING; k++) indices.push(prev + k, tip, prev + ((k + 1) % RING));
-  return { positions, colors, indices };
-}
+/** The isles ride the wind: a slow bob and sway while nothing stands on
+ *  them, eased all but still (`held`, under a body's notice) while the
+ *  round is on (the sim's floor never moves, so a body never sinks). */
+export const ISLE_BOB = { free: 0.3, held: 0.03, period: 7.2, tilt: 0.012 } as const;
 
-/** The isle's crystal clusters: storm-blue shards growing out of its
- *  underside and two at its rim. Each: a base (instance-local), a lean
- *  (unit direction) and a length and girth. */
-export interface IsleCrystal {
-  x: number;
-  y: number;
-  z: number;
-  dx: number;
-  dy: number;
-  dz: number;
-  len: number;
-  girth: number;
-}
-
-export function isleCrystals(i: number): IsleCrystal[] {
-  const isle = BREATH_ISLES[i];
-  const out: IsleCrystal[] = [];
-  const depth = isleDepth(i);
-  for (let c = 0; c < 7; c++) {
-    const a = isleHash(c, 101 + i) * Math.PI * 2;
-    const t = 0.15 + isleHash(c, 103 + i) * 0.55;
-    const r = isle.r * (1 - t) * 0.92;
-    const y = isle.h - 0.6 - depth * t;
-    // Pointing out and down from the stone.
-    const ox = Math.sin(a);
-    const oz = Math.cos(a);
-    const down = -0.35 - isleHash(c, 107) * 0.5;
-    const n = Math.hypot(ox, down, oz);
-    const cluster = 2 + Math.floor(isleHash(c, 109) * 3);
-    for (let s = 0; s < cluster; s++) {
-      const jx = (isleHash(c * 5 + s, 111) - 0.5) * 0.7;
-      const jz = (isleHash(c * 5 + s, 113) - 0.5) * 0.7;
-      const len = 2.2 + isleHash(c * 5 + s, 117) * 3.6 * (s === 0 ? 1.3 : 0.8);
-      out.push({
-        x: isle.x + ox * r,
-        y,
-        z: isle.z + oz * r,
-        dx: ox / n + jx,
-        dy: down / n + (isleHash(c * 5 + s, 119) - 0.5) * 0.4,
-        dz: oz / n + jz,
-        len,
-        girth: 0.16 + len * 0.07,
-      });
-    }
-  }
-  // Two short clusters on the rim, leaning out (they sparkle in the wind).
-  for (let c = 0; c < 2; c++) {
-    const a = isleHash(c, 131 + i) * Math.PI * 2;
-    const r = isle.r - 1.2;
-    out.push({
-      x: isle.x + Math.sin(a) * r,
-      y: isle.h - 0.2,
-      z: isle.z + Math.cos(a) * r,
-      dx: Math.sin(a) * 0.6,
-      dy: 0.8,
-      dz: Math.cos(a) * 0.6,
-      len: 1.6 + isleHash(c, 137) * 1.2,
-      girth: 0.2,
-    });
-  }
-  return out;
-}
-
-/** The isle's hanging roots: each a dangling curve from the underside (a
- *  list of points), swaying in the wind (the painter sways the whole set). */
-export function isleRoots(i: number): { x: number; y: number; z: number }[][] {
-  const isle = BREATH_ISLES[i];
-  const out: { x: number; y: number; z: number }[][] = [];
-  const depth = isleDepth(i);
-  for (let c = 0; c < 11; c++) {
-    const a = isleHash(c, 151 + i) * Math.PI * 2;
-    const t = 0.05 + isleHash(c, 153 + i) * 0.4;
-    const r = isle.r * (1 - t) * 0.95;
-    const y0 = isle.h - 0.8 - depth * t;
-    const len = 4 + isleHash(c, 157) * 9;
-    const pts: { x: number; y: number; z: number }[] = [];
-    const curl = (isleHash(c, 159) - 0.5) * 2.4;
-    for (let s = 0; s <= 6; s++) {
-      const k = s / 6;
-      pts.push({
-        x: isle.x + Math.sin(a) * (r + k * 0.8) + Math.cos(a) * curl * k * k,
-        y: y0 - len * k,
-        z: isle.z + Math.cos(a) * (r + k * 0.8) - Math.sin(a) * curl * k * k,
-      });
-    }
-    out.push(pts);
-  }
+/** An isle's bob `t` seconds in: its lift (yards) and its tilt (radians
+ *  round x and z). `calm` 0 (free) to 1 (held). Fills `out`. */
+export function isleBob(
+  i: number,
+  t: number,
+  calm: number,
+  out: { y: number; rx: number; rz: number } = { y: 0, rx: 0, rz: 0 },
+): { y: number; rx: number; rz: number } {
+  const k = Math.max(0, Math.min(1, calm));
+  const amp = ISLE_BOB.free + (ISLE_BOB.held - ISLE_BOB.free) * k;
+  const w = (Math.PI * 2) / ISLE_BOB.period;
+  const ph = i * 2.3;
+  out.y = amp * Math.sin(t * w + ph) + amp * 0.35 * Math.sin(t * w * 2.7 + ph * 1.7);
+  const lean = ISLE_BOB.tilt * (1 - k);
+  out.rx = lean * Math.sin(t * w * 0.8 + ph + 1.1);
+  out.rz = lean * Math.cos(t * w * 0.65 + ph);
   return out;
 }
 
@@ -351,14 +154,17 @@ export function driftStone(
   },
 ): { x: number; y: number; z: number; spin: number; size: number } {
   const isle = BREATH_ISLES[i];
+  // Round the isle in the open air, from a little over its walk down its
+  // crag's flanks, never inside the rock (the crag narrows as it hangs).
   const a = isleHash(k, 171 + i) * Math.PI * 2 + t * (0.08 + isleHash(k, 173) * 0.12);
-  const r = isle.r * (0.6 + isleHash(k, 175) * 0.9);
-  const y = isle.h - 3 - isleHash(k, 177) * isle.r * 2 + Math.sin(t * 0.7 + k) * 0.6;
+  const down = isleHash(k, 177);
+  const r = isle.r * (1.4 + isleHash(k, 175) * 0.7) * (1 - down * 0.35);
+  const y = isle.h + 2 - down * isleDepth(i) * 0.75 + Math.sin(t * 0.7 + k) * 0.6;
   out.x = isle.x + Math.sin(a) * r;
   out.y = y;
   out.z = isle.z + Math.cos(a) * r;
   out.spin = t * (0.3 + isleHash(k, 179));
-  out.size = 0.5 + isleHash(k, 181) * 1.1;
+  out.size = 0.35 + isleHash(k, 181) * 0.65;
   return out;
 }
 
@@ -421,3 +227,95 @@ export function riderLook(k: number): { wrap: number; bright: number } {
 
 /** The ride's seconds and arc apex, read once (the painter's guards). */
 export const RIDE = { seconds: IT.rideSeconds, apex: IT.rideApex, circleR: IT.circleR } as const;
+
+// ---- the Bulwark's vortex (the third pass) -------------------------------------------
+
+/** The Gale Bulwark's vortex: three bands of wind round the guardian (the
+ *  foot, the waist, the crown; heights and radii in shell radii), each
+ *  turning its own way at its own slant. A band's `over` is the share of
+ *  the shell below which it peels away: the crown goes first (under two
+ *  thirds), then the waist (under a third); the foot holds to the end, so
+ *  the shell's strength reads at a glance. */
+export const BULWARK_BANDS: readonly {
+  y0: number;
+  y1: number;
+  r0: number;
+  r1: number;
+  spin: number;
+  slant: number;
+  over: number;
+}[] = [
+  { y0: 0, y1: 0.75, r0: 1.3, r1: 1.15, spin: 1.5, slant: 1.6, over: 0 },
+  { y0: 0.45, y1: 1.3, r0: 1.18, r1: 0.98, spin: -2.1, slant: -2.4, over: 1 / 3 },
+  { y0: 1.05, y1: 1.8, r0: 1.0, r1: 0.4, spin: 2.8, slant: 3, over: 2 / 3 },
+];
+
+/** A band's life (0 gone, 1 whole) at the shell's charge `k` (0..1). */
+export function bulwarkBandLife(k: number, over: number): number {
+  const c = Math.max(0, Math.min(1, k));
+  if (over <= 0) return 0.45 + 0.55 * c;
+  return Math.max(0, Math.min(1, (c - over) / 0.1));
+}
+
+/** The stones orbiting in the vortex: the most there are, and how many the
+ *  charge `k` keeps (fewer as it thins; the low tier a half). */
+export const BULWARK_DEBRIS = 16;
+export function bulwarkDebrisCount(k: number, density: number): number {
+  const c = Math.max(0, Math.min(1, k));
+  const n = Math.round(BULWARK_DEBRIS * (0.2 + 0.8 * c));
+  return density < 0.5 ? Math.ceil(n / 2) : n;
+}
+
+/** Orbiting stone `j` at `t` seconds, the charge `k`: its place in shell
+ *  radii round the guardian's foot (x, y, z) and its spin; faster and
+ *  tighter while the shell is whole. Fills `out`. */
+export function bulwarkDebris(
+  j: number,
+  t: number,
+  k: number,
+  out: { x: number; y: number; z: number; spin: number; size: number },
+): { x: number; y: number; z: number; spin: number; size: number } {
+  const c = Math.max(0, Math.min(1, k));
+  const a = isleHash(j, 601) * Math.PI * 2 + t * (0.9 + isleHash(j, 603) * 0.8) * (0.45 + 0.55 * c);
+  const r = 1.22 + isleHash(j, 605) * 0.3 + (1 - c) * 0.15;
+  out.x = Math.sin(a) * r;
+  out.z = Math.cos(a) * r;
+  out.y = 0.15 + isleHash(j, 607) * 1.45 + Math.sin(t * 1.3 + j) * 0.08;
+  out.spin = t * (1 + isleHash(j, 609) * 2);
+  out.size = 0.06 + isleHash(j, 611) * 0.08;
+  return out;
+}
+
+/** Seconds a cut Mending Gale takes to part and fade. */
+export const BEAM_CUT_SECONDS = 0.7;
+
+/** A Mending Gale cut `since` seconds ago: the gap at its middle (0..1) and
+ *  what is left of its light. */
+export function beamCutLook(since: number): { cut: number; glow: number } {
+  const t = Math.max(0, since);
+  return {
+    cut: Math.min(1, (t / (BEAM_CUT_SECONDS * 0.7)) ** 0.6),
+    glow: Math.max(0, 1 - t / BEAM_CUT_SECONDS),
+  };
+}
+
+// ---- the ride (the third pass) -------------------------------------------------------
+
+/** Seconds the Gale Path's launch funnel spins up and thins away. */
+export const FUNNEL_SECONDS = 1.1;
+
+/** The launch funnel `age` seconds in: its height (yards), its spread (a
+ *  scale on its radius) and its life (0..1). */
+export function funnelLook(age: number): { h: number; spread: number; life: number } {
+  const t = Math.max(0, Math.min(1, age / FUNNEL_SECONDS));
+  const ease = 1 - (1 - t) ** 3;
+  return {
+    h: 5 + 15 * ease,
+    spread: 0.8 + 1.1 * ease,
+    life: t < 0.12 ? t / 0.12 : Math.max(0, 1 - (t - 0.12) / 0.88),
+  };
+}
+
+/** A rider's trail: how many past places it keeps, and how far apart in
+ *  time (seconds). */
+export const RIDE_TRAIL = { points: 26, every: 0.045 } as const;

@@ -182,3 +182,87 @@ void main() {
   #include <colorspace_fragment>
 }
 `;
+
+/** A band of the Gale Bulwark's vortex (an open lathe round the guardian):
+ *  wind streaks wheeling round it at its own speed and slant, grit carried
+ *  in them, soft at its top and foot, its life (uLive) fading it out as the
+ *  shell thins (a band peels away). vUv.x round, vUv.y up. */
+export const BULWARK_BAND_FRAG = /* glsl */ `
+uniform float uTime;
+uniform vec3 uColor;
+uniform vec3 uEdge;
+uniform float uLive;
+uniform float uSpin;
+uniform float uSlant;
+uniform float uFlash;
+varying vec2 vUv;
+${NOISE}
+void main() {
+  float x = vUv.x * 7.0 + vUv.y * uSlant - uTime * uSpin;
+  float streak = smoothstep(0.5, 0.95, inoise(vec2(x * 2.4, vUv.y * 3.0 - uTime * 0.6)));
+  float fine = smoothstep(0.7, 1.0, inoise(vec2(x * 9.0, vUv.y * 11.0)));
+  float grit = step(0.93, ih(floor(vec2(x * 14.0, vUv.y * 9.0)))) * 0.8;
+  // Thick ropes of wind (a few broad bands of streaks, gaps between them:
+  // the shell reads as wind wheeling round, never a bubble).
+  float rope = smoothstep(0.35, 0.75, sin(x * 3.14159 * 0.9) * 0.5 + 0.5);
+  float body = 0.12 + 0.18 * inoise(vec2(x * 0.8, vUv.y * 2.0 + uTime * 0.3));
+  float ends = smoothstep(0.0, 0.2, vUv.y) * (1.0 - smoothstep(0.72, 1.0, vUv.y));
+  float k = (body + rope * (0.5 + streak * 1.2) + fine * 0.4 + grit) * ends * uLive
+          + uFlash * ends * 0.8;
+  vec3 col = mix(uColor, uEdge, clamp(streak * 0.7 + fine * 0.4 + grit + uFlash, 0.0, 1.0));
+  gl_FragColor = vec4(col * (1.0 + 0.4 * k), clamp(k, 0.0, 1.0));
+  #include <colorspace_fragment>
+}
+`;
+
+/** A Gale Mender's healing beam: a bright braided core and a soft sheath,
+ *  pulses racing from the Mender (vUv.x 0) into the shell (1); cut (uCut 0
+ *  to 1) it parts at its middle, both ends whipping back and fading. */
+export const MEND_BEAM_FRAG = /* glsl */ `
+uniform float uTime;
+uniform vec3 uColor;
+uniform vec3 uCore;
+uniform float uGlow;
+uniform float uCut;
+uniform float uSheath;
+varying vec2 vUv;
+${NOISE}
+void main() {
+  float across = abs(vUv.y * 2.0 - 1.0);
+  float braid = abs(sin(vUv.x * 46.0 - uTime * 14.0)) * 0.5 + 0.5;
+  float core = 1.0 - smoothstep(0.0, mix(0.22, 0.42, braid), across);
+  float sheath = (1.0 - smoothstep(0.2, 1.0, across)) * uSheath;
+  float pulse = smoothstep(0.75, 1.0, fract(vUv.x * 5.0 - uTime * 2.6));
+  float grain = 0.75 + 0.25 * inoise(vec2(vUv.x * 30.0 - uTime * 9.0, vUv.y * 4.0));
+  float ends = smoothstep(0.0, 0.03, vUv.x) * (1.0 - smoothstep(0.97, 1.0, vUv.x));
+  // The cut: a gap opening from the middle, its torn ends flickering.
+  float gap = abs(vUv.x - 0.5) - uCut * 0.5;
+  float torn = smoothstep(-0.01, 0.06, gap);
+  float tear = (1.0 - smoothstep(0.0, 0.05, abs(gap))) * step(0.001, uCut) * (0.6 + 0.4 * sin(uTime * 40.0));
+  float k = ((core * (1.2 + pulse * 1.6) + sheath * 0.45) * grain * ends * torn + tear * 1.5) * uGlow;
+  vec3 col = mix(uColor, uCore, clamp(core * 0.8 + pulse * core, 0.0, 1.0));
+  gl_FragColor = vec4(col * (1.0 + 0.5 * k), clamp(k, 0.0, 1.0));
+  #include <colorspace_fragment>
+}
+`;
+
+/** The Gale Path's launch: a funnel of wind spinning up out of the circle
+ *  (an open cone, wide at its top), streaks twisting up it, flaring and
+ *  thinning away. vUv.x round, vUv.y up. */
+export const FUNNEL_FRAG = /* glsl */ `
+uniform float uTime;
+uniform vec3 uColor;
+uniform vec3 uCore;
+uniform float uLife;
+varying vec2 vUv;
+${NOISE}
+void main() {
+  float x = vUv.x * 5.0 + vUv.y * 3.4 - uTime * 3.2;
+  float streak = smoothstep(0.45, 0.95, inoise(vec2(x * 2.6, vUv.y * 5.0 - uTime * 4.0)));
+  float ends = smoothstep(0.0, 0.1, vUv.y) * (1.0 - smoothstep(0.55, 1.0, vUv.y));
+  float k = (0.2 + streak * 1.3) * ends * uLife;
+  vec3 col = mix(uColor, uCore, streak);
+  gl_FragColor = vec4(col * (1.0 + 0.5 * k), clamp(k, 0.0, 1.0));
+  #include <colorspace_fragment>
+}
+`;
