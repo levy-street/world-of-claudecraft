@@ -9,6 +9,7 @@ import { claimedInstanceAt, enterDungeon } from '../../src/sim/instances/dungeon
 import { Sim } from '../../src/sim/sim';
 import type { Entity } from '../../src/sim/types';
 import type { Fight } from './bastion_fight';
+import { atDungeonLevel } from './dungeon_level';
 
 export * from './bastion_fight';
 
@@ -29,6 +30,7 @@ export function cryptFight(
     ids.push(pid);
   }
   sim.chat(`/dev crypt enter ${difficulty}`, tank.id);
+  atDungeonLevel(sim, ids);
   for (const pid of ids) enterDungeon(sim.ctx, 'hollow_crypt', pid);
   const inst = claimedInstanceAt(sim.ctx, tank.pos);
   if (!inst) throw new Error('no crypt claim');

@@ -34,6 +34,7 @@ import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
 import { DT, type Entity, NYTHRAXIS_BOSS_ID, type SimEvent } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
+import { atDungeonLevel } from './helpers/dungeon_level';
 import { EMPTY_TEST_WORLD } from './sim_shared';
 
 type AnySim = Sim & Record<string, any>;
@@ -68,6 +69,7 @@ function setup(opts: { difficulty?: 'normal' | 'heroic'; phase?: 1 | 2 } = {}) {
     raiderPids.push(pid);
   }
   sim.convertPartyToRaid(tankPid);
+  atDungeonLevel(sim);
   if (difficulty === 'heroic') sim.setDungeonDifficulty('heroic', tankPid);
   sim.enterDungeon('nythraxis_boss_arena', tankPid);
   const tank = sim.entities.get(tankPid) as AnyEntity;

@@ -31,6 +31,7 @@ import type { InstanceSlot } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import { DT, type Entity, IGNIVAR_BOSS_ID } from '../src/sim/types';
 import { localizeSimText } from '../src/ui/sim_i18n';
+import { atDungeonLevel } from './helpers/dungeon_level';
 
 const KEEP_DOOR_POS = { x: 503.05, z: 2243.7 };
 const APPROACH_LEAVE_Z = KEEP_DOOR_POS.z - 6.5;
@@ -38,7 +39,9 @@ const EASTBROOK_POS = { x: -24, z: -114 };
 const SEAL_DENIAL = 'The forge doors hold fast while the battle rages.';
 
 function makeSim(): Sim {
-  return new Sim({ seed: 42, playerClass: 'warrior', devCommands: true });
+  const sim = new Sim({ seed: 42, playerClass: 'warrior', devCommands: true });
+  atDungeonLevel(sim);
+  return sim;
 }
 
 function claimChain(sim: Sim, rooms: readonly string[]): void {

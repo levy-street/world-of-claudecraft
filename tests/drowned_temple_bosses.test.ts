@@ -38,6 +38,7 @@ import { claimedInstanceAt, enterDungeon } from '../src/sim/instances/dungeons';
 import type { InstanceSlot } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import { DT, type Entity } from '../src/sim/types';
+import { atDungeonLevel } from './helpers/dungeon_level';
 
 interface Fight {
   sim: Sim;
@@ -69,6 +70,7 @@ function fight(difficulty: 'normal' | 'heroic' = 'normal', extra = 2): Fight {
     ids.push(pid);
   }
   sim.chat(`/dev temple enter ${difficulty}`, tank.id);
+  atDungeonLevel(sim, ids);
   for (const pid of ids) enterDungeon(sim.ctx, 'drowned_temple', pid);
   const inst = claimedInstanceAt(sim.ctx, tank.pos);
   if (!inst) throw new Error('no temple claim');

@@ -23,6 +23,7 @@ import {
 } from '../src/sim/mob/chain_pull_transit';
 import { type InstanceSlot, Sim } from '../src/sim/sim';
 import { DUNGEON_LEASH_DISTANCE, dist2d, type Entity, type WorldContent } from '../src/sim/types';
+import { atDungeonLevel } from './helpers/dungeon_level';
 
 const WILDHEART_TEST_WORLD: WorldContent = {
   ...BUILTIN_WORLD,
@@ -46,6 +47,7 @@ interface Claimed {
 function claim(dungeonId: string, finalBossId: string): Claimed {
   const sim = makeSim();
   const pid = sim.addPlayer('warrior', 'Alpha');
+  atDungeonLevel(sim);
   expect(enterDungeon(sim.ctx, dungeonId, pid)).toBe(true);
   const instance = sim.instances.find((c) => c.dungeonId === dungeonId && c.partyKey !== null);
   if (!instance) throw new Error(`${dungeonId} instance was not claimed`);

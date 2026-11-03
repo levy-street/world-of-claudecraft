@@ -2220,6 +2220,9 @@ export const ja_JP: EnTranslations = {
       "heroicName": "ヒロイック:{name}",
       "heroicLocked": "ヒロイックの{name}にロックされています。"
     },
+    "dungeonEntry": {
+      "levelRequired": "{name}に入るにはレベル{level}が必要です。"
+    },
     "practiceDps": {
       "title": "練習用ダミー",
       "liveDps": "{value} DPS",

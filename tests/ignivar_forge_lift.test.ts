@@ -14,10 +14,12 @@ import {
 } from '../src/sim/ignivar_raid_ids';
 import { enterDungeon, updateDoorTriggers } from '../src/sim/instances/dungeons';
 import { Sim } from '../src/sim/sim';
+import { atDungeonLevel } from './helpers/dungeon_level';
 
 function boardLift() {
   const sim = new Sim({ seed: 4711, playerClass: 'warrior', devCommands: true });
   const allyPid = sim.addPlayer('paladin', 'Lift Ally');
+  atDungeonLevel(sim);
   const raid = sim.ctx.formDungeonFinderGroup(
     [sim.player.id, allyPid].map((pid) => ({ partyId: null, leaderPid: pid, members: [pid] })),
     { raid: true },

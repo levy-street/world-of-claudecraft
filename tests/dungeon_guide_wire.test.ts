@@ -11,6 +11,7 @@ import { DUNGEONS, instanceOrigin } from '../src/sim/data';
 import { claimedInstanceAt, enterDungeon } from '../src/sim/instances/dungeons';
 import type { Entity } from '../src/sim/types';
 import { bareClient, broadcast, fakeWs, joinServer, lastSnap } from './helpers/bare_client';
+import { atDungeonLevel } from './helpers/dungeon_level';
 
 // biome-ignore lint/suspicious/noExplicitAny: the private dispatch seam (loot_roll_wire idiom)
 function sendCmd(server: GameServer, session: any, frame: Record<string, unknown>): void {
@@ -52,6 +53,7 @@ describe('the guide on the wire', () => {
     const server = new GameServer();
     const session = joinServer(server, fakeWs(), 802, 'Steplight');
     const sim = server.sim;
+    atDungeonLevel(sim, [session.pid]);
     enterDungeon(sim.ctx, 'drowned_temple', session.pid);
     const me = sim.entities.get(session.pid) as Entity;
     const inst = claimedInstanceAt(sim.ctx, me.pos);
@@ -74,6 +76,7 @@ describe('the guide on the wire', () => {
     const watcher = fakeWs();
     const session = joinServer(server, watcher, 804, 'Watcher');
     const sim = server.sim;
+    atDungeonLevel(sim, [session.pid]);
     enterDungeon(sim.ctx, 'drowned_temple', session.pid);
     const me = sim.entities.get(session.pid) as Entity;
     const inst = claimedInstanceAt(sim.ctx, me.pos);

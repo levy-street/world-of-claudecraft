@@ -15,6 +15,7 @@ import {
   INSTANCE_EMPTY_TIMEOUT,
   type SimEvent,
 } from '../src/sim/types';
+import { atDungeonLevel } from './helpers/dungeon_level';
 
 function welcomeEvents(events: SimEvent[], text: string) {
   return events.filter(
@@ -43,6 +44,7 @@ describe('Ignivar room welcome', () => {
     });
     const leaderId = sim.addPlayer('warrior', 'Firstember');
     const laterId = sim.addPlayer('mage', 'Laterember');
+    atDungeonLevel(sim);
     sim.partyInvite(laterId, leaderId);
     sim.partyAccept(laterId);
     // Claim the Halls first: the arena's exit portal routes back to them (the
@@ -119,6 +121,7 @@ describe('Ignivar room welcome', () => {
       devCommands: true,
     });
     const pid = sim.addPlayer('warrior', 'Freshclaim', { characterId: 4274 });
+    atDungeonLevel(sim);
     // The Halls claim keeps the arena's floor-chain exit routable below.
     expect(enterDungeon(sim.ctx, IGNIVAR_FORGE_APPROACH_ID, pid, true)).toBe(true);
     expect(enterDungeon(sim.ctx, IGNIVAR_RAID_ARENA_ID, pid, true)).toBe(true);

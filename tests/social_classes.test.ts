@@ -15,6 +15,7 @@ import {
 } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import { ALL_CLASSES, MAX_LEVEL, type WorldContent } from '../src/sim/types';
+import { atDungeonLevel } from './helpers/dungeon_level';
 import { face, makeWorld, mustEntity, nearestMob, teleport } from './social_shared';
 
 // Most of this file's Sim instances never touch ambient world content at all (kit/stat
@@ -303,6 +304,7 @@ describe('elite mobs', () => {
   it('elites scale like vanilla elites (~2.3x hp, 1.5x damage, 2x xp)', () => {
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'Tank');
+    atDungeonLevel(sim, [pid]);
     sim.enterCrypt(pid);
     const origin = instanceOrigin(0, 0);
     // The Ossuary Warrior is the rework's plain melee crypt elite, the role

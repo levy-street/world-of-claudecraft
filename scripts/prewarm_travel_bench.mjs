@@ -317,6 +317,8 @@ async function run() {
       await setLabel(page, label);
       const entered = await page.evaluate((id) => {
         try {
+          // Clear every door's level floor (dungeon_entry_levels.ts).
+          window.__game.sim.setPlayerLevel(20);
           window.__game.sim.enterDungeon(id);
           return true;
         } catch (e) {

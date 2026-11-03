@@ -72,6 +72,7 @@ import {
   VARKHUL_SHARED_PYRE_CAST_SECONDS,
   VARKHUL_SHARED_PYRE_NAME,
 } from '../src/sim/varkhul_shared_pyre';
+import { atDungeonLevel } from './helpers/dungeon_level';
 
 function claimedEncounter(seed = 42): { sim: Sim; boss: Entity } {
   const sim = new Sim({ seed, playerClass: 'warrior', devCommands: true });
@@ -1556,6 +1557,8 @@ describe('Varkhul encounter behavior', () => {
     // first; the assembly claim gives the crucible's floor-chain exit a live
     // room to route to, and stepping back in takes its real portal out.
     boss.inCombat = false;
+    // The floor-chain exit re-enters the assembly without the dev bypass.
+    atDungeonLevel(sim);
     expect(enterDungeon(sim.ctx, IGNIVAR_MOLTEN_ASSEMBLY_ID, sim.player.id, true)).toBe(true);
     expect(enterDungeon(sim.ctx, IGNIVAR_SECOND_WING_ID, sim.player.id, true)).toBe(true);
     expect(leaveDungeon(sim.ctx, sim.player.id)).toBe(true);

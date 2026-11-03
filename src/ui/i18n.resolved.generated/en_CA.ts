@@ -2220,6 +2220,9 @@ export const en_CA: EnTranslations = {
       "heroicName": "Heroic {name}",
       "heroicLocked": "You are locked to Heroic {name}."
     },
+    "dungeonEntry": {
+      "levelRequired": "You must be level {level} to enter {name}."
+    },
     "practiceDps": {
       "title": "Practice Dummy",
       "liveDps": "{value} DPS",

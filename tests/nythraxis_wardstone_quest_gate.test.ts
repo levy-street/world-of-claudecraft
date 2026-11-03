@@ -14,6 +14,7 @@ import { BUILTIN_WORLD, DUNGEONS, ITEMS, instanceOrigin, QUESTS } from '../src/s
 import { isQuestGatedGroundObjectHidden } from '../src/sim/quest_gated_entity';
 import { Sim } from '../src/sim/sim';
 import { dist2d, type Entity, type WorldContent } from '../src/sim/types';
+import { atDungeonLevel } from './helpers/dungeon_level';
 
 const WARD_ITEM_ID = 'bastion_ward_stone';
 const BASTION_QUEST_ID = 'q_bastion_door';
@@ -31,6 +32,7 @@ function enterRaid(sim: Sim, pid: number) {
     sim.partyInvite(fill, pid);
     sim.partyAccept(fill);
   }
+  atDungeonLevel(sim);
   sim.convertPartyToRaid(pid);
   sim.enterDungeon('nythraxis_boss_arena', pid);
   const p = sim.entities.get(pid)!;

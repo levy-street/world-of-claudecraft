@@ -28,6 +28,7 @@ import type { SimContext } from '../src/sim/sim_context';
 import type { Entity } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 import { localizeSimText } from '../src/ui/sim_i18n';
+import { atDungeonLevel } from './helpers/dungeon_level';
 
 // The keep tower door on Forgefather's Isle: the raid's one overworld entrance.
 const DOOR_POS = { x: 503.05, z: 2243.7 };
@@ -42,7 +43,9 @@ function placeAt(sim: Sim, pid: number, x: number, z: number): void {
   p.prevPos = { ...p.pos };
 }
 
+// The raid forms at the door level floor: fixture characters join at level 1.
 function formTestRaid(sim: Sim, pids: number[]): void {
+  atDungeonLevel(sim, pids);
   const raid = sim.ctx.formDungeonFinderGroup(
     pids.map((pid) => ({ partyId: null, leaderPid: pid, members: [pid] })),
     { raid: true },
@@ -186,6 +189,7 @@ describe('ignivar raid entry: checkpoint redirect', () => {
 
   it('an explicit backward portal never applies the outside checkpoint redirect', () => {
     const sim = new Sim({ seed: 42, playerClass: 'warrior', devCommands: true });
+    atDungeonLevel(sim);
     claimChainAndStepOutside(sim, sim.player.id, [
       IGNIVAR_LIFT_ROOM_ID,
       IGNIVAR_FORGE_APPROACH_ID,

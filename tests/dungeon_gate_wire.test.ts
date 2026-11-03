@@ -11,6 +11,7 @@ import { clearDungeonGateStateForTest } from '../src/sim/instances/dungeon_gate_
 import { enterDungeon } from '../src/sim/instances/dungeons';
 import { Sim } from '../src/sim/sim';
 import type { Entity, WorldContent } from '../src/sim/types';
+import { atDungeonLevel } from './helpers/dungeon_level';
 
 const WORLD: WorldContent = { ...BUILTIN_WORLD, camps: [], npcs: {}, groundObjects: [] };
 const SEED = 13;
@@ -64,6 +65,7 @@ describe('client dungeon gate mirror', () => {
   it('mirrors a live server claim: same walls from the same gate entities', () => {
     const sim = new Sim({ seed: SEED, playerClass: 'warrior', noPlayer: true, world: WORLD });
     const pid = sim.addPlayer('warrior', 'Mirror');
+    atDungeonLevel(sim, [pid]);
     expect(enterDungeon(sim.ctx, 'hollow_crypt', pid)).toBe(true);
     const inst = sim.ctx.instances.find((i) => i.dungeonId === 'hollow_crypt' && i.partyKey);
     if (!inst) throw new Error('no claim');

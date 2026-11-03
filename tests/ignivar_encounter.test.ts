@@ -113,6 +113,7 @@ import {
   type SimEvent,
 } from '../src/sim/types';
 import { VARKHUL_FORGE_PORTAL_ABILITY_ID } from '../src/sim/varkhul_forge_intermission';
+import { atDungeonLevel } from './helpers/dungeon_level';
 
 function claimedEncounter(seed = 42): {
   sim: Sim;
@@ -3112,6 +3113,8 @@ describe('Ignivar encounter', () => {
 
   it('removes encounter-owned player auras immediately when leaving the development raid', () => {
     const { sim, boss } = claimedEncounter();
+    // The arena's floor-chain exit routes through the Halls door, which has a level floor.
+    atDungeonLevel(sim);
     handAggroToStandInTank(sim, boss);
     updateIgnivarEncounter(sim.ctx, boss);
     if (!boss.ignivar) throw new Error('Ignivar state was not initialized');

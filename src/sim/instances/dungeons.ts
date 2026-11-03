@@ -82,6 +82,12 @@ import { retryPendingDifficultyChanges } from './difficulty_selection';
 import { dungeonReentryPoint } from './dungeon_checkpoints';
 import { nearestDungeonDoor } from './dungeon_door_selection';
 import { tickDungeonGates } from './dungeon_gates';
+import {
+  DUNGEON_LEVEL_DENIED_NOTICE_SECONDS,
+  dungeonLevelDeniedText,
+  dungeonLevelRequirement,
+  sameLevelFloorFamily,
+} from './dungeon_level_gate';
 import { applyDungeonSpawnMinibossTuning } from './dungeon_spawn_miniboss';
 import {
   IGNIVAR_ENTRY_DENIED_NOTICE_SECONDS,
@@ -446,6 +452,40 @@ export function enterDungeon(
       }
       return false;
     }
+  }
+  // The door level floor (content/dungeon_entry_levels.ts), a rule for
+  // entrants from OUTSIDE. A player standing inside a claim of this same room
+  // family is moving between its rooms (the Ignivar chain, its backtrack
+  // exits) and already passed its door; any other claim (the ungated
+  // Nythraxis crypt below the gated arena) is still outside. A ghost whose
+  // corpse lies in a live claim of this family is recovering its body, never
+  // starting a run, so the floor never strands a spirit outside its corpse.
+  // It judges the room asked for, before the Ignivar checkpoint redirect
+  // below; every Ignivar room shares one floor (pinned in
+  // tests/dungeon_level_gate.test.ts), so the redirect target answers the same.
+  const levelRequirement = dungeonLevelRequirement(dungeonId, r.e.level);
+  if (
+    levelRequirement !== null &&
+    !bypass &&
+    !ctx.instances.some(
+      (claim) =>
+        claim.partyKey !== null &&
+        sameLevelFloorFamily(claim.dungeonId, dungeonId) &&
+        instanceClaimContains(claim, r.e.pos),
+    ) &&
+    !(
+      r.e.ghost &&
+      r.e.corpseInstanceId != null &&
+      ctx.instances.some(
+        (i) => sameLevelFloorFamily(i.dungeonId, dungeonId) && i.exitId === r.e.corpseInstanceId,
+      )
+    )
+  ) {
+    if (ctx.time >= (r.e.dungeonLevelDeniedAt ?? -Infinity) + DUNGEON_LEVEL_DENIED_NOTICE_SECONDS) {
+      if (!options.preflightOnly) r.e.dungeonLevelDeniedAt = ctx.time;
+      deny(r.meta.entityId, dungeonLevelDeniedText(dungeon.name, levelRequirement));
+    }
+    return false;
   }
   const raidAllowed = RAID_ALLOWED_DUNGEON_IDS.has(dungeonId);
   const raidRequired = RAID_REQUIRED_DUNGEON_IDS.has(dungeonId);

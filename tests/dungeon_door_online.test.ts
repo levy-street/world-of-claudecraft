@@ -25,6 +25,7 @@ vi.mock('../server/db', () => ({
 
 import { GameServer } from '../server/game';
 import { createGroundObject } from '../src/sim/entity';
+import { atDungeonLevel } from './helpers/dungeon_level';
 
 describe('online dungeon door command', () => {
   it('uses the nearby matching door when another instance has the same destination', () => {
@@ -62,6 +63,15 @@ describe('online dungeon door command', () => {
     nearbyDoor.objectItemId = null;
     server.sim.addEntity(nearbyDoor);
 
+    // Below the crypt door's level floor the same command is refused.
+    player.level = 6;
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'enter_dungeon', dungeon: 'hollow_crypt' }),
+    );
+    expect(server.sim.instanceInfoAt(player.pos)).toBeNull();
+
+    atDungeonLevel(server.sim, [session.pid]);
     server.handleMessage(
       session,
       JSON.stringify({ t: 'cmd', cmd: 'enter_dungeon', dungeon: 'hollow_crypt' }),

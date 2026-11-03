@@ -2220,6 +2220,9 @@ export const ru_RU: EnTranslations = {
       "heroicName": "Героический режим: {name}",
       "heroicLocked": "Вы закреплены за героическим подземельем: {name}."
     },
+    "dungeonEntry": {
+      "levelRequired": "Для входа нужен уровень {level}: {name}."
+    },
     "practiceDps": {
       "title": "Тренировочный манекен",
       "liveDps": "{value} DPS",

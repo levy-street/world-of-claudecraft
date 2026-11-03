@@ -9,25 +9,55 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.dungeonEntry.levelRequired"
+  ],
+  "es_ES": [
+    "hudChrome.dungeonEntry.levelRequired"
+  ],
+  "fr_FR": [
+    "hudChrome.dungeonEntry.levelRequired"
+  ],
+  "fr_CA": [
+    "hudChrome.dungeonEntry.levelRequired"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.dungeonEntry.levelRequired"
+  ],
+  "de_DE": [
+    "hudChrome.dungeonEntry.levelRequired"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.dungeonEntry.levelRequired"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.dungeonEntry.levelRequired"
+  ],
+  "nl_NL": [
+    "hudChrome.dungeonEntry.levelRequired"
+  ],
+  "pl_PL": [
+    "hudChrome.dungeonEntry.levelRequired"
+  ],
+  "id_ID": [
+    "hudChrome.dungeonEntry.levelRequired"
+  ],
+  "tr_TR": [
+    "hudChrome.dungeonEntry.levelRequired"
+  ],
+  "sv_SE": [
+    "hudChrome.dungeonEntry.levelRequired"
+  ],
+  "vi_VN": [
+    "hudChrome.dungeonEntry.levelRequired"
+  ],
+  "da_DK": [
+    "hudChrome.dungeonEntry.levelRequired"
+  ]
 };

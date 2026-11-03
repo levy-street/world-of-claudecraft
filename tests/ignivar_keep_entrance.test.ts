@@ -19,6 +19,7 @@ import { Sim } from '../src/sim/sim';
 import { collectCalmAnchorPads } from '../src/sim/terrain_calm_anchors';
 import { dist2d } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
+import { atDungeonLevel } from './helpers/dungeon_level';
 
 const KEEP_DOOR_POS = { x: 503.05, z: 2243.7 };
 const APPROACH_LEAVE_OFFSET = { x: 0, z: -6.5 };
@@ -113,6 +114,7 @@ describe('Ignivar keep entrance: the door in the live world', () => {
   it('boards a raid group onto the forge-lift through the walk-in trigger', () => {
     const sim = new Sim({ seed: 42, playerClass: 'warrior' });
     const ally = sim.addPlayer('paladin', 'Keep Ally');
+    atDungeonLevel(sim);
     formTestRaid(sim, [sim.player.id, ally]);
     placeAt(sim, sim.player.id, KEEP_DOOR_POS.x, KEEP_DOOR_POS.z - 1);
     sim.tick();
@@ -125,6 +127,7 @@ describe('Ignivar keep entrance: the door in the live world', () => {
 
   it('refuses a solo player at the keep door and leaves them outside', () => {
     const sim = new Sim({ seed: 42, playerClass: 'warrior' });
+    atDungeonLevel(sim);
     placeAt(sim, sim.player.id, KEEP_DOOR_POS.x, KEEP_DOOR_POS.z - 1);
     const events = sim.tick();
     expect(

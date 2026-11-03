@@ -37,6 +37,7 @@ import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
 import { DT, type Entity, NYTHRAXIS_BOSS_ID, type SimEvent } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
+import { atDungeonLevel } from './helpers/dungeon_level';
 import { EMPTY_TEST_WORLD } from './sim_shared';
 
 type AnySim = Sim & Record<string, any>;
@@ -63,6 +64,7 @@ function setup(opts: { difficulty?: 'normal' | 'heroic'; phase?: 1 | 2 | 3 } = {
   }) as AnySim;
   const tankPid = sim.addPlayer('warrior', 'Tank') as number;
   sim.players.get(tankPid)!.questsDone.add('q_nythraxis_bound_guardian');
+  atDungeonLevel(sim, [tankPid]);
   const raiderPids: number[] = [];
   for (let i = 0; i < 9; i++) {
     const pid = sim.addPlayer(i < 2 ? 'priest' : 'mage', `Raider${i}`) as number;

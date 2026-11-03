@@ -16,6 +16,7 @@ import {
 import type { InstanceSlot } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import type { Entity, WorldContent } from '../src/sim/types';
+import { atDungeonLevel } from './helpers/dungeon_level';
 
 const WORLD: WorldContent = { ...BUILTIN_WORLD, camps: [], npcs: {}, groundObjects: [] };
 const SQUARE = [
@@ -127,6 +128,7 @@ describe('patrol routing along the loop (mob/patrol_route.ts)', () => {
 function claim(seed: number): { sim: Sim; pid: number; inst: InstanceSlot } {
   const sim = new Sim({ seed, playerClass: 'warrior', noPlayer: true, world: WORLD });
   const pid = sim.addPlayer('warrior', 'Watcher');
+  atDungeonLevel(sim);
   expect(enterDungeon(sim.ctx, 'hollow_crypt', pid)).toBe(true);
   const inst = sim.ctx.instances.find(
     (i) => i.dungeonId === 'hollow_crypt' && i.partyKey !== null,
@@ -166,6 +168,7 @@ describe('the monument patrol (c2) in a live claim', () => {
     const sim = new Sim({ seed: 8, playerClass: 'warrior', noPlayer: true, world: WORLD });
     (sim as unknown as { time: number }).time = 7777.7;
     const pid = sim.addPlayer('warrior', 'Late');
+    atDungeonLevel(sim);
     expect(enterDungeon(sim.ctx, 'hollow_crypt', pid)).toBe(true);
     const inst = sim.ctx.instances.find(
       (i) => i.dungeonId === 'hollow_crypt' && i.partyKey !== null,

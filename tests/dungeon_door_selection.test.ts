@@ -4,13 +4,16 @@ import { createGroundObject } from '../src/sim/entity';
 import { nearestDungeonDoor } from '../src/sim/instances/dungeon_door_selection';
 import { updateDoorTriggers } from '../src/sim/instances/dungeons';
 import { Sim } from '../src/sim/sim';
+import { atDungeonLevel } from './helpers/dungeon_level';
 
 function makeSim() {
-  return new Sim({
+  const sim = new Sim({
     seed: 42,
     playerClass: 'warrior',
     world: { ...BUILTIN_WORLD, camps: [], npcs: {}, groundObjects: [] },
   });
+  atDungeonLevel(sim);
+  return sim;
 }
 
 function overlappingDoors(sim: Sim, height = 0) {
@@ -96,6 +99,7 @@ describe('overlapping dungeon door selection', () => {
     releaseIn(sim, 'sunken_bastion');
     const corpseClaim = sim.player.corpseInstanceId;
     const leader = sim.addPlayer('warrior', 'Other party');
+    atDungeonLevel(sim, [leader]);
     sim.enterDungeon('sunken_bastion', leader);
     sim.partyInvite(sim.player.id, leader);
     sim.partyAccept(sim.player.id);

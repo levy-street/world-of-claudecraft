@@ -7934,6 +7934,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.makers_ember.name': '장인의 불씨',
   'hudChrome.raidLockout.heroicName': '영웅: {name}',
   'hudChrome.raidLockout.heroicLocked': '영웅 난이도 {name}에 귀속되었습니다.',
+  'hudChrome.dungeonEntry.levelRequired': '{name}에 입장하려면 레벨 {level} 이상이어야 합니다.',
   'hudChrome.practiceDps.title': '훈련용 허수아비',
   'hudChrome.practiceDps.prompt': '허수아비를 공격하여 측정을 시작하세요',
   'hudChrome.practiceDps.previous': '이전 측정',

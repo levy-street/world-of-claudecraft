@@ -428,8 +428,11 @@ describe('open dungeon expeditions through the real Sim', () => {
   it('accepts an applicant inside another dungeon without using travel to pull them out of that activity', () => {
     const ctx = setup();
     const { sim, helper } = ctx;
-    expect(sim.enterDungeon('sunken_bastion', helper)).toBe(true);
+    // The other activity is an ungated room: every gated door's level floor
+    // sits above this helper's Hollow Crypt finder band (7 to 10).
+    expect(sim.enterDungeon('the_last_keep', helper)).toBe(true);
     const otherClaim = sim.instanceClaimIdAt(sim.entities.get(helper)!.pos);
+    expect(otherClaim).not.toBeNull();
     acceptHelper(ctx);
     const position = { ...sim.entities.get(helper)!.pos };
     sim.dungeonFinderExpeditionTravel(helper);

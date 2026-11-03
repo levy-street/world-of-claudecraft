@@ -48,6 +48,7 @@ import { enterDungeon } from '../src/sim/instances/dungeons';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 import { armorReduction } from '../src/sim/types';
+import { atDungeonLevel } from './helpers/dungeon_level';
 
 const BASIN = 'wildheart_basin';
 const REF_ARMOR = 2861; // max-armor BiS prot warrior, level 20 (see header)
@@ -325,6 +326,7 @@ describe('normal Wildheart Basin ranged floors', () => {
       world: { ...BUILTIN_WORLD, camps: [], npcs: {}, groundObjects: [] },
     });
     const pid = sim.addPlayer('warrior', 'Alpha');
+    atDungeonLevel(sim);
     expect(enterDungeon(sim.ctx, BASIN, pid)).toBe(true);
     const instance = sim.instances.find((c) => c.dungeonId === BASIN && c.partyKey !== null);
     if (!instance) throw new Error('basin instance was not claimed');
@@ -449,6 +451,7 @@ describe('a really claimed normal instance spawns the retuned roster', () => {
       world: { ...BUILTIN_WORLD, camps: [], npcs: {}, groundObjects: [] },
     });
     const pid = sim.addPlayer('warrior', 'Alpha');
+    atDungeonLevel(sim);
     expect(enterDungeon(sim.ctx, BASIN, pid)).toBe(true);
     const instance = sim.instances.find((c) => c.dungeonId === BASIN && c.partyKey !== null);
     if (!instance) throw new Error('basin instance was not claimed');

@@ -94,6 +94,7 @@ import {
   MSG_RATE_BURST,
   MSG_RATE_REFILL_PER_SECOND,
 } from '../server/msg_rate_limit';
+import { atDungeonLevel } from './helpers/dungeon_level';
 
 function fakeWs() {
   return {
@@ -757,6 +758,7 @@ describe('GameServer sessions', () => {
     server.sim.partyInvite(stayer.pid, leaver.pid);
     server.sim.partyAccept(stayer.pid);
     server.sim.setDungeonDifficulty('heroic', leaver.pid);
+    atDungeonLevel(server.sim, [leaver.pid, stayer.pid]);
     server.sim.enterDungeon('hollow_crypt', leaver.pid);
     server.sim.enterDungeon('hollow_crypt', stayer.pid);
 
@@ -830,6 +832,7 @@ describe('GameServer sessions', () => {
     server.sim.partyInvite(stayer.pid, leaver.pid);
     server.sim.partyAccept(stayer.pid);
     server.sim.setDungeonDifficulty('heroic', leaver.pid);
+    atDungeonLevel(server.sim, [leaver.pid, stayer.pid]);
     server.sim.enterDungeon('hollow_crypt', leaver.pid);
     server.sim.enterDungeon('hollow_crypt', stayer.pid);
 

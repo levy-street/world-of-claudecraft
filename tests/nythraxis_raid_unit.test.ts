@@ -27,6 +27,7 @@ import {
   type WorldContent,
 } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
+import { atDungeonLevel } from './helpers/dungeon_level';
 
 // The two rollGroups APPENDED to the raid base table since it shipped, in
 // append order. Named once so the sweeps below read as "the base walk, then
@@ -108,6 +109,7 @@ function formRaid(sim: Sim, leaderPid: number) {
 function enterRaid(sim: Sim, pid: number) {
   attune(sim, pid);
   formRaid(sim, pid);
+  atDungeonLevel(sim);
   sim.enterDungeon('nythraxis_boss_arena', pid);
   const p = sim.entities.get(pid)!;
   return instanceOrigin(DUNGEONS.nythraxis_boss_arena.index, sim.instanceSlotAt(p.pos)!);
@@ -325,6 +327,7 @@ describe('Nythraxis raid encounter', () => {
   it('blocks attuned solo players from the Nythraxis arena until they are in a raid group', () => {
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'Solo');
+    atDungeonLevel(sim);
     attune(sim, pid);
     const before = { ...sim.entities.get(pid)!.pos };
 
@@ -2899,6 +2902,7 @@ describe('Nythraxis raid encounter', () => {
     const tankPid = sim.addPlayer('warrior', 'Tank');
     attune(sim, tankPid);
     formRaid(sim, tankPid);
+    atDungeonLevel(sim);
     sim.setDungeonDifficulty('heroic', tankPid);
     sim.enterDungeon('nythraxis_boss_arena', tankPid);
     const tank = sim.entities.get(tankPid)!;
@@ -2960,6 +2964,7 @@ describe('Nythraxis raid encounter', () => {
     sim.partyInvite(b, a);
     sim.partyAccept(b);
     formRaid(sim, a);
+    atDungeonLevel(sim);
     sim.enterDungeon('nythraxis_boss_arena', a);
     sim.enterDungeon('nythraxis_boss_arena', b);
     const ae = sim.entities.get(a)!;

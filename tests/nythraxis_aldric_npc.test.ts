@@ -20,6 +20,7 @@ import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
 import { bareClient } from './helpers/bare_client';
+import { atDungeonLevel } from './helpers/dungeon_level';
 
 const ALDRIC_ID = 'brother_aldric_raid';
 const FINAL_QUEST = 'q_nythraxis_scourges_end';
@@ -55,6 +56,7 @@ function formRaid(sim: Sim, leaderPid: number) {
 function enterRaid(sim: Sim, pid: number) {
   attune(sim, pid);
   formRaid(sim, pid);
+  atDungeonLevel(sim, [pid]);
   sim.enterDungeon('nythraxis_boss_arena', pid);
   const p = sim.entities.get(pid)!;
   return instanceOrigin(DUNGEONS.nythraxis_boss_arena.index, sim.instanceSlotAt(p.pos)!);

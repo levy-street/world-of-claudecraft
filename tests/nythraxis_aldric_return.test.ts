@@ -3,6 +3,7 @@ import { BUILTIN_WORLD, DUNGEONS, instanceOrigin } from '../src/sim/data';
 import { resetNythraxisEncounter } from '../src/sim/encounters/nythraxis';
 import { Sim } from '../src/sim/sim';
 import { dist2d } from '../src/sim/types';
+import { atDungeonLevel } from './helpers/dungeon_level';
 
 function encounter() {
   const sim = new Sim({
@@ -18,6 +19,7 @@ function encounter() {
     sim.partyInvite(member, pid);
     sim.partyAccept(member);
   }
+  atDungeonLevel(sim);
   sim.convertPartyToRaid(pid);
   sim.enterDungeon('nythraxis_boss_arena', pid);
   const player = sim.entities.get(pid)!;

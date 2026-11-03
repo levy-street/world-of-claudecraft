@@ -2049,6 +2049,12 @@ export const hudChromeStrings = {
     // mirrored yet ({name} = dungeon name).
     heroicLocked: 'You are locked to Heroic {name}.',
   },
+  // Dungeon door denials that are not lockouts.
+  dungeonEntry: {
+    // The door's level floor ({level} = the required level, {name} = the
+    // localized dungeon name).
+    levelRequired: 'You must be level {level} to enter {name}.',
+  },
   // The practice DPS tracker (src/ui/hud/practice/): the compact readout that
   // appears while the player targets or hits a training dummy. It reads the
   // Damage Meters' own encounter ledger, so its numbers are the meters' numbers

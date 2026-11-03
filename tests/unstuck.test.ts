@@ -56,6 +56,7 @@ import {
   UNSTUCK_RECENT_ID,
   UNSTUCK_SICKNESS_WINDOW_SECONDS,
 } from '../src/sim/unstuck_cooldown';
+import { atDungeonLevel } from './helpers/dungeon_level';
 
 type Event = Extract<SimEvent, { type: 'unstuck' }>;
 
@@ -1406,6 +1407,7 @@ describe('unstuck area identity', () => {
 
   it('reports content-local positions for dungeon, delve, and procedural rift clones', () => {
     const dungeon = makeWorld();
+    atDungeonLevel(dungeon);
     dungeon.enterDungeon('hollow_crypt', dungeon.player.id);
     const dungeonLocation = required(
       unstuckLocationAt(dungeon.ctx, dungeon.player.id, dungeon.player.pos),
@@ -1478,6 +1480,7 @@ describe('unstuck area identity', () => {
     const sim = makeWorld();
     const owner = sim.player.id;
     const foreign = sim.addPlayer('warrior', 'Stranger');
+    atDungeonLevel(sim, [owner]);
     sim.enterDungeon('hollow_crypt', owner);
     const ownerPlayer = required(sim.entities.get(owner), 'dungeon owner');
     const foreignPlayer = required(sim.entities.get(foreign), 'foreign player');
@@ -1513,6 +1516,7 @@ describe('unstuck area identity', () => {
     }
     sim.convertPartyToRaid(owner);
     required(sim.meta(owner), 'raid owner metadata').questsDone.add('q_nythraxis_bound_guardian');
+    atDungeonLevel(sim, [owner]);
     sim.enterDungeon('nythraxis_boss_arena', owner);
 
     const claim = required(

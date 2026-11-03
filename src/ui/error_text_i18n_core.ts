@@ -79,6 +79,18 @@ export function localizeErrorText(text: string, deps: ErrorTextLockoutDeps): str
     }
     return t('hudChrome.raidLockout.heroicLocked', { name });
   }
+  // The dungeon door level floor (src/sim/instances/dungeon_level_gate.ts).
+  // Delves emit the same sentence shape (src/sim/delves/runs.ts), so the arm
+  // claims the line only when the name is a dungeon's; a delve line falls
+  // through to its own sim.delve.* arms in localizeSimText.
+  const levelGate = /^You must be level (\d+) to enter (.+)\.$/.exec(text);
+  const gatedDungeon = levelGate ? DUNGEON_LIST.find((d) => d.name === levelGate[2]) : undefined;
+  if (levelGate && gatedDungeon) {
+    return t('hudChrome.dungeonEntry.levelRequired', {
+      level: formatNumber(Number(levelGate[1]), { maximumFractionDigits: 0 }),
+      name: dungeonDisplayName(gatedDungeon.id),
+    });
+  }
   const exact: Record<string, TranslationKey> = {
     'General chat is temporarily unavailable. Try again shortly.':
       'hudChrome.chatQuota.unavailable',

@@ -3,6 +3,7 @@ import { BUILTIN_WORLD, DUNGEONS, instanceOrigin } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import type { Entity, WorldContent } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
+import { atDungeonLevel } from './helpers/dungeon_level';
 
 // Gravebreaker is a CHARGED AUTO-ATTACK, not a scripted cast: the 12s cadence
 // charges the boss, the next LANDED melee swing releases it. The swing target
@@ -57,6 +58,7 @@ function formRaid(sim: Sim, leaderPid: number) {
 function enterRaid(sim: Sim, pid: number) {
   sim.players.get(pid)!.questsDone.add('q_nythraxis_bound_guardian');
   formRaid(sim, pid);
+  atDungeonLevel(sim, [pid]);
   sim.enterDungeon('nythraxis_boss_arena', pid);
   const p = sim.entities.get(pid)!;
   return instanceOrigin(DUNGEONS.nythraxis_boss_arena.index, sim.instanceSlotAt(p.pos)!);

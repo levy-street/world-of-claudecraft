@@ -7,6 +7,7 @@ import { clearHoardRewardChest } from '../src/sim/rift/hoard_reward_chest';
 import { makeVaultSeed } from '../src/sim/rift/vault_seed';
 import { Sim } from '../src/sim/sim';
 import { expectDefined } from './helpers/defined';
+import { atDungeonLevel } from './helpers/dungeon_level';
 
 const MAX = Number.MAX_SAFE_INTEGER;
 const MARK = 'heroic_mark';
@@ -104,6 +105,7 @@ function heroicRig(dungeon: string, bossId: string, full: boolean) {
     }
     sim.convertPartyToRaid(leader);
   }
+  atDungeonLevel(sim, [leader, partner]);
   sim.setDungeonDifficulty('heroic', leader);
   if (dungeon === 'nythraxis_boss_arena') {
     sim.enterDungeon('nythraxis_crypt', leader);

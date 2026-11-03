@@ -34,22 +34,26 @@ import {
   INSTANCE_EMPTY_TIMEOUT,
   type Vec3,
 } from '../src/sim/types';
+import { atDungeonLevel } from './helpers/dungeon_level';
 
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 function makeSim(seed = 42, weeklyRaidResetMs?: (nowMs: number) => number): Sim {
-  return new Sim({
+  const sim = new Sim({
     seed,
     playerClass: 'warrior',
     autoEquip: false,
     devCommands: true,
     weeklyRaidResetMs,
   });
+  atDungeonLevel(sim);
+  return sim;
 }
 
 function addMeta(sim: Sim, name: string): PlayerMeta {
   const pid = sim.addPlayer('warrior', name);
+  atDungeonLevel(sim, [pid]);
   return sim.players.get(pid)!;
 }
 
@@ -180,6 +184,7 @@ function raidLeader(sim: Sim): PlayerMeta {
   const lead = addMeta(sim, 'Lead');
   for (let i = 0; i < 4; i += 1) {
     const pid = sim.addPlayer('mage', `M${i}`);
+    atDungeonLevel(sim, [pid]);
     sim.partyInvite(pid, lead.entityId);
     sim.partyAccept(pid);
   }
@@ -232,6 +237,7 @@ function raidWithAlly(sim: Sim): { lead: PlayerMeta; ally: PlayerMeta } {
   sim.partyAccept(ally.entityId);
   for (let i = 0; i < 3; i += 1) {
     const pid = sim.addPlayer('mage', `M${i}`);
+    atDungeonLevel(sim, [pid]);
     sim.partyInvite(pid, lead.entityId);
     sim.partyAccept(pid);
   }
@@ -564,6 +570,7 @@ describe('the cleared-run door exception on the weekly rooms', () => {
     const lead = raidLeader(sim);
     // The killer is a raid member with a durable character id, the server shape.
     const memPid = sim.addPlayer('warrior', 'Mem', { characterId: 777 });
+    atDungeonLevel(sim, [memPid]);
     sim.partyInvite(memPid, lead.entityId);
     sim.partyAccept(memPid);
     const mem = sim.players.get(memPid)!;
@@ -583,6 +590,7 @@ describe('the cleared-run door exception on the weekly rooms', () => {
     // and the durable lockout rides back in the way hydration restores it.
     sim.removePlayer(memPid);
     const backPid = sim.addPlayer('warrior', 'Mem', { characterId: 777 });
+    atDungeonLevel(sim, [backPid]);
     sim.partyInvite(backPid, lead.entityId);
     sim.partyAccept(backPid);
     const back = sim.players.get(backPid)!;
@@ -621,6 +629,7 @@ describe('the cleared-run door exception on the weekly rooms', () => {
     // The participant carries a durable character id, the server shape; the
     // kill settles through the HEROIC branch (lockToHeroicClaim minting).
     const memPid = sim.addPlayer('warrior', 'Mem', { characterId: 777 });
+    atDungeonLevel(sim, [memPid]);
     sim.partyInvite(memPid, lead.entityId);
     sim.partyAccept(memPid);
     const mem = sim.players.get(memPid)!;
@@ -632,6 +641,7 @@ describe('the cleared-run door exception on the weekly rooms', () => {
     // and the durable heroic lockout rides back in the way hydration restores it.
     sim.removePlayer(memPid);
     const backPid = sim.addPlayer('warrior', 'Mem', { characterId: 777 });
+    atDungeonLevel(sim, [backPid]);
     sim.partyInvite(backPid, lead.entityId);
     sim.partyAccept(backPid);
     const back = sim.players.get(backPid)!;
@@ -668,6 +678,7 @@ describe('the cleared-run door exception on the weekly rooms', () => {
     // Late joins the raid AFTER the kill, carrying a lock from an earlier run:
     // no return key on this claim, so the door must still refuse the ferry.
     const latePid = sim.addPlayer('mage', 'Late');
+    atDungeonLevel(sim, [latePid]);
     sim.partyInvite(latePid, lead.entityId);
     sim.partyAccept(latePid);
     // The join must have landed, or the refusal below proves nothing.
