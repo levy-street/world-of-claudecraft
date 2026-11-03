@@ -421,7 +421,8 @@ export const BREATH_FIGHT_POOLS = {
   gales: 4,
   strikes: 14,
   charged: 14,
-  cradles: 1,
+  /** Heroic and mythic lift three at once (BREATH_DIFFICULTY cradleCount). */
+  cradles: 3,
   marks: 12,
   bolts: 10,
   beams: 12,

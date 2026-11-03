@@ -54,6 +54,7 @@ import {
   calmOf,
   timedOf,
 } from '../../sim/encounters/smith_heart/breath_ids';
+import { ISLE_MOBS } from '../../sim/encounters/smith_heart/breath_isle_ids';
 import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
 import { fxAnchor } from '../attached_fx_anchor';
@@ -97,6 +98,8 @@ import {
   windFieldLook,
 } from './breath_fight_fx_core';
 import { BreathHeartFx } from './breath_heart_fx';
+import { BreathInhaleStreams } from './breath_inhale_streams';
+import { BreathIslesFx } from './breath_isles_fx';
 import { BreathWindStreaks } from './breath_wind_streaks';
 import { BREATH_TELEGRAPH_GLOW_STEP, type BreathTelegraphKind } from './painted_telegraph_core';
 import { BreathTelegraphs, type PaintedFan } from './painted_telegraphs';
@@ -594,9 +597,15 @@ export class BreathFightFx {
   /** The audio's entity and ground reads, bound once (not per event). */
   /** Mythic's Knotted Gale, a part of this painter (breath_heart_fx.ts). */
   private readonly heart: BreathHeartFx;
+  /** The Islands of the Wind, a part of this painter (breath_isles_fx.ts). */
+  private readonly isles: BreathIslesFx;
+  /** The indrawn breath's streams into the maw (breath_inhale_streams.ts). */
+  private readonly inhale: BreathInhaleStreams;
   private readonly lookup = (id: number): Entity | undefined => this.world?.entities.get(id);
   private readonly groundAt = (x: number, z: number): number => this.groundY(x, z);
   private readonly cradledIds: number[] = [];
+  /** The cradle channel's next tether flicker (s). */
+  private tetherTimer = 0;
   private origin: { x: number; z: number } | null = null;
   private floorY = 0;
   private swell = 0;
@@ -1012,6 +1021,25 @@ export class BreathFightFx {
       groundY: (x, z) => this.groundY(x, z),
       shakeNear: (x, z, amount, reach) => this.shakeNear(x, z, amount, reach),
     });
+    this.isles = new BreathIslesFx({
+      root: this.root,
+      local: this.local,
+      particles: this.particles,
+      uTime: this.uTime,
+      density: this.density,
+      geometries: this.geometries,
+      materials: this.materials,
+      groundY: (x, z) => this.groundY(x, z),
+      shakeNear: (x, z, amount, reach) => this.shakeNear(x, z, amount, reach),
+    });
+    this.inhale = new BreathInhaleStreams({
+      root: this.root,
+      particles: this.particles,
+      uTime: this.uTime,
+      density: this.density,
+      geometries: this.geometries,
+      materials: this.materials,
+    });
     this.readyForEntry = attachSceneGroupGated(scene, this.root, compileGate, () => this.disposed)
       .then(() => {})
       .catch(() => {});
@@ -1103,6 +1131,7 @@ export class BreathFightFx {
     const world = this.world;
     this.audio.event(ev, this.lookup, this.groundAt);
     if (this.heart.handleEvent(ev, world, this.origin)) return true;
+    if (this.isles.handleEvent(ev, world)) return true;
     if (ev.type === 'spellfxAt') {
       if (!breathFightClaims(ev.ability)) return false;
       const r = ev.radius ?? 3;
@@ -1181,6 +1210,8 @@ export class BreathFightFx {
     this.paintMarks(world, dt);
     this.paintBars(world);
     this.heart.update(world, dt);
+    this.isles.update(world, dt);
+    this.inhale.update(this.guardianId >= 0 ? world.entities.get(this.guardianId) : undefined, dt);
     this.updateBolts();
     this.particles.update(this.clock);
     const guardian = this.guardianId >= 0 ? (world.entities.get(this.guardianId) ?? null) : null;
@@ -1231,6 +1262,7 @@ export class BreathFightFx {
       this.discover(world, origin);
     }
     this.heart.beginScan();
+    this.isles.beginScan();
     this.objectIds.length = 0;
     this.cradledIds.length = 0;
     this.guardianId = -1;
@@ -1246,9 +1278,12 @@ export class BreathFightFx {
         const kind = breathObjectKind(e.templateId);
         if (kind === 'wind') this.windId = e.id;
         else if (kind) this.objectIds.push(e.id);
-        else this.heart.takeObject(e);
+        else if (!this.isles.takeObject(e)) this.heart.takeObject(e);
       } else if (e.kind === 'mob') {
+        // The isles' adds (breath_isles_fx.ts); else the guardian.
+        if (this.isles.takeMob(e)) continue;
         this.guardianId = e.id;
+        this.isles.takeGuardian(e);
         let stacks = 0;
         for (const a of e.auras) if (a.id === BREATH_AURAS.swell) stacks = a.stacks ?? 1;
         this.swell = e.dead ? 0 : stacks;
@@ -1262,11 +1297,12 @@ export class BreathFightFx {
           else if (a.id === BREATH_AURAS.pinned) this.pinnedMarks.take(e.id);
           else if (a.id === BREATH_AURAS.drawn) this.drawnMarks.take(e.id);
           else if (a.id === BREATH_AURAS.cradled) this.cradledIds.push(e.id);
-          else this.heart.takeAura(e, a.id);
+          else if (!this.isles.takeAura(e, a.id)) this.heart.takeAura(e, a.id);
         }
       }
     }
     this.heart.endScan();
+    this.isles.endScan(world);
     this.anchorMarks.end();
     this.pinnedMarks.end();
     this.drawnMarks.end();
@@ -1286,7 +1322,10 @@ export class BreathFightFx {
       if (Math.abs(e.pos.x - origin.x) > 300 || Math.abs(e.pos.z - origin.z) > 260) continue;
       if (
         e.kind === 'object' ||
-        (e.kind === 'mob' && e.templateId === BREATH_GUARDIAN) ||
+        (e.kind === 'mob' &&
+          (e.templateId === BREATH_GUARDIAN ||
+            e.templateId === ISLE_MOBS.sentinel ||
+            e.templateId === ISLE_MOBS.mender)) ||
         (e.kind === 'npc' && e.templateId === BREATH_THESSALY_NPC)
       )
         ids.push(e.id);
@@ -1339,6 +1378,8 @@ export class BreathFightFx {
 
   private leave(): void {
     this.heart.leave();
+    this.isles.leave();
+    this.inhale.hide();
     this.origin = null;
     this.rosterSeen = Number.NaN;
     this.candidateIds.length = 0;
@@ -1766,6 +1807,24 @@ export class BreathFightFx {
       if (this.rand() < dt * 16 * this.density)
         this.sparksAt(liftedAt.x, liftedAt.y + 1, liftedAt.z, 3);
     }
+    // The channel that holds them (every tier: the guardian casts nothing
+    // else while it runs): crackling tethers from its body to each lifted.
+    const g = this.guardianId >= 0 ? world.entities.get(this.guardianId) : undefined;
+    if (g && !g.dead && g.castingAbility === BREATH_CASTS.cradleHold) {
+      this.tetherTimer -= dt;
+      if (this.tetherTimer <= 0) {
+        this.tetherTimer = 0.11;
+        for (const id of this.cradledIds) {
+          const p = world.entities.get(id);
+          if (!p) continue;
+          this.beam(g, p, 0.16, 7);
+          if (p !== lifted && this.rand() < 0.5) {
+            const at = fxAnchor(p);
+            this.sparksAt(at.x, at.y + 1, at.z, 2);
+          }
+        }
+      }
+    } else this.tetherTimer = 0;
   }
 
   // ---- the players' marks -----------------------------------------------------------------
@@ -2063,6 +2122,7 @@ export class BreathFightFx {
     this.disposed = true;
     this.root.removeFromParent();
     this.audio.dispose();
+    this.isles.dispose();
     this.particles.dispose();
     this.kit.dispose();
     this.streaks.dispose();

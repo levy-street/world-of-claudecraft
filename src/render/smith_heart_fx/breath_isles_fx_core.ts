@@ -12,7 +12,7 @@
 // Mender's stream draw on EVERY tier (the raid acts on them); the drifting
 // stones, the mist and the motes thin on the low tier.
 
-import { BREATH_ISLES } from '../../sim/content/smith_heart_layout';
+import { BREATH_ISLES, SMITH_HEART_FIELD } from '../../sim/content/smith_heart_layout';
 import { isleSpots, rideArc } from '../../sim/encounters/smith_heart/breath_isle_geometry';
 import {
   ISLE_OBJECTS,
@@ -20,6 +20,7 @@ import {
   isleCircleOf,
   rideOf,
 } from '../../sim/encounters/smith_heart/breath_isle_ids';
+import { authoredFieldSurfaceAt } from '../../sim/instances/authored_field';
 
 /** The palette: the vein's storm teal and white for the wind, a pale gold
  *  for the way home, the crystals' cold blue, the granite's warm grey. */
@@ -29,18 +30,33 @@ export const ISLE_COLORS = {
   home: 0xffe2a0,
   homeCore: 0xfffbe8,
   rune: 0x8ff0ff,
-  crystal: 0x6fd2ff,
-  crystalCore: 0xe6fbff,
-  granite: 0xb8b3a6,
-  graniteDark: 0x4e4a45,
-  strata: 0x8c7f6c,
-  moss: 0x6f8a5a,
+  crystal: 0x3f9ee8,
+  crystalCore: 0xc8f2ff,
+  granite: 0x8d8981,
+  graniteLight: 0xa9a59b,
+  graniteDark: 0x2f2b27,
+  strata: 0x7a6d5c,
+  moss: 0x5d7149,
   root: 0x4a3828,
-  bulwark: 0x9ff0ff,
+  bulwark: 0x58d4ff,
   bulwarkEdge: 0xffffff,
   mend: 0x7affd8,
   ribbon: 0xe8fbff,
   mist: 0xd8eef8,
+} as const;
+
+/** A hex colour as linear-ish rgb 0..1 (the particle pools' format). */
+function rgb(hex: number): readonly [number, number, number] {
+  return [((hex >> 16) & 255) / 255, ((hex >> 8) & 255) / 255, (hex & 255) / 255];
+}
+
+/** The particles' colours (rgb 0..1). */
+export const ISLE_RGB = {
+  pathCore: rgb(ISLE_COLORS.pathCore),
+  homeCore: rgb(ISLE_COLORS.homeCore),
+  ribbon: rgb(ISLE_COLORS.ribbon),
+  bulwarkEdge: rgb(ISLE_COLORS.bulwarkEdge),
+  dust: rgb(0xd6dde2),
 } as const;
 
 /** Pool sizes (fixed: no allocation in a fight). */
@@ -83,8 +99,9 @@ export interface IsleRock {
   indices: number[];
 }
 
-const RING = 30;
+const RING = 40;
 
+/** Push an rgb mix of `a` and `b` (k 0..1). */
 function mixHex(a: number, b: number, k: number, out: number[]): void {
   const t = Math.max(0, Math.min(1, k));
   out.push(
@@ -94,11 +111,37 @@ function mixHex(a: number, b: number, k: number, out: number[]): void {
   );
 }
 
-/** The isle's outline radius at angle step `k` (the field's carved disc,
- *  a little inside it so the rock never overhangs the walkable edge). */
+/** The isle's outline radius at angle step `k`: the field's own carved
+ *  floor's edge along that bearing (marched), a hand inside it, so the rock
+ *  drawn never overhangs the walkable edge. Cached per isle. */
+const rimCache = new Map<number, number[]>();
 export function isleRimRadius(i: number, k: number): number {
-  const isle = BREATH_ISLES[i];
-  return isle.r - 0.7 - 0.9 * isleHash(k, 71 + i * 13);
+  let radii = rimCache.get(i);
+  if (!radii) {
+    const isle = BREATH_ISLES[i];
+    radii = [];
+    for (let s = 0; s < RING; s++) {
+      const a = (s / RING) * Math.PI * 2;
+      let edge = 0;
+      for (let d = 0; d <= isle.r + 1; d += 0.1) {
+        const id = authoredFieldSurfaceAt(
+          SMITH_HEART_FIELD,
+          isle.x + Math.sin(a) * d,
+          isle.z + Math.cos(a) * d,
+        )?.id;
+        if (id !== isle.id) break;
+        edge = d;
+      }
+      radii.push(Math.max(1, edge - 0.3));
+    }
+    rimCache.set(i, radii);
+  }
+  return radii[((k % RING) + RING) % RING];
+}
+
+/** How deep an isle hangs under its floor (yards). */
+export function isleDepth(i: number): number {
+  return BREATH_ISLES[i].r * 2.6;
 }
 
 export function isleRock(i: number): IsleRock {
@@ -110,45 +153,69 @@ export function isleRock(i: number): IsleRock {
   const cx = isle.x;
   const cz = isle.z;
   const top = isle.h;
-  // The top: a fan from the middle, slightly domed, grey granite with moss
-  // patches (vertex colour), its edge a hand lower (worn).
-  positions.push(cx, top + 0.15, cz);
-  mixHex(C.granite, C.moss, 0.35, colors);
-  for (let k = 0; k < RING; k++) {
-    const a = (k / RING) * Math.PI * 2;
-    const r = isleRimRadius(i, k);
-    positions.push(cx + Math.sin(a) * r, top - 0.05, cz + Math.cos(a) * r);
-    mixHex(C.granite, C.moss, isleHash(k, 5 + i) * 0.5, colors);
+  // The top: the floor you stand on, three rings deep (so its paint can
+  // vary): worn granite, moss in its hollows, pale scoured streaks.
+  positions.push(cx, top + 0.02, cz);
+  mixHex(C.granite, C.moss, 0.25, colors);
+  const topRings = [0.34, 0.68, 1];
+  for (const f of topRings) {
+    for (let k = 0; k < RING; k++) {
+      const a = (k / RING) * Math.PI * 2;
+      const r = isleRimRadius(i, k) * f;
+      positions.push(cx + Math.sin(a) * r, top - (f === 1 ? 0.06 : 0), cz + Math.cos(a) * r);
+      const moss = isleHash(k * 3 + Math.round(f * 10), 5 + i);
+      const streak = isleHash(k, 17 + Math.round(f * 7));
+      const tmp: number[] = [];
+      mixHex(
+        C.granite,
+        moss > 0.72 ? C.moss : C.graniteLight,
+        moss > 0.72 ? 0.7 : streak * 0.6,
+        tmp,
+      );
+      colors.push(tmp[0], tmp[1], tmp[2]);
+    }
   }
   for (let k = 0; k < RING; k++) indices.push(0, 1 + k, 1 + ((k + 1) % RING));
-  // The underside: rings going down and in, each jagged, to a point.
-  const depth = isle.r * 2.3;
-  const rings = 9;
-  let prev = 1;
+  for (let ring = 1; ring < topRings.length; ring++) {
+    const a0 = 1 + (ring - 1) * RING;
+    const b0 = 1 + ring * RING;
+    for (let k = 0; k < RING; k++) {
+      const k1 = (k + 1) % RING;
+      indices.push(a0 + k, b0 + k, a0 + k1, a0 + k1, b0 + k, b0 + k1);
+    }
+  }
+  // The underside: a lip that swells out just under the floor's edge, then
+  // the mass hanging in lumps and strata, tapering to a jagged point.
+  const depth = isleDepth(i);
+  const rings = 14;
+  let prev = 1 + (topRings.length - 1) * RING;
   for (let j = 1; j <= rings; j++) {
     const t = j / rings;
     const base = positions.length / 3;
     for (let k = 0; k < RING; k++) {
-      const a = (k / RING) * Math.PI * 2 + (j % 2) * 0.05;
-      // A lip that swells out just under the top, then the hang tapering in
-      // (a little bulge mid-way: the mass of the stone).
-      const bulge = j === 1 ? 1.08 : 1;
-      const taper = (1 - t) ** 1.25 * (1 + 0.18 * Math.sin(t * Math.PI));
-      const jag = 1 + (isleHash(k * 7 + j, 31 + i) - 0.5) * (0.35 + 0.3 * t);
-      const r = isleRimRadius(i, k) * taper * jag * bulge;
-      const y = top - 0.4 - depth * t ** 1.1 - isleHash(k + j * 3, 47 + i) * 1.1 * t;
+      const a = (k / RING) * Math.PI * 2 + (j % 2) * 0.04;
+      const lip = j === 1 ? 1.07 : j === 2 ? 1.03 : 1;
+      const taper = (1 - t) ** 1.05 * (1 + 0.22 * Math.sin(t * Math.PI * 0.9));
+      // Lumps: a few big bulges round it, plus a fine jag.
+      const lump = 0.16 * Math.sin(a * 3 + i * 2.3 + t * 4) + 0.1 * Math.sin(a * 7 - t * 9);
+      const jag = 1 + lump + (isleHash(k * 7 + j, 31 + i) - 0.5) * (0.12 + 0.3 * t);
+      const r = Math.max(0.15, isleRimRadius(i, k) * taper * jag * lip);
+      const y = top - 0.3 - depth * t ** 1.15 - isleHash(k + j * 3, 47 + i) * 0.9 * t;
       positions.push(cx + Math.sin(a) * r, y, cz + Math.cos(a) * r);
-      // Strata: bands of darker and warmer stone, dark toward the point.
-      const band = Math.sin(y * 1.7 + isleHash(j, 3 + i) * 3) * 0.5 + 0.5;
-      const dark = 0.25 + 0.65 * t;
+      // Strata: bands of warmer and darker stone, darkening to the point.
+      const band = Math.sin(y * 1.9 + isleHash(j, 3 + i) * 3) * 0.5 + 0.5;
       const tmp: number[] = [];
-      mixHex(C.granite, C.strata, band * 0.6, tmp);
-      const g = [tmp[0], tmp[1], tmp[2]];
-      const d = (C.graniteDark >> 16) / 255;
+      mixHex(C.granite, C.strata, 0.25 + band * 0.55, tmp);
+      const dark = Math.min(0.92, 0.18 + 0.85 * t);
+      const d = [
+        (C.graniteDark >> 16) / 255,
+        ((C.graniteDark >> 8) & 255) / 255,
+        (C.graniteDark & 255) / 255,
+      ];
       colors.push(
-        g[0] * (1 - dark) + d * dark,
-        g[1] * (1 - dark) + (((C.graniteDark >> 8) & 255) / 255) * dark,
-        g[2] * (1 - dark) + ((C.graniteDark & 255) / 255) * dark,
+        tmp[0] * (1 - dark) + d[0] * dark,
+        tmp[1] * (1 - dark) + d[1] * dark,
+        tmp[2] * (1 - dark) + d[2] * dark,
       );
     }
     for (let k = 0; k < RING; k++) {
@@ -164,10 +231,10 @@ export function isleRock(i: number): IsleRock {
   const tip = positions.length / 3;
   positions.push(
     cx + (isleHash(i, 9) - 0.5) * 2,
-    top - depth - 2.5,
+    top - depth - 3,
     cz + (isleHash(i, 11) - 0.5) * 2,
   );
-  mixHex(C.graniteDark, 0x000000, 0.3, colors);
+  mixHex(C.graniteDark, 0x000000, 0.4, colors);
   for (let k = 0; k < RING; k++) indices.push(prev + k, tip, prev + ((k + 1) % RING));
   return { positions, colors, indices };
 }
@@ -189,7 +256,7 @@ export interface IsleCrystal {
 export function isleCrystals(i: number): IsleCrystal[] {
   const isle = BREATH_ISLES[i];
   const out: IsleCrystal[] = [];
-  const depth = isle.r * 2.3;
+  const depth = isleDepth(i);
   for (let c = 0; c < 7; c++) {
     const a = isleHash(c, 101 + i) * Math.PI * 2;
     const t = 0.15 + isleHash(c, 103 + i) * 0.55;
@@ -213,7 +280,7 @@ export function isleCrystals(i: number): IsleCrystal[] {
         dy: down / n + (isleHash(c * 5 + s, 119) - 0.5) * 0.4,
         dz: oz / n + jz,
         len,
-        girth: 0.3 + len * 0.11,
+        girth: 0.16 + len * 0.07,
       });
     }
   }
@@ -229,7 +296,7 @@ export function isleCrystals(i: number): IsleCrystal[] {
       dy: 0.8,
       dz: Math.cos(a) * 0.6,
       len: 1.6 + isleHash(c, 137) * 1.2,
-      girth: 0.32,
+      girth: 0.2,
     });
   }
   return out;
@@ -240,7 +307,7 @@ export function isleCrystals(i: number): IsleCrystal[] {
 export function isleRoots(i: number): { x: number; y: number; z: number }[][] {
   const isle = BREATH_ISLES[i];
   const out: { x: number; y: number; z: number }[][] = [];
-  const depth = isle.r * 2.3;
+  const depth = isleDepth(i);
   for (let c = 0; c < 11; c++) {
     const a = isleHash(c, 151 + i) * Math.PI * 2;
     const t = 0.05 + isleHash(c, 153 + i) * 0.4;

@@ -221,6 +221,10 @@ const RIFT_CAST_DISPLAY_KEYS: Partial<Record<TranslationKey, true>> = {
   'abilityUi.cast.heart_breath_forking_bolt': true,
   'abilityUi.cast.heart_breath_thunders_cradle': true,
   'abilityUi.cast.heart_breath_drawn_lightning': true,
+  // The Breath's rework (breath_cradle.ts, breath_isle_ids.ts ISLE_CASTS).
+  'abilityUi.cast.heart_breath_cradle_channel': true,
+  'abilityUi.cast.heart_breath_gale_bulwark': true,
+  'abilityUi.cast.heart_breath_mending_gale': true,
   'abilityUi.cast.heart_quench_blades_wake': true,
   'abilityUi.cast.heart_quench_blades_hunt': true,
   'abilityUi.cast.heart_heat_fist': true,
