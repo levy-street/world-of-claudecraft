@@ -2063,7 +2063,8 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 5338 -> 5330 at the integration merge of #4525: the reconnect backoff
     // schedule moved into reconnect_policy.ts beside its predicates, paying for the
     // tavern's resting getter and sitOnSeat send. wc -l. Exact count.
-    ceiling: 5330,
+    // Socket construction and transport-owned event delivery moved to world_socket.ts.
+    ceiling: 5297,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
