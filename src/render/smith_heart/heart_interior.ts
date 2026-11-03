@@ -24,6 +24,7 @@ import type { FireLightSink } from '../point_light_budget';
 import { buildBreathAir } from './breath_air';
 import { BREATH_KIT_KINDS, breathKitReady, dressBreath, ensureBreathKit } from './breath_kit';
 import { BREATH_KIT_KEEL, BREATH_KIT_SHALLOW } from './breath_kit_plan_core';
+import { buildBreathSummit } from './breath_summit';
 import { buildHammerAir } from './hammer_air';
 import { dressHammerVein, ensureHammerKit, HAMMER_KIT_KINDS, hammerKitReady } from './hammer_kit';
 import { heartCliffPaint } from './heart_cliff_paint_core';
@@ -192,6 +193,8 @@ export async function buildSmithHeartInterior(
   group.add(heartKitProgramWarmers());
   group.add(buildHammerAir(deps.lowGfx));
   group.add(buildBreathAir(deps.lowGfx));
+  // The Cornice's open sky: the cloud sea under the summit, the far peaks.
+  group.add(buildBreathSummit(deps.lowGfx));
   group.add(buildQuenchAir(deps.lowGfx));
   group.add(buildHeatAir(deps.lowGfx));
   group.add(buildHeatPour(deps.lowGfx));

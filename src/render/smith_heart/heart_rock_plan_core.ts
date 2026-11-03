@@ -66,6 +66,8 @@ import {
   HEART_WALL_PATH_CLEAR,
   heartFloorClearance,
   heartOpenAir,
+  heartSummitCap,
+  heartSummitOpen,
 } from './heart_walls_core';
 import { HEAT_KIT_SHALLOW } from './heat_kit_plan_core';
 import { RING_KIT_FASCIA_DEPTH, RING_KIT_FASCIA_SURFACES } from './ring_kit_plan_core';
@@ -352,6 +354,9 @@ function bandCandidates(): Candidate[][] {
     for (let x = Math.floor((b.minX - PAD) / GRID) * GRID; x <= b.maxX + PAD; x += GRID) {
       const c = clearOf(x, z);
       if (!Number.isFinite(c.back)) continue;
+      // The summit's shoulders fall away bare (heartSummitOpen): no face
+      // stands up round the Cornice's open rim.
+      if (heartSummitOpen(x, z, c.floor) > 0.3) continue;
       for (let i = 0; i < HEART_ROCK_BANDS.length; i++) {
         if (Math.abs(c.back - HEART_ROCK_BANDS[i].back) <= BAND_TOL) {
           out[i].push({ x, z, ...c });
@@ -460,6 +465,11 @@ function planBand(
         if (heartRockFrontPoints(q, piece).some((f) => clearOf(f.x, f.z).back < band.back - slack))
           continue;
         if (heartOpenAir(px, pz, piece.reach * k)) continue;
+        // Under the summit's cap: no face over the Cornice's horizon (its
+        // upper storey too).
+        const cap = heartSummitCap(px, pz);
+        if (foot + tall > cap) continue;
+        if (upper && upper.y + heartRockPieceOf(upper.piece).height * S.scale > cap) continue;
         // Its back never reaches over a walk behind it (a floor higher up
         // the mountain under its crest).
         if (backOverFloor(q, piece, foot, piece.height * S.scale)) continue;
@@ -839,6 +849,8 @@ export function planHeartNeedles(): HeartKitPlacement[] {
       const c = clearOf(x, z);
       if (!Number.isFinite(c.back) || c.back < R.back) continue;
       if (heartOpenAir(x, z, 16)) continue;
+      if (heartSummitOpen(x, z, c.floor) > 0) continue;
+      if (Number.isFinite(heartSummitCap(x, z))) continue;
       cands.push({ x, z, back: c.back });
     }
   }

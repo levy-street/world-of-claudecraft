@@ -60,12 +60,16 @@ import {
   planHeartUnderCliffs,
 } from '../src/render/smith_heart/heart_rock_plan_core';
 import {
+  HEART_ISLE_AIR,
   HEART_WALL_CLEAR,
   HEART_WALL_PATH_CLEAR,
   heartFloorClearance,
   heartOpenAir,
+  heartSummitCap,
+  heartSummitOpen,
 } from '../src/render/smith_heart/heart_walls_core';
 import {
+  BREATH_ISLES,
   SMITH_HEART_FIELD,
   SMITH_HEART_FLOATING_SURFACES,
   smithHeartAreaAt,
@@ -330,6 +334,13 @@ describe('heart_rock_plan_core: the mountain skinned band by band', () => {
         for (let z = b.minZ - 60; z <= b.maxZ + 60; z += 4) {
           if (!area(smithHeartAreaAt(x, z))) continue;
           if (heartMountainHeight(x, z) <= HEART_MOUNTAIN_CHASM) continue;
+          // The summit's falling shoulders and its capped ring stand bare
+          // by design (the Breath's third pass: open sky round the Cornice).
+          const fl = heartFloorClearance(x, z).floor;
+          if (heartSummitOpen(x, z, fl) > 0.3 || Number.isFinite(heartSummitCap(x, z))) continue;
+          // Nor does a face reach into the open sky round a floating isle.
+          if (BREATH_ISLES.some((b) => Math.hypot(x - b.x, z - b.z) < b.r + HEART_ISLE_AIR + 16))
+            continue;
           const back = backOf(x, z);
           if (back < 0 || back > 60) continue;
           n++;
@@ -338,7 +349,10 @@ describe('heart_rock_plan_core: the mountain skinned band by band', () => {
       return hit / n;
     };
     expect(share((a) => a === 'hammer')).toBeGreaterThan(0.95);
-    expect(share((a) => a !== 'hammer' && a !== 'heart')).toBeGreaterThan(0.9);
+    // 0.88 since the summit's cap (the Breath's third pass): a face whose
+    // crest would stand over the Cornice's horizon is left out, so a few
+    // slopes behind the lower Breath landings go bare past the cap's ring.
+    expect(share((a) => a !== 'hammer' && a !== 'heart')).toBeGreaterThan(0.88);
   });
 
   it('steps the slope back behind the first band, under its floor', () => {

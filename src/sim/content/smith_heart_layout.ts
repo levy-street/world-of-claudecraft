@@ -258,14 +258,21 @@ export const CORNICE_OPEN_RIM: readonly { x: number; z: number; r: number }[] = 
 
 /** The Islands of the Wind (the Guardian of the Breath, design doc 7.2): two
  *  floating islets off the Cornice's south rim (south-east and south-west,
- *  clear of the Heart's area and in a seal marker's reach), reached only on a scripted
+ *  out in the open air the summit's falling shoulders and its cap leave
+ *  round it (render/smith_heart/heart_walls_core.ts heartSummitOpen,
+ *  heartSummitCap: the third pass of 2026-11-03), clear of the wind
+ *  channels' notches and of the climb's head; inside the field's bounds and
+ *  the instance slot's band (local z under 250: past it a body is another
+ *  slot's), clear of the Heart's area and in a seal marker's reach), high
+ *  over the Cornice (seen from it against the sky over every far ridge,
+ *  their crags hanging over the void), reached only on a scripted
  *  ride of the wind (encounters/smith_heart/breath_isles.ts). Each is a
  *  hidden field surface (walkable; drawn by the fight's own floating rock,
  *  render/smith_heart_fx/breath_isles_fx.ts), walled round by its generated
  *  cliffs so nobody falls off one. `h` is its floor's height. */
 export const BREATH_ISLES: readonly { id: string; x: number; z: number; r: number; h: number }[] = [
-  { id: 'breath_isle_southeast', x: 40, z: 136, r: 9, h: H.cornice + 6 },
-  { id: 'breath_isle_southwest', x: -56, z: 146, r: 9, h: H.cornice + 4 },
+  { id: 'breath_isle_southeast', x: 31, z: 139, r: 9, h: H.cornice + 26 },
+  { id: 'breath_isle_southwest', x: -28, z: 142, r: 9, h: H.cornice + 30 },
 ];
 
 // ---- the main map: the Quench (east, low) -------------------------------------------

@@ -499,11 +499,19 @@ function scouredColor(base: Rgb, k: number, x: number, z: number, patch: number)
   const streak = fieldNoise(along * 0.025 + 31, across * 0.16 - 9, 2);
   const wet = Math.max(0, 0.42 - patch) * 1.6;
   const lichen = Math.max(0, patch - 0.66) * 1.4;
-  const t = k * (0.9 + streak * 0.22) * (1 - wet * 0.22);
+  // The painted world's big value groups (its M5 and M6, the third pass of
+  // 2026-11-03): broad drifts of warmer and cooler granite inside the one
+  // stone, pale wind-polished streaks, a cold blue-violet in the hollows
+  // (cool shadow, never black) and grey-green moss in sheltered drifts.
+  const drift = fieldNoise(x * 0.014 + 5, z * 0.014 - 11, 2);
+  const warm = Math.max(0, drift - 0.58) * 2.2;
+  const polish = Math.max(0, streak - 0.62) * 2.4;
+  const moss = Math.max(0, fieldNoise(x * 0.05 + 41, z * 0.05 + 7, 3) - 0.62) * 2.6;
+  const t = k * (0.88 + streak * 0.22 + polish * 0.16) * (1 - wet * 0.26);
   return [
-    base[0] * t - lichen * 0.02,
-    base[1] * t + lichen * 0.015,
-    base[2] * t * (1 + wet * 0.12) - lichen * 0.01,
+    base[0] * t * (1 + warm * 0.07 - wet * 0.04) - lichen * 0.02 - moss * 0.035,
+    base[1] * t * (1 + warm * 0.03 - wet * 0.02) + lichen * 0.015 + moss * 0.012,
+    base[2] * t * (1 + wet * 0.2 - warm * 0.05) - lichen * 0.01 - moss * 0.03,
   ];
 }
 

@@ -27,6 +27,7 @@
 
 import {
   BREATH,
+  BREATH_ISLES,
   GREAT_HEARTH,
   HEART_ROOM,
   HEART_ROOM_CHASM_R,
@@ -121,7 +122,9 @@ function distanceField(): DistanceField {
       const x = x0 + i * CELL;
       const z = z0 + j * CELL;
       const s = authoredFieldSurfaceAt(def, x, z);
-      if (!s) continue;
+      // A hidden floor (the Breath's floating isles) is no ground the
+      // mountain climbs from: open air round it, the summit falling under.
+      if (!s || s.hidden) continue;
       const k = j * nx + i;
       dist[k] = 0;
       nearest[k] = k;
@@ -240,6 +243,9 @@ function segmentDistance(
   return Math.hypot(px - (ax + dx * t), pz - (az + dz * t));
 }
 
+/** How far past a floating isle's rim the air stays open (yards). */
+export const HEART_ISLE_AIR = 12;
+
 /** Is the disc at (x, z) of radius r inside an area that stays open air? */
 export function heartOpenAir(x: number, z: number, r: number): boolean {
   // The chasm round the Seal Dais: inside the Ring's inner edge, all open.
@@ -262,7 +268,59 @@ export function heartOpenAir(x: number, z: number, r: number): boolean {
   }
   // The Heart's chasm, down to the glowing heart under the platform.
   if (Math.hypot(x - HEART_ROOM.x, z - HEART_ROOM.z) - r < HEART_ROOM_CHASM_R) return true;
+  // The open sky round the Breath's floating isles (nothing stands under or
+  // beside one: they float).
+  for (const isle of BREATH_ISLES)
+    if (Math.hypot(x - isle.x, z - isle.z) - r < isle.r + HEART_ISLE_AIR) return true;
   return false;
+}
+
+/** The summit's open shoulders (the Breath's third pass, 2026-11-03): round
+ *  the Storm Cornice and its floating isles the mountain FALLS away under the
+ *  floor instead of climbing round it, so the Cornice stands as the summit
+ *  in open sky. Only the climb's head and the east, where the Heart's
+ *  crown climbs out of its chamber toward the Cornice (it holds the roots
+ *  and keeps the Heart out of the main map's sight), keep their rock (these
+ *  bearings from the Cornice's centre, blended over `blend` degrees). */
+export const HEART_SUMMIT_HEAD = { from: 236, to: 304, blend: 14 } as const;
+export const HEART_SUMMIT_CROWN = { from: 62, to: 128, blend: 14 } as const;
+
+/** How open the summit stands at (x, z) whose nearest floor is `floor`: 1
+ *  past the rim on every open bearing, 0 by the climb's head and round every
+ *  floor under the Cornice's height. */
+export function heartSummitOpen(x: number, z: number, floor: number): number {
+  const C = BREATH.cornice;
+  if (floor < C.h - 0.5) return 0;
+  const deg = ((Math.atan2(x - C.x, z - C.z) * 180) / Math.PI + 360) % 360;
+  let open = 1;
+  for (const S of [HEART_SUMMIT_HEAD, HEART_SUMMIT_CROWN]) {
+    const into = Math.min(deg - (S.from - S.blend), S.to + S.blend - deg);
+    if (into <= 0) continue;
+    const k = Math.min(1, into / S.blend);
+    open = Math.min(open, 1 - k * k * (3 - 2 * k));
+  }
+  return open;
+}
+
+/** The summit's ring of lower rock (the same pass): within `reach` yards
+ *  past the Cornice's rim, on its open bearings, no rock of a lower floor
+ *  stands over the Cornice's floor less `under`, so the summit looks out
+ *  over every ridge round it; the cap lifts away over `blend` yards past
+ *  that (the far ridges keep their height, a horizon of peaks). */
+export const HEART_SUMMIT_CAP = { reach: 34, blend: 30, under: 5 } as const;
+
+/** The highest any rock may stand at (x, z) by the summit's cap (+Infinity
+ *  where the cap does not reach). */
+export function heartSummitCap(x: number, z: number): number {
+  const C = BREATH.cornice;
+  const e = Math.hypot((x - C.x) / C.rx, (z - C.z) / C.rz);
+  const past = (e - 1) * (C.rx + C.rz) * 0.5;
+  const S = HEART_SUMMIT_CAP;
+  if (past > S.reach + S.blend) return Number.POSITIVE_INFINITY;
+  const open = heartSummitOpen(x, z, C.h);
+  if (open <= 0) return Number.POSITIVE_INFINITY;
+  const k = past <= S.reach ? 0 : (past - S.reach) / S.blend;
+  return C.h - S.under + (1 - open) * 400 + k * k * 160;
 }
 
 /** The rock's own scale round (x, z): how far it reaches past the clearance
@@ -306,6 +364,8 @@ export function planHeartWalls(spacing = 5): HeartWallBlock[] {
       const back = c.d - clear;
       const scale = heartWallScale(x, z, c.floor);
       if (back < 0 || back > scale.band) continue;
+      // The summit's shoulders fall away: no crag stands round its rim.
+      if (heartSummitOpen(x, z, c.floor) > 0.3) continue;
       const h1 = heartHash(i * 31 + 5, j * 17 - 3);
       const h2 = heartHash(i - 11, j + 13);
       const h3 = heartHash(i + 101, j * 7 + 1);
@@ -327,6 +387,8 @@ export function planHeartWalls(spacing = 5): HeartWallBlock[] {
       if (r < MIN_R) continue;
       const reach = r + lean;
       if (heartOpenAir(x, z, reach)) continue;
+      // Under the summit's cap (no crag over the Cornice's horizon).
+      if (c.floor + height > heartSummitCap(x, z)) continue;
       out.push({
         x,
         z,

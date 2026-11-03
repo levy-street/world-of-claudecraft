@@ -29,6 +29,8 @@ import {
   heartFloorClearance,
   heartOpenAir,
   heartRidgeNoise,
+  heartSummitCap,
+  heartSummitOpen,
   heartWallScale,
 } from './heart_walls_core';
 
@@ -104,8 +106,21 @@ export function heartHammerTerrace(back: number, x: number, z: number): number {
   return Math.max(0, Math.min(back, stepped));
 }
 
-/** The mountain's height at (x, z), or HEART_MOUNTAIN_CHASM where none. */
+/** How far under the ledge the summit's shoulder has fallen `back` yards
+ *  past the clearance (steepening, a little jag in it). */
+export function heartSummitFall(back: number, jag: number): number {
+  const b = Math.max(0, back);
+  return b * 1.4 + b * b * 0.045 + jag * (1 + b * 0.12);
+}
+
+/** The mountain's height at (x, z), or HEART_MOUNTAIN_CHASM where none
+ *  (under the summit's cap, heartSummitCap). */
 export function heartMountainHeight(x: number, z: number): number {
+  const h = heartMountainRaw(x, z);
+  return h <= HEART_MOUNTAIN_CHASM ? h : Math.min(h, heartSummitCap(x, z));
+}
+
+function heartMountainRaw(x: number, z: number): number {
   const c = heartFloorClearance(x, z);
   if (!Number.isFinite(c.d)) {
     // Far past every floor: the mountain's outer shoulders, at their cap.
@@ -125,6 +140,19 @@ export function heartMountainHeight(x: number, z: number): number {
   const up = Math.max(0, back - HEART_MOUNTAIN_RECESS);
   const climb = lift > 0 ? up + (heartHammerTerrace(up, x, z) - up) * lift : up;
   const top = c.floor + heartMountainRise(climb, ridge, jag, scale.band) * scale.tall;
+  const open = back >= 0 ? heartSummitOpen(x, z, c.floor) : 0;
+  if (open > 0) {
+    // The summit's shoulders: from under the lip the rock falls away into
+    // the chasm, ever steeper, so the Cornice stands in open sky.
+    const fall = Math.max(
+      HEART_MOUNTAIN_CHASM,
+      c.floor - HEART_MOUNTAIN_LEDGE - heartSummitFall(back, jag),
+    );
+    const rising =
+      back >= HEART_MOUNTAIN_RECESS ? top : Math.min(top, c.floor - HEART_MOUNTAIN_LEDGE);
+    if (open >= 1) return fall;
+    return fall + (rising - fall) * (1 - open);
+  }
   if (back >= HEART_MOUNTAIN_RECESS) return top;
   if (back >= 0) return Math.min(top, c.floor - HEART_MOUNTAIN_LEDGE);
   // The foot: inside the clearance the face falls away into the chasm, well

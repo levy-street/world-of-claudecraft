@@ -213,15 +213,22 @@ describe('Smith Heart Breath kit: the piece list and the shipped GLB', () => {
     let total = 0;
     for (const [name, s] of shapes) {
       expect(s.triangles, name).toBeGreaterThan(0);
+      // An isle is a whole landmark seen from all round (its crag, roots,
+      // vines, crystals and stones): a bridge-class budget, never more.
       const cap = /Crack|Scar|Groove|Wall/.test(name)
         ? 1200
         : name === 'Kit_WindBridge'
           ? 12500
-          : 5000;
+          : /WindIsle/.test(name)
+            ? 8000
+            : name === 'Kit_IsleShard'
+              ? 300
+              : 5000;
       expect(s.triangles, name).toBeLessThanOrEqual(cap);
       total += s.triangles;
     }
-    expect(total).toBeLessThan(40_000);
+    // The isles (the third pass) took the kit past its first 40,000.
+    expect(total).toBeLessThan(48_000);
   });
 
   it.skipIf(!haveKit)('lights only crystal: the rods, the horns, the jambs, the stones', () => {
@@ -280,6 +287,34 @@ describe('Smith Heart Breath kit: the measures the plan relies on', () => {
     }
     // Its legs plunge deep into the mist.
     expect(s.min[1]).toBeLessThan(-40);
+  });
+});
+
+describe('Smith Heart Breath kit: the Islands of the Wind (the third pass)', () => {
+  it.skipIf(!haveKit)('lays each isle a flat walk past the sim rim, nothing standing on it', () => {
+    for (const v of ['A', 'B']) {
+      const s = shape(`Kit_WindIsle${v}`);
+      // Nothing rises over the walk inside the sim's floor (r 9, the field's
+      // carved disc inside it): the stones, crystals and vines stand past it.
+      for (const p of s.points)
+        if (Math.hypot(p[0], p[2]) < 9.2) expect(p[1], `${v} ${p}`).toBeLessThan(0.05);
+      // The walk reaches the rim on every bearing (no foot over the air).
+      for (let k = 0; k < 12; k++) {
+        const a = (k / 12) * Math.PI * 2;
+        const hit = s.points.some((p) => {
+          const r = Math.hypot(p[0], p[2]);
+          if (r < 8.4 || r > 11.2 || Math.abs(p[1]) > 0.3) return false;
+          let d = Math.abs(Math.atan2(p[2], p[0]) - a);
+          if (d > Math.PI) d = Math.PI * 2 - d;
+          return d < Math.PI / 12;
+        });
+        expect(hit, `${v} bearing ${k}`).toBe(true);
+      }
+      // A crag hanging well under it, its crystal lit.
+      expect(s.min[1], v).toBeLessThan(-15);
+      expect(s.materials.has('KitGlow'), v).toBe(true);
+    }
+    expect(shape('Kit_IsleShard').max[1] - shape('Kit_IsleShard').min[1]).toBeLessThan(3);
   });
 });
 

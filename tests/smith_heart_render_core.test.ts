@@ -317,8 +317,10 @@ describe('heart_mountain_core: the mountain round every floor', () => {
     const cornice = rise(BREATH.cornice.x, BREATH.cornice.z + BREATH.cornice.rz + pastClear, 60);
     const lake = rise(QUENCH.shelf.x + QUENCH.shelf.rx + pastClear, QUENCH.shelf.z, QUENCH.shelf.h);
     const heart = rise(HEART_ROOM.x + HEART_ROOM_CHASM_R + 30, HEART_ROOM.z, HEART_ROOM.h);
-    expect(cornice).toBeGreaterThan(0);
-    expect(cornice).toBeLessThan(lake * 0.75);
+    // The Cornice is the summit (the Breath's third pass): past its open rim
+    // the mountain falls away under its floor.
+    expect(cornice).toBeLessThan(0);
+    expect(lake).toBeGreaterThan(0);
     expect(heart).toBeGreaterThan(lake);
     expect(CORNICE_WALL_SCALE).toBeLessThan(1);
     expect(HEART_ROOM_WALL_SCALE).toBeGreaterThan(1);

@@ -44,6 +44,9 @@ BUILDERS = {
     'PlateauCrackB': lambda: bp.plateau_crack('B'),
     'StrikeScar': bp.strike_scar,
     'WindGroove': bp.wind_groove,
+    'WindIsleA': lambda: bp.wind_isle(bpy, 'A'),
+    'WindIsleB': lambda: bp.wind_isle(bpy, 'B'),
+    'IsleShard': lambda: bp.isle_shard(bpy),
 }
 
 
