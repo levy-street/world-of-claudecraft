@@ -103,6 +103,8 @@ const DEBUFF_DISPLAY_AURA_IDS: ReadonlySet<string> = new Set([
   // The Guardian of the Quench's cold bar (encounters/smith_heart/quench_ids.ts):
   // the hazard every player watches, so it sits on the debuff bar.
   'heart_quench_cold',
+  // A shatter's splash on an ally (the cold it added): a short hazard mark.
+  'heart_quench_splashed',
   // The Guardian of the Heat's marks (encounters/smith_heart/heat_ids.ts): a
   // Wellkeeper's Kindling Mark and the Cinder Trail it becomes, the Hunted of
   // a Rolling Cinder's quarry, and a cinder's Cooling Crust (on its frame: it

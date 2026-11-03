@@ -50,8 +50,13 @@ export const QUENCH_AURAS = {
   /** The cold reached full: frozen solid (an unbreakable stun) until the
    *  ice shatters. */
   frozen: 'heart_quench_frozen',
-  /** After the shatter: more damage taken for a while. */
+  /** More damage taken: much more while frozen solid (its value the
+   *  freeze's), then less for a while after the shatter (the brittle's). */
   brittle: 'heart_quench_brittle',
+  /** Struck by a shatter's splash a moment ago: `value` the cold it added,
+   *  `value2` the entity id of the player whose ice shattered (the client's
+   *  shards fly from them; the player's own alert reads it). */
+  splashed: 'heart_quench_splashed',
   /** Fallen through the ice: held in the water (a root), then climbing out. */
   trapped: 'heart_quench_trapped',
   /** On the guardian through phase 2: the four blades are awake. */
@@ -99,6 +104,9 @@ export const QUENCH_CUES = {
   /** The fight is over: the shore ice falls and the lake refreezes whole
    *  (spellfx 'nova' on the guardian). */
   thaw: 'heart_quench_thaw',
+  /** The rime cracks a player's immunity (an Ice Block's stasis) as they
+   *  freeze or shatter: the cold bites through (spellfx 'nova' on them). */
+  bite: 'heart_quench_bite',
 } as const;
 
 /** The damage and aura names (combat log, floating text, the buff bar;
@@ -109,6 +117,7 @@ export const QUENCH_NAMES = {
   frozen: 'Encased in Rime',
   shatter: 'Shattering Cold',
   brittle: 'Frost-Brittle',
+  splashed: 'Rime Splash',
   water: 'Freezing Water',
   trapped: 'Under the Ice',
   breath: 'Quenching Breath',
@@ -151,7 +160,7 @@ export const QUENCH_DIFFICULTY: Readonly<Record<QuenchDifficulty, QuenchDifficul
   normal: {
     damageMult: 1,
     splashR: 6,
-    splashCold: 25,
+    splashCold: 35,
     slashMarksLake: 1,
     slashMarksAwake: 2,
     slashAim: 3,
@@ -162,7 +171,7 @@ export const QUENCH_DIFFICULTY: Readonly<Record<QuenchDifficulty, QuenchDifficul
   heroic: {
     damageMult: 1.25,
     splashR: 10,
-    splashCold: 45,
+    splashCold: 55,
     slashMarksLake: 2,
     slashMarksAwake: 3,
     slashAim: 2.5,
@@ -173,7 +182,7 @@ export const QUENCH_DIFFICULTY: Readonly<Record<QuenchDifficulty, QuenchDifficul
   mythic: {
     damageMult: 1.25,
     splashR: 10,
-    splashCold: 45,
+    splashCold: 55,
     slashMarksLake: 2,
     slashMarksAwake: 4,
     slashAim: 2,
@@ -185,20 +194,29 @@ export const QUENCH_DIFFICULTY: Readonly<Record<QuenchDifficulty, QuenchDifficul
 // ---- tuning (SKETCH, unmeasured) ------------------------------------------------------
 
 export const QUENCH_TUNING = {
-  // Frostbite: the cold bar.
+  // Frostbite: the cold bar. The team's pass of 2026-11-04 made it stickier
+  // (was: full alone in 30 s, falling 6 a second in a huddle).
   coldMax: 100,
-  /** Alone, the bar fills in about 30 s. */
-  coldRise: 100 / 30,
+  /** Alone, the bar fills in about 24 s. */
+  coldRise: 100 / 24,
   /** In a huddle (2 or more others within warmR), it falls this fast. */
-  coldFall: 6,
+  coldFall: 4,
   warmR: 6,
   warmNeed: 2,
-  /** At full: frozen this long, then the shatter. */
-  freezeSeconds: 4,
-  shatterMin: 220,
-  shatterMax: 260,
+  /** At full: frozen this long (was 4 s), taking `frozenPct` more damage
+   *  from everything, then the shatter. */
+  freezeSeconds: 6,
+  frozenPct: 1,
+  /** The shatter's hit (was 220 to 260): never lethal alone on Normal for a
+   *  topped-up level-20 cloth wearer (about 1,135 health). */
+  shatterMin: 360,
+  shatterMax: 400,
+  /** After the shatter: more damage taken for a while (was 20%). While it
+   *  lasts no splash can freeze the player again (a chain stays bounded). */
   brittleSeconds: 15,
-  brittlePct: 0.2,
+  brittlePct: 0.3,
+  /** How long a splash's mark stays on the player it struck. */
+  splashMarkSeconds: 2.5,
   /** Cold a hit adds: the guardian's breath, a slash, a fall through the ice. */
   breathCold: 20,
   crossCold: 20,

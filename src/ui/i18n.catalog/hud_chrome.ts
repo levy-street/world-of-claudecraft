@@ -5989,12 +5989,15 @@ export const hudChromeStrings = {
     },
     // The Smith's Heart's Guardian of the Quench (src/ui/quench_aura_effect.ts).
     quenchGuardian: {
-      cold: 'Your cold: {cold} of {max}. Alone it fills in about {fill} sec. Standing within {radius} yd of {others} or more other players lowers it by {fall} every second instead. At {max} you are Encased in Rime for {freeze} sec, then the ice shatters.',
+      cold: 'Your cold: {cold} of {max}. Alone it fills in about {fill} sec. Standing within {radius} yd of {others} or more other players lowers it by {fall} every second instead. Immunities such as Cold Coffin do not stop it: while one lasts you neither give nor take warmth. At {max} you are Encased in Rime for {freeze} sec, then the ice shatters.',
       warmth:
         'Huddled with the raid: your cold falls by {fall} every second. A huddle that stays on one spot for {linger} sec cracks the ice beneath it into a hole of freezing water, so keep moving.',
       frozen:
-        'Encased in rime: you cannot act. When it ends the ice shatters: you take {min} to {max} Frost damage and become Frost-Brittle, and everyone within {radius} yd of you gains {cold} cold ({heroicRadius} yd and {heroicCold} cold on Heroic).',
-      brittle: 'Takes {pct}% more damage from all sources.',
+        'Encased in rime: you cannot act and take {pct}% more damage from all sources, and no immunity holds. When it ends the ice shatters: you take {min} to {max} Frost damage, then take {brittle}% more damage for {seconds} sec, and everyone within {radius} yd of you gains {cold} cold ({heroicRadius} yd and {heroicCold} cold on Heroic).',
+      brittle:
+        'Takes {pct}% more damage from all sources. While this lasts, a shattering ally cannot freeze you solid: their splash stops 1 short of full.',
+      splashed:
+        "An ally's shattering ice splashed you: +{cold} cold. Get back into a huddle before your own bar fills.",
       trapped:
         'Fallen through the ice into freezing water: you cannot move, you take {min} to {max} Frost damage every second and your cold rises. After {seconds} sec you climb out on the edge. The water alone never kills you.',
       awake:
@@ -10358,17 +10361,10 @@ export const hudChromeStrings = {
     },
   },
   // The Smith's Heart's Guardian of the Quench (encounters/smith_heart/
-  // quench*.ts): the raid warnings of its fight and what the guardian SAYS
-  // (quench_voice.ts QUENCH_LINES, the same English).
+  // quench*.ts): what the guardian SAYS (quench_voice.ts QUENCH_LINES, the
+  // same English). Its fight calls no raid warning banner (the owner's rule
+  // of 2026-11-04: its mechanics read in the world).
   quenchGuardian: {
-    warn: {
-      rim: 'The shore ice heaves up! Get onto the lake!',
-      frozen: '{player} is frozen solid! Step away before the ice shatters!',
-      crack: 'The ice groans under the huddle! Move apart!',
-      wake: "The Smith's blades tear free of the lake! Watch where they aim!",
-      marks: 'The blades mark {list}! Lead them clear of the raid!',
-      flurry: 'Every blade hunts at once! Dodge the lines!',
-    },
     say: {
       pull: 'Warm blood on my lake. It will not stay warm for long.',
       shatter: 'Frozen through. Now break.',
@@ -10392,6 +10388,8 @@ export const hudChromeStrings = {
     frozenTitle: 'Encased in rime!',
     waterTitle: 'Under the ice!',
     coldLine: 'Stand within {radius} yd of {others} or more others to warm up',
+    splashTitle: 'Rime splash! +{cold} cold',
+    immuneLine: 'Your immunity does not stop the cold: huddle up',
     warmLine: 'Your cold is falling. Move the huddle within {seconds} sec or the ice cracks',
     frozenLine: 'The ice shatters in {seconds} sec: everyone close, step away',
     waterLine: 'Climbing out in {seconds} sec',

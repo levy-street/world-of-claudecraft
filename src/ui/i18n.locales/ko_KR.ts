@@ -22666,22 +22666,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.heart_captain_thessaly.greeting':
     '발을 단단히 딛으세요, {className}. 풀무가 숨을 쉬면 제 고요 속으로 들어와 바람이 우리에게 부딪혀 흩어지게 하세요.',
   // The Smith's Heart's Guardian of the Quench (M16 fills).
-  'hudChrome.quenchGuardian.warn.rim': '기슭의 얼음이 솟아오릅니다! 호수 위로 올라가세요!',
-  'hudChrome.quenchGuardian.warn.frozen':
-    '{player}님이 꽁꽁 얼어붙었습니다! 얼음이 깨지기 전에 물러나세요!',
-  'hudChrome.quenchGuardian.warn.crack': '뭉친 무리 아래에서 얼음이 삐걱입니다! 흩어지세요!',
-  'hudChrome.quenchGuardian.warn.marks':
-    '칼날들이 {list}을(를) 표적으로 삼습니다! 공격대에서 멀리 유인하세요!',
   'hudChrome.auraEffect.quenchGuardian.marked':
     '{count}명 중 {order}번째입니다. 칼날이 당신을 지나는 선을 따라 날아옵니다. 선을 공격대에서 멀리 유도하세요. 선은 칼날이 날아가기 {lock}초 전에 고정되니 그때 비켜서세요. 그렇지 않으면 {min}~{max}의 냉기 피해와 냉기 {cold}를 받습니다.',
   'hudChrome.quenchAlert.markedTitle': '칼날이 당신을 노립니다! ({count}명 중 {order}번째)',
   'hudChrome.quenchAlert.markedLine': '선을 공격대에서 멀리 유도하고, 고정되면 비켜서세요.',
   'abilityUi.cast.heart_quench_blades_hunt': '칼날의 사냥',
-  'hudChrome.quenchGuardian.warn.flurry': '모든 칼날이 한꺼번에 사냥에 나섭니다! 선을 피하세요!',
   'hudChrome.quenchGuardian.say.flurry':
     '모든 칼날아! 모든 날이여! 내 호수 위에 서 있는 것을 남기지 마라!',
-  'hudChrome.quenchGuardian.warn.wake':
-    '대장장이의 칼날들이 호수에서 뜯겨 나옵니다! 어디를 겨누는지 살피세요!',
   'hudChrome.quenchGuardian.say.pull': '내 호수에 따뜻한 피라. 그 온기도 오래가지 않으리라.',
   'hudChrome.quenchGuardian.say.shatter': '속까지 얼었구나. 이제 부서져라.',
   'hudChrome.quenchGuardian.say.hole': '얼음은 모든 발걸음을 기억한다. 함께 서면, 꺼진다.',
@@ -22692,12 +22683,17 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.quenchGuardian.say.wipe': '고요하다. 잠잠하다. 담금질되었다.',
   'hudChrome.quenchGuardian.say.death': '냉기가... 물러난다... 담금질은 너희의 것이다.',
   'hudChrome.auraEffect.quenchGuardian.cold':
-    '당신의 냉기: {max} 중 {cold}. 혼자 있으면 약 {fill}초 만에 가득 찹니다. {radius}미터 안에 다른 플레이어가 {others}명 이상 있으면 대신 매초 {fall}씩 내려갑니다. {max}에 이르면 {freeze}초 동안 서리에 갇히고, 그 뒤 얼음이 부서집니다.',
+    '당신의 냉기: {max} 중 {cold}. 혼자 있으면 약 {fill}초 만에 가득 찹니다. {radius}미터 안에 다른 플레이어가 {others}명 이상 있으면 대신 매초 {fall}씩 내려갑니다. 차가운 관 같은 무적 효과로는 막을 수 없습니다: 효과가 지속되는 동안에는 온기를 주지도 받지도 못합니다. {max}에 이르면 {freeze}초 동안 서리에 갇히고, 그 뒤 얼음이 부서집니다.',
   'hudChrome.auraEffect.quenchGuardian.warmth':
     '공격대와 함께 모여 있음: 냉기가 매초 {fall}씩 내려갑니다. 한 자리에 {linger}초 동안 머문 무리 아래의 얼음은 갈라져 얼어붙은 물웅덩이가 되니 계속 움직이세요.',
   'hudChrome.auraEffect.quenchGuardian.frozen':
-    '서리에 갇힘: 행동할 수 없습니다. 효과가 끝나면 얼음이 부서져 {min}~{max}의 냉기 피해를 입고 서리 취약 상태가 되며, {radius}미터 안의 모두가 냉기 {cold}을 얻습니다(영웅 난이도에서는 {heroicRadius}미터, 냉기 {heroicCold}).',
-  'hudChrome.auraEffect.quenchGuardian.brittle': '모든 공격으로부터 받는 피해가 {pct}% 증가합니다.',
+    '서리에 갇힘: 행동할 수 없고 모든 공격으로부터 받는 피해가 {pct}% 증가하며, 어떤 무적 효과도 유지되지 않습니다. 효과가 끝나면 얼음이 부서져 {min}~{max}의 냉기 피해를 입고, 이후 {seconds}초 동안 받는 피해가 {brittle}% 증가하며, {radius}미터 안의 모두가 냉기 {cold}을 얻습니다(영웅 난이도에서는 {heroicRadius}미터, 냉기 {heroicCold}).',
+  'hudChrome.auraEffect.quenchGuardian.brittle':
+    '모든 공격으로부터 받는 피해가 {pct}% 증가합니다. 이 효과가 지속되는 동안에는 아군의 얼음이 부서져도 당신이 얼어붙지 않습니다: 튀는 냉기는 가득 차기 1 전에 멈춥니다.',
+  'hudChrome.auraEffect.quenchGuardian.splashed':
+    '아군의 부서진 얼음이 튀었습니다: 냉기 +{cold}. 자신의 게이지가 가득 차기 전에 무리로 돌아가세요.',
+  'hudChrome.quenchAlert.splashTitle': '서리 파편! 냉기 +{cold}',
+  'hudChrome.quenchAlert.immuneLine': '무적 효과로도 냉기는 막을 수 없습니다: 모이세요',
   'hudChrome.auraEffect.quenchGuardian.trapped':
     '얼음을 뚫고 얼어붙은 물에 빠졌습니다: 움직일 수 없고, 매초 {min}~{max}의 냉기 피해를 입으며 냉기가 올라갑니다. {seconds}초 뒤 가장자리로 기어 올라옵니다. 물만으로는 절대 죽지 않습니다.',
   'hudChrome.auraEffect.quenchGuardian.awake':

@@ -1,8 +1,10 @@
 // The Guardian of the Quench's per-tick scope (encounters/smith_heart/
 // quench.ts): the claim, the shared state, the guardian, the players in the
 // Quench Basin, the difficulty's rules, and the plumbing every part of the
-// fight shares (the bar, the damage rolls, the raid warnings, the fight's
-// objects, the hit that never kills). A leaf the fight's modules
+// fight shares (the bar, the damage rolls, the fight's objects, the hit
+// that never kills). The fight calls NO raid warning banner (the owner's rule
+// of 2026-11-04: its mechanics read in the world; the yells and each
+// player's own alert stay). A leaf the fight's modules
 // (quench_cold.ts, quench_ice.ts, quench_blades.ts, quench_rim.ts) and the
 // coordinator share, so none of them reaches into another. Zero rng but the
 // damage rolls.
@@ -36,6 +38,9 @@ export interface QuenchScope {
   /** Living players in the Quench Basin, entity-id order. */
   players: readonly Entity[];
   rules: QuenchDifficultyRules;
+  /** Players a shatter's splash struck this tick (quench_cold.ts: one
+   *  splash a tick each, however many shatter at once). */
+  splashed?: Set<number>;
 }
 
 /** How far over or under the lake's floor a body still counts (yards). */
@@ -138,28 +143,4 @@ export function survivableHit(p: Entity, amount: number): number {
   }
   const room = Math.floor((p.hp - 1) / (amp * vuln)) - 1;
   return Math.max(0, Math.min(amount, room));
-}
-
-/** A raid warning from `from` to every player near the lake (the big orange
- *  line, re-localized client-side by `textKey`). */
-export function raidWarn(
-  s: Pick<QuenchScope, 'ctx' | 'inst'>,
-  from: Entity,
-  key: string,
-  text: string,
-  values?: Record<string, string>,
-): void {
-  for (const p of lakeListeners(s.ctx, s.inst)) {
-    s.ctx.emit({
-      type: 'chat',
-      fromPid: from.id,
-      from: from.name,
-      entityId: from.id,
-      text,
-      textKey: `hudChrome.quenchGuardian.warn.${key}`,
-      ...(values ? { textValues: values } : {}),
-      channel: 'raidWarning',
-      pid: p.id,
-    });
-  }
 }

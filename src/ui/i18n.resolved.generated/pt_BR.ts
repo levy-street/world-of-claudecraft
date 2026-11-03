@@ -4778,10 +4778,11 @@ export const pt_BR: EnTranslations = {
         "swell": "Every {every} sec the swelling storm deals {min} to {max} damage to everyone on the Cornice, {growth}% more for every pulse before it: {stacks} so far."
       },
       "quenchGuardian": {
-        "cold": "Your cold: {cold} of {max}. Alone it fills in about {fill} sec. Standing within {radius} yd of {others} or more other players lowers it by {fall} every second instead. At {max} you are Encased in Rime for {freeze} sec, then the ice shatters.",
+        "cold": "Your cold: {cold} of {max}. Alone it fills in about {fill} sec. Standing within {radius} yd of {others} or more other players lowers it by {fall} every second instead. Immunities such as Cold Coffin do not stop it: while one lasts you neither give nor take warmth. At {max} you are Encased in Rime for {freeze} sec, then the ice shatters.",
         "warmth": "Huddled with the raid: your cold falls by {fall} every second. A huddle that stays on one spot for {linger} sec cracks the ice beneath it into a hole of freezing water, so keep moving.",
-        "frozen": "Encased in rime: you cannot act. When it ends the ice shatters: you take {min} to {max} Frost damage and become Frost-Brittle, and everyone within {radius} yd of you gains {cold} cold ({heroicRadius} yd and {heroicCold} cold on Heroic).",
-        "brittle": "Takes {pct}% more damage from all sources.",
+        "frozen": "Encased in rime: you cannot act and take {pct}% more damage from all sources, and no immunity holds. When it ends the ice shatters: you take {min} to {max} Frost damage, then take {brittle}% more damage for {seconds} sec, and everyone within {radius} yd of you gains {cold} cold ({heroicRadius} yd and {heroicCold} cold on Heroic).",
+        "brittle": "Takes {pct}% more damage from all sources. While this lasts, a shattering ally cannot freeze you solid: their splash stops 1 short of full.",
+        "splashed": "An ally's shattering ice splashed you: +{cold} cold. Get back into a huddle before your own bar fills.",
         "trapped": "Fallen through the ice into freezing water: you cannot move, you take {min} to {max} Frost damage every second and your cold rises. After {seconds} sec you climb out on the edge. The water alone never kills you.",
         "awake": "The Smith's four blades are awake. Each round more players are marked, and a blade flies across the lake down a line through each in turn. It locks {lock} sec before the blade flies, then strikes anyone on it for {min} to {max} Frost damage and adds {cold} cold.",
         "marked": "You are number {order} of {count}: a blade will fly across the lake down the line through you. Lead the line away from the raid. It locks {lock} sec before the blade flies, so step off then, or take {min} to {max} Frost damage and {cold} cold.",
@@ -7375,14 +7376,6 @@ export const pt_BR: EnTranslations = {
       }
     },
     "quenchGuardian": {
-      "warn": {
-        "rim": "The shore ice heaves up! Get onto the lake!",
-        "frozen": "{player} is frozen solid! Step away before the ice shatters!",
-        "crack": "The ice groans under the huddle! Move apart!",
-        "wake": "The Smith's blades tear free of the lake! Watch where they aim!",
-        "marks": "The blades mark {list}! Lead them clear of the raid!",
-        "flurry": "Every blade hunts at once! Dodge the lines!"
-      },
       "say": {
         "pull": "Warm blood on my lake. It will not stay warm for long.",
         "shatter": "Frozen through. Now break.",
@@ -7404,6 +7397,8 @@ export const pt_BR: EnTranslations = {
       "frozenTitle": "Encased in rime!",
       "waterTitle": "Under the ice!",
       "coldLine": "Stand within {radius} yd of {others} or more others to warm up",
+      "splashTitle": "Rime splash! +{cold} cold",
+      "immuneLine": "Your immunity does not stop the cold: huddle up",
       "warmLine": "Your cold is falling. Move the huddle within {seconds} sec or the ice cracks",
       "frozenLine": "The ice shatters in {seconds} sec: everyone close, step away",
       "waterLine": "Climbing out in {seconds} sec",

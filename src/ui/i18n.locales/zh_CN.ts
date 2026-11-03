@@ -23167,8 +23167,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '风沿着固定的路线带你越过虚空：在被放下之前你无法行动。',
   'hudChrome.auraEffect.breathGuardian.windworn':
     '被风耗尽了力气：效果结束前，狂风之路不会带你前往浮岛。',
-  'hudChrome.auraEffect.breathGuardian.thrown':
-    '被巅峰咆哮掀飞：落地之前无法移动。',
+  'hudChrome.auraEffect.breathGuardian.thrown': '被巅峰咆哮掀飞：落地之前无法移动。',
   'hudChrome.auraEffect.breathGuardian.portalA':
     '效果结束时，传送门A会在你所站的位置打开。站在结风附近。本轮你无法携带它。',
   'hudChrome.auraEffect.breathGuardian.portalB':
@@ -23189,18 +23188,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.heart_captain_thessaly.greeting':
     '站稳脚跟，{className}。当风箱呼吸时，进入我的宁静之中，让风撞碎在我们身上。',
   // The Smith's Heart's Guardian of the Quench (M16 fills).
-  'hudChrome.quenchGuardian.warn.rim': '岸冰隆起！快到湖面上去！',
-  'hudChrome.quenchGuardian.warn.frozen': '{player}被冻透了！在冰碎裂之前离开！',
-  'hudChrome.quenchGuardian.warn.crack': '抱团的人群下冰面在呻吟！散开！',
-  'hudChrome.quenchGuardian.warn.marks': '利刃标记了{list}！把它们引离团队！',
   'hudChrome.auraEffect.quenchGuardian.marked':
     '你是{count}人中的第{order}个：利刃将沿穿过你的直线飞来。把直线引离团队。直线在利刃飞出前{lock}秒锁定，届时请离开，否则将受到{min}到{max}点冰霜伤害和{cold}点寒冷。',
   'hudChrome.quenchAlert.markedTitle': '利刃在追猎你！（{count}人中第{order}个）',
   'hudChrome.quenchAlert.markedLine': '把直线引离团队，锁定时立刻离开。',
   'abilityUi.cast.heart_quench_blades_hunt': '利刃狩猎',
-  'hudChrome.quenchGuardian.warn.flurry': '所有利刃同时出猎！躲开直线！',
   'hudChrome.quenchGuardian.say.flurry': '所有利刃！所有锋刃！别让任何人站在我的湖上！',
-  'hudChrome.quenchGuardian.warn.wake': '铸匠之刃挣脱湖面！注意它们瞄准何处！',
   'hudChrome.quenchGuardian.say.pull': '我的湖上来了温热的血。它不会温热太久。',
   'hudChrome.quenchGuardian.say.shatter': '冻透了。现在，碎裂吧。',
   'hudChrome.quenchGuardian.say.hole': '冰记得每一步。聚在一起，它便会崩塌。',
@@ -23210,12 +23203,17 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.quenchGuardian.say.wipe': '静止。无声。淬火已成。',
   'hudChrome.quenchGuardian.say.death': '寒意……放手了……淬火归你们了。',
   'hudChrome.auraEffect.quenchGuardian.cold':
-    '你的寒意：{cold}/{max}。独自一人时约{fill}秒充满。若{radius}码内有{others}名或更多其他玩家，它反而每秒下降{fall}。达到{max}时你会被霜封{freeze}秒，随后冰层碎裂。',
+    '你的寒意：{cold}/{max}。独自一人时约{fill}秒充满。若{radius}码内有{others}名或更多其他玩家，则改为每秒下降{fall}。寒冰棺等免疫效果无法阻止它：免疫期间你既不提供也不获得温暖。达到{max}时你会被冰霜封住{freeze}秒，随后冰层碎裂。',
   'hudChrome.auraEffect.quenchGuardian.warmth':
     '与团队相拥取暖：寒意每秒下降{fall}。在同一处停留{linger}秒的人群，脚下冰面会裂成冰冷的水洞，所以要不断移动。',
   'hudChrome.auraEffect.quenchGuardian.frozen':
-    '被霜封住：无法行动。效果结束时冰层碎裂：你受到{min}到{max}点冰霜伤害并陷入霜脆状态，{radius}码内的所有人获得{cold}点寒意（英雄难度为{heroicRadius}码、{heroicCold}点寒意）。',
-  'hudChrome.auraEffect.quenchGuardian.brittle': '受到的所有伤害提高{pct}%。',
+    '被冰霜封住：你无法行动，受到的所有伤害提高{pct}%，任何免疫效果都无法维持。效果结束时冰层碎裂：你受到{min}到{max}点冰霜伤害，随后{seconds}秒内受到的伤害提高{brittle}%，{radius}码内的所有人获得{cold}点寒意（英雄难度为{heroicRadius}码、{heroicCold}点寒意）。',
+  'hudChrome.auraEffect.quenchGuardian.brittle':
+    '受到的所有伤害提高{pct}%。此效果持续期间，队友碎裂的冰无法将你冻结：溅射的寒意会停在满值前1点。',
+  'hudChrome.auraEffect.quenchGuardian.splashed':
+    '队友碎裂的冰溅到了你：寒意+{cold}。在你自己的寒意条充满前回到人群中。',
+  'hudChrome.quenchAlert.splashTitle': '冰霜溅射！寒意+{cold}',
+  'hudChrome.quenchAlert.immuneLine': '免疫效果挡不住寒意：快抱团',
   'hudChrome.auraEffect.quenchGuardian.trapped':
     '踏穿冰面掉进冰冷的水中：无法移动，每秒受到{min}到{max}点冰霜伤害，寒意不断上升。{seconds}秒后你会爬上岸边。仅凭冰水绝不会致死。',
   'hudChrome.auraEffect.quenchGuardian.awake':

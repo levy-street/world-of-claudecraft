@@ -4778,10 +4778,11 @@ export const zh_CN: EnTranslations = {
         "swell": "每{every}秒，膨胀的风暴对崖台上的所有人造成{min}到{max}点伤害，之前每次脉动使其增强{growth}%：目前已有{stacks}次。"
       },
       "quenchGuardian": {
-        "cold": "你的寒意：{cold}/{max}。独自一人时约{fill}秒充满。若{radius}码内有{others}名或更多其他玩家，它反而每秒下降{fall}。达到{max}时你会被霜封{freeze}秒，随后冰层碎裂。",
+        "cold": "你的寒意：{cold}/{max}。独自一人时约{fill}秒充满。若{radius}码内有{others}名或更多其他玩家，则改为每秒下降{fall}。寒冰棺等免疫效果无法阻止它：免疫期间你既不提供也不获得温暖。达到{max}时你会被冰霜封住{freeze}秒，随后冰层碎裂。",
         "warmth": "与团队相拥取暖：寒意每秒下降{fall}。在同一处停留{linger}秒的人群，脚下冰面会裂成冰冷的水洞，所以要不断移动。",
-        "frozen": "被霜封住：无法行动。效果结束时冰层碎裂：你受到{min}到{max}点冰霜伤害并陷入霜脆状态，{radius}码内的所有人获得{cold}点寒意（英雄难度为{heroicRadius}码、{heroicCold}点寒意）。",
-        "brittle": "受到的所有伤害提高{pct}%。",
+        "frozen": "被冰霜封住：你无法行动，受到的所有伤害提高{pct}%，任何免疫效果都无法维持。效果结束时冰层碎裂：你受到{min}到{max}点冰霜伤害，随后{seconds}秒内受到的伤害提高{brittle}%，{radius}码内的所有人获得{cold}点寒意（英雄难度为{heroicRadius}码、{heroicCold}点寒意）。",
+        "brittle": "受到的所有伤害提高{pct}%。此效果持续期间，队友碎裂的冰无法将你冻结：溅射的寒意会停在满值前1点。",
+        "splashed": "队友碎裂的冰溅到了你：寒意+{cold}。在你自己的寒意条充满前回到人群中。",
         "trapped": "踏穿冰面掉进冰冷的水中：无法移动，每秒受到{min}到{max}点冰霜伤害，寒意不断上升。{seconds}秒后你会爬上岸边。仅凭冰水绝不会致死。",
         "awake": "铸匠的四把利刃已苏醒。每一轮会有更多玩家被标记，利刃依次沿穿过他们的直线飞出。直线在利刃飞出前{lock}秒锁定，随后对线上的目标造成{min}到{max}点冰霜伤害，增加{cold}点寒冷。",
         "marked": "你是{count}人中的第{order}个：利刃将沿穿过你的直线飞来。把直线引离团队。直线在利刃飞出前{lock}秒锁定，届时请离开，否则将受到{min}到{max}点冰霜伤害和{cold}点寒冷。",
@@ -7375,14 +7376,6 @@ export const zh_CN: EnTranslations = {
       }
     },
     "quenchGuardian": {
-      "warn": {
-        "rim": "岸冰隆起！快到湖面上去！",
-        "frozen": "{player}被冻透了！在冰碎裂之前离开！",
-        "crack": "抱团的人群下冰面在呻吟！散开！",
-        "wake": "铸匠之刃挣脱湖面！注意它们瞄准何处！",
-        "marks": "利刃标记了{list}！把它们引离团队！",
-        "flurry": "所有利刃同时出猎！躲开直线！"
-      },
       "say": {
         "pull": "我的湖上来了温热的血。它不会温热太久。",
         "shatter": "冻透了。现在，碎裂吧。",
@@ -7404,6 +7397,8 @@ export const zh_CN: EnTranslations = {
       "frozenTitle": "被霜封住！",
       "waterTitle": "在冰下！",
       "coldLine": "站到{radius}码内有{others}名或更多其他玩家的地方取暖",
+      "splashTitle": "冰霜溅射！寒意+{cold}",
+      "immuneLine": "免疫效果挡不住寒意：快抱团",
       "warmLine": "寒意正在下降。{seconds}秒内移动人群，否则冰面会裂开",
       "frozenLine": "冰层将在{seconds}秒后碎裂：附近的人请离开",
       "waterLine": "{seconds}秒后爬上岸",

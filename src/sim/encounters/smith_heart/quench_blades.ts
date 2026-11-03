@@ -27,7 +27,7 @@ import {
   type QuenchBladeState,
   QUENCH_TUNING as T,
 } from './quench_ids';
-import { beginBar, dropAura, putMarker, type QuenchScope, raidWarn } from './quench_scope';
+import { beginBar, dropAura, putMarker, type QuenchScope } from './quench_scope';
 import type { QuenchBlade, QuenchFightState } from './quench_state';
 import { quenchSay } from './quench_voice';
 
@@ -164,7 +164,6 @@ export function startWake(s: QuenchScope): boolean {
     const e = s.ctx.entities.get(b.objectId);
     if (e) setBladeObject(e, 'wake');
   }
-  raidWarn(s, s.boss, 'wake', "The Smith's blades tear free of the lake! Watch where they aim!");
   quenchSay(s, s.boss, 'wake');
   return true;
 }

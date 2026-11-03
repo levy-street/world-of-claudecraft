@@ -49,8 +49,11 @@ export function quenchAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescri
       return {
         key: `${KEY}.frozen`,
         nums: {
+          pct: pct(T.frozenPct),
           min: T.shatterMin,
           max: T.shatterMax,
+          brittle: pct(T.brittlePct),
+          seconds: T.brittleSeconds,
           radius: QUENCH_DIFFICULTY.normal.splashR,
           cold: QUENCH_DIFFICULTY.normal.splashCold,
           heroicRadius: QUENCH_DIFFICULTY.heroic.splashR,
@@ -59,6 +62,8 @@ export function quenchAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescri
       };
     case QUENCH_AURAS.brittle:
       return { key: `${KEY}.brittle`, nums: { pct: pct(a.value ?? T.brittlePct) } };
+    case QUENCH_AURAS.splashed:
+      return { key: `${KEY}.splashed`, nums: { cold: Math.round(a.value ?? 0) } };
     case QUENCH_AURAS.trapped:
       return {
         key: `${KEY}.trapped`,

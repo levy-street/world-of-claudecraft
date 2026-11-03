@@ -67,6 +67,7 @@ import {
   stepCold,
   stepDeepening,
 } from './quench_cold';
+import { quenchColdDev } from './quench_cold_dev';
 import { clearFlurry, endFlurry, flurryDue, startFlurry, stepFlurry } from './quench_flurry';
 import { clearIce, openHole, startCrack, stepIce } from './quench_ice';
 import {
@@ -476,7 +477,7 @@ export function quenchDevTrigger(
   }
   if (verb === 'burst' || verb === 'freeze') {
     freezePlayer(s, me);
-    return 'You freeze solid: the ice shatters in 4 s.';
+    return `You freeze solid: the ice shatters in ${T.freezeSeconds} s.`;
   }
   if (verb === 'hole') {
     openHole(s, here.x, here.z);
@@ -486,7 +487,7 @@ export function quenchDevTrigger(
     startCrack(s, here.x, here.z);
     return 'The ice groans under you.';
   }
-  return null;
+  return quenchColdDev(s, me, verb, arg);
 }
 
 /** The readout for `/dev heart quench` (state at a glance). */

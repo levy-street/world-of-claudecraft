@@ -22665,8 +22665,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '風が決まった道筋で虚空の上をあなたを運んでいる：降ろされるまで行動できない。',
   'hudChrome.auraEffect.breathGuardian.windworn':
     '風に疲れ果てた：これが切れるまで、疾風の道はあなたを浮島へ運ばない。',
-  'hudChrome.auraEffect.breathGuardian.thrown':
-    '頂の咆哮に吹き飛ばされた：着地するまで動けない。',
+  'hudChrome.auraEffect.breathGuardian.thrown': '頂の咆哮に吹き飛ばされた：着地するまで動けない。',
   'hudChrome.auraEffect.breathGuardian.portalA':
     '効果が切れると、あなたの立つ場所にポータルAが開く。結ばれた疾風の近くに立とう。このラウンドはそれを運べない。',
   'hudChrome.auraEffect.breathGuardian.portalB':
@@ -22687,18 +22686,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.heart_captain_thessaly.greeting':
     '足を踏ん張れ、{className}。ふいごが息をしたら、私の凪の中へ入り、風を我らで受け止めろ。',
   // The Smith's Heart's Guardian of the Quench (M16 fills).
-  'hudChrome.quenchGuardian.warn.rim': '岸の氷がせり上がる！湖の上へ移れ！',
-  'hudChrome.quenchGuardian.warn.frozen': '{player}が凍りついた！氷が砕ける前に離れろ！',
-  'hudChrome.quenchGuardian.warn.crack': '固まった集団の下で氷がきしむ！散らばれ！',
-  'hudChrome.quenchGuardian.warn.marks': '剣が{list}を狙う！レイドから離れて引きつけろ！',
   'hudChrome.auraEffect.quenchGuardian.marked':
     'あなたは{count}人中{order}番目だ。剣があなたを貫く線を飛んでくる。線をレイドから離せ。線は剣が飛ぶ{lock}秒前に固定されるので、その時に線から外れないと{min}から{max}の冷気ダメージと冷え{cold}を受ける。',
   'hudChrome.quenchAlert.markedTitle': '剣があなたを狙っている！({count}人中{order}番目)',
   'hudChrome.quenchAlert.markedLine': '線をレイドから離し、固定されたら線から外れろ。',
   'abilityUi.cast.heart_quench_blades_hunt': '剣の狩り',
-  'hudChrome.quenchGuardian.warn.flurry': 'すべての剣が一斉に狩りを始める！線を避けろ！',
   'hudChrome.quenchGuardian.say.flurry': 'すべての剣よ！すべての刃よ！我が湖に立つものを残すな！',
-  'hudChrome.quenchGuardian.warn.wake': '鍛冶師の剣が湖から解き放たれる！狙いを見極めろ！',
   'hudChrome.quenchGuardian.say.pull': '我が湖に温かい血か。その温もりも長くは続かぬ。',
   'hudChrome.quenchGuardian.say.shatter': '芯まで凍った。さあ、砕けよ。',
   'hudChrome.quenchGuardian.say.hole': '氷はすべての足音を覚えている。寄り集まれば、崩れる。',
@@ -22708,12 +22701,17 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.quenchGuardian.say.wipe': '静まり、黙し、焼き入れられた。',
   'hudChrome.quenchGuardian.say.death': '冷気が……離れていく……焼き入れはお前たちのものだ。',
   'hudChrome.auraEffect.quenchGuardian.cold':
-    'あなたの冷気：{max}中{cold}。ひとりでいると約{fill}秒で満ちる。{radius}ヤード以内に他のプレイヤーが{others}人以上いれば、代わりに毎秒{fall}ずつ下がる。{max}に達すると{freeze}秒間霜に閉ざされ、その後氷が砕ける。',
+    'あなたの冷気：{max}中{cold}。ひとりでいると約{fill}秒で満ちる。{radius}ヤード以内に他のプレイヤーが{others}人以上いれば、代わりに毎秒{fall}ずつ下がる。冷たき棺などの無敵効果では止められない：効果中は温もりを与えることも受けることもできない。{max}に達すると{freeze}秒間霜に閉ざされ、その後氷が砕ける。',
   'hudChrome.auraEffect.quenchGuardian.warmth':
     'レイドと身を寄せ合っている：冷気が毎秒{fall}ずつ下がる。同じ場所に{linger}秒とどまった集団の下では氷が割れ、凍てつく水の穴が開く。動き続けよう。',
   'hudChrome.auraEffect.quenchGuardian.frozen':
-    '霜に閉ざされている：行動できない。効果が切れると氷が砕け、あなたは{min}から{max}の冷気ダメージを受けて霜脆化状態になり、{radius}ヤード以内の全員の冷気が{cold}上がる（ヒロイックでは{heroicRadius}ヤード、冷気{heroicCold}）。',
-  'hudChrome.auraEffect.quenchGuardian.brittle': 'あらゆる攻撃から受けるダメージが{pct}%増加する。',
+    '霜に閉ざされている：行動できず、あらゆる攻撃から受けるダメージが{pct}%増加し、どんな無敵効果も保たれない。効果が切れると氷が砕け、あなたは{min}から{max}の冷気ダメージを受け、その後{seconds}秒間受けるダメージが{brittle}%増加する。{radius}ヤード以内の全員の冷気が{cold}上がる（ヒロイックでは{heroicRadius}ヤード、冷気{heroicCold}）。',
+  'hudChrome.auraEffect.quenchGuardian.brittle':
+    'あらゆる攻撃から受けるダメージが{pct}%増加する。この効果中は、味方の氷が砕けてもあなたが凍りつくことはない：飛び散る冷気は満タンの1手前で止まる。',
+  'hudChrome.auraEffect.quenchGuardian.splashed':
+    '味方の砕けた氷が飛び散った：冷気+{cold}。自分のゲージが満ちる前に集団へ戻れ。',
+  'hudChrome.quenchAlert.splashTitle': '霜の飛沫！冷気+{cold}',
+  'hudChrome.quenchAlert.immuneLine': '無敵効果でも冷気は止まらない：身を寄せ合え',
   'hudChrome.auraEffect.quenchGuardian.trapped':
     '氷を踏み抜き凍てつく水に落ちた：移動できず、毎秒{min}から{max}の冷気ダメージを受け、冷気が上がっていく。{seconds}秒後に縁へ這い上がる。水だけで死ぬことはない。',
   'hudChrome.auraEffect.quenchGuardian.awake':

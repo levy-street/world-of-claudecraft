@@ -24845,12 +24845,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.heart_captain_thessaly.greeting':
     'Держитесь на ногах, {className}. Когда меха вздохнут, вставайте в моё затишье, и пусть ветер разобьётся о нас.',
   // The Smith's Heart's Guardian of the Quench (M16 fills).
-  'hudChrome.quenchGuardian.warn.rim': 'Береговой лёд вздымается! На озеро!',
-  'hudChrome.quenchGuardian.warn.frozen':
-    '{player} промерзает насквозь! Отойдите, пока лёд не разлетелся!',
-  'hudChrome.quenchGuardian.warn.crack': 'Лёд стонет под толпой! Разойдитесь!',
-  'hudChrome.quenchGuardian.warn.marks':
-    'Клинки выбрали цели: {list}! Уводите их от рейда!',
   'hudChrome.auraEffect.quenchGuardian.marked':
     'Вы номер {order} из {count}: клинок полетит вдоль линии через вас. Уведите линию от рейда. Она фиксируется за {lock} сек. до вылета клинка, тогда и сойдите с неё, иначе получите от {min} до {max} ед. урона от магии льда и {cold} холода.',
   'hudChrome.quenchAlert.markedTitle':
@@ -24859,12 +24853,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Уведите линию от рейда и сойдите с неё, когда она зафиксируется.',
   'abilityUi.cast.heart_quench_blades_hunt':
     'Охота клинков',
-  'hudChrome.quenchGuardian.warn.flurry':
-    'Все клинки охотятся разом! Уклоняйтесь от линий!',
   'hudChrome.quenchGuardian.say.flurry':
     'Все клинки! Все лезвия! Не оставьте на моём озере ни одного стоящего!',
-  'hudChrome.quenchGuardian.warn.wake':
-    'Клинки Кузнеца вырываются из озера! Следите, куда они целятся!',
   'hudChrome.quenchGuardian.say.pull': 'Тёплая кровь на моём озере. Тёплой она пробудет недолго.',
   'hudChrome.quenchGuardian.say.shatter': 'Промёрз насквозь. Теперь разбейся.',
   'hudChrome.quenchGuardian.say.hole': 'Лёд помнит каждый шаг. Встаньте вместе, и он не выдержит.',
@@ -24876,13 +24866,19 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.quenchGuardian.say.wipe': 'Тихо. Безмолвно. Закалено.',
   'hudChrome.quenchGuardian.say.death': 'Холод... отпускает... Закалка ваша.',
   'hudChrome.auraEffect.quenchGuardian.cold':
-    'Ваш холод: {cold} из {max}. В одиночку он заполняется примерно за {fill} сек. Если в пределах {radius} м от вас стоят {others} или больше других игроков, он вместо этого падает на {fall} в секунду. На {max} вас на {freeze} сек сковывает иней, затем лёд разлетается.',
+    'Ваш холод: {cold} из {max}. В одиночку шкала заполняется примерно за {fill} сек. Если в пределах {radius} м стоят {others} или больше других игроков, она вместо этого падает на {fall} в секунду. Неуязвимость вроде Холодного гроба её не останавливает: пока она действует, вы не даёте и не получаете тепла. На {max} вас сковывает изморозь на {freeze} сек., затем лёд разлетается.',
   'hudChrome.auraEffect.quenchGuardian.warmth':
     'Вы греетесь вместе с рейдом: холод падает на {fall} в секунду. Если группа простоит на одном месте {linger} сек, лёд под ней треснет и откроется прорубь с ледяной водой, так что не стойте на месте.',
   'hudChrome.auraEffect.quenchGuardian.frozen':
-    'Скован инеем: вы не можете действовать. Когда эффект закончится, лёд разлетится: вы получите от {min} до {max} ед. урона от магии льда и станете Хрупким от мороза, а все в пределах {radius} м от вас получат {cold} холода ({heroicRadius} м и {heroicCold} холода в героическом режиме).',
+    'Скованы изморозью: вы не можете действовать, получаете на {pct}% больше урона из любых источников, и никакая неуязвимость не держится. Когда эффект кончится, лёд разлетится: вы получите от {min} до {max} ед. урона от магии льда, затем {seconds} сек. будете получать на {brittle}% больше урона, а все в пределах {radius} м получат {cold} ед. холода ({heroicRadius} м и {heroicCold} ед. холода в героическом режиме).',
   'hudChrome.auraEffect.quenchGuardian.brittle':
-    'Получаемый урон от всех источников увеличен на {pct}%.',
+    'Получаемый урон из любых источников увеличен на {pct}%. Пока эффект действует, разлетающийся лёд союзника не может сковать вас: его холод останавливается за 1 до полной шкалы.',
+  'hudChrome.auraEffect.quenchGuardian.splashed':
+    'Вас задел разлетевшийся лёд союзника: +{cold} холода. Вернитесь в группу, пока ваша шкала не заполнилась.',
+  'hudChrome.quenchAlert.splashTitle':
+    'Брызги изморози! +{cold} холода',
+  'hudChrome.quenchAlert.immuneLine':
+    'Неуязвимость не спасает от холода: держитесь вместе',
   'hudChrome.auraEffect.quenchGuardian.trapped':
     'Вы провалились сквозь лёд в ледяную воду: вы не можете двигаться, каждую секунду получаете от {min} до {max} ед. урона от магии льда, и ваш холод растёт. Через {seconds} сек вы выбираетесь на край. Сама вода никогда не убивает.',
   'hudChrome.auraEffect.quenchGuardian.awake':

@@ -10,7 +10,7 @@
 
 import { DT } from '../../types';
 import { QUENCH_CASTS, quenchHash, QUENCH_TUNING as T } from './quench_ids';
-import { beginBar, dropFightObject, livePlayers, type QuenchScope, raidWarn } from './quench_scope';
+import { beginBar, dropFightObject, livePlayers, type QuenchScope } from './quench_scope';
 import { clearSlashes, flyLine, landLine, launchLine, openLine } from './quench_slash';
 import type { QuenchFightState } from './quench_state';
 import { quenchSay } from './quench_voice';
@@ -38,7 +38,6 @@ export function startFlurry(s: QuenchScope): boolean {
   st.flurry = { lines: [], gap: 0 };
   s.boss.damageImmune = true;
   beginBar(s, QUENCH_CASTS.flurry, T.flurrySeconds, s.boss.facing);
-  raidWarn(s, s.boss, 'flurry', 'Every blade hunts at once! Dodge the lines!');
   quenchSay(s, s.boss, 'flurry');
   return true;
 }

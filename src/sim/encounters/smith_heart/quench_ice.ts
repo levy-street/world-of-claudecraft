@@ -49,16 +49,12 @@ import {
   dropFightObject,
   frostHit,
   type QuenchScope,
-  raidWarn,
   roll,
   spawnFightObject,
   survivableHit,
 } from './quench_scope';
 import type { QuenchFightState, QuenchHoleState } from './quench_state';
 import { quenchSay } from './quench_voice';
-
-/** Seconds between two of the crack's raid warnings. */
-const CRACK_WARN_EVERY = 6;
 
 // ---- the strain and the cracks ----------------------------------------------------------
 
@@ -114,16 +110,8 @@ function stepStrain(s: QuenchScope): void {
     if (!sp.loaded) sp.t -= T.strainHeal * DT;
     if (sp.t <= 0) continue;
     if (sp.t + 1e-9 >= T.strainLinger) {
-      if (!spotTaken(st, sp.x, sp.z)) {
-        startCrack(s, sp.x, sp.z);
-        // Said at most once in CRACK_WARN_EVERY (the crack's own footprint
-        // is the call; several at once are one warning).
-        const last = st.said.warn_crack;
-        if (last === undefined || st.clock - last >= CRACK_WARN_EVERY - 1e-9) {
-          st.said.warn_crack = st.clock;
-          raidWarn(s, s.boss, 'crack', 'The ice groans under the huddle! Move apart!');
-        }
-      }
+      // The crack's own footprint and its sound are the call (no banner).
+      if (!spotTaken(st, sp.x, sp.z)) startCrack(s, sp.x, sp.z);
       continue;
     }
     keep.push(sp);

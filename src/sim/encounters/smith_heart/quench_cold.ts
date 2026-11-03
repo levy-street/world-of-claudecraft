@@ -1,15 +1,22 @@
 // The Guardian of the Quench's frostbite (docs/design/raid/smith_heart.md
 // section 7.3): every player in the basin carries a cold bar (0 to 100).
 //
-//   The cold      alone it rises (full in about 30 s); within 6 yd of two or
+//   The cold      alone it rises (full in about 24 s); within 6 yd of two or
 //                 more other players (a huddle) it falls instead, and the
 //                 huddle wears its warmth (an aura every client draws).
 //   Frozen solid  at full the player freezes where they stand (an unbreakable
-//                 stun) and the bar resets; 4 s later the ice SHATTERS: a hit
-//                 on them, cold splashed onto everyone close (a chain if it
-//                 fills another bar), then Frost-Brittle, more damage taken
-//                 for 15 s. Heroic's contagious cold splashes further and
-//                 harder.
+//                 stun, double damage taken) and the bar resets; 6 s later
+//                 the ice SHATTERS: a hit on them, cold splashed onto everyone
+//                 close (a chain if it fills another bar), then Frost-Brittle,
+//                 more damage taken for 15 s. Heroic's contagious cold
+//                 splashes further and harder.
+//   Bounded       a player takes one splash a tick however many shatter at
+//                 once, and a Frost-Brittle player's splash stops one short
+//                 of full: a chain freezes each player at most once per
+//                 brittle, so a wave of shatters can never lock the raid.
+//   Immunities    never warmth (quench_bite.ts): a body in stasis gives and
+//                 takes no warmth, and the rime cracks a breakable immunity
+//                 as its wearer freezes, stays frozen or shatters.
 //   Deepening     through phase 2 the cold rises faster every 20 s, without
 //                 end (a stack on the guardian): the soft enrage.
 //
@@ -19,6 +26,7 @@
 // player order.
 
 import { DT, type Entity } from '../../types';
+import { biteThrough, warded } from './quench_bite';
 import { type QBody, warmNeighbours } from './quench_geometry';
 import {
   coldStep,
@@ -36,7 +44,6 @@ import {
   livePlayers,
   putMarker,
   type QuenchScope,
-  raidWarn,
   roll,
 } from './quench_scope';
 import type { QuenchChill } from './quench_state';
@@ -85,13 +92,31 @@ export function isFrozen(s: Pick<QuenchScope, 'st'>, id: number): boolean {
   return (s.st.chill[id]?.frozen ?? 0) > 0;
 }
 
-/** Freeze `p` solid: the bar resets, an unbreakable stun until the shatter.
- *  Exported for the dev trigger. */
+/** Frost-Brittle at `pct` for `seconds` (the freeze's, or the shatter's). */
+function brittle(s: QuenchScope, p: Entity, pct: number, seconds: number): void {
+  dropAura(p, QUENCH_AURAS.brittle);
+  s.ctx.applyAura(p, {
+    id: QUENCH_AURAS.brittle,
+    name: QUENCH_NAMES.brittle,
+    kind: 'vulnerability',
+    remaining: seconds,
+    duration: seconds,
+    value: pct,
+    sourceId: s.boss.id,
+    school: 'frost',
+    undispellable: true,
+  });
+}
+
+/** Freeze `p` solid: the bar resets, an unbreakable stun until the shatter,
+ *  double damage taken while it holds; the rime cracks any immunity they
+ *  wear. Exported for the dev trigger. */
 export function freezePlayer(s: QuenchScope, p: Entity): void {
   const c = chillOf(s, p.id);
   c.cold = 0;
   c.frozen = T.freezeSeconds;
   setWarm(s, p, false);
+  biteThrough(s, p);
   s.ctx.applyAura(p, {
     id: QUENCH_AURAS.frozen,
     name: QUENCH_NAMES.frozen,
@@ -105,6 +130,7 @@ export function freezePlayer(s: QuenchScope, p: Entity): void {
     unbreakableControl: true,
     undispellable: true,
   });
+  brittle(s, p, T.frozenPct, T.freezeSeconds);
   showCold(s, p, 0, 0);
   s.ctx.emit({
     type: 'spellfx',
@@ -114,22 +140,42 @@ export function freezePlayer(s: QuenchScope, p: Entity): void {
     fx: 'nova',
     ability: QUENCH_CUES.freeze,
   });
-  raidWarn(s, s.boss, 'frozen', `${p.name} is frozen solid! Step away before the ice shatters!`, {
-    player: p.name,
-  });
 }
 
 /** Add `amount` cold to `p` (a hit's chill, a splash). A full bar freezes
- *  them now (never in the water: one short of full there). */
-export function addCold(s: QuenchScope, p: Entity, amount: number): void {
-  if (p.dead) return;
+ *  them now (never in the water: one short of full there; nor, with `soft`,
+ *  while they are Frost-Brittle). Returns the cold actually added. */
+export function addCold(s: QuenchScope, p: Entity, amount: number, soft = false): number {
+  if (p.dead) return 0;
   const c = chillOf(s, p.id);
-  if (c.frozen > 0) return;
+  if (c.frozen > 0) return 0;
   const trapped = s.st.trapped[p.id] !== undefined;
-  const cap = trapped ? T.coldMax - 1 : T.coldMax;
-  c.cold = Math.min(cap, c.cold + amount);
-  if (!trapped && c.cold >= T.coldMax - 1e-9) freezePlayer(s, p);
-  else showCold(s, p, c.cold, 1);
+  const held = trapped || (soft && auraOf(p, QUENCH_AURAS.brittle) !== undefined);
+  const cap = held ? T.coldMax - 1 : T.coldMax;
+  const before = c.cold;
+  const next = Math.max(before, Math.min(cap, before + amount));
+  c.cold = next;
+  if (!held && next >= T.coldMax - 1e-9) freezePlayer(s, p);
+  else showCold(s, p, next, 1);
+  return next - before;
+}
+
+/** A shatter's splash on `q`: its cold (one a tick, however many shatter at
+ *  once; never a freeze while they are Frost-Brittle) and the mark the
+ *  client's shards and the player's own alert read. Returns false when the
+ *  tick's one splash had already struck them. */
+function splash(s: QuenchScope, q: Entity, from: Entity): boolean {
+  const struck = s.splashed ?? new Set<number>();
+  s.splashed = struck;
+  if (struck.has(q.id)) return false;
+  struck.add(q.id);
+  const added = addCold(s, q, s.rules.splashCold, true);
+  putMarker(q, QUENCH_AURAS.splashed, QUENCH_NAMES.splashed, T.splashMarkSeconds, s.boss.id, {
+    value: Math.round(added),
+    value2: from.id,
+    school: 'frost',
+  });
+  return true;
 }
 
 /** The ice round a frozen player shatters: the hit, the splash, the brittle
@@ -137,7 +183,11 @@ export function addCold(s: QuenchScope, p: Entity, amount: number): void {
 export function shatter(s: QuenchScope, p: Entity): Entity[] {
   const c = chillOf(s, p.id);
   c.frozen = 0;
+  biteThrough(s, p);
   dropAura(p, QUENCH_AURAS.frozen);
+  // The freeze's double damage ends as the ice breaks: the shatter's own hit
+  // lands on the plain body.
+  dropAura(p, QUENCH_AURAS.brittle);
   const o = s.ctx.instanceOriginOf(s.inst);
   const here = at(s, p);
   s.ctx.emit({
@@ -150,26 +200,14 @@ export function shatter(s: QuenchScope, p: Entity): Entity[] {
     ability: QUENCH_CUES.shatter,
   });
   frostHit(s, p, roll(s, T.shatterMin, T.shatterMax), QUENCH_NAMES.shatter);
-  if (!p.dead)
-    s.ctx.applyAura(p, {
-      id: QUENCH_AURAS.brittle,
-      name: QUENCH_NAMES.brittle,
-      kind: 'vulnerability',
-      remaining: T.brittleSeconds,
-      duration: T.brittleSeconds,
-      value: T.brittlePct,
-      sourceId: s.boss.id,
-      school: 'frost',
-      undispellable: true,
-    });
+  if (!p.dead) brittle(s, p, T.brittlePct, T.brittleSeconds);
   quenchSay(s, s.boss, 'shatter');
   const splashed: Entity[] = [];
   for (const q of livePlayers(s)) {
     if (q.id === p.id) continue;
     const there = at(s, q);
     if (Math.hypot(there.x - here.x, there.z - here.z) > s.rules.splashR) continue;
-    splashed.push(q);
-    addCold(s, q, s.rules.splashCold);
+    if (splash(s, q, p)) splashed.push(q);
   }
   return splashed;
 }
@@ -177,10 +215,11 @@ export function shatter(s: QuenchScope, p: Entity): Entity[] {
 /** One tick of every player's cold. */
 export function stepCold(s: QuenchScope): void {
   const st = s.st;
-  // The bodies that give warmth: living, not frozen, not in the water.
+  // The bodies that give warmth: living, not frozen, not in the water, not
+  // sealed in an immunity.
   const donors: QBody[] = [];
   for (const p of s.players) {
-    if (p.dead || isFrozen(s, p.id) || st.trapped[p.id] !== undefined) continue;
+    if (p.dead || isFrozen(s, p.id) || st.trapped[p.id] !== undefined || warded(p)) continue;
     const here = at(s, p);
     donors.push({ id: p.id, x: here.x, z: here.z });
   }
@@ -189,20 +228,24 @@ export function stepCold(s: QuenchScope): void {
     if (p.dead) continue;
     const c = chillOf(s, p.id);
     if (c.frozen > 0) {
+      // No immunity holds inside the rime (an Ice Block pressed in the ice).
+      if (warded(p)) biteThrough(s, p);
       c.frozen -= DT;
       if (c.frozen <= 1e-9) shatter(s, p);
       continue;
     }
     const trapped = st.trapped[p.id] !== undefined;
+    // An immunity is no warmth: its wearer's bar rises as if alone.
+    const sealed = warded(p);
     let others = 0;
-    if (!trapped) {
+    if (!trapped && !sealed) {
       const here = at(s, p);
       others = warmNeighbours({ id: p.id, x: here.x, z: here.z }, donors);
     }
     // The interphase holds the cold: a huddle still warms, nothing else moves it.
     const raw = coldStep(others, mult);
     const step = st.flurry && raw > 0 ? 0 : raw;
-    setWarm(s, p, !trapped && others >= T.warmNeed);
+    setWarm(s, p, !trapped && !sealed && others >= T.warmNeed);
     const cap = trapped ? T.coldMax - 1 : T.coldMax;
     c.cold = Math.max(0, Math.min(cap, c.cold + step * DT));
     if (!trapped && c.cold >= T.coldMax - 1e-9) {
@@ -241,10 +284,12 @@ export function stepDeepening(s: QuenchScope): void {
   if (st.deepenStacks >= 3) quenchSay(s, b, 'deepen');
 }
 
-/** Every mark of the cold off one body (a reset, a fall, a departure). The
- *  brittle debuff runs out on its own. */
+/** Every mark of the cold off one body (a reset, a fall, a departure), the
+ *  brittle and a splash's mark with it. */
 export function clearColdMarks(e: Entity): void {
   dropAura(e, QUENCH_AURAS.cold);
   dropAura(e, QUENCH_AURAS.warmth);
   dropAura(e, QUENCH_AURAS.frozen);
+  dropAura(e, QUENCH_AURAS.brittle);
+  dropAura(e, QUENCH_AURAS.splashed);
 }
