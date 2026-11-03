@@ -21982,7 +21982,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_mage_frost.bonus4': '施放冰缚会使疾步的剩余冷却时间缩短5秒。',
   'entities.itemSets.vanguard_warlock_affliction.name': '先锋套装：惧羽法衣',
   'entities.itemSets.vanguard_warlock_affliction.bonus2':
-    '折磨的施法时间缩短0.3秒。受到伤害不再延迟你的施法。',
+    '暗影锚的冷却时间缩短15秒。受到伤害不再延迟你的施法。',
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     '吞噬为你多治疗30%，并且可以在移动中引导。',
   'entities.itemSets.vanguard_warlock_demonology.name': '先锋套装：骨缚礼服',

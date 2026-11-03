@@ -472,9 +472,12 @@ describe('Rimewarden Garb (frost)', () => {
 describe('Dreadquill Vestments (affliction)', () => {
   const SET = 'vanguard_warlock_affliction';
 
-  it('2pc: Harrow casts in 1.2 sec (from 1.5), not at 1 piece', () => {
-    expect(resolved(live('warlock', 'affliction', SET, 2), 'fear').castTime).toBeCloseTo(1.2, 6);
-    expect(resolved(live('warlock', 'affliction', SET, 1), 'fear').castTime).toBeCloseTo(1.5, 6);
+  it('2pc: Umbral Anchor recharges in 30 sec (from 45), not at 1 piece', () => {
+    const worn = live('warlock', 'affliction', SET, 2);
+    expect(resolved(worn, 'umbral_anchor').cooldown).toBe(30);
+    // Harrow keeps its authored cast now that the tier no longer shortens it.
+    expect(resolved(worn, 'fear').castTime).toBeCloseTo(1.5, 6);
+    expect(resolved(live('warlock', 'affliction', SET, 1), 'umbral_anchor').cooldown).toBe(45);
   });
 
   /** Channels Consume standing still at low health; pairs each pulse's damage
@@ -796,7 +799,7 @@ describe('Vanguard B sets: tooltip numbers match the constants', () => {
       [B.VANGUARD_FROST_4PC_FLITSTEP_REFUND_SEC],
     ],
     vanguard_warlock_affliction: [
-      [B.VANGUARD_AFFLICTION_2PC_HARROW_CAST_CUT_SEC],
+      [B.VANGUARD_AFFLICTION_2PC_ANCHOR_COOLDOWN_CUT_SEC],
       [pct(B.VANGUARD_AFFLICTION_4PC_CONSUME_HEAL_MULT)],
     ],
     vanguard_warlock_demonology: [

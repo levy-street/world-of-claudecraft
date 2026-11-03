@@ -2071,7 +2071,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     "Tidecall ayrıca hedefini maksimum sağlığının %5'i için 6 saniye kalkan ile korur.",
   'entities.itemSets.vanguard_shaman_restoration.name': 'Tuz Koruma Halka Zırhı',
   'entities.itemSets.vanguard_warlock_affliction.bonus2':
-    "Harrow'un döküm süresi 0,3 san azalır. Alınan hasar artık büyü yapmanı geciktirmez.",
+    "Gölge Çapası'nın bekleme süresi 15 san azalır. Alınan hasar artık büyü yapmanı geciktirmez.",
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     'Consume seni %30 daha fazla iyileştirir ve hareket ederken kanallaştırılabilir.',
   'entities.itemSets.vanguard_warlock_affliction.name': 'Korku Tüyü Giysileri',

@@ -2107,7 +2107,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Wezwanie Pływu również chroni cel tarczą na 5 procent maksymalnego zdrowia na 6 sek.',
   'entities.itemSets.vanguard_shaman_restoration.name': 'Pancerz Kolczasty Gwardy Słoni',
   'entities.itemSets.vanguard_warlock_affliction.bonus2':
-    'Czas rzucania Trwogi jest zmniejszony o 0.3 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
+    'Czas odnowienia Mrocznej Kotwicy jest zmniejszony o 15 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     'Pochłonięcie uzdrawia Ciebie o 30 procent więcej i może być kanalizowane podczas ruchu.',
   'entities.itemSets.vanguard_warlock_affliction.name': 'Szata Pióra Grozy',

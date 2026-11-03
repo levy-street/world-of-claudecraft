@@ -31059,7 +31059,7 @@ export const nl_NL: EnTranslations = {
       },
       "vanguard_warlock_affliction": {
         "name": "Angstqvill Gewaden",
-        "bonus2": "Werptijd van Teisteren is 0.3 sec korter. Opgelopen schade vertraagt je spreuken niet meer.",
+        "bonus2": "Afkoeltijd van Schaduwanker is 15 sec korter. Opgelopen schade vertraagt je spreuken niet meer.",
         "bonus4": "Verteren geneest je 30% meer en kan gekanaliseerd worden terwijl je beweegt."
       },
       "vanguard_warlock_demonology": {

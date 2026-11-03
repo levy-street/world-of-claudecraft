@@ -31059,7 +31059,7 @@ export const zh_CN: EnTranslations = {
       },
       "vanguard_warlock_affliction": {
         "name": "先锋套装：惧羽法衣",
-        "bonus2": "折磨的施法时间缩短0.3秒。受到伤害不再延迟你的施法。",
+        "bonus2": "暗影锚的冷却时间缩短15秒。受到伤害不再延迟你的施法。",
         "bonus4": "吞噬为你多治疗30%，并且可以在移动中引导。"
       },
       "vanguard_warlock_demonology": {

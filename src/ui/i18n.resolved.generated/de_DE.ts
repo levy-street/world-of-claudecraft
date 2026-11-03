@@ -31059,7 +31059,7 @@ export const de_DE: EnTranslations = {
       },
       "vanguard_warlock_affliction": {
         "name": "Furchtfeder-Gewänder",
-        "bonus2": "Die Zauberzeit von Heimsuchung wird um 0,3 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
+        "bonus2": "Die Abklingzeit von Schattenanker wird um 15 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
         "bonus4": "Verzehren heilt dich um 30 Prozent mehr und kann während der Bewegung kanalisiert werden."
       },
       "vanguard_warlock_demonology": {

@@ -21401,7 +21401,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '4点：Icebind詠唱でFlitstepの残りクールダウンが5秒短縮。',
   'entities.itemSets.vanguard_warlock_affliction.name': 'ヴァンガード：Dreadquill Vestments',
   'entities.itemSets.vanguard_warlock_affliction.bonus2':
-    '2点：Harrowの詠唱時間が0.3秒短縮。被ダメージで詠唱が遅れなくなります。',
+    '2点：影の錨の再使用時間が15秒短縮。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     '4点：Consumeの回復量が30%上昇し、移動中にチャネル可能。',
   'entities.itemSets.vanguard_warlock_demonology.name': 'ヴァンガード：Marrowbound Regalia',

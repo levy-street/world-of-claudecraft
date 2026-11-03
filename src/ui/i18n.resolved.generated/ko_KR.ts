@@ -31059,7 +31059,7 @@ export const ko_KR: EnTranslations = {
       },
       "vanguard_warlock_affliction": {
         "name": "선봉대: Dreadquill Vestments",
-        "bonus2": "2세트: Harrow의 시전 시간이 0.3초 감소합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.",
+        "bonus2": "2세트: 암영 닻의 재사용 대기시간이 15초 감소합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.",
         "bonus4": "4세트: Consume의 치유량이 30% 증가하고 이동 중에도 정신 집중할 수 있습니다."
       },
       "vanguard_warlock_demonology": {

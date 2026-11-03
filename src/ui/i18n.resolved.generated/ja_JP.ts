@@ -31059,7 +31059,7 @@ export const ja_JP: EnTranslations = {
       },
       "vanguard_warlock_affliction": {
         "name": "ヴァンガード：Dreadquill Vestments",
-        "bonus2": "2点：Harrowの詠唱時間が0.3秒短縮。被ダメージで詠唱が遅れなくなります。",
+        "bonus2": "2点：影の錨の再使用時間が15秒短縮。被ダメージで詠唱が遅れなくなります。",
         "bonus4": "4点：Consumeの回復量が30%上昇し、移動中にチャネル可能。"
       },
       "vanguard_warlock_demonology": {

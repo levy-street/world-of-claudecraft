@@ -2095,7 +2095,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Tidecall skyddar också sitt mål för 5 procent av din maximala hälsa i 6 sec.',
   'entities.itemSets.vanguard_shaman_restoration.name': 'Brineward Chainmail',
   'entities.itemSets.vanguard_warlock_affliction.bonus2':
-    'Harrows kastningstid minskas med 0,3 sec. Skada du tar fördröjer inte längre dina besvärjelser.',
+    'Skuggankares nedkylning minskas med 15 sek. Skada du tar fördröjer inte längre dina besvärjelser.',
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     'Förtär läker dig för 30 procent mer och kan kanaliseras medan du rör dig.',
   'entities.itemSets.vanguard_warlock_affliction.name': 'Dreadquill Vestments',

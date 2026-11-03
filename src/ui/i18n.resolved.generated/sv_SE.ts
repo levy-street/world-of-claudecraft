@@ -31059,7 +31059,7 @@ export const sv_SE: EnTranslations = {
       },
       "vanguard_warlock_affliction": {
         "name": "Dreadquill Vestments",
-        "bonus2": "Harrows kastningstid minskas med 0,3 sec. Skada du tar fördröjer inte längre dina besvärjelser.",
+        "bonus2": "Skuggankares nedkylning minskas med 15 sek. Skada du tar fördröjer inte längre dina besvärjelser.",
         "bonus4": "Förtär läker dig för 30 procent mer och kan kanaliseras medan du rör dig."
       },
       "vanguard_warlock_demonology": {

@@ -31059,7 +31059,7 @@ export const id_ID: EnTranslations = {
       },
       "vanguard_warlock_affliction": {
         "name": "Gaun Bulu Dread",
-        "bonus2": "Waktu jentikan Cekaman dikurangi 0.3 detik. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.",
+        "bonus2": "Jeda Jangkar Bayangan dikurangi 15 detik. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.",
         "bonus4": "Melahap menyembuhkan 30 persen lebih banyak dan dapat disalurkan sambil bergerak."
       },
       "vanguard_warlock_demonology": {

@@ -21363,7 +21363,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '4세트: Icebind 시전 시 Flitstep의 남은 재사용 대기시간이 5초 감소합니다.',
   'entities.itemSets.vanguard_warlock_affliction.name': '선봉대: Dreadquill Vestments',
   'entities.itemSets.vanguard_warlock_affliction.bonus2':
-    '2세트: Harrow의 시전 시간이 0.3초 감소합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
+    '2세트: 암영 닻의 재사용 대기시간이 15초 감소합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     '4세트: Consume의 치유량이 30% 증가하고 이동 중에도 정신 집중할 수 있습니다.',
   'entities.itemSets.vanguard_warlock_demonology.name': '선봉대: Marrowbound Regalia',

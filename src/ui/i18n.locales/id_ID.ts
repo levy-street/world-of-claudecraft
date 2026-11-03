@@ -2108,7 +2108,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Panggilan Pasang juga melindungi targetnya sebesar 5 persen dari kesehatan maksimal-mu selama 6 detik.',
   'entities.itemSets.vanguard_shaman_restoration.name': 'Perang Garam Brineward',
   'entities.itemSets.vanguard_warlock_affliction.bonus2':
-    'Waktu jentikan Cekaman dikurangi 0.3 detik. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
+    'Jeda Jangkar Bayangan dikurangi 15 detik. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     'Melahap menyembuhkan 30 persen lebih banyak dan dapat disalurkan sambil bergerak.',
   'entities.itemSets.vanguard_warlock_affliction.name': 'Gaun Bulu Dread',

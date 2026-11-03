@@ -2076,7 +2076,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Tidecall cũng bảo vệ mục tiêu của nó với 5 phần trăm sức khỏe tối đa của bạn trong 6 giây.',
   'entities.itemSets.vanguard_shaman_restoration.name': 'Brineward Chainmail',
   'entities.itemSets.vanguard_warlock_affliction.bonus2':
-    'Thời gian truyền tải Giày Vò giảm 0,3 giây. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
+    'Thời gian hồi chiêu của Neo Bóng Tối giảm 15 giây. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     'Nuốt Chửng chữa lành bạn 30 phần trăm nhiều hơn và có thể được truyền tải khi di chuyển.',
   'entities.itemSets.vanguard_warlock_affliction.name': 'Dreadquill Vestments',

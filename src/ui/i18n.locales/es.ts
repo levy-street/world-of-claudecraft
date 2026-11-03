@@ -1951,7 +1951,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_warlock_affliction_shoulder.name': 'Manto Plumapavor',
   'entities.itemSets.vanguard_warlock_affliction.name': 'Vestiduras Plumapavor',
   'entities.itemSets.vanguard_warlock_affliction.bonus2':
-    'El tiempo de lanzamiento de Espanto se reduce 0,3 s. El daño recibido ya no retrasa tus hechizos.',
+    'El tiempo de reutilización de Ancla umbría se reduce 15 s. El daño recibido ya no retrasa tus hechizos.',
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     'Consumir te sana un 30% más y puede canalizarse en movimiento.',
   'entities.items.vanguard_warlock_demonology_chest.name': 'Vestidura Atamédula',

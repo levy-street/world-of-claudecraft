@@ -2178,7 +2178,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Appel des marées octroie aussi à sa cible un bouclier égal à 5 % de vos points de vie maximum pendant 6 s.',
   'entities.itemSets.vanguard_shaman_restoration.name': 'Cotte de mailles Garde-saumâtre',
   'entities.itemSets.vanguard_warlock_affliction.bonus2':
-    "Le temps d'incantation de Tourment est réduit de 0,3 s. Les dégâts subis ne retardent plus vos incantations.",
+    "Le temps de recharge d'Ancre ombrale est réduit de 15 s. Les dégâts subis ne retardent plus vos incantations.",
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     'Consumer vous soigne 30 % de plus et peut être canalisé en mouvement.',
   'entities.itemSets.vanguard_warlock_affliction.name': 'Tenue Plume-de-terreur',

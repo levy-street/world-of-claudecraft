@@ -31059,7 +31059,7 @@ export const en_CA: EnTranslations = {
       },
       "vanguard_warlock_affliction": {
         "name": "Dreadquill Vestments",
-        "bonus2": "Harrow's cast time is reduced by 0.3 sec. Damage taken no longer delays your spellcasting.",
+        "bonus2": "Umbral Anchor's cooldown is reduced by 15 sec. Damage taken no longer delays your spellcasting.",
         "bonus4": "Consume heals you for 30 percent more and can be channeled while moving."
       },
       "vanguard_warlock_demonology": {

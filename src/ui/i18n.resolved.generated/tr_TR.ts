@@ -31059,7 +31059,7 @@ export const tr_TR: EnTranslations = {
       },
       "vanguard_warlock_affliction": {
         "name": "Korku Tüyü Giysileri",
-        "bonus2": "Harrow'un döküm süresi 0,3 san azalır. Alınan hasar artık büyü yapmanı geciktirmez.",
+        "bonus2": "Gölge Çapası'nın bekleme süresi 15 san azalır. Alınan hasar artık büyü yapmanı geciktirmez.",
         "bonus4": "Consume seni %30 daha fazla iyileştirir ve hareket ederken kanallaştırılabilir."
       },
       "vanguard_warlock_demonology": {

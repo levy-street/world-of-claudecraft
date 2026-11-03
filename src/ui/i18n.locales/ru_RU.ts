@@ -23526,7 +23526,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     '4 предмета: применение Icebind сокращает оставшееся время восстановления Flitstep на 5 сек.',
   'entities.itemSets.vanguard_warlock_affliction.name': 'Авангард: Dreadquill Vestments',
   'entities.itemSets.vanguard_warlock_affliction.bonus2':
-    '2 предмета: время произнесения Harrow сокращается на 0,3 сек. Получаемый урон больше не замедляет чтение ваших заклинаний.',
+    '2 предмета: время восстановления Сумрачного якоря сокращается на 15 сек. Получаемый урон больше не замедляет чтение ваших заклинаний.',
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     '4 предмета: Consume лечит на 30% больше и может поддерживаться на ходу.',
   'entities.itemSets.vanguard_warlock_demonology.name': 'Авангард: Marrowbound Regalia',

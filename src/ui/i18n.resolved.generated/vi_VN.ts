@@ -31059,7 +31059,7 @@ export const vi_VN: EnTranslations = {
       },
       "vanguard_warlock_affliction": {
         "name": "Dreadquill Vestments",
-        "bonus2": "Thời gian truyền tải Giày Vò giảm 0,3 giây. Sát thương phải chịu không còn làm chậm việc thi triển phép.",
+        "bonus2": "Thời gian hồi chiêu của Neo Bóng Tối giảm 15 giây. Sát thương phải chịu không còn làm chậm việc thi triển phép.",
         "bonus4": "Nuốt Chửng chữa lành bạn 30 phần trăm nhiều hơn và có thể được truyền tải khi di chuyển."
       },
       "vanguard_warlock_demonology": {

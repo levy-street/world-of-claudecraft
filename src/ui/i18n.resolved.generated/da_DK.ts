@@ -31059,7 +31059,7 @@ export const da_DK: EnTranslations = {
       },
       "vanguard_warlock_affliction": {
         "name": "Dread Quill Gevandter",
-        "bonus2": "Hjemsøg kasttid reduceres med 0,3 sek. Skade, du tager, forsinker ikke længere dine besværgelser.",
+        "bonus2": "Skyggeankers nedkøling reduceres med 15 sek. Skade, du tager, forsinker ikke længere dine besværgelser.",
         "bonus4": "Fortær heler dig for 30 procent mere og kan kanaliseres mens du bevæger dig."
       },
       "vanguard_warlock_demonology": {

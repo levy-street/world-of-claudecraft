@@ -31059,7 +31059,7 @@ export const zh_TW: EnTranslations = {
       },
       "vanguard_warlock_affliction": {
         "name": "先鋒套裝：Dreadquill Vestments",
-        "bonus2": "2件：Harrow施法時間縮短0.3秒。受到傷害不再延遲你的施法。",
+        "bonus2": "2件：暗影錨冷卻時間縮短15秒。受到傷害不再延遲你的施法。",
         "bonus4": "4件：Consume治療量提高30%，且可移動引導。"
       },
       "vanguard_warlock_demonology": {

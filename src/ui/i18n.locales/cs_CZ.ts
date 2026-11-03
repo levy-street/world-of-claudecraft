@@ -2095,7 +2095,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Volání přílivu navíc zaštítí svůj cíl a pohltí 5 % tvého maximálního zdraví na 6 s.',
   'entities.itemSets.vanguard_shaman_restoration.name': 'Drátěná košile Solankostráže',
   'entities.itemSets.vanguard_warlock_affliction.bonus2':
-    'Sesílání Děsu je o 0.3 s kratší. Utržené poškození již nezpožďuje sesílání kouzel.',
+    'Doba obnovy Stínové kotvy je o 15 s kratší. Utržené poškození již nezpožďuje sesílání kouzel.',
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     'Vysát: uzdraví tě o 30 % více a lze jej kanálovat i za pohybu.',
   'entities.itemSets.vanguard_warlock_affliction.name': 'Šat Děsopera',

@@ -2360,7 +2360,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Chamado da Maré também escuda seu alvo em 5% da sua vida máxima por 6 s.',
   'entities.itemSets.vanguard_warlock_affliction.name': 'Vestes da Pena do Pavor',
   'entities.itemSets.vanguard_warlock_affliction.bonus2':
-    'O tempo de conjuração de Atormentar é reduzido em 0,3 s. Dano recebido não atrasa mais suas conjurações.',
+    'A recarga de Âncora Umbral é reduzida em 15 s. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     'Consumir cura 30% a mais e pode ser canalizado em movimento.',
   'entities.itemSets.vanguard_warlock_demonology.name': 'Regália do Vínculo da Medula',

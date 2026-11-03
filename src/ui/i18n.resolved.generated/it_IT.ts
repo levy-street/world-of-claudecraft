@@ -31059,7 +31059,7 @@ export const it_IT: EnTranslations = {
       },
       "vanguard_warlock_affliction": {
         "name": "Vesti Pennaterrore",
-        "bonus2": "Il tempo di lancio di Tormento è ridotto di 0,3 sec. I danni subiti non ritardano più il lancio degli incantesimi.",
+        "bonus2": "Il tempo di recupero di Ancora d'Ombra è ridotto di 15 sec. I danni subiti non ritardano più il lancio degli incantesimi.",
         "bonus4": "Divorare ti cura il 30 percento in più e può essere canalizzato in movimento."
       },
       "vanguard_warlock_demonology": {

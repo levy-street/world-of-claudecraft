@@ -31059,7 +31059,7 @@ export const pl_PL: EnTranslations = {
       },
       "vanguard_warlock_affliction": {
         "name": "Szata Pióra Grozy",
-        "bonus2": "Czas rzucania Trwogi jest zmniejszony o 0.3 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.",
+        "bonus2": "Czas odnowienia Mrocznej Kotwicy jest zmniejszony o 15 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.",
         "bonus4": "Pochłonięcie uzdrawia Ciebie o 30 procent więcej i może być kanalizowane podczas ruchu."
       },
       "vanguard_warlock_demonology": {

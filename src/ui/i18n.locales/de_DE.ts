@@ -2271,7 +2271,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_shaman_restoration_shoulder.name': 'Brandungswacht-Schultermantel',
   'entities.itemSets.vanguard_warlock_affliction.name': 'Furchtfeder-Gewänder',
   'entities.itemSets.vanguard_warlock_affliction.bonus2':
-    'Die Zauberzeit von Heimsuchung wird um 0,3 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
+    'Die Abklingzeit von Schattenanker wird um 15 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     'Verzehren heilt dich um 30 Prozent mehr und kann während der Bewegung kanalisiert werden.',
   'entities.items.vanguard_warlock_affliction_chest.name': 'Furchtfeder-Robe',

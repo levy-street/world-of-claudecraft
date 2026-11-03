@@ -61,10 +61,8 @@ export const VANGUARD_FROST_2PC_ICEBIND_COOLDOWN_CUT_SEC = 2;
 export const VANGUARD_FROST_4PC_FLITSTEP_REFUND_SEC = 5;
 
 // ---- Warlock ----
-/** Dreadquill 2pc: seconds cut from Harrow's cast (1.5 to 1.2). */
-export const VANGUARD_AFFLICTION_2PC_HARROW_CAST_CUT_SEC = 0.3;
-/** Harrow's authored cast time (castPct scales it additively). */
-export const HARROW_CAST_SEC = 1.5;
+/** Dreadquill 2pc: seconds cut from Umbral Anchor's cooldown (45 to 30). */
+export const VANGUARD_AFFLICTION_2PC_ANCHOR_COOLDOWN_CUT_SEC = 15;
 /** Dreadquill 4pc: Consume's health transfer multiplier (+30 percent). */
 export const VANGUARD_AFFLICTION_4PC_CONSUME_HEAL_MULT = 1.3;
 /** Marrowbound 2pc: seconds cut from Bone Armor's cooldown (45 to 35). */
@@ -321,12 +319,13 @@ export const VANGUARD_BONUSES_B: Record<string, readonly SetEngineBonusTier[]> =
   vanguard_warlock_affliction: [
     {
       pieces: 2,
-      // Harrow 1.5 -> 1.2 sec cast: castPct on the authored cast.
+      // Umbral Anchor 45 -> 30 sec cooldown: a flat cut that stacks with Grave
+      // Rhythm's own 15 (down to 15 sec with both).
       effect: {
         ability: [
           {
-            ability: 'fear',
-            castPct: -VANGUARD_AFFLICTION_2PC_HARROW_CAST_CUT_SEC / HARROW_CAST_SEC,
+            ability: 'umbral_anchor',
+            cooldownFlat: -VANGUARD_AFFLICTION_2PC_ANCHOR_COOLDOWN_CUT_SEC,
           },
         ],
       },

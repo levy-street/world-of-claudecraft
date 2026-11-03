@@ -31059,7 +31059,7 @@ export const cs_CZ: EnTranslations = {
       },
       "vanguard_warlock_affliction": {
         "name": "Šat Děsopera",
-        "bonus2": "Sesílání Děsu je o 0.3 s kratší. Utržené poškození již nezpožďuje sesílání kouzel.",
+        "bonus2": "Doba obnovy Stínové kotvy je o 15 s kratší. Utržené poškození již nezpožďuje sesílání kouzel.",
         "bonus4": "Vysát: uzdraví tě o 30 % více a lze jej kanálovat i za pohybu."
       },
       "vanguard_warlock_demonology": {

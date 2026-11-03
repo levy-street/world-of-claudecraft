@@ -2066,7 +2066,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Richiamo della Marea protegge inoltre il suo bersaglio con uno scudo pari al 5 percento della tua salute massima per 6 sec.',
   'entities.itemSets.vanguard_shaman_restoration.name': 'Cotta di Maglia Guardiasalmastra',
   'entities.itemSets.vanguard_warlock_affliction.bonus2':
-    'Il tempo di lancio di Tormento è ridotto di 0,3 sec. I danni subiti non ritardano più il lancio degli incantesimi.',
+    "Il tempo di recupero di Ancora d'Ombra è ridotto di 15 sec. I danni subiti non ritardano più il lancio degli incantesimi.",
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     'Divorare ti cura il 30 percento in più e può essere canalizzato in movimento.',
   'entities.itemSets.vanguard_warlock_affliction.name': 'Vesti Pennaterrore',

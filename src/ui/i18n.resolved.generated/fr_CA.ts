@@ -31059,7 +31059,7 @@ export const fr_CA: EnTranslations = {
       },
       "vanguard_warlock_affliction": {
         "name": "Tenue Plume-de-terreur",
-        "bonus2": "Le temps d'incantation de Tourment est réduit de 0,3 s. Les dégâts subis ne retardent plus vos incantations.",
+        "bonus2": "Le temps de recharge d'Ancre ombrale est réduit de 15 s. Les dégâts subis ne retardent plus vos incantations.",
         "bonus4": "Consumer vous soigne 30 % de plus et peut être canalisé en mouvement."
       },
       "vanguard_warlock_demonology": {

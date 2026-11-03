@@ -31059,7 +31059,7 @@ export const es_ES: EnTranslations = {
       },
       "vanguard_warlock_affliction": {
         "name": "Vestiduras Plumapavor",
-        "bonus2": "El tiempo de lanzamiento de Espanto se reduce 0,3 s. El daño recibido ya no retrasa tus hechizos.",
+        "bonus2": "El tiempo de reutilización de Ancla umbría se reduce 15 s. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Consumir te sana un 30% más y puede canalizarse en movimiento."
       },
       "vanguard_warlock_demonology": {

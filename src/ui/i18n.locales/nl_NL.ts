@@ -2118,7 +2118,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Tidenoproep beschermt zijn doel ook voor 5% van je maximale gezondheid voor 6 sec.',
   'entities.itemSets.vanguard_shaman_restoration.name': 'Ziltwacht Kettingpantser',
   'entities.itemSets.vanguard_warlock_affliction.bonus2':
-    'Werptijd van Teisteren is 0.3 sec korter. Opgelopen schade vertraagt je spreuken niet meer.',
+    'Afkoeltijd van Schaduwanker is 15 sec korter. Opgelopen schade vertraagt je spreuken niet meer.',
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     'Verteren geneest je 30% meer en kan gekanaliseerd worden terwijl je beweegt.',
   'entities.itemSets.vanguard_warlock_affliction.name': 'Angstqvill Gewaden',
