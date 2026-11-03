@@ -1606,9 +1606,17 @@ above disagree, this one wins.
   the north (`breath_summit_core.ts`), the floor's granite drifting warm and cool with moss
   and pale polish. No barrier was added.
 - **The Islands of the Wind, high and real.** The isles are the Breath kit's Blender sculpts
-  (`Kit_WindIsleA`, `Kit_WindIsleB`: a flat walk past the sim's rim, a craggy lip with three
-  wind-rune standing stones, a crag of strata hanging to a point of crystal, roots, vines and
-  a broken chain of carved stone; `Kit_IsleShard` drifting round them) and hang 26 and 30 yd
+  (`docs/design/raid/kit/breath_isles.py`, the AAA pass of 2026-11-03: `Kit_WindIsleA`,
+  `Kit_WindIsleB`, each its own shape; a turf walk whose edge is the isle's own field polygon,
+  so the visible floor ends exactly where a body may stand; the ruined wind shrine on it, a
+  broken ring of flags under the rune ring and the Homeward Gale's dais in a gap of it toward
+  the Cornice; runed standing stones, a broken arch (A) or a wind-bent tree (B) past the edge;
+  one dominant crag tapering to a leaning point of crystal with lesser spires, a jutting
+  shelf and satellite rocks; thick roots and vines; `Kit_IsleShard` drifting round them, in a
+  ring past the satellites and under the point). They draw with the kit's `isle` material
+  (`heart_isle_fill.ts`: a shade floor and the cloud sea's cool bounce, so the hang reads
+  blue-violet from below, never black), and mist streams off each hang, grit and dust fall
+  from it (cosmetic, thinned by the tier). They hang 26 and 30 yd
   over the Cornice off its south rim (`BREATH_ISLES`), in open air (no rock under or beside
   them, `heartOpenAir`), inside the field's bounds and the instance slot's band (a body past
   local z 250 would be the next slot's: the north, the only fully open sky, is out of reach).

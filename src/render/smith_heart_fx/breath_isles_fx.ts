@@ -15,7 +15,9 @@
 //  - the Gale Bulwark and the Menders' beams (breath_bulwark_fx.ts) and the
 //    ride itself, its launch and its landing (breath_ride_fx.ts);
 //  - cosmetic (thinned on the low tier): the drifting stones' count, the
-//    motes.
+//    motes, the isles' life (mist streaming off each hang and away on the
+//    wind, grit falling from under the turf's lip, dust sifting off the
+//    crag: ISLE_LIFE, from the shared particle pools, no new program).
 //
 // Built in the constructor under the host's root and local group (its one
 // gated attach); the kit's pieces join their isles the moment that kit has
@@ -51,9 +53,13 @@ import {
   circleRoute,
   driftStone,
   ISLE_KIT,
+  ISLE_LIFE,
   ISLE_SHARD,
+  type IsleMote,
   isleBob,
   isleDepth,
+  isleGrit,
+  isleMist,
   isleObjectKind,
   isleRuneRing,
   ISLE_POOLS as P,
@@ -102,6 +108,10 @@ const _s = new THREE.Vector3();
 const _p = new THREE.Vector3();
 const _stone = { x: 0, y: 0, z: 0, spin: 0, size: 0 };
 const _bob = { y: 0, rx: 0, rz: 0 };
+const _mote: IsleMote = { x: 0, y: 0, z: 0, vx: 0, vy: 0, vz: 0 };
+const MIST_RGB = [0.86, 0.9, 0.95] as const;
+const GRIT_RGB = [0.36, 0.34, 0.33] as const;
+const DUST_RGB = [0.74, 0.72, 0.68] as const;
 
 export class BreathIslesFx {
   private readonly circles: CircleSlot[] = [];
@@ -311,7 +321,8 @@ export class BreathIslesFx {
     BREATH_ISLES.forEach((_, i) => {
       if (this.dressed[i]) return;
       const kit = ISLE_KIT[i % ISLE_KIT.length];
-      const meshes = heartKitMeshes(SMITH_HEART_BREATH_KIT_URL, kit.piece);
+      // The isle's own stone (the cloud sea's fill under it, heart_isle_fill.ts).
+      const meshes = heartKitMeshes(SMITH_HEART_BREATH_KIT_URL, kit.piece, 'isle');
       if (!meshes) {
         all = false;
         return;
@@ -331,7 +342,7 @@ export class BreathIslesFx {
           if (!g) continue;
           const inst = new THREE.InstancedMesh(
             g,
-            heartKitSlotMaterial(slot),
+            heartKitSlotMaterial(slot === 'stone' ? 'isle' : slot),
             P.stones * BREATH_ISLES.length,
           );
           inst.name = `smithHeartBreathIsleStones:${slot}`;
@@ -466,6 +477,7 @@ export class BreathIslesFx {
       g.rotation.z = b.rz;
     }
     this.mistMat.opacity = 0.2 + 0.18 * woken;
+    this.isleLife(dt);
     // The drifting stones, round the isles in the open air.
     if (this.stones.length > 0) {
       const live = Math.max(3, Math.round(P.stones * this.h.density));
@@ -521,6 +533,64 @@ export class BreathIslesFx {
     this.ride.update(world, dt);
     const g = this.guardianId >= 0 ? world.entities.get(this.guardianId) : undefined;
     this.bulwark.update(world, g, this.bulwarkLeft, this.bulwarkWhole, dt);
+  }
+
+  /** The isles' life (cosmetic, thinned by the tier's density): mist off
+   *  each hang, grit off the lip, dust off the crag, born where the isle
+   *  rides this frame (world space: the shared pools are world space). */
+  private isleLife(dt: number): void {
+    const o = this.h.local.position;
+    const k = dt * this.h.density;
+    for (let i = 0; i < this.isles.length; i++) {
+      const g = this.isles[i].position;
+      const ox = o.x + g.x;
+      const oy = o.y + g.y;
+      const oz = o.z + g.z;
+      if (this.rand() < k * ISLE_LIFE.mist) {
+        const m = isleMist(i, this.rand(), this.rand(), this.rand(), _mote);
+        this.h.particles.puff(ox + m.x, oy + m.y, oz + m.z, 1, {
+          speed: Math.hypot(m.vx, m.vy, m.vz),
+          dir: [m.vx, m.vy, m.vz],
+          spread: 0.15,
+          drag: 0.12,
+          life: 6.5,
+          size: [2.6, 9],
+          color: MIST_RGB,
+          alpha: 0.32,
+          floor: -1e6,
+        });
+      }
+      if (this.rand() < k * ISLE_LIFE.grit) {
+        const m = isleGrit(i, this.rand(), this.rand(), _mote);
+        this.h.particles.puff(ox + m.x, oy + m.y, oz + m.z, 1, {
+          speed: 0.5,
+          dir: [m.vx, m.vy, m.vz],
+          spread: 0.3,
+          drag: 0.2,
+          gravity: 6,
+          life: 3,
+          size: [0.16, 0.11],
+          color: GRIT_RGB,
+          alpha: 0.95,
+          floor: -1e6,
+        });
+      }
+      if (this.rand() < k * ISLE_LIFE.dust) {
+        const m = isleMist(i, this.rand(), this.rand(), this.rand(), _mote);
+        this.h.particles.puff(ox + m.x * 0.85, oy + m.y, oz + m.z * 0.85, 1, {
+          speed: 0.3,
+          dir: [m.vx, -1, m.vz],
+          spread: 0.4,
+          drag: 0.6,
+          gravity: 0.5,
+          life: 4,
+          size: [0.3, 1.1],
+          color: DUST_RGB,
+          alpha: 0.3,
+          floor: -1e6,
+        });
+      }
+    }
   }
 
   // ---- the moments -----------------------------------------------------------------

@@ -28,6 +28,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import shkit  # noqa: E402,F401  (puts the shared dungeon kit on the path)
 import breath_pieces as bp  # noqa: E402
+import breath_isles as bi  # noqa: E402
 from build_smith_heart_hammer_kit import camera, look, preview_materials, scale_figure  # noqa: E402
 from hckit import export_kit  # noqa: E402
 
@@ -44,9 +45,9 @@ BUILDERS = {
     'PlateauCrackB': lambda: bp.plateau_crack('B'),
     'StrikeScar': bp.strike_scar,
     'WindGroove': bp.wind_groove,
-    'WindIsleA': lambda: bp.wind_isle(bpy, 'A'),
-    'WindIsleB': lambda: bp.wind_isle(bpy, 'B'),
-    'IsleShard': lambda: bp.isle_shard(bpy),
+    'WindIsleA': lambda: bi.wind_isle(bpy, 'A'),
+    'WindIsleB': lambda: bi.wind_isle(bpy, 'B'),
+    'IsleShard': lambda: bi.isle_shard(bpy),
 }
 
 

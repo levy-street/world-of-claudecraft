@@ -1,7 +1,9 @@
 // The Islands of the Wind's look (src/render/smith_heart_fx/breath_isles_fx_core.ts):
 // each isle is its own Blender sculpt of the Breath kit, riding the wind on a
 // bob that holds all but still while the round is on, its stones drifting in
-// the open air round it (never inside its crag), the routes run on the ride's
+// the open air round it (never inside its crag), the isles' life (mist off the
+// hang streaming away on the wind, grit off the lip) born outside the rock and
+// thinned by the tier, the routes run on the ride's
 // own arc from each circle to where it carries, the Bulwark thins and cracks
 // as its absorb runs down and its vortex's bands peel away in turn, a cut
 // Mending Gale parts and fades, the launch funnel flares and thins, the
@@ -23,9 +25,15 @@ import {
   funnelLook,
   ISLE_BOB,
   ISLE_KIT,
+  ISLE_LIFE,
+  type IsleMote,
   isleBob,
   isleDepth,
+  isleGrit,
+  isleKitOffset,
+  isleMist,
   isleObjectKind,
+  isleWindAway,
 } from '../src/render/smith_heart_fx/breath_isles_fx_core';
 import { BREATH, BREATH_ISLES } from '../src/sim/content/smith_heart_layout';
 import {
@@ -45,6 +53,8 @@ describe('breath_isles_fx_core', () => {
     for (const k of ISLE_KIT) expect(SMITH_HEART_BREATH_KIT_PIECES).toContain(k.piece.slice(4));
     BREATH_ISLES.forEach((_, i) => {
       expect(isleDepth(i)).toBeGreaterThan(15);
+      // Each isle its own sculpt and its own lean (never one mirrored).
+      expect(Math.hypot(...ISLE_KIT[i].tip)).toBeGreaterThan(2);
       let free = 0;
       let held = 0;
       for (let t = 0; t < 20; t += 0.25) {
@@ -60,16 +70,73 @@ describe('breath_isles_fx_core', () => {
 
   it('drifts its stones round the isle in the open air, never inside its crag', () => {
     BREATH_ISLES.forEach((isle, i) => {
+      let ring = 0;
+      let under = 0;
       for (let k = 0; k < 9; k++)
         for (const t of [0, 7, 31]) {
           const s = driftStone(i, k, t);
           const r = Math.hypot(s.x - isle.x, s.z - isle.z);
-          // The crag narrows as it hangs: a stone further down may come in.
-          const down = Math.max(0, (isle.h - s.y) / isleDepth(i));
-          expect(r, `${i}/${k}`).toBeGreaterThan(isle.r * (1.25 - 0.9 * down));
-          expect(s.y).toBeLessThan(isle.h + 3);
+          if (s.y > isle.h - 1) {
+            // The rim's ring: past every satellite rock (the kit keeps them
+            // inside 1.95 walks, tests/smith_heart_breath_kit.test.ts).
+            ring++;
+            expect(r, `${i}/${k}`).toBeGreaterThan(isle.r * 2);
+            expect(s.y).toBeLessThan(isle.h + 5);
+          } else {
+            // Under the point, clear of its crystal.
+            under++;
+            expect(s.y, `${i}/${k}`).toBeLessThan(isle.h - isleDepth(i) - 3);
+          }
+        }
+      expect(ring).toBeGreaterThan(0);
+      expect(under).toBeGreaterThan(0);
+    });
+  });
+
+  it("turns a kit point by the isle's own turn (the glTF frame, then the piece's)", () => {
+    // Kit +X is the game's +X turned by rot; kit +Y is the game's -Z turned.
+    const rot = ISLE_KIT[0].rot;
+    const a = isleKitOffset(0, 1, 0);
+    expect(a.x).toBeCloseTo(Math.cos(rot), 9);
+    expect(a.z).toBeCloseTo(-Math.sin(rot), 9);
+    const b = isleKitOffset(0, 0, 1);
+    expect(b.x).toBeCloseTo(-Math.sin(rot), 9);
+    expect(b.z).toBeCloseTo(-Math.cos(rot), 9);
+    // Lengths kept.
+    const c = isleKitOffset(1, 3, -4);
+    expect(Math.hypot(c.x, c.z)).toBeCloseTo(5, 9);
+  });
+
+  it('streams mist off each hang and away on the wind, grit off the lip; thinned by the tier', () => {
+    const m: IsleMote = { x: 0, y: 0, z: 0, vx: 0, vy: 0, vz: 0 };
+    BREATH_ISLES.forEach((isle, i) => {
+      const wind = isleWindAway(i);
+      // Away from the summit: the Cornice lies the other way from the isle.
+      expect(
+        wind.x * (BREATH.cornice.x - isle.x) + wind.z * (BREATH.cornice.z - isle.z),
+      ).toBeLessThan(0);
+      for (const u of [0, 0.3, 0.7, 1])
+        for (const v of [0, 0.25, 0.5, 0.9]) {
+          isleMist(i, u, v, 0.5, m);
+          // Born under the walk, on the hang, never past its point.
+          expect(m.y).toBeLessThan(-isleDepth(i) * 0.2);
+          expect(m.y).toBeGreaterThanOrEqual(-isleDepth(i));
+          // Out of the rock (past the crag's taper at that depth) and riding the wind.
+          const f = -m.y / isleDepth(i);
+          expect(Math.hypot(m.x, m.z)).toBeGreaterThan((isle.r + 1) * (1 - f) ** 1.75 * 0.5);
+          expect(m.vx * wind.x + m.vz * wind.z).toBeGreaterThan(0.4);
+          expect(m.vy).toBeLessThan(0);
+          isleGrit(i, u, v, m);
+          // From under the lip, just past the walk.
+          expect(Math.hypot(m.x, m.z)).toBeGreaterThan(isle.r);
+          expect(m.y).toBeLessThan(0);
         }
     });
+    // A trace of life on every tier, never a fog: a few births a second.
+    for (const rate of Object.values(ISLE_LIFE)) {
+      expect(rate).toBeGreaterThan(0.3);
+      expect(rate).toBeLessThan(3);
+    }
   });
 
   it('runs each route on the ride arc from its circle to where it carries', () => {

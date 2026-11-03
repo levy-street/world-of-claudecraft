@@ -68,6 +68,7 @@ export function sourceFingerprint(root = ROOT) {
     'docs/design/raid/kit/shkit.py',
     'docs/design/raid/kit/ring_sculpt.py',
     'docs/design/raid/kit/breath_pieces.py',
+    'docs/design/raid/kit/breath_isles.py',
     'docs/design/raid/kit/build_smith_heart_breath_kit.py',
     'docs/design/raid/kit/build_smith_heart_hammer_kit.py',
     'scripts/assets/smith_heart_breath_kit/build.mjs',

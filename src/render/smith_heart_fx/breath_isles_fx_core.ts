@@ -12,7 +12,7 @@
 // Mender's stream draw on EVERY tier (the raid acts on them); the drifting
 // stones, the mist and the motes thin on the low tier.
 
-import { BREATH_ISLES } from '../../sim/content/smith_heart_layout';
+import { BREATH, BREATH_ISLES } from '../../sim/content/smith_heart_layout';
 import { isleSpots, rideArc } from '../../sim/encounters/smith_heart/breath_isle_geometry';
 import {
   ISLE_OBJECTS,
@@ -91,15 +91,38 @@ export function isleObjectKind(templateId: string): IsleObjectKind | null {
 // ---- the isles ------------------------------------------------------------------------
 
 /** Each isle's Blender sculpt in the Breath kit (docs/design/raid/kit/
- *  breath_pieces.py wind_isle: the walk flat at its origin out past the sim's
- *  rim, the craggy lip, the wind-rune stones, the crag hanging under it with
- *  roots, vines, crystal and a broken stone chain), its turn (three's
- *  rotation.y) and how deep its crag hangs under the floor (yards, its
- *  crystal point past that). */
-export const ISLE_KIT: readonly { piece: string; rot: number; depth: number }[] = [
-  { piece: 'Kit_WindIsleA', rot: 0.6, depth: 21 },
-  { piece: 'Kit_WindIsleB', rot: 2.4, depth: 18 },
+ *  breath_isles.py wind_isle: a turf walk whose edge is the sim's own floor,
+ *  the ruined wind shrine on it, the runed stones, the arch or the tree and
+ *  the satellite rocks past it, the crag hanging under it with roots, vines
+ *  and crystal), its turn (three's rotation.y), how deep its crag hangs
+ *  under the floor (yards) and where its point hangs (the kit's frame,
+ *  Blender x and y: the spec's lean times four, breath_isles.py
+ *  ISLE_SPECS). */
+export const ISLE_KIT: readonly {
+  piece: string;
+  rot: number;
+  depth: number;
+  tip: readonly [number, number];
+}[] = [
+  { piece: 'Kit_WindIsleA', rot: 0.6, depth: 26, tip: [-2.2, 3.8] },
+  { piece: 'Kit_WindIsleB', rot: 2.4, depth: 18.5, tip: [3.4, -2.0] },
 ];
+
+/** A point of an isle's kit frame (Blender x, y) as an offset from its
+ *  centre in the game's frame (x, z): the glTF turn (x, -y) and then the
+ *  isle's own turn. Fills `out`. */
+export function isleKitOffset(
+  i: number,
+  bx: number,
+  by: number,
+  out: { x: number; z: number } = { x: 0, z: 0 },
+): { x: number; z: number } {
+  const rot = ISLE_KIT[i % ISLE_KIT.length].rot;
+  const lz = -by;
+  out.x = bx * Math.cos(rot) + lz * Math.sin(rot);
+  out.z = -bx * Math.sin(rot) + lz * Math.cos(rot);
+  return out;
+}
 /** The stone that drifts round the isles (the kit's Kit_IsleShard). */
 export const ISLE_SHARD = 'Kit_IsleShard';
 
@@ -132,6 +155,75 @@ export function isleBob(
   return out;
 }
 
+const _tipAt = { x: 0, z: 0 };
+
+/** The isles' life (cosmetic: each thins with the tier's density, the low
+ *  tier keeps a trace): mist streaming off the hang and away on the wind,
+ *  grit falling from under the turf's lip, dust sifting off the crag.
+ *  Births per second per isle at full density. */
+export const ISLE_LIFE = { mist: 1.3, grit: 1.1, dust: 0.9 } as const;
+
+export interface IsleMote {
+  /** Birth, isle-local (relative to the isle's floor centre, y up). */
+  x: number;
+  y: number;
+  z: number;
+  /** The way it heads (yards a second before its drag). */
+  vx: number;
+  vy: number;
+  vz: number;
+}
+
+/** The wind's way past an isle: from the Cornice out through it (unit,
+ *  game x and z). */
+export function isleWindAway(i: number): { x: number; z: number } {
+  const isle = BREATH_ISLES[i];
+  const dx = isle.x - BREATH.cornice.x;
+  const dz = isle.z - BREATH.cornice.z;
+  const d = Math.hypot(dx, dz) || 1;
+  return { x: dx / d, z: dz / d };
+}
+
+/** Where a wisp of mist is born on an isle's hang and how it streams (u, v,
+ *  w: three draws in 0..1): on the crag's flank between a quarter and nearly
+ *  all its depth down (the crag narrowing to its leaning point), drifting
+ *  out from it, away on the wind and a little down. Fills `out`. */
+export function isleMist(i: number, u: number, v: number, w: number, out: IsleMote): IsleMote {
+  const isle = BREATH_ISLES[i];
+  const depth = isleDepth(i);
+  const tip = ISLE_KIT[i % ISLE_KIT.length].tip;
+  const at = isleKitOffset(i, tip[0], tip[1], _tipAt);
+  const f = 0.25 + 0.7 * u;
+  const r = (isle.r + 1) * (1 - f) ** 1.75 + 1.2;
+  const a = v * Math.PI * 2;
+  const cx = at.x * f * f;
+  const cz = at.z * f * f;
+  out.x = cx + Math.sin(a) * r;
+  out.y = -f * depth;
+  out.z = cz + Math.cos(a) * r;
+  const wind = isleWindAway(i);
+  const s = 0.9 + 0.8 * w;
+  out.vx = Math.sin(a) * 0.4 + wind.x * s;
+  out.vy = -0.25 - 0.3 * w;
+  out.vz = Math.cos(a) * 0.4 + wind.z * s;
+  return out;
+}
+
+/** Where a grain of grit breaks from under the turf's lip (u, v: draws in
+ *  0..1): round the rim just past the walk, under the turf, falling. */
+export function isleGrit(i: number, u: number, v: number, out: IsleMote): IsleMote {
+  const isle = BREATH_ISLES[i];
+  const a = u * Math.PI * 2;
+  const r = isle.r + 0.4 + v * 0.9;
+  out.x = Math.sin(a) * r;
+  out.y = -0.6 - v * 1.2;
+  out.z = Math.cos(a) * r;
+  out.vx = Math.sin(a) * 0.5;
+  out.vy = 0;
+  out.vz = Math.cos(a) * 0.5;
+  return out;
+}
+
 /** The ring of wind runes round an isle's floor (its inner and outer radius:
  *  just inside the walkable edge). */
 export function isleRuneRing(i: number): { inner: number; outer: number } {
@@ -139,8 +231,11 @@ export function isleRuneRing(i: number): { inner: number; outer: number } {
   return { inner: r - 3.1, outer: r - 1.7 };
 }
 
-/** A drifting stone under an isle `t` seconds in: its place (instance-local)
- *  and spin (a slow orbit on two beats). */
+/** A drifting stone round an isle `t` seconds in: its place (instance-local)
+ *  and spin (a slow orbit on two beats). Two of every three ride a ring
+ *  round the rim, a little over the walk and out past the satellite rocks
+ *  (whose reach the kit keeps inside 1.95 walks); the third hangs under
+ *  the point, torn off with it. */
 export function driftStone(
   i: number,
   k: number,
@@ -154,17 +249,25 @@ export function driftStone(
   },
 ): { x: number; y: number; z: number; spin: number; size: number } {
   const isle = BREATH_ISLES[i];
-  // Round the isle in the open air, from a little over its walk down its
-  // crag's flanks, never inside the rock (the crag narrows as it hangs).
   const a = isleHash(k, 171 + i) * Math.PI * 2 + t * (0.08 + isleHash(k, 173) * 0.12);
-  const down = isleHash(k, 177);
-  const r = isle.r * (1.4 + isleHash(k, 175) * 0.7) * (1 - down * 0.35);
-  const y = isle.h + 2 - down * isleDepth(i) * 0.75 + Math.sin(t * 0.7 + k) * 0.6;
-  out.x = isle.x + Math.sin(a) * r;
-  out.y = y;
-  out.z = isle.z + Math.cos(a) * r;
+  const bob = Math.sin(t * 0.7 + k) * 0.6;
+  if (k % 3 !== 2) {
+    // The rim's ring, in the open air past every satellite.
+    const r = isle.r * (2.05 + isleHash(k, 175) * 0.45);
+    out.x = isle.x + Math.sin(a) * r;
+    out.y = isle.h + 0.6 + isleHash(k, 177) * 3.4 + bob;
+    out.z = isle.z + Math.cos(a) * r;
+  } else {
+    // Under the point, a step of void between each and the crystal.
+    const tip = ISLE_KIT[i % ISLE_KIT.length].tip;
+    const at = isleKitOffset(i, tip[0], tip[1], _tipAt);
+    const r = 2.5 + isleHash(k, 175) * 4;
+    out.x = isle.x + at.x + Math.sin(a) * r;
+    out.y = isle.h - isleDepth(i) - 4 - isleHash(k, 177) * 5 + bob;
+    out.z = isle.z + at.z + Math.cos(a) * r;
+  }
   out.spin = t * (0.3 + isleHash(k, 179));
-  out.size = 0.35 + isleHash(k, 181) * 0.65;
+  out.size = 0.6 + isleHash(k, 181) * 0.6;
   return out;
 }
 
