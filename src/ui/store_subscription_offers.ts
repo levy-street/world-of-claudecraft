@@ -147,6 +147,24 @@ function planBadgeHtml(
   });
 }
 
+/** Statuses with no subscription left to manage: never subscribed, ended, or a first checkout
+ *  that expired unpaid. The service may still report a billing customer (canManage) for them,
+ *  but the portal would only show an empty or finished subscription. */
+const NO_SUBSCRIPTION_STATUSES: readonly SubscriptionSnapshot['status'][] = [
+  'none',
+  'canceled',
+  'incomplete_expired',
+];
+
+/** Whether the Memberships tab offers Manage subscription. A live or unresolved subscription
+ *  (active, trialing, past_due, unpaid, paused, incomplete) keeps it, and so does an ended one
+ *  the service refuses a new checkout: in both cases the badges show the billing note
+ *  (subscriptionPurchase 'billing') that sends the player to Manage subscription. */
+export function showsManageSubscription(state: SubscriptionSnapshot): boolean {
+  if (!state.canManage) return false;
+  return !NO_SUBSCRIPTION_STATUSES.includes(state.status) || !state.canCheckout;
+}
+
 function statusLine(state: SubscriptionSnapshot): string {
   const end = state.currentPeriodEnd;
   if (end !== null && ['active', 'trialing'].includes(state.status)) {
@@ -185,7 +203,7 @@ export function subscriptionOffersHtml(
     (['active', 'trialing'].includes(state.status) || state.cancelAtPeriodEnd
       ? `<p>${esc(statusLine(state))}</p>`
       : '') +
-    (state.canManage
+    (showsManageSubscription(state)
       ? `<button type="button" class="ui-btn ui-btn--lg" data-subscription-action="portal"${focusKeyAttr('subscription-manage')}${busy ? ' disabled' : ''}>${esc(t('hudChrome.wocStore.subscription.manage'))}</button>`
       : '') +
     (pendingAnnual || canDiscoverAnnual
