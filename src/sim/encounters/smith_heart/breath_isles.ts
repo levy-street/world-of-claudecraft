@@ -23,7 +23,7 @@
 //                  whoever steps in back to the Cornice, beside the path.
 //                  Heroic: the same group may ride again (to the other isle,
 //                  or at the next mark). Mythic: a rider set down home is
-//                  Windworn for 90 s and no Gale Path takes them: two groups.
+//                  Windworn for 150 s (past the next mark) and no Gale Path takes them: two groups.
 //   The end        the Bulwark broken, the round ends: any add still standing
 //                  dissolves, the paths go, the guardian fights on. Held for
 //                  75 s it bursts by itself (a heavy blow on the whole Cornice)
@@ -37,6 +37,7 @@
 // existing fields (breath_isle_ids.ts says which): no wire or IWorld change.
 
 import { carryBody, setDownBody } from '../../carried_body';
+import { isSilenced } from '../../combat/cc';
 import { BREATH_ISLES } from '../../content/smith_heart_layout';
 import { MOBS } from '../../data';
 import { createMob } from '../../entity';
@@ -64,6 +65,7 @@ import {
   dropAura,
   dropBreathObject,
   guardianFree,
+  heldFast,
   livePlayers,
   living,
   local,
@@ -279,8 +281,11 @@ function stepMenders(s: BreathScope, shield: { value: number }): void {
     const e = s.ctx.entities.get(a.id);
     if (!living(e)) continue;
     if (a.at) {
-      if (e.castingAbility !== ISLE_CASTS.mending) {
-        // Cut (a player interrupt): it starts over.
+      const held = s.ctx.isStunned(e) || isSilenced(e);
+      if (e.castingAbility !== ISLE_CASTS.mending || held) {
+        // Cut (a player interrupt, a stun, a silence): it starts over.
+        if (e.castingAbility === ISLE_CASTS.mending) clearCastIf(e, ISLE_CASTS.mending);
+        e.channeling = false;
         a.at = null;
         a.next = T.mendEvery;
         continue;
@@ -314,6 +319,7 @@ function stepMenders(s: BreathScope, shield: { value: number }): void {
     }
     a.next -= DT;
     if (a.next > 1e-9 || e.castingAbility !== null) continue;
+    if (s.ctx.isStunned(e) || isSilenced(e)) continue;
     startBar(e, ISLE_CASTS.mending, T.mendCast, s.boss.id, true);
     a.at = { ...e.pos };
   }
@@ -366,7 +372,8 @@ export function endRound(s: Pick<BreathScope, 'ctx' | 'inst' | 'st' | 'boss'>): 
 
 /** May `p` take a ride now (alive, free, out of its grace, not worn)? */
 function mayRide(st: BreathFightState, p: Entity): boolean {
-  if (p.dead || p.carriedBy !== undefined) return false;
+  // The Knotted Gale's carrier and the anchored stay on the Cornice.
+  if (p.dead || p.carriedBy !== undefined || heldFast(p)) return false;
   if ((st.isles.grace[p.id] ?? -1) > st.clock) return false;
   return !st.isles.rides.some((r) => r.playerId === p.id);
 }
@@ -440,6 +447,11 @@ function stepRides(s: BreathScope): void {
   for (const r of st.isles.rides) {
     const p = s.ctx.entities.get(r.playerId);
     const obj = s.ctx.entities.get(r.objectId);
+    if (p?.dead && obj && p.carriedBy === r.objectId) {
+      // Died in the air: the body is set down where the ride was bound.
+      landRide(s, p, r, true);
+      continue;
+    }
     if (!p || !obj || p.carriedBy !== r.objectId) {
       // Let go some other way (a reset took the carrier, a death).
       if (p) dropAura(p, ISLE_AURAS.riding);
@@ -464,7 +476,7 @@ function stepRides(s: BreathScope): void {
   st.isles.rides = keep;
 }
 
-function landRide(s: BreathScope, p: Entity, r: BreathRide): void {
+function landRide(s: BreathScope, p: Entity, r: BreathRide, dead = false): void {
   const o = s.ctx.instanceOriginOf(s.inst);
   const ground = s.ctx.groundPos(o.x + r.to.x, o.z + r.to.z);
   p.pos.x = ground.x;
@@ -484,6 +496,7 @@ function landRide(s: BreathScope, p: Entity, r: BreathRide): void {
     radius: 3,
     ability: ISLE_CUES.rideDown,
   });
+  if (dead) return;
   if (r.dir === 'out') {
     // The isle's wardens turn on whoever the wind set down among them.
     for (const e of livingAdds(s, r.isle)) s.ctx.aggroMob(e, p, false);

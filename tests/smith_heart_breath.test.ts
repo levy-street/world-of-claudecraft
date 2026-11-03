@@ -733,7 +733,7 @@ describe('Guardian of the Breath: heroic', () => {
     expect(BREATH_DIFFICULTY.mythic).toEqual({
       ...BREATH_DIFFICULTY.heroic,
       stormHeart: true,
-      windwornSeconds: 90,
+      windwornSeconds: 150,
     });
     const f = pulled(2);
     expect(f.state()?.difficulty).toBe('normal');

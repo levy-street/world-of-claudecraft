@@ -157,7 +157,12 @@ export function dischargeCradles(s: BreathScope): Entity[][] {
       if (p.id === c.playerId) return true;
       if (st.cradles.some((q) => q.playerId === p.id)) return false;
       const at = local(s.ctx, s.inst, p);
-      return Math.hypot(at.x - c.x, at.z - c.z) <= T.cradleR;
+      const d = Math.hypot(at.x - c.x, at.z - c.z);
+      if (d > T.cradleR) return false;
+      // Under two overlapping circles, a body shares the nearer one only.
+      return st.cradles.every(
+        (q) => q === c || Math.hypot(at.x - q.x, at.z - q.z) > d || (q.x === c.x && q.z === c.z),
+      );
     });
     if (lifted && !lifted.dead && !under.includes(lifted)) under.push(lifted);
     const share = cradleShare(under.length, s.rules.cradleSoakers, s.rules.cradleTotal);

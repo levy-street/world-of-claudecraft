@@ -279,7 +279,7 @@ export const BREATH_DIFFICULTY: Readonly<Record<BreathDifficulty, BreathDifficul
     cradleTotal: 1900,
     isleAt: [0.8, 0.6],
     isleCount: 2,
-    windwornSeconds: 90,
+    windwornSeconds: 150,
     stormHeart: true,
   },
 };

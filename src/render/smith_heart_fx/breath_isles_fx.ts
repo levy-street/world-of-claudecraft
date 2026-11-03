@@ -116,6 +116,7 @@ const _e = new THREE.Euler();
 const _s = new THREE.Vector3();
 const _p = new THREE.Vector3();
 const UP = new THREE.Vector3(0, 1, 0);
+const _stone = { x: 0, y: 0, z: 0, spin: 0, size: 0 };
 
 /** A flat ribbon (a triangle strip as a list) along `pts`, `half` wide,
  *  its width horizontal (or vertical when `upright`); uv.x along 0..1. */
@@ -693,7 +694,7 @@ export class BreathIslesFx {
           this.stones.setMatrixAt(slot, _m.makeScale(0, 0, 0));
           continue;
         }
-        const s = driftStone(i, k, t);
+        const s = driftStone(i, k, t, _stone);
         _e.set(s.spin, s.spin * 0.7, s.spin * 0.3);
         _q.setFromEuler(_e);
         _m.compose(_p.set(s.x, s.y, s.z), _q, _s.set(s.size, s.size * 0.8, s.size));
@@ -749,7 +750,7 @@ export class BreathIslesFx {
       const a = fxAnchor(e);
       const k = Math.min(1, (this.clock - r.born) / RIDE.seconds);
       const look = riderLook(k);
-      r.group.position.set(a.x, e.pos.y - 0.4, a.z);
+      r.group.position.set(a.x, a.y - 0.4, a.z);
       r.group.rotation.y = t * 5;
       r.group.scale.setScalar(0.8 + 0.4 * look.wrap);
       for (const m of r.mats) m.uniforms.uGlow.value = 0.6 + 0.9 * look.bright;
@@ -916,6 +917,7 @@ export class BreathIslesFx {
    *  materials). */
   dispose(): void {
     this.glow?.dispose();
+    this.stones.dispose();
   }
 
   /** The fight's claim is out of view: hide what moves. */

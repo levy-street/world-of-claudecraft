@@ -1,11 +1,10 @@
 // The Guardian of the Breath's per-tick scope (encounters/smith_heart/
 // breath.ts): the claim, the shared state, the guardian, the players on the
 // Storm Cornice, the difficulty's rules, and the plumbing every part of the
-// fight shares (the bar, the hashed marks, the damage rolls (the fight calls no raid
-// warning banner: the owner's rule of 2026-11-03), the fight's objects, the void-safe throw). A leaf the fight's
-// modules (breath_gale.ts, breath_thessaly.ts, breath_storm.ts) and the
-// coordinator share, so none of them reaches into another. Zero rng but the
-// damage rolls.
+// fight shares: the bar, the hashed marks, the damage rolls, the fight's
+// objects, the void-safe throw. The fight calls no raid warning banner (the
+// owner's rule of 2026-11-03). A leaf the fight's modules share, so none of
+// them reaches into another. Zero rng but the damage rolls.
 
 import { BREATH, SMITH_HEART_FIELD } from '../../content/smith_heart_layout';
 import { authoredFieldHeight } from '../../instances/authored_field';

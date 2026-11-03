@@ -486,3 +486,74 @@ describe('the Islands of the Wind: what the raid reads', () => {
     expect(ev.some((e) => e.type === 'chat' && e.channel === 'raidWarning')).toBe(false);
   });
 });
+
+describe('the Islands of the Wind: the review gaps', () => {
+  it('a stunned Mender stops channeling and restores nothing', () => {
+    const f = pulled(4);
+    crossMark(f, 0.7);
+    const mender = addsOf(f).find((e) => e.templateId === ISLE_MOBS.mender) as Entity;
+    const sentinel = addsOf(f).find((e) => e.templateId === ISLE_MOBS.sentinel) as Entity;
+    f.sim.ctx.dealDamage(null, sentinel, sentinel.hp + 1, false, 'physical', null, 'hit', true);
+    for (
+      let i = 0;
+      i < ticks(IT.mendFirst + 1) && mender.castingAbility !== ISLE_CASTS.mending;
+      i++
+    )
+      f.tick();
+    expect(mender.castingAbility).toBe(ISLE_CASTS.mending);
+    const s = shield(f);
+    if (!s) throw new Error('no bulwark');
+    s.value = 10;
+    f.sim.ctx.applyAura(mender, {
+      id: 'test_stun',
+      name: 'Test Stun',
+      kind: 'stun',
+      remaining: IT.mendCast + 1,
+      duration: IT.mendCast + 1,
+      value: 0,
+      sourceId: f.players[1].id,
+      school: 'physical',
+    });
+    f.tick(2);
+    expect(mender.castingAbility).not.toBe(ISLE_CASTS.mending);
+    f.tick(ticks(IT.mendCast));
+    expect(s.value).toBeLessThan(f.boss().maxHp * IT.bulwarkShare * IT.mendShare);
+  });
+
+  it("the Knotted Gale's carrier and the anchored never ride", () => {
+    const f = pulled(4);
+    crossMark(f, 0.7);
+    const i = f.state()?.isles.round?.isles[0] as number;
+    const p = f.players[2];
+    p.auras.push({
+      id: BREATH_AURAS.laden,
+      name: 'Gale-Laden',
+      kind: 'internal_cd',
+      remaining: 20,
+      duration: 20,
+      value: 0.2,
+      sourceId: f.boss().id,
+      school: 'nature',
+    });
+    const path = isleSpots()[i].path;
+    f.put(p, path.x, path.z);
+    f.tick(4);
+    expect(p.carriedBy).toBeUndefined();
+  });
+
+  it('a rider who dies in the air is set down, and no warden turns on the corpse', () => {
+    const f = pulled(4);
+    crossMark(f, 0.7);
+    const i = f.state()?.isles.round?.isles[0] as number;
+    const p = f.players[2];
+    const path = isleSpots()[i].path;
+    f.put(p, path.x, path.z);
+    f.tick(10);
+    expect(p.carriedBy).toBeDefined();
+    f.sim.ctx.dealDamage(null, p, p.hp + 1, false, 'physical', null, 'hit', true);
+    f.tick(3, false);
+    expect(p.carriedBy).toBeUndefined();
+    expect(f.state()?.isles.rides).toHaveLength(0);
+    for (const e of addsOf(f)) expect(e.threat.has(p.id)).toBe(false);
+  });
+});

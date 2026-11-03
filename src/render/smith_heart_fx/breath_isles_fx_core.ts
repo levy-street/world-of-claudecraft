@@ -342,18 +342,24 @@ export function driftStone(
   i: number,
   k: number,
   t: number,
+  out: { x: number; y: number; z: number; spin: number; size: number } = {
+    x: 0,
+    y: 0,
+    z: 0,
+    spin: 0,
+    size: 0,
+  },
 ): { x: number; y: number; z: number; spin: number; size: number } {
   const isle = BREATH_ISLES[i];
   const a = isleHash(k, 171 + i) * Math.PI * 2 + t * (0.08 + isleHash(k, 173) * 0.12);
   const r = isle.r * (0.6 + isleHash(k, 175) * 0.9);
   const y = isle.h - 3 - isleHash(k, 177) * isle.r * 2 + Math.sin(t * 0.7 + k) * 0.6;
-  return {
-    x: isle.x + Math.sin(a) * r,
-    y,
-    z: isle.z + Math.cos(a) * r,
-    spin: t * (0.3 + isleHash(k, 179)),
-    size: 0.5 + isleHash(k, 181) * 1.1,
-  };
+  out.x = isle.x + Math.sin(a) * r;
+  out.y = y;
+  out.z = isle.z + Math.cos(a) * r;
+  out.spin = t * (0.3 + isleHash(k, 179));
+  out.size = 0.5 + isleHash(k, 181) * 1.1;
+  return out;
 }
 
 // ---- the circles and their routes ----------------------------------------------------
