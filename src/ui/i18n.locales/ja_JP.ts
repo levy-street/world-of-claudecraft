@@ -4096,6 +4096,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.emoteWheel': 'エモートホイール',
   'hudChrome.keybinds.sheathe': '武器を納刀/抜刀',
   'hudChrome.keybinds.hideInterface': 'インターフェースを隠す',
+  'hudChrome.keybinds.muteAudio': 'すべてのサウンドをミュート',
+  'hudChrome.keybinds.audioMuted':
+    'すべてのサウンドをミュートしました。もう一度押すと元に戻ります。',
+  'hudChrome.keybinds.audioUnmuted': 'サウンドを元に戻しました。',
   'hudChrome.keybinds.targetFriendly': '最も近い味方をターゲット',
   'hudChrome.keybinds.targetFriendlyNext': '味方ターゲットを順に切り替え',
   'hudChrome.keybinds.targetPrev': 'ターゲットを逆順に切り替え',

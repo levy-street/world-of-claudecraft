@@ -20009,6 +20009,10 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
   'hudChrome.gathering.toolTooltip.wieldDegrade':
     'Por debajo de esa habilidad, todavía funciona como una herramienta de nivel inferior.',
   'hudChrome.keybinds.hideInterface': 'Ocultar interfaz',
+  'hudChrome.keybinds.muteAudio': 'Silenciar todo el sonido',
+  'hudChrome.keybinds.audioMuted':
+    'Todo el sonido silenciado. Pulsa de nuevo para volver a activarlo.',
+  'hudChrome.keybinds.audioUnmuted': 'Sonido activado de nuevo.',
   'hudChrome.keybinds.targetParty1': 'Miembro del grupo objetivo 1',
   'hudChrome.keybinds.targetParty2': 'Miembro del grupo objetivo 2',
   'hudChrome.keybinds.targetParty3': 'Miembro del grupo objetivo 3',

@@ -19796,6 +19796,9 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.toolTooltip.wieldDegrade':
     'Dưới kỹ năng đó, nó vẫn hoạt động như một công cụ cấp thấp hơn.',
   'hudChrome.keybinds.hideInterface': 'Ẩn giao diện',
+  'hudChrome.keybinds.muteAudio': 'Tắt Toàn Bộ Âm Thanh',
+  'hudChrome.keybinds.audioMuted': 'Đã tắt toàn bộ âm thanh. Nhấn lần nữa để bật lại.',
+  'hudChrome.keybinds.audioUnmuted': 'Đã bật lại âm thanh.',
   'hudChrome.keybinds.targetParty1': 'Thành viên bên mục tiêu 1',
   'hudChrome.keybinds.targetParty2': 'Thành viên bên mục tiêu 2',
   'hudChrome.keybinds.targetParty3': 'Thành viên bên mục tiêu 3',

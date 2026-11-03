@@ -19719,6 +19719,9 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.toolTooltip.wieldDegrade':
     'Bu becerinin altında hala daha düşük seviyeli bir araç olarak çalışıyor.',
   'hudChrome.keybinds.hideInterface': 'Arayüzü Gizle',
+  'hudChrome.keybinds.muteAudio': 'Tüm Sesi Kapat',
+  'hudChrome.keybinds.audioMuted': 'Tüm ses kapatıldı. Yeniden açmak için tekrar bas.',
+  'hudChrome.keybinds.audioUnmuted': 'Ses yeniden açıldı.',
   'hudChrome.keybinds.targetParty1': 'Hedef Parti Üyesi 1',
   'hudChrome.keybinds.targetParty2': 'Hedef Parti Üyesi 2',
   'hudChrome.keybinds.targetParty3': 'Hedef Parti Üyesi 3',

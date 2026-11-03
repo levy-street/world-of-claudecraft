@@ -464,6 +464,15 @@ export const BIND_ACTIONS: BindAction[] = [
     kind: 'edge',
     defaults: ['Alt+KeyZ'],
   },
+  // Silences every audio channel at once and back (src/game/audio_mute.ts).
+  // Ctrl+M is free: M is the World Map and no other action claims Ctrl+M.
+  {
+    id: 'muteAudio',
+    label: 'Mute All Sound',
+    category: 'Interface',
+    kind: 'edge',
+    defaults: ['Ctrl+KeyM'],
+  },
   // Pet bar (hunter/warlock pet commands). Bound to Ctrl + 1..5 by default, so the
   // action-bar 1..5 stay free; every one is rebindable like any other action. The
   // handlers live in main.ts (onPet -> the IWorld pet commands).

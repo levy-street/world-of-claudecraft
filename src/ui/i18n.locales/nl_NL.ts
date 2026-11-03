@@ -19978,6 +19978,9 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.toolTooltip.wieldDegrade':
     'Onder die vaardigheid werkt het nog steeds als een hulpmiddel op een lager niveau.',
   'hudChrome.keybinds.hideInterface': 'Interface verbergen',
+  'hudChrome.keybinds.muteAudio': 'Alle geluid dempen',
+  'hudChrome.keybinds.audioMuted': 'Alle geluid gedempt. Druk opnieuw om het weer aan te zetten.',
+  'hudChrome.keybinds.audioUnmuted': 'Geluid weer aan.',
   'hudChrome.keybinds.targetParty1': 'Doelpartijlid 1',
   'hudChrome.keybinds.targetParty2': 'Doelpartijlid 2',
   'hudChrome.keybinds.targetParty3': 'Doelpartijlid 3',

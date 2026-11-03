@@ -20160,6 +20160,10 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.toolTooltip.wieldDegrade':
     'Unterhalb dieser Fähigkeit funktioniert es immer noch als untergeordnetes Werkzeug.',
   'hudChrome.keybinds.hideInterface': 'Schnittstelle ausblenden',
+  'hudChrome.keybinds.muteAudio': 'Alle Töne stummschalten',
+  'hudChrome.keybinds.audioMuted':
+    'Alle Töne stummgeschaltet. Erneut drücken, um sie wieder einzuschalten.',
+  'hudChrome.keybinds.audioUnmuted': 'Ton wieder an.',
   'hudChrome.keybinds.targetParty1': 'Zielparteimitglied 1',
   'hudChrome.keybinds.targetParty2': 'Zielparteimitglied 2',
   'hudChrome.keybinds.targetParty3': 'Zielparteimitglied 3',

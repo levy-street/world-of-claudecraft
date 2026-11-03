@@ -125,6 +125,7 @@ export interface InputCallbacks {
       | 'crafting'
       | 'sheathe'
       | 'hideInterface'
+      | 'muteAudio'
       | 'mount',
   ): void;
   onEmoteWheel(open: boolean): void;
@@ -1403,6 +1404,9 @@ export class Input {
         return;
       case 'hideInterface':
         this.cb.onUiKey('hideInterface');
+        return;
+      case 'muteAudio':
+        this.cb.onUiKey('muteAudio');
         return;
     }
   }

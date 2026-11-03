@@ -20141,6 +20141,9 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.toolTooltip.wieldDegrade':
     'Al di sotto di tale abilità funziona ancora come uno strumento di livello inferiore.',
   'hudChrome.keybinds.hideInterface': 'Nascondi interfaccia',
+  'hudChrome.keybinds.muteAudio': "Disattiva tutto l'audio",
+  'hudChrome.keybinds.audioMuted': "Tutto l'audio è disattivato. Premi di nuovo per riattivarlo.",
+  'hudChrome.keybinds.audioUnmuted': 'Audio riattivato.',
   'hudChrome.keybinds.targetParty1': 'Membro del partito bersaglio 1',
   'hudChrome.keybinds.targetParty2': 'Membro del partito bersaglio 2',
   'hudChrome.keybinds.targetParty3': 'Membro del partito bersaglio 3',

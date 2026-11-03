@@ -171,6 +171,11 @@ describe('registry', () => {
     expect(hideUi?.category).toBe('Interface');
     expect(hideUi?.kind).toBe('edge');
     expect(hideUi?.defaults).toEqual(['Alt+KeyZ']);
+    // Mute All Sound sits on the Ctrl layer of M (bare M is the World Map).
+    const mute = BIND_ACTIONS.find((a) => a.id === 'muteAudio');
+    expect(mute?.category).toBe('Interface');
+    expect(mute?.kind).toBe('edge');
+    expect(mute?.defaults).toEqual(['Ctrl+KeyM']);
     // The Harvest Journal is a rebindable Interface toggle on the shifted layer
     // of KeyK (Shift+H and Shift+J, its own initials, are Damage Meters and
     // Target Buffs/Debuffs); bare KeyK stays the Leaderboard, so the two share

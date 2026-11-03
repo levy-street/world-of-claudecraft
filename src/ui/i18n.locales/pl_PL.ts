@@ -19878,6 +19878,9 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.toolTooltip.wieldDegrade':
     'Poniżej tej umiejętności nadal działa jako narzędzie niższego poziomu.',
   'hudChrome.keybinds.hideInterface': 'Ukryj interfejs',
+  'hudChrome.keybinds.muteAudio': 'Wycisz cały dźwięk',
+  'hudChrome.keybinds.audioMuted': 'Cały dźwięk wyciszony. Naciśnij ponownie, aby go włączyć.',
+  'hudChrome.keybinds.audioUnmuted': 'Dźwięk ponownie włączony.',
   'hudChrome.keybinds.targetParty1': 'Członek grupy docelowej 1',
   'hudChrome.keybinds.targetParty2': 'Członek grupy docelowej 2',
   'hudChrome.keybinds.targetParty3': 'Członek grupy docelowej 3',

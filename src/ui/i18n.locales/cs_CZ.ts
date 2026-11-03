@@ -19642,6 +19642,9 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.toolTooltip.wieldDegrade':
     'Pod touto dovedností stále funguje jako nástroj nižší úrovně.',
   'hudChrome.keybinds.hideInterface': 'Skrýt rozhraní',
+  'hudChrome.keybinds.muteAudio': 'Ztlumit veškerý zvuk',
+  'hudChrome.keybinds.audioMuted': 'Veškerý zvuk ztlumen. Dalším stisknutím ho znovu zapneš.',
+  'hudChrome.keybinds.audioUnmuted': 'Zvuk je znovu zapnutý.',
   'hudChrome.keybinds.targetParty1': 'Cílový člen strany 1',
   'hudChrome.keybinds.targetParty2': 'Člen cílové strany 2',
   'hudChrome.keybinds.targetParty3': 'Člen cílové strany 3',

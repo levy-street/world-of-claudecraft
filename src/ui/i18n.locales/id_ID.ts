@@ -19953,6 +19953,9 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.toolTooltip.wieldDegrade':
     'Di bawah keterampilan itu, ia masih berfungsi sebagai alat tingkat rendah.',
   'hudChrome.keybinds.hideInterface': 'Sembunyikan Antarmuka',
+  'hudChrome.keybinds.muteAudio': 'Bisukan Semua Suara',
+  'hudChrome.keybinds.audioMuted': 'Semua suara dibisukan. Tekan lagi untuk menyalakannya kembali.',
+  'hudChrome.keybinds.audioUnmuted': 'Suara menyala kembali.',
   'hudChrome.keybinds.targetParty1': 'Anggota Partai Sasaran 1',
   'hudChrome.keybinds.targetParty2': 'Anggota Partai Sasaran 2',
   'hudChrome.keybinds.targetParty3': 'Anggota Partai Sasaran 3',

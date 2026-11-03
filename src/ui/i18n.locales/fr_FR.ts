@@ -20230,6 +20230,9 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.toolTooltip.wieldDegrade':
     'En dessous de cette compétence, il fonctionne toujours comme un outil de niveau inférieur.',
   'hudChrome.keybinds.hideInterface': "Masquer l'interface",
+  'hudChrome.keybinds.muteAudio': 'Couper tout le son',
+  'hudChrome.keybinds.audioMuted': 'Tout le son est coupé. Appuyez à nouveau pour le rétablir.',
+  'hudChrome.keybinds.audioUnmuted': 'Son rétabli.',
   'hudChrome.keybinds.targetParty1': 'Membre du groupe cible 1',
   'hudChrome.keybinds.targetParty2': 'Membre du groupe cible 2',
   'hudChrome.keybinds.targetParty3': 'Membre du groupe cible 3',

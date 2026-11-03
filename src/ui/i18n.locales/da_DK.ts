@@ -19708,6 +19708,9 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.toolTooltip.wieldDegrade':
     'Under den færdighed fungerer det stadig som et værktøj på lavere niveau.',
   'hudChrome.keybinds.hideInterface': 'Skjul grænseflade',
+  'hudChrome.keybinds.muteAudio': 'Slå al lyd fra',
+  'hudChrome.keybinds.audioMuted': 'Al lyd er slået fra. Tryk igen for at slå den til.',
+  'hudChrome.keybinds.audioUnmuted': 'Lyden er slået til igen.',
   'hudChrome.keybinds.targetParty1': 'Målpartimedlem 1',
   'hudChrome.keybinds.targetParty2': 'Målpartimedlem 2',
   'hudChrome.keybinds.targetParty3': 'Målpartimedlem 3',
