@@ -16556,7 +16556,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.swipe.specNote_feral':
     'Hvert slag, der rammer, tilføjer 1 Gammelt Blod (maks. 3).',
   'entities.abilities.umbral_anchor.description':
-    'Første kast: forankrer din skygge ved dine fødder i 5 min. Kast igen inden for 40 m for at vende tilbage dertil, hvilket forbruger ankeret og starter en 45 sek. nedkøling.',
+    'Første kast: forankrer din skygge ved dine fødder i 5 min. Kast igen inden for 40 m for at vende tilbage dertil, hvilket starter en 45 sek. nedkøling. Hver tilbagevenden efterlader et nyt anker i 5 min, hvor du stod, så du kan blive ved med at hoppe frem og tilbage, indtil et anker udløber.',
   'entities.abilities.umbral_anchor.name': 'Skyggeanker',
   'entities.abilities.unholy_command.description':
     'Bruger 3 Sjælesplinter for at befale alle dine udøde at gøre 25% mere skade og handle 20% hurtigere i 12 sek.',

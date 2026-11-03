@@ -18309,7 +18309,7 @@ export const de_DE: EnTranslations = {
       },
       "umbral_anchor": {
         "name": "Schattenanker",
-        "description": "Erster Einsatz: verankert Euren Schatten 5 Min. lang an Euren Füßen. Erneuter Einsatz innerhalb von 40 m kehrt dorthin zurück, verbraucht den Anker und startet eine 45-sekündige Abklingzeit."
+        "description": "Erster Einsatz: verankert Euren Schatten 5 Min. lang an Euren Füßen. Erneuter Einsatz innerhalb von 40 m kehrt dorthin zurück und startet eine 45-sekündige Abklingzeit. Jede Rückkehr hinterlässt dort, wo Ihr standet, einen neuen Anker für 5 Min., sodass Ihr hin und her springen könnt, bis ein Anker abläuft."
       },
       "soulwell": {
         "name": "Seelenbrunnen",

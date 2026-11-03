@@ -1153,7 +1153,7 @@ const classAbilityNamesEn = {
       [
         'umbral_anchor',
         'Umbral Anchor',
-        'First cast: anchors your shadow at your feet for 5 min. Recast within 40 m to return there, consuming the anchor and starting a 45 sec cooldown.',
+        'First cast: anchors your shadow at your feet for 5 min. Recast within 40 m to return there, starting a 45 sec cooldown. Each return leaves a new 5 min anchor where you stood, so you can keep jumping back and forth until an anchor expires.',
       ],
       [
         'soulwell',

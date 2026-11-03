@@ -18309,7 +18309,7 @@ export const da_DK: EnTranslations = {
       },
       "umbral_anchor": {
         "name": "Skyggeanker",
-        "description": "Første kast: forankrer din skygge ved dine fødder i 5 min. Kast igen inden for 40 m for at vende tilbage dertil, hvilket forbruger ankeret og starter en 45 sek. nedkøling."
+        "description": "Første kast: forankrer din skygge ved dine fødder i 5 min. Kast igen inden for 40 m for at vende tilbage dertil, hvilket starter en 45 sek. nedkøling. Hver tilbagevenden efterlader et nyt anker i 5 min, hvor du stod, så du kan blive ved med at hoppe frem og tilbage, indtil et anker udløber."
       },
       "soulwell": {
         "name": "Sjælebrønd",

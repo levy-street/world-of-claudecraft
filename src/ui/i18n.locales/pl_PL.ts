@@ -16725,7 +16725,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Zamaszyście przeczesz pazurami pobliskich wrogów, zadając {damage} obrażeń. Wzbudza dodatkowe zagrożenie. Tylko w Postaci Bruina.',
   'entities.abilities.swipe.specNote_feral': 'Każdy trafiony cios dodaje 1 Starą Krew (maks. 3).',
   'entities.abilities.umbral_anchor.description':
-    'Pierwsze rzucenie: zakotwicza twój cień u twoich stóp na 5 minut. Rzuć ponownie w promieniu 40 m, aby tam wrócić, zużywając kotwicę i rozpoczynając 45-sekundowy czas odnowienia.',
+    'Pierwsze rzucenie: zakotwicza twój cień u twoich stóp na 5 minut. Rzuć ponownie w promieniu 40 m, aby tam wrócić, rozpoczynając 45-sekundowy czas odnowienia. Każdy powrót zostawia nową kotwicę na 5 minut w miejscu, w którym stałeś, więc możesz skakać tam i z powrotem, dopóki kotwica nie wygaśnie.',
   'entities.abilities.umbral_anchor.name': 'Mroczna Kotwica',
   'entities.abilities.unholy_command.description':
     'Zużywa 3 Odłamki Duszy, rozkazując wszystkim twoim nieumarłym zadawać o 25% więcej obrażeń i działać o 20% szybciej przez 12 sekund.',

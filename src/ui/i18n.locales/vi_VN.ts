@@ -16674,7 +16674,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Quét vuốt qua kẻ địch gần đó gây {damage} sát thương. Gây thêm thù hận. Chỉ dùng được ở Hình Bruin.',
   'entities.abilities.swipe.specNote_feral': 'Mỗi đòn đánh trúng thêm 1 Huyết Cổ (tối đa 3).',
   'entities.abilities.umbral_anchor.description':
-    'Lần thi triển đầu tiên: neo bóng của bạn tại vị trí đứng trong 5 phút. Thi triển lại trong bán kính 40 mét để quay về đó, tiêu hao neo và bắt đầu thời gian hồi chiêu 45 giây.',
+    'Lần thi triển đầu tiên: neo bóng của bạn tại vị trí đứng trong 5 phút. Thi triển lại trong bán kính 40 mét để quay về đó và bắt đầu thời gian hồi chiêu 45 giây. Mỗi lần quay về để lại một neo mới tồn tại 5 phút ở chỗ bạn vừa đứng, nên bạn có thể nhảy qua lại cho đến khi một neo hết hạn.',
   'entities.abilities.umbral_anchor.name': 'Neo Bóng Tối',
   'entities.abilities.unholy_command.description':
     'Tiêu hao 3 Mảnh Linh Hồn để ra lệnh cho toàn bộ thuộc hạ Bất Tử của bạn gây thêm 25% sát thương và hành động nhanh hơn 20% trong 12 giây.',

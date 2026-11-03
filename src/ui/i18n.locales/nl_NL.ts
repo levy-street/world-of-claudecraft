@@ -16780,7 +16780,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Veeg met je klauwen door nabije vijanden voor {damage} schade. Veroorzaakt extra dreiging. Alleen in Bruingedaante.',
   'entities.abilities.swipe.specNote_feral': 'Elke slag die raakt voegt 1 Oud Bloed toe (max 3).',
   'entities.abilities.umbral_anchor.description':
-    'Eerste bezwering: verankert je schaduw aan je voeten gedurende 5 min. Spreuk opnieuw binnen 40 yard om daarheen terug te keren, waarbij het anker wordt verbruikt en een afkoeltijd van 45 sec begint.',
+    'Eerste bezwering: verankert je schaduw aan je voeten gedurende 5 min. Spreuk opnieuw binnen 40 yard om daarheen terug te keren, waarbij een afkoeltijd van 45 sec begint. Elke terugkeer laat een nieuw anker van 5 min achter waar je stond, zodat je heen en weer kunt blijven springen tot een anker verloopt.',
   'entities.abilities.umbral_anchor.name': 'Schaduwanker',
   'entities.abilities.unholy_command.description':
     'Besteedt 3 Zielfragmenten om al je ondoden te bevelen 12 sec lang 25% meer schade toe te brengen en 20% sneller te handelen.',

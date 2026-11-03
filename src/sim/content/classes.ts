@@ -5918,7 +5918,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [{ type: 'warlockUmbralAnchor', duration: 300, maxRange: 40 }],
     description:
-      'First cast: anchors your shadow at your feet for 5 min. Recast within 40 m to return there, consuming the anchor and starting a 45 sec cooldown.',
+      'First cast: anchors your shadow at your feet for 5 min. Recast within 40 m to return there, starting a 45 sec cooldown. Each return leaves a new 5 min anchor where you stood, so you can keep jumping back and forth until an anchor expires.',
   },
   soulwell: {
     id: 'soulwell',

@@ -16611,7 +16611,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.swipe.specNote_feral':
     'Varje träffande slag lägger till 1 Gammalt Blod (max 3).',
   'entities.abilities.umbral_anchor.description':
-    'Första kastningen: förankrar din skugga vid dina fötter i 5 min. Kasta igen inom 40 m för att återvända dit, vilket förbrukar ankaret och startar en 45 sekunders nedkylning.',
+    'Första kastningen: förankrar din skugga vid dina fötter i 5 min. Kasta igen inom 40 m för att återvända dit, vilket startar en 45 sekunders nedkylning. Varje återvändo lämnar ett nytt ankare i 5 min där du stod, så att du kan fortsätta hoppa fram och tillbaka tills ett ankare löper ut.',
   'entities.abilities.umbral_anchor.name': 'Skuggankare',
   'entities.abilities.unholy_command.description':
     'Förbrukar 3 Själfragment för att befalla alla dina odöda att vålla 25% mer skada och agera 20% snabbare i 12 sek.',

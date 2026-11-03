@@ -18444,7 +18444,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '向后跃出25码，并解除定身和移动减速效果。落地后移动速度提高50%，持续3秒。若你拥有狩猎势能，则将其刷新，并使你获得蓄势返场，持续12秒。',
   'entities.abilities.trailbreak.name': '断迹',
   'entities.abilities.umbral_anchor.description':
-    '首次施放：在脚下锚定暗影，持续5分钟。在40码内再次施放可返回锚点，消耗锚点并触发45秒冷却。',
+    '首次施放：在脚下锚定暗影，持续5分钟。在40码内再次施放可返回锚点，并触发45秒冷却。每次返回都会在你原先站立处留下一个持续5分钟的新锚点，因此你可以来回跳跃，直到锚点消失。',
   'entities.abilities.umbral_anchor.name': '暗影锚',
   'entities.abilities.unholy_command.description':
     '消耗 3 枚灵魂碎片号令所有亡灵，使其伤害提高 25%、行动速度提高 20%，持续 12 秒。',

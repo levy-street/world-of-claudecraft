@@ -18309,7 +18309,7 @@ export const tr_TR: EnTranslations = {
       },
       "umbral_anchor": {
         "name": "Gölge Çapası",
-        "description": "İlk okuma: gölgeni 5 dakika boyunca ayaklarının dibine çapalar. Oraya dönmek için 40 m içinde yeniden oku; bu çapayı tüketir ve 45 saniyelik bekleme süresini başlatır."
+        "description": "İlk okuma: gölgeni 5 dakika boyunca ayaklarının dibine çapalar. Oraya dönmek için 40 m içinde yeniden oku; bu 45 saniyelik bekleme süresini başlatır. Her dönüş, durduğun yere 5 dakikalık yeni bir çapa bırakır; böylece bir çapanın süresi dolana kadar ileri geri sıçramaya devam edebilirsin."
       },
       "soulwell": {
         "name": "Ruh Kuyusu",

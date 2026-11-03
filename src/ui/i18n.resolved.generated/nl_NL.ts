@@ -18309,7 +18309,7 @@ export const nl_NL: EnTranslations = {
       },
       "umbral_anchor": {
         "name": "Schaduwanker",
-        "description": "Eerste bezwering: verankert je schaduw aan je voeten gedurende 5 min. Spreuk opnieuw binnen 40 yard om daarheen terug te keren, waarbij het anker wordt verbruikt en een afkoeltijd van 45 sec begint."
+        "description": "Eerste bezwering: verankert je schaduw aan je voeten gedurende 5 min. Spreuk opnieuw binnen 40 yard om daarheen terug te keren, waarbij een afkoeltijd van 45 sec begint. Elke terugkeer laat een nieuw anker van 5 min achter waar je stond, zodat je heen en weer kunt blijven springen tot een anker verloopt."
       },
       "soulwell": {
         "name": "Zielenbron",

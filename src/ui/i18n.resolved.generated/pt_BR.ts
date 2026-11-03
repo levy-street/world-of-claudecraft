@@ -18309,7 +18309,7 @@ export const pt_BR: EnTranslations = {
       },
       "umbral_anchor": {
         "name": "Âncora Umbral",
-        "description": "Primeira conjuração: ancora sua sombra aos seus pés por 5 min. Lance novamente dentro de 40 m para retornar até lá, consumindo a âncora e iniciando uma recarga de 45 s."
+        "description": "Primeira conjuração: ancora sua sombra aos seus pés por 5 min. Lance novamente dentro de 40 m para retornar até lá, iniciando uma recarga de 45 s. Cada retorno deixa uma nova âncora de 5 min onde você estava, então você pode continuar saltando de um lado para o outro até uma âncora expirar."
       },
       "soulwell": {
         "name": "Poço de Almas",

@@ -16803,7 +16803,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.swipe.specNote_feral':
     'Setiap pukulan yang mengenai menambah 1 Darah Tua (maks 3).',
   'entities.abilities.umbral_anchor.description':
-    'Rapalan pertama: menjangkarkan bayanganmu di kakimu selama 5 menit. Rapal ulang dalam radius 40 yard untuk kembali ke sana, mengonsumsi jangkar dan memulai jeda 45 detik.',
+    'Rapalan pertama: menjangkarkan bayanganmu di kakimu selama 5 menit. Rapal ulang dalam radius 40 yard untuk kembali ke sana dan memulai jeda 45 detik. Setiap kepulangan meninggalkan jangkar baru selama 5 menit di tempatmu berdiri, jadi kamu bisa terus melompat bolak-balik sampai sebuah jangkar kedaluwarsa.',
   'entities.abilities.umbral_anchor.name': 'Jangkar Bayangan',
   'entities.abilities.unholy_command.description':
     'Menghabiskan 3 Serpihan Jiwa untuk memerintahkan semua mayat hidupmu memberikan 25% kerusakan lebih besar dan bertindak 20% lebih cepat selama 12 detik.',

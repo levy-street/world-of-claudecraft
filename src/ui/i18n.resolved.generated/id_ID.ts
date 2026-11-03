@@ -18309,7 +18309,7 @@ export const id_ID: EnTranslations = {
       },
       "umbral_anchor": {
         "name": "Jangkar Bayangan",
-        "description": "Rapalan pertama: menjangkarkan bayanganmu di kakimu selama 5 menit. Rapal ulang dalam radius 40 yard untuk kembali ke sana, mengonsumsi jangkar dan memulai jeda 45 detik."
+        "description": "Rapalan pertama: menjangkarkan bayanganmu di kakimu selama 5 menit. Rapal ulang dalam radius 40 yard untuk kembali ke sana dan memulai jeda 45 detik. Setiap kepulangan meninggalkan jangkar baru selama 5 menit di tempatmu berdiri, jadi kamu bisa terus melompat bolak-balik sampai sebuah jangkar kedaluwarsa."
       },
       "soulwell": {
         "name": "Sumur Jiwa",

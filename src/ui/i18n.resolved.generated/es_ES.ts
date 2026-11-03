@@ -18309,7 +18309,7 @@ export const es_ES: EnTranslations = {
       },
       "umbral_anchor": {
         "name": "Ancla umbría",
-        "description": "Primer uso: ancla tu sombra a tus pies durante 5 min. Vuelve a usarla a un máximo de 40 m para regresar, consumir el ancla e iniciar un tiempo de reutilización de 45 s."
+        "description": "Primer uso: ancla tu sombra a tus pies durante 5 min. Vuelve a usarla a un máximo de 40 m para regresar e iniciar un tiempo de reutilización de 45 s. Cada regreso deja un ancla nueva de 5 min donde estabas, así que puedes saltar de un lado a otro hasta que un ancla expire."
       },
       "soulwell": {
         "name": "Soulwell",

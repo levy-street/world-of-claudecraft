@@ -18309,7 +18309,7 @@ export const en_CA: EnTranslations = {
       },
       "umbral_anchor": {
         "name": "Umbral Anchor",
-        "description": "First cast: anchors your shadow at your feet for 5 min. Recast within 40 m to return there, consuming the anchor and starting a 45 sec cooldown."
+        "description": "First cast: anchors your shadow at your feet for 5 min. Recast within 40 m to return there, starting a 45 sec cooldown. Each return leaves a new 5 min anchor where you stood, so you can keep jumping back and forth until an anchor expires."
       },
       "soulwell": {
         "name": "Soulwell",

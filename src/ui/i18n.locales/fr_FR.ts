@@ -17209,7 +17209,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Balayez vos griffes à travers les ennemis proches pour {damage} points de dégâts. Cause une menace supplémentaire. Forme de Bruin uniquement.',
   'entities.abilities.swipe.specNote_feral': 'Chaque coup porté ajoute 1 Sang ancien (maximum 3).',
   'entities.abilities.umbral_anchor.description':
-    "Première incantation : ancre votre ombre à vos pieds pendant 5 min. Relancez à moins de 40 m pour y retourner, consommant l'ancre et déclenchant une recharge de 45 s.",
+    "Première incantation : ancre votre ombre à vos pieds pendant 5 min. Relancez à moins de 40 m pour y retourner, déclenchant une recharge de 45 s. Chaque retour laisse une nouvelle ancre de 5 min là où vous vous teniez, vous permettant de faire des allers-retours jusqu'à ce qu'une ancre expire.",
   'entities.abilities.umbral_anchor.name': 'Ancre ombrale',
   'entities.abilities.unholy_command.description':
     "Dépense 3 Fragments d'âme pour ordonner à tous vos morts-vivants d'infliger 25% de dégâts en plus et d'agir 20% plus vite pendant 12 s.",

@@ -18309,7 +18309,7 @@ export const pl_PL: EnTranslations = {
       },
       "umbral_anchor": {
         "name": "Mroczna Kotwica",
-        "description": "Pierwsze rzucenie: zakotwicza twój cień u twoich stóp na 5 minut. Rzuć ponownie w promieniu 40 m, aby tam wrócić, zużywając kotwicę i rozpoczynając 45-sekundowy czas odnowienia."
+        "description": "Pierwsze rzucenie: zakotwicza twój cień u twoich stóp na 5 minut. Rzuć ponownie w promieniu 40 m, aby tam wrócić, rozpoczynając 45-sekundowy czas odnowienia. Każdy powrót zostawia nową kotwicę na 5 minut w miejscu, w którym stałeś, więc możesz skakać tam i z powrotem, dopóki kotwica nie wygaśnie."
       },
       "soulwell": {
         "name": "Studnia Dusz",

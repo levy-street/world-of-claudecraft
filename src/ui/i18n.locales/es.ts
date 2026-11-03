@@ -5409,7 +5409,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Maldice tu Mal de ojo principal durante 8 s. Obtener Condena libera una onda que daña a un máximo de 4 enemigos más en 8 m, como máximo una vez por segundo.',
   'entities.abilities.umbral_anchor.name': 'Ancla umbría',
   'entities.abilities.umbral_anchor.description':
-    'Primer uso: ancla tu sombra a tus pies durante 5 min. Vuelve a usarla a un máximo de 40 m para regresar, consumir el ancla e iniciar un tiempo de reutilización de 45 s.',
+    'Primer uso: ancla tu sombra a tus pies durante 5 min. Vuelve a usarla a un máximo de 40 m para regresar e iniciar un tiempo de reutilización de 45 s. Cada regreso deja un ancla nueva de 5 min donde estabas, así que puedes saltar de un lado a otro hasta que un ancla expire.',
   'entities.abilities.hex_of_violence.name': 'Maleficio de violencia',
   'entities.abilities.hex_of_violence.description':
     'Maldice al enemigo durante 8 s. Sus siguientes 3 acciones dañinas generan 7 de Condena cada una y le infligen 17 de daño de las Sombras.',

@@ -18309,7 +18309,7 @@ export const it_IT: EnTranslations = {
       },
       "umbral_anchor": {
         "name": "Ancora d'Ombra",
-        "description": "Primo lancio: ancora la tua ombra ai tuoi piedi per 5 min. Rilancia entro 40 m per tornare lì, consumando l'ancora e avviando un tempo di recupero di 45 sec."
+        "description": "Primo lancio: ancora la tua ombra ai tuoi piedi per 5 min. Rilancia entro 40 m per tornare lì, avviando un tempo di recupero di 45 sec. Ogni ritorno lascia una nuova ancora di 5 min dove ti trovavi, così puoi continuare a saltare avanti e indietro finché un'ancora non scade."
       },
       "soulwell": {
         "name": "Pozzo delle Anime",

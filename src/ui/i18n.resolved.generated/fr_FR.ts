@@ -18309,7 +18309,7 @@ export const fr_FR: EnTranslations = {
       },
       "umbral_anchor": {
         "name": "Ancre ombrale",
-        "description": "Première incantation : ancre votre ombre à vos pieds pendant 5 min. Relancez à moins de 40 m pour y retourner, consommant l'ancre et déclenchant une recharge de 45 s."
+        "description": "Première incantation : ancre votre ombre à vos pieds pendant 5 min. Relancez à moins de 40 m pour y retourner, déclenchant une recharge de 45 s. Chaque retour laisse une nouvelle ancre de 5 min là où vous vous teniez, vous permettant de faire des allers-retours jusqu'à ce qu'une ancre expire."
       },
       "soulwell": {
         "name": "Puits d'âmes",

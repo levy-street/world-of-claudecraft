@@ -17436,7 +17436,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Varre com suas garras os inimigos próximos causando {damage} de dano. Causa ameaça extra. Apenas Forma de Bruin.',
   'entities.abilities.swipe.specNote_feral': 'Cada acerto adiciona 1 de Sangue Antigo (máx. 3).',
   'entities.abilities.umbral_anchor.description':
-    'Primeira conjuração: ancora sua sombra aos seus pés por 5 min. Lance novamente dentro de 40 m para retornar até lá, consumindo a âncora e iniciando uma recarga de 45 s.',
+    'Primeira conjuração: ancora sua sombra aos seus pés por 5 min. Lance novamente dentro de 40 m para retornar até lá, iniciando uma recarga de 45 s. Cada retorno deixa uma nova âncora de 5 min onde você estava, então você pode continuar saltando de um lado para o outro até uma âncora expirar.',
   'entities.abilities.umbral_anchor.name': 'Âncora Umbral',
   'entities.abilities.unholy_command.description':
     'Gasta 3 Fragmentos de Alma para comandar todos os seus mortos-vivos a causar 25% mais dano e agir 20% mais rápido por 12 s.',

@@ -17624,7 +17624,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '後方へ25ヤード跳び、移動不能効果と移動速度低下効果を解除します。着地すると移動速度が3秒間50%上がります。狩猟の勢いがある場合はそれを更新し、再突入準備を12秒間付与します。',
   'entities.abilities.trailbreak.name': '離脱跳躍',
   'entities.abilities.umbral_anchor.description':
-    '初回使用時、足元に5分間残る影の錨を設置します。40ヤード以内で再使用すると錨へ戻り、錨を消費して45秒の再使用時間が始まります。',
+    '初回使用時、足元に5分間残る影の錨を設置します。40ヤード以内で再使用すると錨へ戻り、45秒の再使用時間が始まります。戻るたびに元いた場所に5分間の新しい錨を残すため、錨が消えるまで何度でも行き来できます。',
   'entities.abilities.umbral_anchor.name': '影の錨',
   'entities.abilities.unholy_command.description':
     '魂の欠片を3個消費してすべてのアンデッドに号令を下し、12秒間、与えるダメージを25%、行動速度を20%上昇させる。',

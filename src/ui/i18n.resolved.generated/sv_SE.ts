@@ -18309,7 +18309,7 @@ export const sv_SE: EnTranslations = {
       },
       "umbral_anchor": {
         "name": "Skuggankare",
-        "description": "Första kastningen: förankrar din skugga vid dina fötter i 5 min. Kasta igen inom 40 m för att återvända dit, vilket förbrukar ankaret och startar en 45 sekunders nedkylning."
+        "description": "Första kastningen: förankrar din skugga vid dina fötter i 5 min. Kasta igen inom 40 m för att återvända dit, vilket startar en 45 sekunders nedkylning. Varje återvändo lämnar ett nytt ankare i 5 min där du stod, så att du kan fortsätta hoppa fram och tillbaka tills ett ankare löper ut."
       },
       "soulwell": {
         "name": "Själsbrunn",

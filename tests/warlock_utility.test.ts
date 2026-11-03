@@ -32,7 +32,7 @@ describe('Warlock Umbral Anchor', () => {
     }
   });
 
-  it('places for free of cooldown, then recalls and consumes the anchor', () => {
+  it('places for free of cooldown, then each recall leaves a new anchor where it jumped from', () => {
     const sim = makeWarlock();
     const origin = { ...sim.player.pos };
     const mana = sim.player.resource;
@@ -45,11 +45,24 @@ describe('Warlock Umbral Anchor', () => {
 
     sim.player.gcdRemaining = 0;
     sim.player.resource = sim.player.maxResource;
-    sim.player.pos = { x: origin.x + 20, y: origin.y, z: origin.z };
+    const away = { x: origin.x + 20, y: origin.y, z: origin.z };
+    sim.player.pos = { ...away };
     sim.castAbility('umbral_anchor');
 
     expect(sim.player.pos).toEqual(origin);
-    expect(umbralAnchorPosition(sim.player)).toBeNull();
+    expect(umbralAnchorPosition(sim.player)).toEqual(away);
+    expect(sim.player.cooldowns.get('umbral_anchor')).toBe(45);
+
+    // Off cooldown, the next cast jumps back and leaves a fresh 5 min anchor
+    // at the origin: the warlock can keep bouncing until an anchor expires.
+    sim.player.cooldowns.delete('umbral_anchor');
+    sim.player.gcdRemaining = 0;
+    sim.player.resource = sim.player.maxResource;
+    sim.castAbility('umbral_anchor');
+
+    expect(sim.player.pos).toEqual(away);
+    expect(umbralAnchorPosition(sim.player)).toEqual(origin);
+    expect(sim.player.auras.find((aura) => aura.id === 'umbral_anchor')?.remaining).toBe(300);
     expect(sim.player.cooldowns.get('umbral_anchor')).toBe(45);
   });
 

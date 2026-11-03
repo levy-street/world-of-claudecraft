@@ -17573,7 +17573,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '뒤로 25미터 도약하며 이동 불가 효과와 이동 속도 감소 효과를 해제합니다. 착지하면 3초 동안 이동 속도가 50% 증가합니다. 사냥의 기세가 있으면 이를 갱신하고 12초 동안 재진입 준비를 부여합니다.',
   'entities.abilities.trailbreak.name': '흔적 끊기',
   'entities.abilities.umbral_anchor.description':
-    '처음 사용하면 발밑에 5분 동안 암영 닻을 설치합니다. 40미터 안에서 다시 사용하면 닻으로 돌아가며, 닻을 소모하고 45초의 재사용 대기시간이 시작됩니다.',
+    '처음 사용하면 발밑에 5분 동안 암영 닻을 설치합니다. 40미터 안에서 다시 사용하면 닻으로 돌아가며 45초의 재사용 대기시간이 시작됩니다. 돌아갈 때마다 서 있던 자리에 5분짜리 새 닻을 남기므로, 닻이 사라질 때까지 계속 오갈 수 있습니다.',
   'entities.abilities.umbral_anchor.name': '암영 닻',
   'entities.abilities.unholy_command.description':
     '영혼 조각 3개를 소모해 모든 언데드에게 명령하고 12초 동안 공격력을 25%, 행동 속도를 20% 증가시킵니다.',

@@ -17527,7 +17527,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.swipe.specNote_feral':
     'Ogni colpo a segno aggiunge 1 Sangue Antico (massimo 3).',
   'entities.abilities.umbral_anchor.description':
-    "Primo lancio: ancora la tua ombra ai tuoi piedi per 5 min. Rilancia entro 40 m per tornare lì, consumando l'ancora e avviando un tempo di recupero di 45 sec.",
+    "Primo lancio: ancora la tua ombra ai tuoi piedi per 5 min. Rilancia entro 40 m per tornare lì, avviando un tempo di recupero di 45 sec. Ogni ritorno lascia una nuova ancora di 5 min dove ti trovavi, così puoi continuare a saltare avanti e indietro finché un'ancora non scade.",
   'entities.abilities.umbral_anchor.name': "Ancora d'Ombra",
   'entities.abilities.unholy_command.description':
     "Spende 3 Frammenti d'Anima per comandare tutti i tuoi non morti a infliggere il 25% di danni in più e agire il 20% più velocemente per 12 sec.",

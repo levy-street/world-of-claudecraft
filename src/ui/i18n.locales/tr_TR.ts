@@ -16611,7 +16611,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.swipe.specNote_feral':
     'İsabet eden her vuruş 1 Kadim Kan ekler (en fazla 3).',
   'entities.abilities.umbral_anchor.description':
-    'İlk okuma: gölgeni 5 dakika boyunca ayaklarının dibine çapalar. Oraya dönmek için 40 m içinde yeniden oku; bu çapayı tüketir ve 45 saniyelik bekleme süresini başlatır.',
+    'İlk okuma: gölgeni 5 dakika boyunca ayaklarının dibine çapalar. Oraya dönmek için 40 m içinde yeniden oku; bu 45 saniyelik bekleme süresini başlatır. Her dönüş, durduğun yere 5 dakikalık yeni bir çapa bırakır; böylece bir çapanın süresi dolana kadar ileri geri sıçramaya devam edebilirsin.',
   'entities.abilities.umbral_anchor.name': 'Gölge Çapası',
   'entities.abilities.unholy_command.description':
     '3 Ruh Parçası harcayarak tüm ölülerine 12 sn boyunca %25 daha fazla hasar vermelerini ve %20 daha hızlı hareket etmelerini emreder.',

@@ -69,7 +69,7 @@ describe('Umbral Anchor marker', () => {
     expect(sceneGraphResources(marker)).toEqual(resources);
   });
 
-  it('plays a bounded recall implosion without growing its scene graph', () => {
+  it('replays its placement at the new anchor after a jump without growing its scene graph', () => {
     const sim = new Sim({ seed: 810, playerClass: 'warlock', autoEquip: true });
     sim.setPlayerLevel(20);
     expect(sim.setSpec('affliction')).toBe(true);
@@ -83,14 +83,18 @@ describe('Umbral Anchor marker', () => {
     sim.player.gcdRemaining = 0;
     sim.player.resource = sim.player.maxResource;
     sim.player.pos.x += 8;
+    const jumpedFrom = { ...sim.player.pos };
     sim.castAbility('umbral_anchor');
     marker.update(sim.player, 2.2);
 
+    // The jump leaves a new anchor where it started: the marker moves there.
     expect(marker.group.visible).toBe(true);
+    expect(marker.group.position.x).toBe(jumpedFrom.x);
+    expect(marker.group.position.z).toBe(jumpedFrom.z);
     expect(sceneGraphResources(marker)).toEqual(resources);
 
     marker.update(sim.player, 3);
-    expect(marker.group.visible).toBe(false);
+    expect(marker.group.visible).toBe(true);
     expect(sceneGraphResources(marker)).toEqual(resources);
   });
 

@@ -16527,7 +16527,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Přejeď drápy přes blízké nepřátele za {damage} poškození. Způsobí extra hrozbu. Pouze v medvědí podobě.',
   'entities.abilities.swipe.specNote_feral': 'Každý zásah přidá 1 Starou krev (max 3).',
   'entities.abilities.umbral_anchor.description':
-    'První seslání: na 5 min ukotví tvůj stín k tvým nohám. Seslej znovu do 40 yardů: vrátíš se tam, spotřebuješ kotvu a spustíš dobu obnovy 45 s.',
+    'První seslání: na 5 min ukotví tvůj stín k tvým nohám. Seslej znovu do 40 yardů: vrátíš se tam a spustíš dobu obnovy 45 s. Každý návrat zanechá na místě, kde jsi stál, novou kotvu na 5 min, takže můžeš skákat tam a zpět, dokud kotva nevyprší.',
   'entities.abilities.umbral_anchor.name': 'Stínová kotva',
   'entities.abilities.unholy_command.description':
     'Spotřebuje 3 Úlomky duše a na 12 s přikáže všem tvým nemrtvým způsobit o 25 % více poškození a jednat o 20 % rychleji.',

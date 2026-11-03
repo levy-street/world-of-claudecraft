@@ -18309,7 +18309,7 @@ export const cs_CZ: EnTranslations = {
       },
       "umbral_anchor": {
         "name": "Stínová kotva",
-        "description": "První seslání: na 5 min ukotví tvůj stín k tvým nohám. Seslej znovu do 40 yardů: vrátíš se tam, spotřebuješ kotvu a spustíš dobu obnovy 45 s."
+        "description": "První seslání: na 5 min ukotví tvůj stín k tvým nohám. Seslej znovu do 40 yardů: vrátíš se tam a spustíš dobu obnovy 45 s. Každý návrat zanechá na místě, kde jsi stál, novou kotvu na 5 min, takže můžeš skákat tam a zpět, dokud kotva nevyprší."
       },
       "soulwell": {
         "name": "Studnice duší",

@@ -18309,7 +18309,7 @@ export const vi_VN: EnTranslations = {
       },
       "umbral_anchor": {
         "name": "Neo Bóng Tối",
-        "description": "Lần thi triển đầu tiên: neo bóng của bạn tại vị trí đứng trong 5 phút. Thi triển lại trong bán kính 40 mét để quay về đó, tiêu hao neo và bắt đầu thời gian hồi chiêu 45 giây."
+        "description": "Lần thi triển đầu tiên: neo bóng của bạn tại vị trí đứng trong 5 phút. Thi triển lại trong bán kính 40 mét để quay về đó và bắt đầu thời gian hồi chiêu 45 giây. Mỗi lần quay về để lại một neo mới tồn tại 5 phút ở chỗ bạn vừa đứng, nên bạn có thể nhảy qua lại cho đến khi một neo hết hạn."
       },
       "soulwell": {
         "name": "Giếng Linh Hồn",

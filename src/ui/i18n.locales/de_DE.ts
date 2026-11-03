@@ -17085,7 +17085,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.swipe.specNote_feral':
     'Jeder Treffer, der landet, fügt 1 Altes Blut hinzu (max. 3).',
   'entities.abilities.umbral_anchor.description':
-    'Erster Einsatz: verankert Euren Schatten 5 Min. lang an Euren Füßen. Erneuter Einsatz innerhalb von 40 m kehrt dorthin zurück, verbraucht den Anker und startet eine 45-sekündige Abklingzeit.',
+    'Erster Einsatz: verankert Euren Schatten 5 Min. lang an Euren Füßen. Erneuter Einsatz innerhalb von 40 m kehrt dorthin zurück und startet eine 45-sekündige Abklingzeit. Jede Rückkehr hinterlässt dort, wo Ihr standet, einen neuen Anker für 5 Min., sodass Ihr hin und her springen könnt, bis ein Anker abläuft.',
   'entities.abilities.umbral_anchor.name': 'Schattenanker',
   'entities.abilities.unholy_command.description':
     'Verbraucht 3 Seelenfragmente, um all Euren Untoten 12 Sek. lang zu befehlen, 25% mehr Schaden zu verursachen und 20% schneller zu handeln.',
