@@ -28,6 +28,7 @@ import {
   endlessSongMult,
   COUNCIL_TUNING as T,
 } from '../../sim/encounters/smith_heart/council_ids';
+import { rushReach } from '../../sim/encounters/smith_heart/council_rush_reach';
 import { TELEGRAPH_THREAT_COLORS } from '../floor_telegraph/telegraph_look_core';
 import { fxHash } from './hammer_fx_core';
 
@@ -338,10 +339,11 @@ export function resonancePulseLook(clock: number): number {
   return 0.55 + 0.45 * Math.sin(clock * 6.2832);
 }
 
-/** Mountain's Rush's lane from the Guardian (gx, gz) to the marked player
- *  (tx, tz): its bearing (sim yaw), its length, its half width (the sim's
- *  own, the mark's value2 when it rides). Null when the two stand together.
- *  Fills `out`. */
+/** Mountain's Rush's lane from the Guardian (gx, gz) through the marked
+ *  player (tx, tz): its bearing (sim yaw), its length (the player's distance,
+ *  or `reach` when that runs further: the line goes on to the Quarry's edge,
+ *  `rushLaneReach`), its half width (the sim's own, the mark's value2 when it
+ *  rides). Null when the two stand together. Fills `out`. */
 export function rushLane(
   gx: number,
   gz: number,
@@ -349,15 +351,27 @@ export function rushLane(
   tz: number,
   half: number,
   out: { yaw: number; length: number; half: number },
+  reach = 0,
 ): { yaw: number; length: number; half: number } | null {
   const dx = tx - gx;
   const dz = tz - gz;
   const len = Math.hypot(dx, dz);
   if (len < 0.5) return null;
   out.yaw = Math.atan2(dx, dz);
-  out.length = len;
+  out.length = Math.max(len, reach);
   out.half = half > 0 ? half : T.rushHalfWidth;
   return out;
+}
+
+/** How far the Rush's line runs from the Guardian at world (gx, gz) toward
+ *  the marked player at world (tx, tz) before the Quarry's edge: the sim's
+ *  own rule (council_rush_reach.ts), so the lane on the floor is the path the
+ *  Guardian will run (a pillar on it still stops the run short). */
+export function rushLaneReach(gx: number, gz: number, tx: number, tz: number): number {
+  const def = DUNGEONS.smith_heart;
+  if (!def) return 0;
+  const o = instanceOrigin(def.index, instanceSlotForZ(gz));
+  return rushReach(gx - o.x, gz - o.z, tx - gx, tz - gz);
 }
 
 /** Is this object the Guardian's cursed pillar? */

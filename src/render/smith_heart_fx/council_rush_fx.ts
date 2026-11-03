@@ -35,6 +35,7 @@ import {
   COUNCIL_CASTS,
   markFill,
   rushLane,
+  rushLaneReach,
 } from './council_fx_core';
 import {
   RUSH_TRACE_SECONDS,
@@ -158,6 +159,8 @@ export class CouncilRushFx {
   private scanGuardian = -1;
   /** Where the lane was last draped (NaN: not yet), both ends. */
   private drapedGX = Number.NaN;
+  /** The bar lane's reach to the Quarry's edge, measured at the last drape. */
+  private laneReach = 0;
   private drapedGZ = Number.NaN;
   private drapedTX = Number.NaN;
   private drapedTZ = Number.NaN;
@@ -249,16 +252,18 @@ export class CouncilRushFx {
     const gz = ga.z;
     const ta = fxAnchor(t);
     const half = auraById(t, COUNCIL_AURAS.rushMark)?.value2 ?? 0;
-    const lane = rushLane(gx, gz, ta.x, ta.z, half, _lane);
+    // Re-drape over the floor once either end has moved far enough (the
+    // reach to the Quarry's edge is a march over the field: only then).
+    const redrape =
+      needsRedrape(gx, gz, this.drapedGX, this.drapedGZ) ||
+      needsRedrape(ta.x, ta.z, this.drapedTX, this.drapedTZ);
+    if (redrape) this.laneReach = rushLaneReach(gx, gz, ta.x, ta.z);
+    const lane = rushLane(gx, gz, ta.x, ta.z, half, _lane, this.laneReach);
     if (!lane) {
       this.hideLane();
       return;
     }
-    // Re-drape over the floor once either end has moved far enough.
-    if (
-      needsRedrape(gx, gz, this.drapedGX, this.drapedGZ) ||
-      needsRedrape(ta.x, ta.z, this.drapedTX, this.drapedTZ)
-    ) {
+    if (redrape) {
       this.h.kit.drapeLane(
         this.lane,
         this.h.groundY,

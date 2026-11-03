@@ -13,10 +13,12 @@
 //                 reminder; the real pressure on heroic and mythic). It
 //                 shelters nobody from a Wrath, the rock and Resonance never
 //                 touch it; only the Rush or a Wrath breaks it.
-//   The dash      when the bar lands the line is fixed at where the marked
-//                 player stands; the Guardian plants for a short wind-up
-//                 (rushWindup), then charges down it at a heavy run
-//                 (rushSpeed). It stops at the FIRST pillar on its line:
+//   The dash      when the bar lands the line is fixed: from the Guardian
+//                 through where the marked player stands, on to the
+//                 Quarry's edge (council_rush_reach.ts). The Guardian plants
+//                 for a short wind-up (rushWindup), then charges down it at
+//                 a heavy run (rushSpeed). It stops at the FIRST pillar on
+//                 its line, else at the edge:
 //                   the cursed pillar  it shatters; the Guardian reels (a 5 s
 //                                      stun) and takes 50 percent more damage
 //                                      for 12 s (the reward for aiming);
@@ -24,9 +26,9 @@
 //                                      cursed one keeps pulsing;
 //                   a soul pillar      it stops there, the soul pillar stands.
 //                 Anyone it runs through on the way (each once, as its body
-//                 passes) takes a heavy blow and a throw; with no pillar on
-//                 the line that is the marked player if they stayed on it,
-//                 and the cursed pillar stays. Mythic: a miss sets
+//                 passes) takes a heavy blow and a throw, the marked player
+//                 too if they stayed on it, and with no pillar on the line
+//                 the cursed pillar stays. Mythic: a miss sets
 //                 the Quarry collapsing (a stacking raid-wide blow every 2 s)
 //                 until the cursed pillar breaks.
 //   No heir       it dies with the Guardian, and so does his cursed pillar.
@@ -53,6 +55,7 @@ import {
   pillarBetween,
   raisePillar,
 } from './council_pillars';
+import { rushReach } from './council_rush_reach';
 import {
   beginBar,
   type CouncilScope,
@@ -136,9 +139,10 @@ export function startRush(s: CouncilScope): boolean {
   return true;
 }
 
-/** The bar landed: the line is fixed and the dash begins. Its stop is the
- *  first pillar on the line (the lane is as wide as the Guardian: a pillar it
- *  would brush stops it), else the marked player. */
+/** The bar landed: the line is fixed and the dash begins. The line runs from
+ *  the Guardian through the marked player on to the Quarry's edge
+ *  (`rushReach`); its stop is the first pillar on it (the lane is as wide as
+ *  the Guardian: a pillar it would brush stops it), else that edge. */
 export function landRush(s: CouncilScope, g: Entity, targetId: number | null): void {
   const t = targetId !== null ? s.ctx.entities.get(targetId) : undefined;
   if (t) dropAuraById(t, COUNCIL_AURAS.rushMark);
@@ -149,9 +153,13 @@ export function landRush(s: CouncilScope, g: Entity, targetId: number | null): v
   const dz = t.pos.z - from.z;
   const len = Math.hypot(dx, dz);
   if (len < 1e-6) return;
+  // The line runs on through the marked player to the Quarry's edge.
+  const o = s.ctx.instanceOriginOf(s.inst);
+  const reach = Math.max(len, rushReach(from.x - o.x, from.z - o.z, dx / len, dz / len));
+  const end = { x: from.x + (dx / len) * reach, z: from.z + (dz / len) * reach };
   const walls = councilPillars(s.ctx, s.inst).map((p) => ({ ...p, r: p.r + T.rushHalfWidth }));
-  const hit = pillarBetween(walls, from, t.pos);
-  let stop = len;
+  const hit = pillarBetween(walls, from, end);
+  let stop = reach;
   if (hit) {
     const along = ((hit.e.pos.x - from.x) * dx + (hit.e.pos.z - from.z) * dz) / len;
     stop = Math.max(0, along - hit.r);

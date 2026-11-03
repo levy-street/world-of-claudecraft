@@ -25,6 +25,7 @@ import {
 } from '../src/sim/encounters/smith_heart';
 import { raisePillar } from '../src/sim/encounters/smith_heart/council_pillars';
 import { rushSeconds } from '../src/sim/encounters/smith_heart/council_rush';
+import { RUSH_EDGE_MARGIN, rushReach } from '../src/sim/encounters/smith_heart/council_rush_reach';
 import type { Entity, SimEvent } from '../src/sim/types';
 import { type CouncilFight, councilFight, hitsOf } from './helpers/council_fight';
 
@@ -235,7 +236,7 @@ describe("Mountain's Rush: the wind-up and the run", () => {
     ) as Extract<SimEvent, { type: 'spellfxAt' }>[];
     expect(windups.length).toBe(1);
     // The cue sits at the Guardian's feet and carries the line to its stop:
-    // the marked spot (no pillar on this line).
+    // through the marked spot and on to the Quarry's edge (no pillar on it).
     const w = windups[0];
     expect(w.sourceId).toBe(g.id);
     expect(w.speed).toBe(T.rushSpeed);
@@ -243,8 +244,14 @@ describe("Mountain's Rush: the wind-up and the run", () => {
     const cueAt = f.local({ pos: { x: w.x, y: 0, z: w.z } } as Entity);
     expect(Math.hypot(cueAt.x - start.x, cueAt.z - start.z)).toBeLessThan(1e-6);
     const reach = (w.speed ?? 0) * (w.duration ?? 0);
+    const toAway = Math.hypot(away.x - start.x, away.z - start.z);
+    expect(reach).toBeGreaterThan(toAway + 5);
+    expect(reach).toBeCloseTo(rushReach(start.x, start.z, w.dirX ?? 0, w.dirZ ?? 0), 3);
     const stop = { x: start.x + (w.dirX ?? 0) * reach, z: start.z + (w.dirZ ?? 0) * reach };
-    expect(Math.hypot(stop.x - away.x, stop.z - away.z)).toBeLessThan(0.5);
+    // The stop lies on the line through the marked spot, past it.
+    const across =
+      ((stop.x - start.x) * (away.z - start.z) - (stop.z - start.z) * (away.x - start.x)) / toAway;
+    expect(Math.abs(across)).toBeLessThan(0.5);
     // The marked player walks off: the line does not follow them.
     f.put(target, away.x + 10, away.z + 10);
     // Planted through the wind-up (the AI never walks it off its mark).
@@ -284,6 +291,69 @@ describe("Mountain's Rush: the wind-up and the run", () => {
     expect(hitsOf(ev, COUNCIL_NAMES.rush, target.id)).toEqual([]);
     expect(hitsOf(ev, COUNCIL_NAMES.rush, bystander.id).length).toBe(1);
     expect(warned(ev, 'rushMiss')).toBe(true);
+  });
+});
+
+describe("Mountain's Rush: the whole room", () => {
+  it('the line runs through the marked player to the Quarry edge, hitting whoever stands beyond them', () => {
+    const f = pulled(4);
+    const { g, target, at } = rushSetup(f);
+    // The marked a few yards off the Guardian, away from the curse.
+    const near = past(at, MID, 5);
+    f.put(target, near.x, near.z);
+    // A bystander far beyond the marked player on the same line.
+    const behind = past(MID, near, 20);
+    const bystander = f.players.find((p) => p !== target && p.id !== g.aggroTargetId) as Entity;
+    f.put(bystander, behind.x, behind.z);
+    let ev: SimEvent[] = [];
+    for (let i = 0; i < T.rushCast * 20 + 4 && f.st.rush === null; i++) ev = ev.concat(f.tick());
+    const r = f.st.rush;
+    expect(r).not.toBeNull();
+    if (!r) return;
+    const o = f.sim.ctx.instanceOriginOf(f.inst);
+    const start = { x: r.from.x - o.x, z: r.from.z - o.z };
+    ev = ev.concat(f.tick(Math.ceil((T.rushWindup + 3) * 20)));
+    expect(hitsOf(ev, COUNCIL_NAMES.rush, target.id).length).toBe(1);
+    expect(hitsOf(ev, COUNCIL_NAMES.rush, bystander.id).length).toBe(1);
+    // The line ran on to the room edge: its margin inside the rim.
+    const end = { x: r.to.x - o.x, z: r.to.z - o.z };
+    const dx = near.x - start.x;
+    const dz = near.z - start.z;
+    const len = Math.hypot(dx, dz);
+    const edge = rushReach(start.x, start.z, dx / len, dz / len);
+    expect(edge).toBeGreaterThan(25);
+    expect(Math.hypot(end.x - start.x, end.z - start.z)).toBeCloseTo(edge, 3);
+    const gl = end;
+    const beyond = {
+      x: gl.x + (dx / len) * (RUSH_EDGE_MARGIN + 2),
+      z: gl.z + (dz / len) * (RUSH_EDGE_MARGIN + 2),
+    };
+    expect(rushReach(beyond.x, beyond.z, dx / len, dz / len)).toBe(0);
+  });
+
+  it('the reach stops at the Quarry rim and is zero off the floor', () => {
+    for (let k = 0; k < 8; k++) {
+      const a = (k / 8) * Math.PI * 2;
+      const r = rushReach(MID.x, MID.z, Math.sin(a), Math.cos(a));
+      expect(r).toBeGreaterThan(20);
+      expect(r).toBeLessThan(Math.max(HAMMER_PIT.rx, HAMMER_PIT.rz));
+    }
+    expect(rushReach(MID.x + 200, MID.z, 1, 0)).toBe(0);
+  });
+
+  it('a pillar beyond the marked player still stops the run', () => {
+    const f = pulled(4);
+    const { g, target, at } = rushSetup(f);
+    // The marked stands between the Guardian and the cursed pillar.
+    const half = { x: (MID.x + at.x) / 2, z: (MID.z + at.z) / 2 };
+    f.put(target, half.x, half.z);
+    const ev = runRush(f);
+    expect(cursed(f)).toBeUndefined();
+    expect(
+      warned(ev, 'rushCursed') || g.auras.some((a) => a.id === COUNCIL_AURAS.rushStunned),
+    ).toBe(true);
+    // The marked stayed on the line: trampled on the way to the pillar.
+    expect(hitsOf(ev, COUNCIL_NAMES.rush, target.id).length).toBe(1);
   });
 });
 
@@ -352,7 +422,9 @@ describe('the cursed pillar', () => {
   it("shelters nobody from Mountain's Wrath, and the Wrath shatters it with the rest", () => {
     const f = pulled(4);
     const { g, target, at } = rushSetup(f);
-    f.tick(Math.ceil((T.rushCast + 2) * 20));
+    // The dash runs on to the room's edge: let it finish.
+    f.tick(Math.ceil((T.rushCast + T.rushWindup + 3) * 20));
+    expect(f.st.rush).toBeNull();
     quiet(f.st);
     plant(f, g, MID.x, MID.z);
     const hide = past(MID, at, T.cursedR + 1.5);
