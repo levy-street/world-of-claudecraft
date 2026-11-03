@@ -15,8 +15,7 @@ import type { Aura, Entity } from '../src/sim/types';
 // left the warrior Lingering Dread soak threshold alone. (That soak has since
 // moved 20% -> 10% of max health, anchored on FEAR_BREAK_CHANCE_SCALE so it now
 // absorbs exactly one guaranteed-break hit; see src/sim/content/warrior_rows.ts.)
-// Harrow and Dread Chorus instead carry a deterministic cumulative budget (10%
-// and 8% of max health),
+// Harrow and Dread Chorus instead carry a deterministic 10% cumulative budget,
 // so automatic pet and DoT damage cannot roll an immediate break.
 
 function addTarget(sim: Sim, distance: number, level = 20): Entity {
@@ -141,7 +140,7 @@ describe('G5: damage-scaled fear break', () => {
     expect(fearAura(mob)).toBeUndefined();
   });
 
-  it('Dread Chorus gives every feared target the same 8% damage budget', () => {
+  it('Dread Chorus gives every feared target the same 10% damage budget', () => {
     const sim = new Sim({ seed: 7, playerClass: 'warlock', autoEquip: true });
     sim.setPlayerLevel(20);
     expect(sim.applyTalents({ spec: null, rows: { 8: 'wlk_r8_howl_of_terror' } })).toBe(true);
@@ -162,14 +161,14 @@ describe('G5: damage-scaled fear break', () => {
 
     expect(fearAura(first)?.duration).toBe(5);
     expect(fearAura(second)?.duration).toBe(5);
-    expect(fearAura(first)?.breakThreshold).toBe(8_000);
-    expect(fearAura(second)?.breakThreshold).toBe(4_000);
+    expect(fearAura(first)?.breakThreshold).toBe(10_000);
+    expect(fearAura(second)?.breakThreshold).toBe(5_000);
     expect(fearAura(first)?.breakChanceScale).toBeUndefined();
     expect(fearAura(second)?.breakChanceScale).toBeUndefined();
 
-    dealHit(sim, first, 8_000);
+    dealHit(sim, first, 10_000);
     expect(fearAura(first)).toBeUndefined();
-    expect(fearAura(second)?.breakThreshold).toBe(4_000);
+    expect(fearAura(second)?.breakThreshold).toBe(5_000);
   });
 
   it('states each budget in both Warlock Fear descriptions', () => {
@@ -177,7 +176,7 @@ describe('G5: damage-scaled fear break', () => {
       "Strikes terror into the enemy, leaving it cowering for up to 5 sec. Damage totaling 10% of the target's maximum health breaks the effect.",
     );
     expect(ABILITIES.howl_of_terror.description).toBe(
-      "Frightens nearby enemies for up to 5 sec. Damage totaling 8% of a target's maximum health breaks its fear. (Warlock talent)",
+      "Frightens enemies within 8 yd of the selected location for up to 5 sec. Damage totaling 10% of a target's maximum health breaks its fear. (Warlock talent)",
     );
   });
 

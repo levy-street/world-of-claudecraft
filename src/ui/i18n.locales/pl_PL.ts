@@ -14957,7 +14957,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_stream.description':
     'Przywraca sojuszniczemu celowi 120 zdrowia przez 12 sek. (talent Szamana)',
   'entities.abilities.howl_of_terror.description':
-    'Przeraża pobliskich wrogów na maksymalnie 5 sek. Obrażenia równe łącznie 8% maksymalnego zdrowia celu przerywają jego strach. (talent Czarnoksiężnika)',
+    'Przeraża wrogów w promieniu 8 m od wybranego miejsca na maksymalnie 5 sek. Obrażenia równe łącznie 10% maksymalnego zdrowia celu przerywają jego strach. (talent Czarnoksiężnika)',
   'entities.abilities.ice_block.description':
     'Zamyka cię w litym lodzie na 8 sek., zapewniając odporność na wszystkie obrażenia. Usuwa istniejące zwykłe szkodliwe efekty i zapobiega nakładaniu nowych zwykłych efektów kontroli. Można użyć podczas ogłuszenia lub przemiany. W zamknięciu nie możesz działać. Użyj ponownie, aby anulować. (mag)',
   'entities.abilities.inner_focus.description':

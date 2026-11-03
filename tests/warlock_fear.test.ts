@@ -6,11 +6,11 @@ import {
 } from '../src/sim/combat/warlock_fear';
 
 describe('Warlock fear damage budget', () => {
-  it('grants Harrow a 10% and Dread Chorus an 8% max-health budget', () => {
+  it('grants Harrow and Dread Chorus a 10% max-health budget', () => {
     expect(HARROW_DAMAGE_BUDGET_PCT).toBe(0.1);
-    expect(DREAD_CHORUS_DAMAGE_BUDGET_PCT).toBe(0.08);
+    expect(DREAD_CHORUS_DAMAGE_BUDGET_PCT).toBe(0.1);
     expect(warlockFearBreakThreshold('fear', 100_000)).toBe(10_000);
-    expect(warlockFearBreakThreshold('howl_of_terror', 50_000)).toBe(4_000);
+    expect(warlockFearBreakThreshold('howl_of_terror', 50_000)).toBe(5_000);
   });
 
   it('rounds to a minimum budget of one damage', () => {

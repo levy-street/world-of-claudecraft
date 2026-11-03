@@ -19012,7 +19012,7 @@ export const nl_NL: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Huiveringwekkende huil",
-        "description": "Jaagt nabije vijanden tot 5 sec. angst aan. Schade ter waarde van in totaal 8% van de maximale gezondheid van een doelwit verbreekt de angst. (tovenaarstalent)"
+        "description": "Jaagt vijanden binnen 8 yard van de geselecteerde locatie tot 5 sec. angst aan. Schade ter waarde van in totaal 10% van de maximale gezondheid van een doelwit verbreekt de angst. (tovenaarstalent)"
       },
       "ice_block": {
         "name": "Koude kist",

@@ -15254,7 +15254,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_stream.description':
     'Restaura 120 de salud a un objetivo aliado durante 12 s. (talento de Chamán)',
   'entities.abilities.howl_of_terror.description':
-    'Aterroriza a los enemigos cercanos hasta 5 s. El daño acumulado equivalente al 8% de la salud máxima de un objetivo rompe su miedo. (talento de Brujo)',
+    'Aterroriza a los enemigos en un radio de 8 m del lugar seleccionado hasta 5 s. El daño acumulado equivalente al 10% de la salud máxima de un objetivo rompe su miedo. (talento de Brujo)',
   'entities.abilities.ice_block.description':
     'Te encierra en hielo sólido durante 8 s, haciéndote inmune a todo el daño. Elimina los efectos perjudiciales comunes ya activos e impide que se apliquen nuevos efectos de control comunes. Se puede usar mientras estás aturdido o transformado. No puedes actuar mientras estás encerrado. Vuelve a lanzarlo para cancelar. (mago)',
   'entities.abilities.inner_focus.description':

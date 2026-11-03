@@ -15547,7 +15547,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_stream.description':
     'Rend 120 points de vie à une cible alliée en 12 s. (talent de Chaman)',
   'entities.abilities.howl_of_terror.description':
-    "Effraie les ennemis proches pendant un maximum de 5 s. Les dégâts cumulés équivalant à 8% du maximum de points de vie d'une cible interrompent sa peur. (talent de Démoniste)",
+    "Effraie les ennemis dans un rayon de 8 m autour de l'endroit ciblé pendant un maximum de 5 s. Les dégâts cumulés équivalant à 10% du maximum de points de vie d'une cible interrompent sa peur. (talent de Démoniste)",
   'entities.abilities.ice_block.description':
     'Vous enferme dans la glace pendant 8 s, vous immunisant contre tous les dégâts. Supprime les effets néfastes ordinaires déjà actifs et empêche les nouveaux effets de contrôle ordinaires. Utilisable lorsque vous êtes étourdi ou métamorphosé. Vous ne pouvez pas agir pendant cet effet. Relancez la capacité pour l’annuler. (Mage)',
   'entities.abilities.inner_focus.description':

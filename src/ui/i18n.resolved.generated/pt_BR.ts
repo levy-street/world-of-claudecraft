@@ -19012,7 +19012,7 @@ export const pt_BR: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Uivo de Terror",
-        "description": "Amedronta os inimigos próximos por até 5 s. Dano acumulado equivalente a 8% da vida máxima de um alvo quebra seu medo. (talento de Bruxo)"
+        "description": "Amedronta os inimigos num raio de 8 m do local selecionado por até 5 s. Dano acumulado equivalente a 10% da vida máxima de um alvo quebra seu medo. (talento de Bruxo)"
       },
       "ice_block": {
         "name": "Caixão Frio",

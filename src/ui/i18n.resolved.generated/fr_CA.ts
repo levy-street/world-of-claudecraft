@@ -19012,7 +19012,7 @@ export const fr_CA: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Hurlement d’effroi",
-        "description": "Effraie les ennemis proches pendant un maximum de 5 s. Les dégâts cumulés équivalant à 8% du maximum de points de vie d'une cible interrompent sa peur. (talent de Démoniste)"
+        "description": "Effraie les ennemis dans un rayon de 8 m autour de l'endroit ciblé pendant un maximum de 5 s. Les dégâts cumulés équivalant à 10% du maximum de points de vie d'une cible interrompent sa peur. (talent de Démoniste)"
       },
       "ice_block": {
         "name": "Cercueil froid",

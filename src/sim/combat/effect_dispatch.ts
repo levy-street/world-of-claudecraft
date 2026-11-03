@@ -1849,17 +1849,33 @@ export function runEffects(
         break;
       }
       case 'aoeFear': {
-        ctx.emit({
-          type: 'spellfx',
-          sourceId: p.id,
-          targetId: p.id,
-          school: ability.school,
-          fx: 'nova',
-          ability: ability.id,
-        });
+        // A ground-aimed fear (Dread Chorus) lands where it was aimed; a shout
+        // (Intimidating Shout, Terror Canticle) centers on the caster.
+        const fearCenter = p.castAim ?? p.pos;
+        if (p.castAim) {
+          ctx.emit({
+            type: 'spellfxAt',
+            x: fearCenter.x,
+            z: fearCenter.z,
+            school: ability.school,
+            fx: 'nova',
+            radius: eff.radius,
+            ability: ability.id,
+            sourceId: p.id,
+          });
+        } else {
+          ctx.emit({
+            type: 'spellfx',
+            sourceId: p.id,
+            targetId: p.id,
+            school: ability.school,
+            fx: 'nova',
+            ability: ability.id,
+          });
+        }
         const fearBreakPct = mods.global.fearBreakPct;
         let feared = 0;
-        for (const hostile of ctx.hostilesInRadius(p, p.pos, eff.radius)) {
+        for (const hostile of ctx.hostilesInRadius(p, fearCenter, eff.radius)) {
           if (hostile.dead) continue;
           if (eff.maxTargets !== undefined && feared >= eff.maxTargets) break;
           if (!ctx.hasLineOfSight(p, hostile)) continue;

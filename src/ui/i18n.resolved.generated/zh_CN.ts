@@ -19012,7 +19012,7 @@ export const zh_CN: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "恐惧嚎叫",
-        "description": "使附近的敌人恐惧，最多持续 5 秒。累计达到目标最大生命值 8% 的伤害会打破其恐惧。（术士天赋）"
+        "description": "使选定地点8码内的敌人恐惧，最多持续 5 秒。累计达到目标最大生命值 10% 的伤害会打破其恐惧。（术士天赋）"
       },
       "ice_block": {
         "name": "寒冰棺",

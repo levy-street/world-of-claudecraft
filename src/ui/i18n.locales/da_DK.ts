@@ -14546,7 +14546,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_stream.description':
     'Genopretter 120 helbred hos et allieret mål over 12 sek. (shamantalent)',
   'entities.abilities.howl_of_terror.description':
-    'Skræmmer fjender i nærheden i op til 5 sek. Skade svarende til 8% af målets maksimale helbred bryder deres frygt. (troldmandstalent)',
+    'Skræmmer fjender inden for 8 m af det valgte sted i op til 5 sek. Skade svarende til 10% af målets maksimale helbred bryder deres frygt. (troldmandstalent)',
   'entities.abilities.ice_block.description':
     'Indkapsler jer i fast is i 8 sek. og gør jer immune over for al skade. Fjerner eksisterende almindelige skadelige effekter og forhindrer, at nye almindelige kontroleffekter bliver påført. Kan bruges, mens I er bedøvede eller forvandlede. I kan ikke handle, mens I er indkapslet. Kast igen for at annullere. (magiker)',
   'entities.abilities.inner_focus.description':

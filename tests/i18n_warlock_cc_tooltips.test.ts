@@ -11,7 +11,7 @@ const AFFECTED = [
   {
     ability: 'howl_of_terror',
     key: 'entities.abilities.howl_of_terror.description',
-    breakPct: /(?:8\s*%|%\s*8)/,
+    breakPct: /(?:10\s*%|%\s*10)/,
     stale: /3\s*(?:s|sec|sek|сек|秒|초|detik|giây)/i,
   },
   {

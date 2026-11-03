@@ -14764,7 +14764,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_stream.description':
     'Återställer 120 hälsa hos ett allierat mål under 12 sek. (schamantalang)',
   'entities.abilities.howl_of_terror.description':
-    'Skrämmer fiender i närheten i upp till 5 sek. Skada som sammanlagt motsvarar 8% av målets maximala hälsa bryter deras rädsla. (häxmästartalang)',
+    'Skrämmer fiender inom 8 meter från den valda platsen i upp till 5 sek. Skada som sammanlagt motsvarar 10% av målets maximala hälsa bryter deras rädsla. (häxmästartalang)',
   'entities.abilities.ice_block.description':
     'Innesluter er i fast is i 8 sek. och gör er immuna mot all skada. Tar bort befintliga vanliga skadliga effekter och förhindrar att nya vanliga kontrolleffekter tillämpas. Kan användas medan ni är bedövade eller förvandlade. Ni kan inte agera medan ni är inneslutna. Kasta igen för att avbryta. (magiker)',
   'entities.abilities.inner_focus.description':

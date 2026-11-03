@@ -185,7 +185,7 @@ describe('reviewed localization semantics', () => {
       );
 
       expectStandaloneNumber(dreadChorus, 5);
-      expect(dreadChorus, `${lang} Dread Chorus break threshold`).toMatch(/8\s?%|%\s?8/);
+      expect(dreadChorus, `${lang} Dread Chorus break threshold`).toMatch(/10\s?%|%\s?10/);
       expect(dreadChorus, `${lang} Dread Chorus old duration`).not.toMatch(/(^|\D)3(\D|$)/);
 
       expectStandaloneNumber(ossuaryMark, 15);

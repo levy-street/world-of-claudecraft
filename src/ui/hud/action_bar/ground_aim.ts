@@ -147,6 +147,7 @@ export function abilityAoeRadius(res: { effects: readonly AbilityEffect[] }): nu
   const effect = res.effects.find(
     (eff) =>
       eff.type === 'aoeDamage' ||
+      eff.type === 'aoeFear' ||
       eff.type === 'groundAoE' ||
       eff.type === 'temporalHourglass' ||
       eff.type === 'sporeBurst',

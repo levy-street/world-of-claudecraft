@@ -15240,7 +15240,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_stream.description':
     'Ripristina 120 salute a un bersaglio alleato in 12 sec. (talento dello Sciamano)',
   'entities.abilities.howl_of_terror.description':
-    "Terrorizza i nemici vicini per un massimo di 5 sec. I danni pari in totale all'8% della salute massima del bersaglio interrompono la sua paura. (talento dello Stregone)",
+    'Terrorizza i nemici entro 8 metri dal punto selezionato per un massimo di 5 sec. I danni pari in totale al 10% della salute massima del bersaglio interrompono la sua paura. (talento dello Stregone)',
   'entities.abilities.ice_block.description':
     'Ti racchiude nel ghiaccio solido per 8 s, rendendoti immune a tutti i danni. Rimuove gli effetti dannosi comuni già attivi e impedisce l’applicazione di nuovi effetti di controllo comuni. Utilizzabile mentre sei stordito o trasformato. Non puoi agire mentre sei racchiuso. Lancia di nuovo per annullare. (mago)',
   'entities.abilities.inner_focus.description':

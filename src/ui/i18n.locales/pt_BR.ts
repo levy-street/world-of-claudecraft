@@ -15089,7 +15089,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_stream.description':
     'Restaura 120 de vida de um alvo aliado ao longo de 12 s. (talento de Xamã)',
   'entities.abilities.howl_of_terror.description':
-    'Amedronta os inimigos próximos por até 5 s. Dano acumulado equivalente a 8% da vida máxima de um alvo quebra seu medo. (talento de Bruxo)',
+    'Amedronta os inimigos num raio de 8 m do local selecionado por até 5 s. Dano acumulado equivalente a 10% da vida máxima de um alvo quebra seu medo. (talento de Bruxo)',
   'entities.abilities.ice_block.description':
     'Envolve você em gelo sólido por 8 s, tornando-o imune a todo dano. Remove efeitos nocivos comuns já ativos e impede a aplicação de novos efeitos de controle comuns. Pode ser usado enquanto estiver atordoado ou transformado. Você não pode agir enquanto estiver envolto. Conjure novamente para cancelar. (mago)',
   'entities.abilities.inner_focus.description':

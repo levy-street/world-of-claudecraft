@@ -11153,7 +11153,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_stream.description':
     'Během 12 s obnoví spojeneckému cíli 120 bodů zdraví. (šamanský talent)',
   'entities.abilities.howl_of_terror.description':
-    'Vyděsí blízké nepřátele až na 5 s. Poškození v součtu 8 % maximálního zdraví cíle přeruší jeho strach. (černokněžnický talent)',
+    'Vyděsí nepřátele do 8 yardů od vybraného místa až na 5 s. Poškození v součtu 10 % maximálního zdraví cíle přeruší jeho strach. (černokněžnický talent)',
   'entities.abilities.ice_block.description':
     'Uzavře tě na 8 s do pevného ledu a učiní tě imunním vůči veškerému poškození. Odstraní již aktivní běžné škodlivé efekty a zabrání aplikaci nových běžných ovládacích efektů. Lze použít při omráčení nebo proměnění. Během uvěznění nemůžeš jednat. Opětovným sesláním efekt zrušíš. (mág)',
   'entities.abilities.inner_focus.description':

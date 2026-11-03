@@ -3,7 +3,7 @@
 // Warrior, Priest, or NPC fears.
 
 export const HARROW_DAMAGE_BUDGET_PCT = 0.1;
-export const DREAD_CHORUS_DAMAGE_BUDGET_PCT = 0.08;
+export const DREAD_CHORUS_DAMAGE_BUDGET_PCT = 0.1;
 
 export function warlockFearBreakThreshold(
   abilityId: string,

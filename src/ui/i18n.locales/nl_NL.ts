@@ -14710,7 +14710,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_stream.description':
     'Herstelt 120 gezondheid van een bevriend doelwit gedurende 12 sec. (sjamaantalent)',
   'entities.abilities.howl_of_terror.description':
-    'Jaagt nabije vijanden tot 5 sec. angst aan. Schade ter waarde van in totaal 8% van de maximale gezondheid van een doelwit verbreekt de angst. (tovenaarstalent)',
+    'Jaagt vijanden binnen 8 yard van de geselecteerde locatie tot 5 sec. angst aan. Schade ter waarde van in totaal 10% van de maximale gezondheid van een doelwit verbreekt de angst. (tovenaarstalent)',
   'entities.abilities.ice_block.description':
     'Sluit u 8 sec. lang op in massief ijs en maakt u immuun voor alle schade. Verwijdert bestaande gewone schadelijke effecten en voorkomt dat nieuwe gewone controle-effecten worden toegepast. Kan worden gebruikt terwijl u verdoofd of veranderd bent. U kunt niet handelen zolang u opgesloten bent. Werp opnieuw om te annuleren. (magiër)',
   'entities.abilities.inner_focus.description':

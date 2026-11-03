@@ -1605,7 +1605,7 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
           id: 'wlk_r8_howl_of_terror',
           name: 'Dread Chorus',
           description:
-            "Grants Dread Chorus: frighten enemies within 8 yards for up to 5 sec. Damage totaling 8% of a target's maximum health breaks its fear. 40 sec cooldown.",
+            "Grants Dread Chorus: an instant fear aimed at the ground like a trap, frightening enemies within 8 yards of the selected location for up to 5 sec. Damage totaling 10% of a target's maximum health breaks its fear. 40 sec cooldown.",
           icon: 'wlk_r8_howl_of_terror',
           effect: { grant: { ability: 'howl_of_terror' } },
         },

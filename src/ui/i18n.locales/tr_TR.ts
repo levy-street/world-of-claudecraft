@@ -14720,7 +14720,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_stream.description':
     'Bir müttefik hedefe 12 sn. boyunca 120 sağlık yeniler. (Şaman yeteneği)',
   'entities.abilities.howl_of_terror.description':
-    "Yakındaki düşmanları 5 sn. kadar korkutur. Hedefin azami sağlığının toplam %8'i kadar hasar korkusunu bozar. (Karabüyücü yeteneği)",
+    "Seçilen konumun 8 yarda içindeki düşmanları 5 sn. kadar korkutur. Hedefin azami sağlığının toplam %10'u kadar hasar korkusunu bozar. (Karabüyücü yeteneği)",
   'entities.abilities.ice_block.description':
     'Seni 8 sn boyunca katı buzun içine hapseder ve tüm hasara karşı bağışıklık kazandırır. Mevcut sıradan zararlı etkileri kaldırır ve yeni sıradan kontrol etkilerinin uygulanmasını engeller. Sersemlemiş veya polimorfa uğramışken kullanılabilir. Hapsedilmişken eylemde bulunamazsın. İptal etmek için tekrar kullan. (büyücü)',
   'entities.abilities.inner_focus.description':

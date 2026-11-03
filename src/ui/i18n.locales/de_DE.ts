@@ -14194,7 +14194,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_stream.description':
     'Stellt bei einem verbündeten Ziel im Verlauf von 12 Sek. 120 Gesundheit wieder her. (Schamanentalent)',
   'entities.abilities.howl_of_terror.description':
-    'Versetzt Gegner in der Nähe bis zu 5 Sek. lang in Furcht. Schaden in Höhe von insgesamt 8% der maximalen Gesundheit eines Ziels bricht seine Furcht. (Hexenmeistertalent)',
+    'Versetzt Gegner im Umkreis von 8 m um den gewählten Ort bis zu 5 Sek. lang in Furcht. Schaden in Höhe von insgesamt 10% der maximalen Gesundheit eines Ziels bricht seine Furcht. (Hexenmeistertalent)',
   'entities.abilities.ice_block.description':
     'Schließt Euch 8 Sek. lang in festes Eis ein und macht Euch gegen jeglichen Schaden immun. Entfernt bestehende gewöhnliche schädliche Effekte und verhindert neue gewöhnliche Kontroll-Effekte. Kann während Betäubung oder Verwandlung eingesetzt werden. Ihr könnt währenddessen nicht handeln. Erneut wirken, um den Effekt abzubrechen. (Magier)',
   'entities.abilities.inner_focus.description':
