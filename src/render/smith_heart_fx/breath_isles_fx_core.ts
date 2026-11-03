@@ -282,7 +282,7 @@ export function bulwarkDebris(
   out.z = Math.cos(a) * r;
   out.y = 0.15 + isleHash(j, 607) * 1.45 + Math.sin(t * 1.3 + j) * 0.08;
   out.spin = t * (1 + isleHash(j, 609) * 2);
-  out.size = 0.06 + isleHash(j, 611) * 0.08;
+  out.size = 0.035 + isleHash(j, 611) * 0.055;
   return out;
 }
 

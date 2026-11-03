@@ -453,7 +453,8 @@ export class BreathIslesFx {
     if (this.stones.length === 0 || this.dressed.includes(false)) this.dressIsles();
     // The isles: riding the wind, their runes waking.
     let woken = 0;
-    BREATH_ISLES.forEach((isle, i) => {
+    for (let i = 0; i < BREATH_ISLES.length; i++) {
+      const isle = BREATH_ISLES[i];
       const u = this.runeMats[i].uniforms.uWake;
       u.value += (this.wake[i] - u.value) * Math.min(1, dt * 2.5);
       woken = Math.max(woken, u.value);
@@ -463,7 +464,7 @@ export class BreathIslesFx {
       g.position.y = isle.h + b.y;
       g.rotation.x = b.rx;
       g.rotation.z = b.rz;
-    });
+    }
     this.mistMat.opacity = 0.2 + 0.18 * woken;
     // The drifting stones, round the isles in the open air.
     if (this.stones.length > 0) {

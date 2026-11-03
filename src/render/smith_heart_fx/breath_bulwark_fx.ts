@@ -38,6 +38,7 @@ import {
 } from './breath_isles_fx_core';
 import {
   BULWARK_BAND_FRAG,
+  BULWARK_BAND_VERT,
   BULWARK_FRAG,
   BULWARK_VERT,
   ISLE_RUNE_FRAG,
@@ -47,7 +48,7 @@ import {
 
 const BEAM_STEPS = 32;
 /** The beam's strip half width (yards): the sheath; the core is a third. */
-const BEAM_HALF = 1.15;
+const BEAM_HALF = 1.9;
 
 interface BeamSlot {
   mesh: THREE.Mesh;
@@ -58,6 +59,8 @@ interface BeamSlot {
   flare: number;
   /** The host clock at the cut (NaN: not cut). */
   cutAt: number;
+  /** A cut seen pending its mend cue's grace (NaN: none). */
+  cutDue: number;
   mote: number;
 }
 
@@ -86,6 +89,9 @@ export class BreathBulwarkFx {
   private R = 3.2;
   private readonly at = { x: 0, y: 0, z: 0 };
   private shown = false;
+  /** The vortex's middle (world) and radius, for the bands' camera veil. */
+  private readonly center = { value: new THREE.Vector3() };
+  private readonly radius = { value: 1 };
 
   constructor(private readonly h: BreathIslesHost) {
     this.group.name = 'smithHeartBreathBulwark';
@@ -136,8 +142,10 @@ export class BreathBulwarkFx {
           uSpin: { value: b.spin },
           uSlant: { value: b.slant },
           uFlash: { value: 0 },
+          uCenter: this.center,
+          uRadius: this.radius,
         },
-        vertexShader: ISLE_UV_VERT,
+        vertexShader: BULWARK_BAND_VERT,
         fragmentShader: BULWARK_BAND_FRAG,
         transparent: true,
         depthWrite: false,
@@ -253,6 +261,7 @@ export class BreathBulwarkFx {
         channel: false,
         flare: 0,
         cutAt: Number.NaN,
+        cutDue: Number.NaN,
         mote: 0,
       });
     }
@@ -303,6 +312,8 @@ export class BreathBulwarkFx {
       this.shown = true;
       this.group.position.set(a.x, g.pos.y, a.z);
       this.group.scale.setScalar(this.R * look.pulse);
+      this.center.value.set(a.x, g.pos.y + this.R * 0.6, a.z);
+      this.radius.value = this.R * 1.2;
       const su = this.shellMat.uniforms;
       this.shell.scale.set(1, 1.15, 1);
       su.uSolid.value = 0.1 + 0.22 * k;
@@ -366,16 +377,25 @@ export class BreathBulwarkFx {
     const m = b.id >= 0 ? world.entities.get(b.id) : undefined;
     const channel = !!m && !m.dead && !!g && m.castingAbility === ISLE_CASTS.mending;
     if (b.channel && !channel) {
-      // The channel ended: a mend (the cue's flare is on it) or a cut.
-      if (b.flare < 0.5) this.cut(b);
+      // The channel ended: a mend (the cue's flare is on it, or lands within
+      // a breath: online the mirrored bar may end a frame before its cue)
+      // or a cut. The Bulwark breaking under it is neither.
       b.channel = false;
+      if (b.flare < 0.5 && g) b.cutDue = this.clock + 0.2;
+    }
+    if (!Number.isNaN(b.cutDue) && (b.flare >= 0.5 || !g)) b.cutDue = Number.NaN;
+    if (!Number.isNaN(b.cutDue) && this.clock >= b.cutDue) {
+      b.cutDue = Number.NaN;
+      b.channel = true;
+      this.cut(b);
     }
     if (channel && !b.channel) {
       b.channel = true;
       b.cutAt = Number.NaN;
     }
     const cut = !Number.isNaN(b.cutAt);
-    if (!channel && !cut && b.flare <= 0) {
+    const pending = !Number.isNaN(b.cutDue);
+    if (!channel && !cut && !pending && b.flare <= 0) {
       b.mesh.visible = false;
       return;
     }
@@ -398,7 +418,8 @@ export class BreathBulwarkFx {
     b.mesh.visible = true;
     const t = this.h.uTime.value;
     b.mat.uniforms.uCut.value = 0;
-    b.mat.uniforms.uGlow.value = (channel ? 1.5 + 0.35 * Math.sin(t * 11) : 0) + b.flare * 2;
+    b.mat.uniforms.uGlow.value =
+      (channel || pending ? 1.5 + 0.35 * Math.sin(t * 11) : 0) + b.flare * 2;
     const ma = fxAnchor(m);
     _from.x = ma.x;
     _from.y = m.pos.y + 2.2;

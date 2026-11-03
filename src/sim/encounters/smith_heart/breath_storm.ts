@@ -75,6 +75,7 @@ export function startStorm(s: BreathScope): boolean {
   clearCalm(s.ctx, s.inst, st);
   dropBreathObject(s.ctx, s.inst, st.vortex?.objectId ?? null);
   st.vortex = null;
+  st.roar = null;
   setWind(s, 'break', T.stormCast, st.wind.bearing);
   beginBar(s, BREATH_CASTS.storm, T.stormCast, null);
   breathSay(s, s.boss, 'guardian', 'storm');

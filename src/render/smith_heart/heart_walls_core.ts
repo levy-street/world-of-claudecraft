@@ -244,7 +244,7 @@ function segmentDistance(
 }
 
 /** How far past a floating isle's rim the air stays open (yards). */
-export const HEART_ISLE_AIR = 12;
+export const HEART_ISLE_AIR = 8;
 
 /** Is the disc at (x, z) of radius r inside an area that stays open air? */
 export function heartOpenAir(x: number, z: number, r: number): boolean {

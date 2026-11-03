@@ -1228,7 +1228,10 @@ export class BreathFightFx {
     this.isles.update(world, dt);
     const g0 = this.guardianId >= 0 ? world.entities.get(this.guardianId) : undefined;
     this.inhale.update(g0, dt);
-    this.roar.update(world, g0, true, dt);
+    const meE = world.entities.get(world.playerId);
+    const onCornice =
+      !!meE && !!this.origin && Math.abs(meE.pos.y - this.local.position.y - CORNICE_FLOOR_H) < 6;
+    this.roar.update(world, g0, onCornice, dt);
     this.updateBolts();
     this.particles.update(this.clock);
     const guardian = this.guardianId >= 0 ? (world.entities.get(this.guardianId) ?? null) : null;

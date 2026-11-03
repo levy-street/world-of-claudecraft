@@ -508,6 +508,22 @@ describe('the Summit Roar', () => {
     expect(f.state()?.roar ?? null).toBeNull();
   });
 
+  it('its wave starts at the maw, ends with the storm, and drops a body that leaves', () => {
+    const f = pulled(4);
+    f.dev('/dev heart breath roar');
+    let landedAt = -1;
+    for (let i = 0; i < ticks(T.inhaleCast + T.gustCast + 1) && landedAt < 0; i++) {
+      const ev = f.tick(1, true);
+      if (ev.some((e) => e.type === 'spellfx' && e.ability === BREATH_CUES.gust)) landedAt = i;
+    }
+    expect(landedAt).toBeGreaterThanOrEqual(0);
+    // One tick's travel on the landing tick (never two).
+    expect(f.state()?.roar?.r ?? 0).toBeLessThanOrEqual(T.roarSpeed * DT + 1e-6);
+    // The storm breaking takes the wave in flight with it.
+    f.dev('/dev heart breath phase2');
+    expect(f.state()?.roar ?? null).toBeNull();
+  });
+
   it('is named Summit Roar everywhere the player reads it', () => {
     expect(BREATH_NAMES.gust).toBe('Summit Roar');
     expect(localizeSimAuraName('Summit Roar')).toBe('Summit Roar');

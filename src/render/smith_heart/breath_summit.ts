@@ -82,7 +82,9 @@ void main() {
 export function buildBreathSummit(lowGfx: boolean): THREE.Group {
   const group = new THREE.Group();
   group.name = 'smithHeartBreathSummit';
+  // The low tier draws the upper deck alone (the sea's depth is cosmetic).
   for (const [i, d] of BREATH_CLOUD_SEA.entries()) {
+    if (lowGfx && i > 0) continue;
     const geo = new THREE.PlaneGeometry(d.x1 - d.x0, d.z1 - d.z0, 1, 1);
     geo.rotateX(-Math.PI / 2);
     const mat = new THREE.ShaderMaterial({

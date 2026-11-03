@@ -386,7 +386,6 @@ export function landGust(s: BreathScope): void {
     ability: BREATH_CUES.gust,
   });
   startRoar(s);
-  stepRoar(s);
   if (s.rules.looseGales) startGales(s);
   // The wind comes back: a calm, then the next blow's telegraph.
   beginCalm(s);

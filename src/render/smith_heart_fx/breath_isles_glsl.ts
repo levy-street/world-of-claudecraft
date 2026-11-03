@@ -183,6 +183,19 @@ void main() {
 }
 `;
 
+/** The Bulwark's vertex shader: the uv and the world position (a camera
+ *  inside the vortex thins it, so a melee body is never blinded by it). */
+export const BULWARK_BAND_VERT = /* glsl */ `
+varying vec2 vUv;
+varying vec3 vWorld;
+void main() {
+  vUv = uv;
+  vec4 w = modelMatrix * vec4(position, 1.0);
+  vWorld = w.xyz;
+  gl_Position = projectionMatrix * viewMatrix * w;
+}
+`;
+
 /** A band of the Gale Bulwark's vortex (an open lathe round the guardian):
  *  wind streaks wheeling round it at its own speed and slant, grit carried
  *  in them, soft at its top and foot, its life (uLive) fading it out as the
@@ -195,7 +208,10 @@ uniform float uLive;
 uniform float uSpin;
 uniform float uSlant;
 uniform float uFlash;
+uniform vec3 uCenter;
+uniform float uRadius;
 varying vec2 vUv;
+varying vec3 vWorld;
 ${NOISE}
 void main() {
   float x = vUv.x * 7.0 + vUv.y * uSlant - uTime * uSpin;
@@ -207,8 +223,10 @@ void main() {
   float rope = smoothstep(0.35, 0.75, sin(x * 3.14159 * 0.9) * 0.5 + 0.5);
   float body = 0.12 + 0.18 * inoise(vec2(x * 0.8, vUv.y * 2.0 + uTime * 0.3));
   float ends = smoothstep(0.0, 0.2, vUv.y) * (1.0 - smoothstep(0.72, 1.0, vUv.y));
-  float k = (body + rope * (0.5 + streak * 1.2) + fine * 0.4 + grit) * ends * uLive
-          + uFlash * ends * 0.8;
+  // A camera inside (or right at) the vortex sees it thinned to a veil.
+  float inside = smoothstep(0.9, 1.8, length(cameraPosition - uCenter) / max(uRadius, 0.01));
+  float k = ((body + rope * (0.5 + streak * 1.2) + fine * 0.4 + grit) * ends * uLive
+          + uFlash * ends * 0.8) * mix(0.12, 1.0, inside);
   vec3 col = mix(uColor, uEdge, clamp(streak * 0.7 + fine * 0.4 + grit + uFlash, 0.0, 1.0));
   gl_FragColor = vec4(col * (1.0 + 0.4 * k), clamp(k, 0.0, 1.0));
   #include <colorspace_fragment>
@@ -230,7 +248,7 @@ ${NOISE}
 void main() {
   float across = abs(vUv.y * 2.0 - 1.0);
   float braid = abs(sin(vUv.x * 46.0 - uTime * 14.0)) * 0.5 + 0.5;
-  float core = 1.0 - smoothstep(0.0, mix(0.22, 0.42, braid), across);
+  float core = 1.0 - smoothstep(0.0, mix(0.3, 0.55, braid), across);
   float sheath = (1.0 - smoothstep(0.2, 1.0, across)) * uSheath;
   float pulse = smoothstep(0.75, 1.0, fract(vUv.x * 5.0 - uTime * 2.6));
   float grain = 0.75 + 0.25 * inoise(vec2(vUv.x * 30.0 - uTime * 9.0, vUv.y * 4.0));

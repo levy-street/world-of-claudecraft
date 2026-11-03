@@ -7,7 +7,7 @@
 // knockback's walker a step each tick), so every client sees the wave travel,
 // hit bodies in turn and fling them, instead of a blink to the edge. A throw
 // that carries a body past an open lip leaves it in the air over the void
-// (throwPlayer) and slides on out through the air as it falls. The anchored and the
+// (throwPlayer), the rest of the throw its flight as it falls. The anchored and the
 // Knotted Gale's carrier keep their feet (throwPlayer), yet the blow lands.
 // Zero rng but the damage rolls (in player order, as each is struck).
 
@@ -79,16 +79,25 @@ export function stepRoar(s: BreathScope): void {
   for (let i = w.slides.length - 1; i >= 0; i--) {
     const sl = w.slides[i];
     const p = s.ctx.entities.get(sl.id);
-    if (!p || p.dead) {
+    // Only a living body still in the fight's scope slides (a teleport, a
+    // wipe home or a hearth ends it).
+    if (!p || p.dead || !s.players.includes(p)) {
       w.slides.splice(i, 1);
       continue;
     }
     const step = Math.min(sl.step, sl.left);
     const moved = throwPlayer(s, p, sl.ux, sl.uz, step);
     sl.left -= step;
-    // Done: thrown its whole way, or stopped (a wall, an anchor). Carried
-    // past an open lip it slides on through the air (each step leaves it
-    // aloft over the void, throwPlayer), falling as it goes.
+    if (!p.onGround && sl.left > 1e-6) {
+      // Carried past an open lip into the air: the rest of the throw rides
+      // on as its flight at the same pace, and the fall takes it from here.
+      const secs = Math.max(DT, (sl.left / sl.step) * DT);
+      p.vx = (sl.ux * sl.left) / secs;
+      p.vz = (sl.uz * sl.left) / secs;
+      w.slides.splice(i, 1);
+      continue;
+    }
+    // Done: thrown its whole way, or stopped (a wall, an anchor).
     if (sl.left <= 1e-6 || moved <= 0) w.slides.splice(i, 1);
   }
   if (w.r >= w.reach && w.slides.length === 0) s.st.roar = null;

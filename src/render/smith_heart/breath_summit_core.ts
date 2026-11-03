@@ -11,11 +11,14 @@
 //  - the far peaks: the rock kit's needles (Kit_RockNeedleA, B) stood far
 //    out in the north arc, sunk in the cloud and scaled up into a range, so
 //    the open air has depth and a horizon.
-// Cosmetic scenery: nothing here is a telegraph or touches a walk; the same
-// on every tier (two draws for the sea, a few instances for the peaks).
+// Cosmetic scenery: nothing here is a telegraph or touches a walk (two draws
+// for the sea, the low tier one; a few instances for the peaks). Both reach
+// past the instance slot's band (local z 250) into the sky beyond the map:
+// render only, never a floor or a collider, drawn by the client's own slot.
 // Three-free, DOM-free, deterministic (a hash, never rng).
 
 import { BREATH, SMITH_HEART_FIELD } from '../../sim/content/smith_heart_layout';
+import { authoredFieldHeight, authoredFieldSurfaceAt } from '../../sim/instances/authored_field';
 import type { HeartKitPlacement } from './heart_kit_core';
 import { heartHash } from './heart_plan_core';
 
@@ -101,18 +104,17 @@ export function underCloudSea(x: number, z: number): boolean {
   return x >= d.x0 && x <= d.x1 && z >= d.z0 && z <= d.z1;
 }
 
-/** The Breath's walked floors' ids (every surface but the floating isles,
- *  which float over the sea by design). */
-export function breathSeaClearOfWalks(): boolean {
-  for (const s of SMITH_HEART_FIELD.surfaces) {
-    if (s.hidden) continue;
-    const pts = s.kind === 'poly' ? s.points : null;
-    if (!pts) continue;
-    for (const [x, z] of pts) {
-      if (!underCloudSea(x, z)) continue;
-      const h = s.kind === 'poly' ? s.h : 0;
-      if (h <= BREATH_CLOUD_SEA[0].y + 4) return false;
+/** Does the cloud sea's upper deck lie under every walked floor it spreads
+ *  over (sampled every few yards across its whole rectangle; the floating
+ *  isles float over it by design)? */
+export function breathSeaClearOfWalks(step = 4): boolean {
+  const d = BREATH_CLOUD_SEA[0];
+  const F = SMITH_HEART_FIELD;
+  for (let x = d.x0; x <= d.x1; x += step)
+    for (let z = d.z0; z <= d.z1; z += step) {
+      const s = authoredFieldSurfaceAt(F, x, z);
+      if (!s || s.hidden) continue;
+      if (authoredFieldHeight(F, x, z) <= d.y + 4) return false;
     }
-  }
   return true;
 }
