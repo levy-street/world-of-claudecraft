@@ -27,6 +27,7 @@ import { authoredFieldHeight } from '../src/sim/instances/authored_field';
 import { claimedInstanceAt, enterDungeon } from '../src/sim/instances/dungeons';
 import { Sim } from '../src/sim/sim';
 import { DT, type Entity, type WorldContent } from '../src/sim/types';
+import { atDungeonLevel } from './helpers/dungeon_level';
 
 const FIELD = WILDHEART_BASIN_FIELD;
 const floor = (x: number, z: number): number => authoredFieldHeight(FIELD, x, z);
@@ -84,6 +85,7 @@ describe('the Wildheart exit portal in the jaguar maw', () => {
   it('a player walks from Zulgar round the altar into the jaws and out', () => {
     const sim = new Sim({ seed: 41, playerClass: 'warrior', noPlayer: true, world: WORLD });
     const pid = sim.addPlayer('warrior', 'Mawwalker');
+    atDungeonLevel(sim);
     expect(enterDungeon(sim.ctx, 'wildheart_basin', pid)).toBe(true);
     const p = sim.entities.get(pid) as Entity;
     const inst = claimedInstanceAt(sim.ctx, p.pos);

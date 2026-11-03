@@ -7870,9 +7870,10 @@ export const TARGETS = [
     async capture(page) {
       const entered = await page.evaluate(() => {
         const sim = window.__game?.sim;
-        return typeof sim?.enterDungeon === 'function'
-          ? sim.enterDungeon('wildheart_basin')
-          : false;
+        if (typeof sim?.enterDungeon !== 'function') return false;
+        // The basin door's level floor (dungeon_entry_levels.ts) is 20.
+        sim.setPlayerLevel?.(20);
+        return sim.enterDungeon('wildheart_basin');
       });
       if (!entered) return { skip: 'offline world could not enter the Wildheart Basin' };
       await wait(1500);
@@ -7883,7 +7884,7 @@ export const TARGETS = [
         const player = sim?.player;
         if (!player?.pos) return;
         // Tour god mode (visual_tour.mjs): the 20+ camp mobs at the gate
-        // otherwise kill the level-one photographer before the shot.
+        // otherwise kill the photographer before the shot.
         player.maxHp = 99999;
         player.hp = 99999;
         player.pos.z += 16;
@@ -7928,7 +7929,12 @@ export const TARGETS = [
     when: ['map_surface_core', 'interior_map_controller'],
     variants: [{ key: 'desktop' }, ...(presses === 1 ? [{ key: 'mobile', mobile: true }] : [])],
     async capture(page) {
-      await page.evaluate(() => window.__game?.sim?.enterDungeon?.('hollow_crypt'));
+      // The crypt door's level floor (dungeon_entry_levels.ts) is 7.
+      await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        sim?.setPlayerLevel?.(20);
+        sim?.enterDungeon?.('hollow_crypt');
+      });
       await wait(1500); // let the instance teleport and its zone stream settle
       await awaitWorldPainted(page);
       await dismissTutorialGreeting(page);
@@ -7956,7 +7962,12 @@ export const TARGETS = [
     when: ['map_pinch_zoom_core', 'map_pan_core'],
     variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
     async capture(page) {
-      await page.evaluate(() => window.__game?.sim?.enterDungeon?.('hollow_crypt'));
+      // The crypt door's level floor (dungeon_entry_levels.ts) is 7.
+      await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        sim?.setPlayerLevel?.(20);
+        sim?.enterDungeon?.('hollow_crypt');
+      });
       await wait(1500);
       await awaitWorldPainted(page);
       await dismissTutorialGreeting(page);
@@ -7984,6 +7995,8 @@ export const TARGETS = [
       await page.evaluate(() => {
         const sim = window.__game?.sim;
         if (!sim) return;
+        // The crypt door's level floor (dungeon_entry_levels.ts) is 7.
+        sim.setPlayerLevel?.(20);
         sim.enterDungeon?.('hollow_crypt');
         const inside = { x: sim.player.pos.x + 6, z: sim.player.pos.z - 4 };
         // A raw position write back to the meadow (like the world-map target),

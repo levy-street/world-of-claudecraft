@@ -115,6 +115,7 @@ import {
   updateWorldQuests,
 } from '../../src/sim/world_quests';
 import { WORLD_SEED } from '../../src/sim/world_seed';
+import { atDungeonLevel } from '../helpers/dungeon_level';
 import { runCraft } from '../helpers/enchant_family_cast';
 import { OPEN_FIELD } from '../helpers/open_field';
 import type { Recorder, Scenario } from './record';
@@ -3161,6 +3162,8 @@ function dungeonInstances(): Scenario {
       const eb = sim.entities.get(b) as AnyEntity;
       beef(ea);
       beef(eb);
+      // Clear the Hollow Crypt door level floor (instances/dungeon_level_gate.ts).
+      atDungeonLevel(sim, [a, b]);
       // Walk player A onto the Hollow Crypt door -> the movement-pass door trigger
       // enters the dungeon and claims a fresh instance (rng.int per spawned mob).
       const door = [...sim.entities.values()].find(
@@ -3223,6 +3226,8 @@ function dungeonRaidLockout(): Scenario {
         sim.partyAccept(pid);
       }
       sim.convertPartyToRaid(leader);
+      // Clear the arena door level floor so the lockout is what refuses entry.
+      atDungeonLevel(sim);
       const meta = sim.players.get(leader) as PlayerMeta;
       meta.questsDone.add('q_nythraxis_bound_guardian'); // attune past the royal-door seal
       meta.raidLockouts.set('nythraxis_boss_arena', 999999999); // active lockout (far future ms)

@@ -5,6 +5,7 @@ import { enterDungeon, instanceAt } from '../src/sim/instances/dungeons';
 import { updateFarmFeasts } from '../src/sim/professions/feast';
 import { riftInstanceAtPos } from '../src/sim/rift/runs';
 import { Sim } from '../src/sim/sim';
+import { atDungeonLevel } from './helpers/dungeon_level';
 import { EMPTY_TEST_WORLD } from './sim_shared';
 
 function enterRun() {
@@ -31,8 +32,10 @@ function place(sim: Sim) {
 describe('retired feasts leave their room object roster', () => {
   it.each(['dungeon', 'delve'] as const)('also reclaims expired ids from a %s roster', (kind) => {
     const sim = new Sim({ seed: 42, playerClass: 'warrior', world: EMPTY_TEST_WORLD });
-    if (kind === 'dungeon') enterDungeon(sim.ctx, 'hollow_crypt', sim.player.id);
-    else {
+    if (kind === 'dungeon') {
+      atDungeonLevel(sim);
+      enterDungeon(sim.ctx, 'hollow_crypt', sim.player.id);
+    } else {
       sim.setPlayerLevel(DELVES.collapsed_reliquary.minLevel);
       sim.enterDelve('collapsed_reliquary', 'normal');
     }

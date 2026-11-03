@@ -28,6 +28,7 @@ import {
   type SimEvent,
 } from '../src/sim/types';
 import type { PartyMemberInfo } from '../src/world_api';
+import { atDungeonLevel } from './helpers/dungeon_level';
 import { face, makeFullWorld, makeWorld, mustEntity, nearestMob, teleport } from './social_shared';
 
 const FRESH_CORPSE_TIMER = 60;
@@ -435,11 +436,12 @@ describe('parties', () => {
   it('blocks raid groups from standard dungeons while requiring raid groups for Nythraxis entry', () => {
     const sim = makeWorld();
     const leader = sim.addPlayer('warrior', 'Leader');
+    atDungeonLevel(sim, [leader]);
     sim.players.get(leader)?.questsDone.add('q_nythraxis_bound_guardian');
     sim.enterDungeon('nythraxis_boss_arena', leader);
     expect(sim.entities.get(leader)?.pos.x).toBeLessThan(DUNGEON_X_THRESHOLD);
 
-    fillPartyToFive(sim, leader);
+    atDungeonLevel(sim, fillPartyToFive(sim, leader));
     sim.convertPartyToRaid(leader);
     sim.enterDungeon('sunken_bastion', leader);
     expect(sim.entities.get(leader)?.pos.x).toBeLessThan(DUNGEON_X_THRESHOLD);
@@ -1044,6 +1046,7 @@ describe('the Hollow Crypt', () => {
     const a = sim.addPlayer('warrior', 'Aleph');
     const b = sim.addPlayer('priest', 'Bet');
     const c = sim.addPlayer('rogue', 'Gimel');
+    atDungeonLevel(sim, [a, b, c]);
     sim.partyInvite(b, a);
     sim.partyAccept(b);
     for (const pid of [a, b, c]) teleport(sim, pid, 80, 88);
@@ -1070,6 +1073,7 @@ describe('the Hollow Crypt', () => {
   it('crypt has the full spawn set and Morthen pulses in combat', () => {
     const sim = makeWorld();
     const a = sim.addPlayer('warrior', 'Aleph');
+    atDungeonLevel(sim, [a]);
     teleport(sim, a, 80, 88);
     sim.enterCrypt(a);
     const slot = sim.instanceSlotAt(mustEntity(sim, a).pos) ?? 0;
@@ -1125,6 +1129,7 @@ describe('the new dungeons', () => {
   it('the Sunken Bastion and Gravewyrm Sanctum are enterable with full spawn sets', () => {
     const sim = makeWorld();
     const a = sim.addPlayer('warrior', 'Aleph');
+    atDungeonLevel(sim, [a]);
     teleport(sim, a, 45, 511);
     sim.enterDungeon('sunken_bastion', a);
     const ea = sim.entities.get(a)!;
@@ -1151,6 +1156,7 @@ describe('the new dungeons', () => {
   it('Velkhar summons add waves at hp thresholds and Korgath enrages below 30%', () => {
     const sim = makeWorld();
     const a = sim.addPlayer('warrior', 'Aleph');
+    atDungeonLevel(sim, [a]);
     teleport(sim, a, 0, 876);
     sim.enterDungeon('gravewyrm_sanctum', a);
     const ea = sim.entities.get(a)!;
@@ -1195,6 +1201,7 @@ describe('dungeon difficulty slash command', () => {
   it('routes /dungeon reset to the owned-instance reset', () => {
     const sim = makeWorld();
     const p = sim.addPlayer('warrior', 'Solo');
+    atDungeonLevel(sim, [p]);
     sim.enterDungeon('hollow_crypt', p);
     sim.leaveDungeon(p);
     // Seed a divergent preference so this tests explicit slash-command routing,

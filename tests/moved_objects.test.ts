@@ -53,6 +53,7 @@ import { DOOR_ARCH_JAMB_X } from '../src/sim/prop_layout';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
 import type { SimEvent, WorldContent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
+import { atDungeonLevel } from './helpers/dungeon_level';
 
 const BED = 'bed_eastbrook_1';
 
@@ -440,6 +441,7 @@ describe('moved objects: dungeon doors', () => {
 
   it('leaving the dungeon drops the player in front of the moved door', () => {
     const sim = new Sim({ seed: 9, playerClass: 'warrior', world });
+    atDungeonLevel(sim);
     const door = [...sim.entities.values()].find(
       (e) => e.templateId === 'dungeon_door' && e.dungeonId === crypt.id,
     );

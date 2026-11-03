@@ -10,6 +10,7 @@ import {
 import { claimedInstanceAt, enterDungeon } from '../src/sim/instances/dungeons';
 import { Sim } from '../src/sim/sim';
 import { DT, type Entity } from '../src/sim/types';
+import { atDungeonLevel } from './helpers/dungeon_level';
 
 const dungeon = DUNGEONS.gravewyrm_sanctum;
 
@@ -19,6 +20,7 @@ function room() {
     playerClass: 'warrior',
     world: { ...BUILTIN_WORLD, camps: [], npcs: {}, groundObjects: [] },
   });
+  atDungeonLevel(sim);
   expect(enterDungeon(sim.ctx, dungeon.id, sim.player.id)).toBe(true);
   const inst = claimedInstanceAt(sim.ctx, sim.player.pos);
   if (!inst) throw new Error('no Sanctum claim');

@@ -30,6 +30,7 @@ import {
   SEED,
   teleportTo,
 } from './fixes_shared';
+import { atDungeonLevel } from './helpers/dungeon_level';
 
 // Only this named slice of the Nythraxis quest chain is ever touched by the
 // 'quest npc roles' tests below: the crypt/grave quest-giver NPCs plus the
@@ -147,6 +148,7 @@ describe('quest npc roles', () => {
 
   it('gates the sealed crypt and grave visions behind Nythraxis quests', () => {
     const sim = makeNythraxisSim();
+    atDungeonLevel(sim);
     const crypt = DUNGEON_LIST.find((d) => d.id === 'nythraxis_crypt')!;
     const bossArena = DUNGEON_LIST.find((d) => d.id === 'nythraxis_boss_arena')!;
 
@@ -162,12 +164,14 @@ describe('quest npc roles', () => {
       state: 'active',
     });
     formRaid(sim);
+    atDungeonLevel(sim);
     sim.enterDungeon(bossArena.id);
     expect(dist2d(sim.player.pos, outerCryptPos)).toBeLessThan(0.1);
 
     sim.questLog.delete('q_nythraxis_sealed_crypt');
     sim.players.get(sim.playerId)?.questsDone.add('q_nythraxis_bound_guardian');
     formRaid(sim);
+    atDungeonLevel(sim);
     sim.enterDungeon(bossArena.id);
     expect(dungeonAt(sim.player.pos.x)?.id).toBe('nythraxis_boss_arena');
 

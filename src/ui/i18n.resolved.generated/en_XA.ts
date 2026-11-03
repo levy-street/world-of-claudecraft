@@ -2220,6 +2220,9 @@ export const en_XA: EnTranslations = {
       "heroicName": "[Ĥéŕóíç {name}]",
       "heroicLocked": "[Ýóú áŕé ļóçķéð ţó Ĥéŕóíç {name}.]"
     },
+    "dungeonEntry": {
+      "levelRequired": "[Ýóú ɱúšţ ƀé ļéʋéļ {level} ţó éñţéŕ {name}.]"
+    },
     "practiceDps": {
       "title": "[Þŕáçţíçé Ðúɱɱý]",
       "liveDps": "[{value} ÐÞŠ]",

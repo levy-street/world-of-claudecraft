@@ -28,6 +28,7 @@ import type { PlayerMeta, Sim as SimType } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
 import type { Entity, WorldContent } from '../src/sim/types';
+import { atDungeonLevel } from './helpers/dungeon_level';
 
 type AnySim = SimType & Record<string, any>;
 type AnyEntity = Entity & Record<string, any>;
@@ -101,6 +102,7 @@ function heroicRig(seed = 9) {
   const leader = sim.addPlayer('warrior', 'Lead');
   const away = sim.addPlayer('mage', 'Mate');
   const anchor = sim.addPlayer('priest', 'Anchor');
+  atDungeonLevel(sim, [leader, away, anchor]);
   for (const pid of [away, anchor]) {
     sim.partyInvite(pid, leader);
     sim.partyAccept(pid);

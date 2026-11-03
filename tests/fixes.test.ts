@@ -35,6 +35,7 @@ import {
 
 import { decorations, formRaid, makeLootSim, makeSim, SEED, teleportTo } from './fixes_shared';
 import { expectDefined } from './helpers/defined';
+import { atDungeonLevel } from './helpers/dungeon_level';
 import { wallFootFixture } from './helpers/wall_foot';
 
 interface SimPrivateHarness {
@@ -667,6 +668,7 @@ describe('rare spawn rules', () => {
 describe('the Hollow Crypt doors', () => {
   it('walking into the door teleports you inside; walking into the exit brings you back', () => {
     const sim = makeSim();
+    atDungeonLevel(sim);
     const p = sim.player;
     teleportTo(sim, CRYPT_DOOR_POS.x, CRYPT_DOOR_POS.z - 1.2);
     sim.tick();
@@ -688,6 +690,7 @@ describe('the Hollow Crypt doors', () => {
     const sim = new Sim({ seed: SEED, playerClass: 'warrior', noPlayer: true });
     const a = sim.addPlayer('warrior', 'Anna');
     const b = sim.addPlayer('mage', 'Bert');
+    atDungeonLevel(sim);
     sim.partyInvite(b, a);
     sim.partyAccept(b);
     expect(sim.partyOf(a)?.members).toContain(b);
@@ -715,6 +718,7 @@ describe('the Hollow Crypt doors', () => {
     const sim = new Sim({ seed: SEED, playerClass: 'warrior', noPlayer: true });
     const a = sim.addPlayer('warrior', 'Anna');
     const b = sim.addPlayer('mage', 'Bert');
+    atDungeonLevel(sim);
     teleportTo(sim, CRYPT_DOOR_POS.x, CRYPT_DOOR_POS.z - 1, a);
     sim.tick();
     teleportTo(sim, CRYPT_DOOR_POS.x, CRYPT_DOOR_POS.z - 1, b);
@@ -738,6 +742,7 @@ describe('dungeon instance placement and targetability', () => {
         sim.players.get(sim.playerId)?.questsDone.add('q_nythraxis_bound_guardian');
         formRaid(sim);
       }
+      atDungeonLevel(sim);
       if (ignivarRaidRoom) {
         formRaid(sim);
         expect(enterDungeon(sim.ctx, dungeon.id, sim.playerId, true)).toBe(true);
@@ -1375,6 +1380,7 @@ describe('boss loot and encounter resets', () => {
 
   it('boss adds despawn on encounter reset instead of stacking across pulls', () => {
     const sim = makeSim();
+    atDungeonLevel(sim);
     const p = sim.player;
     teleportTo(sim, 45, 515 - 1.2); // walk into the Sunken Bastion door
     sim.tick();

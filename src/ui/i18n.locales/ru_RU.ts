@@ -9805,6 +9805,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.makers_ember.name': 'Уголёк мастера',
   'hudChrome.raidLockout.heroicName': 'Героический режим: {name}',
   'hudChrome.raidLockout.heroicLocked': 'Вы закреплены за героическим подземельем: {name}.',
+  'hudChrome.dungeonEntry.levelRequired': 'Для входа нужен уровень {level}: {name}.',
   'hudChrome.practiceDps.title': 'Тренировочный манекен',
   'hudChrome.practiceDps.prompt': 'Атакуйте манекен, чтобы начать замер',
   'hudChrome.practiceDps.previous': 'Предыдущие замеры',

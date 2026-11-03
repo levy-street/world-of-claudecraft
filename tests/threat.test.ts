@@ -18,6 +18,7 @@ import { dist2d, SUNDER_ARMOR_PCT_PER_STACK } from '../src/sim/types';
 
 import { terrainHeight } from '../src/sim/world';
 import { expectDefined } from './helpers/defined';
+import { atDungeonLevel } from './helpers/dungeon_level';
 
 interface SimPrivateHarness {
   applyHeal(source: Entity, target: Entity, amount: number, ability: string): void;
@@ -1404,6 +1405,7 @@ describe('hunter pets', () => {
       sim.partyAccept(fill);
     }
     sim.convertPartyToRaid();
+    atDungeonLevel(sim, [sim.playerId]);
     sim.enterDungeon('nythraxis_boss_arena');
     const boss = expectDefined(
       [...sim.entities.values()].find(

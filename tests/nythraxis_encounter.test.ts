@@ -13,6 +13,7 @@ import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
 import { dist2d, type Entity, NYTHRAXIS_BOSS_ID, NYTHRAXIS_ROOM_RADIUS } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
+import { atDungeonLevel } from './helpers/dungeon_level';
 import { EMPTY_TEST_WORLD } from './sim_shared';
 
 type AnySim = Sim & Record<string, any>;
@@ -49,6 +50,7 @@ function setup(opts: { difficulty?: 'normal' | 'heroic'; dpsCount?: number } = {
     sim.partyAccept(pid);
     dpsPids.push(pid);
   }
+  atDungeonLevel(sim);
   sim.convertPartyToRaid(tankPid);
   if (difficulty === 'heroic') sim.setDungeonDifficulty('heroic', tankPid);
   sim.enterDungeon('nythraxis_boss_arena', tankPid);

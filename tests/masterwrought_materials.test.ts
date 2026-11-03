@@ -34,6 +34,7 @@ import { descendRift, updateRiftInstances } from '../src/sim/rift/runs';
 import type { PlayerMeta, Sim as SimType } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import type { Entity, WorldContent } from '../src/sim/types';
+import { atDungeonLevel } from './helpers/dungeon_level';
 import { completeEnchantFamilyCast, runSunder } from './helpers/enchant_family_cast';
 
 type AnySim = SimType & Record<string, any>;
@@ -95,6 +96,7 @@ function heroicMorthenRig(seed = 9): {
   const sim = makeDungeonSim(seed);
   const leader = sim.addPlayer('warrior', 'Lead');
   const member = sim.addPlayer('mage', 'Mate');
+  atDungeonLevel(sim);
   sim.partyInvite(member, leader);
   sim.partyAccept(member);
   sim.setDungeonDifficulty('heroic', leader);
@@ -311,6 +313,7 @@ describe('wyrmfall cores: the boss faucet', () => {
   it('a normal five-man final boss pays nothing and draws nothing', () => {
     const sim = makeDungeonSim(7);
     const leader = sim.addPlayer('warrior', 'Solo');
+    atDungeonLevel(sim);
     enterDungeon(sim.ctx, 'hollow_crypt', leader);
     const inst = claimedDungeon(sim, 'hollow_crypt', 'normal');
     const boss = mobInInstance(sim, inst, 'morthen');
@@ -424,6 +427,7 @@ describe('wyrmfall cores: the two raid arms', () => {
       sim.partyAccept(pid);
       raiders.push(pid);
     }
+    atDungeonLevel(sim);
     sim.convertPartyToRaid(tank);
     if (difficulty === 'heroic') sim.setDungeonDifficulty('heroic', tank);
     for (const pid of raiders) {

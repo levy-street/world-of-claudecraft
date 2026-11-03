@@ -56,6 +56,7 @@ import {
   updateInstances,
 } from '../src/sim/instances/dungeons';
 import { INSTANCE_EMPTY_TIMEOUT } from '../src/sim/types';
+import { atDungeonLevel } from './helpers/dungeon_level';
 
 type AnyEntity = Record<string, any>;
 type AnySim = Record<string, any>;
@@ -109,6 +110,7 @@ describe('dungeon instance survives a dropped connection (issue #1351)', () => {
     const ws = fakeWs();
     const session = expectJoined(server.join(ws, 11, 101, 'Solo', 'warrior', null));
 
+    atDungeonLevel(server.sim, [session.pid]);
     enterDungeon(server.sim.ctx, 'hollow_crypt', session.pid);
     const inst = claimedHollowCrypt(server, session.pid);
     expect(inst).toBeTruthy();
@@ -151,6 +153,7 @@ describe('dungeon instance survives a dropped connection (issue #1351)', () => {
     const ws = fakeWs();
     const session = expectJoined(server.join(ws, 11, 102, 'Ghosted', 'warrior', null));
 
+    atDungeonLevel(server.sim, [session.pid]);
     enterDungeon(server.sim.ctx, 'hollow_crypt', session.pid);
     const inst = claimedHollowCrypt(server, session.pid);
     const mobIds = [...inst.mobIds];
@@ -174,6 +177,7 @@ describe('dungeon instance survives a dropped connection (issue #1351)', () => {
     expect(relogged).not.toBe(session); // a genuinely fresh session and pid
     expect(relogged.pid).not.toBe(session.pid);
 
+    atDungeonLevel(server.sim, [relogged.pid]);
     enterDungeon(server.sim.ctx, 'hollow_crypt', relogged.pid);
 
     expect(claimedHollowCrypt(server, relogged.pid)).toBe(inst); // same claim, not a fresh one
@@ -186,6 +190,7 @@ describe('dungeon instance survives a dropped connection (issue #1351)', () => {
     const ws = fakeWs();
     const session = expectJoined(server.join(ws, 11, 103, 'Abandoned', 'warrior', null));
 
+    atDungeonLevel(server.sim, [session.pid]);
     enterDungeon(server.sim.ctx, 'hollow_crypt', session.pid);
     const inst = claimedHollowCrypt(server, session.pid);
     const exitId = inst.exitId;
@@ -212,6 +217,7 @@ describe('dungeon instance survives a dropped connection (issue #1351)', () => {
     const ws = fakeWs();
     const session = expectJoined(server.join(ws, 11, 104, 'Leaver', 'warrior', null));
 
+    atDungeonLevel(server.sim, [session.pid]);
     enterDungeon(server.sim.ctx, 'hollow_crypt', session.pid);
     const inst = claimedHollowCrypt(server, session.pid);
     expect(inst).toBeTruthy();
@@ -234,7 +240,9 @@ describe('dungeon instance survives a dropped connection (issue #1351)', () => {
     (server.sim as AnySim).partyInvite(b.pid, a.pid);
     (server.sim as AnySim).partyAccept(b.pid);
 
+    atDungeonLevel(server.sim, [a.pid]);
     enterDungeon(server.sim.ctx, 'hollow_crypt', a.pid);
+    atDungeonLevel(server.sim, [b.pid]);
     enterDungeon(server.sim.ctx, 'hollow_crypt', b.pid);
     const inst = (server.sim as AnySim).instances.find(
       (i: any) => i.dungeonId === 'hollow_crypt' && i.partyKey?.startsWith('party:'),

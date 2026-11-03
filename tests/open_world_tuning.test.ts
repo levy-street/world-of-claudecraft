@@ -13,6 +13,7 @@ import {
 } from '../src/sim/mob/open_world_tuning';
 import { Sim } from '../src/sim/sim';
 import type { Entity, MobTemplate } from '../src/sim/types';
+import { atDungeonLevel } from './helpers/dungeon_level';
 
 const ORIGIN = { x: 0, y: 0, z: 0 };
 
@@ -158,6 +159,7 @@ describe('open-world curve at the spawn sites', () => {
   it('keeps instanced spawns on their own tuning table', () => {
     const sim = new Sim({ seed: 99, playerClass: 'warrior', noPlayer: true });
     const pid = sim.addPlayer('warrior', 'Delver');
+    atDungeonLevel(sim);
     enterDungeon(sim.ctx, 'gravewyrm_sanctum', pid);
     const inst = (sim.instances as { dungeonId: string; mobIds: number[] }[]).find(
       (i) => i.dungeonId === 'gravewyrm_sanctum',

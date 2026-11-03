@@ -22,12 +22,14 @@ import type { InstanceSlot } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import type { Entity, WorldContent } from '../src/sim/types';
 import { localizeSimText } from '../src/ui/sim_i18n';
+import { atDungeonLevel } from './helpers/dungeon_level';
 
 const WORLD: WorldContent = { ...BUILTIN_WORLD, camps: [], npcs: {}, groundObjects: [] };
 
 function setup(seed = 11): { sim: Sim; pid: number; inst: InstanceSlot } {
   const sim = new Sim({ seed, playerClass: 'warrior', noPlayer: true, world: WORLD });
   const pid = sim.addPlayer('warrior', 'Gatewalker');
+  atDungeonLevel(sim);
   expect(enterDungeon(sim.ctx, 'hollow_crypt', pid)).toBe(true);
   const inst = sim.ctx.instances.find(
     (i) => i.dungeonId === 'hollow_crypt' && i.partyKey !== null,

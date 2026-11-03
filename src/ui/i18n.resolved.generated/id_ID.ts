@@ -2220,6 +2220,9 @@ export const id_ID: EnTranslations = {
       "heroicName": "{name} Heroik",
       "heroicLocked": "Anda terkunci pada {name} Heroik."
     },
+    "dungeonEntry": {
+      "levelRequired": "You must be level {level} to enter {name}."
+    },
     "practiceDps": {
       "title": "Boneka Latihan",
       "liveDps": "{value} DPS",

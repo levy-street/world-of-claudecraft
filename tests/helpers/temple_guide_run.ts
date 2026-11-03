@@ -8,6 +8,7 @@ import { claimedInstanceAt, enterDungeon } from '../../src/sim/instances/dungeon
 import type { InstanceSlot } from '../../src/sim/sim';
 import { Sim } from '../../src/sim/sim';
 import { DT, type Entity, type SimEvent, type Vec3 } from '../../src/sim/types';
+import { atDungeonLevel } from './dungeon_level';
 
 export interface Run {
   sim: Sim;
@@ -53,6 +54,7 @@ export function temple(
     ids.push(pid);
   }
   sim.chat(`/dev temple enter ${opts.difficulty ?? 'normal'}`, lead.id);
+  atDungeonLevel(sim, ids);
   for (const pid of ids) enterDungeon(sim.ctx, 'drowned_temple', pid);
   const inst = claimedInstanceAt(sim.ctx, lead.pos);
   if (!inst) throw new Error('no temple claim');

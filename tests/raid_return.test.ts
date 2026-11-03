@@ -36,6 +36,7 @@ import {
   IGNIVAR_BOSS_ID,
   NYTHRAXIS_BOSS_ID,
 } from '../src/sim/types';
+import { atDungeonLevel } from './helpers/dungeon_level';
 
 const ARENA_LOCKED_ERROR = 'You are locked to Crucible of the Last Spring.';
 const GATE_SEALED_ERROR = 'The forge gate is sealed to you.';
@@ -48,7 +49,9 @@ const NYTHRAXIS_ATTUNEMENT = 'q_nythraxis_bound_guardian';
 // the dev flag also waives the raid-group gate. productionDoor turns the flag
 // off afterwards, so every assertion runs the door exactly as a live realm does.
 function makeSim(seed = 42): Sim {
-  return new Sim({ seed, playerClass: 'warrior', autoEquip: false, devCommands: true });
+  const sim = new Sim({ seed, playerClass: 'warrior', autoEquip: false, devCommands: true });
+  atDungeonLevel(sim);
+  return sim;
 }
 
 function productionDoor(sim: Sim): void {
@@ -61,6 +64,7 @@ function addMeta(sim: Sim, name: string, characterId?: number): PlayerMeta {
     name,
     characterId === undefined ? undefined : { characterId },
   );
+  atDungeonLevel(sim, [pid]);
   return sim.players.get(pid)!;
 }
 
@@ -78,6 +82,7 @@ function ignivarRaid(sim: Sim, allyCharacterId?: number) {
   sim.partyAccept(ally.entityId);
   for (let i = 0; i < 3; i += 1) {
     const pid = sim.addPlayer('mage', `M${i}`);
+    atDungeonLevel(sim, [pid]);
     sim.partyInvite(pid, lead.entityId);
     sim.partyAccept(pid);
     fillers.push(pid);
@@ -146,6 +151,7 @@ function stepOutside(sim: Sim, pid: number): void {
 function formRaid(sim: Sim, leader: number, members: number[]): string {
   const all = [...members];
   while (all.length < 4) all.push(sim.addPlayer('mage', `New${all.length}`));
+  atDungeonLevel(sim, all);
   for (const pid of all) {
     sim.partyInvite(pid, leader);
     sim.partyAccept(pid);
@@ -557,10 +563,12 @@ describe('rebindHeldAwardsOnJoin: held awards follow the character across a relo
 describe('raid return route: a cleared Nythraxis raider who left the raid', () => {
   function nythraxisRaid(sim: Sim) {
     const tank = sim.addPlayer('warrior', 'Tank');
+    atDungeonLevel(sim, [tank]);
     const raiders = [tank];
     sim.players.get(tank)!.questsDone.add(NYTHRAXIS_ATTUNEMENT);
     for (let i = 0; i < 4; i += 1) {
       const pid = sim.addPlayer('mage', `Dps${i}`);
+      atDungeonLevel(sim, [pid]);
       sim.players.get(pid)!.questsDone.add(NYTHRAXIS_ATTUNEMENT);
       sim.partyInvite(pid, tank);
       sim.partyAccept(pid);
@@ -661,6 +669,7 @@ describe('raid return route: a cleared Nythraxis raider who left the raid', () =
     sim.partyLeave(leaver);
     for (let i = 0; i < 2; i += 1) {
       const pid = sim.addPlayer('mage', `Friend${i}`);
+      atDungeonLevel(sim, [pid]);
       sim.partyInvite(pid, leaver);
       sim.partyAccept(pid);
     }

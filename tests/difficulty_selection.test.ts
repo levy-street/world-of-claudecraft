@@ -6,6 +6,7 @@ import {
 } from '../src/sim/instances/difficulty_selection';
 import { enterDungeon } from '../src/sim/instances/dungeons';
 import { Sim } from '../src/sim/sim';
+import { atDungeonLevel } from './helpers/dungeon_level';
 
 function setup() {
   const sim = new Sim({
@@ -16,6 +17,7 @@ function setup() {
   });
   const leader = sim.addPlayer('warrior', 'Lead');
   const member = sim.addPlayer('priest', 'Member');
+  atDungeonLevel(sim);
   sim.partyInvite(member, leader);
   sim.partyAccept(member);
   expect(sim.enterDungeon('hollow_crypt', member)).toBe(true);
@@ -458,6 +460,7 @@ describe('difficulty selection through the live Sim', () => {
       world: { ...BUILTIN_WORLD, camps: [], npcs: {}, groundObjects: [] },
     });
     const solo = sim.addPlayer('warrior', 'Solo');
+    atDungeonLevel(sim);
     sim.setDungeonDifficulty('heroic', solo);
     expect(sim.enterDungeon('hollow_crypt', solo)).toBe(true);
     const inst = sim.instances.find((i) => i.partyKey !== null && i.dungeonId === 'hollow_crypt')!;

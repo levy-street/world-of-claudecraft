@@ -24,6 +24,7 @@ import { type PlayerMotionDeps, stepPlayerMotion } from '../src/sim/player_motio
 import { Sim } from '../src/sim/sim';
 import { type Entity, emptyMoveInput } from '../src/sim/types';
 import { WORLD_SEED } from '../src/sim/world_seed';
+import { atDungeonLevel } from './helpers/dungeon_level';
 
 type AnySim = Sim &
   Record<string, unknown> & {
@@ -45,6 +46,7 @@ function boardLift(): { sim: AnySim; origin: { x: number; z: number } } {
     autoEquip: true,
     devCommands: true,
   }) as AnySim;
+  atDungeonLevel(sim);
   if (!enterDungeon(sim.ctx, IGNIVAR_LIFT_ROOM_ID, sim.playerId)) {
     throw new Error('the keep door refused the lift');
   }

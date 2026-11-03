@@ -23,6 +23,7 @@ import { expectedStatBudget, itemLevel, primaryStatSum } from '../src/sim/item_l
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 import { buildHeroicVendorView } from '../src/ui/hud/vendor/heroic_vendor_view';
+import { atDungeonLevel } from './helpers/dungeon_level';
 import { VENDOR_TEST_WORLD } from './sim_shared';
 
 type AnySim = Sim & Record<string, any>;
@@ -510,6 +511,7 @@ describe('heroic mark reward persistence', () => {
   const DAY_MS = 24 * 60 * 60 * 1000;
 
   function killHeroicMorthen(sim: AnySim, pid: number): AnyEntity {
+    atDungeonLevel(sim, [pid]);
     sim.setDungeonDifficulty('heroic', pid);
     enterDungeon(sim.ctx, 'hollow_crypt', pid);
     const inst = (sim.instances as any[]).find(
@@ -573,6 +575,7 @@ describe('heroic mark reward persistence', () => {
   it('unlocks the Full Circuit deed from four distinct rewards in one reset window', () => {
     const sim = makeSim(25);
     const pid = sim.addPlayer('warrior', 'Circuit');
+    atDungeonLevel(sim, [pid]);
     const meta = sim.players.get(pid)!;
     const circuit = [
       'hollow_crypt',

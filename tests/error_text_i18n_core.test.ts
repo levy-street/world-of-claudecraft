@@ -4,8 +4,10 @@
 // here is the whole of the live state it still needs, which is what makes the
 // lockout arms and the fall-through chain assertable in isolation.
 import { afterEach, describe, expect, it } from 'vitest';
+import { DELVES, DUNGEONS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import type { SimEvent } from '../src/sim/types';
+import { dungeonDisplayName } from '../src/ui/entity_i18n';
 import { type ErrorTextLockoutDeps, localizeErrorText } from '../src/ui/error_text_i18n_core';
 import { ensureLocaleLoaded, formatDuration, setLanguage, t } from '../src/ui/i18n';
 import type { RaidLockout } from '../src/ui/raid_lockout';
@@ -174,4 +176,65 @@ describe('localizeErrorText: the form gate off a real cast', () => {
       expect(out).toBe(t('hud.errors.requiresForm', { form: t(formKey) }));
     },
   );
+});
+
+// The dungeon door level floor (src/sim/instances/dungeon_level_gate.ts): the
+// refusal comes off a REAL door attempt, so a drift between the sim's literal
+// and this arm's regex fails here rather than leaking raw English.
+describe('localizeErrorText: the dungeon door level floor off a real door', () => {
+  afterEach(() => setLanguage('en'));
+
+  function levelRefusal(): string {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior' });
+    sim.drainEvents();
+    expect(sim.enterDungeon('sunken_bastion')).toBe(false);
+    const errors = sim
+      .drainEvents()
+      .filter((ev): ev is Extract<SimEvent, { type: 'error' }> => ev.type === 'error')
+      .map((ev) => ev.text);
+    expect(errors).toHaveLength(1);
+    return errors[0];
+  }
+
+  it('resolves the catalog key with the level and the localized dungeon name', async () => {
+    const input = levelRefusal();
+    expect(input).toBe(`You must be level 12 to enter ${DUNGEONS.sunken_bastion.name}.`);
+    expect(localizeErrorText(input, deps())).toBe(
+      t('hudChrome.dungeonEntry.levelRequired', {
+        level: '12',
+        name: dungeonDisplayName('sunken_bastion'),
+      }),
+    );
+    await ensureLocaleLoaded('zh_CN');
+    setLanguage('zh_CN');
+    const out = localizeErrorText(input, deps());
+    expect(out).not.toContain('You must be level');
+    expect(out).toBe(
+      t('hudChrome.dungeonEntry.levelRequired', {
+        level: '12',
+        name: dungeonDisplayName('sunken_bastion'),
+      }),
+    );
+  });
+});
+
+// Delves emit the same "You must be level N to enter X." shape
+// (src/sim/delves/runs.ts); the dungeon arm must leave those lines to the
+// delve arms, or the tier form would leak its English " on <tier>" suffix.
+describe('localizeErrorText: delve level lines are not claimed by the dungeon arm', () => {
+  afterEach(() => setLanguage('en'));
+
+  it('falls through to the delve arms for both the plain and the tier line', async () => {
+    const delve = Object.values(DELVES).find((d) => d.tiers.length > 0)!;
+    const tier = delve.tiers[0];
+    const plain = `You must be level 9 to enter ${delve.name}.`;
+    const tiered = `You must be level 9 to enter ${delve.name} on ${tier.label}.`;
+    await ensureLocaleLoaded('zh_CN');
+    setLanguage('zh_CN');
+    for (const line of [plain, tiered]) {
+      const out = localizeErrorText(line, deps());
+      expect(out).toBe(localizeSimText(line));
+      expect(out).not.toBe(line);
+    }
+  });
 });

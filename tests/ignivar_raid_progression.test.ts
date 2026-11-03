@@ -23,9 +23,11 @@ import {
 import { enterDungeon, updateDoorTriggers, updateInstances } from '../src/sim/instances/dungeons';
 import { Sim } from '../src/sim/sim';
 import { IGNIVAR_BOSS_ID } from '../src/sim/types';
+import { atDungeonLevel } from './helpers/dungeon_level';
 
 function claimedRaid(difficulty: 'normal' | 'heroic' = 'normal') {
   const sim = new Sim({ seed: 3410, playerClass: 'warrior', devCommands: true });
+  atDungeonLevel(sim);
   sim.chat(`/dev dungeon ignivar_raid_arena ${difficulty}`);
   sim.chat('/dev ignivarraid');
   const boss = [...sim.entities.values()].find((entity) => entity.templateId === IGNIVAR_BOSS_ID);
@@ -117,6 +119,7 @@ describe('Ignivar raid progression', () => {
   it('spawns five guardian packs and opens the Herald gate only after all guardians die', () => {
     const sim = new Sim({ seed: 3412, playerClass: 'warrior', devCommands: true });
     const allyPid = sim.addPlayer('paladin', 'Approach Ally');
+    atDungeonLevel(sim);
     const raid = sim.ctx.formDungeonFinderGroup(
       [sim.player.id, allyPid].map((pid) => ({
         partyId: null,
@@ -260,6 +263,7 @@ describe('Ignivar raid progression', () => {
     // invariant), and the non-dev refusals stay pinned by the foreign-claim
     // and outside-player cases above.
     const sim = new Sim({ seed: 3411, playerClass: 'warrior', devCommands: true });
+    atDungeonLevel(sim);
     sim.chat(`/dev dungeon ${IGNIVAR_RAID_ARENA_ID} normal`);
     const boss = [...sim.entities.values()].find((entity) => entity.templateId === IGNIVAR_BOSS_ID);
     if (!boss) throw new Error('Solo Ignivar did not spawn');

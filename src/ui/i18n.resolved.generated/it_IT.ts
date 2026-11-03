@@ -2220,6 +2220,9 @@ export const it_IT: EnTranslations = {
       "heroicName": "{name} Eroico",
       "heroicLocked": "Sei bloccato sulla versione Eroica di {name}."
     },
+    "dungeonEntry": {
+      "levelRequired": "You must be level {level} to enter {name}."
+    },
     "practiceDps": {
       "title": "Manichino da pratica",
       "liveDps": "DPS: {value}",

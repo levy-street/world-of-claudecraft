@@ -2220,6 +2220,9 @@ export const pt_BR: EnTranslations = {
       "heroicName": "{name} Heroico",
       "heroicLocked": "Você está vinculado a {name} Heroico."
     },
+    "dungeonEntry": {
+      "levelRequired": "You must be level {level} to enter {name}."
+    },
     "practiceDps": {
       "title": "Boneco de prática",
       "liveDps": "DPS: {value}",

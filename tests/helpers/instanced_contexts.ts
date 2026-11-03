@@ -16,6 +16,7 @@
 // the gate itself uses, and nothing else. No DOM, no server, no fixtures.
 
 import { DELVES } from '../../src/sim/data';
+import { dungeonEntryMinLevel } from '../../src/sim/instances/dungeon_level_gate';
 import { enterDungeon, instanceInfoAt, isInRaidInstance } from '../../src/sim/instances/dungeons';
 import { riftInstanceAtPos } from '../../src/sim/rift/runs';
 import type { RiftInstance } from '../../src/sim/rift/types';
@@ -66,6 +67,10 @@ export function placeInDungeon(
   pid: number = sim.playerId,
   dungeonId: string = TEST_DUNGEON_ID,
 ): DungeonPlacement {
+  // Clear the door's level floor (dungeon_entry_levels.ts), as the delve
+  // placement below clears its minLevel.
+  const floor = dungeonEntryMinLevel(dungeonId);
+  if (entityOf(sim, pid).level < floor) sim.setPlayerLevel(floor, pid);
   if (!enterDungeon(sim.ctx, dungeonId, pid)) {
     throw new Error(`instanced_contexts: enterDungeon(${dungeonId}) refused pid ${pid}`);
   }
@@ -109,6 +114,8 @@ export function placeInRaid(sim: Sim, pid: number = sim.playerId): RaidPlacement
     raiders.push(filler);
   }
   sim.convertPartyToRaid(pid);
+  const raidFloor = dungeonEntryMinLevel(TEST_RAID_DUNGEON_ID);
+  if (entityOf(sim, pid).level < raidFloor) sim.setPlayerLevel(raidFloor, pid);
   if (!enterDungeon(sim.ctx, TEST_RAID_DUNGEON_ID, pid)) {
     throw new Error(`instanced_contexts: raid entry refused pid ${pid}`);
   }

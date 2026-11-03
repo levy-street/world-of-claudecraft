@@ -12,6 +12,7 @@ import { enterDungeon } from '../src/sim/instances/dungeons';
 import { Sim } from '../src/sim/sim';
 import { settleTeleportArrival } from '../src/sim/teleport_arrival';
 import type { WorldContent } from '../src/sim/types';
+import { atDungeonLevel } from './helpers/dungeon_level';
 
 const NO_AMBIENT_WORLD: WorldContent = {
   ...BUILTIN_WORLD,
@@ -56,6 +57,7 @@ describe('instance arrival resets an airborne player (dungeons)', () => {
   it('enterDungeon lands an airborne player settled, with no fall damage on the next tick', () => {
     const sim = makeSim();
     const pid = sim.addPlayer('warrior', 'Solo');
+    atDungeonLevel(sim, [pid]);
     const p = required(sim.entities.get(pid), 'player entity');
     p.maxHp = p.hp = 1_000_000;
     // Mid-jump over the overworld at the exact tick the door trigger fires

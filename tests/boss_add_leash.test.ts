@@ -18,6 +18,7 @@ import { MOBS } from '../src/sim/data';
 import { enterDungeon } from '../src/sim/instances/dungeons';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
+import { atDungeonLevel } from './helpers/dungeon_level';
 
 type AnySim = Sim & Record<string, any>;
 type AnyEntity = Entity & Record<string, any>;
@@ -71,6 +72,7 @@ describe('boss adds anchor where they erupt', () => {
   it('adds hatched from a KITED boss engage instead of leashing home instantly', () => {
     const sim = makeSim();
     const pid = sim.addPlayer('warrior', 'Kiter');
+    atDungeonLevel(sim, [pid]);
     enterDungeon(sim.ctx, 'gravewyrm_sanctum', pid);
     const inst = claimedSanctum(sim, 'normal');
     const boss = velkharIn(sim, inst);
@@ -100,6 +102,7 @@ describe('boss adds anchor where they erupt', () => {
   it('adds hatched at the boss home behave as before: engaged on the victim', () => {
     const sim = makeSim();
     const pid = sim.addPlayer('warrior', 'Tank');
+    atDungeonLevel(sim, [pid]);
     enterDungeon(sim.ctx, 'gravewyrm_sanctum', pid);
     const boss = velkharIn(sim, claimedSanctum(sim, 'normal'));
     const adds = fireFirstWave(sim, boss, pid);
@@ -116,6 +119,7 @@ describe('heroic boss adds swing at addDamageMultiplier', () => {
   it("Velkhar's heroic bonewalkers use the softer add multiplier, the boss the full one", () => {
     const sim = makeSim(123);
     const pid = sim.addPlayer('warrior', 'Hero');
+    atDungeonLevel(sim, [pid]);
     sim.setDungeonDifficulty('heroic', pid);
     enterDungeon(sim.ctx, 'gravewyrm_sanctum', pid);
     const boss = velkharIn(sim, claimedSanctum(sim, 'heroic'));
@@ -155,6 +159,7 @@ describe('heroic boss adds swing at addDamageMultiplier', () => {
   it('normal-difficulty adds use the normal per-mob retune, not the heroic add multiplier', () => {
     const sim = makeSim(321);
     const pid = sim.addPlayer('warrior', 'Normie');
+    atDungeonLevel(sim, [pid]);
     enterDungeon(sim.ctx, 'gravewyrm_sanctum', pid);
     const boss = velkharIn(sim, claimedSanctum(sim, 'normal'));
     const adds = fireFirstWave(sim, boss, pid);

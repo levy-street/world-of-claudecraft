@@ -14,6 +14,7 @@ import { expectedStatBudget, itemLevel, primaryStatSum } from '../src/sim/item_l
 import { Sim } from '../src/sim/sim';
 import type { Entity, ItemDef } from '../src/sim/types';
 import { itemDisplayName } from '../src/ui/entity_i18n';
+import { atDungeonLevel } from './helpers/dungeon_level';
 
 type AnySim = Sim & Record<string, any>;
 type AnyEntity = Entity & Record<string, any>;
@@ -195,6 +196,7 @@ describe('heroic loot flair: the drop swap in a heroic instance', () => {
   function killKorzul(difficulty: 'normal' | 'heroic'): any[] {
     const sim = new Sim({ seed: 7, playerClass: 'warrior', noPlayer: true }) as AnySim;
     const pid = sim.addPlayer('warrior', 'Solo');
+    atDungeonLevel(sim, [pid]);
     if (difficulty === 'heroic') sim.setDungeonDifficulty('heroic', pid);
     enterDungeon(sim.ctx, 'gravewyrm_sanctum', pid);
     const inst = (sim.instances as any[]).find(

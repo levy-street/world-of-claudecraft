@@ -23,6 +23,7 @@ import {
   setOpenDungeonGates,
 } from '../src/sim/instances/dungeon_gate_state';
 import { dungeonGateState, setDungeonGatesDevOpen } from '../src/sim/instances/dungeon_gates';
+import { dungeonEntryMinLevel } from '../src/sim/instances/dungeon_level_gate';
 import { freeInstance, updateDoorTriggers } from '../src/sim/instances/dungeons';
 import { MAX_AGGRO_RADIUS, MAX_WANDER_RADIUS } from '../src/sim/mob/aggro_ranges';
 import { PATROL_REJOIN_DISTANCE } from '../src/sim/mob/patrol';
@@ -31,6 +32,7 @@ import { RIFT_ENTRY_CLEAR_RADIUS } from '../src/sim/rift/entry_clearance';
 import { type InstanceSlot, Sim } from '../src/sim/sim';
 import { RES_HP_FRACTION, RESURRECTION_SICKNESS_ID } from '../src/sim/spirit';
 import { type Entity, PLAYER_INTEREST_DROP_RADIUS } from '../src/sim/types';
+import { atDungeonLevel } from './helpers/dungeon_level';
 
 const CASES = [
   ['hollow_crypt', ['sexton_marrow'], -82, 116],
@@ -75,6 +77,8 @@ function setup(dungeonId = 'hollow_crypt', heroic = false, idleMobTickRadius = 0
     world: { ...BUILTIN_WORLD, camps: [], npcs: {}, groundObjects: [] },
   });
   const pid = sim.addPlayer('warrior', 'Runner');
+  // The door floor, no higher: the arrival tests measure aggro against a low level.
+  atDungeonLevel(sim, [pid], dungeonEntryMinLevel(dungeonId));
   if (heroic) {
     sim.setPlayerLevel(20, pid);
     sim.setDungeonDifficulty('heroic', pid);
@@ -339,6 +343,7 @@ describe('dungeon death checkpoints', () => {
     release(sim, pid);
     expect(dungeonReentryPoint(sim.ctx, inst, player)).toEqual({ x: -82, z: 116 });
     const secondPid = sim.addPlayer('warrior', 'Other');
+    atDungeonLevel(sim, [secondPid], dungeonEntryMinLevel(inst.dungeonId));
     sim.enterDungeon(inst.dungeonId, secondPid);
     const other = sim.instances.find(
       (i) => i.dungeonId === inst.dungeonId && i.partyKey === `solo:${secondPid}`,
@@ -352,6 +357,7 @@ describe('dungeon death checkpoints', () => {
     const { sim, pid } = setup();
     sim.leaveDungeon(pid);
     const secondPid = sim.addPlayer('warrior', 'PartyRunner');
+    atDungeonLevel(sim, [secondPid], dungeonEntryMinLevel('hollow_crypt'));
     sim.partyInvite(secondPid, pid);
     sim.partyAccept(secondPid);
     sim.enterDungeon('hollow_crypt', pid);
@@ -420,6 +426,7 @@ describe('dungeon death checkpoints', () => {
     const oldClaimId = player.corpseInstanceId;
     freeInstance(sim.ctx, inst);
     const secondPid = sim.addPlayer('warrior', 'NewOwner');
+    atDungeonLevel(sim, [secondPid], dungeonEntryMinLevel('hollow_crypt'));
     sim.enterDungeon('hollow_crypt', secondPid);
     earn(sim, inst, 'sexton_marrow');
     expect(inst.exitId).not.toBe(oldClaimId);
@@ -1202,6 +1209,7 @@ describe('dungeon death checkpoints: instances outside the table', () => {
       raiders.push(pid);
     }
     sim.convertPartyToRaid(tank);
+    atDungeonLevel(sim, raiders);
     for (const pid of raiders) {
       sim.enterDungeon('nythraxis_crypt', pid);
       sim.enterDungeon('nythraxis_boss_arena', pid);

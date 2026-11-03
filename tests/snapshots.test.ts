@@ -139,6 +139,7 @@ import {
   joinServer,
   lastSnap,
 } from './helpers/bare_client';
+import { atDungeonLevel } from './helpers/dungeon_level';
 
 // Wire round-trip fixtures only read the player entity they build, never ambient
 // world content, so strip camps/npcs/ground objects to keep each direct Sim cheap
@@ -2686,6 +2687,7 @@ describe('dungeon difficulty wire', () => {
     const server = new GameServer();
     const fc = fakeWs();
     const session = joinServer(server, fc, 1, 'Hero');
+    atDungeonLevel(server.sim, [session.pid]);
     expect(enterDungeon(server.sim.ctx, 'hollow_crypt', session.pid)).toBe(true);
     server.sim.setDungeonDifficulty('heroic', session.pid);
 
@@ -2704,6 +2706,7 @@ describe('dungeon difficulty wire', () => {
     const server = new GameServer();
     const fc = fakeWs();
     const session = joinServer(server, fc, 1, 'Hero');
+    atDungeonLevel(server.sim, [session.pid]);
     expect(enterDungeon(server.sim.ctx, 'hollow_crypt', session.pid)).toBe(true);
     server.sim.leaveDungeon(session.pid);
     const inst = server.sim.instances.find(

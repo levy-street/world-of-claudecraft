@@ -2220,6 +2220,9 @@ export const zh_TW: EnTranslations = {
       "heroicName": "英雄難度:{name}",
       "heroicLocked": "你已被鎖定至英雄難度的{name}。"
     },
+    "dungeonEntry": {
+      "levelRequired": "你必須達到{level}級才能進入{name}。"
+    },
     "practiceDps": {
       "title": "訓練假人",
       "liveDps": "{value} DPS",

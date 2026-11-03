@@ -2220,6 +2220,9 @@ export const nl_NL: EnTranslations = {
       "heroicName": "Heroïsch {name}",
       "heroicLocked": "Je bent vergrendeld voor Heroïsch {name}."
     },
+    "dungeonEntry": {
+      "levelRequired": "You must be level {level} to enter {name}."
+    },
     "practiceDps": {
       "title": "Oefenpop",
       "liveDps": "{value} DPS",

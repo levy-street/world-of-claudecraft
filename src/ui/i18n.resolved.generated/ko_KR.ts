@@ -2220,6 +2220,9 @@ export const ko_KR: EnTranslations = {
       "heroicName": "영웅: {name}",
       "heroicLocked": "영웅 난이도 {name}에 귀속되었습니다."
     },
+    "dungeonEntry": {
+      "levelRequired": "{name}에 입장하려면 레벨 {level} 이상이어야 합니다."
+    },
     "practiceDps": {
       "title": "훈련용 허수아비",
       "liveDps": "{value} DPS",

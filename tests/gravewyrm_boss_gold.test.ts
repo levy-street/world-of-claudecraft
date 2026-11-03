@@ -6,6 +6,7 @@ import { createMob } from '../src/sim/entity';
 import { enterDungeon } from '../src/sim/instances/dungeons';
 import { Sim } from '../src/sim/sim';
 import type { LootEntry } from '../src/sim/types';
+import { atDungeonLevel } from './helpers/dungeon_level';
 
 // Gravewyrm Sanctum gold-farm fix: Korzul the Gravewyrm paid a guaranteed
 // 50000c base, rolled to 3g to 7g per kill by the loot roller's 0.6x to 1.4x
@@ -59,6 +60,7 @@ function heroicKillCopper(seed: number): number {
   const sim = new Sim({ seed, playerClass: 'warrior', noPlayer: true });
   const s = sim as unknown as Record<string, any>;
   const pid = sim.addPlayer('warrior', 'Solo');
+  atDungeonLevel(sim);
   sim.setDungeonDifficulty('heroic', pid);
   enterDungeon(s.ctx, 'gravewyrm_sanctum', pid);
   const inst = (s.instances as any[]).find(

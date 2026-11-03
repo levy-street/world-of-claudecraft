@@ -61,6 +61,7 @@ import { Sim } from '../src/sim/sim';
 import type { Entity, WorldContent } from '../src/sim/types';
 import { RUN_SPEED } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
+import { atDungeonLevel } from './helpers/dungeon_level';
 
 const WILDHEART_TEST_WORLD: WorldContent = {
   ...BUILTIN_WORLD,
@@ -189,6 +190,7 @@ describe('Wildheart Basin dungeon content', () => {
   it('spawns every placed role when a party claims the instance', () => {
     const sim = makeSim();
     const playerId = sim.addPlayer('warrior', 'Alpha');
+    atDungeonLevel(sim);
     expect(enterDungeon(sim.ctx, 'wildheart_basin', playerId)).toBe(true);
     const instance = (
       sim.instances as { dungeonId: string; partyKey: unknown; mobIds: number[] }[]
@@ -339,6 +341,7 @@ describe('Wildheart Basin dungeon content', () => {
     if (!spear) throw new Error('the stalker lost its spear');
     const sim = makeSim(23);
     const pid = sim.addPlayer('warrior', 'Tank');
+    atDungeonLevel(sim);
     expect(enterDungeon(sim.ctx, 'wildheart_basin', pid)).toBe(true);
     const inst = (sim.instances as { dungeonId: string; mobIds: number[] }[]).find(
       (i) => i.dungeonId === 'wildheart_basin',
@@ -564,6 +567,7 @@ describe('Wildheart Basin Tier-2 loot pass', () => {
   ): { sim: Sim; zulgar: Entity; p: Entity } {
     const sim = makeSim(seed);
     const pid = sim.addPlayer('warrior', 'Looter');
+    atDungeonLevel(sim);
     if (difficulty === 'heroic') sim.setDungeonDifficulty('heroic', pid);
     expect(enterDungeon(sim.ctx, 'wildheart_basin', pid)).toBe(true);
     const instance = (sim.instances as { dungeonId: string; mobIds: number[] }[]).find(
@@ -645,6 +649,7 @@ describe('Wildheart Basin Tier-2 loot pass', () => {
     // No portal before the boss dies: a fresh claim spawns none.
     const sim = makeSim(5);
     const pid = sim.addPlayer('warrior', 'Walker');
+    atDungeonLevel(sim);
     expect(enterDungeon(sim.ctx, 'wildheart_basin', pid)).toBe(true);
     const inst = (sim.instances as { dungeonId: string; bossExitId: number | null }[]).find(
       (i) => i.dungeonId === 'wildheart_basin',
@@ -657,6 +662,7 @@ describe('Wildheart Basin Tier-2 loot pass', () => {
     // the finalBossId guard a trash pull would let a group skip the run.
     const sim = makeSim(17);
     const pid = sim.addPlayer('warrior', 'Trasher');
+    atDungeonLevel(sim);
     expect(enterDungeon(sim.ctx, 'wildheart_basin', pid)).toBe(true);
     const inst = (
       sim.instances as { dungeonId: string; bossExitId: number | null; mobIds: number[] }[]

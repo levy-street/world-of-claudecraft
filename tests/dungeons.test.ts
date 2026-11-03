@@ -45,6 +45,7 @@ import {
   PARTY_XP_RANGE,
   type WorldContent,
 } from '../src/sim/types';
+import { atDungeonLevel } from './helpers/dungeon_level';
 
 type AnySim = Sim & Record<string, any>;
 type AnyEntity = Entity & Record<string, any>;
@@ -74,13 +75,22 @@ function selectDifficultyWithoutSwitch(
   if (party) party.dungeonDifficulty = difficulty;
 }
 
+// Every join is raised to the dungeon door level floor: a fresh fixture
+// character starts at level 1, below every gated door.
 function makeSim(seed = 99): AnySim {
-  return new Sim({
+  const sim = new Sim({
     seed,
     playerClass: 'warrior',
     noPlayer: true,
     world: DUNGEON_TEST_WORLD,
   }) as AnySim;
+  const addPlayer = sim.addPlayer.bind(sim);
+  sim.addPlayer = (...args: Parameters<Sim['addPlayer']>) => {
+    const pid = addPlayer(...args);
+    atDungeonLevel(sim, [pid]);
+    return pid;
+  };
+  return sim;
 }
 
 function teleport(sim: AnySim, e: AnyEntity, x: number, z: number): void {
@@ -2148,6 +2158,7 @@ describe('dungeons: heroic daily lockouts', () => {
     }) as AnySim;
     sim.utcDay = '2026-07-12';
     const pid = sim.addPlayer('warrior', 'Raider');
+    atDungeonLevel(sim, [pid]);
     heroicClear(sim, pid, 'hollow_crypt', 'morthen');
 
     const meta = sim.players.get(pid)!;

@@ -6,6 +6,7 @@ import { createMob } from '../src/sim/entity';
 import { enterDungeon } from '../src/sim/instances/dungeons';
 import { Sim } from '../src/sim/sim';
 import type { LootEntry, MobTemplate } from '../src/sim/types';
+import { atDungeonLevel } from './helpers/dungeon_level';
 
 // Heroic finale gold (LootEntry.heroicCopper; bases in
 // src/sim/content/dungeon_difficulty.ts, ladder doc in
@@ -67,6 +68,7 @@ function instanceKillCopper(
   const sim = new Sim({ seed, playerClass: 'warrior', noPlayer: true });
   const s = sim as unknown as Record<string, any>;
   const pid = sim.addPlayer('warrior', 'Solo');
+  atDungeonLevel(sim);
   if (difficulty === 'heroic') sim.setDungeonDifficulty('heroic', pid);
   enterDungeon(s.ctx, dungeonId, pid);
   const inst = (s.instances as any[]).find(

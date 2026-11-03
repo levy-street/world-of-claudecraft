@@ -42,6 +42,7 @@ import { craftVaultDrawBlockedFor, craftVaultStockFor } from '../src/sim/materia
 import { Sim } from '../src/sim/sim';
 import type { DungeonDef, Entity, Vec3 } from '../src/sim/types';
 import { vaultDrawBlocked, vaultDrawStock } from '../src/sim/vault_craft_gate';
+import { atDungeonLevel } from './helpers/dungeon_level';
 import {
   placeInArena,
   placeInBattleground,
@@ -56,7 +57,9 @@ import { EMPTY_TEST_WORLD } from './sim_shared';
 // The gate reads position and two membership maps and nothing else, so the
 // world is trimmed to terrain: no camps, npcs or ground objects to spawn.
 function makeSim(seed = 42): Sim {
-  return new Sim({ seed, playerClass: 'warrior', autoEquip: false, world: EMPTY_TEST_WORLD });
+  const sim = new Sim({ seed, playerClass: 'warrior', autoEquip: false, world: EMPTY_TEST_WORLD });
+  atDungeonLevel(sim);
+  return sim;
 }
 
 function entityOf(sim: Sim, pid: number): Entity {
@@ -114,6 +117,7 @@ describe('vaultDrawBlocked: the six instanced contexts each refuse', () => {
     // A second raider who zones in is refused too, so the answer is not
     // special to whoever claimed the slot.
     const second = placement.raiders[1];
+    atDungeonLevel(sim, [second]);
     expect(enterDungeon(sim.ctx, placement.dungeonId, second)).toBe(true);
     expect(vaultDrawBlocked(sim.ctx, second)).toBe(true);
 

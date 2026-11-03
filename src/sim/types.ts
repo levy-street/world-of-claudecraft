@@ -8515,6 +8515,9 @@ export interface Entity extends ClientMirroredEntityFields {
   // shown to this player, so the 20 Hz walk-in door trigger does not spam the
   // toast (instances/ignivar_entry.ts).
   ignivarEntryDeniedAt?: number;
+  // Sim time of the last "you must be level N" dungeon door denial shown to
+  // this player, throttled the same way (instances/dungeon_level_gate.ts).
+  dungeonLevelDeniedAt?: number;
   // Sim time of the last "the forge doors hold fast" Ignivar exit denial shown
   // to this player while a boss fight seals the room, throttled the same way:
   // the 20 Hz exit-portal walk-in trigger must not spam the toast
