@@ -67,7 +67,8 @@ export function stepBond(s: CouncilScope): number {
   const c = s.bodies.singer;
   const bond = s.st.bond;
   if (!bonded(g, c) || !g || !c) {
-    if (bond.pulses > 0 || g?.auras.some((a) => a.id === COUNCIL_AURAS.bond)) clearBond(s);
+    const worn = (b: Entity | null) => b?.auras.some((a) => a.id === COUNCIL_AURAS.bond) ?? false;
+    if (bond.pulses > 0 || worn(g) || worn(c)) clearBond(s);
     return 0;
   }
   wear(s, g, bond.pulses);

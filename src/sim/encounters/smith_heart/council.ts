@@ -304,6 +304,8 @@ function noteFallen(s: CouncilScope, role: CouncilRole, dead: Entity): void {
     s.st.energy = 0;
     clearRush(s);
   }
+  // No bond with the fallen: the survivor's ward lifts now.
+  clearBond(s);
   // Mythic: its soul takes the most intact pillar (council_soul.ts).
   const soul = survivor && s.rules.soulInTheStone ? takeSoul(s, role, dead) !== null : false;
   if (survivor) sayFallen(s, role, soul);
@@ -474,6 +476,9 @@ function resetCouncil(ctx: SimContext, inst: InstanceSlot, bodies: CouncilBodies
     const b = bodies[r];
     if (!b) continue;
     dropAuraById(b, COUNCIL_AURAS.memory);
+    // The Rush's reel (its stun, the extra damage) never outlives the fight.
+    dropAuraById(b, COUNCIL_AURAS.rushStunned);
+    dropAuraById(b, COUNCIL_AURAS.rushExposed);
     if (b.dead && anyAlive) regrowHead(ctx, b, 1);
     b.resource = 0;
   }

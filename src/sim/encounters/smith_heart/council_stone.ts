@@ -22,8 +22,8 @@
 //                   brings one due), under RANDOM players with only a 2 s
 //                   warning on a locked spot (nobody chooses, nobody kicks);
 //                   the rock stops with her. Mythic: a 1.5 s warning, and the
-//                   Guardian keeps the rock too (with Resonance it is all that
-//                   breaks a soul pillar).
+//                   Guardian keeps the rock too (it is all that breaks a soul
+//                   pillar).
 //   Soul pillars    a rock landing within 6 yd of one strikes a soul pip off
 //                   (council_soul.ts) instead of a piece.
 //

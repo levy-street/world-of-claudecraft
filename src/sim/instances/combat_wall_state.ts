@@ -33,7 +33,8 @@ export interface CombatWallShape {
   /** Drawn by its own encounter's renderer, never as the engine's ice slab
    *  (the Hammer Council's pillars: render/smith_heart_fx). */
   ownLook?: boolean;
-  /** A wall that walks (the mythic Walking Slab): its collider anchors on a
+  /** A wall that walks (the prototype's mythic Walking Slab; none walks
+   *  today, the seam stays): its collider anchors on a
    *  grid this many yards wide (wallAnchor), so the slot's view republishes
    *  a few times a second as it drags, never every tick. */
   anchorStep?: number;

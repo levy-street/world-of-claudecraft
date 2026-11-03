@@ -363,9 +363,8 @@ export const SMITH_HEART_BOSS_SPOTS = {
   quench: { x: QUENCH.lake.x, z: QUENCH.lake.z },
   heat: { x: HEARTH_WELL.x, z: HEARTH_WELL.z },
   final: { x: HEART_ROOM.x, z: HEART_ROOM.z },
-  /** The Hammer Council's other two (section 7.1): the Slabwright and the
-   *  Seam Singer flank the Guardian a little behind it, well inside the
-   *  ring of columns. */
+  /** The Hammer Council's other member (section 7.1): the Seam Singer
+   *  stands a little behind the Guardian, well inside the ring of columns. */
   seamSinger: { x: HAMMER_PIT.x + 3, z: HAMMER_PIT.z + 9 },
 } as const;
 

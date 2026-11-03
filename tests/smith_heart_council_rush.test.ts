@@ -368,6 +368,100 @@ describe('Bond of the Stone', () => {
   });
 });
 
+describe('the lifecycle: nothing of the Rush, the curse or the Bond outlives its fight', () => {
+  /** A mythic pull with a cursed pillar standing, the Quarry collapsing and
+   *  the Guardian reeling from an earlier shattered curse. */
+  function messy(): Fight {
+    const f = pulled(4, 'mythic');
+    const { target, at } = rushSetup(f);
+    const away = past(at, MID, 14);
+    f.put(target, away.x, away.z);
+    runRush(f);
+    expect(f.st.collapse).not.toBeNull();
+    const g = f.bodies().guardian as Entity;
+    f.sim.ctx.applyAura(g, {
+      id: COUNCIL_AURAS.rushExposed,
+      name: COUNCIL_NAMES.rushStunned,
+      kind: 'vulnerability',
+      remaining: T.rushExposedSeconds,
+      duration: T.rushExposedSeconds,
+      value: T.rushExposed,
+      sourceId: g.id,
+      school: 'physical',
+    });
+    f.tick(20 * 3);
+    return f;
+  }
+  const clean = (f: Fight) => {
+    expect(cursed(f)).toBeUndefined();
+    for (const p of f.players)
+      for (const id of [COUNCIL_AURAS.rushMark, COUNCIL_AURAS.collapse])
+        expect(
+          p.auras.some((a) => a.id === id),
+          id,
+        ).toBe(false);
+    for (const b of [f.bodies().guardian, f.bodies().singer])
+      for (const id of [COUNCIL_AURAS.bond, COUNCIL_AURAS.rushStunned, COUNCIL_AURAS.rushExposed])
+        expect(
+          b?.auras.some((a) => a.id === id),
+          id,
+        ).toBe(false);
+  };
+
+  it('a wipe clears the dash, the curse, the collapse, the reel and the bond', () => {
+    const f = messy();
+    for (const p of f.players) f.sim.ctx.handleDeath(p, null);
+    for (let i = 0; i < 20 * 60 && f.state(); i++) f.sim.tick();
+    expect(f.state()).toBeNull();
+    clean(f);
+  });
+
+  it('the dev reset clears them too', () => {
+    const f = messy();
+    f.dev('/dev heart council reset');
+    expect(f.state()).toBeNull();
+    clean(f);
+  });
+
+  it('the Guardian falling breaks his curse and ends the collapse; the kill clears the rest', () => {
+    const f = messy();
+    f.sim.ctx.handleDeath(f.bodies().guardian as Entity, f.players[0]);
+    f.tick();
+    expect(cursed(f)).toBeUndefined();
+    expect(f.st.collapse).toBeNull();
+    expect(f.st.rush).toBeNull();
+    f.sim.ctx.handleDeath(f.bodies().singer as Entity, f.players[0]);
+    f.tick();
+    expect(f.state()?.finished).toBe(true);
+    clean(f);
+  });
+
+  it('a bond worn before its first pulse lifts off the survivor when the other falls', () => {
+    const f = pulled(4);
+    const b = f.bodies();
+    const g = b.guardian as Entity;
+    const c = b.singer as Entity;
+    plant(f, g, MID.x, MID.z);
+    plant(f, c, MID.x + 6, MID.z);
+    f.tick(10);
+    expect(c.auras.some((a) => a.id === COUNCIL_AURAS.bond)).toBe(true);
+    expect(f.st.bond.pulses).toBe(0);
+    f.sim.ctx.handleDeath(g, f.players[0]);
+    f.tick(2);
+    expect(c.auras.some((a) => a.id === COUNCIL_AURAS.bond)).toBe(false);
+  });
+
+  it('a marked player who leaves the Quarry draws no dash', () => {
+    const f = pulled(4);
+    const { g, target } = rushSetup(f);
+    const start = f.local(g);
+    f.put(target, MID.x + 200, MID.z);
+    runRush(f);
+    const now = f.local(g);
+    expect(Math.hypot(now.x - start.x, now.z - start.z)).toBeLessThan(3);
+  });
+});
+
 // ---- the pillar supply over a whole pull ------------------------------------------------------
 
 /** Twelve open spots on a ring round the middle, each well clear of the next. */

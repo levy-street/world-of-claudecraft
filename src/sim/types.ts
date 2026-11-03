@@ -8442,8 +8442,8 @@ export interface Entity extends ClientMirroredEntityFields {
    *  authority only; the client reads the fight from casts, auras and objects. */
   sanctumFight?: SanctumFightState;
   /** The Smith's Heart's Hammer Council fight (encounters/smith_heart/
-   *  council.ts): ONE state object shared by the Guardian, the Slabwright and
-   *  the Seam Singer while they fight. Sim authority only; the client reads
+   *  council.ts): ONE state object shared by the Guardian and the Seam
+   *  Singer while they fight. Sim authority only; the client reads
    *  the fight from casts, auras, the energy bar and the pillar objects. */
   smithHeartFight?: CouncilFightState;
   /** The Smith's Heart's Guardian of the Breath fight (encounters/smith_heart/

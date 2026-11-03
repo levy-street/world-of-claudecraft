@@ -139,7 +139,8 @@ export function startRush(s: CouncilScope): boolean {
 export function landRush(s: CouncilScope, g: Entity, targetId: number | null): void {
   const t = targetId !== null ? s.ctx.entities.get(targetId) : undefined;
   if (t) dropAuraById(t, COUNCIL_AURAS.rushMark);
-  if (!t || t.dead) return;
+  // A marked player who left the Quarry floor draws no dash out of it.
+  if (!t || t.dead || !s.players.includes(t)) return;
   const from = { x: g.pos.x, z: g.pos.z };
   const dx = t.pos.x - from.x;
   const dz = t.pos.z - from.z;
@@ -235,10 +236,13 @@ export function stepRush(s: CouncilScope): RushOutcome | null {
   const r = s.st.rush;
   if (!r) return null;
   const g = s.bodies.guardian;
-  if (!living(g)) {
+  // Gone, or walking home on its leash: the dash is over.
+  if (!living(g) || g.aiState === 'evade') {
     s.st.rush = null;
     return null;
   }
+  // No swing while it charges.
+  g.swingTimer = Math.max(g.swingTimer, 0.6);
   const total = Math.max(DT, Math.hypot(r.to.x - r.from.x, r.to.z - r.from.z) / T.rushSpeed);
   r.remaining = Math.max(0, r.remaining - DT);
   const k = 1 - Math.min(1, r.remaining / total);

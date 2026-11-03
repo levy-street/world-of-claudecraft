@@ -3,8 +3,8 @@
 // portal, derived every tick from the claim's own roster, never a timer and
 // never stored.
 //
-//   the Hammer ALWAYS FIRST: the Hammer Council's fall (all three: the
-//     Guardian, the Slabwright and the Seam Singer) splits the Slab (the gate
+//   the Hammer ALWAYS FIRST: the Hammer Council's fall (both: the Guardian
+//     and the Seam Singer) splits the Slab (the gate
 //     `the_slab`, bosses = the council); nothing past it is reachable before;
 //   the other three in ANY order: no gate orders the Breath, the Quench and
 //     the Heat against each other (each arena's mouth waits only on its own
@@ -112,8 +112,8 @@ export function smithHeartLitCount(mask: number): number {
 }
 
 /** Is a vein's guardian fight won in this claim? The Hammer's is the Hammer
- *  Council's: its vein waits on all three (the Guardian, the Slabwright and
- *  the Seam Singer), never on the Guardian alone. */
+ *  Council's: its vein waits on both (the Guardian and the Seam Singer),
+ *  never on the Guardian alone. */
 export function smithHeartVeinWon(
   ctx: SimContext,
   inst: InstanceSlot,

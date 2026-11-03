@@ -483,8 +483,8 @@ function stepPickups(s: BreathScope, heart: BreathHeart): void {
   }
 }
 
-/** A ball out of time: lethal whatever shields them (as council_prison.ts's
- *  crush: the damage path caps a huge hit), game masters excepted. */
+/** A ball out of time: lethal whatever shields them (the damage path caps
+ *  a huge hit, so a death follows it), game masters excepted. */
 function burst(s: BreathScope): void {
   const o = s.ctx.instanceOriginOf(s.inst);
   const heart = s.st.heart;
