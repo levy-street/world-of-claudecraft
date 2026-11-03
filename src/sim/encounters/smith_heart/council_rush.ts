@@ -62,8 +62,6 @@ import {
   councilTanks,
   living,
   memberFree,
-  namesOf,
-  raidWarn,
   roll,
 } from './council_scope';
 import type { CouncilRush } from './council_state';
@@ -128,13 +126,6 @@ export function startRush(s: CouncilScope): boolean {
     school: 'physical',
     undispellable: true,
   });
-  raidWarn(
-    s,
-    g,
-    'rush',
-    `Mountain's Rush on ${target.name}! Stand so the Cursed Pillar is between you and the Guardian!`,
-    { player: target.name },
-  );
   councilSay(s, 'guardian', 'rush');
   return true;
 }
@@ -336,42 +327,15 @@ export function stepRush(s: CouncilScope): RushOutcome | null {
       outcome = 'cursed';
       breakCursed(s, pl);
       reel(s, g);
-      raidWarn(
-        s,
-        g,
-        'rushCursed',
-        'The Guardian shatters the Cursed Pillar and staggers! Strike now!',
-      );
     } else if (pl?.soul) outcome = 'soul';
-    else if (pl) {
+    else {
       outcome = 'pillar';
-      collapsePillar(s.ctx, s.inst, s.st, pl, false);
-      if (cursedPillar(s))
-        raidWarn(
-          s,
-          g,
-          'rushPillar',
-          "Mountain's Rush smashed a sheltering pillar! The Cursed Pillar still stands.",
-        );
-    } else outcome = 'pillar';
+      if (pl) collapsePillar(s.ctx, s.inst, s.st, pl, false);
+    }
   }
-  const struck = r.struck
-    .map((id) => s.ctx.entities.get(id))
-    .filter((e): e is Entity => e !== undefined);
-  if (outcome === 'miss' && struck.length > 0)
-    raidWarn(s, g, 'rushMiss', `Mountain's Rush tramples ${namesOf(struck)}!`, {
-      players: namesOf(struck),
-    });
   // Mythic: a miss with the curse still standing brings the Quarry down.
-  if (outcome === 'miss' && s.rules.missCollapse && cursedPillar(s) && !s.st.collapse) {
+  if (outcome === 'miss' && s.rules.missCollapse && cursedPillar(s) && !s.st.collapse)
     s.st.collapse = { stacks: 0, timer: T.collapseEvery };
-    raidWarn(
-      s,
-      g,
-      'collapse',
-      "The Quarry is collapsing! Steer the next Mountain's Rush into the Cursed Pillar to stop it!",
-    );
-  }
   return outcome;
 }
 

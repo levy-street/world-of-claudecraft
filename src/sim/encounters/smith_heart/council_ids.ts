@@ -427,7 +427,6 @@ export const COUNCIL_TUNING = {
   bondPulseMax: 48,
   bondPulseGrowth: 0.25,
   bondPulseCap: 6,
-  bondWarnGap: 15,
   // Wake the Stone (the Seam Singer's, kickable: a kick raises nothing).
   wakeFirst: 20,
   wakeEvery: 30,

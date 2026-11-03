@@ -62,20 +62,8 @@ import {
   raisePillar,
   syncPillarWalls,
 } from './council_pillars';
-import { type CouncilScope, damageMult, living, raidWarn, roll } from './council_scope';
+import { type CouncilScope, damageMult, living, roll } from './council_scope';
 import type { CouncilSoul } from './council_state';
-
-/** The lines the raid reads (raid warnings, `hudChrome.council.warn.*`). */
-const TAKE_LINES: Readonly<Record<CouncilRole, string>> = {
-  guardian: "The Guardian's soul enters the stone! Its Echo of Wrath will strike from that pillar.",
-  singer:
-    "The Seam Singer's soul enters the stone! Her Endless Song grows louder with every pulse.",
-};
-const BREAK_LINES: Readonly<Record<CouncilRole, string>> = {
-  guardian: "The Guardian's soul pillar breaks! Its Echo falls silent.",
-  singer: "The Seam Singer's soul pillar breaks! The Endless Song falls silent.",
-};
-const ECHO_LINE = 'Echo of Wrath! Put another pillar between you and the soul pillar!';
 
 /** The soul a pillar holds, by its entity id. */
 export function soulOfPillar(s: CouncilScope, pillarId: number): CouncilSoul | undefined {
@@ -181,7 +169,6 @@ export function takeSoul(s: CouncilScope, role: CouncilRole, from: Entity): Enti
     fx: 'beam',
     ability: COUNCIL_CUES.soulTake,
   });
-  raidWarn(s, from, `soul_${role}`, TAKE_LINES[role]);
   return e;
 }
 
@@ -207,9 +194,6 @@ function burstSoul(s: CouncilScope, p: CouncilPillar, rubble: boolean): void {
   }
   s.st.souls = s.st.souls.filter((q) => q.pillarId !== p.e.id);
   if (soul && rubble && !s.st.soulsSpent.includes(soul.role)) s.st.soulsSpent.push(soul.role);
-  const speaker = firstLiving(s);
-  if (soul && speaker && rubble)
-    raidWarn(s, speaker, `soulBreak_${soul.role}`, BREAK_LINES[soul.role]);
 }
 
 /** A Falling Rock strikes one soul pip off (the only thing that can). Returns true when the pillar burst. */
@@ -314,7 +298,6 @@ export function startEcho(s: CouncilScope): boolean {
   pillar.castTotal = T.echoCast;
   pillar.castRemaining = T.echoCast;
   pillar.castTargetId = null;
-  raidWarn(s, source, 'echo', ECHO_LINE);
   return true;
 }
 

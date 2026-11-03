@@ -37,15 +37,7 @@ import {
 } from './council_ids';
 import { collapsePillar, councilPillars, pillarBetween } from './council_pillars';
 import { breakCursed } from './council_rush';
-import {
-  beginBar,
-  type CouncilScope,
-  jobHolder,
-  living,
-  memberFree,
-  raidWarn,
-  roll,
-} from './council_scope';
+import { beginBar, type CouncilScope, jobHolder, living, memberFree, roll } from './council_scope';
 import { councilSay } from './council_voice';
 
 /** Every member carries the energy bar's frame; only the Wrath's holder's
@@ -96,7 +88,6 @@ export function startWrath(s: CouncilScope): boolean {
     holder.heir,
   );
   wearPillarLimit(s, holder.body);
-  raidWarn(s, holder.body, 'wrath', "Mountain's Wrath! Hide behind a pillar!");
   if (!holder.heir) councilSay(s, holder.role, 'wrath');
   return true;
 }
@@ -173,12 +164,10 @@ export function landWrath(s: CouncilScope, caster: Entity, heir: boolean): numbe
   // One too many behind a pillar (Narrow Shelter) and each of them takes a
   // share of the blast.
   const limit = s.rules.pillarLimit;
-  let crowded = false;
   for (const pl of pillars) {
     const behind = shields.get(pl.e.id);
     if (!behind) continue;
     if (limit !== null && behind.length > limit) {
-      crowded = true;
       for (const p of behind) {
         const amount = heir
           ? roll(s, caster, T.heirWrathMin, T.heirWrathMax)
@@ -200,38 +189,15 @@ export function landWrath(s: CouncilScope, caster: Entity, heir: boolean): numbe
   // Then the mountain's anger brings every pillar down, the cursed one too (a
   // soul's stands): the stone breaks clean, its rubble a look, never a hazard
   // under the hidden.
-  let columns = 0;
   for (const pl of all) {
     if (pl.soul) continue;
-    if (!pl.risen) columns++;
     if (pl.cursed) breakCursed(s, pl);
     else collapsePillar(ctx, inst, st, pl, false);
   }
-  if (crowded)
-    raidWarn(
-      s,
-      caster,
-      'crowded',
-      'Too many players behind one pillar! It could not shield them all.',
-    );
-  if (columns > 0)
-    raidWarn(
-      s,
-      caster,
-      'columnsGone',
-      "The carved columns have fallen! From now on, only pillars raised by Wake the Stone can shield you from Mountain's Wrath.",
-    );
   // The next cover is never more than a breath after the Wrath.
   st.wakeTimer = Math.min(st.wakeTimer, T.wakeAfterWrath);
   // Normal: the song is owed now, so its Resonance runs out before the next.
   if (s.rules.songAfterWrath) st.songDue = T.songAfterWrath;
-  if (st.wraths === T.enrageAfterWraths)
-    raidWarn(
-      s,
-      caster,
-      'enrage',
-      "The mountain's anger grows! Mountain's Wrath now comes much more often.",
-    );
   return struck;
 }
 
@@ -272,7 +238,6 @@ export function landWeight(s: CouncilScope, g: Entity, targetId: number | null):
     school: 'physical',
     undispellable: true,
   });
-  raidWarn(s, g, 'weight', `Hammer's Weight on ${tank.name}: swap tanks!`, { player: tank.name });
 }
 
 /** Clear the job's bars off a body (a reset, a death). */

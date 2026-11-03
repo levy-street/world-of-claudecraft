@@ -57,9 +57,7 @@ import {
   jobHolder,
   living,
   memberFree,
-  namesOf,
   pickMarks,
-  raidWarn,
   roll,
 } from './council_scope';
 import { strikeSoulPip } from './council_soul';
@@ -87,12 +85,6 @@ export function startWake(s: CouncilScope): boolean {
     stampFloor(s.st);
     beginBar(s, holder.role, COUNCIL_CASTS.wake, T.wakeCast, null, false);
     s.st.kickable = COUNCIL_CASTS.wake;
-    raidWarn(
-      s,
-      holder.body,
-      'wakeCast',
-      'The Seam Singer is casting Wake the Stone! Do not interrupt it: an interrupted cast raises no pillars.',
-    );
     councilSay(s, holder.role, 'wake');
     return true;
   }
@@ -119,26 +111,7 @@ export function startWake(s: CouncilScope): boolean {
     obj.dungeonId = s.inst.dungeonId;
     s.st.riseSpots.push({ x: lx, z: lz, remaining: s.rules.heirRiseWarn, objectId: obj.id });
   }
-  raidWarn(
-    s,
-    holder.body,
-    'wakeHeir',
-    `Pillars are bursting up beneath ${namesOf(marked)}! Move away now!`,
-    {
-      players: namesOf(marked),
-    },
-  );
   return true;
-}
-
-/** A kick cut Wake the Stone: no marks, no pillars (the raid is told). */
-export function wakeKicked(s: CouncilScope, singer: Entity): void {
-  raidWarn(
-    s,
-    singer,
-    'wakeKicked',
-    'Wake the Stone was interrupted! No pillars will rise from it.',
-  );
 }
 
 /** The Singer's Wake the Stone bar ran out: the marks go on. */
@@ -161,14 +134,6 @@ export function landWake(s: CouncilScope, caster: Entity): void {
       undispellable: true,
     });
   }
-  if (marked.length > 0)
-    raidWarn(
-      s,
-      caster,
-      'wake',
-      `Wake the Stone on ${namesOf(marked)}! A pillar will rise where each of you stands: stand where the raid needs cover.`,
-      { players: namesOf(marked) },
-    );
 }
 
 /** The marks and the heir's spots count down; each rises when its time is up.
@@ -254,15 +219,6 @@ export function landRockBar(s: CouncilScope, caster: Entity): void {
     school: 'physical',
     undispellable: true,
   });
-  raidWarn(
-    s,
-    caster,
-    'rock',
-    `Falling Rock on ${p.name}! Stack on them to share the damage, away from the pillars!`,
-    {
-      player: p.name,
-    },
-  );
 }
 
 /** The rock counts down on its player and lands where they stand. Returns

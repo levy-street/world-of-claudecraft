@@ -137,7 +137,7 @@ describe('Hammer Council: Narrow Shelter', () => {
     for (const p of behind) expect(wrathOn(ev, p)).toEqual([]);
   });
 
-  it('heroic: a fifth and all five take part of the blast, the raid is told', () => {
+  it('heroic: a fifth and all five take part of the blast', () => {
     const f = pulled(5, 'heroic');
     const behind = hide(f, 5);
     const ev = land(f);
@@ -148,9 +148,7 @@ describe('Hammer Council: Narrow Shelter', () => {
       expect(hits[0].amount).toBeLessThanOrEqual(Math.ceil(T.wrathMax * mult * T.crowdShare));
       expect(hits[0].amount).toBeGreaterThan(0);
     }
-    expect(
-      ev.filter((e) => e.type === 'chat' && e.textKey === 'hudChrome.council.warn.crowded').length,
-    ).toBeGreaterThan(0);
+    expect(ev.some((e) => e.type === 'chat' && e.channel === 'raidWarning')).toBe(false);
   });
 
   it('mythic: three are safe, a fourth is not', () => {
@@ -223,6 +221,5 @@ describe('Hammer Council: Narrow Shelter', () => {
     expect(text).toContain('4');
     expect(text).toContain(`${Math.round(T.crowdShare * 100)}%`);
     expect(localizeSimAuraName('Narrow Shelter')).toBe('Narrow Shelter');
-    expect(t('hudChrome.council.warn.crowded' as never)).toContain('pillar');
   });
 });

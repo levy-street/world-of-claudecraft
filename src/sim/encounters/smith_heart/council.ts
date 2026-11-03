@@ -76,7 +76,6 @@ import {
   holdPlantedAt,
   living,
   quarryPlayers,
-  raidWarn,
 } from './council_scope';
 import {
   applyResonance,
@@ -197,7 +196,7 @@ function freshState(difficulty: CouncilDifficulty): CouncilFightState {
     rush: null,
     cursed: null,
     collapse: null,
-    bond: { pulses: 0, timer: T.bondPulseEvery, warnAt: 0 },
+    bond: { pulses: 0, timer: T.bondPulseEvery },
     wakeTimer: T.wakeFirst,
     rockTimer: T.rockFirst,
     boltTimer: T.boltFirst,
@@ -241,12 +240,6 @@ function scopeOf(
 }
 
 // ---- the stone remembers ----------------------------------------------------------------
-
-/** The lines the raid reads as each one falls (raid warnings). */
-const FALLEN_LINES: Readonly<Record<CouncilRole, string>> = {
-  guardian: "The Guardian of the Hammer falls! The Seam Singer takes up Mountain's Wrath!",
-  singer: 'The Seam Singer falls! The Guardian now raises pillars beneath random players!',
-};
 
 /** Memory of Stone on the living member: one stack per fallen member. */
 function syncMemory(s: CouncilScope): void {
@@ -297,7 +290,6 @@ function noteFallen(s: CouncilScope, role: CouncilRole, dead: Entity): void {
     });
   }
   const survivor = COUNCIL_ROLES.map((r) => s.bodies[r]).find(living);
-  if (survivor) raidWarn(s, survivor, `fell_${role}`, FALLEN_LINES[role]);
   // The Wrath's heir starts its own (shorter) fill from empty; the Rush dies
   // with the Guardian.
   if (role === 'guardian') {

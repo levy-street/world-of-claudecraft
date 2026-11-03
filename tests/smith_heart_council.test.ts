@@ -77,12 +77,6 @@ function quarryCircles(o: { x: number; z: number }) {
   );
 }
 
-const warned = (ev: readonly SimEvent[], key: string) =>
-  ev.some(
-    (e) =>
-      e.type === 'chat' && (e as { textKey?: string }).textKey === `hudChrome.council.warn.${key}`,
-  );
-
 describe('Hammer Council: one pull, two members', () => {
   it('the council is the Guardian and the Seam Singer: no Slabwright anywhere', () => {
     expect([...SMITH_HEART_COUNCIL]).toEqual(['heart_hammer_guardian', 'heart_seam_singer']);
@@ -183,7 +177,7 @@ describe('Hammer Council: the pillars', () => {
     expect(hitsOf(ev, COUNCIL_NAMES.wake).length).toBeGreaterThanOrEqual(2);
   });
 
-  it('a kicked Wake the Stone raises nothing, and the raid is told', () => {
+  it('a kicked Wake the Stone raises nothing (no banner: no marks follow)', () => {
     const f = pulled(4);
     const before = f.pillars().length;
     expect(f.dev('/dev heart council wake')).toBe(true);
@@ -191,7 +185,7 @@ describe('Hammer Council: the pillars', () => {
     f.tick(10);
     f.sim.ctx.cancelCast(c);
     const ev = f.tick(2);
-    expect(warned(ev, 'wakeKicked')).toBe(true);
+    expect(ev.some((e) => e.type === 'chat' && e.channel === 'raidWarning')).toBe(false);
     const more = f.tick(20 * (T.wakeMarkSeconds + 2));
     expect(f.st.wakeMarks.length).toBe(0);
     expect(f.pillars().length).toBe(before);
@@ -229,7 +223,8 @@ describe('Hammer Council: the pillars', () => {
     // Every column is gone, the one that hid someone and the four that did not.
     expect(f.pillars().length).toBe(0);
     expect(quarryCircles(f.world(0, 0)).length).toBe(0);
-    expect(warned(ev, 'columnsGone')).toBe(true);
+    // The columns crumble in the world; no banner says so.
+    expect(ev.some((e) => e.type === 'chat' && e.channel === 'raidWarning')).toBe(false);
     expect(f.st.wraths).toBe(1);
     expect(f.st.energy).toBeLessThan(5);
     // The shattered stone's rubble is a look, never a bite on the hidden.

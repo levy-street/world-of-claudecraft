@@ -24720,15 +24720,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.heart_falling_rock': 'Камнепад',
   'abilityUi.cast.heart_seam_bolt': 'Стрела жилы',
   'abilityUi.cast.heart_song_of_the_seam': 'Песнь жилы',
-  'hudChrome.council.warn.wrath': 'Гнев горы! Спрячьтесь за колонной!',
-  'hudChrome.council.warn.enrage': 'Ярость горы растёт! Теперь Гнев горы приходит гораздо чаще.',
-  'hudChrome.council.warn.weight': 'Тяжесть Молота на {player}: смена танков!',
-  'hudChrome.council.warn.wake':
-    'Пробуждение камня на {players}! Колонна поднимется там, где стоит каждый из вас: встаньте там, где рейду нужно укрытие.',
-  'hudChrome.council.warn.wakeHeir': 'Под {players} вырываются колонны! Немедленно отойдите!',
-  'hudChrome.council.warn.rock':
-    'Камнепад на {player}! Соберитесь рядом, чтобы разделить урон, подальше от колонн!',
-  'hudChrome.council.warn.song': 'Песнь жилы! Прервите её!',
   'hudChrome.council.alert.wakeTitle': 'Пробуждение камня!',
   'hudChrome.council.alert.wakeLine':
     'Колонна поднимется там, где вы стоите: перейдите туда, где рейду нужно укрытие',
@@ -24749,15 +24740,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   // The Hammer Council's mythic, Soul in the Stone (M16 fills).
   'abilityUi.cast.heart_echo_of_wrath': 'Эхо гнева',
   'abilityUi.cast.heart_endless_song': 'Бесконечная песнь',
-  'hudChrome.council.warn.soul_guardian':
-    'Душа Стража вселяется в камень! Эхо гнева ударит из колонны.',
-  'hudChrome.council.warn.soul_singer':
-    'Душа Певца Жилы вселяется в камень! Бесконечная песнь крепнет с каждым ударом.',
-  'hudChrome.council.warn.echo':
-    'Эхо гнева! Встаньте так, чтобы между вами и колонной души была другая колонна!',
-  'hudChrome.council.warn.soulBreak_guardian': 'Колонна души Стража рушится! Его эхо смолкает.',
-  'hudChrome.council.warn.soulBreak_singer':
-    'Колонна души Певца Жилы рушится! Бесконечная песнь смолкает.',
   'hudChrome.council.alert.rockLineSoul':
     'Соберите рядом хотя бы трёх союзников, подальше от укрытий и у колонны души',
   'hudChrome.council.say.guardian_pull':
@@ -24797,27 +24779,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.council.say.guardian_rush': 'Что ж, стойте у меня на пути. Гора не сворачивает.',
   'hudChrome.council.say.singer_wake': 'Проснись, спящий камень. Восстань там, где они стоят!',
   'hudChrome.council.say.singer_rock': 'Посмотрите наверх, малыши! Гора падает!',
-  'hudChrome.council.warn.columnsGone':
-    'Резные колонны рухнули! Теперь от Гнева горы защищают только колонны, поднятые Пробуждением камня.',
-  'hudChrome.council.warn.crowded':
-    'Слишком много игроков за одной колонной! Она не смогла укрыть всех.',
-  'hudChrome.council.warn.rush':
-    'Натиск горы на {player}! Встаньте так, чтобы Проклятая колонна оказалась между вами и Стражем!',
-  'hudChrome.council.warn.rushCursed': 'Страж разбивает Проклятую колонну и шатается! Бейте сейчас!',
-  'hudChrome.council.warn.rushPillar':
-    'Натиск горы разрушил колонну-укрытие! Проклятая колонна всё ещё стоит.',
-  'hudChrome.council.warn.rushMiss': 'Натиск горы растаптывает {players}!',
-  'hudChrome.council.warn.collapse':
-    'Каменоломня рушится! Направьте следующий Натиск горы в Проклятую колонну, чтобы остановить обвал!',
-  'hudChrome.council.warn.bond': 'Узы камня! Разведите Стража и Певца Жилы!',
-  'hudChrome.council.warn.wakeCast':
-    'Певец Жилы читает Пробуждение камня! Не прерывайте: прерванное заклинание не поднимет колонн.',
-  'hudChrome.council.warn.wakeKicked': 'Пробуждение камня прервано! Колонны не поднимутся.',
-  'hudChrome.council.warn.resonance':
-    'Резонанс на {players}: держитесь подальше от всех, пока эффект не закончится!',
-  'hudChrome.council.warn.fell_guardian': 'Страж Молота пал! Певец Жилы перенимает Гнев горы!',
-  'hudChrome.council.warn.fell_singer':
-    'Певец Жилы пал! Теперь Страж поднимает колонны под случайными игроками!',
   // The Smith's Heart's Guardian of the Breath and Captain Thessaly (M16 fills).
   'hudChrome.breathGuardian.warn.inhale': 'Страж делает вдох! Не стойте в вихре перед его пастью!',
   'hudChrome.breathGuardian.warn.gust': 'Порыв мехов! Приготовьтесь к удару!',

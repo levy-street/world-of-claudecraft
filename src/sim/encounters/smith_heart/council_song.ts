@@ -38,17 +38,7 @@ import {
   COUNCIL_ROLES,
   COUNCIL_TUNING as T,
 } from './council_ids';
-import {
-  beginBar,
-  type CouncilScope,
-  living,
-  memberFree,
-  namesOf,
-  pickMarks,
-  raidWarn,
-  roll,
-} from './council_scope';
-import { wakeKicked } from './council_stone';
+import { beginBar, type CouncilScope, living, memberFree, pickMarks, roll } from './council_scope';
 import { councilSay } from './council_voice';
 import { secondsToNextWrath } from './council_wrath';
 
@@ -117,7 +107,6 @@ export function startSong(s: CouncilScope, force = false): boolean {
   s.st.songTimer = T.songEvery;
   beginBar(s, 'singer', COUNCIL_CASTS.song, T.songCast, null, false);
   s.st.kickable = COUNCIL_CASTS.song;
-  raidWarn(s, c, 'song', 'Song of the Seam! Interrupt it!');
   councilSay(s, 'singer', 'song');
   return true;
 }
@@ -146,14 +135,6 @@ export function applyResonance(s: CouncilScope, singer: Entity, count: number): 
       undispellable: true,
     });
   }
-  if (marked.length > 0)
-    raidWarn(
-      s,
-      singer,
-      'resonance',
-      `Resonance on ${namesOf(marked)}: move away from everyone until it ends!`,
-      { players: namesOf(marked) },
-    );
   return marked;
 }
 
@@ -166,8 +147,8 @@ export function landSong(s: CouncilScope, singer: Entity): void {
  *  Wake the Stone raises nothing. */
 export function songKicked(s: CouncilScope, singer: Entity, castId: string): void {
   s.st.quiet = T.kickQuiet;
+  // A kicked Wake simply raises nothing (no marks follow it).
   if (castId === COUNCIL_CASTS.song) applyResonance(s, singer, T.songKickedMarks);
-  else if (castId === COUNCIL_CASTS.wake) wakeKicked(s, singer);
 }
 
 /** One tick of every Resonance: each second it rings on every ally within

@@ -148,34 +148,6 @@ export function roll(s: CouncilScope, body: Entity, min: number, max: number): n
   return Math.max(1, Math.round(s.ctx.rng.range(min, max) * damageMult(s, body)));
 }
 
-/** A raid warning from a council member to every player in the claim (the
- *  big orange line, re-localized client-side by `textKey`). */
-export function raidWarn(
-  s: CouncilScope,
-  from: Entity,
-  key: string,
-  text: string,
-  values?: Record<string, string>,
-): void {
-  for (const meta of s.ctx.players.values()) {
-    const p = s.ctx.entities.get(meta.entityId);
-    if (!p) continue;
-    const o = s.ctx.instanceOriginOf(s.inst);
-    if (Math.hypot(p.pos.x - o.x - HAMMER_PIT.x, p.pos.z - o.z - HAMMER_PIT.z) > 120) continue;
-    s.ctx.emit({
-      type: 'chat',
-      fromPid: from.id,
-      from: from.name,
-      entityId: from.id,
-      text,
-      textKey: `hudChrome.council.warn.${key}`,
-      ...(values ? { textValues: values } : {}),
-      channel: 'raidWarning',
-      pid: meta.entityId,
-    });
-  }
-}
-
 /** Hold a member where its bar began (the mob AI may have walked it). */
 export function holdPlantedAt(
   ctx: SimContext,
@@ -187,10 +159,4 @@ export function holdPlantedAt(
   mob.pos.y = at.y;
   mob.pos.z = at.z;
   ctx.rebucket(mob);
-}
-
-/** Players' names joined for a warning line ("A, B and C" stays a list of
- *  names: "A, B, C"). */
-export function namesOf(players: readonly Entity[]): string {
-  return players.map((p) => p.name).join(', ');
 }

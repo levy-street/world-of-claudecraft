@@ -1,7 +1,5 @@
-// The Hammer Council's player text: every raid warning the council calls
-// resolves through its catalog key to the very English the sim sends (so the
-// banner and the log never read a raw key or drift from the fight), the
-// personal alert's priorities, the marks' tooltips from the live tuning, and
+// The Hammer Council's player text: no raid warning banner (the mechanics
+// read in the world; the yells stay), the personal alert's priorities, the marks' tooltips from the live tuning, and
 // every cast and damage name re-localized.
 
 import { describe, expect, it } from 'vitest';
@@ -21,7 +19,7 @@ import { councilFight } from './helpers/council_fight';
 type Chat = Extract<SimEvent, { type: 'chat' }>;
 
 describe('Hammer Council raid warnings', () => {
-  it('every warning resolves its key to the English the sim sent', () => {
+  it('calls no raid warning banner: every mechanic reads in the world, the yells stay', () => {
     const f = councilFight(6);
     f.dev('/dev heart council pull');
     const events: SimEvent[] = [];
@@ -30,32 +28,17 @@ describe('Hammer Council raid warnings', () => {
       f.dev(`/dev heart council ${cmd}`);
       events.push(...f.tick(20 * 9));
     }
-    // A fallen member's line.
+    // A fallen member.
     const b = f.bodies();
     if (b.singer) f.sim.ctx.handleDeath(b.singer, f.players[0]);
     events.push(...f.tick(5));
-    const warns = events.filter(
-      (e): e is Chat => e.type === 'chat' && e.channel === 'raidWarning' && e.pid === f.pids[0],
+    const warns = events.filter((e): e is Chat => e.type === 'chat' && e.channel === 'raidWarning');
+    expect(warns).toEqual([]);
+    // The boss yells still carry the fight's voice.
+    const yells = events.filter(
+      (e): e is Chat => e.type === 'chat' && (e.textKey ?? '').startsWith('hudChrome.council.say.'),
     );
-    const keys = new Set(warns.map((w) => w.textKey));
-    for (const k of [
-      'wrath',
-      'columnsGone',
-      'weight',
-      'wakeCast',
-      'wake',
-      'rock',
-      'song',
-      'resonance',
-      'rush',
-      'bond',
-      'fell_singer',
-    ])
-      expect([...keys].join(' '), k).toContain(`hudChrome.council.warn.${k}`);
-    for (const w of warns) {
-      expect(w.textKey?.startsWith('hudChrome.council.warn.')).toBe(true);
-      expect(t(w.textKey as never, w.textValues)).toBe(w.text);
-    }
+    expect(yells.length).toBeGreaterThan(0);
   });
 });
 

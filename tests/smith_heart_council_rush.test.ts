@@ -72,11 +72,9 @@ function clearColumns(f: CouncilFight): void {
 }
 
 const cursed = (f: CouncilFight) => f.pillars().find((p) => p.cursed);
-const warned = (ev: readonly SimEvent[], key: string) =>
-  ev.some(
-    (e) =>
-      e.type === 'chat' && (e as { textKey?: string }).textKey === `hudChrome.council.warn.${key}`,
-  );
+/** Did any raid warning banner go up? (The council calls none.) */
+const warned = (ev: readonly SimEvent[]) =>
+  ev.some((e) => e.type === 'chat' && e.channel === 'raidWarning');
 
 /** Set the Rush going with the Guardian at the middle, the Singer parked far
  *  off (no Bond), every column gone. Returns the marked player and the cursed
@@ -159,7 +157,7 @@ describe("Mountain's Rush: the first pillar on its line", () => {
     expect(exposed?.value).toBe(T.rushExposed);
     expect(f.sim.ctx.isStunned(g)).toBe(true);
     expect(hitsOf(ev, COUNCIL_NAMES.rush, target.id)).toEqual([]);
-    expect(warned(ev, 'rushCursed')).toBe(true);
+    expect(warned(ev)).toBe(false);
     // The Guardian stopped at the pillar's face, short of the marked player.
     const gl = f.local(g);
     expect(Math.hypot(gl.x - spot.x, gl.z - spot.z)).toBeGreaterThan(T.cursedR);
@@ -180,7 +178,7 @@ describe("Mountain's Rush: the first pillar on its line", () => {
     expect(cursed(f)).toBeDefined();
     expect(g.auras.some((a) => a.id === COUNCIL_AURAS.rushStunned)).toBe(false);
     expect(hitsOf(ev, COUNCIL_NAMES.rush, target.id)).toEqual([]);
-    expect(warned(ev, 'rushPillar')).toBe(true);
+    expect(warned(ev)).toBe(false);
     const later = f.tick(20 * 4);
     expect(hitsOf(later, COUNCIL_NAMES.cursed).length).toBeGreaterThan(0);
   });
@@ -204,7 +202,7 @@ describe("Mountain's Rush: the first pillar on its line", () => {
     expect(hitsOf(ev, COUNCIL_NAMES.rush, bystander.id).length).toBe(1);
     expect(Math.hypot(target.pos.x - before.x, target.pos.z - before.z)).toBeGreaterThan(2);
     expect(cursed(f)).toBeDefined();
-    expect(warned(ev, 'rushMiss')).toBe(true);
+    expect(warned(ev)).toBe(false);
     // Normal: no collapse.
     expect(f.st.collapse).toBeNull();
   });
@@ -290,7 +288,7 @@ describe("Mountain's Rush: the wind-up and the run", () => {
     expect(f.st.rush).toBeNull();
     expect(hitsOf(ev, COUNCIL_NAMES.rush, target.id)).toEqual([]);
     expect(hitsOf(ev, COUNCIL_NAMES.rush, bystander.id).length).toBe(1);
-    expect(warned(ev, 'rushMiss')).toBe(true);
+    expect(warned(ev)).toBe(false);
   });
 });
 
@@ -349,9 +347,7 @@ describe("Mountain's Rush: the whole room", () => {
     f.put(target, half.x, half.z);
     const ev = runRush(f);
     expect(cursed(f)).toBeUndefined();
-    expect(
-      warned(ev, 'rushCursed') || g.auras.some((a) => a.id === COUNCIL_AURAS.rushStunned),
-    ).toBe(true);
+    expect(g.auras.some((a) => a.id === COUNCIL_AURAS.rushStunned)).toBe(true);
     // The marked stayed on the line: trampled on the way to the pillar.
     expect(hitsOf(ev, COUNCIL_NAMES.rush, target.id).length).toBe(1);
   });
@@ -448,7 +444,7 @@ describe('Mythic: the Quarry collapses after a miss', () => {
     const f = pulled(4, 'mythic');
     let ev = miss(f);
     expect(f.st.collapse).not.toBeNull();
-    expect(warned(ev, 'collapse')).toBe(true);
+    expect(warned(ev)).toBe(false);
     ev = f.tick(20 * 7);
     const p = f.players[1];
     const blows = hitsOf(ev, COUNCIL_NAMES.collapse, p.id);

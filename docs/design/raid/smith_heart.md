@@ -1450,7 +1450,7 @@ harness.
 | One kill | Complete only when both are dead: the Slab (`the_slab` waits on `SMITH_HEART_COUNCIL`), the heart seal's Hammer vein (`smithHeartVeinWon`), the death checkpoints and every credit wait on both; the risen pillars sink back into the floor and the carved columns stand in their sockets again | `content/smith_heart.ts`, `seal.ts`, `council_pillars.ts` (`settlePillars`) |
 | Pillars | The five carved columns (claim objects at `QUARRY_PILLAR_SPOTS`) plus the risen ones, at most 7 standing (the cursed pillar is outside the cap). A carved column has 2 integrity and a risen pillar 1 (`councilPillarFull`), in its template id; each stands as a round combat wall (`COMBAT_WALL_SHAPES`) that blocks bodies and the Wrath's sight line, offline and online. Cracked to 0 by the rock it falls: rubble lies 8 s and bites 90 to 110 a second. A pillar the Wrath or the Rush takes whole leaves rubble that only looks the part | `council_pillars.ts` |
 | Energy | 0 to 100, full in 55 s; the holder's energy bar is its resource; after the 4th Wrath it fills 2.5 times faster (the soft enrage) | `council_wrath.ts` |
-| Mountain's Wrath | At 100 (cast id kept, `heart_mountains_wrath`): a 4 s bar, then 440 to 520 to everyone in the Quarry (45 yd) the caster can see, and then EVERY pillar in the Quarry shatters, carved columns and risen alike (a mythic soul pillar alone stands). The columns teach the first Wrath; it takes them for the rest of the pull, and the raid is warned (`hudChrome.council.warn.columnsGone`) that from now on only pillars raised by Wake the Stone can shield them from Mountain's Wrath. Each landing brings the next Wake due 6 s later (`wakeAfterWrath`) | `council_wrath.ts` (`landWrath`) |
+| Mountain's Wrath | At 100 (cast id kept, `heart_mountains_wrath`): a 4 s bar, then 440 to 520 to everyone in the Quarry (45 yd) the caster can see, and then EVERY pillar in the Quarry shatters, carved columns and risen alike (a mythic soul pillar alone stands). The columns teach the first Wrath; it takes them for the rest of the pull (the columns crumble in the world: from now on only pillars raised by Wake the Stone can shield the raid from Mountain's Wrath; no banner says so, by the owner's rule of 2026-11-03). Each landing brings the next Wake due 6 s later (`wakeAfterWrath`) | `council_wrath.ts` (`landWrath`) |
 | Narrow Shelter (Normal 5, Heroic 4, Mythic 3) | One pillar shields only so many players from the Wrath; with more behind it each of them takes half the blast (`crowdShare`) and the raid is warned. A risen pillar's shadow (2.2 yd round) fits five side by side a stride behind it (pinned per tier). The caster wears the limit through its bar (`heart_narrow_shelter`, `value2`) | `council_wrath.ts`, `council_limit_fx.ts` |
 | Hammer's Weight | The Guardian's: every 18 s (first at 10) a 1.5 s bar at the tank, then 2.2 times a swing through armor and +100 percent physical damage taken for 25 s: swap tanks | `council_wrath.ts` |
 | Hammerfall | Kept: the Guardian's frontal arc (110 degrees, 9 yd, 0.7 of a swing, every third swing) | template `arcCleave` |
@@ -2141,8 +2141,8 @@ on both difficulties (dungeon rework README, goal 4).
   untouched by the rock, no shelter, shattered by the Wrath), mythic's collapse, Bond of the
   Stone together and apart, and the pillar supply over whole pulls per tier (with and
   without a kicked Wake).
-- `tests/smith_heart_council_ui.test.ts`: every raid warning's key resolving to the English
-  the sim sent, the personal alert's priorities, the marks' tooltips from the live tuning,
+- `tests/smith_heart_council_ui.test.ts`: no raid warning banner in the whole fight (the
+  yells stay), the personal alert's priorities, the marks' tooltips from the live tuning,
   every cast and damage name re-localized.
 - `tests/smith_heart_council_fx.test.ts` and `tests/smith_heart_council_bodies.test.ts`: the
   look's pure plans and both painters over a fake world.

@@ -22528,15 +22528,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.heart_falling_rock': '낙석',
   'abilityUi.cast.heart_seam_bolt': '광맥 화살',
   'abilityUi.cast.heart_song_of_the_seam': '광맥의 노래',
-  'hudChrome.council.warn.wrath': '산의 분노! 기둥 뒤에 숨으세요!',
-  'hudChrome.council.warn.enrage': '산의 노여움이 커집니다! 이제 산의 분노가 훨씬 자주 옵니다.',
-  'hudChrome.council.warn.weight': '{player}에게 망치의 무게: 탱커 교대!',
-  'hudChrome.council.warn.wake':
-    '{players}에게 돌 깨우기! 각자 서 있는 곳에 기둥이 솟아오릅니다: 공격대에 엄폐물이 필요한 곳에 서세요.',
-  'hudChrome.council.warn.wakeHeir': '{players} 아래에서 기둥이 솟구칩니다! 지금 피하세요!',
-  'hudChrome.council.warn.rock':
-    '{player}에게 낙석! 기둥에서 떨어진 곳에서 모여 피해를 나눠 받으세요!',
-  'hudChrome.council.warn.song': '광맥의 노래! 차단하세요!',
   'hudChrome.council.alert.wakeTitle': '돌 깨우기!',
   'hudChrome.council.alert.wakeLine':
     '서 있는 곳에 기둥이 솟아오릅니다: 공격대에 엄폐물이 필요한 곳으로 이동하세요',
@@ -22556,15 +22547,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   // The Hammer Council's mythic, Soul in the Stone (M16 fills).
   'abilityUi.cast.heart_echo_of_wrath': '분노의 메아리',
   'abilityUi.cast.heart_endless_song': '끝없는 노래',
-  'hudChrome.council.warn.soul_guardian':
-    '수호자의 영혼이 돌에 깃들었습니다! 그 기둥에서 분노의 메아리가 터져 나옵니다.',
-  'hudChrome.council.warn.soul_singer':
-    '광맥의 노래꾼의 영혼이 돌에 깃들었습니다! 끝없는 노래가 울릴 때마다 커집니다.',
-  'hudChrome.council.warn.echo': '분노의 메아리! 영혼의 기둥과 자신 사이에 다른 기둥을 두세요!',
-  'hudChrome.council.warn.soulBreak_guardian':
-    '수호자의 영혼의 기둥이 부서졌습니다! 메아리가 잠잠해집니다.',
-  'hudChrome.council.warn.soulBreak_singer':
-    '광맥의 노래꾼의 영혼의 기둥이 부서졌습니다! 끝없는 노래가 그칩니다.',
   'hudChrome.council.alert.rockLineSoul':
     '엄폐물에서 떨어져 영혼의 기둥 옆에 아군을 3명 이상 모으세요',
   'hudChrome.council.say.guardian_pull':
@@ -22604,29 +22586,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.council.say.guardian_rush': '그렇다면 내 길을 막아 보아라. 산은 비켜 가지 않는다.',
   'hudChrome.council.say.singer_wake': '깨어나라, 잠든 돌이여. 그들이 선 곳에서 솟아올라라!',
   'hudChrome.council.say.singer_rock': '위를 봐요, 꼬마들! 산이 무너지고 있어요!',
-  'hudChrome.council.warn.columnsGone':
-    '조각된 기둥이 무너졌습니다! 이제부터는 돌 깨우기로 솟아오른 기둥만이 산의 분노를 막아 줍니다.',
-  'hudChrome.council.warn.crowded':
-    '한 기둥 뒤에 너무 많은 플레이어가 있습니다! 모두를 막아 주지 못했습니다.',
-  'hudChrome.council.warn.rush':
-    '{player}에게 산의 돌진! 저주받은 기둥이 수호자와 당신 사이에 오도록 서세요!',
-  'hudChrome.council.warn.rushCursed':
-    '수호자가 저주받은 기둥을 부수고 비틀거립니다! 지금 공격하세요!',
-  'hudChrome.council.warn.rushPillar':
-    '산의 돌진이 엄폐용 기둥을 부쉈습니다! 저주받은 기둥은 아직 서 있습니다.',
-  'hudChrome.council.warn.rushMiss': '산의 돌진에 짓밟혔습니다: {players}!',
-  'hudChrome.council.warn.collapse':
-    '채석장이 무너지고 있습니다! 다음 산의 돌진을 저주받은 기둥으로 유인해 막으세요!',
-  'hudChrome.council.warn.bond': '돌의 결속! 수호자와 광맥의 노래꾼을 떼어 놓으세요!',
-  'hudChrome.council.warn.wakeCast':
-    '광맥의 노래꾼이 돌 깨우기를 시전합니다! 차단하지 마세요: 차단된 시전은 기둥을 세우지 않습니다.',
-  'hudChrome.council.warn.wakeKicked': '돌 깨우기가 차단되었습니다! 기둥이 솟아오르지 않습니다.',
-  'hudChrome.council.warn.resonance':
-    '{players}에게 공명: 효과가 끝날 때까지 모두에게서 떨어지세요!',
-  'hudChrome.council.warn.fell_guardian':
-    '망치의 수호자가 쓰러졌습니다! 광맥의 노래꾼이 산의 분노를 이어받습니다!',
-  'hudChrome.council.warn.fell_singer':
-    '광맥의 노래꾼이 쓰러졌습니다! 이제 수호자가 무작위 플레이어 아래에 기둥을 세웁니다!',
   // The Smith's Heart's Guardian of the Breath and Captain Thessaly (M16 fills).
   'hudChrome.breathGuardian.warn.inhale':
     '수호자가 숨을 들이쉽니다! 입 앞의 소용돌이에 들어가지 마세요!',

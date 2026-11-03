@@ -10260,42 +10260,10 @@ export const hudChromeStrings = {
       'The stone jaguar is about to breathe over this half of the terrace. Cross to the other half',
   },
   // The Smith's Heart's Hammer Council (encounters/smith_heart/council*.ts):
-  // the raid warnings its members call (chat textKey, the banner and the log)
-  // and the personal alert (src/ui/hud/dungeon/council_alert_view.ts).
+  // what its members say (boss yells) and the personal alert
+  // (src/ui/hud/dungeon/council_alert_view.ts). The fight calls no raid
+  // warnings: its mechanics read in the world.
   council: {
-    warn: {
-      wrath: "Mountain's Wrath! Hide behind a pillar!",
-      columnsGone:
-        "The carved columns have fallen! From now on, only pillars raised by Wake the Stone can shield you from Mountain's Wrath.",
-      crowded: 'Too many players behind one pillar! It could not shield them all.',
-      rush: "Mountain's Rush on {player}! Stand so the Cursed Pillar is between you and the Guardian!",
-      rushCursed: 'The Guardian shatters the Cursed Pillar and staggers! Strike now!',
-      rushPillar: "Mountain's Rush smashed a sheltering pillar! The Cursed Pillar still stands.",
-      rushMiss: "Mountain's Rush tramples {players}!",
-      collapse:
-        "The Quarry is collapsing! Steer the next Mountain's Rush into the Cursed Pillar to stop it!",
-      bond: 'Bond of the Stone! Pull the Guardian and the Seam Singer apart!',
-      wakeCast:
-        'The Seam Singer is casting Wake the Stone! Do not interrupt it: an interrupted cast raises no pillars.',
-      wakeKicked: 'Wake the Stone was interrupted! No pillars will rise from it.',
-      enrage: "The mountain's anger grows! Mountain's Wrath now comes much more often.",
-      weight: "Hammer's Weight on {player}: swap tanks!",
-      wake: 'Wake the Stone on {players}! A pillar will rise where each of you stands: stand where the raid needs cover.',
-      wakeHeir: 'Pillars are bursting up beneath {players}! Move away now!',
-      rock: 'Falling Rock on {player}! Stack on them to share the damage, away from the pillars!',
-      song: 'Song of the Seam! Interrupt it!',
-      resonance: 'Resonance on {players}: move away from everyone until it ends!',
-      fell_guardian: "The Guardian of the Hammer falls! The Seam Singer takes up Mountain's Wrath!",
-      fell_singer: 'The Seam Singer falls! The Guardian now raises pillars beneath random players!',
-      // Mythic: Soul in the Stone (encounters/smith_heart/council_soul.ts).
-      soul_guardian:
-        "The Guardian's soul enters the stone! Its Echo of Wrath will strike from that pillar.",
-      soul_singer:
-        "The Seam Singer's soul enters the stone! Her Endless Song grows louder with every pulse.",
-      echo: 'Echo of Wrath! Put another pillar between you and the soul pillar!',
-      soulBreak_guardian: "The Guardian's soul pillar breaks! Its Echo falls silent.",
-      soulBreak_singer: "The Seam Singer's soul pillar breaks! The Endless Song falls silent.",
-    },
     // What the two members SAY (boss yells, encounters/smith_heart/
     // council_voice.ts COUNCIL_LINES, the same English).
     say: {

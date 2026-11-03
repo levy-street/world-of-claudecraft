@@ -22,7 +22,7 @@ import {
   COUNCIL_NAMES,
   COUNCIL_TUNING as T,
 } from './council_ids';
-import { type CouncilScope, living, raidWarn, roll } from './council_scope';
+import { type CouncilScope, living, roll } from './council_scope';
 
 /** Do the two stand bonded (both alive, within reach)? Pure over the bodies. */
 export function bonded(g: Entity | null, c: Entity | null): boolean {
@@ -77,12 +77,6 @@ export function stepBond(s: CouncilScope): number {
   if (bond.timer > 1e-9) return 0;
   bond.timer += T.bondPulseEvery;
   const mult = bondPulseMult(bond.pulses);
-  // The first pulse of a bond tells the raid what it is (at most every
-  // bondWarnGap seconds).
-  if (bond.pulses === 0 && s.st.clock >= bond.warnAt) {
-    bond.warnAt = s.st.clock + T.bondWarnGap;
-    raidWarn(s, g, 'bond', 'Bond of the Stone! Pull the Guardian and the Seam Singer apart!');
-  }
   bond.pulses++;
   s.ctx.emit({
     type: 'spellfx',
