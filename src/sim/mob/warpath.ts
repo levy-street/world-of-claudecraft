@@ -176,11 +176,18 @@ export function nextWarpathDestination(
  * corpses. So the circuit passes a razed picket over and goes to the next one that still
  * has soldiers standing. A stop nobody is posted at is never razed, so a warpather with no
  * muster walks his list exactly as authored.
+ *
+ * The reach counted is the wreck radius LESS the arrive radius: the fists come down
+ * wherever he plants, up to `arriveRadius` off the picket's centre, so only a post inside
+ * that is one every arrival slam is sure to reach. Counting the full radius let a soldier
+ * posted at the rim outlive a wreck that landed on the far side, and the picket never
+ * razed: he marched back onto the same corpses and wrecked them again.
  */
 export function warpathStopRazed(ctx: SimContext, def: WarpathDef, index: number): boolean {
   const stop = def.destinations[index];
   if (!stop) return false;
-  return musterPicketRazed(ctx, ctx.musterArmy, stop.x, stop.z, def.wreck.radius);
+  const reach = Math.max(0, def.wreck.radius - def.arriveRadius);
+  return musterPicketRazed(ctx, ctx.musterArmy, stop.x, stop.z, reach);
 }
 
 /**
