@@ -30,7 +30,7 @@ import {
 } from '../src/sim/mob/boss_slams';
 import { FALL_SAFE_DISTANCE, GRAVITY } from '../src/sim/player_motion';
 import { Sim } from '../src/sim/sim';
-import type { Entity } from '../src/sim/types';
+import { type Entity, MELEE_RANGE } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
 import { WORLD_BOSSES } from '../src/sim/world_boss';
 
@@ -63,6 +63,19 @@ describe('slam tuning', () => {
     const apex = launch().up ** 2 / (2 * GRAVITY);
     expect(apex).toBeLessThan(FALL_SAFE_DISTANCE);
     expect(apex, 'a punt nobody can see is not a punt').toBeGreaterThan(1.5);
+  });
+
+  it('only punts on the slams a melee player can dodge, and has no untelegraphed knockback', () => {
+    // Owner feedback (too many knockbacks): a telegraphed slam may throw you only if melee
+    // can avoid it. The smash has its safe gap, the hammer and boulder are aimed circles and
+    // the cleave is jumped. The stomp and Barrowfall are full circles on his feet wider than
+    // melee reach, so they hit without throwing anyone.
+    expect([...launch().mechanics].sort()).toEqual(['boulder', 'cleave', 'hammer', 'smash']);
+    const t = MOBS[BALGATH];
+    expect(t?.stomp?.radius).toBeGreaterThan(MELEE_RANGE);
+    expect(t?.warpath?.wreck.radius).toBeGreaterThan(MELEE_RANGE);
+    // The Backhand proc (30% on his melee, no telegraph) is gone.
+    expect(t?.knockback).toBeUndefined();
   });
 
   it('keeps the cleave clearable by one ordinary jump', () => {
@@ -125,11 +138,10 @@ describe('launchFromSlam', () => {
   /**
    * Fire the launch, then take the boss out of the world before measuring the flight.
    *
-   * Not squeamishness about a messy fixture: his melee reach is 14.6 yards and his swings
-   * carry a 30% knockback proc, and `applyKnockback` deliberately grounds its victim
-   * (`vy = 0; onGround = true`). Leaving him standing there means a third of flights get
-   * swatted out of the air two ticks in by an unrelated mechanic, and the test would be
-   * measuring his auto-attack rather than the launch it names.
+   * Not squeamishness about a messy fixture: his melee reach is 14.6 yards, and when his
+   * swings carried a knockback proc (since removed) `applyKnockback` grounded its victim
+   * (`vy = 0; onGround = true`) and swatted flights out of the air. Clearing him keeps
+   * the test measuring the launch it names rather than whatever else he does meanwhile.
    */
   const launchAndClearTheField = (radius = 14) => {
     launchFromSlam(
@@ -137,6 +149,7 @@ describe('launchFromSlam', () => {
       boss,
       boss.pos,
       radius,
+      'smash',
     );
     sim.entities.delete(boss.id);
   };
@@ -167,6 +180,7 @@ describe('launchFromSlam', () => {
       boss,
       boss.pos,
       14,
+      'smash',
     );
     expect(player.vy).toBe(0);
     expect(player.onGround).toBe(true);
@@ -179,6 +193,7 @@ describe('launchFromSlam', () => {
       boss,
       boss.pos,
       14,
+      'smash',
     );
     const near = player.vy;
     place(player, lair().x + 13.5, lair().z);
@@ -187,8 +202,27 @@ describe('launchFromSlam', () => {
       boss,
       boss.pos,
       14,
+      'smash',
     );
     expect(near).toBeGreaterThan(player.vy);
+  });
+
+  it('leaves a player in place for a slam his template does not list', () => {
+    // Owner feedback: only a slam a melee player can dodge may throw them. The stomp and
+    // the warpath arrival are full circles on his feet that cover all of melee reach.
+    for (const mechanic of ['stomp', 'wreck'] as const) {
+      place(player, lair().x + 2, lair().z);
+      launchFromSlam(
+        (sim as unknown as { ctx: Parameters<typeof launchFromSlam>[0] }).ctx,
+        boss,
+        boss.pos,
+        14,
+        mechanic,
+      );
+      expect(player.vy, mechanic).toBe(0);
+      expect(player.onGround, mechanic).toBe(true);
+      expect(Math.hypot(player.pos.x - (lair().x + 2), player.pos.z - lair().z), mechanic).toBe(0);
+    }
   });
 
   it('is inert for a mob whose template never opted in', () => {
@@ -203,6 +237,7 @@ describe('launchFromSlam', () => {
       other,
       other.pos,
       14,
+      'smash',
     );
     expect(player.vy).toBe(0);
     expect(player.onGround).toBe(true);
@@ -284,6 +319,47 @@ describe('the aimed slams in a live fight', () => {
     }
     return null;
   };
+
+  /** Engage him, arm one telegraphed ring detonation on his feet with the player 2 yards
+   *  from its centre, and run it through the live windup ticker (mob/locomotion.ts). */
+  const detonateOnHim = (kind: 'stomp' | 'pulse') => {
+    for (let i = 0; i < 40; i++) {
+      tickAlive();
+      place(player, boss.pos.x + 2, boss.pos.z);
+    }
+    expect(['attack', 'chase']).toContain(boss.aiState);
+    const radius =
+      kind === 'stomp' ? MOBS[BALGATH]?.stomp?.radius : MOBS[BALGATH]?.aoePulse?.radius;
+    if (kind === 'stomp') {
+      boss.stompWindupRemaining = 0.01;
+      boss.stompWindupX = boss.pos.x;
+      boss.stompWindupZ = boss.pos.z;
+    } else {
+      boss.pulseWindupRemaining = 0.01;
+      boss.pulseWindupX = boss.pos.x;
+      boss.pulseWindupZ = boss.pos.z;
+    }
+    place(player, boss.pos.x + 2, boss.pos.z);
+    const landed = tickAlive().some(
+      (ev) => ev.type === 'spellfxAt' && ev.fx === 'nova' && ev.radius === radius,
+    );
+    expect(landed, `the ${kind} never detonated`).toBe(true);
+  };
+
+  it('lands the Shockwave Stomp without throwing the melee standing in it', () => {
+    // A full circle on his feet that covers all of melee reach: it hits, it does not punt.
+    detonateOnHim('stomp');
+    expect(player.vy).toBeLessThanOrEqual(0);
+    expect(player.onGround).toBe(true);
+  });
+
+  it('still throws a player the Barrow Smash catches in its solid disc', () => {
+    // The smash keeps its punt (owner call: its safe gap is the dodge), and the live
+    // detonation must tag itself as the smash for that to hold.
+    detonateOnHim('pulse');
+    expect(player.vy).toBeGreaterThan(0);
+    expect(player.onGround).toBe(false);
+  });
 
   it('draws the hammer ring on the player it picked', () => {
     const ring = waitForRing(HAMMER_ABILITY);
@@ -384,8 +460,8 @@ describe('the aimed slams in a live fight', () => {
     expect(r.hit, 'standing in a 120-degree arc cost nothing').toBe(true);
   });
 
-  it('holds his knockback proc for the whole cleave windup, so a jump is never undone', () => {
-    // The Backhand (30% on his melee) shoves AND grounds its victim. Landing it on a player
+  it('opens the escape window for the whole cleave windup, so a jump is never undone', () => {
+    // An on-hit knockback proc shoves AND grounds its victim. Landing one on a player
     // mid-jump in the arc turned a correct read into a hit. The windup opens the same escape
     // window his telegraphed rings already open (rift_escape_window.ts): the proc's roll is
     // still drawn, only the shove is skipped, until the arm has come across.

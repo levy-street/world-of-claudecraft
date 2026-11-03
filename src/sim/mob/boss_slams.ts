@@ -26,7 +26,7 @@
 import { MOBS } from '../data';
 import { shockLanceBraces } from '../lance_trial';
 import type { SimContext } from '../sim_context';
-import type { Aura, Entity, MobTemplate, Vec3 } from '../types';
+import type { Aura, Entity, MobTemplate, SlamLaunchMechanic, Vec3 } from '../types';
 import { angleTo, DT, dist2d, normAngle } from '../types';
 import { groundHeight } from '../world';
 import { splashNearbyMobs } from './boss_collateral';
@@ -80,6 +80,8 @@ export function launchFromSlam(
   mob: Entity,
   center: Vec3,
   radius: number,
+  /** Which slam this is: it punts only if the template's `launch.mechanics` names it. */
+  mechanic: SlamLaunchMechanic,
   /**
    * Only these entity ids, when the blast that called this was not a circle.
    *
@@ -98,7 +100,7 @@ export function launchFromSlam(
   // reaches further than the punt, and a mob with no launch def still shakes the ground.
   shockLanceBraces(ctx, center.x, center.z, radius);
   const def = MOBS[mob.templateId]?.launch;
-  if (!def) return;
+  if (!def || !def.mechanics.includes(mechanic)) return;
   for (const meta of ctx.players.values()) {
     const p = ctx.entities.get(meta.entityId);
     if (!p || p.dead) continue;
@@ -248,8 +250,8 @@ function startCleave(ctx: SimContext, mob: Entity, def: SlamsDef): void {
   mob.slamX = Math.sin(mob.facing);
   mob.slamZ = Math.cos(mob.facing);
   claimMechanicSpacing(mob, def.cleave.windup);
-  // The windup asks the raid to JUMP, so his Backhand proc (which shoves and grounds its
-  // victim) must not land on a player mid-jump and undo a correct read. The same escape
+  // The windup asks the raid to JUMP, so an on-hit knockback proc (which shoves and grounds
+  // its victim) must not land on a player mid-jump and undo a correct read. The same escape
   // window his telegraphed rings open (rift_escape_window.ts): the proc's roll is still
   // drawn, only the shove is skipped, until the arm has come across.
   openRiftEscapeWindow(ctx, mob, def.cleave.windup);
@@ -333,7 +335,7 @@ function fireHammer(ctx: SimContext, mob: Entity, def: SlamsDef): void {
     school,
     def.hammer.name,
   );
-  launchFromSlam(ctx, mob, center, def.hammer.radius);
+  launchFromSlam(ctx, mob, center, def.hammer.radius, 'hammer');
 }
 
 /**
@@ -409,7 +411,7 @@ function fireCleave(ctx: SimContext, mob: Entity, def: SlamsDef): void {
   );
   // Only the ones it actually caught. Whoever cleared it is airborne and riding the arm,
   // and whoever was behind him was never in the arc at all.
-  launchFromSlam(ctx, mob, mob.pos, def.cleave.range, struck);
+  launchFromSlam(ctx, mob, mob.pos, def.cleave.range, 'cleave', struck);
 }
 
 /**

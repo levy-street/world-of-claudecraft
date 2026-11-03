@@ -97,6 +97,7 @@ import {
   NYTHRAXIS_ADD_ID,
   NYTHRAXIS_BOSS_ID,
   SISTER_NHALIA_BOSS_ID,
+  type SlamLaunchMechanic,
   steadyAngleTo,
   TOLLING_BELL_TEMPLATE_ID,
   type Vec3,
@@ -1151,6 +1152,8 @@ function emitTelegraphedImpact(
   center: Vec3,
   radius: number,
   school: Aura['school'],
+  /** Which slam landed: the template's `launch.mechanics` decides whether it punts. */
+  mechanic: SlamLaunchMechanic,
   /** Only these players are punted, for a blast that is not a solid circle (the gap). */
   only?: ReadonlySet<number>,
 ): void {
@@ -1175,7 +1178,7 @@ function emitTelegraphedImpact(
   // behind the telegraphed-mechanics gate, and both detonations already route through it
   // with the ring's true centre and radius, which is exactly what a launch needs. One
   // hook, both slams, and nothing else in the world can reach it.
-  launchFromSlam(ctx, mob, center, radius, only);
+  launchFromSlam(ctx, mob, center, radius, mechanic, only);
 }
 
 // Tick the in-flight instant-mechanic windups and detonate at zero. Runs from
@@ -1204,6 +1207,7 @@ function tickRiftMechanicWindups(ctx: SimContext, mob: Entity): void {
           center,
           stomp.radius,
           (stomp.school ?? 'physical') as Aura['school'],
+          'stomp',
         );
       }
       mob.swingTimer = Math.max(mob.swingTimer, RIFT_POST_MECHANIC_SWING_GAP_SEC);
@@ -1226,6 +1230,7 @@ function tickRiftMechanicWindups(ctx: SimContext, mob: Entity): void {
           center,
           pulse.radius,
           (pulse.school ?? 'shadow') as Aura['school'],
+          'smash',
           // A gapped ring punts only whom it hit; whoever stood in the gap stays put.
           pulse.safeGap ? struck : undefined,
         );

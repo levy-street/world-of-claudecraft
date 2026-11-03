@@ -484,9 +484,9 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
       // The travelling backhand, on one random player inside his reach. Between the
       // aoePulse (36 to 50) and the stomp (18 to 28) in weight: escorting him is meant to
       // cost, not to be a death sentence for whoever draws the short straw. Named for the
-      // clip it plays and NOT "Backhand", which is already the label on his knockback
-      // proc: two different mechanics under one name in the combat log is a fight nobody
-      // can read.
+      // clip it plays and NOT "Backhand", which was the label on his old knockback proc
+      // (removed): two different mechanics under one name in the combat log is a fight
+      // nobody can read.
       swipe: {
         every: 2.6,
         radius: 12,
@@ -606,15 +606,28 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
       // the 4.5 s after a slam, since these land on the far players rather than the melee.
       spacing: 2,
     },
-    // Every heavy slam he lands PUNTS rather than shoves (mob/boss_slams.ts). He is
+    // His dodgeable heavy slams PUNT rather than shove (mob/boss_slams.ts). He is
     // thirteen units of quarried granite and his whole identity is his fists; a victim who
     // slides two yards along the floor reads as having been pushed by a large man, and one
     // thrown four yards into the air reads as having been hit by a building.
     //
+    // Only the slams a player can actually avoid punt (owner feedback: too many
+    // knockbacks). The Barrow Smash has its safe gap, the hammer and boulder are small aimed
+    // circles, and the cleave is jumped or stood behind. The Shockwave Stomp (7 yards) and
+    // Barrowfall (16 yards) are full circles on his own feet that cover all of a melee
+    // player's 5-yard reach, so melee cannot stay on him and dodge them: they still hit,
+    // they just do not throw anyone.
+    //
     // up 11 gives an apex of 11^2/32 = 3.8 yards and about 1.4s of air. That is under the
     // 12-yard FALL_SAFE_DISTANCE with room to spare, so the landing that follows can never
     // quietly add fall damage on top of the slam that caused it.
-    launch: { distance: 6, up: 11, outSpeed: 7, edgeScale: 0.55 },
+    launch: {
+      distance: 6,
+      up: 11,
+      outSpeed: 7,
+      edgeScale: 0.55,
+      mechanics: ['smash', 'hammer', 'cleave', 'boulder'],
+    },
     // He is loose in an inhabited zone, so his craters take the wildlife with them. A third
     // of the raid number: a mirefen boar has a fraction of a raider's pool, and at full
     // strength one warpath lap would sterilize every camp on the circuit and leave the zone
@@ -780,7 +793,6 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
       name: 'Barrowhide',
       school: 'physical',
     },
-    knockback: { chance: 0.3, distance: 7, name: 'Backhand' },
     // Four items of his OWN, and the reason they had to be authored rather than borrowed.
     // An item's level derives from its highest source level, so a level-20 boss dropping
     // this zone's level-10 gear silently re-levels it; sharing the existing level-20 tier

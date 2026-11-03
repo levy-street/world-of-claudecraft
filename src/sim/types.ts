@@ -64,6 +64,12 @@ export const TEMPORAL_HOURGLASS_ALLY_COOLDOWN_RATE = 1.75;
 export const RUN_SPEED = 7; // yards/sec, classic run speed
 export const TURN_SPEED = Math.PI; // rad/sec keyboard turning
 export const MELEE_RANGE = 5; // yards
+
+/** The heavy slams a template's `launch` can opt into (mob/boss_slams.ts launchFromSlam):
+ *  the ring (aoePulse), the circle stomp, the aimed hammer, the frontal cleave, the thrown
+ *  boulder, and the warpath arrival slam. `'smash'` tags EVERY aoePulse detonation, gapped
+ *  or not, so opt into it only for a ring melee can dodge (a `safeGap`, as Balgath's has). */
+export type SlamLaunchMechanic = 'smash' | 'stomp' | 'hammer' | 'cleave' | 'boulder' | 'wreck';
 export const MELEE_ARC = 2.2; // radians half-arc within which melee swings connect
 export const INTERACT_RANGE = 5;
 // /yell broadcast radius and ground-object respawn delay: neutral consts shared by
@@ -2640,9 +2646,9 @@ export interface MobTemplate {
     yell?: string;
   };
   /**
-   * Punt, rather than shove, on every heavy slam this mob lands (mob/boss_slams.ts
-   * `launchFromSlam`, called from the telegraphed detonations, the warpath arrival, and
-   * both aimed slams above).
+   * Punt, rather than shove, on the heavy slams this mob lands (mob/boss_slams.ts
+   * `launchFromSlam`, called from the telegraphed detonations, the warpath arrival, the
+   * aimed slams above and the boulder). Only the slams named in `mechanics` punt.
    *
    * The shipped knockback slides a victim along the ground, which reads as a push. A body
    * thrown into the AIR reads as having been hit by something enormous, and for a boss
@@ -2659,6 +2665,13 @@ export interface MobTemplate {
     outSpeed: number;
     /** Multiplier at the blast rim, easing from 1 at the epicentre. */
     edgeScale: number;
+    /**
+     * The slams that punt. A slam left off still deals its damage and shakes the ground
+     * (lance braces), it just does not move anyone. Rule of thumb: a slam a melee player
+     * cannot dodge while staying in melee (a full circle on the boss's own feet) does not
+     * belong here, because a knockback nobody in melee can avoid is just a tax on melee.
+     */
+    mechanics: readonly SlamLaunchMechanic[];
   };
   /**
    * This mob's telegraphed blasts hurt OTHER CREATURES standing in them, not just players

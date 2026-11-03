@@ -22,7 +22,7 @@ import {
 import { BUILTIN_WORLD, MOBS } from '../src/sim/data';
 import { spawnMobsForDev } from '../src/sim/dev_commands';
 import type { MusterArmyState } from '../src/sim/mirefen_muster';
-import { musterPicketRazed } from '../src/sim/muster_picket_razed';
+import { warpathStopRazed } from '../src/sim/mob/warpath';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
 import type { Entity, WorldContent } from '../src/sim/types';
@@ -87,9 +87,8 @@ interface StopResult {
 function allRazed(sim: Sim): boolean {
   const def = MOBS[BALGATH]?.warpath;
   if (!def) return false;
-  return def.destinations.every((d) =>
-    musterPicketRazed(inner(sim).ctx, inner(sim).musterArmy, d.x, d.z, def.wreck.radius),
-  );
+  // The circuit's own rule, so "the lap is over" means exactly what the boss decides.
+  return def.destinations.every((_, i) => warpathStopRazed(inner(sim).ctx, def, i));
 }
 
 /**
@@ -167,6 +166,49 @@ function expectEveryStopWrecked(sim: Sim, results: StopResult[]): void {
   }
 }
 
+describe('a picket is razed by what his arrival slam can reach', () => {
+  it('ignores a rim post the slam cannot reach from an off-centre landing', () => {
+    // His fists land up to arriveRadius off a picket's centre, so only posts inside
+    // wreck.radius - arriveRadius are sure to be hit. Counting the full radius kept a
+    // picket "standing" on a rim soldier the slam had missed, and he wrecked its corpses
+    // again (the lap in the suite below). The real muster layout has such a post.
+    const sim = newSim(true);
+    place(sim, sim.player, 128, 300);
+    sim.tick();
+    const def = MOBS[BALGATH]?.warpath;
+    if (!def) throw new Error('no warpath');
+    const reach = def.wreck.radius - def.arriveRadius;
+    const army = inner(sim).musterArmy;
+    const ctx = inner(sim).ctx;
+    const postedFrom = (id: number, i: number) => {
+      const s = sim.entities.get(id);
+      const d = def.destinations[i];
+      return s ? Math.hypot(s.spawnPos.x - d.x, s.spawnPos.z - d.z) : Infinity;
+    };
+    let checked = 0;
+    def.destinations.forEach((_, i) => {
+      const near = army.soldierIds.filter((id) => postedFrom(id, i) <= reach);
+      const rim = army.soldierIds.filter((id) => {
+        const d = postedFrom(id, i);
+        return d > reach && d <= def.wreck.radius;
+      });
+      if (near.length === 0 || rim.length === 0) return;
+      checked++;
+      for (const id of near) (sim.entities.get(id) as Entity).dead = true;
+      // Only the rim post stands: razed, so the circuit passes it over.
+      expect(warpathStopRazed(ctx, def, i), `stop ${i} with only its rim post up`).toBe(true);
+      // One soldier inside the reach still standing keeps it a picket worth marching on.
+      (sim.entities.get(near[0]) as Entity).dead = false;
+      expect(warpathStopRazed(ctx, def, i), `stop ${i} with an inner post up`).toBe(false);
+      for (const id of near) (sim.entities.get(id) as Entity).dead = false;
+    });
+    expect(
+      checked,
+      'no stop has a post between the sure reach and the slam radius',
+    ).toBeGreaterThan(0);
+  });
+});
+
 describe('every warpath stop is a wreck with kills', () => {
   it('from his crater bed, with the pull opening beside the rim picket', () => {
     const sim = newSim(true);
@@ -178,7 +220,10 @@ describe('every warpath stop is a wreck with kills', () => {
     const boss = bossId !== null ? sim.entities.get(bossId) : undefined;
     if (!boss) throw new Error('the scheduler raised no Balgath');
     expect(boss.spawnPos.x).toBeCloseTo(147, 0);
-    expectEveryStopWrecked(sim, lap(sim, boss, 12));
+    // 14 yards: far enough off his shins that the opening fight sits on the rim picket.
+    // At 12 it held only while his Backhand proc (removed: an untelegraphed knockback)
+    // kept shoving the raider out to about this range.
+    expectEveryStopWrecked(sim, lap(sim, boss, 14));
   });
 
   it('from a /dev spawn copy dropped beside the player on the crater rim', () => {
