@@ -15,14 +15,13 @@ import { mooringBlocksAura } from './trinkets';
 
 export { onTrinketAvoidance } from './trinkets';
 
-/** Whether a guard keeps this aura off its target: a player's own (the
- *  paladin's Veilbound March on roots and slows, the Mooring Stone on every
- *  control) or the Wildheart Basin's control rules on its jaguars (one of each
- *  control kind per window; half-length stuns on Zulgar's hunting avatar). */
+/** Whether a guard keeps this aura off its target: a buddy (never takes any
+ *  aura, pet/buddy_ai.ts), a player's own guard (the paladin's Veilbound
+ *  March on roots and slows, the Mooring Stone on every control) or the
+ *  Wildheart Basin's control rules on its jaguars (one of each control kind
+ *  per window; half-length stuns on Zulgar's hunting avatar). */
 export function auraGuarded(target: Entity, aura: Aura): boolean {
   return (
-    // A buddy (pet/buddy_ai.ts) is visible but never interactable: no aura,
-    // buff or debuff, from any source, ever lands on it.
     isBuddyMob(target) ||
     veilboundMarchBlocksAura(target, aura) ||
     mooringBlocksAura(target, aura) ||

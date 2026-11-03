@@ -61,6 +61,7 @@ import type { Ante, PickAction } from '../sim/lockpick';
 import type { MarketQuery } from '../sim/market_query';
 import { normalizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
 import { isPersistentEngineAura } from '../sim/persistent_aura';
+import { buddyUnselectableBy } from '../sim/pet/buddy_ai';
 import { isPrimaryOwnedPetEntity } from '../sim/pet/pet_selection';
 import { getArchetypeTitle, getHobbyCraft } from '../sim/professions/archetype';
 import type { RespecPaymentTier } from '../sim/professions/focus';
@@ -3436,7 +3437,9 @@ export class ClientWorld extends ReconWireState implements IWorld {
         if (seq !== null) this.pendingTargetEcho = armTargetEcho(null, seq);
       } else {
         const e = this.entities.get(id);
-        if (e && (!e.dead || deadTargetSelectable(e, this.playerId))) {
+        // Someone else's buddy is never selectable (the sim refuses it too).
+        const selectable = e && !buddyUnselectableBy(e, this.playerId);
+        if (selectable && (!e.dead || deadTargetSelectable(e, this.playerId))) {
           p.targetId = id;
           if (seq !== null) this.pendingTargetEcho = armTargetEcho(id, seq);
         }
