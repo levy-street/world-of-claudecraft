@@ -10,7 +10,7 @@ import { isPlayingDead } from '../sim/combat/hunter_play_dead';
 import { corpseIndicatorFor } from '../sim/corpse_loot_state';
 import { ABILITIES, MOBS, QUESTS } from '../sim/data';
 import { specialRoleColor } from '../sim/discord_roles';
-import { isBuddyMob } from '../sim/pet/buddy_ai';
+import { buddyUnselectableBy, isBuddyMob } from '../sim/pet/buddy_ai';
 import { isQuestGatedEntityHidden } from '../sim/quest_gated_entity';
 import { ambientNpcQuestMarkerKind } from '../sim/quests/ambient_quest_marker';
 import { type QuestMarkerKind, strongerQuestMarker } from '../sim/quests/quest_marker_kind';
@@ -448,7 +448,8 @@ export class NameplatePainter {
         anchor.hpVisible = state.hpVisible;
         anchor.castVisible = state.castVisible;
         anchor.boss = state.frame === 'boss';
-        anchor.pickable = id !== player.id && !entity.dead;
+        anchor.pickable =
+          id !== player.id && !entity.dead && !buddyUnselectableBy(entity, player.id);
       } else {
         this.anchorScratch.push({
           id,
@@ -457,7 +458,7 @@ export class NameplatePainter {
           hpVisible: state.hpVisible,
           castVisible: state.castVisible,
           boss: state.frame === 'boss',
-          pickable: id !== player.id && !entity.dead,
+          pickable: id !== player.id && !entity.dead && !buddyUnselectableBy(entity, player.id),
         });
       }
       this.anchorCount++;

@@ -185,6 +185,7 @@ import {
   NYTHRAXIS_SOUL_REND_SETTLE_SECONDS,
   releaseNythraxisSoulRendMarks,
 } from '../nythraxis_soul_rend';
+import { isBuddyMob } from '../pet/buddy_ai';
 import {
   hasInteractObjectCredit,
   interactObjectCreditKey,
@@ -879,7 +880,9 @@ export function nythraxisTransitionStunTargets(ctx: SimContext, boss: Entity): E
   return [...ctx.entities.values()].filter(
     (e) =>
       (e.kind === 'player' ||
-        (e.kind === 'mob' && (isNythraxisRaidAddTemplate(e.templateId) || e.ownerId !== null))) &&
+        (e.kind === 'mob' &&
+          !isBuddyMob(e) &&
+          (isNythraxisRaidAddTemplate(e.templateId) || e.ownerId !== null))) &&
       willBeInNythraxisRoomAfterResurrection(ctx, boss, e),
   );
 }

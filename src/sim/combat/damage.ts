@@ -244,6 +244,9 @@ export function dealDamage(
   resolvedHpLoss = false,
 ): number {
   if (resolution) resolution.landedHpLoss = 0;
+  // A buddy (pet/buddy_ai.ts) takes no damage from any source: isHostileTo
+  // keeps it out of every enemy scan, and this backstops a non-gated hit.
+  if (isBuddyMob(target)) return 0;
   if (resolvedHpLoss) alreadyFinal = true;
   // Provenance for proc accounting (crafted collections): a copy or redirect
   // share must never earn a second charge, but a ward-normalized ORIGINAL hit

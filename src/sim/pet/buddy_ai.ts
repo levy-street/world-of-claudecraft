@@ -72,6 +72,19 @@ export function isBuddyMob(mob: Pick<Entity, 'ownerId' | 'templateId'>): boolean
   return mob.ownerId !== null && BUDDY_TEMPLATE_IDS.has(mob.templateId);
 }
 
+/** True when `viewerId` may not select `e`: a buddy is visible to everyone but
+ *  selectable only by its own owner, and only to open the rename/autoloot menu
+ *  (ui/hud/buddy_menu.ts). No heal, buff, or damage ever lands on it, the owner
+ *  included: isHostileTo/isFriendlyTo (sim.ts) and the applyHeal/dealDamage
+ *  backstops refuse it for every caster. Same narrowed pick as isBuddyMob, so
+ *  the client picking path shares this rule with the sim select command. */
+export function buddyUnselectableBy(
+  e: Pick<Entity, 'ownerId' | 'templateId'>,
+  viewerId: number | null,
+): boolean {
+  return isBuddyMob(e) && e.ownerId !== viewerId;
+}
+
 /** The owner's live buddy entity, or null. Scoped to buddy templateIds only
  *  (mirrors pet_commands.ts's petOf, which explicitly excludes this kind of
  *  entity so the two lookups never collide for a hunter with both a real
