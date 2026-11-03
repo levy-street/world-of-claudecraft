@@ -353,8 +353,8 @@ function releaseAtNearestGraveyard(
   p.auras = aurasSurvivingDeath(p.auras);
   p.ccDr.clear();
   recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
-  // A ghost shows a full (greyed) bar even though it is still `dead`. recalc forces
-  // hp to 0 while dead, so set the display pools afterward.
+  // A ghost shows a full (greyed) bar even though it is still `dead`. recalc keeps
+  // a ghost's hp at max (entity.ts); set both display pools here regardless.
   p.hp = p.maxHp;
   p.resource =
     p.resourceType === 'mana'

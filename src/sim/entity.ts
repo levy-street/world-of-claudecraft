@@ -811,7 +811,9 @@ export function recalcPlayerStats(
     e.maxHp = Math.round(e.maxHp * (1 + e.stats.pvpVitality));
   }
   e.hp = Math.max(1, Math.round(e.maxHp * hpFrac));
-  if (e.dead) e.hp = 0;
+  // A corpse reads 0; a released ghost stays `dead` but shows the full greyed
+  // bar releaseSpirit set (spirit.ts), so a mid-run recalc must not zero it.
+  if (e.dead) e.hp = e.ghost ? e.maxHp : 0;
   // Body size: players default to 1; a buff_scale aura grows/shrinks them live.
   if (e.kind === 'player') e.scale = scaleMul;
 
