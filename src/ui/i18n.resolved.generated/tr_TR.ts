@@ -18341,7 +18341,7 @@ export const tr_TR: EnTranslations = {
       },
       "fear": {
         "name": "Dehşet",
-        "description": "Düşmanın yüreğine korku salar ve onu 5 saniyeye kadar sinmiş bırakır. Hedefin azami sağlığının toplam %8'i kadar hasar etkiyi bozar."
+        "description": "Düşmanın yüreğine korku salar ve onu 5 saniyeye kadar sinmiş bırakır. Hedefin azami sağlığının toplam %10'u kadar hasar etkiyi bozar."
       },
       "searing_pain": {
         "name": "Dağlama",

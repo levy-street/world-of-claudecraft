@@ -1193,7 +1193,7 @@ const classAbilityNamesEn = {
       [
         'fear',
         'Harrow',
-        "Strikes terror into the enemy, leaving it cowering for up to 5 sec. Damage totaling 8% of the target's maximum health breaks the effect.",
+        "Strikes terror into the enemy, leaving it cowering for up to 5 sec. Damage totaling 10% of the target's maximum health breaks the effect.",
       ],
       [
         'searing_pain',

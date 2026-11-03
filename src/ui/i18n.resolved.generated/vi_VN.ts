@@ -18341,7 +18341,7 @@ export const vi_VN: EnTranslations = {
       },
       "fear": {
         "name": "Giày Vò",
-        "description": "Gieo nỗi kinh hoàng vào kẻ địch, khiến nó co rúm sợ hãi trong tối đa 5 giây. Tổng sát thương bằng 8% máu tối đa của mục tiêu sẽ phá vỡ hiệu ứng."
+        "description": "Gieo nỗi kinh hoàng vào kẻ địch, khiến nó co rúm sợ hãi trong tối đa 5 giây. Tổng sát thương bằng 10% máu tối đa của mục tiêu sẽ phá vỡ hiệu ứng."
       },
       "searing_pain": {
         "name": "Nung Đốt",

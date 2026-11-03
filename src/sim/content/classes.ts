@@ -5950,7 +5950,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     fearDr: true,
     effects: [{ type: 'incapacitate', duration: 5 }],
     description:
-      "Strikes terror into the enemy, leaving it cowering for up to 5 sec. Damage totaling 8% of the target's maximum health breaks the effect.",
+      "Strikes terror into the enemy, leaving it cowering for up to 5 sec. Damage totaling 10% of the target's maximum health breaks the effect.",
   },
   searing_pain: {
     id: 'searing_pain',

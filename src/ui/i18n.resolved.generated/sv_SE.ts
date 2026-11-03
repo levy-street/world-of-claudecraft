@@ -18341,7 +18341,7 @@ export const sv_SE: EnTranslations = {
       },
       "fear": {
         "name": "Plåga",
-        "description": "Slår skräck i fienden och får den att huka sig i upp till 5 sek. Skada som sammanlagt motsvarar 8% av målets maximala hälsa bryter effekten."
+        "description": "Slår skräck i fienden och får den att huka sig i upp till 5 sek. Skada som sammanlagt motsvarar 10% av målets maximala hälsa bryter effekten."
       },
       "searing_pain": {
         "name": "Sveda",

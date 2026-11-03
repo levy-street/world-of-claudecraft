@@ -9662,7 +9662,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Consuma la vitalità del bersaglio, infliggendo {damage} danni da Ombra ogni secondo e trasferendovene il 70% come salute. Afflizione ne trasferisce invece la totalità. Quando è incanalato sul vostro Malocchio primario, consuma all'inizio tutti i Filamenti del Fato, e ogni Filamento genera 1 Condanna in più per impulso.",
   'entities.abilities.fear.name': 'Tormento',
   'entities.abilities.fear.description':
-    "Terrorizza il nemico, lasciandolo tremante per un massimo di 5 s. I danni pari in totale all'8% della salute massima del bersaglio interrompono l'effetto.",
+    "Terrorizza il nemico, lasciandolo tremante per un massimo di 5 s. I danni pari in totale al 10% della salute massima del bersaglio interrompono l'effetto.",
   'entities.abilities.searing_pain.name': 'Bruciatura',
   'entities.abilities.searing_pain.description':
     'Brucia il nemico con fuoco agonizzante per {damage} danni da Fuoco. Lancio rapido.',

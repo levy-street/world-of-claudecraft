@@ -18341,7 +18341,7 @@ export const zh_TW: EnTranslations = {
       },
       "fear": {
         "name": "折魂",
-        "description": "使敵人陷入恐懼並畏縮，最多持續 5 秒。累計達到目標最大生命值 8% 的傷害會打破效果。"
+        "description": "使敵人陷入恐懼並畏縮，最多持續 5 秒。累計達到目標最大生命值 10% 的傷害會打破效果。"
       },
       "searing_pain": {
         "name": "焦灼",

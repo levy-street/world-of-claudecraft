@@ -7876,7 +7876,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.expose_armor.name': 'Rustningsbräsch',
   'entities.abilities.faerie_fire.name': 'Häxljus',
   'entities.abilities.fear.description':
-    'Slår skräck i fienden och får den att huka sig i upp till 5 sek. Skada som sammanlagt motsvarar 8% av målets maximala hälsa bryter effekten.',
+    'Slår skräck i fienden och får den att huka sig i upp till 5 sek. Skada som sammanlagt motsvarar 10% av målets maximala hälsa bryter effekten.',
   'entities.abilities.fear.name': 'Plåga',
   'entities.abilities.ferocious_bite.name': 'Blodsbett',
   'entities.abilities.fire_blast.description': 'Spränger fienden för {damage} eldskada. Omedelbar.',

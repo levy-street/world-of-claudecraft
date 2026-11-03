@@ -5,11 +5,13 @@ const AFFECTED = [
   {
     ability: 'fear',
     key: 'entities.abilities.fear.description',
+    breakPct: /(?:10\s*%|%\s*10)/,
     stale: /8\s*(?:s|sec|sek|сек|秒|초|detik|giây)/i,
   },
   {
     ability: 'howl_of_terror',
     key: 'entities.abilities.howl_of_terror.description',
+    breakPct: /(?:8\s*%|%\s*8)/,
     stale: /3\s*(?:s|sec|sek|сек|秒|초|detik|giây)/i,
   },
   {
@@ -38,8 +40,7 @@ describe('warlock crowd-control resolved tooltip translations', () => {
       for (const row of AFFECTED) {
         const text = description(table, row.ability);
         expect(text, `${locale}.${row.key}`).toContain(row.ability === 'ossuary_mark' ? '15' : '5');
-        if (row.ability !== 'ossuary_mark')
-          expect(text, `${locale}.${row.key}`).toMatch(/(?:8\s*%|%\s*8)/);
+        if ('breakPct' in row) expect(text, `${locale}.${row.key}`).toMatch(row.breakPct);
         expect(text, `${locale}.${row.key}`).not.toMatch(row.stale);
       }
     }

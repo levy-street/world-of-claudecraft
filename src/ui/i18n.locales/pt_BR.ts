@@ -9589,7 +9589,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Consome a vitalidade do alvo, causando {damage} de dano das Sombras a cada segundo e transferindo 70% disso como vida. Aflição transfere tudo em vez disso. Quando canalizado em vosso Olho Maligno principal, consome todos os Fios do Destino no início, e cada Fio gera 1 de Condenação extra por pulso.',
   'entities.abilities.fear.name': 'Atormentar',
   'entities.abilities.fear.description':
-    'Aterroriza o inimigo, deixando-o acuado por até 5 s. Dano acumulado equivalente a 8% da vida máxima do alvo quebra o efeito.',
+    'Aterroriza o inimigo, deixando-o acuado por até 5 s. Dano acumulado equivalente a 10% da vida máxima do alvo quebra o efeito.',
   'entities.abilities.searing_pain.name': 'Cauterizar',
   'entities.abilities.searing_pain.description':
     'Queima o inimigo com fogo agonizante, causando {damage} de dano de Fogo. Lançamento rápido.',

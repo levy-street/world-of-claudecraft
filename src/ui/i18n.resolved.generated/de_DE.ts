@@ -18341,7 +18341,7 @@ export const de_DE: EnTranslations = {
       },
       "fear": {
         "name": "Heimsuchung",
-        "description": "Versetzt den Gegner in Schrecken und lässt ihn bis zu 5 Sek. lang kauern. Schaden in Höhe von insgesamt 8% der maximalen Gesundheit des Ziels bricht den Effekt."
+        "description": "Versetzt den Gegner in Schrecken und lässt ihn bis zu 5 Sek. lang kauern. Schaden in Höhe von insgesamt 10% der maximalen Gesundheit des Ziels bricht den Effekt."
       },
       "searing_pain": {
         "name": "Versengen",

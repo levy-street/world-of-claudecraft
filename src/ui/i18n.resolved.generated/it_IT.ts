@@ -18341,7 +18341,7 @@ export const it_IT: EnTranslations = {
       },
       "fear": {
         "name": "Tormento",
-        "description": "Terrorizza il nemico, lasciandolo tremante per un massimo di 5 s. I danni pari in totale all'8% della salute massima del bersaglio interrompono l'effetto."
+        "description": "Terrorizza il nemico, lasciandolo tremante per un massimo di 5 s. I danni pari in totale al 10% della salute massima del bersaglio interrompono l'effetto."
       },
       "searing_pain": {
         "name": "Bruciatura",

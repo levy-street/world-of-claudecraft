@@ -18341,7 +18341,7 @@ export const fr_CA: EnTranslations = {
       },
       "fear": {
         "name": "Tourment",
-        "description": "Terrifie l'ennemi et le laisse tremblant pendant un maximum de 5 s. Les dégâts cumulés équivalant à 8% du maximum de points de vie de la cible interrompent l'effet."
+        "description": "Terrifie l'ennemi et le laisse tremblant pendant un maximum de 5 s. Les dégâts cumulés équivalant à 10% du maximum de points de vie de la cible interrompent l'effet."
       },
       "searing_pain": {
         "name": "Cautérisation",

@@ -18341,7 +18341,7 @@ export const cs_CZ: EnTranslations = {
       },
       "fear": {
         "name": "Děs",
-        "description": "Vžene nepříteli hrůzu a nechá ho krčit se až 5 s. Poškození v součtu 8 % maximálního zdraví cíle účinek přeruší."
+        "description": "Vžene nepříteli hrůzu a nechá ho krčit se až 5 s. Poškození v součtu 10 % maximálního zdraví cíle účinek přeruší."
       },
       "searing_pain": {
         "name": "Sežehnutí",

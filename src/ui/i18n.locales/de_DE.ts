@@ -9693,7 +9693,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Zehrt die Lebenskraft des Ziels aus, verursacht jede Sekunde {damage} Schattenschaden und überträgt euch 70% davon als Gesundheit. Gebrechen überträgt stattdessen alles. Auf euer vorrangiges Böses Auge kanalisiert, verbraucht der Zauber zu Beginn alle Schicksalsfäden, und jeder Faden erzeugt 1 zusätzliche Verdammnis je Tick.',
   'entities.abilities.fear.name': 'Heimsuchung',
   'entities.abilities.fear.description':
-    'Versetzt den Gegner in Schrecken und lässt ihn bis zu 5 Sek. lang kauern. Schaden in Höhe von insgesamt 8% der maximalen Gesundheit des Ziels bricht den Effekt.',
+    'Versetzt den Gegner in Schrecken und lässt ihn bis zu 5 Sek. lang kauern. Schaden in Höhe von insgesamt 10% der maximalen Gesundheit des Ziels bricht den Effekt.',
   'entities.abilities.searing_pain.name': 'Versengen',
   'entities.abilities.searing_pain.description':
     'Versengt den Gegner mit qualvollem Feuer für {damage} Feuerschaden. Schnell zu wirken.',

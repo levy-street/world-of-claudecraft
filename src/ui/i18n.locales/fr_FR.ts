@@ -10233,7 +10233,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Consume la vitalité de la cible, infligeant {damage} points de dégâts d'Ombre chaque seconde et vous en transférant 70% sous forme de vie. Affliction en transfère la totalité à la place. Canalisé sur votre Mauvais œil principal, il consomme tous les Fils du destin au départ, et chaque Fil génère 1 Condamnation supplémentaire par tic.",
   'entities.abilities.fear.name': 'Tourment',
   'entities.abilities.fear.description':
-    "Terrifie l'ennemi et le laisse tremblant pendant un maximum de 5 s. Les dégâts cumulés équivalant à 8% du maximum de points de vie de la cible interrompent l'effet.",
+    "Terrifie l'ennemi et le laisse tremblant pendant un maximum de 5 s. Les dégâts cumulés équivalant à 10% du maximum de points de vie de la cible interrompent l'effet.",
   'entities.abilities.searing_pain.name': 'Cautérisation',
   'entities.abilities.searing_pain.description':
     "Brûle l'ennemi d'un feu atroce pour {damage} points de dégâts de Feu. Incantation rapide.",

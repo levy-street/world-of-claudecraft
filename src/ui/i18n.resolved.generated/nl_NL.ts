@@ -18341,7 +18341,7 @@ export const nl_NL: EnTranslations = {
       },
       "fear": {
         "name": "Teisteren",
-        "description": "Jaagt de vijand de stuipen op het lijf, waardoor die maximaal 5 sec ineenkrimpt. Schade ter waarde van in totaal 8% van de maximale gezondheid van het doelwit verbreekt het effect."
+        "description": "Jaagt de vijand de stuipen op het lijf, waardoor die maximaal 5 sec ineenkrimpt. Schade ter waarde van in totaal 10% van de maximale gezondheid van het doelwit verbreekt het effect."
       },
       "searing_pain": {
         "name": "Schroeien",

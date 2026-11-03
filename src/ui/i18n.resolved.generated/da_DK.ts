@@ -18341,7 +18341,7 @@ export const da_DK: EnTranslations = {
       },
       "fear": {
         "name": "Hjemsøg",
-        "description": "Slår rædsel i fjenden, så den kryber sammen i op til 5 sek. Skade svarende til 8% af målets maksimale helbred bryder effekten."
+        "description": "Slår rædsel i fjenden, så den kryber sammen i op til 5 sek. Skade svarende til 10% af målets maksimale helbred bryder effekten."
       },
       "searing_pain": {
         "name": "Svid",

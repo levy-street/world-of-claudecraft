@@ -18341,7 +18341,7 @@ export const pt_BR: EnTranslations = {
       },
       "fear": {
         "name": "Atormentar",
-        "description": "Aterroriza o inimigo, deixando-o acuado por até 5 s. Dano acumulado equivalente a 8% da vida máxima do alvo quebra o efeito."
+        "description": "Aterroriza o inimigo, deixando-o acuado por até 5 s. Dano acumulado equivalente a 10% da vida máxima do alvo quebra o efeito."
       },
       "searing_pain": {
         "name": "Cauterizar",

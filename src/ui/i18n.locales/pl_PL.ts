@@ -8082,7 +8082,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.expose_armor.name': 'Wyłom w pancerzu',
   'entities.abilities.faerie_fire.name': 'Wiedźmie światło',
   'entities.abilities.fear.description':
-    'Wzbudza w przeciwniku przerażenie, zmuszając go do kulenia się przez maksymalnie 5 sek. Obrażenia równe łącznie 8% maksymalnego zdrowia celu przerywają efekt.',
+    'Wzbudza w przeciwniku przerażenie, zmuszając go do kulenia się przez maksymalnie 5 sek. Obrażenia równe łącznie 10% maksymalnego zdrowia celu przerywają efekt.',
   'entities.abilities.fear.name': 'Trwoga',
   'entities.abilities.ferocious_bite.name': 'Krwawe ukąszenie',
   'entities.abilities.fire_blast.description':

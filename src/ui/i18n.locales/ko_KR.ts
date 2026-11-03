@@ -6254,7 +6254,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '대상의 생명력을 집어삼켜 매초 {damage}의 암흑 피해를 입히고 그중 70%를 생명력으로 당신에게 옮깁니다. 고통은 대신 전부를 옮깁니다. 주된 사안에 정신을 집중하면 시작할 때 운명의 실타래를 모두 소모하고, 실타래마다 매 주기 단죄를 1씩 더 만듭니다.',
   'entities.abilities.fear.name': '번민',
   'entities.abilities.fear.description':
-    '적에게 공포를 심어 최대 5초 동안 떨게 만듭니다. 대상 최대 생명력의 8%에 해당하는 누적 피해를 받으면 효과가 해제됩니다.',
+    '적에게 공포를 심어 최대 5초 동안 떨게 만듭니다. 대상 최대 생명력의 10%에 해당하는 누적 피해를 받으면 효과가 해제됩니다.',
   'entities.abilities.searing_pain.name': '지지기',
   'entities.abilities.searing_pain.description':
     '고통스러운 불길로 적을 태워 {damage}의 화염 피해를 입힙니다. 빠르게 시전합니다.',

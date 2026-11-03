@@ -10451,7 +10451,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.expose_armor.name': 'Průraz zbroje',
   'entities.abilities.faerie_fire.name': 'Čarodějné světlo',
   'entities.abilities.fear.description':
-    'Vžene nepříteli hrůzu a nechá ho krčit se až 5 s. Poškození v součtu 8 % maximálního zdraví cíle účinek přeruší.',
+    'Vžene nepříteli hrůzu a nechá ho krčit se až 5 s. Poškození v součtu 10 % maximálního zdraví cíle účinek přeruší.',
   'entities.abilities.fear.name': 'Děs',
   'entities.abilities.ferocious_bite.name': 'Krvavý skus',
   'entities.abilities.fire_blast.description':

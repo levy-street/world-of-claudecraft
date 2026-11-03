@@ -18341,7 +18341,7 @@ export const id_ID: EnTranslations = {
       },
       "fear": {
         "name": "Cekaman",
-        "description": "Menanamkan teror ke dalam musuh, membuatnya gemetar ketakutan hingga 5 detik. Kerusakan total sebesar 8% dari kesehatan maksimum target mematahkan efeknya."
+        "description": "Menanamkan teror ke dalam musuh, membuatnya gemetar ketakutan hingga 5 detik. Kerusakan total sebesar 10% dari kesehatan maksimum target mematahkan efeknya."
       },
       "searing_pain": {
         "name": "Bakar",

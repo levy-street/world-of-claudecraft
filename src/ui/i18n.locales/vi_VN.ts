@@ -8057,7 +8057,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.expose_armor.name': 'Xuyên Phá Giáp',
   'entities.abilities.faerie_fire.name': 'Ánh Ma Trơi',
   'entities.abilities.fear.description':
-    'Gieo nỗi kinh hoàng vào kẻ địch, khiến nó co rúm sợ hãi trong tối đa 5 giây. Tổng sát thương bằng 8% máu tối đa của mục tiêu sẽ phá vỡ hiệu ứng.',
+    'Gieo nỗi kinh hoàng vào kẻ địch, khiến nó co rúm sợ hãi trong tối đa 5 giây. Tổng sát thương bằng 10% máu tối đa của mục tiêu sẽ phá vỡ hiệu ứng.',
   'entities.abilities.fear.name': 'Giày Vò',
   'entities.abilities.ferocious_bite.name': 'Cắn Xé Máu',
   'entities.abilities.fire_blast.description':

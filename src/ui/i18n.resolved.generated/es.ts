@@ -18341,7 +18341,7 @@ export const es: EnTranslations = {
       },
       "fear": {
         "name": "Espanto",
-        "description": "Siembra terror en el enemigo y lo deja encogido durante hasta 5 s. El daño acumulado equivalente al 8% de la salud máxima del objetivo rompe el efecto."
+        "description": "Siembra terror en el enemigo y lo deja encogido durante hasta 5 s. El daño acumulado equivalente al 10% de la salud máxima del objetivo rompe el efecto."
       },
       "searing_pain": {
         "name": "Abrasar",

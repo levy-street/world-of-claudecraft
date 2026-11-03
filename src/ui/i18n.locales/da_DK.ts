@@ -7856,7 +7856,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.expose_armor.name': 'Rustningsbrud',
   'entities.abilities.faerie_fire.name': 'Hekselys',
   'entities.abilities.fear.description':
-    'Slår rædsel i fjenden, så den kryber sammen i op til 5 sek. Skade svarende til 8% af målets maksimale helbred bryder effekten.',
+    'Slår rædsel i fjenden, så den kryber sammen i op til 5 sek. Skade svarende til 10% af målets maksimale helbred bryder effekten.',
   'entities.abilities.fear.name': 'Hjemsøg',
   'entities.abilities.ferocious_bite.name': 'Blodbid',
   'entities.abilities.fire_blast.description':

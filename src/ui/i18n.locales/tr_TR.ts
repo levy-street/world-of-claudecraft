@@ -7970,7 +7970,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.expose_armor.name': 'Zırh Gediği',
   'entities.abilities.faerie_fire.name': 'Cadı Işığı',
   'entities.abilities.fear.description':
-    "Düşmanın yüreğine korku salar ve onu 5 saniyeye kadar sinmiş bırakır. Hedefin azami sağlığının toplam %8'i kadar hasar etkiyi bozar.",
+    "Düşmanın yüreğine korku salar ve onu 5 saniyeye kadar sinmiş bırakır. Hedefin azami sağlığının toplam %10'u kadar hasar etkiyi bozar.",
   'entities.abilities.fear.name': 'Dehşet',
   'entities.abilities.ferocious_bite.name': 'Kanlı Isırık',
   'entities.abilities.fire_blast.description': 'Düşmanı {damage} Ateş hasarıyla patlatır. Anında.',

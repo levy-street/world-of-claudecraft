@@ -18341,7 +18341,7 @@ export const zh_CN: EnTranslations = {
       },
       "fear": {
         "name": "惊惧",
-        "description": "使敌人陷入恐惧并畏缩，最多持续 5 秒。累计达到目标最大生命值 8% 的伤害会打破效果。"
+        "description": "使敌人陷入恐惧并畏缩，最多持续 5 秒。累计达到目标最大生命值 10% 的伤害会打破效果。"
       },
       "searing_pain": {
         "name": "焦灼",

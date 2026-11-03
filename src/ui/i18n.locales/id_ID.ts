@@ -8061,7 +8061,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.expose_armor.name': 'Tembus Zirah',
   'entities.abilities.faerie_fire.name': 'Cahaya Sihir',
   'entities.abilities.fear.description':
-    'Menanamkan teror ke dalam musuh, membuatnya gemetar ketakutan hingga 5 detik. Kerusakan total sebesar 8% dari kesehatan maksimum target mematahkan efeknya.',
+    'Menanamkan teror ke dalam musuh, membuatnya gemetar ketakutan hingga 5 detik. Kerusakan total sebesar 10% dari kesehatan maksimum target mematahkan efeknya.',
   'entities.abilities.fear.name': 'Cekaman',
   'entities.abilities.ferocious_bite.name': 'Gigitan Berdarah',
   'entities.abilities.fire_blast.description':

@@ -9525,7 +9525,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Consume la vitalidad del objetivo, infligiendo {damage} de daño de Sombra cada segundo y transfiriéndote un 70% como salud. Aflicción transfiere en cambio la totalidad. Cuando se canaliza sobre tu Mal de ojo principal, consume todos los Hilos del destino al comenzar, y cada Hilo genera 1 de Condena adicional por pulso.',
   'entities.abilities.fear.name': 'Espanto',
   'entities.abilities.fear.description':
-    'Siembra terror en el enemigo y lo deja encogido durante hasta 5 s. El daño acumulado equivalente al 8% de la salud máxima del objetivo rompe el efecto.',
+    'Siembra terror en el enemigo y lo deja encogido durante hasta 5 s. El daño acumulado equivalente al 10% de la salud máxima del objetivo rompe el efecto.',
   'entities.abilities.searing_pain.name': 'Abrasar',
   'entities.abilities.searing_pain.description':
     'Abrasa al enemigo con fuego agonizante por {damage} de daño de Fuego. Lanzamiento rápido.',

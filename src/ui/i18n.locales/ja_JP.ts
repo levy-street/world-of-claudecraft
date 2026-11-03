@@ -6302,7 +6302,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '対象の生命力を貪り、毎秒{damage}の影ダメージを与え、その70%を体力としてあなたへ移します。苦痛はその全てを移します。主たる邪眼へ詠唱を維持すると、開始時に運命の糸をすべて消費し、糸1本ごとに刻みあたり追加で断罪が1得られます。',
   'entities.abilities.fear.name': '責め苦',
   'entities.abilities.fear.description':
-    '敵に恐怖を刻み、最大5秒間おびえさせます。対象の最大体力の8%に相当する合計ダメージを受けると効果が切れます。',
+    '敵に恐怖を刻み、最大5秒間おびえさせます。対象の最大体力の10%に相当する合計ダメージを受けると効果が切れます。',
   'entities.abilities.searing_pain.name': '灼熱',
   'entities.abilities.searing_pain.description':
     '苦痛の炎で敵を焼き、{damage} の火炎ダメージを与えます。詠唱が速い呪文です。',

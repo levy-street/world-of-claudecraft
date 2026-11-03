@@ -18341,7 +18341,7 @@ export const pl_PL: EnTranslations = {
       },
       "fear": {
         "name": "Trwoga",
-        "description": "Wzbudza w przeciwniku przerażenie, zmuszając go do kulenia się przez maksymalnie 5 sek. Obrażenia równe łącznie 8% maksymalnego zdrowia celu przerywają efekt."
+        "description": "Wzbudza w przeciwniku przerażenie, zmuszając go do kulenia się przez maksymalnie 5 sek. Obrażenia równe łącznie 10% maksymalnego zdrowia celu przerywają efekt."
       },
       "searing_pain": {
         "name": "Przypalenie",

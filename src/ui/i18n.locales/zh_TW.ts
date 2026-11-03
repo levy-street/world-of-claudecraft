@@ -7669,7 +7669,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '吞噬目標的生命力，每秒造成 {damage} 點暗影傷害，並將其中的 70% 轉化為生命傳給你。痛苦則改為全部轉化。當引導在你的主邪眼之上時，它會在開始時消耗全部命運絲線，而每一根絲線都會讓每一跳額外產生 1 點譴罪。',
   'entities.abilities.fear.name': '折魂',
   'entities.abilities.fear.description':
-    '使敵人陷入恐懼並畏縮，最多持續 5 秒。累計達到目標最大生命值 8% 的傷害會打破效果。',
+    '使敵人陷入恐懼並畏縮，最多持續 5 秒。累計達到目標最大生命值 10% 的傷害會打破效果。',
   'entities.abilities.searing_pain.name': '焦灼',
   'entities.abilities.searing_pain.description':
     '以痛苦烈焰灼燒敵人，造成 {damage} 點火焰傷害。施法迅速。',

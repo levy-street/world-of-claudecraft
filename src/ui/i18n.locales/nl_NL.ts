@@ -8157,7 +8157,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.expose_armor.name': 'Pantserbres',
   'entities.abilities.faerie_fire.name': 'Heksenlicht',
   'entities.abilities.fear.description':
-    'Jaagt de vijand de stuipen op het lijf, waardoor die maximaal 5 sec ineenkrimpt. Schade ter waarde van in totaal 8% van de maximale gezondheid van het doelwit verbreekt het effect.',
+    'Jaagt de vijand de stuipen op het lijf, waardoor die maximaal 5 sec ineenkrimpt. Schade ter waarde van in totaal 10% van de maximale gezondheid van het doelwit verbreekt het effect.',
   'entities.abilities.fear.name': 'Teisteren',
   'entities.abilities.ferocious_bite.name': 'Bloedbeet',
   'entities.abilities.fire_blast.description':
