@@ -19,8 +19,8 @@
 // Usage:
 //   node scripts/farming_journey_e2e.mjs [--mobile] [--shots <dir>]
 // --mobile runs the same journey in the 844x390 LANDSCAPE touch viewport
-// (the standing mobile capture rule) and interacts through the
-// mobile-interact button. --shots saves the three evidence screenshots
+// (the standing mobile capture rule) and taps the mobile-interact button
+// and crop controls through real touch input. --shots saves the evidence screenshots
 // (plant sheet open, the knob row, the harvest moment) into <dir> with a
 // -desktop/-mobile suffix. LOW graphics preset is seeded through localStorage
 // BEFORE boot (the standing screenshots-on-low rule).
@@ -162,6 +162,23 @@ async function main() {
     // bindTouchTap click path is the same handler a finger reaches), KeyF on
     // desktop. Never a window.__game verb.
     const touchActive = await page.evaluate(() => document.body.classList.contains('mobile-touch'));
+    // The world can exist while the loading curtain still covers the controls.
+    // A DOM click bypasses that curtain, but a player's touch must wait for it.
+    const activateControl = async (selector) => {
+      await page.waitForFunction(
+        (sel) => {
+          const control = document.querySelector(sel);
+          if (!control || control.disabled) return false;
+          const r = control.getBoundingClientRect();
+          const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+          return r.width > 0 && r.height > 0 && hit !== null && control.contains(hit);
+        },
+        { timeout: 30000, polling: 100 },
+        selector,
+      );
+      if (MOBILE) await page.tap(selector);
+      else await page.click(selector);
+    };
     const pressInteract = async () => {
       await dismissOverlays();
       await page.evaluate(() => {
@@ -169,7 +186,7 @@ async function main() {
         if (el && el !== document.body) el.blur?.();
       });
       if (MOBILE && touchActive) {
-        await page.evaluate(() => document.getElementById('mobile-interact')?.click());
+        await activateControl('#mobile-interact');
       } else {
         await page.keyboard.press('KeyF');
       }
@@ -219,6 +236,21 @@ async function main() {
         (selector) => document.querySelector(selector)?.textContent?.trim() ?? '',
         TRACKER_SELECTOR,
       );
+
+    const waitForCompletedObjective = (label) =>
+      MOBILE
+        ? waitForTrackerText(`${label}: 1/1`)
+        : page
+            .waitForFunction(
+              (expected) =>
+                [...document.querySelectorAll('#quest-tracker .qt-obj.done')].some((row) =>
+                  row.textContent.includes(expected),
+                ),
+              { timeout: 10000, polling: 200 },
+              label,
+            )
+            .then(() => true)
+            .catch(() => false);
 
     // The quest-row click can race a repaint: the row click and the
     // detail-button probe live in ONE evaluate, retried until the button is
@@ -287,11 +319,12 @@ async function main() {
     await wait(600);
     await shot('plant-sheet-open');
     await shotElement('#plant-sheet-window .ps-knobs', 'plant-sheet-knobs');
-    await page.evaluate(() => {
-      const root = document.querySelector('#plant-sheet-window');
-      root?.querySelector('[data-seed-crop="vale_wheat"]')?.click();
-      root?.querySelector('[data-plant]')?.click();
-    });
+    const activateCropControl = async (selector) => {
+      const target = `#plant-sheet-window ${selector}`;
+      await activateControl(target);
+    };
+    await activateCropControl('[data-seed-crop="vale_wheat"]');
+    await activateCropControl('[data-plant]');
     const sheetClosed = await page
       .waitForFunction(
         () => {
@@ -304,7 +337,7 @@ async function main() {
       .catch(() => false);
     if (!sheetClosed) fail('the plant sheet never closed after Plant (no farmPlanted)');
     ok('Plant clicked through the sheet DOM; the sheet closed on farmPlanted');
-    const plantedTracker = await waitForTrackerText('Vale Wheat planted');
+    const plantedTracker = await waitForCompletedObjective('Vale Wheat planted');
     if (!plantedTracker) fail('the tracker never showed the planted objective');
     const trackerText1 = await readTrackerText();
     ok(`tracker shows the plant objective: "${trackerText1.replace(/\s+/g, ' ')}"`);
@@ -319,8 +352,15 @@ async function main() {
     });
     ok(`issued /dev farmgrow; chat log answered: "${devLine.replace(/\s+/g, ' ').trim()}"`);
 
-    // ---- Harvest through the interact press -------------------------------
+    // ---- Open the crop choice, then explicitly harvest --------------------
     await pressInteract();
+    if (!(await waitVisible('#plant-sheet-window [data-harvest]', 10000)))
+      fail('the crop choice never offered Harvest');
+    const readyBeforeHarvest = await page.evaluate(() =>
+      window.__game.sim.myFarmPlots.some((plot) => plot.bedId === 'bed_eastbrook_1'),
+    );
+    if (!readyBeforeHarvest) fail('the interact press harvested without an explicit choice');
+    await activateCropControl('[data-harvest]');
     const harvested = await page
       .waitForFunction(
         () => (document.getElementById('chatlog')?.textContent || '').includes('You bring in:'),
@@ -335,8 +375,8 @@ async function main() {
       return log.slice(at, at + 60);
     });
     await shot('harvest-toast');
-    ok(`interact press harvested the ready plot: "${harvestLine.replace(/\s+/g, ' ').trim()}"`);
-    const harvestedTracker = await waitForTrackerText('Vale Wheat harvested');
+    ok(`explicit Harvest collected the ready plot: "${harvestLine.replace(/\s+/g, ' ').trim()}"`);
+    const harvestedTracker = await waitForCompletedObjective('Vale Wheat harvested');
     if (!harvestedTracker) fail('the tracker never showed the harvest objective complete');
     ok('tracker shows the harvest objective');
 
