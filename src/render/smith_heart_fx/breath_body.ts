@@ -46,6 +46,7 @@ import {
 } from '../../sim/encounters/smith_heart/breath_ids';
 import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
+import { fxAnchor } from '../attached_fx_anchor';
 import { wrapAngle } from '../facing_smooth';
 import { attachSceneGroupGated } from '../gated_scene_attach';
 import { GFX } from '../gfx';
@@ -825,7 +826,8 @@ export class BreathBody {
   // ---- the pose ------------------------------------------------------------------------------
 
   private pose(e: Entity, dt: number): void {
-    this.group.position.set(e.pos.x, e.pos.y, e.pos.z);
+    const eAt = fxAnchor(e);
+    this.group.position.set(eAt.x, eAt.y, eAt.z);
     if (e.dead) {
       this.poseDead(e);
       return;
@@ -1180,12 +1182,13 @@ export class BreathBody {
     look: BreathBodyLook,
     dt: number,
   ): void {
+    const eAt = fxAnchor(e);
     const mouth = this.joints[10];
     const sinY = Math.sin(this.yaw);
     const cosY = Math.cos(this.yaw);
-    const mxW = e.pos.x + mouth.x * cosY + mouth.z * sinY;
-    const mzW = e.pos.z - mouth.x * sinY + mouth.z * cosY;
-    const myW = e.pos.y + mouth.y;
+    const mxW = eAt.x + mouth.x * cosY + mouth.z * sinY;
+    const mzW = eAt.z - mouth.x * sinY + mouth.z * cosY;
+    const myW = eAt.y + mouth.y;
     if (look.mouth > 0 && this.rand() < dt * 22 * look.mouth * this.density) {
       // Breath pouring out of the horn's bell, along its yaw.
       this.particles.puff(mxW + sinY * 1.2, myW, mzW + cosY * 1.2, 2, {
@@ -1224,28 +1227,23 @@ export class BreathBody {
     }
     if ((look.tear > 0.2 || look.jitter > 0) && this.rand() < dt * 30 * this.density) {
       // Sparks off the core and the trembling seams.
-      const y = e.pos.y + 2 + this.rand() * 4;
-      this.particles.puff(
-        e.pos.x + (this.rand() - 0.5) * 3,
-        y,
-        e.pos.z + (this.rand() - 0.5) * 3,
-        2,
-        {
-          speed: 5,
-          life: 0.3,
-          size: [0.32, 0.06],
-          color: BREATH_BODY_COLORS.spark,
-          alpha: 1,
-          pool: 'glow',
-        },
-      );
+      const y = eAt.y + 2 + this.rand() * 4;
+      this.particles.puff(eAt.x + (this.rand() - 0.5) * 3, y, eAt.z + (this.rand() - 0.5) * 3, 2, {
+        speed: 5,
+        life: 0.3,
+        size: [0.32, 0.06],
+        color: BREATH_BODY_COLORS.spark,
+        alpha: 1,
+        pool: 'glow',
+      });
     }
   }
 
   /** The tear: the shell bursts out, a flash of white, a shake. */
   private tearBurst(e: Entity): void {
-    const y = e.pos.y + 4;
-    this.particles.puff(e.pos.x, y, e.pos.z, 36, {
+    const eAt = fxAnchor(e);
+    const y = eAt.y + 4;
+    this.particles.puff(eAt.x, y, eAt.z, 36, {
       speed: 12,
       up: 2,
       life: 0.9,
@@ -1255,7 +1253,7 @@ export class BreathBody {
       pool: 'glow',
       radius: 1.5,
     });
-    this.particles.puff(e.pos.x, y, e.pos.z, 16, {
+    this.particles.puff(eAt.x, y, eAt.z, 16, {
       speed: 8,
       up: 1,
       life: 1.6,
@@ -1265,15 +1263,16 @@ export class BreathBody {
       drag: 1.6,
       radius: 2,
     });
-    this.particles.shockRing(e.pos.x, e.pos.z, 0xe6faff, 14, 0.7);
-    this.particles.shockRing(e.pos.x, e.pos.z, 0x47b8ff, 26, 1.1);
-    this.shakeNear(e.pos.x, e.pos.z, 0.8, 70);
+    this.particles.shockRing(eAt.x, eAt.z, 0xe6faff, 14, 0.7);
+    this.particles.shockRing(eAt.x, eAt.z, 0x47b8ff, 26, 1.1);
+    this.shakeNear(eAt.x, eAt.z, 0.8, 70);
     this.stormFrom = Math.max(this.stormFrom, 0.3);
   }
 
   // ---- the death -----------------------------------------------------------------------------
 
   private poseDead(e: Entity): void {
+    const eAt = fxAnchor(e);
     if (this.deadAt < 0) {
       this.deadAt = this.seenAlive ? this.clock : this.clock - BREATH_FALL.end - 1;
       if (!this.seenAlive) {
@@ -1295,7 +1294,7 @@ export class BreathBody {
         p.holder.scale.setScalar(1);
       }
       if (this.seenAlive) {
-        this.particles.puff(e.pos.x, e.pos.y + 4, e.pos.z, 20, {
+        this.particles.puff(eAt.x, eAt.y + 4, eAt.z, 20, {
           speed: 6,
           up: 1,
           life: 0.7,
@@ -1305,8 +1304,8 @@ export class BreathBody {
           pool: 'glow',
           radius: 1.2,
         });
-        this.particles.shockRing(e.pos.x, e.pos.z, BREATH_BODY_COLORS.thread, 9, 0.8);
-        this.shakeNear(e.pos.x, e.pos.z, 0.5, 50);
+        this.particles.shockRing(eAt.x, eAt.z, BREATH_BODY_COLORS.thread, 9, 0.8);
+        this.shakeNear(eAt.x, eAt.z, 0.5, 50);
       }
     }
     this.group.rotation.y = this.yaw;
@@ -1327,8 +1326,8 @@ export class BreathBody {
       if (fall.landed && !p.landed) {
         p.landed = true;
         _a.copy(p.pos).applyAxisAngle(_up, this.yaw);
-        const x = e.pos.x + _a.x;
-        const z = e.pos.z + _a.z;
+        const x = eAt.x + _a.x;
+        const z = eAt.z + _a.z;
         const size = Math.max(p.def.size.x, p.def.size.y);
         this.particles.puff(x, this.groundY(x, z) + 0.2, z, Math.round(2 + size * 2), {
           speed: 1.5 + size,

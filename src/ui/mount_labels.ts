@@ -28,6 +28,7 @@ export const MOUNT_NAME_KEYS: Record<string, TranslationKey> = {
   nightwing_chimera: 'hudChrome.mounts.name_nightwing_chimera',
   referral_tank: 'hudChrome.mounts.name_referral_tank',
   referral_raptor: 'hudChrome.mounts.name_referral_raptor',
+  emberbristle_broom: 'hudChrome.mounts.name_emberbristle_broom',
 };
 
 export const MOUNT_DESC_KEYS: Record<string, TranslationKey> = {
@@ -47,6 +48,7 @@ export const MOUNT_DESC_KEYS: Record<string, TranslationKey> = {
   nightwing_chimera: 'hudChrome.mounts.desc_nightwing_chimera',
   referral_tank: 'hudChrome.mounts.desc_referral_tank',
   referral_raptor: 'hudChrome.mounts.desc_referral_raptor',
+  emberbristle_broom: 'hudChrome.mounts.desc_emberbristle_broom',
 };
 
 /** The localized mount name, falling back to the catalog's English label and

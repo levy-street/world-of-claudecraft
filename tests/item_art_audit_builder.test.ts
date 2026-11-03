@@ -589,7 +589,11 @@ describe('item-art audit builder', () => {
       updateItemArtAuditVerdict(
         {
           ...source,
-          evidence: { ...source.evidence, shippingCatalogSha256: '0'.repeat(64) },
+          evidence: {
+            ...source.evidence,
+            shippingCatalogSha256:
+              '1ce5db8bb37fa5ce649ebbe18dfc23033f71c30674578a65291856e750195d0b'.repeat(64),
+          },
         },
         build,
       ),
@@ -862,6 +866,9 @@ describe('item-art audit builder', () => {
     // the sha/bytes straight from `--verify-only` on this tree.
     // the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge): 1306 / 1324, re-minted on the merged tree.
     // Warfare Season 2: measured again with its four painted weapons, 1288 / 1306 on the release.
+    // 2066 / 2095 at the feature/v045-integration merge into feature/halloween-event:
+    // the integration's catalogue plus the 27 Gourdlight Eve event items, sha and bytes
+    // re-measured with `--verify-only` on the merged tree.
     expect(verified).toMatchObject({
       catalogPath: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
       // Re-minted on the quests integration branch: the catalog carries the 15
@@ -896,11 +903,11 @@ describe('item-art audit builder', () => {
       // + the sprite buddy's whistle render: 2186 / 2215, re-measured with --verify-only.
       // Release adds five painted owners; measured with --verify-only on the combined tree.
       // Restored feral staff and eight jewelry paintings; measured with --verify-only.
-      catalogSha256: '14c4ebd9b13939840b19ee2aae4374db4bd88bce88571f2b7953d5b587ce7deb',
-      catalogBytes: 1182978,
+      catalogSha256: '5ef9cee82541194673dc4768027c5f0b6f0667b11c63f251501db76473f75b58',
+      catalogBytes: 1196985,
       rendererFingerprint: '41f5404c4d6d9643c8f03b9d88a8546e44564cc03a1baabdd4a72cb9258a2da7',
-      catalogCount: 2164,
-      liveItemCount: 2193,
+      catalogCount: 2191,
+      liveItemCount: 2220,
       generatedHeroicDefinitions: 116,
       heroicDefinitionsWithOwnWebp: 86,
       heroicWeaponArtAliases: 30,
@@ -918,7 +925,7 @@ describe('item-art audit builder', () => {
         identity: 45,
       },
       sheetSetSha256: null,
-      shippingCatalogSha256: '21a26de395561c44c1fa71f4d0a808f5aedfb9619c51b2344f8a0a09a5aa4c65',
+      shippingCatalogSha256: '1ce5db8bb37fa5ce649ebbe18dfc23033f71c30674578a65291856e750195d0b',
       machineChecksPassed: true,
       verdict: null,
     });

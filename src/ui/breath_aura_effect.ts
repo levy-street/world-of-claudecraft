@@ -54,6 +54,10 @@ export function breathAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescri
       return { key: `${KEY}.portalA` };
     case BREATH_AURAS.portalB:
       return { key: `${KEY}.portalB` };
+    case BREATH_AURAS.portalC:
+      return { key: `${KEY}.portalC` };
+    case BREATH_AURAS.portalD:
+      return { key: `${KEY}.portalD` };
     case BREATH_AURAS.laden:
       return { key: `${KEY}.laden`, nums: { walk: pct(T.heartWalkMult) } };
     case BREATH_AURAS.anchor:

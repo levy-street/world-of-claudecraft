@@ -2453,6 +2453,80 @@ export class Vfx {
     );
   }
 
+  /** The Emberbristle Broom's trail (yaw = facing, forward = (sin yaw, cos yaw)): embers
+   *  shaken off its smouldering bristles, behind and a little below the rider, drifting
+   *  up and dying out; a slow trickle at rest, a sparkling stream on the move, now and
+   *  then a wisp of smoke. */
+  mountBroomSparks(at: THREE.Vector3, yaw: number, dt: number, moving: boolean): void {
+    if (!this.emitChance(moving ? 46 : 9, dt)) return;
+    const bx = -Math.sin(yaw);
+    const bz = -Math.cos(yaw);
+    const back = 1.9 + Math.random() * 0.6;
+    const drift = moving ? 1.6 : 0.3;
+    const smoke = Math.random() < 0.12;
+    this.spawn(
+      at.x + bx * back + (Math.random() - 0.5) * 0.55,
+      at.y + 0.55 + (Math.random() - 0.5) * 0.45,
+      at.z + bz * back + (Math.random() - 0.5) * 0.55,
+      bx * drift + (Math.random() - 0.5) * 0.5,
+      0.35 + Math.random() * 0.6,
+      bz * drift + (Math.random() - 0.5) * 0.5,
+      smoke ? 0x3a302a : Math.random() < 0.35 ? 0xffd27a : 0xff7a1e,
+      smoke ? 0.5 + Math.random() * 0.3 : 0.12 + Math.random() * 0.14,
+      smoke ? 1.2 + Math.random() * 0.6 : 0.55 + Math.random() * 0.5,
+      smoke ? -0.15 : 0.6,
+      smoke ? SPR.smoke : SPR.sparkle,
+    );
+  }
+
+  /** One free mote of the pooled point cloud at a world point (a seasonal toy's own
+   *  shapes: a ghost's wisps, a broom's sparks, a candle's mist). `kind` picks the sprite;
+   *  `rate` (per second, frame-rate independent through the quality-scaled emit count)
+   *  makes it a stream, or 0 for exactly one mote now. */
+  toyMote(
+    x: number,
+    y: number,
+    z: number,
+    vx: number,
+    vy: number,
+    vz: number,
+    color: number,
+    size: number,
+    life: number,
+    gravity: number,
+    kind: 'glow' | 'spark' | 'smoke' | 'wisp' | 'debris',
+    rate = 0,
+    dt = 0,
+  ): void {
+    const n = rate > 0 ? this.emitCount(rate, dt) : 1;
+    const sprite =
+      kind === 'spark'
+        ? SPR.sparkle
+        : kind === 'smoke'
+          ? SPR.smoke
+          : kind === 'wisp'
+            ? SPR.magicWisp
+            : kind === 'debris'
+              ? SPR.debris
+              : SPR.glowSoft;
+    for (let i = 0; i < n; i++) {
+      const j = n > 1 ? 0.12 : 0;
+      this.spawn(
+        x + (Math.random() - 0.5) * j,
+        y + (Math.random() - 0.5) * j,
+        z + (Math.random() - 0.5) * j,
+        vx,
+        vy,
+        vz,
+        color,
+        size,
+        life,
+        gravity,
+        sprite,
+      );
+    }
+  }
+
   /** Fluid-pool bubble: a small tinted puff that pops just above the surface. */
   fluidBubble(x: number, y: number, z: number, color: number, dt: number, rate: number): void {
     if (!this.emitChance(rate, dt)) return;

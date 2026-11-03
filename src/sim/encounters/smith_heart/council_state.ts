@@ -5,6 +5,7 @@
 // (castingAbility, castTargetId), the auras on the players, the energy bar
 // (the holder's resource) and the pillar, rubble and rise-spot objects.
 
+import type { FloorMechanic } from './council_floor_gap';
 import type { CouncilDifficulty, CouncilRole } from './council_ids';
 
 /** A player mark counting down (Wake the Stone, Falling Rock). */
@@ -122,4 +123,9 @@ export interface CouncilFightState {
   souls: CouncilSoul[];
   /** Mythic: the souls whose pillar burst this pull (never taken again). */
   soulsSpent: CouncilRole[];
+  /** The floor gap (council_floor_gap.ts): the fight clock of the last floor
+   *  mechanic's start (null before the first), and the seconds each one has
+   *  waited on the gap since its own last start. */
+  lastFloorAt: number | null;
+  floorHeld: Partial<Record<FloorMechanic, number>>;
 }

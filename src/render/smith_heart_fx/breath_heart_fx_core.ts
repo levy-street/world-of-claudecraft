@@ -1,18 +1,28 @@
 // Pure plan of the Knotted Gale's look (breath_heart_fx.ts paints it; the sim is
 // encounters/smith_heart/breath_heart.ts): which object a template is, the ball
 // growing and more violent as its fuse runs out, the shrinking ring that IS its
-// timer, the two portals told apart by colour and letter, the throw's arc and the
+// timer, the portals told apart by colour, letter and pattern (phase 2's second pair
+// a bright family of its own, swirling the other way), the throw's arc and the
 // burst's timeline. The sim's numbers are read (breath_ids.ts), never tuned here.
 //
 // Three-free, DOM-free, deterministic.
 
 import { BREATH, CORNICE_GAPS } from '../../sim/content/smith_heart_layout';
-import { BREATH_OBJECTS, BREATH_TUNING as T } from '../../sim/encounters/smith_heart/breath_ids';
+import {
+  BREATH_AURAS,
+  BREATH_OBJECTS,
+  BREATH_TUNING as T,
+} from '../../sim/encounters/smith_heart/breath_ids';
 
-/** Portal A the storm's teal, Portal B its violet, the fuse's end the lethal red. */
+/** Portal A the storm's teal, Portal B its violet (the first pair, cool); Portal
+ *  C its spring green, Portal D its rose (the second pair, phase 2 only: a bright
+ *  family of its own, never a shade of the first's); the fuse's end the lethal red.
+ *  The HUD's alert borders match (tokens.css --color-knot-portal-c and -d). */
 export const HEART_COLORS = {
   a: 0x48f0d8,
   b: 0xb478ff,
+  c: 0xa8ff3e,
+  d: 0xff5ab0,
   core: 0xdcecff,
   storm: 0x8fb4ff,
   danger: 0xff4a3a,
@@ -36,18 +46,85 @@ export function heartRungs(): number[] {
   return Object.values(HEART_FLOOR);
 }
 
-/** Pools: two balls and two portals is all the sim makes; marks are spare by one. */
-export const HEART_POOLS = { knots: 2, marks: 3, flights: 2, bursts: 1 } as const;
+/** Pools: two balls, four portals (two pairs) and two links is all the sim
+ *  makes; marks are spare by one. */
+export const HEART_POOLS = {
+  knots: 2,
+  portals: 4,
+  links: 2,
+  marks: 5,
+  flights: 2,
+  bursts: 1,
+} as const;
 
-export type HeartObjectKind = 'knot' | 'portalA' | 'portalB';
+export type HeartPortalSide = 'A' | 'B' | 'C' | 'D';
+export type HeartObjectKind = 'knot' | 'portalA' | 'portalB' | 'portalC' | 'portalD';
+
+/** Every portal side in pool order: the first pair, then the second. */
+export const HEART_SIDES: readonly HeartPortalSide[] = ['A', 'B', 'C', 'D'];
 
 /** Which of this mechanic's objects a template is, or null. */
 export function heartObjectKind(templateId: string): HeartObjectKind | null {
   if (templateId.startsWith(BREATH_OBJECTS.knotPrefix)) return 'knot';
   if (templateId === BREATH_OBJECTS.portalA) return 'portalA';
   if (templateId === BREATH_OBJECTS.portalB) return 'portalB';
+  if (templateId === BREATH_OBJECTS.portalC) return 'portalC';
+  if (templateId === BREATH_OBJECTS.portalD) return 'portalD';
   return null;
 }
+
+/** The portal side an object kind names (null for the ball). */
+export function portalSideOfKind(kind: HeartObjectKind): HeartPortalSide | null {
+  if (kind === 'portalA') return 'A';
+  if (kind === 'portalB') return 'B';
+  if (kind === 'portalC') return 'C';
+  if (kind === 'portalD') return 'D';
+  return null;
+}
+
+/** The side a mark aura names, or null. */
+export function markSideOf(auraId: string): HeartPortalSide | null {
+  if (auraId === BREATH_AURAS.portalA) return 'A';
+  if (auraId === BREATH_AURAS.portalB) return 'B';
+  if (auraId === BREATH_AURAS.portalC) return 'C';
+  if (auraId === BREATH_AURAS.portalD) return 'D';
+  return null;
+}
+
+export interface PortalSideLook {
+  /** Its slot in the portal pool (side order). */
+  slot: number;
+  /** 0 the first pair (A, B), 1 the second (C, D). */
+  pair: 0 | 1;
+  color: number;
+  /** The mouth's arms of wind: four for the first pair, three for the second. */
+  arms: number;
+  /** Which way the mouth and the funnel turn: the second pair the other way. */
+  spin: 1 | -1;
+  /** 1: a second, inner rim on the mouth (the second pair). */
+  ring2: 0 | 1;
+}
+
+/** A portal side's look: the colour, and the pattern that tells the pairs apart
+ *  even to an eye that cannot tell the colours apart. */
+export function portalSideLook(side: HeartPortalSide): PortalSideLook {
+  const slot = HEART_SIDES.indexOf(side);
+  const pair = slot >= 2 ? 1 : 0;
+  const color = [HEART_COLORS.a, HEART_COLORS.b, HEART_COLORS.c, HEART_COLORS.d][slot];
+  return {
+    slot,
+    pair,
+    color,
+    arms: pair === 0 ? 4 : 3,
+    spin: pair === 0 ? 1 : -1,
+    ring2: pair === 0 ? 0 : 1,
+  };
+}
+
+/** How high each pair's link of light rides over the higher mouth (yards): the
+ *  first pair's beam at the waist, the second pair's braid above it, so two
+ *  links that cross never merge into one. */
+export const LINK_Y = [1.4, 2.3] as const;
 
 /** The fuse now: the template's half second, run down since it last changed. */
 export function liveFuse(templateFuse: number, sinceChange: number): number {

@@ -219,10 +219,20 @@ describe('CouncilFx over a fake world', () => {
     expect(shown('smithHeartPillarPips')).toBe(2);
     expect(shown('smithHeartResonanceRing')).toBe(1);
     expect(shown('smithHeartResonanceThread')).toBe(1);
-    // The soak reads from afar: its countdown rim, its beacon, the rock's shadow.
+    // The soak reads from afar: its countdown rim, its beacon, and the rock's
+    // shadow drawn by the stone paint under the marked player (its char pass,
+    // so the fissures burn through it), heating as the rock comes.
     expect(shown('smithHeartSoakRim')).toBe(1);
     expect(shown('smithHeartSoakBeacon')).toBe(1);
-    expect(shown('smithHeartSoakShadow')).toBe(1);
+    let soakPaint: THREE.ShaderMaterial | undefined;
+    root?.traverse((c) => {
+      const m = (c as THREE.Mesh).material as THREE.ShaderMaterial | undefined;
+      if (c.name === 'smithHeartCouncilTelegraph' && c.visible && m?.uniforms?.uShadow?.value > 0)
+        soakPaint = m;
+    });
+    expect(soakPaint).toBeDefined();
+    expect(soakPaint?.uniforms.uShadow.value).toBeLessThan(1);
+    expect(soakPaint?.uniforms.uHeat.value).toBeGreaterThan(0);
     // The Wrath's real shadow behind both pillars, with its light curtains.
     expect(shown('smithHeartShelter:wrath')).toBe(2);
     expect(shown('smithHeartShelterCurtain:wrath')).toBe(2);

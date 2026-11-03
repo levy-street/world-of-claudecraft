@@ -690,7 +690,8 @@ the click-pick router remains `src/game/interactions.ts`.
 Nameplates stay renderer-owned positioned DOM (`src/render/nameplate_view.ts` +
 `nameplate_painter.ts`) with their documented colors-as-literals exception. Plates draw at
 their own projected anchors and are never stacked apart; NPC plates show only up close
-(`NPC_NAMEPLATE_RANGE`) and carry just the name, role line and quest marker. Restyle within
+(`NPC_NAMEPLATE_RANGE`) and carry just the name, role line and quest marker. Beyond that, out
+to the normal `NAMEPLATE_RANGE`, a quest giver shows its quest marker alone. Restyle within
 those constraints:
 
 - Names in 13 / 15 Cinzel with the four-way black outline; no panel background on standard
@@ -699,7 +700,7 @@ those constraints:
   bars, guild tags, and badges all keep their slots; the current target's plate is always
   visible and slightly larger, coordinated with the selection ring in the world. NPC plates
   are the exception: name, role line and quest marker only, inside `NPC_NAMEPLATE_RANGE`,
-  targeted or not.
+  targeted or not, and just the quest marker beyond it.
 - The update cadence stays on the static tier knob (`nameplateIntervalSec` in
   `src/game/ui_tier_knobs.ts`), never the FPS governor.
 

@@ -598,6 +598,17 @@
       }
     ]
   },
+  "gurglegreen_bubble_loop": {
+    "ceilingDb": 6.3,
+    "tracks": [
+      {
+        "filename": "gurglegreen_bubble_loop.mp3",
+        "sha256": "468c032afd98d18f19530a53c09dd86e0a9155c3f8d3850c13aebdd191f6fed1",
+        "size": 97846,
+        "peakDb": -7.3
+      }
+    ]
+  },
   "hammer_of_justice": {
     "ceilingDb": 6.3,
     "tracks": [
@@ -788,6 +799,17 @@
       }
     ]
   },
+  "impact_gourdfall": {
+    "ceilingDb": 6.7,
+    "tracks": [
+      {
+        "filename": "impact_gourdfall.mp3",
+        "sha256": "290c876bd9a83d4f5d42fa6f7dbe6417284ed21ee57e6311f7889c202458cd44",
+        "size": 31391,
+        "peakDb": -7.7
+      }
+    ]
+  },
   "impact_holy": {
     "ceilingDb": 6.5,
     "tracks": [
@@ -879,6 +901,17 @@
       }
     ]
   },
+  "impact_prank_pumpkin_splat": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "impact_prank_pumpkin_splat.mp3",
+        "sha256": "92cca71b3e05f80ed557f4a4dc94bba131ff5b03fd88f393e65da933d6cdac1a",
+        "size": 23240,
+        "peakDb": -6.2
+      }
+    ]
+  },
   "impact_shadow": {
     "ceilingDb": 6.1,
     "tracks": [
@@ -887,6 +920,17 @@
         "sha256": "1b746f7ec984ca5368462bc3747f8135057ebf209f565828df12bb061358d584",
         "size": 30763,
         "peakDb": -7.1
+      }
+    ]
+  },
+  "impact_swelling_gourd_burst": {
+    "ceilingDb": 6.2,
+    "tracks": [
+      {
+        "filename": "impact_swelling_gourd_burst.mp3",
+        "sha256": "22d856bdb1dae9ab31695ecbe88981073e91e72564f1b9a37316688e043a9bf6",
+        "size": 63991,
+        "peakDb": -7.2
       }
     ]
   },
@@ -3861,6 +3905,17 @@
       }
     ]
   },
+  "mount_idle_emberbristle_broom": {
+    "ceilingDb": 6.1,
+    "tracks": [
+      {
+        "filename": "mount_idle_emberbristle_broom.mp3",
+        "sha256": "37ff72477f0b36590161849de8132556e6dc38f7c468595959b756b120e94647",
+        "size": 73395,
+        "peakDb": -7.1
+      }
+    ]
+  },
   "mount_idle_mech_bird": {
     "ceilingDb": 9.5,
     "tracks": [
@@ -4068,6 +4123,17 @@
         "sha256": "b01e419b817154035271ee47bf23e051fda675a6ab9ef61ebefbfabbf3379e2c",
         "size": 11328,
         "peakDb": -6.2
+      }
+    ]
+  },
+  "mount_run_emberbristle_broom": {
+    "ceilingDb": 4.8,
+    "tracks": [
+      {
+        "filename": "mount_run_emberbristle_broom.mp3",
+        "sha256": "1648d8106f48efe309004cd56aad6f33068c5526300f495b7232dc3029c8c651",
+        "size": 15090,
+        "peakDb": -5.8
       }
     ]
   },
@@ -4712,6 +4778,17 @@
       }
     ]
   },
+  "proj_gourdfall_whistle": {
+    "ceilingDb": 5.8,
+    "tracks": [
+      {
+        "filename": "proj_gourdfall_whistle.mp3",
+        "sha256": "f5f9e6df5162f643ca09bce4192ba73fb5fb2bf4186a92c05732f286c82f4995",
+        "size": 24494,
+        "peakDb": -6.8
+      }
+    ]
+  },
   "proj_holy": {
     "ceilingDb": 5.6,
     "tracks": [
@@ -4954,6 +5031,39 @@
       }
     ]
   },
+  "spell_gurglegreen_cauldron": {
+    "ceilingDb": 6.3,
+    "tracks": [
+      {
+        "filename": "spell_gurglegreen_cauldron.mp3",
+        "sha256": "db78288acaf691587bd3742dc3ef1ff717963da36bbe83edf2b54728fecb7e63",
+        "size": 40168,
+        "peakDb": -7.3
+      }
+    ]
+  },
+  "spell_gurglegreen_quaff": {
+    "ceilingDb": 5.5,
+    "tracks": [
+      {
+        "filename": "spell_gurglegreen_quaff.mp3",
+        "sha256": "9e6c6f3ea2c366b6237301d58bf61703dc2a46d72af7f10191f5ce621e418973",
+        "size": 37660,
+        "peakDb": -6.5
+      }
+    ]
+  },
+  "spell_murmurwick_candle": {
+    "ceilingDb": 6,
+    "tracks": [
+      {
+        "filename": "spell_murmurwick_candle.mp3",
+        "sha256": "2b8e2c3d4bc103af1623409554bc83578f5c04fa6abd5554bd11a1c97f0651ad",
+        "size": 47064,
+        "peakDb": -7
+      }
+    ]
+  },
   "spell_nova": {
     "ceilingDb": 6.5,
     "tracks": [
@@ -4962,6 +5072,39 @@
         "sha256": "a235d6378e504a68ee6607776047017d3d5b31fb900a3d7ac851827bbb576857",
         "size": 43301,
         "peakDb": -7.5
+      }
+    ]
+  },
+  "spell_startled_bats": {
+    "ceilingDb": 6,
+    "tracks": [
+      {
+        "filename": "spell_startled_bats.mp3",
+        "sha256": "5da405af9cc44925db65a1bcc8db5845fa4cd9d4964e2fc5a0c9cfe0174841f3",
+        "size": 58976,
+        "peakDb": -7
+      }
+    ]
+  },
+  "spell_swelling_gourd_pulse": {
+    "ceilingDb": 5.3,
+    "tracks": [
+      {
+        "filename": "spell_swelling_gourd_pulse.mp3",
+        "sha256": "b9fcd3895f2069dc5c666ad5de8dd6a4b28a829af2de9cd9508cc25bfd576e23",
+        "size": 16344,
+        "peakDb": -6.3
+      }
+    ]
+  },
+  "spell_wanderwisp_lantern": {
+    "ceilingDb": 6.2,
+    "tracks": [
+      {
+        "filename": "spell_wanderwisp_lantern.mp3",
+        "sha256": "5e83186075285d7847ff8a1e5047c849bc005d8f22e2a7c5cf47f45231dd14d0",
+        "size": 54587,
+        "peakDb": -7.2
       }
     ]
   },

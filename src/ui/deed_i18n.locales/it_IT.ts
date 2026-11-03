@@ -1437,4 +1437,49 @@ export const table: DeedLocaleTable = {
     desc: 'Acquistato da Garrick Holt, quartiermastro della Sala della Lanterna, per 24 Sigilli della Lanterna.',
     title: 'della Sala della Lanterna',
   },
+  feat_gourdlight_guise: {
+    name: 'Travestimento della Notte delle zucche',
+    desc: 'Possiedi una Testa di zucca intagliata, presa al Vecchio Thatchgrin nel suo campo oltre il Prato dei cinghiali durante la Notte delle zucche.',
+  },
+  feat_old_thatchgrin: {
+    name: 'Stoppie e cenere',
+    desc: 'Aiuta a sconfiggere il Vecchio Thatchgrin nel suo orto di zucche oltre il Prato dei cinghiali durante la Notte delle zucche.',
+  },
+  feat_title_gourdlit: {
+    name: 'L’Illuminato dalle zucche',
+    desc: 'Leggi una Pergamena dell’Illuminato dalle zucche, ottenuta da Hester Gourdwick in cambio di Dolcetti della Notte delle zucche durante l’evento.',
+    title: 'l’Illuminato dalle zucche',
+  },
+  feat_title_trickster: {
+    name: 'Burlone',
+    desc: 'Leggi una Pergamena del Burlone, ottenuta da Hester Gourdwick in cambio di Dolcetti della Notte delle zucche durante l’evento.',
+    title: 'Burlone',
+  },
+  feat_title_hollow_grinned: {
+    name: 'Il Sorriso cavo',
+    desc: 'Leggi una Pergamena del Sorriso cavo, ottenuta da Hester Gourdwick in cambio di Dolcetti della Notte delle zucche durante l’evento.',
+    title: 'dal Sorriso cavo',
+  },
+  feat_pumpkin_hunter: {
+    name: 'Cacciatore di zucche',
+    desc: 'Trova tutte le Zucche infestate nascoste nel mondo durante la Notte delle zucche.',
+    title: 'il Cavo',
+  },
+  feat_gourdlight_doorsteps: {
+    name: 'Ogni soglia',
+    desc: 'Chiedi dolcetto o scherzetto a tutti gli abitanti che rispondono alla porta a Eastbrook, Fenbridge e Highwatch durante la Notte delle zucche.',
+  },
+  feat_gourdlight_errands: {
+    name: 'Agli ordini di Hester',
+    desc: 'Completa almeno una volta ciascuna delle commissioni a rotazione di Hester Gourdwick per la Notte delle zucche.',
+  },
+  feat_gourdlight_frights: {
+    name: 'Tre città spaventate',
+    desc: 'Durante la commissione Bu! di Hester, spaventa un abitante in ciascuna città: Eastbrook, Fenbridge e Highwatch.',
+  },
+  feat_gourdlight_eve_complete: {
+    name: 'La Notte delle zucche dall’inizio alla fine',
+    desc: 'Completa tutta la Notte delle zucche: sconfiggi il Vecchio Thatchgrin, trova tutte le Zucche infestate, completa ogni commissione di Hester, bussa a ogni porta e spaventa un abitante in ciascuna delle tre città.',
+    title: 'il Giurato delle zucche',
+  },
 };

@@ -1133,6 +1133,7 @@ const SANCTUM_EXIT_DUNGEON = 'gravewyrm_sanctum';
  */
 export function buildDoorPrewarmBodies(lowGfx: boolean): THREE.Group {
   const group = new THREE.Group();
+  group.name = 'door-material-prewarm';
   const bodies = [
     buildDoorBody(true, null, lowGfx).body,
     buildDoorBody(false, null, lowGfx).body,

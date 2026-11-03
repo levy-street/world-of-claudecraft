@@ -363,6 +363,16 @@ describe('tinted character materials', () => {
       expect(drop.out.emissive.r).toBeCloseTo(dropExpected.r, 6);
       const kitWeapon = derive({ authoredAtlas: true } as VisualDef, 'weapon');
       expect(kitWeapon.out.emissiveMap).toBeNull();
+
+      // Raid mobs with authored selfIllumination carry their higher floor on the low tier too,
+      // even when authoredAtlas is omitted.
+      const raidBoss = derive(
+        { authoredAtlas: false, selfIllumination: 0.18 } as VisualDef,
+        'body',
+      );
+      expect(raidBoss.out.emissiveMap).toBe(raidBoss.atlas);
+      const bossExpected = raidBoss.out.color.clone().multiplyScalar(0.18);
+      expect(raidBoss.out.emissive.r).toBeCloseTo(bossExpected.r, 6);
     } finally {
       restoreGfx();
     }

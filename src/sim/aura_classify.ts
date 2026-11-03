@@ -97,6 +97,8 @@ const DEBUFF_DISPLAY_AURA_IDS: ReadonlySet<string> = new Set([
   'heart_breath_calm_spent',
   'heart_breath_portal_a',
   'heart_breath_portal_b',
+  'heart_breath_portal_c',
+  'heart_breath_portal_d',
   'heart_breath_laden',
   // The Guardian of the Quench's cold bar (encounters/smith_heart/quench_ids.ts):
   // the hazard every player watches, so it sits on the debuff bar.
@@ -239,6 +241,8 @@ const PARTY_FRAME_HELPFUL_IDS: ReadonlySet<string> = new Set([
 const PARTY_FRAME_EXCLUDED_KINDS: ReadonlySet<AuraKind> = new Set<AuraKind>([
   'sated',
   'cheater_mark',
+  // a worn pumpkin or a trick: cosmetic, never worth a healer's frame slot
+  'seasonal_cosmetic',
 ]);
 
 /** Effects worth surfacing on a compact party/raid frame. Generic maintenance

@@ -1038,14 +1038,14 @@ export const nl_NL: EnTranslations = {
       "fateThreadsSentenceReady": "Drie Lotsdraden: Vonnis kan ze verbruiken voor 18% meer schade."
     },
     "priest": {
-      "gloomtitheLabel": "Gloomtithe",
-      "bombLabel": "Tithe Bomb",
-      "gloomtitheStatus": "{value} of {max} Gloomtithe",
-      "bombStatus": "{value} of {max} Tithe Bomb charges",
-      "bombReady": "Ready",
+      "gloomtitheLabel": "Schemertiende",
+      "bombLabel": "Tiendbom",
+      "gloomtitheStatus": "{value} van {max} Schemertiende",
+      "bombStatus": "{value} van {max} Tiendbomladingen",
+      "bombReady": "Klaar",
       "chargeCount": "{value} / {max}",
-      "gloomtitheTooltip": "Gloomtithe: up to 5 spendable charges. Void Rupture consumes 3; Vampiric Touch consumes 2 for 30% more damage; Call Tithefiend consumes your bank. Generating charges also fills Tithe Bomb, even while this bank is full.",
-      "bombTooltip": "Tithe Bomb: generate 20 Gloomtithe to prepare one bomb. Spending Gloomtithe does not add progress. Progress lasts between fights. Dying or starting a raid boss resets it. A completed cast consumes the bomb; cancelling keeps it."
+      "gloomtitheTooltip": "Schemertiende: maximaal 5 besteedbare ladingen. Leegtescheuring verbruikt er 3; Vampieraanraking verbruikt er 2 voor 30% meer schade; Roep Tiendduivel op verbruikt je hele voorraad. Ladingen genereren vult ook de Tiendbom, zelfs als deze voorraad vol is.",
+      "bombTooltip": "Tiendbom: genereer 20 ladingen Schemertiende om één bom voor te bereiden. Schemertiende uitgeven voegt geen voortgang toe. Voortgang blijft tussen gevechten behouden. Sterven of een gevecht met een raidbaas beginnen zet de voortgang terug op nul. Een voltooide spreuk verbruikt de bom; annuleren behoudt hem."
     },
     "procOverlay": {
       "soulFragmentsMeter": "Zielfragmenten",
@@ -2600,6 +2600,7 @@ export const nl_NL: EnTranslations = {
       "name_lantern_hall_destrier": "Lantaarnhalstrijdros",
       "name_chimeglass_tortoise": "Tolliver het klokkenspel",
       "name_rickshaw_mount": "Beengebonden Riksja",
+      "name_emberbristle_broom": "Sintelborstelbezem",
       "name_wobbles_slime": "Wobbles het Slijmwezen",
       "name_nightwing_chimera": "Nachtvleugelchimera",
       "desc_valorsteed": "Een sterk, tredzeker ros met een leren zadel.",
@@ -2623,7 +2624,8 @@ export const nl_NL: EnTranslations = {
       "desc_lantern_hall_destrier": "Het oorlogspaard van Lantaarnhal, geharnast in eikenhout en ijzer onder het blauw van het gilde. Twee stormlantaarns zwaaien aan zijn zadel en verlichten de weg naar huis.",
       "desc_nightwing_chimera": "Een tweekoppige schemerwyvern uit de oude takken, in rust op achterpoten met klauwen en laag boven de grond scherend op vleugels met arcane graveringen.",
       "desc_chimeglass_tortoise": "Een zoutvlakteschildpad die drie generaties karavanen is ontlopen. Tinkers hebben een bril van stormglas voor hem geslepen en een bronzen bel om zijn keel gehangen, zodat de weg hem lang hoort voordat hij hem ziet.",
-      "desc_rickshaw_mount": "Een ratelende bottenkar met een benige handlanger aan de disselbomen, die je in volle vaart voortsleurt."
+      "desc_rickshaw_mount": "Een ratelende bottenkar met een benige handlanger aan de disselbomen, die je in volle vaart voortsleurt.",
+      "desc_emberbristle_broom": "Een oogstbezem met een oranje lint die een handbreedte boven de grond zweeft en sintels uit zijn borstelharen strooit. Een blijvende beloning van Pompoenlichtavond."
     },
     "mountTraining": {
       "mountPrompt": "Druk op {key} om op de trainings-Moedros te stijgen.",
@@ -4672,7 +4674,10 @@ export const nl_NL: EnTranslations = {
       }
     },
     "auraEffect": {
-      "stilledMindCrit": "Your next Mindfracture or Void Rupture is a guaranteed critical strike if it hits. Other spells do not consume this bonus. Void Rupture still consumes 3 Gloomtithe charges. A resisted cast consumes the bonus.",
+      "gourdlight": {
+        "thatchbound": "Oude Thatchgrin trekt aan je touwtjes. Je kunt niets doen: je wordt naar je dichtstbijzijnde bondgenoot geleid en slaat die elke {every} sec. voor {min} tot {max} schade (tot {mult} keer zoveel tegen een bondgenoot van niveau {level}). Eindigt eerder als je schade gelijk aan {pct}% van je maximale gezondheid oploopt of als een bondgenoot het effect verdrijft (Magie)."
+      },
+      "stilledMindCrit": "Je volgende Geestbreuk of Leegtescheuring is gegarandeerd een kritieke treffer als deze raakt. Andere spreuken verbruiken deze bonus niet. Leegtescheuring verbruikt nog steeds 3 ladingen Schemertiende. Een weerstane spreuk verbruikt de bonus.",
       "wildheart": {
         "packBond": "Krijgt {pct}% minder schade zolang zijn partner dichtbij staat. Trek de Beestenmeester en zijn jaguar uit elkaar om dit te verbreken.",
         "packBondFury": "Doet {pct}% meer schade zolang zijn partner dichtbij staat.",
@@ -4753,7 +4758,9 @@ export const nl_NL: EnTranslations = {
       "breathGuardian": {
         "portalA": "When this ends, Portal A opens exactly where you stand. Stand near the Knotted Gale. You cannot carry it this round.",
         "portalB": "When this ends, Portal B opens exactly where you stand. Stand at the lip of a gap. You cannot carry the Knotted Gale this round.",
-        "laden": "You carry a Knotted Gale: you walk at {walk}% speed, you cannot blink, charge or leap, and no wind, pull, blast or throw can move you. Either portal takes you to the other. Press Interact at the lip of any gap to throw it into the void. When this ends it bursts and kills everyone on the Cornice.",
+        "portalC": "When this ends, Portal C opens exactly where you stand. It links to Portal D only. Stand near the other Knotted Gale. You cannot carry it this round.",
+        "portalD": "When this ends, Portal D opens exactly where you stand. It links to Portal C only. Stand at the lip of a gap away from Portal B. You cannot carry the Knotted Gale this round.",
+        "laden": "You carry a Knotted Gale: you walk at {walk}% speed, you cannot blink, charge or leap, and no wind, pull, blast or throw can move you. Each portal takes you to its partner: A to B, C to D. Press Interact at the lip of any gap to throw it into the void. When this ends it bursts and kills everyone on the Cornice.",
         "wind": "The Guardian of the Breath's wind carries you {speed} yd a second the way it blows. Walk against it to hold your ground; it does not interrupt your casts. Pressed against the rim's wall you take {pinMin} to {pinMax} damage every second. Where the wall is broken there is nothing to stop you: you fall into the void.",
         "draw": "The Guardian draws breath and pulls you toward it, {speed} yd a second. Its vortex deals {min} to {max} damage every {tick} sec to whoever stands before its mouth. Then Bellows Gust deals {gustMin} to {gustMax} damage to everyone on the Cornice and throws them {throw} yd outward.",
         "pinned": "Pressed against the rim's wall by the wind: {min} to {max} damage every second until the wind falls calm or you walk clear of the wall.",
@@ -4860,6 +4867,7 @@ export const nl_NL: EnTranslations = {
       "spellHaste": "Verhoogt de bezweringssnelheid met {pct}%",
       "sated": "Kan niet profiteren van nog een groepshaast-effect",
       "cauterizeFatigue": "Cauteriseren kan geen volgende dodelijke treffer voorkomen",
+      "seasonalCosmetic": "Alleen cosmetisch: geen invloed op gevechten",
       "castShield": "Bezweren kan niet worden onderbroken of vertraagd door schade",
       "dmgDone": "Verhoogt aangerichte schade met {pct}%",
       "dmgDoneReduce": "Vermindert aangerichte schade met {pct}%",
@@ -5007,6 +5015,7 @@ export const nl_NL: EnTranslations = {
       "dodgeReduce": "Verringert Ausweichchance um {pct}%",
       "damageReduction": "Vermindert alle schade die je oploopt met {pct}%",
       "slumber": "Slaapt tot de dageraad. Kan niet worden aangevallen en wordt voor niemand wakker.",
+      "slumberNight": "Hangt levenloos aan zijn paal tot de nacht valt. Kan niet worden aangevallen.",
       "guardianWard": "De volgende dodelijke vijandelijke treffer herstelt je in plaats daarvan naar {pct}% gezondheid",
       "armorFlat": "Verringert Rüstung um {value}",
       "armorFlatStacks": "Verringert Rüstung um {value} ({stacks} Stapel)",
@@ -5086,7 +5095,8 @@ export const nl_NL: EnTranslations = {
     "worldBoss": {
       "spawn": "{name} verrijst boven {zone}!",
       "wake": "{name} ontwaakt boven {zone}!",
-      "sleep": "{name} slaapt tot de dageraad."
+      "sleep": "{name} slaapt tot de dageraad.",
+      "sleepUntilNightfall": "{name} slaapt tot de nacht valt."
     },
     "auth": {
       "appleLoginCta": "Ga verder met Apple",
@@ -7350,8 +7360,12 @@ export const nl_NL: EnTranslations = {
       "aLine": "It opens at your feet in {seconds} sec. Stand near the Knotted Gale.",
       "bTitle": "You are Portal B!",
       "bLine": "It opens at your feet in {seconds} sec. Stand at the lip of a gap.",
+      "cTitle": "You are Portal C!",
+      "cLine": "It opens at your feet in {seconds} sec. Stand near the other Knotted Gale.",
+      "dTitle": "You are Portal D!",
+      "dLine": "It opens at your feet in {seconds} sec. Stand at a gap away from Portal B.",
       "carryTitle": "You carry the Knotted Gale!",
-      "carryLine": "Either portal takes you to the other. Throw it from the lip of a gap. It bursts in {seconds} sec.",
+      "carryLine": "Each portal takes you to its partner: A to B, C to D. Throw it from the lip of a gap. It bursts in {seconds} sec.",
       "lipTitle": "Throw it now!",
       "lipLine": "You stand at the lip of a gap. It bursts in {seconds} sec.",
       "throwKey": "Press {key} at the lip to throw",
@@ -7373,6 +7387,7 @@ export const nl_NL: EnTranslations = {
         "stormGust": "A storm gust gathers! Brace against the wind!",
         "knot": "A Knotted Gale falls! Carry it to a gap and throw it into the void!",
         "knotPortals": "Portal A on {a}, Portal B on {b}!",
+        "knotPortals2": "Portal C on {c}, Portal D on {d}!",
         "knotTaken": "{player} takes up the Knotted Gale!",
         "knotDropped": "{player} falls! The Knotted Gale is free again!",
         "knotFell": "{player} takes the Knotted Gale into the void!",
@@ -8607,6 +8622,107 @@ export const nl_NL: EnTranslations = {
         "0": "Goede compost, de bedden zullen leven. De oude molenaar begroef iets voordat hij vertrok. Zijn molen draait nog steeds in de verre hoek van de tuinen. Ga daar staan.",
         "2": "Dus de molen stuurde je de kustweg af. Het baken houdt een laatste geheim: noordwestelijk ervan, net buiten het pad, was het gras gesneden en terugelegd. Graaf daar."
       }
+    }
+  },
+  "seasonal": {
+    "pumpkins": {
+      "name": "Spookpompoen",
+      "title": "Spookpompoenen",
+      "world": "Wereld",
+      "progress": "{label}: {current}/{total}",
+      "found": "Je steekt een Spookpompoen in {zone} aan: {count}/{total}. Ontvangen Pompoenlichtsnoepjes: {sweets}.",
+      "flash": "Spookpompoen gevonden! {count}/{total}"
+    },
+    "event": {
+      "gourdlight_eve": {
+        "name": "Pompoenlichtavond"
+      }
+    },
+    "trickOrTreat": {
+      "row": "Snoep of een streek!",
+      "rowAria": "Vraag {name} om snoep of een streek",
+      "knockedHint": "Je hebt hier vandaag al aangeklopt. De deur opent weer na de dagelijkse reset.",
+      "treat": "{name} geeft je een snoepje.",
+      "trick": "{name} haalt een streek met je uit: {trick}!",
+      "alreadyKnocked": "Je hebt vandaag al om snoep of een streek gevraagd bij {name}.",
+      "notActive": "Pompoenlichtavond is momenteel niet actief.",
+      "tooFar": "Kom dichterbij om aan te kloppen.",
+      "treatFlash": {
+        "one": "Snoep! {count} Pompoenlichtsnoepje",
+        "few": "Snoep! {count} Pompoenlichtsnoepjes",
+        "many": "Snoep! {count} Pompoenlichtsnoepjes",
+        "other": "Snoep! {count} Pompoenlichtsnoepjes"
+      },
+      "trickFlash": "Een streek! {trick}"
+    },
+    "tricks": {
+      "gourdlight_trick_bat": "Vleermuisgekte",
+      "gourdlight_trick_skeleton": "Rammelende botten",
+      "gourdlight_trick_fumes": "Groene dampen",
+      "gourdlight_trick_strawling": "Strolinggedaante",
+      "gourdlight_costume_skeleton": "Skeletkostuum",
+      "gourdlight_costume_ghost": "Spookkostuum",
+      "gourdlight_costume_bat": "Vleermuiskostuum"
+    },
+    "pumpkinHead": {
+      "on": "Je zet het Uitgesneden pompoenhoofd op.",
+      "off": "Je zet het Uitgesneden pompoenhoofd af."
+    },
+    "jarTrick": "De pot springt open: {trick}!",
+    "guise": "Het amulet knettert en stro kruipt over je heen: {trick}!",
+    "costume": "Je drinkt de drank en verandert: {trick}!",
+    "titleGranted": "Je leest de oorkonde. Nieuwe titel verdiend: {title}.",
+    "titleKnown": "Je hebt die titel al, dus je houdt de oorkonde.",
+    "boundItemGone": "Pompoenlichtavond is voorbij en je voorwerp {item} valt weer uiteen in stro.",
+    "itemUse": {
+      "pumpkinHead": "Gebruik: zet een uitgesneden, van binnen verlichte pompoen over je helm op of neem hem af. Cosmetisch.",
+      "trickJar": "Gebruik: haalt een paar seconden een willekeurige, onschuldige streek met je uit. Cosmetisch.",
+      "pouch": "Gebruik: open het om {count} Pompoenlichtsnoepjes te ontvangen.",
+      "strawlingCharm": "Gebruik: word {seconds} seconden een van de strolingen van Oude Thatchgrin. Niet bruikbaar in gevechten. Wordt nooit verbruikt. Cosmetisch.",
+      "sweet": "Verdiend door tijdens Pompoenlichtavond om snoep of een streek te vragen. Hester Gourdwick ruilt ze voor cosmetische voorwerpen bij haar kraampjes in Eastbrook, Fenbridge en Highwatch.",
+      "costumeSkeleton": "Gebruik: verander {minutes} minuten in een rammelend skelet. Wordt verbruikt. Niet bruikbaar in gevechten; een gevecht beginnen beëindigt het effect. Cosmetisch.",
+      "costumeGhost": "Gebruik: verander {minutes} minuten in een zwevende geest. Wordt verbruikt. Niet bruikbaar in gevechten; een gevecht beginnen beëindigt het effect. Cosmetisch.",
+      "costumeBat": "Gebruik: verander {minutes} minuten in een fladderende vleermuis. Wordt verbruikt. Niet bruikbaar in gevechten; een gevecht beginnen beëindigt het effect. Cosmetisch.",
+      "toyPrank": "Gebruik: gooi hem naar een andere zichtbare speler binnen {range} meter. Diens hoofd wordt {seconds} seconden een lichtgevende pompoenlantaarn die met een rechtermuisklik kan worden verwijderd. Geen van beiden mag in gevecht zijn en jij mag niet sluipen. Wordt nooit verbruikt: na {cooldown} seconden opnieuw bruikbaar. Blijft permanent in bezit en is het hele jaar bruikbaar. Cosmetisch.",
+      "toyLantern": "Gebruik: zet de lantaarn voor je neer. Een klein spook cirkelt {seconds} seconden om je heen. Niet bruikbaar in gevechten of tijdens sluipen. Wordt nooit verbruikt: na {cooldown} seconden opnieuw bruikbaar. Blijft permanent in bezit en is het hele jaar bruikbaar. Cosmetisch.",
+      "toyBats": "Gebruik: open de zak. Een piepende zwerm vleermuizen vliegt eruit en verspreidt zich {seconds} seconden om je heen. Niet bruikbaar in gevechten of tijdens sluipen. Wordt nooit verbruikt: na {cooldown} seconden opnieuw bruikbaar. Blijft permanent in bezit en is het hele jaar bruikbaar. Cosmetisch.",
+      "toyCandleShadows": "Gebruik: steek de kaars voor je aan. Haar vlammen werpen {seconds} seconden dansende schaduwen van een kat, een vleermuis en een heks op de grond eromheen, zichtbaar voor iedereen in de buurt. Niet bruikbaar in gevechten of tijdens sluipen. Wordt nooit verbruikt: na {cooldown} seconden opnieuw bruikbaar. Blijft permanent in bezit en is het hele jaar bruikbaar. Cosmetisch.",
+      "toyCauldron": "Gebruik: zet een grote borrelende ketel voor je neer. Hij blijft {standing} seconden staan. Elke speler die eruit drinkt, barst uiteen in groene bellen en verandert {seconds} seconden in een goblin, ter vervanging van het gedragen kostuum. Neerzetten en drinken werken niet in gevechten of tijdens sluipen; een gevecht beginnen beëindigt de goblinvorm. Wordt nooit verbruikt: na {cooldown} seconden opnieuw bruikbaar. Blijft permanent in bezit en is het hele jaar bruikbaar. Cosmetisch.",
+      "titleWrit": "Gebruik: verdien de titel {title} voor dit personage, te dragen via het Boek der Daden. Wordt verbruikt. Blijft bewaard als je de titel al hebt.",
+      "broomSources": "Te koop bij Hester Gourdwick voor {count} Sintelweven schoven, of zelden als buit van Oude Thatchgrin op een dag dat je hem plundert. Berijden vereist de rijvaardigheid. Blijft permanent in bezit en is het hele jaar berijdbaar.",
+      "sheaf": "Oude Thatchgrin geeft er één op elke dag dat je hem plundert, totdat je de Sintelborstelbezem bezit. Hester Gourdwick ruilt er {count} voor de bezem bij haar kraampjes in Eastbrook, Fenbridge en Highwatch. Ongebruikte schoven blijven bewaard tot de volgende Pompoenlichtavond."
+    },
+    "toy": {
+      "prank": "Je gooit de pompoen. Hij spat uiteen op {name}!",
+      "lantern": "Je zet de lantaarn neer en een klein spook zweeft eruit om je gezelschap te houden.",
+      "bats": "Je opent de zak en een zwerm geschrokken vleermuizen vliegt eruit!",
+      "candleShadows": "Je steekt de kaars aan en schaduwen beginnen om haar vlammen te dansen.",
+      "cauldron": "Je zet de ketel neer en hij begint te borrelen.",
+      "cauldronDrink": "Je drinkt uit de ketel, barst uiteen in groene bellen en verandert in een goblin!",
+      "pranked": "{name} smijt een pompoen op je hoofd! Verwijder hem met een rechtermuisklik of draag hem met trots.",
+      "prankedFlash": "{name} heeft je te pakken!",
+      "prankNeedsPlayer": "De pompoen spat alleen uiteen op een andere speler die niet in gevecht is.",
+      "hidden": "Stap eerst uit de schaduwen: speelgoed zou je verraden."
+    },
+    "itemSource": {
+      "pumpkinHead": "Buit van Oude Thatchgrin op zijn pompoenveld voorbij de Everweide, de eerste keer dat je hem plundert. Geen enkele verkoper verkoopt dit."
+    },
+    "boo": {
+      "row": "Boe!",
+      "rowAria": "Spring voor {name} tevoorschijn en roep boe",
+      "needsCostume": "Trek eerst een kostuum aan: een kostuumdrank, een vleermuis- of skeletstreek, het Strolingamulet, het Uitgesneden pompoenhoofd of een goblinslok uit de Groenborrelketel.",
+      "frightenedHint": "{name} is nog schrikachtig van je vorige grap. Zoek iemand anders.",
+      "landed": "Je springt voor {name} tevoorschijn en roept BOE! Er klinkt een gil en bijna alles valt op de grond.",
+      "flash": "BOE! {name} schrikt!",
+      "noCostume": "Zonder kostuum lacht {name} je alleen maar uit. Trek er eerst een aan.",
+      "already": "{name} is voor vandaag vaak genoeg geschrokken.",
+      "notOnErrand": "Hester heeft je vandaag niet gevraagd iemand te laten schrikken."
+    },
+    "tokenPrice": "{count} {item}",
+    "thatchgrin": {
+      "poleBound": "Paalgebonden",
+      "wakeYell": "De NACHT valt over de akker! Wie loopt er op MIJN veld?",
+      "sleepYell": "De zon is op. Terug op de paal, terug op de uitkijk."
     }
   },
   "dungeonGuide": {
@@ -9903,7 +10019,7 @@ export const nl_NL: EnTranslations = {
       "framesGovernedTalkingHead": "Edit Frames maakt ook het dialoogpaneel losser, waarin de gesproken lijn van een NPC wordt weergegeven terwijl die NPC buiten je zicht is; het draagt ​​zijn naamchip terwijl het los zit.",
       "framesGovernedShardpike": "Kaders bewerken maakt ook de Schervenpiekbalk los: de korte rij handelingen voor het missiehulpmiddel naast je actiebalken, die alleen verschijnt zolang je de Schervenpiek draagt. Losgemaakt heeft hij een naamlabel, zodat je hem vóór het gevecht kunt plaatsen.",
       "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
-      "framesGovernedPriest": "Edit Frames also lets you move the Shadow priest's Gloomtithe and Tithe Bomb medallion.",
+      "framesGovernedPriest": "Met Kaders bewerken kun je ook het medaillon voor Schemertiende en Tiendbom van de schaduwpriester verplaatsen.",
       "framesGovernedResourceAndHill": "Schakel Hulpbronnenbalk losmaken in op het tabblad Frames. Frames Bewerken maakt dan ook je hulpbronnenbalk los, zodat je mana, energie of woede afzonderlijk overal kunt neerzetten. Breedte van de hulpbronnenbalk en Hoogte van de hulpbronnenbalk op hetzelfde tabblad bepalen het formaat. Frames Bewerken maakt ook de balk van Koning van de Heuvel los. Achtergronddekking van Koning van de Heuvel op dat tabblad vervaagt het paneel terwijl de tekst duidelijk leesbaar blijft.",
       "barsTitle": "Balken, timers en gevechtstekst",
       "barsBody": "Je spreukbalk verschijnt in het midden van het scherm, net boven je actiebalken, telkens wanneer je een spreuk uitspreekt of kanaliseert, en toont de naam van de spreuk en de resterende tijd. Je doelwit krijgt een eigen spreukbalk op zijn frame, zodat je kunt zien wat eraan komt en erop kunt reageren.\n\nEen dunne wapenslagbalk zit onder je spreukbalk en vult zich tussen je wapenslagen, zodat een nabij- of afstandsaanvaller kan zien wanneer de volgende automatische treffer landt.\n\nJe ervaringsbalk loopt over de volle breedte onder je actiebalken, verdeeld in segmenten, met een lichter stuk dat de uitgeruste ervaring toont die je hebt opgespaard.\n\nZwem onder water en een blauwe adembalk verschijnt bovenaan het scherm. Hij loopt leeg terwijl je hoofd onder water is, knippert rood zodra hij leeg is en je begint te verdrinken, en vult zich snel weer zodra je boven water komt. Spatie zwemt je omhoog, en de toets Omlaag Zwemmen, standaard Ctrl, brengt je dieper.\n\nSchade en genezing zweven als kleine getallen omhoog boven wat ze raken, zodat je een gevecht kunt lezen zonder tekst te lezen. Het tabblad Gevecht in je chatbox houdt het volledige geschreven verslag bij.",
@@ -10808,6 +10924,7 @@ export const nl_NL: EnTranslations = {
       "hillBodyRamp": "Elke twee uur verschijnt er een heuvel in de Drakenlanden, de Vorstsluier of de Amberval. Het rijk krijgt een kwartier van tevoren een waarschuwing en de cirkel wordt op open terrein gemarkeerd. De heuvel blijft dertig minuten actief. Bij het betreden van de actieve cirkel wordt je wereld-PvP-vlag ingeschakeld volgens de normale niveauregels, ook voor raidleden. De groep met de meeste spelers binnen de cirkel die aan de voorwaarden voldoen, verovert de heuvel na een minuut met een ononderbroken meerderheid; een solospeler telt als een groep van één, maar raidleden en spelers onder het vereiste PvP-niveau kunnen de heuvel niet veroveren en er geen Eer verdienen. Elke bezetter binnen de cirkel verdient in een steeds hoger tempo Eer. Uitbetalingen volgen elkaar sneller op en lopen sneller op, zodat de totale Eer van het vroegere evenement van vijfenveertig minuten behouden blijft. Bij een wisseling van bezetters begint de opbouw opnieuw. Je vlag blijft aan wanneer je de cirkel verlaat; /pvp off gebruikt de normale vertraging van vijf minuten en kan niet aflopen binnen een actieve heuvel of tijdens een gevecht. De heuvelbalk toont de bezetting, aantallen en veroveringsvoortgang; /hill meldt de locatie.",
       "hillBodyPause": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls, and every five minutes while it stands the realm is told where it is and which groups have held it longest. The party with the most players standing inside contests the hill, and after thirty seconds of majority the hill is theirs. A rival party walking in only pauses that count until yours leads again; it starts over only if nobody from your party is left alive inside. A lone player counts as a party of one and keeps a hill they hold when they form a party, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns Honor every minute, and the longer the same party holds it, the more each minute pays: a full party holding an uncontested hill for its whole stand earns about as much as three battleground wins. When the hill changes hands, the new holders start the count from the beginning. When it falls, if the group that held it longest in total held it for at least ten minutes, everyone who stood inside for that group for at least a minute, and is still in that group, earns one win toward the PvP row of the Weekly Vault. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
       "hillBodyFlat": "Eens per drie uur krijgt het hele rijk op een onvoorspelbaar moment te horen dat er over vijftien minuten een heuvel verschijnt in een van de noordelijke zones. De cirkel wordt op open terrein gemarkeerd. De heuvel blijft vijfenveertig minuten staan en verdwijnt dan. Ondertussen worden elke vijf minuten de locatie en de groepen met de langste totale bezettingstijd bekendgemaakt. De groep met de meeste spelers in de cirkel betwist de heuvel en verovert hem na in totaal dertig seconden numeriek overwicht. Een rivaliserende groep pauzeert de teller alleen totdat jouw groep weer voorstaat; de teller begint pas opnieuw als er geen levend lid van jouw groep meer binnen staat. Een solospeler telt als een groep van één en behoudt een bezette heuvel bij het vormen van een groep, maar raidleden tellen helemaal niet mee. Elk lid van de bezettende groep dat binnen staat, krijgt elke minuut evenveel Eer, ongeacht hoe lang de groep de heuvel al bezet. Een volle groep die hem de hele duur ongestoord bezet, verdient ongeveer evenveel als met drie slagveldoverwinningen. Als de heuvel verdwijnt en de groep met de langste totale bezettingstijd minstens tien minuten heeft bezet, krijgt iedereen die tijdens die bezetting minstens één minuut binnen stond en nog in die groep zit één overwinning voor de PvP-rij van de Wekelijkse Kluis. Een balk boven het veld toont de bezetter, de aantallen van beide kanten en de veroveringsteller; /hill in de chat geeft de locatie aan.",
+      "hillBodyTwoHour": "Eens per twee uur krijgt het hele rijk op een onvoorspelbaar moment bericht dat er over vijftien minuten een heuvel in een van de noordelijke gebieden verrijst. De cirkel waar hij komt wordt op open terrein gemarkeerd. Na het verrijzen blijft de heuvel dertig minuten staan en verdwijnt daarna. Zolang hij er is, krijgt het rijk elke vijf minuten zijn locatie te horen en welke groepen hem het langst hebben vastgehouden. De groep met de meeste spelers in de cirkel betwist de heuvel en verovert hem na dertig seconden meerderheid. Als een rivaliserende groep binnenkomt, pauzeert die teller alleen totdat jouw groep weer voorstaat; hij begint pas opnieuw als er niemand van jouw groep levend in de cirkel achterblijft. Een speler alleen telt als een groep van één en houdt een veroverde heuvel als die een groep vormt, maar raidleden tellen helemaal niet mee. Zolang een groep de heuvel vasthoudt, verdient elk groepslid in de cirkel elke minuut evenveel Eer, ongeacht hoelang de groep hem al vasthoudt. Een volledige groep die de heuvel zijn hele duur onbetwist vasthoudt, verdient daardoor ongeveer evenveel als met twee slagveldoverwinningen. Als de heuvel verdwijnt en de groep met de langste totale bezetting hem minstens tien minuten vasthield, krijgt iedereen die voor die groep minstens één minuut in de cirkel stond en er nog steeds bij hoort één overwinning voor de PvP-rij van de Wekelijkse Kluis. Een balk boven het veld toont wie hem vasthoudt, jullie aantallen tegenover die van de tegenstander en de betwistingsteller; /hill in de chat geeft zijn locatie.",
       "limitsBodyRaids": "Het herhaaldelijk verslaan van dezelfde speler betaalt steeds minder en binnenkort niets, en je telling tegen die speler begint slechts ongeveer een uur na het eerste van die kills opnieuw, dus het kamperen op één slachtoffer is nooit de wacht waard. Een doelwit veel onder je niveau betaalt niets. Battlegrounds en Arenas voeren hun eigen regels uit terwijl je erin bent, en ze betalen meer Eer dan de open wereld, dus wereld-PvP is de langzamere weg naar dezelfde verkoper. Raids verdienen niets uit wereldkills: een raidlid neemt geen Eer of goud aan en verkleint niemand anders aandeel, dus vecht als partij om betaald te krijgen."
     },
     "thornhollowPage": {
@@ -15549,6 +15666,7 @@ export const nl_NL: EnTranslations = {
       "accountSuspended": "Dit account is geschorst tot {date}.",
       "alreadyInWorld": "Personage is al in de wereld.",
       "accountSessionLimit": "Te veel personages op dit account zijn al in de wereld.",
+      "worldFightHold": "Een ander personage op dit account is na een gevecht nog in de wereld. Probeer het over een paar minuten opnieuw.",
       "takenOver": "Je personage is overgenomen door een andere sessie.",
       "vaultMailRecovering": "Je kluis-beloningspost wordt hersteld. Probeer het zo over enkele ogenblikken.",
       "renameBeforeEntering": "Dit personage moet hernoemd worden voordat het de wereld kan betreden.",
@@ -18442,16 +18560,16 @@ export const nl_NL: EnTranslations = {
         "description": "Kanaliseert 3 sec lang en brengt elke seconde {damage} Schaduwschade toe. De schade stijgt met de Spreukkracht."
       },
       "vampiric_touch": {
-        "name": "Vampiric Touch",
-        "description": "Deal {damage} Shadow damage over 15 sec, once every 3 sec. Damage increases with Spell Power and ticks can critically strike. Each tick shares healing equal to 20% of the health lost by the enemy among you and injured party members within 30 yards; in a raid, only your subgroup receives this healing. If you have at least 2 Gloomtithe charges, applying this effect consumes 2 to increase all its damage by 30%."
+        "name": "Vampieraanraking",
+        "description": "Breng {damage} schaduwschade toe gedurende 15 sec., eenmaal per 3 sec. De schade neemt toe met spreukkracht en de periodieke treffers kunnen kritisch treffen. Elke treffer verdeelt genezing gelijk aan 20% van de door de vijand verloren gezondheid onder jou en gewonde groepsleden binnen 30 meter; in een raid ontvangt alleen je subgroep deze genezing. Als je minstens 2 ladingen Schemertiende hebt, verbruikt het aanbrengen van dit effect er 2 om alle schade ervan met 30% te verhogen."
       },
       "void_rupture": {
-        "name": "Void Rupture",
-        "description": "Consume 3 Gloomtithe charges to rupture an enemy for {damage} Shadow damage. Damage increases with Spell Power and can critically strike. Requires 3 charges and consumes them even if resisted."
+        "name": "Leegtescheuring",
+        "description": "Verbruik 3 ladingen Schemertiende om een vijand open te scheuren voor {damage} schaduwschade. De schade neemt toe met spreukkracht en kan kritisch treffen. Vereist 3 ladingen en verbruikt ze ook als de spreuk wordt weerstaan."
       },
       "spirit_bomb": {
-        "name": "Tithe Bomb",
-        "description": "Detonate a spirit bomb on an enemy, dealing {damage} Shadow damage to enemies within 8 yards of that target. Damage increases with Spell Power, can critically strike, and is reduced beyond 5 targets. Generate 20 Gloomtithe to prepare one bomb. Generation counts even while holding the maximum 5 Gloomtithe; spending charges is not required and adds no progress. Progress lasts between fights, up to one prepared bomb. Dying clears your progress and prepared bomb. Completing the cast consumes the prepared bomb, even if resisted. Cancellation or interruption preserves it. Starting a raid boss encounter clears your progress and prepared bomb. Cannot open a raid boss encounter with this spell."
+        "name": "Tiendbom",
+        "description": "Laat een geestenbom op een vijand ontploffen en breng {damage} schaduwschade toe aan vijanden binnen 8 meter van dat doelwit. De schade neemt toe met spreukkracht, kan kritisch treffen en wordt verlaagd bij meer dan 5 doelwitten. Genereer 20 ladingen Schemertiende om één bom voor te bereiden. Het genereren telt ook als je het maximum van 5 ladingen vasthoudt; ladingen uitgeven is niet nodig en voegt geen voortgang toe. De voortgang blijft tussen gevechten behouden, tot maximaal één voorbereide bom. Sterven verwijdert je voortgang en voorbereide bom. Een voltooide spreuk verbruikt de voorbereide bom, zelfs als de spreuk wordt weerstaan. Annuleren of onderbreken behoudt de bom. Een gevecht met een raidbaas beginnen verwijdert je voortgang en voorbereide bom. Je kunt met deze spreuk geen gevecht met een raidbaas beginnen."
       },
       "flash_heal": {
         "name": "Dringend Gebed",
@@ -19287,7 +19405,7 @@ export const nl_NL: EnTranslations = {
       "inner_focus": {
         "name": "Gestilde geest",
         "description": "Maakt uw volgende priesterspreuk gratis en niet te onderbreken. Duurt 60 sec.",
-        "specNote_shadow": "Also reserves a guaranteed critical strike for your next Mindfracture or Void Rupture within 60 sec, if it hits. Other spells do not consume this bonus. Void Rupture still consumes 3 Gloomtithe charges. A resisted cast consumes the critical strike bonus."
+        "specNote_shadow": "Reserveert ook een gegarandeerde kritieke treffer voor je volgende Geestbreuk of Leegtescheuring binnen 60 sec., als deze raakt. Andere spreuken verbruiken deze bonus niet. Leegtescheuring verbruikt nog steeds 3 ladingen Schemertiende. Een weerstane spreuk verbruikt de bonus op kritieke treffers."
       },
       "innervate": {
         "name": "Levenssap",
@@ -19485,7 +19603,7 @@ export const nl_NL: EnTranslations = {
       "choir_of_deliverance": {
         "name": "Koor der Verlossing",
         "description": "Kanaliseer 6 sec en genees groepsleden binnen 30 yard voor {damage} elke 2 sec. De genezing neemt toe met spreukkracht.",
-        "specNote_shadow": "For 15 sec, share 20% of the health enemies lose to your Shadow damage as healing among injured party members within 30 yards, including yourself. In raids, only your subgroup is healed. Cast instantly and keep attacking in Shadowform. Absorbed damage and overkill do not add healing."
+        "specNote_shadow": "Verdeel gedurende 15 sec. 20% van de gezondheid die vijanden door jouw schaduwschade verliezen als genezing onder gewonde groepsleden binnen 30 meter, inclusief jezelf. In raids wordt alleen je subgroep genezen. Direct te gebruiken; je kunt in schaduwvorm blijven aanvallen. Geabsorbeerde schade en schade boven de resterende gezondheid leveren geen genezing op."
       },
       "bear_charge": {
         "name": "Bruin-stormloop",
@@ -24700,6 +24818,87 @@ export const nl_NL: EnTranslations = {
       "vanguard_pendant_of_mending": {
         "name": "Voortocht-hanger van Verzorging"
       },
+      "gourdlight_sweet": {
+        "name": "Pompoenlichtsnoepje"
+      },
+      "gourdlight_treat_pouch": {
+        "name": "Zakje pompoenlichtsnoep"
+      },
+      "carved_pumpkin_head": {
+        "name": "Uitgesneden pompoenhoofd"
+      },
+      "jar_of_mischief": {
+        "name": "Pot kattenkwaad"
+      },
+      "thatchgrin_sweet_sack": {
+        "name": "Thatchgrins snoepzak"
+      },
+      "strawling_charm": {
+        "name": "Strolingamulet"
+      },
+      "rattlebone_draught": {
+        "name": "Rammelbotdrank"
+      },
+      "haunting_draught": {
+        "name": "Spookdrank"
+      },
+      "batwing_draught": {
+        "name": "Fladderdrank"
+      },
+      "writ_of_the_gourdlit": {
+        "name": "Oorkonde van de Pompoenverlichte"
+      },
+      "writ_of_the_trickster": {
+        "name": "Oorkonde van de Grappenmaker"
+      },
+      "writ_of_the_hollow_grin": {
+        "name": "Oorkonde van de Holle Grijns"
+      },
+      "reins_emberbristle_broom": {
+        "name": "Sintelborstelbezem"
+      },
+      "hearthroot_toffee": {
+        "name": "Haardworteltoffee"
+      },
+      "gourdseed_brittle": {
+        "name": "Pompoenpittenkrokant"
+      },
+      "crabapple_chew": {
+        "name": "Wildeappeltoffee"
+      },
+      "owlwatch_fudge": {
+        "name": "Uilenwachtfudge"
+      },
+      "lantern_mint_drop": {
+        "name": "Lantaarnmuntje"
+      },
+      "emberwoven_sheaf": {
+        "name": "Sintelweven schoof"
+      },
+      "prankers_pumpkin": {
+        "name": "Grappenmakerspompoen"
+      },
+      "wanderwisp_lantern": {
+        "name": "Dwaallichtlantaarn"
+      },
+      "sack_of_startled_bats": {
+        "name": "Zak geschrokken vleermuizen"
+      },
+      "murmurwick_candle": {
+        "name": "Fluisterpitkaars"
+      },
+      "gurglegreen_cauldron": {
+        "name": "Groenborrelketel"
+      },
+      "thatchgrin_patch_pumpkin": {
+        "name": "Akkerpompoen"
+      },
+      "cursed_candle_stub": {
+        "name": "Vervloekte kaarsstomp"
+      },
+      "gourdlight_crow_feather": {
+        "name": "Pompoenlichtkraaienveer"
+      },
       "membership_staff": {
         "name": "Staf van Verandering"
       },
@@ -26256,6 +26455,18 @@ export const nl_NL: EnTranslations = {
       "muster_effigy": {
         "name": "Strovoorman"
       },
+      "gourdlight_thatchgrin": {
+        "name": "Oude Thatchgrin"
+      },
+      "gourdlight_crow": {
+        "name": "Pompoenlichtkraai"
+      },
+      "gourdlight_strawling": {
+        "name": "Stroling"
+      },
+      "gourdlight_swelling_gourd": {
+        "name": "Zwellende pompoen"
+      },
       "stable_horse": {
         "name": "Stalpaard"
       },
@@ -27409,6 +27620,11 @@ export const nl_NL: EnTranslations = {
         "name": "Hester Quillby",
         "title": "Kaartenmaker",
         "greeting": "Elke kaart van dit moeras die ik ooit kocht, klopte binnen een seizoen niet meer. Het water verlegt de paden en de paden verleggen het water. Dus teken ik zelf kaarten en zit ik hier droog terwijl de inkt opdroogt."
+      },
+      "gourdlight_keeper": {
+        "name": "Hester Gourdwick",
+        "title": "Hoedster van het Pompoenlicht",
+        "greeting": "De pompoenen branden en de lantaarns hangen, dus het moet Pompoenlichtavond zijn. Klop bij de inwoners van Eastbrook, Fenbridge en Highwatch aan en zeg de woorden: snoep of een streek. De meesten geven je een snoepje. Een paar halen een streek met je uit. Breng de snoepjes naar een van mijn kraampjes en ik ruil ze voor iets om te dragen."
       },
       "reeve_ottoline": {
         "name": "Schout Ottoline",
@@ -30041,6 +30257,88 @@ export const nl_NL: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Effectieve genezing op de Genezingspop"
+          }
+        }
+      },
+      "q_gourdlight_rounds": {
+        "title": "Pompoenlichtronde",
+        "text": "Elke Pompoenlichtavond doen de kinderen van de vallei hun ronde, en dit jaar ga jij mee, {playerName}. Klop bij vijf deuren in onze steden aan, zeg de woorden en kijk wat je krijgt. Kom terug als je klaar bent.",
+        "completion": "Vijf deuren en nog al je vingers. Hier, een zakje snoep voor de terugweg. Kom morgen terug, dan gaan de deuren weer open.",
+        "objectives": {
+          "0": {
+            "label": "Deuren waarbij aangeklopt is"
+          }
+        }
+      },
+      "q_gourdlight_daily_patch": {
+        "title": "Pompoenen van de akker",
+        "text": "De akker van Oude Thatchgrin voorbij de Everweide ligt vol pompoenen, en de helft is voorbij zijn stro gerold, waar iemand die voorzichtig is erbij kan. Breng me er vijf, {playerName}. Blijf ver van de oude vogelverschrikker zelf. Hij telt ze allemaal.",
+        "completion": "Vijf mooie ronde exemplaren, zonder één hap eruit. Dat wordt taart voor de hele vallei. Hier, voor je moeite.",
+        "objectives": {
+          "0": {
+            "label": "Akkerpompoenen"
+          }
+        }
+      },
+      "q_gourdlight_daily_boo": {
+        "title": "Boe!",
+        "text": "Niemand in deze steden is in een jaar echt geschrokken, {playerName}, en een Pompoenlichtavond zonder schrik is gewoon een koude nacht. Trek een kostuum aan, een van de mijne is prima, of dat pompoenhoofd als je er een hebt verdiend. Besluip dan drie inwoners en roep lekker hard BOE!",
+        "completion": "Drie? Ik hoorde de kok vanaf de andere kant van het plein een pan laten vallen. Goed gedaan. Hier is jouw deel.",
+        "objectives": {
+          "0": {
+            "label": "Inwoners laten schrikken"
+          }
+        }
+      },
+      "q_gourdlight_daily_wicks": {
+        "title": "Boosaardige pitten",
+        "text": "Iemand zet kaarsen met groene vlammen onder aan onze lantaarnpalen. Ze branden zonder te smelten en fluisteren als je je omdraait. Doof er zes voor me, {playerName}, in een van de drie steden, en breng me de stompjes.",
+        "completion": "Zes stompjes, koud als rijp. Wie ze heeft aangestoken, moet beter zijn best doen. Neem dit en was je handen.",
+        "objectives": {
+          "0": {
+            "label": "Vervloekte kaarsen gedoofd"
+          }
+        }
+      },
+      "q_gourdlight_daily_towns": {
+        "title": "Een deur in elke stad",
+        "text": "De kinderen zeggen dat een echte Pompoenlichtwandelaar voor het einde van de nacht in elke stad aanklopt. Geef ze gelijk, {playerName}. Vraag om snoep of een streek bij één deur in Eastbrook, één in Fenbridge en één in Highwatch. De lantaarns langs de wegen wijzen je de weg.",
+        "completion": "Drie steden in één nacht! Je laarzen hebben dit meer verdiend dan jij.",
+        "objectives": {
+          "0": {
+            "label": "Bij een deur in Eastbrook aangeklopt"
+          },
+          "1": {
+            "label": "Bij een deur in Fenbridge aangeklopt"
+          },
+          "2": {
+            "label": "Bij een deur in Highwatch aangeklopt"
+          }
+        }
+      },
+      "q_gourdlight_daily_feathers": {
+        "title": "Veren voor het vuur",
+        "text": "Als Oude Thatchgrin in het nauw zit, stuurt hij zijn kraaien op iedereen af die op zijn stro slaat. Hun veren branden groen in een haard, en ik heb er drie nodig voor het vreugdevuur van vanavond. Zoek een gevecht op zijn akker, {playerName}, en pluk ze van zijn kraaien.",
+        "completion": "Zwart als een veld zonder maan, en ze ruiken al naar rook. Het vreugdevuur wordt prachtig. Bedankt.",
+        "objectives": {
+          "0": {
+            "label": "Kraaienveren"
+          }
+        }
+      },
+      "q_gourdlight_daily_baskets": {
+        "title": "Manden voor de buren",
+        "text": "Elke Pompoenlichtavond vul ik in elke stad een mand snoep voor een oude vriend, en mijn knieën zijn niet meer wat ze geweest zijn. Breng ze voor me rond, {playerName}: naar kok Marlow in Eastbrook, Kruidenkundige Yara in Fenbridge en Verhalenmeester Caddis daarboven in Highwatch.",
+        "completion": "Alle drie bezorgd, en ik hoor dat Marlow huilde. Hij huilt altijd. Hier is een mand voor jezelf.",
+        "objectives": {
+          "0": {
+            "label": "Mand bij kok Marlow bezorgd"
+          },
+          "1": {
+            "label": "Mand bij Kruidenkundige Yara bezorgd"
+          },
+          "2": {
+            "label": "Mand bij Verhalenmeester Caddis bezorgd"
           }
         }
       },

@@ -140,6 +140,7 @@ export const RETIRED_KEYS = [
   'guide.worldPvpPage.hillBody', // -> guide.worldPvpPage.hillBodyRamp (the hold ramp)
   'guide.worldPvpPage.hillBodyRamp', // -> guide.worldPvpPage.hillBodyPause (30 s capture, a rival pauses it)
   'guide.worldPvpPage.hillBodyPause', // -> guide.worldPvpPage.hillBodyFlat (flat Honor, capture rules retained)
+  'guide.worldPvpPage.hillBodyFlat', // -> guide.worldPvpPage.hillBodyTwoHour (2 h, 30 min schedule restored)
   'guide.commandsPage.pvp', // -> guide.commandsPage.pvpZones
 
   // -- Content the game no longer has, so the wiki must not define it.

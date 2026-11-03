@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { tintedMaterial } from '../src/render/characters/assets';
 import { VISUALS } from '../src/render/characters/manifest';
+import { newRideGripState } from '../src/render/characters/ride_grip_ik';
 import { rideLegDirections } from '../src/render/characters/ride_pose';
 import { CharacterVisual } from '../src/render/characters/visual';
 import { gfxInternalsForTest } from '../src/render/gfx';
@@ -55,7 +56,8 @@ describe('mount visual specs cover the sim catalog', () => {
     for (const key of MOUNT_KEYS) {
       const spec = MOUNT_VISUAL_SPECS[key];
       const def = VISUALS[spec.visualKey];
-      expect(spec.seat, `${key} seat`).toBeGreaterThan(0.5);
+      // a hovering mount's seat rides its ground lift too (the broom floats 0.72 up)
+      expect(spec.seat + spec.groundLift, `${key} seat`).toBeGreaterThan(0.5);
       expect(spec.seat, `${key} seat above its own crown`).toBeLessThan(def.height);
     }
   });
@@ -235,6 +237,8 @@ function ridePoseHarness(): {
     model,
     rideSpec: null,
     rideBlend: 0,
+    rideArmBlend: 0,
+    rideGripState: newRideGripState(),
     climbOn: false,
     climbBlend: 0,
     climbArmBones: undefined,
@@ -372,10 +376,13 @@ describe('the Low vertex-color path covers every mount GLB that ships COLOR_0', 
     ),
   ].sort();
 
-  it('carries authored COLOR_0 on exactly the goblin rocket sled, the Lantern Hall Destrier, the Bonebound Rickshaw, the Dreadspark Groundshaker, and the Valorsteed', () => {
+  it('carries authored COLOR_0 on exactly the Emberbristle Broom, the goblin rocket sled, the Lantern Hall Destrier, the Bonebound Rickshaw, the Dreadspark Groundshaker, and the Valorsteed', () => {
     expect(mountUrls.length).toBeGreaterThanOrEqual(8);
     const withVertexColors = mountUrls.filter((url) => glbAttributes(url).has('COLOR_0'));
     expect(withVertexColors).toEqual([
+      // the broom's ember-tip mask rides a material colour attribute
+      // (scripts/assets/gourdlight_eve/broom.py, export_vertex_color MATERIAL)
+      'models/mounts/emberbristle_broom.glb',
       'models/mounts/goblin_rocket_sled.glb',
       'models/mounts/lantern_hall_destrier.glb',
       'models/mounts/rickshaw_mount.glb',
@@ -574,7 +581,7 @@ describe('procedural bob math', () => {
     expect(spec.seat).toBeLessThan(2.6);
   });
 
-  it('only the Lanternback, the Chimeglass and the Lantern Hall Destrier carry lamps, on their own terms', () => {
+  it('only the Lanternback, the Chimeglass the broom and the Lantern Hall Destrier carry lamps, on their own terms', () => {
     // Catalog mounts and mount SKINS alike: a skin is drawn by the same lamp
     // path, so a new skin shipping stray lamps fails here too.
     const specs: [string, MountVisualSpec][] = [
@@ -624,6 +631,17 @@ describe('procedural bob math', () => {
           expect(lamp.intensity).toBeLessThan(MOUNT_LAMP_INTENSITY);
           expect(lamp.distance).toBeLessThan(MOUNT_LAMP_DISTANCE);
           expect(lamp.flicker).toBe('steady');
+        }
+      } else if (key === 'emberbristle_broom') {
+        // ONE small candle in the pumpkin lantern on its crook, on the lantern's own
+        // bone so the light swings with it: a guttering flame, far dimmer and tighter
+        // than a storm lantern, in the shared warm colour.
+        expect(lamps.map((l) => l.bone)).toEqual(['Lantern']);
+        for (const lamp of lamps) {
+          expect(lamp.color ?? MOUNT_LAMP_COLOR).toBe(MOUNT_LAMP_COLOR);
+          expect(lamp.intensity).toBeLessThan(MOUNT_LAMP_INTENSITY);
+          expect(lamp.distance).toBeLessThan(MOUNT_LAMP_DISTANCE);
+          expect(lamp.flicker ?? 'flame').toBe('flame');
         }
       } else {
         expect(lamps, `${key} must carry no lamps`).toEqual([]);

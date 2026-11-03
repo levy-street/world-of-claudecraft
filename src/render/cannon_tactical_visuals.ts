@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { CANNON_TACTICS } from '../sim/content/cannon_encounter';
 import type { VehicleSession } from '../sim/types';
+import { VisibleChildrenGroup } from './visible_children_group';
 import { worldQuestTraceMaterials } from './world_quest_trace_materials';
 
 export function cannonBarrelTemplate(source: THREE.Object3D): THREE.Group {
@@ -17,7 +18,7 @@ export function cannonBarrelTemplate(source: THREE.Object3D): THREE.Group {
 
 /** Bounded meshes compiled with the encounter, never allocated on impact. */
 export class CannonTacticalVisuals {
-  readonly root = new THREE.Group();
+  readonly root = new VisibleChildrenGroup();
   private readonly ring = new THREE.RingGeometry(0.85, 1, 32);
   private readonly sphere = new THREE.SphereGeometry(1, 10, 6);
   private readonly barrels: { root: THREE.Group; marker: THREE.Mesh }[] = [];

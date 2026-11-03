@@ -1115,4 +1115,49 @@ export const table: DeedLocaleTable = {
     desc: '以24枚燈火印章從燈火大廳軍需官加里克·霍爾特處購得。',
     title: '燈火大廳之人',
   },
+  feat_gourdlight_doorsteps: {
+    name: '家家門前',
+    desc: '在南瓜燈之夜期間，向三座城鎮中每一位會應門的居民說「不給糖就搗蛋」。',
+  },
+  feat_gourdlight_errands: {
+    name: '赫絲特的跑腿',
+    desc: '赫絲特·葫蘆芯每日輪換的南瓜燈之夜差事，每一項至少完成一次。',
+  },
+  feat_gourdlight_frights: {
+    name: '三鎮驚魂',
+    desc: '在赫絲特的「哇！」差事中，分別嚇唬三座城鎮裡的一位居民。',
+  },
+  feat_gourdlight_eve_complete: {
+    name: '南瓜燈之夜，從頭到尾',
+    desc: '完整經歷南瓜燈之夜：擊敗老稻草獰笑，找到所有鬧鬼南瓜，完成赫絲特的每一項差事，敲遍每一扇門，並在三座城鎮各嚇唬一位居民。',
+    title: '南瓜誓約者',
+  },
+  feat_gourdlight_guise: {
+    name: '南瓜燈偽裝',
+    desc: '在南瓜燈之夜期間，從野豬草地外田地裡的老稻草獰笑身上取得並擁有一頂雕刻南瓜頭。',
+  },
+  feat_old_thatchgrin: {
+    name: '殘茬與灰燼',
+    desc: '在南瓜燈之夜期間，協助擊敗野豬草地外南瓜田裡的老稻草獰笑。',
+  },
+  feat_title_gourdlit: {
+    name: '南瓜燈輝者',
+    desc: '在南瓜燈之夜期間，用南瓜燈糖向赫絲特·葫蘆芯換取南瓜燈輝令狀並閱讀。',
+    title: '南瓜燈輝者',
+  },
+  feat_title_trickster: {
+    name: '搗蛋鬼',
+    desc: '在南瓜燈之夜期間，用南瓜燈糖向赫絲特·葫蘆芯換取搗蛋鬼令狀並閱讀。',
+    title: '搗蛋鬼',
+  },
+  feat_title_hollow_grinned: {
+    name: '空洞笑臉者',
+    desc: '在南瓜燈之夜期間，用南瓜燈糖向赫絲特·葫蘆芯換取空洞笑臉令狀並閱讀。',
+    title: '空洞笑臉者',
+  },
+  feat_pumpkin_hunter: {
+    name: '南瓜獵人',
+    desc: '在南瓜燈之夜期間，找到藏在世界各處的所有鬧鬼南瓜。',
+    title: '空心者',
+  },
 };

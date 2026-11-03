@@ -2156,6 +2156,58 @@ export const TARGETS = [
     },
   },
   {
+    key: 'npc-quest-marker-range',
+    label: 'NPC quest markers: the giver marker past the close NPC plate range',
+    when: ['render/nameplate_view', 'render/nameplate_painter'],
+    // The nearest quest giver with an offer, seen from 25 yards: past
+    // NPC_NAMEPLATE_RANGE, so the base checkout draws no plate at all and the
+    // marker-only plate draws the bare quest marker. Desktop only: the plate
+    // paints identically on the compact tier, and the mobile chase camera
+    // looks down past the giver.
+    variants: [{ key: 'desktop' }],
+    async capture(page) {
+      await sweepOverlays(page, 10);
+      const staged = await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        const player = sim?.player;
+        if (!game || !sim || !player) return { ok: false, reason: 'offline world is unavailable' };
+        let giver = null;
+        let best = Number.POSITIVE_INFINITY;
+        for (const e of sim.entities.values()) {
+          if (e.kind !== 'npc' || !e.questIds?.some((q) => sim.questState(q) === 'available')) {
+            continue;
+          }
+          const d = Math.hypot(e.pos.x - player.pos.x, e.pos.z - player.pos.z);
+          if (d < best) {
+            best = d;
+            giver = e;
+          }
+        }
+        if (!giver) return { ok: false, reason: 'no quest giver with an offer' };
+        // Back off along the line to the spawn point, which stands on dry land,
+        // and face the giver with the chase camera on the same heading.
+        const ux = (player.pos.x - giver.pos.x) / (best || 1);
+        const uz = (player.pos.z - giver.pos.z) / (best || 1);
+        player.pos.x = giver.pos.x + ux * 25;
+        player.pos.z = giver.pos.z + uz * 25;
+        player.pos.y = game.renderer?.groundSample?.(player.pos.x, player.pos.z) ?? giver.pos.y;
+        player.prevPos = { ...player.pos };
+        player.facing = Math.atan2(-ux, -uz);
+        game.input.camYaw = player.facing;
+        game.input.camDist = 8;
+        sim.rebucket?.(player);
+        return { ok: true };
+      });
+      if (!staged.ok) return { skip: staged.reason };
+      await wait(1500);
+      await awaitWorldPainted(page);
+      await sweepOverlays(page, 8);
+      await wait(800);
+      return {};
+    },
+  },
+  {
     key: 'floor-vfx-layer',
     label: 'Floor VFX ladder: a boss brand telegraph overlapping a mage meteor footprint',
     when: ['render/floor_vfx_layer'],

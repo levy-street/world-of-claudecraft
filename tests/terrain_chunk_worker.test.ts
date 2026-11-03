@@ -77,7 +77,12 @@ describe('off-thread chunk generation matches the main thread', () => {
     const lit = buildChunkArrays({ ...JOB, lowShade: false });
     const shaded = buildChunkArrays({ ...JOB, lowShade: true, withSplat: false });
     expect(Array.from(shaded.colors)).not.toEqual(Array.from(lit.colors));
-    // ...and only the colours: the surface itself is the same shape either way.
+    expect(Array.from(shaded.uvs)).not.toEqual(Array.from(lit.uvs));
+    for (let i = 0; i < shaded.uvs.length; i++) {
+      expect(shaded.uvs[i]).toBeGreaterThanOrEqual(0);
+      expect(shaded.uvs[i]).toBeLessThanOrEqual(1);
+    }
+    // ...and only the colours and low-tier mask UVs: the surface itself is the same shape either way.
     expect(Array.from(shaded.positions)).toEqual(Array.from(lit.positions));
   });
 

@@ -483,4 +483,41 @@ describe('difficulty selection through the live Sim', () => {
     expect(sim.unappliedDungeonDifficulty(loner)).toBeNull();
     expect(sim.unappliedDungeonDifficulty(leader)).toBeNull();
   });
+
+  it('switches after a party rolls off every boss drop and walks out (owner report 2026-10-27)', () => {
+    // A boss corpse stays lootable with no loot while its need/greed rolls run;
+    // once the winners took everything it must settle, or its 30-minute corpse
+    // hold (frozen while nobody is near) blocks the switch as "loot remains inside".
+    const { sim, leader, member, inst } = setup();
+    expect(sim.enterDungeon('hollow_crypt', leader)).toBe(true);
+    const lead = sim.entities.get(leader)!;
+    const bosses = inst.mobIds
+      .map((id) => sim.entities.get(id)!)
+      .filter((m) => m.templateId === 'morthen' || m.templateId === 'sexton_marrow');
+    for (const boss of bosses) {
+      for (const pid of [leader, member]) {
+        const e = sim.entities.get(pid)!;
+        e.pos = { ...boss.pos };
+        sim.rebucket(e);
+      }
+      sim.dealDamage(lead, boss, boss.hp + 1e6, false, 'physical', null, 'hit');
+      for (const pid of [leader, member]) sim.lootCorpse(boss.id, pid);
+    }
+    expect(sim.ctx.pendingLootRolls.size).toBeGreaterThan(0);
+    for (const roll of [...sim.ctx.pendingLootRolls.values()]) {
+      for (const pid of roll.candidates) sim.submitLootRoll(roll.id, 'need', pid);
+    }
+    expect(sim.ctx.pendingLootRolls.size).toBe(0);
+    for (const boss of bosses) expect(boss.lootable).toBe(false);
+    sim.leaveDungeon(leader);
+    sim.leaveDungeon(member);
+    sim.drainEvents();
+    sim.setDungeonDifficulty('heroic', leader);
+    const text = sim
+      .drainEvents()
+      .filter((e) => e.type === 'error')
+      .map((e) => e.text);
+    expect(text).toContain('Dungeon difficulty set to Heroic.');
+    expect(inst.difficulty).toBe('heroic');
+  });
 });

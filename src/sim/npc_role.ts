@@ -129,6 +129,8 @@ export function npcRoleFor(def: NpcDef): NpcRole | null {
   if (def.warfareVendor) return 'pvpVendor';
   // an inn's keeper is an innkeeper first, whatever fare she also sells
   if (def.innkeeper) return 'innkeeper';
+  // a seasonal keeper reads as her event's keeper, not as a goods vendor
+  if (def.seasonalKeeper) return null;
   const trainer = TRAINER_ROLE_BY_NPC.get(def.id);
   if (trainer) return trainer;
   if (def.vendorItems && def.vendorItems.length > 0) return vendorRoleForStock(def.vendorItems);

@@ -79,6 +79,7 @@ await page.evaluate(() => {
     'reins_lantern_hall_destrier',
     'reins_wobbles_slime',
     'reins_nightwing_chimera',
+    'reins_emberbristle_broom',
   ])
     sim.addItem(id, 1);
 });

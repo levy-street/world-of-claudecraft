@@ -567,4 +567,42 @@ describe('scenery replacement ownership', () => {
       session.dispose();
     }
   });
+
+  it('compacts indexed vertices per reduced part and batches part units on large bands', async () => {
+    const root = new THREE.Group();
+    root.name = 'jungle-features';
+    const material = new THREE.MeshStandardMaterial({ color: 0x458822 });
+    const mesh = new THREE.InstancedMesh(new THREE.BoxGeometry(8, 12, 8), material, 20);
+    for (let i = 0; i < 20; i++) {
+      mesh.setMatrixAt(i, new THREE.Matrix4().makeTranslation(80 + i * 15, 0, 0));
+    }
+    const trunk = new THREE.InstancedMesh(new THREE.BoxGeometry(3, 12, 3), material, 20);
+    for (let i = 0; i < 20; i++) {
+      trunk.setMatrixAt(i, new THREE.Matrix4().makeTranslation(80 + i * 15, 0, 0));
+    }
+    root.add(mesh, trunk);
+    const items = collectSceneryPlacements([root], 0, 0, 630);
+    expect(items).toHaveLength(20);
+    const labels: string[] = [];
+    const band = await buildSceneryBand({
+      name: 'large-band',
+      items,
+      reduction: () => ({ triangles: 12, mode: 'coarse' }),
+      material: sceneryBandMaterial,
+      prepare: async (work, label) => {
+        labels.push(label);
+        return work();
+      },
+      gate: async () => undefined,
+      cancelled: () => false,
+    });
+    band.select(new Uint8Array(20).fill(1));
+    const mergedMesh = band.root.children[0] as THREE.Mesh;
+    // 40 box parts x 12 triangles = 480 triangles (1440 indices), but indexed box has 24 vertices * 40 = 960 vertices (< 1440 non-indexed)
+    expect(mergedMesh.geometry.drawRange.count).toBe(1440);
+    expect(mergedMesh.geometry.attributes.position.count).toBeLessThan(1440);
+    // 40 parts (> 32 threshold) are chunked into 2 scenery-band-part units instead of 40
+    expect(labels.filter((l) => l.startsWith('scenery-band-part:'))).toHaveLength(2);
+    band.dispose();
+  });
 });

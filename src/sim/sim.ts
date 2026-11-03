@@ -81,6 +81,7 @@ export type { CharacterState, PetState } from './character_state';
 import { type AccountEarner, type AccountLedger, freshAccountLedger } from './account_ledger';
 import { spawnBuiltWorldKeepers } from './built_world_keepers';
 import { campPrivateRng } from './camp_private_rng';
+import { savedCharacterCalendar } from './character_calendar_save';
 import { buildCivicServicePlacements } from './civic_service_placements';
 import * as clueMod from './clue_scrolls';
 import {
@@ -92,7 +93,7 @@ import {
 } from './colliders';
 import { applyAbilityCostTail, resolveAbilityChain } from './combat/ability_resolution';
 import { clearAfflictionState } from './combat/affliction';
-import { auraAffectsStats, removeCancelableAura } from './combat/aura_cancel';
+import { cancelPlayerAura } from './combat/aura_cancel_command';
 import { auraReplacementConflicts } from './combat/aura_stacking';
 import {
   isRejectedFriendlyNpcAura,
@@ -156,10 +157,6 @@ import { dealKernelDamage } from './combat/knockback_launch';
 import { tickNaturesFury } from './combat/natures_fury';
 import { clearOssuaryMarks, despawnTemporaryNecromancyUndead } from './combat/necromancy';
 import { tryGrantSolarReprisal } from './combat/paladin_solar_reprisal';
-import {
-  PALADIN_DEVOTION_ABILITY_IDS,
-  stripPaladinDevotionsFromSource,
-} from './combat/paladin_support';
 import {
   completeVeilboundMarch,
   updateVeilboundMarchMovement,
@@ -402,12 +399,9 @@ import { aggroDungeonPackmates } from './mob/dungeon_pack_aggro';
 import { canFlee } from './mob/flee_rules';
 import { forgetLeavingPlayer } from './mob/forget_leaver';
 import { wanderPause } from './mob/idle_rng';
+import { shouldSkipIdleMobTick } from './mob/idle_tick_skip';
 import * as lifecycle from './mob/lifecycle';
-import {
-  isInertInstanceCorpse,
-  resetEvadingMob as resetEvadingMobFn,
-  updateMob as updateMobFn,
-} from './mob/locomotion';
+import { resetEvadingMob as resetEvadingMobFn, updateMob as updateMobFn } from './mob/locomotion';
 import { runMobSwingAffixes } from './mob/mob_swing';
 import { moveTowardImpl } from './mob/move_toward';
 import { spawnOpenWorldMob } from './mob/open_world_tuning';
@@ -450,6 +444,7 @@ import { farmPatchesFor } from './moved_objects';
 import { savedGearFor } from './muster_pike';
 import { updateNpc } from './npc_update';
 import * as nythraxisReadouts from './nythraxis_raid_readouts';
+import { offlineLeaderboardRows } from './offline_leaderboard';
 import {
   grantDevotionFromBlock,
   grantGroundAoEDevotionOnFirstHit,
@@ -516,11 +511,7 @@ import {
   storedCraftResult,
 } from './professions/crafting';
 import { craftingIdentityFor as craftingIdentityForImpl } from './professions/crafting_identity';
-import {
-  craftDailySaveFragment,
-  sanitizeDailyGateLoad,
-  wyrmfallDailySaveFragment,
-} from './professions/daily_gate_load';
+import { sanitizeDailyGateLoad } from './professions/daily_gate_load';
 import {
   type ApplyEnchantResult,
   applyEnchant as applyEnchantImpl,
@@ -705,6 +696,8 @@ import {
 } from './riding_training';
 import { Rng } from './rng';
 import { resolveSavedPosExit } from './saved_pos_exit';
+import * as seasonalMod from './seasonal';
+import { updatePuppetMovement } from './seasonal/scarecrow_puppet';
 import * as seatingMod from './seating';
 import { persistedResource } from './serialize_resource';
 import { computeCharacterModifiers } from './set_bonus_mods';
@@ -735,7 +728,6 @@ import {
   CURRENT_CHARACTER_CONTENT_REVISION,
   migrateCharacterTalentsV2,
 } from './talent_save_migration';
-import * as ferryMod from './transport_ferry';
 import type { TransportFerryView } from './transport_schedule';
 import { updateAbilityDrill } from './tutorial/ability_drill';
 import { updateGauntletRuns } from './tutorial/gauntlet_run';
@@ -749,6 +741,7 @@ import {
   WORLD_BOSSES,
 } from './world_boss';
 import { spawnDevBoss, spawnWorldBoss } from './world_boss_spawn';
+import * as gatesMod from './world_gates';
 
 // Same pattern for the Ravenpost mail book (server/db.ts persists it as a
 // per-realm world_state row alongside the market).
@@ -954,7 +947,6 @@ import {
   swingMissChance,
   TICK_RATE,
   type Vec3,
-  virtualLevel,
   type WeaponSkinLoadout,
   type WeaponSkinType,
   type WorldContent,
@@ -1340,6 +1332,7 @@ export interface PlayerMeta
   extends ReferralRewardState,
     worldQuestState.WorldQuestPlayerState,
     RidingPlayerState,
+    seasonalMod.SeasonalPlayerState,
     HostArmourAuthority,
     lanceTrialMod.LancePlayerState,
     petCommands.PetOwnerRuntimeState,
@@ -2028,6 +2021,7 @@ export class Sim {
   bgMatches = new Map<number, bgMod.BgMatch>(); // pid -> shared match (all members)
   worldPvpBooks = worldPvpMod.newWorldPvpBooks(); // /pvp assist + DR books (live ctx view)
   hillState = hillMod.newHillState(); // King of the Hill: the standing hill (live ctx view)
+  seasonal = seasonalMod.freshSeasonalWorldState(); // host-fed event + /dev override (ctx view)
   readonly hillProbe: HillSpotProbe; // the hill's spot probe, bound in the ctor (pvp/hill_probe.ts)
   private bgBusySlots = new Set<number>();
   private nextBgMatchId = 1;
@@ -2295,7 +2289,7 @@ export class Sim {
     // once here (the rng now exists); a live view + bound callbacks, it draws no rng
     // and mutates nothing, so it cannot perturb the construction draws below.
     this.ctx = this.buildSimContext(cfg);
-    ferryMod.syncFerryGates(this.ctx); // this world's own deck gates before any placement query
+    gatesMod.syncWorldGates(this.ctx); // this world's own gates before any placement query
     // Movement-kernel deps (MV1): pure binding, no rng draws, no construction effects.
     this.playerMotionDeps = {
       seed: this.cfg.seed,
@@ -2303,7 +2297,7 @@ export class Sim {
       resolveMove: (fromX, fromZ, nx, nz, r, e, ignoreFences) =>
         this.resolveMove(fromX, fromZ, nx, nz, r, e, ignoreFences),
       resolvedAbility: (abilityId, pid) => this.resolvedAbility(abilityId, pid),
-      platform: (p) => ferryMod.ferryDeckPlatform(this.ctx, p), // a sailing ship's deck
+      platform: (p) => gatesMod.ferryDeckPlatform(this.ctx, p), // a sailing ship's deck
       cancelCast: (p) => this.cancelCast(p),
       standUp: (p) => seatingMod.standUp(this.ctx, p),
       dealDamage: (source, target, amount, crit, school, ability, kind, noRage) => {
@@ -2826,6 +2820,7 @@ export class Sim {
       questLog: new Map(),
       questsDone: new Set(),
       ...worldQuestState.freshWorldQuestPlayerState(),
+      ...seasonalMod.freshSeasonalPlayerState(),
       counters: freshCounters(),
       autoEquip: opts?.autoEquip ?? false,
       joinedAt: this.time,
@@ -3196,6 +3191,7 @@ export class Sim {
         s.weeklyQuest,
         s.factionCurrencies,
       );
+      seasonalMod.restoreSeasonalState(meta, s.seasonal);
       // A rev reset zeroes COLLECT counts too, and those are derived state only
       // onInventoryChangedForQuests re-credits: re-sync once (inventory is already
       // restored above) so a migrated character holding the collect items is not
@@ -3886,7 +3882,7 @@ export class Sim {
         e.resource,
         e.savedMana,
       ),
-      pos: riftExit?.pos ?? ferryMod.ferrySavePosition(e), // never the sea: a ride saves the destination pier
+      pos: riftExit?.pos ?? gatesMod.ferrySavePosition(e), // never the sea: a ride saves the destination pier
       facing: riftExit?.facing ?? e.facing,
       // Death state: a released spirit resumes its corpse run on relog, and a
       // dead-but-unreleased corpse auto-releases on load (see addPlayer).
@@ -4003,21 +3999,7 @@ export class Sim {
       delveClears: { ...meta.delveClears },
       companionUpgrades: { ...meta.companionUpgrades },
       delveLoreUnlocked: [...meta.delveLoreUnlocked],
-      delveDaily: {
-        date: meta.delveDaily.date,
-        firstClearXp: [...meta.delveDaily.firstClearXp],
-        markClears: meta.delveDaily.markClears,
-      },
-      heroicDaily: { date: meta.heroicDaily.date, marked: [...meta.heroicDaily.marked] },
-      // Masterwrought materials: zero-default omission (the honor idiom), so
-      // a character the faucets never paid serializes byte-identically to a
-      // pre-materials save.
-      ...wyrmfallDailySaveFragment(meta.wyrmfallDaily),
-      ...(meta.emberWeekAnchor !== '' ? { emberWeekAnchor: meta.emberWeekAnchor } : {}),
-      // The oncePerDay craft stamp: zero-default omission like wyrmfallDaily
-      // above, so a character that never crafted a daily-gated recipe
-      // serializes byte-identically to a pre-phase-07 save.
-      ...craftDailySaveFragment(meta.craftDaily),
+      ...savedCharacterCalendar(meta),
       mailWelcomed: meta.mailWelcomed,
       guildLetterSent: meta.guildLetterSent,
       // All three written only when non-empty/true (zero-default
@@ -4112,7 +4094,7 @@ export class Sim {
 
   // --- IWorldTransport ---
   ferryView(): TransportFerryView | null {
-    return ferryMod.transportFerryView(this.ctx, this.entities.get(this.primaryId));
+    return gatesMod.transportFerryView(this.ctx, this.entities.get(this.primaryId));
   }
 
   // --- IWorldMounts ---
@@ -4590,33 +4572,7 @@ export class Sim {
   // XP. Online play overrides this with the cached, realm-scoped server query.
   // Paged through the same helper the server uses so both worlds behave alike.
   leaderboard(page = 0, pageSize = LEADERBOARD_PAGE_SIZE): Promise<LeaderboardPage> {
-    const rows = [...this.players.values()]
-      .map((m) => {
-        const e = this.entities.get(m.entityId);
-        return e ? { meta: m, e } : null;
-      })
-      .filter((x): x is { meta: PlayerMeta; e: Entity } => x !== null)
-      .sort(
-        (a, b) =>
-          b.meta.lifetimeXp - a.meta.lifetimeXp ||
-          b.e.level - a.e.level ||
-          a.meta.name.localeCompare(b.meta.name),
-      )
-      .map(({ meta, e }, i) => ({
-        rank: i + 1,
-        name: meta.name,
-        cls: meta.cls,
-        level: e.level,
-        virtualLevel: virtualLevel(meta.lifetimeXp),
-        lifetimeXp: meta.lifetimeXp,
-        prestigeRank: meta.prestigeRank,
-        // the selected Book of Deeds title (a deed id), like the server fill
-        title: meta.activeTitle,
-        // The guild tag beside the name, read off the passive display field the
-        // host stamps (setPlayerGuild). Omitted rather than empty, like the server
-        // fill; offline that is always the case, since guilds are server-only.
-        ...(e.guild ? { guild: e.guild } : {}),
-      }));
+    const rows = offlineLeaderboardRows(this.players, this.entities); // offline_leaderboard.ts
     return Promise.resolve(paginateLeaderboard(rows, page, pageSize));
   }
   // Guilds are a server-only social system (they live in the server's social DB,
@@ -4713,6 +4669,18 @@ export class Sim {
   }
   abandonClueHunt(pid?: number): void {
     clueMod.abandonClueHunt(this.ctx, pid);
+  }
+  get activeSeasonalEvent(): string | null {
+    return seasonalMod.activeSeasonalEventOf(this.seasonal);
+  }
+  get hauntedPumpkinsFound(): readonly string[] {
+    return seasonalMod.hauntedPumpkinsFoundView(this.primary);
+  }
+  get trickOrTreatedToday(): readonly string[] {
+    return seasonalMod.knockedTodayView(this.primary, this.resetDay);
+  }
+  trickOrTreat(npcId: number, boo = false, pid?: number): void {
+    seasonalMod.knockOrBoo(this.ctx, npcId, boo, pid);
   }
   get treasureMap(): Readonly<TreasureMapProgress> | null {
     return this.primary.treasureMap;
@@ -5189,6 +5157,9 @@ export class Sim {
       get hillState() {
         return sim.hillState;
       },
+      get seasonal() {
+        return sim.seasonal;
+      },
       get hillProbe() {
         return sim.hillProbe;
       },
@@ -5556,7 +5527,7 @@ export class Sim {
       resolveMovePoint: sim.resolveMovePoint.bind(sim),
       resolvePlayerMove: sim.resolveMove.bind(sim),
       resolveMove: sim.resolveMove.bind(sim),
-      platformFor: (p) => ferryMod.ferryDeckPlatform(sim.ctx, p),
+      platformFor: (p) => gatesMod.ferryDeckPlatform(sim.ctx, p),
       // P1a pet AI lives in src/sim/pet/pet_ai.ts; late-bound so sim.ctx resolves at call time.
       updatePet: (pet) => petAi.updatePet(sim.ctx, pet),
       isDelveCompanionMob: companionMod.isDelveCompanionMob,
@@ -5989,7 +5960,7 @@ export class Sim {
     lap?.('respawns');
     this.updateWorldBosses();
     lap?.('worldBosses');
-    ferryMod.updateTransportFerries(this.ctx); // the ferry timetable: board, carry, set down
+    gatesMod.updateWorldGates(this.ctx); // ferry timetable + seasonal decor gate, pre-movement
     tickGroundAoEs(this.ctx);
     lap?.('groundAoEs');
     tickFrozenOrbs(this.ctx);
@@ -6093,7 +6064,7 @@ export class Sim {
         } else if (e.guardianState) {
           if (!updateGuardian(this.ctx, e)) continue;
         } else {
-          if (this.shouldSkipIdleMobTick(e)) continue;
+          if (shouldSkipIdleMobTick(this.ctx, e)) continue;
           this.updateMob(e);
         }
         // Tag the mob.update lap with the mob so the host can attribute this slice
@@ -6191,6 +6162,7 @@ export class Sim {
     worldPvpMod.updateWorldPvp(this.ctx); // the /pvp clock, zone pass + books sweep; zero rng
     lap?.('worldPvp');
     hillMod.updateHill(this.ctx, weeklyMod.recordWeeklyPvpWin); // King of the Hill (pvp/hill.ts): PRIVATE rng
+    seasonalMod.updateSeasonal(this.ctx); // seasonal events + field boss (rng only in his pull)
     lap?.('hill');
     // The Dungeon Finder phase draws ZERO rng (queue bookkeeping + role
     // matching on the sim clock), so appending it here cannot fork the draw order.
@@ -6264,32 +6236,6 @@ export class Sim {
     const out = this.events;
     this.events = [];
     return out;
-  }
-
-  private shouldSkipIdleMobTick(mob: Entity): boolean {
-    const radius = this.cfg.idleMobTickRadius ?? 0;
-    if (radius <= 0) return false;
-    if (mob.dead) {
-      // Instance corpse fields (a cleared rift floor's packs) never decay or
-      // respawn, so once every dead-branch effect is provably spent the corpse
-      // stops paying updateMob. Radius-gated like the live cull: the radius is
-      // the interest-drop radius, so a skipped corpse is outside every
-      // player's replicated view EXCEPT a viewer's own target (targets get
-      // NPC_DROP_RADIUS, slightly wider); that is safe today because the only
-      // frozen fields are two timers nothing serializes, and any change to
-      // that must re-check this exception. Dead mobs draw no rng, so the skip
-      // cannot shift the shared draw order.
-      if (!isInertInstanceCorpse(mob)) return false;
-    } else if (
-      mob.ownerId !== null ||
-      mob.aiState !== 'idle' ||
-      mob.inCombat ||
-      mob.auras.length > 0
-    ) {
-      return false;
-    }
-    if (this.players.size === 0) return true;
-    return !this.playerGrid.hasInRadius(mob.pos.x, mob.pos.z, radius);
   }
 
   private updateLootRolls(): void {
@@ -6611,7 +6557,7 @@ export class Sim {
     if (advanceExclusiveMovement(this.ctx, p, meta, this.playerMotionDeps)) return;
     if (this.updateChargeMovement(p)) return;
     if (this.updateFollowMovement(p, meta)) return;
-    if (this.updateFearMovement(p)) return;
+    if (updatePuppetMovement(this.ctx, p) || this.updateFearMovement(p)) return;
     // The rest of the step (turn integration, wish vector, slope gates, swept
     // static collision, the vertical pass with fall damage) moved VERBATIM to
     // player_motion.ts (MV1), which also eases the body off terrain walls at the
@@ -6803,35 +6749,9 @@ export class Sim {
   }
 
   // Voluntarily cancel one of a player's own helpful auras (the HUD right-click-a-buff
-  // action). Authoritative: the pure predicate refuses debuffs, so a player can never
-  // strip a silence/hex/root off themselves. Mirrors clearAurasFromSource's fade-event
-  // + conditional stat recalc so a stripped buff_*/form_* actually un-folds.
+  // action). Authoritative; the body lives in combat/aura_cancel_command.ts.
   cancelAura(auraId: string, pid?: number): void {
-    const r = this.resolve(pid);
-    if (!r) return;
-    const { e, meta } = r;
-    // The battleground's carried-flag buff is a DROP affordance wearing a buff's
-    // clothes, so it is offered to its owner FIRST: cancelling it must route
-    // through the authoritative flag drop (flag at the runner's feet, catchable,
-    // the bgFlag 'dropped' call to all ten), never the generic splice below,
-    // which would strip the buff and leave the flag carried.
-    if (this.ctx.bgCancelFlagAura(e, auraId)) return;
-    const isPaladinDevotion = PALADIN_DEVOTION_ABILITY_IDS.has(auraId);
-    const removed = removeCancelableAura(e.auras, auraId, isPaladinDevotion ? e.id : undefined);
-    if (!removed) return;
-    if (auraId === 'divine_ascension' && e.paladinDevotion) {
-      e.paladinDevotion.ascensionCharges = 0;
-      e.paladinDevotion.ascensionRemaining = 0;
-    }
-    this.emit({ type: 'aura', targetId: e.id, name: removed.name, gained: false });
-    if (isPaladinDevotion) stripPaladinDevotionsFromSource(this.ctx, e.id, auraId);
-    if (removed.kind === 'stealth') {
-      e.stealthed = e.auras.some((a) => a.kind === 'stealth');
-    }
-    applyGreaterInvisibilityAftereffect(this.ctx, e, removed);
-    if (auraAffectsStats(removed)) {
-      recalcPlayerStats(e, meta.cls, meta.equipment, this.playerMods(meta), meta.equipmentInstance);
-    }
+    cancelPlayerAura(this.ctx, auraId, pid);
   }
 
   private spendResource(p: Entity, cost: number): void {

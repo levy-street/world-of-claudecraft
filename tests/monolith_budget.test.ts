@@ -552,7 +552,9 @@ const MONOLITHS: MonolithRow[] = [
     // Combined guild extractions and integration changes, measured with wc -l.
     // v0.45.2 recovery: reuse the Warfare confirmation formatter for gold,
     // Honor and companions. Measured after recovery integration, zero slack.
-    ceiling: 17733,
+    // Main ce21c7a66f5 sync: parent pins 18043 (Halloween) and 17733 (main).
+    // Exact combined count; the three seasonal wiring lines are preserved.
+    ceiling: 17736,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -1062,7 +1064,7 @@ const MONOLITHS: MonolithRow[] = [
     // Exact count.
     // First-person camera integration extracts the spatial-audio listener.
     // Keep the release branch ceiling ratcheted down by the same eight lines.
-    ceiling: 12346,
+    ceiling: 12193,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -1316,7 +1318,7 @@ const MONOLITHS: MonolithRow[] = [
     // riding progression lives in riding_training.ts. wc -l on the merged tree.
     // 11485 after the courier full-bank sync (PR 4598). wc -l.
     // 11490 with the difficulty menu fix (PR 4625) merged ahead of its landing. wc -l.
-    ceiling: 11490,
+    ceiling: 11410,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1857,7 +1859,9 @@ const MONOLITHS: MonolithRow[] = [
     // wiring composes with the extractions above, still under the release 9751. wc -l.
     // 9694 with the difficulty menu fix (PR 4625) merged ahead of its landing. wc -l.
     // Membership boot wiring lives with its service factory.
-    ceiling: 9693,
+    // Main ce21c7a66f5 sync: parent pins 9758 (Halloween) and 9693 (main).
+    // Exact combined count; the three seasonal wiring lines are preserved.
+    ceiling: 9696,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -2436,7 +2440,7 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 2288 -> 2281 with the Mirefen mudfin huts: the mud hut collider
     // moved to mudfin_huts.ts mudHutCollider, beside the table the renderer
     // draws the huts from. wc -l. Exact count.
-    ceiling: 2281,
+    ceiling: 2279,
     seam: 'per-zone collider data beside the zone content; shared logic stays here',
   },
   {

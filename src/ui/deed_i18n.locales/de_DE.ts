@@ -1406,4 +1406,49 @@ export const table: DeedLocaleTable = {
     desc: 'Bei Garrick Holt, dem Rüstmeister der Laternenhalle, für 24 Laternensiegel gekauft.',
     title: 'von der Laternenhalle',
   },
+  feat_gourdlight_guise: {
+    name: 'Kürbislichtverkleidung',
+    desc: 'Besitze einen Geschnitzten Kürbiskopf, erbeutet vom Alten Thatchgrin auf seinem Feld hinter der Eberwiese während der Kürbislichtnacht.',
+  },
+  feat_old_thatchgrin: {
+    name: 'Stoppeln und Asche',
+    desc: 'Hilf dabei, den Alten Thatchgrin während der Kürbislichtnacht auf seinem Kürbisacker hinter der Eberwiese zu besiegen.',
+  },
+  feat_title_gourdlit: {
+    name: 'Der Kürbiserleuchtete',
+    desc: 'Lies eine Urkunde des Kürbiserleuchteten, während der Kürbislichtnacht bei Hester Gourdwick gegen Kürbislicht-Süßigkeiten eingetauscht.',
+    title: 'der Kürbiserleuchtete',
+  },
+  feat_title_trickster: {
+    name: 'Schelm',
+    desc: 'Lies eine Urkunde des Schelms, während der Kürbislichtnacht bei Hester Gourdwick gegen Kürbislicht-Süßigkeiten eingetauscht.',
+    title: 'Schelm',
+  },
+  feat_title_hollow_grinned: {
+    name: 'Der Hohlgrinser',
+    desc: 'Lies eine Urkunde des Hohlgrinsers, während der Kürbislichtnacht bei Hester Gourdwick gegen Kürbislicht-Süßigkeiten eingetauscht.',
+    title: 'der Hohlgrinser',
+  },
+  feat_pumpkin_hunter: {
+    name: 'Kürbisjäger',
+    desc: 'Finde während der Kürbislichtnacht alle in der Welt versteckten Spukkürbisse.',
+    title: 'der Hohle',
+  },
+  feat_gourdlight_doorsteps: {
+    name: 'Jede Türschwelle',
+    desc: 'Verlange während der Kürbislichtnacht Süßes oder Saures bei allen Stadtbewohnern in Eastbrook, Fenbridge und Highwatch, die auf ein Klopfen antworten.',
+  },
+  feat_gourdlight_errands: {
+    name: 'Auf Hesters Geheiß',
+    desc: 'Erledige jeden von Hester Gourdwicks wechselnden Aufträgen zur Kürbislichtnacht mindestens einmal.',
+  },
+  feat_gourdlight_frights: {
+    name: 'Drei erschreckte Städte',
+    desc: 'Erschrecke bei Hesters Auftrag Buh! je einen Stadtbewohner in Eastbrook, Fenbridge und Highwatch.',
+  },
+  feat_gourdlight_eve_complete: {
+    name: 'Kürbislicht von Anfang bis Ende',
+    desc: 'Erlebe die gesamte Kürbislichtnacht: Besiege den Alten Thatchgrin, finde alle Spukkürbisse, erledige jeden Auftrag von Hester, klopfe an jede Tür und erschrecke je einen Bewohner in jeder der drei Städte.',
+    title: 'der Kürbisgeschworene',
+  },
 };

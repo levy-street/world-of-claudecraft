@@ -1391,4 +1391,49 @@ export const table: DeedLocaleTable = {
     desc: 'Kupiono od Garricka Holta, kwatermistrza Sali Latarni, za 24 Pieczęci Latarni.',
     title: 'z Sali Latarni',
   },
+  feat_gourdlight_guise: {
+    name: 'Dyniowe przebranie',
+    desc: 'Zdobądź Rzeźbioną dyniową głowę ze Starego Słomochichota na jego polu za Łąką Dzików podczas Wigilii Dyniowych Świateł.',
+  },
+  feat_old_thatchgrin: {
+    name: 'Ściernisko i popiół',
+    desc: 'Pomóż pokonać Starego Słomochichota na jego dyniowym poletku za Łąką Dzików podczas Wigilii Dyniowych Świateł.',
+  },
+  feat_title_gourdlit: {
+    name: 'Dyniowy Blask',
+    desc: 'Przeczytaj Akt Dyniowego Blasku, otrzymany od Hester Dynioknot za dyniowe cukierki podczas Wigilii Dyniowych Świateł.',
+    title: 'Dyniowy Blask',
+  },
+  feat_title_trickster: {
+    name: 'Psotnik',
+    desc: 'Przeczytaj Akt Psotnika, otrzymany od Hester Dynioknot za dyniowe cukierki podczas Wigilii Dyniowych Świateł.',
+    title: 'Psotnik',
+  },
+  feat_title_hollow_grinned: {
+    name: 'Pusty Uśmiech',
+    desc: 'Przeczytaj Akt Pustego Uśmiechu, otrzymany od Hester Dynioknot za dyniowe cukierki podczas Wigilii Dyniowych Świateł.',
+    title: 'Pusty Uśmiech',
+  },
+  feat_pumpkin_hunter: {
+    name: 'Łowca dyń',
+    desc: 'Znajdź wszystkie nawiedzone dynie ukryte na świecie podczas Wigilii Dyniowych Świateł.',
+    title: 'Pusty',
+  },
+  feat_gourdlight_doorsteps: {
+    name: 'Każdy próg',
+    desc: 'Poproś o cukierek albo psikus każdego mieszkańca, który otwiera drzwi w Eastbrook, na Moście na Trzęsawisku i w Wysokiej Strażnicy podczas Wigilii Dyniowych Świateł.',
+  },
+  feat_gourdlight_errands: {
+    name: 'Na każde skinienie Hester',
+    desc: 'Ukończ co najmniej raz każdy z rotujących sprawunków Hester Dynioknot podczas Wigilii Dyniowych Świateł.',
+  },
+  feat_gourdlight_frights: {
+    name: 'Trzy wystraszone miasta',
+    desc: 'Podczas sprawunku Hester Bu! przestrasz mieszkańca w każdym z miast: Eastbrook, Most na Trzęsawisku i Wysoka Strażnica.',
+  },
+  feat_gourdlight_eve_complete: {
+    name: 'Dyniowe Światła od początku do końca',
+    desc: 'Ukończ całą Wigilię Dyniowych Świateł: pokonaj Starego Słomochichota, znajdź wszystkie nawiedzone dynie, ukończ każdy sprawunek Hester, zapukaj do wszystkich drzwi i przestrasz mieszkańca w każdym z trzech miast.',
+    title: 'Zaprzysiężony Dyniom',
+  },
 };

@@ -16,6 +16,7 @@ import { LOW_SCENERY_BUDGET } from './scenery_bands/policy_core';
 import { SceneryDetailBatches } from './scenery_detail_batches';
 import {
   inSceneryRegion,
+  SCENERY_DETAIL_EDGES,
   type SceneryDetailBands,
   sceneryDetailLevel,
   sceneryFullDistance,
@@ -41,6 +42,7 @@ interface Batch {
   model: ModelLevels;
   mesh: THREE.InstancedMesh;
   geometry: THREE.BufferGeometry;
+  hideAttr?: THREE.InstancedBufferAttribute;
   level: number;
   slots: number[];
 }
@@ -48,6 +50,7 @@ interface Batch {
 interface Entry {
   mesh: THREE.Mesh;
   source: THREE.BufferGeometry;
+  hideAttr?: THREE.InstancedBufferAttribute;
   model: ModelLevels;
   palmModel?: ModelLevels;
   palmFlags: Uint8Array;
@@ -57,11 +60,16 @@ interface Entry {
   shadowGeometry?: THREE.BufferGeometry;
   positions: Float32Array;
   levels: Uint8Array;
+  margins: Float32Array;
   batches: Batch[];
+  batchLookup: (Batch | undefined)[];
   variants: Map<number, THREE.BufferGeometry>;
   radius: number;
   x: number;
   z: number;
+  selectX: number;
+  selectZ: number;
+  safeStepSq: number;
   matrixVersion: number;
   colorVersion: number;
   hideVersion: number;
@@ -153,9 +161,13 @@ export class SceneryDetailSession {
     const own = model;
     const job = (async () => {
       // The diagnostic off switch keeps the original loading path intact.
-      const { buildSceneryDetail, releaseSceneryTopology, scenerySimplifierReady } = await import(
-        './scenery_detail_indices'
-      );
+      const {
+        buildSceneryDetail,
+        releaseSceneryTopology,
+        retainSceneryTopology,
+        scenerySimplifierReady,
+      } = await import('./scenery_detail_indices');
+      retainSceneryTopology(source);
       await scenerySimplifierReady;
       try {
         for (const level of this.wanted) {
@@ -280,6 +292,9 @@ export class SceneryDetailSession {
     const entry: Entry = {
       mesh,
       source,
+      hideAttr: source.attributes[GHOST_HIDE_ATTRIBUTE] as
+        | THREE.InstancedBufferAttribute
+        | undefined,
       model,
       palmModel,
       palmFlags,
@@ -287,11 +302,16 @@ export class SceneryDetailSession {
       externalCount,
       positions,
       levels: new Uint8Array(count),
+      margins: new Float32Array(count),
       batches: [],
+      batchLookup: new Array(12),
       variants: new Map(),
       radius: 0,
       x: NaN,
       z: NaN,
+      selectX: NaN,
+      selectZ: NaN,
+      safeStepSq: 0,
       matrixVersion: -1,
       colorVersion: -1,
       hideVersion: -1,
@@ -305,11 +325,11 @@ export class SceneryDetailSession {
       for (const batchModel of palmModel ? [model, palmModel] : [model])
         for (const level of batchModel === model ? [0, ...this.wanted] : this.wanted) {
           const geometry = shell(source);
-          if (source.hasAttribute(GHOST_HIDE_ATTRIBUTE))
-            geometry.setAttribute(
-              GHOST_HIDE_ATTRIBUTE,
-              new THREE.InstancedBufferAttribute(new Float32Array(count), 1),
-            );
+          let hideAttr: THREE.InstancedBufferAttribute | undefined;
+          if (source.hasAttribute(GHOST_HIDE_ATTRIBUTE)) {
+            hideAttr = new THREE.InstancedBufferAttribute(new Float32Array(count), 1);
+            geometry.setAttribute(GHOST_HIDE_ATTRIBUTE, hideAttr);
+          }
           const child = new THREE.InstancedMesh(geometry, material, count);
           child.name = `scenery-detail:${level}`;
           child.matrixAutoUpdate = false;
@@ -331,7 +351,16 @@ export class SceneryDetailSession {
           mesh.add(child);
           // Frozen owners will not force a later compose for this new child.
           child.updateMatrixWorld(true);
-          entry.batches.push({ mesh: child, geometry, level, slots: [], model: batchModel });
+          const batch: Batch = {
+            mesh: child,
+            geometry,
+            hideAttr,
+            level,
+            slots: [],
+            model: batchModel,
+          };
+          entry.batches.push(batch);
+          entry.batchLookup[(batchModel === palmModel ? 6 : 0) + level] = batch;
         }
     } else {
       // Landmarks use their whole footprint, not their trunk origin.
@@ -406,16 +435,18 @@ export class SceneryDetailSession {
         if (entry.colorMesh) entry.colorMesh.material = source.material;
         for (const batch of entry.batches) batch.mesh.material = source.material;
       }
-      const hide = entry.source.attributes[GHOST_HIDE_ATTRIBUTE] as
-        | THREE.InstancedBufferAttribute
-        | undefined;
+      const hide =
+        entry.hideAttr ??
+        (entry.source.attributes[GHOST_HIDE_ATTRIBUTE] as
+          | THREE.InstancedBufferAttribute
+          | undefined);
       const matrixVersion = source.instanceMatrix?.version ?? 0;
       const colorVersion = source.instanceColor?.version ?? 0;
       const hideVersion = hide?.version ?? 0;
       const readyLevels = entry.model.indices.size + (entry.palmModel?.indices.size ?? 0);
+      const moved = entry.x !== x || entry.z !== z;
       if (
-        entry.x === x &&
-        entry.z === z &&
+        !moved &&
         entry.matrixVersion === matrixVersion &&
         entry.colorVersion === colorVersion &&
         entry.hideVersion === hideVersion &&
@@ -427,7 +458,11 @@ export class SceneryDetailSession {
         entry.colorVersion !== colorVersion ||
         entry.hideVersion !== hideVersion ||
         entry.readyLevels !== readyLevels;
-      const select = entry.x !== x || entry.z !== z || entry.readyLevels !== readyLevels;
+      const dx = x - entry.selectX;
+      const dz = z - entry.selectZ;
+      const stepSq = dx * dx + dz * dz;
+      const readyChanged = entry.readyLevels !== readyLevels;
+      const select = readyChanged || (moved && !(stepSq < entry.safeStepSq));
       entry.x = x;
       entry.z = z;
       entry.matrixVersion = matrixVersion;
@@ -435,8 +470,17 @@ export class SceneryDetailSession {
       entry.hideVersion = hideVersion;
       entry.readyLevels = readyLevels;
       if (select) {
-        for (const batch of entry.batches) batch.slots.length = 0;
+        const stepDist = readyChanged || !(stepSq < Infinity) ? Infinity : Math.sqrt(stepSq);
+        let minMargin = Infinity;
+        const smallEdge = this.fullDistance + 4;
+        const margins = entry.margins;
         for (let i = 0; i < entry.count; i++) {
+          const rem = margins[i] - stepDist;
+          if (rem > 0) {
+            margins[i] = rem;
+            if (rem < minMargin) minMargin = rem;
+            continue;
+          }
           const placement = entry.placements?.[i];
           const distance = placement
             ? sceneryPlacementDistance(placement, x, z)
@@ -445,27 +489,41 @@ export class SceneryDetailSession {
                 Math.hypot(x - entry.positions[i * 2], z - entry.positions[i * 2 + 1]) -
                   entry.radius,
               );
-          if (!entry.externalCount && placement?.small && distance > this.fullDistance + 4) {
-            changed ||= entry.levels[i] !== 6;
-            entry.levels[i] = 6;
-            if (entry.colorMesh && entry.shadowGeometry) {
-              entry.colorMesh.visible = false;
-              entry.mesh.geometry = entry.shadowGeometry;
+          let itemMargin = Infinity;
+          if (!entry.externalCount && placement?.small) {
+            const smallMargin = Math.abs(distance - smallEdge);
+            if (smallMargin < itemMargin) itemMargin = smallMargin;
+            if (distance > smallEdge) {
+              changed ||= entry.levels[i] !== 6;
+              entry.levels[i] = 6;
+              const safeItem = Math.max(0, itemMargin - 1e-4);
+              margins[i] = safeItem;
+              if (safeItem < minMargin) minMargin = safeItem;
+              if (entry.colorMesh && entry.shadowGeometry) {
+                entry.colorMesh.visible = false;
+                entry.mesh.geometry = entry.shadowGeometry;
+              }
+              continue;
             }
-            continue;
           }
-          let level = sceneryDetailLevel(distance, entry.levels[i], this.bands);
+          const previous = entry.levels[i];
+          let level = sceneryDetailLevel(distance, previous, this.bands);
           let model = entry.palmModel && entry.palmFlags[i] ? entry.palmModel : entry.model;
           if (level && !model.indices.has(level)) level = 0;
           level = (model.canonical.get(level) ?? level) as typeof level;
           if (level === 0) model = entry.model;
-          changed ||= entry.levels[i] !== level;
+          changed ||= previous !== level;
           entry.levels[i] = level;
-          if (source.isInstancedMesh && !entry.externalCount)
-            entry.batches
-              .find((batch) => batch.level === level && batch.model === model)!
-              .slots.push(i);
-          else {
+          for (let band = 0; band < SCENERY_DETAIL_EDGES.length; band++) {
+            const edge = SCENERY_DETAIL_EDGES[band];
+            const threshold = edge + (level > this.bands[band] ? 0 : Math.min(8, edge * 0.05));
+            const margin = Math.abs(distance - threshold);
+            if (margin < itemMargin) itemMargin = margin;
+          }
+          const safeItem = Math.max(0, itemMargin - 1e-4);
+          margins[i] = safeItem;
+          if (safeItem < minMargin) minMargin = safeItem;
+          if (!source.isInstancedMesh || entry.externalCount) {
             const geometry = entry.variants.get(level) ?? entry.source;
             const index = entry.model.indices.get(level);
             if (index) geometry.index = index;
@@ -478,8 +536,22 @@ export class SceneryDetailSession {
             } else entry.mesh.geometry = geometry;
           }
         }
+        entry.safeStepSq = minMargin * minMargin;
+        entry.selectX = x;
+        entry.selectZ = z;
       }
       if (!source.isInstancedMesh || entry.externalCount || !changed) continue;
+      for (const batch of entry.batches) batch.slots.length = 0;
+      for (let i = 0; i < entry.count; i++) {
+        const level = entry.levels[i];
+        if (level === 6) continue;
+        const model =
+          level > 0 && entry.palmModel && entry.palmFlags[i] ? entry.palmModel : entry.model;
+        entry.batchLookup[(model === entry.palmModel ? 6 : 0) + level]!.slots.push(i);
+      }
+      const srcMatArr = source.instanceMatrix.array;
+      const srcColArr = source.instanceColor?.array;
+      const srcHideArr = hide?.array;
       for (const batch of entry.batches) {
         const target = batch.mesh;
         const index = batch.model.indices.get(batch.level);
@@ -488,22 +560,38 @@ export class SceneryDetailSession {
         if (position) batch.geometry.setAttribute('position', position);
         target.count = batch.slots.length;
         target.visible = target.count > 0;
-        const targetHide = batch.geometry.getAttribute(GHOST_HIDE_ATTRIBUTE) as
-          | THREE.InstancedBufferAttribute
-          | undefined;
+        const targetHide = batch.hideAttr;
+        const dstMatArr = target.instanceMatrix.array;
+        const dstColArr = target.instanceColor?.array;
+        const dstHideArr = targetHide?.array;
         for (let j = 0; j < batch.slots.length; j++) {
           const i = batch.slots[j];
-          for (let k = 0; k < 16; k++)
-            target.instanceMatrix.array[j * 16 + k] = source.instanceMatrix.array[i * 16 + k];
-          if (source.instanceColor && target.instanceColor)
-            for (let k = 0; k < 3; k++)
-              target.instanceColor.array[j * 3 + k] = source.instanceColor.array[i * 3 + k];
-          if (hide && targetHide) targetHide.array[j] = hide.array[i];
+          const srcM = i * 16;
+          const dstM = j * 16;
+          for (let k = 0; k < 16; k++) dstMatArr[dstM + k] = srcMatArr[srcM + k];
+          if (srcColArr && dstColArr) {
+            const srcC = i * 3;
+            const dstC = j * 3;
+            dstColArr[dstC] = srcColArr[srcC];
+            dstColArr[dstC + 1] = srcColArr[srcC + 1];
+            dstColArr[dstC + 2] = srcColArr[srcC + 2];
+          }
+          if (srcHideArr && dstHideArr) dstHideArr[j] = srcHideArr[i];
         }
         if (target.count) {
+          target.instanceMatrix.clearUpdateRanges();
+          target.instanceMatrix.addUpdateRange(0, target.count * 16);
           target.instanceMatrix.needsUpdate = true;
-          if (target.instanceColor) target.instanceColor.needsUpdate = true;
-          if (targetHide) targetHide.needsUpdate = true;
+          if (target.instanceColor) {
+            target.instanceColor.clearUpdateRanges();
+            target.instanceColor.addUpdateRange(0, target.count * 3);
+            target.instanceColor.needsUpdate = true;
+          }
+          if (targetHide) {
+            targetHide.clearUpdateRanges();
+            targetHide.addUpdateRange(0, target.count);
+            targetHide.needsUpdate = true;
+          }
         }
       }
       source.count = 0;

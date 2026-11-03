@@ -44,6 +44,7 @@ import { addThreat, clearThreat } from '../../threat';
 import { DT, type Entity } from '../../types';
 import { regrowHead } from '../drowned_temple/hydra_regrowth';
 import { claimBoss, dropAuraById } from '../sunken_bastion/claim';
+import { carryWrathHold, startFloorMechanics } from './council_floor';
 import {
   COUNCIL_AURAS,
   COUNCIL_CASTS,
@@ -214,6 +215,8 @@ function freshState(difficulty: CouncilDifficulty): CouncilFightState {
     casts: 0,
     souls: [],
     soulsSpent: [],
+    lastFloorAt: null,
+    floorHeld: {},
   };
 }
 
@@ -310,6 +313,7 @@ function landBar(s: CouncilScope, role: CouncilRole, body: Entity): void {
   switch (bar.castId) {
     case COUNCIL_CASTS.wrath:
       landWrath(s, body, bar.heir);
+      carryWrathHold(s.st, bar.heir, s.rules.heirFillSeconds);
       return;
     case COUNCIL_CASTS.weight:
       landWeight(s, body, bar.targetId);
@@ -382,12 +386,12 @@ function startBars(s: CouncilScope): void {
   // late it would run into the next one).
   if (st.songDue !== null && st.songDue < -T.songLateDrop) st.songDue = null;
   st.quiet = Math.max(0, st.quiet - DT);
-  // The Wrath first (its holder waits for nothing but its own bar to end).
-  startWrath(s);
+  // The floor mechanics first, the Wrath at their head, one per floor gap
+  // (council_floor.ts: the Wrath, the Echo, Wake the Stone, the rock, the
+  // Walking Slab's start).
+  startFloorMechanics(s);
   // The song next: on normal it is owed only just after a Wrath.
   startSong(s);
-  if (st.wakeTimer <= 0) startWake(s);
-  if (st.rockTimer <= 0) startRock(s);
   if (st.prisonTimer <= 0) startPrison(s);
   if (st.weightTimer <= 0) startWeight(s);
   if (st.boltTimer <= 0) startBolt(s);

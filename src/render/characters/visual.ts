@@ -5,6 +5,7 @@
 // releases mixer bindings, this clone's Skeletons, and the visual's claims
 // on the shared tinted-material cache (which disposes a clone only once no
 // visual mounts it).
+
 import * as THREE from 'three';
 import {
   mainhandShowsWeaponSkin,
@@ -22,6 +23,7 @@ import { GFX } from '../gfx';
 import { cloneMaterialWithHooks } from '../material_clone_hooks';
 import type { MeleeImpactProfile } from '../melee_impact_core';
 import type { MountRideSpec } from '../mount_visuals';
+import { buildSeasonalHeadPiece, fitSeasonalHead } from '../seasonal_head_cosmetic';
 import type { SeatAnimInfo } from '../seated_pose_core';
 import {
   stoneboundShardMaterialOptions,
@@ -145,6 +147,7 @@ import {
 } from './paladin_bastion_sweep_clip';
 import { PaladinBastionSweepFx } from './paladin_bastion_sweep_fx';
 import { PaladinTemplarsVerdictFx } from './paladin_templars_verdict_fx';
+import { applyRideGrip, newRideGripState, type RideArms, resolveRideArms } from './ride_grip_ik';
 import { aimBone, reinArmDirections, rideLegDirections } from './ride_pose';
 import { SanguineWeaponSheath } from './sanguine_weapon_sheath';
 import { type SeatClipPhase, seatClip } from './seat_clips';
@@ -689,6 +692,39 @@ export class CharacterVisual {
     this.wocDressed = true;
     this.wocDefaultDressed = false;
     this.applyWocWorn(wocWornFromEquipment(manifest, equipped, helmHidden));
+    return true;
+  }
+
+  /** Wear or take off the Gourdlight Eve pumpkin head (seasonal_head_core.ts
+   *  decides who draws one). Its first build waits for the event's assets and
+   *  joins hidden until its programs link (revealOnCompile); afterwards a wear
+   *  or a removal is a parent flip. True when the drawn body changed. */
+  setSeasonalHead(on: boolean): boolean {
+    if (!on) {
+      if (!this.seasonalHead) return false;
+      this.seasonalHead.removeFromParent();
+      this.seasonalHead = null;
+      this.wocHead?.setHeadless(false);
+      return true;
+    }
+    if (this.seasonalHead || !this.model) return false;
+    if (this.seasonalHeadBone === undefined) {
+      this.seasonalHeadBone =
+        this.model.getObjectByName('head') ?? this.model.getObjectByName('Head') ?? null;
+    }
+    const bone = this.seasonalHeadBone;
+    if (!bone) return false;
+    const piece = buildSeasonalHeadPiece();
+    if (!piece) return false;
+    fitSeasonalHead(piece, bone, this.root);
+    bone.add(piece);
+    // The pumpkin IS the head: the face, hair and beard under it stop drawing the frame
+    // it shows (never before, so a body is never seen headless while it links). Set
+    // first: without a gate the reveal calls back on this very stack.
+    this.seasonalHead = piece;
+    this.revealOnCompile(piece, 'seasonal head', () => {
+      if (this.seasonalHead === piece) this.wocHead?.setHeadless(true);
+    });
     return true;
   }
 
@@ -1287,6 +1323,10 @@ export class CharacterVisual {
   private chargeGlow: ChargeGlow | null = null;
   /** A permanently lit eye, for a VisualDef that declares one. */
   private eyeGlow: EyeGlow | null = null;
+  // The worn seasonal head (seasonal_head_cosmetic.ts): built on first wear and
+  // hung on the head bone (resolved once; null on a rig without one).
+  private seasonalHead: THREE.Object3D | null = null;
+  private seasonalHeadBone: THREE.Object3D | null | undefined = undefined;
   /**
    * The Shardpike aim reticle around that same eye. Built alongside the glow because it
    * shares its measured offset: the ring and the thing it rings must never drift apart.
@@ -1381,6 +1421,11 @@ export class CharacterVisual {
   private climbTarget: number | null = null;
   private climbArmBones: (THREE.Object3D | null)[] | undefined;
   private climbForearmBones: (THREE.Object3D | null)[] | undefined;
+  /** The broom ride's arm chains (resolveRideArmChain), resolved once; null on a rig
+   *  without them. */
+  private rideArmChain: RideArms | null | undefined;
+  /** Where each hand closes along the broom handle, eased frame to frame (ride_grip_ik). */
+  private readonly rideGripState = newRideGripState();
   private climbLegBones: (THREE.Object3D | null)[] | undefined;
   private climbShinBones: (THREE.Object3D | null)[] | undefined;
   private climbTorsoBone: THREE.Object3D | null | undefined;
@@ -2686,6 +2731,8 @@ export class CharacterVisual {
     if (this.rideBlend < 1e-3) {
       this.rideBlend = 0;
       this.rideArmBlend = 0;
+      // the next ride's grip starts where its own solve puts it, never eased from this one
+      this.rideGripState.primed = false;
       return;
     }
     if (!spec) return;
@@ -2736,6 +2783,17 @@ export class CharacterVisual {
         this.climbTorsoBone = this.model.getObjectByName(CLIMB_TORSO_BONE) ?? null;
       }
       if (this.climbTorsoBone) this.climbTorsoBone.rotation.x += spec.lean * k;
+    }
+    // Hands onto a handle ahead (a broom): a two-bone reach to the grip, solved per
+    // body so a tall or a slight rider both hold the same shaft (ride_grip_ik.ts).
+    if (spec.grip) {
+      if (this.rideArmChain === undefined) {
+        this.rideArmChain = resolveRideArms(this.model, CLIMB_ARM_BONES, CLIMB_FOREARM_BONES);
+        this.rideGripState.primed = false;
+      }
+      if (this.rideArmChain) {
+        applyRideGrip(this.root, this.rideArmChain, spec.grip, k, this.rideGripState, dt);
+      }
     }
     if (spec.upperArm || spec.lowerArm) {
       if (this.climbArmBones === undefined) {
@@ -5238,6 +5296,9 @@ export class CharacterVisual {
     this.templarsVerdictFx = null;
     this.templarsVerdictAction = null;
     this.formAdornments?.dispose();
+    // shared geometry and glow materials (seasonal_decor_assets.ts): only detach
+    this.seasonalHead?.removeFromParent();
+    this.seasonalHead = null;
     this.disposeWeaponAura();
     this.disposeWeaponVfx();
     this.spiritVeil.release();

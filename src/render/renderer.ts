@@ -175,6 +175,7 @@ import {
 import {
   addCharacterEffectAura,
   CHARACTER_EFFECT_RECKLESSNESS,
+  CHARACTER_EFFECT_SEASONAL_FUMES,
   CHARACTER_EFFECT_SOUL_REND,
   characterSporeAura,
   hasCharacterEffect,
@@ -251,6 +252,7 @@ import {
 import { installSpiritVeil } from './characters/ghost_veil';
 import { visualKeyFor, weaponSkinModelUrl } from './characters/manifest';
 import { PooledVisualLifecycle } from './characters/pooled_visual_lifecycle';
+import { effectiveHelmHidden } from './characters/seasonal_head_core';
 import { playerRangedAttackStartsAtLaunch } from './characters/skin_attack';
 import { CharacterVisualPool, characterVisualPoolKey } from './characters/visual_pool';
 import { shouldRetainPooledCharacterVisual } from './characters/visual_pool_policy';
@@ -474,9 +476,11 @@ import {
   storePooledObject as storeGroundObjectInPool,
   takeOrBuildGroundObject,
 } from './ground_object_pool';
+import { buildGroundObjectSparkle, groundObjectSparkleMaterial } from './ground_object_sparkle';
 import { emitGroundPuff } from './ground_puff';
 import { createGroundTilt, type GroundTiltState, stepGroundTilt } from './ground_tilt_core';
 import { buildHauntFeatures, type HauntFeaturesView } from './haunt_features';
+import { buildHauntedPumpkin, syncHauntedPumpkin } from './haunted_pumpkin';
 import { usedJsHeapMb } from './heap_sample';
 import { HillRingVisuals } from './hill_ring';
 import { createHitchFrameAligner } from './hitch_frame_align_core';
@@ -540,7 +544,6 @@ import {
 } from './mage_barrier_visual';
 import { handleMageGroundSpellfxEvent, MageGroundFx } from './mage_ground_fx';
 import { buildMailboxPillar } from './mailbox';
-import { collectObjectTextures } from './material_texture_slots';
 import { type MeleeContactHost, presentMeleeContact } from './melee_contact_present';
 import { meteorLandingBurst } from './meteor_landing_burst';
 import { buildMobNightGlow, type MobNightGlowView } from './mob_night_glow';
@@ -669,11 +672,7 @@ import {
   submitPrewarmCompileUnit,
 } from './prewarm_compile_submission_core';
 import { type PrewarmManifestEntry, runStartedPrewarmEntry } from './prewarm_entry';
-import {
-  boundedPrewarmVisibility,
-  runBackgroundPrewarm,
-  withHiddenPrewarmGroups,
-} from './prewarm_pass';
+import { boundedPrewarmVisibility, withHiddenPrewarmGroups } from './prewarm_pass';
 import {
   compileGroupRunsBeforeInitialPaint,
   mandatoryLandmarkViewsReady,
@@ -697,6 +696,7 @@ import {
   skyAssetInlineWaitMs,
   withRestoredPrewarmState,
 } from './prewarm_policy';
+import { freezePrewarmProgramRoot } from './prewarm_program_anchors';
 import {
   type PrewarmResumeEntry,
   type PrewarmResumeUnit,
@@ -727,7 +727,7 @@ import {
   syncRaidEncounterAnchorVisuals,
   syncRaidEncounterRigVisuals,
 } from './raid_encounter_visuals';
-import { isOwnedPetHostile } from './reaction';
+import { isHostileSelectionTarget } from './reaction';
 import { buildRealmFlora, type RealmFloraView } from './realm_flora';
 import {
   RenderBudgetGovernor,
@@ -786,6 +786,7 @@ import { createRiftAwareGroundSampler } from './rift_ground_sample';
 import { buildRiftRankBadge } from './rift_rank';
 import { syncRigMatrixFreeze, unfreezeRigMatrices } from './rig_visibility_freeze';
 import { RingOfFrostVisuals } from './ring_of_frost_visual';
+import { entityDisplayScale, ScarecrowFx } from './scarecrow_fx';
 import {
   captureSceneCensus,
   createHitchTracker,
@@ -799,6 +800,7 @@ import { sceneKeyLightUniform } from './scene_sampling';
 import * as sceneryDetail from './scenery_detail';
 import { type FlamePerceptualState, updateSceneryFlame } from './scenery_flame';
 import { captureRendererScreenshot } from './screenshot_capture';
+import { SeasonalDecor } from './seasonal_decor';
 import { applySeatAnim } from './seated_pose';
 import { createSelectionReticle, type SelectionReticle } from './selection_reticle';
 import { reticleShownUnder, selectionRingScale } from './selection_ring';
@@ -830,7 +832,7 @@ import {
   shadowTexelWorldSize,
   snapShadowAnchor,
 } from './shadow_texel_snap_core';
-import { disposeUnsharedMeshResources, markSharedMaterial } from './shared_resource';
+import { disposeUnsharedMeshResources } from './shared_resource';
 import { shipShadowHold } from './ship_shadow_hold';
 import {
   buildSky,
@@ -881,7 +883,6 @@ import { refreshTextureAnisotropy } from './texture_anisotropy';
 import { runTexturePrepLane } from './texture_prep_lane';
 import { sweepMaterialTextures, sweepObjectTextures } from './texture_prewarm';
 import { TextureResidencyLedger } from './texture_residency_ledger';
-import { sparkleTexture } from './textures';
 import {
   groundSpeedFromFrame,
   hasTravelFormAura,
@@ -914,6 +915,7 @@ import {
 } from './view_create_budget_core';
 import { ViewCreateRetryGate } from './view_create_retry';
 import { createViewVfxPoseFill } from './view_vfx_pose';
+import { measureCanvasViewport } from './viewport_measure';
 import {
   routeWarlockMeteorSpellfxAt,
   WarlockMeteorFx,
@@ -965,6 +967,7 @@ import {
   type ZonePrewarmStats,
   type ZoneStreamingStats,
 } from './zone_prepare_stats';
+import { runZoneBackgroundPrewarm, runZonePrewarmTask } from './zone_prewarm';
 import {
   buildEntityPrewarmGroup,
   buildNpcPrewarmGroup,
@@ -1047,10 +1050,6 @@ const VFX_PREWARM_BURST_OFFSETS: readonly (readonly [number, number])[] = [
 // cancelled, so the target remains hidden and the serial gate remains occupied
 // until the driver settles instead of overlapping first-draw or later links.
 const VIEW_COMPILE_GATE_MAX_MS = 1500;
-// Textures per zone-prewarm upload unit: small enough that one grant's
-// decode+upload stays well under a frame, large enough not to double the
-// idle-slot count for texture-light children.
-const PREWARM_TEXTURE_UNIT_BATCH = 2;
 // Reserve at the tail of the view-build budget so the compile + final-frame
 // steps always start before the prewarm deadline (runEntry skips late entries).
 const PREWARM_BUILD_RESERVE_MS = 1000;
@@ -1140,7 +1139,6 @@ const LIGHT_BUDGET_RANGE_SQ = 55 * 55;
 const SELECTION_RING_BOOST = 1.5;
 
 const CLICK_MARKER_POOL = 4; // concurrent click-feedback markers before reuse
-const SPARKLE_BOOST = 1.5;
 // Third-person camera obstruction is opacity-only. Anything registered as a
 // hideable crosses the eye-to-camera segment through the shared fade policy.
 // The requested chase-camera distance is never changed by scene geometry.
@@ -1741,6 +1739,7 @@ export class Renderer {
   private amberFeatures: AmberFeaturesView | null = null;
   private nightFeatures: NightFeaturesView | null = null;
   private streetlamps: StreetlampsView | null = null;
+  private seasonalDecor: SeasonalDecor | null = null; // seasonal_decor.ts (event-gated)
   private emberPools: EmberPoolsView | null = null;
   private campBraziers: CampBraziersView | null = null;
   private decorTorchFx: DecorTorchFxView | null = null;
@@ -2009,6 +2008,7 @@ export class Renderer {
   ) => void;
   private frozenOrbFx!: FrozenOrbFx;
   private worldBoss!: WorldBossLayer; // Balgath's fx, far sprites, ward badges
+  private scarecrowFx!: ScarecrowFx; // Gourdlight Eve's field boss (scarecrow_fx.ts)
   private mageGroundFx!: MageGroundFx;
   private varkhulForgestormVisuals?: VarkhulForgestormVisuals;
   private nythraxisMechanicVisuals?: NythraxisMechanicVisuals;
@@ -2341,7 +2341,7 @@ export class Renderer {
       showOwnNameplate: () => this.showOwnNameplate,
       showPlayerNameplates: () => this.showPlayerNameplates,
       showPetNames: () => this.showPetNames,
-      isHostilePlayer: (e) => this.isHostilePlayer(e),
+      isHostilePlayer: (e) => isPvpHostilePlayer(this.sim, e),
       targetHighlight: this.targetHighlight,
     });
 
@@ -2669,17 +2669,9 @@ export class Renderer {
     // The light budget must exist BEFORE any attachZoneFeature call: a static
     // feature that ships glowLights pushes into it during the loop below.
     this.fireLights = props.fireLights;
-    // World-spanning modeled dressing, all static: the Duskfall cave mouths
-    // plus static_world_features.ts (lake flora, the Farshore's palm strand,
-    // the Sanctum's Seal Gate). Attached like the per-zone features so the
-    // distance cull applies: the gates and the palm strand have compact
-    // footprints, and water flora registers one cull child per zone.
     this.hollowGates = buildHollowGates(this.sim.cfg.seed);
-    for (const staticFeature of [
-      this.hollowGates,
-      ...buildStaticWorldFeatures(this.sim.cfg.seed),
-    ]) {
-      this.attachZoneFeature(staticFeature);
+    for (const f of [this.hollowGates, ...buildStaticWorldFeatures(this.sim.cfg.seed)]) {
+      this.attachZoneFeature(f);
     }
     this.flames = props.flames;
     this.windmillFans = props.windmillFans;
@@ -2819,6 +2811,8 @@ export class Renderer {
     // in submits draws; its point lights join the shared fire-light budget.
     this.streetlamps = buildStreetlamps(this.sim.cfg.seed);
     this.attachZoneFeature(this.streetlamps);
+    const seasonalEvent = () => this.sim.activeSeasonalEvent; // built on the event's first open
+    this.seasonalDecor = new SeasonalDecor(this.scene, this.sim.cfg.seed, seasonalEvent, this.worldCompileGate(), this.budgetLights);
     // Warm ground pools under nearby characters after dark. Camera-band sized
     // and rewritten every frame from the entity loop, so it is NOT a zone
     // feature: it is a pooled overlay the sync loop fills.
@@ -3063,7 +3057,7 @@ export class Renderer {
         this.scene,
         this.groundSample,
         this.worldCompileGate(),
-        this.sim, (amount) => this.addShake(amount), () => this.reducedMotion(), (id, gesture) => this.triggerAttack(id, gesture),
+        this.sim, (amount) => this.addShake(amount), () => this.reducedMotion(), (id, gesture) => this.triggerAttack(id, gesture), (id) => this.views.get(id)?.group.position,
       );
     });
     this.hillRingVisuals = new HillRingVisuals(this.scene, gate, (x, z) =>
@@ -3089,6 +3083,7 @@ export class Renderer {
     bd('scene-misc');
     this.vfx = new Vfx(this.scene, vfxAnchor, offsetVfxAnchor, this.groundSample, gate);
     this.vfx.hutFires.setLight(this.lightPulses);
+    this.scarecrowFx = new ScarecrowFx(this.scene, this.vfx, (x, z) => groundHeight(x, z, this.sim.cfg.seed), () => this.sim.entities, (id) => this.sim.entities.get(id), gate, () => this.audioSink, (id, color, k) => { const v = this.views.get(id); if (!v) return; if (k > 0) this.activeVisual(v)?.setAuraGlow(color, k); else { v.visual?.setAuraGlow(color, 0); v.sheepVisual?.setAuraGlow(color, 0); } }, () => this.sim.cfg.seed);
     this.vfx.setViewportScale(this.webgl.domElement.clientHeight * this.webgl.getPixelRatio(), 60);
     this.bgFx = new BattlegroundFx(this.sim, this.views, this.vfx);
     this.farmPatchVisuals = new FarmPatchVisuals(
@@ -3434,22 +3429,7 @@ export class Renderer {
   }
 
   private measureViewport(): { width: number; height: number } {
-    const rect = this.webgl.domElement.getBoundingClientRect();
-    const stableMobileGameViewport =
-      document.body.classList.contains('game-active') &&
-      document.body.classList.contains('mobile-touch');
-    const vv = stableMobileGameViewport ? null : window.visualViewport;
-    const width = Math.round(
-      stableMobileGameViewport
-        ? rect.width || window.innerWidth
-        : (vv?.width ?? (rect.width || window.innerWidth)),
-    );
-    const height = Math.round(
-      stableMobileGameViewport
-        ? rect.height || window.innerHeight
-        : (vv?.height ?? (rect.height || window.innerHeight)),
-    );
-    return { width: Math.max(1, width), height: Math.max(1, height) };
+    return measureCanvasViewport(this.webgl.domElement); // viewport_measure.ts
   }
 
   private castVfxFirstReadRoots(): (THREE.Object3D | undefined)[] {
@@ -3621,14 +3601,17 @@ export class Renderer {
 
   isZonePreparedAt(x: number, z: number): boolean {
     const dungeon = dungeonAt(x);
-    if (dungeon) return dungeonCharacterBodiesResident(dungeon.interior);
+    if (dungeon)
+      return (
+        dungeonCharacterBodiesResident(dungeon.interior) &&
+        (this.staticInteriors?.isDungeonSettled(dungeon, z) ?? true)
+      );
     const id = this.zoneIdAt(x, z);
     return id === null || this.preparedZones.has(id);
   }
 
   isZoneReadyAt(x: number, z: number): boolean {
-    const dungeon = dungeonAt(x);
-    if (dungeon) return dungeonCharacterBodiesResident(dungeon.interior);
+    if (dungeonAt(x)) return Renderer.prototype.isZonePreparedAt.call(this, x, z);
     const id = this.zoneIdAt(x, z);
     if (id === null) return true;
     // Sky residency is part of arrival readiness: a false routes the arrival
@@ -3742,7 +3725,10 @@ export class Renderer {
     if (this.shutdownStarted) return Promise.resolve();
     const dungeon = dungeonAt(x);
     if (dungeon) {
-      return prepareDungeonCharacterBodies(dungeon.interior).then(() => onProgress?.(1, 1));
+      return (
+        this.staticInteriors?.prepareDungeon(dungeon, z, onProgress) ??
+        prepareDungeonCharacterBodies(dungeon.interior).then(() => onProgress?.(1, 1))
+      );
     }
     const zoneId = this.zoneIdAt(x, z);
     if (zoneId === null || this.preparedZones.has(zoneId)) {
@@ -3900,133 +3886,91 @@ export class Renderer {
 
   async prewarmZoneAt(x: number, z: number, opts?: { background?: boolean }): Promise<void> {
     if (this.shutdownStarted) return;
-    const zoneId = this.zoneIdAt(x, z);
+    const dungeon = dungeonAt(x);
+    const zoneId = dungeon ? `dungeon:${dungeon.interior}` : this.zoneIdAt(x, z);
     if (zoneId === null || this.prewarmedZonePrograms.has(zoneId)) return;
-    const pending = this.pendingZonePrewarms.get(zoneId);
-    if (pending) return pending;
-    const task = (async () => {
-      const zone = zoneAt(x, z);
-      const deadline = performance.now() + 5000;
-      const t0 = performance.now();
-      const mobPrewarm = buildEntityPrewarmGroup(this.zonePrewarmHost(), zone);
-      const npcPrewarm = buildNpcPrewarmGroup(this.zonePrewarmHost(), zone, deadline);
-      const mobGroup = mobPrewarm.group;
-      const npcGroup = npcPrewarm.group;
-      // Hide before scene attachment. The shared GPU queue may be occupied by
-      // sky/feature work for many frames before runBackgroundPrewarm starts.
-      mobGroup.visible = false;
-      npcGroup.visible = false;
-      this.scene.add(mobGroup, npcGroup);
-      const tBuild = performance.now();
-      let tCompile = tBuild;
-      try {
-        // A background prewarm (the visible-zone streaming lane) links the new
-        // programs off-thread BEFORE the warm pass renders with them, so the
-        // pass never compiles inside a live gameplay frame. Compile the PREWARM
-        // GROUPS, one idle slot apart, never the whole scene: compileAsync's
-        // synchronous prologue walks and re-initializes every material it is
-        // handed, and a full-scene walk was a measured multi-hundred-ms stall
-        // per streamed zone. Live frames keep rendering across that whole
-        // awaited window, so runBackgroundPrewarm keeps both groups invisible
-        // between its bounded child uploads (a visible group is a grid of T-posed
-        // rigs stacked next to the player). The gating path (behind the loading
-        // screen) keeps render-first, which also covers renderers without
-        // KHR_parallel_shader_compile.
-        if (opts?.background) {
-          await runBackgroundPrewarm([mobGroup, npcGroup], {
-            supportsAsyncCompile: this.asyncCompileSupported,
-            idleSlot: () =>
-              idleSlot(IDLE_PREWARM_TIMEOUT_MS, {
-                maxTimeoutDeferrals: 2,
-              }),
-            compileChild: async (child) => {
-              const childRoot = child as THREE.Object3D;
-              await warmRootBeforeLink(this.compileArms, childRoot, {
-                priority: GPU_WORK_PRIORITY.VISIBLE_PREWARM,
-                label: `zone-prewarm-warm:${childRoot.name || childRoot.type}`,
-                run: (work, priority, label) => this.backgroundGpuWork.run(work, priority, label),
-                includeOffscreenVariant: true,
-              });
-              await this.backgroundGpuWork.run(
-                () => this.compilePrewarmColorPrograms(childRoot, true),
-                GPU_WORK_PRIORITY.VISIBLE_PREWARM,
-                `zone-prewarm-color:${childRoot.name || childRoot.type}`,
-              );
-              await this.backgroundGpuWork.run(
-                () => this.compileShadowPrograms(childRoot),
-                GPU_WORK_PRIORITY.VISIBLE_PREWARM,
-                `zone-prewarm-shadow:${childRoot.name || childRoot.type}`,
-              );
-            },
-            prepareChildAssets: (child) => {
-              this.prewarmObjectTextures(child as THREE.Object3D);
-            },
-            // Decomposed upload: a whole-child bounded render was a measured
-            // 100-345ms main-thread unit (texture decode+upload dominating).
-            // Pre-upload the child's textures in small batches through their
-            // own arbiter units, then the bounded render only pays geometry
-            // upload plus the raster warm.
-            warmChildUnits: (groupLike, child) => {
-              const group = groupLike as THREE.Group;
-              const childRoot = child as THREE.Object3D;
-              const units: { label: string; run: () => void }[] = [];
-              const textures = [...collectObjectTextures(childRoot, false)];
-              for (let i = 0; i < textures.length; i += PREWARM_TEXTURE_UNIT_BATCH) {
-                const batch = textures.slice(i, i + PREWARM_TEXTURE_UNIT_BATCH);
-                units.push({
-                  label: 'zone-prewarm-tex',
-                  run: () => {
-                    for (const texture of batch) this.webgl.initTexture(texture);
-                  },
-                });
-              }
-              units.push({
-                label: `zone-prewarm-render:${childRoot.name || childRoot.type}`,
-                run: () => this.renderBoundedPrewarmRoot(group, childRoot),
-              });
-              return units;
-            },
-            renderWarmPass: () => {
-              tCompile = performance.now();
-              this.renderPrewarmPass(1 / 60, { offscreen: true });
-            },
-            runUpload: (work, label) =>
-              this.backgroundGpuWork.run(
-                work,
-                GPU_WORK_PRIORITY.VISIBLE_PREWARM,
-                label ?? 'zone-prewarm-upload',
-              ),
-          });
-          tCompile = performance.now();
-        } else {
-          mobGroup.visible = true;
-          npcGroup.visible = true;
-          tCompile = performance.now();
-          this.renderPrewarmPass(1 / 60);
-          // The gating path compiles after the pass, exactly as before.
-          if (this.asyncCompileSupported) {
-            await this.compilePrewarmColorPrograms(this.scene, false);
+    return runZonePrewarmTask(
+      this.pendingZonePrewarms,
+      zoneId,
+      opts?.background === true,
+      async (pacing) => {
+        const zone = dungeon ? ({ ...zoneAt(x, z), id: zoneId } as ZoneDef) : zoneAt(x, z);
+        const deadline = performance.now() + 5000;
+        const t0 = performance.now();
+        const mobPrewarm = buildEntityPrewarmGroup(this.zonePrewarmHost(), zone);
+        const npcPrewarm = buildNpcPrewarmGroup(this.zonePrewarmHost(), zone, deadline);
+        const mobGroup = mobPrewarm.group;
+        const npcGroup = npcPrewarm.group;
+        // Hide before scene attachment. The shared GPU queue may be occupied by
+        // sky/feature work for many frames before runBackgroundPrewarm starts.
+        mobGroup.visible = false;
+        npcGroup.visible = false;
+        this.scene.add(mobGroup, npcGroup);
+        const tBuild = performance.now();
+        let tCompile = tBuild;
+        try {
+          // A background prewarm (the visible-zone streaming lane) links the new
+          // programs off-thread BEFORE the warm pass renders with them, so the
+          // pass never compiles inside a live gameplay frame. Compile the PREWARM
+          // GROUPS, one idle slot apart, never the whole scene: compileAsync's
+          // synchronous prologue walks and re-initializes every material it is
+          // handed, and a full-scene walk was a measured multi-hundred-ms stall
+          // per streamed zone. Live frames keep rendering across that whole
+          // awaited window, so runBackgroundPrewarm keeps both groups invisible
+          // between its bounded child uploads (a visible group is a grid of T-posed
+          // rigs stacked next to the player). The gating path (behind the loading
+          // screen) keeps render-first, which also covers renderers without
+          // KHR_parallel_shader_compile.
+          if (opts?.background) {
+            await runZoneBackgroundPrewarm(
+              [mobGroup, npcGroup],
+              {
+                supportsAsyncCompile: this.asyncCompileSupported,
+                arms: this.compileArms,
+                queue: this.backgroundGpuWork,
+                compileColor: (root) => this.compilePrewarmColorPrograms(root, true),
+                compileShadow: (root) => this.compileShadowPrograms(root),
+                prepareAssets: (root) => this.prewarmObjectTextures(root),
+                uploadTexture: (texture) => {
+                  this.webgl.initTexture(texture);
+                },
+                renderRoot: (group, child) => this.renderBoundedPrewarmRoot(group, child),
+                renderWarmPass: () => {
+                  tCompile = performance.now();
+                  this.renderPrewarmPass(1 / 60, { offscreen: true });
+                },
+              },
+              pacing,
+            );
+            tCompile = performance.now();
+          } else {
+            mobGroup.visible = true;
+            npcGroup.visible = true;
+            tCompile = performance.now();
+            this.renderPrewarmPass(1 / 60);
+            // The gating path compiles after the pass, exactly as before.
+            if (this.asyncCompileSupported) {
+              await this.compilePrewarmColorPrograms(this.scene, false);
+            }
           }
+          this.prewarmedZonePrograms.add(zoneId);
+        } finally {
+          mobGroup.removeFromParent();
+          npcGroup.removeFromParent();
+          // Only publish visuals to the live pool after the warm pass. Background
+          // gameplay can otherwise take one out of its T-pose grid while the
+          // prewarm awaits idle compile slots, leaving its shadow variant cold.
+          for (const item of mobPrewarm.pooled) this.pooledVisuals.store(item.key, item.visual);
+          for (const item of npcPrewarm.pooled) this.pooledVisuals.store(item.key, item.visual);
+          this.lastZonePrewarmStats = {
+            zoneId,
+            buildMs: Math.round(tBuild - t0),
+            compileMs: Math.round(tCompile - tBuild),
+            passMs: Math.round(performance.now() - tCompile),
+          };
         }
-        this.prewarmedZonePrograms.add(zoneId);
-      } finally {
-        mobGroup.removeFromParent();
-        npcGroup.removeFromParent();
-        // Only publish visuals to the live pool after the warm pass. Background
-        // gameplay can otherwise take one out of its T-pose grid while the
-        // prewarm awaits idle compile slots, leaving its shadow variant cold.
-        for (const item of mobPrewarm.pooled) this.pooledVisuals.store(item.key, item.visual);
-        for (const item of npcPrewarm.pooled) this.pooledVisuals.store(item.key, item.visual);
-        this.lastZonePrewarmStats = {
-          zoneId,
-          buildMs: Math.round(tBuild - t0),
-          compileMs: Math.round(tCompile - tBuild),
-          passMs: Math.round(performance.now() - tCompile),
-        };
-      }
-    })().finally(() => this.pendingZonePrewarms.delete(zoneId));
-    this.pendingZonePrewarms.set(zoneId, task);
-    return task;
+      },
+    );
   }
 
   /** Blocking-path neighborhood prepare for a teleport ARRIVAL (the rift exit):
@@ -5107,6 +5051,7 @@ export class Renderer {
     this.sentenceVfx.update(dt, this.reducedMotion());
     this.frozenOrbFx.update(dt);
     this.worldBoss.fx.update(dt, this.reducedMotion(), this.sim.entities.values());
+    this.scarecrowFx.update(dt, this.reducedMotion());
     this.mageGroundFx.syncWorldMeteorWarnings(this.sim);
     this.mageGroundFx.update(dt);
     this.varkhulForgestormVisuals?.syncWorld(this.sim);
@@ -5959,6 +5904,7 @@ export class Renderer {
       }
       if (propMaterialPrewarmGroup) this.scene.remove(propMaterialPrewarmGroup);
       ghostVariantSlot.cleanup();
+      if (abilityMaterialSlot.group) freezePrewarmProgramRoot(abilityMaterialSlot.group);
       if (foliagePrewarmGroup) this.scene.remove(foliagePrewarmGroup);
       if (greatTreePrewarmGroup) this.scene.remove(greatTreePrewarmGroup);
       // Removed, never disposed: disposing a material releases its linked
@@ -6128,6 +6074,7 @@ export class Renderer {
         priority: 32,
         required: false,
         run: async () => {
+          if (p.pos.x <= DUNGEON_X_THRESHOLD) return;
           interiorPrewarmGroup = await this.ensureDungeons().buildPrewarmGroup();
           this.scene.add(interiorPrewarmGroup);
         },
@@ -7296,6 +7243,7 @@ export class Renderer {
           break;
         }
         if (ev.fx === 'windup') {
+          this.scarecrowFx.handleWindup(ev.sourceId, ev.ability);
           // A petSpell windup telegraph: start the throw animation now; the
           // projectile for this throw follows petSpell.windup later, timed to
           // the clip's release pose. `ability` rides along so a mob one-shot
@@ -7470,6 +7418,7 @@ export class Renderer {
       case 'spellfxAt': {
         if (ev.fx === 'hoardDig') break;
         if (routeBalgathSpellfxAt(ev, this.worldBoss?.fx, () => this.sim.entities.values())) break;
+        if (this.scarecrowFx.handleSpellfxAt(ev)) break;
         if (ev.fx === 'soulTravel') {
           if (ev.targetId !== undefined) {
             const gy = groundHeight(ev.x, ev.z, this.sim.cfg.seed);
@@ -7950,6 +7899,11 @@ export class Renderer {
       body = built.group;
       height = built.height;
       objectMesh = body;
+    } else if (e.kind === 'object' && e.templateId === 'ground_haunted_pumpkin') {
+      const built = buildHauntedPumpkin(this.sim, e);
+      if (!built) return;
+      body = objectMesh = built.group;
+      height = built.height;
     } else if (e.kind === 'object' && e.objectItemId === 'soulwell') {
       // Temporary Warlock party utility: bespoke procedural prop today, kept
       // behind buildSoulwell so a generated GLB can replace it later.
@@ -7979,19 +7933,8 @@ export class Renderer {
         e.templateId !== 'delve_locked_door' &&
         e.templateId !== 'delve_destructible_wall'
       ) {
-        if (!this.sparkleMat) {
-          this.sparkleMat = markSharedMaterial(
-            new THREE.SpriteMaterial({
-              map: sparkleTexture(),
-              transparent: true,
-              depthWrite: false,
-            }),
-          );
-          if (!this.lowGfx) this.sparkleMat.color.setScalar(SPARKLE_BOOST);
-        }
-        sparkle = new THREE.Sprite(this.sparkleMat);
-        sparkle.scale.set(0.9, 0.9, 1);
-        sparkle.position.y = 1.35;
+        this.sparkleMat ??= groundObjectSparkleMaterial(this.lowGfx);
+        sparkle = buildGroundObjectSparkle(this.sparkleMat);
         group.add(sparkle);
       }
     } else if (
@@ -8030,19 +7973,8 @@ export class Renderer {
       if (result.reused) body.rotation.y = groundQuestObjectYaw(e.objectItemId ?? '', e.id);
       objectMesh = body;
       if (!e.objectItemId?.startsWith('forge_')) {
-        if (!this.sparkleMat) {
-          this.sparkleMat = markSharedMaterial(
-            new THREE.SpriteMaterial({
-              map: sparkleTexture(),
-              transparent: true,
-              depthWrite: false,
-            }),
-          );
-          if (!this.lowGfx) this.sparkleMat.color.setScalar(SPARKLE_BOOST); // gold glint via bloom
-        }
-        sparkle = new THREE.Sprite(this.sparkleMat);
-        sparkle.scale.set(0.9, 0.9, 1);
-        sparkle.position.y = 1.35;
+        this.sparkleMat ??= groundObjectSparkleMaterial(this.lowGfx);
+        sparkle = buildGroundObjectSparkle(this.sparkleMat);
         group.add(sparkle);
       }
     } else {
@@ -8198,7 +8130,7 @@ export class Renderer {
       weaponStowed: false,
       // Born with the CURRENT bit: unlike the stow pose there is no transition
       // to replay, createCharacterVisual composed with it just now.
-      helmHidden: e.helmHidden,
+      helmHidden: effectiveHelmHidden(e),
       // Born with the CURRENT look, for the same reason: createCharacterVisual
       // composed with it just now, so there is nothing to reconcile yet.
       modularAppearance: e.modularAppearance,
@@ -8671,27 +8603,12 @@ export class Renderer {
     if (v) this.activeVisual(v)?.playHit();
   }
 
-  private isHostileSelectionTarget(target: Entity): boolean {
-    // A controlled pet inherits its owner's reaction (a player's pet is hostile
-    // only in PvP), so route mobs through the owner-aware helper; everything
-    // else falls back to the player-vs-player verdict.
-    if (target.kind === 'mob') {
-      return target.ownerId !== null
-        ? isOwnedPetHostile(target, this.sim.entities, (p) => this.isHostilePlayer(p))
-        : target.hostile;
-    }
-    return this.isHostilePlayer(target);
-  }
-
   private isHostileSelectionTargetId(id: number): boolean {
     const target = this.sim.entities.get(id);
-    return target !== undefined && this.isHostileSelectionTarget(target);
-  }
-
-  // The shared client verdict (src/ui/pvp_hostile_core.ts): duel, ranked
-  // arena, Thornhollow Fields, and the open-world /pvp flag pair rule.
-  private isHostilePlayer(target: Entity): boolean {
-    return isPvpHostilePlayer(this.sim, target);
+    return (
+      target !== undefined &&
+      isHostileSelectionTarget(target, this.sim.entities, (p) => isPvpHostilePlayer(this.sim, p))
+    );
   }
 
   // -------------------------------------------------------------------------
@@ -9349,8 +9266,8 @@ export class Renderer {
       this.dnColorScratch.g *= realmTint[1];
       this.dnColorScratch.b *= realmTint[2];
       this.hemi.groundColor.lerp(this.dnColorScratch, k);
-      const baseSun = this.lowGfx ? lowSunIntensity(GFX) : SUN_INTENSITY;
-      const baseHemi = this.lowGfx ? lowHemiIntensity(GFX) : hemiOutdoorIntensity();
+      const baseSun = this.lowGfx ? lowSunIntensity(GFX, g, biome) : SUN_INTENSITY;
+      const baseHemi = this.lowGfx ? lowHemiIntensity(GFX, g, biome) : hemiOutdoorIntensity();
       this.sun.intensity +=
         (baseSun * g.lightScale * (light.sunScale ?? 1) - this.sun.intensity) * k;
       // The ambient half rides its own higher night floor, so terrain shape and
@@ -9836,7 +9753,7 @@ export class Renderer {
       const hasSoulRend = hasCharacterEffect(characterEffects, CHARACTER_EFFECT_SOUL_REND);
       const hasRecklessness = hasCharacterEffect(characterEffects, CHARACTER_EFFECT_RECKLESSNESS);
       const spores = characterSporeAura(characterEffects, this.reducedMotion());
-      const displayScale = e.scale * (this.riftDeathZoneVisuals?.bodySwell(e.id) ?? 1);
+      const displayScale = entityDisplayScale(e, this.riftDeathZoneVisuals, this.scarecrowFx);
       if (displayScale !== v.liveScale) {
         v.liveScale = displayScale;
         v.group.scale.setScalar(displayScale);
@@ -10082,6 +9999,8 @@ export class Renderer {
             }
           }
         }
+        if (vis && e.templateId === 'ground_haunted_pumpkin' && v.objectMesh)
+          syncHauntedPumpkin(v.objectMesh, this.sim, e, this.time, this.reducedMotion(), this.vfx);
         if (vis && e.objectItemId === 'soulwell' && v.objectMesh) {
           syncSoulwellVisual(v.objectMesh, this.time, e.id);
         }
@@ -11090,6 +11009,8 @@ export class Renderer {
           } else if (hasMoonkin) this.vfx.formAura(e.id, 'moonkin', dt);
           else if (hasShadowform) this.vfx.gloam.wearer(e.id, active.gloamCue(), settled, d2, ay);
           if (spores) this.vfx.formAura(e.id, spores, dt);
+          if (hasCharacterEffect(characterEffects, CHARACTER_EFFECT_SEASONAL_FUMES))
+            this.vfx.fluidSmoke(ax, ay + 0.6, az, 0x7bdc4e, dt, 16); // a seasonal trick's fumes
           // orange worn-gear motes: STATIC-preset-gated sheddable prestige
           if (e.kind === 'player' && gfxTierAtLeast(GFX.effectsTier, 'medium')) {
             if (v.legendaryRegaliaRef !== e.equippedInstances) {
@@ -11174,7 +11095,9 @@ export class Renderer {
     const tv = target ? this.views.get(target.id) : undefined;
     if (target && tv) {
       const { x, y, z } = tv.group.position;
-      const hostile = this.isHostileSelectionTarget(target);
+      const hostile = isHostileSelectionTarget(target, this.sim.entities, (p) =>
+        isPvpHostilePlayer(this.sim, p),
+      );
       const boost = this.lowGfx ? 1 : SELECTION_RING_BOOST;
       const heavy = this.targetHighlight.reticle;
       this.selectionReticle.sync(
@@ -11287,6 +11210,7 @@ export class Renderer {
     this.emberPools?.update(lampGlow, this.time);
     this.campBraziers?.update(lampGlow, this.time);
     this.decorTorchFx?.update(lampGlow, this.time);
+    this.seasonalDecor?.update(lampGlow, this.time, p.pos.x, p.pos.z, this.reducedMotion());
     // The night light field: every lamp and camp fire plus the nearby bodies
     // collected above, packed into the terrain shader's uniform slots. Indoors
     // the world clock does not govern the ground either, so the same fogState
@@ -11328,6 +11252,7 @@ export class Renderer {
     this.sentenceVfx.update(dt, this.reducedMotion());
     this.frozenOrbFx.update(dt);
     this.worldBoss.fx.update(dt, this.reducedMotion(), this.sim.entities.values());
+    this.scarecrowFx.update(dt, this.reducedMotion());
     this.worldBoss.syncImpostors(
       this.webgl,
       this.sim.entities.values(),
@@ -11972,6 +11897,7 @@ export class Renderer {
     this.riftDeathZoneVisuals?.dispose();
     this.blobShadows?.dispose();
     this.worldBoss.dispose();
+    this.scarecrowFx.dispose();
     this.authoredLayers?.dispose();
     this.editor.dispose();
   }

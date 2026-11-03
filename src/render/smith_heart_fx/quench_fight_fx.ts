@@ -47,6 +47,7 @@ import {
 } from '../../sim/encounters/smith_heart/quench_ids';
 import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
+import { fxAnchor } from '../attached_fx_anchor';
 import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { type TelegraphFan, TelegraphKit, type TelegraphLane } from '../floor_telegraph';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
@@ -660,11 +661,13 @@ export class QuenchFightFx {
     }
     if (ev.type !== 'spellfx' || !quenchFightClaims(ev.ability)) return false;
     const dst = this.world.entities.get(ev.targetId);
-    if (ev.ability === QUENCH_CUES.plunge && dst) this.splash(dst.pos.x, dst.pos.z, 1.4);
-    else if (ev.ability === QUENCH_CUES.climb && dst) this.splash(dst.pos.x, dst.pos.z, 0.7);
+    if (ev.ability === QUENCH_CUES.plunge && dst)
+      this.splash(fxAnchor(dst).x, fxAnchor(dst).z, 1.4);
+    else if (ev.ability === QUENCH_CUES.climb && dst)
+      this.splash(fxAnchor(dst).x, fxAnchor(dst).z, 0.7);
     else if (ev.ability === QUENCH_CUES.freeze && dst) this.freezeBurst(dst);
     else if (ev.ability === QUENCH_CUES.rim && dst)
-      this.particles.shockRing(dst.pos.x, dst.pos.z, 0xe0f4ff, 40, 1.4);
+      this.particles.shockRing(fxAnchor(dst).x, fxAnchor(dst).z, 0xe0f4ff, 40, 1.4);
     else if (ev.ability === QUENCH_CUES.thaw && dst) this.thaw(dst);
     // The blades' waking is drawn by the blades and the body.
     return true;
@@ -964,12 +967,13 @@ export class QuenchFightFx {
     for (const id of this.coldIds) {
       const e = world.entities.get(id);
       if (!e || e.dead) continue;
+      const eAt = fxAnchor(e);
       let cold = 0;
       for (const a of e.auras) if (a.id === QUENCH_AURAS.cold) cold = a.value;
       const look = frostLook(cold, this.clock, P.crystalsPer, _frost);
       if (look.cover <= 0.02) continue;
-      const floor = this.groundY(e.pos.x, e.pos.z);
-      _v.set(e.pos.x, floor + 0.04, e.pos.z);
+      const floor = this.groundY(eAt.x, eAt.z);
+      _v.set(eAt.x, floor + 0.04, eAt.z);
       const rr = 0.9 + 0.8 * look.cover;
       _s.set(rr, 1, rr);
       this.rimes.setMatrixAt(ri, _m.compose(_v, _q.identity(), _s));
@@ -980,9 +984,9 @@ export class QuenchFightFx {
         frostCrystal(k + id * 31, _crystal);
         const y = floor + _crystal.y * look.height * bodyH;
         _v.set(
-          e.pos.x + Math.sin(_crystal.a) * _crystal.r,
+          eAt.x + Math.sin(_crystal.a) * _crystal.r,
           y,
-          e.pos.z + Math.cos(_crystal.a) * _crystal.r,
+          eAt.z + Math.cos(_crystal.a) * _crystal.r,
         );
         _e.set(Math.cos(_crystal.a) * _crystal.lean, 0, -Math.sin(_crystal.a) * _crystal.lean);
         _q.setFromEuler(_e);
@@ -992,7 +996,7 @@ export class QuenchFightFx {
       }
       // Rime breath off a body past three quarters (cosmetic).
       if (look.pulse > 0 && this.rand() < dt * 6 * this.density) {
-        this.particles.puff(e.pos.x, floor + 1.6, e.pos.z, 1, {
+        this.particles.puff(eAt.x, floor + 1.6, eAt.z, 1, {
           speed: 0.8,
           up: 0.6,
           life: 0.9,
@@ -1015,8 +1019,9 @@ export class QuenchFightFx {
     for (const id of this.warmIds) {
       const e = world.entities.get(id);
       if (!e || e.dead) continue;
-      const floor = this.groundY(e.pos.x, e.pos.z);
-      _v.set(e.pos.x, floor + 0.05, e.pos.z);
+      const eAt = fxAnchor(e);
+      const floor = this.groundY(eAt.x, eAt.z);
+      _v.set(eAt.x, floor + 0.05, eAt.z);
       _s.set(T.warmR * 0.55, 1, T.warmR * 0.55);
       this.warms.setMatrixAt(wi, _m.compose(_v, _q.identity(), _s));
       this.warms.setColorAt(wi, _c.setRGB(0.75, 0, fightHash(id, 9)));
@@ -1024,9 +1029,9 @@ export class QuenchFightFx {
       this.warmBodies.push(this.warmBodyOf(this.warmBodies.length, e));
       if (this.rand() < dt * 5 * this.density) {
         this.particles.puff(
-          e.pos.x + (this.rand() - 0.5) * 1.6,
+          eAt.x + (this.rand() - 0.5) * 1.6,
           floor + 0.4,
-          e.pos.z + (this.rand() - 0.5) * 1.6,
+          eAt.z + (this.rand() - 0.5) * 1.6,
           1,
           {
             speed: 0.4,
@@ -1067,12 +1072,13 @@ export class QuenchFightFx {
     for (const id of this.frozenIds) {
       const e = world.entities.get(id);
       if (!e || e.dead) continue;
+      const eAt = fxAnchor(e);
       let radius = 6;
       for (const a of e.auras) if (a.id === QUENCH_AURAS.frozen && a.value > 0) radius = a.value;
       const since = this.clock - (this.frozenSince.get(id) ?? this.clock);
       const look = frozenLook(since);
-      const floor = this.groundY(e.pos.x, e.pos.z);
-      _v.set(e.pos.x, floor - 0.05, e.pos.z);
+      const floor = this.groundY(eAt.x, eAt.z);
+      _v.set(eAt.x, floor - 0.05, eAt.z);
       _e.set(0, fightHash(id, 2) * Math.PI, 0);
       _q.setFromEuler(_e);
       _s.set(1, 1, 1);
@@ -1081,7 +1087,7 @@ export class QuenchFightFx {
       const fan = this.splashFans[bi];
       fan.id = id;
       fan.fan.group.visible = true;
-      this.kit.drapeFan(fan.fan, this.groundY, e.pos.x, floor, e.pos.z, 0, radius);
+      this.kit.drapeFan(fan.fan, this.groundY, eAt.x, floor, eAt.z, 0, radius);
       this.kit.paintFan(fan.fan, {
         fill: Math.min(1, since / T.freezeSeconds),
         clock: this.clock,
@@ -1101,13 +1107,14 @@ export class QuenchFightFx {
     for (const id of this.trappedIds) {
       const e = world.entities.get(id);
       if (!e || e.dead) continue;
-      const floor = this.groundY(e.pos.x, e.pos.z);
-      _v.set(e.pos.x, floor - 0.25, e.pos.z);
+      const eAt = fxAnchor(e);
+      const floor = this.groundY(eAt.x, eAt.z);
+      _v.set(eAt.x, floor - 0.25, eAt.z);
       _s.set(1, 1, 1);
       this.collars.setMatrixAt(wa, _m.compose(_v, _q.identity(), _s));
       this.collars.setColorAt(wa, _c.setRGB(0, 0, fightHash(id, 6)));
       wa++;
-      if (this.rand() < dt * 4 * this.density) this.splash(e.pos.x, e.pos.z, 0.35);
+      if (this.rand() < dt * 4 * this.density) this.splash(eAt.x, eAt.z, 0.35);
     }
     for (let i = wa; i < P.trapped; i++) this.collars.setMatrixAt(i, _zero);
     this.collars.instanceMatrix.needsUpdate = true;
@@ -1124,8 +1131,9 @@ export class QuenchFightFx {
   private warmBodyOf(i: number, e: Entity): WarmBody {
     const w = this.warmPool[i];
     w.id = e.id;
-    w.x = e.pos.x;
-    w.z = e.pos.z;
+    const eAt = fxAnchor(e);
+    w.x = eAt.x;
+    w.z = eAt.z;
     return w;
   }
 
@@ -1220,8 +1228,9 @@ export class QuenchFightFx {
   // ---- the moments ----------------------------------------------------------------------
 
   private freezeBurst(e: Entity): void {
-    const y = this.groundY(e.pos.x, e.pos.z);
-    this.particles.puff(e.pos.x, y + 1.2, e.pos.z, 14, {
+    const eAt = fxAnchor(e);
+    const y = this.groundY(eAt.x, eAt.z);
+    this.particles.puff(eAt.x, y + 1.2, eAt.z, 14, {
       speed: 2.5,
       life: 0.6,
       size: [0.28, 0.08],
@@ -1230,7 +1239,7 @@ export class QuenchFightFx {
       pool: 'glow',
       radius: 0.8,
     });
-    this.particles.puff(e.pos.x, y + 0.8, e.pos.z, 6, {
+    this.particles.puff(eAt.x, y + 0.8, eAt.z, 6, {
       speed: 1,
       up: 0.5,
       life: 1.4,
@@ -1332,9 +1341,10 @@ export class QuenchFightFx {
 
   /** The guardian fell: the lake refreezes whole, a wave of frost over it. */
   private thaw(e: Entity): void {
-    this.particles.shockRing(e.pos.x, e.pos.z, 0xe8f9ff, 34, 2.2);
-    this.particles.shockRing(e.pos.x, e.pos.z, 0x9ad8ff, 24, 1.6);
-    this.shakeNear(e.pos.x, e.pos.z, 0.4, 60);
+    const eAt = fxAnchor(e);
+    this.particles.shockRing(eAt.x, eAt.z, 0xe8f9ff, 34, 2.2);
+    this.particles.shockRing(eAt.x, eAt.z, 0x9ad8ff, 24, 1.6);
+    this.shakeNear(eAt.x, eAt.z, 0.4, 60);
   }
 
   dispose(): void {

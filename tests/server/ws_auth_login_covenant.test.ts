@@ -97,7 +97,7 @@ function setup() {
   const ws = new FakeWs();
   // characterId is what the kick is keyed on; the rest of the ws_auth suite
   // omits it, which is why its ~30 joins kick with `undefined`.
-  const session = { pid: 1, characterId: CHARACTER, tag: 'covenant-session' };
+  const session = { pid: 1, characterId: CHARACTER, tag: 'covenant-session', ws };
   const game = {
     isIpBlocked: vi.fn(() => false),
     countIpSessions: vi.fn(() => 0),

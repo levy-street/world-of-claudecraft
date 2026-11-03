@@ -25,7 +25,7 @@ export const worldPvp: GuidePage = {
           `<p>${esc(t('guide.worldPvpPage.stakesBodyFlagged'))}</p><p>${esc(t('guide.worldPvpPage.stakesUnflaggedTake'))}</p>`,
         )}
         ${section('guide.worldPvpPage.limitsHeading', `<p>${esc(t('guide.worldPvpPage.limitsBodyRaids'))}</p>`)}
-        ${section('guide.worldPvpPage.hillHeading', `<p>${esc(t('guide.worldPvpPage.hillBodyFlat'))}</p>`)}
+        ${section('guide.worldPvpPage.hillHeading', `<p>${esc(t('guide.worldPvpPage.hillBodyTwoHour'))}</p>`)}
         ${related([
           { href: hrefFor('arena'), key: 'guide.nav.arena' },
           { href: hrefFor('thornhollow-fields'), key: 'guide.nav.thornhollow' },

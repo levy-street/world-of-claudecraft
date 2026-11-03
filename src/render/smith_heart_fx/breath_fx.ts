@@ -28,6 +28,7 @@ import * as THREE from 'three';
 import { resolveUiEffectsProfile } from '../../game/ui_effects_profile';
 import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
+import { fxAnchor } from '../attached_fx_anchor';
 import {
   TELEGRAPH_THREAT_COLORS,
   type TelegraphFan,
@@ -57,6 +58,8 @@ import {
   STORM_LANCE,
 } from './breath_fx_core';
 import { fxHash } from './hammer_fx_core';
+import { BREATH_GUST_GLOW_STEP } from './painted_telegraph_core';
+import { BreathTelegraphs } from './painted_telegraphs';
 
 const SCAN_SEC = 0.1;
 const C = BREATH_FX_COLORS;
@@ -291,9 +294,16 @@ export class BreathFx {
     // The telegraphs: the footprint on every tier (the kit's curtain only
     // where the tier draws detail).
     this.kit = new TelegraphKit(this.root, detail);
+    const exhale = new BreathTelegraphs(BREATH_GUST_GLOW_STEP, this.materials);
     for (let i = 0; i < BREATH_FX_POOLS.telegraphs; i++) {
-      this.fans.push(this.kit.fan(10));
-      this.lanes.push(this.kit.lane(12));
+      const fan = this.kit.fan(10);
+      // The exhale's ring in the wind's paint: pale air blasting outward.
+      exhale.dress(fan, 'gust');
+      this.fans.push(fan);
+      const lane = this.kit.lane(12);
+      // Storm Lance's lane in the storm's paint: lightning racing down it.
+      exhale.dress(lane, 'lance');
+      this.lanes.push(lane);
     }
     // The whirl's stones.
     const chip = chipGeometry();
@@ -531,8 +541,9 @@ export class BreathFx {
         this.endCharge(c);
         continue;
       }
-      c.x = e.pos.x;
-      c.z = e.pos.z;
+      const eAt = fxAnchor(e);
+      c.x = eAt.x;
+      c.z = eAt.z;
       c.y = this.groundY(c.x, c.z);
       const total =
         e.castTotal > 0 ? e.castTotal : c.kind === 'gust' ? this.sim.gustCast : this.sim.lanceCast;

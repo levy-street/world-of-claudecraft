@@ -27,6 +27,7 @@ import {
   normalizeAppearance,
   slotCovered,
 } from './modular';
+import { effectiveHelmHidden } from './seasonal_head_core';
 import { classBodyComposes } from './woc_parts_core';
 
 /** The roster-row fields a look is composed from. Structural on purpose: the
@@ -85,7 +86,11 @@ export function inWorldLookFor(
   // A class on a WOC modular body (woc_parts_core.ts) never composes the
   // KayKit library: its fixed def dresses itself from the worn equipment.
   if (!classBodyComposes(e.templateId as PlayerClass)) return null;
-  return composedLook(e.modularAppearance, armorSetFor(e.templateId as PlayerClass), e.helmHidden);
+  return composedLook(
+    e.modularAppearance,
+    armorSetFor(e.templateId as PlayerClass),
+    effectiveHelmHidden(e),
+  );
 }
 
 /**

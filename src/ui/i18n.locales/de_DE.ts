@@ -26194,4 +26194,235 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.stackUnavailable':
     'Das Hinzufügen von Mitgliedschaftszeit ist derzeit nicht verfügbar. Versuche es in Kürze erneut.',
   'hudChrome.wocStore.subscription.tokenPrice': '{price} für 30 Tage',
+  'errors.api.worldFightHold':
+    'Ein anderer Charakter dieses Kontos befindet sich nach einem Kampf noch in der Welt. Versuche es in ein paar Minuten erneut.',
+  'hudChrome.auraEffect.gourdlight.thatchbound':
+    'Alter Thatchgrin zieht deine Fäden. Du kannst nicht handeln: Du wirst zu deinem nächsten Verbündeten geführt und schlägst ihn alle {every} Sek. für {min} bis {max} Schaden (bis zum {mult}-Fachen gegen einen Verbündeten auf Stufe {level}). Endet vorzeitig, wenn du Schaden in Höhe von {pct}% deiner maximalen Gesundheit erleidest oder ein Verbündeter den Effekt bannt (Magie).',
+  'hudChrome.auraEffect.seasonalCosmetic': 'Rein kosmetisch: kein Einfluss auf den Kampf',
+  'hudChrome.auraEffect.slumberNight':
+    'Hängt bis zum Einbruch der Nacht leblos an seinem Pfahl. Kann nicht angegriffen werden.',
+  'hudChrome.auraEffect.stilledMindCrit':
+    'Dein nächster Geistesbruch oder Leerenriss ist bei einem Treffer garantiert kritisch. Andere Zauber verbrauchen diesen Bonus nicht. Leerenriss verbraucht weiterhin 3 Ladungen Düsterzehnt. Wird dem Zauber widerstanden, wird der Bonus verbraucht.',
+  'hudChrome.mounts.desc_emberbristle_broom':
+    'Ein mit orangefarbenem Band gebundener Erntebesen, der eine Handbreit über dem Boden schwebt und Glut aus seinen Borsten streut. Eine dauerhafte Belohnung der Kürbislichtnacht.',
+  'hudChrome.mounts.name_emberbristle_broom': 'Glutborstenbesen',
+  'hudChrome.worldBoss.sleepUntilNightfall': '{name} schläft bis zum Einbruch der Nacht.',
+  'hudChrome.priest.bombLabel': 'Zehntbombe',
+  'hudChrome.priest.bombReady': 'Bereit',
+  'hudChrome.priest.bombStatus': '{value} von {max} Zehntbombenladungen',
+  'hudChrome.priest.bombTooltip':
+    'Zehntbombe: Erzeuge 20 Ladungen Düsterzehnt, um eine Bombe vorzubereiten. Das Ausgeben von Düsterzehnt erhöht den Fortschritt nicht. Der Fortschritt bleibt zwischen Kämpfen erhalten. Sterben oder der Beginn eines Schlachtzugbosskampfes setzt ihn zurück. Ein abgeschlossener Zauber verbraucht die Bombe; ein Abbruch erhält sie.',
+  'hudChrome.priest.chargeCount': '{value} / {max}',
+  'hudChrome.priest.gloomtitheLabel': 'Düsterzehnt',
+  'hudChrome.priest.gloomtitheStatus': '{value} von {max} Düsterzehnt',
+  'hudChrome.priest.gloomtitheTooltip':
+    'Düsterzehnt: bis zu 5 verbrauchbare Ladungen. Leerenriss verbraucht 3; Vampirberührung verbraucht 2 für 30% mehr Schaden; Zehntteufel rufen verbraucht deinen gesamten Vorrat. Das Erzeugen von Ladungen füllt auch die Zehntbombe, selbst bei vollem Vorrat.',
+  'entities.abilities.choir_of_deliverance.specNote_shadow':
+    'Verteilt 15 Sek. lang 20% der Gesundheit, die Gegner durch deinen Schattenschaden verlieren, als Heilung auf verletzte Gruppenmitglieder innerhalb von 30 Metern, dich eingeschlossen. In Schlachtzügen wird nur deine Untergruppe geheilt. Sofort gewirkt; du kannst in Schattengestalt weiter angreifen. Absorbierter Schaden und Schaden über die verbleibende Gesundheit hinaus erzeugen keine Heilung.',
+  'entities.abilities.inner_focus.specNote_shadow':
+    'Reserviert außerdem einen garantierten kritischen Treffer für deinen nächsten Geistesbruch oder Leerenriss innerhalb von 60 Sek., sofern er trifft. Andere Zauber verbrauchen diesen Bonus nicht. Leerenriss verbraucht weiterhin 3 Ladungen Düsterzehnt. Wird dem Zauber widerstanden, wird der Bonus auf kritische Treffer verbraucht.',
+  'entities.abilities.spirit_bomb.description':
+    'Lässt eine Geisterbombe auf einem Gegner explodieren und fügt Gegnern innerhalb von 8 Metern um das Ziel {damage} Schattenschaden zu. Der Schaden steigt mit der Zaubermacht, kann kritisch treffen und wird bei mehr als 5 Zielen verringert. Erzeuge 20 Ladungen Düsterzehnt, um eine Bombe vorzubereiten. Die Erzeugung zählt auch bei den maximalen 5 gehaltenen Ladungen; Ladungen auszugeben ist nicht nötig und erhöht den Fortschritt nicht. Der Fortschritt bleibt zwischen Kämpfen erhalten, bis zu einer vorbereiteten Bombe. Sterben löscht deinen Fortschritt und deine vorbereitete Bombe. Ein abgeschlossener Zauber verbraucht die vorbereitete Bombe, auch wenn ihm widerstanden wird. Abbruch oder Unterbrechung erhält sie. Der Beginn eines Schlachtzugbosskampfes löscht deinen Fortschritt und deine vorbereitete Bombe. Mit diesem Zauber kannst du keinen Schlachtzugbosskampf eröffnen.',
+  'entities.abilities.spirit_bomb.name': 'Zehntbombe',
+  'entities.abilities.vampiric_touch.description':
+    'Verursacht über 15 Sek. insgesamt {damage} Schattenschaden, einmal alle 3 Sek. Der Schaden steigt mit der Zaubermacht und die regelmäßigen Treffer können kritisch treffen. Jeder Treffer verteilt Heilung in Höhe von 20% der vom Gegner verlorenen Gesundheit auf dich und verletzte Gruppenmitglieder innerhalb von 30 Metern; in einem Schlachtzug erhält nur deine Untergruppe diese Heilung. Hast du mindestens 2 Ladungen Düsterzehnt, verbraucht das Anwenden dieses Effekts 2 davon und erhöht seinen gesamten Schaden um 30%.',
+  'entities.abilities.vampiric_touch.name': 'Vampirberührung',
+  'entities.abilities.void_rupture.description':
+    'Verbraucht 3 Ladungen Düsterzehnt, um einen Gegner aufzureißen und ihm {damage} Schattenschaden zuzufügen. Der Schaden steigt mit der Zaubermacht und kann kritisch treffen. Erfordert 3 Ladungen und verbraucht sie auch dann, wenn dem Zauber widerstanden wird.',
+  'entities.abilities.void_rupture.name': 'Leerenriss',
+  'entities.items.batwing_draught.name': 'Flattertrunk',
+  'entities.items.carved_pumpkin_head.name': 'Geschnitzter Kürbiskopf',
+  'entities.items.crabapple_chew.name': 'Wildapfelkaubonbon',
+  'entities.items.cursed_candle_stub.name': 'Verfluchter Kerzenstummel',
+  'entities.items.emberwoven_sheaf.name': 'Glutverwobene Garbe',
+  'entities.items.gourdlight_crow_feather.name': 'Kürbislicht-Krähenfeder',
+  'entities.items.gourdlight_sweet.name': 'Kürbislicht-Süßigkeit',
+  'entities.items.gourdlight_treat_pouch.name': 'Kürbislicht-Naschbeutel',
+  'entities.items.gourdseed_brittle.name': 'Kürbiskernkrokant',
+  'entities.items.gurglegreen_cauldron.name': 'Grünblubberkessel',
+  'entities.items.haunting_draught.name': 'Spuktrunk',
+  'entities.items.hearthroot_toffee.name': 'Herdwurzeltoffee',
+  'entities.items.jar_of_mischief.name': 'Schabernackglas',
+  'entities.items.lantern_mint_drop.name': 'Laternenminzbonbon',
+  'entities.items.murmurwick_candle.name': 'Flüsterdochtkerze',
+  'entities.items.owlwatch_fudge.name': 'Eulenwacht-Konfekt',
+  'entities.items.prankers_pumpkin.name': 'Streichspielerkürbis',
+  'entities.items.rattlebone_draught.name': 'Klapperknochentrunk',
+  'entities.items.reins_emberbristle_broom.name': 'Glutborstenbesen',
+  'entities.items.sack_of_startled_bats.name': 'Sack erschreckter Fledermäuse',
+  'entities.items.strawling_charm.name': 'Strohlingtalisman',
+  'entities.items.thatchgrin_patch_pumpkin.name': 'Ackerkürbis',
+  'entities.items.thatchgrin_sweet_sack.name': 'Thatchgrins Süßigkeitensack',
+  'entities.items.wanderwisp_lantern.name': 'Wanderlichtlaterne',
+  'entities.items.writ_of_the_gourdlit.name': 'Urkunde des Kürbiserleuchteten',
+  'entities.items.writ_of_the_hollow_grin.name': 'Urkunde des Hohlgrinsers',
+  'entities.items.writ_of_the_trickster.name': 'Urkunde des Schelms',
+  'entities.mobs.gourdlight_crow.name': 'Kürbislichtkrähe',
+  'entities.mobs.gourdlight_strawling.name': 'Strohling',
+  'entities.mobs.gourdlight_swelling_gourd.name': 'Anschwellender Kürbis',
+  'entities.mobs.gourdlight_thatchgrin.name': 'Alter Thatchgrin',
+  'entities.npcs.gourdlight_keeper.greeting':
+    'Die Kürbisse leuchten und die Laternen hängen, also muss Kürbislichtnacht sein. Klopfe bei den Leuten in Eastbrook, Fenbridge und Highwatch an und sage die Worte: Süßes oder Saures. Die meisten geben dir eine Süßigkeit. Einige spielen dir einen Streich. Bring die Süßigkeiten zu einem meiner Stände, und ich tausche sie gegen etwas zum Anziehen.',
+  'entities.npcs.gourdlight_keeper.name': 'Hester Gourdwick',
+  'entities.npcs.gourdlight_keeper.title': 'Hüterin des Kürbislichts',
+  'entities.quests.q_gourdlight_daily_baskets.completion':
+    'Alle drei abgeliefert, und ich höre, Marlow hat geweint. Er weint immer. Hier ist ein Korb für dich.',
+  'entities.quests.q_gourdlight_daily_baskets.objectives.0.label': 'Korb bei Koch Marlow abgegeben',
+  'entities.quests.q_gourdlight_daily_baskets.objectives.1.label':
+    'Korb bei Kräuterkundige Yara abgegeben',
+  'entities.quests.q_gourdlight_daily_baskets.objectives.2.label':
+    'Korb bei Lehrmeister Caddis abgegeben',
+  'entities.quests.q_gourdlight_daily_baskets.text':
+    'Jede Kürbislichtnacht fülle ich in jeder Stadt einen Korb Süßigkeiten für einen alten Freund, und meine Knie sind nicht mehr die besten. Bring sie für mich herum, {playerName}: zu Koch Marlow in Eastbrook, zu Kräuterkundige Yara in Fenbridge und zu Lehrmeister Caddis oben in Highwatch.',
+  'entities.quests.q_gourdlight_daily_baskets.title': 'Körbe für die Nachbarn',
+  'entities.quests.q_gourdlight_daily_boo.completion':
+    'Drei? Ich habe quer über den Platz gehört, wie der Koch eine Pfanne fallen ließ. Gut gemacht. Hier ist dein Anteil.',
+  'entities.quests.q_gourdlight_daily_boo.objectives.0.label': 'Stadtbewohner erschreckt',
+  'entities.quests.q_gourdlight_daily_boo.text':
+    'Seit einem Jahr hat sich in diesen Städten niemand mehr richtig erschreckt, {playerName}, und eine Kürbislichtnacht ohne Schrecken ist nur eine kalte Nacht. Zieh ein Kostüm an, irgendeines von meinen genügt, oder den Kürbiskopf, falls du dir einen verdient hast. Dann schleiche dich an drei Stadtbewohner heran und rufe ein ordentlich lautes BUH!',
+  'entities.quests.q_gourdlight_daily_boo.title': 'Buh!',
+  'entities.quests.q_gourdlight_daily_feathers.completion':
+    'Schwarz wie ein Feld ohne Mond, und sie riechen schon nach Rauch. Das Freudenfeuer wird ein Anblick. Danke.',
+  'entities.quests.q_gourdlight_daily_feathers.objectives.0.label': 'Krähenfedern',
+  'entities.quests.q_gourdlight_daily_feathers.text':
+    'Wenn der Alte Thatchgrin bedrängt wird, ruft er seine Krähen auf diejenigen herab, die auf sein Stroh einschlagen. Ihre Federn brennen im Herd grün, und ich brauche drei für das heutige Freudenfeuer. Suche einen Kampf auf seinem Acker, {playerName}, und zupfe sie seinen Krähen aus.',
+  'entities.quests.q_gourdlight_daily_feathers.title': 'Federn fürs Feuer',
+  'entities.quests.q_gourdlight_daily_patch.completion':
+    'Fünf runde Exemplare und kein einziger Biss darin. Das gibt Kuchen fürs ganze Tal. Hier, für deine Mühe.',
+  'entities.quests.q_gourdlight_daily_patch.objectives.0.label': 'Ackerkürbisse',
+  'entities.quests.q_gourdlight_daily_patch.text':
+    'Der Acker des Alten Thatchgrin hinter der Eberwiese ist voller Kürbisse. Die Hälfte ist außerhalb der Reichweite seines Strohs gerollt, wo vorsichtige Leute sie erreichen können. Bring mir fünf, {playerName}. Halte dich von der alten Vogelscheuche selbst fern. Er zählt jeden einzelnen.',
+  'entities.quests.q_gourdlight_daily_patch.title': 'Kürbisse vom Acker',
+  'entities.quests.q_gourdlight_daily_towns.completion':
+    'Drei Städte in einer Nacht! Deine Stiefel haben sich das mehr verdient als du.',
+  'entities.quests.q_gourdlight_daily_towns.objectives.0.label':
+    'An einer Tür in Eastbrook angeklopft',
+  'entities.quests.q_gourdlight_daily_towns.objectives.1.label':
+    'An einer Tür in Fenbridge angeklopft',
+  'entities.quests.q_gourdlight_daily_towns.objectives.2.label':
+    'An einer Tür in Highwatch angeklopft',
+  'entities.quests.q_gourdlight_daily_towns.text':
+    'Die Kinder sagen, ein echter Kürbislichtwanderer klopft in jeder Stadt an, ehe die Nacht vorbei ist. Gib ihnen recht, {playerName}. Verlange Süßes oder Saures an je einer Tür in Eastbrook, Fenbridge und Highwatch. Die Laternen an den Straßen leuchten dir den Weg.',
+  'entities.quests.q_gourdlight_daily_towns.title': 'Eine Tür in jeder Stadt',
+  'entities.quests.q_gourdlight_daily_wicks.completion':
+    'Sechs Stummel, kalt wie Reif. Wer sie angezündet hat, muss sich mehr Mühe geben. Nimm das und wasch dir die Hände.',
+  'entities.quests.q_gourdlight_daily_wicks.objectives.0.label': 'Verfluchte Kerzen gelöscht',
+  'entities.quests.q_gourdlight_daily_wicks.text':
+    'Jemand stellt Kerzen mit grünen Flammen an den Fuß unserer Laternenpfähle. Sie brennen, ohne zu schmelzen, und flüstern, wenn man ihnen den Rücken zukehrt. Lösche sechs für mich, {playerName}, in einer beliebigen der drei Städte, und bring mir die Stummel.',
+  'entities.quests.q_gourdlight_daily_wicks.title': 'Böse Dochte',
+  'entities.quests.q_gourdlight_rounds.completion':
+    'Fünf Türen und noch alle Finger dran. Hier, ein Beutel Süßigkeiten für den Heimweg. Komm morgen wieder, dann öffnen sich die Türen erneut.',
+  'entities.quests.q_gourdlight_rounds.objectives.0.label': 'An Türen angeklopft',
+  'entities.quests.q_gourdlight_rounds.text':
+    'Jede Kürbislichtnacht ziehen die Kinder des Tals ihre Runden, und dieses Jahr begleitest du sie, {playerName}. Klopfe an fünf Türen in unseren Städten, sage die Worte und sieh, was du bekommst. Komm zu mir zurück, wenn du fertig bist.',
+  'entities.quests.q_gourdlight_rounds.title': 'Kürbislichtrunde',
+  'guide.interfacePage.framesGovernedPriest':
+    'Mit Rahmen bearbeiten kannst du auch das Medaillon für Düsterzehnt und Zehntbombe des Schattenpriesters verschieben.',
+  'guide.worldPvpPage.hillBodyTwoHour':
+    'Einmal alle zwei Stunden wird zu einem unvorhersehbaren Zeitpunkt dem ganzen Realm angekündigt, dass in fünfzehn Minuten ein Hügel in einer der nördlichen Zonen erscheint. Sein Kreis wird auf offenem Gelände markiert. Der Hügel bleibt dreißig Minuten und verschwindet dann. Solange er da ist, erfährt der Realm alle fünf Minuten seinen Standort und welche Gruppen ihn am längsten gehalten haben. Die Gruppe mit den meisten Spielern im Kreis beansprucht den Hügel und erobert ihn nach dreißig Sekunden Mehrheit. Betritt eine rivalisierende Gruppe den Kreis, pausiert dieser Zähler nur, bis deine Gruppe wieder führt; er beginnt erst neu, wenn kein lebendes Mitglied deiner Gruppe mehr im Kreis steht. Ein Einzelspieler zählt als Ein-Personen-Gruppe und behält seinen Hügel, wenn er eine Gruppe gründet; Schlachtzugsmitglieder zählen dagegen überhaupt nicht. Solange eine Gruppe den Hügel hält, erhält jedes ihrer Mitglieder im Kreis jede Minute gleich viel Ehre, unabhängig von der bisherigen Haltedauer. Eine volle Gruppe, die ihn während seiner gesamten Dauer unangefochten hält, verdient daher etwa so viel wie bei zwei Schlachtfeldsiegen. Verschwindet der Hügel, und hat die Gruppe mit der längsten gesamten Haltedauer ihn mindestens zehn Minuten gehalten, erhält jeder, der für diese Gruppe mindestens eine Minute im Kreis stand und ihr weiterhin angehört, einen Sieg für die PvP-Zeile der Wöchentlichen Tresors. Eine Leiste über dem Feld zeigt den Besitzer, eure Anzahl im Vergleich zur gegnerischen und den Eroberungszähler; /hill im Chat nennt den Standort.',
+  'seasonal.boo.already': '{name} hat für heute genug Schrecken erlebt.',
+  'seasonal.boo.flash': 'BUH! {name} ist erschrocken!',
+  'seasonal.boo.frightenedHint':
+    '{name} ist von deinem letzten Schrecken noch ganz schreckhaft. Suche jemand anderen.',
+  'seasonal.boo.landed':
+    'Du springst vor {name} und rufst BUH! Ein Kreischen ertönt, und beinahe fällt alles zu Boden.',
+  'seasonal.boo.needsCostume':
+    'Zieh zuerst ein Kostüm an: einen Kostümtrunk, einen Fledermaus- oder Skelettstreich, den Strohlingtalisman, den Geschnitzten Kürbiskopf oder einen Goblinschluck aus dem Grünblubberkessel.',
+  'seasonal.boo.noCostume': 'Ohne Kostüm lacht {name} dich nur aus. Zieh erst eines an.',
+  'seasonal.boo.notOnErrand': 'Hester hat dich heute nicht gebeten, jemanden zu erschrecken.',
+  'seasonal.boo.row': 'Buh!',
+  'seasonal.boo.rowAria': 'Vor {name} springen und Buh rufen',
+  'seasonal.boundItemGone':
+    'Die Kürbislichtnacht ist vorbei, und dein Gegenstand {item} zerfällt wieder zu Stroh.',
+  'seasonal.costume': 'Du trinkst den Trunk und verwandelst dich: {trick}!',
+  'seasonal.event.gourdlight_eve.name': 'Kürbislichtnacht',
+  'seasonal.guise': 'Der Talisman knistert, und Stroh kriecht über dich: {trick}!',
+  'seasonal.itemSource.pumpkinHead':
+    'Beute vom Alten Thatchgrin auf seinem Kürbisfeld hinter der Eberwiese, wenn du ihn zum ersten Mal plünderst. Bei keinem Händler erhältlich.',
+  'seasonal.itemUse.broomSources':
+    'Für {count} Glutverwobene Garben bei Hester Gourdwick gekauft oder selten als Beute vom Alten Thatchgrin an einem Tag, an dem du ihn plünderst. Zum Reiten ist die Reitfertigkeit erforderlich. Bleibt dauerhaft erhalten und kann das ganze Jahr geritten werden.',
+  'seasonal.itemUse.costumeBat':
+    'Benutzen: Verwandle dich für {minutes} Minuten in eine flatternde Fledermaus. Wird verbraucht. Im Kampf nicht benutzbar; der Kampfbeginn beendet den Effekt. Kosmetisch.',
+  'seasonal.itemUse.costumeGhost':
+    'Benutzen: Verwandle dich für {minutes} Minuten in einen schwebenden Geist. Wird verbraucht. Im Kampf nicht benutzbar; der Kampfbeginn beendet den Effekt. Kosmetisch.',
+  'seasonal.itemUse.costumeSkeleton':
+    'Benutzen: Verwandle dich für {minutes} Minuten in ein klapperndes Skelett. Wird verbraucht. Im Kampf nicht benutzbar; der Kampfbeginn beendet den Effekt. Kosmetisch.',
+  'seasonal.itemUse.pouch': 'Benutzen: Öffne ihn, um {count} Kürbislicht-Süßigkeiten zu erhalten.',
+  'seasonal.itemUse.pumpkinHead':
+    'Benutzen: Setze einen geschnitzten, von innen beleuchteten Kürbis über deinem Helm auf oder nimm ihn ab. Kosmetisch.',
+  'seasonal.itemUse.sheaf':
+    'Der Alte Thatchgrin gibt dir an jedem Tag, an dem du ihn plünderst, eine Garbe, bis du den Glutborstenbesen besitzt. Hester Gourdwick tauscht an ihren Ständen in Eastbrook, Fenbridge und Highwatch {count} davon gegen den Besen. Nicht ausgegebene Garben bleiben für die nächste Kürbislichtnacht erhalten.',
+  'seasonal.itemUse.strawlingCharm':
+    'Benutzen: Werde für {seconds} Sekunden zu einem Strohling des Alten Thatchgrin. Nicht im Kampf benutzbar. Wird niemals verbraucht. Kosmetisch.',
+  'seasonal.itemUse.sweet':
+    'Durch Süßes oder Saures während der Kürbislichtnacht verdient. Hester Gourdwick tauscht sie an ihren Ständen in Eastbrook, Fenbridge und Highwatch gegen kosmetische Gegenstände.',
+  'seasonal.itemUse.titleWrit':
+    'Benutzen: Verleiht diesem Charakter den Titel {title}, der im Buch der Taten angelegt wird. Wird verbraucht. Bleibt erhalten, wenn du den Titel bereits besitzt.',
+  'seasonal.itemUse.toyBats':
+    'Benutzen: Öffne den Sack. Ein quietschender Fledermausschwarm bricht hervor und verteilt sich für {seconds} Sekunden um dich. Im Kampf oder in Verstohlenheit nicht benutzbar. Wird niemals verbraucht: nach {cooldown} Sekunden wieder benutzbar. Bleibt dauerhaft erhalten und ist ganzjährig benutzbar. Kosmetisch.',
+  'seasonal.itemUse.toyCandleShadows':
+    'Benutzen: Zünde die Kerze vor dir an. Ihre Flammen werfen für {seconds} Sekunden tanzende Schatten einer Katze, einer Fledermaus und einer Hexe auf den Boden ringsum, sichtbar für alle in der Nähe. Im Kampf oder in Verstohlenheit nicht benutzbar. Wird niemals verbraucht: nach {cooldown} Sekunden wieder benutzbar. Bleibt dauerhaft erhalten und ist ganzjährig benutzbar. Kosmetisch.',
+  'seasonal.itemUse.toyCauldron':
+    'Benutzen: Stelle einen großen blubbernden Kessel vor dir ab. Er bleibt {standing} Sekunden stehen. Jeder Spieler, der daraus trinkt, zerplatzt in grünen Blasen und verwandelt sich für {seconds} Sekunden in einen Goblin, wobei sein bisheriges Kostüm ersetzt wird. Weder Aufstellen noch Trinken ist im Kampf oder in Verstohlenheit möglich; der Kampfbeginn beendet die Goblingestalt. Wird niemals verbraucht: nach {cooldown} Sekunden wieder benutzbar. Bleibt dauerhaft erhalten und ist ganzjährig benutzbar. Kosmetisch.',
+  'seasonal.itemUse.toyLantern':
+    'Benutzen: Stelle die Laterne vor dir ab. Ein kleiner Geist kreist für {seconds} Sekunden um dich. Im Kampf oder in Verstohlenheit nicht benutzbar. Wird niemals verbraucht: nach {cooldown} Sekunden wieder benutzbar. Bleibt dauerhaft erhalten und ist ganzjährig benutzbar. Kosmetisch.',
+  'seasonal.itemUse.toyPrank':
+    'Benutzen: Wirf ihn auf einen anderen sichtbaren Spieler innerhalb von {range} Metern. Sein Kopf wird für {seconds} Sekunden zu einer leuchtenden Kürbislaterne, die er per Rechtsklick entfernen kann. Keiner von euch darf im Kampf sein, und du darfst nicht in Verstohlenheit sein. Wird niemals verbraucht: nach {cooldown} Sekunden wieder benutzbar. Bleibt dauerhaft erhalten und ist ganzjährig benutzbar. Kosmetisch.',
+  'seasonal.itemUse.trickJar':
+    'Benutzen: Spielt dir für ein paar Sekunden einen zufälligen, harmlosen Streich. Kosmetisch.',
+  'seasonal.jarTrick': 'Das Glas springt auf: {trick}!',
+  'seasonal.pumpkinHead.off': 'Du nimmst den Geschnitzten Kürbiskopf ab.',
+  'seasonal.pumpkinHead.on': 'Du setzt den Geschnitzten Kürbiskopf auf.',
+  'seasonal.pumpkins.flash': 'Spukkürbis gefunden! {count}/{total}',
+  'seasonal.pumpkins.found':
+    'Du zündest einen Spukkürbis in {zone} an: {count}/{total}. Erhaltene Kürbislicht-Süßigkeiten: {sweets}.',
+  'seasonal.pumpkins.name': 'Spukkürbis',
+  'seasonal.pumpkins.progress': '{label}: {current}/{total}',
+  'seasonal.pumpkins.title': 'Spukkürbisse',
+  'seasonal.pumpkins.world': 'Welt',
+  'seasonal.thatchgrin.poleBound': 'Pfahlgebunden',
+  'seasonal.thatchgrin.sleepYell':
+    'Die Sonne ist aufgegangen. Zurück auf den Pfahl, zurück auf Wache.',
+  'seasonal.thatchgrin.wakeYell': 'Die NACHT fällt auf den Acker! Wer geht über MEIN Feld?',
+  'seasonal.titleGranted': 'Du liest die Urkunde. Neuer Titel erhalten: {title}.',
+  'seasonal.titleKnown': 'Du besitzt diesen Titel bereits und behältst daher die Urkunde.',
+  'seasonal.tokenPrice': '{count} {item}',
+  'seasonal.toy.bats':
+    'Du öffnest den Sack, und ein Schwarm erschreckter Fledermäuse bricht hervor!',
+  'seasonal.toy.candleShadows':
+    'Du zündest die Kerze an, und Schatten beginnen um ihre Flammen zu tanzen.',
+  'seasonal.toy.cauldron': 'Du stellst den Kessel ab, und er beginnt zu blubbern.',
+  'seasonal.toy.cauldronDrink':
+    'Du trinkst aus dem Kessel, zerplatzt in grünen Blasen und verwandelst dich in einen Goblin!',
+  'seasonal.toy.hidden': 'Tritt zuerst aus den Schatten: Ein Spielzeug würde dich verraten.',
+  'seasonal.toy.lantern':
+    'Du stellst die Laterne ab, und ein kleiner Geist schwebt heraus, um dir Gesellschaft zu leisten.',
+  'seasonal.toy.prank': 'Du wirfst den Kürbis. Er zerplatzt auf {name}!',
+  'seasonal.toy.prankNeedsPlayer':
+    'Der Kürbis trifft nur einen anderen Spieler, der nicht im Kampf ist.',
+  'seasonal.toy.pranked':
+    '{name} wirft dir einen Kürbis auf den Kopf! Entferne ihn per Rechtsklick oder trage ihn mit Stolz.',
+  'seasonal.toy.prankedFlash': '{name} hat dir einen Streich gespielt!',
+  'seasonal.trickOrTreat.alreadyKnocked':
+    'Du hast heute schon bei {name} Süßes oder Saures verlangt.',
+  'seasonal.trickOrTreat.knockedHint':
+    'Du hast heute hier schon angeklopft. Nach der täglichen Zurücksetzung öffnet sich die Tür wieder.',
+  'seasonal.trickOrTreat.notActive': 'Die Kürbislichtnacht findet gerade nicht statt.',
+  'seasonal.trickOrTreat.row': 'Süßes oder Saures!',
+  'seasonal.trickOrTreat.rowAria': 'Bei {name} Süßes oder Saures verlangen',
+  'seasonal.trickOrTreat.tooFar': 'Komm näher, um anzuklopfen.',
+  'seasonal.trickOrTreat.treat': '{name} gibt dir eine Süßigkeit.',
+  'seasonal.trickOrTreat.treatFlash.few': 'Süßes! {count} Kürbislicht-Süßigkeiten',
+  'seasonal.trickOrTreat.treatFlash.many': 'Süßes! {count} Kürbislicht-Süßigkeiten',
+  'seasonal.trickOrTreat.treatFlash.one': 'Süßes! {count} Kürbislicht-Süßigkeit',
+  'seasonal.trickOrTreat.treatFlash.other': 'Süßes! {count} Kürbislicht-Süßigkeiten',
+  'seasonal.trickOrTreat.trick': '{name} spielt dir einen Streich: {trick}!',
+  'seasonal.trickOrTreat.trickFlash': 'Saures! {trick}',
+  'seasonal.tricks.gourdlight_costume_bat': 'Fledermauskostüm',
+  'seasonal.tricks.gourdlight_costume_ghost': 'Geisterkostüm',
+  'seasonal.tricks.gourdlight_costume_skeleton': 'Skelettkostüm',
+  'seasonal.tricks.gourdlight_trick_bat': 'Fledermausfieber',
+  'seasonal.tricks.gourdlight_trick_fumes': 'Grüne Dämpfe',
+  'seasonal.tricks.gourdlight_trick_skeleton': 'Klapperknochen',
+  'seasonal.tricks.gourdlight_trick_strawling': 'Strohlingsgestalt',
 };

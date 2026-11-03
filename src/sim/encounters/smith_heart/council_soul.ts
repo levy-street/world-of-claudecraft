@@ -39,6 +39,7 @@
 import { HAMMER_PIT } from '../../content/smith_heart_layout';
 import { DT, type Entity } from '../../types';
 import { dropAuraById, dropEncounterObject } from '../sunken_bastion/claim';
+import { stampFloor } from './council_floor_gap';
 import {
   COUNCIL_AURAS,
   COUNCIL_CASTS,
@@ -282,6 +283,8 @@ export function landEcho(s: CouncilScope, pillar: Entity, source: Entity): numbe
   return struck;
 }
 
+/** Its bar counts down and lands; between two bars its clock runs (the bar
+ *  itself starts through the floor gap: startEcho). */
 function stepEcho(s: CouncilScope, soul: CouncilSoul, pillar: Entity, source: Entity): void {
   if (soul.echo !== null) {
     soul.echo -= DT;
@@ -293,15 +296,42 @@ function stepEcho(s: CouncilScope, soul: CouncilSoul, pillar: Entity, source: En
     return;
   }
   soul.timer -= DT;
-  if (soul.timer > 1e-9) return;
+}
+
+/** The Guardian's soul and its standing pillar, or null. */
+function guardianSoul(s: CouncilScope): { soul: CouncilSoul; pillar: Entity } | null {
+  const soul = s.st.souls.find((q) => q.role === 'guardian');
+  if (!soul) return null;
+  const p = councilPillars(s.ctx, s.inst).find(
+    (q) => q.e.id === soul.pillarId && q.soul === 'guardian',
+  );
+  return p ? { soul, pillar: p.e } : null;
+}
+
+/** The Echo's clock has run out and no bar of it is in flight. */
+export function guardianSoulReady(s: CouncilScope): boolean {
+  const g = guardianSoul(s);
+  return g !== null && g.soul.echo === null && g.soul.timer <= 1e-9 && firstLiving(s) !== null;
+}
+
+/** The Echo of Wrath's bar begins on its pillar (a floor mechanic: the floor
+ *  gap calls it, council_floor.ts). */
+export function startEcho(s: CouncilScope): boolean {
+  if (!guardianSoulReady(s)) return false;
+  const g = guardianSoul(s);
+  const source = firstLiving(s);
+  if (!g || !source) return false;
+  const { soul, pillar } = g;
   soul.timer = T.echoEvery;
   soul.echo = T.echoCast;
   s.st.casts++;
+  stampFloor(s.st);
   pillar.castingAbility = COUNCIL_CASTS.echo;
   pillar.castTotal = T.echoCast;
   pillar.castRemaining = T.echoCast;
   pillar.castTargetId = null;
   raidWarn(s, source, 'echo', ECHO_LINE);
+  return true;
 }
 
 // ---- the Slabwright's soul: the Walking Slab ------------------------------------------------
@@ -343,12 +373,16 @@ const SLAB_SWERVE = [0, 0.6, -0.6, 1.2, -1.2] as const;
 function stepSlab(s: CouncilScope, soul: CouncilSoul, p: CouncilPillar, source: Entity): void {
   const { ctx, inst } = s;
   const e = p.e;
-  soul.retarget -= DT;
-  if (soul.retarget <= 1e-9 || !soul.goal) {
-    soul.retarget = T.slabRetarget;
-    const g = largestGroup(s.players);
-    const o = ctx.instanceOriginOf(inst);
-    soul.goal = g ? { x: g.x - o.x, z: g.z - o.z } : null;
+  // Standing still until its walk starts through the floor gap (startSlab);
+  // once walking it re-picks the largest group on its own clock.
+  if (soul.goal) {
+    soul.retarget -= DT;
+    if (soul.retarget <= 1e-9) {
+      soul.retarget = T.slabRetarget;
+      const g = largestGroup(s.players);
+      const o = ctx.instanceOriginOf(inst);
+      soul.goal = g ? { x: g.x - o.x, z: g.z - o.z } : null;
+    }
   }
   if (soul.goal) {
     const o = ctx.instanceOriginOf(inst);
@@ -428,6 +462,29 @@ function stepSlab(s: CouncilScope, soul: CouncilSoul, p: CouncilPillar, source: 
     const amount = roll(s, source, T.slabGrindMin, T.slabGrindMax);
     ctx.dealDamage(source, pl, amount, false, 'physical', COUNCIL_NAMES.grind, 'hit', true);
   }
+}
+
+/** The Slabwright's soul stands still with somewhere to walk: its walk is
+ *  due to start. */
+export function walkingSlabWaiting(s: CouncilScope): boolean {
+  const soul = s.st.souls.find((q) => q.role === 'slabwright');
+  if (!soul || soul.goal || !firstLiving(s)) return false;
+  if (!councilPillars(s.ctx, s.inst).some((q) => q.e.id === soul.pillarId)) return false;
+  return largestGroup(s.players) !== null;
+}
+
+/** The Walking Slab sets off toward the largest group (a floor mechanic: the
+ *  floor gap calls it, council_floor.ts; the dev `soul slabwright` directly). */
+export function startSlab(s: CouncilScope): boolean {
+  if (!walkingSlabWaiting(s)) return false;
+  const soul = s.st.souls.find((q) => q.role === 'slabwright');
+  const g = largestGroup(s.players);
+  if (!soul || !g) return false;
+  const o = s.ctx.instanceOriginOf(s.inst);
+  soul.goal = { x: g.x - o.x, z: g.z - o.z };
+  soul.retarget = T.slabRetarget;
+  stampFloor(s.st);
+  return true;
 }
 
 // ---- the Seam Singer's soul: the Endless Song -----------------------------------------------
@@ -569,9 +626,10 @@ export function soulDevTrigger(
     if (!body) return 'That member is missing from this run.';
     if (s.st.souls.some((q) => q.role === role))
       return `The ${role}'s soul already holds a pillar.`;
-    return takeSoul(s, role, body)
-      ? `The ${role}'s soul takes the stone.`
-      : 'No pillar could hold the soul.';
+    if (!takeSoul(s, role, body)) return 'No pillar could hold the soul.';
+    // A dev line forces it: the slab walks now, past the floor gap.
+    if (role === 'slabwright') startSlab(s);
+    return `The ${role}'s soul takes the stone.`;
   }
   if (verb === 'soulpip') {
     const n = Number(arg);

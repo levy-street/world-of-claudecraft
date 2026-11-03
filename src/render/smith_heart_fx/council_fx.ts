@@ -43,6 +43,7 @@ import {
 } from '../../sim/encounters/smith_heart/council_ids';
 import type { Aura, Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
+import { fxAnchor, needsRedrape } from '../attached_fx_anchor';
 import { type TelegraphFan, TelegraphKit } from '../floor_telegraph';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { attachSceneGroupGated } from '../gated_scene_attach';
@@ -80,10 +81,12 @@ import {
   markFill,
   COUNCIL_FX_POOLS as POOLS,
   RISE_SPOT_SPEC,
+  ROCK_FALL_SECONDS,
   resonanceRing,
   rockFall,
   SOUL_COLORS,
   SOUL_TAKE_SECONDS,
+  soakCountdown,
   WEIGHT_DROP_SECONDS,
   wakeGhost,
 } from './council_fx_core';
@@ -95,6 +98,16 @@ import { CouncilShoulderFx } from './council_shoulder_fx';
 import { CouncilSoakFx } from './council_soak_fx';
 import { CouncilSoulFx } from './council_soul_fx';
 import { chunkGeometry, Rubble } from './hammer_fx';
+import type { CouncilTelegraphKind } from './painted_telegraph_core';
+import {
+  COUNCIL_TELEGRAPH_GLOW_STEP,
+  craterFade,
+  craterHeat,
+  craterPit,
+  ROCK_CRATER,
+  rockCrescendo,
+} from './painted_telegraph_core';
+import { CouncilTelegraphs, type PaintedFan } from './painted_telegraphs';
 
 /** What a soul pillar is to the council's sound. */
 const SOUL_SOUND = { guardian: 'echo', slabwright: 'slab', singer: 'song' } as const;
@@ -113,12 +126,15 @@ const BAND_FRAG = /* glsl */ `
 uniform float uAlpha;
 uniform float uTime;
 uniform float uFlow;
+uniform float uBase;
 uniform vec3 uColor;
 varying vec2 vUv;
 void main() {
   float rise = 1.0 - vUv.y;
   float ripple = 0.6 + 0.4 * sin(vUv.y * 22.0 - uTime * uFlow + vUv.x * 6.2831853 * 3.0);
-  float a = uAlpha * rise * ripple;
+  // \`uBase\` clears the band's foot (the ghost pillar: the split floor under
+  // it reads through).
+  float a = uAlpha * rise * ripple * mix(1.0, smoothstep(0.0, 0.45, vUv.y), uBase);
   gl_FragColor = vec4(uColor * (0.8 + 0.6 * ripple), a);
   #include <colorspace_fragment>
 }
@@ -159,6 +175,8 @@ interface MarkSlot {
   playerId: number;
   auraId: string;
   fan: TelegraphFan;
+  /** The fan's stone paint (Wake the Stone's split, or the rock's). */
+  paint: PaintedFan<CouncilTelegraphKind>;
   ghost: THREE.Mesh;
   ghostMat: THREE.ShaderMaterial;
   seen: boolean;
@@ -170,6 +188,8 @@ interface MarkSlot {
 interface SpotSlot {
   id: number;
   fan: TelegraphFan;
+  /** The fan's stone paint (the heir's rising stone). */
+  paint: PaintedFan<CouncilTelegraphKind>;
   ghost: THREE.Mesh;
   ghostMat: THREE.ShaderMaterial;
   born: number;
@@ -186,6 +206,8 @@ interface RockSlot {
   mesh: THREE.Group;
   spinAxis: THREE.Vector3;
   seen: boolean;
+  /** The floor has rumbled for this drop (once per fall). */
+  rumbled: boolean;
 }
 
 interface RingSlot {
@@ -280,6 +302,41 @@ const ROCK_GRIT = {
   color: C.dust,
   alpha: 0.45,
 };
+/** A pebble hopping off the floor as the rock drops (the ground shaking). */
+const ROCK_PEBBLE = {
+  speed: 0.6,
+  up: 3.2,
+  gravity: 14,
+  life: 0.55,
+  size: [0.32, 0.22] as const,
+  color: [0.36, 0.27, 0.19] as const,
+  alpha: 0.95,
+  drag: 0.4,
+};
+/** Dust lifting off the stone under the falling rock. */
+const ROCK_LIFT_DUST = {
+  speed: 0.4,
+  up: 1.1,
+  life: 1.1,
+  size: [0.9, 2.4] as const,
+  color: [0.62, 0.52, 0.4] as const,
+  alpha: 0.4,
+  drag: 1.6,
+};
+/** The impact's dust wall: rolling out low over the floor from the rim. */
+const _wallDir: [number, number, number] = [1, 0.12, 0];
+const ROCK_DUST_WALL = {
+  speed: 8,
+  life: 1.5,
+  size: [1.8, 4.5] as const,
+  color: [0.34, 0.25, 0.17] as const,
+  alpha: 0.65,
+  drag: 2.2,
+  dir: _wallDir as readonly [number, number, number],
+  spread: 0.25,
+};
+const _cd = { left: 0, beacon: 0, shadow: 0, dark: 0, near: 0 };
+const _pit = { share: 0, near: 0 };
 
 /** An entity's aura by id (an indexed loop: no closure a frame). */
 function auraById(e: Entity | undefined, id: string): Aura | undefined {
@@ -320,6 +377,8 @@ export class CouncilFx {
   private readonly particles: EngineParticles;
   private readonly debris: Rubble;
   private readonly kit: TelegraphKit;
+  /** The kit's fans dressed in the stone (painted_telegraphs.ts). */
+  private readonly paints: CouncilTelegraphs;
   private readonly geometries: THREE.BufferGeometry[] = [];
   private readonly materials: THREE.Material[] = [];
   private readonly pillarsFx: CouncilPillarsFx;
@@ -341,6 +400,13 @@ export class CouncilFx {
   private readonly marks: MarkSlot[] = [];
   private readonly spots: SpotSlot[] = [];
   private readonly rocks: RockSlot[] = [];
+  /** The craters the rocks leave (split stone settling, cosmetic). */
+  private readonly craters: {
+    fan: TelegraphFan;
+    paint: PaintedFan<CouncilTelegraphKind>;
+    born: number;
+    r: number;
+  }[] = [];
   private readonly rings: RingSlot[] = [];
   private readonly weights: WeightSlot[] = [];
   private readonly bolts: BoltSlot[] = [];
@@ -394,6 +460,8 @@ export class CouncilFx {
       () => this.rand(),
     );
     this.kit = new TelegraphKit(this.root, this.detail);
+    this.paints = new CouncilTelegraphs(COUNCIL_TELEGRAPH_GLOW_STEP, this.materials);
+    const paints = this.paints;
     // A one-triangle carrier for every material that waits on a kit's piece.
     const carrier = new THREE.BufferGeometry();
     carrier.setAttribute('position', new THREE.BufferAttribute(new Float32Array(9), 3));
@@ -410,6 +478,7 @@ export class CouncilFx {
       particles: this.particles,
       debris: this.debris,
       kit: this.kit,
+      paints,
       groundY: (x, z) => this.groundY(x, z),
       rand: () => this.rand(),
       now: () => this.clock,
@@ -435,13 +504,14 @@ export class CouncilFx {
     const shardGeo = new THREE.OctahedronGeometry(0.5, 0).scale(0.45, 0.45, 1.6);
     this.geometries.push(bandGeo, ringGeo, threadGeo, shardGeo);
     // ---- the marks and the heir's spots (a footprint and a ghost pillar) ----
-    const ghostMat = (name: string, color: number) => {
+    const ghostMat = (name: string, color: number, base = 0) => {
       const m = new THREE.ShaderMaterial({
         name,
         uniforms: {
           uAlpha: { value: 0 },
           uTime: this.uTime,
           uFlow: { value: 3 },
+          uBase: { value: base },
           uColor: { value: new THREE.Color(color) },
         },
         vertexShader: BAND_VERT,
@@ -458,7 +528,8 @@ export class CouncilFx {
     for (let i = 0; i < POOLS.marks; i++) {
       const fan = this.kit.fan(14);
       fan.group.visible = false;
-      const gm = ghostMat('smithHeartWakeGhost', C.ochre);
+      const paint = paints.dress(fan, 'wake');
+      const gm = ghostMat('smithHeartWakeGhost', C.ochre, 1);
       const ghost = new THREE.Mesh(bandGeo, gm);
       ghost.name = 'smithHeartWakeGhost';
       ghost.visible = false;
@@ -469,6 +540,7 @@ export class CouncilFx {
         playerId: -1,
         auraId: '',
         fan,
+        paint,
         ghost,
         ghostMat: gm,
         seen: false,
@@ -480,7 +552,8 @@ export class CouncilFx {
       const fan = this.kit.fan(14);
       this.kit.layOutFan(fan, 360, { color: RISE_SPOT_SPEC.color, accent: RISE_SPOT_SPEC.accent });
       fan.group.visible = false;
-      const gm = ghostMat('smithHeartRiseGhost', C.ochre);
+      const paint = paints.dress(fan, 'rise');
+      const gm = ghostMat('smithHeartRiseGhost', C.ochre, 1);
       const ghost = new THREE.Mesh(bandGeo, gm);
       ghost.name = 'smithHeartRiseGhost';
       ghost.visible = false;
@@ -489,6 +562,7 @@ export class CouncilFx {
       this.spots.push({
         id: -1,
         fan,
+        paint,
         ghost,
         ghostMat: gm,
         born: -99,
@@ -498,6 +572,13 @@ export class CouncilFx {
         y: 0,
         z: 0,
       });
+    }
+    for (let i = 0; i < POOLS.rocks; i++) {
+      const fan = this.kit.fan(12);
+      this.kit.layOutFan(fan, 360, { color: ROCK_CRATER.color, accent: ROCK_CRATER.accent });
+      fan.group.visible = false;
+      const paint = paints.dress(fan, 'crater');
+      this.craters.push({ fan, paint, born: -99, r: 1 });
     }
     // ---- the falling rocks (a boulder of the rock kit once it lands) ----
     for (let i = 0; i < POOLS.rocks; i++) {
@@ -510,6 +591,7 @@ export class CouncilFx {
         mesh,
         spinAxis: new THREE.Vector3(1, 0.3, 0.2).normalize(),
         seen: false,
+        rumbled: false,
       });
     }
     // ---- Resonance: the ring, the shimmer round the body, the thread ----
@@ -768,6 +850,7 @@ export class CouncilFx {
     this.updateMarks(world);
     this.updateSpots();
     this.updateRocks(world);
+    this.updateCraters();
     this.updateRings(world);
     this.updateWeights(world);
     this.updateDrops(world);
@@ -910,6 +993,7 @@ export class CouncilFx {
       m.playerId = e.id;
       m.auraId = auraId;
       this.kit.layOutFan(m.fan, 360, { color: spec.color, accent: spec.accent });
+      this.paints.setLook(m.paint, auraId === COUNCIL_AURAS.rockMark ? 'rock' : 'wake');
       m.fan.group.visible = true;
       m.ghost.visible = auraId === COUNCIL_AURAS.wakeMark;
     }
@@ -933,19 +1017,33 @@ export class CouncilFx {
       if (!p || !a) continue;
       const spec = COUNCIL_MARK_SPECS[m.auraId];
       const fill = markFill(a.remaining, a.duration);
-      const y = this.groundY(p.pos.x, p.pos.z);
-      // Re-drape over the floor only once the player has moved.
-      if (!(Math.abs(p.pos.x - m.drapedX) <= 0.05 && Math.abs(p.pos.z - m.drapedZ) <= 0.05)) {
-        this.kit.drapeFan(m.fan, this.groundY, p.pos.x, y, p.pos.z, 0, spec.radius);
-        m.drapedX = p.pos.x;
-        m.drapedZ = p.pos.z;
-      }
+      // The mark rides the player's drawn body, never the snapshot.
+      const at = fxAnchor(p);
+      const y = this.groundY(at.x, at.z);
+      // Re-drape over the floor once the player has moved far enough; slide between.
+      if (needsRedrape(at.x, at.z, m.drapedX, m.drapedZ)) {
+        this.kit.drapeFan(m.fan, this.groundY, at.x, y, at.z, 0, spec.radius);
+        m.drapedX = at.x;
+        m.drapedZ = at.z;
+      } else this.kit.placeFan(m.fan, at.x, y, at.z);
       this.kit.paintFan(m.fan, paint(fill, this.clock, spec.radius));
+      // The stone's live dressing: the rock's shadow under the soak and the
+      // floor heating as it drops; the pillar's split heating as it comes.
+      if (m.auraId === COUNCIL_AURAS.rockMark) {
+        const duration = a.duration > 0 ? a.duration : T.rockMarkSeconds;
+        soakCountdown(a.remaining, duration, _cd);
+        this.paints.live(
+          m.paint,
+          rockCrescendo(a.remaining, ROCK_FALL_SECONDS),
+          _cd.shadow,
+          _cd.near,
+        );
+      } else this.paints.live(m.paint, 0.6 * fill * fill);
       if (m.ghost.visible) {
         const g = wakeGhost(fill);
-        m.ghost.position.set(p.pos.x, y, p.pos.z);
+        m.ghost.position.set(at.x, y, at.z);
         m.ghost.scale.set(T.risenR, RISEN_HEIGHT * g.height, T.risenR);
-        m.ghostMat.uniforms.uAlpha.value = 0.55 * g.glow;
+        m.ghostMat.uniforms.uAlpha.value = 0.5 * g.glow;
       }
       // The soak's motes stream in (gather); the wake's rise like dust.
       if (this.density > 0.5 && this.rand() < 0.4) {
@@ -960,8 +1058,8 @@ export class CouncilFx {
         _moteDir[0] = spec.gather ? -Math.sin(ang) : 0;
         _moteDir[1] = spec.gather ? 0 : 1;
         _moteDir[2] = spec.gather ? -Math.cos(ang) : 0;
-        const mx = p.pos.x + Math.sin(ang) * r;
-        this.particles.puff(mx, y + 0.2, p.pos.z + Math.cos(ang) * r, 1, _markMote);
+        const mx = at.x + Math.sin(ang) * r;
+        this.particles.puff(mx, y + 0.2, at.z + Math.cos(ang) * r, 1, _markMote);
       }
     }
   }
@@ -989,10 +1087,11 @@ export class CouncilFx {
       if (sp.id < 0) continue;
       const fill = Math.min(1, (this.clock - sp.born) / sp.seconds);
       this.kit.paintFan(sp.fan, paint(fill, this.clock, RISE_SPOT_SPEC.radius));
+      this.paints.live(sp.paint, 0.6 * fill * fill);
       const g = wakeGhost(fill);
       sp.ghost.position.set(sp.x, sp.y, sp.z);
       sp.ghost.scale.set(T.risenR, RISEN_HEIGHT * g.height, T.risenR);
-      sp.ghostMat.uniforms.uAlpha.value = 0.6 * g.glow;
+      sp.ghostMat.uniforms.uAlpha.value = 0.55 * g.glow;
     }
   }
 
@@ -1030,13 +1129,33 @@ export class CouncilFx {
         this.soak.hide(i);
         continue;
       }
-      const y = this.groundY(p.pos.x, p.pos.z);
+      const at = fxAnchor(p);
+      const y = this.groundY(at.x, at.z);
       const duration = a.duration > 0 ? a.duration : T.rockMarkSeconds;
-      this.soak.paint(i, p.pos.x, y, p.pos.z, T.rockRadius, a.remaining, duration);
+      this.soak.paint(i, at.x, y, at.z, T.rockRadius, a.remaining, duration);
       const fall = rockFall(a.remaining, duration);
+      // The last drop: the floor rumbles once, grit and pebbles hop off the
+      // stone under the shadow (cosmetic: the soak's rim keeps the area).
+      if (a.remaining > ROCK_FALL_SECONDS) r.rumbled = false;
+      else {
+        if (!r.rumbled) {
+          r.rumbled = true;
+          this.shakeNear(at.x, at.z, 0.16, 30);
+        }
+        const drop = 1 - a.remaining / ROCK_FALL_SECONDS;
+        if (this.density > 0.5 && this.rand() < 0.35 + 0.6 * drop) {
+          const ang = this.rand() * Math.PI * 2;
+          const rr = Math.sqrt(this.rand()) * T.rockRadius * 0.8;
+          const px = at.x + Math.sin(ang) * rr;
+          const pz = at.z + Math.cos(ang) * rr;
+          this.particles.puff(px, this.groundY(px, pz) + 0.1, pz, 2, ROCK_PEBBLE);
+          if (this.rand() < 0.5)
+            this.particles.puff(px, this.groundY(px, pz) + 0.2, pz, 1, ROCK_LIFT_DUST);
+        }
+      }
       r.mesh.visible = fall.visible;
       if (!fall.visible) continue;
-      r.mesh.position.set(p.pos.x, y + 1.6 + fall.height, p.pos.z);
+      r.mesh.position.set(at.x, y + 1.6 + fall.height, at.z);
       r.mesh.quaternion.setFromAxisAngle(r.spinAxis, fall.spin);
       // A trail of grit off the falling stone.
       if (this.density > 0.5 && this.rand() < 0.6)
@@ -1050,8 +1169,40 @@ export class CouncilFx {
     }
   }
 
+  private updateCraters(): void {
+    for (const c of this.craters) {
+      if (!c.fan.group.visible) continue;
+      const fade = craterFade(this.clock - c.born);
+      if (fade <= 0) {
+        c.fan.group.visible = false;
+        continue;
+      }
+      this.kit.paintFan(c.fan, { fill: 1, clock: this.clock, range: c.r, fade, front: 0 });
+      const pit = craterPit(this.clock - c.born, _pit);
+      this.paints.live(c.paint, craterHeat(this.clock - c.born), pit.share, pit.near);
+    }
+  }
+
   private rockImpact(x: number, z: number, radius: number): void {
     const y = this.groundY(x, z);
+    // The crater: the floor split where the rock came down.
+    let crater = this.craters[0];
+    for (const c of this.craters) if (c.born < crater.born) crater = c;
+    crater.born = this.clock;
+    crater.r = radius * ROCK_CRATER.share;
+    crater.fan.group.visible = true;
+    this.kit.drapeFan(crater.fan, this.groundY, x, y, z, this.rand() * Math.PI * 2, crater.r);
+    // Dark from this very frame: the pit and the hot cores are painted now,
+    // not on the next update (the impact never reads as a pale flash).
+    this.kit.paintFan(crater.fan, {
+      fill: 1,
+      clock: this.clock,
+      range: crater.r,
+      fade: 1,
+      front: 0,
+    });
+    const pit = craterPit(0, _pit);
+    this.paints.live(crater.paint, craterHeat(0), pit.share, pit.near);
     for (const r of this.rocks) if (r.mesh.visible && r.playerId < 0) r.mesh.visible = false;
     const n = Math.round(40 * this.density * (this.reducedMotion() ? 0.5 : 1));
     for (let i = 0; i < n; i++) {
@@ -1067,27 +1218,62 @@ export class CouncilFx {
         0.3 + this.rand() * 0.8,
       );
     }
-    this.particles.shockRing(x, z, C.soak, radius, 0.45);
-    this.particles.shockRing(x, z, 0xc89a66, radius * 1.6, 0.9);
-    this.particles.puff(x, y + 1.5, z, 14, {
-      speed: 5,
-      life: 0.45,
-      size: [3, 7],
-      color: C.flash,
-      alpha: 0.75,
+    // A brief hot flash at the core (orange white, small: never a pale wash
+    // over the zone), a hot ring racing out past the crater, a dust ring.
+    this.particles.shockRing(x, z, 0xff8a2a, radius * 1.25, 0.28);
+    this.particles.shockRing(x, z, 0x5a3820, radius * 2, 1.1);
+    this.particles.puff(x, y + 0.5, z, 4, {
+      speed: 2,
+      life: 0.14,
+      size: [1.6, 3],
+      color: [1, 0.78, 0.45],
+      alpha: 0.85,
       pool: 'glow',
     });
-    this.particles.puff(x, y + 0.6, z, 26, {
-      speed: 8,
-      up: 2,
-      life: 2.4,
-      size: [2.5, 7],
-      color: C.dust,
-      alpha: 0.55,
-      drag: 1.5,
-      radius: radius * 0.5,
+    this.particles.puff(x, y + 0.3, z, 5, {
+      speed: 3,
+      life: 0.3,
+      size: [1.2, 2.4],
+      color: [1, 0.42, 0.1],
+      alpha: 0.75,
+      pool: 'glow',
+      radius: radius * 0.25,
     });
-    this.shakeNear(x, z, 0.7, 45);
+    // Hot sparks off the split stone, and a wall of dust rolling out low.
+    this.particles.puff(x, y + 0.6, z, 26, {
+      speed: 11,
+      up: 5,
+      gravity: 16,
+      life: 0.7,
+      size: [0.35, 0.08],
+      color: [1, 0.72, 0.32],
+      alpha: 1,
+      pool: 'glow',
+      drag: 0.6,
+    });
+    const wall = Math.round(18 * (this.reducedMotion() ? 0.5 : 1));
+    for (let i = 0; i < wall; i++) {
+      const a = (i / wall) * Math.PI * 2 + this.rand() * 0.3;
+      _wallDir[0] = Math.sin(a);
+      _wallDir[2] = Math.cos(a);
+      const wx = x + Math.sin(a) * radius * 0.85;
+      const wz = z + Math.cos(a) * radius * 0.85;
+      this.particles.puff(wx, this.groundY(wx, wz) + 0.5, wz, 1, ROCK_DUST_WALL);
+    }
+    // A dark plume of grit thrown up from the pit (narrow, rising: it leaves
+    // the crater's floor clear).
+    this.particles.puff(x, y + 1.2, z, 10, {
+      speed: 1.5,
+      up: 5,
+      life: 1.4,
+      size: [1.2, 3.2],
+      color: [0.3, 0.22, 0.16],
+      alpha: 0.6,
+      drag: 1.8,
+      dir: [0, 1, 0],
+      spread: 0.25,
+    });
+    this.shakeNear(x, z, 0.85, 45);
   }
 
   // ---- Resonance --------------------------------------------------------------------------------
@@ -1119,17 +1305,18 @@ export class CouncilFx {
       if (!p || !a) continue;
       const cracking = a.value > 0 && !!a.value2;
       const look = resonanceRing(this.clock, cracking);
-      const y = this.groundY(p.pos.x, p.pos.z);
-      r.ring.position.set(p.pos.x, y + 0.09, p.pos.z);
+      const at = fxAnchor(p);
+      const y = this.groundY(at.x, at.z);
+      r.ring.position.set(at.x, y + 0.09, at.z);
       r.ring.scale.setScalar(look.radius);
       r.ringMat.uniforms.uAlpha.value = (cracking ? 0.95 : 0.7) * (0.6 + 0.4 * look.pulse);
-      r.band.position.set(p.pos.x, y, p.pos.z);
+      r.band.position.set(at.x, y, at.z);
       r.band.scale.set(0.9, 2.4, 0.9);
       r.bandMat.uniforms.uAlpha.value = 0.35 + 0.35 * look.pulse + (cracking ? 0.25 : 0);
       // The thread to the pillar it is cracking.
       const pillar = cracking && a.value2 ? this.pillarsFx.standing(a.value2) : null;
       if (pillar) {
-        _v.set(p.pos.x, y + 1.4, p.pos.z);
+        _v.set(at.x, y + 1.4, at.z);
         _v2.set(pillar.x, pillar.y + Math.min(4, pillar.height * 0.35), pillar.z);
         const len = _v.distanceTo(_v2);
         r.thread.position.copy(_v);
@@ -1171,13 +1358,15 @@ export class CouncilFx {
       const p = world.entities.get(w.playerId);
       const a = auraById(p, COUNCIL_AURAS.weight);
       if (!p || !a) continue;
-      const y = this.groundY(p.pos.x, p.pos.z);
-      w.ring.position.set(p.pos.x, y + 0.1, p.pos.z);
+      // The mark and the stone ride the tank's drawn body, never the snapshot.
+      const at = fxAnchor(p);
+      const y = this.groundY(at.x, at.z);
+      w.ring.position.set(at.x, y + 0.1, at.z);
       w.ring.scale.setScalar(1.7);
       w.ringMat.uniforms.uFill.value = a.duration > 0 ? a.remaining / a.duration : 1;
       w.ringMat.uniforms.uAlpha.value = 0.9;
       if (w.stone) {
-        w.stone.position.set(p.pos.x, y + 3.6 + Math.sin(this.clock * 1.6) * 0.15, p.pos.z);
+        w.stone.position.set(at.x, y + 3.6 + Math.sin(this.clock * 1.6) * 0.15, at.z);
         w.stone.rotation.y = this.clock * 0.5;
       }
     }
@@ -1209,10 +1398,11 @@ export class CouncilFx {
         if (d.mesh) d.mesh.visible = false;
         continue;
       }
-      const y = this.groundY(p.pos.x, p.pos.z);
+      const at = fxAnchor(p);
+      const y = this.groundY(at.x, at.z);
       if (t < 1) {
         if (d.mesh) {
-          d.mesh.position.set(p.pos.x, y + 7 * (1 - t * t) + 0.8, p.pos.z);
+          d.mesh.position.set(at.x, y + 7 * (1 - t * t) + 0.8, at.z);
           d.mesh.rotation.set(0.4, this.clock, 0.2);
         }
         continue;
@@ -1224,17 +1414,17 @@ export class CouncilFx {
         const a = this.rand() * Math.PI * 2;
         const sp = 4 + this.rand() * 8;
         this.debris.throw(
-          p.pos.x,
+          at.x,
           y + 1.2,
-          p.pos.z,
+          at.z,
           Math.sin(a) * sp,
           4 + this.rand() * 6,
           Math.cos(a) * sp,
           0.25 + this.rand() * 0.6,
         );
       }
-      this.particles.shockRing(p.pos.x, p.pos.z, C.weight, 4.5, 0.4);
-      this.particles.puff(p.pos.x, y + 1, p.pos.z, 16, {
+      this.particles.shockRing(at.x, at.z, C.weight, 4.5, 0.4);
+      this.particles.puff(at.x, y + 1, at.z, 16, {
         speed: 5,
         up: 1,
         life: 1.6,
@@ -1242,7 +1432,7 @@ export class CouncilFx {
         color: C.dust,
         alpha: 0.5,
       });
-      this.particles.puff(p.pos.x, y + 1.6, p.pos.z, 8, {
+      this.particles.puff(at.x, y + 1.6, at.z, 8, {
         speed: 3,
         life: 0.35,
         size: [2, 4],
@@ -1250,7 +1440,7 @@ export class CouncilFx {
         alpha: 0.7,
         pool: 'glow',
       });
-      this.shakeNear(p.pos.x, p.pos.z, 0.45, 30);
+      this.shakeNear(at.x, at.z, 0.45, 30);
     }
   }
 
@@ -1264,7 +1454,8 @@ export class CouncilFx {
     b.born = this.clock;
     b.sourceId = sourceId;
     b.targetId = targetId;
-    b.from.set(src.pos.x, this.groundY(src.pos.x, src.pos.z) + 4, src.pos.z);
+    const at = fxAnchor(src);
+    b.from.set(at.x, this.groundY(at.x, at.z) + 4, at.z);
     b.mesh.visible = true;
   }
 
@@ -1278,7 +1469,8 @@ export class CouncilFx {
         b.mesh.visible = false;
         continue;
       }
-      _v2.set(target.pos.x, this.groundY(target.pos.x, target.pos.z) + 1.3, target.pos.z);
+      const at = fxAnchor(target);
+      _v2.set(at.x, this.groundY(at.x, at.z) + 1.3, at.z);
       if (t >= 1) {
         b.alive = false;
         b.mesh.visible = false;
@@ -1330,7 +1522,8 @@ export class CouncilFx {
     s.targetId = targetId;
     s.acc = 0;
     s.soul = soul;
-    s.from.set(src.pos.x, this.groundY(src.pos.x, src.pos.z) + 2.5, src.pos.z);
+    const at = fxAnchor(src);
+    s.from.set(at.x, this.groundY(at.x, at.z) + 2.5, at.z);
     // The beads take the stream's colour (one write per stream, not a frame).
     _beadColor.setHex(soul ? SOUL_COLORS[soul].hex : 0xffc070);
     const base = this.streams.indexOf(s) * BEADS;
@@ -1363,8 +1556,9 @@ export class CouncilFx {
           this.pillarsFx.soulAwake(s.targetId, s.soul);
         } else if (s.alive && target) {
           // It arrives: the survivor flares with the fallen one's light.
-          const y = this.groundY(target.pos.x, target.pos.z) + 3;
-          this.particles.puff(target.pos.x, y, target.pos.z, 24, {
+          const at = fxAnchor(target);
+          const y = this.groundY(at.x, at.z) + 3;
+          this.particles.puff(at.x, y, at.z, 24, {
             speed: 5,
             up: 1,
             life: 0.8,
@@ -1373,19 +1567,16 @@ export class CouncilFx {
             alpha: 0.85,
             pool: 'glow',
           });
-          this.particles.shockRing(target.pos.x, target.pos.z, C.ochre, 7, 0.7);
-          this.shakeNear(target.pos.x, target.pos.z, 0.2, 30);
+          this.particles.shockRing(at.x, at.z, C.ochre, 7, 0.7);
+          this.shakeNear(at.x, at.z, 0.2, 30);
         }
         s.alive = false;
         for (let i = 0; i < BEADS; i++) this.beads.setMatrixAt(base + i, _m.makeScale(0, 0, 0));
         continue;
       }
       any = true;
-      _v2.set(
-        target.pos.x,
-        this.groundY(target.pos.x, target.pos.z) + (s.soul ? 6 : 3),
-        target.pos.z,
-      );
+      const at = fxAnchor(target);
+      _v2.set(at.x, this.groundY(at.x, at.z) + (s.soul ? 6 : 3), at.z);
       // A river of beads of stone light along the arc, its head racing out
       // to the survivor and its tail still leaving the fallen (every tier:
       // it is the inheritance's tell).
@@ -1437,9 +1628,10 @@ export class CouncilFx {
       return;
     }
     const look = energyLook(e.resource);
-    const y = this.groundY(e.pos.x, e.pos.z);
+    const at = fxAnchor(e);
+    const y = this.groundY(at.x, at.z);
     // The gauge round its feet fills with the energy, white-hot near full.
-    this.gauge.position.set(e.pos.x, y + 0.08, e.pos.z);
+    this.gauge.position.set(at.x, y + 0.08, at.z);
     this.gauge.scale.setScalar(Math.max(4, (e.scale ?? 1) * 1.7));
     this.gaugeMat.uniforms.uFill.value = e.resource / T.energyMax;
     (this.gaugeMat.uniforms.uColor.value as THREE.Color).setHex(look.crackle ? 0xfff0c8 : C.ochre);
@@ -1449,7 +1641,7 @@ export class CouncilFx {
     this.gauge.visible = true;
     const tall = (e.scale ?? 1) * 1.6;
     // Over its head (a halo inside the body would be hidden by it).
-    this.halo.position.set(e.pos.x, y + tall * 1.9, e.pos.z);
+    this.halo.position.set(at.x, y + tall * 1.9, at.z);
     const size = 3 + look.glow * 6 + (look.crackle ? Math.sin(this.clock * 20) * 0.6 : 0);
     this.halo.scale.set(size, size, 1);
     this.haloMat.opacity = 0.15 + look.glow * 0.55;
@@ -1461,7 +1653,7 @@ export class CouncilFx {
       _moteColor[0] = 1;
       _moteColor[1] = look.crackle ? 0.92 : 0.7;
       _moteColor[2] = look.crackle ? 0.7 : 0.32;
-      this.particles.puff(e.pos.x + Math.sin(a) * r, y + 0.4, e.pos.z + Math.cos(a) * r, 1, _ember);
+      this.particles.puff(at.x + Math.sin(a) * r, y + 0.4, at.z + Math.cos(a) * r, 1, _ember);
     }
   }
 

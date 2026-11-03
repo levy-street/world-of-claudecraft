@@ -31,7 +31,7 @@
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
 import { isWorldPvpHostile } from './world_pvp';
-import { WORLD_PVP_ASSIST_WINDOW } from './world_pvp_rules';
+import { WORLD_PVP_ASSIST_WINDOW, WORLD_PVP_DEPARTURE_HOLD_WINDOW } from './world_pvp_rules';
 
 /** A live, world-hostile enemy for `victim` from one candidate pid. An enemy
  *  who is themselves on the way out (`PlayerMeta.leaving`: their final save is
@@ -107,4 +107,22 @@ export function forfeitWorldPvpFightOnDeparture(ctx: SimContext, pid: number): b
     books.forfeitVictim = null;
   }
   return true;
+}
+
+/**
+ * The departure hold: does a recent world fight keep `pid`'s body in the
+ * world after they leave it? True for a living player who took or dealt a
+ * world-hostile hit inside WORLD_PVP_DEPARTURE_HOLD_WINDOW. The host holds such
+ * a logout like a closed client (the linkdead grace) instead of removing the
+ * character at once, and refuses another character on the account while the
+ * held body still answers true, so neither a logout nor a switch to an alt can
+ * pull a fighter out of reach. Ask it AFTER the forfeit: a player that rule
+ * killed is a corpse and leaves freely. Duels, battlegrounds and arenas never
+ * book a hit here (isWorldPvpHostile), so their own rules stay in charge.
+ */
+export function worldPvpHoldsDeparture(ctx: SimContext, pid: number): boolean {
+  const e = ctx.entities.get(pid);
+  if (!e || e.kind !== 'player' || e.dead) return false;
+  const at = ctx.worldPvpBooks.lastFightAt.get(pid);
+  return at !== undefined && ctx.time - at <= WORLD_PVP_DEPARTURE_HOLD_WINDOW;
 }

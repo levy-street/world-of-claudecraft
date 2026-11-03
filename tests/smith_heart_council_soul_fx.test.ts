@@ -92,6 +92,9 @@ describe('council_fx_core: Soul in the Stone', () => {
     expect(start.left).toBe(1);
     expect(late.left).toBeLessThan(0.1);
     expect(late.shadow).toBeGreaterThan(start.shadow);
+    expect(late.near).toBeGreaterThan(start.near);
+    expect(start.near).toBeCloseTo(0, 5);
+    expect(late.shadow).toBeLessThan(1);
     expect(late.beacon).toBeGreaterThan(start.beacon);
     // Continuous where it starts to drop.
     expect(rockFall(ROCK_FALL_SECONDS + 1e-4).height).toBeCloseTo(

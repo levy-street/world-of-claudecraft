@@ -25511,4 +25511,225 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.stackUnavailable':
     'Dobu členství momentálně nelze přidat. Zkus to znovu za chvíli.',
   'hudChrome.wocStore.subscription.tokenPrice': '{price} za 30 dní',
+  'errors.api.worldFightHold':
+    'Jiná postava na tomto účtu je po boji stále ve světě. Zkus to znovu za pár minut.',
+  'hudChrome.auraEffect.gourdlight.thatchbound':
+    'Starý Slamoškleb tahá za tvé nitky. Nemůžeš jednat: dovede tě k nejbližšímu spojenci, kterého každých {every} s udeříš za {min} až {max} poškození (až {mult}krát více proti spojenci na úrovni {level}). Účinek skončí dříve, když utrpíš poškození rovné {pct}% svého maximálního zdraví nebo když jej spojenec rozptýlí (magie).',
+  'hudChrome.auraEffect.seasonalCosmetic': 'Pouze vzhled: bez vlivu na boj',
+  'hudChrome.auraEffect.slumberNight':
+    'Až do setmění visí bez života na svém kůlu. Nelze na něj útočit.',
+  'hudChrome.auraEffect.stilledMindCrit':
+    'Tvé příští Zlomení mysli nebo Roztržení prázdnoty při zásahu zaručeně kriticky zasáhne. Jiná kouzla tento bonus nespotřebují. Roztržení prázdnoty stále spotřebuje 3 náboje Desátku temnoty. Pokud cíl kouzlu odolá, bonus se spotřebuje.',
+  'hudChrome.mounts.desc_emberbristle_broom':
+    'Dožínkové koště svázané oranžovou stuhou se vznáší na dlaň nad zemí a z jeho štětin padají uhlíky. Trvalá odměna ze Svátku dýňových světel.',
+  'hudChrome.mounts.name_emberbristle_broom': 'Koště žhavých štětin',
+  'hudChrome.priest.bombLabel': 'Desátková bomba',
+  'hudChrome.priest.bombReady': 'Připraveno',
+  'hudChrome.priest.bombStatus': '{value} z {max} nábojů Desátkové bomby',
+  'hudChrome.priest.bombTooltip':
+    'Desátková bomba: vytvoř 20 nábojů Desátku temnoty a připravíš jednu bombu. Utrácení nábojů nepřidává postup. Postup přetrvává mezi boji. Smrt nebo zahájení boje s nájezdovým bossem jej vynuluje. Dokončené seslání bombu spotřebuje; zrušení ji zachová.',
+  'hudChrome.priest.chargeCount': '{value} / {max}',
+  'hudChrome.priest.gloomtitheLabel': 'Desátek temnoty',
+  'hudChrome.priest.gloomtitheStatus': '{value} z {max} nábojů Desátku temnoty',
+  'hudChrome.priest.gloomtitheTooltip':
+    'Desátek temnoty: až 5 použitelných nábojů. Roztržení prázdnoty spotřebuje 3; Upíří dotek spotřebuje 2 a způsobí o 30% více poškození; Přivolej desátkového běsa spotřebuje celou zásobu. Vytváření nábojů také nabíjí Desátkovou bombu, i když je zásoba plná.',
+  'hudChrome.worldBoss.sleepUntilNightfall': '{name} spí až do setmění.',
+  'entities.abilities.choir_of_deliverance.specNote_shadow':
+    'Po dobu 15 s rozdělíš 20% zdraví, které nepřátelé ztratí tvým stínovým poškozením, jako léčení mezi zraněné členy družiny do 30 yardů včetně sebe. V nájezdu léčíš pouze svou podskupinu. Seslání je okamžité a můžeš dál útočit v Soumračném závoji. Pohlcené poškození a poškození přesahující zbývající zdraví nepřidávají léčení.',
+  'entities.abilities.inner_focus.specNote_shadow':
+    'Také zaručí kritický zásah příštího Zlomení mysli nebo Roztržení prázdnoty do 60 s, pokud zasáhne. Jiná kouzla tento bonus nespotřebují. Roztržení prázdnoty stále spotřebuje 3 náboje Desátku temnoty. Pokud cíl kouzlu odolá, bonus ke kritickému zásahu se spotřebuje.',
+  'entities.abilities.spirit_bomb.description':
+    'Odpálíš na nepříteli duchovní bombu a způsobíš nepřátelům do 8 yardů od cíle {damage} stínového poškození. Poškození roste se silou kouzel, může kriticky zasáhnout a nad 5 cílů se snižuje. Vytvořením 20 nábojů Desátku temnoty připravíš jednu bombu. Vytváření se počítá i při maximálních 5 nábojích; utrácení není nutné a nepřidává postup. Postup přetrvává mezi boji a můžeš mít nejvýše jednu připravenou bombu. Smrt smaže postup i připravenou bombu. Dokončení seslání bombu spotřebuje, i když cíl odolá. Zrušení nebo přerušení ji zachová. Zahájení boje s nájezdovým bossem smaže postup i připravenou bombu. Tímto kouzlem nelze zahájit boj s nájezdovým bossem.',
+  'entities.abilities.spirit_bomb.name': 'Desátková bomba',
+  'entities.abilities.vampiric_touch.description':
+    'Způsobíš {damage} stínového poškození během 15 s, jednou za 3 s. Poškození roste se silou kouzel a jednotlivé tiky mohou kriticky zasáhnout. Každý tik rozdělí léčení rovné 20% zdraví, které nepřítel ztratil, mezi tebe a zraněné členy družiny do 30 yardů; v nájezdu léčí pouze tvou podskupinu. Máš-li alespoň 2 náboje Desátku temnoty, použití účinku spotřebuje 2 a zvýší veškeré jeho poškození o 30%.',
+  'entities.abilities.vampiric_touch.name': 'Upíří dotek',
+  'entities.abilities.void_rupture.description':
+    'Spotřebuješ 3 náboje Desátku temnoty a roztrhneš nepřítele za {damage} stínového poškození. Poškození roste se silou kouzel a může kriticky zasáhnout. Vyžaduje 3 náboje a spotřebuje je, i když cíl odolá.',
+  'entities.abilities.void_rupture.name': 'Roztržení prázdnoty',
+  'entities.items.batwing_draught.name': 'Třepotavý lektvar',
+  'entities.items.carved_pumpkin_head.name': 'Vyřezaná dýňová hlava',
+  'entities.items.crabapple_chew.name': 'Plané jablečné žvýkátko',
+  'entities.items.cursed_candle_stub.name': 'Zbytek prokleté svíčky',
+  'entities.items.emberwoven_sheaf.name': 'Snop protkávaný žárem',
+  'entities.items.gourdlight_crow_feather.name': 'Pero dýňové vrány',
+  'entities.items.gourdlight_sweet.name': 'Dýňová sladkost',
+  'entities.items.gourdlight_treat_pouch.name': 'Váček dýňových sladkostí',
+  'entities.items.gourdseed_brittle.name': 'Dýňový krokant',
+  'entities.items.gurglegreen_cauldron.name': 'Zelenobublavý kotel',
+  'entities.items.haunting_draught.name': 'Přízračný lektvar',
+  'entities.items.hearthroot_toffee.name': 'Krbový karamel',
+  'entities.items.jar_of_mischief.name': 'Sklenice rošťáren',
+  'entities.items.lantern_mint_drop.name': 'Lucernový mentolový bonbon',
+  'entities.items.murmurwick_candle.name': 'Svíčka šeptajícího knotu',
+  'entities.items.owlwatch_fudge.name': 'Soví fondán',
+  'entities.items.prankers_pumpkin.name': 'Šprýmařova dýně',
+  'entities.items.rattlebone_draught.name': 'Lektvar chrastících kostí',
+  'entities.items.reins_emberbristle_broom.name': 'Koště žhavých štětin',
+  'entities.items.sack_of_startled_bats.name': 'Pytel vyplašených netopýrů',
+  'entities.items.strawling_charm.name': 'Talisman slaměnce',
+  'entities.items.thatchgrin_patch_pumpkin.name': 'Dýně z políčka',
+  'entities.items.thatchgrin_sweet_sack.name': 'Slamošklebův pytel sladkostí',
+  'entities.items.wanderwisp_lantern.name': 'Lucerna bludného světélka',
+  'entities.items.writ_of_the_gourdlit.name': 'Listina dýňového světla',
+  'entities.items.writ_of_the_hollow_grin.name': 'Listina dutého úšklebku',
+  'entities.items.writ_of_the_trickster.name': 'Listina šprýmaře',
+  'entities.mobs.gourdlight_crow.name': 'Dýňová vrána',
+  'entities.mobs.gourdlight_strawling.name': 'Slaměnec',
+  'entities.mobs.gourdlight_swelling_gourd.name': 'Bobtnající dýně',
+  'entities.mobs.gourdlight_thatchgrin.name': 'Starý Slamoškleb',
+  'entities.npcs.gourdlight_keeper.greeting':
+    'Dýně svítí a lucerny visí, takže nastal Svátek dýňových světel. Zaklepej na dveře obyvatel Eastbrooku, Fenbridge a Highwatche a řekni: koledu, nebo neplechu. Většina ti dá sladkost. Někteří tě napálí. Přines mi sladkosti k libovolnému z mých stánků a vyměním je za něco na sebe.',
+  'entities.npcs.gourdlight_keeper.name': 'Hester Dýňoknotová',
+  'entities.npcs.gourdlight_keeper.title': 'Strážkyně dýňových světel',
+  'entities.quests.q_gourdlight_daily_baskets.completion':
+    'Všechny tři doručeny, a prý Marlow plakal. Ten pláče pokaždé. Tady máš vlastní košík.',
+  'entities.quests.q_gourdlight_daily_baskets.objectives.0.label': 'Košík předán kuchaři Marlowovi',
+  'entities.quests.q_gourdlight_daily_baskets.objectives.1.label': 'Košík předán bylinkářce Yaře',
+  'entities.quests.q_gourdlight_daily_baskets.objectives.2.label':
+    'Košík předán kronikáři Caddisovi',
+  'entities.quests.q_gourdlight_daily_baskets.text':
+    'Každý Svátek dýňových světel plním košík sladkostí pro starého přítele v každém městě, ale kolena už neslouží jako dřív. Roznes je za mě, {playerName}: kuchaři Marlowovi v Eastbrooku, bylinkářce Yaře ve Fenbridge a kronikáři Caddisovi nahoře v Highwatchi.',
+  'entities.quests.q_gourdlight_daily_baskets.title': 'Košíky pro sousedy',
+  'entities.quests.q_gourdlight_daily_boo.completion':
+    'Tři? Přes celé náměstí jsem slyšela, jak kuchař upustil pánev. Výborně. Tady je tvůj podíl.',
+  'entities.quests.q_gourdlight_daily_boo.objectives.0.label': 'Vystrašení obyvatelé',
+  'entities.quests.q_gourdlight_daily_boo.text':
+    'Nikdo v těchhle městech se už rok pořádně nelekl, {playerName}, a Svátek dýňových světel bez leknutí je jen studená noc. Obleč si kostým, klidně kterýkoli můj, nebo tu dýňovou hlavu, pokud už ji máš. Pak se přikradni ke třem obyvatelům a pořádně nahlas zařvi BAF.',
+  'entities.quests.q_gourdlight_daily_boo.title': 'Baf!',
+  'entities.quests.q_gourdlight_daily_feathers.completion':
+    'Černá jako pole za bezměsíčné noci a už voní kouřem. To bude krásná vatra. Děkuji.',
+  'entities.quests.q_gourdlight_daily_feathers.objectives.0.label': 'Vraní pera',
+  'entities.quests.q_gourdlight_daily_feathers.text':
+    'Když je Starý Slamoškleb v úzkých, povolá vrány na každého, kdo mu mlátí do slámy. Jejich peří hoří v krbu zeleně a já potřebuji tři pera na dnešní vatru. Najdi boj na jeho políčku, {playerName}, a vytrhni je jeho vránám.',
+  'entities.quests.q_gourdlight_daily_feathers.title': 'Peří do ohně',
+  'entities.quests.q_gourdlight_daily_patch.completion':
+    'Pět kulatých a ani do jedné nikdo nekousl. To bude koláč pro celé údolí. Tady máš něco za námahu.',
+  'entities.quests.q_gourdlight_daily_patch.objectives.0.label': 'Dýně z políčka',
+  'entities.quests.q_gourdlight_daily_patch.text':
+    'Slamošklebovo políčko za Kančí loukou se nadouvá dýněmi a polovina se odkutálela za jeho slámu, kde na ně opatrný člověk dosáhne. Přines mi jich pět, {playerName}. Samotnému starému strašákovi se vyhni obloukem. Počítá každou.',
+  'entities.quests.q_gourdlight_daily_patch.title': 'Dýně z políčka',
+  'entities.quests.q_gourdlight_daily_towns.completion':
+    'Tři města za jednu noc! Tuhle odměnu si zasloužily spíš tvoje boty než ty.',
+  'entities.quests.q_gourdlight_daily_towns.objectives.0.label': 'Zaklepání na dveře v Eastbrooku',
+  'entities.quests.q_gourdlight_daily_towns.objectives.1.label': 'Zaklepání na dveře ve Fenbridge',
+  'entities.quests.q_gourdlight_daily_towns.objectives.2.label': 'Zaklepání na dveře v Highwatchi',
+  'entities.quests.q_gourdlight_daily_towns.text':
+    'Děti říkají, že pravý dýňový koledník zaklepe v každém městě, než skončí noc. Dej jim za pravdu, {playerName}. Koleduj u jedněch dveří v Eastbrooku, jedněch ve Fenbridge a jedněch v Highwatchi. Cestu ti osvětlí lucerny podél silnic.',
+  'entities.quests.q_gourdlight_daily_towns.title': 'Dveře v každém městě',
+  'entities.quests.q_gourdlight_daily_wicks.completion':
+    'Šest zbytků, studených jako mráz. Kdo je zapálil, bude se muset snažit víc. Vezmi si tohle a umyj si ruce.',
+  'entities.quests.q_gourdlight_daily_wicks.objectives.0.label': 'Zhasnuté prokleté svíčky',
+  'entities.quests.q_gourdlight_daily_wicks.text':
+    'Někdo staví k našim lampám svíčky se zeleným plamenem. Hoří, ale netají, a když se otočíš, šeptají. Zhasni mi jich šest, {playerName}, v kterémkoli z těch tří měst a přines mi zbytky.',
+  'entities.quests.q_gourdlight_daily_wicks.title': 'Zlověstné knoty',
+  'entities.quests.q_gourdlight_rounds.completion':
+    'Pět dveří a pořád máš všechny prsty. Tady máš váček sladkostí na cestu domů. Vrať se zítra, dveře se zase otevřou.',
+  'entities.quests.q_gourdlight_rounds.objectives.0.label': 'Navštívené dveře',
+  'entities.quests.q_gourdlight_rounds.text':
+    'Každý Svátek dýňových světel děti z údolí chodí koledovat a letos se k nim přidáš i ty, {playerName}. Zaklepej na pět dveří v našich městech, řekni ta slova a uvidíš, co dostaneš. Až skončíš, vrať se za mnou.',
+  'entities.quests.q_gourdlight_rounds.title': 'Dýňová koleda',
+  'guide.interfacePage.framesGovernedPriest':
+    'Úprava rámečků také umožňuje přesunout medailon stínového kněze s Desátkem temnoty a Desátkovou bombou.',
+  'guide.worldPvpPage.hillBodyTwoHour':
+    'Jednou za dvě hodiny, v okamžiku, který nikdo nedokáže předvídat, se celý realm dozví, že za patnáct minut v jedné ze severních oblastí vyroste kopec. Kruh, kde bude stát, se vyznačí na otevřeném prostranství. Kopec stojí třicet minut a pak zmizí. Každých pět minut dostane realm zprávu, kde je a které skupiny jej držely nejdéle. Družina s nejvíce hráči uvnitř bojuje o ovládnutí kopce a po třiceti sekundách převahy jej získá. Příchod soupeřící družiny odpočet pouze pozastaví, dokud tvá družina znovu nepovede; od začátku se počítá jen tehdy, když uvnitř nezůstane nikdo z tvé družiny naživu. Osamělý hráč se počítá jako jednočlenná družina a po vytvoření družiny si ovládaný kopec ponechá, ale členové nájezdu se nepočítají vůbec. Dokud družina kopec drží, každý její člen uvnitř získává každou minutu stejné množství cti bez ohledu na dobu držení. Plná družina držící kopec po celou dobu bez odporu tak získá přibližně tolik jako za dvě vítězství na bojišti. Když kopec zmizí a skupina, která jej držela celkově nejdéle, jej držela alespoň deset minut, každý, kdo pro ni stál uvnitř nejméně minutu a stále je jejím členem, získá jedno vítězství do PvP řádku Týdenního trezoru. Ukazatel nad polem zobrazuje držitele, počet tvých hráčů proti soupeřovým a časovač obsazování; příkaz /hill v chatu sdělí polohu.',
+  'seasonal.boo.already': '{name} už má dnes strašení dost.',
+  'seasonal.boo.flash': 'BAF! {name} se lekl!',
+  'seasonal.boo.frightenedHint':
+    '{name} je po tvém posledním vystrašení pořád nervózní. Najdi někoho jiného.',
+  'seasonal.boo.landed':
+    'Vyskočíš na {name} s výkřikem BAF! Vyděšeně vykřikne a málem všechno upustí.',
+  'seasonal.boo.needsCostume':
+    'Nejdřív si obleč kostým: použij kostýmový lektvar, netopýří nebo kostlivý žert, Talisman slaměnce, Vyřezanou dýňovou hlavu nebo doušek ze Zelenobublavého kotle pro gobliní podobu.',
+  'seasonal.boo.noCostume': 'Bez kostýmu se ti {name} jen směje. Nejdřív si nějaký obleč.',
+  'seasonal.boo.notOnErrand': 'Hester tě dnes neposlala nikoho strašit.',
+  'seasonal.boo.row': 'Baf!',
+  'seasonal.boo.rowAria': 'Vyskočit na {name} a zakřičet baf',
+  'seasonal.boundItemGone':
+    'Svátek dýňových světel skončil a tvůj předmět {item} se rozpadá zpátky na slámu.',
+  'seasonal.costume': 'Vypiješ lektvar a proměníš se: {trick}!',
+  'seasonal.event.gourdlight_eve.name': 'Svátek dýňových světel',
+  'seasonal.guise': 'Talisman zapraská a obalí tě sláma: {trick}!',
+  'seasonal.itemSource.pumpkinHead':
+    'Padá ze Starého Slamoškleba na jeho dýňovém poli za Kančí loukou při prvním vybrání kořisti. Žádný obchodník ji neprodává.',
+  'seasonal.itemUse.broomSources':
+    'Prodává Hester Dýňoknotová za {count} snopů protkávaných žárem, nebo vzácně padá ze Starého Slamoškleba v den, kdy z něj vybereš kořist. K jízdě je nutná jezdecká dovednost. Zůstává natrvalo a lze na něm jezdit po celý rok.',
+  'seasonal.itemUse.costumeBat':
+    'Použití: Na {minutes} minut se proměníš v mávajícího netopýra. Spotřebuje se. Nelze použít v boji a vstup do boje účinek ukončí. Pouze vzhled.',
+  'seasonal.itemUse.costumeGhost':
+    'Použití: Na {minutes} minut se proměníš v plujícího ducha. Spotřebuje se. Nelze použít v boji a vstup do boje účinek ukončí. Pouze vzhled.',
+  'seasonal.itemUse.costumeSkeleton':
+    'Použití: Na {minutes} minut se proměníš v chrastícího kostlivce. Spotřebuje se. Nelze použít v boji a vstup do boje účinek ukončí. Pouze vzhled.',
+  'seasonal.itemUse.pouch': 'Použití: Otevři a získej {count} dýňových sladkostí.',
+  'seasonal.itemUse.pumpkinHead':
+    'Použití: Nasadíš nebo sundáš vyřezanou dýni osvětlenou zevnitř, která se nosí přes helmu. Pouze vzhled.',
+  'seasonal.itemUse.sheaf':
+    'Starý Slamoškleb ti dá jeden každý den, kdy z něj vybereš kořist, dokud nezískáš Koště žhavých štětin. Hester Dýňoknotová jich {count} vymění za koště u svých stánků v Eastbrooku, Fenbridge a Highwatchi. Neutracené snopy zůstanou na další Svátek dýňových světel.',
+  'seasonal.itemUse.strawlingCharm':
+    'Použití: Na {seconds} sekund se proměníš v jednoho ze Slamošklebových slaměnců. Mimo boj. Nikdy se nespotřebuje. Pouze vzhled.',
+  'seasonal.itemUse.sweet':
+    'Získává se koledováním během Svátku dýňových světel. Hester Dýňoknotová je mění za kosmetické předměty u svých stánků v Eastbrooku, Fenbridge a Highwatchi.',
+  'seasonal.itemUse.titleWrit':
+    'Použití: Získáš pro tuto postavu titul {title}, který nasadíš v Knize skutků. Spotřebuje se. Pokud už titul máš, listina ti zůstane.',
+  'seasonal.itemUse.toyBats':
+    'Použití: Otevřeš pytel. Vyletí z něj pištící hejno netopýrů a po dobu {seconds} sekund se rozletí kolem tebe. Nelze použít v boji ani v utajení. Nikdy se nespotřebuje: znovu lze použít po {cooldown} sekundách. Zůstává natrvalo a funguje celý rok. Pouze vzhled.',
+  'seasonal.itemUse.toyCandleShadows':
+    'Použití: Zapálíš před sebou svíčku. Její plameny po dobu {seconds} sekund vrhají na zem tančící stíny kočky, netopýra a čarodějnice, viditelné všem poblíž. Nelze použít v boji ani v utajení. Nikdy se nespotřebuje: znovu lze použít po {cooldown} sekundách. Zůstává natrvalo a funguje celý rok. Pouze vzhled.',
+  'seasonal.itemUse.toyCauldron':
+    'Použití: Postavíš před sebe velký bublající kotel. Stojí {standing} sekund a každý hráč, který se z něj napije, vybuchne v zelených bublinách a na {seconds} sekund se promění v goblina, čímž nahradí současný kostým. Kotel nelze postavit ani z něj pít v boji nebo v utajení a vstup do boje gobliní podobu ukončí. Nikdy se nespotřebuje: znovu lze použít po {cooldown} sekundách. Zůstává natrvalo a funguje celý rok. Pouze vzhled.',
+  'seasonal.itemUse.toyLantern':
+    'Použití: Postavíš před sebe lucernu. Malý duch kolem tebe krouží {seconds} sekund. Nelze použít v boji ani v utajení. Nikdy se nespotřebuje: znovu lze použít po {cooldown} sekundách. Zůstává natrvalo a funguje celý rok. Pouze vzhled.',
+  'seasonal.itemUse.toyPrank':
+    'Použití: Hodíš ji po jiném viditelném hráči do {range} yardů. Jeho hlava se na {seconds} sekund změní ve svítící dýňovou lucernu; pravým kliknutím ji může sundat. Ani jeden z vás nesmí být v boji a ty nesmíš být v utajení. Nikdy se nespotřebuje: znovu lze použít po {cooldown} sekundách. Zůstává natrvalo a funguje celý rok. Pouze vzhled.',
+  'seasonal.itemUse.trickJar':
+    'Použití: Na několik sekund na tobě provede náhodný neškodný žert. Pouze vzhled.',
+  'seasonal.jarTrick': 'Sklenice se otevře s prásknutím: {trick}!',
+  'seasonal.pumpkinHead.off': 'Sundáváš Vyřezanou dýňovou hlavu.',
+  'seasonal.pumpkinHead.on': 'Nasazuješ si Vyřezanou dýňovou hlavu.',
+  'seasonal.pumpkins.flash': 'Nalezena strašidelná dýně! {count}/{total}',
+  'seasonal.pumpkins.found':
+    'Rozsvítíš strašidelnou dýni v oblasti {zone}: {count}/{total}. Získané dýňové sladkosti: {sweets}.',
+  'seasonal.pumpkins.name': 'Strašidelná dýně',
+  'seasonal.pumpkins.progress': '{label}: {current}/{total}',
+  'seasonal.pumpkins.title': 'Strašidelné dýně',
+  'seasonal.pumpkins.world': 'Svět',
+  'seasonal.thatchgrin.poleBound': 'Připoutaný ke kůlu',
+  'seasonal.thatchgrin.sleepYell': 'Slunce vyšlo. Zpátky na kůl, zpátky na hlídku.',
+  'seasonal.thatchgrin.wakeYell': 'Na políčko padá NOC! Kdo chodí po MÉM poli?',
+  'seasonal.titleGranted': 'Přečteš listinu. Získaný nový titul: {title}.',
+  'seasonal.titleKnown': 'Tento titul už máš, takže si listinu ponecháš.',
+  'seasonal.tokenPrice': '{count} {item}',
+  'seasonal.toy.bats': 'Otevřeš pytel a vyletí z něj hejno vyplašených netopýrů!',
+  'seasonal.toy.candleShadows': 'Zapálíš svíčku a kolem jejích plamenů začnou tančit stíny.',
+  'seasonal.toy.cauldron': 'Postavíš kotel a ten začne bublat.',
+  'seasonal.toy.cauldronDrink':
+    'Napiješ se z kotle, vybuchneš v zelených bublinách a proměníš se v goblina!',
+  'seasonal.toy.hidden': 'Nejdřív vystup ze stínů: hračka by tě prozradila.',
+  'seasonal.toy.lantern': 'Postavíš lucernu a vypluje z ní malý duch, aby ti dělal společnost.',
+  'seasonal.toy.prank': 'Hodíš dýni. Rozplácne se o {name}!',
+  'seasonal.toy.prankNeedsPlayer': 'Dýně se rozplácne pouze o jiného hráče, který není v boji.',
+  'seasonal.toy.pranked':
+    '{name} ti rozplácne dýni na hlavě! Sundej ji pravým kliknutím, nebo ji hrdě nos.',
+  'seasonal.toy.prankedFlash': '{name} tě napálil!',
+  'seasonal.trickOrTreat.alreadyKnocked': 'U {name} jsi dnes už koledoval.',
+  'seasonal.trickOrTreat.knockedHint':
+    'Tady už jsi dnes klepal. Dveře se znovu otevřou po denním resetu.',
+  'seasonal.trickOrTreat.notActive': 'Svátek dýňových světel právě neprobíhá.',
+  'seasonal.trickOrTreat.row': 'Koledu, nebo neplechu!',
+  'seasonal.trickOrTreat.rowAria': 'Říct {name}: koledu, nebo neplechu',
+  'seasonal.trickOrTreat.tooFar': 'Přistup blíž, abys mohl zaklepat.',
+  'seasonal.trickOrTreat.treat': '{name} ti podává sladkost.',
+  'seasonal.trickOrTreat.treatFlash.few': 'Koleda! {count} dýňové sladkosti',
+  'seasonal.trickOrTreat.treatFlash.many': 'Koleda! {count} dýňových sladkostí',
+  'seasonal.trickOrTreat.treatFlash.one': 'Koleda! {count} dýňová sladkost',
+  'seasonal.trickOrTreat.treatFlash.other': 'Koleda! {count} dýňových sladkostí',
+  'seasonal.trickOrTreat.trick': '{name} tě napálí: {trick}!',
+  'seasonal.trickOrTreat.trickFlash': 'Neplecha! {trick}',
+  'seasonal.tricks.gourdlight_costume_bat': 'Netopýří kostým',
+  'seasonal.tricks.gourdlight_costume_ghost': 'Kostým ducha',
+  'seasonal.tricks.gourdlight_costume_skeleton': 'Kostým kostlivce',
+  'seasonal.tricks.gourdlight_trick_bat': 'Netopýří poblouznění',
+  'seasonal.tricks.gourdlight_trick_fumes': 'Zelené výpary',
+  'seasonal.tricks.gourdlight_trick_skeleton': 'Chrastící kosti',
+  'seasonal.tricks.gourdlight_trick_strawling': 'Podoba slaměnce',
 };

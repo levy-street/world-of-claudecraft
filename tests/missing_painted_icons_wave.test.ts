@@ -705,9 +705,25 @@ describe('missing painted deed and Heroic weapon integration', () => {
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 346, its 24 pending on the dungeon crest.
     // 352 with Lantern Hall's six after the integration45 backlog supplied all 57 formerly
     // missing crests: only the six, on the pending ledger, have no painting.
-    expect(DEED_ORDER).toHaveLength(359);
+    expect(DEED_ORDER).toHaveLength(369);
     // Release adds Titan, five PvP streak titles and the Hard wisp maze (7).
     expect(DEED_ART_PENDING.size).toBe(13);
+    for (const id of [
+      'feat_gourdlight_doorsteps',
+      'feat_gourdlight_errands',
+      'feat_gourdlight_frights',
+      'feat_gourdlight_eve_complete',
+    ]) {
+      expect(DEED_IMAGE_IDS.has(id), id).toBe(true);
+      expect(DEED_ART_PENDING.has(id), id).toBe(false);
+    }
+    expect(DEED_IMAGE_IDS.has('feat_pumpkin_hunter')).toBe(true);
+    expect(DEED_ART_PENDING.has('feat_pumpkin_hunter')).toBe(false);
+    expect(DEED_IMAGE_IDS.has('feat_title_hollow_grinned')).toBe(true);
+    expect(DEED_ART_PENDING.has('feat_gourdlight_guise')).toBe(false);
+    expect(DEED_ART_PENDING.has('feat_old_thatchgrin')).toBe(false);
+    expect(DEED_IMAGE_IDS.has('feat_old_thatchgrin')).toBe(true);
+    expect(DEED_IMAGE_IDS.has('feat_gourdlight_guise')).toBe(true);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     const credits = readFileSync(path.join(repoRoot, 'CREDITS.md'), 'utf8');
     const provenance = readFileSync(

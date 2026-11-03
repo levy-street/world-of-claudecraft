@@ -8,7 +8,7 @@ import { DIVINE_ASCENSION_AURA_ID } from '../paladin_devotion';
 import type { Aura } from '../types';
 
 type CancelableAura = Pick<Aura, 'id' | 'kind' | 'value'> &
-  Partial<Pick<Aura, 'sourceId' | 'unbreakableControl' | 'undispellable'>>;
+  Partial<Pick<Aura, 'sourceId' | 'unbreakableControl' | 'undispellable' | 'encounterOwned'>>;
 
 // A debuff is anything in the harmful set, OR a stat aura riding a `buff_*` kind
 // with a negative value (an enfeeble / wither drain reuses a buff_* kind but saps
@@ -36,12 +36,16 @@ const CANCELABLE_INTERNAL_CD_IDS: ReadonlySet<string> = new Set([DIVINE_ASCENSIO
 // form aura reverts to caster form) since none of those are harmful. The
 // player-removable test is the same one the dispel and cleanse executors answer to,
 // so an aura no counter may shed is no more cancelable than it is dispellable.
+// The one opt-in past that test is a `seasonal_cosmetic` (a costume, trick, guise or
+// the worn pumpkin head): undispellable so no counter strips it off someone else,
+// but a pure look with no sim effect, so its wearer may take it off
+// (seasonal/seasonal_cancel.ts does the ledger side).
 export function isCancelableAura(a: CancelableAura): boolean {
   return (
     a.id !== 'beacon_of_light' &&
     a.id !== 'veilbound_march' &&
     (a.kind !== 'internal_cd' || CANCELABLE_INTERNAL_CD_IDS.has(a.id)) &&
-    isPlayerRemovableAura(a) &&
+    ((a.kind === 'seasonal_cosmetic' && a.encounterOwned !== true) || isPlayerRemovableAura(a)) &&
     !isDebuffAura(a)
   );
 }

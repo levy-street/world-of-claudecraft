@@ -534,11 +534,12 @@ describe('release v0.39 icon-art second-pass lineage', () => {
     // Their own paintings now ship in referral-reward-icons-v045-2026-10-22,
     // plus reins_nightwing_chimera, so all 138 live hotbar items are painted; none remain parked.
     // Wobbles the Slime's reins ship committed art (a render of the mount): 139.
-    expect(liveHotbarItemIds, 'production isHotbarItemId inventory').toHaveLength(253);
+    // Halloween adds 22 usable rewards with committed item art.
+    expect(liveHotbarItemIds, 'production isHotbarItemId inventory').toHaveLength(275);
     expect(
       artSubjectHotbarItemIds,
       'production isHotbarItemId art-subject inventory (live minus ITEM_ART_PENDING)',
-    ).toHaveLength(253);
+    ).toHaveLength(275);
     expect([...pendingHotbarItemIds].sort(), 'ITEM_ART_PENDING hotbar items').toEqual([]);
     expect(
       pendingHotbarItemIds.filter((id) => shippingImageExists(`/ui/items/${id}.webp`)),

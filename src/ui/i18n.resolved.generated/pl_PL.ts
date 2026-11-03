@@ -1038,14 +1038,14 @@ export const pl_PL: EnTranslations = {
       "fateThreadsSentenceReady": "Trzy Nici Przeznaczenia: Wyrok może je zużyć, zyskując 18% zwiększonych obrażeń."
     },
     "priest": {
-      "gloomtitheLabel": "Gloomtithe",
-      "bombLabel": "Tithe Bomb",
-      "gloomtitheStatus": "{value} of {max} Gloomtithe",
-      "bombStatus": "{value} of {max} Tithe Bomb charges",
-      "bombReady": "Ready",
+      "gloomtitheLabel": "Mroczna dziesięcina",
+      "bombLabel": "Bomba dziesięciny",
+      "gloomtitheStatus": "{value} z {max} ładunków Mrocznej dziesięciny",
+      "bombStatus": "{value} z {max} ładunków Bomby dziesięciny",
+      "bombReady": "Gotowa",
       "chargeCount": "{value} / {max}",
-      "gloomtitheTooltip": "Gloomtithe: up to 5 spendable charges. Void Rupture consumes 3; Vampiric Touch consumes 2 for 30% more damage; Call Tithefiend consumes your bank. Generating charges also fills Tithe Bomb, even while this bank is full.",
-      "bombTooltip": "Tithe Bomb: generate 20 Gloomtithe to prepare one bomb. Spending Gloomtithe does not add progress. Progress lasts between fights. Dying or starting a raid boss resets it. A completed cast consumes the bomb; cancelling keeps it."
+      "gloomtitheTooltip": "Mroczna dziesięcina: do 5 ładunków do wykorzystania. Rozerwanie pustki zużywa 3; Wampiryczny dotyk zużywa 2, zwiększając obrażenia o 30%; Przyzwij Dziesięcinnika zużywa cały zapas. Generowanie ładunków napełnia też Bombę dziesięciny, nawet przy pełnym zapasie.",
+      "bombTooltip": "Bomba dziesięciny: wygeneruj 20 ładunków Mrocznej dziesięciny, aby przygotować jedną bombę. Wydawanie ładunków nie zwiększa postępu. Postęp utrzymuje się między walkami. Śmierć lub rozpoczęcie walki z bossem rajdu go zeruje. Ukończenie rzucania zużywa bombę; anulowanie ją zachowuje."
     },
     "procOverlay": {
       "soulFragmentsMeter": "Odłamki Duszy",
@@ -2600,6 +2600,7 @@ export const pl_PL: EnTranslations = {
       "name_lantern_hall_destrier": "Rumak Sali Latarni",
       "name_chimeglass_tortoise": "Tolliver Chimeglass",
       "name_rickshaw_mount": "Spętana Kośćmi Riksza",
+      "name_emberbristle_broom": "Miotła żarzącej szczeciny",
       "name_wobbles_slime": "Chwiejka, Śluz",
       "name_nightwing_chimera": "Chimera Nocnego Skrzydła",
       "desc_valorsteed": "Wytrzymały, pewnie stąpający rumak ze skórzanym siodłem.",
@@ -2623,7 +2624,8 @@ export const pl_PL: EnTranslations = {
       "desc_lantern_hall_destrier": "Koń bojowy Sali Latarni, opancerzony dębem i żelazem pod błękitem gildii, z dwiema latarniami sztormowymi przy siodle, oświetlającymi drogę do domu.",
       "desc_nightwing_chimera": "Dwugłowa wiwerna zmierzchu z pradawnych konarów, odpoczywająca na szponiastych tylnych nogach i sunąca nad ziemią na skrzydłach pokrytych tajemnymi rytami.",
       "desc_chimeglass_tortoise": "Żółw solny, który wyprzedził trzy pokolenia przyczep kempingowych. Druciarze zmielili mu okulary ze szkła burzowego i zawiesili mu na szyi dzwonek z brązu, tak że droga usłyszy go na długo, zanim go zobaczy.",
-      "desc_rickshaw_mount": "Grzechoczący wózek z kości, z kościstym pachołkiem zaprzężonym do dyszli, ciągnącym cię w pełnym pędzie."
+      "desc_rickshaw_mount": "Grzechoczący wózek z kości, z kościstym pachołkiem zaprzężonym do dyszli, ciągnącym cię w pełnym pędzie.",
+      "desc_emberbristle_broom": "Dożynkowa miotła przewiązana pomarańczową wstążką unosi się na dłoń nad ziemią, gubiąc żar ze szczeciny. Stała nagroda z Wigilii Dyniowych Świateł."
     },
     "mountTraining": {
       "mountPrompt": "Naciśnij {key}, aby dosiąść treningowego Rumaka Męstwa.",
@@ -4672,7 +4674,10 @@ export const pl_PL: EnTranslations = {
       }
     },
     "auraEffect": {
-      "stilledMindCrit": "Your next Mindfracture or Void Rupture is a guaranteed critical strike if it hits. Other spells do not consume this bonus. Void Rupture still consumes 3 Gloomtithe charges. A resisted cast consumes the bonus.",
+      "gourdlight": {
+        "thatchbound": "Stary Słomochichot pociąga za twoje sznurki. Nie możesz działać: podchodzisz do najbliższego sojusznika i uderzasz go co {every} s, zadając od {min} do {max} obrażeń (do {mult} razy więcej przeciw sojusznikowi na poziomie {level}). Efekt kończy się wcześniej, gdy otrzymasz obrażenia równe {pct}% maksymalnego zdrowia lub gdy sojusznik go rozproszy (magia)."
+      },
+      "stilledMindCrit": "Twoje następne Roztrzaskanie umysłu lub Rozerwanie pustki zada gwarantowane trafienie krytyczne, jeśli trafi. Inne zaklęcia nie zużywają tej premii. Rozerwanie pustki nadal zużywa 3 ładunki Mrocznej dziesięciny. Odparcie zaklęcia zużywa premię.",
       "wildheart": {
         "packBond": "Otrzymuje o {pct}% mniej obrażeń, gdy partner stoi blisko. Rozdziel Pogromcę Bestii i jaguara, aby zerwać efekt.",
         "packBondFury": "Zadaje o {pct}% więcej obrażeń, gdy partner stoi blisko.",
@@ -4753,7 +4758,9 @@ export const pl_PL: EnTranslations = {
       "breathGuardian": {
         "portalA": "When this ends, Portal A opens exactly where you stand. Stand near the Knotted Gale. You cannot carry it this round.",
         "portalB": "When this ends, Portal B opens exactly where you stand. Stand at the lip of a gap. You cannot carry the Knotted Gale this round.",
-        "laden": "You carry a Knotted Gale: you walk at {walk}% speed, you cannot blink, charge or leap, and no wind, pull, blast or throw can move you. Either portal takes you to the other. Press Interact at the lip of any gap to throw it into the void. When this ends it bursts and kills everyone on the Cornice.",
+        "portalC": "When this ends, Portal C opens exactly where you stand. It links to Portal D only. Stand near the other Knotted Gale. You cannot carry it this round.",
+        "portalD": "When this ends, Portal D opens exactly where you stand. It links to Portal C only. Stand at the lip of a gap away from Portal B. You cannot carry the Knotted Gale this round.",
+        "laden": "You carry a Knotted Gale: you walk at {walk}% speed, you cannot blink, charge or leap, and no wind, pull, blast or throw can move you. Each portal takes you to its partner: A to B, C to D. Press Interact at the lip of any gap to throw it into the void. When this ends it bursts and kills everyone on the Cornice.",
         "wind": "The Guardian of the Breath's wind carries you {speed} yd a second the way it blows. Walk against it to hold your ground; it does not interrupt your casts. Pressed against the rim's wall you take {pinMin} to {pinMax} damage every second. Where the wall is broken there is nothing to stop you: you fall into the void.",
         "draw": "The Guardian draws breath and pulls you toward it, {speed} yd a second. Its vortex deals {min} to {max} damage every {tick} sec to whoever stands before its mouth. Then Bellows Gust deals {gustMin} to {gustMax} damage to everyone on the Cornice and throws them {throw} yd outward.",
         "pinned": "Pressed against the rim's wall by the wind: {min} to {max} damage every second until the wind falls calm or you walk clear of the wall.",
@@ -4860,6 +4867,7 @@ export const pl_PL: EnTranslations = {
       "spellHaste": "Zwiększa szybkość rzucania zaklęć o {pct}%",
       "sated": "Nie możesz skorzystać z kolejnego grupowego efektu przyspieszenia",
       "cauterizeFatigue": "Kauteryzacja nie może ponownie zapobiec śmiertelnemu trafieniu",
+      "seasonalCosmetic": "Tylko wygląd: bez wpływu na walkę",
       "castShield": "Rzucania nie można przerwać ani opóźnić obrażeniami",
       "dmgDone": "Zwiększa zadawane obrażenia o {pct}%",
       "dmgDoneReduce": "Zmniejsza zadawane obrażenia o {pct}%",
@@ -5007,6 +5015,7 @@ export const pl_PL: EnTranslations = {
       "dodgeReduce": "Verringert Ausweichchance um {pct}%",
       "damageReduction": "Zmniejsza wszelkie otrzymywane obrażenia o {pct}%",
       "slumber": "Śpi do świtu. Nie można go zaatakować i nie obudzi się dla nikogo.",
+      "slumberNight": "Wisi bez życia na swoim palu aż do zmroku. Nie można go zaatakować.",
       "guardianWard": "Kolejny śmiertelny cios wroga zamiast tego przywraca cię do {pct}% zdrowia",
       "armorFlat": "Verringert Rüstung um {value}",
       "armorFlatStacks": "Verringert Rüstung um {value} ({stacks} Stapel)",
@@ -5086,7 +5095,8 @@ export const pl_PL: EnTranslations = {
     "worldBoss": {
       "spawn": "{name} wznosi się nad {zone}!",
       "wake": "{name} budzi się nad {zone}!",
-      "sleep": "{name} śpi do świtu."
+      "sleep": "{name} śpi do świtu.",
+      "sleepUntilNightfall": "{name} śpi do zmroku."
     },
     "auth": {
       "appleLoginCta": "Kontynuuj przez Apple",
@@ -7350,8 +7360,12 @@ export const pl_PL: EnTranslations = {
       "aLine": "It opens at your feet in {seconds} sec. Stand near the Knotted Gale.",
       "bTitle": "You are Portal B!",
       "bLine": "It opens at your feet in {seconds} sec. Stand at the lip of a gap.",
+      "cTitle": "You are Portal C!",
+      "cLine": "It opens at your feet in {seconds} sec. Stand near the other Knotted Gale.",
+      "dTitle": "You are Portal D!",
+      "dLine": "It opens at your feet in {seconds} sec. Stand at a gap away from Portal B.",
       "carryTitle": "You carry the Knotted Gale!",
-      "carryLine": "Either portal takes you to the other. Throw it from the lip of a gap. It bursts in {seconds} sec.",
+      "carryLine": "Each portal takes you to its partner: A to B, C to D. Throw it from the lip of a gap. It bursts in {seconds} sec.",
       "lipTitle": "Throw it now!",
       "lipLine": "You stand at the lip of a gap. It bursts in {seconds} sec.",
       "throwKey": "Press {key} at the lip to throw",
@@ -7373,6 +7387,7 @@ export const pl_PL: EnTranslations = {
         "stormGust": "A storm gust gathers! Brace against the wind!",
         "knot": "A Knotted Gale falls! Carry it to a gap and throw it into the void!",
         "knotPortals": "Portal A on {a}, Portal B on {b}!",
+        "knotPortals2": "Portal C on {c}, Portal D on {d}!",
         "knotTaken": "{player} takes up the Knotted Gale!",
         "knotDropped": "{player} falls! The Knotted Gale is free again!",
         "knotFell": "{player} takes the Knotted Gale into the void!",
@@ -8607,6 +8622,107 @@ export const pl_PL: EnTranslations = {
         "0": "Właściwy kompost, łóżka przetrwają. Stary młynarz pogrzebał coś zanim wyjechał. Jego młyn wciąż się kręci w dalekiej części ogrodów. Idź tam i stań przy nim.",
         "2": "Więc młyn wysłał cię drogą przybrzeżną. Latarnia skrywa ostatnią tajemnicę: na północny-zachód od niej, tuż poza ścieżką, darń została przycięta i ułożona z powrotem. Kopaj tam."
       }
+    }
+  },
+  "seasonal": {
+    "pumpkins": {
+      "name": "Nawiedzona dynia",
+      "title": "Nawiedzone dynie",
+      "world": "Świat",
+      "progress": "{label}: {current}/{total}",
+      "found": "Rozświetlasz nawiedzoną dynię w {zone}: {count}/{total}. Otrzymane dyniowe cukierki: {sweets}.",
+      "flash": "Znaleziono nawiedzoną dynię! {count}/{total}"
+    },
+    "event": {
+      "gourdlight_eve": {
+        "name": "Wigilia Dyniowych Świateł"
+      }
+    },
+    "trickOrTreat": {
+      "row": "Cukierek albo psikus!",
+      "rowAria": "Powiedz {name}: cukierek albo psikus",
+      "knockedHint": "Dziś już tu pukano. Drzwi znów się otworzą po dziennym resecie.",
+      "treat": "{name} wręcza ci słodycz.",
+      "trick": "{name} płata ci figla: {trick}!",
+      "alreadyKnocked": "Dziś już proszono {name} o cukierek albo psikus.",
+      "notActive": "Wigilia Dyniowych Świateł obecnie nie trwa.",
+      "tooFar": "Podejdź bliżej, aby zapukać.",
+      "treatFlash": {
+        "one": "Cukierek! {count} dyniowy cukierek",
+        "few": "Cukierek! {count} dyniowe cukierki",
+        "many": "Cukierek! {count} dyniowych cukierków",
+        "other": "Cukierek! {count} dyniowego cukierka"
+      },
+      "trickFlash": "Psikus! {trick}"
+    },
+    "tricks": {
+      "gourdlight_trick_bat": "Nietoperzowy odlot",
+      "gourdlight_trick_skeleton": "Grzechoczące kości",
+      "gourdlight_trick_fumes": "Zielone opary",
+      "gourdlight_trick_strawling": "Postać słomiaka",
+      "gourdlight_costume_skeleton": "Kostium szkieletu",
+      "gourdlight_costume_ghost": "Kostium ducha",
+      "gourdlight_costume_bat": "Kostium nietoperza"
+    },
+    "pumpkinHead": {
+      "on": "Zakładasz Rzeźbioną dyniową głowę.",
+      "off": "Zdejmujesz Rzeźbioną dyniową głowę."
+    },
+    "jarTrick": "Słoik otwiera się z trzaskiem: {trick}!",
+    "guise": "Talizman trzeszczy, a słoma cię obrasta: {trick}!",
+    "costume": "Wypijasz eliksir i zmieniasz postać: {trick}!",
+    "titleGranted": "Czytasz akt. Zdobyty nowy tytuł: {title}.",
+    "titleKnown": "Masz już ten tytuł, więc zachowujesz akt.",
+    "boundItemGone": "Wigilia Dyniowych Świateł dobiegła końca i twój przedmiot {item} rozpada się z powrotem w słomę.",
+    "itemUse": {
+      "pumpkinHead": "Użycie: Zakładasz lub zdejmujesz rzeźbioną dynię rozświetloną od środka, noszoną na hełmie. Tylko wygląd.",
+      "trickJar": "Użycie: Płata ci losowego, nieszkodliwego figla na kilka sekund. Tylko wygląd.",
+      "pouch": "Użycie: Otwórz, aby otrzymać {count} dyniowych cukierków.",
+      "strawlingCharm": "Użycie: Zmieniasz się w jednego ze słomiaków Starego Słomochichota na {seconds} sekund. Poza walką. Nigdy się nie zużywa. Tylko wygląd.",
+      "sweet": "Zdobywane za cukierek albo psikus podczas Wigilii Dyniowych Świateł. Hester Dynioknot wymienia je na przedmioty kosmetyczne przy swoich straganach w Eastbrook, na Moście na Trzęsawisku i w Wysokiej Strażnicy.",
+      "costumeSkeleton": "Użycie: Zmieniasz się w grzechoczący szkielet na {minutes} minut. Zużywa się. Nie można użyć w walce, a wejście do walki kończy efekt. Tylko wygląd.",
+      "costumeGhost": "Użycie: Zmieniasz się w unoszącego się ducha na {minutes} minut. Zużywa się. Nie można użyć w walce, a wejście do walki kończy efekt. Tylko wygląd.",
+      "costumeBat": "Użycie: Zmieniasz się w trzepoczącego nietoperza na {minutes} minut. Zużywa się. Nie można użyć w walce, a wejście do walki kończy efekt. Tylko wygląd.",
+      "toyPrank": "Użycie: Rzucasz w innego widocznego gracza w zasięgu {range} jardów. Jego głowa zmienia się w świecącą dyniową latarnię na {seconds} sekund; może ją zdjąć prawym przyciskiem myszy. Żadne z was nie może być w walce, a ty nie możesz być w ukryciu. Nigdy się nie zużywa: ponowne użycie po {cooldown} sekundach. Pozostaje na stałe i działa przez cały rok. Tylko wygląd.",
+      "toyLantern": "Użycie: Stawiasz przed sobą latarnię. Mały duch krąży wokół ciebie przez {seconds} sekund. Nie można użyć w walce ani w ukryciu. Nigdy się nie zużywa: ponowne użycie po {cooldown} sekundach. Pozostaje na stałe i działa przez cały rok. Tylko wygląd.",
+      "toyBats": "Użycie: Otwierasz worek. Wypada z niego piszcząca chmara nietoperzy i krąży wokół ciebie przez {seconds} sekund. Nie można użyć w walce ani w ukryciu. Nigdy się nie zużywa: ponowne użycie po {cooldown} sekundach. Pozostaje na stałe i działa przez cały rok. Tylko wygląd.",
+      "toyCandleShadows": "Użycie: Zapalasz przed sobą świecę. Przez {seconds} sekund jej płomienie rzucają na ziemię tańczące cienie kota, nietoperza i wiedźmy, widoczne dla wszystkich w pobliżu. Nie można użyć w walce ani w ukryciu. Nigdy się nie zużywa: ponowne użycie po {cooldown} sekundach. Pozostaje na stałe i działa przez cały rok. Tylko wygląd.",
+      "toyCauldron": "Użycie: Stawiasz przed sobą wielki bulgoczący kocioł. Stoi przez {standing} sekund, a każdy gracz, który się napije, wybucha zielonymi bąbelkami i zmienia się w goblina na {seconds} sekund, zastępując dotychczasowy kostium. Ani stawianie, ani picie nie działa w walce lub w ukryciu, a wejście do walki kończy goblińską postać. Nigdy się nie zużywa: ponowne użycie po {cooldown} sekundach. Pozostaje na stałe i działa przez cały rok. Tylko wygląd.",
+      "titleWrit": "Użycie: Zdobywasz dla tej postaci tytuł {title}, zakładany w Księdze Czynów. Zużywa się. Jeśli masz już tytuł, zachowujesz akt.",
+      "broomSources": "Do kupienia od Hester Dynioknot za {count} snopów przetykanych żarem albo jako rzadki łup ze Starego Słomochichota w dniu, kiedy go łupisz. Jazda wymaga umiejętności jeździectwa. Pozostaje na stałe i można na niej jeździć przez cały rok.",
+      "sheaf": "Stary Słomochichot daje jeden każdego dnia, kiedy zbierzesz z niego łup, dopóki nie zdobędziesz Miotły żarzącej szczeciny. Hester Dynioknot wymienia {count} na miotłę przy swoich straganach w Eastbrook, na Moście na Trzęsawisku i w Wysokiej Strażnicy. Niewydane snopy zostają na następną Wigilię Dyniowych Świateł."
+    },
+    "toy": {
+      "prank": "Rzucasz dynią. Rozbryzguje się na {name}!",
+      "lantern": "Stawiasz latarnię, z której wypływa mały duch, by dotrzymać ci towarzystwa.",
+      "bats": "Otwierasz worek i wylatuje z niego chmara spłoszonych nietoperzy!",
+      "candleShadows": "Zapalasz świecę, a wokół jej płomieni zaczynają tańczyć cienie.",
+      "cauldron": "Stawiasz kocioł, który zaczyna bulgotać.",
+      "cauldronDrink": "Pijesz z kotła, wybuchasz zielonymi bąbelkami i zmieniasz się w goblina!",
+      "pranked": "{name} rozbija ci dynię na głowie! Zdejmij ją prawym przyciskiem myszy albo noś z dumą.",
+      "prankedFlash": "Psikus od {name}!",
+      "prankNeedsPlayer": "Dynia rozbryzguje się tylko na innym graczu, który nie jest w walce.",
+      "hidden": "Najpierw wyjdź z cieni: zabawka zdradziłaby twoją obecność."
+    },
+    "itemSource": {
+      "pumpkinHead": "Wypada ze Starego Słomochichota na jego dyniowym polu za Łąką Dzików przy pierwszym zabraniu łupu. Żaden handlarz jej nie sprzedaje."
+    },
+    "boo": {
+      "row": "Bu!",
+      "rowAria": "Wyskocz przed {name} i krzyknij bu",
+      "needsCostume": "Najpierw załóż kostium: użyj eliksiru przebrania, nietoperzego lub szkieletowego psikusa, Talizmanu słomiaka, Rzeźbionej dyniowej głowy albo goblińskiego łyku z Zielonobulgoczącego kotła.",
+      "frightenedHint": "{name} wciąż podskakuje po twoim ostatnim straszeniu. Znajdź kogoś innego.",
+      "landed": "Wyskakujesz przed {name} z okrzykiem BU! Rozlega się wrzask i niemal wszystko wypada mu z rąk.",
+      "flash": "BU! {name} się przestraszył!",
+      "noCostume": "Bez kostiumu {name} tylko się z ciebie śmieje. Najpierw się przebierz.",
+      "already": "{name} ma już dość strachu na dziś.",
+      "notOnErrand": "Hester nie poprosiła cię dziś o straszenie kogokolwiek."
+    },
+    "tokenPrice": "{count} {item}",
+    "thatchgrin": {
+      "poleBound": "Przywiązany do pala",
+      "wakeYell": "NOC zapada nad poletkiem! Kto chodzi po MOIM polu?",
+      "sleepYell": "Słońce wstało. Z powrotem na pal, z powrotem na wartę."
     }
   },
   "dungeonGuide": {
@@ -9903,7 +10019,7 @@ export const pl_PL: EnTranslations = {
       "framesGovernedTalkingHead": "Edytuj ramki rozluźnia także panel Dialogu, który zawiera wypowiedź NPC, gdy ten NPC jest poza twoim polem widzenia; nosi chip z nazwą, gdy jest luzem.",
       "framesGovernedShardpike": "Edytuj ramki odblokowuje także pasek Odłamkowej Piki: krótki rząd działań narzędzia zadania, pojawiający się obok pasków akcji tylko podczas noszenia samej piki. W odblokowanym stanie ma etykietę nazwy, dzięki czemu możesz ustawić go przed walką, zamiast w jej trakcie.",
       "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
-      "framesGovernedPriest": "Edit Frames also lets you move the Shadow priest's Gloomtithe and Tithe Bomb medallion.",
+      "framesGovernedPriest": "Edycja ramek pozwala też przenieść medalion kapłana Cienia z Mroczną dziesięciną i Bombą dziesięciny.",
       "framesGovernedResourceAndHill": "Włącz Odłącz pasek zasobów na karcie Ramki. Opcja Edytuj ramki odblokuje wtedy także pasek zasobów, dzięki czemu możesz umieścić manę, energię lub gniew osobno w dowolnym miejscu. Szerokość paska zasobów i Wysokość paska zasobów na tej samej karcie zmieniają jego rozmiar. Edytuj ramki odblokowuje także pasek Władcy wzgórza. Krycie tła Władcy wzgórza na tej karcie wygasza jego panel, zachowując czytelność tekstu.",
       "barsTitle": "Paski, liczniki i tekst walki",
       "barsBody": "Twój pasek rzucania pojawia się na środku ekranu, tuż nad paskami akcji, gdy tylko rzucasz zaklęcie lub kanałujesz, i pokazuje nazwę zaklęcia oraz pozostały czas. Twój cel dostaje własny pasek rzucania na swojej ramce, więc widzisz, co nadchodzi, i możesz na to odpowiedzieć.\n\nCienki pasek zamachu leży pod paskiem rzucania i wypełnia się między zamachami twojej broni, więc wojownik walczący wręcz lub na dystans widzi, kiedy padnie następne automatyczne trafienie.\n\nTwój pasek doświadczenia biegnie na całą szerokość pod paskami akcji, podzielony na odcinki, a jaśniejszy fragment pokazuje zgromadzone doświadczenie z wypoczęcia.\n\nZanurz się pod wodą, a na górze ekranu pojawi się niebieski pasek oddechu. Opróżnia się, dopóki twoja głowa jest pod wodą, błyska na czerwono, gdy się wyczerpie i zaczynasz tonąć, i szybko napełnia się ponownie, gdy tylko wynurzysz się na powierzchnię. Spacja unosi cię w górę, a klawisz Nurkowania w dół, domyślnie Ctrl, zabiera cię głębiej.\n\nObrażenia i leczenie unoszą się nad tym, w co trafiły, jako małe liczby, więc możesz odczytać przebieg walki bez czytania tekstu. Zakładka Walka w twoim oknie czatu prowadzi pełny pisemny zapis.",
@@ -10808,6 +10924,7 @@ export const pl_PL: EnTranslations = {
       "hillBodyRamp": "Co dwie godziny wzgórze pojawia się na Smoczych Ziemiach, w Szronowej Krainie lub Bursztynowej Dolinie. Kraina otrzymuje ostrzeżenie piętnaście minut wcześniej, a krąg zostaje oznaczony na otwartym terenie. Wzgórze pozostaje aktywne przez trzydzieści minut. Wejście do aktywnego kręgu włącza flagę PvP w świecie zgodnie ze zwykłymi zasadami poziomu, także członkom rajdu. Grupa z największą liczbą uprawnionych graczy w kręgu przejmuje wzgórze po minucie nieprzerwanej przewagi; samotny gracz liczy się jako jednoosobowa grupa, ale członkowie rajdu i gracze poniżej wymaganego poziomu PvP nie mogą przejmować wzgórza ani zdobywać z niego Honoru. Każdy obrońca stojący wewnątrz zdobywa Honor w rosnącym tempie. Wypłaty są częstsze, a ich wartość rośnie szybciej, dzięki czemu łączna ilość Honoru pozostaje taka sama jak w dawnym wydarzeniu trwającym czterdzieści pięć minut. Zmiana właściciela rozpoczyna wzrost nagród od nowa. Po opuszczeniu kręgu flaga pozostaje włączona; /pvp off korzysta ze zwykłego pięciominutowego opóźnienia i nie może się zakończyć na aktywnym wzgórzu ani podczas walki. Pasek wzgórza pokazuje kontrolę, liczby graczy i postęp przejmowania; /hill podaje jego położenie.",
       "hillBodyPause": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls, and every five minutes while it stands the realm is told where it is and which groups have held it longest. The party with the most players standing inside contests the hill, and after thirty seconds of majority the hill is theirs. A rival party walking in only pauses that count until yours leads again; it starts over only if nobody from your party is left alive inside. A lone player counts as a party of one and keeps a hill they hold when they form a party, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns Honor every minute, and the longer the same party holds it, the more each minute pays: a full party holding an uncontested hill for its whole stand earns about as much as three battleground wins. When the hill changes hands, the new holders start the count from the beginning. When it falls, if the group that held it longest in total held it for at least ten minutes, everyone who stood inside for that group for at least a minute, and is still in that group, earns one win toward the PvP row of the Weekly Vault. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
       "hillBodyFlat": "Raz na trzy godziny, w nieprzewidywalnej chwili, cała kraina otrzymuje zapowiedź, że za piętnaście minut w jednej z północnych stref pojawi się wzgórze. Jego krąg zostaje oznaczony na otwartym terenie. Wzgórze pozostaje przez czterdzieści pięć minut, po czym znika. W tym czasie co pięć minut ogłaszane są jego położenie oraz grupy z najdłuższym łącznym czasem utrzymania. Grupa z największą liczbą graczy w kręgu walczy o wzgórze i zdobywa je po łącznie trzydziestu sekundach przewagi liczebnej. Wejście rywali tylko wstrzymuje licznik, dopóki twoja grupa znów nie uzyska przewagi; odliczanie zaczyna się od nowa tylko wtedy, gdy w kręgu nie pozostanie żaden żywy członek twojej grupy. Samotny gracz liczy się jako jednoosobowa grupa i zachowuje zajęte wzgórze po utworzeniu grupy, ale członkowie rajdu w ogóle się nie liczą. Każdy członek grupy utrzymującej wzgórze, który stoi w kręgu, otrzymuje co minutę tyle samo Honoru, niezależnie od długości utrzymania. Pełna grupa utrzymująca je bez przeszkód przez cały czas jego istnienia zarabia mniej więcej tyle, co za trzy zwycięstwa na polach bitew. Gdy wzgórze znika, jeśli grupa z najdłuższym łącznym utrzymaniem zgromadziła co najmniej dziesięć minut, każdy, kto stał w kręgu przez przynajmniej minutę podczas utrzymania przez tę grupę i nadal do niej należy, otrzymuje jedno zwycięstwo do rzędu PvP Tygodniowego Skarbca. Pasek nad polem pokazuje właściciela, liczebność obu stron i licznik przejmowania; /hill na czacie podaje położenie.",
+      "hillBodyTwoHour": "Raz na dwie godziny, w chwili, której nikt nie potrafi przewidzieć, cały świat gry dowiaduje się, że za piętnaście minut w jednej z północnych stref wyrośnie wzgórze. Na otwartym terenie pojawia się krąg oznaczający jego miejsce. Wzgórze stoi przez trzydzieści minut, potem opada, a co pięć minut świat gry otrzymuje wiadomość o jego położeniu i grupach, które utrzymywały je najdłużej. Drużyna z największą liczbą graczy wewnątrz walczy o wzgórze i przejmuje je po trzydziestu sekundach przewagi. Wejście rywali tylko zatrzymuje licznik do odzyskania przewagi; odliczanie zaczyna się od nowa wyłącznie wtedy, gdy wewnątrz nie zostanie nikt żywy z twojej drużyny. Samotny gracz liczy się jako jednoosobowa drużyna i zachowuje wzgórze po utworzeniu drużyny, lecz członkowie rajdu w ogóle się nie liczą. Gdy drużyna utrzymuje wzgórze, każdy jej członek stojący wewnątrz zdobywa co minutę tyle samo Honoru niezależnie od czasu utrzymania. Pełna drużyna trzymająca wzgórze bez przeciwników przez cały czas zdobywa więc mniej więcej tyle, co za dwa zwycięstwa na polu bitwy. Kiedy wzgórze opada, jeśli grupa utrzymująca je łącznie najdłużej miała je przez co najmniej dziesięć minut, każdy, kto stał w nim dla tej grupy co najmniej minutę i nadal do niej należy, zdobywa jedno zwycięstwo do wiersza PvP Tygodniowego skarbca. Pasek nad polem pokazuje właściciela, liczebność obu stron i czas przejmowania; komenda /hill na czacie podaje położenie.",
       "limitsBodyRaids": "Pokonanie tego samego gracza znowu i znowu płaci mniej za każdym razem i wkrótce nic, a twój rachunek przeciwko temu graczowi zaczyna się tylko od nowa około godzinę po pierwszym z tych zabójstw, więc campowanie jednej ofiary nigdy nie jest warte czekania. Cel znacznie poniżej twojego poziomu płaci wcale. Pola bitwy i Areny prowadzą swoje własne zasady, gdy jesteś w środku, i płacą więcej Honor niż otwarty świat, więc świat PvP jest powolniejszą drogą do tego samego dostawcy. Rajdy nie zarabiają nic ze światowych zabójstw: członek rajdu nie otrzymuje Honor lub złota i nie zmniejsza udziału nikogo innego, więc walcz jako drużyna, aby być opłaconą."
     },
     "thornhollowPage": {
@@ -15549,6 +15666,7 @@ export const pl_PL: EnTranslations = {
       "accountSuspended": "To konto jest zawieszone do {date}.",
       "alreadyInWorld": "Postać jest już w świecie.",
       "accountSessionLimit": "Zbyt wiele postaci na tym koncie jest już w świecie.",
+      "worldFightHold": "Inna postać na tym koncie nadal pozostaje w świecie po walce. Spróbuj ponownie za kilka minut.",
       "takenOver": "Twoją postać przejęła inna sesja.",
       "vaultMailRecovering": "Twoja nagroda ze skarbca jest odtwarzana. Spróbuj ponownie za chwilę.",
       "renameBeforeEntering": "Tę postać trzeba przemianować przed wejściem do świata.",
@@ -18442,16 +18560,16 @@ export const pl_PL: EnTranslations = {
         "description": "Kanałuje przez 3 s, zadając {damage} obrażeń od cienia co sekundę. Obrażenia rosną z mocą zaklęć."
       },
       "vampiric_touch": {
-        "name": "Vampiric Touch",
-        "description": "Deal {damage} Shadow damage over 15 sec, once every 3 sec. Damage increases with Spell Power and ticks can critically strike. Each tick shares healing equal to 20% of the health lost by the enemy among you and injured party members within 30 yards; in a raid, only your subgroup receives this healing. If you have at least 2 Gloomtithe charges, applying this effect consumes 2 to increase all its damage by 30%."
+        "name": "Wampiryczny dotyk",
+        "description": "Zadajesz {damage} obrażeń Cienia przez 15 s, raz na 3 s. Obrażenia rosną z mocą zaklęć, a kolejne impulsy mogą być krytyczne. Każdy impuls rozdziela leczenie równe 20% zdrowia utraconego przez wroga między ciebie i rannych członków drużyny w promieniu 30 jardów; w rajdzie otrzymuje je tylko twoja podgrupa. Jeśli masz co najmniej 2 ładunki Mrocznej dziesięciny, nałożenie efektu zużywa 2 i zwiększa wszystkie jego obrażenia o 30%."
       },
       "void_rupture": {
-        "name": "Void Rupture",
-        "description": "Consume 3 Gloomtithe charges to rupture an enemy for {damage} Shadow damage. Damage increases with Spell Power and can critically strike. Requires 3 charges and consumes them even if resisted."
+        "name": "Rozerwanie pustki",
+        "description": "Zużywasz 3 ładunki Mrocznej dziesięciny, by rozerwać wroga i zadać {damage} obrażeń Cienia. Obrażenia rosną z mocą zaklęć i mogą być krytyczne. Wymaga 3 ładunków i zużywa je nawet wtedy, gdy cel się oprze."
       },
       "spirit_bomb": {
-        "name": "Tithe Bomb",
-        "description": "Detonate a spirit bomb on an enemy, dealing {damage} Shadow damage to enemies within 8 yards of that target. Damage increases with Spell Power, can critically strike, and is reduced beyond 5 targets. Generate 20 Gloomtithe to prepare one bomb. Generation counts even while holding the maximum 5 Gloomtithe; spending charges is not required and adds no progress. Progress lasts between fights, up to one prepared bomb. Dying clears your progress and prepared bomb. Completing the cast consumes the prepared bomb, even if resisted. Cancellation or interruption preserves it. Starting a raid boss encounter clears your progress and prepared bomb. Cannot open a raid boss encounter with this spell."
+        "name": "Bomba dziesięciny",
+        "description": "Detonujesz duchową bombę na wrogu, zadając {damage} obrażeń Cienia wrogom w promieniu 8 jardów od celu. Obrażenia rosną z mocą zaklęć, mogą być krytyczne i maleją powyżej 5 celów. Wygeneruj 20 ładunków Mrocznej dziesięciny, aby przygotować jedną bombę. Generowanie liczy się nawet przy maksymalnych 5 ładunkach; wydawanie nie jest konieczne i nie zwiększa postępu. Postęp utrzymuje się między walkami, a przygotowana może być najwyżej jedna bomba. Śmierć usuwa postęp i przygotowaną bombę. Ukończenie rzucania zużywa bombę, nawet jeśli cel się oprze. Anulowanie lub przerwanie zachowuje ją. Rozpoczęcie walki z bossem rajdu usuwa postęp i przygotowaną bombę. Tym zaklęciem nie można rozpocząć walki z bossem rajdu."
       },
       "flash_heal": {
         "name": "Pilna modlitwa",
@@ -19287,7 +19405,7 @@ export const pl_PL: EnTranslations = {
       "inner_focus": {
         "name": "Wyciszony Umysł",
         "description": "Sprawia, że twoje następne zaklęcie kapłana jest darmowe i nieprzerywalne. Trwa 60 s.",
-        "specNote_shadow": "Also reserves a guaranteed critical strike for your next Mindfracture or Void Rupture within 60 sec, if it hits. Other spells do not consume this bonus. Void Rupture still consumes 3 Gloomtithe charges. A resisted cast consumes the critical strike bonus."
+        "specNote_shadow": "Zapewnia też trafienie krytyczne następnego Roztrzaskania umysłu lub Rozerwania pustki w ciągu 60 s, jeśli trafi. Inne zaklęcia nie zużywają tej premii. Rozerwanie pustki nadal zużywa 3 ładunki Mrocznej dziesięciny. Odparcie zaklęcia zużywa premię do trafienia krytycznego."
       },
       "innervate": {
         "name": "Życiodajna Soki",
@@ -19485,7 +19603,7 @@ export const pl_PL: EnTranslations = {
       "choir_of_deliverance": {
         "name": "Chór Wybawienia",
         "description": "Kanałuje przez 6 s, lecząc członków grupy w promieniu 30 metrów za {damage} co 2 s. Leczenie rośnie wraz z mocą zaklęć.",
-        "specNote_shadow": "For 15 sec, share 20% of the health enemies lose to your Shadow damage as healing among injured party members within 30 yards, including yourself. In raids, only your subgroup is healed. Cast instantly and keep attacking in Shadowform. Absorbed damage and overkill do not add healing."
+        "specNote_shadow": "Przez 15 s rozdzielasz leczenie równe 20% zdrowia utraconego przez wrogów od twoich obrażeń Cienia między rannych członków drużyny w promieniu 30 jardów, wliczając siebie. W rajdzie leczenie obejmuje tylko twoją podgrupę. Rzucasz natychmiast i możesz dalej atakować w Zmierzchowej zasłonie. Pochłonięte obrażenia i obrażenia przekraczające pozostałe zdrowie nie zwiększają leczenia."
       },
       "bear_charge": {
         "name": "Szarża Bruina",
@@ -24700,6 +24818,87 @@ export const pl_PL: EnTranslations = {
       "vanguard_pendant_of_mending": {
         "name": "Wisior Awangardy Gojenia"
       },
+      "gourdlight_sweet": {
+        "name": "Dyniowy cukierek"
+      },
+      "gourdlight_treat_pouch": {
+        "name": "Sakiewka dyniowych cukierków"
+      },
+      "carved_pumpkin_head": {
+        "name": "Rzeźbiona dyniowa głowa"
+      },
+      "jar_of_mischief": {
+        "name": "Słoik psot"
+      },
+      "thatchgrin_sweet_sack": {
+        "name": "Worek słodyczy Słomochichota"
+      },
+      "strawling_charm": {
+        "name": "Talizman słomiaka"
+      },
+      "rattlebone_draught": {
+        "name": "Eliksir grzechoczących kości"
+      },
+      "haunting_draught": {
+        "name": "Upiorny eliksir"
+      },
+      "batwing_draught": {
+        "name": "Trzepoczący eliksir"
+      },
+      "writ_of_the_gourdlit": {
+        "name": "Akt Dyniowego Blasku"
+      },
+      "writ_of_the_trickster": {
+        "name": "Akt Psotnika"
+      },
+      "writ_of_the_hollow_grin": {
+        "name": "Akt Pustego Uśmiechu"
+      },
+      "reins_emberbristle_broom": {
+        "name": "Miotła żarzącej szczeciny"
+      },
+      "hearthroot_toffee": {
+        "name": "Karmel z korzenia paleniska"
+      },
+      "gourdseed_brittle": {
+        "name": "Chrupka z pestek dyni"
+      },
+      "crabapple_chew": {
+        "name": "Cukierek z dzikiego jabłka"
+      },
+      "owlwatch_fudge": {
+        "name": "Sowie krówki"
+      },
+      "lantern_mint_drop": {
+        "name": "Latarniany miętusek"
+      },
+      "emberwoven_sheaf": {
+        "name": "Snop przetykany żarem"
+      },
+      "prankers_pumpkin": {
+        "name": "Dynia psotnika"
+      },
+      "wanderwisp_lantern": {
+        "name": "Latarnia błędnego ognika"
+      },
+      "sack_of_startled_bats": {
+        "name": "Worek spłoszonych nietoperzy"
+      },
+      "murmurwick_candle": {
+        "name": "Świeca szepczącego knota"
+      },
+      "gurglegreen_cauldron": {
+        "name": "Zielonobulgoczący kocioł"
+      },
+      "thatchgrin_patch_pumpkin": {
+        "name": "Dynia z poletka"
+      },
+      "cursed_candle_stub": {
+        "name": "Ogryzek przeklętej świecy"
+      },
+      "gourdlight_crow_feather": {
+        "name": "Pióro dyniowej wrony"
+      },
       "membership_staff": {
         "name": "Kostur Przemiany"
       },
@@ -26256,6 +26455,18 @@ export const pl_PL: EnTranslations = {
       "muster_effigy": {
         "name": "Słomiany Nadzorca"
       },
+      "gourdlight_thatchgrin": {
+        "name": "Stary Słomochichot"
+      },
+      "gourdlight_crow": {
+        "name": "Dyniowa wrona"
+      },
+      "gourdlight_strawling": {
+        "name": "Słomiak"
+      },
+      "gourdlight_swelling_gourd": {
+        "name": "Pęczniejąca dynia"
+      },
       "stable_horse": {
         "name": "Koń stajenny"
       },
@@ -27409,6 +27620,11 @@ export const pl_PL: EnTranslations = {
         "name": "Hester Quillby",
         "title": "Kartografka",
         "greeting": "Każda kupiona przeze mnie mapa tych bagien stawała się błędna w ciągu jednego sezonu. Woda przesuwa ścieżki, a ścieżki przesuwają wodę. Dlatego rysuję własne i siedzę tutaj, gdzie sucho, aż tusz wyschnie."
+      },
+      "gourdlight_keeper": {
+        "name": "Hester Dynioknot",
+        "title": "Strażniczka Dyniowych Świateł",
+        "greeting": "Dynie świecą, latarnie wiszą, więc nadeszła Wigilia Dyniowych Świateł. Zapukaj do mieszkańców Eastbrook, na Moście na Trzęsawisku i w Wysokiej Strażnicy i powiedz: cukierek albo psikus. Większość da ci słodycz. Kilkoro spłata ci figla. Przynieś mi cukierki do dowolnego z moich straganów, a wymienię je na coś do ubrania."
       },
       "reeve_ottoline": {
         "name": "Zarządczyni Ottoline",
@@ -30041,6 +30257,88 @@ export const pl_PL: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Skuteczne leczenie manekina leczenia"
+          }
+        }
+      },
+      "q_gourdlight_rounds": {
+        "title": "Dyniowy obchód",
+        "text": "W każdą Wigilię Dyniowych Świateł dzieci z Doliny obchodzą domy, a w tym roku do nich dołączysz, {playerName}. Zapukaj do pięciorga drzwi w naszych miastach, wypowiedz te słowa i zobacz, co dostaniesz. Wróć do mnie po wszystkim.",
+        "completion": "Pięcioro drzwi, a wszystkie palce na miejscu. Oto sakiewka słodyczy na drogę do domu. Wróć jutro, drzwi znów się otworzą.",
+        "objectives": {
+          "0": {
+            "label": "Drzwi, do których zapukano"
+          }
+        }
+      },
+      "q_gourdlight_daily_patch": {
+        "title": "Dynie z poletka",
+        "text": "Poletko Starego Słomochichota za Łąką Dzików pęka od dyń, a połowa wytoczyła się poza jego słomę, gdzie ostrożna osoba zdoła ich dosięgnąć. Przynieś mi pięć, {playerName}. Samego starego stracha omijaj szerokim łukiem. Liczy każdą sztukę.",
+        "completion": "Pięć okrągłych i żadnej nikt nie nadgryzł. Starczy na placek dla całej Doliny. Proszę, za fatygę.",
+        "objectives": {
+          "0": {
+            "label": "Dynie z poletka"
+          }
+        }
+      },
+      "q_gourdlight_daily_boo": {
+        "title": "Bu!",
+        "text": "Nikt w tych miastach od roku porządnie się nie przestraszył, {playerName}, a Wigilia Dyniowych Świateł bez strachu to tylko zimna noc. Załóż kostium, którykolwiek z moich, albo dyniową głowę, jeśli już ją masz. Potem podkradnij się do trojga mieszkańców i krzyknij głośno BU!",
+        "completion": "Troje? Przez cały plac usłyszałam, jak kucharz upuścił patelnię. Dobra robota. Oto twoja część.",
+        "objectives": {
+          "0": {
+            "label": "Wystraszeni mieszkańcy"
+          }
+        }
+      },
+      "q_gourdlight_daily_wicks": {
+        "title": "Nikczemne knoty",
+        "text": "Ktoś ustawia świece o zielonych płomieniach u stóp naszych latarni. Płoną, nie topiąc się, i szepczą, gdy odwrócisz wzrok. Zgaś dla mnie sześć, {playerName}, w dowolnym z trzech miast i przynieś mi ogryzki.",
+        "completion": "Sześć ogryzków, zimnych jak szron. Kto je zapalił, będzie musiał bardziej się postarać. Weź to i umyj ręce.",
+        "objectives": {
+          "0": {
+            "label": "Zgaszone przeklęte świece"
+          }
+        }
+      },
+      "q_gourdlight_daily_towns": {
+        "title": "Drzwi w każdym mieście",
+        "text": "Dzieci mówią, że prawdziwy dyniowy wędrowiec zapuka w każdym mieście przed końcem nocy. Udowodnij im rację, {playerName}. Poproś o cukierek albo psikus przy jednych drzwiach w Eastbrook, jednych na Moście na Trzęsawisku i jednych w Wysokiej Strażnicy. Latarnie przy drogach rozświetlą ci trasę.",
+        "completion": "Trzy miasta w jedną noc! Twoje buty zasłużyły na to bardziej niż ty.",
+        "objectives": {
+          "0": {
+            "label": "Zapukano do drzwi w Eastbrook"
+          },
+          "1": {
+            "label": "Zapukano do drzwi na Moście na Trzęsawisku"
+          },
+          "2": {
+            "label": "Zapukano do drzwi w Wysokiej Strażnicy"
+          }
+        }
+      },
+      "q_gourdlight_daily_feathers": {
+        "title": "Pióra do ognia",
+        "text": "Gdy Stary Słomochichot ma kłopoty, zwołuje wrony na każdego, kto tłucze jego słomę. Ich pióra płoną w palenisku na zielono, a potrzebuję trzech na dzisiejsze ognisko. Znajdź walkę na jego poletku, {playerName}, i wyskub je jego wronom.",
+        "completion": "Czarne jak pole w bezksiężycową noc i już pachną dymem. Ognisko będzie wspaniałe. Dziękuję.",
+        "objectives": {
+          "0": {
+            "label": "Wronie pióra"
+          }
+        }
+      },
+      "q_gourdlight_daily_baskets": {
+        "title": "Koszyki dla sąsiadów",
+        "text": "W każdą Wigilię Dyniowych Świateł szykuję koszyk słodyczy dla starego przyjaciela w każdym mieście, ale moje kolana już nie te. Roznieś je za mnie, {playerName}: kucharzowi Marlowowi w Eastbrook, zielarce Yarze na Moście na Trzęsawisku i Mistrzowi Wiedzy Caddisowi w Wysokiej Strażnicy.",
+        "completion": "Wszystkie trzy dostarczone, a podobno Marlow się popłakał. On zawsze płacze. Oto koszyk dla ciebie.",
+        "objectives": {
+          "0": {
+            "label": "Koszyk przekazany kucharzowi Marlowowi"
+          },
+          "1": {
+            "label": "Koszyk przekazany zielarce Yarze"
+          },
+          "2": {
+            "label": "Koszyk przekazany Mistrzowi Wiedzy Caddisowi"
           }
         }
       },

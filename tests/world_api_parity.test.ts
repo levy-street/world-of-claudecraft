@@ -91,6 +91,7 @@ import type { IWorldProfessions } from '../src/world_api/professions';
 import type { IWorldProgressionXp } from '../src/world_api/progression_xp';
 import type { IWorldQuests } from '../src/world_api/quests';
 import type { IWorldReliquary } from '../src/world_api/reliquary';
+import type { IWorldSeasonal } from '../src/world_api/seasonal';
 import type { IWorldSeating } from '../src/world_api/seating';
 import type { IWorldSocialGraph } from '../src/world_api/social_graph';
 import type { IWorldTalents } from '../src/world_api/talents';
@@ -658,6 +659,11 @@ export const IWORLD_MEMBERS = [
   { name: 'resting', kind: 'data' },
   // IWorldSeating (seating.ts): sit on a piece of furniture by its seat id.
   { name: 'sitOnSeat', kind: 'method' },
+  // IWorldSeasonal (seasonal.ts): the running seasonal event and trick-or-treat.
+  { name: 'activeSeasonalEvent', kind: 'data' },
+  { name: 'trickOrTreatedToday', kind: 'data' },
+  { name: 'hauntedPumpkinsFound', kind: 'data' },
+  { name: 'trickOrTreat', kind: 'method' },
 ] as const satisfies readonly IWorldMember[];
 
 const DATA_MEMBERS = IWORLD_MEMBERS.filter((m) => m.kind === 'data');
@@ -1022,12 +1028,12 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // sitOnSeat (method) on feature/mirefen-tavern: 426/127/299 on its own,
     // 451/133/318 merged into the v0.45.0 integration.
     // Lantern Hall's guildContracts (data) and buyGuildCosmetic (method): 453/134/319.
-    // Riding ranks (PR 4390) add one method over the release: 466/137/329.
+    // Riding ranks (PR 4390) add one method over the release: 466/140/329.
     // The portrait menu's unappliedDungeonDifficulty (method, PR 4625) adds one
-    // more: 467/137/330.
-    expect(IWORLD_MEMBERS.length).toBe(467);
-    expect(DATA_MEMBERS.length).toBe(137);
-    expect(METHOD_MEMBERS.length).toBe(330);
+    // more: 471/140/331.
+    expect(IWORLD_MEMBERS.length).toBe(471);
+    expect(DATA_MEMBERS.length).toBe(140);
+    expect(METHOD_MEMBERS.length).toBe(331);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -1065,6 +1071,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'activeNythraxisGraveEruptions',
       'activeNythraxisGraveFlames',
       'activeNythraxisGravefires',
+      'activeSeasonalEvent',
       'activeSporeBursts',
       'activeTemporalHourglasses',
       'activeTitle',
@@ -1247,6 +1254,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'harvestCrop',
       'harvestNode',
       'harvestPreference',
+      'hauntedPumpkinsFound',
       'healPet',
       'heroicMarks',
       'hillInfo',
@@ -1472,6 +1480,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'tradeSetOffer',
       'trainRecipe',
       'treasureMap',
+      'trickOrTreat',
+      'trickOrTreatedToday',
       'turnInQuest',
       'unappliedDungeonDifficulty',
       'unbindItem',
@@ -1525,6 +1535,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'activeNythraxisGraveEruptions',
       'activeNythraxisGraveFlames',
       'activeNythraxisGravefires',
+      'activeSeasonalEvent',
       'activeSporeBursts',
       'activeTemporalHourglasses',
       'activeTitle',
@@ -1574,6 +1585,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'guildBankInfo',
       'guildContracts',
       'harvestPreference',
+      'hauntedPumpkinsFound',
       'heroicMarks',
       'hillInfo',
       'hobbyCraft',
@@ -1631,6 +1643,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'townFocusPending',
       'tradeInfo',
       'treasureMap',
+      'trickOrTreatedToday',
       'unlockedMilestones',
       'vaultInfo',
       'vehicleSession',
@@ -1965,6 +1978,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'tradeRequest',
       'tradeSetOffer',
       'trainRecipe',
+      'trickOrTreat',
       'turnInQuest',
       'unappliedDungeonDifficulty',
       'unbindItem',
@@ -2715,6 +2729,13 @@ type _ExhaustWorldPvp = AssertNever<
 >;
 
 const FACET_SEATING = ['sitOnSeat'] as const satisfies readonly (keyof IWorldSeating)[];
+const FACET_SEASONAL = [
+  'activeSeasonalEvent',
+  'trickOrTreatedToday',
+  'hauntedPumpkinsFound',
+  'trickOrTreat',
+] as const satisfies readonly (keyof IWorldSeasonal)[];
+type _ExhaustSeasonal = AssertNever<Exclude<keyof IWorldSeasonal, (typeof FACET_SEASONAL)[number]>>;
 type _ExhaustSeating = AssertNever<Exclude<keyof IWorldSeating, (typeof FACET_SEATING)[number]>>;
 
 // The facet partition, keyed by facet for legible failure messages.
@@ -2758,6 +2779,7 @@ const FACET_MEMBER_ARRAYS: Readonly<Record<string, readonly string[]>> = {
   transport: FACET_TRANSPORT,
   worldPvp: FACET_WORLD_PVP,
   seating: FACET_SEATING,
+  seasonal: FACET_SEASONAL,
 };
 
 describe('W1: aggregate IWorld member set equals the disjoint union of the facets', () => {
@@ -2778,7 +2800,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     // Buddy collection contributes IWorldBuddies.
     // 37 on feature/walkable-tavern-aaa: plus seating.ts (sit on furniture); 39 merged
     // into the v0.45.0 integration (its 38 plus seating.ts).
-    expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(39);
+    // 40 with feature/halloween-event's seasonal.ts.
+    expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(40);
   });
 
   it('every facet FILE on disk is a FACET_MEMBER_ARRAYS key (none can go silently unpartitioned)', () => {
@@ -2864,8 +2887,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     // adds resting (data) and sitOnSeat (the seating facet's method).
     // Plus Lantern Hall's guildContracts and buyGuildCosmetic, the riding
     // ranks method (PR 4390) and unappliedDungeonDifficulty (PR 4625).
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(467);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(467);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(471);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(471);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

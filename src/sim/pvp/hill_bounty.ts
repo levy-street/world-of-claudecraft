@@ -2,7 +2,8 @@
 // The rule tables are the pure leaf hill_bounty_rules.ts; this module decides
 // which world kills are HILL kills, keeps each player's kill and death streak
 // for the life of the hill, pays the victim's bounty in place of the plain
-// world kill, lifts the hourly repeat decay to full Honor for the first
+// world kill (doubled when the victim also carries a world bounty), lifts
+// the hourly repeat decay to full Honor for the first
 // HILL_BOUNTY_REPEAT_CAP kills of a pair, mirrors a running bounty onto the
 // player's entity (`hillBounty`, the nameplate and target-frame tag) while they
 // stand in the hill's zone, and posts the announcer's callouts on the hill

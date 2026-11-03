@@ -37,6 +37,10 @@ export interface LinkdeadSessionView {
   escrowQuarantined: boolean;
 }
 
+// English-source join error, re-localized client-side (src/ui/api_error_i18n.ts).
+export const WORLD_FIGHT_HOLD_JOIN_ERROR =
+  'another character on this account is still in the world after a fight';
+
 export type JoinPlan =
   | { action: 'resume' }
   | { action: 'reject'; error: string }
@@ -50,12 +54,16 @@ export type JoinPlan =
 // - A different character: the account's linkdead sessions never block the
 //   login (the caller displaces them, switching the account over to the new
 //   character immediately instead of at the end of the grace window); only
-//   sessions with a live socket count against the per-account cap.
+//   sessions with a live socket count against the per-account cap. The one
+//   exception: a linkdead body a recent world fight still holds
+//   (heldOtherSession, server/world_pvp_departure.ts) refuses the login until
+//   its fight window closes, so an alt cannot pull a fighter out of reach.
 export function planJoin(opts: {
   accountId: number;
   isGm: boolean;
   sameCharacter: LinkdeadSessionView | null;
   liveOtherSessions: number;
+  heldOtherSession?: boolean;
   maxPerAccount: number;
 }): JoinPlan {
   if (opts.sameCharacter) {
@@ -73,6 +81,7 @@ export function planJoin(opts: {
     // finishes.
     return { action: 'reject', error: 'character already in world' };
   }
+  if (opts.heldOtherSession) return { action: 'reject', error: WORLD_FIGHT_HOLD_JOIN_ERROR };
   if (!opts.isGm && opts.liveOtherSessions >= opts.maxPerAccount) {
     return {
       action: 'reject',
@@ -80,4 +89,35 @@ export function planJoin(opts: {
     };
   }
   return { action: 'join' };
+}
+
+// Count the account's OTHER sessions for planJoin and plan the join: live
+// sockets count against the cap, linkdead ones are returned for the caller to
+// displace on a fresh join, and `holdsBody` (server/world_pvp_departure.ts
+// worldFightHoldsBody) says whether a linkdead one is still held by a recent
+// world fight. `sameCharacter` is never counted as an "other".
+export function planAccountJoin<S extends LinkdeadSessionView>(opts: {
+  sessions: Iterable<S>;
+  accountId: number;
+  isGm: boolean;
+  sameCharacter: S | null;
+  maxPerAccount: number;
+  holdsBody: (session: S) => boolean;
+}): { plan: JoinPlan; linkdeadOthers: S[] } {
+  let liveOtherSessions = 0;
+  const linkdeadOthers: S[] = [];
+  for (const s of opts.sessions) {
+    if (s.accountId !== opts.accountId || s === opts.sameCharacter) continue;
+    if (s.linkdead) linkdeadOthers.push(s);
+    else liveOtherSessions++;
+  }
+  const plan = planJoin({
+    accountId: opts.accountId,
+    isGm: opts.isGm,
+    sameCharacter: opts.sameCharacter,
+    liveOtherSessions,
+    heldOtherSession: linkdeadOthers.some(opts.holdsBody),
+    maxPerAccount: opts.maxPerAccount,
+  });
+  return { plan, linkdeadOthers };
 }

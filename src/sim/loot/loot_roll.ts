@@ -1107,6 +1107,20 @@ export function resolveLootRoll(ctx: SimContext, roll: PendingLootRoll): void {
     roll.windowEligible,
     roll.instance,
   );
+  settleRolledCorpse(ctx, roll.mobId);
+}
+
+// pruneCorpseLoot's pending-roll arm keeps an emptied corpse lootable with no
+// loot while its rolls run. Once the last one resolves into a winner's bags,
+// settle the corpse exactly as if it had been emptied by hand. Without this an
+// instance boss stayed lootable for its whole corpse hold (frozen while nobody
+// is near) and refused the party's difficulty switch with "loot remains
+// inside" (owner report 2026-10-27).
+function settleRolledCorpse(ctx: SimContext, mobId: number): void {
+  const mob = ctx.entities.get(mobId);
+  if (!mob?.dead || !mob.lootable || hasPendingLootRollForMob(ctx, mobId)) return;
+  mob.loot ??= { copper: 0, items: [] };
+  pruneCorpseLoot(ctx, mob);
 }
 
 // Whether `pid` is a currently-connected player the loot hub's addItem/resolve

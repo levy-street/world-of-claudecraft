@@ -117,7 +117,8 @@ describe('mob portrait source manifest', () => {
     // the bodyless bosses show their hidden placeholder rig, like the Spear).
     // 375: plus the Guardian of the Heat's four (its Wellspawn, Wellkeeper,
     // Seedflame and Rolling Cinder).
-    expect(liveIds).toHaveLength(375);
+    // 379: plus the four Gourdlight Eve encounter bodies.
+    expect(liveIds).toHaveLength(379);
     expect(manifest.portraitCount).toBe(liveIds.length);
     expect(manifest.portraits.map((portrait) => portrait.id)).toEqual(liveIds);
     expect(manifest.schemaVersion).toBe(2);

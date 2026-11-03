@@ -2626,6 +2626,7 @@ export const hudChromeStrings = {
     name_lantern_hall_destrier: 'Lantern Hall Destrier',
     name_chimeglass_tortoise: 'Tolliver the Chimeglass',
     name_rickshaw_mount: 'Bonebound Rickshaw',
+    name_emberbristle_broom: 'Emberbristle Broom',
     name_wobbles_slime: 'Wobbles the Slime',
     name_nightwing_chimera: 'Nightwing Chimaera',
     desc_valorsteed: 'A hardy, sure-footed steed with a leather saddle.',
@@ -2665,6 +2666,8 @@ export const hudChromeStrings = {
       'A salt-flat tortoise who has outwalked three generations of caravans. Tinkers ground him spectacles from storm-glass and hung a bronze bell at his throat, so the road hears him long before it sees him.',
     desc_rickshaw_mount:
       'A rattling bone-cart with a bony grunt harnessed to the shafts, hauling you along at a dead run.',
+    desc_emberbristle_broom:
+      'A harvest broom bound with orange ribbon that hovers a hand above the ground, shedding embers from its bristles. A permanent reward from Gourdlight Eve.',
   },
   // The riding lesson at the Highwatch stables (q_riding_lessons): Stablemaster
   // Marla lends the player a training Valorsteed for the paddock race. Finishing
@@ -5801,6 +5804,11 @@ export const hudChromeStrings = {
     },
   },
   auraEffect: {
+    // Gourdlight Eve's encounter auras (src/ui/gourdlight_aura_effect.ts).
+    gourdlight: {
+      thatchbound:
+        'Old Thatchgrin pulls your strings. You cannot act: you are walked to your nearest ally and strike them every {every} sec for {min} to {max} damage (up to {mult} times as much against a level {level} ally). Ends early when you take damage equal to {pct}% of your maximum health, or when an ally dispels it (Magic).',
+    },
     stilledMindCrit:
       'Your next Mindfracture or Void Rupture is a guaranteed critical strike if it hits. Other spells do not consume this bonus. Void Rupture still consumes 3 Gloomtithe charges. A resisted cast consumes the bonus.',
     // The Wildheart Basin's marks and boss auras (src/ui/wildheart_aura_effect.ts).
@@ -5948,8 +5956,12 @@ export const hudChromeStrings = {
         'When this ends, Portal A opens exactly where you stand. Stand near the Knotted Gale. You cannot carry it this round.',
       portalB:
         'When this ends, Portal B opens exactly where you stand. Stand at the lip of a gap. You cannot carry the Knotted Gale this round.',
+      portalC:
+        'When this ends, Portal C opens exactly where you stand. It links to Portal D only. Stand near the other Knotted Gale. You cannot carry it this round.',
+      portalD:
+        'When this ends, Portal D opens exactly where you stand. It links to Portal C only. Stand at the lip of a gap away from Portal B. You cannot carry the Knotted Gale this round.',
       laden:
-        'You carry a Knotted Gale: you walk at {walk}% speed, you cannot blink, charge or leap, and no wind, pull, blast or throw can move you. Either portal takes you to the other. Press Interact at the lip of any gap to throw it into the void. When this ends it bursts and kills everyone on the Cornice.',
+        'You carry a Knotted Gale: you walk at {walk}% speed, you cannot blink, charge or leap, and no wind, pull, blast or throw can move you. Each portal takes you to its partner: A to B, C to D. Press Interact at the lip of any gap to throw it into the void. When this ends it bursts and kills everyone on the Cornice.',
       wind: "The Guardian of the Breath's wind carries you {speed} yd a second the way it blows. Walk against it to hold your ground; it does not interrupt your casts. Pressed against the rim's wall you take {pinMin} to {pinMax} damage every second. Where the wall is broken there is nothing to stop you: you fall into the void.",
       draw: 'The Guardian draws breath and pulls you toward it, {speed} yd a second. Its vortex deals {min} to {max} damage every {tick} sec to whoever stands before its mouth. Then Bellows Gust deals {gustMin} to {gustMax} damage to everyone on the Cornice and throws them {throw} yd outward.',
       pinned:
@@ -6124,6 +6136,8 @@ export const hudChromeStrings = {
     spellHaste: 'Increases spell casting speed by {pct}%',
     sated: 'Cannot benefit from another group haste effect',
     cauterizeFatigue: 'Cauterize cannot prevent another lethal hit',
+    // A seasonal event's look (src/sim/seasonal/): the pumpkin head and the tricks.
+    seasonalCosmetic: 'Cosmetic only: no effect on combat',
     castShield: 'Casting cannot be interrupted or delayed by damage',
     // wordy (M16): filled in the five non-Latin locales in this change.
     dmgDone: 'Increases damage dealt by {pct}%',
@@ -6349,6 +6363,8 @@ export const hudChromeStrings = {
     damageReduction: 'Reduces all damage taken by {pct}%',
     // The slumbering world boss (src/sim/mob/slumber.ts): asleep from dusk to dawn.
     slumber: 'Asleep until dawn. Cannot be attacked and will not wake for anyone.',
+    // A NIGHT sleeper (Old Thatchgrin on his pole by day, mob/slumber.ts awakeAt 'night').
+    slumberNight: 'Hangs lifeless on his pole until nightfall. Cannot be attacked.',
     guardianWard: 'The next lethal enemy hit restores you to {pct}% health instead',
     armorFlat: 'Reduces armor by {value}',
     armorFlatStacks: 'Reduces armor by {value} ({stacks} stacks)',
@@ -6458,6 +6474,8 @@ export const hudChromeStrings = {
     // to arms, the dusk line tells the realm he is gone for the night.
     wake: '{name} wakes over {zone}!',
     sleep: '{name} sleeps until dawn.',
+    // A NIGHT boss (Old Thatchgrin) climbing back onto his pole at dawn.
+    sleepUntilNightfall: '{name} sleeps until nightfall.',
   },
   // Password-reset ("forgot password") flow: the login-panel entry link, the
   // request-a-link panel, and the set-a-new-password panel (index.html +
@@ -10323,9 +10341,13 @@ export const hudChromeStrings = {
     aLine: 'It opens at your feet in {seconds} sec. Stand near the Knotted Gale.',
     bTitle: 'You are Portal B!',
     bLine: 'It opens at your feet in {seconds} sec. Stand at the lip of a gap.',
+    cTitle: 'You are Portal C!',
+    cLine: 'It opens at your feet in {seconds} sec. Stand near the other Knotted Gale.',
+    dTitle: 'You are Portal D!',
+    dLine: 'It opens at your feet in {seconds} sec. Stand at a gap away from Portal B.',
     carryTitle: 'You carry the Knotted Gale!',
     carryLine:
-      'Either portal takes you to the other. Throw it from the lip of a gap. It bursts in {seconds} sec.',
+      'Each portal takes you to its partner: A to B, C to D. Throw it from the lip of a gap. It bursts in {seconds} sec.',
     lipTitle: 'Throw it now!',
     lipLine: 'You stand at the lip of a gap. It bursts in {seconds} sec.',
     throwKey: 'Press {key} at the lip to throw',
@@ -10347,6 +10369,7 @@ export const hudChromeStrings = {
       stormGust: 'A storm gust gathers! Brace against the wind!',
       knot: 'A Knotted Gale falls! Carry it to a gap and throw it into the void!',
       knotPortals: 'Portal A on {a}, Portal B on {b}!',
+      knotPortals2: 'Portal C on {c}, Portal D on {d}!',
       knotTaken: '{player} takes up the Knotted Gale!',
       knotDropped: '{player} falls! The Knotted Gale is free again!',
       knotFell: '{player} takes the Knotted Gale into the void!',

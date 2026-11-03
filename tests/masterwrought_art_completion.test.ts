@@ -842,7 +842,8 @@ describe('Masterwrought art completion evidence', () => {
     // Wobbles the Slime's reins owner (outside the dated universe too): 2,183.
     // + the sprite buddy's whistle render: 2,184.
     // Restored feral staff and eight Season 2 jewelry paintings add nine owners.
-    expect(currentOwnerIds).toHaveLength(2164);
+    // Halloween adds 27 item-art owners outside the sealed historical set.
+    expect(currentOwnerIds).toHaveLength(2191);
     for (const id of datedIds) {
       expect(currentOwnerIds.includes(id), `${id} still has a current mapping owner`).toBe(true);
     }
@@ -1207,6 +1208,53 @@ describe('Masterwrought art completion evidence', () => {
     // completionDatedIds above. This filters by the exact ids of those additions only,
     // never by broad membership of datedIds: a filter keyed on datedIds membership would
     // silently discard future, unrecognized additions to the current owner registry.
+    // The later Halloween icon batches leave the dated completion union intact.
+    const halloweenBatchIds = [
+      'gourdlight-eve-icons-2026-10-16',
+      'gourdlight-eve-thatchgrin-icons-2026-10-17',
+      'gourdlight-eve-shop-and-broom-icons-2026-10-17',
+      'gourdlight-eve-candy-icons-2026-10-18',
+      'gourdlight-eve-sheaf-icon-2026-10-18',
+      'gourdlight-eve-daily-icons-2026-10-18',
+      'gourdlight-eve-toy-icons-2026-10-18',
+    ];
+    const halloweenIds = new Set<string>();
+    for (const batchId of halloweenBatchIds) {
+      const batches = mapping.generatedBatches.filter((batch) => batch.batchId === batchId);
+      expect(batches, batchId).toHaveLength(1);
+      for (const id of batches[0].itemIds) halloweenIds.add(id);
+    }
+    expect(sorted(halloweenIds)).toEqual([
+      'batwing_draught',
+      'carved_pumpkin_head',
+      'crabapple_chew',
+      'cursed_candle_stub',
+      'emberwoven_sheaf',
+      'gourdlight_crow_feather',
+      'gourdlight_sweet',
+      'gourdlight_treat_pouch',
+      'gourdseed_brittle',
+      'gurglegreen_cauldron',
+      'haunting_draught',
+      'hearthroot_toffee',
+      'jar_of_mischief',
+      'lantern_mint_drop',
+      'murmurwick_candle',
+      'owlwatch_fudge',
+      'prankers_pumpkin',
+      'rattlebone_draught',
+      'reins_emberbristle_broom',
+      'sack_of_startled_bats',
+      'strawling_charm',
+      'thatchgrin_patch_pumpkin',
+      'thatchgrin_sweet_sack',
+      'wanderwisp_lantern',
+      'writ_of_the_gourdlit',
+      'writ_of_the_hollow_grin',
+      'writ_of_the_trickster',
+    ]);
+    expect(datedIds.filter((id) => halloweenIds.has(id))).toEqual([]);
+
     const completionOwnerIds = currentOwnerIds.filter(
       (id) =>
         !crucibleIds.has(id) &&
@@ -1241,7 +1289,8 @@ describe('Masterwrought art completion evidence', () => {
         !dungeonReworkIds.has(id) &&
         !buddyIds.has(id) &&
         !backlogAdditiveIds.has(id) &&
-        !lanternHallIds.has(id),
+        !lanternHallIds.has(id) &&
+        !halloweenIds.has(id),
     );
     expect(completionOwnerIds).toHaveLength(1209);
     expect(sorted(completionOwnerIds)).toEqual(completionDatedIds);

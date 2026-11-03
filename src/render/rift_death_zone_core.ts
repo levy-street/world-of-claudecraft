@@ -9,6 +9,44 @@
 // Fairness note: the death zone is an actionable cue, so every value here is
 // tier-independent; no graphics preset or FPS-governor input may feed a plan.
 
+import { DUNGEON_X_THRESHOLD, dungeonAt, isRiftPos } from '../sim/data';
+
+export type EncounterFxScope =
+  | 'rift'
+  | 'hollow_crypt'
+  | 'sunken_bastion'
+  | 'drowned_temple'
+  | 'wildheart_basin'
+  | 'gravewyrm_sanctum'
+  | 'dungeon_generic';
+
+/**
+ * Resolve which encounter FX bundle should be mounted for the local player's
+ * current world X coordinate (or active rift cues). Returns null in the
+ * overworld so no dungeon or raid encounter FX shaders/textures are built or
+ * linked during normal overworld play.
+ */
+export function resolveEncounterFxScope(
+  playerX: number | undefined,
+  hasRiftActivity = false,
+): EncounterFxScope | null {
+  if (hasRiftActivity) return 'rift';
+  if (playerX === undefined || !(playerX > DUNGEON_X_THRESHOLD)) return null;
+  if (isRiftPos(playerX)) return 'rift';
+  const dungeon = dungeonAt(playerX);
+  if (!dungeon) return null;
+  switch (dungeon.id) {
+    case 'hollow_crypt':
+    case 'sunken_bastion':
+    case 'drowned_temple':
+    case 'wildheart_basin':
+    case 'gravewyrm_sanctum':
+      return dungeon.id;
+    default:
+      return 'dungeon_generic';
+  }
+}
+
 export interface DeathZonePlan {
   /** Opacity of the rim band (pulses between RING_MIN_OPACITY and RING_MAX_OPACITY). */
   ringOpacity: number;

@@ -1067,6 +1067,22 @@ Verdict: GENERIC. Earlier candidates: "Immortal" and "Undying" were rejected
 as WoW's Naxxramas titles; "Timeless" (also GENERIC) was replaced by the
 owner's pick before shipping.
 
+### Hester's Gourdlight Eve toys (web-checked 2026-10-19)
+
+The five toys Hester sells for sweets (`src/sim/content/gourdlight_eve.ts` GOURDLIGHT_TOYS).
+Each name was searched as an exact phrase and by its coined token against the open web and
+the major game wikis (Wowhead, warcraft.wiki.gg, RuneScape, UESP, Guild Wars 2).
+
+| Name | Where | Verdict |
+|---|---|---|
+| Pranker's Pumpkin | the prank toy | KEEP. No exact-phrase hit in any game; generic English. Nearest neighbours are unnamed Halloween pumpkins (Team Fortress 2, Dead by Daylight, RuneScape), none a match. |
+| Wanderwisp Lantern | the ghost lantern | KEEP. "Wanderwisp" has no hit; the nearest are the itch.io prototypes "The Wandering Wisp" and "Wizard's Wisp", not the coined token. |
+| Sack of Startled Bats | the bat toy | KEEP. No hit on Wowhead or warcraft.wiki.gg (only bat reagents such as Bat Ear); plain English. |
+| Murmurwick Candle | the candle that casts dancing shadows (its whispers retired in round 10) | KEEP. "Murmurwick" has no hit; the nearest is the unrelated title "No Murders in Grimwick" and ESO's "Murkmire Candle" furnishings, different tokens. |
+| Gurglegreen Cauldron | the toy cauldron (round 10, replaces the retired Sparkbristle Play Broom) | KEEP. Quoted exact-phrase searches for "Gurglegreen" and "Gurglegreen Cauldron", plus a coined-token search scoped to Wowhead, warcraft.wiki.gg, the RuneScape and OSRS wikis, the FFXIV wiki, the GW2 wiki, UESP, the PoE wiki and the Diablo wiki, returned no hit in any game; the nearest results were unrelated ("Cuddly Green Grrgle" WoW decor, a different token). "Cauldron" is shared fantasy English. |
+| the Gourdsworn | the title of Gourdlight Eve's whole-event meta deed (`feat_gourdlight_eve_complete`, round 12) | KEEP. Quoted exact-phrase searches for "Gourdsworn" and "the Gourdsworn", plus a coined-token search scoped to Wowhead, warcraft.wiki.gg, the RuneScape and OSRS wikis, the FFXIV wiki, the GW2 wiki, UESP, the PoE wiki and the Diablo wiki, returned no hit in any game. The nearest results were different tokens: WoW's "Death Foursworn" achievement, GW2's "Bladesworn" specialization, ESL's "Guildsworn" card and the unrelated games "Godsworn", "Crowsworn" and "Ironsworn". WoW's Hallow's End title is "the Hallowed", a different word; "-sworn" is a shared English suffix. |
+| Gourdlight, Start to Finish / Every Doorstep / At Hester's Beck and Call / Three Towns Startled | the round 12 whole-event meta and its three section Feats | KEEP. Plain English phrases built on this event's own names (Gourdlight, Hester); no coined token beyond those already audited above. |
+
 ## Recorded for the maintainer (stopping rule: no unilateral rename)
 
 STATUS 2026-08-20, SETTLED BY THE MAINTAINER, and the scope is narrow on purpose.

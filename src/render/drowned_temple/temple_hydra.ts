@@ -47,7 +47,6 @@ import {
 import type { SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
 import { loadGltf } from '../assets/loader';
-import { registerDeferredPreload } from '../assets/preload';
 import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import {
   comboChargeEnvelope,
@@ -79,8 +78,6 @@ function startLoad(): Promise<void> {
     .catch(() => undefined);
   return loading;
 }
-
-if (typeof window !== 'undefined') registerDeferredPreload(() => startLoad());
 
 /** The three head templates, in the model's neck order (L, C, R). */
 const HEADS = [HYDRA_LEFT_ID, HYDRA_CENTER_ID, HYDRA_RIGHT_ID] as const;

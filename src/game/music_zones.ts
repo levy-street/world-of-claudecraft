@@ -6,6 +6,9 @@ export type MusicZone =
   | 'town_fenbridge'
   | 'town_highwatch'
   | 'town_goldcrest'
+  // Gourdlight Eve's town theme: the three event cities play it instead of their own
+  // while the event runs (seasonal_music.ts)
+  | 'town_gourdlight'
   | 'vale'
   | 'vale_legacy'
   | 'marsh'
@@ -131,6 +134,7 @@ const ALL_MUSIC_ZONE_FLAGS: Record<MusicZone, true> = {
   town_fenbridge: true,
   town_highwatch: true,
   town_goldcrest: true,
+  town_gourdlight: true,
   vale: true,
   vale_legacy: true,
   marsh: true,

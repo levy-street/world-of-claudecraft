@@ -1,6 +1,6 @@
 {
   "name": "world-of-claudecraft",
-  "version": "0.45.3",
+  "version": "0.45.4",
   "private": true,
   "license": "MIT",
   "author": {
@@ -333,7 +333,8 @@
         "GHSA-hqr4-qq8f-hg3x",
         "GHSA-mjw6-4jj6-33hc",
         "GHSA-ch52-4w7c-c8xp",
-        "GHSA-mrhx-c7xc-m3w5"
+        "GHSA-mrhx-c7xc-m3w5",
+        "GHSA-gcqx-w48m-w2h4"
       ]
     },
     "onlyBuiltDependencies": [

@@ -409,6 +409,7 @@ describe('the density model covers the shipped world', () => {
       'crypt_bone_pile',
       'crypt_remembrance_candle',
       'dragonkin_egg',
+      'gourdlight_swelling_gourd',
       'hoard_abyssal_tentacle',
       'hoard_bloat_cap',
       'hoard_bound_pulsar',

@@ -2227,6 +2227,10 @@ export const ZONE2_ITEMS: Record<string, ItemDef> = {
     noVendorSell: true,
     noMarketList: true,
     noDiscard: true,
+    // Skerrit re-grants a missing pike whenever the quest is active (requiredItems,
+    // regrantMissingQuestItems), so a rare that broke down would mint salvage and
+    // disenchant materials forever: break it, talk to him, break the new one.
+    noSalvage: true,
     questId: 'q_socketwrights_due',
   },
   // The muster's own issue of the same pike, lent from the weapon rack at the command camp

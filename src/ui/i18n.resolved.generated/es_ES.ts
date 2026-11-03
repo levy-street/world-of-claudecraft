@@ -2600,6 +2600,7 @@ export const es_ES: EnTranslations = {
       "name_lantern_hall_destrier": "Destrero del Salón del Farol",
       "name_chimeglass_tortoise": "Tolliver el timbre de cristal",
       "name_rickshaw_mount": "Rickshaw Atahuesos",
+      "name_emberbristle_broom": "Escoba de cerdas ardientes",
       "name_wobbles_slime": "Tembleques el Moco",
       "name_nightwing_chimera": "Quimera de Ala Nocturna",
       "desc_valorsteed": "Un corcel resistente y de paso seguro con una silla de cuero.",
@@ -2623,7 +2624,8 @@ export const es_ES: EnTranslations = {
       "desc_lantern_hall_destrier": "El caballo de guerra del Salón del Farol, protegido con roble y hierro bajo el azul de la hermandad, con dos faroles de tormenta que cuelgan de su silla para iluminar el camino a casa.",
       "desc_nightwing_chimera": "Un dracoleón crepuscular bicéfalo de las ramas antiguas, que descansa sobre sus patas traseras con garras y roza el suelo con alas grabadas de runas arcanas.",
       "desc_chimeglass_tortoise": "Una tortuga salada que ha dejado atrás a tres generaciones de caravanas. Los caldereros le quitaron las gafas de cristal de tormenta y le colgaron una campana de bronce en el cuello, de modo que la carretera le oye mucho antes de verlo.",
-      "desc_rickshaw_mount": "Un carromato de huesos traqueteante, con un soldado esquelético enganchado a las varas, que te arrastra a toda carrera."
+      "desc_rickshaw_mount": "Un carromato de huesos traqueteante, con un soldado esquelético enganchado a las varas, que te arrastra a toda carrera.",
+      "desc_emberbristle_broom": "Una escoba de cosecha atada con una cinta naranja que flota a un palmo del suelo y desprende brasas de sus cerdas. Una recompensa permanente de la Noche de las Calabazas."
     },
     "mountTraining": {
       "mountPrompt": "Pulsa {key} para montar el Corcel del Valor de entrenamiento.",
@@ -4672,7 +4674,10 @@ export const es_ES: EnTranslations = {
       }
     },
     "auraEffect": {
-      "stilledMindCrit": "Your next Mindfracture or Void Rupture is a guaranteed critical strike if it hits. Other spells do not consume this bonus. Void Rupture still consumes 3 Gloomtithe charges. A resisted cast consumes the bonus.",
+      "gourdlight": {
+        "thatchbound": "Viejo Thatchgrin tira de tus hilos. No puedes actuar: te obliga a caminar hacia tu aliado más cercano y golpearlo cada {every} s, infligiéndole de {min} a {max} de daño (hasta {mult} veces más contra un aliado de nivel {level}). Termina antes si recibes daño equivalente al {pct}% de tu salud máxima o si un aliado lo disipa (Magia)."
+      },
+      "stilledMindCrit": "Tu próxima Fractura Mental o Ruptura del vacío será un golpe crítico garantizado si acierta. Otros hechizos no consumen esta bonificación. Ruptura del vacío sigue consumiendo 3 cargas de Diezmo sombrío. Un lanzamiento resistido consume la bonificación.",
       "wildheart": {
         "packBond": "Recibe un {pct}% menos de daño mientras su compañero permanece cerca. Separa al Maestro de Bestias de su jaguar para romperlo.",
         "packBondFury": "Inflige un {pct}% más de daño mientras su compañero permanece cerca.",
@@ -4753,7 +4758,9 @@ export const es_ES: EnTranslations = {
       "breathGuardian": {
         "portalA": "When this ends, Portal A opens exactly where you stand. Stand near the Knotted Gale. You cannot carry it this round.",
         "portalB": "When this ends, Portal B opens exactly where you stand. Stand at the lip of a gap. You cannot carry the Knotted Gale this round.",
-        "laden": "You carry a Knotted Gale: you walk at {walk}% speed, you cannot blink, charge or leap, and no wind, pull, blast or throw can move you. Either portal takes you to the other. Press Interact at the lip of any gap to throw it into the void. When this ends it bursts and kills everyone on the Cornice.",
+        "portalC": "When this ends, Portal C opens exactly where you stand. It links to Portal D only. Stand near the other Knotted Gale. You cannot carry it this round.",
+        "portalD": "When this ends, Portal D opens exactly where you stand. It links to Portal C only. Stand at the lip of a gap away from Portal B. You cannot carry the Knotted Gale this round.",
+        "laden": "You carry a Knotted Gale: you walk at {walk}% speed, you cannot blink, charge or leap, and no wind, pull, blast or throw can move you. Each portal takes you to its partner: A to B, C to D. Press Interact at the lip of any gap to throw it into the void. When this ends it bursts and kills everyone on the Cornice.",
         "wind": "The Guardian of the Breath's wind carries you {speed} yd a second the way it blows. Walk against it to hold your ground; it does not interrupt your casts. Pressed against the rim's wall you take {pinMin} to {pinMax} damage every second. Where the wall is broken there is nothing to stop you: you fall into the void.",
         "draw": "The Guardian draws breath and pulls you toward it, {speed} yd a second. Its vortex deals {min} to {max} damage every {tick} sec to whoever stands before its mouth. Then Bellows Gust deals {gustMin} to {gustMax} damage to everyone on the Cornice and throws them {throw} yd outward.",
         "pinned": "Pressed against the rim's wall by the wind: {min} to {max} damage every second until the wind falls calm or you walk clear of the wall.",
@@ -4860,6 +4867,7 @@ export const es_ES: EnTranslations = {
       "spellHaste": "Aumenta la velocidad de lanzamiento un {pct}%",
       "sated": "Impide beneficiarse de otro efecto de celeridad de grupo",
       "cauterizeFatigue": "Cauterizar no puede evitar otro golpe letal",
+      "seasonalCosmetic": "Solo cosmético: no afecta al combate",
       "castShield": "El daño no puede interrumpir ni retrasar tus lanzamientos",
       "dmgDone": "Aumenta el daño infligido un {pct}%",
       "dmgDoneReduce": "Reduce el daño infligido un {pct}%",
@@ -5007,6 +5015,7 @@ export const es_ES: EnTranslations = {
       "dodgeReduce": "Disminuye la probabilidad de esquivar un {pct}%",
       "damageReduction": "Reduce el dano recibido en un {pct}%",
       "slumber": "Dormido hasta el amanecer. No puede ser atacado y no despertará por nadie.",
+      "slumberNight": "Cuelga inerte de su poste hasta el anochecer. No se le puede atacar.",
       "guardianWard": "El siguiente golpe enemigo letal te restaura al {pct}% de salud en su lugar",
       "armorFlat": "Disminuye la armadura en {value}",
       "armorFlatStacks": "Disminuye la armadura en {value} ({stacks} acumulaciones)",
@@ -5086,7 +5095,8 @@ export const es_ES: EnTranslations = {
     "worldBoss": {
       "spawn": "¡{name} se alza sobre {zone}!",
       "wake": "¡{name} despierta sobre {zone}!",
-      "sleep": "{name} duerme hasta el amanecer."
+      "sleep": "{name} duerme hasta el amanecer.",
+      "sleepUntilNightfall": "{name} duerme hasta el anochecer."
     },
     "auth": {
       "appleLoginCta": "Continuar con Apple",
@@ -7350,8 +7360,12 @@ export const es_ES: EnTranslations = {
       "aLine": "It opens at your feet in {seconds} sec. Stand near the Knotted Gale.",
       "bTitle": "You are Portal B!",
       "bLine": "It opens at your feet in {seconds} sec. Stand at the lip of a gap.",
+      "cTitle": "You are Portal C!",
+      "cLine": "It opens at your feet in {seconds} sec. Stand near the other Knotted Gale.",
+      "dTitle": "You are Portal D!",
+      "dLine": "It opens at your feet in {seconds} sec. Stand at a gap away from Portal B.",
       "carryTitle": "You carry the Knotted Gale!",
-      "carryLine": "Either portal takes you to the other. Throw it from the lip of a gap. It bursts in {seconds} sec.",
+      "carryLine": "Each portal takes you to its partner: A to B, C to D. Throw it from the lip of a gap. It bursts in {seconds} sec.",
       "lipTitle": "Throw it now!",
       "lipLine": "You stand at the lip of a gap. It bursts in {seconds} sec.",
       "throwKey": "Press {key} at the lip to throw",
@@ -7373,6 +7387,7 @@ export const es_ES: EnTranslations = {
         "stormGust": "A storm gust gathers! Brace against the wind!",
         "knot": "A Knotted Gale falls! Carry it to a gap and throw it into the void!",
         "knotPortals": "Portal A on {a}, Portal B on {b}!",
+        "knotPortals2": "Portal C on {c}, Portal D on {d}!",
         "knotTaken": "{player} takes up the Knotted Gale!",
         "knotDropped": "{player} falls! The Knotted Gale is free again!",
         "knotFell": "{player} takes the Knotted Gale into the void!",
@@ -8607,6 +8622,107 @@ export const es_ES: EnTranslations = {
         "0": "Compost bien hecho, los bancales vivirán. El viejo molinero enterró algo antes de partir. Su molino aún gira en la esquina más lejana de los jardines. Ve y quédate junto a él.",
         "2": "Así que el molino te llevó por el camino costero. El faro guarda un último secreto: al noroeste de él, justo fuera del camino, el terraplén fue cortado y repuesto. Cava ahí."
       }
+    }
+  },
+  "seasonal": {
+    "pumpkins": {
+      "name": "Calabaza embrujada",
+      "title": "Calabazas embrujadas",
+      "world": "Mundo",
+      "progress": "{label}: {current}/{total}",
+      "found": "Enciendes una Calabaza embrujada en {zone}: {count}/{total}. Dulces de la Noche de las Calabazas recibidos: {sweets}.",
+      "flash": "¡Calabaza embrujada encontrada! {count}/{total}"
+    },
+    "event": {
+      "gourdlight_eve": {
+        "name": "Noche de las Calabazas"
+      }
+    },
+    "trickOrTreat": {
+      "row": "¡Truco o trato!",
+      "rowAria": "Di truco o trato a {name}",
+      "knockedHint": "Hoy ya has llamado aquí. La puerta volverá a abrirse tras el reinicio diario.",
+      "treat": "{name} te da un dulce.",
+      "trick": "{name} te gasta una broma: ¡{trick}!",
+      "alreadyKnocked": "Hoy ya has pedido truco o trato a {name}.",
+      "notActive": "La Noche de las Calabazas no está activa ahora mismo.",
+      "tooFar": "Acércate para llamar.",
+      "treatFlash": {
+        "one": "¡Trato! {count} Dulce de la Noche de las Calabazas",
+        "few": "¡Trato! {count} Dulces de la Noche de las Calabazas",
+        "many": "¡Trato! {count} Dulces de la Noche de las Calabazas",
+        "other": "¡Trato! {count} Dulces de la Noche de las Calabazas"
+      },
+      "trickFlash": "¡Truco! {trick}"
+    },
+    "tricks": {
+      "gourdlight_trick_bat": "Aleteo alocado",
+      "gourdlight_trick_skeleton": "Huesos traqueteantes",
+      "gourdlight_trick_fumes": "Vapores verdes",
+      "gourdlight_trick_strawling": "Apariencia de ser de paja",
+      "gourdlight_costume_skeleton": "Disfraz de esqueleto",
+      "gourdlight_costume_ghost": "Disfraz de fantasma",
+      "gourdlight_costume_bat": "Disfraz de murciélago"
+    },
+    "pumpkinHead": {
+      "on": "Te pones la Cabeza de calabaza tallada.",
+      "off": "Te quitas la Cabeza de calabaza tallada."
+    },
+    "jarTrick": "El tarro se abre de golpe: ¡{trick}!",
+    "guise": "El amuleto crepita y la paja te cubre: ¡{trick}!",
+    "costume": "Bebes el brebaje y te transformas: ¡{trick}!",
+    "titleGranted": "Lees el escrito. Nuevo título conseguido: {title}.",
+    "titleKnown": "Ya tienes ese título, así que conservas el escrito.",
+    "boundItemGone": "La Noche de las Calabazas ha terminado y tu {item} se deshace de nuevo en paja.",
+    "itemUse": {
+      "pumpkinHead": "Uso: Ponte o quítate una calabaza tallada e iluminada por dentro, que se lleva sobre el casco. Cosmético.",
+      "trickJar": "Uso: Te gasta una broma aleatoria e inofensiva durante unos segundos. Cosmético.",
+      "pouch": "Uso: Ábrela para recibir {count} Dulces de la Noche de las Calabazas.",
+      "strawlingCharm": "Uso: Te convierte en uno de los seres de paja del Viejo Thatchgrin durante {seconds} segundos. No se puede usar en combate. Nunca se consume. Cosmético.",
+      "sweet": "Se obtiene pidiendo truco o trato durante la Noche de las Calabazas. Hester Gourdwick los cambia por cosméticos en sus puestos de Eastbrook, Fenbridge y Highwatch.",
+      "costumeSkeleton": "Uso: Te convierte en un esqueleto traqueteante durante {minutes} minutos. Se consume. No se puede usar en combate y entrar en combate termina el efecto. Cosmético.",
+      "costumeGhost": "Uso: Te convierte en un fantasma flotante durante {minutes} minutos. Se consume. No se puede usar en combate y entrar en combate termina el efecto. Cosmético.",
+      "costumeBat": "Uso: Te convierte en un murciélago que aletea durante {minutes} minutos. Se consume. No se puede usar en combate y entrar en combate termina el efecto. Cosmético.",
+      "toyPrank": "Uso: Lánzala a otro jugador visible a un máximo de {range} yardas. Su cabeza se convierte en una calabaza iluminada durante {seconds} segundos, y puede quitársela con un clic derecho. Ninguno de los dos puede estar en combate y tú no puedes estar en sigilo. Nunca se consume: se puede volver a usar tras {cooldown} segundos. Se conserva permanentemente y se puede usar durante todo el año. Cosmético.",
+      "toyLantern": "Uso: Coloca el farol frente a ti. Un pequeño fantasma da vueltas a tu alrededor durante {seconds} segundos. No se puede usar en combate ni en sigilo. Nunca se consume: se puede volver a usar tras {cooldown} segundos. Se conserva permanentemente y se puede usar durante todo el año. Cosmético.",
+      "toyBats": "Uso: Abre el saco. Un enjambre de murciélagos chillones sale volando y se dispersa a tu alrededor durante {seconds} segundos. No se puede usar en combate ni en sigilo. Nunca se consume: se puede volver a usar tras {cooldown} segundos. Se conserva permanentemente y se puede usar durante todo el año. Cosmético.",
+      "toyCandleShadows": "Uso: Enciende la vela frente a ti. Durante {seconds} segundos, sus llamas proyectan sombras danzantes de un gato, un murciélago y una bruja sobre el suelo de alrededor, visibles para todos los que estén cerca. No se puede usar en combate ni en sigilo. Nunca se consume: se puede volver a usar tras {cooldown} segundos. Se conserva permanentemente y se puede usar durante todo el año. Cosmético.",
+      "toyCauldron": "Uso: Coloca un gran caldero burbujeante frente a ti. Permanece {standing} segundos y cualquier jugador que beba de él estalla en burbujas verdes y se convierte en goblin durante {seconds} segundos, reemplazando cualquier disfraz que lleve. No se puede colocar ni beber de él en combate o en sigilo, y entrar en combate termina la forma de goblin. Nunca se consume: se puede volver a usar tras {cooldown} segundos. Se conserva permanentemente y se puede usar durante todo el año. Cosmético.",
+      "titleWrit": "Uso: Consigue el título {title} para este personaje, que se equipa desde el Libro de Gestas. Se consume. Se conserva si ya tienes el título.",
+      "broomSources": "Se compra a Hester Gourdwick por {count} Gavillas tejidas con brasas o, en raras ocasiones, lo deja caer el Viejo Thatchgrin un día en que lo saqueas. Montarlo requiere la habilidad de equitación. Se conserva permanentemente y se puede montar durante todo el año.",
+      "sheaf": "El Viejo Thatchgrin te da una cada día que lo saqueas, hasta que tengas la Escoba de cerdas ardientes. Hester Gourdwick cambia {count} por la escoba en sus puestos de Eastbrook, Fenbridge y Highwatch. Las gavillas sin gastar se conservan para la próxima Noche de las Calabazas."
+    },
+    "toy": {
+      "prank": "¡Lanzas la calabaza y se estampa contra {name}!",
+      "lantern": "Colocas el farol y un pequeño fantasma sale flotando para hacerte compañía.",
+      "bats": "¡Abres el saco y sale volando un enjambre de murciélagos asustados!",
+      "candleShadows": "Enciendes la vela y las sombras empiezan a bailar alrededor de sus llamas.",
+      "cauldron": "Colocas el caldero y empieza a burbujear.",
+      "cauldronDrink": "¡Bebes del caldero, estallas en burbujas verdes y te conviertes en goblin!",
+      "pranked": "¡{name} te estampa una calabaza en la cabeza! Quítatela con un clic derecho o lúcela con orgullo.",
+      "prankedFlash": "¡{name} te ha gastado una broma!",
+      "prankNeedsPlayer": "La calabaza solo se estampa contra otro jugador que no esté en combate.",
+      "hidden": "Sal primero de las sombras: un juguete te delataría."
+    },
+    "itemSource": {
+      "pumpkinHead": "Lo deja caer el Viejo Thatchgrin, en su campo de calabazas más allá del Prado de jabalíes, la primera vez que lo saqueas. No lo vende ningún comerciante."
+    },
+    "boo": {
+      "row": "¡Bu!",
+      "rowAria": "Salta ante {name} y grita bu",
+      "needsCostume": "Ponte primero un disfraz: un brebaje de disfraz, una broma de murciélago o esqueleto, el Amuleto de ser de paja, la Cabeza de calabaza tallada o un sorbo de goblin del Caldero Verdeburbujeante.",
+      "frightenedHint": "{name} aún está nervioso por tu último susto. Busca a otra persona.",
+      "landed": "¡Saltas ante {name} con un BU! Suelta un chillido y casi se le cae todo.",
+      "flash": "¡BU! ¡Has asustado a {name}!",
+      "noCostume": "Sin disfraz, {name} solo se ríe de ti. Ponte uno primero.",
+      "already": "{name} ya ha tenido suficientes sustos por hoy.",
+      "notOnErrand": "Hester no te ha pedido que asustes a nadie hoy."
+    },
+    "tokenPrice": "{count} {item}",
+    "thatchgrin": {
+      "poleBound": "Atado al poste",
+      "wakeYell": "¡La NOCHE cae sobre el huerto! ¿Quién camina por MI campo?",
+      "sleepYell": "Ha salido el sol. De vuelta al poste, de vuelta a vigilar."
     }
   },
   "dungeonGuide": {
@@ -9903,7 +10019,7 @@ export const es_ES: EnTranslations = {
       "framesGovernedTalkingHead": "Editar fotogramas también afloja el panel de Diálogo, que lleva la línea hablada de un NPC mientras ese NPC está fuera de tu vista; lleva su chip con nombre mientras está suelto.",
       "framesGovernedShardpike": "Editar marcos también permite mover la barra de la Pica de Fragmentos, la fila breve de acciones de herramienta de misión que aparece junto a tus barras de acción solo mientras llevas la propia Pica de Fragmentos. Muestra su etiqueta de nombre mientras está desbloqueada para que puedas colocarla antes del combate en lugar de durante él.",
       "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
-      "framesGovernedPriest": "Edit Frames also lets you move the Shadow priest's Gloomtithe and Tithe Bomb medallion.",
+      "framesGovernedPriest": "Editar marcos también te permite mover el medallón de Diezmo sombrío y Bomba del diezmo del sacerdote de Sombras.",
       "framesGovernedResourceAndHill": "Activa Separar barra de recursos en la pestaña Marcos y Editar marcos también desbloqueará tu barra de recursos, para que puedas colocar el maná, la energía o la ira por separado en cualquier lugar; Anchura de la barra de recursos y Altura de la barra de recursos, en esa misma pestaña, ajustan su tamaño. Editar marcos también desbloquea la barra de El Rey de la Colina, y Opacidad del fondo de El Rey de la Colina, en esa pestaña, atenúa su panel sin reducir la claridad del texto.",
       "barsTitle": "Barras, temporizadores y texto de combate",
       "barsBody": "Tu barra de lanzamiento aparece en el centro de la pantalla, justo encima de tus barras de acción, cada vez que lanzas o canalizas, y muestra el nombre del hechizo y el tiempo restante. Tu objetivo tiene su propia barra de lanzamiento en su marco, para que puedas ver lo que viene y responder a ello.\n\nUna fina barra de golpe se sitúa bajo tu barra de lanzamiento y se llena entre los golpes de tu arma, para que un atacante cuerpo a cuerpo o a distancia pueda ver cuándo llega el próximo golpe automático.\n\nTu barra de experiencia ocupa el ancho completo bajo tus barras de acción, dividida en segmentos, con un tramo más claro que muestra la experiencia de descanso que tienes acumulada.\n\nNada bajo el agua y aparecerá una barra de aliento azul en la parte superior de la pantalla. Se vacía mientras tienes la cabeza sumergida, parpadea en rojo en cuanto se agota y empiezas a ahogarte, y se rellena rápido en cuanto sales a la superficie. Space te hace nadar hacia arriba, y la tecla Nadar hacia abajo, Ctrl de forma predeterminada, te lleva más profundo.\n\nEl daño y la sanación flotan hacia arriba sobre aquello que los recibió en forma de pequeños números, para que puedas leer un combate sin leer texto. La pestaña Combate de tu caja de chat conserva el registro escrito completo.",
@@ -10808,6 +10924,7 @@ export const es_ES: EnTranslations = {
       "hillBodyRamp": "Cada dos horas aparece una colina en Las Tierras del Dragón, El Velo de Escarcha o La Cascada de Ámbar. El reino recibe un aviso con quince minutos de antelación y el círculo queda marcado en terreno abierto. La colina permanece activa treinta minutos. Entrar en el círculo activo activa la bandera JcJ mundial según los requisitos de nivel habituales, también para los miembros de bandas. El grupo con más jugadores aptos dentro captura la colina tras un minuto de mayoría ininterrumpida; un jugador solo cuenta como grupo de uno, pero los miembros de bandas y los jugadores por debajo del nivel requerido para JcJ no pueden capturar ni ganar Honor de la colina. Cada defensor dentro gana Honor a un ritmo creciente. Los pagos y su aumento son más rápidos y conservan el Honor total del antiguo evento de cuarenta y cinco minutos. Al cambiar de dueño, el aumento empieza de nuevo. Salir mantiene tu bandera activa; /pvp off tarda los cinco minutos habituales y no puede completarse dentro de una colina activa ni durante el combate. La barra muestra el control, los efectivos y el progreso de captura; /hill indica la ubicación.",
       "hillBodyPause": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls, and every five minutes while it stands the realm is told where it is and which groups have held it longest. The party with the most players standing inside contests the hill, and after thirty seconds of majority the hill is theirs. A rival party walking in only pauses that count until yours leads again; it starts over only if nobody from your party is left alive inside. A lone player counts as a party of one and keeps a hill they hold when they form a party, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns Honor every minute, and the longer the same party holds it, the more each minute pays: a full party holding an uncontested hill for its whole stand earns about as much as three battleground wins. When the hill changes hands, the new holders start the count from the beginning. When it falls, if the group that held it longest in total held it for at least ten minutes, everyone who stood inside for that group for at least a minute, and is still in that group, earns one win toward the PvP row of the Weekly Vault. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
       "hillBodyFlat": "Una vez cada tres horas, en un momento impredecible, se anuncia a todo el reino que dentro de quince minutos aparecerá una colina en una de las zonas del norte, y se marca su círculo en terreno abierto. Permanece cuarenta y cinco minutos y luego desaparece. Mientras permanece, cada cinco minutos se anuncian su ubicación y los grupos que la han controlado durante más tiempo en total. El grupo con más jugadores dentro del círculo disputa la colina y la captura tras acumular treinta segundos de superioridad numérica. La entrada de un grupo rival solo pausa el contador hasta que el tuyo vuelva a liderar; solo se reinicia si no queda ningún miembro vivo de tu grupo dentro. Un jugador solo cuenta como un grupo de uno y conserva la colina al formar un grupo, pero los miembros de banda no cuentan. Cada integrante del grupo que controla la colina y está dentro recibe la misma cantidad de Honor por minuto, sin importar cuánto lleve controlándola. Un grupo completo que la controle sin oposición durante toda su duración gana aproximadamente lo mismo que por tres victorias en campos de batalla. Cuando desaparece, si el grupo con el mayor tiempo total de control acumuló al menos diez minutos, todos los que estuvieron dentro durante al menos un minuto mientras ese grupo la controlaba y siguen en él reciben una victoria para la fila de JcJ de la Bóveda Semanal. Una barra sobre el terreno muestra quién la controla, los jugadores de ambos bandos y el contador de captura; /hill en el chat indica dónde está.",
+      "hillBodyTwoHour": "Una vez cada dos horas, en un momento impredecible, se avisa a todo el reino de que dentro de quince minutos se alzará una colina en una de las zonas del norte, y se marca en terreno abierto el círculo donde aparecerá. La colina permanece treinta minutos y después desaparece. Mientras está alzada, cada cinco minutos se anuncia al reino dónde está y qué grupos la han controlado más tiempo. El grupo con más jugadores dentro del círculo disputa la colina y, tras treinta segundos en mayoría, se hace con ella. La entrada de un grupo rival solo pausa esa cuenta hasta que el tuyo vuelva a tener mayoría; solo se reinicia si no queda ningún miembro vivo de tu grupo dentro. Un jugador solitario cuenta como un grupo de uno y conserva su colina si forma un grupo, pero los miembros de una banda no cuentan. Mientras un grupo controla la colina, cada miembro que esté dentro gana la misma cantidad de Honor cada minuto, sin importar cuánto lleve controlándola. Así, un grupo completo que la controle sin oposición durante toda su duración gana aproximadamente lo mismo que con dos victorias en campos de batalla. Cuando desaparece, si el grupo que más tiempo la controló en total lo hizo durante al menos diez minutos, quienes hayan permanecido dentro para ese grupo al menos un minuto y sigan perteneciendo a él ganan una victoria para la fila JcJ de la Bóveda Semanal. Una barra sobre el campo muestra quién la controla, cuántos sois frente a cuántos son ellos y el reloj de disputa; /hill en el chat indica dónde está.",
       "limitsBodyRaids": "Derrotar al mismo jugador una y otra vez paga cada vez menos y pronto no paga nada, y tu cuenta contra ese jugador solo se reinicia alrededor de una hora después de la primera de esas muertes, así que acechar a una sola víctima nunca vale la espera. Un objetivo muy por debajo de tu nivel no paga absolutamente nada. Los Campos Espinosos y las Arenas siguen sus propias reglas mientras estás dentro, y pagan más Honor que el mundo abierto, así que el JcJ mundial es el camino más lento hacia el mismo vendedor. Las bandas no ganan nada con las muertes en el mundo: un miembro de banda no recibe Honor ni oro y no reduce la parte de nadie más, así que lucha en grupo para que te paguen."
     },
     "thornhollowPage": {
@@ -15549,6 +15666,7 @@ export const es_ES: EnTranslations = {
       "accountSuspended": "Esta cuenta está suspendida hasta {date}.",
       "alreadyInWorld": "El personaje ya está en el mundo.",
       "accountSessionLimit": "Demasiados personajes de esta cuenta ya están en el mundo.",
+      "worldFightHold": "Otro personaje de esta cuenta sigue en el mundo tras un combate. Inténtalo de nuevo dentro de unos minutos.",
       "takenOver": "Otra sesión tomó el control de tu personaje.",
       "vaultMailRecovering": "Tu correo de recompensa del cofre se está restaurando. Intenta de nuevo en un momento.",
       "renameBeforeEntering": "Este personaje debe cambiar de nombre antes de entrar en el mundo.",
@@ -18446,12 +18564,12 @@ export const es_ES: EnTranslations = {
         "description": "Inflige {damage} de daño de Sombras durante 15 s, una vez cada 3 s. El daño aumenta con el poder con hechizos y los pulsos pueden ser críticos. Cada pulso reparte una sanación equivalente al 20% de la vida perdida por el enemigo entre tú y los miembros heridos de tu grupo a 30 yardas o menos; en una banda, solo recibe esta sanación tu subgrupo. Si tienes al menos 2 cargas de Diezmo sombrío, aplicar el efecto consume 2 para aumentar todo su daño un 30%."
       },
       "void_rupture": {
-        "name": "Void Rupture",
-        "description": "Consume 3 Gloomtithe charges to rupture an enemy for {damage} Shadow damage. Damage increases with Spell Power and can critically strike. Requires 3 charges and consumes them even if resisted."
+        "name": "Ruptura del vacío",
+        "description": "Consume 3 cargas de Diezmo sombrío para desgarrar a un enemigo e infligirle {damage} de daño de Sombras. El daño aumenta con el poder con hechizos y puede ser crítico. Requiere 3 cargas y las consume incluso si se resiste."
       },
       "spirit_bomb": {
-        "name": "Tithe Bomb",
-        "description": "Detonate a spirit bomb on an enemy, dealing {damage} Shadow damage to enemies within 8 yards of that target. Damage increases with Spell Power, can critically strike, and is reduced beyond 5 targets. Generate 20 Gloomtithe to prepare one bomb. Generation counts even while holding the maximum 5 Gloomtithe; spending charges is not required and adds no progress. Progress lasts between fights, up to one prepared bomb. Dying clears your progress and prepared bomb. Completing the cast consumes the prepared bomb, even if resisted. Cancellation or interruption preserves it. Starting a raid boss encounter clears your progress and prepared bomb. Cannot open a raid boss encounter with this spell."
+        "name": "Bomba del diezmo",
+        "description": "Detona una bomba espiritual sobre un enemigo e inflige {damage} de daño de Sombras a los enemigos a un máximo de 8 yardas de ese objetivo. El daño aumenta con el poder con hechizos, puede ser crítico y se reduce cuando hay más de 5 objetivos. Genera 20 cargas de Diezmo sombrío para preparar una bomba. La generación cuenta incluso si ya tienes el máximo de 5 cargas; gastarlas no es necesario ni añade progreso. El progreso se conserva entre combates, hasta un máximo de una bomba preparada. Morir elimina el progreso y la bomba preparada. Completar el lanzamiento consume la bomba preparada, incluso si se resiste. Cancelarlo o sufrir una interrupción la conserva. Iniciar un encuentro con un jefe de banda elimina el progreso y la bomba preparada. No puedes iniciar un encuentro con un jefe de banda usando este hechizo."
       },
       "flash_heal": {
         "name": "Plegaria Urgente",
@@ -19287,7 +19405,7 @@ export const es_ES: EnTranslations = {
       "inner_focus": {
         "name": "Mente Serena",
         "description": "Hace que tu próximo hechizo de sacerdote sea gratuito e ininterrumpible. Dura 60 s.",
-        "specNote_shadow": "Also reserves a guaranteed critical strike for your next Mindfracture or Void Rupture within 60 sec, if it hits. Other spells do not consume this bonus. Void Rupture still consumes 3 Gloomtithe charges. A resisted cast consumes the critical strike bonus."
+        "specNote_shadow": "También reserva un golpe crítico garantizado para tu próxima Fractura Mental o Ruptura del vacío en un plazo de 60 s, si acierta. Otros hechizos no consumen esta bonificación. Ruptura del vacío sigue consumiendo 3 cargas de Diezmo sombrío. Un lanzamiento resistido consume la bonificación de golpe crítico."
       },
       "innervate": {
         "name": "Savia Vital",
@@ -24700,6 +24818,87 @@ export const es_ES: EnTranslations = {
       "vanguard_pendant_of_mending": {
         "name": "Colgante de Vanguardia de Curación"
       },
+      "gourdlight_sweet": {
+        "name": "Dulce de la Noche de las Calabazas"
+      },
+      "gourdlight_treat_pouch": {
+        "name": "Bolsa de dulces de la Noche de las Calabazas"
+      },
+      "carved_pumpkin_head": {
+        "name": "Cabeza de calabaza tallada"
+      },
+      "jar_of_mischief": {
+        "name": "Tarro de travesuras"
+      },
+      "thatchgrin_sweet_sack": {
+        "name": "Saco de dulces de Thatchgrin"
+      },
+      "strawling_charm": {
+        "name": "Amuleto de ser de paja"
+      },
+      "rattlebone_draught": {
+        "name": "Brebaje de huesos traqueteantes"
+      },
+      "haunting_draught": {
+        "name": "Brebaje espectral"
+      },
+      "batwing_draught": {
+        "name": "Brebaje aleteante"
+      },
+      "writ_of_the_gourdlit": {
+        "name": "Escrito del Iluminado por las Calabazas"
+      },
+      "writ_of_the_trickster": {
+        "name": "Escrito del Bromista"
+      },
+      "writ_of_the_hollow_grin": {
+        "name": "Escrito de la Sonrisa Hueca"
+      },
+      "reins_emberbristle_broom": {
+        "name": "Escoba de cerdas ardientes"
+      },
+      "hearthroot_toffee": {
+        "name": "Tofe de raíz de hogar"
+      },
+      "gourdseed_brittle": {
+        "name": "Guirlache de semillas de calabaza"
+      },
+      "crabapple_chew": {
+        "name": "Caramelo masticable de manzana silvestre"
+      },
+      "owlwatch_fudge": {
+        "name": "Dulce cremoso del búho vigía"
+      },
+      "lantern_mint_drop": {
+        "name": "Caramelo de menta del farol"
+      },
+      "emberwoven_sheaf": {
+        "name": "Gavilla tejida con brasas"
+      },
+      "prankers_pumpkin": {
+        "name": "Calabaza del bromista"
+      },
+      "wanderwisp_lantern": {
+        "name": "Farol de luz errante"
+      },
+      "sack_of_startled_bats": {
+        "name": "Saco de murciélagos asustados"
+      },
+      "murmurwick_candle": {
+        "name": "Vela de mecha susurrante"
+      },
+      "gurglegreen_cauldron": {
+        "name": "Caldero Verdeburbujeante"
+      },
+      "thatchgrin_patch_pumpkin": {
+        "name": "Calabaza del huerto"
+      },
+      "cursed_candle_stub": {
+        "name": "Cabo de vela maldita"
+      },
+      "gourdlight_crow_feather": {
+        "name": "Pluma de cuervo de la Noche de las Calabazas"
+      },
       "membership_staff": {
         "name": "Bastón del cambio"
       },
@@ -26256,6 +26455,18 @@ export const es_ES: EnTranslations = {
       "muster_effigy": {
         "name": "Capataz de Paja"
       },
+      "gourdlight_thatchgrin": {
+        "name": "Viejo Thatchgrin"
+      },
+      "gourdlight_crow": {
+        "name": "Cuervo de la Noche de las Calabazas"
+      },
+      "gourdlight_strawling": {
+        "name": "Ser de paja"
+      },
+      "gourdlight_swelling_gourd": {
+        "name": "Calabaza hinchada"
+      },
       "stable_horse": {
         "name": "Caballo de establo"
       },
@@ -27409,6 +27620,11 @@ export const es_ES: EnTranslations = {
         "name": "Hester Quillby",
         "title": "Cartógrafo",
         "greeting": "Todos los mapas de esta ciénaga que he comprado dejaron de ser correctos en menos de una estación. El agua mueve los senderos y los senderos mueven el agua. Así que dibujo los míos y me siento aquí, donde está seco, mientras se asienta la tinta."
+      },
+      "gourdlight_keeper": {
+        "name": "Hester Gourdwick",
+        "title": "Guardiana de la Noche de las Calabazas",
+        "greeting": "Las calabazas están encendidas y los faroles colgados, así que debe de ser la Noche de las Calabazas. Llama a las puertas de los vecinos de Eastbrook, Fenbridge y Highwatch, y di las palabras: truco o trato. La mayoría te dará un dulce. Algunos te gastarán una broma. Tráeme los dulces a cualquiera de mis puestos y te los cambiaré por algo que ponerte."
       },
       "reeve_ottoline": {
         "name": "Alguacila Ottoline",
@@ -30041,6 +30257,88 @@ export const es_ES: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Curación efectiva sobre el muñeco de sanación"
+          }
+        }
+      },
+      "q_gourdlight_rounds": {
+        "title": "Ronda de la Noche de las Calabazas",
+        "text": "Cada Noche de las Calabazas, los niños del Valle hacen su ronda, y este año te unirás a ellos, {playerName}. Llama a cinco puertas de nuestros pueblos, di las palabras y mira qué te dan. Vuelve a verme cuando acabes.",
+        "completion": "Cinco puertas y aún conservas todos los dedos. Toma, una bolsa de dulces para la vuelta a casa. Vuelve mañana, las puertas abrirán de nuevo.",
+        "objectives": {
+          "0": {
+            "label": "Puertas a las que has llamado"
+          }
+        }
+      },
+      "q_gourdlight_daily_patch": {
+        "title": "Calabazas del huerto",
+        "text": "El huerto del Viejo Thatchgrin, más allá del Prado de jabalíes, rebosa de calabazas, y la mitad ha rodado más allá de su paja, donde alguien con cuidado puede alcanzarlas. Tráeme cinco, {playerName}. Mantente lejos del viejo espantapájaros. Las cuenta una por una.",
+        "completion": "Cinco bien redondas y ni un mordisco en ninguna. Habrá pastel para todo el Valle. Toma, por las molestias.",
+        "objectives": {
+          "0": {
+            "label": "Calabazas del huerto"
+          }
+        }
+      },
+      "q_gourdlight_daily_boo": {
+        "title": "¡Bu!",
+        "text": "Nadie en estos pueblos se ha llevado un buen susto en todo un año, {playerName}, y una Noche de las Calabazas sin sustos es solo una noche fría. Ponte un disfraz, cualquiera de los míos sirve, o esa cabeza de calabaza si te has ganado una. Luego acércate sigilosamente a tres vecinos y suéltales un buen ¡BU! bien fuerte.",
+        "completion": "¿Tres? He oído al cocinero dejar caer una sartén desde el otro lado de la plaza. Bien hecho. Aquí tienes tu parte.",
+        "objectives": {
+          "0": {
+            "label": "Vecinos asustados"
+          }
+        }
+      },
+      "q_gourdlight_daily_wicks": {
+        "title": "Mechas malvadas",
+        "text": "Alguien ha estado colocando velas de llama verde al pie de nuestras farolas. Arden sin derretirse y susurran cuando les das la espalda. Apaga seis por mí, {playerName}, en cualquiera de los tres pueblos, y tráeme los cabos.",
+        "completion": "Seis cabos, fríos como la escarcha. Quien los encendió tendrá que esforzarse más. Toma esto y lávate las manos.",
+        "objectives": {
+          "0": {
+            "label": "Velas malditas apagadas"
+          }
+        }
+      },
+      "q_gourdlight_daily_towns": {
+        "title": "Una puerta en cada pueblo",
+        "text": "Los niños dicen que un verdadero caminante de las Calabazas llama a las puertas de todos los pueblos antes de que termine la noche. Demuestra que tienen razón, {playerName}. Pide truco o trato en una puerta de Eastbrook, una de Fenbridge y una de Highwatch. Los faroles de los caminos te guiarán.",
+        "completion": "¡Tres pueblos en una noche! Tus botas se han ganado esto más que tú.",
+        "objectives": {
+          "0": {
+            "label": "Una puerta llamada en Eastbrook"
+          },
+          "1": {
+            "label": "Una puerta llamada en Fenbridge"
+          },
+          "2": {
+            "label": "Una puerta llamada en Highwatch"
+          }
+        }
+      },
+      "q_gourdlight_daily_feathers": {
+        "title": "Plumas para el fuego",
+        "text": "Cuando acorralan al Viejo Thatchgrin, llama a sus cuervos para que se lancen sobre quienes golpean su paja. Sus plumas arden con una llama verde, y necesito tres para la hoguera de esta noche. Busca una pelea en su huerto, {playerName}, y arráncaselas a sus cuervos.",
+        "completion": "Negras como un campo sin luna, y ya huelen a humo. La hoguera será digna de ver. Gracias.",
+        "objectives": {
+          "0": {
+            "label": "Plumas de cuervo"
+          }
+        }
+      },
+      "q_gourdlight_daily_baskets": {
+        "title": "Cestas para los vecinos",
+        "text": "Cada Noche de las Calabazas lleno una cesta de dulces para un viejo amigo de cada pueblo, y mis rodillas ya no son lo que eran. Repártelas por mí, {playerName}: al cocinero Marlow en Eastbrook, a Yara la herborista en Fenbridge y al Maestro de saber Caddis, allá en Highwatch.",
+        "completion": "Las tres entregadas, y dicen que Marlow lloró. Siempre llora. Aquí tienes una cesta para ti.",
+        "objectives": {
+          "0": {
+            "label": "Cesta entregada al cocinero Marlow"
+          },
+          "1": {
+            "label": "Cesta entregada a Yara la herborista"
+          },
+          "2": {
+            "label": "Cesta entregada al Maestro de saber Caddis"
           }
         }
       },

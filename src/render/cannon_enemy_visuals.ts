@@ -5,6 +5,7 @@ import { CANNON_ACTIONS, CANNON_ENEMIES } from '../sim/content/cannon_encounter'
 import { cannonMarchMultiplier } from '../sim/minigames/cannon_tactics';
 import type { CannonEnemyKind, VehicleSession } from '../sim/types';
 import { type AnimState, CharacterVisual } from './characters';
+import { VisibleChildrenGroup } from './visible_children_group';
 import { worldQuestTraceMaterials } from './world_quest_trace_materials';
 
 // Conservative simultaneous occupancy at permanent grapeshot slow, pinned
@@ -20,7 +21,7 @@ export const CANNON_ENEMY_LOOKS = {
 } as const;
 
 export class CannonEnemyVisuals {
-  readonly root = new THREE.Group();
+  readonly root = new VisibleChildrenGroup();
   private readonly box = new THREE.BoxGeometry(1, 1, 1);
   private readonly ring = new THREE.RingGeometry(0.86, 1, 32);
   private readonly slots: ReturnType<CannonEnemyVisuals['createSlot']>[] = [];

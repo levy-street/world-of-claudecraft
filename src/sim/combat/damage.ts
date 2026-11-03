@@ -1500,6 +1500,8 @@ export function handleDeath(
   killer: Entity | null,
   killerAbility?: string | null,
 ): void {
+  // A nested damage proc can finish this death before its original hit resumes.
+  if (e.dead) return;
   if (e.kind === 'player') {
     clearSpiritmendCurrents(ctx, e.id);
     clearShamanTalentState(ctx, e);
@@ -1519,6 +1521,9 @@ export function handleDeath(
   afflictionOnDeath(ctx, e);
   destructionOnDeath(ctx, e);
   necromancyOnDeath(ctx, e);
+  // Death bursts can chain back into this entity while the hooks still need it alive.
+  // If that nested call settled the death, do not award its loot or buddy rolls again.
+  if (e.dead) return;
   resetProcState(e);
   cleanupPaladinAegis(ctx, e.id);
   stripSunGodVerdicts(ctx, e.id);
@@ -2025,7 +2030,9 @@ export function handleDeath(
       rollBossBuddyDrops(ctx, e, worldBossContribs, null);
       // World-boss deeds ride the same never-pruned contributor roster.
       deedsMod.onWorldBossKilledForDeeds(ctx, e, worldBossContribs);
-      onWorldBossKilledForWeeklyQuests(ctx, worldBossContribs);
+      // A seasonal field boss never counts toward the weekly (a seasonal window must
+      // not gate a weekly quest): seasonal/scarecrow.ts.
+      if (!template?.seasonalEvent) onWorldBossKilledForWeeklyQuests(ctx, worldBossContribs);
       // The muster's weekly counts his kill for every contributor carrying it.
       creditMusterTrophyKill(ctx, e, worldBossContribs);
     }

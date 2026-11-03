@@ -1,3 +1,4 @@
+import { GOURDLIGHT_TRICKS } from '../sim/content/gourdlight_eve';
 import { NYTHRAXIS_IMPALED_AURA_ID } from '../sim/nythraxis_bone_spike';
 
 export const CHARACTER_EFFECT_SOUL_REND = 1 << 0;
@@ -14,6 +15,9 @@ export const CHARACTER_EFFECT_SPORE_HOT = 1 << 5;
 /** Hunter Play Dead (feign death): the living body takes the same held death
  *  pose as Impaled, for every viewer, until the aura clears. */
 export const CHARACTER_EFFECT_FEIGN_DEATH = 1 << 6;
+/** A Gourdlight Eve trick (seasonal/): wreathed in green fumes for a few seconds. */
+export const CHARACTER_EFFECT_SEASONAL_FUMES = 1 << 7;
+const SEASONAL_FUMES_AURA_ID: string = GOURDLIGHT_TRICKS[2].id;
 
 export interface CharacterEffectAura {
   id: string;
@@ -29,6 +33,8 @@ export function addCharacterEffectAura(flags: number, aura: CharacterEffectAura)
   if (aura.kind === 'buff_reckless') next |= CHARACTER_EFFECT_RECKLESSNESS;
   if (aura.kind === 'form_sporemender') next |= CHARACTER_EFFECT_SPORE_FORM;
   if (aura.id === 'rejuvenation' && aura.kind === 'hot') next |= CHARACTER_EFFECT_SPORE_HOT;
+  if (aura.kind === 'seasonal_cosmetic' && aura.id === SEASONAL_FUMES_AURA_ID)
+    next |= CHARACTER_EFFECT_SEASONAL_FUMES;
   return next;
 }
 

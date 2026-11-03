@@ -36,7 +36,8 @@ export const NAMEPLATE_RANGE_SQ = NAMEPLATE_RANGE * NAMEPLATE_RANGE;
 
 // Town NPC plates (vendors, trainers, quest givers) only show up close, so a
 // busy hub does not fill the screen with labels for people across the square.
-// Their marker on the minimap still points the way from further out.
+// Beyond it, out to the normal NAMEPLATE_RANGE, a quest giver still shows its
+// '!' or '?' on its own (`markerOnly`), so a quest reads from across the square.
 export const NPC_NAMEPLATE_RANGE = 10;
 export const NPC_NAMEPLATE_RANGE_SQ = NPC_NAMEPLATE_RANGE * NPC_NAMEPLATE_RANGE;
 
@@ -87,6 +88,9 @@ export interface NameplatePlan {
   /** an NPC plate: just the name, its role line and its quest marker, never a
    *  cast bar, combo pips, threat tint or raid mark */
   nameOnly: boolean;
+  /** an NPC beyond NPC_NAMEPLATE_RANGE: only its quest marker is drawn, and
+   *  the painter drops the plate when there is no marker to show */
+  markerOnly: boolean;
 }
 
 /** A zeroed plan for the painter to own and reuse. */
@@ -100,6 +104,7 @@ export function newNameplatePlan(): NameplatePlan {
     comboPips: 0,
     noHealthBar: false,
     nameOnly: false,
+    markerOnly: false,
   };
 }
 
@@ -112,8 +117,8 @@ export function newNameplatePlan(): NameplatePlan {
  * player's. `showPlayerNameplates` is the other-players toggle (defaults on):
  * when off, other players' plates hide, except the current target so a clicked
  * player stays readable; the self plate stays governed by showOwnNameplate
- * alone, and mob/object plates are unaffected. An NPC plate shows only inside
- * NPC_NAMEPLATE_RANGE and is `nameOnly`. `standIn` says this entity has
+ * alone, and mob/object plates are unaffected. An NPC plate is `nameOnly`, and
+ * beyond NPC_NAMEPLATE_RANGE it is `markerOnly` (just its quest marker). `standIn` says this entity has
  * no in-world body at all right now (a compile gate hides it, see
  * entity_gate_stand_in_core.ts): its plate is then the only thing telling the
  * player the entity is there, so it overrides BOTH nameplate toggles, the
@@ -204,7 +209,6 @@ export function nameplatePlanInto(
       (d2 > NAMEPLATE_RANGE_SQ ||
         (e.kind === 'object' && !isDoor && !delveInteractNear && !feastNear && !rackNear) ||
         (!isBuddyPet && !showNameplates && e.kind === 'mob' && !e.dead) ||
-        (isNpc && d2 > NPC_NAMEPLATE_RANGE_SQ) ||
         (!showPlayerNameplates && e.kind === 'player' && !isSelf && e.id !== player.targetId)));
   out.noHealthBar = isBuddyPet;
   out.anchorYOffset =
@@ -216,6 +220,7 @@ export function nameplatePlanInto(
     e.id === player.targetId || d2 < NAMEPLATE_URGENT_RANGE_SQ || e.castingAbility !== null;
   out.hasOverheadEmote = hasOverheadEmote;
   out.nameOnly = isNpc;
+  out.markerOnly = isNpc && !standIn && d2 > NPC_NAMEPLATE_RANGE_SQ;
   out.threat = !isNpc && isMobThreateningViewer(e, player.id);
   out.comboPips = isNpc ? 0 : comboPipsFor(player, e);
   return out;

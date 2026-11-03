@@ -87,6 +87,7 @@ import {
 } from '../src/sim/combat/priest/presentation';
 import { CLUE_HUNTS } from '../src/sim/content/clue_hunts';
 import { FARM_PATCHES } from '../src/sim/content/farm_patches';
+import { GOURDLIGHT_PUMPKINS } from '../src/sim/content/gourdlight_pumpkins';
 import { RETIRED_MOUNT_SKIN_IDS } from '../src/sim/content/mount_skins';
 import { MOUNT_RACE_START_PLATFORM, type MountKey } from '../src/sim/content/mounts';
 import { CRAFT_RING, STATION_RADIUS } from '../src/sim/content/professions';
@@ -5873,6 +5874,7 @@ const ALL_DELTA_KEYS = [
   'hirat',
   'hmarks',
   'honor',
+  'hpf',
   'hpref',
   'hpw',
   'hrat',
@@ -5913,6 +5915,7 @@ const ALL_DELTA_KEYS = [
   'rxp',
   'salv',
   'scb',
+  'season',
   'sh',
   'skb',
   'sp',
@@ -5921,6 +5924,7 @@ const ALL_DELTA_KEYS = [
   'tfocus',
   'tfpend',
   'tmap',
+  'tot',
   'trade',
   'tslot',
   'udiff',
@@ -6028,6 +6032,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   hill: 'hillInfo',
   hirat: 'hitRating',
   hmarks: 'heroicMarks',
+  hpf: 'hauntedPumpkinsFound',
   hpref: 'harvestPreference',
   hrat: 'hasteRating',
   inv: 'inventory',
@@ -6063,11 +6068,13 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   rtype: 'resourceType',
   rxp: 'restedXp',
   salv: 'lastSalvageResult',
+  season: 'activeSeasonalEvent',
   sh: 'spellHaste',
   sp: 'spellPower',
   tfocus: 'townFocus',
   tfpend: 'townFocusPending',
   tmap: 'treasureMap',
+  tot: 'trickOrTreatedToday',
   tslot: 'toolEffectSlots',
   udiff: 'unappliedDungeonDifficulty',
   vault: 'vaultInfo',
@@ -6194,6 +6201,11 @@ function dirtyEveryDeltaField(): {
   meta.vault.upgrades = 2;
   // The weekly emissary's charge (wkq): held mid-week so the key rides non-null.
   meta.weeklyQuest = { questId: 'wk_dungeons', week: '2030-W01', count: 1, state: 'active' };
+  // Gourdlight Eve (season, tot): the event running and one knock on today's ledger.
+  sim.seasonal.devOverride = 'gourdlight_eve';
+  meta.seasonalDay = sim.resetDay;
+  meta.seasonalKnocked.add('gourdlight_keeper');
+  meta.hauntedPumpkins.add(GOURDLIGHT_PUMPKINS[0].id);
   // `cvault`: craftVaultStockFor is gated on the craft-draw context predicate,
   // not the banker. This harness player carries a live DELVE RUN (the drun
   // key's seeding below), which the gate refuses by design, so cvault's
@@ -6782,7 +6794,7 @@ describe('full self-state snapshot delta fixture', () => {
       holder: 'none',
       inZone: false,
       inside: false,
-      minutesLeft: 45,
+      minutesLeft: 30,
     });
     expect(['drakelands', 'frostveil', 'amberfall']).toContain(client.hillInfo?.zoneId);
     expect(client.restedXp).toBe(222); // rxp -> restedXp
@@ -7445,7 +7457,13 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.courierInfo).toBeNull();
   });
 
-  it('omits all delta keys on a no-op re-broadcast and preserves the prior mirror', () => {
+  it('omits all delta keys on a no-op re-broadcast and preserves the prior mirror', ({
+    onTestFinished,
+  }) => {
+    // The realm's weekly-reward wire includes wall time even without a sim tick.
+    // Keep both broadcasts in the same second so this is truly a no-op.
+    const clock = vi.spyOn(Date, 'now').mockReturnValue(Date.UTC(2026, 9, 27));
+    onTestFinished(() => clock.mockRestore());
     const { server, fc, leader, memberPid } = dirtyEveryDeltaField();
     broadcast(server);
     const client = bareClient(leader.pid);
@@ -7557,7 +7575,7 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 125 unique keys in sorted order', () => {
+  it('ALL_DELTA_KEYS contains exactly 136 unique keys in sorted order', () => {
     // 109 plus the release batch's pending Town Focus and Spell Crit core keys (113),
     // plus the courier's three keys and the Shardpike trial's lance, lrest and lguide (119).
     // +2: the courier's courierTravelTicks and courierLegTicks (PR 4281), for 124.
@@ -7626,8 +7644,8 @@ describe('delta-key contract pins (anti-drift)', () => {
     // +1: Lantern Hall's weekly contract board gcon (server/quest_snapshot_wire.ts), for 125.
     // Courier vault and other-character stores add one owner delta key.
     // +1: the portrait menu's unapplied claim tier udiff (server/self_scalar_wire.ts).
-    expect(ALL_DELTA_KEYS).toHaveLength(133);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(133);
+    expect(ALL_DELTA_KEYS).toHaveLength(136);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(136);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -7808,7 +7826,7 @@ describe('delta-key contract pins (anti-drift)', () => {
     // Lantern Hall's contract board gcon (quest_snapshot_wire.ts) makes 125.
     // Courier vault and other-character stores add one owner delta key.
     // The unapplied claim tier udiff (self_scalar_wire.ts) adds one more.
-    expect(scraped.size).toBe(133);
+    expect(scraped.size).toBe(136);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

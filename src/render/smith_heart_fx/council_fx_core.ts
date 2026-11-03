@@ -298,24 +298,27 @@ export function rockFall(
  *  of its time left (the rim's sweep), the beacon over its player (bright as
  *  the mark goes on, burning hotter to the end), and the rock's shadow on the
  *  floor (a share of the soak's radius, growing as the rock comes down, its
- *  darkness). The rim and the sweep are the soak's own radius (the sim's). */
+ *  darkness, and `near` the rock's approach 0..1 that the stone paint draws
+ *  it off). The rim and the sweep are the soak's own radius (the sim's). */
 export function soakCountdown(
   remaining: number,
   duration: number,
-  out: { left: number; beacon: number; shadow: number; dark: number } = {
+  out: { left: number; beacon: number; shadow: number; dark: number; near: number } = {
     left: 0,
     beacon: 0,
     shadow: 0,
     dark: 0,
+    near: 0,
   },
-): { left: number; beacon: number; shadow: number; dark: number } {
+): { left: number; beacon: number; shadow: number; dark: number; near: number } {
   const left = duration > 0 ? Math.max(0, Math.min(1, remaining / duration)) : 0;
   const fall = rockFall(remaining, duration);
   const near = 1 - fall.height / ROCK_HANG_HEIGHT;
   out.left = left;
   out.beacon = 0.55 + 0.45 * (1 - left);
-  out.shadow = 0.25 + 0.6 * near;
+  out.shadow = 0.42 + 0.48 * near ** 0.7;
   out.dark = 0.25 + 0.5 * near;
+  out.near = near;
   return out;
 }
 

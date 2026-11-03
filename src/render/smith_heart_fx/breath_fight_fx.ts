@@ -55,6 +55,7 @@ import {
 } from '../../sim/encounters/smith_heart/breath_ids';
 import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
+import { fxAnchor } from '../attached_fx_anchor';
 import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { type TelegraphFan, TelegraphKit } from '../floor_telegraph';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
@@ -96,8 +97,12 @@ import {
 } from './breath_fight_fx_core';
 import { BreathHeartFx } from './breath_heart_fx';
 import { BreathWindStreaks } from './breath_wind_streaks';
+import { BREATH_TELEGRAPH_GLOW_STEP, type BreathTelegraphKind } from './painted_telegraph_core';
+import { BreathTelegraphs, type PaintedFan } from './painted_telegraphs';
 
 const SCAN_SEC = 0.1;
+/** The conductor's beacon and the cradle's crown: a saturated storm blue. */
+const STORM_BLUE = 0x2f7dff;
 const BEAM_POINTS = 10;
 const T = BREATH_TUNING;
 
@@ -281,17 +286,21 @@ void main() {
 }
 `;
 /** A beam of light (the calm landing, the conductor's beacon): bright core,
- *  soft falling bands. */
+ *  soft falling bands. \`uHot\` (the conductor's) runs white hot pulses of
+ *  current down a saturated blue body (0: the calm's soft light, as ever). */
 const BEAM_FRAG = /* glsl */ `
 uniform float uAlpha;
 uniform float uTime;
+uniform float uHot;
 uniform vec3 uColor;
 varying vec2 vUv;
 void main() {
   float bands = 0.7 + 0.3 * sin(vUv.y * 22.0 + uTime * 9.0);
   float edge = 1.0 - abs(vUv.x * 2.0 - 1.0);
   float a = uAlpha * bands * (1.0 - smoothstep(0.7, 1.0, vUv.y)) * (0.6 + 0.4 * edge);
-  gl_FragColor = vec4(uColor * (1.2 + bands * 0.5), a);
+  float pulse = pow(0.5 + 0.5 * sin(vUv.y * 9.0 - uTime * 31.0), 8.0);
+  vec3 col = uColor * (1.2 + bands * 0.5) + vec3(0.85, 0.93, 1.0) * pulse * 1.6 * uHot;
+  gl_FragColor = vec4(col, a * (1.0 + 0.6 * pulse * uHot));
   #include <colorspace_fragment>
 }
 `;
@@ -530,6 +539,10 @@ export class BreathFightFx {
   private readonly chargedFans: FanSlot[] = [];
   private readonly cradleFans: FanSlot[] = [];
   private readonly barFans: FanSlot[] = [];
+  /** The bar's footprint dressed in the storm (its kind follows the bar). */
+  private barPaint: PaintedFan<BreathTelegraphKind> | null = null;
+  /** Every footprint's element paint (painted_telegraphs.ts). */
+  private readonly paints: BreathTelegraphs;
   /** The object footprint pools, in one list (built once, walked by assign). */
   private readonly footprintPools: readonly FanSlot[][] = [
     this.calmFans,
@@ -618,6 +631,7 @@ export class BreathFightFx {
     );
     this.glowTex = hasDom ? radialGlowTexture() : null;
     this.kit = new TelegraphKit(this.root, this.detail);
+    this.paints = new BreathTelegraphs(BREATH_TELEGRAPH_GLOW_STEP, this.materials);
     this.local.name = 'smithHeartBreathLocal';
     this.local.visible = false;
     this.root.add(this.local);
@@ -712,39 +726,45 @@ export class BreathFightFx {
     }
 
     // ---- the footprints (every tier) ----
-    const fans = (n: number, order: number, out: FanSlot[]) => {
+    // Each dressed in its element (painted_telegraphs.ts): the strikes and
+    // the bars' marks in lightning, the charged ground arcing, the vortex,
+    // the gales and the pinned in wind, the calm still and mint.
+    const fans = (n: number, order: number, out: FanSlot[], kind: BreathTelegraphKind) => {
       for (let i = 0; i < n; i++) {
         const fan = this.kit.fan(order);
         fan.group.visible = false;
+        const painted = this.paints.dress(fan, kind);
+        if (out === this.barFans) this.barPaint = painted;
         out.push({ fan, id: -1, born: 0, template: '' });
       }
     };
-    fans(P.calm, 6, this.calmFans);
-    fans(P.vortex, 10, this.vortexFans);
-    fans(P.gales, 10, this.galeFans);
-    fans(P.strikes, 12, this.strikeFans);
-    fans(P.charged, 8, this.chargedFans);
-    fans(P.cradles, 9, this.cradleFans);
-    fans(1, 11, this.barFans);
+    fans(P.calm, 6, this.calmFans, 'calm');
+    fans(P.vortex, 10, this.vortexFans, 'vortex');
+    fans(P.gales, 10, this.galeFans, 'gale');
+    fans(P.strikes, 12, this.strikeFans, 'strike');
+    fans(P.charged, 8, this.chargedFans, 'charged');
+    fans(P.cradles, 9, this.cradleFans, 'cradle');
+    fans(1, 11, this.barFans, 'fork');
     for (const s of this.calmFans) this.layOut(s, 360, C.calm, C.calmEdge);
     for (const s of this.vortexFans) this.layOut(s, 360, C.danger, C.accent);
     for (const s of this.galeFans) this.layOut(s, 360, C.control, C.accent);
     for (const s of this.strikeFans) this.layOut(s, 360, C.danger, C.accent);
     for (const s of this.chargedFans) this.layOut(s, 360, C.danger, C.accent);
     for (const s of this.cradleFans) this.layOut(s, 360, C.soak, C.accent);
-    const markFans = (n: number, arc: number, color: number) => {
+    const markFans = (n: number, arc: number, color: number, kind: BreathTelegraphKind) => {
       const out: TelegraphFan[] = [];
       for (let i = 0; i < n; i++) {
         const f = this.kit.fan(13);
         this.kit.layOutFan(f, arc, { color, accent: C.accent });
         f.group.visible = false;
+        this.paints.dress(f, kind);
         out.push(f);
       }
       return out;
     };
-    this.anchorMarks = new MarkPool(markFans(6, 360, C.calm));
-    this.pinnedMarks = new MarkPool(markFans(10, PINNED_MARK.arcDeg, C.danger));
-    this.drawnMarks = new MarkPool(markFans(2, 360, C.lethal));
+    this.anchorMarks = new MarkPool(markFans(6, 360, C.calm, 'anchor'));
+    this.pinnedMarks = new MarkPool(markFans(10, PINNED_MARK.arcDeg, C.danger, 'pinned'));
+    this.drawnMarks = new MarkPool(markFans(2, 360, C.lethal, 'drawnMark'));
 
     // ---- funnels, beams, domes ----
     const funnelMat = (name: string, spin: number) =>
@@ -796,6 +816,7 @@ export class BreathFightFx {
         uniforms: {
           uAlpha: { value: 0 },
           uTime: this.uTime,
+          uHot: { value: 0 },
           uColor: { value: new THREE.Color(color) },
         },
         vertexShader: FUNNEL_VERT,
@@ -863,27 +884,41 @@ export class BreathFightFx {
     const spentCarrier = new THREE.Sprite(this.seatSpentMat);
     spentCarrier.visible = false;
     this.root.add(spentCarrier);
+    // The conductor's beacon: a saturated electric blue column with white hot
+    // current running down it, a blue glow at its foot and a small white hot
+    // spark in it (crisp, never a milky blob over the marked player).
+    const beaconGlowMat = sprite(STORM_BLUE, 0.85, 'smithHeartBreathBeaconGlow');
+    const beaconCoreMat = sprite(0xf2f8ff, 0.95, 'smithHeartBreathBeaconCore');
     for (let i = 0; i < P.beacons; i++) {
-      const bm = beamMat('smithHeartBreathBeacon', C.accent);
+      const bm = beamMat('smithHeartBreathBeacon', STORM_BLUE);
+      bm.uniforms.uHot.value = 1;
       const mesh = new THREE.Mesh(beamGeo, bm);
       mesh.name = 'smithHeartBreathBeacon';
       mesh.visible = false;
       mesh.frustumCulled = false;
       this.root.add(mesh);
       this.beacons.push({ mesh, mat: bm });
-      const glow = new THREE.Sprite(sprite(0xe6faff, 0.9, 'smithHeartBreathBeaconGlow'));
-      glow.scale.set(2.6, 2.6, 1);
+      const glow = new THREE.Sprite(beaconGlowMat);
+      glow.name = 'smithHeartBreathBeaconGlow';
+      glow.scale.set(1.7, 1.7, 1);
       glow.visible = false;
+      const spark = new THREE.Sprite(beaconCoreMat);
+      spark.scale.set(0.45, 0.45, 1);
+      glow.add(spark);
       this.root.add(glow);
       this.beaconGlows.push(glow);
     }
-    // The Thunder's Cradle's crown over the lifted player.
-    this.crownMat = sprite(0xe6faff, 0.9, 'smithHeartBreathCrown');
+    // The Thunder's Cradle's crown over the lifted player: storm blue, its
+    // core small (it marks who is lifted without washing them out).
+    this.crownMat = sprite(STORM_BLUE, 0.9, 'smithHeartBreathCrown');
     this.crown.name = 'smithHeartBreathCrown';
     this.crown.visible = false;
     const core = new THREE.Sprite(this.crownMat);
-    core.scale.set(3.4, 3.4, 1);
+    core.scale.set(2.2, 2.2, 1);
     this.crown.add(core);
+    const crownHot = new THREE.Sprite(beaconCoreMat);
+    crownHot.scale.set(0.6, 0.6, 1);
+    this.crown.add(crownHot);
     for (let i = 0; i < 8; i++) {
       const s = new THREE.Sprite(this.crownMat);
       s.scale.set(0.8, 0.8, 1);
@@ -1085,31 +1120,37 @@ export class BreathFightFx {
         FORK_BEAM_SECONDS,
         src && src.templateId === BREATH_GUARDIAN ? 4.5 : 1.3,
       );
-      this.sparksAt(dst.pos.x, dst.pos.y + 1.2, dst.pos.z, 10);
+      this.sparksAt(fxAnchor(dst).x, fxAnchor(dst).y + 1.2, fxAnchor(dst).z, 10);
     } else if (ev.ability === BREATH_CUES.anchor && src && dst) {
       this.beam(src, dst, ANCHOR_BEAM_SECONDS, 1.4, C.calm);
     } else if (ev.ability === BREATH_CUES.toss && dst) {
-      this.particles.puff(dst.pos.x, dst.pos.y + 0.6, dst.pos.z, Math.round(16 * this.density), {
-        speed: 9,
-        up: 4,
-        life: 0.8,
-        size: [0.5, 1.6],
-        color: C.grit,
-        alpha: 0.6,
-        drag: 1.2,
-        radius: 0.8,
-      });
-      this.particles.shockRing(dst.pos.x, dst.pos.z, C.control, 3.5, 0.45);
+      this.particles.puff(
+        fxAnchor(dst).x,
+        fxAnchor(dst).y + 0.6,
+        fxAnchor(dst).z,
+        Math.round(16 * this.density),
+        {
+          speed: 9,
+          up: 4,
+          life: 0.8,
+          size: [0.5, 1.6],
+          color: C.grit,
+          alpha: 0.6,
+          drag: 1.2,
+          radius: 0.8,
+        },
+      );
+      this.particles.shockRing(fxAnchor(dst).x, fxAnchor(dst).z, C.control, 3.5, 0.45);
     } else if (ev.ability === BREATH_CUES.swell && src) {
       // The storm swells: a ring rolling over the whole Cornice.
-      this.particles.shockRing(src.pos.x, src.pos.z, 0xbfefff, 46, 1.6);
-      this.particles.shockRing(src.pos.x, src.pos.z, 0x47b8ff, 30, 1.1);
-      this.sparksAt(src.pos.x, src.pos.y + 6, src.pos.z, 14);
+      this.particles.shockRing(fxAnchor(src).x, fxAnchor(src).z, 0xbfefff, 46, 1.6);
+      this.particles.shockRing(fxAnchor(src).x, fxAnchor(src).z, 0x47b8ff, 30, 1.1);
+      this.sparksAt(fxAnchor(src).x, fxAnchor(src).y + 6, fxAnchor(src).z, 14);
     } else if (ev.ability === BREATH_CUES.tear && src) {
       // The storm tears open (the body flies apart: breath_body.ts): the
       // floor takes the flash, a ring races to the rim.
-      this.particles.shockRing(src.pos.x, src.pos.z, 0xe6faff, 55, 1.4);
-      this.shakeNear(src.pos.x, src.pos.z, 0.6, 80);
+      this.particles.shockRing(fxAnchor(src).x, fxAnchor(src).z, 0xe6faff, 55, 1.4);
+      this.shakeNear(fxAnchor(src).x, fxAnchor(src).z, 0.6, 80);
     }
     return true;
   }
@@ -1515,8 +1556,9 @@ export class BreathFightFx {
   // ---- the objects -----------------------------------------------------------------------
 
   private drape(s: FanSlot, e: Entity, r: number, fill: number, fade = 1, front?: number): void {
-    const y = this.groundY(e.pos.x, e.pos.z);
-    this.kit.drapeFan(s.fan, this.groundY, e.pos.x, y, e.pos.z, 0, r);
+    const eAt = fxAnchor(e);
+    const y = this.groundY(eAt.x, eAt.z);
+    this.kit.drapeFan(s.fan, this.groundY, eAt.x, y, eAt.z, 0, r);
     this.kit.paintFan(s.fan, { fill, clock: this.clock, range: r, fade, front });
   }
 
@@ -1592,29 +1634,24 @@ export class BreathFightFx {
       if (!e) f.mesh.visible = false;
       else {
         const r = e.scale > 0 ? e.scale : T.vortexR;
+        const eAt = fxAnchor(e);
         this.drape(s, e, r, 1, 0.85 + 0.15 * Math.sin(this.clock * 9));
         f.mesh.visible = true;
-        f.mesh.position.set(e.pos.x, this.groundY(e.pos.x, e.pos.z), e.pos.z);
+        f.mesh.position.set(eAt.x, this.groundY(eAt.x, eAt.z), eAt.z);
         f.mesh.scale.set(r * 0.8, VORTEX_FUNNEL.height, r * 0.8);
         f.mat.uniforms.uAlpha.value = this.detail ? 0.75 : 0.55;
         if (this.rand() < dt * 30 * this.density) {
           const a = this.rand() * Math.PI * 2;
-          this.particles.puff(
-            e.pos.x + Math.sin(a) * r,
-            e.pos.y + 0.3,
-            e.pos.z + Math.cos(a) * r,
-            1,
-            {
-              speed: 6,
-              up: 3,
-              life: 0.6,
-              size: [0.3, 0.15],
-              color: C.grit,
-              alpha: 0.8,
-              dir: [Math.cos(a), 0.6, -Math.sin(a)],
-              spread: 0.2,
-            },
-          );
+          this.particles.puff(eAt.x + Math.sin(a) * r, eAt.y + 0.3, eAt.z + Math.cos(a) * r, 1, {
+            speed: 6,
+            up: 3,
+            life: 0.6,
+            size: [0.3, 0.15],
+            color: C.grit,
+            alpha: 0.8,
+            dir: [Math.cos(a), 0.6, -Math.sin(a)],
+            spread: 0.2,
+          });
         }
       }
     }
@@ -1628,30 +1665,25 @@ export class BreathFightFx {
         continue;
       }
       const r = e.scale > 0 ? e.scale : T.galeR;
+      const eAt = fxAnchor(e);
       this.drape(s, e, r, 1, 0.9);
       f.mesh.visible = true;
-      f.mesh.position.set(e.pos.x, this.groundY(e.pos.x, e.pos.z), e.pos.z);
+      f.mesh.position.set(eAt.x, this.groundY(eAt.x, eAt.z), eAt.z);
       f.mesh.scale.set(r, GALE_COLUMN.height, r);
       f.mesh.rotation.y = this.clock * 2;
       f.mat.uniforms.uAlpha.value = this.detail ? 0.85 : 0.65;
       if (this.rand() < dt * 24 * this.density) {
         const a = this.rand() * Math.PI * 2;
-        this.particles.puff(
-          e.pos.x + Math.sin(a) * r,
-          e.pos.y + 0.5,
-          e.pos.z + Math.cos(a) * r,
-          1,
-          {
-            speed: 5,
-            up: 6,
-            life: 1,
-            size: [0.35, 0.2],
-            color: C.grit,
-            alpha: 0.85,
-            dir: [Math.cos(a), 0.8, -Math.sin(a)],
-            spread: 0.25,
-          },
-        );
+        this.particles.puff(eAt.x + Math.sin(a) * r, eAt.y + 0.5, eAt.z + Math.cos(a) * r, 1, {
+          speed: 5,
+          up: 6,
+          life: 1,
+          size: [0.35, 0.2],
+          color: C.grit,
+          alpha: 0.85,
+          dir: [Math.cos(a), 0.8, -Math.sin(a)],
+          spread: 0.25,
+        });
       }
     }
     // The strikes' spots, the charged ground, the cradle.
@@ -1717,7 +1749,8 @@ export class BreathFightFx {
             T.cradleHold)
           : T.cradleHold;
       const charge = s && s.id >= 0 ? cradleLook(this.clock - s.born, hold).charge : 0.6;
-      this.crown.position.set(lifted.pos.x, lifted.pos.y + 1.1, lifted.pos.z);
+      const liftedAt = fxAnchor(lifted);
+      this.crown.position.set(liftedAt.x, liftedAt.y + 1.1, liftedAt.z);
       this.crownMat.opacity = 0.5 + 0.5 * charge * (0.8 + 0.2 * Math.sin(this.clock * 17));
       for (let k = 0; k < this.crownSparks.length; k++) {
         const a = (k / this.crownSparks.length) * Math.PI * 2 + this.clock * (2 + charge * 3);
@@ -1729,7 +1762,7 @@ export class BreathFightFx {
         );
       }
       if (this.rand() < dt * 16 * this.density)
-        this.sparksAt(lifted.pos.x, lifted.pos.y + 1, lifted.pos.z, 3);
+        this.sparksAt(liftedAt.x, liftedAt.y + 1, liftedAt.z, 3);
     }
   }
 
@@ -1740,11 +1773,12 @@ export class BreathFightFx {
       if (m.id < 0) continue;
       const p = world.entities.get(m.id);
       if (!p) continue;
-      const y = this.groundY(p.pos.x, p.pos.z);
-      this.kit.drapeFan(m.fan, this.groundY, p.pos.x, y, p.pos.z, 0, 1.15);
+      const pAt = fxAnchor(p);
+      const y = this.groundY(pAt.x, pAt.z);
+      this.kit.drapeFan(m.fan, this.groundY, pAt.x, y, pAt.z, 0, 1.15);
       this.kit.paintFan(m.fan, { fill: 1, clock: this.clock, range: 1.15 });
       if (this.rand() < dt * 6 * this.density)
-        this.particles.puff(p.pos.x, y + 0.2, p.pos.z, 1, {
+        this.particles.puff(pAt.x, y + 0.2, pAt.z, 1, {
           speed: 0.2,
           up: 2.2,
           life: 1,
@@ -1762,15 +1796,16 @@ export class BreathFightFx {
       if (m.id < 0) continue;
       const p = world.entities.get(m.id);
       if (!p) continue;
-      const y = this.groundY(p.pos.x, p.pos.z);
-      this.kit.drapeFan(m.fan, this.groundY, p.pos.x, y, p.pos.z, yaw, PINNED_MARK.r);
+      const pAt = fxAnchor(p);
+      const y = this.groundY(pAt.x, pAt.z);
+      this.kit.drapeFan(m.fan, this.groundY, pAt.x, y, pAt.z, yaw, PINNED_MARK.r);
       this.kit.paintFan(m.fan, {
         fill: 0.6 + 0.4 * Math.abs(Math.sin(this.clock * 4)),
         clock: this.clock,
         range: PINNED_MARK.r,
       });
       if (this.rand() < dt * 20 * this.density)
-        this.particles.puff(p.pos.x + d.x * 0.6, y + 0.4, p.pos.z + d.z * 0.6, 2, {
+        this.particles.puff(pAt.x + d.x * 0.6, y + 0.4, pAt.z + d.z * 0.6, 2, {
           speed: 5,
           up: 2,
           life: 0.5,
@@ -1788,18 +1823,19 @@ export class BreathFightFx {
       if (m.id < 0) continue;
       const p = world.entities.get(m.id);
       if (!p) continue;
-      const y = this.groundY(p.pos.x, p.pos.z);
-      this.kit.drapeFan(m.fan, this.groundY, p.pos.x, y, p.pos.z, 0, 1.4);
+      const pAt = fxAnchor(p);
+      const y = this.groundY(pAt.x, pAt.z);
+      this.kit.drapeFan(m.fan, this.groundY, pAt.x, y, pAt.z, 0, 1.4);
       this.kit.paintFan(m.fan, { fill: 1, clock: this.clock, range: 1.4 });
       if (b < this.beacons.length) {
         const beacon = this.beacons[b];
         const glow = this.beaconGlows[b];
         beacon.mesh.visible = true;
-        beacon.mesh.position.set(p.pos.x, p.pos.y + 2.4, p.pos.z);
+        beacon.mesh.position.set(pAt.x, pAt.y + 2.4, pAt.z);
         beacon.mesh.scale.set(0.35, 14, 0.35);
         beacon.mat.uniforms.uAlpha.value = 0.55 + 0.45 * Math.abs(Math.sin(this.clock * 11));
         glow.visible = true;
-        glow.position.set(p.pos.x, p.pos.y + 2.6, p.pos.z);
+        glow.position.set(pAt.x, pAt.y + 2.6, pAt.z);
         b++;
       }
     }
@@ -1834,11 +1870,17 @@ export class BreathFightFx {
       const color =
         id === BREATH_CASTS.fork ? C.danger : id === BREATH_CASTS.cradle ? C.soak : C.lethal;
       this.kit.layOutFan(slot.fan, 360, { color, accent: C.accent });
+      if (this.barPaint)
+        this.paints.setLook(
+          this.barPaint,
+          id === BREATH_CASTS.fork ? 'fork' : id === BREATH_CASTS.cradle ? 'cradle' : 'drawnBar',
+        );
     }
     slot.fan.group.visible = true;
     const fill = g.castTotal > 0 ? Math.max(0, Math.min(1, 1 - g.castRemaining / g.castTotal)) : 1;
-    const y = this.groundY(target.pos.x, target.pos.z);
-    this.kit.drapeFan(slot.fan, this.groundY, target.pos.x, y, target.pos.z, 0, r);
+    const targetAt = fxAnchor(target);
+    const y = this.groundY(targetAt.x, targetAt.z);
+    this.kit.drapeFan(slot.fan, this.groundY, targetAt.x, y, targetAt.z, 0, r);
     this.kit.paintFan(slot.fan, { fill, clock: this.clock, range: r });
   }
 
@@ -1863,26 +1905,48 @@ export class BreathFightFx {
     sc.mesh.scale.set(r * 2, 1, r * 2);
     sc.mesh.rotation.y = this.rand() * Math.PI * 2;
     sc.mesh.visible = true;
-    this.sparksAt(x, y + 0.5, z, Math.round(12 * size));
+    this.sparksAt(x, y + 0.5, z, Math.round(22 * size));
     this.particles.puff(x, y + 0.4, z, Math.round(6 * size * this.density) + 2, {
       speed: 3,
       up: 1.4,
       life: 1.4,
       size: [1, 3],
-      color: [0.5, 0.55, 0.6],
-      alpha: 0.35,
+      color: [0.36, 0.4, 0.5],
+      alpha: 0.45,
       drag: 1.4,
       radius: r * 0.5,
     });
-    this.particles.shockRing(x, z, 0xd8f6ff, r * 1.2, 0.45);
-    this.shakeNear(x, z, 0.18 * size, 30);
+    // The strike's flash: a blue white burst on the stone, a tight white hot
+    // ring, then rings of saturated storm blue racing past the mark's edge
+    // (cosmetic: the scorch keeps the spot).
+    this.particles.puff(x, y + 0.8, z, Math.round(4 * size) + 2, {
+      speed: 2,
+      life: 0.2,
+      size: [r * 0.9, r * 1.6],
+      color: [0.62, 0.8, 1],
+      alpha: 0.95,
+      pool: 'glow',
+    });
+    this.particles.puff(x, y + 0.3, z, Math.round(5 * size) + 2, {
+      speed: 1,
+      life: 0.35,
+      size: [r * 0.5, r * 0.9],
+      color: [0.1, 0.4, 1],
+      alpha: 0.8,
+      pool: 'glow',
+      radius: r * 0.4,
+    });
+    this.particles.shockRing(x, z, 0xeef6ff, r * 0.9, 0.22);
+    this.particles.shockRing(x, z, 0x2a86ff, r * 1.5, 0.45);
+    this.particles.shockRing(x, z, 0x1446e0, r * 2.3, 0.75);
+    this.shakeNear(x, z, 0.22 * size, 30);
   }
 
   private sparksAt(x: number, y: number, z: number, n: number): void {
     this.particles.puff(x, y, z, Math.max(1, Math.round(n * this.density)), {
-      speed: 6,
-      up: 2,
-      life: 0.35,
+      speed: 9,
+      up: 3,
+      life: 0.45,
       size: [0.3, 0.06],
       color: C.spark,
       alpha: 1,

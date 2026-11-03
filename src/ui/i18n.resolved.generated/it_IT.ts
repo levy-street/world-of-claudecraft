@@ -1038,14 +1038,14 @@ export const it_IT: EnTranslations = {
       "fateThreadsSentenceReady": "Tre Filamenti del Fato: Sentenza può consumarli per un aumento del 18% dei danni."
     },
     "priest": {
-      "gloomtitheLabel": "Gloomtithe",
-      "bombLabel": "Tithe Bomb",
-      "gloomtitheStatus": "{value} of {max} Gloomtithe",
-      "bombStatus": "{value} of {max} Tithe Bomb charges",
-      "bombReady": "Ready",
+      "gloomtitheLabel": "Decima oscura",
+      "bombLabel": "Bomba della decima",
+      "gloomtitheStatus": "{value} cariche di Decima oscura su {max}",
+      "bombStatus": "{value} cariche di Bomba della decima su {max}",
+      "bombReady": "Pronta",
       "chargeCount": "{value} / {max}",
-      "gloomtitheTooltip": "Gloomtithe: up to 5 spendable charges. Void Rupture consumes 3; Vampiric Touch consumes 2 for 30% more damage; Call Tithefiend consumes your bank. Generating charges also fills Tithe Bomb, even while this bank is full.",
-      "bombTooltip": "Tithe Bomb: generate 20 Gloomtithe to prepare one bomb. Spending Gloomtithe does not add progress. Progress lasts between fights. Dying or starting a raid boss resets it. A completed cast consumes the bomb; cancelling keeps it."
+      "gloomtitheTooltip": "Decima oscura: fino a 5 cariche spendibili. Rottura del Vuoto ne consuma 3; Tocco vampirico ne consuma 2 per infliggere il 30% di danni in più; Evoca Demone della Decima consuma l’intera riserva. Generare cariche fa progredire anche la Bomba della decima, persino quando la riserva è piena.",
+      "bombTooltip": "Bomba della decima: genera 20 cariche di Decima oscura per preparare una bomba. Spendere Decima oscura non aggiunge progressi. I progressi persistono tra i combattimenti. Morire o iniziare uno scontro con un boss d’incursione li azzera. Un lancio completato consuma la bomba; annullarlo la conserva."
     },
     "procOverlay": {
       "soulFragmentsMeter": "Frammenti d'Anima",
@@ -2600,6 +2600,7 @@ export const it_IT: EnTranslations = {
       "name_lantern_hall_destrier": "Destriero della Sala della Lanterna",
       "name_chimeglass_tortoise": "Tolliver il Chimeglass",
       "name_rickshaw_mount": "Risciò Vincolato alle Ossa",
+      "name_emberbristle_broom": "Scopa dalle setole ardenti",
       "name_wobbles_slime": "Wobbles la Melma",
       "name_nightwing_chimera": "Chimera Ala Notturna",
       "desc_valorsteed": "Un destriero robusto dal passo sicuro con una sella di cuoio.",
@@ -2623,7 +2624,8 @@ export const it_IT: EnTranslations = {
       "desc_lantern_hall_destrier": "Il cavallo da guerra della Sala della Lanterna, bardato di quercia e ferro sotto l'azzurro della gilda, con due lanterne da tempesta che oscillano dalla sella per illuminare la via di casa.",
       "desc_nightwing_chimera": "Una viverna crepuscolare a due teste proveniente dai rami antichi, che riposa sulle zampe posteriori artigliate e sfiora il terreno con ali incise di rune arcane.",
       "desc_chimeglass_tortoise": "Una tartaruga salata che ha superato tre generazioni di carovane. I calderai gli montarono gli occhiali di vetro anti-tempesta e gli appesero una campana di bronzo al collo, così la strada lo sentì molto prima di vederlo.",
-      "desc_rickshaw_mount": "Un carro d'ossa sferragliante, con un gregario ossuto imbragato alle stanghe, che ti trascina in una corsa sfrenata."
+      "desc_rickshaw_mount": "Un carro d'ossa sferragliante, con un gregario ossuto imbragato alle stanghe, che ti trascina in una corsa sfrenata.",
+      "desc_emberbristle_broom": "Una scopa del raccolto legata con un nastro arancione, che fluttua a un palmo dal suolo e sparge braci dalle setole. Una ricompensa permanente della Notte delle zucche."
     },
     "mountTraining": {
       "mountPrompt": "Premi {key} per salire sul Valorsteed di addestramento.",
@@ -4672,7 +4674,10 @@ export const it_IT: EnTranslations = {
       }
     },
     "auraEffect": {
-      "stilledMindCrit": "Your next Mindfracture or Void Rupture is a guaranteed critical strike if it hits. Other spells do not consume this bonus. Void Rupture still consumes 3 Gloomtithe charges. A resisted cast consumes the bonus.",
+      "gourdlight": {
+        "thatchbound": "Vecchio Thatchgrin tira i tuoi fili. Non puoi agire: vieni condotto verso l’alleato più vicino e lo colpisci ogni {every} s, infliggendo da {min} a {max} danni (fino a {mult} volte tanto contro un alleato di livello {level}). Termina in anticipo se subisci danni pari al {pct}% della tua salute massima o se un alleato dissolve l’effetto (Magia)."
+      },
+      "stilledMindCrit": "La tua prossima Frattura Mentale o Rottura del Vuoto infligge un colpo critico garantito se va a segno. Gli altri incantesimi non consumano questo bonus. Rottura del Vuoto consuma comunque 3 cariche di Decima oscura. Un lancio resistito consuma il bonus.",
       "wildheart": {
         "packBond": "Subisce il {pct}% di danni in meno mentre il compagno è vicino. Separa il Signore delle Bestie dal suo giaguaro per spezzare il legame.",
         "packBondFury": "Infligge il {pct}% di danni in più mentre il compagno è vicino.",
@@ -4753,7 +4758,9 @@ export const it_IT: EnTranslations = {
       "breathGuardian": {
         "portalA": "When this ends, Portal A opens exactly where you stand. Stand near the Knotted Gale. You cannot carry it this round.",
         "portalB": "When this ends, Portal B opens exactly where you stand. Stand at the lip of a gap. You cannot carry the Knotted Gale this round.",
-        "laden": "You carry a Knotted Gale: you walk at {walk}% speed, you cannot blink, charge or leap, and no wind, pull, blast or throw can move you. Either portal takes you to the other. Press Interact at the lip of any gap to throw it into the void. When this ends it bursts and kills everyone on the Cornice.",
+        "portalC": "When this ends, Portal C opens exactly where you stand. It links to Portal D only. Stand near the other Knotted Gale. You cannot carry it this round.",
+        "portalD": "When this ends, Portal D opens exactly where you stand. It links to Portal C only. Stand at the lip of a gap away from Portal B. You cannot carry the Knotted Gale this round.",
+        "laden": "You carry a Knotted Gale: you walk at {walk}% speed, you cannot blink, charge or leap, and no wind, pull, blast or throw can move you. Each portal takes you to its partner: A to B, C to D. Press Interact at the lip of any gap to throw it into the void. When this ends it bursts and kills everyone on the Cornice.",
         "wind": "The Guardian of the Breath's wind carries you {speed} yd a second the way it blows. Walk against it to hold your ground; it does not interrupt your casts. Pressed against the rim's wall you take {pinMin} to {pinMax} damage every second. Where the wall is broken there is nothing to stop you: you fall into the void.",
         "draw": "The Guardian draws breath and pulls you toward it, {speed} yd a second. Its vortex deals {min} to {max} damage every {tick} sec to whoever stands before its mouth. Then Bellows Gust deals {gustMin} to {gustMax} damage to everyone on the Cornice and throws them {throw} yd outward.",
         "pinned": "Pressed against the rim's wall by the wind: {min} to {max} damage every second until the wind falls calm or you walk clear of the wall.",
@@ -4860,6 +4867,7 @@ export const it_IT: EnTranslations = {
       "spellHaste": "Aumenta la velocità di lancio degli incantesimi del {pct}%",
       "sated": "Non puoi beneficiare di un altro effetto di velocità di gruppo",
       "cauterizeFatigue": "La Cauterizzazione non può prevenire un altro colpo letale",
+      "seasonalCosmetic": "Solo cosmetico: nessun effetto sul combattimento",
       "castShield": "Il lancio non può essere interrotto né ritardato dai danni",
       "dmgDone": "Aumenta i danni inflitti del {pct}%",
       "dmgDoneReduce": "Riduce i danni inflitti del {pct}%",
@@ -5007,6 +5015,7 @@ export const it_IT: EnTranslations = {
       "dodgeReduce": "Riduce la probabilità di schivata del {pct}%",
       "damageReduction": "Riduce tutti i danni subiti del {pct}%",
       "slumber": "Dorme fino all'alba. Non può essere attaccato e non si sveglierà per nessuno.",
+      "slumberNight": "Pende inerte dal suo palo fino al calare della notte. Non può essere attaccato.",
       "guardianWard": "Il prossimo colpo nemico letale ti ripristina al {pct}% della salute",
       "armorFlat": "Riduce l'armatura di {value}",
       "armorFlatStacks": "Riduce l'armatura di {value} ({stacks} accumuli)",
@@ -5086,7 +5095,8 @@ export const it_IT: EnTranslations = {
     "worldBoss": {
       "spawn": "{name} si erge su {zone}!",
       "wake": "{name} si sveglia su {zone}!",
-      "sleep": "{name} dorme fino all'alba."
+      "sleep": "{name} dorme fino all'alba.",
+      "sleepUntilNightfall": "{name} dorme fino al calare della notte."
     },
     "auth": {
       "appleLoginCta": "Continua con Apple",
@@ -7350,8 +7360,12 @@ export const it_IT: EnTranslations = {
       "aLine": "It opens at your feet in {seconds} sec. Stand near the Knotted Gale.",
       "bTitle": "You are Portal B!",
       "bLine": "It opens at your feet in {seconds} sec. Stand at the lip of a gap.",
+      "cTitle": "You are Portal C!",
+      "cLine": "It opens at your feet in {seconds} sec. Stand near the other Knotted Gale.",
+      "dTitle": "You are Portal D!",
+      "dLine": "It opens at your feet in {seconds} sec. Stand at a gap away from Portal B.",
       "carryTitle": "You carry the Knotted Gale!",
-      "carryLine": "Either portal takes you to the other. Throw it from the lip of a gap. It bursts in {seconds} sec.",
+      "carryLine": "Each portal takes you to its partner: A to B, C to D. Throw it from the lip of a gap. It bursts in {seconds} sec.",
       "lipTitle": "Throw it now!",
       "lipLine": "You stand at the lip of a gap. It bursts in {seconds} sec.",
       "throwKey": "Press {key} at the lip to throw",
@@ -7373,6 +7387,7 @@ export const it_IT: EnTranslations = {
         "stormGust": "A storm gust gathers! Brace against the wind!",
         "knot": "A Knotted Gale falls! Carry it to a gap and throw it into the void!",
         "knotPortals": "Portal A on {a}, Portal B on {b}!",
+        "knotPortals2": "Portal C on {c}, Portal D on {d}!",
         "knotTaken": "{player} takes up the Knotted Gale!",
         "knotDropped": "{player} falls! The Knotted Gale is free again!",
         "knotFell": "{player} takes the Knotted Gale into the void!",
@@ -8607,6 +8622,107 @@ export const it_IT: EnTranslations = {
         "0": "Un compost adatto, i letti sopravviveranno. Il vecchio mugnaio ha sepolto qualcosa prima di andarsene. Il suo mulino ancora gira nell'angolo più lontano dei giardini. Vai e statti in piedi accanto ad esso.",
         "2": "Quindi il mulino ti ha mandato lungo la strada costiera. Il faro custodisce un ultimo segreto: a nord-ovest da esso, appena fuori dal sentiero, il prato è stato tagliato e rimesso. Scava lì."
       }
+    }
+  },
+  "seasonal": {
+    "pumpkins": {
+      "name": "Zucca infestata",
+      "title": "Zucche infestate",
+      "world": "Mondo",
+      "progress": "{label}: {current}/{total}",
+      "found": "Accendi una Zucca infestata in {zone}: {count}/{total}. Dolcetti della Notte delle zucche ricevuti: {sweets}.",
+      "flash": "Zucca infestata trovata! {count}/{total}"
+    },
+    "event": {
+      "gourdlight_eve": {
+        "name": "Notte delle zucche"
+      }
+    },
+    "trickOrTreat": {
+      "row": "Dolcetto o scherzetto!",
+      "rowAria": "Chiedi dolcetto o scherzetto a {name}",
+      "knockedHint": "Oggi hai già bussato qui. La porta si riapre dopo il ripristino giornaliero.",
+      "treat": "{name} ti porge un dolcetto.",
+      "trick": "{name} ti fa uno scherzo: {trick}!",
+      "alreadyKnocked": "Oggi hai già chiesto dolcetto o scherzetto a {name}.",
+      "notActive": "La Notte delle zucche non è attiva al momento.",
+      "tooFar": "Avvicinati per bussare.",
+      "treatFlash": {
+        "one": "Dolcetto! {count} Dolcetto della Notte delle zucche",
+        "few": "Dolcetto! {count} Dolcetti della Notte delle zucche",
+        "many": "Dolcetto! {count} Dolcetti della Notte delle zucche",
+        "other": "Dolcetto! {count} Dolcetti della Notte delle zucche"
+      },
+      "trickFlash": "Scherzetto! {trick}"
+    },
+    "tricks": {
+      "gourdlight_trick_bat": "Follia di pipistrello",
+      "gourdlight_trick_skeleton": "Ossa tintinnanti",
+      "gourdlight_trick_fumes": "Fumi verdi",
+      "gourdlight_trick_strawling": "Aspetto da omino di paglia",
+      "gourdlight_costume_skeleton": "Costume da scheletro",
+      "gourdlight_costume_ghost": "Costume da fantasma",
+      "gourdlight_costume_bat": "Costume da pipistrello"
+    },
+    "pumpkinHead": {
+      "on": "Indossi la Testa di zucca intagliata.",
+      "off": "Ti togli la Testa di zucca intagliata."
+    },
+    "jarTrick": "Il barattolo si apre di scatto: {trick}!",
+    "guise": "L’amuleto crepita e la paglia ti avvolge: {trick}!",
+    "costume": "Bevi l’intruglio e ti trasformi: {trick}!",
+    "titleGranted": "Leggi la pergamena. Nuovo titolo ottenuto: {title}.",
+    "titleKnown": "Possiedi già questo titolo, quindi conservi la pergamena.",
+    "boundItemGone": "La Notte delle zucche è finita e il tuo oggetto {item} torna a sbriciolarsi in paglia.",
+    "itemUse": {
+      "pumpkinHead": "Uso: indossa o togli una zucca intagliata e illuminata dall’interno, portata sopra l’elmo. Cosmetico.",
+      "trickJar": "Uso: ti fa uno scherzo casuale e innocuo per alcuni secondi. Cosmetico.",
+      "pouch": "Uso: aprilo per ricevere {count} Dolcetti della Notte delle zucche.",
+      "strawlingCharm": "Uso: ti trasforma in uno degli omini di paglia del Vecchio Thatchgrin per {seconds} secondi. Non utilizzabile in combattimento. Non si consuma mai. Cosmetico.",
+      "sweet": "Si ottiene chiedendo dolcetto o scherzetto durante la Notte delle zucche. Hester Gourdwick li scambia con oggetti cosmetici ai suoi banchi di Eastbrook, Fenbridge e Highwatch.",
+      "costumeSkeleton": "Uso: ti trasforma in uno scheletro tintinnante per {minutes} minuti. Si consuma. Non utilizzabile in combattimento; entrare in combattimento termina l’effetto. Cosmetico.",
+      "costumeGhost": "Uso: ti trasforma in un fantasma fluttuante per {minutes} minuti. Si consuma. Non utilizzabile in combattimento; entrare in combattimento termina l’effetto. Cosmetico.",
+      "costumeBat": "Uso: ti trasforma in un pipistrello svolazzante per {minutes} minuti. Si consuma. Non utilizzabile in combattimento; entrare in combattimento termina l’effetto. Cosmetico.",
+      "toyPrank": "Uso: lanciala contro un altro giocatore visibile entro {range} metri. La sua testa diventa una zucca luminosa per {seconds} secondi, rimovibile con un clic destro. Nessuno dei due può essere in combattimento e tu non puoi essere in furtività. Non si consuma mai: riutilizzabile dopo {cooldown} secondi. Si conserva permanentemente ed è utilizzabile tutto l’anno. Cosmetico.",
+      "toyLantern": "Uso: posa la lanterna davanti a te. Un piccolo fantasma ti gira intorno per {seconds} secondi. Non utilizzabile in combattimento o in furtività. Non si consuma mai: riutilizzabile dopo {cooldown} secondi. Si conserva permanentemente ed è utilizzabile tutto l’anno. Cosmetico.",
+      "toyBats": "Uso: apri il sacco. Uno sciame di pipistrelli stridenti ne esce e si disperde intorno a te per {seconds} secondi. Non utilizzabile in combattimento o in furtività. Non si consuma mai: riutilizzabile dopo {cooldown} secondi. Si conserva permanentemente ed è utilizzabile tutto l’anno. Cosmetico.",
+      "toyCandleShadows": "Uso: accendi la candela davanti a te. Per {seconds} secondi le sue fiamme proiettano sul terreno circostante le ombre danzanti di un gatto, un pipistrello e una strega, visibili a chiunque sia nelle vicinanze. Non utilizzabile in combattimento o in furtività. Non si consuma mai: riutilizzabile dopo {cooldown} secondi. Si conserva permanentemente ed è utilizzabile tutto l’anno. Cosmetico.",
+      "toyCauldron": "Uso: posa un grande calderone ribollente davanti a te. Rimane per {standing} secondi, e qualsiasi giocatore che vi beva esplode in bolle verdi e si trasforma in un goblin per {seconds} secondi, sostituendo l’eventuale costume indossato. Non puoi posarlo né berne in combattimento o in furtività; entrare in combattimento termina la forma di goblin. Non si consuma mai: riutilizzabile dopo {cooldown} secondi. Si conserva permanentemente ed è utilizzabile tutto l’anno. Cosmetico.",
+      "titleWrit": "Uso: ottieni il titolo {title} per questo personaggio, da indossare dal Libro delle Imprese. Si consuma. Si conserva se possiedi già il titolo.",
+      "broomSources": "Si acquista da Hester Gourdwick per {count} Covoni intessuti di braci oppure, raramente, si trova sul Vecchio Thatchgrin in un giorno in cui lo depredi. Per cavalcarla serve l’abilità di equitazione. Si conserva permanentemente e si può cavalcare tutto l’anno.",
+      "sheaf": "Il Vecchio Thatchgrin ne dà uno ogni giorno in cui lo depredi, finché non possiedi la Scopa dalle setole ardenti. Hester Gourdwick ne scambia {count} con la scopa ai suoi banchi di Eastbrook, Fenbridge e Highwatch. I covoni non spesi si conservano per la prossima Notte delle zucche."
+    },
+    "toy": {
+      "prank": "Lanci la zucca. Si spiaccica su {name}!",
+      "lantern": "Posi la lanterna e un piccolo fantasma ne esce fluttuando per farti compagnia.",
+      "bats": "Apri il sacco e ne esce uno sciame di pipistrelli spaventati!",
+      "candleShadows": "Accendi la candela e le ombre iniziano a danzare attorno alle sue fiamme.",
+      "cauldron": "Posi il calderone e inizia a ribollire.",
+      "cauldronDrink": "Bevi dal calderone, esplodi in bolle verdi e ti trasformi in un goblin!",
+      "pranked": "{name} ti spiaccica una zucca in testa! Toglila con un clic destro o indossala con orgoglio.",
+      "prankedFlash": "{name} ti ha fatto uno scherzo!",
+      "prankNeedsPlayer": "La zucca si spiaccica solo su un altro giocatore che non sia in combattimento.",
+      "hidden": "Esci prima dalle ombre: un giocattolo ti tradirebbe."
+    },
+    "itemSource": {
+      "pumpkinHead": "Lasciata dal Vecchio Thatchgrin, nel suo campo di zucche oltre il Prato dei cinghiali, la prima volta che lo depredi. Nessun mercante la vende."
+    },
+    "boo": {
+      "row": "Bu!",
+      "rowAria": "Sbuca davanti a {name} e urla bu",
+      "needsCostume": "Mettiti prima un costume: un intruglio da travestimento, uno scherzo da pipistrello o scheletro, l’Amuleto dell’omino di paglia, la Testa di zucca intagliata o un sorso da goblin dal Calderone Verdegorgoglio.",
+      "frightenedHint": "{name} sobbalza ancora per il tuo ultimo spavento. Cerca qualcun altro.",
+      "landed": "Sbucando davanti a {name}, urli BU! Un grido squarcia l’aria e per poco non cade tutto.",
+      "flash": "BU! {name} ha preso uno spavento!",
+      "noCostume": "Senza costume, {name} ti ride soltanto in faccia. Mettine uno prima.",
+      "already": "{name} ha avuto abbastanza spaventi per oggi.",
+      "notOnErrand": "Hester non ti ha chiesto di spaventare nessuno oggi."
+    },
+    "tokenPrice": "{count} {item}",
+    "thatchgrin": {
+      "poleBound": "Legato al palo",
+      "wakeYell": "La NOTTE cala sull’orto! Chi cammina nel MIO campo?",
+      "sleepYell": "Il sole è sorto. Di nuovo sul palo, di nuovo di guardia."
     }
   },
   "dungeonGuide": {
@@ -9903,7 +10019,7 @@ export const it_IT: EnTranslations = {
       "framesGovernedTalkingHead": "Modifica fotogrammi allenta anche il pannello Dialogo, che trasporta la linea parlata di un NPC mentre quell'NPC è fuori dalla tua vista; indossa il chip con il nome mentre è sciolto.",
       "framesGovernedShardpike": "Modifica riquadri sblocca anche la barra della picca di schegge, la breve fila di azioni dello strumento di missione che compare accanto alle barre delle azioni solo mentre trasporti la picca di schegge; quando è sbloccata mostra la sua etichetta, così puoi posizionarla prima dello scontro anziché durante.",
       "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
-      "framesGovernedPriest": "Edit Frames also lets you move the Shadow priest's Gloomtithe and Tithe Bomb medallion.",
+      "framesGovernedPriest": "Modifica riquadri permette anche di spostare il medaglione di Decima oscura e Bomba della decima del sacerdote Ombra.",
       "framesGovernedResourceAndHill": "Attiva Separa barra delle risorse nella scheda Riquadri: Modifica riquadri sbloccherà anche la barra delle risorse, permettendoti di posizionare mana, energia o rabbia separatamente dove preferisci. Larghezza della barra delle risorse e Altezza della barra delle risorse, nella stessa scheda, ne regolano le dimensioni. Modifica riquadri sblocca anche la barra del Re della Collina; Opacità dello sfondo del Re della Collina, nella stessa scheda, attenua il pannello mantenendo il testo ben leggibile.",
       "barsTitle": "Barre, timer e testo di combattimento",
       "barsBody": "La tua barra di lancio appare al centro dello schermo, appena sopra le barre delle azioni, ogni volta che lanci o canalizzi un incantesimo, e riporta il nome dell'incantesimo e il tempo rimanente. Anche il tuo bersaglio ha una propria barra di lancio sul suo riquadro, così puoi vedere cosa sta arrivando e rispondere.\n\nUna sottile barra dell'attacco sta sotto la tua barra di lancio e si riempie tra un colpo d'arma e l'altro, così chi attacca in mischia o a distanza può vedere quando arriverà il prossimo colpo automatico.\n\nLa tua barra dell'esperienza occupa tutta la larghezza sotto le barre delle azioni, suddivisa in segmenti, con un tratto più chiaro che mostra l'esperienza da riposo che hai accumulato.\n\nNuota sott'acqua e in cima allo schermo compare una barra del Fiato blu. Si consuma finché hai la testa sott'acqua, lampeggia di rosso quando si esaurisce e inizi ad annegare, e si riempie di nuovo in fretta non appena riemergi. Barra spaziatrice ti fa nuotare verso l'alto, e il tasto Nuota Verso il Basso, Ctrl di default, ti porta più in profondità.\n\nI danni e le cure salgono fluttuando sopra ciò che hanno colpito come piccoli numeri, così puoi leggere uno scontro senza leggere del testo. La scheda Combattimento nella tua chat conserva il resoconto scritto completo.",
@@ -10808,6 +10924,7 @@ export const it_IT: EnTranslations = {
       "hillBodyRamp": "Ogni due ore compare una collina in Drakelands, La Distesa di Frostveil o Amberfall. Il reame riceve un preavviso di quindici minuti e il cerchio viene segnato su terreno aperto. La collina resta attiva per trenta minuti. Entrare nel cerchio attivo alza la bandiera PvP mondiale secondo i normali requisiti di livello, anche per i membri di un'incursione. Il gruppo con più giocatori idonei all'interno conquista la collina dopo un minuto di maggioranza ininterrotta; un giocatore solo conta come gruppo di uno, ma i membri di incursioni e i giocatori sotto il livello PvP richiesto non possono conquistare né guadagnare Onore della collina. Ogni difensore all'interno guadagna Onore a un ritmo crescente. Le assegnazioni e la loro crescita sono più rapide, mantenendo l'Onore totale del precedente evento di quarantacinque minuti. Un cambio di controllo azzera la crescita. Uscire mantiene la bandiera alzata; /pvp off richiede i soliti cinque minuti e non può completarsi dentro una collina attiva o in combattimento. La barra mostra controllo, numero di giocatori e progresso di conquista; /hill indica la posizione.",
       "hillBodyPause": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls, and every five minutes while it stands the realm is told where it is and which groups have held it longest. The party with the most players standing inside contests the hill, and after thirty seconds of majority the hill is theirs. A rival party walking in only pauses that count until yours leads again; it starts over only if nobody from your party is left alive inside. A lone player counts as a party of one and keeps a hill they hold when they form a party, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns Honor every minute, and the longer the same party holds it, the more each minute pays: a full party holding an uncontested hill for its whole stand earns about as much as three battleground wins. When the hill changes hands, the new holders start the count from the beginning. When it falls, if the group that held it longest in total held it for at least ten minutes, everyone who stood inside for that group for at least a minute, and is still in that group, earns one win toward the PvP row of the Weekly Vault. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
       "hillBodyFlat": "Ogni tre ore, in un momento imprevedibile, tutto il reame viene avvisato che tra quindici minuti apparirà una collina in una delle zone settentrionali, e il suo cerchio viene segnato su terreno aperto. Rimane per quarantacinque minuti, poi scompare. Nel frattempo, ogni cinque minuti vengono annunciate la posizione e le classifiche dei gruppi con il maggior tempo totale di controllo. Il gruppo con più giocatori nel cerchio contende la collina e la conquista dopo trenta secondi complessivi di superiorità numerica. L'arrivo di un gruppo rivale mette solo in pausa il conteggio finché il tuo gruppo non torna in vantaggio; il conteggio riparte da zero solo se nel cerchio non resta alcun membro vivo del tuo gruppo. Un giocatore solo conta come un gruppo di una persona e conserva la collina quando forma un gruppo, ma i membri delle incursioni non contano affatto. Ogni membro del gruppo che controlla la collina e si trova nel cerchio riceve la stessa quantità di Onore ogni minuto, indipendentemente dalla durata del controllo. Un gruppo completo che la tiene indisturbato per tutta la sua durata guadagna circa quanto tre vittorie nei campi di battaglia. Quando scompare, se il gruppo con il maggior controllo totale ha accumulato almeno dieci minuti, chiunque sia rimasto nel cerchio almeno un minuto durante il controllo di quel gruppo e ne faccia ancora parte ottiene una vittoria per la riga PvP del Forziere Settimanale. Una barra sopra il campo mostra chi la controlla, i giocatori dei due schieramenti e il conteggio di conquista; /hill in chat indica dove si trova.",
+      "hillBodyTwoHour": "Una volta ogni due ore, in un momento imprevedibile, tutto il reame viene avvisato che tra quindici minuti sorgerà una collina in una delle zone settentrionali, e il cerchio dove apparirà viene segnato in campo aperto. Rimane per trenta minuti, poi scompare. Mentre è presente, ogni cinque minuti il reame viene informato della sua posizione e dei gruppi che l’hanno controllata più a lungo. Il gruppo con più giocatori dentro il cerchio contende la collina e la conquista dopo trenta secondi di maggioranza. L’ingresso di un gruppo rivale mette solo in pausa il conteggio finché il tuo gruppo non torna in vantaggio; riparte da zero soltanto se non rimane nessun membro vivo del tuo gruppo all’interno. Un giocatore solo conta come un gruppo di una persona e mantiene la collina se forma un gruppo, ma i membri di un’incursione non contano affatto. Mentre un gruppo controlla la collina, ogni suo membro all’interno guadagna la stessa quantità di Onore ogni minuto, indipendentemente dalla durata del controllo. Un gruppo completo che la mantiene incontrastata per tutta la sua durata guadagna quindi circa quanto con due vittorie nei campi di battaglia. Quando scompare, se il gruppo che l’ha controllata più a lungo in totale l’ha tenuta per almeno dieci minuti, chiunque sia rimasto all’interno per quel gruppo per almeno un minuto e ne faccia ancora parte ottiene una vittoria per la riga PvP del forziere settimanale. Una barra sopra il campo mostra chi la controlla, i vostri numeri rispetto agli avversari e il tempo di contesa; /hill in chat ne indica la posizione.",
       "limitsBodyRaids": "Sconfiggere lo stesso giocatore più e più volte paga sempre meno e presto nulla, e il tuo conteggio contro quel giocatore riparte da capo solo circa un'ora dopo la prima di quelle uccisioni, quindi appostarsi su una singola vittima non vale mai l'attesa. Un bersaglio molto al di sotto del tuo livello non paga assolutamente nulla. I Campi di Battaglia e i Colossei seguono le proprie regole mentre sei al loro interno, e pagano più Onore del mondo aperto, quindi il PvP mondiale è la strada più lenta verso lo stesso mercante. Le incursioni non guadagnano nulla dalle uccisioni nel mondo: un membro di un'incursione non riceve Onore né monete e non riduce la quota di nessun altro, quindi combatti in gruppo per essere pagato."
     },
     "thornhollowPage": {
@@ -15549,6 +15666,7 @@ export const it_IT: EnTranslations = {
       "accountSuspended": "Questo account è sospeso fino al {date}.",
       "alreadyInWorld": "Il personaggio è già nel mondo.",
       "accountSessionLimit": "Troppi personaggi di questo account sono già nel mondo.",
+      "worldFightHold": "Un altro personaggio di questo account è ancora nel mondo dopo un combattimento. Riprova tra qualche minuto.",
       "takenOver": "Il tuo personaggio è stato preso in controllo da un'altra sessione.",
       "vaultMailRecovering": "Il tuo premio del caveau tramite posta è in fase di ripristino. Riprova tra poco.",
       "renameBeforeEntering": "Questo personaggio deve essere rinominato prima di entrare nel mondo.",
@@ -18442,16 +18560,16 @@ export const it_IT: EnTranslations = {
         "description": "Incanala per 3 sec, infliggendo {damage} danni da Ombra ogni secondo. Il danno aumenta con il Potere Magico."
       },
       "vampiric_touch": {
-        "name": "Vampiric Touch",
-        "description": "Deal {damage} Shadow damage over 15 sec, once every 3 sec. Damage increases with Spell Power and ticks can critically strike. Each tick shares healing equal to 20% of the health lost by the enemy among you and injured party members within 30 yards; in a raid, only your subgroup receives this healing. If you have at least 2 Gloomtithe charges, applying this effect consumes 2 to increase all its damage by 30%."
+        "name": "Tocco vampirico",
+        "description": "Infligge {damage} danni da Ombra nell’arco di 15 s, con un effetto ogni 3 s. I danni aumentano con la potenza magica e gli effetti periodici possono essere critici. Ogni effetto distribuisce cure pari al 20% della salute persa dal nemico tra te e i membri feriti del gruppo entro 30 metri; nelle incursioni riceve queste cure solo il tuo sottogruppo. Se possiedi almeno 2 cariche di Decima oscura, applicare questo effetto ne consuma 2 per aumentare tutti i suoi danni del 30%."
       },
       "void_rupture": {
-        "name": "Void Rupture",
-        "description": "Consume 3 Gloomtithe charges to rupture an enemy for {damage} Shadow damage. Damage increases with Spell Power and can critically strike. Requires 3 charges and consumes them even if resisted."
+        "name": "Rottura del Vuoto",
+        "description": "Consuma 3 cariche di Decima oscura per squarciare un nemico e infliggergli {damage} danni da Ombra. I danni aumentano con la potenza magica e possono essere critici. Richiede 3 cariche e le consuma anche se l’incantesimo viene resistito."
       },
       "spirit_bomb": {
-        "name": "Tithe Bomb",
-        "description": "Detonate a spirit bomb on an enemy, dealing {damage} Shadow damage to enemies within 8 yards of that target. Damage increases with Spell Power, can critically strike, and is reduced beyond 5 targets. Generate 20 Gloomtithe to prepare one bomb. Generation counts even while holding the maximum 5 Gloomtithe; spending charges is not required and adds no progress. Progress lasts between fights, up to one prepared bomb. Dying clears your progress and prepared bomb. Completing the cast consumes the prepared bomb, even if resisted. Cancellation or interruption preserves it. Starting a raid boss encounter clears your progress and prepared bomb. Cannot open a raid boss encounter with this spell."
+        "name": "Bomba della decima",
+        "description": "Fa esplodere una bomba spirituale su un nemico, infliggendo {damage} danni da Ombra ai nemici entro 8 metri da quel bersaglio. I danni aumentano con la potenza magica, possono essere critici e vengono ridotti oltre i 5 bersagli. Genera 20 cariche di Decima oscura per preparare una bomba. La generazione conta anche quando possiedi il massimo di 5 cariche; spenderle non è necessario e non aggiunge progressi. I progressi persistono tra i combattimenti, fino a una bomba preparata. Morire azzera i progressi ed elimina la bomba preparata. Completare il lancio consuma la bomba preparata, anche se l’incantesimo viene resistito. Annullare o interrompere il lancio la conserva. Iniziare uno scontro con un boss d’incursione azzera i progressi ed elimina la bomba preparata. Non puoi iniziare uno scontro con un boss d’incursione con questo incantesimo."
       },
       "flash_heal": {
         "name": "Preghiera Urgente",
@@ -19287,7 +19405,7 @@ export const it_IT: EnTranslations = {
       "inner_focus": {
         "name": "Mente Quietata",
         "description": "Rende il vostro prossimo incantesimo da sacerdote gratuito e non interrompibile. Dura 60 sec.",
-        "specNote_shadow": "Also reserves a guaranteed critical strike for your next Mindfracture or Void Rupture within 60 sec, if it hits. Other spells do not consume this bonus. Void Rupture still consumes 3 Gloomtithe charges. A resisted cast consumes the critical strike bonus."
+        "specNote_shadow": "Riserva inoltre un colpo critico garantito per la tua prossima Frattura Mentale o Rottura del Vuoto entro 60 s, se va a segno. Gli altri incantesimi non consumano questo bonus. Rottura del Vuoto consuma comunque 3 cariche di Decima oscura. Un lancio resistito consuma il bonus al colpo critico."
       },
       "innervate": {
         "name": "Linfa Vitale",
@@ -19485,7 +19603,7 @@ export const it_IT: EnTranslations = {
       "choir_of_deliverance": {
         "name": "Coro della Liberazione",
         "description": "Canalizza per 6 sec e cura i membri del gruppo entro 30 metri di {damage} ogni 2 sec. La cura aumenta con il potere magico.",
-        "specNote_shadow": "For 15 sec, share 20% of the health enemies lose to your Shadow damage as healing among injured party members within 30 yards, including yourself. In raids, only your subgroup is healed. Cast instantly and keep attacking in Shadowform. Absorbed damage and overkill do not add healing."
+        "specNote_shadow": "Per 15 s, distribuisce come cure il 20% della salute persa dai nemici a causa dei tuoi danni da Ombra tra i membri feriti del gruppo entro 30 metri, te compreso. Nelle incursioni cura solo il tuo sottogruppo. Lancio istantaneo: puoi continuare ad attaccare in forma d’Ombra. I danni assorbiti e quelli eccedenti la salute rimasta non generano cure."
       },
       "bear_charge": {
         "name": "Carica di Bruin",
@@ -24700,6 +24818,87 @@ export const it_IT: EnTranslations = {
       "vanguard_pendant_of_mending": {
         "name": "Ciondolo di Avanguardia di Guarigione"
       },
+      "gourdlight_sweet": {
+        "name": "Dolcetto della Notte delle zucche"
+      },
+      "gourdlight_treat_pouch": {
+        "name": "Sacchetto di dolcetti della Notte delle zucche"
+      },
+      "carved_pumpkin_head": {
+        "name": "Testa di zucca intagliata"
+      },
+      "jar_of_mischief": {
+        "name": "Barattolo di dispetti"
+      },
+      "thatchgrin_sweet_sack": {
+        "name": "Sacco di dolci di Thatchgrin"
+      },
+      "strawling_charm": {
+        "name": "Amuleto dell’omino di paglia"
+      },
+      "rattlebone_draught": {
+        "name": "Intruglio di ossa tintinnanti"
+      },
+      "haunting_draught": {
+        "name": "Intruglio spettrale"
+      },
+      "batwing_draught": {
+        "name": "Intruglio svolazzante"
+      },
+      "writ_of_the_gourdlit": {
+        "name": "Pergamena dell’Illuminato dalle zucche"
+      },
+      "writ_of_the_trickster": {
+        "name": "Pergamena del Burlone"
+      },
+      "writ_of_the_hollow_grin": {
+        "name": "Pergamena del Sorriso cavo"
+      },
+      "reins_emberbristle_broom": {
+        "name": "Scopa dalle setole ardenti"
+      },
+      "hearthroot_toffee": {
+        "name": "Caramella mou alla radice del focolare"
+      },
+      "gourdseed_brittle": {
+        "name": "Croccante ai semi di zucca"
+      },
+      "crabapple_chew": {
+        "name": "Caramella gommosa alla mela selvatica"
+      },
+      "owlwatch_fudge": {
+        "name": "Dolcetto cremoso del gufo vigile"
+      },
+      "lantern_mint_drop": {
+        "name": "Caramella alla menta della lanterna"
+      },
+      "emberwoven_sheaf": {
+        "name": "Covone intessuto di braci"
+      },
+      "prankers_pumpkin": {
+        "name": "Zucca del burlone"
+      },
+      "wanderwisp_lantern": {
+        "name": "Lanterna del fuoco fatuo errante"
+      },
+      "sack_of_startled_bats": {
+        "name": "Sacco di pipistrelli spaventati"
+      },
+      "murmurwick_candle": {
+        "name": "Candela dallo stoppino sussurrante"
+      },
+      "gurglegreen_cauldron": {
+        "name": "Calderone Verdegorgoglio"
+      },
+      "thatchgrin_patch_pumpkin": {
+        "name": "Zucca dell’orto"
+      },
+      "cursed_candle_stub": {
+        "name": "Mozzicone di candela maledetta"
+      },
+      "gourdlight_crow_feather": {
+        "name": "Piuma di corvo della Notte delle zucche"
+      },
       "membership_staff": {
         "name": "Bastone del mutamento"
       },
@@ -26256,6 +26455,18 @@ export const it_IT: EnTranslations = {
       "muster_effigy": {
         "name": "Caposquadra di paglia"
       },
+      "gourdlight_thatchgrin": {
+        "name": "Vecchio Thatchgrin"
+      },
+      "gourdlight_crow": {
+        "name": "Corvo della Notte delle zucche"
+      },
+      "gourdlight_strawling": {
+        "name": "Omino di paglia"
+      },
+      "gourdlight_swelling_gourd": {
+        "name": "Zucca rigonfia"
+      },
       "stable_horse": {
         "name": "Cavallo da stalla"
       },
@@ -27409,6 +27620,11 @@ export const it_IT: EnTranslations = {
         "name": "Hester Quillby",
         "title": "Cartografa",
         "greeting": "Ogni mappa di questa palude che abbia mai comprato diventava sbagliata nel giro di una stagione. L'acqua sposta i sentieri e i sentieri spostano l'acqua. Così me le disegno da sola, e resto qui all'asciutto mentre l'inchiostro si asciuga."
+      },
+      "gourdlight_keeper": {
+        "name": "Hester Gourdwick",
+        "title": "Custode della Notte delle zucche",
+        "greeting": "Le zucche sono illuminate e le lanterne appese: dev’essere la Notte delle zucche. Bussa alle porte degli abitanti di Eastbrook, Fenbridge e Highwatch e pronuncia le parole: dolcetto o scherzetto. Quasi tutti ti daranno un dolce. Qualcuno ti farà uno scherzo. Portami i dolci a uno qualsiasi dei miei banchi e li scambierò con qualcosa da indossare."
       },
       "reeve_ottoline": {
         "name": "Podestà Ottoline",
@@ -30041,6 +30257,88 @@ export const it_IT: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Cura effettiva sul Manichino da Cura"
+          }
+        }
+      },
+      "q_gourdlight_rounds": {
+        "title": "Il giro della Notte delle zucche",
+        "text": "Ogni Notte delle zucche i bambini della Valle fanno il loro giro, e quest’anno andrai con loro, {playerName}. Bussa a cinque porte nelle nostre città, pronuncia le parole e guarda cosa ti danno. Torna da me quando hai finito.",
+        "completion": "Cinque porte e hai ancora tutte le dita. Tieni, un sacchetto di dolci per tornare a casa. Ripassa domani, le porte si apriranno di nuovo.",
+        "objectives": {
+          "0": {
+            "label": "Porte a cui hai bussato"
+          }
+        }
+      },
+      "q_gourdlight_daily_patch": {
+        "title": "Zucche dall’orto",
+        "text": "L’orto del Vecchio Thatchgrin oltre il Prato dei cinghiali trabocca di zucche, e metà sono rotolate oltre la portata della sua paglia, dove una persona prudente può raccoglierle. Portamene cinque, {playerName}. Stai alla larga dal vecchio spaventapasseri. Le conta tutte.",
+        "completion": "Cinque belle tonde e neanche un morso. Ci sarà torta per tutta la Valle. Tieni, per il disturbo.",
+        "objectives": {
+          "0": {
+            "label": "Zucche dell’orto"
+          }
+        }
+      },
+      "q_gourdlight_daily_boo": {
+        "title": "Bu!",
+        "text": "Nessuno in queste città si prende un bello spavento da un anno, {playerName}, e una Notte delle zucche senza spaventi è solo una notte fredda. Mettiti un costume, uno qualsiasi dei miei andrà bene, oppure quella testa di zucca se te ne sei guadagnata una. Poi avvicinati di soppiatto a tre abitanti e fai loro un bel BU! a gran voce.",
+        "completion": "Tre? Ho sentito il cuoco far cadere una padella dall’altra parte della piazza. Ben fatto. Ecco la tua parte.",
+        "objectives": {
+          "0": {
+            "label": "Abitanti spaventati"
+          }
+        }
+      },
+      "q_gourdlight_daily_wicks": {
+        "title": "Stoppini sinistri",
+        "text": "Qualcuno ha lasciato candele con fiamme verdi ai piedi dei nostri lampioni. Bruciano senza sciogliersi e sussurrano quando volti le spalle. Spegnine sei per me, {playerName}, in una qualsiasi delle tre città, e portami i mozziconi.",
+        "completion": "Sei mozziconi, freddi come la brina. Chi li ha accesi dovrà impegnarsi di più. Prendi questo e lavati le mani.",
+        "objectives": {
+          "0": {
+            "label": "Candele maledette spente"
+          }
+        }
+      },
+      "q_gourdlight_daily_towns": {
+        "title": "Una porta in ogni città",
+        "text": "I bambini dicono che un vero viandante delle zucche bussa in ogni città prima che finisca la notte. Dimostra che hanno ragione, {playerName}. Chiedi dolcetto o scherzetto a una porta di Eastbrook, una di Fenbridge e una di Highwatch. Le lanterne sulle strade ti indicheranno il cammino.",
+        "completion": "Tre città in una notte! I tuoi stivali se lo sono meritato più di te.",
+        "objectives": {
+          "0": {
+            "label": "Bussato a una porta di Eastbrook"
+          },
+          "1": {
+            "label": "Bussato a una porta di Fenbridge"
+          },
+          "2": {
+            "label": "Bussato a una porta di Highwatch"
+          }
+        }
+      },
+      "q_gourdlight_daily_feathers": {
+        "title": "Piume per il fuoco",
+        "text": "Quando il Vecchio Thatchgrin è alle strette, richiama i corvi su chi sta maltrattando la sua paglia. Le loro piume bruciano di verde nel camino, e me ne servono tre per il falò di stasera. Cerca uno scontro nel suo orto, {playerName}, e strappale ai suoi corvi.",
+        "completion": "Nere come un campo senza luna, e già odorano di fumo. Il falò sarà uno spettacolo. Grazie.",
+        "objectives": {
+          "0": {
+            "label": "Piume di corvo"
+          }
+        }
+      },
+      "q_gourdlight_daily_baskets": {
+        "title": "Cestini per i vicini",
+        "text": "Ogni Notte delle zucche riempio un cestino di dolci per un vecchio amico in ciascuna città, e le mie ginocchia non sono più quelle di una volta. Consegnali tu per me, {playerName}: al cuoco Marlow a Eastbrook, all’erborista Yara a Fenbridge e al maestro del sapere Caddis lassù a Highwatch.",
+        "completion": "Consegnati tutti e tre, e ho sentito che Marlow ha pianto. Piange sempre. Ecco un cestino tutto per te.",
+        "objectives": {
+          "0": {
+            "label": "Cestino consegnato al cuoco Marlow"
+          },
+          "1": {
+            "label": "Cestino consegnato all’erborista Yara"
+          },
+          "2": {
+            "label": "Cestino consegnato al maestro del sapere Caddis"
           }
         }
       },

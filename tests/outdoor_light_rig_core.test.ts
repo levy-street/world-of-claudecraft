@@ -14,12 +14,33 @@ import {
 
 describe('hemiOutdoorIntensity', () => {
   it('lifts Low fill without altering the higher-tier Lambert terrain reference', () => {
-    expect(lowHemiIntensity({ lowReadabilityLighting: true })).toBe(1.8);
-    expect(lowSunIntensity({ lowReadabilityLighting: true })).toBe(2.25);
+    expect(lowHemiIntensity({ lowReadabilityLighting: true })).toBe(1.2);
+    expect(lowSunIntensity({ lowReadabilityLighting: true })).toBe(1.85);
     expect(lowHemiIntensity({ lowReadabilityLighting: false })).toBe(LAMBERT_RIG_HEMI_INTENSITY);
     expect(lowSunIntensity({ lowReadabilityLighting: false })).toBe(LAMBERT_RIG_SUN_INTENSITY);
     expect(LAMBERT_RIG_HEMI_INTENSITY).toBe(0.9);
     expect(LAMBERT_RIG_SUN_INTENSITY).toBe(2.65);
+  });
+  it('compensates for missing night IBL on Low, with extra lift in dark realms like ember', () => {
+    const low = { lowReadabilityLighting: true };
+    const dayHemi = lowHemiIntensity(low, { fog: 'vale', nightAmt: 0 });
+    const valeNightHemi = lowHemiIntensity(low, { fog: 'vale', nightAmt: 1 });
+    const emberNightHemi = lowHemiIntensity(low, { fog: 'ember', nightAmt: 1 });
+    expect(dayHemi).toBe(1.2);
+    expect(valeNightHemi).toBeCloseTo(1.74, 5);
+    expect(emberNightHemi).toBeCloseTo(2.34, 5);
+    expect(lowSunIntensity(low, { fog: 'vale', nightAmt: 1 })).toBeCloseTo(2.3125, 5);
+    expect(lowSunIntensity(low, { fog: 'ember', nightAmt: 1 })).toBeCloseTo(3.0525, 5);
+    for (const darkBiome of ['ember', 'volcano', 'hollow', 'marsh']) {
+      expect(lowHemiIntensity(low, { fog: [0.2, 0.2, 0.3], nightAmt: 1 }, darkBiome)).toBeCloseTo(
+        2.34,
+        5,
+      );
+      expect(lowSunIntensity(low, { fog: [0.2, 0.2, 0.3], nightAmt: 1 }, darkBiome)).toBeCloseTo(
+        3.0525,
+        5,
+      );
+    }
   });
   it('steps down as the post chain grows (composer < grade < flat)', () => {
     expect(hemiOutdoorIntensity({ composer: true, gradePass: true })).toBe(HEMI_INTENSITY_COMPOSER);

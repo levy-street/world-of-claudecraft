@@ -26190,4 +26190,214 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
   'hudChrome.wocStore.subscription.stackUnavailable':
     'Ahora no se puede añadir tiempo de membresía. Inténtalo de nuevo en breve.',
   'hudChrome.wocStore.subscription.tokenPrice': '{price} por 30 días',
+  'errors.api.worldFightHold':
+    'Otro personaje de esta cuenta sigue en el mundo tras un combate. Inténtalo de nuevo dentro de unos minutos.',
+  'hudChrome.auraEffect.gourdlight.thatchbound':
+    'Viejo Thatchgrin tira de tus hilos. No puedes actuar: te obliga a caminar hacia tu aliado más cercano y golpearlo cada {every} s, infligiéndole de {min} a {max} de daño (hasta {mult} veces más contra un aliado de nivel {level}). Termina antes si recibes daño equivalente al {pct}% de tu salud máxima o si un aliado lo disipa (Magia).',
+  'hudChrome.auraEffect.seasonalCosmetic': 'Solo cosmético: no afecta al combate',
+  'hudChrome.auraEffect.slumberNight':
+    'Cuelga inerte de su poste hasta el anochecer. No se le puede atacar.',
+  'hudChrome.auraEffect.stilledMindCrit':
+    'Tu próxima Fractura Mental o Ruptura del vacío será un golpe crítico garantizado si acierta. Otros hechizos no consumen esta bonificación. Ruptura del vacío sigue consumiendo 3 cargas de Diezmo sombrío. Un lanzamiento resistido consume la bonificación.',
+  'hudChrome.mounts.desc_emberbristle_broom':
+    'Una escoba de cosecha atada con una cinta naranja que flota a un palmo del suelo y desprende brasas de sus cerdas. Una recompensa permanente de la Noche de las Calabazas.',
+  'hudChrome.mounts.name_emberbristle_broom': 'Escoba de cerdas ardientes',
+  'hudChrome.worldBoss.sleepUntilNightfall': '{name} duerme hasta el anochecer.',
+  'entities.abilities.inner_focus.specNote_shadow':
+    'También reserva un golpe crítico garantizado para tu próxima Fractura Mental o Ruptura del vacío en un plazo de 60 s, si acierta. Otros hechizos no consumen esta bonificación. Ruptura del vacío sigue consumiendo 3 cargas de Diezmo sombrío. Un lanzamiento resistido consume la bonificación de golpe crítico.',
+  'entities.abilities.spirit_bomb.description':
+    'Detona una bomba espiritual sobre un enemigo e inflige {damage} de daño de Sombras a los enemigos a un máximo de 8 yardas de ese objetivo. El daño aumenta con el poder con hechizos, puede ser crítico y se reduce cuando hay más de 5 objetivos. Genera 20 cargas de Diezmo sombrío para preparar una bomba. La generación cuenta incluso si ya tienes el máximo de 5 cargas; gastarlas no es necesario ni añade progreso. El progreso se conserva entre combates, hasta un máximo de una bomba preparada. Morir elimina el progreso y la bomba preparada. Completar el lanzamiento consume la bomba preparada, incluso si se resiste. Cancelarlo o sufrir una interrupción la conserva. Iniciar un encuentro con un jefe de banda elimina el progreso y la bomba preparada. No puedes iniciar un encuentro con un jefe de banda usando este hechizo.',
+  'entities.abilities.spirit_bomb.name': 'Bomba del diezmo',
+  'entities.abilities.void_rupture.description':
+    'Consume 3 cargas de Diezmo sombrío para desgarrar a un enemigo e infligirle {damage} de daño de Sombras. El daño aumenta con el poder con hechizos y puede ser crítico. Requiere 3 cargas y las consume incluso si se resiste.',
+  'entities.abilities.void_rupture.name': 'Ruptura del vacío',
+  'entities.items.batwing_draught.name': 'Brebaje aleteante',
+  'entities.items.carved_pumpkin_head.name': 'Cabeza de calabaza tallada',
+  'entities.items.crabapple_chew.name': 'Caramelo masticable de manzana silvestre',
+  'entities.items.cursed_candle_stub.name': 'Cabo de vela maldita',
+  'entities.items.emberwoven_sheaf.name': 'Gavilla tejida con brasas',
+  'entities.items.gourdlight_crow_feather.name': 'Pluma de cuervo de la Noche de las Calabazas',
+  'entities.items.gourdlight_sweet.name': 'Dulce de la Noche de las Calabazas',
+  'entities.items.gourdlight_treat_pouch.name': 'Bolsa de dulces de la Noche de las Calabazas',
+  'entities.items.gourdseed_brittle.name': 'Guirlache de semillas de calabaza',
+  'entities.items.gurglegreen_cauldron.name': 'Caldero Verdeburbujeante',
+  'entities.items.haunting_draught.name': 'Brebaje espectral',
+  'entities.items.hearthroot_toffee.name': 'Tofe de raíz de hogar',
+  'entities.items.jar_of_mischief.name': 'Tarro de travesuras',
+  'entities.items.lantern_mint_drop.name': 'Caramelo de menta del farol',
+  'entities.items.murmurwick_candle.name': 'Vela de mecha susurrante',
+  'entities.items.owlwatch_fudge.name': 'Dulce cremoso del búho vigía',
+  'entities.items.prankers_pumpkin.name': 'Calabaza del bromista',
+  'entities.items.rattlebone_draught.name': 'Brebaje de huesos traqueteantes',
+  'entities.items.reins_emberbristle_broom.name': 'Escoba de cerdas ardientes',
+  'entities.items.sack_of_startled_bats.name': 'Saco de murciélagos asustados',
+  'entities.items.strawling_charm.name': 'Amuleto de ser de paja',
+  'entities.items.thatchgrin_patch_pumpkin.name': 'Calabaza del huerto',
+  'entities.items.thatchgrin_sweet_sack.name': 'Saco de dulces de Thatchgrin',
+  'entities.items.wanderwisp_lantern.name': 'Farol de luz errante',
+  'entities.items.writ_of_the_gourdlit.name': 'Escrito del Iluminado por las Calabazas',
+  'entities.items.writ_of_the_hollow_grin.name': 'Escrito de la Sonrisa Hueca',
+  'entities.items.writ_of_the_trickster.name': 'Escrito del Bromista',
+  'entities.mobs.gourdlight_crow.name': 'Cuervo de la Noche de las Calabazas',
+  'entities.mobs.gourdlight_strawling.name': 'Ser de paja',
+  'entities.mobs.gourdlight_swelling_gourd.name': 'Calabaza hinchada',
+  'entities.mobs.gourdlight_thatchgrin.name': 'Viejo Thatchgrin',
+  'entities.npcs.gourdlight_keeper.greeting':
+    'Las calabazas están encendidas y los faroles colgados, así que debe de ser la Noche de las Calabazas. Llama a las puertas de los vecinos de Eastbrook, Fenbridge y Highwatch, y di las palabras: truco o trato. La mayoría te dará un dulce. Algunos te gastarán una broma. Tráeme los dulces a cualquiera de mis puestos y te los cambiaré por algo que ponerte.',
+  'entities.npcs.gourdlight_keeper.name': 'Hester Gourdwick',
+  'entities.npcs.gourdlight_keeper.title': 'Guardiana de la Noche de las Calabazas',
+  'entities.quests.q_gourdlight_daily_baskets.completion':
+    'Las tres entregadas, y dicen que Marlow lloró. Siempre llora. Aquí tienes una cesta para ti.',
+  'entities.quests.q_gourdlight_daily_baskets.objectives.0.label':
+    'Cesta entregada al cocinero Marlow',
+  'entities.quests.q_gourdlight_daily_baskets.objectives.1.label':
+    'Cesta entregada a Yara la herborista',
+  'entities.quests.q_gourdlight_daily_baskets.objectives.2.label':
+    'Cesta entregada al Maestro de saber Caddis',
+  'entities.quests.q_gourdlight_daily_baskets.text':
+    'Cada Noche de las Calabazas lleno una cesta de dulces para un viejo amigo de cada pueblo, y mis rodillas ya no son lo que eran. Repártelas por mí, {playerName}: al cocinero Marlow en Eastbrook, a Yara la herborista en Fenbridge y al Maestro de saber Caddis, allá en Highwatch.',
+  'entities.quests.q_gourdlight_daily_baskets.title': 'Cestas para los vecinos',
+  'entities.quests.q_gourdlight_daily_boo.completion':
+    '¿Tres? He oído al cocinero dejar caer una sartén desde el otro lado de la plaza. Bien hecho. Aquí tienes tu parte.',
+  'entities.quests.q_gourdlight_daily_boo.objectives.0.label': 'Vecinos asustados',
+  'entities.quests.q_gourdlight_daily_boo.text':
+    'Nadie en estos pueblos se ha llevado un buen susto en todo un año, {playerName}, y una Noche de las Calabazas sin sustos es solo una noche fría. Ponte un disfraz, cualquiera de los míos sirve, o esa cabeza de calabaza si te has ganado una. Luego acércate sigilosamente a tres vecinos y suéltales un buen ¡BU! bien fuerte.',
+  'entities.quests.q_gourdlight_daily_boo.title': '¡Bu!',
+  'entities.quests.q_gourdlight_daily_feathers.completion':
+    'Negras como un campo sin luna, y ya huelen a humo. La hoguera será digna de ver. Gracias.',
+  'entities.quests.q_gourdlight_daily_feathers.objectives.0.label': 'Plumas de cuervo',
+  'entities.quests.q_gourdlight_daily_feathers.text':
+    'Cuando acorralan al Viejo Thatchgrin, llama a sus cuervos para que se lancen sobre quienes golpean su paja. Sus plumas arden con una llama verde, y necesito tres para la hoguera de esta noche. Busca una pelea en su huerto, {playerName}, y arráncaselas a sus cuervos.',
+  'entities.quests.q_gourdlight_daily_feathers.title': 'Plumas para el fuego',
+  'entities.quests.q_gourdlight_daily_patch.completion':
+    'Cinco bien redondas y ni un mordisco en ninguna. Habrá pastel para todo el Valle. Toma, por las molestias.',
+  'entities.quests.q_gourdlight_daily_patch.objectives.0.label': 'Calabazas del huerto',
+  'entities.quests.q_gourdlight_daily_patch.text':
+    'El huerto del Viejo Thatchgrin, más allá del Prado de jabalíes, rebosa de calabazas, y la mitad ha rodado más allá de su paja, donde alguien con cuidado puede alcanzarlas. Tráeme cinco, {playerName}. Mantente lejos del viejo espantapájaros. Las cuenta una por una.',
+  'entities.quests.q_gourdlight_daily_patch.title': 'Calabazas del huerto',
+  'entities.quests.q_gourdlight_daily_towns.completion':
+    '¡Tres pueblos en una noche! Tus botas se han ganado esto más que tú.',
+  'entities.quests.q_gourdlight_daily_towns.objectives.0.label': 'Una puerta llamada en Eastbrook',
+  'entities.quests.q_gourdlight_daily_towns.objectives.1.label': 'Una puerta llamada en Fenbridge',
+  'entities.quests.q_gourdlight_daily_towns.objectives.2.label': 'Una puerta llamada en Highwatch',
+  'entities.quests.q_gourdlight_daily_towns.text':
+    'Los niños dicen que un verdadero caminante de las Calabazas llama a las puertas de todos los pueblos antes de que termine la noche. Demuestra que tienen razón, {playerName}. Pide truco o trato en una puerta de Eastbrook, una de Fenbridge y una de Highwatch. Los faroles de los caminos te guiarán.',
+  'entities.quests.q_gourdlight_daily_towns.title': 'Una puerta en cada pueblo',
+  'entities.quests.q_gourdlight_daily_wicks.completion':
+    'Seis cabos, fríos como la escarcha. Quien los encendió tendrá que esforzarse más. Toma esto y lávate las manos.',
+  'entities.quests.q_gourdlight_daily_wicks.objectives.0.label': 'Velas malditas apagadas',
+  'entities.quests.q_gourdlight_daily_wicks.text':
+    'Alguien ha estado colocando velas de llama verde al pie de nuestras farolas. Arden sin derretirse y susurran cuando les das la espalda. Apaga seis por mí, {playerName}, en cualquiera de los tres pueblos, y tráeme los cabos.',
+  'entities.quests.q_gourdlight_daily_wicks.title': 'Mechas malvadas',
+  'entities.quests.q_gourdlight_rounds.completion':
+    'Cinco puertas y aún conservas todos los dedos. Toma, una bolsa de dulces para la vuelta a casa. Vuelve mañana, las puertas abrirán de nuevo.',
+  'entities.quests.q_gourdlight_rounds.objectives.0.label': 'Puertas a las que has llamado',
+  'entities.quests.q_gourdlight_rounds.text':
+    'Cada Noche de las Calabazas, los niños del Valle hacen su ronda, y este año te unirás a ellos, {playerName}. Llama a cinco puertas de nuestros pueblos, di las palabras y mira qué te dan. Vuelve a verme cuando acabes.',
+  'entities.quests.q_gourdlight_rounds.title': 'Ronda de la Noche de las Calabazas',
+  'guide.interfacePage.framesGovernedPriest':
+    'Editar marcos también te permite mover el medallón de Diezmo sombrío y Bomba del diezmo del sacerdote de Sombras.',
+  'guide.worldPvpPage.hillBodyTwoHour':
+    'Una vez cada dos horas, en un momento impredecible, se avisa a todo el reino de que dentro de quince minutos se alzará una colina en una de las zonas del norte, y se marca en terreno abierto el círculo donde aparecerá. La colina permanece treinta minutos y después desaparece. Mientras está alzada, cada cinco minutos se anuncia al reino dónde está y qué grupos la han controlado más tiempo. El grupo con más jugadores dentro del círculo disputa la colina y, tras treinta segundos en mayoría, se hace con ella. La entrada de un grupo rival solo pausa esa cuenta hasta que el tuyo vuelva a tener mayoría; solo se reinicia si no queda ningún miembro vivo de tu grupo dentro. Un jugador solitario cuenta como un grupo de uno y conserva su colina si forma un grupo, pero los miembros de una banda no cuentan. Mientras un grupo controla la colina, cada miembro que esté dentro gana la misma cantidad de Honor cada minuto, sin importar cuánto lleve controlándola. Así, un grupo completo que la controle sin oposición durante toda su duración gana aproximadamente lo mismo que con dos victorias en campos de batalla. Cuando desaparece, si el grupo que más tiempo la controló en total lo hizo durante al menos diez minutos, quienes hayan permanecido dentro para ese grupo al menos un minuto y sigan perteneciendo a él ganan una victoria para la fila JcJ de la Bóveda Semanal. Una barra sobre el campo muestra quién la controla, cuántos sois frente a cuántos son ellos y el reloj de disputa; /hill en el chat indica dónde está.',
+  'seasonal.boo.already': '{name} ya ha tenido suficientes sustos por hoy.',
+  'seasonal.boo.flash': '¡BU! ¡Has asustado a {name}!',
+  'seasonal.boo.frightenedHint':
+    '{name} aún está nervioso por tu último susto. Busca a otra persona.',
+  'seasonal.boo.landed': '¡Saltas ante {name} con un BU! Suelta un chillido y casi se le cae todo.',
+  'seasonal.boo.needsCostume':
+    'Ponte primero un disfraz: un brebaje de disfraz, una broma de murciélago o esqueleto, el Amuleto de ser de paja, la Cabeza de calabaza tallada o un sorbo de goblin del Caldero Verdeburbujeante.',
+  'seasonal.boo.noCostume': 'Sin disfraz, {name} solo se ríe de ti. Ponte uno primero.',
+  'seasonal.boo.notOnErrand': 'Hester no te ha pedido que asustes a nadie hoy.',
+  'seasonal.boo.row': '¡Bu!',
+  'seasonal.boo.rowAria': 'Salta ante {name} y grita bu',
+  'seasonal.boundItemGone':
+    'La Noche de las Calabazas ha terminado y tu {item} se deshace de nuevo en paja.',
+  'seasonal.costume': 'Bebes el brebaje y te transformas: ¡{trick}!',
+  'seasonal.event.gourdlight_eve.name': 'Noche de las Calabazas',
+  'seasonal.guise': 'El amuleto crepita y la paja te cubre: ¡{trick}!',
+  'seasonal.itemSource.pumpkinHead':
+    'Lo deja caer el Viejo Thatchgrin, en su campo de calabazas más allá del Prado de jabalíes, la primera vez que lo saqueas. No lo vende ningún comerciante.',
+  'seasonal.itemUse.broomSources':
+    'Se compra a Hester Gourdwick por {count} Gavillas tejidas con brasas o, en raras ocasiones, lo deja caer el Viejo Thatchgrin un día en que lo saqueas. Montarlo requiere la habilidad de equitación. Se conserva permanentemente y se puede montar durante todo el año.',
+  'seasonal.itemUse.costumeBat':
+    'Uso: Te convierte en un murciélago que aletea durante {minutes} minutos. Se consume. No se puede usar en combate y entrar en combate termina el efecto. Cosmético.',
+  'seasonal.itemUse.costumeGhost':
+    'Uso: Te convierte en un fantasma flotante durante {minutes} minutos. Se consume. No se puede usar en combate y entrar en combate termina el efecto. Cosmético.',
+  'seasonal.itemUse.costumeSkeleton':
+    'Uso: Te convierte en un esqueleto traqueteante durante {minutes} minutos. Se consume. No se puede usar en combate y entrar en combate termina el efecto. Cosmético.',
+  'seasonal.itemUse.pouch': 'Uso: Ábrela para recibir {count} Dulces de la Noche de las Calabazas.',
+  'seasonal.itemUse.pumpkinHead':
+    'Uso: Ponte o quítate una calabaza tallada e iluminada por dentro, que se lleva sobre el casco. Cosmético.',
+  'seasonal.itemUse.sheaf':
+    'El Viejo Thatchgrin te da una cada día que lo saqueas, hasta que tengas la Escoba de cerdas ardientes. Hester Gourdwick cambia {count} por la escoba en sus puestos de Eastbrook, Fenbridge y Highwatch. Las gavillas sin gastar se conservan para la próxima Noche de las Calabazas.',
+  'seasonal.itemUse.strawlingCharm':
+    'Uso: Te convierte en uno de los seres de paja del Viejo Thatchgrin durante {seconds} segundos. No se puede usar en combate. Nunca se consume. Cosmético.',
+  'seasonal.itemUse.sweet':
+    'Se obtiene pidiendo truco o trato durante la Noche de las Calabazas. Hester Gourdwick los cambia por cosméticos en sus puestos de Eastbrook, Fenbridge y Highwatch.',
+  'seasonal.itemUse.titleWrit':
+    'Uso: Consigue el título {title} para este personaje, que se equipa desde el Libro de Gestas. Se consume. Se conserva si ya tienes el título.',
+  'seasonal.itemUse.toyBats':
+    'Uso: Abre el saco. Un enjambre de murciélagos chillones sale volando y se dispersa a tu alrededor durante {seconds} segundos. No se puede usar en combate ni en sigilo. Nunca se consume: se puede volver a usar tras {cooldown} segundos. Se conserva permanentemente y se puede usar durante todo el año. Cosmético.',
+  'seasonal.itemUse.toyCandleShadows':
+    'Uso: Enciende la vela frente a ti. Durante {seconds} segundos, sus llamas proyectan sombras danzantes de un gato, un murciélago y una bruja sobre el suelo de alrededor, visibles para todos los que estén cerca. No se puede usar en combate ni en sigilo. Nunca se consume: se puede volver a usar tras {cooldown} segundos. Se conserva permanentemente y se puede usar durante todo el año. Cosmético.',
+  'seasonal.itemUse.toyCauldron':
+    'Uso: Coloca un gran caldero burbujeante frente a ti. Permanece {standing} segundos y cualquier jugador que beba de él estalla en burbujas verdes y se convierte en goblin durante {seconds} segundos, reemplazando cualquier disfraz que lleve. No se puede colocar ni beber de él en combate o en sigilo, y entrar en combate termina la forma de goblin. Nunca se consume: se puede volver a usar tras {cooldown} segundos. Se conserva permanentemente y se puede usar durante todo el año. Cosmético.',
+  'seasonal.itemUse.toyLantern':
+    'Uso: Coloca el farol frente a ti. Un pequeño fantasma da vueltas a tu alrededor durante {seconds} segundos. No se puede usar en combate ni en sigilo. Nunca se consume: se puede volver a usar tras {cooldown} segundos. Se conserva permanentemente y se puede usar durante todo el año. Cosmético.',
+  'seasonal.itemUse.toyPrank':
+    'Uso: Lánzala a otro jugador visible a un máximo de {range} yardas. Su cabeza se convierte en una calabaza iluminada durante {seconds} segundos, y puede quitársela con un clic derecho. Ninguno de los dos puede estar en combate y tú no puedes estar en sigilo. Nunca se consume: se puede volver a usar tras {cooldown} segundos. Se conserva permanentemente y se puede usar durante todo el año. Cosmético.',
+  'seasonal.itemUse.trickJar':
+    'Uso: Te gasta una broma aleatoria e inofensiva durante unos segundos. Cosmético.',
+  'seasonal.jarTrick': 'El tarro se abre de golpe: ¡{trick}!',
+  'seasonal.pumpkinHead.off': 'Te quitas la Cabeza de calabaza tallada.',
+  'seasonal.pumpkinHead.on': 'Te pones la Cabeza de calabaza tallada.',
+  'seasonal.pumpkins.flash': '¡Calabaza embrujada encontrada! {count}/{total}',
+  'seasonal.pumpkins.found':
+    'Enciendes una Calabaza embrujada en {zone}: {count}/{total}. Dulces de la Noche de las Calabazas recibidos: {sweets}.',
+  'seasonal.pumpkins.name': 'Calabaza embrujada',
+  'seasonal.pumpkins.progress': '{label}: {current}/{total}',
+  'seasonal.pumpkins.title': 'Calabazas embrujadas',
+  'seasonal.pumpkins.world': 'Mundo',
+  'seasonal.thatchgrin.poleBound': 'Atado al poste',
+  'seasonal.thatchgrin.sleepYell': 'Ha salido el sol. De vuelta al poste, de vuelta a vigilar.',
+  'seasonal.thatchgrin.wakeYell': '¡La NOCHE cae sobre el huerto! ¿Quién camina por MI campo?',
+  'seasonal.titleGranted': 'Lees el escrito. Nuevo título conseguido: {title}.',
+  'seasonal.titleKnown': 'Ya tienes ese título, así que conservas el escrito.',
+  'seasonal.tokenPrice': '{count} {item}',
+  'seasonal.toy.bats': '¡Abres el saco y sale volando un enjambre de murciélagos asustados!',
+  'seasonal.toy.candleShadows':
+    'Enciendes la vela y las sombras empiezan a bailar alrededor de sus llamas.',
+  'seasonal.toy.cauldron': 'Colocas el caldero y empieza a burbujear.',
+  'seasonal.toy.cauldronDrink':
+    '¡Bebes del caldero, estallas en burbujas verdes y te conviertes en goblin!',
+  'seasonal.toy.hidden': 'Sal primero de las sombras: un juguete te delataría.',
+  'seasonal.toy.lantern':
+    'Colocas el farol y un pequeño fantasma sale flotando para hacerte compañía.',
+  'seasonal.toy.prank': '¡Lanzas la calabaza y se estampa contra {name}!',
+  'seasonal.toy.prankNeedsPlayer':
+    'La calabaza solo se estampa contra otro jugador que no esté en combate.',
+  'seasonal.toy.pranked':
+    '¡{name} te estampa una calabaza en la cabeza! Quítatela con un clic derecho o lúcela con orgullo.',
+  'seasonal.toy.prankedFlash': '¡{name} te ha gastado una broma!',
+  'seasonal.trickOrTreat.alreadyKnocked': 'Hoy ya has pedido truco o trato a {name}.',
+  'seasonal.trickOrTreat.knockedHint':
+    'Hoy ya has llamado aquí. La puerta volverá a abrirse tras el reinicio diario.',
+  'seasonal.trickOrTreat.notActive': 'La Noche de las Calabazas no está activa ahora mismo.',
+  'seasonal.trickOrTreat.row': '¡Truco o trato!',
+  'seasonal.trickOrTreat.rowAria': 'Di truco o trato a {name}',
+  'seasonal.trickOrTreat.tooFar': 'Acércate para llamar.',
+  'seasonal.trickOrTreat.treat': '{name} te da un dulce.',
+  'seasonal.trickOrTreat.treatFlash.few': '¡Trato! {count} Dulces de la Noche de las Calabazas',
+  'seasonal.trickOrTreat.treatFlash.many': '¡Trato! {count} Dulces de la Noche de las Calabazas',
+  'seasonal.trickOrTreat.treatFlash.one': '¡Trato! {count} Dulce de la Noche de las Calabazas',
+  'seasonal.trickOrTreat.treatFlash.other': '¡Trato! {count} Dulces de la Noche de las Calabazas',
+  'seasonal.trickOrTreat.trick': '{name} te gasta una broma: ¡{trick}!',
+  'seasonal.trickOrTreat.trickFlash': '¡Truco! {trick}',
+  'seasonal.tricks.gourdlight_costume_bat': 'Disfraz de murciélago',
+  'seasonal.tricks.gourdlight_costume_ghost': 'Disfraz de fantasma',
+  'seasonal.tricks.gourdlight_costume_skeleton': 'Disfraz de esqueleto',
+  'seasonal.tricks.gourdlight_trick_bat': 'Aleteo alocado',
+  'seasonal.tricks.gourdlight_trick_fumes': 'Vapores verdes',
+  'seasonal.tricks.gourdlight_trick_skeleton': 'Huesos traqueteantes',
+  'seasonal.tricks.gourdlight_trick_strawling': 'Apariencia de ser de paja',
 };

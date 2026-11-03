@@ -1038,14 +1038,14 @@ export const id_ID: EnTranslations = {
       "fateThreadsSentenceReady": "Tiga Benang Takdir: Vonis dapat mengonsumsinya untuk 18% kerusakan tambahan."
     },
     "priest": {
-      "gloomtitheLabel": "Gloomtithe",
-      "bombLabel": "Tithe Bomb",
-      "gloomtitheStatus": "{value} of {max} Gloomtithe",
-      "bombStatus": "{value} of {max} Tithe Bomb charges",
-      "bombReady": "Ready",
+      "gloomtitheLabel": "Upeti Kelam",
+      "bombLabel": "Bom Persepuluhan",
+      "gloomtitheStatus": "{value} dari {max} Upeti Kelam",
+      "bombStatus": "{value} dari {max} muatan Bom Persepuluhan",
+      "bombReady": "Siap",
       "chargeCount": "{value} / {max}",
-      "gloomtitheTooltip": "Gloomtithe: up to 5 spendable charges. Void Rupture consumes 3; Vampiric Touch consumes 2 for 30% more damage; Call Tithefiend consumes your bank. Generating charges also fills Tithe Bomb, even while this bank is full.",
-      "bombTooltip": "Tithe Bomb: generate 20 Gloomtithe to prepare one bomb. Spending Gloomtithe does not add progress. Progress lasts between fights. Dying or starting a raid boss resets it. A completed cast consumes the bomb; cancelling keeps it."
+      "gloomtitheTooltip": "Upeti Kelam: hingga 5 muatan yang dapat digunakan. Rekahan Kehampaan menghabiskan 3; Sentuhan Vampir menghabiskan 2 untuk kerusakan 30% lebih besar; Panggil Iblis Persepuluhan menghabiskan seluruh simpananmu. Menghasilkan muatan juga mengisi Bom Persepuluhan, bahkan saat simpanan ini penuh.",
+      "bombTooltip": "Bom Persepuluhan: hasilkan 20 Upeti Kelam untuk menyiapkan satu bom. Menghabiskan Upeti Kelam tidak menambah progres. Progres bertahan antarputaran pertempuran. Mati atau memulai bos raid akan meresetnya. Perapalan yang selesai menghabiskan bom; pembatalan menyimpannya."
     },
     "procOverlay": {
       "soulFragmentsMeter": "Serpihan Jiwa",
@@ -2600,6 +2600,7 @@ export const id_ID: EnTranslations = {
       "name_lantern_hall_destrier": "Kuda Perang Balai Lentera",
       "name_chimeglass_tortoise": "Tolliver si Kaca Cerobong Asap",
       "name_rickshaw_mount": "Becak Terikat Tulang",
+      "name_emberbristle_broom": "Sapu Bulu Bara",
       "name_wobbles_slime": "Wobbles sang Slime",
       "name_nightwing_chimera": "Kimera Nightwing",
       "desc_valorsteed": "Kuda tangguh dengan pijakan mantap dan pelana kulit.",
@@ -2623,7 +2624,8 @@ export const id_ID: EnTranslations = {
       "desc_lantern_hall_destrier": "Kuda perang Balai Lentera, berzirah ek dan besi di bawah warna biru guild, dengan dua lentera badai berayun dari pelananya untuk menerangi jalan pulang.",
       "desc_nightwing_chimera": "Wyvern senja berkepala dua dari dahan purba, bertengger pada kaki belakang bercakar saat istirahat dan melayang dekat tanah dengan sayap berukir arkana.",
       "desc_chimeglass_tortoise": "Kura-kura dataran garam yang telah melampaui tiga generasi karavan. Tinker memberinya kacamata dari kaca badai dan menggantungkan lonceng perunggu di tenggorokannya, sehingga jalan mendengarnya jauh sebelum jalan melihatnya.",
-      "desc_rickshaw_mount": "Gerobak tulang yang berderak, dengan serdadu kurus bertulang diikat pada porosnya, menarikmu melaju kencang."
+      "desc_rickshaw_mount": "Gerobak tulang yang berderak, dengan serdadu kurus bertulang diikat pada porosnya, menarikmu melaju kencang.",
+      "desc_emberbristle_broom": "Sapu panen berikat pita jingga yang melayang setelapak tangan di atas tanah, menebarkan bara dari bulunya. Hadiah permanen dari Malam Cahaya Labu."
     },
     "mountTraining": {
       "mountPrompt": "Tekan {key} untuk menaiki Valorsteed latihan.",
@@ -4672,7 +4674,10 @@ export const id_ID: EnTranslations = {
       }
     },
     "auraEffect": {
-      "stilledMindCrit": "Your next Mindfracture or Void Rupture is a guaranteed critical strike if it hits. Other spells do not consume this bonus. Void Rupture still consumes 3 Gloomtithe charges. A resisted cast consumes the bonus.",
+      "gourdlight": {
+        "thatchbound": "Si Tua Seringai Jerami mengendalikanmu seperti boneka. Kamu tidak dapat bertindak: kamu digerakkan ke sekutu terdekat dan menyerangnya setiap {every} dtk dengan {min} hingga {max} kerusakan (hingga {mult} kali lipat terhadap sekutu level {level}). Berakhir lebih awal setelah kamu menerima kerusakan setara {pct}% kesehatan maksimum, atau saat sekutu menghalaunya (Sihir)."
+      },
+      "stilledMindCrit": "Retak Pikiran atau Rekahan Kehampaan berikutnya dijamin menjadi serangan kritis jika mengenai sasaran. Mantra lain tidak menghabiskan bonus ini. Rekahan Kehampaan tetap menghabiskan 3 muatan Upeti Kelam. Mantra yang dilawan menghabiskan bonusnya.",
       "wildheart": {
         "packBond": "Menerima {pct}% lebih sedikit kerusakan selama pasangannya berdiri dekat. Pisahkan Penakluk Binatang dan jaguarnya untuk mematahkannya.",
         "packBondFury": "Memberikan {pct}% lebih banyak kerusakan selama pasangannya berdiri dekat.",
@@ -4753,7 +4758,9 @@ export const id_ID: EnTranslations = {
       "breathGuardian": {
         "portalA": "When this ends, Portal A opens exactly where you stand. Stand near the Knotted Gale. You cannot carry it this round.",
         "portalB": "When this ends, Portal B opens exactly where you stand. Stand at the lip of a gap. You cannot carry the Knotted Gale this round.",
-        "laden": "You carry a Knotted Gale: you walk at {walk}% speed, you cannot blink, charge or leap, and no wind, pull, blast or throw can move you. Either portal takes you to the other. Press Interact at the lip of any gap to throw it into the void. When this ends it bursts and kills everyone on the Cornice.",
+        "portalC": "When this ends, Portal C opens exactly where you stand. It links to Portal D only. Stand near the other Knotted Gale. You cannot carry it this round.",
+        "portalD": "When this ends, Portal D opens exactly where you stand. It links to Portal C only. Stand at the lip of a gap away from Portal B. You cannot carry the Knotted Gale this round.",
+        "laden": "You carry a Knotted Gale: you walk at {walk}% speed, you cannot blink, charge or leap, and no wind, pull, blast or throw can move you. Each portal takes you to its partner: A to B, C to D. Press Interact at the lip of any gap to throw it into the void. When this ends it bursts and kills everyone on the Cornice.",
         "wind": "The Guardian of the Breath's wind carries you {speed} yd a second the way it blows. Walk against it to hold your ground; it does not interrupt your casts. Pressed against the rim's wall you take {pinMin} to {pinMax} damage every second. Where the wall is broken there is nothing to stop you: you fall into the void.",
         "draw": "The Guardian draws breath and pulls you toward it, {speed} yd a second. Its vortex deals {min} to {max} damage every {tick} sec to whoever stands before its mouth. Then Bellows Gust deals {gustMin} to {gustMax} damage to everyone on the Cornice and throws them {throw} yd outward.",
         "pinned": "Pressed against the rim's wall by the wind: {min} to {max} damage every second until the wind falls calm or you walk clear of the wall.",
@@ -4860,6 +4867,7 @@ export const id_ID: EnTranslations = {
       "spellHaste": "Meningkatkan kecepatan rapal sihir sebesar {pct}%",
       "sated": "Tidak dapat memperoleh manfaat dari efek percepatan kelompok lainnya",
       "cauterizeFatigue": "Kauterisasi tidak dapat mencegah hantaman mematikan lainnya",
+      "seasonalCosmetic": "Hanya kosmetik: tidak memengaruhi pertempuran",
       "castShield": "Rapalan tidak dapat diinterupsi atau ditunda oleh kerusakan",
       "dmgDone": "Meningkatkan kerusakan yang diberikan sebesar {pct}%",
       "dmgDoneReduce": "Mengurangi kerusakan yang diberikan sebesar {pct}%",
@@ -5007,6 +5015,7 @@ export const id_ID: EnTranslations = {
       "dodgeReduce": "Reduce la probabilidad de esquivar un {pct}%",
       "damageReduction": "Mengurangi semua kerusakan yang diterima sebesar {pct}%",
       "slumber": "Tertidur hingga fajar. Tidak dapat diserang dan tidak akan bangun untuk siapa pun.",
+      "slumberNight": "Tergantung tak bernyawa di tiangnya hingga malam tiba. Tidak dapat diserang.",
       "guardianWard": "Serangan musuh mematikan berikutnya memulihkanmu menjadi {pct}% kesehatan",
       "armorFlat": "Reduce la armadura en {value}",
       "armorFlatStacks": "Reduce la armadura en {value} ({stacks} acumulaciones)",
@@ -5086,7 +5095,8 @@ export const id_ID: EnTranslations = {
     "worldBoss": {
       "spawn": "{name} bangkit di atas {zone}!",
       "wake": "{name} terbangun di atas {zone}!",
-      "sleep": "{name} tertidur hingga fajar."
+      "sleep": "{name} tertidur hingga fajar.",
+      "sleepUntilNightfall": "{name} tidur hingga malam tiba."
     },
     "auth": {
       "appleLoginCta": "Lanjutkan dengan Apple",
@@ -7350,8 +7360,12 @@ export const id_ID: EnTranslations = {
       "aLine": "It opens at your feet in {seconds} sec. Stand near the Knotted Gale.",
       "bTitle": "You are Portal B!",
       "bLine": "It opens at your feet in {seconds} sec. Stand at the lip of a gap.",
+      "cTitle": "You are Portal C!",
+      "cLine": "It opens at your feet in {seconds} sec. Stand near the other Knotted Gale.",
+      "dTitle": "You are Portal D!",
+      "dLine": "It opens at your feet in {seconds} sec. Stand at a gap away from Portal B.",
       "carryTitle": "You carry the Knotted Gale!",
-      "carryLine": "Either portal takes you to the other. Throw it from the lip of a gap. It bursts in {seconds} sec.",
+      "carryLine": "Each portal takes you to its partner: A to B, C to D. Throw it from the lip of a gap. It bursts in {seconds} sec.",
       "lipTitle": "Throw it now!",
       "lipLine": "You stand at the lip of a gap. It bursts in {seconds} sec.",
       "throwKey": "Press {key} at the lip to throw",
@@ -7373,6 +7387,7 @@ export const id_ID: EnTranslations = {
         "stormGust": "A storm gust gathers! Brace against the wind!",
         "knot": "A Knotted Gale falls! Carry it to a gap and throw it into the void!",
         "knotPortals": "Portal A on {a}, Portal B on {b}!",
+        "knotPortals2": "Portal C on {c}, Portal D on {d}!",
         "knotTaken": "{player} takes up the Knotted Gale!",
         "knotDropped": "{player} falls! The Knotted Gale is free again!",
         "knotFell": "{player} takes the Knotted Gale into the void!",
@@ -8607,6 +8622,107 @@ export const id_ID: EnTranslations = {
         "0": "Kompos yang tepat, tempat tidur akan hidup. Pedagang tua mengubur sesuatu sebelum pergi. Pabrik biarpun masih berputar di sudut jauh taman-taman. Pergi dan berdiri di sampingnya.",
         "2": "Jadi pabrik mengirim Anda ke pantai jalan. Mercusuar menyimpan satu rahasia terakhir: barat laut darinya, hanya di luar jejak, rumput dipotong dan diletakkan kembali. Gali di sana."
       }
+    }
+  },
+  "seasonal": {
+    "pumpkins": {
+      "name": "Labu Berhantu",
+      "title": "Labu-Labu Berhantu",
+      "world": "Dunia",
+      "progress": "{label}: {current}/{total}",
+      "found": "Kamu menyalakan Labu Berhantu di {zone}: {count}/{total}. Permen Cahaya Labu diterima: {sweets}.",
+      "flash": "Labu Berhantu ditemukan! {count}/{total}"
+    },
+    "event": {
+      "gourdlight_eve": {
+        "name": "Malam Cahaya Labu"
+      }
+    },
+    "trickOrTreat": {
+      "row": "Permen atau keisengan!",
+      "rowAria": "Ucapkan permen atau keisengan kepada {name}",
+      "knockedHint": "Kamu sudah mengetuk di sini hari ini. Pintu terbuka lagi setelah reset harian.",
+      "treat": "{name} memberimu camilan.",
+      "trick": "{name} mengerjaimu: {trick}!",
+      "alreadyKnocked": "Kamu sudah meminta permen atau keisengan kepada {name} hari ini.",
+      "notActive": "Malam Cahaya Labu sedang tidak berlangsung.",
+      "tooFar": "Mendekatlah untuk mengetuk.",
+      "treatFlash": {
+        "one": "Permen! {count} Permen Cahaya Labu",
+        "few": "Permen! {count} Permen Cahaya Labu",
+        "many": "Permen! {count} Permen Cahaya Labu",
+        "other": "Permen! {count} Permen Cahaya Labu"
+      },
+      "trickFlash": "Keisengan! {trick}"
+    },
+    "tricks": {
+      "gourdlight_trick_bat": "Kelakuan Kelelawar",
+      "gourdlight_trick_skeleton": "Tulang Gemeretak",
+      "gourdlight_trick_fumes": "Asap Hijau",
+      "gourdlight_trick_strawling": "Wujud Makhluk Jerami",
+      "gourdlight_costume_skeleton": "Kostum Kerangka",
+      "gourdlight_costume_ghost": "Kostum Hantu",
+      "gourdlight_costume_bat": "Kostum Kelelawar"
+    },
+    "pumpkinHead": {
+      "on": "Kamu mengenakan Kepala Labu Ukir.",
+      "off": "Kamu melepas Kepala Labu Ukir."
+    },
+    "jarTrick": "Stoples terbuka dengan letupan: {trick}!",
+    "guise": "Jimat berderak dan jerami menjalari tubuhmu: {trick}!",
+    "costume": "Kamu meminum ramuan dan berubah: {trick}!",
+    "titleGranted": "Kamu membaca piagam. Gelar baru diperoleh: {title}.",
+    "titleKnown": "Kamu sudah memiliki gelar itu, jadi piagamnya disimpan.",
+    "boundItemGone": "Malam Cahaya Labu telah usai, dan {item} milikmu hancur kembali menjadi jerami.",
+    "itemUse": {
+      "pumpkinHead": "Pakai: Kenakan atau lepaskan labu ukir yang bercahaya dari dalam, dipakai di atas helm. Kosmetik.",
+      "trickJar": "Pakai: Memainkan keisengan acak yang tidak berbahaya padamu selama beberapa detik. Kosmetik.",
+      "pouch": "Pakai: Buka untuk menerima {count} Permen Cahaya Labu.",
+      "strawlingCharm": "Pakai: Menjadi salah satu makhluk jerami Si Tua Seringai Jerami selama {seconds} detik. Di luar pertempuran. Tidak pernah habis dipakai. Kosmetik.",
+      "sweet": "Diperoleh dengan meminta permen atau keisengan selama Malam Cahaya Labu. Hester Sumbu Labu menukarnya dengan kosmetik di kios-kiosnya di Eastbrook, Jembatan Rawa, dan Menara Pengawas.",
+      "costumeSkeleton": "Pakai: Berubah menjadi kerangka gemeretak selama {minutes} menit. Habis dipakai. Tidak dapat digunakan dalam pertempuran, dan memasuki pertempuran mengakhirinya. Kosmetik.",
+      "costumeGhost": "Pakai: Berubah menjadi hantu melayang selama {minutes} menit. Habis dipakai. Tidak dapat digunakan dalam pertempuran, dan memasuki pertempuran mengakhirinya. Kosmetik.",
+      "costumeBat": "Pakai: Berubah menjadi kelelawar yang mengepak selama {minutes} menit. Habis dipakai. Tidak dapat digunakan dalam pertempuran, dan memasuki pertempuran mengakhirinya. Kosmetik.",
+      "toyPrank": "Pakai: Lempar ke pemain lain yang terlihat dalam {range} yard. Kepalanya menjadi lentera labu menyala selama {seconds} detik, dan dapat dilepas dengan klik kanan. Kalian berdua tidak boleh sedang bertempur, dan kamu tidak boleh bersembunyi. Tidak pernah habis: dapat digunakan lagi setelah {cooldown} detik. Disimpan permanen dan dapat digunakan sepanjang tahun. Kosmetik.",
+      "toyLantern": "Pakai: Letakkan lentera di depanmu. Hantu kecil mengitarimu selama {seconds} detik. Tidak dapat digunakan dalam pertempuran atau saat bersembunyi. Tidak pernah habis: dapat digunakan lagi setelah {cooldown} detik. Disimpan permanen dan dapat digunakan sepanjang tahun. Kosmetik.",
+      "toyBats": "Pakai: Buka karungnya. Kawanan kelelawar berdecit keluar dan berpencar di sekitarmu selama {seconds} detik. Tidak dapat digunakan dalam pertempuran atau saat bersembunyi. Tidak pernah habis: dapat digunakan lagi setelah {cooldown} detik. Disimpan permanen dan dapat digunakan sepanjang tahun. Kosmetik.",
+      "toyCandleShadows": "Pakai: Nyalakan lilin di depanmu. Selama {seconds} detik, apinya memproyeksikan bayangan kucing, kelelawar, dan penyihir yang menari di tanah sekitarnya, terlihat oleh semua orang di dekatnya. Tidak dapat digunakan dalam pertempuran atau saat bersembunyi. Tidak pernah habis: dapat digunakan lagi setelah {cooldown} detik. Disimpan permanen dan dapat digunakan sepanjang tahun. Kosmetik.",
+      "toyCauldron": "Pakai: Letakkan kuali besar berbuih di depanmu. Kuali bertahan {standing} detik, dan pemain yang meminumnya meletup dalam gelembung hijau lalu menjadi goblin selama {seconds} detik, menggantikan kostum yang dikenakan. Meletakkan atau meminumnya tidak dapat dilakukan dalam pertempuran atau saat bersembunyi, dan memasuki pertempuran mengakhiri wujud goblin. Tidak pernah habis: dapat digunakan lagi setelah {cooldown} detik. Disimpan permanen dan dapat digunakan sepanjang tahun. Kosmetik.",
+      "titleWrit": "Pakai: Dapatkan gelar {title} untuk karakter ini, dikenakan melalui Kitab Jasa. Habis dipakai. Disimpan jika gelar itu sudah dimiliki.",
+      "broomSources": "Dibeli dari Hester Sumbu Labu seharga {count} Ikatan Jerami Anyaman Bara, atau, meski langka, dijatuhkan Si Tua Seringai Jerami pada hari kamu mengambil jarahannya. Menungganginya memerlukan keahlian berkuda. Disimpan permanen dan dapat ditunggangi sepanjang tahun.",
+      "sheaf": "Si Tua Seringai Jerami memberi satu setiap hari kamu mengambil jarahannya, sampai kamu memiliki Sapu Bulu Bara. Hester Sumbu Labu menukar {count} dengan sapu di kios-kiosnya di Eastbrook, Jembatan Rawa, dan Menara Pengawas. Ikatan yang belum dibelanjakan disimpan untuk Malam Cahaya Labu berikutnya."
+    },
+    "toy": {
+      "prank": "Kamu melempar labu. Labu pecah mengenai {name}!",
+      "lantern": "Kamu meletakkan lentera, dan hantu kecil melayang keluar untuk menemanimu.",
+      "bats": "Kamu membuka karung, dan kawanan kelelawar terkejut berhamburan keluar!",
+      "candleShadows": "Kamu menyalakan lilin, dan bayangan mulai menari di sekeliling apinya.",
+      "cauldron": "Kamu meletakkan kuali, dan kuali mulai berbuih.",
+      "cauldronDrink": "Kamu minum dari kuali, meletup dalam gelembung hijau, dan berubah menjadi goblin!",
+      "pranked": "{name} memecahkan labu di kepalamu! Lepaskan dengan klik kanan, atau kenakan dengan bangga.",
+      "prankedFlash": "Dikerjai oleh {name}!",
+      "prankNeedsPlayer": "Labu hanya bisa mengenai pemain lain yang tidak sedang bertempur.",
+      "hidden": "Keluar dari bayangan dahulu: mainan akan membongkar persembunyianmu."
+    },
+    "itemSource": {
+      "pumpkinHead": "Dijatuhkan Si Tua Seringai Jerami di ladang labunya melewati Padang Babi Hutan saat pertama kali kamu mengambil jarahannya. Tidak dijual pedagang mana pun."
+    },
+    "boo": {
+      "row": "Huu!",
+      "rowAria": "Lompat di depan {name} dan teriakkan huu",
+      "needsCostume": "Kenakan kostum dahulu: ramuan kostum, keisengan kelelawar atau kerangka, Jimat Makhluk Jerami, Kepala Labu Ukir, atau tegukan goblin dari Kuali Gelembung Hijau.",
+      "frightenedHint": "{name} masih gelisah setelah terakhir kau takuti. Cari orang lain.",
+      "landed": "Kamu melompat di depan {name} sambil berteriak HUU! Dia menjerit dan hampir menjatuhkan semua barangnya.",
+      "flash": "HUU! {name} ketakutan!",
+      "noCostume": "Tanpa kostum, {name} hanya menertawakanmu. Kenakan kostum dahulu.",
+      "already": "{name} sudah cukup ditakuti untuk hari ini.",
+      "notOnErrand": "Hester belum memintamu menakuti siapa pun hari ini."
+    },
+    "tokenPrice": "{count} {item}",
+    "thatchgrin": {
+      "poleBound": "Terikat Tiang",
+      "wakeYell": "MALAM turun di ladang! Siapa berjalan di ladang MILIKKU?",
+      "sleepYell": "Matahari terbit. Kembali ke tiang, kembali berjaga."
     }
   },
   "dungeonGuide": {
@@ -9903,7 +10019,7 @@ export const id_ID: EnTranslations = {
       "framesGovernedTalkingHead": "Edit Frames juga melonggarkan panel Dialog, yang membawa kalimat lisan NPC saat NPC tersebut berada di luar pandangan Anda; ia memakai chip namanya saat longgar.",
       "framesGovernedShardpike": "Edit Bingkai juga membebaskan bilah Tombak Serpih, deretan pendek tindakan alat misi yang muncul di samping bilah aksi hanya saat kamu membawa Tombak Serpih itu sendiri; label namanya muncul saat bebas agar bisa ditempatkan sebelum pertempuran.",
       "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
-      "framesGovernedPriest": "Edit Frames also lets you move the Shadow priest's Gloomtithe and Tithe Bomb medallion.",
+      "framesGovernedPriest": "Edit Bingkai juga memungkinkanmu memindahkan medali Upeti Kelam dan Bom Persepuluhan milik priest Bayangan.",
       "framesGovernedResourceAndHill": "Aktifkan Pisahkan bilah sumber daya pada tab Bingkai agar Edit Bingkai juga membuka kunci bilah sumber dayamu, sehingga mana, energi, atau amarah dapat ditempatkan sendiri di mana saja. Lebar bilah sumber daya dan Tinggi bilah sumber daya pada tab yang sama mengatur ukurannya. Edit Bingkai juga membuka kunci bilah Raja Bukit. Opasitas latar Raja Bukit pada tab itu memudarkan panelnya tanpa mengurangi kejelasan teks.",
       "barsTitle": "Bilah, penghitung waktu, dan teks pertarungan",
       "barsBody": "Bilah rapalanmu muncul di tengah layar, tepat di atas bilah aksimu, setiap kali kamu merapal atau menyalurkan mantra, dan menampilkan nama mantra serta waktu yang tersisa. Targetmu mendapatkan bilah rapalannya sendiri pada bingkainya, sehingga kamu bisa melihat apa yang akan datang dan meresponsnya.\n\nSebuah bilah ayunan tipis berada di bawah bilah rapalanmu dan terisi di antara ayunan senjatamu, sehingga penyerang jarak dekat atau jarak jauh bisa melihat kapan pukulan otomatis berikutnya akan mendarat.\n\nBilah pengalamanmu membentang selebar penuh di bawah bilah aksimu, terbagi menjadi segmen-segmen, dengan sebuah bagian yang lebih terang menunjukkan pengalaman istirahat yang telah kamu tabung.\n\nBerenang di bawah air dan sebuah bilah napas biru muncul di bagian atas layar. Bilah itu berkurang selama kepalamu terendam, berkedip merah begitu habis dan kamu mulai tenggelam, lalu terisi cepat begitu kamu muncul ke permukaan. Space membuatmu berenang ke atas, dan tombol Berenang Turun, Ctrl secara bawaan, membawamu lebih dalam.\n\nKerusakan dan penyembuhan melayang ke atas dari apa pun yang menerimanya sebagai angka-angka kecil, sehingga kamu bisa membaca sebuah pertarungan tanpa membaca teks. Tab Catatan Tempur di kotak obrolanmu menyimpan catatan tertulis yang lengkap.",
@@ -10808,6 +10924,7 @@ export const id_ID: EnTranslations = {
       "hillBodyRamp": "Setiap dua jam, sebuah bukit muncul di Tanah Naga, Tabir Beku, atau Air Terjun Amber. Realm menerima peringatan lima belas menit sebelumnya, dan lingkarannya ditandai di tanah terbuka. Bukit tetap aktif selama tiga puluh menit. Memasuki lingkaran aktif mengaktifkan bendera PvP Dunia sesuai aturan level biasa, termasuk bagi anggota raid. Grup dengan pemain yang memenuhi syarat paling banyak di dalamnya merebut bukit setelah mempertahankan mayoritas selama satu menit tanpa terputus; pemain tunggal dihitung sebagai grup beranggota satu, tetapi anggota raid dan pemain di bawah persyaratan level PvP tidak dapat merebut bukit atau memperoleh Kehormatan bukit. Setiap anggota grup penguasa yang berada di dalam lingkaran memperoleh Kehormatan dengan laju yang terus meningkat. Pembagian hadiah menjadi lebih sering dan kenaikannya lebih cepat, sehingga total Kehormatan tetap sama seperti acara lama yang berlangsung empat puluh lima menit. Pergantian penguasa mengulang kenaikan hadiah dari awal. Keluar dari lingkaran tidak menonaktifkan benderamu; /pvp off menggunakan jeda lima menit seperti biasa dan tidak dapat selesai di dalam bukit aktif atau selama pertempuran. Bilah bukit menampilkan penguasaan, jumlah pemain, dan kemajuan perebutan; /hill melaporkan lokasinya.",
       "hillBodyPause": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls, and every five minutes while it stands the realm is told where it is and which groups have held it longest. The party with the most players standing inside contests the hill, and after thirty seconds of majority the hill is theirs. A rival party walking in only pauses that count until yours leads again; it starts over only if nobody from your party is left alive inside. A lone player counts as a party of one and keeps a hill they hold when they form a party, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns Honor every minute, and the longer the same party holds it, the more each minute pays: a full party holding an uncontested hill for its whole stand earns about as much as three battleground wins. When the hill changes hands, the new holders start the count from the beginning. When it falls, if the group that held it longest in total held it for at least ten minutes, everyone who stood inside for that group for at least a minute, and is still in that group, earns one win toward the PvP row of the Weekly Vault. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
       "hillBodyFlat": "Sekali setiap tiga jam, pada waktu yang tidak dapat diprediksi, seluruh realm diberi tahu bahwa sebuah bukit akan muncul di salah satu zona utara dalam lima belas menit, dan lingkarannya ditandai di tanah terbuka. Bukit bertahan selama empat puluh lima menit, lalu menghilang. Selama itu, setiap lima menit lokasi dan kelompok dengan total waktu penguasaan terlama diumumkan. Kelompok dengan pemain terbanyak di dalam lingkaran memperebutkan bukit dan merebutnya setelah mengumpulkan tiga puluh detik keunggulan jumlah. Kedatangan kelompok lawan hanya menjeda hitungan sampai kelompokmu kembali unggul; hitungan hanya diulang dari awal jika tidak ada anggota kelompokmu yang masih hidup di dalam. Pemain sendirian dihitung sebagai kelompok beranggotakan satu orang dan tetap menguasai bukit saat membentuk kelompok, tetapi anggota raid tidak dihitung sama sekali. Setiap anggota kelompok penguasa yang berdiri di dalam mendapat jumlah Kehormatan yang sama setiap menit, berapa pun lamanya mereka menguasai bukit. Kelompok penuh yang menguasainya tanpa gangguan selama seluruh masa bukit mendapat kira-kira setara tiga kemenangan medan perang. Saat bukit menghilang, jika kelompok dengan total penguasaan terlama telah menguasainya setidaknya sepuluh menit, semua pemain yang berdiri di dalam setidaknya satu menit selama penguasaan kelompok itu dan masih tergabung di dalamnya mendapat satu kemenangan untuk baris PvP Gudang Mingguan. Bilah di atas medan menunjukkan penguasa, jumlah pemain kedua pihak, dan hitungan perebutan; /hill di obrolan menunjukkan lokasinya.",
+      "hillBodyTwoHour": "Sekali setiap dua jam, pada waktu yang tak dapat diprediksi, seluruh realm diberi tahu bahwa sebuah bukit akan muncul di salah satu zona utara dalam lima belas menit, dan lingkaran tempatnya berdiri ditandai di tanah terbuka. Setelah muncul, bukit bertahan tiga puluh menit lalu turun, dan setiap lima menit selama masih berdiri, realm diberi tahu lokasinya serta kelompok yang paling lama menguasainya. Party dengan pemain terbanyak di dalam lingkaran memperebutkan bukit, dan setelah unggul jumlah selama tiga puluh detik, bukit menjadi milik mereka. Masuknya party lawan hanya menjeda hitungan sampai partymu unggul lagi; hitungan dimulai ulang hanya jika tak ada anggota partymu yang masih hidup di dalam. Pemain solo dihitung sebagai party satu orang dan tetap menguasai bukit saat membentuk party, tetapi anggota raid sama sekali tidak dihitung. Selama party menguasai bukit, setiap anggotanya yang berdiri di dalam memperoleh Honor dalam jumlah yang sama setiap menit, berapa pun lama penguasaannya. Karena itu, party penuh yang menguasai bukit tanpa gangguan selama seluruh masa kemunculannya memperoleh kira-kira setara dua kemenangan medan perang. Saat bukit turun, jika kelompok yang paling lama menguasainya secara keseluruhan telah menguasainya setidaknya sepuluh menit, setiap orang yang berdiri di dalam untuk kelompok itu setidaknya satu menit dan masih menjadi anggotanya memperoleh satu kemenangan untuk baris PvP Brankas Mingguan. Bilah di atas area menunjukkan pemiliknya, jumlah pemain kedua pihak, dan waktu perebutan; /hill di chat menunjukkan lokasinya.",
       "limitsBodyRaids": "Mengalahkan pemain yang sama lagi dan lagi membayar lebih sedikit setiap kali dan segera tidak ada, dan hitungan kamu melawan pemain itu hanya dimulai lagi sekitar satu jam setelah yang pertama dari pembunuhan itu, jadi mengepung satu korban tidak pernah sepadan dengan menunggu. Target jauh di bawah level kamu tidak membayar apa pun sama sekali. Medan pertempuran dan Arena menjalankan aturan mereka sendiri saat kamu berada di dalam, dan mereka membayar lebih banyak Kehormatan daripada dunia terbuka, jadi Peperangan Dunia adalah jalan yang lebih lambat ke vendor yang sama. Raid tidak memperoleh apa pun dari pembunuhan dunia: anggota raid tidak mengambil Kehormatan atau emas dan tidak mengecilkan bagian siapa pun, jadi bertarung sebagai pihak untuk dibayar."
     },
     "thornhollowPage": {
@@ -15549,6 +15666,7 @@ export const id_ID: EnTranslations = {
       "accountSuspended": "Akun ini ditangguhkan hingga {date}.",
       "alreadyInWorld": "Karakter sudah berada di dalam dunia.",
       "accountSessionLimit": "Terlalu banyak karakter dari akun ini yang sudah berada di dalam dunia.",
+      "worldFightHold": "Karakter lain di akun ini masih berada di dunia setelah bertarung. Coba lagi dalam beberapa menit.",
       "takenOver": "Karakter Anda telah diambil alih oleh sesi lain.",
       "vaultMailRecovering": "Surat hadiah peti Anda sedang dipulihkan. Coba lagi nanti.",
       "renameBeforeEntering": "Karakter ini harus diganti namanya sebelum memasuki dunia.",
@@ -18442,16 +18560,16 @@ export const id_ID: EnTranslations = {
         "description": "Menyalurkan selama 3 dtk, memberi {damage} kerusakan Bayangan setiap detik. Kerusakan meningkat dengan Kekuatan Mantra."
       },
       "vampiric_touch": {
-        "name": "Vampiric Touch",
-        "description": "Deal {damage} Shadow damage over 15 sec, once every 3 sec. Damage increases with Spell Power and ticks can critically strike. Each tick shares healing equal to 20% of the health lost by the enemy among you and injured party members within 30 yards; in a raid, only your subgroup receives this healing. If you have at least 2 Gloomtithe charges, applying this effect consumes 2 to increase all its damage by 30%."
+        "name": "Sentuhan Vampir",
+        "description": "Timbulkan {damage} kerusakan Bayangan selama 15 dtk, sekali setiap 3 dtk. Kerusakan meningkat dengan Daya Sihir dan setiap tik dapat menjadi kritis. Setiap tik membagikan pemulihan sebesar 20% kesehatan yang hilang dari musuh kepada dirimu dan anggota party yang terluka dalam 30 yard; dalam raid, hanya subgrupmu yang menerima pemulihan ini. Jika kamu memiliki setidaknya 2 muatan Upeti Kelam, penerapan efek ini menghabiskan 2 untuk meningkatkan seluruh kerusakannya sebesar 30%."
       },
       "void_rupture": {
-        "name": "Void Rupture",
-        "description": "Consume 3 Gloomtithe charges to rupture an enemy for {damage} Shadow damage. Damage increases with Spell Power and can critically strike. Requires 3 charges and consumes them even if resisted."
+        "name": "Rekahan Kehampaan",
+        "description": "Habiskan 3 muatan Upeti Kelam untuk merobek musuh dengan {damage} kerusakan Bayangan. Kerusakan meningkat dengan Daya Sihir dan dapat menjadi kritis. Memerlukan 3 muatan dan tetap menghabiskannya meski dilawan."
       },
       "spirit_bomb": {
-        "name": "Tithe Bomb",
-        "description": "Detonate a spirit bomb on an enemy, dealing {damage} Shadow damage to enemies within 8 yards of that target. Damage increases with Spell Power, can critically strike, and is reduced beyond 5 targets. Generate 20 Gloomtithe to prepare one bomb. Generation counts even while holding the maximum 5 Gloomtithe; spending charges is not required and adds no progress. Progress lasts between fights, up to one prepared bomb. Dying clears your progress and prepared bomb. Completing the cast consumes the prepared bomb, even if resisted. Cancellation or interruption preserves it. Starting a raid boss encounter clears your progress and prepared bomb. Cannot open a raid boss encounter with this spell."
+        "name": "Bom Persepuluhan",
+        "description": "Ledakkan bom roh pada musuh, menimbulkan {damage} kerusakan Bayangan kepada musuh dalam 8 yard dari sasaran. Kerusakan meningkat dengan Daya Sihir, dapat menjadi kritis, dan berkurang jika melampaui 5 sasaran. Hasilkan 20 Upeti Kelam untuk menyiapkan satu bom. Perolehan tetap dihitung saat menyimpan maksimal 5 Upeti Kelam; menghabiskan muatan tidak diperlukan dan tidak menambah progres. Progres bertahan di antara pertempuran, hingga satu bom siap pakai. Kematian menghapus progres dan bom siap pakai. Menyelesaikan perapalan menghabiskan bom, meski dilawan. Pembatalan atau interupsi menyimpannya. Memulai pertarungan bos raid menghapus progres dan bom siap pakai. Mantra ini tidak dapat digunakan untuk membuka pertarungan bos raid."
       },
       "flash_heal": {
         "name": "Doa Mendesak",
@@ -19287,7 +19405,7 @@ export const id_ID: EnTranslations = {
       "inner_focus": {
         "name": "Pikiran Hening",
         "description": "Membuat mantra pendeta berikutnya gratis dan tak bisa diinterupsi. Bertahan 60 dtk.",
-        "specNote_shadow": "Also reserves a guaranteed critical strike for your next Mindfracture or Void Rupture within 60 sec, if it hits. Other spells do not consume this bonus. Void Rupture still consumes 3 Gloomtithe charges. A resisted cast consumes the critical strike bonus."
+        "specNote_shadow": "Juga menjamin serangan kritis untuk Retak Pikiran atau Rekahan Kehampaan berikutnya dalam 60 dtk, jika mengenai sasaran. Mantra lain tidak menghabiskan bonus ini. Rekahan Kehampaan tetap menghabiskan 3 muatan Upeti Kelam. Mantra yang dilawan menghabiskan bonus kritis."
       },
       "innervate": {
         "name": "Getah Hidup",
@@ -19485,7 +19603,7 @@ export const id_ID: EnTranslations = {
       "choir_of_deliverance": {
         "name": "Paduan Suara Pembebasan",
         "description": "Merapal selama 6 dtk, menyembuhkan anggota grup dalam radius 30 meter sebesar {damage} setiap 2 dtk. Penyembuhan meningkat dengan kekuatan mantra.",
-        "specNote_shadow": "For 15 sec, share 20% of the health enemies lose to your Shadow damage as healing among injured party members within 30 yards, including yourself. In raids, only your subgroup is healed. Cast instantly and keep attacking in Shadowform. Absorbed damage and overkill do not add healing."
+        "specNote_shadow": "Selama 15 dtk, bagikan 20% kesehatan yang hilang dari musuh akibat kerusakan Bayanganmu sebagai pemulihan kepada anggota party yang terluka dalam 30 yard, termasuk dirimu. Dalam raid, hanya subgrupmu yang dipulihkan. Dirapal seketika dan kamu dapat terus menyerang dalam Selubung Senja. Kerusakan yang diserap dan yang melampaui sisa kesehatan tidak menambah pemulihan."
       },
       "bear_charge": {
         "name": "Terjangan Bruin",
@@ -24700,6 +24818,87 @@ export const id_ID: EnTranslations = {
       "vanguard_pendant_of_mending": {
         "name": "Liontin Pelopor Penyembuhan"
       },
+      "gourdlight_sweet": {
+        "name": "Permen Cahaya Labu"
+      },
+      "gourdlight_treat_pouch": {
+        "name": "Kantong Permen Cahaya Labu"
+      },
+      "carved_pumpkin_head": {
+        "name": "Kepala Labu Ukir"
+      },
+      "jar_of_mischief": {
+        "name": "Stoples Keusilan"
+      },
+      "thatchgrin_sweet_sack": {
+        "name": "Karung Permen Seringai Jerami"
+      },
+      "strawling_charm": {
+        "name": "Jimat Makhluk Jerami"
+      },
+      "rattlebone_draught": {
+        "name": "Ramuan Tulang Gemeretak"
+      },
+      "haunting_draught": {
+        "name": "Ramuan Hantu"
+      },
+      "batwing_draught": {
+        "name": "Ramuan Kepakan"
+      },
+      "writ_of_the_gourdlit": {
+        "name": "Piagam Si Bercahaya Labu"
+      },
+      "writ_of_the_trickster": {
+        "name": "Piagam Si Usil"
+      },
+      "writ_of_the_hollow_grin": {
+        "name": "Piagam Seringai Hampa"
+      },
+      "reins_emberbristle_broom": {
+        "name": "Sapu Bulu Bara"
+      },
+      "hearthroot_toffee": {
+        "name": "Karamel Akar Perapian"
+      },
+      "gourdseed_brittle": {
+        "name": "Getas Biji Labu"
+      },
+      "crabapple_chew": {
+        "name": "Permen Kunyah Apel Liar"
+      },
+      "owlwatch_fudge": {
+        "name": "Fudge Penjaga Burung Hantu"
+      },
+      "lantern_mint_drop": {
+        "name": "Permen Mint Lentera"
+      },
+      "emberwoven_sheaf": {
+        "name": "Ikatan Jerami Anyaman Bara"
+      },
+      "prankers_pumpkin": {
+        "name": "Labu Si Usil"
+      },
+      "wanderwisp_lantern": {
+        "name": "Lentera Cahaya Pengembara"
+      },
+      "sack_of_startled_bats": {
+        "name": "Karung Kelelawar Terkejut"
+      },
+      "murmurwick_candle": {
+        "name": "Lilin Sumbu Berbisik"
+      },
+      "gurglegreen_cauldron": {
+        "name": "Kuali Gelembung Hijau"
+      },
+      "thatchgrin_patch_pumpkin": {
+        "name": "Labu Ladang"
+      },
+      "cursed_candle_stub": {
+        "name": "Puntung Lilin Terkutuk"
+      },
+      "gourdlight_crow_feather": {
+        "name": "Bulu Gagak Cahaya Labu"
+      },
       "membership_staff": {
         "name": "Tongkat Perubahan"
       },
@@ -26256,6 +26455,18 @@ export const id_ID: EnTranslations = {
       "muster_effigy": {
         "name": "Mandor Jerami"
       },
+      "gourdlight_thatchgrin": {
+        "name": "Si Tua Seringai Jerami"
+      },
+      "gourdlight_crow": {
+        "name": "Gagak Cahaya Labu"
+      },
+      "gourdlight_strawling": {
+        "name": "Makhluk Jerami"
+      },
+      "gourdlight_swelling_gourd": {
+        "name": "Labu Membengkak"
+      },
       "stable_horse": {
         "name": "Kuda Kandang"
       },
@@ -27409,6 +27620,11 @@ export const id_ID: EnTranslations = {
         "name": "Hester Quillby",
         "title": "Pembuat Peta",
         "greeting": "Setiap peta rawa ini yang pernah kubeli sudah keliru dalam semusim. Air memindahkan jalan, dan jalan memindahkan air. Jadi aku menggambar petaku sendiri, lalu duduk di sini yang kering sembari menunggu tinta mengering."
+      },
+      "gourdlight_keeper": {
+        "name": "Hester Sumbu Labu",
+        "title": "Penjaga Cahaya Labu",
+        "greeting": "Labu sudah menyala dan lentera sudah digantung, jadi pastilah Malam Cahaya Labu telah tiba. Ketuk pintu warga Eastbrook, Jembatan Rawa, dan Menara Pengawas, lalu ucapkan: permen atau keisengan. Kebanyakan akan memberimu permen. Beberapa akan mengerjaimu. Bawa permen itu kepadaku di kiosku yang mana saja, dan akan kutukar dengan sesuatu untuk kau kenakan."
       },
       "reeve_ottoline": {
         "name": "Demang Ottoline",
@@ -30041,6 +30257,88 @@ export const id_ID: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Penyembuhan efektif mengenai Boneka Latihan Penyembuhan"
+          }
+        }
+      },
+      "q_gourdlight_rounds": {
+        "title": "Keliling Cahaya Labu",
+        "text": "Setiap Malam Cahaya Labu, anak-anak Lembah berkeliling, dan tahun ini kau ikut bersama mereka, {playerName}. Ketuk lima pintu di kota-kota kita, ucapkan kata-katanya, dan lihat apa yang diberikan kepadamu. Kembalilah kepadaku setelah selesai.",
+        "completion": "Lima pintu dan jarimu masih lengkap. Ini sekantong permen untuk perjalanan pulang. Datanglah lagi besok, pintunya akan dibuka kembali.",
+        "objectives": {
+          "0": {
+            "label": "Pintu yang diketuk"
+          }
+        }
+      },
+      "q_gourdlight_daily_patch": {
+        "title": "Labu dari Ladang",
+        "text": "Ladang Si Tua Seringai Jerami di seberang Padang Babi Hutan penuh labu, dan separuhnya menggelinding melewati jeraminya sehingga orang yang berhati-hati bisa mengambilnya. Bawakan aku lima, {playerName}. Jauhi orang-orangan sawah tua itu. Dia menghitung semuanya.",
+        "completion": "Lima buah bulat, tanpa bekas gigitan sedikit pun. Cukup untuk pai bagi seluruh Lembah. Ini, untuk jerih payahmu.",
+        "objectives": {
+          "0": {
+            "label": "Labu Ladang"
+          }
+        }
+      },
+      "q_gourdlight_daily_boo": {
+        "title": "Huu!",
+        "text": "Sudah setahun tak ada seorang pun di kota-kota ini yang benar-benar ketakutan, {playerName}, dan Malam Cahaya Labu tanpa kejutan hanyalah malam dingin biasa. Kenakan kostum, yang mana saja dariku boleh, atau kepala labu itu jika sudah kau peroleh. Lalu dekati tiga warga diam-diam dan teriakkan HUU dengan keras.",
+        "completion": "Tiga orang? Aku mendengar si juru masak menjatuhkan wajan dari seberang alun-alun. Bagus sekali. Ini bagianmu.",
+        "objectives": {
+          "0": {
+            "label": "Warga yang ditakuti"
+          }
+        }
+      },
+      "q_gourdlight_daily_wicks": {
+        "title": "Sumbu Jahat",
+        "text": "Seseorang menaruh lilin berapi hijau di kaki tiang lampu kita. Lilin itu terbakar tanpa meleleh dan berbisik saat kau membelakanginya. Padamkan enam untukku, {playerName}, di mana saja di ketiga kota, lalu bawa puntungnya.",
+        "completion": "Enam puntung, dingin seperti embun beku. Siapa pun yang menyalakannya harus berusaha lebih keras. Ambil ini, lalu cuci tanganmu.",
+        "objectives": {
+          "0": {
+            "label": "Lilin terkutuk dipadamkan"
+          }
+        }
+      },
+      "q_gourdlight_daily_towns": {
+        "title": "Pintu di Setiap Kota",
+        "text": "Anak-anak bilang pejalan Cahaya Labu sejati mengetuk pintu di setiap kota sebelum malam berakhir. Buktikan mereka benar, {playerName}. Mintalah permen atau keisengan di satu pintu Eastbrook, satu di Jembatan Rawa, dan satu di Menara Pengawas. Lentera di jalan akan menerangi langkahmu.",
+        "completion": "Tiga kota dalam satu malam! Sepatumu lebih pantas mendapat ini daripada dirimu.",
+        "objectives": {
+          "0": {
+            "label": "Pintu diketuk di Eastbrook"
+          },
+          "1": {
+            "label": "Pintu diketuk di Jembatan Rawa"
+          },
+          "2": {
+            "label": "Pintu diketuk di Menara Pengawas"
+          }
+        }
+      },
+      "q_gourdlight_daily_feathers": {
+        "title": "Bulu untuk Api",
+        "text": "Saat terdesak, Si Tua Seringai Jerami memanggil gagak-gagaknya untuk menyerang siapa pun yang memukuli tubuh jeraminya. Bulu mereka terbakar hijau di perapian, dan aku perlu tiga untuk api unggun malam ini. Cari pertempuran di ladangnya, {playerName}, lalu cabut bulu gagaknya.",
+        "completion": "Hitam seperti ladang tanpa bulan, dan sudah berbau asap. Api unggunnya pasti indah. Terima kasih.",
+        "objectives": {
+          "0": {
+            "label": "Bulu gagak"
+          }
+        }
+      },
+      "q_gourdlight_daily_baskets": {
+        "title": "Keranjang untuk Tetangga",
+        "text": "Setiap Malam Cahaya Labu, kuisi sekeranjang permen untuk sahabat lama di setiap kota, tetapi lututku tak lagi seperti dulu. Antarkan untukku, {playerName}: kepada juru masak Marlow di Eastbrook, Yara si herbalis di Jembatan Rawa, dan Ahli Sejarah Caddis di Menara Pengawas.",
+        "completion": "Ketiganya sudah diantar, dan kudengar Marlow menangis. Dia memang selalu menangis. Ini keranjang untukmu sendiri.",
+        "objectives": {
+          "0": {
+            "label": "Keranjang diberikan kepada juru masak Marlow"
+          },
+          "1": {
+            "label": "Keranjang diberikan kepada Yara si herbalis"
+          },
+          "2": {
+            "label": "Keranjang diberikan kepada Ahli Sejarah Caddis"
           }
         }
       },

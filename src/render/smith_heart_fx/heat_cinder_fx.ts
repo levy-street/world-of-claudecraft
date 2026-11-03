@@ -31,6 +31,7 @@ import {
   heatTimedOf,
   HEAT_TUNING as T,
 } from '../../sim/encounters/smith_heart/heat_ids';
+import { fxAnchor } from '../attached_fx_anchor';
 import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import {
   TELEGRAPH_THREAT_COLORS,
@@ -365,6 +366,7 @@ export class HeatCinderFx {
     for (const id of ids) {
       const e = world.entities.get(id);
       if (!e) continue;
+      const eAt = fxAnchor(e);
       let s = this.falls.find((f) => f.id === id);
       if (!s) {
         s = this.falls.find((f) => f.id < 0);
@@ -372,13 +374,13 @@ export class HeatCinderFx {
         s.id = id;
         s.born = clock;
         s.seconds = heatTimedOf(HEAT_OBJECTS.fallPrefix, e.templateId) ?? T.cinderFallWarn;
-        const y = this.host.groundY(e.pos.x, e.pos.z);
+        const y = this.host.groundY(eAt.x, eAt.z);
         this.host.kit.drapeFan(
           s.fan,
           this.host.groundY,
-          e.pos.x,
+          eAt.x,
           y,
-          e.pos.z,
+          eAt.z,
           0,
           e.scale || T.cinderLandR,
         );
@@ -391,13 +393,13 @@ export class HeatCinderFx {
       PAINT.front = undefined;
       PAINT.fade = undefined;
       this.host.kit.paintFan(s.fan, PAINT);
-      const y = this.host.groundY(e.pos.x, e.pos.z);
-      s.ball.position.set(e.pos.x, y + look.height + BALL_R, e.pos.z);
+      const y = this.host.groundY(eAt.x, eAt.z);
+      s.ball.position.set(eAt.x, y + look.height + BALL_R, eAt.z);
       s.ball.scale.set(BALL_R * 5, BALL_R * 5, 1);
       s.ballMat.opacity = 0.95;
       s.ball.visible = true;
       if (this.host.rand() < dt * 50 * this.host.density)
-        this.host.particles.puff(e.pos.x, s.ball.position.y + 2, e.pos.z, 1, METEOR);
+        this.host.particles.puff(eAt.x, s.ball.position.y + 2, eAt.z, 1, METEOR);
     }
   }
 
@@ -422,10 +424,11 @@ export class HeatCinderFx {
         this.release(s);
         continue;
       }
-      // Smooth toward the mirrored body (a snapshot's step never jerks it).
-      const k = Math.min(1, dt * 12);
-      const mx = (e.pos.x - s.x) * k;
-      const mz = (e.pos.z - s.z) * k;
+      // Ride the drawn body (already smooth: attached_fx_anchor.ts); a lag
+      // toward the snapshot trailed it and stepped with every snapshot.
+      const at = fxAnchor(e);
+      const mx = at.x - s.x;
+      const mz = at.z - s.z;
       s.x += mx;
       s.z += mz;
       const moved = Math.hypot(mx, mz);
@@ -510,12 +513,13 @@ export class HeatCinderFx {
       if (!p || p.dead) continue;
       const m = this.marks[n++];
       m.id = id;
-      const y = this.host.groundY(p.pos.x, p.pos.z);
-      m.chevron.position.set(p.pos.x, p.pos.y + 3.4 + 0.25 * Math.sin(clock * 5), p.pos.z);
+      const pAt = fxAnchor(p);
+      const y = this.host.groundY(pAt.x, pAt.z);
+      m.chevron.position.set(pAt.x, pAt.y + 3.4 + 0.25 * Math.sin(clock * 5), pAt.z);
       m.chevron.scale.set(1.4, 1.4, 1);
       m.chevron.quaternion.copy(this.cameraYaw());
       m.chevron.visible = true;
-      this.host.kit.drapeFan(m.ring, this.host.groundY, p.pos.x, y, p.pos.z, 0, 1.6);
+      this.host.kit.drapeFan(m.ring, this.host.groundY, pAt.x, y, pAt.z, 0, 1.6);
       PAINT.fill = 1;
       PAINT.clock = clock;
       PAINT.range = 1.6;
@@ -551,12 +555,13 @@ export class HeatCinderFx {
       const g = this.addGlows[n++];
       const big =
         e.templateId === HEAT_MOBS.keeper ? 2.2 : e.templateId === HEAT_MOBS.spawn ? 1.5 : 1;
-      g.position.set(e.pos.x, e.pos.y + 1.4 * big, e.pos.z);
+      const eAt = fxAnchor(e);
+      g.position.set(eAt.x, eAt.y + 1.4 * big, eAt.z);
       g.scale.set(4 * big, 4 * big, 1);
       g.visible = true;
       if (this.host.rand() < dt * 14 * big * this.host.density) {
         ADD_FLAME.radius = 0.5 * big;
-        this.host.particles.puff(e.pos.x, e.pos.y + 0.8 * big, e.pos.z, 1, ADD_FLAME);
+        this.host.particles.puff(eAt.x, eAt.y + 0.8 * big, eAt.z, 1, ADD_FLAME);
       }
     }
     for (let i = n; i < this.addGlows.length; i++) this.addGlows[i].visible = false;

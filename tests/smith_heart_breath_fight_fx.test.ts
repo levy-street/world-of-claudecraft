@@ -355,6 +355,18 @@ describe('BreathFightFx', () => {
     expect(shownFans(1.15)).toBe(1);
     expect(shownFans(1.9)).toBe(1);
     expect(root?.getObjectByName('smithHeartBreathBeacon')?.visible).toBe(true);
+    // The beacon reads as crisp current (a saturated blue column running white
+    // hot pulses, a blue glow round a small white spark), never a milky blob.
+    const beacon = root?.getObjectByName('smithHeartBreathBeacon') as THREE.Mesh;
+    const bm = beacon.material as THREE.ShaderMaterial;
+    expect(bm.uniforms.uHot.value).toBe(1);
+    const bc = bm.uniforms.uColor.value as THREE.Color;
+    expect(bc.b).toBeGreaterThan(bc.r * 3);
+    const glow = root?.getObjectByName('smithHeartBreathBeaconGlow') as THREE.Sprite;
+    expect(glow.visible).toBe(true);
+    const gc = (glow.material as THREE.SpriteMaterial).color;
+    expect(gc.b).toBeGreaterThan(gc.r * 3);
+    expect(glow.scale.x).toBeLessThan(2);
     // The circle's seats: P.seats pips per circle (the pool sized and indexed
     // alike), the one anchored player inside it taking one.
     const P = BREATH_FIGHT_POOLS;

@@ -1,8 +1,12 @@
 // The Knotted Gale (encounters/smith_heart/breath_heart.ts), a part of BreathFightFx,
 // on EVERY tier (the raid acts on all of it): the ball, a Storm Orb wound in a knot of
 // wind, growing and more violent to its end, on a floor ring that shrinks as its timer;
-// the two portals told apart at a glance (teal A, violet B, a funnel of wind each, the
-// letter on the floor) with a link of light between them; each marked player's letter
+// the portals told apart at a glance (teal A, violet B, a funnel of wind each, the
+// letter on the floor) with a link of light between them; phase 2's second pair a
+// family of its own (spring-green C, rose D: three arms turning the other way inside
+// a doubled rim, the funnel's bands the other way, a dark plum letter, and a braid of
+// two twisting strands for a link, riding above the first pair's beam); each marked
+// player's letter
 // over their head and the filling ring of the portal to come; the carrier with the ball
 // over them and a ring pressed into the floor. The throw arcs off into the void; the
 // burst is a flash, a wall of storm across the Cornice and a shake. Cosmetic particles
@@ -13,13 +17,13 @@
 
 import * as THREE from 'three';
 import {
-  BREATH_AURAS,
   BREATH_CUES,
   knotOf,
   BREATH_TUNING as T,
 } from '../../sim/encounters/smith_heart/breath_ids';
 import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
+import { fxAnchor } from '../attached_fx_anchor';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import type { EngineParticles } from '../trash_engine_fx/engine_particles';
 import {
@@ -27,15 +31,21 @@ import {
   burstLook,
   HEART_COLORS as C,
   HEART_FLOOR,
+  HEART_SIDES,
   type HeartObjectKind,
+  type HeartPortalSide,
   heartObjectKind,
   KNOT_CARRY_Y,
   KNOT_FLOAT_Y,
   knotLook,
+  LINK_Y,
   liveFuse,
   markFill,
+  markSideOf,
   HEART_POOLS as P,
   portalLink,
+  portalSideLook,
+  portalSideOfKind,
   THROW_ARC,
   throwHeading,
   throwOffset,
@@ -66,9 +76,51 @@ export interface BreathHeartHost {
 
 const color = (hex: number) => new THREE.Color(hex);
 
-/** A block letter as a flat shape in x/y, a yard or so tall: A or B. */
-function letterShape(which: 'A' | 'B'): THREE.Shape {
+/** A ring arc's outline (an ellipse about cx, cy from a0 to a1 radians). */
+function arc(
+  path: THREE.Path,
+  cx: number,
+  cy: number,
+  rx: number,
+  ry: number,
+  a0: number,
+  a1: number,
+  steps: number,
+  first: boolean,
+): void {
+  for (let i = 0; i <= steps; i++) {
+    const a = a0 + ((a1 - a0) * i) / steps;
+    const x = cx + Math.cos(a) * rx;
+    const y = cy + Math.sin(a) * ry;
+    if (first && i === 0) path.moveTo(x, y);
+    else path.lineTo(x, y);
+  }
+}
+
+/** A block letter as a flat shape in x/y, a yard or so tall: A, B, C or D. */
+function letterShape(which: HeartPortalSide): THREE.Shape {
   const s = new THREE.Shape();
+  if (which === 'C') {
+    // A thick open ring, its mouth to the right.
+    const open = (50 * Math.PI) / 180;
+    arc(s, 0.05, 0, 0.55, 0.7, open, Math.PI * 2 - open, 20, true);
+    arc(s, 0.05, 0, 0.29, 0.44, Math.PI * 2 - open, open, 20, false);
+    s.closePath();
+    return s;
+  }
+  if (which === 'D') {
+    s.moveTo(-0.45, -0.7);
+    arc(s, -0.05, 0, 0.53, 0.7, -Math.PI / 2, Math.PI / 2, 18, false);
+    s.lineTo(-0.45, 0.7);
+    s.closePath();
+    const hole = new THREE.Path();
+    hole.moveTo(-0.18, 0.44);
+    hole.lineTo(-0.18, -0.44);
+    arc(hole, -0.05, 0, 0.27, 0.44, -Math.PI / 2, Math.PI / 2, 14, false);
+    hole.closePath();
+    s.holes.push(hole);
+    return s;
+  }
   if (which === 'A') {
     s.moveTo(-0.55, -0.7);
     s.lineTo(-0.15, 0.7);
@@ -138,11 +190,16 @@ interface PortalSlot {
 
 interface MarkSlot {
   ring: THREE.Mesh;
-  letter: { A: THREE.Mesh; B: THREE.Mesh };
+  letter: Record<HeartPortalSide, THREE.Mesh>;
   fill: { value: number };
   ringColor: THREE.Color;
   id: number;
-  which: 'A' | 'B';
+  which: HeartPortalSide;
+}
+
+interface LinkSlot {
+  mesh: THREE.Mesh;
+  len: { value: number };
 }
 
 interface FlightSlot {
@@ -156,14 +213,14 @@ interface FlightSlot {
   hz: number;
 }
 
-const KIND_INDEX: Readonly<Record<'portalA' | 'portalB', number>> = { portalA: 0, portalB: 1 };
-
 export class BreathHeartFx {
   private readonly knots: KnotSlot[] = [];
+  /** One slot per side, in side order (A, B, C, D). */
   private readonly portals: PortalSlot[] = [];
   private readonly marks: MarkSlot[] = [];
   private readonly flights: FlightSlot[] = [];
-  private readonly link: THREE.Mesh;
+  /** One link per pair: A to B, C to D. */
+  private readonly links: LinkSlot[] = [];
   private readonly burstWall: THREE.Mesh;
   private readonly burstFlash: THREE.Mesh;
   private readonly burstAlpha = { value: 0 };
@@ -172,7 +229,7 @@ export class BreathHeartFx {
   // The scan's finds (rewritten at the host's scan pace).
   private seenKnots = 0;
   private seenMarks = 0;
-  private readonly seenPortal = [false, false];
+  private readonly seenPortal = HEART_SIDES.map(() => false);
 
   constructor(private readonly h: BreathHeartHost) {
     const mk = (
@@ -213,12 +270,15 @@ export class BreathHeartFx {
     // Flat on the floor: x/z, uv across the whole square.
     const floorQuad = new THREE.PlaneGeometry(2, 2);
     floorQuad.rotateX(-Math.PI / 2);
-    const letterA = new THREE.ShapeGeometry(letterShape('A'));
-    const letterB = new THREE.ShapeGeometry(letterShape('B'));
-    const floorLetterA = letterA.clone();
-    floorLetterA.rotateX(-Math.PI / 2);
-    const floorLetterB = letterB.clone();
-    floorLetterB.rotateX(-Math.PI / 2);
+    // Each side's letter, upright (over a marked player) and laid flat (in its mouth).
+    const letters = {} as Record<HeartPortalSide, THREE.ShapeGeometry>;
+    const floorLetters = {} as Record<HeartPortalSide, THREE.BufferGeometry>;
+    for (const side of HEART_SIDES) {
+      letters[side] = new THREE.ShapeGeometry(letterShape(side));
+      floorLetters[side] = letters[side].clone();
+      floorLetters[side].rotateX(-Math.PI / 2);
+      h.geometries.push(letters[side], floorLetters[side]);
+    }
     const orb = new THREE.SphereGeometry(1, 28, 20);
     const orbCore = new THREE.SphereGeometry(0.55, 16, 12);
     const knot = new THREE.TorusKnotGeometry(1.25, 0.05, 140, 6, 2, 3);
@@ -226,7 +286,7 @@ export class BreathHeartFx {
     funnel.translate(0, 0.5, 0);
     const wall = new THREE.CylinderGeometry(1, 1, 1, 48, 1, true);
     wall.translate(0, 0.5, 0);
-    h.geometries.push(floorQuad, letterA, letterB, floorLetterA, floorLetterB);
+    h.geometries.push(floorQuad);
     h.geometries.push(orb, orbCore, knot, funnel, wall);
     const windMat = (hex: number, name: string) => {
       const m = new THREE.MeshBasicMaterial({
@@ -292,13 +352,18 @@ export class BreathHeartFx {
       });
     }
 
-    const sideOf = [
-      { hex: C.a, floor: floorLetterA, tag: 'A' },
-      { hex: C.b, floor: floorLetterB, tag: 'B' },
-    ];
-    for (const side of sideOf) {
+    for (const tag of HEART_SIDES) {
+      const look = portalSideLook(tag);
+      const side = { hex: look.color, floor: floorLetters[tag], tag };
       const open = { value: 0 };
-      const u = { uTime: h.uTime, uOpen: open, uColor: { value: color(side.hex) } };
+      const u = {
+        uTime: h.uTime,
+        uOpen: open,
+        uColor: { value: color(side.hex) },
+        uArms: { value: look.arms },
+        uSpin: { value: look.spin },
+        uRing2: { value: look.ring2 },
+      };
       this.portals.push({
         disc: mk(
           `smithHeartPortal${side.tag}`,
@@ -318,7 +383,9 @@ export class BreathHeartFx {
           side.floor,
           new THREE.MeshBasicMaterial({
             name: `smithHeartPortalLetter${side.tag}`,
-            color: 0x06202a,
+            // A dark ink in the pair's own cast: deep sea for A and B, deep
+            // plum for C and D, so the letter stays crisp on its bright mouth.
+            color: look.pair === 0 ? 0x06202a : 0x2a0620,
             transparent: true,
             depthWrite: false,
             toneMapped: false,
@@ -333,20 +400,15 @@ export class BreathHeartFx {
       h.materials.push(this.portals[this.portals.length - 1].letter.material as THREE.Material);
     }
 
-    const faceA = shader(
-      'smithHeartMarkLetterA',
-      { uColor: { value: color(C.a) } },
-      FACING_VERT,
-      FACING_FRAG,
-      { blending: THREE.NormalBlending, depthTest: false, side: THREE.DoubleSide },
-    );
-    const faceB = shader(
-      'smithHeartMarkLetterB',
-      { uColor: { value: color(C.b) } },
-      FACING_VERT,
-      FACING_FRAG,
-      { blending: THREE.NormalBlending, depthTest: false, side: THREE.DoubleSide },
-    );
+    const faces = {} as Record<HeartPortalSide, THREE.ShaderMaterial>;
+    for (const side of HEART_SIDES)
+      faces[side] = shader(
+        `smithHeartMarkLetter${side}`,
+        { uColor: { value: color(portalSideLook(side).color) } },
+        FACING_VERT,
+        FACING_FRAG,
+        { blending: THREE.NormalBlending, depthTest: false, side: THREE.DoubleSide },
+      );
     for (let i = 0; i < P.marks; i++) {
       const fill = { value: 0 };
       const ringColor = color(C.a);
@@ -363,8 +425,10 @@ export class BreathHeartFx {
           HEART_FLOOR.mark,
         ),
         letter: {
-          A: mk('smithHeartMarkLetterA', letterA, faceA),
-          B: mk('smithHeartMarkLetterB', letterB, faceB),
+          A: mk('smithHeartMarkLetterA', letters.A, faces.A),
+          B: mk('smithHeartMarkLetterB', letters.B, faces.B),
+          C: mk('smithHeartMarkLetterC', letters.C, faces.C),
+          D: mk('smithHeartMarkLetterD', letters.D, faces.D),
         },
         fill,
         ringColor,
@@ -373,18 +437,35 @@ export class BreathHeartFx {
       });
     }
 
-    this.link = mk(
-      'smithHeartPortalLink',
-      new THREE.PlaneGeometry(1, 1).rotateY(Math.PI / 2),
-      shader(
-        'smithHeartPortalLink',
-        { uTime: h.uTime, uA: { value: color(C.a) }, uB: { value: color(C.b) } },
-        HEART_UV_VERT,
-        PORTAL_LINK_FRAG,
-        { side: THREE.DoubleSide },
-      ),
-    );
-    h.geometries.push(this.link.geometry);
+    // One link per pair: A's teal to B's violet in a soft beam; C's green to D's
+    // rose in a braid of two twisting strands, riding higher.
+    const linkGeo = new THREE.PlaneGeometry(1, 1).rotateY(Math.PI / 2);
+    h.geometries.push(linkGeo);
+    for (let pair = 0; pair < P.links; pair++) {
+      const from = portalSideLook(HEART_SIDES[pair * 2]).color;
+      const to = portalSideLook(HEART_SIDES[pair * 2 + 1]).color;
+      const len = { value: 1 };
+      this.links.push({
+        mesh: mk(
+          `smithHeartPortalLink${pair + 1}`,
+          linkGeo,
+          shader(
+            `smithHeartPortalLink${pair + 1}`,
+            {
+              uTime: h.uTime,
+              uA: { value: color(from) },
+              uB: { value: color(to) },
+              uBraid: { value: pair },
+              uLen: len,
+            },
+            HEART_UV_VERT,
+            PORTAL_LINK_FRAG,
+            { side: THREE.DoubleSide },
+          ),
+        ),
+        len,
+      });
+    }
 
     const flightMat = windMat(C.core, 'smithHeartKnotFlight');
     for (let i = 0; i < P.flights; i++) {
@@ -419,8 +500,7 @@ export class BreathHeartFx {
   beginScan(): void {
     this.seenKnots = 0;
     this.seenMarks = 0;
-    this.seenPortal[0] = false;
-    this.seenPortal[1] = false;
+    this.seenPortal.fill(false);
   }
 
   /** A fight object the scan found; false when it is none of this mechanic's. */
@@ -431,7 +511,9 @@ export class BreathHeartFx {
       if (this.seenKnots < this.knots.length) this.knots[this.seenKnots++].id = e.id;
       return true;
     }
-    const i = KIND_INDEX[kind];
+    const side = portalSideOfKind(kind);
+    if (!side) return true;
+    const i = portalSideLook(side).slot;
     this.seenPortal[i] = true;
     const s = this.portals[i];
     if (s.id !== e.id) {
@@ -443,13 +525,12 @@ export class BreathHeartFx {
 
   /** A living player's aura the scan found. */
   takeAura(e: Entity, auraId: string): void {
-    const which =
-      auraId === BREATH_AURAS.portalA ? 'A' : auraId === BREATH_AURAS.portalB ? 'B' : null;
+    const which = markSideOf(auraId);
     if (!which || this.seenMarks >= this.marks.length) return;
     const m = this.marks[this.seenMarks++];
     m.id = e.id;
     m.which = which;
-    m.ringColor.setHex(which === 'A' ? C.a : C.b);
+    m.ringColor.setHex(portalSideLook(which).color);
   }
 
   endScan(): void {
@@ -482,10 +563,9 @@ export class BreathHeartFx {
     }
     for (const m of this.marks) {
       m.ring.visible = false;
-      m.letter.A.visible = false;
-      m.letter.B.visible = false;
+      for (const side of HEART_SIDES) m.letter[side].visible = false;
     }
-    this.link.visible = false;
+    for (const l of this.links) l.mesh.visible = false;
     this.burstWall.visible = false;
     this.burstFlash.visible = false;
     for (const f of this.flights) f.mesh.visible = false;
@@ -503,8 +583,9 @@ export class BreathHeartFx {
         h.shakeNear(ev.x, ev.z, 0.25, 35);
         return true;
       }
-      if (ev.ability === BREATH_CUES.portalOpen) {
-        this.puff(ev.x, y + 0.5, ev.z, 26, 7, TINT.a, T.heartPortalR);
+      if (ev.ability === BREATH_CUES.portalOpen || ev.ability === BREATH_CUES.portalOpenPair2) {
+        const tint = ev.ability === BREATH_CUES.portalOpen ? TINT.a : TINT.c;
+        this.puff(ev.x, y + 0.5, ev.z, 26, 7, tint, T.heartPortalR);
         h.shakeNear(ev.x, ev.z, 0.15, 25);
         return true;
       }
@@ -527,11 +608,15 @@ export class BreathHeartFx {
       }
       return false;
     }
-    if (ev.type === 'spellfx' && ev.ability === BREATH_CUES.portalHop) {
+    if (
+      ev.type === 'spellfx' &&
+      (ev.ability === BREATH_CUES.portalHop || ev.ability === BREATH_CUES.portalHopPair2)
+    ) {
       const p = world.entities.get(ev.targetId);
       if (p) {
-        this.puff(p.pos.x, p.pos.y + 1, p.pos.z, 30, 8, TINT.b, 1.5);
-        h.shakeNear(p.pos.x, p.pos.z, 0.2, 18);
+        const tint = ev.ability === BREATH_CUES.portalHop ? TINT.b : TINT.d;
+        this.puff(fxAnchor(p).x, fxAnchor(p).y + 1, fxAnchor(p).z, 30, 8, tint, 1.5);
+        h.shakeNear(fxAnchor(p).x, fxAnchor(p).z, 0.2, 18);
       }
       return true;
     }
@@ -594,12 +679,13 @@ export class BreathHeartFx {
       }
       const look = knotLook(liveFuse(of.fuse, now - k.changedAt));
       const held = of.state === 'held';
-      const floor = h.groundY(e.pos.x, e.pos.z);
+      const eAt = fxAnchor(e);
+      const floor = h.groundY(eAt.x, eAt.z);
       const y = floor + (held ? KNOT_CARRY_Y : KNOT_FLOAT_Y) + 0.15 * Math.sin(now * 3);
       const r = look.radius * (1 + 0.14 * look.throb * Math.sin(now * 14));
       k.crackle.value = look.crackle;
       k.turn += look.spin * dt;
-      k.shell.position.set(e.pos.x, y, e.pos.z);
+      k.shell.position.set(eAt.x, y, eAt.z);
       k.shell.scale.setScalar(r);
       k.core.position.copy(k.shell.position);
       k.core.scale.setScalar(r);
@@ -609,14 +695,14 @@ export class BreathHeartFx {
       k.shell.visible = true;
       k.core.visible = true;
       k.wind.visible = true;
-      k.ring.position.set(e.pos.x, floor + 0.1, e.pos.z);
+      k.ring.position.set(eAt.x, floor + 0.1, eAt.z);
       k.ring.scale.set(look.ringR, 1, look.ringR);
       k.ring.visible = true;
       k.ringColor.setHex(C.storm).lerp(_danger, look.danger);
       k.ringAlpha.value = 0.75 + 0.25 * look.throb * Math.sin(now * 14);
       k.load.visible = held;
       if (held) {
-        k.load.position.set(e.pos.x, floor + 0.12, e.pos.z);
+        k.load.position.set(eAt.x, floor + 0.12, eAt.z);
         k.load.scale.set(1.5, 1, 1.5);
       }
     }
@@ -628,43 +714,48 @@ export class BreathHeartFx {
       p.letter.visible = !!e;
       if (!e) continue;
       const r = e.scale > 0 ? e.scale : T.heartPortalR;
-      const floor = h.groundY(e.pos.x, e.pos.z);
+      const eAt = fxAnchor(e);
+      const floor = h.groundY(eAt.x, eAt.z);
       const open = Math.min(1, (now - p.bornAt) / 0.5);
       p.open.value = open;
-      p.disc.position.set(e.pos.x, floor + 0.08, e.pos.z);
+      p.disc.position.set(eAt.x, floor + 0.08, eAt.z);
       p.disc.scale.set(r * open, 1, r * open);
-      p.funnel.position.set(e.pos.x, floor + 0.05, e.pos.z);
+      p.funnel.position.set(eAt.x, floor + 0.05, eAt.z);
       p.funnel.scale.set(r * open, 6.5 * open, r * open);
-      p.letter.position.set(e.pos.x, floor + 0.1, e.pos.z);
+      p.letter.position.set(eAt.x, floor + 0.1, eAt.z);
       p.letter.scale.setScalar(r * 0.55 * open);
     }
-    // The link of light, A to B, a long flat beam at waist height.
-    const a = this.portals[0].id >= 0 ? world.entities.get(this.portals[0].id) : undefined;
-    const b = this.portals[1].id >= 0 ? world.entities.get(this.portals[1].id) : undefined;
-    this.link.visible = !!a && !!b;
-    if (a && b) {
+    // The links of light within each pair: A to B a long flat beam at waist
+    // height, C to D a braid riding above it. Never one across the pairs.
+    for (let pair = 0; pair < this.links.length; pair++) {
+      const link = this.links[pair];
+      const pa = this.portals[pair * 2];
+      const pb = this.portals[pair * 2 + 1];
+      const a = pa.id >= 0 ? world.entities.get(pa.id) : undefined;
+      const b = pb.id >= 0 ? world.entities.get(pb.id) : undefined;
+      link.mesh.visible = !!a && !!b;
+      if (!a || !b) continue;
       const l = portalLink(a.pos.x, a.pos.z, b.pos.x, b.pos.z);
-      this.link.position.set(l.mx, Math.max(a.pos.y, b.pos.y) + 1.4, l.mz);
-      this.link.rotation.set(0, l.yaw, 0);
-      this.link.scale.set(1, 1.1, Math.max(0.01, l.len));
+      link.mesh.position.set(l.mx, Math.max(a.pos.y, b.pos.y) + LINK_Y[pair], l.mz);
+      link.mesh.rotation.set(0, l.yaw, 0);
+      link.mesh.scale.set(1, 1.1, Math.max(0.01, l.len));
+      link.len.value = l.len;
     }
     // Each marked player: the letter over them, the coming portal filling underfoot.
     for (const m of this.marks) {
       const e = m.id >= 0 ? world.entities.get(m.id) : undefined;
-      const aura = e?.auras.find(
-        (x) => x.id === (m.which === 'A' ? BREATH_AURAS.portalA : BREATH_AURAS.portalB),
-      );
+      const aura = e?.auras.find((x) => markSideOf(x.id) === m.which);
       const show = !!e && !!aura && !e.dead;
       m.ring.visible = show;
-      m.letter.A.visible = show && m.which === 'A';
-      m.letter.B.visible = show && m.which === 'B';
+      for (const side of HEART_SIDES) m.letter[side].visible = show && m.which === side;
       if (!e || !aura || !show) continue;
       m.fill.value = markFill(aura.remaining, aura.duration);
-      const floor = h.groundY(e.pos.x, e.pos.z);
-      m.ring.position.set(e.pos.x, floor + 0.11, e.pos.z);
+      const eAt = fxAnchor(e);
+      const floor = h.groundY(eAt.x, eAt.z);
+      m.ring.position.set(eAt.x, floor + 0.11, eAt.z);
       m.ring.scale.set(T.heartPortalR, 1, T.heartPortalR);
-      const letter = m.which === 'A' ? m.letter.A : m.letter.B;
-      letter.position.set(e.pos.x, e.pos.y + 3.6 + 0.12 * Math.sin(now * 4), e.pos.z);
+      const letter = m.letter[m.which];
+      letter.position.set(eAt.x, eAt.y + 3.6 + 0.12 * Math.sin(now * 4), eAt.z);
       letter.scale.setScalar(1.15);
     }
     // A throw going off into the void, trailing storm.
@@ -704,6 +795,8 @@ const _danger = new THREE.Color(C.danger);
 const TINT = {
   a: [0.28, 0.94, 0.85],
   b: [0.7, 0.47, 1],
+  c: [0.66, 1, 0.24],
+  d: [1, 0.35, 0.69],
   storm: [0.56, 0.7, 1],
   load: [1, 0.82, 0.48],
 } as const;

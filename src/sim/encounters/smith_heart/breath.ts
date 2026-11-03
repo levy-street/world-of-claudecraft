@@ -142,6 +142,8 @@ function freshState(boss: Entity, difficulty: BreathDifficulty): BreathFightStat
     inhaleTimer: T.inhaleFirst,
     circleTimer: T.circleFirst,
     calm: null,
+    lastCalm: null,
+    lastKnots: [],
     pinned: {},
     overLip: [],
     floorSpot: null,
@@ -440,9 +442,9 @@ export function breathDevTrigger(
     startStorm(s);
     return 'The storm breaks (the guardian at half health).';
   }
-  // A forced blow or calm takes the wind from an indrawn breath in flight.
+  // A forced blow, gust or calm takes the wind from an indrawn breath in flight.
   if (
-    (verb === 'blow' || verb === 'calm') &&
+    (verb === 'blow' || verb === 'gust' || verb === 'calm') &&
     (st.wind.phase === 'inhale' || st.wind.phase === 'exhale')
   ) {
     cutBar(s);

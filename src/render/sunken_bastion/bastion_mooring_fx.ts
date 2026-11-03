@@ -36,6 +36,7 @@ import type { SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { radialGlowTexture } from '../textures';
+import { VisibleChildrenGroup } from '../visible_children_group';
 import { bastionSlotOrigin, chainPoints } from './bastion_boss_fx_core';
 import {
   MOORING_FLARE_SECONDS,
@@ -106,7 +107,7 @@ interface SnapSlot {
 }
 
 export class BastionMooringFx {
-  private readonly root = new THREE.Group();
+  private readonly root = new VisibleChildrenGroup();
   private readonly fx: BastionParticles;
   private readonly posts: PostSlot[] = [];
   private readonly snaps: SnapSlot[] = [];

@@ -65,6 +65,7 @@ interface VertexSample {
   color: [number, number, number];
   splat: [number, number, number, number]; // grass, dirt, rock, sand
   extra: [number, number, number, number]; // mud, snow, impact scorch, impact ash
+  lowMask: [number, number]; // road/path weight, water-gated beach sand weight
 }
 
 // Shared scratch colors for the palette blend (hot loop, avoid allocation).
@@ -390,6 +391,7 @@ function sampleVertex(state: ChunkGeometryBuildState, ci: number, cj: number): V
   const wl = waterLevel();
   let shore = autoShoreSand ? clamp01((wl + 1.8 - h) / 1.8) : 0;
   if (shore > 0) shore *= shoreWaterGate(x, z, h, wl, shoreProbeFor(seed));
+  let beachSandW = 0;
   if (biome === 'marsh') {
     cTmp.lerp(dirtDarkC, shore);
     lerpSplat(w, 1, shore);
@@ -404,6 +406,7 @@ function sampleVertex(state: ChunkGeometryBuildState, ci: number, cj: number): V
     if (sandShore > 0) {
       cTmp.lerp(sandC, sandShore);
       lerpSplat(w, 3, sandShore);
+      beachSandW = Math.max(beachSandW, sandShore);
     }
     if (rockShore > 0) {
       cTmp.lerp(wetRockC, rockShore);
@@ -420,8 +423,10 @@ function sampleVertex(state: ChunkGeometryBuildState, ci: number, cj: number): V
     if (strand > 0) {
       cTmp.lerp(sandC, Math.min(1, strand));
       lerpSplat(w, 3, Math.min(1, strand));
+      beachSandW = Math.max(beachSandW, Math.min(1, strand));
     }
   }
+  let roadW = 0;
   // packed dirt at each hub settlement (same feather as the splat weight —
   // a constant lerp stamped a clean-edged brown disc on the grass)
   for (const zn of ZONES) {
@@ -436,8 +441,9 @@ function sampleVertex(state: ChunkGeometryBuildState, ci: number, cj: number): V
         cTmp.lerp(cobbleDarkC, cell * 0.45 * hubT);
         lerpSplat(w, 2, 0.75 * hubT);
       } else {
-        cTmp.lerp(dirtC, 0.72 * hubT);
+        cTmp.lerp(dirtC, (lowShade ? 0.45 : 0.72) * hubT);
         lerpSplat(w, 1, 0.75 * hubT);
+        roadW = Math.max(roadW, 0.75 * hubT);
       }
       break;
     }
@@ -446,22 +452,28 @@ function sampleVertex(state: ChunkGeometryBuildState, ci: number, cj: number): V
   // the Amberfall paves its ways: cobblestone, cell-jittered so the vertex
   // grid reads as laid stones rather than one grey ribbon (rock splat)
   const cobbles = biome === 'amber';
-  if (rd < 1.9) {
+  const rdCore = lowShade ? Math.max(2.1, stepX * 0.62) : 1.9;
+  const rdSpan = lowShade ? Math.max(2.1, stepX * 0.72) : 1.7;
+  if (rd < rdCore) {
     if (cobbles) {
       const cell = (Math.sin(Math.floor(x * 1.6) * 12.9898 + Math.floor(z * 1.6) * 78.233) + 1) / 2;
       cTmp.lerp(cobbleC, 0.9);
       cTmp.lerp(cobbleDarkC, cell * 0.5);
       lerpSplat(w, 2, 0.85);
     } else {
-      cTmp.lerp(dirtC, 0.88);
-      cTmp.lerp(sandC, 0.18);
+      cTmp.lerp(dirtC, lowShade ? 0.52 : 0.88);
+      cTmp.lerp(sandC, lowShade ? 0.1 : 0.18);
       lerpSplat(w, 1, 0.88);
+      roadW = Math.max(roadW, 0.88);
     }
-  } else if (rd < 3.6) {
-    const u = 1 - (rd - 1.9) / 1.7;
+  } else if (rd < rdCore + rdSpan) {
+    const u = 1 - (rd - rdCore) / rdSpan;
     const t = 0.88 * u * u * (3 - 2 * u);
-    cTmp.lerp(cobbles ? cobbleC : dirtC, t);
-    if (!cobbles) cTmp.lerp(sandC, t * 0.14);
+    cTmp.lerp(cobbles ? cobbleC : dirtC, lowShade && !cobbles ? t * 0.55 : t);
+    if (!cobbles) {
+      cTmp.lerp(sandC, t * (lowShade ? 0.08 : 0.14));
+      roadW = Math.max(roadW, t);
+    }
     lerpSplat(w, cobbles ? 2 : 1, t);
   }
   // Break up the rock/snow blend so cliffs read as striated stone and snow
@@ -617,18 +629,18 @@ function sampleVertex(state: ChunkGeometryBuildState, ci: number, cj: number): V
     // inside the cells.
     const fx = paintTintAt(x, z);
     if (fx) {
-      // A TEXTURED swatch is rendered by the fragment tile array, which now
-      // covers its cells completely - shifting the vertex tint/splat toward
-      // it here only bleeds one vertex ring PAST the painted cells (splat
-      // weights interpolate across triangles), which showed as a rock rim
-      // around rock-like paint. Colour-only swatches still need the vertex
-      // path (it is their whole render), and Snow-family swatches ride the
-      // dedicated snow channel either way.
-      if (!fx.textured) {
+      // A TEXTURED swatch is rendered by the fragment tile array on the splat
+      // tier, which covers its cells completely - shifting the vertex tint/splat
+      // toward it there only bleeds one vertex ring PAST the painted cells.
+      // Colour-only swatches and the lowShade Lambert tier (which has no fragment
+      // paint tile array) still need the vertex path as their whole render.
+      if (!fx.textured || lowShade) {
         paintC.setRGB(fx.r, fx.g, fx.b);
         cTmp.lerp(paintC, Math.min(1, fx.strength));
         const pLayer = fx.layer;
         if (pLayer !== -1) lerpSplat(w, pLayer, Math.min(1, fx.strength));
+        if (pLayer === 1) roadW = Math.max(roadW, Math.min(1, fx.strength));
+        else if (pLayer === 3) beachSandW = Math.max(beachSandW, Math.min(1, fx.strength));
       }
       if (fx.snow > 0) snow = Math.max(snow, fx.snow);
     }
@@ -658,6 +670,7 @@ function sampleVertex(state: ChunkGeometryBuildState, ci: number, cj: number): V
     color: [cTmp.r, cTmp.g, cTmp.b],
     splat: w,
     extra: [mud, snow, impact.scorch, impact.ash],
+    lowMask: [roadW, beachSandW],
   };
 }
 
@@ -1066,8 +1079,13 @@ export function fillChunkVertexRow(state: ChunkGeometryBuildState, gj: number): 
     state.colors[vi * 3] = s.color[0];
     state.colors[vi * 3 + 1] = s.color[1];
     state.colors[vi * 3 + 2] = s.color[2];
-    state.uvs[vi * 2] = (x + WORLD_MAX_X) / (WORLD_MAX_X * 2);
-    state.uvs[vi * 2 + 1] = (z - WORLD_MIN_Z) / worldDepth;
+    if (state.lowShade) {
+      state.uvs[vi * 2] = s.lowMask[0];
+      state.uvs[vi * 2 + 1] = s.lowMask[1];
+    } else {
+      state.uvs[vi * 2] = (x + WORLD_MAX_X) / (WORLD_MAX_X * 2);
+      state.uvs[vi * 2 + 1] = (z - WORLD_MIN_Z) / worldDepth;
+    }
     if (state.splats) {
       state.splats[vi * 4] = s.splat[0];
       state.splats[vi * 4 + 1] = s.splat[1];
@@ -1411,8 +1429,18 @@ export function buildChunkCutFine(state: ChunkGeometryBuildState): {
         normals[v * 3 + 2] = 0;
       }
       lerp3(state.colors, colors);
-      uvs[v * 2] = (x + WORLD_MAX_X) / (WORLD_MAX_X * 2);
-      uvs[v * 2 + 1] = (z - WORLD_MIN_Z) / worldDepth;
+      if (state.lowShade) {
+        for (let c = 0; c < 2; c++) {
+          uvs[v * 2 + c] =
+            state.uvs[v00 * 2 + c] * w00 +
+            state.uvs[v10 * 2 + c] * w10 +
+            state.uvs[v01 * 2 + c] * w01 +
+            state.uvs[v11 * 2 + c] * w11;
+        }
+      } else {
+        uvs[v * 2] = (x + WORLD_MAX_X) / (WORLD_MAX_X * 2);
+        uvs[v * 2 + 1] = (z - WORLD_MIN_Z) / worldDepth;
+      }
       const lerp4 = (src: Float32Array, dst: Float32Array): void => {
         for (let c = 0; c < 4; c++) {
           dst[v * 4 + c] =

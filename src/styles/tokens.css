@@ -1394,6 +1394,10 @@
     --color-breath-drowning-soft: rgb(255 60 40 / 40%);
     /* Breath text keeps its cool high-contrast parchment tint. */
     --color-breath-label: #eaf4ff;
+    /* The Knotted Gale's second pair of portals (phase 2): Portal C in the
+       storm's spring green, Portal D in its rose, the floor's own colours. */
+    --color-knot-portal-c: #a8ff3e;
+    --color-knot-portal-d: #ff5ab0;
 
     /* chat */
     /* Multiplies the player's chat opacity while the dock is idle. */

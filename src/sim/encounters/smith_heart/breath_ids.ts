@@ -72,9 +72,13 @@ export const BREATH_AURAS = {
   stormForm: 'heart_breath_storm_unbound',
   /** On the guardian: one stack per pulse of the swelling storm. */
   swell: 'heart_breath_swelling_storm',
-  /** Mythic, the Knotted Gale: the player whose feet open Portal A or B. */
+  /** Mythic, the Knotted Gale: the player whose feet open Portal A or B
+   *  (the first pair, every round) or Portal C or D (the second pair, phase
+   *  2's two-ball round only). */
   portalA: 'heart_breath_portal_a',
   portalB: 'heart_breath_portal_b',
+  portalC: 'heart_breath_portal_c',
+  portalD: 'heart_breath_portal_d',
   /** Mythic: carrying a Knotted Gale (value: the walk's factor; its life is
    *  the fuse). No wind, pull, blast or throw moves this body either. */
   laden: 'heart_breath_laden',
@@ -100,9 +104,12 @@ export const BREATH_OBJECTS = {
   /** Mythic: a Knotted Gale, `<prefix><free|held>_<tenths of fuse left>`
    *  (knotTemplate), its radius (the pick-up's) in `scale`. */
   knotPrefix: 'sh_breath_knot_',
-  /** Mythic: the two wind portals, their radius in `scale`. */
+  /** Mythic: the wind portals, their radius in `scale`: A links to B only,
+   *  C to D only (C and D open in phase 2's two-ball round alone). */
   portalA: 'sh_breath_portal_a',
   portalB: 'sh_breath_portal_b',
+  portalC: 'sh_breath_portal_c',
+  portalD: 'sh_breath_portal_d',
 } as const;
 
 /** The spellfx ability ids of the fight's moments. */
@@ -131,13 +138,17 @@ export const BREATH_CUES = {
   fall: 'heart_breath_fall',
   /** A Knotted Gale drops (spellfxAt 'burst', radius = its pick-up). */
   knotLand: 'heart_breath_knot_land',
-  /** A portal opens (spellfxAt 'burst', radius = the portal). */
+  /** A portal opens (spellfxAt 'burst', radius = the portal): the first
+   *  pair's (A or B), and the second pair's (C or D), so each paints in its
+   *  own pair's colours. */
   portalOpen: 'heart_breath_portal_open',
+  portalOpenPair2: 'heart_breath_portal_open_2',
   /** A player takes a Knotted Gale up (spellfxAt 'burst'). */
   knotTake: 'heart_breath_knot_take',
-  /** The carrier crosses from Portal A to Portal B (spellfx 'nova' on them,
-   *  after the move: the landing). */
+  /** A body crosses from a portal to its partner (spellfx 'nova' on them,
+   *  after the move: the landing): through A and B, and through C and D. */
   portalHop: 'heart_breath_portal_hop',
+  portalHopPair2: 'heart_breath_portal_hop_2',
   /** A Knotted Gale goes into the void (spellfxAt 'burst' at the lip). */
   knotThrow: 'heart_breath_knot_throw',
   /** A Knotted Gale bursts (spellfxAt 'nova', radius = the Cornice). */
@@ -169,6 +180,8 @@ export const BREATH_NAMES = {
   laden: 'Gale-Laden',
   portalA: 'Portal A',
   portalB: 'Portal B',
+  portalC: 'Portal C',
+  portalD: 'Portal D',
 } as const;
 
 /** The English line the carrier reads crossing the portals (re-localized by
@@ -269,8 +282,14 @@ export const BREATH_TUNING = {
   circleR: 3.5,
   /** At most this many take its anchor. */
   circleSeats: 3,
-  /** How far upwind of the guardian it lands (yards). */
+  /** How far upwind of the guardian it lands when no hashed spot fits (yards). */
   circleReach: 12,
+  /** The hashed spots: these reaches upwind, these offsets sideways (yards),
+   *  each circle at least `circleApart` from the one before (Jose's playtest:
+   *  one fixed reach put every circle in the same place). */
+  circleReaches: [8, 14, 20, 26] as readonly number[],
+  circleSides: [-14, -7, 0, 7, 14] as readonly number[],
+  circleApart: 12,
   anchorSeconds: 15,
   /** Heroic: no circle anchors the same player again for this long. */
   spentSeconds: 60,
@@ -385,12 +404,22 @@ export const BREATH_TUNING = {
   /** How near a ball a player takes it up, and a portal's mouth (yards). */
   heartPickR: 2.5,
   heartPortalR: 2.5,
-  /** How far from a gap's reach the lip still counts for the throw (yards). */
-  heartLipReach: 4,
-  /** A ball drops at least this far from every gap, and the second this far
-   *  from the first, both relaxed step by step if the floor cannot give it. */
-  heartFar: 26,
-  heartApart: 18,
+  /** How far from a gap's edge the lip still counts for the throw, and for a
+   *  carrier going over it to count as thrown (yards). Jose's playtest: 4 let
+   *  the throw land from well back on the floor; the carrier must stand right
+   *  at the lip. */
+  heartLipReach: 2,
+  /** A ball drops at least this far from every gap, and this far from the
+   *  round's other ball, the last round's balls and Thessaly's circle, both
+   *  relaxed step by step if the floor cannot give it. 26 left one patch, by
+   *  Thessaly's post, so every ball fell there (Jose's playtest); 16 opens the
+   *  middle of the Cornice too and still asks a 12 yd crawl. */
+  heartFar: 16,
+  heartApart: 20,
+  /** The carrier's walk with the wind at their back (facing within
+   *  `heartTailCone` degrees of where it blows): the load rides it a little. */
+  heartTailMult: 0.45,
+  heartTailCone: 60,
 } as const;
 
 // ---- pure helpers ---------------------------------------------------------------------

@@ -247,10 +247,11 @@ A scheduler opens ranked portals automatically. Tuning is `RIFT_TIER_INFO` plus 
   DEDICATED `Rng` derived from `(worldSeed, spawnOrdinal)`, never the shared
   stream, so adding the scheduler shifts no existing draw order. Which zones are
   due is itself rng-free: pure arithmetic over each zone's own event history.
-- **Zone to rank pool** (`riftTierForZone`): eligible regions are The Amberfall,
-  The Drakelands, The Evergarden, The Farshore, The Frostveil Reach, The
-  Galecrest, The Nightbloom, The Palmreach, The Veiled Hollow, The Willowfen,
-  and The Wraithwood. Each region owns its C/B/A/S weights. The rank sets the
+- **Zone to rank pool** (`riftTierForZone`): eligible regions are The Evergarden,
+  The Farshore, The Galecrest, The Nightbloom, The Palmreach, The Veiled
+  Hollow, The Willowfen, and The Wraithwood. The northern row (The Amberfall,
+  The Frostveil Reach, The Drakelands) never opens a natural rift
+  (maintainer decision). Each region owns its C/B/A/S weights. The rank sets the
   generated dungeon's `baseLevel` (C=20 up to S=28, so B+ runs above the level
   cap) and the reward.
 - **Lifecycle:** a portal ANNOUNCES world-visibly on open, stays until its rift's

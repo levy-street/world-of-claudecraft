@@ -1399,4 +1399,49 @@ export const table: DeedLocaleTable = {
     name: 'Geen voorman meer',
     desc: 'Stop de Begraven Voorman terug in zijn grafheuvel.',
   },
+  feat_gourdlight_guise: {
+    name: 'Pompoenlichtvermomming',
+    desc: 'Bezit een Uitgesneden pompoenhoofd, buitgemaakt op Oude Thatchgrin in zijn veld voorbij de Everweide tijdens Pompoenlichtavond.',
+  },
+  feat_old_thatchgrin: {
+    name: 'Stoppels en as',
+    desc: 'Help Oude Thatchgrin op zijn pompoenakker voorbij de Everweide te verslaan tijdens Pompoenlichtavond.',
+  },
+  feat_title_gourdlit: {
+    name: 'De Pompoenverlichte',
+    desc: 'Lees een Oorkonde van de Pompoenverlichte, tijdens Pompoenlichtavond bij Hester Gourdwick geruild voor Pompoenlichtsnoepjes.',
+    title: 'de Pompoenverlichte',
+  },
+  feat_title_trickster: {
+    name: 'Grappenmaker',
+    desc: 'Lees een Oorkonde van de Grappenmaker, tijdens Pompoenlichtavond bij Hester Gourdwick geruild voor Pompoenlichtsnoepjes.',
+    title: 'Grappenmaker',
+  },
+  feat_title_hollow_grinned: {
+    name: 'De Holle Grijns',
+    desc: 'Lees een Oorkonde van de Holle Grijns, tijdens Pompoenlichtavond bij Hester Gourdwick geruild voor Pompoenlichtsnoepjes.',
+    title: 'met de Holle Grijns',
+  },
+  feat_pumpkin_hunter: {
+    name: 'Pompoenjager',
+    desc: 'Vind alle Spookpompoenen die tijdens Pompoenlichtavond over de wereld verborgen zijn.',
+    title: 'de Holle',
+  },
+  feat_gourdlight_doorsteps: {
+    name: 'Elke drempel',
+    desc: 'Vraag tijdens Pompoenlichtavond om snoep of een streek bij elke inwoner in Eastbrook, Fenbridge en Highwatch die op geklop reageert.',
+  },
+  feat_gourdlight_errands: {
+    name: 'Op Hesters wenken',
+    desc: 'Voltooi elk van Hester Gourdwicks wisselende klusjes voor Pompoenlichtavond minstens eenmaal.',
+  },
+  feat_gourdlight_frights: {
+    name: 'Drie steden geschrokken',
+    desc: 'Laat tijdens Hesters klusje Boe! een inwoner schrikken in elk van de steden Eastbrook, Fenbridge en Highwatch.',
+  },
+  feat_gourdlight_eve_complete: {
+    name: 'Pompoenlicht van begin tot eind',
+    desc: 'Voltooi heel Pompoenlichtavond: versla Oude Thatchgrin, vind alle Spookpompoenen, voltooi elk klusje van Hester, klop bij elke deur aan en laat in elk van de drie steden een inwoner schrikken.',
+    title: 'de Pompoengezworene',
+  },
 };

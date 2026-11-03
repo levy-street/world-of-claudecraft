@@ -1038,14 +1038,14 @@ export const tr_TR: EnTranslations = {
       "fateThreadsSentenceReady": "Üç Kader İpliği: Hüküm onları %18 artan hasar için tüketebilir."
     },
     "priest": {
-      "gloomtitheLabel": "Gloomtithe",
-      "bombLabel": "Tithe Bomb",
-      "gloomtitheStatus": "{value} of {max} Gloomtithe",
-      "bombStatus": "{value} of {max} Tithe Bomb charges",
-      "bombReady": "Ready",
+      "gloomtitheLabel": "Kasvet Öşrü",
+      "bombLabel": "Öşür Bombası",
+      "gloomtitheStatus": "Kasvet Öşrü: {value} / {max}",
+      "bombStatus": "Öşür Bombası yükleri: {value} / {max}",
+      "bombReady": "Hazır",
       "chargeCount": "{value} / {max}",
-      "gloomtitheTooltip": "Gloomtithe: up to 5 spendable charges. Void Rupture consumes 3; Vampiric Touch consumes 2 for 30% more damage; Call Tithefiend consumes your bank. Generating charges also fills Tithe Bomb, even while this bank is full.",
-      "bombTooltip": "Tithe Bomb: generate 20 Gloomtithe to prepare one bomb. Spending Gloomtithe does not add progress. Progress lasts between fights. Dying or starting a raid boss resets it. A completed cast consumes the bomb; cancelling keeps it."
+      "gloomtitheTooltip": "Kasvet Öşrü: harcanabilir en fazla 5 yük. Hiçlik Yarılması 3 yük tüketir; Vampir Dokunuşu %30 daha fazla hasar için 2 yük tüketir; Öşür İfriti Çağır tüm birikimini tüketir. Yük üretmek, birikimin doluyken bile Öşür Bombasını da doldurur.",
+      "bombTooltip": "Öşür Bombası: bir bomba hazırlamak için 20 Kasvet Öşrü üret. Kasvet Öşrü harcamak ilerleme sağlamaz. İlerleme dövüşler arasında korunur. Ölmek veya bir baskın bossu dövüşünü başlatmak ilerlemeyi sıfırlar. Tamamlanan kullanım bombayı tüketir; iptal etmek korur."
     },
     "procOverlay": {
       "soulFragmentsMeter": "Ruh Parçaları",
@@ -2600,6 +2600,7 @@ export const tr_TR: EnTranslations = {
       "name_lantern_hall_destrier": "Fener Salonu Savaş Atı",
       "name_chimeglass_tortoise": "Tolliver Chimeglass",
       "name_rickshaw_mount": "Kemikbağlı Çekçek",
+      "name_emberbristle_broom": "Köz Kıllı Süpürge",
       "name_wobbles_slime": "Sallantı Balçık",
       "name_nightwing_chimera": "Gece Kanadı Kimera",
       "desc_valorsteed": "Deri eyerli, dayanıklı ve sağlam adımlı bir küheylan.",
@@ -2623,7 +2624,8 @@ export const tr_TR: EnTranslations = {
       "desc_lantern_hall_destrier": "Fener Salonunun savaş atı; lonca mavisi altında meşe ve demir zırhlı, eve yolu aydınlatmak için eyerinden iki fırtına feneri sallanır.",
       "desc_nightwing_chimera": "Kadim dallardan iki başlı alacakaranlık wyverni; dinlenirken pençeli arka ayaklarına tüner, gizem işlemeli kanatlarıyla yerin üzerinde süzülür.",
       "desc_chimeglass_tortoise": "Üç nesildir karavanları geride bırakan, tuzla kaplı bir kaplumbağa. Tamirciler ona fırtına camından gözlük taktı ve boğazına bronz bir çan astı, böylece yol onu görmeden çok önce onu duyardı.",
-      "desc_rickshaw_mount": "Sırıklarına kemikleri çıkmış bir avanenin koşulduğu, seni ölümüne bir koşuyla çeken takırdayan kemik arabası."
+      "desc_rickshaw_mount": "Sırıklarına kemikleri çıkmış bir avanenin koşulduğu, seni ölümüne bir koşuyla çeken takırdayan kemik arabası.",
+      "desc_emberbristle_broom": "Turuncu kurdeleyle bağlanmış, yerden bir karış yüksekte süzülen ve kıllarından közler dökülen bir hasat süpürgesi. Kabak Işığı Gecesi etkinliğinden kalıcı bir ödül."
     },
     "mountTraining": {
       "mountPrompt": "Eğitim Yiğit Küheylanına binmek için {key} tuşuna bas.",
@@ -4672,7 +4674,10 @@ export const tr_TR: EnTranslations = {
       }
     },
     "auraEffect": {
-      "stilledMindCrit": "Your next Mindfracture or Void Rupture is a guaranteed critical strike if it hits. Other spells do not consume this bonus. Void Rupture still consumes 3 Gloomtithe charges. A resisted cast consumes the bonus.",
+      "gourdlight": {
+        "thatchbound": "Yaşlı Sırıtan Saman iplerini çekiyor. Hareket edemezsin: en yakın müttefikine yürütülür ve her {every} sn. bir ona {min} ila {max} hasar verirsin ({level}. seviye bir müttefiğe karşı {mult} katına kadar). Azami sağlığının %{pct} kadarına eşit hasar aldığında veya bir müttefikin etkisini kaldırdığında (Büyü) erken sona erer."
+      },
+      "stilledMindCrit": "Sonraki Zihin Kırılması veya Hiçlik Yarılması isabet ederse kesinlikle kritik vurur. Diğer büyüler bu bonusu tüketmez. Hiçlik Yarılması yine 3 Kasvet Öşrü yükü tüketir. Direnilen bir büyü bonusu tüketir.",
       "wildheart": {
         "packBond": "Eşi yakındayken %{pct} daha az hasar alır. Kırmak için Canavar Efendisi ile jaguarını ayır.",
         "packBondFury": "Eşi yakındayken %{pct} daha fazla hasar verir.",
@@ -4753,7 +4758,9 @@ export const tr_TR: EnTranslations = {
       "breathGuardian": {
         "portalA": "When this ends, Portal A opens exactly where you stand. Stand near the Knotted Gale. You cannot carry it this round.",
         "portalB": "When this ends, Portal B opens exactly where you stand. Stand at the lip of a gap. You cannot carry the Knotted Gale this round.",
-        "laden": "You carry a Knotted Gale: you walk at {walk}% speed, you cannot blink, charge or leap, and no wind, pull, blast or throw can move you. Either portal takes you to the other. Press Interact at the lip of any gap to throw it into the void. When this ends it bursts and kills everyone on the Cornice.",
+        "portalC": "When this ends, Portal C opens exactly where you stand. It links to Portal D only. Stand near the other Knotted Gale. You cannot carry it this round.",
+        "portalD": "When this ends, Portal D opens exactly where you stand. It links to Portal C only. Stand at the lip of a gap away from Portal B. You cannot carry the Knotted Gale this round.",
+        "laden": "You carry a Knotted Gale: you walk at {walk}% speed, you cannot blink, charge or leap, and no wind, pull, blast or throw can move you. Each portal takes you to its partner: A to B, C to D. Press Interact at the lip of any gap to throw it into the void. When this ends it bursts and kills everyone on the Cornice.",
         "wind": "The Guardian of the Breath's wind carries you {speed} yd a second the way it blows. Walk against it to hold your ground; it does not interrupt your casts. Pressed against the rim's wall you take {pinMin} to {pinMax} damage every second. Where the wall is broken there is nothing to stop you: you fall into the void.",
         "draw": "The Guardian draws breath and pulls you toward it, {speed} yd a second. Its vortex deals {min} to {max} damage every {tick} sec to whoever stands before its mouth. Then Bellows Gust deals {gustMin} to {gustMax} damage to everyone on the Cornice and throws them {throw} yd outward.",
         "pinned": "Pressed against the rim's wall by the wind: {min} to {max} damage every second until the wind falls calm or you walk clear of the wall.",
@@ -4860,6 +4867,7 @@ export const tr_TR: EnTranslations = {
       "spellHaste": "Büyü okuma hızını {pct}% artırır",
       "sated": "Başka bir grup hız etkisinden yararlanamaz",
       "cauterizeFatigue": "Dağlama başka bir öldürücü darbeyi henüz engelleyemez",
+      "seasonalCosmetic": "Yalnızca görünüş: savaşı etkilemez",
       "castShield": "Büyü okuma hasarla kesilemez veya geciktirilemez",
       "dmgDone": "Verilen hasarı {pct}% artırır",
       "dmgDoneReduce": "Verilen hasarı {pct}% azaltır",
@@ -5007,6 +5015,7 @@ export const tr_TR: EnTranslations = {
       "dodgeReduce": "Reduce la probabilidad de esquivar un {pct}%",
       "damageReduction": "Alınan tüm hasarı {pct}% azaltır",
       "slumber": "Şafağa kadar uyuyor. Saldırılamaz ve kimse için uyanmaz.",
+      "slumberNight": "Gece çökene kadar direğinde cansız asılı kalır. Saldırılamaz.",
       "guardianWard": "Seni öldürecek bir sonraki düşman darbesi engellenir ve yerine canın {pct}%'e geri döner",
       "armorFlat": "Reduce la armadura en {value}",
       "armorFlatStacks": "Reduce la armadura en {value} ({stacks} acumulaciones)",
@@ -5086,7 +5095,8 @@ export const tr_TR: EnTranslations = {
     "worldBoss": {
       "spawn": "{name}, {zone} üzerinde yükseliyor!",
       "wake": "{name}, {zone} üzerinde uyanıyor!",
-      "sleep": "{name} şafağa kadar uyuyor."
+      "sleep": "{name} şafağa kadar uyuyor.",
+      "sleepUntilNightfall": "{name} gece çökene kadar uyur."
     },
     "auth": {
       "appleLoginCta": "Apple ile Devam Et",
@@ -7350,8 +7360,12 @@ export const tr_TR: EnTranslations = {
       "aLine": "It opens at your feet in {seconds} sec. Stand near the Knotted Gale.",
       "bTitle": "You are Portal B!",
       "bLine": "It opens at your feet in {seconds} sec. Stand at the lip of a gap.",
+      "cTitle": "You are Portal C!",
+      "cLine": "It opens at your feet in {seconds} sec. Stand near the other Knotted Gale.",
+      "dTitle": "You are Portal D!",
+      "dLine": "It opens at your feet in {seconds} sec. Stand at a gap away from Portal B.",
       "carryTitle": "You carry the Knotted Gale!",
-      "carryLine": "Either portal takes you to the other. Throw it from the lip of a gap. It bursts in {seconds} sec.",
+      "carryLine": "Each portal takes you to its partner: A to B, C to D. Throw it from the lip of a gap. It bursts in {seconds} sec.",
       "lipTitle": "Throw it now!",
       "lipLine": "You stand at the lip of a gap. It bursts in {seconds} sec.",
       "throwKey": "Press {key} at the lip to throw",
@@ -7373,6 +7387,7 @@ export const tr_TR: EnTranslations = {
         "stormGust": "A storm gust gathers! Brace against the wind!",
         "knot": "A Knotted Gale falls! Carry it to a gap and throw it into the void!",
         "knotPortals": "Portal A on {a}, Portal B on {b}!",
+        "knotPortals2": "Portal C on {c}, Portal D on {d}!",
         "knotTaken": "{player} takes up the Knotted Gale!",
         "knotDropped": "{player} falls! The Knotted Gale is free again!",
         "knotFell": "{player} takes the Knotted Gale into the void!",
@@ -8607,6 +8622,107 @@ export const tr_TR: EnTranslations = {
         "0": "Uygun kompost, yataklar yaşayacak. Eski değirmenci gitmeden önce bir şey gömmüş. Değirmeni bahçelerin uzak köşesinde dönüyor. Oraya gidip yanında dur.",
         "2": "Değirmen seni sahil yolundan göndermiş. Fener bir son sırrı tutuyor: kuzeybatısında, yolun hemen dışında, çimen kesilmiş ve geri döşenmiş. Orada kaz."
       }
+    }
+  },
+  "seasonal": {
+    "pumpkins": {
+      "name": "Perili Kabak",
+      "title": "Perili Kabaklar",
+      "world": "Dünya",
+      "progress": "{label}: {current}/{total}",
+      "found": "{zone} bölgesinde bir Perili Kabak yakarsın: {count}/{total}. Alınan Kabak Işığı Şekerleri: {sweets}.",
+      "flash": "Perili Kabak bulundu! {count}/{total}"
+    },
+    "event": {
+      "gourdlight_eve": {
+        "name": "Kabak Işığı Gecesi"
+      }
+    },
+    "trickOrTreat": {
+      "row": "Şeker mi, şaka mı!",
+      "rowAria": "{name} adlı kişiye şeker mi, şaka mı de",
+      "knockedHint": "Bugün bu kapıyı zaten çaldın. Günlük sıfırlamadan sonra yeniden açılır.",
+      "treat": "{name} sana bir şeker verir.",
+      "trick": "{name} sana şaka yapar: {trick}!",
+      "alreadyKnocked": "Bugün {name} adlı kişiden zaten şeker ya da şaka istedin.",
+      "notActive": "Kabak Işığı Gecesi şu anda etkin değil.",
+      "tooFar": "Kapıyı çalmak için yaklaş.",
+      "treatFlash": {
+        "one": "Şeker! {count} Kabak Işığı Şekeri",
+        "few": "Şeker! {count} Kabak Işığı Şekeri",
+        "many": "Şeker! {count} Kabak Işığı Şekeri",
+        "other": "Şeker! {count} Kabak Işığı Şekeri"
+      },
+      "trickFlash": "Şaka! {trick}"
+    },
+    "tricks": {
+      "gourdlight_trick_bat": "Yarasa Çılgınlığı",
+      "gourdlight_trick_skeleton": "Takırdayan Kemikler",
+      "gourdlight_trick_fumes": "Yeşil Dumanlar",
+      "gourdlight_trick_strawling": "Samancık Görünümü",
+      "gourdlight_costume_skeleton": "İskelet Kostümü",
+      "gourdlight_costume_ghost": "Hayalet Kostümü",
+      "gourdlight_costume_bat": "Yarasa Kostümü"
+    },
+    "pumpkinHead": {
+      "on": "Oyulmuş Kabak Başlığı'nı takarsın.",
+      "off": "Oyulmuş Kabak Başlığı'nı çıkarırsın."
+    },
+    "jarTrick": "Kavanoz pat diye açılır: {trick}!",
+    "guise": "Tılsım çatırdar ve saman bedenini kaplar: {trick}!",
+    "costume": "İksiri içer ve dönüşürsün: {trick}!",
+    "titleGranted": "Fermanı okursun. Yeni unvan kazanıldı: {title}.",
+    "titleKnown": "Bu unvana zaten sahipsin, bu yüzden fermanı saklarsın.",
+    "boundItemGone": "Kabak Işığı Gecesi bitti; {item} eşyan yeniden samana dönüşerek dağılıyor.",
+    "itemUse": {
+      "pumpkinHead": "Kullanım: Miğferinin üzerine, içten aydınlatılmış oyma kabağı tak veya çıkar. Kozmetiktir.",
+      "trickJar": "Kullanım: Birkaç saniyeliğine sana rastgele, zararsız bir şaka yapar. Kozmetiktir.",
+      "pouch": "Kullanım: Açıp {count} Kabak Işığı Şekeri al.",
+      "strawlingCharm": "Kullanım: {seconds} saniye boyunca Yaşlı Sırıtan Saman'ın samancıklarından birine dönüş. Dövüş dışında. Asla tüketilmez. Kozmetiktir.",
+      "sweet": "Kabak Işığı Gecesi boyunca şeker ya da şaka isteyerek kazanılır. Hester Kabakfitil, Doğudere, Bataklık Köprüsü ve Yüksek Gözcü'deki tezgâhlarında bunları kozmetiklerle takas eder.",
+      "costumeSkeleton": "Kullanım: {minutes} dakika boyunca takırdayan bir iskelete dönüş. Tüketilir. Dövüşte kullanılamaz; dövüşe girmek etkiyi sonlandırır. Kozmetiktir.",
+      "costumeGhost": "Kullanım: {minutes} dakika boyunca süzülen bir hayalete dönüş. Tüketilir. Dövüşte kullanılamaz; dövüşe girmek etkiyi sonlandırır. Kozmetiktir.",
+      "costumeBat": "Kullanım: {minutes} dakika boyunca kanat çırpan bir yarasaya dönüş. Tüketilir. Dövüşte kullanılamaz; dövüşe girmek etkiyi sonlandırır. Kozmetiktir.",
+      "toyPrank": "Kullanım: {range} yarda içindeki görünür başka bir oyuncuya fırlat. Başı {seconds} saniye boyunca parlayan bir kabak fenerine dönüşür; sağ tıklayarak çıkarabilir. İkiniz de dövüşte olamazsınız; sen de gizleniyor olamazsın. Asla tüketilmez: {cooldown} saniye sonra yeniden kullanılabilir. Kalıcıdır ve yıl boyunca kullanılabilir. Kozmetiktir.",
+      "toyLantern": "Kullanım: Önüne feneri koy. Küçük bir hayalet {seconds} saniye etrafında döner. Dövüşte veya gizlenirken kullanılamaz. Asla tüketilmez: {cooldown} saniye sonra yeniden kullanılabilir. Kalıcıdır ve yıl boyunca kullanılabilir. Kozmetiktir.",
+      "toyBats": "Kullanım: Çuvalı aç. Ciyaklayan bir yarasa sürüsü fırlayıp {seconds} saniye etrafına dağılır. Dövüşte veya gizlenirken kullanılamaz. Asla tüketilmez: {cooldown} saniye sonra yeniden kullanılabilir. Kalıcıdır ve yıl boyunca kullanılabilir. Kozmetiktir.",
+      "toyCandleShadows": "Kullanım: Önündeki mumu yak. Alevleri {seconds} saniye boyunca çevresindeki yere dans eden kedi, yarasa ve cadı gölgeleri yansıtır; yakındaki herkes bunları görebilir. Dövüşte veya gizlenirken kullanılamaz. Asla tüketilmez: {cooldown} saniye sonra yeniden kullanılabilir. Kalıcıdır ve yıl boyunca kullanılabilir. Kozmetiktir.",
+      "toyCauldron": "Kullanım: Önüne büyük, fokurdayan bir kazan koy. Kazan {standing} saniye kalır; ondan içen her oyuncu yeşil kabarcıklara bürünüp {seconds} saniye gobline dönüşür ve mevcut kostümü değişir. Dövüşte veya gizlenirken kazan konulamaz ve içilemez; dövüşe girmek goblin biçimini sonlandırır. Asla tüketilmez: {cooldown} saniye sonra yeniden kullanılabilir. Kalıcıdır ve yıl boyunca kullanılabilir. Kozmetiktir.",
+      "titleWrit": "Kullanım: Bu karakter için {title} unvanını kazan; Yiğitlikler Kitabı'ndan takılır. Tüketilir. Unvana zaten sahipsen ferman korunur.",
+      "broomSources": "Hester Kabakfitil'den {count} Köz Dokumalı Demet karşılığında alınır veya Yaşlı Sırıtan Saman'ı yağmaladığın bir günde nadiren ondan düşer. Binmek için binicilik becerisi gerekir. Kalıcıdır ve yıl boyunca binilebilir.",
+      "sheaf": "Yaşlı Sırıtan Saman, Köz Kıllı Süpürge'ye sahip olana kadar onu yağmaladığın her gün bir tane verir. Hester Kabakfitil, Doğudere, Bataklık Köprüsü ve Yüksek Gözcü'deki tezgâhlarında {count} demeti süpürgeyle takas eder. Harcanmayan demetler sonraki Kabak Işığı Gecesi için saklanır."
+    },
+    "toy": {
+      "prank": "Kabağı fırlatırsın. {name} üzerine yapışıp parçalanır!",
+      "lantern": "Feneri yere koyarsın; sana eşlik etmek için küçük bir hayalet dışarı süzülür.",
+      "bats": "Çuvalı açarsın; ürkmüş yarasa sürüsü dışarı fırlar!",
+      "candleShadows": "Mumu yakarsın; alevlerinin çevresinde gölgeler dans etmeye başlar.",
+      "cauldron": "Kazanı yere koyarsın; fokurdamaya başlar.",
+      "cauldronDrink": "Kazandan içer, yeşil kabarcıklara bürünür ve gobline dönüşürsün!",
+      "pranked": "{name} kafana bir kabak patlatır! Sağ tıklayarak çıkar veya gururla taşı.",
+      "prankedFlash": "{name} sana şaka yaptı!",
+      "prankNeedsPlayer": "Kabak yalnızca dövüşte olmayan başka bir oyuncuya çarpıp parçalanır.",
+      "hidden": "Önce gölgelerden çık: oyuncak yerini ele verir."
+    },
+    "itemSource": {
+      "pumpkinHead": "Yaşlı Sırıtan Saman'dan, Yaban Domuzu Çayırı'nın ötesindeki kabak tarlasında, onu ilk yağmaladığında düşer. Hiçbir satıcı satmaz."
+    },
+    "boo": {
+      "row": "Böö!",
+      "rowAria": "{name} adlı kişinin önüne atılıp böö diye bağır",
+      "needsCostume": "Önce kostüm giy: kostüm iksiri, yarasa veya iskelet şakası, Samancık Tılsımı, Oyulmuş Kabak Başlığı ya da Yeşil Fokurtu Kazanı'ndan bir goblin yudumu.",
+      "frightenedHint": "{name} son korkutmandan beri hâlâ diken üstünde. Başka birini bul.",
+      "landed": "{name} adlı kişinin önüne atılıp BÖÖ diye bağırırsın! Çığlık atar ve elindekileri neredeyse düşürür.",
+      "flash": "BÖÖ! {name} korktu!",
+      "noCostume": "Kostümsüzken {name} sana yalnızca güler. Önce bir kostüm giy.",
+      "already": "{name} bugün yeterince korktu.",
+      "notOnErrand": "Hester bugün senden kimseyi korkutmanı istemedi."
+    },
+    "tokenPrice": "{count} {item}",
+    "thatchgrin": {
+      "poleBound": "Direğe Bağlı",
+      "wakeYell": "Tarlaya GECE çöküyor! BENİM tarlamda kim yürüyor?",
+      "sleepYell": "Güneş doğdu. Direğe dön, nöbete dön."
     }
   },
   "dungeonGuide": {
@@ -9903,7 +10019,7 @@ export const tr_TR: EnTranslations = {
       "framesGovernedTalkingHead": "Çerçeveleri Düzenle, NPC görüş alanınızın dışındayken bir NPC'nin konuşulan hattını taşıyan Diyalog panelini de gevşetir; gevşekken isim çipini takar.",
       "framesGovernedShardpike": "Çerçeveleri Düzenle, Kıymık Kargısı çubuğunu da serbest bırakır. Bu, yalnızca kargıyı taşırken eylem çubuklarının yanında görünen kısa görev aracı eylem sırasıdır. Serbestken ad etiketini taşır; böylece savaş sırasında değil, öncesinde yerleştirebilirsin.",
       "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
-      "framesGovernedPriest": "Edit Frames also lets you move the Shadow priest's Gloomtithe and Tithe Bomb medallion.",
+      "framesGovernedPriest": "Çerçeveleri Düzenle, Gölge rahibinin Kasvet Öşrü ve Öşür Bombası madalyonunu da taşımana izin verir.",
       "framesGovernedResourceAndHill": "Çerçeveler sekmesinde Kaynak Çubuğunu Ayır seçeneğini açtığında Çerçeveleri Düzenle, kaynak çubuğunun kilidini de açar. Böylece mana, enerji veya öfke çubuğunu bağımsız olarak istediğin yere yerleştirebilirsin. Aynı sekmedeki Kaynak Çubuğu Genişliği ve Kaynak Çubuğu Yüksekliği boyutunu ayarlar. Çerçeveleri Düzenle, Tepede Kral çubuğunun kilidini de açar. Bu sekmedeki Tepede Kral Arka Plan Opaklığı, yazı net kalırken paneli saydamlaştırır.",
       "barsTitle": "Çubuklar, sayaçlar ve savaş metni",
       "barsBody": "Büyü çubuğun, büyü okuduğunda ya da kanalize ettiğinde eylem çubuklarının hemen üzerinde, ekranın ortasında belirir ve büyünün adını ve kalan süreyi taşır. Hedefin de kendi çerçevesinde kendi büyü çubuğuna sahiptir, böylece neyin geldiğini görüp buna karşılık verebilirsin.\n\nBüyü çubuğunun altında ince bir vuruş çubuğu durur ve silah vuruşların arasında dolar, böylece yakın dövüş ya da menzilli bir saldırgan bir sonraki otomatik vuruşun ne zaman ineceğini görebilir.\n\nTecrübe çubuğun eylem çubuklarının altında tam genişlikte uzanır, dilimlere bölünmüştür ve biriktirdiğin dinlenmiş tecrübeyi gösteren daha açık bir bölüm taşır.\n\nSuyun altında yüzersen ekranın üstünde mavi bir nefes çubuğu belirir. Başın suyun altındayken azalır, tükendiğinde kırmızıya döner ve boğulmaya başlarsın, yüzeye çıktığın anda hızla dolar. Boşluk tuşu seni yukarı yüzdürür, varsayılan olarak Ctrl olan Aşağı Yüz tuşu ise seni derine götürür.\n\nHasar ve iyileştirme, indikleri şeyin üzerinde küçük sayılar olarak yükselir, böylece bir dövüşü metin okumadan takip edebilirsin. Sohbet kutundaki Savaş sekmesi tam yazılı kaydı tutar.",
@@ -10808,6 +10924,7 @@ export const tr_TR: EnTranslations = {
       "hillBodyRamp": "Her iki saatte bir Ejder Toprakları, Kırağı Diyarı veya Kehribar Vadisi'nde bir tepe belirir. Diyara on beş dakika önceden uyarı verilir ve çember açık arazide işaretlenir. Tepe otuz dakika aktif kalır. Aktif çembere girmek, baskın üyeleri dahil herkesin Dünya PvP bayrağını normal seviye kurallarına göre açar. İçeride en çok uygun oyuncusu bulunan grup, çoğunluğunu kesintisiz bir dakika koruduktan sonra tepeyi ele geçirir; tek başına oynayan biri tek kişilik grup sayılır, ancak baskın üyeleri ve PvP seviye şartının altındaki oyuncular tepeyi ele geçiremez veya tepeden Onur kazanamaz. İçeride duran her hâkim grup üyesi giderek artan hızda Onur kazanır. Ödemeler daha sık yapılır ve daha hızlı artar; böylece eski kırk beş dakikalık etkinliğin toplam Onur miktarı korunur. Tepe el değiştirdiğinde ödül artışı baştan başlar. Çemberden ayrılınca bayrağın açık kalır; /pvp off normal beş dakikalık gecikmeyi kullanır ve aktif tepenin içindeyken veya savaş sırasında tamamlanamaz. Tepe çubuğu kontrolü, oyuncu sayılarını ve ele geçirme ilerlemesini gösterir; /hill konumunu bildirir.",
       "hillBodyPause": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls, and every five minutes while it stands the realm is told where it is and which groups have held it longest. The party with the most players standing inside contests the hill, and after thirty seconds of majority the hill is theirs. A rival party walking in only pauses that count until yours leads again; it starts over only if nobody from your party is left alive inside. A lone player counts as a party of one and keeps a hill they hold when they form a party, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns Honor every minute, and the longer the same party holds it, the more each minute pays: a full party holding an uncontested hill for its whole stand earns about as much as three battleground wins. When the hill changes hands, the new holders start the count from the beginning. When it falls, if the group that held it longest in total held it for at least ten minutes, everyone who stood inside for that group for at least a minute, and is still in that group, earns one win toward the PvP row of the Weekly Vault. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
       "hillBodyFlat": "Her üç saatte bir, öngörülemeyen bir anda tüm diyara on beş dakika sonra kuzey bölgelerinden birinde bir tepenin belireceği duyurulur ve tepenin çemberi açık arazide işaretlenir. Tepe kırk beş dakika kalır, sonra kaybolur. Bu sırada her beş dakikada bir konumu ve en uzun toplam tutma süresine sahip gruplar duyurulur. Çemberin içinde en çok oyuncusu olan grup tepeyi ele geçirmeye çalışır ve toplam otuz saniye boyunca sayıca üstünlük sağladığında tepeyi alır. Rakip bir grubun girmesi sayacı yalnızca grubunuz tekrar üstün gelene kadar duraklatır; sayaç ancak çemberde grubunuzdan hayatta kimse kalmadığında sıfırlanır. Tek başına bir oyuncu tek kişilik grup sayılır ve grup kurduğunda tuttuğu tepeyi korur, ancak baskın üyeleri hiç sayılmaz. Tepeyi tutan grubun çemberde duran her üyesi, tepeyi ne kadar süredir tuttuklarından bağımsız olarak her dakika aynı miktarda Onur kazanır. Tepeyi bütün süresi boyunca rakipsiz tutan tam bir grup, yaklaşık üç savaş alanı zaferi kadar kazanır. Tepe kaybolduğunda, en uzun toplam tutma süresine sahip grup en az on dakika tutmuşsa, o grubun tutma süresi boyunca çemberde en az bir dakika durmuş ve hâlâ aynı grupta olan herkes Haftalık Kasa'nın PvP sırası için bir zafer kazanır. Alanın üzerindeki çubuk tepeyi kimin tuttuğunu, iki tarafın oyuncu sayılarını ve ele geçirme sayacını gösterir; sohbette /hill komutu konumunu söyler.",
+      "hillBodyTwoHour": "İki saatte bir, kimsenin öngöremeyeceği bir anda, tüm diyara kuzey bölgelerinden birinde on beş dakika sonra bir tepenin yükseleceği bildirilir; tepenin duracağı çember açık arazide işaretlenir. Tepe yükselince otuz dakika kalır, sonra iner. Ayakta olduğu sürece her beş dakikada bir diyara konumu ve onu en uzun tutan gruplar bildirilir. İçeride en çok oyuncusu bulunan grup tepeyi ele geçirmek için yarışır ve otuz saniyelik sayısal üstünlüğün ardından tepe onların olur. Rakip bir grubun girmesi, senin grubun yeniden öne geçene kadar sayacı yalnızca duraklatır; sayaç ancak grubundan içeride kimse hayatta kalmadığında sıfırlanır. Tek başına oyuncu, tek kişilik grup sayılır ve grup kurduğunda tuttuğu tepeyi korur; baskın üyeleri ise hiç sayılmaz. Bir grup tepeyi tutarken içeride duran her üyesi, ne kadar süredir tuttuklarından bağımsız olarak her dakika aynı Onuru kazanır. Böylece tepeyi tüm süresi boyunca rakipsiz tutan tam grup, yaklaşık iki savaş alanı zaferi kadar kazanır. Tepe indiğinde, toplamda en uzun tutan grup onu en az on dakika tuttuysa, o grup için içeride en az bir dakika duran ve hâlâ grupta olan herkes Haftalık Kasa'nın PvP satırına bir zafer kazanır. Alanın üzerindeki çubuk tepenin sahibini, iki tarafın sayılarını ve ele geçirme sayacını gösterir; sohbette /hill konumunu bildirir.",
       "limitsBodyRaids": "Aynı oyuncu tekrar tekrar mağlup etmek daha az az çoğu zaman hiçbir şey öder, ve o oyuncu yönü sayarınız ilk öldürülerinden bir saat sonra baştan başlar, böylece bir kurban değerli bekleme beklemez. Seviyeniz çok aşağı bir hedef hiçbir şey öder. Dövüşlü Alanları ve Arenalar onlara içinde iken kendi kuralları yürütür, ve açık dünyaya daha fazla Onur ödedikleri, böylece dünya PvP aynı satıcıya yavaş yoldur. Raid dünya öldürüleridaten hiç almaz: bir raid üyesi Onur ya da altın almaz ve başkasının hissesini kabusmaz, böylece parti olarak dövüş almak için ödenir."
     },
     "thornhollowPage": {
@@ -15549,6 +15666,7 @@ export const tr_TR: EnTranslations = {
       "accountSuspended": "Bu hesap {date} tarihine kadar askıya alındı.",
       "alreadyInWorld": "Karakter zaten dünyada.",
       "accountSessionLimit": "Bu hesaba ait çok fazla karakter zaten dünyada.",
+      "worldFightHold": "Bu hesaptaki başka bir karakter, bir dövüşten sonra hâlâ dünyada. Birkaç dakika sonra tekrar dene.",
       "takenOver": "Karakteriniz başka bir oturum tarafından devralındı.",
       "vaultMailRecovering": "Kasa ödül postanız geri yükleniyor. Lütfen kısa bir süre sonra tekrar deneyin.",
       "renameBeforeEntering": "Bu karakter dünyaya girmeden önce yeniden adlandırılmalıdır.",
@@ -18442,16 +18560,16 @@ export const tr_TR: EnTranslations = {
         "description": "3 sn kanalize eder ve her saniye {damage} Gölge hasarı verir. Hasar Büyü Gücü ile artar."
       },
       "vampiric_touch": {
-        "name": "Vampiric Touch",
-        "description": "Deal {damage} Shadow damage over 15 sec, once every 3 sec. Damage increases with Spell Power and ticks can critically strike. Each tick shares healing equal to 20% of the health lost by the enemy among you and injured party members within 30 yards; in a raid, only your subgroup receives this healing. If you have at least 2 Gloomtithe charges, applying this effect consumes 2 to increase all its damage by 30%."
+        "name": "Vampir Dokunuşu",
+        "description": "15 sn. boyunca her 3 sn. bir toplam {damage} Gölge hasarı ver. Hasar Büyü Gücü ile artar ve her periyodik vuruş kritik olabilir. Her vuruş, düşmanın kaybettiği sağlığın %20'sine eşit iyileştirmeyi sen ve 30 yarda içindeki yaralı grup üyeleri arasında paylaştırır; baskında yalnızca kendi alt grubun bu iyileştirmeyi alır. En az 2 Kasvet Öşrü yükün varsa bu etkiyi uygulamak 2 yük tüketerek tüm hasarını %30 artırır."
       },
       "void_rupture": {
-        "name": "Void Rupture",
-        "description": "Consume 3 Gloomtithe charges to rupture an enemy for {damage} Shadow damage. Damage increases with Spell Power and can critically strike. Requires 3 charges and consumes them even if resisted."
+        "name": "Hiçlik Yarılması",
+        "description": "3 Kasvet Öşrü yükü tüketerek düşmanı {damage} Gölge hasarıyla yar. Hasar Büyü Gücü ile artar ve kritik vurabilir. 3 yük gerektirir ve büyüye direnilse bile bunları tüketir."
       },
       "spirit_bomb": {
-        "name": "Tithe Bomb",
-        "description": "Detonate a spirit bomb on an enemy, dealing {damage} Shadow damage to enemies within 8 yards of that target. Damage increases with Spell Power, can critically strike, and is reduced beyond 5 targets. Generate 20 Gloomtithe to prepare one bomb. Generation counts even while holding the maximum 5 Gloomtithe; spending charges is not required and adds no progress. Progress lasts between fights, up to one prepared bomb. Dying clears your progress and prepared bomb. Completing the cast consumes the prepared bomb, even if resisted. Cancellation or interruption preserves it. Starting a raid boss encounter clears your progress and prepared bomb. Cannot open a raid boss encounter with this spell."
+        "name": "Öşür Bombası",
+        "description": "Bir düşmanın üzerinde ruh bombası patlatarak hedefin 8 yarda yakınındaki düşmanlara {damage} Gölge hasarı ver. Hasar Büyü Gücü ile artar, kritik vurabilir ve 5 hedefin üzerinde azalır. Bir bomba hazırlamak için 20 Kasvet Öşrü üret. En fazla 5 Kasvet Öşrü tutarken bile üretim sayılır; yük harcamak gerekmez ve ilerleme sağlamaz. İlerleme dövüşler arasında korunur; en fazla bir hazır bomba tutulabilir. Ölmek ilerlemeni ve hazır bombanı siler. Kullanımı tamamlamak, büyüye direnilse bile hazır bombayı tüketir. İptal veya kesinti bombayı korur. Bir baskın bossu dövüşüne başlamak ilerlemeni ve hazır bombanı siler. Bu büyüyle baskın bossu dövüşü başlatılamaz."
       },
       "flash_heal": {
         "name": "Acil Dua",
@@ -19287,7 +19405,7 @@ export const tr_TR: EnTranslations = {
       "inner_focus": {
         "name": "Dingin Zihin",
         "description": "Bir sonraki rahip büyünü bedava ve kesintiye uğratılamaz kılar. 60 sn sürer.",
-        "specNote_shadow": "Also reserves a guaranteed critical strike for your next Mindfracture or Void Rupture within 60 sec, if it hits. Other spells do not consume this bonus. Void Rupture still consumes 3 Gloomtithe charges. A resisted cast consumes the critical strike bonus."
+        "specNote_shadow": "Ayrıca 60 sn. içindeki sonraki Zihin Kırılması veya Hiçlik Yarılması isabet ederse kesinlikle kritik vurur. Diğer büyüler bu bonusu tüketmez. Hiçlik Yarılması yine 3 Kasvet Öşrü yükü tüketir. Direnilen bir büyü, kritik vuruş bonusunu tüketir."
       },
       "innervate": {
         "name": "Yaşam Özsuyu",
@@ -19485,7 +19603,7 @@ export const tr_TR: EnTranslations = {
       "choir_of_deliverance": {
         "name": "Kurtuluş Korosu",
         "description": "6 sn kanalize eder, 30 metre içindeki grup üyelerini her 2 saniyede {damage} kadar iyileştirir. İyileştirme büyü gücüyle artar.",
-        "specNote_shadow": "For 15 sec, share 20% of the health enemies lose to your Shadow damage as healing among injured party members within 30 yards, including yourself. In raids, only your subgroup is healed. Cast instantly and keep attacking in Shadowform. Absorbed damage and overkill do not add healing."
+        "specNote_shadow": "15 sn. boyunca, düşmanların Gölge hasarın yüzünden kaybettiği sağlığın %20'sini, kendin dâhil 30 yarda içindeki yaralı grup üyeleri arasında iyileştirme olarak paylaştır. Baskınlarda yalnızca kendi alt grubun iyileşir. Anında kullanılır ve Alacakaranlık Perdesi içinde saldırmaya devam edebilirsin. Emilen hasar ve kalan sağlığı aşan hasar iyileştirme sağlamaz."
       },
       "bear_charge": {
         "name": "Bruin Hücumu",
@@ -24700,6 +24818,87 @@ export const tr_TR: EnTranslations = {
       "vanguard_pendant_of_mending": {
         "name": "Öncü'nün İyileştirme Kolyesi"
       },
+      "gourdlight_sweet": {
+        "name": "Kabak Işığı Şekeri"
+      },
+      "gourdlight_treat_pouch": {
+        "name": "Kabak Işığı Şeker Kesesi"
+      },
+      "carved_pumpkin_head": {
+        "name": "Oyulmuş Kabak Başlığı"
+      },
+      "jar_of_mischief": {
+        "name": "Yaramazlık Kavanozu"
+      },
+      "thatchgrin_sweet_sack": {
+        "name": "Sırıtan Saman'ın Şeker Çuvalı"
+      },
+      "strawling_charm": {
+        "name": "Samancık Tılsımı"
+      },
+      "rattlebone_draught": {
+        "name": "Takırdayan Kemik İksiri"
+      },
+      "haunting_draught": {
+        "name": "Hayalet İksiri"
+      },
+      "batwing_draught": {
+        "name": "Kanat Çırpma İksiri"
+      },
+      "writ_of_the_gourdlit": {
+        "name": "Kabak Işıklı'nın Fermanı"
+      },
+      "writ_of_the_trickster": {
+        "name": "Şakacı Fermanı"
+      },
+      "writ_of_the_hollow_grin": {
+        "name": "Boş Sırıtış Fermanı"
+      },
+      "reins_emberbristle_broom": {
+        "name": "Köz Kıllı Süpürge"
+      },
+      "hearthroot_toffee": {
+        "name": "Ocak Kökü Karameli"
+      },
+      "gourdseed_brittle": {
+        "name": "Kabak Çekirdekli Krokan"
+      },
+      "crabapple_chew": {
+        "name": "Yaban Elmalı Çiğneme Şekeri"
+      },
+      "owlwatch_fudge": {
+        "name": "Baykuş Nöbeti Şekerlemesi"
+      },
+      "lantern_mint_drop": {
+        "name": "Fener Nane Şekeri"
+      },
+      "emberwoven_sheaf": {
+        "name": "Köz Dokumalı Demet"
+      },
+      "prankers_pumpkin": {
+        "name": "Şakacının Kabağı"
+      },
+      "wanderwisp_lantern": {
+        "name": "Gezgin Işık Feneri"
+      },
+      "sack_of_startled_bats": {
+        "name": "Ürkmüş Yarasalar Çuvalı"
+      },
+      "murmurwick_candle": {
+        "name": "Fısıldayan Fitil Mumu"
+      },
+      "gurglegreen_cauldron": {
+        "name": "Yeşil Fokurtu Kazanı"
+      },
+      "thatchgrin_patch_pumpkin": {
+        "name": "Tarla Kabağı"
+      },
+      "cursed_candle_stub": {
+        "name": "Lanetli Mum Kalıntısı"
+      },
+      "gourdlight_crow_feather": {
+        "name": "Kabak Işığı Karga Tüyü"
+      },
       "membership_staff": {
         "name": "Değişim Asası"
       },
@@ -26256,6 +26455,18 @@ export const tr_TR: EnTranslations = {
       "muster_effigy": {
         "name": "Saman Ustabaşı"
       },
+      "gourdlight_thatchgrin": {
+        "name": "Yaşlı Sırıtan Saman"
+      },
+      "gourdlight_crow": {
+        "name": "Kabak Işığı Kargası"
+      },
+      "gourdlight_strawling": {
+        "name": "Samancık"
+      },
+      "gourdlight_swelling_gourd": {
+        "name": "Şişen Kabak"
+      },
       "stable_horse": {
         "name": "Ahır Atı"
       },
@@ -27409,6 +27620,11 @@ export const tr_TR: EnTranslations = {
         "name": "Hester Quillby",
         "title": "Haritacı",
         "greeting": "Bu bataklığın satın aldığım her haritası bir mevsimde yanlış çıktı. Su patikaları, patikalar suyu kaydırır. Bu yüzden kendim çiziyorum; mürekkep kururken burada, kuru yerde oturuyorum."
+      },
+      "gourdlight_keeper": {
+        "name": "Hester Kabakfitil",
+        "title": "Kabak Işığı Bekçisi",
+        "greeting": "Kabaklar yakıldı, fenerler asıldı; demek ki Kabak Işığı Gecesi geldi. Doğudere, Bataklık Köprüsü ve Yüksek Gözcü halkının kapısını çal ve şu sözleri söyle: şeker mi, şaka mı? Çoğu sana şeker verir. Birkaçı sana şaka yapar. Şekerleri tezgâhlarımdan herhangi birine getir; karşılığında giyecek bir şey veririm."
       },
       "reeve_ottoline": {
         "name": "Vali Ottoline",
@@ -30041,6 +30257,88 @@ export const tr_TR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "İyileştirme Mankenine etkili iyileştirme yapıldı"
+          }
+        }
+      },
+      "q_gourdlight_rounds": {
+        "title": "Kabak Işığı Turu",
+        "text": "Her Kabak Işığı Gecesi Vadi'nin çocukları evleri dolaşır; bu yıl sen de onlara katılıyorsun, {playerName}. Kasabalarımızda beş kapıyı çal, gereken sözleri söyle ve sana ne verildiğine bak. İşin bitince bana dön.",
+        "completion": "Beş kapı; bütün parmakların hâlâ yerinde. Al, eve yürürken yemen için bir kese şeker. Yarın yine gel, kapılar yeniden açılır.",
+        "objectives": {
+          "0": {
+            "label": "Çalınan kapılar"
+          }
+        }
+      },
+      "q_gourdlight_daily_patch": {
+        "title": "Tarladan Kabaklar",
+        "text": "Yaşlı Sırıtan Saman'ın Yaban Domuzu Çayırı'nın ötesindeki tarlası kabak dolu; yarısı da samanlarının dışına, dikkatli birinin ulaşabileceği yerlere yuvarlanmış. Bana beş tane getir, {playerName}. Yaşlı korkuluğun kendisinden uzak dur. Her birini sayıyor.",
+        "completion": "Beş yuvarlak kabak; hiçbirinden bir ısırık bile alınmamış. Bütün Vadi'ye yetecek turta çıkar. Al, zahmetinin karşılığı.",
+        "objectives": {
+          "0": {
+            "label": "Tarla Kabakları"
+          }
+        }
+      },
+      "q_gourdlight_daily_boo": {
+        "title": "Böö!",
+        "text": "Bu kasabalarda bir yıldır kimse doğru dürüst korkmadı, {playerName}; korkusuz bir Kabak Işığı Gecesi de yalnızca soğuk bir gecedir. Bir kostüm giy; benimkilerden herhangi biri olur, kazandıysan o kabak başlığı da olur. Sonra üç kasabalıya usulca yaklaş ve yüksek sesle BÖÖ diye bağır.",
+        "completion": "Üç kişi mi? Aşçının tava düşürdüğünü meydanın öbür ucundan duydum. Aferin. İşte payın.",
+        "objectives": {
+          "0": {
+            "label": "Korkutulan kasabalılar"
+          }
+        }
+      },
+      "q_gourdlight_daily_wicks": {
+        "title": "Uğursuz Fitiller",
+        "text": "Biri lamba direklerimizin dibine yeşil alevli mumlar bırakıyor. Erimeden yanıyorlar; arkanı dönünce de fısıldıyorlar. Üç kasabadan herhangi birinde altısını söndür, {playerName}, ve kalıntılarını getir.",
+        "completion": "Altı kalıntı, kırağı kadar soğuk. Onları kim yaktıysa daha çok uğraşması gerekecek. Al bunu, sonra ellerini yıka.",
+        "objectives": {
+          "0": {
+            "label": "Söndürülen lanetli mumlar"
+          }
+        }
+      },
+      "q_gourdlight_daily_towns": {
+        "title": "Her Kasabada Bir Kapı",
+        "text": "Çocuklar, gerçek bir Kabak Işığı gezgininin gece bitmeden her kasabada kapı çaldığını söyler. Onları haklı çıkar, {playerName}. Doğudere'de bir, Bataklık Köprüsü'nde bir, Yüksek Gözcü'de bir kapıda şeker ya da şaka iste. Yollardaki fenerler sana ışık tutar.",
+        "completion": "Bir gecede üç kasaba! Bunu çizmelerin senden daha çok hak etti.",
+        "objectives": {
+          "0": {
+            "label": "Doğudere'de bir kapı çalındı"
+          },
+          "1": {
+            "label": "Bataklık Köprüsü'nde bir kapı çalındı"
+          },
+          "2": {
+            "label": "Yüksek Gözcü'de bir kapı çalındı"
+          }
+        }
+      },
+      "q_gourdlight_daily_feathers": {
+        "title": "Ateş İçin Tüyler",
+        "text": "Yaşlı Sırıtan Saman köşeye sıkışınca samanına vuranların üzerine kargalarını çağırır. Tüyleri ocakta yeşil yanar; bu geceki şenlik ateşi için üç tane lazım. Tarlasında bir dövüş bul, {playerName}, ve kargalarının tüylerini yol.",
+        "completion": "Aysız tarlalar kadar siyahlar ve şimdiden duman kokuyorlar. Şenlik ateşi görülmeye değer olacak. Teşekkür ederim.",
+        "objectives": {
+          "0": {
+            "label": "Karga tüyleri"
+          }
+        }
+      },
+      "q_gourdlight_daily_baskets": {
+        "title": "Komşulara Sepetler",
+        "text": "Her Kabak Işığı Gecesi, her kasabadaki eski bir dostum için şeker sepeti hazırlarım ama dizlerim eskisi gibi değil. Benim yerime götür, {playerName}: Doğudere'deki Aşçı Marlow'a, Bataklık Köprüsü'ndeki otacı Yara'ya ve yukarıda Yüksek Gözcü'deki İrfan Ustası Caddis'e.",
+        "completion": "Üçü de teslim edildi; duyduğuma göre Marlow ağlamış. Hep ağlar zaten. Bu sepet de senin.",
+        "objectives": {
+          "0": {
+            "label": "Sepet Aşçı Marlow'a bırakıldı"
+          },
+          "1": {
+            "label": "Sepet otacı Yara'ya bırakıldı"
+          },
+          "2": {
+            "label": "Sepet İrfan Ustası Caddis'e bırakıldı"
           }
         }
       },

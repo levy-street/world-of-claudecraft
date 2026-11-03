@@ -770,6 +770,30 @@ describe('Guardian of the Breath: the wipe and the fall', () => {
   });
 });
 
+describe('Guardian of the Breath: a storm gust forced in the Wind half', () => {
+  it('plays its telegraph and gust, then the blow cycle turns on (the wind never freezes)', () => {
+    const f = pulled(4);
+    until(f, () => f.wind()?.phase === 'calm', 20);
+    const st = f.state();
+    if (!st) throw new Error('no state');
+    const blows0 = st.wind.blows;
+    expect(f.dev('/dev heart breath gust 90')).toBe(true);
+    expect(f.wind()?.phase).toBe('gustgather');
+    // The telegraph, then the gust, each for its own length.
+    f.tick(Math.round(T.gustGather / DT) + 1);
+    expect(f.wind()?.phase).toBe('gust');
+    expect(f.wind()?.bearingDeg).toBe(90);
+    f.tick(Math.round(T.gustSeconds / DT) + 1);
+    expect(f.wind()?.phase).toBe('calm');
+    // The gust did not spend a turn: the next blow is the one the cycle owed.
+    const next = blowBearing(st.start, blows0);
+    until(f, () => f.wind()?.phase === 'blow', 12);
+    expect(f.wind()?.phase).toBe('blow');
+    expect(f.wind()?.bearingDeg).toBe(next);
+    expect(f.state()?.wind.blows).toBe(blows0 + 1);
+  });
+});
+
 describe('Guardian of the Breath: determinism', () => {
   it('the same seed and the same raid fight the same fight', () => {
     const run = () => {

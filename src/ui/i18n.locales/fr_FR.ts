@@ -26280,4 +26280,237 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.stackUnavailable':
     "L'ajout de temps d'abonnement est indisponible pour le moment. Réessayez dans quelques instants.",
   'hudChrome.wocStore.subscription.tokenPrice': '{price} pour 30 jours',
+  'errors.api.worldFightHold':
+    'Un autre personnage de ce compte est encore dans le monde après un combat. Réessayez dans quelques minutes.',
+  'hudChrome.auraEffect.gourdlight.thatchbound':
+    'Vieux Thatchgrin tire vos ficelles. Vous ne pouvez pas agir : il vous fait marcher vers votre allié le plus proche et le frapper toutes les {every} s pour {min} à {max} points de dégâts (jusqu’à {mult} fois plus contre un allié de niveau {level}). Prend fin prématurément si vous subissez des dégâts équivalents à {pct}% de votre maximum de points de vie ou si un allié dissipe cet effet (Magie).',
+  'hudChrome.auraEffect.seasonalCosmetic': 'Purement cosmétique : aucun effet sur le combat',
+  'hudChrome.auraEffect.slumberNight':
+    'Il pend sans vie à son poteau jusqu’à la tombée de la nuit. Impossible de l’attaquer.',
+  'hudChrome.auraEffect.stilledMindCrit':
+    'Votre prochaine Fracture mentale ou Rupture du Vide inflige un coup critique garanti si elle touche. Les autres sorts ne consomment pas ce bonus. Rupture du Vide consomme toujours 3 charges de Dîme sombre. Une incantation résistée consomme le bonus.',
+  'hudChrome.mounts.desc_emberbristle_broom':
+    'Un balai de moisson noué d’un ruban orange, qui flotte à une main du sol et sème des braises depuis ses brins. Une récompense permanente de la Veillée des courges.',
+  'hudChrome.mounts.name_emberbristle_broom': 'Balai aux brins de braise',
+  'hudChrome.worldBoss.sleepUntilNightfall': '{name} dort jusqu’à la tombée de la nuit.',
+  'hudChrome.priest.bombLabel': 'Bombe de dîme',
+  'hudChrome.priest.bombReady': 'Prête',
+  'hudChrome.priest.bombStatus': '{value} charges de Bombe de dîme sur {max}',
+  'hudChrome.priest.bombTooltip':
+    'Bombe de dîme : générez 20 charges de Dîme sombre pour préparer une bombe. Dépenser la Dîme sombre n’ajoute aucune progression. La progression persiste entre les combats. Mourir ou engager un boss de raid la réinitialise. Une incantation terminée consomme la bombe ; l’annuler la conserve.',
+  'hudChrome.priest.chargeCount': '{value} / {max}',
+  'hudChrome.priest.gloomtitheLabel': 'Dîme sombre',
+  'hudChrome.priest.gloomtitheStatus': '{value} charges de Dîme sombre sur {max}',
+  'hudChrome.priest.gloomtitheTooltip':
+    'Dîme sombre : jusqu’à 5 charges à dépenser. Rupture du Vide en consomme 3 ; Toucher vampirique en consomme 2 pour infliger 30% de dégâts supplémentaires ; Invoquer un Démon de dîme consomme toute votre réserve. Générer des charges fait aussi progresser la Bombe de dîme, même lorsque cette réserve est pleine.',
+  'entities.abilities.choir_of_deliverance.specNote_shadow':
+    'Pendant 15 s, répartit en soins 20% des points de vie que les ennemis perdent à cause de vos dégâts d’Ombre entre les membres blessés du groupe à moins de 30 mètres, vous compris. En raid, seul votre sous-groupe est soigné. Incantation instantanée, permettant de continuer à attaquer en forme d’Ombre. Les dégâts absorbés et ceux dépassant les points de vie restants ne génèrent pas de soins.',
+  'entities.abilities.inner_focus.specNote_shadow':
+    'Réserve aussi un coup critique garanti pour votre prochaine Fracture mentale ou Rupture du Vide dans les 60 s, si elle touche. Les autres sorts ne consomment pas ce bonus. Rupture du Vide consomme toujours 3 charges de Dîme sombre. Une incantation résistée consomme le bonus de coup critique.',
+  'entities.abilities.spirit_bomb.description':
+    'Fait exploser une bombe spirituelle sur un ennemi, infligeant {damage} points de dégâts d’Ombre aux ennemis à moins de 8 mètres de cette cible. Les dégâts augmentent avec la puissance des sorts, peuvent être critiques et sont réduits au-delà de 5 cibles. Générez 20 charges de Dîme sombre pour préparer une bombe. La génération compte même lorsque vous détenez le maximum de 5 charges ; les dépenser n’est pas nécessaire et n’ajoute aucune progression. La progression persiste entre les combats, jusqu’à une bombe préparée. Mourir efface votre progression et votre bombe préparée. Terminer l’incantation consomme la bombe préparée, même si le sort est résisté. L’annulation ou l’interruption la conserve. Engager un boss de raid efface votre progression et votre bombe préparée. Ce sort ne peut pas servir à engager un boss de raid.',
+  'entities.abilities.spirit_bomb.name': 'Bombe de dîme',
+  'entities.abilities.vampiric_touch.description':
+    'Inflige {damage} points de dégâts d’Ombre en 15 s, avec un effet toutes les 3 s. Les dégâts augmentent avec la puissance des sorts et chaque effet périodique peut être critique. Chaque effet répartit des soins équivalents à 20% des points de vie perdus par l’ennemi entre vous et les membres blessés du groupe à moins de 30 mètres ; en raid, seul votre sous-groupe reçoit ces soins. Si vous avez au moins 2 charges de Dîme sombre, appliquer cet effet en consomme 2 pour augmenter tous ses dégâts de 30%.',
+  'entities.abilities.vampiric_touch.name': 'Toucher vampirique',
+  'entities.abilities.void_rupture.description':
+    'Consomme 3 charges de Dîme sombre pour déchirer un ennemi et lui infliger {damage} points de dégâts d’Ombre. Les dégâts augmentent avec la puissance des sorts et peuvent être critiques. Nécessite 3 charges et les consomme même si le sort est résisté.',
+  'entities.abilities.void_rupture.name': 'Rupture du Vide',
+  'entities.items.batwing_draught.name': 'Breuvage voletant',
+  'entities.items.carved_pumpkin_head.name': 'Tête de citrouille sculptée',
+  'entities.items.crabapple_chew.name': 'Caramel à la pomme sauvage',
+  'entities.items.cursed_candle_stub.name': 'Bout de chandelle maudite',
+  'entities.items.emberwoven_sheaf.name': 'Gerbe tissée de braises',
+  'entities.items.gourdlight_crow_feather.name': 'Plume de corbeau de la Veillée des courges',
+  'entities.items.gourdlight_sweet.name': 'Friandise de la Veillée des courges',
+  'entities.items.gourdlight_treat_pouch.name': 'Sachet de friandises de la Veillée des courges',
+  'entities.items.gourdseed_brittle.name': 'Nougatine aux graines de courge',
+  'entities.items.gurglegreen_cauldron.name': 'Chaudron Vertglouglou',
+  'entities.items.haunting_draught.name': 'Breuvage spectral',
+  'entities.items.hearthroot_toffee.name': 'Caramel à la racine du foyer',
+  'entities.items.jar_of_mischief.name': 'Bocal à malices',
+  'entities.items.lantern_mint_drop.name': 'Pastille de menthe des lanternes',
+  'entities.items.murmurwick_candle.name': 'Chandelle à mèche murmurante',
+  'entities.items.owlwatch_fudge.name': 'Fondant de la chouette vigie',
+  'entities.items.prankers_pumpkin.name': 'Citrouille du farceur',
+  'entities.items.rattlebone_draught.name': 'Breuvage aux os cliquetants',
+  'entities.items.reins_emberbristle_broom.name': 'Balai aux brins de braise',
+  'entities.items.sack_of_startled_bats.name': 'Sac de chauves-souris affolées',
+  'entities.items.strawling_charm.name': 'Charme de créature de paille',
+  'entities.items.thatchgrin_patch_pumpkin.name': 'Citrouille du potager',
+  'entities.items.thatchgrin_sweet_sack.name': 'Sac de friandises de Thatchgrin',
+  'entities.items.wanderwisp_lantern.name': 'Lanterne du feu follet errant',
+  'entities.items.writ_of_the_gourdlit.name': 'Brevet de l’Illuminé des courges',
+  'entities.items.writ_of_the_hollow_grin.name': 'Brevet du Sourire creux',
+  'entities.items.writ_of_the_trickster.name': 'Brevet du Farceur',
+  'entities.mobs.gourdlight_crow.name': 'Corbeau de la Veillée des courges',
+  'entities.mobs.gourdlight_strawling.name': 'Créature de paille',
+  'entities.mobs.gourdlight_swelling_gourd.name': 'Courge gonflante',
+  'entities.mobs.gourdlight_thatchgrin.name': 'Vieux Thatchgrin',
+  'entities.npcs.gourdlight_keeper.greeting':
+    'Les courges brillent et les lanternes sont suspendues : c’est donc la Veillée des courges. Frappez aux portes des habitants d’Eastbrook, de Fenbridge et de Highwatch, puis dites les mots : des bonbons ou un sort. La plupart vous donneront une friandise. Quelques-uns vous joueront un tour. Apportez-moi les friandises à n’importe lequel de mes étals et je vous les échangerai contre quelque chose à porter.',
+  'entities.npcs.gourdlight_keeper.name': 'Hester Gourdwick',
+  'entities.npcs.gourdlight_keeper.title': 'Gardienne de la Veillée des courges',
+  'entities.quests.q_gourdlight_daily_baskets.completion':
+    'Les trois ont été livrées, et j’ai entendu dire que Marlow a pleuré. Il pleure toujours. Voici une corbeille pour vous.',
+  'entities.quests.q_gourdlight_daily_baskets.objectives.0.label':
+    'Corbeille remise au cuisinier Marlow',
+  'entities.quests.q_gourdlight_daily_baskets.objectives.1.label':
+    'Corbeille remise à Yara l’herboriste',
+  'entities.quests.q_gourdlight_daily_baskets.objectives.2.label':
+    'Corbeille remise au maître du savoir Caddis',
+  'entities.quests.q_gourdlight_daily_baskets.text':
+    'À chaque Veillée des courges, je remplis une corbeille de friandises pour un vieil ami dans chaque ville, et mes genoux ne sont plus ce qu’ils étaient. Distribuez-les pour moi, {playerName} : au cuisinier Marlow à Eastbrook, à Yara l’herboriste à Fenbridge et au maître du savoir Caddis, là-haut à Highwatch.',
+  'entities.quests.q_gourdlight_daily_baskets.title': 'Des corbeilles pour les voisins',
+  'entities.quests.q_gourdlight_daily_boo.completion':
+    'Trois ? J’ai entendu le cuisinier lâcher une poêle depuis l’autre bout de la place. Bien joué. Voici votre part.',
+  'entities.quests.q_gourdlight_daily_boo.objectives.0.label': 'Habitants effrayés',
+  'entities.quests.q_gourdlight_daily_boo.text':
+    'Personne dans ces villes n’a eu une bonne frayeur depuis un an, {playerName}, et sans cela, la Veillée des courges n’est qu’une nuit froide. Enfilez un costume, n’importe lequel des miens fera l’affaire, ou cette tête de citrouille si vous en avez gagné une. Puis approchez-vous discrètement de trois habitants et poussez un bon gros BOUH !',
+  'entities.quests.q_gourdlight_daily_boo.title': 'Bouh !',
+  'entities.quests.q_gourdlight_daily_feathers.completion':
+    'Noires comme un champ sans lune, et elles sentent déjà la fumée. Le feu de joie sera splendide. Merci.',
+  'entities.quests.q_gourdlight_daily_feathers.objectives.0.label': 'Plumes de corbeau',
+  'entities.quests.q_gourdlight_daily_feathers.text':
+    'Quand le Vieux Thatchgrin est acculé, il appelle ses corbeaux sur ceux qui malmènent sa paille. Leurs plumes brûlent d’une flamme verte dans l’âtre, et il m’en faut trois pour le feu de joie de ce soir. Trouvez un combat dans son potager, {playerName}, et prélevez-les sur ses corbeaux.',
+  'entities.quests.q_gourdlight_daily_feathers.title': 'Des plumes pour le feu',
+  'entities.quests.q_gourdlight_daily_patch.completion':
+    'Cinq bien rondes, sans la moindre morsure. De quoi faire de la tarte pour toute la vallée. Tenez, pour votre peine.',
+  'entities.quests.q_gourdlight_daily_patch.objectives.0.label': 'Citrouilles du potager',
+  'entities.quests.q_gourdlight_daily_patch.text':
+    'Le potager du Vieux Thatchgrin, au-delà du Pré aux sangliers, regorge de citrouilles. La moitié ont roulé hors de portée de sa paille, là où une personne prudente peut les ramasser. Apportez-m’en cinq, {playerName}. Restez bien à l’écart du vieil épouvantail. Il les compte toutes.',
+  'entities.quests.q_gourdlight_daily_patch.title': 'Les citrouilles du potager',
+  'entities.quests.q_gourdlight_daily_towns.completion':
+    'Trois villes en une nuit ! Vos bottes ont davantage mérité ceci que vous.',
+  'entities.quests.q_gourdlight_daily_towns.objectives.0.label': 'Une porte visitée à Eastbrook',
+  'entities.quests.q_gourdlight_daily_towns.objectives.1.label': 'Une porte visitée à Fenbridge',
+  'entities.quests.q_gourdlight_daily_towns.objectives.2.label': 'Une porte visitée à Highwatch',
+  'entities.quests.q_gourdlight_daily_towns.text':
+    'Les enfants disent qu’un vrai promeneur des courges frappe aux portes de chaque ville avant la fin de la nuit. Donnez-leur raison, {playerName}. Demandez des bonbons ou un sort à une porte d’Eastbrook, une de Fenbridge et une de Highwatch. Les lanternes des routes éclaireront votre chemin.',
+  'entities.quests.q_gourdlight_daily_towns.title': 'Une porte dans chaque ville',
+  'entities.quests.q_gourdlight_daily_wicks.completion':
+    'Six bouts de chandelle, froids comme le givre. La personne qui les a allumés devra faire mieux que cela. Prenez ceci et lavez-vous les mains.',
+  'entities.quests.q_gourdlight_daily_wicks.objectives.0.label': 'Chandelles maudites éteintes',
+  'entities.quests.q_gourdlight_daily_wicks.text':
+    'Quelqu’un dépose des chandelles aux flammes vertes au pied de nos réverbères. Elles brûlent sans fondre et murmurent dès qu’on leur tourne le dos. Éteignez-en six pour moi, {playerName}, dans n’importe laquelle des trois villes, et rapportez-moi les bouts.',
+  'entities.quests.q_gourdlight_daily_wicks.title': 'Méchantes mèches',
+  'entities.quests.q_gourdlight_rounds.completion':
+    'Cinq portes, et vous avez encore tous vos doigts. Tenez, un sachet de friandises pour le retour. Revenez demain, les portes s’ouvriront à nouveau.',
+  'entities.quests.q_gourdlight_rounds.objectives.0.label': 'Portes auxquelles vous avez frappé',
+  'entities.quests.q_gourdlight_rounds.text':
+    'Chaque Veillée des courges, les enfants de la vallée font leur tournée, et cette année vous les accompagnez, {playerName}. Frappez à cinq portes de nos villes, dites les mots et voyez ce qu’on vous offre. Revenez me voir une fois votre tournée terminée.',
+  'entities.quests.q_gourdlight_rounds.title': 'Tournée de la Veillée des courges',
+  'guide.interfacePage.framesGovernedPriest':
+    'Modifier les cadres permet aussi de déplacer le médaillon de Dîme sombre et de Bombe de dîme du prêtre Ombre.',
+  'guide.worldPvpPage.hillBodyTwoHour':
+    'Une fois toutes les deux heures, à un instant imprévisible, tout le royaume apprend qu’une colline surgira dans l’une des zones du nord quinze minutes plus tard. Le cercle de son emplacement est alors marqué en terrain découvert. Elle reste trente minutes, puis disparaît. Tant qu’elle est présente, le royaume reçoit toutes les cinq minutes sa position et le nom des groupes qui l’ont contrôlée le plus longtemps. Le groupe comptant le plus de joueurs dans le cercle dispute la colline et la capture après trente secondes de majorité. L’arrivée d’un groupe rival ne fait que suspendre ce décompte jusqu’à ce que le vôtre reprenne l’avantage ; il ne repart de zéro que si aucun membre de votre groupe n’est encore vivant à l’intérieur. Un joueur seul compte comme un groupe d’une personne et conserve sa colline s’il crée un groupe, mais les membres d’un raid ne comptent pas. Tant qu’un groupe contrôle la colline, chacun de ses membres à l’intérieur gagne la même quantité d’Honneur chaque minute, quelle que soit la durée du contrôle. Un groupe complet qui la tient sans opposition pendant toute son apparition gagne ainsi environ autant qu’avec deux victoires en champ de bataille. Lorsqu’elle disparaît, si le groupe l’ayant contrôlée le plus longtemps au total l’a tenue au moins dix minutes, chaque personne restée à l’intérieur pour ce groupe pendant au moins une minute et en faisant toujours partie gagne une victoire pour la ligne JcJ du coffre hebdomadaire. Une barre au-dessus du terrain indique qui la contrôle, vos effectifs face aux leurs et le décompte de contestation ; /hill dans le chat indique sa position.',
+  'seasonal.boo.already': '{name} a eu assez de frayeurs pour aujourd’hui.',
+  'seasonal.boo.flash': 'BOUH ! {name} a peur !',
+  'seasonal.boo.frightenedHint':
+    '{name} sursaute encore depuis votre dernière farce. Trouvez quelqu’un d’autre.',
+  'seasonal.boo.landed':
+    'Vous bondissez devant {name} en criant BOUH ! Un hurlement retentit et tout manque de tomber.',
+  'seasonal.boo.needsCostume':
+    'Enfilez d’abord un costume : un breuvage de déguisement, un tour de chauve-souris ou de squelette, le Charme de créature de paille, la Tête de citrouille sculptée ou une gorgée de gobelin du Chaudron Vertglouglou.',
+  'seasonal.boo.noCostume':
+    'Sans costume, vous faites seulement rire {name}. Enfilez-en un d’abord.',
+  'seasonal.boo.notOnErrand': 'Hester ne vous a demandé d’effrayer personne aujourd’hui.',
+  'seasonal.boo.row': 'Bouh !',
+  'seasonal.boo.rowAria': 'Bondir devant {name} et crier bouh',
+  'seasonal.boundItemGone':
+    'La Veillée des courges est terminée et votre objet {item} retombe en paille.',
+  'seasonal.costume': 'Vous buvez le breuvage et vous transformez : {trick} !',
+  'seasonal.event.gourdlight_eve.name': 'Veillée des courges',
+  'seasonal.guise': 'Le charme crépite et la paille vous recouvre : {trick} !',
+  'seasonal.itemSource.pumpkinHead':
+    'Obtenue sur le Vieux Thatchgrin, dans son champ de citrouilles au-delà du Pré aux sangliers, la première fois que vous le dépouillez. Aucun marchand ne la vend.',
+  'seasonal.itemUse.broomSources':
+    'Acheté à Hester Gourdwick contre {count} Gerbes tissées de braises ou, rarement, obtenu sur le Vieux Thatchgrin un jour où vous le dépouillez. La compétence d’équitation est nécessaire pour le monter. Conservé définitivement et utilisable comme monture toute l’année.',
+  'seasonal.itemUse.costumeBat':
+    'Utilisation : vous transforme en chauve-souris voletante pendant {minutes} minutes. Consommé à l’usage. Inutilisable en combat ; entrer en combat met fin à l’effet. Cosmétique.',
+  'seasonal.itemUse.costumeGhost':
+    'Utilisation : vous transforme en fantôme flottant pendant {minutes} minutes. Consommé à l’usage. Inutilisable en combat ; entrer en combat met fin à l’effet. Cosmétique.',
+  'seasonal.itemUse.costumeSkeleton':
+    'Utilisation : vous transforme en squelette cliquetant pendant {minutes} minutes. Consommé à l’usage. Inutilisable en combat ; entrer en combat met fin à l’effet. Cosmétique.',
+  'seasonal.itemUse.pouch':
+    'Utilisation : ouvrez-le pour recevoir {count} Friandises de la Veillée des courges.',
+  'seasonal.itemUse.pumpkinHead':
+    'Utilisation : mettez ou retirez une citrouille sculptée éclairée de l’intérieur, portée par-dessus votre casque. Cosmétique.',
+  'seasonal.itemUse.sheaf':
+    'Le Vieux Thatchgrin vous en donne une chaque jour où vous le dépouillez, jusqu’à ce que vous possédiez le Balai aux brins de braise. Hester Gourdwick en échange {count} contre le balai à ses étals d’Eastbrook, de Fenbridge et de Highwatch. Les gerbes non dépensées sont conservées pour la prochaine Veillée des courges.',
+  'seasonal.itemUse.strawlingCharm':
+    'Utilisation : vous transforme en l’une des créatures de paille du Vieux Thatchgrin pendant {seconds} secondes. Inutilisable en combat. Jamais consommé. Cosmétique.',
+  'seasonal.itemUse.sweet':
+    'Obtenues en demandant des bonbons ou un sort pendant la Veillée des courges. Hester Gourdwick les échange contre des objets cosmétiques à ses étals d’Eastbrook, de Fenbridge et de Highwatch.',
+  'seasonal.itemUse.titleWrit':
+    'Utilisation : accorde le titre {title} à ce personnage, à porter depuis le Livre des hauts faits. Consommé à l’usage. Conservé si vous possédez déjà le titre.',
+  'seasonal.itemUse.toyBats':
+    'Utilisation : ouvrez le sac. Une nuée de chauves-souris piaillantes en jaillit et se disperse autour de vous pendant {seconds} secondes. Inutilisable en combat ou en camouflage. Jamais consommé : réutilisable après {cooldown} secondes. Conservé définitivement et utilisable toute l’année. Cosmétique.',
+  'seasonal.itemUse.toyCandleShadows':
+    'Utilisation : allumez la chandelle devant vous. Pendant {seconds} secondes, ses flammes projettent les ombres dansantes d’un chat, d’une chauve-souris et d’une sorcière sur le sol alentour, visibles par tous les joueurs à proximité. Inutilisable en combat ou en camouflage. Jamais consommée : réutilisable après {cooldown} secondes. Conservée définitivement et utilisable toute l’année. Cosmétique.',
+  'seasonal.itemUse.toyCauldron':
+    'Utilisation : posez devant vous un grand chaudron bouillonnant. Il reste {standing} secondes. Tout joueur qui y boit éclate en bulles vertes et se transforme en gobelin pendant {seconds} secondes, remplaçant son éventuel costume. Impossible de le poser ou d’y boire en combat ou en camouflage ; entrer en combat met fin à la forme de gobelin. Jamais consommé : réutilisable après {cooldown} secondes. Conservé définitivement et utilisable toute l’année. Cosmétique.',
+  'seasonal.itemUse.toyLantern':
+    'Utilisation : posez la lanterne devant vous. Un petit fantôme tourne autour de vous pendant {seconds} secondes. Inutilisable en combat ou en camouflage. Jamais consommée : réutilisable après {cooldown} secondes. Conservée définitivement et utilisable toute l’année. Cosmétique.',
+  'seasonal.itemUse.toyPrank':
+    'Utilisation : lancez-la sur un autre joueur visible à moins de {range} mètres. Sa tête devient une citrouille lumineuse pendant {seconds} secondes ; un clic droit lui permet de la retirer. Aucun de vous ne doit être en combat et vous ne devez pas être en camouflage. Jamais consommée : réutilisable après {cooldown} secondes. Conservée définitivement et utilisable toute l’année. Cosmétique.',
+  'seasonal.itemUse.trickJar':
+    'Utilisation : vous joue un tour aléatoire et inoffensif pendant quelques secondes. Cosmétique.',
+  'seasonal.jarTrick': 'Le bocal s’ouvre d’un coup : {trick} !',
+  'seasonal.pumpkinHead.off': 'Vous retirez la Tête de citrouille sculptée.',
+  'seasonal.pumpkinHead.on': 'Vous mettez la Tête de citrouille sculptée.',
+  'seasonal.pumpkins.flash': 'Citrouille hantée trouvée ! {count}/{total}',
+  'seasonal.pumpkins.found':
+    'Vous allumez une Citrouille hantée dans {zone} : {count}/{total}. Friandises de la Veillée des courges reçues : {sweets}.',
+  'seasonal.pumpkins.name': 'Citrouille hantée',
+  'seasonal.pumpkins.progress': '{label} : {current}/{total}',
+  'seasonal.pumpkins.title': 'Citrouilles hantées',
+  'seasonal.pumpkins.world': 'Monde',
+  'seasonal.thatchgrin.poleBound': 'Lié au poteau',
+  'seasonal.thatchgrin.sleepYell': 'Le soleil est levé. Retour au poteau, retour à la garde.',
+  'seasonal.thatchgrin.wakeYell': 'La NUIT tombe sur le potager ! Qui marche dans MON champ ?',
+  'seasonal.titleGranted': 'Vous lisez le brevet. Nouveau titre obtenu : {title}.',
+  'seasonal.titleKnown': 'Vous possédez déjà ce titre et conservez donc le brevet.',
+  'seasonal.tokenPrice': '{count} {item}',
+  'seasonal.toy.bats': 'Vous ouvrez le sac et une nuée de chauves-souris affolées en jaillit !',
+  'seasonal.toy.candleShadows':
+    'Vous allumez la chandelle et les ombres commencent à danser autour de ses flammes.',
+  'seasonal.toy.cauldron': 'Vous posez le chaudron et il se met à bouillonner.',
+  'seasonal.toy.cauldronDrink':
+    'Vous buvez au chaudron, éclatez en bulles vertes et vous transformez en gobelin !',
+  'seasonal.toy.hidden': 'Sortez d’abord des ombres : un jouet vous trahirait.',
+  'seasonal.toy.lantern':
+    'Vous posez la lanterne et un petit fantôme en sort en flottant pour vous tenir compagnie.',
+  'seasonal.toy.prank': 'Vous lancez la citrouille. Elle s’écrase sur {name} !',
+  'seasonal.toy.prankNeedsPlayer':
+    'La citrouille ne peut s’écraser que sur un autre joueur qui n’est pas en combat.',
+  'seasonal.toy.pranked':
+    '{name} vous écrase une citrouille sur la tête ! Retirez-la d’un clic droit ou portez-la fièrement.',
+  'seasonal.toy.prankedFlash': '{name} vous a joué un tour !',
+  'seasonal.trickOrTreat.alreadyKnocked':
+    'Vous avez déjà demandé des bonbons ou un sort à {name} aujourd’hui.',
+  'seasonal.trickOrTreat.knockedHint':
+    'Vous avez déjà frappé ici aujourd’hui. La porte rouvrira après la réinitialisation quotidienne.',
+  'seasonal.trickOrTreat.notActive': 'La Veillée des courges n’a pas lieu en ce moment.',
+  'seasonal.trickOrTreat.row': 'Des bonbons ou un sort !',
+  'seasonal.trickOrTreat.rowAria': 'Demander des bonbons ou un sort à {name}',
+  'seasonal.trickOrTreat.tooFar': 'Approchez-vous pour frapper.',
+  'seasonal.trickOrTreat.treat': '{name} vous tend une friandise.',
+  'seasonal.trickOrTreat.treatFlash.few':
+    'Des bonbons ! {count} Friandises de la Veillée des courges',
+  'seasonal.trickOrTreat.treatFlash.many':
+    'Des bonbons ! {count} Friandises de la Veillée des courges',
+  'seasonal.trickOrTreat.treatFlash.one':
+    'Des bonbons ! {count} Friandise de la Veillée des courges',
+  'seasonal.trickOrTreat.treatFlash.other':
+    'Des bonbons ! {count} Friandises de la Veillée des courges',
+  'seasonal.trickOrTreat.trick': '{name} vous joue un tour : {trick} !',
+  'seasonal.trickOrTreat.trickFlash': 'Un sort ! {trick}',
+  'seasonal.tricks.gourdlight_costume_bat': 'Costume de chauve-souris',
+  'seasonal.tricks.gourdlight_costume_ghost': 'Costume de fantôme',
+  'seasonal.tricks.gourdlight_costume_skeleton': 'Costume de squelette',
+  'seasonal.tricks.gourdlight_trick_bat': 'Folie de chauve-souris',
+  'seasonal.tricks.gourdlight_trick_fumes': 'Vapeurs vertes',
+  'seasonal.tricks.gourdlight_trick_skeleton': 'Os cliquetants',
+  'seasonal.tricks.gourdlight_trick_strawling': 'Apparence de créature de paille',
 };

@@ -9,12 +9,14 @@
 // table, one renderer branch: a new scenery-drawn interactable is a row, never another arm.
 
 import type * as THREE from 'three';
+import { GURGLEGREEN_CAULDRON_ID } from '../sim/content/gourdlight_eve';
 import { MUSTER_RACK_TEMPLATE_ID } from '../sim/content/mirefen_muster';
 import { MUDFIN_HUT_TEMPLATE_ID } from '../sim/mudfin_huts';
 import { REALM_BUILDER_MONUMENT_TEMPLATE_ID } from '../sim/types';
 import { buildMudfinHutPickBody } from './mudfin_hut_pick';
 import { buildMusterRackPickBody } from './muster_camps';
 import { buildRealmBuilderMonumentPickBody } from './realm_builder_monument_fx';
+import { buildToyCauldronPickBody } from './seasonal_toys_fx';
 
 type PickBodyBuilder = () => { group: THREE.Group; height: number };
 
@@ -22,6 +24,8 @@ const PICK_ONLY_OBJECTS: Readonly<Record<string, PickBodyBuilder>> = Object.free
   [REALM_BUILDER_MONUMENT_TEMPLATE_ID]: buildRealmBuilderMonumentPickBody,
   [MUSTER_RACK_TEMPLATE_ID]: buildMusterRackPickBody,
   [MUDFIN_HUT_TEMPLATE_ID]: buildMudfinHutPickBody,
+  // Hester's Gurglegreen Cauldron: drawn by the toys' layer (seasonal_toys_fx.ts)
+  [`ground_${GURGLEGREEN_CAULDRON_ID}`]: buildToyCauldronPickBody,
 });
 
 /** Whether a ground object's art lives in a scenery view (its entity is a pick volume). */

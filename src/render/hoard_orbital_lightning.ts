@@ -8,7 +8,6 @@ import {
 } from '../sim/rift/hoard_orbital_lightning_core';
 import type { HoardBossCueView } from '../world_api/dungeons';
 import { loadGltf } from './assets/loader';
-import { registerDeferredPreload } from './assets/preload';
 import { floorVfxRenderOrder } from './floor_vfx_layer';
 import { attachSceneGroupGated } from './gated_scene_attach';
 import { GFX, type GfxTier } from './gfx';
@@ -34,7 +33,6 @@ function loadOrbitalSources(): Promise<readonly THREE.Group[] | undefined> {
     .catch(() => undefined);
   return loading;
 }
-if (typeof window !== 'undefined') registerDeferredPreload(loadOrbitalSources);
 
 const ORB_PARTS = ['Core', 'OuterEnergy', 'LocalArcs', 'Sparks'] as const;
 const IMPACT_PARTS = ['ImpactCore', 'GroundArcs', 'Crown', 'RadialBurst', 'Sparks'] as const;

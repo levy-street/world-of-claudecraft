@@ -28,8 +28,8 @@ import {
   triad,
 } from './music_notes';
 import { MUSIC_OVERRIDES } from './music_overrides.generated';
+import { buildSiblingMusicThemes, SIBLING_THEME_TRIM } from './music_sibling_themes';
 import { closeMusicDirector } from './music_teardown';
-import { composeDungeonGravewyrmSanctum } from './music_theme_gravewyrm_sanctum';
 import { COMBAT_STREAM_URLS, pickCombatTrackIndex } from './music_tracks';
 import { applyZoneStreamTargets } from './music_zone_streams';
 import type { MusicZone } from './music_zones';
@@ -3479,7 +3479,7 @@ export function buildMusicThemes(withOverrides = true): Record<string, Theme> {
     farshore: composeFarshore(),
     dungeon_hollow_crypt: composeDungeonHollowCrypt(),
     dungeon_sunken_bastion: composeDungeonSunkenBastion(),
-    dungeon_gravewyrm_sanctum: composeDungeonGravewyrmSanctum(),
+    ...buildSiblingMusicThemes(),
     ...buildIgnivarRaidThemes(),
     rift_frost: composeRiftFrost(),
     rift_ember: composeRiftEmber(),
@@ -3514,7 +3514,7 @@ export const THEME_TRIM: Record<string, number> = {
   peaks: 2.05,
   dungeon_hollow_crypt: 2.95,
   dungeon_sunken_bastion: 2.95,
-  dungeon_gravewyrm_sanctum: 1.8,
+  ...SIBLING_THEME_TRIM,
   // Measured against town_eastbrook with scripts/music_gated_rms.mjs.
   ignivar_forge_approach: 2.34,
   ignivar_raid_arena: 1.59,

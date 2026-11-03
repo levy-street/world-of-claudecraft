@@ -42,6 +42,8 @@ import {
 } from './council_fx_core';
 import type { CouncilFxHost, CouncilPillarsFx } from './council_pillars_fx';
 import type { CouncilShelters } from './council_shelter_fx';
+import type { CouncilTelegraphKind } from './painted_telegraph_core';
+import type { PaintedFan } from './painted_telegraphs';
 
 const RING_VERT = /* glsl */ `
 varying vec2 vXZ;
@@ -73,6 +75,8 @@ interface SoulSlot {
   seen: boolean;
   /** The Echo's ring (guardian) or the grind's (slabwright). */
   outer: TelegraphFan;
+  /** The outer ring's stone paint (the Echo's, or the slab's grind). */
+  outerPaint: PaintedFan<CouncilTelegraphKind>;
   /** The crush's ring (slabwright). */
   inner: TelegraphFan;
   /** The song's ring on the floor and its clock (singer). */
@@ -175,6 +179,8 @@ export class CouncilSoulFx {
       const inner = this.h.kit.fan(18);
       outer.group.visible = false;
       inner.group.visible = false;
+      const outerPaint = this.h.paints.dress(outer, 'echo');
+      this.h.paints.dress(inner, 'slabCrush');
       const floorMat = ringMat('smithHeartSongFloor', 18, 0.04);
       const floor = new THREE.Mesh(ringGeo, floorMat);
       floor.name = 'smithHeartSongFloor';
@@ -194,6 +200,7 @@ export class CouncilSoulFx {
         role: null,
         seen: false,
         outer,
+        outerPaint,
         inner,
         floor,
         floorMat,
@@ -222,6 +229,7 @@ export class CouncilSoulFx {
       s.echoAt = -99;
       s.drapedX = Number.NaN;
       s.drapedZ = Number.NaN;
+      this.h.paints.setLook(s.outerPaint, role === 'slabwright' ? 'slabGrind' : 'echo');
       if (role === 'slabwright') {
         this.h.kit.layOutFan(s.outer, 360, {
           color: TELEGRAPH_THREAT_COLORS.danger,

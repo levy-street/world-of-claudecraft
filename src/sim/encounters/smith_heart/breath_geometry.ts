@@ -102,18 +102,46 @@ export function fellFromCornice(x: number, z: number, y: number, onGround: boole
   return inClaimBand(z) && nearCornice(x, z) && onGround && y < C.h - T.voidDepth;
 }
 
-/** Where Thessaly's circle lands: `reach` yards upwind of the guardian (the
- *  wind blowing toward `bearingDeg`), drawn in toward it until the whole
- *  circle stands on the Cornice's floor clear of every gap. */
+/** Where Thessaly's circle lands: on the guardian's upwind side (the wind
+ *  blowing toward `bearingDeg`), at one of a few hashed reaches and sideways
+ *  offsets, so the raid cannot learn one spot (Jose's playtest: it always fell
+ *  in the same place). The whole circle stands on the Cornice's floor clear of
+ *  every gap, and `T.circleApart` from `last` (the circle before it) when the
+ *  floor allows; failing every candidate it is drawn in toward the guardian. */
 export function calmCircleSpot(
   guardian: { x: number; z: number },
   bearingDeg: number,
-  reach: number = T.circleReach,
+  salt = 0,
+  last: { x: number; z: number } | null = null,
 ): { x: number; z: number } {
   const up = ((bearingDeg + 180) * Math.PI) / 180;
-  for (let d = reach; d >= 0; d -= 1) {
-    const x = guardian.x + Math.sin(up) * d;
-    const z = guardian.z + Math.cos(up) * d;
+  const ux = Math.sin(up);
+  const uz = Math.cos(up);
+  const reaches = T.circleReaches;
+  const sides = T.circleSides;
+  const n = reaches.length * sides.length;
+  const start = breathHash(salt, 17) % n;
+  let fallback: { x: number; z: number } | null = null;
+  // Upwind first; a floor too cramped there for a new spot tries crosswind.
+  for (const turn of [0, Math.PI / 2, -Math.PI / 2]) {
+    const dx = ux * Math.cos(turn) + uz * Math.sin(turn);
+    const dz = uz * Math.cos(turn) - ux * Math.sin(turn);
+    for (let i = 0; i < n; i++) {
+      const k = (start + i) % n;
+      const d = reaches[k % reaches.length];
+      const side = sides[Math.floor(k / reaches.length)];
+      // Sideways is the reach's direction turned a quarter.
+      const x = guardian.x + dx * d + dz * side;
+      const z = guardian.z + dz * d - dx * side;
+      if (!circleClear(x, z, T.circleR)) continue;
+      if (last === null || Math.hypot(x - last.x, z - last.z) >= T.circleApart) return { x, z };
+      fallback = fallback ?? { x, z };
+    }
+  }
+  if (fallback) return fallback;
+  for (let d = T.circleReach; d >= 0; d -= 1) {
+    const x = guardian.x + ux * d;
+    const z = guardian.z + uz * d;
     if (circleClear(x, z, T.circleR)) return { x, z };
   }
   return { x: guardian.x, z: guardian.z };
@@ -158,37 +186,48 @@ export function knotGrid(): readonly { x: number; z: number; far: number }[] {
   return out;
 }
 
-/** Where a Knotted Gale drops: hashed over the floor farthest from the gaps
- *  (`T.heartFar` from all of them) and `T.heartApart` from `other`; each bar
- *  drops a little at a time if the floor cannot meet it. */
+/** Where a Knotted Gale drops: hashed over the floor at least `T.heartFar`
+ *  from every gap (a carry, never a throw where it lands) and `T.heartApart`
+ *  from every spot in `avoid` (Thessaly's post and circle, this round's other
+ *  ball, the last round's balls), so no two drops share a place (Jose's
+ *  playtest: every ball fell beside Thessaly, the one patch the old far-from-
+ *  the-gaps bar left). Each bar drops a little at a time if the floor cannot
+ *  meet it. */
 export function knotSpot(
   salt: number,
-  other: { x: number; z: number } | null = null,
+  avoid: readonly { x: number; z: number }[] = [],
 ): { x: number; z: number } {
   const grid = knotGrid();
-  for (let relax = 0; relax <= 30; relax += 2) {
-    const far = T.heartFar - relax;
-    const apart = T.heartApart - relax / 2;
+  for (let relax = 0; relax <= 12; relax += 2) {
+    const far = T.heartFar - relax / 2;
+    const apart = T.heartApart - relax;
     const fits = grid.filter(
-      (g) => g.far >= far && (other === null || Math.hypot(g.x - other.x, g.z - other.z) >= apart),
+      (g) => g.far >= far && avoid.every((o) => Math.hypot(g.x - o.x, g.z - o.z) >= apart),
     );
     if (fits.length > 0) return fits[breathHash(salt, 41) % fits.length];
   }
   return { x: C.x, z: C.z };
 }
 
-/** The lip nearest (x, z): the floor just inside a gap's reach. */
-export function nearestLipSpot(x: number, z: number): { x: number; z: number } {
-  let best: (typeof CORNICE_GAPS)[number] = CORNICE_GAPS[0];
-  let bestD = Number.POSITIVE_INFINITY;
-  for (const g of CORNICE_GAPS) {
-    const d = Math.hypot(x - g.x, z - g.z);
-    if (d < bestD) {
-      best = g;
-      bestD = d;
-    }
+/** The lip nearest (x, z): the floor just inside a gap's reach. A lip within
+ *  `clear` yards of any spot in `avoid` is passed over for the next nearest
+ *  (the Knotted Gale's second pair never opens on the first pair's mouth);
+ *  with every lip taken, the nearest whatever. */
+export function nearestLipSpot(
+  x: number,
+  z: number,
+  avoid: readonly { x: number; z: number }[] = [],
+  clear = 0,
+): { x: number; z: number } {
+  // Nearest first; a tie keeps the layout's order (a stable sort).
+  const lips = CORNICE_GAPS.map((g) => ({ d: Math.hypot(x - g.x, z - g.z), g })).sort(
+    (a, b) => a.d - b.d,
+  );
+  for (const { g } of lips) {
+    const spot = voidCorpseSpot(g.x, g.z);
+    if (avoid.every((o) => Math.hypot(spot.x - o.x, spot.z - o.z) >= clear)) return spot;
   }
-  return voidCorpseSpot(best.x, best.z);
+  return voidCorpseSpot(lips[0].g.x, lips[0].g.z);
 }
 
 /** Loose gale `k`'s place `t` seconds into its run (heroic): a slow, wide,
