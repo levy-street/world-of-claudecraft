@@ -22582,6 +22582,47 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.council.say.singer_soul': '들어 봐요. 돌 속에서 나의 노래는 끝나지 않아요.',
   'hudChrome.council.say.singer_wipe': '쉿. 광맥이 잠잠해졌어요.',
   'hudChrome.council.say.singer_defeat': '마지막 음이... 사라져요.',
+  // The Hammer Council's rework: Mountain's Rush, the Cursed Pillar, Bond of
+  // the Stone, Quarry Collapse and Resonance (M16 fills).
+  'abilityUi.cast.heart_mountains_rush': '산의 돌진',
+  'hudChrome.auraEffect.council.resonance':
+    '{every}초마다 울려 퍼져 자신의 {radius}야드 안에 있는 모든 아군에게 {min}에서 {max}의 자연 피해를 줍니다. 효과가 끝날 때까지 모두에게서 떨어지세요. 영웅·신화: 피해 {heroic}% 증가.',
+  'hudChrome.auraEffect.council.rushMark':
+    '효과가 끝나면 망치의 수호자가 당신을 향해 일직선으로 돌진하며 경로상의 첫 번째 기둥에서 멈춥니다. 저주받은 기둥으로 유인하세요: 기둥이 부서지고 수호자가 {stun}초 동안 기절하며 {exposedSeconds}초 동안 받는 피해가 {exposed}% 증가합니다. 경로에 엄폐용 기둥이 있으면 대신 그 기둥이 파괴됩니다. 경로에 기둥이 없으면 당신과 경로상의 모두가 {min}에서 {max}의 피해를 받고 밀려납니다. 신화: 기둥에 부딪히지 않은 돌진은 저주받은 기둥이 부서질 때까지 채석장 붕괴를 일으킵니다.',
+  'hudChrome.auraEffect.council.rushExposed':
+    '받는 피해가 {pct}% 증가합니다: 산의 돌진이 저주받은 기둥을 부쉈습니다.',
+  'hudChrome.auraEffect.council.bond':
+    '망치 의회의 다른 구성원이 {reach}야드 안에 있는 동안 받는 피해가 {pct}% 감소합니다. {every}초마다 돌의 결속이 공격대 전체에 {min}에서 {max}의 피해를 주며, 매번 {growth}%씩 증가합니다. 둘을 떼어 놓으세요.',
+  'hudChrome.auraEffect.council.collapse':
+    '채석장이 무너지고 있습니다: {every}초마다 중첩 하나당 {min}에서 {max}의 피해를 받으며, 매번 중첩이 하나씩 쌓입니다. 저주받은 기둥이 부서지면 끝납니다.',
+  'hudChrome.council.alert.resonanceLine':
+    '주변의 모든 아군에게 피해를 줍니다: 효과가 끝날 때까지 무리에서 떨어지세요',
+  'hudChrome.council.alert.rushTitle': '산의 돌진!',
+  'hudChrome.council.alert.rushLine':
+    '수호자가 당신에게 돌진합니다: 저주받은 기둥을 당신과 수호자 사이에 두세요',
+  'hudChrome.council.say.guardian_rush': '그렇다면 내 길을 막아 보아라. 산은 비켜 가지 않는다.',
+  'hudChrome.council.say.singer_wake': '깨어나라, 잠든 돌이여. 그들이 선 곳에서 솟아올라라!',
+  'hudChrome.council.say.singer_rock': '위를 봐요, 꼬마들! 산이 무너지고 있어요!',
+  'hudChrome.council.warn.columnsGone':
+    '조각된 기둥이 모두 사라졌습니다! 이제부터는 돌 깨우기로 솟아오른 돌만 몸을 숨겨 줍니다.',
+  'hudChrome.council.warn.rush': '{player}에게 산의 돌진! 돌진을 저주받은 기둥으로 유인하세요!',
+  'hudChrome.council.warn.rushCursed':
+    '수호자가 저주받은 기둥을 부수고 비틀거립니다! 지금 공격하세요!',
+  'hudChrome.council.warn.rushPillar':
+    '돌진이 엄폐용 기둥을 부쉈습니다! 저주받은 기둥은 아직 서 있습니다.',
+  'hudChrome.council.warn.rushMiss': '산의 돌진에 짓밟혔습니다: {players}!',
+  'hudChrome.council.warn.collapse':
+    '채석장이 무너지기 시작합니다! 다음 돌진을 저주받은 기둥으로 유인하세요!',
+  'hudChrome.council.warn.bond': '돌의 결속! 수호자와 광맥의 노래꾼을 떼어 놓으세요!',
+  'hudChrome.council.warn.wakeCast':
+    '광맥의 노래꾼이 돌을 깨웁니다! 끝까지 시전하게 두세요: 차단하면 기둥이 솟아오르지 않습니다.',
+  'hudChrome.council.warn.wakeKicked': '돌 깨우기가 차단되었습니다! 돌이 솟아오르지 않습니다.',
+  'hudChrome.council.warn.resonance':
+    '{players}에게 공명: 효과가 끝날 때까지 모두에게서 떨어지세요!',
+  'hudChrome.council.warn.fell_guardian':
+    '망치의 수호자가 쓰러졌습니다. 그 분노가 광맥의 노래꾼에게 넘어갑니다!',
+  'hudChrome.council.warn.fell_singer':
+    '광맥의 노래꾼이 쓰러졌습니다. 이제 수호자가 원하는 곳에 돌을 솟아오르게 합니다!',
   // The Smith's Heart's Guardian of the Breath and Captain Thessaly (M16 fills).
   'hudChrome.breathGuardian.warn.inhale':
     '수호자가 숨을 들이쉽니다! 입 앞의 소용돌이에 들어가지 마세요!',

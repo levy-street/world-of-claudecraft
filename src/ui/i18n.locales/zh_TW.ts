@@ -23127,6 +23127,37 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.council.say.singer_soul': '聽啊。在岩石之中，我的歌永不終結。',
   'hudChrome.council.say.singer_wipe': '噓。礦脈已歸於寂靜。',
   'hudChrome.council.say.singer_defeat': '最後一個音……消散了。',
+  // The Hammer Council's rework: Mountain's Rush, the Cursed Pillar, Bond of
+  // the Stone, Quarry Collapse and Resonance (M16 fills).
+  'abilityUi.cast.heart_mountains_rush': '山岳衝鋒',
+  'hudChrome.auraEffect.council.resonance':
+    '每{every}秒你會發出共鳴，對你{radius}碼內的每名盟友造成{min}到{max}點自然傷害。在效果結束前遠離所有人。英雄和傳奇難度：傷害提高{heroic}%。',
+  'hudChrome.auraEffect.council.rushMark':
+    '結束時，重錘守護者會沿直線衝向你，並停在其路線上的第一根石柱處。把它引向詛咒石柱：石柱碎裂，守護者被昏迷{stun}秒，並在{exposedSeconds}秒內受到的傷害提高{exposed}%。若路線上擋著一根掩護石柱，則改為摧毀那根石柱。若路線上沒有石柱，你和它路徑上的所有人會受到{min}到{max}點傷害並被擊退。傳奇難度：沒有撞上任何石柱的衝鋒會引發採石場坍塌，直到詛咒石柱碎裂為止。',
+  'hudChrome.auraEffect.council.rushExposed': '受到的傷害提高{pct}%：山岳衝鋒撞碎了詛咒石柱。',
+  'hudChrome.auraEffect.council.bond':
+    '重錘議會的另一名成員在{reach}碼內時，受到的傷害降低{pct}%。岩石之契每{every}秒對全團造成{min}到{max}點傷害，每次提高{growth}%。把他們拉開。',
+  'hudChrome.auraEffect.council.collapse':
+    '採石場正在坍塌：每{every}秒，你每層受到{min}到{max}點傷害，且每次增加一層。詛咒石柱碎裂時結束。',
+  'hudChrome.council.alert.resonanceLine': '你會傷害身邊的每名盟友：在效果結束前遠離團隊',
+  'hudChrome.council.alert.rushTitle': '山岳衝鋒！',
+  'hudChrome.council.alert.rushLine': '守護者衝向你：讓詛咒石柱擋在你和他之間',
+  'hudChrome.council.say.guardian_rush': '那就站在我的路上吧。群山從不繞行。',
+  'hudChrome.council.say.singer_wake': '醒來吧，沉睡的岩石。在他們腳下升起！',
+  'hudChrome.council.say.singer_rock': '抬頭看，小傢伙們！山要塌下來了！',
+  'hudChrome.council.warn.columnsGone':
+    '雕刻的石柱都沒了！從現在起，只有喚醒岩石升起的石柱能為你遮擋。',
+  'hudChrome.council.warn.rush': '山岳衝鋒鎖定了{player}！把衝鋒引向詛咒石柱！',
+  'hudChrome.council.warn.rushCursed': '守護者撞碎了詛咒石柱，搖搖晃晃！快攻擊！',
+  'hudChrome.council.warn.rushPillar': '衝鋒撞毀了一根掩護石柱！詛咒石柱依然矗立。',
+  'hudChrome.council.warn.rushMiss': '山岳衝鋒踐踏了{players}！',
+  'hudChrome.council.warn.collapse': '採石場開始坍塌！把下一次衝鋒引向詛咒石柱！',
+  'hudChrome.council.warn.bond': '岩石之契！把守護者和礦脈歌者拉開！',
+  'hudChrome.council.warn.wakeCast': '礦脈歌者正在喚醒岩石！讓她施放完：打斷不會升起石柱。',
+  'hudChrome.council.warn.wakeKicked': '喚醒岩石被打斷了！不會有岩石升起。',
+  'hudChrome.council.warn.resonance': '{players}身上有共鳴：在效果結束前遠離所有人！',
+  'hudChrome.council.warn.fell_guardian': '重錘守護者倒下了。它的怒火傳給了礦脈歌者！',
+  'hudChrome.council.warn.fell_singer': '礦脈歌者倒下了。現在守護者會隨意升起岩石！',
   // The Smith's Heart's Guardian of the Breath and Captain Thessaly (M16 fills).
   'hudChrome.breathGuardian.warn.inhale': '守護者正在吸氣！別站在牠嘴前的漩渦裡！',
   'hudChrome.breathGuardian.warn.gust': '風箱狂風！準備承受衝擊！',
