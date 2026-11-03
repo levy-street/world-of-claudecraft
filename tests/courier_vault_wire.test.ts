@@ -6,8 +6,11 @@ import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('../server/db', () => ({ insertBankLedgerRow: vi.fn(), insertBankLedgerRows: vi.fn() }));
 
+import { BankLedgerOutboxBudget } from '../server/bank_ledger_outbox';
+import { createBankLedgerSessionJournal } from '../server/bank_ledger_session';
 import {
   BANK_VAULT_LEDGER_ROW_BURST,
+  bankVaultLedgerMaxRows,
   createBankVaultLedgerGuardCoordinator,
 } from '../server/bank_vault_ledger_guard';
 import {
@@ -17,6 +20,7 @@ import {
   emitCourierSelfKeys,
   readCourierDispatch,
 } from '../server/courier_wire';
+import { REALM } from '../server/realm';
 import type { StorageAdmissionSession } from '../server/storage_admission';
 import { applyCourierSelfWire, decodeCourierStores } from '../src/net/courier_wire';
 import type { CourierInfo } from '../src/sim/courier';
@@ -226,14 +230,78 @@ describe('courier vault wire', () => {
         expect(rows).toEqual([]);
         return;
       }
-      expect(admission.tryReserve).toHaveBeenCalledWith(2, 0, 'vault');
-      const vaultRows = rows.find((r) => r.surface === 'vault')?.batch;
-      expect(vaultRows).toMatchObject([
+      // One reservation covers both legs (the courier dispatch floor plus the
+      // two vault rows); a second concurrent one is never requested.
+      expect(admission.tryReserve).toHaveBeenCalledOnce();
+      expect(admission.tryReserve).toHaveBeenCalledWith(
+        bankVaultLedgerMaxRows('courier_dispatch') + 2,
+        0,
+        'personal',
+      );
+      expect(rows).toHaveLength(1);
+      expect(rows[0].batch).toMatchObject([
         { op: 'deposit', itemId: 'copper_ore', count: 3, container: 'vault' },
         { op: 'withdraw', itemId: 'linen_scrap', count: 4, container: 'vault' },
       ]);
     },
   );
+
+  // Discord "Courier seems semi bugged": a trip with a vault leg reserved the
+  // personal rows first, and the real outbox admission hands that reservation
+  // every remaining byte, so the vault reservation was refused on every retry
+  // and the courier hovered at the banker ("Flying to the bank") forever.
+  it('admits a vault leg through the real session journal on the first arrival', () => {
+    const live = { stock: { linen_scrap: 4 } as Record<string, number>, special: [], upgrades: 1 };
+    const bank = { slots: [], purchasedSlots: 0, nextExpansionCost: 500 } as unknown as BankInfo;
+    const meta = {
+      vault: live,
+      courier: {
+        vaultCargo: [{ itemId: 'copper_ore', count: 3 }],
+        vaultWithdrawals: [{ itemId: 'linen_scrap', count: 4 }],
+      },
+    };
+    const host = {
+      ...sim(info()),
+      courierBankInfoFor: () => structuredClone(bank),
+      ctx: {
+        players: new Map([[17, meta]]),
+        resolve: () => ({ meta }),
+        storagePrices: { vaultUpgrades: [20000, 50000, 100000, 200000, 400000] },
+      } as never,
+    };
+    const owner = { realm: REALM, characterId: 10, accountId: 20 };
+    const journal = createBankLedgerSessionJournal(
+      owner,
+      { onProjectionFailure: vi.fn() },
+      { budget: new BankLedgerOutboxBudget() },
+    );
+    const runtime = createBankVaultLedgerGuardCoordinator(() => 0).createRuntime(
+      20,
+      journal.admission,
+      vi.fn(),
+    );
+    const session = {
+      pid: 17,
+      ...owner,
+      left: false,
+      escrowQuarantined: false,
+      bankLedgerJournal: journal,
+      bankVaultLedgerGuard: runtime,
+    } as unknown as StorageAdmissionSession;
+    const deposit = vi.fn(() => {
+      live.stock.copper_ore = 3;
+    });
+    const withdraw = vi.fn(() => {
+      delete live.stock.linen_scrap;
+    });
+    expect(courierBankExchangeFor(host, session, 17, deposit, withdraw)).toBe(true);
+    expect(deposit).toHaveBeenCalledOnce();
+    expect(withdraw).toHaveBeenCalledOnce();
+    expect(live.stock).toEqual({ copper_ore: 3 });
+    // Both legs landed in the one outbox, and no reservation is left behind.
+    expect(journal.outbox.usage).toMatchObject({ reservedRows: 0, reservedEncodedBytes: 0 });
+    expect(journal.outbox.usage.queuedRows).toBe(2);
+  });
 
   it('reads the other-character leg strictly and round-trips it on courierStores', () => {
     const account = {

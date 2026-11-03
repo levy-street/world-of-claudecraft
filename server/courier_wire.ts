@@ -231,48 +231,41 @@ export function courierBankExchangeFor(
   // Resolving it without either callback lets the sim return home instead of
   // retrying forever at the bank. Temporary admission pressure still retries.
   if (rowBound > BANK_VAULT_LEDGER_ROW_BURST) return true;
-  const reservation = owner.bankVaultLedgerGuard.admission.tryReserve(rowBound, 0, 'personal');
-  if (!reservation) return false;
   let before: BankInfo | null;
   let vaultBefore: VaultInfo | null = null;
-  let vaultReservation: ReturnType<typeof owner.bankVaultLedgerGuard.admission.tryReserve> = null;
+  let vaultRowBound = 0;
+  const trip = courierVaultTripFor(sim.ctx, pid);
+  if (trip?.vaultCargo?.length || trip?.vaultWithdrawals?.length) {
+    vaultBefore = courierVaultInfoFor(sim.ctx, pid);
+    if (vaultBefore) vaultRowBound = courierVaultLedgerRowBound(vaultBefore, trip);
+  }
+  // One reservation covers both legs: the session journal hands each open
+  // reservation every remaining byte, so a second concurrent one (the vault
+  // leg's) could never be admitted and the courier hovered at the banker.
+  // A restored trip or changed vault row can outgrow the dispatch bound:
+  // settle without mutations so its cargo returns home, as for the bank.
+  if (rowBound + vaultRowBound > BANK_VAULT_LEDGER_ROW_BURST) return true;
+  const reservation = owner.bankVaultLedgerGuard.admission.tryReserve(
+    rowBound + vaultRowBound,
+    0,
+    'personal',
+  );
+  if (!reservation) return false;
   try {
     before = sim.courierBankInfoFor(pid);
-    const trip = courierVaultTripFor(sim.ctx, pid);
-    if (trip?.vaultCargo?.length || trip?.vaultWithdrawals?.length) {
-      vaultBefore = courierVaultInfoFor(sim.ctx, pid);
-      const rows = courierVaultLedgerRowBound(vaultBefore, trip);
-      // A restored trip or changed vault row can outgrow the dispatch bound.
-      // Settle without mutations so its cargo returns home, as for the bank.
-      if (rows > BANK_VAULT_LEDGER_ROW_BURST) {
-        reservation.cancel();
-        return true;
-      }
-      // Temporary admission pressure waits at the banker.
-      vaultReservation =
-        vaultBefore && rows <= BANK_VAULT_LEDGER_ROW_BURST
-          ? owner.bankVaultLedgerGuard.admission.tryReserve(rows, 0, 'vault')
-          : null;
-      if (!vaultReservation) {
-        reservation.cancel();
-        return false;
-      }
-    }
   } catch (error) {
     reservation.cancel();
-    vaultReservation?.cancel();
     throw error;
   }
   if (!before) {
     reservation.cancel();
-    vaultReservation?.cancel();
     return false;
   }
   try {
     deposit();
     const middle = sim.courierBankInfoFor(pid);
     if (!middle) throw new Error('courier bank disappeared after deposit');
-    const vaultMiddle = vaultReservation ? courierVaultInfoFor(sim.ctx, pid) : null;
+    const vaultMiddle = vaultRowBound ? courierVaultInfoFor(sim.ctx, pid) : null;
     withdraw();
     const after = sim.courierBankInfoFor(pid);
     if (!after) throw new Error('courier bank disappeared after withdraw');
@@ -282,20 +275,17 @@ export function courierBankExchangeFor(
       ...buildPersonalBankLedgerRows('deposit', owner, before, middle),
       ...buildPersonalBankLedgerRows('withdraw', owner, middle, after),
     ];
-    if (!reservation.commit(rows)) throw new Error('courier bank ledger commit refused');
-    if (vaultReservation) {
+    if (vaultRowBound) {
       const vaultAfter = courierVaultInfoFor(sim.ctx, pid);
-      const vaultRows = [
+      rows.push(
         ...buildVaultLedgerRows('deposit', owner, vaultBefore, vaultMiddle),
         ...buildVaultLedgerRows('withdraw', owner, vaultMiddle, vaultAfter),
-      ];
-      if (!vaultReservation.commit(vaultRows))
-        throw new Error('courier vault ledger commit refused');
+      );
     }
+    if (!reservation.commit(rows)) throw new Error('courier bank ledger commit refused');
     return true;
   } catch (error) {
     reservation.failAfterMutation(error);
-    vaultReservation?.failAfterMutation(error);
     throw error;
   }
 }
