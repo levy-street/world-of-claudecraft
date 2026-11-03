@@ -18257,7 +18257,7 @@ export const zh_CN: EnTranslations = {
       },
       "demon_skin": {
         "name": "邪魔硬皮",
-        "description": "恶魔皮肤使你的护甲提高 {buff}，持续 30 分钟。"
+        "description": "恶魔皮肤使你的护甲提高 {buff}，持续 30 分钟。契约深化可使邪魔硬皮生效期间的这部分护甲翻倍，并降低受到的魔法伤害。"
       },
       "immolate": {
         "name": "燃烧契约",

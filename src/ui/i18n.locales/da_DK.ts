@@ -7819,7 +7819,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'En defensiv kampstilling: du skaber 30% mere trussel, men volder og modtager 10% mindre skade. Aktivér igen for at forlade stillingen.',
   'entities.abilities.defensive_stance.name': 'Værgende Stilling',
   'entities.abilities.demon_skin.description':
-    'Dæmonisk hud øger din rustning med {buff} i 30 min.',
+    'Dæmonisk hud øger din rustning med {buff} i 30 min. Pact Deepened kan fordoble denne rustning og reducere den magiske skade, du tager, mens Djævlehud er aktiv.',
   'entities.abilities.demon_skin.name': 'Djævlehud',
   'entities.abilities.demoralizing_roar.description':
     'Demoraliserer nærliggende fjender og sænker deres angrebsstyrke med 20 i 20 sek. Kun i Bruin-form.',

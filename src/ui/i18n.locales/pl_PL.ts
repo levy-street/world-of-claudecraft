@@ -8044,7 +8044,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Defensywna postawa bojowa: generujesz o 30% więcej zagrożenia, lecz zadajesz i otrzymujesz o 10% mniej obrażeń. Rzuć ponownie, aby opuścić postawę.',
   'entities.abilities.defensive_stance.name': 'Czujna postawa',
   'entities.abilities.demon_skin.description':
-    'Demoniczna skóra zwiększa twój pancerz o {buff} na 30 min.',
+    'Demoniczna skóra zwiększa twój pancerz o {buff} na 30 min. Pact Deepened może podwoić ten pancerz i zmniejszyć otrzymywane obrażenia magiczne, dopóki Skóra plugawca jest aktywna.',
   'entities.abilities.demon_skin.name': 'Skóra plugawca',
   'entities.abilities.demoralizing_roar.description':
     'Demoralizuje pobliskich wrogów, zmniejszając ich moc ataku o 20 na 20 sek. Tylko w postaci Bruina.',

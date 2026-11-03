@@ -5641,19 +5641,19 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'shadow',
     requiresTarget: false,
-    effects: [{ type: 'selfBuff', kind: 'buff_armor', value: 30, duration: 1800 }],
+    effects: [{ type: 'selfBuff', kind: 'buff_armor', value: 120, duration: 1800 }],
     ranks: [
       {
         rank: 2,
         level: 12,
         cost: 35,
-        effects: [{ type: 'selfBuff', kind: 'buff_armor', value: 55, duration: 1800 }],
+        effects: [{ type: 'selfBuff', kind: 'buff_armor', value: 220, duration: 1800 }],
       },
       {
         rank: 3,
         level: 20,
         cost: 50,
-        effects: [{ type: 'selfBuff', kind: 'buff_armor', value: 80, duration: 1800 }],
+        effects: [{ type: 'selfBuff', kind: 'buff_armor', value: 320, duration: 1800 }],
       },
     ],
     description:

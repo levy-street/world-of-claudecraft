@@ -18257,7 +18257,7 @@ export const da_DK: EnTranslations = {
       },
       "demon_skin": {
         "name": "Djævlehud",
-        "description": "Dæmonisk hud øger din rustning med {buff} i 30 min."
+        "description": "Dæmonisk hud øger din rustning med {buff} i 30 min. Pact Deepened kan fordoble denne rustning og reducere den magiske skade, du tager, mens Djævlehud er aktiv."
       },
       "immolate": {
         "name": "Brændende Pagt",

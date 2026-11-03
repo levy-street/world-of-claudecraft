@@ -7838,7 +7838,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'En defensiv stridsställning: du genererar 30 % mer hot men vållar och tar 10 % mindre skada. Kasta igen för att lämna ställningen.',
   'entities.abilities.defensive_stance.name': 'Gardställning',
   'entities.abilities.demon_skin.description':
-    'Demonisk hud ökar din rustning med {buff} i 30 min.',
+    'Demonisk hud ökar din rustning med {buff} i 30 min. Pact Deepened kan fördubbla denna rustning och minska magisk skada du tar medan Djävulshud är aktiv.',
   'entities.abilities.demon_skin.name': 'Djävulshud',
   'entities.abilities.demoralizing_roar.description':
     'Demoraliserar närliggande fiender och sänker deras anfallskraft med 20 i 20 sek. Endast i Bruinform.',

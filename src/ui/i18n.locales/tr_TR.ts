@@ -7933,7 +7933,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Savunma amaçlı bir dövüş duruşu: %30 daha fazla tehdit üretirsin ama %10 daha az hasar verir ve alırsın. Duruştan çıkmak için tekrar kullan.',
   'entities.abilities.defensive_stance.name': 'Korumali Durus',
   'entities.abilities.demon_skin.description':
-    'Şeytani deri zırhını 30 dakika boyunca {buff} artırır.',
+    'Şeytani deri zırhını 30 dakika boyunca {buff} artırır. Pact Deepened, İblis Derisi etkinken bu zırhı ikiye katlayabilir ve alınan büyü hasarını azaltabilir.',
   'entities.abilities.demon_skin.name': 'İblis Derisi',
   'entities.abilities.demoralizing_roar.description':
     'Yakındaki düşmanların moralini bozarak saldırı güçlerini 20 saniye boyunca 20 azaltır. Yalnızca Bruin Formu.',

@@ -8019,7 +8019,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Thế đứng phòng thủ: bạn tạo ra nhiều hơn 30% mối đe dọa nhưng gây và nhận ít hơn 10% sát thương. Thi triển lại để rời khỏi thế đứng.',
   'entities.abilities.defensive_stance.name': 'Thế Thủ',
   'entities.abilities.demon_skin.description':
-    'Lớp da quỷ tăng giáp của bạn thêm {buff} trong 30 phút.',
+    'Lớp da quỷ tăng giáp của bạn thêm {buff} trong 30 phút. Pact Deepened có thể nhân đôi lượng giáp này và giảm sát thương phép phải chịu khi Da Ác Quỷ đang hoạt động.',
   'entities.abilities.demon_skin.name': 'Da Ác Quỷ',
   'entities.abilities.demoralizing_roar.description':
     'Áp chế kẻ địch xung quanh, giảm sức tấn công của chúng đi 20 trong 20 giây. Chỉ dùng được ở Bruin Form.',

@@ -7652,7 +7652,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shadow_bolt.name': '幽暗箭',
   'entities.abilities.shadow_bolt.description': '向敌人发射暗影箭，造成 {damage} 点暗影伤害。',
   'entities.abilities.demon_skin.name': '邪魔硬皮',
-  'entities.abilities.demon_skin.description': '恶魔皮肤使你的护甲提高 {buff}，持续 30 分钟。',
+  'entities.abilities.demon_skin.description':
+    '恶魔皮肤使你的护甲提高 {buff}，持续 30 分钟。契约深化可使邪魔硬皮生效期间的这部分护甲翻倍，并降低受到的魔法伤害。',
   'entities.abilities.immolate.name': '燃烧契约',
   'entities.abilities.immolate.description':
     '灼烧敌人，造成 {damage} 点火焰伤害，并在 15 秒内额外造成 {overTime}。',

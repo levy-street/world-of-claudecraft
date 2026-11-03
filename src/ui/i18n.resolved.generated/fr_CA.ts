@@ -18257,7 +18257,7 @@ export const fr_CA: EnTranslations = {
       },
       "demon_skin": {
         "name": "Peau de démon",
-        "description": "Une peau démoniaque augmente votre armure de {buff} pendant 30 min."
+        "description": "Une peau démoniaque augmente votre armure de {buff} pendant 30 min. Pact Deepened peut doubler cette armure et réduire les dégâts magiques subis tant que Peau de démon est active."
       },
       "immolate": {
         "name": "Pacte brûlant",

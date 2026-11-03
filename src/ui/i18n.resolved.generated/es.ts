@@ -18257,7 +18257,7 @@ export const es: EnTranslations = {
       },
       "demon_skin": {
         "name": "Piel de Engendro",
-        "description": "La piel demoníaca aumenta tu armadura en {buff} durante 30 min."
+        "description": "La piel demoníaca aumenta tu armadura en {buff} durante 30 min. Pact Deepened puede duplicar esta armadura y reducir el daño mágico recibido mientras Piel de Engendro está activa."
       },
       "immolate": {
         "name": "Pacto Ardiente",

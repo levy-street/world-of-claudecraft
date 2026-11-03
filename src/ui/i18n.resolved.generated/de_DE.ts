@@ -18257,7 +18257,7 @@ export const de_DE: EnTranslations = {
       },
       "demon_skin": {
         "name": "Dämonenhaut",
-        "description": "Dämonische Haut erhöht eure Rüstung 30 Min. lang um {buff}."
+        "description": "Dämonische Haut erhöht eure Rüstung 30 Min. lang um {buff}. Pact Deepened kann diese Rüstung verdoppeln und erlittenen magischen Schaden verringern, solange Dämonenhaut aktiv ist."
       },
       "immolate": {
         "name": "Brennender Pakt",

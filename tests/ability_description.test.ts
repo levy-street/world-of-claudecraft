@@ -17,10 +17,10 @@ function known(id: string, mods?: TalentModifiers) {
 
 describe('abilityDisplayDescription buff value override', () => {
   it('splices the caller-supplied buff value instead of the resolved ability default', () => {
-    // Fiendhide's base rank-3 armor value is 80; Pact Deepened doubles it for its
+    // Fiendhide's base rank-3 armor value is 320; Pact Deepened doubles it for its
     // owner. A viewer without the talent must still see the OWNER's real value
     // (a real bug: an aura tooltip previously re-resolved from the VIEWER's own
-    // talents, showing the base 80 on another player's Fiendhide even after
+    // talents, showing the base 320 on another player's Fiendhide even after
     // Pact Deepened doubled it for its owner).
     const baseRes = known('demon_skin');
     const doubledMods: TalentModifiers = {
@@ -40,9 +40,9 @@ describe('abilityDisplayDescription buff value override', () => {
       value: ownerEffect.value,
     });
 
-    expect(withoutOverride).toContain('80');
-    expect(withOverride).toContain('160');
-    expect(withOverride).not.toContain('80');
+    expect(withoutOverride).toContain('320');
+    expect(withOverride).toContain('640');
+    expect(withOverride).not.toContain('320');
   });
 });
 

@@ -8117,7 +8117,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Een verdedigende gevechtshouding: je genereert 30% meer dreiging, maar brengt 10% minder schade toe en incasseert 10% minder. Activeer opnieuw om de houding te verlaten.',
   'entities.abilities.defensive_stance.name': 'Bewaakte Houding',
   'entities.abilities.demon_skin.description':
-    'Demonenhuid verhoogt je pantser met {buff} gedurende 30 min.',
+    'Demonenhuid verhoogt je pantser met {buff} gedurende 30 min. Pact Deepened kan dit pantser verdubbelen en ontvangen magische schade verminderen zolang Duivelshuid actief is.',
   'entities.abilities.demon_skin.name': 'Duivelshuid',
   'entities.abilities.demoralizing_roar.description':
     'Demoraliseert nabije vijanden en verlaagt hun aanvalskracht met 20 gedurende 20 sec. Alleen in Bruingedaante.',

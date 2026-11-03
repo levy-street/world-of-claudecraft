@@ -476,10 +476,10 @@ describe('mastery/talent damage percent scales the whole hit, not just the base 
 
       const armorEffect = fiendhide.effects.find((e) => e.type === 'selfBuff');
       if (armorEffect?.type !== 'selfBuff') throw new Error('missing Fiendhide selfBuff');
-      // 80 (authored rank 3 base) x 1.1 (legacy spellDmgPct only): the offense
+      // 320 (authored rank 3 base) x 1.1 (legacy spellDmgPct only): the offense
       // bonus must never reach this, or Fiendhide's armor would silently grow
       // alongside a damage-only spec rebalance.
-      expect(armorEffect.value).toBe(88);
+      expect(armorEffect.value).toBe(352);
     });
 
     it('a spec-less or untuned character keeps a factor of one extra offense bonus', () => {

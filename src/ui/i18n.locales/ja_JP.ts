@@ -6285,7 +6285,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '敵に影の矢を放ち、{damage} の暗黒ダメージを与えます。',
   'entities.abilities.demon_skin.name': '魔物の肌',
   'entities.abilities.demon_skin.description':
-    '悪魔の皮膚により、30分間アーマーが{buff}増加します。',
+    '悪魔の皮膚により、30分間アーマーが{buff}増加します。契約の深化を習得すると、魔物の肌が有効な間このアーマーが2倍になり、受ける魔法ダメージも軽減されます。',
   'entities.abilities.immolate.name': '灼熱の契約',
   'entities.abilities.immolate.description':
     '敵を燃やして{damage}の火炎ダメージを与え、15秒間で追加の{overTime}を与えます。',

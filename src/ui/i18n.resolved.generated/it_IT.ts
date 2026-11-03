@@ -18257,7 +18257,7 @@ export const it_IT: EnTranslations = {
       },
       "demon_skin": {
         "name": "Pelle di Demone",
-        "description": "La pelle demoniaca aumenta la tua armatura di {buff} per 30 min."
+        "description": "La pelle demoniaca aumenta la tua armatura di {buff} per 30 min. Pact Deepened può raddoppiare questa armatura e ridurre i danni magici subiti finché Pelle di Demone è attiva."
       },
       "immolate": {
         "name": "Patto Ardente",

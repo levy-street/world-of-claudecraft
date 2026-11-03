@@ -18257,7 +18257,7 @@ export const cs_CZ: EnTranslations = {
       },
       "demon_skin": {
         "name": "Kůže běsa",
-        "description": "Démonická kůže zvýší tvoji zbroj o {buff} na 30 min."
+        "description": "Démonická kůže zvýší tvoji zbroj o {buff} na 30 min. Pact Deepened může tuto zbroj zdvojnásobit a snížit přijaté magické poškození, dokud je Kůže běsa aktivní."
       },
       "immolate": {
         "name": "Hořící pakt",

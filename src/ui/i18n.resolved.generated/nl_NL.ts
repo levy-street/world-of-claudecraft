@@ -18257,7 +18257,7 @@ export const nl_NL: EnTranslations = {
       },
       "demon_skin": {
         "name": "Duivelshuid",
-        "description": "Demonenhuid verhoogt je pantser met {buff} gedurende 30 min."
+        "description": "Demonenhuid verhoogt je pantser met {buff} gedurende 30 min. Pact Deepened kan dit pantser verdubbelen en ontvangen magische schade verminderen zolang Duivelshuid actief is."
       },
       "immolate": {
         "name": "Brandpact",

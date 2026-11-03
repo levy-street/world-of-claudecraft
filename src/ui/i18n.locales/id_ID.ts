@@ -8020,7 +8020,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Kuda-kuda tempur bertahan: kamu menghasilkan 30% lebih banyak ancaman tetapi memberi dan menerima 10% lebih sedikit kerusakan. Rapal lagi untuk meninggalkan kuda-kuda ini.',
   'entities.abilities.defensive_stance.name': 'Kuda-kuda Waspada',
   'entities.abilities.demon_skin.description':
-    'Kulit iblis meningkatkan zirahmu sebesar {buff} selama 30 menit.',
+    'Kulit iblis meningkatkan zirahmu sebesar {buff} selama 30 menit. Pact Deepened dapat menggandakan zirah ini dan mengurangi kerusakan sihir yang diterima selama Kulit Iblis aktif.',
   'entities.abilities.demon_skin.name': 'Kulit Iblis',
   'entities.abilities.demoralizing_roar.description':
     'Melemahkan semangat musuh di sekitar, mengurangi kekuatan serang mereka sebesar 20 selama 20 detik. Hanya dalam Wujud Bruin.',

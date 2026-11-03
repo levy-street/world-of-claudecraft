@@ -18257,7 +18257,7 @@ export const vi_VN: EnTranslations = {
       },
       "demon_skin": {
         "name": "Da Ác Quỷ",
-        "description": "Lớp da quỷ tăng giáp của bạn thêm {buff} trong 30 phút."
+        "description": "Lớp da quỷ tăng giáp của bạn thêm {buff} trong 30 phút. Pact Deepened có thể nhân đôi lượng giáp này và giảm sát thương phép phải chịu khi Da Ác Quỷ đang hoạt động."
       },
       "immolate": {
         "name": "Khế Ước Rực Cháy",

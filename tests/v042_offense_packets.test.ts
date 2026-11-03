@@ -625,10 +625,10 @@ describe('v0.42.0 offense-only package: real combat-path packets', () => {
       sim.tick();
       const armorBuff = sim.player.auras.find((a) => a.kind === 'buff_armor');
       if (!armorBuff) throw new Error('missing Fiendhide armor buff');
-      // Authored rank-3 (level 20) base 80, scaled ONLY by the legacy
+      // Authored rank-3 (level 20) base 320, scaled ONLY by the legacy
       // spellDmgPct 0.10 (1.10): the demonology offense-only +0.22 spell delta
       // must never reach this flat-magnitude buff.
-      expect(armorBuff.value).toBe(88);
+      expect(armorBuff.value).toBe(352);
     });
   });
 });

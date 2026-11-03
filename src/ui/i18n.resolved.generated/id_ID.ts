@@ -18257,7 +18257,7 @@ export const id_ID: EnTranslations = {
       },
       "demon_skin": {
         "name": "Kulit Iblis",
-        "description": "Kulit iblis meningkatkan zirahmu sebesar {buff} selama 30 menit."
+        "description": "Kulit iblis meningkatkan zirahmu sebesar {buff} selama 30 menit. Pact Deepened dapat menggandakan zirah ini dan mengurangi kerusakan sihir yang diterima selama Kulit Iblis aktif."
       },
       "immolate": {
         "name": "Pakta Membara",

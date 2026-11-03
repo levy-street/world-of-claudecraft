@@ -9572,7 +9572,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Envia uma seta sombria contra o inimigo, causando {damage} de dano de Sombra.',
   'entities.abilities.demon_skin.name': 'Couro Demoníaco',
   'entities.abilities.demon_skin.description':
-    'Pele demoníaca aumenta sua armadura em {buff} por 30 min.',
+    'Pele demoníaca aumenta sua armadura em {buff} por 30 min. Pact Deepened pode dobrar essa armadura e reduzir o dano mágico recebido enquanto Couro Demoníaco estiver ativo.',
   'entities.abilities.immolate.name': 'Pacto Ardente',
   'entities.abilities.immolate.description':
     'Queima o inimigo com {damage} de dano de Fogo e mais {overTime} ao longo de 15 s.',

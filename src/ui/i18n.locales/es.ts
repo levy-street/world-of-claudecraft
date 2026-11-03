@@ -9508,7 +9508,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Envía una descarga sombría al enemigo por {damage} de daño de las Sombras.',
   'entities.abilities.demon_skin.name': 'Piel de Engendro',
   'entities.abilities.demon_skin.description':
-    'La piel demoníaca aumenta tu armadura en {buff} durante 30 min.',
+    'La piel demoníaca aumenta tu armadura en {buff} durante 30 min. Pact Deepened puede duplicar esta armadura y reducir el daño mágico recibido mientras Piel de Engendro está activa.',
   'entities.abilities.immolate.name': 'Pacto Ardiente',
   'entities.abilities.immolate.description':
     'Quema al enemigo por {damage} de daño de Fuego y {overTime} adicionales durante 15 s.',

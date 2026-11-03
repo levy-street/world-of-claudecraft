@@ -18257,7 +18257,7 @@ export const pl_PL: EnTranslations = {
       },
       "demon_skin": {
         "name": "Skóra plugawca",
-        "description": "Demoniczna skóra zwiększa twój pancerz o {buff} na 30 min."
+        "description": "Demoniczna skóra zwiększa twój pancerz o {buff} na 30 min. Pact Deepened może podwoić ten pancerz i zmniejszyć otrzymywane obrażenia magiczne, dopóki Skóra plugawca jest aktywna."
       },
       "immolate": {
         "name": "Płonący pakt",

@@ -18257,7 +18257,7 @@ export const ko_KR: EnTranslations = {
       },
       "demon_skin": {
         "name": "마귀 가죽",
-        "description": "악마의 피부가 30분 동안 방어도를 {buff}만큼 증가시킵니다."
+        "description": "악마의 피부가 30분 동안 방어도를 {buff}만큼 증가시킵니다. 계약 심화를 배우면 마귀 가죽이 활성화된 동안 이 방어도가 두 배가 되고 받는 마법 피해가 감소합니다."
       },
       "immolate": {
         "name": "불타는 계약",

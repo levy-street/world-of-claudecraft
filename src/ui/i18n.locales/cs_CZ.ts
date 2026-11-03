@@ -10411,7 +10411,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Obranný bojový postoj: vytváříš o 30 % více hrozby, ale způsobuješ i utrpíš o 10 % méně poškození. Sesláním znovu postoj opustíš.',
   'entities.abilities.defensive_stance.name': 'Krytý postoj',
   'entities.abilities.demon_skin.description':
-    'Démonická kůže zvýší tvoji zbroj o {buff} na 30 min.',
+    'Démonická kůže zvýší tvoji zbroj o {buff} na 30 min. Pact Deepened může tuto zbroj zdvojnásobit a snížit přijaté magické poškození, dokud je Kůže běsa aktivní.',
   'entities.abilities.demon_skin.name': 'Kůže běsa',
   'entities.abilities.demoralizing_roar.description':
     'Demoralizuje blízké nepřátele a sníží jejich sílu útoku o 20 na 20 s. Pouze v medvědí podobě.',

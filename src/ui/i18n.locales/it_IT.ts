@@ -9645,7 +9645,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Invia un dardo oscuro contro il nemico per {damage} danni da Ombra.',
   'entities.abilities.demon_skin.name': 'Pelle di Demone',
   'entities.abilities.demon_skin.description':
-    'La pelle demoniaca aumenta la tua armatura di {buff} per 30 min.',
+    'La pelle demoniaca aumenta la tua armatura di {buff} per 30 min. Pact Deepened può raddoppiare questa armatura e ridurre i danni magici subiti finché Pelle di Demone è attiva.',
   'entities.abilities.immolate.name': 'Patto Ardente',
   'entities.abilities.immolate.description':
     'Brucia il nemico per {damage} danni da Fuoco e altri {overTime} in 15 sec.',

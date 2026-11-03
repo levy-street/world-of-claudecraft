@@ -6237,7 +6237,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '적에게 어둠의 화살을 보내 {damage}의 암흑 피해를 입힙니다.',
   'entities.abilities.demon_skin.name': '마귀 가죽',
   'entities.abilities.demon_skin.description':
-    '악마의 피부가 30분 동안 방어도를 {buff}만큼 증가시킵니다.',
+    '악마의 피부가 30분 동안 방어도를 {buff}만큼 증가시킵니다. 계약 심화를 배우면 마귀 가죽이 활성화된 동안 이 방어도가 두 배가 되고 받는 마법 피해가 감소합니다.',
   'entities.abilities.immolate.name': '불타는 계약',
   'entities.abilities.immolate.description':
     '적을 불태워 {damage}의 화염 피해를 입히고 15초에 걸쳐 추가로 {overTime}의 피해를 입힙니다.',

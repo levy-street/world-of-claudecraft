@@ -8109,7 +8109,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Посылает во врага темную стрелу, нанося {damage} ед. урона от темной магии.',
   'entities.abilities.demon_skin.name': 'Шкура беса',
   'entities.abilities.demon_skin.description':
-    'Демоническая кожа повышает вашу броню на {buff} на 30 мин.',
+    'Демоническая кожа повышает вашу броню на {buff} на 30 мин. Pact Deepened может удвоить эту броню и снизить получаемый магический урон, пока активна Шкура беса.',
   'entities.abilities.immolate.name': 'Пылающий договор',
   'entities.abilities.immolate.description':
     'Сжигает врага, нанося {damage} ед. урона от огня и еще {overTime} за 15 сек.',

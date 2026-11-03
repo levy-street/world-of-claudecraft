@@ -18257,7 +18257,7 @@ export const ja_JP: EnTranslations = {
       },
       "demon_skin": {
         "name": "魔物の肌",
-        "description": "悪魔の皮膚により、30分間アーマーが{buff}増加します。"
+        "description": "悪魔の皮膚により、30分間アーマーが{buff}増加します。契約の深化を習得すると、魔物の肌が有効な間このアーマーが2倍になり、受ける魔法ダメージも軽減されます。"
       },
       "immolate": {
         "name": "灼熱の契約",

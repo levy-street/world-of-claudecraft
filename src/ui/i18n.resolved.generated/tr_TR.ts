@@ -18257,7 +18257,7 @@ export const tr_TR: EnTranslations = {
       },
       "demon_skin": {
         "name": "İblis Derisi",
-        "description": "Şeytani deri zırhını 30 dakika boyunca {buff} artırır."
+        "description": "Şeytani deri zırhını 30 dakika boyunca {buff} artırır. Pact Deepened, İblis Derisi etkinken bu zırhı ikiye katlayabilir ve alınan büyü hasarını azaltabilir."
       },
       "immolate": {
         "name": "Yanan Ahit",

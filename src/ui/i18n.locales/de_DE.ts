@@ -9676,7 +9676,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Sendet einen schattenhaften Blitz auf den Gegner und verursacht {damage} Schattenschaden.',
   'entities.abilities.demon_skin.name': 'Dämonenhaut',
   'entities.abilities.demon_skin.description':
-    'Dämonische Haut erhöht eure Rüstung 30 Min. lang um {buff}.',
+    'Dämonische Haut erhöht eure Rüstung 30 Min. lang um {buff}. Pact Deepened kann diese Rüstung verdoppeln und erlittenen magischen Schaden verringern, solange Dämonenhaut aktiv ist.',
   'entities.abilities.immolate.name': 'Brennender Pakt',
   'entities.abilities.immolate.description':
     'Verbrennt den Gegner für {damage} Feuerschaden und zusätzlich {overTime} über 15 Sek.',

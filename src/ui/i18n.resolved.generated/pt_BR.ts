@@ -18257,7 +18257,7 @@ export const pt_BR: EnTranslations = {
       },
       "demon_skin": {
         "name": "Couro Demoníaco",
-        "description": "Pele demoníaca aumenta sua armadura em {buff} por 30 min."
+        "description": "Pele demoníaca aumenta sua armadura em {buff} por 30 min. Pact Deepened pode dobrar essa armadura e reduzir o dano mágico recebido enquanto Couro Demoníaco estiver ativo."
       },
       "immolate": {
         "name": "Pacto Ardente",

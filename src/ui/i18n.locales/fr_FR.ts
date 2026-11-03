@@ -10216,7 +10216,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Envoie un trait ténébreux sur l'ennemi pour {damage} points de dégâts d'Ombre.",
   'entities.abilities.demon_skin.name': 'Peau de démon',
   'entities.abilities.demon_skin.description':
-    'Une peau démoniaque augmente votre armure de {buff} pendant 30 min.',
+    'Une peau démoniaque augmente votre armure de {buff} pendant 30 min. Pact Deepened peut doubler cette armure et réduire les dégâts magiques subis tant que Peau de démon est active.',
   'entities.abilities.immolate.name': 'Pacte brûlant',
   'entities.abilities.immolate.description':
     "Brûle l'ennemi pour {damage} points de dégâts de Feu et {overTime} points supplémentaires en 15 s.",
