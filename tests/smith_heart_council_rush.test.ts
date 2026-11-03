@@ -287,6 +287,23 @@ describe("Mountain's Rush: the wind-up and the run", () => {
   });
 });
 
+describe("Mountain's Rush: cut short", () => {
+  it('a Guardian that falls mid-run strikes nobody after and the dash is over', () => {
+    const f = pulled(4);
+    const { g, target, at } = rushSetup(f);
+    const away = past(at, MID, 14);
+    f.put(target, away.x, away.z);
+    for (let i = 0; i < T.rushCast * 20 + 4 && f.st.rush === null; i++) f.tick();
+    expect(f.st.rush).not.toBeNull();
+    // Through the wind-up and a breath of the run, then it falls.
+    f.tick(Math.ceil(T.rushWindup * 20) + 2);
+    f.sim.ctx.handleDeath(g, f.players[0]);
+    const ev = f.tick(20 * 3);
+    expect(f.st.rush).toBeNull();
+    expect(hitsOf(ev, COUNCIL_NAMES.rush, target.id)).toEqual([]);
+  });
+});
+
 describe('the cursed pillar', () => {
   it('pulses low on normal, the real pressure on heroic and mythic', () => {
     const n = COUNCIL_DIFFICULTY.normal;

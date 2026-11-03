@@ -4,7 +4,7 @@
 // passes, cooling, then fading: council_mechanic_look_core.ts `rushScar`) and
 // the star of cracks its feet split open where it plants for the wind-up and
 // where it stops. Presentation only (the lane a player reacts to is the
-// painted lane, council_rush_fx.ts); drawn on every tier (two draws).
+// painted lane, council_rush_fx.ts); drawn on every tier (three draws).
 // Built in the constructor under the host's root (the host's one gated attach);
 // the scar's strip is re-draped over the floor once per Rush into its own
 // preallocated buffer, never a new allocation.
@@ -200,7 +200,7 @@ export class RushScar {
     this.scar.name = 'smithHeartRushScar';
     this.scar.visible = false;
     this.scar.frustumCulled = false;
-    this.scar.renderOrder = floorVfxRenderOrder('encounter', 21);
+    this.scar.renderOrder = floorVfxRenderOrder('encounter', 11);
     h.root.add(this.scar);
     for (let i = 0; i < 2; i++) {
       const mat = new THREE.ShaderMaterial({
@@ -229,7 +229,7 @@ export class RushScar {
       mesh.rotation.x = -Math.PI / 2;
       mesh.visible = false;
       mesh.frustumCulled = false;
-      mesh.renderOrder = floorVfxRenderOrder('encounter', 21);
+      mesh.renderOrder = floorVfxRenderOrder('encounter', 11);
       h.root.add(mesh);
       h.materials.push(mat);
       this.stars.push({ mesh, mat });

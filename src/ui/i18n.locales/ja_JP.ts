@@ -22612,7 +22612,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.council.resonance':
     '{every}秒ごとに共鳴し、自分の{radius}ヤード以内の味方全員に{min}から{max}の自然ダメージを与える。効果が切れるまで全員から離れよう。ヒロイック・ミシック：ダメージ{heroic}%増加。',
   'hudChrome.auraEffect.council.rushMark':
-    '効果が切れると、槌の守護者は一瞬身構えてから、あなたが立っていた場所へ一直線に突進し、行く手の最初の柱で止まる。呪われた柱へ誘導しよう：柱が砕け、守護者は{stun}秒間スタンし、{exposedSeconds}秒間受けるダメージが{exposed}%増加する。途中に遮蔽用の柱があれば、代わりにその柱が壊される。行く手に柱がなければ、突進にぶつかった全員（あなたを含む）が{min}から{max}のダメージを受けて吹き飛ばされる。ミシック：柱に当たらなかった突進は、呪われた柱が砕けるまで採石場の崩落を引き起こす。',
+    '効果が切れると、槌の守護者は{windup}秒間身構えてから、あなたが立っていた場所へ一直線に突進し、行く手の最初の柱で止まる。呪われた柱へ誘導しよう：柱が砕け、守護者は{stun}秒間スタンし、{exposedSeconds}秒間受けるダメージが{exposed}%増加する。途中に遮蔽用の柱があれば、代わりにその柱が壊される。止まるまでに突進がぶつかった全員が{min}から{max}のダメージを受けて吹き飛ばされる。まだ進路上にいればあなたも同じだ。ミシック：柱に当たらなかった突進は、呪われた柱が砕けるまで採石場の崩落を引き起こす。',
   'hudChrome.auraEffect.council.rushExposed':
     '受けるダメージが{pct}%増加：山の突進が呪われた柱を砕いた。',
   'hudChrome.auraEffect.council.bond':

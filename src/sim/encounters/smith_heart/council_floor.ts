@@ -52,7 +52,8 @@ export function wakeSeconds(s: CouncilScope): number {
 }
 
 /** Seconds a Rush puts on the floor: its mark, the wind-up and a typical
- *  dash (half the Quarry's width at the run). */
+ *  dash (about 44 yd at the run; a full-width one runs longer, and the
+ *  Wrath waits on a Rush in flight anyway). */
 export const RUSH_FLOOR_SECONDS = T.rushCast + T.rushWindup + 2;
 
 /** Start whatever floor mechanic is due and the gap allows, in order, and

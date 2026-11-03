@@ -461,7 +461,7 @@ export class CouncilBondFx {
     this.chain.name = 'smithHeartCouncilBondChain';
     this.chain.visible = false;
     this.chain.frustumCulled = false;
-    this.chain.renderOrder = floorVfxRenderOrder('encounter', 22);
+    this.chain.renderOrder = floorVfxRenderOrder('encounter', 10);
     h.root.add(this.chain);
     for (let i = 0; i < 2; i++) {
       const sigilMat = new THREE.ShaderMaterial({
@@ -487,7 +487,7 @@ export class CouncilBondFx {
       const sigil = new THREE.Mesh(discGeo, sigilMat);
       sigil.name = 'smithHeartCouncilBondSigil';
       sigil.rotation.x = -Math.PI / 2;
-      sigil.renderOrder = floorVfxRenderOrder('encounter', 22);
+      sigil.renderOrder = floorVfxRenderOrder('encounter', 10);
       sigil.visible = false;
       sigil.frustumCulled = false;
       const columnMat = new THREE.ShaderMaterial({
@@ -577,10 +577,10 @@ export class CouncilBondFx {
     const rise = bondArch(span);
     this.tether.position.copy(_a);
     _v.subVectors(_b, _a);
-    for (const mat of [this.coreMat, this.haloMat]) {
-      mat.uniforms.uB.value.copy(_v);
-      mat.uniforms.uRise.value = rise;
-    }
+    this.coreMat.uniforms.uB.value.copy(_v);
+    this.coreMat.uniforms.uRise.value = rise;
+    this.haloMat.uniforms.uB.value.copy(_v);
+    this.haloMat.uniforms.uRise.value = rise;
     this.coreMat.uniforms.uRadius.value = look.core;
     this.coreMat.uniforms.uGlow.value = look.glow;
     this.coreMat.uniforms.uFlow.value = look.flow;
@@ -679,6 +679,12 @@ export class CouncilBondFx {
     const n = Math.max(4, Math.round(22 * this.h.density));
     this.h.particles.puff(this.lastMid.x, this.lastMid.y, this.lastMid.z, n, _spark);
     this.h.particles.shockRing(this.lastMid.x, this.lastMid.z, C.bond, 4, 0.4);
+  }
+
+  /** The shards' instance buffer (the host disposes the geometries and
+   *  materials). */
+  dispose(): void {
+    this.shards.dispose();
   }
 
   private hide(): void {

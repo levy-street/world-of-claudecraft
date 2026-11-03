@@ -453,6 +453,14 @@ describe('CouncilFx over a fake world', () => {
     expect(shown('smithHeartCouncilBondSigil')).toBe(0);
     expect(shown('smithHeartCouncilBondColumn')).toBe(0);
     expect(shown('smithHeartCouncilBondChain')).toBe(0);
+    // A Rush whose Guardian falls mid-run: the locked lane goes that frame,
+    // never lit over ground that no longer kills.
+    expect(fx.handleEvent(windup)).toBe(true);
+    fx.update(1 / 30);
+    expect(paints()).toBe(before + 1);
+    guardian.dead = true;
+    fx.update(1 / 30);
+    expect(paints()).toBe(before);
     fx.dispose();
   });
 });

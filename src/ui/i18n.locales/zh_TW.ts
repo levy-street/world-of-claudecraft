@@ -23134,7 +23134,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.council.resonance':
     '每{every}秒你會發出共鳴，對你{radius}碼內的每名盟友造成{min}到{max}點自然傷害。在效果結束前遠離所有人。英雄和傳奇難度：傷害提高{heroic}%。',
   'hudChrome.auraEffect.council.rushMark':
-    '結束時，重錘守護者會先蓄勢片刻，然後沿直線衝向你所站的位置，並停在路上遇到的第一根石柱處。把它引向詛咒石柱：石柱碎裂，守護者被昏迷{stun}秒，並在{exposedSeconds}秒內受到的傷害提高{exposed}%。若路線上擋著一根掩護石柱，則改為摧毀那根石柱。若路上沒有石柱，它撞到的所有人（包括你）會受到{min}到{max}點傷害並被擊退。傳奇難度：沒有撞上任何石柱的衝鋒會引發採石場坍塌，直到詛咒石柱碎裂為止。',
+    '結束時，重錘守護者會先蓄勢{windup}秒，然後沿直線衝向你所站的位置，並停在路上遇到的第一根石柱處。把它引向詛咒石柱：石柱碎裂，守護者被昏迷{stun}秒，並在{exposedSeconds}秒內受到的傷害提高{exposed}%。若路線上擋著一根掩護石柱，則改為摧毀那根石柱。它停下之前撞到的所有人會受到{min}到{max}點傷害並被擊退，如果你還在它的路線上，你也一樣。傳奇難度：沒有撞上任何石柱的衝鋒會引發採石場坍塌，直到詛咒石柱碎裂為止。',
   'hudChrome.auraEffect.council.rushExposed': '受到的傷害提高{pct}%：山岳衝鋒撞碎了詛咒石柱。',
   'hudChrome.auraEffect.council.bond':
     '重錘議會的另一名成員在{reach}碼內時，受到的傷害降低{pct}%。岩石之契每{every}秒對全團造成{min}到{max}點傷害，每次提高{growth}%。把他們拉開。',

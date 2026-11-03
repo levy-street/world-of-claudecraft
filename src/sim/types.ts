@@ -10510,7 +10510,8 @@ export type SimEvent = { pid?: number } & (
       // blast radius in yards; when set the renderer flashes a terrain-draped
       // AoE ring of this size under the burst so the impact area reads clearly
       radius?: number;
-      // 'orb' only: unit drift direction, yards-per-second speed, and lifetime
+      // 'orb' (and the Hammer Council's Mountain's Rush wind-up cue, its fixed
+      // line): unit drift direction, yards-per-second speed, and lifetime
       // in seconds of the roaming visual
       dirX?: number;
       dirZ?: number;

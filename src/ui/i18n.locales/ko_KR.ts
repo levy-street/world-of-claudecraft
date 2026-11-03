@@ -22589,7 +22589,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.council.resonance':
     '{every}초마다 울려 퍼져 자신의 {radius}야드 안에 있는 모든 아군에게 {min}에서 {max}의 자연 피해를 줍니다. 효과가 끝날 때까지 모두에게서 떨어지세요. 영웅·신화: 피해 {heroic}% 증가.',
   'hudChrome.auraEffect.council.rushMark':
-    '효과가 끝나면 망치의 수호자가 잠시 자세를 잡은 뒤, 당신이 서 있던 곳을 향해 일직선으로 돌진하며 길을 막는 첫 번째 기둥에서 멈춥니다. 저주받은 기둥으로 유인하세요: 기둥이 부서지고 수호자가 {stun}초 동안 기절하며 {exposedSeconds}초 동안 받는 피해가 {exposed}% 증가합니다. 경로에 엄폐용 기둥이 있으면 대신 그 기둥이 파괴됩니다. 길에 기둥이 없으면 돌진에 부딪힌 모두(당신 포함)가 {min}에서 {max}의 피해를 받고 밀려납니다. 신화: 기둥에 부딪히지 않은 돌진은 저주받은 기둥이 부서질 때까지 채석장 붕괴를 일으킵니다.',
+    '효과가 끝나면 망치의 수호자가 {windup}초 동안 자세를 잡은 뒤, 당신이 서 있던 곳을 향해 일직선으로 돌진하며 길을 막는 첫 번째 기둥에서 멈춥니다. 저주받은 기둥으로 유인하세요: 기둥이 부서지고 수호자가 {stun}초 동안 기절하며 {exposedSeconds}초 동안 받는 피해가 {exposed}% 증가합니다. 경로에 엄폐용 기둥이 있으면 대신 그 기둥이 파괴됩니다. 멈추기 전까지 돌진에 부딪힌 모두가 {min}에서 {max}의 피해를 받고 밀려나며, 아직 경로 위에 있다면 당신도 마찬가지입니다. 신화: 기둥에 부딪히지 않은 돌진은 저주받은 기둥이 부서질 때까지 채석장 붕괴를 일으킵니다.',
   'hudChrome.auraEffect.council.rushExposed':
     '받는 피해가 {pct}% 증가합니다: 산의 돌진이 저주받은 기둥을 부쉈습니다.',
   'hudChrome.auraEffect.council.bond':

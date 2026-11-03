@@ -16,7 +16,7 @@
 //
 // Every number a player reacts to (the tether showing at all, the scar along the
 // lane the run took) is drawn on every tier; only the motes, the shards and the
-// dust thin (council_bond_fx.ts, council_rush_trail_fx.ts).
+// dust thin (council_bond_fx.ts, council_rush_fx.ts).
 
 import { SMITH_HEART_MOBS } from '../../sim/content/smith_heart';
 import {
@@ -49,9 +49,18 @@ export function bondAnchorY(role: CouncilRole): number {
 /** The sigil under a bonded member (yards: about its body's footprint) and
  *  how tall its column of light climbs (a little past its crown). */
 export function bondSigil(role: CouncilRole): { radius: number; column: number } {
-  const h = BOND_BODY[role].height;
-  return { radius: Math.max(2.6, h * 0.36), column: h * 1.1 };
+  return BOND_SIGILS[role];
 }
+
+const sigilOf = (role: CouncilRole) => {
+  const h = BOND_BODY[role].height;
+  return { radius: Math.max(2.6, h * 0.36), column: h * 1.1 } as const;
+};
+/** The sigils, built once (the painter reads them every frame). */
+const BOND_SIGILS: Readonly<Record<CouncilRole, { radius: number; column: number }>> = {
+  guardian: sigilOf('guardian'),
+  singer: sigilOf('singer'),
+};
 
 /** How far the tether's middle climbs over the line between its anchors
  *  (yards): `close` with the two standing together (a tall loop that rises

@@ -63,6 +63,7 @@ export function councilAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescr
       return {
         key: `${KEY}.rushMark`,
         nums: {
+          windup: T.rushWindup,
           stun: T.rushStunSeconds,
           exposed: pct(T.rushExposed),
           exposedSeconds: T.rushExposedSeconds,

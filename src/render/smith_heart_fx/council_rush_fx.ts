@@ -136,6 +136,8 @@ interface RushRun {
   /** The host clock at the cue; at the stop (NaN: still going). */
   t0: number;
   stoppedAt: number;
+  /** A pillar's burst already played for this stop. */
+  struckPillar: boolean;
   stopX: number;
   stopZ: number;
   nextStride: number;
@@ -215,6 +217,7 @@ export class CouncilRushFx {
       seconds: Math.max(0, seconds),
       t0: now,
       stoppedAt: Number.NaN,
+      struckPillar: false,
       stopX: x + dx * length,
       stopZ: z + dz * length,
       nextStride: now + T.rushWindup,
@@ -288,7 +291,10 @@ export class CouncilRushFx {
     const since = now - r.t0;
     // A run the stop's cue never closed (the Guardian fell, a wipe, an
     // evade): it ends a little after its planned stop, with no burst.
-    if (Number.isNaN(r.stoppedAt) && since > T.rushWindup + r.seconds + 1.5) r.stoppedAt = now;
+    const body = r.guardianId >= 0 ? this.h.entity(r.guardianId) : undefined;
+    const gone = !body || body.dead || body.aiState === 'evade';
+    if (Number.isNaN(r.stoppedAt) && (gone || since > T.rushWindup + r.seconds + 1.5))
+      r.stoppedAt = now;
     const ended = Number.isNaN(r.stoppedAt) ? null : now - r.stoppedAt;
     if (ended !== null && ended > RUSH_TRACE_SECONDS) {
       this.scar.hide();
@@ -356,8 +362,7 @@ export class CouncilRushFx {
       return true;
     }
     // The run: dust and grit thrown up behind the body, a thud per stride.
-    const g = r.guardianId >= 0 ? this.h.entity(r.guardianId) : undefined;
-    const at = g && !g.dead ? fxAnchor(g) : null;
+    const at = body ? fxAnchor(body) : null;
     const k = ph.phase === 'run' ? ph.k : 1;
     const bx = at ? at.x : r.fromX + r.dirX * r.length * k;
     const bz = at ? at.z : r.fromZ + r.dirZ * r.length * k;
@@ -463,9 +468,10 @@ export class CouncilRushFx {
    *  flash in the cursed pillar's colour or the stone's. */
   pillarStruck(x: number, z: number, cursed: boolean): void {
     const r = this.run;
-    if (!r || Number.isNaN(r.stoppedAt)) return;
+    if (!r || Number.isNaN(r.stoppedAt) || r.struckPillar) return;
     if (this.h.now() - r.stoppedAt > 0.35) return;
     if (Math.hypot(x - r.stopX, z - r.stopZ) > 8) return;
+    r.struckPillar = true;
     const y = this.h.groundY(x, z);
     PILLAR_DIR[0] = r.dirX;
     PILLAR_DIR[2] = r.dirZ;

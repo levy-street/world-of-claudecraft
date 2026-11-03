@@ -1698,6 +1698,7 @@ export class CouncilFx {
   dispose(): void {
     if (this.disposed) return;
     this.disposed = true;
+    this.bond.dispose();
     this.root.removeFromParent();
     this.particles.dispose();
     this.kit.dispose();
