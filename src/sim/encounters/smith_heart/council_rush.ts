@@ -129,7 +129,7 @@ export function startRush(s: CouncilScope): boolean {
     s,
     g,
     'rush',
-    `Mountain's Rush on ${target.name}! Lead the charge into the cursed pillar!`,
+    `Mountain's Rush on ${target.name}! Stand so the Cursed Pillar is between you and the Guardian!`,
     { player: target.name },
   );
   councilSay(s, 'guardian', 'rush');
@@ -332,7 +332,7 @@ export function stepRush(s: CouncilScope): RushOutcome | null {
         s,
         g,
         'rushCursed',
-        'The Guardian shatters the cursed pillar and reels! Strike now!',
+        'The Guardian shatters the Cursed Pillar and staggers! Strike now!',
       );
     } else if (pl?.soul) outcome = 'soul';
     else if (pl) {
@@ -343,7 +343,7 @@ export function stepRush(s: CouncilScope): RushOutcome | null {
           s,
           g,
           'rushPillar',
-          'The Rush broke a sheltering pillar! The cursed pillar still stands.',
+          "Mountain's Rush smashed a sheltering pillar! The Cursed Pillar still stands.",
         );
     } else outcome = 'pillar';
   }
@@ -361,7 +361,7 @@ export function stepRush(s: CouncilScope): RushOutcome | null {
       s,
       g,
       'collapse',
-      'The Quarry begins to collapse! Lead the next Rush into the cursed pillar!',
+      "The Quarry is collapsing! Steer the next Mountain's Rush into the Cursed Pillar to stop it!",
     );
   }
   return outcome;

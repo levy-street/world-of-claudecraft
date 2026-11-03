@@ -244,8 +244,8 @@ function scopeOf(
 
 /** The lines the raid reads as each one falls (raid warnings). */
 const FALLEN_LINES: Readonly<Record<CouncilRole, string>> = {
-  guardian: 'The Guardian of the Hammer falls. Its wrath passes to the Seam Singer!',
-  singer: 'The Seam Singer falls. Now the Guardian raises the stone where it will!',
+  guardian: "The Guardian of the Hammer falls! The Seam Singer takes up Mountain's Wrath!",
+  singer: 'The Seam Singer falls! The Guardian now raises pillars beneath random players!',
 };
 
 /** Memory of Stone on the living member: one stack per fallen member. */

@@ -208,13 +208,18 @@ export function landWrath(s: CouncilScope, caster: Entity, heir: boolean): numbe
     else collapsePillar(ctx, inst, st, pl, false);
   }
   if (crowded)
-    raidWarn(s, caster, 'crowded', 'Too many behind one pillar! It could not shield them all.');
+    raidWarn(
+      s,
+      caster,
+      'crowded',
+      'Too many players behind one pillar! It could not shield them all.',
+    );
   if (columns > 0)
     raidWarn(
       s,
       caster,
       'columnsGone',
-      'The carved columns are gone! From now on only the stone Wake the Stone raises can hide you.',
+      "The carved columns have fallen! From now on, only pillars raised by Wake the Stone can shield you from Mountain's Wrath.",
     );
   // The next cover is never more than a breath after the Wrath.
   st.wakeTimer = Math.min(st.wakeTimer, T.wakeAfterWrath);
@@ -225,7 +230,7 @@ export function landWrath(s: CouncilScope, caster: Entity, heir: boolean): numbe
       s,
       caster,
       'enrage',
-      "The mountain's anger quickens! Mountain's Wrath comes much sooner now.",
+      "The mountain's anger grows! Mountain's Wrath now comes much more often.",
     );
   return struck;
 }

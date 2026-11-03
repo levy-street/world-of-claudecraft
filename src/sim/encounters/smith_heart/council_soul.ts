@@ -67,8 +67,9 @@ import type { CouncilSoul } from './council_state';
 
 /** The lines the raid reads (raid warnings, `hudChrome.council.warn.*`). */
 const TAKE_LINES: Readonly<Record<CouncilRole, string>> = {
-  guardian: "The Guardian's soul takes the stone! Its Echo of Wrath will strike from the pillar.",
-  singer: "The Seam Singer's soul takes the stone! Its Endless Song grows with every pulse.",
+  guardian: "The Guardian's soul enters the stone! Its Echo of Wrath will strike from that pillar.",
+  singer:
+    "The Seam Singer's soul enters the stone! Her Endless Song grows louder with every pulse.",
 };
 const BREAK_LINES: Readonly<Record<CouncilRole, string>> = {
   guardian: "The Guardian's soul pillar breaks! Its Echo falls silent.",

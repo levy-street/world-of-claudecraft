@@ -22557,16 +22557,16 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.heart_seam_bolt': '鉱脈の矢',
   'abilityUi.cast.heart_song_of_the_seam': '鉱脈の歌',
   'hudChrome.council.warn.wrath': '山の怒り！柱の陰に隠れろ！',
-  'hudChrome.council.warn.enrage': '山の怒りが速まった！山の怒りがずっと早く来る。',
+  'hudChrome.council.warn.enrage': '山の憤りが増していく！山の怒りがずっと頻繁に来るようになった。',
   'hudChrome.council.warn.weight': '{player}に槌の重み：タンク交代！',
   'hudChrome.council.warn.wake':
-    '石の目覚め：{players}の足元に柱がせり上がる！遮蔽物が必要な場所に立て。',
-  'hudChrome.council.warn.wakeHeir': '{players}の足元で石が目覚める：動け！',
-  'hudChrome.council.warn.rock': '{player}に落石！遮蔽物から離れて一緒に受けろ！',
+    '{players}に石の目覚め！各自の足元に柱が立ち上がる：レイドに遮蔽物が必要な場所に立て。',
+  'hudChrome.council.warn.wakeHeir': '{players}の足元から柱が突き上がる！今すぐ離れろ！',
+  'hudChrome.council.warn.rock': '{player}に落石！柱から離れた場所で集まり、ダメージを分け合え！',
   'hudChrome.council.warn.song': '鉱脈の歌！詠唱を止めろ！',
   'hudChrome.council.alert.wakeTitle': '石の目覚め！',
   'hudChrome.council.alert.wakeLine':
-    '立っている場所に柱がせり上がる：レイドが必要な場所に遮蔽物を置こう',
+    '立っている場所に柱が立ち上がる：レイドに遮蔽物が必要な場所へ移動しよう',
   'hudChrome.council.alert.rockTitle': '落石！',
   'hudChrome.council.alert.rockLine': '柱から離れ、少なくとも3人の味方を集めよう',
   'hudChrome.council.alert.resonanceTitle': '共鳴',
@@ -22612,7 +22612,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.council.resonance':
     '{every}秒ごとに共鳴し、自分の{radius}ヤード以内の味方全員に{min}から{max}の自然ダメージを与える。効果が切れるまで全員から離れよう。ヒロイック・ミシック：ダメージ{heroic}%増加。',
   'hudChrome.auraEffect.council.rushMark':
-    '効果が切れると、槌の守護者があなたに向かって一直線に突進し、進路上の最初の柱で止まる。呪われた柱へ誘導しよう：柱が砕け、守護者は{stun}秒間スタンし、{exposedSeconds}秒間受けるダメージが{exposed}%増加する。途中に遮蔽用の柱があれば、代わりにその柱が壊される。進路上に柱がなければ、あなたと進路上の全員が{min}から{max}のダメージを受けて吹き飛ばされる。ミシック：柱に当たらなかった突進は、呪われた柱が砕けるまで採石場の崩落を引き起こす。',
+    '効果が切れると、槌の守護者は一瞬身構えてから、あなたが立っていた場所へ一直線に突進し、行く手の最初の柱で止まる。呪われた柱へ誘導しよう：柱が砕け、守護者は{stun}秒間スタンし、{exposedSeconds}秒間受けるダメージが{exposed}%増加する。途中に遮蔽用の柱があれば、代わりにその柱が壊される。行く手に柱がなければ、突進にぶつかった全員（あなたを含む）が{min}から{max}のダメージを受けて吹き飛ばされる。ミシック：柱に当たらなかった突進は、呪われた柱が砕けるまで採石場の崩落を引き起こす。',
   'hudChrome.auraEffect.council.rushExposed':
     '受けるダメージが{pct}%増加：山の突進が呪われた柱を砕いた。',
   'hudChrome.auraEffect.council.bond':
@@ -22622,26 +22622,27 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.council.alert.resonanceLine':
     '近くの味方全員を傷つける：効果が切れるまで集団から離れよう',
   'hudChrome.council.alert.rushTitle': '山の突進！',
-  'hudChrome.council.alert.rushLine': '守護者があなたに突進する：呪われた柱を間に挟もう',
+  'hudChrome.council.alert.rushLine': '守護者があなたに突進してくる：呪われた柱を間に挟もう',
   'hudChrome.council.say.guardian_rush': 'ならば我が道に立つがいい。山は道を譲らぬ。',
   'hudChrome.council.say.singer_wake': '目覚めなさい、眠れる石よ。彼らの足元から立ち上がれ！',
   'hudChrome.council.say.singer_rock': '上を見て、おちびさんたち！山が落ちてくるわ！',
   'hudChrome.council.warn.columnsGone':
-    '彫られた柱が消えた！これからは石の目覚めでせり上がる石だけが身を隠してくれる。',
-  'hudChrome.council.warn.rush': '{player}に山の突進！突進を呪われた柱へ誘導しろ！',
+    '彫られた柱は崩れ落ちた！これからは、石の目覚めで立ち上がった柱だけが山の怒りから身を守ってくれる。',
+  'hudChrome.council.warn.crowded': '一本の柱の後ろに人が多すぎる！全員を守りきれなかった。',
+  'hudChrome.council.warn.rush': '{player}に山の突進！呪われた柱が守護者との間に来るように立て！',
   'hudChrome.council.warn.rushCursed': '守護者が呪われた柱を砕いてよろめいた！今だ、攻撃しろ！',
-  'hudChrome.council.warn.rushPillar': '突進が遮蔽用の柱を壊した！呪われた柱はまだ立っている。',
+  'hudChrome.council.warn.rushPillar': '山の突進が遮蔽用の柱を砕いた！呪われた柱はまだ立っている。',
   'hudChrome.council.warn.rushMiss': '山の突進が{players}を踏みつけた！',
-  'hudChrome.council.warn.collapse': '採石場が崩れ始めた！次の突進を呪われた柱へ誘導しろ！',
+  'hudChrome.council.warn.collapse':
+    '採石場が崩れている！次の山の突進を呪われた柱へ誘導して止めろ！',
   'hudChrome.council.warn.bond': '石の絆！守護者と鉱脈の歌い手を引き離せ！',
   'hudChrome.council.warn.wakeCast':
-    '鉱脈の歌い手が石を目覚めさせる！最後まで詠唱させろ：妨害すると柱はせり上がらない。',
-  'hudChrome.council.warn.wakeKicked': '石の目覚めが妨害された！石はせり上がらない。',
+    '鉱脈の歌い手が石の目覚めを詠唱中！妨害するな：妨害された詠唱では柱が立ち上がらない。',
+  'hudChrome.council.warn.wakeKicked': '石の目覚めが妨害された！柱は立ち上がらない。',
   'hudChrome.council.warn.resonance': '{players}に共鳴：効果が切れるまで全員から離れろ！',
-  'hudChrome.council.warn.fell_guardian':
-    '槌の守護者が倒れた。その怒りは鉱脈の歌い手に受け継がれる！',
+  'hudChrome.council.warn.fell_guardian': '槌の守護者が倒れた！鉱脈の歌い手が山の怒りを受け継ぐ！',
   'hudChrome.council.warn.fell_singer':
-    '鉱脈の歌い手が倒れた。これからは守護者が好きな場所に石をせり上げる！',
+    '鉱脈の歌い手が倒れた！これからは守護者がランダムなプレイヤーの足元に柱を立ち上げる！',
   // The Smith's Heart's Guardian of the Breath and Captain Thessaly (M16 fills).
   'hudChrome.breathGuardian.warn.inhale': '守護者が息を吸い込む！口の前の渦に入るな！',
   'hudChrome.breathGuardian.warn.gust': 'ふいごの突風！衝撃に備えろ！',
