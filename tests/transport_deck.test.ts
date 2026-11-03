@@ -370,3 +370,21 @@ describe('walking the deck under way (the real Sim and kernel)', () => {
     expect(run()).toEqual(run());
   });
 });
+
+describe('the aft helm on a sailing ferry', () => {
+  it('lets a passenger walk into the space between the wheel and the stern rail', () => {
+    const sim = sailingSim(60);
+    const player = sim.player;
+    placeOnDeck(sim, player, 2, -14.5, -Math.PI / 2, QUARTERDECK);
+    hold(sim, { forward: true }, 0.27);
+    const at = local(sim, player);
+    expect(Math.abs(at.x)).toBeLessThan(0.5);
+    expect(at.z).toBeLessThan(-14.3);
+    expect(at.y).toBeCloseTo(HULL.captainDeckY, 0);
+    hold(sim, {}, 1);
+    const held = local(sim, player);
+    expect(Math.abs(held.x)).toBeLessThan(0.5);
+    expect(held.z).toBeLessThan(-14.3);
+    expect(held.y).toBeCloseTo(HULL.captainDeckY, 0);
+  });
+});
