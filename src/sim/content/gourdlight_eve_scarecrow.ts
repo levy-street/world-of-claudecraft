@@ -48,8 +48,8 @@
 //     in damage from any source, the classic break-on-damage threshold) and the puppet's
 //     swing (8 to 12 every 2 s, before his mechanic level scale: about a third of his
 //     chaff's burn per second, the owner's "hits soft").
-//   - The charm's drop chance, in the buddy-drop convention (content/buddy_sources.ts:
-//     CALIBRATE). The pumpkin head is guaranteed but never duplicated; the broom is
+//   - The charm's drop chance, in the buddy-drop convention
+//     (content/buddy_sources.ts). The pumpkin head is guaranteed but never duplicated; the broom is
 //     bought from Hester for five Emberwoven Sheaves, one per daily kill, or, rarely
 //     (3%, round 10), dropped outright on a daily looted kill.
 //
