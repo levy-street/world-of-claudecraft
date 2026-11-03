@@ -12,8 +12,8 @@ and not built. The name is provisional and has not been IP-checked yet.
 At a glance: a ten-player level 20 raid (2 tanks, 2 healers, 6 damage), one
 instance slot inside Stormcrag holding two areas no floor joins: the main map (the
 Cleft, the four guardian rooms round the Ring, the heart seal on its dais) and the
-Heart (the final room). Five boss fights: the Hammer Council (the Guardian of the Hammer, the
-Slabwright and the Seam Singer, section 7.1) always first, then the
+Heart (the final room). Five boss fights: the Hammer Council (the Guardian of the Hammer and
+the Seam Singer, section 7.1) always first, then the
 Breath, Quench and Heat guardians in any order; with all four lit and the Ring clear
 the seal opens into a portal to the Heart and the final boss. Twenty mandatory trash
 packs. Target clear: 90 to 120 minutes on normal.
@@ -48,7 +48,7 @@ Sources of truth, in order:
 | The Heat vein's Blender kit (sources, build, plan, painter) | `docs/design/raid/kit/build_smith_heart_heat_kit.py` (the pieces: `heat_pieces.py`), `scripts/assets/smith_heart_heat_kit/build.mjs`, `src/render/smith_heart/heat_kit_plan_core.ts`, `src/render/smith_heart/heat_kit.ts` |
 | The Heat vein's floors, basalt, air, light and the pour | the `hearth` ground, `src/render/smith_heart/heat_hearth_floor.ts`, `heat_soot_core.ts`, `heat_air_core.ts` / `heat_air.ts`, `heat_pour_core.ts` / `heat_pour.ts`, `heart_environment.ts` (`smithHeartHeat`) |
 | The Heat guardian's effects | `src/render/smith_heart_fx/heat_*.ts` (`HeatBody`, `HeatFx`, `HeatFightFx` with its parts `heat_well_fx.ts` and `heat_cinder_fx.ts`), its sounds `src/game/smith_heart_heat_audio*.ts` |
-| The Hammer Council (the first boss: three members, the pillars) | `src/sim/encounters/smith_heart/council*.ts` (`tickHammerCouncil`, `COUNCIL_TUNING`, `COUNCIL_DIFFICULTY`); its look `src/render/smith_heart_fx/council_fx.ts` and `council_bodies.ts`; its alert `src/ui/hud/dungeon/council_alert_view.ts` |
+| The Hammer Council (the first boss: two members, the pillars) | `src/sim/encounters/smith_heart/council*.ts` (`tickHammerCouncil`, `COUNCIL_TUNING`, `COUNCIL_DIFFICULTY`); its look `src/render/smith_heart_fx/council_fx.ts` and `council_bodies.ts`; its alert `src/ui/hud/dungeon/council_alert_view.ts` |
 | Dev commands | `src/sim/dev/smith_heart_dev.ts` (`/dev heart`) |
 
 ## 1. Summary and lore
@@ -359,8 +359,8 @@ and while it stays engaged; open otherwise. Every gate is at least 12 yd wide.
 
 | Gate id | Kind | Where | Waits on | Seals for |
 |---|---|---|---|---|
-| `hammer_pit_mouth` | `stone_slab` | the Pit descent, near its top | packs h1, h2, h3 | the Hammer Council (any of the three fighting: `sealWithBodies`) |
-| `the_slab` | `stone_slab` | the Slab Stair | bosses: the Hammer Council's three | nothing |
+| `hammer_pit_mouth` | `stone_slab` | the Pit descent, near its top | packs h1, h2, h3 | the Hammer Council (either of the two fighting: `sealWithBodies`) |
+| `the_slab` | `stone_slab` | the Slab Stair | bosses: the Hammer Council's two | nothing |
 | `cornice_mouth` | `forge_seal` | the Cornice climb, near its top | packs b1, b2, b3 | Breath guardian |
 | `lake_mouth` | `forge_seal` | the lake descent | packs q1, q2, q3 | Quench guardian |
 | `anvil_mouth` | `forge_seal` | the anvil bridge | packs f1, f2, f3 | Heat guardian |
@@ -879,7 +879,7 @@ The council's effects are `src/render/smith_heart_fx/council_fx.ts` (pure plan
 
 | Moment | Look |
 |---|---|
-| The Slabwright, the Seam Singer | Provisional bodies of the kits' own stone, floating pieces stitched by ochre threads of the vein's light like the Heart's colossus: the Slabwright broad and blocky with slab shoulders, the Seam Singer tall and slender with glowing amber seam crystals; both about 2 to 2.5 times a player. Idle breath, a swing, cast poses (the Slabwright raises its arms and slams for Wake the Stone and the rock; the Singer lifts its arms and its crystals flare with the bar), a hunch and white-gold threads when one holds the Wrath, a fall into rubble. Their joints are kept apart from the pieces, so the official pipeline's models replace the pieces only |
+| The Seam Singer | Provisional body of the kits' own stone, floating pieces stitched by ochre threads of the vein's light like the Heart's colossus (the Slabwright's broad, blocky body left with it in the two-boss rework): the Seam Singer tall and slender with glowing amber seam crystals; both about 2 to 2.5 times a player. Idle breath, a swing, cast poses (the Slabwright raises its arms and slams for Wake the Stone and the rock; the Singer lifts its arms and its crystals flare with the bar), a hunch and white-gold threads when one holds the Wrath, a fall into rubble. Their joints are kept apart from the pieces, so the official pipeline's models replace the pieces only |
 | The pillars | The quarry's carved columns (the Hammer kit's) and the risen stone (the rock kit's needles), each drawing its integrity on the model: a network of seams cracking open and burning hotter, a growing lean, and its pips round its foot: an arc of light on the floor for each piece it started with and, on it, a carved stone socket holding a gem of the vein's light (a spent one a dark stone; the last one throbs; a flash as one is lost) |
 | A pillar rising | Bursting out of the floor in under a second with a shudder, a ring of dust, shards thrown out and a shock ring at the knockback's reach |
 | A pillar losing a piece | Its seams flash, chips and dust off its face, a short shake |
@@ -895,17 +895,16 @@ The council's effects are `src/render/smith_heart_fx/council_fx.ts` (pure plan
 | The stone remembers | A river of beads of stone light arcing from the fallen to each survivor, a flare on arrival |
 | Heroic pulse | A ring out to each pillar's reach every 2 s |
 | Mythic: the soul taking the stone | A river of beads in the soul's own colour from the fallen into the most intact pillar, a flare as it tears free, and on arrival the stone wakes: a burst of its light and two shock rings |
-| Mythic: a soul pillar | Its cracks always open and burning in the soul's colour (the Guardian an ember red-orange, the Slabwright jade green, the Seam Singer sky blue: none of them a mark's colour), a sheath of that light climbing the stone, three soul pips in it round the foot, motes rising off it; it brightens as its behaviour charges |
+| Mythic: a soul pillar | Its cracks always open and burning in the soul's colour (the Guardian an ember red-orange, the Seam Singer sky blue: none of them a mark's colour), a sheath of that light climbing the stone, three soul pips in it round the foot, motes rising off it; it brightens as its behaviour charges |
 | Mythic: a pip struck off | The stone flashes and chips, the pip's light tears out of its foot in sparks and a ring |
 | Mythic: a soul pillar bursting | A flare of the soul's light, a slow column of it climbing away (the soul dissipating), rings, then the usual fall into rubble |
 | Mythic: Echo of Wrath | While its bar runs: a lethal ring out to the Echo's 45 yd filling with it, the real shadow behind every other pillar as the Wrath's (a dark wedge with a bright rim and a light curtain, never wider than the sim's cover), embers drawn into the pillar; on landing rings race out, a wave of dust rolls over the floor, a flash and a shake |
-| Mythic: the Walking Slab | Its own look (the Heart kit's `Kit_SlabCollar`, `Kit_SlabClaw` and `Kit_SlabFace`, `council_slab_fx.ts`): a collar of root rock heaped round its foot, five stone claws round it (the front pair reach out, slam down and bite, then haul the stone forward while the rear three push), a face of cracks on its front with the jade burning in its eyes and mouth, turned the way it drags; the stone lurching and rocking forward on each pull, gouges raked into the floor where the talons bite, grinding dust, its two footprints riding with it (the crush lethal, the grind danger); a crush throws shards and dust off its player and jolts the ground. Still a soul pillar first: its jade cracks, sheath and three jade pips |
 | Mythic: the Endless Song | A notched ring on the floor round the pillar that widens and brightens with every pulse sung, a clock ring closing on the stone until the next pulse, and the pulse's sound rings racing out over the whole Quarry, more of them and brighter as the song grows |
 
 Readability: every footprint (the floor telegraph), ring, gauge, pip, crack and lean draws
 on every tier; the static preset sheds only dust, grit and debris; reduced motion drops the
 shakes. On mythic the soul colours, the sheath, the soul pips, the Echo's ring and its
-shelter wedges, the slab's footprints and the song's rings draw on every tier too (which
+shelter wedges and the song's rings draw on every tier too (which
 pillar holds a soul is never shed); only the motes, embers and dust thin. Every material is built with the effects' root under one gated attach (the kits'
 pieces draw with their shared slot materials, warmed with the interior), no light, fixed
 pools. The council's own cues are claimed (`councilClaims`), so no generic burst doubles
@@ -918,8 +917,8 @@ sampled sounds (`heart_council_*`, ElevenLabs through `scripts/gen_sfx.mjs`, cat
 council's own cues, bars and marks (the HUD's generic nova never doubles them): the Wrath's
 charge fitted to its bar and its blast, a pillar rising, cracking and falling, the rock's fall
 as it drops and its impact, the Seam Bolt, the song's swell; on mythic the soul flowing in,
-the Echo's charge and blast, the Walking Slab's grinding loop while it drags and its crush,
-each Endless Song pulse louder and deeper as it grows, a pip struck, a soul pillar bursting.
+the Echo's charge and blast, Mountain's Rush striking home, the cursed pillar's rise, hum and
+break, the Bond's pulse, Resonance's ring, the Quarry's collapse, each Endless Song pulse louder and deeper as it grows, a pip struck, a soul pillar bursting.
 The heroic pulse is one soft hum, cooled. The members speak as boss yells
 (`council_voice.ts`, `hudChrome.council.say.*`); their voices are auditions only until the
 designer picks one (`scripts/audition_raid_boss_voices.mjs --set council`).
@@ -1434,125 +1433,124 @@ the meters harness, never shipped unmeasured.
 
 ### 7.1 The Hammer Council (always first)
 
-The Quarry's first boss is three stone beings that share the Hammer's strength: the
-**Guardian of the Hammer** (`heart_hammer_guardian`, id frozen: the tank boss), the
-**Slabwright** (`heart_slabwright`: the pillar maker) and the **Seam Singer**
-(`heart_seam_singer`: the caster), standing round the Quarry's middle among its five
-columns. Designed with the owner (2026-10-25) and built as a playable prototype: every
-number below is a SKETCH, unmeasured, to be calibrated with the meters harness.
+The Quarry's first boss is two stone beings that share the Hammer's strength: the
+**Guardian of the Hammer** (`heart_hammer_guardian`, id frozen: the melee tank boss) and the
+**Seam Singer** (`heart_seam_singer`: the caster), standing round the Quarry's middle among
+its five columns. Designed with the owner (2026-10-25) as three members and reworked to two
+from the team's feedback (2026-11-03: "two melee bosses is redundant"): the prototype's
+Slabwright (`heart_slabwright`) left the encounter with its Stone Prison, its mythic
+Shouldered Stone and its Walking Slab soul; its pillars and its rock went to the Seam
+Singer. Every number below is a SKETCH, unmeasured, to be calibrated with the meters
+harness.
 
 | Piece | Rule | Where |
 |---|---|---|
-| One pull | The three are one authored pack (`SMITH_HEART_COUNCIL_PACK`): pulling one pulls all three; a member whose foe fell is put back on the fight with its siblings' hate while any of them fights | `council.ts` (`keepTogether`) |
-| One wipe | The fight ends when no living member fights: every fallen member stands up whole at its place (`Entity.regrown`: no reward twice), the five columns stand whole again, the risen pillars, marks, rubble, Weight and stacks go | `council.ts` (`resetCouncil`), `council_pillars.ts` (`restorePillars`) |
-| One kill | Complete only when all three are dead: the Slab (`the_slab` waits on `SMITH_HEART_COUNCIL`), the heart seal's Hammer vein (`smithHeartVeinWon`) and every credit wait on all three; the risen pillars sink back into the floor | `content/smith_heart.ts`, `seal.ts`, `council_pillars.ts` (`settlePillars`) |
-| Pillars | The five carved columns (claim objects at `QUARRY_PILLAR_SPOTS`) plus the risen ones, at most 7 standing. A carved column has 2 integrity (whole, then cracked) and a risen pillar 1 (`councilPillarFull`), in its template id and stands as a round combat wall (`COMBAT_WALL_SHAPES`): it blocks bodies and the Wrath's sight line, offline and online (`net/combat_wall_wire.ts`). At 0 it falls: its wall goes that tick, rubble lies 8 s and bites 90 to 110 a second, then it is gone. The columns are the field's `encounterOwned` props: the field builds no collider for them | `council_pillars.ts` |
-| Energy | 0 to 100, full in 55 s; the holder's energy bar is its resource (the target frame draws it, the snapshot carries it); after the 4th Wrath it fills 2.5 times faster (the soft enrage) | `council_wrath.ts` |
-| Mountain's Wrath | At 100 (cast id kept, `heart_mountains_wrath`): a 4 s bar, then 440 to 520 to everyone in the Quarry (45 yd) the caster can see; every pillar that stood between it and at least one player loses a piece (once, however many it shielded) | `council_wrath.ts` (`landWrath`), `council_pillars.ts` (`pillarBetween`) |
-| Hammer's Weight | Every 18 s (first at 10): a 1.5 s bar at the tank, then 2.2 times a swing through armor and +100 percent physical damage taken for 25 s: swap tanks | `council_wrath.ts` |
-| Hammerfall | Kept: the frontal arc reads well and keeps the raid off the Guardian's side (110 degrees, 9 yd, 0.7 of a swing, every third swing) | template `arcCleave` |
-| Wake the Stone | Every 30 s (first at 14): a 1.2 s bar, then 1 player (2 on heroic, never more than the cap allows) wear a circle for 5 s; a fresh pillar bursts out where each STANDS (nudged to the nearest clear spot: on the floor, 6.5 yd from another pillar, 4.5 from a council body), 120 to 150 and a throw to everyone within 3 yd | `council_stone.ts`, `council_pillars.ts` (`raisePillar`) |
-| Falling Rock | Every 25 s (first at 9): a 1.2 s bar, then one player wears the soak for 5 s; 1,350 split between everyone within 6 yd (fewer than 3 under it: each takes half as much again and the whole raid takes 140 to 170, the Rockfall Tremor); every pillar within 6 yd of its face loses a piece | `council_stone.ts` |
+| One pull | The two are one authored pack (`SMITH_HEART_COUNCIL_PACK`): pulling one pulls both; a member whose foe fell is put back on the fight with its sibling's hate while the other fights | `council.ts` (`keepTogether`) |
+| One wipe | The fight ends when no living member fights: a fallen member stands up whole at its place (`Entity.regrown`: no reward twice), the five columns stand whole again, the risen and cursed pillars, marks, rubble, Weight, Bond and stacks go | `council.ts` (`resetCouncil`), `council_pillars.ts` (`restorePillars`) |
+| One kill | Complete only when both are dead: the Slab (`the_slab` waits on `SMITH_HEART_COUNCIL`), the heart seal's Hammer vein (`smithHeartVeinWon`), the death checkpoints and every credit wait on both; the risen pillars sink back into the floor and the carved columns stand in their sockets again | `content/smith_heart.ts`, `seal.ts`, `council_pillars.ts` (`settlePillars`) |
+| Pillars | The five carved columns (claim objects at `QUARRY_PILLAR_SPOTS`) plus the risen ones, at most 7 standing (the cursed pillar is outside the cap). A carved column has 2 integrity and a risen pillar 1 (`councilPillarFull`), in its template id; each stands as a round combat wall (`COMBAT_WALL_SHAPES`) that blocks bodies and the Wrath's sight line, offline and online. Cracked to 0 by the rock it falls: rubble lies 8 s and bites 90 to 110 a second. A pillar the Wrath or the Rush takes whole leaves rubble that only looks the part | `council_pillars.ts` |
+| Energy | 0 to 100, full in 55 s; the holder's energy bar is its resource; after the 4th Wrath it fills 2.5 times faster (the soft enrage) | `council_wrath.ts` |
+| Mountain's Wrath | At 100 (cast id kept, `heart_mountains_wrath`): a 4 s bar, then 440 to 520 to everyone in the Quarry (45 yd) the caster can see, and then EVERY pillar in the Quarry shatters, carved columns and risen alike (a mythic soul pillar alone stands). The columns teach the first Wrath; it takes them for the rest of the pull, and the raid is warned (`hudChrome.council.warn.columnsGone`) that from now on only the stone Wake the Stone raises can hide them. Each landing brings the next Wake due 6 s later (`wakeAfterWrath`) | `council_wrath.ts` (`landWrath`) |
+| Narrow Shelter (Normal 5, Heroic 4, Mythic 3) | One pillar shields only so many players from the Wrath; with more behind it each of them takes half the blast (`crowdShare`) and the raid is warned. A risen pillar's shadow (2.2 yd round) fits five side by side a stride behind it (pinned per tier). The caster wears the limit through its bar (`heart_narrow_shelter`, `value2`) | `council_wrath.ts`, `council_limit_fx.ts` |
+| Hammer's Weight | The Guardian's: every 18 s (first at 10) a 1.5 s bar at the tank, then 2.2 times a swing through armor and +100 percent physical damage taken for 25 s: swap tanks | `council_wrath.ts` |
+| Hammerfall | Kept: the Guardian's frontal arc (110 degrees, 9 yd, 0.7 of a swing, every third swing) | template `arcCleave` |
+| Mountain's Rush and the cursed pillar | The Guardian's charge. Every 24 s (first at 16) a 3 s bar at one player who is no council member's tank (only tanks on the floor: no Rush); the player wears the mark and the lane is drawn from the Guardian. With the mark he raises ONE cursed pillar (if none stands) on a 15 yd ring round the middle. While it stands it pulses on the whole raid every 2 s: 14 to 18 on normal (a reminder), 40 to 48 on heroic and 48 to 56 on mythic before the tier's damage. It shelters nobody from a Wrath (its wall still blocks the sight line), the rock and Resonance never touch it, and only the Rush or a Wrath breaks it. When the bar lands the Guardian dashes (40 yd a second) straight at where the marked player stands and stops at the FIRST pillar on the line: the cursed pillar shatters, the Guardian is stunned 5 s and takes 50 percent more damage for 12 s; a sheltering pillar is taken whole instead and the curse keeps pulsing; a soul pillar stops it and stands. Anyone in the path up to the stop takes 480 to 560 and a 10 yd throw; with no pillar on the line that is the marked player, and the cursed pillar stays. Mythic only: a miss sets the Quarry collapsing (every 2 s a raid-wide blow of 30 to 36 per stack, one more stack each time, up to 10) until the cursed pillar breaks. The Rush dies with the Guardian, and so does his cursed pillar | `council_rush.ts` |
+| Wake the Stone | The Seam Singer's, and KICKABLE (nature, in `COUNCIL_KICK_SCHOOLS`): every 30 s (first at 20, and 6 s after each Wrath lands) a 2.5 s bar, then 2 players (3 on heroic and mythic, never more than the cap allows; never a tank while anyone else stands) wear a circle for 5 s; a fresh pillar bursts out where each STANDS (nudged to the nearest clear spot), 120 to 150 and a throw to everyone within 3 yd. A kick raises NOTHING (the trap: the raid that kicks by habit loses its cover); the raid is warned as the bar begins and when a kick cuts it. Her kick's silence and lockout hold the Wake too | `council_stone.ts`, `council_pillars.ts` (`raisePillar`) |
+| The Wrath guard | Normal only (`floorAvoidsWrath`): Wake the Stone and the Rush are not due while what they put on the floor would still run when the Wrath's bar begins (their floor time plus 2 s, `wrathGuardPad`), nor while that bar runs: they wait for it to land. Heroic and mythic let them overlap | `council_floor.ts` (`clearOfWrath`) |
+| Falling Rock | The Seam Singer's: every 25 s (first at 9) a 1.2 s bar, then one player wears the soak for 5 s; 1,350 split between everyone within 6 yd (fewer than 3 under it: each takes half as much again and the whole raid takes 140 to 170, the Rockfall Tremor); every pillar within 6 yd of its face loses a piece (never the cursed one) | `council_stone.ts` |
 | Seam Bolt | Every 8 s: a 2 s kickable bar at a random player in sight, 300 to 340 nature; it lands only on a player still in sight | `council_song.ts` |
-| Song of the Seam | A 3 s kickable bar: sung out, Resonance on 3 players; kicked, on 1. Normal: it starts 1 s after a Wrath lands, so its Resonance (15 s) is over long before the next Wrath (at least 22 s away even in the soft enrage). Heroic: its own clock (first at 20, every 24), so the two overlap | `council_song.ts` |
-| Resonance | 15 s, a ring round the player; standing within 3.5 yd of a pillar's face for 3 s in a row knocks a piece off it, then the 3 s start again; nothing cleanses it (the play: hide behind the most damaged pillar at Wrath, keep off the whole ones). Not a walk-to-cleanse mark (Ignivar's Brand of the Pyre is one) | `council_song.ts` |
-| The stone remembers | When one falls, every survivor gains a stack of Memory of Stone (+15 percent damage dealt each) and takes up its job in a worse form: the Slabwright's pillars rise under RANDOM players on a locked spot with a 2 s warning (the Falling Rock stops with it); the Singer's song is sung by a survivor on 3 players and no kick stops it (the bolt stops with it); the Guardian's energy passes to a survivor (from empty) with a shorter Wrath (fills in 35 s, a 3 s bar, 380 to 450; Hammer's Weight stops with it). The heir is the first survivor in `JOB_HEIRS`; the last one carries every job | `council_scope.ts` (`jobHolder`), `council.ts` |
-| Stone Prison | Every 40 s (first at 20): a 1.5 s bar from the Slabwright, then 2 players (3 on Mythic; never its foes' tanks while anyone else stands) are stunned inside a block of stone, a real target (1,000 health, 1,200 on Mythic). Break it and its player is free, as a stasis immunity does too (the mage's Cold Coffin); 10 s later (8 on Mythic) it crushes them. It stops with the Slabwright; blocks standing still count down | `council_prison.ts`, `council_prison_fx.ts` |
-| Floor gap | The floor mechanics (Mountain's Wrath and its sight field, the Echo of Wrath, Wake the Stone and an heir's rise spots, Falling Rock, the Walking Slab's start) never start within 4 s of each other (`floorGap`): one due sooner waits and starts the moment the gap is over. Due together they go in a fixed order (the Wrath, the Echo, the Wake, the rock, the slab), one per gap, and each still fires. The seconds a mechanic waited come off its next interval (never below one gap), so it keeps its cadence and the fight never drifts slower; a held Wrath lands with the waited seconds' worth of energy. Seam Bolt, the song, Hammer's Weight and Stone Prison paint no floor and keep their clocks. The `/dev heart council wrath`, `wake`, `rock` and `soul slabwright` triggers fire at once, past the gap, and stamp it | `council_floor_gap.ts` (pure), `council_floor.ts` |
-| Narrow Shelter (Heroic 4, Mythic 3) | One pillar shields only so many players from Mountain's Wrath; with more behind it each of them takes half the blast (`crowdShare`) and the raid is warned. The Echo of Wrath keeps no limit. The caster wears the limit through its bar (`heart_narrow_shelter`, `value2`); on each standing pillar's sheltered side a row of gems, one per player it can shield, lit as they hide, red past the limit, on every tier | `council_wrath.ts`, `council_limit_fx.ts` |
-| Shouldered Stone (Mythic) | Within 10 yd of another living member (body to body) the Slabwright takes 80 percent less damage (the shared `shield_wall` ward), so one tank holds the Guardian with the Seam Singer and the other takes the Slabwright away; the other two have no such rule. A raid warning at most every 20 s. Its look: a shell of granite plates with gold cracks and an ochre thread to each member within reach, on every tier; the shell bursts into rock when it is pulled away | `council_shoulder.ts`, `council_shoulder_fx.ts` |
-| Heroic | All the above, plus Resonance overlapping the Wrath, Wake the Stone marking 2, every standing pillar pulsing 60 to 75 nature on whoever stands within 3 yd of its face every 2 s (Restless Stone), and every council number 25 percent higher. The raid has no heroic tier yet (`HEROIC_DUNGEON_IDS`), so a dev run switches it on (`/dev heart council heroic`) | `council_ids.ts` (`COUNCIL_DIFFICULTY`) |
+| Song of the Seam | A 3 s kickable bar: sung out, Resonance on 3 players; kicked, on 1. Normal: it starts 1 s after a Wrath lands, so its Resonance is over long before the next Wrath. Heroic: its own clock (first at 20, every 24), so the two may overlap | `council_song.ts` |
+| Resonance | A SPREAD (the rock's opposite): 6 s, a 7 yd ring round the player; every second it rings for 150 to 180 nature on every ally inside the ring (never its carrier), so the marked step away from the group until it ends. It never touches a pillar. On heroic and mythic it may overlap a Wrath: a carrier then needs a pillar's shadow away from the others (still counted in its capacity) | `council_song.ts` |
+| Bond of the Stone | Within 20 yd of each other (body to body) both members take 80 percent less damage (the shared `shield_wall` ward), and every 3 s the bond pulses on the whole raid for 40 to 48, 25 percent of the first louder each time (capped at six times). Apart, it lifts and its count starts again. Two ways through: one tank drags the Singer far off alone while the raid kills the Guardian (the safe one: the raid stacks for the Wrath, the Singer's Wake marks walk back to the cover), or the raid splits and kills both at once (faster, riskier: half the raid fights away from the Wrath's cover and the Rush's curse) | `council_bond.ts` |
+| Floor gap | The floor mechanics (the Wrath and its sight field, the Echo of Wrath, Wake the Stone and an heir's rise spots, Mountain's Rush, Falling Rock) never start within 4 s of each other (`floorGap`). Due together they go in a fixed order (the Wrath, the Echo, the Wake, the Rush, the rock: the cover before the Rush that spends it), one per gap, and each still fires. The seconds a mechanic waited come off its next interval (never below one gap); a held Wrath lands with the waited seconds' worth of energy. Seam Bolt, the song and Hammer's Weight paint no floor and keep their clocks. The `/dev heart council wrath`, `wake`, `rush` and `rock` triggers fire at once, past the gap, and stamp it | `council_floor_gap.ts` (pure), `council_floor.ts` |
+| The stone remembers | When one falls, the survivor gains Memory of Stone (+15 percent damage dealt) and takes up a WEAKER form of the fallen one's signature (`JOB_HEIRS`): the Guardian fallen, the Singer casts the Wrath herself, a lighter one (fills in 35 s, a 3 s bar, 380 to 450), keeping her own kickable Wake; Hammer's Weight and the Rush die with him. The Singer fallen, the Guardian raises the pillars himself, less often (his own 45 s clock, `heirWakeEvery`, plus one 6 s after each Wrath), under RANDOM players on a locked spot with a 2 s warning (nobody chooses, nobody kicks); her rock, bolt, song and Resonance die with her | `council_scope.ts` (`jobHolder`), `council.ts`, `council_stone.ts` |
+| Heroic | All the above, plus the Wake and the Rush free to overlap the Wrath, Resonance on its own clock, Wake the Stone marking 3, every standing pillar pulsing 60 to 75 nature on whoever stands within 3 yd of its face every 2 s (Restless Stone), the cursed pillar's heavier pulse, and every council number 25 percent higher. The raid has no heroic tier yet (`HEROIC_DUNGEON_IDS`), so a dev run switches it on (`/dev heart council heroic`) | `council_ids.ts` (`COUNCIL_DIFFICULTY`) |
 | Mythic | A prototype behind a dev switch until the game has a mythic tier: one more `COUNCIL_DIFFICULTY` row (see "Mythic" below) | `council_ids.ts`, `council_soul.ts` |
+
+**The pillar supply (pinned by simulation, `tests/smith_heart_council_rush.test.ts`).** A
+Wrath cycle is about 59 s (55 s of fill and the 4 s bar). Each cycle gets a Wake 6 s after
+the Wrath lands and a second on its own 30 s clock, both clear of the next Wrath on normal:
+four risen pillars on normal (four times five is twenty places), six on heroic and mythic
+(twenty-four and eighteen). A raid that makes no mistakes always has room for ten at every
+Wrath. One kicked Wake: normal still shelters ten (two pillars of five), heroic is tight
+(three of four, twelve), mythic leaves someone out (three of three, nine). The Rush spends
+pillars only when it is aimed badly, and the rock only when the soak stands by cover. After
+the soft enrage (the 4th Wrath) the cycle is about 26 s and only the after-Wrath Wake fits:
+the enrage is meant to end the fight.
 
 **Health (sketch, unmeasured).** Planning raid DPS about 600 (ten players at level 20;
 Varkhul's measured adds DPS was a median of 696 on heroic), a 4.5 minute fight at about 85
-percent uptime (the Wraths, the soaks, the moves): about 137,000 after the elite factor,
-split by role: the Guardian 22,000 base (50,600), the Slabwright 19,500 (44,850), the Seam
-Singer 18,000 (41,400). The old guardian's single 32,000 (73,600) was a one-mechanic
-blockout's.
+percent uptime: about 137,000 after the elite factor, split by role: the Guardian 32,000
+base (73,600), the Seam Singer 27,500 (63,250). The Slabwright's 19,500 went to the two in
+proportion, so the fight's length is unchanged.
 
 **Damage (sketch, unmeasured).** Anchored to the level-20 cloth reference (about 1,135 to
 1,345 health, `docs/design/class-health-table-2026-09-11.md`) and the dungeon rework's
 bands (a must-avoid hit 35 to 45 percent, a raid pulse 8 to 15): the Wrath about 40 percent
-of a cloth pool, a full soak's share about 35 percent with 3 under it, a thin soak or a
-second Weight a fumble that does not one-shot from full on normal.
+of a cloth pool, the Rush's blow about 42 percent (a must-avoid), a full soak's share about
+35 percent with 3 under it, a Resonance ring about 14 percent a second (step out), the
+cursed pillar's normal pulse about 1.5 percent (a reminder) and its heroic one about 4.
 
-Kill order is the strategy: the Guardian first leaves the energy with a survivor on a
-shorter cycle; the Slabwright first trades chosen cover for random pillars on a 2 s warning;
-the Singer first makes Resonance unstoppable on three. Every order runs to the finish
-(pinned for all six in `tests/smith_heart_council.test.ts`); survivability on normal is to be
-measured in the playtest.
+Kill order is the strategy: the Guardian first leaves the Singer casting a lighter, faster
+Wrath on top of her own kit (no more Rush and no more tank swap, but the Wraths come every
+38 s); the Singer first leaves the Guardian with all his own pressure and random pillars on
+a 2 s warning about once a cycle (no more kicks, no more choosing where the cover goes).
+Both orders run to the finish (pinned in `tests/smith_heart_council.test.ts`).
 
-Role jobs: tanks swap on Hammer's Weight and keep the three off the pillars the raid needs;
-healers recover after each Wrath and each soak; damage dealers kick the Song (and the bolt),
-put the Wake marks where cover is needed and gather three for the rock away from cover;
-Resonance carriers wait out the Wrath by the most damaged pillar.
+Role jobs: tanks swap on Hammer's Weight and keep the two 20 yd apart (the Bond); healers
+recover after each Wrath, soak, Rush and the cursed pillar's pulse; damage dealers kick the
+Song and the bolt and NEVER the Wake, put the Wake marks where cover is needed, gather
+three for the rock away from cover; a Rush mark leads the charge through the cursed pillar;
+Resonance carriers step out of the group.
 
-IP check (2026-10-25, exact phrase plus coined token on the major game wikis): Slabwright,
-Seam Singer, Hammer Council, Hammer's Weight, Wake the Stone, Seam Bolt, Song of the Seam,
+IP check (2026-10-25, exact phrase plus coined token on the major game wikis): Seam
+Singer, Hammer Council, Hammer's Weight, Wake the Stone, Seam Bolt, Song of the Seam,
 Memory of Stone, Rockfall Tremor, Crumbled Stone and Restless Stone returned no game use
 (CLEAR); Falling Rock (already shipped by the Buried Hoards) and Resonance are generic
-English.
+English. IP check (2026-11-03, the two-boss rework): Mountain's Rush and Bond of the Stone
+returned no game use on the major wikis (warcraft.wiki.gg, Wowhead, the Fandom wikis; the
+nearest were Hearthstone's Rush keyword and the Pokemon Sand Rush ability, different
+phrases) (CLEAR); Cursed Pillar, Shattered Charge and Quarry Collapse are generic English.
 
 #### Mythic: Soul in the Stone (prototype, behind a dev switch until the game has a mythic tier)
 
-Designed with the owner (2026-10-26). The game has no mythic tier, so the council's own
+Designed with the owner (2026-10-26), kept through the two-boss rework with two souls (the
+Slabwright's Walking Slab left with it). The game has no mythic tier, so the council's own
 difficulty gained a `'mythic'` row reached only through `/dev heart council mythic on`
-(dev-gated like `heroic`; turning one on turns the other off). No global difficulty, no
-instance selector, and normal and heroic resolve exactly as before (their tests are
-unchanged, and `tests/smith_heart_council_mythic.test.ts` pins that neither ever holds a
-soul pillar). Every number here is a SKETCH, unmeasured.
+(dev-gated like `heroic`; turning one on turns the other off). Every number here is a
+SKETCH, unmeasured.
 
 | Piece | Rule | Where |
 |---|---|---|
-| Heroic and more | Everything heroic has: Resonance overlapping the Wrath, Wake the Stone marking 2, the pillars' pulse, every number 25 percent higher | `COUNCIL_DIFFICULTY.mythic` |
-| Stronger inheritances | The Slabwright fallen: the random pillars rise under 2 players on a 1.5 s warning (`heirRiseWarn`; the locked spot's template carries it, `councilRiseSpotTemplate`, so every client fills the warning to the moment it rises). The Singer fallen: the unbroken song rings on 4 (`heirSongMarks`). The Guardian fallen: the heir's energy fills in 30 s, its Wrath a 3 s bar (`heirFillSeconds`). The last one carries every job | `council_stone.ts`, `council_song.ts`, `council_wrath.ts` |
-| The rock and Resonance never stop | With the Slabwright fallen, its first living heir keeps casting Falling Rock on its timer (`rockOutlivesSlabwright`, `rockCaster`); Resonance already outlives the Singer through the song's heir. They are the only things that break a soul pillar, so a living member always supplies both (pinned for all six kill orders) | `council_stone.ts` |
-| Soul in the Stone | When a member falls, its soul flows into the most intact standing pillar (highest integrity; on a tie the nearest to the body, then the lower id; `soulHost`). With no pillar standing, a fresh one rises where the body lies to hold it. It counts toward the cap of 7 but is never refused. A second fall while one stands takes a second pillar: two soul pillars at once is the punishment | `council_soul.ts` (`takeSoul`) |
-| The soul pillar | Its template id carries the soul, the pillar's kind and its 3 soul pips (`councilSoulTemplate`), so every client draws it with no wire change. Immune to every normal blow (`crackPillar` refuses it; pillars are objects, never targetable). It shields nobody from Mountain's Wrath or the Echo (its wall still stands: a player it alone hides is struck), but it keeps its collider | `council_soul.ts`, `council_wrath.ts` |
-| Its pips | Only two things strike one off: a Falling Rock landing within 6 yd of its face, and a Resonance carrier standing within 3.5 yd of it for 3 s (the timer restarts; by the Singer's soul, 1.5 s) | `council_stone.ts`, `council_song.ts` (`strikeSoulPip`) |
-| At 0 pips | It bursts (its soul dissipates, the usual collapse and rubble) and its behaviour stops. No reward: the survivors keep their Memory of Stone and their mythic inheritance | `council_soul.ts` |
-| The end and the wipe | The last fall crumbles every soul pillar with the council (no rubble left). A wipe stands the five columns whole again (a column a soul took is a plain column again, a walked one goes back to its socket) and the risen ones go | `council_soul.ts` (`crumbleSouls`), `council_pillars.ts` (`restorePillars`) |
-| Guardian's soul: Echo of Wrath | Every 20 s (first 12 s after the soul takes the stone) the pillar's own 3 s bar (`heart_echo_of_wrath`, never kicked), then 60 percent of a Wrath's roll on every player within 45 yd with no other (soulless) pillar between them and it; each pillar that shields someone loses a piece, like the Wrath. With the energy inherited too, the raid needs cover from two sources at once | `council_soul.ts` (`landEcho`) |
-| Slabwright's soul: the Walking Slab | The pillar drags itself at 1.5 yd a second toward the largest group (the player with the most others within 8 yd, roster order on a tie; its group's centre), re-picked every 3 s, swerving round other pillars and the council's bodies and kept on the pit floor. Its wall moves with it (offline and online: the entity's position rides the snapshot and the combat-wall view follows it, its collider anchored on a half-yard grid in both worlds, `wallAnchor`, so the slot's collider index rebuilds a few times a second rather than every tick). Within 1.5 yd of its face: 380 to 440 and a throw, once per player every 1.5 s (Walking Slab); within 4 yd: 70 to 85 each second (Stone Drag). It shields nothing | `council_soul.ts` (`largestGroup`) |
-| Singer's soul: the Endless Song | A raid-wide pulse every 3 s (first 3 s after), 45 to 55 nature, each pulse 12 percent of the first louder, capped at 4 times it (`endlessSongMult`). The pulse count is a stack of an aura on the pillar and the clock to the next pulse is the pillar's own bar (`heart_endless_song`), so clients read both | `council_soul.ts` |
+| Heroic and more | Everything heroic has: the overlaps, Wake the Stone marking 3, the pillars' pulse, every number 25 percent higher, Narrow Shelter at 3 | `COUNCIL_DIFFICULTY.mythic` |
+| Stronger inheritances | The Singer fallen: the Guardian's random pillars rise on a 1.5 s warning (`heirRiseWarn`; the locked spot's template carries it, `councilRiseSpotTemplate`). The Guardian fallen: the Singer's energy fills in 30 s (`heirFillSeconds`) | `council_stone.ts`, `council_wrath.ts` |
+| The rock never stops | With the Singer fallen the Guardian keeps casting Falling Rock on its timer (`rockOutlivesSinger`, `rockCaster`): the rock is the only thing that breaks a soul pillar, so a living member always supplies it (pinned for both kill orders) | `council_stone.ts` |
+| The Quarry collapses | A Rush that hits no pillar while the cursed pillar stands sets the Quarry collapsing (`missCollapse`, the Rush row above) until the cursed pillar breaks | `council_rush.ts` |
+| Soul in the Stone | When a member falls (the first of the two: the second fall ends the fight), its soul flows into the most intact standing pillar (highest integrity; on a tie the nearest to the body, then the lower id; never the cursed pillar; `soulHost`). With no pillar standing, a fresh one rises where the body lies. It counts toward the cap of 7 but is never refused | `council_soul.ts` (`takeSoul`) |
+| The soul pillar | Its template id carries the soul, the pillar's kind and its 3 soul pips (`councilSoulTemplate`). Immune to every normal blow (`crackPillar` refuses it) and the Wrath leaves it standing when every other pillar shatters. It shields nobody from Mountain's Wrath or the Echo (its wall still stands) | `council_soul.ts`, `council_wrath.ts` |
+| Its pips | Only a Falling Rock landing within 6 yd of its face strikes one off (Resonance is a spread now and never touches a pillar) | `council_stone.ts` (`strikeSoulPip`) |
+| At 0 pips | It bursts (its soul dissipates, the usual collapse and rubble) and its behaviour stops. No reward: the survivor keeps its Memory of Stone and its inheritance | `council_soul.ts` |
+| The end and the wipe | The last fall crumbles every soul pillar with the council. A wipe stands the five columns whole again and the risen ones go | `council_soul.ts` (`crumbleSouls`), `council_pillars.ts` (`restorePillars`) |
+| Guardian's soul: Echo of Wrath | Every 20 s (first 12 s after the soul takes the stone) the pillar's own 3 s bar (`heart_echo_of_wrath`, never kicked), then 60 percent of a Wrath's roll on every player within 45 yd with no other (soulless, uncursed) pillar between them and it; each pillar that shields someone loses a piece | `council_soul.ts` (`landEcho`) |
+| Singer's soul: the Endless Song | A raid-wide pulse every 3 s (first 3 s after), 45 to 55 nature, each pulse 12 percent of the first louder, capped at 4 times it (`endlessSongMult`). The pulse count is a stack of an aura on the pillar and the clock to the next pulse is the pillar's own bar (`heart_endless_song`) | `council_soul.ts` |
 
-The Resonance and Falling Rock tooltips (and the personal alert while a soul pillar stands)
-state the mythic soul-pip rule. The Echo's cover is pillars only (the Quarry floor is open, so
-no terrain hides anyone from it). Switched mid-fight (the dev lines), mythic applies whole
-(`council_soul.ts` `syncSoulsToTier`): off mythic every soul leaves its pillar, which stands
-plain, whole and quiet where it was; onto it every member already fallen takes its soul, in
-fall order, and a soul whose pillar burst is never taken again.
+Switched mid-fight (the dev lines), mythic applies whole (`council_soul.ts`
+`syncSoulsToTier`): off mythic every soul leaves its pillar, which stands plain, whole and
+quiet where it was; onto it the member already fallen takes its soul, and a soul whose
+pillar burst is never taken again. `/dev heart council soul guardian|singer` puts a living
+member's soul in a pillar too (two souls at once, for a test).
 
 The cover's fairness (polish pass): the line of sight is not widened. The Wrath's cover is the
-pillar's wall (radius 2.6 for a column, 2.2 for a risen pillar) and the carved column's shaft
-is only 1.5 yd round (its plinth 2.2), so a player who sees the stone between them and the
-caster is always covered, with room to spare; the Echo's (`pillarBetween`) is the wall plus a
-0.35 breath. The fix was the drawing: the shelter was a needle from the pillar's centre a full
-pillar narrower than the real shadow, and is now the real shadow.
+pillar's wall (radius 2.6 for a column, 2.2 for a risen pillar); the Echo's (`pillarBetween`)
+is the wall plus a 0.35 breath.
 
-The Walking Slab's moving wall (polish pass): its half-yard anchor never held (its floor
-height and yaw changed every tick, so the slot republished and the whole field's cell index
-rebuilt every step, about 0.25 ms a tick on a ten-player claim). A walking round wall now
-anchors its height and yaw too (`combat_wall_state.ts` `wallPlacement`), and a walled list
-is indexed as its base's cells with only the walls filed over them
-(`interior_collider_cells.ts` `noteAppendedColliders`): about 0.03 ms a tick.
-
-Deterministic: every pick is ordered (integrity, distance, id; the group by roster order);
-the only rng draws are the damage rolls, in claim-player order, and only on mythic (no
-soul pillar ever stands on normal or heroic, so their draw order is untouched).
-
-The play it asks for: kill order now also decides which soul the raid carries; the soak
-and the Resonance carriers have a second duty (bring the rock and the marked to the soul
-pillar, away from the cover the Wrath and the Echo need); the Echo and the inherited Wrath
-want cover from two directions; the Walking Slab punishes a stacked raid; the Endless Song
-is a clock that only breaking its pillar stops.
+Deterministic: every pick is ordered (integrity, distance, id); the only rng draws are the
+damage rolls, in claim-player order, and only on mythic (no soul pillar ever stands on
+normal or heroic, so their draw order is untouched).
 
 IP check (2026-10-26, exact phrase plus coined token on the major game wikis): Soul in the
-Stone, Echo of Wrath, Walking Slab and Endless Song returned no game use (CLEAR; the
-nearest were a Hytale "SoulStone" mod, Hearthstone's Echo keyword, Remnant 2's Ruin Slab,
-Final Fantasy's Nameless Song, all different). The grind's working name "Grinding Stone"
-sat too close to Guild Wars 2's "Grinding Stones" skill and shipped as Stone Drag (CLEAR).
+Stone, Echo of Wrath and Endless Song returned no game use (CLEAR; the nearest were a Hytale
+"SoulStone" mod, Hearthstone's Echo keyword, Final Fantasy's Nameless Song, all different).
 
 ### 7.2 Guardian of the Breath
 
@@ -1642,115 +1640,6 @@ no plates broken by the boss's fire (Korzul: here the RAID breaks the ice, in ro
 | Heroic | Every damage number 25 percent higher, contagious cold (a shatter splashes 10 yd and adds 45 cold, so one careless player sets off a chain) and the slashes' row above | `quench_ids.ts` (`QUENCH_DIFFICULTY`) |
 | Mythic | Heroic's numbers and the slashes' row above, plus The Blades Hunt (next row), behind its own dev switch (`/dev heart quench mythic`) | `quench_ids.ts` (`QUENCH_DIFFICULTY`) |
 | The Blades Hunt (Mythic) | Once, at a quarter health, a 20 s bar: the guardian stands with its arms raised, past all harm and striking no one, while the four blades cross the lake: a slash every 1.5 s at first and every second by the end, each down a line through a player (the tank too), fixed where it is drawn, 1 s before the blade flies, the same hit with no cold. The cold does not rise (a huddle still warms), the ice does not strain and the cold does not deepen while it lasts | `quench_flurry.ts` |
-| One wipe | The fight ends when no living member fights: every fallen member stands up whole at its place (`Entity.regrown`: no reward twice), the five columns stand whole again, the risen pillars, marks, rubble, Weight and stacks go | `council.ts` (`resetCouncil`), `council_pillars.ts` (`restorePillars`) |
-| One kill | Complete only when all three are dead: the Slab (`the_slab` waits on `SMITH_HEART_COUNCIL`), the heart seal's Hammer vein (`smithHeartVeinWon`) and every credit wait on all three; the risen pillars sink back into the floor | `content/smith_heart.ts`, `seal.ts`, `council_pillars.ts` (`settlePillars`) |
-| Pillars | The five carved columns (claim objects at `QUARRY_PILLAR_SPOTS`) plus the risen ones, at most 7 standing. A carved column has 2 integrity (whole, then cracked) and a risen pillar 1 (`councilPillarFull`), in its template id and stands as a round combat wall (`COMBAT_WALL_SHAPES`): it blocks bodies and the Wrath's sight line, offline and online (`net/combat_wall_wire.ts`). At 0 it falls: its wall goes that tick, rubble lies 8 s and bites 90 to 110 a second, then it is gone. The columns are the field's `encounterOwned` props: the field builds no collider for them | `council_pillars.ts` |
-| Energy | 0 to 100, full in 55 s; the holder's energy bar is its resource (the target frame draws it, the snapshot carries it); after the 4th Wrath it fills 2.5 times faster (the soft enrage) | `council_wrath.ts` |
-| Mountain's Wrath | At 100 (cast id kept, `heart_mountains_wrath`): a 4 s bar, then 440 to 520 to everyone in the Quarry (45 yd) the caster can see; every pillar that stood between it and at least one player loses a piece (once, however many it shielded) | `council_wrath.ts` (`landWrath`), `council_pillars.ts` (`pillarBetween`) |
-| Hammer's Weight | Every 18 s (first at 10): a 1.5 s bar at the tank, then 2.2 times a swing through armor and +100 percent physical damage taken for 25 s: swap tanks | `council_wrath.ts` |
-| Hammerfall | Kept: the frontal arc reads well and keeps the raid off the Guardian's side (110 degrees, 9 yd, 0.7 of a swing, every third swing) | template `arcCleave` |
-| Wake the Stone | Every 30 s (first at 14): a 1.2 s bar, then 1 player (2 on heroic, never more than the cap allows) wear a circle for 5 s; a fresh pillar bursts out where each STANDS (nudged to the nearest clear spot: on the floor, 6.5 yd from another pillar, 4.5 from a council body), 120 to 150 and a throw to everyone within 3 yd | `council_stone.ts`, `council_pillars.ts` (`raisePillar`) |
-| Falling Rock | Every 25 s (first at 9): a 1.2 s bar, then one player wears the soak for 5 s; 1,350 split between everyone within 6 yd (fewer than 3 under it: each takes half as much again and the whole raid takes 140 to 170, the Rockfall Tremor); every pillar within 6 yd of its face loses a piece | `council_stone.ts` |
-| Seam Bolt | Every 8 s: a 2 s kickable bar at a random player in sight, 300 to 340 nature; it lands only on a player still in sight | `council_song.ts` |
-| Song of the Seam | A 3 s kickable bar: sung out, Resonance on 3 players; kicked, on 1. Normal: it starts 1 s after a Wrath lands, so its Resonance (15 s) is over long before the next Wrath (at least 22 s away even in the soft enrage). Heroic: its own clock (first at 20, every 24), so the two overlap | `council_song.ts` |
-| Resonance | 15 s, a ring round the player; standing within 3.5 yd of a pillar's face for 3 s in a row knocks a piece off it, then the 3 s start again; nothing cleanses it (the play: hide behind the most damaged pillar at Wrath, keep off the whole ones). Not a walk-to-cleanse mark (Ignivar's Brand of the Pyre is one) | `council_song.ts` |
-| The stone remembers | When one falls, every survivor gains a stack of Memory of Stone (+15 percent damage dealt each) and takes up its job in a worse form: the Slabwright's pillars rise under RANDOM players on a locked spot with a 2 s warning (the Falling Rock stops with it); the Singer's song is sung by a survivor on 3 players and no kick stops it (the bolt stops with it); the Guardian's energy passes to a survivor (from empty) with a shorter Wrath (fills in 35 s, a 3 s bar, 380 to 450; Hammer's Weight stops with it). The heir is the first survivor in `JOB_HEIRS`; the last one carries every job | `council_scope.ts` (`jobHolder`), `council.ts` |
-| Stone Prison | Every 40 s (first at 20): a 1.5 s bar from the Slabwright, then 2 players (3 on Mythic; never its foes' tanks while anyone else stands) are stunned inside a block of stone, a real target (1,000 health, 1,200 on Mythic). Break it and its player is free, as a stasis immunity does too (the mage's Cold Coffin); 10 s later (8 on Mythic) it crushes them. It stops with the Slabwright; blocks standing still count down | `council_prison.ts`, `council_prison_fx.ts` |
-| Floor gap | The floor mechanics (Mountain's Wrath and its sight field, the Echo of Wrath, Wake the Stone and an heir's rise spots, Falling Rock, the Walking Slab's start) never start within 4 s of each other (`floorGap`): one due sooner waits and starts the moment the gap is over. Due together they go in a fixed order (the Wrath, the Echo, the Wake, the rock, the slab), one per gap, and each still fires. The seconds a mechanic waited come off its next interval (never below one gap), so it keeps its cadence and the fight never drifts slower; a held Wrath lands with the waited seconds' worth of energy. Seam Bolt, the song, Hammer's Weight and Stone Prison paint no floor and keep their clocks. The `/dev heart council wrath`, `wake`, `rock` and `soul slabwright` triggers fire at once, past the gap, and stamp it | `council_floor_gap.ts` (pure), `council_floor.ts` |
-| Narrow Shelter (Heroic 4, Mythic 3) | One pillar shields only so many players from Mountain's Wrath; with more behind it each of them takes half the blast (`crowdShare`) and the raid is warned. The Echo of Wrath keeps no limit. The caster wears the limit through its bar (`heart_narrow_shelter`, `value2`); on each standing pillar's sheltered side a row of gems, one per player it can shield, lit as they hide, red past the limit, on every tier | `council_wrath.ts`, `council_limit_fx.ts` |
-| Shouldered Stone (Mythic) | Within 10 yd of another living member (body to body) the Slabwright takes 80 percent less damage (the shared `shield_wall` ward), so one tank holds the Guardian with the Seam Singer and the other takes the Slabwright away; the other two have no such rule. A raid warning at most every 20 s. Its look: a shell of granite plates with gold cracks and an ochre thread to each member within reach, on every tier; the shell bursts into rock when it is pulled away | `council_shoulder.ts`, `council_shoulder_fx.ts` |
-| Heroic | All the above, plus Resonance overlapping the Wrath, Wake the Stone marking 2, every standing pillar pulsing 60 to 75 nature on whoever stands within 3 yd of its face every 2 s (Restless Stone), and every council number 25 percent higher. The raid has no heroic tier yet (`HEROIC_DUNGEON_IDS`), so a dev run switches it on (`/dev heart council heroic`) | `council_ids.ts` (`COUNCIL_DIFFICULTY`) |
-| Mythic | A prototype behind a dev switch until the game has a mythic tier: one more `COUNCIL_DIFFICULTY` row (see "Mythic" below) | `council_ids.ts`, `council_soul.ts` |
-
-**Health (sketch, unmeasured).** Planning raid DPS about 600 (ten players at level 20;
-Varkhul's measured adds DPS was a median of 696 on heroic), a 4.5 minute fight at about 85
-percent uptime (the Wraths, the soaks, the moves): about 137,000 after the elite factor,
-split by role: the Guardian 22,000 base (50,600), the Slabwright 19,500 (44,850), the Seam
-Singer 18,000 (41,400). The old guardian's single 32,000 (73,600) was a one-mechanic
-blockout's.
-
-**Damage (sketch, unmeasured).** Anchored to the level-20 cloth reference (about 1,135 to
-1,345 health, `docs/design/class-health-table-2026-09-11.md`) and the dungeon rework's
-bands (a must-avoid hit 35 to 45 percent, a raid pulse 8 to 15): the Wrath about 40 percent
-of a cloth pool, a full soak's share about 35 percent with 3 under it, a thin soak or a
-second Weight a fumble that does not one-shot from full on normal.
-
-Kill order is the strategy: the Guardian first leaves the energy with a survivor on a
-shorter cycle; the Slabwright first trades chosen cover for random pillars on a 2 s warning;
-the Singer first makes Resonance unstoppable on three. Every order runs to the finish
-(pinned for all six in `tests/smith_heart_council.test.ts`); survivability on normal is to be
-measured in the playtest.
-
-Role jobs: tanks swap on Hammer's Weight and keep the three off the pillars the raid needs;
-healers recover after each Wrath and each soak; damage dealers kick the Song (and the bolt),
-put the Wake marks where cover is needed and gather three for the rock away from cover;
-Resonance carriers wait out the Wrath by the most damaged pillar.
-
-IP check (2026-10-25, exact phrase plus coined token on the major game wikis): Slabwright,
-Seam Singer, Hammer Council, Hammer's Weight, Wake the Stone, Seam Bolt, Song of the Seam,
-Memory of Stone, Rockfall Tremor, Crumbled Stone and Restless Stone returned no game use
-(CLEAR); Falling Rock (already shipped by the Buried Hoards) and Resonance are generic
-English.
-
-#### Mythic: Soul in the Stone (prototype, behind a dev switch until the game has a mythic tier)
-
-Designed with the owner (2026-10-26). The game has no mythic tier, so the council's own
-difficulty gained a `'mythic'` row reached only through `/dev heart council mythic on`
-(dev-gated like `heroic`; turning one on turns the other off). No global difficulty, no
-instance selector, and normal and heroic resolve exactly as before (their tests are
-unchanged, and `tests/smith_heart_council_mythic.test.ts` pins that neither ever holds a
-soul pillar). Every number here is a SKETCH, unmeasured.
-
-| Piece | Rule | Where |
-|---|---|---|
-| Heroic and more | Everything heroic has: Resonance overlapping the Wrath, Wake the Stone marking 2, the pillars' pulse, every number 25 percent higher | `COUNCIL_DIFFICULTY.mythic` |
-| Stronger inheritances | The Slabwright fallen: the random pillars rise under 2 players on a 1.5 s warning (`heirRiseWarn`; the locked spot's template carries it, `councilRiseSpotTemplate`, so every client fills the warning to the moment it rises). The Singer fallen: the unbroken song rings on 4 (`heirSongMarks`). The Guardian fallen: the heir's energy fills in 30 s, its Wrath a 3 s bar (`heirFillSeconds`). The last one carries every job | `council_stone.ts`, `council_song.ts`, `council_wrath.ts` |
-| The rock and Resonance never stop | With the Slabwright fallen, its first living heir keeps casting Falling Rock on its timer (`rockOutlivesSlabwright`, `rockCaster`); Resonance already outlives the Singer through the song's heir. They are the only things that break a soul pillar, so a living member always supplies both (pinned for all six kill orders) | `council_stone.ts` |
-| Soul in the Stone | When a member falls, its soul flows into the most intact standing pillar (highest integrity; on a tie the nearest to the body, then the lower id; `soulHost`). With no pillar standing, a fresh one rises where the body lies to hold it. It counts toward the cap of 7 but is never refused. A second fall while one stands takes a second pillar: two soul pillars at once is the punishment | `council_soul.ts` (`takeSoul`) |
-| The soul pillar | Its template id carries the soul, the pillar's kind and its 3 soul pips (`councilSoulTemplate`), so every client draws it with no wire change. Immune to every normal blow (`crackPillar` refuses it; pillars are objects, never targetable). It shields nobody from Mountain's Wrath or the Echo (its wall still stands: a player it alone hides is struck), but it keeps its collider | `council_soul.ts`, `council_wrath.ts` |
-| Its pips | Only two things strike one off: a Falling Rock landing within 6 yd of its face, and a Resonance carrier standing within 3.5 yd of it for 3 s (the timer restarts; by the Singer's soul, 1.5 s) | `council_stone.ts`, `council_song.ts` (`strikeSoulPip`) |
-| At 0 pips | It bursts (its soul dissipates, the usual collapse and rubble) and its behaviour stops. No reward: the survivors keep their Memory of Stone and their mythic inheritance | `council_soul.ts` |
-| The end and the wipe | The last fall crumbles every soul pillar with the council (no rubble left). A wipe stands the five columns whole again (a column a soul took is a plain column again, a walked one goes back to its socket) and the risen ones go | `council_soul.ts` (`crumbleSouls`), `council_pillars.ts` (`restorePillars`) |
-| Guardian's soul: Echo of Wrath | Every 20 s (first 12 s after the soul takes the stone) the pillar's own 3 s bar (`heart_echo_of_wrath`, never kicked), then 60 percent of a Wrath's roll on every player within 45 yd with no other (soulless) pillar between them and it; each pillar that shields someone loses a piece, like the Wrath. With the energy inherited too, the raid needs cover from two sources at once | `council_soul.ts` (`landEcho`) |
-| Slabwright's soul: the Walking Slab | The pillar drags itself at 1.5 yd a second toward the largest group (the player with the most others within 8 yd, roster order on a tie; its group's centre), re-picked every 3 s, swerving round other pillars and the council's bodies and kept on the pit floor. Its wall moves with it (offline and online: the entity's position rides the snapshot and the combat-wall view follows it, its collider anchored on a half-yard grid in both worlds, `wallAnchor`, so the slot's collider index rebuilds a few times a second rather than every tick). Within 1.5 yd of its face: 380 to 440 and a throw, once per player every 1.5 s (Walking Slab); within 4 yd: 70 to 85 each second (Stone Drag). It shields nothing | `council_soul.ts` (`largestGroup`) |
-| Singer's soul: the Endless Song | A raid-wide pulse every 3 s (first 3 s after), 45 to 55 nature, each pulse 12 percent of the first louder, capped at 4 times it (`endlessSongMult`). The pulse count is a stack of an aura on the pillar and the clock to the next pulse is the pillar's own bar (`heart_endless_song`), so clients read both | `council_soul.ts` |
-
-The Resonance and Falling Rock tooltips (and the personal alert while a soul pillar stands)
-state the mythic soul-pip rule. The Echo's cover is pillars only (the Quarry floor is open, so
-no terrain hides anyone from it). Switched mid-fight (the dev lines), mythic applies whole
-(`council_soul.ts` `syncSoulsToTier`): off mythic every soul leaves its pillar, which stands
-plain, whole and quiet where it was; onto it every member already fallen takes its soul, in
-fall order, and a soul whose pillar burst is never taken again.
-
-The cover's fairness (polish pass): the line of sight is not widened. The Wrath's cover is the
-pillar's wall (radius 2.6 for a column, 2.2 for a risen pillar) and the carved column's shaft
-is only 1.5 yd round (its plinth 2.2), so a player who sees the stone between them and the
-caster is always covered, with room to spare; the Echo's (`pillarBetween`) is the wall plus a
-0.35 breath. The fix was the drawing: the shelter was a needle from the pillar's centre a full
-pillar narrower than the real shadow, and is now the real shadow.
-
-The Walking Slab's moving wall (polish pass): its half-yard anchor never held (its floor
-height and yaw changed every tick, so the slot republished and the whole field's cell index
-rebuilt every step, about 0.25 ms a tick on a ten-player claim). A walking round wall now
-anchors its height and yaw too (`combat_wall_state.ts` `wallPlacement`), and a walled list
-is indexed as its base's cells with only the walls filed over them
-(`interior_collider_cells.ts` `noteAppendedColliders`): about 0.03 ms a tick.
-
-Deterministic: every pick is ordered (integrity, distance, id; the group by roster order);
-the only rng draws are the damage rolls, in claim-player order, and only on mythic (no
-soul pillar ever stands on normal or heroic, so their draw order is untouched).
-
-The play it asks for: kill order now also decides which soul the raid carries; the soak
-and the Resonance carriers have a second duty (bring the rock and the marked to the soul
-pillar, away from the cover the Wrath and the Echo need); the Echo and the inherited Wrath
-want cover from two directions; the Walking Slab punishes a stacked raid; the Endless Song
-is a clock that only breaking its pillar stops.
-
-IP check (2026-10-26, exact phrase plus coined token on the major game wikis): Soul in the
-Stone, Echo of Wrath, Walking Slab and Endless Song returned no game use (CLEAR; the
-nearest were a Hytale "SoulStone" mod, Hearthstone's Echo keyword, Remnant 2's Ruin Slab,
-Final Fantasy's Nameless Song, all different). The grind's working name "Grinding Stone"
-sat too close to Guild Wars 2's "Grinding Stones" skill and shipped as Stone Drag (CLEAR).
 
 ### 7.2 Guardian of the Breath
 
@@ -2238,14 +2127,20 @@ on both difficulties (dungeon rework README, goal 4).
   areas, the fall, the seal memory's arrival (live and late), the room's darkness, FinalFx
   over a fake world.
 - `tests/smith_heart_council.test.ts` (on `tests/helpers/council_fight.ts`): the Hammer
-  Council over a real claim: one pull for all three (and nothing else), the energy bar, the
-  five columns as round walls, Wake the Stone's pillar at the marked spot and its throw, the
-  rise's spacing, the Wrath sparing the hidden, striking the exposed and cracking the
-  shielding pillar, Resonance's 3 s cracks and restart, the fall into rubble and the wipe
-  restoring the five, the soak's split and pillars, all six kill orders to the finish, the
-  wipe standing a fallen member up, normal's song after the Wrath, heroic's two marks,
-  pulse and own clock, a kicked song, the Slab and the seal waiting on all three, and
-  determinism.
+  Council over a real claim: two members and no Slabwright, one pull for both (and nothing
+  else), the energy bar, the five columns as round walls, Wake the Stone's two pillars at the
+  marked spots and its throw, a kicked Wake raising nothing, the rise's spacing, the Wrath
+  sparing the hidden, striking the exposed and shattering every pillar (the first Wrath
+  takes the columns, the next needs Wake's stone), the fall into rubble and the wipe
+  restoring the five, the soak's split and pillars, Resonance's spread, both kill orders
+  (the Singer's lighter Wrath; the Guardian's random pillars, less often) to the finish, the
+  wipe standing a fallen member up, normal's song after the Wrath, heroic's three marks,
+  pulse and own clock, a kicked song, the Slab and the seal waiting on both, and
+  determinism. `tests/smith_heart_council_rush.test.ts`: Mountain's Rush (never a tank, the
+  first pillar on its line: cursed, sheltering, none), the cursed pillar (its pulse per tier,
+  untouched by the rock, no shelter, shattered by the Wrath), mythic's collapse, Bond of the
+  Stone together and apart, and the pillar supply over whole pulls per tier (with and
+  without a kicked Wake).
 - `tests/smith_heart_council_ui.test.ts`: every raid warning's key resolving to the English
   the sim sent, the personal alert's priorities, the marks' tooltips from the live tuning,
   every cast and damage name re-localized.
@@ -2272,8 +2167,8 @@ on both difficulties (dungeon rework README, goal 4).
   the look's pure plans and both painters over a fake world.
 - `tests/smith_heart_council_soul_wire.test.ts`: the Mythic soul pillars over the real
   server snapshot path into the online mirror on the browser's timer wire (the soul and
-  its pips, the Walking Slab's position and collider, the Echo's and the Endless Song's
-  bars, the song's pulse count, the burst).
+  its pips, the Echo's and the Endless Song's bars, the song's pulse count, the burst) and
+  the cursed pillar and its collider.
 - `scripts/heart_council_raid.mjs`: the council fought by ten bots over a live dev server
   (two tanks, two healers, six damage dealers; nine and a human with `JOIN`), playing the
   mechanics from the snapshots and writing a fight log; its positioning
@@ -2319,14 +2214,14 @@ on both difficulties (dungeon rework README, goal 4).
 | `/dev heart final <ability>` | one ability now, on any tier: `fist` (on you), `whirl`, `embers`, `freeze` (you), `cold <n>`, `ice`, `wind [deg]`, `bolt`, `drawn`, `orbs`, `tremor`, `anvil` (on you), `shell` |
 | `/dev heart reset` | free the run and claim a fresh one |
 | `/dev heart council` | the Hammer Council's readout (difficulty, each member's health, energy, Wraths, the fallen in order) |
-| `/dev heart council pull` | pull all three onto you |
+| `/dev heart council pull` | pull both onto you |
 | `/dev heart council reset` | the council whole again and out of its fight, the five columns with it |
 | `/dev heart council heroic [on, off]` | the council's heroic rules for this run (the raid has no heroic tier yet) |
 | `/dev heart council energy <n>` | set the Wrath holder's energy (95: a Wrath in about 3 s) |
-| `/dev heart council <mechanic>` | force one mechanic now: wrath, weight, wake, rock, bolt, song (skips its timing guard), resonance [n] |
-| `/dev heart kill guardian`, `slabwright`, `singer` | kill one council member (try each order of the inheritance); `kill council` or `kill hammer` kills all three |
+| `/dev heart council <mechanic>` | force one mechanic now: wrath, weight, rush (the Guardian's charge and its cursed pillar), wake, rock, bolt, song (skips its timing guard), resonance [n] |
+| `/dev heart kill guardian`, `singer` | kill one council member (try each kill order); `kill council` or `kill hammer` kills both |
 | `/dev heart council mythic [on, off]` | the council's mythic prototype for this run (turning it on turns heroic off, and the other way round); mid-fight it applies whole: off, every soul leaves its pillar; on, every member already fallen takes its soul |
-| `/dev heart council soul guardian`, `slabwright`, `singer` | that member's soul takes a pillar now (the most intact, as a fall would), even with the member alive |
+| `/dev heart council soul guardian`, `singer` | that member's soul takes a pillar now (the most intact, as a fall would), even with the member alive |
 | `/dev heart council soulpip <n>` | leave every soul pillar at n pips (0 to 3; 0 bursts them as a last pip would) |
 | `/dev heart breath` | the Guardian of the Breath's readout (difficulty, health, half, the wind's phase and bearing, blows, the next indrawn breath, the swell) |
 | `/dev heart breath pull` | set you down on the Storm Cornice beside the guardian and pull it |
@@ -2352,7 +2247,6 @@ on both difficulties (dungeon rework README, goal 4).
 | `/dev heart quench breath` | Quenching Breath now (echoed by every blade once they are awake) |
 | `/dev heart quench echo [strike]` | a breath (or a strike) echoed by every blade now; wakes the blades first if needed |
 | `/dev heart quench dance` | two blades cross the lake now, on any tier (wakes the blades first if needed) |
-| `/dev heart council prison` | Stone Prison's bar now |
 | `/dev heart quench wander off` (or `on`) | the Guardian of the Quench's blades hold still, or glide again |
 | `/dev heart heat` | the Guardian of the Heat's readout (difficulty, health, phase and stage, the overflow's clock, the next fist, seeds, bands, cinders, Wellspawn, keepers, how many fed it, your Cinder Grip) |
 | `/dev heart heat pull` | set you down on the Hearth's shore before the wellspring and pull it |
