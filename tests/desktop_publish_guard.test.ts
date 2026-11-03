@@ -69,6 +69,23 @@ function grepQF(pattern: string, input: string): boolean {
 }
 
 describe('desktop-publish version lockstep guard', () => {
+  it('fetches full ancestry but checks out only the files read by the release guards', () => {
+    const verify = workflow.slice(workflow.indexOf('\n  verify:'), stepEnd);
+    const checkout = verify.slice(0, verify.indexOf('- name: Verify the tagged commit'));
+    expect(checkout).toMatch(/fetch-depth:\s*0/);
+    expect(checkout).toMatch(/sparse-checkout-cone-mode:\s*false/);
+    const sparse = checkout.match(/sparse-checkout: \|\n((?: {12}.+\n)+)/)?.[1];
+    expect(sparse).toBeDefined();
+    if (!sparse) throw new Error('Release guard checkout must select its input files');
+    const files = sparse
+      .trim()
+      .split('\n')
+      .map((line) => line.trim().replace(/^\//, ''));
+    expect(files.sort()).toEqual(['package.json', ...guards.map((guard) => guard.file)].sort());
+    for (const file of files) expect(readFileSync(file, 'utf8').length).toBeGreaterThan(0);
+    expect(verify).toContain('git merge-base --is-ancestor "$GITHUB_SHA" origin/main');
+  });
+
   it('carries exactly two fixed-string mechanism greps in the lockstep step', () => {
     expect(stepAt).toBeGreaterThan(-1);
     expect(stepEnd).toBeGreaterThan(stepAt);
