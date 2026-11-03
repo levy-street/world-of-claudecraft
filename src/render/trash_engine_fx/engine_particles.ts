@@ -238,7 +238,7 @@ export class EngineParticles {
       s.az = 0;
       s.life = o.life * (0.7 + this.rand() * 0.6);
       s.drag = o.drag ?? 1.2;
-      s.floor = y - 0.6;
+      s.floor = o.floor ?? y - 0.6;
       s.size0 = o.size[0];
       s.size1 = o.size[1];
       s.spin = (this.rand() - 0.5) * 2;
