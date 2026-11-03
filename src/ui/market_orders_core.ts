@@ -6,6 +6,7 @@
 // Vitest drives every branch with plain objects (the market_view precedent).
 
 import { ITEMS } from '../sim/data';
+import { isTrackedItemGrant } from '../sim/item_tracking';
 import { MARKET_ORDER_MAX_UNITS } from '../sim/market_orders';
 import { isMaterialItemId } from '../sim/material_ids';
 import type { ItemDef } from '../sim/types';
@@ -116,9 +117,11 @@ export function orderCountFromInput(raw: string): number {
   return Math.min(MARKET_ORDER_MAX_UNITS, n);
 }
 
-/** An item a buy order may name: the same gate the Sell tab and the sim apply. */
+/** An item a buy order may name: the same eligibility gate the sim applies. */
 export function orderableItem(item: ItemDef): boolean {
-  return item.kind !== 'quest' && !item.noMarketList && !item.soulbound;
+  return (
+    item.kind !== 'quest' && !item.noMarketList && !item.soulbound && !isTrackedItemGrant(item)
+  );
 }
 
 /** The def behind a staged id, or null when it is unknown or not orderable

@@ -6,7 +6,8 @@
 // pinned in tests/market_orders_plan.test.ts.
 import { describe, expect, it } from 'vitest';
 import { bagPools, canGrantCopies } from '../src/sim/bags';
-import { ITEMS } from '../src/sim/data';
+import { recipeById } from '../src/sim/content/recipes';
+import { DELVES, ITEMS, STATIONS } from '../src/sim/data';
 import { isTrackedItemGrant } from '../src/sim/item_tracking';
 import { MARKET_CUT } from '../src/sim/market';
 import {
@@ -14,6 +15,8 @@ import {
   MARKET_ORDER_DURATION,
   MARKET_ORDER_MAX_UNITS,
 } from '../src/sim/market_orders';
+import { craftItem } from '../src/sim/professions/crafting';
+import { stationsOfType } from '../src/sim/professions/stations';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
@@ -85,6 +88,39 @@ function info(sim: Sim, pid: number) {
 }
 
 describe('marketOrderPlace', () => {
+  it('rejects a real crafted Clockreel order before charging escrow', () => {
+    const sim = makeWorld();
+    const pid = player(sim, 'Crafter', 'warrior', 1_000);
+    const meta = playerOf(sim, pid);
+    const p = entityOf(sim, pid);
+    const recipe = recipeById('recipe_clockreel_fishing_rod');
+    if (!recipe?.stationType) throw new Error('missing Clockreel recipe or station');
+    const station = stationsOfType(STATIONS, recipe.stationType)[0];
+    if (!station) throw new Error('missing Clockreel station');
+    meta.inventory = [];
+    meta.craftSkills.engineering = 125;
+    meta.knownRecipes.add(recipe.id);
+    for (const reagent of recipe.reagents) sim.addItem(reagent.itemId, reagent.count, pid);
+    p.pos.x = station.pos.x;
+    p.pos.z = station.pos.z;
+    p.prevPos = { ...p.pos };
+    expect(craftItem(sim.ctx, recipe.id, false, pid).casting).toBe(true);
+    p.castingAbility = null;
+    p.castRemaining = 0;
+    sim.ctx.completeCraftCast(p, meta);
+    expect(meta.lastCraftResult?.ok).toBe(true);
+    const rod = meta.inventory.find((slot) => slot.itemId === 'clockreel_fishing_rod');
+    expect(rod?.instance?.signer).toBeTruthy();
+    expect(bagCount(sim, pid, 'clockreel_fishing_rod')).toBe(0);
+
+    standAtMerchant(sim, pid);
+    sim.events.length = 0;
+    const copper = meta.copper;
+    expect(sim.marketOrderPlace('clockreel_fishing_rod', 1, 50, pid)).toEqual([]);
+    expect(errors(sim)).toEqual(['The Merchant takes no orders for one-of-a-kind gear.']);
+    expect(meta.copper).toBe(copper);
+    expect(sim.marketOrders).toEqual([]);
+  });
   it('escrows count times bid, opens the order, and shows it first in the readout', () => {
     const sim = makeWorld();
     const buyer = player(sim, 'Buyer', 'mage', 10_000);
@@ -259,6 +295,31 @@ describe('marketOrderPlace', () => {
 });
 
 describe('marketOrderFill', () => {
+  it('accepts a plain Stormreel from its real Marks vendor for a wanted order', () => {
+    const sim = makeWorld();
+    const buyer = player(sim, 'Buyer', 'mage', 1_000);
+    const seller = player(sim, 'Seller');
+    const meta = playerOf(sim, seller);
+    const p = entityOf(sim, seller);
+    const rod = 'stormreel_fishing_rod';
+    expect(ITEMS[rod].buyValue).toBeUndefined();
+    meta.delveClears['drowned_litany:normal'] = 3;
+    meta.delveMarks = 24;
+    const door = DELVES.drowned_litany.doorPos;
+    p.pos.x = door.x;
+    p.pos.z = door.z;
+    p.prevPos = { ...p.pos };
+    sim.delveBuyShopItem('drowned_litany', rod, seller);
+    expect(bagCount(sim, seller, rod)).toBe(1);
+
+    standAtMerchant(sim, seller);
+    sim.marketOrderPlace(rod, 1, 50, buyer);
+    expect(sim.marketOrders).toHaveLength(1);
+    const result = sim.marketOrderFill(sim.marketOrders[0].id, 1, seller);
+    expect(result).toEqual({ units: 1, copper: 50 });
+    expect(bagCount(sim, seller, rod)).toBe(0);
+    expect(sim.marketOrders).toHaveLength(0);
+  });
   function board(sim: Sim) {
     const buyer = player(sim, 'Buyer', 'mage', 10_000);
     sim.marketOrderPlace(ORE, 5, 30, buyer);
