@@ -3,6 +3,7 @@ import type { IWorld } from '../world_api';
 import {
   type AfflictionFamiliarPose,
   afflictionFamiliarClass,
+  afflictionFamiliarHoverY,
   afflictionFamiliarLookYaw,
   isAfflictionFamiliarPossessed,
   shouldShowAfflictionFamiliar,
@@ -31,6 +32,9 @@ if (typeof window !== 'undefined') {
 
 interface AfflictionFamiliarHostView {
   group: THREE.Group;
+  /** Unscaled model height (the renderer's view height); the eye hovers at
+   *  its owner's head from it. */
+  height?: number;
 }
 
 export type AfflictionFamiliarModelFactory = () => THREE.Object3D | null;
@@ -57,8 +61,8 @@ function buildApprovedMaledictEye(): THREE.Object3D | null {
  * LOCAL warlock of any spec. It is the clone the live familiar draws, so it
  * wears the loader cache's materials: the program linked here is the one every
  * attach reuses, held for the session because those materials are never
- * disposed. Null for any other class (the familiar is local-only) and before
- * the deferred model has loaded, where the first attach's gate covers it.
+ * disposed. Null for any other class and before the deferred model has loaded:
+ * there, a remote Hexcraft warlock's first eye rides the first attach's gate.
  */
 export function buildAfflictionFamiliarPrewarmStandIn(
   localClass: string,
@@ -73,17 +77,24 @@ export function buildAfflictionFamiliarPrewarmStandIn(
   return root;
 }
 
+/** One eye: its built root (kept across hides so a re-show links nothing) and
+ *  the view group it currently sits on. */
+interface FamiliarSlot {
+  root: THREE.Group;
+  host: THREE.Group | null;
+}
+
 /**
- * Presentation-only companion for the local Affliction warlock.
- * It is deliberately not a sim entity, target, pet, collider, or gameplay actor.
+ * Presentation-only companion for every Affliction warlock in view, the local
+ * player and everyone else alike. It is deliberately not a sim entity, target,
+ * pet, collider, or gameplay actor.
  */
 export class AfflictionFamiliar {
-  // Built once and re-attached on every show: its clone shares the loader
+  // One slot per warlock, kept across hides: each clone shares the loader
   // cache's materials, so a re-attach after a spec switch links nothing, and
-  // only the first attach rides the compile gate (a pending gate keeps the
-  // root hidden across a re-attach too, since the gate owns its visibility).
-  private root: THREE.Group | null = null;
-  private host: THREE.Group | null = null;
+  // only the very first attach rides the compile gate (a pending gate keeps
+  // that root hidden across a re-attach too, since the gate owns its visibility).
+  private readonly slots = new Map<number, FamiliarSlot>();
   private gated = false;
   private readonly pose: AfflictionFamiliarPose = {
     x: 0,
@@ -105,31 +116,64 @@ export class AfflictionFamiliar {
     reducedMotion = false,
     timeSeconds = performance.now() / 1000,
   ): void {
-    const owner = world.entities.get(world.playerId);
-    const host = views.get(world.playerId)?.group;
-    const visible =
-      !!owner && !!host && shouldShowAfflictionFamiliar(owner, world.playerId, world.talentSpec);
-
-    if (this.host && (!visible || this.host !== host || this.root?.parent !== this.host)) {
-      this.clear();
-    }
-    if (!visible || !owner || !host) return;
-
-    if (!this.host) {
-      const root = this.root ?? this.buildRoot();
-      if (!root) return;
-      this.host = host;
-      if (this.gated) {
-        host.add(root);
-      } else {
-        this.gated = true;
-        void attachSceneGroupGated(host, root, this.compileGate());
+    for (const [id, slot] of this.slots) {
+      const owner = world.entities.get(id);
+      const view = views.get(id);
+      const visible =
+        !!owner && !!view && shouldShowAfflictionFamiliar(owner, world.playerId, world.talentSpec);
+      if (!visible || slot.host !== view.group || slot.root.parent !== slot.host) {
+        this.hide(slot);
       }
+      if (!owner) this.slots.delete(id);
     }
+    for (const owner of world.entities.values()) {
+      if (owner.kind !== 'player') continue;
+      const view = views.get(owner.id);
+      if (!view || !shouldShowAfflictionFamiliar(owner, world.playerId, world.talentSpec)) continue;
+      const slot = this.slots.get(owner.id) ?? this.buildSlot(owner.id);
+      if (!slot) continue;
+      if (!slot.host) this.attach(slot, view.group);
+      this.pose3d(slot, owner, view, views, reducedMotion, timeSeconds);
+    }
+  }
 
-    writeAfflictionFamiliarPose(this.pose, timeSeconds, owner.id, reducedMotion);
+  clear(): void {
+    for (const slot of this.slots.values()) this.hide(slot);
+  }
+
+  private attach(slot: FamiliarSlot, host: THREE.Group): void {
+    slot.host = host;
+    if (this.gated) {
+      host.add(slot.root);
+    } else {
+      this.gated = true;
+      void attachSceneGroupGated(host, slot.root, this.compileGate());
+    }
+  }
+
+  private hide(slot: FamiliarSlot): void {
+    slot.root.removeFromParent();
+    slot.host = null;
+  }
+
+  private pose3d(
+    slot: FamiliarSlot,
+    owner: NonNullable<ReturnType<IWorld['entities']['get']>>,
+    view: AfflictionFamiliarHostView,
+    views: ReadonlyMap<number, AfflictionFamiliarHostView>,
+    reducedMotion: boolean,
+    timeSeconds: number,
+  ): void {
+    const host = view.group;
+    writeAfflictionFamiliarPose(
+      this.pose,
+      timeSeconds,
+      owner.id,
+      reducedMotion,
+      afflictionFamiliarHoverY(view.height),
+    );
     const possessed = isAfflictionFamiliarPossessed(owner);
-    const root = this.root as THREE.Group;
+    const root = slot.root;
     root.position.set(this.pose.x, this.pose.y, this.pose.z);
     const targetView = views.get(owner.castTargetId ?? owner.targetId ?? -1);
     const yaw =
@@ -146,18 +190,14 @@ export class AfflictionFamiliar {
     root.scale.setScalar((possessed ? 1.15 : 1) / Math.max(0.01, owner.scale));
   }
 
-  clear(): void {
-    this.root?.removeFromParent();
-    this.host = null;
-  }
-
-  private buildRoot(): THREE.Group | null {
+  private buildSlot(id: number): FamiliarSlot | null {
     const model = this.modelFactory();
     if (!model) return null;
     const root = new THREE.Group();
     root.name = 'affliction-familiar';
     root.add(model);
-    this.root = root;
-    return root;
+    const slot: FamiliarSlot = { root, host: null };
+    this.slots.set(id, slot);
+    return slot;
   }
 }

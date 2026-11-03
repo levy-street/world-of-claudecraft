@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
+  AFFLICTION_FAMILIAR_HEIGHT_FRAC,
   type AfflictionFamiliarPose,
+  afflictionFamiliarHoverY,
   afflictionFamiliarLookYaw,
   shouldShowAfflictionFamiliar,
   writeAfflictionFamiliarPose,
@@ -19,7 +21,7 @@ function emptyPose(): AfflictionFamiliarPose {
 }
 
 describe('Affliction familiar presentation core', () => {
-  it('shows only for the local living Affliction warlock', () => {
+  it('shows for any living Affliction warlock, the local one by its talent spec', () => {
     expect(shouldShowAfflictionFamiliar(warlock, 7, 'affliction')).toBe(true);
     expect(shouldShowAfflictionFamiliar(warlock, 7, 'necromancy')).toBe(false);
     expect(shouldShowAfflictionFamiliar(warlock, 7, null)).toBe(false);
@@ -28,7 +30,24 @@ describe('Affliction familiar presentation core', () => {
       false,
     );
     expect(shouldShowAfflictionFamiliar({ ...warlock, kind: 'mob' }, 7, 'affliction')).toBe(false);
+    // Another player's eye reads the spec their identity wire replicates.
     expect(shouldShowAfflictionFamiliar(warlock, 8, 'affliction')).toBe(false);
+    expect(shouldShowAfflictionFamiliar({ ...warlock, specId: 'affliction' }, 8, null)).toBe(true);
+    expect(
+      shouldShowAfflictionFamiliar({ ...warlock, specId: 'demonology' }, 8, 'affliction'),
+    ).toBe(false);
+    expect(
+      shouldShowAfflictionFamiliar({ ...warlock, specId: 'affliction', dead: true }, 8, null),
+    ).toBe(false);
+  });
+
+  it('hovers at head height when the view knows its model height', () => {
+    expect(afflictionFamiliarHoverY(2)).toBeCloseTo(2 * AFFLICTION_FAMILIAR_HEIGHT_FRAC, 6);
+    expect(afflictionFamiliarHoverY(undefined)).toBe(1.72);
+    expect(afflictionFamiliarHoverY(0)).toBe(1.72);
+    const pose = emptyPose();
+    writeAfflictionFamiliarPose(pose, 0, warlock.id, true, afflictionFamiliarHoverY(2));
+    expect(pose.y).toBeCloseTo(1.8, 6);
   });
 
   it('stays beside the caster while it possesses the Evil Eye', () => {

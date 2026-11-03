@@ -95,6 +95,41 @@ describe('Affliction Maledict Eye familiar', () => {
     expect(host.getObjectByName('affliction-familiar')).toBeUndefined();
   });
 
+  it('gives every Hexcraft warlock in view their own eye at head height', () => {
+    const local = {
+      id: 7,
+      kind: 'player',
+      templateId: 'warlock',
+      dead: false,
+      scale: 1,
+      auras: [],
+    };
+    const other = { ...local, id: 9, specId: 'affliction' };
+    const mage = { ...local, id: 11, templateId: 'mage', specId: 'affliction' };
+    const world = afflictionWorld(local as unknown as Entity);
+    const entities = world.entities as Map<number, Entity>;
+    entities.set(other.id, other as unknown as Entity);
+    entities.set(mage.id, mage as unknown as Entity);
+    const hosts = new Map([7, 9, 11].map((id) => [id, new THREE.Group()]));
+    const views = new Map([...hosts].map(([id, group]) => [id, { group, height: 2 }]));
+    const familiar = new AfflictionFamiliar(undefined, () => new THREE.Group());
+
+    familiar.update(world, views, true, 0);
+    const mine = hosts.get(7)?.getObjectByName('affliction-familiar');
+    const theirs = hosts.get(9)?.getObjectByName('affliction-familiar');
+    expect(mine).toBeDefined();
+    expect(theirs).toBeDefined();
+    expect(theirs).not.toBe(mine);
+    expect(theirs?.position.y).toBeCloseTo(1.8, 6);
+    expect(hosts.get(11)?.getObjectByName('affliction-familiar')).toBeUndefined();
+
+    // A respec on the other client takes their eye away on the next frame.
+    other.specId = 'demonology';
+    familiar.update(world, views, true, 1);
+    expect(hosts.get(9)?.getObjectByName('affliction-familiar')).toBeUndefined();
+    expect(hosts.get(7)?.getObjectByName('affliction-familiar')).toBe(mine);
+  });
+
   it('preloads the model and keeps the manager in the renderer frame update', () => {
     const familiarSource = readFileSync(
       path.join(REPO_ROOT, 'src/render/affliction_familiar.ts'),

@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import {
+  AFFLICTION_FAMILIAR_HEIGHT_FRAC,
   AFFLICTION_FAMILIAR_LOCAL_X,
   AFFLICTION_FAMILIAR_LOCAL_Z,
 } from './affliction_familiar_core';
@@ -197,7 +198,7 @@ export class DrainLifeVfx {
       'demonicDrain',
       casterId,
       targetId,
-      0.78,
+      AFFLICTION_FAMILIAR_HEIGHT_FRAC,
       0.52,
       AFFLICTION_FAMILIAR_LOCAL_X,
       AFFLICTION_FAMILIAR_LOCAL_Z,
@@ -211,7 +212,7 @@ export class DrainLifeVfx {
       'evilEyeGaze',
       casterId,
       targetId,
-      0.78,
+      AFFLICTION_FAMILIAR_HEIGHT_FRAC,
       0.52,
       AFFLICTION_FAMILIAR_LOCAL_X,
       AFFLICTION_FAMILIAR_LOCAL_Z,
