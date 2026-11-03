@@ -422,7 +422,7 @@ function fireBoulders(ctx: SimContext, mob: Entity, def: RangedDef): void {
     }
     // A muster soldier caught under it is crushed like under any of his blows.
     splashNearbyMobs(ctx, mob, center, b.radius, b.min, b.max, school, b.name);
-    launchFromSlam(ctx, mob, center, b.radius);
+    launchFromSlam(ctx, mob, center, b.radius, 'boulder');
   }
 }
 

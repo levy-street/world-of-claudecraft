@@ -643,7 +643,7 @@ function fireWreck(ctx: SimContext, mob: Entity, def: WarpathDef): void {
     def.wreck.name,
   );
   // The arrival slam throws them, like his other two: same shared rule, same opt-in.
-  launchFromSlam(ctx, mob, mob.pos, def.wreck.radius);
+  launchFromSlam(ctx, mob, mob.pos, def.wreck.radius, 'wreck');
 }
 
 /**

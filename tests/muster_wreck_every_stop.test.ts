@@ -220,7 +220,10 @@ describe('every warpath stop is a wreck with kills', () => {
     const boss = bossId !== null ? sim.entities.get(bossId) : undefined;
     if (!boss) throw new Error('the scheduler raised no Balgath');
     expect(boss.spawnPos.x).toBeCloseTo(147, 0);
-    expectEveryStopWrecked(sim, lap(sim, boss, 12));
+    // 14 yards: far enough off his shins that the opening fight sits on the rim picket.
+    // At 12 it held only while his Backhand proc (removed: an untelegraphed knockback)
+    // kept shoving the raider out to about this range.
+    expectEveryStopWrecked(sim, lap(sim, boss, 14));
   });
 
   it('from a /dev spawn copy dropped beside the player on the crater rim', () => {
