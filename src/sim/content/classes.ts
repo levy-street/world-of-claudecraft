@@ -5927,7 +5927,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 8,
     cost: 80,
     castTime: 3,
-    cooldown: 300,
+    cooldown: 60,
     range: 0,
     school: 'shadow',
     requiresTarget: false,

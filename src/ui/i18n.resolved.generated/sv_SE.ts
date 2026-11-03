@@ -17182,7 +17182,7 @@ export const sv_SE: EnTranslations = {
       "clickDestroy": "Klicka för att förstöra",
       "useFishing": "Använd: Fiska i närliggande vatten.",
       "useHealingPotion": "Använd: Återställer omedelbart {amount} hälsa. Användbar i strid. 1 min nedkylning.",
-      "useHealingPotionPct": "Använd: Återställer omedelbart {percent}% av maximal hälsa. Användbar i strid. 2 min nedkylning.",
+      "useHealingPotionPct": "Använd: Återställer omedelbart {percent}% av maximal hälsa. Användbar i strid. 1 min nedkylning.",
       "useManaPotion": "Använd: Återställer omedelbart {amount} mana. Användbar i strid. 1 min nedkylning.",
       "clickUseInstant": "Klicka för att använda omedelbart i strid",
       "clickUse": "Klicka för att använda",

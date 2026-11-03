@@ -17378,7 +17378,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Trois Fils du destin : Sentence peut les consommer pour 18% de dégâts supplémentaires.',
   'hudChrome.warlock.fateThreadsStatus': '{value} sur {max} Fils du destin.',
   'itemUi.tooltip.useHealingPotionPct':
-    'Utiliser : rend instantanément {percent}% de vos points de vie maximum. Utilisable en combat. Recharge de 2 min.',
+    'Utiliser : rend instantanément {percent}% de vos points de vie maximum. Utilisable en combat. Recharge de 1 min.',
   'guide.controls.reliquary': 'Le Reliquaire',
   'guide.deedsPage.rewardsBody':
     "Les récompenses sont toutes purement décoratives, et c'est bien le but. Certains hauts faits accordent un titre à porter ou une bordure pour encadrer votre nom, et jamais rien qui rende votre héros plus puissant. Choisissez le titre et la bordure que vous voulez dans le Livre des hauts faits : le titre vous suit sur votre plaque de nom, dans le chat et sur les classements, à la vue de tous, et la bordure trace ses propres couleurs autour de votre plaque de nom et de votre portrait.",

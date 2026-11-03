@@ -1264,8 +1264,9 @@ export function useItem(
       // short-circuit), so the craft-skill deeds re-check this player.
       if (granted > 0) ctx.markDeedsDirty(meta.entityId);
     }
-    p.potionCooldownUntil = ctx.time + POTION_COOLDOWN;
-    p.potionCdRemaining = POTION_COOLDOWN; // materialized remaining for the action-bar swipe
+    const potionCooldown = def.potionCooldown ?? POTION_COOLDOWN;
+    p.potionCooldownUntil = ctx.time + potionCooldown;
+    p.potionCdRemaining = potionCooldown; // materialized remaining for the action-bar swipe
     let potionHeal = 0;
     if (restoresHp) {
       const baseHeal = (def.potionHp ?? 0) + p.maxHp * (def.potionHpPctMax ?? 0);

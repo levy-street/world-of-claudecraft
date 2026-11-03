@@ -16960,7 +16960,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Tiga Benang Takdir: Vonis dapat mengonsumsinya untuk 18% kerusakan tambahan.',
   'hudChrome.warlock.fateThreadsStatus': '{value} dari {max} Benang Takdir.',
   'itemUi.tooltip.useHealingPotionPct':
-    'Pakai: Memulihkan {percent}% dari nyawa maksimum seketika. Bisa dipakai dalam pertempuran. Jeda 2 mnt.',
+    'Pakai: Memulihkan {percent}% dari nyawa maksimum seketika. Bisa dipakai dalam pertempuran. Jeda 1 mnt.',
   'guide.controls.reliquary': 'Relikuari',
   'guide.deedsPage.rewardsBody':
     'Semua hadiahnya hanya untuk dipamerkan, dan memang itulah maksudnya. Sebagian jasa memberi gelar yang bisa kamu kenakan atau bingkai untuk membingkai namamu, dan tidak pernah sesuatu yang membuat pahlawanmu lebih kuat. Pilih gelar dan bingkai yang kamu mau dari Kitab Jasa: gelar itu ikut serta pada papan namamu, di obrolan, dan di papan peringkat agar dilihat semua orang, sedangkan bingkai menorehkan warnanya sendiri di sekeliling papan nama dan potretmu.',

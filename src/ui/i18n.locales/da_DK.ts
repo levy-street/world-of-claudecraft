@@ -16706,7 +16706,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Tre Skæbnetråde: Dom kan forbruge dem for 18% øget skade.',
   'hudChrome.warlock.fateThreadsStatus': '{value} af {max} Skæbnetråde.',
   'itemUi.tooltip.useHealingPotionPct':
-    'Brug: Genopretter øjeblikkeligt {percent}% af maksimalt helbred. Brugbar i kamp. 2 min afkøling.',
+    'Brug: Genopretter øjeblikkeligt {percent}% af maksimalt helbred. Brugbar i kamp. 1 min afkøling.',
   'guide.controls.reliquary': 'Relikvariet',
   'guide.deedsPage.rewardsBody':
     'Belønningerne er alle sammen ren stads, og det er netop pointen. Nogle bedrifter giver en titel, du kan bære, eller en ramme, der indrammer dit navn, og aldrig noget, der gør din helt stærkere. Vælg den titel og den ramme, du vil have, i Bedrifternes Bog: titlen følger med på dit navneskilt, i chatten og på listerne, hvor alle kan se den, og rammen tegner sine egne farver omkring dit navneskilt og dit portræt.',

@@ -19484,7 +19484,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warlock.fateThreadsSentenceReady': '三層命運絲線：裁決可消耗它們以提高18%的傷害。',
   'hudChrome.warlock.fateThreadsStatus': '{value}/{max} 命運絲線。',
   'itemUi.tooltip.useHealingPotionPct':
-    '使用：立即恢復最大生命值的 {percent}%。戰鬥中可用。2 分鐘冷卻。',
+    '使用：立即恢復最大生命值的 {percent}%。戰鬥中可用。1 分鐘冷卻。',
   'guide.controls.clickMoveNote':
     '點擊移動預設是關閉的，得由你親自開啟：在遊戲選單中打開「按鍵設定」面板，開啟「點擊移動」，再用它下方的「點擊移動按鍵」一列，選擇要由哪一顆滑鼠按鍵負責走路（預設是左鍵，也可以改成右鍵）。開啟之後，點擊地面上的某一處，你就會朝那裡走去，地上還會有一個標記指出你的去向。點擊一隻生物或另一位玩家，你會走到對方身邊並停在距離之內，而這一次點擊仍然照常完成它原本的工作，也就是鎖定目標或互動；若你點擊的東西本來就在你伸手可及之處，你便直接互動，站在原地不動。任何一個移動按鍵都會立刻把控制權收回並結束這趟路程，按住滑鼠按鍵環顧四周也一樣。跳躍則不會，所以你可以一邊跳一邊繼續前進；而打開遊戲選單只是讓這趟路程暫停，等你關上選單，它就會繼續走完。',
   'guide.deedsPage.platformBody':

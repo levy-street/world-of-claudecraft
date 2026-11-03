@@ -17182,7 +17182,7 @@ export const pt_BR: EnTranslations = {
       "clickDestroy": "Clique para destruir",
       "useFishing": "Uso: pesca em águas próximas.",
       "useHealingPotion": "Uso: restaura instantaneamente {amount} de vida. Pode ser usada em combate. Recarga de 1 min.",
-      "useHealingPotionPct": "Uso: restaura instantaneamente {percent}% da vida máxima. Pode ser usada em combate. Recarga de 2 min.",
+      "useHealingPotionPct": "Uso: restaura instantaneamente {percent}% da vida máxima. Pode ser usada em combate. Recarga de 1 min.",
       "useManaPotion": "Uso: restaura instantaneamente {amount} de mana. Pode ser usada em combate. Recarga de 1 min.",
       "clickUseInstant": "Clique para usar instantaneamente em combate",
       "clickUse": "Clique para usar",

@@ -16936,7 +16936,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Drie Lotsdraden: Vonnis kan ze verbruiken voor 18% meer schade.',
   'hudChrome.warlock.fateThreadsStatus': '{value} van {max} Lotsdraden.',
   'itemUi.tooltip.useHealingPotionPct':
-    'Gebruik: Herstelt direct {percent}% van je maximale levenskracht. Bruikbaar in gevecht. 2 min afkoeltijd.',
+    'Gebruik: Herstelt direct {percent}% van je maximale levenskracht. Bruikbaar in gevecht. 1 min afkoeltijd.',
   'guide.controls.reliquary': 'Het Reliquarium',
   'guide.deedsPage.rewardsBody':
     'De beloningen zijn allemaal pure vertoning, en dat is precies de bedoeling. Sommige daden schenken een titel die je kunt dragen of een rand die je naam omlijst, en nooit iets dat je held sterker maakt. Kies de titel en de rand die je wilt in het Boek der Daden: de titel reist met je mee op je naamplaatje, in de chat en op de ranglijsten, zichtbaar voor iedereen, en de rand trekt zijn eigen kleuren om je naamplaatje en je portret.',

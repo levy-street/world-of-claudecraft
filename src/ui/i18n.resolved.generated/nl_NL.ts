@@ -17182,7 +17182,7 @@ export const nl_NL: EnTranslations = {
       "clickDestroy": "Klik om te vernietigen",
       "useFishing": "Gebruik: Vis in nabijgelegen wateren.",
       "useHealingPotion": "Gebruik: Herstelt direct {amount} levenskracht. Bruikbaar in gevecht. 1 min afkoeltijd.",
-      "useHealingPotionPct": "Gebruik: Herstelt direct {percent}% van je maximale levenskracht. Bruikbaar in gevecht. 2 min afkoeltijd.",
+      "useHealingPotionPct": "Gebruik: Herstelt direct {percent}% van je maximale levenskracht. Bruikbaar in gevecht. 1 min afkoeltijd.",
       "useManaPotion": "Gebruik: Herstelt direct {amount} mana. Bruikbaar in gevecht. 1 min afkoeltijd.",
       "clickUseInstant": "Klik om direct te gebruiken in gevecht",
       "clickUse": "Klik om te gebruiken",

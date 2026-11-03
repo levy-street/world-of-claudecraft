@@ -17182,7 +17182,7 @@ export const da_DK: EnTranslations = {
       "clickDestroy": "Klik for at ødelægge",
       "useFishing": "Brug: Fisk i nærliggende vande.",
       "useHealingPotion": "Brug: Genopretter øjeblikkeligt {amount} helbred. Brugbar i kamp. 1 min afkøling.",
-      "useHealingPotionPct": "Brug: Genopretter øjeblikkeligt {percent}% af maksimalt helbred. Brugbar i kamp. 2 min afkøling.",
+      "useHealingPotionPct": "Brug: Genopretter øjeblikkeligt {percent}% af maksimalt helbred. Brugbar i kamp. 1 min afkøling.",
       "useManaPotion": "Brug: Genopretter øjeblikkeligt {amount} mana. Brugbar i kamp. 1 min afkøling.",
       "clickUseInstant": "Klik for at bruge øjeblikkeligt i kamp",
       "clickUse": "Klik for at bruge",

@@ -16949,7 +16949,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Tres Hilos del destino: Sentencia puede consumirlos para un 18% más de daño.',
   'hudChrome.warlock.fateThreadsStatus': '{value} de {max} de Hilos del destino.',
   'itemUi.tooltip.useHealingPotionPct':
-    'Uso: restaura al instante el {percent}% de la salud máxima. Se puede usar en combate. Reutilización de 2 min.',
+    'Uso: restaura al instante el {percent}% de la salud máxima. Se puede usar en combate. Reutilización de 1 min.',
   'guide.controls.reliquary': 'El Relicario',
   'guide.deedsPage.rewardsBody':
     'Las recompensas son todas de exhibición, y esa es justo la idea. Algunas gestas otorgan un título que puedes lucir o un borde para enmarcar tu nombre, y nunca nada que haga más fuerte a tu héroe. Elige el título y el borde que quieras desde el Libro de Gestas: el título te acompaña en la placa de nombre, en el chat y en las tablas para que todos lo vean, y el borde dibuja sus propios colores alrededor de tu placa de nombre y de tu retrato.',

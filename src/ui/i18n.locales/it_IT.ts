@@ -17683,7 +17683,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Tre Filamenti del Fato: Sentenza può consumarli per un aumento del 18% dei danni.',
   'hudChrome.warlock.fateThreadsStatus': '{value} su {max} Filamenti del Fato.',
   'itemUi.tooltip.useHealingPotionPct':
-    'Uso: ripristina istantaneamente il {percent}% della salute massima. Usabile in combattimento. Recupero 2 min.',
+    'Uso: ripristina istantaneamente il {percent}% della salute massima. Usabile in combattimento. Recupero 1 min.',
   'guide.controls.reliquary': 'Il Reliquiario',
   'guide.deedsPage.rewardsBody':
     'Le ricompense sono tutte pura apparenza, ed è proprio questo il punto. Alcune imprese concedono un titolo da indossare o un bordo per incorniciare il tuo nome, e mai nulla che renda il tuo eroe più forte. Scegli il titolo e il bordo che preferisci dal Libro delle Imprese: il titolo ti accompagna sulla targhetta del nome, in chat e nelle classifiche, sotto gli occhi di tutti, e il bordo disegna i propri colori attorno alla targhetta e al ritratto.',

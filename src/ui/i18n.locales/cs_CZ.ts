@@ -16674,7 +16674,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Tři Nitě osudu: Rozsudek je dokáže spotřebovat za 18% zvýšené poškození.',
   'hudChrome.warlock.fateThreadsStatus': 'Nitě osudu {value} z {max}.',
   'itemUi.tooltip.useHealingPotionPct':
-    'Použití: Okamžitě obnoví {percent} % maximálního zdraví. Použitelné v boji. Doba obnovy 2 min.',
+    'Použití: Okamžitě obnoví {percent} % maximálního zdraví. Použitelné v boji. Doba obnovy 1 min.',
   'guide.controls.reliquary': 'Relikviář',
   'guide.deedsPage.rewardsBody':
     'Odměny jsou čistě na parádu, a přesně o to jde. Některé skutky udělují titul, který můžeš nosit, nebo rámeček, jenž orámuje tvé jméno, a nikdy nic, co by tvého hrdinu posílilo. Titul i rámeček si vyber v Knize skutků: titul tě provází na jmenovce, v chatu i na žebříčcích, aby jej viděl každý, a rámeček obtáhne tvou jmenovku a portrét vlastními barvami.',

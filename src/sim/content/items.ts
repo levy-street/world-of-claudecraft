@@ -2386,6 +2386,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     kind: 'potion',
     quality: 'uncommon',
     potionHpPctMax: 0.25,
+    potionCooldown: 60,
     stackSize: 3,
     sellValue: 0,
     soulbound: true,

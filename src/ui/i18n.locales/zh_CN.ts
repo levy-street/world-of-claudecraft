@@ -19479,7 +19479,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warlock.fateThreadsSentenceReady': '三层命运丝线：裁决可消耗它们以提高18%的伤害。',
   'hudChrome.warlock.fateThreadsStatus': '{value}/{max} 命运丝线。',
   'itemUi.tooltip.useHealingPotionPct':
-    '使用：立即恢复最大生命值的 {percent}%。战斗中可用。2 分钟冷却。',
+    '使用：立即恢复最大生命值的 {percent}%。战斗中可用。1 分钟冷却。',
   'guide.controls.clickMoveNote':
     '点击移动默认是关着的，要你自己打开：在游戏菜单中打开“按键绑定”面板，开启“点击移动”，再用它下方的“点击移动按键”一行挑选由哪个鼠标键负责走路（默认是左键，也可以选右键）。开启之后，点一下地面上的某处，你便会朝那里走去，地上还会有一个标记指出你的去向。点击一只生物或另一位玩家，你会走到对方近前、在够得着的距离停下，而这一次点击照样完成它平常的选中或交互；如果你点的东西本来就在身边，那就直接交互，人不必挪窝。任何一个移动按键都会立刻把控制权收回、结束这趟行程，按住鼠标键环顾四周也一样。跳跃不会，所以你可以一路蹦着继续赶路；而打开游戏菜单只是让行程暂停，关掉菜单后它会接着走完。',
   'guide.deedsPage.platformBody':

@@ -16759,7 +16759,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Tre Ödestrådar: Dom kan förbruka dem för 18% ökad skada.',
   'hudChrome.warlock.fateThreadsStatus': '{value} av {max} Ödestrådar.',
   'itemUi.tooltip.useHealingPotionPct':
-    'Använd: Återställer omedelbart {percent}% av maximal hälsa. Användbar i strid. 2 min nedkylning.',
+    'Använd: Återställer omedelbart {percent}% av maximal hälsa. Användbar i strid. 1 min nedkylning.',
   'guide.controls.reliquary': 'Relikvariet',
   'guide.deedsPage.rewardsBody':
     'Belöningarna är rena skrytsaker, och det är hela poängen. Vissa bedrifter ger en titel du kan bära eller en ram som inramar ditt namn, och aldrig något som gör din hjälte starkare. Välj den titel och den ram du vill ha i Bedrifternas bok: titeln följer med på din namnskylt, i chatten och på listorna där alla ser den, och ramen drar sina egna färger runt din namnskylt och ditt porträtt.',

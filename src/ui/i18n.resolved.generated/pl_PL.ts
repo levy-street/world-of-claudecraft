@@ -17182,7 +17182,7 @@ export const pl_PL: EnTranslations = {
       "clickDestroy": "Kliknij, aby zniszczyć",
       "useFishing": "Użycie: Łów ryby w pobliskich wodach.",
       "useHealingPotion": "Użycie: Natychmiast przywraca {amount} zdrowia. Można użyć w walce. Czas odnowienia 1 min.",
-      "useHealingPotionPct": "Użycie: Natychmiast przywraca {percent}% maksymalnego zdrowia. Można użyć w walce. Czas odnowienia 2 min.",
+      "useHealingPotionPct": "Użycie: Natychmiast przywraca {percent}% maksymalnego zdrowia. Można użyć w walce. Czas odnowienia 1 min.",
       "useManaPotion": "Użycie: Natychmiast przywraca {amount} many. Można użyć w walce. Czas odnowienia 1 min.",
       "clickUseInstant": "Kliknij, aby użyć natychmiast w walce",
       "clickUse": "Kliknij, aby użyć",

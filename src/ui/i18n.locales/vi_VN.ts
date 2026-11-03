@@ -16823,7 +16823,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Ba Sợi Định Mệnh: Phán Quyết có thể tiêu thụ chúng để tăng 18% sát thương.',
   'hudChrome.warlock.fateThreadsStatus': '{value} trên {max} Sợi Định Mệnh.',
   'itemUi.tooltip.useHealingPotionPct':
-    'Dùng: Hồi tức thời {percent}% sinh lực tối đa. Dùng được trong chiến đấu. Hồi chiêu 2 phút.',
+    'Dùng: Hồi tức thời {percent}% sinh lực tối đa. Dùng được trong chiến đấu. Hồi chiêu 1 phút.',
   'guide.controls.reliquary': 'Kỳ Trân Các',
   'guide.deedsPage.rewardsBody':
     'Mọi phần thưởng đều chỉ để phô ra, và đó đúng là chủ đích. Một số kỳ công trao cho bạn danh hiệu để đeo hoặc viền để đóng khung tên mình, và không bao giờ trao thứ gì khiến người hùng của bạn mạnh hơn. Hãy chọn danh hiệu và viền bạn muốn trong Sách Kỳ Công: danh hiệu theo bạn trên bảng tên, trong khung trò chuyện và trên các bảng xếp hạng để ai cũng thấy, còn viền vẽ sắc màu riêng của nó quanh bảng tên và chân dung của bạn.',

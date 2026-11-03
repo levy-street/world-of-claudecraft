@@ -759,7 +759,9 @@ export function createActionBarView(
           const itemCdTotal = trinket
             ? trinket.cooldownTotal
             : potionCd > 0
-              ? POTION_COOLDOWN
+              ? // The shared timer may have been started by a longer potion
+                // than this slot's own (a Soul Stone after a healing potion).
+                Math.max(potionCd, item.potionCooldown ?? POTION_COOLDOWN)
               : baseCd > 0
                 ? baseCd
                 : itemCd;

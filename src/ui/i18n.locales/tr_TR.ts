@@ -16759,7 +16759,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Üç Kader İpliği: Hüküm onları %18 artan hasar için tüketebilir.',
   'hudChrome.warlock.fateThreadsStatus': '{value} / {max} Kader İpliği.',
   'itemUi.tooltip.useHealingPotionPct':
-    "Kullan: Azami canın %{percent}'ini anında geri kazandırır. Dövüşte kullanılabilir. 2 dakika bekleme süresi.",
+    "Kullan: Azami canın %{percent}'ini anında geri kazandırır. Dövüşte kullanılabilir. 1 dakika bekleme süresi.",
   'guide.controls.reliquary': 'Yadigârlık',
   'guide.deedsPage.rewardsBody':
     "Ödüllerin tamamı gösteriş içindir, asıl amaç da budur. Bazı yiğitlikler takabileceğin bir unvan ya da adını çerçeveleyecek bir çerçeve verir, kahramanını güçlendirecek hiçbir şey vermez. İstediğin unvanı ve çerçeveyi Yiğitlikler Kitabı'ndan seç: unvan isim levhanda, sohbette ve herkesin görmesi için sıralama tablolarında seninle gezer, çerçeve ise kendi renklerini isim levhanın ve portrenin çevresine çizer.",

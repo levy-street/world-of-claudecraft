@@ -17182,7 +17182,7 @@ export const tr_TR: EnTranslations = {
       "clickDestroy": "Yok etmek için tıkla",
       "useFishing": "Kullanım: Yakındaki sularda balık tut.",
       "useHealingPotion": "Kullanım: Anında {amount} can yeniler. Savaşta kullanılabilir. 1 dk bekleme süresi.",
-      "useHealingPotionPct": "Kullan: Azami canın %{percent}'ini anında geri kazandırır. Dövüşte kullanılabilir. 2 dakika bekleme süresi.",
+      "useHealingPotionPct": "Kullan: Azami canın %{percent}'ini anında geri kazandırır. Dövüşte kullanılabilir. 1 dakika bekleme süresi.",
       "useManaPotion": "Kullanım: Anında {amount} mana yeniler. Savaşta kullanılabilir. 1 dk bekleme süresi.",
       "clickUseInstant": "Savaşta anında kullanmak için tıkla",
       "clickUse": "Kullanmak için tıkla",

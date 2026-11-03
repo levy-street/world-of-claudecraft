@@ -17586,7 +17586,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Três Fios do Destino: Sentença pode consumi-los para 18% de dano aumentado.',
   'hudChrome.warlock.fateThreadsStatus': 'Fios do Destino {value} de {max}.',
   'itemUi.tooltip.useHealingPotionPct':
-    'Uso: restaura instantaneamente {percent}% da vida máxima. Pode ser usada em combate. Recarga de 2 min.',
+    'Uso: restaura instantaneamente {percent}% da vida máxima. Pode ser usada em combate. Recarga de 1 min.',
   'guide.controls.reliquary': 'O Relicário',
   'guide.deedsPage.rewardsBody':
     'As recompensas são todas para exibição, e é exatamente esse o objetivo. Alguns feitos concedem um título para você usar ou uma moldura para emoldurar seu nome, e nunca algo que deixe seu herói mais forte. Escolha o título e a moldura que quiser no Livro dos Feitos: o título acompanha você na placa de nome, no bate-papo e nos quadros, à vista de todos, e a moldura desenha as próprias cores em volta da sua placa de nome e do seu retrato.',

@@ -16878,7 +16878,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Trzy Nici Przeznaczenia: Wyrok może je zużyć, zyskując 18% zwiększonych obrażeń.',
   'hudChrome.warlock.fateThreadsStatus': '{value} z {max} Nici Przeznaczenia.',
   'itemUi.tooltip.useHealingPotionPct':
-    'Użycie: Natychmiast przywraca {percent}% maksymalnego zdrowia. Można użyć w walce. Czas odnowienia 2 min.',
+    'Użycie: Natychmiast przywraca {percent}% maksymalnego zdrowia. Można użyć w walce. Czas odnowienia 1 min.',
   'guide.controls.reliquary': 'Relikwiarz',
   'guide.deedsPage.rewardsBody':
     'Nagrody służą wyłącznie do pokazania się i o to właśnie chodzi. Niektóre czyny przyznają tytuł, który możesz nosić, albo obramowanie oprawiające twoje imię, i nigdy nic, co uczyniłoby twojego bohatera silniejszym. Wybierz tytuł i obramowanie w Księdze Czynów: tytuł towarzyszy ci na tabliczce z imieniem, na czacie i na tablicach wyników, na oczach wszystkich, a obramowanie kreśli własne barwy wokół twojej tabliczki i portretu.',

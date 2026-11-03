@@ -17256,7 +17256,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Drei Schicksalsfäden: Schuldspruch kann sie für 18% erhöhten Schaden verbrauchen.',
   'hudChrome.warlock.fateThreadsStatus': '{value} von {max} Schicksalsfäden.',
   'itemUi.tooltip.useHealingPotionPct':
-    'Benutzen: Stellt sofort {percent}% der maximalen Gesundheit wieder her. Im Kampf nutzbar. 2 Min. Abklingzeit.',
+    'Benutzen: Stellt sofort {percent}% der maximalen Gesundheit wieder her. Im Kampf nutzbar. 1 Min. Abklingzeit.',
   'guide.controls.reliquary': 'Das Reliquiar',
   'guide.deedsPage.rewardsBody':
     'Die Belohnungen sind reine Zurschaustellung, und genau das ist der Sinn. Manche Taten gewähren einen Titel zum Tragen oder einen Rahmen, der deinen Namen einfasst, und niemals etwas, das deinen Helden stärker macht. Wähle den gewünschten Titel und Rahmen im Buch der Taten: Der Titel begleitet dich auf deiner Namensplakette, im Chat und auf den Ranglisten, für alle sichtbar, und der Rahmen legt seine eigenen Farben um deine Namensplakette und dein Porträt.',
