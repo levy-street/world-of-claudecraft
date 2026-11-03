@@ -1823,7 +1823,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/props/wreckage_fallen_anchor.glb": "/media/models/props/wreckage_fallen_anchor.4b6d0ce09b8a.glb",
   "models/props/wreckage_hull_fragment.glb": "/media/models/props/wreckage_hull_fragment.41b2a4a7c28d.glb",
   "models/props/wreckage_waterlogged_barrel.glb": "/media/models/props/wreckage_waterlogged_barrel.2e8dc7617c6d.glb",
-  "models/props/wyrmwatch_harbor.glb": "/media/models/props/wyrmwatch_harbor.cf8f016ea98e.glb",
+  "models/props/wyrmwatch_harbor.glb": "/media/models/props/wyrmwatch_harbor.c82c8bc5c3d4.glb",
   "models/props/yumi_brazier_stand.glb": "/media/models/props/yumi_brazier_stand.d40737b062f8.glb",
   "models/props/yumi_torch_handle.glb": "/media/models/props/yumi_torch_handle.d03d6671b55a.glb",
   "models/quest/bastion_ward_stone.glb": "/media/models/quest/bastion_ward_stone.4364f96ba4ca.glb",

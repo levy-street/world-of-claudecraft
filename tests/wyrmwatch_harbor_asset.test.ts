@@ -42,8 +42,8 @@ import {
 
 const ROOT = path.join(__dirname, '..');
 const GLB = path.join(ROOT, WYRMWATCH_HARBOR_ASSET.target);
-const SHIPPED_SHA256 = 'cf8f016ea98ecc42dd8cb97e38e410d4fc09881092ece79611215211f7423fe6';
-const SHIPPED_BYTES = 463408;
+const SHIPPED_SHA256 = 'c82c8bc5c3d47c29d8ffbd1f3825bc23c8eb94ba4052baad637e1d74ec0635dc';
+const SHIPPED_BYTES = 463396;
 /** Triangles per named part, from the Blender build report. */
 const TRIANGLES: Record<string, number> = {
   QuayDecks: 2052,
