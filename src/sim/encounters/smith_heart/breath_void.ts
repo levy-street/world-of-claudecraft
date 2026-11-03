@@ -22,11 +22,17 @@
 //                      leaves the threat table at once (the guardian turns to
 //                      whoever is left; nobody left is a wipe), and a step the
 //                      mob AI took off the floor is undone, so it never walks
-//                      out through a gap after anyone.
+//                      out through a gap after anyone. A body the Islands
+//                      of the Wind took (riding a gale, or on an isle's
+//                      floor) is still in the fight and keeps its place: a
+//                      lone rider (a solo pull, the tank) dropped mid-air
+//                      read as a wipe and the reset set them back on the
+//                      Cornice, cutting the ride short (Jose's online
+//                      playtest of 2026-11-03).
 //
 // Zero rng; positions are claim-local yards.
 
-import { BREATH, SMITH_HEART_HEIGHTS } from '../../content/smith_heart_layout';
+import { BREATH, BREATH_ISLES, SMITH_HEART_HEIGHTS } from '../../content/smith_heart_layout';
 import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
 import type { Entity } from '../../types';
@@ -39,7 +45,9 @@ import {
   voidCorpseSpot,
 } from './breath_geometry';
 import { BREATH_CUES } from './breath_ids';
+import { isleAt } from './breath_isle_geometry';
 import { type BreathScope, corniceListeners, voidCandidates } from './breath_scope';
+import type { BreathFightState } from './breath_state';
 import { breathSay } from './breath_voice';
 
 /** How far under the Cornice's floor a body counts as off it (yards): the
@@ -131,6 +139,17 @@ function keepable(x: number, z: number, y: number): boolean {
   return y > HIGH_CLIMB - OFF_FLOOR_DROP && onCorniceApproach(x, z);
 }
 
+/** Is `e` in the Islands of the Wind's part of the fight: riding a gale
+ *  (out or home), or standing on an isle's floor (claim-local x, z)? */
+export function inIslesFight(st: BreathFightState, e: Entity, x: number, z: number): boolean {
+  if (st.isles.rides.some((r) => r.playerId === e.id)) return true;
+  const i = isleAt(x, z);
+  return i >= 0 && Math.abs(e.pos.y - BREATH_ISLES[i].h) <= ISLE_FLOOR_SLACK;
+}
+
+/** How far over or under an isle's floor a body still stands on it. */
+const ISLE_FLOOR_SLACK = 4;
+
 /**
  * Hold the guardian to its Cornice (after the mob AI moved it this tick):
  * every threat entry off the floor is dropped (and the guardian turned to
@@ -143,7 +162,10 @@ export function tetherGuardian(s: Pick<BreathScope, 'ctx' | 'inst' | 'st' | 'bos
   let lost = false;
   const off = (id: number): boolean => {
     const e = ctx.entities.get(id);
-    return !e || e.dead || !keepable(e.pos.x - o.x, e.pos.z - o.z, e.pos.y);
+    if (!e || e.dead) return true;
+    const x = e.pos.x - o.x;
+    const z = e.pos.z - o.z;
+    return !keepable(x, z, e.pos.y) && !inIslesFight(st, e, x, z);
   };
   for (const id of [...boss.threat.keys()]) if (off(id)) boss.threat.delete(id);
   if (boss.aggroTargetId !== null && off(boss.aggroTargetId)) {

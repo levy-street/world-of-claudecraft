@@ -611,6 +611,57 @@ describe('the Islands of the Wind: the review gaps', () => {
     expect(p.carriedBy).toBeUndefined();
   });
 
+  it('a lone rider (a solo pull, the tank) rides the whole arc out and home: the fight holds', () => {
+    // Jose's online playtest: the guardian's tether dropped the rider off its
+    // table mid-air, the lone target gone read as a wipe, and the reset set
+    // them back on the Cornice halfway up the arc.
+    const f = pulled(1);
+    crossMark(f, 0.7);
+    const i = f.state()?.isles.round?.isles[0] as number;
+    const p = f.players[0];
+    const spots = isleSpots()[i];
+    /** Ride from where `p` stands, tick by tick: every step on the arc. */
+    const ride = (dir: 'out' | 'home') => {
+      const r0 = f.state()?.isles.rides.find((r) => r.playerId === p.id);
+      expect(r0?.dir).toBe(dir);
+      const ride = { ...(r0 as NonNullable<typeof r0>) };
+      let prev = { ...p.pos };
+      let k = 0;
+      while (p.carriedBy !== undefined && k++ < ticks(IT.rideSeconds + 1)) {
+        f.tick();
+        expect(f.state()).not.toBeNull();
+        expect(f.boss().smithHeartBreath).toBeDefined();
+        const step = Math.hypot(p.pos.x - prev.x, p.pos.y - prev.y, p.pos.z - prev.z);
+        expect(step).toBeLessThan(4);
+        if (p.carriedBy !== undefined) {
+          const at = rideArc(ride.from, ride.to, Math.min(1, (k * DT) / ride.total));
+          const l = f.local(p);
+          expect(Math.hypot(l.x - at.x, p.pos.y - at.y, l.z - at.z)).toBeLessThan(1e-6);
+        }
+        prev = { ...p.pos };
+      }
+      expect(k).toBe(ticks(IT.rideSeconds));
+    };
+    f.put(p, spots.path.x, spots.path.z);
+    f.tick();
+    ride('out');
+    const on = f.local(p);
+    expect(isleAt(on.x, on.z)).toBe(i);
+    expect(p.pos.y).toBeCloseTo(BREATH_ISLES[i].h, 0);
+    // Standing on the isle the fight still holds (no reset carries them off).
+    f.tick(ticks(2));
+    expect(f.state()?.isles.round).not.toBeNull();
+    expect(isleAt(f.local(p).x, f.local(p).z)).toBe(i);
+    f.dev('/dev heart breath killisle');
+    f.tick(ticks(IT.rideGrace + 0.2));
+    f.put(p, spots.home.x, spots.home.z);
+    f.tick();
+    ride('home');
+    const back = f.local(p);
+    expect(Math.hypot(back.x - spots.back.x, back.z - spots.back.z)).toBeLessThan(2);
+    expect(f.state()).not.toBeNull();
+  });
+
   it('a rider who dies in the air is set down, and no warden turns on the corpse', () => {
     const f = pulled(4);
     crossMark(f, 0.7);
