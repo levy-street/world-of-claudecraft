@@ -81,16 +81,17 @@ describe('authoritative referral evidence', () => {
   it('only eligible recipients receive authored boss evidence', () => {
     const { sim, a, ctx } = world();
     sim.events.length = 0;
-    emitReferralBossEvidence(ctx, { templateId: 'morthen', dungeonId: 'hollow_crypt' } as Entity, [
-      sim.meta(a)!,
-    ]);
+    emitReferralBossEvidence(
+      ctx,
+      { templateId: 'morthen' } as Entity,
+      [sim.meta(a)!],
+      'hollow_crypt',
+    );
     expect(sim.events).toMatchObject([
       { kind: 'boss', dungeonId: 'hollow_crypt', participants: [{ characterId: 11 }] },
     ]);
     sim.events.length = 0;
-    emitReferralBossEvidence(ctx, { templateId: 'boar', dungeonId: 'hollow_crypt' } as Entity, [
-      sim.meta(a)!,
-    ]);
+    emitReferralBossEvidence(ctx, { templateId: 'boar' } as Entity, [sim.meta(a)!], 'hollow_crypt');
     expect(sim.events).toEqual([]);
   });
   it('sanitizes and detaches persisted reward receipts', () => {
@@ -104,5 +105,35 @@ describe('authoritative referral evidence', () => {
       referralRewards: { '7': { redeemed: 3 } },
       referralInviterRewards: 3,
     });
+  });
+  it('requires an owning dungeon even when the entity has a portal destination', () => {
+    const { sim, a, ctx } = world();
+    sim.events.length = 0;
+    emitReferralBossEvidence(
+      ctx,
+      { templateId: 'morthen', dungeonId: 'hollow_crypt' } as Entity,
+      [sim.meta(a)!],
+      undefined,
+    );
+    expect(sim.events).toEqual([]);
+  });
+  it('keeps the authored raid activity and the supplied room roster', () => {
+    const { sim, a, ctx } = world();
+    sim.events.length = 0;
+    emitReferralBossEvidence(
+      ctx,
+      { templateId: 'nythraxis_scourge_of_thornpeak', dungeonId: null } as Entity,
+      [sim.meta(a)!],
+      'nythraxis_boss_arena',
+    );
+    expect(sim.events).toMatchObject([
+      {
+        type: 'referralEvidence',
+        kind: 'boss',
+        mobId: 'nythraxis_scourge_of_thornpeak',
+        activityId: 'nythraxis_boss_arena_normal',
+        participants: [{ characterId: 11 }],
+      },
+    ]);
   });
 });

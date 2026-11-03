@@ -81,12 +81,14 @@ export function emitReferralBossEvidence(
   ctx: SimContext,
   mob: Entity,
   eligible: readonly PlayerMeta[],
+  dungeonId: string | null | undefined,
 ): void {
-  if (!mob.dungeonId) return;
+  // Spawned mobs do not carry a portal destination; use their owning claim.
+  if (!dungeonId) return;
   const activity = FINDER_ACTIVITIES.find(
     (a) =>
       a.encounters.some((e) => e.mobId === mob.templateId) &&
-      (a.kind === 'raid' || a.dungeonId === mob.dungeonId),
+      (a.kind === 'raid' || a.dungeonId === dungeonId),
   );
   if (!activity) return;
   const final = activity.encounters.some((e) => e.mobId === mob.templateId && e.final);
