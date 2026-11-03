@@ -51,8 +51,9 @@ export function wakeSeconds(s: CouncilScope): number {
   return holder?.heir ? s.rules.heirRiseWarn : T.wakeCast + T.wakeMarkSeconds;
 }
 
-/** Seconds a Rush puts on the floor (its mark, a breath of dash). */
-export const RUSH_FLOOR_SECONDS = T.rushCast + 1;
+/** Seconds a Rush puts on the floor: its mark, the wind-up and a typical
+ *  dash (half the Quarry's width at the run). */
+export const RUSH_FLOOR_SECONDS = T.rushCast + T.rushWindup + 2;
 
 /** Start whatever floor mechanic is due and the gap allows, in order, and
  *  put each started one's next interval back on its cadence. */

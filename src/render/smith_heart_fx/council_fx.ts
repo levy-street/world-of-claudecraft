@@ -441,6 +441,7 @@ export class CouncilFx {
     compileGate?: (target: THREE.Object3D) => Promise<unknown>,
     private readonly reducedMotion: () => boolean = () => false,
     private readonly shakeSink?: (amount: number) => void,
+    playGesture?: (entityId: number, gesture: string) => void,
   ) {
     this.root.name = 'smith-heart-council-fx';
     setRenderCategory(this.root, 'ui3d');
@@ -501,7 +502,7 @@ export class CouncilFx {
     this.shelters = new CouncilShelters(host, this.pillarsFx);
     this.soak = new CouncilSoakFx(this.root, this.uTime, this.geometries, this.materials);
     this.bond = new CouncilBondFx(host);
-    this.rush = new CouncilRushFx(host);
+    this.rush = new CouncilRushFx(host, playGesture);
     this.limitFx = new CouncilLimitFx(host, this.pillarsFx);
     this.soulFx = new CouncilSoulFx(host, this.pillarsFx, this.shelters);
     const bandGeo = new THREE.CylinderGeometry(1, 1, 1, 40, 1, true).translate(0, 0.5, 0);
@@ -782,16 +783,28 @@ export class CouncilFx {
     );
     if (ev.type === 'spellfxAt') {
       if (!councilClaims(ev.ability)) return false;
-      if (ev.ability === COUNCIL_CUES.collapse)
+      if (ev.ability === COUNCIL_CUES.collapse) {
         this.pillarsFx.collapseAt(ev.x, ev.z, ev.radius ?? 4);
-      else if (ev.ability === COUNCIL_CUES.soulBurst) this.pillarsFx.soulBurstAt(ev.x, ev.z);
+        this.rush.pillarStruck(ev.x, ev.z, false);
+      } else if (ev.ability === COUNCIL_CUES.soulBurst) this.pillarsFx.soulBurstAt(ev.x, ev.z);
       else if (ev.ability === COUNCIL_CUES.rockImpact) this.rockImpact(ev.x, ev.z, ev.radius ?? 6);
       else if (ev.ability === COUNCIL_CUES.settle) this.pillarsFx.settleAt(ev.x, ev.z);
+      else if (ev.ability === COUNCIL_CUES.rushWindup)
+        this.rush.windup(
+          ev.sourceId,
+          ev.x,
+          ev.z,
+          ev.dirX ?? 0,
+          ev.dirZ ?? 0,
+          ev.speed ?? T.rushSpeed,
+          ev.duration ?? 0,
+        );
       else if (ev.ability === COUNCIL_CUES.rushImpact)
         this.rush.impactAt(ev.x, ev.z, ev.radius ?? T.rushHalfWidth);
-      else if (ev.ability === COUNCIL_CUES.cursedBreak)
+      else if (ev.ability === COUNCIL_CUES.cursedBreak) {
         this.pillarsFx.cursedBreakAt(ev.x, ev.z, ev.radius ?? T.cursedR);
-      else if (ev.ability === COUNCIL_CUES.quarryCollapse) this.rush.collapseAt(ev.x, ev.z);
+        this.rush.pillarStruck(ev.x, ev.z, true);
+      } else if (ev.ability === COUNCIL_CUES.quarryCollapse) this.rush.collapseAt(ev.x, ev.z);
       return true;
     }
     if (ev.type !== 'spellfx' || !councilClaims(ev.ability)) return false;
@@ -846,7 +859,7 @@ export class CouncilFx {
     this.updateEnergy(world, dt);
     this.updateWrathShelters(world);
     this.bond.update(dt);
-    this.rush.update();
+    this.rush.update(dt);
     this.audio.update(dt, (id) => world.entities.get(id));
     this.debris.update(dt);
     this.particles.update(this.clock);

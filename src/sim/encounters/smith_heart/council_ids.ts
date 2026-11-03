@@ -196,6 +196,13 @@ export const COUNCIL_CUES = {
   echoBlast: 'heart_echo_of_wrath_blast',
   /** Mythic: the Endless Song pulses (spellfx 'nova' on the pillar). */
   songPulse: 'heart_endless_song_pulse',
+  /** Mountain's Rush's line is fixed and the Guardian plants for its
+   *  wind-up (spellfxAt 'burst' at the Guardian's feet, sourceId the
+   *  Guardian, radius = the lane's half width, dirX/dirZ the line's heading,
+   *  speed the run's and duration its seconds: the stop is
+   *  from + dir * speed * duration; the run starts COUNCIL_TUNING.rushWindup
+   *  after it). */
+  rushWindup: 'heart_mountains_rush_windup',
   /** Mountain's Rush ends (spellfxAt 'burst' where the Guardian stops,
    *  radius = the lane's half width). */
   rushImpact: 'heart_mountains_rush_impact',
@@ -377,13 +384,17 @@ export const COUNCIL_TUNING = {
   /** Physical damage taken while it holds (+100 percent). */
   weightTaken: 1,
   // Mountain's Rush (the Guardian's charge): its first bar, the time between
-  // two, the bar (the mark's warning), the lane's half width, the dash's
-  // speed (yards a second), the blow and the throw on everyone in its path.
+  // two, the bar (the mark's warning), the lane's half width, the wind-up
+  // (the line is fixed when the bar lands; the Guardian plants and braces
+  // this long before it moves), the dash's speed (yards a second: a heavy
+  // run, a 15 yd lane takes under a second, the Quarry's width about four),
+  // the blow and the throw on everyone it runs through.
   rushFirst: 16,
   rushEvery: 24,
   rushCast: 3,
   rushHalfWidth: 2,
-  rushSpeed: 40,
+  rushWindup: 0.8,
+  rushSpeed: 22,
   rushMin: 480,
   rushMax: 560,
   rushKnockback: 10,

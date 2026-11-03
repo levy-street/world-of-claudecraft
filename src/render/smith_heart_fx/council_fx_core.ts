@@ -360,21 +360,6 @@ export function rushLane(
   return out;
 }
 
-/** Bond of the Stone's thread between the two members: its width (yards)
- *  and its light by the seconds since its last pulse (a flare that settles
- *  in half a second) and the clock (a slow breath). Fills `out`. */
-export function bondThreadLook(
-  sincePulse: number,
-  clock: number,
-  out: { width: number; alpha: number } = { width: 0, alpha: 0 },
-): { width: number; alpha: number } {
-  const flare = sincePulse >= 0 && sincePulse < 0.5 ? 1 - sincePulse / 0.5 : 0;
-  const breath = 0.5 + 0.5 * Math.sin(clock * 3.1);
-  out.width = 0.14 + 0.05 * breath + 0.22 * flare;
-  out.alpha = 0.55 + 0.2 * breath + 0.45 * flare;
-  return out;
-}
-
 /** Is this object the Guardian's cursed pillar? */
 export function isCursedPillar(templateId: string): boolean {
   return templateId === COUNCIL_CURSED;
@@ -454,6 +439,7 @@ export function councilClaims(ability: string | undefined): boolean {
     ability === COUNCIL_CUES.soulBurst ||
     ability === COUNCIL_CUES.echoBlast ||
     ability === COUNCIL_CUES.songPulse ||
+    ability === COUNCIL_CUES.rushWindup ||
     ability === COUNCIL_CUES.rushImpact ||
     ability === COUNCIL_CUES.cursedRise ||
     ability === COUNCIL_CUES.cursedPulse ||

@@ -16,6 +16,7 @@ import {
   bondPulseMult,
   COUNCIL_AURAS,
   COUNCIL_CASTS,
+  COUNCIL_CUES,
   COUNCIL_CURSED,
   COUNCIL_DIFFICULTY,
   COUNCIL_NAMES,
@@ -23,6 +24,7 @@ import {
   COUNCIL_TUNING as T,
 } from '../src/sim/encounters/smith_heart';
 import { raisePillar } from '../src/sim/encounters/smith_heart/council_pillars';
+import { rushSeconds } from '../src/sim/encounters/smith_heart/council_rush';
 import type { Entity, SimEvent } from '../src/sim/types';
 import { type CouncilFight, councilFight, hitsOf } from './helpers/council_fight';
 
@@ -105,7 +107,7 @@ function past(from: { x: number; z: number }, p: { x: number; z: number }, out: 
 }
 
 function runRush(f: Fight): SimEvent[] {
-  return f.tick(Math.ceil((T.rushCast + 2) * 20));
+  return f.tick(Math.ceil((T.rushCast + T.rushWindup + 2) * 20));
 }
 
 describe("Mountain's Rush: the mark", () => {
@@ -204,6 +206,84 @@ describe("Mountain's Rush: the first pillar on its line", () => {
     expect(warned(ev, 'rushMiss')).toBe(true);
     // Normal: no collapse.
     expect(f.st.collapse).toBeNull();
+  });
+});
+
+describe("Mountain's Rush: the wind-up and the run", () => {
+  it('a heavy run: the wind-up and the speed leave the 3 s telegraph to aim', () => {
+    // Slow enough to read and to step out of, fast enough to threaten: a
+    // heavy charge, never the old 40 yd/s blink.
+    expect(T.rushSpeed).toBeGreaterThanOrEqual(18);
+    expect(T.rushSpeed).toBeLessThanOrEqual(24);
+    expect(T.rushWindup).toBeGreaterThanOrEqual(0.5);
+    expect(T.rushWindup).toBeLessThanOrEqual(1.2);
+    expect(T.rushCast).toBe(3);
+    expect(rushSeconds(T.rushSpeed * 2)).toBeCloseTo(T.rushWindup + 2, 6);
+  });
+
+  it('the bar fixes the line; the Guardian plants for the wind-up, then runs it at rushSpeed', () => {
+    const f = pulled(4);
+    const { g, target, at } = rushSetup(f);
+    const away = past(at, MID, 14);
+    f.put(target, away.x, away.z);
+    // Run the bar out to the tick the line is fixed.
+    let ev: SimEvent[] = [];
+    for (let i = 0; i < T.rushCast * 20 + 4 && f.st.rush === null; i++) ev = ev.concat(f.tick());
+    expect(f.st.rush).not.toBeNull();
+    const windups = ev.filter(
+      (e) => e.type === 'spellfxAt' && e.ability === COUNCIL_CUES.rushWindup,
+    ) as Extract<SimEvent, { type: 'spellfxAt' }>[];
+    expect(windups.length).toBe(1);
+    // The cue sits at the Guardian's feet and carries the line to its stop:
+    // the marked spot (no pillar on this line).
+    const w = windups[0];
+    expect(w.sourceId).toBe(g.id);
+    expect(w.speed).toBe(T.rushSpeed);
+    const start = f.local(g);
+    const cueAt = f.local({ pos: { x: w.x, y: 0, z: w.z } } as Entity);
+    expect(Math.hypot(cueAt.x - start.x, cueAt.z - start.z)).toBeLessThan(1e-6);
+    const reach = (w.speed ?? 0) * (w.duration ?? 0);
+    const stop = { x: start.x + (w.dirX ?? 0) * reach, z: start.z + (w.dirZ ?? 0) * reach };
+    expect(Math.hypot(stop.x - away.x, stop.z - away.z)).toBeLessThan(0.5);
+    // The marked player walks off: the line does not follow them.
+    f.put(target, away.x + 10, away.z + 10);
+    // Planted through the wind-up (the AI never walks it off its mark).
+    f.tick(Math.floor(T.rushWindup * 20) - 1);
+    const held = f.local(g);
+    expect(Math.hypot(held.x - start.x, held.z - start.z)).toBeLessThan(1e-6);
+    // Then the run: half a second covers half a second of rushSpeed.
+    f.tick(1 + 10);
+    const ran = f.local(g);
+    const d = Math.hypot(ran.x - start.x, ran.z - start.z);
+    expect(d).toBeGreaterThan(T.rushSpeed * 0.5 - 1.2);
+    expect(d).toBeLessThan(T.rushSpeed * 0.5 + 1.2);
+    // Straight down the fixed line, toward the old spot.
+    const along =
+      ((ran.x - start.x) * (away.x - start.x) + (ran.z - start.z) * (away.z - start.z)) /
+      Math.hypot(away.x - start.x, away.z - start.z);
+    expect(along).toBeCloseTo(d, 3);
+  });
+
+  it('it tramples whoever it runs through, each once; a player who stepped off the line is spared', () => {
+    const f = pulled(4);
+    const { g, target, at } = rushSetup(f);
+    const away = past(at, MID, 14);
+    f.put(target, away.x, away.z);
+    const bystander = f.players.find((p) => p !== target && p.id !== g.aggroTargetId) as Entity;
+    const mid = { x: (MID.x + away.x) / 2, z: (MID.z + away.z) / 2 };
+    f.put(bystander, mid.x, mid.z);
+    // To the line's fixing, then the marked steps clear during the wind-up.
+    let ev: SimEvent[] = [];
+    for (let i = 0; i < T.rushCast * 20 + 4 && f.st.rush === null; i++) ev = ev.concat(f.tick());
+    const dx = away.x - MID.x;
+    const dz = away.z - MID.z;
+    const len = Math.hypot(dx, dz);
+    f.put(target, away.x - (dz / len) * 6, away.z + (dx / len) * 6);
+    ev = ev.concat(f.tick(Math.ceil((T.rushWindup + 2) * 20)));
+    expect(f.st.rush).toBeNull();
+    expect(hitsOf(ev, COUNCIL_NAMES.rush, target.id)).toEqual([]);
+    expect(hitsOf(ev, COUNCIL_NAMES.rush, bystander.id).length).toBe(1);
+    expect(warned(ev, 'rushMiss')).toBe(true);
   });
 });
 

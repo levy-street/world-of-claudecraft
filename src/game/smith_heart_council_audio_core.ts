@@ -57,6 +57,9 @@ export const COUNCIL_CUE_SOUNDS: Readonly<Record<string, CouncilSound>> = {
   [COUNCIL_CUES.soulPip]: S('soul_pip', 1, 'source'),
   [COUNCIL_CUES.soulBurst]: S('soul_burst', 1, 'point'),
   [COUNCIL_CUES.echoBlast]: S('echo_blast', 1, 'source'),
+  // Mountain's Rush's wind-up: the Guardian plants, a deep slowed thud at
+  // its feet before the run.
+  [COUNCIL_CUES.rushWindup]: S('rock_impact', 0.7, 'point', 0.62, 0.3),
   // Mountain's Rush striking home (a pillar or the raid): the crush sample.
   [COUNCIL_CUES.rushImpact]: S('slab_crush', 1, 'point', 1, 0.3),
   // The cursed pillar: the rise's burst, a low dark hum, a soul pillar's

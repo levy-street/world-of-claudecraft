@@ -265,7 +265,15 @@ export class RiftDeathZoneVisuals {
     );
     this.finalKit = new FinalKitFx(scene, groundY, world, compileGate, reducedMotion, shake);
     this.finalPhase = new FinalPhaseFx(scene, groundY, world, compileGate, reducedMotion, shake);
-    this.councilFx = new CouncilFx(scene, groundY, world, compileGate, reducedMotion, shake);
+    this.councilFx = new CouncilFx(
+      scene,
+      groundY,
+      world,
+      compileGate,
+      reducedMotion,
+      shake,
+      playGesture,
+    );
     this.councilBodies = new CouncilBodies(
       scene,
       groundY,

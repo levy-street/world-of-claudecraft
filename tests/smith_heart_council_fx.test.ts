@@ -11,7 +11,6 @@ import { describe, expect, it } from 'vitest';
 import { TELEGRAPH_THREAT_COLORS } from '../src/render/floor_telegraph/telegraph_look_core';
 import { CouncilFx } from '../src/render/smith_heart_fx/council_fx';
 import {
-  bondThreadLook,
   COUNCIL_FX_COLORS,
   COUNCIL_FX_POOLS,
   COUNCIL_MARK_SPECS,
@@ -153,7 +152,7 @@ describe('council_fx_core: integrity on the model', () => {
     expect(rushLane(1, 1, 1.1, 1, 2, out)).toBeNull();
   });
 
-  it('the cursed pillar is its own template with its own light, the bond flares on a pulse', () => {
+  it('the cursed pillar is its own template with its own light', () => {
     expect(isCursedPillar(COUNCIL_CURSED)).toBe(true);
     expect(isCursedPillar(councilPillarTemplate(1, true))).toBe(false);
     expect(councilPillarOf(COUNCIL_CURSED)).toBeNull();
@@ -169,12 +168,6 @@ describe('council_fx_core: integrity on the model', () => {
     expect(calm.crack).toBeGreaterThan(0.5);
     expect(pulsed.glow).toBeGreaterThan(calm.glow);
     expect(pulsed.heat).toBeGreaterThan(calm.heat);
-    const b = { width: 0, alpha: 0 };
-    expect(bondThreadLook(99, 0, b)).toBe(b);
-    const settled = { ...b };
-    bondThreadLook(0, 0, b);
-    expect(b.width).toBeGreaterThan(settled.width);
-    expect(b.alpha).toBeGreaterThan(settled.alpha);
   });
 
   it("claims exactly the council's own cues", () => {
@@ -345,6 +338,7 @@ describe('CouncilFx over a fake world', () => {
     for (const e of [me, marked, guardian, singer, cursed]) entities.set(e.id, e);
     const world = { entities, player: me, playerId: me.id } as unknown as IWorld;
     const scene = new THREE.Scene();
+    const gestures: [number, string][] = [];
     const fx = new CouncilFx(
       scene,
       () => 0,
@@ -352,6 +346,7 @@ describe('CouncilFx over a fake world', () => {
       undefined,
       () => false,
       () => {},
+      (id, g) => gestures.push([id, g]),
     );
     for (let i = 0; i < 6; i++) fx.update(1 / 30);
     const root = scene.getObjectByName('smith-heart-council-fx');
@@ -383,7 +378,15 @@ describe('CouncilFx over a fake world', () => {
     guardian.auras.push(aura(COUNCIL_AURAS.bond, 10, 10));
     for (let i = 0; i < 6; i++) fx.update(1 / 30);
     expect(paints()).toBeGreaterThanOrEqual(before + 2);
+    // The bond: the tether (core, halo, shards) and its aura on both members
+    // (a sigil on the floor, a column of light), every tier.
     expect(shown('smithHeartCouncilBondThread')).toBe(1);
+    expect(shown('smithHeartCouncilBondCore')).toBe(1);
+    expect(shown('smithHeartCouncilBondHalo')).toBe(1);
+    expect(shown('smithHeartCouncilBondShards')).toBe(1);
+    expect(shown('smithHeartCouncilBondSigil')).toBe(2);
+    expect(shown('smithHeartCouncilBondColumn')).toBe(2);
+    expect(shown('smithHeartCouncilBondChain')).toBe(1);
     const nova = (ability: string, sourceId: number, targetId = sourceId): SimEvent =>
       ({
         type: 'spellfx',
@@ -405,17 +408,51 @@ describe('CouncilFx over a fake world', () => {
     marked.auras.length = 0;
     for (let i = 0; i < 6; i++) fx.update(1 / 30);
     expect(paints()).toBe(before);
+    // The wind-up: the line fixed from the Guardian's feet to the cursed
+    // pillar's face; the lane stays lit at full through it and the run.
+    const run = Math.hypot(cursed.pos.x - guardian.pos.x, cursed.pos.z - guardian.pos.z) - 4;
+    const windup = {
+      ...at(COUNCIL_CUES.rushWindup, guardian.pos.x, guardian.pos.z, T.rushHalfWidth),
+      sourceId: guardian.id,
+      dirX: (cursed.pos.x - guardian.pos.x) / (run + 4),
+      dirZ: (cursed.pos.z - guardian.pos.z) / (run + 4),
+      speed: T.rushSpeed,
+      duration: run / T.rushSpeed,
+    } as SimEvent;
+    expect(fx.handleEvent(windup)).toBe(true);
+    expect(gestures).toEqual([[guardian.id, 'heart_mountains_rush_windup']]);
+    fx.update(1 / 30);
+    expect(paints()).toBe(before + 1);
+    expect(shown('smithHeartRushStar')).toBe(1);
+    expect(shown('smithHeartRushScar')).toBe(0);
+    // Into the run: the scar tears open behind the body.
+    for (let i = 0; i < Math.ceil((T.rushWindup + 0.2) * 30); i++) fx.update(1 / 30);
+    expect(paints()).toBe(before + 1);
+    expect(shown('smithHeartRushScar')).toBe(1);
     const stop = at(COUNCIL_CUES.rushImpact, cursed.pos.x, cursed.pos.z, T.rushHalfWidth);
     expect(fx.handleEvent(stop)).toBe(true);
+    fx.update(1 / 30);
+    // The stop: the locked lane goes, the scar and both stars stay a while.
+    expect(paints()).toBe(before);
+    expect(shown('smithHeartRushScar')).toBe(1);
+    expect(shown('smithHeartRushStar')).toBe(2);
     entities.delete(cursed.id);
     const brk = at(COUNCIL_CUES.cursedBreak, cursed.pos.x, cursed.pos.z, T.cursedR);
     expect(fx.handleEvent(brk)).toBe(true);
     for (let i = 0; i < 120; i++) fx.update(1 / 30);
     expect(shown('smithHeartCouncilPillar')).toBe(0);
-    // The bond breaks when they are pulled apart (neither wears it).
+    // The Rush's trace fades away.
+    for (let i = 0; i < 90; i++) fx.update(1 / 30);
+    expect(shown('smithHeartRushScar')).toBe(0);
+    expect(shown('smithHeartRushStar')).toBe(0);
+    // The bond breaks when they are pulled apart (neither wears it): every
+    // piece goes the same frame.
     guardian.auras.length = 0;
     fx.update(1 / 30);
     expect(shown('smithHeartCouncilBondThread')).toBe(0);
+    expect(shown('smithHeartCouncilBondSigil')).toBe(0);
+    expect(shown('smithHeartCouncilBondColumn')).toBe(0);
+    expect(shown('smithHeartCouncilBondChain')).toBe(0);
     fx.dispose();
   });
 });

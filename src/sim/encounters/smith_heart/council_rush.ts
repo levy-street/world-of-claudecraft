@@ -13,18 +13,20 @@
 //                 reminder; the real pressure on heroic and mythic). It
 //                 shelters nobody from a Wrath, the rock and Resonance never
 //                 touch it; only the Rush or a Wrath breaks it.
-//   The dash      when the bar lands the Guardian dashes in a straight line at
-//                 where the marked player stands. It stops at the FIRST pillar
-//                 on its line:
+//   The dash      when the bar lands the line is fixed at where the marked
+//                 player stands; the Guardian plants for a short wind-up
+//                 (rushWindup), then charges down it at a heavy run
+//                 (rushSpeed). It stops at the FIRST pillar on its line:
 //                   the cursed pillar  it shatters; the Guardian reels (a 5 s
 //                                      stun) and takes 50 percent more damage
 //                                      for 12 s (the reward for aiming);
 //                   a good pillar      that pillar is taken whole and the
 //                                      cursed one keeps pulsing;
 //                   a soul pillar      it stops there, the soul pillar stands.
-//                 Anyone in the path up to where it stops takes a heavy blow
-//                 and a throw; with no pillar on the line that is the marked
-//                 player, and the cursed pillar stays. Mythic: a miss sets
+//                 Anyone it runs through on the way (each once, as its body
+//                 passes) takes a heavy blow and a throw; with no pillar on
+//                 the line that is the marked player if they stayed on it,
+//                 and the cursed pillar stays. Mythic: a miss sets
 //                 the Quarry collapsing (a stacking raid-wide blow every 2 s)
 //                 until the cursed pillar breaks.
 //   No heir       it dies with the Guardian, and so does his cursed pillar.
@@ -61,6 +63,7 @@ import {
   raidWarn,
   roll,
 } from './council_scope';
+import type { CouncilRush } from './council_state';
 import { councilSay } from './council_voice';
 
 /** Is the Rush due now (its clock run out, the Guardian standing, no dash
@@ -159,8 +162,33 @@ export function landRush(s: CouncilScope, g: Entity, targetId: number | null): v
     from,
     to,
     pillarId: hit ? hit.e.id : null,
+    windup: T.rushWindup,
     remaining: Math.max(DT, stop / T.rushSpeed),
+    struck: [],
   };
+  g.facing = Math.atan2(dx, dz);
+  // The wind-up's cue at the Guardian's feet carries the whole line: its
+  // heading, the run's speed and seconds (the stop is from + dir * both).
+  s.ctx.emit({
+    type: 'spellfxAt',
+    x: from.x,
+    z: from.z,
+    school: 'physical',
+    fx: 'burst',
+    ability: COUNCIL_CUES.rushWindup,
+    radius: T.rushHalfWidth,
+    sourceId: g.id,
+    dirX: dx / len,
+    dirZ: dz / len,
+    speed: T.rushSpeed,
+    duration: stop / T.rushSpeed,
+  });
+}
+
+/** Seconds from the bar landing to the Guardian's stop on a dash of
+ *  `yards` (the wind-up, then the run). */
+export function rushSeconds(yards: number): number {
+  return T.rushWindup + Math.max(DT, yards / T.rushSpeed);
 }
 
 /** Distance from p to the segment a to b (xz). */
@@ -229,23 +257,8 @@ function reel(s: CouncilScope, g: Entity): void {
 /** What the dash ended on (the tests read it). */
 export type RushOutcome = 'cursed' | 'pillar' | 'soul' | 'miss';
 
-/** One tick of the dash: the Guardian moves along its line; on arrival the
- *  first pillar on it is dealt with and everyone in its path is struck.
- *  Returns the outcome on the tick it lands, else null. */
-export function stepRush(s: CouncilScope): RushOutcome | null {
-  const r = s.st.rush;
-  if (!r) return null;
-  const g = s.bodies.guardian;
-  // Gone, or walking home on its leash: the dash is over.
-  if (!living(g) || g.aiState === 'evade') {
-    s.st.rush = null;
-    return null;
-  }
-  // No swing while it charges.
-  g.swingTimer = Math.max(g.swingTimer, 0.6);
-  const total = Math.max(DT, Math.hypot(r.to.x - r.from.x, r.to.z - r.from.z) / T.rushSpeed);
-  r.remaining = Math.max(0, r.remaining - DT);
-  const k = 1 - Math.min(1, r.remaining / total);
+/** Set the Guardian on its line at `k` (0 the start, 1 the stop). */
+function placeOnLine(s: CouncilScope, g: Entity, r: CouncilRush, k: number): void {
   const ground = s.ctx.groundPos(
     r.from.x + (r.to.x - r.from.x) * k,
     r.from.z + (r.to.z - r.from.z) * k,
@@ -255,6 +268,48 @@ export function stepRush(s: CouncilScope): RushOutcome | null {
   g.pos.z = ground.z;
   g.facing = Math.atan2(r.to.x - r.from.x, r.to.z - r.from.z);
   s.ctx.rebucket(g);
+}
+
+/** One tick of the dash: the Guardian holds its wind-up, then moves along
+ *  its line, striking whoever its body passes over this tick (each once);
+ *  on arrival the first pillar on the line is dealt with. Returns the
+ *  outcome on the tick it lands, else null. */
+export function stepRush(s: CouncilScope): RushOutcome | null {
+  const r = s.st.rush;
+  if (!r) return null;
+  const g = s.bodies.guardian;
+  // Gone, or walking home on its leash: the dash is over.
+  if (!living(g) || g.aiState === 'evade') {
+    s.st.rush = null;
+    return null;
+  }
+  // No swing while it braces or charges.
+  g.swingTimer = Math.max(g.swingTimer, 0.6);
+  // The wind-up: planted at the line's start, facing down it.
+  if (r.windup > 1e-9) {
+    r.windup = Math.max(0, r.windup - DT);
+    placeOnLine(s, g, r, 0);
+    return null;
+  }
+  const total = Math.max(DT, Math.hypot(r.to.x - r.from.x, r.to.z - r.from.z) / T.rushSpeed);
+  const k0 = 1 - Math.min(1, r.remaining / total);
+  r.remaining = Math.max(0, r.remaining - DT);
+  const k = 1 - Math.min(1, r.remaining / total);
+  placeOnLine(s, g, r, k);
+  // Whoever the body passed over this tick: a heavy blow and a throw.
+  const a = {
+    x: r.from.x + (r.to.x - r.from.x) * k0,
+    z: r.from.z + (r.to.z - r.from.z) * k0,
+  };
+  const b = { x: g.pos.x, z: g.pos.z };
+  for (const p of s.players) {
+    if (p.dead || r.struck.includes(p.id)) continue;
+    if (segmentDistance(p.pos, a, b) > T.rushHalfWidth + 0.5) continue;
+    r.struck.push(p.id);
+    const amount = roll(s, g, T.rushMin, T.rushMax);
+    s.ctx.dealDamage(g, p, amount, false, 'physical', COUNCIL_NAMES.rush, 'hit', true);
+    if (!p.dead) s.ctx.applyKnockback(g, p, T.rushKnockback);
+  }
   if (r.remaining > 1e-9) return null;
   s.st.rush = null;
   s.ctx.emit({
@@ -292,15 +347,9 @@ export function stepRush(s: CouncilScope): RushOutcome | null {
         );
     } else outcome = 'pillar';
   }
-  const struck: Entity[] = [];
-  for (const p of s.players) {
-    if (p.dead) continue;
-    if (segmentDistance(p.pos, r.from, r.to) > T.rushHalfWidth + 0.5) continue;
-    const amount = roll(s, g, T.rushMin, T.rushMax);
-    s.ctx.dealDamage(g, p, amount, false, 'physical', COUNCIL_NAMES.rush, 'hit', true);
-    if (!p.dead) s.ctx.applyKnockback(g, p, T.rushKnockback);
-    struck.push(p);
-  }
+  const struck = r.struck
+    .map((id) => s.ctx.entities.get(id))
+    .filter((e): e is Entity => e !== undefined);
   if (outcome === 'miss' && struck.length > 0)
     raidWarn(s, g, 'rushMiss', `Mountain's Rush tramples ${namesOf(struck)}!`, {
       players: namesOf(struck),

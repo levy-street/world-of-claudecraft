@@ -66,15 +66,18 @@ export interface CouncilSoul {
   pulses: number;
 }
 
-/** Mountain's Rush in flight: the Guardian dashing along its line (world
- *  points), where it stops, the pillar that stops it (null: it reaches the
- *  marked spot), the marked player, and the dash's seconds left. */
+/** Mountain's Rush in flight: the Guardian planted for its wind-up, then
+ *  dashing along its line (world points), where it stops, the pillar that
+ *  stops it (null: it reaches the marked spot), the marked player, the
+ *  wind-up's and the dash's seconds left, and who it has run through. */
 export interface CouncilRush {
   targetId: number;
   from: { x: number; z: number };
   to: { x: number; z: number };
   pillarId: number | null;
+  windup: number;
   remaining: number;
+  struck: number[];
 }
 
 export interface CouncilFightState {
