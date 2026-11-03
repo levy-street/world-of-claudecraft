@@ -12,7 +12,11 @@
 // Env: SHOT_URL (http://127.0.0.1:5191/), SHOT_W / SHOT_H (1600x900),
 // SHOT_PRESET (4), SHOT_ONLY (comma list of shot names), SHOT_HEROIC=1,
 // SHOT_MYTHIC=1 (the mythic switch on, and only the m* Soul in the Stone
-// shots).
+// shots), SHOT_UI=1 (keep the HUD: the raid warning banners), SHOT_SETTLE
+// (ms to wait for the raid's loading curtain, 9000), SHOT_RUSH_CAM=behind
+// (the Rush shots from behind the Guardian instead of from the side). The b*,
+// c* and w* shots are Bond of the Stone, Mountain's Rush and the columns'
+// warning (entregas consejo_flojos).
 import fs from 'node:fs';
 import path from 'node:path';
 import puppeteer from 'puppeteer-core';
@@ -81,7 +85,10 @@ try {
     },
     { timeout: 180000, polling: 1000 },
   );
-  await page.addStyleTag({ content: '#ui { display: none !important; }' });
+  if (process.env.SHOT_UI !== '1')
+    await page.addStyleTag({ content: '#ui { display: none !important; }' });
+  // Let the raid's own loading curtain clear before the first shot.
+  await sleep(Number(process.env.SHOT_SETTLE ?? 9000));
   const O = await page.evaluate(
     ([ex, ez]) => {
       const p = window.__game.world.player;
@@ -101,6 +108,7 @@ try {
       return id;
     });
   });
+  const RAID = await page.evaluate(() => window.__raid);
   // Place the camera's own player and hold the camera.
   const place = async (at, look, yaw, pitch, dist) =>
     page.evaluate(
@@ -186,6 +194,24 @@ try {
     }
   };
   const reset = () => chat('/dev heart council reset', 1500);
+  // Every council clock parked (no stray Song or Rush in a shot).
+  const park = () =>
+    page.evaluate(() => {
+      for (const e of window.__game.world.entities.values()) {
+        const st = e.smithHeartFight;
+        if (!st) continue;
+        Object.assign(st, {
+          weightTimer: 999,
+          wakeTimer: 999,
+          rockTimer: 999,
+          boltTimer: 999,
+          songTimer: 999,
+          rushTimer: 999,
+          songDue: null,
+        });
+        break;
+      }
+    });
   // The first soul pillar's instance-local spot, and a write to its soul.
   const soulAt = () =>
     page.evaluate(
@@ -227,12 +253,108 @@ try {
     const a = (deg * Math.PI) / 180;
     return [MID.x + Math.sin(a) * (24 + out), MID.z + Math.cos(a) * (24 + out)];
   };
+  // Put a council member at instance-local (x, z) and give it a tank.
+  const member = (tpl, x, z, tankIdx) =>
+    page.evaluate(
+      ([ox, oz, tpl, x, z, tankId]) => {
+        const w = window.__game.world;
+        for (const e of w.entities.values()) {
+          if (e.templateId !== tpl || e.dead) continue;
+          const g = w.ctx.groundPos(ox + x, oz + z);
+          e.pos = { ...g };
+          e.prevPos = { ...g };
+          w.ctx.rebucket(e);
+          const tank = tankId === null ? null : w.entities.get(tankId);
+          if (tank) {
+            w.ctx.aggroMob(e, tank, false);
+            e.threat.set(tank.id, 1e7);
+          }
+        }
+      },
+      [O.x, O.z, tpl, x, z, tankIdx === null ? null : RAID[tankIdx]],
+    );
   const shoot = async (name) => {
     const buf = await page.screenshot();
     fs.mkdirSync(OUT, { recursive: true });
     const file = path.join(OUT, `${name}_${LABEL}.png`);
     fs.writeFileSync(file, buf);
     console.log('SHOT', file);
+  };
+
+  // A Rush led into the cursed pillar: the Guardian across the Quarry, the
+  // marked player beyond the pillar on its line; shoot when `ready` reads
+  // the live state true (then wait `after` ms).
+  const rushScene = async (ready, after = 0) => {
+    await reset();
+    await pull();
+    await member('heart_seam_singer', MID.x - 30, MID.z + 26, 1);
+    await raider(1, MID.x - 31, MID.z + 27);
+    for (let i = 2; i < 8; i++) await raider(i, MID.x - 26 + i, MID.z - 18 - (i % 2) * 2);
+    const clearGap = () =>
+      page.evaluate(() => {
+        for (const e of window.__game.world.entities.values()) {
+          const st = e.smithHeartFight;
+          if (!st) continue;
+          st.lastFloorAt = null;
+          break;
+        }
+      });
+    // Where the cursed pillar will rise: the sim's own pick (council_rush.ts
+    // raiseCursed, the golden angle off the fight's cast count, which the
+    // bar's start raises by one), with no pillar in the way.
+    const casts = (await state())?.casts ?? 0;
+    const ang = (casts + 1) * 2.39996;
+    const cursedAt = [MID.x + Math.sin(ang) * 15, MID.z + Math.cos(ang) * 15];
+    // The Guardian across the middle from it, its tank behind it.
+    const ux = Math.sin(ang);
+    const uz = Math.cos(ang);
+    const g = [cursedAt[0] - ux * 24, cursedAt[1] - uz * 24];
+    await raider(0, g[0] - ux * 2.5, g[1] - uz * 2.5);
+    await member('heart_hammer_guardian', g[0], g[1], 0);
+    await sleep(700);
+    await member('heart_hammer_guardian', g[0], g[1], 0);
+    await clearGap();
+    await chat('/dev heart council rush', 200);
+    // The Singer back to her own tank far off (no bond in the shot).
+    await raider(1, MID.x - 31, MID.z + 27);
+    await member('heart_seam_singer', MID.x - 30, MID.z + 26, 1);
+    const target = await page.evaluate(() => {
+      for (const e of window.__game.world.entities.values())
+        if (e.templateId === 'heart_hammer_guardian' && !e.dead) return e.castTargetId;
+      return null;
+    });
+    if (target === null) {
+      console.log('rush: no bar');
+      return;
+    }
+    await page.evaluate(
+      ([ox, oz, id, x, z]) => {
+        const w = window.__game.world;
+        const e = w.entities.get(id);
+        if (!e) return;
+        const p = w.ctx.groundPos(ox + x, oz + z);
+        e.pos = { ...p };
+        e.prevPos = { ...p };
+        w.ctx.rebucket(e);
+      },
+      [O.x, O.z, target, cursedAt[0] + ux * 6, cursedAt[1] + uz * 6],
+    );
+    // The camera off the line's side, looking across it at its middle.
+    const mid = [(g[0] + cursedAt[0]) / 2, (g[1] + cursedAt[1]) / 2];
+    const side = [-uz, ux];
+    const cam = process.env.SHOT_RUSH_CAM ?? 'side';
+    if (cam === 'side')
+      await place([mid[0] + side[0] * 12, mid[1] + side[1] * 12], mid, 0.0, 0.92, 26);
+    else await place([g[0] - ux * 8, g[1] - uz * 8], cursedAt, 0.0, 0.42, 16);
+    const until = Date.now() + 9000;
+    while (Date.now() < until) {
+      const st = await state();
+      if (st && ready(st)) {
+        break;
+      }
+      await sleep(15);
+    }
+    if (after) await sleep(after);
   };
 
   const scenes = {
@@ -518,6 +640,93 @@ try {
       // After the pull's lines (their bubbles gone).
       await place([MID.x + 2, MID.z - 20], [MID.x + 2, MID.z], 0.0, 0.3, 20);
       await sleep(13000);
+    },
+    // Bond of the Stone (consejo_flojos): the two close together, then
+    // apart inside the reach, then out of it (no tether).
+    async b1_vinculo_juntos() {
+      await reset();
+      await pull();
+      await raider(0, MID.x - 3, MID.z + 1);
+      await raider(1, MID.x + 3, MID.z - 1);
+      await member('heart_hammer_guardian', MID.x - 2.5, MID.z + 1, 0);
+      await member('heart_seam_singer', MID.x + 3, MID.z - 2, 1);
+      for (let i = 2; i < 8; i++) await raider(i, MID.x - 14 - i, MID.z + 10 + (i % 3) * 2);
+      await place([MID.x - 8, MID.z - 9], [MID.x, MID.z], 0.0, 0.78, 26);
+      await sleep(4200);
+    },
+    async b2_vinculo_lejos() {
+      await reset();
+      await pull();
+      await raider(0, MID.x - 9, MID.z + 2);
+      await raider(1, MID.x + 9, MID.z - 2);
+      await member('heart_hammer_guardian', MID.x - 8, MID.z + 2, 0);
+      await member('heart_seam_singer', MID.x + 8, MID.z - 2, 1);
+      for (let i = 2; i < 8; i++) await raider(i, MID.x - 18 - i, MID.z + 14 + (i % 3) * 2);
+      await place([MID.x - 2, MID.z - 12], [MID.x, MID.z], 0.0, 0.9, 32);
+      await sleep(4200);
+    },
+    async b3_vinculo_roto() {
+      await reset();
+      await pull();
+      await raider(0, MID.x - 14, MID.z + 2);
+      await raider(1, MID.x + 14, MID.z - 2);
+      await member('heart_hammer_guardian', MID.x - 13, MID.z + 2, 0);
+      await member('heart_seam_singer', MID.x + 13, MID.z - 2, 1);
+      for (let i = 2; i < 8; i++) await raider(i, MID.x - 18 - i, MID.z + 14 + (i % 3) * 2);
+      await place([MID.x - 2, MID.z - 12], [MID.x, MID.z], 0.0, 0.9, 32);
+      await sleep(4200);
+    },
+    // Mountain's Rush (consejo_flojos): the wind-up, the run, the stop on the
+    // cursed pillar. The Singer parked far off (no bond), the raid aside.
+    async c1_carga_preparacion() {
+      await rushScene((st) => st.rush && st.rush.windup > 0 && st.rush.windup < 0.45);
+    },
+    async c2_carga_rastro() {
+      await rushScene((st) => st.rush && st.rush.windup === 0 && st.rush.remaining < 0.55);
+    },
+    async c3_carga_impacto() {
+      let seen = false;
+      await rushScene((st) => {
+        if (st.rush) seen = true;
+        return seen && !st.rush;
+      }, 90);
+    },
+    // Mountain's Wrath on the bare floor after the columns have fallen: the
+    // reworded warning, a clear view of the rubble (07's replacement).
+    async w1_aviso_columnas() {
+      await reset();
+      await pull();
+      await member('heart_hammer_guardian', MID.x + 4, MID.z + 6, 0);
+      await raider(0, MID.x + 2, MID.z + 4);
+      for (let i = 1; i < 8; i++) {
+        const [x, z] = col(i % 5, 5 + (i > 5 ? 2.5 : 0));
+        await raider(i, x, z);
+      }
+      await place([MID.x - 8, MID.z - 10], [MID.x, MID.z], 0.0, 0.95, 30);
+      await sleep(900);
+      await park();
+      await chat('/dev heart council wrath', 0);
+      // Past the landing: the Song it queues parked too.
+      await sleep(4150);
+      await park();
+      await sleep(2200);
+    },
+    async w2_ira_despues() {
+      await reset();
+      await pull();
+      await member('heart_hammer_guardian', MID.x + 4, MID.z + 6, 0);
+      await raider(0, MID.x + 2, MID.z + 4);
+      for (let i = 1; i < 8; i++) {
+        const [x, z] = col(i % 5, 5 + (i > 5 ? 2.5 : 0));
+        await raider(i, x, z);
+      }
+      await place([MID.x - 2, MID.z - 12], [MID.x, MID.z], 0.0, 1.08, 38);
+      await sleep(900);
+      await park();
+      await chat('/dev heart council wrath', 0);
+      await sleep(4150);
+      await park();
+      await sleep(3200);
     },
     // Review only (never delivered): the two bodies close, the energy, the
     // Weight and a bolt.
