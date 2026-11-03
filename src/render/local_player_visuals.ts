@@ -34,7 +34,10 @@ export class LocalPlayerVisuals {
 
   update(
     world: IWorld,
-    views: ReadonlyMap<number, { group: THREE.Group; height?: number }>,
+    views: ReadonlyMap<
+      number,
+      { group: THREE.Group; height?: number; visual?: { root: THREE.Object3D } | null }
+    >,
     reducedMotion: boolean,
     time: number,
     dt: number,

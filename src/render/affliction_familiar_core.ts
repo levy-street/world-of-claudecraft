@@ -16,6 +16,16 @@ export const AFFLICTION_FAMILIAR_LOCAL_Z = 0.15;
 /** Where the eye hovers, as a fraction of its owner's model height: head
  *  height. Maledict Gaze's ray starts from the same point (drain_life_vfx.ts). */
 export const AFFLICTION_FAMILIAR_HEIGHT_FRAC = 0.9;
+/** How far above its owner's head bone the eye hovers (rig units), measured so
+ *  a standing WOC body keeps the head-height spot it had (head bone 2.46). */
+export const AFFLICTION_FAMILIAR_HEAD_LIFT = 0.11;
+
+const HEAD_BONE_NAME = /^(mixamorig:?)?head$/i;
+
+/** Whether a rig node is the head bone the eye follows. */
+export function isAfflictionFamiliarHeadBone(node: { name: string; type?: string }): boolean {
+  return HEAD_BONE_NAME.test(node.name);
+}
 
 const BASE_X = AFFLICTION_FAMILIAR_LOCAL_X;
 const BASE_Y = 1.72;

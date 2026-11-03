@@ -1,10 +1,12 @@
 import * as THREE from 'three';
 import type { IWorld } from '../world_api';
 import {
+  AFFLICTION_FAMILIAR_HEAD_LIFT,
   type AfflictionFamiliarPose,
   afflictionFamiliarClass,
   afflictionFamiliarHoverY,
   afflictionFamiliarLookYaw,
+  isAfflictionFamiliarHeadBone,
   isAfflictionFamiliarPossessed,
   shouldShowAfflictionFamiliar,
   writeAfflictionFamiliarPose,
@@ -35,6 +37,9 @@ interface AfflictionFamiliarHostView {
   /** Unscaled model height (the renderer's view height); the eye hovers at
    *  its owner's head from it. */
   height?: number;
+  /** The rider body inside the group. A mount lifts it onto the saddle (and a
+   *  moving seat shifts it), so the eye follows its offset to stay by the head. */
+  visual?: { root: THREE.Object3D } | null;
 }
 
 export type AfflictionFamiliarModelFactory = () => THREE.Object3D | null;
@@ -82,7 +87,13 @@ export function buildAfflictionFamiliarPrewarmStandIn(
 interface FamiliarSlot {
   root: THREE.Group;
   host: THREE.Group | null;
+  /** The owner's head bone, resolved once per rider body (`headOf`), so the
+   *  eye follows the real head standing, seated on a mount, or mid-animation. */
+  head: THREE.Object3D | null;
+  headOf: THREE.Object3D | null;
 }
+
+const headScratch = new THREE.Vector3();
 
 /**
  * Presentation-only companion for every Affliction warlock in view, the local
@@ -165,16 +176,29 @@ export class AfflictionFamiliar {
     timeSeconds: number,
   ): void {
     const host = view.group;
-    writeAfflictionFamiliarPose(
-      this.pose,
-      timeSeconds,
-      owner.id,
-      reducedMotion,
-      afflictionFamiliarHoverY(view.height),
-    );
+    const head = this.headOf(slot, view);
+    // Beside the head bone, in the owner's local space: it already carries a
+    // mount's seat lift and a seated rider's lower head. Without a head bone,
+    // fall back to head height from the model height plus the seat offset.
+    let offX = 0;
+    let offZ = 0;
+    let baseY: number;
+    if (head) {
+      head.getWorldPosition(headScratch);
+      host.worldToLocal(headScratch);
+      offX = headScratch.x;
+      offZ = headScratch.z;
+      baseY = headScratch.y + AFFLICTION_FAMILIAR_HEAD_LIFT;
+    } else {
+      const seat = view.visual?.root.position;
+      offX = seat?.x ?? 0;
+      offZ = seat?.z ?? 0;
+      baseY = afflictionFamiliarHoverY(view.height) + (seat?.y ?? 0);
+    }
+    writeAfflictionFamiliarPose(this.pose, timeSeconds, owner.id, reducedMotion, baseY);
     const possessed = isAfflictionFamiliarPossessed(owner);
     const root = slot.root;
-    root.position.set(this.pose.x, this.pose.y, this.pose.z);
+    root.position.set(this.pose.x + offX, this.pose.y, this.pose.z + offZ);
     const targetView = views.get(owner.castTargetId ?? owner.targetId ?? -1);
     const yaw =
       possessed && targetView
@@ -190,13 +214,28 @@ export class AfflictionFamiliar {
     root.scale.setScalar((possessed ? 1.15 : 1) / Math.max(0.01, owner.scale));
   }
 
+  /** The owner's head bone, re-resolved only when the rider body changes. */
+  private headOf(slot: FamiliarSlot, view: AfflictionFamiliarHostView): THREE.Object3D | null {
+    const body = view.visual?.root ?? null;
+    if (body !== slot.headOf) {
+      slot.headOf = body;
+      slot.head = null;
+      body?.traverse((node) => {
+        if (!slot.head && (node as THREE.Bone).isBone && isAfflictionFamiliarHeadBone(node)) {
+          slot.head = node;
+        }
+      });
+    }
+    return slot.head;
+  }
+
   private buildSlot(id: number): FamiliarSlot | null {
     const model = this.modelFactory();
     if (!model) return null;
     const root = new THREE.Group();
     root.name = 'affliction-familiar';
     root.add(model);
-    const slot: FamiliarSlot = { root, host: null };
+    const slot: FamiliarSlot = { root, host: null, head: null, headOf: null };
     this.slots.set(id, slot);
     return slot;
   }
