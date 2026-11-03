@@ -16599,6 +16599,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectRechargeNoSlot': '{profession}上沒有鑲嵌任何效果。',
   'hudChrome.professions.toolEffectRechargeFull': '{effect}已充滿能量。',
   'hudChrome.professions.toolEffectRechargeMaterials': '為{effect}充能需要{material}x{count}。',
+  'hudChrome.professions.toolEffectRechargeLocked':
+    '為{effect}充能需要{material}x{count}，但你的材料已鎖定。請在背包中解鎖。',
   'hudChrome.professions.craftingProgress': '正在製作：還剩{remaining}秒，共{total}秒。',
   'hudChrome.professions.disenchantingProgress': '正在分解：還剩{remaining}秒，共{total}秒。',
   'hudChrome.professions.enchantingProgress': '正在附魔：還剩{remaining}秒，共{total}秒。',

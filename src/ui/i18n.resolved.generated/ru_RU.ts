@@ -6422,7 +6422,7 @@ export const ru_RU: EnTranslations = {
       "toolEffectRechargeFull": "{effect} уже полностью заряжен.",
       "toolEffectRechargeToolCapped": "Чтобы зарядить {effect} дальше, возьмите инструмент получше ({profession}).",
       "toolEffectRechargeMaterials": "Для перезарядки {effect} нужно {material} x{count}.",
-      "toolEffectRechargeLocked": "Recharging {effect} needs {material} x{count}, but your copies are locked. Unlock them in your bags.",
+      "toolEffectRechargeLocked": "Для перезарядки {effect} нужно {material} x{count}, но эти предметы заблокированы. Разблокируйте их в сумках.",
       "craftingProgress": "Вы создаете предмет: осталось {remaining} с из {total} с.",
       "disenchantingProgress": "Вы распыляете предмет: осталось {remaining} с из {total} с.",
       "enchantingProgress": "Вы накладываете чары: осталось {remaining} с из {total} с.",

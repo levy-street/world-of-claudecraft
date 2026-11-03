@@ -6422,7 +6422,7 @@ export const ja_JP: EnTranslations = {
       "toolEffectRechargeFull": "{effect}はすでに完全に充填されている。",
       "toolEffectRechargeToolCapped": "{effect}をさらに充填するには、より上質な{profession}用ツールが必要だ。",
       "toolEffectRechargeMaterials": "{effect}の再充填には{material}x{count}が必要だ。",
-      "toolEffectRechargeLocked": "Recharging {effect} needs {material} x{count}, but your copies are locked. Unlock them in your bags.",
+      "toolEffectRechargeLocked": "{effect}の再充填には{material}x{count}が必要だが、所持品がロックされている。バッグでロックを解除しよう。",
       "craftingProgress": "製作中：残り{remaining}秒（全{total}秒）。",
       "disenchantingProgress": "分解中：残り{remaining}秒（全{total}秒）。",
       "enchantingProgress": "付与中：残り{remaining}秒（全{total}秒）。",

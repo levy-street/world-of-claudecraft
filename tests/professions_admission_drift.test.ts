@@ -622,6 +622,20 @@ describe('tool-recharge admission matches its resolver', () => {
       },
     },
     {
+      name: 'the arcane material is held, but only in a locked stack',
+      expected: 'locked',
+      professionId: 'mining',
+      setup: (sim, meta) => {
+        slotMiningEffect(sim, meta);
+        const slot = meta.toolEffectSlots?.mining;
+        if (!slot) throw new Error('slot');
+        slot.durability = 0;
+        sim.addItem(DUST, 10);
+        const idx = meta.inventory.findIndex((s) => s.itemId === DUST);
+        sim.setItemLocked(DUST, true, sim.playerId, idx);
+      },
+    },
+    {
       name: 'a depleted slot, a tool in the bags, and the material paid for',
       expected: null,
       professionId: 'mining',

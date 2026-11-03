@@ -28,24 +28,14 @@ export const pending: Record<string, readonly string[]> = {
   "de_DE": [
     "hudChrome.professions.toolEffectRechargeLocked"
   ],
-  "zh_CN": [
-    "hudChrome.professions.toolEffectRechargeLocked"
-  ],
-  "zh_TW": [
-    "hudChrome.professions.toolEffectRechargeLocked"
-  ],
-  "ko_KR": [
-    "hudChrome.professions.toolEffectRechargeLocked"
-  ],
-  "ja_JP": [
-    "hudChrome.professions.toolEffectRechargeLocked"
-  ],
+  "zh_CN": [],
+  "zh_TW": [],
+  "ko_KR": [],
+  "ja_JP": [],
   "pt_BR": [
     "hudChrome.professions.toolEffectRechargeLocked"
   ],
-  "ru_RU": [
-    "hudChrome.professions.toolEffectRechargeLocked"
-  ],
+  "ru_RU": [],
   "cs_CZ": [
     "hudChrome.professions.toolEffectRechargeLocked"
   ],

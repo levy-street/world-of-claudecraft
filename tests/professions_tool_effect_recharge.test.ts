@@ -694,6 +694,31 @@ describe('the recharge command: locked materials (Discord report)', () => {
     expect(sim.countItem('arcane_dust')).toBe(10);
   });
 
+  it('an unlocked shortfall the locked stack would cover still denies as locked', () => {
+    // A foreign-crafted slot pays the generic 2 dust; 1 unlocked + 10 locked.
+    const sim = makeSim();
+    sim.addItem('copper_mining_pick', 1);
+    sim.addItemInstance('gatherers_cache', { signer: 'Elsewhere' }, sim.playerId, 1);
+    sim.slotToolEffect('mining', 'gatherers_cache');
+    const slot = metaOf(sim).toolEffectSlots?.mining;
+    if (!slot) throw new Error('slot minted');
+    slot.durability = 0;
+    sim.addItem('arcane_dust', 10);
+    const idx = metaOf(sim).inventory.findIndex((s) => s.itemId === 'arcane_dust');
+    sim.setItemLocked('arcane_dust', true, sim.playerId, idx);
+    sim.addItem('arcane_dust', 1);
+    sim.rechargeToolEffect('mining');
+    expect(lastToolEffectResult(sim.tick())).toMatchObject({
+      ok: false,
+      reason: 'locked',
+      count: 2,
+    });
+    expect(slot.durability).toBe(0);
+    expect(sim.countItem('arcane_dust')).toBe(11);
+  });
+
+  // Regression guard (passes on the pre-fix code too: the spend already skipped
+  // locked copies; the bug was only the raw-count gate).
   it('spends only unlocked copies when an unlocked spare exists beside a locked stack', () => {
     const { sim, slot } = simWithLockedDust();
     sim.addItem('arcane_dust', 1);
