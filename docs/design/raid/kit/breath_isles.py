@@ -835,9 +835,20 @@ def _shrine_floor(p, walk, pads, rng):
     _flagstone(p, core, rng, FLAG_WARM, top=0.06)
     # The dais's wedges, then a kerb of small dressed blocks round its rim
     # (gaps between, a few lost): an old shrine's floor, worn at its edges.
+    spin = float(rng.uniform(0, TAU))
+    lost = set(int(x) for x in rng.choice(9, 2, replace=False))
     for j in range(9):
-        a0 = TAU * j / 9 + 0.03
-        a1 = TAU * (j + 1) / 9 - 0.03
+        a0 = spin + TAU * j / 9 + 0.03 + float(rng.uniform(-0.04, 0.04))
+        a1 = spin + TAU * (j + 1) / 9 - 0.03 + float(rng.uniform(-0.04, 0.04))
+        if j in lost:
+            # One lost to the turf, one cracked across and sunk.
+            if j == min(lost):
+                continue
+            mid = (a0 + a1) / 2
+            _flagstone(p, _arc_stone(home, inner + 0.08, PAD_R - 0.55, a0, mid - 0.03, 2), rng, FLAG, top=0.02)
+            _flagstone(p, _arc_stone(home, inner + 0.12, PAD_R - 0.6, mid + 0.03, a1, 2), rng, FLAG_COOL,
+                       top=0.012)
+            continue
         outline = _arc_stone(home, inner + 0.08, PAD_R - 0.55, a0, a1, steps=3)
         if not all(inside(walk, x, y, 0.12) for (x, y) in outline):
             continue
@@ -880,10 +891,12 @@ def _shrine_floor(p, walk, pads, rng):
         q = centre + d * t + side * float(rng.uniform(-0.25, 0.25))
         if (q - centre).length > L - 1.6:
             continue
-        s = float(rng.uniform(0.55, 0.75))
+        s = float(rng.uniform(0.45, 0.8))
         yaw = float(rng.uniform(0, TAU))
-        outline = [(q.x + math.cos(yaw + TAU * j / 6) * s * (1 + 0.18 * math.sin(j * 2.3 + k)),
-                    q.y + math.sin(yaw + TAU * j / 6) * s * 0.8) for j in range(6)]
+        sides = int(rng.integers(5, 8))
+        outline = [(q.x + math.cos(yaw + TAU * j / sides) * s * float(rng.uniform(0.75, 1.15)),
+                    q.y + math.sin(yaw + TAU * j / sides) * s * float(rng.uniform(0.6, 1.0)))
+                   for j in range(sides)]
         _flagstone(p, outline, rng, tones[k % 3])
     # The landing's mark: a worn round where the wind sets a body down.
     outline = [(land[0] + math.cos(TAU * j / 8) * 0.7, land[1] + math.sin(TAU * j / 8) * 0.7) for j in range(8)]
@@ -1271,6 +1284,23 @@ def wind_isle(bpy, variant):
         nx, ny = math.cos(a), math.sin(a)
         _tuft(p, (x - nx * s * 0.7, y - ny * s * 0.7, 0.0), 0.26, rng, blades=4)
         _flowers(p, (x + ny * s * 0.6, y - nx * s * 0.6, 0.0), rng, n=3)
+    # Bedrock breaking flush through the turf (a step never trips on it).
+    placed = 0
+    for _ in range(40):
+        if placed >= 6:
+            break
+        x, y = float(rng.uniform(-8.0, 8.0)), float(rng.uniform(-8.0, 8.0))
+        r = math.hypot(x, y)
+        if not inside(walk, x, y, 0.8) or RING_IN - 0.7 < r < RING_OUT + 0.5 or r < 2.0:
+            continue
+        if math.hypot(x - pads['home'][0], y - pads['home'][1]) < PAD_R + 0.8:
+            continue
+        s2 = float(rng.uniform(0.5, 1.0))
+        yaw = float(rng.uniform(0, TAU))
+        outline = [(x + math.cos(yaw + TAU * j / 7) * s2 * float(rng.uniform(0.6, 1.2)),
+                    y + math.sin(yaw + TAU * j / 7) * s2 * float(rng.uniform(0.5, 0.9))) for j in range(7)]
+        _flagstone(p, outline, rng, CRAG_BED, top=0.025, bevel=0.14)
+        placed += 1
     # Flowers along the lip and at the stones' feet.
     for k in range(0, len(edge), 9):
         x, y = edge[k]
@@ -1317,8 +1347,8 @@ def wind_isle(bpy, variant):
         _root(p, f, start, a, rng, float(rng.uniform(4.0, 9.5)) * (1.25 if k % 4 == 0 else 1.0),
               float(rng.uniform(0.2, 0.3)))
     # Vines over the lip.
-    for k in range(4):
-        a = TAU * k / 4 + 0.31 + float(rng.uniform(-0.2, 0.2))
+    for k in range(3):
+        a = TAU * k / 3 + 0.31 + float(rng.uniform(-0.2, 0.2))
         x, y, _ = edge_pt(walk, a, 0.18, -0.3)
         _vine(p, f, (x, y, -0.3), a, rng, float(rng.uniform(2.5, 7.0)))
     return p
