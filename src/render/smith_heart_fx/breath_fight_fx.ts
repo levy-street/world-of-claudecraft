@@ -100,6 +100,7 @@ import {
 import { BreathHeartFx } from './breath_heart_fx';
 import { BreathInhaleStreams } from './breath_inhale_streams';
 import { BreathIslesFx } from './breath_isles_fx';
+import { BreathRoarFx } from './breath_roar_fx';
 import { BreathWindStreaks } from './breath_wind_streaks';
 import { BREATH_TELEGRAPH_GLOW_STEP, type BreathTelegraphKind } from './painted_telegraph_core';
 import { BreathTelegraphs, type PaintedFan } from './painted_telegraphs';
@@ -601,6 +602,8 @@ export class BreathFightFx {
   private readonly isles: BreathIslesFx;
   /** The indrawn breath's streams into the maw (breath_inhale_streams.ts). */
   private readonly inhale: BreathInhaleStreams;
+  /** The Summit Roar's wave and hits, the indrawn breath's pull (breath_roar_fx.ts). */
+  private readonly roar: BreathRoarFx;
   private readonly lookup = (id: number): Entity | undefined => this.world?.entities.get(id);
   private readonly groundAt = (x: number, z: number): number => this.groundY(x, z);
   private readonly cradledIds: number[] = [];
@@ -1040,6 +1043,17 @@ export class BreathFightFx {
       geometries: this.geometries,
       materials: this.materials,
     });
+    this.roar = new BreathRoarFx({
+      root: this.root,
+      particles: this.particles,
+      uTime: this.uTime,
+      density: this.density,
+      geometries: this.geometries,
+      materials: this.materials,
+      groundY: (x, z) => this.groundY(x, z),
+      shakeNear: (x, z, amount, reach) => this.shakeNear(x, z, amount, reach),
+      reducedMotion: () => this.reducedMotion(),
+    });
     this.readyForEntry = attachSceneGroupGated(scene, this.root, compileGate, () => this.disposed)
       .then(() => {})
       .catch(() => {});
@@ -1132,6 +1146,7 @@ export class BreathFightFx {
     this.audio.event(ev, this.lookup, this.groundAt);
     if (this.heart.handleEvent(ev, world, this.origin)) return true;
     if (this.isles.handleEvent(ev, world)) return true;
+    if (this.roar.handleEvent(ev, world)) return true;
     if (ev.type === 'spellfxAt') {
       if (!breathFightClaims(ev.ability)) return false;
       const r = ev.radius ?? 3;
@@ -1211,7 +1226,9 @@ export class BreathFightFx {
     this.paintBars(world);
     this.heart.update(world, dt);
     this.isles.update(world, dt);
-    this.inhale.update(this.guardianId >= 0 ? world.entities.get(this.guardianId) : undefined, dt);
+    const g0 = this.guardianId >= 0 ? world.entities.get(this.guardianId) : undefined;
+    this.inhale.update(g0, dt);
+    this.roar.update(world, g0, true, dt);
     this.updateBolts();
     this.particles.update(this.clock);
     const guardian = this.guardianId >= 0 ? (world.entities.get(this.guardianId) ?? null) : null;
@@ -1380,6 +1397,7 @@ export class BreathFightFx {
     this.heart.leave();
     this.isles.leave();
     this.inhale.hide();
+    this.roar.leave();
     this.origin = null;
     this.rosterSeen = Number.NaN;
     this.candidateIds.length = 0;

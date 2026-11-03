@@ -1115,6 +1115,7 @@ const RENDER_PURE_CORES = [
   // The Cornice's open sky (the Breath's third pass): the cloud sea, the far peaks.
   'src/render/smith_heart/breath_summit_core.ts',
   'src/render/smith_heart_fx/breath_fx_core.ts',
+  'src/render/smith_heart_fx/breath_roar_fx_core.ts',
   'src/render/smith_heart_fx/breath_heart_fx_core.ts',
   // The Quench vein (phase 2H): its kit's plan, the shared lip walls, its
   // frost on the mountain, its air and weather, its guardian's effects.

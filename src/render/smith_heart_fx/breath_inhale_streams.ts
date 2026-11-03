@@ -25,10 +25,10 @@ export interface InhaleHost {
   readonly materials: THREE.Material[];
 }
 
-const STREAMS = 14;
+const STREAMS = 22;
 const STEPS = 22;
 /** How far out the streams begin (yards from the maw). */
-const REACH = 34;
+const REACH = 40;
 
 export class BreathInhaleStreams {
   private readonly meshes: THREE.Mesh[] = [];
@@ -91,7 +91,7 @@ export class BreathInhaleStreams {
     const on = this.strength > 0.02 && !!g;
     for (const m of this.meshes) m.visible = on;
     if (!on || !g) return;
-    this.mat.uniforms.uGlow.value = this.strength;
+    this.mat.uniforms.uGlow.value = this.strength * 0.8;
     this.mat.uniforms.uFlow.value = 1.4 + 2.2 * fill;
     const t = this.h.uTime.value;
     const a = fxAnchor(g);
@@ -104,7 +104,7 @@ export class BreathInhaleStreams {
       const ang = (k / STREAMS) * Math.PI * 2 + Math.sin(t * 0.4 + k) * 0.12;
       const sx = mx + Math.sin(ang) * REACH;
       const sz = mz + Math.cos(ang) * REACH;
-      const sy = g.pos.y + 0.6 + (k % 3) * 1.4;
+      const sy = g.pos.y + 0.6 + (k % 4) * 1.6;
       // Each bends round on its way in (a swirl toward the maw).
       const bend = 7 * (k % 2 === 0 ? 1 : -1);
       const attr = this.attrs[k];
@@ -115,7 +115,8 @@ export class BreathInhaleStreams {
         const x = sx + (mx - sx) * e + Math.cos(ang) * side;
         const z = sz + (mz - sz) * e - Math.sin(ang) * side;
         const y = sy + (my - sy) * e + Math.sin(u * Math.PI) * 1.5;
-        const w = 0.55 * (1 - 0.7 * u) * (0.6 + 0.4 * this.strength);
+        // Thick ropes of air at their mouth, drawn thin as they pour in.
+        const w = 1.25 * (1 - 0.72 * u) * (0.6 + 0.4 * this.strength);
         // Flat to the floor (seen from the camera's height), a little
         // raised on its inner edge.
         const px = Math.cos(ang) * w;

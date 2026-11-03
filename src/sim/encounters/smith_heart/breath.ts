@@ -165,6 +165,7 @@ function freshState(boss: Entity, difficulty: BreathDifficulty): BreathFightStat
     gustTimer: T.gustFirst,
     cradles: [],
     isles: { next: 0, round: null, adds: [], paths: [], homes: [], rides: [], grace: {} },
+    roar: null,
     drawn: null,
     heart: null,
     heartTimer: T.heartFirst,
@@ -268,6 +269,7 @@ function clearFight(
     clearIsles(ctx, inst, st, boss);
     dropBreathObject(ctx, inst, st.vortex?.objectId ?? null);
     st.vortex = null;
+    st.roar = null;
     st.pinned = {};
   }
   clearWindAuras(ctx, inst, boss.id);

@@ -15,6 +15,7 @@ import {
   SMITH_HEART_GUARDIANS,
   SMITH_HEART_MOBS,
 } from '../../sim/content/smith_heart';
+import { BREATH_TUNING } from '../../sim/encounters/smith_heart/breath_ids';
 import { fxHash } from './hammer_fx_core';
 
 /** The guardian whose kit these effects dress. */
@@ -85,22 +86,29 @@ export function gustChargeLook(progress: number): {
 }
 
 /** Seconds the gust's wall of wind takes to ride out to the shove's end. */
-export const GUST_WAVE_SECONDS = 0.55;
+/** The Summit Roar's wave rides out at the sim's own pace (breath_roar.ts,
+ *  BREATH_TUNING.roarSpeed): the wall is its front, so it reaches each body
+ *  as the sim strikes it. Seconds to the edge of the guardian's reach. */
+export const GUST_WAVE_SECONDS = (() => {
+  const k = breathGuardianKit();
+  return (k.gustRadius + k.gustShove * 0.8) / BREATH_TUNING.roarSpeed;
+})();
 
-/** The gust `elapsed` seconds after it landed: its wall's radius (past the
- *  gust's own radius out to where the shove ends), height and alpha. */
+/** The gust `elapsed` seconds after it landed: its wall's radius (riding out
+ *  at the wave's own speed to where the shove ends), height and alpha. */
 export function gustBlastLook(
   elapsed: number,
   radius: number,
   shove: number,
 ): { front: number; height: number; alpha: number } {
-  const t = clamp01(elapsed / GUST_WAVE_SECONDS);
-  const ease = 1 - (1 - t) ** 2.2;
-  const after = Math.max(0, elapsed - GUST_WAVE_SECONDS);
+  const reach = radius + shove * 0.8;
+  const span = reach / BREATH_TUNING.roarSpeed;
+  const t = clamp01(elapsed / span);
+  const after = Math.max(0, elapsed - span);
   return {
-    front: (radius + shove * 0.8) * ease,
-    height: 2 + 4.5 * (1 - t) + 1.5 * t,
-    alpha: elapsed < 0 ? 0 : elapsed < GUST_WAVE_SECONDS ? 0.9 : Math.max(0, 0.9 - after / 0.5),
+    front: reach * t,
+    height: 2.5 + 6 * (1 - t) + 1.5 * t,
+    alpha: elapsed < 0 ? 0 : elapsed < span ? 0.9 : Math.max(0, 0.9 - after / 0.5),
   };
 }
 

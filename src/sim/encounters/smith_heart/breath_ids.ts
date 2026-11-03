@@ -117,8 +117,12 @@ export const BREATH_OBJECTS = {
 
 /** The spellfx ability ids of the fight's moments. */
 export const BREATH_CUES = {
-  /** The exhale lands (spellfx 'nova' on the guardian). */
+  /** The exhale lands (spellfx 'nova' on the guardian): the Summit Roar's
+   *  wave leaves its maw, racing out at BREATH_TUNING.roarSpeed. */
   gust: 'heart_bellows_gust',
+  /** The Summit Roar's wave reaches a player (spellfx 'nova' from the
+   *  guardian on them): the blow lands, the throw begins. */
+  roarHit: 'heart_breath_roar_hit',
   /** A strike lands (spellfxAt 'burst', radius = the strike). */
   strike: 'heart_breath_strike',
   /** A leaping bolt jumps (spellfx 'beam', from the last struck to the next;
@@ -338,6 +342,13 @@ export const BREATH_TUNING = {
   gustCast: 1.5,
   gustMin: 160,
   gustMax: 200,
+  /** The Summit Roar's wave: how fast its front races out over the Cornice
+   *  (yards a second; the whole Cornice in about three seconds, so every
+   *  client sees it travel and reach each body in turn), and how long a
+   *  struck body takes to slide its throw (seconds: seen flying, never a
+   *  blink). */
+  roarSpeed: 30,
+  roarSlide: 0.8,
   // Heroic: the loose gales after each indrawn breath.
   galeCount: 3,
   galeSeconds: 20,

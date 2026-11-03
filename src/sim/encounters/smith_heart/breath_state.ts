@@ -166,6 +166,18 @@ export interface BreathHeart {
   presses: number[];
 }
 
+/** The Summit Roar's wave (breath_roar.ts): where it left the maw (world
+ *  yards), its front's radius, how far it runs, who it has struck, and the
+ *  throws still sliding. */
+export interface BreathRoar {
+  x: number;
+  z: number;
+  r: number;
+  reach: number;
+  struck: number[];
+  slides: { id: number; ux: number; uz: number; left: number; step: number }[];
+}
+
 export interface BreathFightState {
   kind: 'breath';
   difficulty: BreathDifficulty;
@@ -202,6 +214,8 @@ export interface BreathFightState {
   /** The vortex object while the guardian draws breath, and its clock. */
   vortex: { objectId: number; x: number; z: number; tick: number } | null;
   gales: BreathGale[];
+  /** The Summit Roar's wave in flight (breath_roar.ts), or null. */
+  roar: BreathRoar | null;
   /** The storm breaking: the barrage's clock (seconds left, next volley). */
   barrage: { remaining: number; next: number; volleys: number } | null;
   spots: BreathSpot[];

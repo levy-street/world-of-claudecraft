@@ -427,7 +427,8 @@ describe('Guardian of the Breath: the indrawn breath and Bellows Gust', () => {
     expect(hitsOf(ev, BREATH_NAMES.vortex, inFront.id).length).toBeGreaterThan(2);
     expect(f.objects(BREATH_OBJECTS.vortex)).toEqual([]);
     const near = dist(f.local(aside), f.local(boss));
-    const gust = f.tick(Math.round(T.gustCast / DT) + 2);
+    // The Roar's wave reaches them and slides their throw (breath_roar.ts).
+    const gust = f.tick(Math.round((T.gustCast + T.roarSlide + 0.6) / DT) + 2);
     expect(hitsOf(gust, BREATH_NAMES.gust, aside.id).length).toBe(1);
     expect(dist(f.local(aside), f.local(boss))).toBeGreaterThan(near + 8);
     expect(f.wind()?.phase).toBe('calm');
@@ -643,9 +644,11 @@ describe('Guardian of the Breath: heroic', () => {
       const aside = f.players[3];
       until(f, () => boss.castingAbility === BREATH_CASTS.gust, 8);
       const b = f.local(boss);
-      f.put(aside, b.x - 6, b.z);
+      // Toward the open south (the wave's throw slides a step a tick, so a
+      // heroic gale wandering across its way to the west could stop it).
+      f.put(aside, b.x, b.z - 6);
       const near = dist(f.local(aside), b);
-      f.tick(Math.round(T.gustCast / DT) + 2);
+      f.tick(Math.round((T.gustCast + T.roarSlide + 0.6) / DT) + 2);
       return { drift, headway, thrown: dist(f.local(aside), b) - near };
     };
     const normal = measure(false);

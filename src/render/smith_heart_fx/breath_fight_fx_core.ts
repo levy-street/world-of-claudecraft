@@ -385,6 +385,7 @@ const CLAIMED: ReadonlySet<string> = new Set([
   BREATH_CUES.calmLand,
   BREATH_CUES.anchor,
   BREATH_CUES.fall,
+  BREATH_CUES.roarHit,
 ]);
 
 /** Is this cue the fight painter's (the renderer's generic draw skipped)? */

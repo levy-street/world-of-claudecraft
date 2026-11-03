@@ -13,6 +13,7 @@ import { BREATH, BREATH_ISLES } from '../src/sim/content/smith_heart_layout';
 import {
   BREATH_AURAS,
   BREATH_CASTS,
+  BREATH_CUES,
   BREATH_DIFFICULTY,
   BREATH_NAMES,
   ISLE_AURAS,
@@ -452,6 +453,59 @@ describe('the Summit Roar', () => {
     f.dev('/dev heart breath roar');
     for (let i = 0; i < ticks(T.inhaleCast + T.gustCast + 6); i++) f.tick(1, false);
     expect(victims.some((p) => p.dead)).toBe(true);
+  });
+
+  it('its wave races out of the maw: the near struck first, each throw slid, never a blink', () => {
+    const f = pulled(4);
+    const b = f.boss();
+    // The guardian in the Cornice's middle, one raider at its feet and one
+    // across the floor (both on the Cornice).
+    const C = BREATH.cornice;
+    const bw = f.world(C.x, C.z);
+    b.pos.x = bw.x;
+    b.pos.z = bw.z;
+    b.pos.y = f.sim.ctx.groundPos(bw.x, bw.z).y;
+    f.sim.ctx.rebucket(b);
+    const [, near, far] = f.players;
+    f.put(near, C.x + 4, C.z);
+    f.put(far, C.x - 27, C.z + 4);
+    expect(inBreathArena(C.x - 27, C.z + 4)).toBe(true);
+    f.dev('/dev heart breath roar');
+    // Through the indrawn breath and the Roar's bar, keeping them in place
+    // (the pull would drag them in).
+    let landed = -1;
+    let nearHit = -1;
+    let farHit = -1;
+    const nearStart = { x: 0, z: 0 };
+    const roarName = BREATH_NAMES.gust;
+    for (let i = 0; i < ticks(T.inhaleCast + T.gustCast + 4); i++) {
+      if (landed < 0) {
+        f.put(near, C.x + 4, C.z);
+        f.put(far, C.x - 27, C.z + 4);
+      }
+      const ev = f.tick(1, true);
+      if (landed < 0 && ev.some((e) => e.type === 'spellfx' && e.ability === BREATH_CUES.gust))
+        landed = i;
+      if (nearHit < 0 && hitsOf(ev, roarName, near.id).length) {
+        nearHit = i;
+        Object.assign(nearStart, f.local(near));
+        // The throw has only begun: one slide's step, not the whole way.
+        expect(Math.hypot(nearStart.x - C.x - 4, nearStart.z - C.z)).toBeLessThan(
+          BREATH_DIFFICULTY.normal.gustThrow * 0.3,
+        );
+      }
+      if (farHit < 0 && hitsOf(ev, roarName, far.id).length) farHit = i;
+    }
+    expect(landed).toBeGreaterThanOrEqual(0);
+    expect(nearHit).toBeGreaterThanOrEqual(landed);
+    // The far raider is struck as the front reaches them (27 yd at its pace).
+    expect(farHit).toBeGreaterThan(nearHit);
+    expect((farHit - landed) * DT).toBeGreaterThan(27 / T.roarSpeed - 0.15);
+    expect((farHit - landed) * DT).toBeLessThan(27 / T.roarSpeed + 0.2);
+    // And the near one slid out its throw (or off the lip) by now.
+    const end = f.local(near);
+    expect(Math.hypot(end.x - nearStart.x, end.z - nearStart.z)).toBeGreaterThan(8);
+    expect(f.state()?.roar ?? null).toBeNull();
   });
 
   it('is named Summit Roar everywhere the player reads it', () => {

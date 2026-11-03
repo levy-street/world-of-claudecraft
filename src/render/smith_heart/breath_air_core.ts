@@ -82,7 +82,8 @@ export function planBreathAir(density = 1): BreathAirPlan {
       hd: C.rz,
       y0: C.h + 0.6,
       y1: C.h + 7,
-      streaks: n(90),
+      // The third pass: more and longer streaks, the gale read at a glance.
+      streaks: n(140),
       grit: n(46),
       gust: 0,
     },

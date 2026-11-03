@@ -285,7 +285,7 @@ function particles(plan: BreathAirPlan) {
         v.y0 + h(2) * (v.y1 - v.y0),
         v.z + (h(3) - 0.5) * 2 * v.hd,
       ]);
-      streakP.push([h(4), 3 + h(5) * 5, 9 + h(6) * 9, v.gust]);
+      streakP.push([h(4), 4 + h(5) * 7, 9 + h(6) * 9, v.gust]);
     }
     for (let i = 0; i < v.grit; i++) {
       const h = (k: number) => heartHash(vi * 1000 + i, k + 500);
@@ -374,7 +374,7 @@ export function buildBreathAir(lowGfx: boolean): THREE.Group {
   add(
     'smithHeartBreathStreaks',
     quadGeometry(p.streaks, p.streakP),
-    airMaterial('smithHeartBreathStreaks', STREAK_VERT, STREAK_FRAG, 0xe8f4fa, 0.55, false),
+    airMaterial('smithHeartBreathStreaks', STREAK_VERT, STREAK_FRAG, 0xf2faff, 0.8, false),
     6,
   );
   add(

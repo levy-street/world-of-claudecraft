@@ -19,10 +19,12 @@
 //                          wind turns and draws everyone toward the guardian
 //                          (the kernel's pull aura), a vortex before its mouth
 //                          bites whoever stands in it; then the Summit Roar
-//                          (Bellows Gust's id), a 1.5 s bar and a blast that
-//                          hurts and throws everyone far from the guardian (26
-//                          yd, 30 on heroic: tanked by the edge, the raid goes
-//                          over it; the anchored stay put).
+//                          (Bellows Gust's id), a 1.5 s bar and a wave racing
+//                          out of its maw that hurts and throws each player far
+//                          from the guardian as it reaches them (26 yd, 30 on
+//                          heroic, slid over a moment: breath_roar.ts; tanked
+//                          by the edge, the raid goes over it; the anchored
+//                          stay put).
 //   Heroic                 three loose gales wander the Cornice after each
 //                          exhale, tossing whoever they touch (a throw can
 //                          carry a body out through a gap); in phase 2, short
@@ -50,6 +52,7 @@ import {
   calmSeconds,
   BREATH_TUNING as T,
 } from './breath_ids';
+import { startRoar, stepRoar } from './breath_roar';
 import {
   auraOf,
   type BreathScope,
@@ -368,8 +371,10 @@ export function landInhale(s: BreathScope): void {
   setWind(s, 'exhale', T.gustCast, s.st.wind.bearing);
 }
 
-/** Bellows Gust lands: everyone on the Cornice is struck and thrown outward
- *  (the anchored keep their feet); heroic sets the loose gales running. */
+/** The Summit Roar (Bellows Gust's id) lands: its wave leaves the maw and
+ *  races out over the Cornice, striking and throwing each player as it
+ *  reaches them (breath_roar.ts; the anchored keep their feet); heroic sets
+ *  the loose gales running. */
 export function landGust(s: BreathScope): void {
   const b = s.boss;
   s.ctx.emit({
@@ -380,28 +385,8 @@ export function landGust(s: BreathScope): void {
     fx: 'nova',
     ability: BREATH_CUES.gust,
   });
-  for (const p of livePlayers(s)) {
-    s.ctx.dealDamage(
-      b,
-      p,
-      roll(s, T.gustMin, T.gustMax),
-      false,
-      'nature',
-      BREATH_NAMES.gust,
-      'hit',
-      true,
-    );
-    if (p.dead) continue;
-    let dx = p.pos.x - b.pos.x;
-    let dz = p.pos.z - b.pos.z;
-    let len = Math.hypot(dx, dz);
-    if (len < 1e-3) {
-      dx = Math.sin(b.facing);
-      dz = Math.cos(b.facing);
-      len = 1;
-    }
-    throwPlayer(s, p, dx / len, dz / len, s.rules.gustThrow);
-  }
+  startRoar(s);
+  stepRoar(s);
   if (s.rules.looseGales) startGales(s);
   // The wind comes back: a calm, then the next blow's telegraph.
   beginCalm(s);
@@ -494,6 +479,7 @@ export function stepWind(s: BreathScope): void {
   syncWindAuras(s);
   stepPinned(s);
   stepVortex(s);
+  stepRoar(s);
   stepGales(s);
 }
 
