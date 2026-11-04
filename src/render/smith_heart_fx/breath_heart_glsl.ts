@@ -123,6 +123,31 @@ void main() {
 }
 `;
 
+/** A portal's letter laid flat in its mouth, turned on the floor to the
+ *  camera's bearing so it always reads upright to the viewer (a fixed decal
+ *  read upside down from the far side; Part C of the bot pass, 2026-11-04).
+ *  The shape's x/y in yards, scaled by the mesh. */
+export const FLOOR_FACING_VERT = /* glsl */ `
+void main() {
+  vec3 c = (modelMatrix * vec4(0.0, 0.0, 0.0, 1.0)).xyz;
+  vec2 toCam = cameraPosition.xz - c.xz;
+  toCam = length(toCam) > 1e-4 ? normalize(toCam) : vec2(0.0, 1.0);
+  vec2 up = -toCam;
+  vec2 right = vec2(-up.y, up.x);
+  float s = length(modelMatrix[0].xyz);
+  vec2 xz = c.xz + (right * position.x + up * position.y) * s;
+  gl_Position = projectionMatrix * viewMatrix * vec4(xz.x, c.y, xz.y, 1.0);
+}
+`;
+
+/** The floor letter's flat ink. */
+export const FLOOR_LETTER_FRAG = /* glsl */ `
+uniform vec3 uColor;
+void main() {
+  gl_FragColor = vec4(uColor, 1.0);
+}
+`;
+
 /** The letter's light (audit point 37: a flat fill): brighter at its top, a
  *  slow pulse of light running up through it. */
 export const FACING_FRAG = /* glsl */ `

@@ -134,3 +134,12 @@ describe('Knotted Gale: the look', () => {
     expect(markSideOf(BREATH_AURAS.laden)).toBeNull();
   });
 });
+
+describe('Knotted Gale: the portal letters read upright', () => {
+  it('the mouth letter turns on the floor to the camera, never a fixed decal', async () => {
+    const glsl = await import('../src/render/smith_heart_fx/breath_heart_glsl');
+    // Laid flat (one height for every vertex), turned by the camera's bearing.
+    expect(glsl.FLOOR_FACING_VERT).toContain('cameraPosition.xz');
+    expect(glsl.FLOOR_FACING_VERT).toContain('vec4(xz.x, c.y, xz.y, 1.0)');
+  });
+});

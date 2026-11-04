@@ -55,6 +55,8 @@ import {
   BURST_FRAG,
   FACING_FRAG,
   FACING_VERT,
+  FLOOR_FACING_VERT,
+  FLOOR_LETTER_FRAG,
   HEART_RING_FRAG,
   HEART_UV_VERT,
   PORTAL_DISC_FRAG,
@@ -272,14 +274,12 @@ export class BreathHeartFx {
     // Flat on the floor: x/z, uv across the whole square.
     const floorQuad = new THREE.PlaneGeometry(2, 2);
     floorQuad.rotateX(-Math.PI / 2);
-    // Each side's letter, upright (over a marked player) and laid flat (in its mouth).
+    // Each side's letter: upright over a marked player, flat in its mouth (the
+    // mouth's shader lays it on the floor, turned to the camera).
     const letters = {} as Record<HeartPortalSide, THREE.ShapeGeometry>;
-    const floorLetters = {} as Record<HeartPortalSide, THREE.BufferGeometry>;
     for (const side of HEART_SIDES) {
       letters[side] = new THREE.ShapeGeometry(letterShape(side));
-      floorLetters[side] = letters[side].clone();
-      floorLetters[side].rotateX(-Math.PI / 2);
-      h.geometries.push(letters[side], floorLetters[side]);
+      h.geometries.push(letters[side]);
     }
     const orb = new THREE.SphereGeometry(1, 28, 20);
     const orbCore = new THREE.SphereGeometry(0.55, 16, 12);
@@ -362,7 +362,7 @@ export class BreathHeartFx {
 
     for (const tag of HEART_SIDES) {
       const look = portalSideLook(tag);
-      const side = { hex: look.color, floor: floorLetters[tag], tag };
+      const side = { hex: look.color, floor: letters[tag], tag };
       const open = { value: 0 };
       const u = {
         uTime: h.uTime,
@@ -389,16 +389,16 @@ export class BreathHeartFx {
         letter: mk(
           `smithHeartPortalLetter${side.tag}`,
           side.floor,
-          new THREE.MeshBasicMaterial({
-            name: `smithHeartPortalLetter${side.tag}`,
-            // A dark ink in the pair's own cast: deep sea for A and B, deep
-            // plum for C and D, so the letter stays crisp on its bright mouth.
-            color: look.pair === 0 ? 0x06202a : 0x2a0620,
-            transparent: true,
-            depthWrite: false,
-            toneMapped: false,
-            side: THREE.DoubleSide,
-          }),
+          // A dark ink in the pair's own cast: deep sea for A and B, deep plum
+          // for C and D, so the letter stays crisp on its bright mouth; turned
+          // to the camera on the floor so it never reads upside down.
+          shader(
+            `smithHeartPortalLetter${side.tag}`,
+            { uColor: { value: color(look.pair === 0 ? 0x06202a : 0x2a0620) } },
+            FLOOR_FACING_VERT,
+            FLOOR_LETTER_FRAG,
+            { transparent: true, depthWrite: false, toneMapped: false, side: THREE.DoubleSide },
+          ),
           HEART_FLOOR.letter,
         ),
         open,
