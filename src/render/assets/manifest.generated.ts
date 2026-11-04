@@ -1771,7 +1771,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/props/smith_heart_breath_kit.glb": "/media/models/props/smith_heart_breath_kit.8c9ed9b5efb9.glb",
   "models/props/smith_heart_gate_kit.glb": "/media/models/props/smith_heart_gate_kit.6994a9e08401.glb",
   "models/props/smith_heart_hammer_kit.glb": "/media/models/props/smith_heart_hammer_kit.b476ac83c2c3.glb",
-  "models/props/smith_heart_heart_kit.glb": "/media/models/props/smith_heart_heart_kit.fc270e53b172.glb",
+  "models/props/smith_heart_heart_kit.glb": "/media/models/props/smith_heart_heart_kit.931401130a4d.glb",
   "models/props/smith_heart_heat_kit.glb": "/media/models/props/smith_heart_heat_kit.eeef5246ab45.glb",
   "models/props/smith_heart_quench_kit.glb": "/media/models/props/smith_heart_quench_kit.b81f811fa753.glb",
   "models/props/smith_heart_ring_kit.glb": "/media/models/props/smith_heart_ring_kit.6a483fd64bdf.glb",
