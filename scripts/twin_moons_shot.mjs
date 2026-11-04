@@ -18,6 +18,11 @@ const URL = process.env.GAME_URL ?? 'http://localhost:5173';
 const OUT_DIR = process.env.OUT_DIR ?? 'tmp/twin-moons';
 const PREFIX = process.env.OUT_PREFIX ?? 'shot';
 const SOAK_MS = Number(process.env.SOAK_MS ?? 25_000);
+// VIEWPORT=mobile shoots a landscape phone (the in-game web client is landscape-only)
+const MOBILE = process.env.VIEWPORT === 'mobile';
+const METRICS = MOBILE
+  ? { width: 844, height: 390, deviceScaleFactor: 2, mobile: true }
+  : { width: 1600, height: 900, deviceScaleFactor: 1, mobile: false };
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 fs.mkdirSync(OUT_DIR, { recursive: true });
 
@@ -40,16 +45,19 @@ const browser = await puppeteer.launch({
   args: [
     '--no-sandbox',
     '--disable-setuid-sandbox',
-    '--window-size=1600,900',
+    `--window-size=${METRICS.width},${METRICS.height}`,
     // GL_ARGS=gpu draws on the machine's GPU (where software WebGL cannot make the
     // world's context); the default stays the portable SwiftShader path
     ...(process.env.GL_ARGS === 'gpu'
       ? ['--use-angle=vulkan', '--enable-features=Vulkan', '--ignore-gpu-blocklist', '--enable-gpu']
       : ['--use-angle=swiftshader', '--enable-unsafe-swiftshader']),
   ],
-  defaultViewport: { width: 1600, height: 900 },
+  defaultViewport: { width: METRICS.width, height: METRICS.height },
 });
 const page = await browser.newPage();
+// exact device metrics through CDP (setViewport can leave innerWidth stale)
+const cdp = await page.createCDPSession();
+await cdp.send('Emulation.setDeviceMetricsOverride', METRICS);
 // the standing capture rule: the lowest graphics preset, seeded before boot
 await page.evaluateOnNewDocument(
   "try { localStorage.setItem('woc_settings', JSON.stringify({ graphicsPreset: 1 })); } catch {}",
