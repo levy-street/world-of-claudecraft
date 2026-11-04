@@ -118,7 +118,7 @@ ${PAINTED_TELEGRAPH_MEASURE_GLSL}
   vec3 tint = vec3(0.4, 0.58, 0.8);
   vec3 deep = vec3(0.07, 0.15, 0.3);
   float shade = 0.8 + 0.3 * plate.y;
-  float c = uChar * (0.45 + 0.42 * swept + 0.12 * uWarn) * shade;
+  float c = uChar * (0.58 + 0.32 * swept) * shade;
   c *= smoothstep(-0.02, 0.3, edge);
   c = clamp(c * uFade, 0.0, 0.9);
   vec3 floorTint = mix(vec3(1.0), tint, c);
@@ -134,9 +134,9 @@ ${PAINTED_TELEGRAPH_RIM_GLSL}
   // The danger reads first: the edge held in the THREAT colour (never washed
   // white by the frost), a band of it glowing in off the edge, a faint wash
   // of it over the frozen floor, burning up over the bar's last stretch.
-  float threatBand = 1.0 - smoothstep(0.0, 1.0 + 0.5 * wk, edge);
+  float threatBand = 1.0 - smoothstep(0.0, 0.55 + 0.25 * wk, edge);
   col += uColor * rimCore * 0.85 * uRim * uRimK;
-  col += uColor * threatBand * (0.2 + 0.18 * uWarn) * uRimK;
+  col += uColor * threatBand * (0.3 + 0.3 * uWarn) * uRimK;
   col += uColor * 0.08 * uWarn * swept * (1.0 - water);
   vec3 cDim = vec3(0.16, 0.32, 0.48);
   vec3 cLit = vec3(0.5, 0.82, 1.0);
@@ -147,19 +147,18 @@ ${PAINTED_TELEGRAPH_RIM_GLSL}
   col += mix(cDim, cLit, swept) * frac * (0.1 + 0.42 * swept) * uCrack * pulse;
   col += mix(cLit, cHot, 0.3 + 0.4 * uWarn) * spoke * 0.5 * bright * uCrack;
   // Each frozen plate its own cold sheen (ice, never bare stone).
-  col += vec3(0.1, 0.22, 0.34) * (0.35 + 0.65 * plate.y) * swept * 0.55 * uBody * (1.0 - water);
+  col += vec3(0.1, 0.22, 0.34) * (0.35 + 0.65 * plate.y) * swept * 0.35 * uBody * (1.0 - water);
   col += cLit * fern * 0.3 * swept * uCrack * pulse;
   // The groove's bevelled lips catching the light.
   col += cHot * groove * (1.0 - groove) * 2.2 * swept * uCrack;
   // Rime along the edges and riding the front.
   col += cLit * feather * (rimeBand * (0.08 + 0.2 * swept) + frontBand * 0.35) * uBody;
-  col += cHot * frontBand * 0.22 * uFront * uBody;
+  col += cHot * frontBand * 0.5 * uFront * uBody;
   // The shards: one facet lit, one shaded, their tips white.
-  col += mix(cDim * 0.6, cLit * 0.7, facet) * shard * (0.35 + 0.25 * swept) * uBody;
+  col += mix(vec3(0.1, 0.24, 0.38), vec3(0.55, 0.85, 1.0), facet) * shard * (0.45 + 0.25 * swept) * uBody;
   col += cHot * shardTip * facet * 0.3 * uBody;
   // The water's rim of slush.
   col += cLit * water * (1.0 - water) * 2.0 * uBody;
-  col += mix(cLit, cHot, 0.5) * 0.14 * uWarn * swept * smoothstep(0.0, 0.4, edge) * (1.0 - water);
   if (uDetail > 0.0) {
     // Fine crazing in the frost.
     float fine = 1.0 - smoothstep(0.0, 0.05, cellNet(wp * uCells * 2.8 + 5.1).x);
