@@ -267,7 +267,11 @@ void main() {
 `;
 /** A slice of the Wheel of the Hearth: Wakefire's sheet clipped to its bearings,
  *  its rim along both straight edges too. A red slice builds and burns as a band
- *  does; the safe slice stays dark (no build, no burn) with a cool rim. */
+ *  does, under a pulsing wash of the lethal crimson (the Hearth's floor glows
+ *  orange-gold in every joint, so neither the danger orange nor the cracks alone
+ *  could tell it from the floor: the bot pass of 2026-11-04). The safe slice
+ *  (uSafe) is the one cool thing on the floor: a clear frost-blue sheet with
+ *  bright cold edges, read in one glance from any height. */
 const WHEEL_FRAG = /* glsl */ `
 uniform float uTime;
 uniform float uBuild;
@@ -275,6 +279,7 @@ uniform float uBurn;
 uniform vec3 uRim;
 uniform vec4 uClip;
 uniform vec4 uArc;
+uniform float uSafe;
 varying vec2 vUv;
 varying vec3 vW;
 ${HEAT_NOISE_GLSL}
@@ -292,6 +297,21 @@ void main() {
     1.0 - smoothstep(0.0, 0.7, edge),
     (1.0 - smoothstep(0.0, 0.03, y)) + smoothstep(0.97, 1.0, y)
   );
+  if (uSafe > 0.5) {
+    // The safe slice: a cool clear sheet, its frost brighter toward the edges and
+    // slowly breathing, a hard bright rim of cold light all round it.
+    float inner = 1.0 - smoothstep(0.0, 3.5, edge);
+    float frost = vn(vW.xz * 0.35 + vec2(uTime * 0.05, 0.0));
+    float breathe = 0.5 + 0.5 * sin(uTime * 2.2);
+    float rime = 1.0 - smoothstep(0.0, 0.06, cellEdge(vW.xz * 0.45));
+    vec3 sheet = mix(vec3(0.12, 0.34, 0.52), vec3(0.42, 0.78, 0.95), 0.45 * frost + 0.4 * inner);
+    sheet = mix(sheet, vec3(0.7, 0.9, 1.0), 0.45 * rime);
+    vec3 cool = mix(sheet, vec3(0.86, 0.97, 1.0), clamp(rims, 0.0, 1.0));
+    float ca = max(rims * 0.98, 0.5 + 0.12 * inner + 0.06 * breathe);
+    gl_FragColor = vec4(cool * (1.0 + 0.5 * clamp(rims, 0.0, 1.0)), clamp(ca, 0.0, 0.97));
+    #include <colorspace_fragment>
+    return;
+  }
   float joint = 1.0 - smoothstep(0.0, 0.07, cellEdge(vW.xz * 0.45));
   float spread = step(vn(vW.xz * 0.12) * 0.8 + 0.1, uBuild);
   float crack = joint * spread * (0.5 + 0.5 * uBuild);
@@ -302,9 +322,11 @@ void main() {
   // every crack, so cracks alone hid the warning): a pulsing wash of the
   // danger colour while it warns; the safe slice (no build) stays dark.
   float warn = (1.0 - uBurn) * smoothstep(0.0, 0.05, uBuild);
-  col = mix(col, uRim * (1.0 + 0.35 * sin(uTime * 7.0)), 0.6 * warn);
-  col = mix(col, uRim * 1.5, clamp(rims, 0.0, 1.0));
-  float wash = 0.12 + 0.18 * uBuild + 0.3 * warn;
+  float pulse = 0.5 + 0.5 * sin(uTime * 7.0);
+  vec3 blood = uRim * (0.38 + 0.22 * pulse);
+  col = mix(col, blood, 0.72 * warn * (1.0 - crack * 0.6));
+  col = mix(col, uRim * 1.6, clamp(rims, 0.0, 1.0));
+  float wash = 0.12 + 0.18 * uBuild + 0.5 * warn;
   float alpha = max(max(rims * 0.95, crack * 0.85), max(wash, uBurn * 0.92));
   gl_FragColor = vec4(col, clamp(alpha, 0.0, 0.96));
   #include <colorspace_fragment>
@@ -557,6 +579,7 @@ export class HeatFightFx implements HeatFxHost {
             uRim: { value: new THREE.Color(TELEGRAPH_THREAT_COLORS.danger) },
             uClip: { value: new THREE.Vector4(-1e9, 1e9, -1e9, 1e9) },
             uArc: { value: new THREE.Vector4() },
+            uSafe: { value: 0 },
           },
           charStep: HEAT_FLOOR.zoneChar.step,
           glowStep: HEAT_FLOOR.zoneGlow.step,
@@ -1087,7 +1110,8 @@ export class HeatFightFx implements HeatFxHost {
           o.z + HEARTH_FLOOR_BOX.z1,
         );
       }
-      (u.uRim.value as THREE.Color).setHex(safe ? WHEEL_SAFE_RIM : TELEGRAPH_THREAT_COLORS.danger);
+      (u.uRim.value as THREE.Color).setHex(safe ? WHEEL_SAFE_RIM : TELEGRAPH_THREAT_COLORS.lethal);
+      u.uSafe.value = safe ? 1 : 0;
       u.uBuild.value = look ? look.build : 0;
       u.uBurn.value = look ? look.burn : 0;
       slot.mesh.visible = true;
