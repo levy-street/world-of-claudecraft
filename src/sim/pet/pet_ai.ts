@@ -69,6 +69,7 @@ import {
   type Vec3,
 } from '../types';
 import { petAssistKeepsTarget, petAssistTargetId } from './pet_assist';
+import { applyPetPvpTaunt, canPetTauntPlayer } from './pet_pvp_taunt';
 import { isTameableFamily, petHeelSpeed, petOwnerScaling } from './pet_scaling';
 import { petCanForceTaunt } from './pet_taunt_gate';
 import { tryUseWarlockPetSkill } from './warlock_pet_skills';
@@ -197,14 +198,22 @@ export function updatePet(ctx: SimContext, pet: Entity): void {
     } else {
       pet.facing = steadyAngleTo(pet.pos, target.pos, pet.facing);
       if (
-        target.kind === 'mob' &&
+        (target.kind === 'mob' || canPetTauntPlayer(ctx, pet, target)) &&
         petCanForceTaunt(pet.templateId) &&
         pet.petTauntTimer <= 0 &&
         (pet.petAutoTaunt || pet.petManualTauntPending)
       ) {
-        if (ctx.applyTaunt(pet, target)) {
+        // A hostile player has no threat table: the taunt switches their
+        // selected target onto the pet instead (pet_pvp_taunt.ts).
+        const taunted =
+          target.kind === 'mob' ? ctx.applyTaunt(pet, target) : applyPetPvpTaunt(ctx, pet, target);
+        if (taunted) {
           pet.petManualTauntPending = false;
           pet.petTauntTimer = PET_GROWL_INTERVAL;
+        } else if (target.kind === 'player') {
+          // Already on the pet: a manual taunt has nothing to do, so it clears
+          // without a cooldown; the autocast simply waits.
+          pet.petManualTauntPending = false;
         }
       }
       // Water Elemental: auto-cast Water Jet on cooldown when the owner armed its
