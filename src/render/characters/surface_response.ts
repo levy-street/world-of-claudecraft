@@ -118,7 +118,8 @@ export function createSurfaceResponseMaterial(
       // frost at its edge; its rim light, glints and bite are emission, below.
       float glazeCoat=0.0;
       if(uSurfaceGlaze.w>0.001) {
-        float glazeEdge=uSurfaceGlaze.x+surfaceGrain*0.035+sin(surfaceP.x*17.0+surfaceP.z*13.0)*0.025;
+        // The front: a gentle wave round the body, never the grain (its patches read as camouflage).
+        float glazeEdge=uSurfaceGlaze.x+sin(surfaceP.x*9.0+surfaceP.z*7.0)*0.03;
         glazeCoat=(1.0-smoothstep(glazeEdge-0.16,glazeEdge,surfaceHeight))*uSurfaceGlaze.w;
         // A smooth film over a deeper blue body, the rime thicker and paler low
         // (never blotches, never a flat grey: the frozen body keeps its icy
@@ -127,7 +128,7 @@ export function createSurfaceResponseMaterial(
         vec3 glazeIce=mix(vec3(0.3,0.5,0.78),vec3(0.86,0.95,1.0),glazeFrost);
         diffuseColor.rgb=mix(diffuseColor.rgb,diffuseColor.rgb*vec3(0.42,0.6,0.92)+glazeIce*0.34,glazeCoat*0.76);
         float glazeFront=(1.0-smoothstep(0.0,0.05,abs(surfaceHeight-glazeEdge+0.05)))*uSurfaceGlaze.w*step(glazeEdge,1.0);
-        diffuseColor.rgb=mix(diffuseColor.rgb,vec3(0.92,0.97,1.0),glazeFront*(0.35+0.3*glazeFrost));
+        diffuseColor.rgb=mix(diffuseColor.rgb,vec3(0.92,0.97,1.0),glazeFront*0.5);
         glazeCoat=max(glazeCoat,glazeFront);
       }
     `,
