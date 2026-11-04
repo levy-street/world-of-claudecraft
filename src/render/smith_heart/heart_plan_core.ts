@@ -455,7 +455,9 @@ export function planHeartLights(): HeartLightSpot[] {
     veinKey('key:quench', 'quench', QUENCH.lake),
     veinKey('key:heat', 'heat', SMITH_HEART_BOSS_SPOTS.heat),
     { ...veinMouth('mouth:hammer', 'hammer', 180), x: 0, z: -86 },
-    veinMouth('mouth:breath', 'breath', 0),
+    // The Breath's mouth: its light only shapes the stone (the halo hung in
+    // the open air with nothing under it; the jambs' crystals carry the glow).
+    { ...veinMouth('mouth:breath', 'breath', 0), noHalo: true },
     veinMouth('mouth:quench', 'quench', 90),
     veinMouth('mouth:heat', 'heat', 270),
     {

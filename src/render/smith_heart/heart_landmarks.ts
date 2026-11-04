@@ -241,9 +241,11 @@ export function buildHeartLandmarks(lowGfx: boolean, centre: THREE.Vector3): Hea
       'heartLandmarkSmoke:heat',
       s.bases,
       s.params,
-      airMat('smithHeartLandmarkSmoke', LANDMARK_BILLOW_VERT, 0x5a2a1c, 0xff6a2a, 0.22, {
+      // Soot, lit only low by the crater (its lit salmon read as floating
+      // globes in the AAA review).
+      airMat('smithHeartLandmarkSmoke', LANDMARK_BILLOW_VERT, 0x241e1c, 0x6a3826, 0.16, {
         uRise: { value: 26 },
-        uSize: { value: 6.0 },
+        uSize: { value: 7.0 },
       }),
     );
     halo('heat', P.heat.color, 1.1);
