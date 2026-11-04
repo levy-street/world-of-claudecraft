@@ -120,6 +120,7 @@ export function sourceFingerprint(root = ROOT) {
     'docs/design/raid/kit/quarter_pieces.py',
     'docs/design/raid/kit/quarter_split.py',
     'docs/design/raid/kit/landmark_pieces.py',
+    'docs/design/raid/kit/landmark_crag.py',
     'docs/design/raid/kit/landmark_paint.py',
     'docs/design/raid/kit/anvil_piece.py',
     'docs/design/raid/kit/build_smith_heart_heart_kit.py',

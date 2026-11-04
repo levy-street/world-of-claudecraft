@@ -47,9 +47,10 @@ Deterministic: every draw is the piece's own seeded rng or a seeded noise.
 import math
 
 import numpy as np
+import landmark_crag as lc
 import quarter_geom as qg
 from gravewyrm_sculpt import Sculpt, block
-from gwkit import crystal, hull
+from gwkit import crystal, hull, mix, sstep
 from heart_pieces import HEART_COLOURS, HEART_KINDS, HSP, ICE, ICE_BODY, ICE_DEEP, RIME, ASH, _clamp, pale_crystal
 from heat_pieces import _bundle_layout, hex_column
 from hckit import GLOW
@@ -141,6 +142,22 @@ def _top(vein, d, r):
     lo, hi = CLIFF[vein]
     t = min(1.0, max(0.0, (r - R_LIP) / (R_BACK - 6.0 - R_LIP)))
     return (lo + (hi - lo) * t ** 0.8) * (0.4 + 0.6 * _env(vein, d))
+
+
+def _top_v(vein, D, R):
+    """`_top` over arrays (the shared crag's crest, landmark_crag.crag)."""
+    lo, hi = CLIFF[vein]
+    d0, d1 = SPAN[vein]
+    t = np.clip((R - R_LIP) / (R_BACK - 6.0 - R_LIP), 0.0, 1.0)
+    a = np.clip((D - d0) / 14.0, 0.0, 1.0)
+    b = np.clip((d1 - D) / 14.0, 0.0, 1.0)
+    env = (a * a * (3 - 2 * a)) * (b * b * (3 - 2 * b))
+    return (lo + (hi - lo) * t ** 0.8) * (0.4 + 0.6 * env)
+
+
+def _crag(f, F, rng, vein, label, **kw):
+    """The vein's cliff in the one grammar the four share (landmark_crag.crag)."""
+    return lc.crag(f, F, rng, SPAN[vein], R_LIP, lambda D, R: _top_v(vein, D, R), label, **kw)
 
 
 def _cliff(f, F, rng, vein, labels, step=4.4, skip=None, stepped=0.0, tilt=0.3):
@@ -477,7 +494,8 @@ def landmark_heat(bpy):
     d0, d1 = SPAN['heat']
     f = _arc_field(F, d0, d1, 59.0, 92.0, -31.0, 31.0)
     _foot(f, F, rng, 'heat')
-    _cliff(f, F, rng, 'heat', ('basalt', 'basalt2', 'lava_crust', 'ember_rock'))
+    # The third round: the shared crag (landmark_crag.py), no heap of blocks.
+    _crag(f, F, rng, 'heat', 'basalt', cols=5, clefts=0.5)
     # The basalt heaved up in great bundles of columns, tallest at the
     # crater, leaning out and broken.
     for (bd, br, rad, top) in HEAT_BUNDLES:
@@ -497,7 +515,7 @@ def landmark_heat(bpy):
                              tilt=(float(rng.uniform(-0.1, 0.1)), float(rng.uniform(-0.1, 0.1))),
                              top_tilt=(float(rng.uniform(-0.4, 0.4)), float(rng.uniform(-0.4, 0.4)))), 0.08)
     # Crusted boulders heaved down the face toward the lip.
-    for _ in range(18):
+    for _ in range(10):
         d = float(rng.uniform(d0 + 4, d1 - 4))
         f.put('lava_crust', block(rng, F.ad(d, float(rng.uniform(62.5, 67.0)), float(rng.uniform(0.2, 2.0))),
                                   (float(rng.uniform(2.2, 3.8)), float(rng.uniform(2.0, 3.4)),
@@ -512,8 +530,19 @@ def landmark_heat(bpy):
                 [(21.0, 74.0, 17.0), (23.0, 69.0, 9.0), (24.0, 64.5, 4.0), (25.0, 61.2, 0.6)]]
     for ch in channels:
         f.sub(Polyline([F.ad(*q) for q in ch], [1.6, 1.7, 1.5, 1.2]), 0.5)
-    _finish(f, F, 6903, amp=0.26)
-    _mesh(bpy, p, f, 'LandmarkHeat', 11800)
+    _finish(f, F, 6903, amp=0.22)
+    # Painted like the other three (the shared kit stone's fracture turned its dark
+    # basalt to pure black faces): warm dark basalt, ash settling on the tops, the
+    # shadow a cool violet, the foot warmed by the lava's light.
+    made = hand_sculpt(bpy, p, f, 'LandmarkHeat', 11800, sharp=40.0, colours=LANDMARK_COLOURS, kinds=LANDMARK_KINDS)
+
+    def lava_warm(col, q, n, c):
+        return mix(col, (0.42, 0.22, 0.15), sstep(5.0, -3.0, q.z) * 0.45)
+
+    paint_faces(p, made, stone_shader(
+        (0.21, 0.19, 0.19), (0.31, 0.28, 0.27), (0.47, 0.42, 0.38), (0.22, 0.2, 0.28),
+        cap=(0.54, 0.5, 0.47), cap_at=(0.74, 0.97), edge=0.62, hollow=0.42, z_span=(-6.0, 24.0),
+        extra=lava_warm))
     tree = _tree(p)
     prng = p.rng
     # The crater's pool.
@@ -663,7 +692,7 @@ def _hammer_crater(f, F, rng):
     for (v, z, tilt) in ((-15.0, 8.0, 0.28), (15.5, 7.0, -0.24), (-10.0, 3.0, 0.18), (11.0, 2.6, -0.2)):
         c = F.at(cu - 7.0 + 0.3 * z, cv + v, z)
         f.put('ochre', block(rng, c, (float(rng.uniform(4.0, 5.0)), float(rng.uniform(6.0, 8.0)),
-                                      float(rng.uniform(3.0, 4.0))), cuts=6, chamfer=(0.88, 0.97),
+                                      float(rng.uniform(3.0, 4.0))), cuts=12, chamfer=(0.7, 0.93),
                              R=rot(rz=F.yaw(0.0) + tilt, rx=tilt * 1.2, ry=0.16)), 0.12)
     return lines
 
@@ -676,13 +705,22 @@ def _hammer_itself(f, F):
     hu, hv, hz = HAMMER_HEAD_HALF
     R = _hammer_rot(F)
     c = F.at(cu, cv, cz)
-    f.put('head', RoundBox(c, (hu, hv, hz), 0.7, R), 0.1)
+    # Rough hewn and worn by the ages it has lain here (the third round: a crisp
+    # chamfered box read as an icon), its corners rounded off and chipped.
+    f.put('head', RoundBox(c, (hu, hv, hz), 1.7, R), 0.1)
+    chips = np.random.default_rng(6917)
+    for _ in range(9):
+        sx = float(chips.choice((-1.0, 1.0)))
+        sz = float(chips.choice((-1.0, 1.0)))
+        o = _mul3(R, (float(chips.uniform(-1.0, 1.0)) * hu, sx * hv * float(chips.uniform(0.5, 1.0)), sz * hz))
+        f.sub(Ellipsoid((c[0] + o[0], c[1] + o[1], c[2] + o[2]),
+                        (float(chips.uniform(1.0, 2.0)), float(chips.uniform(1.2, 2.6)), float(chips.uniform(0.8, 1.6))),
+                        R), 0.25)
     # The bands round its ends and its waist, a hand proud.
     across = Vector((math.cos(math.radians(F.bearing)), math.sin(math.radians(F.bearing)), 0.0))
     for o in (-8.2, 8.2):
         q = Vector(c) + across * o
-        f.put('head', RoundBox(tuple(q), (hu + 0.42, 0.9, hz + 0.42), 0.3, R), 0.06)
-    f.put('head', RoundBox(c, (hu + 0.25, 2.4, hz + 0.25), 0.3, R), 0.06)
+        f.put('head', RoundBox(tuple(q), (hu + 0.42, 0.9, hz + 0.42), 1.2, R), 0.06)
     # Its striking faces, the great chips of the blow out of the corners.
     a = Vector(c) - across * 10.5
     for k, (dz, dq) in enumerate(((3.2, 1.0), (-3.0, 0.8))):
@@ -706,20 +744,23 @@ def landmark_hammer(bpy):
     d0, d1 = SPAN['hammer']
     f = _arc_field(F, d0, d1, 59.0, 97.0, -31.0, 52.0, voxel=0.3)
     _foot(f, F, rng, 'hammer')
-    _hammer_benches(f, F, rng)
+    # The third round: the shared crag (landmark_crag.py) where the quarry's level
+    # courses of worked blocks read as flat brown slabs.
+    _crag(f, F, rng, 'hammer', 'ochre', cols=4, clefts=0.7, setback=(0.8, 2.0))
     cracks = _hammer_crater(f, F, rng)
     for (cd, cr, cz, *_rest) in HAMMER_CLUSTERS[2:]:
         f.sub(Ellipsoid(F.ad(cd, cr, cz + 3.0), (3.6, 3.2, 6.0)), 0.6)
     head_c, across, h0, h1 = _hammer_itself(f, F)
-    _finish(f, F, 6913, amp=0.07)
-    made = hand_sculpt(bpy, p, f, 'LandmarkHammer', 11000, sharp=38.0, colours=LANDMARK_COLOURS, kinds=LANDMARK_KINDS)
+    _finish(f, F, 6913, amp=0.2)
+    made = hand_sculpt(bpy, p, f, 'LandmarkHammer', 11000, sharp=40.0, colours=LANDMARK_COLOURS, kinds=LANDMARK_KINDS)
     crag = stone_shader(
-        (0.45, 0.42, 0.4), (0.62, 0.58, 0.52), (0.82, 0.76, 0.66), (0.33, 0.3, 0.33),
-        cap=(0.76, 0.7, 0.6), cap_at=(0.72, 0.97), bed=(0.6, 0.5, 0.4), bed_scale=0.8, edge=0.7, hollow=0.5,
+        (0.4, 0.36, 0.33), (0.56, 0.5, 0.43), (0.77, 0.69, 0.57), (0.31, 0.28, 0.34),
+        cap=(0.66, 0.6, 0.5), cap_at=(0.84, 0.99), bed=(0.62, 0.5, 0.38), bed_scale=0.8, edge=0.62, hollow=0.45,
         z_span=(-8.0, 22.0))
+    # The hammer: the Smith's own dark granite, weathered like the crag round it.
     dressed = stone_shader(
-        (0.38, 0.35, 0.34), (0.52, 0.48, 0.45), (0.72, 0.66, 0.58), (0.27, 0.25, 0.29),
-        edge=0.95, hollow=0.5, z_span=(2.0, 34.0))
+        (0.36, 0.33, 0.33), (0.5, 0.46, 0.43), (0.68, 0.62, 0.55), (0.28, 0.27, 0.33),
+        cap=(0.62, 0.56, 0.47), cap_at=(0.8, 0.98), edge=0.85, hollow=0.45, z_span=(2.0, 40.0))
     R0 = Vector(head_c)
     hd = (h1 - h0).normalized()
     hl = (h1 - h0).length
@@ -772,33 +813,6 @@ def landmark_hammer(bpy):
                 run, rad = [], []
         if len(run) > 2:
             _glow_thread(p, run, rad, 0.92)
-    # The Smith's mark cut into the head's face toward the room: a key of gold, its bow
-    # and its bit (the Quarry's own carved mark).
-    R = _hammer_rot(F)
-    inward = Vector(tuple(_mul3(R, (-1.0, 0.0, 0.0))))
-    upward = Vector(tuple(_mul3(R, (0.0, 0.0, 1.0))))
-    cq = Vector(head_c)
-    for stroke in (((-1.6, 2.8), (1.6, 2.8), (1.6, 1.0), (-1.6, 1.0), (-1.6, 2.8)), ((0.0, 1.0), (0.0, -2.8)),
-                   ((0.0, -1.2), (1.3, -1.2)), ((0.0, -2.6), (1.5, -2.6))):
-        rays = []
-        for q0, q1 in zip(stroke, stroke[1:]):
-            for t in (0.0, 0.5):
-                a2 = q0[0] + (q1[0] - q0[0]) * t
-                z2 = q0[1] + (q1[1] - q0[1]) * t
-                o = cq + across * a2 + upward * z2
-                rays.append((o + inward * 9.0, o))
-        rays.append((cq + across * stroke[-1][0] + upward * stroke[-1][1] + inward * 9.0,
-                     cq + across * stroke[-1][0] + upward * stroke[-1][1]))
-        surface_ribbon(p, tree, rays, 0.5, 0.95, reach=12.0, gap=5.0, lift=0.07)
-    # Runes of the Smith's gold cut round the head's band (on the stone, found by rays).
-    for o in (-8.2, 8.2):
-        rays = []
-        for k in range(29):
-            a = TAU * k / 28
-            q = Vector(head_c) + across * o
-            d = Vector(tuple(_mul3(R, (math.cos(a), 0.0, math.sin(a)))))
-            rays.append((q + d * 10.0, q))
-        surface_ribbon(p, tree, rays, 0.42, 0.9, reach=12.0, gap=3.0)
     return p
 
 
@@ -898,26 +912,16 @@ def landmark_quench(bpy):
     d0, d1 = SPAN['quench']
     f = _arc_field(F, d0, d1, 59.0, 95.0, -31.0, 20.0)
     _foot(f, F, rng, 'quench')
-    # The crag under the ice: one mass of frost granite, big rounded shoulders under
-    # their snow, a few broken faces standing out of it.
-    _swell(f, F, rng, 'quench', 'frost', 1.5, (6.0, 8.0), (9.0, 16.0), lean=0.1)
-    _apron(f, 6923, 2.0)
-    _shelves(f, 6927, 0.8, 3.6)
-    for _ in range(10):
-        d = float(rng.uniform(d0 + 4, d1 - 4))
-        r = float(rng.uniform(63.0, 76.0))
-        h = _top('quench', d, r)
-        f.put('frost_deep', block(rng, F.ad(d, r, h * 0.55), (float(rng.uniform(3.0, 5.0)), float(rng.uniform(3.0, 6.0)),
-                                                             h * 0.8 + 1.0), cuts=9, chamfer=(0.78, 0.94),
-                                  R=rot(rz=F.yaw(d) + float(rng.uniform(-0.6, 0.6)), ry=float(rng.uniform(-0.2, 0.2))),
-                                  top_tilt=0.4), 0.5)
-    _lip_boulders(f, F, rng, 'quench', 'frost', 30)
+    # The crag under the ice (the third round: the shared crag, landmark_crag.py,
+    # where snow swells read as pillows): frost granite, snow on its ledges.
+    _crag(f, F, rng, 'quench', 'frost', cols=5, clefts=0.5, setback=(0.6, 1.5))
+    _lip_boulders(f, F, rng, 'quench', 'frost', 18)
     _fall_ramps(f, F)
-    _finish(f, F, 6923, amp=0.12)
-    made = hand_sculpt(bpy, p, f, 'LandmarkQuench', 8800, sharp=55.0, colours=LANDMARK_COLOURS, kinds=LANDMARK_KINDS)
+    _finish(f, F, 6923, amp=0.2)
+    made = hand_sculpt(bpy, p, f, 'LandmarkQuench', 8800, sharp=40.0, colours=LANDMARK_COLOURS, kinds=LANDMARK_KINDS)
     paint_faces(p, made, stone_shader(
-        (0.3, 0.35, 0.44), (0.46, 0.51, 0.59), (0.64, 0.68, 0.74), (0.32, 0.39, 0.54),
-        cap=(0.88, 0.91, 0.95), cap_at=(0.42, 0.82), edge=0.45, hollow=0.45, z_span=(-8.0, 14.0)))
+        (0.32, 0.36, 0.43), (0.47, 0.51, 0.58), (0.66, 0.69, 0.74), (0.31, 0.36, 0.5),
+        cap=(0.88, 0.91, 0.95), cap_at=(0.58, 0.86), edge=0.6, hollow=0.45, z_span=(-8.0, 18.0)))
     tree = _tree(p)
     prng = p.rng
     # The ice: a forest of great spires leaning together, tallest behind the
@@ -1009,23 +1013,23 @@ def landmark_breath(bpy):
     def split(d, r):
         return abs(d - BREATH_SPLIT) < math.degrees(3.4 / r)
 
-    # The massif: long lobes of storm stone streaming along the wall the one way the
-    # wind has always blown, undercut in shelves (never a heap of blocks).
-    _swell(f, F, rng, 'breath', 'storm', 1.1, (4.6, 6.0), (11.0, 20.0), lean=0.28, skip=split)
-    _apron(f, 6933, 2.3)
-    _shelves(f, 6937, 1.15, 3.0)
-    _flutes(f, 6939, 0.5)
+    # The massif (the third round: the shared crag, landmark_crag.py, where its
+    # wind-eaten lobes and their shelves' overhangs read as a lilac blob with black
+    # slits): storm slate, its faces grooved by the wind.
+    _crag(f, F, rng, 'breath', 'storm', cols=5, clefts=0.6, lean=0.4)
+    _flutes(f, 6939, 0.35)
     for j in range(len(BREATH_HORNS)):
         _breath_horn(f, F, rng, j)
     # The split: the storm's stroke down the middle of the rock.
     f.sub(Polyline([F.ad(BREATH_SPLIT, 61.0, 2.0), F.ad(BREATH_SPLIT + 0.5, 70.0, 6.0),
                     F.ad(BREATH_SPLIT - 0.5, 80.0, 10.0), F.ad(BREATH_SPLIT, 90.0, 14.0)], [1.6, 2.2, 2.6, 3.0]), 0.6)
-    _lip_boulders(f, F, rng, 'breath', 'storm', 26)
-    _finish(f, F, 6933, amp=0.1)
-    made = hand_sculpt(bpy, p, f, 'LandmarkBreath', 10800, sharp=30.0, colours=LANDMARK_COLOURS, kinds=LANDMARK_KINDS)
+    _lip_boulders(f, F, rng, 'breath', 'storm', 18)
+    _finish(f, F, 6933, amp=0.2)
+    made = hand_sculpt(bpy, p, f, 'LandmarkBreath', 10800, sharp=40.0, colours=LANDMARK_COLOURS, kinds=LANDMARK_KINDS)
     paint_faces(p, made, stone_shader(
-        (0.24, 0.26, 0.33), (0.41, 0.44, 0.5), (0.68, 0.68, 0.72), (0.25, 0.24, 0.36),
-        bed=(0.5, 0.44, 0.6), bed_scale=1.25, edge=0.7, hollow=0.45, z_span=(-6.0, 26.0)))
+        (0.27, 0.28, 0.32), (0.43, 0.44, 0.49), (0.67, 0.67, 0.71), (0.28, 0.27, 0.37),
+        cap=(0.72, 0.73, 0.77), cap_at=(0.74, 0.97), bed=(0.47, 0.45, 0.52), bed_scale=1.0, edge=0.62,
+        hollow=0.42, z_span=(-6.0, 26.0)))
     tree = _tree(p)
     prng = p.rng
     # Violet crystal crowning each horn (the lightning's anchors).

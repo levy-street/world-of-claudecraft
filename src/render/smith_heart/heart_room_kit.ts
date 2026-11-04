@@ -21,7 +21,7 @@ import {
   SMITH_HEART_VEINS,
   type SmithHeartVein,
 } from '../../sim/content/smith_heart_layout';
-import { sharedUniforms } from '../gfx';
+import { GFX, sharedUniforms } from '../gfx';
 import type { HeartFallAltar } from './heart_collapse_rig';
 import {
   ensureHeartKit,
@@ -39,6 +39,7 @@ import {
   planHeartRoomKit,
   planHeartVeinPieces,
 } from './heart_room_kit_plan_core';
+import { heartRootEmissiveGlsl, heartVeinDimGlsl } from './heart_root_look_core';
 
 /** Wait (capped) for the Heart kit before the interior is built. */
 export function ensureHeartRoomKit(): Promise<void> {
@@ -84,7 +85,8 @@ export function heartVeinGlowMaterial(color: number, name: string): THREE.Shader
         // Bands of light falling down the piece (a root's to its altar).
         float run = 0.5 + 0.5 * sin(vH * 0.32 + uTime * 2.1);
         float pulse = 0.78 + 0.34 * run * run;
-        vec3 dark = mix(vec3(0.05, 0.05, 0.06), uColor * 0.18, 0.5) * (0.5 + 0.6 * vShade.r);
+        // Dim, a low glow of its colour (heart_root_look_core.ts): never black.
+        vec3 dark = ${heartVeinDimGlsl()};
         vec3 lit = uColor * vShade * pulse * 1.15 + vec3(1.0, 0.97, 0.9) * smoothstep(0.92, 1.0, vShade.r) * 0.25;
         gl_FragColor = vec4(mix(dark, lit, clamp(uLevel, 0.0, 1.0)), 1.0);
         #include <colorspace_fragment>
@@ -139,6 +141,24 @@ export function buildHeartRoomKit(lowGfx: boolean): HeartRoomKit {
     }
     group.add(bed);
   }
+  // The roots' hand-painted stone in its own colours (heart_root_look_core.ts):
+  // the kit's shared fracture stone sank it to near black on the dark crown.
+  const rootPainted = GFX.standardMaterials
+    ? new THREE.MeshStandardMaterial({
+        name: 'smithHeartRootPainted',
+        vertexColors: true,
+        metalness: 0,
+        roughness: 0.9,
+      })
+    : new THREE.MeshLambertMaterial({ name: 'smithHeartRootPainted', vertexColors: true });
+  rootPainted.onBeforeCompile = (shader) => {
+    shader.fragmentShader = shader.fragmentShader.replace(
+      '#include <emissivemap_fragment>',
+      `#include <emissivemap_fragment>
+${heartRootEmissiveGlsl()}`,
+    );
+  };
+  rootPainted.customProgramCacheKey = () => 'smith-heart-root-painted|aaa3';
   const glows = new Map<SmithHeartVein, THREE.ShaderMaterial>();
   const altars = new Map<SmithHeartVein, HeartFallAltar>();
   for (const vein of SMITH_HEART_VEINS) {
@@ -155,6 +175,7 @@ export function buildHeartRoomKit(lowGfx: boolean): HeartRoomKit {
       for (const m of holder.children) {
         if (!(m instanceof THREE.Mesh)) continue;
         if (m.name.endsWith(':glow')) m.material = glow;
+        else if (p.piece === 'Kit_HeartRoot' && m.name.endsWith(':stone')) m.material = rootPainted;
         // The roots are scenery far over the walk: no shadow from them.
         if (p.noShadow || lowGfx) m.castShadow = false;
       }
