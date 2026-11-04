@@ -4762,7 +4762,7 @@ export const hudChromeStrings = {
     trinketSlot: 'Trinket',
     unequipAria: 'Unequip {item}',
     unequipHint: 'Click ×, right-click, or drag to bags to unequip',
-    // The slot picker (slot_picker_menu.ts): click a slot to list what fits.
+    // The slot picker (slot_picker_controller.ts): click a slot to list what fits.
     pickerHint: 'Click to see what you can equip here',
     pickerTitle: 'Equip: {slot}',
     pickerEmpty: 'Nothing in your bags fits this slot',

@@ -99,6 +99,7 @@ function harness() {
     showError: vi.fn(),
     ctxMenu: { element: () => document.createElement('div'), place: vi.fn(), bind: vi.fn() },
     isMobileLayout: () => false,
+    consumePeek: () => false,
     helmSlotAvailable: () => true,
     helmHidden: () => false,
     toggleHelm: vi.fn(),

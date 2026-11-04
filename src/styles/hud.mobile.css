@@ -8435,6 +8435,12 @@
     flex-direction: column;
     align-items: flex-start;
   }
+  /* The paperdoll slot picker keeps its one-line row on touch: icon, name, item
+     level and delta read across, so the column rule above must not stack them. */
+  body.mobile-touch #ctx-menu .ctx-item.slot-pick-row:has(.ctx-item-meta) {
+    flex-direction: row;
+    align-items: center;
+  }
   /* The Apply Enchant picker's tier captions and per-row effect lines scale up
      with the rest of the touch menu: the base sizes are tuned for the desktop
      popup and read as fine print at arm's length. A caption is not tappable, so

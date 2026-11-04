@@ -51,7 +51,6 @@ import { formatNumber, type TranslationKey, t, tPlural } from './i18n';
 import { iconDataUrl, professionIconUrl, professionImageUrl } from './icons';
 import type { ItemDragState } from './item_drag_state';
 import { wornTooltipInstance } from './item_instance_tooltip';
-import { knownItemDef } from './known_item';
 import { masterwroughtCapReadout } from './masterwrought_cap_view';
 import type { PainterHostPresentation } from './painter_host';
 import { playtimeParts, playtimeShape } from './playtime_view';
@@ -64,8 +63,7 @@ import {
 } from './portrait_chip';
 import { qualityGlowShadow } from './quality_glow';
 import { tSim } from './sim_i18n';
-import { buildSlotPickerCandidates, resolveSlotPickerIndex } from './slot_picker_core';
-import { openSlotPickerMenu } from './slot_picker_menu';
+import { closeSlotPickerIfOpen, openSlotPicker } from './slot_picker_controller';
 import type { StatId } from './stat_tooltip';
 import { focusActiveTab, wireTabStrip } from './tab_strip_painter';
 import { tabStripHtml, tabStripModel } from './tab_strip_view';
@@ -182,9 +180,12 @@ export interface CharWindowDeps extends Omit<PainterHostPresentation, 'itemToolt
   renderBags(): void;
   /** Refusal toast for a drop the socket will not take. */
   showError(text: string): void;
-  /** The shared #ctx-menu seam the slot picker opens on (slot_picker_menu.ts). */
+  /** The shared #ctx-menu seam the slot picker opens on (slot_picker_controller.ts). */
   ctxMenu: CtxMenuSeam;
   isMobileLayout(): boolean;
+  /** True when this click is the release of a touch long-press tooltip peek
+   *  (the shared Hud TouchPeekGuard), so the slot picker must not open. */
+  consumePeek(): boolean;
   /** Whether the player's composed kit has a head piece to hide at all: some
    *  class kits ship no head geometry (a helmless set, see ARMOR_BY_SET), and
    *  the eye must not offer a toggle that can never change anything. */
@@ -244,6 +245,8 @@ export class CharWindow {
     const el = this.deps.root();
     if (el.style.display !== 'block') return;
     el.style.display = 'none';
+    // A slot picker left open would still equip into a sheet nobody can see.
+    closeSlotPickerIfOpen(this.deps);
     this.deps.hideTooltip();
     this.deps.restoreFocus(this.openerFocus);
     this.openerFocus = null;
@@ -289,6 +292,9 @@ export class CharWindow {
     const focusedControl = focusedWithin(el);
     const focusedAct = focusedControl?.dataset.act ?? null;
     const focusedTab = focusedControl?.dataset.tab ?? null;
+    // A paperdoll slot row is a focus stop too (it opens the slot picker), and its
+    // stable identity is the equipment key it already carries.
+    const focusedSlot = focusedControl?.dataset.equipSlot ?? null;
     const hadFocus = focusedControl !== null;
     const world = this.deps.world();
     const p = world.player;
@@ -451,7 +457,17 @@ export class CharWindow {
             (control) => control.dataset.tab === focusedTab,
           )
         : undefined;
-      restoreFirstEnabled([sameAct, sameTab, el.querySelector<HTMLElement>('[data-close]')]);
+      const sameSlot = focusedSlot
+        ? [...el.querySelectorAll<HTMLElement>('.equip-slot[data-equip-slot]')].find(
+            (row) => row.dataset.equipSlot === focusedSlot,
+          )
+        : undefined;
+      restoreFirstEnabled([
+        sameAct,
+        sameTab,
+        sameSlot,
+        el.querySelector<HTMLElement>('[data-close]'),
+      ]);
     }
   }
 
@@ -904,13 +920,18 @@ export class CharWindow {
   }
 
   // Click (or Enter / Space) a paperdoll slot to list the bag copies it would
-  // take, best first (slot_picker_core.ts). The row's own buttons (the corner x,
-  // the helm eye) stop propagation, and a drag never fires a click, so this only
-  // answers a plain press on the slot itself.
+  // take, best first (slot_picker_controller.ts). The row's own buttons (the
+  // corner x, the helm eye) stop propagation, and a drag never fires a click, so
+  // this only answers a plain press on the slot itself. The row is not given a
+  // button role: it holds those buttons, and a button may not nest controls.
   private bindSlotPicker(row: HTMLElement, slot: EquipSlot): void {
     row.tabIndex = 0;
-    row.setAttribute('aria-haspopup', 'menu');
-    row.addEventListener('click', (ev) => this.openSlotPicker(slot, row, ev));
+    row.addEventListener('click', (ev) => {
+      // The release of a touch long-press tooltip peek is not a press (the bags'
+      // TouchPeekGuard rule): it must not also open the picker over the tooltip.
+      if (this.deps.consumePeek()) return;
+      this.openSlotPicker(slot, row, ev);
+    });
     row.addEventListener('keydown', (ev) => {
       if (ev.target !== row || (ev.key !== 'Enter' && ev.key !== ' ')) return;
       ev.preventDefault();
@@ -918,46 +939,16 @@ export class CharWindow {
     });
   }
 
-  /** Open the picker for one paperdoll slot, at the pointer (or beside the
-   *  slot for a keyboard press). Public so a test can drive it directly. */
+  /** Open the picker for one paperdoll slot. Public so a test can drive it. A
+   *  keyboard pick hands focus back to the slot after the equip rebuilds the
+   *  sheet, the corner-x unequip's rule (doUnequip). */
   openSlotPicker(slot: EquipSlot, anchor: HTMLElement, ev: MouseEvent | null): void {
-    const world = this.deps.world();
-    const wornId = world.equipment[slot];
-    const worn = wornId ? knownItemDef(ITEMS, wornId) : undefined;
-    const candidates = buildSlotPickerCandidates({
-      inventory: world.inventory,
-      lookup: (id) => knownItemDef(ITEMS, id),
-      canEquip: (item, bagIndex) =>
-        paperdollDropAction(
-          item,
-          slot,
-          world.cfg.playerClass,
-          world.player.level,
-          world.talentSpec,
-          world.equipment,
-          world.equipmentInstances,
-          world.inventory,
-          bagIndex,
-        ) === 'equip',
-      worn: worn ? { item: worn, instance: world.equipmentInstances?.[slot] } : undefined,
+    openSlotPicker(this.deps, slot, anchor, ev, (itemId, equipSlot, copy) => {
+      this.dropOnEquipSlot(itemId, equipSlot, copy);
+      if (ev) return;
+      const rebuilt = document.getElementById(`equip-slot-${slot}`);
+      this.deps.restoreFocus(rebuilt instanceof HTMLElement ? rebuilt : null);
     });
-    const rect = ev ? null : anchor.getBoundingClientRect();
-    this.deps.hideTooltip();
-    openSlotPickerMenu(
-      this.deps,
-      slot,
-      candidates,
-      ev ? ev.clientX : (rect?.right ?? 0),
-      ev ? ev.clientY : (rect?.top ?? 0),
-      (pick) => {
-        const index = resolveSlotPickerIndex(this.deps.world().inventory, pick);
-        if (index === null) {
-          this.deps.showError(tSim('error.noItem'));
-          return;
-        }
-        this.dropOnEquipSlot(pick.item.id, slot, { slotIndex: index });
-      },
-    );
   }
 
   // `keepFocus` hands focus back to the now-empty slot row after the unequip

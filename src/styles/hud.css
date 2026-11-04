@@ -13596,7 +13596,7 @@
     overflow-y: auto;
     overscroll-behavior: contain;
   }
-  /* Paperdoll slot picker rows (slot_picker_menu.ts): icon, the copy's name in
+  /* Paperdoll slot picker rows (slot_picker_controller.ts): icon, the copy's name in
      its quality color, item level, and the change against the worn piece. */
   #ctx-menu .slot-pick-row {
     display: flex;

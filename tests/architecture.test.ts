@@ -3169,7 +3169,6 @@ const UI_DOM_MODULES = [
   'src/ui/armory_inspect.ts',
   'src/ui/mount_inspect_controller.ts',
   'src/ui/bag_item_action_menu.ts',
-  'src/ui/slot_picker_menu.ts',
   'src/ui/bags_window.ts',
   'src/ui/membership_bag_socket.ts',
   'src/ui/bank_buy_prompt.ts',

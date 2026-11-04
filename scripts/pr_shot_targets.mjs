@@ -5585,6 +5585,131 @@ export const TARGETS = [
     },
   },
   {
+    key: 'bag-sections',
+    label: 'Bag captions: slot sub-headings, the All view Sections toggle, gear-set Favorites',
+    when: ['ui/bag_sections_core', 'ui/bag_gear_sets_core'],
+    // Lowest preset and the List size seeded before boot (Sections is seeded per
+    // variant too, so the All shots need no click). The bags hold weapons of both
+    // hands, armor of several slots, consumables, materials and grey junk; the
+    // Favorites variant first saves the worn gear as the "Tank set" loadout and
+    // takes two pieces off, so the set's caption has something in the bags to list.
+    variants: [
+      { key: 'desktop-weapons-tab', tab: 'weapon', sections: 'off' },
+      { key: 'desktop-armor-tab', tab: 'armor', sections: 'off' },
+      { key: 'desktop-all-sections', sections: 'on' },
+      { key: 'desktop-favorites-sets', tab: 'favourite', sections: 'off', gearSet: true },
+      { key: 'mobile-all-sections', sections: 'on', mobile: true },
+    ].map((v) => ({
+      ...v,
+      async beforeLoad(page) {
+        await page.evaluateOnNewDocument((sections) => {
+          localStorage.setItem('woc_settings', JSON.stringify({ graphicsPreset: 1 }));
+          localStorage.setItem('woc_bag_view_size', 'list');
+          localStorage.setItem('woc_bag_sections', sections);
+          localStorage.removeItem('woc_bag_filter');
+        }, v.sections);
+      },
+    })),
+    async capture(page, variant) {
+      await page.evaluate((gearSet) => {
+        const sim = window.__game?.sim;
+        if (gearSet) {
+          try {
+            sim?.saveLoadout?.('Tank set', [], undefined, true);
+            sim?.unequipItem?.('mainhand');
+            sim?.unequipItem?.('chest');
+          } catch {}
+        }
+        const ids = [
+          'eastbrook_arming_sword',
+          'eastbrook_greatsword',
+          'rusty_dagger',
+          'cryptbone_helm',
+          'recruit_tunic',
+          'homespun_hood',
+          'valefire_lantern',
+          'baked_bread',
+          'minor_healing_potion',
+          'copper_ore',
+          'silverleaf_herb',
+          'soggy_boot',
+          'chipped_tusk',
+        ];
+        for (const id of ids) {
+          try {
+            sim?.addItem(id, 1);
+          } catch {}
+        }
+        try {
+          const slotIndex = sim?.inventory?.findIndex((s) => s.itemId === 'cryptbone_helm');
+          if (typeof slotIndex === 'number' && slotIndex >= 0) {
+            sim?.setItemLocked?.('cryptbone_helm', true, { slotIndex });
+          }
+        } catch {}
+        const el = document.querySelector('#bags');
+        if (el) el.style.display = 'none';
+        window.__game?.hud?.toggleBags?.();
+      }, !!variant?.gearSet);
+      await wait(700);
+      if (variant?.tab) {
+        await page.click(`#bags [data-focus-key="bagchip:${variant.tab}"]`);
+        await wait(400);
+      }
+      return { clip: '#bags' };
+    },
+  },
+  {
+    key: 'char-slot-picker',
+    label: 'Character sheet slot picker: click a slot to list what fits, best first',
+    when: ['ui/slot_picker_core', 'ui/slot_picker_controller'],
+    // Lowest preset. A few weapons go into the bags, the character sheet opens,
+    // and the real main-hand slot row is clicked; the shot is the union of the
+    // sheet and the picker popup.
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }].map((v) => ({
+      ...v,
+      async beforeLoad(page) {
+        await page.evaluateOnNewDocument(() => {
+          localStorage.setItem('woc_settings', JSON.stringify({ graphicsPreset: 1 }));
+        });
+      },
+    })),
+    async capture(page) {
+      await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        for (const id of [
+          'eastbrook_arming_sword',
+          'eastbrook_greatsword',
+          'rusty_dagger',
+          'apprentice_staff',
+          'baked_bread',
+        ]) {
+          try {
+            sim?.addItem(id, 1);
+          } catch {}
+        }
+        const el = document.querySelector('#char-window');
+        if (el) el.style.display = 'none';
+        window.__game?.hud?.toggleChar?.();
+      });
+      await wait(900);
+      await page.click('#char-window #equip-slot-mainhand');
+      await wait(500);
+      const clip = await page.evaluate(() => {
+        const rects = ['#char-window', '#ctx-menu']
+          .map((sel) => document.querySelector(sel))
+          .filter((el) => el && el.getBoundingClientRect().width > 0)
+          .map((el) => el.getBoundingClientRect());
+        if (rects.length === 0) return null;
+        const x = Math.min(...rects.map((r) => r.left));
+        const y = Math.min(...rects.map((r) => r.top));
+        const r = Math.max(...rects.map((q) => q.right));
+        const b = Math.max(...rects.map((q) => q.bottom));
+        return { x, y, width: r - x, height: b - y };
+      });
+      return { clip: clip ?? '#char-window' };
+    },
+  },
+  {
     key: 'ink-map-picker',
     label: "Cartographer's Ink map picker",
     when: ['ui/hud/treasure/ink_map_picker', 'sim/treasure_vault'],

@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 import type { SavedLoadout } from '../src/sim/content/talents';
 import { ITEMS } from '../src/sim/data';
 import { buildGearSet, planGearSwap } from '../src/sim/loadout_gear';
+import { repairTalentLoadouts } from '../src/sim/talent_loadouts';
 import type { InvSlot } from '../src/sim/types';
 import { applyBagFilter, DEFAULT_BAG_FILTER, matchesBagSlot } from '../src/ui/bag_filter';
 import { buildBagGearSetIndex } from '../src/ui/bag_gear_sets_core';
@@ -49,6 +50,25 @@ describe('buildBagGearSetIndex', () => {
       ),
     ]);
     expect(index.setsFor({ itemId: 'hammered_copper_band', count: 1 })).toEqual([0]);
+  });
+});
+
+describe('online mirror shapes', () => {
+  it('a loadout repaired off the wire and a JSON-mirrored bag slot still match', () => {
+    const signed = { signer: 'Aurelia' };
+    const saved = loadout(
+      'PvP set',
+      buildGearSet({ mainhand: 'worn_sword' }, { mainhand: signed }),
+    );
+    // ClientWorld.loadouts arrives as JSON and passes the repair (ability_presentation.ts).
+    const wire = repairTalentLoadouts('warrior', 60, JSON.parse(JSON.stringify([saved])), 0);
+    expect(wire.loadouts[0]?.gear).toEqual(saved.gear);
+    const index = buildBagGearSetIndex(wire.loadouts);
+    // The bag slot is a mirrored snapshot, so a fresh object with a parsed payload.
+    const mirrored = JSON.parse(
+      JSON.stringify({ itemId: 'worn_sword', count: 1, slot: 7, instance: signed }),
+    ) as InvSlot;
+    expect(index.setsFor(mirrored)).toEqual([0]);
   });
 });
 

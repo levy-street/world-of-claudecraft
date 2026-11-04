@@ -1707,10 +1707,13 @@
     align-items: center;
     justify-content: center;
     position: relative;
-    /* A press opens the slot picker (slot_picker_menu.ts). */
+  }
+  /* On the player's own sheet a press opens the slot picker
+     (slot_picker_controller.ts); the inspect window's rows have no picker. */
+  #char-window .equip-slot[data-equip-slot] {
     cursor: var(--cursor-point);
   }
-  .equip-slot:focus-visible {
+  #char-window .equip-slot[data-equip-slot]:focus-visible {
     outline: 2px solid var(--color-border-focus);
     outline-offset: 2px;
   }

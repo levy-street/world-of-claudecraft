@@ -1157,7 +1157,16 @@ export class BagsWindow {
         );
       }
     }
-    for (let i = 0; i < model.emptyCells; i++) grid.appendChild(this.buildEmptyCell(null));
+    // The free squares trail the list. In Sections mode they are the whole bag's
+    // free space, so the last ones keep their materials-only mark (issue #3795),
+    // counted the same way the cells branch counts them.
+    const materialsOnlyTail =
+      model.emptyCells > 0
+        ? materialsOnlyEmptyCells(world.bags, world.inventory, model.emptyCells)
+        : 0;
+    for (let i = 0; i < model.emptyCells; i++) {
+      grid.appendChild(this.buildEmptyCell(null, i >= model.emptyCells - materialsOnlyTail));
+    }
     if (settle) this.applySortSettle(grid);
   }
 

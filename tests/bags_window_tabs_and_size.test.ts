@@ -275,6 +275,16 @@ describe('bag captions', () => {
     expect(errors).toEqual([]);
   });
 
+  it('Sections on refuses a reorder drop and names the toggle as the fix', () => {
+    const { root, window, errors } = harness(gearInv());
+    sectionsButton(root)?.click();
+    (window as unknown as { dropOnBagCell(from: number, to: number | null): void }).dropOnBagCell(
+      0,
+      null,
+    );
+    expect(errors).toEqual(['Turn Sections off to rearrange your bags']);
+  });
+
   it('Favorites captions each gear set by its loadout name, as text', () => {
     const loadouts = [
       {

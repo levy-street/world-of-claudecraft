@@ -5298,6 +5298,7 @@ export class Hud {
       this.keepPopupOnScreen(element);
     },
     bind: (onActivate) => this.bindContextMenuActions(onActivate),
+    close: () => this.closeContextMenu(),
   };
   private readonly bagItemActionMenu = new BagItemActionMenu({
     openMaterialSources: openMaterialSourcesDialog,
@@ -5738,6 +5739,7 @@ export class Hud {
     showError: (text) => this.showError(text),
     ctxMenu: this.ctxMenuSeam,
     isMobileLayout: () => this.isMobileLayout(),
+    consumePeek: () => this.peekGuard.consume(),
     helmSlotAvailable: () => helmSlotAvailableForEntity(this.sim.player, modularLookFor),
     helmHidden: () => this.sim.player?.helmHidden ?? false,
     toggleHelm: () => {
