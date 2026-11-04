@@ -317,7 +317,9 @@ export const FINAL_OVERLOAD = {
    *  (harder each pulse while it fills). */
   pulseMin: 60,
   pulseMax: 70,
-  pulseRise: 300,
+  // 300 until the bot raid of 2026-11-04: a bar two thirds full pulsed about
+  // 250 every 4 s on everyone, which wiped a raid that moved the boss on time.
+  pulseRise: 120,
   /** A bar this full (0 to 1) warns the raid once per fill. */
   warnAt: 0.85,
   /** The burst of a full bar, per difficulty (then it is empty again). */
