@@ -1081,16 +1081,18 @@ export class SocialService {
           accountId: s.accountId,
           friendAccountIds: new Set(s.friendAccountIds),
           friendIds: new Set(s.friendIds),
+          gmHidden: s.gmHidden,
         }
       : null;
   }
 
   // Online as a PUBLIC surface reports it (the guild board's officers online):
   // a session AND not hiding. An anonymous viewer is nobody's friend, so any
-  // setting but 'everyone' reads offline there.
+  // setting but 'everyone' reads offline there, and so does a hidden GM.
   shownOnlinePublicly(characterId: number): boolean {
     if (!this.tx.isOnline(characterId)) return false;
-    return (this.tx.presenceSubject?.(characterId)?.presenceMode ?? 'everyone') === 'everyone';
+    const subject = this.tx.presenceSubject?.(characterId);
+    return subject?.gmHidden !== true && (subject?.presenceMode ?? 'everyone') === 'everyone';
   }
 
   // Re-send one character's own panel: the /presence selector snaps back to

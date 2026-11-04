@@ -17,6 +17,10 @@ export interface ModerationSession {
   // 'moderation.spectate' or 'realm.motd' (see requiredCommandPermission).
   adminPermissions: ReadonlySet<string>;
   name: string;
+  /** Mirrors the sim's Entity.gmHidden on the session so the social graph
+   *  (server/presence_privacy.ts) reads the GM offline too. Set only by
+   *  server/gm_tools_host.ts setGmHidden; never persisted. */
+  gmHidden?: boolean;
 }
 
 export interface ModerationHost<TSession extends ModerationSession> {
