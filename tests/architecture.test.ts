@@ -1116,6 +1116,10 @@ const RENDER_PURE_CORES = [
   'src/render/smith_heart/breath_summit_core.ts',
   // The Breath's storm granite on its cliffs and mountain (vertex paint).
   'src/render/smith_heart/breath_stone_core.ts',
+  // The Breath's storm granite on the rock kit, and the faces hung under its
+  // high walks (the AAA pass's third round).
+  'src/render/smith_heart/breath_rock_storm_core.ts',
+  'src/render/smith_heart/heart_rock_hang_core.ts',
   'src/render/smith_heart_fx/breath_fx_core.ts',
   'src/render/smith_heart_fx/breath_roar_fx_core.ts',
   'src/render/smith_heart_fx/breath_heart_fx_core.ts',

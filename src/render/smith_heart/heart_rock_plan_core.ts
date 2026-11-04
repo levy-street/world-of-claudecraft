@@ -593,7 +593,7 @@ function lipCrossesFloor(
  *  islands', nor the Wind Bridge's and the anvil bridge's, whose arches the
  *  Breath and the Heat kits draw (phases 2G, 2I), nor the hidden
  *  surfaces'), chained end to end per surface. */
-function chasmChains(): FieldCliffRun[][] {
+export function chasmChains(): FieldCliffRun[][] {
   const F = SMITH_HEART_FIELD;
   const floating = new Set([
     ...SMITH_HEART_FLOATING_SURFACES,

@@ -138,6 +138,9 @@ const ROOMS = [
     extra: [
       ['anillo_sello', [0, -12], [0, 0], 0.3, 12],
       ['anillo_boca_aliento', [0, 58], [0, 104], 0.12, 10],
+      // The Breath's mouth and the Cornice's hung face (the AAA pass's third round).
+      ['boca_alto', [0, 66], [0, 150], 0.42, 58],
+      ['boca_lejos', [0, 30], [0, 150], 0.16, 16],
     ],
   },
   {

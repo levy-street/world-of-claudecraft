@@ -17,12 +17,8 @@ import {
   SMITH_HEART_ROCK_KIT_URL,
   upgradeWhenHeartKitLands,
 } from './heart_kit';
-import {
-  planHeartLips,
-  planHeartNeedles,
-  planHeartRock,
-  planHeartUnderCliffs,
-} from './heart_rock_plan_core';
+import { planHeartHangs, planHeartRockLips, planHeartRockUnder } from './heart_rock_hang_core';
+import { planHeartNeedles, planHeartRock } from './heart_rock_plan_core';
 
 /** The rock's culling cell (yards). */
 const ROCK_CELL = 200;
@@ -41,7 +37,15 @@ export function heartRockKitReady(): boolean {
 export function buildHeartRock(lowGfx: boolean): THREE.Group {
   return instanceHeartKit(
     SMITH_HEART_ROCK_KIT_URL,
-    [...planHeartRock(), ...planHeartUnderCliffs(), ...planHeartLips(), ...planHeartNeedles()],
+    // The Breath's high walks hang faces from brink to mist (the lips and
+    // under-walls they replace left out).
+    [
+      ...planHeartRock(),
+      ...planHeartRockUnder(),
+      ...planHeartHangs(),
+      ...planHeartRockLips(),
+      ...planHeartNeedles(),
+    ],
     lowGfx,
     'smithHeartRock',
     ROCK_CELL,

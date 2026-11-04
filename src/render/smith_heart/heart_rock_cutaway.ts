@@ -11,6 +11,7 @@
 // HEART_ROCK_SHADE_FLOOR).
 
 import * as THREE from 'three';
+import { breathRockStormGlsl } from './breath_rock_storm_core';
 import {
   heartCrownCalmGlsl,
   heartCrownColorGlsl,
@@ -72,7 +73,7 @@ export function heartRockBedGlsl(): string {
         }`;
 }
 
-const KEY = `smith-heart-rock-cutaway|beds2g|frost2h|soot2i|crownAaa|${HEART_ROCK_CUT_NEAR}|${HEART_ROCK_CUT_FAR}|${HEART_ROCK_SHADE_FLOOR.join(',')}`;
+const KEY = `smith-heart-rock-cutaway|beds2g|storm3|frost2h|soot2i|crownAaa|${HEART_ROCK_CUT_NEAR}|${HEART_ROCK_CUT_FAR}|${HEART_ROCK_SHADE_FLOOR.join(',')}`;
 
 /** Wire the cutaway into a rock material (before any other layer: those
  *  compose with it). */
@@ -120,6 +121,7 @@ export function applyRockCutaway(mat: THREE.Material): void {
         '#include <color_fragment>',
         `#include <color_fragment>
 ${heartRockBedGlsl()}
+${breathRockStormGlsl()}
 ${quenchFrostGlsl()}
 ${heatSootGlsl()}
 ${heartCrownColorGlsl()}`,

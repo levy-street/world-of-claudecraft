@@ -16,6 +16,7 @@ import { SMITH_HEART_FIELD } from '../../sim/content/smith_heart_layout';
 import { authoredFieldHeight } from '../../sim/instances/authored_field';
 import { heartGatePartPose, heartGateParts, heartGateRig } from './heart_gates_core';
 import { HEART_PROP_RECIPES, type HeartPart, heartPropBase } from './heart_plan_core';
+import { HEART_ROCK_HANG, planHeartHangs } from './heart_rock_hang_core';
 import {
   HEART_ROCK_LIP,
   HEART_ROCK_NEEDLES,
@@ -78,6 +79,24 @@ export function heartRockSolids(): HeartSolid[] {
       hd: back,
       yaw: p.rot,
       what: `rock ${p.piece} (${p.x.toFixed(1)}, ${p.z.toFixed(1)})`,
+    });
+  }
+  // The faces hung under the Breath's high walks: a box from brink to foot,
+  // out over the void as far as the face reaches at mid-drop.
+  for (const p of planHeartHangs()) {
+    const H = HEART_ROCK_HANG;
+    const hh = (H.drop * (p.rise ?? 1)) / 2;
+    const fwd = (H.out * 0.5 - H.depth) / 2;
+    out.push({
+      kind: 'box',
+      x: p.x + Math.sin(p.rot) * fwd,
+      y: p.y - hh,
+      z: p.z + Math.cos(p.rot) * fwd,
+      hw: H.reach * (p.stretch ?? 1),
+      hh,
+      hd: (H.out * 0.5 + H.depth) / 2,
+      yaw: p.rot,
+      what: `hang ${p.piece} (${p.x.toFixed(1)}, ${p.z.toFixed(1)})`,
     });
   }
   // The crest's needles: a box round each one's lower half and its spire.

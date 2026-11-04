@@ -247,8 +247,17 @@ function segmentDistance(
 /** How far past a floating isle's rim the air stays open (yards). */
 export const HEART_ISLE_AIR = 8;
 
-/** Is the disc at (x, z) of radius r inside an area that stays open air? */
-export function heartOpenAir(x: number, z: number, r: number): boolean {
+/** The gulf between the Breath's first landing and the Cornice (the AAA
+ *  pass's third round): the strip left between the two isles' skies, where
+ *  the mountain stood as one flat slab in front of the Cornice from the Ring.
+ *  Open, the Cornice's hung face rises out of the mist behind the landing. */
+export const HEART_BREATH_GULF = { ax: 2, az: 124, bx: 2, bz: 146, r: 12 } as const;
+
+/** Is the disc at (x, z) of radius r inside an area that stays open air?
+ *  `summitSky` false leaves out the summit's sky (the Breath's floating
+ *  isles' and the gulf between them): a face hung under the Cornice, far
+ *  below the isles, stands in it. */
+export function heartOpenAir(x: number, z: number, r: number, summitSky = true): boolean {
   // The chasm round the Seal Dais: inside the Ring's inner edge, all open.
   if (Math.hypot(x - RING.x, z - RING.z) - r < RING.innerR) return true;
   // The Wind Bridge's gulf.
@@ -271,6 +280,9 @@ export function heartOpenAir(x: number, z: number, r: number): boolean {
   if (Math.hypot(x - HEART_ROOM.x, z - HEART_ROOM.z) - r < HEART_ROOM_CHASM_R) return true;
   // The open sky round the Breath's floating isles (nothing stands under or
   // beside one: they float).
+  if (!summitSky) return false;
+  const G = HEART_BREATH_GULF;
+  if (segmentDistance(x, z, G.ax, G.az, G.bx, G.bz) - r < G.r) return true;
   for (let i = 0; i < BREATH_ISLES.length; i++) {
     const isle = BREATH_ISLES[i];
     if (Math.hypot(x - isle.x, z - isle.z) - r < BREATH_ISLE_REACH[i] + HEART_ISLE_AIR) return true;
