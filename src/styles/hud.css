@@ -13596,6 +13596,49 @@
     overflow-y: auto;
     overscroll-behavior: contain;
   }
+  /* Paperdoll slot picker rows (slot_picker_menu.ts): icon, the copy's name in
+     its quality color, item level, and the change against the worn piece. */
+  #ctx-menu .slot-pick-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  #ctx-menu .slot-pick-icon {
+    flex: none;
+    display: inline-flex;
+    --ui-socket-size: 24px;
+  }
+  #ctx-menu .slot-pick-icon .item-icon {
+    width: 24px;
+    height: 24px;
+  }
+  #ctx-menu .slot-pick-name {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  #ctx-menu .slot-pick-row .ctx-item-meta {
+    flex: none;
+    margin: 0;
+  }
+  #ctx-menu .slot-pick-delta {
+    flex: none;
+    min-width: 2.5em;
+    text-align: right;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  #ctx-menu .slot-pick-delta-up {
+    color: var(--color-text-success);
+  }
+  #ctx-menu .slot-pick-delta-down {
+    color: var(--color-danger);
+  }
+  #ctx-menu .slot-pick-delta-same {
+    color: var(--color-text-muted);
+  }
 
   /* ---------- ai account tag ---------- */
   /* ONE class for all three surfaces the operator-set AI mark lands on: the chat

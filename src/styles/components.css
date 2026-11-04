@@ -1707,6 +1707,12 @@
     align-items: center;
     justify-content: center;
     position: relative;
+    /* A press opens the slot picker (slot_picker_menu.ts). */
+    cursor: var(--cursor-point);
+  }
+  .equip-slot:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
   }
   /* Fixed-width text box so every row unit is the same width and its icon lands at
      the identical x within the column (part of the centering contract). */
@@ -9991,10 +9997,13 @@
     background: color-mix(in srgb, var(--color-quest) 85%, var(--color-keyline));
     color: var(--color-keyline);
   }
-  /* Soft Quest section header in a derived bag list only (not All+recent
-     manual cells). Thin parchment caption using quest gold; not a drop
-     target. Spans the full grid row via grid-column. */
+  /* Section captions in a derived bag list only (never the All+recent manual
+     cells unless Sections is on; bag_sections_core.ts). Thin parchment
+     caption, not a drop target, spanning the full grid row via grid-column.
+     The neutral base serves slot and category captions; Quest keeps its gold,
+     a gear set reads gold like the loadout it came from, and Junk greys out. */
   .bag-grid .bag-section-header {
+    --bag-section-ink: var(--color-text-light);
     grid-column: 1 / -1;
     margin: 4px 0 2px;
     padding: 2px 4px 1px;
@@ -10003,10 +10012,48 @@
     font-weight: 600;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: var(--color-quest);
-    border-bottom: 1px solid color-mix(in srgb, var(--color-quest) 35%, transparent);
+    color: var(--bag-section-ink);
+    border-bottom: 1px solid color-mix(in srgb, var(--bag-section-ink) 35%, transparent);
     pointer-events: none;
     user-select: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .bag-grid .bag-section-header.bag-section-quest {
+    --bag-section-ink: var(--color-quest);
+  }
+  .bag-grid .bag-section-header.bag-section-gearset {
+    --bag-section-ink: var(--gold);
+    /* A loadout name is the player's own text: keep its case. */
+    text-transform: none;
+    letter-spacing: 0.02em;
+  }
+  .bag-grid .bag-section-header.bag-section-junk {
+    --bag-section-ink: var(--color-quality-poor);
+  }
+  /* A slot caption nested under a category caption (All with Sections on). */
+  .bag-grid .bag-section-header.bag-section-sub {
+    --bag-section-ink: var(--color-text-muted);
+    margin: 2px 0 1px 8px;
+    font-size: 9px;
+    border-bottom-style: dotted;
+  }
+  .bag-sections-btn {
+    flex: none;
+    cursor: var(--cursor-point);
+    white-space: nowrap;
+  }
+  .bag-sections-btn.active {
+    color: var(--gold);
+    border-color: var(--gold-dim);
+  }
+  .bag-sections-btn:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  body.mobile-touch .bag-sections-btn {
+    min-height: 40px;
   }
   body.mobile-touch .bag-chip {
     min-height: 40px;

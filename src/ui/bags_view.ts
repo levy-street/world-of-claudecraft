@@ -19,6 +19,7 @@ import { WORLD_PVP_SKULL_BAG_ITEM_ID } from '../sim/pvp/world_pvp_trophy';
 import type { InvSlot, ItemDef, ItemInstancePayload } from '../sim/types';
 import {
   applyBagFilter,
+  type BagFilterContext,
   type BagFilterState,
   bagFilterIsDefault,
   bagOrderIsManual,
@@ -735,6 +736,7 @@ export function buildBagGrid(
   lookup: ItemLookup,
   filter: BagFilterState,
   capacity = 0,
+  ctx?: BagFilterContext,
 ): BagGridModel {
   const showEmpties = bagFilterIsDefault(filter);
   const emptyCells = showEmpties ? Math.max(0, capacity - inventory.length) : 0;
@@ -747,7 +749,7 @@ export function buildBagGrid(
       ? { state: 'items', cells, visible: [], emptyCells, overflow }
       : { state: 'empty', cells: [], visible: [], emptyCells: 0, overflow };
   }
-  const visible = applyBagFilter(inventory, lookup, filter);
+  const visible = applyBagFilter(inventory, lookup, filter, ctx);
   if (visible.length === 0)
     return { state: 'noMatch', cells: [], visible: [], emptyCells: 0, overflow };
   return { state: 'items', cells, visible, emptyCells, overflow };

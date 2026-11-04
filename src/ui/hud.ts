@@ -177,7 +177,7 @@ import {
   isToggleAuraKind,
 } from './auras_view';
 import { claudiumLauncherHtml } from './bag_currency_html';
-import { BagItemActionMenu, CTX_MENU_PICKER_CLASS } from './bag_item_action_menu';
+import { BagItemActionMenu, CTX_MENU_PICKER_CLASS, type CtxMenuSeam } from './bag_item_action_menu';
 import { bagSlotsLineKey, bagsWindowShown } from './bags_view';
 import { BagsWindow, dismissBagPrompts } from './bags_window';
 import { BankWindow } from './bank_window';
@@ -5290,17 +5290,19 @@ export class Hud {
   // Composes the shared #ctx-menu popup family (placePopupAt + keepPopupOnScreen,
   // bindContextMenuActions) and the one confirm-dialog family; the bags window
   // opens it via the openItemActionMenu dep above.
+  // One #ctx-menu seam, shared by the bag item menu and the paperdoll slot picker.
+  private readonly ctxMenuSeam: CtxMenuSeam = {
+    element: () => $('#ctx-menu'),
+    place: (element, x, y, reserveRight, reserveBottom) => {
+      this.placePopupAt(element, x, y, reserveRight, reserveBottom);
+      this.keepPopupOnScreen(element);
+    },
+    bind: (onActivate) => this.bindContextMenuActions(onActivate),
+  };
   private readonly bagItemActionMenu = new BagItemActionMenu({
     openMaterialSources: openMaterialSourcesDialog,
     world: () => this.sim,
-    ctxMenu: {
-      element: () => $('#ctx-menu'),
-      place: (element, x, y, reserveRight, reserveBottom) => {
-        this.placePopupAt(element, x, y, reserveRight, reserveBottom);
-        this.keepPopupOnScreen(element);
-      },
-      bind: (onActivate) => this.bindContextMenuActions(onActivate),
-    },
+    ctxMenu: this.ctxMenuSeam,
     confirmDialog: (title, body, okText, cancelText, onOk) =>
       this.confirmDialog(title, body, okText, cancelText, onOk),
     slotName: (slot) => itemSlotName(slot),
@@ -5734,6 +5736,8 @@ export class Hud {
     dragState: this.itemDragState,
     renderBags: () => this.renderBags(),
     showError: (text) => this.showError(text),
+    ctxMenu: this.ctxMenuSeam,
+    isMobileLayout: () => this.isMobileLayout(),
     helmSlotAvailable: () => helmSlotAvailableForEntity(this.sim.player, modularLookFor),
     helmHidden: () => this.sim.player?.helmHidden ?? false,
     toggleHelm: () => {

@@ -4762,6 +4762,14 @@ export const hudChromeStrings = {
     trinketSlot: 'Trinket',
     unequipAria: 'Unequip {item}',
     unequipHint: 'Click ×, right-click, or drag to bags to unequip',
+    // The slot picker (slot_picker_menu.ts): click a slot to list what fits.
+    pickerHint: 'Click to see what you can equip here',
+    pickerTitle: 'Equip: {slot}',
+    pickerEmpty: 'Nothing in your bags fits this slot',
+    pickerItemLevel: 'Item Level {n}',
+    pickerDeltaUp: '+{n}',
+    pickerDeltaDown: '-{n}',
+    pickerDeltaSame: '=',
     // The helmet-visibility eye on the head socket: each string is the action
     // the press performs (so the shown-state button says "Hide helmet").
     hideHelmAria: 'Hide helmet',
@@ -5312,6 +5320,7 @@ export const hudChromeStrings = {
     // that grid is a derived list, its squares hold no bag position, so honoring the drop
     // would move a stack the player never aimed at. Say so instead of doing nothing.
     reorderNeedsRecent: 'Clear the filter and sort by Recent to rearrange your bags',
+    reorderNeedsSectionsOff: 'Turn Sections off to rearrange your bags',
     // Refusal when a drag would move a locked stack, or drop onto one: a locked
     // item is pinned to its bag slot (src/sim/inventory_order.ts isCellPinned).
     reorderLocked: 'Locked items stay in their bag slot. Unlock it to move it.',
@@ -5371,6 +5380,13 @@ export const hudChromeStrings = {
     viewSizeCompact: 'Compact',
     viewSizeLarge: 'Large',
     viewSizeList: 'List',
+    // Bag captions (bag_sections_core.ts). Slot captions reuse the itemUi.slots keys.
+    sectionsButton: 'Sections',
+    sectionsHint: 'Group your bags under headings by item type and slot',
+    sectionOneHand: 'One-Hand',
+    sectionOther: 'Other',
+    sectionLocked: 'Locked',
+    sectionGearSetFallback: 'Set {n}',
     sortAria: 'Sort bag items',
     sortRecent: 'Recent',
     sortQuality: 'Quality',

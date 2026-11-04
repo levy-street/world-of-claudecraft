@@ -44,12 +44,21 @@ import {
   serializeBagFilter,
 } from './bag_filter';
 import { bagFineMark } from './bag_fine_mark_view';
+import { type BagGearSetIndex, buildBagGearSetIndex } from './bag_gear_sets_core';
 import { bagInstanceGlyphKind } from './bag_instance_glyph_view';
 import type { BagMenuTarget } from './bag_item_action_menu';
 import { bagItemHasContextActions } from './bag_item_context_menu';
 import { bagQuestMarkKind, bagQuestMarkProgressFromLog } from './bag_quest_mark_view';
 import { BagQuestTrackerHighlight } from './bag_quest_tracker_highlight';
 import { bagQuestTrackerHighlightId } from './bag_quest_tracker_highlight_view';
+import {
+  type BagSectionKey,
+  bagSectionClass,
+  bagSectionLabel,
+  bagSectionsReplaceCells,
+  buildBagSectionRows,
+  parseBagSectionsPref,
+} from './bag_sections_core';
 import {
   BAG_VIEW_SIZES,
   type BagViewSize,
@@ -74,7 +83,6 @@ import {
   bankDepositOpensPrompt,
   buildBagBar,
   buildBagGrid,
-  buildBagListRows,
   carriedPools,
   materialsOnlyEmptyCells,
   resolveDepositSubmit,
@@ -148,6 +156,8 @@ const BAG_FILTER_KEY = 'woc_bag_filter';
 // The bag view size (bag_view_size_core.ts), kept apart from the filter key so an
 // older build that parses woc_bag_filter never sees a field it does not know.
 const BAG_VIEW_SIZE_KEY = 'woc_bag_view_size';
+// The All view's Sections toggle (bag_sections_core.ts), its own key like the size.
+const BAG_SECTIONS_KEY = 'woc_bag_sections';
 
 // Sort settle ripple: how long an armed settle waits for the tidied grid to
 // arrive before giving up (the bank deposit status timeout-backstop pattern:
@@ -388,6 +398,15 @@ export class BagsWindow {
       return parseBagViewSize(localStorage.getItem(BAG_VIEW_SIZE_KEY));
     } catch {
       return parseBagViewSize(null);
+    }
+  })();
+
+  // The All view's Sections toggle: off keeps the real hand-arranged cells.
+  private sectionsOn: boolean = (() => {
+    try {
+      return parseBagSectionsPref(localStorage.getItem(BAG_SECTIONS_KEY));
+    } catch {
+      return parseBagSectionsPref(null);
     }
   })();
 
@@ -953,6 +972,32 @@ export class BagsWindow {
     });
     tools.appendChild(size);
 
+    // Sections (All view only): group the bag under category captions, with slot
+    // sub-headings under Weapons and Armor. The other tabs caption themselves.
+    if (this.filter.category === 'all') {
+      const sections = document.createElement('button');
+      sections.type = 'button';
+      sections.className = `bag-sections-btn ui-btn${this.sectionsOn ? ' active' : ''}`;
+      sections.dataset.focusKey = 'bag-sections';
+      sections.textContent = t('hudChrome.bags.sectionsButton');
+      sections.setAttribute('aria-pressed', this.sectionsOn ? 'true' : 'false');
+      this.deps.attachTooltip(
+        sections,
+        () => `<div class="tt-sub">${esc(t('hudChrome.bags.sectionsHint'))}</div>`,
+      );
+      sections.addEventListener('click', () => {
+        this.sectionsOn = !this.sectionsOn;
+        try {
+          localStorage.setItem(BAG_SECTIONS_KEY, this.sectionsOn ? 'on' : 'off');
+        } catch {
+          /* storage unavailable (private mode); the toggle still applies in-session */
+        }
+        audio.click();
+        this.render();
+      });
+      tools.appendChild(sections);
+    }
+
     // The one-shot clean-up button (world.sortInventory): unlike the view-only
     // dropdown beside it, this rearranges the REAL cells (server-side online,
     // so both hosts land the identical grid). Pressing it also resets any
@@ -1019,11 +1064,14 @@ export class BagsWindow {
   // without rebuilding the filter bar and stealing input focus.
   private fillGrid(grid: HTMLElement): void {
     const world = this.deps.world();
+    // Saved loadout gear sets: Favorites lists their pieces under each set's name.
+    const gearSets = buildBagGearSetIndex(world.loadouts ?? []);
     const model = buildBagGrid(
       world.inventory,
       (id) => knownItemDef(ITEMS, id),
       this.filter,
       world.bagCapacity,
+      { gearSets },
     );
     // Settle bookkeeping rides every paint: the class never persists across a
     // repaint (each replay would re-run the animation on the fresh nodes).
@@ -1053,7 +1101,7 @@ export class BagsWindow {
     // Soft Quest section headers are NEVER inserted here: bagOrderIsManual is true,
     // and a header node in the cell stream would shift bagIndex drop targets
     // (state.md locked decision 7). Rim/seal alone marks quest stacks in this view.
-    if (model.cells.length > 0) {
+    if (model.cells.length > 0 && !bagSectionsReplaceCells(this.filter, this.sectionsOn)) {
       // The trailing empties past the general pool's headroom are painted as
       // materials-only squares (issue #3795): counted down from the END so
       // exactly generalFree plain empties remain, wherever the holes sit.
@@ -1087,18 +1135,20 @@ export class BagsWindow {
       if (settle) this.applySortSettle(grid);
       return;
     }
-    // Derived list: soft Quest section headers only when buildBagListRows allows
-    // them (not manual All+recent; mixed quest + non-quest). Section rows are not
-    // drop targets and carry no bag cell index. No `continue` in this loop: the
-    // R34 pin holds fillGrid to zero continues so an unknown stack can never be
-    // skipped (tests/bags_window.test.ts).
-    for (const row of buildBagListRows(
+    // Derived list: captions from bag_sections_core.ts (slot sub-headings on
+    // Weapons and Armor, gear sets on Favorites, categories on All with Sections
+    // on, else the soft Quest caption buildBagListRows always allowed). Caption
+    // rows are not drop targets and carry no bag cell index. No `continue` in
+    // this loop: the R34 pin holds fillGrid to zero continues so an unknown
+    // stack can never be skipped (tests/bags_window.test.ts).
+    for (const row of buildBagSectionRows(
       model.visible,
       (id) => knownItemDef(ITEMS, id),
       this.filter,
+      { sectionsOn: this.sectionsOn, gearSets },
     )) {
       if (row.kind === 'section') {
-        grid.appendChild(this.buildSectionHeader(row.section));
+        grid.appendChild(this.buildSectionHeader(row.key, row.level, gearSets));
       } else {
         const s = row.slot;
         const item = knownItemDef(ITEMS, s.itemId);
@@ -1111,14 +1161,19 @@ export class BagsWindow {
     if (settle) this.applySortSettle(grid);
   }
 
-  // Soft parchment section caption for a derived bag list (Quest grouping). Not a
-  // drop target, not focusable, not counted as a bag cell.
-  private buildSectionHeader(_section: 'quest'): HTMLElement {
+  // Soft parchment caption for a derived bag list. Not a drop target, not
+  // focusable, not counted as a bag cell. A gear-set caption is the player's own
+  // loadout name, set as text (never parsed as markup, never routed through t()).
+  private buildSectionHeader(
+    key: BagSectionKey,
+    level: 1 | 2,
+    gearSets: BagGearSetIndex,
+  ): HTMLElement {
     const el = document.createElement('div');
-    el.className = 'bag-section-header bag-section-quest';
+    el.className = `bag-section-header ${bagSectionClass(key)}${level === 2 ? ' bag-section-sub' : ''}`;
     el.setAttribute('role', 'presentation');
-    // Reuse the Quest chip label so the section and filter share one string.
-    el.textContent = t(BAG_CATEGORY_LABEL_KEYS.quest);
+    const label = bagSectionLabel(key, gearSets);
+    el.textContent = 'text' in label ? label.text : t(label.key, label.values);
     return el;
   }
 
@@ -1771,8 +1826,15 @@ export class BagsWindow {
     if (to === null || !bagOrderIsManual(this.filter)) {
       // A filtered / searched / sorted grid is a derived LIST: its squares hold no bag
       // position, so a drop there would move a stack the player never aimed at. Say so
-      // instead of doing nothing, which is indistinguishable from a broken drag.
-      this.deps.showError(t('hudChrome.bags.reorderNeedsRecent'));
+      // instead of doing nothing, which is indistinguishable from a broken drag. With
+      // Sections on, the plain All view is a list too, and the fix is the toggle.
+      this.deps.showError(
+        t(
+          bagOrderIsManual(this.filter) && this.sectionsOn
+            ? 'hudChrome.bags.reorderNeedsSectionsOff'
+            : 'hudChrome.bags.reorderNeedsRecent',
+        ),
+      );
       return;
     }
     const world = this.deps.world();

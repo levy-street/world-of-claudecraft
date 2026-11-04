@@ -3,6 +3,7 @@ import { isItemLocked } from '../sim/item_lock_flag';
 import { junkSellableSlot } from '../sim/items';
 import { isMaterialItem } from '../sim/material_taxonomy';
 import type { InvSlot, ItemDef, ItemInstancePayload } from '../sim/types';
+import type { BagGearSetIndex } from './bag_gear_sets_core';
 
 // Pure, DOM-free core for the modular bag filtering system. The HUD is a thin
 // consumer: it owns the controls and the DOM, and calls applyBagFilter() to turn
@@ -168,6 +169,28 @@ export function bagJunkItemCount(inventory: readonly InvSlot[], lookup: ItemLook
   return total;
 }
 
+// What the bag filter knows beyond the def and the copy. Optional, so every
+// caller that predates it (and the bank, whose Favorites stays the locked copies)
+// keeps its behavior.
+export interface BagFilterContext {
+  /** Saved loadout gear sets (bag_gear_sets_core.ts). A copy a set names is a
+   *  favourite too: the player grouped it by saving the set, and the Favorites
+   *  tab shows it under that set's sub-heading. */
+  gearSets?: BagGearSetIndex;
+}
+
+// The bag grid's per-copy category test: matchesCategory, plus the one arm only
+// the bags can answer (a gear-set piece is a favourite even when unlocked).
+export function matchesBagSlot(
+  item: ItemDef,
+  category: BagCategory,
+  slot: InvSlot,
+  ctx?: BagFilterContext,
+): boolean {
+  if (matchesCategory(item, category, slot)) return true;
+  return category === 'favourite' && (ctx?.gearSets?.setsFor(slot).length ?? 0) > 0;
+}
+
 // Lower rank sorts first, so a descending-quality view reads legendary -> poor.
 // Mirrors the /bags chat-command ordering (sim.ts), extended with legendary.
 const QUALITY_RANK: Record<string, number> = {
@@ -201,6 +224,7 @@ export function applyBagFilter(
   slots: readonly InvSlot[],
   lookup: ItemLookup,
   state: BagFilterState,
+  ctx?: BagFilterContext,
 ): InvSlot[] {
   const query = state.search.trim().toLowerCase();
   const filtered = slots.filter((slot) => {
@@ -211,7 +235,7 @@ export function applyBagFilter(
     // or a name search excludes it, because with no def there is no kind to
     // classify and no name to match.
     if (!item) return state.category === 'all' && !query;
-    if (!matchesCategory(item, state.category, slot)) return false;
+    if (!matchesBagSlot(item, state.category, slot, ctx)) return false;
     if (query && !item.name.toLowerCase().includes(query)) return false;
     return true;
   });

@@ -6,6 +6,7 @@
 // copies its predicate claims, and the Compact / Large / List size select that
 // restyles the grid, persists, and never moves a stack's real cell index.
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { buildGearSet } from '../src/sim/loadout_gear';
 import type { InvSlot } from '../src/sim/types';
 import { BAG_CATEGORIES } from '../src/ui/bag_filter';
 import { BagsWindow, type BagsWindowDeps } from '../src/ui/bags_window';
@@ -18,13 +19,19 @@ beforeEach(() => {
   document.body.innerHTML = '';
 });
 
-function harness(inventory: InvSlot[]): { root: HTMLElement; window: BagsWindow } {
+function harness(
+  inventory: InvSlot[],
+  extra: Record<string, unknown> = {},
+): { root: HTMLElement; window: BagsWindow; errors: string[] } {
+  const errors: string[] = [];
   const world = {
     inventory,
     bags: [null, null, null, null],
     bagCapacity: 16,
     copper: 0,
     sortInventory: () => {},
+    loadouts: [],
+    ...extra,
   } as unknown as IWorld;
   const root = document.createElement('div');
   document.body.appendChild(root);
@@ -63,7 +70,9 @@ function harness(inventory: InvSlot[]): { root: HTMLElement; window: BagsWindow 
     stageMarketSell: noop,
     stageMailParcel: noop,
     insertItemChatLink: noop,
-    showError: noop,
+    showError: (text: string) => {
+      errors.push(text);
+    },
     setPendingPetFeed: noop,
     resetPetBarSig: noop,
     isHotbarItemId: () => false,
@@ -81,7 +90,7 @@ function harness(inventory: InvSlot[]): { root: HTMLElement; window: BagsWindow 
   };
   const window = new BagsWindow(deps);
   window.render();
-  return { root, window };
+  return { root, window, errors };
 }
 
 // soggy_boot is grey vendor trash (what Sell Junk sells); the locked sword is a
@@ -202,5 +211,85 @@ describe('bag view size', () => {
     expect(indices(root)).toEqual(compact);
     pickSize(root, 'list');
     expect(indices(root)).toEqual(compact);
+  });
+});
+
+// Phase 2 and 3: captions over the derived lists, and the All view's Sections toggle.
+function captions(root: HTMLElement): string[] {
+  return [...root.querySelectorAll<HTMLElement>('.bag-grid .bag-section-header')].map(
+    (el) => `${el.classList.contains('bag-section-sub') ? '  ' : ''}${el.textContent ?? ''}`,
+  );
+}
+
+function sectionsButton(root: HTMLElement): HTMLButtonElement | null {
+  return root.querySelector<HTMLButtonElement>('button.bag-sections-btn');
+}
+
+const gearInv = (): InvSlot[] => [
+  { itemId: 'baked_bread', count: 2 },
+  { itemId: 'eastbrook_greatsword', count: 1 },
+  { itemId: 'worn_sword', count: 1 },
+  { itemId: 'recruit_tunic', count: 1 },
+  { itemId: 'soggy_boot', count: 3 },
+];
+
+describe('bag captions', () => {
+  it('Weapons captions each hand group', () => {
+    const { root } = harness(gearInv());
+    chip(root, 'weapon').click();
+    expect(captions(root)).toEqual(['One-Hand', 'Two-Hand']);
+    expect(shownItemIds(root)).toEqual(['worn_sword', 'eastbrook_greatsword']);
+  });
+
+  it('the Sections toggle shows only on All, is off by default, and keeps the real cells', () => {
+    const { root } = harness(gearInv());
+    const btn = sectionsButton(root);
+    expect(btn?.getAttribute('aria-pressed')).toBe('false');
+    expect(captions(root)).toEqual([]);
+    expect(root.querySelector('.bag-grid .bag-item[data-bag-index="0"]')).not.toBeNull();
+    chip(root, 'weapon').click();
+    expect(sectionsButton(root)).toBeNull();
+  });
+
+  it('Sections on groups All by category with nested slot captions, and persists', () => {
+    const { root, errors } = harness(gearInv());
+    sectionsButton(root)?.click();
+    expect(sectionsButton(root)?.getAttribute('aria-pressed')).toBe('true');
+    expect(localStorage.getItem('woc_bag_sections')).toBe('on');
+    expect(captions(root)).toEqual([
+      'Weapons',
+      '  One-Hand',
+      '  Two-Hand',
+      'Armor',
+      '  Chest',
+      'Consumables',
+      'Junk',
+    ]);
+    // A list now: no stack names a real cell, and the free squares still paint.
+    expect(root.querySelector('.bag-grid .bag-item[data-bag-index]')).toBeNull();
+    expect(root.querySelectorAll('.bag-grid .bag-item.empty').length).toBe(16 - 5);
+    // A fresh window reads the toggle back.
+    document.body.innerHTML = '';
+    const again = harness(gearInv());
+    expect(captions(again.root)[0]).toBe('Weapons');
+    expect(errors).toEqual([]);
+  });
+
+  it('Favorites captions each gear set by its loadout name, as text', () => {
+    const loadouts = [
+      {
+        name: '<b>Tank</b> set',
+        alloc: {},
+        bar: [],
+        gear: buildGearSet({ mainhand: 'worn_sword', chest: 'recruit_tunic' }, undefined),
+      },
+    ];
+    const inventory = gearInv();
+    inventory.push({ itemId: 'baked_bread', count: 1, instance: { locked: true } });
+    const { root } = harness(inventory, { loadouts });
+    chip(root, 'favourite').click();
+    expect(captions(root)).toEqual(['<b>Tank</b> set', 'Locked']);
+    expect(root.querySelector('.bag-section-header b')).toBeNull();
+    expect(shownItemIds(root)).toEqual(['worn_sword', 'recruit_tunic', 'baked_bread']);
   });
 });
