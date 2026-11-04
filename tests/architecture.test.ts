@@ -1120,6 +1120,7 @@ const RENDER_PURE_CORES = [
   // high walks (the AAA pass's third round).
   'src/render/smith_heart/breath_rock_storm_core.ts',
   'src/render/smith_heart/heart_rock_hang_core.ts',
+  'src/render/smith_heart/heart_rock_gulf_core.ts',
   // The roots of the mountain readable on the dark crown (the third round).
   'src/render/smith_heart/heart_root_look_core.ts',
   'src/render/smith_heart_fx/breath_fx_core.ts',
