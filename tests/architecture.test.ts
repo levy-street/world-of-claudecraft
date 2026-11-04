@@ -1164,6 +1164,8 @@ const RENDER_PURE_CORES = [
   'src/render/smith_heart_fx/breath_fight_fx_core.ts',
   'src/render/smith_heart_fx/quench_body_core.ts',
   'src/render/smith_heart_fx/quench_fight_fx_core.ts',
+  // The risen Quench blade's point continuing its kit piece, and the piece split.
+  'src/render/smith_heart_fx/quench_blade_tip_core.ts',
   'src/render/smith_heart_fx/quench_frost_fx_core.ts',
   // The Quench's frost glaze painted on a body's own material.
   'src/render/smith_heart_fx/quench_glaze_core.ts',
