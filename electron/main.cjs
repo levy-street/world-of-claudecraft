@@ -23,7 +23,7 @@ const path = require('node:path');
 const { pathToFileURL } = require('node:url');
 const {
   appNavigationOrigins,
-  navigationAllowed,
+  navigationDecision,
   isTrustedSender,
   isDevToolsToggleShortcut,
   isSoftwareRenderer,
@@ -867,9 +867,11 @@ function createMainWindow() {
   // (details.url, details.isMainFrame, details.preventDefault()); the positional
   // (event, url) form is deprecated. An off-origin navigation is blocked.
   const guardNavigation = (details) => {
-    const isMainFrame = details.isMainFrame !== false;
-    if (!navigationAllowed(details.url, isMainFrame, appOrigins)) {
+    const { allowed, isMainFrame } = navigationDecision(details, appOrigins);
+    if (!allowed) {
       details.preventDefault();
+      if (!isMainFrame)
+        log.warn(`[shell] blocked subframe navigation: ${deriveOrigin(details.url)}`);
       if (
         isMainFrame &&
         (details.url.startsWith('http://') || details.url.startsWith('https://'))
