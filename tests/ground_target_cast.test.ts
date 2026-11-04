@@ -146,7 +146,7 @@ describe('ground-targeted casting (thematic per-class spells)', () => {
       if (!sim.setSpec('destruction', pid)) throw new Error('no destruction spec');
       me.auras.push({
         id: 'destruction_ruin',
-        name: 'Ruin',
+        name: 'Wrack',
         kind: 'destruction_ruin',
         value: 5,
         stacks: 5,
@@ -206,7 +206,7 @@ describe('ground-targeted casting (thematic per-class spells)', () => {
     me.resource = 9999;
     me.auras.push({
       id: 'destruction_ruin',
-      name: 'Ruin',
+      name: 'Wrack',
       kind: 'destruction_ruin',
       value: 3,
       stacks: 3,

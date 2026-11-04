@@ -1279,7 +1279,7 @@ const baseEnTable = {
   'aura.improvedImmolate': 'Improved Immolate',
   'aura.demonArmor': 'Demon Armor',
   'aura.desolation': 'Desolation',
-  'aura.destructionRuin': 'Ruin',
+  'aura.destructionRuin': 'Wrack',
   'aura.ruinousBrand': 'Ruinous Brand',
   'aura.duskfireClaim': 'Duskfire Claim',
   'aura.duskweaveCloak': 'Duskweave Cloak',
@@ -21707,7 +21707,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     ...BASE_NEW.id_ID,
     'error.bagEquipHasProperty': 'Tas itu tidak bisa dipakai selama memiliki atribut khusus.',
     'error.unknownAbility': 'Kamu belum mengetahui kemampuan itu.',
-    'error.notEnoughRuin': 'Ruin tidak cukup!',
+    'error.notEnoughRuin': 'Wrack tidak cukup!',
     'error.burningPactRequired': 'Kobaran Api membutuhkan Pakta Membara pada target.',
     'error.shellskinPreventsAttacks': 'Kulit Cangkang mencegah serangan.',
     'error.tithefiendNeedsDirge':
@@ -23250,7 +23250,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.bagEquipHasProperty':
       'Du kan inte utrusta den här väskan så länge den har en särskild egenskap.',
     'error.unknownAbility': 'Du kan inte den förmågan.',
-    'error.notEnoughRuin': 'Inte tillräckligt med Ruin!',
+    'error.notEnoughRuin': 'Inte tillräckligt med Wrack!',
     'error.burningPactRequired': 'Storbrand kräver Brinnande pakt på målet.',
     'error.shellskinPreventsAttacks': 'Skalhud förhindrar attacker.',
     'error.tithefiendNeedsDirge':
@@ -24024,7 +24024,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     ...BASE_NEW.vi_VN,
     'error.bagEquipHasProperty': 'Không thể trang bị túi này khi nó còn mang thuộc tính đặc biệt.',
     'error.unknownAbility': 'Bạn chưa học kỹ năng đó.',
-    'error.notEnoughRuin': 'Không đủ Ruin!',
+    'error.notEnoughRuin': 'Không đủ Wrack!',
     'error.burningPactRequired': 'Bùng Cháy cần mục tiêu đang chịu Khế Ước Rực Cháy.',
     'error.shellskinPreventsAttacks': 'Da Mai ngăn không cho tấn công.',
     'error.tithefiendNeedsDirge': 'Quỷ Thập Phân của bạn cần một kẻ địch đang chịu Ai Ca Mục Rữa.',
@@ -24795,7 +24795,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.bagEquipHasProperty':
       'Du kan ikke iføre dig denne taske, så længe den har en særlig egenskab.',
     'error.unknownAbility': 'Du kender ikke den evne.',
-    'error.notEnoughRuin': 'Ikke nok Ruin!',
+    'error.notEnoughRuin': 'Ikke nok Wrack!',
     'error.burningPactRequired': 'Antændelse kræver Brændende Pagt på målet.',
     'error.shellskinPreventsAttacks': 'Skalhud forhindrer angreb.',
     'error.tithefiendNeedsDirge':
@@ -27274,7 +27274,7 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Improved Immolate': 'aura.improvedImmolate',
   'Demon Armor': 'aura.demonArmor',
   Desolation: 'aura.desolation',
-  Ruin: 'aura.destructionRuin',
+  Wrack: 'aura.destructionRuin',
   'Ruinous Brand': 'aura.ruinousBrand',
   'Duskfire Claim': 'aura.duskfireClaim',
   'Duskweave Cloak': 'aura.duskweaveCloak',

@@ -252,7 +252,7 @@ describe('ProcOverlayPainter class mapping', () => {
     const painter = new ProcOverlayPainter(writers, {} as HTMLElement);
 
     for (let amount = 0; amount <= 5; amount++) {
-      painter.paintDestructionMarks(amount, 'Ruin', `${amount} of 5 Ruin`);
+      painter.paintDestructionMarks(amount, 'Wrack', `${amount} of 5 Wrack`);
       expect(classes.get('destruction')).toBe(true);
       for (let mark = 1; mark <= 5; mark++) {
         expect(classes.get(`r${mark}`)).toBe(mark <= amount);
@@ -265,8 +265,8 @@ describe('ProcOverlayPainter class mapping', () => {
     expect(classes.get('hot')).toBe(false);
     expect(attrs.get('aria-hidden')).toBe('false');
     expect(attrs.get('aria-valuenow')).toBe('5');
-    expect(attrs.get('aria-valuetext')).toBe('5 of 5 Ruin');
-    expect(attrs.get('aria-label')).toBe('Ruin');
+    expect(attrs.get('aria-valuetext')).toBe('5 of 5 Wrack');
+    expect(attrs.get('aria-label')).toBe('Wrack');
     // -1 like every other state: the mover chrome owns the keyboard path, so
     // the always-on bank must not be a focus stop of its own.
     expect(attrs.get('tabindex')).toBe('-1');
@@ -275,7 +275,7 @@ describe('ProcOverlayPainter class mapping', () => {
   it('clears every Destruction mark and restores the meter label on a theme switch', () => {
     const { writers, classes, attrs } = fakeWriters();
     const painter = new ProcOverlayPainter(writers, {} as HTMLElement);
-    painter.paintDestructionMarks(5, 'Ruin', '5 of 5 Ruin');
+    painter.paintDestructionMarks(5, 'Wrack', '5 of 5 Wrack');
 
     painter.paintNecromancyCharges(2, 'Soul Fragments', '2 of 5 Soul Fragments');
     expect(classes.get('destruction')).toBe(false);
@@ -299,7 +299,7 @@ describe('ProcOverlayPainter class mapping', () => {
     for (const paintOtherTheme of paintOtherThemes) {
       const { writers, classes } = fakeWriters();
       const painter = new ProcOverlayPainter(writers, {} as HTMLElement);
-      painter.paintDestructionMarks(5, 'Ruin', '5 of 5 Ruin');
+      painter.paintDestructionMarks(5, 'Wrack', '5 of 5 Wrack');
       paintOtherTheme(painter);
       expect(classes.get('destruction')).toBe(false);
       for (let mark = 1; mark <= 5; mark++) {
