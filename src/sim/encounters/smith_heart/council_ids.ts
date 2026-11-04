@@ -301,8 +301,8 @@ export const COUNCIL_DIFFICULTY: Readonly<Record<CouncilDifficulty, CouncilDiffi
     rockOutlivesSinger: false,
     soulInTheStone: false,
     pillarLimit: 5,
-    cursedPulseMin: 14,
-    cursedPulseMax: 18,
+    cursedPulseMin: 7,
+    cursedPulseMax: 9,
     missCollapse: false,
   },
   heroic: {
