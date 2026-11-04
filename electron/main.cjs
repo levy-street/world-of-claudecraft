@@ -865,13 +865,16 @@ function createMainWindow() {
   // will-frame-navigate (any frame, so subframes are covered), and will-redirect
   // (server-side redirects). Each receives the merged single-details Event object
   // (details.url, details.isMainFrame, details.preventDefault()); the positional
-  // (event, url) form is deprecated. An off-origin navigation is blocked.
+  // (event, url) form is deprecated. An off-origin navigation is blocked, except below a
+  // Stripe Checkout frame, where navigationDecision / frameNavigationAllowed (shell_guards.cjs)
+  // admit the issuer's 3D Secure pages Stripe nests there.
   const guardNavigation = (details) => {
     const { allowed, isMainFrame } = navigationDecision(details, appOrigins);
     if (!allowed) {
       details.preventDefault();
-      if (!isMainFrame)
+      if (!isMainFrame) {
         log.warn(`[shell] blocked subframe navigation: ${deriveOrigin(details.url)}`);
+      }
       if (
         isMainFrame &&
         (details.url.startsWith('http://') || details.url.startsWith('https://'))
