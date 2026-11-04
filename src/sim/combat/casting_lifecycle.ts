@@ -1,4 +1,5 @@
 import { BENISON_4PC_WHISPER_HEAL_BONUS } from '../content/ignivar_set_bonuses';
+import { VANGUARD_DESTRUCTION_4PC_PROC_ID } from '../content/vanguard_set_bonuses_b';
 import { courierSummon } from '../courier';
 import { gliderActionsLocked } from '../glider_action_lock';
 import { shadowActionsLocked } from '../shadow_action_lock';
@@ -135,6 +136,7 @@ import { onCraftedCollectionHeal } from './crafted_collection_effects';
 import {
   consumeDesolationForCast,
   destructionCastTimeMult,
+  slagcrownRuinboltPvpCastTime,
   hasBurningPact,
   reserveRuinousBrandCopy,
   ruinAmount,
@@ -1855,8 +1857,16 @@ export function castAbility(
   ) {
     consumedInstantAura = consumeNextCastInstantAura(ctx, p, ability.id);
   }
-  const instantBaseCastTime =
-    consumedInstantAura !== null ? 0 : res.castTime * shamanCastTimeMultiplier(p, ability.id);
+  // Slagcrown 2pc (Warfare Season 2): a Ruinbolt aimed at an enemy player casts
+  // 0.7 sec slower, added to the BASE so Desolation's multiplier below still cuts
+  // it; an instant stays instant.
+  const instantBaseCastTime = slagcrownRuinboltPvpCastTime(
+    ctx,
+    p,
+    ability.id,
+    target,
+    consumedInstantAura !== null ? 0 : res.castTime * shamanCastTimeMultiplier(p, ability.id),
+  );
   // Brineward 2pc (Warfare Season 2) reads the resolved friendly target's
   // health; a pass-through for every other ability and caster.
   const castTime = brinewardMendingCastTime(
@@ -2103,9 +2113,14 @@ export function castAbility(
   // (Flickerstep is on-GCD but slips past the busy guard); it must not eat
   // the follow-up queued behind that cast.
   if (!blinkThrough) dropStaleHeldPressOnCommit(p, ability);
-  const instantResolved = ability.empowerStages
+  const empoweredResolved = ability.empowerStages
     ? { ...res, empowerLevel: ability.empowerStages }
     : res;
+  // The Slagcrown 4pc's free Ruinbolt leaves Desolation alone (consumeDesolationForCast).
+  const instantResolved =
+    consumedInstantAura?.id === VANGUARD_DESTRUCTION_4PC_PROC_ID
+      ? { ...empoweredResolved, slagcrownFreeRuinbolt: true }
+      : empoweredResolved;
   const stormcastReservation =
     consumedInstantAura?.id === STORMCAST_ID
       ? {

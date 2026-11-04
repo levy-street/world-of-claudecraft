@@ -31065,8 +31065,8 @@ export const ru_RU: EnTranslations = {
       },
       "vanguard_warlock_destruction": {
         "name": "Авангард: Slagcrown Vestments",
-        "bonus2": "2 предмета: время восстановления Cinderhide сокращается на 30 сек. Получаемый урон больше не замедляет чтение ваших заклинаний.",
-        "bonus4": "4 предмета: каждый второй Conflagrate делает следующий Ruinbolt в течение 8 сек. мгновенным."
+        "bonus2": "2 предмета: против вражеских игроков Ruinbolt наносит на 50% больше урона, но читается на 0,7 сек. дольше. Получаемый урон больше не замедляет чтение ваших заклинаний.",
+        "bonus4": "4 предмета: каждый второй Conflagrate делает следующий Ruinbolt в течение 8 сек. мгновенным. Этот бесплатный Ruinbolt не расходует Desolation."
       },
       "vanguard_warrior_arms": {
         "name": "Авангард: Bladewake Battlegear",

@@ -31065,8 +31065,8 @@ export const da_DK: EnTranslations = {
       },
       "vanguard_warlock_destruction": {
         "name": "Slagkrone Gevandter",
-        "bonus2": "Glødehud nedtælling reduceres med 30 sek. Skade, du tager, forsinker ikke længere dine besværgelser.",
-        "bonus4": "Hver anden Antændelse gør din næste Undergangslyn inden 8 sek øjeblikkelig."
+        "bonus2": "Mod fjendtlige spillere gør Undergangslyn 50 % mere skade, men tager 0,7 sek længere at kaste. Skade, du tager, forsinker ikke længere dine besværgelser.",
+        "bonus4": "Hver anden Antændelse gør din næste Undergangslyn inden 8 sek øjeblikkelig. Det gratis Undergangslyn forbruger ikke Ødelæggelse."
       },
       "vanguard_warrior_arms": {
         "name": "Klingevågning Krigs-udstyr",

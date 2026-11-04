@@ -355,12 +355,12 @@ export const VANGUARD_ITEM_SETS: Record<string, ItemSet> = {
       {
         pieces: 2,
         effect: {},
-        text: "Cinderhide's cooldown is reduced by 30 sec. Damage taken no longer delays your spellcasting.",
+        text: 'Against enemy players, Ruinbolt deals 50% more damage but takes 0.7 sec longer to cast. Damage taken no longer delays your spellcasting.',
       },
       {
         pieces: 4,
         effect: {},
-        text: 'Every second Conflagrate makes your next Ruinbolt within 8 sec instant.',
+        text: 'Every second Conflagrate makes your next Ruinbolt within 8 sec instant. That free Ruinbolt does not consume Desolation.',
       },
     ],
   },

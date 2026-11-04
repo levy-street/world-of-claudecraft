@@ -122,6 +122,7 @@ import {
   applyDuskfireClaim,
   applyRuinousBrand,
   destructionAfterCast,
+  slagcrownRuinboltPvpDamageMult,
   summonPyreColossus,
 } from './destruction';
 import { extendOwnedDot } from './dot_mutation';
@@ -953,6 +954,9 @@ export function runEffects(
         ) {
           dmg *= 1 + vsDotted;
         }
+        // Slagcrown 2pc (Warfare Season 2): Ruinbolt hits an enemy player 50
+        // percent harder; 1 for every other ability, caster and target.
+        dmg *= slagcrownRuinboltPvpDamageMult(ctx, p, ability.id, target);
         const crit =
           ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : critChance) ||
           eff.guaranteedCrit === true ||

@@ -31065,8 +31065,8 @@ export const pl_PL: EnTranslations = {
       },
       "vanguard_warlock_destruction": {
         "name": "Szata Korony Żużla",
-        "bonus2": "Regeneracja umiejętności Żarowa Skóra jest zmniejszona o 30 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.",
-        "bonus4": "Każdy drugi Pożoga sprawia, że Twój następny Pocisk Ruiny w ciągu 8 sek jest natychmiastowy."
+        "bonus2": "Przeciwko wrogim graczom Pocisk Ruiny zadaje o 50% więcej obrażeń, ale jego rzucanie trwa o 0,7 sek dłużej. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.",
+        "bonus4": "Każdy drugi Pożoga sprawia, że Twój następny Pocisk Ruiny w ciągu 8 sek jest natychmiastowy. Ten darmowy Pocisk Ruiny nie zużywa Spustoszenia."
       },
       "vanguard_warrior_arms": {
         "name": "Zbroja Bitewna Przebudzenia Ostrzy",

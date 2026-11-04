@@ -31065,8 +31065,8 @@ export const es: EnTranslations = {
       },
       "vanguard_warlock_destruction": {
         "name": "Vestiduras Coronaescoria",
-        "bonus2": "El tiempo de reutilización de Piel de Escoria se reduce 30 s. El daño recibido ya no retrasa tus hechizos.",
-        "bonus4": "Cada segundo lanzamiento de Conflagrar hace que tu próxima Descarga de Ruina en los 8 s siguientes sea instantánea."
+        "bonus2": "Contra jugadores enemigos, Descarga de Ruina inflige un 50 % más de daño, pero tarda 0,7 s más en lanzarse. El daño recibido ya no retrasa tus hechizos.",
+        "bonus4": "Cada segundo lanzamiento de Conflagrar hace que tu próxima Descarga de Ruina en los 8 s siguientes sea instantánea. Esa Descarga de Ruina gratuita no consume Desolación."
       },
       "vanguard_warrior_arms": {
         "name": "Equipo de Batalla Estelahoja",

@@ -2105,9 +2105,9 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Příkaz sklizně sníží zbývající čas obnovy Kostěné zbroje o 2 s.',
   'entities.itemSets.vanguard_warlock_demonology.name': 'Regálie Dřeňopouta',
   'entities.itemSets.vanguard_warlock_destruction.bonus2':
-    'Čas obnovy Struskové kůže je kratší o 30 s. Utržené poškození již nezpožďuje sesílání kouzel.',
+    'Proti nepřátelským hráčům způsobuje Zkázný šíp o 50 % vyšší poškození, ale jeho seslání trvá o 0,7 s déle. Utržené poškození již nezpožďuje sesílání kouzel.',
   'entities.itemSets.vanguard_warlock_destruction.bonus4':
-    'Každé druhé Vzplanutí udělá tvůj příští Zkázný šíp do 8 s okamžitým.',
+    'Každé druhé Vzplanutí udělá tvůj příští Zkázný šíp do 8 s okamžitým. Tento Zkázný šíp zdarma nespotřebuje Zkázu.',
   'entities.itemSets.vanguard_warlock_destruction.name': 'Šat Struskokoruny',
   'entities.itemSets.vanguard_warrior_arms.bonus2':
     'Mrzačící úder sníží zbývající čas obnovy Náporu o 1 s.',

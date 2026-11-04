@@ -2188,9 +2188,9 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Commandement de la moisson réduit de 2 s le temps de recharge restant d'Armure d'os.",
   'entities.itemSets.vanguard_warlock_demonology.name': 'Tenue Lié-à-la-moelle',
   'entities.itemSets.vanguard_warlock_destruction.bonus2':
-    'Le temps de recharge de Peau de braise est réduit de 30 s. Les dégâts subis ne retardent plus vos incantations.',
+    "Contre les joueurs ennemis, Trait de ruine inflige 50 % de dégâts en plus mais met 0,7 s de plus à s'incanter. Les dégâts subis ne retardent plus vos incantations.",
   'entities.itemSets.vanguard_warlock_destruction.bonus4':
-    'Un Conflagration sur deux rend votre prochain Trait de ruine instantané dans les 8 s qui suivent.',
+    'Un Conflagration sur deux rend votre prochain Trait de ruine instantané dans les 8 s qui suivent. Ce Trait de ruine gratuit ne consomme pas Désolation.',
   'entities.itemSets.vanguard_warlock_destruction.name': 'Tenue Couronne-de-scories',
   'entities.itemSets.vanguard_warrior_arms.bonus2':
     'Frappe mutilante réduit de 1 s le temps de recharge restant de Ruée.',

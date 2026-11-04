@@ -23532,9 +23532,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     '4 предмета: Reaping Command сокращает оставшееся время восстановления Bone Armor на 2 сек.',
   'entities.itemSets.vanguard_warlock_destruction.name': 'Авангард: Slagcrown Vestments',
   'entities.itemSets.vanguard_warlock_destruction.bonus2':
-    '2 предмета: время восстановления Cinderhide сокращается на 30 сек. Получаемый урон больше не замедляет чтение ваших заклинаний.',
+    '2 предмета: против вражеских игроков Ruinbolt наносит на 50% больше урона, но читается на 0,7 сек. дольше. Получаемый урон больше не замедляет чтение ваших заклинаний.',
   'entities.itemSets.vanguard_warlock_destruction.bonus4':
-    '4 предмета: каждый второй Conflagrate делает следующий Ruinbolt в течение 8 сек. мгновенным.',
+    '4 предмета: каждый второй Conflagrate делает следующий Ruinbolt в течение 8 сек. мгновенным. Этот бесплатный Ruinbolt не расходует Desolation.',
   'entities.itemSets.vanguard_druid_feral.name': 'Шкура кровавой гривы',
   'entities.itemSets.vanguard_druid_feral.bonus2':
     '2 предмета: время восстановления Bruin Rush сокращается на 3 сек. Получаемый урон больше не замедляет чтение ваших заклинаний.',

@@ -2076,9 +2076,9 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Comando della Mietitura riduce di 2 sec il tempo di recupero rimanente di Armatura d'Ossa.",
   'entities.itemSets.vanguard_warlock_demonology.name': 'Paramenti Legamidollo',
   'entities.itemSets.vanguard_warlock_destruction.bonus2':
-    'Il tempo di recupero di Pelle di Scorie è ridotto di 30 sec. I danni subiti non ritardano più il lancio degli incantesimi.',
+    'Contro i giocatori nemici, Dardo della Rovina infligge il 50% di danni in più ma richiede 0,7 sec in più per essere lanciato. I danni subiti non ritardano più il lancio degli incantesimi.',
   'entities.itemSets.vanguard_warlock_destruction.bonus4':
-    'Ogni secondo lancio di Conflagrazione rende istantaneo il tuo prossimo Dardo della Rovina lanciato entro 8 sec.',
+    'Ogni secondo lancio di Conflagrazione rende istantaneo il tuo prossimo Dardo della Rovina lanciato entro 8 sec. Quel Dardo della Rovina gratuito non consuma Desolazione.',
   'entities.itemSets.vanguard_warlock_destruction.name': 'Vesti Coronascoria',
   'entities.itemSets.vanguard_warrior_arms.bonus2':
     'Colpo Mutilante riduce di 1 sec il tempo di recupero rimanente di Irruzione.',

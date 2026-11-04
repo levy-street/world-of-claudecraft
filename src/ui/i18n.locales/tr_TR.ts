@@ -2081,9 +2081,9 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     "Reaping Command, Bone Armor'un kalan bekleme süresini 2 san azaltır.",
   'entities.itemSets.vanguard_warlock_demonology.name': 'İlik Bağlı Saltanatı',
   'entities.itemSets.vanguard_warlock_destruction.bonus2':
-    "Cinderhide'ın bekleme süresi 30 san azalır. Alınan hasar artık büyü yapmanı geciktirmez.",
+    'Düşman oyunculara karşı Ruinbolt %50 daha fazla hasar verir ama yapılması 0,7 san daha uzun sürer. Alınan hasar artık büyü yapmanı geciktirmez.',
   'entities.itemSets.vanguard_warlock_destruction.bonus4':
-    "Her ikinci Conflagrate, sonraki Ruinbolt'u 8 saniye içinde anlık yapar.",
+    "Her ikinci Conflagrate, sonraki Ruinbolt'u 8 saniye içinde anlık yapar. Bu bedava Ruinbolt, Desolation tüketmez.",
   'entities.itemSets.vanguard_warlock_destruction.name': 'Cüruf Kütü Giysileri',
   'entities.itemSets.vanguard_warrior_arms.bonus2':
     "Maiming Strike, Onrush'ın kalan bekleme süresini 1 san azaltır.",

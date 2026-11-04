@@ -2117,9 +2117,9 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Rozkaz Żniwiarz zmniejsza pozostałą regenerację umiejętności Pancerza Kości o 2 sek.',
   'entities.itemSets.vanguard_warlock_demonology.name': 'Regalia Związana Szpikiem',
   'entities.itemSets.vanguard_warlock_destruction.bonus2':
-    'Regeneracja umiejętności Żarowa Skóra jest zmniejszona o 30 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
+    'Przeciwko wrogim graczom Pocisk Ruiny zadaje o 50% więcej obrażeń, ale jego rzucanie trwa o 0,7 sek dłużej. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
   'entities.itemSets.vanguard_warlock_destruction.bonus4':
-    'Każdy drugi Pożoga sprawia, że Twój następny Pocisk Ruiny w ciągu 8 sek jest natychmiastowy.',
+    'Każdy drugi Pożoga sprawia, że Twój następny Pocisk Ruiny w ciągu 8 sek jest natychmiastowy. Ten darmowy Pocisk Ruiny nie zużywa Spustoszenia.',
   'entities.itemSets.vanguard_warlock_destruction.name': 'Szata Korony Żużla',
   'entities.itemSets.vanguard_warrior_arms.bonus2':
     'Okaleczające Uderzenie zmniejsza pozostałą regenerację umiejętności Natarcia o 1 sek.',

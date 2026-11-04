@@ -2105,9 +2105,9 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Skördande befallning minskar återstående nedräkning för Benrustning med 2 sec.',
   'entities.itemSets.vanguard_warlock_demonology.name': 'Marrowbound Regalia',
   'entities.itemSets.vanguard_warlock_destruction.bonus2':
-    'Glödhudens nedräkning minskas med 30 sec. Skada du tar fördröjer inte längre dina besvärjelser.',
+    'Mot fientliga spelare gör Fördärvsbult 50 % mer skada men tar 0,7 sec längre att kasta. Skada du tar fördröjer inte längre dina besvärjelser.',
   'entities.itemSets.vanguard_warlock_destruction.bonus4':
-    'Var andra Conflagrate gör din nästa Fördärvsbult inom 8 sec omedelbar.',
+    'Var andra Conflagrate gör din nästa Fördärvsbult inom 8 sec omedelbar. Den gratis Fördärvsbulten förbrukar inte Ödeläggelse.',
   'entities.itemSets.vanguard_warlock_destruction.name': 'Slagcrown Vestments',
   'entities.itemSets.vanguard_warrior_arms.bonus2':
     'Stympande hugg minskar Anstormningens återstående nedräkning med 1 sec.',

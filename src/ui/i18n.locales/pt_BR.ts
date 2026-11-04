@@ -2370,9 +2370,9 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Comando Ceifador reduz em 2 s o tempo de recarga restante de Armadura de Ossos.',
   'entities.itemSets.vanguard_warlock_destruction.name': 'Vestes da Coroa de Escória',
   'entities.itemSets.vanguard_warlock_destruction.bonus2':
-    'O tempo de recarga de Pele de Escórias é reduzido em 30 s. Dano recebido não atrasa mais suas conjurações.',
+    'Contra jogadores inimigos, Seta da Ruína causa 50% mais dano, mas leva 0,7 s a mais para ser conjurada. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.vanguard_warlock_destruction.bonus4':
-    'A cada segunda conjuração de Conflagrar, sua próxima Seta da Ruína em até 8 s se torna instantânea.',
+    'A cada segunda conjuração de Conflagrar, sua próxima Seta da Ruína em até 8 s se torna instantânea. Essa Seta da Ruína gratuita não consome Desolação.',
   'entities.itemSets.vanguard_warrior_arms.name': 'Equipamento de Batalha do Rastro da Lâmina',
   'entities.itemSets.vanguard_warrior_arms.bonus2':
     'Golpe Mutilador reduz em 1 s o tempo de recarga restante de Arremetida.',

@@ -31065,8 +31065,8 @@ export const id_ID: EnTranslations = {
       },
       "vanguard_warlock_destruction": {
         "name": "Gaun Mahkota Terak",
-        "bonus2": "Jeda Kulit Bara dikurangi 30 detik. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.",
-        "bonus4": "Setiap Kobaran Api kedua membuat Baut Reruntuhan berikutnya dalam 8 detik instan."
+        "bonus2": "Terhadap pemain musuh, Baut Reruntuhan memberikan 50% lebih banyak kerusakan tetapi butuh 0,7 detik lebih lama untuk dirapal. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.",
+        "bonus4": "Setiap Kobaran Api kedua membuat Baut Reruntuhan berikutnya dalam 8 detik instan. Baut Reruntuhan gratis itu tidak menghabiskan Kemusnahan."
       },
       "vanguard_warrior_arms": {
         "name": "Peralatan Pertempuran Pelepasan Blade",

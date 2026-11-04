@@ -2118,9 +2118,9 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Perintah Penuaian mengurangi jeda tersisa Zirah Tulang sebesar 2 detik.',
   'entities.itemSets.vanguard_warlock_demonology.name': 'Perhiasan Terikat Sumsum',
   'entities.itemSets.vanguard_warlock_destruction.bonus2':
-    'Jeda Kulit Bara dikurangi 30 detik. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
+    'Terhadap pemain musuh, Baut Reruntuhan memberikan 50% lebih banyak kerusakan tetapi butuh 0,7 detik lebih lama untuk dirapal. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
   'entities.itemSets.vanguard_warlock_destruction.bonus4':
-    'Setiap Kobaran Api kedua membuat Baut Reruntuhan berikutnya dalam 8 detik instan.',
+    'Setiap Kobaran Api kedua membuat Baut Reruntuhan berikutnya dalam 8 detik instan. Baut Reruntuhan gratis itu tidak menghabiskan Kemusnahan.',
   'entities.itemSets.vanguard_warlock_destruction.name': 'Gaun Mahkota Terak',
   'entities.itemSets.vanguard_warrior_arms.bonus2':
     'Serangan Pelukai mengurangi jeda tersisa Serbuan sebesar 1 detik.',

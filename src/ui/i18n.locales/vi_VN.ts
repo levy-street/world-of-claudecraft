@@ -2086,9 +2086,9 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Reaping Command giảm cooldown còn lại của Giáp Xương 2 giây.',
   'entities.itemSets.vanguard_warlock_demonology.name': 'Marrowbound Regalia',
   'entities.itemSets.vanguard_warlock_destruction.bonus2':
-    'Cooldown Da Than Hồng giảm 30 giây. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
+    'Khi đối đầu người chơi địch, Tia Hủy Diệt gây thêm 50% sát thương nhưng thời gian thi triển dài hơn 0,7 giây. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
   'entities.itemSets.vanguard_warlock_destruction.bonus4':
-    'Cứ hai lần Bùng Cháy làm cho Tia Hủy Diệt tiếp theo của bạn trong vòng 8 giây tức thời.',
+    'Cứ hai lần Bùng Cháy làm cho Tia Hủy Diệt tiếp theo của bạn trong vòng 8 giây tức thời. Tia Hủy Diệt miễn phí đó không tiêu hao Điêu Tàn.',
   'entities.itemSets.vanguard_warlock_destruction.name': 'Slagcrown Vestments',
   'entities.itemSets.vanguard_warrior_arms.bonus2':
     'Đòn Cướp Phá giảm cooldown còn lại của Xông Tới 1 giây.',
