@@ -1,4 +1,5 @@
-// The Guardian of the Breath's and the Hammer Council's floor warnings, as
+// The Guardian of the Breath's, the Hammer Council's and the Guardian of the
+// Quench's floor warnings, as
 // numbers: which paint each of their footprints wears and how strongly (the
 // shaders are breath_telegraph_glsl.ts and council_telegraph_glsl.ts, the
 // dressing painted_telegraphs.ts). Brought to the Guardian of the Heat's
@@ -27,7 +28,13 @@
 //     (black and crisp as it lands) and heats the cores as it drops, its
 //     crater cooling after;
 //   - rubble (a fallen pillar's footprint): broken stone and gravel, the cracks
-//     glowing faintly ochre.
+//     glowing faintly ochre;
+//   - frost (every Guardian of the Quench footprint: Quenching Breath's cone,
+//     a crack's hole, the freeze's shatter ring, a slash's lane; Jose's
+//     playtest of 2026-11-04): the lake frozen deep under the mark, fracture
+//     lines and rime feathers lit behind a crystallising front, shards of ice
+//     standing along every edge pointing in, a crack opening to black water, a
+//     slash's lane split by the blade's groove with frost ferns off it.
 // The flicker, the motes, the fine cracks and the dust are the cosmetic layers
 // the low tier sheds (`uDetail`); the edge, the fill's front and the main lines
 // draw on every tier and never hide the area or its timing.
@@ -35,7 +42,14 @@
 // Three-free, DOM-free, deterministic.
 
 /** The paints. */
-export type TelegraphPaintKind = 'bolt' | 'charged' | 'wind' | 'calm' | 'quake' | 'rubble';
+export type TelegraphPaintKind =
+  | 'bolt'
+  | 'charged'
+  | 'wind'
+  | 'calm'
+  | 'quake'
+  | 'rubble'
+  | 'frost';
 
 /** Every Breath footprint the fight paints. */
 export type BreathTelegraphKind =
@@ -66,6 +80,9 @@ export type CouncilTelegraphKind =
   | 'song'
   | 'crater';
 
+/** Every Guardian of the Quench footprint the fight paints. */
+export type QuenchTelegraphKind = 'breath' | 'crack' | 'splash' | 'slash';
+
 export interface PaintedTelegraphLook {
   paint: TelegraphPaintKind;
   /** How strongly the paint takes the floor under the mark (the multiply). */
@@ -78,9 +95,11 @@ export interface PaintedTelegraphLook {
   crack: number;
   /** The edge line's strength (1 a hard edge). */
   rim: number;
-  /** Wind: the spiral's twist and turn (signed: the way it turns). */
+  /** Wind: the spiral's twist and turn (signed: the way it turns). Frost:
+   *  the shards' length along the edges (yards). */
   spin: number;
-  /** Wind: the streaks' flow along the radius (+ outward, - inward). */
+  /** Wind: the streaks' flow along the radius (+ outward, - inward). Frost:
+   *  the black water opening in the middle (0 none, 1 a crack's hole). */
   flow: number;
   /** Whether the kit's cosmetic curtain stands on its edge (a mark riding a
    *  moving body goes without: it would jitter). */
@@ -146,6 +165,18 @@ export const COUNCIL_TELEGRAPH_LOOKS: Readonly<Record<CouncilTelegraphKind, Pain
     crater: look('quake', 0.8, 1, 0.7, 1, { rim: 0.9, curtain: false }),
   };
 
+/** Per kind. Every one in the frost paint; the threat colour stays the
+ *  owner's (the kit's edge). The cone and the lane wear the longest shards
+ *  (their edges are what a player dodges across); the crack opens to black
+ *  water; the freeze's ring rides a frozen body, so it goes without the kit's
+ *  curtain, and so does every other (a pale curtain washed the frost out). */
+export const QUENCH_TELEGRAPH_LOOKS: Readonly<Record<QuenchTelegraphKind, PaintedTelegraphLook>> = {
+  breath: look('frost', 0.72, 1, 0.42, 1, { spin: 1.3, curtain: false }),
+  crack: look('frost', 0.7, 1, 0.75, 1, { spin: 0.7, flow: 1, curtain: false }),
+  splash: look('frost', 0.6, 0.9, 0.6, 0.9, { spin: 0.9, curtain: false }),
+  slash: look('frost', 0.7, 1, 0.55, 1, { spin: 0.85, curtain: false }),
+};
+
 /** The glow passes' encounter rungs, each over every char rung of its owner
  *  (BreathFightFx's fans 6 to 13, BreathFx's exhale ring 10, CouncilFx's
  *  rubble 12, marks and spots 14, the Echo's and the Song's outer ring 16), so
@@ -153,6 +184,9 @@ export const COUNCIL_TELEGRAPH_LOOKS: Readonly<Record<CouncilTelegraphKind, Pain
 export const BREATH_TELEGRAPH_GLOW_STEP = 14;
 export const BREATH_GUST_GLOW_STEP = 15;
 export const COUNCIL_TELEGRAPH_GLOW_STEP = 17;
+/** The Quench's glow rung: over every char rung of its owners (QuenchFx's
+ *  cone 10; QuenchFightFx's cracks 8, shatter rings 10, lanes 11). */
+export const QUENCH_TELEGRAPH_GLOW_STEP = 13;
 
 /** The crater a Falling Rock leaves where it lands (cosmetic: no threat
  *  colour on its edge, the soak is over): the rock's own size, split stone

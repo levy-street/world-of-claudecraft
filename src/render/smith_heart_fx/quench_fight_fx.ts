@@ -57,6 +57,8 @@ import { getFlameTex } from '../ignivar_fire_vfx';
 import { setRenderCategory } from '../renderer_diagnostics';
 import { heartKitSlotMaterial } from '../smith_heart/heart_kit';
 import { EngineParticles } from '../trash_engine_fx/engine_particles';
+import { QUENCH_TELEGRAPH_GLOW_STEP, type QuenchTelegraphKind } from './painted_telegraph_core';
+import { QuenchTelegraphs } from './painted_telegraphs';
 import {
   QUENCH_FIGHT_COLORS as C,
   crackLook,
@@ -377,19 +379,32 @@ export class QuenchFightFx {
       () => this.rand(),
       this.detail,
     );
-    const fans = (n: number, order: number, out: FanSlot[], arc: number, color: number) => {
+    // Every footprint dressed in the frost paint (painted_telegraphs.ts:
+    // Jose's playtest of 2026-11-04 read them as generic red circles): the
+    // crack opening to black water, the shatter's ring, the slash's groove.
+    const paints = new QuenchTelegraphs(QUENCH_TELEGRAPH_GLOW_STEP, this.materials);
+    const fans = (
+      n: number,
+      order: number,
+      out: FanSlot[],
+      arc: number,
+      color: number,
+      kind: QuenchTelegraphKind,
+    ) => {
       for (let i = 0; i < n; i++) {
         const fan = this.kit.fan(order);
         this.kit.layOutFan(fan, arc, { color, accent: C.accent });
         fan.group.visible = false;
+        paints.dress(fan, kind);
         out.push({ fan, id: -1, born: 0, template: '' });
       }
     };
-    fans(P.cracks, 8, this.crackFans, 360, C.danger);
-    fans(P.frozen, 10, this.splashFans, 360, C.danger);
+    fans(P.cracks, 8, this.crackFans, 360, C.danger, 'crack');
+    fans(P.frozen, 10, this.splashFans, 360, C.danger, 'splash');
     for (let i = 0; i < P.lanes; i++) {
       const lane = this.kit.lane(11);
       lane.group.visible = false;
+      paints.dress(lane, 'slash');
       this.lanes.push({ lane, id: -1, born: 0 });
     }
 
