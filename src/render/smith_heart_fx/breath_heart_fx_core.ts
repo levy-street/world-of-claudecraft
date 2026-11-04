@@ -242,10 +242,10 @@ export function flightScale(t: number): number {
 
 /** The wake: `ghosts` copies of the ball strung back along its arc, each `step`
  *  seconds behind the last, smaller and fainter the further back. */
-export const FLIGHT_TRAIL = { ghosts: 7, step: 0.05 } as const;
+export const FLIGHT_TRAIL = { ghosts: 7, step: 0.06 } as const;
 export function flightGhost(i: number): { lag: number; scale: number; alpha: number } {
   const k = (i + 1) / (FLIGHT_TRAIL.ghosts + 1);
-  return { lag: (i + 1) * FLIGHT_TRAIL.step, scale: 0.95 * (1 - 0.7 * k), alpha: 0.78 * (1 - k) };
+  return { lag: (i + 1) * FLIGHT_TRAIL.step, scale: 0.62 * (1 - 0.75 * k), alpha: 0.6 * (1 - k) };
 }
 
 /** The burst's timeline: the flash dying and the wall rushing out across the
