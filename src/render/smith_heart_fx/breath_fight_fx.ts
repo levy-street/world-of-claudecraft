@@ -98,6 +98,7 @@ import {
   type WindFieldLook,
   windFieldLook,
 } from './breath_fight_fx_core';
+import { FUNNEL_FRAG, GALE_FOOT_DUST, GALE_GRIT, WIND_FUNNEL_VERT } from './breath_gale_glsl';
 import { BreathHeartFx } from './breath_heart_fx';
 import { BreathInhaleStreams } from './breath_inhale_streams';
 import { BreathIslesFx } from './breath_isles_fx';
@@ -269,60 +270,7 @@ void main() {
   gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 }
 `;
-/** A funnel of wind (the vortex, a loose gale), with how squarely each point
- *  faces the eye: a column of wind is seen through more of itself at its
- *  silhouette, so it reads as a body of air and never as a painted cone. */
-const WIND_FUNNEL_VERT = /* glsl */ `
-varying vec2 vUv;
-varying float vFace;
-void main() {
-  vUv = uv;
-  vec4 mv = modelViewMatrix * vec4(position, 1.0);
-  vFace = abs(dot(normalize(normalMatrix * normal), normalize(-mv.xyz)));
-  gl_Position = projectionMatrix * mv;
-}
-`;
-/** The wind's own look: long streaks wound up the column, a body of grey grit
- *  thickest low and at the silhouette, a skirt of dust where it scours the
- *  floor, self-shaded dark low and pale at its lip (audit point 16: the cream
- *  ribbons on a bare disc read as a cone). `uCore` 1 is a gale's inner core:
- *  tighter streaks, darker, nearly no skirt. */
-const FUNNEL_FRAG = /* glsl */ `
-uniform float uAlpha;
-uniform float uTime;
-uniform float uSpin;
-uniform float uCore;
-uniform vec3 uWind;
-uniform vec3 uShade;
-uniform vec3 uGrit;
-varying vec2 vUv;
-varying float vFace;
-float h(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
-float n(vec2 p) {
-  vec2 i = floor(p);
-  vec2 f = fract(p);
-  f = f * f * (3.0 - 2.0 * f);
-  return mix(mix(h(i), h(i + vec2(1, 0)), f.x), mix(h(i + vec2(0, 1)), h(i + vec2(1, 1)), f.x), f.y);
-}
-void main() {
-  float y = vUv.y;
-  float sp = vUv.x * 6.0 + y * (3.0 + 2.0 * uCore) - uTime * uSpin;
-  float bands = n(vec2(sp * 3.0, y * 4.0)) * 0.6 + n(vec2(sp * 7.0, y * 9.0)) * 0.4;
-  float streak = smoothstep(0.6, 0.9, bands);
-  // Wind seen edge-on is thicker: the column's silhouette fills in.
-  float edge = 1.0 - vFace;
-  float body = (0.3 + 0.7 * edge * edge) * (1.0 - smoothstep(0.15, 0.95, y)) * (0.75 + 0.25 * bands);
-  // The skirt where it scours the floor, torn by the streaks.
-  float skirt = (1.0 - smoothstep(0.0, 0.2, y)) * (1.0 - uCore) * (0.5 + 0.5 * bands);
-  float fade = smoothstep(0.0, 0.04, y) * (1.0 - smoothstep(0.62, 1.0, y));
-  float a = (streak * 0.75 + body * 0.62 + skirt * 0.7) * fade * uAlpha;
-  vec3 col = mix(uShade, uWind, 0.2 + 0.8 * streak);
-  col = mix(col, uGrit, clamp(body * 0.7 + skirt * 0.8, 0.0, 1.0) * (1.0 - 0.6 * streak));
-  col *= (0.55 + 0.5 * y) * (1.0 - 0.3 * uCore);
-  gl_FragColor = vec4(col, clamp(a, 0.0, 0.92));
-  #include <colorspace_fragment>
-}
-`;
+// The funnels of wind (the vortex, the loose gales): breath_gale_glsl.ts.
 /** A beam of light (the calm landing, the conductor's beacon): bright core,
  *  soft falling bands. \`uHot\` (the conductor's) runs white hot pulses of
  *  current down a saturated blue body (0: the calm's soft light, as ever). */
@@ -1792,32 +1740,33 @@ export class BreathFightFx {
       core.mesh.rotation.y = -this.clock * 3;
       core.mat.uniforms.uAlpha.value = this.detail ? 0.75 : 0.55;
       // Grit thrown up and round the column, and dust rolling out at its foot.
-      if (this.rand() < dt * 24 * this.density) {
+      if (this.rand() < dt * GALE_GRIT.rate * this.density) {
         const a = this.rand() * Math.PI * 2;
         this.particles.puff(eAt.x + Math.sin(a) * r, eAt.y + 0.5, eAt.z + Math.cos(a) * r, 1, {
           speed: 5,
           up: 6,
           life: 1,
-          size: [0.35, 0.2],
-          color: C.grit,
-          alpha: 0.85,
+          size: [...GALE_GRIT.size],
+          color: GALE_GRIT.color,
+          alpha: GALE_GRIT.alpha,
           dir: [Math.cos(a), 0.8, -Math.sin(a)],
           spread: 0.25,
         });
       }
-      if (this.rand() < dt * GALE_CORE.dust * this.density) {
+      // Soft billows swelling and overlapping into one skirt (never a ring of puffs).
+      if (this.rand() < dt * GALE_FOOT_DUST.rate * this.density) {
         const a = this.rand() * Math.PI * 2;
-        const rr = r * (0.7 + 0.5 * this.rand());
-        this.particles.puff(eAt.x + Math.sin(a) * rr, eAt.y + 0.2, eAt.z + Math.cos(a) * rr, 1, {
-          speed: 3.5,
-          up: 0.6,
-          life: 1.4,
-          size: [0.9, 2.4],
-          color: GALE_CORE.dustColor,
-          alpha: 0.6,
-          dir: [Math.cos(a), 0.15, -Math.sin(a)],
-          spread: 0.35,
-          drag: 1.6,
+        const rr = r * (0.55 + 0.6 * this.rand());
+        this.particles.puff(eAt.x + Math.sin(a) * rr, eAt.y + 0.4, eAt.z + Math.cos(a) * rr, 1, {
+          speed: GALE_FOOT_DUST.speed,
+          up: 0.9,
+          life: GALE_FOOT_DUST.life,
+          size: [...GALE_FOOT_DUST.size],
+          color: GALE_FOOT_DUST.color,
+          alpha: GALE_FOOT_DUST.alpha,
+          dir: [Math.cos(a), 0.2, -Math.sin(a)],
+          spread: 0.5,
+          drag: GALE_FOOT_DUST.drag,
         });
       }
     }
