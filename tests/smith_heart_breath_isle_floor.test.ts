@@ -335,4 +335,79 @@ describe('the Islands of the Wind: standing on the new floor', () => {
     const q2 = f.local(e);
     expect(onIsleFloor(i, q2.x, q2.z, e.pos.y)).toBe(true);
   });
+
+  it('lets an add thrown up over its own isle land, never snapping it back mid-air', () => {
+    const f = pulled();
+    const i = crossMark(f, 0.7);
+    const sentinel = (f.state()?.isles.adds ?? []).find((a) => a.role === 'sentinel');
+    if (!sentinel) throw new Error('no sentinel');
+    const e = f.sim.ctx.entities.get(sentinel.id) as Entity;
+    f.tick(2);
+    const isle = BREATH_ISLES[i];
+    // Over the isle's middle, two yards up (a knockback's arc), off its
+    // last floor spot.
+    const o = f.world(0, 0);
+    const spot = at(i, 0, 1.5);
+    e.pos.x = o.x + spot.x;
+    e.pos.z = o.z + spot.z;
+    e.pos.y = isle.h + 2;
+    e.onGround = false;
+    f.tick(1);
+    const q = f.local(e);
+    expect(Math.hypot(q.x - spot.x, q.z - spot.z)).toBeLessThan(1);
+  });
+
+  it('keeps a Sentinel chasing across a bay on its floor and in the fight', () => {
+    const f = pulled();
+    const i = crossMark(f, 0.7);
+    const sentinel = (f.state()?.isles.adds ?? []).find((a) => a.role === 'sentinel');
+    if (!sentinel) throw new Error('no sentinel');
+    const e = f.sim.ctx.entities.get(sentinel.id) as Entity;
+    const p = f.players[2];
+    // The raider across the deepest bay from where the Sentinel is put.
+    const deg = bays(i)[0];
+    const r = rim(i, deg);
+    const near = at(i, deg - 28, r - 1.2);
+    const far = at(i, deg + 28, r - 1.2);
+    const o = f.world(0, 0);
+    e.pos.x = o.x + near.x;
+    e.pos.z = o.z + near.z;
+    e.pos.y = BREATH_ISLES[i].h;
+    f.put(p, far.x, far.z);
+    e.threat.set(p.id, 1e6);
+    e.aggroTargetId = p.id;
+    for (let k = 0; k < ticks(10); k++) {
+      f.tick();
+      const q = f.local(e);
+      expect(onIsleFloor(i, q.x, q.z, e.pos.y)).toBe(true);
+    }
+    expect(e.dead).toBe(false);
+    expect(e.aiState).not.toBe('evade');
+    expect(e.threat.size).toBeGreaterThan(0);
+  });
+
+  it("lays back only a summit's own corpse: never one on a floor, never the next slot's", () => {
+    const f = pulled();
+    const [a, b] = [f.players[2], f.players[3]];
+    // A corpse lying on the Cornice's floor stays where it fell.
+    f.put(a, C.x - 10, C.z);
+    f.tick(2, false);
+    f.sim.ctx.dealDamage(null, a, a.hp + 1, false, 'physical', null, 'hit', true);
+    f.tick(2, false);
+    expect(a.dead).toBe(true);
+    const lay = f.local(a);
+    f.tick(20, false);
+    expect(Math.hypot(f.local(a).x - lay.x, f.local(a).z - lay.z)).toBeLessThan(0.01);
+    // A corpse in the void past this claim's band (the next slot's) is not
+    // carried onto this Cornice.
+    f.sim.ctx.dealDamage(null, b, b.hp + 1, false, 'physical', null, 'hit', true);
+    f.tick(1, false);
+    expect(b.dead).toBe(true);
+    const o = f.world(0, 0);
+    b.pos = { x: o.x + 0, y: F.voidHeight, z: o.z + 260 };
+    b.prevPos = { ...b.pos };
+    f.tick(20, false);
+    expect(f.local(b).z).toBeGreaterThan(250);
+    expect(b.pos.y).toBeLessThan(F.voidHeight + 3);
+  });
 });

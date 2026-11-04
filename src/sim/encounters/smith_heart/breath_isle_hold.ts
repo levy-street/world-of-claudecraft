@@ -4,7 +4,9 @@
 // would walk straight off the rim and drop into the void: so each add's last
 // spot on its own isle's floor is kept, and a step that left that floor is
 // undone, as the guardian is held to its Cornice (breath_void.ts
-// tetherGuardian). Run after the mob AI moved them this tick.
+// tetherGuardian). Run after the mob AI moved them this tick. An add thrown
+// up over its own isle is left to land; one carried off it any other way (a
+// grip, a pull to the Cornice) is set back too: the isle is its post.
 //
 // Zero rng; positions are claim-local yards for the floor test.
 
@@ -30,7 +32,9 @@ export function holdIsleAdds(ctx: SimContext, inst: InstanceSlot, st: BreathFigh
   for (const a of st.isles.adds) {
     const e = ctx.entities.get(a.id);
     if (!living(e)) continue;
-    if (onIsleFloor(a.isle, e.pos.x - o.x, e.pos.z - o.z, e.pos.y)) {
+    const lx = e.pos.x - o.x;
+    const lz = e.pos.z - o.z;
+    if (onIsleFloor(a.isle, lx, lz, e.pos.y)) {
       if (a.floor) {
         a.floor.x = e.pos.x;
         a.floor.y = e.pos.y;
@@ -38,6 +42,8 @@ export function holdIsleAdds(ctx: SimContext, inst: InstanceSlot, st: BreathFigh
       } else a.floor = { x: e.pos.x, y: e.pos.y, z: e.pos.z };
       continue;
     }
+    // Thrown up over its own isle (a knockback's arc): left to land.
+    if (isleAt(lx, lz) === a.isle && e.pos.y > BREATH_ISLES[a.isle].h) continue;
     if (!a.floor) continue;
     e.pos.x = a.floor.x;
     e.pos.y = a.floor.y;

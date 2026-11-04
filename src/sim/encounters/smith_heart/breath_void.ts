@@ -36,6 +36,7 @@
 
 import {
   BREATH,
+  BREATH_ISLE_REACH,
   BREATH_ISLES,
   SMITH_HEART_FIELD,
   SMITH_HEART_HEIGHTS,
@@ -47,7 +48,9 @@ import { thessalyOf } from './breath_gale';
 import {
   fellFromCornice,
   inBreathArena,
+  inClaimBand,
   lipDistance,
+  nearCornice,
   onCorniceApproach,
   voidCorpseSpot,
 } from './breath_geometry';
@@ -101,8 +104,9 @@ export function stepVoidDeaths(ctx: SimContext, inst: InstanceSlot): void {
     const back = voidCorpseSpot(lx, lz);
     if (p.dead) {
       // The landing's own hit killed it first (a fall from an isle, high
-      // over the Cornice): its body is laid back all the same.
-      if (p.pos.y < SMITH_HEART_FIELD.voidHeight + 3)
+      // over the Cornice): its body is laid back all the same, but only a
+      // body of THIS claim's summit (never one in the next slot's void).
+      if (p.pos.y < SMITH_HEART_FIELD.voidHeight + 3 && underSummit(lx, lz))
         layOnFloor(ctx, p, o.x + back.x, o.z + back.z);
       continue;
     }
@@ -126,6 +130,14 @@ export function stepVoidDeaths(ctx: SimContext, inst: InstanceSlot): void {
     }
     layOnFloor(ctx, p, o.x + back.x, o.z + back.z);
   }
+}
+
+/** Is claim-local (x, z) under this claim's summit: in its band, and under
+ *  the Cornice or an isle (as far as a fall off either carries a body)? */
+function underSummit(x: number, z: number): boolean {
+  if (!inClaimBand(z)) return false;
+  if (nearCornice(x, z)) return true;
+  return BREATH_ISLES.some((c, i) => Math.hypot(x - c.x, z - c.z) <= BREATH_ISLE_REACH[i] + 30);
 }
 
 /** Set a body (alive or dead) down on the floor at world (x, z), at rest. */
