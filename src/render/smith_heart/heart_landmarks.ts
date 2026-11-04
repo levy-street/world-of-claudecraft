@@ -30,6 +30,7 @@ import { heartKitMeshes, SMITH_HEART_HEART_KIT_URL } from './heart_kit';
 import {
   HEART_LANDMARK_FRAME,
   heartBreathBolts,
+  heartLandmarkHaloSpots,
   heartLandmarkPoint,
   heartLandmarkSpots,
 } from './heart_landmarks_core';
@@ -37,6 +38,7 @@ import {
   BOLT_VERT,
   LANDMARK_BILLOW_VERT,
   LANDMARK_HALO_VERT,
+  LANDMARK_HEAT_BLOOM_VERT,
   LANDMARK_PLUME_VERT,
   landmarkGlowFrag,
 } from './heart_landmarks_glsl';
@@ -206,10 +208,23 @@ export function buildHeartLandmarks(lowGfx: boolean, centre: THREE.Vector3): Hea
     return { bases, params };
   };
   const halo = (vein: SmithHeartVein, color: number, size: number) => {
-    const spots = heartLandmarkSpots(vein);
-    const mat = airMat(`smithHeartLandmarkHalo:${vein}`, LANDMARK_HALO_VERT, color, 0xffffff, 0.5, {
-      uQuiet: { value: 0 },
-    });
+    // The Heat's is its crater's bloom alone (heartLandmarkHaloSpots).
+    const spots = heartLandmarkHaloSpots(vein);
+    const heat = vein === 'heat';
+    const mat = heat
+      ? airMat(
+          `smithHeartLandmarkHalo:${vein}`,
+          LANDMARK_HEAT_BLOOM_VERT,
+          color,
+          P.heat.hot,
+          0.42,
+          {
+            uQuiet: { value: 0 },
+          },
+        )
+      : airMat(`smithHeartLandmarkHalo:${vein}`, LANDMARK_HALO_VERT, color, 0xffffff, 0.5, {
+          uQuiet: { value: 0 },
+        });
     add(
       vein,
       `heartLandmarkHalo:${vein}`,

@@ -182,6 +182,28 @@ void main() {
   gl_Position = projectionMatrix * mv;
 }`;
 
+/** The Heat's crater bloom (the AAA pass's third round: the disc halos on the
+ *  crater and the lava's feet read as salmon globes hanging in the air): one
+ *  column of heat rising off the crater only, its foot on the lava and its
+ *  body drawn tall and narrow, hot gold low and fading up into the dark; no
+ *  quiet glow (asleep the lava's own faces carry the quarter's tint), shown
+ *  while the quarter is awake. */
+export const LANDMARK_HEAT_BLOOM_VERT = /* glsl */ `${AIR_HEAD}
+uniform float uQuiet;
+void main() {
+  vec3 p = position;
+  float beat = 0.82 + 0.18 * sin(uTime * 1.7 + aParams.x * 6.0);
+  vFade = uLit * beat;
+  float size = 2.6 + 2.4 * aParams.y;
+  // The column stands on the crater: its centre lifted by its own half height.
+  p.y += size * 1.7;
+  vHot = 0.55 + 0.45 * smoothstep(0.2, -1.0, aCorner.y);
+  vec4 mv = modelViewMatrix * vec4(p, 1.0);
+  mv.xy += aCorner * vec2(0.6, 1.9) * size * step(0.002, vFade);
+  vCorner = aCorner;
+  gl_Position = projectionMatrix * mv;
+}`;
+
 /** The Breath's lightning: each bolt a ribbon turned to the camera,
  *  flashing in its own bursts while the quarter is awake, its path
  *  jumping with every flash (`aParams`: x the bolt's phase, y the side, z
