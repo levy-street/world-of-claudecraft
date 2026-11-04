@@ -107,6 +107,8 @@ export const HEART_COLLAPSE_LOOK = {
   landmarkSeconds: 5.5,
   landmarkTilt: 1.05,
   landmarkDrop: 150,
+  /** A root tears out of the crown this long after its landmark starts to go. */
+  rootLag: 0.3,
   /** The room's dimming: the rebirth's end, then each fallen quarter's share. */
   dimRisen: 0.3,
   dimPerQuarter: 0.13,
@@ -345,13 +347,18 @@ export const HEART_FALL_LOOK = {
 /** The chasm's layers of light under a fallen quarter (yards under the walk): the heart's
  *  own light far down, smoke in it nearer the hole. */
 export const HEART_FALL_DEPTH: readonly { y: number; r: number; k: number; scale: number }[] = [
-  { y: -18, r: 72, k: 0.05, scale: 0.05 },
-  { y: -28, r: 74, k: 0.11, scale: 0.038 },
-  { y: -37, r: 78, k: 0.24, scale: 0.026 },
+  // The weak-spots pass of 2026-11-04 (the abyss read as a painted floor): four
+  // thin wisps spread from just under the keel down to the bed, each fading where
+  // the eye meets it edge on (DEPTH_VERT `vDown`), so the hole keeps its depth
+  // from a body's height and gains parallax from above.
+  { y: -14, r: 72, k: 0.035, scale: 0.055 },
+  { y: -24, r: 74, k: 0.07, scale: 0.042 },
+  { y: -34, r: 76, k: 0.13, scale: 0.031 },
+  { y: -43, r: 80, k: 0.26, scale: 0.022 },
 ];
 /** The veil of dark air over the heart's bed (it stands lit as a plate from up here): the
- *  bed sinks into it, burning through at the heart. */
-export const HEART_FALL_VEIL = { y: -39, r: 130 } as const;
+ *  bed sinks into it, burning through at the heart. Under the deepest wisp. */
+export const HEART_FALL_VEIL = { y: -45, r: 130 } as const;
 
 /** How strong the heart burns for slot `key`, the room's darkness `dark` given: the room
  *  dims through the collapse, but a fallen quarter opens onto the heart itself, awake. */
@@ -416,6 +423,18 @@ export function heartFallEdgeLight(t: number): number {
   if (t < 0) return 0;
   const end = L.give + L.first + L.spread + L.scatter + 0.5;
   return Math.max(0, 1 - t / end);
+}
+
+/** A root of the mountain whose landmark falls (the weak-spots pass of
+ *  2026-11-04: it stayed hanging from the crown over the hole, its foot torn
+ *  off in the air). It tears out of the crown a beat after its landmark starts
+ *  to go and drops after it into the abyss, gone with it: its drop (yards)
+ *  `t` seconds into its quarter's fall. */
+export function heartRootFall(t: number): { drop: number; gone: boolean } {
+  const L = HEART_COLLAPSE_LOOK;
+  if (t < 0) return { drop: 0, gone: false };
+  const k = Math.max(0, Math.min(1, (t - L.landmarkAt - L.rootLag) / L.landmarkSeconds));
+  return { drop: L.landmarkDrop * 1.4 * k ** 2.2, gone: k >= 1 };
 }
 
 /** A quarter's ridge horn: it goes with the first of its two quarters to fall. */

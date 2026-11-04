@@ -207,7 +207,7 @@ export async function buildSmithHeartInterior(
   if (heartKit) group.add(heartKit.group);
   // The platform's four quarters round the central ring (phase 2K), the one
   // the final boss stands in awake.
-  const quarters = heartKit ? buildHeartQuarters(deps.lowGfx, heartKit.altar) : null;
+  const quarters = heartKit ? buildHeartQuarters(deps.lowGfx, heartKit.altar, heartKit.root) : null;
   if (quarters) group.add(quarters.group);
   const room = buildHeartRoom(
     deps.lowGfx,

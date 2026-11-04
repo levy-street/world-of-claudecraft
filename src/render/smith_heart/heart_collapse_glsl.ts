@@ -59,9 +59,14 @@ void main() {
  *  its edge, each layer its own drift, so looking down through the hole has parallax. */
 export const DEPTH_VERT = /* glsl */ `
 varying vec3 vL;
+varying float vDown;
 void main() {
   vL = position;
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  vec4 mv = modelViewMatrix * vec4(position, 1.0);
+  // How squarely the eye looks down onto the layer (1 straight down, 0 edge on).
+  vec3 up = normalize(mat3(modelViewMatrix)[1]);
+  vDown = abs(dot(normalize(mv.xyz), up));
+  gl_Position = projectionMatrix * mv;
 }`;
 
 export const DEPTH_FRAG = /* glsl */ `
@@ -70,19 +75,23 @@ uniform float uK;
 uniform float uScale;
 uniform float uSeed;
 varying vec3 vL;
+varying float vDown;
 ${NOISE}
 void main() {
   float r = length(vL.xz);
   vec2 p = vL.xz * uScale + uSeed;
   float n = hF(p + vec2(uTime * 0.035, -uTime * 0.05));
   float m = hF(p * 2.3 - vec2(uTime * 0.06, uTime * 0.02));
-  float smoke = smoothstep(0.3, 0.8, n) * (0.55 + 0.45 * m);
+  // Wisps with clear gaps between them (the layers under show through: parallax).
+  float smoke = smoothstep(0.42, 0.85, n) * (0.5 + 0.5 * m);
   float edge = 1.0 - smoothstep(34.0, 76.0, r);
   float beat = 0.85 + 0.15 * sin(uTime * 2.856);
   // The heart's own light welling up under the ring, through the smoke further out.
   float well = 1.0 - smoothstep(8.0, 52.0, r);
   vec3 col = mix(vec3(1.0, 0.33, 0.07), vec3(1.0, 0.72, 0.36), smoke * smoke + well * well * 0.4);
-  gl_FragColor = vec4(col * (smoke * edge + well * well * 0.5) * uK * beat, 1.0);
+  // Edge on, a thin layer never piles up into a lit floor: it fades away.
+  float face = smoothstep(0.06, 0.5, vDown);
+  gl_FragColor = vec4(col * (smoke * edge + well * well * 0.5) * uK * beat * face, 1.0);
 }`;
 
 /** The veil of dark air over the heart's bed: thin at the heart, thick out at the bed's
@@ -90,6 +99,7 @@ void main() {
 export const VEIL_FRAG = /* glsl */ `
 uniform float uTime;
 varying vec3 vL;
+varying float vDown;
 ${NOISE}
 void main() {
   float r = length(vL.xz);
