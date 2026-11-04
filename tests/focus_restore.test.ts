@@ -97,8 +97,8 @@ describe('captureFocusKey', () => {
 
   it('refuses a keyed control in ANOTHER window, even with the identical key', () => {
     // The extraction's acceptance criterion. Two windows, one shared key namespace:
-    // the mailbox parcel stepper and the professions action buttons really are both
-    // `<id>:<role>` under `data-focus-key`. Focus is in window B; window A repaints.
+    // the mailbox parcel stepper and the bank window controls really do share the
+    // one flat `data-focus-key` attribute. Focus is in window B; window A repaints.
     // A returns null, so A's ladder never runs and focus stays where the player put
     // it. Note the key is the SAME string in both, which is what makes this a refusal
     // by CONTAINMENT and not by key mismatch.

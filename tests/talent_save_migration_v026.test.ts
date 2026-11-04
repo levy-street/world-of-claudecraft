@@ -324,12 +324,13 @@ describe('talent production save migrations', () => {
     // above preserves it verbatim, and the load arm then ignores it, so the
     // field is ABSENT from the re-serialized character rather than normalized
     // to `{}`. Not vacuous: the fixture really does carry it, and this is the
-    // pin that an old save loads cleanly and the next write drops the field.
+    // pin that an old save loads cleanly and the next write drops the field
+    // (the queued re-spec blob, which this fixture never carried, is pinned the
+    // same way in tests/character_state_backcompat.test.ts).
     expect((fixture.state as unknown as Record<string, unknown>).townFocus).toEqual({
       eastbrook: 4,
     });
     expect('townFocus' in first).toBe(false);
-    expect('pendingTownFocus' in first).toBe(false);
     expect(first.skin).toBe(3);
     expect(first.cooldowns).toEqual(fixture.state.cooldowns);
 

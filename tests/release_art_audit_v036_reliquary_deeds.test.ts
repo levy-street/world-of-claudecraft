@@ -212,8 +212,9 @@ describe('v0.36 release-audit Reliquary deed art', () => {
       'feat_guild_hallsworn',
       'feat_guild_of_lantern_hall',
     ]);
-    expect(DEED_ORDER).toHaveLength(369);
-    expect(DEED_IMAGE_IDS.size).toBe(356);
+    // 368 / 355 after Town Focus and its painted Civic Duty deed (soc_civic_duty) left the game (2026-11-04).
+    expect(DEED_ORDER).toHaveLength(368);
+    expect(DEED_IMAGE_IDS.size).toBe(355);
     expect(sorted(DEED_IMAGE_IDS)).toEqual(
       sorted(DEED_ORDER.filter((id) => !DEED_ART_PENDING.has(id))),
     );

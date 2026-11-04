@@ -1122,7 +1122,7 @@
     background: var(--panel-base);
   }
   /* Footer hint line (the interact-key-takes-loot-only note on a harvestable corpse). */
-  .loot-footer-hint {
+  #loot-window .loot-footer-hint {
     opacity: 0.75;
     margin-bottom: 6px;
   }

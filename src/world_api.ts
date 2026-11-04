@@ -716,6 +716,9 @@ export const COMMAND_NAMES = [
   'bank_deposit',
   'bank_withdraw',
   'bank_buy_slots',
+  // Retired with the Town Focus mechanic (2026-11-04); the token stays, the
+  // server dispatches it as a no-op (DISPATCH_ONLY_COMMANDS below).
+  'set_town_focus',
   'set_dungeon_difficulty',
   'heroic_buy',
   'crucible_buy',
@@ -1044,6 +1047,11 @@ export const DISPATCH_ONLY_COMMANDS = [
   // ladder replaced enchants with gem ratings; the server dispatches it as a
   // no-op tombstone (server/game.ts).
   'rift_enchant_item',
+  // The retired Town Focus allocation (removed from the game 2026-11-04): no
+  // sender since the panel left; the server dispatches it as a no-op
+  // tombstone (server/game.ts) so a stale client bundle is met with silence
+  // rather than the unknown-command anomaly arm.
+  'set_town_focus',
 ] as const satisfies readonly CommandName[];
 
 export type DispatchOnlyCommand = (typeof DISPATCH_ONLY_COMMANDS)[number];

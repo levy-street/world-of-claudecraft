@@ -6201,6 +6201,9 @@ export class GameServer {
       case 'inspectCorpseHarvest':
         dispatchCorpseHarvestInspection(sim, session, msg, pid, (f) => this.send(session, f));
         break;
+      case 'set_town_focus':
+        // Retired no-op tombstone (Town Focus left 2026-11-04; COMMAND_NAMES is append-only).
+        break;
       // The authenticated player's preference is a setting; the sim validates it.
       case 'set_harvest_preference':
         if (typeof msg.raw === 'string') sim.setHarvestPreference(msg.raw, pid);

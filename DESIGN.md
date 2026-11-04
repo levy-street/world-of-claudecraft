@@ -845,8 +845,7 @@ Fixed anchors; context changes emphasis, never position:
 - **Combat:** target frame, cast bars, cooldowns, and resource states are the loudest
   elements; party frames stay fully readable (never tiered, never dimmed); social toasts
   defer; the rewards card never pulses.
-- **Town:** merchant and quest NPC markers prominent; Town Focus entry appears; chat lingers
-  longer before fading.
+- **Town:** merchant and quest NPC markers prominent; chat lingers longer before fading.
 - **Group content:** party frames grow to the five-member set with role, range, dead, and
   disconnect states mandatory; the tracker keeps its three-quest cap.
 

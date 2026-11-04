@@ -84,8 +84,7 @@
     <a class="t2" href="#gathering">Gathering professions (universal)</a>
     <a class="t3" href="#nodes">World-spawn nodes (Mining / Logging / Herbalism)</a>
     <a class="t2" href="#monster">Monster Harvesting (single-use corpses) and focus</a>
-    <a class="t3" href="#focus">Focus: additive allocation (voluntary)</a>
-    <a class="t3" href="#respec">Re-spec cost: time, coins, or materials</a>
+    <a class="t3" href="#focus">Focus: removed</a>
     <a class="t3" href="#signed">Signed materials and the self-gathered bonus</a>
     <a class="t3" href="#alts">Why account-level breadth does not break exclusivity</a>
     <a class="t2" href="#tools">Tools</a>
@@ -127,7 +126,7 @@
   <table>
     <tr><th></th><th>Production</th><th>Gathering</th></tr>
     <tr><td><strong>Math</strong></td><td>Conserved (one active specialty at a time)</td><td>Additive (a floor that only gains bonuses)</td></tr>
-    <tr><td><strong>How it changes</strong></td><td>Emerges from crafting, switched by attunement</td><td>Proficiency grows by use; Monster Harvesting adds a town-set focus</td></tr>
+    <tr><td><strong>How it changes</strong></td><td>Emerges from crafting, switched by attunement</td><td>Proficiency grows by use</td></tr>
     <tr><td><strong>Effect on the rest</strong></td><td>Only the active specialty is empowered</td><td>Focusing one never weakens another</td></tr>
     <tr><td><strong>The fantasy</strong></td><td>Master of a small cluster of crafts</td><td>Pick what you harvest best</td></tr>
   </table>
@@ -153,7 +152,6 @@
       <tr><td class="name">attunement</td><td>the quest that sets which specialty is active</td></tr>
       <tr><td class="name">tier quest</td><td>the per-craft quest that unlocks the next rarity tier's recipes and ceiling</td></tr>
       <tr><td class="name">the common floor</td><td>common-tier crafting, free for everyone, never in competition</td></tr>
-      <tr><td class="name">focus</td><td>the town-set, additive Monster Harvesting component bonus</td></tr>
       <tr><td class="name">signed material</td><td>a rare or better monster material stamped with its gatherer's name</td></tr>
       <tr><td class="name">base tool / effect</td><td>an infinite-durability gathering tool, and the rechargeable bonuses slotted onto it</td></tr>
       <tr><td class="name">Jack of All Trades</td><td>the breadth attunement: everything at a mid tier, nothing at the top</td></tr>
@@ -395,33 +393,8 @@
     <svg id="corpse-diagram" viewBox="0 0 720 230" role="img" aria-label="Extraction tradeoff bars"></svg>
   </div>
 
-  <h3 id="focus">Focus: additive allocation (voluntary)</h3>
-  <p>On top of the per-corpse choice, a player sets a persistent <strong>focus</strong> in town. Focus is additive: every component starts at a guaranteed baseline that is never penalized, and focus points <em>add</em> rarity/yield bonuses to chosen components only. The only cost is opportunity. This lets a group divide the work: each member focuses different components so the party covers more high-tier materials between them.</p>
-
-  <div class="figure" id="fig6">
-    <h4>Figure 6. Additive focus: the baseline never drops</h4>
-    <p class="cap">Monster Harvesting focus over component types. The inner solid ring is the guaranteed baseline for every component. Focus points add the outer band on chosen components only (here a venom specialist boosting venom sacs and glands). Unfocused components stay at baseline, never below. Contrast the production wheel, where only one specialty is empowered at a time rather than every axis at once.</p>
-    <div class="row">
-      <div class="col"><svg id="radar-additive" viewBox="-92 -10 544 380" role="img" aria-label="Additive focus radar over monster component types"></svg></div>
-      <div class="col">
-        <div class="legend" style="margin-top:0">
-          <span><span class="swatch" style="background:var(--teal)"></span>Baseline (always present)</span>
-          <span><span class="swatch" style="background:var(--gold)"></span>Focus bonus (added on top)</span>
-        </div>
-        <p class="muted" style="font-size:14px">Whether focus is a small skill tree or a town-rebalanced additive radar is TBD; the invariant is fixed either way: additive only, baseline never drops, configured in town.</p>
-      </div>
-    </div>
-  </div>
-
-  <h3 id="respec">Re-spec cost: time, coins, or materials</h3>
-  <p>Re-aiming your focus draws on three resources, and you choose which one or two to spend:</p>
-  <table>
-    <tr><th>Pay with</th><th>Speed</th><th>Cost</th></tr>
-    <tr><td>Time only</td><td>Very slow</td><td>Free</td></tr>
-    <tr><td>Time plus a little coin or materials</td><td>Faster</td><td>Small coin or material cost</td></tr>
-    <tr><td>Coins plus materials</td><td>Instant</td><td>Higher coin and material cost</td></tr>
-  </table>
-  <p>The deeper and more peaked your focus, the larger the budget of whichever resources you use, so a casual rebalance is cheap and a hard pivot is a real commitment. (Gathering focus is additive and has no attunement gate, so unlike a production specialty there is no structural cost to switching, hence this explicit re-spec to keep a hard pivot meaningful.) Exact curves are tuning, deferred.</p>
+  <h3 id="focus">Focus: removed</h3>
+  <p>The persistent, town-set additive focus allocation (and its time, coin or material re-spec) shipped as Town Focus and was removed from the game on 2026-11-04: its launcher only appeared in town, so nobody found it, and the mechanic was judged not useful. The per-corpse choice above is the whole of the harvesting tradeoff now; every component yields its baseline tier and quantity with no allocation on top.</p>
 
   <h3 id="signed">Signed materials and the self-gathered bonus</h3>
   <ul>
@@ -565,17 +538,16 @@
     <li><code>gathering.ts</code>: node harvest, per-player respawn state, corpse harvest, proficiency gain and rarity rolls.</li>
     <li><code>crafting.ts</code>: recipe resolution, material consumption, quality roll, ilvl budget computation, crafting-only effect application.</li>
     <li><code>wheel.ts</code>: the one-active-specialty mastery model (additive skill gain, the at-most-two active cap, the active archetype and attunement, the adjacent-pair majors and capped opposite hobby, specialization-concentration readout). Attunement switching is quest-driven (see Production core), not decay.</li>
-    <li><code>focus.ts</code>: the additive gathering focus allocation plus the time/coin/material re-spec.</li>
     <li><code>tools.ts</code>: base-tool tier gating plus effect application, depletion, and recharge.</li>
   </ul>
-  <p class="muted">Per the seam rules, these modules hold functions; backing state (per-player craft skills, the active archetype and attunement history, the current hobby, focus allocations, respawn timers, corpse flags, re-spec timers) lives on <code>Sim</code> as live <code>ctx</code> views, with thin same-named delegates where a foreign caller resolves a method.</p>
+  <p class="muted">Per the seam rules, these modules hold functions; backing state (per-player craft skills, the active archetype and attunement history, the current hobby, respawn timers, corpse flags) lives on <code>Sim</code> as live <code>ctx</code> views, with thin same-named delegates where a foreign caller resolves a method.</p>
 
   <h3 id="arch-client">The <code>IWorld</code> seam, client, persistence</h3>
   <ul>
-    <li><strong>IWorld</strong> (<code>src/world_api.ts</code>): extend first, implement in both <code>Sim</code> and <code>ClientWorld</code>, then consume from render/ui. New surface: read craft skills and the wheel, current majors/hobby, specialization perks, focus allocation, node availability, corpse component options, recipe lists and craft results, tool tier and effect charges.</li>
+    <li><strong>IWorld</strong> (<code>src/world_api.ts</code>): extend first, implement in both <code>Sim</code> and <code>ClientWorld</code>, then consume from render/ui. New surface: read craft skills and the wheel, current majors/hobby, specialization perks, node availability, corpse component options, recipe lists and craft results, tool tier and effect charges.</li>
     <li><strong>Client (render / ui):</strong> a professions/wheel HUD window following the module-first UI rules. All player-visible strings are <code>t()</code> keys; numbers/money through the formatters. Sim/server emit stable keys plus values re-localized by the matcher.</li>
     <li><strong>Guide / wiki:</strong> player-facing professions, gathering, and recipe content feeds <code>/wiki</code>; add <code>guide.*</code> prose keys and run <code>npm run wiki:content</code>.</li>
-    <li><strong>Persistence (<code>server/</code>):</strong> per-player craft skills, the active archetype, attunement history (which archetypes have been entered and the make-amends count per archetype), current hobby, focus allocations, and learned recipes persist (JSONB on the character) with additive back-compat load. Signed-material gatherer names, per-effect charges, rolled quality/stats, and the <code>boundTo</code> recipient persist on item instances. Respawn timers and mobile stations are sim runtime state.</li>
+    <li><strong>Persistence (<code>server/</code>):</strong> per-player craft skills, the active archetype, attunement history (which archetypes have been entered and the make-amends count per archetype), current hobby, and learned recipes persist (JSONB on the character) with additive back-compat load. Signed-material gatherer names, per-effect charges, rolled quality/stats, and the <code>boundTo</code> recipient persist on item instances. Respawn timers and mobile stations are sim runtime state.</li>
   </ul>
 
   <h2 id="slices">Build order (slices)</h2>
@@ -630,7 +602,6 @@
 
   <h4>Gathering, tools, and monster harvesting</h4>
   <ul>
-    <li>Gathering focus: skill tree vs additive radar, focus granularity, and the re-spec cost curves.</li>
     <li>Monster-tier to item-tier mapping: the shared rarity scale that tool gating reads from.</li>
     <li>Tool effects: the effect catalog, deterministic depletion tuning, and recharge material costs.</li>
     <li>Signed materials: the size of the self-gathered craft bonus.</li>
@@ -746,15 +717,6 @@
     group(20, "Focus one component", [5, 0, 0], "high tier, the other two skipped");
     group(270, "Focus two", [4, 3, 0], "good, narrower haul");
     group(510, "Split across all three", [2, 2, 2], "everything, but low tier each");
-  })();
-
-  // Figure 6: additive focus radar over component types.
-  (function () {
-    const svg = document.getElementById("radar-additive"); if (!svg) return;
-    const base = 38;
-    gridAndAxes(svg, COMP, 112);
-    valuePoly(svg, [base, base, base, base, base + 46, base + 42, base, base], COL.gold, "rgba(217,178,90,0.16)", 112);
-    valuePoly(svg, new Array(COMP.length).fill(base), COL.teal, "rgba(79,208,192,0.30)", 112);
   })();
 
   // Figure 4: power spectrum.

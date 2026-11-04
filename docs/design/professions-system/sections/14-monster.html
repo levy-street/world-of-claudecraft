@@ -13,33 +13,8 @@
     <svg id="corpse-diagram" viewBox="0 0 720 230" role="img" aria-label="Extraction tradeoff bars"></svg>
   </div>
 
-  <h3 id="focus">Focus: additive allocation (voluntary)</h3>
-  <p>On top of the per-corpse choice, a player sets a persistent <strong>focus</strong> in town. Focus is additive: every component starts at a guaranteed baseline that is never penalized, and focus points <em>add</em> rarity/yield bonuses to chosen components only. The only cost is opportunity. This lets a group divide the work: each member focuses different components so the party covers more high-tier materials between them.</p>
-
-  <div class="figure" id="fig6">
-    <h4>Figure 6. Additive focus: the baseline never drops</h4>
-    <p class="cap">Monster Harvesting focus over component types. The inner solid ring is the guaranteed baseline for every component. Focus points add the outer band on chosen components only (here a venom specialist boosting venom sacs and glands). Unfocused components stay at baseline, never below. Contrast the production wheel, where only one specialty is empowered at a time rather than every axis at once.</p>
-    <div class="row">
-      <div class="col"><svg id="radar-additive" viewBox="-92 -10 544 380" role="img" aria-label="Additive focus radar over monster component types"></svg></div>
-      <div class="col">
-        <div class="legend" style="margin-top:0">
-          <span><span class="swatch" style="background:var(--teal)"></span>Baseline (always present)</span>
-          <span><span class="swatch" style="background:var(--gold)"></span>Focus bonus (added on top)</span>
-        </div>
-        <p class="muted" style="font-size:14px">Whether focus is a small skill tree or a town-rebalanced additive radar is TBD; the invariant is fixed either way: additive only, baseline never drops, configured in town.</p>
-      </div>
-    </div>
-  </div>
-
-  <h3 id="respec">Re-spec cost: time, coins, or materials</h3>
-  <p>Re-aiming your focus draws on three resources, and you choose which one or two to spend:</p>
-  <table>
-    <tr><th>Pay with</th><th>Speed</th><th>Cost</th></tr>
-    <tr><td>Time only</td><td>Very slow</td><td>Free</td></tr>
-    <tr><td>Time plus a little coin or materials</td><td>Faster</td><td>Small coin or material cost</td></tr>
-    <tr><td>Coins plus materials</td><td>Instant</td><td>Higher coin and material cost</td></tr>
-  </table>
-  <p>The deeper and more peaked your focus, the larger the budget of whichever resources you use, so a casual rebalance is cheap and a hard pivot is a real commitment. (Gathering focus is additive and has no attunement gate, so unlike a production specialty there is no structural cost to switching, hence this explicit re-spec to keep a hard pivot meaningful.) Exact curves are tuning, deferred.</p>
+  <h3 id="focus">Focus: removed</h3>
+  <p>The persistent, town-set additive focus allocation (and its time, coin or material re-spec) shipped as Town Focus and was removed from the game on 2026-11-04: its launcher only appeared in town, so nobody found it, and the mechanic was judged not useful. The per-corpse choice above is the whole of the harvesting tradeoff now; every component yields its baseline tier and quantity with no allocation on top.</p>
 
   <h3 id="signed">Signed materials and the self-gathered bonus</h3>
   <ul>

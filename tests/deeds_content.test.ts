@@ -1146,10 +1146,11 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // Re-baselined 2026-11-04 when Town Focus left the game and took its deed
   // soc_civic_duty (Civic Duty, renown 5, a launch-block row) with it: a
   // DELETION, not an append, and the one the append-only table has taken
-  // (docs/design/deeds.md, rule 5's third recorded consequence). Like the
-  // v0.42.0 retune, it cannot be verified the auditable way, so the literal is
-  // MEASURED off the live table; no other row's trigger or renown moved (the
-  // ids, order and renown pins above prove the rest of the table intact).
+  // (docs/design/deeds.md, rule 5's third recorded consequence). The literal is
+  // MEASURED off the live table; the deletion was reconstructed independently
+  // (re-inserting the row at index 164 and its id into feat_book_complete's
+  // derived meta list reproduces the previous 6209fd36... digest exactly), so
+  // no other row's trigger or renown moved.
   const FROZEN_CATALOG_SHA256 = 'ac4694749689eda53c4c3369c0d2c403292c3baac4f62f2ce25848760cdc0a6d';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { DEEDS } from '../src/sim/content/deeds';
 import type { CharacterState } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 
@@ -155,12 +156,22 @@ describe('character state JSONB back-compat', () => {
     // The earned day is kept verbatim (the Book never drops an earned record),
     // but the removed deed scores nothing.
     expect(reserialized.deeds?.soc_civic_duty).toBe('2026-10-01');
+    // Renown is re-derived from the live catalog on load: the removed deed
+    // contributes 0, so the total equals the catalog sum of the OTHER earned
+    // ids (a literal, not a same-path comparison), and a positive control
+    // with a live 25-Renown deed added scores exactly 25 more.
+    const liveRenown = Object.keys(reserialized.deeds ?? {})
+      .filter((id) => id !== 'soc_civic_duty')
+      .reduce((sum, id) => sum + (DEEDS[id]?.renown ?? 0), 0);
+    expect(reserialized.renown ?? 0).toBe(liveRenown);
+    expect(DEEDS.soc_wyrms_hoard.renown).toBe(25);
     const control = new Sim({ seed: 1, playerClass: 'warrior' });
     const controlPid = control.addPlayer('warrior', 'Control', {
-      state: { ...legacy, deeds: state.deeds } as unknown as CharacterState,
+      state: {
+        ...legacy,
+        deeds: { ...(legacy.deeds as Record<string, string>), soc_wyrms_hoard: '2026-10-02' },
+      } as unknown as CharacterState,
     });
-    expect(sim2.serializeCharacter(pid)!.renown).toBe(
-      control.serializeCharacter(controlPid)!.renown,
-    );
+    expect(control.serializeCharacter(controlPid)!.renown ?? 0).toBe(liveRenown + 25);
   });
 });

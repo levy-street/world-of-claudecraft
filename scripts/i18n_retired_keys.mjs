@@ -122,7 +122,6 @@ export const RETIRED_KEYS = [
   'guide.gear.soulboundBody', // -> guide.gear.soulboundBodyBound (bind-on-trade rules)
   'guide.profPages.ench.enchantsNote', // -> guide.profPages.ench.enchantsNoteOffhand
   'guide.profPages.specimenBody', // -> guide.profPages.specimenBodyFamilies
-  'guide.professions.focusBody', // -> guide.professions.focusBodyTiers
   'guide.professions.harvestBodyChoice', // folded into the harvest section's body copy
   // -> guide.profPages.gatherDeeds.farmingSown (farming gained its own deeds at D13)
   'guide.profPages.gatherDeeds.farming',

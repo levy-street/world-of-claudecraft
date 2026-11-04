@@ -449,7 +449,6 @@ const baseEnTable = {
   'error.patternKnown': 'You already know that recipe.',
   'error.patternProfession': 'You have not practiced that profession.',
   'error.patternSkill': 'Your skill is too low to learn that pattern.',
-  // #1144: the chosen re-spec payment tier's coin/material cost is unaffordable.
   // Custom per-item ground-pickup lines (src/sim/content/ground_pickup_lines.ts).
   // Emitted via def.pickupDeny/def.pickupEnough (variable-routed, so the S3 guard
   // cannot see them); values must stay byte-identical to that table for the EXACT

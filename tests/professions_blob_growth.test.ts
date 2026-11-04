@@ -2040,12 +2040,13 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // + vault retune 119 + quiver 66 + quest shields 68. No storage limit changes.
     // Advanced riding adds the sparse ridingTier scalar (+15, PR 4390).
     // 261,480 -> 261,340 when Town Focus left the game (2026-11-04): the fixture's
-    // ten-row full-budget townFocus record (`"townFocus":{...},`, 140 bytes) is no
-    // longer serialized at all.
+    // ten-row full-budget townFocus record (`"townFocus":{...},`, 110 bytes) is no
+    // longer serialized at all, and its deeds row no longer carries the removed
+    // `"soc_civic_duty":"<day>",` (30 bytes). MEASURED.
     expect(baselineBytes).toBe(261340);
     expect(bytes - baselineBytes).toBe(8284);
     // 266,699 -> 266,721 with Wobbles the Slime's reins (+22, kept).
-    // 269,764 -> 269,624: the 140-byte townFocus record left (Town Focus removed).
+    // 269,764 -> 269,624: the townFocus record (110) and the Civic Duty deeds row (30) left.
     expect(bytes).toBe(269624);
     // Keep the warning threshold unchanged: saves above it remain whole.
     expect(bytes).toBeGreaterThan(CHARACTER_BLOB_WARN_BYTES);
@@ -2436,7 +2437,7 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // (`"membership_staff",`, +19, PR 4281), isolated with membership below.
     // 249,984 -> 250,006 with Wobbles the Slime's reins (+22, kept).
     // Advanced riding adds the sparse ridingTier scalar (+15, PR 4390).
-    // 250,915 -> 250,775 when Town Focus left the game (the same 140-byte record).
+    // 250,915 -> 250,775 when Town Focus left the game (the same 110 + 30 bytes).
     expect(beforeReferralBytes).toBe(250775);
     expect(bytes - gourdlightEveBytes - stampCardBytes - beforeReferralBytes).toBe(122);
     expect(
@@ -2463,7 +2464,7 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     expect(membershipIds.size).toBe(9);
     const beforeMembershipBytes = Buffer.byteLength(JSON.stringify(withoutMembership), 'utf8');
     // 249,810 -> 249,832 with Wobbles the Slime's reins (+22, kept).
-    // 250,741 -> 250,601: the 140-byte townFocus record left (Town Focus removed).
+    // 250,741 -> 250,601: the townFocus record (110) and the Civic Duty deeds row (30) left.
     expect(beforeMembershipBytes).toBe(250601);
     expect(beforeReferralBytes - beforeMembershipBytes).toBe(174);
     expect(
@@ -2992,8 +2993,10 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         // Advanced riding adds the sparse scalar ,"ridingTier":2 (15 bytes).
         15 -
         // Minus 140 when Town Focus left the game (2026-11-04): the fixture's
-        // ten-row full-budget allocation (`"townFocus":{...},`) is no longer a
-        // field at all. MEASURED (every whole-blob pin above moved by the same 140).
+        // ten-row full-budget allocation (`"townFocus":{...},`, 110 bytes) is no
+        // longer a field at all, and the deeds row below loses its
+        // `"soc_civic_duty":"<day>",` (30 bytes). MEASURED (every whole-blob
+        // pin above moved by the same 140).
         140,
     );
     const forgeBaseline = {
@@ -3108,7 +3111,7 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // The Staff of Changing's discovery id adds 19 (247,136, PR 4281).
       // The sprite buddy's whistle id adds 18 (247,154).
       // Advanced riding contributes 15 bytes for the armed ridingTier scalar.
-      // 248,045 -> 247,905 when Town Focus left the game (the 140-byte townFocus record).
+      // 248,045 -> 247,905 when Town Focus left the game (townFocus 110 + Civic Duty row 30).
     ).toBe(247905);
     // Removing ONLY field_kit (the Bramblehide release content and the two
     // dev-mount reins items still present, current staged tree) reproduces
@@ -3151,7 +3154,7 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // The Staff of Changing's discovery id adds 19 (249,946, PR 4281); reins_nightwing_chimera adds 26 (249,972).
       // reins_wobbles_slime adds 22 (249,994).
       // Advanced riding contributes the same 15 bytes here.
-      // 250,903 -> 250,763 when Town Focus left the game (the 140-byte townFocus record).
+      // 250,903 -> 250,763 when Town Focus left the game (townFocus 110 + Civic Duty row 30).
     ).toBe(250763);
     const priorContent = withoutCrucibleContent(withoutReferral);
     const contentDelta = Object.fromEntries(

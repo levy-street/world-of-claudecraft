@@ -6816,9 +6816,9 @@ export class Hud {
     if (this.questlogWindow.isOpen) this.questlogWindow.render();
     if ($('#bags').style.display !== 'none') this.renderBags();
     this.repaintOpenServiceWindows();
-    // Windows whose repaint signature is text-independent never move on a
-    // language switch alone, so each open one gets a forced rebuild with fresh
-    // t() here, the arena / Vale Cup relocalize arm (#2500).
+    // The windows below repaint behind text-independent signatures, so a
+    // language switch alone never moves them: each open one gets a forced
+    // rebuild with fresh t() here, the arena / Vale Cup relocalize arm (#2500).
     if (this.marketWindow.isOpen) this.marketWindow.render();
     if (this.bankWindow.isOpen) this.bankWindow.render();
     if (this.courierWindow.isOpen()) this.courierWindow.render(true);

@@ -1867,9 +1867,10 @@ const MONOLITHS: MonolithRow[] = [
     // Membership boot wiring lives with its service factory.
     // Main ce21c7a66f5 sync: parent pins 9758 (Halloween) and 9693 (main).
     // Exact combined count; the three seasonal wiring lines are preserved.
-    // LOWERED 9696 -> 9690 when Town Focus left the game (2026-11-04): the
-    // set_town_focus dispatch arm and its import left. wc -l. Exact count.
-    ceiling: 9690,
+    // LOWERED 9696 -> 9693 when Town Focus left the game (2026-11-04): the
+    // set_town_focus dispatch body and its import left; the append-only wire
+    // token keeps a three-line no-op tombstone arm. wc -l. Exact count.
+    ceiling: 9693,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
