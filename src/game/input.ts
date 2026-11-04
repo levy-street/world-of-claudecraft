@@ -59,8 +59,8 @@ const TOUCH_JUMP_LATCH_MS = 220;
 // the value above one full input/tick window (50ms) guarantees a grounded tick
 // observes the jump. Held jumps are unaffected (the key stays physically down).
 const KEY_JUMP_LATCH_MS = 150;
-const CAMERA_DRAG_START_DISTANCE = 18;
-const CAMERA_DRAG_START_MS = 140;
+const CAMERA_DRAG_START_DISTANCE = 4;
+const CAMERA_DRAG_START_MS = 45;
 
 type FullscreenDocument = Document & {
   webkitFullscreenElement?: Element | null;
@@ -1875,7 +1875,7 @@ export class Input {
       );
     }
 
-    const mouselook = this.isMouselookActive();
+    const mouselook = this.isMouselookActive() || (this.rightDown && this.downButton !== this.clickMoveMouseButton);
     const aHeld = held('turnLeft');
     const dHeld = held('turnRight');
     // A couched Shardpike turns the left/right keys (and the on-screen lean keycaps) into
