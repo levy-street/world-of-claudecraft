@@ -111,7 +111,7 @@ function navigationAllowed(
 
 // Embed roots whose OWN nested frames are not knowable in advance: Stripe Checkout. A
 // 3D Secure challenge renders the card issuer's ACS page (any bank's origin) inside
-// hooks.stripe.com and then returns to the session's return_url. Only these roots relax
+// hooks.stripe.com and then returns inside Stripe's own frames. Only these roots relax
 // their subtree; Turnstile, WalletConnect and Link roots keep the strict list throughout.
 const NESTED_FRAME_ROOT_ORIGINS = Object.freeze(
   new Set(['https://js.stripe.com', 'https://checkout.stripe.com', 'https://hooks.stripe.com']),

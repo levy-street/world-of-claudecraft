@@ -130,7 +130,7 @@ describe('navigationAllowed', () => {
 // Electron fires will-frame-navigate for EVERY frame in the tree, not just the app's own
 // iframes. Stripe Embedded Checkout nests frames of its own inside its iframe: a 3D Secure
 // challenge renders the card issuer's ACS page (an arbitrary bank origin) inside the
-// hooks.stripe.com frame, then returns to the session's return_url. Gating those against the
+// hooks.stripe.com frame, then returns inside Stripe's frames. Gating those against the
 // app's embed allow-list blanked the challenge and left the checkout greyed out on its
 // processing state in the desktop client only (the Windows membership checkout report).
 describe('frameNavigationAllowed', () => {
@@ -140,7 +140,7 @@ describe('frameNavigationAllowed', () => {
   const embed = 'https://js.stripe.com/v3/embedded-checkout-inner.html';
   const acs = 'https://acs.examplebank.co.nz/challenge?id=1';
 
-  it('lets a Stripe-nested 3DS issuer frame and the return_url load', () => {
+  it('lets a Stripe-nested 3DS issuer frame and its return page load', () => {
     for (const url of [
       acs,
       'https://worldofclaudecraft.com/store/return?session_id=cs_test_1',
@@ -151,10 +151,35 @@ describe('frameNavigationAllowed', () => {
     ]) {
       expect(frameNavigationAllowed(url, false, [hooks, embed, top], app)).toBe(true);
     }
-    // A per-session Stripe subdomain root relaxes its subtree the same way.
-    expect(frameNavigationAllowed(acs, false, ['https://b.js.stripe.com/v3/x', top], app)).toBe(
-      true,
-    );
+    // Every Stripe root, including a per-session js.stripe.com subdomain, relaxes its
+    // subtree the same way.
+    for (const root of [
+      'https://b.js.stripe.com/v3/x',
+      'https://hooks.stripe.com/three_d_secure/authenticate',
+      'https://checkout.stripe.com/c/pay/cs_test_1',
+    ]) {
+      expect(frameNavigationAllowed(acs, false, [root, top], app)).toBe(true);
+    }
+    // A blob minted by a third-party https page below Stripe is that page's own origin.
+    expect(
+      frameNavigationAllowed(
+        'blob:https://acs.examplebank.co.nz/9f',
+        false,
+        [hooks, embed, top],
+        app,
+      ),
+    ).toBe(true);
+  });
+
+  it('does not relax a look-alike Stripe root', () => {
+    for (const root of [
+      'https://js.stripe.com.evil.com/x',
+      'https://evil-js.stripe.com/x',
+      'https://api.stripe.com/x',
+      'http://js.stripe.com/x',
+    ]) {
+      expect(frameNavigationAllowed(acs, false, [root, top], app)).toBe(false);
+    }
   });
 
   it('keeps direct children of the app frame on the strict embed allow-list', () => {
