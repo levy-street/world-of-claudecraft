@@ -147,6 +147,7 @@ import {
 import type { CastVfxReadiness } from './cast_vfx_readiness_core';
 import {
   aimCelestialSprites,
+  attachCelestialSprites,
   buildCelestialSprites,
   type CelestialSprites,
 } from './celestial_sprites';
@@ -2493,10 +2494,7 @@ export class Renderer {
     // the per-frame aim/fade (updateCelestialSprites).
     const celestial = buildCelestialSprites(LOW_GFX);
     this.celestialSprites = celestial;
-    for (const sp of celestial.allSprites) {
-      setRenderCategory(sp, 'sky');
-      this.scene.add(sp);
-    }
+    attachCelestialSprites(celestial, this.scene, (texture) => this.prewarmTexture(texture));
 
     // god-ray shafts: elongated additive gradient sprites hanging sunward of
     // the camera; opacity follows how directly the camera faces the sun
@@ -8907,7 +8905,8 @@ export class Renderer {
         this.starAmt = nightStarAmount(gday);
         // The two moons set the night floor: the mage's moon is the normal night,
         // the natural moon's phase brightens it and an eclipse darkens it.
-        const moonLit = sky.nightLitFrac;
+        // (an authored sun anchor hides the moons, so it keeps the normal night)
+        const moonLit = this.moonSky?.nightLitFrac ?? 0.5;
         // the whole grade warms as the sun crosses the horizon, so the fog,
         // sky dome, and water all take the sunrise/sunset orange rather than
         // just the key light

@@ -20,7 +20,15 @@ import {
   setLunarPhaseOverride,
   setMoonLatitudeOverride,
 } from '../src/render/day_night_clock';
-import { cyclePhase, DAWN_PHASE, DUSK_PHASE, isDaylightPhase } from '../src/sim/day_night';
+import { lunarPhase } from '../src/render/day_night_core';
+import { moonLatitudeDeg } from '../src/render/twin_moons_core';
+import {
+  cyclePhase,
+  DAWN_PHASE,
+  DAY_NIGHT_CYCLE_MS,
+  DUSK_PHASE,
+  isDaylightPhase,
+} from '../src/sim/day_night';
 
 function deps() {
   return { log: vi.fn(), refreshDayNightDial: vi.fn() };
@@ -96,9 +104,17 @@ describe('the command', () => {
 describe('the moon eclipse scrub', () => {
   afterEach(() => {
     setMoonLatitudeOverride(null);
+    vi.useRealTimers();
   });
 
+  // a fixed instant, so "the real orbit" is one number to compare against
+  const NOW = Date.UTC(2026, 10, 5, 12, 0, 0);
+  const realLatitude = () => moonLatitudeDeg(NOW / DAY_NIGHT_CYCLE_MS);
+  const realPhase = () => lunarPhase(NOW);
+
   it('pins a full moon onto the sun path (a total eclipse), and auto releases both pins', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(NOW);
     const d = deps();
     expect(tryDayNightDevCommand('/daynight moon eclipse', d)).toBe(true);
     expect(currentLunarPhase()).toBe(MOON_PRESETS.full);
@@ -107,14 +123,37 @@ describe('the moon eclipse scrub', () => {
     expect(sky.umbra).toBeCloseTo(1, 9);
     expect(sky.mageCover).toBeCloseTo(1, 9);
     expect(tryDayNightDevCommand('/daynight moon auto', d)).toBe(true);
-    expect(currentMoonSky(0).latitudeDeg).not.toBe(0);
+    expect(currentLunarPhase()).toBeCloseTo(realPhase(), 9);
+    expect(currentMoonSky(0).latitudeDeg).toBeCloseTo(realLatitude(), 9);
+  });
+
+  it('every release word and a bare /daynight moon clear both pins', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(NOW);
+    for (const release of ['/daynight moon off', '/daynight moon clear', '/daynight moon']) {
+      const d = deps();
+      tryDayNightDevCommand('/daynight moon eclipse', d);
+      expect(tryDayNightDevCommand(release, d)).toBe(true);
+      expect(currentLunarPhase(), release).toBeCloseTo(realPhase(), 9);
+      expect(currentMoonSky(0).latitudeDeg, release).toBeCloseTo(realLatitude(), 9);
+    }
   });
 
   it('a plain moon phase after an eclipse puts the moon back on its real orbit', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(NOW);
     const d = deps();
     tryDayNightDevCommand('/daynight moon eclipse', d);
     expect(tryDayNightDevCommand('/daynight moon crescent', d)).toBe(true);
     expect(currentLunarPhase()).toBe(MOON_PRESETS.crescent);
-    expect(currentMoonSky(0).latitudeDeg).not.toBe(0);
+    expect(currentMoonSky(0).latitudeDeg).toBeCloseTo(realLatitude(), 9);
+  });
+
+  it('an unknown moon word leaves an eclipse pinned', () => {
+    const d = deps();
+    tryDayNightDevCommand('/daynight moon eclipse', d);
+    expect(tryDayNightDevCommand('/daynight moon teatime', d)).toBe(true);
+    expect(currentLunarPhase()).toBe(MOON_PRESETS.full);
+    expect(currentMoonSky(0).latitudeDeg).toBe(0);
   });
 });

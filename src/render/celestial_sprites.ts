@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { type MoonTerminator, moonTerminator } from './day_night_core';
 import { paintMageMoonFace, paintMageMoonGlow } from './mage_moon_face';
+import { setRenderCategory } from './renderer_diagnostics';
 import {
   MAGE_MOON_RADII,
   type MoonSky,
@@ -313,6 +314,14 @@ function paintMoonFace(
 }
 
 /**
+ * Where the umbra's centre lands on the 256 face canvas for an offset in disc
+ * radii in the face frame (+y up): canvas y grows downward, so +y is subtracted.
+ */
+export function eclipseCanvasCentre(offset: readonly [number, number]): [number, number] {
+  return [128 + offset[0] * MOON_R, 128 - offset[1] * MOON_R];
+}
+
+/**
  * The planet's shadow on the face during a lunar eclipse: the penumbra a soft
  * dimming ring, the umbra the copper red of sunlight bent through the planet's
  * air. `offset` is the umbra's centre in disc radii in the face frame (+x the
@@ -320,8 +329,7 @@ function paintMoonFace(
  * lands on face pixels and the sky around the moon stays clear.
  */
 function paintMoonEclipse(ctx: CanvasRenderingContext2D, offset: readonly [number, number]): void {
-  const cx = 128 + offset[0] * MOON_R;
-  const cy = 128 - offset[1] * MOON_R;
+  const [cx, cy] = eclipseCanvasCentre(offset);
   const umbraR = UMBRA_RADII * MOON_R;
   ctx.save();
   ctx.globalCompositeOperation = 'source-atop';
@@ -462,8 +470,32 @@ function makeSprite(
 // cycle (29.5 world days), free in any given frame. An eclipse's umbra snaps to
 // a tenth of a disc radius the same way, a few dozen paints across a whole
 // eclipse.
-const MOON_PHASE_BUCKETS = 64;
-const ECLIPSE_STEPS_PER_RADIUS = 10;
+export const MOON_PHASE_BUCKETS = 64;
+export const ECLIPSE_STEPS_PER_RADIUS = 10;
+
+/** The repaint bucket of a lunar phase (wrapped into [0, 1)). */
+export function moonPhaseBucket(p: number): number {
+  return Math.floor((((p % 1) + 1) % 1) * MOON_PHASE_BUCKETS);
+}
+
+/**
+ * The natural moon face's repaint key: the phase bucket alone outside an
+ * eclipse, the bucket plus the umbra offset snapped to a tenth of a radius during
+ * one. The face repaints only when this changes. The umbra never reaches past
+ * the penumbra's edge (under 7 radii, so within +-70 steps), and the +-500 guard
+ * packs the two steps without collision; an eclipse key is always far above the
+ * 64 plain buckets.
+ */
+export function naturalMoonRepaintKey(
+  p: number,
+  eclipse: readonly [number, number] | null,
+): number {
+  const bucket = moonPhaseBucket(p);
+  if (!eclipse) return bucket;
+  const ex = Math.round(eclipse[0] * ECLIPSE_STEPS_PER_RADIUS);
+  const ey = Math.round(eclipse[1] * ECLIPSE_STEPS_PER_RADIUS);
+  return (bucket * 1000 + ex + 500) * 1000 + ey + 500;
+}
 
 /** Build the sun and moon sprite sets. The caller (renderer) categorizes and
  *  adds them to the scene, then drives position/opacity per frame and feeds
@@ -558,13 +590,12 @@ export function buildCelestialSprites(lowGfx: boolean): CelestialSprites {
     mageSprites,
     allSprites: [...sunSprites, ...mageSprites, ...moonSprites],
     setNaturalMoon(p: number, eclipse: readonly [number, number] | null): void {
-      const bucket = Math.floor((((p % 1) + 1) % 1) * MOON_PHASE_BUCKETS);
-      const ex = eclipse ? Math.round(eclipse[0] * ECLIPSE_STEPS_PER_RADIUS) : 0;
-      const ey = eclipse ? Math.round(eclipse[1] * ECLIPSE_STEPS_PER_RADIUS) : 0;
-      // ex/ey stay within +-60 (the penumbra reaches under 6 radii), so 1000 separates them
-      const key = eclipse ? (bucket * 1000 + ex + 500) * 1000 + ey + 500 : bucket;
+      const key = naturalMoonRepaintKey(p, eclipse);
       if (key === lastKey) return;
       lastKey = key;
+      const bucket = moonPhaseBucket(p);
+      const ex = eclipse ? Math.round(eclipse[0] * ECLIPSE_STEPS_PER_RADIUS) : 0;
+      const ey = eclipse ? Math.round(eclipse[1] * ECLIPSE_STEPS_PER_RADIUS) : 0;
       const term = moonTerminator((bucket + 0.5) / MOON_PHASE_BUCKETS);
       const offset: [number, number] | null = eclipse
         ? [ex / ECLIPSE_STEPS_PER_RADIUS, ey / ECLIPSE_STEPS_PER_RADIUS]
@@ -587,6 +618,24 @@ export function buildCelestialSprites(lowGfx: boolean): CelestialSprites {
       }
     },
   };
+}
+
+/**
+ * Put every celestial sprite in the scene under the sky render category and
+ * upload its texture now, at boot. The moons are hidden by day and indoors, and
+ * the boot texture pass walks visible objects only, so without this their first
+ * upload would land in a live frame at dusk.
+ */
+export function attachCelestialSprites(
+  celestial: CelestialSprites,
+  scene: THREE.Scene,
+  prewarm: (texture: THREE.Texture | null) => void,
+): void {
+  for (const sp of celestial.allSprites) {
+    setRenderCategory(sp, 'sky');
+    scene.add(sp);
+    prewarm(sp.material.map);
+  }
 }
 
 /** One frame's inputs for aimCelestialSprites. */
