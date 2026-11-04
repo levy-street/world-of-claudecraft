@@ -29,13 +29,14 @@ import type { MaterialComposition } from '../sim/material_sources';
 import { vaultMaterialIds } from '../sim/materials_vault';
 import type { EquipSlot, InvSlot, ItemDef, ItemInstancePayload } from '../sim/types';
 import type { IWorld } from '../world_api';
+import { BAG_CATEGORY_LABEL_KEYS } from './bag_category_labels';
 import { bagCornerMark, bagRimClasses } from './bag_corner_mark_view';
 import {
   BAG_CATEGORIES,
   BAG_SORTS,
-  type BagCategory,
   type BagFilterState,
   type BagSort,
+  bagJunkItemCount,
   bagOrderIsManual,
   bagQuestItemCount,
   DEFAULT_BAG_FILTER,
@@ -49,6 +50,12 @@ import { bagItemHasContextActions } from './bag_item_context_menu';
 import { bagQuestMarkKind, bagQuestMarkProgressFromLog } from './bag_quest_mark_view';
 import { BagQuestTrackerHighlight } from './bag_quest_tracker_highlight';
 import { bagQuestTrackerHighlightId } from './bag_quest_tracker_highlight_view';
+import {
+  BAG_VIEW_SIZES,
+  type BagViewSize,
+  bagViewSizeClass,
+  parseBagViewSize,
+} from './bag_view_size_core';
 import {
   type BagDestroyAction,
   type BagMode,
@@ -138,6 +145,9 @@ import { dropOnWorld } from './world_drop_target';
 import { wornItemCellParts } from './worn_item_cell_view';
 
 const BAG_FILTER_KEY = 'woc_bag_filter';
+// The bag view size (bag_view_size_core.ts), kept apart from the filter key so an
+// older build that parses woc_bag_filter never sees a field it does not know.
+const BAG_VIEW_SIZE_KEY = 'woc_bag_view_size';
 
 // Sort settle ripple: how long an armed settle waits for the tidied grid to
 // arrive before giving up (the bank deposit status timeout-backstop pattern:
@@ -203,15 +213,10 @@ const QUALITY_DEFAULT_COLOR = 'var(--color-quality-default)';
 // its per-copy flag (bound is the flag a player checks before trading). The
 // rim/wash/seal are salience for sighted scanning, not new information.
 
-const BAG_CATEGORY_LABEL_KEYS: Record<BagCategory, TranslationKey> = {
-  all: 'hudChrome.bags.filterAll',
-  weapon: 'hudChrome.bags.filterWeapon',
-  armor: 'hudChrome.bags.filterArmor',
-  consumable: 'hudChrome.bags.filterConsumable',
-  material: 'hudChrome.bags.filterMaterial',
-  tool: 'hudChrome.bags.filterTool',
-  quest: 'hudChrome.bags.filterQuest',
-  mount: 'hudChrome.bags.filterMount',
+const BAG_VIEW_SIZE_LABEL_KEYS: Record<BagViewSize, TranslationKey> = {
+  compact: 'hudChrome.bags.viewSizeCompact',
+  large: 'hudChrome.bags.viewSizeLarge',
+  list: 'hudChrome.bags.viewSizeList',
 };
 const BAG_SORT_LABEL_KEYS: Record<BagSort, TranslationKey> = {
   recent: 'hudChrome.bags.sortRecent',
@@ -374,6 +379,15 @@ export class BagsWindow {
       return parseBagFilter(localStorage.getItem(BAG_FILTER_KEY));
     } catch {
       return { ...DEFAULT_BAG_FILTER };
+    }
+  })();
+
+  // Presentation-only view size (compact / large / list), persisted on its own key.
+  private viewSize: BagViewSize = (() => {
+    try {
+      return parseBagViewSize(localStorage.getItem(BAG_VIEW_SIZE_KEY));
+    } catch {
+      return parseBagViewSize(null);
     }
   })();
 
@@ -830,6 +844,8 @@ export class BagsWindow {
     // Quest chip badge: total stack count of quest items (bagQuestItemCount).
     // Only painted when N > 0 so an empty bag of quest pieces stays quiet.
     const questCount = bagQuestItemCount(world.inventory, (id) => knownItemDef(ITEMS, id));
+    // Junk chip badge: what Sell Junk would take (bagJunkItemCount), same quiet-at-0 rule.
+    const junkCount = bagJunkItemCount(world.inventory, (id) => knownItemDef(ITEMS, id));
 
     const chips = document.createElement('div');
     chips.className = 'bag-chips';
@@ -847,6 +863,13 @@ export class BagsWindow {
         chip.setAttribute(
           'aria-label',
           t('hudChrome.bags.filterQuestCountAria', { count: countText }),
+        );
+      } else if (category === 'junk' && junkCount > 0) {
+        const countText = formatNumber(junkCount, { maximumFractionDigits: 0 });
+        chip.innerHTML = `${esc(label)}<span class="bag-chip-count bag-chip-count-junk" aria-hidden="true">${esc(countText)}</span>`;
+        chip.setAttribute(
+          'aria-label',
+          t('hudChrome.bags.filterJunkCountAria', { count: countText }),
         );
       } else {
         chip.textContent = label;
@@ -901,6 +924,34 @@ export class BagsWindow {
       this.render();
     });
     tools.appendChild(sort);
+
+    // The view size (compact grid, large grid, or a named list): presentation only,
+    // persisted on its own key, and it rebuilds the window so every cell repaints at
+    // the new size. Same select idiom (and focus key) as the sort beside it.
+    const size = document.createElement('select');
+    size.className = 'bag-size ui-btn';
+    size.dataset.focusKey = 'bag-size';
+    size.setAttribute('aria-label', t('hudChrome.bags.viewSizeAria'));
+    for (const option of BAG_VIEW_SIZES) {
+      const opt = document.createElement('option');
+      opt.value = option;
+      opt.textContent = t(BAG_VIEW_SIZE_LABEL_KEYS[option]);
+      size.appendChild(opt);
+    }
+    // Set after the options exist: flagging an option selected before it joins
+    // the select is not honoured by every DOM (happy-dom keeps the first one).
+    size.value = this.viewSize;
+    size.addEventListener('change', () => {
+      this.viewSize = parseBagViewSize(size.value);
+      try {
+        localStorage.setItem(BAG_VIEW_SIZE_KEY, this.viewSize);
+      } catch {
+        /* storage unavailable (private mode); the size still applies in-session */
+      }
+      audio.click();
+      this.render();
+    });
+    tools.appendChild(size);
 
     // The one-shot clean-up button (world.sortInventory): unlike the view-only
     // dropdown beside it, this rearranges the REAL cells (server-side online,
@@ -977,6 +1028,8 @@ export class BagsWindow {
     // Settle bookkeeping rides every paint: the class never persists across a
     // repaint (each replay would re-run the animation on the fresh nodes).
     grid.classList.remove('bag-grid-settle');
+    for (const option of BAG_VIEW_SIZES) grid.classList.remove(bagViewSizeClass(option));
+    grid.classList.add(bagViewSizeClass(this.viewSize));
     const settle = this.consumeSortSettle(bagSortSignature(world.inventory));
     if (model.state === 'empty') {
       grid.innerHTML = `<div class="bag-empty">${esc(t('itemUi.bags.empty'))}</div>`;
@@ -1157,7 +1210,7 @@ export class BagsWindow {
       // .bi-quest-seal-ready (static; optional pulse is CSS-only).
       const cornerSeal = cornerMarkHtml(cornerMark, { questReady });
       const lockSeal = lockMarkHtml(locked);
-      row.innerHTML = `${this.deps.itemIcon(item, parts.quality)}${parts.qualityBadge}${cornerSeal}${lockSeal}<span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
+      row.innerHTML = `${this.deps.itemIcon(item, parts.quality)}${parts.qualityBadge}${cornerSeal}${lockSeal}<span class="bi-name" aria-hidden="true">${esc(itemName)}</span><span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
       // An item mid-cooldown (the firebottle's 5s throw pacing, the faction
       // quartermaster goods in ITEM_BASE_COOLDOWNS) paints a draining curtain on
       // its slot. The bag is a cold window with no per-frame driver, so the sweep
@@ -1556,7 +1609,7 @@ export class BagsWindow {
     // marks are def-free (instance payload only) and do apply, minted through
     // the shared item_instance_glyph_mark helper.
     const instanceMark = instanceGlyphMarkHtml(glyphKind);
-    row.innerHTML = `${unknownItemIconHtml(s.itemId)}${instanceMark}<span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
+    row.innerHTML = `${unknownItemIconHtml(s.itemId)}${instanceMark}<span class="bi-name" aria-hidden="true">${esc(s.itemId)}</span><span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
     if (canDeposit) {
       row.addEventListener('click', (ev) => {
         // The same peek and trailing-synthetic-click dance as the known cell:

@@ -9492,6 +9492,67 @@
   .bag-item:hover {
     filter: brightness(1.25);
   }
+  /* Bag view size (src/ui/bag_view_size_core.ts; the painter stamps one
+     .bag-size-* class on .bag-grid). Presentation only: every size keeps the
+     real cell order and drop indices. Compact is the classic grid above, so it
+     needs no rule. The item name rides every stack cell but only List shows it
+     (the cell's accessible name already carries it, so it is aria-hidden). */
+  .bag-item .bi-name {
+    display: none;
+  }
+  .bag-grid.bag-size-large {
+    grid-template-columns: repeat(auto-fill, minmax(var(--socket-size-bag-large), 1fr));
+  }
+  /* The cell is a .ui-socket--bag, whose width/height come from --ui-socket-size
+     (library.css), so the larger grid re-points that one variable. */
+  .bag-grid.bag-size-large .bag-item {
+    --ui-socket-size: var(--socket-size-bag-large);
+  }
+  .bag-grid.bag-size-list {
+    grid-template-columns: repeat(auto-fill, minmax(var(--bag-list-row-min), 1fr));
+  }
+  /* List rows: the icon keeps a square on the leading edge and the name fills
+     the rest. Every mark is pinned to that icon square, so a corner glyph, the
+     lock, the quality badge, the count and a cooldown curtain all read exactly
+     as they do on a grid cell. Empty squares stay as blank rows: each is a real
+     cell, so dragging a stack onto one still parks it there. */
+  .bag-grid.bag-size-list .bag-item {
+    width: auto;
+    height: auto;
+    aspect-ratio: auto;
+    min-height: calc(var(--bag-list-icon) + 4px);
+    padding: 0 6px 0 calc(var(--bag-list-icon) + 10px);
+    display: flex;
+    align-items: center;
+    text-align: start;
+  }
+  .bag-grid.bag-size-list .bag-item .item-icon {
+    width: var(--bag-list-icon);
+    height: var(--bag-list-icon);
+  }
+  .bag-grid.bag-size-list .bag-item .bi-name {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 12px;
+    color: var(--bag-slot-quality, var(--color-text-light));
+  }
+  .bag-grid.bag-size-list .bag-item > .loot-quality-badge {
+    right: auto;
+    left: calc(var(--bag-list-icon) + 1px);
+    transform: translateX(-100%);
+  }
+  .bag-grid.bag-size-list .bag-item .bi-count {
+    right: auto;
+    left: 2px;
+    width: var(--bag-list-icon);
+    text-align: end;
+  }
+  .bag-grid.bag-size-list .bag-item .bag-cd-curtain {
+    right: auto;
+    width: calc(var(--bag-list-icon) + 4px);
+  }
   /* An unknown-id stack (stale-client fallback cell) exposes no click action,
      so it must not wear the click affordance: no hover lift, and the themed
      arrow cursor WHENEVER the cell is not draggable (trade or vendor open).
@@ -9954,7 +10015,8 @@
   body.mobile-touch .bag-search {
     min-height: 40px;
   }
-  body.mobile-touch .bag-sort {
+  body.mobile-touch .bag-sort,
+  body.mobile-touch .bag-size {
     min-height: 40px;
   }
   .bag-tools {
@@ -9974,7 +10036,9 @@
     outline: 2px solid var(--color-border-focus);
     outline-offset: 2px;
   }
-  .bag-sort {
+  /* The view-size select (bag_view_size_core.ts) rides the sort select shape. */
+  .bag-sort,
+  .bag-size {
     flex: none;
     cursor: var(--cursor-point);
   }

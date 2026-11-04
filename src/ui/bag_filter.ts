@@ -1,6 +1,8 @@
 import { compareBagStacks } from '../sim/inventory_sort';
+import { isItemLocked } from '../sim/item_lock_flag';
+import { junkSellableSlot } from '../sim/items';
 import { isMaterialItem } from '../sim/material_taxonomy';
-import type { InvSlot, ItemDef } from '../sim/types';
+import type { InvSlot, ItemDef, ItemInstancePayload } from '../sim/types';
 
 // Pure, DOM-free core for the modular bag filtering system. The HUD is a thin
 // consumer: it owns the controls and the DOM, and calls applyBagFilter() to turn
@@ -8,14 +10,21 @@ import type { InvSlot, ItemDef } from '../sim/types';
 // host-agnostic lets tests drive it directly (tests/bag_filter.test.ts) without a
 // browser, mirroring unit_portrait.ts / xp_bar.ts.
 
+// Rail order is the player's own priority list (the inventory UX research):
+// the everyday gear and consumable tabs first, then Quest items, then the two
+// slot-aware tabs (Favourites, Junk), then the rarer Tools and Mounts. The
+// persisted filter stores the category VALUE, never its index, so reordering
+// here never re-points a saved preference.
 export const BAG_CATEGORIES = [
   'all',
   'weapon',
   'armor',
   'consumable',
   'material',
-  'tool',
   'quest',
+  'favourite',
+  'junk',
+  'tool',
   'mount',
 ] as const;
 export const BAG_SORTS = ['recent', 'quality', 'name'] as const;
@@ -94,7 +103,27 @@ export type ItemLookup = (itemId: string) => ItemDef | undefined;
 // phase 10 alchemy apex) join for the same reason and one more: a flask is
 // literally the buff a raider reaches for before a pull, so burying it under 'all'
 // would hide the most-clicked consumable in the game.
-export function matchesCategory(item: ItemDef, category: BagCategory): boolean {
+//
+// Two chips answer about the COPY, not the def, so they read the optional `slot`:
+// - 'favourite' is a player-locked copy (src/sim/item_lock_flag.ts isItemLocked),
+//   the lock the player already sets from the item menu. Without a slot there is
+//   no copy to ask, so it never matches (a def alone is never a favourite).
+// - 'junk' is exactly what the vendor's Sell Junk sweep would sell
+//   (src/sim/items.ts junkSellableSlot, the one sweep rule the vendor preview also
+//   reads), so the tab can never promise a sale the vendor then refuses. Without
+//   a slot it judges a plain single copy, which is what a def-only census means.
+//   Note it keys off poor QUALITY, never kind 'junk': that kind is the generic
+//   material bucket (ores, hides, reagents), which the Materials chip owns.
+export interface CategorySlot {
+  count: number;
+  instance?: ItemInstancePayload;
+}
+
+export function matchesCategory(
+  item: ItemDef,
+  category: BagCategory,
+  slot?: CategorySlot,
+): boolean {
   switch (category) {
     case 'all':
       return true;
@@ -119,7 +148,24 @@ export function matchesCategory(item: ItemDef, category: BagCategory): boolean {
       return item.kind === 'quest';
     case 'mount':
       return item.kind === 'mount';
+    case 'favourite':
+      return slot !== undefined && isItemLocked(slot.instance);
+    case 'junk':
+      return junkSellableSlot(item, slot ?? { count: 1 });
   }
+}
+
+// Stack count of the stacks the Junk chip would show (and Sell Junk would sell),
+// for the chip's count badge: the quest badge's twin, so a player sees "Junk 7"
+// before they walk to a vendor. Unknown defs contribute 0.
+export function bagJunkItemCount(inventory: readonly InvSlot[], lookup: ItemLookup): number {
+  let total = 0;
+  for (const slot of inventory) {
+    const item = lookup(slot.itemId);
+    if (!item || !matchesCategory(item, 'junk', slot)) continue;
+    total += Math.max(0, Math.floor(slot.count));
+  }
+  return total;
 }
 
 // Lower rank sorts first, so a descending-quality view reads legendary -> poor.
@@ -165,7 +211,7 @@ export function applyBagFilter(
     // or a name search excludes it, because with no def there is no kind to
     // classify and no name to match.
     if (!item) return state.category === 'all' && !query;
-    if (!matchesCategory(item, state.category)) return false;
+    if (!matchesCategory(item, state.category, slot)) return false;
     if (query && !item.name.toLowerCase().includes(query)) return false;
     return true;
   });

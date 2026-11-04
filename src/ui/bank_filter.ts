@@ -59,7 +59,9 @@ export function filterBankSlots(
   const filtered = models.filter((m) => {
     const item = lookup(m.itemId);
     if (!item) return state.category === 'all' && !query;
-    if (!matchesCategory(item, state.category)) return false;
+    // The slot-aware chips (Favourites = a locked copy, Junk = what Sell Junk
+    // would take) read the bank slot's own count + instance, exactly as bags do.
+    if (!matchesCategory(item, state.category, m)) return false;
     if (query && !nameOf(m).toLowerCase().includes(query)) return false;
     return true;
   });

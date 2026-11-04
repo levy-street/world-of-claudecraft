@@ -9,25 +9,145 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.bags.filterFavourite",
+    "hudChrome.bags.filterJunk",
+    "hudChrome.bags.filterJunkCountAria",
+    "hudChrome.bags.viewSizeAria",
+    "hudChrome.bags.viewSizeCompact",
+    "hudChrome.bags.viewSizeLarge",
+    "hudChrome.bags.viewSizeList"
+  ],
+  "es_ES": [
+    "hudChrome.bags.filterFavourite",
+    "hudChrome.bags.filterJunk",
+    "hudChrome.bags.filterJunkCountAria",
+    "hudChrome.bags.viewSizeAria",
+    "hudChrome.bags.viewSizeCompact",
+    "hudChrome.bags.viewSizeLarge",
+    "hudChrome.bags.viewSizeList"
+  ],
+  "fr_FR": [
+    "hudChrome.bags.filterFavourite",
+    "hudChrome.bags.filterJunk",
+    "hudChrome.bags.filterJunkCountAria",
+    "hudChrome.bags.viewSizeAria",
+    "hudChrome.bags.viewSizeCompact",
+    "hudChrome.bags.viewSizeLarge",
+    "hudChrome.bags.viewSizeList"
+  ],
+  "fr_CA": [
+    "hudChrome.bags.filterFavourite",
+    "hudChrome.bags.filterJunk",
+    "hudChrome.bags.filterJunkCountAria",
+    "hudChrome.bags.viewSizeAria",
+    "hudChrome.bags.viewSizeCompact",
+    "hudChrome.bags.viewSizeLarge",
+    "hudChrome.bags.viewSizeList"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.bags.filterFavourite",
+    "hudChrome.bags.filterJunk",
+    "hudChrome.bags.filterJunkCountAria",
+    "hudChrome.bags.viewSizeAria",
+    "hudChrome.bags.viewSizeCompact",
+    "hudChrome.bags.viewSizeLarge",
+    "hudChrome.bags.viewSizeList"
+  ],
+  "de_DE": [
+    "hudChrome.bags.filterFavourite",
+    "hudChrome.bags.filterJunk",
+    "hudChrome.bags.filterJunkCountAria",
+    "hudChrome.bags.viewSizeAria",
+    "hudChrome.bags.viewSizeCompact",
+    "hudChrome.bags.viewSizeLarge",
+    "hudChrome.bags.viewSizeList"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.bags.filterFavourite",
+    "hudChrome.bags.filterJunk",
+    "hudChrome.bags.filterJunkCountAria",
+    "hudChrome.bags.viewSizeAria",
+    "hudChrome.bags.viewSizeCompact",
+    "hudChrome.bags.viewSizeLarge",
+    "hudChrome.bags.viewSizeList"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.bags.filterFavourite",
+    "hudChrome.bags.filterJunk",
+    "hudChrome.bags.filterJunkCountAria",
+    "hudChrome.bags.viewSizeAria",
+    "hudChrome.bags.viewSizeCompact",
+    "hudChrome.bags.viewSizeLarge",
+    "hudChrome.bags.viewSizeList"
+  ],
+  "nl_NL": [
+    "hudChrome.bags.filterFavourite",
+    "hudChrome.bags.filterJunk",
+    "hudChrome.bags.filterJunkCountAria",
+    "hudChrome.bags.viewSizeAria",
+    "hudChrome.bags.viewSizeCompact",
+    "hudChrome.bags.viewSizeLarge",
+    "hudChrome.bags.viewSizeList"
+  ],
+  "pl_PL": [
+    "hudChrome.bags.filterFavourite",
+    "hudChrome.bags.filterJunk",
+    "hudChrome.bags.filterJunkCountAria",
+    "hudChrome.bags.viewSizeAria",
+    "hudChrome.bags.viewSizeCompact",
+    "hudChrome.bags.viewSizeLarge",
+    "hudChrome.bags.viewSizeList"
+  ],
+  "id_ID": [
+    "hudChrome.bags.filterFavourite",
+    "hudChrome.bags.filterJunk",
+    "hudChrome.bags.filterJunkCountAria",
+    "hudChrome.bags.viewSizeAria",
+    "hudChrome.bags.viewSizeCompact",
+    "hudChrome.bags.viewSizeLarge",
+    "hudChrome.bags.viewSizeList"
+  ],
+  "tr_TR": [
+    "hudChrome.bags.filterFavourite",
+    "hudChrome.bags.filterJunk",
+    "hudChrome.bags.filterJunkCountAria",
+    "hudChrome.bags.viewSizeAria",
+    "hudChrome.bags.viewSizeCompact",
+    "hudChrome.bags.viewSizeLarge",
+    "hudChrome.bags.viewSizeList"
+  ],
+  "sv_SE": [
+    "hudChrome.bags.filterFavourite",
+    "hudChrome.bags.filterJunk",
+    "hudChrome.bags.filterJunkCountAria",
+    "hudChrome.bags.viewSizeAria",
+    "hudChrome.bags.viewSizeCompact",
+    "hudChrome.bags.viewSizeLarge",
+    "hudChrome.bags.viewSizeList"
+  ],
+  "vi_VN": [
+    "hudChrome.bags.filterFavourite",
+    "hudChrome.bags.filterJunk",
+    "hudChrome.bags.filterJunkCountAria",
+    "hudChrome.bags.viewSizeAria",
+    "hudChrome.bags.viewSizeCompact",
+    "hudChrome.bags.viewSizeLarge",
+    "hudChrome.bags.viewSizeList"
+  ],
+  "da_DK": [
+    "hudChrome.bags.filterFavourite",
+    "hudChrome.bags.filterJunk",
+    "hudChrome.bags.filterJunkCountAria",
+    "hudChrome.bags.viewSizeAria",
+    "hudChrome.bags.viewSizeCompact",
+    "hudChrome.bags.viewSizeLarge",
+    "hudChrome.bags.viewSizeList"
+  ]
 };

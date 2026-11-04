@@ -5357,7 +5357,20 @@ export const hudChromeStrings = {
     // visible count badge is aria-hidden, so this whole phrase carries the
     // number for assistive tech. {count} is already formatNumber'd by the host.
     filterQuestCountAria: 'Quest, {count} items',
+    // The player's locked copies (src/sim/item_lock.ts): the lock IS the
+    // favorite mark, so this chip shows exactly what Lock Item protected.
+    filterFavourite: 'Favorites',
+    // Exactly what the vendor's Sell Junk would sell (junkSellableSlot).
+    filterJunk: 'Junk',
+    // Accessible name for the Junk chip when it has a count badge (the badge
+    // itself is aria-hidden). {count} is already formatNumber'd by the host.
+    filterJunkCountAria: 'Junk, {count} items',
     filterMount: 'Mounts',
+    // The bag view size select (bag_view_size_core.ts): presentation only.
+    viewSizeAria: 'Bag view size',
+    viewSizeCompact: 'Compact',
+    viewSizeLarge: 'Large',
+    viewSizeList: 'List',
     sortAria: 'Sort bag items',
     sortRecent: 'Recent',
     sortQuality: 'Quality',

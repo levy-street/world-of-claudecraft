@@ -95,6 +95,7 @@ const FULL_KEYS = [
   'minimapZoom',
   'woc_bag_filter',
   'woc_bank_filter',
+  'woc_bag_view_size',
   'woc_crafting_tab',
   'woc_guild_hide_offline',
   'woc_party_collapsed',

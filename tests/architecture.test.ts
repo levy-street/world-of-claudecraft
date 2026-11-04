@@ -485,6 +485,7 @@ const UI_PURE_CORES = [
   'src/ui/item_instance_glyph_mark.ts',
   'src/ui/bag_corner_mark_view.ts',
   'src/ui/bag_fine_mark_view.ts',
+  'src/ui/bag_view_size_core.ts',
   'src/ui/bag_quest_mark_view.ts',
   'src/ui/bag_quest_tracker_highlight_view.ts',
   'src/ui/quest_item_tooltip_view.ts',
