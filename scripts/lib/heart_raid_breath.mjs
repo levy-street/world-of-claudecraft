@@ -413,7 +413,10 @@ function plan(world, st) {
     }
     // No healer or too few to kill the adds: the isle is left to burst.
     const healer = group.some((pid) => world.players.get(pid)?.healer);
-    if (group.length < 4 || !healer) {
+    // Normal: the raid stays on the Cornice and lets the Bulwark burst (the
+    // design's way for a raid that never rides; the bots' isle groups died
+    // to the Sentinel more often than not).
+    if (DIFF === 'normal' || group.length < 4 || !healer) {
       st.riders.set(isle, []);
       log(`ISLE ${isle}: nobody rides (no healer or too few free)`);
       continue;

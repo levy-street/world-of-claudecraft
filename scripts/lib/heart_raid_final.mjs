@@ -60,7 +60,7 @@ const SPLINTERS = new Set(Object.values(FINAL_ADD_MOBS));
 const L = (world, p) => ({ x: p.x - world.origin.x, z: p.z - world.origin.z });
 const W = (world, p) => ({ x: p.x + world.origin.x, z: p.z + world.origin.z });
 /** Move the boss on once its quarter's bar passes this. */
-const MOVE_AT = 62;
+const MOVE_AT = 45;
 
 export const final = {
   key: 'final',
@@ -198,7 +198,7 @@ export const final = {
   statusLine(world) {
     const b = world.mobs.boss;
     if (!b) return '-';
-    const z = finalZoneOf(auraOf(b, FINAL_AURAS.state)?.value);
+    const z = zoneCode(b);
     const bars = HEART_QUARTER_ORDER.map(
       (v) => `${v[0]}${Math.round(auraOf(b, overloadAuraId(v))?.value ?? 0)}`,
     ).join(' ');
@@ -220,6 +220,13 @@ export const final = {
   },
 };
 
+/** The zone on the boss's state aura (a value of 0, the first quarter, rides
+ *  the wire as an absent value). */
+function zoneCode(b) {
+  const a = auraOf(b, FINAL_AURAS.state);
+  return a ? finalZoneOf(a.value ?? 0) : 'ring';
+}
+
 function init(st) {
   if (st.zones) return;
   Object.assign(st, {
@@ -235,7 +242,7 @@ function init(st) {
 
 function zoneOfBoss(world) {
   const b = world.mobs.boss;
-  return b ? finalZoneOf(auraOf(b, FINAL_AURAS.state)?.value) : 'ring';
+  return b ? zoneCode(b) : 'ring';
 }
 function bar(world, vein) {
   const b = world.mobs.boss;
