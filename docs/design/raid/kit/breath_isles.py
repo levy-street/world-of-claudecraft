@@ -220,7 +220,7 @@ CRYSTAL_TINT = (0.22, 0.52, 0.62)
 # The crag right under the turf: dark, warm and layered (it frames the walk).
 CRAG = (0.19, 0.165, 0.15)
 CRAG_BED = (0.3, 0.26, 0.22)
-FLOWERS = ((0.9, 0.87, 0.78), (0.86, 0.72, 0.32), (0.58, 0.48, 0.74), (0.82, 0.5, 0.42))
+FLOWERS = ((0.8, 0.78, 0.68), (0.76, 0.65, 0.34), (0.54, 0.47, 0.64), (0.72, 0.5, 0.42))
 
 # Face kinds of their own (painted in IslePiece.finish).
 TURF_K, SOIL_K, LEAF_K, FLAG_K = 20, 21, 22, 23
@@ -239,7 +239,9 @@ ISLE_SPECS = {
               # beds under a thin turf.
               proms=(6.22, 5.38, 1.62, 3.63),
               # The bays (deep lips, hanging roots and curtains of vines).
-              bays=(4.68, 0.79, 2.54)),
+              bays=(4.68, 0.79, 2.54),
+              # The ruin isle: dry and warm, ochre in its wear.
+              key=((0.56, 0.5, 0.34), 0.16)),
     # B: broad and twin-fanged (two spires near as long and a third short); a
     # wind-bent tree on the south promontory, a runed stone at the tongue's tip
     # and one over the two ledges, a fallen stone on a shelf under a bay.
@@ -250,6 +252,8 @@ ISLE_SPECS = {
               stones=(5.98, 1.13, 3.55), arch=None, tree=4.01, fallen=4.84, sun=(0.03, 1.0),
               proms=(5.93, 1.13, 4.01, 2.65),
               bays=(4.84, 0.44, 1.75),
+              # The tree's isle: cool and lush.
+              key=((0.27, 0.36, 0.25), 0.16),
               # The broadest isle's crag a little coarser (its tree and two
               # ledges pay for it, inside the isle's budget).
               sculpt=1900),
@@ -592,6 +596,24 @@ class IslePiece(BreathPiece):
             h = rise(p.x, p.y)
             base = mix(base, TURF_SUN, sstep(0.0, 0.05, h) * 0.5)
             base = mix(base, TURF_COOL, sstep(0.0, -0.05, h) * 0.55)
+        walk = getattr(self, 'walk_poly', None)
+        if walk is not None:
+            a = math.atan2(p.y, p.x)
+            sd = float(poly_sd(walk, np.array([p.x]), np.array([p.y]))[0])
+            near_rim = sstep(-1.6, -0.35, sd)
+            bay = _ang_near(a, self.bay_angles, 0.32)
+            prom = _ang_near(a, self.prom_angles, 0.16)
+            # Lush and dark where the bays shelter it.
+            base = mix(base, mix(MOSS_DEEP, TURF_COOL, 0.4), bay * sstep(-4.0, -0.8, sd) * 0.55)
+            # The rim rolls: a darker band a yard in.
+            base = mix(base, MOSS_DEEP, near_rim * (1 - sstep(-0.35, -0.05, sd)) * 0.35)
+            # On a promontory's tip the grass thins to bare, bedded rock.
+            base = mix(base, mix(CRAG_BED, ROCK_WARM, 0.4), prom * sstep(-1.1, -0.25, sd) * 0.8)
+            for (sx, sy) in self.lee:
+                d = math.hypot(p.x - sx, p.y - sy)
+                base = mix(base, MOSS_DEEP, sstep(2.4, 0.6, d) * 0.45)
+            key = self.key_tint
+            base = mix(base, key[0], key[1])
         m = _fbm(p.x * 0.38 + 9.0, p.y * 0.38, 1.0)
         base = mix(base, MOSS_DEEP, sstep(0.44, 0.24, m) * 0.6)
         base = mix(base, TURF_SUN, sstep(0.6, 0.8, m) * 0.45)
@@ -604,7 +626,9 @@ class IslePiece(BreathPiece):
             t = max(0.0, min(1.0, ((p.x - x0) * ex + (p.y - y0) * ey) / (ex * ex + ey * ey)))
             d = math.hypot(p.x - x0 - ex * t, p.y - y0 - ey * t)
             wear = sstep(w * 1.6, w * 0.4, d) * (0.6 + 0.4 * _fbm(p.x * 1.1, p.y * 1.1, 4.0))
-            base = mix(base, mix(TURF_DRY, SOIL, 0.55), wear * 0.9)
+            # Bleached and trodden: a pale straw edge, bare earth at its heart.
+            base = mix(base, mix(TURF_DRY, (0.62, 0.56, 0.43), 0.5), sstep(w * 1.9, w * 0.9, d) * 0.55)
+            base = mix(base, mix(TURF_DRY, SOIL, 0.5), wear * 0.85)
         # Combed by the gale (soft streaks along the wind's line).
         streak = math.sin((p.x * 0.6 + p.y * 0.8) * 2.2 + b * 4.0)
         base = tuple(ch * (1.0 + 0.06 * streak) for ch in base)
@@ -769,18 +793,18 @@ def _isle_field(S, walk, ledges, rng):
     # Under the lip, the crag in beds (laid after the lip's fall, so they
     # stand proud of it): flat-topped slabs stepping out round the crown in
     # courses (never a smooth drum under the turf).
-    for course, (z0, out0, th) in enumerate(((-1.0, 0.15, 1.0), (-2.2, 0.7, 1.1), (-3.4, 1.1, 1.2),
-                                             (-4.7, 0.9, 1.3))):
-        n = 20 - course * 3
+    for course, (z0, out0, th) in enumerate(((-1.05, 0.2, 0.75), (-2.1, 0.75, 0.8), (-3.3, 1.15, 0.9),
+                                             (-4.6, 0.9, 1.0))):
+        n = 13 - course * 2
         off = float(rng.uniform(0, TAU))
         for k in range(n):
-            a = off + TAU * k / n + float(rng.uniform(-0.08, 0.08))
+            a = off + TAU * k / n + float(rng.uniform(-0.1, 0.1))
             r = edge_r(walk, a) + out0 * float(rng.uniform(0.6, 1.3)) - 0.6
-            w = float(rng.uniform(1.6, 2.6))
+            w = float(rng.uniform(2.6, 3.8))
             f.put(('g5', 'g0', 'g4')[k % 3], block(
                 rng, (math.cos(a) * r, math.sin(a) * r, z0 - float(rng.uniform(0, 0.3))),
-                (1.6 + out0, w, th * float(rng.uniform(0.8, 1.15))), cuts=6, chamfer=(0.9, 0.99),
-                R=rot(rz=a + float(rng.uniform(-0.15, 0.15)), ry=float(rng.uniform(-0.06, 0.06)))), 0.12)
+                (1.9 + out0, w, th * float(rng.uniform(0.8, 1.15))), cuts=5, chamfer=(0.93, 0.99),
+                R=rot(rz=a + float(rng.uniform(-0.12, 0.12)), ry=float(rng.uniform(-0.05, 0.05)))), 0.12)
     # The promontories: the crag's dark beds stepping out under a thin
     # turf skin, flat-topped and thin (never a floor-high ledge by the rim).
     for a0 in S['proms']:
@@ -815,7 +839,9 @@ def _isle_field(S, walk, ledges, rng):
         at = (math.cos(a) * r, math.sin(a) * r)
         sat_tips.append(_satellite(f, rng, at, top, size, depth))
         # Its top flat (a small walk of turf).
-        near = ((X - at[0]) ** 2 + (Y - at[1]) ** 2 < (size * 1.8) ** 2) + 0 * Z
+        ang = np.arctan2(Y - at[1], X - at[0])
+        ragged = size * (1.55 + 0.3 * np.sin(ang * 3.0 + a * 7.0) + 0.18 * np.sin(ang * 5.0 + a * 3.0))
+        near = ((X - at[0]) ** 2 + (Y - at[1]) ** 2 < ragged ** 2) + 0 * Z
         f.d = np.where(near, np.maximum(f.d, (Z - top).astype(np.float32)), f.d)
     outcrops = list(S['stones'])
     if S['arch']:
@@ -949,12 +975,19 @@ def _cap(p, walk, ledges, rng, rise, S):
                     continue
                 if r == 0:
                     with p.as_kind(TURF_K):
-                        p._paint([face], p.vary(TURF, 0.08), STONE)
+                        p._paint([face], p.vary(TURF_SUN, 0.08), STONE)
                 else:
                     with p.as_kind(RAW):
                         p._paint([face], p.vary((CRAG_BED, CRAG, CRAG_BED, CRAG)[r], 0.07), STONE)
                 face.smooth = r == 0
                 p.facing([face], (ox, oy, 0.2))
+        # One slab broken out of the step, leaning against it.
+        k = len(run) // 3
+        x, y, low, high, ox, oy = run[k]
+        with p.as_kind(RAW):
+            slab(p, (x + ox * 0.16, y + oy * 0.16, low + (high - low) * 0.2), (0.6, 0.16, (high - low) * 0.55),
+                 p.vary(CRAG_BED, 0.06), yaw=math.atan2(oy, ox) + math.pi / 2, pitch=0.0, roll=-0.3, chamfer=0.05,
+                 jitter=0.04)
         # Boulders set into the step (low: never over a body's ankle on the
         # floor below), a little apart.
         with p.as_kind(RAW):
@@ -1001,10 +1034,14 @@ def _cap(p, walk, ledges, rng, rise, S):
         for i in range(nb):
             f = bm.faces.new((a[i], b[i], b[(i + 1) % nb], a[(i + 1) % nb]))
             (lip_turf if k < 2 else lip_soil).append(f)
+    bare = [f for k, f in enumerate(lip_turf + lip_soil) if promk[k % nb] > 0.55]
+    bare_set = set(bare)
     with p.as_kind(TURF_K):
-        p._paint(lip_turf, TURF, STONE)
+        p._paint([f for f in lip_turf if f not in bare_set], TURF, STONE)
     with p.as_kind(SOIL_K):
-        p._paint(lip_soil, SOIL, STONE)
+        p._paint([f for f in lip_soil if f not in bare_set], SOIL, STONE)
+    with p.as_kind(RAW):
+        p._paint(bare, CRAG_BED, STONE)
     for f in lip_turf + lip_soil:
         f.smooth = True
     centre = Vector((0.0, 0.0, 1.5))
@@ -1099,7 +1136,7 @@ def _shrine_floor(p, walk, pads, rng):
         cx, cy = math.cos(am) * rm, math.sin(am) * rm
         if math.hypot(cx - home[0], cy - home[1]) < PAD_R + 0.9:
             continue
-        if rng.uniform(0, 1) < 0.33:
+        if rng.uniform(0, 1) < 0.5:
             continue
         L = float(rng.uniform(0.75, 1.35))
         W = float(rng.uniform(0.6, 1.05))
@@ -1371,19 +1408,21 @@ def _tree(p, base, a, rng):
             p.sweep([tuple(q0), tuple(q1), tuple(q2)], 0.22 if k < 2 else 0.16, 0.06, p.vary(BARK, 0.06), sides=5)
             tips.append(q2)
     with p.as_kind(LEAF_K):
-        for q in tips + [trunk[-1]]:
+        for q in tips:
             for j in range(2):
-                c = q + out * float(rng.uniform(-0.3, 0.5)) + side * float(rng.uniform(-0.7, 0.7)) \
-                    + Vector((0, 0, float(rng.uniform(-0.2, 0.5))))
-                s = float(rng.uniform(1.2, 1.8))
-                crystal(p, tuple(c), (s * 1.6, s * 1.1, s * 0.8), p.vary(LEAF, 0.1), n=16, boxy=1.0,
-                        jitter=0.18, yaw=a + float(rng.uniform(-0.4, 0.4)))
+                c = q + out * float(rng.uniform(0.1, 0.6)) + side * float(rng.uniform(-0.6, 0.6)) \
+                    + Vector((0, 0, float(rng.uniform(-0.15, 0.25))))
+                s = float(rng.uniform(1.2, 1.7))
+                crystal(p, tuple(c), (s * 2.0, s * 1.05, s * 0.55), p.vary(mix(LEAF, MOSS_DEEP, 0.35), 0.08),
+                        n=16, boxy=1.0, jitter=0.18, yaw=a + float(rng.uniform(-0.25, 0.25)))
     return trunk[-1]
 
 
-def _flowers(p, c, rng, n=4):
-    """A few wildflowers in a clump (small painted heads on short stems)."""
-    tone = FLOWERS[int(rng.integers(0, len(FLOWERS)))]
+def _flowers(p, c, rng, n=4, tone=None):
+    """A few wildflowers in a clump (small painted heads on short stems), one
+    hue to a clump."""
+    if tone is None:
+        tone = FLOWERS[int(rng.integers(0, len(FLOWERS)))]
     with p.as_kind(PAINT):
         for _ in range(n):
             a = float(rng.uniform(0, TAU))
@@ -1518,6 +1557,15 @@ def wind_isle(bpy, variant):
         return 0.06 * edge_k * float(n3.fbm(np.array([x * 0.22]), np.array([y * 0.22]), np.array([0.5]), 2)[0])
     p.turf_rise = rise
     p.sun = S['sun']
+    p.walk_poly = walk
+    p.bay_angles = S['bays']
+    p.prom_angles = S['proms']
+    p.key_tint = S['key']
+    p.lee = [edge_pt(walk, a, -1.2)[:2] for a in S['stones']]
+    if S['arch']:
+        p.lee += [edge_pt(walk, a, -1.0)[:2] for a in S['arch']]
+    if S['tree'] is not None:
+        p.lee.append(edge_pt(walk, S['tree'], -1.4)[:2])
     edge, nrm, lvl, risers = _cap(p, walk, ledges, rng, rise, S)
     _shrine_floor(p, walk, pads, rng)
     home_a = math.atan2(pads['home'][1], pads['home'][0])
@@ -1532,15 +1580,18 @@ def wind_isle(bpy, variant):
         return (x, y, lv(math.cos(a) * (er - 0.4), math.sin(a) * (er - 0.4)) + dz)
 
     def flower_bed(c, n, spread=0.55):
-        """Grass and flowers gathered in a clump (against a stone, at a foot)."""
+        """Grass and flowers gathered in a dense clump (against a stone, at a
+        foot), the flowers all of one hue."""
+        tone = FLOWERS[int(rng.integers(0, len(FLOWERS)))]
         for j in range(n):
             b = float(rng.uniform(0, TAU))
-            rr = float(rng.uniform(0.1, spread))
+            rr = float(rng.uniform(0.05, spread * 0.7))
             q = (c[0] + math.cos(b) * rr, c[1] + math.sin(b) * rr, c[2])
             if j % 3 == 0:
-                _flowers(p, q, rng, n=3)
+                _flowers(p, q, rng, n=3, tone=tone)
             else:
-                _tuft(p, q, float(rng.uniform(0.22, 0.4)), rng, blades=int(rng.integers(3, 6)))
+                # Ankle-high at most (a blade never reads as a wall).
+                _tuft(p, q, float(rng.uniform(0.22, 0.33)), rng, blades=int(rng.integers(3, 5)))
 
     # The ruins on the promontories, past the walk: the runed standing stones
     # (one broken on each isle), the arch or the tree, each with grass and
@@ -1666,7 +1717,7 @@ def wind_isle(bpy, variant):
         flower_bed((x + s2 * 0.9, y, lv(x, y)), 1, 0.25)
         placed += 1
     # Flowers in drifts along the lip.
-    for k in range(0, len(edge), 12):
+    for k in range(0, len(edge), 16):
         x, y = edge[k]
         nx, ny = nrm[k]
         if math.hypot(x - pads['home'][0], y - pads['home'][1]) < PAD_R + 0.4 or rng.uniform(0, 1) < 0.35:
