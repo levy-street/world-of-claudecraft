@@ -58,6 +58,7 @@ import {
 import { heartVeinGlowMaterial } from '../smith_heart/heart_room_kit';
 import { radialGlowTexture } from '../textures';
 import { EngineParticles } from '../trash_engine_fx/engine_particles';
+import { SOCKET_FRAG, SOCKET_VERT } from './quench_blade_socket_glsl';
 import {
   BLADE_FLOAT_LIFT,
   BLADE_FOLLOW_RATE,
@@ -82,54 +83,7 @@ const KIT_LEAN = 0.17;
 const _look: BladeLook = { lift: 0, upright: 0, light: 0, shake: 0 };
 const _e = new THREE.Euler();
 
-const SOCKET_VERT = /* glsl */ `
-varying vec2 vUv;
-void main() {
-  vUv = uv;
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-}
-`;
-/** The broken ice a blade leaves in the lake once torn out (audit point 19:
- *  a ring of radial sectors round a black middle read as a drain): plates of
- *  the lake heaved and cracked along warped seams, a ragged edge melting into
- *  the lake, and the slot of dark water the blade stood in, long along its
- *  broad face. */
-const SOCKET_FRAG = /* glsl */ `
-uniform float uAlpha;
-uniform vec3 uDark;
-uniform vec3 uLight;
-varying vec2 vUv;
-float h(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
-float n(vec2 p) {
-  vec2 i = floor(p);
-  vec2 f = fract(p);
-  f = f * f * (3.0 - 2.0 * f);
-  return mix(mix(h(i), h(i + vec2(1, 0)), f.x), mix(h(i + vec2(0, 1)), h(i + vec2(1, 1)), f.x), f.y);
-}
-void main() {
-  vec2 p = (vUv - 0.5) * 2.0;
-  float r = length(p);
-  float a = atan(p.y, p.x);
-  float rag = 0.74 + 0.18 * n(vec2(a * 2.5, 1.7)) + 0.06 * n(vec2(a * 9.0, 4.1));
-  if (r > rag) discard;
-  // Heaved plates along warped seams (never sectors of a circle).
-  vec2 q = p * 2.4 + vec2(n(p * 3.0), n(p * 3.0 + 7.0)) * 0.8;
-  float plate = h(floor(q));
-  vec2 f = fract(q);
-  float seam = min(min(f.x, 1.0 - f.x), min(f.y, 1.0 - f.y));
-  float crack = (1.0 - smoothstep(0.02, 0.07, seam)) * smoothstep(0.15, 0.45, r);
-  // The slot the blade stood in: dark water, long along its broad face.
-  float slot = 1.0 - smoothstep(0.1, 0.2, length(p * vec2(0.5, 1.7)) + 0.06 * n(p * 9.0));
-  // Lake ice heaved up, a touch paler than the lake round it, never a white disc.
-  vec3 ice = mix(uDark * 2.2, uLight * 0.62, 0.3 + 0.35 * plate);
-  vec3 col = mix(ice, uDark * 0.9, crack * 0.65);
-  col = mix(col, uDark * 0.35, slot);
-  float alpha = (1.0 - smoothstep(rag - 0.14, rag, r)) * uAlpha;
-  alpha *= 0.26 + 0.16 * plate + 0.6 * slot + 0.3 * crack;
-  gl_FragColor = vec4(col, alpha);
-  #include <colorspace_fragment>
-}
-`;
+// The socket's shaders: quench_blade_socket_glsl.ts.
 
 interface BladeView {
   /** The blade's home (QUENCH_BLADE_SPOTS index) when it is drawn at home. */
@@ -580,13 +534,15 @@ export class QuenchBladesFx {
     (this.glowMats[b.home].uniforms.uColor.value as THREE.Color)
       .setHex(C.bladeLight)
       .multiplyScalar(0.8 + 1.4 * Math.max(look.light, held ? 1.2 : 0));
-    // The torn socket at its home once it has risen out of the lake.
-    const torn = state !== 'sunk' && b.lift > 0.5;
-    b.socket.visible = torn;
-    if (torn) {
+    // The socket at its home the whole fight, along the blade's broad face:
+    // seated, the blade stands in its slot; torn out, the slot stays
+    // (quench_blade_socket_glsl.ts).
+    b.socket.visible = true;
+    {
       const hx = this.origin.x + home.x;
       const hz = this.origin.z + home.z;
       b.socket.position.set(hx, this.groundY(hx, hz) + 0.05, hz);
+      b.socket.rotation.y = home.rot;
       b.socketMat.uniforms.uAlpha.value = 1;
     }
     this.cosmetics(e, b, look, state, floor, dt);

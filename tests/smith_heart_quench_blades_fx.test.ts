@@ -9,6 +9,7 @@
 
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
+import { SOCKET_FRAG } from '../src/render/smith_heart_fx/quench_blade_socket_glsl';
 import { QuenchBladesFx } from '../src/render/smith_heart_fx/quench_blades_fx';
 import {
   BLADE_HOMES,
@@ -113,6 +114,33 @@ describe('QuenchBladesFx over a fake world on a 20 Hz clock', () => {
     const holder = (i: number) => scene.getObjectByName(`quenchBlade:${i}`) as THREE.Object3D;
     return { entities, world, scene, fx, holder, blades, boss };
   }
+
+  it('seats a sunk blade in its socket, carved along its broad face, and keeps the slot once torn', () => {
+    // The AAA pass's third round: the socket read as a pale sticker the blade floated over.
+    const { fx, scene, blades } = rig();
+    for (const b of blades) b.templateId = bladeTemplate('sunk');
+    for (let i = 0; i < 10; i++) fx.update(1 / 60);
+    const sockets: THREE.Object3D[] = [];
+    scene.traverse((x) => {
+      if (x.name === 'smithHeartQuenchBladeSocket') sockets.push(x);
+    });
+    expect(sockets.length).toBe(BLADE_HOMES.length);
+    sockets.forEach((s, i) => {
+      expect(s.visible).toBe(true);
+      expect(s.position.x).toBeCloseTo(o.x + BLADE_HOMES[i].x, 6);
+      expect(s.position.z).toBeCloseTo(o.z + BLADE_HOMES[i].z, 6);
+      expect(s.rotation.y).toBeCloseTo(BLADE_HOMES[i].rot, 6);
+    });
+    for (const b of blades) b.templateId = bladeTemplate('float');
+    for (let i = 0; i < 30; i++) fx.update(1 / 60);
+    for (const s of sockets) expect(s.visible).toBe(true);
+    // Carved, never painted on: a slot with walls and a lit lip, no hard edge.
+    expect(SOCKET_FRAG).toContain('float wall');
+    expect(SOCKET_FRAG).toContain('float lipLit');
+    expect(SOCKET_FRAG).toContain('smoothstep(rag * 0.45, rag, r)');
+    expect(SOCKET_FRAG).not.toMatch(/pow\(/);
+    fx.dispose();
+  });
 
   it('a floating blade glides after its object instead of stepping with it', () => {
     const { fx, holder, blades } = rig();
