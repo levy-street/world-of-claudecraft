@@ -5316,6 +5316,16 @@
     max-height: calc(var(--app-vh) * 0.34 / var(--ui-scale, 1));
     overflow-y: auto;
   }
+  /* The Professions hub strip scrolls sideways on a phone rather than
+     wrapping, and each tab keeps the 40px touch floor. */
+  body.mobile-touch .prof-hub-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+  body.mobile-touch .prof-hub-tab {
+    min-height: 40px;
+    white-space: nowrap;
+  }
   body.mobile-touch .crafting-tabs {
     flex-wrap: nowrap;
     overflow-x: auto;
@@ -6461,18 +6471,6 @@
   }
   body.mobile-touch #char-window .char-sidebar-tab {
     min-height: 40px;
-  }
-  @media (max-width: 720px) {
-    body.mobile-touch #char-window .char-skills,
-    body.mobile-touch #char-window .char-skill-list {
-      grid-template-columns: minmax(0, 1fr);
-    }
-    body.mobile-touch #char-window .char-skill-name {
-      font-size: 16px;
-    }
-    body.mobile-touch #char-window .char-open-professions {
-      justify-self: stretch;
-    }
   }
   @media (orientation: landscape) {
     body.mobile-touch #char-window {

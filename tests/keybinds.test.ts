@@ -171,22 +171,16 @@ describe('registry', () => {
     expect(hideUi?.category).toBe('Interface');
     expect(hideUi?.kind).toBe('edge');
     expect(hideUi?.defaults).toEqual(['Alt+KeyZ']);
-    // The Harvest Journal is a rebindable Interface toggle on the shifted layer
-    // of KeyK (Shift+H and Shift+J, its own initials, are Damage Meters and
-    // Target Buffs/Debuffs); bare KeyK stays the Leaderboard, so the two share
-    // the physical key across layers and never collide.
-    const journal = BIND_ACTIONS.find((a) => a.id === 'harvestJournal');
-    expect(journal?.category).toBe('Interface');
-    expect(journal?.kind).toBe('edge');
-    expect(journal?.defaults).toEqual(['Shift+KeyK']);
-    // Perfecting is a rebindable Interface toggle on the shifted layer of KeyT
-    // (Crafting's letter; its own initial is the Spellbook bare and Professions
-    // shifted), so the crafting family's endgame window sits over Crafting and
-    // the two share the physical key across layers without colliding.
-    const perfecting = BIND_ACTIONS.find((a) => a.id === 'perfecting');
-    expect(perfecting?.category).toBe('Interface');
-    expect(perfecting?.kind).toBe('edge');
-    expect(perfecting?.defaults).toEqual(['Shift+KeyT']);
+    // The Harvest Journal and Perfecting are Professions hub tabs (menu
+    // consolidation step 1): rebindable Interface actions that open the hub on
+    // their tab, with NO default key (Shift+K and Shift+T are freed; Shift+P
+    // opens the hub and T lands on its Crafting tab).
+    for (const id of ['harvestJournal', 'perfecting']) {
+      const tab = BIND_ACTIONS.find((a) => a.id === id);
+      expect(tab?.category, id).toBe('Interface');
+      expect(tab?.kind, id).toBe('edge');
+      expect(tab?.defaults, id).toEqual([]);
+    }
     // Loot Explorer is a rebindable Interface toggle on the shifted layer of
     // KeyO (bare KeyO is free), matching the collection/catalog convention
     // every other shifted-letter window uses.

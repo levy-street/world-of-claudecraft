@@ -6355,6 +6355,9 @@ export const ja_JP: EnTranslations = {
       "sharpeningStoneUse": "使用: メインハンド武器を研ぎ、30 分間攻撃力が 6 上昇します。",
       "manaElixirUse": "使用: 1 時間精神が 6 上昇します。"
     },
+    "professionsHub": {
+      "tabOverview": "概要"
+    },
     "professions": {
       "title": "専門技能",
       "close": "専門技能を閉じる",

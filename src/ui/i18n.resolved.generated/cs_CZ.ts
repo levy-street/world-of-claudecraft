@@ -6355,6 +6355,9 @@ export const cs_CZ: EnTranslations = {
       "sharpeningStoneUse": "Použití: Nabrousí tvou zbraň v hlavní ruce, zvyšuje útočnou moc o 6 na 30 minut.",
       "manaElixirUse": "Použití: Zvyšuje duch o 6 na 1 hodinu."
     },
+    "professionsHub": {
+      "tabOverview": "Overview"
+    },
     "professions": {
       "title": "Profese",
       "close": "Zavřít profese",

@@ -487,7 +487,7 @@ describe('hudChrome.gathering catch line (Professions 2.0)', () => {
     );
   });
 
-  it('both profession windows read the shared name table rather than a private copy', () => {
+  it('every gathering-name consumer reads the shared name table rather than a private copy', () => {
     // The half the map read above cannot see: a window that re-privatises its
     // own copy would keep passing the exhaustiveness arm while drifting from
     // it. Comments are stripped first, so the import cannot be satisfied by a
@@ -501,8 +501,9 @@ describe('hudChrome.gathering catch line (Professions 2.0)', () => {
         // then `//` would be truncated; verified absent in the files below,
         // and a URL's `//` follows a colon, so it is never matched.
         .replace(/(^|\s)\/\/.*$/gm, '$1');
+    // (The Character sheet's Skills tab, once a consumer, left with the
+    // Professions hub: its Overview tab is the professions window below.)
     for (const file of [
-      'src/ui/char_window.ts',
       'src/ui/hud/professions/professions_window.ts',
       // The third consumer, which is why the table was extracted at all.
       'src/ui/hud/vendor/vendor_window.ts',

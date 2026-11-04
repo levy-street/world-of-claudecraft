@@ -6355,6 +6355,9 @@ export const fr_FR: EnTranslations = {
       "sharpeningStoneUse": "Utilisation : Aiguise votre arme principale, augmentant la Puissance d'attaque de 6 pendant 30 min.",
       "manaElixirUse": "Utilisation : Augmente l'Esprit de 6 pendant 1 heure."
     },
+    "professionsHub": {
+      "tabOverview": "Overview"
+    },
     "professions": {
       "title": "Métiers",
       "close": "Fermer les métiers",

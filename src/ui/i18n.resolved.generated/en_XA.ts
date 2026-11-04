@@ -6355,6 +6355,9 @@ export const en_XA: EnTranslations = {
       "sharpeningStoneUse": "[Úšé: Šĥáŕþéñš ýóúŕ ɱáíñ ĥáñð ŵéáþóñ, íñçŕéášíñĝ Áţţáçķ Þóŵéŕ ƀý 6 ƒóŕ 30 ɱíñ.]",
       "manaElixirUse": "[Úšé: Íñçŕéášéš Šþíŕíţ ƀý 6 ƒóŕ 1 ĥóúŕ.]"
     },
+    "professionsHub": {
+      "tabOverview": "[Óʋéŕʋíéŵ]"
+    },
     "professions": {
       "title": "[Þŕóƒéššíóñš]",
       "close": "[Çļóšé þŕóƒéššíóñš]",

@@ -191,15 +191,6 @@ describe('char_window: paperdoll helm-visibility eye', () => {
 });
 
 describe('char_window: profession art placements', () => {
-  it('renders gathering rows through the art-or-procedural icon resolver', () => {
-    // professionIconUrl, not professionImageUrl: the resolver that falls back
-    // to the procedural composer, so a pending-art profession still paints
-    // (the five-icon render test below pins the behavior; this pins the seam).
-    expect(painter).toMatch(/professionIconUrl\(`gather_\$\{r\.professionId\}`, 96\)/);
-    expect(painter).toContain('class="char-gather-icon"');
-    expect(painter).toContain('class="char-gather-row char-skill-row');
-  });
-
   it('shows the current pair crest inline without inventing a tiny tooltip target', () => {
     expect(painter).toContain('archetypeImageUrl(world.archetypeTitle)');
     expect(painter).toContain('class="char-archetype-title-crest"');
@@ -207,7 +198,7 @@ describe('char_window: profession art placements', () => {
     expect(painter).toContain('alt=""');
   });
 
-  it('paints the exact gathering, Honor, and archetype identities', () => {
+  it('paints the exact Honor and archetype identities', () => {
     let canvasContext: unknown;
     canvasContext = new Proxy(
       {},
@@ -222,11 +213,6 @@ describe('char_window: profession art placements', () => {
     );
     const root = document.createElement('div');
     document.body.appendChild(root);
-    const professionsLauncher = document.createElement('button');
-    professionsLauncher.id = 'mm-professions';
-    const openProfessions = vi.fn();
-    professionsLauncher.addEventListener('click', openProfessions);
-    document.body.appendChild(professionsLauncher);
     let world = {
       cfg: { playerClass: 'warrior' },
       player: { name: 'Aurelia', level: 60, skin: 0 },
@@ -302,8 +288,10 @@ describe('char_window: profession art placements', () => {
       ['reputation', 'false'],
       ['currencies', 'false'],
       ['progression', 'false'],
-      ['skills', 'false'],
     ]);
+    // The Skills tab left the sheet with the Professions hub (menu
+    // consolidation step 1): the hub's Overview tab owns those rows.
+    expect(root.querySelector('[data-tab="skills"]')).toBeNull();
     expect(tabs.every((tab) => tab.closest('.char-footer') !== null)).toBe(true);
     // The sidebar panel scrolls and the Stats board holds no focusable
     // content, so it carries its own tab stop and takes its name from the
@@ -322,31 +310,6 @@ describe('char_window: profession art placements', () => {
     expect(root.querySelector('#char-sidebar-panel')?.getAttribute('aria-labelledby')).toBe(
       'char-sidebar-tab-progression',
     );
-    // Gathering now lives on the Skills board instead of being duplicated under Stats.
-    const skillsTab = root.querySelector<HTMLElement>('[data-tab="skills"]');
-    skillsTab?.focus();
-    skillsTab?.click();
-    expect(document.activeElement).toBe(root.querySelector('[data-tab="skills"]'));
-    expect(root.querySelector('[data-tab="skills"]')?.getAttribute('aria-selected')).toBe('true');
-    const skillGroups = root.querySelectorAll<HTMLElement>('.char-skill-group');
-    expect(skillGroups).toHaveLength(2);
-    const craftingRows = skillGroups[1].querySelectorAll<HTMLElement>('.char-skill-row');
-    expect(craftingRows).toHaveLength(CRAFT_RING.length);
-    expect(craftingRows[0].classList.contains('is-empty')).toBe(false);
-    expect([...craftingRows].slice(1).every((row) => row.classList.contains('is-empty'))).toBe(
-      true,
-    );
-    expect([...craftingRows].map((row) => row.querySelector('b')?.textContent)).toEqual(
-      CRAFT_RING.map((craft, index) => `${index === 0 ? 37 : 0} / ${craft.maxSkill}`),
-    );
-    expect(skillGroups[1].querySelectorAll('.char-skill-rail')).toHaveLength(CRAFT_RING.length);
-    expect(
-      skillGroups[1]
-        .querySelector<HTMLElement>('.char-skill-rail')
-        ?.style.getPropertyValue('--char-skill-pct'),
-    ).toBe(`${(37 / CRAFT_RING[0].maxSkill) * 100}%`);
-    root.querySelector<HTMLButtonElement>('[data-act="open-professions"]')?.click();
-    expect(openProfessions).toHaveBeenCalledOnce();
     const honorBalance = root.querySelector<HTMLElement>('.char-honor-balance');
     expect(honorBalance?.textContent).toContain('187');
     expect(
@@ -363,17 +326,6 @@ describe('char_window: profession art placements', () => {
         alt: '',
         draggable: 'false',
       },
-    ]);
-    expect(
-      [...root.querySelectorAll<HTMLImageElement>('.char-gather-icon')].map((img) =>
-        img.getAttribute('src'),
-      ),
-    ).toEqual([
-      '/ui/professions/gather_mining.webp',
-      '/ui/professions/gather_logging.webp',
-      '/ui/professions/gather_herbalism.webp',
-      '/ui/professions/gather_fishing.webp',
-      '/ui/professions/gather_farming.webp',
     ]);
     const crest = root.querySelector<HTMLImageElement>('.char-archetype-title-crest');
     expect(crest?.getAttribute('src')).toBe('/ui/professions/archetype_smith.webp');
@@ -398,106 +350,6 @@ describe('char_window: profession art placements', () => {
     win.render();
     expect(root.querySelector('.char-archetype-title-crest')).toBeNull();
     expect(root.innerHTML).not.toContain('/ui/professions/archetype_bombardier.webp');
-  });
-
-  it('floors a fractional gathering proficiency in the rendered row (issue 2339)', () => {
-    // The sheet must never claim an uncrossed threshold: the deed evaluator
-    // and the band ladder compare the raw value with >=, so 99.5 renders 99
-    // (the professions-window floor convention), never a rounded 100.
-    let canvasContext: unknown;
-    canvasContext = new Proxy(
-      {},
-      {
-        get: () => () => canvasContext,
-        set: () => true,
-      },
-    );
-    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(canvasContext as never);
-    vi.spyOn(HTMLCanvasElement.prototype, 'toDataURL').mockReturnValue(
-      'data:image/png;base64,stub',
-    );
-    const root = document.createElement('div');
-    const world = {
-      cfg: { playerClass: 'warrior' },
-      player: { name: 'Aurelia', level: 60, skin: 0 },
-      equipment: {},
-      honor: 0,
-      archetypeTitle: null,
-      hobbyCraft: 'jewelcrafting',
-      craftingIdentity: { craftSkills: {} },
-      selectedMount: () => null,
-      ownedMounts: () => [],
-      selectMount: () => {},
-      professionsState: {
-        skills: [
-          { professionId: 'mining', skill: 99.75, maxSkill: 100 },
-          { professionId: 'logging', skill: 12, maxSkill: 100 },
-          { professionId: 'herbalism', skill: 100, maxSkill: 100 },
-          { professionId: 'fishing', skill: 99.5, maxSkill: 200 },
-        ],
-      },
-    };
-    const win = new CharWindow({
-      root: () => root,
-      world: () => world as never,
-      closeOthers: vi.fn(),
-      hideTooltip: vi.fn(),
-      captureFocus: () => null,
-      restoreFocus: vi.fn(),
-      slotName: (slot) => slot,
-      statCellHtml: () => '',
-      statTooltipHtml: () => '',
-      progressionHtml: () => '',
-      unequip: vi.fn(),
-      beginUnequipDrag: vi.fn(),
-      endUnequipDrag: vi.fn(),
-      renderPreview: vi.fn(),
-      renderSkinPicker: vi.fn(),
-      openPlayerCard: vi.fn(),
-      openPrestige: vi.fn(),
-      openDeeds: vi.fn(),
-      openCosmetics: vi.fn(),
-      openReliquary: vi.fn(),
-      dragState: new ItemDragState(),
-      renderBags: vi.fn(),
-      showError: vi.fn(),
-      helmSlotAvailable: () => true,
-      helmHidden: () => false,
-      toggleHelm: vi.fn(),
-      playtimeVisible: () => true,
-      togglePlaytimeVisible: vi.fn(),
-      itemIcon: () => '',
-      moneyHtml: () => '',
-      wornItemTooltip: () => '',
-      attachTooltip: vi.fn(),
-    });
-
-    win.render();
-    // Gathering now lives on the Skills board instead of being duplicated under Stats.
-    root.querySelector<HTMLElement>('[data-tab="skills"]')?.click();
-    const values = [...root.querySelectorAll('.char-gather-row b')].map((b) => b.textContent);
-    // The row renders a BOUNDED "skill / max", never a bare integer. The floor
-    // still holds (99.75 and 99.5 read 99, never a fake crossed 100), and
-    // fishing's denominator is its own 200 cap, not the 100 the other four
-    // share. Farming's untouched "0 / 100" tail is load-bearing: a gathering id
-    // missing from GATHERING_PROFESSION_NAME_KEYS renders NO row at all, so
-    // this list length is what catches the silent drop on a fifth profession.
-    expect(values).toEqual(['99 / 100', '12 / 100', '100 / 100', '99 / 200', '0 / 100']);
-    // Decisive against a regression to the bare integer: no row may render a
-    // lone number with no denominator.
-    for (const value of values) expect(value).toMatch(/^\d+ \/ \d+$/);
-  });
-
-  it('renders the gathering denominator through the shared professions skillValue key', () => {
-    // The same key the professions window uses, so the two surfaces cannot
-    // drift apart and a locale owns the separator. Never a concatenated
-    // '/' literal in the painter.
-    // Strip whole-line comments first: gatheringHtml's own comment names this
-    // key in prose, so an uncommented read is one reword from self-satisfying.
-    const code = painter.replace(/^\s*\/\/.*$/gm, '');
-    expect(code).toContain("t('hudChrome.professions.skillValue'");
-    expect(code).toMatch(/skill:\s*formatNumber\(r\.displayValue/);
-    expect(code).toMatch(/max:\s*formatNumber\(r\.maxSkill/);
   });
 });
 

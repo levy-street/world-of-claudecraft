@@ -612,6 +612,7 @@ import {
 } from './hud/professions/profession_log_tones';
 import { buildProfessionTutorialModel } from './hud/professions/profession_tutorial_view';
 import { renderProfessionTutorial } from './hud/professions/profession_tutorial_window';
+import { ProfessionsHubController } from './hud/professions/professions_hub_controller';
 import { ProfessionsWindow } from './hud/professions/professions_window';
 import { recipePatternTooltipLines } from './hud/professions/recipe_pattern_tooltip_view';
 import {
@@ -2932,8 +2933,6 @@ export class Hud {
     $('#mm-loot-explorer')?.addEventListener('click', () => this.toggleLootExplorer());
     $('#mm-cosmetics')?.addEventListener('click', () => this.cosmeticsWindow.toggle());
     $('#mm-professions').addEventListener('click', () => this.toggleProfessions());
-    $('#mm-harvest-journal')?.addEventListener('click', () => this.toggleHarvestJournal());
-    $('#mm-perfecting')?.addEventListener('click', () => this.togglePerfecting());
     // The always-on tracker headers share one delegation contract
     // (tracker_header_wiring.ts): a click or Enter/Space on the header flips
     // the persisted collapse, stopped before the game binds hijack the focused
@@ -3163,7 +3162,6 @@ export class Hud {
     $('#map-level-toggle').addEventListener('click', () => this.toggleMapLevel());
 
     $('#mm-bag').addEventListener('click', () => this.toggleBags());
-    $('#mm-crafting').addEventListener('click', () => this.toggleCrafting());
     // Drop an equipped piece dragged out of the paperdoll onto the bags window.
     const bagsEl = $('#bags');
     bagsEl.addEventListener('dragover', (e) => {
@@ -3683,26 +3681,22 @@ export class Hud {
         this.worldQuestPuzzleWindow.close();
         break;
       case 'professions-window':
-        // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
-        this.professionsWindow.close();
+      case 'harvest-journal-window':
+      case 'perfecting-window':
+      case 'crafting-window':
+        // The Professions hub's members: the hub closes the shown one through
+        // its own painter (focus returns, the 1 Hz clocks disarm, an open
+        // Perfecting naming prompt tears down inert-safe).
+        this.professionsHub.close();
         break;
       case 'harvest-preference-window':
         // Route through the controller so focus returns to the opener
         // (WCAG 2.2 AA) and the visit is invalidated (Intentional Gathering PR3).
         this.harvestPreferenceController.close();
         break;
-      case 'harvest-journal-window':
-        // Route through the painter: focus returns (WCAG 2.2 AA), clock disposed.
-        this.harvestJournalWindow.close();
-        break;
       case 'plant-sheet-window':
         // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
         this.plantSheetWindow.close();
-        break;
-      case 'perfecting-window':
-        // Route through the painter: focus returns (WCAG 2.2 AA), the 1 Hz
-        // clock disarms, and an open naming prompt tears down inert-safe.
-        this.perfectingWindow.close();
         break;
       case 'arena-window':
         // Route through the painter so focus returns to the opener (WCAG 2.2 AA),
@@ -3735,9 +3729,6 @@ export class Hud {
         break;
       case 'town-focus-window':
         this.closeTownFocus();
-        break;
-      case 'crafting-window':
-        this.closeCrafting();
         break;
       case 'commission-board-window':
         this.closeCommissionBoard();
@@ -5418,6 +5409,22 @@ export class Hud {
   // craft-wheel identity browser over IWorldProfessions, plus the tool-effect
   // slot/recharge senders the acquisition craft opened. A standalone
   // trapping window (windowFocus), the deeds shape exactly.
+  // The Professions hub (menu consolidation step 1): one tabbed window over
+  // the four professions windows, which keep their own ids and roots.
+  private readonly professionsHub = new ProfessionsHubController({
+    members: () => ({
+      overview: this.professionsWindow,
+      crafting: {
+        isOpen: this.craftingWindowEl?.style.display === 'flex',
+        open: () => this.showCrafting(),
+        close: () => this.closeCrafting(),
+        rootElement: () => this.craftingWindowEl,
+      },
+      perfecting: this.perfectingWindow,
+      harvest: this.harvestJournalWindow,
+    }),
+    touch: () => document.body.classList.contains('mobile-touch'),
+  });
   private readonly professionsWindow = new ProfessionsWindow({
     ...this.presentationBag,
     root: () => $('#professions-window'),
@@ -5427,7 +5434,8 @@ export class Hud {
     consumePeek: () => this.peekGuard.consume(),
     openWiki: () => this.openWiki(),
     ...this.windowFocus('#professions-window'),
-    openHarvestJournal: () => this.harvestJournalWindow.open(),
+    openHarvestJournal: () => this.professionsHub.open('harvest'),
+    hubStrip: this.professionsHub.stripFor('overview'),
     harvestBody: () => this.lootWindow.openHarvestBodyChoice(),
     openHarvestPreference: () => this.harvestPreferenceController.open(),
   });
@@ -5451,6 +5459,7 @@ export class Hud {
     closeOthers: () => this.closeOtherWindows('#harvest-journal-window'),
     ...this.windowFocus('#harvest-journal-window'),
     onVisibilityChange: () => this.syncAnyWindowOpenState(),
+    hubStrip: this.professionsHub.stripFor('harvest'),
   });
   // The plant sheet painter (farming_plant_sheet_view.ts core + its painter):
   // the bed-verbs plant window. Cold, paint-on-open; farm events feed it.
@@ -5471,6 +5480,7 @@ export class Hud {
     closeOthers: () => this.closeOtherWindows('#perfecting-window'),
     ...this.windowFocus('#perfecting-window'),
     onVisibilityChange: () => this.syncAnyWindowOpenState(),
+    hubStrip: this.professionsHub.stripFor('perfecting'),
   });
   // The Reliquary window painter (reliquary_view.ts core + reliquary_window.ts
   // painter): Overview + shelf chrome over IWorldReliquary. A standalone
@@ -14997,11 +15007,7 @@ export class Hud {
   // -------------------------------------------------------------------------
 
   toggleCrafting(): void {
-    if ($('#crafting-window').style.display === 'flex') {
-      this.closeCrafting();
-      return;
-    }
-    this.openCrafting();
+    this.professionsHub.toggle('crafting');
   }
 
   // `craftId` (the gossip dialog's Crafting shortcut on a station master)
@@ -15020,25 +15026,22 @@ export class Hud {
       this.selectedCraftTab = craftId;
       this.persistCraftingTab();
     }
-    this.closeOtherWindows('#crafting-window');
-    this.renderCrafting();
-    // AFTER the paint, the train / unbind ordering (see toggleTownFocus):
-    // captureFocus records the opener and installs the trap over a root that
-    // is by then populated and displayed. #crafting-window now installs its
-    // own trap (this change), so the craftId branch below only needs to move
-    // focus onto the selected tab within that trap, not chase it back from body.
-    this.craftingOpenerFocus = this.craftingWindowFocus.captureFocus();
+    this.professionsHub.open('crafting');
     if (craftId !== undefined) {
       const scroller = $('#crafting-window').querySelector('.crafting-body');
       if (scroller) scroller.scrollTop = 0;
-      // The gossip route reaches here after the dialog released its focus
-      // trap WITHOUT restoring (the successor-window premise): land keyboard
-      // focus on the selected tab (onSelectCraft's refocus target) after the
-      // crafting trap is installed so the handoff never strands focus on body.
+      // The gossip route arrives with the dialog's trap released WITHOUT a
+      // restore: land focus on the selected craft tab so it never sits on body.
       ($('#crafting-window').querySelector('.crafting-tab.sel') as HTMLElement | null)?.focus();
-    } else {
-      this.focusManager.focusFirst($('#crafting-window'));
     }
+  }
+
+  // The hub's Crafting member: captureFocus AFTER the paint (train/unbind order).
+  private showCrafting(): void {
+    this.closeOtherWindows('#crafting-window');
+    this.renderCrafting();
+    this.craftingOpenerFocus = this.craftingWindowFocus.captureFocus();
+    this.focusManager.focusFirst($('#crafting-window'));
   }
 
   /** Live craft-cast session for the open crafting window: the entity cast
@@ -15182,6 +15185,7 @@ export class Hud {
         onClose: () => this.closeCrafting(),
         onOpenOrders: () => this.openCommissionBoard(),
         onOpenPerfecting: () => this.openPerfecting(),
+        hubStrip: this.professionsHub.stripFor('crafting'),
         commissionChecked: (recipeId) => this.craftCommissionOptIn.has(recipeId),
         onToggleCommission: (recipeId, on) => {
           if (on) this.craftCommissionOptIn.add(recipeId);
@@ -15451,11 +15455,10 @@ export class Hud {
     return this.deedsWindow.isOpen;
   }
 
-  // The Professions window entry point (keybind, minimap, and More-tray all
-  // toggle; Esc closes via the managed-window case directly). Open/close/isOpen
-  // wrappers land only when a consumer lands with them.
+  // The Professions hub entry points (menu consolidation): every launcher,
+  // keybind and cross-link opens the hub, landing on its tab.
   toggleProfessions(): void {
-    this.professionsWindow.toggle();
+    this.professionsHub.toggle();
   }
 
   // The Reliquary window entry point (keybind, minimap, and More-tray all
@@ -15469,9 +15472,8 @@ export class Hud {
     this.reliquaryWindow.toggle();
   }
 
-  // The Harvest Journal keybind entry (the professions row opens it directly).
   toggleHarvestJournal(): void {
-    this.harvestJournalWindow.toggle();
+    this.professionsHub.toggle('harvest');
   }
 
   // The bed choice route: planting and deliberate crop harvesting.
@@ -15479,16 +15481,12 @@ export class Hud {
     this.plantSheetWindow.open(bedId);
   }
 
-  // The Perfecting window entry points (the crafting window's title-bar
-  // button and its apex-row links open; Esc closes via the managed-window
-  // case; the reliquary-shaped toggle is what the side-rail tile and the
-  // keybind both call, both shipped in this unit).
   openPerfecting(): void {
-    this.perfectingWindow.open();
+    this.professionsHub.open('perfecting');
   }
 
   togglePerfecting(): void {
-    this.perfectingWindow.toggle();
+    this.professionsHub.toggle('perfecting');
   }
 
   toggleLootExplorer(): void {

@@ -6355,6 +6355,9 @@ export const de_DE: EnTranslations = {
       "sharpeningStoneUse": "Einsatz: Schärft deine Haupthandwaffe und erhöht Angriffskraft um 6 für 30 Minuten.",
       "manaElixirUse": "Einsatz: Erhöht Geist um 6 für 1 Stunde."
     },
+    "professionsHub": {
+      "tabOverview": "Overview"
+    },
     "professions": {
       "title": "Berufe",
       "close": "Berufe schließen",

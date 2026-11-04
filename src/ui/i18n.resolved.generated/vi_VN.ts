@@ -6355,6 +6355,9 @@ export const vi_VN: EnTranslations = {
       "sharpeningStoneUse": "Sử Dụng Đá Mài",
       "manaElixirUse": "Sử Dụng Thuốc Tinh Xuyễn"
     },
+    "professionsHub": {
+      "tabOverview": "Overview"
+    },
     "professions": {
       "title": "Nghề nghiệp",
       "close": "Đóng ngành nghề",

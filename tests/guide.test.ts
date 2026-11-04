@@ -1685,15 +1685,18 @@ describe('Guide controls reference completeness', () => {
   // Third wave, found by the farming Phase 8 QA: the Harvest Journal shipped a
   // defaulted window bind (Shift+K) with no controls row, exactly the drift
   // class the two waves above were written against. Same per-bind contract.
-  it('documents the Harvest Journal bind and keeps it in step with the game default', () => {
+  it('drops the Harvest Journal and Perfecting rows with their freed defaults (Professions hub tabs)', () => {
     setLanguage('en');
     const html = controlsPage.render({
       params: [],
       sub: 'reference/controls',
       titleKey: 'guide.nav.controls',
     });
-    expect(html).toContain('<kbd>Shift+K</kbd></td><td>Harvest Journal</td>');
-    expect(BIND_ACTIONS.find((a) => a.id === 'harvestJournal')?.defaults).toEqual(['Shift+KeyK']);
+    expect(html).not.toContain('<kbd>Shift+K</kbd>');
+    expect(html).not.toContain('<kbd>Shift+T</kbd>');
+    expect(html).toContain('<kbd>Shift+P</kbd></td><td>Professions</td>');
+    expect(BIND_ACTIONS.find((a) => a.id === 'harvestJournal')?.defaults).toEqual([]);
+    expect(BIND_ACTIONS.find((a) => a.id === 'perfecting')?.defaults).toEqual([]);
   });
 
   // The COMPLETENESS pin the three waves above were missing: every Interface
@@ -1713,14 +1716,19 @@ describe('Guide controls reference completeness', () => {
       titleKey: 'guide.nav.controls',
     });
     const kbds = new Set([...html.matchAll(/<kbd>([^<]+)<\/kbd>/g)].map((m) => m[1]));
+    // An action that ships no default (a rebind-only hub tab) has no keycap
+    // to document; every action that does ship one must have its row.
     const missing = BIND_ACTIONS.filter(
-      (a) => a.category === 'Interface' && !a.defaults.some((code) => kbds.has(keyLabel(code))),
+      (a) =>
+        a.category === 'Interface' &&
+        a.defaults.length > 0 &&
+        !a.defaults.some((code) => kbds.has(keyLabel(code))),
     ).map((a) => a.id);
     expect(missing).toEqual([]);
     // Anti-vacuous: the scrape really read keycaps, and the two shifted rows
     // this pin was written for are among them.
     expect(kbds.has('Shift+P')).toBe(true);
-    expect(kbds.has('Shift+K')).toBe(true);
+    expect(kbds.has('Shift+X')).toBe(true);
   });
 
   it('keeps the second-wave binds in step with the game defaults', () => {

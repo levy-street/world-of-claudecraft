@@ -1994,6 +1994,8 @@ async function startGame(
     onLootExplorer: () => hud.toggleLootExplorer(),
     onMountToggle: () => world.toggleMounted(),
     onProfessions: () => hud.toggleProfessions(),
+    onPerfecting: () => hud.togglePerfecting(),
+    onHarvestJournal: () => hud.toggleHarvestJournal(),
     onNameplates: () => (renderer.showNameplates = !renderer.showNameplates),
     onMusic: () => {
       music.setEnabled(!music.enabled);

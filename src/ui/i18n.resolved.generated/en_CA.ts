@@ -6355,6 +6355,9 @@ export const en_CA: EnTranslations = {
       "sharpeningStoneUse": "Use: Sharpens your main hand weapon, increasing Attack Power by 6 for 30 min.",
       "manaElixirUse": "Use: Increases Spirit by 6 for 1 hour."
     },
+    "professionsHub": {
+      "tabOverview": "Overview"
+    },
     "professions": {
       "title": "Professions",
       "close": "Close professions",

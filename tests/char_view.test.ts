@@ -105,14 +105,9 @@ describe('char_view: paperdoll data model', () => {
 });
 
 describe('char_view: sidebar tabs', () => {
-  it('models the Stats, Progression, and Skills tabs with one selected tab', () => {
-    expect(CHARACTER_SIDEBAR_TABS).toEqual([
-      'stats',
-      'reputation',
-      'currencies',
-      'progression',
-      'skills',
-    ]);
+  it('models the Stats, Reputation, Currencies and Progression tabs with one selected tab', () => {
+    // The Skills tab left with the Professions hub (menu consolidation step 1).
+    expect(CHARACTER_SIDEBAR_TABS).toEqual(['stats', 'reputation', 'currencies', 'progression']);
     expect(buildCharacterSidebarView('progression')).toEqual({
       selected: 'progression',
       tabs: [
@@ -120,7 +115,6 @@ describe('char_view: sidebar tabs', () => {
         { id: 'reputation', selected: false },
         { id: 'currencies', selected: false },
         { id: 'progression', selected: true },
-        { id: 'skills', selected: false },
       ],
     });
   });

@@ -6355,6 +6355,9 @@ export const ko_KR: EnTranslations = {
       "sharpeningStoneUse": "사용: 주 무기를 연마하여 30분 동안 전투력이 6 증가합니다.",
       "manaElixirUse": "사용: 1시간 동안 정신력이 6 증가합니다."
     },
+    "professionsHub": {
+      "tabOverview": "개요"
+    },
     "professions": {
       "title": "전문 기술",
       "close": "전문 기술 닫기",

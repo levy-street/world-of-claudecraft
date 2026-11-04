@@ -11,6 +11,10 @@
 export interface MicroMenuLauncherSpec {
   readonly selector: string;
   readonly windowId: string;
+  /** A hub launcher's other member windows (menu consolidation): the ring is
+   *  on while ANY of `windowId` or these is open, because a hub shows one
+   *  member window per tab and the launcher opens all of them. */
+  readonly memberWindowIds?: readonly string[];
 }
 
 /**
@@ -30,15 +34,16 @@ export const MICRO_MENU_LAUNCHERS: readonly MicroMenuLauncherSpec[] = [
   { selector: '#mm-reliquary', windowId: 'reliquary-window' },
   { selector: '#mm-loot-explorer', windowId: 'loot-explorer-window' },
   { selector: '#mm-cosmetics', windowId: 'cosmetics-window' },
-  { selector: '#mm-professions', windowId: 'professions-window' },
-  { selector: '#mm-harvest-journal', windowId: 'harvest-journal-window' },
+  {
+    selector: '#mm-professions',
+    windowId: 'professions-window',
+    memberWindowIds: ['crafting-window', 'perfecting-window', 'harvest-journal-window'],
+  },
   // The one launcher whose window ships in no markup entry: the Perfecting
   // painter mints #perfecting-window on first open (still a .window.panel, so
   // Hud's window observer stamps data-window-open on it like any other).
-  { selector: '#mm-perfecting', windowId: 'perfecting-window' },
   { selector: '#mm-map', windowId: 'map-window' },
   { selector: '#mm-bag', windowId: 'bags' },
-  { selector: '#mm-crafting', windowId: 'crafting-window' },
   { selector: '#mm-arena', windowId: 'arena-window' },
   { selector: '#mm-dfinder', windowId: 'dungeon-finder-window' },
   { selector: '#expedition-bell', windowId: 'dungeon-finder-window' },
@@ -116,7 +121,13 @@ export function createMicroMenuStateView(
   return {
     tick(isWindowOpen, counts) {
       for (let i = 0; i < launchers.length; i++) {
-        launchers[i].on = isWindowOpen(MICRO_MENU_LAUNCHERS[i].windowId);
+        const spec = MICRO_MENU_LAUNCHERS[i];
+        let on = isWindowOpen(spec.windowId);
+        const members = spec.memberWindowIds;
+        if (!on && members) {
+          for (let m = 0; m < members.length && !on; m++) on = isWindowOpen(members[m]);
+        }
+        launchers[i].on = on;
       }
       for (let i = 0; i < badges.length; i++) {
         const badge = badges[i];

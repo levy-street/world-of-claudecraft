@@ -1924,18 +1924,6 @@
     color: var(--color-white);
     font-weight: normal;
   }
-  .char-gather-row {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    min-width: 0;
-  }
-  .char-gather-icon {
-    flex: 0 0 22px;
-    width: 22px;
-    height: 22px;
-    object-fit: contain;
-  }
   .char-archetype-title-crest {
     flex: 0 0 28px;
     width: 28px;
@@ -2571,114 +2559,6 @@
   }
   #char-window .pc-share-row {
     flex: 0 0 auto;
-  }
-  #char-window .char-skills {
-    display: grid;
-    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.6fr);
-    align-items: start;
-    gap: var(--spacing-md);
-    padding-top: var(--spacing-sm);
-  }
-  #char-window .char-skill-group {
-    min-width: 0;
-    padding: var(--spacing-md);
-  }
-  #char-window .char-skill-group h3 {
-    margin: 0 0 var(--spacing-md);
-    font-family: var(--font-display);
-    font-size: 21px;
-    color: var(--color-accent);
-  }
-  #char-window .char-skill-list {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
-    margin: 0;
-    line-height: normal;
-  }
-  #char-window .char-skill-group--gathering .char-skill-list {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  #char-window .char-skill-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    min-width: 0;
-    min-height: 80px;
-    padding: 12px;
-  }
-  #char-window :is(.char-craft-icon, .char-gather-icon) {
-    width: 48px;
-    height: 48px;
-    flex: 0 0 48px;
-    margin: 0;
-    object-fit: contain;
-  }
-  #char-window .char-skill-copy {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: var(--spacing-sm);
-    min-width: 0;
-    flex: 1 1 auto;
-    font-size: 13px;
-    line-height: 1.4;
-  }
-  #char-window .char-skill-name {
-    grid-column: 1 / -1;
-    font-size: 15px;
-    font-weight: 600;
-    overflow-wrap: anywhere;
-  }
-  #char-window .char-skill-copy > b {
-    grid-column: 2;
-    grid-row: 2;
-    font-weight: 500;
-    color: var(--color-text-secondary);
-    font-variant-numeric: tabular-nums;
-  }
-  #char-window .char-skill-rail {
-    grid-column: 1;
-    grid-row: 2;
-    align-self: center;
-    position: relative;
-    height: 7px;
-    overflow: hidden;
-    border-radius: var(--radius-sm);
-    background: var(--color-bar-track);
-  }
-  #char-window .char-skill-rail > span {
-    display: block;
-    width: var(--char-skill-pct);
-    height: 100%;
-    background: var(--color-accent);
-  }
-  #char-window .char-open-professions {
-    grid-column: 1 / -1;
-    justify-self: end;
-    min-height: 44px;
-    padding-inline: var(--spacing-lg);
-    font-size: 14px;
-  }
-  @media (max-height: 850px) {
-    #char-window .char-skill-group {
-      padding: 12px;
-    }
-    #char-window .char-skill-group h3 {
-      margin-bottom: 12px;
-      font-size: 19px;
-    }
-    #char-window .char-skill-list {
-      gap: var(--spacing-sm);
-    }
-    #char-window .char-skill-row {
-      min-height: 64px;
-      padding: var(--spacing-sm);
-    }
-    #char-window :is(.char-craft-icon, .char-gather-icon) {
-      width: 40px;
-      height: 40px;
-      flex-basis: 40px;
-    }
   }
 
   /* ---------- spellbook ---------- */
@@ -13191,6 +13071,20 @@
   #perfecting-window .panel-title > span {
     flex: 1 1 auto;
     min-width: 0;
+  }
+  /* The Professions hub strip (menu consolidation step 1): the shared
+     Overview / Crafting / Perfecting / Harvest Journal tab row each of the
+     four professions windows paints under its title bar, so the four read
+     as one tabbed window. The ui-tabs / ui-tab primitives own the look; this
+     sets only the strip's place in the column-flex window. */
+  .prof-hub-tabs {
+    flex: none;
+    flex-wrap: wrap;
+    margin: 4px 0 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .prof-hub-tab {
+    cursor: var(--cursor-point);
   }
   /* ONE empty-state family for the professions windows (phase 14: the
      harvest journal's shape, the best of the four the family had grown, now

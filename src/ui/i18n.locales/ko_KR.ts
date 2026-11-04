@@ -20468,6 +20468,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.partyFrames.header': '파티',
   'hudChrome.professions.retentionFooter': '전문 기술 재설정 시 숙련도의 60%가 유지됩니다.',
   'hudChrome.professions.tutorialLink': '전문 기술 튜토리얼',
+  'hudChrome.professionsHub.tabOverview': '개요',
   'hudChrome.marketWindow.mixedListingsFooter':
     '상인은 일반 상품을 보충하며, 플레이어 매물은 판매자가 정한 가격으로 함께 표시됩니다.',
   'hudChrome.mapAtlas.track': '추적',

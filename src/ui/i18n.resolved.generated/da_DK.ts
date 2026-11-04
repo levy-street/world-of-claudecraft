@@ -6355,6 +6355,9 @@ export const da_DK: EnTranslations = {
       "sharpeningStoneUse": "Brug: Slår dit hovedhånds våben, øger Angrebskraft med 6 i 30 min.",
       "manaElixirUse": "Brug: Øger Ånd med 6 i 1 time."
     },
+    "professionsHub": {
+      "tabOverview": "Overview"
+    },
     "professions": {
       "title": "Erhverv",
       "close": "Luk erhverv",

@@ -165,8 +165,11 @@ export interface MobileControlCallbacks {
   /** Use the shared riding toggle from the More tray: dismount instantly or
    *  summon the trained ride with the selected cosmetic. */
   onMountToggle(): void;
-  /** Open the Professions window, folded into the More tray on mobile. */
+  /** Open the Professions hub, folded into the More tray on mobile. */
   onProfessions(): void;
+  /** Open the Professions hub straight on its Perfecting / Harvest Journal tab. */
+  onPerfecting(): void;
+  onHarvestJournal(): void;
   /** Toggle world nameplates; returns the new on/off state to sync the button glow. */
   onNameplates(): boolean;
   /** Toggle background music; returns whether music is now enabled. */
@@ -552,6 +555,8 @@ export class MobileControls {
     this.bindButton('mobile-loot-explorer', () => this.callbacks.onLootExplorer());
     this.bindButton('mobile-mounts', () => this.callbacks.onMountToggle());
     this.bindButton('mobile-professions', () => this.callbacks.onProfessions());
+    this.bindButton('mobile-perfecting', () => this.callbacks.onPerfecting());
+    this.bindButton('mobile-harvest-journal', () => this.callbacks.onHarvestJournal());
     const nameplatesBtn = document.getElementById('mobile-nameplates');
     this.bindButton('mobile-nameplates', () => {
       const on = this.callbacks.onNameplates();

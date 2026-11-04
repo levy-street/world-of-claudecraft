@@ -61,8 +61,8 @@ import { renderGatheringGoalTrackRow, type TrackRowDeps } from './gathering_goal
 import { professionImageUrl } from './profession_art';
 import { renderProfessionIdentityCard } from './profession_identity_card';
 import type { ProfessionIdentityModel } from './profession_identity_view';
+import type { ProfessionsHubStrip } from './professions_hub_controller';
 import { fineSubText, ordinaryHeldText, vaultDrawText } from './reagent_suffix_view';
-
 // Station display names (Professions 2.0): StationType id -> the
 // localized station name, same id-to-key table shape as craftNameText
 // (char_window.ts) so the deny toast (hud.ts) and the window rows below
@@ -107,6 +107,11 @@ export interface CraftingWindowDeps
    *  live tab list (resolveSelectedCraft) so a stale pick falls back safely. */
   selectedCraft(): string | null;
   onSelectCraft(professionId: string): void;
+  /** The Professions hub's shared tab strip (professions_hub_controller.ts),
+   *  placed under the title bar. When present Perfecting is a sibling tab, so
+   *  the title-bar Perfecting button is not painted (the apex-row links
+   *  still route through onOpenPerfecting). Optional so rigs stay valid. */
+  hubStrip?: ProfessionsHubStrip;
 }
 
 /** Paint the crafting panel from a prepared view. `learnHints` maps a
@@ -130,7 +135,9 @@ export function renderCraftingWindow(
   // A standalone trapping window (the train/professions shape), not the
   // vendor's docked bags pairing: announce it as a labeled dialog for the
   // focus contract (src/ui/CLAUDE.md).
-  markDialogRoot(el, { label: t('hudChrome.crafting.title') });
+  markDialogRoot(el, {
+    label: t(deps.hubStrip ? 'hudChrome.professions.title' : 'hudChrome.crafting.title'),
+  });
   const focusKey = captureFocusKey(el);
   const scrollTop = el.querySelector('.crafting-body')?.scrollTop ?? 0;
   // The tab strip is its own horizontal scroller on mobile (hud.mobile.css
@@ -151,10 +158,12 @@ export function renderCraftingWindow(
   const cardScrollTop = el.querySelector('.profession-identity-card')?.scrollTop ?? 0;
   // The Perfecting entry rides the commission-board precedent: a sibling
   // title-bar button, rendered only when the composition wires the window.
-  const perfectingBtn = deps.onOpenPerfecting
-    ? `<button type="button" class="crafting-orders-btn crafting-perfecting-btn ui-btn ui-btn--gold" data-open-perfecting data-skip-open-focus data-focus-key="perfecting" aria-label="${esc(t('hudChrome.perfecting.openButtonAria'))}">${esc(t('hudChrome.perfecting.openButton'))}</button>`
-    : '';
-  el.innerHTML = `<div class="panel-title ui-win-head"><span class="ui-win-title">${esc(t('hudChrome.crafting.title'))}</span>${perfectingBtn}<button type="button" class="crafting-orders-btn ui-btn ui-btn--gold" data-open-orders data-skip-open-focus data-focus-key="orders" aria-label="${esc(t('hudChrome.commissionBoard.openButtonAria'))}">${esc(t('hudChrome.commissionBoard.openButton'))}</button><button type="button" class="x-btn ui-x-btn" data-close data-focus-key="close" aria-label="${esc(t('hudChrome.crafting.close'))}">${svgIcon('close')}</button></div>`;
+  const perfectingBtn =
+    deps.onOpenPerfecting && !deps.hubStrip
+      ? `<button type="button" class="crafting-orders-btn crafting-perfecting-btn ui-btn ui-btn--gold" data-open-perfecting data-skip-open-focus data-focus-key="perfecting" aria-label="${esc(t('hudChrome.perfecting.openButtonAria'))}">${esc(t('hudChrome.perfecting.openButton'))}</button>`
+      : '';
+  el.innerHTML = `<div class="panel-title ui-win-head"><span class="ui-win-title">${esc(t(deps.hubStrip ? 'hudChrome.professions.title' : 'hudChrome.crafting.title'))}</span>${perfectingBtn}<button type="button" class="crafting-orders-btn ui-btn ui-btn--gold" data-open-orders data-skip-open-focus data-focus-key="orders" aria-label="${esc(t('hudChrome.commissionBoard.openButtonAria'))}">${esc(t('hudChrome.commissionBoard.openButton'))}</button><button type="button" class="x-btn ui-x-btn" data-close data-focus-key="close" aria-label="${esc(t('hudChrome.crafting.close'))}">${svgIcon('close')}</button></div>${deps.hubStrip?.html() ?? ''}`;
+  deps.hubStrip?.wire(el);
   el.querySelector('[data-open-orders]')?.addEventListener('click', () => deps.onOpenOrders());
   el.querySelector('[data-open-perfecting]')?.addEventListener('click', () =>
     deps.onOpenPerfecting?.(),

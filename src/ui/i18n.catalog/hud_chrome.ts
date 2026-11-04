@@ -8671,6 +8671,12 @@ export const hudChromeStrings = {
   // window. Craft and pair NAMES resolve through craftName / archetypePair
   // above; these keys are the window's own chrome. Wording follows the
   // crafting identity card family (crafting.identity.*).
+  // The Professions hub (menu consolidation step 1): the shared tab strip
+  // over the four professions windows. The other three tabs reuse their
+  // former window titles (crafting/perfecting/harvestJournal .title).
+  professionsHub: {
+    tabOverview: 'Overview',
+  },
   professions: {
     title: 'Professions',
     close: 'Close professions',

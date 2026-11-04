@@ -18,7 +18,6 @@
 // raw hex sits in this painter.
 
 import { audio } from '../game/audio';
-import { CRAFT_RING } from '../sim/content/professions';
 import { ITEMS } from '../sim/data';
 import { type EquipSlot, type ItemDef, type ItemInstancePayload, isMechWearer } from '../sim/types';
 import type { IWorld } from '../world_api';
@@ -42,12 +41,10 @@ import { writeHotbarDragData } from './hud/action_bar/hotbar';
 import { isUsableTrinketId } from './hud/action_bar/trinket_slot_core';
 import { currenciesTabHtml } from './hud/currencies';
 import { archetypeTitleText, craftNameText } from './hud/professions/craft_name_view';
-import { gatheringProfessionNameKey } from './hud/professions/gathering_profession_name';
-import { buildGatheringProficiencyRows } from './hud/professions/gathering_view';
 import { archetypeImageUrl } from './hud/professions/profession_art';
 import { reputationTabHtml } from './hud/reputation';
 import { formatNumber, type TranslationKey, t, tPlural } from './i18n';
-import { iconDataUrl, professionIconUrl, professionImageUrl } from './icons';
+import { iconDataUrl } from './icons';
 import type { ItemDragState } from './item_drag_state';
 import { wornTooltipInstance } from './item_instance_tooltip';
 import { masterwroughtCapReadout } from './masterwrought_cap_view';
@@ -78,7 +75,6 @@ const SLOT_EMPTY_BORDER_COLOR = 'var(--color-slot-empty-border)';
 const CHARACTER_SIDEBAR_LABEL_KEYS: Record<CharacterSidebarTab, TranslationKey> = {
   stats: 'hudChrome.charSidebar.character',
   progression: 'hudChrome.charSidebar.progression',
-  skills: 'hudChrome.charSidebar.professions',
   reputation: 'hudChrome.charSidebar.reputation',
   currencies: 'hudChrome.charSidebar.currencies',
 };
@@ -373,10 +369,6 @@ export class CharWindow {
       audio.click();
       this.deps.openPlayerCard();
     });
-    el.querySelector('[data-act="open-professions"]')?.addEventListener('click', () => {
-      audio.click();
-      document.getElementById('mm-professions')?.click();
-    });
     const playtimeEye = el.querySelector<HTMLElement>('[data-act="toggle-playtime"]');
     if (playtimeEye) {
       this.deps.attachTooltip(playtimeEye, () =>
@@ -460,7 +452,6 @@ export class CharWindow {
     // (the footer keeps only the share and cosmetics actions).
     if (selected === 'progression')
       return this.deps.progressionHtml(world.player.level) + this.playtimeHtml(world);
-    if (selected === 'skills') return this.skillsHtml(world);
     if (selected === 'reputation') return reputationTabHtml(world, Date.now());
     if (selected === 'currencies') return currenciesTabHtml(world);
     return this.statsRailHtml(world);
@@ -510,52 +501,6 @@ export class CharWindow {
           .replace('class="stat-cell"', 'class="stat-cell ui-stat-row ui-card"'),
       )
       .join('');
-  }
-
-  private skillsHtml(world: IWorld): string {
-    const crafting = CRAFT_RING.map((craft) => {
-      const value = Math.max(0, Math.floor(world.craftingIdentity.craftSkills[craft.id] ?? 0));
-      const skill = t('hudChrome.professions.skillValue', {
-        skill: formatNumber(value, { maximumFractionDigits: 0 }),
-        max: formatNumber(craft.maxSkill, { maximumFractionDigits: 0 }),
-      });
-      const iconUrl = professionImageUrl(`prof_${craft.id}`);
-      const icon = iconUrl
-        ? `<img class="char-craft-icon" src="${esc(iconUrl)}" alt="" draggable="false">`
-        : '';
-      const name = craftNameText(craft.id);
-      return `<span class="char-skill-row ui-card${value === 0 ? ' is-empty' : ''}">${icon}<span class="char-skill-copy"><span class="char-skill-name">${esc(name)}</span><b>${esc(skill)}</b><span class="char-skill-rail" role="progressbar" aria-label="${esc(name)}" aria-valuemin="0" aria-valuemax="${craft.maxSkill}" aria-valuenow="${Math.min(value, craft.maxSkill)}" style="--char-skill-pct:${Math.min(100, (value / craft.maxSkill) * 100)}%"><span></span></span></span></span>`;
-    }).join('');
-    return `<div class="char-skills"><section class="char-skill-group char-skill-group--gathering ui-card"><h3>${esc(t('hudChrome.charSidebar.gathering'))}</h3>${this.gatheringHtml(world)}</section><section class="char-skill-group char-skill-group--crafting ui-card"><h3>${esc(t('hudChrome.charSidebar.crafting'))}</h3><div class="char-skill-list">${crafting}</div></section><button type="button" class="ui-btn ui-btn--gold char-open-professions" data-act="open-professions">${esc(t('hudChrome.charSidebar.openProfessions'))}</button></div>`;
-  }
-
-  // The "Gathering" section (issue 1124): one row per gathering profession, showing
-  // the viewer's own proficiency points (IWorldProfessions#professionsState).
-  // Data comes from the pure gathering_view.ts core; this painter only formats it.
-  // The value renders "12 / 100" through the SAME hudChrome.professions.skillValue
-  // key the professions window uses, never a bare integer: an unbounded number
-  // that ticks up +1 per harvest is what players read as a character level.
-  private gatheringHtml(world: IWorld): string {
-    const rows = buildGatheringProficiencyRows(world);
-    const items = rows
-      .map((r) => {
-        const key = gatheringProfessionNameKey(r.professionId);
-        if (key === undefined) return '';
-        // professionIconUrl, not professionImageUrl: a pending-art profession
-        // (farming) must paint its procedural composer icon, never an iconless
-        // gap beside painted siblings; the professions window resolves the
-        // same way. 96 keeps the 48px card icon crisp on 2x displays.
-        const iconUrl = professionIconUrl(`gather_${r.professionId}`, 96);
-        const icon = `<img class="char-gather-icon" src="${esc(iconUrl)}" alt="" draggable="false">`;
-        const skillValue = t('hudChrome.professions.skillValue', {
-          skill: formatNumber(r.displayValue, { maximumFractionDigits: 0 }),
-          max: formatNumber(r.maxSkill, { maximumFractionDigits: 0 }),
-        });
-        const percent = Math.min(100, (r.displayValue / r.maxSkill) * 100);
-        return `<span class="char-gather-row char-skill-row ui-card${r.displayValue === 0 ? ' is-empty' : ''}">${icon}<span class="char-skill-copy"><span class="char-skill-name">${esc(t(key))}</span><b>${esc(skillValue)}</b><span class="char-skill-rail" role="progressbar" aria-label="${esc(t(key))}" aria-valuemin="0" aria-valuemax="${r.maxSkill}" aria-valuenow="${Math.min(r.displayValue, r.maxSkill)}" style="--char-skill-pct:${percent}%"><span></span></span></span></span>`;
-      })
-      .join('');
-    return `<div class="char-stats cp-stats char-skill-list">${items}</div>`;
   }
 
   // The lifetime "Time Played" line (the same running total the /playtime

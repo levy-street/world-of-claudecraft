@@ -21149,6 +21149,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.partyFrames.header': '队伍',
   'hudChrome.professions.retentionFooter': '重置专业后保留60%的技能。',
   'hudChrome.professions.tutorialLink': '专业教程',
+  'hudChrome.professionsHub.tabOverview': '总览',
   'hudChrome.marketWindow.mixedListingsFooter':
     '商人会补充普通商品；玩家上架的物品会以其要价并列显示。',
   'hudChrome.mapAtlas.track': '追踪',

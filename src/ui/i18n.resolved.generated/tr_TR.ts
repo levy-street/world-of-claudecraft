@@ -6355,6 +6355,9 @@ export const tr_TR: EnTranslations = {
       "sharpeningStoneUse": "Kullanım: Ana silahını taharuz eder, 30 dk. boyunca Saldırı Gücünü 6 artırır.",
       "manaElixirUse": "Kullanım: Ruh değerini 1 saat boyunca 6 artırır."
     },
+    "professionsHub": {
+      "tabOverview": "Overview"
+    },
     "professions": {
       "title": "Meslekler",
       "close": "Meslekleri kapat",

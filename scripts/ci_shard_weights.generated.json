@@ -3984,7 +3984,7 @@
   "tests/professions_nudges.test.ts": 8544,
   "tests/professions_perks.test.ts": 1786,
   "tests/professions_quest_cadence.test.ts": 4265,
-  "tests/professions_rail_tiles.test.ts": 24,
+  "tests/professions_hub_launchers.test.ts": 24,
   "tests/professions_rarity_roll.test.ts": 3240,
   "tests/professions_result_mirrors_online.test.ts": 2378,
   "tests/professions_rod_recipes.test.ts": 35,

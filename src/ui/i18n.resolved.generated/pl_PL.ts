@@ -6355,6 +6355,9 @@ export const pl_PL: EnTranslations = {
       "sharpeningStoneUse": "Użycie: Ostrzy twoją główną broń, zwiększając Moc Ataku o 6 na 30 min.",
       "manaElixirUse": "Użycie: Zwiększa Ducha o 6 na 1 godzinę."
     },
+    "professionsHub": {
+      "tabOverview": "Overview"
+    },
     "professions": {
       "title": "Zawody",
       "close": "Zamknij zawody",

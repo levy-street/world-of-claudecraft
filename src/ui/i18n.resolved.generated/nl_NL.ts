@@ -6355,6 +6355,9 @@ export const nl_NL: EnTranslations = {
       "sharpeningStoneUse": "Gebruik: Slijpt je hoofdhand wapen, verhoogt Aanvalssterkte met 6 voor 30 min.",
       "manaElixirUse": "Gebruik: Verhoogt Geest met 6 voor 1 uur."
     },
+    "professionsHub": {
+      "tabOverview": "Overview"
+    },
     "professions": {
       "title": "Beroepen",
       "close": "Sluit beroepen",

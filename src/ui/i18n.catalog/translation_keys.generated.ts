@@ -17142,6 +17142,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.professions.tutorialLine'
   | 'hudChrome.professions.tutorialLink'
   | 'hudChrome.professions.unattunedIdentity'
+  | 'hudChrome.professionsHub.tabOverview'
   | 'hudChrome.pullTimer.cancel'
   | 'hudChrome.pullTimer.countdown'
   | 'hudChrome.pullTimer.pull'

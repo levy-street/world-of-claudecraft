@@ -9,25 +9,55 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.professionsHub.tabOverview"
+  ],
+  "es_ES": [
+    "hudChrome.professionsHub.tabOverview"
+  ],
+  "fr_FR": [
+    "hudChrome.professionsHub.tabOverview"
+  ],
+  "fr_CA": [
+    "hudChrome.professionsHub.tabOverview"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.professionsHub.tabOverview"
+  ],
+  "de_DE": [
+    "hudChrome.professionsHub.tabOverview"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.professionsHub.tabOverview"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.professionsHub.tabOverview"
+  ],
+  "nl_NL": [
+    "hudChrome.professionsHub.tabOverview"
+  ],
+  "pl_PL": [
+    "hudChrome.professionsHub.tabOverview"
+  ],
+  "id_ID": [
+    "hudChrome.professionsHub.tabOverview"
+  ],
+  "tr_TR": [
+    "hudChrome.professionsHub.tabOverview"
+  ],
+  "sv_SE": [
+    "hudChrome.professionsHub.tabOverview"
+  ],
+  "vi_VN": [
+    "hudChrome.professionsHub.tabOverview"
+  ],
+  "da_DK": [
+    "hudChrome.professionsHub.tabOverview"
+  ]
 };

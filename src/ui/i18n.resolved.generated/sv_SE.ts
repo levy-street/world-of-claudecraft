@@ -6355,6 +6355,9 @@ export const sv_SE: EnTranslations = {
       "sharpeningStoneUse": "Användning: Skärper ditt huvudhandsväpen, ökar attackkraft med 6 för 30 min.",
       "manaElixirUse": "Användning: Ökar anden med 6 för 1 timme."
     },
+    "professionsHub": {
+      "tabOverview": "Overview"
+    },
     "professions": {
       "title": "Yrken",
       "close": "Stäng yrken",

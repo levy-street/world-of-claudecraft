@@ -627,11 +627,20 @@ the collapse chevron.
 
 The existing `#side-buttons` rail stays at the bottom right. It is a two-column rail of
 34 x 30 `.ui-icon-btn--micro` buttons, with live `.ui-keycap` labels, `.ui-badge`
-notifications, and a gold selected ring while the destination window is open. Existing
-destinations and keybinds remain available.
+notifications, and a gold selected ring while the destination window is open.
 
 The proposed 3 x 2 launcher tile grid and the More hub are withdrawn. The micro menu does
 not become a card or a full-height backing rail.
+
+Amended at the menu consolidation (approved 2026-11-04): the rail carries FEWER WINDOWS,
+not a hub of launchers. Windows that belong to one system fold into one tabbed hub window
+with one rail button, and the absorbed windows keep their own ids and painters as the
+hub's tabs: every destination stays reachable, but no longer each from its own rail slot
+and its own key. The first hub is Professions (Shift+P: Overview, Crafting, Perfecting,
+Harvest Journal; T still lands on Crafting), so the Crafting, Perfecting and Harvest
+Journal buttons left the rail and Shift+T and Shift+K became free (both actions stay
+rebindable, with no default). A hub button's selected ring lights while any of its tabs
+is open. Each later hub records itself here when it lands.
 
 ### 7.10 Chat
 
@@ -766,18 +775,27 @@ Every window adopts the grammar; these carry specific intent:
   the existing `--bank-slot-quality` hook. Bank-docked behavior stays.
 - **Character** (`char_window.ts`): a sheet in four bands. The head; the body; a row
   of the five attribute tiles; and a footer that carries the tab strip (Character,
-  Reputation, Currencies, Progression, Professions) beside the Cosmetics and Share Player
-  Card actions. The Character tab keeps the paperdoll and seats the Offense, Defense and Specialization
+  Reputation, Currencies, Progression) beside the Cosmetics and Share Player Card actions. The Character tab keeps the paperdoll and seats the Offense, Defense and Specialization
   boards in a rail at its right that scrolls on the wheel; every other tab takes the whole
   body: Reputation (`src/ui/hud/reputation/`, one card per faction with the standing pill
   and tier bar on the quality ramp), Currencies (`src/ui/hud/currencies/`, the activity
   currencies and the faction rows), Progression (milestones, title, Reliquary and Time
-  Played) and Professions (the gathering and crafting boards). The Specialization board is
+  Played). The Specialization board is
   a readout only (spec, role, mastery): the talents window owns the picker. Stat labels
   remain muted with parchment values;
   `item_compare.ts` continues to provide success and danger deltas. (Amended at the
   world-quest reputation work: the earlier note seated Stats, Progression and Skills in a
-  300px side rail, which left no room for the reputation and currency surfaces.)
+  300px side rail, which left no room for the reputation and currency surfaces. Amended
+  again at the menu consolidation, 2026-11-04: the Professions tab left the sheet, because
+  the Professions hub's Overview tab owns the same gathering and crafting rows. The audit
+  plan takes the sheet to two tabs, Character and Progression, as later steps move
+  Reputation and Currencies out.)
+- **Professions hub** (`src/ui/hud/professions/professions_hub_*`): one tabbed window over
+  the four professions windows. Each member window paints the shared `ui-tabs` strip under
+  its title bar and shows the hub title; one member is shown at a time, a tab switch opens
+  the next member at the same position (desktop) and the hub remembers its last tab per
+  device. The crafting window's title-bar Perfecting button is not painted inside the hub,
+  because Perfecting is a sibling tab.
   ACCEPTED DEVIATION (stage and overlay): on pointer form factors the 3D model preview is
   the full-height stage of the equipment pane, and the two equipment slot columns float
   over its outer edges on a scrim (`--color-stage-overlay-scrim`), spanning the stage

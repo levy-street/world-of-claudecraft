@@ -20519,6 +20519,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.partyFrames.header': 'パーティ',
   'hudChrome.professions.retentionFooter': 'リスペック時はスキルの60%を保持します。',
   'hudChrome.professions.tutorialLink': '専門技能チュートリアル',
+  'hudChrome.professionsHub.tabOverview': '概要',
   'hudChrome.marketWindow.mixedListingsFooter':
     '商人はコモンの商品を補充し、プレイヤーの出品は希望価格でその隣に並びます。',
   'hudChrome.mapAtlas.track': '追跡',

@@ -6355,6 +6355,9 @@ export const ru_RU: EnTranslations = {
       "sharpeningStoneUse": "Использование: затачивает оружие в правой руке, повышая силу атаки на 6 на 30 мин.",
       "manaElixirUse": "Использование: повышает дух на 6 на 1 ч."
     },
+    "professionsHub": {
+      "tabOverview": "Обзор"
+    },
     "professions": {
       "title": "Профессии",
       "close": "Закрыть профессии",

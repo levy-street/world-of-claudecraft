@@ -6355,6 +6355,9 @@ export const zh_CN: EnTranslations = {
       "sharpeningStoneUse": "使用：打磨你的主手武器，使攻击强度提高 6 点，持续 30 分钟。",
       "manaElixirUse": "使用：精神提高 6 点，持续 1 小时。"
     },
+    "professionsHub": {
+      "tabOverview": "总览"
+    },
     "professions": {
       "title": "专业",
       "close": "关闭专业",

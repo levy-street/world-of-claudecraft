@@ -590,6 +590,8 @@ function mobileCallbacks() {
     onReliquary: noop,
     onLootExplorer: noop,
     onProfessions: noop,
+    onPerfecting: noop,
+    onHarvestJournal: noop,
     onNameplates: () => false,
     onMusic: () => true,
     onRecenterCamera: noop,

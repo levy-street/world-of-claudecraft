@@ -57,6 +57,7 @@ import {
   samePerfectRef,
   sameSelectedCopy,
 } from './perfecting_view';
+import type { ProfessionsHubStrip } from './professions_hub_controller';
 
 // The convergence poll while open (the harvest journal's cadence): the tick
 // compares a value signature and repaints only when the model moved.
@@ -73,6 +74,9 @@ export interface PerfectingWindowDeps extends PainterHostPresentation {
   /** Fired after the root's display flips either way; Hud wires it to
    *  syncAnyWindowOpenState (the farming windows' body-class family). */
   onVisibilityChange?(): void;
+  /** The Professions hub's shared tab strip (professions_hub_controller.ts),
+   *  placed under the title bar. Optional so painter rigs stay valid. */
+  hubStrip?: ProfessionsHubStrip;
 }
 
 interface BuiltView {
@@ -193,6 +197,12 @@ export class PerfectingWindow {
   private setPendingSend(value: boolean): void {
     this.pendingSend = value;
     this.root().setAttribute('aria-busy', value ? 'true' : 'false');
+  }
+
+  /** The minted root, created on first reach (the Professions hub carries
+   *  its tab position onto it before the first open). */
+  rootElement(): HTMLElement {
+    return this.root();
   }
 
   get isOpen(): boolean {
@@ -402,8 +412,9 @@ export class PerfectingWindow {
     // The rewrite targets the inner shell so the sibling live region never
     // leaves the tree (see root()).
     shell.innerHTML =
-      `<div class="panel-title ui-win-head"><span class="ui-win-title" id="perfecting-title">${esc(t('hudChrome.perfecting.title'))}</span>` +
+      `<div class="panel-title ui-win-head"><span class="ui-win-title" id="perfecting-title">${esc(t(this.deps.hubStrip ? 'hudChrome.professions.title' : 'hudChrome.perfecting.title'))}</span>` +
       `<button type="button" class="x-btn ui-x-btn" data-close data-focus-key="pfClose" aria-label="${esc(t('hudChrome.perfecting.close'))}" title="${esc(t('hudChrome.perfecting.close'))}">${svgIcon('close')}</button></div>` +
+      (this.deps.hubStrip?.html() ?? '') +
       `<div class="pf-body">${this.bodyHtml(view)}</div>`;
     this.wire(root, view);
     const newScroller = root.querySelector<HTMLElement>('.pf-body');
@@ -455,6 +466,7 @@ export class PerfectingWindow {
 
   private wire(root: HTMLElement, view: PerfectingViewModel): void {
     this.swap.wire(view);
+    this.deps.hubStrip?.wire(root);
     root.querySelector('[data-close]')?.addEventListener('click', () => this.close());
     const rows = [...root.querySelectorAll<HTMLElement>('[data-cand-i]')];
     for (const btn of rows) {

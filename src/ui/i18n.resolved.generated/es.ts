@@ -6355,6 +6355,9 @@ export const es: EnTranslations = {
       "sharpeningStoneUse": "Uso: Afila tu arma de mano derecha, aumentando el poder de ataque en 6 p. durante 30 min.",
       "manaElixirUse": "Uso: Aumenta el espíritu en 6 p. durante 1 hora."
     },
+    "professionsHub": {
+      "tabOverview": "Overview"
+    },
     "professions": {
       "title": "Profesiones",
       "close": "Cerrar profesiones",

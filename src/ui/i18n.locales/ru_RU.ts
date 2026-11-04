@@ -22616,6 +22616,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.partyFrames.header': 'Группа',
   'hudChrome.professions.retentionFooter': 'При смене специализации сохраняется 60% навыка.',
   'hudChrome.professions.tutorialLink': 'Обучение профессиям',
+  'hudChrome.professionsHub.tabOverview': 'Обзор',
   'hudChrome.marketWindow.mixedListingsFooter':
     'Торговец пополняет обычные товары; лоты игроков размещаются рядом по назначенной ими цене.',
   'hudChrome.mapAtlas.track': 'Отследить',

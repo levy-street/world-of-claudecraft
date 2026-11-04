@@ -53,6 +53,7 @@ import {
   harvestJournalClock,
   harvestJournalViewSignature,
 } from './harvest_journal_view';
+import type { ProfessionsHubStrip } from './professions_hub_controller';
 
 /** The countdown clock's cadence: one wall-clock second, the resolution of
  *  the finest line the journal renders. Fixed for every player on every
@@ -159,6 +160,9 @@ export interface HarvestJournalWindowDeps {
    *  the mobile chrome's body classes track this window like every sibling
    *  (the P9b QA body-class gap this dep closes). */
   onVisibilityChange?(): void;
+  /** The Professions hub's shared tab strip (professions_hub_controller.ts),
+   *  placed under the title bar. Optional so painter rigs stay valid. */
+  hubStrip?: ProfessionsHubStrip;
 }
 
 export class HarvestJournalWindow {
@@ -181,6 +185,11 @@ export class HarvestJournalWindow {
 
   get isOpen(): boolean {
     return this.deps.root().style.display === 'flex';
+  }
+
+  /** The window root (the Professions hub carries its tab position here). */
+  rootElement(): HTMLElement {
+    return this.deps.root();
   }
 
   open(): void {
@@ -331,12 +340,14 @@ export class HarvestJournalWindow {
       root.appendChild(this.liveStatusNode());
     }
     content.innerHTML =
-      `<div class="panel-title ui-win-head"><span class="ui-win-title" id="harvest-journal-title">${esc(t('hudChrome.harvestJournal.title'))}</span>` +
+      `<div class="panel-title ui-win-head"><span class="ui-win-title" id="harvest-journal-title">${esc(t(this.deps.hubStrip ? 'hudChrome.professions.title' : 'hudChrome.harvestJournal.title'))}</span>` +
       `<button type="button" class="x-btn ui-x-btn" data-close data-focus-key="harvestJournalClose" aria-label="${esc(t('hudChrome.harvestJournal.close'))}">${svgIcon('close')}</button></div>` +
+      (this.deps.hubStrip?.html() ?? '') +
       `<div class="hj-body">${this.bodyHtml(view, nowMs)}</div>`;
     this.collectCountdownCells(content, nowMs);
     this.announceReadyFlips(view);
     root.querySelector('[data-close]')?.addEventListener('click', () => this.close());
+    this.deps.hubStrip?.wire(content);
     if (focusKey !== null) {
       // findFocusKey, never a selector the key is spliced into: the namespace
       // is flat and shared across every window, so the captured key is

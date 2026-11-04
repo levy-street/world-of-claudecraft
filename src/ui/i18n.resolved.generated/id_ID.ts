@@ -6355,6 +6355,9 @@ export const id_ID: EnTranslations = {
       "sharpeningStoneUse": "Gunakan: Menajamkan senjata tangan Anda, meningkatkan Kekuatan Serangan sebesar 25 selama 1 jam.",
       "manaElixirUse": "Gunakan: Meningkatkan Roh sebesar 6 selama 1 jam."
     },
+    "professionsHub": {
+      "tabOverview": "Overview"
+    },
     "professions": {
       "title": "Profesi",
       "close": "Tutup profesi",

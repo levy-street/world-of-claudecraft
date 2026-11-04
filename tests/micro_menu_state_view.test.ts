@@ -75,9 +75,8 @@ describe('micro_menu_state_view: the open-window ring', () => {
         // The four plain window toggles that were missing from the registry
         // (2026-09 review): no ring and no aria-pressed until they landed here.
         '#mm-cosmetics',
-        '#mm-harvest-journal',
         '#mm-loot-explorer',
-        '#mm-perfecting',
+        '#mm-professions',
         '#expedition-bell',
       ]),
     );
@@ -131,12 +130,10 @@ describe('micro_menu_state_view: the count badges', () => {
 });
 
 describe('micro_menu_state_view: the registry is real', () => {
-  it('rings each of the four late-added launchers from its own window', () => {
+  it('rings each of the late-added launchers from its own window', () => {
     const cases: ReadonlyArray<readonly [string, string]> = [
       ['#mm-cosmetics', 'cosmetics-window'],
-      ['#mm-harvest-journal', 'harvest-journal-window'],
       ['#mm-loot-explorer', 'loot-explorer-window'],
-      ['#mm-perfecting', 'perfecting-window'],
     ];
     for (const [selector, windowId] of cases) {
       const state = view().tick(openOnly(windowId), { talentPoints: 0 });
@@ -145,6 +142,23 @@ describe('micro_menu_state_view: the registry is real', () => {
         `${windowId} must light ${selector} and nothing else`,
       ).toEqual([selector]);
     }
+  });
+
+  it('rings the Professions hub launcher from ANY of its four member windows', () => {
+    for (const windowId of [
+      'professions-window',
+      'crafting-window',
+      'perfecting-window',
+      'harvest-journal-window',
+    ]) {
+      const state = view().tick(openOnly(windowId), { talentPoints: 0 });
+      expect(
+        state.launchers.filter((l) => l.on).map((l) => l.selector),
+        `${windowId} must light #mm-professions and nothing else`,
+      ).toEqual(['#mm-professions']);
+    }
+    const none = view().tick(() => false, { talentPoints: 0 });
+    expect(none.launchers.some((l) => l.on)).toBe(false);
   });
 
   it('names a launcher and a window that exist in BOTH entry documents', () => {

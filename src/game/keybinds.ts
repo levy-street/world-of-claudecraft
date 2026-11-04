@@ -31,7 +31,7 @@ export interface BindAction {
   label: string;
   category: string;
   kind: BindKind;
-  defaults: string[]; // 1 or 2 codes; index 0 = primary, 1 = secondary
+  defaults: string[]; // 0 to 2 codes (0 = unbound by default); index 0 = primary, 1 = secondary
   // When true this action is exempt from the classic-style "one code per action"
   // uniqueness sweep: its code may deliberately overlap another action's. Used
   // by Attack Move, whose default (A) intentionally shadows Turn Left while the
@@ -376,7 +376,8 @@ export const BIND_ACTIONS: BindAction[] = [
   },
   // Professions parks on the shifted layer of KeyP like Deeds does on Z:
   // every bare letter default is already taken, and Shift+P keeps the
-  // Spellbook's plain P untouched. Rebindable like any action.
+  // Spellbook's plain P untouched. It opens the Professions hub (Overview,
+  // Crafting, Perfecting, Harvest Journal) on its last tab. Rebindable.
   {
     id: 'professions',
     label: 'Professions',
@@ -393,28 +394,24 @@ export const BIND_ACTIONS: BindAction[] = [
     kind: 'edge',
     defaults: ['Shift+KeyX'],
   },
-  // The Harvest Journal parks on Shift+K. Its own initials are both spoken
-  // for on the shifted layer (Shift+H is Damage Meters, Shift+J is Target
-  // Buffs and Debuffs), and K is the free key next to them; bare KeyK stays
-  // the Leaderboard. Rebindable like any action.
+  // The Harvest Journal and Perfecting are tabs of the Professions hub (menu
+  // consolidation, 2026-11-04): Shift+P opens the hub and T lands on its
+  // Crafting tab, so neither tab ships a default key any more (their old
+  // Shift+K and Shift+T are free). Both actions stay rebindable and open the
+  // hub straight on their tab.
   {
     id: 'harvestJournal',
     label: 'Harvest Journal',
     category: 'Interface',
     kind: 'edge',
-    defaults: ['Shift+KeyK'],
+    defaults: [],
   },
-  // Perfecting parks on the shifted layer of KeyT, Crafting's letter: bare
-  // KeyT is Crafting, its own initial is spoken for on both layers (bare P is
-  // the Spellbook, Shift+P is Professions), and Perfecting is the crafting
-  // family's endgame surface, so it sits over Crafting the way Professions
-  // sits over the Spellbook. Rebindable like any action.
   {
     id: 'perfecting',
     label: 'Perfecting',
     category: 'Interface',
     kind: 'edge',
-    defaults: ['Shift+KeyT'],
+    defaults: [],
   },
   // Loot Explorer parks on Shift+O: bare KeyO is free, and Shift+O keeps the
   // shifted-letter-row convention every other collection/catalog window uses.
@@ -425,7 +422,7 @@ export const BIND_ACTIONS: BindAction[] = [
     kind: 'edge',
     defaults: ['Shift+KeyO'],
   },
-  // Cosmetics uses Shift+Y; Shift+K belongs to the Harvest Journal.
+  // Cosmetics uses Shift+Y.
   {
     id: 'cosmetics',
     label: 'Cosmetics',
