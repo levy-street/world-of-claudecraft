@@ -37,6 +37,12 @@ export const LAKE_ICE_LOOK = {
   crackDepth: 0.95,
 } as const;
 
+/** The key light's highlight on the lake's polish, as a share of its full peak,
+ *  and the most it may add to a channel: a glint, never a white sheet over the
+ *  slashes' lines (tests/smith_heart_quench_glare.test.ts). */
+export const LAKE_ICE_GLARE = 0.3;
+export const LAKE_ICE_GLARE_CAP = 0.18;
+
 /** How far in from an edge the snow drifts over the ice (yards). */
 export const LAKE_ICE_EDGE = 1.5;
 
@@ -214,9 +220,18 @@ export function lakeIceMaterial(pair: DetailPair, lowGfx: boolean): THREE.Materi
           '#include <emissivemap_fragment>',
           `#include <emissivemap_fragment>
         totalEmissiveRadiance += ${v3(LAKE_ICE_LOOK.sky)} * iceGraze * 0.5 * ( 1.0 - iceSnow ) * ( 1.0 - iceSkin * 0.5 );`,
+        )
+        .replace(
+          '#include <lights_fragment_end>',
+          `#include <lights_fragment_end>
+        // The key's highlight on the polish is a hint, never a sheet: at its
+        // full GGX peak it washed a slash's line white across the lake's
+        // sunward half (the bot pass of 2026-11-04). Its colour kept, its
+        // peak held to LAKE_ICE_GLARE_CAP of the light.
+        reflectedLight.directSpecular = min( reflectedLight.directSpecular * ${LAKE_ICE_GLARE.toFixed(2)}, vec3( ${LAKE_ICE_GLARE_CAP.toFixed(2)} ) );`,
         );
     };
-    std.customProgramCacheKey = () => `smith-heart-lake-ice|${lowGfx ? 'low' : 'full'}`;
+    std.customProgramCacheKey = () => `smith-heart-lake-ice-glint|${lowGfx ? 'low' : 'full'}`;
     m = std;
   }
   markSharedMaterial(m);
