@@ -165,6 +165,10 @@ describe('Knotted Gale: the row', () => {
     const far = Math.max(...knotGrid().map((g) => g.far)) - T.heartLipReach;
     expect(far / (RUN_SPEED * 0.5)).toBeLessThan(T.heartFuse * 0.6);
     expect(far / (RUN_SPEED * T.heartWalkMult)).toBeGreaterThan(T.heartFuse * 0.75);
+    // Even the NEAREST drop (heartFar from a lip) is a whole fuse's crawl with no
+    // tailwind (phase 2's storm): every ball, the second one too, needs the portals.
+    const near = T.heartFar - T.heartLipReach;
+    expect(near / (RUN_SPEED * T.heartWalkMult)).toBeGreaterThan(T.heartFuse - 0.01);
     // Where a ball really drops is that far.
     for (let salt = 0; salt < 40; salt++) {
       const at = knotSpot(salt * 97);

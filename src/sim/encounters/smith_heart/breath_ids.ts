@@ -454,8 +454,11 @@ export const BREATH_TUNING = {
    *  portal (the Cornice is too small; tests/smith_heart_breath_heart.test.ts
    *  pins the walk's length). A quarter makes a badly placed portal the burst
    *  the design asks for. */
-  // The open rim (2026-11-03) brought every lip nearer: a fifth now.
-  heartWalkMult: 0.2,
+  // The open rim (2026-11-03) brought every lip nearer: a fifth. At a fifth a
+  // ball dropped at heartFar crawled to a lip in 11 s of its 20 s fuse (phase
+  // 2's second ball above all: the storm has no tailwind), so no portal was
+  // needed (2026-11-04); a tenth makes the nearest drop a whole fuse's crawl.
+  heartWalkMult: 0.1,
   /** How near a ball a player takes it up, and a portal's mouth (yards). */
   heartPickR: 2.5,
   heartPortalR: 2.5,

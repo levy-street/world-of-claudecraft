@@ -1597,7 +1597,7 @@ table below disagree, this block wins. Every number stays a SKETCH (unmeasured).
   and the personal alerts (the Knotted Gale's marks).
 - **Phase 2** is unchanged (the team plays the new version before "more chaos").
 - **Mythic** keeps the Knotted Gale; its throw is now at any open lip, the carrier's walk a
-  fifth of a run (`heartWalkMult`), since every lip came nearer.
+  tenth of a run (`heartWalkMult`; a fifth until 2026-11-04: a ball dropped at `heartFar` walked to a lip in 11 s of its 20 s fuse): the nearest drop is a whole fuse's crawl, so every ball, phase 2's second one too, needs the portals.
 
 **The third pass of 2026-11-03 (the owner's review of the rework).** Where it and the block
 above disagree, this one wins.
