@@ -15,7 +15,7 @@ const sectionOrder = [
   'Membership ability',
 ] as const;
 type Group = (typeof sectionOrder)[number];
-type Entry = { name: string; level: number; line: string };
+type Entry = { name: string; level: number; line: string; specIds: string[] };
 
 export function classAbilitySections(
   cls: PlayerClass,
@@ -37,9 +37,9 @@ export function classAbilitySections(
     if (def.hiddenFromPlayer) continue;
     const source = abilityIndexGroup(def);
     if (source !== CLASSES[cls].name && source !== 'All classes') continue;
-    const specNames = specs
+    const specIds = specs
       .filter((s) => def.specs?.includes(s.id) || specSignatureIds(s).includes(id))
-      .map((s) => s.name);
+      .map((s) => s.id);
     const talents = ROW_TREES[cls].flatMap((row) =>
       row.options
         .filter((o) => o.effect.grant?.ability === id)
@@ -58,9 +58,8 @@ export function classAbilitySections(
       group = 'Talent choices';
       detail = talents.map((o) => o.name + ' (level ' + o.level + ')').join(' or ');
       level = Math.min(...talents.map((o) => o.level));
-    } else if (specNames.length) {
+    } else if (specIds.length) {
       group = 'Specialization abilities';
-      detail = specNames.join(' or ');
     } else if (baseIds.has(id)) {
       group = 'Class spellbook';
       detail = 'Level ' + def.learnLevel;
@@ -82,6 +81,7 @@ export function classAbilitySections(
       name: def.name,
       level: group === 'Class spellbook' || group === 'Talent choices' ? level : 0,
       line,
+      specIds,
     });
     groups.set(group, entries);
   }
@@ -90,6 +90,18 @@ export function classAbilitySections(
     .map((group) => {
       const entries = groups.get(group)!;
       entries.sort((a, b) => a.level - b.level || a.name.localeCompare(b.name, 'en'));
+      if (group === 'Specialization abilities') {
+        const subsections = specs.flatMap((spec) => {
+          const lines = entries
+            .filter((entry) => entry.specIds.includes(spec.id))
+            .map((entry) => entry.line);
+          if (!lines.length) return [];
+          const title = titleBy.spec?.get(cls + '/' + spec.id);
+          const heading = title ? link(title, spec.name) : spec.name;
+          return ['=== ' + heading + ' ===\n' + bullets(lines)];
+        });
+        return section(group, subsections.join('\n\n'));
+      }
       return section(group, bullets(entries.map((e) => e.line)));
     })
     .join('');

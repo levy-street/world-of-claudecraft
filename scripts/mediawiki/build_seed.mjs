@@ -244,7 +244,7 @@ for(const page of pages) {
   const path = illustrations.get(page.title);
   if(path) page.text = '<woc-art path="' + path + '" />\\n' + page.text;
 }
-const seedTimestamp = process.env.MEDIAWIKI_SEED_TIMESTAMP ?? '2026-11-04T02:00:00Z';
+const seedTimestamp = process.env.MEDIAWIKI_SEED_TIMESTAMP ?? '2026-11-04T03:00:00Z';
 const now = new Date(seedTimestamp).toISOString().replace(/\\.\\d{3}Z$/, 'Z');
 const body = pages.map((page, index) => \`
   <page>
