@@ -85,6 +85,7 @@ import {
   FORK_REACH,
   fxHash01,
   GALE_COLUMN,
+  GALE_CORE,
   gapLips,
   gapThreat,
   BREATH_FIGHT_POOLS as P,
@@ -260,7 +261,7 @@ void main() {
   #include <colorspace_fragment>
 }
 `;
-/** A funnel of wind (the vortex, a loose gale): streaks spiralling up. */
+/** A plain uv pass (the calm's beams and the beacons). */
 const FUNNEL_VERT = /* glsl */ `
 varying vec2 vUv;
 void main() {
@@ -268,13 +269,34 @@ void main() {
   gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 }
 `;
+/** A funnel of wind (the vortex, a loose gale), with how squarely each point
+ *  faces the eye: a column of wind is seen through more of itself at its
+ *  silhouette, so it reads as a body of air and never as a painted cone. */
+const WIND_FUNNEL_VERT = /* glsl */ `
+varying vec2 vUv;
+varying float vFace;
+void main() {
+  vUv = uv;
+  vec4 mv = modelViewMatrix * vec4(position, 1.0);
+  vFace = abs(dot(normalize(normalMatrix * normal), normalize(-mv.xyz)));
+  gl_Position = projectionMatrix * mv;
+}
+`;
+/** The wind's own look: long streaks wound up the column, a body of grey grit
+ *  thickest low and at the silhouette, a skirt of dust where it scours the
+ *  floor, self-shaded dark low and pale at its lip (audit point 16: the cream
+ *  ribbons on a bare disc read as a cone). `uCore` 1 is a gale's inner core:
+ *  tighter streaks, darker, nearly no skirt. */
 const FUNNEL_FRAG = /* glsl */ `
 uniform float uAlpha;
 uniform float uTime;
 uniform float uSpin;
+uniform float uCore;
 uniform vec3 uWind;
 uniform vec3 uShade;
+uniform vec3 uGrit;
 varying vec2 vUv;
+varying float vFace;
 float h(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 float n(vec2 p) {
   vec2 i = floor(p);
@@ -283,11 +305,21 @@ float n(vec2 p) {
   return mix(mix(h(i), h(i + vec2(1, 0)), f.x), mix(h(i + vec2(0, 1)), h(i + vec2(1, 1)), f.x), f.y);
 }
 void main() {
-  float sp = vUv.x * 6.0 + vUv.y * 3.0 - uTime * uSpin;
-  float bands = n(vec2(sp * 3.0, vUv.y * 4.0)) * 0.6 + n(vec2(sp * 7.0, vUv.y * 9.0)) * 0.4;
-  float fade = smoothstep(0.0, 0.08, vUv.y) * (1.0 - smoothstep(0.7, 1.0, vUv.y));
-  float a = uAlpha * fade * smoothstep(0.38, 0.82, bands);
-  gl_FragColor = vec4(mix(uShade, uWind, 0.3 + bands * 0.7), a);
+  float y = vUv.y;
+  float sp = vUv.x * 6.0 + y * (3.0 + 2.0 * uCore) - uTime * uSpin;
+  float bands = n(vec2(sp * 3.0, y * 4.0)) * 0.6 + n(vec2(sp * 7.0, y * 9.0)) * 0.4;
+  float streak = smoothstep(0.6, 0.9, bands);
+  // Wind seen edge-on is thicker: the column's silhouette fills in.
+  float edge = 1.0 - vFace;
+  float body = (0.3 + 0.7 * edge * edge) * (1.0 - smoothstep(0.15, 0.95, y)) * (0.75 + 0.25 * bands);
+  // The skirt where it scours the floor, torn by the streaks.
+  float skirt = (1.0 - smoothstep(0.0, 0.2, y)) * (1.0 - uCore) * (0.5 + 0.5 * bands);
+  float fade = smoothstep(0.0, 0.04, y) * (1.0 - smoothstep(0.62, 1.0, y));
+  float a = (streak * 0.75 + body * 0.62 + skirt * 0.7) * fade * uAlpha;
+  vec3 col = mix(uShade, uWind, 0.2 + 0.8 * streak);
+  col = mix(col, uGrit, clamp(body * 0.7 + skirt * 0.8, 0.0, 1.0) * (1.0 - 0.6 * streak));
+  col *= (0.55 + 0.5 * y) * (1.0 - 0.3 * uCore);
+  gl_FragColor = vec4(col, clamp(a, 0.0, 0.92));
   #include <colorspace_fragment>
 }
 `;
@@ -565,6 +597,7 @@ export class BreathFightFx {
   // Cosmetic and every-tier extras.
   private readonly vortexFunnel: Funnel;
   private readonly galeFunnels: Funnel[] = [];
+  private readonly galeCores: Funnel[] = [];
   private readonly calmBeams: Funnel[] = [];
   private readonly calmDomes: Funnel[] = [];
   private readonly seatPips: THREE.Sprite[] = [];
@@ -781,17 +814,19 @@ export class BreathFightFx {
     this.drawnMarks = new MarkPool(markFans(2, 360, C.lethal, 'drawnMark'));
 
     // ---- funnels, beams, domes ----
-    const funnelMat = (name: string, spin: number) =>
+    const funnelMat = (name: string, spin: number, core = 0) =>
       new THREE.ShaderMaterial({
         name,
         uniforms: {
           uAlpha: { value: 0 },
           uTime: this.uTime,
           uSpin: { value: spin },
+          uCore: { value: core },
           uWind: { value: new THREE.Color(...C.wind) },
-          uShade: { value: new THREE.Color(0.5, 0.58, 0.66) },
+          uShade: { value: new THREE.Color(0.3, 0.34, 0.4) },
+          uGrit: { value: new THREE.Color(...GALE_CORE.dustColor) },
         },
-        vertexShader: FUNNEL_VERT,
+        vertexShader: WIND_FUNNEL_VERT,
         fragmentShader: FUNNEL_FRAG,
         transparent: true,
         depthWrite: false,
@@ -808,8 +843,8 @@ export class BreathFightFx {
       }
     }
     this.geometries.push(funnelGeo);
-    const funnel = (name: string, spin: number): Funnel => {
-      const mat = funnelMat(name, spin);
+    const funnel = (name: string, spin: number, core = 0): Funnel => {
+      const mat = funnelMat(name, spin, core);
       this.materials.push(mat);
       const mesh = new THREE.Mesh(funnelGeo, mat);
       mesh.name = name;
@@ -819,8 +854,11 @@ export class BreathFightFx {
       return { mesh, mat };
     };
     this.vortexFunnel = funnel('smithHeartBreathVortex', VORTEX_FUNNEL.spin);
-    for (let i = 0; i < P.gales; i++)
+    for (let i = 0; i < P.gales; i++) {
       this.galeFunnels.push(funnel('smithHeartBreathGale', GALE_COLUMN.spin));
+      // Its tighter, darker core spinning faster inside it (the same program).
+      this.galeCores.push(funnel('smithHeartBreathGaleCore', GALE_COLUMN.spin * GALE_CORE.spin, 1));
+    }
     const beamGeo = new THREE.CylinderGeometry(0.5, 0.5, 1, 18, 1, true).translate(0, 0.5, 0);
     const domeGeo = new THREE.SphereGeometry(1, 28, 12, 0, Math.PI * 2, 0, Math.PI / 2);
     this.geometries.push(beamGeo, domeGeo);
@@ -1423,7 +1461,13 @@ export class BreathFightFx {
       p.end();
     }
     this.vortexFunnel.mesh.visible = false;
-    for (const f of [...this.galeFunnels, ...this.calmBeams, ...this.calmDomes, ...this.beacons])
+    for (const f of [
+      ...this.galeFunnels,
+      ...this.galeCores,
+      ...this.calmBeams,
+      ...this.calmDomes,
+      ...this.beacons,
+    ])
       f.mesh.visible = false;
     for (const s of [...this.seatPips, ...this.beaconGlows]) s.visible = false;
     this.crown.visible = false;
@@ -1723,9 +1767,11 @@ export class BreathFightFx {
     for (let i = 0; i < this.galeFans.length; i++) {
       const s = this.galeFans[i];
       const f = this.galeFunnels[i];
+      const core = this.galeCores[i];
       const e = s.id >= 0 ? world.entities.get(s.id) : undefined;
       if (!e) {
         f.mesh.visible = false;
+        core.mesh.visible = false;
         continue;
       }
       const r = e.scale > 0 ? e.scale : T.galeR;
@@ -1736,6 +1782,16 @@ export class BreathFightFx {
       f.mesh.scale.set(r, GALE_COLUMN.height, r);
       f.mesh.rotation.y = this.clock * 2;
       f.mat.uniforms.uAlpha.value = this.detail ? 0.85 : 0.65;
+      core.mesh.visible = true;
+      core.mesh.position.copy(f.mesh.position);
+      core.mesh.scale.set(
+        r * GALE_CORE.width,
+        GALE_COLUMN.height * GALE_CORE.height,
+        r * GALE_CORE.width,
+      );
+      core.mesh.rotation.y = -this.clock * 3;
+      core.mat.uniforms.uAlpha.value = this.detail ? 0.75 : 0.55;
+      // Grit thrown up and round the column, and dust rolling out at its foot.
       if (this.rand() < dt * 24 * this.density) {
         const a = this.rand() * Math.PI * 2;
         this.particles.puff(eAt.x + Math.sin(a) * r, eAt.y + 0.5, eAt.z + Math.cos(a) * r, 1, {
@@ -1747,6 +1803,21 @@ export class BreathFightFx {
           alpha: 0.85,
           dir: [Math.cos(a), 0.8, -Math.sin(a)],
           spread: 0.25,
+        });
+      }
+      if (this.rand() < dt * GALE_CORE.dust * this.density) {
+        const a = this.rand() * Math.PI * 2;
+        const rr = r * (0.7 + 0.5 * this.rand());
+        this.particles.puff(eAt.x + Math.sin(a) * rr, eAt.y + 0.2, eAt.z + Math.cos(a) * rr, 1, {
+          speed: 3.5,
+          up: 0.6,
+          life: 1.4,
+          size: [0.9, 2.4],
+          color: GALE_CORE.dustColor,
+          alpha: 0.6,
+          dir: [Math.cos(a), 0.15, -Math.sin(a)],
+          spread: 0.35,
+          drag: 1.6,
         });
       }
     }

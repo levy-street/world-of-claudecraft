@@ -362,6 +362,17 @@ export function boltFlare(elapsed: number, seconds: number): number {
 
 /** A loose gale's column: its height and how its funnel widens up it. */
 export const GALE_COLUMN = { height: 10, topScale: 1.6, spin: 3.2 } as const;
+/** A gale's inner core (a share of its column's width and height, its spin a
+ *  multiple of the column's) and the dust rolling out at its foot (puffs a
+ *  second): a storm with a dark heart and a skirt of grit, never a bare cone. */
+export const GALE_CORE = {
+  width: 0.5,
+  height: 0.85,
+  spin: 1.7,
+  dust: 12,
+  /** The scoured grit: warmer and darker than the pale Cornice, so it reads on it. */
+  dustColor: [0.38, 0.34, 0.31] as const,
+} as const;
 /** The vortex's funnel before the guardian's mouth. */
 export const VORTEX_FUNNEL = { height: 6, topScale: 1.9, spin: 4.5 } as const;
 

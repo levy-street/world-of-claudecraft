@@ -21,7 +21,6 @@ import {
   shockRingLook,
 } from '../gravewyrm_sanctum_fx/sanctum_fx_core';
 import {
-  DUST_FRAG,
   FIRE_FRAG,
   FIRE_VERT,
   GHOST_RAMP,
@@ -30,6 +29,7 @@ import {
   ParticlePool,
   type ParticleSpec,
 } from '../hollow_crypt/crypt_fx_particles';
+import { SMOKE_FRAG, SMOKE_VERT } from './engine_smoke_glsl';
 
 const RING_SLOTS = 14;
 /** The shock ring's hot crest, as a share of its radius. */
@@ -152,8 +152,8 @@ export class EngineParticles {
     this.pools = {
       smoke: pool(
         'trashEngineSmoke',
-        PARTICLE_VERT,
-        DUST_FRAG,
+        SMOKE_VERT,
+        SMOKE_FRAG,
         THREE.NormalBlending,
         1200,
         steps.smoke,

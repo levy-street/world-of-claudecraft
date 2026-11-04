@@ -12,6 +12,7 @@ import {
   heartObjectKind,
   heartRungs,
   knotLook,
+  LINK_R,
   LINK_Y,
   liveFuse,
   markFill,
@@ -23,6 +24,7 @@ import {
   throwHeading,
   throwOffset,
 } from '../src/render/smith_heart_fx/breath_heart_fx_core';
+import { PORTAL_LINK_FRAG, PORTAL_LINK_VERT } from '../src/render/smith_heart_fx/breath_heart_glsl';
 import {
   BREATH_AURAS,
   BREATH_OBJECTS,
@@ -118,6 +120,12 @@ describe('Knotted Gale: the look', () => {
     expect(HEART_POOLS.links).toBe(2);
     expect(HEART_POOLS.marks).toBeGreaterThanOrEqual(4);
     expect(LINK_Y[1]).toBeGreaterThan(LINK_Y[0]);
+    // Each link is a tube of light nearly a yard across (the audit's point 15: the
+    // flat ribbon read as a faint line), the braid wound a little wider.
+    expect(LINK_R[0]).toBeGreaterThanOrEqual(0.4);
+    expect(LINK_R[1]).toBeGreaterThan(LINK_R[0]);
+    expect(PORTAL_LINK_VERT).toContain('vFace');
+    expect(PORTAL_LINK_FRAG).toContain('core');
     // The objects and the marks name their side.
     expect(portalSideOfKind('portalC')).toBe('C');
     expect(portalSideOfKind('knot')).toBeNull();
