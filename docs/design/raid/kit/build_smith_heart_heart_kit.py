@@ -43,6 +43,7 @@ import shkit  # noqa: E402,F401  (puts the shared dungeon kit on the path)
 import heart_pieces as hp  # noqa: E402
 import quarter_pieces as qp  # noqa: E402
 import landmark_pieces as lp  # noqa: E402
+import anvil_piece as ap  # noqa: E402
 import quarter_split as qs  # noqa: E402
 from build_smith_heart_hammer_kit import camera, look, scale_figure  # noqa: E402
 from hckit import export_kit  # noqa: E402
@@ -90,6 +91,8 @@ BUILDERS = {
     'SlabClaw': lambda: hp.slab_claw(bpy),
     'SlabCollar': lambda: hp.slab_collar(bpy),
     'SlabFace': lambda: hp.slab_face(bpy),
+    # The Masterless Strength's great anvil (Weight of the Anvil).
+    'FinalAnvil': lambda: ap.final_anvil(bpy),
 }
 
 

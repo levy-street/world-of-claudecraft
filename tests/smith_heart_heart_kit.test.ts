@@ -142,6 +142,7 @@ describe('Smith Heart Heart kit: the piece list and the shipped GLB', () => {
       'AltarQuench',
       'AltarHeat',
       'HeartRoot',
+      'FinalAnvil',
       'HeartCrystal',
       'CoreBed',
       'ColTorso',
@@ -323,7 +324,8 @@ describe('Smith Heart Heart kit: the plan', () => {
         const p = heartRootPoint(vein, t);
         const r = Math.hypot(p.x - HEART_ROOM.x, p.z - HEART_ROOM.z);
         expect(r, `${vein} t ${t.toFixed(2)}`).toBeGreaterThan(HEART_ROOM.r + 8);
-        expect(p.y).toBeGreaterThan(8);
+        // Its near end plunges under the walk's height, inside its landmark.
+        expect(p.y).toBeGreaterThan(-10);
       }
       // Its far end lies in the mountain's rock (the crown holds it).
       const end = heartRootPoint(vein, 1);

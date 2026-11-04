@@ -49,7 +49,8 @@ FLOOR_TOP = 0.02  # the sheet (quarter_pieces.SHEET_Z)
 SLAB_BOTTOM = -3.25  # the keel's top: the floor layer's rock runs down to it
 KEEL_BAND_R = 38.0  # the keel's masses part here
 ISLAND_CLIP = 6.0  # a loose shell narrower than this goes whole, never cut
-KEEL_STEP = 2.6  # the keel's walls: a column every this many yards
+KEEL_STEP = 1.9  # the keel's walls: a column every this many yards
+KEEL_ROWS = 11  # and this many rows down them
 RIDGE_STEP = 1.5
 CHAIN_TOL = 0.14
 
@@ -394,33 +395,44 @@ def _srgb(c):
     return tuple(ch ** 2.2 for ch in c)
 
 
-FRESH = _srgb((0.66, 0.6, 0.53))
-ROCK = _srgb((0.42, 0.38, 0.35))
-ROCK_DARK = _srgb((0.17, 0.16, 0.17))
-ROCK_DEEP = _srgb((0.3, 0.2, 0.15))
+# The mountain's own stone in section, painted (the raid's Painted World brief): warm
+# dark granite in thick wandering beds, a paler lift between them, a fresh pale break in
+# the top yard, sinking into a warm shadow lit from the heart far below. Never grey flats.
+FRESH = _srgb((0.68, 0.6, 0.5))
+ROCK_LIFT = _srgb((0.5, 0.42, 0.36))
+ROCK = _srgb((0.38, 0.31, 0.28))
+ROCK_DARK = _srgb((0.2, 0.17, 0.18))
+ROCK_DEEP = _srgb((0.42, 0.22, 0.13))
 VEIN_LIGHT = (1.0, 0.62, 0.22)
+BED_H = 4.2  # a bed of the section's rock, yards (thick and thin about this)
 
 
 def _mix(a, b, t):
     return tuple(a[k] + (b[k] - a[k]) * t for k in range(3))
 
 
+def _bed(x, y, z):
+    """Where a height lies in its bed: 0 at the bed's foot (its overhang), 1 at its top,
+    wandering round the room."""
+    w = z + _vnoise(x * 0.06, y * 0.06) * 3.6 + 0.9 * math.sin(z * 0.41)
+    return (w / BED_H) % 1.0
+
+
 def rock_colour(x, y, z):
     """The rock a break shows: fresh and pale in the first yard, then bedded granite
-    darkening down the keel."""
+    darkening down the keel, warm where the heart's light catches it."""
     n = _vnoise(x * 0.5 + z * 0.2, y * 0.5 - z * 0.2)
-    bed = 0.5 + 0.5 * math.sin(z * 1.35 + _vnoise(x * 0.1, y * 0.1) * 6.0)
-    bed = bed * bed * (3 - 2 * bed)
-    # Warm low down: the heart's light far below catches it.
-    deep = max(0.0, min(1.0, (-z - 8.0) / 30.0))
-    c = _mix(ROCK, ROCK_DARK, 0.2 + 0.8 * bed)
-    c = _mix(c, ROCK_DEEP, deep * deep * 0.7)
-    # A faceted rock, face by face.
-    c = tuple(ch * (0.72 + 0.56 * _hash2(round(x * 1.4) + 0.3, round(y * 1.4) + round(z * 1.4) * 1.7)) for ch in c)
-    fresh = max(0.0, min(1.0, 1.0 + z / 1.4)) * (0.55 + 0.45 * n)
-    c = _mix(c, FRESH, fresh)
-    k = 0.82 + 0.36 * n
-    return tuple(ch * k for ch in c)
+    broad = _vnoise(x * 0.08 + z * 0.05 + 3.0, y * 0.08 - z * 0.05)
+    bed = _bed(x, y, z)
+    c = _mix(ROCK_DARK, ROCK, min(1.0, bed * 1.6))
+    c = _mix(c, ROCK_LIFT, max(0.0, min(1.0, (bed - 0.62) / 0.38)) * (0.55 + 0.45 * broad))
+    deep = max(0.0, min(1.0, (-z - 7.0) / 26.0))
+    c = _mix(c, ROCK_DEEP, deep * deep * 0.8)
+    # The brush: broad strokes along the bed, a little chip by chip.
+    c = tuple(ch * (0.84 + 0.34 * broad) * (0.92 + 0.16 * _hash2(round(x * 1.1) + 0.3, round(y * 1.1) + round(z * 1.1) * 1.7))
+              for ch in c)
+    fresh = max(0.0, min(1.0, 1.0 + z / 1.2)) * (0.5 + 0.5 * n)
+    return _mix(c, FRESH, fresh)
 
 
 def _flat(a, b, c):
@@ -436,12 +448,33 @@ def rock_tri(a, b, c, m, tag):
     return Tri((a, b, c), (n, n, n), (rock_colour(*a), rock_colour(*b), rock_colour(*c)), m, tag)
 
 
-def strip(path, tops, bottoms, out_dir, m, tag, rows=2, jag=0.5, salt=0.0, close=False, veins=0):
+def _densify(path, tops, bottoms, step):
+    """A wall's plan path with no span longer than `step` (a long span drew one flat
+    plane, however the rows break it)."""
+    if step is None or len(path) < 2:
+        return path, tops, bottoms
+    p2, t2, b2 = [path[0]], [tops[0]], [bottoms[0]]
+    for k in range(len(path) - 1):
+        a, c = path[k], path[k + 1]
+        L = math.hypot(c[0] - a[0], c[1] - a[1])
+        n = max(1, int(math.ceil(L / step)))
+        for j in range(1, n + 1):
+            f = j / n
+            p2.append((a[0] + (c[0] - a[0]) * f, a[1] + (c[1] - a[1]) * f))
+            t2.append(tops[k] + (tops[k + 1] - tops[k]) * f)
+            b2.append(bottoms[k] + (bottoms[k + 1] - bottoms[k]) * f)
+    return p2, t2, b2
+
+
+def strip(path, tops, bottoms, out_dir, m, tag, rows=2, jag=0.5, salt=0.0, close=False, veins=0, step=None):
     """A wall of broken rock under a plan path. `out_dir(mid)` is the plan direction out
     of the rock at a mid point: the wall faces it, and its inner rows only ever fall back
     INTO the rock, so the exact edge at the top stays exact. `close`: its last row back
     on the plan path too (it meets a shell of rock there). `veins`: seams of crystal
-    running down it, a hair proud."""
+    running down it, a hair proud. `step`: the longest span along the path. Each row's
+    height falls in its bed of rock and is cut back under the bed above, so the wall reads
+    as ledges, and each column is its own broken spur, so never as a plane."""
+    path, tops, bottoms = _densify(path, tops, bottoms, step)
     n = len(path)
     out = []
     if n < 2:
@@ -457,6 +490,8 @@ def strip(path, tops, bottoms, out_dir, m, tag, rows=2, jag=0.5, salt=0.0, close
         o = out_dir(((x + (b[0] if k < n - 1 else a[0])) / 2, (y + (b[1] if k < n - 1 else a[1])) / 2))
         if nx * o[0] + ny * o[1] < 0:
             nx, ny = -nx, -ny
+        # A long stretch of the wall stands out or back as one buttress.
+        spur = _vnoise(x * 0.11 + salt, y * 0.11 - salt * 0.5)
         col = []
         for j in range(rows + 1):
             f = j / rows
@@ -470,7 +505,8 @@ def strip(path, tops, bottoms, out_dir, m, tag, rows=2, jag=0.5, salt=0.0, close
                 a = _vnoise(x * 0.17 + salt + j * 0.7, y * 0.17 - j * 0.4)
                 b = _vnoise(x * 0.8 + salt + j * 3.1, y * 0.8 - j * 1.7)
                 c = _hash2(round(x * 2.0) + j * 7.0 + salt, round(y * 2.0) - j * 3.0)
-                back = jag * (0.08 + 0.42 * a + 0.12 * b + 0.38 * c)
+                ledge = _bed(x, y, z) ** 2
+                back = jag * (0.06 + 0.3 * a + 0.1 * b + 0.16 * c + 0.3 * spur + 0.34 * (1.0 - ledge))
             col.append((x - nx * back, y - ny * back, z))
         grid.append(col)
     for k in range(n - 1):
@@ -605,7 +641,7 @@ def floor_walls(edges, m, tag):
         line = _simplify([(q[0], q[1]) for q in chain], CHAIN_TOL)
         tops = [FLOOR_TOP - 0.02] * len(line)
         bottoms = [SLAB_BOTTOM] * len(line)
-        out.extend(strip(line, tops, bottoms, out_dir, m, tag, rows=1, jag=0.7))
+        out.extend(strip(line, tops, bottoms, out_dir, m, tag, rows=2, jag=1.5, step=2.4))
     return out
 
 
@@ -824,7 +860,8 @@ def split_keel(tris):
         if other != i:
             # What stands after the neighbour has gone: the whole section of the rock.
             quarters[i].extend(bucket_wall(edges, _radius, KEEL_STEP, None, STONE, tag_of(_neighbour_class(i, other), mass),
-                                           rows=6, jag=4.2, salt=salt, reach=0.3, z_top=SLAB_BOTTOM, close=True, veins=3))
+                                           rows=KEEL_ROWS, jag=5.0, salt=salt, reach=0.3, z_top=SLAB_BOTTOM, close=True,
+                                           veins=3))
         else:
             # The masses' own borders: round the band, or out along the middle.
             rs_mid = [_radius(e[0]) for e in edges]
@@ -867,7 +904,7 @@ def _ring_face(edges, i, mass, salt):
                       reach=0.3, z_top=SLAB_BOTTOM, close=True)
     # The column's face: the same cut seen from the other side.
     flipped = [(a, b, (-ins[0], -ins[1])) for a, b, ins in edges]
-    out.extend(bucket_wall(flipped, param, KEEL_STEP, None, STONE, tag_of(1, 0), rows=7, jag=3.0, salt=salt + 40.0,
+    out.extend(bucket_wall(flipped, param, KEEL_STEP, None, STONE, tag_of(1, 0), rows=KEEL_ROWS, jag=3.6, salt=salt + 40.0,
                            reach=0.3, z_top=-0.25, close=True, veins=2))
     return out
 

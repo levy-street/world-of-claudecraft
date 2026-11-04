@@ -17,6 +17,11 @@ import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { fxHash } from './hammer_fx_core';
 
+/** The great anvil's Blender model in the Heart kit (docs/design/raid/kit/
+ *  anvil_piece.py); `anvilStone` and `anvilCrystals` are its fallback until the
+ *  kit lands. */
+export const FINAL_ANVIL_PIECE = 'Kit_FinalAnvil';
+
 /** The anvil's size (yards): its length along the horn, its height. */
 export const ANVIL_SIZE = { length: 11, height: 7.1, depth: 4 } as const;
 
@@ -126,6 +131,10 @@ export function anvilCrystals(): THREE.BufferGeometry {
   const merged = mergeGeometries(parts, false) ?? new THREE.BufferGeometry();
   for (const p of parts) p.dispose();
   merged.computeVertexNormals();
+  // White: the crystal's material reads vertex colours (the kit's model paints
+  // each facet's light in them).
+  const white = new Float32Array((merged.getAttribute('position')?.count ?? 0) * 3).fill(1);
+  merged.setAttribute('color', new THREE.BufferAttribute(white, 3));
   return merged;
 }
 

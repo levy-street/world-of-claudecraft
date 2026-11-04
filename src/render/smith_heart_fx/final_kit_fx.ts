@@ -53,6 +53,7 @@ import { attachSceneGroupGated } from '../gated_scene_attach';
 import { GFX } from '../gfx';
 import { getFlameTex } from '../ignivar_fire_vfx';
 import { setRenderCategory } from '../renderer_diagnostics';
+import { heartKitMeshes, SMITH_HEART_HEART_KIT_URL } from '../smith_heart/heart_kit';
 import { EngineParticles } from '../trash_engine_fx/engine_particles';
 import {
   anvilDrop,
@@ -84,7 +85,13 @@ import {
   WHIRL_FRAG,
   WHIRL_VERT,
 } from './final_kit_glsl';
-import { anvilCrystals, anvilStone, iceCrust, shellStone } from './final_kit_shapes';
+import {
+  anvilCrystals,
+  anvilStone,
+  FINAL_ANVIL_PIECE,
+  iceCrust,
+  shellStone,
+} from './final_kit_shapes';
 import {
   coldReachFill,
   FINAL_TELEGRAPH_POOLS,
@@ -391,22 +398,34 @@ export class FinalKitFx {
     this.anvilStoneMat = new THREE.MeshLambertMaterial({
       name: 'smithHeartFinalAnvilStone',
       vertexColors: true,
-      flatShading: true,
       emissive: 0x120804,
     });
     this.anvilCrystalMat = new THREE.MeshBasicMaterial({
       name: 'smithHeartFinalAnvilCrystal',
       color: 0xffb030,
+      vertexColors: true,
       toneMapped: false,
     });
     this.materials.push(this.anvilStoneMat, this.anvilCrystalMat);
-    for (const [geo, mat] of [
-      [stoneGeo, this.anvilStoneMat],
-      [crystalGeo, this.anvilCrystalMat],
-    ] as const) {
-      const m = new THREE.Mesh(geo, mat);
-      m.frustumCulled = false;
-      this.anvil.add(m);
+    // The Blender model when the Heart kit has landed (the interior waits for it,
+    // capped), the carved fallback otherwise; the same two materials either way.
+    const kitAnvil = hasDom ? heartKitMeshes(SMITH_HEART_HEART_KIT_URL, FINAL_ANVIL_PIECE) : null;
+    if (kitAnvil) {
+      for (const m of kitAnvil.children) {
+        if (!(m instanceof THREE.Mesh)) continue;
+        m.material = m.name.endsWith(':glow') ? this.anvilCrystalMat : this.anvilStoneMat;
+        m.frustumCulled = false;
+      }
+      this.anvil.add(kitAnvil);
+    } else {
+      for (const [geo, mat] of [
+        [stoneGeo, this.anvilStoneMat],
+        [crystalGeo, this.anvilCrystalMat],
+      ] as const) {
+        const m = new THREE.Mesh(geo, mat);
+        m.frustumCulled = false;
+        this.anvil.add(m);
+      }
     }
     this.anvil.name = 'smithHeartFinalAnvil';
     this.anvil.visible = false;

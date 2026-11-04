@@ -90,6 +90,8 @@ export const SMITH_HEART_HEART_KIT_PIECES = [
   'SlabClaw',
   'SlabCollar',
   'SlabFace',
+  // The Masterless Strength's great anvil (src/render/smith_heart_fx/final_kit_fx.ts).
+  'FinalAnvil',
 ];
 
 export const ASSET = {
@@ -118,6 +120,8 @@ export function sourceFingerprint(root = ROOT) {
     'docs/design/raid/kit/quarter_pieces.py',
     'docs/design/raid/kit/quarter_split.py',
     'docs/design/raid/kit/landmark_pieces.py',
+    'docs/design/raid/kit/landmark_paint.py',
+    'docs/design/raid/kit/anvil_piece.py',
     'docs/design/raid/kit/build_smith_heart_heart_kit.py',
     'docs/design/raid/kit/build_smith_heart_hammer_kit.py',
     'scripts/assets/smith_heart_heart_kit/build.mjs',

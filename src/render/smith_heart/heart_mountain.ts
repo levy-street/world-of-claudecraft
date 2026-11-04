@@ -1,11 +1,11 @@
 // The Smith's Heart's mountain (heart_mountain_core.ts plans it): one indexed,
-// flat-shaded heightfield of rock round every floor, tinted by height (dark
+// heightfield of rock round every floor, tinted by height (dark
 // basalt down by the chasm, paler granite on the ridges where the storm light
 // catches it) with a hashed mottle. Static, one draw; the low tier builds it
 // on a coarser grid (fewer facets, the same mountain).
 
 import * as THREE from 'three';
-import { detailedSurfaceMat } from '../worn_stone';
+import { surfaceMat } from '../gfx';
 import {
   HAMMER_ROCK_GAIN,
   HAMMER_ROCK_MIX,
@@ -148,13 +148,11 @@ export function buildHeartMountain(lowGfx: boolean): THREE.Mesh {
   geometry.computeBoundingSphere();
   const mesh = new THREE.Mesh(
     geometry,
-    // The shared triplanar rock (natural fracture) on the tiers that draw it:
-    // the faceted mass reads as stone, not as painted card.
-    detailedSurfaceMat(
-      { color: 0xffffff, vertexColors: true, roughness: 0.95, flatShading: true },
-      'rock',
-      { strength: 0.55 },
-    ),
+    // The dark mass behind the rock kit, smooth and plain: faceted, the grid's
+    // faces turned from the light drew as black slits standing in the crown
+    // (seen through the kit's gaps); with the shared fracture, smooth normals
+    // scribbled black at every grazing angle.
+    surfaceMat({ color: 0xffffff, vertexColors: true, roughness: 0.95 }),
   );
   mesh.name = 'smithHeartMountain';
   mesh.matrixAutoUpdate = false;

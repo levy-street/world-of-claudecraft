@@ -24,7 +24,7 @@
 
 import * as THREE from 'three';
 import type { SmithHeartVein } from '../../sim/content/smith_heart_layout';
-import { sharedUniforms } from '../gfx';
+import { GFX, sharedUniforms } from '../gfx';
 import { type HeartAirV3, type HeartAirV4, heartQuadGeometry } from './heart_air_quads';
 import { heartKitMeshes, SMITH_HEART_HEART_KIT_URL } from './heart_kit';
 import {
@@ -127,6 +127,17 @@ export function buildHeartLandmarks(lowGfx: boolean, centre: THREE.Vector3): Hea
   const A = HEART_LANDMARK_AIR;
   const rigs = new Map<SmithHeartVein, LandmarkRig>();
   const veins: SmithHeartVein[] = ['breath', 'quench', 'hammer', 'heat'];
+  // The Hammer's, the Quench's and the Breath's rock is painted in its vertex
+  // colours (landmark_paint.py): the shared stone's photographic fracture
+  // would turn that paint to camouflage. Built-in, no texture, one program.
+  const painted = GFX.standardMaterials
+    ? new THREE.MeshStandardMaterial({
+        name: 'smithHeartLandmarkPainted',
+        vertexColors: true,
+        metalness: 0,
+        roughness: 0.92,
+      })
+    : new THREE.MeshLambertMaterial({ name: 'smithHeartLandmarkPainted', vertexColors: true });
 
   for (const vein of veins) {
     const glow = new THREE.ShaderMaterial({
@@ -152,6 +163,7 @@ export function buildHeartLandmarks(lowGfx: boolean, centre: THREE.Vector3): Hea
       for (const m of piece.children) {
         if (!(m instanceof THREE.Mesh)) continue;
         if (m.name.endsWith(':glow')) m.material = glow;
+        else if (m.name.endsWith(':stone') && vein !== 'heat') m.material = painted;
         if (lowGfx) m.castShadow = false;
       }
       group.add(piece);

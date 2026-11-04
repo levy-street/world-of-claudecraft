@@ -44,7 +44,7 @@ export const HEART_SLAB = { height: 9, thick: 2.2 } as const;
 export const HEART_SEAL_BARRIER = {
   sillHeight: 0.6,
   sillDepth: 0.9,
-  veilTop: 2.2,
+  veilTop: 2.9,
   postHeight: 2.8,
   postWidth: 1.2,
   postDepth: 1.3,

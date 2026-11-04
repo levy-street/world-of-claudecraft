@@ -97,7 +97,7 @@ void main() {
   ${LANDMARK_FLAVOUR[vein]}
   float level = mix(uQuiet * (0.85 + 0.15 * sin(uTime * 1.1 + vP.y * 0.3)), 1.15 * flav, uLit);
   vec3 white = vec3(1.0, 0.97, 0.9);
-  vec3 c = uColor * (0.4 + 0.75 * vShade.r) * level * 1.5;
+  vec3 c = uColor * (0.2 + 0.95 * vShade.r) * level * 1.5;
   c += mix(uColor, uHot, 0.5) * hot * uLit * (0.4 + 0.6 * vShade.r) * 1.1;
   c += white * smoothstep(0.92, 1.0, vShade.r) * 0.3 * uLit;
   vec3 dark = uColor * 0.05;

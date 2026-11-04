@@ -76,6 +76,7 @@ import {
   ARRIVAL_END,
   ARRIVAL_SKIP_SECONDS,
   ARRIVAL_WAVE_AT,
+  ARRIVAL_WAVE_LOOK,
   arrivalWave,
   COLOSSUS_ARM,
   COLOSSUS_FIST_IMPACT,
@@ -265,8 +266,13 @@ export class FinalFx {
   private readonly heartMat: THREE.ShaderMaterial;
   private heartMesh: THREE.Group | null = null;
   private readonly heartHalo: THREE.Sprite;
-  private readonly flashes: { sprite: THREE.Sprite; born: number; size: number; span: number }[] =
-    [];
+  private readonly flashes: {
+    sprite: THREE.Sprite;
+    born: number;
+    size: number;
+    span: number;
+    peak: number;
+  }[] = [];
   private readonly threads: THREE.InstancedMesh;
   private readonly threadColor = new THREE.Color();
   private readonly wrathWall: THREE.Mesh;
@@ -413,7 +419,7 @@ export class FinalFx {
       const sprite = new THREE.Sprite(m);
       sprite.visible = false;
       this.root.add(sprite);
-      this.flashes.push({ sprite, born: -99, size: 1, span: 0.4 });
+      this.flashes.push({ sprite, born: -99, size: 1, span: 0.4, peak: 1 });
     }
     // The threads of the veins' light: one instanced draw.
     const threadGeo = new THREE.CylinderGeometry(1, 1, 1, 6, 1, true).translate(0, 0.5, 0);
@@ -569,11 +575,13 @@ export class FinalFx {
     size: number,
     span: number,
     color = 0xffeed0,
+    peak = 1,
   ): void {
     const f = this.flashes.find((q) => this.clock - q.born > q.span) ?? this.flashes[0];
     f.born = this.clock;
     f.size = size;
     f.span = span;
+    f.peak = peak;
     (f.sprite.material as THREE.SpriteMaterial).color.setHex(color);
     f.sprite.position.set(x, y, z);
     f.sprite.visible = true;
@@ -1264,11 +1272,14 @@ export class FinalFx {
       // Whole: the four-colour shockwave across the platform and the chasm.
       const cx = ox + this.heartPos.x;
       const cz = oz + this.heartPos.z;
+      // Five crests, the stone showing through the air they leave (the
+      // floor is pale: a filled wake or a full flash burns it out flat).
+      const W = ARRIVAL_WAVE_LOOK;
       for (let i = 0; i < 4; i++)
-        this.particles.shockRing(cx, cz, VEINS[i], 36 + i * 14, 1.2 + i * 0.3);
-      this.particles.shockRing(cx, cz, C.ring, 90, 2.2);
-      this.flash(cx, this.heartPos.y, cz, 80, 1.1);
-      this.flash(cx, this.heartPos.y + 6, cz, 40, 0.5, 0xffffff);
+        this.particles.shockRing(cx, cz, VEINS[i], 36 + i * 14, 1.2 + i * 0.3, W.ring);
+      this.particles.shockRing(cx, cz, C.ring, 90, 2.2, W.ring);
+      this.flash(cx, this.heartPos.y, cz, 80, 1.1, 0xffeed0, W.flash);
+      this.flash(cx, this.heartPos.y + 6, cz, 40, 0.5, 0xffffff, W.core);
       // The veins' light flung out of the heart in every direction.
       for (let i = 0; i < Math.round(70 * this.density) + 10; i++) {
         const a = this.rand() * Math.PI * 2;
@@ -1364,7 +1375,7 @@ export class FinalFx {
       const k = age / f.span;
       const s = f.size * (0.6 + 0.6 * k);
       f.sprite.scale.set(s, s, 1);
-      (f.sprite.material as THREE.SpriteMaterial).opacity = (1 - k) * (1 - k);
+      (f.sprite.material as THREE.SpriteMaterial).opacity = f.peak * (1 - k) * (1 - k);
     }
   }
 
