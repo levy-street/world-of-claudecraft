@@ -863,6 +863,56 @@ def _altar_clamp(f):
     _clamp(f, np.where(Z < 3.0, np.sqrt(X * X + Y * Y) - 3.08, np.sqrt(X * X + Y * Y) - 3.45))
 
 
+# The Heat's altar painted by hand (the weak-spots pass of 2026-11-04: its basalt
+# read as one near-black lump on the dark crown): warm lit column faces climbing to
+# pale worn arrises and ash on the heads, the shade a cool violet-brown (never
+# black), the plinth's dressed stone its own warm grey, and embers burning in the
+# joints between the columns (the vein's glow, tinted and dimmed at runtime).
+HEAT_ALTAR_PAINT = dict(
+    low=(0.27, 0.21, 0.19), mid=(0.42, 0.33, 0.28), high=(0.66, 0.52, 0.41),
+    cool=(0.25, 0.2, 0.27), ash=(0.7, 0.65, 0.6), plinth=((0.42, 0.38, 0.35), (0.58, 0.53, 0.48)),
+)
+
+
+def _heat_altar_paint(bpy, p, f):
+    from landmark_paint import hand_sculpt, paint_faces, stone_shader, surface_ribbon
+    A = HEAT_ALTAR_PAINT
+    made = hand_sculpt(bpy, p, f, 'Altarheat', 5200, sharp=38.0, colours=HEART_COLOURS, kinds=HEART_KINDS)
+    columns = stone_shader(A['low'], A['mid'], A['high'], A['cool'], cap=A['ash'], cap_at=(0.72, 0.95),
+                           edge=1.0, hollow=0.9, z_span=(1.0, 6.4))
+    pl_lo, pl_hi = A['plinth']
+
+    def shade(q, n, c):
+        if q.z < 1.0:
+            # The plinth: dressed warm grey, its top lit, its foot in a cool shade.
+            col = mix(pl_lo, pl_hi, sstep(0.2, 0.95, n.z * 0.5 + 0.5))
+            col = mix(col, A['cool'], sstep(-0.1, -0.7, n.z) * 0.7)
+            return mix(col, tuple(min(1.0, ch * 1.35 + 0.04) for ch in col), max(0.0, c) * 0.8)
+        col = columns(q, n, c)
+        # The fire's warmth up the faces that look in at the crystal's crown.
+        glow = sstep(3.2, 6.2, q.z) * max(0.0, -(q.x * n.x + q.y * n.y) / max(0.3, math.hypot(q.x, q.y)))
+        return mix(col, (0.78, 0.46, 0.26), 0.35 * glow)
+
+    paint_faces(p, made, shade)
+    from mathutils.bvhtree import BVHTree
+    tree = BVHTree.FromBMesh(p.bm)
+    # Embers in the joints: rays laid up the altar's sides between the columns,
+    # each a short burning seam on the stone (never a thread in the air).
+    rng = np.random.default_rng(5537)
+    for k in range(14):
+        a = TAU * k / 14 + float(rng.uniform(-0.12, 0.12))
+        z0 = float(rng.uniform(1.4, 2.6))
+        z1 = z0 + float(rng.uniform(1.6, 3.2))
+        rays = []
+        for j in range(9):
+            z = z0 + (z1 - z0) * j / 8
+            wob = 0.08 * math.sin(j * 1.7 + k)
+            out = Vector((math.sin(a + wob), -math.cos(a + wob), 0.0))
+            rays.append((tuple(out * 4.2 + Vector((0.0, 0.0, z))), tuple(out * 0.4 + Vector((0.0, 0.0, z)))))
+        surface_ribbon(p, tree, rays, float(rng.uniform(0.07, 0.13)), 0.88, reach=6.0, gap=0.5, lift=0.03)
+    return made
+
+
 def altar(bpy, vein):
     """An altar (see the module doc): inside r 3.08 below 3 yd (the
     collider's 3 and a hair), its heart crystal pale (the runtime tints it
@@ -937,7 +987,10 @@ def altar(bpy, vein):
     _weather(f, seed, amp=0.08, scale=0.7, band=0.35)
     f.cut_below(0.0)
     _altar_clamp(f)
-    _mesh(bpy, p, f, 'Altar' + vein, 5200)
+    if vein == 'heat':
+        _heat_altar_paint(bpy, p, f)
+    else:
+        _mesh(bpy, p, f, 'Altar' + vein, 5200)
     prng = p.rng
     # The vein's heart: a cluster of pale crystal (tinted at runtime).
     if vein == 'hammer':
@@ -1051,8 +1104,10 @@ def heart_root(bpy):
     N = 44
 
     def girth(t):
-        # Thick where it enters the rock at both ends, narrowest on its free span.
-        return 2.5 + 2.3 * (1.0 - t / 0.42) ** 2 * (t < 0.42) + 3.4 * max(0.0, (t - 0.45) / 0.55) ** 1.5
+        # Thick where it enters the rock at both ends, narrowest on its free span
+        # (the weak-spots pass of 2026-11-04: the free span half again as thick, so
+        # it reads as a root of the mountain from the platform, never a cable).
+        return 3.8 + 2.3 * (1.0 - t / 0.42) ** 2 * (t < 0.42) + 3.4 * max(0.0, (t - 0.45) / 0.55) ** 1.5
 
     def frame_at(t):
         c = _bez(t, S)
@@ -1070,12 +1125,30 @@ def heart_root(bpy):
             t = k / N
             c, _d, side, up = frame_at(t)
             ang = TAU * j / 4 + t * 4.4
-            spread = girth(t) * 0.62
+            spread = girth(t) * 0.72
             pts.append(tuple(c + (side * math.cos(ang) + up * math.sin(ang)) * spread))
-            radii.append(girth(t) * (0.5 + 0.05 * math.sin(k * 0.9 + j * 1.7)))
+            radii.append(girth(t) * (0.44 + 0.08 * math.sin(k * 0.9 + j * 1.7)))
         strands.append(pts)
         f.put('g1', Polyline(pts, radii), 0.3)
     f.put('g1', Polyline([tuple(_bez(k / N, S)) for k in range(N + 1)], [girth(k / N) * 0.62 for k in range(N + 1)]), 0.5)
+    # Gnarls: burls swelling out of the braid where a strand crosses another, and
+    # a few short spurs broken off along the free span, so its silhouette knots.
+    for k in range(9):
+        t = 0.12 + 0.75 * k / 8 + float(rng.uniform(-0.03, 0.03))
+        c, _d, side, up = frame_at(t)
+        ang = float(rng.uniform(0.0, TAU))
+        out = side * math.cos(ang) + up * math.sin(ang)
+        g = girth(t)
+        f.put('g1', Ellipsoid(tuple(c + out * g * 0.75), (g * 0.7, g * 0.8, g * 0.62), None), 0.9)
+    for k in range(4):
+        t = 0.2 + 0.18 * k + float(rng.uniform(-0.04, 0.04))
+        c, d, side, up = frame_at(t)
+        ang = float(rng.uniform(0.0, TAU))
+        out = side * math.cos(ang) + up * math.sin(ang)
+        g = girth(t)
+        a = c + out * g * 0.6
+        b = a + out * float(rng.uniform(2.5, 4.0)) - d * 1.5
+        f.put('g1', Polyline([tuple(a), tuple(b)], [g * 0.32, 0.45]), 0.7)
     # The far end: strands parting and driving back into the mountain's rock.
     far = np.asarray(_bez(1.0, S))
     for (dx, dy, dz, r) in ((-9.0, 12.0, -7.0, 3.4), (10.0, 13.0, -4.0, 3.2), (-5.0, 15.0, 10.0, 3.0), (7.0, 14.0, 13.0, 2.8)):
@@ -1090,11 +1163,11 @@ def heart_root(bpy):
         mid = near + np.array((math.cos(a) * reach * 0.55, math.sin(a) * reach * 0.55, 5.0))
         end = near + np.array((math.cos(a) * reach, math.sin(a) * reach, -4.0 - float(rng.uniform(0.0, 6.0))))
         f.put('g1', Polyline([tuple(near + np.array((0.0, 0.0, 10.0))), tuple(mid), tuple(end)], [3.2, 2.2, 0.7]), 0.7)
-    f.displace(lambda X, Y, Z: 0.28 * n1.fbm(X * 0.2, Y * 0.1, Z * 0.2, 3)
-               + 0.16 * (n1.ridged(X * 0.5, Y * 0.22, Z * 0.5, 2) - 0.45), band=1.2)
-    made = hand_sculpt(bpy, p, f, 'HeartRoot', 7000, sharp=60.0, colours=HEART_COLOURS, kinds=HEART_KINDS)
+    f.displace(lambda X, Y, Z: 0.42 * n1.fbm(X * 0.2, Y * 0.1, Z * 0.2, 3)
+               + 0.3 * (n1.ridged(X * 0.5, Y * 0.22, Z * 0.5, 2) - 0.45), band=1.4)
+    made = hand_sculpt(bpy, p, f, 'HeartRoot', 7600, sharp=60.0, colours=HEART_COLOURS, kinds=HEART_KINDS)
     paint_faces(p, made, stone_shader(
-        (0.15, 0.13, 0.14), (0.29, 0.26, 0.26), (0.5, 0.45, 0.4), (0.09, 0.09, 0.14),
+        (0.2, 0.17, 0.17), (0.36, 0.31, 0.29), (0.58, 0.51, 0.44), (0.14, 0.13, 0.19),
         edge=1.0, hollow=0.95, z_span=(8.0, 66.0)))
     from mathutils.bvhtree import BVHTree
     tree = BVHTree.FromBMesh(p.bm)

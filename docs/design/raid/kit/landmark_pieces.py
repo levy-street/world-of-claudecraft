@@ -698,33 +698,77 @@ def _hammer_crater(f, F, rng):
 
 
 def _hammer_itself(f, F):
-    """The great hammer: a dressed block of dark granite, chamfered, banded at both
-    ends, its haft bound in three places and ending in a pommel."""
+    """The great hammer: the Smith's sledge of dark granite, its head a sculpted form
+    (the weak-spots pass of 2026-11-04: a rounded box read as one dark block). A
+    narrow eye block round the haft's socket, girt by a proud collar; cheeks that
+    flare out toward both striking faces in stepped, chamfered courses, a worked lip
+    round each face; the faces themselves domed and broken at their corners by the
+    blow; fluting cut along its top and its front; a great crack down its front face
+    where the fall split it (its gold thread laid after the mesh). The haft is bound
+    in three places and ends in a pommel. Returns the head's centre, its long axis,
+    the haft's ends and the crack's points."""
     from jaguar_head_sculpt import RoundBox
     cu, cv, cz = HAMMER_HEAD
     hu, hv, hz = HAMMER_HEAD_HALF
     R = _hammer_rot(F)
     c = F.at(cu, cv, cz)
-    # Rough hewn and worn by the ages it has lain here (the third round: a crisp
-    # chamfered box read as an icon), its corners rounded off and chipped.
-    f.put('head', RoundBox(c, (hu, hv, hz), 1.7, R), 0.1)
+    C = Vector(c)
+
+    def L(o):
+        q = _mul3(R, o)
+        return (C.x + q[0], C.y + q[1], C.z + q[2])
+
+    def on_face(o, into):
+        """Local point `o` marched along local `into` onto the head's surface (a
+        groove or a crack follows the stone, never the air past it)."""
+        d = _mul3(R, into)
+        q = np.asarray(L(o), dtype=np.float64) - d * 2.5
+        for _ in range(140):
+            if float(f.sample(q[None, :])[0]) <= 0.0:
+                break
+            q = q + d * 0.05
+        return tuple(q)
+
+    # The eye block and its collar.
+    f.put('head', RoundBox(c, (hu * 0.84, 3.4, hz * 0.84), 1.3, R), 0.3)
+    f.put('head', RoundBox(c, (hu * 0.84 + 0.6, 1.15, hz * 0.84 + 0.6), 0.8, R), 0.12)
+    for s in (-1.0, 1.0):
+        # The cheeks flaring toward the face, in three courses.
+        for k, (y, g) in enumerate(((4.4, 0.9), (6.4, 0.98), (8.2, 1.05))):
+            f.put('head', RoundBox(L((0.0, s * y, 0.0)), (hu * g, 1.25, hz * g), 1.15, R), 0.55)
+        # The worked lip round the striking face, a hand proud.
+        f.put('head', RoundBox(L((0.0, s * 9.0, 0.0)), (hu * 1.05 + 0.45, 0.62, hz * 1.05 + 0.45), 0.7, R), 0.1)
+        # The striking face: broad, a little domed.
+        f.put('head', Ellipsoid(L((0.0, s * 9.8, 0.0)), (hu * 1.0, 1.3, hz * 1.0), R), 0.35)
+    for s in (-1.0, 1.0):
+        # Fluting along its top and down its front, course to course, on the stone.
+        for x in (-2.6, 0.0, 2.6):
+            run = [on_face((x, s * y, hz * 1.1), (0.0, 0.0, -1.0)) for y in (3.9, 5.3, 6.7, 8.1)]
+            f.groove(Polyline(run, 0.02), 0.45, 0.34)
+        for z in (-2.4, 0.2, 2.6):
+            run = [on_face((-hu * 1.1, s * y, z), (1.0, 0.0, 0.0)) for y in (3.9, 5.3, 6.7, 8.1)]
+            f.groove(Polyline(run, 0.02), 0.45, 0.34)
     chips = np.random.default_rng(6917)
-    for _ in range(9):
+    # The blow broke the faces' corners.
+    for _ in range(12):
+        sy = float(chips.choice((-1.0, 1.0)))
         sx = float(chips.choice((-1.0, 1.0)))
         sz = float(chips.choice((-1.0, 1.0)))
-        o = _mul3(R, (float(chips.uniform(-1.0, 1.0)) * hu, sx * hv * float(chips.uniform(0.5, 1.0)), sz * hz))
-        f.sub(Ellipsoid((c[0] + o[0], c[1] + o[1], c[2] + o[2]),
-                        (float(chips.uniform(1.0, 2.0)), float(chips.uniform(1.2, 2.6)), float(chips.uniform(0.8, 1.6))),
-                        R), 0.25)
-    # The bands round its ends and its waist, a hand proud.
+        o = (sx * hu * float(chips.uniform(0.75, 1.05)), sy * float(chips.uniform(8.6, 10.6)),
+             sz * hz * float(chips.uniform(0.75, 1.05)))
+        f.sub(Ellipsoid(L(o), (float(chips.uniform(0.8, 1.6)), float(chips.uniform(0.7, 1.4)),
+                               float(chips.uniform(0.7, 1.4))), R), 0.22)
+    # The fall's crack down the front face, from the collar's shoulder to the foot.
+    crack = []
+    for k in range(9):
+        t = k / 8
+        crack.append(on_face((-hu * 1.2, 1.6 + 2.8 * t + 0.5 * math.sin(t * 9.0), hz * 0.9 - t * hz * 1.8),
+                             (1.0, 0.0, 0.0)))
+    f.groove(Polyline(crack, 0.02), 0.6, 0.42)
+    # Its gold thread rides a little inside the crack's mouth.
+    inward = _mul3(R, (1.0, 0.0, 0.0))
+    crack = [tuple(np.asarray(q) + inward * 0.18) for q in crack]
     across = Vector((math.cos(math.radians(F.bearing)), math.sin(math.radians(F.bearing)), 0.0))
-    for o in (-8.2, 8.2):
-        q = Vector(c) + across * o
-        f.put('head', RoundBox(tuple(q), (hu + 0.42, 0.9, hz + 0.42), 1.2, R), 0.06)
-    # Its striking faces, the great chips of the blow out of the corners.
-    a = Vector(c) - across * 10.5
-    for k, (dz, dq) in enumerate(((3.2, 1.0), (-3.0, 0.8))):
-        f.sub(Ellipsoid(tuple(a + Vector((0.0, 0.0, dz))), (2.2, 1.6, 1.3), R), 0.1)
     # The haft.
     end = F.at(*HAMMER_HAFT_END)
     base = Vector(c)
@@ -734,7 +778,7 @@ def _hammer_itself(f, F):
     for t in (0.34, 0.5, 0.82):
         f.put('head', Ellipsoid(tuple(base.lerp(tip, t)), (2.5, 2.5, 1.0), None), 0.12)
     f.put('head', Ellipsoid(tuple(tip), (2.7, 2.7, 2.4), None), 0.25)
-    return c, across, base, tip
+    return c, across, base, tip, crack
 
 
 def landmark_hammer(bpy):
@@ -750,28 +794,37 @@ def landmark_hammer(bpy):
     cracks = _hammer_crater(f, F, rng)
     for (cd, cr, cz, *_rest) in HAMMER_CLUSTERS[2:]:
         f.sub(Ellipsoid(F.ad(cd, cr, cz + 3.0), (3.6, 3.2, 6.0)), 0.6)
-    head_c, across, h0, h1 = _hammer_itself(f, F)
+    head_c, across, h0, h1, head_crack = _hammer_itself(f, F)
     _finish(f, F, 6913, amp=0.2)
     made = hand_sculpt(bpy, p, f, 'LandmarkHammer', 11000, sharp=40.0, colours=LANDMARK_COLOURS, kinds=LANDMARK_KINDS)
     crag = stone_shader(
         (0.4, 0.36, 0.33), (0.56, 0.5, 0.43), (0.77, 0.69, 0.57), (0.31, 0.28, 0.34),
         cap=(0.66, 0.6, 0.5), cap_at=(0.84, 0.99), bed=(0.62, 0.5, 0.38), bed_scale=0.8, edge=0.62, hollow=0.45,
         z_span=(-8.0, 22.0))
-    # The hammer: the Smith's own dark granite, weathered like the crag round it.
+    # The hammer: the Smith's own granite, darker and cooler than the crag but
+    # lit like it (the weak-spots pass: its shade a violet slate, never black),
+    # its worn arrises pale, dust settled on its top; its collar and its lips a
+    # darker dressed course, so its rhythm reads from the room.
     dressed = stone_shader(
-        (0.36, 0.33, 0.33), (0.5, 0.46, 0.43), (0.68, 0.62, 0.55), (0.28, 0.27, 0.33),
-        cap=(0.62, 0.56, 0.47), cap_at=(0.8, 0.98), edge=0.85, hollow=0.45, z_span=(2.0, 40.0))
+        (0.4, 0.37, 0.37), (0.56, 0.51, 0.47), (0.76, 0.69, 0.6), (0.36, 0.34, 0.44),
+        cap=(0.7, 0.63, 0.52), cap_at=(0.78, 0.97), edge=1.0, hollow=0.55, z_span=(4.0, 22.0))
+    course = stone_shader(
+        (0.32, 0.29, 0.29), (0.43, 0.38, 0.35), (0.6, 0.53, 0.45), (0.3, 0.28, 0.37),
+        edge=1.0, hollow=0.5, z_span=(4.0, 22.0))
     R0 = Vector(head_c)
     hd = (h1 - h0).normalized()
     hl = (h1 - h0).length
 
     def shade(q, n, c):
         o = q - R0
-        ac = abs(o.dot(across))
-        rad = (o - across * o.dot(across)).length
+        a = o.dot(across)
+        ac = abs(a)
+        rad = (o - across * a).length
         t = o.dot(hd)
         haft = (o - hd * t).length < 3.2 and -1.0 < t < hl + 3.5
         head = ac < 11.4 and rad < 9.0
+        if head and (ac < 1.4 or 8.4 < ac < 9.5):
+            return course(q, n, c)
         return dressed(q, n, c) if head or haft else crag(q, n, c)
 
     paint_faces(p, made, shade)
@@ -796,6 +849,8 @@ def landmark_hammer(bpy):
                 faces = pale_crystal(p, foot, d, L, rr * (1.0 if k == 0 else float(prng.uniform(0.45, 0.7))),
                                      bright=0.15 if k == 0 else 0.0)
             crystal_grade(p, faces, foot, d, L)
+    # Gold in the hammer's own crack, from its collar to its foot.
+    _glow_thread(p, head_crack, [0.16 + 0.1 * math.sin(math.pi * k / 8) for k in range(9)], 0.95)
     # Gold down in the fractures: a thread of the vein's light deep in each.
     for (pts, radii) in cracks:
         out = Vector(pts[0]).normalized()
