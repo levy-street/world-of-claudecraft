@@ -3611,7 +3611,9 @@ export class ClientWorld extends ReconWireState implements IWorld {
     this.cmd({ cmd: 'unequip_bag', socket });
   }
   useItem(itemId: string, target?: Parameters<IWorld['useItem']>[1]): void {
-    this.cmd({ cmd: 'use', item: itemId, slot: target?.slotIndex, inkMap: target?.inkMap });
+    // aim is the ground point an aimed throwable (Clockwork Shock Bomb) lands on.
+    const { slotIndex: slot, inkMap, aim } = target ?? {};
+    this.cmd({ cmd: 'use', item: itemId, slot, inkMap, aim });
   }
   discardItem(itemId: string, count?: number, target?: NamedSlotTarget): void {
     if (target === undefined) this.cmd({ cmd: 'discard', item: itemId, count });
