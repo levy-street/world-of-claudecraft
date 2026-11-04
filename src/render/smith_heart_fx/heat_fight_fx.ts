@@ -298,8 +298,13 @@ void main() {
   float lvl = lavaLevel(vW.xz, vec2(0.0, 1.5), uTime, 1.2);
   float m = max(crack * 0.75, uBurn * (0.55 + 0.6 * lvl));
   vec3 col = molten(clamp(m, 0.0, 1.0));
+  // A red slice reads red at a glance (the Hearth's floor already glows gold in
+  // every crack, so cracks alone hid the warning): a pulsing wash of the
+  // danger colour while it warns; the safe slice (no build) stays dark.
+  float warn = (1.0 - uBurn) * smoothstep(0.0, 0.05, uBuild);
+  col = mix(col, uRim * (1.0 + 0.35 * sin(uTime * 7.0)), 0.6 * warn);
   col = mix(col, uRim * 1.5, clamp(rims, 0.0, 1.0));
-  float wash = 0.12 + 0.18 * uBuild;
+  float wash = 0.12 + 0.18 * uBuild + 0.3 * warn;
   float alpha = max(max(rims * 0.95, crack * 0.85), max(wash, uBurn * 0.92));
   gl_FragColor = vec4(col, clamp(alpha, 0.0, 0.96));
   #include <colorspace_fragment>
