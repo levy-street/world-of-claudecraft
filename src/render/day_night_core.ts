@@ -544,12 +544,23 @@ const CELESTIAL_ARC_HEIGHT = 0.28;
  *  the horizon through the night. The renderer places the key light and the sky
  *  sun disc along this, and the HUD is unaffected. */
 export function sunDirection(phase: number): [number, number, number] {
+  return sunDirectionInto([0, 0, 0], phase);
+}
+
+/** sunDirection written into a caller-owned vector, for per-frame callers. */
+export function sunDirectionInto(
+  out: [number, number, number],
+  phase: number,
+): [number, number, number] {
   const a = (phase - 0.25) * 2 * Math.PI; // dawn 0, noon PI/2, dusk PI, midnight -PI/2
   const x = Math.cos(a);
   const y = Math.sin(a) * CELESTIAL_ARC_HEIGHT; // capped peak so it stays in view
   const z = CELESTIAL_TILT_Z;
   const len = Math.hypot(x, y, z);
-  return [x / len, y / len, z / len];
+  out[0] = x / len;
+  out[1] = y / len;
+  out[2] = z / len;
+  return out;
 }
 
 /** Unit direction toward the mage's moon (the night key light): the sun's

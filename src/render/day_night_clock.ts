@@ -8,7 +8,7 @@
 
 import { DAY_NIGHT_CYCLE_MS, NOON_PHASE } from '../sim/day_night';
 import { cyclePhase, DAY_ONLY, lunarPhase } from './day_night_core';
-import { type MoonSky, moonSky } from './twin_moons_core';
+import { createMoonSky, type MoonSky, moonSkyInto } from './twin_moons_core';
 
 let phaseOverride: number | null = null;
 
@@ -56,8 +56,18 @@ export function setMoonLatitudeOverride(deg: number | null): void {
   latitudeOverride = deg;
 }
 
+const liveMoonSky = createMoonSky();
+
 /** The two-moon sky for a cycle phase (twin_moons_core), on the live lunar
- *  clock and the epoch-anchored world-day count, honoring both dev overrides. */
+ *  clock and the epoch-anchored world-day count, honoring both dev overrides.
+ *  Read every frame, so it fills one reused object: the result is valid until
+ *  the next call. */
 export function currentMoonSky(dayPhase: number): MoonSky {
-  return moonSky(dayPhase, currentLunarPhase(), Date.now() / DAY_NIGHT_CYCLE_MS, latitudeOverride);
+  return moonSkyInto(
+    liveMoonSky,
+    dayPhase,
+    currentLunarPhase(),
+    Date.now() / DAY_NIGHT_CYCLE_MS,
+    latitudeOverride,
+  );
 }

@@ -24,7 +24,7 @@
 // reaches the sim, and the night it lights never drops below the night floors
 // day_night_core already guarantees (moonNightFloors clamps the key light).
 
-import { aboveHorizon, moonTerminator, SYNODIC_MONTH_DAYS, sunDirection } from './day_night_core';
+import { aboveHorizon, SYNODIC_MONTH_DAYS, sunDirectionInto } from './day_night_core';
 
 export { SYNODIC_MONTH_DAYS };
 
@@ -79,14 +79,23 @@ const TAU = Math.PI * 2;
 const frac = (x: number) => x - Math.floor(x);
 const clamp01 = (x: number) => Math.max(0, Math.min(1, x));
 const dot = (a: Vec3, b: Vec3) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
-const cross = (a: Vec3, b: Vec3): Vec3 => [
-  a[1] * b[2] - a[2] * b[1],
-  a[2] * b[0] - a[0] * b[2],
-  a[0] * b[1] - a[1] * b[0],
-];
-function norm(v: Vec3): Vec3 {
+/** a x b into out; safe when out is a or b (reads every input first). */
+function crossInto(out: Vec3, a: Vec3, b: Vec3): Vec3 {
+  const x = a[1] * b[2] - a[2] * b[1];
+  const y = a[2] * b[0] - a[0] * b[2];
+  const z = a[0] * b[1] - a[1] * b[0];
+  out[0] = x;
+  out[1] = y;
+  out[2] = z;
+  return out;
+}
+/** Normalize v in place. */
+function normInto(v: Vec3): Vec3 {
   const l = Math.hypot(v[0], v[1], v[2]) || 1;
-  return [v[0] / l, v[1] / l, v[2] / l];
+  v[0] /= l;
+  v[1] /= l;
+  v[2] /= l;
+  return v;
 }
 
 /** The natural moon's offset from the sun's path, in degrees, for a world-day count. */
@@ -112,12 +121,23 @@ export function naturalMoonPathPhase(dayPhase: number, lunarPhase: number): numb
 
 /** Unit tangent of the sun's path at a path phase, pointing the way the sky turns (westward). */
 export function pathTangent(pathPhase: number): Vec3 {
-  const d = sunDirection(pathPhase);
+  return pathTangentInto([0, 0, 0], pathPhase);
+}
+
+const sPathDir: Vec3 = [0, 0, 0];
+
+/** pathTangent written into a caller-owned vector. */
+export function pathTangentInto(out: Vec3, pathPhase: number): Vec3 {
+  const d = sunDirectionInto(sPathDir, pathPhase);
   const a = (pathPhase - 0.25) * TAU;
   // derivative of sunDirection's unnormalized vector, then made perpendicular to d
-  const raw: Vec3 = [-Math.sin(a), Math.cos(a) * 0.28, 0];
-  const k = dot(raw, d);
-  return norm([raw[0] - k * d[0], raw[1] - k * d[1], raw[2] - k * d[2]]);
+  const rx = -Math.sin(a);
+  const ry = Math.cos(a) * 0.28;
+  const k = rx * d[0] + ry * d[1];
+  out[0] = rx - k * d[0];
+  out[1] = ry - k * d[1];
+  out[2] = -k * d[2];
+  return normInto(out);
 }
 
 export interface MoonSky {
@@ -178,9 +198,29 @@ export function nightLitFraction(
   return clamp01(mage + natural);
 }
 
+/** A MoonSky with every field zeroed, for a caller that fills one per frame with moonSkyInto. */
+export function createMoonSky(): MoonSky {
+  return {
+    mageDir: [0, 0, 0],
+    naturalDir: [0, 0, 0],
+    naturalTangent: [0, 0, 0],
+    lunarPhase: 0,
+    litFrac: 0,
+    latitudeDeg: 0,
+    size: 1,
+    mageUp: 0,
+    naturalUp: 0,
+    umbra: 0,
+    penumbra: 0,
+    mageCover: 0,
+    umbraOffset: [0, 0],
+    nightLitFrac: 0.5,
+  };
+}
+
 /**
- * The whole two-moon sky for one moment. `latitudeOverrideDeg` is the dev
- * `/daynight moon eclipse` pin (null for the real orbit).
+ * The whole two-moon sky for one moment, as a fresh object. `latitudeOverrideDeg`
+ * is the dev `/daynight moon eclipse` pin (null for the real orbit).
  */
 export function moonSky(
   dayPhase: number,
@@ -188,58 +228,77 @@ export function moonSky(
   worldDays: number,
   latitudeOverrideDeg: number | null = null,
 ): MoonSky {
+  return moonSkyInto(createMoonSky(), dayPhase, lunarPhase, worldDays, latitudeOverrideDeg);
+}
+
+// Module scratch for moonSkyInto, so the per-frame path allocates nothing.
+const sOnPath: Vec3 = [0, 0, 0];
+const sTangent: Vec3 = [0, 0, 0];
+const sNorth: Vec3 = [0, 0, 0];
+const sTmp: Vec3 = [0, 0, 0];
+const sFaceUp: Vec3 = [0, 0, 0];
+
+/**
+ * moonSky written into a caller-owned MoonSky (createMoonSky), so the renderer's
+ * per-frame read allocates nothing: every vector it touches is either one of
+ * `out`'s own or this module's scratch. Returns `out`.
+ */
+export function moonSkyInto(
+  out: MoonSky,
+  dayPhase: number,
+  lunarPhase: number,
+  worldDays: number,
+  latitudeOverrideDeg: number | null = null,
+): MoonSky {
   const lp = frac(lunarPhase);
-  const mageDir = sunDirection(dayPhase + 0.5);
+  const mageDir = sunDirectionInto(out.mageDir, dayPhase + 0.5);
   const pathPhase = naturalMoonPathPhase(dayPhase, lp);
-  const onPath = sunDirection(pathPhase);
-  const tangent = pathTangent(pathPhase);
-  const north = norm(cross(tangent, onPath));
+  const onPath = sunDirectionInto(sOnPath, pathPhase);
+  const tangent = pathTangentInto(sTangent, pathPhase);
+  const north = normInto(crossInto(sNorth, tangent, onPath));
   const latitudeDeg = latitudeOverrideDeg ?? moonLatitudeDeg(worldDays);
   const offset = latitudeToRadii(latitudeDeg) * MOON_ANGULAR_RADIUS;
-  const naturalDir = norm([
-    onPath[0] * Math.cos(offset) + north[0] * Math.sin(offset),
-    onPath[1] * Math.cos(offset) + north[1] * Math.sin(offset),
-    onPath[2] * Math.cos(offset) + north[2] * Math.sin(offset),
-  ]);
-  const naturalTangent = norm(cross(naturalDir, cross(tangent, naturalDir)));
-  const faceUp = norm(cross(naturalTangent, naturalDir));
+  const c = Math.cos(offset);
+  const s = Math.sin(offset);
+  const naturalDir = out.naturalDir;
+  naturalDir[0] = onPath[0] * c + north[0] * s;
+  naturalDir[1] = onPath[1] * c + north[1] * s;
+  naturalDir[2] = onPath[2] * c + north[2] * s;
+  normInto(naturalDir);
+  // the path tangent made perpendicular to the moon's own direction
+  const naturalTangent = normInto(
+    crossInto(out.naturalTangent, naturalDir, crossInto(sTmp, tangent, naturalDir)),
+  );
+  const faceUp = normInto(crossInto(sFaceUp, naturalTangent, naturalDir));
   const size = moonSizeFactor(worldDays);
 
   // the shadow's centre is the antisolar point, which is where the mage's moon hangs
-  const toShadow: Vec3 = [
-    mageDir[0] - naturalDir[0],
-    mageDir[1] - naturalDir[1],
-    mageDir[2] - naturalDir[2],
-  ];
+  sTmp[0] = mageDir[0] - naturalDir[0];
+  sTmp[1] = mageDir[1] - naturalDir[1];
+  sTmp[2] = mageDir[2] - naturalDir[2];
   const sep = Math.acos(Math.max(-1, Math.min(1, dot(naturalDir, mageDir)))) / MOON_ANGULAR_RADIUS;
   const area = Math.PI * size * size;
   const umbra = circleOverlap(sep, UMBRA_RADII, size) / area;
   const penumbra = Math.max(0, circleOverlap(sep, PENUMBRA_RADII, size) / area - umbra);
   const mageCover =
     circleOverlap(sep, size, MAGE_MOON_RADII) / (Math.PI * MAGE_MOON_RADII * MAGE_MOON_RADII);
-  const umbraOffset: [number, number] = [
-    dot(toShadow, naturalTangent) / (MOON_ANGULAR_RADIUS * size),
-    dot(toShadow, faceUp) / (MOON_ANGULAR_RADIUS * size),
-  ];
+  out.umbraOffset[0] = dot(sTmp, naturalTangent) / (MOON_ANGULAR_RADIUS * size);
+  out.umbraOffset[1] = dot(sTmp, faceUp) / (MOON_ANGULAR_RADIUS * size);
 
-  const litFrac = moonTerminator(lp).litFrac;
+  // moonTerminator's lit fraction, inline so no terminator object is built per frame
+  const litFrac = (1 - Math.cos(TAU * lp)) / 2;
   const naturalUp = aboveHorizon(naturalDir[1]);
-  return {
-    mageDir,
-    naturalDir,
-    naturalTangent,
-    lunarPhase: lp,
-    litFrac,
-    latitudeDeg,
-    size,
-    mageUp: aboveHorizon(mageDir[1]),
-    naturalUp,
-    umbra,
-    penumbra,
-    mageCover,
-    umbraOffset,
-    nightLitFrac: nightLitFraction(litFrac, naturalUp, umbra, penumbra, mageCover),
-  };
+  out.lunarPhase = lp;
+  out.litFrac = litFrac;
+  out.latitudeDeg = latitudeDeg;
+  out.size = size;
+  out.mageUp = aboveHorizon(mageDir[1]);
+  out.naturalUp = naturalUp;
+  out.umbra = umbra;
+  out.penumbra = penumbra;
+  out.mageCover = mageCover;
+  out.nightLitFrac = nightLitFraction(litFrac, naturalUp, umbra, penumbra, mageCover);
+  return out;
 }
 
 /**

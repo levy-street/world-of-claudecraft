@@ -8,10 +8,12 @@ import {
   moonNightFloors,
   moonTerminator,
   sunDirection,
+  sunDirectionInto,
 } from '../src/render/day_night_core';
 import {
   ANOMALISTIC_MONTH_DAYS,
   circleOverlap,
+  createMoonSky,
   DRACONIC_MONTH_DAYS,
   latitudeToRadii,
   MAGE_MOON_RADII,
@@ -22,6 +24,7 @@ import {
   moonLatitudeDeg,
   moonSizeFactor,
   moonSky,
+  moonSkyInto,
   NIGHT_SWING,
   naturalMoonPathPhase,
   nightLitFraction,
@@ -334,6 +337,37 @@ describe('the night light the two moons give', () => {
   it('the live sky feeds that fraction, from the moon actually being up', () => {
     const night = moonSky(0, 0.5, OFF_NODE_DAYS);
     expect(night.nightLitFrac).toBeCloseTo(nightLitFraction(1, night.naturalUp, 0, 0, 0), 12);
+  });
+});
+
+describe('moonSkyInto (the per-frame, allocation-free read)', () => {
+  it('fills a reused object exactly as moonSky builds a fresh one, with no state carried over', () => {
+    const out = createMoonSky();
+    const cases: [number, number, number, number | null][] = [
+      [0, 0.5, 0, 0], // a total eclipse
+      [0.83, 0.18, 12.4, null],
+      [0.1, 0.93, 40.2, -3],
+      [0.5, 0.25, 7, null], // daytime: both moons down
+      [0, 0.5, 0, 0], // back to the eclipse: nothing from the cases between leaks in
+    ];
+    for (const [d, lp, days, lat] of cases) {
+      const fresh = moonSky(d, lp, days, lat);
+      const reused = moonSkyInto(out, d, lp, days, lat);
+      expect(reused).toBe(out);
+      expect(reused).toEqual(fresh);
+    }
+  });
+
+  it('keeps moonTerminator lit fraction while computing it inline', () => {
+    for (const lp of [0, 0.1, 0.25, 0.5, 0.73, 0.99]) {
+      expect(moonSky(0, lp, 3).litFrac).toBeCloseTo(moonTerminator(lp).litFrac, 12);
+    }
+  });
+
+  it('writes sunDirectionInto into the given vector with the same value as sunDirection', () => {
+    const v: [number, number, number] = [9, 9, 9];
+    expect(sunDirectionInto(v, 0.37)).toBe(v);
+    expect(v).toEqual(sunDirection(0.37));
   });
 });
 
