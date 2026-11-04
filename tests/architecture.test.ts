@@ -604,6 +604,7 @@ const UI_PURE_CORES = [
   'src/ui/hud/professions/farming_plant_sheet_view.ts',
   'src/ui/hud/professions/harvest_journal_view.ts',
   'src/ui/hud/professions/professions_hub_view.ts',
+  'src/ui/hud/hub/window_hub_view.ts',
   'src/ui/hud/professions/harvest_preference_view.ts',
   'src/ui/hud/professions/perfecting_view.ts',
   'src/ui/hud/professions/perfecting_swap_view.ts',
@@ -3378,9 +3379,10 @@ const UI_DOM_MODULES = [
   // (a bare setTimeout sat in the sweep's blind spot, the whole-branch
   // review's note).
   'src/ui/hud/professions/professions_window.ts',
-  // The Professions hub's tab group: reaches localStorage for the per-device
-  // last-tab memory (the crafting_tab_pref precedent).
-  'src/ui/hud/professions/professions_hub_controller.ts',
+  // The shared window-hub tab group (Professions, Book of the Realm,
+  // Activities): reaches localStorage for the per-device last-tab memory (the
+  // crafting_tab_pref precedent).
+  'src/ui/hud/hub/window_hub_controller.ts',
   'src/ui/raid_boss_guide_window.ts',
   'src/ui/raid_boss_guide_model_controller.ts',
   'src/ui/hud/chat/ready_check_leader_window.ts',
