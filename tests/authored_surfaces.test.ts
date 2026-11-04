@@ -176,6 +176,8 @@ const AUTHORED_ATLAS_DEFS = [
   'mob_ignivar_ember_sentinel',
   'mob_ignivar_cinder_artificer',
   'mob_healing_tide_totem',
+  // the Smith's Heart's Masterless Strength (its own rigged model)
+  'smith_heart_masterless_strength',
   'mob_hoard_abyssal_maw',
   'mob_hoard_hoarfrost_warden',
   'mob_hoard_emberforge_tyrant',
