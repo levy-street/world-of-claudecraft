@@ -49,8 +49,8 @@ import {
   type ProfessionsViewInput,
   type ProfessionsViewModel,
   professionsRefreshSig,
-  ringArcPath,
   type RingLayout,
+  ringArcPath,
 } from './professions_view';
 
 // Ring node distance from the container center, in percent of the box

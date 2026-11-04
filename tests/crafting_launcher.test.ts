@@ -34,7 +34,9 @@ describe('desktop launcher (the Professions hub)', () => {
     }
     expect(sideButtons).not.toContain("'#mm-crafting'");
     expect(hud).not.toContain("$('#mm-crafting')");
-    expect(hud).toMatch(/toggleCrafting\(\): void \{\s*this\.professionsHub\.toggle\('crafting'\);/);
+    expect(hud).toMatch(
+      /toggleCrafting\(\): void \{\s*this\.professionsHub\.toggle\('crafting'\);/,
+    );
   });
 });
 

@@ -4,8 +4,8 @@
 // position and focus contract, and the last tab is remembered per device.
 import { beforeEach, describe, expect, it } from 'vitest';
 import {
-  type ProfessionsHubMember,
   ProfessionsHubController,
+  type ProfessionsHubMember,
 } from '../src/ui/hud/professions/professions_hub_controller';
 import {
   PROFESSIONS_HUB_TAB_KEY,
