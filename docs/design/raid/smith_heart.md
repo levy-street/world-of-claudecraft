@@ -2189,9 +2189,13 @@ on both difficulties (dungeon rework README, goal 4).
   server snapshot path into the online mirror on the browser's timer wire (the soul and
   its pips, the Echo's and the Endless Song's bars, the song's pulse count, the burst) and
   the cursed pillar and its collider.
-- `scripts/heart_council_raid.mjs`: the council fought by ten bots over a live dev server
-  (two tanks, two healers, six damage dealers; nine and a human with `JOIN`), playing the
-  mechanics from the snapshots and writing a fight log; its positioning
+- `scripts/heart_raid.mjs` (`BOSS=council|breath|quench|heat|final`, run with tsx;
+  `scripts/heart_council_raid.mjs` is the council's alias): every boss fought by ten bots
+  over a live dev server (two tanks, two healers, six damage dealers; nine and a human
+  with `JOIN`), playing the mechanics from the snapshots and writing a fight log
+  (`IGNORE=<key mechanic>` plays the raid that ignores it); the shared raid is
+  `scripts/lib/heart_raid_bots.mjs`, each boss's AI `scripts/lib/heart_raid_<boss>.mjs`
+  (reusing the sim's pure geometry). The council's positioning
   (`scripts/lib/heart_council_tactics.mjs`) is pinned to the server's geometry by
   `tests/smith_heart_council_bot_tactics.test.ts`.
 - Every new Smith's Heart test follows the path pattern `tests/smith_heart_*.test.ts`
