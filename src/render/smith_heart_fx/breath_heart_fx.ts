@@ -327,6 +327,7 @@ export class BreathHeartFx {
               uColor: { value: ringColor },
               uAlpha: ringAlpha,
               uFill: { value: 0 },
+              uTime: h.uTime,
             },
             HEART_UV_VERT,
             HEART_RING_FRAG,
@@ -338,7 +339,12 @@ export class BreathHeartFx {
           floorQuad,
           shader(
             'smithHeartKnotLoad',
-            { uColor: { value: color(C.load) }, uAlpha: { value: 0.9 }, uFill: { value: 0.75 } },
+            {
+              uColor: { value: color(C.load) },
+              uAlpha: { value: 0.9 },
+              uFill: { value: 0.75 },
+              uTime: h.uTime,
+            },
             HEART_UV_VERT,
             HEART_RING_FRAG,
           ),
@@ -406,7 +412,7 @@ export class BreathHeartFx {
     for (const side of HEART_SIDES)
       faces[side] = shader(
         `smithHeartMarkLetter${side}`,
-        { uColor: { value: color(portalSideLook(side).color) } },
+        { uColor: { value: color(portalSideLook(side).color) }, uTime: h.uTime },
         FACING_VERT,
         FACING_FRAG,
         { blending: THREE.NormalBlending, depthTest: false, side: THREE.DoubleSide },
@@ -420,7 +426,7 @@ export class BreathHeartFx {
           floorQuad,
           shader(
             'smithHeartMarkRing',
-            { uColor: { value: ringColor }, uAlpha: { value: 1 }, uFill: fill },
+            { uColor: { value: ringColor }, uAlpha: { value: 1 }, uFill: fill, uTime: h.uTime },
             HEART_UV_VERT,
             HEART_RING_FRAG,
           ),
