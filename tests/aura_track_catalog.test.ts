@@ -590,6 +590,60 @@ describe('aura track catalog: what it derives', () => {
     expect(state.overflow, 'a four-ally party should not overflow the track').toBe(0);
   });
 
+  it("paints Summon Pyre Colossus's 30 sec window as an Offensive row on the Colossus", () => {
+    // The summon leaves no buff on the warlock: its timer is the `pyre_guardian`
+    // aura on the Colossus (combat/destruction.ts), sourced to the warlock. The
+    // effect type named no kind, so the window joined no track until the bespoke
+    // row named it. Driven through the real cast and the real selection core.
+    const power = AURA_TRACKS.find((t) => t.id === 'power');
+    expect(power).toBeDefined();
+    if (!power) return;
+    const entry = auraTrackEntry('pyre_guardian');
+    expect(entry, 'pyre_guardian has no catalog row').toBeDefined();
+    expect(entry?.category).toBe('power');
+    expect(entry?.abilityId).toBe('summon_infernal');
+    expect(entry?.duration).toBe(30);
+
+    const sim = new Sim({ seed: 23, playerClass: 'warlock', autoEquip: true, world: EMPTY_TEST_WORLD });
+    sim.setPlayerLevel(20);
+    expect(sim.setSpec('destruction'), 'warlock could not pick destruction').toBe(true);
+    sim.tick();
+    const warlock = sim.player;
+    warlock.resource = warlock.maxResource;
+    warlock.gcdRemaining = 0;
+    const eventsBefore = sim.events.length;
+    sim.castAbility('summon_infernal', warlock.id, { x: warlock.pos.x + 6, z: warlock.pos.z });
+    for (let i = 0; i < 3; i++) sim.tick();
+    const refused = sim.events
+      .slice(eventsBefore)
+      .filter((e) => e.type === 'error')
+      .map((e) => ('text' in e ? e.text : ''));
+    expect(refused, 'Summon Pyre Colossus was refused').toEqual([]);
+    const colossus = [...sim.entities.values()].find(
+      (e) => e.templateId === 'pyre_colossus' && e.ownerId === warlock.id,
+    );
+    expect(colossus, 'no Pyre Colossus answered').toBeDefined();
+    if (!colossus) return;
+
+    const view = createAuraTrackView(power, {
+      isOwn: (a) => a.sourceId === warlock.id,
+      isMode: () => false,
+      auraName: (a) => a.name,
+      unitName: (e) => e.name,
+      iconKey: (a) => a.id,
+    });
+    const state = view.tick({
+      player: warlock,
+      allies: sim.entities.values(),
+      enabled: true,
+      includeModes: true,
+    });
+    const rows = state.rows.slice(0, state.count).map((r) => r.key);
+    expect(rows, 'the Pyre Colossus window paints no Offensive row').toContain(
+      `${colossus.id}:pyre_guardian`,
+    );
+  });
+
   it('honours its by-id exclusions, each of which has a live ability behind it', () => {
     // An exclusion for a spell that no longer exists is a rule protecting
     // nothing, and reads as coverage it is not providing.

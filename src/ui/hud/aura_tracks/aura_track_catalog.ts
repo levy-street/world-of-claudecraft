@@ -141,6 +141,10 @@ const POWER_KINDS: ReadonlySet<string> = new Set([
   // The Chronomancer's offensive window: it freezes four Arcane Charges so Aether
   // Darts fires its full barrage without spending them (combat/chronomancy.ts).
   'perfect_moment',
+  // Ruination's Pyre Colossus: a 30 sec summon on a 180 sec cooldown, timed by
+  // the `pyre_guardian` aura on the Colossus itself (combat/destruction.ts),
+  // which the warlock casts, so it reaches this track as an own row on the pet.
+  'pyre_guardian',
 ]);
 
 // Movement and concealment. `ice_floes` is here rather than in POWER because
@@ -230,6 +234,11 @@ const BESPOKE_EFFECT_AURAS: ReadonlyMap<string, BespokeEffectAura> = new Map<
     'perfectMoment',
     { auraId: PERFECT_MOMENT_ID, kind: 'perfect_moment', duration: PERFECT_MOMENT_DURATION },
   ],
+  // Summon Pyre Colossus's window is not a buff on the warlock: summonPyreColossus
+  // (combat/destruction.ts) puts a fixed `pyre_guardian` aura, sourced to the
+  // warlock, on the Colossus for the effect's authored duration. Without this
+  // row the effect type named no kind and the 30 sec summon joined no track.
+  ['summonPyreColossus', { auraId: 'pyre_guardian', kind: 'pyre_guardian' }],
 ]);
 
 // Aura kinds that read as a maintained HEAL on the unit carrying them. The plain
