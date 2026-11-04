@@ -6,8 +6,9 @@
 // the HUD (minimap dial) both read currentDayNightPhase(), so a single override
 // drives them together and they never disagree.
 
-import { NOON_PHASE } from '../sim/day_night';
+import { DAY_NIGHT_CYCLE_MS, NOON_PHASE } from '../sim/day_night';
 import { cyclePhase, DAY_ONLY, lunarPhase } from './day_night_core';
+import { createMoonSky, type MoonSky, moonSkyInto } from './twin_moons_core';
 
 let phaseOverride: number | null = null;
 
@@ -44,4 +45,29 @@ export function setLunarPhaseOverride(phase: number | null): void {
 export function currentLunarPhase(): number {
   if (moonOverride !== null) return moonOverride;
   return lunarPhase(Date.now());
+}
+
+let latitudeOverride: number | null = null;
+
+/** Pin the natural moon's offset from the sun's path, in degrees (0 = on the
+ *  path, so a full moon is a total eclipse covering the mage's moon), or pass
+ *  null to resume its real tilted orbit. The `/daynight moon eclipse` dev command. */
+export function setMoonLatitudeOverride(deg: number | null): void {
+  latitudeOverride = deg;
+}
+
+const liveMoonSky = createMoonSky();
+
+/** The two-moon sky for a cycle phase (twin_moons_core), on the live lunar
+ *  clock and the epoch-anchored world-day count, honoring both dev overrides.
+ *  Read every frame, so it fills one reused object: the result is valid until
+ *  the next call. */
+export function currentMoonSky(dayPhase: number): MoonSky {
+  return moonSkyInto(
+    liveMoonSky,
+    dayPhase,
+    currentLunarPhase(),
+    Date.now() / DAY_NIGHT_CYCLE_MS,
+    latitudeOverride,
+  );
 }

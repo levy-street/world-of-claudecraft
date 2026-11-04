@@ -33,6 +33,7 @@ import {
   REALM_NIGHT_PALETTE,
   REALM_SKY_IRRADIANCE,
   realmLightTint,
+  SYNODIC_MONTH_DAYS,
   skyTintForDayness,
   sunDirection,
   sunsetWarmGate,
@@ -626,8 +627,9 @@ describe('warmDuskGrade (the whole frame goes orange at the horizon)', () => {
 });
 
 describe('lunarPhase / moonTerminator (the moon runs real phases)', () => {
-  it('anchors the lunar cycle to the epoch across eight world days', () => {
-    expect(LUNAR_CYCLE_MS).toBe(8 * DAY_NIGHT_CYCLE_MS);
+  it('anchors the lunar cycle to the epoch across the 29.5-world-day month', () => {
+    expect(SYNODIC_MONTH_DAYS).toBe(29.530589);
+    expect(LUNAR_CYCLE_MS).toBe(29.530589 * DAY_NIGHT_CYCLE_MS);
     expect(lunarPhase(0)).toBe(0);
     expect(lunarPhase(LUNAR_CYCLE_MS / 2)).toBeCloseTo(0.5, 12);
     expect(lunarPhase(LUNAR_CYCLE_MS * 2.25)).toBeCloseTo(0.25, 12);
