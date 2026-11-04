@@ -64,7 +64,6 @@ import {
   fightHash,
   frostCrystal,
   frostLook,
-  frozenLook,
   holeLook,
   QUENCH_FIGHT_POOLS as P,
   QUENCH_FIGHT_REACH,
@@ -217,7 +216,7 @@ void main() {
   #include <colorspace_fragment>
 }
 `;
-/** An instanced body-frame mesh (blocks, collars) with its parameters. */
+/** An instanced body-frame mesh (the water's collars) with its parameters. */
 const BODY_VERT = /* glsl */ `
 ${CAMERA_RELATIVE_GLSL}
 varying vec3 vN;
@@ -231,32 +230,6 @@ void main() {
   vN = normalize(mat3(modelMatrix) * mat3(instanceMatrix) * normal);
   vV = normalize(cameraPosition - wp.xyz);
   gl_Position = projectionMatrix * wocCamRelView(wp.xyz);
-}
-`;
-/** The block of clear ice round a frozen player (vP: grow, crack, seed). */
-const BLOCK_FRAG = /* glsl */ `
-uniform vec3 uIce;
-uniform vec3 uDeep;
-uniform vec3 uLight;
-varying vec3 vN;
-varying vec3 vV;
-varying vec3 vL;
-varying vec3 vP;
-float h(vec3 p) { return fract(sin(dot(p, vec3(127.1, 311.7, 74.7))) * 43758.5453); }
-void main() {
-  if (vL.y > vP.x * 2.5) discard;
-  float fres = pow(1.0 - abs(dot(normalize(vN), normalize(vV))), 2.0);
-  vec3 q = vL * 3.0 + vP.z * 11.0;
-  float cell = h(floor(q));
-  float crack = step(1.0 - vP.y * 0.45, cell) * step(0.4, fract(q.y * 2.0 + cell));
-  // Clear deep ice, paler at its faces' edges, a rime frost at its foot.
-  float rimeFoot = 1.0 - smoothstep(0.0, 0.5, vL.y);
-  // Deep glacier blue in its heart, pale only at its faces' edges.
-  vec3 col = mix(uDeep * 0.75, uIce, 0.08 + 0.62 * fres) + uLight * crack * 1.6;
-  col = mix(col, uIce * 1.1, rimeFoot * 0.5);
-  float alpha = clamp(0.42 + fres * 0.5 + crack * 0.4 + rimeFoot * 0.3, 0.0, 0.94);
-  gl_FragColor = vec4(col, alpha);
-  #include <colorspace_fragment>
 }
 `;
 /** The churning freezing water round a trapped player's waist. */
@@ -337,7 +310,6 @@ export class QuenchFightFx {
   private readonly crystals: THREE.InstancedMesh;
   private readonly warms: THREE.InstancedMesh;
   private readonly links: THREE.InstancedMesh;
-  private readonly blocks: THREE.InstancedMesh;
   private readonly collars: THREE.InstancedMesh;
   private readonly rim: THREE.InstancedMesh;
   /** The shore ice's slabs by object id, and when each appeared. */
@@ -562,10 +534,9 @@ export class QuenchFightFx {
     for (let i = 0; i < P.links; i++) this.links.setMatrixAt(i, _zero);
     this.root.add(this.links);
 
-    // ---- the freeze's blocks, the water's collars ----
-    const blockGeo = new THREE.CylinderGeometry(0.95, 1.05, 2.5, 6, 3).translate(0, 1.25, 0);
+    // ---- the water's collars (the freeze's encasement is QuenchFrostFx's) ----
     const collarGeo = new THREE.CylinderGeometry(1.05, 1.2, 1.2, 24, 2, true).translate(0, 0.6, 0);
-    this.geometries.push(blockGeo, collarGeo);
+    this.geometries.push(collarGeo);
     const bodyMat = (name: string, frag: string, uniforms: Record<string, THREE.IUniform>) => {
       const m = new THREE.ShaderMaterial({
         name,
@@ -579,17 +550,6 @@ export class QuenchFightFx {
       this.materials.push(m);
       return m;
     };
-    this.blocks = instanced(
-      blockGeo,
-      bodyMat('smithHeartQuenchFrozenBlock', BLOCK_FRAG, {
-        uIce: { value: new THREE.Color(...C.frost) },
-        uDeep: { value: new THREE.Color(...C.frostDeep) },
-        uLight: { value: new THREE.Color(...C.crackLight) },
-      }),
-      P.frozen,
-      'smithHeartQuenchFrozenBlocks',
-      0,
-    );
     this.collars = instanced(
       collarGeo,
       bodyMat('smithHeartQuenchWaterCollar', COLLAR_FRAG, {
@@ -602,7 +562,6 @@ export class QuenchFightFx {
       0,
     );
     // Body meshes are scene objects, never floor marks.
-    this.blocks.renderOrder = 0;
     this.collars.renderOrder = 0;
 
     // ---- the shore ice ----
@@ -880,7 +839,6 @@ export class QuenchFightFx {
       this.warms,
       this.crystals,
       this.links,
-      this.blocks,
       this.collars,
       this.rim,
     ]) {
@@ -1082,7 +1040,8 @@ export class QuenchFightFx {
     for (let i = links; i < P.links; i++) this.links.setMatrixAt(i, _zero);
     this.links.instanceMatrix.needsUpdate = true;
     this.links.visible = links > 0;
-    // The freeze: a block of ice round each frozen body, the shatter's ring.
+    // The freeze: the shatter's ring round each frozen body (its encasement
+    // is QuenchFrostFx's).
     let bi = 0;
     for (const s of this.splashFans) s.id = -1;
     for (const id of this.frozenIds) {
@@ -1092,14 +1051,7 @@ export class QuenchFightFx {
       let radius = 6;
       for (const a of e.auras) if (a.id === QUENCH_AURAS.frozen && a.value > 0) radius = a.value;
       const since = this.clock - (this.frozenSince.get(id) ?? this.clock);
-      const look = frozenLook(since);
       const floor = this.groundY(eAt.x, eAt.z);
-      _v.set(eAt.x, floor - 0.05, eAt.z);
-      _e.set(0, fightHash(id, 2) * Math.PI, 0);
-      _q.setFromEuler(_e);
-      _s.set(1, 1, 1);
-      this.blocks.setMatrixAt(bi, _m.compose(_v, _q, _s));
-      this.blocks.setColorAt(bi, _c.setRGB(look.grow, look.crack, fightHash(id, 4)));
       const fan = this.splashFans[bi];
       fan.id = id;
       fan.fan.group.visible = true;
@@ -1111,13 +1063,7 @@ export class QuenchFightFx {
       });
       bi++;
     }
-    for (let i = bi; i < P.frozen; i++) {
-      this.blocks.setMatrixAt(i, _zero);
-      this.splashFans[i].fan.group.visible = false;
-    }
-    this.blocks.instanceMatrix.needsUpdate = true;
-    this.blocks.visible = bi > 0;
-    if (this.blocks.instanceColor) this.blocks.instanceColor.needsUpdate = true;
+    for (let i = bi; i < P.frozen; i++) this.splashFans[i].fan.group.visible = false;
     // The water: a churning collar round each trapped body's waist.
     let wa = 0;
     for (const id of this.trappedIds) {
@@ -1381,7 +1327,6 @@ export class QuenchFightFx {
       this.warms,
       this.crystals,
       this.links,
-      this.blocks,
       this.collars,
       this.rim,
     ])

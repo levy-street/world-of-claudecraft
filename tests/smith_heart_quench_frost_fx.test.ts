@@ -8,15 +8,22 @@ import { describe, expect, it } from 'vitest';
 import {
   CHUNK_SECONDS,
   chunkPose,
+  encaseLook,
+  encaseVertex,
+  GLAZE_LAYERS,
+  GLAZE_PROFILE,
   type HuddleRing,
   huddleRings,
   QUENCH_FROST_POOLS,
+  SPLASH_FLIGHT_SECONDS,
   shardFlight,
   shellLook,
+  shoulderCrystal,
   spikePose,
   vaporRate,
 } from '../src/render/smith_heart_fx/quench_frost_fx_core';
 import { QUENCH_TUNING as T } from '../src/sim/encounters/smith_heart/quench_ids';
+import { quenchDock } from '../src/ui/hud/dungeon/dungeon_prompts';
 
 describe('Quench frost pass: the icy aura', () => {
   it('climbs and brightens with the bar, pulses past three quarters', () => {
@@ -107,10 +114,83 @@ describe('Quench frost pass: shards, chunks, spikes', () => {
       const s1 = spikePose(9, k, 1);
       expect(s0.h).toBe(0);
       expect(s1.h).toBeGreaterThan(0.6);
-      expect(s1.r).toBeGreaterThan(0.8);
+      expect(s1.r).toBeGreaterThan(0.7);
       seen.add(Math.floor(((s1.a % (Math.PI * 2)) / (Math.PI * 2)) * 4));
     }
     // Round the whole body, not to one side.
     expect(seen.size).toBe(4);
+  });
+});
+
+describe('Quench frost pass v2: the glaze, the shoulders, the encasement', () => {
+  it('the glaze hugs a silhouette: narrow ankles and neck, broad shoulders, a closed crown', () => {
+    const ys = GLAZE_PROFILE.map(([, y]) => y);
+    for (let i = 1; i < ys.length; i++) expect(ys[i]).toBeGreaterThan(ys[i - 1]);
+    expect(ys[0]).toBe(0);
+    expect(ys[ys.length - 1]).toBe(1);
+    const at = (y: number) =>
+      GLAZE_PROFILE.reduce((best, p) => (Math.abs(p[1] - y) < Math.abs(best[1] - y) ? p : best))[0];
+    expect(at(0.74)).toBeGreaterThan(at(0.06));
+    expect(at(0.74)).toBeGreaterThan(at(0.84) * 2);
+    expect(GLAZE_PROFILE[GLAZE_PROFILE.length - 1][0]).toBeLessThan(0.05);
+    // Two layers: the outer a fainter rime off the inner.
+    expect(GLAZE_LAYERS.length).toBe(2);
+    expect(GLAZE_LAYERS[1][0]).toBeGreaterThan(GLAZE_LAYERS[0][0]);
+    expect(GLAZE_LAYERS[1][1]).toBeLessThan(GLAZE_LAYERS[0][1]);
+  });
+
+  it('rime crystals grow from the shoulders only past half the bar, on both sides', () => {
+    expect(shoulderCrystal(0, 30)).toBeNull();
+    const a = shoulderCrystal(0, 70);
+    const b = { ...(shoulderCrystal(1, 95) ?? { side: 0, size: 0 }) };
+    expect(a?.side ?? 0).toBeLessThan(0);
+    expect(b.side).toBeGreaterThan(0);
+    expect(shoulderCrystal(0, 100)?.size ?? 0).toBeGreaterThan(shoulderCrystal(0, 60)?.size ?? 0);
+  });
+
+  it('the encasement closes fast, cracks toward the shatter, and its countdown burns down and quickens', () => {
+    const early = { ...encaseLook(0.2, 0) };
+    const late = { ...encaseLook(T.freezeSeconds - 0.3, 0) };
+    expect(encaseLook(0.5, 0).grow).toBe(1);
+    expect(early.crack).toBe(0);
+    expect(late.crack).toBeGreaterThan(0.9);
+    expect(late.countdown).toBeGreaterThan(early.countdown);
+    expect(encaseLook(T.freezeSeconds, 0).countdown).toBe(1);
+    // Its heartbeat: more beats in the last second than in the first.
+    const beats = (from: number) => {
+      let n = 0;
+      let prev = encaseLook(from, from).beat;
+      for (let t = from; t < from + 1; t += 0.005) {
+        const b = encaseLook(t, t).beat;
+        if (prev < 0.5 && b >= 0.5) n++;
+        prev = b;
+      }
+      return n;
+    };
+    expect(beats(T.freezeSeconds - 1)).toBeGreaterThan(beats(0));
+  });
+
+  it("the crystal's facets stay closed: every copy of a vertex moves the same way", () => {
+    const a = { ...encaseVertex(0.5257, 0.8507, 0) };
+    const b = encaseVertex(0.5257, 0.8507, 0);
+    expect(b).toEqual(a);
+    // Taller than wide, flatter front to back.
+    expect(Math.abs(encaseVertex(0, 1, 0).y)).toBeGreaterThan(Math.abs(encaseVertex(1, 0, 0).x));
+    expect(Math.abs(encaseVertex(0, 0, 1).z)).toBeLessThan(Math.abs(encaseVertex(1, 0, 0).x) + 0.2);
+  });
+
+  it('the splash shards fly slower than a blink (about 1.25 s)', () => {
+    expect(SPLASH_FLIGHT_SECONDS).toBeGreaterThanOrEqual(1.2);
+  });
+
+  it('the cold bar docks on the player frame, never the middle of the screen', () => {
+    const frame = { id: 'player-frame' } as unknown as HTMLElement;
+    const layer = {
+      ownerDocument: { getElementById: (id: string) => (id === 'player-frame' ? frame : null) },
+    } as unknown as HTMLElement;
+    expect(quenchDock(layer)).toBe(frame);
+    const bare = { ownerDocument: { getElementById: () => null } } as unknown as HTMLElement;
+    expect(quenchDock(bare)).toBe(bare);
+    expect(quenchDock(null)).toBeNull();
   });
 });

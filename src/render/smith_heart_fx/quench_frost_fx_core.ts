@@ -34,16 +34,18 @@ export const QUENCH_FROST_POOLS = {
   /** Splash shards in flight. */
   bolts: 18,
   /** Tumbling chunks of shattered ice. */
-  chunks: 72,
+  chunks: 130,
   /** Chunks one shatter throws (the low tier throws half). */
-  chunksPer: 14,
+  chunksPer: 24,
   /** Ice spikes round one encased body. */
-  spikesPer: 9,
+  spikesPer: 12,
+  /** Rime crystals on one cold body's shoulders. */
+  shoulderPer: 6,
   frozen: 10,
 } as const;
 
 /** Seconds a splash shard flies from the shattered to the struck. */
-export const SPLASH_FLIGHT_SECONDS = 0.85;
+export const SPLASH_FLIGHT_SECONDS = 1.25;
 /** Seconds a struck body's shell flares after its shard lands. */
 export const SPLASH_FLARE_SECONDS = 0.9;
 /** Seconds a shatter's chunks tumble. */
@@ -223,9 +225,9 @@ export function chunkPose(
 ): ChunkPose | null {
   if (elapsed < 0 || elapsed >= CHUNK_SECONDS) return null;
   const a = fightHash(seed, i * 3 + 1) * Math.PI * 2;
-  const sp = 4.5 + fightHash(seed, i * 3 + 2) * 5;
-  const up = 3 + fightHash(seed, i * 3 + 3) * 4.5;
-  const g = 16;
+  const sp = 5 + fightHash(seed, i * 3 + 2) * 7;
+  const up = 3.5 + fightHash(seed, i * 3 + 3) * 5.5;
+  const g = 24;
   const tLand = (up + Math.sqrt(up * up + 2 * g * 1.2)) / g;
   const t = Math.min(elapsed, tLand);
   const skid = Math.max(0, elapsed - tLand);
@@ -235,7 +237,7 @@ export function chunkPose(
   out.y = Math.max(0.08, 1.2 + up * t - 0.5 * g * t * t);
   out.rx = elapsed * (6 + 8 * fightHash(seed, i + 40));
   out.ry = elapsed * (4 + 6 * fightHash(seed, i + 80)) + a;
-  const base = 0.16 + 0.22 * fightHash(seed, i + 120);
+  const base = 0.18 + 0.32 * fightHash(seed, i + 120);
   out.size = base * (1 - smooth((elapsed - CHUNK_SECONDS * 0.65) / (CHUNK_SECONDS * 0.35)));
   return out;
 }
@@ -264,10 +266,121 @@ export function spikePose(
 ): SpikePose {
   const n = QUENCH_FROST_POOLS.spikesPer;
   out.a = (k / n) * Math.PI * 2 + fightHash(id, k + 7) * 0.5;
-  out.r = 0.85 + fightHash(id, k + 11) * 0.45;
-  out.lean = 0.35 + fightHash(id, k + 13) * 0.45;
+  out.r = 0.75 + fightHash(id, k + 11) * 0.45;
+  out.lean = 0.3 + fightHash(id, k + 13) * 0.5;
   const g = smooth(grow);
-  out.h = (0.7 + fightHash(id, k + 17) * 1.3) * g;
-  out.w = (0.18 + fightHash(id, k + 19) * 0.16) * (0.4 + 0.6 * g);
+  out.h = (0.9 + fightHash(id, k + 17) * 1.5) * g;
+  out.w = (0.2 + fightHash(id, k + 19) * 0.2) * (0.4 + 0.6 * g);
+  return out;
+}
+
+// ---- the glaze's shape -------------------------------------------------------------
+
+/**
+ * The frost glaze's profile up a body (a lathe: [radius, height share], both
+ * yards and 0..1 of the body): narrow at the ankles, out at the hips, in at
+ * the waist, broad at the shoulders, in at the neck, round over the head. It
+ * hugs a player's silhouette instead of standing round it like a sleeve.
+ */
+export const GLAZE_PROFILE: readonly (readonly [number, number])[] = [
+  [0.17, 0],
+  [0.16, 0.06],
+  [0.2, 0.24],
+  [0.26, 0.42],
+  [0.33, 0.5],
+  [0.32, 0.58],
+  [0.4, 0.68],
+  [0.47, 0.74],
+  [0.42, 0.8],
+  [0.2, 0.84],
+  [0.19, 0.87],
+  [0.23, 0.92],
+  [0.18, 0.97],
+  [0.03, 1],
+];
+
+/** The glaze's two layers: the inner one on the body, the outer a fainter
+ *  breath of rime off it (scale, opacity share). */
+export const GLAZE_LAYERS: readonly (readonly [number, number])[] = [
+  [1, 1],
+  [1.14, 0.45],
+];
+
+/**
+ * Shoulder crystal `k` (0..5; even the left shoulder, odd the right) on a body
+ * at `cold`: rime crystals growing out of the shoulders once the bar passes
+ * half, longer as it fills; null while too warm for it. The frame: `side`
+ * across the body (yards, + right), `up` and `out` its lean, `size` its length.
+ */
+export function shoulderCrystal(
+  k: number,
+  cold: number,
+  out: { side: number; fwd: number; h: number; lean: number; size: number } = {
+    side: 0,
+    fwd: 0,
+    h: 0,
+    lean: 0,
+    size: 0,
+  },
+): typeof out | null {
+  const c = clamp01(cold / T.coldMax);
+  const start = 0.45 + 0.08 * Math.floor(k / 2);
+  const g = smooth((c - start) / 0.25);
+  if (g <= 0.01) return null;
+  const side = k % 2 === 0 ? -1 : 1;
+  out.side = side * (0.3 + 0.06 * fightHash(k, 61));
+  out.fwd = (fightHash(k, 67) - 0.5) * 0.24;
+  out.h = 0.75 + 0.03 * fightHash(k, 71);
+  out.lean = side * (0.55 + 0.35 * fightHash(k, 73));
+  out.size = (0.38 + 0.3 * fightHash(k, 79)) * g;
+  return out;
+}
+
+// ---- the encasement ------------------------------------------------------------------
+
+export interface EncaseLook {
+  /** How far up the body the crystal has closed (0..1). */
+  grow: number;
+  /** Its cracks spreading toward the shatter (0..1). */
+  crack: number;
+  /** The countdown burning down the ice (0 at the freeze, 1 at the shatter). */
+  countdown: number;
+  /** The heartbeat of its light: faster as the shatter nears (0..1). */
+  beat: number;
+}
+
+/** The encasement `elapsed` seconds into a freeze at clock `t`. */
+export function encaseLook(
+  elapsed: number,
+  t: number,
+  out: EncaseLook = { grow: 0, crack: 0, countdown: 0, beat: 0 },
+): EncaseLook {
+  const k = clamp01(elapsed / T.freezeSeconds);
+  out.grow = smooth(elapsed / 0.4);
+  out.crack = smooth((elapsed - 0.8) / (T.freezeSeconds - 0.8));
+  out.countdown = k;
+  out.beat = 0.5 + 0.5 * Math.sin(t * (4 + 20 * k * k));
+  return out;
+}
+
+/**
+ * The encasement crystal's vertex `(x, y, z)` (a unit icosphere's) jittered
+ * into a faceted, body-shaped shell: taller than wide, flatter front to back,
+ * each facet pushed in or out by a hash of where it sits (the same for every
+ * copy of a vertex, so the facets stay closed). Writes into `out`.
+ */
+export function encaseVertex(
+  x: number,
+  y: number,
+  z: number,
+  out: { x: number; y: number; z: number } = { x: 0, y: 0, z: 0 },
+): { x: number; y: number; z: number } {
+  const q = (v: number) => Math.round(v * 1000);
+  const j = 0.84 + 0.32 * fightHash(q(x) * 7 + q(z), q(y) + 11);
+  // Shoulders broad, the foot narrower, the crown a crystal point.
+  const waist = y > 0.55 ? 0.78 : y < -0.6 ? 0.88 : 1;
+  out.x = x * 0.82 * j * waist;
+  out.z = z * 0.66 * j * waist;
+  out.y = y * (y > 0.7 ? 1.38 : 1.18) * (0.95 + 0.1 * j);
   return out;
 }

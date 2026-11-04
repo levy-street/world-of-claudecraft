@@ -39,11 +39,14 @@ import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { heartKitSlotMaterial } from '../smith_heart/heart_kit';
 import type { EngineParticles } from '../trash_engine_fx/engine_particles';
+import { QuenchEncaseFx } from './quench_encase_fx';
 import { QUENCH_FIGHT_COLORS as C, fightHash } from './quench_fight_fx_core';
 import {
   CHUNK_SECONDS,
   type ChunkPose,
   chunkPose,
+  GLAZE_LAYERS,
+  GLAZE_PROFILE,
   type HuddleBody,
   type HuddleRing,
   huddleRings,
@@ -54,11 +57,13 @@ import {
   type SpikePose,
   shardFlight,
   shellLook,
+  shoulderCrystal,
   spikePose,
   vaporRate,
 } from './quench_frost_fx_core';
 
-const BODY_H = 2.05;
+/** A player rig's height (characters/manifest.ts HUMANOID_H). */
+const BODY_H = 2.6;
 const _m = new THREE.Matrix4();
 const _q = new THREE.Quaternion();
 const _e = new THREE.Euler();
@@ -73,6 +78,8 @@ const _chunk: ChunkPose = { x: 0, y: 0, z: 0, rx: 0, ry: 0, size: 0 };
 const _spike: SpikePose = { a: 0, r: 0, lean: 0, h: 0, w: 0 };
 const _p = { x: 0, y: 0, z: 0 };
 const _p2 = { x: 0, y: 0, z: 0 };
+const _up = new THREE.Vector3(0, 1, 0);
+const _sh = { side: 0, fwd: 0, h: 0, lean: 0, size: 0 };
 
 // ---- shaders -----------------------------------------------------------------------------
 
@@ -132,7 +139,11 @@ void main() {
   float streak = smoothstep(0.78, 0.98, n(vec2(a * 7.0 + vSeed * 5.0, y * 1.5)));
   vec3 col = mix(uDeep, uFrost, 0.3 + 0.55 * fres + 0.2 * cell);
   col = col * (0.8 + 0.3 * vS.y) + uFrost * (lip * 0.9 + glint * 1.1);
-  float alpha = under * (0.16 + 0.42 * fres + 0.22 * feather + 0.25 * streak);
+  // Round the legs the lathe spans the gap between them: there the frost is
+  // a rim of rime on the silhouette only, never a skirt filled across.
+  float legs = 1.0 - smoothstep(0.42, 0.52, y);
+  float fill = mix(1.0, 0.15, legs);
+  float alpha = under * ((0.08 + 0.16 * feather + 0.2 * streak) * fill + 0.4 * fres);
   alpha += under * (0.7 * lip + 0.6 * glint);
   // The bite: jagged veins racing up and round a body hidden in an immunity.
   float vein = abs(fract(a * 1.6 + y * 3.2 + n(q * 2.0) * 0.8 - uTime * 1.8) - 0.5);
@@ -213,6 +224,8 @@ export class QuenchFrostFx {
   private readonly shellAttr: THREE.InstancedBufferAttribute;
   private readonly rings: THREE.InstancedMesh;
   private readonly spikes: THREE.InstancedMesh;
+  private readonly shoulders: THREE.InstancedMesh;
+  private readonly encase: QuenchEncaseFx;
   private readonly chunks: THREE.InstancedMesh;
   private readonly bolts: THREE.InstancedMesh;
   private readonly boltPool: Bolt[] = [];
@@ -261,8 +274,15 @@ export class QuenchFrostFx {
     };
 
     // ---- the icy aura ----
-    const shellGeo = new THREE.CylinderGeometry(0.44, 0.56, 1, 28, 8, true).translate(0, 0.5, 0);
-    this.shellAttr = new THREE.InstancedBufferAttribute(new Float32Array(P.shells * 4), 4);
+    // A lathe up a player's silhouette (GLAZE_PROFILE), two layers per body.
+    const shellGeo = new THREE.LatheGeometry(
+      GLAZE_PROFILE.map(([r, y]) => new THREE.Vector2(r, y)),
+      28,
+    );
+    this.shellAttr = new THREE.InstancedBufferAttribute(
+      new Float32Array(P.shells * GLAZE_LAYERS.length * 4),
+      4,
+    );
     this.shellAttr.setUsage(THREE.DynamicDrawUsage);
     shellGeo.setAttribute('aShell', this.shellAttr);
     this.geometries.push(shellGeo);
@@ -281,7 +301,12 @@ export class QuenchFrostFx {
       side: THREE.FrontSide,
     });
     this.materials.push(shellMat);
-    this.shells = instanced(shellGeo, shellMat, P.shells, 'smithHeartQuenchFrostShells');
+    this.shells = instanced(
+      shellGeo,
+      shellMat,
+      P.shells * GLAZE_LAYERS.length,
+      'smithHeartQuenchFrostShells',
+    );
     this.shells.renderOrder = 2;
 
     // ---- the huddle's rings ----
@@ -334,6 +359,13 @@ export class QuenchFrostFx {
     tint(chunkGeo, -1, 1);
     this.geometries.push(spikeGeo, chunkGeo);
     this.spikes = instanced(spikeGeo, iceMat, P.frozen * P.spikesPer, 'smithHeartQuenchRimeSpikes');
+    this.shoulders = instanced(
+      spikeGeo,
+      iceMat,
+      P.shells * P.shoulderPer,
+      'smithHeartQuenchShoulderRime',
+    );
+    this.encase = new QuenchEncaseFx(this.root, this.uTime, this.groundY);
     this.chunks = instanced(chunkGeo, iceMat, P.chunks, 'smithHeartQuenchShatterChunks');
     for (let i = 0; i < Math.ceil(P.chunks / P.chunksPer) + 1; i++)
       this.bursts.push({ live: false, born: 0, seed: 0, x: 0, y: 0, z: 0, n: 0 });
@@ -413,15 +445,17 @@ export class QuenchFrostFx {
     this.paintShells(world, f, dt, clock);
     this.paintRings(world, f);
     this.paintSpikes(world, f, clock);
+    this.encase.frame(world, f.frozenIds, f.frozenSince, clock);
     this.paintChunks(clock);
     this.paintBolts(world, clock);
   }
 
   private paintShells(world: IWorld, f: QuenchFrostFrame, dt: number, clock: number): void {
     let n = 0;
+    let si = 0;
     const arr = this.shellAttr.array as Float32Array;
     for (const id of f.coldIds) {
-      if (n >= P.shells) break;
+      if (n + GLAZE_LAYERS.length > P.shells * GLAZE_LAYERS.length) break;
       const e = world.entities.get(id);
       if (!e || e.dead) continue;
       let cold = 0;
@@ -442,14 +476,33 @@ export class QuenchFrostFx {
       const at = fxAnchor(e);
       const floor = this.groundY(at.x, at.z);
       _v.set(at.x, floor + 0.02, at.z);
-      const grow = 1 + flare * 0.18 + look.pulse * 0.05;
-      _s.set(grow, BODY_H, grow);
-      this.shells.setMatrixAt(n, _m.compose(_v, _q.identity(), _s));
-      arr[n * 4] = look.height;
-      arr[n * 4 + 1] = look.glow;
-      arr[n * 4 + 2] = look.bite;
-      arr[n * 4 + 3] = look.alpha;
-      n++;
+      const grow = 1 + flare * 0.12 + look.pulse * 0.03;
+      _q.setFromAxisAngle(_up, e.facing);
+      for (const [scale, share] of GLAZE_LAYERS) {
+        _s.set(grow * scale, BODY_H * (scale > 1 ? 1.02 : 1), grow * scale * 0.82);
+        this.shells.setMatrixAt(n, _m.compose(_v, _q, _s));
+        arr[n * 4] = look.height;
+        arr[n * 4 + 1] = look.glow;
+        arr[n * 4 + 2] = look.bite;
+        arr[n * 4 + 3] = look.alpha * share;
+        n++;
+      }
+      // Rime crystals growing out of the shoulders past half the bar.
+      const fx0 = Math.sin(e.facing);
+      const fz0 = Math.cos(e.facing);
+      for (let k = 0; k < P.shoulderPer && si < P.shells * P.shoulderPer; k++) {
+        if (!shoulderCrystal(k, cold, _sh)) continue;
+        // Across the body is (cos f, -sin f); forward is (sin f, cos f).
+        _v.set(
+          at.x + fz0 * _sh.side + fx0 * _sh.fwd,
+          floor + BODY_H * _sh.h,
+          at.z - fx0 * _sh.side + fz0 * _sh.fwd,
+        );
+        _q.setFromAxisAngle(_w.set(fx0, 0, fz0), _sh.lean);
+        _s.set(_sh.size * 0.35, _sh.size, _sh.size * 0.35);
+        this.shoulders.setMatrixAt(si++, _m.compose(_v, _q, _s));
+        _v.set(at.x, floor + 0.02, at.z);
+      }
       // The breath's vapour, out ahead of the face.
       const rate = vaporRate(cold);
       if (rate > 0 && this.rand() < dt * rate * this.density) {
@@ -488,7 +541,10 @@ export class QuenchFrostFx {
         );
       }
     }
-    for (let i = n; i < P.shells; i++) this.shells.setMatrixAt(i, _zero);
+    for (let i = n; i < P.shells * GLAZE_LAYERS.length; i++) this.shells.setMatrixAt(i, _zero);
+    for (let i = si; i < P.shells * P.shoulderPer; i++) this.shoulders.setMatrixAt(i, _zero);
+    this.shoulders.instanceMatrix.needsUpdate = true;
+    this.shoulders.visible = si > 0;
     this.shells.instanceMatrix.needsUpdate = true;
     this.shellAttr.needsUpdate = true;
     this.shells.visible = n > 0;
@@ -641,27 +697,37 @@ export class QuenchFrostFx {
       _s.set(0.36, 0.36, 1.7);
       this.bolts.setMatrixAt(n++, _m.compose(_v, _q, _s));
       // A cold glow at its head, a trail of rime glitter and mist behind it.
+      // The trail draws on every tier (it says who the cold is flying to):
+      // a bright head, a glittering wake that lingers, a breath of mist.
       this.particles.puff(_v.x, _v.y, _v.z, 1, {
         speed: 0,
-        life: 0.12,
-        size: [1.1, 0.6],
+        life: 0.16,
+        size: [1.4, 0.7],
+        color: C.shard,
+        alpha: 1,
+        pool: 'glow',
+      });
+      this.particles.puff(_v.x, _v.y, _v.z, 3, {
+        speed: 0.35,
+        life: 0.8,
+        size: [0.34, 0.06],
         color: C.shard,
         alpha: 1,
         pool: 'glow',
       });
       this.particles.puff(_v.x, _v.y, _v.z, 2, {
         speed: 0.4,
-        life: 0.45,
+        life: 0.55,
         size: [0.3, 0.05],
         color: C.frostDeep,
         alpha: 1,
       });
       this.particles.puff(_v.x, _v.y, _v.z, 1, {
         speed: 0.2,
-        life: 0.6,
-        size: [0.5, 1],
+        life: 0.9,
+        size: [0.6, 1.3],
         color: C.mist,
-        alpha: 0.35,
+        alpha: 0.4,
       });
     }
     for (let i = n; i < P.bolts; i++) this.bolts.setMatrixAt(i, _zero);
@@ -675,7 +741,15 @@ export class QuenchFrostFx {
     for (const b of this.bursts) b.live = false;
     this.splashSeen.clear();
     this.flareAt.clear();
-    for (const mesh of [this.shells, this.rings, this.spikes, this.chunks, this.bolts]) {
+    this.encase.clear();
+    for (const mesh of [
+      this.shells,
+      this.rings,
+      this.spikes,
+      this.shoulders,
+      this.chunks,
+      this.bolts,
+    ]) {
       for (let i = 0; i < mesh.count; i++) mesh.setMatrixAt(i, _zero);
       mesh.instanceMatrix.needsUpdate = true;
       mesh.visible = false;
@@ -685,7 +759,15 @@ export class QuenchFrostFx {
   dispose(): void {
     for (const g of this.geometries) g.dispose();
     for (const m of this.materials) m.dispose();
-    for (const mesh of [this.shells, this.rings, this.spikes, this.chunks, this.bolts])
+    this.encase.dispose();
+    for (const mesh of [
+      this.shells,
+      this.rings,
+      this.spikes,
+      this.shoulders,
+      this.chunks,
+      this.bolts,
+    ])
       mesh.dispose();
   }
 }

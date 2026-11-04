@@ -19229,6 +19229,102 @@
       animation: none;
     }
   }
+  /* Docked on the player frame (dungeon_prompts.ts quenchDock; the owner's
+     rule of 2026-11-04: no box in the middle of the screen). A compact frost
+     bar riding just above the frame like a secondary resource bar: a frost
+     crystal icon and a small title on the left, the bar with its numbers on
+     the right, the state carried by colour, icon and the title's words. The
+     instruction line is dropped (the world shows what to do); the freeze
+     pulses the bar's edge, never anything over the screen's middle. */
+  #player-frame > #heart-quench-alert {
+    --qa-tone: var(--color-debuff-frost);
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: auto;
+    bottom: calc(100% + 6px);
+    transform: none;
+    min-width: 0;
+    max-width: none;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 8px 2px 26px;
+    border-width: 1px;
+    border-color: var(--qa-tone);
+    text-align: left;
+  }
+  #player-frame > #heart-quench-alert::before {
+    content: "";
+    position: absolute;
+    left: 7px;
+    top: 50%;
+    width: 13px;
+    height: 13px;
+    transform: translateY(-50%);
+    clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+    background: radial-gradient(circle, var(--color-text-light) 0 22%, var(--qa-tone) 60%);
+  }
+  #player-frame > #heart-quench-alert .fa-title {
+    flex: 0 0 auto;
+    max-width: 46%;
+    overflow: hidden;
+    font-size: 11px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: var(--qa-tone);
+  }
+  #player-frame > #heart-quench-alert .fa-line {
+    display: none;
+  }
+  #player-frame > #heart-quench-alert .fa-bar {
+    --bar-h: 10px;
+    --bar-color: var(--qa-tone);
+    flex: 1 1 auto;
+    width: auto;
+  }
+  #player-frame > #heart-quench-alert .fa-bar-label {
+    flex: 0 0 auto;
+    font-size: 10px;
+    white-space: nowrap;
+  }
+  #player-frame > #heart-quench-alert.is-warm {
+    --qa-tone: var(--color-gold);
+  }
+  #player-frame > #heart-quench-alert.is-freezing,
+  #player-frame > #heart-quench-alert.is-frozen,
+  #player-frame > #heart-quench-alert.is-marked {
+    --qa-tone: var(--color-hostile);
+  }
+  #player-frame > #heart-quench-alert.is-water {
+    --qa-tone: var(--color-mana);
+  }
+  #player-frame > #heart-quench-alert.is-freezing {
+    animation: none;
+  }
+  #player-frame > #heart-quench-alert.is-frozen {
+    animation: heart-quench-dock-pulse 0.7s ease-in-out infinite alternate;
+  }
+  @keyframes heart-quench-dock-pulse {
+    from {
+      box-shadow: 0 0 0 0 transparent;
+    }
+    to {
+      box-shadow: 0 0 10px 1px var(--qa-tone);
+    }
+  }
+  body.mobile-touch #player-frame > #heart-quench-alert {
+    left: -4px;
+    right: auto;
+    width: min(220px, 60vw);
+    min-width: 0;
+    bottom: calc(100% + 10px);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #player-frame > #heart-quench-alert.is-frozen {
+      animation: none;
+    }
+  }
   body.mobile-touch #heart-council-alert {
     min-width: min(420px, calc(100vw - 32px));
   }

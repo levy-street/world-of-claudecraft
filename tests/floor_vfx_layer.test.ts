@@ -418,6 +418,9 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   // The Breath's Knotted Gale: its floor discs on HEART_FLOOR's own rungs; the ball,
   // the funnels and the burst are bodies at the default order.
   { file: 'src/render/smith_heart_fx/breath_heart_fx.ts', layer: 'encounter', strict: false },
+  // The Breath's Summit Roar: its blast ring and wake on the encounter rung;
+  // its whole-screen frost veil is a camera overlay (order 9990), so not strict.
+  { file: 'src/render/smith_heart_fx/breath_roar_fx.ts', layer: 'encounter', strict: false },
   // Its element telegraphs (the Quench's frost, the Breath's storm, the
   // Hammer's granite, the Heat's molten basalt): char, glow and curtain on
   // the kit's own rungs (FINAL_KIT_FLOOR).
@@ -440,6 +443,12 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
  * otherwise, so a floor mechanic cannot ship outside the ladder unnoticed.
  */
 const FLOOR_VFX_OUT_OF_SCOPE: readonly string[] = [
+  // The Quench's freeze: a crystal of ice round a frozen body, ordered after
+  // the body's own frost shell; a body mesh, never a floor mark
+  'src/render/smith_heart_fx/quench_encase_fx.ts',
+  // The Breath's summit: two decks of cloud sea far below the Cornice, ordered
+  // between themselves (the lower first); scenery in the air, never a floor mark
+  'src/render/smith_heart/breath_summit.ts',
   // the seasonal candle halos: camera-facing sprites at a candle's height, never on
   // the floor (their ground pools take the floor ladder through floorVfxRenderOrder)
   'src/render/seasonal_decor_lights.ts',
