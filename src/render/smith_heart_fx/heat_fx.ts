@@ -51,11 +51,19 @@ import { attachSceneGroupGated } from '../gated_scene_attach';
 import { GFX } from '../gfx';
 import { getFlameTex } from '../ignivar_fire_vfx';
 import { setRenderCategory } from '../renderer_diagnostics';
-import { heartKitProgramWarmers, heartKitSlotMaterial } from '../smith_heart/heart_kit';
+import {
+  ensureHeartKit,
+  heartKitLoaded,
+  heartKitMeshes,
+  heartKitProgramWarmers,
+  heartKitSlotMaterial,
+  SMITH_HEART_HEART_KIT_URL,
+} from '../smith_heart/heart_kit';
 import { heartVeinGlowMaterial } from '../smith_heart/heart_room_kit';
 import { radialGlowTexture } from '../textures';
 import { EngineParticles } from '../trash_engine_fx/engine_particles';
 import { inSmithHeartClaim } from './council_fx_core';
+import { HEAT_BODY_COLORS } from './heat_body_core';
 import { heatClaimOrigin } from './heat_fight_fx_core';
 import { HEAT_FLOOR, heatParticleSteps } from './heat_floor_ladder_core';
 import {
@@ -63,6 +71,7 @@ import {
   craterLook,
   type FistLook,
   fistLook,
+  HEAT_FIST_SCULPT,
   heatFxHash,
   HEAT_FX_POOLS as P,
   SWELL_HEIGHT,
@@ -71,7 +80,7 @@ import {
 } from './heat_fx_core';
 import { HEAT_LAVA_GLSL, HEAT_MOLTEN_GLSL, HEAT_NOISE_GLSL } from './heat_lava_glsl';
 import { moltenDecal } from './heat_molten_decal';
-import { basaltColumn, crystalPrism, swellWallGeometry } from './heat_shapes';
+import { basaltColumn, basaltRepaint, crystalPrism, swellWallGeometry } from './heat_shapes';
 import { HeatTelegraphs } from './heat_telegraph';
 
 const SCAN_SEC = 0.1;
@@ -365,6 +374,16 @@ export class HeatFx {
       this.root.add(fist);
       this.fists.push({ id: -1, born: 0, seconds: T.fistCast, x: 0, z: 0, yaw: 0, fan, fist });
     }
+    // The fist's sculpted rock (the Heart kit's colossus fist and forearm,
+    // repainted basalt) takes the column bundle's place once the kit is in;
+    // the columns stand in until then (the same stone material: no link).
+    if (hasDom && heartKitLoaded(SMITH_HEART_HEART_KIT_URL)) this.sculptFists(stone, glow);
+    else if (hasDom)
+      void ensureHeartKit(SMITH_HEART_HEART_KIT_URL)
+        .then(() => {
+          if (!this.disposed) this.sculptFists(stone, glow);
+        })
+        .catch(() => {});
 
     // ---- the lanes, their walls and wakes ----
     const wallGeo = swellWallGeometry();
@@ -476,8 +495,52 @@ export class HeatFx {
       .catch(() => {});
   }
 
+  /** Swap every fist's column bundle for the sculpted fist and forearm
+   *  (HEAT_FIST_SCULPT), keeping its crystal knuckles and halo. Once. */
+  private sculptFists(stone: THREE.Material, glow: THREE.Material): void {
+    const S = HEAT_FIST_SCULPT;
+    const fistKit = heartKitMeshes(SMITH_HEART_HEART_KIT_URL, S.fist.node);
+    const armKit = heartKitMeshes(SMITH_HEART_HEART_KIT_URL, S.arm.node);
+    if (!fistKit || !armKit) return;
+    const paint = (kit: THREE.Group): void => {
+      for (const m of kit.children) {
+        if (!(m instanceof THREE.Mesh)) continue;
+        if (m.name.endsWith(':glow')) {
+          m.material = glow;
+          m.castShadow = false;
+        } else {
+          m.geometry = basaltRepaint(
+            m.geometry,
+            HEAT_BODY_COLORS.basalt,
+            HEAT_BODY_COLORS.basaltShade,
+          );
+          this.geometries.push(m.geometry);
+          m.material = stone;
+          m.castShadow = true;
+        }
+      }
+    };
+    paint(fistKit);
+    paint(armKit);
+    for (const slot of this.fists) {
+      const g = slot.fist;
+      for (const c of [...g.children])
+        if (c instanceof THREE.Mesh && c.userData.heatFistColumn) g.remove(c);
+      const f = fistKit.clone();
+      f.position.set(S.fist.at[0], S.fist.at[1], S.fist.at[2]);
+      f.rotation.set(S.fist.rot[0], S.fist.rot[1], S.fist.rot[2]);
+      f.scale.setScalar(S.fist.scale);
+      const a = armKit.clone();
+      a.position.set(S.arm.at[0], S.arm.at[1], S.arm.at[2]);
+      a.rotation.set(S.arm.rot[0], S.arm.rot[1], S.arm.rot[2]);
+      a.scale.set(S.arm.scale[0], S.arm.scale[1], S.arm.scale[2]);
+      g.add(f, a);
+    }
+  }
+
   /** A giant fist of hexagonal basalt, its knuckles white-gold crystal, an
-   *  arm of bundled columns rising off it (built once per slot). */
+   *  arm of bundled columns rising off it (built once per slot; the sculpted
+   *  fist takes the columns' place once the Heart kit is in). */
   private buildFist(
     column: THREE.BufferGeometry,
     prism: THREE.BufferGeometry,
@@ -497,6 +560,7 @@ export class HeatFx {
       m.position.set(Math.sin(a) * r, 0.4, Math.cos(a) * r);
       m.scale.set(2.2, 3.4 + heatFxHash(salt, k) * 0.8, 2.2);
       m.castShadow = true;
+      m.userData.heatFistColumn = true;
       g.add(m);
     }
     // The arm above it, rising toward the guardian.
@@ -505,6 +569,7 @@ export class HeatFx {
       const m = new THREE.Mesh(column, stone);
       m.position.set(Math.sin(a) * 1.1, 3.4, Math.cos(a) * 1.1);
       m.scale.set(1.7, 9, 1.7);
+      m.userData.heatFistColumn = true;
       g.add(m);
     }
     // The knuckles: crystal breaking out of its face, pointing down.

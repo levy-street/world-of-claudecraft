@@ -53,6 +53,15 @@ const smooth = (v: number) => {
 // ---- the fist ------------------------------------------------------------------------
 
 /** The share of the bar after which the giant fist starts to fall. */
+/** The Basalt Fist's sculpted rock (audit point 17: the bundle of square
+ *  columns): the Heart kit's colossus fist and forearm, repainted basalt, in
+ *  the fist's frame (yards: y up from the knuckles' floor, +z the knuckles'
+ *  face), the crystal knuckles kept on that face. */
+export const HEAT_FIST_SCULPT = {
+  fist: { node: 'Kit_ColFist', at: [0, 2.6, 0], rot: [0, 0, 0], scale: 1.55 },
+  arm: { node: 'Kit_ColForearm', at: [0, 8.4, -0.4], rot: [0.1, 0, 0], scale: [1.45, 1.45, 1.45] },
+} as const;
+
 export const FIST_DROP_FROM = 0.62;
 /** How high over the spot the fist hangs before it falls (yards). */
 export const FIST_DROP_HEIGHT = 30;

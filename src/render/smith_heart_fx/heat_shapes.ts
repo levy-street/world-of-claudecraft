@@ -31,6 +31,31 @@ export function shadeByHeight(
   return g;
 }
 
+/** A copy of a kit rock's geometry repainted the Hearth's sooted basalt: its
+ *  painted value kept, its colour mapped from `shade` (dark) to `basalt`
+ *  (lit). The caller owns and disposes the copy. */
+export function basaltRepaint(
+  src: THREE.BufferGeometry,
+  basalt: readonly [number, number, number],
+  shade: readonly [number, number, number],
+): THREE.BufferGeometry {
+  const g = src.clone();
+  const col = g.getAttribute('color');
+  if (col) {
+    for (let i = 0; i < col.count; i++) {
+      const v = Math.min(1, col.getX(i) * 1.4);
+      col.setXYZ(
+        i,
+        shade[0] + (basalt[0] - shade[0]) * v,
+        shade[1] + (basalt[1] - shade[1]) * v,
+        shade[2] + (basalt[2] - shade[2]) * v,
+      );
+    }
+    col.needsUpdate = true;
+  }
+  return g;
+}
+
 /** A hexagonal basalt column, its foot at y 0, `h` tall, `r` across its
  *  flats' circle, its head bevelled (one unit's shape: scale it). */
 export function basaltColumn(r = 0.5, h = 1): THREE.BufferGeometry {
