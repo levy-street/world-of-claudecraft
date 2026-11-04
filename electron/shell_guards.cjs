@@ -109,6 +109,98 @@ function navigationAllowed(
   return subframeHostSuffixAllowed(url, subframeHostSuffixes);
 }
 
+// Embed roots whose OWN nested frames are not knowable in advance: Stripe Checkout. A
+// 3D Secure challenge renders the card issuer's ACS page (any bank's origin) inside
+// hooks.stripe.com and then returns to the session's return_url. Only these roots relax
+// their subtree; Turnstile, WalletConnect and Link roots keep the strict list throughout.
+const NESTED_FRAME_ROOT_ORIGINS = Object.freeze(
+  new Set(['https://js.stripe.com', 'https://checkout.stripe.com', 'https://hooks.stripe.com']),
+);
+const NESTED_FRAME_ROOT_HOST_SUFFIXES = Object.freeze(['.js.stripe.com']);
+
+// Schemes a frame nested below a NESTED_FRAME_ROOT may load. Plaintext http: and local
+// schemes (file:, app:) are denied, and so is any URL (or blob: URL) in an app or dev
+// origin: a document there would be same-origin with the main frame.
+const NESTED_FRAME_SCHEMES = Object.freeze(new Set(['https:', 'about:', 'blob:', 'data:']));
+
+// The parent-frame URLs of a WebFrameMain-like frame, nearest first, ending at the main
+// frame. Returns null when the frame is gone or a disposed frame's getter throws, which
+// callers treat as "ancestry unknown" (the strict rule).
+function frameAncestorUrls(frame) {
+  try {
+    if (!frame) return null;
+    const urls = [];
+    for (let parent = frame.parent; parent; parent = parent.parent) urls.push(parent.url);
+    return urls;
+  } catch {
+    return null;
+  }
+}
+
+function nestedFrameUrlAllowed(url, mainOrigins) {
+  let parsed;
+  try {
+    parsed = new URL(url);
+  } catch {
+    return false;
+  }
+  if (!NESTED_FRAME_SCHEMES.has(parsed.protocol)) return false;
+  if (mainOrigins.has(deriveOrigin(url))) return false;
+  if (parsed.protocol === 'blob:') {
+    // blob:<origin>/<uuid>: the document runs in the inner origin.
+    const inner = deriveOrigin(parsed.pathname);
+    if (!inner || mainOrigins.has(inner) || !inner.startsWith('https:')) return false;
+  }
+  return true;
+}
+
+// The guard for will-frame-navigate / will-redirect. Electron emits these for EVERY frame
+// in the tree, so frames Stripe Checkout nests inside its own iframe were gated against
+// the app's embed list too, which blanked a 3D Secure challenge and left the desktop
+// checkout greyed out on its processing state. The main frame and every frame not below
+// a NESTED_FRAME_ROOT keep the strict navigationAllowed rule. A frame at depth two or more
+// whose ancestry provably ends at the main frame and whose embed root (the main frame's
+// direct child) is a NESTED_FRAME_ROOT may load any nestedFrameUrlAllowed URL.
+// `ancestorUrls` is nearest first, ending at the main frame (frameAncestorUrls); null or
+// a short list means the strict rule.
+function frameNavigationAllowed(
+  url,
+  isMainFrame,
+  ancestorUrls,
+  mainFrameOrigins,
+  subframeOrigins = EMBEDDED_SUBFRAME_ORIGINS,
+  subframeHostSuffixes = EMBEDDED_SUBFRAME_HOST_SUFFIXES,
+) {
+  const strict = () =>
+    navigationAllowed(url, isMainFrame, mainFrameOrigins, subframeOrigins, subframeHostSuffixes);
+  if (isMainFrame || !Array.isArray(ancestorUrls) || ancestorUrls.length < 2) return strict();
+  const mainOrigins = toOriginSet(mainFrameOrigins);
+  if (!mainOrigins.has(deriveOrigin(ancestorUrls[ancestorUrls.length - 1]))) return strict();
+  const embedRoot = ancestorUrls[ancestorUrls.length - 2];
+  const rootIsNestedFrameRoot =
+    NESTED_FRAME_ROOT_ORIGINS.has(deriveOrigin(embedRoot)) ||
+    subframeHostSuffixAllowed(embedRoot, NESTED_FRAME_ROOT_HOST_SUFFIXES);
+  if (!rootIsNestedFrameRoot) return strict();
+  return nestedFrameUrlAllowed(url, mainOrigins);
+}
+
+// The full guardNavigation decision for an Electron navigation `details` object, pure so a
+// Vitest can drive it. A missing isMainFrame is the main frame (the safe default), and any
+// throw while reading the frame tree blocks rather than escaping the listener (an uncaught
+// exception in the main process exits the app via the crash guard).
+function navigationDecision(details, mainFrameOrigins) {
+  try {
+    const isMainFrame = details.isMainFrame !== false;
+    const ancestors = isMainFrame ? [] : frameAncestorUrls(details.frame);
+    return {
+      allowed: frameNavigationAllowed(details.url, isMainFrame, ancestors, mainFrameOrigins),
+      isMainFrame,
+    };
+  } catch {
+    return { allowed: false, isMainFrame: details?.isMainFrame !== false };
+  }
+}
+
 // External document paths that belong in the system browser rather than navigating
 // the desktop game shell.
 const EXTERNAL_DOCUMENT_PATHS = new Set([
@@ -397,6 +489,10 @@ module.exports = {
   originAllowed,
   appNavigationOrigins,
   navigationAllowed,
+  frameAncestorUrls,
+  frameNavigationAllowed,
+  navigationDecision,
+  NESTED_FRAME_ROOT_ORIGINS,
   isTrustedSender,
   isDevToolsToggleShortcut,
   isSoftwareRenderer,
