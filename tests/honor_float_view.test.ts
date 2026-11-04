@@ -19,6 +19,7 @@ const ALL_REASONS: HonorReason[] = [
   'fiesta_win',
   'battleground_win',
   'battleground_first_win',
+  'arena_first_win',
   'battleground_complete',
   'battleground_kill',
   'battleground_assist',
@@ -37,6 +38,9 @@ const NAMED: HonorReason[] = [
   'battleground_kill',
   'battleground_assist',
   'battleground_first_win',
+  // The ranked arena's per-bracket daily bonus lands beside `arena_win` the
+  // same way, so it floats the same First Win label.
+  'arena_first_win',
   'world_kill',
   'world_assist',
   'hill_hold',
@@ -74,6 +78,8 @@ describe('the Honor float names the battleground drip and nothing else', () => {
     // the reason label exists for.
     expect(honorFloatText('battleground_first_win', 120)).toBe('+120 Honor (First Win)');
     expect(honorFloatReasonKey('battleground_win')).toBeNull();
+    expect(honorFloatText('arena_first_win', 100)).toBe('+100 Honor (First Win)');
+    expect(honorFloatReasonKey('arena_win')).toBeNull();
   });
 
   it('the named reasons are exactly the mapped ones', () => {

@@ -10259,7 +10259,7 @@ export class Hud {
             })
           : t('hud.arena.statusFight');
     let vsBlock: string;
-    if (m.format === '2v2') {
+    if (m.format === '2v2' || m.format === '3v3') {
       const allyNames = [esc(t('hud.core.you')), ...m.allies.map((c) => esc(c.name))].join(' - ');
       const enemyNames = m.enemies.map((c) => esc(c.name)).join(' - ');
       const vs = esc(t('hud.arena.vsLine', { name: '' }).trim());

@@ -1070,8 +1070,14 @@ function deedListForKeys(keys: ReadonlySet<string>): readonly string[] {
 const METERS: Record<DeedMeterId, (meta: PlayerMeta) => number> = {
   prestigeRank: (m) => m.prestigeRank,
   talentPoints: (m) => pointsSpent(m.talents),
-  arenaRankedMatches: (m) => m.arenaWins + m.arenaLosses + m.arena2v2Wins + m.arena2v2Losses,
-  arenaRankedWins: (m) => m.arenaWins + m.arena2v2Wins,
+  arenaRankedMatches: (m) =>
+    m.arenaWins +
+    m.arenaLosses +
+    m.arena2v2Wins +
+    m.arena2v2Losses +
+    m.arena3v3Wins +
+    m.arena3v3Losses,
+  arenaRankedWins: (m) => m.arenaWins + m.arena2v2Wins + m.arena3v3Wins,
   bgWins: (m) => m.bgWins,
   bgCaptures: (m) => m.bgCaptures,
   // LIFETIME honor, never the spendable balance: a rank once earned survives

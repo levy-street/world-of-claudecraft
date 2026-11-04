@@ -2650,7 +2650,8 @@ export const pl_PL: EnTranslations = {
       "launcherTitle": "PvP",
       "mobileLabel": "PvP",
       "bracket1v1": "1v1",
-      "bracket2v2": "2v2"
+      "bracket2v2": "2v2",
+      "bracket3v3": "3v3"
     },
     "bg": {
       "title": "Pola Ciernistej Kotliny",
@@ -3435,6 +3436,7 @@ export const pl_PL: EnTranslations = {
         "fiestaWin": "Zwycięstwo Fiesty",
         "battlegroundWin": "Zwycięstwo na Polach Ciernistej Kotliny",
         "battlegroundFirstWin": "Pierwsze dzisiejsze zwycięstwo na Polach Ciernistej Kotliny",
+        "arenaFirstWin": "Pierwsze dzisiejsze zwycięstwo na arenie w tej kategorii",
         "battlegroundComplete": "Stoczono bitwę na Polach Ciernistej Kotliny",
         "battlegroundKill": "Honorowe zabójstwo",
         "battlegroundAssist": "Asysta przy ciosie kończącym",
@@ -10532,11 +10534,13 @@ export const pl_PL: EnTranslations = {
       "duelsBody": "Wyzwij dowolnego napotkanego gracza na przyjacielski pojedynek. Stawką jest tylko duma, więc to najprostszy sposób, by poznać starcie lub rozstrzygnąć przyjacielski spór.",
       "coliseumHeading": "Popielne Koloseum",
       "coliseumBody": "Koloseum to arena królestwa, gdzie mierzysz się z innymi graczami w rankingowych pojedynkach, jeden na jednego albo dwóch na dwóch. Każda kategoria trzyma własną tabelę, więc zwycięstwo podnosi cię po tej drabinie na oczach całego królestwa. Gra rankingowa otwiera się na 15. poziomie i dotyczy to również twojego partnera: jeśli któreś z was jest poniżej, kolejka pozostaje zamknięta, dopóki oboje nie spełnicie wymogu. Całe gracz kontra gracz mieszka za jednym przyciskiem oznaczonym PvP: otwórz go i wybierz zakładkę, Pola Ciernistej Kotliny, jeden na jednego albo dwóch na dwóch, a potem zgłoś się sam albo ze swoim partnerem. Dopóki jesteś w kolejce albo w pojedynku, pozostałe zakładki są zablokowane, więc nigdy nie możesz stać w dwóch kolejkach naraz.",
+      "coliseumBodyThreeBrackets": "Koloseum to arena królestwa, gdzie mierzysz się z innymi graczami w rankingowych pojedynkach: jeden na jednego, dwóch na dwóch albo trzech na trzech. Każda kategoria trzyma własną tabelę, więc zwycięstwo podnosi cię po tej drabinie na oczach całego królestwa. Gra rankingowa otwiera się na 15. poziomie i dotyczy to każdego, z kim się zapisujesz: jeśli ktokolwiek z twojej drużyny jest poniżej, kolejka pozostaje zamknięta, dopóki wszyscy nie spełnicie wymogu. Całe gracz kontra gracz mieszka za jednym przyciskiem oznaczonym PvP: otwórz go i wybierz zakładkę, Pola Ciernistej Kotliny, jeden na jednego, dwóch na dwóch albo trzech na trzech, a potem zgłoś się sam albo ze swoją drużyną. Dopóki jesteś w kolejce albo w pojedynku, pozostałe zakładki są zablokowane, więc nigdy nie możesz stać w dwóch kolejkach naraz. Przeciągający się pojedynek trzech na trzech wyczerpuje wszystkich: po jego połowie Wyniszczenie co sekundę odbiera nieco więcej leczenia, które otrzymuje każdy wojownik, więc pat nie może trwać wiecznie.",
       "ladderHeading": "Wspinaczka po drabinie rankingowej",
       "ladderBody": "Rozgrywka rankingowa śledzi twoją pozycję w czasie. Sprawdź ranking, by zobaczyć, gdzie jesteś i kto dzierży szczyt królestwa.",
       "rewardsHeading": "Co płaci rozgrywka rankingowa",
       "rewardsBody": "Rankingowe zwycięstwo płaci Honor, walutę gracz kontra gracz, a porażka kosztuje cię jedynie ranking. Honor ma nagradzać prawdziwe starcia: pokonanie tego samego przeciwnika lub tej samej drużyny ponownie tego samego dnia nie płaci już nic więcej, długi zwycięski dzień płaci coraz mniej za każde kolejne zwycięstwo, a mecz zakończony walkowerem przeciwnika wciąż zmienia twój ranking, lecz nie płaci żadnego Honoru. Ten dzień należy do Honoru i odnawia się według własnego zegara, niezależnie od resetu instancji królestwa.",
       "rewardsBodyLossShare": "Zwycięstwo rankingowe daje Honor, walutę gracz kontra gracz, a porażka rozegrana do końca nadal daje jego mniejszą część, podobnie jak remis, więc jedynym prawdziwym kosztem porażki jest ranking. Honor ma nagradzać prawdziwe mecze: ponowne pokonanie tego samego przeciwnika albo tej samej drużyny tego samego dnia nie daje nic więcej, podobnie jak ponowna porażka z nimi. Długi dzień zwycięstw płaci pełną stawkę za pierwszy ciąg wygranych, potem ją zmniejsza o połowę, a jeszcze głębiej zmniejsza ponownie i pozostaje na tym poziomie. Mecz poddany przez przeciwnika nadal zmienia twój ranking, ale nie daje w ogóle Honoru. Ten dzień należy do królestwa i kończy się o nocnej godzinie resetu, tej samej granicy, przy której czyszczą się wszystkie dzienne blokady.",
+      "rewardsFirstWinBody": "Twoje pierwsze rankingowe zwycięstwo każdego dnia wypłaca dodatkową premię, a każda kategoria ma własną: pierwsze zwycięstwo jeden na jednego, dwóch na dwóch i trzech na trzech odbiera każde po jednej. Porażka ani remis nigdy jej nie zużywają.",
       "honorHeading": "Honor",
       "honorBody": "Honor to waluta walki z innymi graczami. Zdobywasz go w Koloseum oraz na Polach Ciernistej Kotliny, jest trzymany osobno od twoich monet i nigdy się z nimi nie miesza, a twoja karta postaci pokazuje, ile go posiadasz. Jest dokładnie jedna rzecz, na którą możesz go wydać: ekwipunek działań wojennych.",
       "quartermastersBody": "Dwoje kwatermistrzów prowadzi te same półki, więc handluj z tym, który jest bliżej. FURIA, Honorowy kwatermistrz, stoi w Dolinie Wschodniego Strumienia, a Marszałek Wojenny Draven Kole, Mistrz Zaopatrzenia Działań Wojennych, trzyma ladę w Highwatch. Ich towar to poziom działań wojennych: pięć rodzin pancerza, a do tego naszyjniki, pierścienie i broń wspólne dla wszystkich z nich.",

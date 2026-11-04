@@ -4979,6 +4979,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Abre Profesiones para colocar esto en una herramienta de recolección.',
   'hudChrome.pvp.bracket1v1': '1c1',
   'hudChrome.pvp.bracket2v2': '2c2',
+  'hudChrome.pvp.bracket3v3': '3c3',
   'hudChrome.pvp.launcherTitle': 'JcJ',
   'hudChrome.pvp.mobileLabel': 'JcJ',
   'hudChrome.townFocus.respecCostFree': 'Gratis',
@@ -4995,6 +4996,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.reasons.battlegroundComplete': 'batalla de Thornhollow Fields disputada',
   'hudChrome.warfare.reasons.battlegroundFirstWin':
     'primera victoria del día en Thornhollow Fields',
+  'hudChrome.warfare.reasons.arenaFirstWin': 'primera victoria de arena de hoy en esta categoría',
   'hudChrome.warfare.reasons.battlegroundKill': 'muerte honorable',
   'hudChrome.warfare.reasons.battlegroundWin': 'victoria en Thornhollow Fields',
   'hudChrome.warfareShop.buyAria': 'Comprar {item} por {honor}',
@@ -11967,6 +11969,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Una descarga de naturaleza lanzada a un objetivo a distancia, tu hechizo de ataque habitual.',
   'guide.arenaPage.coliseumBody':
     'El Coliseo es la arena del reino, donde te enfrentas a otros jugadores en combates clasificatorios, uno contra uno o dos contra dos. Cada categoría mantiene su propia clasificación, así que una victoria te eleva en esa escalera a la vista de todo el reino. El juego clasificatorio se abre en el nivel 15, y eso vale también para tu compañero: si alguno de los dos está por debajo, la cola sigue cerrada hasta que ambos cumpláis. Todo el jugador contra jugador vive tras un único botón, marcado JcJ: ábrelo y escoge una pestaña, Campos Espinosos, uno contra uno o dos contra dos, y luego apúntate solo o con tu compañero. Mientras estás en cola o en un combate, las demás pestañas permanecen bloqueadas, así que nunca puedes estar en dos colas a la vez.',
+  'guide.arenaPage.coliseumBodyThreeBrackets':
+    'El Coliseo es la arena del reino, donde te enfrentas a otros jugadores en combates clasificatorios: uno contra uno, dos contra dos o tres contra tres. Cada categoría mantiene su propia clasificación, así que una victoria te eleva en esa escalera a la vista de todo el reino. El juego clasificatorio se abre en el nivel 15, y eso vale para todos con quienes entras en cola: si alguien de tu grupo está por debajo, la cola sigue cerrada hasta que todos cumpláis. Todo el jugador contra jugador vive tras un único botón, marcado JcJ: ábrelo y escoge una pestaña, Campos Espinosos, uno contra uno, dos contra dos o tres contra tres, y luego apúntate solo o con tu grupo. Mientras estás en cola o en un combate, las demás pestañas permanecen bloqueadas, así que nunca puedes estar en dos colas a la vez. Un combate de tres contra tres que se alarga desgasta a todos: pasada su mitad, Desgaste recorta cada segundo un poco más la sanación que recibe cada luchador, así que un punto muerto no puede durar para siempre.',
   'guide.arenaPage.coliseumHeading': 'El Coliseo Ceniciento',
   'guide.arenaPage.duelsBody':
     'Reta a un duelo amistoso a cualquier jugador que encuentres. No hay nada en juego salvo el orgullo, así que es la forma más sencilla de aprender un enfrentamiento o zanjar una discusión amistosa.',
@@ -19661,6 +19665,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Las compras de Honor son definitivas. La lista de recompra solo contiene lo que vendiste: una compra con monedas normalmente puede venderse por su precio de venta y recuperarse de la lista si vuelves a cambiar de idea, pero el equipo de Guerra se liga al alma en cuanto lo compras, así que nunca puede intercambiarse, enviarse por correo ni venderse, y nunca llega a esa lista. La tienda pide confirmación por eso: lee la pieza antes de pulsar.',
   'guide.arenaPage.rewardsBodyLossShare':
     'Una victoria puntuada paga Honor, la moneda de jugador contra jugador, y una derrota que juegas hasta el final también paga una parte menor, igual que un empate, así que la clasificación es lo único que realmente cuesta una derrota. El Honor recompensa partidas reales: vencer al mismo rival o equipo otra vez el mismo día no paga más, ni tampoco volver a perder contra ellos. Un día de victorias largo paga completo durante su primer tramo y luego reduce a la mitad el pago, vuelve a reducirlo más adelante y se queda así. Una partida que el rival abandona aún mueve tu clasificación, pero no paga Honor. El día pertenece al reino y cambia a la hora del reinicio nocturno, el mismo límite en que se reinician los bloqueos diarios.',
+  'guide.arenaPage.rewardsFirstWinBody':
+    'Tu primera victoria clasificatoria de cada día paga una bonificación adicional, y cada categoría tiene la suya: una primera victoria en uno contra uno, en dos contra dos y en tres contra tres reclama cada una la suya. Una derrota o un empate nunca la gastan.',
   'guide.arenaPage.warfareBodyStatsStay':
     'Cada pieza de Guerra lleva índice de Ofensiva de Guerra e índice de Defensa de Guerra, y esos índices no hacen nada contra monstruos. Solo se aplican al luchar contra otro jugador, en duelo, arena o campo de batalla: la Ofensiva aumenta el daño que infliges y la Defensa reduce el daño que recibes, cada una hasta su propio límite. Cada familia de armadura también es un conjunto, y sus bonificaciones son índices o efectos de Guerra que solo funcionan contra jugadores, así que las bonificaciones de un conjunto completo de Honor no sirven contra un jefe de mazmorra. Las piezas mantienen sus estadísticas normales, armadura y daño de arma, que sí funcionan en todas partes; contra monstruos solo se apagan los índices de Guerra y sus bonificaciones. Hay una excepción que funciona en todas partes: dos piezas de cualquiera de estos conjuntos hacen además que el daño recibido ya no retrase tus hechizos.',
   'guide.arenaPage.warfareTradeBodyRatingSpent':

@@ -5240,6 +5240,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Öffne die Berufe, um dies auf ein Sammelwerkzeug einzusetzen.',
   'hudChrome.pvp.bracket1v1': '1v1',
   'hudChrome.pvp.bracket2v2': '2v2',
+  'hudChrome.pvp.bracket3v3': '3v3',
   'hudChrome.pvp.launcherTitle': 'PvP',
   'hudChrome.pvp.mobileLabel': 'PvP',
   'hudChrome.townFocus.respecCostFree': 'Kostenlos',
@@ -5256,6 +5257,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.reasons.battlegroundComplete': 'Kampf um die Thornhollow-Felder ausgetragen',
   'hudChrome.warfare.reasons.battlegroundFirstWin':
     'erster heutiger Sieg in den Thornhollow-Feldern',
+  'hudChrome.warfare.reasons.arenaFirstWin': 'erster Arenasieg des Tages in dieser Wertungsklasse',
   'hudChrome.warfare.reasons.battlegroundKill': 'ehrenhafte Ausschaltung',
   'hudChrome.warfare.reasons.battlegroundWin': 'Thornhollow-Felder-Sieg',
   'hudChrome.warfareShop.buyAria': '{item} für {honor} kaufen',
@@ -11881,6 +11883,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Ein Naturblitz, den du aus der Distanz auf ein Ziel schleuderst, dein erster Schadenszauber.',
   'guide.arenaPage.coliseumBody':
     'Das Kolosseum ist die Arena des Reichs, wo du in gewerteten Matches gegen andere Spieler antrittst, eins gegen eins oder zwei gegen zwei. Jede Wertungsklasse hat ihre eigene Rangliste, ein Sieg hebt dich also auf dieser Leiter empor, für das ganze Reich sichtbar. Gewertetes Spiel öffnet sich auf Stufe 15, und das gilt auch für deinen Partner: Ist einer von euch darunter, bleibt die Warteschlange geschlossen, bis ihr beide die Bedingung erfüllt. Das gesamte Spieler-gegen-Spieler liegt hinter einer einzigen Schaltfläche mit der Aufschrift PvP: Öffne sie und wähle einen Reiter, Thornhollow-Felder, eins gegen eins oder zwei gegen zwei, und melde dich dann allein oder mit deinem Partner an. Solange du in der Warteschlange oder in einem Match bist, bleiben die anderen Reiter gesperrt, du kannst also nie in zwei Warteschlangen zugleich stehen.',
+  'guide.arenaPage.coliseumBodyThreeBrackets':
+    'Das Kolosseum ist die Arena des Reichs, wo du in gewerteten Matches gegen andere Spieler antrittst: eins gegen eins, zwei gegen zwei oder drei gegen drei. Jede Wertungsklasse hat ihre eigene Rangliste, ein Sieg hebt dich also auf dieser Leiter empor, für das ganze Reich sichtbar. Gewertetes Spiel öffnet sich auf Stufe 15, und das gilt für alle, mit denen du dich anmeldest: Ist jemand aus deiner Gruppe darunter, bleibt die Warteschlange geschlossen, bis ihr alle die Bedingung erfüllt. Das gesamte Spieler-gegen-Spieler liegt hinter einer einzigen Schaltfläche mit der Aufschrift PvP: Öffne sie und wähle einen Reiter, Thornhollow-Felder, eins gegen eins, zwei gegen zwei oder drei gegen drei, und melde dich dann allein oder mit deiner Gruppe an. Solange du in der Warteschlange oder in einem Match bist, bleiben die anderen Reiter gesperrt, du kannst also nie in zwei Warteschlangen zugleich stehen. Ein Match drei gegen drei, das sich hinzieht, zermürbt alle: Nach seiner Hälfte kürzt Zermürbung jede Sekunde etwas mehr die Heilung, die jeder Kämpfer erhält, damit kein Patt ewig dauern kann.',
   'guide.arenaPage.coliseumHeading': 'Das Aschene Kolosseum',
   'guide.arenaPage.duelsBody':
     'Fordere jeden Spieler, dem du begegnest, zu einem freundschaftlichen Duell heraus. Es steht nichts auf dem Spiel außer dem Stolz, also ist es der einfachste Weg, eine Paarung zu lernen oder eine freundschaftliche Wette zu klären.',
@@ -19859,6 +19863,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Ehrenkäufe sind endgültig. Die Rückkaufliste enthält nur Dinge, die du verkauft hast. Ein Münzkauf kann normalerweise zum Verkaufspreis zurückverkauft und aus dieser Liste zurückgeholt werden, falls du es dir anders überlegst. Kriegsführungsausrüstung bindet sich jedoch im Augenblick des Kaufs an die Seele. Sie kann daher nie gehandelt, verschickt oder für irgendetwas zurückverkauft werden und erreicht die Liste nie. Genau deshalb verlangt der Laden eine Bestätigung: Prüfe das Stück, bevor du drückst.',
   'guide.arenaPage.rewardsBodyLossShare':
     'Ein gewerteter Sieg zahlt Ehre, die Währung für Spieler gegen Spieler. Eine Niederlage, die du bis zum Ende spielst, zahlt trotzdem einen kleineren Anteil, ebenso ein Unentschieden, daher ist die Wertung der einzige echte Verlust einer Niederlage. Ehre soll echte Matches belohnen: Ein Sieg gegen denselben Gegner oder dasselbe Team am selben Tag zahlt nicht noch einmal, und eine weitere Niederlage gegen sie ebenfalls nicht. Ein langer Siegestag zahlt für den ersten Abschnitt die volle Belohnung, danach halbiert sich der Siegwert und später noch einmal, bevor er auf dieser Stufe bleibt. Ein Match, das der Gegner aufgibt, bewegt deine Wertung, zahlt aber überhaupt keine Ehre. Der Tag gehört zum Reich und wechselt zur nächtlichen Resetstunde, an der auch jede tägliche Sperre gelöscht wird.',
+  'guide.arenaPage.rewardsFirstWinBody':
+    'Dein erster gewerteter Sieg jedes Tages zahlt obendrauf einen Bonus, und jede Wertungsklasse hat ihren eigenen: Ein erster Sieg in eins gegen eins, in zwei gegen zwei und in drei gegen drei holt sich jeweils einen. Eine Niederlage oder ein Unentschieden verbraucht ihn nie.',
   'guide.arenaPage.warfareBodyStatsStay':
     'Jedes Kriegsführungsstück trägt Kriegsführungs-Offensivwertung und Kriegsführungs-Defensivwertung. Beide Werte wirken überhaupt nicht gegen Monster. Sie gelten nur, wenn du einen anderen Spieler bekämpfst, im Duell, in der Arena oder auf dem Schlachtfeld: Offensivwertung erhöht deinen verursachten Schaden, Defensivwertung senkt deinen erlittenen Schaden, jeweils bis zur eigenen Obergrenze. Jede Rüstungsfamilie ist außerdem ein Set, dessen Boni ebenfalls Kriegsführungswerte oder Effekte enthalten, die nur gegen Spieler wirken. Die Setboni einer vollständigen Ehrenausrüstung zählen daher gegen einen Dungeonboss nicht. Die gewöhnlichen Werte, Rüstung und Waffenschaden der Stücke gelten weiterhin überall; nur Kriegsführungswerte und Setboni schweigen gegen Monster. Eine Ausnahme wirkt überall: Zwei Teile eines dieser Sets sorgen außerdem dafür, dass erlittener Schaden dein Zauberwirken nicht mehr verzögert.',
   'guide.arenaPage.warfareTradeBodyRatingSpent':

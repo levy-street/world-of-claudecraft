@@ -296,6 +296,12 @@ export const RETIRED_KEYS = [
   // The successor rewardsBodyLossShare says so, and its five non-Latin fills
   // rode the same change; this key keeps its reviewed overlay rows.
   'guide.arenaPage.rewardsBody',
+  // The 3v3 bracket (2026-11-04): the Coliseum prose named two ranked brackets
+  // ('one on one or two on two') and three tabs, and a partner rather than a
+  // party; PVP_TABS now carries 3v3 too (src/ui/pvp_tabs_view.ts). The successor
+  // coliseumBodyThreeBrackets names all three brackets and the 3v3 Attrition
+  // ramp, and every locale fill rode the same change; this key keeps its rows.
+  'guide.arenaPage.coliseumBody',
   // Phase 20 (2026-09-03, the wiki completeness audit): the Warfare prose said
   // 'a full honor kit is worth nothing on a dungeon boss', but every WARFARE row
   // carries ordinary stats and its slot's armor or weapon baseline

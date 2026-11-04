@@ -180,6 +180,11 @@ export interface CharacterState extends ReferralRewardState {
   arena2v2Wins?: number;
   arena2v2Losses?: number;
   arena2v2Draws?: number;
+  // The 3v3 bracket, written only once it has a result (absent before).
+  arena3v3Rating?: number;
+  arena3v3Wins?: number;
+  arena3v3Losses?: number;
+  arena3v3Draws?: number;
   // Thornhollow Fields battleground standing (JSONB; optional and written only once a
   // result or capture exists, so pre-Thornhollow Fields saves load cleanly and
   // unchanged saves stay byte-equal).

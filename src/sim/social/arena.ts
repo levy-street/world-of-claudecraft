@@ -1,4 +1,4 @@
-// Session A2: The Ashen Coliseum ranked Arena (1v1 + 2v2 queue, matchmaking, Elo,
+// Session A2: The Ashen Coliseum ranked Arena (1v1 + 2v2 + 3v3 queue, matchmaking, Elo,
 // per-bout Entity resets), MOVED verbatim out of the Sim monolith behind the
 // SimContext seam. Move-not-rewrite: statements, branch order, queue/iteration
 // order, the matchmaking guard loops, the ~28-field fighter reset, and the
@@ -133,6 +133,16 @@ export function restoreArenaReturnPools(ctx: SimContext, e: Entity, pools: Arena
 const ARENA_COUNTDOWN = 5; // gates pre-fight: heal up, no swings land yet
 const ARENA_RETURN_DELAY = 5; // aftermath: hold on the sands before going home
 const ARENA_MAX_DURATION = 150; // seconds; a stalling match resolves on hp%
+// 3v3 runs longer and closes on Attrition instead of a hard stop at 150: from
+// the 150th second every fighter's healing taken drops by one more percent per
+// second, down to -75% at 225 s, and a bout still standing at 300 s (a full
+// minute at the floor) resolves on hp% like the smaller brackets.
+export const ARENA_3V3_MAX_DURATION = 300;
+export const ARENA_ATTRITION_START = 150;
+export const ARENA_ATTRITION_MAX_PCT = 75;
+export const ARENA_ATTRITION_AURA_ID = 'arena_attrition';
+export const ARENA_ATTRITION_AURA_NAME = 'Attrition';
+export const ARENA_3V3_TEAM_SIZE = 3;
 export const ARENA_BASE_RATING = 1500; // every character starts here, unranked
 const ARENA_MIN_RATING = 100; // a rating floor so a losing streak can't go absurd
 const ARENA_K_FACTOR = 32; // Elo sensitivity per match
@@ -225,6 +235,43 @@ export function arenaQueueJoin(
       color: '#ffa040',
       pid: id,
     });
+    return;
+  }
+
+  // Ranked 3v3: solos, pairs and full trios pool in join order and the
+  // matchmaker packs them into teams of three. Only the leader queues a party.
+  if (fmt === '3v3') {
+    if (r.e.level < ARENA_MIN_LEVEL) {
+      ctx.error(id, `You must be level ${ARENA_MIN_LEVEL} to queue for the arena.`);
+      return;
+    }
+    const party = ctx.partyOf(id);
+    let unitPids: number[];
+    if (!party || party.members.length === 1) {
+      unitPids = [id];
+    } else if (party.members.length <= ARENA_3V3_TEAM_SIZE) {
+      if (party.leader !== id) {
+        ctx.error(id, 'Only the party leader may queue your team for 3v3.');
+        return;
+      }
+      unitPids = [...party.members];
+    } else {
+      ctx.error(id, 'A 3v3 premade allows a party of up to three.');
+      return;
+    }
+    if (!teamQueueMembersReady(ctx, id, unitPids)) return;
+    const unit: ArenaQueueUnit = { pids: unitPids, rating: arenaTeamRating(ctx, unitPids, '3v3') };
+    ctx.arenaQueue3v3.push(unit);
+    const position = ctx.arenaQueue3v3.reduce((n, u) => n + u.pids.length, 0);
+    for (const mPid of unitPids) {
+      ctx.emit({ type: 'arenaQueued', position, format: fmt, pid: mPid });
+      ctx.emit({
+        type: 'log',
+        text: 'You join the Ashen Coliseum 3v3 queue. Stand by for opponents…',
+        color: '#ffa040',
+        pid: mPid,
+      });
+    }
     return;
   }
 
@@ -383,6 +430,52 @@ export function arenaQueueJoin(
   }
 }
 
+// The ranked team guards every queued party member must pass (the same set the
+// 2v2 path checks inline), reported to the queueing leader. True = all clear.
+function teamQueueMembersReady(ctx: SimContext, id: number, unitPids: number[]): boolean {
+  for (const mPid of unitPids) {
+    if (mPid === id) continue;
+    const e = ctx.entities.get(mPid);
+    const mMeta = ctx.players.get(mPid);
+    if (!e || !mMeta) {
+      ctx.error(id, 'A party member is unavailable.');
+      return false;
+    }
+    if (e.dead) {
+      ctx.error(id, `${mMeta.name} cannot queue while dead.`);
+      return false;
+    }
+    if (ctx.arenaMatches.has(mPid)) {
+      ctx.error(id, `${mMeta.name} is already in an arena match.`);
+      return false;
+    }
+    if (isArenaQueued(ctx, mPid)) {
+      ctx.error(id, `${mMeta.name} is already in the arena queue.`);
+      return false;
+    }
+    if (duelFor(ctx, mPid) !== null) {
+      ctx.error(id, `${mMeta.name} cannot queue while dueling.`);
+      return false;
+    }
+    if (ctx.trades.has(mPid)) {
+      ctx.error(id, `${mMeta.name} must finish trading before queueing.`);
+      return false;
+    }
+    if (e.level < ARENA_MIN_LEVEL) {
+      ctx.error(
+        id,
+        `${mMeta.name} must be at least level ${ARENA_MIN_LEVEL} to queue for the arena.`,
+      );
+      return false;
+    }
+    if (e.pos.x > DUNGEON_X_THRESHOLD) {
+      ctx.error(id, `${mMeta.name} cannot queue from inside an instance.`);
+      return false;
+    }
+  }
+  return true;
+}
+
 export function arenaQueueLeave(ctx: SimContext, pid?: number): void {
   const r = ctx.resolve(pid);
   if (!r) return;
@@ -391,13 +484,15 @@ export function arenaQueueLeave(ctx: SimContext, pid?: number): void {
   const teamQueue =
     fmt === '2v2'
       ? ctx.arenaQueue2v2
-      : fmt === 'fiesta'
-        ? ctx.arenaQueueFiesta
-        : fmt === 'yumi3'
-          ? ctx.arenaQueueYumi3
-          : fmt === 'yumi5'
-            ? ctx.arenaQueueYumi5
-            : null;
+      : fmt === '3v3'
+        ? ctx.arenaQueue3v3
+        : fmt === 'fiesta'
+          ? ctx.arenaQueueFiesta
+          : fmt === 'yumi3'
+            ? ctx.arenaQueueYumi3
+            : fmt === 'yumi5'
+              ? ctx.arenaQueueYumi5
+              : null;
   const unit = teamQueue ? teamQueue.find((u) => u.pids.includes(id)) : null;
   if (arenaDequeue(ctx, id)) {
     ctx.emit({ type: 'arenaUnqueued', pid: id });
@@ -408,7 +503,9 @@ export function arenaQueueLeave(ctx: SimContext, pid?: number): void {
           ? 'You leave the Protect Yumi queue.'
           : fmt === '2v2'
             ? 'You leave the Ashen Coliseum 2v2 queue.'
-            : 'You leave the Ashen Coliseum queue.';
+            : fmt === '3v3'
+              ? 'You leave the Ashen Coliseum 3v3 queue.'
+              : 'You leave the Ashen Coliseum queue.';
     ctx.emit({ type: 'log', text: leaveText, color: '#ffa040', pid: id });
     if (unit) {
       const teamLeaveText =
@@ -416,7 +513,9 @@ export function arenaQueueLeave(ctx: SimContext, pid?: number): void {
           ? 'Your team leaves the 2v2 Fiesta queue.'
           : fmt === 'yumi3' || fmt === 'yumi5'
             ? 'Your team leaves the Protect Yumi queue.'
-            : 'Your team leaves the Ashen Coliseum 2v2 queue.';
+            : fmt === '3v3'
+              ? 'Your team leaves the Ashen Coliseum 3v3 queue.'
+              : 'Your team leaves the Ashen Coliseum 2v2 queue.';
       for (const mPid of unit.pids) {
         if (mPid === id) continue;
         ctx.emit({ type: 'arenaUnqueued', pid: mPid });
@@ -430,6 +529,7 @@ export function isArenaQueued(ctx: SimContext, pid: number): boolean {
   return (
     ctx.arenaQueue1v1.includes(pid) ||
     ctx.arenaQueue2v2.some((u) => u.pids.includes(pid)) ||
+    ctx.arenaQueue3v3.some((u) => u.pids.includes(pid)) ||
     ctx.arenaQueueFiesta.some((u) => u.pids.includes(pid)) ||
     ctx.arenaQueueYumi3.some((u) => u.pids.includes(pid)) ||
     ctx.arenaQueueYumi5.some((u) => u.pids.includes(pid))
@@ -439,6 +539,7 @@ export function isArenaQueued(ctx: SimContext, pid: number): boolean {
 export function arenaQueuedFormat(ctx: SimContext, pid: number): ArenaFormat | null {
   if (ctx.arenaQueue1v1.includes(pid)) return '1v1';
   if (ctx.arenaQueue2v2.some((u) => u.pids.includes(pid))) return '2v2';
+  if (ctx.arenaQueue3v3.some((u) => u.pids.includes(pid))) return '3v3';
   if (ctx.arenaQueueFiesta.some((u) => u.pids.includes(pid))) return 'fiesta';
   if (ctx.arenaQueueYumi3.some((u) => u.pids.includes(pid))) return 'yumi3';
   if (ctx.arenaQueueYumi5.some((u) => u.pids.includes(pid))) return 'yumi5';
@@ -454,7 +555,9 @@ export function arenaQueuePosition(ctx: SimContext, pid: number, format: ArenaFo
         ? ctx.arenaQueueYumi3
         : format === 'yumi5'
           ? ctx.arenaQueueYumi5
-          : ctx.arenaQueue2v2;
+          : format === '3v3'
+            ? ctx.arenaQueue3v3
+            : ctx.arenaQueue2v2;
   let pos = 0;
   for (const unit of queue) {
     if (unit.pids.includes(pid)) return pos + 1;
@@ -472,6 +575,11 @@ export function arenaDequeue(ctx: SimContext, pid: number): boolean {
   const ui = ctx.arenaQueue2v2.findIndex((u) => u.pids.includes(pid));
   if (ui >= 0) {
     ctx.arenaQueue2v2.splice(ui, 1);
+    return true;
+  }
+  const t3 = ctx.arenaQueue3v3.findIndex((u) => u.pids.includes(pid));
+  if (t3 >= 0) {
+    ctx.arenaQueue3v3.splice(t3, 1);
     return true;
   }
   const fi = ctx.arenaQueueFiesta.findIndex((u) => u.pids.includes(pid));
@@ -529,6 +637,14 @@ export function arenaAllPids(match: ArenaMatch): number[] {
 }
 
 export function arenaStanding(meta: PlayerMeta, format: ArenaFormat): ArenaStanding {
+  if (format === '3v3') {
+    return {
+      rating: meta.arena3v3Rating,
+      wins: meta.arena3v3Wins,
+      losses: meta.arena3v3Losses,
+      draws: meta.arena3v3Draws,
+    };
+  }
   return format === '2v2'
     ? {
         rating: meta.arena2v2Rating,
@@ -557,7 +673,12 @@ export function addArenaResult(
 ): { before: number; after: number } {
   const before = arenaStanding(meta, format).rating;
   const after = Math.max(ARENA_MIN_RATING, before + delta);
-  if (format === '2v2') {
+  if (format === '3v3') {
+    meta.arena3v3Rating = after;
+    if (won === true) meta.arena3v3Wins++;
+    else if (won === false) meta.arena3v3Losses++;
+    else meta.arena3v3Draws++;
+  } else if (format === '2v2') {
     meta.arena2v2Rating = after;
     if (won === true) meta.arena2v2Wins++;
     else if (won === false) meta.arena2v2Losses++;
@@ -632,6 +753,7 @@ export function arenaCombatants(ctx: SimContext, pids: number[]): ArenaCombatant
 export function updateArena(ctx: SimContext): void {
   matchmakeArena1v1(ctx);
   matchmakeArena2v2(ctx);
+  matchmakeArena3v3(ctx);
   ctx.matchmakeYumi();
   const seen = new Set<ArenaMatch>();
   for (const match of ctx.arenaMatches.values()) {
@@ -718,12 +840,57 @@ export function updateArena(ctx: SimContext): void {
       ctx.updateYumiActive(match);
       continue;
     }
-    if (match.timer >= ARENA_MAX_DURATION) {
+    if (match.format === '3v3') updateArenaAttrition(ctx, match);
+    const maxDuration = match.format === '3v3' ? ARENA_3V3_MAX_DURATION : ARENA_MAX_DURATION;
+    if (match.timer >= maxDuration) {
       const fa = arenaTeamHpFrac(ctx, match, 'A');
       const fb = arenaTeamHpFrac(ctx, match, 'B');
       const winner = Math.abs(fa - fb) < 0.02 ? null : fa > fb ? 'A' : 'B';
       endArenaMatch(ctx, match, winner, 'timeout');
     }
+  }
+}
+
+/** The 3v3 Attrition cut at `elapsed` active seconds: 0 through the 150th
+ *  second, then one more percent per whole second, capped at 75% (225 s). */
+export function arenaAttritionFraction(elapsed: number): number {
+  if (elapsed < ARENA_ATTRITION_START) return 0;
+  return Math.min(ARENA_ATTRITION_MAX_PCT, Math.floor(elapsed - ARENA_ATTRITION_START)) / 100;
+}
+
+// Keep every standing 3v3 fighter's Attrition debuff at the current cut. It is a
+// mortal_wound aura, so healingTakenMult applies it to every heal, HoT, leech
+// and potion with no new hook; undispellable so no counter can shed it, and
+// re-asserted every tick so an immunity that refused or purged it only delays
+// it. The stack count carries the percentage for the icon. The arena clean
+// slate strips it with every other aura on the way out (resetForArena).
+function updateArenaAttrition(ctx: SimContext, match: ArenaMatch): void {
+  const cut = arenaAttritionFraction(match.timer);
+  if (cut <= 0) return;
+  const pct = Math.round(cut * 100);
+  for (const pid of arenaAllPids(match)) {
+    if (match.defeated.has(pid)) continue;
+    const e = ctx.entities.get(pid);
+    if (!e || e.dead) continue;
+    const aura = e.auras.find((a) => a.id === ARENA_ATTRITION_AURA_ID);
+    if (aura) {
+      aura.value = cut;
+      aura.stacks = pct;
+      continue;
+    }
+    ctx.applyAura(e, {
+      id: ARENA_ATTRITION_AURA_ID,
+      name: ARENA_ATTRITION_AURA_NAME,
+      kind: 'mortal_wound',
+      remaining: 3600,
+      duration: 3600,
+      permanent: true,
+      value: cut,
+      stacks: pct,
+      sourceId: e.id,
+      school: 'physical',
+      undispellable: true,
+    });
   }
 }
 
@@ -778,7 +945,17 @@ export function matchmakeArena1v1(ctx: SimContext): void {
   }
 }
 
-export function pruneTeamQueue(ctx: SimContext, fmt: '2v2' | 'fiesta'): void {
+type TeamQueueFormat = '2v2' | '3v3' | 'fiesta';
+
+function teamQueueFor(ctx: SimContext, fmt: TeamQueueFormat): ArenaQueueUnit[] {
+  return fmt === 'fiesta'
+    ? ctx.arenaQueueFiesta
+    : fmt === '3v3'
+      ? ctx.arenaQueue3v3
+      : ctx.arenaQueue2v2;
+}
+
+export function pruneTeamQueue(ctx: SimContext, fmt: TeamQueueFormat): void {
   const keep = (unit: ArenaQueueUnit) =>
     unit.pids.every((id) => {
       const e = ctx.entities.get(id);
@@ -788,7 +965,7 @@ export function pruneTeamQueue(ctx: SimContext, fmt: '2v2' | 'fiesta'): void {
       // after joining here (see matchmakeArena1v1's matching comment).
       return !!e && !e.dead && !ctx.arenaMatches.has(id) && e.pos.x <= DUNGEON_X_THRESHOLD;
     });
-  const queue = fmt === 'fiesta' ? ctx.arenaQueueFiesta : ctx.arenaQueue2v2;
+  const queue = teamQueueFor(ctx, fmt);
   const pruned: ArenaQueueUnit[] = [];
   const survivors = queue.filter((unit) => {
     if (keep(unit)) return true;
@@ -796,6 +973,7 @@ export function pruneTeamQueue(ctx: SimContext, fmt: '2v2' | 'fiesta'): void {
     return false;
   });
   if (fmt === 'fiesta') ctx.arenaQueueFiesta = survivors;
+  else if (fmt === '3v3') ctx.arenaQueue3v3 = survivors;
   else ctx.arenaQueue2v2 = survivors;
   if (pruned.length === 0) return;
   // A dropped unit can carry a teammate who did nothing wrong (the OTHER member
@@ -805,7 +983,9 @@ export function pruneTeamQueue(ctx: SimContext, fmt: '2v2' | 'fiesta'): void {
   const leaveText =
     fmt === 'fiesta'
       ? 'You leave the 2v2 Fiesta queue.'
-      : 'You leave the Ashen Coliseum 2v2 queue.';
+      : fmt === '3v3'
+        ? 'You leave the Ashen Coliseum 3v3 queue.'
+        : 'You leave the Ashen Coliseum 2v2 queue.';
   for (const unit of pruned) {
     for (const pid of unit.pids) {
       if (!ctx.entities.get(pid)) continue;
@@ -818,9 +998,9 @@ export function pruneTeamQueue(ctx: SimContext, fmt: '2v2' | 'fiesta'): void {
 export function removeTeamQueueUnits(
   ctx: SimContext,
   units: ArenaQueueUnit[],
-  fmt: '2v2' | 'fiesta',
+  fmt: TeamQueueFormat,
 ): void {
-  const queue = fmt === 'fiesta' ? ctx.arenaQueueFiesta : ctx.arenaQueue2v2;
+  const queue = teamQueueFor(ctx, fmt);
   for (const unit of units) {
     const i = queue.indexOf(unit);
     if (i >= 0) queue.splice(i, 1);
@@ -908,6 +1088,84 @@ export function matchmakeTeamFormat(ctx: SimContext, fmt: '2v2' | 'fiesta'): voi
   }
 }
 
+// How far into the 3v3 queue the matchmaker looks for team-mates and
+// opponents. Bounds the pairing search (it runs every tick); a unit further
+// back waits until the ones ahead of it have been seated.
+const ARENA_3V3_SEARCH_WINDOW = 12;
+
+// Every way to make a team of three from `pool`: index lists of at most three
+// units whose sizes sum to exactly ARENA_3V3_TEAM_SIZE, in queue order.
+function threeTeamCombos(pool: readonly ArenaQueueUnit[]): number[][] {
+  const out: number[][] = [];
+  const size = (i: number) => pool[i].pids.length;
+  for (let a = 0; a < pool.length; a++) {
+    if (size(a) === ARENA_3V3_TEAM_SIZE) out.push([a]);
+    for (let b = a + 1; b < pool.length; b++) {
+      if (size(a) + size(b) === ARENA_3V3_TEAM_SIZE) out.push([a, b]);
+      for (let c = b + 1; c < pool.length; c++) {
+        if (size(a) + size(b) + size(c) === ARENA_3V3_TEAM_SIZE) out.push([a, b, c]);
+      }
+    }
+  }
+  return out;
+}
+
+function comboRating(ctx: SimContext, pool: readonly ArenaQueueUnit[], combo: number[]): number {
+  return arenaTeamRating(
+    ctx,
+    combo.flatMap((i) => pool[i].pids),
+    '3v3',
+  );
+}
+
+// Ranked 3v3 matchmaker. The head of the queue is always seated first (it has
+// waited longest): its team is the first queue-order completion of the head
+// unit that leaves a full opposing team behind, and the opponents are the
+// completion among the rest closest to it in rating. Units of any size 1..3
+// mix freely, so a trio, a pair plus a solo, or three solos all make a team.
+// Deterministic: queue order and rating only, no rng.
+export function matchmakeArena3v3(ctx: SimContext): void {
+  let guard = ARENA_SLOT_COUNT + 1;
+  while (guard-- > 0) {
+    pruneTeamQueue(ctx, '3v3');
+    if (freeArenaSlot(ctx, '3v3') === null) return;
+    const pool = ctx.arenaQueue3v3.slice(0, ARENA_3V3_SEARCH_WINDOW);
+    if (pool.reduce((n, u) => n + u.pids.length, 0) < ARENA_3V3_TEAM_SIZE * 2) return;
+    let picked: { a: number[]; b: number[] } | null = null;
+    for (const a of threeTeamCombos(pool)) {
+      if (a[0] !== 0) break; // combos are in queue order: the head's ones come first
+      const used = new Set(a);
+      const restIdx = pool.map((_u, i) => i).filter((i) => !used.has(i));
+      const rest = restIdx.map((i) => pool[i]);
+      const ratingA = comboRating(ctx, pool, a);
+      let best: number[] | null = null;
+      let bestGap = Infinity;
+      for (const combo of threeTeamCombos(rest)) {
+        const b = combo.map((i) => restIdx[i]);
+        const gap = Math.abs(comboRating(ctx, pool, b) - ratingA);
+        if (gap < bestGap) {
+          bestGap = gap;
+          best = b;
+        }
+      }
+      if (best) {
+        picked = { a, b: best };
+        break;
+      }
+    }
+    if (!picked) return;
+    const unitsA = picked.a.map((i) => pool[i]);
+    const unitsB = picked.b.map((i) => pool[i]);
+    removeTeamQueueUnits(ctx, [...unitsA, ...unitsB], '3v3');
+    startArenaMatch(
+      ctx,
+      '3v3',
+      unitsA.flatMap((u) => u.pids),
+      unitsB.flatMap((u) => u.pids),
+    );
+  }
+}
+
 export function startArenaMatch(
   ctx: SimContext,
   format: ArenaFormat,
@@ -924,7 +1182,12 @@ export function startArenaMatch(
         if (ctx.entities.get(pid) && !ctx.arenaMatches.has(pid)) ctx.arenaQueue1v1.unshift(pid);
       }
     } else {
-      const requeue = format === 'fiesta' ? ctx.arenaQueueFiesta : ctx.arenaQueue2v2;
+      const requeue =
+        format === 'fiesta'
+          ? ctx.arenaQueueFiesta
+          : format === '3v3'
+            ? ctx.arenaQueue3v3
+            : ctx.arenaQueue2v2;
       const okA = teamA.every((pid) => ctx.entities.get(pid) && !ctx.arenaMatches.has(pid));
       const okB = teamB.every((pid) => ctx.entities.get(pid) && !ctx.arenaMatches.has(pid));
       if (okB) requeue.unshift({ pids: teamB, rating: arenaTeamRating(ctx, teamB, format) });
@@ -979,6 +1242,11 @@ export function startArenaMatch(
     const [first, second] = entities;
     if (first) placeInArena(ctx, first, origin, map.spawnA);
     if (second) placeInArena(ctx, second, origin, map.spawnB);
+  } else if (format === '3v3') {
+    // Owner call: each 3v3 side arrives stacked on its 1v1 spawn point, no
+    // per-fighter spread (placeTeamInArena reuses the last spawn it is given).
+    placeTeamInArena(ctx, teamA, origin, [map.spawnA]);
+    placeTeamInArena(ctx, teamB, origin, [map.spawnB]);
   } else {
     placeTeamInArena(ctx, teamA, origin, map.spawnsA2v2);
     placeTeamInArena(ctx, teamB, origin, map.spawnsB2v2);

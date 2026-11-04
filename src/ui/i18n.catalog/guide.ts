@@ -2253,6 +2253,11 @@ export const guideStrings = {
     coliseumHeading: 'The Ashen Coliseum',
     coliseumBody:
       "The Coliseum is the realm's arena, where you face other players in ranked matches, one on one or two on two. Each bracket keeps its own standing, so a win lifts you up that ladder for the whole realm to see. Ranked play opens at level 15, and that applies to your partner too: if either of you is below it, the queue stays closed until you both qualify. All of player versus player lives behind one button, marked PvP: open it and pick a tab, Thornhollow Fields, one on one, or two on two, then sign up alone or with your partner. While you are queued or in a match, the other tabs stay locked, so you can never sit in two queues at once.",
+    // The successor of coliseumBody (retired in scripts/i18n_retired_keys.mjs) once
+    // the 3v3 bracket shipped: three brackets, three tabs, a party of up to three,
+    // and the 3v3 Attrition ramp (src/sim/social/arena.ts). Shapes only, no timings.
+    coliseumBodyThreeBrackets:
+      "The Coliseum is the realm's arena, where you face other players in ranked matches: one on one, two on two, or three on three. Each bracket keeps its own standing, so a win lifts you up that ladder for the whole realm to see. Ranked play opens at level 15, and that applies to everyone you queue with: if anyone in your party is below it, the queue stays closed until you all qualify. All of player versus player lives behind one button, marked PvP: open it and pick a tab, Thornhollow Fields, one on one, two on two, or three on three, then sign up alone or with your party. While you are queued or in a match, the other tabs stay locked, so you can never sit in two queues at once. A three on three match that drags on wears everyone down: past its halfway mark, Attrition cuts the healing every fighter receives a little more each second, so a stalemate cannot last forever.",
 
     ladderHeading: 'Climbing the ladder',
     ladderBody:
@@ -2274,6 +2279,10 @@ export const guideStrings = {
     // quartering; the rematch and forfeit clauses stay byte for byte.
     rewardsBodyLossShare:
       "A ranked win pays Honor, the player versus player currency, and a loss you play to the end still pays a smaller share of it, as does a draw, so rating is the only thing a loss really costs you. Honor is meant to reward real matches: beating the same opponent or the same team again on the same day pays nothing further (nor does losing to them again), a long winning day pays in full for its first stretch of wins and then halves what a win pays, halving it again deeper in and staying there, and a match your opponent forfeits still moves your rating but pays no Honor at all. That day is the realm's own: it rolls over at the realm's nightly reset hour, the same boundary every daily lockout clears on.",
+    // The daily hook (src/sim/pvp/honor.ts ARENA_FIRST_WIN_BONUS_HONOR): one bonus
+    // per ranked bracket per day, on a win only. Shape only, never the amount.
+    rewardsFirstWinBody:
+      'Your first ranked win of each day pays a bonus on top, and every bracket keeps its own: a first win in one on one, in two on two, and in three on three each claims one. A loss or a draw never spends it.',
 
     // Honor and the Warfare tier (src/sim/content/pvp_honor.ts, the two
     // warfareVendor NPCs, src/sim/pvp/power.ts). Spoiler-safe: no prices, no

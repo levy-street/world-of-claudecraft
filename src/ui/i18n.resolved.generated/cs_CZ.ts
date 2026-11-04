@@ -2650,7 +2650,8 @@ export const cs_CZ: EnTranslations = {
       "launcherTitle": "PvP",
       "mobileLabel": "PvP",
       "bracket1v1": "1v1",
-      "bracket2v2": "2v2"
+      "bracket2v2": "2v2",
+      "bracket3v3": "3v3"
     },
     "bg": {
       "title": "Thornhollowská pole",
@@ -3435,6 +3436,7 @@ export const cs_CZ: EnTranslations = {
         "fiestaWin": "Vítězství ve Fiestě",
         "battlegroundWin": "vítězství v Thornhollowských polích",
         "battlegroundFirstWin": "první dnešní výhra v Thornhollowských polích",
+        "arenaFirstWin": "první dnešní výhra v aréně v této kategorii",
         "battlegroundComplete": "odehraná bitva o Thornhollowská pole",
         "battlegroundKill": "čestné zabití",
         "battlegroundAssist": "asistence u zabití",
@@ -10532,11 +10534,13 @@ export const cs_CZ: EnTranslations = {
       "duelsBody": "Vyzvi libovolného hráče, kterého potkáš, na přátelský duel. V sázce je jen hrdost, takže je to nejsnazší cesta, jak se naučit matchup nebo vyřešit přátelskou hádku.",
       "coliseumHeading": "Popelavé koloseum",
       "coliseumBody": "Koloseum je aréna říše, kde se v hodnocených zápasech utkáváš s ostatními hráči, jeden na jednoho nebo dva na dva. Každá kategorie si drží vlastní pořadí, takže výhra tě po tom žebříku zvedne před očima celé říše. Hodnocená hra se otevírá na úrovni 15 a platí to i pro tvého partnera: pokud je někdo z vás níž, fronta zůstane zavřená, dokud nesplníte oba. Celé hráč proti hráči bydlí za jediným tlačítkem označeným PvP: otevři ho a vyber záložku, Thornhollowská pole, jeden na jednoho nebo dva na dva, a pak se přihlas sám nebo se svým partnerem. Dokud jsi ve frontě nebo v zápase, ostatní záložky zůstávají zamčené, takže nikdy nemůžeš být ve dvou frontách naráz.",
+      "coliseumBodyThreeBrackets": "Koloseum je aréna říše, kde se v hodnocených zápasech utkáváš s ostatními hráči: jeden na jednoho, dva na dva nebo tři na tři. Každá kategorie si drží vlastní pořadí, takže výhra tě po tom žebříku zvedne před očima celé říše. Hodnocená hra se otevírá na úrovni 15 a platí to pro každého, s kým se řadíš: pokud je kdokoli z tvé skupiny níž, fronta zůstane zavřená, dokud nesplníte všichni. Celé hráč proti hráči bydlí za jediným tlačítkem označeným PvP: otevři ho a vyber záložku, Thornhollowská pole, jeden na jednoho, dva na dva nebo tři na tři, a pak se přihlas sám nebo se svou skupinou. Dokud jsi ve frontě nebo v zápase, ostatní záložky zůstávají zamčené, takže nikdy nemůžeš být ve dvou frontách naráz. Zápas tři na tři, který se táhne, vyčerpá všechny: po jeho polovině Opotřebení každou sekundou o něco víc ubírá léčení, které každý bojovník přijímá, takže pat nemůže trvat věčně.",
       "ladderHeading": "Stoupání po žebříku",
       "ladderBody": "Hodnocené hraní sleduje tvoje postavení v čase. Podívej se na žebříček, kde sedíš a kdo drží vrchol světa.",
       "rewardsHeading": "Co vyplácí hodnocené hraní",
       "rewardsBody": "Hodnocená výhra vyplácí čest, měnu boje hráč proti hráči, a prohra tě nestojí nic než hodnocení. Čest má odměňovat opravdové zápasy: porazit stejného soupeře nebo stejný tým znovu ve stejný den už nic nevyplatí, dlouhý vítězný den vyplácí za každou další výhru trochu méně, a zápas, který tvůj soupeř vzdá, sice pohne tvým hodnocením, ale nevyplatí žádnou čest. Tento den patří jen cti a obrací se podle vlastních hodin, ne podle denního resetu instancí říše.",
       "rewardsBodyLossShare": "Hodnocené vítězství vyplácí Čest, měnu hráč proti hráči, a dohraný zápas, který prohraješ, stále vyplatí její menší podíl, stejně jako remíza, takže prohra tě doopravdy stojí jen hodnocení. Čest má odměňovat skutečné zápasy: opakované poražení stejného soupeře nebo týmu ve stejný den už nic dalšího nevyplatí a stejně tak další prohra s nimi. Dlouhý vítězný den platí první sérii výher celou odměnou, potom ji půlí, dál ji půlí znovu a na této hodnotě zůstane. Zápas, který soupeř vzdá, ti sice posune hodnocení, ale nevyplatí vůbec žádnou Čest. Den patří vlastnímu času říše a přetočí se při nočním resetu říše, stejné hranici, kdy se mažou všechny denní uzamčení.",
+      "rewardsFirstWinBody": "Tvoje první hodnocená výhra každého dne vyplácí navíc bonus a každá kategorie má svůj vlastní: první výhra jeden na jednoho, dva na dva i tři na tři si každá jeden vybere. Prohra ani remíza ho nikdy nespotřebuje.",
       "honorHeading": "Čest",
       "honorBody": "Čest je měna boje proti ostatním hráčům. Získáváš ji v Koloseu i venku na Thornhollowských polích, drží se odděleně od tvých mincí a nikdy se s nimi nemísí, a na listu postavy vidíš, kolik jí máš. Je přesně jedna věc, za kterou ji utratíš: válečnická výbava.",
       "quartermastersBody": "Dva zásobovači drží stejné zboží, takže obchoduj s tím, který je blíž. FÚRIE, Intendant cti, stojí v Eastbrookském údolí, a Válečný maršál Draven Kole, Mistr válečnických skladů, drží pult v Highwatchi. Jejich zásoby tvoří stupeň Válečnictví: pět rodin zbroje, plus náhrdelníky, prsteny a zbraně společné pro všechny.",

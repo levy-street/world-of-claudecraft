@@ -5206,6 +5206,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Abra Profissões para encaixar isto em uma ferramenta de coleta.',
   'hudChrome.pvp.bracket1v1': '1v1',
   'hudChrome.pvp.bracket2v2': '2v2',
+  'hudChrome.pvp.bracket3v3': '3v3',
   'hudChrome.pvp.launcherTitle': 'JcJ',
   'hudChrome.pvp.mobileLabel': 'JcJ',
   'hudChrome.townFocus.respecCostFree': 'Grátis',
@@ -5222,6 +5223,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.reasons.battlegroundComplete': 'batalha de Campos de Thornhollow disputada',
   'hudChrome.warfare.reasons.battlegroundFirstWin':
     'primeira vitória em Campos de Thornhollow hoje',
+  'hudChrome.warfare.reasons.arenaFirstWin': 'primeira vitória na arena hoje nesta categoria',
   'hudChrome.warfare.reasons.battlegroundKill': 'abate honroso',
   'hudChrome.warfare.reasons.battlegroundWin': 'vitória em Campos de Thornhollow',
   'hudChrome.warfareShop.buyAria': 'Comprar {item} por {honor}',
@@ -11790,6 +11792,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Uma seta de natureza arremessada num alvo à distância, sua magia de ataque preferida.',
   'guide.arenaPage.coliseumBody':
     'O Coliseu é a arena do reino, onde você enfrenta outros jogadores em partidas ranqueadas, um contra um ou dois contra dois. Cada categoria mantém sua própria classificação, então uma vitória eleva você naquela escada à vista de todo o reino. O jogo ranqueado abre no nível 15, e isso vale para seu parceiro também: se um de vocês estiver abaixo, a fila continua fechada até que ambos se qualifiquem. Todo o jogador contra jogador vive atrás de um único botão, marcado JxJ: abra-o e escolha uma aba, Campos de Thornhollow, um contra um ou dois contra dois, e então inscreva-se sozinho ou com seu parceiro. Enquanto você está na fila ou numa partida, as outras abas ficam travadas, então você nunca pode estar em duas filas ao mesmo tempo.',
+  'guide.arenaPage.coliseumBodyThreeBrackets':
+    'O Coliseu é a arena do reino, onde você enfrenta outros jogadores em partidas ranqueadas: um contra um, dois contra dois ou três contra três. Cada categoria mantém sua própria classificação, então uma vitória eleva você naquela escada à vista de todo o reino. O jogo ranqueado abre no nível 15, e isso vale para todos com quem você entra na fila: se alguém do seu grupo estiver abaixo, a fila continua fechada até que todos se qualifiquem. Todo o jogador contra jogador vive atrás de um único botão, marcado JxJ: abra-o e escolha uma aba, Campos de Thornhollow, um contra um, dois contra dois ou três contra três, e então inscreva-se sozinho ou com seu grupo. Enquanto você está na fila ou numa partida, as outras abas ficam travadas, então você nunca pode estar em duas filas ao mesmo tempo. Uma partida de três contra três que se arrasta desgasta todo mundo: passada a metade, Desgaste corta a cada segundo um pouco mais da cura que cada lutador recebe, então um impasse não pode durar para sempre.',
   'guide.arenaPage.coliseumHeading': 'O Coliseu das Cinzas',
   'guide.arenaPage.duelsBody':
     'Desafie qualquer jogador que encontrar para um duelo amistoso. Nada está em jogo além do orgulho, então é a forma mais fácil de aprender um confronto ou resolver uma discussão amigável.',
@@ -19701,6 +19705,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Compras de Honra são definitivas. A lista de recompra só guarda o que você vendeu: uma compra com moedas normalmente pode ser vendida pelo preço de venda e recuperada dessa lista se você mudar de ideia, mas o equipamento de Guerra se vincula no instante da compra, então nunca pode ser trocado, enviado ou vendido de volta por nada, e nunca chega à lista. A loja pede confirmação por esse motivo: leia a peça antes de confirmar.',
   'guide.arenaPage.rewardsBodyLossShare':
     'Uma vitória ranqueada paga Honra, a moeda de jogador contra jogador, e uma derrota jogada até o fim ainda paga uma parte menor, assim como um empate, então a classificação é o único custo real de uma derrota. Honra deve recompensar partidas reais: vencer o mesmo oponente ou a mesma equipe outra vez no mesmo dia não paga nada além, nem perder para eles novamente, uma longa sequência de vitórias paga por inteiro no primeiro trecho e depois reduz pela metade o pagamento de uma vitória, reduzindo-o de novo mais adiante e permanecendo assim, e uma partida abandonada pelo oponente ainda move sua classificação, mas não paga Honra. O dia é do reino: ele reinicia na hora do reset noturno, o mesmo limite em que toda restrição diária é liberada.',
+  'guide.arenaPage.rewardsFirstWinBody':
+    'Sua primeira vitória ranqueada de cada dia paga um bônus extra, e cada categoria tem o seu: uma primeira vitória no um contra um, no dois contra dois e no três contra três reivindica um cada. Uma derrota ou um empate nunca o gastam.',
   'guide.arenaPage.warfareBodyStatsStay':
     'Cada peça de Guerra traz Classificação de Ofensiva de Guerra e Classificação de Defesa de Guerra, e essas duas classificações não fazem absolutamente nada contra monstros. Elas só se aplicam quando você luta contra outro jogador, em um duelo, na arena ou no campo de batalha, onde a Ofensiva aumenta o dano causado e a Defesa reduz o dano recebido, cada uma até seu próprio limite. Cada família de armadura também é um conjunto, e seus bônus igualmente são classificações de Guerra ou efeitos que só funcionam contra jogadores, então os bônus de conjunto de um traje completo de Honra não contam contra um chefe de masmorra. As próprias peças ainda trazem atributos comuns, armadura e dano de arma, que funcionam em qualquer lugar; são as classificações de Guerra e os bônus de conjunto que ficam inativos contra monstros. Há uma exceção que funciona em todo lugar: duas peças de qualquer um desses conjuntos também fazem com que o dano recebido não atrase mais suas conjurações.',
   'guide.arenaPage.warfareTradeBodyRatingSpent':

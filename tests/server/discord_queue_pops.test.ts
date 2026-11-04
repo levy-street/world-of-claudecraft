@@ -130,11 +130,12 @@ describe('queuedPidsOf', () => {
         bgQueue: [{ pids: [1, 2] }, { pids: [3] }],
         arenaQueue1v1: [4],
         arenaQueue2v2: [{ pids: [5, 6] }],
+        arenaQueue3v3: [{ pids: [9, 10, 11] }],
         arenaQueueFiesta: [{ pids: [7] }],
         arenaQueueYumi3: [{ pids: [8] }],
         arenaQueueYumi5: [],
       }),
-    ).toEqual([4, 1, 2, 3, 5, 6, 7, 8]);
+    ).toEqual([4, 1, 2, 3, 5, 6, 9, 10, 11, 7, 8]);
   });
 });
 

@@ -5142,6 +5142,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Buka Profesi untuk memasangnya pada alat pengumpulan.',
   'hudChrome.pvp.bracket1v1': '1v1',
   'hudChrome.pvp.bracket2v2': '2v2',
+  'hudChrome.pvp.bracket3v3': '3v3',
   'hudChrome.pvp.launcherTitle': 'PvP',
   'hudChrome.pvp.mobileLabel': 'PvP',
   'hudChrome.townFocus.respecCostFree': 'Gratis',
@@ -5157,6 +5158,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.reasons.battlegroundAssist': 'Bantuan pukulan pamungkas',
   'hudChrome.warfare.reasons.battlegroundComplete': 'Pertempuran Medan Thornhollow selesai',
   'hudChrome.warfare.reasons.battlegroundFirstWin': 'Kemenangan pertama Medan Thornhollow hari ini',
+  'hudChrome.warfare.reasons.arenaFirstWin': 'Kemenangan arena pertama hari ini di kategori ini',
   'hudChrome.warfare.reasons.battlegroundKill': 'Pembunuhan terhormat',
   'hudChrome.warfare.reasons.battlegroundWin': 'Kemenangan Medan Thornhollow',
   'hudChrome.warfareShop.buyAria': 'Beli {item} seharga {honor}',
@@ -10656,6 +10658,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Anak panah alam yang dilontarkan ke sasaran dari kejauhan, serangan andalanmu.',
   'guide.arenaPage.coliseumBody':
     'Koloseum adalah arena alam ini, tempat kamu menghadapi pemain lain dalam pertandingan berperingkat, satu lawan satu atau dua lawan dua. Setiap kategori menyimpan peringkatnya sendiri, jadi sebuah kemenangan mengangkatmu di tangga itu untuk dilihat seluruh alam. Permainan berperingkat terbuka di level 15, dan itu berlaku untuk rekanmu juga: kalau salah satu dari kalian di bawahnya, antreannya tetap tertutup sampai kalian berdua memenuhi syarat. Seluruh pemain lawan pemain berada di balik satu tombol bertanda PvP: bukalah dan pilih sebuah tab, Medan Thornhollow, satu lawan satu, atau dua lawan dua, lalu daftarkan diri sendirian atau bersama rekanmu. Selagi kamu mengantre atau berada dalam pertandingan, tab lainnya tetap terkunci, jadi kamu tidak pernah bisa berada di dua antrean sekaligus.',
+  'guide.arenaPage.coliseumBodyThreeBrackets':
+    'Koloseum adalah arena alam ini, tempat kamu menghadapi pemain lain dalam pertandingan berperingkat: satu lawan satu, dua lawan dua, atau tiga lawan tiga. Setiap kategori menyimpan peringkatnya sendiri, jadi sebuah kemenangan mengangkatmu di tangga itu untuk dilihat seluruh alam. Permainan berperingkat terbuka di level 15, dan itu berlaku untuk semua orang yang mengantre bersamamu: kalau ada anggota party-mu yang di bawahnya, antreannya tetap tertutup sampai kalian semua memenuhi syarat. Seluruh pemain lawan pemain berada di balik satu tombol bertanda PvP: bukalah dan pilih sebuah tab, Medan Thornhollow, satu lawan satu, dua lawan dua, atau tiga lawan tiga, lalu daftarkan diri sendirian atau bersama party-mu. Selagi kamu mengantre atau berada dalam pertandingan, tab lainnya tetap terkunci, jadi kamu tidak pernah bisa berada di dua antrean sekaligus. Pertandingan tiga lawan tiga yang berlarut-larut menguras semua orang: lewat dari pertengahannya, Atrisi memangkas penyembuhan yang diterima setiap petarung sedikit lebih banyak setiap detik, sehingga kebuntuan tidak bisa berlangsung selamanya.',
   'guide.arenaPage.coliseumHeading': 'Coliseum Abu',
   'guide.arenaPage.duelsBody':
     'Tantang pemain mana pun yang kamu temui untuk duel persahabatan. Tak ada yang dipertaruhkan selain harga diri, jadi inilah cara termudah mempelajari sebuah pertandingan atau menyelesaikan perselisihan ramah.',
@@ -19643,6 +19647,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Pembelian Kehormatan bersifat final. Daftar pembelian kembali hanya memuat barang yang kamu jual: pembelian dengan koin biasanya dapat dijual kembali seharga jualnya dan diambil lagi dari daftar itu jika kamu berubah pikiran, tetapi perlengkapan Perang terikat jiwa saat dibeli, jadi tak pernah bisa ditukar, dikirim, atau dijual kembali, dan tak pernah masuk daftar itu. Toko meminta konfirmasi karena alasan tersebut: baca barangnya sebelum menekan tombol.',
   'guide.arenaPage.rewardsBodyLossShare':
     'Kemenangan berperingkat membayar Kehormatan, mata uang pemain melawan pemain, dan kekalahan yang kamu mainkan sampai selesai tetap membayar bagian yang lebih kecil, begitu juga hasil seri, jadi rating adalah satu-satunya hal yang benar-benar hilang karena kalah. Kehormatan dimaksudkan untuk memberi hadiah pada pertandingan sungguhan: mengalahkan lawan atau tim yang sama lagi pada hari yang sama tidak memberi bayaran tambahan, begitu juga kalah dari mereka lagi, hari kemenangan panjang membayar penuh untuk rentang kemenangan awal lalu membagi dua bayaran kemenangan, membaginya lagi lebih dalam dan bertahan di sana, dan pertandingan yang dibatalkan lawan tetap mengubah ratingmu tetapi sama sekali tidak membayar Kehormatan. Hari itu milik realm sendiri: berganti saat reset malam realm, batas yang sama ketika semua penguncian harian dibersihkan.',
+  'guide.arenaPage.rewardsFirstWinBody':
+    'Kemenangan berperingkat pertamamu setiap hari membayar bonus tambahan, dan setiap kategori punya bonusnya sendiri: kemenangan pertama di satu lawan satu, di dua lawan dua, dan di tiga lawan tiga masing-masing mengklaim satu. Kekalahan atau seri tidak pernah menghabiskannya.',
   'guide.arenaPage.warfareBodyStatsStay':
     'Setiap perlengkapan Perang membawa Rating Serangan Perang dan Rating Pertahanan Perang, dan kedua rating itu sama sekali tidak berpengaruh melawan monster. Keduanya hanya berlaku saat kamu melawan pemain lain, dalam duel, arena, atau medan pertempuran, saat Serangan menambah kerusakan yang kamu berikan dan Pertahanan mengurangi kerusakan yang kamu terima, masing-masing hingga batasnya sendiri. Setiap keluarga zirah juga merupakan set, dan bonus setnya juga berupa rating Perang atau efek yang hanya bekerja melawan pemain, jadi bonus set lengkap Kehormatan tidak berarti apa-apa pada bos dungeon. Potongannya sendiri tetap membawa statistik biasa, zirah, dan kerusakan senjata yang bekerja di mana-mana; rating Perang dan bonus setlah yang diam terhadap monster. Satu pengecualian berlaku di mana saja: dua bagian dari set mana pun ini juga membuat kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
   'guide.arenaPage.warfareTradeBodyRatingSpent':

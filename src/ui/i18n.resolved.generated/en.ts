@@ -2650,7 +2650,8 @@ export const en: EnTranslations = {
       "launcherTitle": "PvP",
       "mobileLabel": "PvP",
       "bracket1v1": "1v1",
-      "bracket2v2": "2v2"
+      "bracket2v2": "2v2",
+      "bracket3v3": "3v3"
     },
     "bg": {
       "title": "Thornhollow Fields",
@@ -3435,6 +3436,7 @@ export const en: EnTranslations = {
         "fiestaWin": "Fiesta victory",
         "battlegroundWin": "Thornhollow Fields victory",
         "battlegroundFirstWin": "first Thornhollow Fields win today",
+        "arenaFirstWin": "first arena win today in this bracket",
         "battlegroundComplete": "Thornhollow Fields battle fought",
         "battlegroundKill": "honorable kill",
         "battlegroundAssist": "killing blow assisted",
@@ -10532,11 +10534,13 @@ export const en: EnTranslations = {
       "duelsBody": "Challenge any player you meet to a friendly duel. Nothing is on the line but pride, so it is the easiest way to learn a matchup or settle a friendly argument.",
       "coliseumHeading": "The Ashen Coliseum",
       "coliseumBody": "The Coliseum is the realm's arena, where you face other players in ranked matches, one on one or two on two. Each bracket keeps its own standing, so a win lifts you up that ladder for the whole realm to see. Ranked play opens at level 15, and that applies to your partner too: if either of you is below it, the queue stays closed until you both qualify. All of player versus player lives behind one button, marked PvP: open it and pick a tab, Thornhollow Fields, one on one, or two on two, then sign up alone or with your partner. While you are queued or in a match, the other tabs stay locked, so you can never sit in two queues at once.",
+      "coliseumBodyThreeBrackets": "The Coliseum is the realm's arena, where you face other players in ranked matches: one on one, two on two, or three on three. Each bracket keeps its own standing, so a win lifts you up that ladder for the whole realm to see. Ranked play opens at level 15, and that applies to everyone you queue with: if anyone in your party is below it, the queue stays closed until you all qualify. All of player versus player lives behind one button, marked PvP: open it and pick a tab, Thornhollow Fields, one on one, two on two, or three on three, then sign up alone or with your party. While you are queued or in a match, the other tabs stay locked, so you can never sit in two queues at once. A three on three match that drags on wears everyone down: past its halfway mark, Attrition cuts the healing every fighter receives a little more each second, so a stalemate cannot last forever.",
       "ladderHeading": "Climbing the ladder",
       "ladderBody": "Ranked play tracks your standing over time. Check the leaderboard to see where you sit and who holds the top of the realm.",
       "rewardsHeading": "What ranked play pays",
       "rewardsBody": "A ranked win pays Honor, the player versus player currency, and a loss costs you nothing but rating. Honor is meant to reward real matches: beating the same opponent or the same team again on the same day pays nothing further, a long winning day pays a little less per win as it goes on, and a match your opponent forfeits still moves your rating but pays no Honor at all. That day is Honor's own, and it rolls over on its own clock rather than with the realm's instance reset.",
       "rewardsBodyLossShare": "A ranked win pays Honor, the player versus player currency, and a loss you play to the end still pays a smaller share of it, as does a draw, so rating is the only thing a loss really costs you. Honor is meant to reward real matches: beating the same opponent or the same team again on the same day pays nothing further (nor does losing to them again), a long winning day pays in full for its first stretch of wins and then halves what a win pays, halving it again deeper in and staying there, and a match your opponent forfeits still moves your rating but pays no Honor at all. That day is the realm's own: it rolls over at the realm's nightly reset hour, the same boundary every daily lockout clears on.",
+      "rewardsFirstWinBody": "Your first ranked win of each day pays a bonus on top, and every bracket keeps its own: a first win in one on one, in two on two, and in three on three each claims one. A loss or a draw never spends it.",
       "honorHeading": "Honor",
       "honorBody": "Honor is the currency of fighting other players. You earn it in the Coliseum and out on Thornhollow Fields, it is kept apart from your coin and never mixes with it, and your character sheet shows how much you are holding. There is exactly one thing to spend it on: Warfare gear.",
       "quartermastersBody": "Two quartermasters keep the same shelves, so trade with whichever is nearer. FURY, the Honor Quartermaster, stands in Eastbrook Vale, and Warmarshal Draven Kole, Master of the Warfare Stores, keeps the counter in Highwatch. Their stock is the Warfare tier: five armor families, plus necks, rings, and weapons shared across all of them.",

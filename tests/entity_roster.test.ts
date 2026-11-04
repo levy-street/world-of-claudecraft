@@ -143,6 +143,7 @@ function makeCtx() {
     trades: new Map(),
     arenaQueue1v1: [],
     arenaQueue2v2: [],
+    arenaQueue3v3: [],
     arenaQueueFiesta: [],
     arenaBusySlots: new Set(),
     arenaQueueYumi3: [],

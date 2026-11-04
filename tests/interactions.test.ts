@@ -196,12 +196,13 @@ describe('activePvpOpponentIds', () => {
         standings: {
           '1v1': { rating: 1500, wins: 0, losses: 0, draws: 0 },
           '2v2': { rating: 1500, wins: 0, losses: 0, draws: 0 },
+          '3v3': { rating: 1500, wins: 0, losses: 0, draws: 0 },
           fiesta: { rating: 1500, wins: 0, losses: 0, draws: 0 },
           yumi3: { rating: 1500, wins: 0, losses: 0, draws: 0 },
           yumi5: { rating: 1500, wins: 0, losses: 0, draws: 0 },
         },
         ladder: [],
-        ladders: { '1v1': [], '2v2': [], fiesta: [], yumi3: [], yumi5: [] },
+        ladders: { '1v1': [], '2v2': [], '3v3': [], fiesta: [], yumi3: [], yumi5: [] },
         match: {
           map: 'coliseum' as const,
           oppPid: 3,
@@ -243,12 +244,13 @@ describe('activePvpOpponentIds', () => {
       standings: {
         '1v1': { rating: 1500, wins: 0, losses: 0, draws: 0 },
         '2v2': { rating: 1500, wins: 0, losses: 0, draws: 0 },
+        '3v3': { rating: 1500, wins: 0, losses: 0, draws: 0 },
         fiesta: { rating: 1500, wins: 0, losses: 0, draws: 0 },
         yumi3: { rating: 1500, wins: 0, losses: 0, draws: 0 },
         yumi5: { rating: 1500, wins: 0, losses: 0, draws: 0 },
       },
       ladder: [],
-      ladders: { '1v1': [], '2v2': [], fiesta: [], yumi3: [], yumi5: [] },
+      ladders: { '1v1': [], '2v2': [], '3v3': [], fiesta: [], yumi3: [], yumi5: [] },
     };
     const matchBase = {
       map: 'coliseum' as const,
@@ -309,12 +311,13 @@ describe('activePvpOpponentIds', () => {
         standings: {
           '1v1': { rating: 1500, wins: 0, losses: 0, draws: 0 },
           '2v2': { rating: 1500, wins: 0, losses: 0, draws: 0 },
+          '3v3': { rating: 1500, wins: 0, losses: 0, draws: 0 },
           fiesta: { rating: 1500, wins: 0, losses: 0, draws: 0 },
           yumi3: { rating: 1500, wins: 0, losses: 0, draws: 0 },
           yumi5: { rating: 1500, wins: 0, losses: 0, draws: 0 },
         },
         ladder: [],
-        ladders: { '1v1': [], '2v2': [], fiesta: [], yumi3: [], yumi5: [] },
+        ladders: { '1v1': [], '2v2': [], '3v3': [], fiesta: [], yumi3: [], yumi5: [] },
         match: {
           map: 'coliseum' as const,
           oppPid: 3,

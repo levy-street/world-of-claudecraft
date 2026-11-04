@@ -2650,7 +2650,8 @@ export const id_ID: EnTranslations = {
       "launcherTitle": "PvP",
       "mobileLabel": "PvP",
       "bracket1v1": "1v1",
-      "bracket2v2": "2v2"
+      "bracket2v2": "2v2",
+      "bracket3v3": "3v3"
     },
     "bg": {
       "title": "Medan Thornhollow",
@@ -3435,6 +3436,7 @@ export const id_ID: EnTranslations = {
         "fiestaWin": "Kemenangan Fiesta",
         "battlegroundWin": "Kemenangan Medan Thornhollow",
         "battlegroundFirstWin": "Kemenangan pertama Medan Thornhollow hari ini",
+        "arenaFirstWin": "Kemenangan arena pertama hari ini di kategori ini",
         "battlegroundComplete": "Pertempuran Medan Thornhollow selesai",
         "battlegroundKill": "Pembunuhan terhormat",
         "battlegroundAssist": "Bantuan pukulan pamungkas",
@@ -10532,11 +10534,13 @@ export const id_ID: EnTranslations = {
       "duelsBody": "Tantang pemain mana pun yang kamu temui untuk duel persahabatan. Tak ada yang dipertaruhkan selain harga diri, jadi inilah cara termudah mempelajari sebuah pertandingan atau menyelesaikan perselisihan ramah.",
       "coliseumHeading": "Coliseum Abu",
       "coliseumBody": "Koloseum adalah arena alam ini, tempat kamu menghadapi pemain lain dalam pertandingan berperingkat, satu lawan satu atau dua lawan dua. Setiap kategori menyimpan peringkatnya sendiri, jadi sebuah kemenangan mengangkatmu di tangga itu untuk dilihat seluruh alam. Permainan berperingkat terbuka di level 15, dan itu berlaku untuk rekanmu juga: kalau salah satu dari kalian di bawahnya, antreannya tetap tertutup sampai kalian berdua memenuhi syarat. Seluruh pemain lawan pemain berada di balik satu tombol bertanda PvP: bukalah dan pilih sebuah tab, Medan Thornhollow, satu lawan satu, atau dua lawan dua, lalu daftarkan diri sendirian atau bersama rekanmu. Selagi kamu mengantre atau berada dalam pertandingan, tab lainnya tetap terkunci, jadi kamu tidak pernah bisa berada di dua antrean sekaligus.",
+      "coliseumBodyThreeBrackets": "Koloseum adalah arena alam ini, tempat kamu menghadapi pemain lain dalam pertandingan berperingkat: satu lawan satu, dua lawan dua, atau tiga lawan tiga. Setiap kategori menyimpan peringkatnya sendiri, jadi sebuah kemenangan mengangkatmu di tangga itu untuk dilihat seluruh alam. Permainan berperingkat terbuka di level 15, dan itu berlaku untuk semua orang yang mengantre bersamamu: kalau ada anggota party-mu yang di bawahnya, antreannya tetap tertutup sampai kalian semua memenuhi syarat. Seluruh pemain lawan pemain berada di balik satu tombol bertanda PvP: bukalah dan pilih sebuah tab, Medan Thornhollow, satu lawan satu, dua lawan dua, atau tiga lawan tiga, lalu daftarkan diri sendirian atau bersama party-mu. Selagi kamu mengantre atau berada dalam pertandingan, tab lainnya tetap terkunci, jadi kamu tidak pernah bisa berada di dua antrean sekaligus. Pertandingan tiga lawan tiga yang berlarut-larut menguras semua orang: lewat dari pertengahannya, Atrisi memangkas penyembuhan yang diterima setiap petarung sedikit lebih banyak setiap detik, sehingga kebuntuan tidak bisa berlangsung selamanya.",
       "ladderHeading": "Menaiki tangga peringkat",
       "ladderBody": "Permainan berperingkat melacak kedudukanmu dari waktu ke waktu. Lihat papan peringkat untuk mengetahui posisimu dan siapa yang memuncaki realm.",
       "rewardsHeading": "Yang dibayar oleh permainan berperingkat",
       "rewardsBody": "Kemenangan berperingkat membayar Kehormatan, mata uang pemain lawan pemain, dan kekalahan tidak merugikanmu apa pun selain peringkat. Kehormatan dimaksudkan untuk mengganjar pertandingan yang sungguhan: mengalahkan lawan atau tim yang sama lagi pada hari yang sama tidak membayar apa-apa lagi, hari kemenangan yang panjang membayar sedikit lebih kecil per kemenangan seiring berjalannya, dan sebuah pertandingan yang berakhir karena lawanmu menyerah tetap menggerakkan peringkatmu, tetapi sama sekali tidak membayar Kehormatan. Hari itu adalah milik Kehormatan sendiri, dan ia bergulir dengan jamnya sendiri, bukan mengikuti reset instansi realm.",
       "rewardsBodyLossShare": "Kemenangan berperingkat membayar Kehormatan, mata uang pemain melawan pemain, dan kekalahan yang kamu mainkan sampai selesai tetap membayar bagian yang lebih kecil, begitu juga hasil seri, jadi rating adalah satu-satunya hal yang benar-benar hilang karena kalah. Kehormatan dimaksudkan untuk memberi hadiah pada pertandingan sungguhan: mengalahkan lawan atau tim yang sama lagi pada hari yang sama tidak memberi bayaran tambahan, begitu juga kalah dari mereka lagi, hari kemenangan panjang membayar penuh untuk rentang kemenangan awal lalu membagi dua bayaran kemenangan, membaginya lagi lebih dalam dan bertahan di sana, dan pertandingan yang dibatalkan lawan tetap mengubah ratingmu tetapi sama sekali tidak membayar Kehormatan. Hari itu milik realm sendiri: berganti saat reset malam realm, batas yang sama ketika semua penguncian harian dibersihkan.",
+      "rewardsFirstWinBody": "Kemenangan berperingkat pertamamu setiap hari membayar bonus tambahan, dan setiap kategori punya bonusnya sendiri: kemenangan pertama di satu lawan satu, di dua lawan dua, dan di tiga lawan tiga masing-masing mengklaim satu. Kekalahan atau seri tidak pernah menghabiskannya.",
       "honorHeading": "Kehormatan",
       "honorBody": "Kehormatan adalah mata uang untuk bertarung melawan pemain lain. Kamu memperolehnya di Coliseum maupun di Medan Thornhollow; ia disimpan terpisah dari uangmu dan tak pernah tercampur dengannya, dan lembar karaktermu menunjukkan berapa banyak yang kamu miliki. Hanya ada satu hal untuk membelanjakannya: Perlengkapan Perang.",
       "quartermastersBody": "Dua kepala perbekalan menjaga rak dagangan yang sama, jadi berdaganglah dengan yang lebih dekat denganmu. AMARAH, Kepala Suku Kehormatan, berdiri di Lembah Eastbrook, dan Marsekal Perang Draven Kole, Master Gudang Perang, melayani di Highwatch. Persediaan mereka adalah tingkat Perang: lima keluarga zirah, ditambah kalung, cincin, dan senjata yang dibagikan di antara semuanya.",

@@ -1558,7 +1558,7 @@ export interface PlayerMeta
   // only its anti-relog cooldown is persisted through Entity.cooldowns.
   pendingUnstuck: unstuckMod.PendingUnstuck | null;
   // Ashen Coliseum standings. Legacy arenaRating/Wins/Losses are the 1v1
-  // bracket; 2v2 is fully independent and persisted alongside them.
+  // bracket; 2v2 and 3v3 are fully independent and persisted alongside them.
   arenaRating: number;
   arenaWins: number;
   arenaLosses: number;
@@ -1567,6 +1567,10 @@ export interface PlayerMeta
   arena2v2Wins: number;
   arena2v2Losses: number;
   arena2v2Draws: number;
+  arena3v3Rating: number;
+  arena3v3Wins: number;
+  arena3v3Losses: number;
+  arena3v3Draws: number;
   // Thornhollow Fields 5v5 battleground standing (rated, not matched); bgCaptures is
   // the career flag-capture count feeding the Book of Deeds meters. All
   // persisted in CharacterState, absent until the first result.
@@ -2002,6 +2006,7 @@ export class Sim {
   // and the set of busy instance slots
   arenaQueue1v1: number[] = [];
   arenaQueue2v2: ArenaQueueUnit[] = [];
+  arenaQueue3v3: ArenaQueueUnit[] = [];
   arenaQueueFiesta: ArenaQueueUnit[] = []; // 2v2 Fiesta (party mode) queue
   arenaQueueYumi3: ArenaQueueUnit[] = []; // Protect Yumi 3v3 queue
   arenaQueueYumi5: ArenaQueueUnit[] = []; // Protect Yumi 5v5 queue
@@ -2753,6 +2758,12 @@ export class Sim {
       losses: savedState?.arena2v2Losses ?? 0,
       draws: savedState?.arena2v2Draws ?? 0,
     };
+    const savedArena3v3: ArenaStanding = {
+      rating: savedState?.arena3v3Rating ?? arenaMod.ARENA_BASE_RATING,
+      wins: savedState?.arena3v3Wins ?? 0,
+      losses: savedState?.arena3v3Losses ?? 0,
+      draws: savedState?.arena3v3Draws ?? 0,
+    };
     const player = createPlayer(this.nextId++, cls, startPos, name);
     if (opts?.appearance) player.modularAppearance = opts.appearance;
     this.addEntity(player);
@@ -2840,6 +2851,10 @@ export class Sim {
       arena2v2Wins: savedArena2v2.wins,
       arena2v2Losses: savedArena2v2.losses,
       arena2v2Draws: savedArena2v2.draws,
+      arena3v3Rating: savedArena3v3.rating,
+      arena3v3Wins: savedArena3v3.wins,
+      arena3v3Losses: savedArena3v3.losses,
+      arena3v3Draws: savedArena3v3.draws,
       // Finite-clamped like the arena standings above: bgRating feeds Elo
       // math, so a corrupt row must never flow NaN through a match result.
       bgRating: Number.isFinite(savedState?.bgRating)
@@ -3911,6 +3926,17 @@ export class Sim {
       // battleground and Vale Cup blocks below already follow).
       ...(meta.arenaDraws ? { arena1v1Draws: meta.arenaDraws } : {}),
       ...(meta.arena2v2Draws ? { arena2v2Draws: meta.arena2v2Draws } : {}),
+      // 3v3 is absent until the bracket's first result, so every save written
+      // before the bracket existed (and every character who never plays it)
+      // stays byte-equal.
+      ...(meta.arena3v3Wins || meta.arena3v3Losses || meta.arena3v3Draws
+        ? {
+            arena3v3Rating: meta.arena3v3Rating,
+            arena3v3Wins: meta.arena3v3Wins,
+            arena3v3Losses: meta.arena3v3Losses,
+            ...(meta.arena3v3Draws ? { arena3v3Draws: meta.arena3v3Draws } : {}),
+          }
+        : {}),
       // Absent until the first Thornhollow Fields result or capture moves something
       // (back-compat + parity-stable saves).
       ...(meta.bgWins ||
@@ -5105,6 +5131,12 @@ export class Sim {
       },
       set arenaQueue2v2(v) {
         sim.arenaQueue2v2 = v;
+      },
+      get arenaQueue3v3() {
+        return sim.arenaQueue3v3;
+      },
+      set arenaQueue3v3(v) {
+        sim.arenaQueue3v3 = v;
       },
       get arenaQueueFiesta() {
         return sim.arenaQueueFiesta;
@@ -9737,6 +9769,7 @@ export class Sim {
     const standings: Record<ArenaFormat, ArenaStanding> = {
       '1v1': this.arenaStanding(meta, '1v1'),
       '2v2': this.arenaStanding(meta, '2v2'),
+      '3v3': this.arenaStanding(meta, '3v3'),
       // Fiesta is unranked party play — it keeps no standing of its own; mirror
       // 2v2 just to satisfy the bracket record (the Fiesta UI never reads it).
       fiesta: this.arenaStanding(meta, '2v2'),
@@ -9747,6 +9780,7 @@ export class Sim {
     const ladders: Record<ArenaFormat, import('../world_api').ArenaLadderEntry[]> = {
       '1v1': this.arenaLadder('1v1'),
       '2v2': this.arenaLadder('2v2'),
+      '3v3': this.arenaLadder('3v3'),
       fiesta: [],
       yumi3: [],
       yumi5: [],
@@ -9764,9 +9798,11 @@ export class Sim {
             ? playerCount(this.arenaQueueYumi5)
             : format === '2v2'
               ? playerCount(this.arenaQueue2v2)
-              : format === '1v1'
-                ? this.arenaQueue1v1.length
-                : 0;
+              : format === '3v3'
+                ? playerCount(this.arenaQueue3v3)
+                : format === '1v1'
+                  ? this.arenaQueue1v1.length
+                  : 0;
     return {
       rating: standing.rating,
       wins: standing.wins,

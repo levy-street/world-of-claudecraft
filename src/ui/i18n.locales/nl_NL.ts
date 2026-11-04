@@ -5173,6 +5173,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Open Beroepen om dit op een verzamelgereedschap te plaatsen.',
   'hudChrome.pvp.bracket1v1': '1v1',
   'hudChrome.pvp.bracket2v2': '2v2',
+  'hudChrome.pvp.bracket3v3': '3v3',
   'hudChrome.pvp.launcherTitle': 'PvP',
   'hudChrome.pvp.mobileLabel': 'PvP',
   'hudChrome.townFocus.respecCostFree': 'Gratis',
@@ -5189,6 +5190,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.reasons.battlegroundComplete': 'gevecht in Doornholte-Velden uitgevochten',
   'hudChrome.warfare.reasons.battlegroundFirstWin':
     'eerste overwinning van vandaag in Doornholte-Velden',
+  'hudChrome.warfare.reasons.arenaFirstWin': 'eerste arenaoverwinning van vandaag in deze klasse',
   'hudChrome.warfare.reasons.battlegroundKill': 'eervolle overwinning',
   'hudChrome.warfare.reasons.battlegroundWin': 'overwinning in Doornholte-Velden',
   'hudChrome.warfareShop.buyAria': 'Koop {item} voor {honor}',
@@ -9990,6 +9992,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Een natuurbout die van afstand op een doelwit wordt geworpen, je vertrouwde nuke.',
   'guide.arenaPage.coliseumBody':
     'Het Colosseum is de arena van het rijk, waar je andere spelers treft in gerangschikte partijen, één tegen één of twee tegen twee. Elke klasse houdt haar eigen stand bij, dus een overwinning tilt je op die ladder omhoog voor het hele rijk om te zien. Gerangschikt spel opent op niveau 15, en dat geldt ook voor je partner: is een van jullie beiden eronder, dan blijft de wachtrij dicht tot jullie er allebei aan voldoen. Alles van speler tegen speler zit achter één knop, gemerkt PvP: open hem en kies een tabblad, Doornholte-Velden, één tegen één of twee tegen twee, en meld je dan aan, alleen of met je partner. Zolang je in de wachtrij of in een partij zit, blijven de andere tabbladen vergrendeld, zodat je nooit in twee wachtrijen tegelijk kunt zitten.',
+  'guide.arenaPage.coliseumBodyThreeBrackets':
+    'Het Colosseum is de arena van het rijk, waar je andere spelers treft in gerangschikte partijen: één tegen één, twee tegen twee of drie tegen drie. Elke klasse houdt haar eigen stand bij, dus een overwinning tilt je op die ladder omhoog voor het hele rijk om te zien. Gerangschikt spel opent op niveau 15, en dat geldt voor iedereen met wie je je aanmeldt: zit iemand uit je groep eronder, dan blijft de wachtrij dicht tot jullie er allemaal aan voldoen. Alles van speler tegen speler zit achter één knop, gemerkt PvP: open hem en kies een tabblad, Doornholte-Velden, één tegen één, twee tegen twee of drie tegen drie, en meld je dan aan, alleen of met je groep. Zolang je in de wachtrij of in een partij zit, blijven de andere tabbladen vergrendeld, zodat je nooit in twee wachtrijen tegelijk kunt zitten. Een partij drie tegen drie die blijft slepen, slijt iedereen af: voorbij de helft snijdt Uitputting elke seconde iets meer in de genezing die elke vechter ontvangt, zodat een patstelling niet eeuwig kan duren.',
   'guide.arenaPage.coliseumHeading': 'Het Asgrauwe Colosseum',
   'guide.arenaPage.duelsBody':
     'Daag elke speler die je tegenkomt uit voor een vriendschappelijk duel. Er staat niets op het spel behalve trots, dus het is de makkelijkste manier om een matchup te leren of een vriendschappelijk meningsverschil te beslechten.',
@@ -19667,6 +19671,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Aankopen met Eer zijn definitief. De terugkooplijst bevat alleen wat je hebt verkocht: een aankoop met munten kan meestal voor de verkoopprijs worden teruggekocht en uit die lijst worden teruggehaald als je opnieuw van gedachten verandert, maar Oorlogsuitrusting bindt aan je ziel zodra je haar koopt en kan dus nooit worden verhandeld, verstuurd of voor iets worden terugverkocht, en komt nooit op die lijst. De winkel vraagt je daarom om te bevestigen: bekijk het stuk voordat je erop drukt.',
   'guide.arenaPage.rewardsBodyLossShare':
     "Een overwinning met rating betaalt Eer, de speler-tegen-speler-valuta, en een nederlaag die je tot het einde speelt betaalt er nog steeds een kleiner deel van, net als een gelijkspel, dus rating is het enige dat een nederlaag echt kost. Eer beloont echte wedstrijden: dezelfde tegenstander of hetzelfde team opnieuw op dezelfde dag verslaan levert niets extra's op, en opnieuw van hen verliezen evenmin. Een lange overwinningsdag betaalt volledig voor de eerste reeks overwinningen, halveert daarna de beloning en halveert haar verderop nogmaals, waarna die laag blijft. Een wedstrijd die je tegenstander opgeeft verschuift je rating nog steeds, maar betaalt helemaal geen Eer. Die dag hoort bij het rijk zelf: hij rolt om op het nachtelijke resetuur van het rijk, dezelfde grens waarop elke dagelijkse uitsluiting wordt gewist.",
+  'guide.arenaPage.rewardsFirstWinBody':
+    'Je eerste gerangschikte overwinning van elke dag betaalt er een bonus bovenop, en elke klasse heeft haar eigen: een eerste overwinning in één tegen één, in twee tegen twee en in drie tegen drie claimt er elk een. Een nederlaag of een gelijkspel verbruikt hem nooit.',
   'guide.arenaPage.warfareBodyStatsStay':
     'Elk Oorlogsstuk draagt een aanvals- en verdedigingsrating voor Oorlogsvoering, en die twee ratings doen helemaal niets tegen monsters. Ze gelden alleen wanneer je tegen een andere speler vecht, in een duel, de arena of het slagveld. Aanval verhoogt daar de schade die je toebrengt en Verdediging verlaagt de schade die je ontvangt, elk tot zijn eigen plafond. Elke pantserfamilie is ook een verzameling en haar setbonussen zijn eveneens ratings of effecten voor Oorlogsvoering die alleen tegen spelers werken, dus de setbonussen van een volledige Eerset tellen niets tegen een kerkerbaas. De stukken zelf dragen nog steeds hun gewone statistieken, pantser en wapenschade, en die werken overal. Het zijn de ratings en setbonussen voor Oorlogsvoering die tegen een monster stilvallen. Eén uitzondering werkt overal: twee delen van elk van deze sets zorgen er ook voor dat opgelopen schade je spreuken niet meer vertraagt.',
   'guide.arenaPage.warfareTradeBodyRatingSpent':

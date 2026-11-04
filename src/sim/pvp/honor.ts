@@ -3,16 +3,20 @@
 
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
-import type { ArenaFormat, HonorArenaDailyState, HonorReason } from '../types';
+import type { ArenaFormat, HonorArenaDailyState, HonorReason, RankedArenaFormat } from '../types';
 import { doubleHonorActive, honorEventMultiplier } from './honor_event';
 
 export const RANKED_ARENA_WIN_HONOR = {
   '1v1': 25,
   '2v2': 50,
+  // Owner tuning 2026-11-04: a 3v3 win pays 75, the same 25-per-fighter step
+  // the two smaller brackets already climb by.
+  '3v3': 75,
 } as const;
 
 // What a ranked bout pays the side that did not win: one third of the bracket's
-// win award, rounded (1v1 pays 8, 2v2 pays 17). A draw pays this to both sides.
+// win award, rounded (1v1 pays 8, 2v2 pays 17, 3v3 pays 25). A draw pays this to
+// both sides.
 //
 // Ranked arena was the one PvP mode that paid a loss nothing at all, so a player
 // who queued and lost had no path toward Warfare gear except winning: rating is
@@ -32,6 +36,7 @@ export const ARENA_LOSS_HONOR_SHARE = 1 / 3;
 export const RANKED_ARENA_LOSS_HONOR = {
   '1v1': Math.round(RANKED_ARENA_WIN_HONOR['1v1'] * ARENA_LOSS_HONOR_SHARE),
   '2v2': Math.round(RANKED_ARENA_WIN_HONOR['2v2'] * ARENA_LOSS_HONOR_SHARE),
+  '3v3': Math.round(RANKED_ARENA_WIN_HONOR['3v3'] * ARENA_LOSS_HONOR_SHARE),
 } as const;
 
 export const FIESTA_KILL_HONOR = 20;
@@ -79,7 +84,20 @@ export const BATTLEGROUND_ASSIST_HONOR = 4;
 // in line with the delve daily (`meta.delveDaily.firstClearXp`,
 // src/sim/delves/runs.ts grantDelveClearTo), the one in-repo precedent, which
 // SWAPS one authored reward for another for a first/repeat ratio near 1.6x.
-export const BATTLEGROUND_FIRST_WIN_BONUS_HONOR = 40;
+//
+// Raised to 100 on 2026-11-04 (owner tuning), the same flat 100 every ranked
+// arena bracket now pays for its own first win (ARENA_FIRST_WIN_BONUS_HONOR
+// below), so all four PvP modes share one daily hook. The weekend event still
+// doubles it here, as it doubles every battleground award.
+export const BATTLEGROUND_FIRST_WIN_BONUS_HONOR = 100;
+
+// The first ranked WIN of each day pays this on top of the ordinary win award,
+// once per bracket: a player who wins a 1v1, a 2v2 and a 3v3 on the same day
+// collects it three times. Flat for the reason the battleground bonus above is
+// flat, never decayed (the first win of a bracket has no earlier win to repeat)
+// and never tapered (the daily taper caps routine wins, not the daily hook).
+// No weekend doubling: the Double Honor event is a battleground event only.
+export const ARENA_FIRST_WIN_BONUS_HONOR = 100;
 
 // Arena is especially easy to coordinate in 1v1, so only the first win against
 // the same opponent/team pays each UTC day. Fiesta uses softer decay because its
@@ -130,6 +148,18 @@ function normalizeCountRecord(value: unknown): Record<string, number> {
   return out;
 }
 
+const RANKED_FORMATS: readonly RankedArenaFormat[] = ['1v1', '2v2', '3v3'];
+
+export function isRankedArenaFormat(format: ArenaFormat): format is RankedArenaFormat {
+  return (RANKED_FORMATS as readonly ArenaFormat[]).includes(format);
+}
+
+function normalizeArenaFirstWins(value: unknown): { arenaFirstWinClaimed?: RankedArenaFormat[] } {
+  if (!Array.isArray(value)) return {};
+  const claimed = RANKED_FORMATS.filter((f) => value.includes(f));
+  return claimed.length > 0 ? { arenaFirstWinClaimed: claimed } : {};
+}
+
 export function normalizeHonorDailyState(value: unknown): HonorArenaDailyState | undefined {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return undefined;
   const record = value as Record<string, unknown>;
@@ -149,6 +179,9 @@ export function normalizeHonorDailyState(value: unknown): HonorArenaDailyState |
     // written before the bonus existed (or on a day that has not paid it) is
     // byte-equal to what it was. Any truthy stored value normalizes to `true`.
     ...(record.bgFirstWinClaimed ? { bgFirstWinClaimed: true } : {}),
+    // Same absent-until-claimed rule, as a de-duplicated list of the ranked
+    // brackets that have paid; anything that is not a ranked bracket id drops.
+    ...normalizeArenaFirstWins(record.arenaFirstWinClaimed),
     totalWins: normalizeHonorCounter(record.totalWins),
   };
 }
@@ -217,6 +250,7 @@ function dailyWindow(ctx: SimContext, meta: PlayerMeta) {
     // The new day re-arms the first-win bonus. `undefined` rather than `false`
     // for the same byte-equality reason.
     daily.bgFirstWinClaimed = undefined;
+    daily.arenaFirstWinClaimed = undefined;
     daily.totalWins = 0;
   }
   return daily;
@@ -278,7 +312,7 @@ export function awardRankedArenaResultHonor(
   opponentTeamKey: string,
   outcome: 'win' | 'loss' | 'draw',
 ): number {
-  if (format !== '1v1' && format !== '2v2') return 0;
+  if (!isRankedArenaFormat(format)) return 0;
   const daily = dailyWindow(ctx, meta);
   const key = `${format}:${opponentTeamKey}`;
   const won = outcome === 'win';
@@ -294,7 +328,16 @@ export function awardRankedArenaResultHonor(
     if (!daily.lossesByOpponent) daily.lossesByOpponent = {};
     daily.lossesByOpponent[key] = repeats + 1;
   }
-  return grantHonor(ctx, meta, amount, won ? 'arena_win' : 'arena_complete');
+  let total = grantHonor(ctx, meta, amount, won ? 'arena_win' : 'arena_complete');
+  // The bracket's first WIN of the day only: a loss or a draw never claims it.
+  if (won && !daily.arenaFirstWinClaimed?.includes(format)) {
+    const bonus = grantHonor(ctx, meta, ARENA_FIRST_WIN_BONUS_HONOR, 'arena_first_win');
+    // Spent only if it actually PAID (the honor-ceiling race, as for the
+    // battleground bonus).
+    if (bonus > 0) daily.arenaFirstWinClaimed = [...(daily.arenaFirstWinClaimed ?? []), format];
+    total += bonus;
+  }
+  return total;
 }
 
 /** What one played-out Thornhollow Fields result paid: the ordinary result award

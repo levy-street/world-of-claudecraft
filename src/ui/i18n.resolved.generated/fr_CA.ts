@@ -2650,7 +2650,8 @@ export const fr_CA: EnTranslations = {
       "launcherTitle": "JcJ",
       "mobileLabel": "JcJ",
       "bracket1v1": "1v1",
-      "bracket2v2": "2v2"
+      "bracket2v2": "2v2",
+      "bracket3v3": "3v3"
     },
     "bg": {
       "title": "Champs de Thornhollow",
@@ -3435,6 +3436,7 @@ export const fr_CA: EnTranslations = {
         "fiestaWin": "Victoire en Fiesta",
         "battlegroundWin": "victoire aux Champs de Thornhollow",
         "battlegroundFirstWin": "première victoire du jour aux Champs de Thornhollow",
+        "arenaFirstWin": "première victoire en arène du jour dans cette catégorie",
         "battlegroundComplete": "bataille des Champs de Thornhollow menée",
         "battlegroundKill": "élimination honorable",
         "battlegroundAssist": "coup fatal assisté",
@@ -10532,11 +10534,13 @@ export const fr_CA: EnTranslations = {
       "duelsBody": "Défiez en duel amical n'importe quel joueur que vous croisez. Rien n'est en jeu, sinon la fierté: c'est donc le moyen le plus simple d'apprendre un affrontement ou de régler un différend bon enfant.",
       "coliseumHeading": "Le Colisée de cendres",
       "coliseumBody": "Le Colisée est l'arène du royaume, où vous affrontez d'autres joueurs en matchs classés, en un contre un ou en deux contre deux. Chaque catégorie tient son propre classement, une victoire vous élève donc sur cette échelle à la vue de tout le royaume. Le jeu classé s'ouvre au niveau 15, et cela vaut aussi pour votre partenaire : si l'un de vous est en dessous, la file reste fermée jusqu'à ce que vous remplissiez tous les deux la condition. Tout le joueur contre joueur tient derrière un seul bouton, marqué JcJ : ouvrez-le et choisissez un onglet, Champs de Thornhollow, un contre un ou deux contre deux, puis inscrivez-vous seul ou avec votre partenaire. Tant que vous êtes en file ou en match, les autres onglets restent verrouillés, vous ne pouvez donc jamais être dans deux files à la fois.",
+      "coliseumBodyThreeBrackets": "Le Colisée est l'arène du royaume, où vous affrontez d'autres joueurs en matchs classés : en un contre un, en deux contre deux ou en trois contre trois. Chaque catégorie tient son propre classement, une victoire vous élève donc sur cette échelle à la vue de tout le royaume. Le jeu classé s'ouvre au niveau 15, et cela vaut pour tous ceux avec qui vous vous inscrivez : si quelqu'un de votre groupe est en dessous, la file reste fermée jusqu'à ce que vous remplissiez tous la condition. Tout le joueur contre joueur tient derrière un seul bouton, marqué JcJ : ouvrez-le et choisissez un onglet, Champs de Thornhollow, un contre un, deux contre deux ou trois contre trois, puis inscrivez-vous seul ou avec votre groupe. Tant que vous êtes en file ou en match, les autres onglets restent verrouillés, vous ne pouvez donc jamais être dans deux files à la fois. Un match en trois contre trois qui s'éternise use tout le monde : passé sa moitié, Usure réduit chaque seconde un peu plus les soins que reçoit chaque combattant, si bien qu'une impasse ne peut pas durer éternellement.",
       "ladderHeading": "Gravir l'échelle",
       "ladderBody": "Le jeu classé suit votre classement dans le temps. Consultez le classement pour voir où vous en êtes et qui tient le haut du royaume.",
       "rewardsHeading": "Ce que rapporte le jeu classé",
       "rewardsBody": "Une victoire classée rapporte de l'honneur, la monnaie du joueur contre joueur, et une défaite ne vous coûte rien d'autre que de la cote. L'honneur est pensé pour récompenser de vraies rencontres : battre à nouveau le même adversaire ou la même équipe le même jour ne rapporte plus rien, une longue journée de victoires rapporte un peu moins par victoire à mesure qu'elle avance, et un match abandonné par votre adversaire fait quand même évoluer votre cote mais ne rapporte aucun honneur. Cette journée est propre à l'honneur, et elle se renouvelle selon son propre cycle plutôt qu'avec la réinitialisation des instances du royaume.",
       "rewardsBodyLossShare": "Une victoire classée rapporte de l’Honneur, la monnaie joueur contre joueur, et une défaite jouée jusqu’au bout en rapporte encore une petite part, comme un match nul. La cote est donc le seul vrai coût d’une défaite. L’Honneur récompense les vrais matchs : battre le même adversaire ou la même équipe une seconde fois le même jour ne rapporte plus rien, pas plus qu’une nouvelle défaite contre eux. Une longue journée de victoires paie entièrement la première série, puis les gains sont divisés par deux, puis encore par deux plus loin, où ils restent. Un match abandonné par l’adversaire modifie quand même votre cote mais ne rapporte aucun Honneur. La journée du royaume se réinitialise à l’heure nocturne habituelle, la même limite qui efface les verrouillages quotidiens.",
+      "rewardsFirstWinBody": "Votre première victoire classée de chaque jour rapporte un bonus en plus, et chaque catégorie a le sien : une première victoire en un contre un, en deux contre deux et en trois contre trois en réclame chacune un. Une défaite ou un match nul ne le dépense jamais.",
       "honorHeading": "Honneur",
       "honorBody": "L'honneur est la monnaie du combat entre joueurs. Vous le gagnez au Colisée et sur les Champs de Thornhollow, il est tenu à l'écart de votre argent et ne s'y mélange jamais, et votre feuille de personnage indique combien vous en détenez. Il n'y a exactement qu'une chose sur laquelle le dépenser : l'équipement de Guerre.",
       "quartermastersBody": "Deux intendants tiennent les mêmes étals, alors faites affaire avec celui qui est le plus proche. FURIE, l'Intendant de l'honneur, se tient dans le Val d'Eastbrook, et le Maréchal de guerre Draven Kole, Maître des réserves de Guerre, tient le comptoir à Highwatch. Leur stock est le palier de Guerre : cinq familles d'armures, plus des colliers, des anneaux et des armes communs à toutes.",

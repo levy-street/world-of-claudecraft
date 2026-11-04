@@ -5306,6 +5306,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Ouvrez Métiers pour le sertir sur un outil de récolte.',
   'hudChrome.pvp.bracket1v1': '1v1',
   'hudChrome.pvp.bracket2v2': '2v2',
+  'hudChrome.pvp.bracket3v3': '3v3',
   'hudChrome.pvp.launcherTitle': 'JcJ',
   'hudChrome.pvp.mobileLabel': 'JcJ',
   'hudChrome.townFocus.respecCostFree': 'Gratuit',
@@ -5322,6 +5323,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.reasons.battlegroundComplete': 'bataille des Champs de Thornhollow menée',
   'hudChrome.warfare.reasons.battlegroundFirstWin':
     'première victoire du jour aux Champs de Thornhollow',
+  'hudChrome.warfare.reasons.arenaFirstWin':
+    'première victoire en arène du jour dans cette catégorie',
   'hudChrome.warfare.reasons.battlegroundKill': 'élimination honorable',
   'hudChrome.warfare.reasons.battlegroundWin': 'victoire aux Champs de Thornhollow',
   'hudChrome.warfareShop.buyAria': 'Acheter {item} pour {honor}',
@@ -12597,6 +12600,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Un trait de nature lancé sur une cible à distance, votre frappe de prédilection.',
   'guide.arenaPage.coliseumBody':
     "Le Colisée est l'arène du royaume, où vous affrontez d'autres joueurs en matchs classés, en un contre un ou en deux contre deux. Chaque catégorie tient son propre classement, une victoire vous élève donc sur cette échelle à la vue de tout le royaume. Le jeu classé s'ouvre au niveau 15, et cela vaut aussi pour votre partenaire : si l'un de vous est en dessous, la file reste fermée jusqu'à ce que vous remplissiez tous les deux la condition. Tout le joueur contre joueur tient derrière un seul bouton, marqué JcJ : ouvrez-le et choisissez un onglet, Champs de Thornhollow, un contre un ou deux contre deux, puis inscrivez-vous seul ou avec votre partenaire. Tant que vous êtes en file ou en match, les autres onglets restent verrouillés, vous ne pouvez donc jamais être dans deux files à la fois.",
+  'guide.arenaPage.coliseumBodyThreeBrackets':
+    "Le Colisée est l'arène du royaume, où vous affrontez d'autres joueurs en matchs classés : en un contre un, en deux contre deux ou en trois contre trois. Chaque catégorie tient son propre classement, une victoire vous élève donc sur cette échelle à la vue de tout le royaume. Le jeu classé s'ouvre au niveau 15, et cela vaut pour tous ceux avec qui vous vous inscrivez : si quelqu'un de votre groupe est en dessous, la file reste fermée jusqu'à ce que vous remplissiez tous la condition. Tout le joueur contre joueur tient derrière un seul bouton, marqué JcJ : ouvrez-le et choisissez un onglet, Champs de Thornhollow, un contre un, deux contre deux ou trois contre trois, puis inscrivez-vous seul ou avec votre groupe. Tant que vous êtes en file ou en match, les autres onglets restent verrouillés, vous ne pouvez donc jamais être dans deux files à la fois. Un match en trois contre trois qui s'éternise use tout le monde : passé sa moitié, Usure réduit chaque seconde un peu plus les soins que reçoit chaque combattant, si bien qu'une impasse ne peut pas durer éternellement.",
   'guide.arenaPage.coliseumHeading': 'Le Colisée de cendres',
   'guide.arenaPage.duelsBody':
     "Défiez en duel amical n'importe quel joueur que vous croisez. Rien n'est en jeu, sinon la fierté: c'est donc le moyen le plus simple d'apprendre un affrontement ou de régler un différend bon enfant.",
@@ -19930,6 +19935,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Les achats d’honneur sont définitifs. La liste de rachat ne contient que ce que vous avez vendu : un achat avec des pièces peut généralement être revendu à son prix de vente puis récupéré dans cette liste si vous changez encore d’avis, mais l’équipement de guerre devient lié à l’âme dès son achat. Il ne peut donc jamais être échangé, envoyé ou revendu, et n’atteint jamais cette liste. La boutique vous demande confirmation pour cette raison : examinez la pièce avant de cliquer.',
   'guide.arenaPage.rewardsBodyLossShare':
     'Une victoire classée rapporte de l’Honneur, la monnaie joueur contre joueur, et une défaite jouée jusqu’au bout en rapporte encore une petite part, comme un match nul. La cote est donc le seul vrai coût d’une défaite. L’Honneur récompense les vrais matchs : battre le même adversaire ou la même équipe une seconde fois le même jour ne rapporte plus rien, pas plus qu’une nouvelle défaite contre eux. Une longue journée de victoires paie entièrement la première série, puis les gains sont divisés par deux, puis encore par deux plus loin, où ils restent. Un match abandonné par l’adversaire modifie quand même votre cote mais ne rapporte aucun Honneur. La journée du royaume se réinitialise à l’heure nocturne habituelle, la même limite qui efface les verrouillages quotidiens.',
+  'guide.arenaPage.rewardsFirstWinBody':
+    'Votre première victoire classée de chaque jour rapporte un bonus en plus, et chaque catégorie a le sien : une première victoire en un contre un, en deux contre deux et en trois contre trois en réclame chacune un. Une défaite ou un match nul ne le dépense jamais.',
   'guide.arenaPage.warfareBodyStatsStay':
     "Chaque pièce de guerre porte une cote d’offensive de guerre et une cote de défense de guerre, et ces cotes n’ont absolument aucun effet contre les monstres. Elles ne s’appliquent que lorsque vous combattez un autre joueur, en duel, dans l’arène ou sur le champ de bataille : l’offensive augmente les dégâts infligés et la défense réduit les dégâts reçus, chacune jusqu’à son propre plafond. Chaque famille d’armure est aussi un ensemble, dont les bonus sont également des cotes ou des effets qui ne fonctionnent que contre les joueurs. Les bonus d’un équipement d’honneur complet ne comptent donc pas contre un boss de donjon. Les pièces gardent leurs statistiques ordinaires, leur armure et leurs dégâts d’arme, qui fonctionnent partout ; seules les cotes et les bonus d’ensemble restent inactifs contre les monstres. Une exception fonctionne partout : deux pièces de n'importe lequel de ces ensembles empêchent aussi les dégâts subis de retarder vos incantations.",
   'guide.arenaPage.warfareTradeBodyRatingSpent':

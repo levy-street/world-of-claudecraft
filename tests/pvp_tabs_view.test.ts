@@ -2,7 +2,7 @@
 // display order with Thornhollow Fields primary, busy-state derivation from BOTH world
 // shapes (offline Sim and ClientWorld mirror), pinning and locking, and the
 // dev-only edge where a retired bracket is live. The World PvP flag tab is a
-// fourth, non-queue tab: never pinned, never locked.
+// fifth, non-queue tab: never pinned, never locked.
 import { describe, expect, it } from 'vitest';
 import { buildPvpTabs, PVP_TABS, type PvpTabsInput } from '../src/ui/pvp_tabs_view';
 
@@ -13,10 +13,10 @@ const idle = (selected: PvpTabsInput['selected'] = 'ravenrift'): PvpTabsInput =>
 });
 
 describe('pvp tabs: order, pinning, locking', () => {
-  it('offers exactly Thornhollow Fields, 1v1, 2v2, World PvP, in that order, Thornhollow Fields primary', () => {
-    expect(PVP_TABS).toEqual(['ravenrift', '1v1', '2v2', 'world']);
+  it('offers exactly Thornhollow Fields, 1v1, 2v2, 3v3, World PvP, in that order, Thornhollow Fields primary', () => {
+    expect(PVP_TABS).toEqual(['ravenrift', '1v1', '2v2', '3v3', 'world']);
     const m = buildPvpTabs(idle());
-    expect(m.tabs.map((tab) => tab.id)).toEqual(['ravenrift', '1v1', '2v2', 'world']);
+    expect(m.tabs.map((tab) => tab.id)).toEqual(['ravenrift', '1v1', '2v2', '3v3', 'world']);
   });
 
   it('the World PvP tab never locks while a queue or match pins another tab', () => {
@@ -53,11 +53,11 @@ describe('pvp tabs: order, pinning, locking', () => {
     expect(m.tabs.every((tab) => !tab.locked)).toBe(true);
   });
 
-  it('a queued battleground pins Thornhollow Fields and locks both arena tabs', () => {
+  it('a queued battleground pins Thornhollow Fields and locks every arena tab', () => {
     const m = buildPvpTabs({ ...idle('1v1'), bg: { queued: true, match: null } });
     expect(m.active).toBe('ravenrift');
     expect(m.commit).toBe(true);
-    expect(m.tabs.filter((tab) => tab.locked).map((tab) => tab.id)).toEqual(['1v1', '2v2']);
+    expect(m.tabs.filter((tab) => tab.locked).map((tab) => tab.id)).toEqual(['1v1', '2v2', '3v3']);
   });
 
   it('a live battleground match pins Thornhollow Fields too (the match field alone)', () => {
@@ -76,7 +76,25 @@ describe('pvp tabs: order, pinning, locking', () => {
     });
     expect(m.active).toBe('2v2');
     expect(m.commit).toBe(true);
-    expect(m.tabs.filter((tab) => tab.locked).map((tab) => tab.id)).toEqual(['ravenrift', '1v1']);
+    expect(m.tabs.filter((tab) => tab.locked).map((tab) => tab.id)).toEqual([
+      'ravenrift',
+      '1v1',
+      '3v3',
+    ]);
+  });
+
+  it('a queued 3v3 pins the 3v3 tab and locks the other queue tabs', () => {
+    const m = buildPvpTabs({
+      ...idle('1v1'),
+      arena: { queued: true, format: '3v3', match: null },
+    });
+    expect(m.active).toBe('3v3');
+    expect(m.commit).toBe(true);
+    expect(m.tabs.filter((tab) => tab.locked).map((tab) => tab.id)).toEqual([
+      'ravenrift',
+      '1v1',
+      '2v2',
+    ]);
   });
 
   it('a live arena match pins by the MATCH format, not the stale queued format', () => {
@@ -104,7 +122,11 @@ describe('pvp tabs: order, pinning, locking', () => {
     });
     expect(m.active).toBe('1v1');
     expect(m.commit).toBe(false);
-    expect(m.tabs.filter((tab) => tab.locked).map((tab) => tab.id)).toEqual(['ravenrift', '2v2']);
+    expect(m.tabs.filter((tab) => tab.locked).map((tab) => tab.id)).toEqual([
+      'ravenrift',
+      '2v2',
+      '3v3',
+    ]);
   });
 
   it('produces identical strips from a Sim-shaped and a mirror-shaped snapshot', () => {

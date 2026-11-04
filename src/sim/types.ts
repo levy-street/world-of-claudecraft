@@ -142,6 +142,9 @@ export type HonorReason =
   // The once-per-UTC-day first Thornhollow Fields win bonus, paid as its own
   // grant beside the ordinary win award so the float and the chat line name it.
   | 'battleground_first_win'
+  // The once-per-day first ranked arena win bonus, one per bracket (1v1, 2v2,
+  // 3v3), paid as its own grant beside the ordinary win award.
+  | 'arena_first_win'
   | 'battleground_complete'
   | 'battleground_kill'
   | 'battleground_assist'
@@ -180,6 +183,9 @@ export interface HonorArenaDailyState {
   // It rides THIS window rather than a state of its own because the window already
   // owns the UTC date string and the one rollover that clears every daily counter.
   bgFirstWinClaimed?: boolean;
+  // The ranked brackets whose first-win-of-the-day bonus has been paid for
+  // `date`. Same absent-until-claimed rule as bgFirstWinClaimed above.
+  arenaFirstWinClaimed?: RankedArenaFormat[];
   totalWins: number;
 }
 // Shared cooldown across ALL combat potions (classic-era potion sickness): one
@@ -331,11 +337,13 @@ export const MELEE_CLASSES: ReadonlySet<PlayerClass> = new Set([
 export function isPetClass(cls: PlayerClass): boolean {
   return cls === 'hunter' || cls === 'warlock' || cls === 'mage';
 }
-// '1v1'/'2v2' are the ranked Ashen Coliseum ladders; 'fiesta' is the
+// '1v1'/'2v2'/'3v3' are the ranked Ashen Coliseum ladders; 'fiesta' is the
 // dopamine-maxxed 2v2 party mode (score-based, respawns, augments, a shrinking
 // ring); see docs/design and the Fiesta region of sim.ts. yumi3/yumi5 are the
 // Protect Yumi maze objective brackets (3v3 / 5v5, unranked; social/yumi.ts).
-export type ArenaFormat = '1v1' | '2v2' | 'fiesta' | 'yumi3' | 'yumi5';
+export type ArenaFormat = '1v1' | '2v2' | '3v3' | 'fiesta' | 'yumi3' | 'yumi5';
+// The ranked brackets: the ones that keep a rating, a ladder, and Honor awards.
+export type RankedArenaFormat = '1v1' | '2v2' | '3v3';
 
 export type DungeonDifficulty = 'normal' | 'heroic';
 

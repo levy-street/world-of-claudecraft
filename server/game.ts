@@ -7186,13 +7186,15 @@ export class GameServer {
         const fmt =
           msg.format === '2v2'
             ? '2v2'
-            : msg.format === 'fiesta'
-              ? 'fiesta'
-              : msg.format === 'yumi3'
-                ? 'yumi3'
-                : msg.format === 'yumi5'
-                  ? 'yumi5'
-                  : '1v1';
+            : msg.format === '3v3'
+              ? '3v3'
+              : msg.format === 'fiesta'
+                ? 'fiesta'
+                : msg.format === 'yumi3'
+                  ? 'yumi3'
+                  : msg.format === 'yumi5'
+                    ? 'yumi5'
+                    : '1v1';
         sim.arenaQueueJoin(pid, fmt);
         // ARENA_WIRE_HZ throttles the `arena` self key to once per 10s (the
         // #940 perf fix for the uncached arenaLadder() sort), so without this

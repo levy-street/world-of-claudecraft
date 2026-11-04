@@ -5106,6 +5106,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Mở Nghề Nghiệp để gắn cái này vào một công cụ thu thập.',
   'hudChrome.pvp.bracket1v1': '1v1',
   'hudChrome.pvp.bracket2v2': '2v2',
+  'hudChrome.pvp.bracket3v3': '3v3',
   'hudChrome.pvp.launcherTitle': 'PvP',
   'hudChrome.pvp.mobileLabel': 'PvP',
   'hudChrome.townFocus.respecCostFree': 'Miễn Phí',
@@ -5122,6 +5123,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.reasons.battlegroundComplete': 'trận Cánh Đồng Trũng Gai đã đấu',
   'hudChrome.warfare.reasons.battlegroundFirstWin':
     'chiến thắng Cánh Đồng Trũng Gai đầu tiên hôm nay',
+  'hudChrome.warfare.reasons.arenaFirstWin': 'chiến thắng đấu trường đầu tiên hôm nay ở hạng này',
   'hudChrome.warfare.reasons.battlegroundKill': 'hạ gục vinh dự',
   'hudChrome.warfare.reasons.battlegroundWin': 'chiến thắng Cánh Đồng Trũng Gai',
   'hudChrome.warfareShop.buyAria': 'Mua {item} với giá {honor}',
@@ -10632,6 +10634,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Một tia tự nhiên ném vào mục tiêu từ xa, đòn chủ lực quen thuộc của bạn.',
   'guide.arenaPage.coliseumBody':
     'Đấu Trường La Mã là đấu trường của máy chủ, nơi bạn đối đầu người chơi khác trong các trận xếp hạng, một chọi một hoặc hai chọi hai. Mỗi hạng giữ bảng xếp riêng, nên một chiến thắng nâng bạn lên nấc thang ấy cho cả máy chủ trông thấy. Đấu xếp hạng mở ở cấp 15, và điều đó áp cả cho bạn đồng đội: nếu một trong hai người còn dưới mức ấy, hàng chờ vẫn đóng cho tới khi cả hai đủ điều kiện. Toàn bộ phần người chơi đấu người chơi nằm sau một nút duy nhất, ghi PvP: mở nó ra và chọn một thẻ, Cánh Đồng Trũng Gai, một chọi một hoặc hai chọi hai, rồi đăng ký một mình hoặc cùng bạn đồng đội. Trong lúc bạn đang xếp hàng hoặc đang trong trận, các thẻ khác vẫn khóa, nên bạn không bao giờ có thể ở trong hai hàng chờ cùng lúc.',
+  'guide.arenaPage.coliseumBodyThreeBrackets':
+    'Đấu Trường La Mã là đấu trường của máy chủ, nơi bạn đối đầu người chơi khác trong các trận xếp hạng: một chọi một, hai chọi hai hoặc ba chọi ba. Mỗi hạng giữ bảng xếp riêng, nên một chiến thắng nâng bạn lên nấc thang ấy cho cả máy chủ trông thấy. Đấu xếp hạng mở ở cấp 15, và điều đó áp cho mọi người cùng xếp hàng với bạn: nếu có ai trong nhóm còn dưới mức ấy, hàng chờ vẫn đóng cho tới khi tất cả đủ điều kiện. Toàn bộ phần người chơi đấu người chơi nằm sau một nút duy nhất, ghi PvP: mở nó ra và chọn một thẻ, Cánh Đồng Trũng Gai, một chọi một, hai chọi hai hoặc ba chọi ba, rồi đăng ký một mình hoặc cùng nhóm của bạn. Trong lúc bạn đang xếp hàng hoặc đang trong trận, các thẻ khác vẫn khóa, nên bạn không bao giờ có thể ở trong hai hàng chờ cùng lúc. Một trận ba chọi ba kéo dài sẽ bào mòn tất cả: quá nửa trận, Hao Mòn cắt bớt lượng hồi máu mà mỗi đấu sĩ nhận được thêm một chút mỗi giây, nên thế bế tắc không thể kéo dài mãi.',
   'guide.arenaPage.coliseumHeading': 'Đấu Trường Tro Tàn',
   'guide.arenaPage.duelsBody':
     'Thách đấu giao hữu bất kỳ người chơi nào bạn gặp. Chẳng có gì đặt cược ngoài lòng tự tôn, nên đây là cách dễ nhất để học một thế đối đầu hay phân định một cuộc tranh luận thân tình.',
@@ -19501,6 +19505,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Mua bằng Danh Dự là quyết định cuối cùng. Danh sách mua lại chỉ giữ những món bạn đã bán: món mua bằng tiền thường có thể bán lại theo giá bán của nó rồi mua lại từ danh sách nếu bạn đổi ý lần nữa. Nhưng trang bị Chiến Trận ràng buộc ngay khi mua, nên không thể giao dịch, gửi thư hay bán lại lấy bất cứ thứ gì, và không bao giờ xuất hiện trong danh sách đó. Vì vậy cửa hàng mới yêu cầu xác nhận: hãy đọc kỹ món đồ trước khi bấm.',
   'guide.arenaPage.rewardsBodyLossShare':
     'Thắng trận xếp hạng nhận Danh Dự, tiền tệ PvP. Một trận thua chơi đến hết vẫn nhận phần nhỏ hơn, hòa cũng vậy, nên thứ thực sự mất khi thua chỉ là điểm xếp hạng. Danh Dự thưởng cho những trận đấu thực sự: đánh bại cùng một đối thủ hoặc đội lần nữa trong cùng ngày không nhận thêm gì, thua họ lần nữa cũng vậy. Trong ngày thắng nhiều, giai đoạn đầu nhận đủ thưởng, sau đó thưởng mỗi trận thắng giảm một nửa, rồi giảm thêm một nửa khi thắng nhiều hơn nữa và giữ ở mức đó. Đối thủ bỏ cuộc vẫn làm thay đổi điểm xếp hạng nhưng không cho Danh Dự. Ngày được tính theo máy chủ: chuyển ngày vào giờ đặt lại mỗi đêm, cùng mốc xóa mọi giới hạn hằng ngày.',
+  'guide.arenaPage.rewardsFirstWinBody':
+    'Trận thắng xếp hạng đầu tiên mỗi ngày của bạn trả thêm một khoản thưởng, và mỗi hạng có khoản riêng: trận thắng đầu tiên ở một chọi một, hai chọi hai và ba chọi ba mỗi trận nhận một khoản. Một trận thua hay hòa không bao giờ tiêu mất nó.',
   'guide.arenaPage.warfareBodyStatsStay':
     'Mọi món Chiến Trận đều có Điểm Tấn Công Chiến Trận và Điểm Phòng Thủ Chiến Trận; hai chỉ số này hoàn toàn không tác dụng với quái vật. Chúng chỉ áp dụng khi đánh người chơi khác trong đấu tay đôi, đấu trường hoặc chiến trường: Tấn Công tăng sát thương gây ra, Phòng Thủ giảm sát thương nhận vào, mỗi loại có giới hạn riêng. Mỗi dòng giáp cũng là một bộ; thưởng bộ cũng là điểm Chiến Trận hoặc hiệu ứng chỉ tác dụng với người chơi, nên thưởng của cả bộ Danh Dự không có tác dụng với trùm phó bản. Bản thân các món vẫn có chỉ số thường, giáp và sát thương vũ khí hoạt động ở mọi nơi; chỉ điểm Chiến Trận và thưởng bộ ngừng tác dụng khi đánh quái. Có một ngoại lệ hoạt động ở mọi nơi: hai món của bất kỳ bộ nào trong số này còn khiến sát thương phải chịu không làm chậm việc thi triển phép nữa.',
   'guide.arenaPage.warfareTradeBodyRatingSpent':

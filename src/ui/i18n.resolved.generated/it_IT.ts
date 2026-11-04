@@ -2650,7 +2650,8 @@ export const it_IT: EnTranslations = {
       "launcherTitle": "PvP",
       "mobileLabel": "PvP",
       "bracket1v1": "1c1",
-      "bracket2v2": "2c2"
+      "bracket2v2": "2c2",
+      "bracket3v3": "3c3"
     },
     "bg": {
       "title": "Campi di Thornhollow",
@@ -3435,6 +3436,7 @@ export const it_IT: EnTranslations = {
         "fiestaWin": "Vittoria nella Fiesta",
         "battlegroundWin": "vittoria ai Campi di Thornhollow",
         "battlegroundFirstWin": "prima vittoria di oggi ai Campi di Thornhollow",
+        "arenaFirstWin": "prima vittoria in arena di oggi in questa categoria",
         "battlegroundComplete": "battaglia dei Campi di Thornhollow combattuta",
         "battlegroundKill": "uccisione onorevole",
         "battlegroundAssist": "assistenza al colpo di grazia",
@@ -10532,11 +10534,13 @@ export const it_IT: EnTranslations = {
       "duelsBody": "Sfida a duello amichevole qualsiasi giocatore che incontri. In palio non c'è altro che l'orgoglio, quindi è il modo più semplice per imparare uno scontro o risolvere una disputa amichevole.",
       "coliseumHeading": "Il Colosseo di Cenere",
       "coliseumBody": "Il Colosseo è l'arena del reame, dove affronti altri giocatori in incontri classificati, uno contro uno o due contro due. Ogni categoria tiene la propria classifica, quindi una vittoria ti solleva su quella scala sotto gli occhi di tutto il reame. Il gioco classificato si apre al livello 15, e vale anche per il tuo compagno: se uno dei due è sotto, la coda resta chiusa finché non vi qualificate entrambi. Tutto il giocatore contro giocatore sta dietro un unico pulsante, marcato GcG: aprilo e scegli una linguetta, Campi di Thornhollow, uno contro uno o due contro due, poi iscriviti da solo o con il tuo compagno. Mentre sei in coda o in un incontro, le altre linguette restano bloccate, così non puoi mai stare in due code alla volta.",
+      "coliseumBodyThreeBrackets": "Il Colosseo è l'arena del reame, dove affronti altri giocatori in incontri classificati: uno contro uno, due contro due o tre contro tre. Ogni categoria tiene la propria classifica, quindi una vittoria ti solleva su quella scala sotto gli occhi di tutto il reame. Il gioco classificato si apre al livello 15, e vale per chiunque entri in coda con te: se qualcuno del tuo gruppo è sotto, la coda resta chiusa finché non vi qualificate tutti. Tutto il giocatore contro giocatore sta dietro un unico pulsante, marcato GcG: aprilo e scegli una linguetta, Campi di Thornhollow, uno contro uno, due contro due o tre contro tre, poi iscriviti da solo o con il tuo gruppo. Mentre sei in coda o in un incontro, le altre linguette restano bloccate, così non puoi mai stare in due code alla volta. Un incontro tre contro tre che si trascina logora tutti: superata la sua metà, Logoramento riduce ogni secondo un po' di più le cure che ogni combattente riceve, così uno stallo non può durare per sempre.",
       "ladderHeading": "Scalare la classifica",
       "ladderBody": "Il gioco classificato traccia la tua posizione nel tempo. Controlla la classifica per vedere dove ti trovi e chi domina la vetta del reame.",
       "rewardsHeading": "Cosa paga il gioco classificato",
       "rewardsBody": "Una vittoria classificata paga Onore, la moneta del giocatore contro giocatore, e una sconfitta non ti costa altro che indice. L'Onore è pensato per premiare incontri autentici: battere di nuovo lo stesso avversario o la stessa squadra nello stesso giorno non paga più nulla, una lunga giornata di vittorie rende un po' meno per ogni vittoria man mano che procede, e una partita che il tuo avversario abbandona muove comunque il tuo indice ma non paga alcun Onore. Quella giornata appartiene solo all'Onore, e si rinnova secondo un proprio ciclo orario, non con il ripristino delle istanze del reame.",
       "rewardsBodyLossShare": "Una vittoria classificata paga Onore, la valuta giocatore contro giocatore, e anche una sconfitta giocata fino alla fine paga una parte minore, così la valutazione è l’unico vero costo della sconfitta. L’Onore serve a ricompensare partite reali: battere di nuovo lo stesso avversario o la stessa squadra nello stesso giorno non paga altro, e nemmeno perdere di nuovo contro di loro; una lunga giornata di vittorie paga per intero la prima serie, poi dimezza la ricompensa, la dimezza ancora più avanti e resta a quel livello, mentre una partita abbandonata dall’avversario muove comunque la valutazione ma non paga Onore. Il giorno è quello del reame: ricomincia all’ora del reset notturno, lo stesso confine in cui si azzerano tutti i blocchi giornalieri.",
+      "rewardsFirstWinBody": "La tua prima vittoria classificata di ogni giorno paga un bonus in più, e ogni categoria ha il suo: una prima vittoria nell’uno contro uno, nel due contro due e nel tre contro tre ne reclama uno ciascuna. Una sconfitta o un pareggio non lo consumano mai.",
       "honorHeading": "Onore",
       "honorBody": "L'Onore è la moneta che si guadagna combattendo altri giocatori. Lo ottieni nel Colosseo e nei Campi di Thornhollow, viene tenuto separato dalle tue monete e non si mescola mai con esse, e la tua scheda del personaggio mostra quanto ne possiedi. C'è esattamente una cosa su cui spenderlo: l'equipaggiamento da Guerra.",
       "quartermastersBody": "Due quartiermastri tengono gli stessi scaffali, quindi commercia con quello più vicino a te. FURIA, il Quartiermastro d'Onore, si trova nella Valle di Eastbrook, mentre il Guerramaresciallo Draven Kole, Maestro del Negozio della Guerra, tiene banco a Highwatch. Il loro assortimento è il livello Guerra: cinque famiglie di armature, più collane, anelli e armi condivisi tra tutte.",

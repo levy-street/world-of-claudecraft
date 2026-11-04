@@ -78,6 +78,7 @@ export {
 export {
   ARENA_DAILY_TAPER_FLOOR_START,
   ARENA_DAILY_TAPER_START,
+  ARENA_FIRST_WIN_BONUS_HONOR,
   ARENA_LOSS_HONOR_SHARE,
   ARENA_REPEAT_DR,
   arenaRepeatHonorMultiplier,
@@ -102,6 +103,7 @@ export {
   grantHonor,
   HONOR_REPEAT_DR,
   honorTeamIdentity,
+  isRankedArenaFormat,
   normalizeHonorCounter,
   normalizeHonorDailyState,
   RANKED_ARENA_LOSS_HONOR,

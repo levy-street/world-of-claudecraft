@@ -2650,7 +2650,8 @@ export const da_DK: EnTranslations = {
       "launcherTitle": "PvP",
       "mobileLabel": "PvP",
       "bracket1v1": "1v1",
-      "bracket2v2": "2v2"
+      "bracket2v2": "2v2",
+      "bracket3v3": "3v3"
     },
     "bg": {
       "title": "Tornehulemarkerne",
@@ -3435,6 +3436,7 @@ export const da_DK: EnTranslations = {
         "fiestaWin": "Fiesta-sejr",
         "battlegroundWin": "sejr i Tornehulemarkerne",
         "battlegroundFirstWin": "første sejr i Tornehulemarkerne i dag",
+        "arenaFirstWin": "første arenasejr i dag i denne klasse",
         "battlegroundComplete": "kamp udkæmpet i Tornehulemarkerne",
         "battlegroundKill": "hæderligt drab",
         "battlegroundAssist": "medvirket til dræbende slag",
@@ -10532,11 +10534,13 @@ export const da_DK: EnTranslations = {
       "duelsBody": "Udfordr enhver spiller du møder til en venskabelig duel. Intet andet end stolthed står på spil, så det er den nemmeste måde at lære en kamp at kende eller bilægge en venskabelig uenighed.",
       "coliseumHeading": "Det Askegrå Colosseum",
       "coliseumBody": "Kolosseum er rigets arena, hvor du møder andre spillere i rangerede kampe, en mod en eller to mod to. Hver klasse holder sin egen stilling, så en sejr løfter dig på den stige for hele riget at se. Rangeret spil åbner på niveau 15, og det gælder også din makker: er en af jer under det, står køen lukket, indtil I begge kvalificerer jer. Alt spiller mod spiller bor bag én knap, mærket PvP: åbn den og vælg et faneblad, Tornehulemarkerne, en mod en eller to mod to, og meld dig så til alene eller sammen med din makker. Mens du står i kø eller er i en kamp, forbliver de andre faneblade låst, så du kan aldrig stå i to køer på én gang.",
+      "coliseumBodyThreeBrackets": "Kolosseum er rigets arena, hvor du møder andre spillere i rangerede kampe: en mod en, to mod to eller tre mod tre. Hver klasse holder sin egen stilling, så en sejr løfter dig på den stige for hele riget at se. Rangeret spil åbner på niveau 15, og det gælder alle, du stiller op sammen med: er nogen i din gruppe under det, står køen lukket, indtil I alle kvalificerer jer. Alt spiller mod spiller bor bag én knap, mærket PvP: åbn den og vælg et faneblad, Tornehulemarkerne, en mod en, to mod to eller tre mod tre, og meld dig så til alene eller sammen med din gruppe. Mens du står i kø eller er i en kamp, forbliver de andre faneblade låst, så du kan aldrig stå i to køer på én gang. En tre mod tre-kamp, der trækker ud, slider alle ned: efter halvvejs skærer Udmattelse lidt mere hvert sekund i den helbredelse, hver kæmper modtager, så et dødvande kan ikke vare evigt.",
       "ladderHeading": "At klatre op ad rangstigen",
       "ladderBody": "Rangeret spil følger din placering over tid. Tjek ranglisten for at se hvor du ligger og hvem der holder toppen af riget.",
       "rewardsHeading": "Hvad rangeret spil betaler",
       "rewardsBody": "En rangeret sejr udbetaler Ære, valutaen for spiller mod spiller, og et nederlag koster dig intet andet end rating. Ære skal belønne rigtige kampe: at besejre den samme modstander eller det samme hold igen samme dag udbetaler ikke mere, en lang sejrsdag udbetaler lidt mindre pr. sejr, efterhånden som den skrider frem, og en kamp din modstander opgiver flytter stadig din rating, men udbetaler slet ingen Ære. Den dag er Æres egen, og den nulstiller efter sit eget ur snarere end med rigets instans-nulstilling.",
       "rewardsBodyLossShare": "En sejr i ranglisten giver Ære, spiller-mod-spiller-valutaen, og et nederlag, du spiller til ende, giver stadig en mindre andel, ligesom uafgjort gør, så rang er det eneste, et nederlag virkelig koster dig. Ære skal belønne rigtige kampe: at besejre den samme modstander eller det samme hold igen samme dag giver ikke mere (og det gør et nyt nederlag mod dem heller ikke), en lang sejrsdag giver fuld betaling for dagens første række sejre og halverer derefter sejrsbetalingen, halverer den igen længere inde og bliver der, og en kamp, som modstanderen opgiver, flytter stadig din rang, men giver slet ingen Ære. Dagen følger rigets egen tid: Den skifter ved rigets natlige nulstilling, den samme grænse hvor alle daglige lockouts ryddes.",
+      "rewardsFirstWinBody": "Din første rangerede sejr hver dag udbetaler en bonus oveni, og hver klasse har sin egen: en første sejr i en mod en, i to mod to og i tre mod tre henter hver sin. Et nederlag eller uafgjort bruger den aldrig.",
       "honorHeading": "Ære",
       "honorBody": "Ære er valutaen for at kæmpe mod andre spillere. Du optjener den i Coliseum og ude på Tornehulemarkerne, den holdes adskilt fra dine mønter og blandes aldrig med dem, og dit karakterark viser, hvor meget du har liggende. Der er præcis én ting at bruge den på: Krigsførelsesudstyr.",
       "quartermastersBody": "To kvartermestre fører de samme varer, så handl med den, der er nærmest. RASERI, Æreskvartermesteren, står i Østbæk Dal, og Krigsmarskal Draven Kole, Mester af Krigsførelseslageret, passer disken i Højvagt. Deres sortiment er Krigsførelsesudstyret: fem rustningsfamilier, plus halskæder, ringe og våben, der er fælles for dem alle.",

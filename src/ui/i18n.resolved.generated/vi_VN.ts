@@ -2650,7 +2650,8 @@ export const vi_VN: EnTranslations = {
       "launcherTitle": "PvP",
       "mobileLabel": "PvP",
       "bracket1v1": "1v1",
-      "bracket2v2": "2v2"
+      "bracket2v2": "2v2",
+      "bracket3v3": "3v3"
     },
     "bg": {
       "title": "Cánh Đồng Trũng Gai",
@@ -3435,6 +3436,7 @@ export const vi_VN: EnTranslations = {
         "fiestaWin": "Chiến thắng Fiesta",
         "battlegroundWin": "chiến thắng Cánh Đồng Trũng Gai",
         "battlegroundFirstWin": "chiến thắng Cánh Đồng Trũng Gai đầu tiên hôm nay",
+        "arenaFirstWin": "chiến thắng đấu trường đầu tiên hôm nay ở hạng này",
         "battlegroundComplete": "trận Cánh Đồng Trũng Gai đã đấu",
         "battlegroundKill": "hạ gục vinh dự",
         "battlegroundAssist": "hỗ trợ đòn hạ gục",
@@ -10532,11 +10534,13 @@ export const vi_VN: EnTranslations = {
       "duelsBody": "Thách đấu giao hữu bất kỳ người chơi nào bạn gặp. Chẳng có gì đặt cược ngoài lòng tự tôn, nên đây là cách dễ nhất để học một thế đối đầu hay phân định một cuộc tranh luận thân tình.",
       "coliseumHeading": "Đấu Trường Tro Tàn",
       "coliseumBody": "Đấu Trường La Mã là đấu trường của máy chủ, nơi bạn đối đầu người chơi khác trong các trận xếp hạng, một chọi một hoặc hai chọi hai. Mỗi hạng giữ bảng xếp riêng, nên một chiến thắng nâng bạn lên nấc thang ấy cho cả máy chủ trông thấy. Đấu xếp hạng mở ở cấp 15, và điều đó áp cả cho bạn đồng đội: nếu một trong hai người còn dưới mức ấy, hàng chờ vẫn đóng cho tới khi cả hai đủ điều kiện. Toàn bộ phần người chơi đấu người chơi nằm sau một nút duy nhất, ghi PvP: mở nó ra và chọn một thẻ, Cánh Đồng Trũng Gai, một chọi một hoặc hai chọi hai, rồi đăng ký một mình hoặc cùng bạn đồng đội. Trong lúc bạn đang xếp hàng hoặc đang trong trận, các thẻ khác vẫn khóa, nên bạn không bao giờ có thể ở trong hai hàng chờ cùng lúc.",
+      "coliseumBodyThreeBrackets": "Đấu Trường La Mã là đấu trường của máy chủ, nơi bạn đối đầu người chơi khác trong các trận xếp hạng: một chọi một, hai chọi hai hoặc ba chọi ba. Mỗi hạng giữ bảng xếp riêng, nên một chiến thắng nâng bạn lên nấc thang ấy cho cả máy chủ trông thấy. Đấu xếp hạng mở ở cấp 15, và điều đó áp cho mọi người cùng xếp hàng với bạn: nếu có ai trong nhóm còn dưới mức ấy, hàng chờ vẫn đóng cho tới khi tất cả đủ điều kiện. Toàn bộ phần người chơi đấu người chơi nằm sau một nút duy nhất, ghi PvP: mở nó ra và chọn một thẻ, Cánh Đồng Trũng Gai, một chọi một, hai chọi hai hoặc ba chọi ba, rồi đăng ký một mình hoặc cùng nhóm của bạn. Trong lúc bạn đang xếp hàng hoặc đang trong trận, các thẻ khác vẫn khóa, nên bạn không bao giờ có thể ở trong hai hàng chờ cùng lúc. Một trận ba chọi ba kéo dài sẽ bào mòn tất cả: quá nửa trận, Hao Mòn cắt bớt lượng hồi máu mà mỗi đấu sĩ nhận được thêm một chút mỗi giây, nên thế bế tắc không thể kéo dài mãi.",
       "ladderHeading": "Leo Bảng Xếp Hạng",
       "ladderBody": "Chế độ xếp hạng theo dõi thứ hạng của bạn theo thời gian. Xem bảng xếp hạng để biết bạn đang ở đâu và ai đang đứng đầu vương quốc.",
       "rewardsHeading": "Chế Độ Xếp Hạng Trả Gì",
       "rewardsBody": "Một chiến thắng xếp hạng trả Danh dự, đồng tiền của việc người chơi đấu người chơi, còn một thất bại không tốn của bạn gì ngoài điểm xếp hạng. Danh dự được thiết kế để thưởng cho những trận đấu thực sự: đánh bại cùng một đối thủ hay cùng một đội lần nữa trong cùng một ngày sẽ không trả thêm gì nữa, một ngày thắng dài sẽ trả ít Danh dự hơn một chút cho mỗi trận thắng khi nó kéo dài, và một trận đấu mà đối thủ của bạn bỏ cuộc vẫn thay đổi điểm xếp hạng của bạn nhưng không trả Danh dự nào cả. Ngày đó là ngày riêng của Danh dự, và nó tự làm mới theo đồng hồ riêng chứ không theo giờ đặt lại instance của vương quốc.",
       "rewardsBodyLossShare": "Thắng trận xếp hạng nhận Danh Dự, tiền tệ PvP. Một trận thua chơi đến hết vẫn nhận phần nhỏ hơn, hòa cũng vậy, nên thứ thực sự mất khi thua chỉ là điểm xếp hạng. Danh Dự thưởng cho những trận đấu thực sự: đánh bại cùng một đối thủ hoặc đội lần nữa trong cùng ngày không nhận thêm gì, thua họ lần nữa cũng vậy. Trong ngày thắng nhiều, giai đoạn đầu nhận đủ thưởng, sau đó thưởng mỗi trận thắng giảm một nửa, rồi giảm thêm một nửa khi thắng nhiều hơn nữa và giữ ở mức đó. Đối thủ bỏ cuộc vẫn làm thay đổi điểm xếp hạng nhưng không cho Danh Dự. Ngày được tính theo máy chủ: chuyển ngày vào giờ đặt lại mỗi đêm, cùng mốc xóa mọi giới hạn hằng ngày.",
+      "rewardsFirstWinBody": "Trận thắng xếp hạng đầu tiên mỗi ngày của bạn trả thêm một khoản thưởng, và mỗi hạng có khoản riêng: trận thắng đầu tiên ở một chọi một, hai chọi hai và ba chọi ba mỗi trận nhận một khoản. Một trận thua hay hòa không bao giờ tiêu mất nó.",
       "honorHeading": "Danh Dự",
       "honorBody": "Danh dự là đồng tiền của việc chiến đấu với người chơi khác. Bạn kiếm được nó tại Đấu Trường Tro Tàn và ngoài Cánh Đồng Trũng Gai, nó được giữ tách biệt với tiền vàng của bạn và không bao giờ trộn lẫn, còn bảng nhân vật của bạn hiển thị bạn đang giữ bao nhiêu. Chỉ có đúng một thứ để tiêu nó vào: trang bị Chiến Tranh.",
       "quartermastersBody": "Hai quân nhu trưởng giữ cùng một loại hàng, nên hãy giao dịch với người nào gần bạn hơn. NỘ KHÍ, Thủ Lĩnh Danh Dự, đứng tại Thung Lũng Đông Khê, còn Chiến Thống Chế Draven Kole, Quân Nhu Trưởng Chiến Tranh, giữ quầy hàng tại Highwatch. Hàng của họ thuộc bậc Chiến Tranh: năm dòng giáp, cùng dây chuyền, nhẫn, và vũ khí dùng chung cho tất cả các dòng đó.",

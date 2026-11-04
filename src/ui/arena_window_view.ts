@@ -25,7 +25,9 @@ import type { ArenaFormat, ArenaInfo, ArenaStanding, PartyInfo } from '../world_
 
 /** Premade-party cap per team bracket (1v1 is partyless). */
 function bracketTeamCap(fmt: ArenaFormat): number {
-  return fmt === 'yumi5' ? 5 : fmt === 'yumi3' ? 3 : fmt === '2v2' || fmt === 'fiesta' ? 2 : 1;
+  if (fmt === 'yumi5') return 5;
+  if (fmt === 'yumi3' || fmt === '3v3') return 3;
+  return fmt === '2v2' || fmt === 'fiesta' ? 2 : 1;
 }
 
 /** One all-time ladder entry as the HUD caches it (server-fetched, online only). */
@@ -145,9 +147,11 @@ export function buildArenaView(input: ArenaViewInput): ArenaView {
   // draws field would otherwise render NaN in the rating-summary line. Every
   // other draws consumer in this file already defaults; this is the one that
   // reaches painters through `view.standing`, so one site covers them all.
-  const rawStanding = a.standings[bracket];
+  // A snapshot from a server that predates a bracket (the 3v3 rollout) has no
+  // standing or ladder for it at all, so both fall back to an unranked start.
+  const rawStanding = a.standings[bracket] ?? { rating: 1500, wins: 0, losses: 0, draws: 0 };
   const standing = { ...rawStanding, draws: rawStanding.draws ?? 0 };
-  const ladderRows = a.ladders[bracket];
+  const ladderRows = a.ladders[bracket] ?? [];
   const partySize = party?.members.length ?? 1;
   const isLeader = !party || party.leader === myPid;
   const teamCap = bracketTeamCap(bracket);
@@ -192,16 +196,20 @@ export function buildArenaView(input: ArenaViewInput): ArenaView {
   } else if (a.queued) {
     action = { kind: 'queued', queueSize: a.queueSize };
   } else {
-    // 2v2 is a premade queue: the server rejects the whole team if any queued
-    // member is below the floor, so a level-eligible leader with a below-level
-    // teammate must see the same disabled affordance, not just their own level.
+    // 2v2 and 3v3 are premade queues: the server rejects the whole team if any
+    // queued member is below the floor, so a level-eligible leader with a
+    // below-level teammate must see the same disabled affordance, not just their
+    // own level.
+    const ranked = bracket === '1v1' || bracket === '2v2' || bracket === '3v3';
     const partyBelowMinLevel =
-      bracket === '2v2' && isTeamBracket && party && partySize >= 2 && partySize <= teamCap
+      (bracket === '2v2' || bracket === '3v3') &&
+      isTeamBracket &&
+      party &&
+      partySize >= 2 &&
+      partySize <= teamCap
         ? party.members.some((m) => m.level < ARENA_MIN_LEVEL)
         : false;
-    const belowMinLevel =
-      ((bracket === '1v1' || bracket === '2v2') && input.playerLevel < ARENA_MIN_LEVEL) ||
-      partyBelowMinLevel;
+    const belowMinLevel = (ranked && input.playerLevel < ARENA_MIN_LEVEL) || partyBelowMinLevel;
     let queueDisabled = belowMinLevel;
     if (isTeamBracket && party && partySize >= 2 && partySize <= teamCap && !isLeader)
       queueDisabled = true;

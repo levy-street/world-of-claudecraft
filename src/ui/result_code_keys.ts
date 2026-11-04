@@ -83,6 +83,7 @@ export const HONOR_REASON_KEYS: Record<HonorReason, TranslationKey> = {
   fiesta_win: 'hudChrome.warfare.reasons.fiestaWin',
   battleground_win: 'hudChrome.warfare.reasons.battlegroundWin',
   battleground_first_win: 'hudChrome.warfare.reasons.battlegroundFirstWin',
+  arena_first_win: 'hudChrome.warfare.reasons.arenaFirstWin',
   battleground_complete: 'hudChrome.warfare.reasons.battlegroundComplete',
   battleground_kill: 'hudChrome.warfare.reasons.battlegroundKill',
   battleground_assist: 'hudChrome.warfare.reasons.battlegroundAssist',
