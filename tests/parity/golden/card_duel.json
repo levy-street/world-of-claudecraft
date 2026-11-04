@@ -29,7 +29,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 1013,
-      "state": "1cc24567",
+      "state": "ee49712b",
       "events": "8650d7d6",
       "rng": {
         "draws": 0,
@@ -40,7 +40,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 1013,
-      "state": "28effcb0",
+      "state": "41caeb50",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -51,7 +51,7 @@
       "tick": 15,
       "time": 0.75,
       "nextId": 1013,
-      "state": "94a47546",
+      "state": "676bae16",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -62,7 +62,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 1013,
-      "state": "6eba19b9",
+      "state": "1c57c5ff",
       "events": "3f5a7a0c",
       "rng": {
         "draws": 0,
@@ -73,7 +73,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 1013,
-      "state": "abb05baa",
+      "state": "c9ff713c",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -84,7 +84,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 1013,
-      "state": "c325abf3",
+      "state": "50d843c1",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -95,7 +95,7 @@
       "tick": 35,
       "time": 1.75,
       "nextId": 1013,
-      "state": "3986a78b",
+      "state": "fd633df9",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -106,7 +106,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1013,
-      "state": "d1eb4a2e",
+      "state": "bccce1b0",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -117,7 +117,7 @@
       "tick": 41,
       "time": 2.05,
       "nextId": 1013,
-      "state": "9ba97017",
+      "state": "4ff125f5",
       "events": "741638a5",
       "rng": {
         "draws": 6,
@@ -199,7 +199,6 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },
@@ -284,7 +283,6 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },

@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "e889f096",
+      "state": "37d1e84a",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -95,7 +95,6 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },
@@ -175,7 +174,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "c8aac0bf",
+      "state": "a87991e9",
       "events": "8fe5cea8",
       "rng": {
         "draws": 0,
@@ -269,7 +268,6 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },
@@ -349,7 +347,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "4f996b53",
+      "state": "c398769d",
       "events": "c52a2f18",
       "rng": {
         "draws": 0,
@@ -450,7 +448,6 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },
@@ -530,7 +527,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "a3de75a6",
+      "state": "8e35c25a",
       "events": "8f633dc8",
       "rng": {
         "draws": 0,
@@ -631,7 +628,6 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },
@@ -711,7 +707,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "2dd4cf78",
+      "state": "a9806244",
       "events": "e8cba138",
       "rng": {
         "draws": 0,
@@ -812,7 +808,6 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },
@@ -892,7 +887,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "14e393f0",
+      "state": "5c3ccd64",
       "events": "4d1f4d7c",
       "rng": {
         "draws": 1,
@@ -986,7 +981,6 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },
@@ -1067,7 +1061,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 1012,
-      "state": "de37e7d0",
+      "state": "17970e84",
       "events": "741638a5",
       "rng": {
         "draws": 1,
@@ -1161,7 +1155,6 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },

@@ -30,7 +30,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 1015,
-      "state": "923570ee",
+      "state": "b00117c0",
       "events": "08be3e77",
       "rng": {
         "draws": 0,
@@ -41,7 +41,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 1015,
-      "state": "234ef837",
+      "state": "4a9791c5",
       "events": "14dc52c1",
       "rng": {
         "draws": 66,
@@ -52,7 +52,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 1015,
-      "state": "f819eae9",
+      "state": "429dcedf",
       "events": "f3c46c01",
       "rng": {
         "draws": 246,
@@ -63,7 +63,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 1015,
-      "state": "63c4f11e",
+      "state": "c30f33f0",
       "events": "1b9b3d0d",
       "rng": {
         "draws": 482,
@@ -74,7 +74,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 1015,
-      "state": "4282aa9f",
+      "state": "e442d65d",
       "events": "f71b8be8",
       "rng": {
         "draws": 757,
@@ -85,7 +85,7 @@
       "tick": 150,
       "time": 7.5,
       "nextId": 1015,
-      "state": "8a2b1658",
+      "state": "14d226a2",
       "events": "741638a5",
       "rng": {
         "draws": 1028,
@@ -96,7 +96,7 @@
       "tick": 163,
       "time": 8.15,
       "nextId": 1015,
-      "state": "21eb3c6c",
+      "state": "26d382c6",
       "events": "f5e07b12",
       "rng": {
         "draws": 1177,
@@ -195,7 +195,6 @@
             },
             "spec": "arms"
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },
@@ -291,7 +290,6 @@
             },
             "spec": "arcane"
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },
@@ -388,7 +386,6 @@
             },
             "spec": "assassination"
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },
@@ -479,7 +476,6 @@
             },
             "spec": "beast_mastery"
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },
