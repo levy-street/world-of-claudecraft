@@ -28,8 +28,10 @@ import {
   BASIC_RIDING_FEE_COPPER,
   ridingMoveSpeedPct,
 } from '../../src/sim/riding_training';
+import { deedDisplayCategory } from '../../src/ui/deeds_view';
 import { armorySkinStrings } from '../../src/ui/i18n.catalog/armory';
 import { clueStrings } from '../../src/ui/i18n.catalog/clues';
+import { guideStrings } from '../../src/ui/i18n.catalog/guide';
 import { heading, list, percent, type SystemWriter, words } from './system_writer';
 
 export function addExpeditionCollections(w: SystemWriter) {
@@ -119,7 +121,10 @@ export function addExpeditionCollections(w: SystemWriter) {
   }
   for (const d of Object.values(DEEDS).filter((d) => !d.hidden)) {
     const articleTitle = w.article(
-      'Book of Deeds',
+      {
+        owner: 'Book of Deeds',
+        section: guideStrings.deedsPage.cat[deedDisplayCategory(d.category)],
+      },
       d.name,
       'Deed',
       d.desc,
@@ -158,7 +163,7 @@ export function addExpeditionCollections(w: SystemWriter) {
   for (const page of RELIQUARY_PAGES) {
     const guide = GUIDE_RELIQUARY.find((p) => p.id === page.id);
     w.article(
-      'The Reliquary',
+      { owner: 'The Reliquary', section: guideStrings.reliquaryPage.shelf[page.shelf] },
       page.name,
       'Collection',
       page.desc ?? '',

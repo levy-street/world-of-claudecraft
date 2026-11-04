@@ -306,5 +306,6 @@ export function addSystemArticles(ctx: SystemWikiContext): string[] {
   addActivityRules(w);
   addTradeSkills(w);
   addExpeditionCollections(w);
+  w.describe('Level experience', 'Experience needed to reach the next character level.');
   return w.finish();
 }

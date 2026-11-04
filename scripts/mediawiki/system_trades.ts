@@ -31,7 +31,10 @@ export function addTradeSkills(w: SystemWriter) {
     const guide = recipeNames.get(r.id);
     const combo = r.comboRequirement;
     const articleTitle = w.article(
-      'Crafting recipes',
+      {
+        owner: 'Crafting recipes',
+        section: r.professionId.charAt(0).toUpperCase() + r.professionId.slice(1),
+      },
       guide?.name ?? ITEMS[r.resultItemId].name,
       'Recipe',
       'Makes ' +

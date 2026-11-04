@@ -51,8 +51,8 @@ try {
             window.dispatchEvent(new HashChangeEvent('hashchange'));
             let first = null;
             if (
-              document.querySelector('main h1')?.textContent !==
-              (title === 'Main Page' ? 'Player Encyclopedia' : title)
+              document.querySelector('main')?.dataset.article !== title ||
+              !document.querySelector('main h1')
             )
               throw Error('Navigation failed at ' + title);
             if (document.documentElement.scrollWidth > innerWidth + 1)

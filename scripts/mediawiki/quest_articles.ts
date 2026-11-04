@@ -16,7 +16,32 @@ import {
   TICK_RATE,
 } from '../../src/sim/types';
 import { type ArticleTools, append, lines, recipeLabel, ref, words } from './entity_format';
-import { questRoute } from './quest_route';
+import { type QuestRoute, questRoute } from './quest_route';
+
+function contact(
+  w: ArticleTools,
+  ids: readonly string[],
+  route: QuestRoute,
+  step: 'Start' | 'Hand-in',
+) {
+  const npcs = getActiveWorldContent().npcs;
+  return ids
+    .map((id) => {
+      const name = npcs[id]?.name;
+      const locations = route.points.filter(
+        (p) =>
+          p.step === step &&
+          (ids.length === 1 || (name && (p.label === name || p.label.startsWith(name + ' (')))),
+      );
+      const stops = locations.map((p) => {
+        const place =
+          p.frame === 'Overworld' ? (zoneContaining(p.x, p.z)?.name ?? p.frame) : p.frame;
+        return place + ' (' + Number(p.x.toFixed(2)) + ', ' + Number(p.z.toFixed(2)) + ')';
+      });
+      return ref(w, 'npc', id) + (stops.length ? ' · ' + [...new Set(stops)].join(' or ') : '');
+    })
+    .join(' or ');
+}
 
 export function questZoneName(quest: QuestDef | undefined): string {
   const giver = quest && getActiveWorldContent().npcs[quest.giverNpcId];
@@ -59,22 +84,13 @@ function target(w: ArticleTools, o: QuestObjective): string {
 export function addQuestArticles(w: ArticleTools, itemSources: Map<string, Set<string>>) {
   for (const quest of Object.values(QUESTS)) {
     const zone = questZoneName(quest);
+    const route = questRoute(quest);
 
     const facts: [string, string][] = [
-      ['Starts with', ref(w, 'npc', quest.giverNpcId)],
-      [
-        'Turn in to',
-        questTurnInNpcIds(quest)
-          .map((id) => ref(w, 'npc', id))
-          .join(' or '),
-      ],
-
-      ['Starting area', zone],
-      ['Base experience', String(quest.xpReward)],
-      ['Base money', w.money(quest.copperReward)],
+      ['Start', contact(w, [quest.giverNpcId], route, 'Start')],
+      ['Hand in', contact(w, questTurnInNpcIds(quest), route, 'Hand-in')],
+      ['Minimum level', String(quest.minLevel ?? 1)],
     ];
-
-    if (quest.minLevel) facts.push(['Minimum level', String(quest.minLevel)]);
 
     if (quest.maxLevel) facts.push(['Highest level to accept', String(quest.maxLevel)]);
 
@@ -141,13 +157,6 @@ export function addQuestArticles(w: ArticleTools, itemSources: Map<string, Set<s
           : 'Hand over the requested items at turn-in.',
       );
 
-    if (quest.requiredItems?.length)
-      objectives.push(
-        'If missing, these items are reissued on acceptance: ' +
-          quest.requiredItems.map((id) => ref(w, 'item', id)).join(', ') +
-          '.',
-      );
-
     const byReward = new Map<string, string[]>();
 
     for (const cls of Object.keys(CLASSES) as PlayerClass[]) {
@@ -195,8 +204,6 @@ export function addQuestArticles(w: ArticleTools, itemSources: Map<string, Set<s
           '. Meet the recipe skill requirement to turn in.',
       );
 
-    const route = questRoute(quest);
-
     const markers: [string, string][] = route.points.map((p) => [
       String(p.step),
       p.label +
@@ -239,11 +246,10 @@ export function addQuestArticles(w: ArticleTools, itemSources: Map<string, Set<s
 
         case 'gather':
           action =
-            'Harvest ' +
-            what +
-            ' until you earn ' +
-            n +
-            ' gathering credits. Merely buying the material does not count.';
+            o.nodeType === 'ore' && !o.itemId
+              ? 'Mine ore veins ' + n + ' ' + (n === 1 ? 'time.' : 'times.')
+              : 'Harvest ' + what + ' until you earn ' + n + ' gathering credits.';
+          action += ' Credit comes from gathering the material yourself.';
           break;
 
         case 'craft':
@@ -278,40 +284,57 @@ export function addQuestArticles(w: ArticleTools, itemSources: Map<string, Set<s
       if (quest.resolvedObjectiveCounts === 'archetypeAmends' && i === 0)
         action = objectives[0] + '.';
 
-      if (places.length)
+      if (places.length) {
+        const spot = places[0];
+        const zone = spot.frame === 'Overworld' ? zoneContaining(spot.x, spot.z) : null;
+        const nearby = zone?.pois
+          .filter((poi) => !poi.hideOnMap && Math.hypot(poi.x - spot.x, poi.z - spot.z) <= 35)
+          .sort(
+            (a, b) =>
+              Math.hypot(a.x - spot.x, a.z - spot.z) - Math.hypot(b.x - spot.x, b.z - spot.z),
+          )[0];
         action +=
           ' ' +
-          places[0].label +
-          ' at (' +
-          Number(places[0].x.toFixed(2)) +
+          spot.label.charAt(0).toUpperCase() +
+          spot.label.slice(1) +
+          ' (' +
+          Number(spot.x.toFixed(2)) +
           ', ' +
-          Number(places[0].z.toFixed(2)) +
+          Number(spot.z.toFixed(2)) +
           ')' +
-          (places[0].frame === 'Overworld' ? '' : ' inside ' + places[0].frame) +
+          (nearby ? ', near ' + nearby.label : '') +
+          (spot.frame === 'Overworld' ? '' : ' inside ' + spot.frame) +
           '.';
+      }
 
       return '# ' + [action, ...instructions].join(' ');
     });
 
-    const directions =
+    const directions = w.section(
+      'Walkthrough',
+      'Accept the quest from ' +
+        ref(w, 'npc', quest.giverNpcId) +
+        '.' +
+        (quest.requiredItems?.length
+          ? ' If missing, you receive ' +
+            quest.requiredItems.map((id) => ref(w, 'item', id)).join(', ') +
+            ' when you accept.'
+          : '') +
+        '\n\n' +
+        steps.join('\n') +
+        '\n\nHand in to ' +
+        questTurnInNpcIds(quest)
+          .map((id) => ref(w, 'npc', id))
+          .join(' or ') +
+        '.',
+    );
+    const map =
+      w.questMap?.(route) ??
       w.section(
-        'Walkthrough',
-        'Accept the quest from ' +
-          ref(w, 'npc', quest.giverNpcId) +
-          '.\n\n' +
-          steps.join('\n') +
-          '\n\nHand in to ' +
-          questTurnInNpcIds(quest)
-            .map((id) => ref(w, 'npc', id))
-            .join(' or ') +
-          '.',
-      ) +
-      (w.questMap?.(route) ??
-        w.section(
-          'Coordinates',
-          'Coordinates are X, Z in yards. Instance coordinates are measured from the room origin.\n\n' +
-            w.table(markers),
-        ));
+        'Coordinates',
+        'Coordinates are X, Z in yards. Instance coordinates are measured from the room origin.\n\n' +
+          w.table(markers),
+      );
 
     const e = quest.completionEffect;
 
@@ -328,19 +351,26 @@ export function addQuestArticles(w: ArticleTools, itemSources: Map<string, Set<s
 
     w.add(
       w.titleBy.quest.get(quest.id)!,
-      w.section(
-        'Quest text',
-        quest.text.replaceAll('$N', 'adventurer').replaceAll('$C', 'adventurer'),
-      ) +
-        w.section('Facts', w.table(facts)) +
+      w.section('Quest brief', w.table(facts)) +
         lines(w, 'Objectives', objectives) +
         directions +
         w.section(
-          'Completion',
-          quest.completionText.replaceAll('$N', 'adventurer').replaceAll('$C', 'adventurer'),
+          'Rewards',
+          w.table([
+            ['Base experience', quest.xpReward + ' XP'],
+            ['Base money', w.money(quest.copperReward)],
+          ]) + (rewards.length ? '\n\n' + w.bullets(rewards) : ''),
         ) +
-        lines(w, 'Rewards', rewards) +
-        lines(w, 'Unlocks', next),
+        lines(w, 'Unlocks', next) +
+        map +
+        w.section(
+          'Quest dialogue',
+          quest.text.replaceAll('$N', 'adventurer').replaceAll('$C', 'adventurer'),
+        ) +
+        w.section(
+          'On completion',
+          quest.completionText.replaceAll('$N', 'adventurer').replaceAll('$C', 'adventurer'),
+        ),
       ['Quests', zone],
     );
   }

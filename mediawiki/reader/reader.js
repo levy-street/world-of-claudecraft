@@ -1,3 +1,4 @@
+import { browseTrails, directoryLink, isCollection, isDirectory, subjects } from './browse.js';
 import { directoryArt } from './directory_art.js';
 
 const escapeHtml = (text) =>
@@ -8,21 +9,6 @@ const escapeHtml = (text) =>
 const href = (title) => '#' + encodeURIComponent(title);
 const link = (title, label = title) =>
   '<a href="' + escapeHtml(href(title)) + '">' + escapeHtml(label) + '</a>';
-const topics = [
-  ['Items', 'Items', 'Equipment, materials and consumables'],
-  ['Quests', 'Quests', 'Walkthroughs, maps and rewards'],
-  ['Mobs', 'Enemies', 'Creature stats, encounters and loot'],
-  ['Abilities', 'Abilities', 'Costs, ranks and scaling'],
-  ['Gameplay Systems', 'Game systems', 'Rules, professions and collections'],
-  ['Dungeons', 'Dungeons', 'Encounters and heroic difficulty'],
-  ['Zones', 'Zones', 'Regions, settlements and points of interest'],
-  ['NPCs', 'NPCs', 'Quest givers, vendors and services'],
-  ['Classes', 'Classes', 'Starting stats and class kits'],
-  ['Specializations', 'Specializations', 'Masteries and build choices'],
-  ['Talent choices', 'Talent choices', 'What each choice changes'],
-  ['All Pages', 'All articles', 'Alphabetical index'],
-];
-
 function safeChart(markup, mapUrl) {
   const parsed = new DOMParser().parseFromString(markup, 'text/html').body.firstElementChild;
   if (!parsed?.classList.contains('woc-map')) return '';
@@ -71,7 +57,7 @@ function inline(s) {
     .replace(/\uE000(\d+)\uE001/g, (_, i) => tokens[Number(i)]);
 }
 
-function renderBody(body, mapUrl, indexIcon) {
+function renderBody(body, mapUrl, indexIcon, directoryClass, groupTile) {
   const lines = body.split('\n'),
     output = [],
     headings = [];
@@ -112,16 +98,19 @@ function renderBody(body, mapUrl, indexIcon) {
         rows = [line.slice(2)];
       while (i + 1 < lines.length && lines[i + 1].startsWith(line.slice(0, 2)))
         rows.push(lines[++i].slice(2));
+      const listClass = type === 'ul' ? directoryClass?.(rows) : '';
       output.push(
         '<' +
           type +
+          (listClass ? ' class="' + listClass + '"' : '') +
           '>' +
           rows
             .map(
               (row) =>
                 '<li>' +
-                (indexIcon?.(row.match(/^\[\[([^\]|]+)/)?.[1]) ?? '') +
-                inline(row) +
+                (listClass === 'browse-groups'
+                  ? groupTile(row)
+                  : (indexIcon?.(row.match(/^\[\[([^\]|]+)/)?.[1]) ?? '') + inline(row)) +
                 '</li>',
             )
             .join('') +
@@ -134,6 +123,36 @@ function renderBody(body, mapUrl, indexIcon) {
     output.push('<p>' + inline(line) + '</p>');
   }
   return { markup: output.join(''), headings };
+}
+
+function addIndexFilter(view) {
+  const lists = [...view.querySelectorAll('.browse-records')];
+  const rows = lists.flatMap((list) => [...list.children]);
+  if (rows.length < 35) return;
+  const form = document.createElement('search');
+  form.className = 'group-filter';
+  form.innerHTML =
+    '<label for="group-filter">Find an entry in this list</label><textarea id="group-filter" rows="1" placeholder="Filter by name" spellcheck="false"></textarea><small aria-live="polite"></small>';
+  view.querySelector('article').before(form);
+  const field = form.querySelector('textarea');
+  const result = form.querySelector('small');
+  const names = rows.map((row) => row.textContent.toLowerCase());
+  field.addEventListener('input', () => {
+    const query = field.value.trim().toLowerCase();
+    let visible = 0;
+    rows.forEach((row, i) => {
+      row.hidden = !names[i].includes(query);
+      if (!row.hidden) visible++;
+    });
+    for (const list of lists) {
+      list.hidden = ![...list.children].some((row) => !row.hidden);
+      const heading = list.previousElementSibling;
+      if (heading?.matches('h2,h3')) heading.hidden = list.hidden;
+    }
+    field.style.height = 'auto';
+    field.style.height = field.scrollHeight + 2 + 'px';
+    result.textContent = query ? visible + ' matching entries' : '';
+  });
 }
 
 export async function openReader({ seedUrl, packed, assetUrl }) {
@@ -192,15 +211,70 @@ export async function openReader({ seedUrl, packed, assetUrl }) {
       pages.set(title, { title, text, art, categories, sort: title.toLocaleLowerCase('en') });
     }
     const all = [...pages.values()].sort((a, b) => a.title.localeCompare(b.title, 'en'));
-    const navItems = topics.filter(([key]) => pages.has(key));
+    const groups = subjects.map(([name, entries]) => [
+      name,
+      entries.filter(([key]) => pages.has(key)),
+    ]);
+    const trails = browseTrails(pages);
+    const tileArt = new Map();
+    for (const [title, page] of pages) {
+      if (!isDirectory(page)) continue;
+      for (const match of page.text.matchAll(/^\* \[\[([^\]|]+)/gm)) {
+        const art = pages.get(match[1])?.art;
+        if (art) {
+          tileArt.set(title, art);
+          break;
+        }
+      }
+    }
+    const groupTile = (row) => {
+      const child = directoryLink(row);
+      const note = row
+        .slice(row.indexOf(']]') + 2)
+        .trim()
+        .replace(/^·\s*/, '')
+        .replace(/^\((\d+)\)$/, '$1 articles');
+      return (
+        '<a class="browse-tile" href="' +
+        href(child.title) +
+        '">' +
+        image(pages.get(child.title)?.art || tileArt.get(child.title), 'index-icon') +
+        '<span><strong>' +
+        escapeHtml(child.label) +
+        '</strong>' +
+        (note ? '<small>' + inline(note) + '</small>' : '') +
+        '</span></a>'
+      );
+    };
+    const wideNav = window.matchMedia('(min-width: 768px)');
     nav.innerHTML =
-      '<p class="navlabel">Browse</p>' +
-      navItems
+      groups
         .map(
-          ([key, label]) =>
-            '<a class="navlink" href="' + href(key) + '">' + escapeHtml(label) + '</a>',
+          ([name, entries]) =>
+            '<details class="topic-nav"' +
+            (wideNav.matches ? ' open' : '') +
+            '><summary>' +
+            escapeHtml(name) +
+            '</summary><div>' +
+            entries
+              .map(
+                ([key, label]) =>
+                  '<a class="navlink" href="' + href(key) + '">' + escapeHtml(label) + '</a>',
+              )
+              .join('') +
+            '</div></details>',
         )
-        .join('');
+        .join('') +
+      '<a class="navlink full-index" href="' +
+      href('All Pages') +
+      '">A to Z index</a>';
+    function openNavGroups(open) {
+      for (const group of nav.querySelectorAll('details')) group.open = open;
+    }
+    wideNav.addEventListener('change', (event) => openNavGroups(event.matches));
+    nav.addEventListener('click', (event) => {
+      if (!wideNav.matches && event.target.closest('a')) openNavGroups(false);
+    });
     document.documentElement.style.setProperty('--cover', 'url("' + cover + '")');
     let timer;
     function route() {
@@ -262,6 +336,7 @@ export async function openReader({ seedUrl, packed, assetUrl }) {
         return;
       }
       input.value = '';
+      view.dataset.article = current;
       const page = pages.get(current);
       document.title =
         (current === 'Main Page' ? 'Player Encyclopedia' : current) + ' | World of ClaudeCraft';
@@ -274,24 +349,35 @@ export async function openReader({ seedUrl, packed, assetUrl }) {
       }
       if (current === 'Main Page') {
         view.innerHTML =
-          '<div class="hero"><p class="overline">Eastbrook archives · Player reference</p><h1>Player Encyclopedia</h1><p class="intro">Find an item’s source, follow a quest route, or see how an ability scales.</p><div class="hero-actions"><a href="#Quests">Browse quests</a><a href="#Gameplay%20Systems">Game systems</a></div></div><h2>Browse the collection</h2><div class="directory">' +
-          navItems
+          '<div class="hero"><p class="overline">Eastbrook archives · Player reference</p><h1>Player Encyclopedia</h1><p class="intro">Find an item’s source, follow a quest route, or see how an ability scales.</p><div class="hero-actions"><a href="#Items">Browse items</a><a href="#Quests">Find a quest</a></div></div>' +
+          groups
             .map(
-              ([key, label, description]) =>
-                '<a class="entry" href="' +
-                href(key) +
-                '">' +
-                image(directoryArt(key), 'entry-icon') +
-                '<strong>' +
-                escapeHtml(label) +
-                '</strong><small>' +
-                escapeHtml(description) +
-                '</small></a>',
+              ([name, entries]) =>
+                '<section class="home-section"><h2>' +
+                escapeHtml(name) +
+                '</h2><div class="directory">' +
+                entries
+                  .map(
+                    ([key, label, description]) =>
+                      '<a class="entry" href="' +
+                      href(key) +
+                      '">' +
+                      image(directoryArt(key), 'entry-icon') +
+                      '<strong>' +
+                      escapeHtml(label) +
+                      '</strong><small>' +
+                      escapeHtml(description) +
+                      '</small></a>',
+                  )
+                  .join('') +
+                '</div></section>',
             )
             .join('') +
-          '</div><p class="foot">' +
+          '<p class="foot">' +
           all.length.toLocaleString('en') +
           ' articles · ' +
+          link('All Pages', 'A to Z index') +
+          ' · ' +
           link('Quick Start', 'Getting started') +
           ' · ' +
           link('Sources Used', 'Sources') +
@@ -299,25 +385,56 @@ export async function openReader({ seedUrl, packed, assetUrl }) {
         loadArt();
         return;
       }
+      const directory = isDirectory(page);
       const indexIcon =
-        page.categories.includes('Portals') || current === 'All Pages'
+        directory || current === 'All Pages'
           ? (title) => image(pages.get(title)?.art, 'index-icon')
           : undefined;
-      const { markup, headings } = renderBody(page.text, mapUrl, indexIcon);
+      const directoryClass = (rows) => {
+        if (!directory || !rows.every((row) => directoryLink(row))) return '';
+        if (
+          isCollection(page) &&
+          !rows.every((row) => pages.get(directoryLink(row).title)?.categories[0] === page.title)
+        )
+          return '';
+        return rows.every((row) => isDirectory(pages.get(directoryLink(row).title))) ||
+          current === 'Gameplay Systems'
+          ? 'browse-groups'
+          : 'browse-records';
+      };
+      const { markup, headings } = renderBody(
+        page.text,
+        mapUrl,
+        indexIcon,
+        directoryClass,
+        groupTile,
+      );
       const category = page.categories.find((c) => c !== current && pages.has(c));
+      const parents =
+        trails.get(current) ??
+        (category ? [...(trails.get(category) ?? []), { title: category, label: category }] : []);
       view.innerHTML =
         '<div class="crumb">' +
         link('Main Page', 'Encyclopedia') +
-        (category ? ' / ' + link(category) : '') +
+        parents.map(({ title, label }) => ' / ' + link(title, label)).join('') +
         '</div><div class="article-heading">' +
         image(
           page.art,
           /^\/(?:map_bg|textures\/loading)/.test(page.art) ? 'article-art wide' : 'article-art',
         ) +
         '<h1>' +
-        escapeHtml(current) +
+        escapeHtml(
+          current.replace(/ \((?:Items|Abilities|NPCs|Enemies) index\)(?: \(\d+\))?$/, ''),
+        ) +
         '</h1></div><div class="tags">' +
-        page.categories.map((c) => '<span class="tag">' + escapeHtml(c) + '</span>').join('') +
+        page.categories
+          .filter((c) => c !== 'Portals' && !c.endsWith(' directories'))
+          .map((c) =>
+            pages.has(c) && c !== current
+              ? '<a class="tag" href="' + href(c) + '">' + escapeHtml(c) + '</a>'
+              : '<span class="tag">' + escapeHtml(c) + '</span>',
+          )
+          .join('') +
         '</div>' +
         (headings.length > 2
           ? '<nav class="jump" aria-label="On this page">' +
@@ -340,6 +457,7 @@ export async function openReader({ seedUrl, packed, assetUrl }) {
         '</article><p class="foot">' +
         link('Main Page', 'Return to the encyclopedia') +
         '</p>';
+      if (directory) addIndexFilter(view);
       loadArt();
       for (const a of view.querySelectorAll('[data-part]')) {
         a.addEventListener('click', (e) => {

@@ -1,12 +1,13 @@
 import { replaceResolvedAbility } from '../../src/sim/combat/action_replacement';
 import { druidFormEntryTarget } from '../../src/sim/combat/druid_form_entry';
 import { requiredForms } from '../../src/sim/combat/form_requirement';
-import { COURIER_ABILITY } from '../../src/sim/content/courier';
+import { getItemCooldownDuration } from '../../src/sim/content/item_cooldowns';
 import { ROW_TREES, specSignatureIds, TALENTS } from '../../src/sim/content/talents';
 import { ABILITIES, CLASSES, QUESTS } from '../../src/sim/data';
 import type { ResolvedAbility } from '../../src/sim/resolved_ability';
 import { type AbilityDef, GCD, MAX_LEVEL, MELEE_RANGE, MIN_GCD } from '../../src/sim/types';
 import { abilityDisplayDescription, abilityEffectText } from '../../src/ui/ability_description';
+import { abilityIndexGroup, itemActionSource } from './ability_access';
 import { specializationExamples } from './ability_builds';
 import { mediawikiAbilityDescription } from './ability_description';
 import { abilityScalingLines } from './ability_scaling';
@@ -36,7 +37,33 @@ export function abilityArticle(
   def: AbilityDef,
   { link, section, table, bullets, titleBy }: AbilityPageTools,
 ): string {
-  const className = CLASSES[def.class].name;
+  const item = itemActionSource(def);
+  if (item) {
+    const title = titleBy.item?.get(item.id);
+    const bomb = title ? link(title, item.name) : item.name;
+    return (
+      section(
+        'How it works',
+        'Use ' +
+          bomb +
+          ' from your bags or action bar to detonate it at the aimed position. Every living mob within 5 yd of the impact takes the same base roll of 120 to 160 Nature damage. The roll depends on simulation time and has no Spell Power or Attack Power coefficient.',
+      ) +
+      section(
+        'Item use',
+        table([
+          ['Source', bomb],
+          ['Who can use it', 'Any class carrying the item'],
+          ['Cost', 'One bomb per successful use'],
+          ['Cooldown', getItemCooldownDuration(item.id) + ' sec'],
+          [
+            'Range',
+            'Up to 30 yd. An aim beyond the limit lands at 30 yd. Without a ground point, the blast lands 8 yd straight ahead.',
+          ],
+        ]),
+      )
+    );
+  }
+  const className = abilityIndexGroup(def);
   const specName = (id: string) =>
     TALENTS[def.class].specs.find((s) => s.id === id)?.name ?? clean(id);
   const specLink = (id: string) => {
@@ -48,7 +75,7 @@ export function abilityArticle(
       ? link(titleBy.ability.get(id)!, ABILITIES[id].name)
       : (ABILITIES[id]?.name ?? clean(id));
   const classGrant =
-    def.id === COURIER_ABILITY.id
+    className === 'All classes'
       ? 'All classes with active membership'
       : link(titleBy.class.get(def.class)!, className);
   const base: ResolvedAbility = {

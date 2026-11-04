@@ -13,6 +13,7 @@ export interface AbilityPageTools {
     class: Map<string, string>;
     ability: Map<string, string>;
     quest: Map<string, string>;
+    item?: Map<string, string>;
     spec?: Map<string, string>;
     talent?: Map<string, string>;
   };

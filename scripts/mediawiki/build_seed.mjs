@@ -25,6 +25,10 @@ await writeFile(
   sourcePath,
   `
 import { ABILITIES, CLASSES, DUNGEON_LIST, ITEMS, MOBS, NPCS, QUESTS, ZONES, zoneContaining, BUILTIN_WORLD } from '../../src/sim/data';
+import { addCatalogPortals } from '../../scripts/mediawiki/catalog_portals';
+import { addQuestDirectory } from '../../scripts/mediawiki/quest_directory';
+import { subjects } from '../../mediawiki/reader/browse';
+import { abilityIndexGroup } from '../../scripts/mediawiki/ability_access';
 import { articleArt } from '../../scripts/mediawiki/article_art';
 import { abilityArticle } from '../../scripts/mediawiki/ability_article';
 import { addTalentPages } from '../../scripts/mediawiki/talent_articles';
@@ -120,16 +124,8 @@ const zoneForQuest = id => questZoneName(QUESTS[id]);
 const reserve = title => unique(title, usedTitles);
 add('MediaWiki:Common.css', css, []);
 add('Main Page', section('World of ClaudeCraft', 'Look up a reward, plan a build, or read an encounter before you enter. Each article describes the rules in this edition of the game.') +
-  section('Explore the encyclopedia',bullets([
-    link('Items') + ' · Equipment, consumables, weapons and materials',
-    link('Quests') + ' · Story quests, daily world quests and weekly charges',
-    link('Mobs','Enemies') + ' · Creature stats, drops and encounter mechanics',
-    link('Abilities') + ' · Effects, requirements and scaling',
-    link('Specializations') + ' · ' + link('Talent choices'),
-    link('Gameplay Systems') + ' · Rules and progression',
-    link('Zones') + ' · ' + link('Dungeons') + ' · ' + link('NPCs'),
-    link('Classes') + ' · ' + link('Quick Start') + ' · ' + link('All Pages')
-  ])), ['Wiki']);
+  subjects.map(([name,entries])=>section(name,bullets(entries.map(([title,label,description])=>link(title,label)+' · '+description)))).join('')+
+  section('Reference', link('Quick Start') + ' · ' + link('All Pages','A to Z index')), ['Wiki']);
 
 add('Quick Start', section('First hour route', bullets([
   'Create an online character for persistence, or use offline play for a quick solo test.',
@@ -193,39 +189,27 @@ add('Sources Used', section('Game mechanics', bullets([
 addTalentPages(writer);
 addSystemArticles({ add, unique: reserve, titleBy });
 addRotatingQuests({ ...writer, reserve });
-add('Level experience', 'Experience needed to reach the next character level.', ['Systems']);
+addCatalogPortals({ ...writer, reserve });
+const zoneDirectories = addQuestDirectory({ ...writer, reserve });
 
-const portals = [
-  ['Zones', ZONES.map((z) => titleBy.zone.get(z.id))],
-  ['Classes', Object.keys(CLASSES).map((id) => titleBy.class.get(id))],
-  ['Dungeons', DUNGEON_LIST.map((d) => titleBy.dungeon.get(d.id))],
-  ['NPCs', Object.keys(NPCS).map((id) => titleBy.npc.get(id))],
-
-  ['Mobs', Object.keys(MOBS).map((id) => titleBy.mob.get(id))],
-  ['Items', Object.keys(ITEMS).map((id) => titleBy.item.get(id))],
-  ['Abilities', visibleAbilities.map(([id]) => titleBy.ability.get(id))],
+const sortedZones = [...ZONES].sort((a,b) => a.levelRange[0]-b.levelRange[0] || a.levelRange[1]-b.levelRange[1] || a.name.localeCompare(b.name,'en'));
+add('Zones', section('Regions by level',bullets(sortedZones.map(z=>link(titleBy.zone.get(z.id)) + ' · '+(z.levelRange[0]===z.levelRange[1]?'Level '+z.levelRange[0]:'Levels '+z.levelRange.join(' to '))+' · '+z.hub.name))),['Portals']);
+add('Classes',section('Playable classes',bullets(Object.keys(CLASSES).sort().map(id=>link(titleBy.class.get(id))))),['Portals']);
+const groupRooms = (rooms) => bullets(rooms.map(d=>link(titleBy.dungeon.get(d.id))+' · '+d.suggestedPlayers+' suggested players'));
+const rooms = [...DUNGEON_LIST].sort((a,b)=>a.name.localeCompare(b.name,'en'));
+const dungeonSections = [
+  ['Dungeon entrances', rooms.filter(d=>d.overworldDoor!==false && d.suggestedPlayers<=5)],
+  ['Raid entrances', rooms.filter(d=>d.overworldDoor!==false && d.suggestedPlayers>5)],
+  ['Connected rooms',rooms.filter(d=>d.overworldDoor===false)],
 ];
-
-for (const [portal, titles] of portals) {
-  add(portal, section('Articles', bullets(titles.sort().map((title) => link(title)))), ['Portals']);
-}
-
-const questsByZone = new Map();
-for (const [id,quest] of Object.entries(QUESTS)) {
-  const zone = zoneForQuest(id);
-  const group = questsByZone.get(zone) ?? [];
-  group.push(link(titleBy.quest.get(id), quest.name));
-  questsByZone.set(zone,group);
-}
-add('Quests', section('Repeatable activities', link('World quests') + ' · ' + link('Weekly quests')) +
-  [...questsByZone].sort(([a],[b])=>a.localeCompare(b,'en')).map(([zone,quests])=>section(zone,bullets(quests.sort()))).join(''), ['Portals']);
+add('Dungeons',dungeonSections.filter(([,ds])=>ds.length).map(([name,ds])=>section(name,groupRooms(ds))).join(''),['Portals']);
 
 for (const zone of ZONES) {
   const npcs = Object.entries(BUILTIN_WORLD.npcs).filter(([, npc]) => (!npc.dynamic || npc.fixedPost) && zoneContaining(npc.pos.x,npc.pos.z)?.id === zone.id).map(([id]) => titleBy.npc.get(id));
   const quests = Object.keys(QUESTS).filter((id) => zoneForQuest(id) === zone.name).map((id) => titleBy.quest.get(id));
   add(titleBy.zone.get(zone.id), section('Overview', zone.welcome) + section('Facts', table([
     ['Level range', zone.levelRange[0] + '-' + zone.levelRange[1]], ['Hub', zone.hub.name], ['Biome', zone.biome], ['Graveyard', zone.graveyard.x + ', ' + zone.graveyard.z],
-  ])) + section('Points of interest', bullets(zone.pois.map((poi) => poi.label))) + section('NPCs', bullets(npcs.map((title) => link(title)))) + section('Quests starting here', bullets(quests.map((title) => link(title)))), ['Zones', zone.biome]);
+  ])) + section('Points of interest', bullets(zone.pois.map((poi) => poi.label))) + section('NPCs', bullets(npcs.map((title) => link(title)))) + section('Quests starting here', (zoneDirectories.has(zone.name) ? link(zoneDirectories.get(zone.name), 'Browse quests in ' + zone.name) + '\\n\\n' : '') + bullets(quests.map((title) => link(title)))), ['Zones', zone.biome]);
 }
 
 for (const [id, cls] of Object.entries(CLASSES)) {
@@ -246,17 +230,23 @@ for (const [id,npc] of Object.entries(NPCS)) {
 
 addEntityArticles({ ...writer, money, kindWording });
 for (const [id, ability] of visibleAbilities) {
-  add(titleBy.ability.get(id), abilityArticle(ability, writer), ['Abilities', CLASSES[ability.class]?.name ?? ability.class]);
+  add(titleBy.ability.get(id), abilityArticle(ability, writer), ['Abilities', abilityIndexGroup(ability)]);
 }
 
-add('All Pages', section('Complete index', bullets(pages.filter(page => !page.title.startsWith('MediaWiki:')).map((page) => link(page.title)).sort())), ['Wiki']);
+const letters = new Map();
+for (const page of pages.filter(p=>!p.title.startsWith('MediaWiki:')).sort((a,b)=>a.title.localeCompare(b.title,'en'))) {
+  const letter = page.title[0].toUpperCase();
+  if(!letters.has(letter))letters.set(letter,[]);
+  letters.get(letter).push(link(page.title));
+}
+add('All Pages',[...letters].map(([letter,titles])=>section(letter,bullets(titles))).join(''),['Wiki']);
 
 const illustrations = articleArt(titleBy);
 for(const page of pages) {
   const path = illustrations.get(page.title);
   if(path) page.text = '<woc-art path="' + path + '" />\\n' + page.text;
 }
-const seedTimestamp = process.env.MEDIAWIKI_SEED_TIMESTAMP ?? '2026-11-04T00:00:00Z';
+const seedTimestamp = process.env.MEDIAWIKI_SEED_TIMESTAMP ?? '2026-11-04T01:00:00Z';
 const now = new Date(seedTimestamp).toISOString().replace(/\\.\\d{3}Z$/, 'Z');
 const body = pages.map((page, index) => \`
   <page>

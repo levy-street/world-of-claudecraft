@@ -15,6 +15,21 @@ const tools = {
   titleBy: { class: titles(CLASSES), ability: titles(ABILITIES), quest: titles(QUESTS) },
 };
 describe('Player encyclopedia ability mechanics', () => {
+  it('describes the ground-aim bomb through its inventory item rather than a class spell grant', () => {
+    const article = abilityArticle(ABILITIES.clockwork_shock_bomb, {
+      ...tools,
+      link: (title, label = title) => '[[' + title + '|' + label + ']]',
+      titleBy: {
+        ...tools.titleBy,
+        item: new Map([['clockwork_shock_bomb', 'reserved bomb item']]),
+      },
+    });
+    expect(article).toContain('reserved bomb item');
+    expect(article).toContain('Any class carrying');
+    expect(article).toContain('120 to 160');
+    expect(article).toContain('One bomb per successful use');
+    expect(article).not.toMatch(/Warrior|First rank|Global cooldown|Level 1/);
+  });
   it('renders every visible ability without leaking a spellbook token', () => {
     for (const def of Object.values(ABILITIES).filter((d) => !d.hiddenFromPlayer)) {
       const text = abilityArticle(def, tools);

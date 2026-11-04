@@ -1,3 +1,5 @@
+import { systemDirectory } from './system_directory';
+
 /** A system and its entries share one index. Existing game entities resolve through the seed's title maps. */
 export interface SystemWikiContext {
   add(title: string, text: string, categories: string[]): void;
@@ -28,11 +30,11 @@ export function percent(value: number): string {
 export function systemWriter(ctx: SystemWikiContext) {
   const add = (title: string, body: string, categories: string[]) =>
     ctx.add(title, body.replace(/\s*[\u2013\u2014\u2015]\s*/g, ', '), categories);
-  const groups = new Map<string, { title: string; body: string; entries: string[] }>();
+  const groups = new Map<string, { title: string; body: string; entries: Map<string, string[]> }>();
   const group = (name: string) => {
     let found = groups.get(name);
     if (!found) {
-      found = { title: ctx.unique(name), body: '', entries: [] };
+      found = { title: ctx.unique(name), body: '', entries: new Map() };
       groups.set(name, found);
     }
     return found;
@@ -51,25 +53,39 @@ export function systemWriter(ctx: SystemWikiContext) {
         ? `[[${title}${label && label !== title ? `|${label}` : ''}]]`
         : (label ?? words(id));
     },
-    article(groupName: string, name: string, suffix: string, ...paragraphs: string[]) {
+    article(
+      grouping: string | { owner: string; section: string },
+      name: string,
+      suffix: string,
+      ...paragraphs: string[]
+    ) {
+      const groupName = typeof grouping === 'string' ? grouping : grouping.owner;
+      const section = typeof grouping === 'string' ? 'Entries' : grouping.section;
       const owner = group(groupName);
       const title = ctx.unique(`${name} (${suffix})`);
       add(title, `${paragraphs.filter(Boolean).join('\n\n')}\n\nSee [[${owner.title}]].`, [
         groupName,
       ]);
-      owner.entries.push(`[[${title}|${name}]]`);
+      const entries = owner.entries.get(section) ?? [];
+      entries.push(`[[${title}|${name}]]`);
+      owner.entries.set(section, entries);
       return title;
     },
     finish() {
       const index = [...groups.values()].sort((a, b) => a.title.localeCompare(b.title, 'en'));
       for (const page of index) {
+        const categories = ['Systems', 'Gameplay Systems'];
+        const sections = [...page.entries].sort(([a], [b]) => a.localeCompare(b, 'en'));
+        if (sections.some(([name]) => name !== 'Entries'))
+          categories.push('Collection directories');
         add(
           page.title,
-          page.body + (page.entries.length ? heading('Entries', list(page.entries.sort())) : ''),
-          ['Systems'],
+          page.body +
+            sections.map(([name, entries]) => heading(name, list(entries.sort()))).join(''),
+          categories,
         );
       }
-      ctx.add('Gameplay Systems', list(index.map((page) => `[[${page.title}]]`)), ['Systems']);
+      ctx.add('Gameplay Systems', systemDirectory(groups), ['Systems']);
       return index.map((page) => page.title);
     },
   };
