@@ -30,6 +30,7 @@ import { addQuestDirectory } from '../../scripts/mediawiki/quest_directory';
 import { subjects } from '../../mediawiki/reader/browse';
 import { abilityIndexGroup } from '../../scripts/mediawiki/ability_access';
 import { articleArt } from '../../scripts/mediawiki/article_art';
+import { classAbilitySections } from '../../scripts/mediawiki/class_ability_sections';
 import { abilityArticle } from '../../scripts/mediawiki/ability_article';
 import { addTalentPages } from '../../scripts/mediawiki/talent_articles';
 import { addSystemArticles } from '../../scripts/mediawiki/system_articles';
@@ -213,10 +214,7 @@ for (const zone of ZONES) {
 }
 
 for (const [id, cls] of Object.entries(CLASSES)) {
-  const abilities = cls.abilities
-    .filter((abilityId) => titleBy.ability.has(abilityId))
-    .map((abilityId) => link(titleBy.ability.get(abilityId), ABILITIES[abilityId]?.name ?? abilityId));
-  add(titleBy.class.get(id), section('Overview', cls.name + ' starts with ' + (ITEMS[cls.startWeapon]?.name ?? cls.startWeapon) + ' and uses ' + cls.resourceType + '.') + section('Starting weapon', link(titleBy.item.get(cls.startWeapon), ITEMS[cls.startWeapon]?.name ?? cls.startWeapon)) + section('Build choices', link('Specializations') + ' · ' + link('Talent choices')) + section('Stats', table(Object.entries(cls.baseStats).map(([k, v]) => [k.toUpperCase(), String(v)]))) + section('Abilities', bullets(abilities)), ['Classes']);
+  add(titleBy.class.get(id), section('Overview', cls.name + ' starts with ' + (ITEMS[cls.startWeapon]?.name ?? cls.startWeapon) + ' and uses ' + cls.resourceType + '.') + section('Starting weapon', link(titleBy.item.get(cls.startWeapon), ITEMS[cls.startWeapon]?.name ?? cls.startWeapon)) + section('Build choices', link('Specializations') + ' · ' + link('Talent choices')) + section('Stats', table(Object.entries(cls.baseStats).map(([k, v]) => [k.toUpperCase(), String(v)]))) + classAbilitySections(id, writer), ['Classes']);
 }
 
 for (const dungeon of DUNGEON_LIST) {
@@ -246,7 +244,7 @@ for(const page of pages) {
   const path = illustrations.get(page.title);
   if(path) page.text = '<woc-art path="' + path + '" />\\n' + page.text;
 }
-const seedTimestamp = process.env.MEDIAWIKI_SEED_TIMESTAMP ?? '2026-11-04T01:00:00Z';
+const seedTimestamp = process.env.MEDIAWIKI_SEED_TIMESTAMP ?? '2026-11-04T02:00:00Z';
 const now = new Date(seedTimestamp).toISOString().replace(/\\.\\d{3}Z$/, 'Z');
 const body = pages.map((page, index) => \`
   <page>

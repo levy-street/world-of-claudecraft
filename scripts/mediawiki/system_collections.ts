@@ -32,6 +32,7 @@ import { deedDisplayCategory } from '../../src/ui/deeds_view';
 import { armorySkinStrings } from '../../src/ui/i18n.catalog/armory';
 import { clueStrings } from '../../src/ui/i18n.catalog/clues';
 import { guideStrings } from '../../src/ui/i18n.catalog/guide';
+import { deedLead, deedRequirements } from './deed_requirements';
 import { heading, list, percent, type SystemWriter, words } from './system_writer';
 
 export function addExpeditionCollections(w: SystemWriter) {
@@ -119,26 +120,33 @@ export function addExpeditionCollections(w: SystemWriter) {
     );
     w.registerArt('companion', b.key, articleTitle);
   }
-  for (const d of Object.values(DEEDS).filter((d) => !d.hidden)) {
-    const articleTitle = w.article(
+  const deeds = Object.values(DEEDS).filter((d) => !d.hidden);
+  const titles = new Map(deeds.map((d) => [d.id, w.reserveArticle(d.name, 'Deed')]));
+  for (const [id, title] of titles) w.registerArt('deed', id, title);
+  for (const d of deeds) {
+    w.article(
       {
         owner: 'Book of Deeds',
+        title: titles.get(d.id),
         section: guideStrings.deedsPage.cat[deedDisplayCategory(d.category)],
       },
       d.name,
       'Deed',
-      d.desc,
-      'Awards ' +
-        d.renown +
-        ' Renown.' +
-        (d.feat ? ' This feat sits outside completion percentages.' : ''),
+      deedLead(d),
+      heading('How to earn', deedRequirements(w, d)),
+      heading(
+        'Reward',
+        'Awards ' +
+          d.renown +
+          ' Renown.' +
+          (d.feat ? ' This feat sits outside completion percentages.' : ''),
+      ),
       d.reward?.kind === 'title'
         ? `Unlocks the title "${d.reward.text}".`
         : d.reward?.kind === 'border'
           ? `Unlocks the ${words(d.reward.slug)} nameplate border.`
           : '',
     );
-    w.registerArt('deed', d.id, articleTitle);
   }
   for (const set of Object.values(ITEM_SETS)) {
     const pieces = Object.values(ITEMS).filter((i) => i.set === set.id);

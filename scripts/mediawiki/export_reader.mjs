@@ -19,7 +19,10 @@ const paths = new Set([
     body.matchAll(/data-zone=&quot;([a-z0-9_]+)&quot;/g),
     (m) => '/map_bg/' + m[1] + '.webp',
   ),
-  ...Array.from(body.matchAll(/&lt;woc-art path=&quot;([^&]+)&quot; \/&gt;/g), (m) => m[1]),
+  ...Array.from(
+    body.matchAll(/&lt;woc-art path=&quot;([^&]+)&quot;(?: size=&quot;icon&quot;)? \/&gt;/g),
+    (m) => m[1],
+  ),
 ]);
 const assets = {};
 for (const path of paths) {

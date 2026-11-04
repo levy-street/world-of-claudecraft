@@ -899,3 +899,195 @@ body[data-woc-site] .searchbox #lookup {
 #view .browse-records li[hidden] {
   display: none;
 }
+
+#view article ul:has(> li > .ability-icon) {
+  list-style: none;
+  padding-inline-start: 0;
+}
+#view article li:has(> .ability-icon) {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+  margin: 0.35rem 0;
+}
+.ability-icon {
+  width: 32px;
+  height: 32px;
+  flex: none;
+  object-fit: contain;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+}
+
+/* Encyclopedia articles use the companion color tokens in a conventional wiki reading column. */
+#view .wiki-title {
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+}
+#view article.wiki-prose {
+  display: flow-root;
+  margin-top: 18px;
+}
+.wiki-opening {
+  min-width: 0;
+}
+#view .wiki-prose p,
+#view .wiki-prose li {
+  max-width: 78ch;
+}
+#view article .wiki-lead {
+  font-size: 1.15rem;
+  line-height: 1.55;
+  margin: 0 0 1em;
+}
+#view article .wiki-flavor {
+  font-style: italic;
+  color: var(--text-dim);
+}
+#view .wiki-prose > h2 {
+  font-size: clamp(23px, 2.3vw, 31px);
+  padding-bottom: 5px;
+  border-bottom: 1px solid var(--border-soft);
+  overflow: hidden;
+}
+#view .wiki-prose > h2::after {
+  display: none;
+}
+#view .wiki-prose > h3 {
+  font: 600 20px / 1.35 var(--font-display);
+}
+#view .wiki-prose :is(h2, h3):target {
+  outline: 1px solid var(--gold);
+}
+#view .wiki-contents {
+  display: table;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 9px 16px;
+  margin: 12px 0 20px;
+  border: 1px solid var(--border-soft);
+  background: var(--bg-2);
+}
+.wiki-contents summary,
+.wiki-box-title {
+  color: var(--gold);
+  font: 600 16px / 1.45 var(--font-display);
+}
+.wiki-contents summary {
+  cursor: pointer;
+}
+#view .wiki-contents nav > ol {
+  margin: 8px 0 4px;
+}
+#view .wiki-contents ol {
+  margin: 0;
+  padding-left: 1.4rem;
+}
+#view .wiki-contents li {
+  margin: 0;
+  padding: 2px 0;
+  color: var(--muted);
+}
+.wiki-infobox {
+  box-sizing: border-box;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  background: var(--bg-2);
+  margin: 0 0 18px;
+}
+.wiki-box-title {
+  background: var(--panel);
+  text-align: center;
+  padding: 8px;
+  border-bottom: 1px solid var(--border-soft);
+}
+.wiki-box-art {
+  display: grid;
+  place-items: center;
+  padding: 12px;
+}
+#view .wiki-box-art .article-art {
+  width: 60px;
+  height: 60px;
+}
+#view .wiki-box-art .article-art.wide {
+  width: 100%;
+  height: auto;
+  max-height: 200px;
+  object-fit: contain;
+}
+#view .wiki-infobox .scroll {
+  margin: 0;
+  border: 0;
+}
+#view .wiki-infobox :is(td, th) {
+  font-size: 15px;
+  line-height: 1.4;
+  padding: 6px 10px;
+}
+#view .wiki-infobox th {
+  width: 40%;
+}
+#view .wiki-reward {
+  padding: 8px 12px;
+}
+#view .wiki-reward p {
+  margin: 4px 0;
+}
+#view .wiki-categories {
+  clear: both;
+  padding: 12px 0;
+  border-top: 1px solid var(--border-soft);
+}
+.wiki-categories strong {
+  color: var(--text-dim);
+  margin-right: 5px;
+}
+@media (min-width: 1050px) {
+  .wiki-infobox {
+    float: right;
+    width: clamp(240px, 30%, 305px);
+    margin: 0 0 18px 26px;
+  }
+  #view .wiki-prose > .scroll,
+  #view .wiki-prose > ul,
+  #view .wiki-prose > ol {
+    display: flow-root;
+  }
+  #view .wiki-prose > .woc-map {
+    clear: both;
+  }
+}
+@media (max-width: 1049px) {
+  #view .wiki-box-art:has(.article-art:not(.wide)) {
+    float: right;
+    padding: 5px 10px;
+    margin-top: -36px;
+  }
+  #view .wiki-box-art .article-art:not(.wide) {
+    width: 27px;
+    height: 27px;
+  }
+  #view .wiki-box-art .article-art.wide {
+    max-height: 140px;
+  }
+  #view .wiki-infobox .wiki-box-title {
+    text-align: left;
+    padding-right: 52px;
+  }
+  #view article.wiki-prose {
+    display: flex;
+    flex-direction: column;
+  }
+  #view .wiki-prose > * {
+    min-width: 0;
+  }
+  #view .wiki-infobox {
+    order: -1;
+  }
+  #view .wiki-opening {
+    display: flow-root;
+    order: -2;
+  }
+}

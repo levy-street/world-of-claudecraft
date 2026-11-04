@@ -526,3 +526,11 @@ body {
   object-fit: contain;
   margin: 12px 0;
 }
+
+.woc-inline-art {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  vertical-align: middle;
+  margin-right: 0.3em;
+}

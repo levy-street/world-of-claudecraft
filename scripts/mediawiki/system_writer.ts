@@ -5,7 +5,7 @@ export interface SystemWikiContext {
   add(title: string, text: string, categories: string[]): void;
   unique(title: string): string;
   titleBy: Record<'item' | 'npc' | 'mob' | 'zone' | 'dungeon', Map<string, string>> &
-    Partial<Record<'recipe' | 'deed' | 'companion', Map<string, string>>>;
+    Partial<Record<'recipe' | 'deed' | 'companion' | 'quest', Map<string, string>>>;
 }
 
 export function words(id: string): string {
@@ -47,14 +47,21 @@ export function systemWriter(ctx: SystemWikiContext) {
       ctx.titleBy[kind] ??= new Map();
       ctx.titleBy[kind].set(id, title);
     },
-    entity(type: 'item' | 'npc' | 'mob' | 'zone' | 'dungeon', id: string, label?: string) {
-      const title = ctx.titleBy[type].get(id);
+    reserveArticle(name: string, suffix: string) {
+      return ctx.unique(`${name} (${suffix})`);
+    },
+    entity(
+      type: 'item' | 'npc' | 'mob' | 'zone' | 'dungeon' | 'quest' | 'deed',
+      id: string,
+      label?: string,
+    ) {
+      const title = ctx.titleBy[type]?.get(id);
       return title
         ? `[[${title}${label && label !== title ? `|${label}` : ''}]]`
         : (label ?? words(id));
     },
     article(
-      grouping: string | { owner: string; section: string },
+      grouping: string | { owner: string; section: string; title?: string },
       name: string,
       suffix: string,
       ...paragraphs: string[]
@@ -62,7 +69,9 @@ export function systemWriter(ctx: SystemWikiContext) {
       const groupName = typeof grouping === 'string' ? grouping : grouping.owner;
       const section = typeof grouping === 'string' ? 'Entries' : grouping.section;
       const owner = group(groupName);
-      const title = ctx.unique(`${name} (${suffix})`);
+      const title =
+        (typeof grouping === 'string' ? undefined : grouping.title) ??
+        ctx.unique(`${name} (${suffix})`);
       add(title, `${paragraphs.filter(Boolean).join('\n\n')}\n\nSee [[${owner.title}]].`, [
         groupName,
       ]);

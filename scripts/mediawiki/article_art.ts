@@ -10,7 +10,7 @@ import { classIconUrl } from '../../src/ui/class_icon_art';
 import { crestIconUrl } from '../../src/ui/crest_icon_art';
 import { currencyImageUrl } from '../../src/ui/currency_art';
 import { activitySceneUrl } from '../../src/ui/dungeon_activity_art';
-import { abilityImageUrl, deedImageUrl, itemImageUrl, weaponIconUrl } from '../../src/ui/icons';
+import { deedImageUrl, itemImageUrl, weaponIconUrl } from '../../src/ui/icons';
 import { BAKED_MAP_BG } from '../../src/ui/map_bg_manifest.generated';
 import { mapMarkerIconUrl, questMarkerArtId } from '../../src/ui/map_marker_icon_art';
 import { specIconUrl } from '../../src/ui/spec_icon_art';
@@ -18,6 +18,8 @@ import { talentRowOptionIconRef } from '../../src/ui/talent_icons';
 import { BUDDY_PORTRAIT_URLS, targetPortraitUrl } from '../../src/ui/target_portrait_view';
 import { WEEKLY_ART_DIR } from '../../src/ui/weekly_quests_view';
 import { worldQuestBoardArt } from '../../src/ui/world_quest_leaderboard_view';
+
+import { wikiAbilityArtPath } from './ability_art_path';
 
 type TitleMaps = Partial<
   Record<
@@ -60,7 +62,7 @@ export function articleArt(titleBy: TitleMaps): Map<string, string> {
     if (files.get(path)) byTitle.set(title, path);
   };
   for (const id of titleBy.item?.keys() ?? []) add('item', id, paintedItem(id));
-  for (const id of titleBy.ability?.keys() ?? []) add('ability', id, abilityImageUrl(id));
+  for (const id of titleBy.ability?.keys() ?? []) add('ability', id, wikiAbilityArtPath(id));
   for (const id of titleBy.class?.keys() ?? []) add('class', id, classIconUrl(id));
   for (const id of titleBy.mob?.keys() ?? []) add('mob', id, targetPortraitUrl(id, true));
   for (const id of titleBy.zone?.keys() ?? []) {
@@ -98,7 +100,7 @@ export function articleArt(titleBy: TitleMaps): Map<string, string> {
           art.kind === 'image'
             ? art.url
             : art.kind === 'ability'
-              ? abilityImageUrl(art.id)
+              ? wikiAbilityArtPath(art.id)
               : crestIconUrl(art.id),
         );
       }

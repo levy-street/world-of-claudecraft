@@ -72,6 +72,7 @@ $wgHooks['ParserFirstCallInit'][] = static function ( $parser ) use ( $wgScriptP
         if ( !preg_match( '~^/(?:ui|map_bg|textures/loading)/[A-Za-z0-9_/-]+\.(?:webp|png|jpg)$~D', $path ) ) {
             return '';
         }
-        return '<img class="woc-page-art" alt="" src="' . htmlspecialchars( $wgScriptPath . '/resources/assets/game' . $path, ENT_QUOTES ) . '">';
+        $class = ( $args['size'] ?? '' ) === 'icon' ? 'woc-inline-art' : 'woc-page-art';
+        return '<img class="' . $class . '" alt="" src="' . htmlspecialchars( $wgScriptPath . '/resources/assets/game' . $path, ENT_QUOTES ) . '">';
     } );
 };

@@ -1,3 +1,4 @@
+import { layoutArticle, sectionRoute } from './article_layout.js';
 import { browseTrails, directoryLink, isCollection, isDirectory, subjects } from './browse.js';
 import { directoryArt } from './directory_art.js';
 
@@ -44,6 +45,8 @@ function inline(s) {
     tokens.push(value);
     return '\uE000' + (tokens.length - 1) + '\uE001';
   }
+  const icon = s.match(/^<woc-art path="(\/ui\/[A-Za-z0-9_/-]+\.webp)" size="icon" \/>\s*/);
+  if (icon) s = s.slice(icon[0].length);
   s = s
     .replace(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g, (_, title, label) =>
       keep(link(title, label || title)),
@@ -51,10 +54,18 @@ function inline(s) {
     .replace(/\[(https?:\/\/[^\s\]]+) ([^\]]+)\]/g, (_, url, label) =>
       keep('<a href="' + escapeHtml(url) + '" rel="noreferrer">' + escapeHtml(label) + '</a>'),
     );
-  return escapeHtml(s)
+  const content = escapeHtml(s)
     .replace(/&#39;&#39;&#39;(.*?)&#39;&#39;&#39;/g, '<strong>$1</strong>')
     .replace(/&#39;&#39;(.*?)&#39;&#39;/g, '<em>$1</em>')
     .replace(/\uE000(\d+)\uE001/g, (_, i) => tokens[Number(i)]);
+  if (!icon) return content;
+  return (
+    '<img class="ability-icon" data-game-art="' +
+    escapeHtml(icon[1]) +
+    '" alt="" width="32" height="32" loading="lazy" decoding="async"><span>' +
+    content +
+    '</span>'
+  );
 }
 
 function renderBody(body, mapUrl, indexIcon, directoryClass, groupTile) {
@@ -72,7 +83,8 @@ function renderBody(body, mapUrl, indexIcon, directoryClass, groupTile) {
     if (header) {
       const id = 'part-' + headings.length;
       headings.push([id, header[2]]);
-      output.push('<h2 id="' + id + '">' + inline(header[2]) + '</h2>');
+      const tag = header[1].length === 3 ? 'h3' : 'h2';
+      output.push('<' + tag + ' id="' + id + '">' + inline(header[2]) + '</' + tag + '>');
       continue;
     }
     if (line.startsWith('{|')) {
@@ -279,7 +291,7 @@ export async function openReader({ seedUrl, packed, assetUrl }) {
     let timer;
     function route() {
       try {
-        return decodeURIComponent(location.hash.slice(1)) || 'Main Page';
+        return sectionRoute(location.hash).article;
       } catch {
         return 'Main Page';
       }
@@ -436,7 +448,7 @@ export async function openReader({ seedUrl, packed, assetUrl }) {
           )
           .join('') +
         '</div>' +
-        (headings.length > 2
+        ((directory || current === 'All Pages') && headings.length > 2
           ? '<nav class="jump" aria-label="On this page">' +
             headings
               .map(
@@ -458,6 +470,13 @@ export async function openReader({ seedUrl, packed, assetUrl }) {
         link('Main Page', 'Return to the encyclopedia') +
         '</p>';
       if (directory) addIndexFilter(view);
+      else if (current !== 'All Pages')
+        layoutArticle(
+          view,
+          page,
+          wideNav.matches,
+          page.categories.find((c) => pages.get(c)?.categories.includes('Zones')),
+        );
       loadArt();
       for (const a of view.querySelectorAll('[data-part]')) {
         a.addEventListener('click', (e) => {
@@ -477,10 +496,26 @@ export async function openReader({ seedUrl, packed, assetUrl }) {
     window.addEventListener('hashchange', () => {
       clearTimeout(timer);
       show();
-      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-      view.focus({ preventScroll: true });
+      if (!scrollToSection()) {
+        window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+        view.focus({ preventScroll: true });
+      }
     });
+    function scrollToSection() {
+      let target;
+      try {
+        const section = sectionRoute(location.hash).section;
+        target = section && document.getElementById('section-' + section);
+      } catch {
+        return false;
+      }
+      if (!target) return false;
+      target.scrollIntoView({ block: 'start', behavior: 'instant' });
+      target.focus({ preventScroll: true });
+      return true;
+    }
     show();
+    scrollToSection();
   } catch (error) {
     view.textContent = 'The encyclopedia could not open. ' + error.message;
   }
