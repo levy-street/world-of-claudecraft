@@ -37,11 +37,11 @@ export const MICRO_MENU_LAUNCHERS: readonly MicroMenuLauncherSpec[] = [
   {
     selector: '#mm-professions',
     windowId: 'professions-window',
+    // One member ships in no markup entry: the Perfecting painter mints
+    // #perfecting-window on first open (still a .window.panel, so Hud's
+    // window observer stamps data-window-open on it like any other).
     memberWindowIds: ['crafting-window', 'perfecting-window', 'harvest-journal-window'],
   },
-  // The one launcher whose window ships in no markup entry: the Perfecting
-  // painter mints #perfecting-window on first open (still a .window.panel, so
-  // Hud's window observer stamps data-window-open on it like any other).
   { selector: '#mm-map', windowId: 'map-window' },
   { selector: '#mm-bag', windowId: 'bags' },
   { selector: '#mm-arena', windowId: 'arena-window' },

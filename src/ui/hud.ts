@@ -3316,6 +3316,7 @@ export class Hud {
       // Piggyback the resize-grip stamp on this one observer (window_resize.ts
       // deliberately runs no body-wide observer of its own).
       markResizableWindow(el);
+      return el;
     };
     this.windowObserver = new MutationObserver((mutations) => {
       const windowsToSync = new Set<HTMLElement>();
@@ -3323,7 +3324,8 @@ export class Hud {
         if (m.type === 'childList') {
           m.addedNodes.forEach((node) => {
             if (!(node instanceof HTMLElement)) return;
-            if (node.matches('.window.panel')) observeWindow(node);
+            // Synced once too: a root minted already shown has no style record.
+            if (node.matches('.window.panel')) windowsToSync.add(observeWindow(node));
             node.querySelectorAll<HTMLElement>('.window.panel').forEach(observeWindow);
           });
           continue;
@@ -15036,7 +15038,6 @@ export class Hud {
     }
   }
 
-  // The hub's Crafting member: captureFocus AFTER the paint (train/unbind order).
   private showCrafting(): void {
     this.closeOtherWindows('#crafting-window');
     this.renderCrafting();
@@ -15455,8 +15456,7 @@ export class Hud {
     return this.deedsWindow.isOpen;
   }
 
-  // The Professions hub entry points (menu consolidation): every launcher,
-  // keybind and cross-link opens the hub, landing on its tab.
+  // Professions hub entry points: every opener lands on the hub at its tab.
   toggleProfessions(): void {
     this.professionsHub.toggle();
   }

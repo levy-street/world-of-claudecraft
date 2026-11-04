@@ -108,16 +108,25 @@ describe('position carry across a tab switch', () => {
   };
 
   it('carries exactly the remembered-position fields of a placed window', () => {
-    expect(professionsHubPositionCarry(placed, false)).toEqual(placed);
-    expect(Object.keys(professionsHubPositionCarry(placed, false) ?? {}).sort()).toEqual(
+    const carry = professionsHubPositionCarry(placed, false);
+    expect(carry).toEqual({ kind: 'set', fields: placed });
+    expect(Object.keys(carry?.kind === 'set' ? carry.fields : {}).sort()).toEqual(
       [...PROFESSIONS_HUB_POSITION_FIELDS].sort(),
     );
   });
 
-  it('carries nothing on touch, for an unplaced window, or for a partial record', () => {
+  it('resets the next window to the default spot when the shown one was never placed', () => {
+    expect(professionsHubPositionCarry({ ...placed, windowMoved: undefined }, false)).toEqual({
+      kind: 'reset',
+    });
+    expect(professionsHubPositionCarry({ ...placed, reqVh: undefined }, false)).toEqual({
+      kind: 'reset',
+    });
+    expect(professionsHubPositionCarry({}, false)).toEqual({ kind: 'reset' });
+  });
+
+  it('carries nothing on touch, where every member is a full-screen sheet', () => {
     expect(professionsHubPositionCarry(placed, true)).toBeNull();
-    expect(professionsHubPositionCarry({ ...placed, windowMoved: undefined }, false)).toBeNull();
-    expect(professionsHubPositionCarry({ ...placed, reqVh: undefined }, false)).toBeNull();
-    expect(professionsHubPositionCarry({}, false)).toBeNull();
+    expect(professionsHubPositionCarry({}, true)).toBeNull();
   });
 });

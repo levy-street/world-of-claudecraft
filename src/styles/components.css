@@ -13080,11 +13080,8 @@
   .prof-hub-tabs {
     flex: none;
     flex-wrap: wrap;
-    margin: 4px 0 8px;
+    margin: var(--spacing-xs) 0 var(--spacing-sm);
     border-bottom: 1px solid var(--border);
-  }
-  .prof-hub-tab {
-    cursor: var(--cursor-point);
   }
   /* ONE empty-state family for the professions windows (phase 14: the
      harvest journal's shape, the best of the four the family had grown, now

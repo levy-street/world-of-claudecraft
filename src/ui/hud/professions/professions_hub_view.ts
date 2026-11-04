@@ -83,6 +83,13 @@ export function professionsHubToggle(
 }
 
 export const PROFESSIONS_HUB_TAB_CLASS = 'prof-hub-tab';
+
+/** The focus-carry identity of a hub tab (focus_restore.ts): a member that
+ *  rebuilds while a hub tab holds keyboard focus finds the same tab again by
+ *  this key instead of dropping focus to the body. */
+export function professionsHubTabFocusKey(tab: string): string {
+  return `profHub:${tab}`;
+}
 export const PROFESSIONS_HUB_SELECTED_CLASS = 'is-on';
 
 /** The shared strip model, labels resolved at paint time (a language switch
@@ -115,24 +122,33 @@ export const PROFESSIONS_HUB_POSITION_FIELDS = [
   'windowMoved',
 ] as const;
 
+export type ProfessionsHubPositionCarry =
+  | { readonly kind: 'set'; readonly fields: Readonly<Record<string, string>> }
+  | { readonly kind: 'reset' };
+
 /**
  * The position a tab switch hands from the member being hidden to the one
  * being shown, so the hub reads as one window that changed its page rather
- * than a new window cascading elsewhere. Null when there is nothing to carry:
- * on touch every member is a full-screen sheet (an inline position would
- * break that layout), and a member that was never placed leaves the next one
- * to the normal open cascade.
+ * than a new window appearing elsewhere.
+ * - A placed member (dragged, or placed by the open cascade) hands over its
+ *   remembered position fields.
+ * - An unplaced member sits at the default spot, so the next member is RESET
+ *   to the default too: otherwise a tab the player once dragged would jump
+ *   back to that old spot on a switch.
+ * - Null on touch: every member is a full-screen sheet there and an inline
+ *   position would break that layout.
  */
 export function professionsHubPositionCarry(
   from: Readonly<Record<string, string | undefined>>,
   touch: boolean,
-): Record<string, string> | null {
-  if (touch || from.windowMoved !== '1') return null;
-  const carry: Record<string, string> = {};
+): ProfessionsHubPositionCarry | null {
+  if (touch) return null;
+  if (from.windowMoved !== '1') return { kind: 'reset' };
+  const fields: Record<string, string> = {};
   for (const field of PROFESSIONS_HUB_POSITION_FIELDS) {
     const value = from[field];
-    if (value === undefined) return null;
-    carry[field] = value;
+    if (value === undefined) return { kind: 'reset' };
+    fields[field] = value;
   }
-  return carry;
+  return { kind: 'set', fields };
 }

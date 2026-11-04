@@ -638,8 +638,8 @@ with one rail button, and the absorbed windows keep their own ids and painters a
 hub's tabs: every destination stays reachable, but no longer each from its own rail slot
 and its own key. The first hub is Professions (Shift+P: Overview, Crafting, Perfecting,
 Harvest Journal; T still lands on Crafting), so the Crafting, Perfecting and Harvest
-Journal buttons left the rail and Shift+T and Shift+K became free (both actions stay
-rebindable, with no default). A hub button's selected ring lights while any of its tabs
+Journal buttons left the rail and Shift+T and Shift+K no longer ship as defaults (both
+actions stay rebindable, and a binding a player already saved keeps working). A hub button's selected ring lights while any of its tabs
 is open. Each later hub records itself here when it lands.
 
 ### 7.10 Chat

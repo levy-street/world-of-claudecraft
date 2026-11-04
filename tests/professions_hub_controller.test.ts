@@ -133,6 +133,22 @@ describe('position carry', () => {
     hub.open('crafting');
     expect(members.crafting.el.dataset.windowMoved).toBeUndefined();
   });
+
+  it('an unplaced shown window resets the next one, clearing a past drag', () => {
+    // Crafting was dragged once in an earlier session...
+    place(members.crafting.el);
+    members.crafting.el.style.left = '900px';
+    members.crafting.el.style.top = '40px';
+    members.crafting.el.style.transform = 'none';
+    // ...but the hub is open on an Overview the player never moved.
+    hub.open('overview');
+    hub.open('crafting');
+    expect(members.crafting.el.dataset.windowMoved).toBeUndefined();
+    expect(members.crafting.el.dataset.reqLeft).toBeUndefined();
+    expect(members.crafting.el.style.left).toBe('');
+    expect(members.crafting.el.style.top).toBe('');
+    expect(members.crafting.el.style.transform).toBe('');
+  });
 });
 
 describe('the strip a member paints', () => {

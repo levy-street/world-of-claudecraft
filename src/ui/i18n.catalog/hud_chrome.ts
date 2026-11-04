@@ -8667,16 +8667,16 @@ export const hudChromeStrings = {
       'Use: Sharpens your main hand weapon, increasing Attack Power by 6 for 30 min.',
     manaElixirUse: 'Use: Increases Spirit by 6 for 1 hour.',
   },
-  // Professions window (Professions 2.0): the read-only craft-wheel
-  // window. Craft and pair NAMES resolve through craftName / archetypePair
-  // above; these keys are the window's own chrome. Wording follows the
-  // crafting identity card family (crafting.identity.*).
   // The Professions hub (menu consolidation step 1): the shared tab strip
   // over the four professions windows. The other three tabs reuse their
   // former window titles (crafting/perfecting/harvestJournal .title).
   professionsHub: {
     tabOverview: 'Overview',
   },
+  // Professions window (Professions 2.0): the read-only craft-wheel
+  // window. Craft and pair NAMES resolve through craftName / archetypePair
+  // above; these keys are the window's own chrome. Wording follows the
+  // crafting identity card family (crafting.identity.*).
   professions: {
     title: 'Professions',
     close: 'Close professions',

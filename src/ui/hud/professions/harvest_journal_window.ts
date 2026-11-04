@@ -341,7 +341,7 @@ export class HarvestJournalWindow {
     }
     content.innerHTML =
       `<div class="panel-title ui-win-head"><span class="ui-win-title" id="harvest-journal-title">${esc(t(this.deps.hubStrip ? 'hudChrome.professions.title' : 'hudChrome.harvestJournal.title'))}</span>` +
-      `<button type="button" class="x-btn ui-x-btn" data-close data-focus-key="harvestJournalClose" aria-label="${esc(t('hudChrome.harvestJournal.close'))}">${svgIcon('close')}</button></div>` +
+      `<button type="button" class="x-btn ui-x-btn" data-close data-focus-key="harvestJournalClose" aria-label="${esc(t(this.deps.hubStrip ? 'hudChrome.professions.close' : 'hudChrome.harvestJournal.close'))}">${svgIcon('close')}</button></div>` +
       (this.deps.hubStrip?.html() ?? '') +
       `<div class="hj-body">${this.bodyHtml(view, nowMs)}</div>`;
     this.collectCountdownCells(content, nowMs);

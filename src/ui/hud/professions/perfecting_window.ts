@@ -411,9 +411,13 @@ export class PerfectingWindow {
     const focusKey = captureFocusKey(root);
     // The rewrite targets the inner shell so the sibling live region never
     // leaves the tree (see root()).
+    // Inside the Professions hub the close button closes the whole hub.
+    const closeLabel = t(
+      this.deps.hubStrip ? 'hudChrome.professions.close' : 'hudChrome.perfecting.close',
+    );
     shell.innerHTML =
       `<div class="panel-title ui-win-head"><span class="ui-win-title" id="perfecting-title">${esc(t(this.deps.hubStrip ? 'hudChrome.professions.title' : 'hudChrome.perfecting.title'))}</span>` +
-      `<button type="button" class="x-btn ui-x-btn" data-close data-focus-key="pfClose" aria-label="${esc(t('hudChrome.perfecting.close'))}" title="${esc(t('hudChrome.perfecting.close'))}">${svgIcon('close')}</button></div>` +
+      `<button type="button" class="x-btn ui-x-btn" data-close data-focus-key="pfClose" aria-label="${esc(closeLabel)}" title="${esc(closeLabel)}">${svgIcon('close')}</button></div>` +
       (this.deps.hubStrip?.html() ?? '') +
       `<div class="pf-body">${this.bodyHtml(view)}</div>`;
     this.wire(root, view);

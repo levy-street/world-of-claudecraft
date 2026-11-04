@@ -396,9 +396,9 @@ export const BIND_ACTIONS: BindAction[] = [
   },
   // The Harvest Journal and Perfecting are tabs of the Professions hub (menu
   // consolidation, 2026-11-04): Shift+P opens the hub and T lands on its
-  // Crafting tab, so neither tab ships a default key any more (their old
-  // Shift+K and Shift+T are free). Both actions stay rebindable and open the
-  // hub straight on their tab.
+  // Crafting tab, so neither tab ships a default key any more (Shift+K and
+  // Shift+T are no longer defaults; a saved binding keeps working). Both
+  // actions stay rebindable and open the hub straight on their tab.
   {
     id: 'harvestJournal',
     label: 'Harvest Journal',

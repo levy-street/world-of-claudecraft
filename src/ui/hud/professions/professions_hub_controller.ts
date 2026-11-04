@@ -14,17 +14,21 @@
 // Cold: no driver, no layout read. The one browser global it reaches is
 // localStorage for the per-device last-tab memory (UI_DOM_MODULES).
 
+import { FOCUS_KEY_ATTR } from '../../focus_restore';
 import { focusActiveTab, wireTabStrip } from '../../tab_strip_painter';
 import {
   isProfessionsHubTab,
+  PROFESSIONS_HUB_POSITION_FIELDS,
   PROFESSIONS_HUB_SELECTED_CLASS,
   PROFESSIONS_HUB_TAB_CLASS,
   PROFESSIONS_HUB_TAB_KEY,
   PROFESSIONS_HUB_TABS,
+  type ProfessionsHubPositionCarry,
   type ProfessionsHubTab,
   parseProfessionsHubTab,
   professionsHubPositionCarry,
   professionsHubStripHtml,
+  professionsHubTabFocusKey,
   professionsHubToggle,
   resolveProfessionsHubTab,
 } from './professions_hub_view';
@@ -56,6 +60,21 @@ export interface ProfessionsHubStrip {
   wire(root: HTMLElement): void;
 }
 
+/** Write a carry onto the member about to be shown, BEFORE it opens, so Hud's
+ *  window observer places it from these fields on show. A reset also clears
+ *  the inline placement a past drag left, handing the root back to its CSS
+ *  default spot. Cold: runs once per tab switch. */
+function applyPositionCarry(to: HTMLElement, carry: ProfessionsHubPositionCarry): void {
+  if (carry.kind === 'set') {
+    Object.assign(to.dataset, carry.fields);
+    return;
+  }
+  for (const field of PROFESSIONS_HUB_POSITION_FIELDS) delete to.dataset[field];
+  for (const prop of ['left', 'top', 'right', 'bottom', 'transform'] as const) {
+    to.style[prop] = '';
+  }
+}
+
 export class ProfessionsHubController {
   constructor(private readonly deps: ProfessionsHubDeps) {}
 
@@ -82,7 +101,7 @@ export class ProfessionsHubController {
       const carry = from ? professionsHubPositionCarry(from.dataset, this.deps.touch()) : null;
       this.deps.members()[current].close();
       const to = this.deps.members()[target].rootElement();
-      if (carry && to) Object.assign(to.dataset, carry);
+      if (carry && to) applyPositionCarry(to, carry);
     }
     this.deps.members()[target].open();
     this.saveTab(target);
@@ -108,11 +127,18 @@ export class ProfessionsHubController {
   stripFor(tab: ProfessionsHubTab): ProfessionsHubStrip {
     return {
       html: () => professionsHubStripHtml(tab),
-      wire: (root) =>
+      wire: (root) => {
+        // Stamp the focus-carry key BEFORE the member's restore ladder runs
+        // (every member wires the strip ahead of it), so a rebuild with a hub
+        // tab focused lands back on that tab.
+        for (const node of root.querySelectorAll<HTMLElement>(`.${PROFESSIONS_HUB_TAB_CLASS}`)) {
+          node.setAttribute(FOCUS_KEY_ATTR, professionsHubTabFocusKey(node.dataset.tab ?? ''));
+        }
         wireTabStrip(root, PROFESSIONS_HUB_TAB_CLASS, (id, focusFollow) => {
           if (!isProfessionsHubTab(id) || id === tab) return;
           this.open(id, focusFollow);
-        }),
+        });
+      },
     };
   }
 
