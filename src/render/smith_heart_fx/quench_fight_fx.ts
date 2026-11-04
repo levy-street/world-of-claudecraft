@@ -105,8 +105,11 @@ void main() {
   gl_Position = projectionMatrix * modelViewMatrix * instanceMatrix * vec4(position, 1.0);
 }
 `;
-/** A hole of freezing water: dark deep water under a churn of slush and
- *  floating shards, a rim of broken white ice (vP: churn, fresh, seed). */
+/** A hole of freezing water (vP: churn, fresh, seed): a thin broken lip of
+ *  ice with jagged teeth, the lake's own ice showing round it (never a ring
+ *  painted over it), an inner wall of ice falling away into the water so the
+ *  hole has depth, dark deep water under a slow swell, slush and torn floes
+ *  drifting near the lip (never square), glints of the sky (audit point 14). */
 const HOLE_FRAG = /* glsl */ `
 uniform float uTime;
 uniform vec3 uDeep;
@@ -125,31 +128,35 @@ void main() {
   float r = length(vXY);
   float a = atan(vXY.y, vXY.x);
   float seed = vP.z * 37.0;
-  // The rim ragged: a thin lip of broken ice round the edge.
-  float ragged = 0.93 + 0.05 * n(vec2(a * 5.0 + seed, seed));
-  if (r > 1.0) discard;
-  float rim = smoothstep(ragged - 0.06, ragged, r);
+  // The break: a ragged outline, teeth of ice reaching in from it.
+  float edge = 0.9 + 0.06 * n(vec2(a * 6.0 + seed, seed)) + 0.03 * n(vec2(a * 21.0 - seed, seed * 2.0));
+  float teeth = 0.07 * smoothstep(0.55, 0.9, n(vec2(a * 15.0 + seed * 3.0, 7.0)));
+  float lipIn = edge - teeth;
+  // Past the break the lake's own ice shows.
+  float outside = smoothstep(edge, edge + 0.03, r);
+  if (r > 1.0 || outside >= 1.0) discard;
+  float lip = smoothstep(lipIn - 0.025, lipIn, r);
   float t = uTime;
   vec2 q = vXY * 5.0 + vec2(seed);
   float swell = n(q + vec2(t * 0.3, -t * 0.22)) * 0.6 + n(q * 2.3 - vec2(t * 0.5, t * 0.4)) * 0.4;
-  // Floes of broken ice drifting near the lip, slush churned by the break.
-  vec2 cellP = vXY * 3.2 + vec2(seed * 0.3) + vec2(sin(t * 0.2), cos(t * 0.17)) * 0.15;
-  float floe = step(0.72, h(floor(cellP))) * smoothstep(0.45, 0.8, r) * (1.0 - rim);
-  vec2 fc = fract(cellP) - 0.5;
-  floe *= step(max(abs(fc.x), abs(fc.y)), 0.36);
+  vec3 water = mix(uDeep * 0.8, uLit * 0.85, swell * 0.35 + (1.0 - r) * 0.08);
+  // Slush churned by the break, torn floes drifting near the lip.
   float slush = smoothstep(0.62, 0.9, n(q * 1.7 + vec2(t * 0.15, t * 0.1))) * vP.x;
-  vec3 water = mix(uDeep, uLit, swell * 0.45 + (1.0 - r) * 0.1);
-  water = mix(water, uRim * 0.75, slush * 0.35);
-  water = mix(water, uRim * 0.9, floe * 0.85);
+  water = mix(water, uRim * 0.7, slush * 0.3);
+  vec2 drift = vec2(sin(t * 0.2 + seed), cos(t * 0.17 + seed)) * 0.25;
+  float floe = smoothstep(0.7, 0.735, n(vXY * 3.6 + vec2(seed * 0.4) + drift)) * smoothstep(0.35, 0.7, r);
+  water = mix(water, uRim * 0.82, floe * 0.9);
   // Glints of the sky on the dark water.
-  float glint = pow(max(0.0, n(q * 3.1 + vec2(t * 0.8, -t * 0.6)) - 0.62) * 2.6, 3.0);
-  water += uLit * glint * 0.7;
-  // A shadowed inner wall of ice just inside the lip.
-  float wall = smoothstep(ragged - 0.16, ragged - 0.06, r) * (1.0 - rim);
-  water = mix(water, uDeep * 0.6, wall * 0.6);
-  vec3 col = mix(water, uRim, rim * (0.8 + 0.2 * vP.y));
-  float alpha = 0.97;
-  gl_FragColor = vec4(col, alpha);
+  float glint = max(0.0, n(q * 3.1 + vec2(t * 0.8, -t * 0.6)) - 0.62) * 2.6;
+  water += uLit * glint * glint * glint * 0.7;
+  // The inner wall of ice falling away into the water: lit at its top under
+  // the lip, lost in the dark at the waterline.
+  float wallW = 0.16;
+  float wall = smoothstep(lipIn - wallW, lipIn - 0.01, r) * (1.0 - lip);
+  vec3 wallCol = mix(uDeep * 0.45, uLit * 1.05, smoothstep(lipIn - wallW, lipIn, r));
+  water = mix(water, wallCol, wall * 0.85);
+  vec3 col = mix(water, uRim, lip * (0.82 + 0.18 * vP.y));
+  gl_FragColor = vec4(col, 0.97 * (1.0 - outside));
   #include <colorspace_fragment>
 }
 `;

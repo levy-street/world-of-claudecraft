@@ -186,6 +186,7 @@ import { createTurnInPlaceState, stepTurnInPlace } from './turn_in_place_core';
 import { warriorActionBlend } from './warrior_action_blend';
 import { WarriorActionProps } from './warrior_action_props';
 import { WarriorBodyEffects } from './warrior_body_effects';
+import { easeSink } from './water_sink_core';
 import { SPIN_ATTACK_VISUAL_DURATION, weaponAttackStyle } from './weapon_attack_style_core';
 import { fixedHandPropsShown, swappedClip, weaponLoadout } from './weapon_loadout_core';
 import {
@@ -1311,6 +1312,9 @@ export class CharacterVisual {
   private readonly harvestRecoil = new HarvestRecoil();
   private auraGlowColor = 0xffffff;
   private auraGlowIntensity = 0;
+  /** The drawn sink into water (setWaterSink) and where it is easing to. */
+  private waterSink = 0;
+  private waterSinkTarget = 0;
 
   private baseState: BaseState = 'idle';
   /** The seat facts of the last update (AnimState.seat): which chair clips the sit and
@@ -1865,6 +1869,10 @@ export class CharacterVisual {
       this.braceUntil = extendBrace(this.braceUntil, this.clock);
     }
     if (this.surfaceResponse.update(dt, this.root, this.height)) this.applyVisualMaterials();
+    if (this.waterSink !== this.waterSinkTarget) {
+      this.waterSink = easeSink(this.waterSink, this.waterSinkTarget, dt);
+      this.root.position.y = -this.waterSink;
+    }
     // A streamed armor file that landed (or a better tier of one): the dressing
     // attaches it (at once with no work queue behind this body, else as a unit
     // of it), and the re-dress that follows is here, on the per-frame path.
@@ -3864,9 +3872,18 @@ export class CharacterVisual {
    *  no glow pulse, turn or entrance carries over from the last one. */
   resetForReuse(): void {
     this.turnState.seeded = false;
+    this.waterSink = 0;
+    this.waterSinkTarget = 0;
     this.entranceFor = undefined;
     this.wasSwimming = false;
     if (this.glowPulse?.reset() && !this.disposed) this.applyVisualMaterials();
+  }
+
+  /** Draw the body this far down into water it fell into (the Quench's
+   *  holes, smith_heart_fx/quench_glaze_core.ts quenchSinkOf), eased per frame;
+   *  0 stands it back on its feet. Presentation only. */
+  setWaterSink(depth: number): void {
+    this.waterSinkTarget = Math.max(0, depth);
   }
 
   /** A frost glaze held on the body's own material (the Quench's cold,

@@ -70,3 +70,16 @@ export function quenchGlazeOf(
   out.alpha = look.alpha;
   return out;
 }
+
+/** How deep a body fallen through the ice stands in the water (yards): waist
+ *  deep, so the hole reads as water and never as a plate under its feet
+ *  (audit point 14). */
+export const QUENCH_TRAPPED_SINK = 1.05;
+
+/** How far below its feet a body carrying `auras` is drawn: a body the sim
+ *  holds in a hole (`QUENCH_AURAS.trapped`) stands sunk in the water; 0 for
+ *  every other. Presentation only: the sim keeps its feet on the ice. */
+export function quenchSinkOf(auras: readonly GlazeAura[]): number {
+  for (const a of auras) if (a.id === QUENCH_AURAS.trapped) return QUENCH_TRAPPED_SINK;
+  return 0;
+}
