@@ -17,6 +17,7 @@ import {
   SMITH_HEART_ROCK_KIT_URL,
   upgradeWhenHeartKitLands,
 } from './heart_kit';
+import { planHeartGulfWalls } from './heart_rock_gulf_core';
 import { planHeartHangs, planHeartRockLips, planHeartRockUnder } from './heart_rock_hang_core';
 import { planHeartNeedles, planHeartRock } from './heart_rock_plan_core';
 
@@ -45,6 +46,8 @@ export function buildHeartRock(lowGfx: boolean): THREE.Group {
       ...planHeartHangs(),
       ...planHeartRockLips(),
       ...planHeartNeedles(),
+      // The Wind Bridge gulf's far walls (the weak-spots pass of 2026-11-04).
+      ...planHeartGulfWalls(),
     ],
     lowGfx,
     'smithHeartRock',

@@ -16,6 +16,7 @@ import { SMITH_HEART_FIELD } from '../../sim/content/smith_heart_layout';
 import { authoredFieldHeight } from '../../sim/instances/authored_field';
 import { heartGatePartPose, heartGateParts, heartGateRig } from './heart_gates_core';
 import { HEART_PROP_RECIPES, type HeartPart, heartPropBase } from './heart_plan_core';
+import { planHeartGulfWalls } from './heart_rock_gulf_core';
 import { HEART_ROCK_HANG, planHeartHangs } from './heart_rock_hang_core';
 import {
   HEART_ROCK_LIP,
@@ -64,7 +65,7 @@ export function heartWallSolids(spacing = 5): HeartSolid[] {
  *  its drop, out over the void as far as its face leans. */
 export function heartRockSolids(): HeartSolid[] {
   const out: HeartSolid[] = [];
-  for (const p of [...planHeartRock(), ...planHeartUnderCliffs()]) {
+  for (const p of [...planHeartRock(), ...planHeartUnderCliffs(), ...planHeartGulfWalls()]) {
     const m = heartRockPieceOf(p.piece);
     const k = p.scale ?? 1;
     const hh = (m.height * k * (p.rise ?? 1)) / 2;

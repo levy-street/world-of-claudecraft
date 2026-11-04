@@ -316,8 +316,9 @@ function slopeUnder(
 }
 
 /** Does a piece's body (back to its depth, across its reach) stand over a
- *  walked floor between its foot and its crest? */
-function backOverFloor(
+ *  walked floor between its foot and its crest? (Shared with the gulf's walls,
+ *  heart_rock_gulf_core.ts.) */
+export function heartRockBackOverFloor(
   p: { x: number; z: number; rot: number; scale?: number },
   piece: HeartRockPiece,
   foot: number,
@@ -445,7 +446,7 @@ function planBand(
           const q2 = { x: px - Math.sin(rot) * back, z: pz - Math.cos(rot) * back, rot, scale: k };
           if (!Number.isFinite(clearOf(q2.x, q2.z).back)) continue;
           if (heartOpenAir(q2.x, q2.z, piece2.reach * k)) continue;
-          if (backOverFloor(q2, piece2, foot2, piece2.height * S.scale)) continue;
+          if (heartRockBackOverFloor(q2, piece2, foot2, piece2.height * S.scale)) continue;
           if (
             heartRockFrontPoints(q2, piece2).some((f) => clearOf(f.x, f.z).back < band.back - slack)
           )
@@ -472,7 +473,7 @@ function planBand(
         if (upper && upper.y + heartRockPieceOf(upper.piece).height * S.scale > cap) continue;
         // Its back never reaches over a walk behind it (a floor higher up
         // the mountain under its crest).
-        if (backOverFloor(q, piece, foot, piece.height * S.scale)) continue;
+        if (heartRockBackOverFloor(q, piece, foot, piece.height * S.scale)) continue;
         const placed: HeartKitPlacement = {
           piece: index >= HEART_ROCK_FAR_FROM ? `${name}Far` : name,
           x: px,
@@ -813,7 +814,7 @@ export function planHeartUnderCliffs(): HeartKitPlacement[] {
       const foot = heartRockBedFloor(floor - U.below - tall);
       const q = { x: cx, z: cz, rot: Math.atan2(nx, nz), scale: k };
       // Never over another walk (a lower landing beside it).
-      if (backOverFloor(q, piece, foot, tall)) continue;
+      if (heartRockBackOverFloor(q, piece, foot, tall)) continue;
       out.push({
         piece: name,
         x: cx,
