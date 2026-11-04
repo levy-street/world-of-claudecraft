@@ -22,6 +22,7 @@ import {
   restoreServerTime,
   setServerTimePhase,
 } from './dev/day_night_override';
+import { clearCooldownsForDev } from './dev/dev_cooldowns';
 import { displacePlayerForDev } from './dev/dev_displace';
 import { handleDrownedTempleDevChat } from './dev/drowned_temple_dev';
 import { handleFerryDevChat } from './dev/ferry_dev';
@@ -1216,8 +1217,9 @@ export function handleDevChat(
         entity.profilerInvulnerable = false;
         entity.hp = entity.maxHp;
         entity.resource = entity.maxResource;
+        clearCooldownsForDev(entity, ctx.time);
       }
-      emitDevLog(ctx, pid, `[dev] God mode ${entity.devGod ? 'ON' : 'OFF'}.`);
+      emitDevLog(ctx, pid, `[dev] God mode ${entity.devGod ? 'ON' : 'OFF'} (no cooldowns).`);
     }
     return null;
   }
@@ -1513,12 +1515,7 @@ export function handleDevChat(
   }
   if (/^\/(?:dev\s+cooldowns|devcooldowns)\s*$/i.test(raw)) {
     const entity = ctx.entities.get(pid);
-    if (entity) {
-      entity.cooldowns.clear();
-      entity.gcdRemaining = 0;
-      entity.potionCooldownUntil = ctx.time;
-      entity.potionCdRemaining = 0;
-    }
+    if (entity) clearCooldownsForDev(entity, ctx.time);
     emitDevLog(ctx, pid, '[dev] Cooldowns cleared.');
     return null;
   }

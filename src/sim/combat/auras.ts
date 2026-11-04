@@ -39,6 +39,7 @@
 import { shouldFireConsumeTickSfx } from '../consume_sfx';
 import { updateDawnBattleStandards } from '../content/faction_rewards';
 import { TRINKET_AURA } from '../content/trinkets';
+import { clearCooldownsForDev } from '../dev/dev_cooldowns';
 import { pctValue, recalcPlayerStats } from '../entity';
 import { manaRegenPer2s } from '../mana_regen';
 import { CHEATER_MARK_AURA_ID } from '../moderation';
@@ -223,7 +224,7 @@ export function updateRegen(ctx: SimContext, p: Entity, meta: PlayerMeta): void 
   }
 }
 
-export function updateTimers(p: Entity): void {
+export function updateTimers(p: Entity, ctx?: Pick<SimContext, 'devCommands' | 'time'>): void {
   p.gcdRemaining = Math.max(0, p.gcdRemaining - DT);
   p.potionCdRemaining = Math.max(0, p.potionCdRemaining - DT);
   p.firebottleCdRemaining = Math.max(0, p.firebottleCdRemaining - DT);
@@ -271,6 +272,8 @@ export function updateTimers(p: Entity): void {
       if (state.charges <= 0) p.cooldowns.set(abilityId, state.recharge);
     }
   }
+  // [dev] /dev god keeps every cooldown clear; gated on devCommands like its 100x damage.
+  if (ctx?.devCommands && p.devGod) clearCooldownsForDev(p, ctx.time);
 }
 
 // Combo points are character-bound (retail-style): they survive target swaps and

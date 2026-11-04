@@ -131,6 +131,8 @@ describe('Vaulting Charge that never leaves the ground', () => {
     const origin = riftInstanceOrigin(inst.slot, inst.floorIndex);
     const p = sim.player;
     const aim = { x: origin.x + 8, z: origin.z + floorZ };
+    // /dev god clears cooldowns every tick; the room is already cleared, so drop it here.
+    p.devGod = false;
 
     p.gcdRemaining = 0;
     p.cooldowns.delete('heroic_leap');
