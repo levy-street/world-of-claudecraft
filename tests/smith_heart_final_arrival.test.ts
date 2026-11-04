@@ -109,10 +109,17 @@ describe('the body through the rebuild (final_body_fx.ts)', () => {
     expect(sent).toContain(FINAL_BODY_GESTURES.show);
     expect(sent).not.toContain(FINAL_BODY_GESTURES.hide);
     expect(sent).not.toContain(FINAL_BODY_GESTURES.shift);
+    // Dormant, it kneels while its stone gathers.
+    expect(sent).toContain(FINAL_BODY_GESTURES.kneel);
     sent.length = 0;
     frame(false, true, 0.1);
     frame(true, false, 0.2);
+    // It rises and roars awake.
+    expect(sent).toContain(FINAL_BODY_GESTURES.stand);
     expect(sent).toContain(FINAL_BODY_GESTURES.shift);
+    expect(sent.indexOf(FINAL_BODY_GESTURES.stand)).toBeLessThan(
+      sent.indexOf(FINAL_BODY_GESTURES.shift),
+    );
     // Asleep (neither): hidden.
     const s2: string[] = [];
     const fx2 = new FinalBodyFx(new THREE.Group(), host(), (_id, g) => s2.push(g));

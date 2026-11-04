@@ -263,7 +263,8 @@ export class FinalBodyFx {
       this.send(showBody ? FINAL_BODY_GESTURES.show : FINAL_BODY_GESTURES.hide);
       this.bodyShown = showBody;
     }
-    const kneel = f.kneeling && !f.dead;
+    // Forming, it kneels dormant while its stone gathers; it rises as it wakes.
+    const kneel = (f.kneeling || f.forming) && !f.dead;
     if (kneel !== this.kneelSent || resend) {
       this.send(kneel ? FINAL_BODY_GESTURES.kneel : FINAL_BODY_GESTURES.stand);
       this.kneelSent = kneel;

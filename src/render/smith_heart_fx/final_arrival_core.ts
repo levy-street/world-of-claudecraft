@@ -57,6 +57,10 @@ export function arrivalAnchor(
   }
 }
 
+/** Kneeling while it forms (final_body_fx.ts: the false death's stance), the
+ *  model's anchors stand this share of its height. */
+export const ARRIVAL_KNEEL_HEIGHT = 0.72;
+
 /** From this share of its flight a piece sinks into the model's stone. */
 export const ARRIVAL_ABSORB_FROM = 0.62;
 

@@ -73,6 +73,7 @@ import { radialGlowTexture } from '../textures';
 import { EngineParticles } from '../trash_engine_fx/engine_particles';
 import { NOVA_WAVE_SECONDS, novaWave } from '../trash_engine_fx/trash_engine_fx_core';
 import {
+  ARRIVAL_KNEEL_HEIGHT,
   arrivalAnchor,
   arrivalForming,
   arrivalModelShown,
@@ -1001,7 +1002,9 @@ export class FinalFx {
         this.groundY(at.x, at.z) + this.body.position.y,
         at.z - this.originZ,
         boss.facing,
-        FINAL_BODY_HEIGHT * (boss.scale > 0 ? boss.scale : 1),
+        FINAL_BODY_HEIGHT *
+          (boss.scale > 0 ? boss.scale : 1) *
+          (modelWhole ? 1 : ARRIVAL_KNEEL_HEIGHT),
         this.heartAt,
       );
       this.modelHeart.set(h.x, h.y, h.z);
@@ -1178,7 +1181,9 @@ export class FinalFx {
         this.groundY(at.x, at.z) + this.body.position.y,
         at.z - this.originZ,
         boss.facing,
-        FINAL_BODY_HEIGHT * (boss.scale > 0 ? boss.scale : 1),
+        FINAL_BODY_HEIGHT *
+          (boss.scale > 0 ? boss.scale : 1) *
+          (arrivalForming(t, ARRIVAL_WAVE_AT, false) ? ARRIVAL_KNEEL_HEIGHT : 1),
         this.anchorAt,
       );
       p.target.set(this.anchorAt.x, this.anchorAt.y, this.anchorAt.z);
