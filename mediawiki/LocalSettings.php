@@ -63,6 +63,8 @@ wfLoadSkin( 'Vector' );
 
 $wgHooks['BeforePageDisplay'][] = static function ( OutputPage $out, Skin $skin ): void {
 	$out->addStyle( '/wiki/resources/assets/woc-mediawiki.css' );
+	$out->addStyle( '/wiki/resources/assets/encyclopedia/hover_tooltip.css' );
+	$out->addHeadItem( 'woc-hover-cards', '<script type="module" src="/wiki/resources/assets/encyclopedia/mediawiki_hover.js"></script>' );
 };
 
 // Page art is limited to packaged game images. Wiki editors cannot supply a host or arbitrary markup.

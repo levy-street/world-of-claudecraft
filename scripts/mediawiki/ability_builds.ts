@@ -4,8 +4,22 @@ import { computeTalentModifiers, TALENTS } from '../../src/sim/content/talents';
 import { CLASSES, QUESTS } from '../../src/sim/data';
 import { createPlayer } from '../../src/sim/entity';
 import type { ResolvedAbility } from '../../src/sim/resolved_ability';
-import { MAX_LEVEL, type PlayerClass } from '../../src/sim/types';
+import { type AbilityDef, MAX_LEVEL, type PlayerClass } from '../../src/sim/types';
 import { abilityDisplayDescription, abilityEffectText } from '../../src/ui/ability_description';
+
+export function referenceAbility(def: AbilityDef): ResolvedAbility {
+  return {
+    def,
+    rank: 1,
+    cost: def.cost,
+    castTime: def.castTime,
+    cooldown: def.cooldown,
+    effects: def.effects,
+    threatFlat: def.threat?.flat ?? 0,
+    threatMult: def.threat?.mult ?? 1,
+    charges: def.maxCharges,
+  };
+}
 
 const zero = { spellPower: 0, attackPower: 0, healPower: 0, rangedPower: 0 };
 const sample = { spellPower: 100, attackPower: 100, healPower: 100, rangedPower: 100 };

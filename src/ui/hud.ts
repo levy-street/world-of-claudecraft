@@ -139,29 +139,13 @@ import {
   type OverheadEmoteId,
   type PartyInfo,
 } from '../world_api';
-import { abilityScalingOf } from './ability_damage';
-import {
-  abilityDisplayDescription,
-  abilityEffectAuraInput,
-  abilityEffectText,
-  formatAbilityNumber,
-} from './ability_description';
+import { formatAbilityNumber } from './ability_description';
 import { abilityDisplayName, abilityDisplayNameFromSource } from './ability_display_name';
-import {
-  abilityCastLine,
-  abilityRangeLine,
-  abilityRequirementLines,
-  describeAbilitySummary,
-  playerSpellHasteFrac,
-  resourceDisplayName,
-} from './ability_tooltip_lines';
+import { describeAbilitySummary, playerSpellHasteFrac } from './ability_tooltip_lines';
+import { abilityTooltipHtml, auraEffectTooltipHtml } from './ability_tooltip_view';
 import { ArenaWindow } from './arena_window';
 import { auraDisplayNameForHud, auraDisplayNameFromSource } from './aura_display_name';
-import {
-  type AuraEffectInput,
-  auraEffectDescriptor,
-  auraEffectMaximumFractionDigits,
-} from './aura_effect';
+import type { AuraEffectInput } from './aura_effect';
 import { auraGainLogKeyFor, findAuraForGainEvent } from './aura_gain_log';
 import { resolveHudAuraIconId, resolveHudAuraIconUrl } from './aura_icon_runtime';
 import type { AuraOverlayController } from './aura_overlay_controller';
@@ -6217,27 +6201,7 @@ export class Hud {
   // for current AuraKinds and safely omits an unknown mixed-release kind. Injected so
   // the view never calls t().
   private auraEffectTooltipHtml(a: AuraEffectInput & { id?: string }): string {
-    const effect = auraEffectDescriptor(a, this.sim.player);
-    if (!effect) return '';
-    const values: Record<string, string> = {};
-    if (effect.nums) {
-      for (const [k, n] of Object.entries(effect.nums)) {
-        values[k] = formatNumber(n, {
-          maximumFractionDigits: auraEffectMaximumFractionDigits(n),
-        });
-      }
-    }
-    // Resolve the {school} placeholder in the dot/absorb/thorns summaries. Prefer
-    // the SOURCE ability's school: it is authoritative and always present
-    // client-side, unlike the aura's own school, which the ability-tooltip call
-    // site omits (only kind+value) and the online wire mirror drops. Without this
-    // a magic reflect like Lightning Shield read a raw "{school}" (ability tooltip)
-    // or the wrong "Physical" (online buff frame) instead of its real school.
-    const school = (a.id ? ABILITIES[a.id]?.school : undefined) ?? effect.school;
-    if (school) {
-      values.school = t(`hudChrome.auraEffect.school.${school}` as TranslationKey);
-    }
-    return `<div class="tt-effect">${esc(t(effect.key as TranslationKey, values))}</div>`;
+    return auraEffectTooltipHtml(a, this.sim.player);
   }
 
   attachTooltip(el: HTMLElement, html: () => string, isSpell: () => boolean = () => false): void {
@@ -6930,83 +6894,12 @@ export class Hud {
   }
 
   private abilityTooltip(res: ResolvedAbility): string {
-    const a = res.def;
-    const scaling = abilityScalingOf(this.sim.player);
-    const damageText = abilityEffectText(res, scaling);
-    let html = `<div class="tt-title">${esc(abilityDisplayName(a))}</div>`;
-    html += `<div class="tt-sub">${esc(t('abilityUi.tooltip.rank', { rank: formatAbilityNumber(res.rank) }))}</div>`;
-    const costLine: string[] = [];
-    if (res.cost > 0) {
-      costLine.push(
-        t('abilityUi.tooltip.cost', {
-          cost: formatAbilityNumber(res.cost),
-          resource: resourceDisplayName(this.sim.player.resourceType),
-        }),
-      );
-    }
-    if (a.devotionCost) {
-      costLine.push(
-        t('abilityUi.tooltip.cost', {
-          cost: formatAbilityNumber(a.devotionCost),
-          resource: t('abilityUi.resources.devotion'),
-        }),
-      );
-    }
-    if ((a.ruinCost ?? 0) > 0) {
-      costLine.push(
-        t('abilityUi.tooltip.ruinCost', {
-          cost: formatAbilityNumber(a.ruinCost ?? 0),
-        }),
-      );
-    }
-    const rangeLine = abilityRangeLine(a);
-    if (rangeLine) costLine.push(rangeLine);
-    if (costLine.length) html += `<div class="tt-stat">${costLine.map(esc).join(' &nbsp; ')}</div>`;
-    const castLine = [abilityCastLine(res, playerSpellHasteFrac(this.sim.player))];
-    // Use the RESOLVED cooldown (res.cooldown), not res.def.cooldown, so talents that
-    // reduce cooldown (Improved Mortal Strike, Barrage, Improved Fire Blast, ...) show
-    // their effect in the tooltip.
-    if (res.cooldown > 0)
-      castLine.push(
-        t('abilityUi.tooltip.cooldownSeconds', {
-          seconds: formatAbilityNumber(res.cooldown),
-        }),
-      );
-    html += `<div class="tt-stat">${castLine.map(esc).join(' &nbsp; ')}</div>`;
-    html += `<div class="tt-desc">${esc(abilityDisplayDescription(res, damageText, scaling, undefined, this.sim.talents.spec))}</div>`;
-    // Resolved buff/aura effect line(s). Reads the RESOLVED effect value, so a buff's
-    // tooltip reflects rank AND talents that strengthen it (Improved Devotion Aura /
-    // Aspect of the Hawk / Fortitude via buffPct) - which the static description can't.
-    for (const eff of res.effects) {
-      if (res.def.tooltipOmitEffectLines) break;
-      const resolvedAuraEffect = abilityEffectAuraInput(eff);
-      if (resolvedAuraEffect) {
-        html += this.auraEffectTooltipHtml(resolvedAuraEffect);
-      } else if (eff.type === 'selfBuff' || eff.type === 'buffTarget') {
-        // Pass the ability id so the effect line can resolve its damage school
-        // (the {school} placeholder in the thorns/dot/absorb summaries).
-        html += this.auraEffectTooltipHtml({
-          kind: eff.kind,
-          value: eff.value,
-          id: a.id,
-        });
-      } else if (eff.type === 'partyMeleeBuff') {
-        // Sanguine Aura: surface the same composite line the buff icon shows.
-        html += this.auraEffectTooltipHtml({
-          kind: 'sanguine',
-          value: eff.attackSpeedMult,
-          value2: eff.dmgPct,
-        });
-      }
-    }
-    // Pass the RESOLVED ability, not just its def: a talent that retires a
-    // requirement (Cheap Trick on Gut Punch) must retire its line with it, the
-    // same way the resolved cost / cast / cooldown above beat the def's.
-    const requirements = abilityRequirementLines(a, this.sim.talents.spec, res);
-    if (requirements.length) {
-      html += requirements.map((line) => `<div class="tt-sub">${esc(line)}</div>`).join('');
-    }
-    return html;
+    return abilityTooltipHtml(
+      res,
+      this.sim.player.resourceType,
+      this.sim.talents.spec,
+      this.sim.player,
+    );
   }
 
   // -------------------------------------------------------------------------

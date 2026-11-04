@@ -4,6 +4,7 @@ COPY mediawiki/apache-wiki.conf /etc/apache2/conf-enabled/wiki-path.conf
 COPY mediawiki/entrypoint.sh /usr/local/bin/woc-mediawiki-entrypoint
 COPY mediawiki/LocalSettings.php /opt/woc/LocalSettings.php
 COPY mediawiki/seed/pages.xml /opt/woc/seed/pages.xml
+COPY mediawiki/seed/pages.tooltips.json mediawiki/reader/mediawiki_hover.js mediawiki/reader/hover_tooltip.js mediawiki/reader/tooltip_content.js mediawiki/reader/hover_tooltip.css /var/www/html/resources/assets/encyclopedia/
 COPY mediawiki/theme/Common.css /var/www/html/resources/assets/woc-mediawiki.css
 COPY public/map_bg/ /var/www/html/resources/assets/game/map_bg/
 COPY public/ui/ /var/www/html/resources/assets/game/ui/

@@ -1,6 +1,8 @@
 import { layoutArticle, sectionRoute } from './article_layout.js';
 import { browseTrails, directoryLink, isCollection, isDirectory, subjects } from './browse.js';
 import { directoryArt } from './directory_art.js';
+import { mountWikiTooltips } from './hover_tooltip.js';
+import { tooltipLookup } from './tooltip_content.js';
 
 const escapeHtml = (text) =>
   String(text).replace(
@@ -167,7 +169,19 @@ function addIndexFilter(view) {
   });
 }
 
-export async function openReader({ seedUrl, packed, assetUrl }) {
+async function readPayload(url, packed) {
+  if (packed) {
+    const bytes = Uint8Array.from(atob(packed), (s) => s.charCodeAt(0));
+    return new Response(
+      new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip')),
+    ).text();
+  }
+  const response = await fetch(url);
+  if (!response.ok) throw Error('Could not load the encyclopedia data.');
+  return response.text();
+}
+
+export async function openReader({ seedUrl, packed, cardsUrl, packedCards, assetUrl }) {
   const view = document.querySelector('#view'),
     input = document.querySelector('#lookup'),
     nav = document.querySelector('#navigation');
@@ -196,17 +210,16 @@ export async function openReader({ seedUrl, packed, assetUrl }) {
     for (const el of view.querySelectorAll('[data-game-art]')) observer.observe(el);
   }
   try {
-    let xmlText;
-    if (packed) {
-      const bytes = Uint8Array.from(atob(packed), (s) => s.charCodeAt(0));
-      xmlText = await new Response(
-        new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip')),
-      ).text();
-    } else {
-      const response = await fetch(seedUrl);
-      if (!response.ok) throw Error('Could not load the article index.');
-      xmlText = await response.text();
-    }
+    const lookupReady =
+      cardsUrl || packedCards
+        ? readPayload(cardsUrl, packedCards)
+            .then((text) => tooltipLookup(JSON.parse(text), assetUrl))
+            .catch((error) => {
+              console.error('Unable to load encyclopedia tooltips', error);
+              return null;
+            })
+        : null;
+    const xmlText = await readPayload(seedUrl, packed);
     const dom = new DOMParser().parseFromString(xmlText, 'application/xml');
     if (dom.querySelector('parsererror')) throw Error('Could not read the article index.');
     const pages = new Map();
@@ -516,6 +529,8 @@ export async function openReader({ seedUrl, packed, assetUrl }) {
     }
     show();
     scrollToSection();
+    const lookup = await lookupReady;
+    if (lookup) mountWikiTooltips(view, lookup);
   } catch (error) {
     view.textContent = 'The encyclopedia could not open. ' + error.message;
   }

@@ -9,7 +9,15 @@ import { DIRECTORY_ART, directoryArt } from '../../mediawiki/reader/directory_ar
 const output = process.argv[2];
 if (!output) throw Error('Pass the output HTML path.');
 const html = await readFile('encyclopedia.html', 'utf8');
-const css = await readFile('mediawiki/reader/reader.css', 'utf8');
+const styles = Object.fromEntries(
+  await Promise.all(
+    ['reader', 'hover_tooltip'].map(async (name) => [
+      name,
+      await readFile('mediawiki/reader/' + name + '.css', 'utf8'),
+    ]),
+  ),
+);
+const cards = await readFile('mediawiki/seed/pages.tooltips.json');
 const xml = await readFile('mediawiki/seed/pages.xml');
 const body = xml.toString('utf8');
 const paths = new Set([
@@ -24,6 +32,10 @@ const paths = new Set([
     (m) => m[1],
   ),
 ]);
+for (const html of Object.values(JSON.parse(cards))) {
+  for (const match of html.matchAll(/src="\/?((?:ui|textures)\/[\w/-]+\.(?:webp|png))"/g))
+    paths.add('/' + match[1]);
+}
 const assets = {};
 for (const path of paths) {
   const mime = path.endsWith('.woff2')
@@ -36,11 +48,14 @@ for (const path of paths) {
   assets[path] = 'data:' + mime + ';base64,' + (await readFile('public' + path)).toString('base64');
 }
 const packed = gzipSync(xml, { level: 9 }).toString('base64');
+const packedCards = gzipSync(cards, { level: 9 }).toString('base64');
 const { outputFiles } = await build({
   stdin: {
     contents:
       "import {mountCompanion} from './mediawiki/reader/companion.js';import {openReader} from './mediawiki/reader/reader.js';const assets=JSON.parse(document.getElementById('game-art').textContent); const assetUrl=path=>assets[path];mountCompanion(assetUrl);openReader({assetUrl,packed:" +
       JSON.stringify(packed) +
+      ',packedCards:' +
+      JSON.stringify(packedCards) +
       '});',
     resolveDir: process.cwd(),
   },
@@ -53,7 +68,10 @@ const { outputFiles } = await build({
 await writeFile(
   resolve(output),
   html
-    .replace(/<link rel="stylesheet"[^>]+>/, () => '<style>' + css + '</style>')
+    .replace(
+      /<link rel="stylesheet" href="\.\/mediawiki\/reader\/(reader|hover_tooltip)\.css"[^>]*>/g,
+      (_, name) => '<style>' + styles[name] + '</style>',
+    )
     .replace(
       /<script type="module"[^>]*><\/script>/,
       () =>

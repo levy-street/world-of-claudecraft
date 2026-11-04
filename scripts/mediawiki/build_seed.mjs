@@ -1,5 +1,5 @@
 import { execFile } from 'node:child_process';
-import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { copyFile, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { promisify } from 'node:util';
 import { build } from 'esbuild';
@@ -24,6 +24,8 @@ const css = (await readFile('mediawiki/theme/Common.css', 'utf8')).replaceAll('\
 await writeFile(
   sourcePath,
   `
+import { writeFileSync } from 'node:fs';
+import { tooltipCatalog } from '../../scripts/mediawiki/tooltip_catalog';
 import { ABILITIES, CLASSES, DUNGEON_LIST, ITEMS, MOBS, NPCS, QUESTS, ZONES, zoneContaining, BUILTIN_WORLD } from '../../src/sim/data';
 import { addCatalogPortals } from '../../scripts/mediawiki/catalog_portals';
 import { addQuestDirectory } from '../../scripts/mediawiki/quest_directory';
@@ -280,6 +282,7 @@ const xml = \`<?xml version="1.0" encoding="UTF-8"?>
 </mediawiki>
 \`;
 
+writeFileSync(new URL('./tooltips.json', import.meta.url), JSON.stringify(tooltipCatalog(titleBy), null, 1) + '\\n');
 console.log(xml);
 `,
 );
@@ -298,5 +301,9 @@ const { stdout } = await execFileAsync(process.execPath, [bundlePath], {
   maxBuffer: 50 * 1024 * 1024,
 });
 await writeFile(outputPath, stdout);
+await copyFile(
+  resolve(tmpDir, 'tooltips.json'),
+  outputPath.replace(/\.xml$/i, '') + '.tooltips.json',
+);
 await rm(tmpDir, { recursive: true, force: true });
 console.log(`wrote ${outputPath}`);

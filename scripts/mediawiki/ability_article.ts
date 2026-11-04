@@ -8,7 +8,7 @@ import type { ResolvedAbility } from '../../src/sim/resolved_ability';
 import { type AbilityDef, GCD, MAX_LEVEL, MELEE_RANGE, MIN_GCD } from '../../src/sim/types';
 import { abilityDisplayDescription, abilityEffectText } from '../../src/ui/ability_description';
 import { abilityIndexGroup, itemActionSource } from './ability_access';
-import { specializationExamples } from './ability_builds';
+import { referenceAbility, specializationExamples } from './ability_builds';
 import { mediawikiAbilityDescription } from './ability_description';
 import { abilityScalingLines } from './ability_scaling';
 import { type AbilityPageTools, affectedAbilities } from './talent_articles';
@@ -78,17 +78,7 @@ export function abilityArticle(
     className === 'All classes'
       ? 'All classes with active membership'
       : link(titleBy.class.get(def.class)!, className);
-  const base: ResolvedAbility = {
-    def,
-    rank: 1,
-    cost: def.cost,
-    castTime: def.castTime,
-    cooldown: def.cooldown,
-    effects: def.effects,
-    threatFlat: def.threat?.flat ?? 0,
-    threatMult: def.threat?.mult ?? 1,
-    charges: def.maxCharges,
-  };
+  const base = referenceAbility(def);
   const grantChoices = ROW_TREES[def.class].flatMap((row) =>
     row.options
       .filter((o) => o.effect.grant?.ability === def.id)

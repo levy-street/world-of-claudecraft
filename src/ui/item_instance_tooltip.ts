@@ -466,10 +466,10 @@ export function vendorSellTooltipLine(item: ItemDef): string {
 }
 
 /** The classic weapon/armor level gate line for the shared item card. */
-export function itemRequiredLevelLine(item: ItemDef, playerLevel: number): string {
+export function itemRequiredLevelLine(item: ItemDef, playerLevel?: number): string {
   const req = requiredLevelFor(item);
   if ((item.kind !== 'weapon' && item.kind !== 'armor') || req <= 1) return '';
-  return `<div class="${playerLevel >= req ? 'tt-sub' : 'tt-red'}">${esc(
+  return `<div class="${playerLevel !== undefined && playerLevel < req ? 'tt-red' : 'tt-sub'}">${esc(
     t('hudChrome.itemTooltip.requiresLevel', { level: itemNumber(req) }),
   )}</div>`;
 }

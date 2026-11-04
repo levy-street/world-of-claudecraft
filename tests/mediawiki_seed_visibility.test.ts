@@ -28,6 +28,7 @@ import { WORLD_QUESTS } from '../src/sim/content/world_quests';
 import { ABILITIES, ITEMS, MOBS, QUESTS } from '../src/sim/data';
 
 let xml = '';
+let cards: Record<string, string>;
 let workDir = '';
 
 beforeAll(() => {
@@ -38,6 +39,7 @@ beforeAll(() => {
     stdio: 'pipe',
   });
   xml = readFileSync(out, 'utf8');
+  cards = JSON.parse(readFileSync(path.join(workDir, 'pages.tooltips.json'), 'utf8'));
 }, 120_000);
 
 afterAll(() => {
@@ -119,4 +121,42 @@ describe('the searchable player encyclopedia', () => {
       expect(page).toMatch(/class=&quot;woc-pin&quot; title=&quot;[S0-9/]*H(?:[/0-9]* )/);
     }
   });
+});
+
+describe('the encyclopedia hover catalog', () => {
+  it('maps every item and visible ability to its reserved article title', () => {
+    const expected = xml
+      .split('<page>')
+      .slice(1)
+      .filter(
+        (page) => page.includes('[[Category:Items]]') || page.includes('[[Category:Abilities]]'),
+      )
+      .map((page) => page.match(/<title>([^<]+)<\/title>/)![1])
+      .sort();
+    const entities: Record<string, string> = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&apos;',
+    };
+    expect(
+      Object.keys(cards)
+        .map((title) => title.replace(/[&<>"']/g, (c) => entities[c]))
+        .sort(),
+    ).toEqual(expected);
+    for (const [title, html] of Object.entries(cards)) {
+      expect(html, title).toContain('class="tt-title"');
+    }
+    expect(cards['Clockwork Shock Bomb (Ability)']).toBe(cards['Clockwork Shock Bomb']);
+  });
+  it.runIf(process.env.MEDIAWIKI_SEED_RELEASE_TIER === '1')(
+    'ships the regenerated tooltips',
+    () => {
+      expect(
+        readFileSync('mediawiki/seed/pages.tooltips.json', 'utf8') ===
+          readFileSync(path.join(workDir, 'pages.tooltips.json'), 'utf8'),
+      ).toBe(true);
+    },
+  );
 });

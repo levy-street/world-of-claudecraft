@@ -1,0 +1,116 @@
+.wiki-game-tooltip {
+  --color-quest: #ffd12d;
+  --gold: #ffd100;
+  position: fixed;
+  z-index: 10000;
+  box-sizing: border-box;
+  width: max-content;
+  max-width: min(24rem, calc(100vw - 16px));
+  max-height: calc(100vh - 16px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  padding: 10px 13px;
+  border: 1px solid #b19e72;
+  border-radius: 5px;
+  box-shadow:
+    inset 0 0 0 1px #374051,
+    0 4px 15px #0008;
+  background: #101724;
+  color: #f6f2e5;
+  color-scheme: dark;
+  text-align: start;
+  font: 400 15px / 1.35 var(--font-ui, "Segoe UI", sans-serif);
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+.wiki-game-tooltip[hidden] {
+  display: none;
+}
+.wiki-game-tooltip .tt-title {
+  font: 600 16px / 1.35 var(--font-display, Georgia, serif);
+  margin-block-end: 3px;
+}
+.wiki-game-tooltip .tt-sub,
+.wiki-game-tooltip .tt-weapon-type,
+.wiki-game-tooltip .tt-set-bonus {
+  color: #b4bbca;
+}
+.wiki-game-tooltip .tt-stat,
+.wiki-game-tooltip .tt-armor {
+  color: #fff;
+}
+.wiki-game-tooltip .tt-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0 12px;
+}
+.wiki-game-tooltip .tt-row > * {
+  min-width: 0;
+}
+.wiki-game-tooltip .tt-desc,
+.wiki-game-tooltip .tt-set-name,
+.wiki-game-tooltip .tt-cmp-head,
+.wiki-game-tooltip .tt-bd-head,
+.wiki-game-tooltip .tt-unique,
+.wiki-game-tooltip .tt-effect {
+  color: #f2d190;
+}
+.wiki-game-tooltip .tt-desc,
+.wiki-game-tooltip .tt-set-name,
+.wiki-game-tooltip .tt-bd-head {
+  margin-top: 5px;
+}
+.wiki-game-tooltip .tt-material-use {
+  color: #d6ce83;
+}
+.wiki-game-tooltip .tt-green,
+.wiki-game-tooltip .tt-set-bonus.active {
+  color: #81ef69;
+}
+.wiki-game-tooltip .tt-red,
+.wiki-game-tooltip .tt-armor-bad {
+  color: #ff9186;
+}
+.wiki-game-tooltip .tt-cmp,
+.wiki-game-tooltip .tt-recipe-product {
+  margin-top: 6px;
+  padding-top: 5px;
+  border-top: 1px solid #525665;
+}
+.wiki-game-tooltip img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  vertical-align: middle;
+}
+.wiki-game-tooltip .tt-profession-header img {
+  width: 32px;
+  height: 32px;
+}
+.wiki-game-tooltip .coin {
+  display: inline-block;
+  width: 0.7em;
+  height: 0.7em;
+  margin-inline: 2px 4px;
+  border-radius: 50%;
+  border: 1px solid #fff6;
+  box-sizing: border-box;
+}
+.wiki-game-tooltip .coin.g {
+  background: #e4b842;
+}
+.wiki-game-tooltip .coin.s {
+  background: #b6bdc7;
+}
+.wiki-game-tooltip .coin.c {
+  background: #cb884f;
+}
+.wiki-game-tooltip .visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  clip-path: inset(50%);
+  overflow: hidden;
+}
