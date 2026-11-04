@@ -22,6 +22,7 @@
 //   duty?(world,st,b,me)   { goal, tol, duty, hold? } a bot's mechanic move, or null
 //   hazards?(world,st,b,me) circles {x,z,r} a bot keeps out of on its role spot
 //   bad?(world, st, at)    true when a spot is unsafe (extra to the hazards)
+//   roleSpot?(world,st,b,me) a bot's own resting spot instead of the generic one
 //   obstacles?(world)      circles a walking bot goes round
 //   blocksLine?(world,a,b) true when no line of sight (pillars)
 //   stillFor?(world,st,b)  seconds the bot may stand still to cast
@@ -943,7 +944,8 @@ function threatOk(world, b, mob) {
   if (mob.aggro === b.pid) return holdThreat(b);
   if (!Array.isArray(thr)) return true;
   let tankHate = 0;
-  for (const [id, v] of thr) if (world.players.get(id)?.tank) tankHate = Math.max(tankHate, v);
+  for (const [id, v] of thr)
+    if (id !== b.pid && world.players.get(id)?.tank) tankHate = Math.max(tankHate, v);
   if (tankHate <= 0) return world.players.get(mob.aggro)?.tank ? true : holdThreat(b);
   const mine = thr.find(([id]) => id === b.pid)?.[1] ?? 0;
   return mine < tankHate * (b.spec.melee ? 0.9 : 1.1) ? true : holdThreat(b);
@@ -977,6 +979,13 @@ export function clearSpot(world, from, hazards, maxR = 14) {
  *  an arc round the anchor. */
 function rolePosition(world, st, b, me, hazards, boss) {
   const role = b.spec.role;
+  const own = boss.roleSpot?.(world, st, b, me);
+  if (own) {
+    const bad = (at) => hazards.some((h) => hypot(h, at) < h.r) || boss.bad?.(world, st, at);
+    if (b.goal && hypot(b.goal, own) < 3 && !bad(b.goal)) return b.goal;
+    b.goal = bad(own) ? (clearSpot(world, own, hazards) ?? own) : own;
+    return b.goal;
+  }
   let want;
   const t = combatTarget(world, st, b, boss);
   if (role === 'tank') {
@@ -1016,15 +1025,35 @@ function rolePosition(world, st, b, me, hazards, boss) {
       sight.every((q) => hypot(at, q) <= reach + (q.reach ?? 0) && !world.blocks(at, q));
     if (b.goal && hypot(b.goal, want) < 9 && ok(b.goal)) return b.goal;
     if (!ok(want)) {
+      let found = null;
       search: for (const dr of [0, -4, 4, -7, -10]) {
         for (const da of [0.15, -0.15, 0.3, -0.3, 0.45, -0.45, 0.6, -0.6, 0.8, -0.8]) {
           const at = arcAt(da, dr);
           if (ok(at)) {
-            want = at;
+            found = at;
             break search;
           }
         }
       }
+      // The arc has no clear line (walls between): any bearing round what
+      // it must see, in reach, the nearest to the arc's spot.
+      const focus = sight[0];
+      if (!found && focus) {
+        let bestD = Number.POSITIVE_INFINITY;
+        for (let r = 10; r <= reach - 2; r += 3) {
+          for (let k = 0; k < 32; k++) {
+            const a = (k / 32) * Math.PI * 2;
+            const at = add(focus, { x: Math.sin(a), z: Math.cos(a) }, r + (focus.reach ?? 0));
+            if (!ok(at)) continue;
+            const d = hypot(at, want) + hypot(at, b.self) * 0.5;
+            if (d < bestD) {
+              bestD = d;
+              found = at;
+            }
+          }
+        }
+      }
+      if (found) want = found;
     }
   }
   const bad = (at) => hazards.some((h) => hypot(h, at) < h.r) || boss.bad?.(world, st, at);

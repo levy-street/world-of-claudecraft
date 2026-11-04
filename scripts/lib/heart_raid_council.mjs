@@ -15,11 +15,12 @@ import {
   COUNCIL_REACH,
   coverSpots,
   faceDistance,
+  hiddenFrom,
   onFloor,
   parsePillar,
   pillarBetween,
+  riseClear,
   rockSpot,
-  wakeSpot,
 } from './heart_council_tactics.mjs';
 import {
   add,
@@ -138,9 +139,11 @@ export const council = {
     readPillars(world);
     // The Singer's keeper counts as a tank (healers watch him, the rest
     // keep their threat under his).
-    const k = keeper(world);
-    if (k && alive(world.mobs.guardian) && alive(world.mobs.singer)) {
-      const p = world.players.get(k.pid);
+    // The Guardian's swap partner counts as a tank (healers watch him, the
+    // rest keep their threat under his).
+    const sw = swapper(world);
+    if (sw && alive(world.mobs.guardian)) {
+      const p = world.players.get(sw.pid);
       if (p) p.tank = true;
     }
     // The Wrath's energy rate, measured (the soft enrage speeds it up).
@@ -165,21 +168,31 @@ export const council = {
     return !!pillarBetween(allWalls(world), a, b, 0.5);
   },
   tankSpot(world, st, b, t) {
-    if (t && t.id === world.mobs.guardian?.id) return world.tankG;
-    // The Singer's tank keeps her past the Bond's reach of the Guardian.
     const g = world.mobs.guardian;
-    if (alive(g) && t) {
-      const spot = world.tankS;
-      if (hypot(spot, g) >= BOND_REACH + 10) return spot;
-      return add(g, unit(g, spot), BOND_REACH + 12);
-    }
-    return world.tankS;
+    if (t && t.id === g?.id) return world.tankG;
+    // The off-tank waits at the Guardian's back for the swap.
+    if (!t && b.offTank && alive(g)) return offTankSpot(world);
+    // The Singer's keeper holds her past the Bond's reach of the Guardian;
+    // once he fell she is brought to the raid's spot.
+    if (alive(g) && t) return keeperSpot(world, st);
+    return world.tankG;
   },
   targets(world, st, b) {
     if (keeper(world) === b && alive(world.mobs.guardian) && alive(world.mobs.singer))
       return world.mobs.singer;
     for (const r of ORDER) if (alive(world.mobs[r])) return world.mobs[r];
     return null;
+  },
+  roleSpot(world, st, b) {
+    // Healers stand between the Guardian's tank and the Singer's keeper, so
+    // both stay in reach.
+    if (b.spec.role !== 'healer') return null;
+    const g = world.mobs.guardian;
+    const s = world.mobs.singer;
+    if (!alive(g) || !alive(s) || hypot(g, s) < 22) return null;
+    const mid = add(g, unit(g, s), hypot(g, s) * 0.45);
+    const side = b.spec.key === 'h1' ? -1 : 1;
+    return add(add(mid, world.home, 6), perp(unit(g, s)), side * 3);
   },
   tankAssign(world, st, b) {
     tankPlan(world, st, b);
@@ -421,6 +434,19 @@ function trackState(world, st) {
   const g = world.mobs.guardian;
   const s = world.mobs.singer;
   if (alive(g) && alive(s) && st.engagedAt && hypot(g, s) < BOND_REACH) st.bondTicks++;
+  // Who holds each member (a change logged: a lost Singer is the Bond).
+  for (const r of ROLES) {
+    const m = world.mobs[r];
+    const on = alive(m) && m.aggro != null ? (world.players.get(m.aggro)?.name ?? '?') : null;
+    const key = `hold_${r}`;
+    if (on !== (st[key] ?? null)) {
+      if (on && st.engagedAt)
+        log(
+          `  ${r} now on ${on}${r === 'singer' && alive(g) && alive(s) ? ` (${hypot(g, s).toFixed(0)} yd from the guardian)` : ''}`,
+        );
+      st[key] = on;
+    }
+  }
   // The Rush's outcome: the Guardian stunned (the cursed pillar broken), or
   // whoever its blow struck.
   const r = st.rushes[st.rushes.length - 1];
@@ -461,13 +487,16 @@ function castEnded(world, st, key, castId, e) {
     if (r && t && alive(g)) {
       // The line is fixed where the marked player stands as the bar lands.
       const dir = unit(g, t);
+      const { hit, stop } = rushStop(world, g, t);
       r.landedAt = Date.now();
+      r.aim = hit ? (hit.cursed ? 'the cursed pillar' : `pillar #${hit.id}`) : 'no pillar';
       st.rush = {
         from: { x: g.x, z: g.z },
-        to: add(g, dir, 70),
-        until: Date.now() + 4000,
+        to: add(g, dir, stop),
+        until: Date.now() + (0.8 + stop / 22) * 1000 + 600,
         pid: r.pid,
       };
+      log(`  RUSH lands: the line meets ${r.aim} (${stop.toFixed(0)} yd)`);
     }
     return;
   }
@@ -543,25 +572,54 @@ function planMechanics(world, st) {
       continue;
     }
     if (st.wakePlan.has(p.pid)) continue;
-    const hd = holder(world) ?? world.mobs.guardian;
-    const raidSpot = add(world.anchor, world.home, 14);
-    const spot = wakeSpot({
-      holder: hd ?? world.center,
-      raid: raidSpot,
-      pillars: [...world.pillars.values()].concat(
-        [...st.wakePlan.values()].map((w) => ({ ...w.spot })),
-      ),
-      bodies: ROLES.map((r) => world.mobs[r]).filter(alive),
-      floor: world.floor,
-      others: [],
-      lane: st.wakePlan.size === 0 ? 0 : 7,
-    });
+    const spot = wakeSlot(world, st, p);
     st.wakePlan.set(p.pid, { spot, at: now });
     st.wakes.push({ t: fightSec(), who: p.name, ok: !!spot });
     log(
       `WAKE THE STONE on ${p.name}: carries it to ${spot ? where(world, spot) : 'nowhere clear (stays put)'}`,
     );
   }
+}
+
+/** The bearings (off the raid's side of the Wrath's caster) and the
+ *  distances a Wake the Stone pillar is raised at: at the flanks of the
+ *  ranged arc first, so the cover stands beside the raid and never in its
+ *  line of fire; then wider, then nearer the middle. */
+const WAKE_SLOTS = [
+  [1, 12],
+  [-1, 12],
+  [-1.5, 12],
+  [1.5, 12],
+  [1, 17],
+  [-1, 17],
+  [-1.5, 17],
+  [0.55, 9],
+  [-0.55, 9],
+  [0, 16],
+];
+
+/** Where a Wake the Stone mark carries his pillar: the first slot clear
+ *  for a rise (no pillar, planned or standing, and no council body near)
+ *  that he reaches with time to spare. */
+function wakeSlot(world, st, p) {
+  const src = world.tankG;
+  const pillars = [...world.pillars.values()];
+  if (world.cursed) pillars.push(world.cursed);
+  for (const w of st.wakePlan.values()) if (w.spot) pillars.push({ ...w.spot });
+  const bodies = ROLES.map((r) => world.mobs[r]).filter(alive);
+  const secs = rem(p, AURA.wake);
+  const base = Math.atan2(world.home.x, world.home.z);
+  let best = null;
+  WAKE_SLOTS.forEach(([da, r], i) => {
+    const at = add(src, { x: Math.sin(base + da), z: Math.cos(base + da) }, r);
+    if (!riseClear(at, pillars, bodies, world.floor, 0.8)) return;
+    if (inLane(world, st, at)) return;
+    const travel = hypot(p, at) / 7;
+    if (travel > secs - 0.6) return;
+    const cost = i * 1.5 + travel;
+    if (!best || cost < best.cost) best = { at, cost };
+  });
+  return best?.at ?? null;
 }
 
 function planCover(world, st, casts, key, pre = false) {
@@ -573,35 +631,46 @@ function planCover(world, st, casts, key, pre = false) {
   const people = world.living().filter((p) => p.bot);
   const forbidden = new Set();
   const rockGroup = rockCover(world, st, cover, sources, remS);
-  if (rockGroup) {
+  const soaking = new Set();
+  if (rockGroup?.open) {
+    // No shadow with the room: the group soaks away from the cover.
+    for (const p of rockGroup.group) soaking.add(p.pid);
+  } else if (rockGroup) {
     for (const [pid, spot] of rockGroup.assign) {
       assign.set(pid, spot);
       used.set(spot.pillar.id, (used.get(spot.pillar.id) ?? 0) + 1);
     }
     for (const q of cover)
-      if (q.id === rockGroup.pillar.id || faceDistance(q, rockGroup.at) <= COUNCIL_REACH.rock + 1)
-        forbidden.add(q.id);
+      if (faceDistance(q, rockGroup.at) <= COUNCIL_REACH.rock + 1) forbidden.add(q.id);
   }
   // The nearest first: the far ones then take what is left in reach.
   people.sort((a, b) => nearestCover(cover, a) - nearestCover(cover, b));
   for (const p of people) {
-    if (assign.has(p.pid)) continue;
+    if (assign.has(p.pid) || soaking.has(p.pid)) continue;
     const minFace = HEROIC_PLUS ? COUNCIL_REACH.pulse + 0.5 : 1.2;
     let best = null;
     let bestCost = Number.POSITIVE_INFINITY;
     for (const pl of cover) {
       if (forbidden.has(pl.id)) continue;
       if ((used.get(pl.id) ?? 0) >= SHELTER) continue;
-      for (const spot of coverSpots(pl, cover, sources, minFace)) {
+      for (const raw of coverSpots(pl, cover, sources, minFace)) {
+        // The server counts a player against the FIRST pillar on the line
+        // from the caster (council_wrath.ts landWrath), not the one he
+        // meant to stand behind: count him there.
+        const first =
+          sources.length === 1 ? (pillarBetween(cover, sources[0], raw, 0.35) ?? pl) : pl;
+        if (forbidden.has(first.id) || (used.get(first.id) ?? 0) >= SHELTER) continue;
+        const spot = first === pl ? raw : { ...raw, pillar: first };
         if (!onFloor(spot, world.floor, 5)) continue;
         if (world.rubble.some((q) => hypot(q, spot) < q.r)) continue;
         if (world.riseSpots.some((q) => hypot(q, spot) < q.r)) continue;
         if (inLane(world, st, spot)) continue;
         const travel = hypot(p, spot) / 7;
         if (travel > remS - 0.3) continue;
-        const was = st.activeCover?.assign.get(p.pid)?.pillar?.id === pl.id ? 3 : 0;
+        const sp = spot.pillar;
+        const was = st.activeCover?.assign.get(p.pid)?.pillar?.id === sp.id ? 3 : 0;
         const pref =
-          (pl.risen ? 0 : 1.2) + (pl.integrity - 1) * 2.5 - (used.get(pl.id) ?? 0) * 0.6 - was;
+          (sp.risen ? 0 : 1.2) + (sp.integrity - 1) * 2.5 - (used.get(sp.id) ?? 0) * 0.6 - was;
         const cost = travel + pref;
         if (cost < bestCost) {
           bestCost = cost;
@@ -616,13 +685,15 @@ function planCover(world, st, casts, key, pre = false) {
   }
   const summary =
     [...used.entries()].map(([id, n]) => `#${id} x${n}`).join(', ') || 'no reachable cover';
-  const unplaced = people.filter((p) => !assign.has(p.pid)).map((p) => p.name);
-  const line = `${summary}${unplaced.length ? `; no spot in time for ${unplaced.join(', ')}` : ''}`;
+  const unplaced = people
+    .filter((p) => !assign.has(p.pid) && !soaking.has(p.pid))
+    .map((p) => p.name);
+  const line = `${summary}${unplaced.length ? `; no spot in time for ${unplaced.join(', ')}` : ''}${rockGroup ? (rockGroup.open ? '; the rock soaks in the open' : `; the rock in #${rockGroup.pillar.id}'s shadow`) : ''}`;
   if (!pre && line !== st.lastCoverLine) log(`  cover plan: ${line}`);
   else if (pre && !st.lastCoverLine?.startsWith('pre'))
     log(`  moving to cover early (the bar is due): ${line}`);
   st.lastCoverLine = pre ? `pre ${line}` : line;
-  return { key, pillarsKey: pillarsKey(world), assign, summary, sources };
+  return { key, pillarsKey: pillarsKey(world), assign, summary, sources, soaking };
 }
 
 function nearestCover(cover, p) {
@@ -631,39 +702,93 @@ function nearestCover(cover, p) {
   return d;
 }
 
+/** Who the Wrath's bar comes from and how long it runs (the heir's is
+ *  shorter). */
+function wrathTiming(world) {
+  const h = holder(world);
+  if (!h) return null;
+  const heir = world.roleOfTid[h.tid] !== 'guardian';
+  const bar = heir ? 3 : 4;
+  const toBar = secondsToBar(world);
+  return { h, bar, toBar, toLand: h.cast === CAST.wrath ? (h.castRem ?? 0) : toBar + bar };
+}
+
+/**
+ * A Falling Rock shared in a pillar's shadow (it lands while the Wrath's bar
+ * runs): the mark stands on the shadow's axis more than the rock's reach
+ * from every cover pillar's face (no pillar loses a piece), the soakers
+ * between him and the pillar, all hidden from the sources, the whole group
+ * within that pillar's Narrow Shelter. Null when no pillar has the room.
+ */
+function rockShadow(world, st, marked, cover, sources, used, groupN, secs) {
+  if (sources.length === 0) return null;
+  const src = {
+    x: sources.reduce((a, s) => a + s.x, 0) / sources.length,
+    z: sources.reduce((a, s) => a + s.z, 0) / sources.length,
+  };
+  let best = null;
+  for (const pl of cover) {
+    if (pl.soul || SHELTER - (used?.get(pl.id) ?? 0) < groupN) continue;
+    const u = unit(src, pl);
+    for (const extra of [0, 1, 2])
+      for (const side of [0, 0.8, -0.8]) {
+        const at = add(add(pl, u, pl.r + COUNCIL_REACH.rock + 1.4 + extra), perp(u), side);
+        if (!onFloor(at, world.floor, 5)) continue;
+        if (cover.some((q) => faceDistance(q, at) <= COUNCIL_REACH.rock + 1)) continue;
+        if (!hiddenFrom(cover, sources, at, 0.6)) continue;
+        if (sources.some((s) => pillarBetween(cover, s, at, 0.35)?.id !== pl.id)) continue;
+        if (world.rubble.some((q) => hypot(q, at) < q.r)) continue;
+        if (inLane(world, st, at)) continue;
+        const travel = hypot(marked, at) / 7;
+        if (travel > secs - 0.4) continue;
+        const cost = travel + extra * 0.2 + Math.abs(side) * 0.1;
+        if (!best || cost < best.cost) best = { pillar: pl, at, u, cost };
+      }
+  }
+  if (!best) return null;
+  const spots = [];
+  for (const [d, s] of [
+    [-1.6, 0],
+    [-3, 0],
+    [-1.3, 1.2],
+    [-1.3, -1.2],
+  ]) {
+    const at = add(add(best.at, best.u, d), perp(best.u), s);
+    if (hiddenFrom(cover, sources, at, 0.4)) spots.push({ ...at, pillar: best.pillar });
+  }
+  return { pillar: best.pillar, at: { ...best.at, pillar: best.pillar }, spots };
+}
+
+/** The rock group's place through a Wrath bar: in a pillar's shadow when the
+ *  rock lands inside the bar (or too late to soak first and hide after);
+ *  `open` when no shadow has the room (the group soaks away from the cover
+ *  and takes the blast rather than crack the raid's pillar). Null when the
+ *  rock does not meet the Wrath. */
 function rockCover(world, st, cover, sources, remS) {
   const rock = st.rock;
-  if (!rock) return null;
+  if (!rock || IGNORE === 'rock') return null;
   const marked = world.players.get(rock.pid);
+  if (!marked || marked.dead || !marked.bot) return null;
   const rockRem = rem(marked, AURA.rock);
-  if (!marked || marked.dead || rockRem > remS - 0.2 || rockRem < remS - 2.2) return null;
-  if (!marked.bot) return null;
+  if (rockRem > remS + 0.3 || rockRem < remS - 2.4) return null;
   const group = [...rock.soakers]
     .map((pid) => world.players.get(pid))
     .filter((p) => p && !p.dead && p.bot);
-  let best = null;
-  for (const pl of cover) {
-    if (pl.integrity < 2) continue;
-    for (const at of coverSpots(pl, cover, sources, 1.2)) {
-      if (!onFloor(at, world.floor, 5)) continue;
-      if (hypot(marked, at) / 7 > rockRem - 0.3) continue;
-      const near = cover.filter(
-        (q) => q !== pl && faceDistance(q, at) <= COUNCIL_REACH.rock + 1,
-      ).length;
-      const cost = near * 10 + hypot(marked, at) / 7;
-      if (!best || cost < best.cost) best = { pillar: pl, at, cost };
-    }
+  const n = Math.min(group.length, SHELTER);
+  const sh = rockShadow(world, st, marked, cover, sources, null, n, rockRem);
+  if (!sh) return { open: true, group };
+  const assign = new Map([[marked.pid, sh.at]]);
+  const others = group
+    .filter((p) => p.pid !== marked.pid)
+    .sort((x, y) => hypot(x, sh.at) - hypot(y, sh.at))
+    .slice(0, n - 1);
+  const spots = sh.spots.slice();
+  for (const p of others) {
+    spots.sort((x, y) => hypot(x, p) - hypot(y, p));
+    const spot = spots.shift();
+    if (spot) assign.set(p.pid, spot);
   }
-  if (!best) return null;
-  const spots = coverSpots(best.pillar, cover, sources, 1.2).filter(
-    (q) => hypot(q, best.at) <= 2.5,
-  );
-  const assign = new Map();
-  for (const p of group) {
-    const spot = spots.slice().sort((x, y) => hypot(x, p) - hypot(y, p))[0] ?? best.at;
-    if (hypot(p, spot) / 7 <= remS - 0.3) assign.set(p.pid, spot);
-  }
-  return { pillar: best.pillar, at: best.at, assign };
+  return { pillar: sh.pillar, at: sh.at, assign };
 }
 
 function planRock(world, st, marked) {
@@ -679,30 +804,6 @@ function planRock(world, st, marked) {
     hazards.push({ ...add(g, f, 5), r: 6 });
   }
   for (const w of st.wakePlan.values()) if (w.spot) hazards.push({ ...w.spot, r: 4 });
-  let home = add(world.anchor, world.home, 12);
-  let homeWeight = 0.25;
-  const h = holder(world);
-  const wrathIn = secondsToBar(world) + (h && world.roleOfTid[h.tid] !== 'guardian' ? 3 : 4);
-  if (h && wrathIn < 10 && cover.length > 0) {
-    const best = cover
-      .slice()
-      .sort((x, y) => x.integrity - y.integrity || hypot(x, home) - hypot(y, home))[0];
-    const behind = coverSpots(best, cover, [h], 1.5)[0];
-    if (behind) {
-      home = behind;
-      homeWeight = 1;
-    }
-  }
-  const spot = rockSpot({
-    from: marked,
-    cover,
-    soul,
-    hazards,
-    floor: world.floor,
-    home,
-    homeWeight,
-  });
-  const need = HEROIC_PLUS ? 4 : 3;
   const candidates = world
     .living()
     .filter(
@@ -710,57 +811,133 @@ function planRock(world, st, marked) {
         p.pid !== marked.pid &&
         p.bot &&
         !p.tank &&
+        !p.healer &&
         !hasAura(p, AURA.wake) &&
-        !hasAura(p, AURA.resonance),
+        !hasAura(p, AURA.resonance) &&
+        !(st.rushSpot?.pid === p.pid && laneNow(world, st)?.bar),
     )
-    .filter((p) => p.hp / p.mhp > 0.45)
-    .sort((a, b) => hypot(a, spot ?? marked) - hypot(b, spot ?? marked));
+    .filter((p) => p.hp / p.mhp > 0.45);
+  const rockRem = rem(marked, AURA.rock);
+  // The rock meets the Wrath's bar: plan it in a pillar's shadow now.
+  const w = wrathTiming(world);
+  if (w && soul === null && rockRem >= w.toBar - 0.5 && rockRem <= w.toLand + 0.3) {
+    const n = Math.min(SHELTER, 4);
+    const sh = rockShadow(world, st, marked, cover, [w.h], null, n, rockRem);
+    if (sh) {
+      const soakers = candidates.sort((a, b) => hypot(a, sh.at) - hypot(b, sh.at)).slice(0, n - 1);
+      return {
+        pid: marked.pid,
+        spot: { x: sh.at.x, z: sh.at.z },
+        soakers: new Set([marked.pid, ...soakers.map((p) => p.pid)]),
+        shadow: true,
+      };
+    }
+  }
+  const home = add(world.anchor, world.home, 12);
+  const spot = rockSpot({
+    from: marked,
+    cover,
+    soul,
+    hazards,
+    floor: world.floor,
+    home,
+    homeWeight: 0.25,
+  });
+  const need = HEROIC_PLUS ? 4 : 3;
+  candidates.sort((a, b) => hypot(a, spot ?? marked) - hypot(b, spot ?? marked));
   const soakers = new Set([marked.pid, ...candidates.slice(0, need).map((p) => p.pid)]);
   return { pid: marked.pid, spot: spot ?? { x: marked.x, z: marked.z }, soakers };
 }
 
 // ---- Mountain's Rush --------------------------------------------------------------------
 
-/** The spot that puts the cursed pillar between the Guardian and the marked
- *  player, with no sheltering pillar in front of it on the line. */
-function rushSpot(world, me) {
+/** The Rush's walls: every pillar (the cursed one too) widened by the
+ *  charge's half width and the sight pad (council_rush.ts landRush). */
+const RUSH_WALL = 2 + 0.35;
+function rushWalls(world, pad = 0) {
+  const all = [...world.pillars.values()];
+  if (world.cursed) all.push({ ...world.cursed, cursed: true });
+  return all.map((p) => ({ ...p, r: p.r + RUSH_WALL + pad }));
+}
+
+/** The first pillar on the charge's line from `g` through `at` (on to the
+ *  Quarry's edge), and how far along it the Guardian stops. */
+function rushStop(world, g, at, pad = 0) {
+  const d = unit(g, at);
+  const end = add(g, d, 70);
+  const hit = pillarBetween(rushWalls(world, pad), g, end, 0);
+  if (!hit) return { hit: null, stop: 70 };
+  const along = (hit.x - g.x) * d.x + (hit.z - g.z) * d.z;
+  return { hit, stop: Math.max(0, along - hit.r) };
+}
+
+/**
+ * Where the marked player stands so the charge breaks the cursed pillar: a
+ * spot whose line from the Guardian meets the cursed pillar first (no
+ * sheltering pillar before it), the nearest he can reach in the bar's time.
+ * Behind the pillar he can stay put (the Guardian stops at it); in front of
+ * it he steps out of the lane as the bar lands. With no such spot, a line
+ * that meets no pillar at all (the curse stays, no cover is lost). Returns
+ * { at, kind: 'behind' | 'front' | 'miss' } or null.
+ */
+function rushSpot(world, st, me, secs) {
   const g = world.mobs.guardian;
+  if (!alive(g)) return null;
   const c = world.cursed;
-  if (!alive(g) || !c) return null;
-  const dir = unit(g, c);
-  // The nearest point of the ray past the pillar: the marked only has the
-  // bar's 3 s to reach it.
-  const gc = hypot(g, c);
-  const proj = (me.x - g.x) * dir.x + (me.z - g.z) * dir.z;
-  for (const back of [Math.max(3.5, proj - gc - 2.2), 3.5, 5, 7]) {
-    const at = add(c, dir, 2.2 + back);
-    if (!onFloor(at, world.floor, 4)) continue;
-    // Another pillar first on the line would take the charge whole.
-    const first = pillarBetween(
-      [...world.pillars.values(), c].map((p) => ({ ...p, r: p.r + 2.2 })),
-      g,
-      at,
-      0,
-    );
-    if (first && first !== c && first.id !== c.id) continue;
-    if (hypot(me, at) / 7 > 3.1) continue;
-    return at;
+  const reach = Math.max(0, (secs - 0.45) * 7);
+  let best = null;
+  for (let r = 0; r <= reach + 1e-6; r += 1.25) {
+    const n = r === 0 ? 1 : Math.max(10, Math.round((2 * Math.PI * r) / 1.25));
+    for (let k = 0; k < n; k++) {
+      const a = (k / n) * Math.PI * 2;
+      const at = { x: me.x + Math.sin(a) * r, z: me.z + Math.cos(a) * r };
+      if (!onFloor(at, world.floor, 4)) continue;
+      const dg = hypot(g, at);
+      if (dg < 8) continue;
+      if (world.rubble.some((q) => hypot(q, at) < q.r)) continue;
+      if ([...world.pillars.values()].some((q) => hypot(q, at) < q.r + 1)) continue;
+      // Margins: the cursed pillar met with a yard to spare, the others
+      // missed with one.
+      const tight = rushStop(world, g, at, -1);
+      const wide = rushStop(world, g, at, 1);
+      let kind = null;
+      let cost = r;
+      if (c && tight.hit?.cursed && wide.hit?.cursed) {
+        if (c && hypot(at, c) < c.r + 1) continue;
+        kind = dg > hypot(g, c) ? 'behind' : 'front';
+        if (kind === 'front') cost += 6;
+      } else if (!wide.hit || wide.hit.soul) {
+        kind = 'miss';
+        cost += 14;
+      } else continue;
+      if (!best || cost < best.cost) best = { at, kind, cost };
+    }
   }
-  return null;
+  return best;
 }
 
-function g0(world, st) {
-  return st.rushes.length;
+/** Does a planned Rush spot still aim where it meant to? */
+function rushStillGood(world, plan) {
+  const g = world.mobs.guardian;
+  if (!alive(g)) return false;
+  const tight = rushStop(world, g, plan.at, -1);
+  const wide = rushStop(world, g, plan.at, 1);
+  if (plan.kind === 'miss') return !wide.hit || !!wide.hit.soul;
+  return !!(tight.hit?.cursed && wide.hit?.cursed);
 }
 
-/** The fixed lane of a landed Rush (or the drawn lane of a running bar). */
+/** The fixed lane of a landed Rush (or the drawn lane of a running bar),
+ *  from the Guardian to where it stops. */
 function laneNow(world, st) {
   const g = world.mobs.guardian;
   if (st?.rush) return st.rush;
   if (!alive(g) || g.cast !== CAST.rush) return null;
   const t = world.players.get(g.castTgt);
   if (!t) return null;
-  return { from: g, to: add(g, unit(g, t), 70), pid: t.pid, bar: true };
+  // The marked heads for his planned spot: draw the lane through it.
+  const aim = st?.rushSpot?.pid === t.pid ? st.rushSpot.at : t;
+  const { stop } = rushStop(world, g, aim);
+  return { from: g, to: add(g, unit(g, aim), stop), pid: t.pid, bar: true };
 }
 function inLane(world, st, at) {
   const lane = laneNow(world, st);
@@ -774,18 +951,61 @@ function inLane(world, st, at) {
  *  past the Bond's reach (Goad, no stance needed), so the two tanks swap
  *  the Guardian on Hammer's Weight without ever bringing her along. */
 function keeper(world) {
-  const k = world.bots.find((x) => x.spec.key === 'arms' && x.self && !x.self.dead);
+  const k = world.bots.find((x) => x.spec.key === 'ot' && x.self && !x.self.dead);
   return k ?? null;
+}
+
+/** The Guardian's second tank for the Hammer's Weight swap while the
+ *  off-tank keeps the Singer: the arms warrior (Goad, no stance needed). */
+function swapper(world) {
+  return world.bots.find((x) => x.spec.key === 'arms' && x.self && !x.self.dead) ?? null;
+}
+
+function swapperDuty(world, st, b, me) {
+  const g = world.mobs.guardian;
+  if (swapper(world) !== b || !alive(g) || st.mainTankPid !== b.pid || !st.engagedAt) return null;
+  const holding = g.aggro === b.pid;
+  const goal = holding
+    ? world.tankG
+    : hypot(me, g) > 6
+      ? add(g, unit(g, me), 3)
+      : { x: me.x, z: me.z };
+  return {
+    goal,
+    tol: 1.5,
+    duty: 'swap tank',
+    ownThreat: true,
+    cast(bot) {
+      if (holding || hypot(bot.self, g) > 7.5) return false;
+      if ((bot.self.cds?.taunt ?? 0) > 0.05 || Date.now() - (bot.lastSent.taunt ?? 0) < 1000)
+        return false;
+      if (bot.self.target !== g.id) bot.cmd({ cmd: 'target', id: g.id });
+      bot.lastSent.taunt = Date.now();
+      bot.cmd({ cmd: 'cast', ability: 'taunt' });
+      log(`TAUNT: ${bot.name} takes the Guardian for the Hammer's Weight swap`);
+      return true;
+    },
+  };
 }
 
 /** The two tanks hold the Guardian and swap him on Hammer's Weight; once
  *  he falls (or the keeper is gone) they take the Singer. */
 function tankPlan(world, st, b) {
-  const tanks = world.living().filter((p) => p.tank);
   const g = world.mobs.guardian;
   const s = world.mobs.singer;
   const holderOf = (m) => (m?.aggro != null ? (world.players.get(m.aggro) ?? null) : null);
   b.loose = null;
+  const kp = keeper(world);
+  if (kp === b && alive(g) && alive(s)) {
+    b.tankTarget = 'singer';
+    const h = holderOf(s);
+    if (h && h.pid !== b.pid) b.loose = { r: 'singer', m: s, onTank: h.tank };
+    return;
+  }
+  const sw = swapper(world);
+  const tanks = world
+    .living()
+    .filter((p) => (p.tank && (!kp || p.pid !== kp.pid || !alive(s))) || (sw && p.pid === sw.pid));
   if (!alive(g)) {
     b.tankTarget = alive(s) ? 'singer' : null;
     const h = holderOf(s);
@@ -815,10 +1035,62 @@ function tankPlan(world, st, b) {
       b.loose = { r: 'singer', m: s, onTank: h.tank };
     return;
   }
-  b.tankTarget = 'guardian';
   const h = holderOf(g);
-  if (main?.pid === b.pid && h && h.pid !== b.pid)
-    b.loose = { r: 'guardian', m: g, onTank: h.tank };
+  b.offTank = main?.pid !== b.pid;
+  if (!b.offTank) {
+    b.tankTarget = 'guardian';
+    if (h && h.pid !== b.pid) b.loose = { r: 'guardian', m: g, onTank: h.tank };
+    return;
+  }
+  // The off-tank holds no threat war with the main: he stops hitting the
+  // Guardian until the swap hands it to him (a debuffed tank who keeps
+  // swinging takes it back and dies under Hammer's Weight).
+  b.tankTarget = null;
+  if (b.self?.auto && Date.now() - (b.lastAttackCmd ?? 0) > 1000) {
+    b.cmd({ cmd: 'stopattack' });
+    b.lastAttackCmd = Date.now();
+  }
+  // A Guardian loose on a non-tank (the main tank dead or out of reach):
+  // take it.
+  if (h && !h.tank && (!main || hypot(main, g) > 12)) {
+    b.tankTarget = 'guardian';
+    b.loose = { r: 'guardian', m: g, onTank: false };
+  }
+}
+
+/** Where the off-tank waits: at the Guardian's back (out of Hammerfall's
+ *  arc), in taunt reach. */
+function offTankSpot(world) {
+  const g = world.mobs.guardian;
+  const h = g.aggro != null ? world.players.get(g.aggro) : null;
+  if (!h) return world.tankG;
+  return add(g, unit(h, g), (g.reach ?? 2) + 3);
+}
+
+/** The keeper's spot: the planned one while it stays far from the
+ *  Guardian; when the Guardian comes near (a Rush, a drag) a new one 30 yd
+ *  from him, the nearest to the old, away from the raid. */
+function keeperSpot(world, st) {
+  const g = world.mobs.guardian;
+  st.keeperSpot ??= world.tankS;
+  if (!alive(g) || hypot(st.keeperSpot, g) >= BOND_REACH + 8) return st.keeperSpot;
+  let best = null;
+  for (const r of [30, 27, 33]) {
+    for (let k = 0; k < 36; k++) {
+      const a = (k / 36) * Math.PI * 2;
+      const at = add(g, { x: Math.sin(a), z: Math.cos(a) }, r);
+      if (!onFloor(at, world.floor, 6)) continue;
+      if (hypot(at, world.anchor) < 18) continue;
+      const cost = hypot(at, st.keeperSpot);
+      if (!best || cost < best.cost) best = { at, cost };
+    }
+    if (best) break;
+  }
+  if (best) {
+    st.keeperSpot = best.at;
+    log(`  KEEPER: the Guardian came near, the Singer goes to ${where(world, best.at)}`);
+  }
+  return st.keeperSpot;
 }
 
 function keeperDuty(world, st, b, me) {
@@ -827,14 +1099,25 @@ function keeperDuty(world, st, b, me) {
   if (!alive(s) || !alive(g) || keeper(world) !== b || !st.engagedAt) return null;
   const holding = s.aggro === b.pid;
   const spot = council.tankSpot(world, st, b, s);
-  const goal = holding ? spot : hypot(me, s) > 6 ? add(s, unit(s, me), 4) : { x: me.x, z: me.z };
+  // Holding her and already past the Bond's reach: stand and hit her (the
+  // threat that keeps her); only drag her on while the Guardian is near.
+  const apart = hypot(g, s) >= BOND_REACH + 5;
+  const goal = !holding
+    ? hypot(me, s) > 6
+      ? add(s, unit(s, me), 4)
+      : { x: me.x, z: me.z }
+    : apart
+      ? hypot(me, s) > 3.5
+        ? add(s, unit(s, me), 2.5)
+        : { x: me.x, z: me.z }
+      : spot;
   return {
     goal,
-    tol: 1.5,
+    tol: holding && !apart ? 2.5 : 1.2,
     duty: 'keeper',
     ownThreat: true,
     cast(bot) {
-      if (holding || hypot(bot.self, s) > 7.5) return false;
+      if (bot.cls !== 'warrior' || holding || hypot(bot.self, s) > 7.5) return false;
       if ((bot.self.cds?.taunt ?? 0) > 0.05 || Date.now() - (bot.lastSent.taunt ?? 0) < 1000)
         return false;
       if (bot.self.target !== s.id) bot.cmd({ cmd: 'target', id: s.id });
@@ -848,7 +1131,7 @@ function keeperDuty(world, st, b, me) {
 
 function duty(world, st, b, me) {
   init(st);
-  const kd = keeperDuty(world, st, b, me);
+  const kd = keeperDuty(world, st, b, me) ?? swapperDuty(world, st, b, me);
   if (kd) {
     // The keeper still dodges the Rush's lane.
     const lane = laneNow(world, st);
@@ -867,34 +1150,48 @@ function duty(world, st, b, me) {
     alive(world.mobs.singer);
   if (coverSpot && !singerTank && !(rock?.soakers.has(b.pid) && rockRem < coverRem - 2.2))
     return { goal: coverSpot, tol: 0.6, duty: 'cover' };
-  const lane = laneNow(world, st);
   // The marked player leads the charge through the cursed pillar.
-  if (lane?.bar && lane.pid === b.pid && IGNORE !== 'rush') {
-    const spot = st.rushSpot?.pid === b.pid ? st.rushSpot.at : rushSpot(world, me);
-    if (spot) {
-      if (st.rushSpot?.pid !== b.pid)
-        log(
-          `  RUSH: ${me.name} runs ${hypot(me, spot).toFixed(0)} yd to put the cursed pillar on the line`,
-        );
-      st.rushSpot = { pid: b.pid, at: spot };
-      return { goal: spot, tol: 0.7, duty: 'rush' };
+  const g = world.mobs.guardian;
+  if (alive(g) && g.cast === CAST.rush && g.castTgt === b.pid && IGNORE !== 'rush') {
+    const secs = g.castRem ?? 0;
+    const now = Date.now();
+    let plan =
+      st.rushSpot?.pid === b.pid && st.rushSpot.n === st.rushes.length ? st.rushSpot : null;
+    const was = plan;
+    if (plan && now - plan.at0 > 400) {
+      if (rushStillGood(world, plan)) plan.at0 = now;
+      else plan = null;
     }
-    if (st.rushNoSpot !== g0(world, st)) {
-      st.rushNoSpot = g0(world, st);
-      log(`  RUSH: ${me.name} finds no spot behind the cursed pillar in time`);
+    if (!plan) {
+      const fresh = rushSpot(world, st, me, secs);
+      if (fresh) {
+        plan = { pid: b.pid, n: st.rushes.length, at: fresh.at, kind: fresh.kind, at0: now };
+        st.rushSpot = plan;
+        if (!was || was.kind !== plan.kind)
+          log(
+            `  RUSH: ${me.name} runs ${hypot(me, plan.at).toFixed(0)} yd (${plan.kind === 'miss' ? 'no line to the cursed pillar in time: a clean miss' : `the cursed pillar on the line, ${plan.kind} it`})`,
+          );
+      } else plan = was;
+    }
+    if (plan) return { goal: plan.at, tol: 0.6, duty: 'rush' };
+    if (st.rushNoSpot !== st.rushes.length) {
+      st.rushNoSpot = st.rushes.length;
+      log(`  RUSH: ${me.name} finds no line in time`);
     }
   }
-  // Anyone in the lane steps out of it (the marked too once the bar landed
-  // with no cursed pillar on its line).
+  // Anyone in the lane steps out of it (the marked too once the bar landed:
+  // behind the cursed pillar the lane stops short of him).
+  const lane = laneNow(world, st);
   if (lane && segDist(me, lane.from, lane.to) < RUSH_LANE && (lane.pid !== b.pid || !lane.bar)) {
-    if (!(lane.pid === b.pid && st.rushSpot?.pid === b.pid && hypot(me, st.rushSpot.at) < 1.5)) {
-      const d = unit(lane.from, lane.to);
-      const side = perp(d);
-      const along = (me.x - lane.from.x) * d.x + (me.z - lane.from.z) * d.z;
-      const foot = add(lane.from, d, along);
-      const s = (me.x - foot.x) * side.x + (me.z - foot.z) * side.z >= 0 ? 1 : -1;
-      return { goal: add(foot, side, s * (RUSH_LANE + 1.5)), tol: 0.6, duty: 'lane' };
-    }
+    const d = unit(lane.from, lane.to);
+    const side = perp(d);
+    const along = (me.x - lane.from.x) * d.x + (me.z - lane.from.z) * d.z;
+    const foot = add(lane.from, d, along);
+    let sgn = (me.x - foot.x) * side.x + (me.z - foot.z) * side.z >= 0 ? 1 : -1;
+    // The side with no pillar in the way.
+    const out = (k) => add(foot, side, k * (RUSH_LANE + 1.5));
+    if ([...world.pillars.values()].some((q) => hypot(q, out(sgn)) < q.r + 1)) sgn = -sgn;
+    return { goal: out(sgn), tol: 0.6, duty: 'lane' };
   }
   if (st.wakePlan.has(b.pid) && st.wakePlan.get(b.pid).spot)
     return { goal: st.wakePlan.get(b.pid).spot, tol: 0.8, duty: 'wake' };
