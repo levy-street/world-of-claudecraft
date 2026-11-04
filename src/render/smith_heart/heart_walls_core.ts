@@ -27,6 +27,7 @@
 
 import {
   BREATH,
+  BREATH_ISLE_REACH,
   BREATH_ISLES,
   GREAT_HEARTH,
   HEART_ROOM,
@@ -270,8 +271,10 @@ export function heartOpenAir(x: number, z: number, r: number): boolean {
   if (Math.hypot(x - HEART_ROOM.x, z - HEART_ROOM.z) - r < HEART_ROOM_CHASM_R) return true;
   // The open sky round the Breath's floating isles (nothing stands under or
   // beside one: they float).
-  for (const isle of BREATH_ISLES)
-    if (Math.hypot(x - isle.x, z - isle.z) - r < isle.r + HEART_ISLE_AIR) return true;
+  for (let i = 0; i < BREATH_ISLES.length; i++) {
+    const isle = BREATH_ISLES[i];
+    if (Math.hypot(x - isle.x, z - isle.z) - r < BREATH_ISLE_REACH[i] + HEART_ISLE_AIR) return true;
+  }
   return false;
 }
 

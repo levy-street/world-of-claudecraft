@@ -1622,6 +1622,17 @@ above disagree, this one wins.
   them, `heartOpenAir`), inside the field's bounds and the instance slot's band (a body past
   local z 250 would be the next slot's: the north, the only fully open sky, is out of reach).
   They bob on the wind and hold still while the round is on.
+- **The isles' organic floors (2026-11-04, Jose's call).** Each isle's walk is no longer a
+  near-disc: `content/smith_heart_isle_floor.ts` (`ISLE_FLOOR_SPECS`) gives it an apron toward
+  the Cornice (the Homeward Gale's circle stands on it), bays bitten in, broad promontories,
+  one narrow rock tongue, a ragged rim, and one ledge (A) or two (B) a stride up on its far
+  promontory (under MAX_STEP_HEIGHT and the field's cliffStep: walked up, never a wall). The
+  rim lies open (`BREATH_ISLE_LIPS`): a body that walks off falls to the void and dies like a
+  fall off the Cornice, its body laid back on the Cornice even when the landing itself killed
+  it. The adds are held to their isle's floor (`breath_isle_hold.ts`). The fight's rune ring
+  sits inside the deepest bay (`isleRuneRing`). The kit's turf, lip and ledges are these
+  polygons exactly (`ISLE_WALKS`, `ISLE_LEDGES`), pinned by
+  `tests/smith_heart_breath_kit.test.ts` and `tests/smith_heart_breath_isle_floor.test.ts`.
 - **The Summit Roar as a wave.** It no longer strikes the whole Cornice in one tick: its wave
   leaves the maw at 30 yd a second and each player is struck as it arrives, the throw sliding
   out over 0.8 s (`breath_roar.ts`); drawn as a ring with rippling rings and a wind wall at the

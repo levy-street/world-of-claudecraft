@@ -35,7 +35,7 @@ import {
   isleObjectKind,
   isleWindAway,
 } from '../src/render/smith_heart_fx/breath_isles_fx_core';
-import { BREATH, BREATH_ISLES } from '../src/sim/content/smith_heart_layout';
+import { BREATH, BREATH_ISLE_REACH, BREATH_ISLES } from '../src/sim/content/smith_heart_layout';
 import {
   galePathTemplate,
   homeGaleTemplate,
@@ -44,6 +44,7 @@ import {
   rideArc,
   rideTemplate,
 } from '../src/sim/encounters/smith_heart';
+import { isleAt } from '../src/sim/encounters/smith_heart/breath_isle_geometry';
 import { castDisplayName } from '../src/ui/cast_display_name';
 
 describe('breath_isles_fx_core', () => {
@@ -127,8 +128,10 @@ describe('breath_isles_fx_core', () => {
           expect(m.vx * wind.x + m.vz * wind.z).toBeGreaterThan(0.4);
           expect(m.vy).toBeLessThan(0);
           isleGrit(i, u, v, m);
-          // From under the lip, just past the walk.
-          expect(Math.hypot(m.x, m.z)).toBeGreaterThan(isle.r);
+          // From under the lip, just past the walk: off its floor (its bays
+          // and tongues), never further out than its furthest reach.
+          expect(isleAt(isle.x + m.x, isle.z + m.z)).toBe(-1);
+          expect(Math.hypot(m.x, m.z)).toBeLessThan(BREATH_ISLE_REACH[i] + 1.5);
           expect(m.y).toBeLessThan(0);
         }
     });

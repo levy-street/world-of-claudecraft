@@ -49,6 +49,7 @@ import { clearCastIf, dropEncounterBody, startBar } from '../sunken_bastion/clai
 import { thessalyOf } from './breath_gale';
 import { breathHash } from './breath_geometry';
 import { isleAt, isleSpots, rideArc } from './breath_isle_geometry';
+import { holdIsleAdds } from './breath_isle_hold';
 import {
   galePathTemplate,
   homeGaleTemplate,
@@ -204,7 +205,14 @@ function wakeIsle(s: BreathScope, i: number): void {
     ctx.addEntity(e);
     inst.mobIds.push(e.id);
     s.boss.summonedIds.push(e.id);
-    s.st.isles.adds.push({ id: e.id, isle: i, role, next: T.mendFirst, at: null });
+    s.st.isles.adds.push({
+      id: e.id,
+      isle: i,
+      role,
+      next: T.mendFirst,
+      at: null,
+      floor: { x: e.pos.x, y: e.pos.y, z: e.pos.z },
+    });
   });
   s.ctx.emit({
     type: 'spellfxAt',
@@ -574,6 +582,7 @@ function stepCircles(s: BreathScope): void {
 /** One tick of the isles (rides and homes in any half: a rider in flight or
  *  stranded is always brought back). */
 export function stepIsles(s: BreathScope): void {
+  holdIsleAdds(s.ctx, s.inst, s.st);
   stepRound(s);
   stepRides(s);
   stepCircles(s);

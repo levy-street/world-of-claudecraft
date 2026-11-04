@@ -13,7 +13,9 @@
 //                      god mode and stood alive on the void's floor). Its
 //                      body is laid back on the Cornice's floor by the gap
 //                      (voidCorpseSpot), so no resurrection lands in the
-//                      void again. A real game master (gm, or the profiler's
+//                      void again; a body the landing itself killed (a fall
+//                      off an isle, higher still) is laid back the same.
+//                      A real game master (gm, or the profiler's
 //                      invulnerable stand-in) is never killed, as the shared
 //                      wipe spares them (encounter_wipe.ts): set back on the
 //                      floor instead.
@@ -32,7 +34,12 @@
 //
 // Zero rng; positions are claim-local yards.
 
-import { BREATH, BREATH_ISLES, SMITH_HEART_HEIGHTS } from '../../content/smith_heart_layout';
+import {
+  BREATH,
+  BREATH_ISLES,
+  SMITH_HEART_FIELD,
+  SMITH_HEART_HEIGHTS,
+} from '../../content/smith_heart_layout';
 import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
 import type { Entity } from '../../types';
@@ -87,11 +94,18 @@ export function stepOverLip(s: Pick<BreathScope, 'ctx' | 'inst' | 'st' | 'boss'>
 export function stepVoidDeaths(ctx: SimContext, inst: InstanceSlot): void {
   const o = ctx.instanceOriginOf(inst);
   for (const p of voidCandidates(ctx, inst)) {
-    if (p.dead || p.ghost) continue;
+    if (p.ghost) continue;
     const lx = p.pos.x - o.x;
     const lz = p.pos.z - o.z;
     if (!fellFromCornice(lx, lz, p.pos.y, p.onGround)) continue;
     const back = voidCorpseSpot(lx, lz);
+    if (p.dead) {
+      // The landing's own hit killed it first (a fall from an isle, high
+      // over the Cornice): its body is laid back all the same.
+      if (p.pos.y < SMITH_HEART_FIELD.voidHeight + 3)
+        layOnFloor(ctx, p, o.x + back.x, o.z + back.z);
+      continue;
+    }
     if (p.gm || (p.profilerInvulnerable && ctx.devCommands)) {
       layOnFloor(ctx, p, o.x + back.x, o.z + back.z);
       continue;

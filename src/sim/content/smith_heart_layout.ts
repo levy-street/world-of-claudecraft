@@ -46,7 +46,13 @@
 // the renderer (terrain, light rivers, the seal, the portal) read this one
 // record.
 
-import type { AuthoredFieldDef, FieldProp, FieldSurface } from '../instances/authored_field/types';
+import type {
+  AuthoredFieldDef,
+  FieldPolySurface,
+  FieldProp,
+  FieldSurface,
+} from '../instances/authored_field/types';
+import { bearingDeg, isleFloorSurfaces } from './smith_heart_isle_floor';
 
 /** The void under every floor: the fissures' depth (below the Quench Basin). */
 export const SMITH_HEART_VOID_HEIGHT = -70;
@@ -268,8 +274,10 @@ export const CORNICE_OPEN_RIM: readonly { x: number; z: number; r: number }[] = 
  *  their crags hanging over the void), reached only on a scripted
  *  ride of the wind (encounters/smith_heart/breath_isles.ts). Each is a
  *  hidden field surface (walkable; drawn by the fight's own floating rock,
- *  render/smith_heart_fx/breath_isles_fx.ts), walled round by its generated
- *  cliffs so nobody falls off one. `h` is its floor's height. */
+ *  render/smith_heart_fx/breath_isles_fx.ts) with an organic outline and a
+ *  ledge or two (smith_heart_isle_floor.ts ISLE_FLOOR_SPECS), its lip open
+ *  (BREATH_ISLE_LIPS: a body that walks off falls). `h` is its floor's
+ *  height, `r` its nominal reach (the rim swells past it and bites in). */
 export const BREATH_ISLES: readonly { id: string; x: number; z: number; r: number; h: number }[] = [
   { id: 'breath_isle_southeast', x: 31, z: 139, r: 9, h: H.cornice + 26 },
   { id: 'breath_isle_southwest', x: -28, z: 142, r: 9, h: H.cornice + 30 },
@@ -580,16 +588,31 @@ function cornice(): FieldSurface {
   return { kind: 'poly', id: 'storm_cornice', points, h: C.h, edge: 'rock', ground: 'scoured' };
 }
 
-/** A floating islet's floor: a carved disc, hidden from the generic terrain
- *  (the fight draws the floating rock). */
-function isleSurface(c: { id: string; x: number; z: number; r: number; h: number }): FieldSurface {
-  const points: [number, number][] = [];
-  for (let d = 0, k = 0; d < 360; d += 15, k++) {
-    const bite = 1.4 * hash01(k, 71 + Math.round(c.x));
-    points.push(bearingPoint(c.x, c.z, d, c.r - bite, c.r - bite));
-  }
-  return { kind: 'poly', id: c.id, points, h: c.h, hidden: true, edge: 'rock', ground: 'scoured' };
+/** A floating islet's floors: its organic outline and its ledges
+ *  (smith_heart_isle_floor.ts), hidden from the generic terrain (the fight
+ *  draws the floating rock). */
+function isleSurfaces(c: (typeof BREATH_ISLES)[number]): FieldPolySurface[] {
+  const C = BREATH.cornice;
+  return isleFloorSurfaces(c, bearingDeg(c.x, c.z, C.x, C.z));
 }
+
+/** How far each isle's rim reaches at its furthest (yards from its centre:
+ *  the tip of its tongue), in BREATH_ISLES order. What must stay open air
+ *  round an isle measures from this, never from its nominal `r`. */
+export const BREATH_ISLE_REACH: readonly number[] = BREATH_ISLES.map((c) => {
+  let reach = 0;
+  for (const s of isleSurfaces(c))
+    for (const [x, z] of s.points) reach = Math.max(reach, Math.hypot(x - c.x, z - c.z));
+  return reach;
+});
+
+/** The isles' open lips: one disc over each isle, past its furthest reach,
+ *  so no wall stands round an isle's rim (a body that walks off falls to the
+ *  void and dies, breath_void.ts stepVoidDeaths). Its ledges' steps are
+ *  under the field's cliffStep, never a wall either. */
+export const BREATH_ISLE_LIPS: readonly { x: number; z: number; r: number }[] = BREATH_ISLES.map(
+  (c, i) => ({ x: c.x, z: c.z, r: BREATH_ISLE_REACH[i] + 2 }),
+);
 
 /** The Ring as one flat annulus sector (clockwise from `fromDeg` to `toDeg`). */
 function ringSector(): FieldSurface {
@@ -794,7 +817,7 @@ const AUTHORED_SURFACES: FieldSurface[] = [
     { stairs: true, ground: 'scoured' },
   ),
   cornice(),
-  ...BREATH_ISLES.map(isleSurface),
+  ...BREATH_ISLES.flatMap(isleSurfaces),
   // --- The Quench (east): descends to the Quench Basin --------------------------------
   path(
     'quench_mouth',
@@ -1226,7 +1249,11 @@ export const SMITH_HEART_FIELD: AuthoredFieldDef = {
   bounds: { minX: -258, maxX: 248, minZ: -246, maxZ: 238 },
   voidHeight: SMITH_HEART_VOID_HEIGHT,
   cliffStep: 1.1,
-  lipOpenings: [...CORNICE_GAPS, ...CORNICE_OPEN_RIM].map(({ x, z, r }) => ({ x, z, r })),
+  lipOpenings: [...CORNICE_GAPS, ...CORNICE_OPEN_RIM, ...BREATH_ISLE_LIPS].map(({ x, z, r }) => ({
+    x,
+    z,
+    r,
+  })),
   mapVoid: 'mist',
   surfaces: SURFACES,
   walls: [],

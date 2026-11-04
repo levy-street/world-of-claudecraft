@@ -12,6 +12,11 @@
 // Mender's stream draw on EVERY tier (the raid acts on them); the drifting
 // stones, the mist and the motes thin on the low tier.
 
+import {
+  bearingDeg,
+  ISLE_FLOOR_SPECS,
+  isleRimRadius,
+} from '../../sim/content/smith_heart_isle_floor';
 import { BREATH, BREATH_ISLES } from '../../sim/content/smith_heart_layout';
 import { isleSpots, rideArc } from '../../sim/encounters/smith_heart/breath_isle_geometry';
 import {
@@ -209,12 +214,21 @@ export function isleMist(i: number, u: number, v: number, w: number, out: IsleMo
   return out;
 }
 
-/** Where a grain of grit breaks from under the turf's lip (u, v: draws in
- *  0..1): round the rim just past the walk, under the turf, falling. */
-export function isleGrit(i: number, u: number, v: number, out: IsleMote): IsleMote {
+/** How far isle `i`'s walk reaches along game bearing `a` (radians, x = sin a,
+ *  z = cos a): its organic rim (smith_heart_isle_floor.ts), the sim's own. */
+export function isleRimAt(i: number, a: number): number {
   const isle = BREATH_ISLES[i];
+  const spec = ISLE_FLOOR_SPECS[isle.id];
+  const toward = bearingDeg(isle.x, isle.z, BREATH.cornice.x, BREATH.cornice.z);
+  return isleRimRadius(spec, toward, (a * 180) / Math.PI);
+}
+
+/** Where a grain of grit breaks from under the turf's lip (u, v: draws in
+ *  0..1): round the rim just past the walk (its bays and tongues), under the
+ *  turf, falling. */
+export function isleGrit(i: number, u: number, v: number, out: IsleMote): IsleMote {
   const a = u * Math.PI * 2;
-  const r = isle.r + 0.4 + v * 0.9;
+  const r = isleRimAt(i, a) + 0.4 + v * 0.9;
   out.x = Math.sin(a) * r;
   out.y = -0.6 - v * 1.2;
   out.z = Math.cos(a) * r;
@@ -225,10 +239,10 @@ export function isleGrit(i: number, u: number, v: number, out: IsleMote): IsleMo
 }
 
 /** The ring of wind runes round an isle's floor (its inner and outer radius:
- *  just inside the walkable edge). */
+ *  inside the deepest of its bays, so it never hangs over the void). */
 export function isleRuneRing(i: number): { inner: number; outer: number } {
   const r = BREATH_ISLES[i].r;
-  return { inner: r - 3.1, outer: r - 1.7 };
+  return { inner: r - 4.0, outer: r - 2.6 };
 }
 
 /** A drifting stone round an isle `t` seconds in: its place (instance-local)

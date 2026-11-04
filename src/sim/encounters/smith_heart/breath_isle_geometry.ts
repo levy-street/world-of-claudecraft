@@ -6,6 +6,7 @@
 // Instance-local yards. No SimContext, no rng, so the renderer and the bots
 // read the very same spots.
 
+import { isIsleFloorOf } from '../../content/smith_heart_isle_floor';
 import { BREATH, BREATH_ISLES, SMITH_HEART_FIELD } from '../../content/smith_heart_layout';
 import { authoredFieldSurfaceAt } from '../../instances/authored_field';
 import { inBreathArena } from './breath_geometry';
@@ -65,11 +66,11 @@ export function isleSpots(): readonly IsleSpots[] {
   return cache;
 }
 
-/** The isle whose floor (x, z) stands on, or -1. */
+/** The isle whose floor (x, z) stands on (its outline or a ledge), or -1. */
 export function isleAt(x: number, z: number): number {
   const id = authoredFieldSurfaceAt(SMITH_HEART_FIELD, x, z)?.id;
   if (!id) return -1;
-  return BREATH_ISLES.findIndex((b) => b.id === id);
+  return BREATH_ISLES.findIndex((b) => isIsleFloorOf(id, b.id));
 }
 
 /** A ride's arc: from `a` to `b` (instance-local, y the floor height at

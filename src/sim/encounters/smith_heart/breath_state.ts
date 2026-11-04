@@ -98,6 +98,9 @@ export interface BreathIsleAdd {
   /** The Mender's next channel (seconds), and its channel's planted spot. */
   next: number;
   at: { x: number; y: number; z: number } | null;
+  /** Its last spot on its isle's floor (breath_isle_hold.ts): a step off
+   *  the rim is undone to it. */
+  floor?: { x: number; y: number; z: number };
 }
 
 /** The Islands of the Wind (breath_isles.ts). */
