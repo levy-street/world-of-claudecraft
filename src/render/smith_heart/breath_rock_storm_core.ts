@@ -90,3 +90,22 @@ export function breathRockStormGlsl(): string {
           }
         }`;
 }
+
+/** The storm's shadow lift (linear rgb times the rock's paint, emissive): its
+ *  joints and clefts fall to a blue-violet, never a near-black navy. */
+export const BREATH_ROCK_SHADOW_LIFT = [0.1, 0.11, 0.17] as const;
+
+/** The shadow lift's GLSL (after the rock's shade floor: `vRockCutWorld`,
+ *  `uHeartSlot`, `uHeartCore` in, `totalEmissiveRadiance` raised). */
+export function breathRockStormLiftGlsl(): string {
+  const B = BREATH_ROCK_STORM;
+  return `{
+          vec2 bL = vRockCutWorld.xz - uHeartSlot;
+          float bW = smoothstep( ${f(B.z0)}, ${f(B.z1)}, bL.y )
+            * ( 1.0 - smoothstep( ${f(B.x0)}, ${f(B.x1)}, bL.x ) )
+            * smoothstep( ${f(B.ring0)}, ${f(B.ring1)}, length( bL - vec2( ${f(RING.x)}, ${f(RING.z)} ) ) - ${f(RING.outerR)} )
+            * smoothstep( ${f(B.heart0)}, ${f(B.heart1)}, length( bL - vec2( ${f(HEART_ROOM.x)}, ${f(HEART_ROOM.z)} ) ) )
+            * ( 1.0 - uHeartCore );
+          totalEmissiveRadiance += diffuseColor.rgb * ${v3(BREATH_ROCK_SHADOW_LIFT)} * bW;
+        }`;
+}

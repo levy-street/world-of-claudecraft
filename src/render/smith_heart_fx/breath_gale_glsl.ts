@@ -66,8 +66,9 @@ void main() {
   float a = (body * ${GALE_BODY_ALPHA.toFixed(2)} + skirt * 0.8 + streak * 0.35 + fleck * 0.9) * fade * uAlpha;
   // Its colour: storm grey-blue in the body, the dust's brown low, paler up
   // where it opens to the sky; the core darker still.
-  vec3 col = mix(uShade, uWind, 0.08 + 0.42 * smoothstep(0.25, 0.95, y) * (1.0 - torn * 0.6));
-  col = mix(col, uGrit, clamp(skirt * 0.9 + (1.0 - y) * 0.35 * torn, 0.0, 1.0));
+  vec3 col = mix(uShade, uWind, 0.22 + 0.5 * smoothstep(0.2, 0.95, y) * (1.0 - torn * 0.45));
+  // The dust's brown only in the skirt (the column itself is cool storm grey).
+  col = mix(col, uGrit, clamp(skirt * 0.65, 0.0, 1.0));
   col = mix(col, uWind * 1.05, streak * 0.8);
   col = mix(col, uGrit * 0.45, fleck);
   col *= (0.62 + 0.45 * y) * (1.0 - 0.32 * uCore);

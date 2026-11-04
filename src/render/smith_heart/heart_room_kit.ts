@@ -175,7 +175,13 @@ ${heartRootEmissiveGlsl()}`,
       for (const m of holder.children) {
         if (!(m instanceof THREE.Mesh)) continue;
         if (m.name.endsWith(':glow')) m.material = glow;
-        else if (p.piece === 'Kit_HeartRoot' && m.name.endsWith(':stone')) m.material = rootPainted;
+        // The roots, and the Heat's altar (its dark basalt read as pure black
+        // through the shared stone), in their own painted colours.
+        else if (
+          (p.piece === 'Kit_HeartRoot' || p.piece === 'Kit_AltarHeat') &&
+          m.name.endsWith(':stone')
+        )
+          m.material = rootPainted;
         // The roots are scenery far over the walk: no shadow from them.
         if (p.noShadow || lowGfx) m.castShadow = false;
       }

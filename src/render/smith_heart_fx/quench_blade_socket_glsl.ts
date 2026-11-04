@@ -60,10 +60,10 @@ void main() {
   col = mix(col, uDark * 0.85, crack * 0.7);
   col = mix(col, uDark * 0.55, wall * 0.8);
   col = mix(col, uLight * 0.9, lipLit * 0.55);
-  col = mix(col, uDark * 0.28, slot);
+  col = mix(col, uDark * 0.6, slot);
   // No edge: the plates melt into the lake long before the rag.
   float fade = 1.0 - smoothstep(rag * 0.45, rag, r);
-  float alpha = fade * (0.22 + 0.14 * plate + 0.3 * rim * abs(lit) + 0.3 * crack) + slot * 0.75 + wall * 0.5;
+  float alpha = fade * (0.22 + 0.14 * plate + 0.3 * rim * abs(lit) + 0.3 * crack) + slot * 0.55 + wall * 0.45;
   gl_FragColor = vec4(col, clamp(alpha, 0.0, 0.95) * uAlpha);
   #include <colorspace_fragment>
 }

@@ -36,9 +36,8 @@ describe('heart_root_look_core: the roots read on the dark crown', () => {
 
   it('paints the roots’ stone and every landmark’s in their own colours', () => {
     const kit = readFileSync('src/render/smith_heart/heart_room_kit.ts', 'utf8');
-    expect(kit).toMatch(
-      /Kit_HeartRoot' && m\.name\.endsWith\(':stone'\)\) m\.material = rootPainted/,
-    );
+    expect(kit).toContain("(p.piece === 'Kit_HeartRoot' || p.piece === 'Kit_AltarHeat') &&");
+    expect(kit).toContain('m.material = rootPainted;');
     const lm = readFileSync('src/render/smith_heart/heart_landmarks.ts', 'utf8');
     expect(lm).toContain("else if (m.name.endsWith(':stone')) m.material = painted;");
     expect(lm).not.toContain("vein !== 'heat'");

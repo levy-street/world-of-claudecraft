@@ -1027,8 +1027,8 @@ def landmark_breath(bpy):
     _finish(f, F, 6933, amp=0.2)
     made = hand_sculpt(bpy, p, f, 'LandmarkBreath', 10800, sharp=40.0, colours=LANDMARK_COLOURS, kinds=LANDMARK_KINDS)
     paint_faces(p, made, stone_shader(
-        (0.27, 0.28, 0.32), (0.43, 0.44, 0.49), (0.67, 0.67, 0.71), (0.28, 0.27, 0.37),
-        cap=(0.72, 0.73, 0.77), cap_at=(0.74, 0.97), bed=(0.47, 0.45, 0.52), bed_scale=1.0, edge=0.62,
+        (0.24, 0.23, 0.3), (0.37, 0.35, 0.45), (0.55, 0.52, 0.63), (0.25, 0.22, 0.36),
+        cap=(0.6, 0.58, 0.68), cap_at=(0.8, 0.98), bed=(0.42, 0.38, 0.52), bed_scale=1.0, edge=0.62,
         hollow=0.42, z_span=(-6.0, 26.0)))
     tree = _tree(p)
     prng = p.rng
