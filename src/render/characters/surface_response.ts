@@ -120,9 +120,12 @@ export function createSurfaceResponseMaterial(
       if(uSurfaceGlaze.w>0.001) {
         float glazeEdge=uSurfaceGlaze.x+surfaceGrain*0.035+sin(surfaceP.x*17.0+surfaceP.z*13.0)*0.025;
         glazeCoat=(1.0-smoothstep(glazeEdge-0.16,glazeEdge,surfaceHeight))*uSurfaceGlaze.w;
-        float glazeFrost=0.5+0.5*surfaceGrain;
-        vec3 glazeIce=mix(vec3(0.5,0.72,0.92),vec3(0.84,0.93,1.0),glazeFrost);
-        diffuseColor.rgb=mix(diffuseColor.rgb,diffuseColor.rgb*vec3(0.5,0.7,0.95)+glazeIce*0.3,glazeCoat*0.72);
+        // A smooth film over a deeper blue body, the rime thicker and paler low
+        // (never blotches, never a flat grey: the frozen body keeps its icy
+        // contrast; the rim and the glints below carry the detail).
+        float glazeFrost=0.2+0.55*(1.0-smoothstep(0.0,0.8,surfaceHeight));
+        vec3 glazeIce=mix(vec3(0.3,0.5,0.78),vec3(0.86,0.95,1.0),glazeFrost);
+        diffuseColor.rgb=mix(diffuseColor.rgb,diffuseColor.rgb*vec3(0.42,0.6,0.92)+glazeIce*0.34,glazeCoat*0.76);
         float glazeFront=(1.0-smoothstep(0.0,0.05,abs(surfaceHeight-glazeEdge+0.05)))*uSurfaceGlaze.w*step(glazeEdge,1.0);
         diffuseColor.rgb=mix(diffuseColor.rgb,vec3(0.92,0.97,1.0),glazeFront*(0.35+0.3*glazeFrost));
         glazeCoat=max(glazeCoat,glazeFront);
@@ -154,7 +157,7 @@ export function createSurfaceResponseMaterial(
         float glazePoint=1.0-smoothstep(0.03,0.13,length(fract(surfaceP*24.0)-glazeAt));
         float glazeTwinkle=fract(glazeSeed*7.0+dot(glazeView,vec3(3.1,5.7,4.3))+dot(surfaceP,vec3(1.3,0.7,1.1)));
         float glazeGlint=step(0.86,glazeSeed)*smoothstep(0.8,0.97,glazeTwinkle)*glazePoint;
-        totalEmissiveRadiance+=vec3(0.42,0.72,1.0)*glazeCoat*(glazeRim*(0.35+0.45*uSurfaceGlaze.y)+glazeGlint*2.2);
+        totalEmissiveRadiance+=vec3(0.42,0.72,1.0)*glazeCoat*(glazeRim*(0.55+0.5*uSurfaceGlaze.y)+glazeGlint*2.2);
         totalEmissiveRadiance+=vec3(0.62,0.9,1.0)*surfaceVein*uSurfaceGlaze.z*glazeCoat*0.9;
       }`,
     );
@@ -216,6 +219,9 @@ export class CharacterSurfaceResponse {
                             ? 10
                             : -1;
     if (kind < 0 || !Number.isFinite(strength) || strength <= 0) return false;
+    // A held frost glaze already paints the cold on the body: a frost hit's
+    // grainy coat over it read as camouflage blotches (the AAA review).
+    if (kind === 1 && this.glazed) return false;
     const edge = !this.active;
     this.transient = true;
     this.age = 0;

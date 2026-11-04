@@ -62,3 +62,13 @@ it("paints the glaze on the body's own material: a chilled film, a rim and glint
     response.uniforms.uSurfaceGlaze,
   );
 });
+
+it('lets a held frost glaze stand for a frost hit (no grainy coat over it)', () => {
+  const response = new CharacterSurfaceResponse();
+  response.setGlaze({ height: 1, glow: 1, bite: 0, alpha: 1 });
+  expect(response.trigger('frost', 0.8)).toBe(false);
+  expect(response.uniforms.uSurfaceKind.value).not.toBe(1);
+  // Any other school still reacts under the glaze.
+  response.trigger('fire', 0.8);
+  expect(response.uniforms.uSurfaceKind.value).toBe(0);
+});
