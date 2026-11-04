@@ -913,7 +913,9 @@ def _cap(p, walk, ledges, rng, rise, S):
         for q in run:
             pts.append(Vector((q[0], q[1])))
         edges += [(i0 + k, i0 + k + 1) for k in range(len(run) - 1)]
-    step = 0.84
+    # (0.84 until the weak-spots pass: the flat cap's spare triangles went to the
+    # grass clumps over it, the paint carried as well at this grain.)
+    step = 0.98
     for i in range(-18, 19):
         for j in range(-18, 19):
             x = i * step + (j % 2) * step * 0.5 + float(rng.uniform(-0.12, 0.12))
@@ -962,9 +964,13 @@ def _cap(p, walk, ledges, rng, rise, S):
             w1 = max(-1.0, min(1.0, float(nr.fbm(np.array([x * 2.6]), np.array([y * 2.6]), np.array([0.7]), 2)[0]) * 1.6))
             w2 = max(-1.0, min(1.0, float(nr.fbm(np.array([x * 3.7]), np.array([y * 3.7]), np.array([3.1]), 2)[0]) * 1.6))
             j1 = float(rng.uniform(-0.03, 0.03))
-            prof = ((0.0, high), (0.06 + 0.03 * w1, high - 0.08 - 0.03 * w2),
-                    (0.03 + 0.05 * w2 + j1, low + h * (0.58 + 0.14 * w1)),
-                    (0.1 + 0.07 * w1 - j1, low + h * (0.3 + 0.12 * w2)), (0.07, low - 0.06))
+            # The weak-spots pass: the beds wander far more along a step (one
+            # proud and high here, sunk and low a stride on), so a step never
+            # reads as a regular kerb; still nothing past a hand out.
+            w3 = max(-1.0, min(1.0, float(nr.fbm(np.array([x * 1.3]), np.array([y * 1.3]), np.array([5.3]), 2)[0]) * 1.8))
+            prof = ((0.0, high), (0.05 + 0.04 * w1, high - 0.07 - 0.06 * max(0.0, w3)),
+                    (0.02 + 0.07 * w2 + j1, low + h * (0.55 + 0.25 * w1 * w3)),
+                    (0.11 + 0.06 * w3 - j1, low + h * (0.28 + 0.18 * w2)), (0.07, low - 0.06))
             rows.append([bm.verts.new((x + ox * o, y + oy * o, z)) for (o, z) in prof])
         for k in range(len(rows) - 1):
             ox, oy = run[k][4], run[k][5]
@@ -997,7 +1003,7 @@ def _cap(p, walk, ledges, rng, rise, S):
                 if rng.uniform(0, 1) < 0.45:
                     continue
                 h = high - low
-                s_ = float(rng.uniform(0.18, 0.26))
+                s_ = float(rng.uniform(0.15, 0.3))
                 crystal(p, (x + ox * 0.1, y + oy * 0.1, low + h * 0.25), (s_ * 1.5, s_, h * 0.42),
                         p.vary(CRAG_BED, 0.08), n=8, boxy=0.6, jitter=0.2,
                         yaw=math.atan2(oy, ox) + float(rng.uniform(-0.4, 0.4)), floor=low - 0.06)
@@ -1610,6 +1616,41 @@ def wind_isle(bpy, variant):
         # A bed of flowers on the walk against the stone's side of the rim.
         q = rim_pt(a, -0.45)
         flower_bed(q, 4, 0.4)
+    # The weak-spots pass of 2026-11-04 (at eye level the turf read flat): low
+    # clumps of wind-combed grass scattered over the walk itself, thicker toward
+    # the rim and the stones, never on the shrine's flags, its ring, the dais or a
+    # ledge's step; ankle-high (a blade never reads as a wall), three-sided
+    # blades kept few so the isle stays inside its budget. Their own seed, so
+    # every other piece of dressing stays where it stood.
+    grng = np.random.default_rng(S['seed'] + 977)
+    placed = []
+    tries = 0
+    while len(placed) < S.get('clumps', 21) and tries < 4000:
+        tries += 1
+        x = float(grng.uniform(-11.0, 11.0))
+        y = float(grng.uniform(-11.0, 11.0))
+        r = math.hypot(x, y)
+        if r < 1.8 or RING_IN - 0.7 < r < RING_OUT + 0.6:
+            continue
+        if not inside(walk, x, y, 0.5):
+            continue
+        if any(math.hypot(x - q[0], y - q[1]) < PAD_R + 1.0 for q in (pads['home'], pads['land'])):
+            continue
+        if ledge_sd(x, y) < 0.45:
+            continue
+        # Thicker toward the rim: an inner spot is kept one time in three.
+        depth_in = -float(poly_sd(walk, np.array([x]), np.array([y]))[0])
+        if depth_in > 2.6 and grng.uniform(0, 1) < 0.66:
+            continue
+        if any(math.hypot(x - q[0], y - q[1]) < 1.1 for q in placed):
+            continue
+        placed.append((x, y))
+        z = level_at(ledges, x, y) + rise(x, y)
+        for j in range(int(grng.integers(1, 3))):
+            b = float(grng.uniform(0, TAU))
+            rr = float(grng.uniform(0.0, 0.3))
+            _tuft(p, (x + math.cos(b) * rr, y + math.sin(b) * rr, z), float(grng.uniform(0.16, 0.3)), grng,
+                  blades=3)
     if S['arch']:
         a0, a1 = S['arch']
         _broken_arch(p, walk, a0, a1, rng)
