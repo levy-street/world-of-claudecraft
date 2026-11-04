@@ -241,7 +241,7 @@ ISLE_SPECS = {
               # The bays (deep lips, hanging roots and curtains of vines).
               bays=(4.68, 0.79, 2.54),
               # The ruin isle: dry and warm, ochre in its wear.
-              key=((0.56, 0.5, 0.34), 0.16)),
+              key=((0.58, 0.5, 0.32), 0.3)),
     # B: broad and twin-fanged (two spires near as long and a third short); a
     # wind-bent tree on the south promontory, a runed stone at the tongue's tip
     # and one over the two ledges, a fallen stone on a shelf under a bay.
@@ -253,7 +253,7 @@ ISLE_SPECS = {
               proms=(5.93, 1.13, 4.01, 2.65),
               bays=(4.84, 0.44, 1.75),
               # The tree's isle: cool and lush.
-              key=((0.27, 0.36, 0.25), 0.16),
+              key=((0.24, 0.36, 0.3), 0.3),
               # The broadest isle's crag a little coarser (its tree and two
               # ledges pay for it, inside the isle's budget).
               sculpt=1900),
@@ -814,11 +814,11 @@ def _isle_field(S, walk, ledges, rng):
             # Their tops under every floor's height by a hand and more (never
             # read as more floor past the rim).
             z0 = -0.66 - j * 0.42 - float(rng.uniform(0, 0.15))
-            r = er + 0.15 + 0.25 * j + float(rng.uniform(-0.1, 0.25))
+            r = er + 0.05 + 0.18 * j + float(rng.uniform(-0.1, 0.15))
             f.put(('g5', 'g2', 'g4')[j % 3], block(
-                rng, (math.cos(a) * r, math.sin(a) * r, z0), (1.5, float(rng.uniform(1.4, 2.4)), 0.36),
-                cuts=6, chamfer=(0.9, 0.99), R=rot(rz=a + float(rng.uniform(-0.25, 0.25)),
-                                                   ry=float(rng.uniform(-0.05, 0.05)))), 0.08)
+                rng, (math.cos(a) * r, math.sin(a) * r, z0), (1.2, float(rng.uniform(1.3, 2.1)), 0.42),
+                cuts=6, chamfer=(0.86, 0.98), R=rot(rz=a + float(rng.uniform(-0.25, 0.25)),
+                                                    ry=float(rng.uniform(0.22, 0.38)))), 0.1)
     # The bays: the rock undercut under the lip, so its soil overhangs.
     for a in S['bays']:
         er = edge_r(walk, a)
@@ -978,7 +978,8 @@ def _cap(p, walk, ledges, rng, rise, S):
                         p._paint([face], p.vary(TURF_SUN, 0.08), STONE)
                 else:
                     with p.as_kind(RAW):
-                        p._paint([face], p.vary((CRAG_BED, CRAG, CRAG_BED, CRAG)[r], 0.07), STONE)
+                        p._paint([face], p.vary((CRAG_BED, CRAG, mix(CRAG_BED, ROCK_PALE, 0.45), CRAG)[r], 0.07),
+                                 STONE)
                 face.smooth = r == 0
                 p.facing([face], (ox, oy, 0.2))
         # One slab broken out of the step, leaning against it.
@@ -1701,7 +1702,7 @@ def wind_isle(bpy, variant):
     # Bedrock breaking flush through the turf (a step never trips on it).
     placed = 0
     for _ in range(60):
-        if placed >= 7:
+        if placed >= 4:
             break
         x, y = float(rng.uniform(-10.0, 10.0)), float(rng.uniform(-10.0, 10.0))
         r = math.hypot(x, y)
@@ -1709,10 +1710,14 @@ def wind_isle(bpy, variant):
             continue
         if math.hypot(x - pads['home'][0], y - pads['home'][1]) < PAD_R + 0.8 or ledge_sd(x, y) < 1.2:
             continue
-        s2 = float(rng.uniform(0.5, 1.0))
+        s2 = float(rng.uniform(0.45, 0.85))
         yaw = float(rng.uniform(0, TAU))
-        outline = [(x + math.cos(yaw + TAU * j / 7) * s2 * float(rng.uniform(0.6, 1.2)),
-                    y + math.sin(yaw + TAU * j / 7) * s2 * float(rng.uniform(0.5, 0.9))) for j in range(7)]
+        outline = []
+        for j in range(9):
+            b = TAU * j / 9 + float(rng.uniform(-0.2, 0.2))
+            rr = s2 * float(rng.uniform(0.45, 1.2))
+            u, v = math.cos(b) * rr * 1.5, math.sin(b) * rr * 0.6
+            outline.append((x + u * math.cos(yaw) - v * math.sin(yaw), y + u * math.sin(yaw) + v * math.cos(yaw)))
         _flagstone(p, outline, rng, CRAG_BED, top=lv(x, y) + 0.025, bevel=0.14, floor=lv(x, y))
         flower_bed((x + s2 * 0.9, y, lv(x, y)), 1, 0.25)
         placed += 1
