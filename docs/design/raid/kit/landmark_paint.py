@@ -139,11 +139,14 @@ def stone_shader(low, mid, high, cool, *, cap=None, cap_at=(0.5, 0.9), bed=None,
     return shade
 
 
-def surface_ribbon(p, tree, pts, w, shade, slot=GLOW, lift=0.05, reach=9.0, gap=1.5):
+def surface_ribbon(p, tree, pts, w, shade, slot=GLOW, lift=0.05, reach=9.0, gap=1.5, smooth=0, ease=0):
     """A thin line of light laid on a surface: `pts` are (from, to) rays (each from
     outside the rock toward it); where one hits, the ribbon has a point there, turned to
     the surface; a ray that misses or jumps more than `gap` yards breaks the line, so no
-    stretch of it ever hangs in the air. Single sided, facing out."""
+    stretch of it ever hangs in the air. Single sided, facing out. `smooth` averages each
+    point's normal with that many neighbours either side (a ribbon over rough rock
+    otherwise twists face to face like a chain); `ease` likewise eases its points (over
+    faceted rock a line otherwise saws between the facets)."""
     bm = p.bm
     run = []
 
@@ -151,6 +154,23 @@ def surface_ribbon(p, tree, pts, w, shade, slot=GLOW, lift=0.05, reach=9.0, gap=
         if len(run) < 2:
             run.clear()
             return
+        if smooth:
+            normals = []
+            for k in range(len(run)):
+                acc = Vector((0.0, 0.0, 0.0))
+                for j in range(max(0, k - smooth), min(len(run), k + smooth + 1)):
+                    acc += run[j][1]
+                normals.append(acc.normalized() if acc.length > 1e-6 else run[k][1])
+            run[:] = [(q, n) for (q, _n), n in zip(run, normals)]
+        if ease:
+            eased = []
+            for k in range(len(run)):
+                acc = Vector((0.0, 0.0, 0.0))
+                js = range(max(0, k - ease), min(len(run), k + ease + 1))
+                for j in js:
+                    acc += run[j][0]
+                eased.append(acc / len(js))
+            run[:] = [(q, n) for q, (_q, n) in zip(eased, run)]
         rows = []
         for k, (q, n) in enumerate(run):
             d = (run[min(k + 1, len(run) - 1)][0] - run[max(k - 1, 0)][0])

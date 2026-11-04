@@ -57,7 +57,7 @@ from hckit import GLOW
 from jaguar_head_sculpt import Ellipsoid, Noise, Polyline, rot
 from landmark_paint import crystal_grade, hand_sculpt, ice_sheet, paint_faces, stone_shader, surface_ribbon
 from mathutils import Vector
-from quarter_pieces import ribbon, strip
+from quarter_pieces import strip
 from ring_sculpt import _weather
 from shkit import PAINT, TAU, RAW
 
@@ -276,9 +276,9 @@ def _glow_line(p, pts, w, shade=1.0):
               z1=q1[2] + 0.04)
 
 
-def _vein_net(p, tree, F, rng, vein, n, w=(0.12, 0.22), shade=0.85, r=(63.0, 82.0)):
+def _vein_net(p, tree, F, rng, vein, n, w=(0.12, 0.22), shade=0.85, r=(63.0, 82.0), draw=True):
     """Veins of the element's light down the cliff's faces (draped lines
-    wandering down toward the lip)."""
+    wandering down toward the lip). `draw=False` only takes its random draws."""
     d0, d1 = SPAN[vein]
     for _ in range(n):
         d = float(rng.uniform(d0 + 4, d1 - 4))
@@ -291,7 +291,54 @@ def _vein_net(p, tree, F, rng, vein, n, w=(0.12, 0.22), shade=0.85, r=(63.0, 82.
             rr -= 0.5
             d += float(rng.uniform(-0.5, 0.5))
         if len(pts) > 5:
-            _glow_line(p, pts, float(rng.uniform(*w)), shade)
+            ww = float(rng.uniform(*w))
+            if draw:
+                _glow_line(p, pts, ww, shade)
+
+
+def _ember_veins(p, tree, F, rng, n=11):
+    """The Heat's ember veins (the weak-spots pass's second round: its draped vein net
+    hung straight down the columns' faces as dark red streaks, read as blood or a
+    texture fault). Each vein is found on the face the raid sees by rays cast out from
+    the platform, so it lies on the rock and follows its form; it wanders down from a
+    broken head toward the lava in an uneven meander (two waves of their own per vein,
+    never the same twice), forks once or twice, and breaks wherever the rock steps back.
+    Drawn twice: a broad smoulder and a narrow hot core over it (shade 0.985, the
+    landmark's glow shader lights that band as fire), tapering at both ends."""
+    d0, d1 = SPAN['heat']
+
+    def wave(t, wl, ph):
+        return math.sin(t * wl + ph) + 0.45 * math.sin(t * wl * 2.7 + ph * 1.9)
+
+    def vein(d, z0, z1, amp, wl, ph, w):
+        # `d` is where it starts: its meander is measured from there.
+        rays = []
+        steps = max(4, int((z0 - z1) / 0.4))
+        for k in range(steps + 1):
+            t = k / steps
+            z = z0 + (z1 - z0) * t
+            dd = d + amp * (wave(t, wl, ph) - wave(0.0, wl, ph))
+            rays.append((F.ad(dd, 57.5, z), F.ad(dd, 96.0, z)))
+        surface_ribbon(p, tree, rays, w * 2.6, 0.62, reach=40.0, gap=1.1, lift=0.05, smooth=2)
+        surface_ribbon(p, tree, rays, w, 0.985, reach=40.0, gap=1.1, lift=0.09, smooth=2)
+        return rays
+
+    for _ in range(n):
+        d = float(rng.uniform(d0 + 5, d1 - 5))
+        z0 = float(rng.uniform(5.0, 17.0))
+        z1 = float(rng.uniform(-0.5, 2.5))
+        amp = float(rng.uniform(0.6, 2.4))
+        wl = float(rng.uniform(2.0, 6.5))
+        ph = float(rng.uniform(0, TAU))
+        w = float(rng.uniform(0.12, 0.22))
+        vein(d, z0, z1, amp, wl, ph, w)
+        # A fork or two splitting off down the face.
+        for _f in range(int(rng.integers(0, 3))):
+            t = float(rng.uniform(0.2, 0.6))
+            zf = z0 + (z1 - z0) * t
+            df = d + amp * (wave(t, wl, ph) - wave(0.0, wl, ph))
+            vein(df, zf, max(z1, zf - float(rng.uniform(2.0, 5.0))), float(rng.uniform(0.5, 1.4)),
+                 float(rng.uniform(1.5, 3.0)), float(rng.uniform(0, TAU)), w * 0.65)
 
 
 def _keep_off_walk(foot, d, L, r_min=62.4):
@@ -305,16 +352,6 @@ def _keep_off_walk(foot, d, L, r_min=62.4):
         out = Vector((tip.x, tip.y, 0.0)).normalized()
         v = (v + out * 0.25).normalized()
     return tuple(v)
-
-
-def _z_near(pts, q):
-    best = None
-    bd = 1e9
-    for r in pts:
-        dd = (r[0] - q[0]) ** 2 + (r[1] - q[1]) ** 2
-        if dd < bd:
-            bd, best = dd, r
-    return best[2]
 
 
 def _fall(p, pts, w, side, shade=0.95):
@@ -341,9 +378,15 @@ def _fall(p, pts, w, side, shade=0.95):
             loop[p.col] = (g, g, g, 1.0)
 
 
-def _river(p, tree, F, path, w):
-    """Lava down a channel: draped along `path` ((d, r) pairs), a ribbon of
-    light; returns its last point."""
+def _river(p, tree, F, path, w, down=False):
+    """Lava down a channel: found along `path` ((d, r) pairs) and laid ON the rock it
+    runs over, a crusted edge and a hot core; returns its last point.
+    The weak-spots pass's second round: it was a flat ribbon draped from above, so
+    down a steep channel it stood on edge in thin vertical sheets (from the platform,
+    red streaks read as blood or a texture fault). Now each point is found by a ray
+    from the platform's side and above, so the lava hugs the channel's bed and face
+    and follows their form (normals eased along it, never twisting face to face).
+    `down`: found from straight above instead (a flank running across the mass's top)."""
     pts = []
     for (d, r) in path:
         for t in range(3):
@@ -352,12 +395,21 @@ def _river(p, tree, F, path, w):
                 continue
             h = _drape(tree, *F.ad(d, rr, 0.0)[:2])
             if h:
-                pts.append((h[0].x, h[0].y, h[0].z))
+                pts.append((d, rr, h[0].z))
     if len(pts) < 3:
         return None
-    ribbon(p, [(q[0], q[1]) for q in pts], w, lambda q, pts=pts: _z_near(pts, q) + 0.08, (1.0, 1.0, 1.0),
-           slot=GLOW, edge=(0.55, 0.55, 0.55), taper=False)
-    return pts[-1]
+    rays = []
+    for (d, rr, z) in pts:
+        q = Vector(F.ad(d, rr, z))
+        if down:
+            rays.append((q + Vector((0.0, 0.0, 6.0)), q - Vector((0.0, 0.0, 2.0))))
+            continue
+        toward = Vector(F.ad(d, -1.0, 0.0)) - Vector(F.ad(d, 0.0, 0.0))
+        rays.append((q + toward * 4.0 + Vector((0.0, 0.0, 4.0)), q - toward * 1.0 - Vector((0.0, 0.0, 1.0))))
+    surface_ribbon(p, tree, rays, w, 0.55, reach=10.0, gap=1.6, lift=0.12, smooth=3, ease=1)
+    surface_ribbon(p, tree, rays, w * 0.5, 1.0, reach=10.0, gap=1.6, lift=0.18, smooth=3, ease=1)
+    d, rr, z = pts[-1]
+    return F.ad(d, rr, z)
 
 
 def _lip_fall(p, F, d, z_top, w, length=34.0):
@@ -573,10 +625,13 @@ def landmark_heat(bpy):
     # The flanks: lava pouring off each end of the mass into the chasm.
     for (d, out) in ((d0 + 4.0, -3.0), (d1 - 4.0, 3.0)):
         path = [(d + out * 0.1 * t, 70.0 - t * 0.6) for t in range(10)]
-        last = _river(p, tree, F, path, 1.6)
+        last = _river(p, tree, F, path, 1.6, down=True)
         z = last[2] if last else 3.0
         _flank_fall(p, F, d + out * 0.9, 64.5, z, 2.4, out * 0.5)
-    _vein_net(p, tree, F, prng, 'heat', 18, w=(0.14, 0.26), shade=0.8)
+    # The draped vein net is gone (see _ember_veins); its draws are still taken so the
+    # fire crystals and the ash below keep the places Jose approved.
+    _vein_net(p, tree, F, prng, 'heat', 18, w=(0.14, 0.26), shade=0.8, draw=False)
+    _ember_veins(p, tree, F, np.random.default_rng(6907))
     # Fire crystal bursting out round the crater and between the bundles.
     for _ in range(16):
         bd, br, rad, top = HEAT_BUNDLES[int(prng.randrange(len(HEAT_BUNDLES)))]
@@ -602,8 +657,11 @@ def landmark_heat(bpy):
 
 # ================================================================ the Hammer
 HAMMER_CLUSTERS = (  # (d, r, z, n, main height, main radius, lean (radial, across))
-    (-7.0, 65.0, 1.2, 9, 10.0, 1.7, (-0.25, -0.3)),
-    (7.5, 65.0, 1.2, 9, 11.5, 1.8, (-0.25, 0.3)),
+    # The two by the head stand off its flanks, lower and leaning away from it (the
+    # weak-spots pass's second round: in front of it they hid its head from the floor),
+    # so they frame the hammer instead of screening it.
+    (-17.0, 65.5, 1.2, 7, 8.0, 1.6, (-0.2, -0.5)),
+    (17.5, 65.5, 1.2, 7, 9.0, 1.7, (-0.2, 0.5)),
     (19.0, 71.0, 8.5, 8, 11.0, 1.6, (-0.4, 0.3)),
     (-13.5, 72.0, 7.5, 7, 10.0, 1.5, (-0.4, -0.35)),
     (29.0, 68.5, 4.5, 7, 9.0, 1.4, (-0.5, 0.25)),
@@ -805,12 +863,25 @@ def landmark_hammer(bpy):
     # lit like it (the weak-spots pass: its shade a violet slate, never black),
     # its worn arrises pale, dust settled on its top; its collar and its lips a
     # darker dressed course, so its rhythm reads from the room.
+    # The second round: the head is the room's focal silhouette, so it is lit as one:
+    # its front (the face the raid walks up to) a step brighter, and the gold
+    # crystal's light warming every face that turns down toward it (its underside
+    # read as a black hole under the lips from the floor).
+    out_dir = Vector((math.sin(math.radians(F.bearing)), -math.cos(math.radians(F.bearing)), 0.0))
+
+    def head_light(col, q, n, c):
+        below = sstep(-0.05, -0.75, n.z)
+        col = mix(col, (0.84, 0.6, 0.3), 0.5 * below)
+        front = max(0.0, -(n.x * out_dir.x + n.y * out_dir.y))
+        return mix(col, tuple(min(1.0, ch * 1.22 + 0.04) for ch in col), 0.55 * front)
+
     dressed = stone_shader(
-        (0.4, 0.37, 0.37), (0.56, 0.51, 0.47), (0.76, 0.69, 0.6), (0.36, 0.34, 0.44),
-        cap=(0.7, 0.63, 0.52), cap_at=(0.78, 0.97), edge=1.0, hollow=0.55, z_span=(4.0, 22.0))
+        (0.44, 0.41, 0.4), (0.6, 0.55, 0.5), (0.8, 0.73, 0.63), (0.4, 0.37, 0.46),
+        cap=(0.74, 0.67, 0.55), cap_at=(0.78, 0.97), edge=1.0, hollow=0.45, z_span=(4.0, 22.0),
+        extra=head_light)
     course = stone_shader(
         (0.32, 0.29, 0.29), (0.43, 0.38, 0.35), (0.6, 0.53, 0.45), (0.3, 0.28, 0.37),
-        edge=1.0, hollow=0.5, z_span=(4.0, 22.0))
+        edge=1.0, hollow=0.5, z_span=(4.0, 22.0), extra=head_light)
     R0 = Vector(head_c)
     hd = (h1 - h0).normalized()
     hl = (h1 - h0).length
@@ -850,7 +921,7 @@ def landmark_hammer(bpy):
                                      bright=0.15 if k == 0 else 0.0)
             crystal_grade(p, faces, foot, d, L)
     # Gold in the hammer's own crack, from its collar to its foot.
-    _glow_thread(p, head_crack, [0.16 + 0.1 * math.sin(math.pi * k / 8) for k in range(9)], 0.95)
+    _glow_thread(p, head_crack, [0.24 + 0.16 * math.sin(math.pi * k / 8) for k in range(9)], 1.0)
     # Gold down in the fractures: a thread of the vein's light deep in each.
     for (pts, radii) in cracks:
         out = Vector(pts[0]).normalized()

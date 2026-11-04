@@ -137,6 +137,24 @@ export const HEART_ROOT_SPINE: readonly { out: number; up: number }[] = [
   { out: 50, up: 54 },
 ];
 
+/** Where each root's arm clamps the platform's lip (the weak-spots pass's second
+ *  round; heart_pieces.py ROOT_GRIP_X, ROOT_RIM_Y): in the root's frame, `across`
+ *  its local +X and `out` along its outward run (negative: toward the platform).
+ *  Chosen where the straight roots' lip and the Hammer's (turned by its foot and
+ *  aim) cross, so the one Blender piece grips the rim under all four. */
+export const HEART_ROOT_GRIP = { across: 5.8, out: -12.3 } as const;
+
+/** The root's grip on the lip, instance-local (x, z). */
+export function heartRootGripPoint(vein: SmithHeartVein): { x: number; z: number } {
+  const f = heartRootFrame(vein);
+  const { across, out } = HEART_ROOT_GRIP;
+  // Local +X is (cos rot, -sin rot); outward (local -Z) is (-sin rot, -cos rot).
+  return {
+    x: f.x + Math.cos(f.rot) * across - Math.sin(f.rot) * out,
+    z: f.z - Math.sin(f.rot) * across - Math.cos(f.rot) * out,
+  };
+}
+
 /** A point `t` (0 at the altar, 1 at the crown) along a vein's root, in
  *  instance-local yards. */
 export function heartRootPoint(

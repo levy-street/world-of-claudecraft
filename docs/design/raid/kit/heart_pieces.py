@@ -874,7 +874,7 @@ HEAT_ALTAR_PAINT = dict(
 )
 
 
-def _heat_altar_paint(bpy, p, f):
+def _heat_altar_paint(bpy, p, f, bundle=None):
     from landmark_paint import hand_sculpt, paint_faces, stone_shader, surface_ribbon
     A = HEAT_ALTAR_PAINT
     made = hand_sculpt(bpy, p, f, 'Altarheat', 5200, sharp=38.0, colours=HEART_COLOURS, kinds=HEART_KINDS)
@@ -896,20 +896,84 @@ def _heat_altar_paint(bpy, p, f):
     paint_faces(p, made, shade)
     from mathutils.bvhtree import BVHTree
     tree = BVHTree.FromBMesh(p.bm)
-    # Embers in the joints: rays laid up the altar's sides between the columns,
-    # each a short burning seam on the stone (never a thread in the air).
+    # Embers in the joints (the weak-spots pass's second round: rays swung a fixed
+    # wobble across the columns, so every seam zigzagged face to face in the same
+    # beat). Now each seam runs up a real joint between two outer columns, aimed
+    # into its crease so it hugs it; joints are picked at random, each burns its own
+    # stretch (some long from the plinth, some short and high, one or two broken
+    # in two), and a few spill a short crack across a column's face.
     rng = np.random.default_rng(5537)
-    for k in range(14):
-        a = TAU * k / 14 + float(rng.uniform(-0.12, 0.12))
-        z0 = float(rng.uniform(1.4, 2.6))
-        z1 = z0 + float(rng.uniform(1.6, 3.2))
+    outer = [c for c in (bundle or []) if math.hypot(c[0], c[1]) > 0.9]
+    joints = []
+    for i, a in enumerate(outer):
+        for b in outer[i + 1:]:
+            gap = math.hypot(a[0] - b[0], a[1] - b[1])
+            mx_, my_ = (a[0] + b[0]) / 2, (a[1] + b[1]) / 2
+            rm = math.hypot(mx_, my_)
+            # Side by side round the bundle (a joint the raid can see), never one
+            # column behind the other.
+            if gap < 1.45 and rm > 0.8 and abs(((a[0] - b[0]) * mx_ + (a[1] - b[1]) * my_) / (gap * rm)) < 0.55:
+                joints.append(((a[0] + b[0]) / 2, (a[1] + b[1]) / 2, min(a[2], b[2]), (a[0] - b[0]) / gap,
+                               (a[1] - b[1]) / gap))
+    order = rng.permutation(len(joints))
+    for idx in order[:18]:
+        mx, my, top, tx, ty = joints[int(idx)]
+        r = math.hypot(mx, my)
+        ox, oy = mx / r, my / r
+        z0 = float(rng.uniform(1.15, 1.6)) if rng.random() < 0.55 else float(rng.uniform(2.2, 3.6))
+        z1 = min(top - 0.35, z0 + float(rng.uniform(1.2, 4.2)))
+        if z1 - z0 < 0.7:
+            continue
+        steps = max(4, int((z1 - z0) / 0.18))
+        cut = float(rng.uniform(0.35, 0.65)) if rng.random() < 0.3 else None
+        drift = float(rng.uniform(-0.04, 0.04))
+        runs = [[]]
+        for j in range(steps + 1):
+            t = j / steps
+            if cut is not None and abs(t - cut) < 0.06:
+                if runs[-1]:
+                    runs.append([])
+                continue
+            z = z0 + (z1 - z0) * t
+            sl = drift * t + 0.025 * math.sin(t * float(rng.uniform(3.0, 7.0)))
+            q = Vector((mx + tx * sl, my + ty * sl, z))
+            runs[-1].append((tuple(q + Vector((ox, oy, 0.0)) * 3.2), tuple(q - Vector((ox, oy, 0.0)) * 0.6)))
+        w = float(rng.uniform(0.07, 0.16))
+        for run in runs:
+            surface_ribbon(p, tree, run, w, 0.88, reach=6.0, gap=0.45, lift=0.03)
+        # A short crack spilling off across a column's face.
+        if rng.random() < 0.6:
+            zc = z0 + (z1 - z0) * float(rng.uniform(0.3, 0.8))
+            side = float(rng.choice((-1.0, 1.0)))
+            n = int(rng.integers(3, 6))
+            rays = []
+            for j in range(n):
+                s_ = side * (0.08 + 0.13 * j)
+                q = Vector((mx + tx * s_, my + ty * s_, zc - 0.16 * j - 0.05 * j * j))
+                rays.append((tuple(q + Vector((ox, oy, 0.0)) * 3.2), tuple(q - Vector((ox, oy, 0.0)) * 0.6)))
+            surface_ribbon(p, tree, rays, w * 0.7, 0.8, reach=6.0, gap=0.4, lift=0.03)
+    # Cracks down the columns' own faces: a random walk round each column (kinks of
+    # their own length and turn, never a beat), the fire showing through.
+    faces_ = [c for c in outer if c[2] > 3.0]
+    for idx in rng.permutation(len(faces_))[:7]:
+        cx, cy, top = faces_[int(idx)]
+        base = math.atan2(cy, cx)
+        a = base + float(rng.uniform(-0.6, 0.6))
+        z = float(rng.uniform(min(top - 0.6, 3.4), top - 0.4))
+        end = max(1.1, z - float(rng.uniform(1.4, 3.6)))
         rays = []
-        for j in range(9):
-            z = z0 + (z1 - z0) * j / 8
-            wob = 0.08 * math.sin(j * 1.7 + k)
-            out = Vector((math.sin(a + wob), -math.cos(a + wob), 0.0))
-            rays.append((tuple(out * 4.2 + Vector((0.0, 0.0, z))), tuple(out * 0.4 + Vector((0.0, 0.0, z)))))
-        surface_ribbon(p, tree, rays, float(rng.uniform(0.07, 0.13)), 0.88, reach=6.0, gap=0.5, lift=0.03)
+        while z > end:
+            seg = float(rng.uniform(0.25, 0.7))
+            turn = float(rng.normal(0.0, 0.32))
+            n = max(2, int(seg / 0.12))
+            for j in range(n):
+                a += turn / n
+                a = max(base - 0.95, min(base + 0.95, a))
+                z -= seg / n
+                o = Vector((math.cos(a), math.sin(a), 0.0))
+                q = Vector((cx, cy, z))
+                rays.append((tuple(q + o * 2.6), tuple(q)))
+        surface_ribbon(p, tree, rays, float(rng.uniform(0.06, 0.12)), 0.85, reach=4.0, gap=0.35, lift=0.03)
     return made
 
 
@@ -922,6 +986,7 @@ def altar(bpy, vein):
     p = HSP('Kit_Altar' + vein.capitalize(), seed=seed, ao=0.6, ao_dist=1.6, dust=0.4)
     rng = np.random.default_rng(seed)
     f = Sculpt((-3.6, -3.6, -0.4), (3.6, 3.6, 8.6), 0.07)
+    heat_columns = []
     _plinth(f, rng)
     heart = (0.0, -0.4, 5.0)
     if vein == 'hammer':
@@ -980,6 +1045,7 @@ def altar(bpy, vein):
             top = 6.2 - r * 0.9 + float(rng.uniform(-0.5, 0.4))
             if r < 0.7:
                 top = 5.0
+            heat_columns.append((cx, cy, max(2.0, top)))
             f.put(('basalt', 'basalt2', 'basalt')[int(rng.integers(0, 3))],
                   hex_column((cx, cy), 0.62, 0.8, max(2.0, top), phase=float(rng.uniform(0, 1)),
                              top_tilt=(float(rng.uniform(-0.2, 0.2)), float(rng.uniform(-0.2, 0.2)))), 0.04)
@@ -988,7 +1054,7 @@ def altar(bpy, vein):
     f.cut_below(0.0)
     _altar_clamp(f)
     if vein == 'heat':
-        _heat_altar_paint(bpy, p, f)
+        _heat_altar_paint(bpy, p, f, heat_columns)
     else:
         _mesh(bpy, p, f, 'Altar' + vein, 5200)
     prng = p.rng
@@ -1087,6 +1153,72 @@ def _bez_d(t, P):
     return 2 * (1 - t) * (b - a) + 2 * t * (c - b)
 
 
+# The root's arm down to the platform (the weak-spots pass's second round: the roots
+# rose out of the landmarks behind and seemed to start in the air over them). In the
+# root's frame (x across, y out from the platform, z over its lift: the walk at
+# ROOT_FLOOR_Z, the platform's lip ROOT_RIM_Y in front of the root's foot): one arm
+# leaves the braid where it clears its landmark, drapes down over the landmark's face
+# and clamps the lip with a claw of toes, their tips over the edge onto the walk.
+# Its wrist sits where the straight roots' lip and the Hammer's (turned: its foot
+# and aim, heart_room_kit_plan_core.ts HEART_ROOT_AIM) cross, so all four grip it.
+ROOT_FLOOR_Z = -6.0
+ROOT_RIM_Y = -12.3
+ROOT_GRIP_X = 5.8
+
+
+def _root_grip(f, rng, frame_at):
+    c0 = np.asarray(frame_at(0.3)[0])
+    wrist = np.array((ROOT_GRIP_X, ROOT_RIM_Y + 1.1, ROOT_FLOOR_Z + 0.75))
+    path = [c0, np.array((1.4, 7.6, 10.5)), np.array((3.4, 1.8, 4.8)), np.array((4.9, -4.4, -0.6)),
+            np.array((5.6, -8.8, -4.1)), wrist]
+    radii = [3.7, 3.2, 2.8, 2.45, 2.1, 1.8]
+    pts = []
+    rad = []
+    for i in range(len(path) - 1):
+        for k in range(4):
+            t = k / 4
+            pts.append(tuple(path[i] * (1 - t) + path[i + 1] * t))
+            rad.append(radii[i] * (1 - t) + radii[i + 1] * t)
+    pts.append(tuple(wrist))
+    rad.append(radii[-1])
+    f.put('g1', Polyline(pts, rad), 1.0)
+    # Two strands twisting down the arm, so it reads as the braid's own, not a pipe.
+    for j in range(2):
+        twist = []
+        tr = []
+        for k, q in enumerate(pts):
+            ang = math.pi * j + k * 0.55
+            r = rad[k] * 0.62
+            d = np.asarray(pts[min(k + 1, len(pts) - 1)]) - np.asarray(pts[max(k - 1, 0)])
+            d = d / max(1e-6, np.linalg.norm(d))
+            side = np.cross(d, (0.0, 0.0, 1.0))
+            side = side / max(1e-6, np.linalg.norm(side))
+            up = np.cross(side, d)
+            twist.append(tuple(np.asarray(q) + (side * math.cos(ang) + up * math.sin(ang)) * r))
+            tr.append(rad[k] * 0.5)
+        f.put('g1', Polyline(twist, tr), 0.5)
+    # A knot where it leaves the braid and one at the wrist.
+    f.put('g1', Ellipsoid(tuple(c0 + np.array((0.8, -2.0, -1.0))), (3.2, 3.0, 2.8), None), 1.0)
+    f.put('g1', Ellipsoid(tuple(wrist + np.array((0.0, 0.4, 0.15))), (2.4, 2.0, 1.35), None), 0.6)
+    # The claw: five toes over the lip, the middle ones longest, each knuckled, its tip
+    # pressed into the walk just past the edge; two short ones hook down the fascia.
+    for (dx, reach, lift) in ((-1.5, 0.9, 0.0), (-0.75, 1.3, 0.1), (0.05, 1.55, 0.15), (0.85, 1.25, 0.1),
+                              (1.55, 0.8, 0.0)):
+        jig = float(rng.uniform(-0.12, 0.12))
+        a = wrist + np.array((dx * 0.45, -0.4, 0.2))
+        b = np.array((wrist[0] + dx * 0.85 + jig, ROOT_RIM_Y + 0.15, ROOT_FLOOR_Z + 0.6 + lift))
+        c = np.array((wrist[0] + dx * 1.05 + jig, ROOT_RIM_Y - reach * 0.6, ROOT_FLOOR_Z + 0.32 + lift * 0.5))
+        d = np.array((wrist[0] + dx * 1.15 + jig, ROOT_RIM_Y - reach, ROOT_FLOOR_Z + 0.02))
+        f.put('g1', Polyline([tuple(a), tuple(b), tuple(c), tuple(d)], [0.95, 0.72, 0.5, 0.2]), 0.3)
+        f.put('g1', Ellipsoid(tuple(b), (0.75, 0.75, 0.62), None), 0.25)
+    for dx in (-1.1, 1.2):
+        a = wrist + np.array((dx * 0.6, -0.6, -0.2))
+        b = np.array((wrist[0] + dx, ROOT_RIM_Y + 0.55, ROOT_FLOOR_Z - 1.2))
+        c = np.array((wrist[0] + dx * 1.1, ROOT_RIM_Y + 0.45, ROOT_FLOOR_Z - 3.2))
+        f.put('g1', Polyline([tuple(a), tuple(b), tuple(c)], [0.7, 0.5, 0.18]), 0.3)
+    return pts
+
+
 def heart_root(bpy):
     """A root of the mountain (see the module doc): one great braid of rock from the
     crown down into its landmark. It leaves the mountain as a mass of strands parting and
@@ -1099,7 +1231,7 @@ def heart_root(bpy):
     p = HSP('Kit_HeartRoot', seed=5601, ao=0.6, ao_dist=4.0, dust=0.0)
     rng = np.random.default_rng(5601)
     S = ROOT_SPINE
-    f = Sculpt((-18.0, -10.0, -24.0), (18.0, 72.0, 78.0), 0.3)
+    f = Sculpt((-18.0, -16.0, -24.0), (18.0, 72.0, 78.0), 0.3)
     n1 = Noise(5603)
     N = 44
 
@@ -1163,9 +1295,10 @@ def heart_root(bpy):
         mid = near + np.array((math.cos(a) * reach * 0.55, math.sin(a) * reach * 0.55, 5.0))
         end = near + np.array((math.cos(a) * reach, math.sin(a) * reach, -4.0 - float(rng.uniform(0.0, 6.0))))
         f.put('g1', Polyline([tuple(near + np.array((0.0, 0.0, 10.0))), tuple(mid), tuple(end)], [3.2, 2.2, 0.7]), 0.7)
+    arm = _root_grip(f, rng, frame_at)
     f.displace(lambda X, Y, Z: 0.42 * n1.fbm(X * 0.2, Y * 0.1, Z * 0.2, 3)
                + 0.3 * (n1.ridged(X * 0.5, Y * 0.22, Z * 0.5, 2) - 0.45), band=1.4)
-    made = hand_sculpt(bpy, p, f, 'HeartRoot', 7600, sharp=60.0, colours=HEART_COLOURS, kinds=HEART_KINDS)
+    made = hand_sculpt(bpy, p, f, 'HeartRoot', 8000, sharp=60.0, colours=HEART_COLOURS, kinds=HEART_KINDS)
     paint_faces(p, made, stone_shader(
         (0.2, 0.17, 0.17), (0.36, 0.31, 0.29), (0.58, 0.51, 0.44), (0.14, 0.13, 0.19),
         edge=1.0, hollow=0.95, z_span=(8.0, 66.0)))
@@ -1181,6 +1314,13 @@ def heart_root(bpy):
             out = side * math.cos(ang) + up * math.sin(ang)
             rays.append((c + out * (girth(t) * 1.9 + 2.0), c))
         surface_ribbon(p, tree, rays, 0.62, 0.92, reach=24.0, gap=3.2, lift=0.08)
+    # And down the arm's back to its wrist (lit from above, the side the raid sees).
+    rays = []
+    for k in range(len(arm) - 1):
+        for t in (0.0, 0.5):
+            q = Vector(arm[k]).lerp(Vector(arm[k + 1]), t)
+            rays.append((q + Vector((-1.2, -1.0, 4.0)), q))
+    surface_ribbon(p, tree, rays, 0.42, 0.9, reach=8.0, gap=1.6, lift=0.08)
     return p
 
 
