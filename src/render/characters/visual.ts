@@ -1869,10 +1869,8 @@ export class CharacterVisual {
       this.braceUntil = extendBrace(this.braceUntil, this.clock);
     }
     if (this.surfaceResponse.update(dt, this.root, this.height)) this.applyVisualMaterials();
-    if (this.waterSink !== this.waterSinkTarget) {
+    if (this.waterSink !== this.waterSinkTarget)
       this.waterSink = easeSink(this.waterSink, this.waterSinkTarget, dt);
-      this.root.position.y = -this.waterSink;
-    }
     // A streamed armor file that landed (or a better tier of one): the dressing
     // attaches it (at once with no work queue behind this body, else as a unit
     // of it), and the re-dress that follows is here, on the per-frame path.
@@ -2306,7 +2304,9 @@ export class CharacterVisual {
     // as the character falling off the wall. Authored maps only: the built-in
     // world keeps the upright body it shipped with.
     this.poseWrap.rotation.z = isBuiltinWorldActive() ? 0 : (s.bankRoll ?? 0) * (1 - climb);
+    // (the rig root is the mount seat's; a body sunk in water rides the pose)
     this.poseWrap.position.y =
+      -this.waterSink +
       this.swimBlend * (swimRise + Math.sin(this.swimBobTime * 2 + this.bobPhase) * 0.08) +
       // Compress at the start of the pull, back to neutral as the body rises.
       CLIMB_BODY_DUCK * climb * (1 - env01(this.climbPhase, 0.1, 0.55));
