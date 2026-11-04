@@ -411,6 +411,13 @@ function plan(world, st) {
       group.push(b.pid);
       if (group.length >= 4) break;
     }
+    // No healer or too few to kill the adds: the isle is left to burst.
+    const healer = group.some((pid) => world.players.get(pid)?.healer);
+    if (group.length < 4 || !healer) {
+      st.riders.set(isle, []);
+      log(`ISLE ${isle}: nobody rides (no healer or too few free)`);
+      continue;
+    }
     st.riders.set(isle, group);
     log(`ISLE ${isle}: ${group.map((pid) => world.players.get(pid)?.name).join(', ')} ride out`);
   }
@@ -665,6 +672,21 @@ function lipSpotFor(world, from, avoidSides = []) {
 }
 
 function knotDuty(world, st, b, me) {
+  const d = knotDutyInner(world, st, b, me);
+  const tag = d ? `${d.duty}` : null;
+  st.knotTag ??= new Map();
+  if (d && st.knotTag.get(b.pid) !== tag) {
+    const g = d.goal ? `${hypot(me, d.goal).toFixed(1)} yd away` : '';
+    const l = L(world, me);
+    log(
+      `  knot: ${me.name} ${tag} ${g} (lip ${inBreathArena(l.x, l.z) ? lipDistance(l.x, l.z).toFixed(1) : 'off'})`,
+    );
+  }
+  st.knotTag.set(b.pid, tag);
+  return d;
+}
+
+function knotDutyInner(world, st, b, me) {
   if (IGNORE === 'knot') return null;
   const o = world.o;
   if (o.knots.length === 0 && !myMark(me)) return null;
