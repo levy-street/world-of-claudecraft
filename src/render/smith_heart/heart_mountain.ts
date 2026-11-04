@@ -7,6 +7,13 @@
 import * as THREE from 'three';
 import { surfaceMat } from '../gfx';
 import {
+  BREATH_ROCK_GAIN,
+  BREATH_ROCK_MIX,
+  BREATH_ROCK_TONE,
+  breathStoneBed,
+  breathStoneWeight,
+} from './breath_stone_core';
+import {
   HAMMER_ROCK_GAIN,
   HAMMER_ROCK_MIX,
   HAMMER_ROCK_TONE,
@@ -46,6 +53,7 @@ const ROCK_HIGH = new THREE.Color(0x6a6766);
 const HAMMER_ROCK = new THREE.Color(HAMMER_ROCK_TONE);
 const QUENCH_ROCK = new THREE.Color(QUENCH_ROCK_TONE);
 const HEAT_ROCK = new THREE.Color(HEAT_ROCK_TONE);
+const BREATH_ROCK = new THREE.Color(BREATH_ROCK_TONE);
 const CROWN_ROCK = new THREE.Color(HEART_CROWN_TONE);
 
 /** A Hammer step's shade (a gain): its own tone of the bed, the ledge's
@@ -116,6 +124,13 @@ export function buildHeartMountain(lowGfx: boolean): THREE.Mesh {
       const soot = heatSootWeight(g.x0 + i * g.cell, g.z0 + j * g.cell);
       if (soot > 0)
         c.lerp(HEAT_ROCK, soot * HEAT_ROCK_MIX).multiplyScalar(1 + soot * (HEAT_ROCK_GAIN - 1));
+      // The Breath's storm granite: wind-carved slate, never a brown wall.
+      const storm = breathStoneWeight(g.x0 + i * g.cell, g.z0 + j * g.cell);
+      if (storm > 0)
+        c.lerp(BREATH_ROCK, storm * BREATH_ROCK_MIX).multiplyScalar(
+          (1 + storm * (BREATH_ROCK_GAIN - 1)) *
+            (1 + storm * breathStoneBed(g.x0 + i * g.cell, h, g.z0 + j * g.cell)),
+        );
       // The Heart's crown (phase 2J): a dark warm granite round the chamber.
       const crown = heartCrownWeight(g.x0 + i * g.cell, g.z0 + j * g.cell);
       if (crown > 0)

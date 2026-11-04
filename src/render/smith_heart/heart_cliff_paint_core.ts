@@ -11,6 +11,7 @@
 import { smithHeartAreaAt } from '../../sim/content/smith_heart_layout';
 import type { FieldCliffRun } from '../../sim/instances/authored_field';
 import { cliffColor, fieldNoise, type Rgb } from '../authored_field/field_mesh_core';
+import { breathCliffPaint, inBreathStone } from './breath_stone_core';
 import { heatCliffPaint, inHeatSoot } from './heat_soot_core';
 import { inQuenchFrost, quenchCliffPaint } from './quench_frost_core';
 
@@ -85,6 +86,8 @@ export function heartCliffPaint(
   if (inQuenchFrost(x, z)) return quenchCliffPaint(x, y, z, top);
   // The Heat's columnar basalt (phase 2I), ash along its lips.
   if (inHeatSoot(x, z)) return heatCliffPaint(x, y, z, top);
+  // The Breath's storm granite (the AAA pass of 2026-11-04), scoured pale lips.
+  if (inBreathStone(x, z)) return breathCliffPaint(x, y, z, top);
   if (smithHeartAreaAt(x, z) !== 'hammer') return cliffColor(run, x, y, z, top);
   const depth = Math.max(0, top - y);
   const bed = 0.5 + 0.5 * Math.sin(y * 0.9 + fieldNoise(x * 0.05, z * 0.05, 2) * 5);

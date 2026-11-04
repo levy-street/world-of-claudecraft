@@ -1114,6 +1114,8 @@ const RENDER_PURE_CORES = [
   'src/render/smith_heart/breath_air_core.ts',
   // The Cornice's open sky (the Breath's third pass): the cloud sea, the far peaks.
   'src/render/smith_heart/breath_summit_core.ts',
+  // The Breath's storm granite on its cliffs and mountain (vertex paint).
+  'src/render/smith_heart/breath_stone_core.ts',
   'src/render/smith_heart_fx/breath_fx_core.ts',
   'src/render/smith_heart_fx/breath_roar_fx_core.ts',
   'src/render/smith_heart_fx/breath_heart_fx_core.ts',
