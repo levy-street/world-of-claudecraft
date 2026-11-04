@@ -131,6 +131,9 @@ export const council = {
     world.anchor = add(world.tankG, away, 4);
     world.prepull = add(world.center, away, 30);
     world.reach = 42;
+    // The ranged stay within a short run of the Rush's line wherever the
+    // cursed pillar rises (its 15 yd ring).
+    world.rangeScale = 0.75;
     world.energyRate = 100 / 55;
     return true;
   },
@@ -791,6 +794,10 @@ function rockCover(world, st, cover, sources, remS) {
   return { pillar: sh.pillar, at: sh.at, assign };
 }
 
+function soakRank(p) {
+  return (p.healer ? 2 : 0) + (p.hp / p.mhp < 0.45 ? 1 : 0);
+}
+
 function planRock(world, st, marked) {
   const cover = coverPillars(world);
   const souls = soulPillars(world);
@@ -811,12 +818,13 @@ function planRock(world, st, marked) {
         p.pid !== marked.pid &&
         p.bot &&
         !p.tank &&
-        !p.healer &&
         !hasAura(p, AURA.wake) &&
         !hasAura(p, AURA.resonance) &&
         !(st.rushSpot?.pid === p.pid && laneNow(world, st)?.bar),
     )
-    .filter((p) => p.hp / p.mhp > 0.45);
+    // The healthy damage dealers first; a healer or a hurt one only to make
+    // up the numbers (a short soak hurts everyone far more).
+    .sort((a, b) => soakRank(a) - soakRank(b));
   const rockRem = rem(marked, AURA.rock);
   // The rock meets the Wrath's bar: plan it in a pillar's shadow now.
   const w = wrathTiming(world);
@@ -824,7 +832,9 @@ function planRock(world, st, marked) {
     const n = Math.min(SHELTER, 4);
     const sh = rockShadow(world, st, marked, cover, [w.h], null, n, rockRem);
     if (sh) {
-      const soakers = candidates.sort((a, b) => hypot(a, sh.at) - hypot(b, sh.at)).slice(0, n - 1);
+      const soakers = candidates
+        .sort((a, b) => soakRank(a) - soakRank(b) || hypot(a, sh.at) - hypot(b, sh.at))
+        .slice(0, n - 1);
       return {
         pid: marked.pid,
         spot: { x: sh.at.x, z: sh.at.z },
@@ -844,7 +854,9 @@ function planRock(world, st, marked) {
     homeWeight: 0.25,
   });
   const need = HEROIC_PLUS ? 4 : 3;
-  candidates.sort((a, b) => hypot(a, spot ?? marked) - hypot(b, spot ?? marked));
+  candidates.sort(
+    (a, b) => soakRank(a) - soakRank(b) || hypot(a, spot ?? marked) - hypot(b, spot ?? marked),
+  );
   const soakers = new Set([marked.pid, ...candidates.slice(0, need).map((p) => p.pid)]);
   return { pid: marked.pid, spot: spot ?? { x: marked.x, z: marked.z }, soakers };
 }
