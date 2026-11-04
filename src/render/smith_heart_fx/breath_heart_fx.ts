@@ -397,7 +397,12 @@ export class BreathHeartFx {
             { uColor: { value: color(look.pair === 0 ? 0x06202a : 0x2a0620) } },
             FLOOR_FACING_VERT,
             FLOOR_LETTER_FRAG,
-            { transparent: true, depthWrite: false, toneMapped: false, side: THREE.DoubleSide },
+            {
+              blending: THREE.NormalBlending,
+              depthWrite: false,
+              toneMapped: false,
+              side: THREE.DoubleSide,
+            },
           ),
           HEART_FLOOR.letter,
         ),
