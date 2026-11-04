@@ -1675,6 +1675,11 @@ the bots to reuse later).
 4.5 minute fight at about 85 percent uptime and the bot raid's measured 400 to 460 a
 second (the council's anchor): the Wind half runs to about 2.2 minutes, the Storm after.
 
+Measured (the bot raid of 2026-11-04, `scripts/heart_raid.mjs`): ten kit-geared bots killed
+Normal in 5:38 with no deaths at about 290 a second, and wiped twice to the Swelling Storm
+at 6:11 when the isle round ran long; the guardian's base health goes from 43,000 to 38,000
+so a sane raid kills it before the soft enrage bites.
+
 **Damage (sketch, unmeasured).** Anchored to the level-20 cloth reference (about 1,135 to
 1,345 health) and the dungeon rework's bands: the pin about 8 percent a second (leave the
 wall), the vortex about 15 percent a second (never stand before the mouth), a strike about
@@ -1801,7 +1806,7 @@ guardian cannot be pushed past an overflow before it happens.
 | Molten Swell | 0.6 s after the slam three walls of molten rock roll out of the spot, one straight away from the wellspring and one to either side: 32 yd at 10 yd a second, 5 yd wide, 380 to 440 to each player a wall rolls over (once). The lanes show with the spot, so the raid already knows the gaps to stand in (the side toward the guardian is always clear) | `heat_fist.ts` |
 | Hearth Flare | Phase 1, every 4 s: everyone farther than 20 yd from the wellspring's middle (12 yd past its lip) takes 260 to 300 and is Flare-Scorched (25 percent more Fire and other magic damage taken, 8 s). The raid fights close. In phases 2 and 3 it strikes only the guardian's own target when that one stands out of reach | `heat_flare.ts` |
 | Wellspring Fire | The whole fight: whoever stands inside the lip burns, 120 to 140 every half second | `heat_flare.ts` |
-| Cinder Grip | The tank's stacking burn: every landed swing adds a stack (18 Fire a second each, 15 s, at most 10). The tanks swap around 5 | content `stackPoison` |
+| Cinder Grip | The tank's stacking burn: every landed swing adds a stack (9 Fire a second each, 15 s, at most 10; 18 until the bot raid of 2026-11-04 measured both tanks burning 90 a second after a swap at 5). The tanks swap around 5 | content `stackPoison` |
 | The overflows | At 70 and at 40 percent: it sinks 2.5 s into the wellspring (untargetable, nothing harms it), the Hearth overflows, then it rises over 3 s, still out of reach. Every 4.5 s three rivers of the first flame run out of the wellspring across the shore (2.5 s of warning down their lanes, then 3 s of fire, 180 to 220 every half second, from nine hashed bearings); every 3 s Falling Cinders strike random players (140 to 170; two on Normal, three on Heroic). Normal: 20 s of it, a pure dodge and heal check | `heat_overflow.ts` |
 | Wellspawn (Heroic) | Four children of the flame climb out at the room's edge as the Hearth overflows and walk to the wellspring (3 yd a second, walked by the encounter). They slow as they lose health, crawling from half health down (15 percent of their speed), and every slow, root, stun and control works on them. One that reaches the lip feeds the guardian 3 percent of its health and blasts the raid for 380 to 420. The overflow lasts until they are gone (at least 8 s, at most 45 s); survivors dive in when it ends | `heat_wellspawn.ts` |
 | Wellkeepers (Heroic, second overflow) | Two keepers rise by the wellspring and must be tanked. Every 10 s each puts a Kindling Mark on a player; 5 s later that player trails fire for 8 s (Cinder Trail: patches 2.5 yd wide that burn 15 s, 80 to 95 a second to allies, and heal a Wellspawn in them 8 percent of its health a second). The marked player leaves the group and the children's path. They sink back when the overflow ends | `heat_wellspawn.ts` |

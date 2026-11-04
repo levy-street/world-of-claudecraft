@@ -295,7 +295,9 @@ export const HEAT_TUNING = {
   scorchedPct: 0.25,
   scorchedSeconds: 8,
   // Cinder Grip (the template's stackPoison): per stack a second.
-  gripPerTick: 18,
+  // 18 until the bot raid of 2026-11-04: swapped at 5 stacks, both tanks still
+  // burned 90 a second each for 15 s, more than two level-20 healers keep up.
+  gripPerTick: 9,
   gripSeconds: 15,
   gripMaxStacks: 10,
   // The overflow's rivers and Falling Cinders.

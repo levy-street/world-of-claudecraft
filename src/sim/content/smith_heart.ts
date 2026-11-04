@@ -361,7 +361,7 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
   // record stays the look's numbers: the whole Cornice, the throw). Storm
   // Lance stays the trash kit's own line, on its own clock.
   heart_breath_guardian: {
-    ...boss('heart_breath_guardian', 'Guardian of the Breath', 43000, 0x5ab8e8, 3.4),
+    ...boss('heart_breath_guardian', 'Guardian of the Breath', 38000, 0x5ab8e8, 3.4),
     ccImmune: true,
     slowImmune: true,
     trashKit: {
