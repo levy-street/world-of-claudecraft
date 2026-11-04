@@ -315,11 +315,13 @@ export const FINAL_OVERLOAD = {
   pulseEvery: 4,
   /** A pulse: this much at an empty bar, rising by `pulseRise` at a full one
    *  (harder each pulse while it fills). */
-  pulseMin: 60,
-  pulseMax: 70,
+  // 60 to 70 until the bot raid of 2026-11-04: even an empty bar's pulse on
+  // all ten was as much as two level-20 healers put out, before any kit.
+  pulseMin: 35,
+  pulseMax: 40,
   // 300 until the bot raid of 2026-11-04: a bar two thirds full pulsed about
   // 250 every 4 s on everyone, which wiped a raid that moved the boss on time.
-  pulseRise: 120,
+  pulseRise: 70,
   /** A bar this full (0 to 1) warns the raid once per fill. */
   warnAt: 0.85,
   /** The burst of a full bar, per difficulty (then it is empty again). */
