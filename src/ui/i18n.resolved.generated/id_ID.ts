@@ -9292,6 +9292,7 @@ export const id_ID: EnTranslations = {
       "subtitle": "Jelajahi dunia, selesaikan quest, dan taklukkan dungeon bersama teman.",
       "ctaPlay": "Main Sekarang",
       "ctaLearn": "Cara Bermain",
+      "encyclopedia": "Encyclopedia",
       "what": {
         "heading": "MMO klasik, dibuat agar mudah dimainkan",
         "pillarPlayTitle": "Buka situsnya dan mainkan",

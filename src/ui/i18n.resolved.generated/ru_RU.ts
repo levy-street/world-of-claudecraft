@@ -9292,6 +9292,7 @@ export const ru_RU: EnTranslations = {
       "subtitle": "Исследуйте мир, выполняйте задания и проходите подземелья с друзьями.",
       "ctaPlay": "Играть",
       "ctaLearn": "Как играть",
+      "encyclopedia": "Encyclopedia",
       "what": {
         "heading": "Классическая MMO, в которую легко погрузиться",
         "pillarPlayTitle": "Откройте сайт и играйте",

@@ -153,6 +153,7 @@ export const guideStrings = {
     subtitle: 'Explore the world, take on quests, and tackle dungeons with friends.',
     ctaPlay: 'Play Now',
     ctaLearn: 'How to Play',
+    encyclopedia: 'Encyclopedia',
 
     // "What is it" benefit trio.
     what: {

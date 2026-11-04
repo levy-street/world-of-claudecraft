@@ -9292,6 +9292,7 @@ export const tr_TR: EnTranslations = {
       "subtitle": "Dünyayı keşfet, görevler üstlen ve arkadaşlarınla zindanlara gir.",
       "ctaPlay": "Şimdi Oyna",
       "ctaLearn": "Nasıl Oynanır",
+      "encyclopedia": "Encyclopedia",
       "what": {
         "heading": "Klasik bir MMO, hemen başlanacak biçimde",
         "pillarPlayTitle": "Siteyi aç ve oyna",

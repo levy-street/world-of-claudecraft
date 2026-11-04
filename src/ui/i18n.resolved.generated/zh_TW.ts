@@ -9292,6 +9292,7 @@ export const zh_TW: EnTranslations = {
       "subtitle": "探索世界、接受任務，與好友一起挑戰地下城。",
       "ctaPlay": "立即遊玩",
       "ctaLearn": "如何遊玩",
+      "encyclopedia": "Encyclopedia",
       "what": {
         "heading": "一款上手即玩的經典MMO",
         "pillarPlayTitle": "打開網站即可開玩",

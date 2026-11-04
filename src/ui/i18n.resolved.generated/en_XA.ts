@@ -9292,6 +9292,7 @@ export const en_XA: EnTranslations = {
       "subtitle": "[Éẋþļóŕé ţĥé ŵóŕļð, ţáķé óñ ɋúéšţš, áñð ţáçķļé ðúñĝéóñš ŵíţĥ ƒŕíéñðš.]",
       "ctaPlay": "[Þļáý Ñóŵ]",
       "ctaLearn": "[Ĥóŵ ţó Þļáý]",
+      "encyclopedia": "[Éñçýçļóþéðíá]",
       "what": {
         "heading": "[Á çļáššíç ⱮⱮÓ, ɱáðé ţó ƀé þíçķéð úþ]",
         "pillarPlayTitle": "[Óþéñ ţĥé šíţé áñð þļáý]",

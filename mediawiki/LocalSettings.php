@@ -64,3 +64,14 @@ wfLoadSkin( 'Vector' );
 $wgHooks['BeforePageDisplay'][] = static function ( OutputPage $out, Skin $skin ): void {
 	$out->addStyle( '/wiki/resources/assets/woc-mediawiki.css' );
 };
+
+// Page art is limited to packaged game images. Wiki editors cannot supply a host or arbitrary markup.
+$wgHooks['ParserFirstCallInit'][] = static function ( $parser ) use ( $wgScriptPath ) {
+    $parser->setHook( 'woc-art', static function ( $input, $args ) use ( $wgScriptPath ) {
+        $path = $args['path'] ?? '';
+        if ( !preg_match( '~^/(?:ui|map_bg|textures/loading)/[A-Za-z0-9_/-]+\.(?:webp|png|jpg)$~D', $path ) ) {
+            return '';
+        }
+        return '<img class="woc-page-art" alt="" src="' . htmlspecialchars( $wgScriptPath . '/resources/assets/game' . $path, ENT_QUOTES ) . '">';
+    } );
+};

@@ -23,7 +23,9 @@ import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path, { resolve } from 'node:path';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { ABILITIES } from '../src/sim/data';
+import { WEEKLY_QUESTS } from '../src/sim/content/weekly_quests';
+import { WORLD_QUESTS } from '../src/sim/content/world_quests';
+import { ABILITIES, ITEMS, MOBS, QUESTS } from '../src/sim/data';
 
 let xml = '';
 let workDir = '';
@@ -80,5 +82,41 @@ describe('MediaWiki ability visibility', () => {
   it('publishes the reworked Retribution defensive under its current name only', () => {
     expect(xml).toContain('<title>Debt of Light (Ability)</title>');
     expect(xml).not.toContain('Faithforged Guard (Ability)');
+  });
+});
+
+describe('the searchable player encyclopedia', () => {
+  it('has unique article destinations and resolves every internal article link', () => {
+    const titles = [...xml.matchAll(/<title>([^<]+)<\/title>/g)].map((m) => m[1]);
+    const published = new Set(titles);
+    expect(published.size).toBe(titles.length);
+    const missing = new Set<string>();
+    for (const [, title] of xml.matchAll(/\[\[([^\]|]+)(?:\|[^\]]+)?\]\]/g)) {
+      if (!title.startsWith('Category:') && !published.has(title)) missing.add(title);
+    }
+    expect([...missing]).toEqual([]);
+  });
+
+  it('publishes every item and creature and maps every standard, world, and weekly quest', () => {
+    const pages = xml.split('<page>').slice(1);
+    const count = (category: string) =>
+      pages.filter((p) => p.includes('[[Category:' + category + ']]'));
+    expect(count('Items').length).toBe(Object.keys(ITEMS).length);
+    expect(count('Mobs').length).toBe(Object.keys(MOBS).length);
+    const routes = pages.filter((p) => p.includes('== Route map =='));
+    expect(routes.length).toBe(
+      Object.keys(QUESTS).length + WORLD_QUESTS.length + WEEKLY_QUESTS.length,
+    );
+    for (const page of routes) {
+      expect(page).toContain('class=&quot;woc-map&quot;');
+      expect(page).toContain('class=&quot;woc-pin&quot;');
+    }
+    const standard = routes.filter((p) => p.includes('[[Category:Quests]]'));
+    expect(standard.length).toBe(Object.keys(QUESTS).length);
+    for (const page of standard) {
+      expect(page).toContain('== Walkthrough ==');
+      expect(page).toMatch(/title=&quot;[^&]*?\([-\d.]+, [-\d.]+\)/);
+      expect(page).toContain('Hand-in');
+    }
   });
 });

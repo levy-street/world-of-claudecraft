@@ -9292,6 +9292,7 @@ export const sv_SE: EnTranslations = {
       "subtitle": "Utforska världen, ta dig an uppdrag och kämpa dig igenom dungeons med vänner.",
       "ctaPlay": "Spela nu",
       "ctaLearn": "Så spelar du",
+      "encyclopedia": "Encyclopedia",
       "what": {
         "heading": "Ett klassiskt MMO, gjort för att tas upp",
         "pillarPlayTitle": "Öppna sidan och spela",

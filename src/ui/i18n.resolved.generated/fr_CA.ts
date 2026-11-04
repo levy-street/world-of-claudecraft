@@ -9292,6 +9292,7 @@ export const fr_CA: EnTranslations = {
       "subtitle": "Explorez le monde, accomplissez des quêtes et affrontez des donjons entre amis.",
       "ctaPlay": "Jouer maintenant",
       "ctaLearn": "Comment jouer",
+      "encyclopedia": "Encyclopedia",
       "what": {
         "heading": "Un MMO classique, conçu pour être pris en main",
         "pillarPlayTitle": "Ouvrez le site et jouez",

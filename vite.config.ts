@@ -1398,6 +1398,7 @@ export default defineConfig({
         admin: fileURLToPath(new URL('admin.html', import.meta.url)),
         play: fileURLToPath(new URL('play.html', import.meta.url)),
         guide: fileURLToPath(new URL('guide.html', import.meta.url)),
+        encyclopedia: fileURLToPath(new URL('encyclopedia.html', import.meta.url)),
         editor: fileURLToPath(new URL('editor.html', import.meta.url)),
         walletHandoff: fileURLToPath(new URL('wallet-handoff.html', import.meta.url)),
       },

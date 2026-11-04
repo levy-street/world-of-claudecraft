@@ -9292,6 +9292,7 @@ export const cs_CZ: EnTranslations = {
       "subtitle": "Prozkoumej svět, plň úkoly a zdolávej dungeony s přáteli.",
       "ctaPlay": "Hrát teď",
       "ctaLearn": "Jak hrát",
+      "encyclopedia": "Encyclopedia",
       "what": {
         "heading": "Klasické MMO, do kterého se snadno naskočí",
         "pillarPlayTitle": "Otevři stránku a hraj",

@@ -9292,6 +9292,7 @@ export const vi_VN: EnTranslations = {
       "subtitle": "Khám phá thế giới, nhận nhiệm vụ và chinh phục hầm ngục cùng bạn bè.",
       "ctaPlay": "Chơi Ngay",
       "ctaLearn": "Cách Chơi",
+      "encyclopedia": "Encyclopedia",
       "what": {
         "heading": "Một MMO cổ điển, được làm ra để dễ bắt nhịp",
         "pillarPlayTitle": "Mở trang và chơi",

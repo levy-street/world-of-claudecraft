@@ -10538,6 +10538,7 @@ export type TranslationKeyFlat =
   | 'guide.home.community.play'
   | 'guide.home.ctaLearn'
   | 'guide.home.ctaPlay'
+  | 'guide.home.encyclopedia'
   | 'guide.home.eyebrow'
   | 'guide.home.faq.a1'
   | 'guide.home.faq.a2'

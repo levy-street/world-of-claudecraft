@@ -1,0 +1,65 @@
+import { applyAbilityCostTail, resolveAbilityChain } from '../../src/sim/combat/ability_resolution';
+import { abilitiesKnownAt } from '../../src/sim/content/classes';
+import { computeTalentModifiers, TALENTS } from '../../src/sim/content/talents';
+import { CLASSES, QUESTS } from '../../src/sim/data';
+import { createPlayer } from '../../src/sim/entity';
+import type { ResolvedAbility } from '../../src/sim/resolved_ability';
+import { MAX_LEVEL, type PlayerClass } from '../../src/sim/types';
+import { abilityDisplayDescription, abilityEffectText } from '../../src/ui/ability_description';
+
+const zero = { spellPower: 0, attackPower: 0, healPower: 0, rangedPower: 0 };
+const sample = { spellPower: 100, attackPower: 100, healPower: 100, rangedPower: 100 };
+const completedQuests = new Set(Object.keys(QUESTS));
+// This is a publication snapshot. Ask the same two resolve stages as the HUD
+// instead of approximating spec-specific transformations or talent baking.
+function resolveClass(cls: PlayerClass) {
+  const entries: { spec: string; name: string; abilities: Map<string, ResolvedAbility> }[] = [];
+  const actor = createPlayer(1, cls, { x: 0, y: 0, z: 0 }, 'Wiki');
+  actor.level = MAX_LEVEL;
+  for (const spec of TALENTS[cls].specs) {
+    const talents = { spec: spec.id, rows: {} };
+    const mods = computeTalentModifiers(cls, talents, MAX_LEVEL);
+    const known = abilitiesKnownAt(cls, MAX_LEVEL, mods, completedQuests);
+    const abilities = new Map<string, ResolvedAbility>();
+    for (const ab of known) {
+      const resolved = resolveAbilityChain(ab, actor, { cls, talents }, mods);
+      abilities.set(ab.def.id, applyAbilityCostTail(resolved, ab.def.id, actor, known, mods));
+    }
+    entries.push({ spec: spec.id, name: spec.name, abilities });
+  }
+  return entries;
+}
+const cache = new Map<PlayerClass, ReturnType<typeof resolveClass>>();
+
+export function specializationExamples(base: ResolvedAbility): [string, string][] {
+  const cls = base.def.class;
+  let entries = cache.get(cls);
+  if (!entries) {
+    entries = resolveClass(cls);
+    cache.set(cls, entries);
+  }
+  function text(ab: ResolvedAbility): string {
+    const baseText = abilityDisplayDescription(ab, abilityEffectText(ab, zero), zero);
+    const powered = abilityDisplayDescription(ab, abilityEffectText(ab, sample), sample);
+    const lines = [
+      `${ab.def.name}. Cost ${ab.cost}. ${ab.def.channel ? ab.def.channel.duration + ' sec channel' : ab.castTime ? ab.castTime + ' sec cast' : 'Instant'}. ${ab.cooldown} sec cooldown.`,
+    ];
+    if (ab.charges && ab.charges > 1) lines.push(`Stores ${ab.charges} charges.`);
+    for (const e of ab.effects) {
+      if (e.type === 'gainResource')
+        lines.push(
+          `Grants ${e.amount} ${CLASSES[cls].resourceType} before resource-generation modifiers.`,
+        );
+    }
+    lines.push(baseText);
+    if (baseText !== powered) lines.push('With 100 in each power rating: ' + powered);
+    return lines.join(' ');
+  }
+  const neutral = text(base);
+  return entries.flatMap((entry) => {
+    const ab = entry.abilities.get(base.def.id);
+    if (!ab) return [];
+    const value = text(ab);
+    return value !== neutral ? [[entry.spec, value] as [string, string]] : [];
+  });
+}

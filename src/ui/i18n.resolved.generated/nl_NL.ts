@@ -9292,6 +9292,7 @@ export const nl_NL: EnTranslations = {
       "subtitle": "Verken de wereld, voltooi quests en trotseer dungeons met vrienden.",
       "ctaPlay": "Speel nu",
       "ctaLearn": "Hoe te spelen",
+      "encyclopedia": "Encyclopedia",
       "what": {
         "heading": "Een klassieke MMO, gemaakt om zo op te pakken",
         "pillarPlayTitle": "Open de site en speel",

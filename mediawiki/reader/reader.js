@@ -1,0 +1,369 @@
+import { directoryArt } from './directory_art.js';
+
+const escapeHtml = (text) =>
+  String(text).replace(
+    /[&<>"']/g,
+    (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch],
+  );
+const href = (title) => '#' + encodeURIComponent(title);
+const link = (title, label = title) =>
+  '<a href="' + escapeHtml(href(title)) + '">' + escapeHtml(label) + '</a>';
+const topics = [
+  ['Items', 'Items', 'Equipment, materials and consumables'],
+  ['Quests', 'Quests', 'Walkthroughs, maps and rewards'],
+  ['Mobs', 'Enemies', 'Creature stats, encounters and loot'],
+  ['Abilities', 'Abilities', 'Costs, ranks and scaling'],
+  ['Gameplay Systems', 'Game systems', 'Rules, professions and collections'],
+  ['Dungeons', 'Dungeons', 'Encounters and heroic difficulty'],
+  ['Zones', 'Zones', 'Regions, settlements and points of interest'],
+  ['NPCs', 'NPCs', 'Quest givers, vendors and services'],
+  ['Classes', 'Classes', 'Starting stats and class kits'],
+  ['Specializations', 'Specializations', 'Masteries and build choices'],
+  ['Talent choices', 'Talent choices', 'What each choice changes'],
+  ['All Pages', 'All articles', 'Alphabetical index'],
+];
+
+function safeChart(markup, mapUrl) {
+  const parsed = new DOMParser().parseFromString(markup, 'text/html').body.firstElementChild;
+  if (!parsed?.classList.contains('woc-map')) return '';
+  const chart = document.createElement('div');
+  chart.className = 'woc-map';
+  chart.setAttribute('role', 'img');
+  chart.setAttribute('aria-label', 'Quest route map. The numbered locations are listed below.');
+  const zone = parsed.dataset.zone;
+  if (zone && /^[a-z0-9_]+$/.test(zone)) {
+    const url = mapUrl(zone);
+    if (url) {
+      chart.style.backgroundImage = 'url("' + url + '")';
+      chart.style.backgroundSize = parsed.style.backgroundSize;
+      chart.style.backgroundPosition = parsed.style.backgroundPosition;
+    }
+  }
+  for (const source of parsed.children) {
+    if (!['woc-pin', 'woc-radius'].includes(source.className)) continue;
+    const pin = document.createElement('span');
+    pin.className = source.className;
+    for (const prop of ['left', 'top', 'width', 'height'])
+      if (/^[-.\d]+%$/.test(source.style[prop])) pin.style[prop] = source.style[prop];
+    pin.title = source.title;
+    pin.textContent = source.textContent;
+    chart.append(pin);
+  }
+  return chart.outerHTML;
+}
+
+function inline(s) {
+  const tokens = [];
+  function keep(value) {
+    tokens.push(value);
+    return '\uE000' + (tokens.length - 1) + '\uE001';
+  }
+  s = s
+    .replace(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g, (_, title, label) =>
+      keep(link(title, label || title)),
+    )
+    .replace(/\[(https?:\/\/[^\s\]]+) ([^\]]+)\]/g, (_, url, label) =>
+      keep('<a href="' + escapeHtml(url) + '" rel="noreferrer">' + escapeHtml(label) + '</a>'),
+    );
+  return escapeHtml(s)
+    .replace(/&#39;&#39;&#39;(.*?)&#39;&#39;&#39;/g, '<strong>$1</strong>')
+    .replace(/&#39;&#39;(.*?)&#39;&#39;/g, '<em>$1</em>')
+    .replace(/\uE000(\d+)\uE001/g, (_, i) => tokens[Number(i)]);
+}
+
+function renderBody(body, mapUrl, indexIcon) {
+  const lines = body.split('\n'),
+    output = [],
+    headings = [];
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line || line.startsWith('[[Category:')) continue;
+    if (line.startsWith('<div class="woc-map"')) {
+      output.push(safeChart(line, mapUrl));
+      continue;
+    }
+    const header = line.match(/^(={2,3})\s*(.+?)\s*\1$/);
+    if (header) {
+      const id = 'part-' + headings.length;
+      headings.push([id, header[2]]);
+      output.push('<h2 id="' + id + '">' + inline(header[2]) + '</h2>');
+      continue;
+    }
+    if (line.startsWith('{|')) {
+      const rows = [];
+      let cells = [];
+      while (++i < lines.length) {
+        const value = lines[i].trim();
+        if (value === '|-' || value === '|}') {
+          if (cells.length) rows.push('<tr>' + cells.join('') + '</tr>');
+          cells = [];
+          if (value === '|}') break;
+        } else if (value.startsWith('!') || value.startsWith('|')) {
+          const tag = value[0] === '!' ? 'th' : 'td';
+          for (const cell of value.slice(1).split(tag === 'th' ? '!!' : '||'))
+            cells.push('<' + tag + '>' + inline(cell.trim()) + '</' + tag + '>');
+        }
+      }
+      output.push('<div class="scroll"><table>' + rows.join('') + '</table></div>');
+      continue;
+    }
+    if (/^\* |^# /.test(line)) {
+      const type = line[0] === '*' ? 'ul' : 'ol',
+        rows = [line.slice(2)];
+      while (i + 1 < lines.length && lines[i + 1].startsWith(line.slice(0, 2)))
+        rows.push(lines[++i].slice(2));
+      output.push(
+        '<' +
+          type +
+          '>' +
+          rows
+            .map(
+              (row) =>
+                '<li>' +
+                (indexIcon?.(row.match(/^\[\[([^\]|]+)/)?.[1]) ?? '') +
+                inline(row) +
+                '</li>',
+            )
+            .join('') +
+          '</' +
+          type +
+          '>',
+      );
+      continue;
+    }
+    output.push('<p>' + inline(line) + '</p>');
+  }
+  return { markup: output.join(''), headings };
+}
+
+export async function openReader({ seedUrl, packed, assetUrl }) {
+  const view = document.querySelector('#view'),
+    input = document.querySelector('#lookup'),
+    nav = document.querySelector('#navigation');
+  const cover = assetUrl('/website-hero-eastbrook-v1.webp');
+  const mapUrl = (id) => assetUrl('/map_bg/' + id + '.webp');
+  const image = (path, className) =>
+    path
+      ? '<img class="' +
+        className +
+        '" data-game-art="' +
+        escapeHtml(path) +
+        '" alt="" width="32" height="32" loading="lazy" decoding="async">'
+      : '';
+  const observer = new IntersectionObserver(
+    (changes) => {
+      for (const { target, isIntersecting } of changes)
+        if (isIntersecting) {
+          target.src = assetUrl(target.dataset.gameArt);
+          observer.unobserve(target);
+        }
+    },
+    { rootMargin: '300px' },
+  );
+  function loadArt() {
+    observer.disconnect();
+    for (const el of view.querySelectorAll('[data-game-art]')) observer.observe(el);
+  }
+  try {
+    let xmlText;
+    if (packed) {
+      const bytes = Uint8Array.from(atob(packed), (s) => s.charCodeAt(0));
+      xmlText = await new Response(
+        new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip')),
+      ).text();
+    } else {
+      const response = await fetch(seedUrl);
+      if (!response.ok) throw Error('Could not load the article index.');
+      xmlText = await response.text();
+    }
+    const dom = new DOMParser().parseFromString(xmlText, 'application/xml');
+    if (dom.querySelector('parsererror')) throw Error('Could not read the article index.');
+    const pages = new Map();
+    for (const page of dom.getElementsByTagName('page')) {
+      const title = page.getElementsByTagName('title')[0].textContent;
+      if (title.startsWith('MediaWiki:')) continue;
+      const source = page.getElementsByTagName('text')[0].textContent;
+      const artwork = source.match(
+        /^<woc-art path="(\/(?:ui|map_bg|textures\/loading)\/[\w/-]+\.(?:webp|png|jpg))" \/>\n/,
+      );
+      const art = artwork?.[1] || directoryArt(title);
+      const text = artwork ? source.slice(artwork[0].length) : source;
+      const categories = [...text.matchAll(/\[\[Category:([^\]]+)\]\]/g)].map((m) => m[1]);
+      pages.set(title, { title, text, art, categories, sort: title.toLocaleLowerCase('en') });
+    }
+    const all = [...pages.values()].sort((a, b) => a.title.localeCompare(b.title, 'en'));
+    const navItems = topics.filter(([key]) => pages.has(key));
+    nav.innerHTML =
+      '<p class="navlabel">Browse</p>' +
+      navItems
+        .map(
+          ([key, label]) =>
+            '<a class="navlink" href="' + href(key) + '">' + escapeHtml(label) + '</a>',
+        )
+        .join('');
+    document.documentElement.style.setProperty('--cover', 'url("' + cover + '")');
+    let timer;
+    function route() {
+      try {
+        return decodeURIComponent(location.hash.slice(1)) || 'Main Page';
+      } catch {
+        return 'Main Page';
+      }
+    }
+    function search(q, limit = 70) {
+      const search = q.toLocaleLowerCase('en').trim(),
+        terms = search.split(/\s+/).filter(Boolean);
+      const named = all.filter((p) => terms.every((t) => p.sort.includes(t)));
+      const namedSet = new Set(named);
+      const full =
+        terms.length && q.length >= 3
+          ? all.filter(
+              (p) =>
+                !namedSet.has(p) &&
+                !p.categories.includes('Portals') &&
+                p.title !== 'All Pages' &&
+                terms.every((t) => p.text.toLowerCase().includes(t)),
+            )
+          : [];
+      const found = [...named, ...full];
+      view.innerHTML =
+        '<p class="overline">Article search</p><h1>' +
+        escapeHtml(q || 'All articles') +
+        '</h1><p>' +
+        found.length.toLocaleString('en') +
+        ' results</p><ul class="results">' +
+        found
+          .slice(0, limit)
+          .map(
+            (p) =>
+              '<li class="result">' +
+              image(p.art, 'result-icon') +
+              link(p.title) +
+              ' <small>' +
+              escapeHtml(p.categories[0] || 'Reference') +
+              '</small></li>',
+          )
+          .join('') +
+        '</ul>' +
+        (found.length > limit ? '<button id="more">Show more results</button>' : '');
+      loadArt();
+      document.querySelector('#more')?.addEventListener('click', () => search(q, limit + 100));
+    }
+    function show() {
+      const current = route();
+      for (const a of nav.querySelectorAll('a')) {
+        if (a.hash === href(current)) a.setAttribute('aria-current', 'page');
+        else a.removeAttribute('aria-current');
+      }
+      if (current.startsWith('search=')) {
+        const q = current.slice(7);
+        input.value = q;
+        search(q);
+        return;
+      }
+      input.value = '';
+      const page = pages.get(current);
+      document.title =
+        (current === 'Main Page' ? 'Player Encyclopedia' : current) + ' | World of ClaudeCraft';
+      if (!page) {
+        view.innerHTML =
+          '<h1>Article unavailable</h1><p>' +
+          link('All Pages', 'Browse the complete index') +
+          '</p>';
+        return;
+      }
+      if (current === 'Main Page') {
+        view.innerHTML =
+          '<div class="hero"><p class="overline">Eastbrook archives · Player reference</p><h1>Player Encyclopedia</h1><p class="intro">Find an item’s source, follow a quest route, or see how an ability scales.</p><div class="hero-actions"><a href="#Quests">Browse quests</a><a href="#Gameplay%20Systems">Game systems</a></div></div><h2>Browse the collection</h2><div class="directory">' +
+          navItems
+            .map(
+              ([key, label, description]) =>
+                '<a class="entry" href="' +
+                href(key) +
+                '">' +
+                image(directoryArt(key), 'entry-icon') +
+                '<strong>' +
+                escapeHtml(label) +
+                '</strong><small>' +
+                escapeHtml(description) +
+                '</small></a>',
+            )
+            .join('') +
+          '</div><p class="foot">' +
+          all.length.toLocaleString('en') +
+          ' articles · ' +
+          link('Quick Start', 'Getting started') +
+          ' · ' +
+          link('Sources Used', 'Sources') +
+          '</p>';
+        loadArt();
+        return;
+      }
+      const indexIcon =
+        page.categories.includes('Portals') || current === 'All Pages'
+          ? (title) => image(pages.get(title)?.art, 'index-icon')
+          : undefined;
+      const { markup, headings } = renderBody(page.text, mapUrl, indexIcon);
+      const category = page.categories.find((c) => c !== current && pages.has(c));
+      view.innerHTML =
+        '<div class="crumb">' +
+        link('Main Page', 'Encyclopedia') +
+        (category ? ' / ' + link(category) : '') +
+        '</div><div class="article-heading">' +
+        image(
+          page.art,
+          /^\/(?:map_bg|textures\/loading)/.test(page.art) ? 'article-art wide' : 'article-art',
+        ) +
+        '<h1>' +
+        escapeHtml(current) +
+        '</h1></div><div class="tags">' +
+        page.categories.map((c) => '<span class="tag">' + escapeHtml(c) + '</span>').join('') +
+        '</div>' +
+        (headings.length > 2
+          ? '<nav class="jump" aria-label="On this page">' +
+            headings
+              .map(
+                ([id, title]) =>
+                  '<a href="' +
+                  href(current) +
+                  '" data-part="' +
+                  id +
+                  '">' +
+                  escapeHtml(title) +
+                  '</a>',
+              )
+              .join('') +
+            '</nav>'
+          : '') +
+        '<article>' +
+        markup +
+        '</article><p class="foot">' +
+        link('Main Page', 'Return to the encyclopedia') +
+        '</p>';
+      loadArt();
+      for (const a of view.querySelectorAll('[data-part]')) {
+        a.addEventListener('click', (e) => {
+          e.preventDefault();
+          document.getElementById(a.dataset.part)?.scrollIntoView();
+        });
+      }
+    }
+    input.addEventListener('input', () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        const s = input.value;
+        history.replaceState(null, '', href('search=' + s));
+        search(s);
+      }, 140);
+    });
+    window.addEventListener('hashchange', () => {
+      clearTimeout(timer);
+      show();
+      window.scrollTo({top:0,left:0,behavior:'instant'});
+      view.focus({ preventScroll: true });
+    });
+    show();
+  } catch (error) {
+    view.textContent = 'The encyclopedia could not open. ' + error.message;
+  }
+}

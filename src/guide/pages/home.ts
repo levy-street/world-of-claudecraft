@@ -17,6 +17,7 @@ function heroHtml(): string {
         <p class="guide-hero-sub">${esc(t('guide.home.subtitle'))}</p>
         <div class="guide-hero-cta">
           <a class="guide-cta" href="/play">${esc(t('guide.home.ctaPlay'))}</a>
+          <a class="guide-cta guide-cta-ghost" href="/encyclopedia.html">${esc(t('guide.home.encyclopedia'))}</a>
           <a class="guide-cta guide-cta-ghost" href="${esc(hrefFor('how-to-play'))}">${esc(t('guide.home.ctaLearn'))}</a>
         </div>
       </div>
