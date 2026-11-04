@@ -172,4 +172,67 @@ describe("a loose gale's toss slides", () => {
     expect(text).not.toMatch(/\{\w+\}|hudChrome/);
     expect(text).toMatch(/Loose Gale/);
   });
+
+  it('a new wave of gales never stops a toss dead; a throw still sliding is never shoved again', () => {
+    const f = pulled();
+    const p = f.players[1];
+    intoGale(f, p);
+    f.tick(3, true);
+    expect(f.state()?.galeShoves.some((sl) => sl.id === p.id)).toBe(true);
+    // The next exhale looses new gales mid-slide: the toss slides on.
+    f.dev('/dev heart breath tornado');
+    expect(f.state()?.galeShoves.some((sl) => sl.id === p.id)).toBe(true);
+    // A body the Summit Roar is throwing is not tossed on top of it.
+    const st = f.state();
+    if (!st) throw new Error('no fight');
+    const q = f.players[2];
+    st.roar = { x: 0, z: 0, r: 999, reach: 1, struck: [q.id], slides: [] };
+    st.roar.slides.push({
+      id: q.id,
+      ux: 1,
+      uz: 0,
+      left: 9,
+      step: 0.5,
+      k: 0,
+      n: 16,
+      ease: 'linear',
+      yards: 9,
+      aura: BREATH_AURAS.thrown,
+    });
+    intoGale(f, q);
+    f.tick(1, true);
+    expect(st.galeShoves.some((sl) => sl.id === q.id)).toBe(false);
+  });
+
+  it('a reset mid-throw drops the Summit Roar hold too (never left rooted)', () => {
+    const f = pulled();
+    const st = f.state();
+    if (!st) throw new Error('no fight');
+    const p = f.players[1];
+    p.auras.push({
+      id: BREATH_AURAS.thrown,
+      name: 'Summit Roar',
+      kind: 'root',
+      remaining: 1.3,
+      duration: 1.3,
+      value: 0,
+      sourceId: f.boss().id,
+      school: 'nature',
+    });
+    st.roar = { x: 0, z: 0, r: 999, reach: 1, struck: [p.id], slides: [] };
+    st.roar.slides.push({
+      id: p.id,
+      ux: 1,
+      uz: 0,
+      left: 9,
+      step: 0.5,
+      k: 0,
+      n: 16,
+      ease: 'linear',
+      yards: 9,
+      aura: BREATH_AURAS.thrown,
+    });
+    f.dev('/dev heart breath reset');
+    expect(has(p, BREATH_AURAS.thrown)).toBe(false);
+  });
 });

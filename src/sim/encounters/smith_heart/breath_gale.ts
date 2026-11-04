@@ -397,7 +397,9 @@ export function landGust(s: BreathScope): void {
 
 /** Set the loose gales running (heroic, after an exhale; the dev trigger). */
 export function startGales(s: BreathScope): void {
-  clearGales(s.ctx, s.inst, s.st);
+  // The old gales go; a toss still sliding slides on (never stopped dead).
+  for (const g of s.st.gales) dropBreathObject(s.ctx, s.inst, g.objectId);
+  s.st.gales = [];
   for (let k = 0; k < T.galeCount; k++) {
     const at = looseGalePos(k + s.st.casts, 0);
     const e = spawnBreathObject(
@@ -458,8 +460,13 @@ function stepGales(s: BreathScope): void {
       // The toss SLIDES (Jose's playtest of 2026-11-04: a one-tick throw read
       // as a sideways teleport): a shove eased out over galeSlide, held so
       // the online client draws it (breath_shove.ts). A body still sliding
-      // is not shoved again.
-      if (!p.dead && !st.galeShoves.some((sl) => sl.id === p.id)) {
+      // (a toss, or the Summit Roar's throw) is not shoved again: two
+      // shoves never stack.
+      if (
+        !p.dead &&
+        !st.galeShoves.some((sl) => sl.id === p.id) &&
+        !st.roar?.slides.some((sl) => sl.id === p.id)
+      ) {
         const len = d > 1e-3 ? d : 1;
         const shove = beginShove(
           s,

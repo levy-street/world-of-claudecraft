@@ -54,6 +54,7 @@ import {
   roll,
   spawnBreathObject,
 } from './breath_scope';
+import { clearShoves } from './breath_shove';
 import type { BreathFightState, BreathSpot } from './breath_state';
 import { clearCalm } from './breath_thessaly';
 import { breathSay } from './breath_voice';
@@ -75,6 +76,7 @@ export function startStorm(s: BreathScope): boolean {
   clearCalm(s.ctx, s.inst, st);
   dropBreathObject(s.ctx, s.inst, st.vortex?.objectId ?? null);
   st.vortex = null;
+  if (st.roar) clearShoves(s, st.roar.slides);
   st.roar = null;
   setWind(s, 'break', T.stormCast, st.wind.bearing);
   beginBar(s, BREATH_CASTS.storm, T.stormCast, null);

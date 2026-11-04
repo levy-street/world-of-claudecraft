@@ -77,6 +77,7 @@ import {
   holdPlanted,
   living,
 } from './breath_scope';
+import { clearShoves } from './breath_shove';
 import type { BreathFightState } from './breath_state';
 import {
   clearStorm,
@@ -270,6 +271,8 @@ function clearFight(
     clearIsles(ctx, inst, st, boss);
     dropBreathObject(ctx, inst, st.vortex?.objectId ?? null);
     st.vortex = null;
+    // A throw still sliding lets go (its hold dropped, never left rooted).
+    if (st.roar) clearShoves({ ctx }, st.roar.slides);
     st.roar = null;
     st.pinned = {};
   }

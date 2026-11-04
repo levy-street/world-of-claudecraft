@@ -30,6 +30,32 @@ export interface BreathTossHost {
   groundY(x: number, z: number): number;
 }
 
+// The trail's puffs, reused every frame (no allocation per frame).
+const DUST_DIR: [number, number, number] = [0, 0.3, 0];
+const STREAK_DIR: [number, number, number] = [0, 0, 0];
+const DUST = {
+  speed: 1.6,
+  up: 1.2,
+  life: 0.9,
+  size: [0.7, 1.8] as const,
+  color: [0.62, 0.58, 0.52] as const,
+  alpha: 0.45,
+  dir: DUST_DIR,
+  spread: 0.6,
+  drag: 1.5,
+  radius: 0.35,
+};
+const STREAK = {
+  speed: 3,
+  life: 0.35,
+  size: [0.9, 0.2] as const,
+  color: [0.9, 0.94, 0.98] as const,
+  alpha: 0.35,
+  dir: STREAK_DIR,
+  spread: 0.15,
+  pool: 'glow' as const,
+};
+
 interface Trail {
   id: number;
   until: number;
@@ -61,9 +87,9 @@ export class BreathTossFx {
       speed: 13,
       up: 1.5,
       life: 0.55,
-      size: [1.1, 2.6],
+      size: [0.8, 1.8],
       color: [0.86, 0.9, 0.94],
-      alpha: 0.5,
+      alpha: 0.38,
       dir: [ux, 0.12, uz],
       spread: 0.35,
       drag: 2.2,
@@ -119,30 +145,16 @@ export class BreathTossFx {
       const y = this.h.groundY(a.x, a.z);
       const ux = -mx / moved;
       const uz = -mz / moved;
+      DUST_DIR[0] = ux;
+      DUST_DIR[2] = uz;
+      STREAK_DIR[0] = ux;
+      STREAK_DIR[2] = uz;
+      DUST.alpha = 0.45 * (0.4 + 0.6 * left);
+      STREAK.alpha = 0.35 * left;
       while (t.emit >= 1) {
         t.emit -= 1;
-        this.h.particles.puff(a.x, y + 0.15, a.z, 1, {
-          speed: 1.6,
-          up: 1.2,
-          life: 0.9,
-          size: [0.7, 1.8],
-          color: [0.62, 0.58, 0.52],
-          alpha: 0.45 * (0.4 + 0.6 * left),
-          dir: [ux, 0.3, uz],
-          spread: 0.6,
-          drag: 1.5,
-          radius: 0.35,
-        });
-        this.h.particles.puff(a.x, y + 0.9, a.z, 1, {
-          speed: 3,
-          life: 0.35,
-          size: [0.9, 0.2],
-          color: [0.9, 0.94, 0.98],
-          alpha: 0.35 * left,
-          dir: [ux, 0, uz],
-          spread: 0.15,
-          pool: 'glow',
-        });
+        this.h.particles.puff(a.x, y + 0.15, a.z, 1, DUST);
+        this.h.particles.puff(a.x, y + 0.9, a.z, 1, STREAK);
       }
     }
   }
