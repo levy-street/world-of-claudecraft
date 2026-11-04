@@ -25,8 +25,11 @@
 //    pulse a low ring of it (the bars themselves are the HUD's, the floor's
 //    light the room's);
 //  - its own model (phase 2O, final_body_fx.ts): the rigged Quadrant
-//    Guardian takes the pieces' place under the arrival's shockwave, wears
-//    the body of the quarter it drinks and transforms as it crosses;
+//    Guardian stands from the arrival's FIRST frame, dormant, and every
+//    piece flies into it and is drawn into its stone (final_arrival_core.ts:
+//    Jose's playtest of 2026-11-04 saw the old body rebuilt, then a snap to
+//    the model); under the shockwave it roars awake, wears the body of the
+//    quarter it drinks and transforms as it crosses;
 //  - the death: the model's fall, the heart rising out of its chest,
 //    flickering dark and sinking into its bed (the room goes dark with it:
 //    ../smith_heart/heart_final_core.ts).
@@ -69,6 +72,12 @@ import { heartSealSlotKey, heartSealView, newHeartSealView } from '../smith_hear
 import { radialGlowTexture } from '../textures';
 import { EngineParticles } from '../trash_engine_fx/engine_particles';
 import { NOVA_WAVE_SECONDS, novaWave } from '../trash_engine_fx/trash_engine_fx_core';
+import {
+  arrivalAnchor,
+  arrivalForming,
+  arrivalModelShown,
+  arrivalPieceScale,
+} from './final_arrival_core';
 import { FINAL_BODY_HEIGHT, finalBodyPoint } from './final_body_core';
 import { FinalBodyFx } from './final_body_fx';
 import {
@@ -250,6 +259,8 @@ interface PieceRig {
   diedQuat: THREE.Quaternion;
   fall: { land: V3; chasm: boolean; start: number } | null;
   landed: boolean;
+  /** Where on the model it flies in (room-local, final_arrival_core.ts). */
+  target: THREE.Vector3;
 }
 
 export class FinalFx {
@@ -321,6 +332,10 @@ export class FinalFx {
   /** Its own model: the element bodies, the transformation, the auras. */
   private readonly bodyFx: FinalBodyFx;
   private readonly heartAt = { x: 0, y: 0, z: 0 };
+  /** The model's chest (room-local) this frame, while it is shown. */
+  private readonly modelHeart = new THREE.Vector3();
+  private bossNow: Entity | null = null;
+  private readonly anchorAt = { x: 0, y: 0, z: 0 };
   private zone: ReturnType<typeof finalZoneOf> = 'ring';
   private readonly diedHeart = new THREE.Vector3();
   private diedHeartSet = false;
@@ -488,6 +503,7 @@ export class FinalFx {
       diedQuat: new THREE.Quaternion(),
       fall: null,
       landed: false,
+      target: new THREE.Vector3(),
     }));
     for (const s of [-1, 1] as const) {
       const w = this.wrist[s < 0 ? 0 : 1];
@@ -717,6 +733,7 @@ export class FinalFx {
       boss,
       zone: this.zone,
       whole: t >= ARRIVAL_WAVE_AT,
+      forming: arrivalForming(t, ARRIVAL_WAVE_AT, this.deadAt >= 0),
       dead: this.deadAt >= 0,
       kneeling: heartCollapseView(this.slotKey)?.stage === 'kneel',
       clock: this.clock,
@@ -966,11 +983,17 @@ export class FinalFx {
   }
 
   private poseBody(boss: Entity, t: number, dt: number): void {
+    this.bossNow = boss;
     this.slotPoses(boss, dt);
     const dead = this.deadAt >= 0;
-    // The model stands whole: the heart is the gem in its chest.
+    // The model stands whole: the heart is the gem in its chest. It stands
+    // from the arrival's first frame (final_arrival_core.ts), so the heart
+    // glides into its chest even while it forms.
     const modelWhole = dead || t >= ARRIVAL_WAVE_AT;
-    if (modelWhole) {
+    const shown = arrivalModelShown(t, dead);
+    // The heart sits in the model's chest (its gem): whole, or glided in.
+    const inChest = !dead && (modelWhole || (shown && t >= ARRIVAL.glideEnd));
+    if (shown) {
       const at = fxAnchor(boss);
       const h = finalBodyPoint(
         'heart',
@@ -981,12 +1004,15 @@ export class FinalFx {
         FINAL_BODY_HEIGHT * (boss.scale > 0 ? boss.scale : 1),
         this.heartAt,
       );
+      this.modelHeart.set(h.x, h.y, h.z);
       // Dead: the heart starts from the chest it stood in as it fell.
-      if (!dead || !this.diedHeartSet) {
-        this.diedHeart.set(h.x, h.y, h.z);
-        this.diedHeartSet = dead;
+      if (modelWhole) {
+        if (!dead || !this.diedHeartSet) {
+          this.diedHeart.set(h.x, h.y, h.z);
+          this.diedHeartSet = dead;
+        }
+        this.heartPos.copy(this.diedHeart);
       }
-      this.heartPos.copy(this.diedHeart);
     }
     if (!dead) this.diedHeartSet = false;
     const deathT = dead ? this.clock - this.deadAt : 0;
@@ -1003,7 +1029,9 @@ export class FinalFx {
         this.heartPos.z + (HEART_ROOM.z - this.heartPos.z) * sink,
       );
     } else if (t < ARRIVAL_END) {
-      const slot = { x: this.heartPos.x, y: this.heartPos.y, z: this.heartPos.z };
+      const slot = shown
+        ? { x: this.modelHeart.x, y: this.modelHeart.y, z: this.modelHeart.z }
+        : { x: this.heartPos.x, y: this.heartPos.y, z: this.heartPos.z };
       const a = heartArrivalPoint(Math.max(0, t), slot);
       if (t < 0) {
         a.p = { x: HEART_ROOM.x, y: HEART_CORE_BED_Y, z: HEART_ROOM.z };
@@ -1092,7 +1120,8 @@ export class FinalFx {
       this.heartMesh.scale.setScalar(1.5 + 1.3 * swell);
       // The model's own gem is the heart while it stands; the crystal shows
       // through the arrival and rises out of its chest at its death.
-      this.heartMesh.visible = !modelWhole || dead;
+      // Glided into the forming model's chest, its gem takes over too.
+      this.heartMesh.visible = !inChest;
     }
     this.heartHalo.visible = true;
     // The halo is in the root's frame (world); the body's group is offset.
@@ -1103,9 +1132,9 @@ export class FinalFx {
     );
     // The model's gem carries its own light: the halo only warms it.
     const halo =
-      (14 + flare * (modelWhole && !dead ? 12 : 30) + (t >= 0 && t < ARRIVAL.glideEnd ? 16 : 0)) *
+      (14 + flare * (inChest ? 12 : 30) + (t >= 0 && t < ARRIVAL.glideEnd ? 16 : 0)) *
       Math.max(0.15, heartLevel) *
-      (modelWhole && !dead ? 0.5 : 1);
+      (inChest ? 0.5 : 1);
     this.heartHalo.scale.set(halo, halo, 1);
     (this.heartHalo.material as THREE.SpriteMaterial).opacity = 0.55 * Math.max(0.1, heartLevel);
     // Every piece.
@@ -1138,11 +1167,27 @@ export class FinalFx {
         : this.groundY(this.originX + rest.x, this.originZ + rest.z) + p.def.size * 0.22;
     const ph = t < 0 ? { phase: 'rest' as const, k: 0 } : colossusPiecePhase(p.def, t);
     if (!h) return;
+    // Where on the model it flies in (final_arrival_core.ts): the old body
+    // is never assembled; a piece is drawn into the stone and gone at its lock.
+    const boss = this.bossNow;
+    if (boss) {
+      const at = fxAnchor(boss);
+      finalBodyPoint(
+        arrivalAnchor(p.def.joint, p.def.side, p.index),
+        at.x - this.originX,
+        this.groundY(at.x, at.z) + this.body.position.y,
+        at.z - this.originZ,
+        boss.facing,
+        FINAL_BODY_HEIGHT * (boss.scale > 0 ? boss.scale : 1),
+        this.anchorAt,
+      );
+      p.target.set(this.anchorAt.x, this.anchorAt.y, this.anchorAt.z);
+    } else p.target.copy(p.pos);
+    const mirror = p.def.joint === 'shoulder' && p.def.side < 0 ? -1 : 1;
+    h.scale.set(mirror * p.def.scale, p.def.scale, p.def.scale);
     h.visible = true;
     if (ph.phase === 'locked') {
-      h.position.copy(p.pos);
-      h.quaternion.copy(p.quat);
-      if (ph.k < 1) h.position.y += (1 - ph.k) * 0.4 * Math.sin(ph.k * 20);
+      h.visible = false;
       return;
     }
     _e.set(tilt.x, tilt.y, tilt.z, 'YXZ');
@@ -1169,7 +1214,10 @@ export class FinalFx {
     }
     // Flying in round the heart, tumbling, easing into its slot.
     const from = { x: rest.x, y: restY - p.def.size * 0.32 + lifted, z: rest.z };
-    const to = { x: p.pos.x, y: p.pos.y, z: p.pos.z };
+    const to = { x: p.target.x, y: p.target.y, z: p.target.z };
+    const sink = arrivalPieceScale(ph.k);
+    h.scale.multiplyScalar(Math.max(0.001, sink));
+    h.visible = sink > 0.01;
     const c = { x: this.heartPos.x, y: this.heartPos.y, z: this.heartPos.z };
     const f = colossusFlyPoint(from, to, c, ph.k, 1.1 + fxHash(23, p.index) * 0.6);
     h.position.set(f.x, f.y, f.z);
@@ -1189,7 +1237,7 @@ export class FinalFx {
     _e.set(spin * 0.7, spin, spin * 0.4, 'XYZ');
     _q2.setFromEuler(_e);
     _q.multiply(_q2);
-    h.quaternion.copy(_q).slerp(p.quat, ph.k * ph.k);
+    h.quaternion.copy(_q);
   }
 
   /** The arrival's moments as they happen (never replayed for a raid that
@@ -1252,11 +1300,20 @@ export class FinalFx {
         this.shakeNear(wx, wz, 0.18 + d.size * 0.02);
       }
       if (crossed(colossusLockAt(d))) {
-        // Locked: a flash and sparks at the joint.
-        const px = ox + p.pos.x;
-        const pz = oz + p.pos.z;
-        this.flash(px, p.pos.y, pz, d.joint === 'shard' ? 4 : 7 + d.size, 0.45, VEINS[p.index % 4]);
-        this.particles.puff(px, p.pos.y, pz, d.joint === 'shard' ? 4 : 12, {
+        // Drawn into the model: a flash and sparks where it sank in, the
+        // stone's cracks flaring with it (final_arrival_core.ts).
+        const px = ox + p.target.x;
+        const pz = oz + p.target.z;
+        this.flash(
+          px,
+          p.target.y,
+          pz,
+          d.joint === 'shard' ? 4 : 7 + d.size,
+          0.45,
+          VEINS[p.index % 4],
+        );
+        if (d.joint !== 'shard') this.bodyFx.pieceDrawnIn();
+        this.particles.puff(px, p.target.y, pz, d.joint === 'shard' ? 4 : 12, {
           speed: 6,
           life: 0.6,
           size: [0.3, 0.08],
@@ -1334,7 +1391,8 @@ export class FinalFx {
         const plan = p.fall;
         k = plan && deathT < plan.start ? 1 : 0;
       } else if (t >= lockAt) {
-        k = Math.min(1, (t - lockAt) / 0.35);
+        // Drawn into the model's stone: nothing left to stitch.
+        k = 0;
       } else if (t >= 0) {
         // Reaching for a flying piece: a thin thread already.
         const ph = colossusPiecePhase(p.def, t);

@@ -67,6 +67,10 @@ export interface FinalBodyFrame {
   zone: HeartQuarterZone;
   /** The arrival is over (or was never seen): the model stands whole. */
   whole: boolean;
+  /** The arrival is under way: the model already stands (from the first
+   *  frame, final_arrival_core.ts), dormant, the pieces drawn into it; no
+   *  aura until it roars awake as it stands whole. */
+  forming: boolean;
   dead: boolean;
   kneeling: boolean;
   clock: number;
@@ -113,6 +117,7 @@ export class FinalBodyFx {
   private shown: FinalBodyElement | null = null;
   private bodyShown: boolean | null = null;
   private kneelSent: boolean | null = null;
+  private wasForming = false;
   private resendIn = 0;
   private bossId = -1;
   private shiftAt = -99;
@@ -226,7 +231,10 @@ export class FinalBodyFx {
     if (resend) this.resendIn = RESEND_SEC;
     // A corpse keeps the body it died in (its state aura is gone with it).
     const next = f.dead && this.shown ? this.shown : finalBodyElement(f.zone);
-    const showBody = f.whole || f.dead;
+    const showBody = f.whole || f.dead || f.forming;
+    // Formed: it roars awake as the arrival's shockwave lands.
+    const awoke = this.wasForming && !f.forming && f.whole && !f.dead;
+    this.wasForming = f.forming;
     // The transformation starts on a quarter change of a body seen whole.
     if (
       !f.dead &&
@@ -260,7 +268,11 @@ export class FinalBodyFx {
       this.send(kneel ? FINAL_BODY_GESTURES.kneel : FINAL_BODY_GESTURES.stand);
       this.kneelSent = kneel;
     }
-    if (!showBody || f.dead) {
+    if (awoke) {
+      this.send(FINAL_BODY_GESTURES.shift);
+      this.send(FINAL_BODY_GESTURES.charge);
+    }
+    if (!showBody || f.dead || f.forming) {
       this.rockScale = Math.max(0, this.rockScale - f.dt * 2);
       this.paintRocks(f.clock, 0);
       this.paintBolts(f.clock);
@@ -276,6 +288,11 @@ export class FinalBodyFx {
     this.rockScale += (rocksOn - this.rockScale) * Math.min(1, f.dt * 3);
     this.paintRocks(f.clock, this.rockScale);
     this.paintBolts(f.clock);
+  }
+
+  /** A piece of the arrival sank into the model: its cracks flare. */
+  pieceDrawnIn(): void {
+    this.send(FINAL_BODY_GESTURES.charge);
   }
 
   private send(gesture: string): void {
