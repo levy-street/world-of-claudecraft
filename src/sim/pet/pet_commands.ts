@@ -66,6 +66,7 @@ import {
 import { wispMazeActionsLocked } from '../wisp_maze_action_lock';
 import { applyPetOwnerScaling, petRangedAttack, startWaterJet } from './pet_ai';
 import { isPetMode } from './pet_assist';
+import { applyPetPvpTaunt, canPetTauntPlayer } from './pet_pvp_taunt';
 import { isTameableFamily } from './pet_scaling';
 import { isPrimaryOwnedPetEntity } from './pet_selection';
 import { petCanForceTaunt } from './pet_taunt_gate';
@@ -721,6 +722,20 @@ export function petTaunt(ctx: SimContext, pid?: number): void {
       : r.e.targetId !== null
         ? (ctx.entities.get(r.e.targetId) ?? null)
         : null;
+  // A hostile player is a valid taunt target too: the taunt switches their
+  // selected target onto the pet (pet_pvp_taunt.ts).
+  if (target && canPetTauntPlayer(ctx, pet, target)) {
+    pet.aggroTargetId = target.id;
+    pet.inCombat = true;
+    if (dist2d(pet.pos, target.pos) > PET_TAUNT_RANGE) {
+      pet.petManualTauntPending = true;
+      return;
+    }
+    if (!applyPetPvpTaunt(ctx, pet, target)) return;
+    pet.petManualTauntPending = false;
+    pet.petTauntTimer = PET_GROWL_INTERVAL;
+    return;
+  }
   if (
     target?.kind !== 'mob' ||
     target.dead ||
