@@ -552,7 +552,16 @@ export const HEART_ROCK_LIP = {
   push: 1.8,
   /** The steepest slope a lip follows (rise per yard). */
   maxShear: 1,
+  /** The Storm Cornice's open (lethal) rim: its lips tucked UNDER the
+   *  brink instead of set out past it (its field face falls sheer there:
+   *  heart_interior.ts `sheer`), their snowy tops this far under the floor,
+   *  so no rock past the red edge reads as ground (Jose's playtest of
+   *  2026-11-04: pale rock past the edge where a body still falls). */
+  corniceTuck: 2.6,
 } as const;
+
+/** The Storm Cornice's floor (the field surface whose rim tucks its lips). */
+const CORNICE_FLOOR = 'storm_cornice';
 
 /** Does a lip module hanging from (x, y, z) (along u, leaning out along n,
  *  `half` yards either way) stand through a walked floor? At each yard `w`
@@ -688,8 +697,10 @@ export function planHeartLips(): HeartKitPlacement[] {
       const cz = (A.z + B.z) / 2;
       // The chord's middle sits inside a bending lip: set it out onto the lip.
       const bow = (M.x - cx) * nx + (M.z - cz) * nz;
-      const ox = cx + nx * (Math.max(0, bow) + HEART_ROCK_LIP.push);
-      const oz = cz + nz * (Math.max(0, bow) + HEART_ROCK_LIP.push);
+      const tuck = surface === CORNICE_FLOOR;
+      const push = tuck ? 0 : HEART_ROCK_LIP.push;
+      const ox = cx + nx * (Math.max(0, bow) + push);
+      const oz = cz + nz * (Math.max(0, bow) + push);
       const stretch = (chord + HEART_ROCK_LIP.overlap) / (HEART_ROCK_LIP.half * 2);
       const reachX = (HEART_ROCK_LIP.half + 2.6) * stretch;
       // The brink under the lowest of the floor over its whole body (its
@@ -710,7 +721,8 @@ export function planHeartLips(): HeartKitPlacement[] {
         ym -
         over -
         (stairs.has(surface) ? 0.3 : 0) -
-        (RING_KIT_FASCIA_SURFACES.has(surface) ? RING_KIT_FASCIA_DEPTH : 0);
+        (RING_KIT_FASCIA_SURFACES.has(surface) ? RING_KIT_FASCIA_DEPTH : 0) -
+        (tuck ? HEART_ROCK_LIP.corniceTuck : 0);
       // Not where another floor lies under its leaning face (a stair's foot
       // beside the arena it enters, a bridge's end): the rock would stand
       // through that floor.

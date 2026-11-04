@@ -67,6 +67,9 @@ export interface FieldTerrainOptions {
   shallow?: { surfaces: ReadonlySet<string>; depth: number };
   /** Surfaces with no skirt (a kit's own rock stands there and can fall away). */
   noSkirt?: ReadonlySet<string>;
+  /** Surfaces whose drop falls sheer for its first `depth` yards (nothing
+   *  past the lip reads as ground from above: field_mesh_core.ts). */
+  sheer?: { surfaces: ReadonlySet<string>; depth: number };
   /** The cliff faces' rock: fractured slabs (the default), level bedded
    *  strata (a shelf cut into a mountain), or a glacier crevasse wall (annual
    *  layers and meltwater flutes, a little glossier: wet ice). */
@@ -160,6 +163,7 @@ export function buildAuthoredFieldTerrain(
     flare: 0.22,
     ...(opts.shallow ? { shallow: opts.shallow } : {}),
     ...(opts.noSkirt ? { noSkirt: opts.noSkirt } : {}),
+    ...(opts.sheer ? { sheer: opts.sheer } : {}),
     ...(opts.cliffPaint ? { paint: opts.cliffPaint } : {}),
     ...(opts.cliffRock === 'glacier' ? { uvScale: GLACIER_CLIFF_UV } : {}),
   });

@@ -52,6 +52,11 @@ export const HEART_ROCK_HANG = {
   push: 1.8,
   /** Only under a walk this high over the void. */
   minDrop: 50,
+  /** The Storm Cornice's open (lethal) rim: its faces hung from UNDER the
+   *  brink, not set out past it (its field face falls sheer there), their
+   *  snowy brink this far under the floor, so no rock past the red edge
+   *  reads as ground (Jose's playtest of 2026-11-04). */
+  corniceTuck: 2.6,
   /** The steepest slope it follows (a stair's). */
   maxShear: 0.7,
   /** Its height fitted to the drop (down past the mist), within these. */
@@ -166,8 +171,10 @@ export function planHeartHangs(): HeartKitPlacement[] {
       const cx = (A.x + B.x) / 2;
       const cz = (A.z + B.z) / 2;
       const bow = (M.x - cx) * nx + (M.z - cz) * nz;
-      const ox = cx + nx * (Math.max(0, bow) + H.push);
-      const oz = cz + nz * (Math.max(0, bow) + H.push);
+      const tuck = surface === 'storm_cornice';
+      const push = tuck ? 0 : H.push;
+      const ox = cx + nx * (Math.max(0, bow) + push);
+      const oz = cz + nz * (Math.max(0, bow) + push);
       const stretch = (chord + H.overlap) / (H.half * 2);
       const reachX = H.reach * stretch;
       // The brink under the lowest of the floor over its whole body.
@@ -181,12 +188,12 @@ export function planHeartHangs(): HeartKitPlacement[] {
           over = Math.max(over, ym + shear * a - authoredFieldHeight(F, px, pz) + 0.05);
         }
       }
-      const y = ym - over - 0.3;
+      const y = ym - over - 0.3 - (tuck ? H.corniceTuck : 0);
       const rise = Math.max(H.rise[0], Math.min(H.rise[1], (y - F.voidHeight + H.below) / H.drop));
       const drop = H.drop * rise;
       // Never in the open air: its body out at mid-drop and at its foot.
-      const mid = H.push + H.out * 0.5;
-      const foot = H.push + H.out * 0.85;
+      const mid = push + H.out * 0.5;
+      const foot = push + H.out * 0.85;
       if (
         heartOpenAir(ox + nx * mid, oz + nz * mid, reachX * 0.5, false) ||
         heartOpenAir(ox + nx * foot, oz + nz * foot, reachX * 0.5, false)

@@ -9,7 +9,7 @@
 //
 // PURE: three-free, DOM-free, deterministic. Vertex paint only (no program).
 
-import { inSmithHeartRoom, RING } from '../../sim/content/smith_heart_layout';
+import { BREATH, inSmithHeartRoom, RING } from '../../sim/content/smith_heart_layout';
 import { fieldNoise, type Rgb } from '../authored_field/field_mesh_core';
 
 /** Where the storm granite holds (instance-local yards): from the Ring's
@@ -22,6 +22,24 @@ export const BREATH_STONE = { z0: 74, z1: 92, x0: 74, x1: 96, ring0: 4, ring1: 1
 export const BREATH_CLIFF_DEEP: Rgb = [0.33, 0.35, 0.45];
 export const BREATH_CLIFF_SLATE: Rgb = [0.5, 0.53, 0.6];
 export const BREATH_CLIFF_PALE: Rgb = [0.72, 0.73, 0.77];
+
+/** The Storm Cornice's floor (its field surface's id) and how far its open
+ *  rim falls sheer before the massif flares (yards): nothing past the lip
+ *  reads as ground from above (Jose's playtest of 2026-11-04: pale rock past
+ *  the red edge where a body still falls; heart_interior.ts `sheer`). */
+export const CORNICE_SURFACE = 'storm_cornice';
+export const CORNICE_SHEER = 14;
+/** Under the Cornice's lip: the scoured crust's depth (a hair, the red edge
+ *  sits on it) and the shadow its first yards fall into (the drop reads). */
+export const CORNICE_LIP = { crust: 0.35, shade: 7, dark: 0.5 } as const;
+
+/** Is a face under a lip at height `top` round (x, z) the Cornice's own rim
+ *  (not a walk below it, not an isle over it)? */
+export function corniceRimFace(x: number, z: number, top: number): boolean {
+  const C = BREATH.cornice;
+  if (Math.abs(top - C.h) > 0.6) return false;
+  return Math.hypot((x - C.x) / (C.rx + 6), (z - C.z) / (C.rz + 6)) <= 1;
+}
 
 /** The mountain mass's tint toward the slate, and its lift. */
 export const BREATH_ROCK_TONE = 0x6f7787;
@@ -80,6 +98,19 @@ export function breathCliffPaint(x: number, y: number, z: number, top: number): 
   const body: Rgb = [b[0] * k * g, b[1] * k * g, b[2] * k * g];
   // Its depth falls to the blue-violet shadow, never black.
   const c = mix3(body, BREATH_CLIFF_DEEP, smooth(0, 70, depth) * 0.7);
+  if (corniceRimFace(x, z, top)) {
+    // The Cornice's open rim: only a hair of scoured crust under the red
+    // edge, then the face falls away into its own shadow, so the drop reads
+    // as a drop (never a pale ledge past the lip).
+    const crust = Math.max(0, 1 - depth / CORNICE_LIP.crust);
+    const shade = 1 - CORNICE_LIP.dark * (1 - smooth(0, CORNICE_LIP.shade, depth));
+    const under = mix3(c, BREATH_CLIFF_DEEP, (1 - smooth(0, CORNICE_LIP.shade, depth)) * 0.6);
+    return mix3(
+      [under[0] * shade, under[1] * shade, under[2] * shade],
+      BREATH_CLIFF_PALE,
+      crust * 0.5,
+    );
+  }
   // The lip scoured pale by the gale, ragged.
   const rim = Math.max(0, 1 - (depth - fieldNoise(x * 0.3, z * 0.3, 2) * 1.4) / 1.8);
   return mix3(c, BREATH_CLIFF_PALE, Math.min(1, rim) * 0.7);

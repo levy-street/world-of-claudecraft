@@ -784,6 +784,12 @@ export interface FieldCliffOptions {
   /** Surfaces with no skirt at all (a kit's own rock stands there and can fall away:
    *  the Smith's Heart's Anvil). */
   noSkirt?: ReadonlySet<string>;
+  /** Surfaces whose drop into the void falls SHEER for its first `depth`
+   *  yards (no outward flare, no jag out past the lip), so nothing past the
+   *  walkable lip reads as more ground from above; the massif flares below
+   *  that (the Smith's Heart's Storm Cornice: Jose's playtest of 2026-11-04
+   *  saw rock past its red edge where a body still falls). */
+  sheer?: { surfaces: ReadonlySet<string>; depth: number };
   /** The faces' vertex paint (default `cliffColor`). */
   paint?: CliffPaint;
   /** Texture repeats per yard on the faces (default 0.12). */
@@ -1035,6 +1041,7 @@ export function planFieldCliffs(def: AuthoredFieldDef, opts: FieldCliffOptions):
     const skirt = ownedSkirtRing(def, index, ring);
     ring = skirt.ring;
     const shallow = opts.shallow?.surfaces.has(s.id) ? opts.shallow.depth : 0;
+    const sheer = opts.sheer?.surfaces.has(s.id) ? opts.sheer.depth : 0;
     const n = ring.length;
     const tops: number[] = [];
     const bottoms: number[] = [];
@@ -1078,10 +1085,15 @@ export function planFieldCliffs(def: AuthoredFieldDef, opts: FieldCliffOptions):
         const depth = top - y;
         const intoVoid = bottoms[k] <= opts.voidFloor + 0.01;
         const straight = r === 0 || !intoVoid || (masonry && depth < 3.2);
-        const jag = straight
-          ? 0
-          : (fieldNoise(ex * 0.35 + y * 0.21, ez * 0.35 - y * 0.17, 3) - 0.3) * 2.6;
-        const flare = straight ? 0 : Math.max(0, depth * opts.flare + jag);
+        // A sheer face: nothing out past the lip for its first yards, the
+        // flare growing in smoothly below them.
+        const sheerK = sheer > 0 ? Math.min(1, Math.max(0, (depth - sheer) / sheer)) : 1;
+        const jag =
+          straight || sheerK <= 0
+            ? 0
+            : (fieldNoise(ex * 0.35 + y * 0.21, ez * 0.35 - y * 0.17, 3) - 0.3) * 2.6 * sheerK;
+        const flare =
+          straight || sheerK <= 0 ? 0 : Math.max(0, Math.max(0, depth - sheer) * opts.flare + jag);
         // The massif never flares out over a neighbouring walkable floor at
         // or below the rock's height (it would stand through that floor's
         // walk): it pulls back toward its own lip there.
