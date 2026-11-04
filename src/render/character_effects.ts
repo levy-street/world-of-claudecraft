@@ -16,6 +16,7 @@ import {
   characterEffectFlags,
   hasCharacterEffect,
 } from './character_effects_core';
+import { type QuenchGlaze, quenchGlazeOf } from './smith_heart_fx/quench_glaze_core';
 
 export function isAvengingWrathAura(aura: Pick<Aura, 'id' | 'kind'>): boolean {
   return aura.id === 'avenging_wrath' && aura.kind === 'buff_dmg_done';
@@ -165,4 +166,21 @@ export function characterRuneTintColor(e: Entity): number | null {
     if (a.id === WARD_RUNE_AURA_ID) return RUNE_VISUALS.defense.color;
   }
   return null;
+}
+
+/** The rig surface a body tint lands on (characters/visual.ts). */
+export interface CharacterBodyTintTarget {
+  setRuneTint(color: number | null): void;
+  setFrostGlaze(glaze: QuenchGlaze | null): void;
+}
+
+const _glaze: QuenchGlaze = { height: 0, glow: 0, bite: 0, alpha: 0 };
+
+/** Every whole-body tint a character's mirrored auras ask for, handed to its
+ *  rig each frame: a Thornhollow Fields rune's lean and the Quench's frost
+ *  glaze painted on the body's own material. `t` is render time in seconds
+ *  (the glaze's urgent pulse). */
+export function applyCharacterBodyTints(v: CharacterBodyTintTarget, e: Entity, t: number): void {
+  v.setRuneTint(characterRuneTintColor(e));
+  v.setFrostGlaze(e.auras.length === 0 ? null : quenchGlazeOf(e.auras, t, _glaze));
 }

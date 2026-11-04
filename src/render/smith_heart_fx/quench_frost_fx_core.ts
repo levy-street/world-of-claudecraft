@@ -277,36 +277,6 @@ export function spikePose(
 // ---- the glaze's shape -------------------------------------------------------------
 
 /**
- * The frost glaze's profile up a body (a lathe: [radius, height share], both
- * yards and 0..1 of the body): narrow at the ankles, out at the hips, in at
- * the waist, broad at the shoulders, in at the neck, round over the head. It
- * hugs a player's silhouette instead of standing round it like a sleeve.
- */
-export const GLAZE_PROFILE: readonly (readonly [number, number])[] = [
-  [0.17, 0],
-  [0.16, 0.06],
-  [0.2, 0.24],
-  [0.26, 0.42],
-  [0.33, 0.5],
-  [0.32, 0.58],
-  [0.4, 0.68],
-  [0.47, 0.74],
-  [0.42, 0.8],
-  [0.2, 0.84],
-  [0.19, 0.87],
-  [0.23, 0.92],
-  [0.18, 0.97],
-  [0.03, 1],
-];
-
-/** The glaze's two layers: the inner one on the body, the outer a fainter
- *  breath of rime off it (scale, opacity share). */
-export const GLAZE_LAYERS: readonly (readonly [number, number])[] = [
-  [1, 1],
-  [1.14, 0.45],
-];
-
-/**
  * Shoulder crystal `k` (0..5; even the left shoulder, odd the right) on a body
  * at `cold`: rime crystals growing out of the shoulders once the bar passes
  * half, longer as it fills; null while too warm for it. The frame: `side`

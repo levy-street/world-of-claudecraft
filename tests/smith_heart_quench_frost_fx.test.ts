@@ -10,8 +10,6 @@ import {
   chunkPose,
   encaseLook,
   encaseVertex,
-  GLAZE_LAYERS,
-  GLAZE_PROFILE,
   type HuddleRing,
   huddleRings,
   QUENCH_FROST_POOLS,
@@ -22,7 +20,8 @@ import {
   spikePose,
   vaporRate,
 } from '../src/render/smith_heart_fx/quench_frost_fx_core';
-import { QUENCH_TUNING as T } from '../src/sim/encounters/smith_heart/quench_ids';
+import { quenchGlazeOf } from '../src/render/smith_heart_fx/quench_glaze_core';
+import { QUENCH_AURAS, QUENCH_TUNING as T } from '../src/sim/encounters/smith_heart/quench_ids';
 import { quenchDock } from '../src/ui/hud/dungeon/dungeon_prompts';
 
 describe('Quench frost pass: the icy aura', () => {
@@ -123,20 +122,53 @@ describe('Quench frost pass: shards, chunks, spikes', () => {
 });
 
 describe('Quench frost pass v2: the glaze, the shoulders, the encasement', () => {
-  it('the glaze hugs a silhouette: narrow ankles and neck, broad shoulders, a closed crown', () => {
-    const ys = GLAZE_PROFILE.map(([, y]) => y);
-    for (let i = 1; i < ys.length; i++) expect(ys[i]).toBeGreaterThan(ys[i - 1]);
-    expect(ys[0]).toBe(0);
-    expect(ys[ys.length - 1]).toBe(1);
-    const at = (y: number) =>
-      GLAZE_PROFILE.reduce((best, p) => (Math.abs(p[1] - y) < Math.abs(best[1] - y) ? p : best))[0];
-    expect(at(0.74)).toBeGreaterThan(at(0.06));
-    expect(at(0.74)).toBeGreaterThan(at(0.84) * 2);
-    expect(GLAZE_PROFILE[GLAZE_PROFILE.length - 1][0]).toBeLessThan(0.05);
-    // Two layers: the outer a fainter rime off the inner.
-    expect(GLAZE_LAYERS.length).toBe(2);
-    expect(GLAZE_LAYERS[1][0]).toBeGreaterThan(GLAZE_LAYERS[0][0]);
-    expect(GLAZE_LAYERS[1][1]).toBeLessThan(GLAZE_LAYERS[0][1]);
+  it('the glaze is painted on the body itself: none without the cold, climbing with the bar', () => {
+    // Nothing of the Quench on a body: no glaze (every character, every frame).
+    expect(quenchGlazeOf([], 0)).toBeNull();
+    expect(quenchGlazeOf([{ id: 'rejuvenation', kind: 'hot', value: 5 }], 0)).toBeNull();
+    // A sliver of cold wears nothing; then it climbs and brightens with the bar.
+    expect(quenchGlazeOf([{ id: QUENCH_AURAS.cold, value: 2 }], 0)).toBeNull();
+    const none = { height: 0, glow: 0, bite: 1, alpha: 0 };
+    const low = { ...(quenchGlazeOf([{ id: QUENCH_AURAS.cold, value: 20 }], 0) ?? none) };
+    const high = { ...(quenchGlazeOf([{ id: QUENCH_AURAS.cold, value: 90 }], 0.1) ?? none) };
+    expect(low.alpha).toBeGreaterThan(0);
+    expect(high.height).toBeGreaterThan(low.height);
+    expect(high.glow).toBeGreaterThan(low.glow);
+    expect(high.height).toBeLessThanOrEqual(1);
+    expect(low.bite).toBe(0);
+    // The same read of the bar the shell drew.
+    expect(low.height).toBeCloseTo(shellLook(20, false, 0, 0).height, 6);
+  });
+
+  it('a frozen body is glazed to the crown, and a warded one bites at no cold', () => {
+    const frozen = quenchGlazeOf([{ id: QUENCH_AURAS.frozen }], 0);
+    expect(frozen?.height).toBeGreaterThanOrEqual(1);
+    expect(frozen?.alpha).toBe(1);
+    const warded = quenchGlazeOf(
+      [
+        { id: QUENCH_AURAS.cold, value: 0 },
+        { id: 'ice_block', kind: 'stasis' },
+      ],
+      0,
+    );
+    expect(warded?.bite).toBe(1);
+    expect(warded?.alpha).toBeGreaterThan(0.5);
+  });
+
+  it("a splash flares the glaze as its shard lands, read from the mark's own age", () => {
+    const mark = (age: number) =>
+      quenchGlazeOf(
+        [
+          { id: QUENCH_AURAS.cold, value: 10 },
+          { id: QUENCH_AURAS.splashed, value: 10, remaining: T.splashMarkSeconds - age },
+        ],
+        0,
+      )?.glow ?? 0;
+    const calm = mark(0.1);
+    // In flight: no flare yet; landed: flared; a second later: calm again.
+    expect(calm).toBeCloseTo(mark(SPLASH_FLIGHT_SECONDS - 0.05), 6);
+    expect(mark(SPLASH_FLIGHT_SECONDS + 0.05)).toBeGreaterThan(calm + 0.5);
+    expect(mark(SPLASH_FLIGHT_SECONDS + 1.0)).toBeCloseTo(calm, 6);
   });
 
   it('rime crystals grow from the shoulders only past half the bar, on both sides', () => {

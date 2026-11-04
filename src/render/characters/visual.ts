@@ -3869,6 +3869,14 @@ export class CharacterVisual {
     if (this.glowPulse?.reset() && !this.disposed) this.applyVisualMaterials();
   }
 
+  /** A frost glaze held on the body's own material (the Quench's cold,
+   *  smith_heart_fx/quench_glaze_core.ts), or null to release it. Re-mounts
+   *  only on the on/off edge; while held, only its uniform moves. */
+  setFrostGlaze(glaze: { height: number; glow: number; bite: number; alpha: number } | null): void {
+    if (this.disposed) return;
+    if (this.surfaceResponse.setGlaze(glaze)) this.applyVisualMaterials();
+  }
+
   clearElementResponse(): void {
     this.harvestRecoil.clear();
     this.warriorBody.clearContactRecoil();
