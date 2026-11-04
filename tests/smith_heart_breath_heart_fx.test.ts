@@ -5,6 +5,10 @@
 import { describe, expect, it } from 'vitest';
 import {
   burstLook,
+  FLIGHT_LOOK,
+  FLIGHT_TRAIL,
+  flightGhost,
+  flightScale,
   HEART_COLORS,
   HEART_FLOOR,
   HEART_POOLS,
@@ -90,6 +94,31 @@ describe('Knotted Gale: the look', () => {
     const b = burstLook(1);
     expect(b?.radius ?? 0).toBeGreaterThan(a?.radius ?? 0);
     expect(burstLook(5)).toBeNull();
+  });
+
+  it('the thrown ball reads in flight: held large, haloed, a wake along its arc', () => {
+    // Never the old pale orb shrinking to 0.4: it stays at least the size of a ball
+    // ripe in a carrier's hands (knotLook's radius runs 0.85 to 1.6) the whole way.
+    expect(flightScale(0)).toBe(FLIGHT_LOOK.start);
+    expect(flightScale(THROW_ARC.seconds)).toBe(FLIGHT_LOOK.end);
+    expect(flightScale(THROW_ARC.seconds * 2)).toBe(FLIGHT_LOOK.end);
+    for (let t = 0; t <= THROW_ARC.seconds; t += 0.1)
+      expect(flightScale(t)).toBeGreaterThanOrEqual(1);
+    // Its halo is wider than the ball, so its dark rim shows round it.
+    expect(FLIGHT_LOOK.halo).toBeGreaterThan(1.2);
+    // The wake: each ghost further back along the arc, smaller and fainter, never
+    // past a visible alpha or the ball's own size.
+    let last = { lag: 0, scale: 1, alpha: 1 };
+    for (let i = 0; i < FLIGHT_TRAIL.ghosts; i++) {
+      const g = flightGhost(i);
+      expect(g.lag).toBeGreaterThan(last.lag);
+      expect(g.scale).toBeLessThan(last.scale);
+      expect(g.alpha).toBeLessThan(last.alpha);
+      expect(g.alpha).toBeGreaterThan(0);
+      last = g;
+    }
+    // The whole wake trails a short stretch of the arc, not the whole throw.
+    expect(flightGhost(FLIGHT_TRAIL.ghosts - 1).lag).toBeLessThan(THROW_ARC.seconds / 3);
   });
 
   it('the second pair reads apart from the first: colour, pattern, link and letter', () => {
