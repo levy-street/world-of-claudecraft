@@ -10165,7 +10165,7 @@ export const tr_TR: EnTranslations = {
       "shadow_bolt": "Bir hedefe okuduğun bir gölge oku; başvuru bombasın.",
       "summon_imp": "Düşmanlara uzaktan Kül Oku savuran bir Emberkin çağırır.",
       "demon_skin": "Derini sertleştirip zırh ekleyen kalıcı bir öz güçlendirmesi.",
-      "immolate": "Bir hedefi tutuşturur; açılış darbesi ve sonra süren bir yanış verir.",
+      "immolate": "Bir hedefi tutuşturur ve süren bir yanış bırakır.",
       "corruption": "Bir hedefi gölgeyle çürütür ve sen başka işler yaparken hasar verir.",
       "life_tap": "Tükendiğinde kendi canının bir kısmını manaya çevirir.",
       "wrath": "Bir hedefe menzilden fırlatılan bir doğa oku; başvuru bomban.",
@@ -18265,7 +18265,7 @@ export const tr_TR: EnTranslations = {
       },
       "immolate": {
         "name": "Yanan Ahit",
-        "description": "Düşmanı {damage} Ateş hasarıyla ve ek olarak 15 saniye boyunca {overTime} ile yakar."
+        "description": "Düşmanı 15 saniye boyunca {damage} Ateş hasarıyla yakar."
       },
       "corruption": {
         "name": "Kara Çürüme",

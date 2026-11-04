@@ -10165,7 +10165,7 @@ export const sv_SE: EnTranslations = {
       "shadow_bolt": "En skuggpil du kastar mot ett mål, din förstavalskanon.",
       "summon_imp": "Kallar fram en Emberkin som kastar Felbolt mot fiender på avstånd.",
       "demon_skin": "En varaktig självförstärkning som härdar din hud och ger rustning.",
-      "immolate": "Sätter ett mål i brand för ett inledande slag och en brand som dröjer kvar.",
+      "immolate": "Sätter ett mål i brand med en brand som dröjer kvar.",
       "corruption": "Förmultnar ett mål med skugga som tickar medan du gör andra saker.",
       "life_tap": "Byter en del av din egen hälsa tillbaka till mana när du sinar.",
       "wrath": "En naturpil kastad mot ett mål från avstånd, din förstavalskanon.",
@@ -18265,7 +18265,7 @@ export const sv_SE: EnTranslations = {
       },
       "immolate": {
         "name": "Brinnande pakt",
-        "description": "Bränner fienden för {damage} eldskada och ytterligare {overTime} över 15 sek."
+        "description": "Bränner fienden för {damage} eldskada över 15 sek."
       },
       "corruption": {
         "name": "Svartröta",

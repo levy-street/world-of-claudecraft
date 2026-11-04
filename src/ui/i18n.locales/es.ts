@@ -9512,7 +9512,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'La piel demoníaca aumenta tu armadura en {buff} durante 30 min. Pact Deepened puede duplicar esta armadura y reducir el daño mágico recibido mientras Piel de Engendro está activa.',
   'entities.abilities.immolate.name': 'Pacto Ardiente',
   'entities.abilities.immolate.description':
-    'Quema al enemigo por {damage} de daño de Fuego y {overTime} adicionales durante 15 s.',
+    'Quema al enemigo por {damage} de daño de Fuego durante 15 s.',
   'entities.abilities.corruption.name': 'Putrefacción Negra',
   'entities.abilities.corruption.description':
     'Corrompe al objetivo y causa {damage} de daño de las Sombras durante 18 s.',
@@ -11917,8 +11917,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Prepara un golpe más fuerte que gasta ira en tu próximo ataque.',
   'guide.abilityHook.holy_light':
     'Una sanación constante y considerable para reponer a un aliado o a ti mismo.',
-  'guide.abilityHook.immolate':
-    'Prende fuego a un objetivo con un golpe inicial y una quemadura que perdura.',
+  'guide.abilityHook.immolate': 'Prende fuego a un objetivo con una quemadura que perdura.',
   'guide.abilityHook.judgement':
     'Gasta tu Sello activo para golpear a un enemigo a corta distancia.',
   'guide.abilityHook.lesser_heal':

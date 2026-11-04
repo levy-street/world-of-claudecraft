@@ -10165,7 +10165,7 @@ export const de_DE: EnTranslations = {
       "shadow_bolt": "Ein Schattenblitz, den du auf ein Ziel wirkst, dein erster Schadenszauber.",
       "summon_imp": "Ruft einen Emberkin herbei, der aus der Distanz Verderbnisblitz auf Gegner wirkt.",
       "demon_skin": "Eine anhaltende Selbststärkung, die deine Haut abhärtet und Rüstung verleiht.",
-      "immolate": "Setzt ein Ziel in Brand für einen Eröffnungstreffer und einen anhaltenden Brand.",
+      "immolate": "Setzt ein Ziel in einen anhaltenden Brand.",
       "corruption": "Lässt ein Ziel mit Schatten verrotten, der tickt, während du anderes erledigst.",
       "life_tap": "Tauscht einen Teil deiner eigenen Gesundheit in Mana zurück, wenn du leerläufst.",
       "wrath": "Ein Naturblitz, den du aus der Distanz auf ein Ziel schleuderst, dein erster Schadenszauber.",
@@ -18265,7 +18265,7 @@ export const de_DE: EnTranslations = {
       },
       "immolate": {
         "name": "Brennender Pakt",
-        "description": "Verbrennt den Gegner für {damage} Feuerschaden und zusätzlich {overTime} über 15 Sek."
+        "description": "Verbrennt den Gegner für {damage} Feuerschaden über 15 Sek."
       },
       "corruption": {
         "name": "Schwarzfäule",

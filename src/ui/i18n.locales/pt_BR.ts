@@ -9576,7 +9576,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Pele demoníaca aumenta sua armadura em {buff} por 30 min. Pact Deepened pode dobrar essa armadura e reduzir o dano mágico recebido enquanto Couro Demoníaco estiver ativo.',
   'entities.abilities.immolate.name': 'Pacto Ardente',
   'entities.abilities.immolate.description':
-    'Queima o inimigo com {damage} de dano de Fogo e mais {overTime} ao longo de 15 s.',
+    'Queima o inimigo com {damage} de dano de Fogo ao longo de 15 s.',
   'entities.abilities.corruption.name': 'Podridão Negra',
   'entities.abilities.corruption.description':
     'Corrompe o alvo, causando {damage} de dano de Sombra ao longo de 18 s.',
@@ -11742,8 +11742,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Prepara um golpe mais pesado que gasta fúria no seu próximo ataque.',
   'guide.abilityHook.holy_light':
     'Uma cura firme e considerável para recuperar um aliado ou você mesmo.',
-  'guide.abilityHook.immolate':
-    'Põe fogo no alvo com um golpe de abertura e uma queimadura que persiste.',
+  'guide.abilityHook.immolate': 'Põe fogo no alvo com uma queimadura que persiste.',
   'guide.abilityHook.judgement': 'Gasta seu Selo ativo para atingir um inimigo a curta distância.',
   'guide.abilityHook.lesser_heal':
     'Uma conjuração firme para recuperar um aliado quando há tempo para ficar parado.',

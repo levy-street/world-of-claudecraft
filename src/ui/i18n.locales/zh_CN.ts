@@ -7659,8 +7659,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.demon_skin.description':
     '恶魔皮肤使你的护甲提高 {buff}，持续 30 分钟。契约深化可使邪魔硬皮生效期间的这部分护甲翻倍，并降低受到的魔法伤害。',
   'entities.abilities.immolate.name': '燃烧契约',
-  'entities.abilities.immolate.description':
-    '灼烧敌人，造成 {damage} 点火焰伤害，并在 15 秒内额外造成 {overTime}。',
+  'entities.abilities.immolate.description': '灼烧敌人，在 15 秒内造成 {damage} 点火焰伤害。',
   'entities.abilities.corruption.name': '黑腐术',
   'entities.abilities.corruption.description': '腐蚀目标，在 18 秒内造成 {damage} 点暗影伤害。',
   'entities.abilities.life_tap.name': '苛酷交易',
@@ -11165,7 +11164,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.healing_wave': '你的主力治疗，为自己或盟友直接补血。',
   'guide.abilityHook.heroic_strike': '预备一次更重的挥击，在下次攻击时消耗怒气。',
   'guide.abilityHook.holy_light': '稳健而可观的治疗，用于把盟友或自己奶满。',
-  'guide.abilityHook.immolate': '点燃目标，打出一记起手伤害并留下持续燃烧。',
+  'guide.abilityHook.immolate': '点燃目标，留下持续燃烧。',
   'guide.abilityHook.judgement': '消耗你激活的圣印，从近距离打击敌人。',
   'guide.abilityHook.lesser_heal': '稳健的施法治疗，有空站定时为盟友补血。',
   'guide.abilityHook.life_tap': '在法力枯竭时，将部分自身生命值转化为法力。',

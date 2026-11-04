@@ -9649,7 +9649,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'La pelle demoniaca aumenta la tua armatura di {buff} per 30 min. Pact Deepened può raddoppiare questa armatura e ridurre i danni magici subiti finché Pelle di Demone è attiva.',
   'entities.abilities.immolate.name': 'Patto Ardente',
   'entities.abilities.immolate.description':
-    'Brucia il nemico per {damage} danni da Fuoco e altri {overTime} in 15 sec.',
+    'Brucia il nemico per {damage} danni da Fuoco in 15 sec.',
   'entities.abilities.corruption.name': 'Marciume Nero',
   'entities.abilities.corruption.description':
     'Corrompe il bersaglio, infliggendo {damage} danni da Ombra in 18 s.',
@@ -11849,8 +11849,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Mette in coda un fendente più pesante che spende ira al tuo prossimo colpo.',
   'guide.abilityHook.holy_light':
     'Una cura costante e di buona entità per rimettere in piedi un alleato o te stesso.',
-  'guide.abilityHook.immolate':
-    "Incendia un bersaglio per un colpo iniziale e un'ustione che perdura.",
+  'guide.abilityHook.immolate': "Incendia un bersaglio con un'ustione che perdura.",
   'guide.abilityHook.judgement':
     'Spende il tuo Sigillo attivo per colpire un nemico dalla corta distanza.',
   'guide.abilityHook.lesser_heal':

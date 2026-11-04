@@ -10165,7 +10165,7 @@ export const pt_BR: EnTranslations = {
       "shadow_bolt": "Uma seta de sombra que você lança no alvo, sua magia de ataque preferida.",
       "summon_imp": "Convoca um Emberkin que lança Descarga Vil nos inimigos à distância.",
       "demon_skin": "Um aprimoramento próprio duradouro que endurece sua pele e adiciona armadura.",
-      "immolate": "Põe fogo no alvo com um golpe de abertura e uma queimadura que persiste.",
+      "immolate": "Põe fogo no alvo com uma queimadura que persiste.",
       "corruption": "Apodrece o alvo com magia sombria que causa dano contínuo enquanto você faz outras coisas.",
       "life_tap": "Troca parte da sua própria vida por mana quando você fica sem.",
       "wrath": "Uma seta de natureza arremessada num alvo à distância, sua magia de ataque preferida.",
@@ -18265,7 +18265,7 @@ export const pt_BR: EnTranslations = {
       },
       "immolate": {
         "name": "Pacto Ardente",
-        "description": "Queima o inimigo com {damage} de dano de Fogo e mais {overTime} ao longo de 15 s."
+        "description": "Queima o inimigo com {damage} de dano de Fogo ao longo de 15 s."
       },
       "corruption": {
         "name": "Podridão Negra",

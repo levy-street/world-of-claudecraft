@@ -272,19 +272,14 @@ describe('destruction progression', () => {
         },
       ],
     ]);
+    // Burning Pact is instant with no opening hit: the old hit rides the burn.
+    expect(ABILITIES.immolate.castTime).toBe(0);
     expect(ABILITIES.immolate.effects).toEqual([
-      { type: 'directDamage', min: 31, max: 31 },
-      { type: 'dot', total: 56, duration: 15, interval: 3 },
+      { type: 'dot', total: 87, duration: 15, interval: 3 },
     ]);
     expect(ABILITIES.immolate.ranks?.map((rank) => rank.effects)).toEqual([
-      [
-        { type: 'directDamage', min: 62, max: 62 },
-        { type: 'dot', total: 98, duration: 15, interval: 3 },
-      ],
-      [
-        { type: 'directDamage', min: 70, max: 70 },
-        { type: 'dot', total: 100, duration: 15, interval: 3 },
-      ],
+      [{ type: 'dot', total: 160, duration: 15, interval: 3 }],
+      [{ type: 'dot', total: 170, duration: 15, interval: 3 }],
     ]);
     expect(ABILITIES.conflagrate.effects).toEqual([
       { type: 'destructionConflagrate' },

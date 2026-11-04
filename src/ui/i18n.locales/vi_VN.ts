@@ -8147,7 +8147,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Che chắn bạn trong băng, hấp thụ {damage} sát thương trong 60 giây.',
   'entities.abilities.ice_barrier.name': 'Màn Băng',
   'entities.abilities.immolate.description':
-    'Thiêu đốt kẻ địch gây {damage} sát thương Hỏa cùng thêm {overTime} trong 15 giây.',
+    'Thiêu đốt kẻ địch gây {damage} sát thương Hỏa trong 15 giây.',
   'entities.abilities.immolate.name': 'Khế Ước Rực Cháy',
   'entities.abilities.insect_swarm.description':
     'Kẻ địch bị bầy côn trùng bủa vây, nhận {damage} sát thương Tự Nhiên trong 12 giây.',
@@ -10586,8 +10586,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Đặt sẵn một cú vung nặng tay tiêu nộ khí vào đòn đánh kế tiếp của bạn.',
   'guide.abilityHook.holy_light':
     'Một đòn trị liệu vững chãi, đáng kể để hồi đầy cho đồng đội hoặc bản thân.',
-  'guide.abilityHook.immolate':
-    'Thiêu cháy mục tiêu cho một đòn mở màn và một vệt cháy âm ỉ kéo dài.',
+  'guide.abilityHook.immolate': 'Thiêu cháy mục tiêu bằng một vệt cháy âm ỉ kéo dài.',
   'guide.abilityHook.judgement':
     'Tiêu Ấn Chú đang kích hoạt để giáng đòn lên kẻ địch từ cự ly gần.',
   'guide.abilityHook.lesser_heal':

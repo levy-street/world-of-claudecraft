@@ -7945,8 +7945,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ice_barrier.description':
     'Beskytter dig med is og opsuger {damage} skade i 60 sek.',
   'entities.abilities.ice_barrier.name': 'Frostslør',
-  'entities.abilities.immolate.description':
-    'Brænder fjenden for {damage} Ildskade og yderligere {overTime} over 15 sek.',
+  'entities.abilities.immolate.description': 'Brænder fjenden for {damage} Ildskade over 15 sek.',
   'entities.abilities.immolate.name': 'Brændende Pagt',
   'entities.abilities.insect_swarm.description':
     'Fjenden sværmes af insekter og tager {damage} naturskade over 12 sek.',
@@ -9659,8 +9658,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Sætter et tungere sving i kø der bruger raseri på dit næste slag.',
   'guide.abilityHook.holy_light':
     'En stabil, anselig helbredelse til at fylde en allieret eller dig selv op.',
-  'guide.abilityHook.immolate':
-    'Sætter ild til et mål for et indledende slag og en brand der hænger ved.',
+  'guide.abilityHook.immolate': 'Sætter ild til et mål med en brand der hænger ved.',
   'guide.abilityHook.judgement': 'Bruger dit aktive Segl til at ramme en fjende på kort afstand.',
   'guide.abilityHook.lesser_heal':
     'En stabil besværgelse til at fylde en allieret op når der er tid til at stå stille.',

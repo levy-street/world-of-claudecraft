@@ -10165,7 +10165,7 @@ export const cs_CZ: EnTranslations = {
       "shadow_bolt": "Stínová střela seslaná na cíl, tvoje základní ničivé kouzlo.",
       "summon_imp": "Přivolá Žhavorodého, který na nepřátele z dálky sesílá Běsový výstřel.",
       "demon_skin": "Trvalý self-buff, který zpevní kůži a přidá zbroj.",
-      "immolate": "Zapálí cíl úvodním zásahem a přetrvávajícím hořením.",
+      "immolate": "Zapálí cíl hořením, které ho postupně spaluje.",
       "corruption": "Rozloží cíl stínem, který tiká, zatímco děláš jiné věci.",
       "life_tap": "Vymění část tvého zdraví zpět za manu, když vyschneš.",
       "wrath": "Přírodní střela hozená na cíl z dálky, tvoje základní ničivé kouzlo.",
@@ -18265,7 +18265,7 @@ export const cs_CZ: EnTranslations = {
       },
       "immolate": {
         "name": "Hořící pakt",
-        "description": "Spálí nepřítele za {damage} ohnivého poškození a dalších {overTime} během 15 s."
+        "description": "Spálí nepřítele za {damage} ohnivého poškození během 15 s."
       },
       "corruption": {
         "name": "Černá hniloba",

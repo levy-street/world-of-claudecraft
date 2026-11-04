@@ -7660,8 +7660,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.demon_skin.description':
     '惡魔皮膚使你的護甲提高 {buff}，持續 30 分鐘。契約深化可使邪魔之皮生效期間的這部分護甲翻倍，並降低受到的魔法傷害。',
   'entities.abilities.immolate.name': '燃燒契約',
-  'entities.abilities.immolate.description':
-    '灼燒敵人，造成 {damage} 點火焰傷害，並在 15 秒內額外造成 {overTime}。',
+  'entities.abilities.immolate.description': '灼燒敵人，在 15 秒內造成 {damage} 點火焰傷害。',
   'entities.abilities.corruption.name': '黑腐術',
   'entities.abilities.corruption.description': '腐蝕目標，在 18 秒內造成 {damage} 點暗影傷害。',
   'entities.abilities.life_tap.name': '苛刻交易',
@@ -11179,7 +11178,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.healing_wave': '你主要的治療法術，直接為自己或友方回復生命。',
   'guide.abilityHook.heroic_strike': '預備一記更沉重的揮擊，在你的下一擊消耗怒氣。',
   'guide.abilityHook.holy_light': '穩定而可觀的治療，用來把友方或自己補滿。',
-  'guide.abilityHook.immolate': '點燃目標，造成一記前置傷害並留下持續燃燒。',
+  'guide.abilityHook.immolate': '點燃目標，留下持續燃燒。',
   'guide.abilityHook.judgement': '消耗你當前的聖印，從近距離打擊敵人。',
   'guide.abilityHook.lesser_heal': '穩定的施法治療，在有時間站定時補滿友方。',
   'guide.abilityHook.life_tap': '在法力見底時，以部分自身生命換回法力。',

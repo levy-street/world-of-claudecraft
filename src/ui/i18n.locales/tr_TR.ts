@@ -8060,7 +8060,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Seni buzla kalkanlar ve 60 saniye boyunca {damage} hasarı emer.',
   'entities.abilities.ice_barrier.name': 'Buz Örtüsü',
   'entities.abilities.immolate.description':
-    'Düşmanı {damage} Ateş hasarıyla ve ek olarak 15 saniye boyunca {overTime} ile yakar.',
+    'Düşmanı 15 saniye boyunca {damage} Ateş hasarıyla yakar.',
   'entities.abilities.immolate.name': 'Yanan Ahit',
   'entities.abilities.insect_swarm.description':
     'Düşman böceklerce sarılır ve 12 saniye boyunca {damage} Doğa hasarı alır.',
@@ -10475,8 +10475,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Bir sonraki vuruşunda öfke harcayan daha ağır bir savruş sıraya koyar.',
   'guide.abilityHook.holy_light':
     'Bir dostu ya da kendini tam doldurmak için istikrarlı, hatırı sayılır bir iyileştirme.',
-  'guide.abilityHook.immolate':
-    'Bir hedefi tutuşturur; açılış darbesi ve sonra süren bir yanış verir.',
+  'guide.abilityHook.immolate': 'Bir hedefi tutuşturur ve süren bir yanış bırakır.',
   'guide.abilityHook.judgement': 'Aktif Mührünü harcayarak kısa menzilden bir düşmana vurur.',
   'guide.abilityHook.lesser_heal':
     'Sabit durmaya vakit olduğunda bir dostu doldurmak için istikrarlı bir okuma.',

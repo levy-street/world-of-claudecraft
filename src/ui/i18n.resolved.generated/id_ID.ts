@@ -10165,7 +10165,7 @@ export const id_ID: EnTranslations = {
       "shadow_bolt": "Anak panah bayangan yang kamu rapalkan ke sasaran, serangan andalanmu.",
       "summon_imp": "Memanggil Emberkin yang merapal Baut Fel ke musuh dari kejauhan.",
       "demon_skin": "Penguat-diri tahan lama yang mengeraskan kulitmu dan menambah zirah.",
-      "immolate": "Membakar sasaran untuk hantaman pembuka dan kobaran yang terus membara.",
+      "immolate": "Membakar sasaran dengan kobaran yang terus membara.",
       "corruption": "Membusukkan sasaran dengan bayangan yang menggerogoti sementara kamu melakukan hal lain.",
       "life_tap": "Menukar sebagian nyawamu sendiri kembali menjadi mana saat kamu kehabisan.",
       "wrath": "Anak panah alam yang dilontarkan ke sasaran dari kejauhan, serangan andalanmu.",
@@ -18265,7 +18265,7 @@ export const id_ID: EnTranslations = {
       },
       "immolate": {
         "name": "Pakta Membara",
-        "description": "Membakar musuh sebesar {damage} kerusakan Api dan tambahan {overTime} selama 15 detik."
+        "description": "Membakar musuh sebesar {damage} kerusakan Api selama 15 detik."
       },
       "corruption": {
         "name": "Busuk Hitam",

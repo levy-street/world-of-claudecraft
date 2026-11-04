@@ -6244,7 +6244,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '악마의 피부가 30분 동안 방어도를 {buff}만큼 증가시킵니다. 계약 심화를 배우면 마귀 가죽이 활성화된 동안 이 방어도가 두 배가 되고 받는 마법 피해가 감소합니다.',
   'entities.abilities.immolate.name': '불타는 계약',
   'entities.abilities.immolate.description':
-    '적을 불태워 {damage}의 화염 피해를 입히고 15초에 걸쳐 추가로 {overTime}의 피해를 입힙니다.',
+    '적을 불태워 15초에 걸쳐 {damage}의 화염 피해를 입힙니다.',
   'entities.abilities.corruption.name': '검은 부패',
   'entities.abilities.corruption.description':
     '대상을 부패시켜 18초에 걸쳐 {damage}의 암흑 피해를 입힙니다.',
@@ -9906,7 +9906,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.healing_wave': '주력 치유로, 자신이나 아군의 체력을 직접 회복시킵니다.',
   'guide.abilityHook.heroic_strike': '다음 타격에 분노를 소모해 더 강하게 휘두르도록 예약합니다.',
   'guide.abilityHook.holy_light': '아군이나 자신의 체력을 채워 주는 안정적이고 큰 치유입니다.',
-  'guide.abilityHook.immolate': '대상에 불을 붙여 첫 타격을 입히고 지속되는 화염 피해를 남깁니다.',
+  'guide.abilityHook.immolate': '대상에 불을 붙여 지속되는 화염 피해를 남깁니다.',
   'guide.abilityHook.judgement': '현재 활성화된 인장을 소모해 근거리에서 적을 강타합니다.',
   'guide.abilityHook.lesser_heal':
     '가만히 서 있을 여유가 있을 때 아군의 체력을 채우는 안정적인 치유입니다.',

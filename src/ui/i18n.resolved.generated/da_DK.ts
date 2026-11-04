@@ -10165,7 +10165,7 @@ export const da_DK: EnTranslations = {
       "shadow_bolt": "Et lyn af skygge du kaster mod et mål, din foretrukne bombe.",
       "summon_imp": "Kalder en Emberkin frem, der kaster Dæmonlyn mod fjender på afstand.",
       "demon_skin": "En vedvarende selvforstærkning der hærder din hud og tilføjer rustning.",
-      "immolate": "Sætter ild til et mål for et indledende slag og en brand der hænger ved.",
+      "immolate": "Sætter ild til et mål med en brand der hænger ved.",
       "corruption": "Forrådner et mål med skygge der tikker mens du gør andre ting.",
       "life_tap": "Bytter noget af dit eget helbred tilbage til mana når du løber tør.",
       "wrath": "Et naturlyn kastet mod et mål på afstand, din foretrukne bombe.",
@@ -18265,7 +18265,7 @@ export const da_DK: EnTranslations = {
       },
       "immolate": {
         "name": "Brændende Pagt",
-        "description": "Brænder fjenden for {damage} Ildskade og yderligere {overTime} over 15 sek."
+        "description": "Brænder fjenden for {damage} Ildskade over 15 sek."
       },
       "corruption": {
         "name": "Sortråd",

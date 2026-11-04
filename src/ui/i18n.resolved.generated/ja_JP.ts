@@ -10165,7 +10165,7 @@ export const ja_JP: EnTranslations = {
       "shadow_bolt": "標的に放つシャドウのボルト。主力の火力です。",
       "summon_imp": "エンバーキンを呼び出し、遠くから敵へフェルボルトを放たせます。",
       "demon_skin": "肌を硬化させてアーマーを上げる、持続する自己強化です。",
-      "immolate": "標的に火を放ち、初撃を与えつつ燃焼を残します。",
+      "immolate": "標的に火を放ち、燃え続ける炎を残します。",
       "corruption": "標的をシャドウで蝕み、他の行動をしている間も継続して効果が続きます。",
       "life_tap": "マナが尽きたとき、自分の体力を一部マナに変換します。",
       "wrath": "遠距離から標的に放つネイチャーのボルト。主力の火力です。",
@@ -18265,7 +18265,7 @@ export const ja_JP: EnTranslations = {
       },
       "immolate": {
         "name": "灼熱の契約",
-        "description": "敵を燃やして{damage}の火炎ダメージを与え、15秒間で追加の{overTime}を与えます。"
+        "description": "敵を燃やし、15秒かけて{damage}の火炎ダメージを与えます。"
       },
       "corruption": {
         "name": "黒腐れ",

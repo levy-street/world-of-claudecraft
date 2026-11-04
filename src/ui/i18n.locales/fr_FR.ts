@@ -10220,7 +10220,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Une peau démoniaque augmente votre armure de {buff} pendant 30 min. Pact Deepened peut doubler cette armure et réduire les dégâts magiques subis tant que Peau de démon est active.',
   'entities.abilities.immolate.name': 'Pacte brûlant',
   'entities.abilities.immolate.description':
-    "Brûle l'ennemi pour {damage} points de dégâts de Feu et {overTime} points supplémentaires en 15 s.",
+    "Brûle l'ennemi pour {damage} points de dégâts de Feu en 15 s.",
   'entities.abilities.corruption.name': 'Pourriture noire',
   'entities.abilities.corruption.description':
     "Corrompt la cible et inflige {damage} points de dégâts d'Ombre en 18 s.",
@@ -12547,8 +12547,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Prépare un coup plus lourd qui dépense de la rage sur votre prochaine attaque.',
   'guide.abilityHook.holy_light':
     "Un soin régulier et conséquent pour remettre d'aplomb un allié ou vous-même.",
-  'guide.abilityHook.immolate':
-    "Embrase une cible pour un coup d'ouverture et une brûlure qui s'attarde.",
+  'guide.abilityHook.immolate': "Embrase une cible d'une brûlure qui s'attarde.",
   'guide.abilityHook.judgement':
     'Dépense votre Sceau actif pour frapper un ennemi à courte portée.',
   'guide.abilityHook.lesser_heal':

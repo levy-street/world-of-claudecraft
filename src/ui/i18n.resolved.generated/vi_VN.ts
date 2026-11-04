@@ -10165,7 +10165,7 @@ export const vi_VN: EnTranslations = {
       "shadow_bolt": "Một tia bóng tối bạn niệm vào mục tiêu, đòn chủ lực quen thuộc của bạn.",
       "summon_imp": "Gọi lên một Emberkin niệm Tiễn Tro vào kẻ địch từ xa.",
       "demon_skin": "Một buff bản thân lâu dài giúp da bạn cứng cáp hơn và tăng giáp.",
-      "immolate": "Thiêu cháy mục tiêu cho một đòn mở màn và một vệt cháy âm ỉ kéo dài.",
+      "immolate": "Thiêu cháy mục tiêu bằng một vệt cháy âm ỉ kéo dài.",
       "corruption": "Làm mục rữa mục tiêu bằng bóng tối, gây sát thương theo thời gian trong khi bạn làm việc khác.",
       "life_tap": "Đánh đổi một phần máu của chính bạn để lấy lại mana khi cạn kiệt.",
       "wrath": "Một tia tự nhiên ném vào mục tiêu từ xa, đòn chủ lực quen thuộc của bạn.",
@@ -18265,7 +18265,7 @@ export const vi_VN: EnTranslations = {
       },
       "immolate": {
         "name": "Khế Ước Rực Cháy",
-        "description": "Thiêu đốt kẻ địch gây {damage} sát thương Hỏa cùng thêm {overTime} trong 15 giây."
+        "description": "Thiêu đốt kẻ địch gây {damage} sát thương Hỏa trong 15 giây."
       },
       "corruption": {
         "name": "Hắc Hủ",

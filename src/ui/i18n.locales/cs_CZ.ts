@@ -10531,7 +10531,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Obalí tě ledovým štítem, který pohltí {damage} poškození na 60 s.',
   'entities.abilities.ice_barrier.name': 'Mrazivý závoj',
   'entities.abilities.immolate.description':
-    'Spálí nepřítele za {damage} ohnivého poškození a dalších {overTime} během 15 s.',
+    'Spálí nepřítele za {damage} ohnivého poškození během 15 s.',
   'entities.abilities.immolate.name': 'Hořící pakt',
   'entities.abilities.insect_swarm.description':
     'Nepřítele obklopí roj hmyzu a způsobí {damage} přírodního poškození během 12 s.',
@@ -12646,7 +12646,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.summon_imp':
     'Přivolá Žhavorodého, který na nepřátele z dálky sesílá Běsový výstřel.',
   'guide.abilityHook.demon_skin': 'Trvalý self-buff, který zpevní kůži a přidá zbroj.',
-  'guide.abilityHook.immolate': 'Zapálí cíl úvodním zásahem a přetrvávajícím hořením.',
+  'guide.abilityHook.immolate': 'Zapálí cíl hořením, které ho postupně spaluje.',
   'guide.abilityHook.corruption': 'Rozloží cíl stínem, který tiká, zatímco děláš jiné věci.',
   'guide.abilityHook.life_tap': 'Vymění část tvého zdraví zpět za manu, když vyschneš.',
   'guide.abilityHook.wrath': 'Přírodní střela hozená na cíl z dálky, tvoje základní ničivé kouzlo.',

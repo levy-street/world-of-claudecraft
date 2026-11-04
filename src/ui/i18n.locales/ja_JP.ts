@@ -6293,7 +6293,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '悪魔の皮膚により、30分間アーマーが{buff}増加します。契約の深化を習得すると、魔物の肌が有効な間このアーマーが2倍になり、受ける魔法ダメージも軽減されます。',
   'entities.abilities.immolate.name': '灼熱の契約',
   'entities.abilities.immolate.description':
-    '敵を燃やして{damage}の火炎ダメージを与え、15秒間で追加の{overTime}を与えます。',
+    '敵を燃やし、15秒かけて{damage}の火炎ダメージを与えます。',
   'entities.abilities.corruption.name': '黒腐れ',
   'entities.abilities.corruption.description':
     '対象を堕落させ、18秒間で {damage} の暗黒ダメージを与えます。',
@@ -9944,7 +9944,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.healing_wave': '主力のヒール。自分や味方を直接回復します。',
   'guide.abilityHook.heroic_strike': '次の一撃にレイジを乗せ、より重い攻撃を予約します。',
   'guide.abilityHook.holy_light': '味方や自分の体力を満タンに戻す、安定した大きめのヒールです。',
-  'guide.abilityHook.immolate': '標的に火を放ち、初撃を与えつつ燃焼を残します。',
+  'guide.abilityHook.immolate': '標的に火を放ち、燃え続ける炎を残します。',
   'guide.abilityHook.judgement': '現在のシールを消費し、近距離から敵を打ち据えます。',
   'guide.abilityHook.lesser_heal':
     '立ち止まる余裕があるときに味方の体力を満タンに戻す、安定した詠唱です。',

@@ -10165,7 +10165,7 @@ export const pl_PL: EnTranslations = {
       "shadow_bolt": "Pocisk cienia rzucany w cel, twój podstawowy atak.",
       "summon_imp": "Przyzywa Emberkina, który z dystansu rzuca w przeciwników Plugawym pociskiem.",
       "demon_skin": "Trwałe wzmocnienie, które utwardza skórę i zwiększa pancerz.",
-      "immolate": "Podpala cel, zadając początkowy cios i pozostawiając utrzymujące się płomienie.",
+      "immolate": "Podpala cel, pozostawiając utrzymujące się płomienie.",
       "corruption": "Skaża cel cieniem, który zadaje obrażenia, gdy zajmujesz się czymś innym.",
       "life_tap": "Zamienia część własnego zdrowia z powrotem na manę, gdy ci jej zabraknie.",
       "wrath": "Pocisk natury ciskany w cel z dystansu, twój podstawowy atak.",
@@ -18265,7 +18265,7 @@ export const pl_PL: EnTranslations = {
       },
       "immolate": {
         "name": "Płonący pakt",
-        "description": "Pali wroga, zadając {damage} obrażeń od ognia oraz dodatkowe {overTime} w ciągu 15 sek."
+        "description": "Pali wroga, zadając {damage} obrażeń od ognia w ciągu 15 sek."
       },
       "corruption": {
         "name": "Czarna zgnilizna",

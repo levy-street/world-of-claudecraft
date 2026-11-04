@@ -10165,7 +10165,7 @@ export const ko_KR: EnTranslations = {
       "shadow_bolt": "대상에게 시전하는 어둠의 화살로, 주력 공격기입니다.",
       "summon_imp": "불씨족을 불러내어 먼 거리에서 적에게 지옥불 화살을 날리게 합니다.",
       "demon_skin": "피부를 단단하게 만들어 방어도를 높여 주는 지속형 자기 강화입니다.",
-      "immolate": "대상에 불을 붙여 첫 타격을 입히고 지속되는 화염 피해를 남깁니다.",
+      "immolate": "대상에 불을 붙여 지속되는 화염 피해를 남깁니다.",
       "corruption": "대상을 어둠으로 부식시켜, 다른 일을 하는 동안에도 피해가 들어갑니다.",
       "life_tap": "마나가 바닥날 때 자신의 생명력 일부를 마나로 전환합니다.",
       "wrath": "원거리에서 대상에게 던지는 자연 화살로, 주력 공격기입니다.",
@@ -18265,7 +18265,7 @@ export const ko_KR: EnTranslations = {
       },
       "immolate": {
         "name": "불타는 계약",
-        "description": "적을 불태워 {damage}의 화염 피해를 입히고 15초에 걸쳐 추가로 {overTime}의 피해를 입힙니다."
+        "description": "적을 불태워 15초에 걸쳐 {damage}의 화염 피해를 입힙니다."
       },
       "corruption": {
         "name": "검은 부패",

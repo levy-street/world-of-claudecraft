@@ -10165,7 +10165,7 @@ export const it_IT: EnTranslations = {
       "shadow_bolt": "Un dardo d'ombra che lanci su un bersaglio, il tuo colpo di riferimento.",
       "summon_imp": "Chiama un Emberkin che lancia Dardo di Cenere sui nemici dalla distanza.",
       "demon_skin": "Un potenziamento personale duraturo che irrobustisce la pelle e aggiunge corazza.",
-      "immolate": "Incendia un bersaglio per un colpo iniziale e un'ustione che perdura.",
+      "immolate": "Incendia un bersaglio con un'ustione che perdura.",
       "corruption": "Marcisce il bersaglio con l'ombra, che continua a pulsare mentre fai altro.",
       "life_tap": "Converte parte della tua salute in mana quando resti a secco.",
       "wrath": "Un dardo di natura scagliato su un bersaglio dalla distanza, il tuo colpo di riferimento.",
@@ -18265,7 +18265,7 @@ export const it_IT: EnTranslations = {
       },
       "immolate": {
         "name": "Patto Ardente",
-        "description": "Brucia il nemico per {damage} danni da Fuoco e altri {overTime} in 15 sec."
+        "description": "Brucia il nemico per {damage} danni da Fuoco in 15 sec."
       },
       "corruption": {
         "name": "Marciume Nero",

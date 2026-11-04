@@ -10165,7 +10165,7 @@ export const nl_NL: EnTranslations = {
       "shadow_bolt": "Een bout van schaduw die je op een doelwit afvuurt, je vertrouwde nuke.",
       "summon_imp": "Roept een Emberkin op die Felbolt op vijanden werpt vanaf een afstand.",
       "demon_skin": "Een blijvende zelfbuff die je huid verhardt en pantser toevoegt.",
-      "immolate": "Steekt een doelwit in brand voor een openingsklap en een brand die blijft hangen.",
+      "immolate": "Steekt een doelwit in brand met een brand die blijft hangen.",
       "corruption": "Laat een doelwit wegrotten met schaduw die tikt terwijl jij andere dingen doet.",
       "life_tap": "Ruilt een deel van je eigen gezondheid terug om in mana wanneer je droog komt te staan.",
       "wrath": "Een natuurbout die van afstand op een doelwit wordt geworpen, je vertrouwde nuke.",
@@ -18265,7 +18265,7 @@ export const nl_NL: EnTranslations = {
       },
       "immolate": {
         "name": "Brandpact",
-        "description": "Verbrandt de vijand voor {damage} Vuurschade en nog eens {overTime} gedurende 15 sec."
+        "description": "Verbrandt de vijand voor {damage} Vuurschade gedurende 15 sec."
       },
       "corruption": {
         "name": "Zwartrot",

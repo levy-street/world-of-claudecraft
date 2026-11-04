@@ -10165,7 +10165,7 @@ export const fr_FR: EnTranslations = {
       "shadow_bolt": "Un trait d'ombre que vous lancez sur une cible, votre frappe de prédilection.",
       "summon_imp": "Appelle un Emberkin qui lance Éclair fel sur les ennemis à distance.",
       "demon_skin": "Une amélioration personnelle durable qui durcit votre peau et ajoute de l'armure.",
-      "immolate": "Embrase une cible pour un coup d'ouverture et une brûlure qui s'attarde.",
+      "immolate": "Embrase une cible d'une brûlure qui s'attarde.",
       "corruption": "Ronge une cible d'ombre dont les dégâts s'égrènent pendant que vous faites autre chose.",
       "life_tap": "Échange une part de votre propre vie contre du mana quand vous êtes à sec.",
       "wrath": "Un trait de nature lancé sur une cible à distance, votre frappe de prédilection.",
@@ -18265,7 +18265,7 @@ export const fr_FR: EnTranslations = {
       },
       "immolate": {
         "name": "Pacte brûlant",
-        "description": "Brûle l'ennemi pour {damage} points de dégâts de Feu et {overTime} points supplémentaires en 15 s."
+        "description": "Brûle l'ennemi pour {damage} points de dégâts de Feu en 15 s."
       },
       "corruption": {
         "name": "Pourriture noire",

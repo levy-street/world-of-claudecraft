@@ -8116,7 +8116,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Демоническая кожа повышает вашу броню на {buff} на 30 мин. Pact Deepened может удвоить эту броню и снизить получаемый магический урон, пока активна Шкура беса.',
   'entities.abilities.immolate.name': 'Пылающий договор',
   'entities.abilities.immolate.description':
-    'Сжигает врага, нанося {damage} ед. урона от огня и еще {overTime} за 15 сек.',
+    'Сжигает врага, нанося {damage} ед. урона от огня за 15 сек.',
   'entities.abilities.corruption.name': 'Чёрная гниль',
   'entities.abilities.corruption.description':
     'Поражает цель порчей, нанося {damage} ед. урона от темной магии за 18 сек.',
@@ -11883,7 +11883,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Готовит более тяжелый замах, который потратит ярость на следующем ударе.',
   'guide.abilityHook.holy_light': 'Ровное, ощутимое лечение, чтобы долечить союзника или себя.',
   'guide.abilityHook.immolate':
-    'Поджигает цель: наносит урон при наложении и оставляет затяжной ожог.',
+    'Поджигает цель, оставляя затяжной ожог.',
   'guide.abilityHook.judgement':
     'Тратит вашу активную печать, чтобы ударить врага с короткой дистанции.',
   'guide.abilityHook.lesser_heal':

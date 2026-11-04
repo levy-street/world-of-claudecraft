@@ -8152,7 +8152,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Melindungimu dengan es, menyerap {damage} kerusakan selama 60 detik.',
   'entities.abilities.ice_barrier.name': 'Selubung Beku',
   'entities.abilities.immolate.description':
-    'Membakar musuh sebesar {damage} kerusakan Api dan tambahan {overTime} selama 15 detik.',
+    'Membakar musuh sebesar {damage} kerusakan Api selama 15 detik.',
   'entities.abilities.immolate.name': 'Pakta Membara',
   'entities.abilities.insect_swarm.description':
     'Musuh dikerumuni serangga, menerima {damage} kerusakan Alam selama 12 detik.',
@@ -10609,8 +10609,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Mengantrekan ayunan lebih berat yang menghabiskan amarah pada pukulanmu berikutnya.',
   'guide.abilityHook.holy_light':
     'Penyembuhan mantap berukuran besar untuk memenuhi nyawa sekutu atau dirimu sendiri.',
-  'guide.abilityHook.immolate':
-    'Membakar sasaran untuk hantaman pembuka dan kobaran yang terus membara.',
+  'guide.abilityHook.immolate': 'Membakar sasaran dengan kobaran yang terus membara.',
   'guide.abilityHook.judgement':
     'Menghabiskan Segel aktifmu untuk menghantam musuh dari jarak dekat.',
   'guide.abilityHook.lesser_heal':

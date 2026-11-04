@@ -10165,7 +10165,7 @@ export const zh_CN: EnTranslations = {
       "shadow_bolt": "向目标施放一道暗影箭，是你的常用输出。",
       "summon_imp": "召来一只烬裔，从远处向敌人施放邪能箭。",
       "demon_skin": "持续的自我增益，强化皮肤并提升护甲。",
-      "immolate": "点燃目标，打出一记起手伤害并留下持续燃烧。",
+      "immolate": "点燃目标，留下持续燃烧。",
       "corruption": "用暗影腐蚀目标，在你做别的事时持续造成伤害。",
       "life_tap": "在法力枯竭时，将部分自身生命值转化为法力。",
       "wrath": "从远处向目标投出一道自然箭矢，是你的常用输出。",
@@ -18265,7 +18265,7 @@ export const zh_CN: EnTranslations = {
       },
       "immolate": {
         "name": "燃烧契约",
-        "description": "灼烧敌人，造成 {damage} 点火焰伤害，并在 15 秒内额外造成 {overTime}。"
+        "description": "灼烧敌人，在 15 秒内造成 {damage} 点火焰伤害。"
       },
       "corruption": {
         "name": "黑腐术",

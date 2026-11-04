@@ -8172,7 +8172,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Osłania cię lodem, pochłaniając {damage} obrażeń przez 60 sek.',
   'entities.abilities.ice_barrier.name': 'Lodowa zasłona',
   'entities.abilities.immolate.description':
-    'Pali wroga, zadając {damage} obrażeń od ognia oraz dodatkowe {overTime} w ciągu 15 sek.',
+    'Pali wroga, zadając {damage} obrażeń od ognia w ciągu 15 sek.',
   'entities.abilities.immolate.name': 'Płonący pakt',
   'entities.abilities.insect_swarm.description':
     'Wroga oblepia rój owadów, zadając {damage} obrażeń od natury w ciągu 12 sek.',
@@ -9955,8 +9955,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Kolejkuje cięższy zamach, który zużywa wściekłość przy następnym ciosie.',
   'guide.abilityHook.holy_light':
     'Stabilne, pokaźne leczenie do uzupełnienia zdrowia sojusznika lub własnego.',
-  'guide.abilityHook.immolate':
-    'Podpala cel, zadając początkowy cios i pozostawiając utrzymujące się płomienie.',
+  'guide.abilityHook.immolate': 'Podpala cel, pozostawiając utrzymujące się płomienie.',
   'guide.abilityHook.judgement':
     'Zużywa twoją aktywną pieczęć, by uderzyć wroga z bliskiego dystansu.',
   'guide.abilityHook.lesser_heal':

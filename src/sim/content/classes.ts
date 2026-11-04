@@ -5666,36 +5666,30 @@ export const ABILITIES: Record<string, AbilityDef> = {
     specs: ['destruction'],
     learnLevel: 5,
     cost: 25,
-    castTime: 2.0,
+    // Instant, with no opening hit: the old hit is folded into the burn
+    // (31+56, 62+98, 70+100). As a pure DoT it now scales through
+    // dotTickBonus (duration / 15), the same rule as Blackrot.
+    castTime: 0,
     cooldown: 0,
     range: 30,
     school: 'fire',
     requiresTarget: true,
-    effects: [
-      { type: 'directDamage', min: 31, max: 31 },
-      { type: 'dot', total: 56, duration: 15, interval: 3 },
-    ],
+    effects: [{ type: 'dot', total: 87, duration: 15, interval: 3 }],
     ranks: [
       {
         rank: 2,
         level: 10,
         cost: 40,
-        effects: [
-          { type: 'directDamage', min: 62, max: 62 },
-          { type: 'dot', total: 98, duration: 15, interval: 3 },
-        ],
+        effects: [{ type: 'dot', total: 160, duration: 15, interval: 3 }],
       },
       {
         rank: 3,
         level: 16,
         cost: 60,
-        effects: [
-          { type: 'directDamage', min: 70, max: 70 },
-          { type: 'dot', total: 100, duration: 15, interval: 3 },
-        ],
+        effects: [{ type: 'dot', total: 170, duration: 15, interval: 3 }],
       },
     ],
-    description: 'Burns the enemy for $d Fire damage and an additional $o over 15 sec.',
+    description: 'Burns the enemy for $d Fire damage over 15 sec.',
   },
   corruption: {
     id: 'corruption',

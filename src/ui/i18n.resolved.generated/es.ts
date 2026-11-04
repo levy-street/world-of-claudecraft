@@ -10165,7 +10165,7 @@ export const es: EnTranslations = {
       "shadow_bolt": "Una descarga de sombra que lanzas contra un objetivo, tu hechizo de ataque habitual.",
       "summon_imp": "Invoca a un Emberkin que lanza Descarga Vil contra los enemigos desde la distancia.",
       "demon_skin": "Una mejora propia y duradera que endurece tu piel y añade armadura.",
-      "immolate": "Prende fuego a un objetivo con un golpe inicial y una quemadura que perdura.",
+      "immolate": "Prende fuego a un objetivo con una quemadura que perdura.",
       "corruption": "Pudre al objetivo con sombra que va dañando mientras haces otras cosas.",
       "life_tap": "Convierte parte de tu propia salud en maná cuando te quedas sin él.",
       "wrath": "Una descarga de naturaleza lanzada a un objetivo a distancia, tu hechizo de ataque habitual.",
@@ -18265,7 +18265,7 @@ export const es: EnTranslations = {
       },
       "immolate": {
         "name": "Pacto Ardiente",
-        "description": "Quema al enemigo por {damage} de daño de Fuego y {overTime} adicionales durante 15 s."
+        "description": "Quema al enemigo por {damage} de daño de Fuego durante 15 s."
       },
       "corruption": {
         "name": "Putrefacción Negra",

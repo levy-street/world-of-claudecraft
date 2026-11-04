@@ -7964,8 +7964,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ice_barrier.description':
     'Skyddar dig i is och absorberar {damage} skada i 60 sek.',
   'entities.abilities.ice_barrier.name': 'Frostslöja',
-  'entities.abilities.immolate.description':
-    'Bränner fienden för {damage} eldskada och ytterligare {overTime} över 15 sek.',
+  'entities.abilities.immolate.description': 'Bränner fienden för {damage} eldskada över 15 sek.',
   'entities.abilities.immolate.name': 'Brinnande pakt',
   'entities.abilities.insect_swarm.description':
     'Fienden svärmas av insekter och tar {damage} naturskada över 12 sek.',
@@ -9791,8 +9790,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Köar ett tyngre svingslag som förbrukar raseri på ditt nästa slag.',
   'guide.abilityHook.holy_light':
     'En stadig, rejäl läkning för att toppa upp en allierad eller dig själv.',
-  'guide.abilityHook.immolate':
-    'Sätter ett mål i brand för ett inledande slag och en brand som dröjer kvar.',
+  'guide.abilityHook.immolate': 'Sätter ett mål i brand med en brand som dröjer kvar.',
   'guide.abilityHook.judgement':
     'Förbrukar ditt aktiva sigill för att slå en fiende från kort avstånd.',
   'guide.abilityHook.lesser_heal':

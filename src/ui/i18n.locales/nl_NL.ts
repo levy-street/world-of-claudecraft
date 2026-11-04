@@ -8248,7 +8248,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Schermt je af met ijs en absorbeert {damage} schade gedurende 60 sec.',
   'entities.abilities.ice_barrier.name': 'Vorstsluier',
   'entities.abilities.immolate.description':
-    'Verbrandt de vijand voor {damage} Vuurschade en nog eens {overTime} gedurende 15 sec.',
+    'Verbrandt de vijand voor {damage} Vuurschade gedurende 15 sec.',
   'entities.abilities.immolate.name': 'Brandpact',
   'entities.abilities.insect_swarm.description':
     'De vijand wordt belaagd door insecten en lijdt {damage} Natuurschade gedurende 12 sec.',
@@ -9941,8 +9941,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Zet een zwaardere uithaal in de wachtrij die rage besteedt bij je volgende klap.',
   'guide.abilityHook.holy_light':
     'Een gestage, flinke genezing om een bondgenoot of jezelf aan te vullen.',
-  'guide.abilityHook.immolate':
-    'Steekt een doelwit in brand voor een openingsklap en een brand die blijft hangen.',
+  'guide.abilityHook.immolate': 'Steekt een doelwit in brand met een brand die blijft hangen.',
   'guide.abilityHook.judgement':
     'Besteedt je actieve Zegel om een vijand van korte afstand te raken.',
   'guide.abilityHook.lesser_heal':

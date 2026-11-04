@@ -1094,11 +1094,7 @@ const classAbilityNamesEn = {
         'Fiendhide',
         'Demonic skin increases your armor by {buff} for 30 min. Pact Deepened can double this armor and reduce magic damage taken while Fiendhide is active.',
       ],
-      [
-        'immolate',
-        'Burning Pact',
-        'Burns the enemy for {damage} Fire damage and an additional {overTime} over 15 sec.',
-      ],
+      ['immolate', 'Burning Pact', 'Burns the enemy for {damage} Fire damage over 15 sec.'],
       [
         'corruption',
         'Blackrot',

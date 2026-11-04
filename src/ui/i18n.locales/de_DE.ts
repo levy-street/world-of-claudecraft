@@ -9680,7 +9680,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Dämonische Haut erhöht eure Rüstung 30 Min. lang um {buff}. Pact Deepened kann diese Rüstung verdoppeln und erlittenen magischen Schaden verringern, solange Dämonenhaut aktiv ist.',
   'entities.abilities.immolate.name': 'Brennender Pakt',
   'entities.abilities.immolate.description':
-    'Verbrennt den Gegner für {damage} Feuerschaden und zusätzlich {overTime} über 15 Sek.',
+    'Verbrennt den Gegner für {damage} Feuerschaden über 15 Sek.',
   'entities.abilities.corruption.name': 'Schwarzfäule',
   'entities.abilities.corruption.description':
     'Verderbt das Ziel und verursacht über 18 Sek. {damage} Schattenschaden.',
@@ -11834,8 +11834,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Reiht einen schwereren Schwung ein, der bei deinem nächsten Treffer Wut verbraucht.',
   'guide.abilityHook.holy_light':
     'Eine stetige, ansehnliche Heilung, um einen Verbündeten oder dich selbst aufzufüllen.',
-  'guide.abilityHook.immolate':
-    'Setzt ein Ziel in Brand für einen Eröffnungstreffer und einen anhaltenden Brand.',
+  'guide.abilityHook.immolate': 'Setzt ein Ziel in einen anhaltenden Brand.',
   'guide.abilityHook.judgement':
     'Verbraucht dein aktives Siegel, um einen Gegner aus kurzer Distanz zu treffen.',
   'guide.abilityHook.lesser_heal':

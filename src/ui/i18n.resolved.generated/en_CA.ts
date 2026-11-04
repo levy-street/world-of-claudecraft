@@ -10165,7 +10165,7 @@ export const en_CA: EnTranslations = {
       "shadow_bolt": "A bolt of shadow you cast at a target, your go-to nuke.",
       "summon_imp": "Calls up an Emberkin that casts Felbolt at enemies from range.",
       "demon_skin": "A lasting self-buff that toughens your skin and adds armor.",
-      "immolate": "Sets a target alight for an opening hit and a burn that lingers.",
+      "immolate": "Sets a target alight with a burn that lingers.",
       "corruption": "Rots a target with shadow that ticks while you do other things.",
       "life_tap": "Trades some of your own health back into mana when you run dry.",
       "wrath": "A nature bolt thrown at a target from range, your go-to nuke.",
@@ -18265,7 +18265,7 @@ export const en_CA: EnTranslations = {
       },
       "immolate": {
         "name": "Burning Pact",
-        "description": "Burns the enemy for {damage} Fire damage and an additional {overTime} over 15 sec."
+        "description": "Burns the enemy for {damage} Fire damage over 15 sec."
       },
       "corruption": {
         "name": "Blackrot",

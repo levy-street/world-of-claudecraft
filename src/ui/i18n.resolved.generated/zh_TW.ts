@@ -10165,7 +10165,7 @@ export const zh_TW: EnTranslations = {
       "shadow_bolt": "向目標施放一道暗影箭，是你慣用的核彈。",
       "summon_imp": "召來一隻燼裔，從遠處向敵人施放邪能箭。",
       "demon_skin": "持續的自我增益，強化皮膚並增加護甲。",
-      "immolate": "點燃目標，造成一記前置傷害並留下持續燃燒。",
+      "immolate": "點燃目標，留下持續燃燒。",
       "corruption": "以暗影腐蝕目標，在你做其他事時持續造成傷害。",
       "life_tap": "在法力見底時，以部分自身生命換回法力。",
       "wrath": "從遠處朝目標擲出一道自然箭矢，是你慣用的核彈。",
@@ -18265,7 +18265,7 @@ export const zh_TW: EnTranslations = {
       },
       "immolate": {
         "name": "燃燒契約",
-        "description": "灼燒敵人，造成 {damage} 點火焰傷害，並在 15 秒內額外造成 {overTime}。"
+        "description": "灼燒敵人，在 15 秒內造成 {damage} 點火焰傷害。"
       },
       "corruption": {
         "name": "黑腐術",
