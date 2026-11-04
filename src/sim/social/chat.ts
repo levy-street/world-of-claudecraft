@@ -21,6 +21,7 @@ import { CLASSES, zoneAt } from '../data';
 import * as deedsMod from '../deeds';
 import { handleDevChat } from '../dev_commands';
 import { graveyardReadout } from '../entity_roster';
+import { gmHiddenFrom } from '../gm_presence';
 import { livePlaytimeSeconds } from '../playtime';
 import { hillReadoutLine, setWorldPvpFlag, toggleWorldPvpFlag } from '../pvp';
 import {
@@ -295,6 +296,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
     const ciMatches: PlayerMeta[] = [];
     const wanted = targetName.toLowerCase();
     for (const meta of ctx.players.values()) {
+      if (hiddenFromLookup(ctx, r.meta, meta)) continue;
       if (meta.name === targetName) {
         target = meta;
         break;
@@ -336,6 +338,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
     const ciMatches: PlayerMeta[] = [];
     const wanted = targetName.toLowerCase();
     for (const meta of ctx.players.values()) {
+      if (hiddenFromLookup(ctx, r.meta, meta)) continue;
       if (meta.name === targetName) {
         target = meta;
         break;
@@ -396,6 +399,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
       const wanted = nameArg.toLowerCase();
       const ci: PlayerMeta[] = [];
       for (const meta of ctx.players.values()) {
+        if (hiddenFromLookup(ctx, r.meta, meta)) continue;
         if (meta.name === nameArg) {
           target = meta;
           break;
@@ -445,6 +449,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
     const assistParty = ctx.partyOf(r.meta.entityId);
     const candidates: AssistCandidate[] = [];
     for (const meta of ctx.players.values()) {
+      if (hiddenFromLookup(ctx, r.meta, meta)) continue;
       const ent = ctx.entities.get(meta.entityId);
       const inParty = assistParty ? assistParty.members.includes(meta.entityId) : false;
       const inRange = ent ? dist2d(r.e.pos, ent.pos) <= ASSIST_RANGE : false;
@@ -715,7 +720,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
   // same longest-online-name resolver.
   const wm = /^\/(?:w|whisper|t|tell)\s+([\s\S]+)$/i.exec(line);
   if (wm) {
-    const resolved = resolveWhisperTarget(ctx, wm[1]);
+    const resolved = resolveWhisperTarget(ctx, wm[1], r.meta);
     if (!resolved) return null;
     if ('error' in resolved) {
       ctx.error(r.meta.entityId, resolved.error);
@@ -980,7 +985,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
       const targetName = emMatch[2];
       let text = def.solo;
       if (targetName && def.target) {
-        const t = findPlayerByName(ctx, targetName);
+        const t = findPlayerByName(ctx, targetName, r.meta);
         if (t) text = def.target.replace('%t', t.name === r.meta.name ? 'themselves' : t.name);
       }
       broadcastEmote(ctx, r.meta, r.e, text);
@@ -1060,11 +1065,13 @@ export { handleDevChat } from '../dev_commands';
 export function resolveWhisperTarget(
   ctx: SimContext,
   rest: string,
+  caller?: PlayerMeta,
 ): { target: PlayerMeta; message: string } | { error: string } | null {
   const trimmed = rest.trim();
   if (!trimmed) return null;
   const matches: { target: PlayerMeta; message: string; exactCase: boolean }[] = [];
   for (const target of ctx.players.values()) {
+    if (hiddenFromLookup(ctx, caller, target, true)) continue;
     const exactMessage = whisperMessageForName(trimmed, target.name, true);
     if (exactMessage !== null) {
       matches.push({ target, message: exactMessage, exactCase: true });
@@ -1086,13 +1093,35 @@ export function resolveWhisperTarget(
   return { error: `There is no player named '${typedName}' online.` };
 }
 
+// /visible off (src/sim/gm_presence.ts): a hidden GM answers no name lookup
+// (/inspect, /invite, /follow, /assist, /w, a targeted emote, a commission)
+// from anyone else, the same "not online" a logged-out player gets. The one
+// way through is a whisper reply: a player the GM whispered can answer them.
+export function hiddenFromLookup(
+  ctx: SimContext,
+  caller: PlayerMeta | undefined,
+  meta: PlayerMeta,
+  reply = false,
+): boolean {
+  if (!caller) return false;
+  const actor = ctx.entities.get(caller.entityId);
+  const target = ctx.entities.get(meta.entityId);
+  if (!actor || !target || !gmHiddenFrom(ctx.entities, actor, target)) return false;
+  return !(reply && caller.lastWhisperFrom === meta.name);
+}
+
 // Resolve a player by name the same way whispers do: an exact-case match
 // wins outright, otherwise a case-insensitive match is used only when it is
-// unambiguous.
-export function findPlayerByName(ctx: SimContext, name: string): PlayerMeta | null {
+// unambiguous. A hidden GM is not found by anyone else (hiddenFromLookup).
+export function findPlayerByName(
+  ctx: SimContext,
+  name: string,
+  caller?: PlayerMeta,
+): PlayerMeta | null {
   const wanted = name.toLowerCase();
   const ci: PlayerMeta[] = [];
   for (const meta of ctx.players.values()) {
+    if (hiddenFromLookup(ctx, caller, meta)) continue;
     if (meta.name === name) return meta;
     if (meta.name.toLowerCase() === wanted) ci.push(meta);
   }

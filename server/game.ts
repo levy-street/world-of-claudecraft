@@ -1979,6 +1979,7 @@ export class GameServer {
   }
 
   private moderationHost(): ModerationHost<ClientSession> {
+    const social = this.social;
     return {
       sessionByName: (name) => this.sessionByName(name),
       notice: (session, text) => this.sendChatNotice(session, text),
@@ -2001,7 +2002,7 @@ export class GameServer {
       jail: (moderator, target, minutes) => this.jailSession(moderator, target, minutes),
       unjail: (moderator, target) => this.unjailSession(moderator, target),
       realmMotd: (actor, command) => this.realmMotd.handle(actor, command),
-      ...gmToolsHost(this.sim, this.clients, (t, c) => this.broadcastSystem(t, c)),
+      ...gmToolsHost(this.sim, this.clients, (t, c) => this.broadcastSystem(t, c), social),
     };
   }
 

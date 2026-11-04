@@ -164,7 +164,7 @@ export function openCommissionOrder(
   let crafterId: number | undefined;
   let resolvedCrafterName: string | undefined;
   if (scope === 'crafter') {
-    const target = crafterName ? findPlayerByName(ctx, crafterName) : null;
+    const target = crafterName ? findPlayerByName(ctx, crafterName, r.meta) : null;
     if (!target) return { ok: false, reason: 'unknown_crafter' };
     if (target.entityId === r.meta.entityId) return { ok: false, reason: 'self_crafter' };
     crafterId = target.entityId;

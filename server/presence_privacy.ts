@@ -28,6 +28,10 @@ import { acquireFlairCommand } from './flair_command_guard';
 //   none      nobody does: you appear offline to every friend and guildmate
 //
 // Per character, persisted in characters.presence_mode (social_db.ts schema).
+//
+// A GM hidden with /visible off (src/sim/gm_presence.ts) reads as 'none' at
+// every one of those points, whatever their own setting: the session carries
+// gmHidden beside presenceMode (server/gm_tools_host.ts sets both halves).
 
 export { PRESENCE_MODES, type PresenceMode };
 
@@ -40,6 +44,8 @@ export interface PresenceSubject {
   presenceMode?: PresenceMode;
   /** The subject's own friends list, for the 'friends' mode. */
   friendIds?: ReadonlySet<number>;
+  /** Staff invisibility (/visible off): offline to everyone but themselves. Never persisted. */
+  gmHidden?: boolean;
 }
 
 /** Keep logout permissions after the shared live-account cache is cleared. */
@@ -58,6 +64,7 @@ export function presenceHiddenFrom(
   viewerAccountId?: number,
 ): boolean {
   if (subject.characterId === viewerCharId) return false;
+  if (subject.gmHidden === true) return true;
   const mode = subject.presenceMode ?? 'everyone';
   if (mode === 'everyone') return false;
   if (mode === 'none') return true;

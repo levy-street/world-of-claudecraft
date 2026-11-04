@@ -55,6 +55,8 @@ export interface WhoVisibilitySession {
   presenceMode?: PresenceMode;
   friendIds?: ReadonlySet<number>;
   friendAccountIds?: ReadonlySet<number>;
+  /** /visible off (server/gm_tools_host.ts): hidden like presence 'none'. */
+  gmHidden?: boolean;
 }
 
 /** May `viewer` see `candidate` in /who? Fail closed while the candidate's block
