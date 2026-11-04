@@ -11,9 +11,10 @@
 //                 more damage taken for 15 s. Heroic's contagious cold
 //                 splashes further and harder.
 //   Bounded       a player takes one splash a tick however many shatter at
-//                 once, and a Frost-Brittle player's splash stops one short
-//                 of full: a chain freezes each player at most once per
-//                 brittle, so a wave of shatters can never lock the raid.
+//                 once (a frozen one takes none), and a splash never takes a
+//                 Frost-Brittle player past 80: one who just shattered has
+//                 seconds alone before a chain can freeze them again, so a
+//                 wave of shatters cannot lock the raid in a burst.
 //   Immunities    never warmth (quench_bite.ts): a body in stasis gives and
 //                 takes no warmth, and the rime cracks a breakable immunity
 //                 as its wearer freezes, stays frozen or shatters.
@@ -41,6 +42,7 @@ import {
   auraOf,
   dropAura,
   frostHit,
+  lakeListeners,
   livePlayers,
   putMarker,
   type QuenchScope,
@@ -144,14 +146,20 @@ export function freezePlayer(s: QuenchScope, p: Entity): void {
 
 /** Add `amount` cold to `p` (a hit's chill, a splash). A full bar freezes
  *  them now (never in the water: one short of full there; nor, with `soft`,
- *  while they are Frost-Brittle). Returns the cold actually added. */
+ *  while they are Frost-Brittle: a splash stops at brittleSplashCap then).
+ *  Returns the cold actually added. */
 export function addCold(s: QuenchScope, p: Entity, amount: number, soft = false): number {
   if (p.dead) return 0;
   const c = chillOf(s, p.id);
   if (c.frozen > 0) return 0;
   const trapped = s.st.trapped[p.id] !== undefined;
-  const held = trapped || (soft && auraOf(p, QUENCH_AURAS.brittle) !== undefined);
-  const cap = held ? T.coldMax - 1 : T.coldMax;
+  const brittleNow = soft && auraOf(p, QUENCH_AURAS.brittle) !== undefined;
+  const held = trapped || brittleNow;
+  const cap = brittleNow
+    ? Math.max(c.cold, T.brittleSplashCap)
+    : trapped
+      ? T.coldMax - 1
+      : T.coldMax;
   const before = c.cold;
   const next = Math.max(before, Math.min(cap, before + amount));
   c.cold = next;
@@ -165,16 +173,20 @@ export function addCold(s: QuenchScope, p: Entity, amount: number, soft = false)
  *  client's shards and the player's own alert read. Returns false when the
  *  tick's one splash had already struck them. */
 function splash(s: QuenchScope, q: Entity, from: Entity): boolean {
+  // The frozen are sealed in their own ice: nothing reaches them.
+  if (isFrozen(s, q.id)) return false;
   const struck = s.splashed ?? new Set<number>();
   s.splashed = struck;
   if (struck.has(q.id)) return false;
   struck.add(q.id);
   const added = addCold(s, q, s.rules.splashCold, true);
-  putMarker(q, QUENCH_AURAS.splashed, QUENCH_NAMES.splashed, T.splashMarkSeconds, s.boss.id, {
-    value: Math.round(added),
-    value2: from.id,
-    school: 'frost',
-  });
+  // Only a splash that moved the bar marks them (no "+0" alert or shard).
+  if (added > 0.5)
+    putMarker(q, QUENCH_AURAS.splashed, QUENCH_NAMES.splashed, T.splashMarkSeconds, s.boss.id, {
+      value: Math.round(added),
+      value2: from.id,
+      school: 'frost',
+    });
   return true;
 }
 
@@ -254,11 +266,19 @@ export function stepCold(s: QuenchScope): void {
     }
     showCold(s, p, c.cold, step < 0 ? -1 : 1);
   }
-  // A player gone from the basin (dead, or away) leaves the fight's marks.
+  // A player gone from the basin leaves the fight's marks: the dead, and
+  // the living gone far from the lake. A living player just off the ice
+  // (a leap, a flight over the floor band) keeps their bar, held where it
+  // stands, so leaving the lake for a moment never resets it.
+  let near: Entity[] | null = null;
   for (const key of Object.keys(st.chill)) {
     const id = Number(key);
     if (s.players.some((p) => p.id === id && !p.dead)) continue;
     const e = s.ctx.entities.get(id);
+    if (e && !e.dead) {
+      near ??= lakeListeners(s.ctx, s.inst);
+      if (near.some((q) => q.id === id)) continue;
+    }
     if (e) clearColdMarks(e);
     delete st.chill[id];
   }

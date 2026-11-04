@@ -251,7 +251,8 @@ void main() {
   float crack = step(1.0 - vP.y * 0.45, cell) * step(0.4, fract(q.y * 2.0 + cell));
   // Clear deep ice, paler at its faces' edges, a rime frost at its foot.
   float rimeFoot = 1.0 - smoothstep(0.0, 0.5, vL.y);
-  vec3 col = mix(uDeep, uIce, 0.2 + 0.6 * fres) + uLight * crack * 1.6;
+  // Deep glacier blue in its heart, pale only at its faces' edges.
+  vec3 col = mix(uDeep * 0.75, uIce, 0.08 + 0.62 * fres) + uLight * crack * 1.6;
   col = mix(col, uIce * 1.1, rimeFoot * 0.5);
   float alpha = clamp(0.42 + fres * 0.5 + crack * 0.4 + rimeFoot * 0.3, 0.0, 0.94);
   gl_FragColor = vec4(col, alpha);

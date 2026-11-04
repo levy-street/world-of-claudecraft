@@ -130,10 +130,10 @@ void main() {
   // A glaze, not a sleeve: almost clear in its middle, rime at its edges,
   // a bright ragged lip, feathered streaks and glints.
   float streak = smoothstep(0.78, 0.98, n(vec2(a * 7.0 + vSeed * 5.0, y * 1.5)));
-  vec3 col = mix(uDeep, uFrost, 0.45 + 0.55 * fres + 0.2 * cell);
-  col = col * (0.75 + 0.35 * vS.y) + uFrost * (lip * 0.9 + glint * 1.1);
-  float alpha = under * (0.02 + 0.3 * fres * fres + 0.16 * feather * fres + 0.22 * streak);
-  alpha += under * (0.6 * lip + 0.55 * glint);
+  vec3 col = mix(uDeep, uFrost, 0.3 + 0.55 * fres + 0.2 * cell);
+  col = col * (0.8 + 0.3 * vS.y) + uFrost * (lip * 0.9 + glint * 1.1);
+  float alpha = under * (0.16 + 0.42 * fres + 0.22 * feather + 0.25 * streak);
+  alpha += under * (0.7 * lip + 0.6 * glint);
   // The bite: jagged veins racing up and round a body hidden in an immunity.
   float vein = abs(fract(a * 1.6 + y * 3.2 + n(q * 2.0) * 0.8 - uTime * 1.8) - 0.5);
   float veins = (1.0 - smoothstep(0.0, 0.05, vein)) * step(0.5, vS.z);
@@ -165,14 +165,14 @@ void main() {
   if (r > 1.0) discard;
   float a = atan(vXY.y, vXY.x);
   // A bright band at the rim, embers running round it, a soft warm floor.
-  float band = smoothstep(0.84, 0.93, r) * (1.0 - smoothstep(0.95, 1.0, r));
+  float band = smoothstep(0.8, 0.9, r) * (1.0 - smoothstep(0.95, 1.0, r));
   float run = 0.55 + 0.45 * sin(a * 9.0 - uTime * 2.6 + vP.z * 20.0);
   float beads = smoothstep(0.82, 1.0, sin(a * 18.0 + uTime * 1.7 + vP.z * 7.0));
-  float floorGlow = pow(1.0 - r, 1.4) * 0.28;
+  float floorGlow = pow(1.0 - r, 1.4) * 0.22;
   float breathe = 0.85 + 0.15 * sin(uTime * 3.1 + vP.z * 31.0);
   vec3 col = uWarm * (band * (0.7 + 0.6 * run) + floorGlow) + uCore * beads * band * 1.2;
-  float alpha = (band * (0.6 + 0.4 * run) + floorGlow + beads * band * 0.5) * vP.x * breathe;
-  gl_FragColor = vec4(col * vP.x * breathe, alpha);
+  float alpha = (band * (0.75 + 0.25 * run) + floorGlow + beads * band * 0.5) * vP.x * breathe;
+  gl_FragColor = vec4(col * 1.25, clamp(alpha, 0.0, 0.95));
   #include <colorspace_fragment>
 }
 `;
@@ -219,6 +219,12 @@ export class QuenchFrostFx {
   private readonly bursts: Burst[] = [];
   private readonly ringRecs: HuddleRing[] = [];
   private readonly ringBodies: HuddleBody[] = [];
+  /** The warm bodies' records, reused every frame. */
+  private readonly ringPool: HuddleBody[] = Array.from({ length: 32 }, () => ({
+    id: -1,
+    x: 0,
+    z: 0,
+  }));
   private readonly ringParent = new Int16Array(32);
   /** Last splash-mark time left seen per player (a fresh mark is a new splash). */
   private readonly splashSeen = new Map<number, number>();
@@ -295,7 +301,6 @@ export class QuenchFrostFx {
       polygonOffset: true,
       polygonOffsetFactor: -2,
       polygonOffsetUnits: -2,
-      blending: THREE.AdditiveBlending,
     });
     this.materials.push(ringMat);
     this.rings = instanced(disc, ringMat, P.rings, 'smithHeartQuenchHuddleRings');
@@ -336,11 +341,11 @@ export class QuenchFrostFx {
     // ---- the splash's shards ----
     const boltGeo = new THREE.OctahedronGeometry(1, 0);
     this.geometries.push(boltGeo);
+    // Opaque-ish deep ice blue: an additive white is lost on the sunlit lake.
     const boltMat = new THREE.MeshBasicMaterial({
-      color: 0xd8f6ff,
+      color: 0xa8ecff,
       transparent: true,
-      opacity: 0.95,
-      blending: THREE.AdditiveBlending,
+      opacity: 1,
       depthWrite: false,
       toneMapped: false,
       fog: false,
@@ -421,7 +426,8 @@ export class QuenchFrostFx {
       if (!e || e.dead) continue;
       let cold = 0;
       let mark: { value: number; value2?: number; remaining: number } | null = null;
-      let warded = e.damageImmune === true;
+      // The auras only (what both worlds mirror): a stasis is the bite.
+      let warded = false;
       for (const a of e.auras) {
         if (a.id === QUENCH_AURAS.cold) cold = a.value;
         else if (a.id === QUENCH_AURAS.splashed) mark = a;
@@ -521,7 +527,11 @@ export class QuenchFrostFx {
       const e = world.entities.get(id);
       if (!e || e.dead) continue;
       const at = fxAnchor(e);
-      this.ringBodies.push({ id, x: at.x, z: at.z });
+      const rec = this.ringPool[this.ringBodies.length];
+      rec.id = id;
+      rec.x = at.x;
+      rec.z = at.z;
+      this.ringBodies.push(rec);
     }
     const count = huddleRings(this.ringBodies, this.ringRecs, P.rings, T.warmR, this.ringParent);
     for (let i = 0; i < count; i++) {
@@ -628,17 +638,31 @@ export class QuenchFrostFx {
       _v.set(_p.x, floor + _p.y, _p.z);
       _w.set(_p2.x - _p.x, _p2.y - _p.y + 1e-4, _p2.z - _p.z).normalize();
       _q.setFromUnitVectors(_fwd, _w);
-      _s.set(0.13, 0.13, 0.55);
+      _s.set(0.36, 0.36, 1.7);
       this.bolts.setMatrixAt(n++, _m.compose(_v, _q, _s));
-      if (this.rand() < 0.7 * this.density)
-        this.particles.puff(_v.x, _v.y, _v.z, 1, {
-          speed: 0.3,
-          life: 0.35,
-          size: [0.22, 0.04],
-          color: C.shard,
-          alpha: 0.9,
-          pool: 'glow',
-        });
+      // A cold glow at its head, a trail of rime glitter and mist behind it.
+      this.particles.puff(_v.x, _v.y, _v.z, 1, {
+        speed: 0,
+        life: 0.12,
+        size: [1.1, 0.6],
+        color: C.shard,
+        alpha: 1,
+        pool: 'glow',
+      });
+      this.particles.puff(_v.x, _v.y, _v.z, 2, {
+        speed: 0.4,
+        life: 0.45,
+        size: [0.3, 0.05],
+        color: C.frostDeep,
+        alpha: 1,
+      });
+      this.particles.puff(_v.x, _v.y, _v.z, 1, {
+        speed: 0.2,
+        life: 0.6,
+        size: [0.5, 1],
+        color: C.mist,
+        alpha: 0.35,
+      });
     }
     for (let i = n; i < P.bolts; i++) this.bolts.setMatrixAt(i, _zero);
     this.bolts.instanceMatrix.needsUpdate = true;

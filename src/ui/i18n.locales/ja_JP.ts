@@ -22705,9 +22705,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.quenchGuardian.warmth':
     'レイドと身を寄せ合っている：冷気が毎秒{fall}ずつ下がる。同じ場所に{linger}秒とどまった集団の下では氷が割れ、凍てつく水の穴が開く。動き続けよう。',
   'hudChrome.auraEffect.quenchGuardian.frozen':
-    '霜に閉ざされている：行動できず、あらゆる攻撃から受けるダメージが{pct}%増加し、どんな無敵効果も保たれない。効果が切れると氷が砕け、あなたは{min}から{max}の冷気ダメージを受け、その後{seconds}秒間受けるダメージが{brittle}%増加する。{radius}ヤード以内の全員の冷気が{cold}上がる（ヒロイックでは{heroicRadius}ヤード、冷気{heroicCold}）。',
+    '霜に閉ざされている：行動できず、あらゆる攻撃から受けるダメージが{pct}%増加し、冷たき棺などの無敵効果は霜に砕かれる。効果が切れると氷が砕け、あなたは{min}から{max}の冷気ダメージを受け、その後{seconds}秒間受けるダメージが{brittle}%増加する。{radius}ヤード以内の全員の冷気が{cold}上がる（ヒロイックでは{heroicRadius}ヤード、冷気{heroicCold}）。',
   'hudChrome.auraEffect.quenchGuardian.brittle':
-    'あらゆる攻撃から受けるダメージが{pct}%増加する。この効果中は、味方の氷が砕けてもあなたが凍りつくことはない：飛び散る冷気は満タンの1手前で止まる。',
+    'あらゆる攻撃から受けるダメージが{pct}%増加する。この効果中は、味方の砕けた氷の飛沫であなたの冷気が{cap}を超えることはない。',
   'hudChrome.auraEffect.quenchGuardian.splashed':
     '味方の砕けた氷が飛び散った：冷気+{cold}。自分のゲージが満ちる前に集団へ戻れ。',
   'hudChrome.quenchAlert.splashTitle': '霜の飛沫！冷気+{cold}',

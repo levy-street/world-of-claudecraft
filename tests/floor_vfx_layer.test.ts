@@ -399,6 +399,7 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   // encounter band; the provisional body's blocks and collars keep the default
   // order 0 on purpose (scene objects, never floor marks), so not strict.
   { file: 'src/render/smith_heart_fx/quench_fight_fx.ts', layer: 'encounter', strict: false },
+  { file: 'src/render/smith_heart_fx/quench_frost_fx.ts', layer: 'encounter', strict: false },
   // The Guardian of the Heat's fight in the Hearth: the same split, its burn
   // sheaths ride the bodies at the default order 0.
   { file: 'src/render/smith_heart_fx/heat_fight_fx.ts', layer: 'encounter', strict: false },

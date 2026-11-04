@@ -23207,9 +23207,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.quenchGuardian.warmth':
     '与团队相拥取暖：寒意每秒下降{fall}。在同一处停留{linger}秒的人群，脚下冰面会裂成冰冷的水洞，所以要不断移动。',
   'hudChrome.auraEffect.quenchGuardian.frozen':
-    '被冰霜封住：你无法行动，受到的所有伤害提高{pct}%，任何免疫效果都无法维持。效果结束时冰层碎裂：你受到{min}到{max}点冰霜伤害，随后{seconds}秒内受到的伤害提高{brittle}%，{radius}码内的所有人获得{cold}点寒意（英雄难度为{heroicRadius}码、{heroicCold}点寒意）。',
+    '被冰霜封住：你无法行动，受到的所有伤害提高{pct}%，冰霜会击碎寒冰棺等免疫效果。效果结束时冰层碎裂：你受到{min}到{max}点冰霜伤害，随后{seconds}秒内受到的伤害提高{brittle}%，{radius}码内的所有人获得{cold}点寒意（英雄难度为{heroicRadius}码、{heroicCold}点寒意）。',
   'hudChrome.auraEffect.quenchGuardian.brittle':
-    '受到的所有伤害提高{pct}%。此效果持续期间，队友碎裂的冰无法将你冻结：溅射的寒意会停在满值前1点。',
+    '受到的所有伤害提高{pct}%。此效果持续期间，队友碎冰的溅射无法让你的寒意超过{cap}。',
   'hudChrome.auraEffect.quenchGuardian.splashed':
     '队友碎裂的冰溅到了你：寒意+{cold}。在你自己的寒意条充满前回到人群中。',
   'hudChrome.quenchAlert.splashTitle': '冰霜溅射！寒意+{cold}',

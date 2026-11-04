@@ -5993,9 +5993,9 @@ export const hudChromeStrings = {
       warmth:
         'Huddled with the raid: your cold falls by {fall} every second. A huddle that stays on one spot for {linger} sec cracks the ice beneath it into a hole of freezing water, so keep moving.',
       frozen:
-        'Encased in rime: you cannot act and take {pct}% more damage from all sources, and no immunity holds. When it ends the ice shatters: you take {min} to {max} Frost damage, then take {brittle}% more damage for {seconds} sec, and everyone within {radius} yd of you gains {cold} cold ({heroicRadius} yd and {heroicCold} cold on Heroic).',
+        'Encased in rime: you cannot act and take {pct}% more damage from all sources, and the rime cracks immunities such as Cold Coffin. When it ends the ice shatters: you take {min} to {max} Frost damage, then take {brittle}% more damage for {seconds} sec, and everyone within {radius} yd of you gains {cold} cold ({heroicRadius} yd and {heroicCold} cold on Heroic).',
       brittle:
-        'Takes {pct}% more damage from all sources. While this lasts, a shattering ally cannot freeze you solid: their splash stops 1 short of full.',
+        "Takes {pct}% more damage from all sources. While this lasts, a shattering ally's splash cannot take your cold past {cap}.",
       splashed:
         "An ally's shattering ice splashed you: +{cold} cold. Get back into a huddle before your own bar fills.",
       trapped:

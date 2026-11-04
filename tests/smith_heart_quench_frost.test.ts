@@ -177,9 +177,13 @@ describe('Quench frost pass: immunities are never warmth', () => {
     const f = pulled(6);
     const [a] = huddle(f);
     setCold(f, a, 30);
+    const [, , , b] = f.players;
+    setCold(f, b, 30);
     a.damageImmune = true;
     f.tick(ticks(1));
     expect(coldOf(f, a)).toBeGreaterThan(30);
+    // Nor a warm body for the others: b, with only c left, rises too.
+    expect(coldOf(f, b)).toBeGreaterThan(30);
     a.damageImmune = false;
   });
 
@@ -230,6 +234,27 @@ describe('Quench frost pass: immunities are never warmth', () => {
     expect(m.auras.some((a) => a.kind === 'stasis')).toBe(false);
     const out = f.tick(ticks(T.freezeSeconds));
     expect(hitsOf(out, QUENCH_NAMES.shatter, m.id).some((n) => n > 0)).toBe(true);
+  });
+
+  it('a Temporal Hourglass stasis is cracked as its wearer freezes', () => {
+    const f = pulled(6);
+    const a = f.players[2];
+    f.put(a, 182, 14);
+    f.tick(1);
+    f.sim.ctx.applyAura(a, {
+      id: TEMPORAL_HOURGLASS_ID,
+      name: 'Temporal Hourglass',
+      kind: 'stasis',
+      remaining: 6,
+      duration: 6,
+      value: 0,
+      sourceId: f.players[3].id,
+      school: 'arcane',
+    });
+    setCold(f, a, T.coldMax - 0.05);
+    f.tick(2);
+    expect(has(a, QUENCH_AURAS.frozen)).toBe(true);
+    expect(has(a, TEMPORAL_HOURGLASS_ID)).toBe(false);
   });
 
   it("an unbreakable stasis (the Barrowstone statue's death save) is the owner's and stays", () => {
@@ -320,6 +345,8 @@ describe('Quench frost pass: the harsher freeze', () => {
     const dealt = hitsOf(out, QUENCH_NAMES.shatter, a.id);
     expect(dealt.length).toBe(1);
     expect(dealt[0]).toBeGreaterThanOrEqual(T.shatterMin - 1);
+    // On the plain body: the freeze's double damage is gone before the hit.
+    expect(dealt[0]).toBeLessThanOrEqual(T.shatterMax * QUENCH_DIFFICULTY.normal.damageMult + 1);
   });
 });
 
@@ -373,7 +400,7 @@ describe('Quench frost pass: the splash', () => {
     for (const p of ring) expect(hitsOf(later, QUENCH_NAMES.shatter, p.id)).toEqual([]);
   });
 
-  it('a Frost-Brittle player is never frozen by a splash (one short of full); a bare one is', () => {
+  it('a splash never takes a Frost-Brittle player past 80 (a bare one freezes)', () => {
     const f = pulled(6);
     f.dev('/dev heart quench heroic');
     const [, , a, b, c] = f.players;
@@ -392,12 +419,45 @@ describe('Quench frost pass: the splash', () => {
       school: 'frost',
       undispellable: true,
     });
-    setCold(f, b, 90);
+    setCold(f, b, 30);
     setCold(f, c, 90);
     f.dev('/dev heart quench splash', a.id);
     expect(has(b, QUENCH_AURAS.frozen)).toBe(false);
-    expect(coldOf(f, b)).toBeCloseTo(T.coldMax - 1, 5);
+    expect(T.brittleSplashCap).toBe(80);
+    expect(coldOf(f, b)).toBeCloseTo(T.brittleSplashCap, 5);
+    expect(aura(b, QUENCH_AURAS.splashed)?.value).toBe(T.brittleSplashCap - 30);
     expect(has(c, QUENCH_AURAS.frozen)).toBe(true);
+    // Bounded in time: from the cap, alone, it takes seconds to freeze.
+    expect((T.coldMax - T.brittleSplashCap) / T.coldRise).toBeGreaterThan(4);
+  });
+
+  it('a frozen player takes no splash: no cold, no mark, and their splash for the tick is not spent', () => {
+    const f = pulled(6);
+    const [, , a, b] = f.players;
+    f.put(a, 182, 14);
+    f.put(b, 184, 14);
+    f.tick(1);
+    f.dev('/dev heart quench burst', b.id);
+    f.dev('/dev heart quench splash', a.id);
+    expect(has(b, QUENCH_AURAS.splashed)).toBe(false);
+    expect(f.state()?.chill[b.id]?.frozen).toBeGreaterThan(0);
+  });
+
+  it('leaving the lake for a moment keeps the bar (no reset by a step off the ice)', () => {
+    const f = pulled(6);
+    const a = f.players[2];
+    f.put(a, 182, 14);
+    f.tick(1);
+    setCold(f, a, 90);
+    // Off the lake's floor (out of the basin) for a moment, still near.
+    f.put(a, 262, -2);
+    f.tick(3);
+    expect(coldOf(f, a)).toBeCloseTo(90, 5);
+    expect(has(a, QUENCH_AURAS.cold)).toBe(true);
+    // Back on the ice: it rises on from where it stood.
+    f.put(a, 182, 14);
+    f.tick(2);
+    expect(coldOf(f, a)).toBeGreaterThan(90);
   });
 });
 
@@ -452,9 +512,10 @@ describe('Quench frost pass: dev verbs and the own alert', () => {
     expect(frozen).toContain(
       `${Math.round(T.brittlePct * 100)}% more damage for ${T.brittleSeconds} sec`,
     );
-    expect(frozen).toContain('no immunity holds');
+    expect(frozen).toContain('the rime cracks immunities');
     expect(say(QUENCH_AURAS.cold, 20)).toContain('Cold Coffin');
     expect(say(QUENCH_AURAS.brittle, 0.3)).toContain('30% more damage');
+    expect(say(QUENCH_AURAS.brittle, 0.3)).toContain(`past ${T.brittleSplashCap}`);
     expect(say(QUENCH_AURAS.splashed, 35)).toContain('+35 cold');
   });
 });

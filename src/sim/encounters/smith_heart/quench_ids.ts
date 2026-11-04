@@ -212,9 +212,11 @@ export const QUENCH_TUNING = {
   shatterMin: 360,
   shatterMax: 400,
   /** After the shatter: more damage taken for a while (was 20%). While it
-   *  lasts no splash can freeze the player again (a chain stays bounded). */
+   *  lasts a splash never takes the player past brittleSplashCap (a chain
+   *  stays bounded: seconds alone before it can freeze them again). */
   brittleSeconds: 15,
   brittlePct: 0.3,
+  brittleSplashCap: 80,
   /** How long a splash's mark stays on the player it struck. */
   splashMarkSeconds: 2.5,
   /** Cold a hit adds: the guardian's breath, a slash, a fall through the ice. */

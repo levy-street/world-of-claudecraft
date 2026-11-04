@@ -43,7 +43,7 @@ export const QUENCH_FROST_POOLS = {
 } as const;
 
 /** Seconds a splash shard flies from the shattered to the struck. */
-export const SPLASH_FLIGHT_SECONDS = 0.42;
+export const SPLASH_FLIGHT_SECONDS = 0.85;
 /** Seconds a struck body's shell flares after its shard lands. */
 export const SPLASH_FLARE_SECONDS = 0.9;
 /** Seconds a shatter's chunks tumble. */
@@ -117,6 +117,13 @@ export interface HuddleRing {
  * most `cap`; returns how many. Groups under 3 draw no ring (a huddle is
  * three).
  */
+/** The root of `i` in a union-find `parent` (no closure: called per frame). */
+function rootOf(parent: Int16Array, i: number): number {
+  let k = i;
+  while (parent[k] !== k) k = parent[k];
+  return k;
+}
+
 export function huddleRings(
   bodies: readonly HuddleBody[],
   out: HuddleRing[],
@@ -124,28 +131,23 @@ export function huddleRings(
   reach: number = T.warmR,
   parent: Int16Array = new Int16Array(bodies.length),
 ): number {
-  const n = bodies.length;
+  const n = Math.min(bodies.length, parent.length);
   for (let i = 0; i < n; i++) parent[i] = i;
-  const find = (i: number): number => {
-    let k = i;
-    while (parent[k] !== k) k = parent[k];
-    return k;
-  };
   for (let i = 0; i < n; i++)
     for (let j = i + 1; j < n; j++) {
       if (Math.hypot(bodies[i].x - bodies[j].x, bodies[i].z - bodies[j].z) > reach + 1e-9) continue;
-      const a = find(i);
-      const b = find(j);
+      const a = rootOf(parent, i);
+      const b = rootOf(parent, j);
       if (a !== b) parent[Math.max(a, b)] = Math.min(a, b);
     }
   let count = 0;
   for (let root = 0; root < n && count < cap; root++) {
-    if (find(root) !== root) continue;
+    if (rootOf(parent, root) !== root) continue;
     let sx = 0;
     let sz = 0;
     let m = 0;
     for (let i = 0; i < n; i++)
-      if (find(i) === root) {
+      if (rootOf(parent, i) === root) {
         sx += bodies[i].x;
         sz += bodies[i].z;
         m++;
@@ -155,9 +157,13 @@ export function huddleRings(
     const cz = sz / m;
     let far = 0;
     for (let i = 0; i < n; i++)
-      if (find(i) === root) far = Math.max(far, Math.hypot(bodies[i].x - cx, bodies[i].z - cz));
-    const r = out[count] ?? { x: 0, z: 0, radius: 0, members: 0 };
-    out[count] = r;
+      if (rootOf(parent, i) === root)
+        far = Math.max(far, Math.hypot(bodies[i].x - cx, bodies[i].z - cz));
+    let r = out[count];
+    if (!r) {
+      r = { x: 0, z: 0, radius: 0, members: 0 };
+      out[count] = r;
+    }
     r.x = cx;
     r.z = cz;
     r.radius = far + 1.4;
