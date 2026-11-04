@@ -6,8 +6,8 @@
 //     only light; the pieces a body touches stay within their colliders, the
 //     walls and the inlays never stand over a walk, the arch never over its
 //     deck; each floating isle's turf walk IS the sim's floor (its edge the
-//     isle's field polygon, no floor-high ledge past it, nothing but grass
-//     standing on it);
+//     isle's organic field polygon, its ledges at their heights, no
+//     floor-high ledge past it, nothing but grass standing on it);
 //   - the plan fits every Breath prop, walls every Breath walk over the void
 //     (never over a walk), lays the inlays flat on Breath floors, and leaves
 //     the bridge's drop to the arch (no mountain lip under it).
@@ -309,18 +309,48 @@ describe('Smith Heart Breath kit: the measures the plan relies on', () => {
   });
 });
 
-/** An isle's walkable floor (its field polygon, the sim's own) in its kit
- *  piece's glTF frame (x, z: the runtime turns the piece by ISLE_KIT's rot). */
-function isleWalk(i: number): [number, number][] {
+/** A point of the sim's frame round isle `i` in its kit piece's glTF frame
+ *  (x, z: the runtime turns the piece by ISLE_KIT's rot). */
+function toKit(i: number, x: number, z: number): [number, number] {
   const isle = BREATH_ISLES[i];
-  const surface = F.surfaces.find((q) => q.id === isle.id);
-  if (!surface || surface.kind !== 'poly') throw new Error(`no polygon for ${isle.id}`);
   const rot = ISLE_KIT[i].rot;
-  return surface.points.map(([x, z]) => {
-    const dx = x - isle.x;
-    const dz = z - isle.z;
-    return [dx * Math.cos(rot) - dz * Math.sin(rot), dx * Math.sin(rot) + dz * Math.cos(rot)];
-  });
+  const dx = x - isle.x;
+  const dz = z - isle.z;
+  return [dx * Math.cos(rot) - dz * Math.sin(rot), dx * Math.sin(rot) + dz * Math.cos(rot)];
+}
+
+/** An isle's walkable floors (its organic outline and its ledges, the sim's
+ *  own polygons) in its kit piece's frame, each with its height over the
+ *  isle's floor. */
+function isleFloors(i: number): { poly: [number, number][]; rise: number }[] {
+  const isle = BREATH_ISLES[i];
+  const out: { poly: [number, number][]; rise: number }[] = [];
+  for (const q of F.surfaces) {
+    if (q.id !== isle.id && !q.id.startsWith(`${isle.id}_ledge_`)) continue;
+    if (q.kind !== 'poly') throw new Error(`no polygon for ${q.id}`);
+    out.push({ poly: q.points.map(([x, z]) => toKit(i, x, z)), rise: q.h - isle.h });
+  }
+  if (!out.length || out[0].rise !== 0) throw new Error(`no walk for ${isle.id}`);
+  return out;
+}
+
+/** An isle's walk (its whole outline) in its kit piece's frame. */
+function isleWalk(i: number): [number, number][] {
+  return isleFloors(i)[0].poly;
+}
+
+/** The sim's floor over the isle's at a kit point: the highest of its
+ *  floors within `reach` yards (a step's face stands right on a ledge's
+ *  edge), or -Infinity off the walk. */
+function floorNear(
+  floors: { poly: [number, number][]; rise: number }[],
+  x: number,
+  z: number,
+  reach: number,
+) {
+  let best = Number.NEGATIVE_INFINITY;
+  for (const f of floors) if (polySd(f.poly, x, z) < reach) best = Math.max(best, f.rise);
+  return best;
 }
 
 /** Signed distance from (x, z) to a polygon's edge, negative inside. */
@@ -341,27 +371,43 @@ function polySd(poly: [number, number][], x: number, z: number): number {
 
 describe('Smith Heart Breath kit: the Islands of the Wind', () => {
   it.skipIf(!haveKit)(
-    "lays each isle's turf walk exactly on the sim's floor, nothing standing on it",
+    "lays each isle's turf walk exactly on the sim's floors, nothing standing on it",
     () => {
       BREATH_ISLES.forEach((_, i) => {
         const v = 'AB'[i];
         const s = shape(`Kit_WindIsle${v}`);
-        const walk = isleWalk(i);
-        // Nothing but ankle-high grass stands on the walk (its shrine's flags
-        // lie flush), so a body never meets an unseen wall inside it.
-        for (const p of s.points)
-          if (polySd(walk, p[0], p[2]) < -0.05) expect(p[1], `${v} ${p}`).toBeLessThan(0.4);
-        // The flat walk reaches every corner of the sim's polygon.
-        for (const [x, z] of walk) {
-          const hit = s.points.some(
-            (p) => Math.abs(p[1]) < 0.02 && Math.hypot(p[0] - x, p[2] - z) < 0.15,
-          );
-          expect(hit, `${v} corner ${x} ${z}`).toBe(true);
+        const floors = isleFloors(i);
+        const walk = floors[0].poly;
+        // Nothing but ankle-high grass stands on the walk or a ledge (the
+        // shrine's flags lie flush, a step's rubble low), so a body never
+        // meets an unseen wall inside it.
+        for (const p of s.points) {
+          if (polySd(walk, p[0], p[2]) >= -0.05) continue;
+          const floor = floorNear(floors, p[0], p[2], 0.3);
+          expect(p[1] - floor, `${v} ${p}`).toBeLessThan(0.4);
         }
-        // No floor-high ledge past it: every face that lies flat near the
-        // walk's height lies on the walk (the old turf ran 0.7 yd past the
+        // The turf reaches every corner of every floor of the sim's, at the
+        // height the sim stands a body there (the highest floor holding it:
+        // a ledge over the walk's own rim).
+        for (const f of floors)
+          for (const [x, z] of f.poly) {
+            const rise = floorNear(floors, x, z, 0.02);
+            const hit = s.points.some(
+              (p) => Math.abs(p[1] - rise) < 0.02 && Math.hypot(p[0] - x, p[2] - z) < 0.15,
+            );
+            expect(hit, `${v} corner ${x} ${z} at ${rise}`).toBe(true);
+          }
+        // And each ledge stands a stride up off the walk: the turf at its
+        // height a hand inside it, at the walk's a hand outside its step.
+        for (const f of floors.slice(1)) {
+          expect(f.rise).toBeGreaterThan(0.3);
+          expect(f.rise).toBeLessThanOrEqual(0.9 + 1e-6);
+        }
+        // No floor-high ledge past the rim: every face that lies flat near a
+        // floor's height lies on the walk (the old turf ran 0.7 yd past the
         // sim's floor, an unseen wall at its edge).
         let flat = 0;
+        const levels = floors.map((f) => f.rise);
         for (const [a, b, c] of s.tris) {
           const A = s.points[a];
           const B = s.points[b];
@@ -378,7 +424,7 @@ describe('Smith Heart Breath kit: the Islands of the Wind', () => {
           const len = Math.hypot(nx, ny, nz);
           if (len < 1e-9 || ny / len < 0.9) continue;
           const cy = (A[1] + B[1] + C[1]) / 3;
-          if (cy < -0.35 || cy > 0.1) continue;
+          if (!levels.some((l) => cy > l - 0.35 && cy < l + 0.1)) continue;
           flat++;
           const cx = (A[0] + B[0] + C[0]) / 3;
           const cz = (A[2] + B[2] + C[2]) / 3;

@@ -47,23 +47,132 @@ from ring_sculpt import facet_crystal
 from shkit import DRESSED, PAINT, RAW, TAU, WOOD
 
 # ---- the sim's walk in the kit's frame -------------------------------------------------
-# smith_heart_layout.ts isleSurface(BREATH_ISLES[i]) (24 bearings, each bitten
-# in), less the isle's centre, turned by -ISLE_KIT[i].rot and taken to the
-# Blender frame ((x, z) game to (x, -z)). Counter-clockwise. The test pins the
-# shipped walk to the sim's polygon, so a change of either fails it.
+# smith_heart_isle_floor.ts isleFloorSurfaces(BREATH_ISLES[i]) (the organic
+# outline of 2026-11-04: an apron toward the Cornice, bays, promontories, a
+# narrow rock tongue; 144 bearings), less the isle's centre, turned by
+# -ISLE_KIT[i].rot and taken to the Blender frame ((x, z) game to (x, -z)).
+# Counter-clockwise. ISLE_LEDGES: each isle's ledges a stride up (their rise
+# over the walk, their polygon in the same frame), later ones over earlier.
+# The test pins the shipped walk and ledges to the sim's polygons, so a change
+# of either fails it.
 ISLE_WALKS = {
-    'A': ((-5.0453, -7.3747), (-2.5369, -7.2131), (-0.6641, -8.6747), (1.5713, -8.3779),
-          (3.4365, -7.1654), (4.9738, -5.7984), (7.1329, -4.8799), (7.3858, -2.5977),
-          (7.8547, -0.6013), (8.0524, 1.5102), (7.4019, 3.55), (6.5378, 5.6081),
-          (4.5343, 6.6278), (2.602, 7.3982), (0.656, 8.5699), (-1.6154, 8.6131),
-          (-3.8601, 8.0484), (-5.0232, 5.856), (-6.9363, 4.7454), (-7.7608, 2.7296),
-          (-8.1055, 0.6205), (-8.6244, -1.6175), (-7.4776, -3.5863), (-6.5273, -5.599)),
-    'B': ((-5.2457, 5.7267), (-6.4422, 4.1057), (-8.1064, 2.5575), (-7.8658, 0.3448),
-          (-7.4498, -1.6502), (-6.949, -3.6159), (-6.1167, -5.603), (-4.6857, -7.3522),
-          (-2.6192, -8.3021), (-0.3788, -8.6424), (1.7576, -7.9346), (3.5437, -6.8103),
-          (5.9174, -6.46), (6.8142, -4.3428), (8.0957, -2.5541), (7.659, -0.3357),
-          (8.7848, 1.9459), (6.9537, 3.6183), (5.9332, 5.4349), (4.8075, 7.5435),
-          (2.706, 8.5772), (0.3835, 8.7482), (-1.7696, 7.9886), (-4.0369, 7.758)),
+    'A': (
+          (-5.4973, -8.0353), (-5.1326, -8.2531), (-4.7437, -8.4265), (-4.3449, -8.5726),
+          (-3.9908, -8.8068), (-3.5146, -8.7529), (-3.0110, -8.5609), (-2.5416, -8.3772),
+          (-2.0811, -8.1184), (-1.6298, -7.7488), (-1.2181, -7.3760), (-0.8594, -7.1255),
+          (-0.5330, -6.9621), (-0.2213, -6.7521), (0.0747, -6.8734), (0.3856, -7.0679),
+          (0.7224, -7.3380), (1.1045, -7.7391), (1.5145, -8.0750), (1.9331, -8.2921),
+          (2.4124, -8.6271), (2.8936, -8.8412), (3.3368, -8.8669), (3.7733, -8.8368),
+          (4.1786, -8.7126), (4.5462, -8.5063), (5.3853, -9.0978), (6.4194, -9.8389),
+          (7.3050, -10.1951), (7.8061, -9.9475), (7.6867, -8.9611), (7.2296, -7.7196),
+          (6.8504, -6.7031), (6.9157, -6.2002), (7.1602, -5.8767), (7.2753, -5.4580),
+          (7.5712, -5.1798), (7.8032, -4.8528), (8.0023, -4.5049), (8.3259, -4.2198),
+          (8.6204, -3.9063), (9.0594, -3.6377), (9.4707, -3.3310), (9.7487, -2.9577),
+          (10.1429, -2.6000), (10.4574, -2.1994), (10.7443, -1.7744), (10.9030, -1.3151),
+          (11.0338, -0.8446), (10.8740, -0.3564), (10.7603, 0.1169), (10.6211, 0.5794),
+          (10.4033, 1.0242), (9.9999, 1.4272), (9.7357, 1.8260), (9.5376, 2.2234),
+          (9.2719, 2.5927), (9.0254, 2.9539), (8.7389, 3.2886), (8.6226, 3.6819),
+          (8.4442, 4.0499), (8.2588, 4.4140), (7.9628, 4.7134), (7.6218, 4.9729),
+          (7.1257, 5.1057), (6.4477, 5.0597), (5.9060, 5.0661), (5.4208, 5.0767),
+          (5.1533, 5.2665), (4.9597, 5.5321), (4.7264, 5.7586), (4.7103, 6.2787),
+          (4.6335, 6.7727), (4.6160, 7.4224), (4.4675, 7.9359), (4.2443, 8.3741),
+          (3.9426, 8.7006), (3.5261, 8.7814), (3.1261, 8.8882), (2.7656, 9.1156),
+          (2.3448, 9.1475), (1.9490, 9.2669), (1.5893, 9.6236), (1.1985, 9.9366),
+          (0.7966, 10.4063), (0.3519, 10.7368), (-0.1173, 10.7910), (-0.6022, 11.0393),
+          (-1.0798, 10.9682), (-1.5612, 10.9389), (-2.0012, 10.6703), (-2.3812, 10.2143),
+          (-2.7448, 9.8157), (-3.1343, 9.5767), (-3.4325, 9.1210), (-3.7390, 8.7565),
+          (-4.1179, 8.5861), (-4.5361, 8.4874), (-4.7901, 8.0924), (-5.1730, 7.9286),
+          (-5.4398, 7.5919), (-5.7754, 7.3597), (-6.0531, 7.0567), (-6.2373, 6.6601),
+          (-6.3698, 6.2328), (-6.2883, 5.6377), (-6.1576, 5.0538), (-6.1372, 4.6042),
+          (-6.2124, 4.2501), (-6.6381, 4.1282), (-7.1931, 4.0494), (-7.6690, 3.8869),
+          (-8.2579, 3.7420), (-8.7833, 3.5268), (-8.9482, 3.1472), (-9.1700, 2.7821),
+          (-9.3769, 2.4037), (-9.4454, 1.9866), (-9.5185, 1.5719), (-9.6781, 1.1673),
+          (-9.6867, 0.7415), (-9.8704, 0.3235), (-9.8531, -0.1071), (-9.9553, -0.5431),
+          (-9.9313, -0.9777), (-9.8677, -1.4083), (-9.9281, -1.8620), (-9.8475, -2.2957),
+          (-9.7301, -2.7208), (-9.6650, -3.1632), (-9.5463, -3.5925), (-9.3300, -3.9839),
+          (-9.1613, -4.3938), (-9.1033, -4.8653), (-8.8575, -5.2430), (-8.5495, -5.5781),
+          (-8.2016, -5.8766), (-7.9429, -6.2330), (-7.5619, -6.4865), (-7.2914, -6.8286),
+          (-6.9091, -7.0609), (-6.5779, -7.3369), (-6.2929, -7.6673), (-5.8710, -7.8258),
+    ),
+    'B': (
+          (-6.5580, 7.1592), (-6.9196, 6.9220), (-7.3204, 6.7102), (-7.5478, 6.3356),
+          (-7.9689, 6.1170), (-8.2290, 5.7641), (-8.5214, 5.4308), (-8.6797, 5.0132),
+          (-9.0551, 4.7157), (-9.2168, 4.2998), (-9.2625, 3.8385), (-9.3926, 3.4205),
+          (-9.5111, 3.0007), (-9.6315, 2.5825), (-9.7069, 2.1537), (-9.9068, 1.7486),
+          (-9.9199, 1.3077), (-9.8017, 0.8592), (-9.8774, 0.4330), (-9.8316, 0.0017),
+          (-9.6607, -0.4201), (-9.6681, -0.8442), (-9.6275, -1.2658), (-9.3819, -1.6526),
+          (-9.2784, -2.0553), (-9.0905, -2.4341), (-9.0707, -2.8583), (-8.9423, -3.2530),
+          (-8.6332, -3.5742), (-8.5874, -4.0026), (-8.2675, -4.3020), (-8.1604, -4.7095),
+          (-8.0296, -5.1135), (-7.8564, -5.4991), (-7.8202, -5.9985), (-7.8307, -6.5685),
+          (-7.7143, -7.0664), (-7.4157, -7.4132), (-7.1499, -7.8000), (-6.8065, -8.1089),
+          (-6.4403, -8.3902), (-5.8650, -8.3730), (-5.3383, -8.3762), (-4.8520, -8.4006),
+          (-4.4188, -8.4849), (-3.9343, -8.4332), (-3.5709, -8.6167), (-3.2425, -8.9039),
+          (-2.8532, -9.0437), (-2.4130, -8.9991), (-2.0453, -9.2181), (-1.6180, -9.1666),
+          (-1.2161, -9.2251), (-0.7894, -9.0051), (-0.3720, -8.4865), (-0.0014, -8.0985),
+          (0.3388, -7.7915), (0.6500, -7.4446), (0.9647, -7.3371), (1.3027, -7.3956),
+          (1.6496, -7.4471), (2.0916, -7.8112), (2.5462, -8.0802), (3.0428, -8.3646),
+          (3.4761, -8.3961), (3.9308, -8.4335), (4.3374, -8.3356), (4.6904, -8.1273),
+          (4.9786, -7.8178), (5.3855, -7.6941), (5.6397, -7.3525), (5.9129, -7.0492),
+          (6.3433, -6.9248), (6.7125, -6.7148), (7.2150, -6.6136), (7.7982, -6.5457),
+          (8.2622, -6.3421), (8.6605, -6.0664), (9.1138, -5.8083), (9.6412, -5.5685),
+          (9.9265, -5.1696), (10.2120, -4.7641), (10.4643, -4.3366), (10.7455, -3.9131),
+          (10.8205, -3.4137), (10.8259, -2.9028), (10.8937, -2.4170), (10.8470, -1.9145),
+          (10.6230, -1.4004), (10.5411, -0.9241), (10.4711, -0.4590), (10.2182, -0.0018),
+          (10.1801, 0.4427), (9.8072, 0.8563), (9.4864, 1.2472), (8.8999, 1.5677),
+          (8.3902, 1.8585), (7.8397, 2.0992), (7.3213, 2.3070), (6.7928, 2.4711),
+          (6.4169, 2.6567), (6.2300, 2.9038), (6.1321, 3.1908), (6.1932, 3.5742),
+          (6.3356, 4.0347), (6.4431, 4.5099), (6.6541, 5.1040), (6.6487, 5.5769),
+          (6.6503, 6.0917), (6.5082, 6.5059), (6.2953, 6.8677), (6.0132, 7.1638),
+          (5.7041, 7.4310), (5.3878, 7.6917), (5.2048, 8.1669), (5.5238, 9.5638),
+          (5.7643, 11.0685), (5.5250, 11.8430), (4.7014, 11.3446), (3.6673, 10.0703),
+          (2.8447, 9.0168), (2.4313, 9.0675), (2.0156, 9.0842), (1.6409, 9.2965),
+          (1.2306, 9.3346), (0.8161, 9.3091), (0.4002, 9.1305), (0.0015, 8.8871),
+          (-0.3680, 8.4615), (-0.7155, 8.1945), (-1.0596, 8.0595), (-1.3978, 7.9353),
+          (-1.8239, 8.2340), (-2.2750, 8.4964), (-2.7884, 8.8490), (-3.2339, 8.8898),
+          (-3.6301, 8.7681), (-4.0847, 8.7636), (-4.4224, 8.4989), (-4.7353, 8.2051),
+          (-5.1664, 8.1127), (-5.4789, 7.8275), (-5.8475, 7.6233), (-6.2732, 7.4787),
+    ),
+}
+ISLE_LEDGES = {
+    'A': (
+        (0.550, (
+          (8.3259, -4.2198), (8.6204, -3.9063), (9.0594, -3.6377), (9.4707, -3.3310),
+          (9.7487, -2.9577), (10.1429, -2.6000), (10.4574, -2.1994), (10.7443, -1.7744),
+          (10.9030, -1.3151), (11.0338, -0.8446), (10.8740, -0.3564), (10.7603, 0.1169),
+          (10.6211, 0.5794), (10.4033, 1.0242), (9.9999, 1.4272), (9.7357, 1.8260),
+          (9.5376, 2.2234), (9.2719, 2.5927), (9.0254, 2.9539), (8.7389, 3.2886),
+          (8.2942, 2.7146), (7.9753, 2.2301), (7.7436, 1.8052), (7.5581, 1.4175),
+          (7.4812, 1.0677), (7.4693, 0.7353), (7.4016, 0.4038), (7.3050, 0.0794),
+          (7.2808, -0.2387), (7.3236, -0.5606), (7.3398, -0.8853), (7.3636, -1.2161),
+          (7.4279, -1.5623), (7.4723, -1.9154), (7.5026, -2.2762), (7.6819, -2.7018),
+          (7.9122, -3.1771), (8.0739, -3.6587),
+        )),
+    ),
+    'B': (
+        (0.450, (
+          (5.9129, -7.0492), (6.3433, -6.9248), (6.7125, -6.7148), (7.2150, -6.6136),
+          (7.7982, -6.5457), (8.2622, -6.3421), (8.6605, -6.0664), (9.1138, -5.8083),
+          (9.6412, -5.5685), (9.9265, -5.1696), (10.2120, -4.7641), (10.4643, -4.3366),
+          (10.7455, -3.9131), (10.8205, -3.4137), (10.8259, -2.9028), (10.8937, -2.4170),
+          (10.8470, -1.9145), (10.6230, -1.4004), (10.5411, -0.9241), (10.4711, -0.4590),
+          (10.2182, -0.0018), (10.1801, 0.4427), (9.8072, 0.8563), (9.4864, 1.2472),
+          (9.1442, 0.7984), (8.9044, 0.3872), (8.4917, -0.0015), (8.1923, -0.3591),
+          (7.8508, -0.6882), (7.5590, -0.9965), (7.3101, -1.2903), (7.0780, -1.5704),
+          (6.8988, -1.8498), (6.7552, -2.1312), (6.6073, -2.4061), (6.5296, -2.7060),
+          (6.5125, -3.0382), (6.4774, -3.3733), (6.4103, -3.7025), (6.3319, -4.0354),
+          (6.2399, -4.3708), (6.1602, -4.7286), (6.0977, -5.1184), (6.0198, -5.5181),
+          (5.9194, -5.9214), (5.8384, -6.3737),
+        )),
+        (0.900, (
+          (9.1138, -5.8083), (9.6412, -5.5685), (9.9265, -5.1696), (10.2120, -4.7641),
+          (10.4643, -4.3366), (10.7455, -3.9131), (10.8205, -3.4137), (10.8259, -2.9028),
+          (10.8937, -2.4170), (10.8470, -1.9145), (10.6230, -1.4004), (10.5411, -0.9241),
+          (10.4711, -0.4590), (10.2182, -0.0018), (9.7572, -0.4277), (9.3803, -0.8223),
+          (9.0754, -1.1964), (8.8335, -1.5592), (8.6302, -1.9148), (8.4888, -2.2761),
+          (8.3631, -2.6385), (8.2341, -2.9986), (8.2267, -3.4093), (8.3608, -3.9005),
+          (8.5576, -4.4567), (8.8181, -5.0932),
+        )),
+    ),
 }
 # breath_isle_geometry.ts isleSpots(): where a ride sets a body down (`land`)
 # and the Homeward Gale's circle (`home`, its near edge, toward the Cornice).
@@ -73,8 +182,9 @@ ISLE_PADS = {
 }
 # The Gale's circle (ISLE_TUNING.circleR 2.6, its disc drawn 1.2 times that).
 PAD_R = 2.95
-# The fight's rune ring (breath_isles_fx_core.ts isleRuneRing: r - 3.1 to r - 1.7).
-RING_IN, RING_OUT = 5.65, 7.45
+# The fight's rune ring (breath_isles_fx_core.ts isleRuneRing: r - 4.0 to r - 2.6,
+# inside the deepest bay), its flags a quarter yard past it each side.
+RING_IN, RING_OUT = 4.75, 6.65
 
 # ---- the isles' own paint (sRGB) --------------------------------------------------------
 # Warm key, cool shadow (L1): warm greys and a little ochre under the turf,
@@ -116,20 +226,33 @@ FLOWERS = ((0.9, 0.87, 0.78), (0.86, 0.72, 0.32), (0.58, 0.48, 0.74), (0.82, 0.5
 TURF_K, SOIL_K, LEAF_K, FLAG_K = 20, 21, 22, 23
 
 ISLE_SPECS = {
-    # A: one tall leaning crag with a lesser spire, a broken arch on its far
-    # rim, three satellites strung off its left and right.
+    # A: one tall leaning crag with a lesser spire; its broken arch on the
+    # east promontory, a runed stone at the tongue's tip and one behind the
+    # far ledge; three satellites strung out past its bays.
     'A': dict(seed=6101, depth=26.0, lean=(-0.55, 0.95), crown=9.6,
               spires=((0.62, (4.6, -3.2), 0.55),),
               ledges=((1.05, -6.5, 3.4),),
-              sats=((5.2, 13.6, 1.2, 2.9, 7.5), (1.66, 14.8, -5.0, 1.8, 4.6), (0.35, 15.0, -9.5, 1.25, 3.2)),
-              stones=(0.52, 2.53, 4.71), arch=(5.86, 6.32), tree=None, fallen=None, sun=(-0.98, -0.2)),
-    # B: broad and twin-fanged (two spires near as long and a third short),
-    # a wind-bent tree on its rim and a fallen stone on a shelf.
+              sats=((4.68, 14.0, 1.2, 2.9, 7.5), (0.79, 14.6, -5.0, 1.8, 4.6), (2.53, 14.8, -9.5, 1.25, 3.2)),
+              stones=(6.2, 5.38, 4.3), arch=(1.4, 1.84), tree=None, fallen=None, sun=(-0.98, -0.2),
+              # The promontories (kit angles: the far ledge's, the tongue's,
+              # the arch's, the apron's flank) where the crag shows dark in
+              # beds under a thin turf.
+              proms=(6.22, 5.38, 1.62, 3.63),
+              # The bays (deep lips, hanging roots and curtains of vines).
+              bays=(4.68, 0.79, 2.54)),
+    # B: broad and twin-fanged (two spires near as long and a third short); a
+    # wind-bent tree on the south promontory, a runed stone at the tongue's tip
+    # and one over the two ledges, a fallen stone on a shelf under a bay.
     'B': dict(seed=6201, depth=18.5, lean=(0.85, -0.5), crown=11.2,
               spires=((0.8, (-4.4, 2.6), 0.75), (0.48, (3.4, 4.2), 0.5)),
               ledges=((5.24, -4.6, 3.6), (2.2, -9.0, 2.6)),
-              sats=((0.7, 14.0, 2.2, 2.3, 5.6), (4.36, 13.6, -3.5, 3.1, 8.5), (1.92, 15.5, -7.5, 1.3, 3.4)),
-              stones=(1.4, 4.36, 5.76), arch=None, tree=0.33, fallen=5.24, sun=(0.03, 1.0)),
+              sats=((0.44, 14.0, 2.2, 2.3, 5.6), (4.84, 14.0, -3.5, 3.1, 8.5), (1.75, 14.6, -7.5, 1.3, 3.4)),
+              stones=(5.98, 1.13, 3.55), arch=None, tree=4.01, fallen=4.84, sun=(0.03, 1.0),
+              proms=(5.93, 1.13, 4.01, 2.65),
+              bays=(4.84, 0.44, 1.75),
+              # The broadest isle's crag a little coarser (its tree and two
+              # ledges pay for it, inside the isle's budget).
+              sculpt=1900),
 }
 
 
@@ -207,6 +330,55 @@ def resample(poly, step):
 
 def inside(poly, x, y, inset=0.0):
     return float(poly_sd(poly, np.array([x]), np.array([y]))[0]) < -inset
+
+
+def level_at(ledges, x, y):
+    """The walk's floor over z 0 at (x, y): the highest ledge holding it
+    (ISLE_LEDGES: later ledges stand on earlier ones), else 0."""
+    lv = 0.0
+    for rise, poly in ledges:
+        if inside(poly, x, y, -1e-4):
+            lv = max(lv, rise)
+    return lv
+
+
+def rim_level(ledges, x, y, nx, ny):
+    """The floor's height at a rim point (x, y), its outward normal (nx, ny):
+    the level just inside it."""
+    return level_at(ledges, x - nx * 0.3, y - ny * 0.3)
+
+
+def ledge_risers(ledges, walk, step=0.35):
+    """Every ledge's step inside the walk: runs of (x, y, low, high, nx, ny),
+    the normal toward the low side, sampled every `step` yards along the
+    ledge's edges that do not lie on the rim."""
+    runs = []
+    for rise, poly in ledges:
+        n = len(poly)
+        run = []
+        for i in range(n):
+            ax, ay = poly[i]
+            bx, by = poly[(i + 1) % n]
+            mx, my = (ax + bx) / 2, (ay + by) / 2
+            L = math.hypot(bx - ax, by - ay)
+            if L < 1e-6 or float(poly_sd(walk, np.array([mx]), np.array([my]))[0]) > -0.12:
+                if run:
+                    runs.append(run)
+                    run = []
+                continue
+            # Outward from the ledge (counter-clockwise polygon: right of the edge).
+            ox, oy = (by - ay) / L, -(bx - ax) / L
+            k = max(1, int(math.ceil(L / step)))
+            for j in range(k + 1):
+                t = j / k
+                x, y = ax + (bx - ax) * t, ay + (by - ay) * t
+                if run and math.hypot(run[-1][0] - x, run[-1][1] - y) < 1e-6:
+                    continue
+                low = level_at([q for q in ledges if q[0] < rise], x + ox * 0.15, y + oy * 0.15)
+                run.append((x, y, low, rise, ox, oy))
+        if run:
+            runs.append(run)
+    return runs
 
 
 def smooth_path(pts, per=3):
@@ -302,7 +474,7 @@ class IslePiece(BreathPiece):
                 elif kind == LEAF_K:
                     k = 0.88 + 0.26 * _fbm(p.x * 1.7, p.y * 1.7, p.z * 1.7)
                     col = tuple(ch * k for ch in col)
-                    col = mix(col, LEAF_SUN, max(0.0, n.z) * 0.4)
+                    col = mix(col, LEAF_SUN, max(0.0, n.z) * 0.25)
                     col = mix(col, MOSS_DEEP, max(0.0, -n.z) * 0.5)
                 else:
                     k = 0.9 + 0.18 * _fbm(p.x * 1.6, p.y * 1.6, p.z * 1.6)
@@ -505,7 +677,7 @@ def _satellite(f, rng, at, top, size, depth):
     return tip
 
 
-def _isle_field(S, walk, rng):
+def _isle_field(S, walk, ledges, rng):
     D = S['depth']
     crown = S['crown']
     lean = S['lean']
@@ -587,6 +759,9 @@ def _isle_field(S, walk, rng):
     # it), the lip rounding down outside it into the belly.
     sd = poly_sd(walk, f.axes[0][:, None], f.axes[1][None, :])[:, :, None]
     out = np.maximum(sd, 0.0)
+    # (The ledges are their own turf a stride up, closed round by their
+    # steps and the lip: the rock under them stays at the walk's height, so
+    # the coarse sculpt never bevels a ledge's rim into a shelf.)
     f.d = np.maximum(f.d, (Z + 0.06 + out * 2.0 + out * out * 0.1).astype(np.float32))
     # The lip's beds cut sharp into the crown (horizontal joints under the turf).
     joints = (np.abs(np.sin((Z + 0.35) * 2.4 + 0.0 * X)) > 0.92) & (sd > 0.05) & (Z < -0.5) & (Z > -5.0)
@@ -606,6 +781,27 @@ def _isle_field(S, walk, rng):
                 rng, (math.cos(a) * r, math.sin(a) * r, z0 - float(rng.uniform(0, 0.3))),
                 (1.6 + out0, w, th * float(rng.uniform(0.8, 1.15))), cuts=6, chamfer=(0.9, 0.99),
                 R=rot(rz=a + float(rng.uniform(-0.15, 0.15)), ry=float(rng.uniform(-0.06, 0.06)))), 0.12)
+    # The promontories: the crag's dark beds stepping out under a thin
+    # turf skin, flat-topped and thin (never a floor-high ledge by the rim).
+    for a0 in S['proms']:
+        for j in range(5):
+            a = a0 + float(rng.uniform(-0.2, 0.2))
+            er = edge_r(walk, a)
+            # Their tops under every floor's height by a hand and more (never
+            # read as more floor past the rim).
+            z0 = -0.66 - j * 0.42 - float(rng.uniform(0, 0.15))
+            r = er + 0.15 + 0.25 * j + float(rng.uniform(-0.1, 0.25))
+            f.put(('g5', 'g2', 'g4')[j % 3], block(
+                rng, (math.cos(a) * r, math.sin(a) * r, z0), (1.5, float(rng.uniform(1.4, 2.4)), 0.36),
+                cuts=6, chamfer=(0.9, 0.99), R=rot(rz=a + float(rng.uniform(-0.25, 0.25)),
+                                                   ry=float(rng.uniform(-0.05, 0.05)))), 0.08)
+    # The bays: the rock undercut under the lip, so its soil overhangs.
+    for a in S['bays']:
+        er = edge_r(walk, a)
+        for j in (-1, 0, 1):
+            b = a + j * 0.16
+            f.sub(Ellipsoid((math.cos(b) * (er + 0.5), math.sin(b) * (er + 0.5), -2.3 - abs(j) * 0.3),
+                            (1.3, 2.2, 0.85), rot(rz=b)), 0.3)
     # A finer grain over everything under the lip (never the walk).
     n2 = Noise(S['seed'] + 7)
 
@@ -661,29 +857,57 @@ def _isle_field(S, walk, rng):
 
 
 # ---- the walk's cap -------------------------------------------------------------------
-def _cap(p, walk, rng, rise):
-    """The turf cap: the sim's polygon exactly, triangulated fine enough to
-    carry its paint, swelling gently (`rise`: a few centimetres, nothing at
-    its edge, on the shrine's floor or under a foot's snap tolerance), and
-    a thick earthen lip curling over its edge, overhanging raggedly, roots
-    dangling out of the soil."""
+def _ang_near(a, targets, width):
+    """How near bearing `a` (radians) lies to the nearest of `targets` (1 on
+    one, 0 past `width` radians), smooth."""
+    best = 0.0
+    for t in targets:
+        d = abs((a - t + math.pi) % TAU - math.pi)
+        best = max(best, math.exp(-(d / width) ** 2))
+    return best
+
+
+def _cap(p, walk, ledges, rng, rise, S):
+    """The turf cap: the sim's polygons exactly (the walk and its ledges, each
+    a stride up), triangulated fine enough to carry its paint, swelling
+    gently (`rise`: a few centimetres, nothing at its edges, on the shrine's
+    floor or under a foot's snap tolerance); each ledge's step a short face
+    of dark bedded rock; and a thick earthen lip curling over the rim,
+    overhanging deepest in the bays (roots and clods out of its soil), thin
+    over the promontories where the crag's beds show."""
     from mathutils.geometry import delaunay_2d_cdt
     bm = p.bm
-    edge, nrm = resample(walk, 0.5)
+    edge, nrm = resample(walk, 0.6)
     pts = [Vector((x, y)) for (x, y) in edge]
     nb = len(pts)
-    step = 0.74
-    for i in range(-16, 17):
-        for j in range(-16, 17):
+    edges = [(i, (i + 1) % nb) for i in range(nb)]
+    risers = ledge_risers(ledges, walk)
+    for run in risers:
+        i0 = len(pts)
+        for q in run:
+            pts.append(Vector((q[0], q[1])))
+        edges += [(i0 + k, i0 + k + 1) for k in range(len(run) - 1)]
+    step = 0.84
+    for i in range(-18, 19):
+        for j in range(-18, 19):
             x = i * step + (j % 2) * step * 0.5 + float(rng.uniform(-0.12, 0.12))
             y = j * step * 0.88 + float(rng.uniform(-0.12, 0.12))
-            if inside(walk, x, y, 0.28):
-                pts.append(Vector((x, y)))
-    edges = [(i, (i + 1) % nb) for i in range(nb)]
+            if not inside(walk, x, y, 0.28):
+                continue
+            if any(abs(float(poly_sd(q, np.array([x]), np.array([y]))[0])) < 0.22 for _, q in ledges):
+                continue
+            pts.append(Vector((x, y)))
     out = delaunay_2d_cdt(pts, edges, [], 0, 1e-5)
     vco, _, fcs = out[0], out[1], out[2]
-    vs = [bm.verts.new((v.x, v.y, rise(v.x, v.y))) for v in vco]
     made = []
+    at_level = {}
+
+    def vert(i, lv):
+        key = (i, lv)
+        if key not in at_level:
+            v = vco[i]
+            at_level[key] = bm.verts.new((v.x, v.y, lv + rise(v.x, v.y)))
+        return at_level[key]
     for poly in fcs:
         c = Vector((0.0, 0.0))
         for i in poly:
@@ -691,27 +915,85 @@ def _cap(p, walk, rng, rise):
         c /= len(poly)
         if not inside(walk, c.x, c.y, -0.01):
             continue
+        lv = level_at(ledges, c.x, c.y)
         try:
-            made.append(bm.faces.new([vs[i] for i in poly]))
+            made.append(bm.faces.new([vert(i, lv) for i in poly]))
         except ValueError:
             pass
     with p.as_kind(TURF_K):
         p._paint(made, TURF, STONE)
     p.facing(made, (0, 0, 1))
-    # The lip: four rings down and out round the edge (ragged, never past
-    # 0.16 of the walk), its foot tucked into the rock.
+    # Each ledge's step: a short face of the crag's dark beds, never one
+    # slab: the turf rolled a finger over its top, then two or three beds of
+    # rock each standing out its own way (one proud, one sunk), broken by
+    # boulders set into it, its foot tucked under the floor below. Nothing
+    # reaches more than a hand out over the lower floor above ankle height.
+    nr = Noise(int(rng.integers(1, 9999)))
+    for run in risers:
+        rows = []
+        for (x, y, low, high, ox, oy) in run:
+            h = high - low
+            w1 = max(-1.0, min(1.0, float(nr.fbm(np.array([x * 2.6]), np.array([y * 2.6]), np.array([0.7]), 2)[0]) * 1.6))
+            w2 = max(-1.0, min(1.0, float(nr.fbm(np.array([x * 3.7]), np.array([y * 3.7]), np.array([3.1]), 2)[0]) * 1.6))
+            j1 = float(rng.uniform(-0.03, 0.03))
+            prof = ((0.0, high), (0.06 + 0.03 * w1, high - 0.08 - 0.03 * w2),
+                    (0.03 + 0.05 * w2 + j1, low + h * (0.58 + 0.14 * w1)),
+                    (0.1 + 0.07 * w1 - j1, low + h * (0.3 + 0.12 * w2)), (0.07, low - 0.06))
+            rows.append([bm.verts.new((x + ox * o, y + oy * o, z)) for (o, z) in prof])
+        for k in range(len(rows) - 1):
+            ox, oy = run[k][4], run[k][5]
+            for r in range(4):
+                try:
+                    face = bm.faces.new((rows[k][r], rows[k][r + 1], rows[k + 1][r + 1], rows[k + 1][r]))
+                except ValueError:
+                    continue
+                if r == 0:
+                    with p.as_kind(TURF_K):
+                        p._paint([face], p.vary(TURF, 0.08), STONE)
+                else:
+                    with p.as_kind(RAW):
+                        p._paint([face], p.vary((CRAG_BED, CRAG, CRAG_BED, CRAG)[r], 0.07), STONE)
+                face.smooth = r == 0
+                p.facing([face], (ox, oy, 0.2))
+        # Boulders set into the step (low: never over a body's ankle on the
+        # floor below), a little apart.
+        with p.as_kind(RAW):
+            for k in range(1, len(run) - 1, 2):
+                x, y, low, high, ox, oy = run[k]
+                if rng.uniform(0, 1) < 0.45:
+                    continue
+                h = high - low
+                s_ = float(rng.uniform(0.18, 0.26))
+                crystal(p, (x + ox * 0.1, y + oy * 0.1, low + h * 0.25), (s_ * 1.5, s_, h * 0.42),
+                        p.vary(CRAG_BED, 0.08), n=8, boxy=0.6, jitter=0.2,
+                        yaw=math.atan2(oy, ox) + float(rng.uniform(-0.4, 0.4)), floor=low - 0.06)
+    # The lip: rings down and out round the rim (ragged; over the bays it
+    # bulges out and drops deep, its soil a yard and more; over the
+    # promontories a thin turf skin on the crag), its foot tucked into the
+    # rock. Each rim point rides its own floor's height.
     n2 = Noise(int(rng.integers(1, 9999)))
     rings = []
-    lip = ((0.0, 0.0), (0.11, -0.12), (0.32, -0.4), (0.18, -0.78), (-0.3, -1.05))
+    lip = ((0.0, 0.0), (0.11, -0.12), (0.32, -0.4), (0.22, -0.8), (-0.3, -1.05))
+    lvl = [rim_level(ledges, x, y, nx, ny) for (x, y), (nx, ny) in zip(edge, nrm)]
+    bayk = [_ang_near(math.atan2(y, x), S['bays'], 0.3) for (x, y) in edge]
+    promk = [_ang_near(math.atan2(y, x), S['proms'], 0.22) for (x, y) in edge]
+    prev_z = [0.0] * nb
     for k, (o, z) in enumerate(lip):
         ring = []
-        for (x, y), (nx, ny) in zip(edge, nrm):
+        for i, ((x, y), (nx, ny)) in enumerate(zip(edge, nrm)):
             w = float(n2.fbm(np.array([x * 0.55]), np.array([y * 0.55]), np.array([0.3]), 2)[0])
             v = float(n2.fbm(np.array([x * 1.7]), np.array([y * 1.7]), np.array([2.1]), 2)[0])
             notch = 0.45 if v > 0.68 else 1.0
-            oo = o * (0.35 + 1.0 * w + 0.35 * v) * notch if 0 < k < len(lip) - 1 else o
-            zz = z * (0.65 + 0.9 * w + 0.4 * v) if 1 < k < len(lip) - 1 else z
-            ring.append(bm.verts.new((x + nx * oo, y + ny * oo, zz)))
+            deep = 1.0 + 0.85 * bayk[i] - 0.4 * promk[i]
+            bulge = 1.0 + 0.9 * bayk[i] - 0.5 * promk[i]
+            oo = o * (0.35 + 1.0 * w + 0.35 * v) * notch * bulge if 0 < k < len(lip) - 1 else o
+            zz = z * (0.65 + 0.9 * w + 0.4 * v) * deep if 1 < k < len(lip) - 1 else z * deep
+            # Always falling ring to ring (never a flat shelf of soil that
+            # would read as more floor past the rim).
+            if k > 0:
+                zz = min(zz, prev_z[i] - (0.1 if k == 1 else 0.5 if k == len(lip) - 1 else 0.22))
+            prev_z[i] = zz
+            ring.append(bm.verts.new((x + nx * oo, y + ny * oo, lvl[i] + zz)))
         rings.append(ring)
     lip_turf, lip_soil = [], []
     for k in range(len(rings) - 1):
@@ -728,30 +1010,35 @@ def _cap(p, walk, rng, rise):
     centre = Vector((0.0, 0.0, 1.5))
     p.facing(lip_turf + lip_soil, lambda c: Vector((c.x, c.y, 0.0)).normalized() + Vector((0, 0, 0.35))
              if Vector((c.x, c.y, 0)).length > 1e-3 else centre)
-    # Clods of earth bulging out of the lip, the turf's roots holding them.
+    # Clods of earth bulging out of the bays' deep lips, the turf's roots
+    # holding them.
     with p.as_kind(SOIL_K):
-        for i in range(2, nb, 7):
-            q = rings[3][i].co
-            nx, ny = nrm[i]
-            s = float(rng.uniform(0.45, 0.85))
-            crystal(p, (q.x + nx * s * 0.2, q.y + ny * s * 0.2, q.z - s * 0.55), (s * 1.3, s, s * 0.9),
-                    p.vary(SOIL, 0.1), n=9, boxy=0.45, jitter=0.25, yaw=math.atan2(ny, nx))
-    # Rootlets dangling out of the soil under the lip.
-    with p.as_kind(WOOD):
-        for i in range(0, nb, 3):
-            if (i // 9) % 2 or rng.uniform(0, 1) < 0.2:
+        for i in range(2, nb, 5):
+            # Only where the lip hangs deep (a clod under a thin lip would
+            # sit level with the floor, a ledge past the rim).
+            if bayk[i] < 0.35:
                 continue
             q = rings[3][i].co
             nx, ny = nrm[i]
-            L = float(rng.uniform(0.4, 1.4))
+            s = float(rng.uniform(0.45, 0.85)) * (1.0 + 0.4 * bayk[i])
+            crystal(p, (q.x + nx * s * 0.2, q.y + ny * s * 0.2, q.z - s * 0.55), (s * 1.3, s, s * 0.9),
+                    p.vary(SOIL, 0.1), n=9, boxy=0.45, jitter=0.25, yaw=math.atan2(ny, nx))
+    # Rootlets dangling out of the soil under the lip, in curtains in the bays.
+    with p.as_kind(WOOD):
+        for i in range(0, nb, 3):
+            if bayk[i] < 0.3 and ((i // 9) % 2 or rng.uniform(0, 1) < 0.72):
+                continue
+            q = rings[3][i].co
+            nx, ny = nrm[i]
+            L = float(rng.uniform(0.4, 1.4)) * (1.0 + 1.3 * bayk[i])
             sw = float(rng.uniform(-0.25, 0.25))
             pts = [(q.x, q.y, q.z), (q.x + nx * 0.15 - ny * sw * 0.3, q.y + ny * 0.15 + nx * sw * 0.3, q.z - L * 0.4),
                    (q.x + nx * 0.2 - ny * sw, q.y + ny * 0.2 + nx * sw, q.z - L)]
             p.sweep(smooth_path(pts, 2), float(rng.uniform(0.04, 0.07)), 0.012, p.vary(ROOT, 0.1), sides=3)
-    return edge, nrm
+    return edge, nrm, lvl, risers
 
 
-def _flagstone(p, outline, rng, color, top=0.03, bevel=0.1):
+def _flagstone(p, outline, rng, color, top=0.03, bevel=0.1, floor=0.0):
     """One dressed flag lying in the turf: its top a hair over the walk, its
     chamfer dipping under the turf (a crisp line, never a coplanar fight)."""
     bm = p.bm
@@ -771,7 +1058,7 @@ def _flagstone(p, outline, rng, color, top=0.03, bevel=0.1):
         v = Vector(q)
         d = v - c
         inner = c + d * max(0.0, 1.0 - bevel / max(1e-3, d.length))
-        lo.append(bm.verts.new((v.x, v.y, -0.04)))
+        lo.append(bm.verts.new((v.x, v.y, floor - 0.04)))
         z = top + tilt[0] * (inner.x - c.x) + tilt[1] * (inner.y - c.y)
         hi.append(bm.verts.new((inner.x, inner.y, z)))
     faces = [bm.faces.new(hi)]
@@ -818,9 +1105,10 @@ def _shrine_floor(p, walk, pads, rng):
         W = float(rng.uniform(0.6, 1.05))
         turn = am + math.pi / 2 + float(rng.uniform(-0.25, 0.25))
         outline = []
-        for j in range(6):
-            b = TAU * j / 6 + float(rng.uniform(-0.25, 0.25))
-            r = 1.0 + float(rng.uniform(-0.18, 0.12))
+        sides = int(rng.integers(5, 8))
+        for j in range(sides):
+            b = TAU * j / sides + float(rng.uniform(-0.3, 0.3))
+            r = 1.0 + float(rng.uniform(-0.28, 0.12))
             u, v = math.cos(b) * L / 2 * r, math.sin(b) * W / 2 * r
             outline.append((cx + u * math.cos(turn) - v * math.sin(turn), cy + u * math.sin(turn) + v * math.cos(turn)))
         if not all(inside(walk, x, y, 0.3) for (x, y) in outline):
@@ -1019,13 +1307,13 @@ def _drum_pillar(p, base, h, r, rng, broken=0.0, tilt=(0.0, 0.0)):
 def _broken_arch(p, walk, a0, a1, rng):
     """A broken arch of the wind shrine on the rim, past the walk: two
     pillars, the arch's voussoirs on one side, the rest fallen."""
-    pa = edge_pt(walk, a0, 1.35, -1.0)
-    pb = edge_pt(walk, a1, 1.35, -1.0)
+    pa = edge_pt(walk, a0, 1.9, -1.0)
+    pb = edge_pt(walk, a1, 1.9, -1.0)
     with p.as_kind(DRESSED):
         ta = _drum_pillar(p, pa, 5.0, 0.5, rng)
         tb = _drum_pillar(p, pb, 5.0, 0.5, rng)
         # A third pillar fallen out of true beside them, its top broken.
-        c = edge_pt(walk, a1 + (a1 - a0) * 0.9, 1.5, -1.0)
+        c = edge_pt(walk, a1 + (a1 - a0) * 0.9, 1.9, -1.0)
         _drum_pillar(p, c, 3.6, 0.45, rng, broken=0.2, tilt=(math.cos(a1) * 0.09, math.sin(a1) * 0.09))
         # The arch's springers on both pillars, its crown fallen.
         A = Vector(pa[:2])
@@ -1058,15 +1346,15 @@ def _tree(p, base, a, rng):
     trunk = [Vector((x, y, z - 0.4)), Vector((x, y, z + 0.8))]
     for k in range(1, 5):
         t = k / 4
-        q = Vector((x, y, z + 0.8)) + out * (t * t * 2.4) + side * math.sin(t * 2.4) * 0.5 \
+        q = Vector((x, y, z + 0.8)) + out * (t * t * 1.5) + side * math.sin(t * 2.4) * 0.5 \
             + Vector((0, 0, t * 4.2))
         trunk.append(q)
     trunk = [Vector(q) for q in smooth_path([tuple(q) for q in trunk], 3)]
     with p.as_kind(WOOD):
         p.sweep([tuple(q) for q in trunk], 0.55, 0.16, p.vary(BARK, 0.05), sides=7)
         # Roots gripping the outcrop.
-        for k in range(4):
-            b = TAU * k / 4 + float(rng.uniform(-0.3, 0.3))
+        for k in range(3):
+            b = TAU * k / 3 + float(rng.uniform(-0.3, 0.3))
             d = Vector((math.cos(b), math.sin(b), 0.0))
             pts = [trunk[1] - Vector((0, 0, 0.4)), trunk[0] + d * 0.9 + Vector((0, 0, 0.1)),
                    trunk[0] + d * 1.7 - Vector((0, 0, 0.6))]
@@ -1077,18 +1365,18 @@ def _tree(p, base, a, rng):
             q0 = trunk[i]
             b = (k - 1) * 0.9 + float(rng.uniform(-0.2, 0.2))
             d = (out * math.cos(b) + side * math.sin(b)).normalized()
-            L = float(rng.uniform(1.6, 2.4))
+            L = float(rng.uniform(1.4, 2.0))
             q1 = q0 + d * L * 0.5 + Vector((0, 0, 0.6))
-            q2 = q0 + d * L + Vector((0, 0, 0.5)) + out * 0.5
+            q2 = q0 + d * L + Vector((0, 0, 0.5)) + out * 0.2
             p.sweep([tuple(q0), tuple(q1), tuple(q2)], 0.22 if k < 2 else 0.16, 0.06, p.vary(BARK, 0.06), sides=5)
             tips.append(q2)
     with p.as_kind(LEAF_K):
         for q in tips + [trunk[-1]]:
-            for j in range(3):
-                c = q + out * float(rng.uniform(0.0, 1.0)) + side * float(rng.uniform(-0.7, 0.7)) \
+            for j in range(2):
+                c = q + out * float(rng.uniform(-0.3, 0.5)) + side * float(rng.uniform(-0.7, 0.7)) \
                     + Vector((0, 0, float(rng.uniform(-0.2, 0.5))))
                 s = float(rng.uniform(1.2, 1.8))
-                crystal(p, tuple(c), (s * 1.6, s * 1.1, s * 0.8), p.vary(LEAF_SUN, 0.1), n=22, boxy=1.0,
+                crystal(p, tuple(c), (s * 1.6, s * 1.1, s * 0.8), p.vary(LEAF, 0.1), n=16, boxy=1.0,
                         jitter=0.18, yaw=a + float(rng.uniform(-0.4, 0.4)))
     return trunk[-1]
 
@@ -1186,20 +1474,37 @@ def wind_isle(bpy, variant):
     """A floating islet of the wind (see the module's notes)."""
     S = ISLE_SPECS[variant]
     walk = ISLE_WALKS[variant]
+    ledges = ISLE_LEDGES[variant]
     pads = ISLE_PADS[variant]
     D = S['depth']
     rng = np.random.default_rng(S['seed'])
-    f, tips, sat_tips = _isle_field(S, walk, rng)
+    f, tips, sat_tips = _isle_field(S, walk, ledges, rng)
     glows = []
     p = IslePiece('Kit_WindIsle' + variant, seed=S['seed'], depth=D, ao=0.65, ao_dist=3.0, lichen=1.0,
                   glows=glows)
-    verts, faces = gs.mesh_sculpt(f, bpy, 'WindIsle' + variant, 4300)
+    verts, faces = gs.mesh_sculpt(f, bpy, 'WindIsle' + variant, S.get('sculpt', 2900))
     add_sculpt(p, f, verts, faces, STORM_COLOURS, STORM_KINDS, smooth=True)
     prng = p.rng
-    # The walk: its turf cap and the shrine's floor.
+
+    def lv(x, y):
+        return level_at(ledges, x, y)
+
+    def ledge_sd(x, y):
+        return min((abs(float(poly_sd(q, np.array([x]), np.array([y]))[0])) for _, q in ledges), default=9.0)
+
+    # Worn paths across the turf: from the Gale's dais in to the middle, on
+    # out to each ledge's step and to the far promontory's ruin.
     p.worn.append((pads['home'][0], pads['home'][1], 0.0, 0.0, 0.85))
+    for rise_, poly in ledges[:1]:
+        cx = sum(q[0] for q in poly) / len(poly)
+        cy = sum(q[1] for q in poly) / len(poly)
+        p.worn.append((0.0, 0.0, cx * 0.86, cy * 0.86, 0.6))
+    a_far = S['stones'][1]
+    p.worn.append((0.0, 0.0, math.cos(a_far) * (edge_r(walk, a_far) - 1.0),
+                   math.sin(a_far) * (edge_r(walk, a_far) - 1.0), 0.45))
     # The turf's swells: a few centimetres (within a foot's snap), none at
-    # its edge (the sim's rim), on the shrine's flags or the dais.
+    # its edge (the sim's rim), by a ledge's step, on the shrine's flags or
+    # the dais.
     n3 = Noise(S['seed'] + 31)
 
     def rise(x, y):
@@ -1209,10 +1514,11 @@ def wind_isle(bpy, variant):
         if math.hypot(x - pads['home'][0], y - pads['home'][1]) < PAD_R + 0.6:
             return 0.0
         edge_k = min(1.0, max(0.0, -float(poly_sd(walk, np.array([x]), np.array([y]))[0]) - 0.2) / 1.2)
+        edge_k *= min(1.0, max(0.0, ledge_sd(x, y) - 0.25) / 0.8)
         return 0.06 * edge_k * float(n3.fbm(np.array([x * 0.22]), np.array([y * 0.22]), np.array([0.5]), 2)[0])
     p.turf_rise = rise
     p.sun = S['sun']
-    edge, nrm = _cap(p, walk, rng, rise)
+    edge, nrm, lvl, risers = _cap(p, walk, ledges, rng, rise, S)
     _shrine_floor(p, walk, pads, rng)
     home_a = math.atan2(pads['home'][1], pads['home'][0])
 
@@ -1220,21 +1526,46 @@ def wind_isle(bpy, variant):
         d = abs((a - home_a + math.pi) % TAU - math.pi)
         return d > wide
 
-    # The rim's runed standing stones (one broken on each isle).
+    def rim_pt(a, out, dz=0.0):
+        x, y, _ = edge_pt(walk, a, out)
+        er = edge_r(walk, a)
+        return (x, y, lv(math.cos(a) * (er - 0.4), math.sin(a) * (er - 0.4)) + dz)
+
+    def flower_bed(c, n, spread=0.55):
+        """Grass and flowers gathered in a clump (against a stone, at a foot)."""
+        for j in range(n):
+            b = float(rng.uniform(0, TAU))
+            rr = float(rng.uniform(0.1, spread))
+            q = (c[0] + math.cos(b) * rr, c[1] + math.sin(b) * rr, c[2])
+            if j % 3 == 0:
+                _flowers(p, q, rng, n=3)
+            else:
+                _tuft(p, q, float(rng.uniform(0.22, 0.4)), rng, blades=int(rng.integers(3, 6)))
+
+    # The ruins on the promontories, past the walk: the runed standing stones
+    # (one broken on each isle), the arch or the tree, each with grass and
+    # flowers gathered at its foot.
     for k, a in enumerate(S['stones']):
         base = edge_pt(walk, a, 1.75, -0.75)
         glows.append(_rune_stone(p, base, a, float(prng.uniform(4.2, 5.4)), rng, broken=(k == 1)))
         for j in range(3):
-            b = a + float(rng.uniform(-0.5, 0.5))
+            b = a + float(rng.uniform(-0.45, 0.45))
             c = edge_pt(walk, b, float(rng.uniform(0.9, 1.9)), -0.75)
             c = _on_surface(f, [(c[0], c[1], c[2] + 0.6)], lift=0.0)[0]
             if inside(walk, c[0], c[1], -0.6):
                 continue
             _tuft(p, c, float(rng.uniform(0.45, 0.75)), rng, blades=5)
+        # A bed of flowers on the walk against the stone's side of the rim.
+        q = rim_pt(a, -0.45)
+        flower_bed(q, 4, 0.4)
     if S['arch']:
-        _broken_arch(p, walk, S['arch'][0], S['arch'][1], rng)
+        a0, a1 = S['arch']
+        _broken_arch(p, walk, a0, a1, rng)
+        for a in (a0, a1):
+            flower_bed(rim_pt(a, -0.4), 4, 0.35)
     if S['tree'] is not None:
-        _tree(p, edge_pt(walk, S['tree'], 1.35, -0.6), S['tree'], rng)
+        _tree(p, edge_pt(walk, S['tree'], 1.1, -0.6), S['tree'], rng)
+        flower_bed(rim_pt(S['tree'], -0.4), 3, 0.45)
     if S['fallen'] is not None:
         # A standing stone fallen onto the shelf below the rim.
         a = S['fallen']
@@ -1243,76 +1574,104 @@ def wind_isle(bpy, variant):
         with p.as_kind(DRESSED):
             slab(p, (top[0], top[1], top[2] + 0.4), (3.4, 1.4, 0.9), p.vary(STORM_PALE, 0.06), yaw=a + 1.3,
                  pitch=0.18, chamfer=0.26)
+    # Each ledge's step: a rubble of its own rock at its foot (low, a step's
+    # height at most), grass and flowers against it, and a flat stone where
+    # the worn path climbs it.
+    for run in risers:
+        for k in range(1, len(run) - 1, 4):
+            x, y, low, high, ox, oy = run[k]
+            if rng.uniform(0, 1) < 0.25:
+                continue
+            o = float(rng.uniform(0.2, 0.5))
+            q = (x + ox * o, y + oy * o)
+            if not inside(walk, q[0], q[1], 0.3):
+                continue
+            s = float(rng.uniform(0.22, 0.42))
+            with p.as_kind(RAW):
+                crystal(p, (q[0], q[1], low), (s * 1.4, s, min(0.26, s * 0.6)), p.vary(CRAG_BED, 0.08), n=9,
+                        boxy=0.7, jitter=0.25, yaw=float(rng.uniform(0, TAU)), floor=low - 0.08)
+            flower_bed((q[0] + ox * 0.3, q[1] + oy * 0.3, low), 2, 0.3)
+        mid = run[len(run) // 2]
+        x, y, low, high, ox, oy = mid
+        sx, sy = -oy, ox
+        cx, cy = x + ox * 0.5, y + oy * 0.5
+        yaw = math.atan2(oy, ox) + float(rng.uniform(-0.3, 0.3))
+        out = []
+        for j in range(8):
+            b = TAU * j / 8 + float(rng.uniform(-0.18, 0.18))
+            rr = float(rng.uniform(0.75, 1.1))
+            u, v = math.cos(b) * 0.42 * rr, math.sin(b) * 0.6 * rr
+            out.append((cx + u * math.cos(yaw) - v * math.sin(yaw), cy + u * math.sin(yaw) + v * math.cos(yaw)))
+        _flagstone(p, out, rng, CRAG_BED, top=low + (high - low) * 0.45, bevel=0.14, floor=low)
     # Grass along the lip (inside the walk only within its last half yard,
-    # never on the shrine's floor or the dais) and loose stones.
+    # never on the shrine's floor or the dais), in clumps, thicker where it
+    # is sheltered (the bays) and loose stones.
     for k in range(0, len(edge), 2):
         x, y = edge[k]
         nx, ny = nrm[k]
         if math.hypot(x - pads['home'][0], y - pads['home'][1]) < PAD_R + 0.4:
             continue
-        if rng.uniform(0, 1) < 0.2:
+        bay = _ang_near(math.atan2(y, x), S['bays'], 0.3)
+        if rng.uniform(0, 1) < 0.62 - 0.4 * bay:
             continue
         inset = float(rng.uniform(0.12, 0.42))
-        _tuft(p, (x - nx * inset, y - ny * inset, 0.0), float(rng.uniform(0.2, 0.32)), rng,
+        _tuft(p, (x - nx * inset, y - ny * inset, lvl[k]), float(rng.uniform(0.2, 0.34)), rng,
               blades=int(rng.integers(3, 6)))
     # Grass curling over the lip, hanging down the turf's edge.
     with p.as_kind(TURF_K):
         for k in range(0, len(edge), 2):
             x, y = edge[k]
             nx, ny = nrm[k]
-            if rng.uniform(0, 1) < 0.45:
+            if rng.uniform(0, 1) < 0.7:
                 continue
             for j in range(2):
                 o = float(rng.uniform(0.04, 0.12))
-                hh = float(rng.uniform(0.25, 0.55))
-                p.spike((x + nx * o + ny * (j - 0.5) * 0.2, y + ny * o - nx * (j - 0.5) * 0.2, -0.06),
+                hh = float(rng.uniform(0.14, 0.3))
+                p.spike((x + nx * o + ny * (j - 0.5) * 0.2, y + ny * o - nx * (j - 0.5) * 0.2, lvl[k] - 0.06),
                         0.06, -hh, p.vary(TURF, 0.12), sides=3, lean=(nx * hh * 0.35, ny * hh * 0.35),
                         phase=float(rng.uniform(0, TAU)))
-    # Rock breaking up through the turf by the edge (low, a step's height),
-    # flowers and grass gathered against them.
-    for k in range(9):
-        a = float(rng.uniform(0, TAU))
+    # Rock breaking up through the turf by the edge on the promontories (low,
+    # a step's height), flowers and grass gathered against them.
+    for k in range(7):
+        a = S['proms'][k % len(S['proms'])] + float(rng.uniform(-0.3, 0.3))
         if not clear_of_home(a, 0.55):
             continue
         x, y, _ = edge_pt(walk, a, -float(rng.uniform(0.7, 1.1)))
-        if RING_IN - 0.6 < math.hypot(x, y) < RING_OUT + 0.4:
+        if RING_IN - 0.6 < math.hypot(x, y) < RING_OUT + 0.4 or ledge_sd(x, y) < 0.7:
             continue
-        s = float(rng.uniform(0.45, 0.9))
+        z = lv(x, y)
+        s = float(rng.uniform(0.45, 0.85))
         with p.as_kind(RAW):
-            crystal(p, (x, y, 0.0), (s * 1.5, s, s * 0.5), p.vary(CRAG_BED, 0.08), n=11, boxy=0.75,
-                    jitter=0.22, yaw=float(rng.uniform(0, TAU)), floor=-0.1)
+            crystal(p, (x, y, z), (s * 1.5, s, min(0.36, s * 0.5)), p.vary(CRAG_BED, 0.08), n=11, boxy=0.75,
+                    jitter=0.22, yaw=float(rng.uniform(0, TAU)), floor=z - 0.1)
         nx, ny = math.cos(a), math.sin(a)
-        _tuft(p, (x - nx * s * 0.7, y - ny * s * 0.7, 0.0), 0.26, rng, blades=4)
-        _flowers(p, (x + ny * s * 0.6, y - nx * s * 0.6, 0.0), rng, n=3)
+        flower_bed((x - nx * s * 0.7, y - ny * s * 0.7, z), 3, 0.35)
+        flower_bed((x + ny * s * 0.7, y - nx * s * 0.7, z), 2, 0.3)
     # Bedrock breaking flush through the turf (a step never trips on it).
     placed = 0
-    for _ in range(40):
-        if placed >= 6:
+    for _ in range(60):
+        if placed >= 7:
             break
-        x, y = float(rng.uniform(-8.0, 8.0)), float(rng.uniform(-8.0, 8.0))
+        x, y = float(rng.uniform(-10.0, 10.0)), float(rng.uniform(-10.0, 10.0))
         r = math.hypot(x, y)
         if not inside(walk, x, y, 0.8) or RING_IN - 0.7 < r < RING_OUT + 0.5 or r < 2.0:
             continue
-        if math.hypot(x - pads['home'][0], y - pads['home'][1]) < PAD_R + 0.8:
+        if math.hypot(x - pads['home'][0], y - pads['home'][1]) < PAD_R + 0.8 or ledge_sd(x, y) < 1.2:
             continue
         s2 = float(rng.uniform(0.5, 1.0))
         yaw = float(rng.uniform(0, TAU))
         outline = [(x + math.cos(yaw + TAU * j / 7) * s2 * float(rng.uniform(0.6, 1.2)),
                     y + math.sin(yaw + TAU * j / 7) * s2 * float(rng.uniform(0.5, 0.9))) for j in range(7)]
-        _flagstone(p, outline, rng, CRAG_BED, top=0.025, bevel=0.14)
+        _flagstone(p, outline, rng, CRAG_BED, top=lv(x, y) + 0.025, bevel=0.14, floor=lv(x, y))
+        flower_bed((x + s2 * 0.9, y, lv(x, y)), 1, 0.25)
         placed += 1
-    # Flowers along the lip and at the stones' feet.
-    for k in range(0, len(edge), 9):
+    # Flowers in drifts along the lip.
+    for k in range(0, len(edge), 12):
         x, y = edge[k]
         nx, ny = nrm[k]
-        if math.hypot(x - pads['home'][0], y - pads['home'][1]) < PAD_R + 0.4 or rng.uniform(0, 1) < 0.4:
+        if math.hypot(x - pads['home'][0], y - pads['home'][1]) < PAD_R + 0.4 or rng.uniform(0, 1) < 0.35:
             continue
-        _flowers(p, (x - nx * 0.35, y - ny * 0.35, 0.0), rng, n=3)
-    for a in S['stones']:
-        q = edge_pt(walk, a, 1.0, -0.4)
-        q = _on_surface(f, [(q[0], q[1], q[2] + 0.4)], lift=0.0)[0]
-        if not inside(walk, q[0], q[1], -0.5):
-            _flowers(p, q, rng, n=4)
+        flower_bed((x - nx * 0.45, y - ny * 0.45, lvl[k]), 2, 0.3)
     # The satellites' dressing: tufts, a root, a crystal.
     for (a, r, top, size, depth), tip in zip(S['sats'], sat_tips):
         cx, cy = math.cos(a) * r, math.sin(a) * r
@@ -1329,28 +1688,30 @@ def wind_isle(bpy, variant):
         _crystal_cluster(p, at, (0, 0, -1), rng, n=5 if i == 0 else 3, big=6.0 if i == 0 else 3.6,
                          r=0.62 if i == 0 else 0.42)
         glows.append(at)
-    for c in range(4):
-        a = TAU * c / 4 + float(rng.uniform(-0.35, 0.35))
+    for c in range(2):
+        a = TAU * c / 2 + float(rng.uniform(-0.35, 0.35))
         z = float(rng.uniform(-D * 0.75, -4.5))
         cx, cy = _hang_c(z, D, S['lean'])
         r = _hang_r(z, D, S['crown']) + 2.0
         at = _on_surface(f, [(cx + math.cos(a) * r, cy + math.sin(a) * r, z)], lift=-0.25)[0]
         _crystal_cluster(p, at, (math.cos(a), math.sin(a), -0.5), rng, n=3, big=2.8, r=0.3)
         glows.append(at)
-    # The roots: out from under the turf, clinging down the belly, hanging.
-    for k in range(8):
-        a = TAU * k / 8 + float(rng.uniform(-0.2, 0.2))
+    # The roots: out from under the turf, clinging down the belly, hanging;
+    # most out of the bays' deep soil.
+    starts = [b + d for b in S['bays'] for d in (-0.22, 0.2)]
+    for k, a in enumerate(starts):
+        a += float(rng.uniform(-0.08, 0.08))
         x, y, _ = edge_pt(walk, a, 0.25)
-        start = _on_surface(f, [(x, y, -1.0)], lift=0.15)[0]
+        start = _on_surface(f, [(x, y, -1.2)], lift=0.15)[0]
         # Out from under the turf, never up over its lip.
-        start = (start[0], start[1], min(start[2], -0.6))
-        _root(p, f, start, a, rng, float(rng.uniform(4.0, 9.5)) * (1.25 if k % 4 == 0 else 1.0),
-              float(rng.uniform(0.2, 0.3)))
-    # Vines over the lip.
-    for k in range(3):
-        a = TAU * k / 3 + 0.31 + float(rng.uniform(-0.2, 0.2))
-        x, y, _ = edge_pt(walk, a, 0.18, -0.3)
-        _vine(p, f, (x, y, -0.3), a, rng, float(rng.uniform(2.5, 7.0)))
+        start = (start[0], start[1], min(start[2], -0.9))
+        _root(p, f, start, a, rng, float(rng.uniform(4.0, 9.5)) * (1.25 if k % 3 == 0 else 1.0),
+              float(rng.uniform(0.2, 0.3)), sides=4)
+    # Vines over the lip, curtained in the bays.
+    for k, a in enumerate(S['bays']):
+        for d in ((-0.12, 0.1) if k == 0 else (0.0,)):
+            x, y, _ = edge_pt(walk, a + d, 0.18)
+            _vine(p, f, (x, y, -0.4), a + d, rng, float(rng.uniform(2.5, 6.5)))
     return p
 
 

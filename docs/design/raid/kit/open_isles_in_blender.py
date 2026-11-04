@@ -35,6 +35,12 @@ VIEWS = {
     'encima_A': ((14.0, -22.0, 13.0), (0.0, 0.0, -1.0), 30),
     # Over B's walk.
     'encima_B': ((B_AT[0] - 16.0, B_AT[1] - 20.0, B_AT[2] + 13.0), (B_AT[0], B_AT[1], B_AT[2] - 1.0), 30),
+    # Straight down on each walk (its organic outline, its ledges).
+    'cenital_A': ((0.0, -0.01, 42.0), (0.0, 0.0, 0.0), 32),
+    'cenital_B': ((B_AT[0], B_AT[1] - 0.01, B_AT[2] + 42.0), (B_AT[0], B_AT[1], B_AT[2]), 32),
+    # Down onto a bay's lip and A's ledge, close.
+    'borde_A': ((9.0, 9.0, 4.0), (3.0, 4.0, -1.5), 30),
+    'repisa_A': ((2.0, -1.0, 3.2), (9.5, -1.0, 0.2), 28),
 }
 
 
@@ -71,13 +77,16 @@ def main():
     figure.location = (-2.8, 1.4, 1.0)
     cam = camera('isles', lens=30)
     scene.camera = cam
+    only = arg('--views')
     for name, (eye, at, lens) in VIEWS.items():
+        if only and name not in only.split(','):
+            continue
         cam.data.lens = lens
         look(cam, Vector(eye), Vector(at))
         scene.render.filepath = os.path.join(out, f'isles_{name}.png')
         bpy.ops.render.render(write_still=True)
-    # Leave the scene on the look from the Cornice.
-    eye, at, lens = VIEWS['debajo']
+    # Leave the scene on the look down onto A's walk.
+    eye, at, lens = VIEWS['encima_A']
     cam.data.lens = lens
     look(cam, Vector(eye), Vector(at))
     if arg('--save'):
