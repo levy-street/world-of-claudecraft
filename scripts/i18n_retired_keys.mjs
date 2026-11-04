@@ -387,6 +387,10 @@ export const RETIRED_KEYS = [
   'guide.combat.unstuckBody',
   'guide.commandsPage.unstuck',
   'guide.glossary.unstuckDef',
+  // -- v0.46.0 Professions hub. The Harvest Journal became a tab of the Professions
+  // window and Shift+K no longer ships as a default keybind, so the guide's controls
+  // page dropped its row (the action stays rebindable from the keybind options).
+  'guide.controls.harvestJournal',
 ];
 
 export const RETIRED_KEY_SET = new Set(RETIRED_KEYS);

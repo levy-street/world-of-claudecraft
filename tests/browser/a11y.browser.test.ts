@@ -1271,6 +1271,8 @@ describe('axe: professions window tool-effect controls', () => {
     const win = new ProfessionsWindow(
       stubDeps({
         root: () => root,
+        // stubDeps answers every missing dep with a no-op; outside the hub there is no strip.
+        hubStrip: undefined,
         world: () => world as never,
         consumePeek: () => false,
         itemIcon: () => '<img alt="">',
@@ -1388,6 +1390,8 @@ describe('axe: harvest journal rows and the ready status line', () => {
     const win = new HarvestJournalWindow(
       stubDeps({
         root: () => root,
+        // stubDeps answers every missing dep with a no-op; outside the hub there is no strip.
+        hubStrip: undefined,
         world: () => world as never,
       }),
     );

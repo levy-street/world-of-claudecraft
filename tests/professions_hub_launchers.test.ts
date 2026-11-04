@@ -78,8 +78,10 @@ describe('one Professions launcher on the rail', () => {
       'mm-deeds',
       'mm-reliquary',
       'mm-loot-explorer',
+      'mm-leaderboard',
       'mm-professions',
       'mm-bag',
+      'mm-map',
     ];
     for (const [name, html] of entries) {
       const buttons = colA(html).match(/<button[^>]*class="[^"]*\bmicro-btn\b[^"]*"[^>]*>/g) ?? [];
