@@ -23168,6 +23168,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.breathGuardian.windworn':
     '被风耗尽了力气：效果结束前，狂风之路不会带你前往浮岛。',
   'hudChrome.auraEffect.breathGuardian.thrown': '被巅峰咆哮掀飞：落地之前无法移动。',
+  'hudChrome.auraEffect.breathGuardian.tossed': '被游荡狂风掀飞：狂风放下你之前无法移动。',
   'hudChrome.auraEffect.breathGuardian.portalA':
     '效果结束时，传送门A会在你所站的位置打开。站在结风附近。本轮你无法携带它。',
   'hudChrome.auraEffect.breathGuardian.portalB':

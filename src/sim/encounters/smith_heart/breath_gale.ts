@@ -26,8 +26,9 @@
 //                          by the edge, the raid goes over it; the anchored
 //                          stay put).
 //   Heroic                 three loose gales wander the Cornice after each
-//                          exhale, tossing whoever they touch (a throw can
-//                          carry a body out through a gap); in phase 2, short
+//                          exhale, tossing whoever they touch: a shove slid
+//                          over galeSlide (breath_shove.ts), never a blink (a
+//                          throw can carry a body out through a gap); in phase 2, short
 //                          gusts return now and then, telegraphed.
 //
 // The wind's phase, bearing and length ride ONE object's template id
@@ -70,6 +71,7 @@ import {
   spawnBreathObject,
   throwPlayer,
 } from './breath_scope';
+import { beginShove, clearShoves, stepShoves } from './breath_shove';
 import type { BreathFightState } from './breath_state';
 import { breathSay } from './breath_voice';
 
@@ -413,6 +415,8 @@ export function startGales(s: BreathScope): void {
 
 function stepGales(s: BreathScope): void {
   const st = s.st;
+  // The tosses slide on even once their gales have gone.
+  if (st.galeShoves.length > 0) stepShoves(s, st.galeShoves);
   if (st.gales.length === 0) return;
   const keep: typeof st.gales = [];
   for (const g of st.gales) {
@@ -451,9 +455,24 @@ function stepGales(s: BreathScope): void {
         'hit',
         true,
       );
-      if (!p.dead) {
+      // The toss SLIDES (Jose's playtest of 2026-11-04: a one-tick throw read
+      // as a sideways teleport): a shove eased out over galeSlide, held so
+      // the online client draws it (breath_shove.ts). A body still sliding
+      // is not shoved again.
+      if (!p.dead && !st.galeShoves.some((sl) => sl.id === p.id)) {
         const len = d > 1e-3 ? d : 1;
-        throwPlayer(s, p, d > 1e-3 ? dx / len : 0, d > 1e-3 ? dz / len : 1, T.galeThrow);
+        const shove = beginShove(
+          s,
+          p,
+          d > 1e-3 ? dx / len : 0,
+          d > 1e-3 ? dz / len : 1,
+          T.galeThrow,
+          T.galeSlide,
+          'out',
+          BREATH_AURAS.tossed,
+          BREATH_NAMES.gale,
+        );
+        if (shove) st.galeShoves.push(shove);
       }
     }
     keep.push(g);
@@ -464,6 +483,7 @@ function stepGales(s: BreathScope): void {
 export function clearGales(ctx: SimContext, inst: InstanceSlot, st: BreathFightState): void {
   for (const g of st.gales) dropBreathObject(ctx, inst, g.objectId);
   st.gales = [];
+  clearShoves({ ctx }, st.galeShoves);
 }
 
 // ---- the tick ---------------------------------------------------------------------------------

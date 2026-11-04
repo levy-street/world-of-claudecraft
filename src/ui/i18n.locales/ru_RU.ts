@@ -24830,6 +24830,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.breathGuardian.windworn': 'Измотан ветром: пока эффект не закончится, Путь шквала не перенесёт вас на острова.',
   'hudChrome.auraEffect.breathGuardian.thrown':
     'Отброшен Рёвом вершины: вы не можете двигаться, пока не приземлитесь.',
+  'hudChrome.auraEffect.breathGuardian.tossed':
+    'Отброшен блуждающим вихрем: вы не можете двигаться, пока порыв не опустит вас.',
   'hudChrome.auraEffect.breathGuardian.portalA': 'Когда эффект закончится, Портал A откроется точно там, где вы стоите. Встаньте рядом с Узлом бури. В этом раунде вы не можете его нести.',
   'hudChrome.auraEffect.breathGuardian.portalB': 'Когда эффект закончится, Портал B откроется точно там, где вы стоите. Встаньте у края Карниза. В этом раунде вы не можете нести Узел бури.',
   'hudChrome.auraEffect.breathGuardian.portalC': 'Когда эффект закончится, Портал C откроется точно там, где вы стоите. Он связан только с Порталом D. Встаньте рядом со вторым Узлом бури. В этом раунде вы не можете его нести.',

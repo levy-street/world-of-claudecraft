@@ -705,6 +705,8 @@ describe('Guardian of the Breath: heroic', () => {
     const before = f.local(p);
     const hits = hitsOf(f.tick(2), BREATH_NAMES.gale, p.id);
     expect(hits.length).toBe(1);
+    // The toss slides out over its moment (smith_heart_breath_gale_shove.test.ts).
+    f.tick(Math.round(T.galeSlide / DT));
     expect(dist(f.local(p), before)).toBeGreaterThan(3);
     // Normal: none.
     const n = pulled(4);

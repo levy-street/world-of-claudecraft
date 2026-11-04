@@ -103,6 +103,7 @@ import { BreathHeartFx } from './breath_heart_fx';
 import { BreathInhaleStreams } from './breath_inhale_streams';
 import { BreathIslesFx } from './breath_isles_fx';
 import { BreathRoarFx } from './breath_roar_fx';
+import { BreathTossFx } from './breath_toss_fx';
 import { BreathWindStreaks } from './breath_wind_streaks';
 import { BREATH_TELEGRAPH_GLOW_STEP, type BreathTelegraphKind } from './painted_telegraph_core';
 import { BreathTelegraphs, type PaintedFan } from './painted_telegraphs';
@@ -585,6 +586,7 @@ export class BreathFightFx {
   private readonly inhale: BreathInhaleStreams;
   /** The Summit Roar's wave and hits, the indrawn breath's pull (breath_roar_fx.ts). */
   private readonly roar: BreathRoarFx;
+  private readonly toss: BreathTossFx;
   private readonly lookup = (id: number): Entity | undefined => this.world?.entities.get(id);
   private readonly groundAt = (x: number, z: number): number => this.groundY(x, z);
   private readonly cradledIds: number[] = [];
@@ -1040,6 +1042,12 @@ export class BreathFightFx {
       shakeNear: (x, z, amount, reach) => this.shakeNear(x, z, amount, reach),
       reducedMotion: () => this.reducedMotion(),
     });
+    this.toss = new BreathTossFx({
+      particles: this.particles,
+      density: this.density,
+      groundY: (x, z) => this.groundY(x, z),
+      shakeNear: (x, z, amount, reach) => this.shakeNear(x, z, amount, reach),
+    });
     this.readyForEntry = attachSceneGroupGated(scene, this.root, compileGate, () => this.disposed)
       .then(() => {})
       .catch(() => {});
@@ -1156,23 +1164,8 @@ export class BreathFightFx {
     } else if (ev.ability === BREATH_CUES.anchor && src && dst) {
       this.beam(src, dst, ANCHOR_BEAM_SECONDS, 1.4, C.calm);
     } else if (ev.ability === BREATH_CUES.toss && dst) {
-      this.particles.puff(
-        fxAnchor(dst).x,
-        fxAnchor(dst).y + 0.6,
-        fxAnchor(dst).z,
-        Math.round(16 * this.density),
-        {
-          speed: 9,
-          up: 4,
-          life: 0.8,
-          size: [0.5, 1.6],
-          color: C.grit,
-          alpha: 0.6,
-          drag: 1.2,
-          radius: 0.8,
-        },
-      );
-      this.particles.shockRing(fxAnchor(dst).x, fxAnchor(dst).z, C.control, 3.5, 0.45);
+      // The shove: its burst, its slide's trail and a light kick (breath_toss_fx.ts).
+      this.toss.blow(world, src, dst);
     } else if (ev.ability === BREATH_CUES.swell && src) {
       // The storm swells: a ring rolling over the whole Cornice.
       this.particles.shockRing(fxAnchor(src).x, fxAnchor(src).z, 0xbfefff, 46, 1.6);
@@ -1218,6 +1211,7 @@ export class BreathFightFx {
     const onCornice =
       !!meE && !!this.origin && Math.abs(meE.pos.y - this.local.position.y - CORNICE_FLOOR_H) < 6;
     this.roar.update(world, g0, onCornice, dt);
+    this.toss.update(world, dt);
     this.updateBolts();
     this.particles.update(this.clock);
     const guardian = this.guardianId >= 0 ? (world.entities.get(this.guardianId) ?? null) : null;
@@ -1387,6 +1381,7 @@ export class BreathFightFx {
     this.isles.leave();
     this.inhale.hide();
     this.roar.leave();
+    this.toss.clear();
     this.origin = null;
     this.rosterSeen = Number.NaN;
     this.candidateIds.length = 0;

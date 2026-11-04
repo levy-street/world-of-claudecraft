@@ -155,6 +155,7 @@ function freshState(boss: Entity, difficulty: BreathDifficulty): BreathFightStat
     anchors: [],
     vortex: null,
     gales: [],
+    galeShoves: [],
     barrage: null,
     spots: [],
     forkTimer: T.forkFirst,

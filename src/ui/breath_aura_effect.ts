@@ -114,6 +114,8 @@ export function breathAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescri
       return { key: `${KEY}.windworn` };
     case BREATH_AURAS.thrown:
       return { key: `${KEY}.thrown` };
+    case BREATH_AURAS.tossed:
+      return { key: `${KEY}.tossed` };
     case BREATH_AURAS.stormForm:
       return { key: `${KEY}.stormForm` };
     case BREATH_AURAS.swell:

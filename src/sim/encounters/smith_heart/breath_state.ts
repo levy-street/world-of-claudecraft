@@ -5,6 +5,7 @@
 // players' auras and the fight's objects (breath_ids.ts says which).
 
 import type { BreathDifficulty, BreathWindPhase } from './breath_ids';
+import type { BreathShove } from './breath_shove';
 
 /** The wind's clock (phase 1, and the heroic gusts of phase 2). */
 export interface BreathWind {
@@ -178,7 +179,7 @@ export interface BreathRoar {
   r: number;
   reach: number;
   struck: number[];
-  slides: { id: number; ux: number; uz: number; left: number; step: number }[];
+  slides: BreathShove[];
 }
 
 export interface BreathFightState {
@@ -217,6 +218,8 @@ export interface BreathFightState {
   /** The vortex object while the guardian draws breath, and its clock. */
   vortex: { objectId: number; x: number; z: number; tick: number } | null;
   gales: BreathGale[];
+  /** The loose gales' tosses still sliding (breath_shove.ts). */
+  galeShoves: BreathShove[];
   /** The Summit Roar's wave in flight (breath_roar.ts), or null. */
   roar: BreathRoar | null;
   /** The storm breaking: the barrage's clock (seconds left, next volley). */

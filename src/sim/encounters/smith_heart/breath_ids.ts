@@ -89,6 +89,10 @@ export const BREATH_AURAS = {
    *  (breath_roar.ts), so the online client draws the server's slide
    *  instead of predicting steps the player cannot take. */
   thrown: 'heart_breath_roar_thrown',
+  /** Tossed by a loose gale: the same unbreakable root while the shove
+   *  slides (breath_shove.ts; Jose's playtest of 2026-11-04 read the old
+   *  one-tick toss as a sideways teleport). */
+  tossed: 'heart_breath_gale_tossed',
 } as const;
 
 /** The fight's object templates (their radius rides `scale`). */
@@ -360,6 +364,9 @@ export const BREATH_TUNING = {
   galeMin: 120,
   galeMax: 150,
   galeThrow: 11,
+  /** How long a toss slides its throw (seconds, eased out: a shove that
+   *  starts fast and settles, never a blink). */
+  galeSlide: 0.6,
   /** One toss per player per gale in this many seconds. */
   galeEvery: 2,
   // At half health: the storm breaks.
