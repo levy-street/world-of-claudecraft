@@ -23,6 +23,7 @@
 //   hazards?(world,st,b,me) circles {x,z,r} a bot keeps out of on its role spot
 //   bad?(world, st, at)    true when a spot is unsafe (extra to the hazards)
 //   roleSpot?(world,st,b,me) a bot's own resting spot instead of the generic one
+//   opener                 the roster key that pulls (default the main tank 'mt')
 //   tauntPad               yards past a taunt's reach a large body still counts (its girth)
 //   obstacles?(world)      circles a walking bot goes round
 //   blocksLine?(world,a,b) true when no line of sight (pillars)
@@ -644,7 +645,7 @@ async function fight(world, bots, byKey, boss) {
     lastHp: {},
   };
   world.st = st;
-  const mt = byKey.mt ?? bots.find((b) => b.spec.role === 'tank');
+  const mt = byKey[boss.opener ?? 'mt'] ?? byKey.mt ?? bots.find((b) => b.spec.role === 'tank');
   log(`PULL: ${mt.name} opens on the ${world.roles[0]} (${DIFF})`);
   fightStart = Date.now();
   st.pullAt = Date.now();
@@ -812,6 +813,11 @@ function act(world, st, b, mt, boss) {
   const now = Date.now();
   const role = b.spec.role;
   if (role === 'tank') (boss.tankAssign ?? tankAssign)(world, st, b, me);
+  // The opener pulls the main body before anything is engaged.
+  if (b === mt && !st.engagedAt && alive(world.mobs[world.roles[0]])) {
+    b.tankTarget = world.roles[0];
+    b.loose = { r: world.roles[0], m: world.mobs[world.roles[0]], onTank: false };
+  }
   const d = boss.duty?.(world, st, b, me) ?? null;
   let goal = d?.goal ?? null;
   let tol = d?.tol ?? 1.0;
@@ -1109,7 +1115,7 @@ function tankAssign(world, st, b, me) {
   if (!mainTank)
     mainTank =
       (holderOf(g)?.tank ? holderOf(g) : null) ??
-      tanks.find((p) => p.bot?.spec.key === 'mt') ??
+      tanks.find((p) => p.bot?.spec.key === (boss.opener ?? 'mt')) ??
       tanks[0];
   const other = mainTank ? tanks.find((p) => p.pid !== mainTank.pid) : null;
   if (mainTank && other && heavy(mainTank) && !heavy(other)) {
