@@ -1157,6 +1157,8 @@ const RENDER_PURE_CORES = [
   'src/render/smith_heart_fx/quench_body_core.ts',
   'src/render/smith_heart_fx/quench_fight_fx_core.ts',
   'src/render/smith_heart_fx/quench_frost_fx_core.ts',
+  // The Quench's frost glaze painted on a body's own material.
+  'src/render/smith_heart_fx/quench_glaze_core.ts',
   'src/render/smith_heart_fx/heat_body_core.ts',
   'src/render/smith_heart_fx/heat_fight_fx_core.ts',
   // The Heat's floor ladder (every floor layer's unique rung) and its molten
