@@ -54,6 +54,7 @@ import {
 } from '../sim/account_flair';
 import { isOwnAura } from '../sim/aura_classify';
 import { bagPools } from '../sim/bags';
+import { ruinAmountFromAuras } from '../sim/combat/destruction';
 import { buddyVendorOffer } from '../sim/content/buddy_offers';
 import { DEEDS } from '../sim/content/deeds';
 import { vendorFactionForNpc } from '../sim/content/faction_vendors';
@@ -7317,10 +7318,14 @@ export class Hud {
       abilityId === 'clockwork_shock_bomb'
         ? (this.sim.player.cooldowns.get(abilityId) ?? 0) <= 0
         : actionBarCooldownRemaining(this.sim.player, resolved) <= 0;
+    // Short on Wrack (Rain of Fire): skip the reticle so the press goes straight
+    // to the sim, which refuses at once with "Not enough Wrack!" instead of
+    // letting the player aim a cast that can never land.
+    const wrackReady = (resolved.def.ruinCost ?? 0) <= ruinAmountFromAuras(this.sim.player.auras);
     this.playerGroundAim.pressPosition(
       abilityId,
       slotForAim,
-      this.groundReticleEnabled() && !this.sim.player.dead && cdReady,
+      this.groundReticleEnabled() && !this.sim.player.dead && cdReady && wrackReady,
       document.body.classList.contains('mobile-touch'),
     );
   }
