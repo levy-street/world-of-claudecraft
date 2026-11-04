@@ -87,7 +87,7 @@ export const ENGINE_AURAS: Readonly<Record<PlayerClass, readonly EngineRow[]>> =
   warlock: [
     { kind: 'soul_fragments', name: 'Soul Fragments' },
     { kind: 'necromancy_death_echo', name: 'Death Echo' },
-    { kind: 'destruction_ruin', name: 'Ruin' },
+    { kind: 'destruction_ruin', name: 'Wrack' },
     { kind: 'desolation', name: 'Desolation' },
   ],
   druid: [

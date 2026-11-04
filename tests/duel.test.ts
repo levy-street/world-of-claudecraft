@@ -266,7 +266,7 @@ describe('duel: PvP combat affordances', () => {
     warlock.gcdRemaining = 0;
     warlock.auras.push({
       id: 'destruction_ruin',
-      name: 'Ruin',
+      name: 'Wrack',
       kind: 'destruction_ruin',
       remaining: 3600,
       duration: 3600,

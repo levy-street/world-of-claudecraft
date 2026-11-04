@@ -95,7 +95,7 @@ export function gainRuin(ctx: SimContext, player: Entity, amount: number): void 
   }
   ctx.applyAura(player, {
     id: RUIN_AURA_ID,
-    name: 'Ruin',
+    name: 'Wrack',
     kind: 'destruction_ruin',
     value: next,
     stacks: next,

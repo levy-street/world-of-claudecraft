@@ -58,7 +58,7 @@ function giveRuin(p: Entity, stacks: number): void {
   if (stacks <= 0) return;
   p.auras.push({
     id: 'destruction_ruin',
-    name: 'Ruin',
+    name: 'Wrack',
     kind: 'destruction_ruin',
     value: stacks,
     stacks,
