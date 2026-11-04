@@ -89,26 +89,43 @@ void main() {
   gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 }
 `;
-/** The ring of broken ice a blade leaves in the lake once torn out. */
+/** The broken ice a blade leaves in the lake once torn out (audit point 19:
+ *  a ring of radial sectors round a black middle read as a drain): plates of
+ *  the lake heaved and cracked along warped seams, a ragged edge melting into
+ *  the lake, and the slot of dark water the blade stood in, long along its
+ *  broad face. */
 const SOCKET_FRAG = /* glsl */ `
 uniform float uAlpha;
 uniform vec3 uDark;
 uniform vec3 uLight;
 varying vec2 vUv;
 float h(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+float n(vec2 p) {
+  vec2 i = floor(p);
+  vec2 f = fract(p);
+  f = f * f * (3.0 - 2.0 * f);
+  return mix(mix(h(i), h(i + vec2(1, 0)), f.x), mix(h(i + vec2(0, 1)), h(i + vec2(1, 1)), f.x), f.y);
+}
 void main() {
   vec2 p = (vUv - 0.5) * 2.0;
   float r = length(p);
   float a = atan(p.y, p.x);
-  if (r > 1.0) discard;
-  // A dark heave of broken plates, radial cracks of light, open water deep in.
-  float cell = floor(a * 3.2 + 3.2) + floor(r * 4.0) * 13.0;
-  float plate = h(vec2(cell, 3.1));
-  float crack = 1.0 - smoothstep(0.0, 0.05, abs(fract(a * 1.9 + plate * 0.3) - 0.5) - 0.44);
-  float water = 1.0 - smoothstep(0.18, 0.34, r);
-  vec3 col = mix(uDark, uLight, crack * (1.0 - r) + plate * 0.25);
-  col = mix(col, uDark * 0.4, water);
-  float alpha = (1.0 - smoothstep(0.82, 1.0, r)) * uAlpha * (0.55 + 0.35 * plate + 0.3 * water);
+  float rag = 0.74 + 0.18 * n(vec2(a * 2.5, 1.7)) + 0.06 * n(vec2(a * 9.0, 4.1));
+  if (r > rag) discard;
+  // Heaved plates along warped seams (never sectors of a circle).
+  vec2 q = p * 2.4 + vec2(n(p * 3.0), n(p * 3.0 + 7.0)) * 0.8;
+  float plate = h(floor(q));
+  vec2 f = fract(q);
+  float seam = min(min(f.x, 1.0 - f.x), min(f.y, 1.0 - f.y));
+  float crack = (1.0 - smoothstep(0.02, 0.07, seam)) * smoothstep(0.15, 0.45, r);
+  // The slot the blade stood in: dark water, long along its broad face.
+  float slot = 1.0 - smoothstep(0.1, 0.2, length(p * vec2(0.5, 1.7)) + 0.06 * n(p * 9.0));
+  // Lake ice heaved up, a touch paler than the lake round it, never a white disc.
+  vec3 ice = mix(uDark * 2.2, uLight * 0.62, 0.3 + 0.35 * plate);
+  vec3 col = mix(ice, uDark * 0.9, crack * 0.65);
+  col = mix(col, uDark * 0.35, slot);
+  float alpha = (1.0 - smoothstep(rag - 0.14, rag, r)) * uAlpha;
+  alpha *= 0.26 + 0.16 * plate + 0.6 * slot + 0.3 * crack;
   gl_FragColor = vec4(col, alpha);
   #include <colorspace_fragment>
 }
@@ -243,8 +260,13 @@ export class QuenchBladesFx {
       const col = new Float32Array(pos.count * 3);
       for (let i = 0; i < pos.count; i++) {
         pos.setXYZ(i, pos.getX(i) * 1.1, pos.getY(i), pos.getZ(i) * 0.46);
+        // The blade's own paint carried down to its point (audit point 19: a
+        // pale flat wedge): deep glacier blue down the middle, its bevelled
+        // edges catching the light, a little paler toward the point.
         const k = Math.min(1, -pos.getY(i) / BLADE_TIP);
-        col.set([0.3 + 0.5 * k, 0.52 + 0.38 * k, 0.7 + 0.28 * k], i * 3);
+        const edge = Math.min(1, Math.abs(pos.getX(i)) / 1.1);
+        const v = 0.55 + 0.4 * edge + 0.12 * k;
+        col.set([0.2 * v + 0.12 * edge, 0.46 * v + 0.1 * edge, 0.82 * v + 0.08 * edge], i * 3);
       }
       tipGeo.setAttribute('color', new THREE.BufferAttribute(col, 3));
       tipGeo.computeVertexNormals();

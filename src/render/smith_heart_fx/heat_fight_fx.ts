@@ -325,12 +325,17 @@ varying vec2 vUv;
 varying float vFace;
 ${HEAT_NOISE_GLSL}
 void main() {
+  // A lance of flame, never a solid tube (audit point 18): a thin white-hot
+  // core inside a sheath of fire torn by its own flicker, tapering in at both
+  // ends.
   float run = vn(vec2(vUv.y * 9.0 - uTime * 16.0, vUv.x * 6.0));
-  float core = pow(vFace, 6.0);
-  float sheath = pow(vFace, 1.4);
-  vec3 col = mix(vec3(1.0, 0.7, 0.3), vec3(1.0, 0.97, 0.86), core * (0.75 + 0.25 * run));
-  float a = (0.15 + 0.55 * sheath + 0.6 * core) * (0.8 + 0.2 * run) * uAlpha;
-  gl_FragColor = vec4(col * a * 3.0, min(1.0, a));
+  float flick = vn(vec2(vUv.y * 24.0 - uTime * 30.0, vUv.x * 12.0 + uTime * 3.0));
+  float core = pow(vFace, 9.0);
+  float sheath = pow(vFace, 2.2) * smoothstep(0.3, 0.75, flick);
+  float taper = smoothstep(0.0, 0.08, vUv.y) * (0.55 + 0.45 * smoothstep(1.0, 0.85, vUv.y));
+  vec3 col = mix(vec3(1.0, 0.5, 0.14), vec3(1.0, 0.95, 0.8), core * (0.7 + 0.3 * run));
+  float a = (0.5 * sheath + 0.95 * core) * (0.75 + 0.25 * run) * taper * uAlpha;
+  gl_FragColor = vec4(col * a * 2.4, min(1.0, a));
   #include <colorspace_fragment>
 }
 `;
@@ -1167,7 +1172,7 @@ export class HeatFightFx implements HeatFxHost {
       const k = since / BOLT_SECONDS;
       b.mesh.position.copy(_v);
       b.mesh.quaternion.copy(_q);
-      const w = 0.6 * (1 - k * 0.6);
+      const w = 0.45 * (1 - k * 0.6);
       b.mesh.scale.set(w, len, w);
       b.mat.uniforms.uAlpha.value = 1 - k;
       b.mesh.visible = true;

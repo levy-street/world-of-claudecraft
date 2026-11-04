@@ -158,8 +158,10 @@ void main() {
   gl_Position = projectionMatrix * wocCamRelView(wp.xyz);
 }
 `;
-/** A rolling wall of molten rock: its face boiling white-gold up toward the
- *  crest, plates of dark crust riding its back, drops of light on the lip. */
+/** A rolling wall of molten rock (audit point 18: the whole wall glowed, a
+ *  smooth gold egg): plates of dark crust riding its back with their seams
+ *  alight, the curl's face open and boiling, a hot lip that tears into
+ *  spatter, its foot sunk in its own wake. */
 const WALL_FRAG = /* glsl */ `
 uniform float uTime;
 uniform float uHeat;
@@ -170,13 +172,21 @@ ${HEAT_MOLTEN_GLSL}
 ${HEAT_LAVA_GLSL}
 void main() {
   // Along the profile: 0 the back's foot, ~0.62 the crest, 1 the curl's lip.
-  float crest = 1.0 - smoothstep(0.0, 0.3, abs(vUv.y - 0.66));
-  float lvl = lavaLevel(vec2(vW.x + vW.z, vUv.y * 9.0), vec2(0.0, -1.6), uTime, 1.15);
-  float m = mix(lvl * 0.75, 1.0, crest * 0.55) + 0.2 * smoothstep(0.75, 1.0, vUv.y);
+  float y = vUv.y;
+  float along = vW.x + vW.z;
+  float lvl = lavaLevel(vec2(along, y * 7.0), vec2(0.0, -1.3), uTime, 1.0);
+  // The back crusts over; the curl's face runs open.
+  float face = smoothstep(0.55, 0.82, y);
+  float lip = 1.0 - smoothstep(0.0, 0.06, abs(y - 0.66));
+  float m = lvl * mix(0.62, 1.05, face) + lip * 0.3 * (0.5 + 0.5 * lvl);
   m *= uHeat;
-  float edge = smoothstep(0.0, 0.08, vUv.x) * smoothstep(1.0, 0.92, vUv.x);
-  vec3 col = molten(clamp(m, 0.0, 1.0));
-  gl_FragColor = vec4(col, 0.92 * edge + 0.08);
+  // The lip tears into spatter; the foot sinks into the wake.
+  float tear = vn(vec2(along * 1.4, uTime * 1.7)) * 0.6 + vn(vec2(along * 4.0, uTime * 3.1)) * 0.4;
+  if (y > 0.86 + 0.14 * tear) discard;
+  float foot = smoothstep(0.0, 0.07, y);
+  float edge = smoothstep(0.0, 0.1, vUv.x) * smoothstep(1.0, 0.9, vUv.x);
+  vec3 col = molten(clamp(m, 0.0, 1.0)) * 0.82;
+  gl_FragColor = vec4(col, (0.94 * edge + 0.06) * foot);
   #include <colorspace_fragment>
 }
 `;
