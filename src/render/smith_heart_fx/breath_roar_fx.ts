@@ -25,6 +25,7 @@ import { BREATH_CASTS, BREATH_CUES } from '../../sim/encounters/smith_heart/brea
 import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
 import { fxAnchor } from '../attached_fx_anchor';
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import type { EngineParticles } from '../trash_engine_fx/engine_particles';
 import {
@@ -105,12 +106,13 @@ void main() {
  *  place on the screen projected per vertex; streaks at the screen's edges
  *  rushing in toward it. */
 const SCREEN_VERT = /* glsl */ `
+${CAMERA_RELATIVE_GLSL}
 uniform vec3 uMaw;
 varying vec2 vPos;
 varying vec2 vMaw;
 void main() {
   vPos = position.xy;
-  vec4 c = projectionMatrix * viewMatrix * vec4(uMaw, 1.0);
+  vec4 c = projectionMatrix * wocCamRelView(uMaw);
   vMaw = c.w > 0.0 ? clamp(c.xy / c.w, vec2(-1.5), vec2(1.5)) : vec2(0.0);
   gl_Position = vec4(position.xy, 0.0, 1.0);
 }

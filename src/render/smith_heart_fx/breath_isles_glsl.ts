@@ -4,6 +4,8 @@
 // the Gale Bulwark's shell. Additive (rgb is the colour, alpha the
 // strength: THREE's additive blend multiplies them), no lights, no textures.
 
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
+
 /** Shared: a hash and a value noise. */
 const NOISE = /* glsl */ `
 float ih(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
@@ -186,13 +188,14 @@ void main() {
 /** The Bulwark's vertex shader: the uv and the world position (a camera
  *  inside the vortex thins it, so a melee body is never blinded by it). */
 export const BULWARK_BAND_VERT = /* glsl */ `
+${CAMERA_RELATIVE_GLSL}
 varying vec2 vUv;
 varying vec3 vWorld;
 void main() {
   vUv = uv;
   vec4 w = modelMatrix * vec4(position, 1.0);
   vWorld = w.xyz;
-  gl_Position = projectionMatrix * viewMatrix * w;
+  gl_Position = projectionMatrix * wocCamRelView(w.xyz);
 }
 `;
 
