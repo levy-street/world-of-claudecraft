@@ -50,7 +50,7 @@ const GROUPS = [
   ['h1', 'h2', 'ele'],
 ];
 /** How long a huddle holds one spot before it shifts (the ice strains 8 s). */
-const SHIFT_EVERY = 5500;
+const SHIFT_EVERY = 7000;
 
 const L = (world, p) => ({ x: p.x - world.origin.x, z: p.z - world.origin.z });
 const W = (world, p) => ({ x: p.x + world.origin.x, z: p.z + world.origin.z });
