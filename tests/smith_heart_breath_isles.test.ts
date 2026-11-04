@@ -590,7 +590,38 @@ describe('the Islands of the Wind: the review gaps', () => {
     expect(s.value).toBeLessThan(f.boss().maxHp * IT.bulwarkShare * IT.mendShare);
   });
 
-  it("the Knotted Gale's carrier and the anchored never ride", () => {
+  it("Thessaly's anchor never keeps a player off the ride (the ride is no wind push)", () => {
+    // Jose's playtest of 2026-11-04: anchored by Thessaly's calm, the Gale
+    // Path would not take him up to the isle. The anchor stops the wind, the
+    // pull, the blast and the throws; the ride is the encounter's scripted
+    // flight, so it carries an anchored player all the same, out and home.
+    const f = pulled(4);
+    crossMark(f, 0.7);
+    const i = f.state()?.isles.round?.isles[0] as number;
+    const p = f.players[2];
+    p.auras.push({
+      id: BREATH_AURAS.anchor,
+      name: 'Anchored in Calm',
+      kind: 'internal_cd',
+      remaining: 15,
+      duration: 15,
+      value: 0,
+      sourceId: f.boss().id,
+      school: 'holy',
+    });
+    const path = isleSpots()[i].path;
+    f.put(p, path.x, path.z);
+    f.tick(2);
+    expect(p.carriedBy).toBeDefined();
+    expect(has(p, ISLE_AURAS.riding)).toBe(true);
+    f.tick(ticks(IT.rideSeconds + 0.3));
+    const at = f.local(p);
+    expect(isleAt(at.x, at.z)).toBe(i);
+    expect(p.carriedBy).toBeUndefined();
+    expect(p.pos.y).toBeCloseTo(BREATH_ISLES[i].h, 0);
+  });
+
+  it("the Knotted Gale's carrier never rides", () => {
     const f = pulled(4);
     crossMark(f, 0.7);
     const i = f.state()?.isles.round?.isles[0] as number;

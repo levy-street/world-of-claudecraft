@@ -89,6 +89,37 @@ describe('the Breath moves bodies the online client can draw', () => {
     expect(s.movementOverrideEpoch).toBe(startEpoch);
   });
 
+  it("an anchored player rides too, the override held the whole arc (Thessaly's calm never blocks it)", () => {
+    const f = pulled(4);
+    const b = f.boss();
+    b.hp = Math.floor(b.maxHp * 0.7) - 1;
+    for (let i = 0; i < ticks(3) && !f.state()?.isles.round; i++) f.tick();
+    const i = f.state()?.isles.round?.isles[0] as number;
+    const p = f.players[2];
+    p.auras.push({
+      id: BREATH_AURAS.anchor,
+      name: 'Anchored in Calm',
+      kind: 'internal_cd',
+      remaining: 15,
+      duration: 15,
+      value: 0,
+      sourceId: b.id,
+      school: 'holy',
+    });
+    const s = sessionOf(f, p.id);
+    const w = watch(f, s);
+    w.tick();
+    f.put(p, isleSpots()[i].path.x, isleSpots()[i].path.z);
+    w.tick();
+    expect(p.carriedBy).toBeDefined();
+    const startEpoch = s.movementOverrideEpoch;
+    for (let k = 0; k < ticks(IT.rideSeconds) - 2; k++) {
+      w.tick();
+      expect(s.movementOverrideActive).toBe(true);
+    }
+    expect(s.movementOverrideEpoch).toBe(startEpoch);
+  });
+
   it("the Summit Roar's slide holds the override while the throw slides", () => {
     const f = pulled(4);
     const b = f.boss();

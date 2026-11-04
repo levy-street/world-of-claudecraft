@@ -37,6 +37,7 @@
 // existing fields (breath_isle_ids.ts says which): no wire or IWorld change.
 
 import { carryBody, setDownBody } from '../../carried_body';
+import { carriesLoad } from '../../combat/carried_load';
 import { isSilenced } from '../../combat/cc';
 import { BREATH_ISLES } from '../../content/smith_heart_layout';
 import { MOBS } from '../../data';
@@ -66,7 +67,6 @@ import {
   dropAura,
   dropBreathObject,
   guardianFree,
-  heldFast,
   livePlayers,
   living,
   local,
@@ -380,8 +380,11 @@ export function endRound(s: Pick<BreathScope, 'ctx' | 'inst' | 'st' | 'boss'>): 
 
 /** May `p` take a ride now (alive, free, out of its grace, not worn)? */
 function mayRide(st: BreathFightState, p: Entity): boolean {
-  // The Knotted Gale's carrier and the anchored stay on the Cornice.
-  if (p.dead || p.carriedBy !== undefined || heldFast(p)) return false;
+  // The Knotted Gale's carrier stays on the Cornice. Thessaly's anchor
+  // never does: it holds a body against the wind, the pull, the blast and
+  // the throws, and the ride is the encounter's own scripted flight (Jose's
+  // playtest of 2026-11-04: anchored, the Gale Path would not take him).
+  if (p.dead || p.carriedBy !== undefined || carriesLoad(p)) return false;
   if ((st.isles.grace[p.id] ?? -1) > st.clock) return false;
   return !st.isles.rides.some((r) => r.playerId === p.id);
 }
