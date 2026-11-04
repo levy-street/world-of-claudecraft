@@ -43,6 +43,9 @@ export interface ResolvedAbility {
   bonusCharges?: number; // talent-added uses, kept distinct from native maxCharges
   /** Individual Temporal Echo conversion after worn-set resolution. */
   echoConvertSingle?: number;
+  /** Destruction-only: this Ruinbolt was made instant by the Slagcrown 4pc. Its cast
+   *  was free, so it leaves Desolation for the next hard cast (consumeDesolationForCast). */
+  slagcrownFreeRuinbolt?: boolean;
   /** Destruction-only cast-time reservation; consumed once even if a projectile resists/fizzles. */
   ruinousBrandCopy?: { targetId: number; value: number };
   /** 1-based authoritative charge stage for hold-to-charge spells. */

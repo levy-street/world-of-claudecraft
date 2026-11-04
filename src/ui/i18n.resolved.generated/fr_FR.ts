@@ -31065,8 +31065,8 @@ export const fr_FR: EnTranslations = {
       },
       "vanguard_warlock_destruction": {
         "name": "Tenue Couronne-de-scories",
-        "bonus2": "Le temps de recharge de Peau de braise est réduit de 30 s. Les dégâts subis ne retardent plus vos incantations.",
-        "bonus4": "Un Conflagration sur deux rend votre prochain Trait de ruine instantané dans les 8 s qui suivent."
+        "bonus2": "Contre les joueurs ennemis, Trait de ruine inflige 50 % de dégâts en plus mais met 0,7 s de plus à s'incanter. Les dégâts subis ne retardent plus vos incantations.",
+        "bonus4": "Un Conflagration sur deux rend votre prochain Trait de ruine instantané dans les 8 s qui suivent. Ce Trait de ruine gratuit ne consomme pas Désolation."
       },
       "vanguard_warrior_arms": {
         "name": "Équipement de guerre Sillage-de-lame",

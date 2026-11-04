@@ -31065,8 +31065,8 @@ export const de_DE: EnTranslations = {
       },
       "vanguard_warlock_destruction": {
         "name": "Schlackenkronen-Gewänder",
-        "bonus2": "Die Abklingzeit von Schlackenhaut wird um 30 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
-        "bonus4": "Jede zweite Feuersbrunst lässt deinen nächsten Verderbensblitz innerhalb von 8 Sek. sofort wirken."
+        "bonus2": "Gegen feindliche Spieler verursacht Verderbensblitz 50 % mehr Schaden, braucht aber 0,7 Sek. länger zum Wirken. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
+        "bonus4": "Jede zweite Feuersbrunst lässt deinen nächsten Verderbensblitz innerhalb von 8 Sek. sofort wirken. Dieser kostenlose Verderbensblitz verbraucht keine Verwüstung."
       },
       "vanguard_warrior_arms": {
         "name": "Klingensog-Kampfrüstung",

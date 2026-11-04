@@ -31065,8 +31065,8 @@ export const cs_CZ: EnTranslations = {
       },
       "vanguard_warlock_destruction": {
         "name": "Šat Struskokoruny",
-        "bonus2": "Čas obnovy Struskové kůže je kratší o 30 s. Utržené poškození již nezpožďuje sesílání kouzel.",
-        "bonus4": "Každé druhé Vzplanutí udělá tvůj příští Zkázný šíp do 8 s okamžitým."
+        "bonus2": "Proti nepřátelským hráčům způsobuje Zkázný šíp o 50 % vyšší poškození, ale jeho seslání trvá o 0,7 s déle. Utržené poškození již nezpožďuje sesílání kouzel.",
+        "bonus4": "Každé druhé Vzplanutí udělá tvůj příští Zkázný šíp do 8 s okamžitým. Tento Zkázný šíp zdarma nespotřebuje Zkázu."
       },
       "vanguard_warrior_arms": {
         "name": "Bojová výstroj Čepelostopy",

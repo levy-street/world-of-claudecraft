@@ -31065,8 +31065,8 @@ export const it_IT: EnTranslations = {
       },
       "vanguard_warlock_destruction": {
         "name": "Vesti Coronascoria",
-        "bonus2": "Il tempo di recupero di Pelle di Scorie è ridotto di 30 sec. I danni subiti non ritardano più il lancio degli incantesimi.",
-        "bonus4": "Ogni secondo lancio di Conflagrazione rende istantaneo il tuo prossimo Dardo della Rovina lanciato entro 8 sec."
+        "bonus2": "Contro i giocatori nemici, Dardo della Rovina infligge il 50% di danni in più ma richiede 0,7 sec in più per essere lanciato. I danni subiti non ritardano più il lancio degli incantesimi.",
+        "bonus4": "Ogni secondo lancio di Conflagrazione rende istantaneo il tuo prossimo Dardo della Rovina lanciato entro 8 sec. Quel Dardo della Rovina gratuito non consuma Desolazione."
       },
       "vanguard_warrior_arms": {
         "name": "Tenuta da Battaglia Scialama",

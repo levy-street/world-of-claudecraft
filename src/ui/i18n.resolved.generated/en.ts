@@ -31065,8 +31065,8 @@ export const en: EnTranslations = {
       },
       "vanguard_warlock_destruction": {
         "name": "Slagcrown Vestments",
-        "bonus2": "Cinderhide's cooldown is reduced by 30 sec. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Every second Conflagrate makes your next Ruinbolt within 8 sec instant."
+        "bonus2": "Against enemy players, Ruinbolt deals 50% more damage but takes 0.7 sec longer to cast. Damage taken no longer delays your spellcasting.",
+        "bonus4": "Every second Conflagrate makes your next Ruinbolt within 8 sec instant. That free Ruinbolt does not consume Desolation."
       },
       "vanguard_warrior_arms": {
         "name": "Bladewake Battlegear",

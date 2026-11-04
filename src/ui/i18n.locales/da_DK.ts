@@ -2086,9 +2086,9 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Høsting Kommando reducerer Knoglerustning resterende nedtælling med 2 sek.',
   'entities.itemSets.vanguard_warlock_demonology.name': 'Marvbundet Regalia',
   'entities.itemSets.vanguard_warlock_destruction.bonus2':
-    'Glødehud nedtælling reduceres med 30 sek. Skade, du tager, forsinker ikke længere dine besværgelser.',
+    'Mod fjendtlige spillere gør Undergangslyn 50 % mere skade, men tager 0,7 sek længere at kaste. Skade, du tager, forsinker ikke længere dine besværgelser.',
   'entities.itemSets.vanguard_warlock_destruction.bonus4':
-    'Hver anden Antændelse gør din næste Undergangslyn inden 8 sek øjeblikkelig.',
+    'Hver anden Antændelse gør din næste Undergangslyn inden 8 sek øjeblikkelig. Det gratis Undergangslyn forbruger ikke Ødelæggelse.',
   'entities.itemSets.vanguard_warlock_destruction.name': 'Slagkrone Gevandter',
   'entities.itemSets.vanguard_warrior_arms.bonus2':
     'Lemlæstende Slag reducerer Fremstorm resterende nedtælling med 1 sek.',

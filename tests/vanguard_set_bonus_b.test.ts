@@ -7,7 +7,11 @@
 
 import { describe, expect, it } from 'vitest';
 import { HOURBINDER_HASTE_ID } from '../src/sim/combat/chronomancy';
-import { gainRuin, ruinAmount } from '../src/sim/combat/destruction';
+import {
+  gainRuin,
+  ruinAmount,
+  slagcrownRuinboltPvpDamageMult,
+} from '../src/sim/combat/destruction';
 import { refundFlitstep } from '../src/sim/combat/frost_mage';
 import { BRINEWARD_SHIELD_ID, brinewardMendingCastTime } from '../src/sim/combat/shaman_spiritmend';
 import { spellHasteMult } from '../src/sim/combat/spell_combat';
@@ -558,9 +562,66 @@ describe('Marrowbound Regalia (demonology)', () => {
 describe('Slagcrown Vestments (destruction)', () => {
   const SET = 'vanguard_warlock_destruction';
 
-  it('2pc: Cinderhide cooldown 120 -> 90 sec, not at 1 piece', () => {
-    expect(resolved(live('warlock', 'destruction', SET, 2), 'cinderhide').cooldown).toBe(90);
-    expect(resolved(live('warlock', 'destruction', SET, 1), 'cinderhide').cooldown).toBe(120);
+  /** An enemy player in an active duel, 10 yd in front of the warlock. */
+  function duelFoe(sim: Sim): Entity {
+    const id = sim.addPlayer('mage', 'Foe');
+    sim.setPlayerLevel(20, id);
+    const foe = expectDefined(sim.entities.get(id));
+    foe.pos.x = sim.player.pos.x;
+    foe.pos.z = sim.player.pos.z + 10;
+    const a = sim.player.id;
+    const duel = { a, b: id, state: 'active' as const, timer: 0 };
+    sim.duels.set(a, duel);
+    sim.duels.set(id, duel);
+    sim.player.facing = 0;
+    return foe;
+  }
+
+  /** Starts a hard-cast Ruinbolt at `target` and returns its cast bar length. */
+  function ruinboltCastBar(sim: Sim, target: Entity): number {
+    sim.targetEntity(target.id);
+    ready(sim, 'chaos_bolt');
+    gainRuin(sim.ctx, sim.player, 3);
+    sim.castAbility('chaos_bolt');
+    expect(sim.player.castingAbility).toBe('chaos_bolt');
+    return sim.player.castRemaining;
+  }
+
+  it('2pc: Cinderhide keeps its own 120 sec cooldown (the old 2pc row is gone)', () => {
+    expect(resolved(live('warlock', 'destruction', SET, 2), 'cinderhide').cooldown).toBe(120);
+  });
+
+  it('2pc: Ruinbolt hits an enemy player 50 percent harder, nothing else', () => {
+    const worn = live('warlock', 'destruction', SET, 2);
+    const foe = duelFoe(worn);
+    const mob = addHostile(worn, 10);
+    expect(slagcrownRuinboltPvpDamageMult(worn.ctx, worn.player, 'chaos_bolt', foe)).toBe(
+      B.VANGUARD_DESTRUCTION_2PC_RUINBOLT_PVP_DMG_MULT,
+    );
+    expect(B.VANGUARD_DESTRUCTION_2PC_RUINBOLT_PVP_DMG_MULT).toBe(1.5);
+    // PvE and other spells are untouched.
+    expect(slagcrownRuinboltPvpDamageMult(worn.ctx, worn.player, 'chaos_bolt', mob)).toBe(1);
+    expect(slagcrownRuinboltPvpDamageMult(worn.ctx, worn.player, 'conflagrate', foe)).toBe(1);
+    // A player who is not hostile (the duel over) gets the plain Ruinbolt.
+    worn.duels.clear();
+    expect(slagcrownRuinboltPvpDamageMult(worn.ctx, worn.player, 'chaos_bolt', foe)).toBe(1);
+    // One piece short: nothing.
+    const bare = live('warlock', 'destruction', SET, 1);
+    expect(slagcrownRuinboltPvpDamageMult(bare.ctx, bare.player, 'chaos_bolt', duelFoe(bare))).toBe(
+      1,
+    );
+  });
+
+  it('2pc: Ruinbolt at an enemy player casts 0.7 sec slower, at a monster unchanged', () => {
+    const vsMob = live('warlock', 'destruction', SET, 2);
+    const mobBar = ruinboltCastBar(vsMob, addHostile(vsMob, 10));
+    const vsFoe = live('warlock', 'destruction', SET, 2);
+    const foeBar = ruinboltCastBar(vsFoe, duelFoe(vsFoe));
+    expect(foeBar - mobBar).toBeCloseTo(B.VANGUARD_DESTRUCTION_2PC_RUINBOLT_PVP_CAST_ADD_SEC, 6);
+    expect(B.VANGUARD_DESTRUCTION_2PC_RUINBOLT_PVP_CAST_ADD_SEC).toBe(0.7);
+    // One piece short, the enemy player sees the ordinary cast.
+    const bare = live('warlock', 'destruction', SET, 1);
+    expect(ruinboltCastBar(bare, duelFoe(bare))).toBeCloseTo(mobBar, 6);
   });
 
   function seedPact(sim: Sim, target: Entity): void {
@@ -608,7 +669,7 @@ describe('Slagcrown Vestments (destruction)', () => {
     expect(instantRuinbolt(afterConflagrates(3, 2))).toBeUndefined();
   });
 
-  it('4pc: the instant Ruinbolt consumes cleanly beside Desolation', () => {
+  it('4pc: the free instant Ruinbolt leaves Desolation for the next hard cast', () => {
     const sim = afterConflagrates(4, 2);
     const desolationBefore = sim.player.auras.find((aura) => aura.id === 'desolation');
     const stacksBefore = desolationBefore?.stacks ?? 0;
@@ -620,11 +681,24 @@ describe('Slagcrown Vestments (destruction)', () => {
     const ruinBefore = ruinAmount(sim.player);
     sim.castAbility('chaos_bolt');
     expect(ruinAmount(sim.player)).toBe(ruinBefore - 3); // the Ruinbolt was committed
-    // Instant: no cast bar, the empower is gone, one Desolation stack spent.
+    // Instant: no cast bar, the empower is gone, and no Desolation stack spent
+    // (owner call: the proc is already free and instant).
     expect(sim.player.castingAbility).toBeFalsy();
     expect(instantRuinbolt(sim)).toBeUndefined();
     const stacksAfter = sim.player.auras.find((aura) => aura.id === 'desolation')?.stacks ?? 0;
-    expect(stacksAfter).toBe(stacksBefore - 1);
+    expect(stacksAfter).toBe(stacksBefore);
+
+    // The next, hard-cast Ruinbolt still spends one as usual.
+    for (let tick = 0; tick < 40; tick++) sim.tick();
+    sim.player.gcdRemaining = 0;
+    sim.player.resource = sim.player.maxResource;
+    gainRuin(sim.ctx, sim.player, 3);
+    sim.castAbility('chaos_bolt');
+    expect(sim.player.castingAbility).toBe('chaos_bolt');
+    for (let tick = 0; tick < 20 * 4 && sim.player.castingAbility; tick++) sim.tick();
+    const stacksAfterHardCast =
+      sim.player.auras.find((aura) => aura.id === 'desolation')?.stacks ?? 0;
+    expect(stacksAfterHardCast).toBe(stacksBefore - 1);
   });
 });
 
@@ -804,7 +878,10 @@ describe('Vanguard B sets: tooltip numbers match the constants', () => {
       [B.VANGUARD_DEMONOLOGY_4PC_BONE_ARMOR_REFUND_SEC],
     ],
     vanguard_warlock_destruction: [
-      [B.VANGUARD_DESTRUCTION_2PC_CINDERHIDE_COOLDOWN_CUT_SEC],
+      [
+        pct(B.VANGUARD_DESTRUCTION_2PC_RUINBOLT_PVP_DMG_MULT),
+        B.VANGUARD_DESTRUCTION_2PC_RUINBOLT_PVP_CAST_ADD_SEC,
+      ],
       [B.VANGUARD_DESTRUCTION_4PC_WINDOW_SEC],
     ],
     vanguard_druid_balance: [

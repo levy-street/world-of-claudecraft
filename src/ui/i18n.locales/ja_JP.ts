@@ -21406,9 +21406,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '4点：Reaping CommandでBone Armorの残りクールダウンが2秒短縮。',
   'entities.itemSets.vanguard_warlock_destruction.name': 'ヴァンガード：Slagcrown Vestments',
   'entities.itemSets.vanguard_warlock_destruction.bonus2':
-    '2点：Cinderhideのクールダウンが30秒短縮。被ダメージで詠唱が遅れなくなります。',
+    '2点：敵プレイヤーに対して、Ruinboltのダメージが50%増加するが、詠唱時間が0.7秒長くなる。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vanguard_warlock_destruction.bonus4':
-    '4点：2回ごとのConflagrateで8秒以内の次のRuinboltが即時発動。',
+    '4点：2回ごとのConflagrateで8秒以内の次のRuinboltが即時発動。この無料のRuinboltはDesolationを消費しない。',
   'entities.itemSets.vanguard_druid_feral.name': '血たてがみの皮装',
   'entities.itemSets.vanguard_druid_feral.bonus2':
     '2点：Bruin Rushのクールダウンが3秒短縮。被ダメージで詠唱が遅れなくなります。',

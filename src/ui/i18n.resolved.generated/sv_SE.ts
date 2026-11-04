@@ -31065,8 +31065,8 @@ export const sv_SE: EnTranslations = {
       },
       "vanguard_warlock_destruction": {
         "name": "Slagcrown Vestments",
-        "bonus2": "Glödhudens nedräkning minskas med 30 sec. Skada du tar fördröjer inte längre dina besvärjelser.",
-        "bonus4": "Var andra Conflagrate gör din nästa Fördärvsbult inom 8 sec omedelbar."
+        "bonus2": "Mot fientliga spelare gör Fördärvsbult 50 % mer skada men tar 0,7 sec längre att kasta. Skada du tar fördröjer inte längre dina besvärjelser.",
+        "bonus4": "Var andra Conflagrate gör din nästa Fördärvsbult inom 8 sec omedelbar. Den gratis Fördärvsbulten förbrukar inte Ödeläggelse."
       },
       "vanguard_warrior_arms": {
         "name": "Bladewake Battlegear",

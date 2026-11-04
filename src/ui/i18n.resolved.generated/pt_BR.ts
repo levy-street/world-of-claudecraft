@@ -31065,8 +31065,8 @@ export const pt_BR: EnTranslations = {
       },
       "vanguard_warlock_destruction": {
         "name": "Vestes da Coroa de Escória",
-        "bonus2": "O tempo de recarga de Pele de Escórias é reduzido em 30 s. Dano recebido não atrasa mais suas conjurações.",
-        "bonus4": "A cada segunda conjuração de Conflagrar, sua próxima Seta da Ruína em até 8 s se torna instantânea."
+        "bonus2": "Contra jogadores inimigos, Seta da Ruína causa 50% mais dano, mas leva 0,7 s a mais para ser conjurada. Dano recebido não atrasa mais suas conjurações.",
+        "bonus4": "A cada segunda conjuração de Conflagrar, sua próxima Seta da Ruína em até 8 s se torna instantânea. Essa Seta da Ruína gratuita não consome Desolação."
       },
       "vanguard_warrior_arms": {
         "name": "Equipamento de Batalha do Rastro da Lâmina",

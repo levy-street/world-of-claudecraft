@@ -4,9 +4,10 @@
 // Design and PvE ceilings: docs/design/warfare-season-2.md.
 //
 // Most tiers are GENERIC rows (ability mods, procs) that accumulateTalentEffect
-// applies with no class-module change. Five tiers are BESPOKE (the effect
+// applies with no class-module change. Six tiers are BESPOKE (the effect
 // carries only the audited numbers under `tuning`; the call site gates on
-// wearsSetBonus): Brineward 2pc and 4pc (combat/shaman_spiritmend.ts),
+// wearsSetBonus): Slagcrown 2pc (combat/destruction.ts), Brineward 2pc and 4pc
+// (combat/shaman_spiritmend.ts),
 // Hourbinder's 4pc (combat/chronomancy.ts via the mage post-cast rider),
 // Rimewarden 4pc (combat/frost_mage.ts) and Dreadquill 4pc's heal half
 // (combat/affliction.ts). None of the bonuses carries the raid sets' spell
@@ -71,12 +72,19 @@ export const VANGUARD_AFFLICTION_4PC_CONSUME_HEAL_MULT = 1.3;
 export const VANGUARD_DEMONOLOGY_2PC_BONE_ARMOR_COOLDOWN_CUT_SEC = 10;
 /** Marrowbound 4pc: seconds refunded from Bone Armor per Reaping Command. */
 export const VANGUARD_DEMONOLOGY_4PC_BONE_ARMOR_REFUND_SEC = 2;
-/** Slagcrown 2pc: seconds cut from Cinderhide's cooldown (120 to 90). */
-export const VANGUARD_DESTRUCTION_2PC_CINDERHIDE_COOLDOWN_CUT_SEC = 30;
+/** Slagcrown 2pc (owner rework 2026-11-04): against an enemy player, Ruinbolt
+ *  deals this much more damage (+50 percent)... */
+export const VANGUARD_DESTRUCTION_2PC_RUINBOLT_PVP_DMG_MULT = 1.5;
+/** ...and takes this many seconds longer to cast (2.3 to 3.0, before Desolation's
+ *  30 percent cut, so 2.1 with it). Slow and heavy: the cast to interrupt. */
+export const VANGUARD_DESTRUCTION_2PC_RUINBOLT_PVP_CAST_ADD_SEC = 0.7;
 /** Slagcrown 4pc: Conflagrate casts per instant Ruinbolt. */
 export const VANGUARD_DESTRUCTION_4PC_CONFLAGRATES_PER_PROC = 2;
 /** Slagcrown 4pc: seconds the instant Ruinbolt stays armed. */
 export const VANGUARD_DESTRUCTION_4PC_WINDOW_SEC = 8;
+/** Slagcrown 4pc: the proc (and armed aura) id, read where its free Ruinbolt
+ *  skips Desolation (casting_lifecycle.ts castAbility). */
+export const VANGUARD_DESTRUCTION_4PC_PROC_ID = 'set_vanguard_warlock_destruction_4pc';
 
 // ---- Druid ----
 /** Starwarden 2pc: seconds cut from Gripping Roots' cast. */
@@ -380,25 +388,30 @@ export const VANGUARD_BONUSES_B: Record<string, readonly SetEngineBonusTier[]> =
   vanguard_warlock_destruction: [
     {
       pieces: 2,
-      // Cinderhide 120 -> 90 sec: a resolved cooldownFlat row.
+      // Bespoke: against an enemy player only, Ruinbolt hits 50 percent harder
+      // and casts 0.7 sec slower (slagcrownRuinboltPvpCastTime and
+      // slagcrownRuinboltPvpDamageMult in combat/destruction.ts, read at the
+      // cast-time resolve in casting_lifecycle.ts and at Ruinbolt's hit in
+      // effect_dispatch.ts). Conditional on the target, so neither half can be
+      // a resolved dmgPct / castPct row, and PvE is untouched. The 4pc's instant
+      // Ruinbolt has no cast to slow, so it keeps only the damage half.
       effect: {
-        ability: [
-          {
-            ability: 'cinderhide',
-            cooldownFlat: -VANGUARD_DESTRUCTION_2PC_CINDERHIDE_COOLDOWN_CUT_SEC,
-          },
-        ],
+        tuning: {
+          ruinboltPvpDmgMult: VANGUARD_DESTRUCTION_2PC_RUINBOLT_PVP_DMG_MULT,
+          ruinboltPvpCastAddSec: VANGUARD_DESTRUCTION_2PC_RUINBOLT_PVP_CAST_ADD_SEC,
+        },
       },
     },
     {
       pieces: 4,
       // Every second Conflagrate arms an instant Ruinbolt for 8 sec. The
-      // instant is consumed at cast start; the Ruinbolt then spends one
-      // Desolation stack in applyAbility exactly as a hard cast would, so both
-      // consume once and nothing is left armed.
+      // instant is consumed at cast start, and that free Ruinbolt leaves
+      // Desolation alone (owner call 2026-11-04: the proc is already instant,
+      // so a stack spent on it bought nothing); the next hard cast still gets
+      // Desolation's faster cast. See consumeDesolationForCast.
       effect: {
         proc: {
-          id: 'set_vanguard_warlock_destruction_4pc',
+          id: VANGUARD_DESTRUCTION_4PC_PROC_ID,
           name: 'Ruinbolt',
           school: 'fire',
           trigger: {

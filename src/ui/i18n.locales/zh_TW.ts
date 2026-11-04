@@ -22001,9 +22001,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '4件：Reaping Command使Bone Armor剩餘冷卻縮短2秒。',
   'entities.itemSets.vanguard_warlock_destruction.name': '先鋒套裝：Slagcrown Vestments',
   'entities.itemSets.vanguard_warlock_destruction.bonus2':
-    '2件：Cinderhide冷卻縮短30秒。受到傷害不再延遲你的施法。',
+    '2件：對敵對玩家施放時，Ruinbolt傷害提高50%，但施法時間延長0.7秒。受到傷害不再延遲你的施法。',
   'entities.itemSets.vanguard_warlock_destruction.bonus4':
-    '4件：每第二次Conflagrate使8秒內下一次Ruinbolt瞬發。',
+    '4件：每第二次Conflagrate使8秒內下一次Ruinbolt瞬發。這次免費的Ruinbolt不會消耗Desolation。',
   'entities.itemSets.vanguard_druid_feral.name': '血鬃獸皮',
   'entities.itemSets.vanguard_druid_feral.bonus2':
     '2件：Bruin Rush冷卻縮短3秒。受到傷害不再延遲你的施法。',

@@ -31065,8 +31065,8 @@ export const tr_TR: EnTranslations = {
       },
       "vanguard_warlock_destruction": {
         "name": "Cüruf Kütü Giysileri",
-        "bonus2": "Cinderhide'ın bekleme süresi 30 san azalır. Alınan hasar artık büyü yapmanı geciktirmez.",
-        "bonus4": "Her ikinci Conflagrate, sonraki Ruinbolt'u 8 saniye içinde anlık yapar."
+        "bonus2": "Düşman oyunculara karşı Ruinbolt %50 daha fazla hasar verir ama yapılması 0,7 san daha uzun sürer. Alınan hasar artık büyü yapmanı geciktirmez.",
+        "bonus4": "Her ikinci Conflagrate, sonraki Ruinbolt'u 8 saniye içinde anlık yapar. Bu bedava Ruinbolt, Desolation tüketmez."
       },
       "vanguard_warrior_arms": {
         "name": "Kılıç Silksi Savaş Giysileri",

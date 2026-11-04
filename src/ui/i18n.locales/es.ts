@@ -1971,9 +1971,9 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_warlock_destruction_shoulder.name': 'Manto Coronaescoria',
   'entities.itemSets.vanguard_warlock_destruction.name': 'Vestiduras Coronaescoria',
   'entities.itemSets.vanguard_warlock_destruction.bonus2':
-    'El tiempo de reutilización de Piel de Escoria se reduce 30 s. El daño recibido ya no retrasa tus hechizos.',
+    'Contra jugadores enemigos, Descarga de Ruina inflige un 50 % más de daño, pero tarda 0,7 s más en lanzarse. El daño recibido ya no retrasa tus hechizos.',
   'entities.itemSets.vanguard_warlock_destruction.bonus4':
-    'Cada segundo lanzamiento de Conflagrar hace que tu próxima Descarga de Ruina en los 8 s siguientes sea instantánea.',
+    'Cada segundo lanzamiento de Conflagrar hace que tu próxima Descarga de Ruina en los 8 s siguientes sea instantánea. Esa Descarga de Ruina gratuita no consume Desolación.',
   'entities.items.vanguard_warrior_arms_chest.name': 'Cota Estelahoja',
   'entities.items.vanguard_warrior_arms_gloves.name': 'Machacadores Estelahoja',
   'entities.items.vanguard_warrior_arms_helmet.name': 'Gran Yelmo Estelahoja',

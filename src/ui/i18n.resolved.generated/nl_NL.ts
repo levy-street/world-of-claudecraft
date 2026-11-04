@@ -31065,8 +31065,8 @@ export const nl_NL: EnTranslations = {
       },
       "vanguard_warlock_destruction": {
         "name": "Slakkenkroon Gewaden",
-        "bonus2": "Afkoelingseffect van Sintelhuid is 30 sec korter. Opgelopen schade vertraagt je spreuken niet meer.",
-        "bonus4": "Elke tweede Ontvlamming maakt je volgende Ruinenschicht binnen 8 sec onmiddellijk."
+        "bonus2": "Tegen vijandige spelers doet Ruinenschicht 50% meer schade, maar duurt het 0,7 sec langer om te spreken. Opgelopen schade vertraagt je spreuken niet meer.",
+        "bonus4": "Elke tweede Ontvlamming maakt je volgende Ruinenschicht binnen 8 sec onmiddellijk. Die gratis Ruinenschicht verbruikt geen Verwoesting."
       },
       "vanguard_warrior_arms": {
         "name": "Blaadwekking Gevechtsuitrusting",

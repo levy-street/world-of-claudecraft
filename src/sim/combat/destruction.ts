@@ -9,8 +9,13 @@
 import { createDemonPet } from '../pet/pet_commands';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
 import type { SimContext } from '../sim_context';
+import {
+  VANGUARD_DESTRUCTION_2PC_RUINBOLT_PVP_CAST_ADD_SEC,
+  VANGUARD_DESTRUCTION_2PC_RUINBOLT_PVP_DMG_MULT,
+} from '../content/vanguard_set_bonuses_b';
 import { petOffenseMultiplier } from '../spec_output_tuning';
 import type { AbilityDef, Aura, Entity } from '../types';
+import { wearsSetBonus } from './set_bonus_wearer';
 import { grantShadowCredit } from './warlock_talents';
 
 export const RUIN_MAX = 5;
@@ -172,6 +177,50 @@ export function gainDesolation(ctx: SimContext, player: Entity): void {
   });
 }
 
+const SLAGCROWN_SET_ID = 'vanguard_warlock_destruction';
+
+// Slagcrown 2pc (Warfare Season 2, Ruination): its Ruinbolt rule applies only
+// when a 2pc wearer aims Ruinbolt at an enemy PLAYER (the WARFARE pvpOnly reading:
+// both sides players, hostile to each other), so a monster, a pet or a dummy sees
+// the ordinary Ruinbolt and PvE stays exactly as it was.
+function slagcrownPvpRuinbolt(
+  ctx: SimContext,
+  caster: Entity,
+  abilityId: string,
+  target: Entity | null,
+): boolean {
+  if (abilityId !== 'chaos_bolt' || !target || target.kind !== 'player') return false;
+  if (!ctx.isHostileTo(caster, target)) return false;
+  return wearsSetBonus(ctx, caster, SLAGCROWN_SET_ID, 2);
+}
+
+/** Slagcrown 2pc, cast half: Ruinbolt at an enemy player casts 0.7 sec slower.
+ *  Takes the BASE cast time (before Desolation's multiplier, so a Desolation
+ *  Ruinbolt is 2.1 sec, not 2.3); an instant (the 4pc's free Ruinbolt) stays 0. */
+export function slagcrownRuinboltPvpCastTime(
+  ctx: SimContext,
+  caster: Entity,
+  abilityId: string,
+  target: Entity | null,
+  castTime: number,
+): number {
+  if (castTime <= 0 || !slagcrownPvpRuinbolt(ctx, caster, abilityId, target)) return castTime;
+  return castTime + VANGUARD_DESTRUCTION_2PC_RUINBOLT_PVP_CAST_ADD_SEC;
+}
+
+/** Slagcrown 2pc, damage half: Ruinbolt's hit on an enemy player is 50 percent
+ *  bigger (hard cast and the 4pc's instant alike); 1 for everything else. */
+export function slagcrownRuinboltPvpDamageMult(
+  ctx: SimContext,
+  caster: Entity,
+  abilityId: string,
+  target: Entity,
+): number {
+  return slagcrownPvpRuinbolt(ctx, caster, abilityId, target)
+    ? VANGUARD_DESTRUCTION_2PC_RUINBOLT_PVP_DMG_MULT
+    : 1;
+}
+
 export function destructionCastTimeMult(player: Entity, abilityId: string): number {
   if (abilityId === 'chaos_bolt' && player.auras.some((aura) => aura.id === DESOLATION_AURA_ID)) {
     return DESOLATION_RUINBOLT_CAST_MULT;
@@ -185,6 +234,9 @@ export function consumeDesolationForCast(
   res: ResolvedAbility,
 ): ResolvedAbility {
   if (res.def.id !== 'chaos_bolt' && res.def.id !== 'rain_of_fire') return res;
+  // The Slagcrown 4pc's free Ruinbolt is already instant: a stack spent on it
+  // would buy nothing, so it stays for the next hard cast.
+  if (res.slagcrownFreeRuinbolt === true) return res;
   const index = player.auras.findIndex((candidate) => candidate.id === DESOLATION_AURA_ID);
   if (index < 0) return res;
   const aura = player.auras[index];

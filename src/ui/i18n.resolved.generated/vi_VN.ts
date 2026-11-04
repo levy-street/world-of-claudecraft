@@ -31065,8 +31065,8 @@ export const vi_VN: EnTranslations = {
       },
       "vanguard_warlock_destruction": {
         "name": "Slagcrown Vestments",
-        "bonus2": "Cooldown Da Than Hồng giảm 30 giây. Sát thương phải chịu không còn làm chậm việc thi triển phép.",
-        "bonus4": "Cứ hai lần Bùng Cháy làm cho Tia Hủy Diệt tiếp theo của bạn trong vòng 8 giây tức thời."
+        "bonus2": "Khi đối đầu người chơi địch, Tia Hủy Diệt gây thêm 50% sát thương nhưng thời gian thi triển dài hơn 0,7 giây. Sát thương phải chịu không còn làm chậm việc thi triển phép.",
+        "bonus4": "Cứ hai lần Bùng Cháy làm cho Tia Hủy Diệt tiếp theo của bạn trong vòng 8 giây tức thời. Tia Hủy Diệt miễn phí đó không tiêu hao Điêu Tàn."
       },
       "vanguard_warrior_arms": {
         "name": "Bladewake Battlegear",

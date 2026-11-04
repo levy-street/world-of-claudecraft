@@ -697,18 +697,20 @@ Implementation routes:
 **Set:** Slagcrown Vestments
 **Items:** Slagcrown Hood, Slagcrown Mantle, Slagcrown Robes, Slagcrown Leggings, Slagcrown Gloves
 
-- **2pc:** "Cinderhide's cooldown is reduced by 30 sec." (`cinderhide`, 25 percent damage reduction for 10 sec, 120 to 90 sec)
-  - Route: DATA. `{ ability: 'cinderhide', cooldownFlat: -30 }`.
+- **2pc (reworked 2026-11-04):** "Against enemy players, Ruinbolt deals 50% more damage but takes 0.7 sec longer to cast." (`chaos_bolt` 2.3 to 3.0 sec, 2.1 with Desolation; replaces the old Cinderhide 120 to 90 sec row)
+  - Route: BESPOKE. `slagcrownRuinboltPvpCastTime` (cast-time resolve, `casting_lifecycle.ts`) and `slagcrownRuinboltPvpDamageMult` (Ruinbolt's hit, `effect_dispatch.ts`), both gated on a hostile PLAYER target, so PvE is unchanged.
+  - PvP read: the slow, heavy cast to interrupt; left alone, each hit takes about a third of a cloth player.
 - **4pc:** "Every second Conflagrate makes your next Ruinbolt within 8 sec instant." (`conflagrate` 2 charges 18 sec, `chaos_bolt` 2.3 sec cast)
   - Route: DATA ProcDef. `trigger: { on: 'castNth', n: 2, abilities: ['conflagrate'] }`, `responses: [{ kind: 'empowerNext', aura: 'next_cast_instant', abilities: ['chaos_bolt'], duration: 8 }]`.
-  - Verify the order against Desolation (the spec mastery already shortens the next
-    Ruinbolt after Conflagrate); the instant must consume cleanly with it.
-  - PvP read: a telegraph-free burst window.
+  - The free instant Ruinbolt does NOT consume Desolation (owner call 2026-11-04): the
+    stack stays for the next hard cast. It keeps the 2pc's damage half and has no cast
+    to slow.
+  - PvP read: an uninterruptible follow-up hit; the double Conflagrate is the tell.
 - **PvE ceiling:** Ruincaller Vestments (2pc: Conflagrate holds 3 charges, up to +50
   percent Conflagrate throughput, plus pushback immunity; 4pc: Ruinbolt +20 percent
-  damage). Ours adds no damage per cast; the instant saves only the Desolation
-  shortened remainder of one Ruinbolt per two Conflagrates (a few percent DPS at most,
-  under the Ruincaller 4pc's flat +20 percent on the same spell). Tuning flag: measure in the destruction probe.
+  damage). Ours adds no PvE damage (the 2pc only reads enemy players); the instant saves
+  the cast of one Ruinbolt per two Conflagrates and its Desolation stack. Tuning flag:
+  measure in the destruction probe.
 
 ---
 

@@ -31065,8 +31065,8 @@ export const zh_TW: EnTranslations = {
       },
       "vanguard_warlock_destruction": {
         "name": "先鋒套裝：Slagcrown Vestments",
-        "bonus2": "2件：Cinderhide冷卻縮短30秒。受到傷害不再延遲你的施法。",
-        "bonus4": "4件：每第二次Conflagrate使8秒內下一次Ruinbolt瞬發。"
+        "bonus2": "2件：對敵對玩家施放時，Ruinbolt傷害提高50%，但施法時間延長0.7秒。受到傷害不再延遲你的施法。",
+        "bonus4": "4件：每第二次Conflagrate使8秒內下一次Ruinbolt瞬發。這次免費的Ruinbolt不會消耗Desolation。"
       },
       "vanguard_warrior_arms": {
         "name": "先鋒套裝：Bladewake Battlegear",

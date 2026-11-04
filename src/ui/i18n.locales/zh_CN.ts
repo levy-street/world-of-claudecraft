@@ -21986,9 +21986,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_warlock_demonology.bonus4': '收割指令使骨甲的剩余冷却时间缩短2秒。',
   'entities.itemSets.vanguard_warlock_destruction.name': '先锋套装：渣冠法衣',
   'entities.itemSets.vanguard_warlock_destruction.bonus2':
-    '烬皮的冷却时间缩短30秒。受到伤害不再延迟你的施法。',
+    '对敌对玩家施放时，毁灭箭造成的伤害提高50%，但施法时间延长0.7秒。受到伤害不再延迟你的施法。',
   'entities.itemSets.vanguard_warlock_destruction.bonus4':
-    '每第二次烧燃会使你8秒内的下一次毁灭箭变为瞬发。',
+    '每第二次烧燃会使你8秒内的下一次毁灭箭变为瞬发。这次免费的毁灭箭不会消耗毁灭性。',
   'entities.itemSets.vanguard_druid_feral.name': '血鬃兽皮',
   'entities.itemSets.vanguard_druid_feral.bonus2':
     '熊冲的冷却时间缩短3秒。受到伤害不再延迟你的施法。',

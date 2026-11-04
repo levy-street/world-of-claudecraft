@@ -2128,9 +2128,9 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Oogstcommando vermindert het resterende afkoelingseffect van Beenaarmering 2 sec.',
   'entities.itemSets.vanguard_warlock_demonology.name': 'Merggebonden Gliering',
   'entities.itemSets.vanguard_warlock_destruction.bonus2':
-    'Afkoelingseffect van Sintelhuid is 30 sec korter. Opgelopen schade vertraagt je spreuken niet meer.',
+    'Tegen vijandige spelers doet Ruinenschicht 50% meer schade, maar duurt het 0,7 sec langer om te spreken. Opgelopen schade vertraagt je spreuken niet meer.',
   'entities.itemSets.vanguard_warlock_destruction.bonus4':
-    'Elke tweede Ontvlamming maakt je volgende Ruinenschicht binnen 8 sec onmiddellijk.',
+    'Elke tweede Ontvlamming maakt je volgende Ruinenschicht binnen 8 sec onmiddellijk. Die gratis Ruinenschicht verbruikt geen Verwoesting.',
   'entities.itemSets.vanguard_warlock_destruction.name': 'Slakkenkroon Gewaden',
   'entities.itemSets.vanguard_warrior_arms.bonus2':
     'Verminkende Slag vermindert het resterende afkoelingseffect van Bestorming 1 sec.',

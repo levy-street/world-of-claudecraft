@@ -21369,9 +21369,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '4세트: Reaping Command가 Bone Armor의 남은 재사용 대기시간을 2초 줄입니다.',
   'entities.itemSets.vanguard_warlock_destruction.name': '선봉대: Slagcrown Vestments',
   'entities.itemSets.vanguard_warlock_destruction.bonus2':
-    '2세트: Cinderhide의 재사용 대기시간이 30초 감소합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
+    '2세트: 적 플레이어에게 Ruinbolt가 50% 더 큰 피해를 주지만 시전 시간이 0.7초 길어집니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
   'entities.itemSets.vanguard_warlock_destruction.bonus4':
-    '4세트: 두 번째 Conflagrate마다 8초 안의 다음 Ruinbolt를 즉시 시전하게 합니다.',
+    '4세트: 두 번째 Conflagrate마다 8초 안의 다음 Ruinbolt를 즉시 시전하게 합니다. 이 무료 Ruinbolt는 Desolation을 소모하지 않습니다.',
   'entities.itemSets.vanguard_druid_feral.name': '피갈기 가죽',
   'entities.itemSets.vanguard_druid_feral.bonus2':
     '2세트: Bruin Rush의 재사용 대기시간이 3초 감소합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
