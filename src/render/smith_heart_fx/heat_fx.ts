@@ -369,7 +369,7 @@ export class HeatFx {
       map: this.glowTex,
       color: 0xffd27a,
       transparent: true,
-      opacity: 0.7,
+      opacity: 0.42,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
       fog: false,
@@ -592,8 +592,9 @@ export class HeatFx {
       g.add(m);
     }
     const halo = new THREE.Sprite(haloMat);
-    halo.position.set(0, 1, 0);
-    halo.scale.set(10, 10, 1);
+    // A soft breath of light round the knuckles, never a disc behind the fist.
+    halo.position.set(0, 0.6, 1.2);
+    halo.scale.set(6.5, 6.5, 1);
     g.add(halo);
     return g;
   }
