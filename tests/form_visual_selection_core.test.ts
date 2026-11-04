@@ -379,6 +379,24 @@ describe("Thatchbound's puppet bodies", () => {
   });
 });
 
+describe("the Strawling Charm's guise", () => {
+  const guise = { kind: 'seasonal_cosmetic', id: 'gourdlight_trick_strawling' };
+  it("rides the polymorph slot as the puppet strawling's body", () => {
+    expect(requestedCharacterForm(maskFor([guise]))).toBe('sheep');
+    expect(characterFormAssetKey('form_sheep', [guise])).toBe('form_puppet_strawling');
+    // a real polymorph and a puppet still outrank a cosmetic body
+    expect(
+      characterFormAssetKey('form_sheep', [guise, { kind: 'polymorph', id: 'polymorph' }]),
+    ).toBe('form_sheep');
+    expect(
+      characterFormAssetKey('form_sheep', [
+        guise,
+        { kind: 'incapacitate', id: 'thatchbound_crow' },
+      ]),
+    ).toBe('form_puppet_crow');
+  });
+});
+
 describe('the Gurglegreen Cauldron goblin (round 11)', () => {
   const goblin = { kind: 'seasonal_cosmetic', id: 'gourdlight_toy_gurglegreen' };
   it("rides the polymorph slot as the treasure goblin's body, the costumes' seam", () => {

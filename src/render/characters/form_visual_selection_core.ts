@@ -1,5 +1,6 @@
 import { GOURDLIGHT_TRICKS } from '../../sim/content/gourdlight_eve';
 import {
+  STRAWLING_GUISE_AURA_ID,
   THATCHBOUND_CROW_AURA_ID,
   THATCHBOUND_STRAWLING_AURA_ID,
 } from '../../sim/content/gourdlight_eve_scarecrow';
@@ -100,6 +101,9 @@ const TRICK_FORM_ASSETS: Readonly<Record<string, CharacterFormAssetKey>> = {
   // the Gurglegreen Cauldron's drinker (round 11, seasonal/toy_cauldron.ts): the Coinsack
   // Scurrier's goblin body, worn the same way as a costume
   gourdlight_toy_gurglegreen: 'form_costume_goblin',
+  // the Strawling Charm's guise (Old Thatchgrin's cosmetic, seasonal_cosmetics.ts): the
+  // same straw body Thatchbound's puppet wears, here as a look with no control behind it
+  [STRAWLING_GUISE_AURA_ID]: 'form_puppet_strawling',
 };
 
 /** Thatchbound's puppet bodies (Old Thatchgrin's mind control): kind 'incapacitate', a
