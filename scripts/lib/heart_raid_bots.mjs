@@ -23,6 +23,7 @@
 //   hazards?(world,st,b,me) circles {x,z,r} a bot keeps out of on its role spot
 //   bad?(world, st, at)    true when a spot is unsafe (extra to the hazards)
 //   roleSpot?(world,st,b,me) a bot's own resting spot instead of the generic one
+//   tauntPad               yards past a taunt's reach a large body still counts (its girth)
 //   obstacles?(world)      circles a walking bot goes round
 //   blocksLine?(world,a,b) true when no line of sight (pillars)
 //   stillFor?(world,st,b)  seconds the bot may stand still to cast
@@ -732,7 +733,16 @@ function processEvents(world, bots, st) {
         if (mine(b, ev.targetId)) {
           const ab = ev.ability ?? (world.mobIds.has(ev.sourceId) ? 'melee swing' : 'other');
           st.dmgTaken.set(ab, (st.dmgTaken.get(ab) ?? 0) + amount);
-          st.lastHit.set(ev.targetId, { ability: ab, amount, from: nameOf(ev.sourceId), at: now });
+          // Cauterize (the fire mage's lethal save) burns its wearer after it caught
+          // a killing blow: the death is that blow's, the burn a late tick.
+          if (ab === 'Cauterized') st.burnt = new Set([...(st.burnt ?? []), ev.targetId]);
+          else
+            st.lastHit.set(ev.targetId, {
+              ability: ab,
+              amount,
+              from: nameOf(ev.sourceId),
+              at: now,
+            });
           const who = nameOf(ev.targetId);
           st.hitLog.push({ at: now, ability: ab, who, amount });
           if (st.hitLog.length > 600) st.hitLog.splice(0, st.hitLog.length - 600);
@@ -760,8 +770,10 @@ function processEvents(world, bots, st) {
         if (world.pids.has(ev.entityId)) {
           const hit = st.lastHit.get(ev.entityId);
           const who = world.players.get(ev.entityId)?.name ?? `#${ev.entityId}`;
+          const burnt = st.burnt?.has(ev.entityId);
+          st.burnt?.delete(ev.entityId);
           const cause = hit
-            ? `${hit.ability} (${hit.amount} from ${hit.from})`
+            ? `${hit.ability} (${hit.amount} from ${hit.from})${burnt ? ', then the Cauterize burn unhealed' : ''}`
             : 'unknown (a fall?)';
           st.deaths.push({ t: fightSec(), who, cause, ability: hit?.ability ?? 'unknown' });
           log(`DEATH: ${who} - ${cause}`);
@@ -1140,7 +1152,7 @@ function tankTaunt(world, st, b) {
   if (!loose) return false;
   const { r, m } = loose;
   const tauntId = b.cls === 'warrior' ? 'taunt' : 'sacred_challenge';
-  const reach = (b.cls === 'warrior' ? 7.5 : 29) + (m.reach ?? 0);
+  const reach = (b.cls === 'warrior' ? 7.5 : 29) + (m.reach ?? 0) + (world.boss.tauntPad ?? 0);
   if (hypot(b.self, m) > reach || !cdReady(b, tauntId)) return false;
   if (world.blocks(b.self, m)) return false;
   if (b.self.target !== m.id) b.cmd({ cmd: 'target', id: m.id });
