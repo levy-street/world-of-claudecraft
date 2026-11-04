@@ -294,25 +294,39 @@ if (process.env.SHOT_LIST === '1') {
 }
 
 fs.mkdirSync(OUT, { recursive: true });
-const browser = await puppeteer.launch({
-  executablePath: BROWSER_PATH,
-  headless: false,
-  args: [
-    `--window-size=${W},${H + 100}`,
-    '--window-position=-2400,0',
-    '--use-angle=d3d11',
-    '--ignore-gpu-blocklist',
-    '--disable-renderer-backgrounding',
-    '--disable-backgrounding-occluded-windows',
-    '--disable-background-timer-throttling',
-  ],
-  defaultViewport: { width: W, height: H },
-  protocolTimeout: 240000,
-});
+// SHOT_CONNECT (a DevTools URL such as http://127.0.0.1:9333): reuse one browser already
+// running with remote debugging (real GPU), disconnecting at the end instead of closing it,
+// so a long pass keeps one browser on a shared machine.
+const CONNECT = process.env.SHOT_CONNECT ?? '';
+const browser = CONNECT
+  ? await puppeteer.connect({
+      browserURL: CONNECT,
+      defaultViewport: { width: W, height: H },
+      protocolTimeout: 240000,
+    })
+  : await puppeteer.launch({
+      executablePath: BROWSER_PATH,
+      headless: false,
+      args: [
+        `--window-size=${W},${H + 100}`,
+        '--window-position=-2400,0',
+        '--use-angle=d3d11',
+        '--ignore-gpu-blocklist',
+        '--disable-renderer-backgrounding',
+        '--disable-backgrounding-occluded-windows',
+        '--disable-background-timer-throttling',
+      ],
+      defaultViewport: { width: W, height: H },
+      protocolTimeout: 240000,
+    });
 let count = 0;
 try {
   // The window's own first tab: a new one would activate the window.
-  const [page] = await browser.pages();
+  // Connected: the browser's own tab (never a background or extension page).
+  const pages = await browser.pages();
+  const page = CONNECT
+    ? (pages.find((p) => /^(about:blank|https?:)/.test(p.url())) ?? (await browser.newPage()))
+    : pages[0];
   const cdp = await page.createCDPSession();
   const landed = new Set();
   page.on('response', (r) => {
@@ -331,11 +345,13 @@ try {
       /* ignore */
     }
   }, PRESET);
-  const { windowId, bounds } = await cdp.send('Browser.getWindowForTarget');
-  console.log('window', JSON.stringify(bounds));
-  if (bounds.left > -W) {
-    await cdp.send('Browser.setWindowBounds', { windowId, bounds: { left: -2400, top: 0 } });
-    console.log('window moved off-screen');
+  if (!CONNECT) {
+    const { windowId, bounds } = await cdp.send('Browser.getWindowForTarget');
+    console.log('window', JSON.stringify(bounds));
+    if (bounds.left > -W) {
+      await cdp.send('Browser.setWindowBounds', { windowId, bounds: { left: -2400, top: 0 } });
+      console.log('window moved off-screen');
+    }
   }
   await page.goto(URL, { waitUntil: 'networkidle0', timeout: 180000 });
   const gpu = await page.evaluate(() => {
@@ -597,8 +613,10 @@ try {
         return id;
       });
     });
-  const raider = (i, x, z) =>
-    page.evaluate(
+  // A scene shot alone (SHOT_ONLY) may place a raider before any spread made the raid.
+  const raider = async (i, x, z) => {
+    await addRaid();
+    return page.evaluate(
       ([ox, oz, i, x, z]) => {
         const w = window.__game.world;
         const e = w.entities.get(window.__raid[i]);
@@ -609,7 +627,11 @@ try {
       },
       [O.x, O.z, i, x, z],
     );
-  const raidId = (i) => page.evaluate((i) => window.__raid[i], i);
+  };
+  const raidId = async (i) => {
+    await addRaid();
+    return page.evaluate((i) => window.__raid[i], i);
+  };
   /** Spread the raid round a point, so a fight's marks land on bodies in the arena. */
   const spreadRaid = async (cx, cz, r, from = 0) => {
     await addRaid();
@@ -1076,5 +1098,6 @@ try {
   );
 } finally {
   console.log('captures', count);
-  await browser.close();
+  if (CONNECT) await browser.disconnect();
+  else await browser.close();
 }
