@@ -5,6 +5,7 @@ import {
   dayNightPhaseOverride,
   setDayNightPhaseOverride,
   setLunarPhaseOverride,
+  setMoonLatitudeOverride,
 } from '../render/day_night_clock';
 import { phaseToCycleMs } from '../sim/day_night';
 import { parseServerTimeCommand } from '../sim/dev/day_night_override';
@@ -30,6 +31,8 @@ export interface DayNightDevHud {
 // Dev-only chat command to scrub the world day/night cycle for testing:
 //   /daynight night|dawn|day|dusk|<0..1>|auto   (also /dev daynight, /dev time)
 //   /daynight moon new|crescent|half|full|<0..1>|auto   (the lunar phase)
+//   /daynight moon eclipse   (a full moon on the sun's path: a total eclipse
+//                             that covers the mage's moon; auto clears it)
 // Render-only: it just overrides the shared clock phase (day_night_clock), so
 // the sky lighting and the minimap dial both jump to the chosen time of day.
 // Returns true when it handled the input (so it is not also sent to chat).
@@ -111,7 +114,7 @@ export function tryDayNightDevCommand(
   const arg = m[1].trim().toLowerCase();
   if (!arg) {
     hud.log('[dev] usage: /daynight night|dawn|day|dusk|<0..1>|auto', '#ffcf6a');
-    hud.log('[dev]        /daynight moon new|crescent|half|full|<0..1>|auto', '#ffcf6a');
+    hud.log('[dev]        /daynight moon new|crescent|half|full|eclipse|<0..1>|auto', '#ffcf6a');
     return true;
   }
   const moonArg = arg.match(/^moon\s*(.*)$/);
@@ -119,18 +122,26 @@ export function tryDayNightDevCommand(
     const moonWord = moonArg[1].trim();
     if (!moonWord || ['auto', 'off', 'real', 'resume', 'clear'].includes(moonWord)) {
       setLunarPhaseOverride(null);
+      setMoonLatitudeOverride(null);
       hud.log('[dev] moon resumed (real lunar clock)', '#8fd0ff');
+      return true;
+    }
+    if (moonWord === 'eclipse') {
+      setLunarPhaseOverride(MOON_PRESETS.full);
+      setMoonLatitudeOverride(0);
+      hud.log('[dev] moon set to a total eclipse (full, on the sun path)', '#8fd0ff');
       return true;
     }
     const moonPhase = parsePhaseArg(moonWord, MOON_PRESETS);
     if (moonPhase === null) {
       hud.log(
-        `[dev] unknown moon "${moonWord}" - try new|crescent|half|full|<0..1>|auto`,
+        `[dev] unknown moon "${moonWord}" - try new|crescent|half|full|eclipse|<0..1>|auto`,
         '#ffcf6a',
       );
       return true;
     }
     setLunarPhaseOverride(moonPhase);
+    setMoonLatitudeOverride(null);
     hud.log(`[dev] moon set to ${moonWord} (lunar phase ${moonPhase.toFixed(2)})`, '#8fd0ff');
     return true;
   }

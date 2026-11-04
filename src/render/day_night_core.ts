@@ -552,8 +552,10 @@ export function sunDirection(phase: number): [number, number, number] {
   return [x / len, y / len, z / len];
 }
 
-/** Unit direction toward the moon: the sun's antipode in the cycle, so it climbs
- *  the sky through the night while the sun is down and sets around dawn. */
+/** Unit direction toward the mage's moon (the night key light): the sun's
+ *  antipode in the cycle, so it climbs the sky through the night while the sun
+ *  is down and sets around dawn. The natural moon's own spot is
+ *  twin_moons_core's moonSky. */
 export function moonDirection(phase: number): [number, number, number] {
   return sunDirection(phase + 0.5);
 }
@@ -644,11 +646,16 @@ export function nightSkyDesat(nightAmt: number): number {
   return 0.75 * smoothstep(clamp01(nightAmt));
 }
 
-/** The synodic month: eight world days per lunar cycle, epoch-anchored like
- *  the day itself, so the moon's shape drifts night to night the way the real
- *  moon's does and every player sees the identical phase. Defined in world
- *  days on purpose, so it scales with the day period automatically. */
-export const LUNAR_CYCLE_MS = 8 * DAY_NIGHT_CYCLE_MS;
+/** Earth's synodic month in world days: new moon to new moon. */
+export const SYNODIC_MONTH_DAYS = 29.530589;
+
+/** The natural moon's synodic month: Earth's 29.5 world days per lunar cycle
+ *  (about 22 real hours at the 45-minute day), epoch-anchored like the day
+ *  itself, so its shape drifts night to night the way the real moon's does and
+ *  every player sees the identical phase. Defined in world days on purpose, so
+ *  it scales with the day period automatically. Where the two moons sit is
+ *  twin_moons_core. */
+export const LUNAR_CYCLE_MS = SYNODIC_MONTH_DAYS * DAY_NIGHT_CYCLE_MS;
 
 /** Lunar phase in [0, 1): 0 = new moon, 0.25 = first quarter, 0.5 = full,
  *  0.75 = last quarter. Same defensive double-modulo as cyclePhase. */

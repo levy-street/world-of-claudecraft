@@ -299,7 +299,7 @@ import {
   characterLodBandsInto,
 } from './crowd_lod';
 import { buildDawnholdFeatures, type DawnholdFeaturesView } from './dawnhold_features';
-import { currentDayNightPhase, currentLunarPhase, dayNightPhaseOverride } from './day_night_clock';
+import { currentDayNightPhase, currentMoonSky, dayNightPhaseOverride } from './day_night_clock';
 import {
   aboveHorizon,
   DAY_ONLY,
@@ -309,8 +309,6 @@ import {
   effectiveDayness,
   fullDayGrade,
   globalDayness,
-  moonDirection,
-  moonTerminator,
   NEUTRAL_DAY_GRADE,
   nightIblScale,
   nightSkyDesat,
@@ -891,6 +889,7 @@ import {
 } from './travel_speed_fx';
 import { TravelSpeedFxPainter } from './travel_speed_fx_painter';
 import { updateTreeSwayPlayer } from './tree_sway';
+import type { MoonSky } from './twin_moons_core';
 import { UnderwaterView } from './underwater';
 import { createPrewarmGroupSlot, createVariantPrewarmSlot } from './variant_prewarm_slot';
 import { routeVarkhulForgeHammer } from './varkhul_forge_hammer';
@@ -1684,8 +1683,8 @@ export class Renderer {
   private hemi!: THREE.HemisphereLight;
   private sky!: THREE.Mesh;
   private skyView!: SkyView;
-  private sunSprites: THREE.Sprite[] = [];
-  private moonSprites: THREE.Sprite[] = [];
+  private moonSky: MoonSky | null = null;
+  private moonAmp = 1;
   private celestialSprites: CelestialSprites | null = null;
   private sunDir = new THREE.Vector3();
   // the moving moon direction plus how far above the horizon each body sits
@@ -2494,9 +2493,7 @@ export class Renderer {
     // the per-frame aim/fade (updateCelestialSprites).
     const celestial = buildCelestialSprites(LOW_GFX);
     this.celestialSprites = celestial;
-    this.sunSprites = celestial.sunSprites;
-    this.moonSprites = celestial.moonSprites;
-    for (const sp of [...this.sunSprites, ...this.moonSprites]) {
+    for (const sp of celestial.allSprites) {
       setRenderCategory(sp, 'sky');
       this.scene.add(sp);
     }
@@ -8862,6 +8859,7 @@ export class Renderer {
     this.godRayZoneScale +=
       (shaftTarget - this.godRayZoneScale) * (1 - Math.exp(-2 * Math.max(0, dt)));
     const phaseOverride = dayNightPhaseOverride();
+    this.moonSky = null;
     if (this.lowGfx && DAY_ONLY && phaseOverride === null) {
       if (this.fixedLowDayBiome !== biome) {
         this.dnGrade = NEUTRAL_DAY_GRADE;
@@ -8890,11 +8888,13 @@ export class Renderer {
         this.starAmt = 0;
       } else {
         const sd = sunDirection(phase);
-        const md = moonDirection(phase);
+        const sky = currentMoonSky(phase);
+        this.moonSky = sky;
+        this.moonAmp = Math.max(amp, 0.6);
         this.sunDir.set(sd[0], sd[1], sd[2]);
-        this.moonDir.set(md[0], md[1], md[2]);
+        this.moonDir.set(sky.mageDir[0], sky.mageDir[1], sky.mageDir[2]);
         this.sunUp = aboveHorizon(sd[1]) * amp;
-        this.moonUp = aboveHorizon(md[1]) * Math.max(amp, 0.6);
+        this.moonUp = sky.mageUp * this.moonAmp;
         // Authored lighting pins the sun where the maker aimed it: the world
         // clock must not swing the key light (or its disc) off that angle.
         const sunAnchor = this.authoredLighting.sunAnchor;
@@ -8902,10 +8902,12 @@ export class Renderer {
           this.sunDir.copy(sunAnchor).normalize();
           this.sunUp = aboveHorizon(this.sunDir.y) * amp;
           this.moonUp = 0;
+          this.moonSky = null;
         }
         this.starAmt = nightStarAmount(gday);
-        // Moon phase lifts the night floor (full brighter, new darker), epoch-anchored.
-        const moonLit = moonTerminator(currentLunarPhase()).litFrac;
+        // The two moons set the night floor: the mage's moon is the normal night,
+        // the natural moon's phase brightens it and an eclipse darkens it.
+        const moonLit = sky.nightLitFrac;
         // the whole grade warms as the sun crosses the horizon, so the fog,
         // sky dome, and water all take the sunrise/sunset orange rather than
         // just the key light
@@ -9392,19 +9394,17 @@ export class Renderer {
   }
 
   private updateCelestialSprites(): void {
-    aimCelestialSprites(
-      this.celestialSprites,
-      this.sunSprites,
-      this.moonSprites,
-      this.camera,
-      this.sunDir,
-      this.moonDir,
-      this.sunUp,
-      this.moonUp,
-      this.fogState === 'outdoor',
-      currentLunarPhase(),
-      duskWarmAmount(this.sunDir.y),
-    );
+    aimCelestialSprites(this.celestialSprites, {
+      camera: this.camera,
+      sunDir: this.sunDir,
+      mageDir: this.moonDir,
+      sunUp: this.sunUp,
+      mageUp: this.moonUp,
+      moonAmp: this.moonAmp,
+      sky: this.moonSky,
+      outdoor: this.fogState === 'outdoor',
+      sunWarmth: duskWarmAmount(this.sunDir.y),
+    });
   }
 
   // Drop the view of an entity that left the world / our interest area.

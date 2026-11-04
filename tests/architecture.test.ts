@@ -1495,6 +1495,8 @@ const RENDER_PURE_CORES = [
   'src/render/water_flora_core.ts',
   'src/render/water_flora_shader_core.ts',
   'src/render/day_night_core.ts',
+  // where the mage's moon and the natural moon sit, their eclipses and night light
+  'src/render/twin_moons_core.ts',
   'src/render/authored_walls_core.ts',
   'src/render/garden_maze_core.ts',
   'src/render/garden_parterre_core.ts',

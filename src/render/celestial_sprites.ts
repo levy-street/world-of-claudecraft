@@ -1,15 +1,30 @@
 import * as THREE from 'three';
 import { type MoonTerminator, moonTerminator } from './day_night_core';
+import { paintMageMoonFace, paintMageMoonGlow } from './mage_moon_face';
+import {
+  MAGE_MOON_RADII,
+  type MoonSky,
+  mageHaloBoost,
+  PENUMBRA_RADII,
+  spriteRotationAlong,
+  UMBRA_RADII,
+} from './twin_moons_core';
 
-// celestial_sprites: the sun and moon as they appear in the sky. Billboard
+// celestial_sprites: the sun and the two moons as they appear in the sky. Billboard
 // sprites (always camera-facing, so they read as perfect circles anywhere on
 // screen; a dome-shader disc would project to an ellipse off-axis) with
 // canvas-drawn faces:
 // - the sun is a white-hot core whose HDR material color pushes its texels
 //   over the composer's bloom threshold (so it genuinely glares on bloom
 //   tiers), under a soft corona and a wide horizontal lens streak;
-// - the moon is a cratered face, normal-blended so its maria and craters read
-//   DARK against the sky, over a modest cool glow that never washes the face.
+// - the natural moon is a cratered face, normal-blended so its maria and
+//   craters read DARK against the sky, over a modest cool glow that never
+//   washes the face; it turns so its lit limb faces the sun, and takes the
+//   planet's copper umbra during a lunar eclipse;
+// - the mage's moon is a self-lit gold disc carved with the mage's sigil
+//   (mage_moon_face.ts), over a warm halo that widens near the horizon. It sits
+//   behind the natural moon, which covers it at an eclipse. Where both moons
+//   sit is twin_moons_core.
 //
 // All textures are deterministic canvas paints (module-local LCG, the
 // textures.ts convention: no Math.random, same face every boot). The renderer
@@ -252,6 +267,7 @@ function paintMoonFace(
   ctx: CanvasRenderingContext2D,
   term: MoonTerminator | null,
   lowGfx = false,
+  eclipse: readonly [number, number] | null = null,
 ): void {
   const rnd = makeRng(97);
   ctx.clearRect(0, 0, MOON_TEX, MOON_TEX);
@@ -293,6 +309,32 @@ function paintMoonFace(
   paintMoonCraters(ctx, rnd, lowGfx);
   ctx.restore(); // drops the clip AND the composite mode together
   if (term && term.litFrac < 0.985) paintMoonPhaseShadow(ctx, term);
+  if (eclipse) paintMoonEclipse(ctx, eclipse);
+}
+
+/**
+ * The planet's shadow on the face during a lunar eclipse: the penumbra a soft
+ * dimming ring, the umbra the copper red of sunlight bent through the planet's
+ * air. `offset` is the umbra's centre in disc radii in the face frame (+x the
+ * texture's right, +y up; MoonSky.umbraOffset). Painted source-atop, so it only
+ * lands on face pixels and the sky around the moon stays clear.
+ */
+function paintMoonEclipse(ctx: CanvasRenderingContext2D, offset: readonly [number, number]): void {
+  const cx = 128 + offset[0] * MOON_R;
+  const cy = 128 - offset[1] * MOON_R;
+  const umbraR = UMBRA_RADII * MOON_R;
+  ctx.save();
+  ctx.globalCompositeOperation = 'source-atop';
+  const pen = ctx.createRadialGradient(cx, cy, umbraR, cx, cy, PENUMBRA_RADII * MOON_R);
+  pen.addColorStop(0, 'rgba(26, 20, 26, 0.5)');
+  pen.addColorStop(1, 'rgba(26, 20, 26, 0)');
+  ctx.fillStyle = pen;
+  ctx.fillRect(0, 0, MOON_TEX, MOON_TEX);
+  ctx.fillStyle = 'rgba(122, 42, 24, 0.9)';
+  ctx.beginPath();
+  ctx.arc(cx, cy, umbraR, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
 }
 
 /** Sprite widths in world units at the celestial radius. The halo profile below
@@ -364,12 +406,17 @@ function moonGlowTexture(): THREE.CanvasTexture {
 export interface CelestialSprites {
   /** aimed along the sun direction; [corona, glare streak, core disc] */
   sunSprites: THREE.Sprite[];
-  /** aimed along the moon direction; [glow, cratered face] */
+  /** aimed along the natural moon's direction; [glow, cratered face] */
   moonSprites: THREE.Sprite[];
-  /** Repaint the moon face for a lunar phase (0 = new, 0.5 = full). Cheap to
-   *  call every frame: a no-op until the phase crosses its next repaint
-   *  bucket (the shape moves imperceptibly between buckets). */
-  setMoonPhase(p: number): void;
+  /** aimed along the mage's moon direction (the night key light); [halo, sigil face] */
+  mageSprites: THREE.Sprite[];
+  /** every sprite above, for scene entry */
+  allSprites: THREE.Sprite[];
+  /** Repaint the natural moon's face for a lunar phase (0 = new, 0.5 = full)
+   *  and, during an eclipse, the umbra's offset in disc radii (null outside
+   *  one). Cheap to call every frame: a no-op until the phase crosses its next
+   *  repaint bucket or the umbra moves a tenth of a radius. */
+  setNaturalMoon(p: number, eclipse: readonly [number, number] | null): void;
   /** Shift the sun's disc, corona, and glare toward deep sunset orange:
    *  0 = high noon white-gold, 1 = full horizon-crossing orange. Driven per
    *  frame from duskWarmAmount, so the disc itself sets the way the sky does. */
@@ -412,12 +459,15 @@ function makeSprite(
 
 // The phase shadow's shape moves imperceptibly within 1/64th of the lunar
 // cycle, so repaints snap to these buckets: at most 64 canvas paints per full
-// cycle (eight world days), free in any given frame.
+// cycle (29.5 world days), free in any given frame. An eclipse's umbra snaps to
+// a tenth of a disc radius the same way, a few dozen paints across a whole
+// eclipse.
 const MOON_PHASE_BUCKETS = 64;
+const ECLIPSE_STEPS_PER_RADIUS = 10;
 
 /** Build the sun and moon sprite sets. The caller (renderer) categorizes and
  *  adds them to the scene, then drives position/opacity per frame and feeds
- *  the lunar phase through setMoonPhase. */
+ *  the lunar phase through setNaturalMoon. */
 export function buildCelestialSprites(lowGfx: boolean): CelestialSprites {
   const sunSprites = [
     makeSprite(sunCoronaTexture(), 230, 230, lowGfx ? 0.6 : 0.5, THREE.AdditiveBlending, -9),
@@ -446,16 +496,17 @@ export function buildCelestialSprites(lowGfx: boolean): CelestialSprites {
   let lastWarmth = -1;
   // the moon face paints into a canvas the phase repaints reuse
   const faceCtx = makeCanvas(MOON_TEX, MOON_TEX);
-  paintMoonFace(faceCtx, null, lowGfx); // full face until the first setMoonPhase
+  paintMoonFace(faceCtx, null, lowGfx); // full face until the first setNaturalMoon
   const faceTex = new THREE.CanvasTexture(faceCtx.canvas);
   const moonSprites = [
+    // drawn over the mage's moon (renderOrder -8.6), which sits behind it
     makeSprite(
       moonGlowTexture(),
       MOON_HALO_SCALE,
       MOON_HALO_SCALE,
       lowGfx ? 0.22 : 0.3,
       THREE.AdditiveBlending,
-      -9,
+      -8.4,
     ),
     // normal-blended so maria/craters read dark; a light HDR lift lets the
     // bright HIGHLANDS bloom gently against the night sky while the maria and
@@ -472,16 +523,53 @@ export function buildCelestialSprites(lowGfx: boolean): CelestialSprites {
       lowGfx ? [1, 1, 1] : [1.2, 1.24, 1.34],
     ),
   ];
-  let lastBucket = -1;
+  for (const sp of moonSprites) sp.userData.baseScale = sp.scale.x;
+  // The mage's moon: painted once (it never changes shape), a touch smaller than
+  // the natural moon so a covering is total, with the same halo-to-face ratio so
+  // the hollow halo profile holds for it too.
+  const mageFaceCtx = makeCanvas(MOON_TEX, MOON_TEX);
+  paintMageMoonFace(mageFaceCtx, lowGfx);
+  const mageGlowCtx = makeCanvas(MOON_TEX, MOON_TEX);
+  paintMageMoonGlow(mageGlowCtx, moonHaloAlpha, HALO_STOPS);
+  const mageSprites = [
+    makeSprite(
+      new THREE.CanvasTexture(mageGlowCtx.canvas),
+      MOON_HALO_SCALE * MAGE_MOON_RADII,
+      MOON_HALO_SCALE * MAGE_MOON_RADII,
+      lowGfx ? 0.36 : 0.42,
+      THREE.AdditiveBlending,
+      -9,
+    ),
+    makeSprite(
+      new THREE.CanvasTexture(mageFaceCtx.canvas),
+      MOON_FACE_SCALE * MAGE_MOON_RADII,
+      MOON_FACE_SCALE * MAGE_MOON_RADII,
+      1,
+      THREE.NormalBlending,
+      -8.6,
+      lowGfx ? [1, 1, 1] : [1.4, 1.3, 1.12],
+    ),
+  ];
+  for (const sp of mageSprites) sp.userData.baseScale = sp.scale.x;
+  let lastKey = -1;
   return {
     sunSprites,
     moonSprites,
-    setMoonPhase(p: number): void {
+    mageSprites,
+    allSprites: [...sunSprites, ...mageSprites, ...moonSprites],
+    setNaturalMoon(p: number, eclipse: readonly [number, number] | null): void {
       const bucket = Math.floor((((p % 1) + 1) % 1) * MOON_PHASE_BUCKETS);
-      if (bucket === lastBucket) return;
-      lastBucket = bucket;
+      const ex = eclipse ? Math.round(eclipse[0] * ECLIPSE_STEPS_PER_RADIUS) : 0;
+      const ey = eclipse ? Math.round(eclipse[1] * ECLIPSE_STEPS_PER_RADIUS) : 0;
+      // ex/ey stay within +-60 (the penumbra reaches under 6 radii), so 1000 separates them
+      const key = eclipse ? (bucket * 1000 + ex + 500) * 1000 + ey + 500 : bucket;
+      if (key === lastKey) return;
+      lastKey = key;
       const term = moonTerminator((bucket + 0.5) / MOON_PHASE_BUCKETS);
-      paintMoonFace(faceCtx, term, lowGfx);
+      const offset: [number, number] | null = eclipse
+        ? [ex / ECLIPSE_STEPS_PER_RADIUS, ey / ECLIPSE_STEPS_PER_RADIUS]
+        : null;
+      paintMoonFace(faceCtx, term, lowGfx, offset);
       faceTex.needsUpdate = true;
       // the halo follows the lit fraction: a full moon glows, a new one barely.
       // Kept modest on purpose: an additive halo that is too strong bleeds over
@@ -501,37 +589,89 @@ export function buildCelestialSprites(lowGfx: boolean): CelestialSprites {
   };
 }
 
+/** One frame's inputs for aimCelestialSprites. */
+export interface CelestialFrame {
+  camera: THREE.Camera;
+  sunDir: THREE.Vector3;
+  /** the mage's moon, which is also the night key light's direction */
+  mageDir: THREE.Vector3;
+  /** how far each body is up (aboveHorizon), already scaled by the realm's amplitude */
+  sunUp: number;
+  mageUp: number;
+  /** the realm's moon amplitude, applied to the natural moon the same way */
+  moonAmp: number;
+  /** the two-moon sky, or null while the cycle is pinned (no natural moon drawn) */
+  sky: MoonSky | null;
+  /** the camera is under real sky (the overworld) */
+  outdoor: boolean;
+  /** duskWarmAmount of the sun's elevation */
+  sunWarmth: number;
+}
+
+const tmpRight = new THREE.Vector3();
+const tmpUp = new THREE.Vector3();
+const tmpZ = new THREE.Vector3();
+const tmpRightArr: [number, number, number] = [0, 0, 0];
+const tmpUpArr: [number, number, number] = [0, 0, 0];
+
+function placeSprite(sp: THREE.Sprite, camera: THREE.Camera, dir: THREE.Vector3, up: number): void {
+  sp.position.copy(camera.position).addScaledVector(dir, 760);
+  sp.material.opacity = (sp.userData.baseOpacity as number) * up;
+}
+
 /**
  * Aim and fade the camera-riding sun and moon sprites for this frame, moved
  * out of renderer.ts. The basin keeps directional daylight and the sky dome,
  * but these sprites can clip against its high rim as oversized wedges, so they
- * are reserved for the overworld (`outdoor`). Keeps the moon's shape on the
- * lunar clock (no-op between phase buckets) and runs the sun's disc to sunset
- * orange (`sunWarmth`) on the same horizon curve the sky glow uses.
+ * are reserved for the overworld (`outdoor`). Keeps the natural moon's shape on
+ * the lunar clock (no-op between repaint buckets), turns its lit limb toward
+ * the sun, paints any eclipse, widens the mage's halo near the horizon, and
+ * runs the sun's disc to sunset orange (`sunWarmth`) on the same horizon curve
+ * the sky glow uses.
  */
-export function aimCelestialSprites(
-  celestial: CelestialSprites | null,
-  sunSprites: readonly THREE.Sprite[],
-  moonSprites: readonly THREE.Sprite[],
-  camera: THREE.Camera,
-  sunDir: THREE.Vector3,
-  moonDir: THREE.Vector3,
-  sunUp: number,
-  moonUp: number,
-  outdoor: boolean,
-  lunarPhase: number,
-  sunWarmth: number,
-): void {
-  celestial?.setMoonPhase(lunarPhase);
-  celestial?.setSunWarmth(sunWarmth);
-  for (const sp of sunSprites) {
-    sp.position.copy(camera.position).addScaledVector(sunDir, 760);
-    sp.visible = outdoor && sunUp > 0.02;
-    sp.material.opacity = (sp.userData.baseOpacity as number) * sunUp;
+export function aimCelestialSprites(celestial: CelestialSprites | null, f: CelestialFrame): void {
+  if (!celestial) return;
+  celestial.setSunWarmth(f.sunWarmth);
+  for (const sp of celestial.sunSprites) {
+    placeSprite(sp, f.camera, f.sunDir, f.sunUp);
+    sp.visible = f.outdoor && f.sunUp > 0.02;
   }
-  for (const sp of moonSprites) {
-    sp.position.copy(camera.position).addScaledVector(moonDir, 760);
-    sp.visible = outdoor && moonUp > 0.02;
-    sp.material.opacity = (sp.userData.baseOpacity as number) * moonUp;
+  const boost = mageHaloBoost(f.mageDir.y);
+  for (let i = 0; i < celestial.mageSprites.length; i++) {
+    const sp = celestial.mageSprites[i];
+    placeSprite(sp, f.camera, f.mageDir, f.mageUp);
+    sp.visible = f.outdoor && f.mageUp > 0.02;
+    const scale = (sp.userData.baseScale as number) * (i === 0 ? boost : 1);
+    sp.scale.set(scale, scale, 1);
+  }
+  const sky = f.sky;
+  const naturalUp = sky ? sky.naturalUp * f.moonAmp : 0;
+  if (!sky) {
+    for (const sp of celestial.moonSprites) sp.visible = false;
+    return;
+  }
+  const eclipsed = sky.umbra > 0 || sky.penumbra > 0;
+  celestial.setNaturalMoon(sky.lunarPhase, eclipsed ? sky.umbraOffset : null);
+  f.camera.matrixWorld.extractBasis(tmpRight, tmpUp, tmpZ);
+  tmpRightArr[0] = tmpRight.x;
+  tmpRightArr[1] = tmpRight.y;
+  tmpRightArr[2] = tmpRight.z;
+  tmpUpArr[0] = tmpUp.x;
+  tmpUpArr[1] = tmpUp.y;
+  tmpUpArr[2] = tmpUp.z;
+  const rotation = spriteRotationAlong(sky.naturalTangent, tmpRightArr, tmpUpArr);
+  for (let i = 0; i < celestial.moonSprites.length; i++) {
+    const sp = celestial.moonSprites[i];
+    sp.position.copy(f.camera.position);
+    sp.position.x += sky.naturalDir[0] * 760;
+    sp.position.y += sky.naturalDir[1] * 760;
+    sp.position.z += sky.naturalDir[2] * 760;
+    // the glow follows the lit fraction (setNaturalMoon) and dies in the umbra
+    const shine = i === 0 ? 1 - sky.umbra : 1;
+    sp.material.opacity = (sp.userData.baseOpacity as number) * naturalUp * shine;
+    sp.material.rotation = rotation;
+    const scale = (sp.userData.baseScale as number) * sky.size;
+    sp.scale.set(scale, scale, 1);
+    sp.visible = f.outdoor && naturalUp > 0.02;
   }
 }

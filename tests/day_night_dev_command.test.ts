@@ -13,9 +13,12 @@ import {
   tryDayNightDevCommand,
 } from '../src/game/daynight_dev_command';
 import {
+  currentLunarPhase,
+  currentMoonSky,
   dayNightPhaseOverride,
   setDayNightPhaseOverride,
   setLunarPhaseOverride,
+  setMoonLatitudeOverride,
 } from '../src/render/day_night_clock';
 import { cyclePhase, DAWN_PHASE, DUSK_PHASE, isDaylightPhase } from '../src/sim/day_night';
 
@@ -87,5 +90,31 @@ describe('the command', () => {
     expect(dayNightPhaseOverride()).toBeNull();
     expect(tryDayNightDevCommand('/daynight', d)).toBe(true);
     expect(d.log).toHaveBeenCalledTimes(3);
+  });
+});
+
+describe('the moon eclipse scrub', () => {
+  afterEach(() => {
+    setMoonLatitudeOverride(null);
+  });
+
+  it('pins a full moon onto the sun path (a total eclipse), and auto releases both pins', () => {
+    const d = deps();
+    expect(tryDayNightDevCommand('/daynight moon eclipse', d)).toBe(true);
+    expect(currentLunarPhase()).toBe(MOON_PRESETS.full);
+    const sky = currentMoonSky(0);
+    expect(sky.latitudeDeg).toBe(0);
+    expect(sky.umbra).toBeCloseTo(1, 9);
+    expect(sky.mageCover).toBeCloseTo(1, 9);
+    expect(tryDayNightDevCommand('/daynight moon auto', d)).toBe(true);
+    expect(currentMoonSky(0).latitudeDeg).not.toBe(0);
+  });
+
+  it('a plain moon phase after an eclipse puts the moon back on its real orbit', () => {
+    const d = deps();
+    tryDayNightDevCommand('/daynight moon eclipse', d);
+    expect(tryDayNightDevCommand('/daynight moon crescent', d)).toBe(true);
+    expect(currentLunarPhase()).toBe(MOON_PRESETS.crescent);
+    expect(currentMoonSky(0).latitudeDeg).not.toBe(0);
   });
 });
