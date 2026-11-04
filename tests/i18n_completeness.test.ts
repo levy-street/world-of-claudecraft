@@ -225,7 +225,6 @@ describe('i18n whole-catalog completeness', () => {
         'hudChrome.hill.',
         'hudChrome.warfareShop.',
         'hudChrome.statInfo.',
-        'hudChrome.townFocus.',
         'hudChrome.auraEffect.benison',
         'hudChrome.loot.rollWon',
         'hudChrome.interfaceUnlock.',

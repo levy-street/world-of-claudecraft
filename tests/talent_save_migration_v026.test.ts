@@ -319,14 +319,17 @@ describe('talent production save migrations', () => {
     // synthetic q_fixture_done, pinning that done-history survives unknown ids.
     expect(first.questLog).toEqual(fixture.state.questLog);
     expect(first.questsDone).toEqual(fixture.state.questsDone);
-    // Same shape one field over (#2511): the fixture's townFocus is
-    // `{ eastbrook: 4 }`, a key that names no component family, and the load
-    // arm drops it so it cannot ride back out through the panel into a request
-    // the command boundary now rejects. Not vacuous, the fixture really does
-    // carry it, and the pure migration above still preserves it verbatim: the
-    // drop belongs to the load arm alone.
-    expect(fixture.state.townFocus).toEqual({ eastbrook: 4 });
-    expect(first.townFocus).toEqual({});
+    // Town Focus was removed from the game (2026-11-04): the fixture still
+    // carries a `townFocus` blob (`{ eastbrook: 4 }`), the pure migration
+    // above preserves it verbatim, and the load arm then ignores it, so the
+    // field is ABSENT from the re-serialized character rather than normalized
+    // to `{}`. Not vacuous: the fixture really does carry it, and this is the
+    // pin that an old save loads cleanly and the next write drops the field.
+    expect((fixture.state as unknown as Record<string, unknown>).townFocus).toEqual({
+      eastbrook: 4,
+    });
+    expect('townFocus' in first).toBe(false);
+    expect('pendingTownFocus' in first).toBe(false);
     expect(first.skin).toBe(3);
     expect(first.cooldowns).toEqual(fixture.state.cooldowns);
 

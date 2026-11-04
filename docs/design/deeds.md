@@ -102,6 +102,30 @@ server store always canonical.
    another renown-bearing deed, and
    record the account-side fallout (Renown board entry floor and
    completion-time tie-break, `server/deeds_board.ts`) in the PR that does it.
+   A third recorded consequence, of REMOVING a deed outright rather than
+   retiring it to a Feat (`soc_civic_duty`, "Civic Duty", renown 5, removed
+   2026-11-04 with the whole Town Focus mechanic it measured): rule 5 keeps a
+   deed visible when the CONTENT it measures is retired, so a player who did
+   it still has it. It does not apply when the mechanic itself leaves the game
+   and never existed for most characters: nothing a Feat could preserve
+   remains, the launcher only ever appeared in town, and keeping a ghost row
+   in every Book would be worse than none (rule 3 of "Adding a deed"). The
+   id leaves `DEED_ORDER` (the one deletion the append-only table has taken;
+   `tests/deeds_content.test.ts` re-pins the launch block one index earlier),
+   its `townFocusPoints` meter leaves the `DeedMeter` union, its crest leaves
+   `public/ui/deeds/`, and its locale rows leave `deed_i18n.locales/`. An
+   already-earned grant is harmless by construction: `restoreBookOfDeeds`
+   keeps the stored day verbatim (the Book never drops an earned record),
+   `recomputeRenown` counts live catalog ids only (a decrease of 5 for the
+   few earners, allowed under the same reading as the Fiesta ruling above),
+   the Book window and every meter walk `DEED_ORDER` so no ghost row paints,
+   the account ledger's decode is catalog-bounded (see "The account ledger"),
+   and the Renown board's SQL roll-up skips unknown ids, logging them once
+   per refresh so a maintainer can purge the dead `character_deeds` rows by
+   hand if the log is unwelcome. Pinned by the Town Focus case in
+   `tests/character_state_backcompat.test.ts`. Any future outright removal
+   follows this precedent, records it here, and ships in the same change as
+   the mechanic it belongs to.
 3. **Closed trigger vocabulary.** Every trigger is one of the `DeedTrigger`
    kinds in `src/sim/types.ts`: a predicate over persisted state (`level`,
    `lifetimeXp`, `quest`/`quests`, `arenaRating`, `craftSkill`, `gathering`,

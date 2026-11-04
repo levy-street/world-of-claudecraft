@@ -4970,8 +4970,8 @@ export const hudChromeStrings = {
     // plus its live status against THIS body (denial, reservation,
     // concentration benefit) and a Change entry into the shared preference
     // picker, replacing the per-tag checkbox section above. The keys above
-    // stay live for Town Focus (which reuses the components map) and for the
-    // retired-picker's own defensive arms; nothing above is removed.
+    // stay live for the components label map and for the retired-picker's
+    // own defensive arms; nothing above is removed.
     preferenceLabel: 'Harvest preference: {preference}',
     changeButton: 'Change',
     // Live placeholders off the real admission constants
@@ -5013,40 +5013,6 @@ export const hudChromeStrings = {
       bagsFull: 'Your bags are too full to harvest.',
       malformedInput: 'Something went wrong. Try again.',
     },
-  },
-  // #1143: persistent town focus allocation panel. Reuses the corpseHarvest
-  // component-name map above for consistency; only town-focus-specific copy
-  // lives here.
-  townFocus: {
-    title: 'Town Focus',
-    hint: "Focus points add a bonus on top of every component's baseline yield. Unfocused components stay at baseline.",
-    // Tier legibility: the tier-shift rule ({points} = POINTS_PER_TIER_BONUS,
-    // {steps} = MAX_FOCUS_TIER_BONUS) and the town-only rule, always visible.
-    tierHint:
-      'Every {points} points on a component raise its harvest tier one step, up to {steps} steps; fewer than {points} points still boost the yield.',
-    townOnlyHint: 'Focus can only be changed while you are in town.',
-    // Focus is a bonus, never a selector (docs/design/professions.md): the
-    // panel says where the selector lives so a silk focus is not read as
-    // "harvest silk only".
-    preferenceHint:
-      'Focus raises the grade and amount of what you harvest. To harvest only one material, set a Harvest Preference from your Field Kit or the Professions window.',
-    // The queued re-spec (#1144). {time} is pre-formatted (formatDuration).
-    pendingLine: 'Saved. Your re-spec to this allocation completes in {time}.',
-    budgetLabel: 'Points remaining: {remaining} / {budget}',
-    saveButton: 'Save Focus',
-    notInTownHint: 'You must be in town to set your focus.',
-    increaseAria: 'Increase focus on {component}',
-    decreaseAria: 'Decrease focus on {component}',
-    // #1144 re-spec cost model: the payment-tier picker and its cost preview,
-    // shown above Save. {coin}/{materials} are pre-formatted (formatMoney /
-    // formatNumber + the material item's localized name), matching the
-    // pre-formatted-placeholder idiom budgetLabel/tierHint already use above.
-    respecTierLabel: 'Re-spec speed',
-    respecTierTimeOption: 'Free (take your time)',
-    respecTierPartialOption: 'Faster (small cost)',
-    respecTierInstantOption: 'Instant (full cost)',
-    respecCostFree: 'Free',
-    respecCostLine: 'Costs {coin} and {materials}',
   },
   // The shared corpse-harvest preference picker (Intentional Gathering PR3):
   // one radio choice of All or a single material, reused unmodified by the
@@ -6365,7 +6331,7 @@ export const hudChromeStrings = {
     // locale, so a reword mints new keys rather than going stale in place).
     takeLootButton: 'Take Loot',
     takeLootTooltip: 'Takes the coins and dropped items. Does not use up the harvest.',
-    // Footer hint on the corpse loot window, the town-focus hint-line idiom.
+    // Footer hint on the corpse loot window (the .loot-footer-hint line).
     // Intentional gathering PR1: the interact key takes ordinary loot only and
     // never harvests; components come from the explicit Harvest button. The key
     // is remappable, so the copy names the action, never a key cap. Existing

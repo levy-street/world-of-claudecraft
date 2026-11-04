@@ -25,7 +25,6 @@ import {
   grantCorpseHarvest,
   snapshotCorpseHarvestGrantInputs,
 } from '../src/sim/professions/corpse_harvest_grant';
-import type { FocusAllocation } from '../src/sim/professions/focus';
 import {
   TIER2_TOOL_WIELD_PROFICIENCY,
   TIER3_TOOL_WIELD_PROFICIENCY,
@@ -137,14 +136,12 @@ beforeAll(() => setActiveWorldContent(CORPSE_TEST_WORLD));
 afterAll(() => setActiveWorldContent(null));
 
 describe('corpseHarvestOrdinaryYields: pure reserved-capacity ledger (no rng)', () => {
-  it('reserves the legendary-tier max per yielding component, in tag order, unfocused', () => {
+  it('reserves the legendary-tier max per yielding component, in tag order', () => {
     // forest_wolf: hide -> rough_hide, fang -> wolf_fang (tests/corpse_harvest_sim.test.ts
-    // "grants the mapped component item only to the winner"). harvestTierQuantity('legendary') = 6,
-    // and an empty townFocus leaves applyFocusBonus unchanged.
+    // "grants the mapped component item only to the winner"). harvestTierQuantity('legendary') = 6.
     const inputs: CorpseHarvestGrantInputs = {
       componentTags: ['hide', 'fang'],
       chosenComponents: [],
-      townFocus: {},
       bestAnyToolTier: 1,
     };
     expect(corpseHarvestOrdinaryYields(inputs)).toEqual([
@@ -157,7 +154,6 @@ describe('corpseHarvestOrdinaryYields: pure reserved-capacity ledger (no rng)', 
     const inputs: CorpseHarvestGrantInputs = {
       componentTags: ['hide', 'hide'],
       chosenComponents: [],
-      townFocus: {},
       bestAnyToolTier: 1,
     };
     // Two 'hide' extractions, each reserving 6: one slot, summed count.
@@ -168,7 +164,6 @@ describe('corpseHarvestOrdinaryYields: pure reserved-capacity ledger (no rng)', 
     const inputs: CorpseHarvestGrantInputs = {
       componentTags: ['hide', 'not_a_real_family'],
       chosenComponents: [],
-      townFocus: {},
       bestAnyToolTier: 1,
     };
     expect(corpseHarvestOrdinaryYields(inputs)).toEqual([{ itemId: 'rough_hide', count: 6 }]);
@@ -181,37 +176,21 @@ describe('corpseHarvestOrdinaryYields: pure reserved-capacity ledger (no rng)', 
     const spread: CorpseHarvestGrantInputs = {
       componentTags: ['hide', 'fang'],
       chosenComponents: [],
-      townFocus: {},
       bestAnyToolTier: 1,
     };
     const concentrated: CorpseHarvestGrantInputs = {
       componentTags: ['hide', 'fang'],
       chosenComponents: ['hide'],
-      townFocus: {},
       bestAnyToolTier: 1,
     };
     expect(corpseHarvestOrdinaryYields(concentrated)).toEqual([{ itemId: 'rough_hide', count: 6 }]);
     expect(corpseHarvestOrdinaryYields(spread)).toContainEqual({ itemId: 'rough_hide', count: 6 });
   });
 
-  it('town focus raises the reserved max (applyFocusBonus), never lowers it below the unfocused floor', () => {
-    // FOCUS_YIELD_BONUS_PER_POINT = 0.1: 10 points on hide is +100% of the
-    // legendary-tier base (6), so the reserved max is 12, not 6.
-    const focused: FocusAllocation = { hide: 10 };
-    const inputs: CorpseHarvestGrantInputs = {
-      componentTags: ['hide'],
-      chosenComponents: [],
-      townFocus: focused,
-      bestAnyToolTier: 1,
-    };
-    expect(corpseHarvestOrdinaryYields(inputs)).toEqual([{ itemId: 'rough_hide', count: 12 }]);
-  });
-
   it('bestAnyToolTier plays no part in the reserved capacity (the tool gate only ever downgrades a jackpot)', () => {
     const lowTool: CorpseHarvestGrantInputs = {
       componentTags: ['hide'],
       chosenComponents: [],
-      townFocus: {},
       bestAnyToolTier: 1,
     };
     const highTool: CorpseHarvestGrantInputs = { ...lowTool, bestAnyToolTier: 5 };
@@ -220,10 +199,9 @@ describe('corpseHarvestOrdinaryYields: pure reserved-capacity ledger (no rng)', 
 });
 
 describe('snapshotCorpseHarvestGrantInputs: clones every field, draws no rng', () => {
-  it('mutating the original tags/chosen arrays and townFocus after the call leaves the snapshot untouched', () => {
+  it('mutating the original tags/chosen arrays after the call leaves the snapshot untouched', () => {
     const { sim, mob, a, ctx } = soloRig(11);
     const meta = mustPlayer(sim as unknown as SimInternals, a);
-    meta.townFocus = { hide: 1 };
     const tags = ['hide'];
     const chosen = ['hide'];
     let draws = 0;
@@ -231,16 +209,11 @@ describe('snapshotCorpseHarvestGrantInputs: clones every field, draws no rng', (
     const snapshot = snapshotCorpseHarvestGrantInputs(meta, tags, chosen);
     sim.rng.setObserver(null);
     expect(draws).toBe(0);
-    // Mutate every source AFTER the snapshot: the original arrays in place,
-    // and meta.townFocus both by reassignment and (the stronger claim) by
-    // mutating the SAME object the snapshot was built from.
+    // Mutate every source AFTER the snapshot: the original arrays in place.
     tags.push('fang');
     chosen.push('fang');
-    meta.townFocus.hide = 99;
-    meta.townFocus = { hide: 99, fang: 99 };
     expect(snapshot.componentTags).toEqual(['hide']);
     expect(snapshot.chosenComponents).toEqual(['hide']);
-    expect(snapshot.townFocus).toEqual({ hide: 1 });
     // The snapshot is what a grant actually runs against; confirm the mutated
     // sources never reach it by checking the grant uses the frozen 'hide' set,
     // not the mutated ['hide','fang'] one (which would also try to extract fang).
@@ -296,7 +269,6 @@ describe('grantCorpseHarvest: capacity refusal draws no rng and spends no claim'
     const inputs: CorpseHarvestGrantInputs = {
       componentTags: expectDefined(MOBS.forest_wolf.componentTags),
       chosenComponents: [],
-      townFocus: meta.townFocus,
       bestAnyToolTier: 1,
     };
     sim.drainEvents();
@@ -321,7 +293,6 @@ describe('grantCorpseHarvest: capacity refusal draws no rng and spends no claim'
     const inputs: CorpseHarvestGrantInputs = {
       componentTags: ['not_a_real_family'],
       chosenComponents: [],
-      townFocus: {},
       bestAnyToolTier: 1,
     };
     sim.drainEvents();
@@ -339,40 +310,6 @@ describe('grantCorpseHarvest: capacity refusal draws no rng and spends no claim'
 });
 
 describe('grantCorpseHarvest: frozen inputs, never the live meta at grant time', () => {
-  it('the frozen town focus decides the grant; a later change to meta.townFocus is inert (seed 3)', () => {
-    // Two otherwise-identical runs at the same seed and inputs, differing only
-    // in whether meta.townFocus is mutated AFTER the frozen inputs snapshot is
-    // taken. If the leaf reads meta.townFocus live (a bug this seam exists to
-    // prevent), the mutated run would diverge from the untouched one; reading
-    // only the frozen `inputs.townFocus` makes the two runs byte-identical.
-    const run = (mutateLiveFocusAfterSnapshot: boolean) => {
-      const { sim, mob, a, ctx } = soloRig(3);
-      const meta = mustPlayer(sim as unknown as SimInternals, a);
-      const inputs: CorpseHarvestGrantInputs = {
-        componentTags: ['hide'],
-        chosenComponents: ['hide'],
-        townFocus: {},
-        bestAnyToolTier: 1,
-      };
-      if (mutateLiveFocusAfterSnapshot) meta.townFocus = { hide: 10 };
-      const granted = grantCorpseHarvest(ctx, mob, meta, inputs);
-      return {
-        granted,
-        inventory: structuredClone(meta.inventory),
-        rough: sim.countItem('rough_hide', a),
-      };
-    };
-    const withLiveMutation = run(true);
-    const withoutLiveMutation = run(false);
-    // Non-vacuity floor: both runs must actually succeed and actually grant
-    // something, or the equality below would hold trivially on two no-ops.
-    expect(withLiveMutation.granted).toBe(true);
-    expect(withoutLiveMutation.granted).toBe(true);
-    expect(withoutLiveMutation.rough).toBeGreaterThan(0);
-    expect(withLiveMutation.rough).toBe(withoutLiveMutation.rough);
-    expect(withLiveMutation.inventory).toEqual(withoutLiveMutation.inventory);
-  });
-
   it('the frozen bestAnyToolTier decides the premium arm; a later tool upgrade is inert (seed 15)', () => {
     // Baseline pin (tests/corpse_harvest_sim.test.ts "corpse premium-arm tool
     // gating", soloRig(15)): the hide rarity roll clears the signable floor
@@ -386,7 +323,6 @@ describe('grantCorpseHarvest: frozen inputs, never the live meta at grant time',
       const inputs: CorpseHarvestGrantInputs = {
         componentTags: ['hide'],
         chosenComponents: ['hide'],
-        townFocus: {},
         bestAnyToolTier: 1, // frozen bare-hands floor, captured before any tool change
       };
       if (grantWieldableTierThreeToolAfterSnapshot) {
@@ -433,7 +369,6 @@ describe('grantCorpseHarvest: frozen inputs, never the live meta at grant time',
     const inputs: CorpseHarvestGrantInputs = {
       componentTags: ['hide'],
       chosenComponents: ['hide'],
-      townFocus: {},
       bestAnyToolTier: 2, // frozen as though covering, though nothing is actually carried
     };
     sim.drainEvents();
@@ -465,7 +400,6 @@ describe('grantCorpseHarvest: signed components share compatible material-stack 
     const inputs: CorpseHarvestGrantInputs = {
       componentTags: expectDefined(MOBS.forest_wolf.componentTags),
       chosenComponents: ['fang'],
-      townFocus: {},
       bestAnyToolTier: 1,
     };
     sim.drainEvents();
@@ -510,7 +444,6 @@ describe('grantCorpseHarvest: an optional specimen never displaces a reserved or
     const inputs: CorpseHarvestGrantInputs = {
       componentTags: expectDefined(MOBS.wild_boar.componentTags),
       chosenComponents: [],
-      townFocus: {},
       bestAnyToolTier: 1,
     };
     sim.drainEvents();
@@ -534,7 +467,6 @@ describe('grantCorpseHarvest: an optional specimen never displaces a reserved or
     const inputs: CorpseHarvestGrantInputs = {
       componentTags: expectDefined(MOBS.wild_boar.componentTags),
       chosenComponents: [],
-      townFocus: {},
       bestAnyToolTier: 1,
     };
     const granted = grantCorpseHarvest(ctx, boar, m, inputs);
@@ -552,7 +484,6 @@ describe('grantCorpseHarvest: claim timing, ledger, and no-regrant', () => {
     const inputs: CorpseHarvestGrantInputs = {
       componentTags: expectDefined(MOBS.forest_wolf.componentTags),
       chosenComponents: [],
-      townFocus: {},
       bestAnyToolTier: 1,
     };
     const claimSeenDuringOrdinaryGrants: (number | null)[] = [];
@@ -589,7 +520,6 @@ describe('grantCorpseHarvest: claim timing, ledger, and no-regrant', () => {
     const inputs: CorpseHarvestGrantInputs = {
       componentTags: expectDefined(MOBS.forest_wolf.componentTags),
       chosenComponents: ['hide'],
-      townFocus: {},
       bestAnyToolTier: 1,
     };
     sim.drainEvents();
@@ -616,7 +546,6 @@ describe('grantCorpseHarvest: claim timing, ledger, and no-regrant', () => {
     const inputs: CorpseHarvestGrantInputs = {
       componentTags: expectDefined(MOBS.forest_wolf.componentTags),
       chosenComponents: [],
-      townFocus: {},
       bestAnyToolTier: 1,
     };
     sim.drainEvents();
@@ -643,7 +572,6 @@ describe('grantCorpseHarvest: claim timing, ledger, and no-regrant', () => {
     const inputs: CorpseHarvestGrantInputs = {
       componentTags: expectDefined(MOBS.forest_wolf.componentTags),
       chosenComponents: [],
-      townFocus: {},
       bestAnyToolTier: 1,
     };
     sim.drainEvents();

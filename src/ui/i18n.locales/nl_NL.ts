@@ -1095,10 +1095,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Verhoogt schade toegebracht aan spelers met {increase}% en vermindert schade uit spelers met {reduction}%. Verhoogt ook je maximale gezondheid met {health}% overal behalve in kerkers, raids, delves en rifts.',
   'hudChrome.statInfo.names.spellCrit': 'Spreuk Kritiek',
   'hudChrome.targetAuras.close': 'Sluit doelwit aura venster',
-  'hudChrome.townFocus.pendingLine':
-    'Opgeslagen. Je herspecificatie naar deze toewijzing is voltooid in {time}.',
-  'hudChrome.townFocus.preferenceHint':
-    'Focus verhoogt de graad en hoeveelheid van wat je oogst. Om slechts één materiaal te oogsten, stel een Oogstvoorkeur in vanuit je Veldkit of het Vakwindow.',
   'hudChrome.trade.offerQuantityAll': 'Bied alles aan',
   'hudChrome.trade.offerQuantityConfirm': 'Bied aan',
   'hudChrome.trade.offerQuantityHint': 'Je wordt gevraagd hoeveel je wilt aanbieden',
@@ -4212,8 +4208,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Je hoeft deze niet met het oog te vinden. Elk grondstoffenpunt in de zone staat getekend op de Gebiedskaart, overal waar de kaart die grond toont, en op de minimap zodra je erlangs komt, zodat je een farmroute al vanaf het kaartscherm kunt uitstippelen voordat je vertrekt. Een grondstoffenpunt dat je gereedschap nog niet kan bewerken wordt gemarkeerd in plaats van verborgen: het houdt zijn plek met een doorgestreepte, gedimde markering, zodat je kunt zien naar welke grond je toe traint. Op desktop noemt het aanwijzen van een ader, houtopstand of veld in de wereld de naam ervan, vertelt het welk gereedschap het vraagt, en telt het, zodra je het hebt bewerkt, je eigen hergroeitijd af tot op de seconde. Op touchscreens is er niets om aan te wijzen, dus vertellen de minimap-markeringen hetzelfde verhaal.',
   'guide.profPages.specimenBodyFamilies':
     'Houd wat tasruimte vrij wanneer je farmt: een gesigneerde meevaller heeft een eigen slot nodig of een bijpassende gesigneerde stapel om in te landen, en past er niets, dan komt de opbrengst nog steeds binnen maar gaat de handtekening verloren. Ook lijkoogst heeft zijn eigen jackpotarm: ongeveer {pct}% van elk geoogst component komt zeldzaam of beter uit. Een familie die een perfect exemplaar te geven heeft (huid, zijde, gif, klauw, vlees) houdt haar gewone opbrengst gewoon en slaat het gesigneerde exemplaar ernaast; de andere vijf, tand, stof, slagtand, hoorn en kieuwen, signeren de opbrengst zelf.',
-  'guide.professions.focusBodyTiers':
-    'Elke hoofdplaats heeft een Stadsfocus-paneel voor oogsters op bezoek: sta in de stad, open het naast de minimap, en verdeel een budget van 10 focuspunten over de componenttypen die je belangrijk vindt. Elke 5 punten op een component verhogen de oogstgraad met één stap (maximaal twee stappen), en elk punt voegt 10 procent toe aan de opbrengst; componenten zonder focus worden nooit slechter.\n\nJe toewijzing volgt je personage overal mee en kan bij elk later bezoek aan de stad worden herverdeeld, in het tempo dat je zelf kiest. De tijd nemen is gratis: de herverdeling duurt 1 minuut per punt dat je verplaatst. Een beetje betalen versnelt het, 15 seconden per punt plus 5 koper en 1 Chimestof per punt, en volledig betalen maakt het direct voor 25 koper en 5 Chimestof per punt. Alleen de punten die je daadwerkelijk verplaatst, tellen mee, dus een enkel punt verschuiven is goedkoop, en een paneel dat je opent en ongewijzigd weer sluit kost niets, op geen enkele snelheid.',
   'guide.professions.harvestBodyFamilies':
     'Verzamelen stopt niet bij bronpunten. Veel gevelde beesten kunnen eenmalig worden geoogst, wie het eerst komt wie het eerst maalt, voor huiden, tanden, klauwen, slagtanden, hoorns, kieuwen, zijde, gif, stof en vlees, rechtstreeks van het karkas naast de gewone buit. De interactietoets neemt alleen de buit; oogsten is een aparte keuze, die je maakt in het onderdeel Oogsten van het buitvenster. Waar een beest meer dan één bruikbare component draagt, is de keuze aan jou: neem alles wat het te bieden heeft, of concentreer je op minder componenten en neem een meetbaar betere kwaliteit van wat je wel neemt.\n\nEen zeldzame of betere oogstrol op een specimenfamilie geeft ook een gesigneerd perfect exemplaar (een Ongerepte huid, Ongerepte zijde, Ongerepte gifklier, Ongerepte Klauw of Eerste snit) bovenop de gewone opbrengst, en registreert Een Perfect Exemplaar in je Boek der Daden. Elk personage kan oogsten, geen training vereist, en elk gereedschap dat je bezit telt mee voor de premiumerkenning, tot welk beroep het ook behoort.',
   'guide.professions.toolEffectsHeading': 'Gereedschapseffecten',
@@ -5175,12 +5169,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.pvp.bracket2v2': '2v2',
   'hudChrome.pvp.launcherTitle': 'PvP',
   'hudChrome.pvp.mobileLabel': 'PvP',
-  'hudChrome.townFocus.respecCostFree': 'Gratis',
-  'hudChrome.townFocus.respecCostLine': 'Kost {coin} en {materials}',
-  'hudChrome.townFocus.respecTierInstantOption': 'Direct (volledige kosten)',
-  'hudChrome.townFocus.respecTierLabel': 'Herverdelingssnelheid',
-  'hudChrome.townFocus.respecTierPartialOption': 'Sneller (kleine kosten)',
-  'hudChrome.townFocus.respecTierTimeOption': 'Gratis (neem de tijd)',
   'hudChrome.warfare.floatReasons.assist': 'Hulp',
   'hudChrome.warfare.floatReasons.firstWin': 'Eerste Overwinning',
   'hudChrome.warfare.floatReasons.kill': 'Kill',
@@ -5998,7 +5986,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Hoofdambachten vragen een gelofte. Een liefhebberij vraagt alleen waar je nieuwsgierigheid ronddwaalt, {playerName}. Pluk een paar kruiden en beslis welk ambacht tegenover je hoofdambachten je wilt beoefenen.',
   'entities.quests.q_prof_hobby_switch.title': 'Een Andere Tijdverdrijf',
   'entities.quests.q_prof_intro.completion':
-    'Zie je? Erts verzameld en eelt op je handen. Ga door met het mijnen, houtkappen en kruidenplukken terwijl je de wegen afloopt, en als je terug in de stad bent, let dan op het Stadsfocusbord bij de markt en de nabijgelegen knutselbank. Er zit een eerlijke handel in dit alles, als je dat wilt.',
+    'Zie je? Erts verzameld en eelt op je handen. Ga door met het mijnen, houtkappen en kruidenplukken terwijl je de wegen afloopt, en als je terug in de stad bent, let dan op de knutselbank bij de markt. Er zit een eerlijke handel in dit alles, als je dat wilt.',
   'entities.quests.q_prof_intro.objectives.0.label': 'Ertsslagader geoogst',
   'entities.quests.q_prof_intro.text':
     'Elke ziel in Oostbeek beoefent een ambacht naast het zwaard, {playerName}. Er zijn ertsslagaders in de rotsen rond de Kopergroeve, ten noordoosten van de stad, voorbij de wolvenrennen. Ga zelf een houweel zwaaien en bewerk er 5; ik zie het verschil.',
@@ -6619,18 +6607,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Naast gevecht en quests beloont de wereld je voor het bewerken van het land en de smidse: grondstoffen verzamelen, ze in tien ambachtsvakken tot uitrusting en goederen maken, en een identiteit aannemen als een van de tien archetypen die deze vakken vertegenwoordigen.',
   'hudChrome.mobile.dailyRewards': 'Winkel',
   'hudChrome.perf.labels.predLead': 'Predictievoorsprong',
-  'hudChrome.townFocus.budgetLabel': 'Punten over: {remaining} / {budget}',
-  'hudChrome.townFocus.decreaseAria': 'Verminder de focus op {component}',
-  'hudChrome.townFocus.hint':
-    'Focuspunten geven een bonus bovenop de basisopbrengst van elk onderdeel. Onderdelen zonder focus blijven op het basisniveau.',
-  'hudChrome.townFocus.increaseAria': 'Vergroot de focus op {component}',
-  'hudChrome.townFocus.notInTownHint': 'Je moet in de stad zijn om je focus in te stellen.',
-  'hudChrome.townFocus.saveButton': 'Focus opslaan',
-  'hudChrome.townFocus.tierHint':
-    'Elke {points} punten op een onderdeel verhogen het oogstniveau een stap, maximaal {steps} stappen; minder dan {points} punten boosten nog steeds de opbrengst.',
-  'hudChrome.townFocus.title': 'Stadsfocus',
-  'hudChrome.townFocus.townOnlyHint':
-    'Focus kan alleen worden gewijzigd terwijl je in de stad bent.',
   'hudChrome.archetypeTitle.none': 'Geen',
   'entities.itemSets.crownforged.bonus4':
     'Je kritieke wapentreffers splinteren het doelwit met Beensplinter, waardoor het 8 schade bloedt elke 2 sec gedurende 12 sec. Stapelt tot 3 keer.',
@@ -14271,9 +14247,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.models.groupForms': 'Druïdengedaanten',
   'guide.nav.sidebarLabel': 'Gidsonderwerpen',
   'guide.professions.craftHowTitle': 'Het vervaardigingsvenster',
-  'guide.professions.focusBody':
-    'Elke hoofdplaats heeft een Stadsfocus-paneel voor oogsters op bezoek: sta in de stad, open het naast de minimap, en richt een klein budget aan focuspunten op de componenttypen die je belangrijk vindt. Hoe meer focus je aan een component geeft, hoe fijner en rijker het van elk later lijk komt; je toewijzing volgt je personage waar het ook zwerft, en je kunt haar gratis herzien bij elk later bezoek aan de stad.',
-  'guide.professions.focusTitle': 'Stadsfocus',
   'guide.professions.harvestTitle': 'De jacht zelf oogsten',
   'guide.search.typeAbility': 'Vaardigheid',
   'guide.search.typeDeed': 'Daad',
@@ -17225,7 +17198,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.faq.q7': 'Waarom ging mijn verzamelen ineens langzamer?',
   'guide.profPages.faq.q8': 'Kan ik buiten de stad ambachten maken?',
   'guide.profPages.faq.a3':
-    'Het zijn twee losse handelingen op hetzelfde lichaam. Alles wat een lijk vasthoudt, munt en buit plus alle oogstbare componenten, opent in hetzelfde venster, maar de interactietoets en Buit Nemen pakken alleen de gewone buit, die de normale lootregels volgt. Oogsten is de ambachtenkant, die materialen van het karkas zelf afstript, en gebeurt pas wanneer je in dat venster Oogsten kiest.\n\nOogsten is wie-het-eerst-komt, eenmalig gebruik: elk lijk kan precies eenmaal worden geoogst, door wie het als eerste claimt, ook online. Je Stadsfocus bepaalt wat je krijgt: terwijl je in een stadshub staat, kun je 10 focuspunten spreiden over de componenttypen die je interesseren, en elk gefocust component rolt een betere rang (elke 5 punten verhoogt het een stap, maximaal twee stappen) en levert meer op (10 procent per punt). Ongefocuste componenten worden nooit slechter.',
+    'Het zijn twee losse handelingen op hetzelfde lichaam. Alles wat een lijk vasthoudt, munt en buit plus alle oogstbare componenten, opent in hetzelfde venster, maar de interactietoets en Buit Nemen pakken alleen de gewone buit, die de normale lootregels volgt. Oogsten is de ambachtenkant, die materialen van het karkas zelf afstript, en gebeurt pas wanneer je in dat venster Oogsten kiest.\n\nOogsten is wie-het-eerst-komt, eenmalig gebruik: elk lijk kan precies eenmaal worden geoogst, door wie het als eerste claimt, ook online.',
   'guide.profPages.faq.a4':
     'Je hebt een uitzonderlijk rijke vondst gedaan. Ongeveer 1 op 90 oogsten veroorzaakt een zeldzame verzamelgebeurtenis: oeroud kernhout bij bomen, een ongerepte ader bij erts of een maanverlichte bloem bij kruiden. De opbrengst wordt vervijfvoudigd, elke eenheid krijgt jouw handtekening en de hele zone hoort van de vondst. Ook een gewone oogst met zeldzame of betere kwaliteit ondertekent de opbrengst.\n\nBewaar ondertekende materialen of verkoop ze duur: een ondertekende eenheid van een benodigde grondstof in je tassen of je Materialenkluis, waar het ambacht die kan gebruiken, voegt 2 procentpunten toe aan de Meesterwerkkans. Ze kunnen een passende stapel delen met ongetekend materiaal en eenheden van andere verzamelaars en ondertekenaars zonder merken te verliezen; elke bron en hoeveelheid blijft apart bewaard.',
   'guide.profPages.faq.a5':

@@ -6,14 +6,14 @@
 //
 //  - captureFocusKey: the activeElement narrowing, the containment check, and the
 //    dataset read. The containment check is the acceptance criterion of the extraction:
-//    mailbox_window and town_focus_window key their steppers under the SAME
+//    mailbox_window and the (since-removed) town_focus_window keyed their steppers under the SAME
 //    `data-focus-key` attribute in the same `<id>:<role>` shape, so ONE flat namespace
 //    is shared across windows and a copy that forgot the check would let its own
 //    repaint pull focus out of the other window. That is what the cross-window case
 //    below plants.
 //  - restoreFirstEnabled: the walk and the disabled skip. Every rung the two migrated
 //    callers actually pass is represented: a button (both), an `<input type=number>`
-//    (mailbox's quantity field), a `null` hole (town focus's `querySelector` miss) and
+//    (mailbox's quantity field), a `null` hole (a `querySelector` miss) and
 //    an `undefined` one (mailbox's `Map.get` / optional-field miss).
 //
 // jsdom rather than the fake-element harness tests/dialog_root.test.ts uses:
@@ -97,7 +97,7 @@ describe('captureFocusKey', () => {
 
   it('refuses a keyed control in ANOTHER window, even with the identical key', () => {
     // The extraction's acceptance criterion. Two windows, one shared key namespace:
-    // the mailbox parcel stepper and the town focus stepper really are both
+    // the mailbox parcel stepper and the professions action buttons really are both
     // `<id>:<role>` under `data-focus-key`. Focus is in window B; window A repaints.
     // A returns null, so A's ladder never runs and focus stays where the player put
     // it. Note the key is the SAME string in both, which is what makes this a refusal
@@ -379,7 +379,7 @@ describe('restoreFirstEnabled', () => {
 //     nobody, and both painters' grants stay green. The gate's own comment says as much:
 //     "a read moved into a NEW un-named helper is still out of reach."
 //  2. NO DEFERRAL. The focus is synchronous, unlike FocusManager.restore's setTimeout(0),
-//     and town_focus_window's documented scroll-then-focus ordering depends on it.
+//     and the callers' documented scroll-then-focus ordering depends on it.
 // ---------------------------------------------------------------------------
 
 const repoRoot = path.resolve(__dirname, '..');
@@ -544,7 +544,7 @@ describe('the data-focus-key namespace has exactly one reader', () => {
     const readers = uiFiles.filter((f) => TOUCHES_NAMESPACE.test(f.code));
     // Named literals rather than a count, so migrating a third window is not a test edit.
     expect(readers.map((f) => f.file)).toContain('mailbox_window.ts');
-    expect(readers.map((f) => f.file)).toContain('town_focus_window.ts');
+    expect(readers.map((f) => f.file)).toContain('bank_window.ts');
     // And the constant's own spelling, which the two above do not use.
     expect(readers.map((f) => f.file)).toContain('restart_strip_painter.ts');
   });

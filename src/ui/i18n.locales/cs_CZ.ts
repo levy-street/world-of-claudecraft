@@ -1082,10 +1082,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Zvyšuje poškození způsobené hráčům o {increase} % a snižuje poškození utrpěné od hráčů o {reduction} %. Také zvyšuje tvé maximální zdraví o {health} % všude kromě dungeonů, raidů, výprav a trhlin.',
   'hudChrome.statInfo.names.spellCrit': 'Kritický zásah kouzlem',
   'hudChrome.targetAuras.close': 'Zavřít okno aur cíle',
-  'hudChrome.townFocus.pendingLine':
-    'Uloženo. Tvá úprava na toto rozložení bude dokončena za {time}.',
-  'hudChrome.townFocus.preferenceHint':
-    'Zaměření zvyšuje jakost a množství toho, co sklidíš. Chceš-li sklízet jen jeden materiál, nastav si Preferenci sklizně ve své Polní výbavě nebo v okně Profese.',
   'hudChrome.trade.offerQuantityAll': 'Nabídnout vše',
   'hudChrome.trade.offerQuantityConfirm': 'Nabídnout',
   'hudChrome.trade.offerQuantityHint': 'Budeš dotázán(a), kolik chceš nabídnout',
@@ -4153,8 +4149,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Nemusíš je hledat očima. Každý zdroj v zóně je vykreslený na mapě zóny všude, kde mapa tu oblast ukazuje, a na minimapě, jakmile kolem něj projdeš, takže si farmařskou trasu můžeš naplánovat z obrazovky mapy ještě předtím, než vyrazíš. Zdroj, který tvé nástroje ještě neumí zpracovat, je označený, ne skrytý: drží si své místo přeškrtnutou, ztlumenou značkou, takže vidíš, na jakou úroveň se ještě trénuješ. Na počítači ti najetí myší na žílu, strom nebo porost ukáže jeho název, řekne ti, jaký nástroj chce, a jakmile ho zpracuješ, odpočítá ti vlastní obnovu na sekundu přesně. Na dotykovém ovládání není co najíždět myší, takže totéž říkají značky na minimapě.',
   'guide.profPages.specimenBodyFamilies':
     'Když farmíš, nech si v brašnách trochu místa navíc: podepsaný nečekaný nález potřebuje vlastní místo nebo odpovídající podepsaný stack, kam přistát, a když se nikam nevejde, výnos i tak dorazí, ale podpis se ztratí. I sklizeň z těl má vlastní jackpotové rameno: zhruba {pct} % z každé sklizené složky vyjde vzácné nebo lepší. Rodina, která má co dát jako dokonalý exemplář (kůže, hedvábí, jed, dráp, maso), nechá svůj běžný výnos prostý a razí podepsaný exemplář vedle něj; ostatních pět, tesák, látka, kly, roh a žábry, podepíše přímo samotný výnos.',
-  'guide.professions.focusBodyTiers':
-    'Každé větší město drží panel Zaměření města pro přicházející sběrače: postav se ve městě, otevři ho vedle minimapy a rozděl rozpočet 10 bodů zaměření mezi typy složek, na kterých ti záleží. Každých 5 bodů na složce zvýší její úroveň sklizně o jeden stupeň (nejvýš o dva stupně) a každý bod přidá 10 procent k jejímu výnosu; nezaměřené složky nikdy nic nezhorší.\n\nTvé rozdělení sleduje postavu kamkoli jde a lze ho přesměrovat při každé další návštěvě města, tempem, které si zvolíš. Nespěchat je zdarma: přesměrování běží 1 minutu na každý přesunutý bod. Malá platba to zrychlí, 15 sekund na bod plus 5 měďáků a 1 Zvonivý prach na bod, a plná platba to udělá okamžité za 25 měďáků a 5 Zvonivého prachu na bod. Počítají se jen body, které skutečně přesuneš, takže posunout jediný bod je levné, a panel, který otevřeš a zavřeš beze změny, nestojí nic při žádné úrovni platby.',
   'guide.professions.harvestBodyFamilies':
     'Sběr nekončí u nalezišť. Mnoho skolených tvorů lze jednou sklidit, kdo dřív přijde, ten dřív bere, na kůže, tesáky, drápy, kly, rohy, žábry, hedvábí, jed, látku a maso, přímo z těla vedle jeho běžné kořisti. Tlačítko interakce sebere jen kořist; sklizení je vlastní volba, kterou provedeš v části Sklizeň v okně kořisti. Když tvor nese víc než jednu zpracovatelnou složku, volba je na tobě: vezmi si všechno, co může dát, nebo se soustřeď na méně složek a získej měřitelně jemnější jakost toho, co si vezmeš.\n\nHod na vzácnou nebo lepší sklizeň u rodiny s dokonalým exemplářem ti navíc k běžnému výnosu udělí podepsaný dokonalý exemplář (Nepoškozenou kůži, Nedotčené hedvábí, Nedotčenou jedovou žlázu, Nedotčený dráp nebo Prvotřídní kus) a zapíše ti do Knihy skutků Dokonalý exemplář. Sklízet může kdokoli, žádný výcvik není potřeba, a do prémiového ramene se počítá jakýkoli sběračský nástroj, který vlastníš, ať patří k jakémukoli řemeslu.',
   'guide.professions.toolEffectsHeading': 'Efekty nástrojů',
@@ -5103,12 +5097,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.pvp.bracket2v2': '2v2',
   'hudChrome.pvp.launcherTitle': 'PvP',
   'hudChrome.pvp.mobileLabel': 'PvP',
-  'hudChrome.townFocus.respecCostFree': 'Zdarma',
-  'hudChrome.townFocus.respecCostLine': 'Stojí {coin} a {materials}',
-  'hudChrome.townFocus.respecTierInstantOption': 'Okamžitě (plná cena)',
-  'hudChrome.townFocus.respecTierLabel': 'Rychlost úpravy',
-  'hudChrome.townFocus.respecTierPartialOption': 'Rychleji (malý poplatek)',
-  'hudChrome.townFocus.respecTierTimeOption': 'Zdarma (nespěchej)',
   'hudChrome.warfare.floatReasons.assist': 'Asistence',
   'hudChrome.warfare.floatReasons.firstWin': 'První výhra',
   'hudChrome.warfare.floatReasons.kill': 'Zabití',
@@ -5864,7 +5852,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Hlavní obory vyžadují slib. Koníček se jen ptá, kam tě zavede tvá zvídavost, {playerName}. Nasbírej pár bylin a rozhodni se, které řemeslo naproti svým hlavním oborům chceš provozovat.',
   'entities.quests.q_prof_hobby_switch.title': 'Jiná kratochvíle',
   'entities.quests.q_prof_intro.completion':
-    'Vidíš? Ruda vytěžena a mozoly na rukách. Pokračuj v dolování, těžbě dřeva a sběru bylin cestou po silnicích, a až se vrátíš do města, mrkni na Nástěnku obecního středu u tržiště a na řemeslný stůl poblíž. Je v tom poctivý obchod, pokud ho chceš.',
+    'Vidíš? Ruda vytěžena a mozoly na rukách. Pokračuj v dolování, těžbě dřeva a sběru bylin cestou po silnicích, a až se vrátíš do města, mrkni na řemeslný stůl u tržiště. Je v tom poctivý obchod, pokud ho chceš.',
   'entities.quests.q_prof_intro.objectives.0.label': 'Vytěžena rudná žíla',
   'entities.quests.q_prof_intro.text':
     'Každá duše v Eastbrooku pracuje kromě meče i v nějakém řemesle, {playerName}. V skalách kolem Měděné štoly severovýchodně od města, za vlčími stezkami, jsou rudné žíly. Jdi si sám zamasat krumpáčem a vytěž jich 5; věř mi, poznám rozdíl.',
@@ -6412,17 +6400,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.dailyRewards': 'Obchod',
   'hudChrome.perf.labels.predLead': 'Náskok predikce',
   'hudChrome.perf.labels.serverTick': 'Frekvence tiků serveru',
-  'hudChrome.townFocus.budgetLabel': 'Zbývající body: {remaining} / {budget}',
-  'hudChrome.townFocus.decreaseAria': 'Snížit zaměření na {component}',
-  'hudChrome.townFocus.hint':
-    'Body zaměření přidávají bonus nad základní výnos každé součásti. Nezaměřené součásti zůstávají na základní hodnotě.',
-  'hudChrome.townFocus.increaseAria': 'Zvýšit zaměření na {component}',
-  'hudChrome.townFocus.notInTownHint': 'Zaměření lze nastavit jen ve městě.',
-  'hudChrome.townFocus.saveButton': 'Uložit zaměření',
-  'hudChrome.townFocus.tierHint':
-    'Každých {points} bodů na komponentě zvýší její úroveň sklizně o jeden stupeň, až o {steps} stupňů; méně než {points} bodů přesto zvýší výnos.',
-  'hudChrome.townFocus.title': 'Zaměření města',
-  'hudChrome.townFocus.townOnlyHint': 'Tato nastavení platí pouze ve vašem domovském městě.',
   'hudChrome.archetypeTitle.none': 'Žádný',
   'entities.itemSets.crownforged.bonus4':
     'Kritické zásahy tvé zbraně roztříští cíl efektem Kostitříska a způsobí mu krvácení za 8 poškození každé 2 s po dobu 12 s. Nasčítá se až 3krát.',
@@ -14343,9 +14320,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'guide.models.groupForms': 'Podoby druida',
   'guide.nav.sidebarLabel': 'Témata průvodce',
   'guide.professions.craftHowTitle': 'Okno výroby',
-  'guide.professions.focusBody':
-    'Každé větší město drží panel Zaměření města pro přicházející sběrače: postav se ve městě, otevři ho vedle minimapy a namiř malý rozpočet bodů zaměření na typy komponent, na kterých ti záleží. Čím víc zaměření dáš dané komponentě, tím jemnější a bohatší padá z každého dalšího těla; tvé rozdělení následuje postavu, ať se toulá kamkoli, a můžeš ho zdarma přepracovat při každé pozdější návštěvě města.',
-  'guide.professions.focusTitle': 'Zaměření města',
   'guide.professions.harvestTitle': 'Sklizeň ze samotného lovu',
   'guide.search.typeAbility': 'Schopnost',
   'guide.search.typeDeed': 'Skutek',
@@ -16946,7 +16920,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.faq.q7': 'Proč mi sběr najednou zpomalil?',
   'guide.profPages.faq.q8': 'Mohu vyrábět mimo město?',
   'guide.profPages.faq.a3':
-    'Jsou to dvě samostatné činnosti nad týmž tělem. Vše, co tělo drží, mince a kořist plus jakékoli skliditelné součásti, se otevírá ve stejném okně, ale tlačítko interakce a Sebrat kořist vezmou jen běžnou kořist, která se řídí normálními pravidly kořisti. Sklizení je stranou profese, která strhuje materiály ze samotné mrtvoly, a nastane teprve tehdy, když v tom okně zvolíš Sklidit.\n\nSklizení je první přijde první bere, pro jednoho hráče: každé tělo lze sklidit přesně jednou, tím, kdo si ho nárokuje jako první, online nevyjímaje. Tvoje Střediště zaměření určuje, co dostaneš: zatímco stojíš v uzlovém centru města, můžeš rozložit 10 bodů zaměření na typy složek, o které stojíš, a každá zaměřená složka hází za lepší stupeň (každých 5 bodů ji posune o krok výše, nejvýše o dva) a dává víc (10 procent za bod). Nezaměřené složky se nikdy nezhorší.',
+    'Jsou to dvě samostatné činnosti nad týmž tělem. Vše, co tělo drží, mince a kořist plus jakékoli skliditelné součásti, se otevírá ve stejném okně, ale tlačítko interakce a Sebrat kořist vezmou jen běžnou kořist, která se řídí normálními pravidly kořisti. Sklizení je stranou profese, která strhuje materiály ze samotné mrtvoly, a nastane teprve tehdy, když v tom okně zvolíš Sklidit.\n\nSklizení je první přijde první bere, pro jednoho hráče: každé tělo lze sklidit přesně jednou, tím, kdo si ho nárokuje jako první, online nevyjímaje.',
   'guide.profPages.faq.a4':
     'Narazil jsi na mimořádný nález. Zhruba 1 sběr z 90 spustí vzácnou událost (prastaré jádrové dřevo u stromu, neposkvrněná žíla u rudy, měsíční květ u bylin): výnos se zpětinásobí, každá jednotka získá tvůj podpis a nález se oznámí celé zóně. Také běžný sběr s výslednou vzácnou či vyšší kvalitou podepíše celý výnos.\n\nPodepsané materiály se vyplatí ponechat nebo draze prodat: jakákoli podepsaná jednotka potřebné přísady v brašnách nebo v Trezoru materiálů, odkud ji může daná výroba čerpat, zvyšuje šanci na mistrovské dílo o 2 procentní body. Může sdílet slučitelnou hromádku s nepodepsaným materiálem i jednotkami jiných sběračů a podepisujících, aniž ztratí značku; počty pro každý původ se uchovávají zvlášť.',
   'guide.profPages.faq.a5':

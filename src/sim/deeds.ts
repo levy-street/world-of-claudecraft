@@ -970,7 +970,6 @@ export const METER_DIRTY_KEYS: Record<DeedMeterId, readonly string[]> = {
   vcupGuildWins: [],
   bankPurchasedSlots: [],
   bankSocketsUnlocked: [],
-  townFocusPoints: [],
   delveLoreCount: [],
   companionRankBest: [],
   itemsDiscoveredCount: ['items'],
@@ -1089,12 +1088,6 @@ const METERS: Record<DeedMeterId, (meta: PlayerMeta) => number> = {
   vcupGuildWins: (m) => m.vcupGuildWins,
   bankPurchasedSlots: (m) => m.bank.purchasedSlots,
   bankSocketsUnlocked: (m) => m.bank.unlockedSockets,
-  townFocusPoints: (m) => {
-    // Allocation-free sum (tick-tail predicate: no Object.values array).
-    let n = 0;
-    for (const k in m.townFocus) n += m.townFocus[k];
-    return n;
-  },
   delveLoreCount: (m) => m.delveLoreUnlocked.size,
   companionRankBest: (m) => Math.max(0, ...Object.values(m.companionUpgrades)),
   itemsDiscoveredCount: (m) => m.deedStats.itemsDiscovered.size,

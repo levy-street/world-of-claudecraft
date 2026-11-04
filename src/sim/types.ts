@@ -13156,7 +13156,6 @@ export type DeedMeterId =
   // Gold-bought bank bag sockets unlocked (BankState.unlockedSockets, phase 06;
   // monotonic: an unlock never reverts).
   | 'bankSocketsUnlocked'
-  | 'townFocusPoints'
   | 'delveLoreCount'
   | 'companionRankBest'
   | 'itemsDiscoveredCount'

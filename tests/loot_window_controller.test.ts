@@ -105,7 +105,6 @@ type HarvestInfoImpl = (id: number) => CorpseHarvestInfo | null | Promise<Corpse
 function harness(
   initialEntities: Entity[] = [],
   corpseAvailability = (mob: Entity) => corpseLootAvailability(mob, 7),
-  townFocus: Record<string, number> = {},
   // Defaults to "no usable current answer" (the contract's own null case), so
   // any test not about the harvest section itself gets a harmless, disabled
   // section rather than an admitted one it never asked for.
@@ -125,7 +124,6 @@ function harness(
     partyInfo: null,
     inventory: [{ itemId: 'field_kit', count: 1 }],
     player: { pos: { x: 0, y: 0, z: 0 }, dead: false },
-    townFocus,
     lootCorpse,
     harvestCorpse,
     collectDelveChestLoot,
@@ -389,7 +387,7 @@ describe('LootWindowController', () => {
     // Intentional gathering PR1: the interact key takes ordinary loot only, so
     // the footer hint must not promise a one-press harvest. No key name: the
     // interact key is remappable.
-    expect(test.element.querySelector('.town-focus-hint')?.textContent).toBe(
+    expect(test.element.querySelector('.loot-footer-hint')?.textContent).toBe(
       'The interact key only takes the loot. To gather components, use Harvest here.',
     );
     takeLoot?.click();
@@ -554,7 +552,7 @@ describe('LootWindowController', () => {
     expect(test.element.querySelector('.corpse-harvest')).toBeNull();
     expect(harvestBtn(test.element)).toBeNull();
     expect(changeBtn(test.element)).toBeNull();
-    expect(test.element.querySelector('.town-focus-hint')).toBeNull();
+    expect(test.element.querySelector('.loot-footer-hint')).toBeNull();
     expect(test.corpseHarvestInfo).not.toHaveBeenCalled();
   });
 
@@ -571,7 +569,7 @@ describe('LootWindowController', () => {
 
     expect(test.element.style.display).toBe('block');
     expect(test.element.innerHTML).toContain('money:12');
-    expect(test.element.querySelector('.town-focus-hint')).toBeNull();
+    expect(test.element.querySelector('.loot-footer-hint')).toBeNull();
     expect(test.element.querySelector('.corpse-harvest')).toBeNull();
   });
 
@@ -694,7 +692,7 @@ describe('LootWindowController', () => {
         templateId: harvestMobId,
         loot: { copper: 25, items: [{ itemId: itemIds[0], count: 1, personalFor: [7] }] },
       });
-      const test = harness([mob], (entry) => corpseLootAvailability(entry, 7), {}, info);
+      const test = harness([mob], (entry) => corpseLootAvailability(entry, 7), info);
       test.controller.openCorpse(id, 400, 300);
       return { mob, test, id };
     }
@@ -1024,7 +1022,6 @@ describe('LootWindowController', () => {
           entity(60, { kind: 'mob', templateId: harvestMobId, loot: { copper: 2, items: [] } }),
         ],
         (entry) => corpseLootAvailability(entry, 7),
-        {},
         () => {
           calls += 1;
           return calls === 1 ? first.promise : second.promise;
@@ -1048,7 +1045,6 @@ describe('LootWindowController', () => {
       const test = harness(
         [mob],
         (entry) => corpseLootAvailability(entry, 7),
-        {},
         (id) => harvestInfo({ corpseId: id, preference: { kind: 'all' } }),
       );
       test.controller.openCorpse(50, 0, 0);
@@ -1072,7 +1068,6 @@ describe('LootWindowController', () => {
       const test = harness(
         [mob],
         (entry) => corpseLootAvailability(entry, 7),
-        {},
         (id) => harvestInfo({ corpseId: id, preference: { kind: 'all' } }),
       );
       test.controller.openCorpse(50, 0, 0);
@@ -1093,7 +1088,6 @@ describe('LootWindowController', () => {
       const test = harness(
         [mob],
         (entry) => corpseLootAvailability(entry, 7),
-        {},
         (id) => harvestInfo({ corpseId: id, preference: { kind: 'all' } }),
       );
 
@@ -1118,7 +1112,6 @@ describe('LootWindowController', () => {
         const test = harness(
           [mob],
           (entry) => corpseLootAvailability(entry, 7),
-          {},
           (id) => {
             calls += 1;
             return calls === 1
@@ -1245,7 +1238,6 @@ describe('LootWindowController', () => {
         const test = harness(
           [mob],
           (entry) => corpseLootAvailability(entry, 7),
-          {},
           (id) => {
             calls += 1;
             return calls === 1
@@ -1269,7 +1261,6 @@ describe('LootWindowController', () => {
       const test = harness(
         [mob],
         (entry) => corpseLootAvailability(entry, 7),
-        {},
         (id) => harvestInfo({ corpseId: id, preference: { kind: 'all' } }),
       );
       test.controller.openCorpse(50, 0, 0);
@@ -1311,7 +1302,6 @@ describe('LootWindowController', () => {
       const test = harness(
         [mob],
         (entry) => corpseLootAvailability(entry, 7),
-        {},
         () => promise,
       );
       test.controller.openCorpse(50, 0, 0);
@@ -1334,25 +1324,24 @@ describe('LootWindowController', () => {
       const test = harness(
         [mob],
         (entry) => corpseLootAvailability(entry, 7),
-        {},
         (id) => harvestInfo({ corpseId: id, preference: { kind: 'all' } }),
       );
       test.controller.openCorpse(90, 0, 0);
       await flush();
       changeBtn(test.element)?.focus();
-      const hintBefore = test.element.querySelector('.town-focus-hint')?.textContent ?? '';
+      const hintBefore = test.element.querySelector('.loot-footer-hint')?.textContent ?? '';
 
       i18nProbe.suffix = ' [xx]';
       test.controller.relocalize();
 
-      const hint = test.element.querySelector('.town-focus-hint');
+      const hint = test.element.querySelector('.loot-footer-hint');
       expect(hint?.textContent).toBe(`${hintBefore} [xx]`);
       expect(takeLootBtn(test.element)?.textContent).toBe('Take Loot [xx]');
       expect(document.activeElement).toBe(changeBtn(test.element));
       // Re-latched, not cleared: the next poll rebuilds nothing.
       test.advanceClock(1000);
       test.controller.updateProximity();
-      expect(test.element.querySelector('.town-focus-hint')).toBe(hint);
+      expect(test.element.querySelector('.loot-footer-hint')).toBe(hint);
     });
 
     it('relocalize() is a no-op while nothing is open and while a chest is open', () => {
@@ -1393,7 +1382,6 @@ describe('LootWindowController', () => {
       const test = harness(
         [mob],
         (entry) => corpseLootAvailability(entry, 7),
-        {},
         () => {
           sendCalls += 1;
           return reply.promise;
@@ -1426,7 +1414,6 @@ describe('LootWindowController', () => {
       const test = harness(
         [mob],
         (entry) => corpseLootAvailability(entry, 7),
-        {},
         (id) => {
           if (!reentered) {
             reentered = true;
@@ -1450,7 +1437,6 @@ describe('LootWindowController', () => {
       const test = harness(
         [mob],
         (entry) => corpseLootAvailability(entry, 7),
-        {},
         (id) => harvestInfo({ corpseId: id, preference: { kind: 'all' } }),
       );
       test.controller.openCorpse(50, 0, 0);
@@ -1482,7 +1468,6 @@ describe('LootWindowController', () => {
       const test = harness(
         [mob],
         (entry) => corpseLootAvailability(entry, 7),
-        {},
         (id) => harvestInfo({ corpseId: id, preference: { kind: 'all' } }),
       );
       test.controller.openCorpse(50, 0, 0);
@@ -1500,7 +1485,6 @@ describe('LootWindowController', () => {
       const test = harness(
         [a, b],
         (entry) => corpseLootAvailability(entry, 7),
-        {},
         (id) => harvestInfo({ corpseId: id, preference: { kind: 'all' } }),
       );
       test.controller.openCorpse(50, 0, 0);
@@ -1517,7 +1501,6 @@ describe('LootWindowController', () => {
       const test = harness(
         [mob],
         (entry) => corpseLootAvailability(entry, 7),
-        {},
         () => harvestInfo({ corpseId: 999, preference: { kind: 'all' } }),
       );
 
@@ -1541,7 +1524,6 @@ describe('LootWindowController', () => {
       const test = harness(
         [mob],
         (entry) => corpseLootAvailability(entry, 7),
-        {},
         (id) =>
           harvestInfo({
             corpseId: id,
@@ -1604,7 +1586,7 @@ describe('live inventory and server inspection integration', () => {
       const reply = corpseHarvestInspectionReply(sim, session, { id, rid }, 7);
       if (reply) request.onReply({ t: 'corpseHarvestInfo', ...reply });
     });
-    const h = harness([body], undefined, {}, (id) => request.issue(id));
+    const h = harness([body], undefined, (id) => request.issue(id));
     h.controller.openCorpse(body.id, 100, 100);
     await flush();
     const initial = h.element.innerHTML;

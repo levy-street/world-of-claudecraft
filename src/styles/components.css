@@ -1121,6 +1121,11 @@
     /* Keep another window's text from showing through the corpse choice. */
     background: var(--panel-base);
   }
+  /* Footer hint line (the interact-key-takes-loot-only note on a harvestable corpse). */
+  .loot-footer-hint {
+    opacity: 0.75;
+    margin-bottom: 6px;
+  }
   .loot-item {
     display: flex;
     align-items: center;
@@ -1195,88 +1200,6 @@
      aria-disabled still blocks activation and preserves keyboard focus; styling
      each half-second poll as disabled would make the button flash. Actual
      denials and command waits keep the shared native .btn:disabled treatment. */
-
-  /* ---------- town-focus ---------- */
-  /* town focus (#1143): persistent town-set component harvest focus */
-  #town-focus-window {
-    width: 340px;
-    overflow-y: auto;
-  }
-  .town-focus-hint {
-    opacity: 0.75;
-    margin-bottom: 6px;
-  }
-  .town-focus-not-in-town {
-    font-size: 12px;
-    color: var(--color-text-error);
-    margin-bottom: 6px;
-  }
-  .town-focus-budget {
-    margin-bottom: 8px;
-  }
-  /* The queued re-spec line (#1144): the one line on the panel that says
-     Save took, in the same gold the chat notice for it uses. */
-  .town-focus-pending {
-    color: var(--gold);
-    margin-bottom: 8px;
-  }
-  .town-focus-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 4px 0;
-  }
-  .town-focus-row .tf-name {
-    flex: 1;
-    font-size: 12px;
-  }
-  .town-focus-row .tf-points {
-    font-size: 12px;
-    min-width: 1.5em;
-    text-align: center;
-  }
-  .tf-step {
-    width: 28px;
-    height: 28px;
-    cursor: var(--cursor-point);
-  }
-  .tf-step:disabled {
-    opacity: 0.4;
-    cursor: default;
-  }
-  /* #1144 re-spec cost model: the payment-tier picker + its cost preview. */
-  .town-focus-tier-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    margin-top: 8px;
-  }
-  .town-focus-tier-label {
-    font-size: 12px;
-  }
-  .town-focus-tier-select {
-    min-height: 28px;
-    padding: 2px 6px;
-  }
-  .town-focus-tier-select:disabled {
-    opacity: 0.4;
-    cursor: default;
-  }
-  .town-focus-cost {
-    opacity: 0.75;
-    margin-top: 4px;
-  }
-  .town-focus-save {
-    width: 100%;
-    margin-top: 8px;
-    padding: 8px;
-    cursor: var(--cursor-point);
-  }
-  .town-focus-save:disabled {
-    opacity: 0.4;
-    cursor: default;
-  }
 
   /* ---------- harvest-preference ---------- */
   /* One framed picker across corpse, Field Kit and Professions entrances.

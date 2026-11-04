@@ -516,7 +516,6 @@ import {
 } from './tick_perf_log';
 import { createTickSaveObserver, TickProfiler, type TickProfilerSample } from './tick_profiler';
 import { hrtimeToMs, TickRateMeter } from './tick_rate_meter';
-import { applyTownFocusCommand } from './town_focus_command';
 import { ferryDeckWire, transportHeadJson } from './transport_head';
 import { maybeTrackDay7Retained, trackLevelMilestoneCapi } from './ua_capi';
 import { recordUnstuckEvent } from './unstuck_records';
@@ -705,7 +704,7 @@ export const SELF_WIRE_PHASES = [
   'delve',
   'prof', // prof, cprof, mst
   'corder',
-  'craft', // enchant outcomes, town focus, gathering, tool slots, mounts, renown, title
+  'craft', // enchant outcomes, gathering, tool slots, mounts, renown, title
   'heavy', // the wireRev-gated heavy block
   'assemble', // the final base-JSON + extras splice (multi-KB copy on a heavy payload)
 ].map((n) => `self.${n}`);
@@ -6202,9 +6201,6 @@ export class GameServer {
       case 'inspectCorpseHarvest':
         dispatchCorpseHarvestInspection(sim, session, msg, pid, (f) => this.send(session, f));
         break;
-      case 'set_town_focus':
-        applyTownFocusCommand(sim, msg, pid);
-        break;
       // The authenticated player's preference is a setting; the sim validates it.
       case 'set_harvest_preference':
         if (typeof msg.raw === 'string') sim.setHarvestPreference(msg.raw, pid);
@@ -8628,7 +8624,7 @@ export class GameServer {
     maybe('denc', this.sim.lastDisenchantResultFor(anchorSession.pid));
     maybe('ench', this.sim.lastEnchantResultFor(anchorSession.pid));
     maybe('salv', this.sim.lastSalvageResultFor(anchorSession.pid));
-    // Gathering-adjacent self fields (tfocus/gprof/tslot/hpref): extracted to
+    // Gathering-adjacent self fields (gprof/tslot/hpref): extracted to
     // gathering_self_wire.ts to keep this coordinator under its monolith
     // ceiling; see that module for the per-field comments this call replaces.
     appendGatheringSelfWire(this.sim, anchorSession.pid, maybe, maybeSerialized);

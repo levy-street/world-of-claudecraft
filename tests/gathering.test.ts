@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { HARVEST_COMPONENT_ITEMS } from '../src/sim/content/professions';
 import { MOBS } from '../src/sim/data';
-import { isTownFocusComponent, TOWN_FOCUS_COMPONENTS } from '../src/sim/professions/focus';
 import {
   effectiveFocusComponents,
   forfeitsEveryMappedYield,
@@ -253,45 +252,6 @@ describe('isHarvestableCorpse', () => {
     }
     expect(UNMAPPED_FAMILY in table).toBe(false);
     expect(isHarvestableCorpse([UNMAPPED_FAMILY, UNMAPPED_FAMILY_2])).toBe(false);
-  });
-
-  it('deliberately does NOT govern the Town Focus slider list', () => {
-    // Worth stating, because "one rule, one place" invites the assumption that it
-    // covers this too, and it does not. #2511 moved TOWN_FOCUS_COMPONENTS into
-    // the sim (professions/focus.ts) as a FROZEN Object.keys snapshot behind a
-    // Set, because the question it answers is "which keys does setTownFocus
-    // accept", and a Set is what closes the Object.prototype hole there. The
-    // harvest asks a different question, "which family pays out", and answers it
-    // by truthiness through harvestItemForFamily, because the grant loop's
-    // `if (!itemId) continue` is the behavior it has to match.
-    //
-    // The two agree on every shipped family and diverge only on a key mapped to
-    // an empty string: the panel would offer a slider the harvest refuses. That
-    // is a hypothetical, it is one line to close on either side, and it belongs
-    // with whichever of the two rules moves first, so it is documented here
-    // rather than fixed twice.
-    for (const component of TOWN_FOCUS_COMPONENTS) {
-      expect(harvestFamilyYieldsItem(component), component).toBe(true);
-    }
-    expect([...TOWN_FOCUS_COMPONENTS]).toEqual(Object.keys(HARVEST_COMPONENT_ITEMS));
-    // Ten since Phase 11m appended horn and gills to the yield table (the
-    // literal order is pinned in tests/focus.test.ts).
-    expect(TOWN_FOCUS_COMPONENTS).toHaveLength(10);
-    // No unmapped family reaches the panel, which is the property that
-    // actually matters for a player: a family no row maps is not a key at all.
-    // The synthetic never-mapped pair stands in, since no shipped family is
-    // unmapped any more.
-    for (const unmapped of [UNMAPPED_FAMILY, UNMAPPED_FAMILY_2]) {
-      expect(TOWN_FOCUS_COMPONENTS).not.toContain(unmapped);
-      expect(isTownFocusComponent(unmapped), unmapped).toBe(false);
-      expect(harvestFamilyYieldsItem(unmapped), unmapped).toBe(false);
-    }
-    // ...and the prototype keys #2511's Set closes are refused on both sides, so
-    // the two rules cannot disagree about those either.
-    for (const inherited of ['constructor', 'toString', 'valueOf', 'hasOwnProperty']) {
-      expect(isTownFocusComponent(inherited), inherited).toBe(false);
-      expect(harvestFamilyYieldsItem(inherited), inherited).toBe(false);
-    }
   });
 
   it('answers for every shipped template, and none is excluded any more', () => {

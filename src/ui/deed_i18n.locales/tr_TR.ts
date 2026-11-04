@@ -670,7 +670,6 @@ export const table: DeedLocaleTable = {
     name: 'Ejder İstifi',
     desc: 'Ömür boyu toplamda 100 altın değerinde para yağmala.',
   },
-  soc_civic_duty: { name: 'Vatandaşlık Görevi', desc: 'İlk kasaba odak puanını ata.' },
   exp_long_road_north: {
     name: 'Kuzeye Giden Uzun Yol',
     desc: 'Üç merkez yerleşimin hepsini ziyaret et: Doğudere, Bataklık Köprüsü ve Yüksek Gözcü.',

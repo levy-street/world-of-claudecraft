@@ -1209,8 +1209,8 @@ export function resolveCorpseHarvest(currentClaimedBy: number | null, pid: numbe
  * but reuses the same classic six-tier naming so it reads consistently. */
 export type HarvestTier = 'poor' | 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
 
-// Exported so professions/focus.ts (#1143) can shift a rolled tier upward by a
-// persistent town-focus bonus without redefining the tier order.
+// Exported so sibling leaves and tests can walk the ladder without redefining
+// the tier order.
 export const HARVEST_TIERS: readonly HarvestTier[] = [
   'poor',
   'common',

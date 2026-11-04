@@ -835,7 +835,6 @@ const UI_PURE_CORES = [
   'src/ui/gpu_notice_view.ts',
   'src/ui/perf_nudge_view.ts',
   'src/ui/hud/loot/corpse_harvest_view.ts',
-  'src/ui/town_focus_view.ts',
   'src/ui/mount_race_view.ts',
   'src/ui/pet_action_icons.ts',
   'src/ui/pet_frame_view.ts',
@@ -3425,7 +3424,6 @@ const UI_DOM_MODULES = [
   'src/ui/touch_frame_drag.ts',
   'src/ui/touch_item_drag.ts',
   'src/ui/touch_tap.ts',
-  'src/ui/town_focus_window.ts',
   // The tracker-stack seat applier: owns a resize listener and bounded
   // getBoundingClientRect reads by design (the module comment carries the
   // cadence contract); the seat math itself is the tracker_stack_anchor_core

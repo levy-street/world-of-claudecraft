@@ -2852,9 +2852,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.statInfo.desc.warfareWithHealth':
     '对玩家造成的伤害提高 {increase}%，受到玩家造成的伤害降低 {reduction}%。此外，在地下城、团队副本、探秘与裂隙以外的地方，还会使你的最大生命值提高 {health}%。',
   'hudChrome.statInfo.names.spellCrit': '法术暴击',
-  'hudChrome.townFocus.pendingLine': '已保存。你向此分配方案的重新分配将在 {time} 后完成。',
-  'hudChrome.townFocus.preferenceHint':
-    '专注会提高你采集到的品级与数量。若只想采集单一材料，请通过你的野外工具包或专业窗口设置采集偏好。',
   'hudChrome.trinkets.scaled': '{base} (+{bonus})',
   'hudChrome.vehicle.wave': '第 {wave} / {total} 波',
   'hudChrome.warfare.floatReasons.hill': '山丘',
@@ -5163,23 +5160,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '{material}不在这具尸体上。可用：{materials}。',
   'hudChrome.corpseHarvest.denial.bagsFull': '你的背包太满，无法采集。',
   'hudChrome.corpseHarvest.denial.malformedInput': '出了点问题，请重试。',
-  'hudChrome.townFocus.title': '城镇专注',
-  'hudChrome.townFocus.hint':
-    '专注点会在每种材料的基础产出上叠加加成。未专注的材料保持基础产出不变。',
-  'hudChrome.townFocus.tierHint':
-    '每在一种材料上投入{points}点专注，其采集品阶就会提升一阶，最多提升{steps}阶；不足{points}点时仍会提高产出。',
-  'hudChrome.townFocus.townOnlyHint': '专注只能在城镇中调整。',
-  'hudChrome.townFocus.budgetLabel': '剩余点数：{remaining} / {budget}',
-  'hudChrome.townFocus.saveButton': '保存专注',
-  'hudChrome.townFocus.notInTownHint': '你必须在城镇中才能设置专注。',
-  'hudChrome.townFocus.increaseAria': '增加对{component}的专注',
-  'hudChrome.townFocus.decreaseAria': '减少对{component}的专注',
-  'hudChrome.townFocus.respecTierLabel': '重新分配速度',
-  'hudChrome.townFocus.respecTierTimeOption': '免费（花费时间）',
-  'hudChrome.townFocus.respecTierPartialOption': '更快（少量花费）',
-  'hudChrome.townFocus.respecTierInstantOption': '即时（全额花费）',
-  'hudChrome.townFocus.respecCostFree': '免费',
-  'hudChrome.townFocus.respecCostLine': '花费 {coin} 和 {materials}',
   'hudChrome.theme.preset': '界面主题',
   'hudChrome.theme.customColors': '自定义颜色',
   'hudChrome.theme.reset': '重置',
@@ -8453,7 +8433,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_prof_intro.text':
     '东溪人人除了舞刀弄剑，还得有门手艺，{playerName}。镇子东北方、狼径外的铜矿坑周围岩石里有矿脉。拿起矿镐，亲手开采5处；别想蒙我，我看得出差别。',
   'entities.quests.q_prof_intro.completion':
-    '看吧？矿石采到了，手上也磨出了茧。赶路时继续采矿、伐木和采药；回城后，别忘了市场旁的城镇专注告示板和附近的制作台。只要你愿意，这些手艺都能换来公道的生计。',
+    '看吧？矿石采到了，手上也磨出了茧。赶路时继续采矿、伐木和采药；回城后，别忘了市场旁的制作台。只要你愿意，这些手艺都能换来公道的生计。',
   'entities.quests.q_prof_intro.objectives.0.label': '已开采矿脉',
   'entities.quests.q_farm_intro.title': '第一道犁沟',
   'entities.quests.q_farm_intro.text':
@@ -13675,9 +13655,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.professions.harvestTitle': '收获狩猎本身',
   'guide.professions.harvestBodyChoice':
     '采集并不止步于资源节点。许多被击杀的野兽都可以被采集一次，先到先得：兽皮、尖牙、丝线与兽肉，与它的普通战利品一并直接取自尸体，一次按键就会同时打开两者。当一头野兽身上不止一种可用材料时，如何取舍便由你决定：把它能给的全部取走，或专注于更少的材料，换取你所取之物明显更精细的品级。\n\n在能产出标本的族群身上掷出精良或更高的采集品质时，除普通产出之外还会额外获得一件署名的完美标本（一块Pristine Hide、一块Pristine Silk、一枚Pristine Venom Gland或一份Prime Cut），并在你的功绩之书中记下A Perfect Specimen。任何角色都可以采集，无需训练；而你拥有的任何采集工具，无论属于哪一门行业，都会计入最上等材料的判定。',
-  'guide.professions.focusTitle': '城镇专注',
-  'guide.professions.focusBody':
-    '每座主城都为过路的采集者备有一块城镇专注面板：站在城镇里，从小地图旁打开它，把一小笔专注点数投向你在意的那些材料种类。此后每具尸体上产出的受专注材料都会精细一个品级、也略微丰厚一些；你的分配会跟随你的角色走遍各地，而且日后任何一次回到城镇，都可以免费重新调整。',
   'guide.professions.craftMasteryTitle': '技能与精通',
   'guide.professions.craftMasteryBody':
     '成功制作会提升你在该行业的技能，而技能绝不会把某个行业的配方锁起来：只要你知道一个配方并持有它的材料，你就可以尝试制作。每个配方产出的都是它所承诺的那件成品，而熟练的手艺偶尔能打造出一件杰作：同样的成品，做工更精，并蕴含一丝额外的力量。唯一的例外是组合配方：只有调谐到连接这两门行业的原型、并在两门行业都证明过技艺的制作者，才能使用它们。',
@@ -19103,8 +19080,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '你不必全靠眼睛去找。区域里的每一处资源点，只要地图正显示着那片地面，都会画在区域地图上，你经过时也会出现在小地图上，因此一条采集路线可以在出发之前就在地图界面上规划好。你的工具还够不着的资源点是标出来而不是藏起来：它留在原处，只是标记被划掉并变暗，好让你看见自己正在为之训练的那片地。在桌面端，把鼠标悬停在世界里的矿脉、林木或草丛上，会说出它的名字、告诉你它需要哪种工具，而且在你采过之后，还会以秒为单位为你自己倒数它的重生时间。触屏上没有悬停可言，于是小地图上的标记讲的是同一件事。',
   'guide.profPages.specimenBodyFamilies':
     '采集时请留出一点背包空间：一件署名的意外之喜需要属于它自己的空位，或者一个可以并进去的同款署名堆叠；若实在放不下，产出仍然会到手，只是署名就此失去。尸体采集也有属于自己的一份大奖机制：每种被采集的材料大约有 {pct}% 的几率掷出精良或更高品质。能给出完美标本的族群（兽皮、丝线、毒液、利爪、兽肉）会让普通产出保持朴素，另外在旁边铸出那件署名标本；其余五种，尖牙、布料、獠牙、兽角与鱼鳃，则直接把署名打在产出本身上。',
-  'guide.professions.focusBodyTiers':
-    '每座主城都为过路的采集者备有一块城镇专注面板：站在城镇里，从小地图旁打开它，把 10 点专注点数的预算摊到你在意的那些材料种类上。某种材料每投入 5 点，它的采集品级就提升一档（最多两档），而每一点都会让它的产量增加 10%；未获专注的材料绝不会因此变差。\n\n你的分配会跟随你的角色走遍各地，日后任何一次回到城镇都可以重新调整，快慢由你决定。慢慢来是免费的：每移动 1 点，重新调整需要 1 分钟。花点小钱可以加快，每点 15 秒，另加每点 5 铜与 1 个铃音之尘；全额付费则立刻完成，每点 25 铜与 5 个铃音之尘。只有你实际移动的点数才算钱，所以挪动一个点很便宜，而打开面板又原样关上，在任何档位下都分文不取。',
   'guide.professions.endgameHeading': '大师锻造终局',
   'guide.professions.endgameBody':
     '每门手艺的训练师阶梯之上，都坐落着同一座峰顶：大师锻造家族，也就是装备与物品页面所述、带着金色"装备唯一：大师锻造"标签的制造装备。无论哪门手艺攀登，这条链都是同一个形状：顶级图样靠寻获而非传授，按日限定的中间制作为整件事定下节奏，三种共享材料供每架阶梯取用。成品像任何其他制造品一样自由交易（交易规则载于制作经济页面），而两件的穿戴上限让它们是配装上的点睛，而非整套行头，所以从不踏足最深终局的工匠，照样把货卖给住在那里的人。',
@@ -20200,7 +20175,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.faq.q7': '我的采集怎么突然变慢了？',
   'guide.profPages.faq.q8': '离开城镇还能制作吗？',
   'guide.profPages.faq.a3':
-    '这是对同一具尸体的两个独立操作。尸体身上的一切，钱币与掉落物，外加任何可采集的材料，都在同一个窗口里打开，但互动键与“拾取战利品”只会取走普通战利品，它照常按普通的拾取规则走。采集则是专业这一侧，直接从尸身上剥下材料，只有当你在那个窗口里选择“采集”时才会发生。\n\n采集先到先得，且只有一次：每具尸体只能被采集一次，由最先取走的人拿下，在线上也一样。你的城镇专注决定你能采到什么：站在主城里，你可以把10点专注点数摊到你在意的那些材料种类上，每一种获得专注的材料都会掷出更好的品级（每5点提升一档，最多两档），产量也更高（每点10%）。未获专注的材料绝不会因此变差。',
+    '这是对同一具尸体的两个独立操作。尸体身上的一切，钱币与掉落物，外加任何可采集的材料，都在同一个窗口里打开，但互动键与“拾取战利品”只会取走普通战利品，它照常按普通的拾取规则走。采集则是专业这一侧，直接从尸身上剥下材料，只有当你在那个窗口里选择“采集”时才会发生。\n\n采集先到先得，且只有一次：每具尸体只能被采集一次，由最先取走的人拿下，在线上也一样。',
   'guide.profPages.faq.a4':
     '你碰上了丰收。大约每90次采集中有1次触发稀有采集事件：树木中的古老心材、矿石中的完美矿脉或草药中的月光花。产量变为五倍，每个单位都署上你的名字，并向整个区域通报发现。普通采集若掷出精良或更高品质，也会为产出署名。\n\n已署名材料值得保留或高价出售：在背包中，或在该制作能取用的材料仓库中，持有任意一份所需材料的已署名个体，即可使杰作几率提高2个百分点。它们可以与未署名材料、其他采集者或署名者的单位共用兼容堆叠，不会丢失任何标记；每个来源及其数量均分别保留。',
   'guide.profPages.faq.a5':

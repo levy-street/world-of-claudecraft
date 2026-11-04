@@ -3,8 +3,8 @@
 // professions blob (every field at its plausible ceiling: all live nodes on
 // cooldown, every recipe known, every craft and gathering skill capped, all
 // three slottable tool-effect slots filled with maximum-length crafter names,
-// every archetype pair attuned and hobby-quested, full town focus, every
-// cadence window live), settles it to a fixed point through the REAL
+// every archetype pair attuned and hobby-quested, every cadence window
+// live), settles it to a fixed point through the REAL
 // serialize-load-serialize path, and asserts a byte ceiling plus the per-field
 // entry caps that make the growth model linear-in-content rather than
 // unbounded-per-player. The fixture is a conservative PER-FIELD ceiling
@@ -148,7 +148,6 @@ const PROFESSIONS_BLOB_FIELDS = [
   'recipesGrandfathered',
   'masteryResetApplied',
   'proficiencyDisplayHealApplied',
-  'townFocus',
   'archetype',
   'questCadence',
   'tierMailSent',
@@ -673,11 +672,6 @@ function ceilingSim(nowMs?: number): Sim {
   // window and must be re-checked.
   if (cadenceQuests.length < 7) throw new Error('cadence quest set shrank; re-check the fixture');
   for (const q of cadenceQuests) meta.questCadence.set(q.id, 600);
-  // Full focus budget spread across every component family.
-  const components = Object.keys(HARVEST_COMPONENT_ITEMS);
-  meta.townFocus = Object.fromEntries(
-    components.map((c, i) => [c, i < 4 ? 2 : 1]),
-  ) as PlayerMeta['townFocus'];
   const firstPair = craftsForPairTarget(ARCHETYPE_PAIR_TARGETS[0]);
   if (!firstPair) throw new Error('no first archetype pair');
   meta.archetype = {
@@ -959,9 +953,6 @@ describe('the professions blob growth bound (phase 16)', () => {
     // load, which is what keeps it a 2-entry field rather than one that
     // grows a row per craft the character ever touched.
     expect(Object.keys(s2.tierMailSent ?? {})).toHaveLength(2);
-    expect(Object.keys(s2.townFocus ?? {})).toHaveLength(
-      Object.keys(HARVEST_COMPONENT_ITEMS).length,
-    );
     expect(Object.keys(s2.craftSkills ?? {})).toHaveLength(CRAFT_RING.length);
     expect(Object.keys(s2.gatheringProficiency ?? {})).toHaveLength(
       Object.keys(GATHERING_PROFESSIONS).length,
@@ -2048,10 +2039,14 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // skull 42 + Titan 26 + PvP titles 138 + Hard maze 34 + skull bag 62
     // + vault retune 119 + quiver 66 + quest shields 68. No storage limit changes.
     // Advanced riding adds the sparse ridingTier scalar (+15, PR 4390).
-    expect(baselineBytes).toBe(261480);
+    // 261,480 -> 261,340 when Town Focus left the game (2026-11-04): the fixture's
+    // ten-row full-budget townFocus record (`"townFocus":{...},`, 140 bytes) is no
+    // longer serialized at all.
+    expect(baselineBytes).toBe(261340);
     expect(bytes - baselineBytes).toBe(8284);
     // 266,699 -> 266,721 with Wobbles the Slime's reins (+22, kept).
-    expect(bytes).toBe(269764);
+    // 269,764 -> 269,624: the 140-byte townFocus record left (Town Focus removed).
+    expect(bytes).toBe(269624);
     // Keep the warning threshold unchanged: saves above it remain whole.
     expect(bytes).toBeGreaterThan(CHARACTER_BLOB_WARN_BYTES);
     process.stdout.write(
@@ -2441,7 +2436,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // (`"membership_staff",`, +19, PR 4281), isolated with membership below.
     // 249,984 -> 250,006 with Wobbles the Slime's reins (+22, kept).
     // Advanced riding adds the sparse ridingTier scalar (+15, PR 4390).
-    expect(beforeReferralBytes).toBe(250915);
+    // 250,915 -> 250,775 when Town Focus left the game (the same 140-byte record).
+    expect(beforeReferralBytes).toBe(250775);
     expect(bytes - gourdlightEveBytes - stampCardBytes - beforeReferralBytes).toBe(122);
     expect(
       fieldBytes(beforeStampCards, 'deedStats') - fieldBytes(withoutReferral, 'deedStats'),
@@ -2467,7 +2463,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     expect(membershipIds.size).toBe(9);
     const beforeMembershipBytes = Buffer.byteLength(JSON.stringify(withoutMembership), 'utf8');
     // 249,810 -> 249,832 with Wobbles the Slime's reins (+22, kept).
-    expect(beforeMembershipBytes).toBe(250741);
+    // 250,741 -> 250,601: the 140-byte townFocus record left (Town Focus removed).
+    expect(beforeMembershipBytes).toBe(250601);
     expect(beforeReferralBytes - beforeMembershipBytes).toBe(174);
     expect(
       fieldBytes(withoutReferral, 'deedStats') - fieldBytes(withoutMembership, 'deedStats'),
@@ -2993,7 +2990,11 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         // rewards carry no Reliquary page, so no firstFind row. MEASURED.
         68 +
         // Advanced riding adds the sparse scalar ,"ridingTier":2 (15 bytes).
-        15,
+        15 -
+        // Minus 140 when Town Focus left the game (2026-11-04): the fixture's
+        // ten-row full-budget allocation (`"townFocus":{...},`) is no longer a
+        // field at all. MEASURED (every whole-blob pin above moved by the same 140).
+        140,
     );
     const forgeBaseline = {
       questsDone: 4606,
@@ -3042,7 +3043,9 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // undercounted the merged tree).
       // deeds 1,572 -> 1,808 with Lantern Hall (#4530), its deed rows (+236 of the +281
       // above), MEASURED on the merged tree.
-      deeds: 2006,
+      // deeds 2,006 -> 1,976 when Town Focus left the game: the maximal fixture no
+      // longer earns soc_civic_duty (its 30-byte deeds row). MEASURED.
+      deeds: 1976,
       // deedStats +4,648 and reliquary +8,848 at the second release/v0.44.0 base
       // merge: Warfare Season 2's 139 item ids (the 13,496 attributed above).
       // deedStats 9,427 -> 14,446 at the choose-one leveling quest gear: its
@@ -3105,7 +3108,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // The Staff of Changing's discovery id adds 19 (247,136, PR 4281).
       // The sprite buddy's whistle id adds 18 (247,154).
       // Advanced riding contributes 15 bytes for the armed ridingTier scalar.
-    ).toBe(248045);
+      // 248,045 -> 247,905 when Town Focus left the game (the 140-byte townFocus record).
+    ).toBe(247905);
     // Removing ONLY field_kit (the Bramblehide release content and the two
     // dev-mount reins items still present, current staged tree) reproduces
     // 209,524 plus the 1,548-byte Bramblehide delta plus the 71-byte
@@ -3147,7 +3151,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // The Staff of Changing's discovery id adds 19 (249,946, PR 4281); reins_nightwing_chimera adds 26 (249,972).
       // reins_wobbles_slime adds 22 (249,994).
       // Advanced riding contributes the same 15 bytes here.
-    ).toBe(250903);
+      // 250,903 -> 250,763 when Town Focus left the game (the 140-byte townFocus record).
+    ).toBe(250763);
     const priorContent = withoutCrucibleContent(withoutReferral);
     const contentDelta = Object.fromEntries(
       (['knownRecipes', 'deedStats', 'reliquary'] as const).map((key) => [

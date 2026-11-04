@@ -344,7 +344,6 @@ export const DEED_IMAGE_IDS: ReadonlySet<string> = new Set([
   'pvp_vcup_wins_10',
   'pvp_vcup_wins_25',
   'soc_by_ravens_wing',
-  'soc_civic_duty',
   'soc_first_party',
   'soc_first_sale',
   'soc_first_salvage',

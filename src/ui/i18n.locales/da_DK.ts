@@ -1066,9 +1066,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Øger skade behandlet til spillere med {increase}% og reducerer skade modtaget fra spillere med {reduction}%. Øger også dit maksimale helbred med {health}% overalt undtagen kerker, raids, dyk og spalter.',
   'hudChrome.statInfo.names.spellCrit': 'Sprækkkritik',
   'hudChrome.targetAuras.close': 'Luk målauravindues',
-  'hudChrome.townFocus.pendingLine': 'Gemt. Din re-spec til denne tildeling gennemføres på {time}.',
-  'hudChrome.townFocus.preferenceHint':
-    'Fokus øger karakteren og mængden af hvad du høster. For kun at høste ét materiale, indstilles en Høst-præference fra dit feltkit eller Professionervindue.',
   'hudChrome.trade.offerQuantityAll': 'Byd alt',
   'hudChrome.trade.offerQuantityConfirm': 'Tilbyd',
   'hudChrome.trade.offerQuantityHint': 'Du vil blive spurgt hvor mange der skal bydes',
@@ -4138,8 +4135,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Du behøver ikke finde disse med øjet. Hver ressourcekilde i zonen er tegnet ind på zonekortet, hvor end kortet viser den jord, og på minikortet, mens du passerer den, så en farmerute kan planlægges fra kortskærmen, før du drager af sted. En ressourcekilde, dine værktøjer endnu ikke kan bearbejde, er markeret snarere end skjult: den holder sin plads med et overstreget, nedtonet mærke, så du kan se den jord, du træner dig hen imod. På skrivebord navngiver det at holde musen over en åre, en lund eller en plet i verden den, fortæller dig det værktøj, den kræver, og tæller, når du selv har arbejdet den, din egen genskabelse ned til sekundet. På berøring er der intet at holde musen over, så minikortets mærker fortæller den samme historie.',
   'guide.profPages.specimenBodyFamilies':
     'Hold lidt taskeplads fri, når du farmer: et signeret vindfald har brug for sin egen plads eller en matchende signeret stak at lande i, og passer intet, ankommer udbyttet stadig, men signaturen går tabt. Lighøst har også sin egen jackpot-arm: omkring {pct}% af hver høstet komponent kommer op som sjælden eller bedre. En familie med et perfekt eksemplar at give (skind, silke, gift, klo, kød) holder sit ordinære udbytte ordinært og præger det signerede eksemplar ved siden af; de fem andre, hugtand, stof, stødtand, horn og gæller, signerer selve udbyttet.',
-  'guide.professions.focusBodyTiers':
-    'Hver hjemmebase har et Byfokus-panel til besøgende høstere: stå i byen, åbn det ved siden af minikortet, og fordel et budget på 10 fokuspoint over de komponenttyper, du bryder dig om. Hvert 5. point på en komponent hæver dens høstgrad ét trin (højst to trin), og hvert point lægger 10 procent til dens udbytte; ikke-fokuserede komponenter bliver aldrig ringere.\n\nDin fordeling følger din karakter overalt og kan omlægges ved ethvert senere besøg i byen, i det tempo du selv vælger. At tage sig god tid er gratis: omlægningen kører i 1 minut pr. point, du flytter. At betale lidt fremskynder den, 15 sekunder pr. point plus 5 kobber og 1 Kime Støv pr. point, og at betale fuldt ud gør den øjeblikkelig for 25 kobber og 5 Kime Støv pr. point. Kun de point, du rent faktisk flytter, tælles, så at rykke et enkelt point er billigt, og et panel, du åbner og lukker uændret, koster intet uanset trin.',
   'guide.professions.harvestBodyFamilies':
     'Indsamling stopper ikke ved ressourcekilder. Mange dræbte bæster kan høstes én gang hver, den der kommer først betjenes først, for skind, hugtænder, kløer, stødtænder, horn, gæller, silke, gift, stof og kød, direkte fra liget ved siden af dets almindelige bytte. Interaktionstasten tager kun byttet; høsten er et valg for sig, som du foretager i afsnittet Høst i byttevinduet. Bærer et bæst mere end én brugbar komponent, er valget dit: tag alt, hvad det kan give, eller koncentrer dig om færre komponenter og tag en mærkbart finere grad af det, du faktisk tager.\n\nEt sjældent eller bedre høsteresultat på en prøve-bærende familie giver også et signeret perfekt eksemplar (et Uberørt Skind, Uberørt Silke, Uberørt Giftkirtel, Uberørt Klo eller Førsteklasses Udskæring) oven i det ordinære udbytte og optegner Et Perfekt Eksemplar i din Bedrifternes Bog. Enhver karakter kan høste, ingen træning kræves, og ethvert indsamlingsredskab, du ejer, tæller mod premium-armen, uanset hvilket håndværk det tilhører.',
   'guide.professions.toolEffectsHeading': 'Værktøjseffekter',
@@ -5079,12 +5074,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.pvp.bracket2v2': '2v2',
   'hudChrome.pvp.launcherTitle': 'PvP',
   'hudChrome.pvp.mobileLabel': 'PvP',
-  'hudChrome.townFocus.respecCostFree': 'Gratis',
-  'hudChrome.townFocus.respecCostLine': 'Koster {coin} og {materials}',
-  'hudChrome.townFocus.respecTierInstantOption': 'Øjeblikkelig (fuld pris)',
-  'hudChrome.townFocus.respecTierLabel': 'Genfordelingshastighed',
-  'hudChrome.townFocus.respecTierPartialOption': 'Hurtigere (lille pris)',
-  'hudChrome.townFocus.respecTierTimeOption': 'Gratis (tag din tid)',
   'hudChrome.warfare.floatReasons.assist': 'Assist',
   'hudChrome.warfare.floatReasons.firstWin': 'Første sejr',
   'hudChrome.warfare.floatReasons.kill': 'Drab',
@@ -5884,7 +5873,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Hovedfag kræver et løfte. En hobby spørger kun, hvor din nysgerrighed vanker, {playerName}. Saml et par urter og beslut dig for, hvilket håndværk modsat dine hovedfag du vil udforske.',
   'entities.quests.q_prof_hobby_switch.title': 'En Anden Tidsfordriv',
   'entities.quests.q_prof_intro.completion':
-    'Se? Malm indsamlet og hård hud på hænderne. Bliv ved med minedriften, skovhugsten og urtesamlingen, når du rejser vejene, og når du er tilbage i byen, hold øje med Byfokus-opslagstavlen ved markedet og den nærliggende håndværksbænk. Der er en god handel at finde i alt dette, hvis du vil have det.',
+    'Se? Malm indsamlet og hård hud på hænderne. Bliv ved med minedriften, skovhugsten og urtesamlingen, når du rejser vejene, og når du er tilbage i byen, hold øje med håndværksbænken ved markedet. Der er en god handel at finde i alt dette, hvis du vil have det.',
   'entities.quests.q_prof_intro.objectives.0.label': 'Malmåre høstet',
   'entities.quests.q_prof_intro.text':
     'Enhver sjæl i Østbæk arbejder med et håndværk udover sværdet, {playerName}. Der er malmårer i klipperne omkring Kobbergraven, nordøst for byen, forbi ulveløbene. Gå sving en hakke og bearbejd 5 af dem selv, forstået; jeg vil kende forskel.',
@@ -6419,17 +6408,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Ud over kamp og opdrag belønner verden dig for at arbejde med jorden og essen: at samle råmaterialer, forvandle dem til udstyr og varer på tværs af ti håndværksfag og finde sig til rette i en identitet som en af de ti arketyper, fagene står for.',
   'hudChrome.mobile.dailyRewards': 'Butik',
   'hudChrome.perf.labels.predLead': 'Forudsigelsesforspring',
-  'hudChrome.townFocus.budgetLabel': 'Point tilbage: {remaining} / {budget}',
-  'hudChrome.townFocus.decreaseAria': 'Sænk fokus på {component}',
-  'hudChrome.townFocus.hint':
-    'Fokuspoint lægger en bonus oven på hver komponents grundudbytte. Ufokuserede komponenter bliver på grundniveauet.',
-  'hudChrome.townFocus.increaseAria': 'Øg fokus på {component}',
-  'hudChrome.townFocus.notInTownHint': 'Du skal være i byen for at sætte dit fokus.',
-  'hudChrome.townFocus.saveButton': 'Gem fokus',
-  'hudChrome.townFocus.tierHint':
-    'Hvert {points} point på en komponent løfter dens høstniveau et trin, op til {steps} trin; færre end {points} point øger stadig udbyttet.',
-  'hudChrome.townFocus.title': 'Byfokus',
-  'hudChrome.townFocus.townOnlyHint': 'Fokus kan kun ændres, mens du er i byen.',
   'hudChrome.archetypeTitle.none': 'Ingen',
   'entities.itemSets.crownforged.bonus4':
     'Dine kritiske våbenslag splintrer målet med Bensplint og påfører 8 blødningsskade hvert 2. sek. i 12 sek. Stakker op til 3 gange.',
@@ -14112,9 +14090,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.models.groupForms': 'Druideformer',
   'guide.nav.sidebarLabel': 'Guideemner',
   'guide.professions.craftHowTitle': 'Håndværksvinduet',
-  'guide.professions.focusBody':
-    'Hver hjemmebase har et Byfokus-panel for besøgende høstere: stå i byen, åbn det ved siden af minikortet, og ret et lille budget af fokuspoint mod de komponenttyper, du bryder dig om. Jo mere fokus du giver en komponent, jo finere og rigere kommer den af hvert senere lig; din fordeling følger din karakter, hvor end den færdes, og du kan omarbejde den, gratis, ved ethvert senere besøg i byen.',
-  'guide.professions.focusTitle': 'Byfokus',
   'guide.professions.harvestTitle': 'At høste selve jagten',
   'guide.search.typeAbility': 'Evne',
   'guide.search.typeDeed': 'Bedrift',
@@ -16986,7 +16961,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.faq.q7': 'Hvorfor gik min indsamling pludselig langsommere?',
   'guide.profPages.faq.q8': 'Kan jeg lave håndværk væk fra byen?',
   'guide.profPages.faq.a3':
-    'Det er to adskilte handlinger på den samme krop. Alt et kadaver indeholder, mønt og bytte plus eventuelle høstbare komponenter, åbner i det samme vindue, men interaktionstasten og Tag bytte samler kun det almindelige bytte, som følger de normale byteregler. Høst er fagenes side, der stripper materialer af selve kadaveret, og den sker først, når du vælger Høst i det vindue.\n\nHøst er først til mølle, enkeltbrug: hvert kadaver kan høstes præcis én gang, af den der gør krav på det først, online inkluderet. Dit Byfokus former, hvad du får: mens du står i et byhub kan du sprede 10 fokuspoint over de komponenttyper du holder af, og hvert fokuseret komponent ruller et bedre trin (hvert 5 point løfter det et trin, højst to trin) og giver mere (10 procent pr. point). Ufokuserede komponenter gøres aldrig dårligere.',
+    'Det er to adskilte handlinger på den samme krop. Alt et kadaver indeholder, mønt og bytte plus eventuelle høstbare komponenter, åbner i det samme vindue, men interaktionstasten og Tag bytte samler kun det almindelige bytte, som følger de normale byteregler. Høst er fagenes side, der stripper materialer af selve kadaveret, og den sker først, når du vælger Høst i det vindue.\n\nHøst er først til mølle, enkeltbrug: hvert kadaver kan høstes præcis én gang, af den der gør krav på det først, online inkluderet.',
   'guide.profPages.faq.a4':
     'Du fandt en usædvanlig rig forekomst. Omtrent 1 ud af 90 indsamlinger udløser en sjælden begivenhed: urgammelt kerneved i træer, en uberørt åre i malm eller en månebelyst blomst i urter. Udbyttet femdobles, hver enhed får dit navn som signatur, og fundet annonceres i hele zonen. Et almindeligt fund med sjælden eller bedre kvalitet får også signeret sit udbytte.\n\nSignerede materialer er værd at gemme eller sælge dyrt: en signeret enhed af en nødvendig ingrediens i taskerne eller Materialehvælvet, hvor håndværket kan hente den, giver 2 procentpoint større chance for et mesterværk. De kan dele en kompatibel stak med usignerede enheder eller andre indsamleres og underskriveres enheder uden at miste mærker; hver kilde og mængde gemmes særskilt.',
   'guide.profPages.faq.a5':

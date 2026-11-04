@@ -114,4 +114,53 @@ describe('character state JSONB back-compat', () => {
     const canonicalPid = sim3.addPlayer('warrior', 'Reloaded', { state: reserialized });
     expect(sim3.serializeCharacter(canonicalPid)).toEqual(reserialized);
   });
+
+  it('loads an old row still carrying the removed Town Focus fields and its deed', () => {
+    // Town Focus left the game on 2026-11-04 (the professions consolidation).
+    // Rows written by older builds still carry `townFocus` (always, as `{}`
+    // or an allocation), sometimes `pendingTownFocus` (a queued re-spec), and
+    // the earned record of its deed `soc_civic_duty`, which left DEED_ORDER
+    // with it. All three must load without throwing, the two blobs must be
+    // dropped on the next write (never normalized or round-tripped), and the
+    // earned record must stay harmless: `recomputeRenown` is catalog-bounded,
+    // so the 5 Renown it used to score fall away on load (docs/design/deeds.md,
+    // rule 5's third recorded consequence), and the loaded world keeps ticking.
+    const sim = makeSim();
+    const state = sim.serializeCharacter(sim.playerId)!;
+    const legacy = JSON.parse(JSON.stringify(state)) as Record<string, unknown>;
+    legacy.townFocus = { hide: 4, silk: 6 };
+    legacy.pendingTownFocus = {
+      allocation: { fang: 10 },
+      remainingSeconds: 30,
+      coin: 5,
+      materials: 1,
+    };
+    legacy.deeds = {
+      ...((legacy.deeds as Record<string, string> | undefined) ?? {}),
+      soc_civic_duty: '2026-10-01',
+    };
+
+    const sim2 = new Sim({ seed: 1, playerClass: 'warrior' });
+    let pid = -1;
+    expect(() => {
+      pid = sim2.addPlayer('warrior', 'Reloaded', { state: legacy as unknown as CharacterState });
+    }).not.toThrow();
+    expect(() => {
+      for (let i = 0; i < 40; i++) sim2.tick();
+    }).not.toThrow();
+
+    const reserialized = sim2.serializeCharacter(pid)!;
+    expect('townFocus' in reserialized).toBe(false);
+    expect('pendingTownFocus' in reserialized).toBe(false);
+    // The earned day is kept verbatim (the Book never drops an earned record),
+    // but the removed deed scores nothing.
+    expect(reserialized.deeds?.soc_civic_duty).toBe('2026-10-01');
+    const control = new Sim({ seed: 1, playerClass: 'warrior' });
+    const controlPid = control.addPlayer('warrior', 'Control', {
+      state: { ...legacy, deeds: state.deeds } as unknown as CharacterState,
+    });
+    expect(sim2.serializeCharacter(pid)!.renown).toBe(
+      control.serializeCharacter(controlPid)!.renown,
+    );
+  });
 });

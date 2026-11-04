@@ -102,19 +102,22 @@ describe('deed_i18n English resolution', () => {
     // cmb_balgath_ten, cmb_point_taken), each a name and a desc, no title.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 346.
     // 352 with Lantern Hall's six (three contract milestones, three bought titles).
-    expect(manifest.filter((row) => row.field === 'name').length).toBe(369);
+    // 368 after Civic Duty (soc_civic_duty) left with the Town Focus mechanic (2026-11-04).
+    expect(manifest.filter((row) => row.field === 'name').length).toBe(368);
     // 289 descs at the release/v0.43.0 merge: plus the eight world-quest deeds.
     // 296 with the seven faction standing deeds. 298 with the two Clue Scroll
     // casket deeds. 300 with the Coinsack deed, 303 with the Mirefen three.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 327.
     // 333 with Lantern Hall's six.
-    expect(manifest.filter((row) => row.field === 'desc').length).toBe(350);
+    // 349 after Civic Duty left.
+    expect(manifest.filter((row) => row.field === 'desc').length).toBe(349);
     // 668 rows: 318 names + 299 descs + 51 titles (the three faction Champion
     // titles Riftwarden, Dawnkeeper and Forgemaster join the 47, then the
     // Clue Scroll Treasure Hunter title); 670 with the Coinsack deed's name and desc;
     // 676 with the Mirefen three.
     // 740 with Lantern Hall's six names, six descs and three titles.
-    expect(manifest.length).toBe(785);
+    // 783 after Civic Duty's name and desc left.
+    expect(manifest.length).toBe(783);
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 725 rows, 52 titles
     // (the Drowned Temple lore guide's Witness of the Choir).
     // 55 with Lantern Hall's three (Writ-Runner, Hallsworn, of Lantern Hall).

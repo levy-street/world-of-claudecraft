@@ -2411,7 +2411,7 @@ describe('legacy per-call components shapes are refused before admission (#2474,
 // corpseHarvestStatusView/corpseHarvestPreferenceOptions in
 // tests/corpse_harvest_view.test.ts and tests/harvest_preference*.test.ts.
 // The old "an omitted pick derives from town focus" tests are retired the
-// same way (town focus is bonus math only now, never selection); what
+// same way (the Town Focus mechanic itself has since left the game); what
 // remains genuinely domain is that this gate refuses on `chosen` content
 // alone, which the last case below states directly.
 describe('a pick of nothing but unmapped families is refused, claim intact (#2509)', () => {
@@ -2618,11 +2618,10 @@ describe('a pick of nothing but unmapped families is refused, claim intact (#250
     });
   });
 
-  it('refuses driven by `chosen` content alone, not by any town-focus derivation (retires the pre-PR3 default)', () => {
-    // Retires the pre-PR3 "an omitted pick derives from meta.townFocus" case:
-    // grantCorpseHarvestOnMob takes `chosen` directly and never reads
-    // townFocus at all, so there is no live path left that could derive a
-    // pick from it. On MIXED_TEMPLATE_ID (hide, claw mapped; UNMAPPED_FAMILY
+  it('refuses driven by `chosen` content alone (retires the pre-PR3 derived default)', () => {
+    // Retires the pre-PR3 "an omitted pick derives from the town focus" case:
+    // grantCorpseHarvestOnMob takes `chosen` directly and nothing else can
+    // derive a pick for it. On MIXED_TEMPLATE_ID (hide, claw mapped; UNMAPPED_FAMILY
     // not) an explicit UNMAPPED-ONLY pick still refuses at the pick-level
     // #2509 gate with the claim intact, while an unspecified/empty pick
     // SPREADS across every tag (the mapped ones included) and grants: an

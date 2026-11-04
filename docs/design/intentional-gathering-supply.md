@@ -70,9 +70,9 @@ identify all existing specimen opportunities from the real component tables.
 - Deliberate corpse grants come from actual `harvestResult` events, including
   plain/signed/specimen classification. Timed casts collect events returned by
   every `Sim.tick()`; they do not reread the drained event queue afterward.
-- Ordinary and focused fixture characters have the default empty town-focus
-  allocation. Existing town yield/tier bonuses still execute through the real grant
-  code, but specialized town builds are not separately sampled here.
+- Fixture characters carry no per-component yield bonus (the Town Focus
+  allocation that once supplied one was removed from the game on 2026-11-04);
+  the harvest grant code runs as shipped.
 - Tools, seeds and the Field Kit are setup grants. Bag snapshots occur after tool
   setup. Full-bag fixtures use the real capacity and distinct equipment slots.
 - Ambient mobs are removed. Only explicitly named travel scenarios use real movement;

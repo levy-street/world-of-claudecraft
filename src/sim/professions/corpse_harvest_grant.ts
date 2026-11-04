@@ -2,13 +2,12 @@
 // src/sim/interaction.ts's `harvestCorpse`, extracted so a future timed-cast
 // completion boundary can share it (PR3 prep). NOT a behavior-neutral move:
 // every admission-time fact that must not drift once a harvest is in flight
-// (the player's town focus, their best wieldable any-profession gathering
-// tool tier, and the per-component wield-requirement denial hint) is frozen
-// into `CorpseHarvestGrantInputs` by the caller, via `snapshotCorpseHarvestGrantInputs`,
-// and read ONLY from there: never a live `meta.townFocus` or a fresh bag scan
-// mid-grant. That is what makes a focus re-spec or a gear swap between
-// admission and completion unable to retarget an already-admitted harvest,
-// whenever admission itself becomes a timed cast.
+// (the player's best wieldable any-profession gathering tool tier and the
+// per-component wield-requirement denial hint) is frozen into
+// `CorpseHarvestGrantInputs` by the caller, via `snapshotCorpseHarvestGrantInputs`,
+// and read ONLY from there: never a fresh bag scan mid-grant. That is what
+// makes a gear swap between admission and completion unable to retarget an
+// already-admitted harvest, whenever admission itself becomes a timed cast.
 //
 // Two behavior changes from the pre-extraction body:
 //  1. `mob.harvestClaimedBy` is now set AFTER the ordinary (plain plus
@@ -36,10 +35,8 @@ import { noteReliquaryMark } from '../reliquary';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { Entity, InvSlot } from '../types';
-import { applyFocusBonus, applyFocusTierBonus, type FocusAllocation } from './focus';
 import {
   forfeitsEveryMappedYield,
-  type HarvestTier,
   harvestItemForFamily,
   harvestTierQuantity,
   isHarvestableCorpse,
@@ -58,11 +55,11 @@ import { bestWieldableAnyGatherToolTier, minWieldRequirementToWorkAny } from './
  * Every decision a corpse harvest grant needs, frozen at admission time.
  * `componentTags` and `chosenComponents` are the same two arrays
  * `resolveCorpseFocusHarvest`/`yieldingFocusComponents` already take (a real
- * corpse's tagged families and the player's #1142 focus pick, `components ??`
- * the persistent town-focus default, both resolved by the caller); this module
- * makes no claim about where they came from and is exercised directly with
- * synthetic families in tests/corpse_harvest_grant.test.ts. `townFocus`,
- * `bestAnyToolTier` and `wieldRequirementByComponent` are the live reads this
+ * corpse's tagged families and the player's #1142 focus pick, both resolved
+ * by the caller); this module makes no claim about where they came from and
+ * is exercised directly with synthetic families in
+ * tests/corpse_harvest_grant.test.ts. `bestAnyToolTier` and
+ * `wieldRequirementByComponent` are the live reads this
  * module would otherwise make against `PlayerMeta`/`meta.inventory` mid-grant;
  * freezing them here is the whole point of the seam. Build one with
  * `snapshotCorpseHarvestGrantInputs` (below), which clones every field so the
@@ -72,7 +69,6 @@ import { bestWieldableAnyGatherToolTier, minWieldRequirementToWorkAny } from './
 export interface CorpseHarvestGrantInputs {
   readonly componentTags: readonly string[];
   readonly chosenComponents: readonly string[];
-  readonly townFocus: FocusAllocation;
   readonly bestAnyToolTier: number;
   /**
    * Per-component `minWieldRequirementToWorkAny` result, frozen at the SAME
@@ -86,9 +82,8 @@ export interface CorpseHarvestGrantInputs {
 
 /**
  * Builds a frozen `CorpseHarvestGrantInputs` from the player's CURRENT state:
- * cloned `componentTags`/`chosenComponents` arrays, a cloned `townFocus`
- * record (shallow is enough; its values are plain numbers), the best
- * wieldable any-profession gathering tool tier, and the wield-requirement
+ * cloned `componentTags`/`chosenComponents` arrays, the best wieldable
+ * any-profession gathering tool tier, and the wield-requirement
  * denial hint for every family the pick will actually try to extract
  * (`yieldingFocusComponents`, so a family the pick cannot reach costs no
  * lookup). Every read here is a pure bag/state scan; this function draws NO
@@ -102,7 +97,6 @@ export function snapshotCorpseHarvestGrantInputs(
 ): CorpseHarvestGrantInputs {
   const tags = [...componentTags];
   const chosen = [...chosenComponents];
-  const townFocus = { ...meta.townFocus };
   const bestAnyToolTier = bestWieldableAnyGatherToolTier(
     meta.inventory,
     meta.gatheringProficiency,
@@ -119,32 +113,17 @@ export function snapshotCorpseHarvestGrantInputs(
   return {
     componentTags: tags,
     chosenComponents: chosen,
-    townFocus,
     bestAnyToolTier,
     wieldRequirementByComponent,
   };
 }
 
 /**
- * `harvestTierQuantity(tier)` with the player's persistent town focus (#1143)
- * yield bonus applied on top, rounded to the nearest whole item. Never
- * negative and never below the tier's unfocused quantity. Moved verbatim from
- * interaction.ts's private helper of the same name/body.
- */
-function focusedHarvestQuantity(
-  tier: HarvestTier,
-  component: string,
-  focus: FocusAllocation,
-): number {
-  return Math.round(applyFocusBonus(harvestTierQuantity(tier), component, focus));
-}
-
-/**
  * The reserved ordinary-grant ledger: for every family the pick actually
  * EXTRACTS (`yieldingFocusComponents`), the MAXIMUM plain quantity a
- * legendary-tier roll could add (`focusedHarvestQuantity('legendary', ...)`,
- * focus-boosted, same top-of-the-ladder reservation the pre-extraction
- * pre-gate used), coalesced by item id so two families mapping to the same
+ * legendary-tier roll could add (`harvestTierQuantity('legendary')`, the same
+ * top-of-the-ladder reservation the pre-extraction pre-gate used), coalesced
+ * by item id so two families mapping to the same
  * item reserve one summed slot. Pure and rng-free: this is what the capacity
  * gate in `grantCorpseHarvest` checks BEFORE the roll, and it is deliberately
  * a plain re-statement of the `wanted` loop `harvestCorpse` used to build
@@ -157,7 +136,7 @@ export function corpseHarvestOrdinaryYields(inputs: CorpseHarvestGrantInputs): I
     // yieldingFocusComponents already dropped every family harvestItemForFamily
     // answers nothing for; kept as a type narrowing, unreachable by construction.
     if (!wantedItemId) continue;
-    const maxQty = focusedHarvestQuantity('legendary', component, inputs.townFocus);
+    const maxQty = harvestTierQuantity('legendary');
     const existing = wanted.find((w) => w.itemId === wantedItemId);
     if (existing) existing.count += maxQty;
     else wanted.push({ itemId: wantedItemId, count: maxQty });
@@ -230,8 +209,7 @@ export function grantCorpseHarvest(
     // Unreachable by construction: resolveCorpseFocusHarvest only ever yields
     // families yieldingFocusComponents kept, the same accessor.
     if (!itemId) continue;
-    const tier = applyFocusTierBonus(y.tier, y.component, inputs.townFocus);
-    const qty = focusedHarvestQuantity(tier, y.component, inputs.townFocus);
+    const qty = harvestTierQuantity(y.tier);
     const rarity = rollCorpseMaterialRarity(ctx.rng);
     // Premium-arm tool denial: happens strictly AFTER the rarity roll and
     // draws no rng of its own. A denied family downgrades to the plain

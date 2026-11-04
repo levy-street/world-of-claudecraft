@@ -4918,14 +4918,6 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "crest": "/ui/deeds/soc_wyrms_hoard.webp"
   },
   {
-    "id": "soc_civic_duty",
-    "name": "Civic Duty",
-    "category": "social",
-    "renown": 5,
-    "feat": false,
-    "crest": "/ui/deeds/soc_civic_duty.webp"
-  },
-  {
     "id": "exp_long_road_north",
     "name": "The Long Road North",
     "category": "exploration",

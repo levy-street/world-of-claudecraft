@@ -707,7 +707,6 @@ export const table: DeedLocaleTable = {
     name: 'Timbunan Sang Wyrm',
     desc: 'Jarah total 100 emas seumur hidup dalam bentuk kepingan uang.',
   },
-  soc_civic_duty: { name: 'Tugas Warga', desc: 'Alokasikan poin fokus kota pertamamu.' },
   exp_long_road_north: {
     name: 'Jalan Panjang ke Utara',
     desc: 'Kunjungi ketiga permukiman pusat: Eastbrook, Jembatan Rawa, dan Menara Pengawas.',

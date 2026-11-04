@@ -24,7 +24,6 @@ export const MICRO_MENU_LAUNCHERS: readonly MicroMenuLauncherSpec[] = [
   { selector: '#mm-char', windowId: 'char-window' },
   { selector: '#mm-spell', windowId: 'spellbook' },
   { selector: '#mm-talents', windowId: 'talents-window' },
-  { selector: '#mm-town-focus', windowId: 'town-focus-window' },
   { selector: '#mm-quest', windowId: 'quest-log-window' },
   { selector: '#mm-deeds', windowId: 'deeds-window' },
   { selector: '#mm-reliquary', windowId: 'reliquary-window' },

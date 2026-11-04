@@ -7,7 +7,7 @@
 //   - offline `Sim.harvestCorpse(id: number, pid?: number): boolean`, a thin
 //     wrapper over `startCorpseHarvest`: no per-call `components` override,
 //     `meta.harvestPreference` is the sole source of what gets extracted (the
-//     legacy per-corpse town-focus default no longer applies).
+//     legacy per-corpse derived default no longer applies).
 //   - the online `harvestCorpse` wire command: id only, ABSENT `components`
 //     is the only accepted shape (a legacy `components` field, even `[]` or
 //     `null`, is refused outright with no admission/roll/grant/reservation/
@@ -256,15 +256,12 @@ describe('Sim.harvestCorpse (offline, real ticks, EMPTY_TEST_WORLD)', () => {
     expect(harvestResult).toBeDefined();
   });
 
-  it("the stored harvest preference alone resolves extraction; a caller's town-focus allocation is never consulted", () => {
+  it('the stored harvest preference alone resolves extraction', () => {
     const { sim, a } = rig();
     sim.addItem('field_kit', 1, a);
     const meta = mustMeta(sim, a);
-    // A pre-PR3 caller narrowed to this single tag via town focus; the
-    // current command must never read it at all. `meta.harvestPreference` is
-    // left at its default (All), which resolves to the empty "spread every
-    // tag" pick.
-    meta.townFocus.fang = 5;
+    // `meta.harvestPreference` is left at its default (All), which resolves
+    // to the empty "spread every tag" pick.
     const mob = spawnWolfCorpse(sim, 9007, { x: 0, z: 0 });
     sim.drainEvents();
 

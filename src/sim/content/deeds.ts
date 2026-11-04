@@ -1729,14 +1729,6 @@ export const DEEDS: Record<string, DeedDef> = {
     renown: 25,
     trigger: { kind: 'stat', stat: 'lootCopper', count: 1000000 },
   },
-  soc_civic_duty: {
-    id: 'soc_civic_duty',
-    name: 'Civic Duty',
-    desc: 'Allocate your first town focus point.',
-    category: 'social',
-    renown: 5,
-    trigger: { kind: 'meter', meter: 'townFocusPoints', amount: 1 },
-  },
   exp_long_road_north: {
     id: 'exp_long_road_north',
     name: 'The Long Road North',

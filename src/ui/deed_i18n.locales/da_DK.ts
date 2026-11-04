@@ -631,7 +631,6 @@ export const table: DeedLocaleTable = {
     name: 'En Orms Skat',
     desc: 'Saml en samlet livstidssum på 100 guld i mønt som bytte.',
   },
-  soc_civic_duty: { name: 'Borgerpligt', desc: 'Tildel dit første byfokus-point.' },
   exp_long_road_north: {
     name: 'Den Lange Vej mod Nord',
     desc: 'Besøg alle tre hovedbyer: Østbæk, Sumpbroen og Højvagten.',

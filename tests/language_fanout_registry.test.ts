@@ -198,7 +198,6 @@ const FANOUT_ARMS: readonly string[] = [
   // guards are pinned by tests/train_window_hud.test.ts, since this half only
   // sees refreshLocalizedDynamicUi's OWN statement-position calls.
   'this.repaintOpenServiceWindows|',
-  'this.renderTownFocus|this.townFocusOpen',
   'this.marketWindow.render|this.marketWindow.isOpen',
   'this.bankWindow.render|this.bankWindow.isOpen',
   'this.courierWindow.render|this.courierWindow.isOpen()',
@@ -695,12 +694,6 @@ const ANSWERED: readonly AnsweredSurface[] = [
     memos: ['lastPartySig'],
     answer: 'this.partyFramesPainter.relocalize',
     why: "the party roster signature: member pids, hp and resource numbers and role ids. The localized text on those frames is repainted by the partyFramesPainter.relocalize() arm the fan-out already drives, which clears the painter's own memo rather than relying on this one",
-  },
-  {
-    file: 'hud.ts',
-    memos: ['lastTownFocusSig'],
-    answer: 'this.renderTownFocus',
-    why: "the Town Focus signature: the allocation, the budget and the in-town flag, all text-independent by design. The fan-out's own arm re-renders the panel when it is open, which was added for exactly this reason (the slow-band probe would otherwise leave it in the old locale until the player edited it)",
   },
 ];
 

@@ -1122,10 +1122,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Erhöht den an Spielern verursachten Schaden um {increase}% und verringert den von Spielern erlittenen Schaden um {reduction}%. Erhöht außerdem deine maximale Gesundheit um {health}%, überall außer in Dungeons, Schlachtzügen, Tiefgängen und Rissen.',
   'hudChrome.statInfo.names.spellCrit': 'Zauberkritchance',
   'hudChrome.targetAuras.close': 'Zielaura-Fenster schließen',
-  'hudChrome.townFocus.pendingLine':
-    'Gespeichert. Deine Neuausrichtung auf diese Verteilung ist in {time} abgeschlossen.',
-  'hudChrome.townFocus.preferenceHint':
-    'Fokus erhöht die Güte und Menge dessen, was du erntest. Um nur ein Material zu ernten, lege über dein Feldset oder das Berufe-Fenster eine Erntepräferenz fest.',
   'hudChrome.trade.offerQuantityAll': 'Alles anbieten',
   'hudChrome.trade.offerQuantityConfirm': 'Anbieten',
   'hudChrome.trade.offerQuantityHint': 'Du wirst gefragt, wie viele du anbieten möchtest',
@@ -4273,8 +4269,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Du musst diese nicht mit bloßem Auge finden. Jeder Knoten der Zone ist auf der Zonenkarte eingezeichnet, überall dort, wo die Karte diesen Boden zeigt, und auf der Minikarte, sobald du daran vorbeikommst, sodass sich eine Sammelroute schon am Kartenbildschirm planen lässt, bevor du aufbrichst. Ein Knoten, den deine Werkzeuge noch nicht bearbeiten können, wird markiert statt versteckt: Er behält seinen Platz mit einer durchgestrichenen, abgedunkelten Markierung, sodass du den Boden siehst, auf den du hintrainierst. Auf dem Desktop nennt dir das Überfahren einer Ader, eines Baumstands oder eines Krautflecks in der Welt mit der Maus seinen Namen, sagt dir, welches Werkzeug er verlangt, und zählt, sobald du ihn bearbeitet hast, dein eigenes Nachwachsen auf die Sekunde genau herunter. Auf Touchgeräten gibt es nichts zum Überfahren, die Markierungen auf der Minikarte erzählen also dieselbe Geschichte.',
   'guide.profPages.specimenBodyFamilies':
     'Halte beim Farmen ein wenig Taschenplatz frei: Ein signierter Glücksfund braucht einen eigenen Platz oder einen passenden signierten Stapel, in dem er landen kann, und wenn nichts passt, kommt der Ertrag zwar trotzdem an, aber die Signatur geht verloren. Auch die Leichenernte hat ihren eigenen Jackpot-Arm: Etwa {pct}% jeder geernteten Komponente fallen als Selten oder besser aus. Eine Familie, die ein makelloses Exemplar zu geben hat (Haut, Seide, Gift, Klaue, Fleisch), belässt ihren gewöhnlichen Ertrag schlicht und prägt das signierte Exemplar daneben; die anderen fünf, Fangzahn, Stoff, Stoßzahn, Horn und Kiemen, signieren den Ertrag selbst.',
-  'guide.professions.focusBodyTiers':
-    'Jede Knotenpunktstadt hält ein Stadtfokus-Panel für vorbeikommende Sammler bereit: Stell dich in die Stadt, öffne es neben der Minikarte, und verteile ein Budget von 10 Fokuspunkten auf die Komponententypen, die dir wichtig sind. Je 5 Punkte auf einer Komponente erhöhen ihre Erntegüte um eine Stufe (höchstens zwei Stufen), und jeder Punkt fügt ihrem Ertrag 10 Prozent hinzu; unfokussierte Komponenten werden nie verschlechtert.\n\nDeine Verteilung folgt deinem Charakter überallhin und lässt sich bei jedem späteren Besuch in der Stadt neu ausrichten, in dem Tempo, das du wählst. Dir Zeit zu lassen ist kostenlos: Die Neuausrichtung läuft 1 Minute pro Punkt, den du verschiebst. Ein wenig zu zahlen beschleunigt sie, 15 Sekunden pro Punkt plus 5 Kupfer und 1 Glockenpulver pro Punkt, und die volle Zahlung macht sie sofort, für 25 Kupfer und 5 Glockenpulver pro Punkt. Gezählt werden nur die Punkte, die du tatsächlich bewegst, das Verschieben eines einzelnen Punkts ist also günstig, und ein Panel, das du öffnest und unverändert wieder schließt, kostet auf keiner Stufe etwas.',
   'guide.professions.harvestBodyFamilies':
     'Das Sammeln hört nicht bei Knoten auf. Viele erlegte Tiere können jeweils einmal geerntet werden, nach dem Prinzip Erster kommt, Erster mahlt, für Häute, Fangzähne, Klauen, Stoßzähne, Hörner, Kiemen, Seide, Gift, Stoff und Fleisch, direkt von der Leiche neben der gewöhnlichen Beute. Die Interaktionstaste nimmt nur die Beute; das Verwerten ist eine eigene Entscheidung, die du im Abschnitt Verwerten des Beutefensters triffst. Trägt ein Tier mehr als eine verwertbare Komponente, so liegt die Wahl bei dir: Nimm alles mit, was es hergeben kann, oder konzentriere dich auf weniger Komponenten und nimm eine messbar feinere Güte dessen mit, was du nimmst.\n\nEin seltener oder besserer Erntewurf bei einer exemplartragenden Familie gewährt zudem ein signiertes makelloses Exemplar (ein Unberührtes Fell, eine Unberührte Seide, eine Unberührte Giftdrüse, eine Unberührte Klaue oder ein Erstklassiges Stück) zusätzlich zum gewöhnlichen Ertrag und vermerkt Ein Makelloses Exemplar in deinem Buch der Taten. Jeder Charakter kann ernten, ohne Ausbildung, und jedes Sammelwerkzeug, das du besitzt, zählt für den Premium-Arm, gleichgültig, zu welchem Beruf es gehört.',
   'guide.professions.toolEffectsHeading': 'Werkzeugeffekte',
@@ -5242,12 +5236,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.pvp.bracket2v2': '2v2',
   'hudChrome.pvp.launcherTitle': 'PvP',
   'hudChrome.pvp.mobileLabel': 'PvP',
-  'hudChrome.townFocus.respecCostFree': 'Kostenlos',
-  'hudChrome.townFocus.respecCostLine': 'Kostet {coin} und {materials}',
-  'hudChrome.townFocus.respecTierInstantOption': 'Sofort (voller Preis)',
-  'hudChrome.townFocus.respecTierLabel': 'Umverteilungstempo',
-  'hudChrome.townFocus.respecTierPartialOption': 'Schneller (geringe Kosten)',
-  'hudChrome.townFocus.respecTierTimeOption': 'Kostenlos (Zeit lassen)',
   'hudChrome.warfare.floatReasons.assist': 'Unterstützung',
   'hudChrome.warfare.floatReasons.firstWin': 'Erster Sieg',
   'hudChrome.warfare.floatReasons.kill': 'Ausschaltung',
@@ -6008,7 +5996,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Hauptberufe erfordern ein Gelöbnis. Ein Hobby fragt nur, wohin deine Neugier wandert, {playerName}. Sammle ein paar Kräuter und entscheide, welches Handwerk dem deiner Hauptberufe gegenüber du verfolgen möchtest.',
   'entities.quests.q_prof_hobby_switch.title': 'Eine andere Freizeitbeschäftigung',
   'entities.quests.q_prof_intro.completion':
-    'Siehst du? Erz gesammelt und Schwielen an den Händen. Betreibe Bergbau, Holzfällen und Kräutersammeln weiter auf deinen Reisen, und wenn du wieder in der Stadt bist, schau auf das Stadtfokus-Brett beim Markt und die Werkbank in der Nähe. Da steckt ein fairer Handel drin, wenn du ihn willst.',
+    'Siehst du? Erz gesammelt und Schwielen an den Händen. Betreibe Bergbau, Holzfällen und Kräutersammeln weiter auf deinen Reisen, und wenn du wieder in der Stadt bist, schau auf die Werkbank beim Markt. Da steckt ein fairer Handel drin, wenn du ihn willst.',
   'entities.quests.q_prof_intro.objectives.0.label': 'Erzader abgebaut',
   'entities.quests.q_prof_intro.text':
     'Jede Seele in Eastbrook betreibt neben dem Schwert noch ein Handwerk, {playerName}. Im Gestein rund um die Kupferschürfe nordöstlich der Stadt, vorbei an den Wolfsläufen, gibt es Erzadern. Geh selbst mit der Spitzhacke ran und bearbeite 5 davon; ich werde den Unterschied merken.',
@@ -6632,14 +6620,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Jenseits von Kampf und Quests belohnt dich die Welt für die Arbeit an Land und Esse: Rohstoffe sammeln, sie über zehn Handwerksgewerbe hinweg zu Ausrüstung und Waren verarbeiten und in eine Identität als einer der zehn Archetypen hineinwachsen, für die diese Gewerbe stehen.',
   'hudChrome.mobile.dailyRewards': 'Shop',
   'hudChrome.perf.labels.predLead': 'Prädiktionsvorlauf',
-  'hudChrome.townFocus.budgetLabel': 'Verbleibende Punkte: {remaining} / {budget}',
-  'hudChrome.townFocus.decreaseAria': 'Fokus auf {component} verringern',
-  'hudChrome.townFocus.hint':
-    'Fokuspunkte gewähren einen Bonus auf den Grundertrag jeder Einrichtung. Einrichtungen ohne Fokus bleiben beim Grundertrag.',
-  'hudChrome.townFocus.increaseAria': 'Fokus auf {component} erhöhen',
-  'hudChrome.townFocus.notInTownHint': 'Du musst in der Stadt sein, um deinen Fokus festzulegen.',
-  'hudChrome.townFocus.saveButton': 'Fokus speichern',
-  'hudChrome.townFocus.title': 'Stadtfokus',
   'hudChrome.archetypeTitle.none': 'Keiner',
   'entities.itemSets.crownforged.bonus4':
     'Eure kritischen Waffentreffer zersplittern das Ziel mit Knochensplitter und lassen es 12 Sek. lang alle 2 Sek. 8 Schaden bluten. Stapelt sich bis zu 3-mal.',
@@ -13714,9 +13694,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.models.groupForms': 'Druidengestalten',
   'guide.nav.sidebarLabel': 'Handbuchthemen',
   'guide.professions.craftHowTitle': 'Das Handwerksfenster',
-  'guide.professions.focusBody':
-    'Jede größere Stadt hält ein Stadtfokus-Panel für vorbeikommende Sammler bereit: Stell dich in die Stadt, öffne es neben der Minikarte und richte ein kleines Budget an Fokuspunkten auf die Komponententypen, die dir wichtig sind. Je mehr Fokus du einer Komponente gibst, desto feiner und reicher fällt sie von jeder späteren Leiche ab; deine Verteilung folgt deinem Charakter, wohin er auch zieht, und du kannst sie bei jedem späteren Besuch in der Stadt kostenlos umarbeiten.',
-  'guide.professions.focusTitle': 'Stadtfokus',
   'guide.professions.harvestTitle': 'Die Jagd selbst ernten',
   'guide.search.typeAbility': 'Fähigkeit',
   'guide.search.typeDeed': 'Tat',
@@ -14834,10 +14811,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.social.hideOfflineTitle': 'Offline-Gildenmitglieder ausblenden',
   'hudChrome.social.offlineHeader': 'Offline ({n})',
   'hudChrome.social.onlineHeader': 'Online ({n})',
-  'hudChrome.townFocus.tierHint':
-    'Alle {points} Punkte auf einer Komponente erhöhen ihre Sammelstufe um einen Schritt, bis zu {steps} Schritte; weniger als {points} Punkte steigern trotzdem den Ertrag.',
-  'hudChrome.townFocus.townOnlyHint':
-    'Fokus kann nur geändert werden, während du in der Stadt bist.',
   'hudChrome.unbind.cannotAfford': 'Du kannst die Entbindungsgebühr nicht bezahlen.',
   'hudChrome.unbind.close': 'Entbindung schließen',
   'hudChrome.unbind.confirmBody': '{name} für {fee} entbinden?',
@@ -17550,7 +17523,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.faq.q7': 'Warum hat sich mein Sammeln plötzlich verlangsamt?',
   'guide.profPages.faq.q8': 'Kann ich außerhalb der Stadt herstellen?',
   'guide.profPages.faq.a3':
-    'Das sind zwei getrennte Handlungen an derselben Leiche. Alles, was eine Leiche hält, Münzen und Drops plus alle erntbaren Komponenten, öffnet sich in demselben Fenster, doch die Interaktionstaste und Beute nehmen holen nur die gewöhnliche Beute, die den normalen Beuteregeln folgt. Das Ernten ist die Berufsseite, wobei Materialien direkt von der Leiche selbst abgestreift werden, und es geschieht erst, wenn du in diesem Fenster Verwerten wählst.\n\nErnten ist nach dem Prinzip Erster kommt, einzelne Nutzung: Jede Leiche kann genau einmal geerntet werden, von wem auch immer sie zuerst beansprucht, inklusive online. Dein Stadtfokus beeinflusst, was du bekommst: Während du in einem Stadthub stehst, kannst du 10 Fokuspunkte auf die Komponententypen verteilen, die dir wichtig sind, und jede fokussierte Komponente würfelt eine bessere Güte (alle 5 Punkte erhöht sich diese um eine Stufe, maximal um zwei Stufen) und ergibt mehr (10 Prozent pro Punkt). Unfokussierte Komponenten werden nie verschlechtert.',
+    'Das sind zwei getrennte Handlungen an derselben Leiche. Alles, was eine Leiche hält, Münzen und Drops plus alle erntbaren Komponenten, öffnet sich in demselben Fenster, doch die Interaktionstaste und Beute nehmen holen nur die gewöhnliche Beute, die den normalen Beuteregeln folgt. Das Ernten ist die Berufsseite, wobei Materialien direkt von der Leiche selbst abgestreift werden, und es geschieht erst, wenn du in diesem Fenster Verwerten wählst.\n\nErnten ist nach dem Prinzip Erster kommt, einzelne Nutzung: Jede Leiche kann genau einmal geerntet werden, von wem auch immer sie zuerst beansprucht, inklusive online.',
   'guide.profPages.faq.a4':
     'Du hast einen besonders ergiebigen Fund gemacht. Etwa 1 von 90 Ernten löst ein seltenes Sammelereignis aus: uraltes Kernholz bei Bäumen, eine makellose Ader bei Erz oder eine mondbeschienene Blüte bei Kräutern. Es verfünffacht den Ertrag, signiert jede Einheit mit deinem Namen und meldet den Fund der ganzen Zone. Auch ein Seltenheitswurf von selten oder besser bei einer normalen Ernte signiert den Ertrag.\n\nSignierte Materialien solltest du aufheben oder teuer verkaufen: Jede signierte Einheit einer benötigten Zutat in deinen Taschen oder im Materialtresor, auf die das Handwerk zugreifen kann, erhöht die Meisterwerkchance um 2 Prozentpunkte. Sie kann einen kompatiblen Stapel mit unsignierten Materialien sowie Einheiten anderer Sammler und Unterzeichner teilen, ohne eine Markierung zu verlieren; Quelle und Menge bleiben jeweils einzeln erhalten.',
   'guide.profPages.faq.a5':

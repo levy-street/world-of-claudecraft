@@ -554,7 +554,10 @@ const MONOLITHS: MonolithRow[] = [
     // Honor and companions. Measured after recovery integration, zero slack.
     // Main ce21c7a66f5 sync: parent pins 18043 (Halloween) and 17733 (main).
     // Exact combined count; the three seasonal wiring lines are preserved.
-    ceiling: 17736,
+    // LOWERED 17736 -> 17535 when Town Focus left the game (2026-11-04): the
+    // panel's toggle/render/close cluster, its slow-band button gate and its
+    // isInTown read all left with the feature. wc -l. Exact count.
+    ceiling: 17535,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -1318,7 +1321,10 @@ const MONOLITHS: MonolithRow[] = [
     // riding progression lives in riding_training.ts. wc -l on the merged tree.
     // 11485 after the courier full-bank sync (PR 4598). wc -l.
     // 11490 with the difficulty menu fix (PR 4625) merged ahead of its landing. wc -l.
-    ceiling: 11410,
+    // LOWERED 11410 -> 11371 when Town Focus left the game (2026-11-04): the
+    // townFocus delegates, PlayerMeta fields and the tick-loop re-spec arm left
+    // with the feature. wc -l. Exact count.
+    ceiling: 11371,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1861,7 +1867,9 @@ const MONOLITHS: MonolithRow[] = [
     // Membership boot wiring lives with its service factory.
     // Main ce21c7a66f5 sync: parent pins 9758 (Halloween) and 9693 (main).
     // Exact combined count; the three seasonal wiring lines are preserved.
-    ceiling: 9696,
+    // LOWERED 9696 -> 9690 when Town Focus left the game (2026-11-04): the
+    // set_town_focus dispatch arm and its import left. wc -l. Exact count.
+    ceiling: 9690,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -2063,7 +2071,9 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 5338 -> 5330 at the integration merge of #4525: the reconnect backoff
     // schedule moved into reconnect_policy.ts beside its predicates, paying for the
     // tavern's resting getter and sitOnSeat send. wc -l. Exact count.
-    ceiling: 5330,
+    // LOWERED 5330 -> 5290 when Town Focus left the game (2026-11-04): the
+    // tfocus/tfpend mirrors and the setTownFocus send left. wc -l. Exact count.
+    ceiling: 5290,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

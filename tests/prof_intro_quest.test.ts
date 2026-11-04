@@ -1,5 +1,5 @@
 // Professions onboarding quest (issue #1701 follow-up): before this, nothing in
-// the starting flow ever pointed a new player at gathering/crafting/town focus
+// the starting flow ever pointed a new player at gathering/crafting
 // (at the time no level/quest/tool gate existed at the mechanic level, so there
 // was no natural "unlock" moment; #2343 has since made a matching-profession
 // tool mandatory for every node harvest, which is why the fixtures below carry

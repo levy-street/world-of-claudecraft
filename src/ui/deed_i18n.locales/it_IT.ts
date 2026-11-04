@@ -794,10 +794,6 @@ export const table: DeedLocaleTable = {
     name: 'Un Tesoro da Wyrm',
     desc: "Raccogli come bottino un totale complessivo di 100 monete d'oro in denaro sonante.",
   },
-  soc_civic_duty: {
-    name: 'Dovere Civico',
-    desc: 'Assegna il tuo primo punto di sviluppo cittadino.',
-  },
   exp_long_road_north: {
     name: 'La Lunga Strada verso Nord',
     desc: 'Visita tutti e tre gli insediamenti principali: Eastbrook, Fenbridge e Highwatch.',

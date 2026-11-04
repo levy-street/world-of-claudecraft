@@ -683,10 +683,6 @@ export const table: DeedLocaleTable = {
     name: 'Skarb żmija',
     desc: 'Zdobądź z łupów łącznie 100 sztuk złota w monetach.',
   },
-  soc_civic_duty: {
-    name: 'Obywatelski obowiązek',
-    desc: 'Przydziel swój pierwszy punkt rozwoju miasta.',
-  },
   exp_long_road_north: {
     name: 'Długa droga na północ',
     desc: 'Odwiedź wszystkie trzy główne osady: Eastbrook, Most na Trzęsawisku i Wysoką Strażnicę.',

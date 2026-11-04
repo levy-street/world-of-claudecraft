@@ -89,12 +89,6 @@ import type { MaterialComposition } from '../sim/material_sources';
 import { isBuddyMob } from '../sim/pet/buddy_ai';
 import { PET_MODES } from '../sim/pet/pet_assist';
 import { petCanForceTaunt } from '../sim/pet/pet_taunt_gate';
-import {
-  computeRespecCost,
-  FOCUS_POINT_BUDGET,
-  isInTownZone,
-  type RespecPaymentTier,
-} from '../sim/professions/focus';
 import { inRangeStationTypes, stationTypesSignature } from '../sim/professions/stations';
 import { TIER_SKILL_STEP, tierForSkill } from '../sim/professions/wheel';
 import { questObjectivesForMob } from '../sim/quest_targets';
@@ -975,8 +969,6 @@ import { installTargetOfTargetControls } from './totarget_frame_controller';
 import { attachTouchFrameDrags, type TouchFrameDrags } from './touch_frame_drag';
 import { TouchPeekGuard } from './touch_peek';
 import { bindTouchDoubleTap, bindTouchTap } from './touch_tap';
-import { buildTownFocusView, stepTownFocus, townFocusRenderSig } from './town_focus_view';
-import { renderTownFocusWindow } from './town_focus_window';
 import { trackerCollapseSettings } from './tracker_collapse_settings';
 import { wireTrackerHeader } from './tracker_header_wiring';
 import { installTrackerStackAnchor } from './tracker_stack_anchor';
@@ -2925,7 +2917,6 @@ export class Hud {
     $('#mm-char').addEventListener('click', () => this.toggleChar());
     $('#mm-spell').addEventListener('click', () => this.toggleSpellbook());
     $('#mm-talents')?.addEventListener('click', () => this.toggleTalents());
-    $('#mm-town-focus')?.addEventListener('click', () => this.toggleTownFocus());
     $('#mm-quest').addEventListener('click', () => this.toggleQuestLog());
     $('#mm-deeds').addEventListener('click', () => this.toggleDeeds());
     $('#mm-reliquary')?.addEventListener('click', () => this.toggleReliquary());
@@ -3732,9 +3723,6 @@ export class Hud {
         break;
       case 'unbind-window':
         this.closeUnbind();
-        break;
-      case 'town-focus-window':
-        this.closeTownFocus();
         break;
       case 'crafting-window':
         this.closeCrafting();
@@ -6828,12 +6816,9 @@ export class Hud {
     if (this.questlogWindow.isOpen) this.questlogWindow.render();
     if ($('#bags').style.display !== 'none') this.renderBags();
     this.repaintOpenServiceWindows();
-    // The Town Focus signature is text-independent (the allocation, the budget
-    // and the in-town flag), so a language switch alone never moves it and the
-    // slow-band probe would leave the panel in the old locale until the player
-    // edited it. Force one rebuild with fresh t(), the arena / Vale Cup
-    // relocalize arm (#2500).
-    if (this.townFocusOpen) this.renderTownFocus();
+    // Windows whose repaint signature is text-independent never move on a
+    // language switch alone, so each open one gets a forced rebuild with fresh
+    // t() here, the arena / Vale Cup relocalize arm (#2500).
     if (this.marketWindow.isOpen) this.marketWindow.render();
     if (this.bankWindow.isOpen) this.bankWindow.render();
     if (this.courierWindow.isOpen()) this.courierWindow.render(true);
@@ -6851,7 +6836,7 @@ export class Hud {
     // The crafting window's repaint memos (station set, reagent sig, the
     // profession surface sig) are all text-independent, so a language switch
     // alone never moves them and an open window kept the previous locale
-    // indefinitely (the same class as the town-focus arm above); one forced
+    // indefinitely (the same text-independent-sig class as the arms above); one forced
     // rebuild re-runs every t(), identity card included.
     if ($('#crafting-window').style.display === 'flex') this.renderCrafting();
     // The deed tracker's texts re-localize on its next elided paint; run one
@@ -8537,18 +8522,7 @@ export class Hud {
       );
     }
 
-    // Town Focus (#1143): the minimap button (and, if open, the panel's live
-    // gate) only ever shows/works while standing in a town hub. Cheap zone
-    // check, gated to the slow tier since it changes only on foot travel.
     if (slowHud) {
-      const inTown = this.isInTown();
-      const townFocusBtn = document.getElementById('mm-town-focus');
-      if (townFocusBtn) townFocusBtn.style.display = inTown ? '' : 'none';
-      // An open panel converges on the same band, behind its own invalidation
-      // signature (#2500): the probe reads cheaply and rebuilds only when what
-      // the panel shows moves. Walking in or out of town is one of the inputs
-      // it carries, so the panel's disabled state follows the button above.
-      this.refreshOpenTownFocusIfChanged();
       // Crafting window staleness: the
       // window is a cold painter, so an open window repaints only when the
       // in-range station-type set changes (walking in/out of a station's
@@ -14827,170 +14801,6 @@ export class Hud {
   }
 
   // -------------------------------------------------------------------------
-  // Town Focus (#1143): persistent per-player harvest-component focus,
-  // settable only while standing in the current zone's town hub (the
-  // lightweight town-tag stand-in; see professions/focus.ts). The panel shows
-  // the allocation and lets it be edited even out of town (so a player can see
-  // what they have), but disables the steppers/save outside town: the real
-  // gate is server-side in Sim.setTownFocus, this is a cosmetic usability gate.
-  // -------------------------------------------------------------------------
-
-  private townFocusDraft: Record<string, number> | null = null;
-
-  /** The #1144 re-spec payment tier the panel's Save will charge. Defaults to
-   *  'time', the free tier, so an untouched picker never surprises the player
-   *  with a charge; reset alongside townFocusDraft on every fresh open. */
-  private townFocusRespecTier: RespecPaymentTier = 'time';
-
-  /** The signature of what the panel currently shows (#2500). `''` until the
-   *  first paint arms it, which no real signature can spell (every one carries
-   *  the in-town flag, the budget and a row per component). */
-  private lastTownFocusSig = '';
-
-  // Standalone trapping window (#2525): the train / unbind shape, one
-  // windowFocus bridge plus one opener field. The panel was outside the shared
-  // focus system entirely: absent from every windowFocus(rootSel) call site and
-  // not one of the two documented opt-outs (#bags and #bank-window, which pair
-  // with a second window and must stay Tab-passable), so it had no Tab trap and
-  // no return-to-opener. It was not the last out (vendor, trade and map still
-  // are; crafting joined at #2876, report at qr-19-report-window-focus-trap-carveout);
-  // it is the one that became REACHABLE, because
-  // #2500 stopped the panel rebuilding itself twice a second and focus started
-  // surviving long enough for the missing hand-back to matter.
-  private readonly townFocusWindowFocus = this.windowFocus('#town-focus-window');
-  private townFocusOpenerFocus: HTMLElement | null = null;
-
-  private isInTown(): boolean {
-    const pos = this.sim.player.pos;
-    return isInTownZone(pos, zoneAt(pos.x, pos.z));
-  }
-
-  toggleTownFocus(): void {
-    const el = $('#town-focus-window');
-    if (el.style.display === 'block') {
-      this.closeTownFocus();
-      return;
-    }
-    this.closeOtherWindows('#town-focus-window');
-    // Open on the QUEUED allocation when one waits: re-saving it never restarts the clock.
-    this.townFocusDraft = { ...(this.sim.townFocusPending?.allocation ?? this.sim.townFocus) };
-    this.townFocusRespecTier = 'time';
-    this.renderTownFocus();
-    // AFTER the first paint, the train / unbind ordering: captureFocus records
-    // the opener (the minimap button) and installs the trap over a root that is
-    // by then populated and displayed. The one case where AFTER would be worse
-    // than BEFORE is unreachable: if the paint could leave focus INSIDE the
-    // panel, captureFocus would record an in-window opener and the bridge's
-    // in-window arm would then decline to release the trap on close. It cannot,
-    // because the root is display:none until this paint, so a browser has
-    // already blurred its stale children to <body>, and activeFocusable()
-    // rejects <body>.
-    this.townFocusOpenerFocus = this.townFocusWindowFocus.captureFocus();
-  }
-
-  private renderTownFocus(): void {
-    const inTown = this.isInTown();
-    const allocation = this.townFocusDraft ?? this.sim.townFocus;
-    const pending = this.sim.townFocusPending;
-    const view = buildTownFocusView(allocation, FOCUS_POINT_BUDGET, inTown, pending);
-    // Re-arm the latch on EVERY paint, whatever caused it (the open, a step, a
-    // language switch), so the slow-band probe below elides against the state
-    // actually on screen rather than against the last thing the probe itself
-    // painted.
-    this.lastTownFocusSig = townFocusRenderSig(view);
-    // #1144: the cost preview for the CHOSEN tier, priced off the committed
-    // allocation vs the draft (never the raw request), the same pair
-    // Sim.setTownFocus charges against server-side.
-    const cost = computeRespecCost(this.sim.townFocus, allocation, this.townFocusRespecTier);
-    renderTownFocusWindow(
-      $('#town-focus-window'),
-      view,
-      { tier: this.townFocusRespecTier, cost },
-      {
-        onStep: (component, delta) => {
-          this.townFocusDraft = stepTownFocus(
-            this.townFocusDraft ?? this.sim.townFocus,
-            component,
-            delta,
-            FOCUS_POINT_BUDGET,
-          );
-          this.renderTownFocus();
-        },
-        onTierChange: (tier) => {
-          this.townFocusRespecTier = tier;
-          this.renderTownFocus();
-        },
-        onSave: () => {
-          this.sim.setTownFocus(this.townFocusDraft ?? {}, this.townFocusRespecTier);
-          this.townFocusDraft = null;
-          this.closeTownFocus();
-        },
-        onClose: () => this.closeTownFocus(),
-      },
-    );
-  }
-
-  /** Slow-band staleness check for an OPEN panel (#2500). The panel used to
-   *  repaint on the open check alone, so an idle one discarded and rebuilt its
-   *  entire subtree twice a second: wasted work, and it destroyed the keyboard
-   *  user's focused control on a timer. Rebuild only when what the panel shows
-   *  actually moves (an edit to the draft, or walking in or out of town). The
-   *  open check comes FIRST so a closed panel costs nothing at all, and
-   *  renderTownFocus() owns the re-arm so every other paint cause arms it too. */
-  private refreshOpenTownFocusIfChanged(): void {
-    if (!this.townFocusOpen) return;
-    const sig = townFocusRenderSig(
-      buildTownFocusView(
-        this.townFocusDraft ?? this.sim.townFocus,
-        FOCUS_POINT_BUDGET,
-        this.isInTown(),
-        this.sim.townFocusPending,
-      ),
-    );
-    if (sig === this.lastTownFocusSig) return;
-    this.renderTownFocus();
-  }
-
-  /** The ONE close path: the X and Save go through onClose/onSave, Escape and
-   *  the gamepad go through closeAll -> closeManagedWindow's `town-focus-window`
-   *  case, and the toggle re-press comes straight here. So releasing the trap and
-   *  handing focus back once, here, covers every one of them.
-   *
-   *  Deliberately NOT guarded on `townFocusOpen` the way closeTrain/closeUnbind
-   *  guard on their npc id: those hold open state in a field, this panel reads
-   *  it off the DOM, every caller is already guarded, and a redundant call is a
-   *  no-op (the opener is nulled below, and releasing a released trap does
-   *  nothing). A guard would also make the "a later close cannot re-steal focus"
-   *  test pass for the wrong reason.
-   *
-   *  KNOWN EDGE, NOT fixed here, and the obvious local fix is a trap. The panel
-   *  is deliberately readable out of town while the slow band hides
-   *  #mm-town-focus out of town, so a player can open it in town, walk out, and
-   *  close with the opener no longer rendered. FocusManager then refuses the
-   *  hand-back (no client rects: moving focus somewhere invisible is a WCAG
-   *  2.4.11 failure), focus is left standing, and the browser drops it to <body>
-   *  with the panel. That is the pre-#2525 outcome, never worse, and the trap is
-   *  released either way.
-   *  Do NOT "fix" it by keeping the button visible while townFocusOpen: the
-   *  hand-back lands, then the next slow tick (<=500ms later) hides the button
-   *  again now that the panel is closed, and focus drops anyway. A flicker
-   *  instead of a loss. The real fix is a fallback destination, which
-   *  makeWindowFocus passes for NO window (closeTrain / closeUnbind hand back to
-   *  a gossip button that is already gone), so it belongs to the bridge and the
-   *  whole family, not to this one caller. */
-  closeTownFocus(): void {
-    $('#town-focus-window').style.display = 'none';
-    this.townFocusDraft = null;
-    this.hideTooltip();
-    this.townFocusWindowFocus.restoreFocus(this.townFocusOpenerFocus);
-    this.townFocusOpenerFocus = null;
-  }
-
-  get townFocusOpen(): boolean {
-    return $('#town-focus-window').style.display === 'block';
-  }
-
-  // -------------------------------------------------------------------------
   // Crafting (#1127): a minimal common-tier crafting window. Anywhere,
   // anytime (no vendor/NPC gate): lists every known recipe with a Craft
   // button enabled only when the player holds every required reagent.
@@ -15022,7 +14832,7 @@ export class Hud {
     }
     this.closeOtherWindows('#crafting-window');
     this.renderCrafting();
-    // AFTER the paint, the train / unbind ordering (see toggleTownFocus):
+    // AFTER the paint, the train / unbind ordering:
     // captureFocus records the opener and installs the trap over a root that
     // is by then populated and displayed. #crafting-window now installs its
     // own trap (this change), so the craftId branch below only needs to move

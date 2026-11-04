@@ -377,11 +377,11 @@ describe('renderCorpseHarvestPanel: dispatch', () => {
 });
 
 // Preserved unchanged by the Intentional Gathering PR3 harvest-status rework:
-// Town Focus (src/ui/town_focus_window.ts) still reads the sibling
-// `hudChrome.corpseHarvest.components.*` keys directly via componentLabel's
-// own key map, pinned by tests/town_focus_i18n.test.ts against the real set
-// of componentTags used across mob content.
-describe('componentLabel: preserved for Town Focus and its i18n pin', () => {
+// componentLabel reads the `hudChrome.corpseHarvest.components.*` keys via its
+// own key map. Pinned here against the real set of componentTags used across
+// mob content (the former Town Focus panel's i18n pin, kept after that panel
+// left the game because the label map is what the corpse window renders).
+describe('componentLabel: the component-tag label map', () => {
   it('resolves a real label for a known component tag', () => {
     expect(componentLabel('hide')).toBe('Hide');
   });

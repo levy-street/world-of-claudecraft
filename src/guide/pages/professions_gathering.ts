@@ -235,18 +235,16 @@ function rareSection(): string {
     </section>`;
 }
 
-// Corpse harvesting and Town Focus, shared with the overview catalog block
-// (guide.professions.harvest*/focus*): the mechanics apply to every gatherer.
-// Both bodies render the CURRENT keys (harvestBodyFamilies, focusBodyTiers):
-// the retired harvestBodyChoice/focusBody values stay in the catalog with
-// their reviewed translations rather than being reworded in place, the
-// #2514 precedent the catalog already documents.
+// Corpse harvesting, shared with the overview catalog block
+// (guide.professions.harvest*): the mechanics apply to every gatherer. The
+// body renders the CURRENT key (harvestBodyFamilies): the retired
+// harvestBodyChoice value stays in the catalog with its reviewed translations
+// rather than being reworded in place, the #2514 precedent the catalog
+// already documents.
 function corpseSection(): string {
   return `<section class="guide-block" id="prof-corpse">
       <h2>${esc(t('guide.professions.harvestTitle'))}</h2>
       ${paras('guide.professions.harvestBodyFamilies')}
-      <h3>${esc(t('guide.professions.focusTitle'))}</h3>
-      ${paras('guide.professions.focusBodyTiers')}
     </section>`;
 }
 

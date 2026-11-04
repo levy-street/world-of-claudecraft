@@ -738,10 +738,6 @@ export const table: DeedLocaleTable = {
     name: 'Un trésor de wyrm',
     desc: "Ramassez un total cumulé de 100 pièces d'or en espèces.",
   },
-  soc_civic_duty: {
-    name: 'Devoir civique',
-    desc: 'Attribuez votre premier point de priorité de la ville.',
-  },
   exp_long_road_north: {
     name: 'La longue route du nord',
     desc: 'Visitez les trois bourgs principaux : Eastbrook, Fenbridge et Highwatch.',

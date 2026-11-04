@@ -1125,10 +1125,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Aumenta i danni inflitti ai giocatori del {increase}% e riduce i danni subiti dai giocatori del {reduction}%. Aumenta anche la tua salute massima del {health}% ovunque tranne che nei dungeon, nelle incursioni, nelle spedizioni e negli squarci.',
   'hudChrome.statInfo.names.spellCrit': 'Critico Magico',
   'hudChrome.targetAuras.close': 'Chiudi la finestra delle aure del bersaglio',
-  'hudChrome.townFocus.pendingLine':
-    'Salvato. La tua redistribuzione a questa allocazione si completa tra {time}.',
-  'hudChrome.townFocus.preferenceHint':
-    'Il Focus aumenta il grado e la quantità di ciò che raccogli. Per raccogliere un solo materiale, imposta una Preferenza di Raccolta dal tuo Kit da Campo o dalla finestra Professioni.',
   'hudChrome.trade.offerQuantityAll': 'Offri tutto',
   'hudChrome.trade.offerQuantityConfirm': 'Offri',
   'hudChrome.trade.offerQuantityHint': 'Ti verrà chiesto quanti offrirne',
@@ -4268,8 +4264,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Non devi trovarli a occhio. Ogni nodo della zona è disegnato sulla mappa della zona ovunque essa mostri quel terreno, e sulla minimappa mentre lo attraversi, così un giro di raccolta può essere pianificato dalla schermata della mappa prima ancora di partire. Un nodo che i tuoi strumenti non possono ancora lavorare è segnato anziché nascosto: mantiene il suo posto con un segno barrato e attenuato, così puoi vedere il terreno verso cui ti stai allenando. Su desktop, passare il puntatore su un filone, un boschetto o un'aiuola nel mondo lo nomina, ti dice lo strumento che richiede e, una volta che l'hai lavorato, fa il conto alla rovescia al secondo fino alla tua ricomparsa personale. Su schermo touch non c'è nulla su cui passare il puntatore, quindi i segni sulla minimappa raccontano la stessa storia.",
   'guide.profPages.specimenBodyFamilies':
     "Tieni un po' di spazio libero nelle borse quando raccogli: un colpo di fortuna firmato ha bisogno di uno slot tutto suo o di una pila firmata corrispondente in cui atterrare, e se non entra da nessuna parte la resa arriva comunque, ma la firma va perduta. Anche la raccolta dalle carcasse ha il suo ramo da jackpot: circa il {pct}% di ogni componente raccolto esce raro o superiore. Una famiglia che ha un esemplare perfetto da dare (pelle, seta, veleno, artiglio, carne) mantiene semplice la sua resa ordinaria e conia l'esemplare firmato accanto a essa; le altre cinque, zanna, panno, difesa, corno e branchie, firmano la resa stessa.",
-  'guide.professions.focusBodyTiers':
-    "Ogni città principale tiene un pannello Focus Cittadino per i raccoglitori di passaggio: fermati in città, aprilo da accanto alla minimappa e distribuisci un budget di 10 punti focus tra i tipi di componente che ti interessano. Ogni 5 punti su un componente ne innalza il grado di raccolta di un gradino (due gradini al massimo), e ogni punto aggiunge il 10 percento alla sua resa; i componenti non focalizzati non vengono mai peggiorati.\n\nLa tua ripartizione segue il tuo personaggio ovunque vada e può essere ridiretta a ogni successiva visita in città, al ritmo che scegli. Prendersi il proprio tempo è gratis: la ridirezione richiede 1 minuto per ogni punto che sposti. Pagare un po' la velocizza, 15 secondi per punto più 5 rame e 1 Polvere di Tintinnio per punto, e pagare per intero la rende istantanea per 25 rame e 5 Polveri di Tintinnio per punto. Vengono contati solo i punti che sposti davvero, quindi spostare un solo punto costa poco, e un pannello che apri e chiudi senza modifiche non costa nulla a nessun livello.",
   'guide.professions.harvestBodyFamilies':
     'La raccolta non si ferma ai nodi. Molte bestie uccise possono essere raccolte una volta ciascuna, primo arrivato primo servito, per pelli, zanne, artigli, difese, corna, branchie, seta, veleno, panno e carne, direttamente dalla carcassa insieme al bottino ordinario. Il tasto interagisci prende solo il bottino; la raccolta è una scelta a parte, che fai dalla sezione Raccolta della finestra del bottino. Quando una bestia porta più di un componente lavorabile, la scelta è tua: prendi tutto quello che può dare, oppure concentrati su meno componenti e ottieni una qualità misurabilmente superiore di ciò che scegli di prendere.\n\nUn tiro di raccolto raro o superiore su una famiglia che porta esemplari concede anche un esemplare puro firmato (una Pelle Pura, Seta Pura, Ghiandola di Veleno Pura, Artiglio Puro o Taglio Pregiato) in aggiunta alla resa ordinaria, e registra Un Esemplare Perfetto nel tuo Libro delle Imprese. Qualunque personaggio può raccogliere, senza alcun addestramento richiesto, e qualsiasi strumento di raccolta che possiedi conta verso il bonus avanzato, indipendentemente dal mestiere a cui appartiene.',
   'guide.professions.toolEffectsHeading': 'Effetti da strumento',
@@ -5245,12 +5239,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.pvp.bracket2v2': '2c2',
   'hudChrome.pvp.launcherTitle': 'PvP',
   'hudChrome.pvp.mobileLabel': 'PvP',
-  'hudChrome.townFocus.respecCostFree': 'Gratis',
-  'hudChrome.townFocus.respecCostLine': 'Costa {coin} e {materials}',
-  'hudChrome.townFocus.respecTierInstantOption': 'Istantaneo (costo pieno)',
-  'hudChrome.townFocus.respecTierLabel': 'Velocità di reimpostazione',
-  'hudChrome.townFocus.respecTierPartialOption': 'Più veloce (costo ridotto)',
-  'hudChrome.townFocus.respecTierTimeOption': 'Gratis (con calma)',
   'hudChrome.warfare.floatReasons.assist': 'Assist',
   'hudChrome.warfare.floatReasons.firstWin': 'Prima Vittoria',
   'hudChrome.warfare.floatReasons.kill': 'Uccisione',
@@ -6012,7 +6000,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'I principali richiedono un voto. Un passatempo chiede solo dove vaga la tua curiosità, {playerName}. Raccogli qualche erba e decidi quale mestiere opposto ai tuoi principali vuoi coltivare.',
   'entities.quests.q_prof_hobby_switch.title': 'Un Altro Passatempo',
   'entities.quests.q_prof_intro.completion':
-    "Visto? Minerale raccolto e calli sulle mani. Continua a scavare, tagliare legna e raccogliere erbe mentre percorri le strade, e quando sei di ritorno in città, tieni d'occhio la Bacheca del Focus della Città vicino al mercato e il banco di fabbricazione vicino. C'è un buon affare che ti aspetta in tutto ciò, se lo vuoi.",
+    "Visto? Minerale raccolto e calli sulle mani. Continua a scavare, tagliare legna e raccogliere erbe mentre percorri le strade, e quando sei di ritorno in città, tieni d'occhio il banco di fabbricazione vicino al mercato. C'è un buon affare che ti aspetta in tutto ciò, se lo vuoi.",
   'entities.quests.q_prof_intro.objectives.0.label': 'Filone di minerale raccolto',
   'entities.quests.q_prof_intro.text':
     'Ogni anima di Eastbrook lavora un mestiere oltre alla spada, {playerName}. Ci sono filoni di minerale nelle rocce intorno alla Cava di Rame, a nordest della città, oltre i sentieri dei lupi. Vai a dare qualche picconata e lavorane 5 tu stesso, intendiamoci; saprò vedere la differenza.',
@@ -6649,17 +6637,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Oltre al combattimento e alle missioni, il mondo ti ricompensa per il lavoro della terra e della forgia: raccogliere materie prime, trasformarle in equipaggiamento e beni attraverso dieci mestieri artigiani e assumere un'identità come uno dei dieci archetipi che quei mestieri rappresentano.",
   'hudChrome.mobile.dailyRewards': 'Negozio',
   'hudChrome.perf.labels.predLead': 'Anticipo di predizione',
-  'hudChrome.townFocus.budgetLabel': 'Punti rimanenti: {remaining} / {budget}',
-  'hudChrome.townFocus.decreaseAria': 'Riduci la priorità di {component}',
-  'hudChrome.townFocus.hint':
-    'I punti priorità aggiungono un bonus sopra la resa base di ogni componente. I componenti senza priorità restano alla resa base.',
-  'hudChrome.townFocus.increaseAria': 'Aumenta la priorità di {component}',
-  'hudChrome.townFocus.notInTownHint': 'Devi essere in città per impostare la priorità.',
-  'hudChrome.townFocus.saveButton': 'Salva priorità',
-  'hudChrome.townFocus.tierHint':
-    'Ogni {points} punti su un componente aumentano il suo livello di raccolta di un grado, fino a {steps} gradi; meno di {points} punti aumentano comunque la resa.',
-  'hudChrome.townFocus.title': 'Priorità della città',
-  'hudChrome.townFocus.townOnlyHint': 'Il focus puo essere modificato solo mentre sei in citta.',
   'hudChrome.archetypeTitle.none': 'Nessuno',
   'entities.itemSets.crownforged.bonus4':
     'I colpi critici della tua arma scheggiano il bersaglio con Scheggiaossa, facendolo sanguinare per 8 danni ogni 2 sec per 12 sec. Si accumula fino a 3 volte.',
@@ -14732,9 +14709,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.models.groupForms': 'Forme del Druido',
   'guide.nav.sidebarLabel': 'Argomenti della guida',
   'guide.professions.craftHowTitle': 'La finestra di creazione',
-  'guide.professions.focusBody':
-    'Ogni città principale tiene un pannello Focus Cittadino per i raccoglitori di passaggio: fermati in città, aprilo da accanto alla minimappa e indirizza un piccolo budget di punti focus verso i tipi di componente che ti interessano. Più focus dai a un componente, più fine e ricco esce da ogni cadavere successivo; la tua ripartizione segue il personaggio ovunque vada, e puoi rielaborarla, gratis, a ogni successiva visita in città.',
-  'guide.professions.focusTitle': 'Focus Cittadino',
   'guide.professions.harvestTitle': 'Raccogliere dalla caccia stessa',
   'guide.search.typeAbility': 'Abilità',
   'guide.search.typeDeed': 'Impresa',
@@ -17973,7 +17947,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.faq.q7': 'Perche la mia raccolta e improvvisamente rallentata?',
   'guide.profPages.faq.q8': 'Posso lavorare lontano dalla citta?',
   'guide.profPages.faq.a3':
-    'Sono due azioni distinte sullo stesso corpo. Tutto cio che una carcassa contiene, monete e drop piu eventuali componenti raccoglibili, si apre nella stessa finestra, ma il tasto interagisci e Prendi il bottino raccolgono solo il bottino ordinario, che segue le normali regole di saccheggio. La raccolta e il lato delle professioni, che strappa i materiali dalla carcassa stessa, e avviene solo quando scegli Raccogli in quella finestra.\n\nLa raccolta e chi prima arriva, uso singolo: ogni carcassa puo essere raccolta esattamente una volta, da chiunque la rivendichi per primo, anche online. Il tuo Focus della Citta determina cosa ottieni: mentre sei in un hub cittadino puoi distribuire 10 punti di focus tra i tipi di componenti che ti interessano, e ogni componente focalizzato tira un livello migliore (ogni 5 punti lo fa avanzare di un gradino, al massimo due gradini) e produce di piu (10 percento per punto). I componenti non focalizzati non vengono mai peggiorati.',
+    'Sono due azioni distinte sullo stesso corpo. Tutto cio che una carcassa contiene, monete e drop piu eventuali componenti raccoglibili, si apre nella stessa finestra, ma il tasto interagisci e Prendi il bottino raccolgono solo il bottino ordinario, che segue le normali regole di saccheggio. La raccolta e il lato delle professioni, che strappa i materiali dalla carcassa stessa, e avviene solo quando scegli Raccogli in quella finestra.\n\nLa raccolta e chi prima arriva, uso singolo: ogni carcassa puo essere raccolta esattamente una volta, da chiunque la rivendichi per primo, anche online.',
   'guide.profPages.faq.a4':
     'Hai trovato una raccolta eccezionale. Circa 1 raccolta su 90 attiva un evento raro: durame antico negli alberi, una vena intatta nei minerali o una fioritura lunare nelle erbe. Moltiplica per cinque la resa, firma ogni unità con il tuo nome e annuncia il ritrovamento all’intera zona. Anche un normale raccolto di qualità rara o superiore riceve la firma su tutta la resa.\n\nConviene conservare i materiali firmati o venderli cari: possedere una copia firmata di un reagente necessario nelle borse o nella Caveau dei Materiali, dove la lavorazione può attingervi, aggiunge 2 punti percentuali alla probabilità di capolavoro. Possono condividere una pila compatibile con materiali non firmati o unità di altri raccoglitori e firmatari senza perdere alcun marchio; ogni origine e quantità rimane registrata separatamente.',
   'guide.profPages.faq.a5':

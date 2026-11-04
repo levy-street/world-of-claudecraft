@@ -1078,10 +1078,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Zwiększa obrażenia zadawane graczom o {increase}% i zmniejsza obrażenia otrzymane od graczy o {reduction}%. Także podnosi twoje maksymalne zdrowie o {health}% wszędzie poza lochami, najazdami, zagłębieniami i szczelinami.',
   'hudChrome.statInfo.names.spellCrit': 'Trafienie krytyczne zaklęcia',
   'hudChrome.targetAuras.close': 'Zamknij okno aury celu',
-  'hudChrome.townFocus.pendingLine':
-    'Zapisano. Twoja respec do tego przydziału zostanie ukończona za {time}.',
-  'hudChrome.townFocus.preferenceHint':
-    'Focus zwiększa ocenę i ilość tego, co zbierasz. Aby zbierać tylko jeden materiał, ustaw Preferencję zbierania z twojego zestawu polowego lub okna Zawodów.',
   'hudChrome.trade.offerQuantityAll': 'Zaoferuj wszystko',
   'hudChrome.trade.offerQuantityConfirm': 'Zaoferuj',
   'hudChrome.trade.offerQuantityHint': 'Zapyta cię ile zaoferować',
@@ -4188,8 +4184,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Nie musisz szukać ich na oko. Każdy węzeł w strefie jest zaznaczony na mapie strefy wszędzie tam, gdzie mapa pokazuje ten teren, oraz na minimapie, gdy go mijasz, więc trasę zbieracką można zaplanować z ekranu mapy jeszcze przed wyruszeniem. Węzeł, którego twoje narzędzia nie potrafią jeszcze obrobić, jest oznaczony, a nie ukryty: zachowuje swoje miejsce jako przekreślony, przygaszony znacznik, więc widzisz teren, do którego dopiero się wspinasz. Na komputerze najechanie kursorem na żyłę, drzewostan albo łan w świecie nazywa go, mówi ci, jakiego narzędzia wymaga, i, gdy już go obrobisz, odlicza czas do jego odnowienia z dokładnością do sekundy. Na dotyku nie ma czego najeżdżać, więc tę samą historię opowiadają znaczniki na minimapie.',
   'guide.profPages.specimenBodyFamilies':
     'Zachowaj trochę wolnego miejsca w torbie, gdy zbierasz: podpisana gratka potrzebuje własnego miejsca albo pasującego podpisanego stosu, w którym może wylądować, a jeśli nic nie pasuje, plon i tak dociera, ale podpis ginie. Zbieranie ze zwłok ma też swoją własną szansę na trafienie: około {pct}% każdego zebranego komponentu wychodzi w jakości rzadkiej lub lepszej. Rodzina, która ma czym obdarować w postaci doskonałego okazu (skóra, jedwab, jad, pazur, mięso), zostawia swój zwykły plon czysty i wybija obok niego podpisany, doskonały okaz; pozostałych pięć, kieł, tkanina, cios, róg i skrzela, podpisuje sam plon.',
-  'guide.professions.focusBodyTiers':
-    'Każde miasto centralne prowadzi panel Priorytetów miasta dla odwiedzających je zbieraczy: stań w mieście, otwórz go obok minimapy i rozdziel budżet 10 punktów priorytetu między typy komponentów, na których ci zależy. Każde 5 punktów na komponencie podnosi jego gatunek zbioru o jeden stopień (najwyżej o dwa), a każdy punkt dodaje 10 procent do jego uzysku; komponenty bez priorytetu nigdy nie są gorsze.\n\nTwój przydział podąża za postacią wszędzie i można go przekierować przy każdej kolejnej wizycie w mieście, w tempie, jakie wybierzesz. Nie spiesząc się, nic nie płacisz: przekierowanie trwa 1 minutę za każdy przesunięty punkt. Zapłacenie niewielkiej kwoty przyspiesza to do 15 sekund za punkt plus 5 miedziaków i 1 Pył Kuranta za punkt, a pełna zapłata robi to natychmiast za 25 miedziaków i 5 Pyłu Kuranta za punkt. Liczą się tylko punkty, które faktycznie przesuwasz, więc drobna korekta o jeden punkt jest tania, a panel otwarty i zamknięty bez zmian nic nie kosztuje, niezależnie od wybranego tempa.',
   'guide.professions.harvestBodyFamilies':
     'Zbieractwo nie kończy się na węzłach. Wiele pokonanych bestii można zebrać raz każdą, kto pierwszy, ten lepszy, na skóry, kły, pazury, ciosy, rogi, skrzela, jedwab, jad, tkaninę i mięso, prosto ze zwłok obok zwykłego łupu. Klawisz interakcji zabiera tylko łup; zbieranie to osobny wybór, którego dokonujesz w sekcji Zbieranie w oknie łupu. Gdy bestia niesie więcej niż jeden nadający się do obróbki komponent, wybór należy do ciebie: weź wszystko, co może dać, albo skup się na mniejszej liczbie komponentów i zdobądź wymiernie lepszy gatunek tego, co bierzesz.\n\nRzut zbioru w jakości rzadkiej lub lepszej na rodzinie mającej czym obdarować przyznaje też podpisany doskonały okaz (Nieskazitelną skórę, Nieskazitelny jedwab, Nieskazitelny Gruczoł Jadowy, Nieskazitelny Pazur albo Pierwsze cięcie) ponad zwykły plon i zapisuje w twojej Księdze Czynów czyn Doskonały Okaz. Zbierać może każda postać, bez wymaganego treningu, a do gałęzi premiowej liczy się każde posiadane przez ciebie narzędzie zbierackie, bez względu na to, do którego fachu należy.',
   'guide.professions.toolEffectsHeading': 'Efekty narzędzi',
@@ -5145,12 +5139,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.pvp.bracket2v2': '2v2',
   'hudChrome.pvp.launcherTitle': 'PvP',
   'hudChrome.pvp.mobileLabel': 'PvP',
-  'hudChrome.townFocus.respecCostFree': 'Za darmo',
-  'hudChrome.townFocus.respecCostLine': 'Kosztuje {coin} i {materials}',
-  'hudChrome.townFocus.respecTierInstantOption': 'Natychmiastowy (pełny koszt)',
-  'hudChrome.townFocus.respecTierLabel': 'Szybkość resetu talentów',
-  'hudChrome.townFocus.respecTierPartialOption': 'Szybszy (niski koszt)',
-  'hudChrome.townFocus.respecTierTimeOption': 'Darmowy (nie spiesz się)',
   'hudChrome.warfare.floatReasons.assist': 'Asysta',
   'hudChrome.warfare.floatReasons.firstWin': 'Pierwsze zwycięstwo',
   'hudChrome.warfare.floatReasons.kill': 'Zabójstwo',
@@ -5908,7 +5896,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Specjalizacje wymagają przysięgi. Hobby pyta jedynie, dokąd wędruje twoja ciekawość, {playerName}. Zbierz kilka ziół i zdecyduj, które rzemiosło po przeciwnej stronie twoich specjalizacji chcesz rozwijać.',
   'entities.quests.q_prof_hobby_switch.title': 'Inne zajęcie',
   'entities.quests.q_prof_intro.completion':
-    'Widzisz? Ruda zebrana i odciski na rękach. Nie przerywaj wydobycia, ścinki drzew i zbierania ziół w trakcie podróży po drogach, a gdy wrócisz do miasta, zerknij na Tablicę Skupienia przy rynku i pobliskie stoisko rzemieślnicze. Jest w tym uczciwy zarobek, jeśli go zechcesz.',
+    'Widzisz? Ruda zebrana i odciski na rękach. Nie przerywaj wydobycia, ścinki drzew i zbierania ziół w trakcie podróży po drogach, a gdy wrócisz do miasta, zerknij na stoisko rzemieślnicze przy rynku. Jest w tym uczciwy zarobek, jeśli go zechcesz.',
   'entities.quests.q_prof_intro.objectives.0.label': 'Żyła rudy wydobyta',
   'entities.quests.q_prof_intro.text':
     'Każda dusza w Eastbrook uprawia jakiś fach oprócz miecza, {playerName}. W skałach wokół Miedzianego Wykopaliska, na północnym wschodzie od miasta za wilczymi szlakami, są żyły rudy. Idź i wydobądź własnoręcznie 5 z nich; poznam różnicę.',
@@ -6583,17 +6571,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Poza walką i zadaniami świat nagradza pracę na roli i przy kuźni: zbieranie surowców, przekuwanie ich w ekwipunek i towary w dziesięciu rzemiosłach oraz wrastanie w tożsamość jednego z dziesięciu archetypów, które te fachy reprezentują.',
   'hudChrome.mobile.dailyRewards': 'Sklep',
   'hudChrome.perf.labels.predLead': 'Wyprzedzenie predykcji',
-  'hudChrome.townFocus.budgetLabel': 'Pozostałe punkty: {remaining} / {budget}',
-  'hudChrome.townFocus.decreaseAria': 'Zmniejsz priorytet: {component}',
-  'hudChrome.townFocus.hint':
-    'Punkty priorytetu dodają premię ponad bazowy uzysk każdego elementu. Elementy bez priorytetu pozostają na poziomie bazowym.',
-  'hudChrome.townFocus.increaseAria': 'Zwiększ priorytet: {component}',
-  'hudChrome.townFocus.notInTownHint': 'Musisz być w mieście, aby ustawić priorytety.',
-  'hudChrome.townFocus.saveButton': 'Zapisz priorytety',
-  'hudChrome.townFocus.tierHint':
-    'Każde {points} punktów na komponencie podnosi poziom zbioru o jeden stopień, do {steps} stopni; mniej niż {points} punktów nadal zwiększa uzysk.',
-  'hudChrome.townFocus.title': 'Priorytety miasta',
-  'hudChrome.townFocus.townOnlyHint': 'Priorytety można zmieniać tylko w mieście.',
   'hudChrome.archetypeTitle.none': 'Brak',
   'entities.itemSets.crownforged.bonus4':
     'Twoje krytyczne trafienia bronią rozłupują cel Kościaną Drzazgą, zadając 8 obrażeń od krwawienia co 2 s przez 12 s. Kumuluje się do 3 razy.',
@@ -14454,9 +14431,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.models.groupForms': 'Postacie druida',
   'guide.nav.sidebarLabel': 'Tematy przewodnika',
   'guide.professions.craftHowTitle': 'Okno wytwarzania',
-  'guide.professions.focusBody':
-    'W każdym głównym mieście działa panel Priorytetów miasta dla odwiedzających zbieraczy: stań w mieście, otwórz go obok minimapy i skieruj niewielki budżet punktów priorytetu na interesujące cię rodzaje komponentów. Im więcej priorytetu przydzielisz komponentowi, tym lepszej i bogatszej jakości schodzi on z każdego późniejszego ciała; twój przydział podąża za postacią, gdziekolwiek się uda, a możesz go przerobić za darmo przy każdej kolejnej wizycie w mieście.',
-  'guide.professions.focusTitle': 'Priorytety miasta',
   'guide.professions.harvestTitle': 'Pozyskiwanie z samego łowu',
   'guide.search.typeAbility': 'Zdolność',
   'guide.search.typeDeed': 'Czyn',
@@ -17164,7 +17138,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.faq.q7': 'Dlaczego moje zbieranie nagle zwolniło?',
   'guide.profPages.faq.q8': 'Czy mogę wytwarzać z dala od miasta?',
   'guide.profPages.faq.a3':
-    'To dwie osobne czynności na tym samym ciele. Wszystko, co tusza zawiera, monety i łupy plus wszelkie zbieralne składniki, otwiera się w tym samym oknie, ale klawisz interakcji i Weź łup zabierają wyłącznie zwykły łup, który podąża za normalnymi zasadami łupów. Zbieranie to strona profesji, ściągająca materiały z samej tuszy, i następuje dopiero wtedy, gdy w tym oknie wybierzesz Zbierz.\n\nZbieranie odbywa się na zasadzie kto pierwszy, jednorazowe użycie: każda tusza może być zebrana dokładnie raz, przez tego, kto ją pierwszy zgłosi, także online. Twoje Priorytety Miasta kształtują to, co dostaniesz: stojąc w centrum miasta, możesz rozłożyć 10 punktów priorytetu na typy składników, na których ci zależy, a każdy priorytetowy składnik wylosuje lepszy poziom (co 5 punktów podnosi go o krok, co najwyżej dwa kroki) i da więcej (10 procent za punkt). Niepiorytetowane składniki nigdy nie są pogarszane.',
+    'To dwie osobne czynności na tym samym ciele. Wszystko, co tusza zawiera, monety i łupy plus wszelkie zbieralne składniki, otwiera się w tym samym oknie, ale klawisz interakcji i Weź łup zabierają wyłącznie zwykły łup, który podąża za normalnymi zasadami łupów. Zbieranie to strona profesji, ściągająca materiały z samej tuszy, i następuje dopiero wtedy, gdy w tym oknie wybierzesz Zbierz.\n\nZbieranie odbywa się na zasadzie kto pierwszy, jednorazowe użycie: każda tusza może być zebrana dokładnie raz, przez tego, kto ją pierwszy zgłosi, także online.',
   'guide.profPages.faq.a4':
     'Trafił ci się wyjątkowo obfity zbiór. Około 1 na 90 zbiorów wyzwala rzadkie wydarzenie: pradawna twardziel w drzewie, nieskazitelna żyła w rudzie lub skąpany w księżycu kwiat w ziołach. Pięciokrotnie zwiększa plon, podpisuje każdą jednostkę twoim imieniem i ogłasza znalezisko całej strefie. Zwykły zbiór z wylosowaną rzadką lub wyższą jakością też podpisuje plon.\n\nPodpisane materiały warto zachować lub drogo sprzedać: dowolna podpisana sztuka potrzebnego reagenta w torbach lub Skarbcu Materiałów, skąd rzemiosło może ją pobrać, dodaje 2 punkty procentowe do szansy mistrzowskiego wykonania. Mogą współdzielić zgodny stos z niepodpisanym materiałem oraz sztukami innych zbieraczy i podpisujących bez utraty oznaczeń; każde źródło i jego ilość są zachowane oddzielnie.',
   'guide.profPages.faq.a5':

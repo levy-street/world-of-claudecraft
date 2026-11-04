@@ -1080,10 +1080,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Meningkatkan kerusakan yang diberikan kepada pemain sebesar {increase}% dan mengurangi kerusakan yang diterima dari pemain sebesar {reduction}%. Juga menaikkan kesehatan maksimalmu sebesar {health}% di mana-mana kecuali di dungeon, raid, menggali dan celah.',
   'hudChrome.statInfo.names.spellCrit': 'Mantra Kritis',
   'hudChrome.targetAuras.close': 'Tutup jendela aura target',
-  'hudChrome.townFocus.pendingLine':
-    'Tersimpan. Spesialisasi ulangmu ke alokasi ini selesai dalam {time}.',
-  'hudChrome.townFocus.preferenceHint':
-    'Fokus menaikkan nilai dan jumlah apa yang kamu kumpulkan. Untuk mengumpulkan hanya satu bahan, atur Pilihan Kumpul dari Peralatan Lapanganmu atau jendela Profesi.',
   'hudChrome.trade.offerQuantityAll': 'Tawarkan semua',
   'hudChrome.trade.offerQuantityConfirm': 'Tawarkan',
   'hudChrome.trade.offerQuantityHint': 'Kamu akan ditanya berapa banyak yang akan ditawarkan',
@@ -4199,8 +4195,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Kamu tidak perlu mencarinya dengan mata sendiri. Setiap simpul di zona itu digambar di peta zona di mana pun peta itu menampilkan tanah tersebut, dan di minimap saat kamu melewatinya, sehingga sebuah putaran panen bisa direncanakan dari layar peta sebelum kamu berangkat. Simpul yang belum bisa dikerjakan alatmu ditandai, bukan disembunyikan: ia tetap ada di tempatnya dengan tanda pudar bercoret, sehingga kamu bisa melihat tanah yang sedang kamu tuju lewat latihan. Di desktop, mengarahkan kursor ke sebuah urat, rumpun, atau petak di dunia menyebutkan namanya, memberitahumu alat yang dibutuhkannya, dan, begitu kamu pernah mengerjakannya, menghitung mundur kemunculannya kembali hingga ke detik. Di layar sentuh tidak ada yang bisa diarahkan kursor, sehingga tanda di minimap menyampaikan cerita yang sama.',
   'guide.profPages.specimenBodyFamilies':
     'Sisakan sedikit ruang tas saat kamu berburu bahan: rejeki bertanda tangan butuh ruangnya sendiri atau tumpukan bertanda tangan yang cocok untuk mendarat, dan jika tidak ada yang muat hasilnya tetap datang tetapi tanda tangannya hilang. Pemanenan bangkai juga punya lengan jackpot tersendiri: sekitar {pct}% dari tiap komponen yang dipanen muncul langka atau lebih baik. Keluarga yang punya spesimen sempurna untuk diberikan (kulit, sutra, bisa, cakar, daging) menjaga hasil biasanya tetap polos dan mencetak spesimen bertanda tangan di sampingnya; lima keluarga lainnya, taring, kain, gading, tanduk, dan insang, menandatangani hasil panennya sendiri.',
-  'guide.professions.focusBodyTiers':
-    'Setiap kota pusat menyimpan panel Fokus Kota bagi para pemanen yang berkunjung: berdirilah di kota, buka dari samping minimap, dan sebarkan anggaran 10 poin fokus ke jenis komponen yang kamu pedulikan. Setiap 5 poin pada sebuah komponen menaikkan tingkat panennya satu langkah (maksimal dua langkah), dan setiap poin menambah 10 persen pada hasilnya; komponen yang tidak difokuskan tidak pernah dibuat lebih buruk.\n\nAlokasimu mengikuti karaktermu ke mana pun kamu pergi, dan bisa diarahkan ulang pada kunjungan berikutnya ke kota, dengan kecepatan yang kamu pilih sendiri. Mengambil waktu itu gratis: penataan ulang berjalan 1 menit per poin yang kamu pindahkan. Membayar sedikit mempercepatnya, 15 detik per poin ditambah 5 tembaga dan 1 Debu Dentingan per poin, dan membayar penuh membuatnya instan seharga 25 tembaga dan 5 Debu Dentingan per poin. Hanya poin yang benar-benar kamu pindahkan yang dihitung, sehingga memindahkan satu poin saja murah, dan panel yang kamu buka lalu tutup tanpa perubahan tidak dikenai biaya sama sekali pada tingkat kecepatan mana pun.',
   'guide.professions.harvestBodyFamilies':
     'Pengumpulan tidak berhenti di simpul. Banyak binatang yang dibunuh bisa dipanen sekali masing-masing, siapa cepat dia dapat, untuk kulit, taring, cakar, gading, tanduk, insang, sutra, bisa, kain, dan daging, langsung dari bangkai bersama jarahan biasanya. Tombol interaksi hanya mengambil jarahan; memanen adalah pilihan tersendiri, yang kamu lakukan dari bagian Panen di jendela jarahan. Bila seekor binatang membawa lebih dari satu komponen yang bisa diolah, pilihannya ada di tanganmu: ambil semua yang bisa diberikannya, atau fokus pada lebih sedikit komponen dan dapatkan kualitas yang jauh lebih baik dari apa yang kamu ambil.\n\nLemparan panen langka atau lebih baik pada keluarga berisi spesimen juga memberikan spesimen sempurna bertanda tangan (Kulit Murni, Sutra Murni, Kelenjar Racun Murni, Cakar Murni, atau Potongan Perdana) di atas hasil biasa, dan mencatat Spesimen Sempurna di Kitab Jasamu. Karakter mana pun bisa memanen, tanpa pelatihan, dan alat pengumpul mana pun yang kamu miliki dihitung untuk bagian premium, dari perdagangan mana pun alat itu berasal.',
   'guide.professions.toolEffectsHeading': 'Efek Alat',
@@ -5144,12 +5138,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.pvp.bracket2v2': '2v2',
   'hudChrome.pvp.launcherTitle': 'PvP',
   'hudChrome.pvp.mobileLabel': 'PvP',
-  'hudChrome.townFocus.respecCostFree': 'Gratis',
-  'hudChrome.townFocus.respecCostLine': 'Biaya {coin} dan {materials}',
-  'hudChrome.townFocus.respecTierInstantOption': 'Instan (biaya penuh)',
-  'hudChrome.townFocus.respecTierLabel': 'Kecepatan Penataan Ulang',
-  'hudChrome.townFocus.respecTierPartialOption': 'Lebih Cepat (biaya kecil)',
-  'hudChrome.townFocus.respecTierTimeOption': 'Gratis (butuh waktu)',
   'hudChrome.warfare.floatReasons.assist': 'Bantuan',
   'hudChrome.warfare.floatReasons.firstWin': 'Kemenangan Pertama',
   'hudChrome.warfare.floatReasons.kill': 'Bunuh',
@@ -5903,7 +5891,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Bidang utama menuntut sumpah. Hobi hanya bertanya ke mana rasa ingin tahumu mengembara, {playerName}. Kumpulkan beberapa herba dan putuskan kerajinan mana yang berlawanan dengan bidang utamamu yang ingin kamu tekuni.',
   'entities.quests.q_prof_hobby_switch.title': 'Hobi yang Berbeda',
   'entities.quests.q_prof_intro.completion':
-    'Sudah, kan? Bijih terkumpul dan tanganmu sudah kapalan. Terus galilah, tebang, dan petik herba saat kamu menjelajah jalan-jalan, dan ketika kamu kembali ke kota, perhatikan papan Fokus Kota di dekat pasar dan bangku kerajinan di sana. Ada perdagangan adil yang menanti di semuanya, jika kamu mau.',
+    'Sudah, kan? Bijih terkumpul dan tanganmu sudah kapalan. Terus galilah, tebang, dan petik herba saat kamu menjelajah jalan-jalan, dan ketika kamu kembali ke kota, perhatikan bangku kerajinan di dekat pasar. Ada perdagangan adil yang menanti di semuanya, jika kamu mau.',
   'entities.quests.q_prof_intro.objectives.0.label': 'Urat bijih dipanen',
   'entities.quests.q_prof_intro.text':
     'Setiap jiwa di Eastbrook menekuni perdagangan selain pedang, {playerName}. Ada urat bijih di bebatuan sekitar Galian Tembaga, timur laut kota, melewati Lintasan Serigala. Pergi ayunkan beliung dan kerjakan 5 di antaranya sendiri, ingat; aku tahu bedanya.',
@@ -6580,17 +6568,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Di luar pertempuran dan misi, dunia mengganjarmu karena menggarap tanah dan tempaan: mengumpulkan bahan mentah, mengolahnya menjadi perlengkapan dan barang lewat sepuluh kerajinan, dan menetap dalam identitas sebagai salah satu dari sepuluh arketipe yang diwakili kerajinan-kerajinan itu.',
   'hudChrome.mobile.dailyRewards': 'Toko',
   'hudChrome.perf.labels.predLead': 'Jarak Prediksi',
-  'hudChrome.townFocus.budgetLabel': 'Sisa poin: {remaining} / {budget}',
-  'hudChrome.townFocus.decreaseAria': 'Kurangi fokus pada {component}',
-  'hudChrome.townFocus.hint':
-    'Poin fokus menambahkan bonus di atas hasil dasar setiap komponen. Komponen tanpa fokus tetap pada hasil dasar.',
-  'hudChrome.townFocus.increaseAria': 'Tambah fokus pada {component}',
-  'hudChrome.townFocus.notInTownHint': 'Kamu harus berada di kota untuk mengatur fokusmu.',
-  'hudChrome.townFocus.saveButton': 'Simpan Fokus',
-  'hudChrome.townFocus.tierHint':
-    'Setiap {points} poin pada komponen meningkatkan tingkat panennya satu langkah, hingga {steps} langkah; kurang dari {points} poin tetap meningkatkan hasilnya.',
-  'hudChrome.townFocus.title': 'Fokus Kota',
-  'hudChrome.townFocus.townOnlyHint': 'Fokus hanya bisa diubah saat kamu berada di kota.',
   'hudChrome.archetypeTitle.none': 'Tidak Ada',
   'entities.itemSets.crownforged.bonus4':
     'Serangan kritis senjatamu menyerpihkan target dengan Serpih Tulang, membuatnya berdarah sebesar 8 kerusakan setiap 2 detik selama 12 detik. Menumpuk hingga 3 kali.',
@@ -14231,9 +14208,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'guide.models.groupForms': 'Wujud Druid',
   'guide.nav.sidebarLabel': 'Topik panduan',
   'guide.professions.craftHowTitle': 'Jendela kriya',
-  'guide.professions.focusBody':
-    'Setiap kota pusat menyimpan panel Fokus Kota bagi para pemanen yang berkunjung: berdirilah di kota, buka dari samping minimap, dan arahkan sedikit anggaran poin fokus pada jenis komponen yang kamu pedulikan. Makin banyak fokus yang kamu berikan pada sebuah komponen, makin halus dan kaya ia keluar dari tiap mayat berikutnya; alokasimu mengikuti karaktermu ke mana pun mereka menjelajah, dan kamu bisa mengubahnya, gratis, pada kunjungan berikutnya ke kota.',
-  'guide.professions.focusTitle': 'Fokus Kota',
   'guide.professions.harvestTitle': 'Memanen dari hasil buruan',
   'guide.search.typeAbility': 'Kemampuan',
   'guide.search.typeDeed': 'Jasa',
@@ -17239,7 +17213,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.faq.q7': 'Mengapa pengumpulan saya tiba-tiba melambat?',
   'guide.profPages.faq.q8': 'Bisakah saya membuat di luar kota?',
   'guide.profPages.faq.a3':
-    'Keduanya adalah dua tindakan terpisah pada tubuh yang sama. Semua yang dipegang bangkai, koin dan jarahan ditambah komponen yang bisa dipanen, terbuka di jendela yang sama, tetapi tombol interaksi dan Ambil Jarahan hanya mengambil jarahan biasa, yang mengikuti aturan jarahan normal. Pemanenan adalah sisi profesi, mengupas bahan dari bangkai itu sendiri, dan baru terjadi saat kamu memilih Panen di jendela itu.\n\nPemanenan adalah siapa cepat, sekali pakai: setiap bangkai hanya bisa dipanen sekali, oleh siapapun yang mengklaimnya pertama, termasuk secara online. Fokus Kotamu membentuk apa yang kamu dapatkan: saat berdiri di pusat kota kamu bisa menyebarkan 10 poin fokus ke jenis komponen yang kamu pedulikan, dan setiap komponen yang difokuskan menghasilkan tingkat yang lebih baik (setiap 5 poin menaikkannya satu langkah, maksimal dua langkah) dan menghasilkan lebih banyak (10 persen per poin). Komponen yang tidak difokuskan tidak pernah dibuat lebih buruk.',
+    'Keduanya adalah dua tindakan terpisah pada tubuh yang sama. Semua yang dipegang bangkai, koin dan jarahan ditambah komponen yang bisa dipanen, terbuka di jendela yang sama, tetapi tombol interaksi dan Ambil Jarahan hanya mengambil jarahan biasa, yang mengikuti aturan jarahan normal. Pemanenan adalah sisi profesi, mengupas bahan dari bangkai itu sendiri, dan baru terjadi saat kamu memilih Panen di jendela itu.\n\nPemanenan adalah siapa cepat, sekali pakai: setiap bangkai hanya bisa dipanen sekali, oleh siapapun yang mengklaimnya pertama, termasuk secara online.',
   'guide.profPages.faq.a4':
     'Kamu menemukan hasil berlimpah. Sekitar 1 dari 90 panen memicu kejadian pengumpulan langka: kayu teras purba pada pohon, urat murni pada bijih, atau bunga bermandikan bulan pada herba. Hasilnya dikalikan lima, setiap unit ditandatangani dengan namamu, dan temuannya diumumkan ke seluruh zona. Panen biasa yang mendapat kualitas langka atau lebih baik juga menandatangani hasilnya.\n\nBahan bertanda tangan layak disimpan atau dijual mahal: memiliki unit bertanda tangan dari reagen yang diperlukan di tas atau Brankas Material, di tempat pembuatan dapat mengambilnya, menambah 2 poin persentase peluang karya master. Unit itu dapat berbagi tumpukan yang cocok dengan bahan tanpa tanda tangan atau unit pengumpul dan penanda tangan lain tanpa kehilangan tanda; sumber dan jumlah masing-masing tetap dicatat terpisah.',
   'guide.profPages.faq.a5':

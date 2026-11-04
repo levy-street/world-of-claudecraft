@@ -362,21 +362,6 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: "the micro-menu rail's open-window ring and unspent-point badge; every write goes through the elided facet, so a steady rail costs no DOM mutation",
   },
   {
-    call: 'this.isInTown',
-    band: 'slow',
-    gate: '',
-    surface: 'none',
-    why: 'the zone read behind the Town Focus button and the open panel gate; no DOM write',
-  },
-  {
-    call: 'this.refreshOpenTownFocusIfChanged',
-    band: 'slow',
-    gate: '',
-    surface: 'window',
-    guard: { kind: 'hud', proof: 'if (sig === this.lastTownFocusSig) return;' },
-    why: 'rebuilds the Town Focus window when the allocation draft or the in-town flag moves. The standing exception of this table until #2500, when the open check was the whole gate and an idle panel rebuilt its whole subtree twice a second, restoring scrollTop but destroying keyboard focus',
-  },
-  {
     call: 'this.renderCrafting',
     band: 'slow',
     gate: "$('#crafting-window').style.display === 'flex' && stationTypesSignature(inRangeStationTypes(sim.stationPlacements, sim.player.pos, sim.activeMobileStationCrafts)) !== this.lastCraftingStationSig",
@@ -1974,10 +1959,11 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // chrome 99 -> 100: the dungeon objectives tracker's medium-band paint
       // (hud/dungeon/dungeon_tracker_painter.ts), facet-routed like the deed strip.
       // window 53 -> 54: Lantern Hall's guild window (hud/guild_hall/guild_hall_window.ts).
-    ).toEqual({ window: 55, chrome: 101, none: 21 });
+      // window 55 -> 54, none 21 -> 20: Town Focus removed from the game (its
+      // isInTown zone read and the open-panel signature probe both leave).
+    ).toEqual({ window: 54, chrome: 101, none: 20 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
-    expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');
     // The guard KINDS are pinned the same way and for the same reason: `kind` is otherwise a
     // free-text opt-out, so a row could keep `surface: 'window'`, keep the counts above
     // intact, and swap `module` for a plausible-sounding `none` while the real guard was
@@ -2004,7 +1990,8 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // HUD fields (lastCharSheetSig et al) because the cold char_window painter
       // holds no signature of its own to diff. The release's trade row left this
       // bucket when its lastTradeSig latch moved into the woc_trade module.
-      hud: 6,
+      // 6 -> 5: the Town Focus probe's lastTownFocusSig latch left with the feature.
+      hud: 5,
       // Up to 12 with the crucible vendor's out-of-range close: the same
       // callsite-guarded shape as the copper and heroic vendor closes.
       // Up one more on the release arm's own callsite-guarded row, beside the
@@ -2061,7 +2048,6 @@ describe('Hud.update() drives exactly the registered set, on the registered band
         // Phase 20: the progression-block latch for the open character sheet.
         'hud.ts: if (sig === this.lastCharSheetSig) return;',
         'hud.ts: if (sig === this.lastProfessionSurfaceSig) return;',
-        'hud.ts: if (sig === this.lastTownFocusSig) return;',
         'hud/woc_trade/woc_trade_controller.ts: if (sig === this.lastTradeSig) return;',
         'hud/delve/lockpick_window.ts: if (lockpickRenderSig(view) !== this.lastSig) this.renderBoard();',
         'hud/expeditions/expedition_controller.ts: if (sig === this.lastSig) {',

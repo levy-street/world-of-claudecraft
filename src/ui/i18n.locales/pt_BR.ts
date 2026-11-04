@@ -1053,10 +1053,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Aumenta o dano causado a jogadores em {increase}% e reduz o dano recebido de jogadores em {reduction}%. Também aumenta sua vida máxima em {health}% em qualquer lugar, exceto masmorras, raides, incursões e fendas.',
   'hudChrome.statInfo.names.spellCrit': 'Crítico de Feitiço',
   'hudChrome.targetAuras.close': 'Fechar janela de auras do alvo',
-  'hudChrome.townFocus.pendingLine':
-    'Salvo. Sua redistribuição de Foco para esta configuração é concluída em {time}.',
-  'hudChrome.townFocus.preferenceHint':
-    'O Foco aumenta o grau e a quantidade do que você coleta. Para coletar apenas um material, defina uma Preferência de Coleta pelo seu Kit de Campo ou pela janela de Profissões.',
   'hudChrome.trinkets.cooldownMinutes': '{minutes} min',
   'hudChrome.trinkets.cooldownSeconds': '{seconds} s',
   'hudChrome.trinkets.equip.guardHeat':
@@ -4241,8 +4237,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Você não precisa encontrá-los a olho nu. Cada nó da zona é desenhado no mapa da zona onde quer que o mapa mostre aquele terreno, e no minimapa conforme você passa por ele, então uma rota de coleta pode ser planejada pela tela do mapa antes de você sair. Um nó que suas ferramentas ainda não conseguem trabalhar aparece marcado em vez de escondido: ele mantém o lugar com uma marca riscada e esmaecida, para que você veja o terreno rumo ao qual está treinando. No desktop, passar o cursor sobre um veio, um arvoredo ou um canteiro no mundo o nomeia, diz qual ferramenta ele exige e, depois que você o trabalhou, conta sua própria regeneração até o segundo. No toque não há nada para passar o cursor, então as marcas do minimapa contam a mesma história.',
   'guide.profPages.specimenBodyFamilies':
     'Guarde um pouco de espaço livre nas bolsas quando for farmar: um golpe de sorte assinado precisa de um espaço só dele ou de uma pilha assinada compatível para cair, e se nada couber o rendimento ainda chega, mas a assinatura se perde. A colheita de cadáveres também tem seu próprio braço de sorte grande: cerca de {pct}% de cada componente colhido sai raro ou melhor. Uma família que tem um espécime perfeito a oferecer (couro, seda, veneno, garra, carne) mantém seu rendimento comum simples e cunha o espécime assinado ao lado dele; as outras cinco, presa, pano, presa, chifre e guelras, assinam o próprio rendimento.',
-  'guide.professions.focusBodyTiers':
-    'Toda cidade principal mantém um painel de Foco da Cidade para os coletores de passagem: fique na cidade, abra-o ao lado do minimapa e distribua um orçamento de 10 pontos de foco entre os tipos de componente que lhe interessam. A cada 5 pontos em um componente, o grau de colheita dele sobe um degrau (no máximo dois degraus), e cada ponto acrescenta 10 por cento ao seu rendimento; componentes sem foco nunca pioram.\n\nSua distribuição acompanha seu personagem para onde ele for e pode ser redirecionada em qualquer visita posterior à cidade, no ritmo que você escolher. Ir com calma não custa nada: o redirecionamento leva 1 minuto por ponto movido. Pagar um pouco acelera o processo, 15 segundos por ponto mais 5 cobre e 1 Pó de Toque por ponto, e pagar o valor total o torna instantâneo por 25 cobre e 5 Pó de Toque por ponto. Só os pontos que você realmente move são contados, então ajustar um único ponto é barato, e abrir e fechar o painel sem mudar nada não custa nada em nenhum nível.',
   'guide.professions.harvestBodyFamilies':
     'A coleta não para nos nós. Muitas feras abatidas podem ser colhidas uma vez cada, por ordem de chegada, por couros, presas, garras, presas, chifres, guelras, seda, veneno, pano e carne, direto do cadáver junto com o saque comum. A tecla de interação pega apenas o saque; a coleta é uma escolha à parte, feita na seção Coleta da janela de saque. Quando uma fera carrega mais de um componente aproveitável, a escolha é sua: pegue tudo o que ela puder dar, ou concentre-se em menos componentes e leve um grau visivelmente mais fino do que você escolher levar.\n\nUm resultado de colheita raro ou melhor em uma família com espécime também concede um espécime perfeito assinado (um Couro Imaculado, uma Seda imaculada, uma Glândula de veneno imaculada, uma Garra Imaculada ou um Corte Principal) além do rendimento comum, e registra Um Espécime Perfeito no seu Livro dos Feitos. Qualquer personagem pode colher, sem necessidade de treinamento, e qualquer ferramenta de coleta que você possua conta para o braço premium, seja qual for o ofício ao qual ela pertença.',
   'guide.professions.toolEffectsHeading': 'Efeitos de ferramenta',
@@ -5208,12 +5202,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.pvp.bracket2v2': '2v2',
   'hudChrome.pvp.launcherTitle': 'JcJ',
   'hudChrome.pvp.mobileLabel': 'JcJ',
-  'hudChrome.townFocus.respecCostFree': 'Grátis',
-  'hudChrome.townFocus.respecCostLine': 'Custa {coin} e {materials}',
-  'hudChrome.townFocus.respecTierInstantOption': 'Instantâneo (custo total)',
-  'hudChrome.townFocus.respecTierLabel': 'Velocidade de redefinição',
-  'hudChrome.townFocus.respecTierPartialOption': 'Mais rápido (custo pequeno)',
-  'hudChrome.townFocus.respecTierTimeOption': 'Grátis (sem pressa)',
   'hudChrome.warfare.floatReasons.assist': 'Assistência',
   'hudChrome.warfare.floatReasons.firstWin': 'Primeira Vitória',
   'hudChrome.warfare.floatReasons.kill': 'Abate',
@@ -5974,7 +5962,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Os ofícios principais exigem um juramento. Um passatempo só pergunta para onde sua curiosidade vai, {playerName}. Colete algumas ervas e decida qual ofício oposto aos seus principais você quer seguir.',
   'entities.quests.q_prof_hobby_switch.title': 'Um Passatempo Diferente',
   'entities.quests.q_prof_intro.completion':
-    'Viu? Minério coletado e calos nas mãos. Continue com a mineração, a lenharia e a colheita de ervas durante suas viagens, e quando estiver de volta à cidade, observe o quadro do Foco do Vilarejo perto do mercado e a bancada de artesanato por perto. Há uma troca justa esperando em tudo isso, se você quiser.',
+    'Viu? Minério coletado e calos nas mãos. Continue com a mineração, a lenharia e a colheita de ervas durante suas viagens, e quando estiver de volta à cidade, observe a bancada de artesanato perto do mercado. Há uma troca justa esperando em tudo isso, se você quiser.',
   'entities.quests.q_prof_intro.objectives.0.label': 'Veio de minério extraído',
   'entities.quests.q_prof_intro.text':
     'Toda alma em Eastbrook exerce um ofício além da espada, {playerName}. Há veios de minério nas rochas ao redor da Escavação de Cobre, a nordeste da cidade, além das trilhas dos lobos. Vá bater com uma picareta e trabalhe 5 deles você mesmo; eu saberei a diferença.',
@@ -6604,14 +6592,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Além do combate e das missões, o mundo recompensa quem trabalha a terra e a forja: coletando matérias-primas, transformando-as em equipamento e bens ao longo de dez ofícios de criação e assumindo uma identidade como um dos dez arquétipos que esses ofícios representam.',
   'hudChrome.mobile.dailyRewards': 'Loja',
   'hudChrome.perf.labels.predLead': 'Avanço da Predição',
-  'hudChrome.townFocus.budgetLabel': 'Pontos restantes: {remaining} / {budget}',
-  'hudChrome.townFocus.decreaseAria': 'Diminuir o foco em {component}',
-  'hudChrome.townFocus.hint':
-    'Pontos de foco adicionam um bônus sobre o rendimento base de cada componente. Componentes sem foco permanecem no valor base.',
-  'hudChrome.townFocus.increaseAria': 'Aumentar o foco em {component}',
-  'hudChrome.townFocus.notInTownHint': 'Você precisa estar na cidade para definir seu foco.',
-  'hudChrome.townFocus.saveButton': 'Salvar Foco',
-  'hudChrome.townFocus.title': 'Foco da Cidade',
   'hudChrome.archetypeTitle.none': 'Nenhum',
   'entities.itemSets.crownforged.bonus4':
     'Seus acertos críticos com armas estilhaçam o alvo com Estilhaço Ósseo, causando 8 de sangramento a cada 2 s por 12 s. Acumula até 3 vezes.',
@@ -14579,9 +14559,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.models.groupForms': 'Formas de Druida',
   'guide.nav.sidebarLabel': 'Tópicos do guia',
   'guide.professions.craftHowTitle': 'A janela de criação',
-  'guide.professions.focusBody':
-    'Toda cidade principal mantém um painel de Foco da Cidade para os coletores de passagem: fique na cidade, abra-o ao lado do minimapa e direcione um pequeno orçamento de pontos de foco aos tipos de componente que lhe interessam. Quanto mais foco você dá a um componente, mais fino e rico ele sai de cada corpo dali em diante; sua distribuição acompanha seu personagem por onde ele andar, e você pode reajustá-la, de graça, em qualquer visita posterior à cidade.',
-  'guide.professions.focusTitle': 'Foco da Cidade',
   'guide.professions.harvestTitle': 'Colhendo a própria caçada',
   'guide.search.typeAbility': 'Habilidade',
   'guide.search.typeDeed': 'Feito',
@@ -16041,10 +16018,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.social.hideOfflineTitle': 'Ocultar membros da guilda offline',
   'hudChrome.social.offlineHeader': 'Offline ({n})',
   'hudChrome.social.onlineHeader': 'Online ({n})',
-  'hudChrome.townFocus.tierHint':
-    'Cada {points} pontos em um componente elevam seu nível de coleta um passo, até {steps} passos; menos de {points} pontos ainda aumentam o rendimento.',
-  'hudChrome.townFocus.townOnlyHint':
-    'O foco só pode ser alterado enquanto você estiver na cidade.',
   'hudChrome.unbind.cannotAfford': 'Você não pode pagar a taxa de desvincular.',
   'hudChrome.unbind.close': 'Fechar desvinculação',
   'hudChrome.unbind.confirmBody': 'Desvincular {name} por {fee}?',
@@ -17871,7 +17844,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.faq.q7': 'Por que minha coleta ficou de repente mais lenta?',
   'guide.profPages.faq.q8': 'Posso criar longe da cidade?',
   'guide.profPages.faq.a3':
-    'São duas ações separadas no mesmo corpo. Tudo que um cadáver contém, moedas e drops mais quaisquer componentes coletáveis, abre na mesma janela, mas a tecla de interação e Pegar Saque recolhem apenas o saque comum, que segue as regras normais de saque. A colheita é o lado das profissões, extraindo materiais do próprio cadáver, e só acontece quando você escolhe Coletar nessa janela.\n\nA colheita é por ordem de chegada e de uso único: cada cadáver pode ser colhido exatamente uma vez, por quem o reivindicar primeiro, inclusive online. O Foco do Vilarejo molda o que você obtém: enquanto estiver em um centro de vilarejo, você pode distribuir 10 pontos de foco pelos tipos de componente que lhe interessam, e cada componente focado rola um nível melhor (a cada 5 pontos sobe um degrau, no máximo dois degraus) e rende mais (10 por cento por ponto). Componentes sem foco nunca são piorados.',
+    'São duas ações separadas no mesmo corpo. Tudo que um cadáver contém, moedas e drops mais quaisquer componentes coletáveis, abre na mesma janela, mas a tecla de interação e Pegar Saque recolhem apenas o saque comum, que segue as regras normais de saque. A colheita é o lado das profissões, extraindo materiais do próprio cadáver, e só acontece quando você escolhe Coletar nessa janela.\n\nA colheita é por ordem de chegada e de uso único: cada cadáver pode ser colhido exatamente uma vez, por quem o reivindicar primeiro, inclusive online.',
   'guide.profPages.faq.a4':
     'Você encontrou uma colheita excepcional. Cerca de 1 a cada 90 coletas ativa um evento raro: cerne ancestral em árvores, veio intacto em minério ou flor enluarada em ervas. Ele multiplica a produção por cinco, assina cada unidade com seu nome e anuncia a descoberta para toda a zona. Uma coleta comum que resulte em qualidade rara ou superior também assina toda a produção.\n\nVale guardar os materiais assinados ou vendê-los caro: ter qualquer unidade assinada de um reagente necessário nas bolsas ou no Depósito de Materiais, onde a fabricação possa utilizá-la, adiciona 2 pontos percentuais à chance de obra-prima. Eles podem compartilhar uma pilha compatível com material sem assinatura ou unidades de outros coletores e signatários sem perder marcas; cada origem e quantidade fica registrada separadamente.',
   'guide.profPages.faq.a5':

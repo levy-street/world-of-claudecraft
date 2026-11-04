@@ -391,7 +391,7 @@
 
   <div class="figure" id="fig5">
     <h4>Figure 5. Per-corpse extraction tradeoff</h4>
-    <p class="cap">A drake corpse tagged with three component types. Concentrating extraction on one component returns a high tier; splitting across all three returns a lower tier of each. The persistent town focus shifts these tiers further up for your specialized components.</p>
+    <p class="cap">A drake corpse tagged with three component types. Concentrating extraction on one component returns a high tier; splitting across all three returns a lower tier of each.</p>
     <svg id="corpse-diagram" viewBox="0 0 720 230" role="img" aria-label="Extraction tradeoff bars"></svg>
   </div>
 
@@ -585,7 +585,7 @@
     <li><strong>Per-item-instance foundation:</strong> an instance id plus payload (signer, charges, rolled quality/stats, the <code>boundTo</code> recipient) across inventory, equipment, trade, market, vendor, the snapshot, the wire, and persistence. Cross-cutting, and it must land before tools, harvesting, and crafted gear, which all carry item identity. <span class="muted">Note: only higher-tier crafts carry item identity, so common-tier crafting can ship fungibly before this slice; the instance model gates the high-tier work, not the first playable crafting.</span></li>
     <li><strong>Production core:</strong> the ten crafts and their outputs, recipes, crafting, the one-active-specialty wheel (additive skill, the at-most-two active cap, adjacent-pair majors, capped opposite hobby), attunement (the per-tier quest ladder: the first-time lore quest and the repeatable make-amends switch quest), tiered mastery (the per-tier quest gate, xp lost above the current ceiling, diminishing returns below capability), combo-specific signature recipes, rarity-tier quality, ilvl-budget plus crafting-only effects, bind-to-recipient (<code>boundTo</code>) on high-tier gear with its commission/order workflow, and the first specialization perks. Start with low-stakes consumables, then enhancements, then gear.</li>
     <li><strong>Crafted tools:</strong> base tool tiers (infinite durability) plus slotted effects with durability and craft-aligned recharge.</li>
-    <li><strong>Monster Harvesting plus focus:</strong> single-use corpses, component-type tags, per-corpse focus picker, the additive town focus, the time/coin/material re-spec, and signed rare+ materials with the self-gathered craft bonus.</li>
+    <li><strong>Monster Harvesting plus focus:</strong> single-use corpses, component-type tags, per-corpse focus picker, and signed rare+ materials with the self-gathered craft bonus.</li>
     <li><strong>Cosmetics / market integration, wiki polish, balance.</strong></li>
   </ol>
   <p class="muted">Much later: Battlefield Experience (observed item use; committed as a concept, not needed until the core is proven); and a possible off-wheel cosmetic/housing system (Carpenter, Mason, and tending skills) if the ten feel too limited.</p>

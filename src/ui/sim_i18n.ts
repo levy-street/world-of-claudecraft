@@ -449,18 +449,7 @@ const baseEnTable = {
   'error.patternKnown': 'You already know that recipe.',
   'error.patternProfession': 'You have not practiced that profession.',
   'error.patternSkill': 'Your skill is too low to learn that pattern.',
-  'error.townFocusNotInTown': 'You must be in town to set your focus.',
-  'error.townFocusOverBudget': 'That allocation exceeds your focus point budget.',
-  'error.townFocusInvalid': 'Invalid focus allocation.',
   // #1144: the chosen re-spec payment tier's coin/material cost is unaffordable.
-  'error.townFocusCannotAfford': 'You cannot afford that focus re-spec.',
-  // #1144: the 'time'/'timeAndPartial' tiers queue the reallocation instead of
-  // committing it immediately; these three cover the queue/resolve lifecycle
-  // (see Sim.setTownFocus / updateTownFocusRespec in src/sim/sim.ts).
-  'log.townFocusRespecQueued': 'Your focus re-spec will complete in {seconds}s.',
-  'log.townFocusRespecComplete': 'Your focus re-spec is complete.',
-  'error.townFocusRespecCancelled':
-    'You could not afford your pending focus re-spec, so it was cancelled.',
   // Custom per-item ground-pickup lines (src/sim/content/ground_pickup_lines.ts).
   // Emitted via def.pickupDeny/def.pickupEnough (variable-routed, so the S3 guard
   // cannot see them); values must stay byte-identical to that table for the EXACT
@@ -2993,9 +2982,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.bankMaxSlots': 'Tu banco no se puede ampliar más.',
     'error.bankTooFar': 'Estás demasiado lejos del banquero.',
     'log.bankSlotsPurchased': 'Compras espacios de banco adicionales.',
-    'error.townFocusNotInTown': 'Debes estar en el pueblo para fijar tu enfoque.',
-    'error.townFocusOverBudget': 'Esa asignación supera tu presupuesto de puntos de enfoque.',
-    'error.townFocusInvalid': 'Asignación de enfoque no válida.',
     'log.dungeonDifficultyHeroic': 'Dificultad de mazmorra fijada en Heroica.',
     'log.dungeonDifficultyNormal': 'Dificultad de mazmorra fijada en Normal.',
     'log.dungeonDifficultyIsHeroic':
@@ -3099,10 +3085,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.patternKnown': 'Ya conoces esa receta.',
     'error.patternProfession': 'No has practicado esa profesión.',
     'error.patternSkill': 'Tu habilidad es demasiado baja para aprender ese patrón.',
-    'error.townFocusCannotAfford': 'No puedes pagar ese reajuste de enfoque.',
-    'log.townFocusRespecComplete': 'Tu reajuste de enfoque se ha completado.',
-    'error.townFocusRespecCancelled':
-      'No podías permitirte la reespecialización de enfoque pendiente, así que se canceló.',
     'error.ignivarRaidInCombat':
       'Tu banda sigue en combate. Podrás entrar cuando termine la lucha.',
     'error.ignivarForgeGateSealed': 'La puerta de la forja está sellada para ti.',
@@ -3327,7 +3309,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.ignivarLiftArrives': 'El elevador de forja se asienta; su puerta se abre con un chirrido.',
     'log.provingFerry': 'El ferry te dejará en Proving Shore.',
     'mechanic.broodRipple': 'Onda de cría',
-    'log.townFocusRespecQueued': 'Tu redistribución del enfoque se completará en {seconds}s.',
     'log.pyreCrashes': '{name} irrumpe en la batalla.',
     'mechanic.nythraxisBindingSigil': 'Sello vinculante',
     'mechanic.broodCleave': 'Tajo de la prole',
@@ -4339,9 +4320,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.bankMaxSlots': 'Tu banco no se puede ampliar más.',
     'error.bankTooFar': 'Estás demasiado lejos del banquero.',
     'log.bankSlotsPurchased': 'Compras espacios de banco adicionales.',
-    'error.townFocusNotInTown': 'Debes estar en el pueblo para fijar tu enfoque.',
-    'error.townFocusOverBudget': 'Esa asignación supera tu presupuesto de puntos de enfoque.',
-    'error.townFocusInvalid': 'Asignación de enfoque no válida.',
     'log.dungeonDifficultyHeroic': 'Dificultad de mazmorra fijada en Heroica.',
     'log.dungeonDifficultyNormal': 'Dificultad de mazmorra fijada en Normal.',
     'log.dungeonDifficultyIsHeroic':
@@ -4450,11 +4428,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.patternKnown': 'Ya conoces esa receta.',
     'error.patternProfession': 'No has practicado esa profesión.',
     'error.patternSkill': 'Tu nivel de habilidad es demasiado bajo para aprender ese patrón.',
-    'error.townFocusCannotAfford': 'No puedes costear ese reajuste de enfoque.',
-    'log.townFocusRespecComplete': 'Tu reajuste de enfoque ha terminado.',
 
-    'error.townFocusRespecCancelled':
-      'No podías permitirte la reespecialización de enfoque pendiente, así que se canceló.',
     'error.ignivarRaidInCombat':
       'Tu banda sigue en combate. Podrás entrar cuando termine la lucha.',
     'error.ignivarForgeGateSealed': 'La puerta de la forja está sellada para ti.',
@@ -4630,7 +4604,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.provingFerry': 'El ferry te dejará en Proving Shore.',
     'log.provingLeave': 'El cruce se afianza y Eastbrook Vale se extiende ante ti.',
     'log.pyreCrashes': '{name} irrumpe en la batalla.',
-    'log.townFocusRespecQueued': 'Tu redistribución del enfoque se completará en {seconds}s.',
     'mechanic.broodCleave': 'Tajo de la prole',
     'mechanic.broodRipple': 'Onda de cría',
     'mechanic.fireBreath': 'Aliento de fuego',
@@ -5685,9 +5658,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.bankMaxSlots': 'Votre banque ne peut plus être agrandie.',
     'error.bankTooFar': 'Vous êtes trop loin du banquier.',
     'log.bankSlotsPurchased': 'Vous achetez des emplacements de banque supplémentaires.',
-    'error.townFocusNotInTown': 'Vous devez être en ville pour définir vos priorités.',
-    'error.townFocusOverBudget': 'Cette répartition dépasse votre budget de points de priorité.',
-    'error.townFocusInvalid': 'Répartition de priorités invalide.',
     'log.dungeonDifficultyHeroic': 'Difficulté du donjon définie sur Héroïque.',
     'log.dungeonDifficultyNormal': 'Difficulté du donjon définie sur Normal.',
     'log.dungeonDifficultyIsHeroic':
@@ -5796,11 +5766,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.patternKnown': 'Vous connaissez déjà cette recette.',
     'error.patternProfession': "Vous n'avez pas pratiqué cette profession.",
     'error.patternSkill': 'Votre compétence est trop faible pour apprendre ce patron.',
-    'error.townFocusCannotAfford': "Vous n'avez pas les moyens de cette respécialisation de focus.",
-    'log.townFocusRespecComplete': 'Votre respécialisation de focus est terminée.',
 
-    'error.townFocusRespecCancelled':
-      'Vous n’aviez pas les moyens de payer votre réattribution de spécialisation de focus en attente ; elle a donc été annulée.',
     'error.ignivarRaidInCombat':
       'Votre raid est toujours en combat. Vous pourrez entrer une fois le combat terminé.',
     'error.ignivarForgeGateSealed': 'La porte de la forge vous est scellée.',
@@ -6044,8 +6010,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
       'Vous quittez le paddock et le cours se termine. Revenez voir Marla pour réessayer.',
     'log.pyreCrashes': '{name} se jette dans la bataille.',
     'mechanic.broodCleave': 'Frappe circulaire de la couvée',
-    'log.townFocusRespecQueued':
-      'Le changement de votre orientation sera terminé dans {seconds} s.',
     'log.provingLeave': 'La traversée commence, et Eastbrook Vale s’étend devant vous.',
     'mechanic.ignivarApocalypse': 'Apocalypse',
     'mechanic.ignivarCruciblePerimeter': 'Périmètre du creuset',
@@ -7150,9 +7114,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.bankMaxSlots': 'Votre banque ne peut plus être agrandie.',
     'error.bankTooFar': 'Vous êtes trop loin du banquier.',
     'log.bankSlotsPurchased': 'Vous achetez des emplacements de banque supplémentaires.',
-    'error.townFocusNotInTown': 'Vous devez être en ville pour définir vos priorités.',
-    'error.townFocusOverBudget': 'Cette répartition dépasse votre budget de points de priorité.',
-    'error.townFocusInvalid': 'Répartition de priorités invalide.',
     'log.dungeonDifficultyHeroic': 'Difficulté du donjon définie sur Héroïque.',
     'log.dungeonDifficultyNormal': 'Difficulté du donjon définie sur Normal.',
     'log.dungeonDifficultyIsHeroic':
@@ -7261,12 +7222,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.patternKnown': 'Vous connaissez déjà cette recette.',
     'error.patternProfession': "Vous n'avez pas pratiqué cette profession.",
     'error.patternSkill': 'Votre compétence est trop faible pour apprendre ce patron.',
-    'error.townFocusCannotAfford':
-      'Vous n’avez pas assez de moyens pour cette respécialisation de focus.',
-    'log.townFocusRespecComplete': 'Votre respécialisation de focus est complétée.',
 
-    'error.townFocusRespecCancelled':
-      'Vous n’aviez pas les moyens de payer votre réattribution de spécialisation de focus en attente ; elle a donc été annulée.',
     'error.ignivarRaidInCombat':
       'Votre raid est toujours en combat. Vous pourrez entrer une fois le combat terminé.',
     'error.ignivarForgeGateSealed': 'La porte de la forge vous est scellée.',
@@ -7453,8 +7409,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.provingFerry': 'Le bac vous dépose sur le Rivage de l’Épreuve.',
     'log.provingLeave': 'La traversée commence, et Eastbrook Vale s’étend devant vous.',
     'log.pyreCrashes': '{name} se jette dans la bataille.',
-    'log.townFocusRespecQueued':
-      'Le changement de votre orientation sera terminé dans {seconds} s.',
     'mechanic.broodCleave': 'Frappe circulaire de la couvée',
     'mechanic.broodRipple': 'Ondulation du couvain',
     'mechanic.fireBreath': 'Souffle de feu',
@@ -8840,9 +8794,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.bankMaxSlots': 'La tua banca non può essere ampliata oltre.',
     'error.bankTooFar': 'Sei troppo lontano dal banchiere.',
     'log.bankSlotsPurchased': 'Acquisti spazi aggiuntivi della banca.',
-    'error.townFocusNotInTown': 'Devi essere in città per impostare le priorità.',
-    'error.townFocusOverBudget': 'Quella ripartizione supera i tuoi punti priorità disponibili.',
-    'error.townFocusInvalid': 'Ripartizione delle priorità non valida.',
     'log.dungeonDifficultyHeroic': 'Difficoltà del dungeon impostata su Eroica.',
     'log.dungeonDifficultyNormal': 'Difficoltà del dungeon impostata su Normale.',
     'log.dungeonDifficultyIsHeroic':
@@ -8949,11 +8900,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.patternKnown': 'Conosci già quella ricetta.',
     'error.patternProfession': 'Non hai praticato quella professione.',
     'error.patternSkill': 'La tua abilità è troppo bassa per imparare quello schema.',
-    'error.townFocusCannotAfford': 'Non puoi permetterti quella rispecializzazione del focus.',
-    'log.townFocusRespecComplete': 'La tua rispecializzazione del focus è completata.',
 
-    'error.townFocusRespecCancelled':
-      'Non potevi permetterti la riassegnazione della specializzazione di focus in sospeso, quindi è stata annullata.',
     'error.ignivarRaidInCombat':
       'La tua incursione è ancora in combattimento. Potrai entrare quando lo scontro sarà terminato.',
     'error.ignivarForgeGateSealed': 'Il cancello della forgia ti è precluso.',
@@ -9198,7 +9145,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'mechanic.ignivarCleansingBacklash': 'Contraccolpo purificante',
     'mechanic.broodCleave': 'Fendente della progenie',
     'mechanic.fireBreath': 'Respiro di fuoco',
-    'log.townFocusRespecQueued': 'La ridistribuzione del focus sarà completata tra {seconds}s.',
     'mechanic.nythraxisBoneSlam': "Colpo d'ossa",
     'mechanic.nythraxisBoneSpike': "Punta d'osso",
     'mechanic.ignivarRevolvingInferno': 'Inferno rotante',
@@ -10287,9 +10233,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.bankMaxSlots': 'Eure Bank kann nicht weiter erweitert werden.',
     'error.bankTooFar': 'Ihr seid zu weit vom Bankier entfernt.',
     'log.bankSlotsPurchased': 'Ihr kauft zusätzliche Bankfächer.',
-    'error.townFocusNotInTown': 'Ihr müsst Euch in der Stadt befinden, um Euren Fokus festzulegen.',
-    'error.townFocusOverBudget': 'Diese Verteilung übersteigt Euer Budget an Fokuspunkten.',
-    'error.townFocusInvalid': 'Ungültige Fokusverteilung.',
     'log.dungeonDifficultyHeroic': 'Dungeon-Schwierigkeit auf Heroisch gesetzt.',
     'log.dungeonDifficultyNormal': 'Dungeon-Schwierigkeit auf Normal gesetzt.',
     'log.dungeonDifficultyIsHeroic':
@@ -10398,11 +10341,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.patternKnown': 'Das Rezept kennen Sie bereits.',
     'error.patternProfession': 'Du hast diesen Beruf nicht ausgeübt.',
     'error.patternSkill': 'Deine Fertigkeit ist zu gering, um dieses Muster zu erlernen.',
-    'error.townFocusCannotAfford': 'Du kannst dir diese Fokus-Neuverteilung nicht leisten.',
-    'log.townFocusRespecComplete': 'Deine Fokus-Neuverteilung ist abgeschlossen.',
 
-    'error.townFocusRespecCancelled':
-      'Du konntest dir deine ausstehende Fokus-Neuspezialisierung nicht leisten, daher wurde sie abgebrochen.',
     'error.ignivarRaidInCombat':
       'Dein Schlachtzug befindet sich noch im Kampf. Du kannst eintreten, sobald der Kampf vorbei ist.',
     'error.ignivarForgeGateSealed': 'Das Tor zur Schmiede ist für dich versiegelt.',
@@ -10642,7 +10581,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'mechanic.ignivarApocalypse': 'Apokalypse',
     'log.longWalkHealer':
       'Der Hüter hat dich wieder auf die Beine gestellt. Geh beim nächsten Mal zu deiner Leiche zurück: Das kostet dich nichts.',
-    'log.townFocusRespecQueued': 'Deine Fokus-Neuverteilung ist in {seconds} Sek. abgeschlossen.',
     'mechanic.fireBreath': 'Feueratem',
     'mechanic.broodCleave': 'Brutspalter',
     'mechanic.ignivarCleansingBacklash': 'Reinigende Gegenreaktion',
@@ -11818,9 +11756,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.flaskWarboar': '战猪之力',
     'aura.flaskRunewater': '符水清明',
     'aura.wellFed': '精神饱满',
-    'error.townFocusNotInTown': '你必须在城镇中才能设置专注。',
-    'error.townFocusOverBudget': '该分配超出了你的专注点上限。',
-    'error.townFocusInvalid': '无效的专注分配。',
     'log.dungeonDifficultyHeroic': '地下城难度已设为英雄。',
     'log.dungeonDifficultyNormal': '地下城难度已设为普通。',
     'log.dungeonDifficultyIsHeroic': '地下城难度：英雄。使用 /dungeon normal 可以更改。',
@@ -11865,10 +11800,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.patternKnown': '你已经学会了该配方。',
     'error.patternProfession': '你尚未修习该专业。',
     'error.patternSkill': '你的技能不足以学习该图样。',
-    'error.townFocusCannotAfford': '你负担不起这次专注重置。',
-    'log.townFocusRespecComplete': '你的专注重置已完成。',
 
-    'error.townFocusRespecCancelled': '你无法负担待处理的专精重置费用，因此操作已取消。',
     'error.ignivarRaidInCombat': '你的团队仍在战斗中。战斗结束后才能进入。',
     'error.ignivarForgeGateSealed': '熔炉大门拒绝向你开放。',
     'error.liveRaidClaimUnsafe': '无法安全替换当前的实时团队归属。',
@@ -12062,7 +11994,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.provingFerry': '渡船把你送上试炼之滨。',
     'log.provingLeave': '渡航开始，东溪谷在你面前铺展开来。',
     'log.pyreCrashes': '{name} 冲入了战场。',
-    'log.townFocusRespecQueued': '你的专注重置将在 {seconds} 秒后完成。',
     'mechanic.broodCleave': '繁育劈砍',
     'mechanic.broodRipple': '繁育涟漪',
     'mechanic.fireBreath': '火焰吐息',
@@ -13103,9 +13034,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.flaskWarboar': '戰豬之力',
     'aura.flaskRunewater': '符水清明',
     'aura.wellFed': '精神飽滿',
-    'error.townFocusNotInTown': '你必須在城鎮中才能設定專注。',
-    'error.townFocusOverBudget': '此分配超出了你的專注點數上限。',
-    'error.townFocusInvalid': '無效的專注分配。',
     'log.dungeonDifficultyHeroic': '地城難度已設定為英雄。',
     'log.dungeonDifficultyNormal': '地城難度已設定為普通。',
     'log.dungeonDifficultyIsHeroic': '地城難度：英雄。使用 /dungeon normal 來變更。',
@@ -13150,10 +13078,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.patternKnown': '你已經學會了該配方。',
     'error.patternProfession': '你尚未修習該專業。',
     'error.patternSkill': '你的技能不足以學習該圖樣。',
-    'error.townFocusCannotAfford': '你負擔不起這次專注重置。',
-    'log.townFocusRespecComplete': '你的專注重置已完成。',
 
-    'error.townFocusRespecCancelled': '你無法負擔待處理的專精重置費用，因此操作已取消。',
     'error.ignivarRaidInCombat': '你的團隊仍在戰鬥中。戰鬥結束後才能進入。',
     'error.ignivarForgeGateSealed': '熔爐大門拒絕向你開放。',
     'error.liveRaidClaimUnsafe': '無法安全替換目前的即時團隊歸屬。',
@@ -13347,7 +13272,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.provingFerry': '渡船把你送上試煉之濱。',
     'log.provingLeave': '渡航開始，東溪谷在你面前鋪展開來。',
     'log.pyreCrashes': '{name} 衝入了戰場。',
-    'log.townFocusRespecQueued': '你的專注重置將在 {seconds} 秒後完成。',
     'mechanic.broodCleave': '繁育劈砍',
     'mechanic.broodRipple': '繁育漣漪',
     'mechanic.fireBreath': '火焰吐息',
@@ -14398,9 +14322,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.flaskWarboar': '전투 멧돼지의 힘',
     'aura.flaskRunewater': '룬물의 명료함',
     'aura.wellFed': '잘 먹음',
-    'error.townFocusNotInTown': '집중을 설정하려면 마을에 있어야 합니다.',
-    'error.townFocusOverBudget': '해당 배분이 집중 포인트 한도를 초과합니다.',
-    'error.townFocusInvalid': '잘못된 집중 배분입니다.',
     'log.dungeonDifficultyHeroic': '던전 난이도가 영웅으로 설정되었습니다.',
     'log.dungeonDifficultyNormal': '던전 난이도가 일반으로 설정되었습니다.',
     'log.dungeonDifficultyIsHeroic':
@@ -14448,10 +14369,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.patternKnown': '이미 알고 있는 제조법입니다.',
     'error.patternProfession': '해당 전문 기술을 수련한 적이 없습니다.',
     'error.patternSkill': '숙련도가 낮아 그 도안을 배울 수 없습니다.',
-    'error.townFocusCannotAfford': '해당 집중 재설정 비용을 감당할 수 없습니다.',
-    'log.townFocusRespecComplete': '집중 재설정이 완료되었습니다.',
 
-    'error.townFocusRespecCancelled': '대기 중인 특성 초기화 비용을 감당할 수 없어 취소되었습니다.',
     'error.ignivarRaidInCombat':
       '공격대가 아직 전투 중입니다. 전투가 끝난 뒤에 입장할 수 있습니다.',
     'error.ignivarForgeGateSealed': '당신에게는 대장간 문이 봉인되어 있습니다.',
@@ -14670,7 +14588,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.provingFerry': '나룻배가 당신을 수련의 해안에 내려 줍니다.',
     'log.provingLeave': '건너기가 시작되고, Eastbrook Vale이 눈앞에 펼쳐집니다.',
     'log.pyreCrashes': '{name}이(가) 전장으로 돌진합니다.',
-    'log.townFocusRespecQueued': '집중력 재설정이 {seconds}초 후 완료됩니다.',
     'mechanic.broodCleave': '부화 베기',
     'mechanic.broodRipple': '부화 파동',
     'mechanic.fireBreath': '화염 숨결',
@@ -15733,9 +15650,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.flaskWarboar': '戦猪の力',
     'aura.flaskRunewater': '呪水の明晰',
     'aura.wellFed': '満腹',
-    'error.townFocusNotInTown': 'フォーカスを設定するには町にいる必要があります。',
-    'error.townFocusOverBudget': 'その割り振りはフォーカスポイントの上限を超えています。',
-    'error.townFocusInvalid': '無効なフォーカスの割り振りです。',
     'log.dungeonDifficultyHeroic': 'ダンジョン難易度をヒロイックに設定しました。',
     'log.dungeonDifficultyNormal': 'ダンジョン難易度をノーマルに設定しました。',
     'log.dungeonDifficultyIsHeroic':
@@ -15782,11 +15696,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.patternKnown': 'そのレシピはすでに習得しています。',
     'error.patternProfession': 'その職業を修めていません。',
     'error.patternSkill': '技能が足りないため、その図案を習得できません。',
-    'error.townFocusCannotAfford': 'そのフォーカス再設定を支払えません。',
-    'log.townFocusRespecComplete': 'フォーカス再設定が完了しました。',
 
-    'error.townFocusRespecCancelled':
-      '保留中のフォーカス振り直し費用を支払えないため、キャンセルされました。',
     'error.ignivarRaidInCombat': 'あなたのレイドはまだ戦闘中です。戦闘が終わるまで入場できません。',
     'error.ignivarForgeGateSealed': 'あなたに対して鍛冶場の門は封印されています。',
     'error.liveRaidClaimUnsafe': '現在進行中のレイドの権利を安全に置き換えられません。',
@@ -15998,7 +15908,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.provingFerry': '渡し船があなたを修練の浜へ降ろします。',
     'log.provingLeave': '渡航が始まり、イーストブルック渓谷が目の前に広がります。',
     'log.pyreCrashes': '{name}が戦場へ突入します。',
-    'log.townFocusRespecQueued': '集中力の振り直しは{seconds}秒後に完了します。',
     'mechanic.broodCleave': 'ブルード・クリーヴ',
     'mechanic.broodRipple': 'ブルード・リップル',
     'mechanic.fireBreath': 'ファイアブレス',
@@ -16955,9 +16864,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.bankMaxSlots': 'Seu banco não pode ser expandido além disso.',
     'error.bankTooFar': 'Você está longe demais do banqueiro.',
     'log.bankSlotsPurchased': 'Você compra espaços de banco adicionais.',
-    'error.townFocusNotInTown': 'Você precisa estar na cidade para definir seu foco.',
-    'error.townFocusOverBudget': 'Essa alocação excede seu limite de pontos de foco.',
-    'error.townFocusInvalid': 'Alocação de foco inválida.',
     'log.dungeonDifficultyHeroic': 'Dificuldade da masmorra definida como Heroico.',
     'log.dungeonDifficultyNormal': 'Dificuldade da masmorra definida como Normal.',
     'log.dungeonDifficultyIsHeroic':
@@ -17064,11 +16970,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.patternKnown': 'Você já conhece essa receita.',
     'error.patternProfession': 'Você não praticou essa profissão.',
     'error.patternSkill': 'Sua habilidade é baixa demais para aprender esse molde.',
-    'error.townFocusCannotAfford': 'Você não pode pagar essa redefinição de foco.',
-    'log.townFocusRespecComplete': 'Sua redefinição de foco foi concluída.',
 
-    'error.townFocusRespecCancelled':
-      'Você não pôde pagar pela redefinição de foco pendente, então ela foi cancelada.',
     'error.ignivarRaidInCombat':
       'Seu raide ainda está em combate. Você poderá entrar quando a luta terminar.',
     'error.ignivarForgeGateSealed': 'O portão da forja está selado para você.',
@@ -17299,7 +17201,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
       'Você sai do paddock e a aula termina. Volte para Marla para tentar novamente.',
     'log.mountTrainSuccess': 'Marla assume as rédeas do Valorsteed. Bem montado.',
     'log.pyreCrashes': '{name} entra na batalha.',
-    'log.townFocusRespecQueued': 'Sua redistribuição do foco será concluída em {seconds}s.',
     'mechanic.ignivarCleansingBacklash': 'Reação de limpeza',
     'log.ridingLearned':
       'Você aprendeu a equitação. Agora você pode invocar e montar uma montaria.',
@@ -18497,9 +18398,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.flaskWarboar': 'Мощь Боевого Вепря',
     'aura.flaskRunewater': 'Ясность Рунной Воды',
     'aura.wellFed': 'Сытость',
-    'error.townFocusNotInTown': 'Чтобы задать фокус, нужно находиться в городе.',
-    'error.townFocusOverBudget': 'Такое распределение превышает ваш запас очков фокуса.',
-    'error.townFocusInvalid': 'Недопустимое распределение фокуса.',
     'log.dungeonDifficultyHeroic': 'Установлена героическая сложность подземелий.',
     'log.dungeonDifficultyNormal': 'Установлена обычная сложность подземелий.',
     'log.dungeonDifficultyIsHeroic':
@@ -18550,11 +18448,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.patternKnown': 'Вы уже знаете этот рецепт.',
     'error.patternProfession': 'Вы не занимались этой профессией.',
     'error.patternSkill': 'Ваш навык слишком низок, чтобы изучить эту схему.',
-    'error.townFocusCannotAfford': 'Вам не хватает средств на эту смену фокуса.',
-    'log.townFocusRespecComplete': 'Смена фокуса завершена.',
 
-    'error.townFocusRespecCancelled':
-      'Вы не смогли оплатить ожидающую смену специализации фокуса, поэтому она была отменена.',
     'error.ignivarRaidInCombat':
       'Ваш рейд всё ещё в бою. Вы сможете войти, когда сражение закончится.',
     'error.ignivarForgeGateSealed': 'Вам закрыт доступ к воротам кузницы.',
@@ -18778,7 +18672,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.provingFerry': 'Паром высаживает вас на Берегу Испытаний.',
     'log.provingLeave': 'Переправа начинается, и Истврукская долина раскидывается перед вами.',
     'log.pyreCrashes': '{name} врывается в битву.',
-    'log.townFocusRespecQueued': 'Перенастройка вашего фокуса завершится через {seconds} с.',
     'mechanic.broodCleave': 'Рассечение выводка',
     'mechanic.broodRipple': 'Всплеск выводка',
     'mechanic.fireBreath': 'Огненное дыхание',
@@ -19508,8 +19401,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.legendaryNameShape': 'Toto jméno nelze do díla vepsat.',
     'error.legendaryDeed': 'Abyste z tohoto díla udělali legendu, potřebujete Listinu stvoření.',
 
-    'error.townFocusRespecCancelled':
-      'Nemáš dost prostředků na čekající změnu zaměření, takže byla zrušena.',
     'error.ignivarRaidInCombat': 'Tvůj raid je stále v boji. Vstoupit můžeš, až boj skončí.',
     'error.ignivarForgeGateSealed': 'Brána kovárny je pro tebe zapečetěná.',
     'error.liveRaidClaimUnsafe': 'Tento nárok na probíhající raid nelze bezpečně nahradit.',
@@ -20292,8 +20183,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.legendaryDeed':
       'Je hebt een Scheppingsakte nodig om van dat werkstuk een legende te maken.',
 
-    'error.townFocusRespecCancelled':
-      'Je kon de geplande focus-herverdeling niet betalen, dus deze is geannuleerd.',
     'error.ignivarRaidInCombat':
       'Je raid is nog in gevecht. Je kunt binnenkomen zodra het gevecht voorbij is.',
     'error.ignivarForgeGateSealed': 'De poort van de smidse is voor jou verzegeld.',
@@ -21067,8 +20956,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.legendaryNameShape': 'Tego imienia nie można wyryć na dziele.',
     'error.legendaryDeed': 'Potrzebujesz Aktu stworzenia, by uczynić to dzieło legendą.',
 
-    'error.townFocusRespecCancelled':
-      'Nie było Cię stać na oczekującą zmianę specjalizacji skupienia, więc ją anulowano.',
     'error.ignivarRaidInCombat':
       'Twój rajd wciąż jest w walce. Możesz wejść, gdy walka się zakończy.',
     'error.ignivarForgeGateSealed': 'Brama kuźni jest dla Ciebie zamknięta.',
@@ -21840,8 +21727,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.legendaryNameShape': 'Nama itu tidak dapat diukir pada karya tersebut.',
     'error.legendaryDeed': 'Anda memerlukan Akta Penciptaan untuk menjadikan karya itu legenda.',
 
-    'error.townFocusRespecCancelled':
-      'Kamu tidak mampu membayar perubahan spesialisasi fokus yang tertunda, jadi perubahan itu dibatalkan.',
     'error.ignivarRaidInCombat':
       'Raid kamu masih dalam pertempuran. Kamu dapat masuk setelah pertarungan berhenti.',
     'error.ignivarForgeGateSealed': 'Gerbang tempa itu tertutup bagimu.',
@@ -22613,8 +22498,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.legendaryNameShape': 'O isim esere yazılamaz.',
     'error.legendaryDeed': 'O eseri efsaneye dönüştürmek için bir Yaratım Senedi gerekir.',
 
-    'error.townFocusRespecCancelled':
-      'Bekleyen odak uzmanlık değişikliğinin ücretini karşılayamadığın için iptal edildi.',
     'error.ignivarRaidInCombat': 'Raid’in hâlâ savaşta. Savaş sona erince girebilirsin.',
     'error.ignivarForgeGateSealed': 'Demirhane kapısı sana kapalı.',
     'error.liveRaidClaimUnsafe': 'Bu canlı raid talebi güvenle değiştirilemez.',
@@ -23381,8 +23264,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.legendaryNameShape': 'Det namnet kan inte ristas in i verket.',
     'error.legendaryDeed': 'Du behöver en Skapelseurkund för att göra det verket till en legend.',
 
-    'error.townFocusRespecCancelled':
-      'Du hade inte råd med den pågående ändringen av fokusinriktning, så den avbröts.',
     'error.ignivarRaidInCombat':
       'Ditt raid är fortfarande i strid. Du kan gå in när striden är över.',
     'error.ignivarForgeGateSealed': 'Smidesporten är stängd för dig.',
@@ -24153,8 +24034,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.legendaryNameShape': 'Cái tên đó không thể khắc lên tác phẩm.',
     'error.legendaryDeed': 'Bạn cần một Chứng thư Tạo tác để biến tác phẩm đó thành huyền thoại.',
 
-    'error.townFocusRespecCancelled':
-      'Bạn không đủ tiền để đặt lại chuyên môn đang chờ, nên thao tác đã bị hủy.',
     'error.ignivarRaidInCombat':
       'Đội raid của bạn vẫn đang giao chiến. Bạn có thể vào khi trận chiến kết thúc.',
     'error.ignivarForgeGateSealed': 'Cổng lò rèn không mở cho bạn.',
@@ -24926,8 +24805,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.legendaryNameShape': 'Det navn kan ikke indgraveres i værket.',
     'error.legendaryDeed': 'Du skal bruge et Skabelsesskøde for at gøre det værk til en legende.',
 
-    'error.townFocusRespecCancelled':
-      'Du havde ikke råd til at nulstille dit fokus, så det blev annulleret.',
     'error.ignivarRaidInCombat': 'Dit raid er stadig i kamp. Du kan gå ind, når kampen er slut.',
     'error.ignivarForgeGateSealed': 'Smedjens port er lukket for dig.',
     'error.liveRaidClaimUnsafe':
@@ -29740,11 +29617,6 @@ const RULES: Rule[] = [
     re: /^Your Umbral Anchor is out of range\.$/,
     build: () =>
       `${tEntity({ kind: 'ability', id: 'umbral_anchor', field: 'name' })}: ${t('hud.errors.outOfRange')}`,
-  },
-  // #1144: timed town-focus re-spec queued (Sim.setTownFocus).
-  {
-    re: /^Your focus re-spec will complete in (\d+)s\.$/,
-    build: (m) => tSim('log.townFocusRespecQueued', { seconds: m[1] }),
   },
   // Profession-service in-progress countdowns (social/chat_readouts.ts
   // castingReadout): craft/disenchant/enchant/salvage/tool-recharge each hold

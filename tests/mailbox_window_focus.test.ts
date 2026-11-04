@@ -209,8 +209,8 @@ describe('the mailbox parcel list carries keyboard focus across its own rebuild'
   });
 
   it('never reads a focus key off a control OUTSIDE the window', () => {
-    // The shared namespace hazard the extraction is about: town_focus_window keys its
-    // allocation steppers with the SAME data-focus-key attribute in the same
+    // The shared namespace hazard the extraction is about: other windows key their
+    // own controls with the SAME data-focus-key attribute in the same
     // <id>:<role> shape. Plant one of those outside the mailbox, focus it, and repaint:
     // the parcel list must not pull focus into itself.
     const { root } = stagedParcel(FANG, 4);

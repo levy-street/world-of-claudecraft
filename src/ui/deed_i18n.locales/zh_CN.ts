@@ -635,7 +635,6 @@ export const table: DeedLocaleTable = {
   soc_pocket_money: { name: '零花钱', desc: '生涯累计拾取1金币的钱币。' },
   soc_heavy_purse: { name: '沉甸甸的钱袋', desc: '生涯累计拾取10金币的钱币。' },
   soc_wyrms_hoard: { name: '巨龙的宝藏', desc: '生涯累计拾取100金币的钱币。' },
-  soc_civic_duty: { name: '公民义务', desc: '分配你的第一个城镇专注点。' },
   exp_long_road_north: { name: '北上长路', desc: '造访全部三座主城：东溪、芬桥与高望。' },
   exp_vale_wayfarer: { name: '溪谷远行者', desc: '造访东溪谷的全部11处具名之地。' },
   exp_marsh_wayfarer: { name: '湿地远行者', desc: '造访泥沼湿地的全部8处具名之地。' },

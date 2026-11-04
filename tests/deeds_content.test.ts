@@ -153,8 +153,11 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 346, 3810.
     // + Lantern Hall (the Highwatch guild): three contract milestones (5, 10, 25) and the
     // quartermaster's three zero-Renown title feats: 352, 3850.
-    expect(DEED_ORDER.length).toBe(369);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(4010);
+    // Town Focus removed from the game (2026-11-04): soc_civic_duty (renown 5)
+    // leaves the catalog outright, the one deletion the append-only table has
+    // taken (docs/design/deeds.md, rule 5's third recorded consequence): 368, 4005.
+    expect(DEED_ORDER.length).toBe(368);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(4005);
   });
 
   it('ships the audited per-category counts', () => {
@@ -201,7 +204,8 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       pvp: 40,
       // +2 bank socket ladder deeds (soc_strongbox_outfitter,
       // soc_four_bags_deep; Bank Storage phase 06).
-      social: 20,
+      // -1 soc_civic_duty, removed with the Town Focus mechanic.
+      social: 19,
       // +2 the Clue Scroll casket pair (exp_clue_first_casket and
       // exp_clue_ten_caskets, both on the clueCasketsOpened meter).
       // +1 the release's ferry round trip (exp_harbor_to_harbor).
@@ -213,10 +217,11 @@ describe('audited launch totals (literals: update deliberately with the catalog)
   });
 
   it('pins the catalog-refresh additions: ids, order, and renown literals', () => {
-    // The refresh tail appends AFTER the 186-deed launch set; both the launch
+    // The refresh tail appends AFTER the launch set (186 deeds as shipped, 185
+    // since soc_civic_duty left with the Town Focus mechanic); both the launch
     // block and the tail are order-pinned so any insertion or reorder reds.
-    expect(DEED_ORDER[185]).toBe('hid_codfather');
-    expect(DEED_ORDER.slice(186)).toEqual([
+    expect(DEED_ORDER[184]).toBe('hid_codfather');
+    expect(DEED_ORDER.slice(185)).toEqual([
       'prog_crown_below',
       'prog_mere_at_rest',
       'prog_callused_hands',
@@ -1138,7 +1143,14 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // Release merge: retain the release catalogue first and append integration's
   // 33 deeds. Stripping them reproduces the release's frozen digest below.
   // Main's frozen catalog is preserved as the prefix; Halloween appends ten feats.
-  const FROZEN_CATALOG_SHA256 = '6209fd36c03fe4f3d6c8a4ba2966d04b4ba0ba2c21128b82db589c50e24697b2';
+  // Re-baselined 2026-11-04 when Town Focus left the game and took its deed
+  // soc_civic_duty (Civic Duty, renown 5, a launch-block row) with it: a
+  // DELETION, not an append, and the one the append-only table has taken
+  // (docs/design/deeds.md, rule 5's third recorded consequence). Like the
+  // v0.42.0 retune, it cannot be verified the auditable way, so the literal is
+  // MEASURED off the live table; no other row's trigger or renown moved (the
+  // ids, order and renown pins above prove the rest of the table intact).
+  const FROZEN_CATALOG_SHA256 = 'ac4694749689eda53c4c3369c0d2c403292c3baac4f62f2ce25848760cdc0a6d';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -1219,8 +1231,15 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   //
   // The hard Wisp Maze deed now appends after the World PvP title ladder.
   // Stripping it reproduces the previous 325-deed mint.
+  //
+  // The 2026-11-04 Town Focus removal DELETED soc_civic_duty from the launch
+  // block, so the old f0b1e522... pre-append literal can never reproduce again
+  // by stripping the ten Gourdlight feats alone. As at the v0.42.0 retune, the
+  // baseline below is MEASURED fresh off the live table with those ten removed,
+  // folding the one deletion into the checkpoint; every append AFTER it is
+  // once again provable the auditable way against it.
   const PRE_APPEND_CATALOG_SHA256 =
-    'f0b1e522f87715f2ffbf812095ea6fb172aa9116d57c706a9fe65f945b1b482d';
+    '8a6d2800c8ee671e7eab580e86677be5597b235ab010570cbbd56048067f7bbb';
   const APPENDED_SINCE: readonly string[] = [
     'feat_gourdlight_guise',
     'feat_old_thatchgrin',
