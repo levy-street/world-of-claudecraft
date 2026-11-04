@@ -40,28 +40,46 @@ export function isTameableFamily(family: MobFamily): boolean {
 // Provenance of the three ratios, per the rule in docs/design/spell-balance-framework.md
 // that a coefficient needs a classic-era formula, a checked-in reference, or a measured
 // result. Armor and attack power are the classic-era inheritance ratios verbatim. Health
-// is the one adaptation, and is derived below rather than picked.
+// is a deliberate design choice, documented below.
 
 /**
- * Share of the owner's max health added to the pet's template pool.
+ * Share of the owner's max health added to a hunter pet's template pool.
  *
- * The classic-era rule inherits a share of the hunter's STAMINA, which does not port
- * directly: a pet here has no stamina stat at all, its pool is the flat template ladder
- * `hpBase + hpPerLevel * (level - 1)`, so there is nothing for a stamina ratio to apply
- * to. Re-basing the same rule onto the owner's health is what this is, and at the
- * level-20 reference the two agree closely: the classic 45% of the hunter's
- * stamina-derived health is 176, against 181 from 25% of max health (a 3% gap).
+ * Max health is the basis rather than stamina because a pet here has no stamina stat:
+ * its pool is the flat template ladder `hpBase + hpPerLevel * (level - 1)`.
  *
- * Max health is deliberately the basis rather than the stamina component, because it is
- * the more CONSERVATIVE of the two once gear is involved: at best-in-slot the
- * stamina-faithful port would hand the pet 531 health where this hands it 379.
- *
- * The measured corroboration, per the framework's third arm: this lands a median
- * tameable beast in the warlock tank demons' durability band (which is the comparison
- * that matters, since those are the pets it competes with) instead of well under it,
- * which is why beast pets were dying to raid damage demons survived.
+ * 60% is the TANK share, the same one a warlock's threat-holding pet gets
+ * (WARLOCK_TANK_PET_OWNER_HP_SHARE below): every tameable beast taunts (Growl, see
+ * pet_taunt_gate.ts), so a hunter pet is a tank pet. It was 25% (a stamina-faithful
+ * port of the classic-era 45% stamina rule), which left a level-20 beast at 502 to 682
+ * health, low enough for a single big spell to kill it. A test pins that every tameable
+ * template can taunt, so this premise cannot drift silently.
  */
-export const PET_OWNER_HP_SHARE = 0.25;
+export const PET_OWNER_HP_SHARE = 0.6;
+
+/**
+ * Share of the owner's max health added to a warlock pet's template pool (the
+ * demons and the Necromancy undead). Before this, warlock pets kept only their
+ * flat template pool, so at level 20 a single big spell killed Emberkin (363)
+ * or the Bone Mage (193), while every normal tamed beast already sat above 500.
+ * Health only: their armor, damage and haste stay as authored.
+ */
+export const WARLOCK_PET_OWNER_HP_SHARE = 0.5;
+
+/** The larger share for a warlock pet that holds threat (Duskmurk, Graveguard). */
+export const WARLOCK_TANK_PET_OWNER_HP_SHARE = 0.6;
+
+/**
+ * Warlock pets that never inherit: the Pyre Colossus is a 30 sec Ruination
+ * cooldown that already has the largest pool, not a standing companion.
+ */
+export const WARLOCK_PET_HP_SHARE_EXCLUDED: ReadonlySet<string> = new Set(['pyre_colossus']);
+
+/** The owner health share for a warlock pet, or 0 when it does not inherit. */
+export function warlockPetOwnerHpShare(templateId: string, isTank: boolean): number {
+  if (WARLOCK_PET_HP_SHARE_EXCLUDED.has(templateId)) return 0;
+  return isTank ? WARLOCK_TANK_PET_OWNER_HP_SHARE : WARLOCK_PET_OWNER_HP_SHARE;
+}
 
 /**
  * Share of the owner's armor added to the pet's template armor. This is the classic-era

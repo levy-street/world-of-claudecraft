@@ -15,9 +15,14 @@ import {
 import {
   isTameableFamily,
   PET_CATCHUP_SPEED_MULT,
+  PET_OWNER_HP_SHARE,
   petHeelSpeed,
   petOwnerScaling,
+  WARLOCK_PET_OWNER_HP_SHARE,
+  WARLOCK_TANK_PET_OWNER_HP_SHARE,
+  warlockPetOwnerHpShare,
 } from '../src/sim/pet/pet_scaling';
+import { petCanForceTaunt } from '../src/sim/pet/pet_taunt_gate';
 import { Sim } from '../src/sim/sim';
 import { DT, type Entity, type ItemDef, RUN_SPEED, type Vec3 } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
@@ -83,11 +88,11 @@ function tamedWolf(level = 20): {
 
 describe('pet_scaling: owner share math', () => {
   it('splits the owner into the documented shares', () => {
-    // Literal pin of the ratios themselves (0.25 hp, 0.35 armor, 0.22 ranged AP, 1.0
-    // melee haste), so a retune has to come here and be deliberate.
+    // Literal pin of the ratios themselves (0.6 hp, the tank share; 0.35 armor, 0.22
+    // ranged AP, 1.0 melee haste), so a retune has to come here and be deliberate.
     expect(petOwnerScaling({ maxHp: 1000, armor: 400, rangedPower: 300, meleeHaste: 0.2 })).toEqual(
       {
-        hp: 250,
+        hp: 600,
         armor: 140,
         attackPower: 66,
         meleeHaste: 0.2,
@@ -99,11 +104,25 @@ describe('pet_scaling: owner share math', () => {
     expect(
       petOwnerScaling({ maxHp: 101, armor: 101, rangedPower: 101, meleeHaste: 0.075 }),
     ).toEqual({
-      hp: 25,
+      hp: 61,
       armor: 35,
       attackPower: 22,
       meleeHaste: 0.075,
     });
+  });
+
+  it('gives hunter pets the tank share because every tameable beast taunts', () => {
+    // PET_OWNER_HP_SHARE is the tank share on the premise that a hunter pet is a
+    // tank pet. If a tameable template ever loses its taunt, that pet needs the
+    // smaller share and this premise needs revisiting.
+    expect(PET_OWNER_HP_SHARE).toBe(WARLOCK_TANK_PET_OWNER_HP_SHARE);
+    // The same template filter tameError applies (family, then untameable, elite,
+    // boss and rare), so this walks exactly the beasts a hunter can own.
+    const tameable = Object.entries(MOBS).filter(
+      ([, t]) => isTameableFamily(t.family) && !t.untameable && !t.elite && !t.boss && !t.rare,
+    );
+    expect(tameable.length).toBeGreaterThan(0);
+    for (const [id] of tameable) expect(petCanForceTaunt(id), `${id} cannot taunt`).toBe(true);
   });
 
   it('never returns a negative share for a drained owner', () => {
@@ -283,7 +302,7 @@ describe('pet_scaling: re-deriving is safe', () => {
     const beforeHp = pet.hp;
     hunter.maxHp += 400;
     applyPetOwnerScaling(sim.ctx, pet);
-    const gained = Math.round(400 * 0.25);
+    const gained = Math.round(400 * PET_OWNER_HP_SHARE);
     expect(pet.maxHp).toBe(before + gained);
     expect(pet.hp).toBe(beforeHp + gained);
   });
@@ -321,7 +340,7 @@ describe('pet_scaling: re-deriving is safe', () => {
     const withAura = pet.maxHp;
     hunter.maxHp += 400;
     applyPetOwnerScaling(sim.ctx, pet);
-    expect(pet.maxHp).toBe(withAura + Math.round(400 * 0.25));
+    expect(pet.maxHp).toBe(withAura + Math.round(400 * PET_OWNER_HP_SHARE));
   });
 });
 
@@ -413,19 +432,34 @@ describe('pet_scaling: scope', () => {
     expect(demon.petOwnerHpBonus).toBe(0);
   });
 
-  it('leaves a warlock demon on its authored pool', () => {
+  // Warlock pets inherit HEALTH only: 60% of the warlock's max health for the
+  // threat-holding demon (Duskmurk), 50% for the others, none for the 30 sec
+  // Pyre Colossus. Their attack power stays 0 (authored damage, not a share).
+  it.each([
+    ['gloomshade', WARLOCK_TANK_PET_OWNER_HP_SHARE],
+    ['emberkin', WARLOCK_PET_OWNER_HP_SHARE],
+  ])('gives the warlock demon %s its share of the owner health', (templateId, pct) => {
     const sim = new Sim({ seed: 5, playerClass: 'warlock', noPlayer: true }) as AnySim;
     const wid = sim.addPlayer('warlock', 'Caster') as number;
     sim.setPlayerLevel(20, wid);
     const warlock = sim.entities.get(wid) as AnyEntity;
-    summonPet(sim.ctx, warlock, 'gloomshade');
+    summonPet(sim.ctx, warlock, templateId);
     const demon = petOf(sim.ctx, wid) as AnyEntity;
-    expect(demon.maxHp).toBe(templateHp('gloomshade', demon.level));
-    expect(demon.attackPower).toBe(0);
-    expect(demon.petOwnerHpBonus).toBe(0);
     for (let i = 0; i < 20; i++) sim.tick();
-    expect(demon.maxHp).toBe(templateHp('gloomshade', demon.level));
+    const share = Math.round(warlock.maxHp * pct);
+    expect(demon.petOwnerHpBonus).toBe(share);
+    expect(demon.maxHp).toBe(templateHp(templateId, demon.level) + share);
+    expect(demon.hp).toBe(demon.maxHp);
     expect(demon.attackPower).toBe(0);
+  });
+
+  it('keeps the warlock share rules: tank 60%, others 50%, Pyre Colossus none', () => {
+    expect(WARLOCK_TANK_PET_OWNER_HP_SHARE).toBe(0.6);
+    expect(WARLOCK_PET_OWNER_HP_SHARE).toBe(0.5);
+    expect(warlockPetOwnerHpShare('graveguard', true)).toBe(0.6);
+    expect(warlockPetOwnerHpShare('necromancy_bone_mage', false)).toBe(0.5);
+    expect(warlockPetOwnerHpShare('pyre_colossus', true)).toBe(0);
+    expect(warlockPetOwnerHpShare('pyre_colossus', false)).toBe(0);
   });
 });
 
