@@ -519,4 +519,10 @@ body {
   background-image: url("/wiki/resources/assets/game/map_bg/wraithwood.webp");
 }
 
-.woc-page-art { display:block; max-width:180px; height:88px; object-fit:contain; margin:12px 0; }
+.woc-page-art {
+  display: block;
+  max-width: 180px;
+  height: 88px;
+  object-fit: contain;
+  margin: 12px 0;
+}

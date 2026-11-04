@@ -116,7 +116,7 @@ describe('the searchable player encyclopedia', () => {
     for (const page of standard) {
       expect(page).toContain('== Walkthrough ==');
       expect(page).toMatch(/title=&quot;[^&]*?\([-\d.]+, [-\d.]+\)/);
-      expect(page).toContain('Hand-in');
+      expect(page).toMatch(/class=&quot;woc-pin&quot; title=&quot;[S0-9/]*H(?:[/0-9]* )/);
     }
   });
 });

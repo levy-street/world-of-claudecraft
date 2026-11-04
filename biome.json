@@ -53,6 +53,13 @@
   "overrides": [
     {
       "includes": [
+        "mediawiki/reader/companion/woc-chrome.css",
+        "mediawiki/reader/companion/woc-premium.css"
+      ],
+      "formatter": { "enabled": false }
+    },
+    {
+      "includes": [
         "docs/achievements/placeholder-art-completion-2026-08-09/accepted-art.json",
         "docs/achievements/placeholder-art-completion-2026-08-09/mob-portrait-source-manifest.json",
         "docs/achievements/placeholder-art-completion-2026-08-09/weapons-a-generation-record.json",

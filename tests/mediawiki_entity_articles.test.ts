@@ -54,6 +54,9 @@ describe('encyclopedia entity articles', () => {
     );
     expect(pages.get('mob/balgath_cyclops')).toContain('next dawn');
     expect(pages.get('item/emissary_cache')).toContain('equally likely');
+    expect(pages.get('item/legendary_cowl_of_event_horizon')).toContain('hoard');
+    expect(pages.get('item/siltguard_helm')).toContain('equal odds');
+    expect(pages.get('item/reins_mech_bird')).toContain('Legacy souvenir');
     expect(pages.get('item/seal_of_the_nine_oaths')).toContain('Heroic Marks');
     const unlisted = Object.values(DUNGEONS).find(
       (d) => d.guideVisible === false && d.spawns.length,

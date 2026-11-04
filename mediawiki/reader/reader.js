@@ -359,7 +359,7 @@ export async function openReader({ seedUrl, packed, assetUrl }) {
     window.addEventListener('hashchange', () => {
       clearTimeout(timer);
       show();
-      window.scrollTo({top:0,left:0,behavior:'instant'});
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
       view.focus({ preventScroll: true });
     });
     show();

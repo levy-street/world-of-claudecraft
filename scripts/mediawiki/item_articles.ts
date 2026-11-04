@@ -1,4 +1,3 @@
-import {indexSpecialItemSources} from './special_item_sources';
 import { stackSizeOf } from '../../src/sim/bags';
 import {
   CASKET_COPPER_BASE,
@@ -20,6 +19,7 @@ import { ITEM_SETS } from '../../src/sim/content/item_sets';
 import { MOUNTS } from '../../src/sim/content/mounts';
 import { MOBILE_CRAFTING_STATION_DURATION_TICKS } from '../../src/sim/content/professions';
 import { RELIQUARY_PAGES, reliquaryRelicSource } from '../../src/sim/content/reliquary';
+import { MECH_CHROMAS, SKIN_RANK_ROLL_WEIGHTS, SKIN_RANKS } from '../../src/sim/content/skins';
 import {
   HOARD_MIN_LEVEL,
   TREASURE_DIG_RADIUS,
@@ -72,6 +72,7 @@ import {
 } from '../../src/ui/trinket_tooltip_view';
 import { indexActivityItems } from './activity_item_sources';
 import { type ArticleTools, append, lines, pct, recipeLabel, ref, words } from './entity_format';
+import { indexSpecialItemSources } from './special_item_sources';
 import { vendorOfferText } from './vendor_offer';
 
 // Each reused HUD builder emits escaped single-line divs. Keep their player-facing
@@ -365,12 +366,34 @@ function effects(w: ArticleTools, item: ItemDef): string[] {
         out.push('Starts the one-time hammer quest. Crafting consumes the Ember.');
         break;
 
-      case 'mechChroma':
-        out.push('Unlocks the ' + words(use.chromaId) + ' mech color.');
+      case 'mechChroma': {
+        out.push('Use to unlock the ' + words(use.chromaId) + ' mech color on your account.');
+        const chroma = MECH_CHROMAS.find((c) => c.id === use.chromaId);
+        if (chroma)
+          out.push(
+            'To unlock the appearance directly, use ' +
+              ref(w, 'item', 'alien_armor_plate') +
+              ', roll ' +
+              chroma.rank +
+              ' or higher and choose this color. That choice grants the appearance directly rather than a plate item.',
+          );
         break;
+      }
 
       case 'skinSelect':
-        out.push('Roll a reward rank and choose a skin of that rank or lower.');
+        out.push(
+          'Roll a reward rank and choose a skin of that rank or lower. Rank odds: ' +
+            SKIN_RANKS.map(
+              (rank) =>
+                rank +
+                ' ' +
+                pct(
+                  SKIN_RANK_ROLL_WEIGHTS[rank] /
+                    Object.values(SKIN_RANK_ROLL_WEIGHTS).reduce((a, b) => a + b, 0),
+                ),
+            ).join(', ') +
+            '. Claiming your choice consumes the token.',
+        );
         break;
 
       case 'harvestPreference':
@@ -432,7 +455,7 @@ function effects(w: ArticleTools, item: ItemDef): string[] {
 export function addItemArticles(w: ArticleTools, sources: Map<string, Set<string>>) {
   const uses = new Map<string, Set<string>>();
   indexActivityItems(w, sources, uses);
-  indexSpecialItemSources(w,sources);
+  indexSpecialItemSources(w, sources);
 
   for (const n of Object.values(NPCS))
     for (const id of n.vendorItems ?? []) {
@@ -637,3 +660,31 @@ export function addItemArticles(w: ArticleTools, sources: Map<string, Set<string
       ways.push(
         h.corpsePreferenceItemId
           ? 'Harvest creature corpses. Set harvest preference to ' +
+              ref(w, 'item', h.corpsePreferenceItemId) +
+              '.'
+          : 'Gather through ' + words(h.familyId) + '.',
+      );
+
+    const season = seasonalItemSourceText(item);
+    if (season) ways.push(season);
+
+    w.add(
+      w.titleBy.item.get(item.id)!,
+      w.section(
+        'Overview',
+        item.name +
+          ' is a ' +
+          quality +
+          ' ' +
+          kind +
+          (item.slot ? ' for ' + words(item.slot) : '') +
+          '.',
+      ) +
+        w.section('Facts', w.table(facts)) +
+        lines(w, 'Equipment and use', effects(w, item)) +
+        lines(w, 'Sources', ways.length ? ways : ['Acquisition unverified for this release.']) +
+        lines(w, 'Used for', Array.from(uses.get(item.id) ?? [])),
+      ['Items', kind, quality],
+    );
+  }
+}
