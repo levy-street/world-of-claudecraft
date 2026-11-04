@@ -2562,6 +2562,12 @@ export class OptionsWindow {
     // Wide, multi-column layout for the key-binding view only; each sibling
     // sub-view keeps its own board-specific width.
     el.classList.add('kb-wide');
+    // Every rebind, cancel, conflict prompt and toggle repaints this panel in
+    // place, which swaps in a fresh scroller at the top. Carry the old
+    // scroller's offset over so clicking a key low in the list keeps the row in
+    // view. Navigation goes through render(), whose layout.finish() then sets
+    // the view's own remembered offset, so this never leaks between views.
+    const keptScrollTop = el.querySelector('.ui-win-body')?.scrollTop ?? 0;
     const scroll = this.viewShell(t('hud.options.keyBindings'));
     const rail = document.createElement('div');
     rail.className = 'kb-options-rail';
@@ -2725,6 +2731,7 @@ export class OptionsWindow {
     footer.append(reset, back);
     el.appendChild(footer);
     el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
+    scroll.scrollTop = keptScrollTop;
   }
 
   private beginCapture(actionId: string, index: number, fallbackLabel: string): void {
