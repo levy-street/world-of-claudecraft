@@ -1446,10 +1446,12 @@ describe('ActionBarController per-spec action bar memory and talent choice swaps
     controller.replaceAttackAction({ type: 'ability', id: 'fireball' });
     controller.saveAttackAction();
 
-    // Switch to frost
+    // First visit to frost: it has no key 1 of its own yet, so it starts from
+    // Fire's instead of an empty slot, stored under frost's own key.
     state.spec = 'frost';
     controller.syncSpec();
-    expect(controller.attackAction).toBeNull();
+    expect(controller.attackAction).toEqual({ type: 'ability', id: 'fireball' });
+    expect(storage.getItem('woc_hotbar_mage_ActionbarTester_frost:s0')).not.toBeNull();
 
     // Place frostbolt on attack slot for Frost
     controller.replaceAttackAction({ type: 'ability', id: 'frostbolt' });
@@ -1464,6 +1466,37 @@ describe('ActionBarController per-spec action bar memory and talent choice swaps
     state.spec = 'frost';
     controller.syncSpec();
     expect(controller.attackAction).toEqual({ type: 'ability', id: 'frostbolt' });
+  });
+
+  it('swaps the attack slot per spec when a saved build switches the spec', () => {
+    // A build switch installs its bar through applyLoadout, which takes the new
+    // spec itself, so the per-frame syncSpec never sees a change. It must still
+    // keep each spec's own key 1, and never write one spec's over the other's.
+    const storage = new MemoryStorage();
+    const { controller, state } = makeHarness('mage', ['fireball', 'frostbolt'], bar(), storage);
+    state.showAttackButton = false;
+    state.spec = 'fire';
+    controller.init();
+    controller.replaceAttackAction({ type: 'ability', id: 'fireball' });
+    controller.saveAttackAction();
+    state.spec = 'frost';
+    controller.syncSpec();
+    controller.replaceAttackAction({ type: 'ability', id: 'frostbolt' });
+    controller.saveAttackAction();
+
+    // Build switch back to Fire: the live spec flips, then the build applies.
+    state.spec = 'fire';
+    controller.applyLoadout(bar().map(() => null), { spec: 'fire', rows: {} });
+    controller.saveActions();
+    expect(controller.syncSpec()).toBe(false);
+    expect(controller.actionForSlot(0)).toEqual({ type: 'ability', id: 'fireball' });
+
+    // And back to Frost: its own key 1 survived the Fire save untouched.
+    state.spec = 'frost';
+    controller.applyLoadout(bar().map(() => null), { spec: 'frost', rows: {} });
+    controller.saveActions();
+    expect(controller.actionForSlot(0)).toEqual({ type: 'ability', id: 'frostbolt' });
+    expect(storage.getItem('woc_hotbar_mage_ActionbarTester_fire:s0')).toContain('fireball');
   });
 });
 
