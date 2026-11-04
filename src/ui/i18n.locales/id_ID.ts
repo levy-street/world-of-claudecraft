@@ -2108,7 +2108,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Panggilan Pasang juga melindungi targetnya sebesar 5 persen dari kesehatan maksimal-mu selama 6 detik.',
   'entities.itemSets.vanguard_shaman_restoration.name': 'Perang Garam Brineward',
   'entities.itemSets.vanguard_warlock_affliction.bonus2':
-    'Waktu jentikan Cekaman dikurangi 0.3 detik. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
+    'Jeda Jangkar Bayangan dikurangi 15 detik. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     'Melahap menyembuhkan 30 persen lebih banyak dan dapat disalurkan sambil bergerak.',
   'entities.itemSets.vanguard_warlock_affliction.name': 'Gaun Bulu Dread',
@@ -7400,6 +7400,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.levelFamily': '{family} Level {level}',
   'hudChrome.mobTooltip.elite': 'Elite',
   'hudChrome.mobTooltip.boss': 'Bos',
+  'hudChrome.mobTooltip.buddyOwner': 'Teman milik {owner}',
   'hudChrome.options.aurasOnPlayerFrame': 'Buff pada Bingkai Pemain',
   'hudChrome.options.playerFrameScale': 'Skala Bingkai Pemain',
   'hudChrome.options.showDailyRewardsChest': 'Tampilkan Peti Hadiah Harian',
@@ -8020,7 +8021,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Kuda-kuda tempur bertahan: kamu menghasilkan 30% lebih banyak ancaman tetapi memberi dan menerima 10% lebih sedikit kerusakan. Rapal lagi untuk meninggalkan kuda-kuda ini.',
   'entities.abilities.defensive_stance.name': 'Kuda-kuda Waspada',
   'entities.abilities.demon_skin.description':
-    'Kulit iblis meningkatkan zirahmu sebesar {buff} selama 30 menit.',
+    'Kulit iblis meningkatkan zirahmu sebesar {buff} selama 30 menit. Pact Deepened dapat menggandakan zirah ini dan mengurangi kerusakan sihir yang diterima selama Kulit Iblis aktif.',
   'entities.abilities.demon_skin.name': 'Kulit Iblis',
   'entities.abilities.demoralizing_roar.description':
     'Melemahkan semangat musuh di sekitar, mengurangi kekuatan serang mereka sebesar 20 selama 20 detik. Hanya dalam Wujud Bruin.',
@@ -8061,7 +8062,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.expose_armor.name': 'Tembus Zirah',
   'entities.abilities.faerie_fire.name': 'Cahaya Sihir',
   'entities.abilities.fear.description':
-    'Menanamkan teror ke dalam musuh, membuatnya gemetar ketakutan hingga 5 detik. Kerusakan total sebesar 8% dari kesehatan maksimum target mematahkan efeknya.',
+    'Menanamkan teror ke dalam musuh, membuatnya gemetar ketakutan hingga 5 detik. Kerusakan total sebesar 10% dari kesehatan maksimum target mematahkan efeknya.',
   'entities.abilities.fear.name': 'Cekaman',
   'entities.abilities.ferocious_bite.name': 'Gigitan Berdarah',
   'entities.abilities.fire_blast.description':
@@ -8151,7 +8152,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Melindungimu dengan es, menyerap {damage} kerusakan selama 60 detik.',
   'entities.abilities.ice_barrier.name': 'Selubung Beku',
   'entities.abilities.immolate.description':
-    'Membakar musuh sebesar {damage} kerusakan Api dan tambahan {overTime} selama 15 detik.',
+    'Membakar musuh sebesar {damage} kerusakan Api selama 15 detik.',
   'entities.abilities.immolate.name': 'Pakta Membara',
   'entities.abilities.insect_swarm.description':
     'Musuh dikerumuni serangga, menerima {damage} kerusakan Alam selama 12 detik.',
@@ -10608,8 +10609,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Mengantrekan ayunan lebih berat yang menghabiskan amarah pada pukulanmu berikutnya.',
   'guide.abilityHook.holy_light':
     'Penyembuhan mantap berukuran besar untuk memenuhi nyawa sekutu atau dirimu sendiri.',
-  'guide.abilityHook.immolate':
-    'Membakar sasaran untuk hantaman pembuka dan kobaran yang terus membara.',
+  'guide.abilityHook.immolate': 'Membakar sasaran dengan kobaran yang terus membara.',
   'guide.abilityHook.judgement':
     'Menghabiskan Segel aktifmu untuk menghantam musuh dari jarak dekat.',
   'guide.abilityHook.lesser_heal':
@@ -14739,7 +14739,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_stream.description':
     'Memulihkan 120 nyawa target sekutu selama 12 detik. (talenta Shaman)',
   'entities.abilities.howl_of_terror.description':
-    'Membuat musuh di dekatnya ketakutan hingga 5 detik. Kerusakan total sebesar 8% dari kesehatan maksimum target mematahkan ketakutannya. (talenta Warlock)',
+    'Membuat musuh dalam radius 8 yard dari lokasi yang dipilih ketakutan hingga 5 detik. Kerusakan total sebesar 10% dari kesehatan maksimum target mematahkan ketakutannya. (talenta Warlock)',
   'entities.abilities.ice_block.description':
     'Membungkusmu dalam es padat selama 8 detik, membuatmu kebal terhadap semua kerusakan. Menghapus efek berbahaya biasa yang sudah aktif dan mencegah penerapan efek pengendalian biasa yang baru. Dapat digunakan saat terkena stun atau polymorph. Kamu tidak dapat bertindak selama terbungkus. Rapal lagi untuk membatalkan. (mage)',
   'entities.abilities.inner_focus.description':
@@ -16770,7 +16770,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Meningkatkan kecepatan gerak sebesar 35%, tetapi mengorbankan 2% dari nyawa maksimummu setiap detik. Rapal lagi untuk membatalkan. Efek ini nonaktif secara otomatis pada 20% nyawa.',
   'entities.abilities.sacrilegious_march.name': 'Barisan Penodaan',
   'entities.abilities.sentence.description':
-    'Mengonsumsi semua Kecaman dan Benang Takdir untuk menjatuhkan vonis kepada musuh. Setiap Benang meningkatkan kerusakan sebesar 6%. Efek tambahan meningkat pada 20, 50, 80, dan 100 Kecaman. Skala kerusakannya mendatar setelah level 16.',
+    'Mengonsumsi semua Kecaman dan Benang Takdir untuk menjatuhkan vonis kepada musuh. Membutuhkan setidaknya 20 Kecaman. Kerusakan meningkat sesuai Kecaman yang dikonsumsi, dan setiap Benang meningkatkannya sebesar 6%. Pada 50 Kecaman, juga memulihkanmu sebesar 20% dari kerusakan yang diberikan. Pada 80, juga mengenai musuh dalam radius 8 yard dari target sebesar 35% kerusakannya. Pada 100, juga memberikan 5% kerusakan lebih besar kepada pemain dan bos, serta langsung membunuh musuh biasa di bawah 20% kesehatan. Skala kerusakannya mendatar setelah level 16.',
   'entities.abilities.sentence.name': 'Vonis',
   'entities.abilities.sinister_strike.description':
     'Serangan seketika sebesar kerusakan senjata ditambah {damage}. Memberi 1 poin combo.',
@@ -16803,7 +16803,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.swipe.specNote_feral':
     'Setiap pukulan yang mengenai menambah 1 Darah Tua (maks 3).',
   'entities.abilities.umbral_anchor.description':
-    'Rapalan pertama: menjangkarkan bayanganmu di kakimu selama 5 menit. Rapal ulang dalam radius 40 yard untuk kembali ke sana, mengonsumsi jangkar dan memulai jeda 45 detik.',
+    'Rapalan pertama: menjangkarkan bayanganmu di kakimu selama 5 menit. Rapal ulang dalam radius 40 yard untuk kembali ke sana dan memulai jeda 45 detik. Setiap kepulangan meninggalkan jangkar baru selama 5 menit di tempatmu berdiri, jadi kamu bisa terus melompat bolak-balik sampai sebuah jangkar kedaluwarsa.',
   'entities.abilities.umbral_anchor.name': 'Jangkar Bayangan',
   'entities.abilities.unholy_command.description':
     'Menghabiskan 3 Serpihan Jiwa untuk memerintahkan semua mayat hidupmu memberikan 25% kerusakan lebih besar dan bertindak 20% lebih cepat selama 12 detik.',
@@ -16960,7 +16960,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Tiga Benang Takdir: Vonis dapat mengonsumsinya untuk 18% kerusakan tambahan.',
   'hudChrome.warlock.fateThreadsStatus': '{value} dari {max} Benang Takdir.',
   'itemUi.tooltip.useHealingPotionPct':
-    'Pakai: Memulihkan {percent}% dari nyawa maksimum seketika. Bisa dipakai dalam pertempuran. Jeda 2 mnt.',
+    'Pakai: Memulihkan {percent}% dari nyawa maksimum seketika. Bisa dipakai dalam pertempuran. Jeda 1 mnt.',
   'guide.controls.reliquary': 'Relikuari',
   'guide.deedsPage.rewardsBody':
     'Semua hadiahnya hanya untuk dipamerkan, dan memang itulah maksudnya. Sebagian jasa memberi gelar yang bisa kamu kenakan atau bingkai untuk membingkai namamu, dan tidak pernah sesuatu yang membuat pahlawanmu lebih kuat. Pilih gelar dan bingkai yang kamu mau dari Kitab Jasa: gelar itu ikut serta pada papan namamu, di obrolan, dan di papan peringkat agar dilihat semua orang, sedangkan bingkai menorehkan warnanya sendiri di sekeliling papan nama dan potretmu.',
@@ -19952,6 +19952,9 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.toolTooltip.wieldDegrade':
     'Di bawah keterampilan itu, ia masih berfungsi sebagai alat tingkat rendah.',
   'hudChrome.keybinds.hideInterface': 'Sembunyikan Antarmuka',
+  'hudChrome.keybinds.muteAudio': 'Bisukan Semua Suara',
+  'hudChrome.keybinds.audioMuted': 'Semua suara dibisukan. Tekan lagi untuk menyalakannya kembali.',
+  'hudChrome.keybinds.audioUnmuted': 'Suara menyala kembali.',
   'hudChrome.keybinds.targetParty1': 'Anggota Partai Sasaran 1',
   'hudChrome.keybinds.targetParty2': 'Anggota Partai Sasaran 2',
   'hudChrome.keybinds.targetParty3': 'Anggota Partai Sasaran 3',

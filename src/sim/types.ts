@@ -1317,6 +1317,10 @@ interface BaseItemDef {
   // same authoritative use path and shared cooldown as flat healing potions.
   potionHpPctMax?: number;
   potionMana?: number;
+  // Seconds this potion locks the shared potion cooldown for, when shorter than
+  // the default POTION_COOLDOWN (Soul Stone: 60). Any potion still reads the
+  // one shared timer before it can be used.
+  potionCooldown?: number;
   // elixirs: a temporary stat-buff aura granted on use (classic battle elixirs).
   // `aura` is a flavor name shown in the buff frame; `value` is the stat amount,
   // `duration` the buff length in seconds. Folds through the normal aura/stat path.

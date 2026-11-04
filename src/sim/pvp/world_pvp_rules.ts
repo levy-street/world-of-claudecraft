@@ -21,7 +21,9 @@ export const WORLD_PVP_MIN_LEVEL = 10;
 
 /** How long the flag stays up after /pvp off (the classic five minutes). The
  *  drop is DEFERRED while the player is in combat, so switching off mid-fight
- *  can never make an attacker's next blow fizzle. */
+ *  can never make an attacker's next blow fizzle, and every world PvP action
+ *  during the countdown restarts it from the full five minutes
+ *  (world_pvp.ts resetWorldPvpDisarm). */
 export const WORLD_PVP_DISARM_SECONDS = 300;
 
 /** The gold stake a world kill moves: the SMALLER of this cap and

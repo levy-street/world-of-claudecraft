@@ -2522,6 +2522,9 @@ export const id_ID: EnTranslations = {
       "friendlyNameplates": "Alihkan Papan Nama Sekutu",
       "sheathe": "Sarungkan/Cabut Senjata",
       "hideInterface": "Sembunyikan Antarmuka",
+      "muteAudio": "Bisukan Semua Suara",
+      "audioMuted": "Semua suara dibisukan. Tekan lagi untuk menyalakannya kembali.",
+      "audioUnmuted": "Suara menyala kembali.",
       "dive": "Berenang ke Bawah",
       "categoryPet": "Peliharaan",
       "petAttack": "Peliharaan: Serang",
@@ -5086,7 +5089,8 @@ export const id_ID: EnTranslations = {
       "hostile": "Bermusuhan",
       "friendly": "Ramah",
       "elite": "Elite",
-      "boss": "Bos"
+      "boss": "Bos",
+      "buddyOwner": "Teman milik {owner}"
     },
     "playerTooltip": {
       "guild": "<{guild}>",
@@ -10161,7 +10165,7 @@ export const id_ID: EnTranslations = {
       "shadow_bolt": "Anak panah bayangan yang kamu rapalkan ke sasaran, serangan andalanmu.",
       "summon_imp": "Memanggil Emberkin yang merapal Baut Fel ke musuh dari kejauhan.",
       "demon_skin": "Penguat-diri tahan lama yang mengeraskan kulitmu dan menambah zirah.",
-      "immolate": "Membakar sasaran untuk hantaman pembuka dan kobaran yang terus membara.",
+      "immolate": "Membakar sasaran dengan kobaran yang terus membara.",
       "corruption": "Membusukkan sasaran dengan bayangan yang menggerogoti sementara kamu melakukan hal lain.",
       "life_tap": "Menukar sebagian nyawamu sendiri kembali menjadi mana saat kamu kehabisan.",
       "wrath": "Anak panah alam yang dilontarkan ke sasaran dari kejauhan, serangan andalanmu.",
@@ -17182,7 +17186,7 @@ export const id_ID: EnTranslations = {
       "clickDestroy": "Klik untuk menghancurkan",
       "useFishing": "Pakai: Memancing di perairan terdekat.",
       "useHealingPotion": "Pakai: Memulihkan {amount} nyawa seketika. Bisa dipakai dalam pertempuran. Jeda 1 mnt.",
-      "useHealingPotionPct": "Pakai: Memulihkan {percent}% dari nyawa maksimum seketika. Bisa dipakai dalam pertempuran. Jeda 2 mnt.",
+      "useHealingPotionPct": "Pakai: Memulihkan {percent}% dari nyawa maksimum seketika. Bisa dipakai dalam pertempuran. Jeda 1 mnt.",
       "useManaPotion": "Pakai: Memulihkan {amount} mana seketika. Bisa dipakai dalam pertempuran. Jeda 1 mnt.",
       "clickUseInstant": "Klik untuk memakai seketika dalam pertempuran",
       "clickUse": "Klik untuk memakai",
@@ -18257,11 +18261,11 @@ export const id_ID: EnTranslations = {
       },
       "demon_skin": {
         "name": "Kulit Iblis",
-        "description": "Kulit iblis meningkatkan zirahmu sebesar {buff} selama 30 menit."
+        "description": "Kulit iblis meningkatkan zirahmu sebesar {buff} selama 30 menit. Pact Deepened dapat menggandakan zirah ini dan mengurangi kerusakan sihir yang diterima selama Kulit Iblis aktif."
       },
       "immolate": {
         "name": "Pakta Membara",
-        "description": "Membakar musuh sebesar {damage} kerusakan Api dan tambahan {overTime} selama 15 detik."
+        "description": "Membakar musuh sebesar {damage} kerusakan Api selama 15 detik."
       },
       "corruption": {
         "name": "Busuk Hitam",
@@ -18281,7 +18285,7 @@ export const id_ID: EnTranslations = {
       },
       "sentence": {
         "name": "Vonis",
-        "description": "Mengonsumsi semua Kecaman dan Benang Takdir untuk menjatuhkan vonis kepada musuh. Setiap Benang meningkatkan kerusakan sebesar 6%. Efek tambahan meningkat pada 20, 50, 80, dan 100 Kecaman. Skala kerusakannya mendatar setelah level 16."
+        "description": "Mengonsumsi semua Kecaman dan Benang Takdir untuk menjatuhkan vonis kepada musuh. Membutuhkan setidaknya 20 Kecaman. Kerusakan meningkat sesuai Kecaman yang dikonsumsi, dan setiap Benang meningkatkannya sebesar 6%. Pada 50 Kecaman, juga memulihkanmu sebesar 20% dari kerusakan yang diberikan. Pada 80, juga mengenai musuh dalam radius 8 yard dari target sebesar 35% kerusakannya. Pada 100, juga memberikan 5% kerusakan lebih besar kepada pemain dan bos, serta langsung membunuh musuh biasa di bawah 20% kesehatan. Skala kerusakannya mendatar setelah level 16."
       },
       "life_tap": {
         "name": "Tawar Getir",
@@ -18309,7 +18313,7 @@ export const id_ID: EnTranslations = {
       },
       "umbral_anchor": {
         "name": "Jangkar Bayangan",
-        "description": "Rapalan pertama: menjangkarkan bayanganmu di kakimu selama 5 menit. Rapal ulang dalam radius 40 yard untuk kembali ke sana, mengonsumsi jangkar dan memulai jeda 45 detik."
+        "description": "Rapalan pertama: menjangkarkan bayanganmu di kakimu selama 5 menit. Rapal ulang dalam radius 40 yard untuk kembali ke sana dan memulai jeda 45 detik. Setiap kepulangan meninggalkan jangkar baru selama 5 menit di tempatmu berdiri, jadi kamu bisa terus melompat bolak-balik sampai sebuah jangkar kedaluwarsa."
       },
       "soulwell": {
         "name": "Sumur Jiwa",
@@ -18341,7 +18345,7 @@ export const id_ID: EnTranslations = {
       },
       "fear": {
         "name": "Cekaman",
-        "description": "Menanamkan teror ke dalam musuh, membuatnya gemetar ketakutan hingga 5 detik. Kerusakan total sebesar 8% dari kesehatan maksimum target mematahkan efeknya."
+        "description": "Menanamkan teror ke dalam musuh, membuatnya gemetar ketakutan hingga 5 detik. Kerusakan total sebesar 10% dari kesehatan maksimum target mematahkan efeknya."
       },
       "searing_pain": {
         "name": "Bakar",
@@ -19012,7 +19016,7 @@ export const id_ID: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Lolongan Ngeri",
-        "description": "Membuat musuh di dekatnya ketakutan hingga 5 detik. Kerusakan total sebesar 8% dari kesehatan maksimum target mematahkan ketakutannya. (talenta Warlock)"
+        "description": "Membuat musuh dalam radius 8 yard dari lokasi yang dipilih ketakutan hingga 5 detik. Kerusakan total sebesar 10% dari kesehatan maksimum target mematahkan ketakutannya. (talenta Warlock)"
       },
       "ice_block": {
         "name": "Peti Es",
@@ -31055,7 +31059,7 @@ export const id_ID: EnTranslations = {
       },
       "vanguard_warlock_affliction": {
         "name": "Gaun Bulu Dread",
-        "bonus2": "Waktu jentikan Cekaman dikurangi 0.3 detik. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.",
+        "bonus2": "Jeda Jangkar Bayangan dikurangi 15 detik. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.",
         "bonus4": "Melahap menyembuhkan 30 persen lebih banyak dan dapat disalurkan sambil bergerak."
       },
       "vanguard_warlock_demonology": {

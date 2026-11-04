@@ -3104,6 +3104,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.friendly': '아군',
   'hudChrome.mobTooltip.elite': '정예',
   'hudChrome.mobTooltip.boss': '우두머리',
+  'hudChrome.mobTooltip.buddyOwner': '{owner}의 버디',
   'hudChrome.targetFrame.unlock': '대상 프레임 이동',
   'hudChrome.targetFrame.lock': '대상 프레임 고정',
   'hudChrome.playerFrame.unlock': '플레이어 프레임 이동',
@@ -4069,6 +4070,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.emoteWheel': '감정 표현 휠',
   'hudChrome.keybinds.sheathe': '무기 넣기/빼기',
   'hudChrome.keybinds.hideInterface': '인터페이스 숨기기',
+  'hudChrome.keybinds.muteAudio': '모든 소리 음소거',
+  'hudChrome.keybinds.audioMuted': '모든 소리를 음소거했습니다. 다시 누르면 소리가 켜집니다.',
+  'hudChrome.keybinds.audioUnmuted': '소리를 다시 켰습니다.',
   'hudChrome.keybinds.targetFriendly': '가장 가까운 아군 대상 지정',
   'hudChrome.keybinds.targetFriendlyNext': '아군 대상 순환',
   'hudChrome.keybinds.targetPrev': '대상 역방향 순환',
@@ -6237,10 +6241,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '적에게 어둠의 화살을 보내 {damage}의 암흑 피해를 입힙니다.',
   'entities.abilities.demon_skin.name': '마귀 가죽',
   'entities.abilities.demon_skin.description':
-    '악마의 피부가 30분 동안 방어도를 {buff}만큼 증가시킵니다.',
+    '악마의 피부가 30분 동안 방어도를 {buff}만큼 증가시킵니다. 계약 심화를 배우면 마귀 가죽이 활성화된 동안 이 방어도가 두 배가 되고 받는 마법 피해가 감소합니다.',
   'entities.abilities.immolate.name': '불타는 계약',
   'entities.abilities.immolate.description':
-    '적을 불태워 {damage}의 화염 피해를 입히고 15초에 걸쳐 추가로 {overTime}의 피해를 입힙니다.',
+    '적을 불태워 15초에 걸쳐 {damage}의 화염 피해를 입힙니다.',
   'entities.abilities.corruption.name': '검은 부패',
   'entities.abilities.corruption.description':
     '대상을 부패시켜 18초에 걸쳐 {damage}의 암흑 피해를 입힙니다.',
@@ -6254,7 +6258,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '대상의 생명력을 집어삼켜 매초 {damage}의 암흑 피해를 입히고 그중 70%를 생명력으로 당신에게 옮깁니다. 고통은 대신 전부를 옮깁니다. 주된 사안에 정신을 집중하면 시작할 때 운명의 실타래를 모두 소모하고, 실타래마다 매 주기 단죄를 1씩 더 만듭니다.',
   'entities.abilities.fear.name': '번민',
   'entities.abilities.fear.description':
-    '적에게 공포를 심어 최대 5초 동안 떨게 만듭니다. 대상 최대 생명력의 8%에 해당하는 누적 피해를 받으면 효과가 해제됩니다.',
+    '적에게 공포를 심어 최대 5초 동안 떨게 만듭니다. 대상 최대 생명력의 10%에 해당하는 누적 피해를 받으면 효과가 해제됩니다.',
   'entities.abilities.searing_pain.name': '지지기',
   'entities.abilities.searing_pain.description':
     '고통스러운 불길로 적을 태워 {damage}의 화염 피해를 입힙니다. 빠르게 시전합니다.',
@@ -9902,7 +9906,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.healing_wave': '주력 치유로, 자신이나 아군의 체력을 직접 회복시킵니다.',
   'guide.abilityHook.heroic_strike': '다음 타격에 분노를 소모해 더 강하게 휘두르도록 예약합니다.',
   'guide.abilityHook.holy_light': '아군이나 자신의 체력을 채워 주는 안정적이고 큰 치유입니다.',
-  'guide.abilityHook.immolate': '대상에 불을 붙여 첫 타격을 입히고 지속되는 화염 피해를 남깁니다.',
+  'guide.abilityHook.immolate': '대상에 불을 붙여 지속되는 화염 피해를 남깁니다.',
   'guide.abilityHook.judgement': '현재 활성화된 인장을 소모해 근거리에서 적을 강타합니다.',
   'guide.abilityHook.lesser_heal':
     '가만히 서 있을 여유가 있을 때 아군의 체력을 채우는 안정적인 치유입니다.',
@@ -14717,7 +14721,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_stream.description':
     '12초에 걸쳐 아군 대상의 생명력을 120 회복합니다. (주술사 특성)',
   'entities.abilities.howl_of_terror.description':
-    '주위 적을 최대 5초 동안 공포에 빠뜨립니다. 대상 최대 생명력의 8%에 해당하는 누적 피해를 받으면 공포가 해제됩니다. (흑마법사 특성)',
+    '지정한 위치 8미터 안의 적을 최대 5초 동안 공포에 빠뜨립니다. 대상 최대 생명력의 10%에 해당하는 누적 피해를 받으면 공포가 해제됩니다. (흑마법사 특성)',
   'entities.abilities.ice_block.description':
     '8초 동안 단단한 얼음 속에 자신을 가두어 모든 피해에 면역이 됩니다. 이미 활성화된 일반적인 해로운 효과를 제거하고 새로운 일반 제어 효과가 적용되는 것을 방지합니다. 기절 또는 변이 상태에서도 사용할 수 있습니다. 갇힌 동안에는 행동할 수 없습니다. 다시 사용하면 취소됩니다. (마법사)',
   'entities.abilities.inner_focus.description':
@@ -17504,7 +17508,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '적에게 {damage}의 신성 피해를 입히거나 아군 대상을 {healing}만큼 치유합니다. 피해는 주문력에 비례해 증가하고, 치유는 치유력에 비례해 증가합니다. 교리는 이 피해를 유대를 통해 치유로 전환합니다. 30미터 이내에 유대가 맺어진 부상당한 파티원이 없으면, 30미터 이내에서 생명력이 가장 낮은 부상당한 파티원을 피해량의 15%만큼 치유합니다. 파티원을 치유하면 해당 대상으로부터 10미터 이내에 있고 시야가 확보된 다른 부상당한 파티원 최대 2명도 함께 치유하며, 각각 회복된 생명력의 50%만큼 치유합니다. 이 추가 치유는 치명타가 발생하지 않으며 교리 유대를 생성하지 않습니다. (교리 고유 능력)',
   'entities.abilities.scouring_mercy.name': '정화의 자비',
   'entities.abilities.sentence.description':
-    '모든 단죄와 운명의 실을 소모해 적에게 선고를 내립니다. 실 하나당 피해가 6% 증가하고, 추가 효과는 단죄 20, 50, 80, 100에서 강화됩니다. 16레벨 이후 피해 증가폭이 완만해집니다.',
+    '모든 단죄와 운명의 실을 소모해 적에게 선고를 내립니다. 단죄가 최소 20 필요합니다. 피해는 소모한 단죄에 따라 증가하며, 실 하나당 6% 증가합니다. 단죄 50에서는 입힌 피해의 20%만큼 생명력도 회복합니다. 80에서는 대상 8미터 안의 적에게도 피해의 35%를 입힙니다. 100에서는 플레이어와 우두머리에게 주는 피해가 5% 더 증가하고, 생명력이 20% 미만인 일반 적을 즉시 처치합니다. 16레벨 이후 피해 증가폭이 완만해집니다.',
   'entities.abilities.sentence.name': '선고',
   'entities.abilities.seraphic_vigil.description':
     '아군 한 명에게 수호의 축복을 걸어 위험에 처하면 생명력을 {buff} 회복시킵니다. 축복 고유 능력입니다.',
@@ -17573,7 +17577,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '뒤로 25미터 도약하며 이동 불가 효과와 이동 속도 감소 효과를 해제합니다. 착지하면 3초 동안 이동 속도가 50% 증가합니다. 사냥의 기세가 있으면 이를 갱신하고 12초 동안 재진입 준비를 부여합니다.',
   'entities.abilities.trailbreak.name': '흔적 끊기',
   'entities.abilities.umbral_anchor.description':
-    '처음 사용하면 발밑에 5분 동안 암영 닻을 설치합니다. 40미터 안에서 다시 사용하면 닻으로 돌아가며, 닻을 소모하고 45초의 재사용 대기시간이 시작됩니다.',
+    '처음 사용하면 발밑에 5분 동안 암영 닻을 설치합니다. 40미터 안에서 다시 사용하면 닻으로 돌아가며 45초의 재사용 대기시간이 시작됩니다. 돌아갈 때마다 서 있던 자리에 5분짜리 새 닻을 남기므로, 닻이 사라질 때까지 계속 오갈 수 있습니다.',
   'entities.abilities.umbral_anchor.name': '암영 닻',
   'entities.abilities.unholy_command.description':
     '영혼 조각 3개를 소모해 모든 언데드에게 명령하고 12초 동안 공격력을 25%, 행동 속도를 20% 증가시킵니다.',
@@ -18686,7 +18690,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '운명의 실타래 3개: 선고로 소모하면 피해가 18% 증가합니다.',
   'hudChrome.warlock.fateThreadsStatus': '운명의 실타래 {value}/{max}.',
   'itemUi.tooltip.useHealingPotionPct':
-    '사용: 즉시 최대 생명력의 {percent}%를 회복합니다. 전투 중 사용 가능. 재사용 대기시간 2분.',
+    '사용: 즉시 최대 생명력의 {percent}%를 회복합니다. 전투 중 사용 가능. 재사용 대기시간 1분.',
   'guide.controls.clickMoveNote':
     '클릭하여 이동은 직접 켜기 전까지 꺼져 있습니다. 게임 메뉴에서 키 설정 창을 열고 클릭하여 이동을 켠 다음, 그 아래의 클릭 이동 버튼 줄에서 어느 마우스 버튼이 걸음을 맡을지 고르세요(기본값은 왼쪽 클릭이며 오른쪽 클릭도 쓸 수 있습니다). 켜 두면 땅 위의 한 지점을 클릭할 때 그곳으로 걸어가며, 바닥에 남는 표식이 어디로 향하는지 알려 줍니다. 생물이나 다른 플레이어를 클릭하면 그쪽으로 걸어가 사거리 안에서 멈추고, 그 클릭은 대상 지정이나 상호작용이라는 본래 역할도 그대로 해냅니다. 클릭한 것에 이미 닿을 만큼 가까이 있다면 제자리에 선 채로 상호작용만 하게 됩니다. 이동 키를 아무거나 누르면 조작이 곧바로 돌아오며 가던 길이 끝나고, 마우스 버튼을 누른 채 주위를 둘러보아도 마찬가지입니다. 점프는 길을 끊지 않으므로 뛰어오르는 동안에도 계속 나아가며, 게임 메뉴를 여는 것은 가던 길을 잠시 멈출 뿐이어서 메뉴를 닫으면 다시 이어집니다.',
   'guide.deedsPage.platformBody':
@@ -21359,7 +21363,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '4세트: Icebind 시전 시 Flitstep의 남은 재사용 대기시간이 5초 감소합니다.',
   'entities.itemSets.vanguard_warlock_affliction.name': '선봉대: Dreadquill Vestments',
   'entities.itemSets.vanguard_warlock_affliction.bonus2':
-    '2세트: Harrow의 시전 시간이 0.3초 감소합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
+    '2세트: 암영 닻의 재사용 대기시간이 15초 감소합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     '4세트: Consume의 치유량이 30% 증가하고 이동 중에도 정신 집중할 수 있습니다.',
   'entities.itemSets.vanguard_warlock_demonology.name': '선봉대: Marrowbound Regalia',

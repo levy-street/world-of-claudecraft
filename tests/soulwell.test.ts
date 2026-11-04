@@ -70,7 +70,7 @@ describe('Warlock Soulwell', () => {
     expect(ABILITIES.soulwell).toMatchObject({
       class: 'warlock',
       castTime: 3,
-      cooldown: 300,
+      cooldown: 60,
       requiresOutOfCombat: true,
       effects: [{ type: 'summonSoulwell', duration: SOULWELL_DURATION }],
     });
@@ -263,7 +263,7 @@ describe('Warlock Soulwell', () => {
     expect(sim.entities.has(well.id)).toBe(false);
   });
 
-  it('restores 25% maximum health, consumes one stone, and shares the potion cooldown', () => {
+  it('restores 25% maximum health, consumes one stone, and starts the shared potion cooldown for 1 min', () => {
     const { sim, allyId, ally } = world();
     sim.addItem(SOUL_STONE_ITEM_ID, 3, allyId);
     sim.addItem('minor_healing_potion', 1, allyId);
@@ -274,7 +274,7 @@ describe('Warlock Soulwell', () => {
 
     expect(ally.hp - before).toBe(Math.round(ally.maxHp * 0.25));
     expect(sim.countItem(SOUL_STONE_ITEM_ID, allyId)).toBe(2);
-    expect(ally.potionCdRemaining).toBe(120);
+    expect(ally.potionCdRemaining).toBe(60);
 
     const afterStone = ally.hp;
     sim.useItem('minor_healing_potion', allyId);

@@ -3121,6 +3121,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.friendly': '味方',
   'hudChrome.mobTooltip.elite': 'エリート',
   'hudChrome.mobTooltip.boss': 'ボス',
+  'hudChrome.mobTooltip.buddyOwner': '{owner}のバディ',
   'hudChrome.targetFrame.unlock': 'ターゲットフレームを移動',
   'hudChrome.targetFrame.lock': 'ターゲットフレームを固定',
   'hudChrome.playerFrame.unlock': 'プレイヤーフレームを移動',
@@ -4095,6 +4096,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.emoteWheel': 'エモートホイール',
   'hudChrome.keybinds.sheathe': '武器を納刀/抜刀',
   'hudChrome.keybinds.hideInterface': 'インターフェースを隠す',
+  'hudChrome.keybinds.muteAudio': 'すべてのサウンドをミュート',
+  'hudChrome.keybinds.audioMuted':
+    'すべてのサウンドをミュートしました。もう一度押すと元に戻ります。',
+  'hudChrome.keybinds.audioUnmuted': 'サウンドを元に戻しました。',
   'hudChrome.keybinds.targetFriendly': '最も近い味方をターゲット',
   'hudChrome.keybinds.targetFriendlyNext': '味方ターゲットを順に切り替え',
   'hudChrome.keybinds.targetPrev': 'ターゲットを逆順に切り替え',
@@ -6285,10 +6290,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '敵に影の矢を放ち、{damage} の暗黒ダメージを与えます。',
   'entities.abilities.demon_skin.name': '魔物の肌',
   'entities.abilities.demon_skin.description':
-    '悪魔の皮膚により、30分間アーマーが{buff}増加します。',
+    '悪魔の皮膚により、30分間アーマーが{buff}増加します。契約の深化を習得すると、魔物の肌が有効な間このアーマーが2倍になり、受ける魔法ダメージも軽減されます。',
   'entities.abilities.immolate.name': '灼熱の契約',
   'entities.abilities.immolate.description':
-    '敵を燃やして{damage}の火炎ダメージを与え、15秒間で追加の{overTime}を与えます。',
+    '敵を燃やし、15秒かけて{damage}の火炎ダメージを与えます。',
   'entities.abilities.corruption.name': '黒腐れ',
   'entities.abilities.corruption.description':
     '対象を堕落させ、18秒間で {damage} の暗黒ダメージを与えます。',
@@ -6302,7 +6307,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '対象の生命力を貪り、毎秒{damage}の影ダメージを与え、その70%を体力としてあなたへ移します。苦痛はその全てを移します。主たる邪眼へ詠唱を維持すると、開始時に運命の糸をすべて消費し、糸1本ごとに刻みあたり追加で断罪が1得られます。',
   'entities.abilities.fear.name': '責め苦',
   'entities.abilities.fear.description':
-    '敵に恐怖を刻み、最大5秒間おびえさせます。対象の最大体力の8%に相当する合計ダメージを受けると効果が切れます。',
+    '敵に恐怖を刻み、最大5秒間おびえさせます。対象の最大体力の10%に相当する合計ダメージを受けると効果が切れます。',
   'entities.abilities.searing_pain.name': '灼熱',
   'entities.abilities.searing_pain.description':
     '苦痛の炎で敵を焼き、{damage} の火炎ダメージを与えます。詠唱が速い呪文です。',
@@ -9939,7 +9944,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.healing_wave': '主力のヒール。自分や味方を直接回復します。',
   'guide.abilityHook.heroic_strike': '次の一撃にレイジを乗せ、より重い攻撃を予約します。',
   'guide.abilityHook.holy_light': '味方や自分の体力を満タンに戻す、安定した大きめのヒールです。',
-  'guide.abilityHook.immolate': '標的に火を放ち、初撃を与えつつ燃焼を残します。',
+  'guide.abilityHook.immolate': '標的に火を放ち、燃え続ける炎を残します。',
   'guide.abilityHook.judgement': '現在のシールを消費し、近距離から敵を打ち据えます。',
   'guide.abilityHook.lesser_heal':
     '立ち止まる余裕があるときに味方の体力を満タンに戻す、安定した詠唱です。',
@@ -14769,7 +14774,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_stream.description':
     '味方1体の体力を12秒かけて120回復する。（シャーマンのタレント）',
   'entities.abilities.howl_of_terror.description':
-    '周囲の敵を最大5秒間恐怖状態にする。対象の最大体力の8%に相当する合計ダメージを受けると、その恐怖は解除される。（ウォーロックのタレント）',
+    '選択した地点から8ヤード以内の敵を最大5秒間恐怖状態にする。対象の最大体力の10%に相当する合計ダメージを受けると、その恐怖は解除される。（ウォーロックのタレント）',
   'entities.abilities.ice_block.description':
     '8秒間自身を堅い氷に封じ、あらゆるダメージを無効化します。すでにかかっている通常の有害な効果を取り除き、新たな通常の行動阻害効果の付与を防ぎます。スタンまたは変身中でも使用できます。氷の中では行動できません。再使用すると解除します。（メイジ）',
   'entities.abilities.inner_focus.description':
@@ -17557,7 +17562,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '敵に{damage}の聖なるダメージを与えるか、味方1体を{healing}回復する。ダメージは魔力で、回復量は治癒力で上昇する。ドクトリンは絆を通じてこのダメージを回復に変換する。30メートル以内に絆を結んだ負傷パーティメンバーがいない場合、30メートル以内で体力が最も低い負傷パーティメンバーをダメージの15%分回復する。パーティメンバーを回復すると、その対象から10メートル以内かつ視界内にいる負傷パーティメンバーを最大2人まで追加で回復し、それぞれ回復量の50%分を回復する。この追加回復はクリティカルにならず、ドクトリンの絆も生成しない。（ドクトリン固有能力）',
   'entities.abilities.scouring_mercy.name': '浄罪の慈悲',
   'entities.abilities.sentence.description':
-    '断罪と運命の糸をすべて消費して敵に宣告を下します。糸1本につきダメージが6%増加し、追加効果は断罪20、50、80、100で強化されます。レベル16以降はダメージの伸びが緩やかになります。',
+    '断罪と運命の糸をすべて消費して敵に宣告を下します。断罪が20以上必要です。ダメージは消費した断罪に応じて増加し、糸1本につき6%増加します。断罪50では、与えたダメージの20%分あなたの体力も回復します。80では、対象から8ヤード以内の敵にもダメージの35%を与えます。100では、プレイヤーとボスへのダメージがさらに5%増加し、体力20%未満の通常の敵を即座に倒します。レベル16以降はダメージの伸びが緩やかになります。',
   'entities.abilities.sentence.name': '宣告',
   'entities.abilities.seraphic_vigil.description':
     '味方1体に見守りの祝福を与え、危機に陥った時に体力を{buff}回復する。ベネディクション固有能力。',
@@ -17624,7 +17629,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '後方へ25ヤード跳び、移動不能効果と移動速度低下効果を解除します。着地すると移動速度が3秒間50%上がります。狩猟の勢いがある場合はそれを更新し、再突入準備を12秒間付与します。',
   'entities.abilities.trailbreak.name': '離脱跳躍',
   'entities.abilities.umbral_anchor.description':
-    '初回使用時、足元に5分間残る影の錨を設置します。40ヤード以内で再使用すると錨へ戻り、錨を消費して45秒の再使用時間が始まります。',
+    '初回使用時、足元に5分間残る影の錨を設置します。40ヤード以内で再使用すると錨へ戻り、45秒の再使用時間が始まります。戻るたびに元いた場所に5分間の新しい錨を残すため、錨が消えるまで何度でも行き来できます。',
   'entities.abilities.umbral_anchor.name': '影の錨',
   'entities.abilities.unholy_command.description':
     '魂の欠片を3個消費してすべてのアンデッドに号令を下し、12秒間、与えるダメージを25%、行動速度を20%上昇させる。',
@@ -18736,7 +18741,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '運命の糸が3本: 宣告で消費するとダメージが18%増加します。',
   'hudChrome.warlock.fateThreadsStatus': '運命の糸 {value}/{max}。',
   'itemUi.tooltip.useHealingPotionPct':
-    '使用: 即座に最大体力の{percent}%を回復します。戦闘中に使用可能。クールダウン2分。',
+    '使用: 即座に最大体力の{percent}%を回復します。戦闘中に使用可能。クールダウン1分。',
   'guide.controls.clickMoveNote':
     'クリック移動は、自分で有効にするまではオフのままです。ゲームメニューからキー設定パネルを開き、「クリック移動」をオンにして、そのすぐ下にある「クリック移動ボタン」の行で、どのマウスボタンで歩くかを選びましょう（初期設定は「左クリック」、「右クリック」も選べます）。オンにすると、地面のどこかをクリックすればそこへ歩いていき、目指している場所には地面にマーカーが表示されます。クリーチャーや他のプレイヤーをクリックすると、その相手のもとまで歩いていって射程に入ったところで止まり、そのクリックはターゲットや対話といったいつもの役目もきちんと果たします。クリックしたものにもう手が届く距離にいるなら、そのまま動かずに対話するだけです。移動キーを押せばすぐに操作が手元へ戻って移動は終わり、マウスボタンを押したまま見回した場合も同じです。ジャンプでは終わらないので、跳んでいる間も移動は続きます。ゲームメニューを開いても移動は一時停止するだけで、メニューを閉じれば続きから再開します。',
   'guide.deedsPage.platformBody':
@@ -21396,7 +21401,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '4点：Icebind詠唱でFlitstepの残りクールダウンが5秒短縮。',
   'entities.itemSets.vanguard_warlock_affliction.name': 'ヴァンガード：Dreadquill Vestments',
   'entities.itemSets.vanguard_warlock_affliction.bonus2':
-    '2点：Harrowの詠唱時間が0.3秒短縮。被ダメージで詠唱が遅れなくなります。',
+    '2点：影の錨の再使用時間が15秒短縮。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     '4点：Consumeの回復量が30%上昇し、移動中にチャネル可能。',
   'entities.itemSets.vanguard_warlock_demonology.name': 'ヴァンガード：Marrowbound Regalia',

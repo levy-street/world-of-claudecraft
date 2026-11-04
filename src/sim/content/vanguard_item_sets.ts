@@ -323,7 +323,7 @@ export const VANGUARD_ITEM_SETS: Record<string, ItemSet> = {
       {
         pieces: 2,
         effect: {},
-        text: "Harrow's cast time is reduced by 0.3 sec. Damage taken no longer delays your spellcasting.",
+        text: "Umbral Anchor's cooldown is reduced by 15 sec. Damage taken no longer delays your spellcasting.",
       },
       {
         pieces: 4,

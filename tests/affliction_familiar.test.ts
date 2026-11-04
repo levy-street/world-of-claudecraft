@@ -6,6 +6,10 @@ import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
 import { AfflictionFamiliar } from '../src/render/affliction_familiar';
+import {
+  AFFLICTION_FAMILIAR_HEAD_LIFT,
+  AFFLICTION_FAMILIAR_LOCAL_Z,
+} from '../src/render/affliction_familiar_core';
 import type { Entity } from '../src/sim/types';
 import type { IWorld } from '../src/world_api';
 import { stripComments } from './helpers/strip_comments';
@@ -93,6 +97,75 @@ describe('Affliction Maledict Eye familiar', () => {
 
     familiar.clear();
     expect(host.getObjectByName('affliction-familiar')).toBeUndefined();
+  });
+
+  it('gives every Hexcraft warlock in view their own eye at head height', () => {
+    const local = {
+      id: 7,
+      kind: 'player',
+      templateId: 'warlock',
+      dead: false,
+      scale: 1,
+      auras: [],
+    };
+    const other = { ...local, id: 9, specId: 'affliction' };
+    const mage = { ...local, id: 11, templateId: 'mage', specId: 'affliction' };
+    const world = afflictionWorld(local as unknown as Entity);
+    const entities = world.entities as Map<number, Entity>;
+    entities.set(other.id, other as unknown as Entity);
+    entities.set(mage.id, mage as unknown as Entity);
+    const hosts = new Map([7, 9, 11].map((id) => [id, new THREE.Group()]));
+    const views = new Map([...hosts].map(([id, group]) => [id, { group, height: 2 }]));
+    const familiar = new AfflictionFamiliar(undefined, () => new THREE.Group());
+
+    familiar.update(world, views, true, 0);
+    const mine = hosts.get(7)?.getObjectByName('affliction-familiar');
+    const theirs = hosts.get(9)?.getObjectByName('affliction-familiar');
+    expect(mine).toBeDefined();
+    expect(theirs).toBeDefined();
+    expect(theirs).not.toBe(mine);
+    expect(theirs?.position.y).toBeCloseTo(1.8, 6);
+    expect(hosts.get(11)?.getObjectByName('affliction-familiar')).toBeUndefined();
+
+    // A respec on the other client takes their eye away on the next frame.
+    other.specId = 'demonology';
+    familiar.update(world, views, true, 1);
+    expect(hosts.get(9)?.getObjectByName('affliction-familiar')).toBeUndefined();
+    expect(hosts.get(7)?.getObjectByName('affliction-familiar')).toBe(mine);
+  });
+
+  it('follows the head bone, so a mounted rider keeps the eye by the head', () => {
+    const player = {
+      id: 7,
+      kind: 'player',
+      templateId: 'warlock',
+      dead: false,
+      scale: 1,
+      auras: [],
+    };
+    const world = afflictionWorld(player as unknown as Entity);
+    const group = new THREE.Group();
+    const body = new THREE.Group();
+    const head = new THREE.Bone();
+    head.name = 'head';
+    body.add(head);
+    group.add(body);
+    // Seated on a mount: the rider body is lifted and the head sits at 3.72.
+    body.position.set(0, 2.4, 0.3);
+    head.position.set(0, 1.32, 0);
+    const views = new Map([[7, { group, height: 2.86, visual: { root: body } }]]);
+    const familiar = new AfflictionFamiliar(undefined, () => new THREE.Group());
+
+    familiar.update(world, views, true, 0);
+    const eye = group.getObjectByName('affliction-familiar') as THREE.Group;
+    expect(eye.position.y).toBeCloseTo(3.72 + AFFLICTION_FAMILIAR_HEAD_LIFT, 5);
+    expect(eye.position.z).toBeCloseTo(0.3 + AFFLICTION_FAMILIAR_LOCAL_Z, 5);
+
+    // Dismounted: the body drops back and the eye follows it down.
+    body.position.set(0, 0, 0);
+    head.position.set(0, 2.46, 0);
+    familiar.update(world, views, true, 1);
+    expect(eye.position.y).toBeCloseTo(2.46 + AFFLICTION_FAMILIAR_HEAD_LIFT, 5);
   });
 
   it('preloads the model and keeps the manager in the renderer frame update', () => {

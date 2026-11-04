@@ -179,13 +179,13 @@ describe('reviewed localization semantics', () => {
       const ossuaryMark = table.entities.abilities.ossuary_mark.description;
 
       expectStandaloneNumber(harrow, 5);
-      expect(harrow, `${lang} Harrow break threshold`).toMatch(/8\s?%|%\s?8/);
+      expect(harrow, `${lang} Harrow break threshold`).toMatch(/10\s?%|%\s?10/);
       expect(harrow, `${lang} Harrow old duration`).not.toMatch(
         /(^|\D)8\s*(s|sec|sek|秒|초|giây)/i,
       );
 
       expectStandaloneNumber(dreadChorus, 5);
-      expect(dreadChorus, `${lang} Dread Chorus break threshold`).toMatch(/8\s?%|%\s?8/);
+      expect(dreadChorus, `${lang} Dread Chorus break threshold`).toMatch(/10\s?%|%\s?10/);
       expect(dreadChorus, `${lang} Dread Chorus old duration`).not.toMatch(/(^|\D)3(\D|$)/);
 
       expectStandaloneNumber(ossuaryMark, 15);

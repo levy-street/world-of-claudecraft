@@ -2076,7 +2076,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Tidecall cũng bảo vệ mục tiêu của nó với 5 phần trăm sức khỏe tối đa của bạn trong 6 giây.',
   'entities.itemSets.vanguard_shaman_restoration.name': 'Brineward Chainmail',
   'entities.itemSets.vanguard_warlock_affliction.bonus2':
-    'Thời gian truyền tải Giày Vò giảm 0,3 giây. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
+    'Thời gian hồi chiêu của Neo Bóng Tối giảm 15 giây. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     'Nuốt Chửng chữa lành bạn 30 phần trăm nhiều hơn và có thể được truyền tải khi di chuyển.',
   'entities.itemSets.vanguard_warlock_affliction.name': 'Dreadquill Vestments',
@@ -7408,6 +7408,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.levelFamily': '{family} cấp {level}',
   'hudChrome.mobTooltip.elite': 'Tinh Anh',
   'hudChrome.mobTooltip.boss': 'Boss',
+  'hudChrome.mobTooltip.buddyOwner': 'Bạn đồng hành của {owner}',
   'hudChrome.mobile.hotbarPage': 'Kỹ Năng',
   'hudChrome.mobile.hotbarPageAria': 'Hiện bộ kỹ năng tiếp theo',
   'hudChrome.options.aurasOnPlayerFrame': 'Hiệu Ứng Có Lợi Trên Khung Người Chơi',
@@ -8019,7 +8020,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Thế đứng phòng thủ: bạn tạo ra nhiều hơn 30% mối đe dọa nhưng gây và nhận ít hơn 10% sát thương. Thi triển lại để rời khỏi thế đứng.',
   'entities.abilities.defensive_stance.name': 'Thế Thủ',
   'entities.abilities.demon_skin.description':
-    'Lớp da quỷ tăng giáp của bạn thêm {buff} trong 30 phút.',
+    'Lớp da quỷ tăng giáp của bạn thêm {buff} trong 30 phút. Pact Deepened có thể nhân đôi lượng giáp này và giảm sát thương phép phải chịu khi Da Ác Quỷ đang hoạt động.',
   'entities.abilities.demon_skin.name': 'Da Ác Quỷ',
   'entities.abilities.demoralizing_roar.description':
     'Áp chế kẻ địch xung quanh, giảm sức tấn công của chúng đi 20 trong 20 giây. Chỉ dùng được ở Bruin Form.',
@@ -8057,7 +8058,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.expose_armor.name': 'Xuyên Phá Giáp',
   'entities.abilities.faerie_fire.name': 'Ánh Ma Trơi',
   'entities.abilities.fear.description':
-    'Gieo nỗi kinh hoàng vào kẻ địch, khiến nó co rúm sợ hãi trong tối đa 5 giây. Tổng sát thương bằng 8% máu tối đa của mục tiêu sẽ phá vỡ hiệu ứng.',
+    'Gieo nỗi kinh hoàng vào kẻ địch, khiến nó co rúm sợ hãi trong tối đa 5 giây. Tổng sát thương bằng 10% máu tối đa của mục tiêu sẽ phá vỡ hiệu ứng.',
   'entities.abilities.fear.name': 'Giày Vò',
   'entities.abilities.ferocious_bite.name': 'Cắn Xé Máu',
   'entities.abilities.fire_blast.description':
@@ -8146,7 +8147,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Che chắn bạn trong băng, hấp thụ {damage} sát thương trong 60 giây.',
   'entities.abilities.ice_barrier.name': 'Màn Băng',
   'entities.abilities.immolate.description':
-    'Thiêu đốt kẻ địch gây {damage} sát thương Hỏa cùng thêm {overTime} trong 15 giây.',
+    'Thiêu đốt kẻ địch gây {damage} sát thương Hỏa trong 15 giây.',
   'entities.abilities.immolate.name': 'Khế Ước Rực Cháy',
   'entities.abilities.insect_swarm.description':
     'Kẻ địch bị bầy côn trùng bủa vây, nhận {damage} sát thương Tự Nhiên trong 12 giây.',
@@ -10585,8 +10586,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Đặt sẵn một cú vung nặng tay tiêu nộ khí vào đòn đánh kế tiếp của bạn.',
   'guide.abilityHook.holy_light':
     'Một đòn trị liệu vững chãi, đáng kể để hồi đầy cho đồng đội hoặc bản thân.',
-  'guide.abilityHook.immolate':
-    'Thiêu cháy mục tiêu cho một đòn mở màn và một vệt cháy âm ỉ kéo dài.',
+  'guide.abilityHook.immolate': 'Thiêu cháy mục tiêu bằng một vệt cháy âm ỉ kéo dài.',
   'guide.abilityHook.judgement':
     'Tiêu Ấn Chú đang kích hoạt để giáng đòn lên kẻ địch từ cự ly gần.',
   'guide.abilityHook.lesser_heal':
@@ -14645,7 +14645,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_stream.description':
     'Hồi 120 máu cho một mục tiêu đồng minh trong 12 giây. (thiên phú Shaman)',
   'entities.abilities.howl_of_terror.description':
-    'Khiến kẻ địch ở gần sợ hãi trong tối đa 5 giây. Tổng sát thương bằng 8% máu tối đa của mục tiêu sẽ phá vỡ nỗi sợ của nó. (thiên phú Warlock)',
+    'Khiến kẻ địch trong bán kính 8 thước quanh vị trí đã chọn sợ hãi trong tối đa 5 giây. Tổng sát thương bằng 10% máu tối đa của mục tiêu sẽ phá vỡ nỗi sợ của nó. (thiên phú Warlock)',
   'entities.abilities.ice_block.description':
     'Bao bọc bạn trong băng cứng suốt 8 giây, khiến bạn miễn nhiễm mọi sát thương. Xóa các hiệu ứng có hại thông thường đang tồn tại và ngăn các hiệu ứng khống chế thông thường mới được áp dụng. Có thể dùng khi bị choáng hoặc biến hình. Bạn không thể hành động khi bị bao bọc. Dùng lại để hủy. (pháp sư)',
   'entities.abilities.inner_focus.description':
@@ -16642,7 +16642,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Tăng 35% tốc độ di chuyển, nhưng hy sinh 2% máu tối đa của bạn mỗi giây. Thi triển lại để hủy. Tự động tắt khi máu ở mức 20%.',
   'entities.abilities.sacrilegious_march.name': 'Cuộc Hành Quân Phạm Thượng',
   'entities.abilities.sentence.description':
-    'Tiêu thụ toàn bộ Kết Án và Sợi Định Mệnh để tuyên án kẻ địch. Mỗi Sợi tăng 6% sát thương. Các hiệu ứng bổ sung leo thang ở 20, 50, 80, và 100 Kết Án. Mức tăng sát thương của nó chững lại sau cấp 16.',
+    'Tiêu thụ toàn bộ Kết Án và Sợi Định Mệnh để tuyên án kẻ địch. Cần ít nhất 20 Kết Án. Sát thương tăng theo lượng Kết Án đã tiêu thụ, và mỗi Sợi tăng thêm 6%. Ở 50 Kết Án, còn hồi cho bạn 20% sát thương gây ra. Ở 80, còn đánh trúng kẻ địch trong bán kính 8 thước quanh mục tiêu với 35% sát thương. Ở 100, còn gây thêm 5% sát thương lên người chơi và trùm, đồng thời hạ gục ngay một kẻ địch thường dưới 20% máu. Mức tăng sát thương của nó chững lại sau cấp 16.',
   'entities.abilities.sentence.name': 'Phán Quyết',
   'entities.abilities.sinister_strike.description':
     'Một đòn đánh tức thời gây sát thương vũ khí cộng thêm {damage}. Nhận 1 điểm liên hoàn.',
@@ -16674,7 +16674,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Quét vuốt qua kẻ địch gần đó gây {damage} sát thương. Gây thêm thù hận. Chỉ dùng được ở Hình Bruin.',
   'entities.abilities.swipe.specNote_feral': 'Mỗi đòn đánh trúng thêm 1 Huyết Cổ (tối đa 3).',
   'entities.abilities.umbral_anchor.description':
-    'Lần thi triển đầu tiên: neo bóng của bạn tại vị trí đứng trong 5 phút. Thi triển lại trong bán kính 40 mét để quay về đó, tiêu hao neo và bắt đầu thời gian hồi chiêu 45 giây.',
+    'Lần thi triển đầu tiên: neo bóng của bạn tại vị trí đứng trong 5 phút. Thi triển lại trong bán kính 40 mét để quay về đó và bắt đầu thời gian hồi chiêu 45 giây. Mỗi lần quay về để lại một neo mới tồn tại 5 phút ở chỗ bạn vừa đứng, nên bạn có thể nhảy qua lại cho đến khi một neo hết hạn.',
   'entities.abilities.umbral_anchor.name': 'Neo Bóng Tối',
   'entities.abilities.unholy_command.description':
     'Tiêu hao 3 Mảnh Linh Hồn để ra lệnh cho toàn bộ thuộc hạ Bất Tử của bạn gây thêm 25% sát thương và hành động nhanh hơn 20% trong 12 giây.',
@@ -16823,7 +16823,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Ba Sợi Định Mệnh: Phán Quyết có thể tiêu thụ chúng để tăng 18% sát thương.',
   'hudChrome.warlock.fateThreadsStatus': '{value} trên {max} Sợi Định Mệnh.',
   'itemUi.tooltip.useHealingPotionPct':
-    'Dùng: Hồi tức thời {percent}% sinh lực tối đa. Dùng được trong chiến đấu. Hồi chiêu 2 phút.',
+    'Dùng: Hồi tức thời {percent}% sinh lực tối đa. Dùng được trong chiến đấu. Hồi chiêu 1 phút.',
   'guide.controls.reliquary': 'Kỳ Trân Các',
   'guide.deedsPage.rewardsBody':
     'Mọi phần thưởng đều chỉ để phô ra, và đó đúng là chủ đích. Một số kỳ công trao cho bạn danh hiệu để đeo hoặc viền để đóng khung tên mình, và không bao giờ trao thứ gì khiến người hùng của bạn mạnh hơn. Hãy chọn danh hiệu và viền bạn muốn trong Sách Kỳ Công: danh hiệu theo bạn trên bảng tên, trong khung trò chuyện và trên các bảng xếp hạng để ai cũng thấy, còn viền vẽ sắc màu riêng của nó quanh bảng tên và chân dung của bạn.',
@@ -19795,6 +19795,9 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.toolTooltip.wieldDegrade':
     'Dưới kỹ năng đó, nó vẫn hoạt động như một công cụ cấp thấp hơn.',
   'hudChrome.keybinds.hideInterface': 'Ẩn giao diện',
+  'hudChrome.keybinds.muteAudio': 'Tắt Toàn Bộ Âm Thanh',
+  'hudChrome.keybinds.audioMuted': 'Đã tắt toàn bộ âm thanh. Nhấn lần nữa để bật lại.',
+  'hudChrome.keybinds.audioUnmuted': 'Đã bật lại âm thanh.',
   'hudChrome.keybinds.targetParty1': 'Thành viên bên mục tiêu 1',
   'hudChrome.keybinds.targetParty2': 'Thành viên bên mục tiêu 2',
   'hudChrome.keybinds.targetParty3': 'Thành viên bên mục tiêu 3',

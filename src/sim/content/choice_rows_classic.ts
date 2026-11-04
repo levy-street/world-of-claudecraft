@@ -1605,7 +1605,7 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
           id: 'wlk_r8_howl_of_terror',
           name: 'Dread Chorus',
           description:
-            "Grants Dread Chorus: frighten enemies within 8 yards for up to 5 sec. Damage totaling 8% of a target's maximum health breaks its fear. 40 sec cooldown.",
+            "Grants Dread Chorus: an instant fear aimed at the ground like a trap, frightening enemies within 8 yards of the selected location for up to 5 sec. Damage totaling 10% of a target's maximum health breaks its fear. 40 sec cooldown.",
           icon: 'wlk_r8_howl_of_terror',
           effect: { grant: { ability: 'howl_of_terror' } },
         },
@@ -1672,7 +1672,8 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'wlk_r14_amplify_curse',
           name: 'Deepened Hex',
-          description: "Your specialization's primary generator costs 25% less mana.",
+          description:
+            "Your specialization's primary generator costs 25% less mana: Needle of Fate (Hexcraft), Essence Reap (Necromancy) or Gloom Bolt (Ruination).",
           icon: 'wlk_r14_amplify_curse',
           effect: {
             ability: [
@@ -1775,7 +1776,7 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
           id: 'wlk_r20_chaos_bolt',
           name: 'Unbroken Ritual',
           description:
-            'Each second spent casting or channeling reduces the remaining cooldown of your Warlock class and specialization abilities by 0.5 sec. Does not affect capstone talents.',
+            'Each second spent casting or channeling reduces the remaining cooldown of your Warlock class and specialization abilities by 0.5 sec. Does not affect capstone talents. Affects Umbral Anchor, Abyssal Gag, Dread Chorus, Sanguine Covenant and Soulwell; Hexcraft: Evil Eye, Hex of Violence, Litany of Guilt, Cruel Pact, Vicarious Suffering, Possess the Evil Eye, Hour of Judgment and Coven; Necromancy: Raise Graveguard, Soul Lance, Corpse Explosion, Reaping Command, Ossuary Mark, Sacrifice Undead, Bone Armor, Unholy Command, Army of the Dead and Lich Form; Ruination: Duskfire, Conflagrate, Ruinous Brand, Cinderhide and Summon Pyre Colossus.',
           icon: 'wlk_r20_chaos_bolt',
           effect: { global: { warlockUnbrokenRitual: 0.5 } },
         },
@@ -1783,7 +1784,7 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
           id: 'wlk_r20_grimoire_of_haste',
           name: 'Forbidden Reflection',
           description:
-            'The first Warlock class or specialization ability with a cooldown that you use, except Soulwell and Army of the Dead, creates a forbidden reflection. You may use that same ability once more within 10 sec for its normal cost without starting another cooldown. This effect can occur once every 60 sec.',
+            'The first Warlock class or specialization ability with a cooldown that you use, except Soulwell, Army of the Dead, Evil Eye and Raise Graveguard, creates a forbidden reflection. You may use that same ability once more within 10 sec for its normal cost without starting another cooldown. This effect can occur once every 60 sec. Affects Umbral Anchor, Abyssal Gag, Dread Chorus and Sanguine Covenant; Hexcraft: Hex of Violence, Litany of Guilt, Cruel Pact, Vicarious Suffering, Possess the Evil Eye, Hour of Judgment and Coven; Necromancy: Soul Lance, Corpse Explosion, Reaping Command, Ossuary Mark, Sacrifice Undead, Bone Armor, Unholy Command and Lich Form; Ruination: Duskfire, Conflagrate, Ruinous Brand, Cinderhide and Summon Pyre Colossus.',
           icon: 'wlk_r20_grimoire_of_haste',
           effect: {
             global: { warlockForbiddenReflection: 60 },

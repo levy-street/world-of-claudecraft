@@ -2360,7 +2360,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Chamado da Maré também escuda seu alvo em 5% da sua vida máxima por 6 s.',
   'entities.itemSets.vanguard_warlock_affliction.name': 'Vestes da Pena do Pavor',
   'entities.itemSets.vanguard_warlock_affliction.bonus2':
-    'O tempo de conjuração de Atormentar é reduzido em 0,3 s. Dano recebido não atrasa mais suas conjurações.',
+    'A recarga de Âncora Umbral é reduzida em 15 s. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     'Consumir cura 30% a mais e pode ser canalizado em movimento.',
   'entities.itemSets.vanguard_warlock_demonology.name': 'Regália do Vínculo da Medula',
@@ -7404,6 +7404,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.levelFamily': '{family} de nível {level}',
   'hudChrome.mobTooltip.elite': 'Elite',
   'hudChrome.mobTooltip.boss': 'Chefe',
+  'hudChrome.mobTooltip.buddyOwner': 'Companheiro de {owner}',
   'hudChrome.options.aurasOnPlayerFrame': 'Benefícios no Quadro do Jogador',
   'hudChrome.options.playerFrameScale': 'Escala do Quadro do Jogador',
   'hudChrome.options.showDailyRewardsChest': 'Mostrar Baú de Recompensas Diárias',
@@ -9572,10 +9573,10 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Envia uma seta sombria contra o inimigo, causando {damage} de dano de Sombra.',
   'entities.abilities.demon_skin.name': 'Couro Demoníaco',
   'entities.abilities.demon_skin.description':
-    'Pele demoníaca aumenta sua armadura em {buff} por 30 min.',
+    'Pele demoníaca aumenta sua armadura em {buff} por 30 min. Pact Deepened pode dobrar essa armadura e reduzir o dano mágico recebido enquanto Couro Demoníaco estiver ativo.',
   'entities.abilities.immolate.name': 'Pacto Ardente',
   'entities.abilities.immolate.description':
-    'Queima o inimigo com {damage} de dano de Fogo e mais {overTime} ao longo de 15 s.',
+    'Queima o inimigo com {damage} de dano de Fogo ao longo de 15 s.',
   'entities.abilities.corruption.name': 'Podridão Negra',
   'entities.abilities.corruption.description':
     'Corrompe o alvo, causando {damage} de dano de Sombra ao longo de 18 s.',
@@ -9589,7 +9590,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Consome a vitalidade do alvo, causando {damage} de dano das Sombras a cada segundo e transferindo 70% disso como vida. Aflição transfere tudo em vez disso. Quando canalizado em vosso Olho Maligno principal, consome todos os Fios do Destino no início, e cada Fio gera 1 de Condenação extra por pulso.',
   'entities.abilities.fear.name': 'Atormentar',
   'entities.abilities.fear.description':
-    'Aterroriza o inimigo, deixando-o acuado por até 5 s. Dano acumulado equivalente a 8% da vida máxima do alvo quebra o efeito.',
+    'Aterroriza o inimigo, deixando-o acuado por até 5 s. Dano acumulado equivalente a 10% da vida máxima do alvo quebra o efeito.',
   'entities.abilities.searing_pain.name': 'Cauterizar',
   'entities.abilities.searing_pain.description':
     'Queima o inimigo com fogo agonizante, causando {damage} de dano de Fogo. Lançamento rápido.',
@@ -11741,8 +11742,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Prepara um golpe mais pesado que gasta fúria no seu próximo ataque.',
   'guide.abilityHook.holy_light':
     'Uma cura firme e considerável para recuperar um aliado ou você mesmo.',
-  'guide.abilityHook.immolate':
-    'Põe fogo no alvo com um golpe de abertura e uma queimadura que persiste.',
+  'guide.abilityHook.immolate': 'Põe fogo no alvo com uma queimadura que persiste.',
   'guide.abilityHook.judgement': 'Gasta seu Selo ativo para atingir um inimigo a curta distância.',
   'guide.abilityHook.lesser_heal':
     'Uma conjuração firme para recuperar um aliado quando há tempo para ficar parado.',
@@ -15089,7 +15089,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_stream.description':
     'Restaura 120 de vida de um alvo aliado ao longo de 12 s. (talento de Xamã)',
   'entities.abilities.howl_of_terror.description':
-    'Amedronta os inimigos próximos por até 5 s. Dano acumulado equivalente a 8% da vida máxima de um alvo quebra seu medo. (talento de Bruxo)',
+    'Amedronta os inimigos num raio de 8 m do local selecionado por até 5 s. Dano acumulado equivalente a 10% da vida máxima de um alvo quebra seu medo. (talento de Bruxo)',
   'entities.abilities.ice_block.description':
     'Envolve você em gelo sólido por 8 s, tornando-o imune a todo dano. Remove efeitos nocivos comuns já ativos e impede a aplicação de novos efeitos de controle comuns. Pode ser usado enquanto estiver atordoado ou transformado. Você não pode agir enquanto estiver envolto. Conjure novamente para cancelar. (mago)',
   'entities.abilities.inner_focus.description':
@@ -17403,7 +17403,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Aumenta a velocidade de movimento em 35%, mas sacrifica 2% da sua vida máxima a cada segundo. Lance de novo para cancelar. Desativa-se automaticamente com 20% de vida.',
   'entities.abilities.sacrilegious_march.name': 'Marcha Sacrílega',
   'entities.abilities.sentence.description':
-    'Consome toda a Condenação e os Fios do Destino para executar a sentença sobre o inimigo. Cada Fio aumenta o dano em 6%. Efeitos adicionais escalam em 20, 50, 80 e 100 de Condenação. Sua escala de dano se estabiliza após o nível 16.',
+    'Consome toda a Condenação e os Fios do Destino para executar a sentença sobre o inimigo. Requer pelo menos 20 de Condenação. O dano aumenta com a Condenação consumida, e cada Fio o aumenta em 6%. Com 50 de Condenação, também cura você em 20% do dano causado. Com 80, também atinge inimigos num raio de 8 m do alvo com 35% do seu dano. Com 100, também causa 5% a mais de dano a jogadores e chefes, e mata instantaneamente um inimigo normal abaixo de 20% de vida. Sua escala de dano se estabiliza após o nível 16.',
   'entities.abilities.sentence.name': 'Sentença',
   'entities.abilities.sinister_strike.description':
     'Um golpe instantâneo por dano da arma mais {damage}. Concede 1 ponto de combo.',
@@ -17436,7 +17436,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Varre com suas garras os inimigos próximos causando {damage} de dano. Causa ameaça extra. Apenas Forma de Bruin.',
   'entities.abilities.swipe.specNote_feral': 'Cada acerto adiciona 1 de Sangue Antigo (máx. 3).',
   'entities.abilities.umbral_anchor.description':
-    'Primeira conjuração: ancora sua sombra aos seus pés por 5 min. Lance novamente dentro de 40 m para retornar até lá, consumindo a âncora e iniciando uma recarga de 45 s.',
+    'Primeira conjuração: ancora sua sombra aos seus pés por 5 min. Lance novamente dentro de 40 m para retornar até lá, iniciando uma recarga de 45 s. Cada retorno deixa uma nova âncora de 5 min onde você estava, então você pode continuar saltando de um lado para o outro até uma âncora expirar.',
   'entities.abilities.umbral_anchor.name': 'Âncora Umbral',
   'entities.abilities.unholy_command.description':
     'Gasta 3 Fragmentos de Alma para comandar todos os seus mortos-vivos a causar 25% mais dano e agir 20% mais rápido por 12 s.',
@@ -17586,7 +17586,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Três Fios do Destino: Sentença pode consumi-los para 18% de dano aumentado.',
   'hudChrome.warlock.fateThreadsStatus': 'Fios do Destino {value} de {max}.',
   'itemUi.tooltip.useHealingPotionPct':
-    'Uso: restaura instantaneamente {percent}% da vida máxima. Pode ser usada em combate. Recarga de 2 min.',
+    'Uso: restaura instantaneamente {percent}% da vida máxima. Pode ser usada em combate. Recarga de 1 min.',
   'guide.controls.reliquary': 'O Relicário',
   'guide.deedsPage.rewardsBody':
     'As recompensas são todas para exibição, e é exatamente esse o objetivo. Alguns feitos concedem um título para você usar ou uma moldura para emoldurar seu nome, e nunca algo que deixe seu herói mais forte. Escolha o título e a moldura que quiser no Livro dos Feitos: o título acompanha você na placa de nome, no bate-papo e nos quadros, à vista de todos, e a moldura desenha as próprias cores em volta da sua placa de nome e do seu retrato.',
@@ -20000,6 +20000,10 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.toolTooltip.wieldDegrade':
     'Abaixo dessa habilidade, ainda funciona como uma ferramenta de nível inferior.',
   'hudChrome.keybinds.hideInterface': 'Ocultar interface',
+  'hudChrome.keybinds.muteAudio': 'Silenciar todo o som',
+  'hudChrome.keybinds.audioMuted':
+    'Todo o som foi silenciado. Pressione novamente para reativá-lo.',
+  'hudChrome.keybinds.audioUnmuted': 'Som reativado.',
   'hudChrome.keybinds.targetParty1': 'Membro da Parte Alvo 1',
   'hudChrome.keybinds.targetParty2': 'Membro da Parte Alvo 2',
   'hudChrome.keybinds.targetParty3': 'Membro da Parte Alvo 3',

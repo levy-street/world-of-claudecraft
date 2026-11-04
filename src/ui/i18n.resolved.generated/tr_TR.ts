@@ -2522,6 +2522,9 @@ export const tr_TR: EnTranslations = {
       "friendlyNameplates": "Dost İsim Levhalarını Aç/Kapat",
       "sheathe": "Silahı Kın'a Tak / Çıkar",
       "hideInterface": "Arayüzü Gizle",
+      "muteAudio": "Tüm Sesi Kapat",
+      "audioMuted": "Tüm ses kapatıldı. Yeniden açmak için tekrar bas.",
+      "audioUnmuted": "Ses yeniden açıldı.",
       "dive": "Aşağı Yüz",
       "categoryPet": "Yoldaş",
       "petAttack": "Yoldaş: Saldır",
@@ -5086,7 +5089,8 @@ export const tr_TR: EnTranslations = {
       "hostile": "Düşman",
       "friendly": "Dost",
       "elite": "Seçkin",
-      "boss": "Patron"
+      "boss": "Patron",
+      "buddyOwner": "Yoldaş sahibi: {owner}"
     },
     "playerTooltip": {
       "guild": "<{guild}>",
@@ -10161,7 +10165,7 @@ export const tr_TR: EnTranslations = {
       "shadow_bolt": "Bir hedefe okuduğun bir gölge oku; başvuru bombasın.",
       "summon_imp": "Düşmanlara uzaktan Kül Oku savuran bir Emberkin çağırır.",
       "demon_skin": "Derini sertleştirip zırh ekleyen kalıcı bir öz güçlendirmesi.",
-      "immolate": "Bir hedefi tutuşturur; açılış darbesi ve sonra süren bir yanış verir.",
+      "immolate": "Bir hedefi tutuşturur ve süren bir yanış bırakır.",
       "corruption": "Bir hedefi gölgeyle çürütür ve sen başka işler yaparken hasar verir.",
       "life_tap": "Tükendiğinde kendi canının bir kısmını manaya çevirir.",
       "wrath": "Bir hedefe menzilden fırlatılan bir doğa oku; başvuru bomban.",
@@ -17182,7 +17186,7 @@ export const tr_TR: EnTranslations = {
       "clickDestroy": "Yok etmek için tıkla",
       "useFishing": "Kullanım: Yakındaki sularda balık tut.",
       "useHealingPotion": "Kullanım: Anında {amount} can yeniler. Savaşta kullanılabilir. 1 dk bekleme süresi.",
-      "useHealingPotionPct": "Kullan: Azami canın %{percent}'ini anında geri kazandırır. Dövüşte kullanılabilir. 2 dakika bekleme süresi.",
+      "useHealingPotionPct": "Kullan: Azami canın %{percent}'ini anında geri kazandırır. Dövüşte kullanılabilir. 1 dakika bekleme süresi.",
       "useManaPotion": "Kullanım: Anında {amount} mana yeniler. Savaşta kullanılabilir. 1 dk bekleme süresi.",
       "clickUseInstant": "Savaşta anında kullanmak için tıkla",
       "clickUse": "Kullanmak için tıkla",
@@ -18257,11 +18261,11 @@ export const tr_TR: EnTranslations = {
       },
       "demon_skin": {
         "name": "İblis Derisi",
-        "description": "Şeytani deri zırhını 30 dakika boyunca {buff} artırır."
+        "description": "Şeytani deri zırhını 30 dakika boyunca {buff} artırır. Pact Deepened, İblis Derisi etkinken bu zırhı ikiye katlayabilir ve alınan büyü hasarını azaltabilir."
       },
       "immolate": {
         "name": "Yanan Ahit",
-        "description": "Düşmanı {damage} Ateş hasarıyla ve ek olarak 15 saniye boyunca {overTime} ile yakar."
+        "description": "Düşmanı 15 saniye boyunca {damage} Ateş hasarıyla yakar."
       },
       "corruption": {
         "name": "Kara Çürüme",
@@ -18281,7 +18285,7 @@ export const tr_TR: EnTranslations = {
       },
       "sentence": {
         "name": "Hüküm",
-        "description": "Düşmana hüküm giydirmek için tüm Mahkûmiyeti ve Kader İpliklerini tüketir. Her İplik hasarı %6 artırır. Ek etkiler 20, 50, 80 ve 100 Mahkûmiyette artar. Hasar ölçeklenmesi seviye 16'dan sonra düzleşir."
+        "description": "Düşmana hüküm giydirmek için tüm Mahkûmiyeti ve Kader İpliklerini tüketir. En az 20 Mahkûmiyet gerektirir. Hasar tüketilen Mahkûmiyetle artar ve her İplik hasarı %6 artırır. 50 Mahkûmiyette ayrıca verilen hasarın %20'si kadar seni iyileştirir. 80'de ayrıca hedefin 8 yarda içindeki düşmanlara hasarının %35'i kadar vurur. 100'de ayrıca oyunculara ve patronlara %5 daha fazla hasar verir ve sağlığı %20'nin altındaki sıradan bir düşmanı anında öldürür. Hasar ölçeklenmesi seviye 16'dan sonra düzleşir."
       },
       "life_tap": {
         "name": "Ağır Pazarlık",
@@ -18309,7 +18313,7 @@ export const tr_TR: EnTranslations = {
       },
       "umbral_anchor": {
         "name": "Gölge Çapası",
-        "description": "İlk okuma: gölgeni 5 dakika boyunca ayaklarının dibine çapalar. Oraya dönmek için 40 m içinde yeniden oku; bu çapayı tüketir ve 45 saniyelik bekleme süresini başlatır."
+        "description": "İlk okuma: gölgeni 5 dakika boyunca ayaklarının dibine çapalar. Oraya dönmek için 40 m içinde yeniden oku; bu 45 saniyelik bekleme süresini başlatır. Her dönüş, durduğun yere 5 dakikalık yeni bir çapa bırakır; böylece bir çapanın süresi dolana kadar ileri geri sıçramaya devam edebilirsin."
       },
       "soulwell": {
         "name": "Ruh Kuyusu",
@@ -18341,7 +18345,7 @@ export const tr_TR: EnTranslations = {
       },
       "fear": {
         "name": "Dehşet",
-        "description": "Düşmanın yüreğine korku salar ve onu 5 saniyeye kadar sinmiş bırakır. Hedefin azami sağlığının toplam %8'i kadar hasar etkiyi bozar."
+        "description": "Düşmanın yüreğine korku salar ve onu 5 saniyeye kadar sinmiş bırakır. Hedefin azami sağlığının toplam %10'u kadar hasar etkiyi bozar."
       },
       "searing_pain": {
         "name": "Dağlama",
@@ -19012,7 +19016,7 @@ export const tr_TR: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Dehşet Uluması",
-        "description": "Yakındaki düşmanları 5 sn. kadar korkutur. Hedefin azami sağlığının toplam %8'i kadar hasar korkusunu bozar. (Karabüyücü yeteneği)"
+        "description": "Seçilen konumun 8 yarda içindeki düşmanları 5 sn. kadar korkutur. Hedefin azami sağlığının toplam %10'u kadar hasar korkusunu bozar. (Karabüyücü yeteneği)"
       },
       "ice_block": {
         "name": "Soğuk Tabut",
@@ -31055,7 +31059,7 @@ export const tr_TR: EnTranslations = {
       },
       "vanguard_warlock_affliction": {
         "name": "Korku Tüyü Giysileri",
-        "bonus2": "Harrow'un döküm süresi 0,3 san azalır. Alınan hasar artık büyü yapmanı geciktirmez.",
+        "bonus2": "Gölge Çapası'nın bekleme süresi 15 san azalır. Alınan hasar artık büyü yapmanı geciktirmez.",
         "bonus4": "Consume seni %30 daha fazla iyileştirir ve hareket ederken kanallaştırılabilir."
       },
       "vanguard_warlock_demonology": {

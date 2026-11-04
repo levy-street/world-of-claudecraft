@@ -30,6 +30,7 @@ import {
 } from './game/arrival_cinematic';
 import { runBlockingArrivalWarmup, settleWorldEntryCover } from './game/arrival_warmup';
 import { audio } from './game/audio';
+import { audibleVolume, toggleAudioMuted } from './game/audio_mute';
 import { AutoLoot } from './game/autoloot';
 import { shouldRouteInteractToBgFlag } from './game/bg_flag_interact';
 import { applyBossTestDrive, parseBossTestDrive } from './game/boss_test_drive';
@@ -1870,6 +1871,9 @@ async function startGame(
             toggleDiscordPanel();
             break;
 
+          case 'muteAudio':
+            toggleMuteAllSound();
+            break;
           case 'sheathe':
             // Cosmetic sheathe toggle (Z): the cue-on-state-change rule lives
             // in sheathe_toggle.ts, shared with the gamepad dispatch below.
@@ -2067,6 +2071,15 @@ async function startGame(
   const gamepadBindings = new GamepadBindings();
   const crossHotbar = createCrossHotbar(() => hud, keybindScope, gamepadBindings);
   const canUseGameKeysNow = () => !gameplayInputBlocked();
+  // Mute All Sound (Ctrl+M, or its pad bind): re-applies every channel
+  // through audibleVolume, leaving the saved sliders untouched.
+  function toggleMuteAllSound(): void {
+    const nowMuted = toggleAudioMuted();
+    for (const key of ['sfxVolume', 'ambientVolume', 'musicVolume', 'voiceVolume'] as const) {
+      applySetting(key, settings.get(key));
+    }
+    hud.log(t(nowMuted ? 'hudChrome.keybinds.audioMuted' : 'hudChrome.keybinds.audioUnmuted'));
+  }
   function dispatchGamepadAction(id: string): void {
     // Cancel backs out one step at a time: the top window, then the target. Only
     // once there is nothing left to leave does the game menu come up, which is
@@ -2189,6 +2202,9 @@ async function startGame(
       case 'sheathe':
         // The keyboard arm's exact rule, from the same module.
         toggleSheatheWithCue(world, audio);
+        break;
+      case 'muteAudio':
+        toggleMuteAllSound();
         break;
       case 'chat':
         openChat();
@@ -2514,17 +2530,17 @@ async function startGame(
         input.setTouchLookSpeed(v);
         break;
       case 'sfxVolume':
-        audio.setVolume(v);
-        sfx.setVolume(v);
+        audio.setVolume(audibleVolume(v));
+        sfx.setVolume(audibleVolume(v));
         break;
       case 'ambientVolume':
-        sfx.setAmbientVolume(v);
+        sfx.setAmbientVolume(audibleVolume(v));
         break;
       case 'musicVolume':
-        music.setVolume(v);
+        music.setVolume(audibleVolume(v));
         break;
       case 'voiceVolume':
-        voice.setVolume(v);
+        voice.setVolume(audibleVolume(v));
         break;
       case 'brightness':
         renderer.setBrightness(v);

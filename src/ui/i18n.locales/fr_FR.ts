@@ -2178,7 +2178,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Appel des marées octroie aussi à sa cible un bouclier égal à 5 % de vos points de vie maximum pendant 6 s.',
   'entities.itemSets.vanguard_shaman_restoration.name': 'Cotte de mailles Garde-saumâtre',
   'entities.itemSets.vanguard_warlock_affliction.bonus2':
-    "Le temps d'incantation de Tourment est réduit de 0,3 s. Les dégâts subis ne retardent plus vos incantations.",
+    "Le temps de recharge d'Ancre ombrale est réduit de 15 s. Les dégâts subis ne retardent plus vos incantations.",
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     'Consumer vous soigne 30 % de plus et peut être canalisé en mouvement.',
   'entities.itemSets.vanguard_warlock_affliction.name': 'Tenue Plume-de-terreur',
@@ -7992,6 +7992,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.levelFamily': '{family} niveau {level}',
   'hudChrome.mobTooltip.elite': 'Élite',
   'hudChrome.mobTooltip.boss': 'Boss',
+  'hudChrome.mobTooltip.buddyOwner': 'Compagnon de {owner}',
   'hudChrome.options.aurasOnPlayerFrame': 'Améliorations sur le cadre du joueur',
   'hudChrome.options.playerFrameScale': 'Échelle du cadre du joueur',
   'hudChrome.options.showDailyRewardsChest': 'Afficher le coffre des récompenses quotidiennes',
@@ -10216,10 +10217,10 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Envoie un trait ténébreux sur l'ennemi pour {damage} points de dégâts d'Ombre.",
   'entities.abilities.demon_skin.name': 'Peau de démon',
   'entities.abilities.demon_skin.description':
-    'Une peau démoniaque augmente votre armure de {buff} pendant 30 min.',
+    'Une peau démoniaque augmente votre armure de {buff} pendant 30 min. Pact Deepened peut doubler cette armure et réduire les dégâts magiques subis tant que Peau de démon est active.',
   'entities.abilities.immolate.name': 'Pacte brûlant',
   'entities.abilities.immolate.description':
-    "Brûle l'ennemi pour {damage} points de dégâts de Feu et {overTime} points supplémentaires en 15 s.",
+    "Brûle l'ennemi pour {damage} points de dégâts de Feu en 15 s.",
   'entities.abilities.corruption.name': 'Pourriture noire',
   'entities.abilities.corruption.description':
     "Corrompt la cible et inflige {damage} points de dégâts d'Ombre en 18 s.",
@@ -10233,7 +10234,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Consume la vitalité de la cible, infligeant {damage} points de dégâts d'Ombre chaque seconde et vous en transférant 70% sous forme de vie. Affliction en transfère la totalité à la place. Canalisé sur votre Mauvais œil principal, il consomme tous les Fils du destin au départ, et chaque Fil génère 1 Condamnation supplémentaire par tic.",
   'entities.abilities.fear.name': 'Tourment',
   'entities.abilities.fear.description':
-    "Terrifie l'ennemi et le laisse tremblant pendant un maximum de 5 s. Les dégâts cumulés équivalant à 8% du maximum de points de vie de la cible interrompent l'effet.",
+    "Terrifie l'ennemi et le laisse tremblant pendant un maximum de 5 s. Les dégâts cumulés équivalant à 10% du maximum de points de vie de la cible interrompent l'effet.",
   'entities.abilities.searing_pain.name': 'Cautérisation',
   'entities.abilities.searing_pain.description':
     "Brûle l'ennemi d'un feu atroce pour {damage} points de dégâts de Feu. Incantation rapide.",
@@ -12546,8 +12547,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Prépare un coup plus lourd qui dépense de la rage sur votre prochaine attaque.',
   'guide.abilityHook.holy_light':
     "Un soin régulier et conséquent pour remettre d'aplomb un allié ou vous-même.",
-  'guide.abilityHook.immolate':
-    "Embrase une cible pour un coup d'ouverture et une brûlure qui s'attarde.",
+  'guide.abilityHook.immolate': "Embrase une cible d'une brûlure qui s'attarde.",
   'guide.abilityHook.judgement':
     'Dépense votre Sceau actif pour frapper un ennemi à courte portée.',
   'guide.abilityHook.lesser_heal':
@@ -15547,7 +15547,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_stream.description':
     'Rend 120 points de vie à une cible alliée en 12 s. (talent de Chaman)',
   'entities.abilities.howl_of_terror.description':
-    "Effraie les ennemis proches pendant un maximum de 5 s. Les dégâts cumulés équivalant à 8% du maximum de points de vie d'une cible interrompent sa peur. (talent de Démoniste)",
+    "Effraie les ennemis dans un rayon de 8 m autour de l'endroit ciblé pendant un maximum de 5 s. Les dégâts cumulés équivalant à 10% du maximum de points de vie d'une cible interrompent sa peur. (talent de Démoniste)",
   'entities.abilities.ice_block.description':
     'Vous enferme dans la glace pendant 8 s, vous immunisant contre tous les dégâts. Supprime les effets néfastes ordinaires déjà actifs et empêche les nouveaux effets de contrôle ordinaires. Utilisable lorsque vous êtes étourdi ou métamorphosé. Vous ne pouvez pas agir pendant cet effet. Relancez la capacité pour l’annuler. (Mage)',
   'entities.abilities.inner_focus.description':
@@ -17176,7 +17176,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Augmente la vitesse de déplacement de 35%, mais sacrifie 2% de vos points de vie maximum chaque seconde. Relancez pour annuler. Se désactive à 20% de points de vie.',
   'entities.abilities.sacrilegious_march.name': 'Marche sacrilège',
   'entities.abilities.sentence.description':
-    "Consomme toute la Condamnation et les Fils du destin pour prononcer la sentence sur l'ennemi. Chaque Fil augmente les dégâts de 6%. Des effets supplémentaires s'ajoutent à 20, 50, 80 et 100 Condamnation. Sa montée en dégâts se stabilise après le niveau 16.",
+    "Consomme toute la Condamnation et les Fils du destin pour prononcer la sentence sur l'ennemi. Nécessite au moins 20 Condamnation. Les dégâts augmentent avec la Condamnation consommée, et chaque Fil les augmente de 6%. À 50 Condamnation, vous rend aussi 20% des dégâts infligés en points de vie. À 80, touche aussi les ennemis dans un rayon de 8 m autour de la cible pour 35% de ses dégâts. À 100, inflige aussi 5% de dégâts supplémentaires aux joueurs et aux boss, et tue instantanément un ennemi normal sous 20% de points de vie. Sa montée en dégâts se stabilise après le niveau 16.",
   'entities.abilities.sentence.name': 'Sentence',
   'entities.abilities.sinister_strike.description':
     "Une frappe instantanée pour les dégâts de l'arme plus {damage}. Confère 1 point de combo.",
@@ -17209,7 +17209,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Balayez vos griffes à travers les ennemis proches pour {damage} points de dégâts. Cause une menace supplémentaire. Forme de Bruin uniquement.',
   'entities.abilities.swipe.specNote_feral': 'Chaque coup porté ajoute 1 Sang ancien (maximum 3).',
   'entities.abilities.umbral_anchor.description':
-    "Première incantation : ancre votre ombre à vos pieds pendant 5 min. Relancez à moins de 40 m pour y retourner, consommant l'ancre et déclenchant une recharge de 45 s.",
+    "Première incantation : ancre votre ombre à vos pieds pendant 5 min. Relancez à moins de 40 m pour y retourner, déclenchant une recharge de 45 s. Chaque retour laisse une nouvelle ancre de 5 min là où vous vous teniez, vous permettant de faire des allers-retours jusqu'à ce qu'une ancre expire.",
   'entities.abilities.umbral_anchor.name': 'Ancre ombrale',
   'entities.abilities.unholy_command.description':
     "Dépense 3 Fragments d'âme pour ordonner à tous vos morts-vivants d'infliger 25% de dégâts en plus et d'agir 20% plus vite pendant 12 s.",
@@ -17378,7 +17378,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Trois Fils du destin : Sentence peut les consommer pour 18% de dégâts supplémentaires.',
   'hudChrome.warlock.fateThreadsStatus': '{value} sur {max} Fils du destin.',
   'itemUi.tooltip.useHealingPotionPct':
-    'Utiliser : rend instantanément {percent}% de vos points de vie maximum. Utilisable en combat. Recharge de 2 min.',
+    'Utiliser : rend instantanément {percent}% de vos points de vie maximum. Utilisable en combat. Recharge de 1 min.',
   'guide.controls.reliquary': 'Le Reliquaire',
   'guide.deedsPage.rewardsBody':
     "Les récompenses sont toutes purement décoratives, et c'est bien le but. Certains hauts faits accordent un titre à porter ou une bordure pour encadrer votre nom, et jamais rien qui rende votre héros plus puissant. Choisissez le titre et la bordure que vous voulez dans le Livre des hauts faits : le titre vous suit sur votre plaque de nom, dans le chat et sur les classements, à la vue de tous, et la bordure trace ses propres couleurs autour de votre plaque de nom et de votre portrait.",
@@ -20229,6 +20229,9 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.toolTooltip.wieldDegrade':
     'En dessous de cette compétence, il fonctionne toujours comme un outil de niveau inférieur.',
   'hudChrome.keybinds.hideInterface': "Masquer l'interface",
+  'hudChrome.keybinds.muteAudio': 'Couper tout le son',
+  'hudChrome.keybinds.audioMuted': 'Tout le son est coupé. Appuyez à nouveau pour le rétablir.',
+  'hudChrome.keybinds.audioUnmuted': 'Son rétabli.',
   'hudChrome.keybinds.targetParty1': 'Membre du groupe cible 1',
   'hudChrome.keybinds.targetParty2': 'Membre du groupe cible 2',
   'hudChrome.keybinds.targetParty3': 'Membre du groupe cible 3',

@@ -2522,6 +2522,9 @@ export const cs_CZ: EnTranslations = {
       "friendlyNameplates": "Přepnout přátelské jmenovky",
       "sheathe": "Zasunout/Vytasit zbraň",
       "hideInterface": "Skrýt rozhraní",
+      "muteAudio": "Ztlumit veškerý zvuk",
+      "audioMuted": "Veškerý zvuk ztlumen. Dalším stisknutím ho znovu zapneš.",
+      "audioUnmuted": "Zvuk je znovu zapnutý.",
       "dive": "Potopit se",
       "categoryPet": "Mazlíček",
       "petAttack": "Mazlíček: Útok",
@@ -5086,7 +5089,8 @@ export const cs_CZ: EnTranslations = {
       "hostile": "Nepřátelský",
       "friendly": "Přátelský",
       "elite": "Elita",
-      "boss": "Boss"
+      "boss": "Boss",
+      "buddyOwner": "Společník hráče {owner}"
     },
     "playerTooltip": {
       "guild": "<{guild}>",
@@ -10161,7 +10165,7 @@ export const cs_CZ: EnTranslations = {
       "shadow_bolt": "Stínová střela seslaná na cíl, tvoje základní ničivé kouzlo.",
       "summon_imp": "Přivolá Žhavorodého, který na nepřátele z dálky sesílá Běsový výstřel.",
       "demon_skin": "Trvalý self-buff, který zpevní kůži a přidá zbroj.",
-      "immolate": "Zapálí cíl úvodním zásahem a přetrvávajícím hořením.",
+      "immolate": "Zapálí cíl hořením, které ho postupně spaluje.",
       "corruption": "Rozloží cíl stínem, který tiká, zatímco děláš jiné věci.",
       "life_tap": "Vymění část tvého zdraví zpět za manu, když vyschneš.",
       "wrath": "Přírodní střela hozená na cíl z dálky, tvoje základní ničivé kouzlo.",
@@ -17182,7 +17186,7 @@ export const cs_CZ: EnTranslations = {
       "clickDestroy": "Kliknutím zničíš",
       "useFishing": "Použití: Rybař v blízkých vodách.",
       "useHealingPotion": "Použití: Okamžitě obnoví {amount} zdraví. Použitelné v boji. Doba obnovy 2 min.",
-      "useHealingPotionPct": "Použití: Okamžitě obnoví {percent} % maximálního zdraví. Použitelné v boji. Doba obnovy 2 min.",
+      "useHealingPotionPct": "Použití: Okamžitě obnoví {percent} % maximálního zdraví. Použitelné v boji. Doba obnovy 1 min.",
       "useManaPotion": "Použití: Okamžitě obnoví {amount} many. Použitelné v boji. Doba obnovy 2 min.",
       "clickUseInstant": "Kliknutím okamžitě použiješ v boji",
       "clickUse": "Kliknutím použiješ",
@@ -18257,11 +18261,11 @@ export const cs_CZ: EnTranslations = {
       },
       "demon_skin": {
         "name": "Kůže běsa",
-        "description": "Démonická kůže zvýší tvoji zbroj o {buff} na 30 min."
+        "description": "Démonická kůže zvýší tvoji zbroj o {buff} na 30 min. Pact Deepened může tuto zbroj zdvojnásobit a snížit přijaté magické poškození, dokud je Kůže běsa aktivní."
       },
       "immolate": {
         "name": "Hořící pakt",
-        "description": "Spálí nepřítele za {damage} ohnivého poškození a dalších {overTime} během 15 s."
+        "description": "Spálí nepřítele za {damage} ohnivého poškození během 15 s."
       },
       "corruption": {
         "name": "Černá hniloba",
@@ -18281,7 +18285,7 @@ export const cs_CZ: EnTranslations = {
       },
       "sentence": {
         "name": "Rozsudek",
-        "description": "Spotřebuje veškeré Odsouzení a Nitě osudu, aby na nepříteli vynesla rozsudek. Každá Nit zvýší poškození o 6 %. Přidané efekty eskalují při 20, 50, 80 a 100 Odsouzení. Škálování jeho poškození se po úrovni 16 zplošťuje."
+        "description": "Spotřebuje veškeré Odsouzení a Nitě osudu, aby na nepříteli vynesla rozsudek. Vyžaduje alespoň 20 Odsouzení. Poškození roste se spotřebovaným Odsouzením a každá Nit ho zvýší o 6 %. Při 50 Odsouzení vás navíc vyléčí o 20 % způsobeného poškození. Při 80 navíc zasáhne nepřátele do 8 yardů od cíle za 35 % svého poškození. Při 100 navíc způsobí hráčům a bossům o 5 % vyšší poškození a okamžitě zabije běžného nepřítele pod 20 % zdraví. Škálování jeho poškození se po úrovni 16 zplošťuje."
       },
       "life_tap": {
         "name": "Tvrdý obchod",
@@ -18309,7 +18313,7 @@ export const cs_CZ: EnTranslations = {
       },
       "umbral_anchor": {
         "name": "Stínová kotva",
-        "description": "První seslání: na 5 min ukotví tvůj stín k tvým nohám. Seslej znovu do 40 yardů: vrátíš se tam, spotřebuješ kotvu a spustíš dobu obnovy 45 s."
+        "description": "První seslání: na 5 min ukotví tvůj stín k tvým nohám. Seslej znovu do 40 yardů: vrátíš se tam a spustíš dobu obnovy 45 s. Každý návrat zanechá na místě, kde jsi stál, novou kotvu na 5 min, takže můžeš skákat tam a zpět, dokud kotva nevyprší."
       },
       "soulwell": {
         "name": "Studnice duší",
@@ -18341,7 +18345,7 @@ export const cs_CZ: EnTranslations = {
       },
       "fear": {
         "name": "Děs",
-        "description": "Vžene nepříteli hrůzu a nechá ho krčit se až 5 s. Poškození v součtu 8 % maximálního zdraví cíle účinek přeruší."
+        "description": "Vžene nepříteli hrůzu a nechá ho krčit se až 5 s. Poškození v součtu 10 % maximálního zdraví cíle účinek přeruší."
       },
       "searing_pain": {
         "name": "Sežehnutí",
@@ -19012,7 +19016,7 @@ export const cs_CZ: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Děsivé zavytí",
-        "description": "Vyděsí blízké nepřátele až na 5 s. Poškození v součtu 8 % maximálního zdraví cíle přeruší jeho strach. (černokněžnický talent)"
+        "description": "Vyděsí nepřátele do 8 yardů od vybraného místa až na 5 s. Poškození v součtu 10 % maximálního zdraví cíle přeruší jeho strach. (černokněžnický talent)"
       },
       "ice_block": {
         "name": "Ledová rakev",
@@ -31055,7 +31059,7 @@ export const cs_CZ: EnTranslations = {
       },
       "vanguard_warlock_affliction": {
         "name": "Šat Děsopera",
-        "bonus2": "Sesílání Děsu je o 0.3 s kratší. Utržené poškození již nezpožďuje sesílání kouzel.",
+        "bonus2": "Doba obnovy Stínové kotvy je o 15 s kratší. Utržené poškození již nezpožďuje sesílání kouzel.",
         "bonus4": "Vysát: uzdraví tě o 30 % více a lze jej kanálovat i za pohybu."
       },
       "vanguard_warlock_demonology": {

@@ -5418,7 +5418,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresAuraStacks: 20,
     effects: [{ type: 'afflictionSentence' }],
     description:
-      'Consumes all Condemnation and Fate Threads to pass sentence on the enemy. Each Thread increases damage by 6%. Added effects escalate at 20, 50, 80, and 100 Condemnation. Its damage scaling flattens after level 16.',
+      'Consumes all Condemnation and Fate Threads to pass sentence on the enemy. Requires at least 20 Condemnation. Damage grows with the Condemnation consumed, and each Thread increases it by 6%. At 50 Condemnation it also heals you for 20% of the damage dealt. At 80 it also hits enemies within 8 yd of the target for 35% of its damage. At 100 it also deals 5% more damage to players and bosses, and instantly kills a normal enemy below 20% health. Its damage scaling flattens after level 16.',
   },
   cursed_accomplice: {
     id: 'cursed_accomplice',
@@ -5641,19 +5641,19 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'shadow',
     requiresTarget: false,
-    effects: [{ type: 'selfBuff', kind: 'buff_armor', value: 30, duration: 1800 }],
+    effects: [{ type: 'selfBuff', kind: 'buff_armor', value: 120, duration: 1800 }],
     ranks: [
       {
         rank: 2,
         level: 12,
         cost: 35,
-        effects: [{ type: 'selfBuff', kind: 'buff_armor', value: 55, duration: 1800 }],
+        effects: [{ type: 'selfBuff', kind: 'buff_armor', value: 220, duration: 1800 }],
       },
       {
         rank: 3,
         level: 20,
         cost: 50,
-        effects: [{ type: 'selfBuff', kind: 'buff_armor', value: 80, duration: 1800 }],
+        effects: [{ type: 'selfBuff', kind: 'buff_armor', value: 320, duration: 1800 }],
       },
     ],
     description:
@@ -5666,36 +5666,30 @@ export const ABILITIES: Record<string, AbilityDef> = {
     specs: ['destruction'],
     learnLevel: 5,
     cost: 25,
-    castTime: 2.0,
+    // Instant, with no opening hit: the old hit is folded into the burn
+    // (31+56, 62+98, 70+100). As a pure DoT it now scales through
+    // dotTickBonus (duration / 15), the same rule as Blackrot.
+    castTime: 0,
     cooldown: 0,
     range: 30,
     school: 'fire',
     requiresTarget: true,
-    effects: [
-      { type: 'directDamage', min: 31, max: 31 },
-      { type: 'dot', total: 56, duration: 15, interval: 3 },
-    ],
+    effects: [{ type: 'dot', total: 87, duration: 15, interval: 3 }],
     ranks: [
       {
         rank: 2,
         level: 10,
         cost: 40,
-        effects: [
-          { type: 'directDamage', min: 62, max: 62 },
-          { type: 'dot', total: 98, duration: 15, interval: 3 },
-        ],
+        effects: [{ type: 'dot', total: 160, duration: 15, interval: 3 }],
       },
       {
         rank: 3,
         level: 16,
         cost: 60,
-        effects: [
-          { type: 'directDamage', min: 70, max: 70 },
-          { type: 'dot', total: 100, duration: 15, interval: 3 },
-        ],
+        effects: [{ type: 'dot', total: 170, duration: 15, interval: 3 }],
       },
     ],
-    description: 'Burns the enemy for $d Fire damage and an additional $o over 15 sec.',
+    description: 'Burns the enemy for $d Fire damage over 15 sec.',
   },
   corruption: {
     id: 'corruption',
@@ -5918,7 +5912,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [{ type: 'warlockUmbralAnchor', duration: 300, maxRange: 40 }],
     description:
-      'First cast: anchors your shadow at your feet for 5 min. Recast within 40 m to return there, consuming the anchor and starting a 45 sec cooldown.',
+      'First cast: anchors your shadow at your feet for 5 min. Recast within 40 m to return there, starting a 45 sec cooldown. Each return leaves a new 5 min anchor where you stood, so you can keep jumping back and forth until an anchor expires.',
   },
   soulwell: {
     id: 'soulwell',
@@ -5927,7 +5921,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 8,
     cost: 80,
     castTime: 3,
-    cooldown: 300,
+    cooldown: 60,
     range: 0,
     school: 'shadow',
     requiresTarget: false,
@@ -5950,7 +5944,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     fearDr: true,
     effects: [{ type: 'incapacitate', duration: 5 }],
     description:
-      "Strikes terror into the enemy, leaving it cowering for up to 5 sec. Damage totaling 8% of the target's maximum health breaks the effect.",
+      "Strikes terror into the enemy, leaving it cowering for up to 5 sec. Damage totaling 10% of the target's maximum health breaks the effect.",
   },
   searing_pain: {
     id: 'searing_pain',

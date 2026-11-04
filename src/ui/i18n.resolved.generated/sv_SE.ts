@@ -2522,6 +2522,9 @@ export const sv_SE: EnTranslations = {
       "friendlyNameplates": "Växla vänliga namnskyltar",
       "sheathe": "Slida/Ta fram vapen",
       "hideInterface": "Dölj gränssnitt",
+      "muteAudio": "Stäng av allt ljud",
+      "audioMuted": "Allt ljud är avstängt. Tryck igen för att slå på det.",
+      "audioUnmuted": "Ljudet är på igen.",
       "dive": "Simma nedåt",
       "categoryPet": "Djur",
       "petAttack": "Djur: Anfall",
@@ -5086,7 +5089,8 @@ export const sv_SE: EnTranslations = {
       "hostile": "Fientlig",
       "friendly": "Vänlig",
       "elite": "Elit",
-      "boss": "Boss"
+      "boss": "Boss",
+      "buddyOwner": "Följeslagare till {owner}"
     },
     "playerTooltip": {
       "guild": "<{guild}>",
@@ -10161,7 +10165,7 @@ export const sv_SE: EnTranslations = {
       "shadow_bolt": "En skuggpil du kastar mot ett mål, din förstavalskanon.",
       "summon_imp": "Kallar fram en Emberkin som kastar Felbolt mot fiender på avstånd.",
       "demon_skin": "En varaktig självförstärkning som härdar din hud och ger rustning.",
-      "immolate": "Sätter ett mål i brand för ett inledande slag och en brand som dröjer kvar.",
+      "immolate": "Sätter ett mål i brand med en brand som dröjer kvar.",
       "corruption": "Förmultnar ett mål med skugga som tickar medan du gör andra saker.",
       "life_tap": "Byter en del av din egen hälsa tillbaka till mana när du sinar.",
       "wrath": "En naturpil kastad mot ett mål från avstånd, din förstavalskanon.",
@@ -17182,7 +17186,7 @@ export const sv_SE: EnTranslations = {
       "clickDestroy": "Klicka för att förstöra",
       "useFishing": "Använd: Fiska i närliggande vatten.",
       "useHealingPotion": "Använd: Återställer omedelbart {amount} hälsa. Användbar i strid. 1 min nedkylning.",
-      "useHealingPotionPct": "Använd: Återställer omedelbart {percent}% av maximal hälsa. Användbar i strid. 2 min nedkylning.",
+      "useHealingPotionPct": "Använd: Återställer omedelbart {percent}% av maximal hälsa. Användbar i strid. 1 min nedkylning.",
       "useManaPotion": "Använd: Återställer omedelbart {amount} mana. Användbar i strid. 1 min nedkylning.",
       "clickUseInstant": "Klicka för att använda omedelbart i strid",
       "clickUse": "Klicka för att använda",
@@ -18257,11 +18261,11 @@ export const sv_SE: EnTranslations = {
       },
       "demon_skin": {
         "name": "Djävulshud",
-        "description": "Demonisk hud ökar din rustning med {buff} i 30 min."
+        "description": "Demonisk hud ökar din rustning med {buff} i 30 min. Pact Deepened kan fördubbla denna rustning och minska magisk skada du tar medan Djävulshud är aktiv."
       },
       "immolate": {
         "name": "Brinnande pakt",
-        "description": "Bränner fienden för {damage} eldskada och ytterligare {overTime} över 15 sek."
+        "description": "Bränner fienden för {damage} eldskada över 15 sek."
       },
       "corruption": {
         "name": "Svartröta",
@@ -18281,7 +18285,7 @@ export const sv_SE: EnTranslations = {
       },
       "sentence": {
         "name": "Dom",
-        "description": "Förbrukar all Fördömelse och alla Ödestrådar för att fälla dom över fienden. Varje Tråd ökar skadan med 6%. Extra effekter trappas upp vid 20, 50, 80 och 100 Fördömelse. Dess skalning av skada planar ut efter nivå 16."
+        "description": "Förbrukar all Fördömelse och alla Ödestrådar för att fälla dom över fienden. Kräver minst 20 Fördömelse. Skadan växer med den förbrukade Fördömelsen, och varje Tråd ökar den med 6%. Vid 50 Fördömelse helar den dig dessutom för 20% av den utdelade skadan. Vid 80 träffar den dessutom fiender inom 8 meter från målet för 35% av sin skada. Vid 100 gör den dessutom 5% mer skada mot spelare och bossar och dödar omedelbart en vanlig fiende under 20% hälsa. Dess skalning av skada planar ut efter nivå 16."
       },
       "life_tap": {
         "name": "Hårt köpslag",
@@ -18309,7 +18313,7 @@ export const sv_SE: EnTranslations = {
       },
       "umbral_anchor": {
         "name": "Skuggankare",
-        "description": "Första kastningen: förankrar din skugga vid dina fötter i 5 min. Kasta igen inom 40 m för att återvända dit, vilket förbrukar ankaret och startar en 45 sekunders nedkylning."
+        "description": "Första kastningen: förankrar din skugga vid dina fötter i 5 min. Kasta igen inom 40 m för att återvända dit, vilket startar en 45 sekunders nedkylning. Varje återvändo lämnar ett nytt ankare i 5 min där du stod, så att du kan fortsätta hoppa fram och tillbaka tills ett ankare löper ut."
       },
       "soulwell": {
         "name": "Själsbrunn",
@@ -18341,7 +18345,7 @@ export const sv_SE: EnTranslations = {
       },
       "fear": {
         "name": "Plåga",
-        "description": "Slår skräck i fienden och får den att huka sig i upp till 5 sek. Skada som sammanlagt motsvarar 8% av målets maximala hälsa bryter effekten."
+        "description": "Slår skräck i fienden och får den att huka sig i upp till 5 sek. Skada som sammanlagt motsvarar 10% av målets maximala hälsa bryter effekten."
       },
       "searing_pain": {
         "name": "Sveda",
@@ -19012,7 +19016,7 @@ export const sv_SE: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Skräckyl",
-        "description": "Skrämmer fiender i närheten i upp till 5 sek. Skada som sammanlagt motsvarar 8% av målets maximala hälsa bryter deras rädsla. (häxmästartalang)"
+        "description": "Skrämmer fiender inom 8 meter från den valda platsen i upp till 5 sek. Skada som sammanlagt motsvarar 10% av målets maximala hälsa bryter deras rädsla. (häxmästartalang)"
       },
       "ice_block": {
         "name": "Kall kista",
@@ -31055,7 +31059,7 @@ export const sv_SE: EnTranslations = {
       },
       "vanguard_warlock_affliction": {
         "name": "Dreadquill Vestments",
-        "bonus2": "Harrows kastningstid minskas med 0,3 sec. Skada du tar fördröjer inte längre dina besvärjelser.",
+        "bonus2": "Skuggankares nedkylning minskas med 15 sek. Skada du tar fördröjer inte längre dina besvärjelser.",
         "bonus4": "Förtär läker dig för 30 procent mer och kan kanaliseras medan du rör dig."
       },
       "vanguard_warlock_demonology": {

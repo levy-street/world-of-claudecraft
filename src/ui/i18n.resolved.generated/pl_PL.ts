@@ -2522,6 +2522,9 @@ export const pl_PL: EnTranslations = {
       "friendlyNameplates": "Przełącz plakietki sojuszników",
       "sheathe": "Schowaj/Wyciągnij Broń",
       "hideInterface": "Ukryj interfejs",
+      "muteAudio": "Wycisz cały dźwięk",
+      "audioMuted": "Cały dźwięk wyciszony. Naciśnij ponownie, aby go włączyć.",
+      "audioUnmuted": "Dźwięk ponownie włączony.",
       "dive": "Nurkowanie w dół",
       "categoryPet": "Zwierzę",
       "petAttack": "Zwierzę: Atak",
@@ -5086,7 +5089,8 @@ export const pl_PL: EnTranslations = {
       "hostile": "Wrogi",
       "friendly": "Przyjazny",
       "elite": "Elita",
-      "boss": "Boss"
+      "boss": "Boss",
+      "buddyOwner": "Towarzysz gracza {owner}"
     },
     "playerTooltip": {
       "guild": "<{guild}>",
@@ -10161,7 +10165,7 @@ export const pl_PL: EnTranslations = {
       "shadow_bolt": "Pocisk cienia rzucany w cel, twój podstawowy atak.",
       "summon_imp": "Przyzywa Emberkina, który z dystansu rzuca w przeciwników Plugawym pociskiem.",
       "demon_skin": "Trwałe wzmocnienie, które utwardza skórę i zwiększa pancerz.",
-      "immolate": "Podpala cel, zadając początkowy cios i pozostawiając utrzymujące się płomienie.",
+      "immolate": "Podpala cel, pozostawiając utrzymujące się płomienie.",
       "corruption": "Skaża cel cieniem, który zadaje obrażenia, gdy zajmujesz się czymś innym.",
       "life_tap": "Zamienia część własnego zdrowia z powrotem na manę, gdy ci jej zabraknie.",
       "wrath": "Pocisk natury ciskany w cel z dystansu, twój podstawowy atak.",
@@ -17182,7 +17186,7 @@ export const pl_PL: EnTranslations = {
       "clickDestroy": "Kliknij, aby zniszczyć",
       "useFishing": "Użycie: Łów ryby w pobliskich wodach.",
       "useHealingPotion": "Użycie: Natychmiast przywraca {amount} zdrowia. Można użyć w walce. Czas odnowienia 1 min.",
-      "useHealingPotionPct": "Użycie: Natychmiast przywraca {percent}% maksymalnego zdrowia. Można użyć w walce. Czas odnowienia 2 min.",
+      "useHealingPotionPct": "Użycie: Natychmiast przywraca {percent}% maksymalnego zdrowia. Można użyć w walce. Czas odnowienia 1 min.",
       "useManaPotion": "Użycie: Natychmiast przywraca {amount} many. Można użyć w walce. Czas odnowienia 1 min.",
       "clickUseInstant": "Kliknij, aby użyć natychmiast w walce",
       "clickUse": "Kliknij, aby użyć",
@@ -18257,11 +18261,11 @@ export const pl_PL: EnTranslations = {
       },
       "demon_skin": {
         "name": "Skóra plugawca",
-        "description": "Demoniczna skóra zwiększa twój pancerz o {buff} na 30 min."
+        "description": "Demoniczna skóra zwiększa twój pancerz o {buff} na 30 min. Pact Deepened może podwoić ten pancerz i zmniejszyć otrzymywane obrażenia magiczne, dopóki Skóra plugawca jest aktywna."
       },
       "immolate": {
         "name": "Płonący pakt",
-        "description": "Pali wroga, zadając {damage} obrażeń od ognia oraz dodatkowe {overTime} w ciągu 15 sek."
+        "description": "Pali wroga, zadając {damage} obrażeń od ognia w ciągu 15 sek."
       },
       "corruption": {
         "name": "Czarna zgnilizna",
@@ -18281,7 +18285,7 @@ export const pl_PL: EnTranslations = {
       },
       "sentence": {
         "name": "Wyrok",
-        "description": "Zużywa całe Potępienie i Nici Przeznaczenia, aby wydać wyrok na wroga. Każda Nić zwiększa obrażenia o 6%. Dodatkowe efekty eskalują przy 20, 50, 80 i 100 Potępienia. Skalowanie jego obrażeń spłaszcza się po 16 poziomie."
+        "description": "Zużywa całe Potępienie i Nici Przeznaczenia, aby wydać wyrok na wroga. Wymaga co najmniej 20 Potępienia. Obrażenia rosną wraz ze zużytym Potępieniem, a każda Nić zwiększa je o 6%. Przy 50 Potępienia dodatkowo leczy cię o 20% zadanych obrażeń. Przy 80 dodatkowo trafia wrogów w promieniu 8 m od celu za 35% swoich obrażeń. Przy 100 dodatkowo zadaje graczom i bossom o 5% więcej obrażeń oraz natychmiast zabija zwykłego wroga poniżej 20% zdrowia. Skalowanie jego obrażeń spłaszcza się po 16 poziomie."
       },
       "life_tap": {
         "name": "Trudny targ",
@@ -18309,7 +18313,7 @@ export const pl_PL: EnTranslations = {
       },
       "umbral_anchor": {
         "name": "Mroczna Kotwica",
-        "description": "Pierwsze rzucenie: zakotwicza twój cień u twoich stóp na 5 minut. Rzuć ponownie w promieniu 40 m, aby tam wrócić, zużywając kotwicę i rozpoczynając 45-sekundowy czas odnowienia."
+        "description": "Pierwsze rzucenie: zakotwicza twój cień u twoich stóp na 5 minut. Rzuć ponownie w promieniu 40 m, aby tam wrócić, rozpoczynając 45-sekundowy czas odnowienia. Każdy powrót zostawia nową kotwicę na 5 minut w miejscu, w którym stałeś, więc możesz skakać tam i z powrotem, dopóki kotwica nie wygaśnie."
       },
       "soulwell": {
         "name": "Studnia Dusz",
@@ -18341,7 +18345,7 @@ export const pl_PL: EnTranslations = {
       },
       "fear": {
         "name": "Trwoga",
-        "description": "Wzbudza w przeciwniku przerażenie, zmuszając go do kulenia się przez maksymalnie 5 sek. Obrażenia równe łącznie 8% maksymalnego zdrowia celu przerywają efekt."
+        "description": "Wzbudza w przeciwniku przerażenie, zmuszając go do kulenia się przez maksymalnie 5 sek. Obrażenia równe łącznie 10% maksymalnego zdrowia celu przerywają efekt."
       },
       "searing_pain": {
         "name": "Przypalenie",
@@ -19012,7 +19016,7 @@ export const pl_PL: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Wycie Grozy",
-        "description": "Przeraża pobliskich wrogów na maksymalnie 5 sek. Obrażenia równe łącznie 8% maksymalnego zdrowia celu przerywają jego strach. (talent Czarnoksiężnika)"
+        "description": "Przeraża wrogów w promieniu 8 m od wybranego miejsca na maksymalnie 5 sek. Obrażenia równe łącznie 10% maksymalnego zdrowia celu przerywają jego strach. (talent Czarnoksiężnika)"
       },
       "ice_block": {
         "name": "Zimna Trumna",
@@ -31055,7 +31059,7 @@ export const pl_PL: EnTranslations = {
       },
       "vanguard_warlock_affliction": {
         "name": "Szata Pióra Grozy",
-        "bonus2": "Czas rzucania Trwogi jest zmniejszony o 0.3 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.",
+        "bonus2": "Czas odnowienia Mrocznej Kotwicy jest zmniejszony o 15 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.",
         "bonus4": "Pochłonięcie uzdrawia Ciebie o 30 procent więcej i może być kanalizowane podczas ruchu."
       },
       "vanguard_warlock_demonology": {

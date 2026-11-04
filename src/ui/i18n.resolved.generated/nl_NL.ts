@@ -2522,6 +2522,9 @@ export const nl_NL: EnTranslations = {
       "friendlyNameplates": "Naamplaatjes van bondgenoten omschakelen",
       "sheathe": "Wapen Schede In/Uit",
       "hideInterface": "Interface verbergen",
+      "muteAudio": "Alle geluid dempen",
+      "audioMuted": "Alle geluid gedempt. Druk opnieuw om het weer aan te zetten.",
+      "audioUnmuted": "Geluid weer aan.",
       "dive": "Omlaag Zwemmen",
       "categoryPet": "Huisdier",
       "petAttack": "Huisdier: Aanvallen",
@@ -5086,7 +5089,8 @@ export const nl_NL: EnTranslations = {
       "hostile": "Vijandig",
       "friendly": "Vriendelijk",
       "elite": "Elite",
-      "boss": "Baas"
+      "boss": "Baas",
+      "buddyOwner": "Metgezel van {owner}"
     },
     "playerTooltip": {
       "guild": "<{guild}>",
@@ -10161,7 +10165,7 @@ export const nl_NL: EnTranslations = {
       "shadow_bolt": "Een bout van schaduw die je op een doelwit afvuurt, je vertrouwde nuke.",
       "summon_imp": "Roept een Emberkin op die Felbolt op vijanden werpt vanaf een afstand.",
       "demon_skin": "Een blijvende zelfbuff die je huid verhardt en pantser toevoegt.",
-      "immolate": "Steekt een doelwit in brand voor een openingsklap en een brand die blijft hangen.",
+      "immolate": "Steekt een doelwit in brand met een brand die blijft hangen.",
       "corruption": "Laat een doelwit wegrotten met schaduw die tikt terwijl jij andere dingen doet.",
       "life_tap": "Ruilt een deel van je eigen gezondheid terug om in mana wanneer je droog komt te staan.",
       "wrath": "Een natuurbout die van afstand op een doelwit wordt geworpen, je vertrouwde nuke.",
@@ -17182,7 +17186,7 @@ export const nl_NL: EnTranslations = {
       "clickDestroy": "Klik om te vernietigen",
       "useFishing": "Gebruik: Vis in nabijgelegen wateren.",
       "useHealingPotion": "Gebruik: Herstelt direct {amount} levenskracht. Bruikbaar in gevecht. 1 min afkoeltijd.",
-      "useHealingPotionPct": "Gebruik: Herstelt direct {percent}% van je maximale levenskracht. Bruikbaar in gevecht. 2 min afkoeltijd.",
+      "useHealingPotionPct": "Gebruik: Herstelt direct {percent}% van je maximale levenskracht. Bruikbaar in gevecht. 1 min afkoeltijd.",
       "useManaPotion": "Gebruik: Herstelt direct {amount} mana. Bruikbaar in gevecht. 1 min afkoeltijd.",
       "clickUseInstant": "Klik om direct te gebruiken in gevecht",
       "clickUse": "Klik om te gebruiken",
@@ -18257,11 +18261,11 @@ export const nl_NL: EnTranslations = {
       },
       "demon_skin": {
         "name": "Duivelshuid",
-        "description": "Demonenhuid verhoogt je pantser met {buff} gedurende 30 min."
+        "description": "Demonenhuid verhoogt je pantser met {buff} gedurende 30 min. Pact Deepened kan dit pantser verdubbelen en ontvangen magische schade verminderen zolang Duivelshuid actief is."
       },
       "immolate": {
         "name": "Brandpact",
-        "description": "Verbrandt de vijand voor {damage} Vuurschade en nog eens {overTime} gedurende 15 sec."
+        "description": "Verbrandt de vijand voor {damage} Vuurschade gedurende 15 sec."
       },
       "corruption": {
         "name": "Zwartrot",
@@ -18281,7 +18285,7 @@ export const nl_NL: EnTranslations = {
       },
       "sentence": {
         "name": "Vonnis",
-        "description": "Verbruikt alle Verdoemenis en Lotsdraden om vonnis te vellen over de vijand. Elke Draad verhoogt de schade met 6%. Extra effecten schalen op bij 20, 50, 80 en 100 Verdoemenis. De schaalvergroting van zijn schade vlakt af na niveau 16."
+        "description": "Verbruikt alle Verdoemenis en Lotsdraden om vonnis te vellen over de vijand. Vereist minstens 20 Verdoemenis. De schade groeit met de verbruikte Verdoemenis, en elke Draad verhoogt die met 6%. Bij 50 Verdoemenis geneest het je bovendien voor 20% van de toegebrachte schade. Bij 80 raakt het bovendien vijanden binnen 8 yard van het doelwit voor 35% van de schade. Bij 100 doet het bovendien 5% meer schade aan spelers en bazen, en doodt het direct een normale vijand onder 20% gezondheid. De schaalvergroting van zijn schade vlakt af na niveau 16."
       },
       "life_tap": {
         "name": "Zware Koop",
@@ -18309,7 +18313,7 @@ export const nl_NL: EnTranslations = {
       },
       "umbral_anchor": {
         "name": "Schaduwanker",
-        "description": "Eerste bezwering: verankert je schaduw aan je voeten gedurende 5 min. Spreuk opnieuw binnen 40 yard om daarheen terug te keren, waarbij het anker wordt verbruikt en een afkoeltijd van 45 sec begint."
+        "description": "Eerste bezwering: verankert je schaduw aan je voeten gedurende 5 min. Spreuk opnieuw binnen 40 yard om daarheen terug te keren, waarbij een afkoeltijd van 45 sec begint. Elke terugkeer laat een nieuw anker van 5 min achter waar je stond, zodat je heen en weer kunt blijven springen tot een anker verloopt."
       },
       "soulwell": {
         "name": "Zielenbron",
@@ -18341,7 +18345,7 @@ export const nl_NL: EnTranslations = {
       },
       "fear": {
         "name": "Teisteren",
-        "description": "Jaagt de vijand de stuipen op het lijf, waardoor die maximaal 5 sec ineenkrimpt. Schade ter waarde van in totaal 8% van de maximale gezondheid van het doelwit verbreekt het effect."
+        "description": "Jaagt de vijand de stuipen op het lijf, waardoor die maximaal 5 sec ineenkrimpt. Schade ter waarde van in totaal 10% van de maximale gezondheid van het doelwit verbreekt het effect."
       },
       "searing_pain": {
         "name": "Schroeien",
@@ -19012,7 +19016,7 @@ export const nl_NL: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Huiveringwekkende huil",
-        "description": "Jaagt nabije vijanden tot 5 sec. angst aan. Schade ter waarde van in totaal 8% van de maximale gezondheid van een doelwit verbreekt de angst. (tovenaarstalent)"
+        "description": "Jaagt vijanden binnen 8 yard van de geselecteerde locatie tot 5 sec. angst aan. Schade ter waarde van in totaal 10% van de maximale gezondheid van een doelwit verbreekt de angst. (tovenaarstalent)"
       },
       "ice_block": {
         "name": "Koude kist",
@@ -31055,7 +31059,7 @@ export const nl_NL: EnTranslations = {
       },
       "vanguard_warlock_affliction": {
         "name": "Angstqvill Gewaden",
-        "bonus2": "Werptijd van Teisteren is 0.3 sec korter. Opgelopen schade vertraagt je spreuken niet meer.",
+        "bonus2": "Afkoeltijd van Schaduwanker is 15 sec korter. Opgelopen schade vertraagt je spreuken niet meer.",
         "bonus4": "Verteren geneest je 30% meer en kan gekanaliseerd worden terwijl je beweegt."
       },
       "vanguard_warlock_demonology": {

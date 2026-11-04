@@ -2118,7 +2118,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Tidenoproep beschermt zijn doel ook voor 5% van je maximale gezondheid voor 6 sec.',
   'entities.itemSets.vanguard_shaman_restoration.name': 'Ziltwacht Kettingpantser',
   'entities.itemSets.vanguard_warlock_affliction.bonus2':
-    'Werptijd van Teisteren is 0.3 sec korter. Opgelopen schade vertraagt je spreuken niet meer.',
+    'Afkoeltijd van Schaduwanker is 15 sec korter. Opgelopen schade vertraagt je spreuken niet meer.',
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     'Verteren geneest je 30% meer en kan gekanaliseerd worden terwijl je beweegt.',
   'entities.itemSets.vanguard_warlock_affliction.name': 'Angstqvill Gewaden',
@@ -7504,6 +7504,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.levelFamily': 'Niveau {level} {family}',
   'hudChrome.mobTooltip.elite': 'Elite',
   'hudChrome.mobTooltip.boss': 'Baas',
+  'hudChrome.mobTooltip.buddyOwner': 'Metgezel van {owner}',
   'hudChrome.options.aurasOnPlayerFrame': 'Buffs op het spelerframe',
   'hudChrome.options.playerFrameScale': 'Schaal spelerframe',
   'hudChrome.options.showDailyRewardsChest': 'Kist met dagelijkse beloningen tonen',
@@ -8117,7 +8118,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Een verdedigende gevechtshouding: je genereert 30% meer dreiging, maar brengt 10% minder schade toe en incasseert 10% minder. Activeer opnieuw om de houding te verlaten.',
   'entities.abilities.defensive_stance.name': 'Bewaakte Houding',
   'entities.abilities.demon_skin.description':
-    'Demonenhuid verhoogt je pantser met {buff} gedurende 30 min.',
+    'Demonenhuid verhoogt je pantser met {buff} gedurende 30 min. Pact Deepened kan dit pantser verdubbelen en ontvangen magische schade verminderen zolang Duivelshuid actief is.',
   'entities.abilities.demon_skin.name': 'Duivelshuid',
   'entities.abilities.demoralizing_roar.description':
     'Demoraliseert nabije vijanden en verlaagt hun aanvalskracht met 20 gedurende 20 sec. Alleen in Bruingedaante.',
@@ -8157,7 +8158,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.expose_armor.name': 'Pantserbres',
   'entities.abilities.faerie_fire.name': 'Heksenlicht',
   'entities.abilities.fear.description':
-    'Jaagt de vijand de stuipen op het lijf, waardoor die maximaal 5 sec ineenkrimpt. Schade ter waarde van in totaal 8% van de maximale gezondheid van het doelwit verbreekt het effect.',
+    'Jaagt de vijand de stuipen op het lijf, waardoor die maximaal 5 sec ineenkrimpt. Schade ter waarde van in totaal 10% van de maximale gezondheid van het doelwit verbreekt het effect.',
   'entities.abilities.fear.name': 'Teisteren',
   'entities.abilities.ferocious_bite.name': 'Bloedbeet',
   'entities.abilities.fire_blast.description':
@@ -8247,7 +8248,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Schermt je af met ijs en absorbeert {damage} schade gedurende 60 sec.',
   'entities.abilities.ice_barrier.name': 'Vorstsluier',
   'entities.abilities.immolate.description':
-    'Verbrandt de vijand voor {damage} Vuurschade en nog eens {overTime} gedurende 15 sec.',
+    'Verbrandt de vijand voor {damage} Vuurschade gedurende 15 sec.',
   'entities.abilities.immolate.name': 'Brandpact',
   'entities.abilities.insect_swarm.description':
     'De vijand wordt belaagd door insecten en lijdt {damage} Natuurschade gedurende 12 sec.',
@@ -9940,8 +9941,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Zet een zwaardere uithaal in de wachtrij die rage besteedt bij je volgende klap.',
   'guide.abilityHook.holy_light':
     'Een gestage, flinke genezing om een bondgenoot of jezelf aan te vullen.',
-  'guide.abilityHook.immolate':
-    'Steekt een doelwit in brand voor een openingsklap en een brand die blijft hangen.',
+  'guide.abilityHook.immolate': 'Steekt een doelwit in brand met een brand die blijft hangen.',
   'guide.abilityHook.judgement':
     'Besteedt je actieve Zegel om een vijand van korte afstand te raken.',
   'guide.abilityHook.lesser_heal':
@@ -14710,7 +14710,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_stream.description':
     'Herstelt 120 gezondheid van een bevriend doelwit gedurende 12 sec. (sjamaantalent)',
   'entities.abilities.howl_of_terror.description':
-    'Jaagt nabije vijanden tot 5 sec. angst aan. Schade ter waarde van in totaal 8% van de maximale gezondheid van een doelwit verbreekt de angst. (tovenaarstalent)',
+    'Jaagt vijanden binnen 8 yard van de geselecteerde locatie tot 5 sec. angst aan. Schade ter waarde van in totaal 10% van de maximale gezondheid van een doelwit verbreekt de angst. (tovenaarstalent)',
   'entities.abilities.ice_block.description':
     'Sluit u 8 sec. lang op in massief ijs en maakt u immuun voor alle schade. Verwijdert bestaande gewone schadelijke effecten en voorkomt dat nieuwe gewone controle-effecten worden toegepast. Kan worden gebruikt terwijl u verdoofd of veranderd bent. U kunt niet handelen zolang u opgesloten bent. Werp opnieuw om te annuleren. (magiër)',
   'entities.abilities.inner_focus.description':
@@ -16748,7 +16748,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Verhoogt je bewegingssnelheid met 35%, maar offert elke seconde 2% van je maximale gezondheid op. Spreuk opnieuw om te annuleren. Het schakelt uit bij 20% gezondheid.',
   'entities.abilities.sacrilegious_march.name': 'Heiligschennende mars',
   'entities.abilities.sentence.description':
-    'Verbruikt alle Verdoemenis en Lotsdraden om vonnis te vellen over de vijand. Elke Draad verhoogt de schade met 6%. Extra effecten schalen op bij 20, 50, 80 en 100 Verdoemenis. De schaalvergroting van zijn schade vlakt af na niveau 16.',
+    'Verbruikt alle Verdoemenis en Lotsdraden om vonnis te vellen over de vijand. Vereist minstens 20 Verdoemenis. De schade groeit met de verbruikte Verdoemenis, en elke Draad verhoogt die met 6%. Bij 50 Verdoemenis geneest het je bovendien voor 20% van de toegebrachte schade. Bij 80 raakt het bovendien vijanden binnen 8 yard van het doelwit voor 35% van de schade. Bij 100 doet het bovendien 5% meer schade aan spelers en bazen, en doodt het direct een normale vijand onder 20% gezondheid. De schaalvergroting van zijn schade vlakt af na niveau 16.',
   'entities.abilities.sentence.name': 'Vonnis',
   'entities.abilities.sinister_strike.description':
     'Een directe slag voor wapenschade plus {damage}. Levert 1 combopunt op.',
@@ -16780,7 +16780,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Veeg met je klauwen door nabije vijanden voor {damage} schade. Veroorzaakt extra dreiging. Alleen in Bruingedaante.',
   'entities.abilities.swipe.specNote_feral': 'Elke slag die raakt voegt 1 Oud Bloed toe (max 3).',
   'entities.abilities.umbral_anchor.description':
-    'Eerste bezwering: verankert je schaduw aan je voeten gedurende 5 min. Spreuk opnieuw binnen 40 yard om daarheen terug te keren, waarbij het anker wordt verbruikt en een afkoeltijd van 45 sec begint.',
+    'Eerste bezwering: verankert je schaduw aan je voeten gedurende 5 min. Spreuk opnieuw binnen 40 yard om daarheen terug te keren, waarbij een afkoeltijd van 45 sec begint. Elke terugkeer laat een nieuw anker van 5 min achter waar je stond, zodat je heen en weer kunt blijven springen tot een anker verloopt.',
   'entities.abilities.umbral_anchor.name': 'Schaduwanker',
   'entities.abilities.unholy_command.description':
     'Besteedt 3 Zielfragmenten om al je ondoden te bevelen 12 sec lang 25% meer schade toe te brengen en 20% sneller te handelen.',
@@ -16936,7 +16936,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Drie Lotsdraden: Vonnis kan ze verbruiken voor 18% meer schade.',
   'hudChrome.warlock.fateThreadsStatus': '{value} van {max} Lotsdraden.',
   'itemUi.tooltip.useHealingPotionPct':
-    'Gebruik: Herstelt direct {percent}% van je maximale levenskracht. Bruikbaar in gevecht. 2 min afkoeltijd.',
+    'Gebruik: Herstelt direct {percent}% van je maximale levenskracht. Bruikbaar in gevecht. 1 min afkoeltijd.',
   'guide.controls.reliquary': 'Het Reliquarium',
   'guide.deedsPage.rewardsBody':
     'De beloningen zijn allemaal pure vertoning, en dat is precies de bedoeling. Sommige daden schenken een titel die je kunt dragen of een rand die je naam omlijst, en nooit iets dat je held sterker maakt. Kies de titel en de rand die je wilt in het Boek der Daden: de titel reist met je mee op je naamplaatje, in de chat en op de ranglijsten, zichtbaar voor iedereen, en de rand trekt zijn eigen kleuren om je naamplaatje en je portret.',
@@ -19977,6 +19977,9 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.toolTooltip.wieldDegrade':
     'Onder die vaardigheid werkt het nog steeds als een hulpmiddel op een lager niveau.',
   'hudChrome.keybinds.hideInterface': 'Interface verbergen',
+  'hudChrome.keybinds.muteAudio': 'Alle geluid dempen',
+  'hudChrome.keybinds.audioMuted': 'Alle geluid gedempt. Druk opnieuw om het weer aan te zetten.',
+  'hudChrome.keybinds.audioUnmuted': 'Geluid weer aan.',
   'hudChrome.keybinds.targetParty1': 'Doelpartijlid 1',
   'hudChrome.keybinds.targetParty2': 'Doelpartijlid 2',
   'hudChrome.keybinds.targetParty3': 'Doelpartijlid 3',

@@ -2066,7 +2066,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Richiamo della Marea protegge inoltre il suo bersaglio con uno scudo pari al 5 percento della tua salute massima per 6 sec.',
   'entities.itemSets.vanguard_shaman_restoration.name': 'Cotta di Maglia Guardiasalmastra',
   'entities.itemSets.vanguard_warlock_affliction.bonus2':
-    'Il tempo di lancio di Tormento è ridotto di 0,3 sec. I danni subiti non ritardano più il lancio degli incantesimi.',
+    "Il tempo di recupero di Ancora d'Ombra è ridotto di 15 sec. I danni subiti non ritardano più il lancio degli incantesimi.",
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     'Divorare ti cura il 30 percento in più e può essere canalizzato in movimento.',
   'entities.itemSets.vanguard_warlock_affliction.name': 'Vesti Pennaterrore',
@@ -7461,6 +7461,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.levelFamily': '{family} di livello {level}',
   'hudChrome.mobTooltip.elite': 'Élite',
   'hudChrome.mobTooltip.boss': 'Boss',
+  'hudChrome.mobTooltip.buddyOwner': 'Compagno di {owner}',
   'hudChrome.options.aurasOnPlayerFrame': 'Buff sul riquadro del giocatore',
   'hudChrome.options.playerFrameScale': 'Scala del riquadro del giocatore',
   'hudChrome.options.showDailyRewardsChest': 'Mostra forziere delle ricompense giornaliere',
@@ -9645,10 +9646,10 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Invia un dardo oscuro contro il nemico per {damage} danni da Ombra.',
   'entities.abilities.demon_skin.name': 'Pelle di Demone',
   'entities.abilities.demon_skin.description':
-    'La pelle demoniaca aumenta la tua armatura di {buff} per 30 min.',
+    'La pelle demoniaca aumenta la tua armatura di {buff} per 30 min. Pact Deepened può raddoppiare questa armatura e ridurre i danni magici subiti finché Pelle di Demone è attiva.',
   'entities.abilities.immolate.name': 'Patto Ardente',
   'entities.abilities.immolate.description':
-    'Brucia il nemico per {damage} danni da Fuoco e altri {overTime} in 15 sec.',
+    'Brucia il nemico per {damage} danni da Fuoco in 15 sec.',
   'entities.abilities.corruption.name': 'Marciume Nero',
   'entities.abilities.corruption.description':
     'Corrompe il bersaglio, infliggendo {damage} danni da Ombra in 18 s.',
@@ -9662,7 +9663,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Consuma la vitalità del bersaglio, infliggendo {damage} danni da Ombra ogni secondo e trasferendovene il 70% come salute. Afflizione ne trasferisce invece la totalità. Quando è incanalato sul vostro Malocchio primario, consuma all'inizio tutti i Filamenti del Fato, e ogni Filamento genera 1 Condanna in più per impulso.",
   'entities.abilities.fear.name': 'Tormento',
   'entities.abilities.fear.description':
-    "Terrorizza il nemico, lasciandolo tremante per un massimo di 5 s. I danni pari in totale all'8% della salute massima del bersaglio interrompono l'effetto.",
+    "Terrorizza il nemico, lasciandolo tremante per un massimo di 5 s. I danni pari in totale al 10% della salute massima del bersaglio interrompono l'effetto.",
   'entities.abilities.searing_pain.name': 'Bruciatura',
   'entities.abilities.searing_pain.description':
     'Brucia il nemico con fuoco agonizzante per {damage} danni da Fuoco. Lancio rapido.',
@@ -11848,8 +11849,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Mette in coda un fendente più pesante che spende ira al tuo prossimo colpo.',
   'guide.abilityHook.holy_light':
     'Una cura costante e di buona entità per rimettere in piedi un alleato o te stesso.',
-  'guide.abilityHook.immolate':
-    "Incendia un bersaglio per un colpo iniziale e un'ustione che perdura.",
+  'guide.abilityHook.immolate': "Incendia un bersaglio con un'ustione che perdura.",
   'guide.abilityHook.judgement':
     'Spende il tuo Sigillo attivo per colpire un nemico dalla corta distanza.',
   'guide.abilityHook.lesser_heal':
@@ -15240,7 +15240,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_stream.description':
     'Ripristina 120 salute a un bersaglio alleato in 12 sec. (talento dello Sciamano)',
   'entities.abilities.howl_of_terror.description':
-    "Terrorizza i nemici vicini per un massimo di 5 sec. I danni pari in totale all'8% della salute massima del bersaglio interrompono la sua paura. (talento dello Stregone)",
+    'Terrorizza i nemici entro 8 metri dal punto selezionato per un massimo di 5 sec. I danni pari in totale al 10% della salute massima del bersaglio interrompono la sua paura. (talento dello Stregone)',
   'entities.abilities.ice_block.description':
     'Ti racchiude nel ghiaccio solido per 8 s, rendendoti immune a tutti i danni. Rimuove gli effetti dannosi comuni già attivi e impedisce l’applicazione di nuovi effetti di controllo comuni. Utilizzabile mentre sei stordito o trasformato. Non puoi agire mentre sei racchiuso. Lancia di nuovo per annullare. (mago)',
   'entities.abilities.inner_focus.description':
@@ -17493,7 +17493,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Aumenta la velocità di movimento del 35%, ma sacrifica il 2% della tua salute massima ogni secondo. Rilancia per annullare. Si disattiva al 20% di salute.',
   'entities.abilities.sacrilegious_march.name': 'Marcia Sacrilega',
   'entities.abilities.sentence.description':
-    'Consuma tutta la Condanna e i Filamenti del Fato per pronunciare la sentenza sul nemico. Ogni Filamento aumenta i danni del 6%. Gli effetti aggiuntivi si intensificano a 20, 50, 80 e 100 Condanna. La sua scalatura dei danni si appiattisce dopo il livello 16.',
+    "Consuma tutta la Condanna e i Filamenti del Fato per pronunciare la sentenza sul nemico. Richiede almeno 20 Condanna. I danni aumentano con la Condanna consumata e ogni Filamento li aumenta del 6%. A 50 Condanna ti cura anche del 20% dei danni inflitti. A 80 colpisce anche i nemici entro 8 metri dal bersaglio per il 35% dei suoi danni. A 100 infligge anche il 5% di danni in più a giocatori e boss, e uccide all'istante un nemico normale sotto il 20% di salute. La sua scalatura dei danni si appiattisce dopo il livello 16.",
   'entities.abilities.sentence.name': 'Sentenza',
   'entities.abilities.sinister_strike.description':
     "Un colpo istantaneo per danni dell'arma più {damage}. Conferisce 1 punto combo.",
@@ -17527,7 +17527,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.swipe.specNote_feral':
     'Ogni colpo a segno aggiunge 1 Sangue Antico (massimo 3).',
   'entities.abilities.umbral_anchor.description':
-    "Primo lancio: ancora la tua ombra ai tuoi piedi per 5 min. Rilancia entro 40 m per tornare lì, consumando l'ancora e avviando un tempo di recupero di 45 sec.",
+    "Primo lancio: ancora la tua ombra ai tuoi piedi per 5 min. Rilancia entro 40 m per tornare lì, avviando un tempo di recupero di 45 sec. Ogni ritorno lascia una nuova ancora di 5 min dove ti trovavi, così puoi continuare a saltare avanti e indietro finché un'ancora non scade.",
   'entities.abilities.umbral_anchor.name': "Ancora d'Ombra",
   'entities.abilities.unholy_command.description':
     "Spende 3 Frammenti d'Anima per comandare tutti i tuoi non morti a infliggere il 25% di danni in più e agire il 20% più velocemente per 12 sec.",
@@ -17683,7 +17683,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Tre Filamenti del Fato: Sentenza può consumarli per un aumento del 18% dei danni.',
   'hudChrome.warlock.fateThreadsStatus': '{value} su {max} Filamenti del Fato.',
   'itemUi.tooltip.useHealingPotionPct':
-    'Uso: ripristina istantaneamente il {percent}% della salute massima. Usabile in combattimento. Recupero 2 min.',
+    'Uso: ripristina istantaneamente il {percent}% della salute massima. Usabile in combattimento. Recupero 1 min.',
   'guide.controls.reliquary': 'Il Reliquiario',
   'guide.deedsPage.rewardsBody':
     'Le ricompense sono tutte pura apparenza, ed è proprio questo il punto. Alcune imprese concedono un titolo da indossare o un bordo per incorniciare il tuo nome, e mai nulla che renda il tuo eroe più forte. Scegli il titolo e il bordo che preferisci dal Libro delle Imprese: il titolo ti accompagna sulla targhetta del nome, in chat e nelle classifiche, sotto gli occhi di tutti, e il bordo disegna i propri colori attorno alla targhetta e al ritratto.',
@@ -20140,6 +20140,9 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.toolTooltip.wieldDegrade':
     'Al di sotto di tale abilità funziona ancora come uno strumento di livello inferiore.',
   'hudChrome.keybinds.hideInterface': 'Nascondi interfaccia',
+  'hudChrome.keybinds.muteAudio': "Disattiva tutto l'audio",
+  'hudChrome.keybinds.audioMuted': "Tutto l'audio è disattivato. Premi di nuovo per riattivarlo.",
+  'hudChrome.keybinds.audioUnmuted': 'Audio riattivato.',
   'hudChrome.keybinds.targetParty1': 'Membro del partito bersaglio 1',
   'hudChrome.keybinds.targetParty2': 'Membro del partito bersaglio 2',
   'hudChrome.keybinds.targetParty3': 'Membro del partito bersaglio 3',

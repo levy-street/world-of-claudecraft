@@ -1094,11 +1094,7 @@ const classAbilityNamesEn = {
         'Fiendhide',
         'Demonic skin increases your armor by {buff} for 30 min. Pact Deepened can double this armor and reduce magic damage taken while Fiendhide is active.',
       ],
-      [
-        'immolate',
-        'Burning Pact',
-        'Burns the enemy for {damage} Fire damage and an additional {overTime} over 15 sec.',
-      ],
+      ['immolate', 'Burning Pact', 'Burns the enemy for {damage} Fire damage over 15 sec.'],
       [
         'corruption',
         'Blackrot',
@@ -1122,7 +1118,7 @@ const classAbilityNamesEn = {
       [
         'sentence',
         'Sentence',
-        'Consumes all Condemnation and Fate Threads to pass sentence on the enemy. Each Thread increases damage by 6%. Added effects escalate at 20, 50, 80, and 100 Condemnation. Its damage scaling flattens after level 16.',
+        'Consumes all Condemnation and Fate Threads to pass sentence on the enemy. Requires at least 20 Condemnation. Damage grows with the Condemnation consumed, and each Thread increases it by 6%. At 50 Condemnation it also heals you for 20% of the damage dealt. At 80 it also hits enemies within 8 yd of the target for 35% of its damage. At 100 it also deals 5% more damage to players and bosses, and instantly kills a normal enemy below 20% health. Its damage scaling flattens after level 16.',
       ],
       ['life_tap', 'Hard Bargain', 'Converts {damage} health into {damage} mana.'],
       [
@@ -1153,7 +1149,7 @@ const classAbilityNamesEn = {
       [
         'umbral_anchor',
         'Umbral Anchor',
-        'First cast: anchors your shadow at your feet for 5 min. Recast within 40 m to return there, consuming the anchor and starting a 45 sec cooldown.',
+        'First cast: anchors your shadow at your feet for 5 min. Recast within 40 m to return there, starting a 45 sec cooldown. Each return leaves a new 5 min anchor where you stood, so you can keep jumping back and forth until an anchor expires.',
       ],
       [
         'soulwell',
@@ -1193,7 +1189,7 @@ const classAbilityNamesEn = {
       [
         'fear',
         'Harrow',
-        "Strikes terror into the enemy, leaving it cowering for up to 5 sec. Damage totaling 8% of the target's maximum health breaks the effect.",
+        "Strikes terror into the enemy, leaving it cowering for up to 5 sec. Damage totaling 10% of the target's maximum health breaks the effect.",
       ],
       [
         'searing_pain',
@@ -2031,7 +2027,7 @@ const classAbilityNamesEn = {
       [
         'howl_of_terror',
         'Dread Chorus',
-        "Frightens nearby enemies for up to 5 sec. Damage totaling 8% of a target's maximum health breaks its fear. (Warlock talent)",
+        "Frightens enemies within 8 yd of the selected location for up to 5 sec. Damage totaling 10% of a target's maximum health breaks its fear. (Warlock talent)",
       ],
       [
         'ice_block',

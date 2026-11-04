@@ -2271,7 +2271,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_shaman_restoration_shoulder.name': 'Brandungswacht-Schultermantel',
   'entities.itemSets.vanguard_warlock_affliction.name': 'Furchtfeder-Gewänder',
   'entities.itemSets.vanguard_warlock_affliction.bonus2':
-    'Die Zauberzeit von Heimsuchung wird um 0,3 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
+    'Die Abklingzeit von Schattenanker wird um 15 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     'Verzehren heilt dich um 30 Prozent mehr und kann während der Bewegung kanalisiert werden.',
   'entities.items.vanguard_warlock_affliction_chest.name': 'Furchtfeder-Robe',
@@ -7502,6 +7502,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.levelFamily': 'Stufe {level} {family}',
   'hudChrome.mobTooltip.elite': 'Elite',
   'hudChrome.mobTooltip.boss': 'Boss',
+  'hudChrome.mobTooltip.buddyOwner': 'Gefährte von {owner}',
   'hudChrome.options.aurasOnPlayerFrame': 'Stärkungszauber am Spielerfenster',
   'hudChrome.options.playerFrameScale': 'Skalierung des Spielerfensters',
   'hudChrome.options.showDailyRewardsChest': 'Truhe der täglichen Belohnungen anzeigen',
@@ -9676,10 +9677,10 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Sendet einen schattenhaften Blitz auf den Gegner und verursacht {damage} Schattenschaden.',
   'entities.abilities.demon_skin.name': 'Dämonenhaut',
   'entities.abilities.demon_skin.description':
-    'Dämonische Haut erhöht eure Rüstung 30 Min. lang um {buff}.',
+    'Dämonische Haut erhöht eure Rüstung 30 Min. lang um {buff}. Pact Deepened kann diese Rüstung verdoppeln und erlittenen magischen Schaden verringern, solange Dämonenhaut aktiv ist.',
   'entities.abilities.immolate.name': 'Brennender Pakt',
   'entities.abilities.immolate.description':
-    'Verbrennt den Gegner für {damage} Feuerschaden und zusätzlich {overTime} über 15 Sek.',
+    'Verbrennt den Gegner für {damage} Feuerschaden über 15 Sek.',
   'entities.abilities.corruption.name': 'Schwarzfäule',
   'entities.abilities.corruption.description':
     'Verderbt das Ziel und verursacht über 18 Sek. {damage} Schattenschaden.',
@@ -9693,7 +9694,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Zehrt die Lebenskraft des Ziels aus, verursacht jede Sekunde {damage} Schattenschaden und überträgt euch 70% davon als Gesundheit. Gebrechen überträgt stattdessen alles. Auf euer vorrangiges Böses Auge kanalisiert, verbraucht der Zauber zu Beginn alle Schicksalsfäden, und jeder Faden erzeugt 1 zusätzliche Verdammnis je Tick.',
   'entities.abilities.fear.name': 'Heimsuchung',
   'entities.abilities.fear.description':
-    'Versetzt den Gegner in Schrecken und lässt ihn bis zu 5 Sek. lang kauern. Schaden in Höhe von insgesamt 8% der maximalen Gesundheit des Ziels bricht den Effekt.',
+    'Versetzt den Gegner in Schrecken und lässt ihn bis zu 5 Sek. lang kauern. Schaden in Höhe von insgesamt 10% der maximalen Gesundheit des Ziels bricht den Effekt.',
   'entities.abilities.searing_pain.name': 'Versengen',
   'entities.abilities.searing_pain.description':
     'Versengt den Gegner mit qualvollem Feuer für {damage} Feuerschaden. Schnell zu wirken.',
@@ -11833,8 +11834,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Reiht einen schwereren Schwung ein, der bei deinem nächsten Treffer Wut verbraucht.',
   'guide.abilityHook.holy_light':
     'Eine stetige, ansehnliche Heilung, um einen Verbündeten oder dich selbst aufzufüllen.',
-  'guide.abilityHook.immolate':
-    'Setzt ein Ziel in Brand für einen Eröffnungstreffer und einen anhaltenden Brand.',
+  'guide.abilityHook.immolate': 'Setzt ein Ziel in einen anhaltenden Brand.',
   'guide.abilityHook.judgement':
     'Verbraucht dein aktives Siegel, um einen Gegner aus kurzer Distanz zu treffen.',
   'guide.abilityHook.lesser_heal':
@@ -14194,7 +14194,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_stream.description':
     'Stellt bei einem verbündeten Ziel im Verlauf von 12 Sek. 120 Gesundheit wieder her. (Schamanentalent)',
   'entities.abilities.howl_of_terror.description':
-    'Versetzt Gegner in der Nähe bis zu 5 Sek. lang in Furcht. Schaden in Höhe von insgesamt 8% der maximalen Gesundheit eines Ziels bricht seine Furcht. (Hexenmeistertalent)',
+    'Versetzt Gegner im Umkreis von 8 m um den gewählten Ort bis zu 5 Sek. lang in Furcht. Schaden in Höhe von insgesamt 10% der maximalen Gesundheit eines Ziels bricht seine Furcht. (Hexenmeistertalent)',
   'entities.abilities.ice_block.description':
     'Schließt Euch 8 Sek. lang in festes Eis ein und macht Euch gegen jeglichen Schaden immun. Entfernt bestehende gewöhnliche schädliche Effekte und verhindert neue gewöhnliche Kontroll-Effekte. Kann während Betäubung oder Verwandlung eingesetzt werden. Ihr könnt währenddessen nicht handeln. Erneut wirken, um den Effekt abzubrechen. (Magier)',
   'entities.abilities.inner_focus.description':
@@ -17052,7 +17052,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Erhöht das Bewegungstempo um 35%, opfert aber jede Sekunde 2% Eurer maximalen Gesundheit. Erneut wirken, um abzubrechen. Schaltet sich bei 20% Gesundheit automatisch ab.',
   'entities.abilities.sacrilegious_march.name': 'Frevelhafter Marsch',
   'entities.abilities.sentence.description':
-    'Verbraucht alle Verdammnis und Schicksalsfäden, um über den Gegner das Urteil zu fällen. Jeder Faden erhöht den Schaden um 6%. Zusätzliche Effekte eskalieren bei 20, 50, 80 und 100 Verdammnis. Seine Schadensskalierung flacht nach Stufe 16 ab.',
+    'Verbraucht alle Verdammnis und Schicksalsfäden, um über den Gegner das Urteil zu fällen. Benötigt mindestens 20 Verdammnis. Der Schaden steigt mit der verbrauchten Verdammnis, und jeder Faden erhöht ihn um 6%. Bei 50 Verdammnis wirst du zusätzlich um 20% des verursachten Schadens geheilt. Bei 80 erleiden zusätzlich Gegner im Umkreis von 8 m um das Ziel 35% des Schadens. Bei 100 steigt der Schaden gegen Spieler und Bosse zusätzlich um 5%, und ein normaler Gegner unter 20% Gesundheit wird sofort getötet. Seine Schadensskalierung flacht nach Stufe 16 ab.',
   'entities.abilities.sentence.name': 'Schuldspruch',
   'entities.abilities.sinister_strike.description':
     'Ein sofortiger Schlag für Waffenschaden plus {damage}. Gewährt 1 Combopunkt.',
@@ -17085,7 +17085,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.swipe.specNote_feral':
     'Jeder Treffer, der landet, fügt 1 Altes Blut hinzu (max. 3).',
   'entities.abilities.umbral_anchor.description':
-    'Erster Einsatz: verankert Euren Schatten 5 Min. lang an Euren Füßen. Erneuter Einsatz innerhalb von 40 m kehrt dorthin zurück, verbraucht den Anker und startet eine 45-sekündige Abklingzeit.',
+    'Erster Einsatz: verankert Euren Schatten 5 Min. lang an Euren Füßen. Erneuter Einsatz innerhalb von 40 m kehrt dorthin zurück und startet eine 45-sekündige Abklingzeit. Jede Rückkehr hinterlässt dort, wo Ihr standet, einen neuen Anker für 5 Min., sodass Ihr hin und her springen könnt, bis ein Anker abläuft.',
   'entities.abilities.umbral_anchor.name': 'Schattenanker',
   'entities.abilities.unholy_command.description':
     'Verbraucht 3 Seelenfragmente, um all Euren Untoten 12 Sek. lang zu befehlen, 25% mehr Schaden zu verursachen und 20% schneller zu handeln.',
@@ -17256,7 +17256,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Drei Schicksalsfäden: Schuldspruch kann sie für 18% erhöhten Schaden verbrauchen.',
   'hudChrome.warlock.fateThreadsStatus': '{value} von {max} Schicksalsfäden.',
   'itemUi.tooltip.useHealingPotionPct':
-    'Benutzen: Stellt sofort {percent}% der maximalen Gesundheit wieder her. Im Kampf nutzbar. 2 Min. Abklingzeit.',
+    'Benutzen: Stellt sofort {percent}% der maximalen Gesundheit wieder her. Im Kampf nutzbar. 1 Min. Abklingzeit.',
   'guide.controls.reliquary': 'Das Reliquiar',
   'guide.deedsPage.rewardsBody':
     'Die Belohnungen sind reine Zurschaustellung, und genau das ist der Sinn. Manche Taten gewähren einen Titel zum Tragen oder einen Rahmen, der deinen Namen einfasst, und niemals etwas, das deinen Helden stärker macht. Wähle den gewünschten Titel und Rahmen im Buch der Taten: Der Titel begleitet dich auf deiner Namensplakette, im Chat und auf den Ranglisten, für alle sichtbar, und der Rahmen legt seine eigenen Farben um deine Namensplakette und dein Porträt.',
@@ -20159,6 +20159,10 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.toolTooltip.wieldDegrade':
     'Unterhalb dieser Fähigkeit funktioniert es immer noch als untergeordnetes Werkzeug.',
   'hudChrome.keybinds.hideInterface': 'Schnittstelle ausblenden',
+  'hudChrome.keybinds.muteAudio': 'Alle Töne stummschalten',
+  'hudChrome.keybinds.audioMuted':
+    'Alle Töne stummgeschaltet. Erneut drücken, um sie wieder einzuschalten.',
+  'hudChrome.keybinds.audioUnmuted': 'Ton wieder an.',
   'hudChrome.keybinds.targetParty1': 'Zielparteimitglied 1',
   'hudChrome.keybinds.targetParty2': 'Zielparteimitglied 2',
   'hudChrome.keybinds.targetParty3': 'Zielparteimitglied 3',

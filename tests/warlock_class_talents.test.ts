@@ -4,7 +4,10 @@ import { dealDamage } from '../src/sim/combat/damage';
 import { gainRuin, spendRuin } from '../src/sim/combat/destruction';
 import { consumeFreeCostFor } from '../src/sim/combat/empower_next';
 import { onCastCompleted } from '../src/sim/combat/talent_procs';
-import { canUseForbiddenReflection } from '../src/sim/combat/warlock_talents';
+import {
+  armForbiddenReflection,
+  canUseForbiddenReflection,
+} from '../src/sim/combat/warlock_talents';
 import { ABILITIES } from '../src/sim/content/classes';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
@@ -174,14 +177,14 @@ describe('warlock class talent tree', () => {
     base.sim.castAbility('demon_skin');
     deepened.sim.castAbility('demon_skin');
 
-    // 88/176, not the authored 80/160: Fiendhide's armor is a flat-magnitude
+    // 352/704, not the authored 320/640: Fiendhide's armor is a flat-magnitude
     // buff kind, which deliberately scales with the destruction viability
     // floor's spellDmgPct 0.1 (SCALABLE_BUFF_KINDS in content/classes.ts).
-    expect(base.player.stats.armor - baseArmor).toBe(88);
-    expect(deepened.player.stats.armor - deepenedArmor).toBe(176);
+    expect(base.player.stats.armor - baseArmor).toBe(352);
+    expect(deepened.player.stats.armor - deepenedArmor).toBe(704);
     expect(base.player.auras.find((aura) => aura.id === 'demon_skin')?.value2).toBeUndefined();
     expect(deepened.player.auras.find((aura) => aura.id === 'demon_skin')).toMatchObject({
-      value: 176,
+      value: 704,
       value2: 0.05,
     });
   });
@@ -225,10 +228,10 @@ describe('warlock class talent tree', () => {
     const { sim, player } = rig({});
     const baseArmor = player.stats.armor;
     sim.castAbility('demon_skin');
-    // 88/176 through the destruction viability floor, same reasoning as the
+    // 352/704 through the destruction viability floor, same reasoning as the
     // Pact Deepened doubling test above.
     expect(player.auras.find((aura) => aura.id === 'demon_skin')).toMatchObject({
-      value: 88,
+      value: 352,
       value2: undefined,
     });
 
@@ -239,17 +242,17 @@ describe('warlock class talent tree', () => {
       }),
     ).toBe(true);
     expect(player.auras.find((aura) => aura.id === 'demon_skin')).toMatchObject({
-      value: 176,
+      value: 704,
       value2: 0.05,
     });
-    expect(player.stats.armor - baseArmor).toBe(176);
+    expect(player.stats.armor - baseArmor).toBe(704);
 
     expect(sim.applyTalents({ spec: 'destruction', rows: {} })).toBe(true);
     expect(player.auras.find((aura) => aura.id === 'demon_skin')).toMatchObject({
-      value: 88,
+      value: 352,
       value2: undefined,
     });
-    expect(player.stats.armor - baseArmor).toBe(88);
+    expect(player.stats.armor - baseArmor).toBe(352);
   });
 
   it('awards one or two Shadow Credit charges from real specialization spending', () => {
@@ -351,6 +354,26 @@ describe('warlock class talent tree', () => {
     expect(player.cooldowns.has('soulwell')).toBe(true);
     expect(player.auras.some((aura) => aura.id === 'wlk_forbidden_reflection')).toBe(false);
     expect(player.auras.some((aura) => aura.id === 'wlk_forbidden_reflection_lock')).toBe(false);
+  });
+
+  it('does not waste Forbidden Reflection on Evil Eye or Raise Graveguard', () => {
+    for (const [spec, id] of [
+      ['affliction', 'evil_eye'],
+      ['demonology', 'raise_graveguard'],
+    ] as const) {
+      const { sim, player } = rig({ 20: 'wlk_r20_grimoire_of_haste' }, spec);
+      const meta = sim.ctx.players.get(player.id);
+      if (!meta) throw new Error('missing player meta');
+      armForbiddenReflection(sim.ctx, player, meta, ABILITIES[id], ABILITIES[id].cooldown);
+      expect(
+        player.auras.some((aura) => aura.id === 'wlk_forbidden_reflection'),
+        id,
+      ).toBe(false);
+      expect(
+        player.auras.some((aura) => aura.id === 'wlk_forbidden_reflection_lock'),
+        id,
+      ).toBe(false);
+    }
   });
 
   it('does not let Forbidden Reflection duplicate Army of the Dead', () => {

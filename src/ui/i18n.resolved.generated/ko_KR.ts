@@ -2522,6 +2522,9 @@ export const ko_KR: EnTranslations = {
       "friendlyNameplates": "우호 이름표 전환",
       "sheathe": "무기 넣기/빼기",
       "hideInterface": "인터페이스 숨기기",
+      "muteAudio": "모든 소리 음소거",
+      "audioMuted": "모든 소리를 음소거했습니다. 다시 누르면 소리가 켜집니다.",
+      "audioUnmuted": "소리를 다시 켰습니다.",
       "dive": "아래로 수영",
       "categoryPet": "펫",
       "petAttack": "펫: 공격",
@@ -5086,7 +5089,8 @@ export const ko_KR: EnTranslations = {
       "hostile": "적대",
       "friendly": "아군",
       "elite": "정예",
-      "boss": "우두머리"
+      "boss": "우두머리",
+      "buddyOwner": "{owner}의 버디"
     },
     "playerTooltip": {
       "guild": "<{guild}>",
@@ -10161,7 +10165,7 @@ export const ko_KR: EnTranslations = {
       "shadow_bolt": "대상에게 시전하는 어둠의 화살로, 주력 공격기입니다.",
       "summon_imp": "불씨족을 불러내어 먼 거리에서 적에게 지옥불 화살을 날리게 합니다.",
       "demon_skin": "피부를 단단하게 만들어 방어도를 높여 주는 지속형 자기 강화입니다.",
-      "immolate": "대상에 불을 붙여 첫 타격을 입히고 지속되는 화염 피해를 남깁니다.",
+      "immolate": "대상에 불을 붙여 지속되는 화염 피해를 남깁니다.",
       "corruption": "대상을 어둠으로 부식시켜, 다른 일을 하는 동안에도 피해가 들어갑니다.",
       "life_tap": "마나가 바닥날 때 자신의 생명력 일부를 마나로 전환합니다.",
       "wrath": "원거리에서 대상에게 던지는 자연 화살로, 주력 공격기입니다.",
@@ -17182,7 +17186,7 @@ export const ko_KR: EnTranslations = {
       "clickDestroy": "클릭하여 파괴",
       "useFishing": "사용: 가까운 물가에서 낚시합니다.",
       "useHealingPotion": "사용: 즉시 생명력을 {amount} 회복합니다. 전투 중 사용 가능. 재사용 대기시간 1분.",
-      "useHealingPotionPct": "사용: 즉시 최대 생명력의 {percent}%를 회복합니다. 전투 중 사용 가능. 재사용 대기시간 2분.",
+      "useHealingPotionPct": "사용: 즉시 최대 생명력의 {percent}%를 회복합니다. 전투 중 사용 가능. 재사용 대기시간 1분.",
       "useManaPotion": "사용: 즉시 마나를 {amount} 회복합니다. 전투 중 사용 가능. 재사용 대기시간 1분.",
       "clickUseInstant": "클릭하여 전투 중 즉시 사용",
       "clickUse": "클릭하여 사용",
@@ -18257,11 +18261,11 @@ export const ko_KR: EnTranslations = {
       },
       "demon_skin": {
         "name": "마귀 가죽",
-        "description": "악마의 피부가 30분 동안 방어도를 {buff}만큼 증가시킵니다."
+        "description": "악마의 피부가 30분 동안 방어도를 {buff}만큼 증가시킵니다. 계약 심화를 배우면 마귀 가죽이 활성화된 동안 이 방어도가 두 배가 되고 받는 마법 피해가 감소합니다."
       },
       "immolate": {
         "name": "불타는 계약",
-        "description": "적을 불태워 {damage}의 화염 피해를 입히고 15초에 걸쳐 추가로 {overTime}의 피해를 입힙니다."
+        "description": "적을 불태워 15초에 걸쳐 {damage}의 화염 피해를 입힙니다."
       },
       "corruption": {
         "name": "검은 부패",
@@ -18281,7 +18285,7 @@ export const ko_KR: EnTranslations = {
       },
       "sentence": {
         "name": "선고",
-        "description": "모든 단죄와 운명의 실을 소모해 적에게 선고를 내립니다. 실 하나당 피해가 6% 증가하고, 추가 효과는 단죄 20, 50, 80, 100에서 강화됩니다. 16레벨 이후 피해 증가폭이 완만해집니다."
+        "description": "모든 단죄와 운명의 실을 소모해 적에게 선고를 내립니다. 단죄가 최소 20 필요합니다. 피해는 소모한 단죄에 따라 증가하며, 실 하나당 6% 증가합니다. 단죄 50에서는 입힌 피해의 20%만큼 생명력도 회복합니다. 80에서는 대상 8미터 안의 적에게도 피해의 35%를 입힙니다. 100에서는 플레이어와 우두머리에게 주는 피해가 5% 더 증가하고, 생명력이 20% 미만인 일반 적을 즉시 처치합니다. 16레벨 이후 피해 증가폭이 완만해집니다."
       },
       "life_tap": {
         "name": "가혹한 거래",
@@ -18309,7 +18313,7 @@ export const ko_KR: EnTranslations = {
       },
       "umbral_anchor": {
         "name": "암영 닻",
-        "description": "처음 사용하면 발밑에 5분 동안 암영 닻을 설치합니다. 40미터 안에서 다시 사용하면 닻으로 돌아가며, 닻을 소모하고 45초의 재사용 대기시간이 시작됩니다."
+        "description": "처음 사용하면 발밑에 5분 동안 암영 닻을 설치합니다. 40미터 안에서 다시 사용하면 닻으로 돌아가며 45초의 재사용 대기시간이 시작됩니다. 돌아갈 때마다 서 있던 자리에 5분짜리 새 닻을 남기므로, 닻이 사라질 때까지 계속 오갈 수 있습니다."
       },
       "soulwell": {
         "name": "영혼샘",
@@ -18341,7 +18345,7 @@ export const ko_KR: EnTranslations = {
       },
       "fear": {
         "name": "번민",
-        "description": "적에게 공포를 심어 최대 5초 동안 떨게 만듭니다. 대상 최대 생명력의 8%에 해당하는 누적 피해를 받으면 효과가 해제됩니다."
+        "description": "적에게 공포를 심어 최대 5초 동안 떨게 만듭니다. 대상 최대 생명력의 10%에 해당하는 누적 피해를 받으면 효과가 해제됩니다."
       },
       "searing_pain": {
         "name": "지지기",
@@ -19012,7 +19016,7 @@ export const ko_KR: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "공포의 울부짖음",
-        "description": "주위 적을 최대 5초 동안 공포에 빠뜨립니다. 대상 최대 생명력의 8%에 해당하는 누적 피해를 받으면 공포가 해제됩니다. (흑마법사 특성)"
+        "description": "지정한 위치 8미터 안의 적을 최대 5초 동안 공포에 빠뜨립니다. 대상 최대 생명력의 10%에 해당하는 누적 피해를 받으면 공포가 해제됩니다. (흑마법사 특성)"
       },
       "ice_block": {
         "name": "차가운 관",
@@ -31055,7 +31059,7 @@ export const ko_KR: EnTranslations = {
       },
       "vanguard_warlock_affliction": {
         "name": "선봉대: Dreadquill Vestments",
-        "bonus2": "2세트: Harrow의 시전 시간이 0.3초 감소합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.",
+        "bonus2": "2세트: 암영 닻의 재사용 대기시간이 15초 감소합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.",
         "bonus4": "4세트: Consume의 치유량이 30% 증가하고 이동 중에도 정신 집중할 수 있습니다."
       },
       "vanguard_warlock_demonology": {

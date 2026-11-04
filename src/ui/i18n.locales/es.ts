@@ -1951,7 +1951,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_warlock_affliction_shoulder.name': 'Manto Plumapavor',
   'entities.itemSets.vanguard_warlock_affliction.name': 'Vestiduras Plumapavor',
   'entities.itemSets.vanguard_warlock_affliction.bonus2':
-    'El tiempo de lanzamiento de Espanto se reduce 0,3 s. El daño recibido ya no retrasa tus hechizos.',
+    'El tiempo de reutilización de Ancla umbría se reduce 15 s. El daño recibido ya no retrasa tus hechizos.',
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     'Consumir te sana un 30% más y puede canalizarse en movimiento.',
   'entities.items.vanguard_warlock_demonology_chest.name': 'Vestidura Atamédula',
@@ -5400,7 +5400,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Perfora al enemigo e inflige {damage} de daño de las Sombras. Genera {needleDoom} de Condena si porta tu Mal de ojo; si no existe ninguno, primero marca al objetivo.',
   'entities.abilities.sentence.name': 'Sentencia',
   'entities.abilities.sentence.description':
-    'Consume toda la Condena y los Hilos del destino para sentenciar al enemigo. Cada Hilo aumenta el daño un 6%. Los efectos adicionales aumentan con 20, 50, 80 y 100 de Condena. El escalado de daño se aplana después del nivel 16.',
+    'Consume toda la Condena y los Hilos del destino para sentenciar al enemigo. Requiere al menos 20 de Condena. El daño aumenta con la Condena consumida y cada Hilo lo aumenta un 6%. Con 50 de Condena, además te cura un 20% del daño infligido. Con 80, además golpea a los enemigos en un radio de 8 m del objetivo con el 35% de su daño. Con 100, además inflige un 5% más de daño a jugadores y jefes, y mata al instante a un enemigo normal con menos del 20% de salud. El escalado de daño se aplana después del nivel 16.',
   'entities.abilities.cursed_accomplice.name': 'Cómplice maldito',
   'entities.abilities.cursed_accomplice.description':
     'Si no seleccionas a un jugador aliado, enlaza tu ojo maléfico y hace que su Mirada genere 2 de Condena. Al enlazar a un aliado, su daño al objetivo de Mal de ojo genera 3. Solo puede activarse una vez cada 2 s.',
@@ -5409,7 +5409,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Maldice tu Mal de ojo principal durante 8 s. Obtener Condena libera una onda que daña a un máximo de 4 enemigos más en 8 m, como máximo una vez por segundo.',
   'entities.abilities.umbral_anchor.name': 'Ancla umbría',
   'entities.abilities.umbral_anchor.description':
-    'Primer uso: ancla tu sombra a tus pies durante 5 min. Vuelve a usarla a un máximo de 40 m para regresar, consumir el ancla e iniciar un tiempo de reutilización de 45 s.',
+    'Primer uso: ancla tu sombra a tus pies durante 5 min. Vuelve a usarla a un máximo de 40 m para regresar e iniciar un tiempo de reutilización de 45 s. Cada regreso deja un ancla nueva de 5 min donde estabas, así que puedes saltar de un lado a otro hasta que un ancla expire.',
   'entities.abilities.hex_of_violence.name': 'Maleficio de violencia',
   'entities.abilities.hex_of_violence.description':
     'Maldice al enemigo durante 8 s. Sus siguientes 3 acciones dañinas generan 7 de Condena cada una y le infligen 17 de daño de las Sombras.',
@@ -7400,6 +7400,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.friendly': 'Amistoso',
   'hudChrome.mobTooltip.elite': 'Élite',
   'hudChrome.mobTooltip.boss': 'Jefe',
+  'hudChrome.mobTooltip.buddyOwner': 'Compañero de {owner}',
   'hud.core.mapCanvasLabel': 'Mapa',
   'hud.core.mapSummary': 'Mapa de {zone}.',
   'hud.core.mapMarkerDescription': '{area}. {markers}',
@@ -9508,10 +9509,10 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Envía una descarga sombría al enemigo por {damage} de daño de las Sombras.',
   'entities.abilities.demon_skin.name': 'Piel de Engendro',
   'entities.abilities.demon_skin.description':
-    'La piel demoníaca aumenta tu armadura en {buff} durante 30 min.',
+    'La piel demoníaca aumenta tu armadura en {buff} durante 30 min. Pact Deepened puede duplicar esta armadura y reducir el daño mágico recibido mientras Piel de Engendro está activa.',
   'entities.abilities.immolate.name': 'Pacto Ardiente',
   'entities.abilities.immolate.description':
-    'Quema al enemigo por {damage} de daño de Fuego y {overTime} adicionales durante 15 s.',
+    'Quema al enemigo por {damage} de daño de Fuego durante 15 s.',
   'entities.abilities.corruption.name': 'Putrefacción Negra',
   'entities.abilities.corruption.description':
     'Corrompe al objetivo y causa {damage} de daño de las Sombras durante 18 s.',
@@ -9525,7 +9526,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Consume la vitalidad del objetivo, infligiendo {damage} de daño de Sombra cada segundo y transfiriéndote un 70% como salud. Aflicción transfiere en cambio la totalidad. Cuando se canaliza sobre tu Mal de ojo principal, consume todos los Hilos del destino al comenzar, y cada Hilo genera 1 de Condena adicional por pulso.',
   'entities.abilities.fear.name': 'Espanto',
   'entities.abilities.fear.description':
-    'Siembra terror en el enemigo y lo deja encogido durante hasta 5 s. El daño acumulado equivalente al 8% de la salud máxima del objetivo rompe el efecto.',
+    'Siembra terror en el enemigo y lo deja encogido durante hasta 5 s. El daño acumulado equivalente al 10% de la salud máxima del objetivo rompe el efecto.',
   'entities.abilities.searing_pain.name': 'Abrasar',
   'entities.abilities.searing_pain.description':
     'Abrasa al enemigo con fuego agonizante por {damage} de daño de Fuego. Lanzamiento rápido.',
@@ -11916,8 +11917,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Prepara un golpe más fuerte que gasta ira en tu próximo ataque.',
   'guide.abilityHook.holy_light':
     'Una sanación constante y considerable para reponer a un aliado o a ti mismo.',
-  'guide.abilityHook.immolate':
-    'Prende fuego a un objetivo con un golpe inicial y una quemadura que perdura.',
+  'guide.abilityHook.immolate': 'Prende fuego a un objetivo con una quemadura que perdura.',
   'guide.abilityHook.judgement':
     'Gasta tu Sello activo para golpear a un enemigo a corta distancia.',
   'guide.abilityHook.lesser_heal':
@@ -15254,7 +15254,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_stream.description':
     'Restaura 120 de salud a un objetivo aliado durante 12 s. (talento de Chamán)',
   'entities.abilities.howl_of_terror.description':
-    'Aterroriza a los enemigos cercanos hasta 5 s. El daño acumulado equivalente al 8% de la salud máxima de un objetivo rompe su miedo. (talento de Brujo)',
+    'Aterroriza a los enemigos en un radio de 8 m del lugar seleccionado hasta 5 s. El daño acumulado equivalente al 10% de la salud máxima de un objetivo rompe su miedo. (talento de Brujo)',
   'entities.abilities.ice_block.description':
     'Te encierra en hielo sólido durante 8 s, haciéndote inmune a todo el daño. Elimina los efectos perjudiciales comunes ya activos e impide que se apliquen nuevos efectos de control comunes. Se puede usar mientras estás aturdido o transformado. No puedes actuar mientras estás encerrado. Vuelve a lanzarlo para cancelar. (mago)',
   'entities.abilities.inner_focus.description':
@@ -16949,7 +16949,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Tres Hilos del destino: Sentencia puede consumirlos para un 18% más de daño.',
   'hudChrome.warlock.fateThreadsStatus': '{value} de {max} de Hilos del destino.',
   'itemUi.tooltip.useHealingPotionPct':
-    'Uso: restaura al instante el {percent}% de la salud máxima. Se puede usar en combate. Reutilización de 2 min.',
+    'Uso: restaura al instante el {percent}% de la salud máxima. Se puede usar en combate. Reutilización de 1 min.',
   'guide.controls.reliquary': 'El Relicario',
   'guide.deedsPage.rewardsBody':
     'Las recompensas son todas de exhibición, y esa es justo la idea. Algunas gestas otorgan un título que puedes lucir o un borde para enmarcar tu nombre, y nunca nada que haga más fuerte a tu héroe. Elige el título y el borde que quieras desde el Libro de Gestas: el título te acompaña en la placa de nombre, en el chat y en las tablas para que todos lo vean, y el borde dibuja sus propios colores alrededor de tu placa de nombre y de tu retrato.',
@@ -20008,6 +20008,10 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
   'hudChrome.gathering.toolTooltip.wieldDegrade':
     'Por debajo de esa habilidad, todavía funciona como una herramienta de nivel inferior.',
   'hudChrome.keybinds.hideInterface': 'Ocultar interfaz',
+  'hudChrome.keybinds.muteAudio': 'Silenciar todo el sonido',
+  'hudChrome.keybinds.audioMuted':
+    'Todo el sonido silenciado. Pulsa de nuevo para volver a activarlo.',
+  'hudChrome.keybinds.audioUnmuted': 'Sonido activado de nuevo.',
   'hudChrome.keybinds.targetParty1': 'Miembro del grupo objetivo 1',
   'hudChrome.keybinds.targetParty2': 'Miembro del grupo objetivo 2',
   'hudChrome.keybinds.targetParty3': 'Miembro del grupo objetivo 3',

@@ -138,9 +138,9 @@ const NUMBER_ALLOWLIST: Record<string, number[]> = {
   // values live in shaman_unleash_weapon.ts and shaman_spiritmend.ts rather
   // than one shared ability effect array.
   unleash_weapon: [54, 64, 30, 2, 20, 6, 75, 3, 4, 125, 8, 50],
-  // Harrow's deterministic break budget is WARLOCK_FEAR_DAMAGE_BUDGET_PCT
+  // Harrow's deterministic break budget is HARROW_DAMAGE_BUDGET_PCT
   // (src/sim/combat/warlock_fear.ts), applied when the aura is created.
-  fear: [8],
+  fear: [10],
   // The shared Temporal Exhaustion gate is owned by combat/haste_burst.ts.
   bloodlust: [10],
   // Divine Ascension's resource price, charge count and lifetime are owned by

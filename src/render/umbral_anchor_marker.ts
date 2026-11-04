@@ -221,6 +221,10 @@ export class UmbralAnchorMarker {
   private phase: UmbralAnchorVfxPhase = 'hidden';
   private phaseStartedAt = 0;
   private hadAnchor = false;
+  // Where the shown anchor sits: a jump swaps it for a new one at the jump's
+  // start in the same tick, and the new one must replay its placement there.
+  private anchorX = 0;
+  private anchorZ = 0;
 
   constructor(private readonly groundY?: (x: number, z: number) => number) {
     this.group.name = 'umbral-anchor-marker';
@@ -349,7 +353,7 @@ export class UmbralAnchorMarker {
   ): void {
     const anchor = anchorAura(owner);
     if (anchor) {
-      if (!this.hadAnchor) {
+      if (!this.hadAnchor || anchor.value !== this.anchorX || anchor.value3 !== this.anchorZ) {
         this.phase = 'placing';
         this.phaseStartedAt = time;
         this.drapeGround(anchor.value, anchor.value2 ?? 0, anchor.value3 ?? 0);
@@ -362,6 +366,8 @@ export class UmbralAnchorMarker {
       }
       this.group.position.set(anchor.value, anchor.value2 ?? 0, anchor.value3 ?? 0);
       this.hadAnchor = true;
+      this.anchorX = anchor.value;
+      this.anchorZ = anchor.value3 ?? 0;
     } else if (this.hadAnchor) {
       this.phase = 'recalling';
       this.phaseStartedAt = time;

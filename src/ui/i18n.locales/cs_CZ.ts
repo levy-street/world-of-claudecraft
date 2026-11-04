@@ -2095,7 +2095,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Volání přílivu navíc zaštítí svůj cíl a pohltí 5 % tvého maximálního zdraví na 6 s.',
   'entities.itemSets.vanguard_shaman_restoration.name': 'Drátěná košile Solankostráže',
   'entities.itemSets.vanguard_warlock_affliction.bonus2':
-    'Sesílání Děsu je o 0.3 s kratší. Utržené poškození již nezpožďuje sesílání kouzel.',
+    'Doba obnovy Stínové kotvy je o 15 s kratší. Utržené poškození již nezpožďuje sesílání kouzel.',
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     'Vysát: uzdraví tě o 30 % více a lze jej kanálovat i za pohybu.',
   'entities.itemSets.vanguard_warlock_affliction.name': 'Šat Děsopera',
@@ -9838,6 +9838,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.levelFamily': 'Úroveň {level} {family}',
   'hudChrome.mobTooltip.elite': 'Elita',
   'hudChrome.mobTooltip.boss': 'Boss',
+  'hudChrome.mobTooltip.buddyOwner': 'Společník hráče {owner}',
   'hudChrome.raidConvert.leaderOnly': 'Na skupinu může převést jen vůdce raidu.',
   'hudChrome.raidConvert.notRaid': 'Tvoje skupina není raid.',
   'hudChrome.raidConvert.toPartyDone': 'Tvůj raid byl převeden zpět na skupinu.',
@@ -10411,7 +10412,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Obranný bojový postoj: vytváříš o 30 % více hrozby, ale způsobuješ i utrpíš o 10 % méně poškození. Sesláním znovu postoj opustíš.',
   'entities.abilities.defensive_stance.name': 'Krytý postoj',
   'entities.abilities.demon_skin.description':
-    'Démonická kůže zvýší tvoji zbroj o {buff} na 30 min.',
+    'Démonická kůže zvýší tvoji zbroj o {buff} na 30 min. Pact Deepened může tuto zbroj zdvojnásobit a snížit přijaté magické poškození, dokud je Kůže běsa aktivní.',
   'entities.abilities.demon_skin.name': 'Kůže běsa',
   'entities.abilities.demoralizing_roar.description':
     'Demoralizuje blízké nepřátele a sníží jejich sílu útoku o 20 na 20 s. Pouze v medvědí podobě.',
@@ -10451,7 +10452,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.expose_armor.name': 'Průraz zbroje',
   'entities.abilities.faerie_fire.name': 'Čarodějné světlo',
   'entities.abilities.fear.description':
-    'Vžene nepříteli hrůzu a nechá ho krčit se až 5 s. Poškození v součtu 8 % maximálního zdraví cíle účinek přeruší.',
+    'Vžene nepříteli hrůzu a nechá ho krčit se až 5 s. Poškození v součtu 10 % maximálního zdraví cíle účinek přeruší.',
   'entities.abilities.fear.name': 'Děs',
   'entities.abilities.ferocious_bite.name': 'Krvavý skus',
   'entities.abilities.fire_blast.description':
@@ -10530,7 +10531,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Obalí tě ledovým štítem, který pohltí {damage} poškození na 60 s.',
   'entities.abilities.ice_barrier.name': 'Mrazivý závoj',
   'entities.abilities.immolate.description':
-    'Spálí nepřítele za {damage} ohnivého poškození a dalších {overTime} během 15 s.',
+    'Spálí nepřítele za {damage} ohnivého poškození během 15 s.',
   'entities.abilities.immolate.name': 'Hořící pakt',
   'entities.abilities.insect_swarm.description':
     'Nepřítele obklopí roj hmyzu a způsobí {damage} přírodního poškození během 12 s.',
@@ -11153,7 +11154,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_stream.description':
     'Během 12 s obnoví spojeneckému cíli 120 bodů zdraví. (šamanský talent)',
   'entities.abilities.howl_of_terror.description':
-    'Vyděsí blízké nepřátele až na 5 s. Poškození v součtu 8 % maximálního zdraví cíle přeruší jeho strach. (černokněžnický talent)',
+    'Vyděsí nepřátele do 8 yardů od vybraného místa až na 5 s. Poškození v součtu 10 % maximálního zdraví cíle přeruší jeho strach. (černokněžnický talent)',
   'entities.abilities.ice_block.description':
     'Uzavře tě na 8 s do pevného ledu a učiní tě imunním vůči veškerému poškození. Odstraní již aktivní běžné škodlivé efekty a zabrání aplikaci nových běžných ovládacích efektů. Lze použít při omráčení nebo proměnění. Během uvěznění nemůžeš jednat. Opětovným sesláním efekt zrušíš. (mág)',
   'entities.abilities.inner_focus.description':
@@ -12645,7 +12646,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.summon_imp':
     'Přivolá Žhavorodého, který na nepřátele z dálky sesílá Běsový výstřel.',
   'guide.abilityHook.demon_skin': 'Trvalý self-buff, který zpevní kůži a přidá zbroj.',
-  'guide.abilityHook.immolate': 'Zapálí cíl úvodním zásahem a přetrvávajícím hořením.',
+  'guide.abilityHook.immolate': 'Zapálí cíl hořením, které ho postupně spaluje.',
   'guide.abilityHook.corruption': 'Rozloží cíl stínem, který tiká, zatímco děláš jiné věci.',
   'guide.abilityHook.life_tap': 'Vymění část tvého zdraví zpět za manu, když vyschneš.',
   'guide.abilityHook.wrath': 'Přírodní střela hozená na cíl z dálky, tvoje základní ničivé kouzlo.',
@@ -16497,7 +16498,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Zvýší rychlost pohybu o 35 %, ale každou sekundu obětuje 2 % tvého maximálního zdraví. Seslej znovu pro zrušení. Při 20 % zdraví se samo vypne.',
   'entities.abilities.sacrilegious_march.name': 'Svatokrádežný pochod',
   'entities.abilities.sentence.description':
-    'Spotřebuje veškeré Odsouzení a Nitě osudu, aby na nepříteli vynesla rozsudek. Každá Nit zvýší poškození o 6 %. Přidané efekty eskalují při 20, 50, 80 a 100 Odsouzení. Škálování jeho poškození se po úrovni 16 zplošťuje.',
+    'Spotřebuje veškeré Odsouzení a Nitě osudu, aby na nepříteli vynesla rozsudek. Vyžaduje alespoň 20 Odsouzení. Poškození roste se spotřebovaným Odsouzením a každá Nit ho zvýší o 6 %. Při 50 Odsouzení vás navíc vyléčí o 20 % způsobeného poškození. Při 80 navíc zasáhne nepřátele do 8 yardů od cíle za 35 % svého poškození. Při 100 navíc způsobí hráčům a bossům o 5 % vyšší poškození a okamžitě zabije běžného nepřítele pod 20 % zdraví. Škálování jeho poškození se po úrovni 16 zplošťuje.',
   'entities.abilities.sentence.name': 'Rozsudek',
   'entities.abilities.sinister_strike.description':
     'Okamžitý úder za poškození zbraně plus {damage}. Udělí 1 combo bod.',
@@ -16527,7 +16528,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Přejeď drápy přes blízké nepřátele za {damage} poškození. Způsobí extra hrozbu. Pouze v medvědí podobě.',
   'entities.abilities.swipe.specNote_feral': 'Každý zásah přidá 1 Starou krev (max 3).',
   'entities.abilities.umbral_anchor.description':
-    'První seslání: na 5 min ukotví tvůj stín k tvým nohám. Seslej znovu do 40 yardů: vrátíš se tam, spotřebuješ kotvu a spustíš dobu obnovy 45 s.',
+    'První seslání: na 5 min ukotví tvůj stín k tvým nohám. Seslej znovu do 40 yardů: vrátíš se tam a spustíš dobu obnovy 45 s. Každý návrat zanechá na místě, kde jsi stál, novou kotvu na 5 min, takže můžeš skákat tam a zpět, dokud kotva nevyprší.',
   'entities.abilities.umbral_anchor.name': 'Stínová kotva',
   'entities.abilities.unholy_command.description':
     'Spotřebuje 3 Úlomky duše a na 12 s přikáže všem tvým nemrtvým způsobit o 25 % více poškození a jednat o 20 % rychleji.',
@@ -16674,7 +16675,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Tři Nitě osudu: Rozsudek je dokáže spotřebovat za 18% zvýšené poškození.',
   'hudChrome.warlock.fateThreadsStatus': 'Nitě osudu {value} z {max}.',
   'itemUi.tooltip.useHealingPotionPct':
-    'Použití: Okamžitě obnoví {percent} % maximálního zdraví. Použitelné v boji. Doba obnovy 2 min.',
+    'Použití: Okamžitě obnoví {percent} % maximálního zdraví. Použitelné v boji. Doba obnovy 1 min.',
   'guide.controls.reliquary': 'Relikviář',
   'guide.deedsPage.rewardsBody':
     'Odměny jsou čistě na parádu, a přesně o to jde. Některé skutky udělují titul, který můžeš nosit, nebo rámeček, jenž orámuje tvé jméno, a nikdy nic, co by tvého hrdinu posílilo. Titul i rámeček si vyber v Knize skutků: titul tě provází na jmenovce, v chatu i na žebříčcích, aby jej viděl každý, a rámeček obtáhne tvou jmenovku a portrét vlastními barvami.',
@@ -19641,6 +19642,9 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.toolTooltip.wieldDegrade':
     'Pod touto dovedností stále funguje jako nástroj nižší úrovně.',
   'hudChrome.keybinds.hideInterface': 'Skrýt rozhraní',
+  'hudChrome.keybinds.muteAudio': 'Ztlumit veškerý zvuk',
+  'hudChrome.keybinds.audioMuted': 'Veškerý zvuk ztlumen. Dalším stisknutím ho znovu zapneš.',
+  'hudChrome.keybinds.audioUnmuted': 'Zvuk je znovu zapnutý.',
   'hudChrome.keybinds.targetParty1': 'Cílový člen strany 1',
   'hudChrome.keybinds.targetParty2': 'Člen cílové strany 2',
   'hudChrome.keybinds.targetParty3': 'Člen cílové strany 3',

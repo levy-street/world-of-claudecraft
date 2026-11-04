@@ -86,6 +86,21 @@ export function placeOrRecallUmbralAnchor(
     warlock.auras.splice(index, 1);
     ctx.emit({ type: 'aura', targetId: warlock.id, name: aura.name, gained: false });
   }
+  // Every jump leaves a fresh anchor where the warlock jumped from, so the
+  // next cast (once the cooldown allows) takes them back there. The chain only
+  // ends when an anchor expires.
+  ctx.applyAura(warlock, {
+    id: UMBRAL_ANCHOR_ID,
+    name: 'Umbral Anchor',
+    kind: 'warlock_anchor',
+    remaining: duration,
+    duration,
+    value: from.x,
+    value2: from.y,
+    value3: from.z,
+    sourceId: warlock.id,
+    school: 'shadow',
+  });
 
   for (const point of [from, anchor]) {
     ctx.emit({

@@ -2522,6 +2522,9 @@ export const da_DK: EnTranslations = {
       "friendlyNameplates": "Slå navneskilte for allierede til/fra",
       "sheathe": "Gem/fremvis våben",
       "hideInterface": "Skjul grænseflade",
+      "muteAudio": "Slå al lyd fra",
+      "audioMuted": "Al lyd er slået fra. Tryk igen for at slå den til.",
+      "audioUnmuted": "Lyden er slået til igen.",
       "dive": "Svøm ned",
       "categoryPet": "Kæledyr",
       "petAttack": "Kæledyr: Angrib",
@@ -5086,7 +5089,8 @@ export const da_DK: EnTranslations = {
       "hostile": "Fjendtlig",
       "friendly": "Venlig",
       "elite": "Elite",
-      "boss": "Boss"
+      "boss": "Boss",
+      "buddyOwner": "Ledsager til {owner}"
     },
     "playerTooltip": {
       "guild": "<{guild}>",
@@ -10161,7 +10165,7 @@ export const da_DK: EnTranslations = {
       "shadow_bolt": "Et lyn af skygge du kaster mod et mål, din foretrukne bombe.",
       "summon_imp": "Kalder en Emberkin frem, der kaster Dæmonlyn mod fjender på afstand.",
       "demon_skin": "En vedvarende selvforstærkning der hærder din hud og tilføjer rustning.",
-      "immolate": "Sætter ild til et mål for et indledende slag og en brand der hænger ved.",
+      "immolate": "Sætter ild til et mål med en brand der hænger ved.",
       "corruption": "Forrådner et mål med skygge der tikker mens du gør andre ting.",
       "life_tap": "Bytter noget af dit eget helbred tilbage til mana når du løber tør.",
       "wrath": "Et naturlyn kastet mod et mål på afstand, din foretrukne bombe.",
@@ -17182,7 +17186,7 @@ export const da_DK: EnTranslations = {
       "clickDestroy": "Klik for at ødelægge",
       "useFishing": "Brug: Fisk i nærliggende vande.",
       "useHealingPotion": "Brug: Genopretter øjeblikkeligt {amount} helbred. Brugbar i kamp. 1 min afkøling.",
-      "useHealingPotionPct": "Brug: Genopretter øjeblikkeligt {percent}% af maksimalt helbred. Brugbar i kamp. 2 min afkøling.",
+      "useHealingPotionPct": "Brug: Genopretter øjeblikkeligt {percent}% af maksimalt helbred. Brugbar i kamp. 1 min afkøling.",
       "useManaPotion": "Brug: Genopretter øjeblikkeligt {amount} mana. Brugbar i kamp. 1 min afkøling.",
       "clickUseInstant": "Klik for at bruge øjeblikkeligt i kamp",
       "clickUse": "Klik for at bruge",
@@ -18257,11 +18261,11 @@ export const da_DK: EnTranslations = {
       },
       "demon_skin": {
         "name": "Djævlehud",
-        "description": "Dæmonisk hud øger din rustning med {buff} i 30 min."
+        "description": "Dæmonisk hud øger din rustning med {buff} i 30 min. Pact Deepened kan fordoble denne rustning og reducere den magiske skade, du tager, mens Djævlehud er aktiv."
       },
       "immolate": {
         "name": "Brændende Pagt",
-        "description": "Brænder fjenden for {damage} Ildskade og yderligere {overTime} over 15 sek."
+        "description": "Brænder fjenden for {damage} Ildskade over 15 sek."
       },
       "corruption": {
         "name": "Sortråd",
@@ -18281,7 +18285,7 @@ export const da_DK: EnTranslations = {
       },
       "sentence": {
         "name": "Dom",
-        "description": "Forbruger al Fordømmelse og alle Skæbnetråde for at afsige dom over fjenden. Hver Tråd øger skaden med 6%. Ekstra effekter eskalerer ved 20, 50, 80 og 100 Fordømmelse. Dens skadesskalering flader ud efter niveau 16."
+        "description": "Forbruger al Fordømmelse og alle Skæbnetråde for at afsige dom over fjenden. Kræver mindst 20 Fordømmelse. Skaden stiger med den forbrugte Fordømmelse, og hver Tråd øger den med 6%. Ved 50 Fordømmelse heler den dig desuden for 20% af den påførte skade. Ved 80 rammer den desuden fjender inden for 8 m af målet for 35% af sin skade. Ved 100 gør den desuden 5% mere skade på spillere og bosser og dræber øjeblikkeligt en almindelig fjende under 20% helbred. Dens skadesskalering flader ud efter niveau 16."
       },
       "life_tap": {
         "name": "Hård Handel",
@@ -18309,7 +18313,7 @@ export const da_DK: EnTranslations = {
       },
       "umbral_anchor": {
         "name": "Skyggeanker",
-        "description": "Første kast: forankrer din skygge ved dine fødder i 5 min. Kast igen inden for 40 m for at vende tilbage dertil, hvilket forbruger ankeret og starter en 45 sek. nedkøling."
+        "description": "Første kast: forankrer din skygge ved dine fødder i 5 min. Kast igen inden for 40 m for at vende tilbage dertil, hvilket starter en 45 sek. nedkøling. Hver tilbagevenden efterlader et nyt anker i 5 min, hvor du stod, så du kan blive ved med at hoppe frem og tilbage, indtil et anker udløber."
       },
       "soulwell": {
         "name": "Sjælebrønd",
@@ -18341,7 +18345,7 @@ export const da_DK: EnTranslations = {
       },
       "fear": {
         "name": "Hjemsøg",
-        "description": "Slår rædsel i fjenden, så den kryber sammen i op til 5 sek. Skade svarende til 8% af målets maksimale helbred bryder effekten."
+        "description": "Slår rædsel i fjenden, så den kryber sammen i op til 5 sek. Skade svarende til 10% af målets maksimale helbred bryder effekten."
       },
       "searing_pain": {
         "name": "Svid",
@@ -19012,7 +19016,7 @@ export const da_DK: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Rædselshyl",
-        "description": "Skræmmer fjender i nærheden i op til 5 sek. Skade svarende til 8% af målets maksimale helbred bryder deres frygt. (troldmandstalent)"
+        "description": "Skræmmer fjender inden for 8 m af det valgte sted i op til 5 sek. Skade svarende til 10% af målets maksimale helbred bryder deres frygt. (troldmandstalent)"
       },
       "ice_block": {
         "name": "Kold kiste",
@@ -31055,7 +31059,7 @@ export const da_DK: EnTranslations = {
       },
       "vanguard_warlock_affliction": {
         "name": "Dread Quill Gevandter",
-        "bonus2": "Hjemsøg kasttid reduceres med 0,3 sek. Skade, du tager, forsinker ikke længere dine besværgelser.",
+        "bonus2": "Skyggeankers nedkøling reduceres med 15 sek. Skade, du tager, forsinker ikke længere dine besværgelser.",
         "bonus4": "Fortær heler dig for 30 procent mere og kan kanaliseres mens du bevæger dig."
       },
       "vanguard_warlock_demonology": {

@@ -2501,6 +2501,11 @@ export const hudChromeStrings = {
     sheathe: 'Sheathe/Unsheathe Weapon',
     // Hides the whole HUD for a clean screenshot or video (Alt+Z by default).
     hideInterface: 'Hide Interface',
+    // Silences every sound channel at once (Ctrl+M by default); the two lines
+    // after it are the chat notes a press leaves.
+    muteAudio: 'Mute All Sound',
+    audioMuted: 'All sound muted. Press again to turn it back on.',
+    audioUnmuted: 'Sound back on.',
     // Swimming: Jump swims up, this swims down.
     dive: 'Swim Down',
     // Pet bar (Ctrl+1..5 by default) key-binding rows + category header.
@@ -6476,6 +6481,8 @@ export const hudChromeStrings = {
     // "lite" run); "Boss" is not.
     elite: 'Elite',
     boss: 'Boss',
+    // Under a buddy's name: whose companion it is.
+    buddyOwner: "{owner}'s Buddy",
   },
   // The player mouseover tooltip (player_tooltip_view.ts): the classic
   // <Guild> line and the chosen specialization with its role, both slots

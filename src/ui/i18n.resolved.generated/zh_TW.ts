@@ -2522,6 +2522,9 @@ export const zh_TW: EnTranslations = {
       "friendlyNameplates": "切換友方姓名板",
       "sheathe": "收起/拔出武器",
       "hideInterface": "隱藏介面",
+      "muteAudio": "靜音所有聲音",
+      "audioMuted": "已靜音所有聲音。再按一次可恢復。",
+      "audioUnmuted": "聲音已恢復。",
       "dive": "下潛",
       "categoryPet": "寵物",
       "petAttack": "寵物：攻擊",
@@ -5086,7 +5089,8 @@ export const zh_TW: EnTranslations = {
       "hostile": "敵對",
       "friendly": "友方",
       "elite": "精英",
-      "boss": "首領"
+      "boss": "首領",
+      "buddyOwner": "{owner}的夥伴"
     },
     "playerTooltip": {
       "guild": "<{guild}>",
@@ -10161,7 +10165,7 @@ export const zh_TW: EnTranslations = {
       "shadow_bolt": "向目標施放一道暗影箭，是你慣用的核彈。",
       "summon_imp": "召來一隻燼裔，從遠處向敵人施放邪能箭。",
       "demon_skin": "持續的自我增益，強化皮膚並增加護甲。",
-      "immolate": "點燃目標，造成一記前置傷害並留下持續燃燒。",
+      "immolate": "點燃目標，留下持續燃燒。",
       "corruption": "以暗影腐蝕目標，在你做其他事時持續造成傷害。",
       "life_tap": "在法力見底時，以部分自身生命換回法力。",
       "wrath": "從遠處朝目標擲出一道自然箭矢，是你慣用的核彈。",
@@ -17182,7 +17186,7 @@ export const zh_TW: EnTranslations = {
       "clickDestroy": "點擊摧毀",
       "useFishing": "使用：在附近水域釣魚。",
       "useHealingPotion": "使用：立即恢復 {amount} 點生命值。戰鬥中可用。1 分鐘冷卻。",
-      "useHealingPotionPct": "使用：立即恢復最大生命值的 {percent}%。戰鬥中可用。2 分鐘冷卻。",
+      "useHealingPotionPct": "使用：立即恢復最大生命值的 {percent}%。戰鬥中可用。1 分鐘冷卻。",
       "useManaPotion": "使用：立即恢復 {amount} 點法力值。戰鬥中可用。1 分鐘冷卻。",
       "clickUseInstant": "點擊在戰鬥中立即使用",
       "clickUse": "點擊使用",
@@ -18257,11 +18261,11 @@ export const zh_TW: EnTranslations = {
       },
       "demon_skin": {
         "name": "邪魔之皮",
-        "description": "惡魔皮膚使你的護甲提高 {buff}，持續 30 分鐘。"
+        "description": "惡魔皮膚使你的護甲提高 {buff}，持續 30 分鐘。契約深化可使邪魔之皮生效期間的這部分護甲翻倍，並降低受到的魔法傷害。"
       },
       "immolate": {
         "name": "燃燒契約",
-        "description": "灼燒敵人，造成 {damage} 點火焰傷害，並在 15 秒內額外造成 {overTime}。"
+        "description": "灼燒敵人，在 15 秒內造成 {damage} 點火焰傷害。"
       },
       "corruption": {
         "name": "黑腐術",
@@ -18281,7 +18285,7 @@ export const zh_TW: EnTranslations = {
       },
       "sentence": {
         "name": "裁決",
-        "description": "消耗全部譴罪與命運絲線裁決敵人。每條絲線使傷害提高6%，附加效果會在20、50、80和100點譴罪時提升。16級後傷害成長趨於平緩。"
+        "description": "消耗全部譴罪與命運絲線裁決敵人。至少需要20點譴罪。傷害隨消耗的譴罪提高，每條絲線再使傷害提高6%。達到50點譴罪時，還會為你恢復相當於所造成傷害20%的生命值。達到80點時，還會對目標8碼內的敵人造成35%的傷害。達到100點時，對玩家和首領的傷害還會提高5%，並立即擊殺生命值低於20%的普通敵人。16級後傷害成長趨於平緩。"
       },
       "life_tap": {
         "name": "苛刻交易",
@@ -18309,7 +18313,7 @@ export const zh_TW: EnTranslations = {
       },
       "umbral_anchor": {
         "name": "暗影錨",
-        "description": "首次施放：在腳下錨定暗影，持續5分鐘。在40碼內再次施放可返回錨點，消耗錨點並觸發45秒冷卻。"
+        "description": "首次施放：在腳下錨定暗影，持續5分鐘。在40碼內再次施放可返回錨點，並觸發45秒冷卻。每次返回都會在你原先站立處留下一個持續5分鐘的新錨點，因此你可以來回跳躍，直到錨點消失。"
       },
       "soulwell": {
         "name": "靈魂之井",
@@ -18341,7 +18345,7 @@ export const zh_TW: EnTranslations = {
       },
       "fear": {
         "name": "折魂",
-        "description": "使敵人陷入恐懼並畏縮，最多持續 5 秒。累計達到目標最大生命值 8% 的傷害會打破效果。"
+        "description": "使敵人陷入恐懼並畏縮，最多持續 5 秒。累計達到目標最大生命值 10% 的傷害會打破效果。"
       },
       "searing_pain": {
         "name": "焦灼",
@@ -19012,7 +19016,7 @@ export const zh_TW: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "恐懼嚎叫",
-        "description": "使附近的敵人恐懼，最多持續 5 秒。累計達到目標最大生命值 8% 的傷害會打破其恐懼。（術士天賦）"
+        "description": "使選定地點8碼內的敵人恐懼，最多持續 5 秒。累計達到目標最大生命值 10% 的傷害會打破其恐懼。（術士天賦）"
       },
       "ice_block": {
         "name": "寒冰棺",
@@ -31055,7 +31059,7 @@ export const zh_TW: EnTranslations = {
       },
       "vanguard_warlock_affliction": {
         "name": "先鋒套裝：Dreadquill Vestments",
-        "bonus2": "2件：Harrow施法時間縮短0.3秒。受到傷害不再延遲你的施法。",
+        "bonus2": "2件：暗影錨冷卻時間縮短15秒。受到傷害不再延遲你的施法。",
         "bonus4": "4件：Consume治療量提高30%，且可移動引導。"
       },
       "vanguard_warlock_demonology": {

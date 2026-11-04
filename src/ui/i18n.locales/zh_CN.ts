@@ -4638,6 +4638,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.friendly': '友方',
   'hudChrome.mobTooltip.elite': '精英',
   'hudChrome.mobTooltip.boss': '首领',
+  'hudChrome.mobTooltip.buddyOwner': '{owner}的伙伴',
   'hudChrome.targetFrame.unlock': '移动目标框',
   'hudChrome.targetFrame.lock': '锁定目标框',
   'hudChrome.playerFrame.unlock': '移动玩家框',
@@ -5572,6 +5573,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.emoteWheel': '表情轮盘',
   'hudChrome.keybinds.sheathe': '收起/拔出武器',
   'hudChrome.keybinds.hideInterface': '隐藏界面',
+  'hudChrome.keybinds.muteAudio': '静音所有声音',
+  'hudChrome.keybinds.audioMuted': '已静音所有声音。再按一次可恢复。',
+  'hudChrome.keybinds.audioUnmuted': '声音已恢复。',
   'hudChrome.keybinds.targetFriendly': '选中最近友方',
   'hudChrome.keybinds.targetFriendlyNext': '切换友方目标',
   'hudChrome.keybinds.targetPrev': '反向切换目标',
@@ -7652,10 +7656,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shadow_bolt.name': '幽暗箭',
   'entities.abilities.shadow_bolt.description': '向敌人发射暗影箭，造成 {damage} 点暗影伤害。',
   'entities.abilities.demon_skin.name': '邪魔硬皮',
-  'entities.abilities.demon_skin.description': '恶魔皮肤使你的护甲提高 {buff}，持续 30 分钟。',
+  'entities.abilities.demon_skin.description':
+    '恶魔皮肤使你的护甲提高 {buff}，持续 30 分钟。契约深化可使邪魔硬皮生效期间的这部分护甲翻倍，并降低受到的魔法伤害。',
   'entities.abilities.immolate.name': '燃烧契约',
-  'entities.abilities.immolate.description':
-    '灼烧敌人，造成 {damage} 点火焰伤害，并在 15 秒内额外造成 {overTime}。',
+  'entities.abilities.immolate.description': '灼烧敌人，在 15 秒内造成 {damage} 点火焰伤害。',
   'entities.abilities.corruption.name': '黑腐术',
   'entities.abilities.corruption.description': '腐蚀目标，在 18 秒内造成 {damage} 点暗影伤害。',
   'entities.abilities.life_tap.name': '苛酷交易',
@@ -7668,7 +7672,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '吞噬目标的生命力，每秒造成 {damage} 点暗影伤害，并将其中的 70% 转化为生命传给你。痛苦则改为全部转化。当引导在你的主邪眼之上时，它会在开始时消耗全部命运丝线，而每一根丝线都会让每一跳额外产生 1 点谴罪。',
   'entities.abilities.fear.name': '惊惧',
   'entities.abilities.fear.description':
-    '使敌人陷入恐惧并畏缩，最多持续 5 秒。累计达到目标最大生命值 8% 的伤害会打破效果。',
+    '使敌人陷入恐惧并畏缩，最多持续 5 秒。累计达到目标最大生命值 10% 的伤害会打破效果。',
   'entities.abilities.searing_pain.name': '焦灼',
   'entities.abilities.searing_pain.description':
     '以痛苦烈焰灼烧敌人，造成 {damage} 点火焰伤害。施法迅速。',
@@ -11160,7 +11164,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.healing_wave': '你的主力治疗，为自己或盟友直接补血。',
   'guide.abilityHook.heroic_strike': '预备一次更重的挥击，在下次攻击时消耗怒气。',
   'guide.abilityHook.holy_light': '稳健而可观的治疗，用于把盟友或自己奶满。',
-  'guide.abilityHook.immolate': '点燃目标，打出一记起手伤害并留下持续燃烧。',
+  'guide.abilityHook.immolate': '点燃目标，留下持续燃烧。',
   'guide.abilityHook.judgement': '消耗你激活的圣印，从近距离打击敌人。',
   'guide.abilityHook.lesser_heal': '稳健的施法治疗，有空站定时为盟友补血。',
   'guide.abilityHook.life_tap': '在法力枯竭时，将部分自身生命值转化为法力。',
@@ -15681,7 +15685,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_stream.description':
     '在12秒内为一个友方目标恢复120点生命值。（萨满天赋）',
   'entities.abilities.howl_of_terror.description':
-    '使附近的敌人恐惧，最多持续 5 秒。累计达到目标最大生命值 8% 的伤害会打破其恐惧。（术士天赋）',
+    '使选定地点8码内的敌人恐惧，最多持续 5 秒。累计达到目标最大生命值 10% 的伤害会打破其恐惧。（术士天赋）',
   'entities.abilities.ice_block.description':
     '将你封入坚冰8秒，使你免疫所有伤害。移除已存在的普通有害效果，并阻止新的普通控制效果施加于你。可在昏迷或变形状态下使用。被封冻期间无法行动。再次施放可取消。（法师）',
   'entities.abilities.inner_focus.description':
@@ -18377,7 +18381,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '对敌人造成{damage}点神圣伤害，或为一名友方目标治疗{healing}点生命值。伤害随法术强度提高，治疗随治疗强度提高。教义会通过你的纽带将此伤害转化为治疗。若30米内没有已建立纽带且受伤的队伍成员，则治疗30米内生命值最低的受伤队伍成员，治疗量为伤害的15%。治疗一名队伍成员时，还会为该目标10米内、且处于你视野中的至多2名其他受伤队伍成员治疗，每人恢复量为已恢复生命值的50%。这些额外治疗不会触发暴击，也不会建立教义纽带。（教义专属技能）',
   'entities.abilities.scouring_mercy.name': '涤罪慈悲',
   'entities.abilities.sentence.description':
-    '消耗全部谴罪与命运丝线裁决敌人。每条丝线使伤害提高6%，附加效果会在20、50、80和100点谴罪时提升。16级后伤害成长趋于平缓。',
+    '消耗全部谴罪与命运丝线裁决敌人。至少需要20点谴罪。伤害随消耗的谴罪提高，每条丝线再使伤害提高6%。达到50点谴罪时，还会为你恢复相当于所造成伤害20%的生命值。达到80点时，还会对目标8码内的敌人造成35%的伤害。达到100点时，对玩家和首领的伤害还会提高5%，并立即击杀生命值低于20%的普通敌人。16级后伤害成长趋于平缓。',
   'entities.abilities.sentence.name': '裁决',
   'entities.abilities.seraphic_vigil.description':
     '为一名盟友施加守望祝福，在其陷入危险时恢复 {buff} 点生命值。赐福专属技能。',
@@ -18443,7 +18447,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '向后跃出25码，并解除定身和移动减速效果。落地后移动速度提高50%，持续3秒。若你拥有狩猎势能，则将其刷新，并使你获得蓄势返场，持续12秒。',
   'entities.abilities.trailbreak.name': '断迹',
   'entities.abilities.umbral_anchor.description':
-    '首次施放：在脚下锚定暗影，持续5分钟。在40码内再次施放可返回锚点，消耗锚点并触发45秒冷却。',
+    '首次施放：在脚下锚定暗影，持续5分钟。在40码内再次施放可返回锚点，并触发45秒冷却。每次返回都会在你原先站立处留下一个持续5分钟的新锚点，因此你可以来回跳跃，直到锚点消失。',
   'entities.abilities.umbral_anchor.name': '暗影锚',
   'entities.abilities.unholy_command.description':
     '消耗 3 枚灵魂碎片号令所有亡灵，使其伤害提高 25%、行动速度提高 20%，持续 12 秒。',
@@ -19479,7 +19483,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warlock.fateThreadsSentenceReady': '三层命运丝线：裁决可消耗它们以提高18%的伤害。',
   'hudChrome.warlock.fateThreadsStatus': '{value}/{max} 命运丝线。',
   'itemUi.tooltip.useHealingPotionPct':
-    '使用：立即恢复最大生命值的 {percent}%。战斗中可用。2 分钟冷却。',
+    '使用：立即恢复最大生命值的 {percent}%。战斗中可用。1 分钟冷却。',
   'guide.controls.clickMoveNote':
     '点击移动默认是关着的，要你自己打开：在游戏菜单中打开“按键绑定”面板，开启“点击移动”，再用它下方的“点击移动按键”一行挑选由哪个鼠标键负责走路（默认是左键，也可以选右键）。开启之后，点一下地面上的某处，你便会朝那里走去，地上还会有一个标记指出你的去向。点击一只生物或另一位玩家，你会走到对方近前、在够得着的距离停下，而这一次点击照样完成它平常的选中或交互；如果你点的东西本来就在身边，那就直接交互，人不必挪窝。任何一个移动按键都会立刻把控制权收回、结束这趟行程，按住鼠标键环顾四周也一样。跳跃不会，所以你可以一路蹦着继续赶路；而打开游戏菜单只是让行程暂停，关掉菜单后它会接着走完。',
   'guide.deedsPage.platformBody':
@@ -21977,7 +21981,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_mage_frost.bonus4': '施放冰缚会使疾步的剩余冷却时间缩短5秒。',
   'entities.itemSets.vanguard_warlock_affliction.name': '先锋套装：惧羽法衣',
   'entities.itemSets.vanguard_warlock_affliction.bonus2':
-    '折磨的施法时间缩短0.3秒。受到伤害不再延迟你的施法。',
+    '暗影锚的冷却时间缩短15秒。受到伤害不再延迟你的施法。',
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     '吞噬为你多治疗30%，并且可以在移动中引导。',
   'entities.itemSets.vanguard_warlock_demonology.name': '先锋套装：骨缚礼服',

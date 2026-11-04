@@ -2522,6 +2522,9 @@ export const fr_FR: EnTranslations = {
       "friendlyNameplates": "Basculer les plaques de nom amies",
       "sheathe": "Ranger/Dégainer l'arme",
       "hideInterface": "Masquer l'interface",
+      "muteAudio": "Couper tout le son",
+      "audioMuted": "Tout le son est coupé. Appuyez à nouveau pour le rétablir.",
+      "audioUnmuted": "Son rétabli.",
       "dive": "Nager vers le bas",
       "categoryPet": "Familier",
       "petAttack": "Familier : attaquer",
@@ -5086,7 +5089,8 @@ export const fr_FR: EnTranslations = {
       "hostile": "Hostile",
       "friendly": "Amical",
       "elite": "Élite",
-      "boss": "Boss"
+      "boss": "Boss",
+      "buddyOwner": "Compagnon de {owner}"
     },
     "playerTooltip": {
       "guild": "<{guild}>",
@@ -10161,7 +10165,7 @@ export const fr_FR: EnTranslations = {
       "shadow_bolt": "Un trait d'ombre que vous lancez sur une cible, votre frappe de prédilection.",
       "summon_imp": "Appelle un Emberkin qui lance Éclair fel sur les ennemis à distance.",
       "demon_skin": "Une amélioration personnelle durable qui durcit votre peau et ajoute de l'armure.",
-      "immolate": "Embrase une cible pour un coup d'ouverture et une brûlure qui s'attarde.",
+      "immolate": "Embrase une cible d'une brûlure qui s'attarde.",
       "corruption": "Ronge une cible d'ombre dont les dégâts s'égrènent pendant que vous faites autre chose.",
       "life_tap": "Échange une part de votre propre vie contre du mana quand vous êtes à sec.",
       "wrath": "Un trait de nature lancé sur une cible à distance, votre frappe de prédilection.",
@@ -17182,7 +17186,7 @@ export const fr_FR: EnTranslations = {
       "clickDestroy": "Cliquer pour détruire",
       "useFishing": "Utiliser : pêcher dans les eaux proches.",
       "useHealingPotion": "Utiliser : rend instantanément {amount} points de vie. Utilisable en combat. Recharge de 1 min.",
-      "useHealingPotionPct": "Utiliser : rend instantanément {percent}% de vos points de vie maximum. Utilisable en combat. Recharge de 2 min.",
+      "useHealingPotionPct": "Utiliser : rend instantanément {percent}% de vos points de vie maximum. Utilisable en combat. Recharge de 1 min.",
       "useManaPotion": "Utiliser : rend instantanément {amount} mana. Utilisable en combat. Recharge de 1 min.",
       "clickUseInstant": "Cliquer pour utiliser instantanément en combat",
       "clickUse": "Cliquer pour utiliser",
@@ -18257,11 +18261,11 @@ export const fr_FR: EnTranslations = {
       },
       "demon_skin": {
         "name": "Peau de démon",
-        "description": "Une peau démoniaque augmente votre armure de {buff} pendant 30 min."
+        "description": "Une peau démoniaque augmente votre armure de {buff} pendant 30 min. Pact Deepened peut doubler cette armure et réduire les dégâts magiques subis tant que Peau de démon est active."
       },
       "immolate": {
         "name": "Pacte brûlant",
-        "description": "Brûle l'ennemi pour {damage} points de dégâts de Feu et {overTime} points supplémentaires en 15 s."
+        "description": "Brûle l'ennemi pour {damage} points de dégâts de Feu en 15 s."
       },
       "corruption": {
         "name": "Pourriture noire",
@@ -18281,7 +18285,7 @@ export const fr_FR: EnTranslations = {
       },
       "sentence": {
         "name": "Sentence",
-        "description": "Consomme toute la Condamnation et les Fils du destin pour prononcer la sentence sur l'ennemi. Chaque Fil augmente les dégâts de 6%. Des effets supplémentaires s'ajoutent à 20, 50, 80 et 100 Condamnation. Sa montée en dégâts se stabilise après le niveau 16."
+        "description": "Consomme toute la Condamnation et les Fils du destin pour prononcer la sentence sur l'ennemi. Nécessite au moins 20 Condamnation. Les dégâts augmentent avec la Condamnation consommée, et chaque Fil les augmente de 6%. À 50 Condamnation, vous rend aussi 20% des dégâts infligés en points de vie. À 80, touche aussi les ennemis dans un rayon de 8 m autour de la cible pour 35% de ses dégâts. À 100, inflige aussi 5% de dégâts supplémentaires aux joueurs et aux boss, et tue instantanément un ennemi normal sous 20% de points de vie. Sa montée en dégâts se stabilise après le niveau 16."
       },
       "life_tap": {
         "name": "Marché brutal",
@@ -18309,7 +18313,7 @@ export const fr_FR: EnTranslations = {
       },
       "umbral_anchor": {
         "name": "Ancre ombrale",
-        "description": "Première incantation : ancre votre ombre à vos pieds pendant 5 min. Relancez à moins de 40 m pour y retourner, consommant l'ancre et déclenchant une recharge de 45 s."
+        "description": "Première incantation : ancre votre ombre à vos pieds pendant 5 min. Relancez à moins de 40 m pour y retourner, déclenchant une recharge de 45 s. Chaque retour laisse une nouvelle ancre de 5 min là où vous vous teniez, vous permettant de faire des allers-retours jusqu'à ce qu'une ancre expire."
       },
       "soulwell": {
         "name": "Puits d'âmes",
@@ -18341,7 +18345,7 @@ export const fr_FR: EnTranslations = {
       },
       "fear": {
         "name": "Tourment",
-        "description": "Terrifie l'ennemi et le laisse tremblant pendant un maximum de 5 s. Les dégâts cumulés équivalant à 8% du maximum de points de vie de la cible interrompent l'effet."
+        "description": "Terrifie l'ennemi et le laisse tremblant pendant un maximum de 5 s. Les dégâts cumulés équivalant à 10% du maximum de points de vie de la cible interrompent l'effet."
       },
       "searing_pain": {
         "name": "Cautérisation",
@@ -19012,7 +19016,7 @@ export const fr_FR: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Hurlement d’effroi",
-        "description": "Effraie les ennemis proches pendant un maximum de 5 s. Les dégâts cumulés équivalant à 8% du maximum de points de vie d'une cible interrompent sa peur. (talent de Démoniste)"
+        "description": "Effraie les ennemis dans un rayon de 8 m autour de l'endroit ciblé pendant un maximum de 5 s. Les dégâts cumulés équivalant à 10% du maximum de points de vie d'une cible interrompent sa peur. (talent de Démoniste)"
       },
       "ice_block": {
         "name": "Cercueil froid",
@@ -31055,7 +31059,7 @@ export const fr_FR: EnTranslations = {
       },
       "vanguard_warlock_affliction": {
         "name": "Tenue Plume-de-terreur",
-        "bonus2": "Le temps d'incantation de Tourment est réduit de 0,3 s. Les dégâts subis ne retardent plus vos incantations.",
+        "bonus2": "Le temps de recharge d'Ancre ombrale est réduit de 15 s. Les dégâts subis ne retardent plus vos incantations.",
         "bonus4": "Consumer vous soigne 30 % de plus et peut être canalisé en mouvement."
       },
       "vanguard_warlock_demonology": {

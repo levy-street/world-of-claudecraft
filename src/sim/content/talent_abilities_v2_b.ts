@@ -120,12 +120,13 @@ export const TALENT_ABILITIES_V2_B = {
     cost: 55,
     castTime: 0,
     cooldown: 40,
-    range: 0,
+    range: 30,
     school: 'shadow',
     requiresTarget: false,
+    targetMode: 'position',
     effects: [{ type: 'aoeFear', duration: 5, radius: 8 }],
     description:
-      "Frightens nearby enemies for up to 5 sec. Damage totaling 8% of a target's maximum health breaks its fear. (Warlock talent)",
+      "Frightens enemies within 8 yd of the selected location for up to 5 sec. Damage totaling 10% of a target's maximum health breaks its fear. (Warlock talent)",
   },
   curse_of_exhaustion: {
     id: 'curse_of_exhaustion',

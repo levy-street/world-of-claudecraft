@@ -2522,6 +2522,9 @@ export const ja_JP: EnTranslations = {
       "friendlyNameplates": "友好ネームプレート切り替え",
       "sheathe": "武器を納刀/抜刀",
       "hideInterface": "インターフェースを隠す",
+      "muteAudio": "すべてのサウンドをミュート",
+      "audioMuted": "すべてのサウンドをミュートしました。もう一度押すと元に戻ります。",
+      "audioUnmuted": "サウンドを元に戻しました。",
       "dive": "潜水",
       "categoryPet": "ペット",
       "petAttack": "ペット：攻撃",
@@ -5086,7 +5089,8 @@ export const ja_JP: EnTranslations = {
       "hostile": "敵対",
       "friendly": "味方",
       "elite": "エリート",
-      "boss": "ボス"
+      "boss": "ボス",
+      "buddyOwner": "{owner}のバディ"
     },
     "playerTooltip": {
       "guild": "<{guild}>",
@@ -10161,7 +10165,7 @@ export const ja_JP: EnTranslations = {
       "shadow_bolt": "標的に放つシャドウのボルト。主力の火力です。",
       "summon_imp": "エンバーキンを呼び出し、遠くから敵へフェルボルトを放たせます。",
       "demon_skin": "肌を硬化させてアーマーを上げる、持続する自己強化です。",
-      "immolate": "標的に火を放ち、初撃を与えつつ燃焼を残します。",
+      "immolate": "標的に火を放ち、燃え続ける炎を残します。",
       "corruption": "標的をシャドウで蝕み、他の行動をしている間も継続して効果が続きます。",
       "life_tap": "マナが尽きたとき、自分の体力を一部マナに変換します。",
       "wrath": "遠距離から標的に放つネイチャーのボルト。主力の火力です。",
@@ -17182,7 +17186,7 @@ export const ja_JP: EnTranslations = {
       "clickDestroy": "クリックして破棄",
       "useFishing": "使用: 近くの水辺で釣りをします。",
       "useHealingPotion": "使用: 即座に体力を{amount}回復します。戦闘中に使用可能。クールダウン1分。",
-      "useHealingPotionPct": "使用: 即座に最大体力の{percent}%を回復します。戦闘中に使用可能。クールダウン2分。",
+      "useHealingPotionPct": "使用: 即座に最大体力の{percent}%を回復します。戦闘中に使用可能。クールダウン1分。",
       "useManaPotion": "使用: 即座にマナを{amount}回復します。戦闘中に使用可能。クールダウン1分。",
       "clickUseInstant": "クリックして戦闘中に即使用",
       "clickUse": "クリックして使用",
@@ -18257,11 +18261,11 @@ export const ja_JP: EnTranslations = {
       },
       "demon_skin": {
         "name": "魔物の肌",
-        "description": "悪魔の皮膚により、30分間アーマーが{buff}増加します。"
+        "description": "悪魔の皮膚により、30分間アーマーが{buff}増加します。契約の深化を習得すると、魔物の肌が有効な間このアーマーが2倍になり、受ける魔法ダメージも軽減されます。"
       },
       "immolate": {
         "name": "灼熱の契約",
-        "description": "敵を燃やして{damage}の火炎ダメージを与え、15秒間で追加の{overTime}を与えます。"
+        "description": "敵を燃やし、15秒かけて{damage}の火炎ダメージを与えます。"
       },
       "corruption": {
         "name": "黒腐れ",
@@ -18281,7 +18285,7 @@ export const ja_JP: EnTranslations = {
       },
       "sentence": {
         "name": "宣告",
-        "description": "断罪と運命の糸をすべて消費して敵に宣告を下します。糸1本につきダメージが6%増加し、追加効果は断罪20、50、80、100で強化されます。レベル16以降はダメージの伸びが緩やかになります。"
+        "description": "断罪と運命の糸をすべて消費して敵に宣告を下します。断罪が20以上必要です。ダメージは消費した断罪に応じて増加し、糸1本につき6%増加します。断罪50では、与えたダメージの20%分あなたの体力も回復します。80では、対象から8ヤード以内の敵にもダメージの35%を与えます。100では、プレイヤーとボスへのダメージがさらに5%増加し、体力20%未満の通常の敵を即座に倒します。レベル16以降はダメージの伸びが緩やかになります。"
       },
       "life_tap": {
         "name": "過酷な取引",
@@ -18309,7 +18313,7 @@ export const ja_JP: EnTranslations = {
       },
       "umbral_anchor": {
         "name": "影の錨",
-        "description": "初回使用時、足元に5分間残る影の錨を設置します。40ヤード以内で再使用すると錨へ戻り、錨を消費して45秒の再使用時間が始まります。"
+        "description": "初回使用時、足元に5分間残る影の錨を設置します。40ヤード以内で再使用すると錨へ戻り、45秒の再使用時間が始まります。戻るたびに元いた場所に5分間の新しい錨を残すため、錨が消えるまで何度でも行き来できます。"
       },
       "soulwell": {
         "name": "魂の泉",
@@ -18341,7 +18345,7 @@ export const ja_JP: EnTranslations = {
       },
       "fear": {
         "name": "責め苦",
-        "description": "敵に恐怖を刻み、最大5秒間おびえさせます。対象の最大体力の8%に相当する合計ダメージを受けると効果が切れます。"
+        "description": "敵に恐怖を刻み、最大5秒間おびえさせます。対象の最大体力の10%に相当する合計ダメージを受けると効果が切れます。"
       },
       "searing_pain": {
         "name": "灼熱",
@@ -19012,7 +19016,7 @@ export const ja_JP: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "恐怖の遠吠え",
-        "description": "周囲の敵を最大5秒間恐怖状態にする。対象の最大体力の8%に相当する合計ダメージを受けると、その恐怖は解除される。（ウォーロックのタレント）"
+        "description": "選択した地点から8ヤード以内の敵を最大5秒間恐怖状態にする。対象の最大体力の10%に相当する合計ダメージを受けると、その恐怖は解除される。（ウォーロックのタレント）"
       },
       "ice_block": {
         "name": "冷たき棺",
@@ -31055,7 +31059,7 @@ export const ja_JP: EnTranslations = {
       },
       "vanguard_warlock_affliction": {
         "name": "ヴァンガード：Dreadquill Vestments",
-        "bonus2": "2点：Harrowの詠唱時間が0.3秒短縮。被ダメージで詠唱が遅れなくなります。",
+        "bonus2": "2点：影の錨の再使用時間が15秒短縮。被ダメージで詠唱が遅れなくなります。",
         "bonus4": "4点：Consumeの回復量が30%上昇し、移動中にチャネル可能。"
       },
       "vanguard_warlock_demonology": {

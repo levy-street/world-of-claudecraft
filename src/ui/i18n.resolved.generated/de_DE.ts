@@ -2522,6 +2522,9 @@ export const de_DE: EnTranslations = {
       "friendlyNameplates": "Freundliche Namensschilder umschalten",
       "sheathe": "Waffe einstecken/ziehen",
       "hideInterface": "Schnittstelle ausblenden",
+      "muteAudio": "Alle Töne stummschalten",
+      "audioMuted": "Alle Töne stummgeschaltet. Erneut drücken, um sie wieder einzuschalten.",
+      "audioUnmuted": "Ton wieder an.",
       "dive": "Nach unten schwimmen",
       "categoryPet": "Begleiter",
       "petAttack": "Begleiter: Angreifen",
@@ -5086,7 +5089,8 @@ export const de_DE: EnTranslations = {
       "hostile": "Feindlich",
       "friendly": "Freundlich",
       "elite": "Elite",
-      "boss": "Boss"
+      "boss": "Boss",
+      "buddyOwner": "Gefährte von {owner}"
     },
     "playerTooltip": {
       "guild": "<{guild}>",
@@ -10161,7 +10165,7 @@ export const de_DE: EnTranslations = {
       "shadow_bolt": "Ein Schattenblitz, den du auf ein Ziel wirkst, dein erster Schadenszauber.",
       "summon_imp": "Ruft einen Emberkin herbei, der aus der Distanz Verderbnisblitz auf Gegner wirkt.",
       "demon_skin": "Eine anhaltende Selbststärkung, die deine Haut abhärtet und Rüstung verleiht.",
-      "immolate": "Setzt ein Ziel in Brand für einen Eröffnungstreffer und einen anhaltenden Brand.",
+      "immolate": "Setzt ein Ziel in einen anhaltenden Brand.",
       "corruption": "Lässt ein Ziel mit Schatten verrotten, der tickt, während du anderes erledigst.",
       "life_tap": "Tauscht einen Teil deiner eigenen Gesundheit in Mana zurück, wenn du leerläufst.",
       "wrath": "Ein Naturblitz, den du aus der Distanz auf ein Ziel schleuderst, dein erster Schadenszauber.",
@@ -17182,7 +17186,7 @@ export const de_DE: EnTranslations = {
       "clickDestroy": "Zum Zerstören klicken",
       "useFishing": "Benutzen: Angelt in nahen Gewässern.",
       "useHealingPotion": "Benutzen: Stellt sofort {amount} Gesundheit wieder her. Im Kampf nutzbar. 1 Min. Abklingzeit.",
-      "useHealingPotionPct": "Benutzen: Stellt sofort {percent}% der maximalen Gesundheit wieder her. Im Kampf nutzbar. 2 Min. Abklingzeit.",
+      "useHealingPotionPct": "Benutzen: Stellt sofort {percent}% der maximalen Gesundheit wieder her. Im Kampf nutzbar. 1 Min. Abklingzeit.",
       "useManaPotion": "Benutzen: Stellt sofort {amount} Mana wieder her. Im Kampf nutzbar. 1 Min. Abklingzeit.",
       "clickUseInstant": "Zum sofortigen Benutzen im Kampf klicken",
       "clickUse": "Zum Benutzen klicken",
@@ -18257,11 +18261,11 @@ export const de_DE: EnTranslations = {
       },
       "demon_skin": {
         "name": "Dämonenhaut",
-        "description": "Dämonische Haut erhöht eure Rüstung 30 Min. lang um {buff}."
+        "description": "Dämonische Haut erhöht eure Rüstung 30 Min. lang um {buff}. Pact Deepened kann diese Rüstung verdoppeln und erlittenen magischen Schaden verringern, solange Dämonenhaut aktiv ist."
       },
       "immolate": {
         "name": "Brennender Pakt",
-        "description": "Verbrennt den Gegner für {damage} Feuerschaden und zusätzlich {overTime} über 15 Sek."
+        "description": "Verbrennt den Gegner für {damage} Feuerschaden über 15 Sek."
       },
       "corruption": {
         "name": "Schwarzfäule",
@@ -18281,7 +18285,7 @@ export const de_DE: EnTranslations = {
       },
       "sentence": {
         "name": "Schuldspruch",
-        "description": "Verbraucht alle Verdammnis und Schicksalsfäden, um über den Gegner das Urteil zu fällen. Jeder Faden erhöht den Schaden um 6%. Zusätzliche Effekte eskalieren bei 20, 50, 80 und 100 Verdammnis. Seine Schadensskalierung flacht nach Stufe 16 ab."
+        "description": "Verbraucht alle Verdammnis und Schicksalsfäden, um über den Gegner das Urteil zu fällen. Benötigt mindestens 20 Verdammnis. Der Schaden steigt mit der verbrauchten Verdammnis, und jeder Faden erhöht ihn um 6%. Bei 50 Verdammnis wirst du zusätzlich um 20% des verursachten Schadens geheilt. Bei 80 erleiden zusätzlich Gegner im Umkreis von 8 m um das Ziel 35% des Schadens. Bei 100 steigt der Schaden gegen Spieler und Bosse zusätzlich um 5%, und ein normaler Gegner unter 20% Gesundheit wird sofort getötet. Seine Schadensskalierung flacht nach Stufe 16 ab."
       },
       "life_tap": {
         "name": "Harter Handel",
@@ -18309,7 +18313,7 @@ export const de_DE: EnTranslations = {
       },
       "umbral_anchor": {
         "name": "Schattenanker",
-        "description": "Erster Einsatz: verankert Euren Schatten 5 Min. lang an Euren Füßen. Erneuter Einsatz innerhalb von 40 m kehrt dorthin zurück, verbraucht den Anker und startet eine 45-sekündige Abklingzeit."
+        "description": "Erster Einsatz: verankert Euren Schatten 5 Min. lang an Euren Füßen. Erneuter Einsatz innerhalb von 40 m kehrt dorthin zurück und startet eine 45-sekündige Abklingzeit. Jede Rückkehr hinterlässt dort, wo Ihr standet, einen neuen Anker für 5 Min., sodass Ihr hin und her springen könnt, bis ein Anker abläuft."
       },
       "soulwell": {
         "name": "Seelenbrunnen",
@@ -18341,7 +18345,7 @@ export const de_DE: EnTranslations = {
       },
       "fear": {
         "name": "Heimsuchung",
-        "description": "Versetzt den Gegner in Schrecken und lässt ihn bis zu 5 Sek. lang kauern. Schaden in Höhe von insgesamt 8% der maximalen Gesundheit des Ziels bricht den Effekt."
+        "description": "Versetzt den Gegner in Schrecken und lässt ihn bis zu 5 Sek. lang kauern. Schaden in Höhe von insgesamt 10% der maximalen Gesundheit des Ziels bricht den Effekt."
       },
       "searing_pain": {
         "name": "Versengen",
@@ -19012,7 +19016,7 @@ export const de_DE: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Schreckensheulen",
-        "description": "Versetzt Gegner in der Nähe bis zu 5 Sek. lang in Furcht. Schaden in Höhe von insgesamt 8% der maximalen Gesundheit eines Ziels bricht seine Furcht. (Hexenmeistertalent)"
+        "description": "Versetzt Gegner im Umkreis von 8 m um den gewählten Ort bis zu 5 Sek. lang in Furcht. Schaden in Höhe von insgesamt 10% der maximalen Gesundheit eines Ziels bricht seine Furcht. (Hexenmeistertalent)"
       },
       "ice_block": {
         "name": "Kalter Sarg",
@@ -31055,7 +31059,7 @@ export const de_DE: EnTranslations = {
       },
       "vanguard_warlock_affliction": {
         "name": "Furchtfeder-Gewänder",
-        "bonus2": "Die Zauberzeit von Heimsuchung wird um 0,3 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
+        "bonus2": "Die Abklingzeit von Schattenanker wird um 15 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
         "bonus4": "Verzehren heilt dich um 30 Prozent mehr und kann während der Bewegung kanalisiert werden."
       },
       "vanguard_warlock_demonology": {

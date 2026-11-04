@@ -2076,7 +2076,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Tidevandskald skjolder også sit mål for 5 procent af din maksimale sundhed i 6 sek.',
   'entities.itemSets.vanguard_shaman_restoration.name': 'Saltbølge Kædemail',
   'entities.itemSets.vanguard_warlock_affliction.bonus2':
-    'Hjemsøg kasttid reduceres med 0,3 sek. Skade, du tager, forsinker ikke længere dine besværgelser.',
+    'Skyggeankers nedkøling reduceres med 15 sek. Skade, du tager, forsinker ikke længere dine besværgelser.',
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     'Fortær heler dig for 30 procent mere og kan kanaliseres mens du bevæger dig.',
   'entities.itemSets.vanguard_warlock_affliction.name': 'Dread Quill Gevandter',
@@ -7215,6 +7215,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.levelFamily': 'Niveau {level} {family}',
   'hudChrome.mobTooltip.elite': 'Elite',
   'hudChrome.mobTooltip.boss': 'Boss',
+  'hudChrome.mobTooltip.buddyOwner': 'Ledsager til {owner}',
   'hudChrome.options.aurasOnPlayerFrame': 'Buffs på spillerrammen',
   'hudChrome.options.playerFrameScale': 'Spillerrammens skala',
   'hudChrome.options.showDailyRewardsChest': 'Vis kisten med daglige belønninger',
@@ -7819,7 +7820,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'En defensiv kampstilling: du skaber 30% mere trussel, men volder og modtager 10% mindre skade. Aktivér igen for at forlade stillingen.',
   'entities.abilities.defensive_stance.name': 'Værgende Stilling',
   'entities.abilities.demon_skin.description':
-    'Dæmonisk hud øger din rustning med {buff} i 30 min.',
+    'Dæmonisk hud øger din rustning med {buff} i 30 min. Pact Deepened kan fordoble denne rustning og reducere den magiske skade, du tager, mens Djævlehud er aktiv.',
   'entities.abilities.demon_skin.name': 'Djævlehud',
   'entities.abilities.demoralizing_roar.description':
     'Demoraliserer nærliggende fjender og sænker deres angrebsstyrke med 20 i 20 sek. Kun i Bruin-form.',
@@ -7856,7 +7857,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.expose_armor.name': 'Rustningsbrud',
   'entities.abilities.faerie_fire.name': 'Hekselys',
   'entities.abilities.fear.description':
-    'Slår rædsel i fjenden, så den kryber sammen i op til 5 sek. Skade svarende til 8% af målets maksimale helbred bryder effekten.',
+    'Slår rædsel i fjenden, så den kryber sammen i op til 5 sek. Skade svarende til 10% af målets maksimale helbred bryder effekten.',
   'entities.abilities.fear.name': 'Hjemsøg',
   'entities.abilities.ferocious_bite.name': 'Blodbid',
   'entities.abilities.fire_blast.description':
@@ -7944,8 +7945,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ice_barrier.description':
     'Beskytter dig med is og opsuger {damage} skade i 60 sek.',
   'entities.abilities.ice_barrier.name': 'Frostslør',
-  'entities.abilities.immolate.description':
-    'Brænder fjenden for {damage} Ildskade og yderligere {overTime} over 15 sek.',
+  'entities.abilities.immolate.description': 'Brænder fjenden for {damage} Ildskade over 15 sek.',
   'entities.abilities.immolate.name': 'Brændende Pagt',
   'entities.abilities.insect_swarm.description':
     'Fjenden sværmes af insekter og tager {damage} naturskade over 12 sek.',
@@ -9658,8 +9658,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Sætter et tungere sving i kø der bruger raseri på dit næste slag.',
   'guide.abilityHook.holy_light':
     'En stabil, anselig helbredelse til at fylde en allieret eller dig selv op.',
-  'guide.abilityHook.immolate':
-    'Sætter ild til et mål for et indledende slag og en brand der hænger ved.',
+  'guide.abilityHook.immolate': 'Sætter ild til et mål med en brand der hænger ved.',
   'guide.abilityHook.judgement': 'Bruger dit aktive Segl til at ramme en fjende på kort afstand.',
   'guide.abilityHook.lesser_heal':
     'En stabil besværgelse til at fylde en allieret op når der er tid til at stå stille.',
@@ -14546,7 +14545,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_stream.description':
     'Genopretter 120 helbred hos et allieret mål over 12 sek. (shamantalent)',
   'entities.abilities.howl_of_terror.description':
-    'Skræmmer fjender i nærheden i op til 5 sek. Skade svarende til 8% af målets maksimale helbred bryder deres frygt. (troldmandstalent)',
+    'Skræmmer fjender inden for 8 m af det valgte sted i op til 5 sek. Skade svarende til 10% af målets maksimale helbred bryder deres frygt. (troldmandstalent)',
   'entities.abilities.ice_block.description':
     'Indkapsler jer i fast is i 8 sek. og gør jer immune over for al skade. Fjerner eksisterende almindelige skadelige effekter og forhindrer, at nye almindelige kontroleffekter bliver påført. Kan bruges, mens I er bedøvede eller forvandlede. I kan ikke handle, mens I er indkapslet. Kast igen for at annullere. (magiker)',
   'entities.abilities.inner_focus.description':
@@ -16523,7 +16522,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Øger bevægelseshastigheden med 35%, men ofrer 2% af dit maksimale helbred hvert sekund. Kast igen for at annullere. Den slår fra ved 20% helbred.',
   'entities.abilities.sacrilegious_march.name': 'Vanhellig march',
   'entities.abilities.sentence.description':
-    'Forbruger al Fordømmelse og alle Skæbnetråde for at afsige dom over fjenden. Hver Tråd øger skaden med 6%. Ekstra effekter eskalerer ved 20, 50, 80 og 100 Fordømmelse. Dens skadesskalering flader ud efter niveau 16.',
+    'Forbruger al Fordømmelse og alle Skæbnetråde for at afsige dom over fjenden. Kræver mindst 20 Fordømmelse. Skaden stiger med den forbrugte Fordømmelse, og hver Tråd øger den med 6%. Ved 50 Fordømmelse heler den dig desuden for 20% af den påførte skade. Ved 80 rammer den desuden fjender inden for 8 m af målet for 35% af sin skade. Ved 100 gør den desuden 5% mere skade på spillere og bosser og dræber øjeblikkeligt en almindelig fjende under 20% helbred. Dens skadesskalering flader ud efter niveau 16.',
   'entities.abilities.sentence.name': 'Dom',
   'entities.abilities.sinister_strike.description':
     'Et øjeblikkeligt slag for våbenskade plus {damage}. Giver 1 combopoint.',
@@ -16556,7 +16555,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.swipe.specNote_feral':
     'Hvert slag, der rammer, tilføjer 1 Gammelt Blod (maks. 3).',
   'entities.abilities.umbral_anchor.description':
-    'Første kast: forankrer din skygge ved dine fødder i 5 min. Kast igen inden for 40 m for at vende tilbage dertil, hvilket forbruger ankeret og starter en 45 sek. nedkøling.',
+    'Første kast: forankrer din skygge ved dine fødder i 5 min. Kast igen inden for 40 m for at vende tilbage dertil, hvilket starter en 45 sek. nedkøling. Hver tilbagevenden efterlader et nyt anker i 5 min, hvor du stod, så du kan blive ved med at hoppe frem og tilbage, indtil et anker udløber.',
   'entities.abilities.umbral_anchor.name': 'Skyggeanker',
   'entities.abilities.unholy_command.description':
     'Bruger 3 Sjælesplinter for at befale alle dine udøde at gøre 25% mere skade og handle 20% hurtigere i 12 sek.',
@@ -16706,7 +16705,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Tre Skæbnetråde: Dom kan forbruge dem for 18% øget skade.',
   'hudChrome.warlock.fateThreadsStatus': '{value} af {max} Skæbnetråde.',
   'itemUi.tooltip.useHealingPotionPct':
-    'Brug: Genopretter øjeblikkeligt {percent}% af maksimalt helbred. Brugbar i kamp. 2 min afkøling.',
+    'Brug: Genopretter øjeblikkeligt {percent}% af maksimalt helbred. Brugbar i kamp. 1 min afkøling.',
   'guide.controls.reliquary': 'Relikvariet',
   'guide.deedsPage.rewardsBody':
     'Belønningerne er alle sammen ren stads, og det er netop pointen. Nogle bedrifter giver en titel, du kan bære, eller en ramme, der indrammer dit navn, og aldrig noget, der gør din helt stærkere. Vælg den titel og den ramme, du vil have, i Bedrifternes Bog: titlen følger med på dit navneskilt, i chatten og på listerne, hvor alle kan se den, og rammen tegner sine egne farver omkring dit navneskilt og dit portræt.',
@@ -19707,6 +19706,9 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.toolTooltip.wieldDegrade':
     'Under den færdighed fungerer det stadig som et værktøj på lavere niveau.',
   'hudChrome.keybinds.hideInterface': 'Skjul grænseflade',
+  'hudChrome.keybinds.muteAudio': 'Slå al lyd fra',
+  'hudChrome.keybinds.audioMuted': 'Al lyd er slået fra. Tryk igen for at slå den til.',
+  'hudChrome.keybinds.audioUnmuted': 'Lyden er slået til igen.',
   'hudChrome.keybinds.targetParty1': 'Målpartimedlem 1',
   'hudChrome.keybinds.targetParty2': 'Målpartimedlem 2',
   'hudChrome.keybinds.targetParty3': 'Målpartimedlem 3',

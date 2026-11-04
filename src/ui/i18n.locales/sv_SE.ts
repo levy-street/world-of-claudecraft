@@ -2095,7 +2095,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Tidecall skyddar också sitt mål för 5 procent av din maximala hälsa i 6 sec.',
   'entities.itemSets.vanguard_shaman_restoration.name': 'Brineward Chainmail',
   'entities.itemSets.vanguard_warlock_affliction.bonus2':
-    'Harrows kastningstid minskas med 0,3 sec. Skada du tar fördröjer inte längre dina besvärjelser.',
+    'Skuggankares nedkylning minskas med 15 sek. Skada du tar fördröjer inte längre dina besvärjelser.',
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     'Förtär läker dig för 30 procent mer och kan kanaliseras medan du rör dig.',
   'entities.itemSets.vanguard_warlock_affliction.name': 'Dreadquill Vestments',
@@ -7238,6 +7238,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.levelFamily': 'Nivå {level} {family}',
   'hudChrome.mobTooltip.elite': 'Elit',
   'hudChrome.mobTooltip.boss': 'Boss',
+  'hudChrome.mobTooltip.buddyOwner': 'Följeslagare till {owner}',
   'hudChrome.options.aurasOnPlayerFrame': 'Förstärkningar på spelarramen',
   'hudChrome.options.playerFrameScale': 'Spelarramens skala',
   'hudChrome.options.showDailyRewardsChest': 'Visa kistan för dagliga belöningar',
@@ -7838,7 +7839,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'En defensiv stridsställning: du genererar 30 % mer hot men vållar och tar 10 % mindre skada. Kasta igen för att lämna ställningen.',
   'entities.abilities.defensive_stance.name': 'Gardställning',
   'entities.abilities.demon_skin.description':
-    'Demonisk hud ökar din rustning med {buff} i 30 min.',
+    'Demonisk hud ökar din rustning med {buff} i 30 min. Pact Deepened kan fördubbla denna rustning och minska magisk skada du tar medan Djävulshud är aktiv.',
   'entities.abilities.demon_skin.name': 'Djävulshud',
   'entities.abilities.demoralizing_roar.description':
     'Demoraliserar närliggande fiender och sänker deras anfallskraft med 20 i 20 sek. Endast i Bruinform.',
@@ -7876,7 +7877,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.expose_armor.name': 'Rustningsbräsch',
   'entities.abilities.faerie_fire.name': 'Häxljus',
   'entities.abilities.fear.description':
-    'Slår skräck i fienden och får den att huka sig i upp till 5 sek. Skada som sammanlagt motsvarar 8% av målets maximala hälsa bryter effekten.',
+    'Slår skräck i fienden och får den att huka sig i upp till 5 sek. Skada som sammanlagt motsvarar 10% av målets maximala hälsa bryter effekten.',
   'entities.abilities.fear.name': 'Plåga',
   'entities.abilities.ferocious_bite.name': 'Blodsbett',
   'entities.abilities.fire_blast.description': 'Spränger fienden för {damage} eldskada. Omedelbar.',
@@ -7963,8 +7964,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ice_barrier.description':
     'Skyddar dig i is och absorberar {damage} skada i 60 sek.',
   'entities.abilities.ice_barrier.name': 'Frostslöja',
-  'entities.abilities.immolate.description':
-    'Bränner fienden för {damage} eldskada och ytterligare {overTime} över 15 sek.',
+  'entities.abilities.immolate.description': 'Bränner fienden för {damage} eldskada över 15 sek.',
   'entities.abilities.immolate.name': 'Brinnande pakt',
   'entities.abilities.insect_swarm.description':
     'Fienden svärmas av insekter och tar {damage} naturskada över 12 sek.',
@@ -9790,8 +9790,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Köar ett tyngre svingslag som förbrukar raseri på ditt nästa slag.',
   'guide.abilityHook.holy_light':
     'En stadig, rejäl läkning för att toppa upp en allierad eller dig själv.',
-  'guide.abilityHook.immolate':
-    'Sätter ett mål i brand för ett inledande slag och en brand som dröjer kvar.',
+  'guide.abilityHook.immolate': 'Sätter ett mål i brand med en brand som dröjer kvar.',
   'guide.abilityHook.judgement':
     'Förbrukar ditt aktiva sigill för att slå en fiende från kort avstånd.',
   'guide.abilityHook.lesser_heal':
@@ -14764,7 +14763,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_stream.description':
     'Återställer 120 hälsa hos ett allierat mål under 12 sek. (schamantalang)',
   'entities.abilities.howl_of_terror.description':
-    'Skrämmer fiender i närheten i upp till 5 sek. Skada som sammanlagt motsvarar 8% av målets maximala hälsa bryter deras rädsla. (häxmästartalang)',
+    'Skrämmer fiender inom 8 meter från den valda platsen i upp till 5 sek. Skada som sammanlagt motsvarar 10% av målets maximala hälsa bryter deras rädsla. (häxmästartalang)',
   'entities.abilities.ice_block.description':
     'Innesluter er i fast is i 8 sek. och gör er immuna mot all skada. Tar bort befintliga vanliga skadliga effekter och förhindrar att nya vanliga kontrolleffekter tillämpas. Kan användas medan ni är bedövade eller förvandlade. Ni kan inte agera medan ni är inneslutna. Kasta igen för att avbryta. (magiker)',
   'entities.abilities.inner_focus.description':
@@ -16578,7 +16577,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Ökar förflyttningshastigheten med 35%, men offrar 2% av din maximala hälsa varje sekund. Kasta igen för att avbryta. Den stängs av vid 20% hälsa.',
   'entities.abilities.sacrilegious_march.name': 'Vanhelgande marsch',
   'entities.abilities.sentence.description':
-    'Förbrukar all Fördömelse och alla Ödestrådar för att fälla dom över fienden. Varje Tråd ökar skadan med 6%. Extra effekter trappas upp vid 20, 50, 80 och 100 Fördömelse. Dess skalning av skada planar ut efter nivå 16.',
+    'Förbrukar all Fördömelse och alla Ödestrådar för att fälla dom över fienden. Kräver minst 20 Fördömelse. Skadan växer med den förbrukade Fördömelsen, och varje Tråd ökar den med 6%. Vid 50 Fördömelse helar den dig dessutom för 20% av den utdelade skadan. Vid 80 träffar den dessutom fiender inom 8 meter från målet för 35% av sin skada. Vid 100 gör den dessutom 5% mer skada mot spelare och bossar och dödar omedelbart en vanlig fiende under 20% hälsa. Dess skalning av skada planar ut efter nivå 16.',
   'entities.abilities.sentence.name': 'Dom',
   'entities.abilities.sinister_strike.description':
     'Ett omedelbart slag för vapenskada plus {damage}. Ger 1 kombopoäng.',
@@ -16611,7 +16610,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.swipe.specNote_feral':
     'Varje träffande slag lägger till 1 Gammalt Blod (max 3).',
   'entities.abilities.umbral_anchor.description':
-    'Första kastningen: förankrar din skugga vid dina fötter i 5 min. Kasta igen inom 40 m för att återvända dit, vilket förbrukar ankaret och startar en 45 sekunders nedkylning.',
+    'Första kastningen: förankrar din skugga vid dina fötter i 5 min. Kasta igen inom 40 m för att återvända dit, vilket startar en 45 sekunders nedkylning. Varje återvändo lämnar ett nytt ankare i 5 min där du stod, så att du kan fortsätta hoppa fram och tillbaka tills ett ankare löper ut.',
   'entities.abilities.umbral_anchor.name': 'Skuggankare',
   'entities.abilities.unholy_command.description':
     'Förbrukar 3 Själfragment för att befalla alla dina odöda att vålla 25% mer skada och agera 20% snabbare i 12 sek.',
@@ -16759,7 +16758,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Tre Ödestrådar: Dom kan förbruka dem för 18% ökad skada.',
   'hudChrome.warlock.fateThreadsStatus': '{value} av {max} Ödestrådar.',
   'itemUi.tooltip.useHealingPotionPct':
-    'Använd: Återställer omedelbart {percent}% av maximal hälsa. Användbar i strid. 2 min nedkylning.',
+    'Använd: Återställer omedelbart {percent}% av maximal hälsa. Användbar i strid. 1 min nedkylning.',
   'guide.controls.reliquary': 'Relikvariet',
   'guide.deedsPage.rewardsBody':
     'Belöningarna är rena skrytsaker, och det är hela poängen. Vissa bedrifter ger en titel du kan bära eller en ram som inramar ditt namn, och aldrig något som gör din hjälte starkare. Välj den titel och den ram du vill ha i Bedrifternas bok: titeln följer med på din namnskylt, i chatten och på listorna där alla ser den, och ramen drar sina egna färger runt din namnskylt och ditt porträtt.',
@@ -19741,6 +19740,9 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.toolTooltip.wieldDegrade':
     'Under den färdigheten fungerar det fortfarande som ett verktyg på lägre nivå.',
   'hudChrome.keybinds.hideInterface': 'Dölj gränssnitt',
+  'hudChrome.keybinds.muteAudio': 'Stäng av allt ljud',
+  'hudChrome.keybinds.audioMuted': 'Allt ljud är avstängt. Tryck igen för att slå på det.',
+  'hudChrome.keybinds.audioUnmuted': 'Ljudet är på igen.',
   'hudChrome.keybinds.targetParty1': 'Målpartsmedlem 1',
   'hudChrome.keybinds.targetParty2': 'Målpartsmedlem 2',
   'hudChrome.keybinds.targetParty3': 'Målpartsmedlem 3',

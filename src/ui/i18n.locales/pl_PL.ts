@@ -2107,7 +2107,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Wezwanie Pływu również chroni cel tarczą na 5 procent maksymalnego zdrowia na 6 sek.',
   'entities.itemSets.vanguard_shaman_restoration.name': 'Pancerz Kolczasty Gwardy Słoni',
   'entities.itemSets.vanguard_warlock_affliction.bonus2':
-    'Czas rzucania Trwogi jest zmniejszony o 0.3 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
+    'Czas odnowienia Mrocznej Kotwicy jest zmniejszony o 15 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     'Pochłonięcie uzdrawia Ciebie o 30 procent więcej i może być kanalizowane podczas ruchu.',
   'entities.itemSets.vanguard_warlock_affliction.name': 'Szata Pióra Grozy',
@@ -7439,6 +7439,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.levelFamily': 'Poziom {level}: {family}',
   'hudChrome.mobTooltip.elite': 'Elita',
   'hudChrome.mobTooltip.boss': 'Boss',
+  'hudChrome.mobTooltip.buddyOwner': 'Towarzysz gracza {owner}',
   'hudChrome.options.aurasOnPlayerFrame': 'Wzmocnienia na ramce gracza',
   'hudChrome.options.playerFrameScale': 'Skala ramki gracza',
   'hudChrome.options.showDailyRewardsChest': 'Pokaż skrzynię codziennych nagród',
@@ -8044,7 +8045,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Defensywna postawa bojowa: generujesz o 30% więcej zagrożenia, lecz zadajesz i otrzymujesz o 10% mniej obrażeń. Rzuć ponownie, aby opuścić postawę.',
   'entities.abilities.defensive_stance.name': 'Czujna postawa',
   'entities.abilities.demon_skin.description':
-    'Demoniczna skóra zwiększa twój pancerz o {buff} na 30 min.',
+    'Demoniczna skóra zwiększa twój pancerz o {buff} na 30 min. Pact Deepened może podwoić ten pancerz i zmniejszyć otrzymywane obrażenia magiczne, dopóki Skóra plugawca jest aktywna.',
   'entities.abilities.demon_skin.name': 'Skóra plugawca',
   'entities.abilities.demoralizing_roar.description':
     'Demoralizuje pobliskich wrogów, zmniejszając ich moc ataku o 20 na 20 sek. Tylko w postaci Bruina.',
@@ -8082,7 +8083,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.expose_armor.name': 'Wyłom w pancerzu',
   'entities.abilities.faerie_fire.name': 'Wiedźmie światło',
   'entities.abilities.fear.description':
-    'Wzbudza w przeciwniku przerażenie, zmuszając go do kulenia się przez maksymalnie 5 sek. Obrażenia równe łącznie 8% maksymalnego zdrowia celu przerywają efekt.',
+    'Wzbudza w przeciwniku przerażenie, zmuszając go do kulenia się przez maksymalnie 5 sek. Obrażenia równe łącznie 10% maksymalnego zdrowia celu przerywają efekt.',
   'entities.abilities.fear.name': 'Trwoga',
   'entities.abilities.ferocious_bite.name': 'Krwawe ukąszenie',
   'entities.abilities.fire_blast.description':
@@ -8171,7 +8172,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Osłania cię lodem, pochłaniając {damage} obrażeń przez 60 sek.',
   'entities.abilities.ice_barrier.name': 'Lodowa zasłona',
   'entities.abilities.immolate.description':
-    'Pali wroga, zadając {damage} obrażeń od ognia oraz dodatkowe {overTime} w ciągu 15 sek.',
+    'Pali wroga, zadając {damage} obrażeń od ognia w ciągu 15 sek.',
   'entities.abilities.immolate.name': 'Płonący pakt',
   'entities.abilities.insect_swarm.description':
     'Wroga oblepia rój owadów, zadając {damage} obrażeń od natury w ciągu 12 sek.',
@@ -9954,8 +9955,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Kolejkuje cięższy zamach, który zużywa wściekłość przy następnym ciosie.',
   'guide.abilityHook.holy_light':
     'Stabilne, pokaźne leczenie do uzupełnienia zdrowia sojusznika lub własnego.',
-  'guide.abilityHook.immolate':
-    'Podpala cel, zadając początkowy cios i pozostawiając utrzymujące się płomienie.',
+  'guide.abilityHook.immolate': 'Podpala cel, pozostawiając utrzymujące się płomienie.',
   'guide.abilityHook.judgement':
     'Zużywa twoją aktywną pieczęć, by uderzyć wroga z bliskiego dystansu.',
   'guide.abilityHook.lesser_heal':
@@ -14957,7 +14957,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_stream.description':
     'Przywraca sojuszniczemu celowi 120 zdrowia przez 12 sek. (talent Szamana)',
   'entities.abilities.howl_of_terror.description':
-    'Przeraża pobliskich wrogów na maksymalnie 5 sek. Obrażenia równe łącznie 8% maksymalnego zdrowia celu przerywają jego strach. (talent Czarnoksiężnika)',
+    'Przeraża wrogów w promieniu 8 m od wybranego miejsca na maksymalnie 5 sek. Obrażenia równe łącznie 10% maksymalnego zdrowia celu przerywają jego strach. (talent Czarnoksiężnika)',
   'entities.abilities.ice_block.description':
     'Zamyka cię w litym lodzie na 8 sek., zapewniając odporność na wszystkie obrażenia. Usuwa istniejące zwykłe szkodliwe efekty i zapobiega nakładaniu nowych zwykłych efektów kontroli. Można użyć podczas ogłuszenia lub przemiany. W zamknięciu nie możesz działać. Użyj ponownie, aby anulować. (mag)',
   'entities.abilities.inner_focus.description':
@@ -16693,7 +16693,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Zwiększa szybkość poruszania się o 35%, ale poświęca 2% twojego maksymalnego zdrowia każdej sekundy. Rzuć ponownie, aby anulować. Wyłącza się przy 20% zdrowia.',
   'entities.abilities.sacrilegious_march.name': 'Świętokradczy Marsz',
   'entities.abilities.sentence.description':
-    'Zużywa całe Potępienie i Nici Przeznaczenia, aby wydać wyrok na wroga. Każda Nić zwiększa obrażenia o 6%. Dodatkowe efekty eskalują przy 20, 50, 80 i 100 Potępienia. Skalowanie jego obrażeń spłaszcza się po 16 poziomie.',
+    'Zużywa całe Potępienie i Nici Przeznaczenia, aby wydać wyrok na wroga. Wymaga co najmniej 20 Potępienia. Obrażenia rosną wraz ze zużytym Potępieniem, a każda Nić zwiększa je o 6%. Przy 50 Potępienia dodatkowo leczy cię o 20% zadanych obrażeń. Przy 80 dodatkowo trafia wrogów w promieniu 8 m od celu za 35% swoich obrażeń. Przy 100 dodatkowo zadaje graczom i bossom o 5% więcej obrażeń oraz natychmiast zabija zwykłego wroga poniżej 20% zdrowia. Skalowanie jego obrażeń spłaszcza się po 16 poziomie.',
   'entities.abilities.sentence.name': 'Wyrok',
   'entities.abilities.sinister_strike.description':
     'Natychmiastowy cios za obrażenia broni plus {damage}. Przyznaje 1 punkt combo.',
@@ -16725,7 +16725,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Zamaszyście przeczesz pazurami pobliskich wrogów, zadając {damage} obrażeń. Wzbudza dodatkowe zagrożenie. Tylko w Postaci Bruina.',
   'entities.abilities.swipe.specNote_feral': 'Każdy trafiony cios dodaje 1 Starą Krew (maks. 3).',
   'entities.abilities.umbral_anchor.description':
-    'Pierwsze rzucenie: zakotwicza twój cień u twoich stóp na 5 minut. Rzuć ponownie w promieniu 40 m, aby tam wrócić, zużywając kotwicę i rozpoczynając 45-sekundowy czas odnowienia.',
+    'Pierwsze rzucenie: zakotwicza twój cień u twoich stóp na 5 minut. Rzuć ponownie w promieniu 40 m, aby tam wrócić, rozpoczynając 45-sekundowy czas odnowienia. Każdy powrót zostawia nową kotwicę na 5 minut w miejscu, w którym stałeś, więc możesz skakać tam i z powrotem, dopóki kotwica nie wygaśnie.',
   'entities.abilities.umbral_anchor.name': 'Mroczna Kotwica',
   'entities.abilities.unholy_command.description':
     'Zużywa 3 Odłamki Duszy, rozkazując wszystkim twoim nieumarłym zadawać o 25% więcej obrażeń i działać o 20% szybciej przez 12 sekund.',
@@ -16878,7 +16878,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Trzy Nici Przeznaczenia: Wyrok może je zużyć, zyskując 18% zwiększonych obrażeń.',
   'hudChrome.warlock.fateThreadsStatus': '{value} z {max} Nici Przeznaczenia.',
   'itemUi.tooltip.useHealingPotionPct':
-    'Użycie: Natychmiast przywraca {percent}% maksymalnego zdrowia. Można użyć w walce. Czas odnowienia 2 min.',
+    'Użycie: Natychmiast przywraca {percent}% maksymalnego zdrowia. Można użyć w walce. Czas odnowienia 1 min.',
   'guide.controls.reliquary': 'Relikwiarz',
   'guide.deedsPage.rewardsBody':
     'Nagrody służą wyłącznie do pokazania się i o to właśnie chodzi. Niektóre czyny przyznają tytuł, który możesz nosić, albo obramowanie oprawiające twoje imię, i nigdy nic, co uczyniłoby twojego bohatera silniejszym. Wybierz tytuł i obramowanie w Księdze Czynów: tytuł towarzyszy ci na tabliczce z imieniem, na czacie i na tablicach wyników, na oczach wszystkich, a obramowanie kreśli własne barwy wokół twojej tabliczki i portretu.',
@@ -19877,6 +19877,9 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.toolTooltip.wieldDegrade':
     'Poniżej tej umiejętności nadal działa jako narzędzie niższego poziomu.',
   'hudChrome.keybinds.hideInterface': 'Ukryj interfejs',
+  'hudChrome.keybinds.muteAudio': 'Wycisz cały dźwięk',
+  'hudChrome.keybinds.audioMuted': 'Cały dźwięk wyciszony. Naciśnij ponownie, aby go włączyć.',
+  'hudChrome.keybinds.audioUnmuted': 'Dźwięk ponownie włączony.',
   'hudChrome.keybinds.targetParty1': 'Członek grupy docelowej 1',
   'hudChrome.keybinds.targetParty2': 'Członek grupy docelowej 2',
   'hudChrome.keybinds.targetParty3': 'Członek grupy docelowej 3',

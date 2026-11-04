@@ -2522,6 +2522,9 @@ export const zh_CN: EnTranslations = {
       "friendlyNameplates": "切换友方姓名板",
       "sheathe": "收起/拔出武器",
       "hideInterface": "隐藏界面",
+      "muteAudio": "静音所有声音",
+      "audioMuted": "已静音所有声音。再按一次可恢复。",
+      "audioUnmuted": "声音已恢复。",
       "dive": "下潜",
       "categoryPet": "宠物",
       "petAttack": "宠物：攻击",
@@ -5086,7 +5089,8 @@ export const zh_CN: EnTranslations = {
       "hostile": "敌对",
       "friendly": "友方",
       "elite": "精英",
-      "boss": "首领"
+      "boss": "首领",
+      "buddyOwner": "{owner}的伙伴"
     },
     "playerTooltip": {
       "guild": "<{guild}>",
@@ -10161,7 +10165,7 @@ export const zh_CN: EnTranslations = {
       "shadow_bolt": "向目标施放一道暗影箭，是你的常用输出。",
       "summon_imp": "召来一只烬裔，从远处向敌人施放邪能箭。",
       "demon_skin": "持续的自我增益，强化皮肤并提升护甲。",
-      "immolate": "点燃目标，打出一记起手伤害并留下持续燃烧。",
+      "immolate": "点燃目标，留下持续燃烧。",
       "corruption": "用暗影腐蚀目标，在你做别的事时持续造成伤害。",
       "life_tap": "在法力枯竭时，将部分自身生命值转化为法力。",
       "wrath": "从远处向目标投出一道自然箭矢，是你的常用输出。",
@@ -17182,7 +17186,7 @@ export const zh_CN: EnTranslations = {
       "clickDestroy": "点击摧毁",
       "useFishing": "使用：在附近水域钓鱼。",
       "useHealingPotion": "使用：立即恢复 {amount} 点生命值。战斗中可用。1 分钟冷却。",
-      "useHealingPotionPct": "使用：立即恢复最大生命值的 {percent}%。战斗中可用。2 分钟冷却。",
+      "useHealingPotionPct": "使用：立即恢复最大生命值的 {percent}%。战斗中可用。1 分钟冷却。",
       "useManaPotion": "使用：立即恢复 {amount} 点法力值。战斗中可用。1 分钟冷却。",
       "clickUseInstant": "点击在战斗中立即使用",
       "clickUse": "点击使用",
@@ -18257,11 +18261,11 @@ export const zh_CN: EnTranslations = {
       },
       "demon_skin": {
         "name": "邪魔硬皮",
-        "description": "恶魔皮肤使你的护甲提高 {buff}，持续 30 分钟。"
+        "description": "恶魔皮肤使你的护甲提高 {buff}，持续 30 分钟。契约深化可使邪魔硬皮生效期间的这部分护甲翻倍，并降低受到的魔法伤害。"
       },
       "immolate": {
         "name": "燃烧契约",
-        "description": "灼烧敌人，造成 {damage} 点火焰伤害，并在 15 秒内额外造成 {overTime}。"
+        "description": "灼烧敌人，在 15 秒内造成 {damage} 点火焰伤害。"
       },
       "corruption": {
         "name": "黑腐术",
@@ -18281,7 +18285,7 @@ export const zh_CN: EnTranslations = {
       },
       "sentence": {
         "name": "裁决",
-        "description": "消耗全部谴罪与命运丝线裁决敌人。每条丝线使伤害提高6%，附加效果会在20、50、80和100点谴罪时提升。16级后伤害成长趋于平缓。"
+        "description": "消耗全部谴罪与命运丝线裁决敌人。至少需要20点谴罪。伤害随消耗的谴罪提高，每条丝线再使伤害提高6%。达到50点谴罪时，还会为你恢复相当于所造成伤害20%的生命值。达到80点时，还会对目标8码内的敌人造成35%的伤害。达到100点时，对玩家和首领的伤害还会提高5%，并立即击杀生命值低于20%的普通敌人。16级后伤害成长趋于平缓。"
       },
       "life_tap": {
         "name": "苛酷交易",
@@ -18309,7 +18313,7 @@ export const zh_CN: EnTranslations = {
       },
       "umbral_anchor": {
         "name": "暗影锚",
-        "description": "首次施放：在脚下锚定暗影，持续5分钟。在40码内再次施放可返回锚点，消耗锚点并触发45秒冷却。"
+        "description": "首次施放：在脚下锚定暗影，持续5分钟。在40码内再次施放可返回锚点，并触发45秒冷却。每次返回都会在你原先站立处留下一个持续5分钟的新锚点，因此你可以来回跳跃，直到锚点消失。"
       },
       "soulwell": {
         "name": "灵魂之井",
@@ -18341,7 +18345,7 @@ export const zh_CN: EnTranslations = {
       },
       "fear": {
         "name": "惊惧",
-        "description": "使敌人陷入恐惧并畏缩，最多持续 5 秒。累计达到目标最大生命值 8% 的伤害会打破效果。"
+        "description": "使敌人陷入恐惧并畏缩，最多持续 5 秒。累计达到目标最大生命值 10% 的伤害会打破效果。"
       },
       "searing_pain": {
         "name": "焦灼",
@@ -19012,7 +19016,7 @@ export const zh_CN: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "恐惧嚎叫",
-        "description": "使附近的敌人恐惧，最多持续 5 秒。累计达到目标最大生命值 8% 的伤害会打破其恐惧。（术士天赋）"
+        "description": "使选定地点8码内的敌人恐惧，最多持续 5 秒。累计达到目标最大生命值 10% 的伤害会打破其恐惧。（术士天赋）"
       },
       "ice_block": {
         "name": "寒冰棺",
@@ -31055,7 +31059,7 @@ export const zh_CN: EnTranslations = {
       },
       "vanguard_warlock_affliction": {
         "name": "先锋套装：惧羽法衣",
-        "bonus2": "折磨的施法时间缩短0.3秒。受到伤害不再延迟你的施法。",
+        "bonus2": "暗影锚的冷却时间缩短15秒。受到伤害不再延迟你的施法。",
         "bonus4": "吞噬为你多治疗30%，并且可以在移动中引导。"
       },
       "vanguard_warlock_demonology": {

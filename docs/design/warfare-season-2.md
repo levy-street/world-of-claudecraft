@@ -670,8 +670,8 @@ Implementation routes:
 **Set:** Dreadquill Vestments
 **Items:** Dreadquill Hood, Dreadquill Mantle, Dreadquill Robe, Dreadquill Leggings, Dreadquill Handwraps
 
-- **2pc:** "Harrow's cast time is reduced by 0.3 sec." (`fear`, 5 sec incapacitate, 1.5 to 1.2 sec cast)
-  - Route: DATA. `{ ability: 'fear', castPct: -0.2 }`.
+- **2pc:** "Umbral Anchor's cooldown is reduced by 15 sec." (`umbral_anchor`, 45 to 30 sec cooldown; replaced the earlier 0.3 sec Harrow cast cut)
+  - Route: DATA. `{ ability: 'umbral_anchor', cooldownFlat: -15 }`.
 - **4pc:** "Passing Sentence heals you for 4 percent of your maximum health." (`sentence`)
   - Route: DATA ProcDef. `trigger: { on: 'castNth', n: 1, abilities: ['sentence'] }`, `responses: [{ kind: 'heal', amountPctMaxHp: 0.04, target: 'self' }]` (`target: 'self'` is REQUIRED, Sentence is hostile).
   - Links loosely to the 2pc (control buys time to build Condemnation); disclose that it

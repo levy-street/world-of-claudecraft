@@ -2071,7 +2071,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     "Tidecall ayrıca hedefini maksimum sağlığının %5'i için 6 saniye kalkan ile korur.",
   'entities.itemSets.vanguard_shaman_restoration.name': 'Tuz Koruma Halka Zırhı',
   'entities.itemSets.vanguard_warlock_affliction.bonus2':
-    "Harrow'un döküm süresi 0,3 san azalır. Alınan hasar artık büyü yapmanı geciktirmez.",
+    "Gölge Çapası'nın bekleme süresi 15 san azalır. Alınan hasar artık büyü yapmanı geciktirmez.",
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     'Consume seni %30 daha fazla iyileştirir ve hareket ederken kanallaştırılabilir.',
   'entities.itemSets.vanguard_warlock_affliction.name': 'Korku Tüyü Giysileri',
@@ -7323,6 +7323,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.levelFamily': 'Seviye {level} {family}',
   'hudChrome.mobTooltip.elite': 'Seçkin',
   'hudChrome.mobTooltip.boss': 'Patron',
+  'hudChrome.mobTooltip.buddyOwner': 'Yoldaş sahibi: {owner}',
   'hudChrome.options.aurasOnPlayerFrame': 'Oyuncu Çerçevesinde Güçlendirmeler',
   'hudChrome.options.playerFrameScale': 'Oyuncu Çerçevesi Ölçeği',
   'hudChrome.options.showDailyRewardsChest': 'Günlük Ödül Sandığını Göster',
@@ -7933,7 +7934,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Savunma amaçlı bir dövüş duruşu: %30 daha fazla tehdit üretirsin ama %10 daha az hasar verir ve alırsın. Duruştan çıkmak için tekrar kullan.',
   'entities.abilities.defensive_stance.name': 'Korumali Durus',
   'entities.abilities.demon_skin.description':
-    'Şeytani deri zırhını 30 dakika boyunca {buff} artırır.',
+    'Şeytani deri zırhını 30 dakika boyunca {buff} artırır. Pact Deepened, İblis Derisi etkinken bu zırhı ikiye katlayabilir ve alınan büyü hasarını azaltabilir.',
   'entities.abilities.demon_skin.name': 'İblis Derisi',
   'entities.abilities.demoralizing_roar.description':
     'Yakındaki düşmanların moralini bozarak saldırı güçlerini 20 saniye boyunca 20 azaltır. Yalnızca Bruin Formu.',
@@ -7970,7 +7971,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.expose_armor.name': 'Zırh Gediği',
   'entities.abilities.faerie_fire.name': 'Cadı Işığı',
   'entities.abilities.fear.description':
-    "Düşmanın yüreğine korku salar ve onu 5 saniyeye kadar sinmiş bırakır. Hedefin azami sağlığının toplam %8'i kadar hasar etkiyi bozar.",
+    "Düşmanın yüreğine korku salar ve onu 5 saniyeye kadar sinmiş bırakır. Hedefin azami sağlığının toplam %10'u kadar hasar etkiyi bozar.",
   'entities.abilities.fear.name': 'Dehşet',
   'entities.abilities.ferocious_bite.name': 'Kanlı Isırık',
   'entities.abilities.fire_blast.description': 'Düşmanı {damage} Ateş hasarıyla patlatır. Anında.',
@@ -8059,7 +8060,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Seni buzla kalkanlar ve 60 saniye boyunca {damage} hasarı emer.',
   'entities.abilities.ice_barrier.name': 'Buz Örtüsü',
   'entities.abilities.immolate.description':
-    'Düşmanı {damage} Ateş hasarıyla ve ek olarak 15 saniye boyunca {overTime} ile yakar.',
+    'Düşmanı 15 saniye boyunca {damage} Ateş hasarıyla yakar.',
   'entities.abilities.immolate.name': 'Yanan Ahit',
   'entities.abilities.insect_swarm.description':
     'Düşman böceklerce sarılır ve 12 saniye boyunca {damage} Doğa hasarı alır.',
@@ -10474,8 +10475,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Bir sonraki vuruşunda öfke harcayan daha ağır bir savruş sıraya koyar.',
   'guide.abilityHook.holy_light':
     'Bir dostu ya da kendini tam doldurmak için istikrarlı, hatırı sayılır bir iyileştirme.',
-  'guide.abilityHook.immolate':
-    'Bir hedefi tutuşturur; açılış darbesi ve sonra süren bir yanış verir.',
+  'guide.abilityHook.immolate': 'Bir hedefi tutuşturur ve süren bir yanış bırakır.',
   'guide.abilityHook.judgement': 'Aktif Mührünü harcayarak kısa menzilden bir düşmana vurur.',
   'guide.abilityHook.lesser_heal':
     'Sabit durmaya vakit olduğunda bir dostu doldurmak için istikrarlı bir okuma.',
@@ -14720,7 +14720,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_stream.description':
     'Bir müttefik hedefe 12 sn. boyunca 120 sağlık yeniler. (Şaman yeteneği)',
   'entities.abilities.howl_of_terror.description':
-    "Yakındaki düşmanları 5 sn. kadar korkutur. Hedefin azami sağlığının toplam %8'i kadar hasar korkusunu bozar. (Karabüyücü yeteneği)",
+    "Seçilen konumun 8 yarda içindeki düşmanları 5 sn. kadar korkutur. Hedefin azami sağlığının toplam %10'u kadar hasar korkusunu bozar. (Karabüyücü yeteneği)",
   'entities.abilities.ice_block.description':
     'Seni 8 sn boyunca katı buzun içine hapseder ve tüm hasara karşı bağışıklık kazandırır. Mevcut sıradan zararlı etkileri kaldırır ve yeni sıradan kontrol etkilerinin uygulanmasını engeller. Sersemlemiş veya polimorfa uğramışken kullanılabilir. Hapsedilmişken eylemde bulunamazsın. İptal etmek için tekrar kullan. (büyücü)',
   'entities.abilities.inner_focus.description':
@@ -16578,7 +16578,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     "Hareket hızını %35 artırır, ama her saniye azami canının %2'sini feda eder. İptal etmek için tekrar oku. %20 canda kendiliğinden kapanır.",
   'entities.abilities.sacrilegious_march.name': 'Günahkâr Yürüyüş',
   'entities.abilities.sentence.description':
-    "Düşmana hüküm giydirmek için tüm Mahkûmiyeti ve Kader İpliklerini tüketir. Her İplik hasarı %6 artırır. Ek etkiler 20, 50, 80 ve 100 Mahkûmiyette artar. Hasar ölçeklenmesi seviye 16'dan sonra düzleşir.",
+    "Düşmana hüküm giydirmek için tüm Mahkûmiyeti ve Kader İpliklerini tüketir. En az 20 Mahkûmiyet gerektirir. Hasar tüketilen Mahkûmiyetle artar ve her İplik hasarı %6 artırır. 50 Mahkûmiyette ayrıca verilen hasarın %20'si kadar seni iyileştirir. 80'de ayrıca hedefin 8 yarda içindeki düşmanlara hasarının %35'i kadar vurur. 100'de ayrıca oyunculara ve patronlara %5 daha fazla hasar verir ve sağlığı %20'nin altındaki sıradan bir düşmanı anında öldürür. Hasar ölçeklenmesi seviye 16'dan sonra düzleşir.",
   'entities.abilities.sentence.name': 'Hüküm',
   'entities.abilities.sinister_strike.description':
     'Silah hasarı artı {damage} veren anlık bir vuruş. 1 kombo puanı kazandırır.',
@@ -16611,7 +16611,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.swipe.specNote_feral':
     'İsabet eden her vuruş 1 Kadim Kan ekler (en fazla 3).',
   'entities.abilities.umbral_anchor.description':
-    'İlk okuma: gölgeni 5 dakika boyunca ayaklarının dibine çapalar. Oraya dönmek için 40 m içinde yeniden oku; bu çapayı tüketir ve 45 saniyelik bekleme süresini başlatır.',
+    'İlk okuma: gölgeni 5 dakika boyunca ayaklarının dibine çapalar. Oraya dönmek için 40 m içinde yeniden oku; bu 45 saniyelik bekleme süresini başlatır. Her dönüş, durduğun yere 5 dakikalık yeni bir çapa bırakır; böylece bir çapanın süresi dolana kadar ileri geri sıçramaya devam edebilirsin.',
   'entities.abilities.umbral_anchor.name': 'Gölge Çapası',
   'entities.abilities.unholy_command.description':
     '3 Ruh Parçası harcayarak tüm ölülerine 12 sn boyunca %25 daha fazla hasar vermelerini ve %20 daha hızlı hareket etmelerini emreder.',
@@ -16759,7 +16759,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Üç Kader İpliği: Hüküm onları %18 artan hasar için tüketebilir.',
   'hudChrome.warlock.fateThreadsStatus': '{value} / {max} Kader İpliği.',
   'itemUi.tooltip.useHealingPotionPct':
-    "Kullan: Azami canın %{percent}'ini anında geri kazandırır. Dövüşte kullanılabilir. 2 dakika bekleme süresi.",
+    "Kullan: Azami canın %{percent}'ini anında geri kazandırır. Dövüşte kullanılabilir. 1 dakika bekleme süresi.",
   'guide.controls.reliquary': 'Yadigârlık',
   'guide.deedsPage.rewardsBody':
     "Ödüllerin tamamı gösteriş içindir, asıl amaç da budur. Bazı yiğitlikler takabileceğin bir unvan ya da adını çerçeveleyecek bir çerçeve verir, kahramanını güçlendirecek hiçbir şey vermez. İstediğin unvanı ve çerçeveyi Yiğitlikler Kitabı'ndan seç: unvan isim levhanda, sohbette ve herkesin görmesi için sıralama tablolarında seninle gezer, çerçeve ise kendi renklerini isim levhanın ve portrenin çevresine çizer.",
@@ -19718,6 +19718,9 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.toolTooltip.wieldDegrade':
     'Bu becerinin altında hala daha düşük seviyeli bir araç olarak çalışıyor.',
   'hudChrome.keybinds.hideInterface': 'Arayüzü Gizle',
+  'hudChrome.keybinds.muteAudio': 'Tüm Sesi Kapat',
+  'hudChrome.keybinds.audioMuted': 'Tüm ses kapatıldı. Yeniden açmak için tekrar bas.',
+  'hudChrome.keybinds.audioUnmuted': 'Ses yeniden açıldı.',
   'hudChrome.keybinds.targetParty1': 'Hedef Parti Üyesi 1',
   'hudChrome.keybinds.targetParty2': 'Hedef Parti Üyesi 2',
   'hudChrome.keybinds.targetParty3': 'Hedef Parti Üyesi 3',

@@ -5,7 +5,9 @@ import { CourierVisual } from './courier_visual';
 import { setRenderCategory } from './renderer_diagnostics';
 import { UmbralAnchorMarker } from './umbral_anchor_marker';
 
-/** Owner-only world decorations share the renderer's frame and teardown lifecycle. */
+/** Player world decorations share the renderer's frame and teardown lifecycle:
+ *  the owner-only anchor and courier, and the Affliction familiar every
+ *  Hexcraft warlock in view wears. */
 export class LocalPlayerVisuals {
   private readonly anchor: UmbralAnchorMarker;
   private readonly familiar: AfflictionFamiliar;
@@ -32,7 +34,10 @@ export class LocalPlayerVisuals {
 
   update(
     world: IWorld,
-    views: ReadonlyMap<number, { group: THREE.Group }>,
+    views: ReadonlyMap<
+      number,
+      { group: THREE.Group; height?: number; visual?: { root: THREE.Object3D } | null }
+    >,
     reducedMotion: boolean,
     time: number,
     dt: number,

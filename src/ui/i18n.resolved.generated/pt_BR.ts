@@ -2522,6 +2522,9 @@ export const pt_BR: EnTranslations = {
       "friendlyNameplates": "Alternar placas de nome de aliados",
       "sheathe": "Embainhar/Desembainhar Arma",
       "hideInterface": "Ocultar interface",
+      "muteAudio": "Silenciar todo o som",
+      "audioMuted": "Todo o som foi silenciado. Pressione novamente para reativá-lo.",
+      "audioUnmuted": "Som reativado.",
       "dive": "Nadar para Baixo",
       "categoryPet": "Mascote",
       "petAttack": "Mascote: atacar",
@@ -5086,7 +5089,8 @@ export const pt_BR: EnTranslations = {
       "hostile": "Hostil",
       "friendly": "Amistoso",
       "elite": "Elite",
-      "boss": "Chefe"
+      "boss": "Chefe",
+      "buddyOwner": "Companheiro de {owner}"
     },
     "playerTooltip": {
       "guild": "<{guild}>",
@@ -10161,7 +10165,7 @@ export const pt_BR: EnTranslations = {
       "shadow_bolt": "Uma seta de sombra que você lança no alvo, sua magia de ataque preferida.",
       "summon_imp": "Convoca um Emberkin que lança Descarga Vil nos inimigos à distância.",
       "demon_skin": "Um aprimoramento próprio duradouro que endurece sua pele e adiciona armadura.",
-      "immolate": "Põe fogo no alvo com um golpe de abertura e uma queimadura que persiste.",
+      "immolate": "Põe fogo no alvo com uma queimadura que persiste.",
       "corruption": "Apodrece o alvo com magia sombria que causa dano contínuo enquanto você faz outras coisas.",
       "life_tap": "Troca parte da sua própria vida por mana quando você fica sem.",
       "wrath": "Uma seta de natureza arremessada num alvo à distância, sua magia de ataque preferida.",
@@ -17182,7 +17186,7 @@ export const pt_BR: EnTranslations = {
       "clickDestroy": "Clique para destruir",
       "useFishing": "Uso: pesca em águas próximas.",
       "useHealingPotion": "Uso: restaura instantaneamente {amount} de vida. Pode ser usada em combate. Recarga de 1 min.",
-      "useHealingPotionPct": "Uso: restaura instantaneamente {percent}% da vida máxima. Pode ser usada em combate. Recarga de 2 min.",
+      "useHealingPotionPct": "Uso: restaura instantaneamente {percent}% da vida máxima. Pode ser usada em combate. Recarga de 1 min.",
       "useManaPotion": "Uso: restaura instantaneamente {amount} de mana. Pode ser usada em combate. Recarga de 1 min.",
       "clickUseInstant": "Clique para usar instantaneamente em combate",
       "clickUse": "Clique para usar",
@@ -18257,11 +18261,11 @@ export const pt_BR: EnTranslations = {
       },
       "demon_skin": {
         "name": "Couro Demoníaco",
-        "description": "Pele demoníaca aumenta sua armadura em {buff} por 30 min."
+        "description": "Pele demoníaca aumenta sua armadura em {buff} por 30 min. Pact Deepened pode dobrar essa armadura e reduzir o dano mágico recebido enquanto Couro Demoníaco estiver ativo."
       },
       "immolate": {
         "name": "Pacto Ardente",
-        "description": "Queima o inimigo com {damage} de dano de Fogo e mais {overTime} ao longo de 15 s."
+        "description": "Queima o inimigo com {damage} de dano de Fogo ao longo de 15 s."
       },
       "corruption": {
         "name": "Podridão Negra",
@@ -18281,7 +18285,7 @@ export const pt_BR: EnTranslations = {
       },
       "sentence": {
         "name": "Sentença",
-        "description": "Consome toda a Condenação e os Fios do Destino para executar a sentença sobre o inimigo. Cada Fio aumenta o dano em 6%. Efeitos adicionais escalam em 20, 50, 80 e 100 de Condenação. Sua escala de dano se estabiliza após o nível 16."
+        "description": "Consome toda a Condenação e os Fios do Destino para executar a sentença sobre o inimigo. Requer pelo menos 20 de Condenação. O dano aumenta com a Condenação consumida, e cada Fio o aumenta em 6%. Com 50 de Condenação, também cura você em 20% do dano causado. Com 80, também atinge inimigos num raio de 8 m do alvo com 35% do seu dano. Com 100, também causa 5% a mais de dano a jogadores e chefes, e mata instantaneamente um inimigo normal abaixo de 20% de vida. Sua escala de dano se estabiliza após o nível 16."
       },
       "life_tap": {
         "name": "Barganha Amarga",
@@ -18309,7 +18313,7 @@ export const pt_BR: EnTranslations = {
       },
       "umbral_anchor": {
         "name": "Âncora Umbral",
-        "description": "Primeira conjuração: ancora sua sombra aos seus pés por 5 min. Lance novamente dentro de 40 m para retornar até lá, consumindo a âncora e iniciando uma recarga de 45 s."
+        "description": "Primeira conjuração: ancora sua sombra aos seus pés por 5 min. Lance novamente dentro de 40 m para retornar até lá, iniciando uma recarga de 45 s. Cada retorno deixa uma nova âncora de 5 min onde você estava, então você pode continuar saltando de um lado para o outro até uma âncora expirar."
       },
       "soulwell": {
         "name": "Poço de Almas",
@@ -18341,7 +18345,7 @@ export const pt_BR: EnTranslations = {
       },
       "fear": {
         "name": "Atormentar",
-        "description": "Aterroriza o inimigo, deixando-o acuado por até 5 s. Dano acumulado equivalente a 8% da vida máxima do alvo quebra o efeito."
+        "description": "Aterroriza o inimigo, deixando-o acuado por até 5 s. Dano acumulado equivalente a 10% da vida máxima do alvo quebra o efeito."
       },
       "searing_pain": {
         "name": "Cauterizar",
@@ -19012,7 +19016,7 @@ export const pt_BR: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Uivo de Terror",
-        "description": "Amedronta os inimigos próximos por até 5 s. Dano acumulado equivalente a 8% da vida máxima de um alvo quebra seu medo. (talento de Bruxo)"
+        "description": "Amedronta os inimigos num raio de 8 m do local selecionado por até 5 s. Dano acumulado equivalente a 10% da vida máxima de um alvo quebra seu medo. (talento de Bruxo)"
       },
       "ice_block": {
         "name": "Caixão Frio",
@@ -31055,7 +31059,7 @@ export const pt_BR: EnTranslations = {
       },
       "vanguard_warlock_affliction": {
         "name": "Vestes da Pena do Pavor",
-        "bonus2": "O tempo de conjuração de Atormentar é reduzido em 0,3 s. Dano recebido não atrasa mais suas conjurações.",
+        "bonus2": "A recarga de Âncora Umbral é reduzida em 15 s. Dano recebido não atrasa mais suas conjurações.",
         "bonus4": "Consumir cura 30% a mais e pode ser canalizado em movimento."
       },
       "vanguard_warlock_demonology": {

@@ -2522,6 +2522,9 @@ export const en: EnTranslations = {
       "friendlyNameplates": "Toggle Friendly Nameplates",
       "sheathe": "Sheathe/Unsheathe Weapon",
       "hideInterface": "Hide Interface",
+      "muteAudio": "Mute All Sound",
+      "audioMuted": "All sound muted. Press again to turn it back on.",
+      "audioUnmuted": "Sound back on.",
       "dive": "Swim Down",
       "categoryPet": "Pet",
       "petAttack": "Pet: Attack",
@@ -5086,7 +5089,8 @@ export const en: EnTranslations = {
       "hostile": "Hostile",
       "friendly": "Friendly",
       "elite": "Elite",
-      "boss": "Boss"
+      "boss": "Boss",
+      "buddyOwner": "{owner}'s Buddy"
     },
     "playerTooltip": {
       "guild": "<{guild}>",
@@ -10161,7 +10165,7 @@ export const en: EnTranslations = {
       "shadow_bolt": "A bolt of shadow you cast at a target, your go-to nuke.",
       "summon_imp": "Calls up an Emberkin that casts Felbolt at enemies from range.",
       "demon_skin": "A lasting self-buff that toughens your skin and adds armor.",
-      "immolate": "Sets a target alight for an opening hit and a burn that lingers.",
+      "immolate": "Sets a target alight with a burn that lingers.",
       "corruption": "Rots a target with shadow that ticks while you do other things.",
       "life_tap": "Trades some of your own health back into mana when you run dry.",
       "wrath": "A nature bolt thrown at a target from range, your go-to nuke.",
@@ -17182,7 +17186,7 @@ export const en: EnTranslations = {
       "clickDestroy": "Click to destroy",
       "useFishing": "Use: Fish in nearby waters.",
       "useHealingPotion": "Use: Instantly restores {amount} health. Usable in combat. 2 min cooldown.",
-      "useHealingPotionPct": "Use: Instantly restores {percent}% of maximum health. Usable in combat. 2 min cooldown.",
+      "useHealingPotionPct": "Use: Instantly restores {percent}% of maximum health. Usable in combat. 1 min cooldown.",
       "useManaPotion": "Use: Instantly restores {amount} mana. Usable in combat. 2 min cooldown.",
       "clickUseInstant": "Click to use instantly in combat",
       "clickUse": "Click to use",
@@ -18261,7 +18265,7 @@ export const en: EnTranslations = {
       },
       "immolate": {
         "name": "Burning Pact",
-        "description": "Burns the enemy for {damage} Fire damage and an additional {overTime} over 15 sec."
+        "description": "Burns the enemy for {damage} Fire damage over 15 sec."
       },
       "corruption": {
         "name": "Blackrot",
@@ -18281,7 +18285,7 @@ export const en: EnTranslations = {
       },
       "sentence": {
         "name": "Sentence",
-        "description": "Consumes all Condemnation and Fate Threads to pass sentence on the enemy. Each Thread increases damage by 6%. Added effects escalate at 20, 50, 80, and 100 Condemnation. Its damage scaling flattens after level 16."
+        "description": "Consumes all Condemnation and Fate Threads to pass sentence on the enemy. Requires at least 20 Condemnation. Damage grows with the Condemnation consumed, and each Thread increases it by 6%. At 50 Condemnation it also heals you for 20% of the damage dealt. At 80 it also hits enemies within 8 yd of the target for 35% of its damage. At 100 it also deals 5% more damage to players and bosses, and instantly kills a normal enemy below 20% health. Its damage scaling flattens after level 16."
       },
       "life_tap": {
         "name": "Hard Bargain",
@@ -18309,7 +18313,7 @@ export const en: EnTranslations = {
       },
       "umbral_anchor": {
         "name": "Umbral Anchor",
-        "description": "First cast: anchors your shadow at your feet for 5 min. Recast within 40 m to return there, consuming the anchor and starting a 45 sec cooldown."
+        "description": "First cast: anchors your shadow at your feet for 5 min. Recast within 40 m to return there, starting a 45 sec cooldown. Each return leaves a new 5 min anchor where you stood, so you can keep jumping back and forth until an anchor expires."
       },
       "soulwell": {
         "name": "Soulwell",
@@ -18341,7 +18345,7 @@ export const en: EnTranslations = {
       },
       "fear": {
         "name": "Harrow",
-        "description": "Strikes terror into the enemy, leaving it cowering for up to 5 sec. Damage totaling 8% of the target's maximum health breaks the effect."
+        "description": "Strikes terror into the enemy, leaving it cowering for up to 5 sec. Damage totaling 10% of the target's maximum health breaks the effect."
       },
       "searing_pain": {
         "name": "Sear",
@@ -19012,7 +19016,7 @@ export const en: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Dread Chorus",
-        "description": "Frightens nearby enemies for up to 5 sec. Damage totaling 8% of a target's maximum health breaks its fear. (Warlock talent)"
+        "description": "Frightens enemies within 8 yd of the selected location for up to 5 sec. Damage totaling 10% of a target's maximum health breaks its fear. (Warlock talent)"
       },
       "ice_block": {
         "name": "Cold Coffin",
@@ -31055,7 +31059,7 @@ export const en: EnTranslations = {
       },
       "vanguard_warlock_affliction": {
         "name": "Dreadquill Vestments",
-        "bonus2": "Harrow's cast time is reduced by 0.3 sec. Damage taken no longer delays your spellcasting.",
+        "bonus2": "Umbral Anchor's cooldown is reduced by 15 sec. Damage taken no longer delays your spellcasting.",
         "bonus4": "Consume heals you for 30 percent more and can be channeled while moving."
       },
       "vanguard_warlock_demonology": {

@@ -2522,6 +2522,9 @@ export const vi_VN: EnTranslations = {
       "friendlyNameplates": "Bật/Tắt Bảng Tên Đồng Minh",
       "sheathe": "Tra/Rút Vũ Khí",
       "hideInterface": "Ẩn giao diện",
+      "muteAudio": "Tắt Toàn Bộ Âm Thanh",
+      "audioMuted": "Đã tắt toàn bộ âm thanh. Nhấn lần nữa để bật lại.",
+      "audioUnmuted": "Đã bật lại âm thanh.",
       "dive": "Lặn Xuống",
       "categoryPet": "Thú Cưng",
       "petAttack": "Thú Cưng: Tấn Công",
@@ -5086,7 +5089,8 @@ export const vi_VN: EnTranslations = {
       "hostile": "Thù Địch",
       "friendly": "Thân Thiện",
       "elite": "Tinh Anh",
-      "boss": "Boss"
+      "boss": "Boss",
+      "buddyOwner": "Bạn đồng hành của {owner}"
     },
     "playerTooltip": {
       "guild": "<{guild}>",
@@ -10161,7 +10165,7 @@ export const vi_VN: EnTranslations = {
       "shadow_bolt": "Một tia bóng tối bạn niệm vào mục tiêu, đòn chủ lực quen thuộc của bạn.",
       "summon_imp": "Gọi lên một Emberkin niệm Tiễn Tro vào kẻ địch từ xa.",
       "demon_skin": "Một buff bản thân lâu dài giúp da bạn cứng cáp hơn và tăng giáp.",
-      "immolate": "Thiêu cháy mục tiêu cho một đòn mở màn và một vệt cháy âm ỉ kéo dài.",
+      "immolate": "Thiêu cháy mục tiêu bằng một vệt cháy âm ỉ kéo dài.",
       "corruption": "Làm mục rữa mục tiêu bằng bóng tối, gây sát thương theo thời gian trong khi bạn làm việc khác.",
       "life_tap": "Đánh đổi một phần máu của chính bạn để lấy lại mana khi cạn kiệt.",
       "wrath": "Một tia tự nhiên ném vào mục tiêu từ xa, đòn chủ lực quen thuộc của bạn.",
@@ -17182,7 +17186,7 @@ export const vi_VN: EnTranslations = {
       "clickDestroy": "Nhấp để hủy bỏ",
       "useFishing": "Dùng: Câu cá ở vùng nước gần đó.",
       "useHealingPotion": "Dùng: Hồi tức thời {amount} sinh lực. Dùng được trong chiến đấu. Hồi chiêu 1 phút.",
-      "useHealingPotionPct": "Dùng: Hồi tức thời {percent}% sinh lực tối đa. Dùng được trong chiến đấu. Hồi chiêu 2 phút.",
+      "useHealingPotionPct": "Dùng: Hồi tức thời {percent}% sinh lực tối đa. Dùng được trong chiến đấu. Hồi chiêu 1 phút.",
       "useManaPotion": "Dùng: Hồi tức thời {amount} mana. Dùng được trong chiến đấu. Hồi chiêu 1 phút.",
       "clickUseInstant": "Nhấp để dùng tức thời trong chiến đấu",
       "clickUse": "Nhấp để sử dụng",
@@ -18257,11 +18261,11 @@ export const vi_VN: EnTranslations = {
       },
       "demon_skin": {
         "name": "Da Ác Quỷ",
-        "description": "Lớp da quỷ tăng giáp của bạn thêm {buff} trong 30 phút."
+        "description": "Lớp da quỷ tăng giáp của bạn thêm {buff} trong 30 phút. Pact Deepened có thể nhân đôi lượng giáp này và giảm sát thương phép phải chịu khi Da Ác Quỷ đang hoạt động."
       },
       "immolate": {
         "name": "Khế Ước Rực Cháy",
-        "description": "Thiêu đốt kẻ địch gây {damage} sát thương Hỏa cùng thêm {overTime} trong 15 giây."
+        "description": "Thiêu đốt kẻ địch gây {damage} sát thương Hỏa trong 15 giây."
       },
       "corruption": {
         "name": "Hắc Hủ",
@@ -18281,7 +18285,7 @@ export const vi_VN: EnTranslations = {
       },
       "sentence": {
         "name": "Phán Quyết",
-        "description": "Tiêu thụ toàn bộ Kết Án và Sợi Định Mệnh để tuyên án kẻ địch. Mỗi Sợi tăng 6% sát thương. Các hiệu ứng bổ sung leo thang ở 20, 50, 80, và 100 Kết Án. Mức tăng sát thương của nó chững lại sau cấp 16."
+        "description": "Tiêu thụ toàn bộ Kết Án và Sợi Định Mệnh để tuyên án kẻ địch. Cần ít nhất 20 Kết Án. Sát thương tăng theo lượng Kết Án đã tiêu thụ, và mỗi Sợi tăng thêm 6%. Ở 50 Kết Án, còn hồi cho bạn 20% sát thương gây ra. Ở 80, còn đánh trúng kẻ địch trong bán kính 8 thước quanh mục tiêu với 35% sát thương. Ở 100, còn gây thêm 5% sát thương lên người chơi và trùm, đồng thời hạ gục ngay một kẻ địch thường dưới 20% máu. Mức tăng sát thương của nó chững lại sau cấp 16."
       },
       "life_tap": {
         "name": "Mặc Cả Nghiệt Ngã",
@@ -18309,7 +18313,7 @@ export const vi_VN: EnTranslations = {
       },
       "umbral_anchor": {
         "name": "Neo Bóng Tối",
-        "description": "Lần thi triển đầu tiên: neo bóng của bạn tại vị trí đứng trong 5 phút. Thi triển lại trong bán kính 40 mét để quay về đó, tiêu hao neo và bắt đầu thời gian hồi chiêu 45 giây."
+        "description": "Lần thi triển đầu tiên: neo bóng của bạn tại vị trí đứng trong 5 phút. Thi triển lại trong bán kính 40 mét để quay về đó và bắt đầu thời gian hồi chiêu 45 giây. Mỗi lần quay về để lại một neo mới tồn tại 5 phút ở chỗ bạn vừa đứng, nên bạn có thể nhảy qua lại cho đến khi một neo hết hạn."
       },
       "soulwell": {
         "name": "Giếng Linh Hồn",
@@ -18341,7 +18345,7 @@ export const vi_VN: EnTranslations = {
       },
       "fear": {
         "name": "Giày Vò",
-        "description": "Gieo nỗi kinh hoàng vào kẻ địch, khiến nó co rúm sợ hãi trong tối đa 5 giây. Tổng sát thương bằng 8% máu tối đa của mục tiêu sẽ phá vỡ hiệu ứng."
+        "description": "Gieo nỗi kinh hoàng vào kẻ địch, khiến nó co rúm sợ hãi trong tối đa 5 giây. Tổng sát thương bằng 10% máu tối đa của mục tiêu sẽ phá vỡ hiệu ứng."
       },
       "searing_pain": {
         "name": "Nung Đốt",
@@ -19012,7 +19016,7 @@ export const vi_VN: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Tiếng Hú Kinh Hoàng",
-        "description": "Khiến kẻ địch ở gần sợ hãi trong tối đa 5 giây. Tổng sát thương bằng 8% máu tối đa của mục tiêu sẽ phá vỡ nỗi sợ của nó. (thiên phú Warlock)"
+        "description": "Khiến kẻ địch trong bán kính 8 thước quanh vị trí đã chọn sợ hãi trong tối đa 5 giây. Tổng sát thương bằng 10% máu tối đa của mục tiêu sẽ phá vỡ nỗi sợ của nó. (thiên phú Warlock)"
       },
       "ice_block": {
         "name": "Quan Tài Lạnh",
@@ -31055,7 +31059,7 @@ export const vi_VN: EnTranslations = {
       },
       "vanguard_warlock_affliction": {
         "name": "Dreadquill Vestments",
-        "bonus2": "Thời gian truyền tải Giày Vò giảm 0,3 giây. Sát thương phải chịu không còn làm chậm việc thi triển phép.",
+        "bonus2": "Thời gian hồi chiêu của Neo Bóng Tối giảm 15 giây. Sát thương phải chịu không còn làm chậm việc thi triển phép.",
         "bonus4": "Nuốt Chửng chữa lành bạn 30 phần trăm nhiều hơn và có thể được truyền tải khi di chuyển."
       },
       "vanguard_warlock_demonology": {

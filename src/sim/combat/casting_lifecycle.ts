@@ -294,6 +294,7 @@ const SELECTED_HOSTILE_AIM_FALLBACK = new Set([
   'earthbind',
   'frostjaw_trap',
   'bear_trap',
+  'howl_of_terror',
 ]);
 
 function isStasisToggle(ability: AbilityDef): boolean {

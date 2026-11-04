@@ -22,6 +22,9 @@ export interface MobTooltipModel {
   name: string;
   /** Localized original buddy type, present only when different from its nickname. */
   buddyType?: string;
+  /** A buddy's owner, as the world shows them, present only for a buddy whose
+   *  owner the client can see. Renders "<owner>'s Buddy" under the name. */
+  buddyOwner?: string;
   level: number;
   /** Already-localized creature-type label (e.g. "Beasts"). */
   familyLabel: string;
@@ -50,6 +53,9 @@ export function mobTooltipHtml(m: MobTooltipModel, deps: MobTooltipI18n): string
   const level = deps.fmt(m.level, { maximumFractionDigits: 0 });
   const title = `<div class="tt-title" style="color:${m.color}">${esc(m.name)}</div>`;
   const buddyType = m.buddyType ? `<div class="tt-sub">${esc(m.buddyType)}</div>` : '';
+  const buddyOwner = m.buddyOwner
+    ? `<div class="tt-sub">${esc(deps.t('hudChrome.mobTooltip.buddyOwner', { owner: m.buddyOwner }))}</div>`
+    : '';
   const sub = `<div class="tt-sub" style="color:${m.color}">${esc(
     deps.t('hudChrome.mobTooltip.levelFamily', { level, family: m.familyLabel }),
   )}</div>`;
@@ -72,5 +78,5 @@ export function mobTooltipHtml(m: MobTooltipModel, deps: MobTooltipI18n): string
   const reactionClass = m.hostile ? 'tt-red' : 'tt-green';
   const reactionKey = m.hostile ? 'hudChrome.mobTooltip.hostile' : 'hudChrome.mobTooltip.friendly';
   const reaction = `<div class="${reactionClass}">${esc(deps.t(reactionKey))}</div>`;
-  return title + buddyType + sub + rank + quests + reaction;
+  return title + buddyType + buddyOwner + sub + rank + quests + reaction;
 }

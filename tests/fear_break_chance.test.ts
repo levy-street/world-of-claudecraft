@@ -15,7 +15,7 @@ import type { Aura, Entity } from '../src/sim/types';
 // left the warrior Lingering Dread soak threshold alone. (That soak has since
 // moved 20% -> 10% of max health, anchored on FEAR_BREAK_CHANCE_SCALE so it now
 // absorbs exactly one guaranteed-break hit; see src/sim/content/warrior_rows.ts.)
-// Harrow and Dread Chorus instead carry a deterministic 8% cumulative budget,
+// Harrow and Dread Chorus instead carry a deterministic 10% cumulative budget,
 // so automatic pet and DoT damage cannot roll an immediate break.
 
 function addTarget(sim: Sim, distance: number, level = 20): Entity {
@@ -101,7 +101,7 @@ describe('G5: damage-scaled fear break', () => {
     expect(fearAura(mob)).toBeDefined();
   });
 
-  it('Harrow absorbs 8% max-health damage before breaking', () => {
+  it('Harrow absorbs 10% max-health damage before breaking', () => {
     // Seed hunted (post-merge camp order) so the level-14-vs-20 Harrow cast
     // is not resisted: the fear must actually land for the aura assertions.
     // Re-hunted (1 -> 3) after the Eastbrook camp respacing thinned the zone-1
@@ -126,13 +126,13 @@ describe('G5: damage-scaled fear break', () => {
     expect(aura?.duration).toBe(5);
     expect(aura?.breaksOnDamage).toBe(true);
     expect(aura?.breakChanceScale).toBeUndefined();
-    expect(aura?.breakThreshold).toBe(8_000);
+    expect(aura?.breakThreshold).toBe(10_000);
 
     let draws = 0;
     sim.rng.setObserver(() => {
       draws++;
     });
-    dealHit(sim, mob, 7_999);
+    dealHit(sim, mob, 9_999);
     sim.rng.setObserver(null);
     expect(draws).toBe(0);
     expect(fearAura(mob)?.breakThreshold).toBe(1);
@@ -140,7 +140,7 @@ describe('G5: damage-scaled fear break', () => {
     expect(fearAura(mob)).toBeUndefined();
   });
 
-  it('Dread Chorus gives every feared target the same 8% damage budget', () => {
+  it('Dread Chorus gives every feared target the same 10% damage budget', () => {
     const sim = new Sim({ seed: 7, playerClass: 'warlock', autoEquip: true });
     sim.setPlayerLevel(20);
     expect(sim.applyTalents({ spec: null, rows: { 8: 'wlk_r8_howl_of_terror' } })).toBe(true);
@@ -161,22 +161,22 @@ describe('G5: damage-scaled fear break', () => {
 
     expect(fearAura(first)?.duration).toBe(5);
     expect(fearAura(second)?.duration).toBe(5);
-    expect(fearAura(first)?.breakThreshold).toBe(8_000);
-    expect(fearAura(second)?.breakThreshold).toBe(4_000);
+    expect(fearAura(first)?.breakThreshold).toBe(10_000);
+    expect(fearAura(second)?.breakThreshold).toBe(5_000);
     expect(fearAura(first)?.breakChanceScale).toBeUndefined();
     expect(fearAura(second)?.breakChanceScale).toBeUndefined();
 
-    dealHit(sim, first, 8_000);
+    dealHit(sim, first, 10_000);
     expect(fearAura(first)).toBeUndefined();
-    expect(fearAura(second)?.breakThreshold).toBe(4_000);
+    expect(fearAura(second)?.breakThreshold).toBe(5_000);
   });
 
-  it('states the 8% budget in both Warlock Fear descriptions', () => {
+  it('states each budget in both Warlock Fear descriptions', () => {
     expect(ABILITIES.fear.description).toBe(
-      "Strikes terror into the enemy, leaving it cowering for up to 5 sec. Damage totaling 8% of the target's maximum health breaks the effect.",
+      "Strikes terror into the enemy, leaving it cowering for up to 5 sec. Damage totaling 10% of the target's maximum health breaks the effect.",
     );
     expect(ABILITIES.howl_of_terror.description).toBe(
-      "Frightens nearby enemies for up to 5 sec. Damage totaling 8% of a target's maximum health breaks its fear. (Warlock talent)",
+      "Frightens enemies within 8 yd of the selected location for up to 5 sec. Damage totaling 10% of a target's maximum health breaks its fear. (Warlock talent)",
     );
   });
 

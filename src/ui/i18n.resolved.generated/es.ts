@@ -2522,6 +2522,9 @@ export const es: EnTranslations = {
       "friendlyNameplates": "Alternar placas de nombre de aliados",
       "sheathe": "Envainar/Desenvainar arma",
       "hideInterface": "Ocultar interfaz",
+      "muteAudio": "Silenciar todo el sonido",
+      "audioMuted": "Todo el sonido silenciado. Pulsa de nuevo para volver a activarlo.",
+      "audioUnmuted": "Sonido activado de nuevo.",
       "dive": "Nadar hacia abajo",
       "categoryPet": "Mascota",
       "petAttack": "Mascota: atacar",
@@ -5086,7 +5089,8 @@ export const es: EnTranslations = {
       "hostile": "Hostil",
       "friendly": "Amistoso",
       "elite": "Élite",
-      "boss": "Jefe"
+      "boss": "Jefe",
+      "buddyOwner": "Compañero de {owner}"
     },
     "playerTooltip": {
       "guild": "<{guild}>",
@@ -10161,7 +10165,7 @@ export const es: EnTranslations = {
       "shadow_bolt": "Una descarga de sombra que lanzas contra un objetivo, tu hechizo de ataque habitual.",
       "summon_imp": "Invoca a un Emberkin que lanza Descarga Vil contra los enemigos desde la distancia.",
       "demon_skin": "Una mejora propia y duradera que endurece tu piel y añade armadura.",
-      "immolate": "Prende fuego a un objetivo con un golpe inicial y una quemadura que perdura.",
+      "immolate": "Prende fuego a un objetivo con una quemadura que perdura.",
       "corruption": "Pudre al objetivo con sombra que va dañando mientras haces otras cosas.",
       "life_tap": "Convierte parte de tu propia salud en maná cuando te quedas sin él.",
       "wrath": "Una descarga de naturaleza lanzada a un objetivo a distancia, tu hechizo de ataque habitual.",
@@ -17182,7 +17186,7 @@ export const es: EnTranslations = {
       "clickDestroy": "Haz clic para destruir",
       "useFishing": "Uso: pesca en aguas cercanas.",
       "useHealingPotion": "Uso: restaura al instante {amount} de salud. Se puede usar en combate. Reutilización de 1 min.",
-      "useHealingPotionPct": "Uso: restaura al instante el {percent}% de la salud máxima. Se puede usar en combate. Reutilización de 2 min.",
+      "useHealingPotionPct": "Uso: restaura al instante el {percent}% de la salud máxima. Se puede usar en combate. Reutilización de 1 min.",
       "useManaPotion": "Uso: restaura al instante {amount} de maná. Se puede usar en combate. Reutilización de 1 min.",
       "clickUseInstant": "Haz clic para usar al instante en combate",
       "clickUse": "Haz clic para usar",
@@ -18257,11 +18261,11 @@ export const es: EnTranslations = {
       },
       "demon_skin": {
         "name": "Piel de Engendro",
-        "description": "La piel demoníaca aumenta tu armadura en {buff} durante 30 min."
+        "description": "La piel demoníaca aumenta tu armadura en {buff} durante 30 min. Pact Deepened puede duplicar esta armadura y reducir el daño mágico recibido mientras Piel de Engendro está activa."
       },
       "immolate": {
         "name": "Pacto Ardiente",
-        "description": "Quema al enemigo por {damage} de daño de Fuego y {overTime} adicionales durante 15 s."
+        "description": "Quema al enemigo por {damage} de daño de Fuego durante 15 s."
       },
       "corruption": {
         "name": "Putrefacción Negra",
@@ -18281,7 +18285,7 @@ export const es: EnTranslations = {
       },
       "sentence": {
         "name": "Sentencia",
-        "description": "Consume toda la Condena y los Hilos del destino para sentenciar al enemigo. Cada Hilo aumenta el daño un 6%. Los efectos adicionales aumentan con 20, 50, 80 y 100 de Condena. El escalado de daño se aplana después del nivel 16."
+        "description": "Consume toda la Condena y los Hilos del destino para sentenciar al enemigo. Requiere al menos 20 de Condena. El daño aumenta con la Condena consumida y cada Hilo lo aumenta un 6%. Con 50 de Condena, además te cura un 20% del daño infligido. Con 80, además golpea a los enemigos en un radio de 8 m del objetivo con el 35% de su daño. Con 100, además inflige un 5% más de daño a jugadores y jefes, y mata al instante a un enemigo normal con menos del 20% de salud. El escalado de daño se aplana después del nivel 16."
       },
       "life_tap": {
         "name": "Trato Amargo",
@@ -18309,7 +18313,7 @@ export const es: EnTranslations = {
       },
       "umbral_anchor": {
         "name": "Ancla umbría",
-        "description": "Primer uso: ancla tu sombra a tus pies durante 5 min. Vuelve a usarla a un máximo de 40 m para regresar, consumir el ancla e iniciar un tiempo de reutilización de 45 s."
+        "description": "Primer uso: ancla tu sombra a tus pies durante 5 min. Vuelve a usarla a un máximo de 40 m para regresar e iniciar un tiempo de reutilización de 45 s. Cada regreso deja un ancla nueva de 5 min donde estabas, así que puedes saltar de un lado a otro hasta que un ancla expire."
       },
       "soulwell": {
         "name": "Pozo de Almas",
@@ -18341,7 +18345,7 @@ export const es: EnTranslations = {
       },
       "fear": {
         "name": "Espanto",
-        "description": "Siembra terror en el enemigo y lo deja encogido durante hasta 5 s. El daño acumulado equivalente al 8% de la salud máxima del objetivo rompe el efecto."
+        "description": "Siembra terror en el enemigo y lo deja encogido durante hasta 5 s. El daño acumulado equivalente al 10% de la salud máxima del objetivo rompe el efecto."
       },
       "searing_pain": {
         "name": "Abrasar",
@@ -19012,7 +19016,7 @@ export const es: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Aullido Pavoroso",
-        "description": "Aterroriza a los enemigos cercanos hasta 5 s. El daño acumulado equivalente al 8% de la salud máxima de un objetivo rompe su miedo. (talento de Brujo)"
+        "description": "Aterroriza a los enemigos en un radio de 8 m del lugar seleccionado hasta 5 s. El daño acumulado equivalente al 10% de la salud máxima de un objetivo rompe su miedo. (talento de Brujo)"
       },
       "ice_block": {
         "name": "Ataúd Helado",
@@ -31055,7 +31059,7 @@ export const es: EnTranslations = {
       },
       "vanguard_warlock_affliction": {
         "name": "Vestiduras Plumapavor",
-        "bonus2": "El tiempo de lanzamiento de Espanto se reduce 0,3 s. El daño recibido ya no retrasa tus hechizos.",
+        "bonus2": "El tiempo de reutilización de Ancla umbría se reduce 15 s. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Consumir te sana un 30% más y puede canalizarse en movimiento."
       },
       "vanguard_warlock_demonology": {
