@@ -5243,6 +5243,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Apri Professioni per inserirlo su uno strumento da raccolta.',
   'hudChrome.pvp.bracket1v1': '1c1',
   'hudChrome.pvp.bracket2v2': '2c2',
+  'hudChrome.pvp.bracket3v3': '3c3',
   'hudChrome.pvp.launcherTitle': 'PvP',
   'hudChrome.pvp.mobileLabel': 'PvP',
   'hudChrome.townFocus.respecCostFree': 'Gratis',
@@ -5259,6 +5260,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.reasons.battlegroundComplete': 'battaglia dei Campi di Thornhollow combattuta',
   'hudChrome.warfare.reasons.battlegroundFirstWin':
     'prima vittoria di oggi ai Campi di Thornhollow',
+  'hudChrome.warfare.reasons.arenaFirstWin': 'prima vittoria in arena di oggi in questa categoria',
   'hudChrome.warfare.reasons.battlegroundKill': 'uccisione onorevole',
   'hudChrome.warfare.reasons.battlegroundWin': 'vittoria ai Campi di Thornhollow',
   'hudChrome.warfareShop.buyAria': 'Compra {item} per {honor}',
@@ -11898,6 +11900,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Un dardo di natura scagliato su un bersaglio dalla distanza, il tuo colpo di riferimento.',
   'guide.arenaPage.coliseumBody':
     "Il Colosseo è l'arena del reame, dove affronti altri giocatori in incontri classificati, uno contro uno o due contro due. Ogni categoria tiene la propria classifica, quindi una vittoria ti solleva su quella scala sotto gli occhi di tutto il reame. Il gioco classificato si apre al livello 15, e vale anche per il tuo compagno: se uno dei due è sotto, la coda resta chiusa finché non vi qualificate entrambi. Tutto il giocatore contro giocatore sta dietro un unico pulsante, marcato GcG: aprilo e scegli una linguetta, Campi di Thornhollow, uno contro uno o due contro due, poi iscriviti da solo o con il tuo compagno. Mentre sei in coda o in un incontro, le altre linguette restano bloccate, così non puoi mai stare in due code alla volta.",
+  'guide.arenaPage.coliseumBodyThreeBrackets':
+    "Il Colosseo è l'arena del reame, dove affronti altri giocatori in incontri classificati: uno contro uno, due contro due o tre contro tre. Ogni categoria tiene la propria classifica, quindi una vittoria ti solleva su quella scala sotto gli occhi di tutto il reame. Il gioco classificato si apre al livello 15, e vale per chiunque entri in coda con te: se qualcuno del tuo gruppo è sotto, la coda resta chiusa finché non vi qualificate tutti. Tutto il giocatore contro giocatore sta dietro un unico pulsante, marcato GcG: aprilo e scegli una linguetta, Campi di Thornhollow, uno contro uno, due contro due o tre contro tre, poi iscriviti da solo o con il tuo gruppo. Mentre sei in coda o in un incontro, le altre linguette restano bloccate, così non puoi mai stare in due code alla volta. Un incontro tre contro tre che si trascina logora tutti: superata la sua metà, Logoramento riduce ogni secondo un po' di più le cure che ogni combattente riceve, così uno stallo non può durare per sempre.",
   'guide.arenaPage.coliseumHeading': 'Il Colosseo di Cenere',
   'guide.arenaPage.duelsBody':
     "Sfida a duello amichevole qualsiasi giocatore che incontri. In palio non c'è altro che l'orgoglio, quindi è il modo più semplice per imparare uno scontro o risolvere una disputa amichevole.",
@@ -19831,6 +19835,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Gli acquisti con Onore sono definitivi. La lista di ricompra contiene solo ciò che hai venduto: un acquisto in monete di solito può essere rivenduto al suo prezzo e recuperato dalla lista se cambi di nuovo idea, ma l’equipaggiamento da Guerra si vincola all’anima nel momento dell’acquisto, quindi non può essere scambiato, spedito o rivenduto e non raggiunge mai quella lista. Il negozio chiede conferma per questo motivo: leggi il pezzo prima di premere.',
   'guide.arenaPage.rewardsBodyLossShare':
     'Una vittoria classificata paga Onore, la valuta giocatore contro giocatore, e anche una sconfitta giocata fino alla fine paga una parte minore, così la valutazione è l’unico vero costo della sconfitta. L’Onore serve a ricompensare partite reali: battere di nuovo lo stesso avversario o la stessa squadra nello stesso giorno non paga altro, e nemmeno perdere di nuovo contro di loro; una lunga giornata di vittorie paga per intero la prima serie, poi dimezza la ricompensa, la dimezza ancora più avanti e resta a quel livello, mentre una partita abbandonata dall’avversario muove comunque la valutazione ma non paga Onore. Il giorno è quello del reame: ricomincia all’ora del reset notturno, lo stesso confine in cui si azzerano tutti i blocchi giornalieri.',
+  'guide.arenaPage.rewardsFirstWinBody':
+    'La tua prima vittoria classificata di ogni giorno paga un bonus in più, e ogni categoria ha il suo: una prima vittoria nell’uno contro uno, nel due contro due e nel tre contro tre ne reclama uno ciascuna. Una sconfitta o un pareggio non lo consumano mai.',
   'guide.arenaPage.warfareBodyStatsStay':
     "Ogni pezzo da Guerra porta Valutazione Offensiva da Guerra e Valutazione Difensiva da Guerra, e queste due statistiche non fanno nulla contro i mostri. Si applicano solo quando combatti contro un altro giocatore, in duello, nell’arena o nel campo di battaglia: l’Offensiva aumenta i danni inflitti e la Difensiva riduce i danni subiti, ciascuna fino al proprio limite. Ogni famiglia di armature è anche un completo, e i suoi bonus sono allo stesso modo valutazioni o effetti da Guerra che funzionano solo contro i giocatori, quindi i bonus di un completo d’onore non contano contro un boss di dungeon. I pezzi conservano comunque le statistiche normali, l’armatura e i danni dell’arma, che funzionano ovunque; contro un mostro si spengono solo le valutazioni e i bonus del completo da Guerra. Un'eccezione funziona ovunque: due pezzi di uno qualsiasi di questi set fanno anche sì che i danni subiti non ritardino più il lancio degli incantesimi.",
   'guide.arenaPage.warfareTradeBodyRatingSpent':

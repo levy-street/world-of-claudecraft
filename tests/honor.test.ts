@@ -5,6 +5,7 @@ import { bestEpicGearFor } from '../src/sim/dev/bis_gear';
 import { createMob } from '../src/sim/entity';
 import {
   ARENA_DAILY_TAPER_START,
+  ARENA_FIRST_WIN_BONUS_HONOR,
   ARENA_LOSS_HONOR_SHARE,
   awardBattlegroundAssistHonor,
   awardBattlegroundHonor,
@@ -164,23 +165,25 @@ describe('ranked Arena honor', () => {
     arena.endArenaMatch(sim.ctx, match, 'A', 'defeat');
 
     // Pinned to the literals (not the constants) so a wrong 1v1 faucet or a
-    // wrong loss share reddens here.
-    expect(sim.meta(a)!.honor).toBe(25);
+    // wrong loss share reddens here. The winner's 125 is the 25 win plus the
+    // bracket's 100 first win of the day.
+    expect(sim.meta(a)!.honor).toBe(125);
     expect(sim.meta(b)!.honor).toBe(8);
     expect(RANKED_ARENA_WIN_HONOR['1v1']).toBe(25);
     expect(RANKED_ARENA_LOSS_HONOR['1v1']).toBe(8);
+    expect(ARENA_FIRST_WIN_BONUS_HONOR).toBe(100);
     expect(sim.meta(a)!.arenaWins).toBe(1);
     expect(sim.meta(b)!.arenaLosses).toBe(1);
 
     arena.endArenaMatch(sim.ctx, match, 'B', 'forfeit');
-    expect(sim.meta(a)!.honor).toBe(25);
+    expect(sim.meta(a)!.honor).toBe(125);
     expect(sim.meta(b)!.honor).toBe(8);
     expect(sim.meta(a)!.arenaWins).toBe(1);
     expect(sim.meta(b)!.arenaWins).toBe(0);
   });
 
-  it('pays both brackets a loss award of one third of their own win award', () => {
-    for (const format of ['1v1', '2v2'] as const) {
+  it('pays every bracket a loss award of one third of their own win award', () => {
+    for (const format of ['1v1', '2v2', '3v3'] as const) {
       expect(RANKED_ARENA_LOSS_HONOR[format]).toBe(
         Math.round(RANKED_ARENA_WIN_HONOR[format] * ARENA_LOSS_HONOR_SHARE),
       );
@@ -261,8 +264,9 @@ describe('ranked Arena honor', () => {
     arena.endArenaMatch(sim.ctx, match, 'A', 'defeat');
 
     for (const pid of match.teamA) {
-      // Pinned to the literal (not the constant) so a wrong 2v2 faucet reddens here.
-      expect(sim.meta(pid)!.honor).toBe(50);
+      // Pinned to the literal (not the constant) so a wrong 2v2 faucet reddens
+      // here: the 50 win plus the bracket's 100 first win of the day.
+      expect(sim.meta(pid)!.honor).toBe(150);
       expect(RANKED_ARENA_WIN_HONOR['2v2']).toBe(50);
       expect(sim.meta(pid)!.arena2v2Wins).toBe(1);
     }
@@ -281,7 +285,9 @@ describe('ranked Arena honor', () => {
     const repeat = Array.from({ length: 4 }, () =>
       awardRankedArenaResultHonor(sim.ctx, meta, '1v1', '["character:9"]', 'win'),
     );
-    expect(repeat).toEqual([25, 0, 0, 0]);
+    // The day's first 1v1 win carries the 100 first-win bonus; the rematches
+    // pay nothing (and never re-pay the bonus).
+    expect(repeat).toEqual([125, 0, 0, 0]);
 
     const fresh = world();
     fresh.resetDay = '2026-07-08';
@@ -290,16 +296,17 @@ describe('ranked Arena honor', () => {
     for (let i = 0; i < ARENA_DAILY_TAPER_START; i++) {
       expect(
         awardRankedArenaResultHonor(fresh.ctx, freshMeta, '1v1', `["character:${i}"]`, 'win'),
-      ).toBe(25);
+      ).toBe(i === 0 ? 125 : 25);
     }
     expect(
       awardRankedArenaResultHonor(fresh.ctx, freshMeta, '1v1', '["character:next"]', 'win'),
     ).toBe(12);
 
+    // The new day re-arms both the taper and the first-win bonus.
     fresh.resetDay = '2026-07-09';
     expect(
       awardRankedArenaResultHonor(fresh.ctx, freshMeta, '1v1', '["character:next"]', 'win'),
-    ).toBe(25);
+    ).toBe(125);
   });
 
   it('decays a repeated loss to the same team and rolls the counter over each day', () => {
@@ -327,12 +334,13 @@ describe('ranked Arena honor', () => {
 
     // Losing to a team first must not spend the award for beating it later.
     expect(awardRankedArenaResultHonor(sim.ctx, meta, '1v1', key, 'loss')).toBe(8);
-    expect(awardRankedArenaResultHonor(sim.ctx, meta, '1v1', key, 'win')).toBe(25);
+    // 25 + the bracket's first win of the day (the loss before it never claims it).
+    expect(awardRankedArenaResultHonor(sim.ctx, meta, '1v1', key, 'win')).toBe(125);
     // And each counter is spent exactly once, so the pairing's whole day is
     // win + loss and no more: the win-trading ceiling.
     expect(awardRankedArenaResultHonor(sim.ctx, meta, '1v1', key, 'loss')).toBe(0);
     expect(awardRankedArenaResultHonor(sim.ctx, meta, '1v1', key, 'win')).toBe(0);
-    expect(meta.honor).toBe(33);
+    expect(meta.honor).toBe(133);
   });
 
   it('tapers loss awards on the daily win count without letting losses advance it', () => {
@@ -348,7 +356,8 @@ describe('ranked Arena honor', () => {
       );
     }
     expect(meta.honorArenaDaily?.totalWins).toBe(0);
-    expect(awardRankedArenaResultHonor(sim.ctx, meta, '1v1', '["character:win"]', 'win')).toBe(25);
+    // Untapered, and still the day's first 1v1 win (25 + 100).
+    expect(awardRankedArenaResultHonor(sim.ctx, meta, '1v1', '["character:win"]', 'win')).toBe(125);
 
     // Wins do taper the loss award, on the same curve they taper themselves.
     const winner = world();
@@ -368,7 +377,7 @@ describe('ranked Arena honor', () => {
     const pid = sim.addPlayer('warrior', 'Replay');
     const meta = sim.meta(pid)!;
     const key = '["name:opponent"]';
-    expect(awardRankedArenaResultHonor(sim.ctx, meta, '1v1', key, 'win')).toBe(25);
+    expect(awardRankedArenaResultHonor(sim.ctx, meta, '1v1', key, 'win')).toBe(125);
     // The persisted window is carried into a SECOND world that was never fed
     // a day (the tests/delves.test.ts shape): Sim.resetDay is monotone
     // non-decreasing, so '' on the first world would be held at 2026-07-08
@@ -422,6 +431,75 @@ describe('ranked Arena honor', () => {
     const loaded = world();
     const meta = loaded.meta(loaded.addPlayer('warrior', 'Corrupt', { state: state as never }))!;
     expect(meta.honorArenaDaily?.lossesByOpponent).toEqual({ valid: 3 });
+  });
+
+  it('pays 3v3 a 75 win and a 25 loss, so its first win of the day pays 175', () => {
+    expect(RANKED_ARENA_WIN_HONOR['3v3']).toBe(75);
+    expect(RANKED_ARENA_LOSS_HONOR['3v3']).toBe(25);
+    const sim = world();
+    sim.resetDay = '2026-07-08';
+    const meta = sim.meta(sim.addPlayer('warrior', 'Trio'))!;
+    expect(awardRankedArenaResultHonor(sim.ctx, meta, '3v3', '["character:1"]', 'loss')).toBe(25);
+    expect(awardRankedArenaResultHonor(sim.ctx, meta, '3v3', '["character:2"]', 'win')).toBe(175);
+    expect(awardRankedArenaResultHonor(sim.ctx, meta, '3v3', '["character:3"]', 'win')).toBe(75);
+  });
+
+  it('pays the first-win bonus once per bracket per day, on a win only', () => {
+    const sim = world();
+    sim.resetDay = '2026-07-08';
+    const meta = sim.meta(sim.addPlayer('warrior', 'Daily'))!;
+    // A draw never claims it.
+    expect(awardRankedArenaResultHonor(sim.ctx, meta, '2v2', '["character:1"]', 'draw')).toBe(17);
+    expect(meta.honorArenaDaily?.arenaFirstWinClaimed).toBeUndefined();
+    // Each bracket's first win claims its own bonus.
+    expect(awardRankedArenaResultHonor(sim.ctx, meta, '1v1', '["character:2"]', 'win')).toBe(125);
+    expect(awardRankedArenaResultHonor(sim.ctx, meta, '2v2', '["character:3"]', 'win')).toBe(150);
+    expect(awardRankedArenaResultHonor(sim.ctx, meta, '3v3', '["character:4"]', 'win')).toBe(175);
+    expect(meta.honorArenaDaily?.arenaFirstWinClaimed).toEqual(['1v1', '2v2', '3v3']);
+    // A second win in any of them pays the plain award.
+    expect(awardRankedArenaResultHonor(sim.ctx, meta, '2v2', '["character:5"]', 'win')).toBe(50);
+    const reasons = sim.events
+      .filter((event) => event.type === 'honor')
+      .map((event) => (event as { reason: string }).reason);
+    expect(reasons.filter((r) => r === 'arena_first_win')).toHaveLength(3);
+    // The new day re-arms every bracket.
+    sim.resetDay = '2026-07-09';
+    expect(awardRankedArenaResultHonor(sim.ctx, meta, '2v2', '["character:5"]', 'win')).toBe(150);
+    expect(meta.honorArenaDaily?.arenaFirstWinClaimed).toEqual(['2v2']);
+  });
+
+  it('round-trips the claimed brackets and drops unknown ones', () => {
+    const sim = world();
+    sim.resetDay = '2026-07-08';
+    const pid = sim.addPlayer('warrior', 'Keeper');
+    const meta = sim.meta(pid)!;
+    // Absent until a bracket claims it.
+    expect(sim.serializeCharacter(pid)!.honorArenaDaily?.arenaFirstWinClaimed).toBeUndefined();
+    awardRankedArenaResultHonor(sim.ctx, meta, '3v3', '["character:1"]', 'win');
+    const saved = sim.serializeCharacter(pid)!;
+    expect(saved.honorArenaDaily?.arenaFirstWinClaimed).toEqual(['3v3']);
+
+    const loaded = world();
+    loaded.resetDay = '2026-07-08';
+    const loadedMeta = loaded.meta(loaded.addPlayer('warrior', 'Keeper', { state: saved }))!;
+    // Relogging cannot re-arm the claimed bracket.
+    expect(
+      awardRankedArenaResultHonor(loaded.ctx, loadedMeta, '3v3', '["character:2"]', 'win'),
+    ).toBe(75);
+
+    const state = sim.serializeCharacter(pid)! as unknown as Record<string, unknown>;
+    state.honorArenaDaily = {
+      date: '2026-07-08',
+      winsByOpponent: {},
+      fiestaCompletionsByOpponent: {},
+      arenaFirstWinClaimed: ['2v2', 'fiesta', 7, '2v2'],
+      totalWins: 0,
+    };
+    const corrupt = world();
+    const corruptMeta = corrupt.meta(
+      corrupt.addPlayer('warrior', 'Keeper', { state: state as never }),
+    )!;
+    expect(corruptMeta.honorArenaDaily?.arenaFirstWinClaimed).toEqual(['2v2']);
   });
 });
 
@@ -509,11 +587,12 @@ describe('Thornhollow Fields honor income', () => {
     return { sim, meta: sim.meta(pid)! };
   }
 
-  it("pays 160 for the day's first win and 120 for the next", () => {
+  it("pays 220 for the day's first win and 120 for the next", () => {
     const { sim, meta } = bgPlayer();
     const first = awardBattlegroundHonor(sim.ctx, meta, '["character:1"]', 'win');
     expect(first.firstWinBonus).toBe(BATTLEGROUND_FIRST_WIN_BONUS_HONOR);
-    expect(first.total).toBe(160);
+    expect(BATTLEGROUND_FIRST_WIN_BONUS_HONOR).toBe(100);
+    expect(first.total).toBe(220);
     // A fresh opposing identity, so the repeat curve is not what is measured:
     // only the bonus should be missing the second time.
     const second = awardBattlegroundHonor(sim.ctx, meta, '["character:2"]', 'win');
@@ -546,7 +625,7 @@ describe('Thornhollow Fields honor income', () => {
     // Base is floored at 0.25 (60 -> 15); the bonus is NOT decayed with it.
     expect(win.total - win.firstWinBonus).toBe(30);
     expect(win.firstWinBonus).toBe(BATTLEGROUND_FIRST_WIN_BONUS_HONOR);
-    expect(win.total).toBe(70);
+    expect(win.total).toBe(130);
   });
 
   it('floors the result curve at a quarter and never reaches zero', () => {
@@ -565,8 +644,8 @@ describe('Thornhollow Fields honor income', () => {
       { length: 6 },
       () => awardBattlegroundHonor(wins.sim.ctx, wins.meta, key, 'win').total,
     );
-    // The first carries the +20 daily bonus; the rest are the floored base.
-    expect(winPaid).toEqual([160, 60, 30, 30, 30, 30]);
+    // The first carries the +100 daily bonus; the rest are the floored base.
+    expect(winPaid).toEqual([220, 60, 30, 30, 30, 30]);
   });
 
   it('keeps the battleground result curve separate from the shared Fiesta one', () => {

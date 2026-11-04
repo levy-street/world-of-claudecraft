@@ -2650,7 +2650,8 @@ export const sv_SE: EnTranslations = {
       "launcherTitle": "PvP",
       "mobileLabel": "PvP",
       "bracket1v1": "1v1",
-      "bracket2v2": "2v2"
+      "bracket2v2": "2v2",
+      "bracket3v3": "3v3"
     },
     "bg": {
       "title": "Törnhålefälten",
@@ -3435,6 +3436,7 @@ export const sv_SE: EnTranslations = {
         "fiestaWin": "Fiesta-seger",
         "battlegroundWin": "seger i Törnhålefälten",
         "battlegroundFirstWin": "första segern i Törnhålefälten idag",
+        "arenaFirstWin": "första arenasegern idag i denna klass",
         "battlegroundComplete": "strid i Törnhålefälten utkämpad",
         "battlegroundKill": "hederligt dråp",
         "battlegroundAssist": "assisterat dödande slag",
@@ -10532,11 +10534,13 @@ export const sv_SE: EnTranslations = {
       "duelsBody": "Utmana vilken spelare du än möter till en vänskaplig duell. Inget står på spel utom stoltheten, så det är det enklaste sättet att lära sig en matchning eller göra upp en vänskaplig tvist.",
       "coliseumHeading": "Det askgråa colosseumet",
       "coliseumBody": "Kolosseum är rikets arena, där du möter andra spelare i rankade matcher, en mot en eller två mot två. Varje klass håller sin egen ställning, så en seger lyfter dig på den stegen inför hela riket. Rankat spel öppnar på nivå 15, och det gäller din partner också: är någon av er under den står kön stängd tills ni båda kvalificerar er. Allt spelare mot spelare bor bakom en enda knapp, märkt PvP: öppna den och välj en flik, Törnhålefälten, en mot en eller två mot två, och anmäl dig sedan ensam eller med din partner. Medan du står i kö eller är i en match förblir de andra flikarna låsta, så du kan aldrig stå i två köer samtidigt.",
+      "coliseumBodyThreeBrackets": "Kolosseum är rikets arena, där du möter andra spelare i rankade matcher: en mot en, två mot två eller tre mot tre. Varje klass håller sin egen ställning, så en seger lyfter dig på den stegen inför hela riket. Rankat spel öppnar på nivå 15, och det gäller alla du köar med: är någon i din grupp under den står kön stängd tills ni alla kvalificerar er. Allt spelare mot spelare bor bakom en enda knapp, märkt PvP: öppna den och välj en flik, Törnhålefälten, en mot en, två mot två eller tre mot tre, och anmäl dig sedan ensam eller med din grupp. Medan du står i kö eller är i en match förblir de andra flikarna låsta, så du kan aldrig stå i två köer samtidigt. En tre mot tre-match som drar ut på tiden sliter ner alla: efter halvvägs skär Utnötning varje sekund lite mer i den läkning varje kämpe tar emot, så ett dödläge kan inte vara för evigt.",
       "ladderHeading": "Klättra på rankingstegen",
       "ladderBody": "Rankat spel följer din ställning över tid. Kolla topplistan för att se var du befinner dig och vem som håller rikets topp.",
       "rewardsHeading": "Vad rankat spel betalar",
       "rewardsBody": "En rankad vinst betalar Heder, valutan för spelare mot spelare, och en förlust kostar dig ingenting annat än ställning. Heder är tänkt att belöna riktiga matcher: att besegra samma motståndare eller samma lag igen samma dag betalar inget mer, en lång vinstdag ger lite mindre Heder per vinst ju längre den pågår, och en match din motståndare ger förlorad flyttar ändå din ställning men betalar ingen Heder alls. Den dagen är Hederns egen, och den rullar över på sin egen klocka snarare än med rikets instansåterställning.",
       "rewardsBodyLossShare": "En rankad vinst ger Heder, valutan för spelare mot spelare, och en förlust som du spelar till slutet ger fortfarande en mindre andel, liksom oavgjort, så rankning är det enda en förlust egentligen kostar dig. Heder ska belöna riktiga matcher: att besegra samma motståndare eller samma lag igen samma dag ger inget mer, och det gör inte heller att förlora mot dem igen. En lång vinstdag betalar fullt för sin första följd av segrar, halverar sedan vad en vinst ger, halverar det igen längre in och stannar där. En match som din motståndare lämnar påverkar fortfarande din rankning men ger ingen Heder alls. Dagen tillhör riket: den rullar över vid rikets nattliga återställningstid, samma gräns där alla dagliga låsningar nollställs.",
+      "rewardsFirstWinBody": "Din första rankade seger varje dag betalar ut en bonus ovanpå, och varje klass har sin egen: en första seger i en mot en, i två mot två och i tre mot tre hämtar var sin. En förlust eller oavgjort förbrukar den aldrig.",
       "honorHeading": "Heder",
       "honorBody": "Heder är valutan för att slåss mot andra spelare. Du tjänar den i Coliseum och ute på Törnhålefälten, den hålls skild från ditt mynt och blandas aldrig med det, och ditt karaktärsblad visar hur mycket du har. Det finns precis en enda sak att spendera den på: Krigföringsutrustning.",
       "quartermastersBody": "Två kvartersmästare håller samma hyllor, så handla med den som är närmast. RASERI, Hederskvartermästaren, står i Östbäcksdalen, och Krigsmarskalk Draven Kole, Mästare av Krigföringsförråden, sköter disken i Highwatch. Deras lager är Krigföringsnivån: fem rustningsfamiljer, plus halsband, ringar och vapen som delas mellan dem alla.",

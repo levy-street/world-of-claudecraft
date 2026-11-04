@@ -28,6 +28,7 @@ export const HONOR_FLOAT_REASON_KEYS: Partial<Record<HonorReason, TranslationKey
   battleground_kill: 'hudChrome.warfare.floatReasons.kill',
   battleground_assist: 'hudChrome.warfare.floatReasons.assist',
   battleground_first_win: 'hudChrome.warfare.floatReasons.firstWin',
+  arena_first_win: 'hudChrome.warfare.floatReasons.firstWin',
   // World PvP (/pvp) pays the same fast mid-fight drip, so it names itself
   // with the same two short labels.
   world_kill: 'hudChrome.warfare.floatReasons.kill',

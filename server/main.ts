@@ -335,9 +335,11 @@ import { isConnectionRefused } from './ip_block';
 import { pruneExpiredBlockedIps } from './ip_block_db';
 import { pruneItemLedgerBatch } from './item_ledger_db';
 import {
+  type ArenaLadderFormat,
   buildDeedsBoard,
   buildGuildBoardResponse,
   configureLeaderboardRuntime,
+  decodeArenaFormat,
   decodedRouteName,
   decodeGuildBoardCategory,
   type ReleaseEntry,
@@ -780,9 +782,9 @@ async function getGuildLeaderboard(scope: 'realm' | 'global'): Promise<GuildLead
   }
 }
 
-// Arena ladder cache. Per FORMAT ('1v1' | '2v2', the only two the public ladder
-// serves; the wider ArenaFormat union never reaches here, so an unrecognized
-// ?format value can never mint a third cache slot), same compute-once /
+// Arena ladder cache. Per FORMAT ('1v1' | '2v2' | '3v3', the only three the public
+// ladder serves; the wider ArenaFormat union never reaches here, so an unrecognized
+// ?format value can never mint a fourth cache slot), same compute-once /
 // serve-from-memory shape as the player and guild boards above. Wired into
 // bustBoardCaches below because the ladder is character-faced and
 // moderation-visible: a ban delists immediately in-process while cross-process
@@ -790,14 +792,15 @@ async function getGuildLeaderboard(scope: 'realm' | 'global'): Promise<GuildLead
 // readArenaLeaderboard (server/leaderboard.ts) is the INNER read, so
 // ARENA_LEADERBOARD_LIMIT stays the one place the ladder depth is set.
 const arenaLeaderboardCache: Record<
-  '1v1' | '2v2',
+  ArenaLadderFormat,
   { at: number; leaders: ArenaLeaderRow[] } | null
 > = {
   '1v1': null,
   '2v2': null,
+  '3v3': null,
 };
 
-async function refreshArena(format: '1v1' | '2v2'): Promise<ArenaLeaderRow[]> {
+async function refreshArena(format: ArenaLadderFormat): Promise<ArenaLeaderRow[]> {
   const epoch = boardEpoch;
   const { leaders } = await readArenaLeaderboard({ topArenaRatings }, format);
   // Skip the install if a moderation bust landed mid-refresh (see boardEpoch).
@@ -808,7 +811,7 @@ async function refreshArena(format: '1v1' | '2v2'): Promise<ArenaLeaderRow[]> {
 // Single-flight per format, keyed on boardEpoch exactly like the player/guild
 // refreshes, so a moderation bust (which bumps boardEpoch) drops any in-flight
 // pre-ban arena refresh instead of handing a post-bust reader its pre-ban snapshot.
-const refreshArenaShared: Record<'1v1' | '2v2', () => Promise<ArenaLeaderRow[]>> = {
+const refreshArenaShared: Record<ArenaLadderFormat, () => Promise<ArenaLeaderRow[]>> = {
   '1v1': singleFlight(
     () => refreshArena('1v1'),
     () => boardEpoch,
@@ -817,9 +820,13 @@ const refreshArenaShared: Record<'1v1' | '2v2', () => Promise<ArenaLeaderRow[]>>
     () => refreshArena('2v2'),
     () => boardEpoch,
   ),
+  '3v3': singleFlight(
+    () => refreshArena('3v3'),
+    () => boardEpoch,
+  ),
 };
 
-async function getArenaLeaderboard(format: '1v1' | '2v2'): Promise<ArenaLeaderRow[]> {
+async function getArenaLeaderboard(format: ArenaLadderFormat): Promise<ArenaLeaderRow[]> {
   const cached = arenaLeaderboardCache[format];
   if (cached && Date.now() - cached.at < LEADERBOARD_TTL_MS) return cached.leaders;
   try {
@@ -985,6 +992,7 @@ function bustBoardCaches(): void {
   guildLeaderboardCache.global = null;
   arenaLeaderboardCache['1v1'] = null;
   arenaLeaderboardCache['2v2'] = null;
+  arenaLeaderboardCache['3v3'] = null;
   bgLeaderboardCache = null;
   deedsBoardCache = null;
   // The guild board's officer roster (guild_board_presence.ts): a moderated
@@ -1194,6 +1202,7 @@ export const boardReadTestSeam = {
     guildLeaderboardCache.global = null;
     arenaLeaderboardCache['1v1'] = null;
     arenaLeaderboardCache['2v2'] = null;
+    arenaLeaderboardCache['3v3'] = null;
     bgLeaderboardCache = null;
     deedsBoardCache = null;
     deedsRarityCache = null;
@@ -2345,7 +2354,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       // migrated twin (same public-read budget, same 429 body).
       if (!publicReadRateLimited(req).allowed) return json(res, 429, { error: 'rate limited' });
       const params = new URLSearchParams((req.url ?? '').split('?')[1] ?? '');
-      const format: '1v1' | '2v2' = params.get('format') === '2v2' ? '2v2' : '1v1';
+      const format = decodeArenaFormat(params.get('format') ?? undefined);
       return json(res, 200, { format, leaders: await getArenaLeaderboard(format) });
     }
     if (req.method === 'GET' && url === '/api/leaderboard') {

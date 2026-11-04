@@ -5070,6 +5070,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     "Bunu bir toplama aletine yuvalamak için Meslekler'i aç.",
   'hudChrome.pvp.bracket1v1': '1v1',
   'hudChrome.pvp.bracket2v2': '2v2',
+  'hudChrome.pvp.bracket3v3': '3v3',
   'hudChrome.pvp.launcherTitle': 'PvP',
   'hudChrome.pvp.mobileLabel': 'PvP',
   'hudChrome.townFocus.respecCostFree': 'Ücretsiz',
@@ -5085,6 +5086,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.reasons.battlegroundAssist': 'öldürücü darbeye yardım edildi',
   'hudChrome.warfare.reasons.battlegroundComplete': 'Dikenvadi Ovası savaşı yapıldı',
   'hudChrome.warfare.reasons.battlegroundFirstWin': 'bugünkü ilk Dikenvadi Ovası galibiyeti',
+  'hudChrome.warfare.reasons.arenaFirstWin': 'bu kategorideki bugünkü ilk arena galibiyeti',
   'hudChrome.warfare.reasons.battlegroundKill': 'onurlu öldürme',
   'hudChrome.warfare.reasons.battlegroundWin': 'Dikenvadi Ovası zaferi',
   'hudChrome.warfareShop.buyAria': '{honor} karşılığında {item} satın al',
@@ -10515,6 +10517,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.wrath': 'Bir hedefe menzilden fırlatılan bir doğa oku; başvuru bomban.',
   'guide.arenaPage.coliseumBody':
     'Kolezyum diyarın arenasıdır; orada diğer oyuncularla dereceli maçlarda, birebir ya da ikiye iki karşılaşırsın. Her kategori kendi sıralamasını tutar, dolayısıyla bir galibiyet seni tüm diyarın gözü önünde o merdivende yükseltir. Dereceli oyun 15. seviyede açılır ve bu partnerin için de geçerlidir: ikinizden biri altındaysa, ikiniz de yeterli olana dek sıra kapalı kalır. Tüm oyuncuya karşı oyuncu, PvP işaretli tek bir düğmenin ardında yaşar: onu aç ve bir sekme seç, Dikenvadi Ovası, birebir ya da ikiye iki, sonra tek başına ya da partnerinle kaydol. Sırada ya da bir maçtayken diğer sekmeler kilitli kalır, böylece asla aynı anda iki sırada bulunamazsın.',
+  'guide.arenaPage.coliseumBodyThreeBrackets':
+    'Kolezyum diyarın arenasıdır; orada diğer oyuncularla dereceli maçlarda birebir, ikiye iki ya da üçe üç karşılaşırsın. Her kategori kendi sıralamasını tutar, dolayısıyla bir galibiyet seni tüm diyarın gözü önünde o merdivende yükseltir. Dereceli oyun 15. seviyede açılır ve bu birlikte sıraya girdiğin herkes için geçerlidir: grubundan biri altındaysa, hepiniz yeterli olana dek sıra kapalı kalır. Tüm oyuncuya karşı oyuncu, PvP işaretli tek bir düğmenin ardında yaşar: onu aç ve bir sekme seç, Dikenvadi Ovası, birebir, ikiye iki ya da üçe üç, sonra tek başına ya da grubunla kaydol. Sırada ya da bir maçtayken diğer sekmeler kilitli kalır, böylece asla aynı anda iki sırada bulunamazsın. Uzayan bir üçe üç maçı herkesi yıpratır: yarısı geçtikten sonra Yıpranma, her dövüşçünün aldığı iyileştirmeyi her saniye biraz daha kırpar, böylece bir çıkmaz sonsuza dek süremez.',
   'guide.arenaPage.coliseumHeading': 'Kül Kolezyumu',
   'guide.arenaPage.duelsBody':
     'Karşılaştığın herhangi bir oyuncuyu dostane bir düelloya davet et. Gururdan başka kaybedilecek bir şey yok, bu yüzden bir eşleşmeyi öğrenmenin ya da dostça bir tartışmayı çözmenin en kolay yoludur.',
@@ -19426,6 +19430,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Onur satın alımları kesindir. Geri satın alma listesinde yalnızca sattığın şeyler bulunur: para ile alınan bir şey, fikrini yeniden değiştirirsen genellikle satış fiyatına geri satılıp bu listeden alınabilir; ancak Harp teçhizatı satın aldığın anda ruha bağlanır, bu yüzden hiçbir zaman takas edilemez, postalanamaz veya başka bir bedel karşılığında geri satılamaz ve bu listeye asla ulaşmaz. Mağaza bu yüzden onay ister: parçaya basmadan önce onu oku.',
   'guide.arenaPage.rewardsBodyLossShare':
     "Dereceli bir galibiyet, oyuncuya karşı oyuncu para birimi olan Onur'u öder; sonuna kadar oynadığın bir yenilgi ve beraberlik de onun daha küçük bir payını öder, bu yüzden bir yenilginin gerçekten kaybettirdiği tek şey derecelendirmedir. Onur gerçek maçları ödüllendirmek içindir: aynı rakibi veya aynı takımı aynı gün tekrar yenmek daha fazla ödeme yapmaz, onlara tekrar yenilmek de yapmaz. Uzun bir galibiyet günü ilk galibiyetler dizisinde tam ödeme yapar, sonra galibiyet ödemesini yarıya indirir, ileride bir kez daha yarıya indirir ve orada kalır. Rakibinin hükmen bıraktığı maç dereceni yine değiştirir ama hiç Onur ödemez. Gün, diyarın kendi günüdür: her günlük kilidin açıldığı sınır olan diyarın gece sıfırlanma saatinde yenilenir.",
+  'guide.arenaPage.rewardsFirstWinBody':
+    'Her günün ilk dereceli galibiyeti üstüne bir ikramiye öder ve her kategorinin kendi ikramiyesi vardır: birebir, ikiye iki ve üçe üç maçlardaki ilk galibiyet her biri birini alır. Bir yenilgi ya da beraberlik onu asla harcamaz.',
   'guide.arenaPage.warfareBodyStatsStay':
     'Her Harp parçası Harp Saldırı ve Harp Savunma Derecesi taşır; bu iki derece canavarlara karşı hiçbir şey yapmaz. Yalnızca düelloda, arenada veya savaş alanında başka bir oyuncuyla dövüşürken uygulanır; Saldırı verdiğin hasarı artırır, Savunma aldığın hasarı azaltır ve her biri kendi tavanına ulaşabilir. Her zırh ailesi aynı zamanda bir settir ve set bonusları da yalnızca oyunculara karşı çalışan Harp derecesi veya etkileridir; bu nedenle eksiksiz bir onur setinin set bonusları zindan patronuna karşı hiçbir şey yapmaz. Parçaların sıradan istatistikleri, zırhı ve silah hasarı yine vardır ve her yerde çalışır; canavara karşı sessiz kalan Harp dereceleri ve set bonuslarıdır. Her yerde geçerli tek bir istisna var: bu setlerden herhangi birinin iki parçası, alınan hasarın büyü yapmanı geciktirmesini de engeller.',
   'guide.arenaPage.warfareTradeBodyRatingSpent':

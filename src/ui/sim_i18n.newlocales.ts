@@ -326,6 +326,7 @@ export const BASE_NEW = {
     'aura.carrierFatigue': 'Únava vlajkonoše',
     'aura.ashenStep': 'Popelavý krok',
     'aura.destructionRuin': 'Zkáza',
+    'aura.arenaAttrition': 'Opotřebení',
     'aura.effigy': 'Podobizna',
     'aura.dawnsWrath': 'Hněv úsvitu',
     'aura.emberward': 'Žhavá ochrana',
@@ -980,6 +981,7 @@ export const BASE_NEW = {
     'aura.craftedShelter': 'Fremstillet ly',
     'aura.dawnsWrath': 'Daggryets vrede',
     'aura.destructionRuin': 'Ruin',
+    'aura.arenaAttrition': 'Udmattelse',
     'aura.duskfireClaim': 'Skumringsildens krav',
     'aura.effigy': 'Afbildning',
     'aura.emberward': 'Glødeværn',
@@ -1622,6 +1624,7 @@ export const BASE_NEW = {
     'aura.ashenStep': 'Langkah Abu',
     'aura.effigy': 'Patung',
     'aura.destructionRuin': 'Kehancuran',
+    'aura.arenaAttrition': 'Atrisi',
     'aura.craftedCollection': 'Koleksi Buatan',
     'aura.craftedPreservation': 'Pelestarian yang Dibuat',
     'aura.craftedMomentum': 'Momentum yang Dibuat',
@@ -2281,6 +2284,7 @@ export const BASE_NEW = {
     'aura.cheaterMark': 'Gemarkeerd als valsspeler',
     'aura.carrierFatigue': 'Vermoeidheid van de drager',
     'aura.destructionRuin': 'Ruïne',
+    'aura.arenaAttrition': 'Uitputting',
     'aura.craftedCollection': 'Vervaardigde collectie',
     'aura.ashenStep': 'Asgrauwe stap',
     'aura.craftedPreservation': 'Ambachtelijk behoud',
@@ -2950,6 +2954,7 @@ export const BASE_NEW = {
     'aura.craftedPreservation': 'Rzemieślnicza ochrona',
     'aura.effigy': 'Wizerunek',
     'aura.destructionRuin': 'Ruina',
+    'aura.arenaAttrition': 'Wyniszczenie',
     'aura.dawnsWrath': 'Gniew Świtu',
     'aura.hatchlingBurn': 'Oparzenie pisklęcia',
     'aura.ignivarForgeChains': 'Łańcuchy Kuźni',
@@ -3608,6 +3613,7 @@ export const BASE_NEW = {
     'aura.broodlordsWard': 'Kullherrens värn',
     'aura.effigy': 'Avbildning',
     'aura.destructionRuin': 'Förödelse',
+    'aura.arenaAttrition': 'Utnötning',
     'aura.dawnsWrath': 'Gryningens vrede',
     'aura.ignivarBrandOfThePyre': 'Bålets brännmärke',
     'aura.gloomtithe': 'Dystert tionde',
@@ -4239,6 +4245,7 @@ export const BASE_NEW = {
     'aura.cheaterMark': 'Hileci olarak işaretlendi',
     'aura.coldsightRead': 'Soğuk Görüş Okuması',
     'aura.destructionRuin': 'Yıkım',
+    'aura.arenaAttrition': 'Yıpranma',
     'aura.craftedMomentum': 'Hazırlanmış Momentum',
     'aura.dawnsWrath': 'Şafağın Gazabı',
     'aura.courserDaze': 'Sersemlemiş',
@@ -4892,6 +4899,7 @@ export const BASE_NEW = {
     'aura.carrierFatigue': 'Mệt mỏi của người vận chuyển',
     'aura.emberward': 'Hộ Thuẫn Than Hồng',
     'aura.destructionRuin': 'Sự đổ nát',
+    'aura.arenaAttrition': 'Hao Mòn',
     'aura.effigy': 'hình nộm',
     'aura.craftedPreservation': 'Bảo quản thủ công',
     'aura.coldsightRead': 'Đọc Cảm Quan Băng Giá',
@@ -5594,6 +5602,11 @@ export const ARENA_NEW = {
     memberDueling: '{name} se nemůže zařadit do fronty během duelu.',
     memberTrading: '{name} musí před zařazením dokončit obchod.',
     memberInstance: '{name} se nemůže zařadit do fronty z instance.',
+    join3v3: 'Připojuješ se do fronty Ashen Coliseum 3v3. Čekej na soupeře...',
+    leave3v3: 'Opouštíš frontu Ashen Coliseum 3v3.',
+    teamLeave3v3: 'Tvůj tým opouští frontu Ashen Coliseum 3v3.',
+    partyLeaderQueue3v3: 'Do 3v3 může tým zařadit jen vůdce skupiny.',
+    premadeUpToThree: 'Předem složený tým 3v3 povoluje skupinu nejvýše tří hráčů.',
   },
   da_DK: {
     alreadyQueuedOther:
@@ -5611,6 +5624,11 @@ export const ARENA_NEW = {
     partyMemberUnavailable: 'Et gruppemedlem er ikke tilgængeligt.',
     premadeNeedsTwo: 'En 2v2-premade kræver en gruppe på præcis to.',
     teamLeave2v2: 'Dit hold forlader Ashen Coliseum 2v2-køen.',
+    join3v3: 'Du tilslutter dig Ashen Coliseum 3v3-køen. Hold dig klar til modstandere...',
+    leave3v3: 'Du forlader Ashen Coliseum 3v3-køen.',
+    teamLeave3v3: 'Dit hold forlader Ashen Coliseum 3v3-køen.',
+    partyLeaderQueue3v3: 'Kun gruppelederen kan stille jeres hold op til 3v3.',
+    premadeUpToThree: 'En 3v3-premade tillader en gruppe på højst tre.',
   },
   id_ID: {
     alreadyQueuedOther:
@@ -5628,6 +5646,11 @@ export const ARENA_NEW = {
     partyMemberUnavailable: 'Salah satu anggota party tidak tersedia.',
     premadeNeedsTwo: 'Party premade 2v2 membutuhkan tepat dua anggota.',
     teamLeave2v2: 'Timmu keluar dari antrean 2v2 Ashen Coliseum.',
+    join3v3: 'Kamu bergabung ke antrean 3v3 Ashen Coliseum. Bersiaplah menghadapi lawan...',
+    leave3v3: 'Kamu keluar dari antrean 3v3 Ashen Coliseum.',
+    teamLeave3v3: 'Timmu keluar dari antrean 3v3 Ashen Coliseum.',
+    partyLeaderQueue3v3: 'Hanya pemimpin party yang boleh mengantrekan tim untuk 3v3.',
+    premadeUpToThree: 'Party premade 3v3 boleh berisi paling banyak tiga anggota.',
   },
   nl_NL: {
     alreadyQueuedOther:
@@ -5646,6 +5669,12 @@ export const ARENA_NEW = {
     partyMemberUnavailable: 'Een groepslid is niet beschikbaar.',
     premadeNeedsTwo: 'Een 2v2-premade vereist een groep van precies twee leden.',
     teamLeave2v2: 'Je team verlaat de 2v2-wachtrij van het Ashen Coliseum.',
+    join3v3:
+      'Je sluit je aan bij de 3v3-wachtrij van het Ashen Coliseum. Wacht op tegenstanders...',
+    leave3v3: 'Je verlaat de 3v3-wachtrij van het Ashen Coliseum.',
+    teamLeave3v3: 'Je team verlaat de 3v3-wachtrij van het Ashen Coliseum.',
+    partyLeaderQueue3v3: 'Alleen de groepsleider mag je team voor 3v3 in de wachtrij zetten.',
+    premadeUpToThree: 'Een 3v3-premade staat een groep van maximaal drie leden toe.',
   },
   pl_PL: {
     alreadyQueuedOther:
@@ -5663,6 +5692,11 @@ export const ARENA_NEW = {
     partyMemberUnavailable: 'Członek drużyny jest niedostępny.',
     premadeNeedsTwo: 'Gotowa drużyna do 2v2 wymaga dokładnie dwóch członków.',
     teamLeave2v2: 'Twoja drużyna opuszcza kolejkę 2v2 Popielnego Koloseum.',
+    join3v3: 'Dołączasz do kolejki 3v3 Popielnego Koloseum. Czekaj na przeciwników...',
+    leave3v3: 'Opuszczasz kolejkę 3v3 Popielnego Koloseum.',
+    teamLeave3v3: 'Twoja drużyna opuszcza kolejkę 3v3 Popielnego Koloseum.',
+    partyLeaderQueue3v3: 'Tylko przywódca drużyny może ustawić wasz zespół w kolejce do 3v3.',
+    premadeUpToThree: 'Gotowa drużyna do 3v3 może liczyć najwyżej trzech członków.',
   },
   sv_SE: {
     alreadyQueuedOther: 'Du står redan i {current}-kön. Lämna den innan du köar för {next}.',
@@ -5679,6 +5713,11 @@ export const ARENA_NEW = {
     partyMemberUnavailable: 'En gruppmedlem är otillgänglig.',
     premadeNeedsTwo: 'Ett förbestämt 2v2-lag kräver en grupp på exakt två.',
     teamLeave2v2: 'Ditt lag lämnar Ashen Coliseums 2v2-kö.',
+    join3v3: 'Du ställer dig i Ashen Coliseums 3v3-kö. Vänta på motståndare...',
+    leave3v3: 'Du lämnar Ashen Coliseums 3v3-kö.',
+    teamLeave3v3: 'Ditt lag lämnar Ashen Coliseums 3v3-kö.',
+    partyLeaderQueue3v3: 'Endast gruppledaren får ställa ert lag i kö för 3v3.',
+    premadeUpToThree: 'Ett förbestämt 3v3-lag tillåter en grupp på högst tre.',
   },
   tr_TR: {
     alreadyQueuedOther:
@@ -5696,6 +5735,11 @@ export const ARENA_NEW = {
     partyMemberUnavailable: 'Bir grup üyesi müsait değil.',
     premadeNeedsTwo: '2v2 hazır takım tam olarak iki kişilik bir grup gerektirir.',
     teamLeave2v2: 'Takımın Kül Kolezyumu 2v2 sırasından ayrılıyor.',
+    join3v3: 'Kül Kolezyumu 3v3 sırasına katıldın. Rakipler için bekle...',
+    leave3v3: 'Kül Kolezyumu 3v3 sırasından ayrıldın.',
+    teamLeave3v3: 'Takımın Kül Kolezyumu 3v3 sırasından ayrılıyor.',
+    partyLeaderQueue3v3: 'Takımını 3v3 sırasına yalnızca grup lideri sokabilir.',
+    premadeUpToThree: '3v3 hazır takım en fazla üç kişilik bir gruba izin verir.',
   },
   vi_VN: {
     alreadyQueuedOther:
@@ -5713,6 +5757,11 @@ export const ARENA_NEW = {
     partyMemberUnavailable: 'Một thành viên trong nhóm hiện không sẵn sàng.',
     premadeNeedsTwo: 'Đội lập sẵn 2v2 cần một nhóm gồm đúng hai người.',
     teamLeave2v2: 'Đội của bạn rời khỏi hàng chờ Đấu Trường Tro Tàn 2v2.',
+    join3v3: 'Bạn đã tham gia hàng chờ Đấu Trường Tro Tàn 3v3. Hãy chờ đối thủ...',
+    leave3v3: 'Bạn rời khỏi hàng chờ Đấu Trường Tro Tàn 3v3.',
+    teamLeave3v3: 'Đội của bạn rời khỏi hàng chờ Đấu Trường Tro Tàn 3v3.',
+    partyLeaderQueue3v3: 'Chỉ trưởng nhóm mới có thể xếp hàng cho đội của bạn vào 3v3.',
+    premadeUpToThree: 'Đội lập sẵn 3v3 cho phép một nhóm tối đa ba người.',
   },
 };
 

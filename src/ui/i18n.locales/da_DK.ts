@@ -5077,6 +5077,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Åbn Erhverv for at sætte denne i et indsamlingsværktøj.',
   'hudChrome.pvp.bracket1v1': '1v1',
   'hudChrome.pvp.bracket2v2': '2v2',
+  'hudChrome.pvp.bracket3v3': '3v3',
   'hudChrome.pvp.launcherTitle': 'PvP',
   'hudChrome.pvp.mobileLabel': 'PvP',
   'hudChrome.townFocus.respecCostFree': 'Gratis',
@@ -5092,6 +5093,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.reasons.battlegroundAssist': 'medvirket til dræbende slag',
   'hudChrome.warfare.reasons.battlegroundComplete': 'kamp udkæmpet i Tornehulemarkerne',
   'hudChrome.warfare.reasons.battlegroundFirstWin': 'første sejr i Tornehulemarkerne i dag',
+  'hudChrome.warfare.reasons.arenaFirstWin': 'første arenasejr i dag i denne klasse',
   'hudChrome.warfare.reasons.battlegroundKill': 'hæderligt drab',
   'hudChrome.warfare.reasons.battlegroundWin': 'sejr i Tornehulemarkerne',
   'hudChrome.warfareShop.buyAria': 'Køb {item} for {honor}',
@@ -9702,6 +9704,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.wrath': 'Et naturlyn kastet mod et mål på afstand, din foretrukne bombe.',
   'guide.arenaPage.coliseumBody':
     'Kolosseum er rigets arena, hvor du møder andre spillere i rangerede kampe, en mod en eller to mod to. Hver klasse holder sin egen stilling, så en sejr løfter dig på den stige for hele riget at se. Rangeret spil åbner på niveau 15, og det gælder også din makker: er en af jer under det, står køen lukket, indtil I begge kvalificerer jer. Alt spiller mod spiller bor bag én knap, mærket PvP: åbn den og vælg et faneblad, Tornehulemarkerne, en mod en eller to mod to, og meld dig så til alene eller sammen med din makker. Mens du står i kø eller er i en kamp, forbliver de andre faneblade låst, så du kan aldrig stå i to køer på én gang.',
+  'guide.arenaPage.coliseumBodyThreeBrackets':
+    'Kolosseum er rigets arena, hvor du møder andre spillere i rangerede kampe: en mod en, to mod to eller tre mod tre. Hver klasse holder sin egen stilling, så en sejr løfter dig på den stige for hele riget at se. Rangeret spil åbner på niveau 15, og det gælder alle, du stiller op sammen med: er nogen i din gruppe under det, står køen lukket, indtil I alle kvalificerer jer. Alt spiller mod spiller bor bag én knap, mærket PvP: åbn den og vælg et faneblad, Tornehulemarkerne, en mod en, to mod to eller tre mod tre, og meld dig så til alene eller sammen med din gruppe. Mens du står i kø eller er i en kamp, forbliver de andre faneblade låst, så du kan aldrig stå i to køer på én gang. En tre mod tre-kamp, der trækker ud, slider alle ned: efter halvvejs skærer Udmattelse lidt mere hvert sekund i den helbredelse, hver kæmper modtager, så et dødvande kan ikke vare evigt.',
   'guide.arenaPage.coliseumHeading': 'Det Askegrå Colosseum',
   'guide.arenaPage.duelsBody':
     'Udfordr enhver spiller du møder til en venskabelig duel. Intet andet end stolthed står på spil, så det er den nemmeste måde at lære en kamp at kende eller bilægge en venskabelig uenighed.',
@@ -19395,6 +19399,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Æreskøb er endelige. Tilbagekøbslisten indeholder kun det, du solgte: Et møntkøb kan som regel sælges tilbage til sin salgspris og hentes fra listen, hvis du ombestemmer dig igen, men krigsudstyr bliver sjælebundet i det øjeblik, du køber det, så det kan aldrig handles, sendes med post eller sælges tilbage for noget, og det når aldrig den liste. Butikken beder dig bekræfte af den grund: læs genstanden, før du trykker på den.',
   'guide.arenaPage.rewardsBodyLossShare':
     'En sejr i ranglisten giver Ære, spiller-mod-spiller-valutaen, og et nederlag, du spiller til ende, giver stadig en mindre andel, ligesom uafgjort gør, så rang er det eneste, et nederlag virkelig koster dig. Ære skal belønne rigtige kampe: at besejre den samme modstander eller det samme hold igen samme dag giver ikke mere (og det gør et nyt nederlag mod dem heller ikke), en lang sejrsdag giver fuld betaling for dagens første række sejre og halverer derefter sejrsbetalingen, halverer den igen længere inde og bliver der, og en kamp, som modstanderen opgiver, flytter stadig din rang, men giver slet ingen Ære. Dagen følger rigets egen tid: Den skifter ved rigets natlige nulstilling, den samme grænse hvor alle daglige lockouts ryddes.',
+  'guide.arenaPage.rewardsFirstWinBody':
+    'Din første rangerede sejr hver dag udbetaler en bonus oveni, og hver klasse har sin egen: en første sejr i en mod en, i to mod to og i tre mod tre henter hver sin. Et nederlag eller uafgjort bruger den aldrig.',
   'guide.arenaPage.warfareBodyStatsStay':
     'Hvert krigsstykke har Krigsoffensiv og Krigsforsvarsvurdering, og de to vurderinger gør slet intet mod monstre. De gælder kun, når du kæmper mod en anden spiller, i en duel, arenaen eller slagmarken, hvor Offensiv øger den skade, du gør, og Forsvar mindsker den skade, du tager, hver op til sin egen grænse. Hver rustningsfamilie er også et sæt, og sættets bonusser er ligeledes krigsvurderinger eller effekter, der kun virker mod spillere, så et komplet æressætets sætbonusser tæller intet mod en dungeonboss. Selve delene har stadig deres almindelige egenskaber, rustning og våbenskade, og de virker overalt. Det er krigsvurderingerne og sætbonusserne, der bliver tavse mod et monster. Én undtagelse virker overalt: to dele af ethvert af disse sæt gør også, at skade ikke længere forsinker dine besværgelser.',
   'guide.arenaPage.warfareTradeBodyRatingSpent':

@@ -2650,7 +2650,8 @@ export const es: EnTranslations = {
       "launcherTitle": "JcJ",
       "mobileLabel": "JcJ",
       "bracket1v1": "1c1",
-      "bracket2v2": "2c2"
+      "bracket2v2": "2c2",
+      "bracket3v3": "3c3"
     },
     "bg": {
       "title": "Campos Espinosos",
@@ -3435,6 +3436,7 @@ export const es: EnTranslations = {
         "fiestaWin": "Victoria en Fiesta",
         "battlegroundWin": "victoria en Thornhollow Fields",
         "battlegroundFirstWin": "primera victoria del día en Thornhollow Fields",
+        "arenaFirstWin": "primera victoria de arena de hoy en esta categoría",
         "battlegroundComplete": "batalla de Thornhollow Fields disputada",
         "battlegroundKill": "muerte honorable",
         "battlegroundAssist": "golpe de gracia asistido",
@@ -10532,11 +10534,13 @@ export const es: EnTranslations = {
       "duelsBody": "Reta a un duelo amistoso a cualquier jugador que encuentres. No hay nada en juego salvo el orgullo, así que es la forma más sencilla de aprender un enfrentamiento o zanjar una discusión amistosa.",
       "coliseumHeading": "El Coliseo Ceniciento",
       "coliseumBody": "El Coliseo es la arena del reino, donde te enfrentas a otros jugadores en combates clasificatorios, uno contra uno o dos contra dos. Cada categoría mantiene su propia clasificación, así que una victoria te eleva en esa escalera a la vista de todo el reino. El juego clasificatorio se abre en el nivel 15, y eso vale también para tu compañero: si alguno de los dos está por debajo, la cola sigue cerrada hasta que ambos cumpláis. Todo el jugador contra jugador vive tras un único botón, marcado JcJ: ábrelo y escoge una pestaña, Campos Espinosos, uno contra uno o dos contra dos, y luego apúntate solo o con tu compañero. Mientras estás en cola o en un combate, las demás pestañas permanecen bloqueadas, así que nunca puedes estar en dos colas a la vez.",
+      "coliseumBodyThreeBrackets": "El Coliseo es la arena del reino, donde te enfrentas a otros jugadores en combates clasificatorios: uno contra uno, dos contra dos o tres contra tres. Cada categoría mantiene su propia clasificación, así que una victoria te eleva en esa escalera a la vista de todo el reino. El juego clasificatorio se abre en el nivel 15, y eso vale para todos con quienes entras en cola: si alguien de tu grupo está por debajo, la cola sigue cerrada hasta que todos cumpláis. Todo el jugador contra jugador vive tras un único botón, marcado JcJ: ábrelo y escoge una pestaña, Campos Espinosos, uno contra uno, dos contra dos o tres contra tres, y luego apúntate solo o con tu grupo. Mientras estás en cola o en un combate, las demás pestañas permanecen bloqueadas, así que nunca puedes estar en dos colas a la vez. Un combate de tres contra tres que se alarga desgasta a todos: pasada su mitad, Desgaste recorta cada segundo un poco más la sanación que recibe cada luchador, así que un punto muerto no puede durar para siempre.",
       "ladderHeading": "Ascender en la clasificación",
       "ladderBody": "El juego clasificatorio registra tu posición a lo largo del tiempo. Consulta la clasificación para ver dónde estás y quién ocupa la cima del reino.",
       "rewardsHeading": "Lo que paga el juego clasificatorio",
       "rewardsBody": "Una victoria clasificatoria paga Honor, la moneda del combate JcJ, y una derrota no te cuesta nada salvo índice. El Honor está pensado para recompensar combates reales: vencer otra vez al mismo rival o al mismo equipo el mismo día no paga nada más, un día largo de victorias paga cada vez un poco menos por triunfo a medida que avanza, y un combate que tu rival abandona sigue moviendo tu índice pero no paga Honor en absoluto. Ese día es propio del Honor, y se reinicia con su propio reloj en vez de con el reinicio de instancias del reino.",
       "rewardsBodyLossShare": "Una victoria puntuada paga Honor, la moneda de jugador contra jugador, y una derrota que juegas hasta el final también paga una parte menor, igual que un empate, así que la clasificación es lo único que realmente cuesta una derrota. El Honor recompensa partidas reales: vencer al mismo rival o equipo otra vez el mismo día no paga más, ni tampoco volver a perder contra ellos. Un día de victorias largo paga completo durante su primer tramo y luego reduce a la mitad el pago, vuelve a reducirlo más adelante y se queda así. Una partida que el rival abandona aún mueve tu clasificación, pero no paga Honor. El día pertenece al reino y cambia a la hora del reinicio nocturno, el mismo límite en que se reinician los bloqueos diarios.",
+      "rewardsFirstWinBody": "Tu primera victoria clasificatoria de cada día paga una bonificación adicional, y cada categoría tiene la suya: una primera victoria en uno contra uno, en dos contra dos y en tres contra tres reclama cada una la suya. Una derrota o un empate nunca la gastan.",
       "honorHeading": "Honor",
       "honorBody": "El Honor es la moneda de enfrentarte a otros jugadores. Lo ganas en el Coliseo y también en los Campos Espinosos, se mantiene aparte de tu dinero y nunca se mezcla con él, y tu hoja de personaje muestra cuánto tienes acumulado. Hay exactamente una cosa en la que gastarlo: el equipo de guerra.",
       "quartermastersBody": "Dos intendentes llevan el mismo surtido, así que comercia con el que tengas más cerca. FURIA, el Intendente de Honor, está en el Valle de Eastbrook, y el Mariscal de Guerra Draven Kole, Maestro de los Almacenes de Guerra, atiende el mostrador en Highwatch. Su surtido es el equipo de guerra: cinco familias de armadura, además de collares, anillos y armas compartidos entre todas ellas.",

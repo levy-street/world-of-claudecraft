@@ -1,5 +1,5 @@
 // Thin DOM painter for the merged PvP window: Thornhollow Fields (the primary tab)
-// plus the two ranked arena brackets, one window on the classic G keybind.
+// plus the three ranked arena brackets, one window on the classic G keybind.
 //
 // The consumer half of the pure-core + thin-painter split, driven by THREE
 // pure cores: pvp_tabs_view.ts decides the tab strip (which tab is pinned by a
@@ -714,6 +714,7 @@ export class ArenaWindow {
     if (tab === 'world') return t('hudChrome.worldPvp.tab');
     if (tab === '1v1') return t('hudChrome.pvp.bracket1v1');
     if (tab === '2v2') return t('hudChrome.pvp.bracket2v2');
+    if (tab === '3v3') return t('hudChrome.pvp.bracket3v3');
     // Retired brackets stay renderable (a dev-started bout commits them into
     // the title tag), so their labels stay localized, never a raw id.
     if (tab === 'fiesta') return t('fiesta.bracket');

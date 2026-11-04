@@ -5095,6 +5095,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Öppna Yrken för att montera detta på ett insamlingsverktyg.',
   'hudChrome.pvp.bracket1v1': '1v1',
   'hudChrome.pvp.bracket2v2': '2v2',
+  'hudChrome.pvp.bracket3v3': '3v3',
   'hudChrome.pvp.launcherTitle': 'PvP',
   'hudChrome.pvp.mobileLabel': 'PvP',
   'hudChrome.townFocus.respecCostFree': 'Gratis',
@@ -5110,6 +5111,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.reasons.battlegroundAssist': 'assisterat dödande slag',
   'hudChrome.warfare.reasons.battlegroundComplete': 'strid i Törnhålefälten utkämpad',
   'hudChrome.warfare.reasons.battlegroundFirstWin': 'första segern i Törnhålefälten idag',
+  'hudChrome.warfare.reasons.arenaFirstWin': 'första arenasegern idag i denna klass',
   'hudChrome.warfare.reasons.battlegroundKill': 'hederligt dråp',
   'hudChrome.warfare.reasons.battlegroundWin': 'seger i Törnhålefälten',
   'hudChrome.warfareShop.buyAria': 'Köp {item} för {honor}',
@@ -9835,6 +9837,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.wrath': 'En naturpil kastad mot ett mål från avstånd, din förstavalskanon.',
   'guide.arenaPage.coliseumBody':
     'Kolosseum är rikets arena, där du möter andra spelare i rankade matcher, en mot en eller två mot två. Varje klass håller sin egen ställning, så en seger lyfter dig på den stegen inför hela riket. Rankat spel öppnar på nivå 15, och det gäller din partner också: är någon av er under den står kön stängd tills ni båda kvalificerar er. Allt spelare mot spelare bor bakom en enda knapp, märkt PvP: öppna den och välj en flik, Törnhålefälten, en mot en eller två mot två, och anmäl dig sedan ensam eller med din partner. Medan du står i kö eller är i en match förblir de andra flikarna låsta, så du kan aldrig stå i två köer samtidigt.',
+  'guide.arenaPage.coliseumBodyThreeBrackets':
+    'Kolosseum är rikets arena, där du möter andra spelare i rankade matcher: en mot en, två mot två eller tre mot tre. Varje klass håller sin egen ställning, så en seger lyfter dig på den stegen inför hela riket. Rankat spel öppnar på nivå 15, och det gäller alla du köar med: är någon i din grupp under den står kön stängd tills ni alla kvalificerar er. Allt spelare mot spelare bor bakom en enda knapp, märkt PvP: öppna den och välj en flik, Törnhålefälten, en mot en, två mot två eller tre mot tre, och anmäl dig sedan ensam eller med din grupp. Medan du står i kö eller är i en match förblir de andra flikarna låsta, så du kan aldrig stå i två köer samtidigt. En tre mot tre-match som drar ut på tiden sliter ner alla: efter halvvägs skär Utnötning varje sekund lite mer i den läkning varje kämpe tar emot, så ett dödläge kan inte vara för evigt.',
   'guide.arenaPage.coliseumHeading': 'Det askgråa colosseumet',
   'guide.arenaPage.duelsBody':
     'Utmana vilken spelare du än möter till en vänskaplig duell. Inget står på spel utom stoltheten, så det är det enklaste sättet att lära sig en matchning eller göra upp en vänskaplig tvist.',
@@ -19438,6 +19442,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Hedersköp är slutgiltiga. Återköpslistan innehåller bara det du har sålt: ett köp för mynt kan vanligen säljas tillbaka för sitt försäljningspris och hämtas tillbaka från listan om du ändrar dig igen, men krigföringsutrustning binds till själen i samma ögonblick som du köper den. Den kan därför aldrig handlas, skickas med post eller säljas tillbaka för något, och den hamnar aldrig på listan. Butiken ber dig bekräfta av den anledningen: läs föremålet innan du trycker.',
   'guide.arenaPage.rewardsBodyLossShare':
     'En rankad vinst ger Heder, valutan för spelare mot spelare, och en förlust som du spelar till slutet ger fortfarande en mindre andel, liksom oavgjort, så rankning är det enda en förlust egentligen kostar dig. Heder ska belöna riktiga matcher: att besegra samma motståndare eller samma lag igen samma dag ger inget mer, och det gör inte heller att förlora mot dem igen. En lång vinstdag betalar fullt för sin första följd av segrar, halverar sedan vad en vinst ger, halverar det igen längre in och stannar där. En match som din motståndare lämnar påverkar fortfarande din rankning men ger ingen Heder alls. Dagen tillhör riket: den rullar över vid rikets nattliga återställningstid, samma gräns där alla dagliga låsningar nollställs.',
+  'guide.arenaPage.rewardsFirstWinBody':
+    'Din första rankade seger varje dag betalar ut en bonus ovanpå, och varje klass har sin egen: en första seger i en mot en, i två mot två och i tre mot tre hämtar var sin. En förlust eller oavgjort förbrukar den aldrig.',
   'guide.arenaPage.warfareBodyStatsStay':
     'Varje krigföringsföremål har Krigföringsanfall och Krigföringsförsvar, och dessa två värden gör ingenting alls mot monster. De gäller bara när du slåss mot en annan spelare, i en duell, på arenan eller slagfältet. Där ökar Anfall skadan du orsakar och Försvar minskar skadan du tar, vart och ett upp till sitt eget tak. Varje rustningsfamilj är också ett set, och dess setbonusar är likaså krigföringsvärden eller effekter som endast fungerar mot spelare, så setbonusarna från en full hedersuppsättning betyder ingenting mot en fängelsehålechef. Föremålen har fortfarande sina vanliga egenskaper, rustning och vapenskada, och dessa fungerar överallt. Det är krigföringsvärdena och setbonusarna som tystnar mot ett monster. Ett undantag fungerar överallt: två delar av vilket som helst av dessa set gör också att skada du tar inte längre fördröjer dina besvärjelser.',
   'guide.arenaPage.warfareTradeBodyRatingSpent':

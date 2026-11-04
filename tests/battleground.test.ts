@@ -3234,12 +3234,14 @@ describe('Thornhollow Fields: the first win of the day pays a bonus', () => {
     // paid "log in, win once, log off" better than it paid playing a session.
     // A flat 20 is a judgment about what a daily hook is worth, so asserting it
     // against BATTLEGROUND_WIN_HONOR would restate the shape that was removed.
-    expect(BATTLEGROUND_FIRST_WIN_BONUS_HONOR).toBe(40);
-    // The property that actually matters: first win to repeat win is 1.33x, in
-    // line with the delve daily's ~1.6x rather than the old 3x.
+    // Owner tuning 2026-11-04 raised it to a flat 100, the same daily hook every
+    // ranked arena bracket now pays (ARENA_FIRST_WIN_BONUS_HONOR).
+    expect(BATTLEGROUND_FIRST_WIN_BONUS_HONOR).toBe(100);
+    // The property that actually matters: first win to repeat win stays under
+    // 2x (about 1.83x), well short of the old derived 3x.
     const firstWin = BATTLEGROUND_WIN_HONOR + BATTLEGROUND_FIRST_WIN_BONUS_HONOR;
-    expect(firstWin).toBe(160);
-    expect(firstWin / BATTLEGROUND_WIN_HONOR).toBeLessThan(1.5);
+    expect(firstWin).toBe(220);
+    expect(firstWin / BATTLEGROUND_WIN_HONOR).toBeLessThan(2);
   });
 
   it('pays exactly once per reset day, under its own honor reason', () => {

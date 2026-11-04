@@ -283,6 +283,7 @@ export interface SimContextPrimitives {
   readonly trades: Map<number, TradeSession>;
   arenaQueue1v1: number[];
   arenaQueue2v2: ArenaQueueUnit[];
+  arenaQueue3v3: ArenaQueueUnit[];
   arenaQueueFiesta: ArenaQueueUnit[];
   readonly arenaBusySlots: Set<number>;
   nextArenaMatchId: number;
@@ -1491,6 +1492,12 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     set arenaQueue2v2(v) {
       host.arenaQueue2v2 = v;
+    },
+    get arenaQueue3v3() {
+      return host.arenaQueue3v3;
+    },
+    set arenaQueue3v3(v) {
+      host.arenaQueue3v3 = v;
     },
     get arenaQueueFiesta() {
       return host.arenaQueueFiesta;

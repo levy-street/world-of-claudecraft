@@ -5143,6 +5143,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Otwórz Profesje, aby osadzić to na narzędziu zbierackim.',
   'hudChrome.pvp.bracket1v1': '1v1',
   'hudChrome.pvp.bracket2v2': '2v2',
+  'hudChrome.pvp.bracket3v3': '3v3',
   'hudChrome.pvp.launcherTitle': 'PvP',
   'hudChrome.pvp.mobileLabel': 'PvP',
   'hudChrome.townFocus.respecCostFree': 'Za darmo',
@@ -5159,6 +5160,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.reasons.battlegroundComplete': 'Stoczono bitwę na Polach Ciernistej Kotliny',
   'hudChrome.warfare.reasons.battlegroundFirstWin':
     'Pierwsze dzisiejsze zwycięstwo na Polach Ciernistej Kotliny',
+  'hudChrome.warfare.reasons.arenaFirstWin':
+    'Pierwsze dzisiejsze zwycięstwo na arenie w tej kategorii',
   'hudChrome.warfare.reasons.battlegroundKill': 'Honorowe zabójstwo',
   'hudChrome.warfare.reasons.battlegroundWin': 'Zwycięstwo na Polach Ciernistej Kotliny',
   'hudChrome.warfareShop.buyAria': 'Kup {item} za {honor}',
@@ -9997,6 +10000,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.wrath': 'Pocisk natury ciskany w cel z dystansu, twój podstawowy atak.',
   'guide.arenaPage.coliseumBody':
     'Koloseum to arena królestwa, gdzie mierzysz się z innymi graczami w rankingowych pojedynkach, jeden na jednego albo dwóch na dwóch. Każda kategoria trzyma własną tabelę, więc zwycięstwo podnosi cię po tej drabinie na oczach całego królestwa. Gra rankingowa otwiera się na 15. poziomie i dotyczy to również twojego partnera: jeśli któreś z was jest poniżej, kolejka pozostaje zamknięta, dopóki oboje nie spełnicie wymogu. Całe gracz kontra gracz mieszka za jednym przyciskiem oznaczonym PvP: otwórz go i wybierz zakładkę, Pola Ciernistej Kotliny, jeden na jednego albo dwóch na dwóch, a potem zgłoś się sam albo ze swoim partnerem. Dopóki jesteś w kolejce albo w pojedynku, pozostałe zakładki są zablokowane, więc nigdy nie możesz stać w dwóch kolejkach naraz.',
+  'guide.arenaPage.coliseumBodyThreeBrackets':
+    'Koloseum to arena królestwa, gdzie mierzysz się z innymi graczami w rankingowych pojedynkach: jeden na jednego, dwóch na dwóch albo trzech na trzech. Każda kategoria trzyma własną tabelę, więc zwycięstwo podnosi cię po tej drabinie na oczach całego królestwa. Gra rankingowa otwiera się na 15. poziomie i dotyczy to każdego, z kim się zapisujesz: jeśli ktokolwiek z twojej drużyny jest poniżej, kolejka pozostaje zamknięta, dopóki wszyscy nie spełnicie wymogu. Całe gracz kontra gracz mieszka za jednym przyciskiem oznaczonym PvP: otwórz go i wybierz zakładkę, Pola Ciernistej Kotliny, jeden na jednego, dwóch na dwóch albo trzech na trzech, a potem zgłoś się sam albo ze swoją drużyną. Dopóki jesteś w kolejce albo w pojedynku, pozostałe zakładki są zablokowane, więc nigdy nie możesz stać w dwóch kolejkach naraz. Przeciągający się pojedynek trzech na trzech wyczerpuje wszystkich: po jego połowie Wyniszczenie co sekundę odbiera nieco więcej leczenia, które otrzymuje każdy wojownik, więc pat nie może trwać wiecznie.',
   'guide.arenaPage.coliseumHeading': 'Popielne Koloseum',
   'guide.arenaPage.duelsBody':
     'Wyzwij dowolnego napotkanego gracza na przyjacielski pojedynek. Stawką jest tylko duma, więc to najprostszy sposób, by poznać starcie lub rozstrzygnąć przyjacielski spór.',
@@ -19523,6 +19528,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Zakupy za honor są ostateczne. Lista odkupienia zawiera tylko to, co sprzedasz: zakup za monety zwykle można sprzedać po cenie sprzedaży i odzyskać z tej listy, jeśli znów zmienisz zdanie, ale sprzęt Wojny wiąże się z duszą natychmiast po zakupie, więc nie można go wymienić, wysłać pocztą ani odkupić za żadną cenę i nigdy nie trafia na tę listę. Sklep prosi o potwierdzenie z tego powodu: przeczytaj opis przed kliknięciem.',
   'guide.arenaPage.rewardsBodyLossShare':
     'Zwycięstwo rankingowe daje Honor, walutę gracz kontra gracz, a porażka rozegrana do końca nadal daje jego mniejszą część, podobnie jak remis, więc jedynym prawdziwym kosztem porażki jest ranking. Honor ma nagradzać prawdziwe mecze: ponowne pokonanie tego samego przeciwnika albo tej samej drużyny tego samego dnia nie daje nic więcej, podobnie jak ponowna porażka z nimi. Długi dzień zwycięstw płaci pełną stawkę za pierwszy ciąg wygranych, potem ją zmniejsza o połowę, a jeszcze głębiej zmniejsza ponownie i pozostaje na tym poziomie. Mecz poddany przez przeciwnika nadal zmienia twój ranking, ale nie daje w ogóle Honoru. Ten dzień należy do królestwa i kończy się o nocnej godzinie resetu, tej samej granicy, przy której czyszczą się wszystkie dzienne blokady.',
+  'guide.arenaPage.rewardsFirstWinBody':
+    'Twoje pierwsze rankingowe zwycięstwo każdego dnia wypłaca dodatkową premię, a każda kategoria ma własną: pierwsze zwycięstwo jeden na jednego, dwóch na dwóch i trzech na trzech odbiera każde po jednej. Porażka ani remis nigdy jej nie zużywają.',
   'guide.arenaPage.warfareBodyStatsStay':
     'Każda część sprzętu Wojny ma Ofensywę wojenną i ocenę Obrony wojennej, a te dwie oceny nie działają w ogóle przeciw potworom. Działają wyłącznie podczas walki z innym graczem, w pojedynku, na arenie albo na polu bitwy, gdzie Ofensywa zwiększa zadawane obrażenia, a Obrona zmniejsza otrzymywane, każda do własnego limitu. Każda rodzina pancerza jest także zestawem, a jej premie zestawu również są ocenami Wojny lub efektami działającymi wyłącznie przeciw graczom, więc pełna premia zestawu za honor nie ma znaczenia przeciw bossowi lochu. Same części nadal mają zwykłe statystyki, pancerz i obrażenia broni, które działają wszędzie; przeciw potworowi wyciszają się tylko oceny Wojny i premie zestawu. Jeden wyjątek działa wszędzie: dwie części dowolnego z tych zestawów sprawiają też, że otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
   'guide.arenaPage.warfareTradeBodyRatingSpent':

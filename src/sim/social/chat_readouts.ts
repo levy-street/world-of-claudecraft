@@ -152,7 +152,7 @@ export function arenaReadout(meta: PlayerMeta): string {
     const pct = Math.round((wins / played) * 100);
     return `${label} Rating ${rating} - ${wins} wins, ${losses} losses, ${draws} draws (${pct}% win rate)`;
   };
-  return `Arena: ${part('1v1', meta.arenaRating, meta.arenaWins, meta.arenaLosses, meta.arenaDraws)}. ${part('2v2', meta.arena2v2Rating, meta.arena2v2Wins, meta.arena2v2Losses, meta.arena2v2Draws)}.`;
+  return `Arena: ${part('1v1', meta.arenaRating, meta.arenaWins, meta.arenaLosses, meta.arenaDraws)}. ${part('2v2', meta.arena2v2Rating, meta.arena2v2Wins, meta.arena2v2Losses, meta.arena2v2Draws)}. ${part('3v3', meta.arena3v3Rating, meta.arena3v3Wins, meta.arena3v3Losses, meta.arena3v3Draws)}.`;
 }
 export function buybackReadout(meta: PlayerMeta): string {
   const slots = meta.vendorBuyback.filter((s) => ITEMS[s.itemId] && s.count > 0);

@@ -3906,6 +3906,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.partyFrames.showPets': '显示宠物',
   'hudChrome.pvp.bracket1v1': '1v1',
   'hudChrome.pvp.bracket2v2': '2v2',
+  'hudChrome.pvp.bracket3v3': '3v3',
   'hudChrome.pvp.launcherTitle': 'PvP',
   'hudChrome.warfareShop.buyAria': '以 {honor} 购买 {item}',
   'itemUi.market.saleBuyer': '售予{buyer}',
@@ -5219,6 +5220,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.reasons.fiestaWin': '嘉年华胜利',
   'hudChrome.warfare.reasons.battlegroundWin': '荆谷原野胜利',
   'hudChrome.warfare.reasons.battlegroundFirstWin': '荆谷原野每日首胜',
+  'hudChrome.warfare.reasons.arenaFirstWin': '该组别竞技场每日首胜',
   'hudChrome.warfare.reasons.battlegroundComplete': '荆谷原野参战',
   'hudChrome.warfare.reasons.battlegroundKill': '荣誉击杀',
   'hudChrome.warfare.reasons.battlegroundAssist': '助攻击杀',
@@ -11188,6 +11190,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.wrath': '从远处向目标投出一道自然箭矢，是你的常用输出。',
   'guide.arenaPage.coliseumBody':
     '斗兽场是国度的竞技场，你在那里与其他玩家进行评级比赛，一对一或二对二。每个组别各自保有自己的排名，因此一场胜利会让你在那道阶梯上攀升，供整个国度观看。评级玩法在 15 级开启，这一条对你的搭档同样适用：只要你们其中一人未达标，队列就保持关闭，直到你们两人都符合条件为止。整个玩家对战玩家都藏在一个标着 PvP 的按钮之后：打开它并选一个标签页，荆谷原野、一对一或二对二，然后独自或与搭档一同报名。你在排队或比赛期间，其余标签页都保持锁定，因此你绝不可能同时身处两个队列。',
+  'guide.arenaPage.coliseumBodyThreeBrackets':
+    '斗兽场是国度的竞技场，你在那里与其他玩家进行评级比赛：一对一、二对二或三对三。每个组别各自保有自己的排名，因此一场胜利会让你在那道阶梯上攀升，供整个国度观看。评级玩法在 15 级开启，这一条对与你一同排队的每个人都适用：只要队伍中有人未达标，队列就保持关闭，直到所有人都符合条件为止。整个玩家对战玩家都藏在一个标着 PvP 的按钮之后：打开它并选一个标签页，荆谷原野、一对一、二对二或三对三，然后独自或与队伍一同报名。你在排队或比赛期间，其余标签页都保持锁定，因此你绝不可能同时身处两个队列。拖得太久的三对三比赛会磨垮所有人：过了半场之后，消耗会每秒多削减一点每名战士受到的治疗，因此僵局不可能永远持续。',
   'guide.arenaPage.coliseumHeading': '灰烬角斗场',
   'guide.arenaPage.duelsBody':
     '可以向你遇到的任何玩家发起一场友好的决斗。除了荣誉，没有任何东西被押上，因此这是了解某种对局，或友好地一较高下的最简单方式。',
@@ -20669,6 +20673,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '荣誉购买是最终的。回购列表里只会有你卖出去的东西：用钱币买下的东西通常可以按出售价格卖回给商人，若你再次改变主意，还能从那份列表里把它买回来；但战争套装在你买下的那一刻便已灵魂绑定，因此它再也无法交易、邮寄，或以任何形式退回，也永远不会进入那份列表。商店正因如此才要你确认一次：按下之前，请把那件装备看清楚。',
   'guide.arenaPage.rewardsBodyLossShare':
     '一场排位胜利会发放荣誉，也就是玩家对战的货币，而一场打到终场的落败仍会发放其中较小的一份，平局亦然，因此评分才是落败真正让你付出的唯一代价。荣誉意在奖励真刀真枪的对局：同一天里再次击败同一个对手或同一支队伍不会再有额外收益（再次败给他们也一样），连胜的一天里开头的若干场胜利照旧足额发放，此后每场胜利只给一半，打得更久后再减半，并就此稳住，而对手认输的比赛虽然照样影响评分，却完全不给荣誉。这一天属于国度自己：它在国度的夜间重置时刻翻篇，也正是所有每日锁定一并解除的那道界线。',
+  'guide.arenaPage.rewardsFirstWinBody':
+    '你每天的首场评级胜利会额外支付一笔奖励，而且每个组别各有一笔：一对一、二对二和三对三的首场胜利各自领取一笔。失败或平局永远不会消耗它。',
   'guide.arenaPage.warfareBodyStatsStay':
     '每一件战争装备都带有战争进攻等级与战争防御等级，而这两项等级对怪物毫无作用。它们只在你与其他玩家交手时生效，无论是决斗、竞技场还是战场：进攻提高你造成的伤害，防御削减你受到的伤害，各自都有自己的上限。每个护甲系列同时也是一套套装，它的套装效果同样是只对玩家生效的战争等级或效果，因此一整身荣誉装备的套装效果在地下城首领面前一文不值。装备本身仍带有普通属性、护甲与武器伤害，这些在任何地方都照常生效；面对怪物时哑火的，只是战争等级与套装效果。但有一个例外在任何地方都有效：穿戴其中任意一套的两件后，受到伤害不再延迟你的施法。',
   'guide.arenaPage.warfareTradeBodyRatingSpent':

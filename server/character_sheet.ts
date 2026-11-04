@@ -473,6 +473,18 @@ function arenaBrackets(state: CharacterState): Record<string, SheetArenaBracket>
       draws: Number(state.arena2v2Draws ?? 0),
     };
   }
+  if (
+    state.arena3v3Rating !== undefined ||
+    state.arena3v3Wins !== undefined ||
+    state.arena3v3Losses !== undefined
+  ) {
+    out['3v3'] = {
+      rating: Number(state.arena3v3Rating ?? 0),
+      wins: Number(state.arena3v3Wins ?? 0),
+      losses: Number(state.arena3v3Losses ?? 0),
+      draws: Number(state.arena3v3Draws ?? 0),
+    };
+  }
   return out;
 }
 

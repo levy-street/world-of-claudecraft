@@ -5101,6 +5101,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Otevři Profese a vlož ho do sběračského nástroje.',
   'hudChrome.pvp.bracket1v1': '1v1',
   'hudChrome.pvp.bracket2v2': '2v2',
+  'hudChrome.pvp.bracket3v3': '3v3',
   'hudChrome.pvp.launcherTitle': 'PvP',
   'hudChrome.pvp.mobileLabel': 'PvP',
   'hudChrome.townFocus.respecCostFree': 'Zdarma',
@@ -5116,6 +5117,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.reasons.battlegroundAssist': 'asistence u zabití',
   'hudChrome.warfare.reasons.battlegroundComplete': 'odehraná bitva o Thornhollowská pole',
   'hudChrome.warfare.reasons.battlegroundFirstWin': 'první dnešní výhra v Thornhollowských polích',
+  'hudChrome.warfare.reasons.arenaFirstWin': 'první dnešní výhra v aréně v této kategorii',
   'hudChrome.warfare.reasons.battlegroundKill': 'čestné zabití',
   'hudChrome.warfare.reasons.battlegroundWin': 'vítězství v Thornhollowských polích',
   'hudChrome.warfareShop.buyAria': 'Koupit {item} za {honor}',
@@ -12905,6 +12907,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.coliseumHeading': 'Popelavé koloseum',
   'guide.arenaPage.coliseumBody':
     'Koloseum je aréna říše, kde se v hodnocených zápasech utkáváš s ostatními hráči, jeden na jednoho nebo dva na dva. Každá kategorie si drží vlastní pořadí, takže výhra tě po tom žebříku zvedne před očima celé říše. Hodnocená hra se otevírá na úrovni 15 a platí to i pro tvého partnera: pokud je někdo z vás níž, fronta zůstane zavřená, dokud nesplníte oba. Celé hráč proti hráči bydlí za jediným tlačítkem označeným PvP: otevři ho a vyber záložku, Thornhollowská pole, jeden na jednoho nebo dva na dva, a pak se přihlas sám nebo se svým partnerem. Dokud jsi ve frontě nebo v zápase, ostatní záložky zůstávají zamčené, takže nikdy nemůžeš být ve dvou frontách naráz.',
+  'guide.arenaPage.coliseumBodyThreeBrackets':
+    'Koloseum je aréna říše, kde se v hodnocených zápasech utkáváš s ostatními hráči: jeden na jednoho, dva na dva nebo tři na tři. Každá kategorie si drží vlastní pořadí, takže výhra tě po tom žebříku zvedne před očima celé říše. Hodnocená hra se otevírá na úrovni 15 a platí to pro každého, s kým se řadíš: pokud je kdokoli z tvé skupiny níž, fronta zůstane zavřená, dokud nesplníte všichni. Celé hráč proti hráči bydlí za jediným tlačítkem označeným PvP: otevři ho a vyber záložku, Thornhollowská pole, jeden na jednoho, dva na dva nebo tři na tři, a pak se přihlas sám nebo se svou skupinou. Dokud jsi ve frontě nebo v zápase, ostatní záložky zůstávají zamčené, takže nikdy nemůžeš být ve dvou frontách naráz. Zápas tři na tři, který se táhne, vyčerpá všechny: po jeho polovině Opotřebení každou sekundou o něco víc ubírá léčení, které každý bojovník přijímá, takže pat nemůže trvat věčně.',
   'guide.arenaPage.ladderHeading': 'Stoupání po žebříku',
   'guide.arenaPage.ladderBody':
     'Hodnocené hraní sleduje tvoje postavení v čase. Podívej se na žebříček, kde sedíš a kdo drží vrchol světa.',
@@ -19339,6 +19343,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Nákupy za čest jsou konečné. Seznam zpětného odkupu obsahuje jen to, co jsi prodal(a): nákup za mince lze obvykle prodat zpět za prodejní cenu a znovu získat ze seznamu, když si to rozmyslíš, ale Válečnická výbava se v okamžiku nákupu váže na duši, takže ji nelze obchodovat, posílat poštou ani za cokoli prodat zpět a do seznamu se nikdy nedostane. Obchod proto žádá potvrzení: před stisknutím si kus přečti.',
   'guide.arenaPage.rewardsBodyLossShare':
     'Hodnocené vítězství vyplácí Čest, měnu hráč proti hráči, a dohraný zápas, který prohraješ, stále vyplatí její menší podíl, stejně jako remíza, takže prohra tě doopravdy stojí jen hodnocení. Čest má odměňovat skutečné zápasy: opakované poražení stejného soupeře nebo týmu ve stejný den už nic dalšího nevyplatí a stejně tak další prohra s nimi. Dlouhý vítězný den platí první sérii výher celou odměnou, potom ji půlí, dál ji půlí znovu a na této hodnotě zůstane. Zápas, který soupeř vzdá, ti sice posune hodnocení, ale nevyplatí vůbec žádnou Čest. Den patří vlastnímu času říše a přetočí se při nočním resetu říše, stejné hranici, kdy se mažou všechny denní uzamčení.',
+  'guide.arenaPage.rewardsFirstWinBody':
+    'Tvoje první hodnocená výhra každého dne vyplácí navíc bonus a každá kategorie má svůj vlastní: první výhra jeden na jednoho, dva na dva i tři na tři si každá jeden vybere. Prohra ani remíza ho nikdy nespotřebuje.',
   'guide.arenaPage.warfareBodyStatsStay':
     'Každý kus Válečnictví nese útočné a obranné hodnocení Válečnictví a tato dvě hodnocení proti nestvůrám nedělají vůbec nic. Platí jen při boji s jiným hráčem, v souboji, aréně nebo na bojišti, kde útok přidává k tvému způsobenému poškození a obrana snižuje poškození, které utržíš, vždy až ke své vlastní hranici. Každá rodina zbroje je také sada a její bonusy jsou rovněž hodnocení Válečnictví nebo účinky fungující jen proti hráčům, takže bonusy celé čestné výbavy se proti bossovi dungeonu nepočítají. Samotné kusy stále nesou běžné statistiky, zbroj a poškození zbraně a ty fungují všude; proti nestvůře mlčí jen hodnocení Válečnictví a bonusy sady. Jedna výjimka platí všude: dva kusy kterékoli z těchto sad navíc zajistí, že utržené poškození nezpožďuje sesílání kouzel.',
   'guide.arenaPage.warfareTradeBodyRatingSpent':

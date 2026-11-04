@@ -100,9 +100,12 @@ const LEADERBOARD_DEEDS_BOARD = 'deeds';
 export const LEADERBOARD_LEGACY_LIMIT_MAX = LEADERBOARD_MAX;
 /** How many arena ranks the public ladder returns (mirrors the legacy fixed arg). */
 export const ARENA_LEADERBOARD_LIMIT = 20;
-/** The ?format value that selects the 2v2 arena ladder; anything else is 1v1. */
+/** The ?format values that select a team arena ladder; anything else is 1v1. */
 const ARENA_FORMAT_2V2 = '2v2';
+const ARENA_FORMAT_3V3 = '3v3';
 const ARENA_FORMAT_DEFAULT = '1v1';
+/** The ranked brackets the public ladder serves. */
+export type ArenaLadderFormat = '1v1' | '2v2' | '3v3';
 /** Max character-search results returned per query (mirrors the legacy fixed arg). */
 export const SEARCH_RESULT_LIMIT = 8;
 
@@ -158,7 +161,7 @@ export interface LeaderboardRuntime {
   deedsSelfRank(accountId: number): Promise<DeedsLeaderboardSelf | null>;
   /** Cache-fronted arena ladder read (main.ts getArenaLeaderboard): the leader
    *  rows for ONE format; the handler re-attaches the { format, leaders } envelope. */
-  getArenaLeaderboard(format: '1v1' | '2v2'): Promise<ArenaLeaderRow[]>;
+  getArenaLeaderboard(format: ArenaLadderFormat): Promise<ArenaLeaderRow[]>;
   /** Cache-fronted accounts-created count for project-stats (main.ts
    *  getAccountsCreatedCount): the moderation-invariant COUNT(*), its own 60s TTL. */
   getAccountsCreatedCount(): Promise<number>;
@@ -242,12 +245,14 @@ export function decodeLegacyLimit(raw: string | undefined): number {
   );
 }
 
-/** ?format=2v2 -> '2v2'; anything else (incl. absent) -> 1v1. The public ladder
- *  only ever serves these two formats, so the return narrows below the wider
- *  ArenaFormat union: an unrecognized ?format value can never mint a third arena
- *  cache slot on either dispatch arm. */
-export function decodeArenaFormat(raw: string | undefined): '1v1' | '2v2' {
-  return raw === ARENA_FORMAT_2V2 ? ARENA_FORMAT_2V2 : ARENA_FORMAT_DEFAULT;
+/** ?format=2v2 -> '2v2', ?format=3v3 -> '3v3'; anything else (incl. absent) ->
+ *  1v1. The public ladder only ever serves the three ranked brackets, so the
+ *  return narrows below the wider ArenaFormat union: an unrecognized ?format value
+ *  can never mint a fourth arena cache slot on either dispatch arm. */
+export function decodeArenaFormat(raw: string | undefined): ArenaLadderFormat {
+  if (raw === ARENA_FORMAT_2V2) return ARENA_FORMAT_2V2;
+  if (raw === ARENA_FORMAT_3V3) return ARENA_FORMAT_3V3;
+  return ARENA_FORMAT_DEFAULT;
 }
 
 /** ?limit=N for the releases feed, clamped to [1, max]. */

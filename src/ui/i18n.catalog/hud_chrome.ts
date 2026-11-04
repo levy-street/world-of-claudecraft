@@ -2718,6 +2718,7 @@ export const hudChromeStrings = {
     mobileLabel: 'PvP',
     bracket1v1: '1v1',
     bracket2v2: '2v2',
+    bracket3v3: '3v3',
   },
   bg: {
     title: 'Thornhollow Fields',
@@ -3865,6 +3866,9 @@ export const hudChromeStrings = {
       fiestaWin: 'Fiesta victory',
       battlegroundWin: 'Thornhollow Fields victory',
       battlegroundFirstWin: 'first Thornhollow Fields win today',
+      // The once-a-day bonus each ranked bracket (1v1, 2v2, 3v3) pays on its own
+      // first win (src/sim/pvp/honor.ts ARENA_FIRST_WIN_BONUS_HONOR).
+      arenaFirstWin: 'first arena win today in this bracket',
       battlegroundComplete: 'Thornhollow Fields battle fought',
       battlegroundKill: 'honorable kill',
       battlegroundAssist: 'killing blow assisted',

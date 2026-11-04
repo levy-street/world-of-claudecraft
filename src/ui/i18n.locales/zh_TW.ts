@@ -3906,6 +3906,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.partyFrames.showPets': '顯示寵物',
   'hudChrome.pvp.bracket1v1': '1v1',
   'hudChrome.pvp.bracket2v2': '2v2',
+  'hudChrome.pvp.bracket3v3': '3v3',
   'hudChrome.pvp.launcherTitle': 'PvP',
   'hudChrome.warfareShop.buyAria': '以 {honor} 購買 {item}',
   'itemUi.market.saleBuyer': '售予 {buyer}',
@@ -5219,6 +5220,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.reasons.fiestaWin': '嘉年華勝利',
   'hudChrome.warfare.reasons.battlegroundWin': '荊谷原野勝利',
   'hudChrome.warfare.reasons.battlegroundFirstWin': '荊谷原野每日首勝',
+  'hudChrome.warfare.reasons.arenaFirstWin': '該組別競技場每日首勝',
   'hudChrome.warfare.reasons.battlegroundComplete': '荊谷原野參戰',
   'hudChrome.warfare.reasons.battlegroundKill': '榮譽擊殺',
   'hudChrome.warfare.reasons.battlegroundAssist': '助攻擊殺',
@@ -11201,6 +11203,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.wrath': '從遠處朝目標擲出一道自然箭矢，是你慣用的核彈。',
   'guide.arenaPage.coliseumBody':
     '鬥獸場是國度的競技場，你在那裡與其他玩家進行評級比賽，一對一或二對二。每個組別各自保有自己的排名，因此一場勝利會讓你在那道階梯上攀升，供整個國度觀看。評級玩法在 15 級開啟，這一條對你的隊友同樣適用：只要你們其中一人未達標，佇列就保持關閉，直到你們兩人都符合條件為止。整個玩家對戰玩家都藏在一個標著 PvP 的按鈕之後：開啟它並選一個分頁，荊谷原野、一對一或二對二，然後獨自或與隊友一同報名。你在排隊或比賽期間，其餘分頁都保持鎖定，因此你絕不可能同時身處兩個佇列。',
+  'guide.arenaPage.coliseumBodyThreeBrackets':
+    '鬥獸場是國度的競技場，你在那裡與其他玩家進行評級比賽：一對一、二對二或三對三。每個組別各自保有自己的排名，因此一場勝利會讓你在那道階梯上攀升，供整個國度觀看。評級玩法在 15 級開啟，這一條對與你一同排隊的每個人都適用：只要隊伍中有人未達標，佇列就保持關閉，直到所有人都符合條件為止。整個玩家對戰玩家都藏在一個標著 PvP 的按鈕之後：開啟它並選一個分頁，荊谷原野、一對一、二對二或三對三，然後獨自或與隊伍一同報名。你在排隊或比賽期間，其餘分頁都保持鎖定，因此你絕不可能同時身處兩個佇列。拖得太久的三對三比賽會磨垮所有人：過了半場之後，消耗會每秒多削減一點每名戰士受到的治療，因此僵局不可能永遠持續。',
   'guide.arenaPage.coliseumHeading': '灰燼鬥獸場',
   'guide.arenaPage.duelsBody':
     '向你遇到的任何玩家發起一場友誼決鬥。賭上的只有顏面，所以這是學習對戰組合或解決友好爭論最簡單的方式。',
@@ -20676,6 +20680,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '榮譽購買一經完成便無法反悔。買回清單裡只會有你賣出過的東西：以錢幣買下的東西通常還能按出售價格賣回，若你再次改變心意，也能從那份清單裡把它取回；但戰爭套裝在你買下的那一刻便靈魂綁定，因此它永遠無法交易、郵寄，也無法賣回換取任何東西，也就永遠不會出現在那份清單裡。商店會因此請你再確認一次：按下去之前，先把那件裝備看清楚。',
   'guide.arenaPage.rewardsBodyLossShare':
     '一場排名勝利會發放榮譽這種玩家對戰貨幣，而一場你打到最後的落敗仍會發放其中較小的一份，平手亦然，因此落敗真正讓你付出的代價只有評分。榮譽的用意是獎勵真正的對戰：同一天內再次擊敗同一位對手或同一支隊伍不會再發放（再次敗給他們也一樣），連勝的一天裡開頭的若干場勝利照舊足額發放，此後每場勝利只給一半，打得更久之後再減半，並就此穩住，而對手棄賽的比賽雖然仍會牽動你的評分，卻完全不發榮譽。這個「一天」是國度自己的一天：它在國度自己的夜間重置時刻換日，而那正是所有每日鎖定一併解除的同一道界線。',
+  'guide.arenaPage.rewardsFirstWinBody':
+    '你每天的首場評級勝利會額外支付一筆獎勵，而且每個組別各有一筆：一對一、二對二和三對三的首場勝利各自領取一筆。失敗或平手永遠不會消耗它。',
   'guide.arenaPage.warfareBodyStatsStay':
     '每一件戰爭裝備都帶有戰爭攻擊等級與戰爭防禦等級，而這兩項數值對怪物完全沒有作用。它們只在你與其他玩家交手時生效，無論是決鬥、競技場，還是戰場：攻擊等級會增加你造成的傷害，防禦等級則削減你承受的傷害，兩者各有自己的上限。每個護甲系列同時也是一套套裝，而它的套裝效果同樣是戰爭等級，或是只對玩家生效的效果，因此一身榮譽裝備的套裝效果打起地城首領來一文不值。裝備本身仍帶有一般的屬性、護甲值與武器傷害，而這些在任何地方都有效；面對怪物時沉寂下來的，是戰爭等級與套裝效果。但有一個例外在任何地方都有效：穿戴其中任一套的兩件後，受到傷害不再延遲你的施法。',
   'guide.arenaPage.warfareTradeBodyRatingSpent':

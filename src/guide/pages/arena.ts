@@ -2,8 +2,8 @@
 // ranked brackets, what a match pays, and the Honor currency with the Warfare gear it
 // buys. Concepts only, no ratings math, honor amounts, prices, item budgets, or
 // matchmaking internals. (The Fiesta and Protect Yumi modes are retired from the menu,
-// so the page no longer documents them; PVP_TABS is exactly Thornhollow Fields, 1v1
-// and 2v2, which is why the copy names one button with three tabs.)
+// so the page no longer documents them; PVP_TABS is Thornhollow Fields, 1v1, 2v2 and
+// 3v3 plus the World PvP flag tab, and the copy names the four queue tabs.)
 
 import { esc } from '../../ui/esc';
 import { t } from '../../ui/i18n';
@@ -18,7 +18,12 @@ export const arena: GuidePage = {
       <article class="guide-article guide-arena">
         ${pageHeader('guide.arenaPage.heading', 'guide.arenaPage.intro')}
         ${section('guide.arenaPage.duelsHeading', `<p>${esc(t('guide.arenaPage.duelsBody'))}</p>`)}
-        ${section('guide.arenaPage.coliseumHeading', `<p>${esc(t('guide.arenaPage.coliseumBody'))}</p>`)}
+        ${section(
+          'guide.arenaPage.coliseumHeading',
+          // Retired and re-keyed with the 3v3 bracket (2026-11-04): coliseumBody
+          // named two brackets and three tabs (src/ui/pvp_tabs_view.ts PVP_TABS).
+          p('guide.arenaPage.coliseumBodyThreeBrackets'),
+        )}
         ${section(
           'guide.arenaPage.rewardsHeading',
           // Retired and re-keyed at Phase 20 (the wiki completeness audit,
@@ -26,7 +31,7 @@ export const arena: GuidePage = {
           // rolls on its own clock. A played-out loss and a draw pay
           // RANKED_ARENA_LOSS_HONOR, and the day is ctx.resetDay, the realm's
           // nightly reset (src/sim/pvp/honor.ts).
-          p('guide.arenaPage.rewardsBodyLossShare'),
+          p('guide.arenaPage.rewardsBodyLossShare') + p('guide.arenaPage.rewardsFirstWinBody'),
         )}
         ${section('guide.arenaPage.ladderHeading', `<p>${esc(t('guide.arenaPage.ladderBody'))}</p>`)}
         ${section(

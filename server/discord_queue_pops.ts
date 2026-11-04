@@ -174,6 +174,7 @@ export interface QueuedPidsSource {
   bgQueue: readonly { pids: readonly number[] }[];
   arenaQueue1v1: readonly number[];
   arenaQueue2v2: readonly { pids: readonly number[] }[];
+  arenaQueue3v3: readonly { pids: readonly number[] }[];
   arenaQueueFiesta: readonly { pids: readonly number[] }[];
   arenaQueueYumi3: readonly { pids: readonly number[] }[];
   arenaQueueYumi5: readonly { pids: readonly number[] }[];
@@ -185,6 +186,7 @@ export function queuedPidsOf(ctx: QueuedPidsSource): number[] {
   for (const list of [
     ctx.bgQueue,
     ctx.arenaQueue2v2,
+    ctx.arenaQueue3v3,
     ctx.arenaQueueFiesta,
     ctx.arenaQueueYumi3,
     ctx.arenaQueueYumi5,

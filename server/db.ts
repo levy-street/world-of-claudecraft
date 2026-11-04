@@ -3599,25 +3599,24 @@ export async function topArenaRatings(
   limit = 20,
   format: ArenaFormat = '1v1',
 ): Promise<ArenaLeaderRow[]> {
-  const fmt: ArenaFormat = format === '2v2' ? '2v2' : '1v1';
-  const ratingExpr =
-    fmt === '2v2'
-      ? "COALESCE((state->>'arena2v2Rating')::int, 1500)"
-      : "COALESCE((state->>'arena1v1Rating')::int, (state->>'arenaRating')::int, 1500)";
-  const winsExpr =
-    fmt === '2v2'
-      ? "COALESCE((state->>'arena2v2Wins')::int, 0)"
-      : "COALESCE((state->>'arena1v1Wins')::int, (state->>'arenaWins')::int, 0)";
-  const lossesExpr =
-    fmt === '2v2'
-      ? "COALESCE((state->>'arena2v2Losses')::int, 0)"
-      : "COALESCE((state->>'arena1v1Losses')::int, (state->>'arenaLosses')::int, 0)";
+  const fmt: ArenaFormat = format === '2v2' || format === '3v3' ? format : '1v1';
+  // 2v2 and 3v3 have no legacy alias (their fields were always bracket-named);
+  // only 1v1 falls back to the pre-bracket arenaRating/Wins/Losses fields.
+  const team = fmt === '1v1' ? null : fmt;
+  const ratingExpr = team
+    ? `COALESCE((state->>'arena${team}Rating')::int, 1500)`
+    : "COALESCE((state->>'arena1v1Rating')::int, (state->>'arenaRating')::int, 1500)";
+  const winsExpr = team
+    ? `COALESCE((state->>'arena${team}Wins')::int, 0)`
+    : "COALESCE((state->>'arena1v1Wins')::int, (state->>'arenaWins')::int, 0)";
+  const lossesExpr = team
+    ? `COALESCE((state->>'arena${team}Losses')::int, 0)`
+    : "COALESCE((state->>'arena1v1Losses')::int, (state->>'arenaLosses')::int, 0)";
   // No legacy alias: draws were never persisted before the W-L-D change, so an
   // untouched row correctly reads 0 rather than borrowing another field.
-  const drawsExpr =
-    fmt === '2v2'
-      ? "COALESCE((state->>'arena2v2Draws')::int, 0)"
-      : "COALESCE((state->>'arena1v1Draws')::int, 0)";
+  const drawsExpr = team
+    ? `COALESCE((state->>'arena${team}Draws')::int, 0)`
+    : "COALESCE((state->>'arena1v1Draws')::int, 0)";
   const res = await runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS, (query) =>
     query(
       `SELECT name, class, level,

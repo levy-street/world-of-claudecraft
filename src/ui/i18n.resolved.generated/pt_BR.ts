@@ -2650,7 +2650,8 @@ export const pt_BR: EnTranslations = {
       "launcherTitle": "JcJ",
       "mobileLabel": "JcJ",
       "bracket1v1": "1v1",
-      "bracket2v2": "2v2"
+      "bracket2v2": "2v2",
+      "bracket3v3": "3v3"
     },
     "bg": {
       "title": "Campos de Thornhollow",
@@ -3435,6 +3436,7 @@ export const pt_BR: EnTranslations = {
         "fiestaWin": "Vitória na Fiesta",
         "battlegroundWin": "vitória em Campos de Thornhollow",
         "battlegroundFirstWin": "primeira vitória em Campos de Thornhollow hoje",
+        "arenaFirstWin": "primeira vitória na arena hoje nesta categoria",
         "battlegroundComplete": "batalha de Campos de Thornhollow disputada",
         "battlegroundKill": "abate honroso",
         "battlegroundAssist": "assistência em abate",
@@ -10532,11 +10534,13 @@ export const pt_BR: EnTranslations = {
       "duelsBody": "Desafie qualquer jogador que encontrar para um duelo amistoso. Nada está em jogo além do orgulho, então é a forma mais fácil de aprender um confronto ou resolver uma discussão amigável.",
       "coliseumHeading": "O Coliseu das Cinzas",
       "coliseumBody": "O Coliseu é a arena do reino, onde você enfrenta outros jogadores em partidas ranqueadas, um contra um ou dois contra dois. Cada categoria mantém sua própria classificação, então uma vitória eleva você naquela escada à vista de todo o reino. O jogo ranqueado abre no nível 15, e isso vale para seu parceiro também: se um de vocês estiver abaixo, a fila continua fechada até que ambos se qualifiquem. Todo o jogador contra jogador vive atrás de um único botão, marcado JxJ: abra-o e escolha uma aba, Campos de Thornhollow, um contra um ou dois contra dois, e então inscreva-se sozinho ou com seu parceiro. Enquanto você está na fila ou numa partida, as outras abas ficam travadas, então você nunca pode estar em duas filas ao mesmo tempo.",
+      "coliseumBodyThreeBrackets": "O Coliseu é a arena do reino, onde você enfrenta outros jogadores em partidas ranqueadas: um contra um, dois contra dois ou três contra três. Cada categoria mantém sua própria classificação, então uma vitória eleva você naquela escada à vista de todo o reino. O jogo ranqueado abre no nível 15, e isso vale para todos com quem você entra na fila: se alguém do seu grupo estiver abaixo, a fila continua fechada até que todos se qualifiquem. Todo o jogador contra jogador vive atrás de um único botão, marcado JxJ: abra-o e escolha uma aba, Campos de Thornhollow, um contra um, dois contra dois ou três contra três, e então inscreva-se sozinho ou com seu grupo. Enquanto você está na fila ou numa partida, as outras abas ficam travadas, então você nunca pode estar em duas filas ao mesmo tempo. Uma partida de três contra três que se arrasta desgasta todo mundo: passada a metade, Desgaste corta a cada segundo um pouco mais da cura que cada lutador recebe, então um impasse não pode durar para sempre.",
       "ladderHeading": "Subindo no ranking",
       "ladderBody": "O jogo ranqueado acompanha sua classificação ao longo do tempo. Confira o placar para ver onde você está e quem domina o topo do reino.",
       "rewardsHeading": "O que o jogo ranqueado paga",
       "rewardsBody": "Uma vitória ranqueada paga Honra, a moeda de jogador contra jogador, e uma derrota custa a você nada além de classificação. A Honra existe para recompensar partidas de verdade: vencer o mesmo oponente ou a mesma equipe de novo no mesmo dia não paga mais nada, um longo dia de vitórias paga um pouco menos por vitória conforme avança, e uma partida que seu oponente abandona ainda move sua classificação, mas não paga Honra alguma. Esse dia é só da Honra, e ele vira em seu próprio relógio, não junto com a redefinição de instâncias do reino.",
       "rewardsBodyLossShare": "Uma vitória ranqueada paga Honra, a moeda de jogador contra jogador, e uma derrota jogada até o fim ainda paga uma parte menor, assim como um empate, então a classificação é o único custo real de uma derrota. Honra deve recompensar partidas reais: vencer o mesmo oponente ou a mesma equipe outra vez no mesmo dia não paga nada além, nem perder para eles novamente, uma longa sequência de vitórias paga por inteiro no primeiro trecho e depois reduz pela metade o pagamento de uma vitória, reduzindo-o de novo mais adiante e permanecendo assim, e uma partida abandonada pelo oponente ainda move sua classificação, mas não paga Honra. O dia é do reino: ele reinicia na hora do reset noturno, o mesmo limite em que toda restrição diária é liberada.",
+      "rewardsFirstWinBody": "Sua primeira vitória ranqueada de cada dia paga um bônus extra, e cada categoria tem o seu: uma primeira vitória no um contra um, no dois contra dois e no três contra três reivindica um cada. Uma derrota ou um empate nunca o gastam.",
       "honorHeading": "Honra",
       "honorBody": "Honra é a moeda de lutar contra outros jogadores. Você a ganha no Coliseu e nos Campos de Thornhollow, ela fica separada das suas moedas e nunca se mistura com elas, e sua ficha de personagem mostra quanto você tem guardado. Há exatamente uma coisa em que gastá-la: equipamento de Guerra.",
       "quartermastersBody": "Dois intendentes mantêm as mesmas prateleiras, então negocie com quem estiver mais perto. FÚRIA, a Intendente de Honra, fica no Vale de Eastbrook, e o Marechal de Guerra Draven Kole, Mestre das Reservas de Guerra, mantém o balcão em Highwatch. O estoque deles é o nível de Guerra: cinco famílias de armadura, além de colares, anéis e armas compartilhados entre todas elas.",

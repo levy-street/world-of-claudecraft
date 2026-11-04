@@ -1,5 +1,5 @@
 // Pure view model for the merged PvP window's tab strip: Thornhollow Fields first (the
-// primary tab), then the two ranked arena brackets. It derives busy-state from
+// primary tab), then the three ranked arena brackets. It derives busy-state from
 // the two IWorld snapshots itself (so the painter never re-implements the
 // resolution), decides which tab is pinned (a live queue or match commits its
 // own tab), and locks the rest while one mode is busy, so the UI can never
@@ -11,8 +11,8 @@ import type { ArenaFormat, ArenaInfo, BgInfo } from '../world_api';
 /** The merged window's tabs, in display order: Thornhollow Fields is primary.
  *  `world` is the World PvP flag tab (src/ui/hud/world_pvp/): not a queue mode,
  *  so it never pins and never locks (raising the flag while queued is fine). */
-export type PvpTabId = 'ravenrift' | '1v1' | '2v2' | 'world';
-export const PVP_TABS: readonly PvpTabId[] = ['ravenrift', '1v1', '2v2', 'world'];
+export type PvpTabId = 'ravenrift' | '1v1' | '2v2' | '3v3' | 'world';
+export const PVP_TABS: readonly PvpTabId[] = ['ravenrift', '1v1', '2v2', '3v3', 'world'];
 
 export interface PvpTabState {
   id: PvpTabId;
@@ -52,7 +52,9 @@ export function buildPvpTabs(input: PvpTabsInput): PvpTabsModel {
     ? (input.arena.match?.format ?? (input.arena.queued ? input.arena.format : null))
     : null;
   const offeredArena: PvpTabId | null =
-    arenaBusyBracket === '1v1' || arenaBusyBracket === '2v2' ? arenaBusyBracket : null;
+    arenaBusyBracket === '1v1' || arenaBusyBracket === '2v2' || arenaBusyBracket === '3v3'
+      ? arenaBusyBracket
+      : null;
   const pinned: PvpTabId | null = bgBusy ? 'ravenrift' : offeredArena;
   const active = pinned ?? input.selected;
   const busy = bgBusy || arenaBusyBracket !== null;
