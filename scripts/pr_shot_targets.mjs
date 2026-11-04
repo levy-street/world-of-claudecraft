@@ -5521,6 +5521,70 @@ export const TARGETS = [
     },
   },
   {
+    key: 'bag-tabs-sizes',
+    label: 'Bag tabs (Favorites, Junk) and view sizes (Compact, Large, List)',
+    when: ['ui/bag_view_size', 'ui/bag_category_labels', 'ui/bag_filter'],
+    // One standalone page per view: each seeds the lowest graphics preset and its
+    // bag view size before boot (the size is read at window construction), then
+    // fills the bags with gear, consumables, materials, grey junk and one locked
+    // favorite, opens the bags, and clicks the variant's tab through the real chip.
+    variants: [
+      { key: 'desktop-list', size: 'list' },
+      { key: 'desktop-large', size: 'large' },
+      { key: 'desktop-junk-tab', size: 'compact', tab: 'junk' },
+      { key: 'desktop-favorites-tab', size: 'list', tab: 'favourite' },
+      { key: 'mobile-list', size: 'list', mobile: true },
+    ].map((v) => ({
+      ...v,
+      async beforeLoad(page) {
+        await page.evaluateOnNewDocument((size) => {
+          localStorage.setItem('woc_settings', JSON.stringify({ graphicsPreset: 1 }));
+          localStorage.setItem('woc_bag_view_size', size);
+          localStorage.removeItem('woc_bag_filter');
+        }, v.size);
+      },
+    })),
+    async capture(page, variant) {
+      await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        const ids = [
+          'eastbrook_arming_sword',
+          'apprentice_staff',
+          'cryptbone_helm',
+          'baked_bread',
+          'minor_healing_potion',
+          'minor_mana_potion',
+          'copper_ore',
+          'fine_copper_ore',
+          'silverleaf_herb',
+          'soggy_boot',
+          'chipped_tusk',
+          'cracked_fetish',
+        ];
+        for (const id of ids) {
+          try {
+            sim?.addItem(id, 1);
+          } catch {}
+        }
+        try {
+          const slotIndex = sim?.inventory?.findIndex((s) => s.itemId === 'cryptbone_helm');
+          if (typeof slotIndex === 'number' && slotIndex >= 0) {
+            sim?.setItemLocked?.('cryptbone_helm', true, { slotIndex });
+          }
+        } catch {}
+        const el = document.querySelector('#bags');
+        if (el) el.style.display = 'none';
+        window.__game?.hud?.toggleBags?.();
+      });
+      await wait(700);
+      if (variant?.tab) {
+        await page.click(`#bags [data-focus-key="bagchip:${variant.tab}"]`);
+        await wait(400);
+      }
+      return { clip: '#bags' };
+    },
+  },
+  {
     key: 'ink-map-picker',
     label: "Cartographer's Ink map picker",
     when: ['ui/hud/treasure/ink_map_picker', 'sim/treasure_vault'],
