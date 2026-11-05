@@ -30,6 +30,7 @@ import {
   pouredAuraId,
   quarterBit,
 } from '../src/sim/encounters/smith_heart/final_phase_ids';
+import { QUIET_WARNINGS } from '../src/sim/encounters/smith_heart/final_scope';
 import type { Aura, SimEvent } from '../src/sim/types';
 import { auraEffectDescriptor } from '../src/ui/aura_effect';
 import { castDisplayName } from '../src/ui/cast_display_name';
@@ -68,17 +69,8 @@ describe('part 2: what the raid reads', () => {
       (e): e is Chat => e.type === 'chat' && e.channel === 'raidWarning' && e.pid === f.pids[0],
     );
     const keys = new Set(warns.map((w) => w.textKey));
-    for (const k of [
-      'intermission',
-      'coal',
-      'toll',
-      'pounce',
-      'poured',
-      'release',
-      'final',
-      'awaken',
-      'fury',
-    ])
+    for (const k of QUIET_WARNINGS) expect(keys, k).not.toContain(`hudChrome.finalBoss.warn.${k}`);
+    for (const k of ['intermission', 'poured', 'release', 'final', 'awaken', 'fury'])
       expect(keys, k).toContain(`hudChrome.finalBoss.warn.${k}`);
     for (const w of warns) expect(t(w.textKey as never)).toBe(w.text);
     // The soon-warning's key exists too (its own test times it).

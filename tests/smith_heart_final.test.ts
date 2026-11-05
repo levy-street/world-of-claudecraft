@@ -219,7 +219,8 @@ describe('the quarter rules', () => {
     const warns = ev.filter(
       (e) => e.type === 'chat' && e.channel === 'raidWarning' && e.pid === f.pids[0],
     ) as Extract<SimEvent, { type: 'chat' }>[];
-    expect(warns.map((w) => w.textKey)).toContain('hudChrome.finalBoss.warn.enterBreath');
+    // The quarter it drinks reads on the Overload panel, not a banner.
+    expect(warns.map((w) => w.textKey)).not.toContain('hudChrome.finalBoss.warn.enterBreath');
   });
 
   it('Heroic: a switch shocks the raid and marks it; a switch while marked hits three times as hard', () => {
