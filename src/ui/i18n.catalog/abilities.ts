@@ -257,7 +257,7 @@ const classAbilityNamesEn = {
       [
         'scatterbolt',
         'Scatterbolt',
-        'Fire a spray of bolts in an 8-yard cone (90 degrees) in front of you, knocking enemies back up to 20 yards from you. Knockback-immune enemies are unaffected. Deals no damage.',
+        'Fire a spray of bolts in an 8-yard cone (90 degrees) in front of you, knocking enemies back up to 20 yards from you. Enemy players are thrown into the air in a straight line: knocked off a ledge, they keep going and take falling damage, and a fatal fall counts as your kill. Knockback-immune enemies are unaffected. Deals no damage.',
       ],
       [
         'pack_rally',
@@ -1009,7 +1009,7 @@ const classAbilityNamesEn = {
       [
         'lava_burst',
         'Magma Burst',
-        'Deal {damage} Fire damage. A hit grants 1 Thunder. Always critically strikes a target burning with your Cinder Jolt. A critical strike deals an extra 24% of the normal hit. Magma Surge: each Cinder Jolt tick has a 20% chance to reset this cooldown and make your next Magma Burst within 10 sec instant. Damage increases with Spell Power. (Thundercall)',
+        'Deal {damage} Fire damage. A hit grants 1 Thunder. Always critically strikes a target burning with your Cinder Jolt. A critical strike deals an extra 24% of the normal hit. Magma Surge: each Cinder Jolt tick has a 20% chance to reset this cooldown and make your next Magma Burst within 12 sec instant. A surge during a Magma Burst cast also clears the cooldown of that cast, so you can follow it with the instant one. Damage increases with Spell Power. (Thundercall)',
       ],
       [
         'thunderstorm',
@@ -1668,7 +1668,7 @@ const classAbilityNamesEn = {
       [
         'sporemender_form',
         'Sporemender Form',
-        'Shapeshift into a Sporemender, increasing your healing done by 20% and your armor by 40%, but reducing your movement speed by 20%. All of your caster-form spells stay usable. Lasts until you shift out. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form. (Groveheart signature)',
+        'Shapeshift into a Sporemender, increasing your healing done by 20% and your armor by 40%, but reducing your movement speed by 20% while on foot. All of your caster-form spells stay usable, and you can shift in and out while mounted. Lasts until you shift out. Shifting into any form while on foot grants Loping Stride, a short burst of movement speed. Cast again to return to caster form. (Groveheart signature)',
       ],
       [
         'spore_burst',
@@ -1690,7 +1690,7 @@ const classAbilityNamesEn = {
           balance:
             'Each Wildbolt or Skyfall you cast has a 10% chance to arm it for Spore Burst, at most once every 10 sec.',
           restoration:
-            'Each tick of your heal-over-time effects has a 10% chance to arm it for Spore Burst, at most once every 10 sec.',
+            'Each tick of your heal-over-time effects has a 10% chance to arm it for Spore Burst and take 15 sec off the Spore Burst cooldown, at most once every 20 sec. This Spore Burst is free but not stronger.',
         },
       ],
       [

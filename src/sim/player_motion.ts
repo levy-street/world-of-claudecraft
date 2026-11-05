@@ -23,7 +23,7 @@ import {
   isFeigningDeath,
   movementInputWouldMove,
 } from './combat/cast_move_gate';
-import { isRooted, isStunned } from './combat/cc';
+import { isFacingLocked, isRooted, isStunned } from './combat/cc';
 import { SPOREMENDER_FORM_KIND, SPOREMENDER_MOVE_SPEED_MULT } from './combat/druid_sporemender';
 import { huntingMomentumSpeedMult } from './combat/hunting_momentum_speed';
 import { isVeilboundMarchActive } from './combat/paladin_veilbound_state';
@@ -296,7 +296,9 @@ export function moveSpeedMult(e: Entity, extraSpeedPct = 0): number {
     // Groveheart's Sporemender Form walks 20% slower. A form penalty, not a
     // snare: slow immunity never lifts it, and it scales the final speed so a
     // Loping Stride burst or a slow still applies on top of the slower pace.
-    if (a.kind === SPOREMENDER_FORM_KIND) formPace = SPOREMENDER_MOVE_SPEED_MULT;
+    // It is the druid's own gait, so a mounted rider (the form is mount-safe,
+    // combat/forms.ts) rides at the mount's full speed.
+    if (a.kind === SPOREMENDER_FORM_KIND && !e.mountKey) formPace = SPOREMENDER_MOVE_SPEED_MULT;
   }
   speed *= formPassive;
   // Hunting Momentum (Fieldcraft): +15% per stack, its own layer like the form
@@ -305,10 +307,12 @@ export function moveSpeedMult(e: Entity, extraSpeedPct = 0): number {
   // Mounted travel: the active ground mount rides the entity mirror (mountKey,
   // synced over the wire like skin), so the online self-extrapolator predicts
   // mounted speed in lockstep with the server. Additive on top of the buff
-  // times form-passive product, like the Fiesta augment below (mounting strips
-  // every form, so in play the passive is 1 here). The whole expression is
-  // slow * (max(buffs) * formPassive + mountPct + extraSpeedPct); slows still
-  // bite multiplicatively.
+  // times form-passive product, like the Fiesta augment below (only Cat Form
+  // sets the passive and mounting strips it; the mount-safe forms in
+  // combat/forms.ts carry none, so in play the passive is 1 here). The whole
+  // expression is slow * (max(buffs) * formPassive + mountPct + extraSpeedPct)
+  // * cargo * formPace; slows still bite multiplicatively, and formPace is 1
+  // for a mounted rider.
   if (e.mountKey) speed += ridingMoveSpeedPct(e.ridingTier);
   // Fiesta move-speed augments (only ever non-zero inside a Fiesta bout).
   if (extraSpeedPct) speed += extraSpeedPct;
@@ -384,7 +388,7 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
   // Convention: facing f points along (sin f, cos f); the camera sits behind
   // the player, so screen-right is the world vector (-cos f, sin f).
   // Turning right therefore DECREASES facing.
-  if (!isStunned(p)) {
+  if (!isFacingLocked(p)) {
     if (inp.turnLeft) p.facing = normAngle(p.facing + TURN_SPEED * DT);
     if (inp.turnRight) p.facing = normAngle(p.facing - TURN_SPEED * DT);
   }

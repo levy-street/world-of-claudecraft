@@ -11,7 +11,7 @@ import { armorReduction, dist2d } from '../types';
 import { hasUnbreakableMovementLock } from './cc';
 import { glacialFrontContains } from './glacial_front';
 import { grantHunterFocus, onHunterTrailbreak } from './hunter_shared';
-import { trailbreakArcFor } from './hunter_trailbreak_arc';
+import { trailbreakLaunchFor } from './hunter_trailbreak_arc';
 import { HUNTING_MOMENTUM_MAX_STACKS } from './hunting_momentum_speed';
 import { wearsSetBonus } from './set_bonus_wearer';
 
@@ -479,10 +479,12 @@ export function trailbreak(ctx: SimContext, hunter: Entity, distance: number): v
   // lift the kernel grants a jumping body, so a low crate behind the hunter
   // is footing to carry onto, not a wall that ends the leap at its face.
   hunter.onGround = false;
-  const arc = trailbreakArcFor(ctx, hunter, distance);
-  hunter.vx = arc.vx;
-  hunter.vz = arc.vz;
-  hunter.vy = arc.vy;
+  // The flat hop off a ledge or roof, the planner's arc everywhere else
+  // (hunter_trailbreak_arc.ts planTrailbreakLaunch).
+  const launch = trailbreakLaunchFor(ctx, hunter, distance);
+  hunter.vx = launch.vx;
+  hunter.vz = launch.vz;
+  hunter.vy = launch.vy;
   hunter.jumping = true;
   hunter.fallStartY = hunter.pos.y;
   // Touching down grants the landing sprint (combat/hunter_tick.ts). The marker

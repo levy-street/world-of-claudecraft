@@ -126,14 +126,19 @@ export function characterFormMaskForAura(aura: AuraIdentity): number {
   return 0;
 }
 
-export function requestedCharacterForm(mask: number): CharacterFormVisual {
+/** The form a body asks to wear. A MOUNTED rider never asks for the
+ *  Sporemender rig: the form is mount-safe in the sim (combat/forms.ts), but
+ *  the chibi rig has no seated pose, so the rider keeps the base body in the
+ *  saddle the way Moonwing and Gloamveil do (the form's spore drift still
+ *  marks it, character_effects_core.ts). */
+export function requestedCharacterForm(mask: number, mounted = false): CharacterFormVisual {
   if (mask & CHARACTER_FORM_FLAG.sheep) return 'sheep';
   if (mask & CHARACTER_FORM_FLAG.bear) return 'bear';
   if (mask & CHARACTER_FORM_FLAG.cat) return 'cat';
   if (mask & CHARACTER_FORM_FLAG.travel) return 'travel';
   if (mask & CHARACTER_FORM_FLAG.fireball) return 'fireball';
   if (mask & CHARACTER_FORM_FLAG.metamorph) return 'metamorph';
-  if (mask & CHARACTER_FORM_FLAG.sporemender) return 'sporemender';
+  if (mask & CHARACTER_FORM_FLAG.sporemender && !mounted) return 'sporemender';
   return 'base';
 }
 

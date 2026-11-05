@@ -1928,12 +1928,14 @@ describe('delta snapshots', () => {
   });
 
   it.each([
-    ['unreleased corpse', true, false, false, false],
-    ['released ghost', true, true, false, true],
-    ['stunned player', false, false, true, false],
+    ['unreleased corpse', true, false, null, false],
+    ['released ghost', true, true, null, true],
+    ['stunned player', false, false, 'stun', false],
+    // A Play Dead corpse must not turn with the camera: enemy players would see it.
+    ['hunter playing dead', false, false, 'feign_death', false],
   ] as const)(
     'applies v2 facing guards at consumption for a %s',
-    (_name, dead, ghost, stunned, appliesFacing) => {
+    (_name, dead, ghost, lockKind, appliesFacing) => {
       const facingServer = new GameServer();
       const facingClient = fakeWs();
       const facingSession = joinServer(
@@ -1950,11 +1952,11 @@ describe('delta snapshots', () => {
       entity.facing = 0.25;
       entity.dead = dead;
       entity.ghost = ghost;
-      if (stunned) {
+      if (lockKind) {
         entity.auras.push({
-          id: 'test_stun',
-          name: 'Test Stun',
-          kind: 'stun',
+          id: 'test_facing_lock',
+          name: 'Test Facing Lock',
+          kind: lockKind,
           remaining: 5,
           duration: 5,
           value: 0,

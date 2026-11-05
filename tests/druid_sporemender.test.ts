@@ -100,8 +100,11 @@ describe('Sporemender Form: definition and spec gate', () => {
     const tooltip = ABILITIES.sporemender_form.description;
     expect(tooltip).toContain(`healing done by ${pct(SPOREMENDER_HEALING_DONE_PCT)}`);
     expect(tooltip).toContain(`armor by ${pct(SPOREMENDER_ARMOR_MULT - 1)}`);
-    expect(tooltip).toContain(`movement speed by ${pct(1 - SPOREMENDER_MOVE_SPEED_MULT)}`);
-    expect(tooltip).toContain('All of your caster-form spells stay usable.');
+    expect(tooltip).toContain(
+      `movement speed by ${pct(1 - SPOREMENDER_MOVE_SPEED_MULT)} while on foot`,
+    );
+    expect(tooltip).toContain('All of your caster-form spells stay usable');
+    expect(tooltip).toContain('you can shift in and out while mounted');
   });
 
   it('shows both Groveheart signatures on the talent spec page', async () => {

@@ -6,7 +6,7 @@
 // it. Growing replays the guessed tick as an extra one, so a lone late frame (a stall) is still
 // dropped. A grown tick is handed back only while the body is at rest on idle input and the
 // skipped frame carries no new facing, where skipping it changes nothing.
-import { isStunned } from '../src/sim/combat/cc';
+import { isFacingLocked } from '../src/sim/combat/cc';
 import { type MoveInputFrame, parseMoveInputFrame } from '../src/sim/move_input';
 import type { PlayerMeta, Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
@@ -120,7 +120,7 @@ export function applyMovementInputFrame(
   Object.assign(meta.moveInput, frame.moveInput);
   if (ctx) noteBattlegroundWallPressure(ctx, meta, entity);
   session.lastInputAt = simTime;
-  if (frame.facing !== null && (!entity.dead || entity.ghost) && !isStunned(entity)) {
+  if (frame.facing !== null && (!entity.dead || entity.ghost) && !isFacingLocked(entity)) {
     entity.facing = frame.facing;
   }
   return frame;
@@ -150,7 +150,7 @@ export function consumeMovementFramesV2(
     noteBattlegroundWallPressure(sim.ctx, meta, entity);
     Object.assign(meta.moveInput, frame.mi);
     noteBattlegroundWallPressure(sim.ctx, meta, entity, frame.mi, frame.facing ?? entity.facing);
-    if (frame.facing !== null && (!entity.dead || entity.ghost) && !isStunned(entity)) {
+    if (frame.facing !== null && (!entity.dead || entity.ghost) && !isFacingLocked(entity)) {
       entity.facing = frame.facing;
     }
     session.lastConsumedCt = frame.ct;

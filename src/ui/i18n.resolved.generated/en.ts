@@ -3795,7 +3795,7 @@ export const en: EnTranslations = {
         "heat": "Your melee and ranged weapon hits each add a heat stack, up to {max}. Heat lasts {duration} sec, refreshed whenever you gain a stack.",
         "ignite": "Your melee and ranged weapon critical hits set the target alight, dealing {tick} Fire damage every {every} sec for {duration} sec. A new critical hit refreshes it. Damage increases with Attack Power or Ranged Attack Power, whichever is higher.",
         "guardHeat": "Each attack you parry, dodge or block adds a heat stack, up to {max}. Heat lasts {duration} sec, refreshed whenever you gain a stack.",
-        "stoneHeart": "When a hit would kill you, you turn to stone for {statue} sec instead: you take no damage and cannot move or act, then return with {restore} health ({restorePct}% of your maximum health). Can occur once every {icd}. Never in duels or arena matches, which end at the killing blow."
+        "stoneHeart": "When a hit would kill you, you turn to stone for {statue} sec instead: you take no damage and cannot move or act, then return with {restore} health ({restorePct}% of your maximum health). Can occur once every {icd}. Never works in PvP: not in duels, arenas, battlegrounds or other PvP matches, nor while your World PvP flag is up."
       },
       "range": "{min} to {max}",
       "use": {
@@ -4922,7 +4922,7 @@ export const en: EnTranslations = {
       "formTravel": "Fleet Form: movement speed increased by {pct}%",
       "formFireball": "Ember Form: movement speed increased by {pct}%; attacks and spells are disabled",
       "formMoonkin": "Moonwing Form: spell damage increased by {pct}% and armor increased by {armorPct}%",
-      "formSporemender": "Sporemender Form: healing done increased by {pct}%, armor increased by {armorPct}%, and movement speed reduced by {slowPct}%",
+      "formSporemender": "Sporemender Form: healing done increased by {pct}%, armor increased by {armorPct}%, and movement speed reduced by {slowPct}% while on foot",
       "formShadow": "Gloamveil Form: Shadow damage increased by {pct}%",
       "resourceCount": "{value} of {max}",
       "formLich": "Soul Lance also strikes up to {targets} nearby enemies for {pct}% damage",
@@ -17398,7 +17398,7 @@ export const en: EnTranslations = {
       },
       "scatterbolt": {
         "name": "Scatterbolt",
-        "description": "Fire a spray of bolts in an 8-yard cone (90 degrees) in front of you, knocking enemies back up to 20 yards from you. Knockback-immune enemies are unaffected. Deals no damage."
+        "description": "Fire a spray of bolts in an 8-yard cone (90 degrees) in front of you, knocking enemies back up to 20 yards from you. Enemy players are thrown into the air in a straight line: knocked off a ledge, they keep going and take falling damage, and a fatal fall counts as your kill. Knockback-immune enemies are unaffected. Deals no damage."
       },
       "pack_rally": {
         "name": "Pack Rally",
@@ -18017,7 +18017,7 @@ export const en: EnTranslations = {
       },
       "lava_burst": {
         "name": "Magma Burst",
-        "description": "Deal {damage} Fire damage. A hit grants 1 Thunder. Always critically strikes a target burning with your Cinder Jolt. A critical strike deals an extra 24% of the normal hit. Magma Surge: each Cinder Jolt tick has a 20% chance to reset this cooldown and make your next Magma Burst within 10 sec instant. Damage increases with Spell Power. (Thundercall)"
+        "description": "Deal {damage} Fire damage. A hit grants 1 Thunder. Always critically strikes a target burning with your Cinder Jolt. A critical strike deals an extra 24% of the normal hit. Magma Surge: each Cinder Jolt tick has a 20% chance to reset this cooldown and make your next Magma Burst within 12 sec instant. A surge during a Magma Burst cast also clears the cooldown of that cast, so you can follow it with the instant one. Damage increases with Spell Power. (Thundercall)"
       },
       "thunderstorm": {
         "name": "Stormbreak",
@@ -18546,7 +18546,7 @@ export const en: EnTranslations = {
       },
       "sporemender_form": {
         "name": "Sporemender Form",
-        "description": "Shapeshift into a Sporemender, increasing your healing done by 20% and your armor by 40%, but reducing your movement speed by 20%. All of your caster-form spells stay usable. Lasts until you shift out. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form. (Groveheart signature)"
+        "description": "Shapeshift into a Sporemender, increasing your healing done by 20% and your armor by 40%, but reducing your movement speed by 20% while on foot. All of your caster-form spells stay usable, and you can shift in and out while mounted. Lasts until you shift out. Shifting into any form while on foot grants Loping Stride, a short burst of movement speed. Cast again to return to caster form. (Groveheart signature)"
       },
       "spore_burst": {
         "name": "Spore Burst",
@@ -18559,7 +18559,7 @@ export const en: EnTranslations = {
         "description": "Your spells can arm Nature's Boon for 10 sec: the spell it names becomes free, 25% stronger, and castable in any form. A fresh proc refreshes the duration.",
         "specNote_feral": "Each landed melee auto-attack has a 1 in 15 chance to arm it for Sporemending, or for Oakhide while in Bruin Form.",
         "specNote_balance": "Each Wildbolt or Skyfall you cast has a 10% chance to arm it for Spore Burst, at most once every 10 sec.",
-        "specNote_restoration": "Each tick of your heal-over-time effects has a 10% chance to arm it for Spore Burst, at most once every 10 sec."
+        "specNote_restoration": "Each tick of your heal-over-time effects has a 10% chance to arm it for Spore Burst and take 15 sec off the Spore Burst cooldown, at most once every 20 sec. This Spore Burst is free but not stronger."
       },
       "overbloom": {
         "name": "Overbloom",

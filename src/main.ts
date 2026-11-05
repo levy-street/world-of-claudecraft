@@ -425,7 +425,7 @@ import { ARRIVAL_NEIGHBOR_STREAM_RADIUS } from './render/zone_streaming';
 import { desktopBridge } from './runtime';
 import { breathFraction, stepBreathUsedSeconds } from './sim/breath';
 import { pathCrossesFence } from './sim/colliders';
-import { isStunned } from './sim/combat/cc';
+import { isFacingLocked } from './sim/combat/cc';
 import { ABILITIES, CLASSES } from './sim/content/classes';
 import { HEROIC_VENDOR_STOCK } from './sim/content/heroic_vendor';
 import { MECH_CHROMAS } from './sim/content/skins';
@@ -4296,11 +4296,11 @@ async function startGame(
         );
         Object.assign(offlineSim.moveInput, mi);
         const stepFacing = movementFacing ?? facing;
-        // A stun locks facing (issue #2426): stepPlayerMotion already blocks
+        // A stun or Play Dead locks facing (#2426, isFacingLocked): the kernel blocks
         // turnLeft/turnRight while stunned, but mouselook/controller facing is
         // applied out of band, here, before tick(), and must honor the same gate
         // or a stunned player can still turn to face away from a positional attack.
-        if (stepFacing !== null && !isStunned(offlineSim.player)) {
+        if (stepFacing !== null && !isFacingLocked(offlineSim.player)) {
           offlineSim.player.facing = stepFacing;
         }
         offlineSim.updateFiestaBots(); // dev: steer Fiesta practice bots (no-op unless active)
@@ -4450,12 +4450,12 @@ async function startGame(
     const alpha = snapshotAlpha(performance.now(), net.lastSnapAt, net.snapInterval);
     // facing interp capped at 1 - extrapolating angles past the snapshot oscillates
     const interpServerFacing = interpolatedOnlineSelfFacing(net, pe, alpha);
-    const foreignFacing = movementFacing ?? resolved.facing;
+    const foreignFacing = isFacingLocked(pe) ? null : (movementFacing ?? resolved.facing);
     if (edgeReleaseFacing !== null) seedKeyboardTurnRelease(kbTurn, edgeReleaseFacing);
     kbTurnArgs.rawTurnIntent = glider.scriptedMovementActive(world);
     kbTurnArgs.turnLeft = resolved.mi.turnLeft;
     kbTurnArgs.turnRight = resolved.mi.turnRight;
-    kbTurnArgs.turnAllowed = net.spectating === null && !movementFrozen() && !isStunned(pe);
+    kbTurnArgs.turnAllowed = net.spectating === null && !movementFrozen() && !isFacingLocked(pe);
     kbTurnArgs.sentFacing =
       (!movementFrozen() ? (renderFacing ?? controllerFacing) : null) ?? resolved.facing;
     kbTurnArgs.serverFacing = interpServerFacing;

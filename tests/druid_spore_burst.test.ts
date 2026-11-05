@@ -9,13 +9,16 @@ import { groundTelegraphWireJson } from '../server/ground_telegraph_wire';
 import { decodeSporeBursts } from '../src/net/ground_telegraph_wire';
 import { MOONTIDE_STAGES, VERDANCE_STAGES } from '../src/sim/combat/druid_engines';
 import {
+  GROVEHEART_BOON_COOLDOWN_CUT,
   GROVEHEART_BOON_ICD,
+  GROVEHEART_BOON_POWER,
   MOONGROVE_BOON_ICD,
   NATURES_BOON_ID,
   NATURES_BOON_POWER,
   naturesBoonArmedFor,
   naturesBoonOnCast,
   naturesBoonOnHotTick,
+  naturesBoonPowerFor,
 } from '../src/sim/combat/druid_natures_boon';
 import {
   SPORE_BURST_FULL_BANK_POWER,
@@ -310,7 +313,7 @@ describe("Spore Burst: Nature's Boon", () => {
     expect(countDraws(sim, () => naturesBoonOnCast(ctx, me, 'wrath'))).toBe(0);
   });
 
-  it('Groveheart: an owned HoT tick rolls it behind a 10 sec cooldown', () => {
+  it('Groveheart: an owned HoT tick rolls it behind a 20 sec cooldown', () => {
     const { sim, me } = druid('restoration');
     const ctx = rawCtx(sim);
     const hot = { id: 'rejuvenation', kind: 'hot', sourceId: me.id } as Aura;
@@ -321,6 +324,106 @@ describe("Spore Burst: Nature's Boon", () => {
     }
     expect(armedFor(me)).toEqual(['spore_burst']);
     expect(me.procState?.icds.dru_grove_natures_boon).toBe(GROVEHEART_BOON_ICD);
+    expect(GROVEHEART_BOON_ICD).toBe(20);
+  });
+
+  it('Groveheart: a proc takes 15 sec off the Spore Burst cooldown', () => {
+    const { sim, me } = druid('restoration');
+    const ctx = rawCtx(sim);
+    me.cooldowns.set('spore_burst', 25);
+    const hot = { id: 'rejuvenation', kind: 'hot', sourceId: me.id } as Aura;
+    let ticks = 0;
+    while (armedFor(me).length === 0 && ticks < 500) {
+      // A miss leaves the cooldown untouched.
+      expect(me.cooldowns.get('spore_burst')).toBe(25);
+      naturesBoonOnHotTick(ctx, me, hot);
+      ticks++;
+    }
+    expect(armedFor(me)).toEqual(['spore_burst']);
+    expect(me.cooldowns.get('spore_burst')).toBe(25 - GROVEHEART_BOON_COOLDOWN_CUT);
+    // Inside the internal cooldown a tick neither rolls nor cuts again.
+    expect(countDraws(sim, () => naturesBoonOnHotTick(ctx, me, hot))).toBe(0);
+    expect(me.cooldowns.get('spore_burst')).toBe(25 - GROVEHEART_BOON_COOLDOWN_CUT);
+  });
+
+  it('Groveheart: a proc with less than 15 sec left ends the cooldown, and the window pays', () => {
+    const { sim, pid, me } = druid('restoration');
+    const ctx = rawCtx(sim);
+    me.cooldowns.set('spore_burst', 9);
+    const hot = { id: 'rejuvenation', kind: 'hot', sourceId: me.id } as Aura;
+    let ticks = 0;
+    while (armedFor(me).length === 0 && ticks < 500) {
+      naturesBoonOnHotTick(ctx, me, hot);
+      ticks++;
+    }
+    expect(me.cooldowns.has('spore_burst')).toBe(false);
+    const mana = me.resource;
+    me.gcdRemaining = 0;
+    sim.castAbility('spore_burst', pid, AIM);
+    expect(me.resource).toBe(mana);
+    expect(me.cooldowns.get('spore_burst')).toBeCloseTo(30, 5);
+    expect(armedFor(me)).toEqual([]);
+  });
+
+  it('Moongrove: a proc leaves the Spore Burst cooldown running', () => {
+    const { sim, me } = druid('balance');
+    const ctx = rawCtx(sim);
+    me.cooldowns.set('spore_burst', 25);
+    let casts = 0;
+    while (armedFor(me).length === 0 && casts < 500) {
+      naturesBoonOnCast(ctx, me, 'wrath');
+      casts++;
+    }
+    expect(armedFor(me)).toEqual(['spore_burst']);
+    expect(me.cooldowns.get('spore_burst')).toBe(25);
+  });
+
+  it('arms the Moongrove window 25% stronger and the Groveheart window at plain strength', () => {
+    const moon = druid('balance');
+    let casts = 0;
+    while (armedFor(moon.me).length === 0 && casts < 500) {
+      naturesBoonOnCast(rawCtx(moon.sim), moon.me, 'wrath');
+      casts++;
+    }
+    expect(naturesBoonPowerFor(moon.me.auras, SPORE_BURST_ID)).toBe(NATURES_BOON_POWER);
+
+    const grove = druid('restoration');
+    const hot = { id: 'rejuvenation', kind: 'hot', sourceId: grove.me.id } as Aura;
+    let ticks = 0;
+    while (armedFor(grove.me).length === 0 && ticks < 500) {
+      naturesBoonOnHotTick(rawCtx(grove.sim), grove.me, hot);
+      ticks++;
+    }
+    expect(naturesBoonPowerFor(grove.me.auras, SPORE_BURST_ID)).toBe(GROVEHEART_BOON_POWER);
+    expect(GROVEHEART_BOON_POWER).toBe(1);
+  });
+
+  it('a Groveheart free Spore Burst hits exactly as hard as a paid one', () => {
+    const burst = (armed: boolean) => {
+      const { sim, pid, me } = druid('restoration');
+      const target = wolf(sim, AIM.x, AIM.z);
+      if (armed) {
+        const hot = { id: 'rejuvenation', kind: 'hot', sourceId: me.id } as Aura;
+        let ticks = 0;
+        while (armedFor(me).length === 0 && ticks < 500) {
+          naturesBoonOnHotTick(rawCtx(sim), me, hot);
+          ticks++;
+        }
+        expect(armedFor(me)).toEqual(['spore_burst']);
+        me.cooldowns.delete('spore_burst');
+      }
+      const mana = me.resource;
+      me.gcdRemaining = 0;
+      sim.castAbility('spore_burst', pid, AIM);
+      const spent = mana - me.resource;
+      tickN(sim, FUSE_TICKS);
+      return { damage: 5000 - target.hp, spent };
+    };
+    const paid = burst(false);
+    const free = burst(true);
+    expect(free.spent).toBe(0);
+    expect(paid.spent).toBeGreaterThan(0);
+    expect(free.damage).toBe(paid.damage);
   });
 
   it('neither hook draws for a Wildfang druid', () => {

@@ -3,6 +3,7 @@ import { anchorProbeInOpenField } from '../scripts/probe_anchor';
 import { shouldDeliverCombatEventToViewer } from '../server/event_delivery';
 import { isBlocked } from '../src/sim/colliders';
 import { abilityCastSurvivesMovement } from '../src/sim/combat/cast_move_gate';
+import { isFacingLocked } from '../src/sim/combat/cc';
 import { isPlayingDead } from '../src/sim/combat/hunter_play_dead';
 import { ABILITIES } from '../src/sim/content/classes';
 import { MOBS } from '../src/sim/data';
@@ -144,6 +145,36 @@ describe('Play Dead moving grace', () => {
     sim.moveInput.forward = true;
     sim.tick();
     expect(isPlayingDead(sim.player)).toBe(false);
+  });
+});
+
+describe('Play Dead locks facing', () => {
+  it('turn keys cannot rotate the corpse, and turning does not stand it up', () => {
+    const sim = hunter();
+    sim.castAbility('play_dead');
+    sim.tick();
+    expect(isPlayingDead(sim.player)).toBe(true);
+    const facing = sim.player.facing;
+    sim.moveInput.turnLeft = true;
+    ticks(sim, 20);
+    expect(sim.player.facing).toBe(facing);
+    expect(isPlayingDead(sim.player)).toBe(true);
+    // Standing up frees the turn again.
+    sim.moveInput.turnLeft = false;
+    sim.castAbility('play_dead');
+    sim.tick();
+    expect(isPlayingDead(sim.player)).toBe(false);
+    sim.moveInput.turnLeft = true;
+    ticks(sim, 5);
+    expect(sim.player.facing).not.toBe(facing);
+  });
+
+  it('is part of the shared facing lock beside a stun', () => {
+    const sim = hunter();
+    expect(isFacingLocked(sim.player)).toBe(false);
+    sim.castAbility('play_dead');
+    sim.tick();
+    expect(isFacingLocked(sim.player)).toBe(true);
   });
 });
 

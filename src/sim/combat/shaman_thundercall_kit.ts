@@ -7,7 +7,9 @@
 // - Magma Burst: the Wrath Lava Burst rule, a guaranteed crit against a
 //   target carrying the caster's own Cinder Jolt DoT.
 // - Magma Surge: the Cataclysm Lava Surge proc (20% per Cinder Jolt tick)
-//   resets Magma Burst and makes the next one instant.
+//   resets Magma Burst and makes the next one instant. A surge taken while
+//   Magma Burst is being hard-cast also clears the cooldown that cast arms
+//   when it completes, so the surged Magma Burst follows back to back.
 // - Stormbreak: the Wrath Thunderstorm's 8% maximum Mana return.
 //
 // v0.45 rotation fix: Magma Burst banks Thunder and carries the Wrath Lava
@@ -37,7 +39,7 @@ export const MAGMA_BURST_THUNDER = 1;
 // so a crit deals an extra 24% of the normal hit (1.5 to 1.74 before gear).
 export const MAGMA_BURST_CRIT_BONUS = 0.24;
 export const MAGMA_SURGE_CHANCE = 0.2;
-export const MAGMA_SURGE_DURATION = 10;
+export const MAGMA_SURGE_DURATION = 12;
 export const STORMBREAK_ABILITY_ID = 'thunderstorm';
 export const STORMBREAK_MANA_FRACTION = 0.08;
 // Cataclysm's 18 sec Flame Shock with the Glyph of Flame Shock's +50%. Cinder
@@ -168,9 +170,9 @@ export function magmaBurstGuaranteedCrit(
 
 /**
  * Called once per DoT tick with the damage it landed; only a Thundercall's own
- * Cinder Jolt tick that dealt damage can surge. No roll while the caster is
- * hard-casting Magma Burst: that cast arms the cooldown when it completes,
- * which would strand a proc taken mid-cast.
+ * Cinder Jolt tick that dealt damage can surge. A tick that lands while the
+ * caster is hard-casting Magma Burst rolls too: the cast arms its cooldown
+ * when it completes, and thundercallOnTimedCastCompleted clears it again.
  */
 export function thundercallOnDotTick(
   ctx: SimContext,
@@ -179,7 +181,6 @@ export function thundercallOnDotTick(
   landed: number,
 ): void {
   if (dot.id !== CINDER_JOLT_DOT_ID || !source || source.dead || landed <= 0) return;
-  if (source.castingAbility === MAGMA_BURST_ABILITY_ID) return;
   if (!knows(ctx, source, MAGMA_BURST_ABILITY_ID)) return;
   if (!ctx.rng.chance(MAGMA_SURGE_CHANCE)) return;
   source.cooldowns.delete(MAGMA_BURST_ABILITY_ID);
@@ -201,6 +202,24 @@ export function thundercallOnDotTick(
     school: 'fire',
     fx: 'procSurge',
   });
+}
+
+/**
+ * Runs after a TIMED (cast-bar) cast resolves. A Magma Surge still up when a
+ * hard-cast Magma Burst completes can only have been gained mid-cast: a surge
+ * held at cast start makes that cast instant and is consumed by it, so the
+ * completion never reaches this timed arm. The surge's reset then applies to
+ * the cooldown the completed cast just armed, and the surged Magma Burst can
+ * follow at once. Draws no rng.
+ */
+export function thundercallOnTimedCastCompleted(
+  ctx: SimContext,
+  player: Entity,
+  abilityId: string,
+): void {
+  if (abilityId !== MAGMA_BURST_ABILITY_ID || thundercallMeta(ctx, player) === null) return;
+  if (!player.auras.some((aura) => aura.id === MAGMA_SURGE_ID)) return;
+  player.cooldowns.delete(MAGMA_BURST_ABILITY_ID);
 }
 
 /** Stormbreak's Mana return, applied once per successful cast. */

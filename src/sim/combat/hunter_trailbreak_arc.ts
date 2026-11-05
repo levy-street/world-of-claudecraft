@@ -228,6 +228,74 @@ export function planTrailbreakArc(
   };
 }
 
+/** The launch the body actually takes: the planner's arc, or the fixed flat
+ *  hop. A clear line onto ground at or below the feet takes the flat hop (the
+ *  flat ground speed, JUMP_VELOCITY up), so a leap or a throw off a rooftop or a
+ *  cliff edge keeps its speed and sails out in a straight line, then falls the
+ *  full height. The planner alone would aim that case at the low landing seat:
+ *  footing behind the feet (the roof, the plateau) sits above the chord down to
+ *  it, so it lifted and stretched the arc into a slow glide that tracked the
+ *  ground below instead of leaving the edge level. Rising ground or a wall in
+ *  the way keeps the planner's lifted or shortened arc. */
+export interface TrailbreakLaunch {
+  vx: number;
+  vz: number;
+  vy: number;
+  /** Yards the plan covers (the planner's distance either way). */
+  distance: number;
+  /** True when the flat hop was taken instead of the planner's arc. */
+  flat: boolean;
+}
+
+/** Does the fixed flat hop (JUMP_VELOCITY up, `speed` along the line) pass over
+ *  every floor between the feet and `yards` out? A bump or a prop top above
+ *  that path means the planner's lifted arc is needed instead. */
+export function flatHopClears(
+  deps: Pick<TrailbreakSweepDeps, 'floorAt'>,
+  from: Vec3,
+  dirX: number,
+  dirZ: number,
+  speed: number,
+  yards: number,
+): boolean {
+  for (let d = TRAILBREAK_SWEEP_STEP; d < yards; d += TRAILBREAK_SWEEP_STEP) {
+    const t = d / speed;
+    const hopY = from.y + JUMP_VELOCITY * t - (GRAVITY * t * t) / 2;
+    const x = from.x + dirX * d;
+    const z = from.z + dirZ * d;
+    if (deps.floorAt(x, z, hopY) > hopY - TRAILBREAK_TERRAIN_CLEARANCE) return false;
+  }
+  return true;
+}
+
+/** Plan the launch (see TrailbreakLaunch): the arc, unless the flat hop
+ *  clears a line that ends at or below the feet. */
+export function planTrailbreakLaunch(
+  deps: TrailbreakSweepDeps,
+  from: Vec3,
+  facing: number,
+  distance: number,
+): TrailbreakLaunch {
+  const arc = planTrailbreakArc(deps, from, facing, distance);
+  const dirX = -Math.sin(facing);
+  const dirZ = -Math.cos(facing);
+  const speed = distance / (trailbreakFlatTicks() * DT);
+  if (
+    arc.distance >= distance - 1e-6 &&
+    arc.landing.y <= from.y &&
+    flatHopClears(deps, from, dirX, dirZ, speed, distance)
+  ) {
+    return {
+      vx: dirX * speed,
+      vz: dirZ * speed,
+      vy: JUMP_VELOCITY,
+      distance: arc.distance,
+      flat: true,
+    };
+  }
+  return { vx: arc.vx, vz: arc.vz, vy: arc.vy, distance: arc.distance, flat: false };
+}
+
 /** The live binding: the Sim's own terrain, floor, and swept-collision reads
  *  (delve modules, doors, rift walls included), fences ignored the way the
  *  jumping body ignores them, and the kernel's own walked-steepness view (a
@@ -236,6 +304,17 @@ export function planTrailbreakArc(
  *  lift the kernel grants mid-flight; the resolve judges every sample at the
  *  launch feet height, which is conservative (a low prop far up a hill may
  *  read as a wall and shorten the leap) and never lets the body clip. */
+function liveSweepDeps(ctx: SimContext, body: Entity): TrailbreakSweepDeps {
+  const seed = ctx.cfg.seed;
+  return {
+    groundAt: (x, z) => groundHeight(x, z, seed),
+    steepnessAt: (x, z, ground) => walkedSteepnessAt(x, z, seed, ground),
+    floorAt: (x, z, maxY) => floorHeightAt(seed, x, z, PLAYER_BODY_RADIUS, maxY),
+    resolve: (fromX, fromZ, toX, toZ) =>
+      ctx.resolveMove(fromX, fromZ, toX, toZ, PLAYER_BODY_RADIUS, body, true),
+  };
+}
+
 export function trailbreakArcFor(
   ctx: SimContext,
   hunter: Entity,
@@ -245,17 +324,16 @@ export function trailbreakArcFor(
   // throws its victim along a heading of its own without turning them.
   facing: number = hunter.facing,
 ): TrailbreakArc {
-  const seed = ctx.cfg.seed;
-  return planTrailbreakArc(
-    {
-      groundAt: (x, z) => groundHeight(x, z, seed),
-      steepnessAt: (x, z, ground) => walkedSteepnessAt(x, z, seed, ground),
-      floorAt: (x, z, maxY) => floorHeightAt(seed, x, z, PLAYER_BODY_RADIUS, maxY),
-      resolve: (fromX, fromZ, toX, toZ) =>
-        ctx.resolveMove(fromX, fromZ, toX, toZ, PLAYER_BODY_RADIUS, hunter, true),
-    },
-    hunter.pos,
-    facing,
-    distance,
-  );
+  return planTrailbreakArc(liveSweepDeps(ctx, hunter), hunter.pos, facing, distance);
+}
+
+/** The live launch (planTrailbreakLaunch) for Trailbreak and the airborne
+ *  knockback alike; the body must already be flagged airborne (see above). */
+export function trailbreakLaunchFor(
+  ctx: SimContext,
+  body: Entity,
+  distance: number,
+  facing: number = body.facing,
+): TrailbreakLaunch {
+  return planTrailbreakLaunch(liveSweepDeps(ctx, body), body.pos, facing, distance);
 }

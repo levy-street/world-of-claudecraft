@@ -4,6 +4,7 @@
 // statue and the Muster Grapnel's haul, plus the loot rows that pay them out.
 import { describe, expect, it } from 'vitest';
 import {
+  barrowstoneSuppressed,
   GUTTERED_GLARE_DRIFT,
   glareLineHits,
   MUSTER_STANDARD_SOLDIERS,
@@ -540,6 +541,63 @@ describe('Barrowstone Heart: the stone statue', () => {
     ctxOf(sim).arenaMatches.delete(p.id);
     expect(auraOf(p, TRINKET_AURA.stoneStatue)).toBeUndefined();
     expect(p.cooldowns.get(trinketCooldownKey('barrowstone_heart')) ?? 0).toBe(0);
+  });
+
+  it('never holds in a battleground, a duel, or with the World PvP flag up, and is not spent', () => {
+    const contexts: Array<[string, (sim: Sim, pid: number) => () => void]> = [
+      [
+        'battleground',
+        (sim, pid) => {
+          ctxOf(sim).bgMatches.set(pid, {} as never);
+          return () => ctxOf(sim).bgMatches.delete(pid);
+        },
+      ],
+      [
+        'duel',
+        (sim, pid) => {
+          ctxOf(sim).duels.set(pid, {} as never);
+          return () => ctxOf(sim).duels.delete(pid);
+        },
+      ],
+      [
+        'World PvP flag',
+        (sim, pid) => {
+          const meta = ctxOf(sim).players.get(pid);
+          if (!meta) throw new Error('no meta');
+          meta.worldPvp = { flagged: true, disarmAt: null, kills: 0, deaths: 0 };
+          return () => {
+            meta.worldPvp = { flagged: false, disarmAt: null, kills: 0, deaths: 0 };
+          };
+        },
+      ],
+    ];
+    for (const [label, enter] of contexts) {
+      const sim = wearing('barrowstone_heart');
+      const wolf = foe(sim, 0, 3);
+      const p = sim.player;
+      const leave = enter(sim, p.id);
+      expect(barrowstoneSuppressed(ctxOf(sim), p), label).toBe(true);
+      // Even a mob's killing blow goes through: PvP never keeps the safety net.
+      ctxOf(sim).dealDamage(wolf, p, p.hp + 500, false, 'physical', null, 'hit');
+      expect(p.dead, label).toBe(true);
+      expect(auraOf(p, TRINKET_AURA.stoneStatue), label).toBeUndefined();
+      expect(p.cooldowns.get(trinketCooldownKey('barrowstone_heart')) ?? 0, label).toBe(0);
+      leave();
+      expect(barrowstoneSuppressed(ctxOf(sim), p), label).toBe(false);
+    }
+  });
+
+  it('still holds out of PvP with the World PvP flag down', () => {
+    const sim = wearing('barrowstone_heart');
+    const wolf = foe(sim, 0, 3);
+    const p = sim.player;
+    const meta = ctxOf(sim).players.get(p.id);
+    if (!meta) throw new Error('no meta');
+    meta.worldPvp = { flagged: false, disarmAt: null, kills: 0, deaths: 0 };
+    expect(barrowstoneSuppressed(ctxOf(sim), p)).toBe(false);
+    ctxOf(sim).dealDamage(wolf, p, p.hp + 500, false, 'physical', null, 'hit');
+    expect(p.dead).toBe(false);
+    expect(auraOf(p, TRINKET_AURA.stoneStatue)).toBeDefined();
   });
 
   it('has nothing to use: the press is refused and costs nothing', () => {
