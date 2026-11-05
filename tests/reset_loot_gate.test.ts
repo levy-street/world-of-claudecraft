@@ -73,6 +73,24 @@ function crucibleWithLoot(loot: (lead: PlayerMeta, ally: PlayerMeta) => LootSlot
   return { sim, lead, ally, varkhul };
 }
 
+function walkIn(sim: Sim, pid: number): void {
+  if (!enterDungeon(sim.ctx, IGNIVAR_LIFT_ROOM_ID, pid)) throw new Error('lift');
+  for (const room of [
+    IGNIVAR_FORGE_APPROACH_ID,
+    IGNIVAR_RAID_ARENA_ID,
+    IGNIVAR_MOLTEN_ASSEMBLY_ID,
+    IGNIVAR_SECOND_WING_ID,
+  ]) {
+    if (!enterDungeon(sim.ctx, room, pid, true)) throw new Error(`${room} entry`);
+  }
+}
+
+function walkOut(sim: Sim, pid: number): void {
+  const e = sim.entities.get(pid)!;
+  for (let hop = 0; hop < 6 && e.pos.x > DUNGEON_X_THRESHOLD; hop += 1) leaveDungeon(sim.ctx, pid);
+  if (e.pos.x > DUNGEON_X_THRESHOLD) throw new Error('never left the raid');
+}
+
 function errors(sim: Sim): string[] {
   return (sim.drainEvents() as { type: string; text?: string }[])
     .filter((ev) => ev.type === 'error')
@@ -205,5 +223,53 @@ describe('the Crucible difficulty change with an unclaimed quest item on Varkhul
     const { sim, varkhul } = crucibleWithLoot(() => []);
     varkhul.loot = null;
     expect(corpseBlocksInstanceReset(sim.ctx, varkhul)).toBe(true);
+  });
+
+  it('end to end: a real Varkhul kill, the leader loots, the Ember is left, the change applies', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: false, devCommands: true });
+    const { lead, ally } = raid(sim);
+    ally.questLog.set('q_forgefathers_requiem', {
+      questId: 'q_forgefathers_requiem',
+      counts: [0],
+      state: 'active',
+    });
+    // Looter-takes-all, so no need-greed roll opens on the kill.
+    const party = sim.ctx.partyOf(lead.entityId)!;
+    party.lootStrategies = {
+      ...party.lootStrategies,
+      commonItems: 'looter-takes-all',
+      premiumItems: 'looter-takes-all',
+    };
+    walkIn(sim, lead.entityId);
+    walkIn(sim, ally.entityId);
+    const wing = liveClaim(sim, IGNIVAR_SECOND_WING_ID)!;
+    const varkhul = wing.mobIds
+      .map((id) => sim.entities.get(id))
+      .find((m): m is Entity => m?.templateId === VARKHUL_BOSS_ID)!;
+    const leadEntity = sim.entities.get(lead.entityId)!;
+    const allyEntity = sim.entities.get(ally.entityId)!;
+    leadEntity.pos = { ...varkhul.pos };
+    allyEntity.pos = { ...varkhul.pos };
+    // The Grand Forge Assembly floor pins hp at 50% until the intermission
+    // completes; clear it so the settle kill lands (as ignivar_weekly_lockout does).
+    varkhul.damageFloorHp = undefined;
+    sim.ctx.dealDamage(leadEntity, varkhul, varkhul.hp + 100, false, 'physical', null, 'hit');
+    expect(varkhul.dead).toBe(true);
+    // The kill rolled the guaranteed Ember for the quest-holder only.
+    const emberSlot = varkhul.loot?.items.find((s) => s.itemId === EMBER);
+    expect(emberSlot?.personalFor).toEqual([ally.entityId]);
+    // The leader takes everything they can; only the Ember is left behind.
+    sim.lootCorpse(varkhul.id, lead.entityId);
+    expect(varkhul.loot?.items.filter((s) => s.count > 0).map((s) => s.itemId)).toEqual([EMBER]);
+    expect(corpseBlocksInstanceReset(sim.ctx, varkhul)).toBe(false);
+    walkOut(sim, lead.entityId);
+    walkOut(sim, ally.entityId);
+    sim.drainEvents();
+    sim.setDungeonDifficulty('heroic', lead.entityId);
+    const text = errors(sim);
+    expect(text).not.toContain(LOOT_BLOCKED);
+    expect(text).toContain(APPLIED);
+    expect(liveClaim(sim, IGNIVAR_LIFT_ROOM_ID)?.difficulty).toBe('heroic');
+    expect(sim.ctx.countItem(EMBER, ally.entityId)).toBe(1);
   });
 });
