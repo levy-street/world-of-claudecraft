@@ -52,6 +52,7 @@ import {
   IGNORE,
   log,
   segDist,
+  tankAssign,
   unit,
 } from './heart_raid_bots.mjs';
 
@@ -129,8 +130,29 @@ export const final = {
     const r = Math.hypot(l.x - HEART_ROOM.x, l.z - HEART_ROOM.z);
     return r < HEART_QUARTERS.rimR - 4;
   },
-  tankSpot(world, st) {
+  tankSpot(world, st, b, t) {
+    // A Splinter is held where it rose (its signature is its quarter's).
+    if (t && SPLINTERS.has(t.tid)) return t;
     return dragSpot(world, st);
+  },
+  // An intermission's Splinters are split between the tanks in turn (the
+  // shielded boss needs none): each takes back its own when one turns away.
+  tankAssign(world, st, b, me) {
+    const s = world.splinters ?? [];
+    if (!s.length) return tankAssign(world, st, b, me);
+    const tanks = world
+      .living()
+      .filter((p) => p.tank)
+      .sort((x, y) => x.pid - y.pid);
+    const mine = s
+      .slice()
+      .sort((x, y) => x.id - y.id)
+      .filter((_, i) => tanks[i % tanks.length]?.pid === b.pid);
+    const loose = mine.find((m) => m.aggro !== b.pid);
+    b.tankTarget = (loose ?? mine[0])?.id ?? null;
+    b.loose = loose
+      ? { r: loose.id, m: loose, onTank: !!world.players.get(loose.aggro)?.tank }
+      : null;
   },
   meleeReach() {
     return 7;
