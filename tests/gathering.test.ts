@@ -415,7 +415,11 @@ describe('isHarvestableCorpse', () => {
       'gourdlight_swelling_gourd',
     ])
       expect(untagged).toContain(MOBS[id]);
-    expect(untagged).toHaveLength(326);
+    // The Breath's floating isles add the Gale Sentinel and the Gale Mender,
+    // untagged encounter adds: 328.
+    expect(untagged).toContain(MOBS.heart_gale_sentinel);
+    expect(untagged).toContain(MOBS.heart_gale_mender);
+    expect(untagged).toHaveLength(328);
     for (const m of untagged) expect(isHarvestableCorpse(m.componentTags)).toBe(false);
     // The three literals above are the load-bearing ones; this sum states that
     // they partition MOBS, so a template that fell out of all three would read
