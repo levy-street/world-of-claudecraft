@@ -21142,8 +21142,17 @@
     border-top: 1px solid var(--gold-dim);
   }
   #options-menu .opt-quick > .opt-btn.ui-btn {
+    justify-content: flex-start;
     text-align: start;
-    padding-inline-end: 34px;
+    white-space: normal;
+    padding-inline: 10px 34px;
+  }
+  /* An odd row out (five rows on desktop: no Haptics) spans both columns, so
+     the longest label (the Steam wishlist) never runs under its chevron. */
+  /* Matches the `all: revert-layer` reset's id specificity, which would
+     otherwise wipe grid-column on the plate. */
+  #options-menu .opt-quick > .opt-btn.ui-btn:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
   }
   .opt-btn-toggle[aria-pressed="false"] .opt-btn-status {
     color: var(--color-text-muted);
