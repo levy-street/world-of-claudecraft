@@ -220,7 +220,7 @@ export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRule
   },
   heroic: {
     damageMult: 1.25,
-    healthMult: 1.4,
+    healthMult: 1.2,
     overflowAdds: true,
     seedHatch: true,
     bolts: 3,

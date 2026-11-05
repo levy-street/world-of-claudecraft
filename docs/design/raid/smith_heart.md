@@ -1438,7 +1438,7 @@ its own yet, so each boss's Heroic health rides its difficulty row (`healthMult`
 the pull by `encounters/smith_heart/tier_health.ts`; Normal and Mythic keep the template
 pool). Calibrated with the bot raid (`scripts/heart_raid.mjs`) in the previous tier's best gear
 (the Nythraxis top-parse loadouts) toward a 5 to 7 minute kill: the Hammer Council 2.0, the
-Breath 2.4, the Quench 2.0, the Heat 1.4, the Masterless Strength 1.4. Every number and why:
+Breath 2.4, the Quench 2.0, the Heat 1.2, the Masterless Strength 1.4. Every number and why:
 the pass's notes (E:/woc/entregas/raid_corazon/heroico/NOTAS.md, outside the repo).
 
 ### 7.1 The Hammer Council (always first)
