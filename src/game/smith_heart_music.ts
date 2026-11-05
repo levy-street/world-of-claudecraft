@@ -1,13 +1,9 @@
-// The Smith's Heart's score per area (docs/design/raid/smith_heart.md): one
-// cue per vein and one for the Heart, each borrowed from an existing track
-// whose own brief fits the room, until the raid gets its own score:
-//   the Hammer and the Ring: the Gravewyrm Sanctum's (the same mountain);
-//   the Breath: "Spirefall" (a bastion up inside its own thunderhead);
-//   the Quench: "Hoarfrost Vault" (a tomb with all its echoes frozen);
-//   the Heat: "The Anvil Below" (a forge that never went out, anvil strikes,
-//     bellows drums, a smith's chant);
-//   the Heart: "The Unlit Door" (almost no pulse, just a heart somewhere
-//     behind the walls).
+// The Smith's Heart's score per area (docs/design/raid/smith_heart.md): the
+// raid's own halls theme, "The Sleeping Veins" (a slow heartbeat under warm
+// strings, a solemn horn, glass bells), plays in every vein and in the Heart
+// between the fights; each boss fight then takes over with its own cue
+// (smith_heart_boss_music.ts). The table stays per area so a vein can get a
+// variation of its own later without touching the decision.
 // Pure: the instance music decision (instance_music.ts) asks it by world
 // position; the area split is the layout's (smithHeartAreaAt).
 
@@ -16,12 +12,12 @@ import { DUNGEONS, instanceOrigin, instanceSlotForZ } from '../sim/data';
 import type { MusicZone } from './music_zones';
 
 export const SMITH_HEART_AREA_MUSIC: Readonly<Record<SmithHeartArea, MusicZone>> = {
-  hammer: 'dungeon_gravewyrm_sanctum',
-  ring: 'dungeon_gravewyrm_sanctum',
-  breath: 'rift_storm',
-  quench: 'rift_frost',
-  heat: 'rift_ember',
-  heart: 'rift_void',
+  hammer: 'dungeon_smith_heart',
+  ring: 'dungeon_smith_heart',
+  breath: 'dungeon_smith_heart',
+  quench: 'dungeon_smith_heart',
+  heat: 'dungeon_smith_heart',
+  heart: 'dungeon_smith_heart',
 };
 
 /** The Smith's Heart's cue for a player at world (x, z) inside the raid. */

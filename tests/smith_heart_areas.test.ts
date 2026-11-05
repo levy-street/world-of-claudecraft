@@ -6,6 +6,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { instanceMusicDecision } from '../src/game/instance_music';
+import { ZONE_STREAM_URLS } from '../src/game/music_tracks';
 import { SMITH_HEART_AREA_MUSIC, smithHeartMusicZoneAt } from '../src/game/smith_heart_music';
 import {
   SMITH_HEART_CORE_FOG,
@@ -55,7 +56,7 @@ describe("the Smith's Heart's areas", () => {
     expect(wrong.slice(0, 10)).toEqual([]);
   });
 
-  it('scores each area with its own cue, the Heart apart from the veins', () => {
+  it("scores every area with the raid's own halls theme, the decision following the player", () => {
     const o = instanceOrigin(DUNGEONS.smith_heart.index, 3);
     expect(smithHeartMusicZoneAt(o.x + HEART_ROOM.x, o.z + HEART_ROOM.z)).toBe(
       SMITH_HEART_AREA_MUSIC.heart,
@@ -64,13 +65,14 @@ describe("the Smith's Heart's areas", () => {
       SMITH_HEART_AREA_MUSIC.quench,
     );
     expect(smithHeartMusicZoneAt(o.x, o.z)).toBe(SMITH_HEART_AREA_MUSIC.ring);
-    const veins = new Set([
-      SMITH_HEART_AREA_MUSIC.breath,
-      SMITH_HEART_AREA_MUSIC.quench,
-      SMITH_HEART_AREA_MUSIC.heat,
-      SMITH_HEART_AREA_MUSIC.heart,
-    ]);
-    expect(veins.size).toBe(4);
+    // No borrowed cue left: every vein, the Ring and the Heart play the raid's
+    // own halls theme, a committed stream (the bosses carry their own fight cues).
+    expect(new Set(Object.values(SMITH_HEART_AREA_MUSIC))).toEqual(
+      new Set(['dungeon_smith_heart']),
+    );
+    expect(ZONE_STREAM_URLS.dungeon_smith_heart).toMatch(
+      /^\/audio\/music\/dungeon_smith_heart\.mp3\?v=[a-f0-9]{12}$/,
+    );
     // The live decision follows the player into the Heart.
     const decide = (x: number, z: number) =>
       instanceMusicDecision({
