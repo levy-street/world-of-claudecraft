@@ -260,7 +260,7 @@ export const FINAL_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalDifficultyR
   },
   heroic: {
     damageMult: 1.2,
-    healthMult: 1.8,
+    healthMult: 1.4,
     burstTier: 'heavy',
     switchShock: true,
     embers: true,

@@ -157,6 +157,17 @@ export const final = {
   meleeReach() {
     return 7;
   },
+  // The healers stand between the ring and the boss's quarter (14 yd out on
+  // its bearing, a little apart): every tank and the raid round the boss in
+  // reach, and only a step when the boss changes quarter.
+  roleSpot(world, st, b) {
+    if (b.spec.role !== 'healer') return null;
+    const boss = world.mobs.boss;
+    if (!alive(boss) || hypot(boss, world.center) < 4) return null;
+    const u = unit(world.center, boss);
+    const side = b.spec.key === 'h1' ? 1 : -1;
+    return add(add(world.center, u, 14), { x: -u.z, z: u.x }, side * 4);
+  },
   targets(world) {
     const s = world.splinters;
     if (s.length) return s.slice().sort((x, y) => x.hp / x.mhp - y.hp / y.mhp)[0];
