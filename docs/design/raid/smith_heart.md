@@ -1443,7 +1443,7 @@ damage, so a human kill takes about 0.65 of the bots' time, and a bot fight on a
 level-20 gear) aims at 4 to 5 minutes for humans (6 to 7 for the bots), held where the bots
 still kill it before the soft enrage: the Guardian 54,000, the Seam Singer 46,000, the Breath
 80,000, the Quench 62,000, the Heat 64,000, the Masterless Strength 72,000. Heroic (the previous
-tier's best gear) aims at 6 to 7 minutes for humans: the Hammer Council 1.85, the Breath 1.45,
+tier's best gear) aims at 6 to 7 minutes for humans: the Hammer Council 1.85, the Breath 1.65,
 the Quench 2.2, the Heat 1.45, the Masterless Strength 2.1. Heroic's key mechanics kill when
 ignored: Mountain's Wrath lands at about 110 percent of a Heroic-geared cloth body on whoever
 no pillar hides (`wrathMult` 2.8), the Council's soft enrage waits for 8 Wraths (4 on Normal
