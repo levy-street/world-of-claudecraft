@@ -35,6 +35,16 @@ const DUNGEON_BOSS_IDS = [
   'ysolei',
 ] as const;
 
+/** The Smith's Heart raid's bosses, whose rows come from smith_heart_boss_music.ts. */
+const SMITH_HEART_BOSS_IDS = [
+  'heart_hammer_guardian',
+  'heart_seam_singer',
+  'heart_breath_guardian',
+  'heart_quench_guardian',
+  'heart_heat_guardian',
+  'heart_masterless_strength',
+] as const;
+
 const zoneFixture = ZONES.find((zone) => zone.id === 'eastbrook_vale');
 if (!zoneFixture) throw new Error('eastbrook_vale fixture is missing');
 const zone = zoneFixture;
@@ -65,7 +75,9 @@ const morthen = (aggroTargetId: number | null): InstanceMusicEntity => ({
 
 describe('per-boss fight tracks', () => {
   it('ships one versioned cue per dungeon boss, preserving Morthen and sharing the Hydra cue', () => {
-    expect(Object.keys(BOSS_TRACK_URLS).sort()).toEqual([...DUNGEON_BOSS_IDS].sort());
+    expect(Object.keys(BOSS_TRACK_URLS).sort()).toEqual(
+      [...DUNGEON_BOSS_IDS, ...SMITH_HEART_BOSS_IDS].sort(),
+    );
     expect(BOSS_TRACK_URLS.morthen).toBe(MORTHEN_URL);
     expect(BOSS_TRACK_URLS.rimeweb).toContain('boss_rimeweb.mp3?v=964cbe52e766');
     expect(BOSS_TRACK_URLS.the_gorgebloom).toContain('boss_the_gorgebloom.mp3?v=a657f10af536');
@@ -74,8 +86,9 @@ describe('per-boss fight tracks', () => {
     );
     expect(BOSS_TRACK_URLS.mere_hydra_head_left).toBe(BOSS_TRACK_URLS.mere_hydra_head_center);
     expect(BOSS_TRACK_URLS.mere_hydra_head_right).toBe(BOSS_TRACK_URLS.mere_hydra_head_center);
-    expect(new Set(Object.values(BOSS_TRACK_URLS)).size).toBe(18);
-    for (const id of DUNGEON_BOSS_IDS) {
+    // 18 dungeon cues, plus the raid's five (the Council's two share one).
+    expect(new Set(Object.values(BOSS_TRACK_URLS)).size).toBe(23);
+    for (const id of [...DUNGEON_BOSS_IDS, ...SMITH_HEART_BOSS_IDS]) {
       expect(MOBS[id], id).toBeDefined();
       const [asset, hash] = BOSS_TRACK_URLS[id].split('?v=');
       const bytes = readFileSync(path.join(__dirname, '..', 'public', asset));
