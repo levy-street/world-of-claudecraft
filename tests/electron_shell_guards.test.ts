@@ -8,11 +8,14 @@ import {
   EMBEDDED_SUBFRAME_HOST_SUFFIXES,
   EMBEDDED_SUBFRAME_ORIGINS,
   extractInlineScriptHashes,
+  frameAncestorUrls,
+  frameNavigationAllowed,
   isDevToolsToggleShortcut,
   isExternalDocumentUrl,
   isSoftwareRenderer,
   isTrustedSender,
   navigationAllowed,
+  navigationDecision,
   originAllowed,
   toCanonicalExternalUrl,
   withCspHeader,
@@ -121,6 +124,166 @@ describe('navigationAllowed', () => {
 
   it('denies a malformed navigation URL', () => {
     expect(navigationAllowed('::: not a url', true, main)).toBe(false);
+  });
+});
+
+// Electron fires will-frame-navigate for EVERY frame in the tree, not just the app's own
+// iframes. Stripe Embedded Checkout nests frames of its own inside its iframe: a 3D Secure
+// challenge renders the card issuer's ACS page (an arbitrary bank origin) inside the
+// hooks.stripe.com frame, then returns inside Stripe's frames. Gating those against the
+// app's embed allow-list blanked the challenge and left the checkout greyed out on its
+// processing state in the desktop client only (the Windows membership checkout report).
+describe('frameNavigationAllowed', () => {
+  const app = new Set(['app://worldofclaudecraft', 'http://localhost:5173']);
+  const top = 'app://worldofclaudecraft/play';
+  const hooks = 'https://hooks.stripe.com/three_d_secure/authenticate';
+  const embed = 'https://js.stripe.com/v3/embedded-checkout-inner.html';
+  const acs = 'https://acs.examplebank.co.nz/challenge?id=1';
+
+  it('lets a Stripe-nested 3DS issuer frame and its return page load', () => {
+    for (const url of [
+      acs,
+      'https://worldofclaudecraft.com/store/return?session_id=cs_test_1',
+      'about:blank',
+      'about:srcdoc',
+      'data:text/html,acs',
+      'blob:https://js.stripe.com/1b2c3d',
+    ]) {
+      expect(frameNavigationAllowed(url, false, [hooks, embed, top], app)).toBe(true);
+    }
+    // Every Stripe root, including a per-session js.stripe.com subdomain, relaxes its
+    // subtree the same way.
+    for (const root of [
+      'https://b.js.stripe.com/v3/x',
+      'https://hooks.stripe.com/three_d_secure/authenticate',
+      'https://checkout.stripe.com/c/pay/cs_test_1',
+    ]) {
+      expect(frameNavigationAllowed(acs, false, [root, top], app)).toBe(true);
+    }
+    // A blob minted by a third-party https page below Stripe is that page's own origin.
+    expect(
+      frameNavigationAllowed(
+        'blob:https://acs.examplebank.co.nz/9f',
+        false,
+        [hooks, embed, top],
+        app,
+      ),
+    ).toBe(true);
+  });
+
+  it('does not relax a look-alike Stripe root', () => {
+    for (const root of [
+      'https://js.stripe.com.evil.com/x',
+      'https://evil-js.stripe.com/x',
+      'https://api.stripe.com/x',
+      'http://js.stripe.com/x',
+    ]) {
+      expect(frameNavigationAllowed(acs, false, [root, top], app)).toBe(false);
+    }
+  });
+
+  it('keeps direct children of the app frame on the strict embed allow-list', () => {
+    expect(frameNavigationAllowed('https://evil.com/', false, [top], app)).toBe(false);
+    expect(frameNavigationAllowed(embed, false, [top], app)).toBe(true);
+  });
+
+  it('fails toward the strict rule when ancestry is unknown or does not end at the app', () => {
+    expect(frameNavigationAllowed(acs, false, null, app)).toBe(false);
+    expect(frameNavigationAllowed(acs, false, [], app)).toBe(false);
+    // Truncated walk: hooks is not the main frame, so nothing relaxes.
+    expect(frameNavigationAllowed('https://evil.com/', false, [hooks, embed], app)).toBe(false);
+  });
+
+  it('keeps frames nested under the app or dev own iframes strict', () => {
+    for (const own of ['app://worldofclaudecraft/frame.html', 'http://localhost:5173/x']) {
+      expect(frameNavigationAllowed('https://evil.com/', false, [own, top], app)).toBe(false);
+    }
+  });
+
+  it('relaxes only Stripe roots, never Turnstile, WalletConnect or Link', () => {
+    for (const root of [
+      'https://challenges.cloudflare.com/x',
+      'https://verify.walletconnect.com/x',
+      'https://link.com/x',
+      'https://checkout.link.com/x',
+      'https://evil.com/frame',
+    ]) {
+      expect(frameNavigationAllowed('https://evil.com/', false, [root, top], app)).toBe(false);
+    }
+  });
+
+  it('never relaxes the main frame, plaintext or local schemes, or app-origin documents', () => {
+    expect(frameNavigationAllowed(acs, true, [], app)).toBe(false);
+    for (const url of [
+      'http://acs.examplebank.co.nz/',
+      'file:///C:/Windows/win.ini',
+      'javascript:alert(1)',
+      'app://worldofclaudecraft/index.html',
+      'http://localhost:5173/index.html',
+      'blob:app://worldofclaudecraft/1b2c3d',
+      'blob:http://localhost:5173/1b2c3d',
+      '::: not a url',
+    ]) {
+      expect(frameNavigationAllowed(url, false, [hooks, embed, top], app)).toBe(false);
+    }
+  });
+});
+
+describe('frameAncestorUrls', () => {
+  it('walks parent frames from the nearest up to the main frame', () => {
+    const main = { url: 'app://worldofclaudecraft/play', parent: null };
+    const embed = { url: 'https://js.stripe.com/v3/x', parent: main };
+    const hooks = { url: 'https://hooks.stripe.com/3ds', parent: embed };
+    expect(frameAncestorUrls({ url: 'https://acs.bank/', parent: hooks })).toEqual([
+      'https://hooks.stripe.com/3ds',
+      'https://js.stripe.com/v3/x',
+      'app://worldofclaudecraft/play',
+    ]);
+    expect(frameAncestorUrls(null)).toBeNull();
+  });
+
+  it('returns null when a disposed frame getter throws', () => {
+    const disposed = {
+      url: 'https://acs.bank/',
+      get parent(): never {
+        throw new Error('Render frame was disposed before WebFrameMain could be accessed');
+      },
+    };
+    expect(frameAncestorUrls(disposed)).toBeNull();
+  });
+});
+
+describe('navigationDecision', () => {
+  const app = new Set(['app://worldofclaudecraft']);
+  const main = { url: 'app://worldofclaudecraft/play', parent: null };
+  const embed = { url: 'https://js.stripe.com/v3/x', parent: main };
+  const hooks = { url: 'https://hooks.stripe.com/3ds', parent: embed };
+
+  it('admits a nested 3DS frame and blocks a foreign main-frame navigation', () => {
+    expect(
+      navigationDecision({ url: 'https://acs.bank/c', isMainFrame: false, frame: hooks }, app),
+    ).toEqual({ allowed: true, isMainFrame: false });
+    expect(navigationDecision({ url: 'https://evil.com/', isMainFrame: true }, app)).toEqual({
+      allowed: false,
+      isMainFrame: true,
+    });
+  });
+
+  it('treats a missing isMainFrame as the main frame', () => {
+    expect(navigationDecision({ url: 'https://acs.bank/c', frame: hooks }, app).allowed).toBe(
+      false,
+    );
+  });
+
+  it('blocks instead of throwing when the frame tree is unreadable', () => {
+    const details = {
+      url: 'https://acs.bank/c',
+      isMainFrame: false,
+      get frame(): never {
+        throw new Error('disposed');
+      },
+    };
+    expect(navigationDecision(details, app)).toEqual({ allowed: false, isMainFrame: false });
   });
 });
 

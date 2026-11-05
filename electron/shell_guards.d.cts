@@ -15,6 +15,24 @@ export function navigationAllowed(
   subframeOrigins?: Iterable<string>,
   subframeHostSuffixes?: readonly string[],
 ): boolean;
+export interface FrameLike {
+  url: string;
+  parent: FrameLike | null;
+}
+export function frameAncestorUrls(frame: FrameLike | null | undefined): string[] | null;
+export function frameNavigationAllowed(
+  url: string,
+  isMainFrame: boolean,
+  ancestorUrls: readonly string[] | null,
+  mainFrameOrigins: Iterable<string>,
+  subframeOrigins?: Iterable<string>,
+  subframeHostSuffixes?: readonly string[],
+): boolean;
+export const NESTED_FRAME_ROOT_ORIGINS: ReadonlySet<string>;
+export function navigationDecision(
+  details: { url: string; isMainFrame?: boolean; frame?: FrameLike | null },
+  mainFrameOrigins: Iterable<string>,
+): { allowed: boolean; isMainFrame: boolean };
 export function isTrustedSender(
   frame: { origin?: unknown; url?: unknown } | null | undefined,
   allowedOrigins: Iterable<string>,
