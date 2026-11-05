@@ -67,6 +67,8 @@ export interface OverloadRow {
   danger: boolean;
   /** Part 2: its quarter's Splinter lives (an intermission). */
   awake: boolean;
+  /** The visible percent, locale-formatted (tr_TR "%50", fr_FR "50 %"). */
+  pctText: string;
   aria: string;
 }
 
@@ -117,6 +119,7 @@ export function makeOverloadView(): OverloadView {
       active: false,
       danger: false,
       awake: false,
+      pctText: '',
       aria: '',
     })),
     root: '',
@@ -163,6 +166,7 @@ export function buildOverloadView(boss: OverloadBoss | null, out: OverloadView):
     row.danger = row.pct >= OVERLOAD_DANGER_AT && !out.frozen;
     row.awake = (mask & quarterBit(row.vein)) !== 0;
     row.label = t(LABEL_KEYS[row.vein] as never);
+    row.pctText = formatNumber(row.pct / 100, { style: 'percent', maximumFractionDigits: 0 });
     row.aria = t('hudChrome.finalOverload.barAria', {
       quarter: row.label,
       pct: formatNumber(row.pct, { maximumFractionDigits: 0 }),
@@ -243,7 +247,7 @@ function phaseLines(
       out.phase = t('hudChrome.finalOverload.ringFallsIn', { seconds: whole(left) });
     else
       out.phase = t('hudChrome.finalOverload.fallsIn', {
-        quarter: t(`hudChrome.finalOverload.${next}`),
+        quarter: t(LABEL_KEYS[next] as never),
         seconds: whole(left),
       });
   } else if (stage === 'final') {
