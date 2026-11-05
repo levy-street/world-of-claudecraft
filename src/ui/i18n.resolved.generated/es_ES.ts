@@ -1839,6 +1839,7 @@ export const es_ES: EnTranslations = {
       "chat": "Saltar al chat"
     },
     "mobile": {
+      "groupRecord": "Record",
       "jump": "Saltar",
       "leaderboard": "Clasificación",
       "dailyRewards": "Tienda",
@@ -3606,6 +3607,7 @@ export const es_ES: EnTranslations = {
       }
     },
     "currencies": {
+      "walletChipAria": "{name}: {amount}",
       "intro": "Ninguna de estas ocupa espacio en las bolsas. Las monedas siguen en tu bolsa como siempre.",
       "activities": "Actividades",
       "factions": "Facciones",
@@ -6032,6 +6034,10 @@ export const es_ES: EnTranslations = {
         "none": "Nadie",
         "title": "Quién te ve conectado en listas de amigos y el registro de hermandad, con tu zona y posición en el mapa. Tu grupo siempre te ve."
       },
+      "guildEvents": {
+        "heading": "Guild events",
+        "dateLabel": "Date"
+      },
       "billboard": {
         "label": "Tablón de la Hermandad",
         "empty": "Aún no hay nada publicado en el tablón.",
@@ -6357,6 +6363,20 @@ export const es_ES: EnTranslations = {
     },
     "professionsHub": {
       "tabOverview": "Overview"
+    },
+    "activities": {
+      "title": "Activities",
+      "close": "Close Activities",
+      "tabDungeons": "Dungeons and Raids",
+      "tabPvp": "PvP"
+    },
+    "bookOfRealm": {
+      "title": "Book of the Realm",
+      "close": "Close the Book of the Realm",
+      "tabDeeds": "Deeds",
+      "tabTitles": "Titles",
+      "tabReputation": "Reputation",
+      "tabRankings": "Rankings"
     },
     "professions": {
       "title": "Profesiones",

@@ -39,10 +39,8 @@ import { focusedWithin, restoreFirstEnabled } from './focus_restore';
 import { gearScore } from './gear_score_view';
 import { writeHotbarDragData } from './hud/action_bar/hotbar';
 import { isUsableTrinketId } from './hud/action_bar/trinket_slot_core';
-import { currenciesTabHtml } from './hud/currencies';
 import { archetypeTitleText, craftNameText } from './hud/professions/craft_name_view';
 import { archetypeImageUrl } from './hud/professions/profession_art';
-import { reputationTabHtml } from './hud/reputation';
 import { formatNumber, type TranslationKey, t, tPlural } from './i18n';
 import { iconDataUrl } from './icons';
 import type { ItemDragState } from './item_drag_state';
@@ -75,8 +73,6 @@ const SLOT_EMPTY_BORDER_COLOR = 'var(--color-slot-empty-border)';
 const CHARACTER_SIDEBAR_LABEL_KEYS: Record<CharacterSidebarTab, TranslationKey> = {
   stats: 'hudChrome.charSidebar.character',
   progression: 'hudChrome.charSidebar.progression',
-  reputation: 'hudChrome.charSidebar.reputation',
-  currencies: 'hudChrome.charSidebar.currencies',
 };
 
 const charSidebarTabId = (id: CharacterSidebarTab): string => `char-sidebar-tab-${id}`;
@@ -452,8 +448,6 @@ export class CharWindow {
     // (the footer keeps only the share and cosmetics actions).
     if (selected === 'progression')
       return this.deps.progressionHtml(world.player.level) + this.playtimeHtml(world);
-    if (selected === 'reputation') return reputationTabHtml(world, Date.now());
-    if (selected === 'currencies') return currenciesTabHtml(world);
     return this.statsRailHtml(world);
   }
 

@@ -27,8 +27,11 @@ export interface WindowHubSpec<T extends string> {
   readonly defaultTab: T;
   /** localStorage key for the last tab this device opened. */
   readonly storageKey: string;
-  /** The tablist's accessible name: the hub's own title. */
+  /** The hub's title: the tablist's accessible name, and the title every
+   *  member shows while it is a tab of the hub. */
   readonly ariaLabelKey: TranslationKey;
+  /** Every member's close button names the whole hub. */
+  readonly closeKey: TranslationKey;
   /** Hub-specific strip class (spacing hooks); `ui-tabs` is always added. */
   readonly stripClass: string;
   /** Hub-specific tab class, the one the wiring and focus queries select on;
@@ -107,8 +110,8 @@ export function windowHubStripModel<T extends string>(
 ): TabStripModel<T> {
   return tabStripModel<T>({
     ariaLabel: t(spec.ariaLabelKey),
-    stripClass: `${spec.stripClass} ui-tabs`,
-    tabClass: `${spec.tabClass} ui-tab`,
+    stripClass: `${spec.stripClass} window-hub-tabs ui-tabs`,
+    tabClass: `${spec.tabClass} window-hub-tab ui-tab`,
     selectedClass: WINDOW_HUB_SELECTED_CLASS,
     tabs: spec.tabs.map((tab) => ({ id: tab.id, label: t(tab.labelKey) })),
     selected: active,

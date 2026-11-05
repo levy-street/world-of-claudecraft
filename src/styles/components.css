@@ -2517,6 +2517,24 @@
     top: 12px;
     max-height: calc(var(--app-vh, 100vh) / var(--window-scale) - 24px);
   }
+  /* Desktop C (menu consolidation step 3): the bags dock to the RIGHT of the
+     sheet, the pair centred together, the way the bank seats its companion.
+     694px is half of the sheet (1060) + gap (8) + bags (320); on a narrow
+     screen both clamp to the 16px margin and the bags sit over the sheet's
+     right edge rather than off screen. */
+  body.char-bags-docked:not(.mobile-touch) #char-window {
+    left: max(16px, calc(50% - 694px));
+    transform: none;
+  }
+  body.char-bags-docked:not(.mobile-touch) #bags {
+    left: auto;
+    right: max(16px, calc(50% - 694px));
+    top: 12px;
+    bottom: auto;
+    width: 320px;
+    max-height: calc(var(--app-vh, 100vh) / var(--window-scale) - 24px);
+    transform: none;
+  }
   body:not(.mobile-touch) #char-window .char-stats-rail .stat-panel {
     padding: 8px 12px;
   }
@@ -9283,6 +9301,34 @@
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
   }
+  /* The wallet strip (menu consolidation step 3): the currencies that left the
+     Character sheet, one wrapping chip row between the grid and the purse. */
+  #bags .bag-wallet {
+    flex: none;
+    margin-top: var(--spacing-xs);
+  }
+  #bags .bag-wallet[hidden] {
+    display: none;
+  }
+  #bags .bag-wallet-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs);
+  }
+  #bags .bag-wallet-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+  }
+  #bags .bag-wallet-icon {
+    display: inline-flex;
+    width: 18px;
+    height: 18px;
+  }
+  #bags .bag-wallet-icon img {
+    width: 100%;
+    height: 100%;
+  }
   /* The purse is a real footer row seated on the window's bottom edge, ruled off
      from the grid above it, not a block floating in the empty tail of the list. */
   #bags .money {
@@ -11256,20 +11302,23 @@
      entry-card list, title picker, filter bar) over the IWorldDeeds facet.
      Progress bars and crest urls are build-time writes; the unearned-card
      crest desaturation is a class-driven CSS filter, never inline style. */
-  #deeds-window {
+  #deeds-window,
+  #titles-window {
     width: 940px;
     max-width: calc(100vw - 32px);
     height: 680px;
     max-height: calc(var(--app-vh, 100vh) - 32px);
     flex-direction: column;
   }
-  #deeds-window .panel-title {
+  #deeds-window .panel-title,
+  #titles-window .panel-title {
     flex: none;
     display: flex;
     align-items: center;
     gap: 8px;
   }
-  #deeds-window .panel-title > span {
+  #deeds-window .panel-title > span,
+  #titles-window .panel-title > span {
     flex: 1 1 auto;
     min-width: 0;
   }
@@ -13072,12 +13121,12 @@
     flex: 1 1 auto;
     min-width: 0;
   }
-  /* The Professions hub strip (menu consolidation step 1): the shared
-     Overview / Crafting / Perfecting / Harvest Journal tab row each of the
-     four professions windows paints under its title bar, so the four read
-     as one tabbed window. The ui-tabs / ui-tab primitives own the look; this
-     sets only the strip's place in the column-flex window. */
-  .prof-hub-tabs {
+  /* The window-hub strip (menu consolidation, src/ui/hud/hub/): the shared
+     tab row each member of a hub (Professions, Book of the Realm,
+     Activities) paints under its title bar, so the members read as one
+     tabbed window. The ui-tabs / ui-tab primitives own the look; this sets
+     only the strip's place in the column-flex window. */
+  .window-hub-tabs {
     flex: none;
     flex-wrap: wrap;
     margin: var(--spacing-xs) 0 var(--spacing-sm);
@@ -14340,6 +14389,35 @@
     font-size: 15px;
     line-height: 1;
     padding: 0;
+  }
+  /* The Discord strip (menu consolidation step 5): the foot of every tab, the
+     Discord window's rail button folded into Social. */
+  .soc-discord-strip {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-xs);
+    padding-top: var(--spacing-xs);
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+  }
+  .soc-discord-strip[hidden] {
+    display: none;
+  }
+  .soc-discord-icon {
+    display: inline-flex;
+    width: 18px;
+    height: 18px;
+    flex: none;
+  }
+  .soc-discord-text {
+    flex: 1 1 auto;
+    min-width: 0;
+    color: var(--color-text-secondary);
+  }
+  .soc-discord-open {
+    flex: none;
   }
   .soc-notice {
     flex: none;
@@ -24140,118 +24218,9 @@
   #weekly-quests-window .wk-actions .wk-btn {
     flex: 1;
   }
-  #calendar-window {
-    width: 520px;
-    height: min(620px, calc(85vh - 24px));
-    display: none;
-    flex-direction: column;
-    overflow: hidden;
-    min-height: 0;
-  }
-  .cal-nav {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    margin: 2px 0 8px;
-  }
-  .cal-nav-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    cursor: var(--cursor-point);
-  }
-  .cal-nav-btn .ui-icon {
-    width: 12px;
-    height: 12px;
-  }
-  .cal-month-title {
-    font-family: var(--title-font);
-    font-size: 14.5px;
-    color: var(--gold);
-    text-transform: capitalize;
-  }
-  .cal-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 3px;
-  }
-  .cal-weekday {
-    text-align: center;
-    font-size: 10.5px;
-    color: var(--color-text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    padding: 2px 0;
-  }
-  .cal-cell {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2px;
-    min-height: 40px;
-    padding: 4px 2px 3px;
-    background: color-mix(in srgb, var(--color-white) 2%, transparent);
-    border: 1px solid color-mix(in srgb, var(--color-white) 6%, transparent);
-    border-radius: 5px;
-    color: var(--color-text);
-    cursor: var(--cursor-point);
-    font-size: 12px;
-  }
-  .cal-cell:hover {
-    background: color-mix(in srgb, var(--color-white) 7%, transparent);
-    border-color: color-mix(in srgb, var(--gold-dim) 40%, transparent);
-  }
-  .cal-cell.out {
-    opacity: 0.35;
-  }
-  .cal-cell.today {
-    border-color: var(--gold-dim);
-  }
-  .cal-cell.sel {
-    background: color-mix(in srgb, var(--gold-dim) 12%, transparent);
-    border-color: var(--gold-dim);
-  }
-  .cal-daynum {
-    line-height: 1;
-  }
-  .cal-marks {
-    display: flex;
-    gap: 3px;
-    min-height: 6px;
-  }
-  .cal-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    flex: 0 0 auto;
-  }
-  .cal-dot.system {
-    background: var(--gold);
-  }
-  .cal-dot.guild {
-    /* matches the market tab pip: a UI accent green, not --color-friendly */
-    background: var(--color-friendly);
-  }
-  .cal-day-pane {
-    margin-top: 8px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    overflow-y: auto;
-    min-height: 0;
-    flex: 1;
-  }
-  .cal-day-title {
-    font-family: var(--title-font);
-    font-size: 12.5px;
-    color: var(--color-accent);
-    border-bottom: 1px solid color-mix(in srgb, var(--color-white) 8%, transparent);
-    padding-bottom: 4px;
-    text-transform: capitalize;
-  }
+  /* The guild Events list and booking form in the Social window's Guild tab
+     (menu consolidation step 4, which removed the Event Calendar window).
+     The cal- names are kept from the calendar it came from. */
   .cal-event {
     display: flex;
     align-items: flex-start;
@@ -26406,6 +26375,22 @@
      #loot-explorer-window overrides in hud.mobile.css (@layer hud-mobile),
      silently defeating the mobile sizing/scrolling rules for this window. */
 @layer components {
+  /* The Book of the Realm's Reputation tab (menu consolidation step 2): the
+     sheet's faction cards on their own root, sized like the Loot Explorer and
+     scrolling in the body. */
+  #reputation-window {
+    width: min(90vw, 640px);
+    height: min(85vh, 640px);
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
+  }
+  #reputation-window .reputation-window-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+  }
   #loot-explorer-window {
     width: min(90vw, 760px);
     height: min(85vh, 760px);

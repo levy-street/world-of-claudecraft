@@ -110,8 +110,6 @@ export const social: GuidePage = {
           <p>${esc(t('guide.social.guildBankRulesBody'))}</p>
         </section>
 
-        ${section('guide.social.calendarHeading', p('guide.social.calendarBodyDoubleHonor'))}
-
         <section class="guide-block">
           <h2>${esc(t('guide.social.etiquetteHeading'))}</h2>
           <p>${esc(t('guide.social.etiquetteBody'))}</p>

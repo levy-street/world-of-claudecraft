@@ -1839,6 +1839,7 @@ export const cs_CZ: EnTranslations = {
       "chat": "Přeskočit na chat"
     },
     "mobile": {
+      "groupRecord": "Record",
       "jump": "Skok",
       "leaderboard": "Žebříčky",
       "dailyRewards": "Obchod",
@@ -3606,6 +3607,7 @@ export const cs_CZ: EnTranslations = {
       }
     },
     "currencies": {
+      "walletChipAria": "{name}: {amount}",
       "intro": "Žádná z nich nezabírá místo v brašně. Mince zůstávají v brašně jako obvykle.",
       "activities": "Aktivity",
       "factions": "Frakce",
@@ -6032,6 +6034,10 @@ export const cs_CZ: EnTranslations = {
         "none": "Nikdo",
         "title": "Kdo tě vidí jako online v seznamech přátel a v seznamu cechu, tvoji zónu a pozici na mapě. Tvá skupina tě vždy vidí."
       },
+      "guildEvents": {
+        "heading": "Guild events",
+        "dateLabel": "Date"
+      },
       "billboard": {
         "label": "Cechovní nástěnka",
         "empty": "Na nástěnce zatím nic není.",
@@ -6357,6 +6363,20 @@ export const cs_CZ: EnTranslations = {
     },
     "professionsHub": {
       "tabOverview": "Overview"
+    },
+    "activities": {
+      "title": "Activities",
+      "close": "Close Activities",
+      "tabDungeons": "Dungeons and Raids",
+      "tabPvp": "PvP"
+    },
+    "bookOfRealm": {
+      "title": "Book of the Realm",
+      "close": "Close the Book of the Realm",
+      "tabDeeds": "Deeds",
+      "tabTitles": "Titles",
+      "tabReputation": "Reputation",
+      "tabRankings": "Rankings"
     },
     "professions": {
       "title": "Profese",

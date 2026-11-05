@@ -391,6 +391,19 @@ export const RETIRED_KEYS = [
   // window and Shift+K no longer ships as a default keybind, so the guide's controls
   // page dropped its row (the action stays rebindable from the keybind options).
   'guide.controls.harvestJournal',
+  // -- v0.46.0 menu consolidation. The Book of the Realm, Activities and Social
+  // hubs absorbed these windows' keys (Shift+X, Shift+O, K, U no longer ship as
+  // defaults; Shift+Z and Shift+I name their hubs), and the Event Calendar
+  // window left the game with its I key, so the controls page and the social
+  // page dropped these rows.
+  'guide.controls.deeds',
+  'guide.controls.reliquary',
+  'guide.controls.leaderboard',
+  'guide.controls.calendar',
+  'guide.controls.dungeonFinder',
+  'guide.controls.discord',
+  'guide.social.calendarHeading',
+  'guide.social.calendarBodyDoubleHonor',
 ];
 
 export const RETIRED_KEY_SET = new Set(RETIRED_KEYS);

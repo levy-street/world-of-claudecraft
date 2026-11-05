@@ -17,7 +17,6 @@
       "source": "Authored in-repo as layered SVG to the shared art direction (scripts/assets/chrome_crown/crown.svg, rendered onto the key by scripts/assets/chrome_crown/render_source.mjs), then keyed and encoded by the same converter"
     },
     { "icon": "dfinder", "motif": "Stone dungeon archway with a raised portcullis" },
-    { "icon": "donate", "motif": "Solid gold heart" },
     { "icon": "emote", "motif": "Round gold medallion with a smiling face in relief" },
     {
       "icon": "harvest-journal",

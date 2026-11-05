@@ -1839,6 +1839,7 @@ export const id_ID: EnTranslations = {
       "chat": "Lewati ke Obrolan"
     },
     "mobile": {
+      "groupRecord": "Record",
       "jump": "Lompat",
       "leaderboard": "Peringkat",
       "dailyRewards": "Toko",
@@ -3606,6 +3607,7 @@ export const id_ID: EnTranslations = {
       }
     },
     "currencies": {
+      "walletChipAria": "{name}: {amount}",
       "intro": "Tidak satu pun dari ini menggunakan ruang tas. Koin tetap di tas seperti biasanya.",
       "activities": "Aktivitas",
       "factions": "Faksi-faksi",
@@ -6032,6 +6034,10 @@ export const id_ID: EnTranslations = {
         "none": "Tidak ada",
         "title": "Siapa yang melihatmu online di daftar teman dan rostelunsur serikat, beserta zona dan posisi petamu. Partimu selalu melihatmu."
       },
+      "guildEvents": {
+        "heading": "Guild events",
+        "dateLabel": "Date"
+      },
       "billboard": {
         "label": "Papan Pengumuman Serikat",
         "empty": "Belum ada apa pun di papan pengumuman.",
@@ -6357,6 +6363,20 @@ export const id_ID: EnTranslations = {
     },
     "professionsHub": {
       "tabOverview": "Overview"
+    },
+    "activities": {
+      "title": "Activities",
+      "close": "Close Activities",
+      "tabDungeons": "Dungeons and Raids",
+      "tabPvp": "PvP"
+    },
+    "bookOfRealm": {
+      "title": "Book of the Realm",
+      "close": "Close the Book of the Realm",
+      "tabDeeds": "Deeds",
+      "tabTitles": "Titles",
+      "tabReputation": "Reputation",
+      "tabRankings": "Rankings"
     },
     "professions": {
       "title": "Profesi",

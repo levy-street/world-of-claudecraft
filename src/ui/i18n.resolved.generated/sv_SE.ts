@@ -1839,6 +1839,7 @@ export const sv_SE: EnTranslations = {
       "chat": "Hoppa till chatt"
     },
     "mobile": {
+      "groupRecord": "Record",
       "jump": "Hoppa",
       "leaderboard": "Ranking",
       "dailyRewards": "Butik",
@@ -3606,6 +3607,7 @@ export const sv_SE: EnTranslations = {
       }
     },
     "currencies": {
+      "walletChipAria": "{name}: {amount}",
       "intro": "Ingen av dessa tar upp väskeutrymme. Mynt stannar i din väska som vanligt.",
       "activities": "Aktiviteter",
       "factions": "Fraktioner",
@@ -6032,6 +6034,10 @@ export const sv_SE: EnTranslations = {
         "none": "Ingen",
         "title": "Vem som ser dig online i vännernas listor och gildsamlandet, med din zon och kartposition. Ditt lag ser alltid dig."
       },
+      "guildEvents": {
+        "heading": "Guild events",
+        "dateLabel": "Date"
+      },
       "billboard": {
         "label": "Gillets anslagstavla",
         "empty": "Inget på anslagstavlan än.",
@@ -6357,6 +6363,20 @@ export const sv_SE: EnTranslations = {
     },
     "professionsHub": {
       "tabOverview": "Overview"
+    },
+    "activities": {
+      "title": "Activities",
+      "close": "Close Activities",
+      "tabDungeons": "Dungeons and Raids",
+      "tabPvp": "PvP"
+    },
+    "bookOfRealm": {
+      "title": "Book of the Realm",
+      "close": "Close the Book of the Realm",
+      "tabDeeds": "Deeds",
+      "tabTitles": "Titles",
+      "tabReputation": "Reputation",
+      "tabRankings": "Rankings"
     },
     "professions": {
       "title": "Yrken",

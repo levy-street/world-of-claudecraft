@@ -300,10 +300,12 @@ describe('painted HUD-chrome launcher icons', () => {
     expect(chromeIconUrl('crown')).toBe('/ui/chrome/crown.webp');
     // Guard D only proves SOME placeholder exists; tie the crown to the
     // RELIQUARY buttons specifically (the professions crosshair precedent), so
-    // re-iconing the launcher cannot leave this green by accident.
+    // re-iconing the launcher cannot leave this green by accident. Since the menu
+    // consolidation the Reliquary is a Book of the Realm tab, so its one launcher
+    // is the More tray's deep-link tile (the rail carries the Book's button).
     for (const doc of entryDocs) {
       const html = readEntry(doc);
-      expect(html, `${doc} side rail`).toMatch(/id="mm-reliquary"[^>]*data-icon="crown"/);
+      expect(html, `${doc} side rail`).not.toMatch(/id="mm-reliquary"/);
       expect(html, `${doc} More tray`).toMatch(/id="mobile-reliquary"[^>]*data-icon="crown"/);
     }
   });

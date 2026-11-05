@@ -328,9 +328,11 @@ export const BIND_ACTIONS: BindAction[] = [
     defaults: ['KeyG'],
   },
   {
-    // Shift+KeyI: bare KeyI belongs to Calendar (unchanged).
+    // Activities (menu consolidation, 2026-11-04): the Groups hub (Dungeons
+    // and Raids, PvP, Card Duel) on its last tab. The id stays dungeonFinder so
+    // a saved binding keeps working.
     id: 'dungeonFinder',
-    label: 'Dungeon Finder',
+    label: 'Activities',
     category: 'Interface',
     kind: 'edge',
     defaults: ['Shift+KeyI'],
@@ -344,32 +346,30 @@ export const BIND_ACTIONS: BindAction[] = [
     kind: 'edge',
     defaults: ['Backquote'],
   },
+  // The menu consolidation (2026-11-04) folded these windows into hubs (the
+  // Book of the Realm, Activities, Social), so they no longer ship a default
+  // key: K, U, Shift+X, Shift+O and Shift+Y are free. Each action stays
+  // rebindable, opens its hub on that tab, and a saved binding keeps working.
   {
     id: 'leaderboard',
     label: 'Leaderboard',
     category: 'Interface',
     kind: 'edge',
-    defaults: ['KeyK'],
-  },
-  {
-    id: 'calendar',
-    label: 'Event Calendar',
-    category: 'Interface',
-    kind: 'edge',
-    defaults: ['KeyI'],
+    defaults: [],
   },
   {
     id: 'discord',
     label: 'Discord',
     category: 'Interface',
     kind: 'edge',
-    defaults: ['KeyU'],
+    defaults: [],
   },
-  // The Book of Deeds parks on the shifted layer of KeyZ, like Damage Meters
-  // does on H and the Shift+digit secondary bar. Rebindable like any other action.
+  // The Book of the Realm (Deeds, Titles, Reliquary, Reputation, Loot
+  // Explorer, Rankings) parks on the shifted layer of KeyZ, like Damage Meters
+  // does on H. The id stays deeds so a saved binding keeps working.
   {
     id: 'deeds',
-    label: 'Book of Deeds',
+    label: 'Book of the Realm',
     category: 'Interface',
     kind: 'edge',
     defaults: ['Shift+KeyZ'],
@@ -385,14 +385,12 @@ export const BIND_ACTIONS: BindAction[] = [
     kind: 'edge',
     defaults: ['Shift+KeyP'],
   },
-  // The Reliquary parks on Shift+X: bare KeyX is the emote wheel; Shift+X was
-  // free and sits beside Deeds (Shift+Z) on the shifted letter row.
   {
     id: 'reliquary',
     label: 'The Reliquary',
     category: 'Interface',
     kind: 'edge',
-    defaults: ['Shift+KeyX'],
+    defaults: [],
   },
   // The Harvest Journal and Perfecting are tabs of the Professions hub (menu
   // consolidation, 2026-11-04): Shift+P opens the hub and T lands on its
@@ -413,22 +411,21 @@ export const BIND_ACTIONS: BindAction[] = [
     kind: 'edge',
     defaults: [],
   },
-  // Loot Explorer parks on Shift+O: bare KeyO is free, and Shift+O keeps the
-  // shifted-letter-row convention every other collection/catalog window uses.
   {
     id: 'lootExplorer',
     label: 'Loot Explorer',
     category: 'Interface',
     kind: 'edge',
-    defaults: ['Shift+KeyO'],
+    defaults: [],
   },
-  // Cosmetics uses Shift+Y.
+  // Cosmetics keeps its window, opened from the Character sheet footer and the
+  // mobile More tray; it no longer ships a default key.
   {
     id: 'cosmetics',
     label: 'Cosmetics',
     category: 'Interface',
     kind: 'edge',
-    defaults: ['Shift+KeyY'],
+    defaults: [],
   },
   {
     id: 'chat',

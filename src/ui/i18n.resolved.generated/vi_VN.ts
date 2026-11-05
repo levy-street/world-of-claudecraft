@@ -1839,6 +1839,7 @@ export const vi_VN: EnTranslations = {
       "chat": "Chuyển tới Trò Chuyện"
     },
     "mobile": {
+      "groupRecord": "Record",
       "jump": "Nhảy",
       "leaderboard": "Xếp Hạng",
       "dailyRewards": "Cửa hàng",
@@ -3606,6 +3607,7 @@ export const vi_VN: EnTranslations = {
       }
     },
     "currencies": {
+      "walletChipAria": "{name}: {amount}",
       "intro": "Không có cái nào chiếm chỗ túi. Tiền xu vẫn ở túi của bạn như mọi khi.",
       "activities": "Hoạt Động",
       "factions": "Phe Phái",
@@ -6032,6 +6034,10 @@ export const vi_VN: EnTranslations = {
         "none": "Không Ai",
         "title": "Ai thấy bạn trực tuyến trong danh sách bạn bè và danh sách thành viên hội, kèm theo khu vực và vị trí bản đồ của bạn. Đội của bạn luôn thấy bạn."
       },
+      "guildEvents": {
+        "heading": "Guild events",
+        "dateLabel": "Date"
+      },
       "billboard": {
         "label": "Bảng Tin Bang Hội",
         "empty": "Bảng tin chưa có gì được dán lên.",
@@ -6357,6 +6363,20 @@ export const vi_VN: EnTranslations = {
     },
     "professionsHub": {
       "tabOverview": "Overview"
+    },
+    "activities": {
+      "title": "Activities",
+      "close": "Close Activities",
+      "tabDungeons": "Dungeons and Raids",
+      "tabPvp": "PvP"
+    },
+    "bookOfRealm": {
+      "title": "Book of the Realm",
+      "close": "Close the Book of the Realm",
+      "tabDeeds": "Deeds",
+      "tabTitles": "Titles",
+      "tabReputation": "Reputation",
+      "tabRankings": "Rankings"
     },
     "professions": {
       "title": "Nghề nghiệp",

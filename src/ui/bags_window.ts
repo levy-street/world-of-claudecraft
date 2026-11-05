@@ -232,6 +232,9 @@ export interface BagsWindowDeps extends PainterHostPresentation {
   root(): HTMLElement;
   /** The live world (offline Sim or online ClientWorld mirror). */
   world(): IWorld;
+  /** The wallet strip markup under the grid (the currencies, menu
+   *  consolidation step 3); empty hides the row. */
+  walletHtml?(): string;
   /** Localized $WOC on-chain balance markup for the money footer. */
   wocBalanceHtml(): string;
   /** Localized launcher for the Claudium store, empty when the feature is not available. */
@@ -391,6 +394,7 @@ export class BagsWindow {
   // whatever caused it. -1 is the cold sentinel: a real purse is never negative, so
   // a window shown without a paint would always converge on the first probe.
   private lastMoneyCopper = -1;
+  private lastWalletHtml = '';
 
   // Set when render() or refreshGrid() skipped a rebuild because a bag row was
   // mid-drag (see render()'s own comment). Flushed by flushDeferredRender(),
@@ -455,9 +459,26 @@ export class BagsWindow {
     // the bag moves nothing in the bags themselves.
     this.skullBagPane.refreshIfChanged();
     const el = this.deps.root();
+    // The wallet strip repaints on its own string signature (the currencies
+    // move without a bag change), never through a full render.
+    const wallet = el.querySelector<HTMLElement>('.bag-wallet');
+    if (wallet && el.style.display !== 'none' && this.walletHtml() !== this.lastWalletHtml) {
+      this.paintWallet(wallet);
+    }
     if (!bagsMoneyRowStale(el.style.display, this.deps.world().copper, this.lastMoneyCopper))
       return;
     this.refreshMoneyRow();
+  }
+
+  private walletHtml(): string {
+    return this.deps.walletHtml?.() ?? '';
+  }
+
+  private paintWallet(row: HTMLElement): void {
+    const html = this.walletHtml();
+    row.innerHTML = html;
+    row.hidden = html === '';
+    this.lastWalletHtml = html;
   }
 
   /** Rewrite ONLY the .money footer in place, re-binding its two launchers. Every
@@ -588,6 +609,10 @@ export class BagsWindow {
     el.appendChild(grid);
     grid.scrollTop = prevScrollTop;
     this.skullBagPane.mount(el);
+    const walletRow = document.createElement('div');
+    walletRow.className = 'bag-wallet';
+    el.appendChild(walletRow);
+    this.paintWallet(walletRow);
     const moneyRow = document.createElement('div');
     moneyRow.className = 'money ui-money';
     el.appendChild(moneyRow);

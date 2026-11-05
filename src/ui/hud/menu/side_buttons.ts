@@ -14,19 +14,11 @@ export const SIDE_BUTTONS: readonly [selector: string, action: string, labelKey:
     ['#mm-spell', 'spellbook', 'abilityUi.spellbook.title'],
     ['#mm-talents', 'talents', 'game.talents.title'],
     ['#mm-quest', 'questlog', 'questUi.log.title'],
-    ['#mm-deeds', 'deeds', 'hudChrome.deeds.title'],
-    ['#mm-reliquary', 'reliquary', 'hudChrome.reliquary.title'],
-    ['#mm-loot-explorer', 'lootExplorer', 'hudChrome.lootExplorer.title'],
-    ['#mm-cosmetics', 'cosmetics', 'hudChrome.cosmetics.title'],
+    ['#mm-deeds', 'deeds', 'hudChrome.bookOfRealm.title'],
     ['#mm-professions', 'professions', 'hudChrome.professions.title'],
     ['#mm-map', 'map', 'hud.core.mobileMap'],
     ['#mm-bag', 'bags', 'itemUi.bags.title'],
-    ['#mm-arena', 'arena', 'hudChrome.pvp.launcherTitle'],
-    ['#mm-dfinder', 'dungeonFinder', 'hudChrome.finder.title'],
-    ['#mm-leaderboard', 'leaderboard', 'game.leaderboard.title'],
-    ['#mm-emote', 'emoteWheel', 'hudChrome.emoteWheel.label'],
     ['#mm-social', 'social', 'hud.social.friendsTab'],
-    ['#mm-discord', 'discord', 'hudChrome.discord.title'],
   ];
 
 /** Repaint every side-menu button's keycap + aria label from the live bindings. */

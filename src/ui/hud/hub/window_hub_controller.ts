@@ -15,6 +15,7 @@
 // localStorage for the per-device last-tab memory (UI_DOM_MODULES).
 
 import { FOCUS_KEY_ATTR } from '../../focus_restore';
+import { t } from '../../i18n';
 import { focusActiveTab, wireTabStrip } from '../../tab_strip_painter';
 import {
   isWindowHubTab,
@@ -55,6 +56,10 @@ export interface WindowHubDeps<T extends string> {
 export interface WindowHubStrip {
   html(): string;
   wire(root: HTMLElement): void;
+  /** The hub's title, resolved: a member shows it in place of its own. */
+  title(): string;
+  /** The hub's close-button name, resolved. */
+  closeLabel(): string;
 }
 
 /** Write a carry onto the member about to be shown, BEFORE it opens, so Hud's
@@ -96,20 +101,28 @@ export class WindowHubController<T extends string> {
    *  it (the gossip route to a different craft relies on that). */
   open(tab?: T, focusTabs = false): void {
     const target = resolveWindowHubTab(this.spec, tab, this.savedTab());
-    const current = this.activeTab();
-    if (current !== null && current !== target) {
-      const from = this.deps.members()[current].rootElement();
-      const carry = from ? windowHubPositionCarry(from.dataset, this.deps.touch()) : null;
-      this.deps.members()[current].close();
-      const to = this.deps.members()[target].rootElement();
-      if (carry && to) applyPositionCarry(to, carry);
-    }
+    this.prepare(target);
     this.deps.members()[target].open();
-    this.saveTab(target);
     if (focusTabs) {
       const root = this.deps.members()[target].rootElement();
       if (root) focusActiveTab(root, this.spec.tabClass, WINDOW_HUB_SELECTED_CLASS);
     }
+  }
+
+  /** Make room for `tab`: hide any OTHER shown member (carrying its position
+   *  onto the target) and remember the tab. Every member calls this from its
+   *  own open path (its closeOthers dep), so a deep link that reaches a member
+   *  directly (a chat link, a tracker click) still shows one tab at a time. */
+  prepare(tab: T): void {
+    const current = this.activeTab();
+    if (current !== null && current !== tab) {
+      const from = this.deps.members()[current].rootElement();
+      const carry = from ? windowHubPositionCarry(from.dataset, this.deps.touch()) : null;
+      this.deps.members()[current].close();
+      const to = this.deps.members()[tab].rootElement();
+      if (carry && to) applyPositionCarry(to, carry);
+    }
+    this.saveTab(tab);
   }
 
   /** A launcher press: see windowHubToggle for the rule. */
@@ -128,6 +141,8 @@ export class WindowHubController<T extends string> {
   stripFor(tab: T): WindowHubStrip {
     return {
       html: () => windowHubStripHtml(this.spec, tab),
+      title: () => t(this.spec.ariaLabelKey),
+      closeLabel: () => t(this.spec.closeKey),
       wire: (root) => {
         // Stamp the focus-carry key BEFORE the member's restore ladder runs
         // (every member wires the strip ahead of it), so a rebuild with a hub

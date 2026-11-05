@@ -20,9 +20,9 @@ export interface MicroMenuLauncherSpec {
 /**
  * Every micro-menu launcher that OPENS A WINDOW, paired with that window's element
  * id. The ring means exactly one thing, "this button's window is open", which is why
- * the rail's other buttons are deliberately absent: `#mm-emote` opens the emote
- * wheel (not a `.window`),
- * and `#mm-wiki` / `#mm-discord` leave the game entirely.
+ * the rail carries nothing else (the menu consolidation moved the emote wheel,
+ * the wiki link and Discord off it). A hub launcher lists its other member
+ * windows so its ring stays on whichever tab is shown.
  */
 export const MICRO_MENU_LAUNCHERS: readonly MicroMenuLauncherSpec[] = [
   { selector: '#mm-char', windowId: 'char-window' },
@@ -30,10 +30,18 @@ export const MICRO_MENU_LAUNCHERS: readonly MicroMenuLauncherSpec[] = [
   { selector: '#mm-talents', windowId: 'talents-window' },
   { selector: '#mm-town-focus', windowId: 'town-focus-window' },
   { selector: '#mm-quest', windowId: 'quest-log-window' },
-  { selector: '#mm-deeds', windowId: 'deeds-window' },
-  { selector: '#mm-reliquary', windowId: 'reliquary-window' },
-  { selector: '#mm-loot-explorer', windowId: 'loot-explorer-window' },
-  { selector: '#mm-cosmetics', windowId: 'cosmetics-window' },
+  {
+    selector: '#mm-deeds',
+    windowId: 'deeds-window',
+    // The Book of the Realm (menu consolidation step 2).
+    memberWindowIds: [
+      'titles-window',
+      'reliquary-window',
+      'reputation-window',
+      'loot-explorer-window',
+      'leaderboard-window',
+    ],
+  },
   {
     selector: '#mm-professions',
     windowId: 'professions-window',
@@ -44,11 +52,12 @@ export const MICRO_MENU_LAUNCHERS: readonly MicroMenuLauncherSpec[] = [
   },
   { selector: '#mm-map', windowId: 'map-window' },
   { selector: '#mm-bag', windowId: 'bags' },
-  { selector: '#mm-arena', windowId: 'arena-window' },
-  { selector: '#mm-dfinder', windowId: 'dungeon-finder-window' },
-  { selector: '#expedition-bell', windowId: 'dungeon-finder-window' },
-  { selector: '#mm-cardduel', windowId: 'card-duel-window' },
-  { selector: '#mm-leaderboard', windowId: 'leaderboard-window' },
+  {
+    selector: '#expedition-bell',
+    windowId: 'dungeon-finder-window',
+    // Activities (menu consolidation step 4): the bell is the hub's launcher.
+    memberWindowIds: ['arena-window', 'card-duel-window'],
+  },
   { selector: '#mm-wocmarket', windowId: 'woc-market-window' },
   { selector: '#mm-social', windowId: 'social-window' },
   { selector: '#mm-options', windowId: 'options-menu' },

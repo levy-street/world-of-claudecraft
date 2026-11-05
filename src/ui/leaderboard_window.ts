@@ -41,6 +41,7 @@ import { classDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import { buildGuildLeaderboardView, type GuildLeaderboardRow } from './guild_leaderboard_view';
 import { guildTagHtml } from './guild_tag';
+import type { WindowHubStrip } from './hud/hub/window_hub_controller';
 import { formatNumber, t } from './i18n';
 import {
   dailyPodiumSlot,
@@ -88,6 +89,9 @@ type LeaderboardBoard = 'players' | 'guilds' | 'deeds' | 'devs' | 'daily' | 'wor
  */
 export interface LeaderboardWindowDeps {
   root(): HTMLElement;
+  /** The Book of the Realm strip (menu consolidation step 2), painted under
+   *  the title bar while this window is one of the hub's tabs. */
+  hubStrip?: WindowHubStrip;
   world(): IWorld;
   closeOthers(): void;
   captureFocus(): HTMLElement | null;
@@ -194,6 +198,18 @@ export class LeaderboardWindow {
       this.close();
       return;
     }
+    this.open();
+  }
+
+  /** The root a hub tab switch carries its position onto. */
+  rootElement(): HTMLElement {
+    return this.deps.root();
+  }
+
+  /** Show the boards from the top (the Book of the Realm's Rankings tab, and
+   *  the closed arm of toggle()). Already shown: nothing to do. */
+  open(): void {
+    if (this.isOpen) return;
     // Capture the opener BEFORE closing other windows, so a sibling window's own
     // focus-return on close cannot clobber the element we restore to (WCAG).
     this.openerFocus = this.deps.captureFocus();
@@ -239,8 +255,11 @@ export class LeaderboardWindow {
     const el = this.deps.root();
     const world = this.deps.world();
     markDialogRoot(el, { labelledBy: 'leaderboard-title' });
-    el.innerHTML = this.titleHtml(world.realm) + this.tabsHtml() + this.loadingBodyHtml();
+    const hub = this.deps.hubStrip;
+    el.innerHTML =
+      this.titleHtml(world.realm) + (hub?.html() ?? '') + this.tabsHtml() + this.loadingBodyHtml();
     el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
+    hub?.wire(el);
     this.wireTabs(el);
     if (focus === 'open') (el.querySelector('[data-close]') as HTMLElement | null)?.focus();
     // A tab switch rebuilt the strip and destroyed the focused button; put the
@@ -630,11 +649,12 @@ export class LeaderboardWindow {
   // ---- HTML builders (the localized DOM the pure view-model drives) ----------
 
   private titleHtml(realm: string): string {
+    const hub = this.deps.hubStrip;
     const realmTag = realm ? ` &middot; ${esc(realm)}` : '';
     return (
-      `<div class="panel-title ui-win-head"><span id="leaderboard-title" class="ui-win-title">${esc(t('game.leaderboard.title'))} ` +
+      `<div class="panel-title ui-win-head"><span id="leaderboard-title" class="ui-win-title">${esc(hub ? hub.title() : t('game.leaderboard.title'))} ` +
       `<span class="lb-subtitle ui-win-sub">${esc(t('game.leaderboard.subtitle'))}${realmTag}</span></span>` +
-      `<button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(t('hudChrome.leaderboard.close'))}">${svgIcon('close')}</button></div>`
+      `<button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(hub ? hub.closeLabel() : t('hudChrome.leaderboard.close'))}">${svgIcon('close')}</button></div>`
     );
   }
 

@@ -1839,6 +1839,7 @@ export const ko_KR: EnTranslations = {
       "chat": "채팅으로 건너뛰기"
     },
     "mobile": {
+      "groupRecord": "기록",
       "jump": "점프",
       "leaderboard": "순위",
       "dailyRewards": "상점",
@@ -3606,6 +3607,7 @@ export const ko_KR: EnTranslations = {
       }
     },
     "currencies": {
+      "walletChipAria": "{name}: {amount}",
       "intro": "모두 가방 칸을 차지하지 않습니다. 동전은 늘 그렇듯 가방에 있습니다.",
       "activities": "활동",
       "factions": "세력",
@@ -6032,6 +6034,10 @@ export const ko_KR: EnTranslations = {
         "none": "아무도 없음",
         "title": "친구 목록과 길드 명단에서 누가 당신의 접속 상태, 지역, 지도 위치를 볼 수 있는지 정합니다. 파티원은 항상 볼 수 있습니다."
       },
+      "guildEvents": {
+        "heading": "길드 행사",
+        "dateLabel": "Date"
+      },
       "billboard": {
         "label": "길드 게시판",
         "empty": "게시판에 아직 아무 내용도 없습니다.",
@@ -6357,6 +6363,20 @@ export const ko_KR: EnTranslations = {
     },
     "professionsHub": {
       "tabOverview": "개요"
+    },
+    "activities": {
+      "title": "활동",
+      "close": "활동 닫기",
+      "tabDungeons": "던전 및 공격대",
+      "tabPvp": "PvP"
+    },
+    "bookOfRealm": {
+      "title": "왕국의 서",
+      "close": "왕국의 서 닫기",
+      "tabDeeds": "업적",
+      "tabTitles": "칭호",
+      "tabReputation": "평판",
+      "tabRankings": "순위표"
     },
     "professions": {
       "title": "전문 기술",

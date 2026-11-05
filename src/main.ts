@@ -1850,7 +1850,7 @@ async function startGame(
             hud.toggleArena();
             break;
           case 'dungeonFinder':
-            hud.toggleDungeonFinder();
+            hud.toggleActivities();
             break;
           case 'bgFlag':
             bgFlagKey();
@@ -1862,9 +1862,6 @@ async function startGame(
             break;
           case 'leaderboard':
             hud.toggleLeaderboard();
-            break;
-          case 'calendar':
-            hud.toggleCalendar();
             break;
           case 'discord':
             toggleDiscordPanel();
@@ -1989,11 +1986,15 @@ async function startGame(
     onMap: () => hud.toggleMap(),
     onLeaderboard: () => hud.toggleLeaderboard(),
     onDailyRewards: () => hud.toggleDailyRewards(),
-    onDeeds: () => hud.toggleDeeds(),
+    onDeeds: () => hud.toggleDeeds('deeds'),
+    onTitles: () => hud.toggleDeeds('titles'),
+    onReputation: () => hud.toggleDeeds('reputation'),
     onReliquary: () => hud.toggleReliquary(),
     onLootExplorer: () => hud.toggleLootExplorer(),
     onMountToggle: () => world.toggleMounted(),
-    onProfessions: () => hud.toggleProfessions(),
+    onProfessions: () => hud.toggleProfessions('overview'),
+    onCardDuel: () => hud.toggleCardDuel(),
+    onCosmetics: () => hud.toggleCosmetics(),
     onPerfecting: () => hud.togglePerfecting(),
     onHarvestJournal: () => hud.toggleHarvestJournal(),
     onNameplates: () => (renderer.showNameplates = !renderer.showNameplates),
@@ -2173,9 +2174,6 @@ async function startGame(
       case 'leaderboard':
         hud.toggleLeaderboard();
         break;
-      case 'calendar':
-        hud.toggleCalendar();
-        break;
       case 'discord':
         toggleDiscordPanel();
         break;
@@ -2186,7 +2184,7 @@ async function startGame(
         hud.toggleCrafting();
         break;
       case 'dungeonFinder':
-        hud.toggleDungeonFinder();
+        hud.toggleActivities();
         break;
       case 'sheathe':
         // The keyboard arm's exact rule, from the same module.
@@ -2966,11 +2964,10 @@ async function startGame(
       crossHotbarSet: () => gamepad.getCrossHotbarSet(),
     },
   });
-  // Desktop discoverability for the Discord link/panel: the micro-menu button
-  // (#mm-discord) mirrors the mobile "More" tray entry (onDiscord), opening the
-  // account panel when logged in and falling through to the community invite
-  // otherwise, so it is a live affordance offline too (not gated on `online`).
-  hud.attachDiscordHook(() => openDiscordEntry());
+  // The Social window's Discord strip opens the account panel when logged in
+  // and falls through to the community invite otherwise (not gated on
+  // `online`); a build with Discord off attaches nothing, hiding the strip.
+  if (DISCORD_BUILD_ENABLED) hud.attachDiscordHook(() => openDiscordEntry());
   if (online) {
     // Issue #2416: chain onto whatever onReconnected enterWorld already armed
     // (the reconnect overlay teardown), rather than replacing it: hud does not

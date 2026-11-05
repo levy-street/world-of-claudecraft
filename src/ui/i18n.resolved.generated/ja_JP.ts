@@ -1839,6 +1839,7 @@ export const ja_JP: EnTranslations = {
       "chat": "チャットへスキップ"
     },
     "mobile": {
+      "groupRecord": "記録",
       "jump": "ジャンプ",
       "leaderboard": "ランキング",
       "dailyRewards": "ストア",
@@ -3606,6 +3607,7 @@ export const ja_JP: EnTranslations = {
       }
     },
     "currencies": {
+      "walletChipAria": "{name}: {amount}",
       "intro": "いずれもバッグの枠を使いません。コインはこれまで通りバッグにあります。",
       "activities": "アクティビティ",
       "factions": "勢力",
@@ -6032,6 +6034,10 @@ export const ja_JP: EnTranslations = {
         "none": "なし",
         "title": "フレンドリストとギルド名簿で誰にオンライン状態、ゾーン、マップ上の位置を見せるか。パーティーメンバーには常に表示されます。"
       },
+      "guildEvents": {
+        "heading": "ギルドイベント",
+        "dateLabel": "Date"
+      },
       "billboard": {
         "label": "ギルド掲示板",
         "empty": "掲示板にはまだ何もありません。",
@@ -6357,6 +6363,20 @@ export const ja_JP: EnTranslations = {
     },
     "professionsHub": {
       "tabOverview": "概要"
+    },
+    "activities": {
+      "title": "アクティビティ",
+      "close": "アクティビティを閉じる",
+      "tabDungeons": "ダンジョンとレイド",
+      "tabPvp": "PvP"
+    },
+    "bookOfRealm": {
+      "title": "王国の書",
+      "close": "王国の書を閉じる",
+      "tabDeeds": "功績",
+      "tabTitles": "称号",
+      "tabReputation": "評判",
+      "tabRankings": "ランキング"
     },
     "professions": {
       "title": "専門技能",

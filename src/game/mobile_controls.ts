@@ -156,8 +156,12 @@ export interface MobileControlCallbacks {
   /** Open the $WOC Exchange, folded into the More tray on mobile (its
    *  launcher stays hidden until the online market attach unhides it). */
   onWocMarket(): void;
-  /** Open the Book of Deeds window, folded into the More tray on mobile. */
+  /** The More tray is a grouped deep-link index (menu consolidation step 5):
+   *  each tile opens its hub already on its tab. The Book of the Realm's
+   *  Deeds, Titles and Reputation tabs. */
   onDeeds(): void;
+  onTitles(): void;
+  onReputation(): void;
   /** Open The Reliquary window, folded into the More tray on mobile. */
   onReliquary(): void;
   /** Open the Loot Explorer window, folded into the More tray on mobile. */
@@ -165,8 +169,11 @@ export interface MobileControlCallbacks {
   /** Use the shared riding toggle from the More tray: dismount instantly or
    *  summon the trained ride with the selected cosmetic. */
   onMountToggle(): void;
-  /** Open the Professions hub, folded into the More tray on mobile. */
+  /** Open the Professions hub on its Overview tab. */
   onProfessions(): void;
+  /** Activities' Card Duel tab, and the Cosmetics window (no rail button). */
+  onCardDuel(): void;
+  onCosmetics(): void;
   /** Open the Professions hub straight on its Perfecting / Harvest Journal tab. */
   onPerfecting(): void;
   onHarvestJournal(): void;
@@ -539,21 +546,20 @@ export class MobileControls {
     this.bindButton('mobile-arena', () => this.callbacks.onArena());
     this.bindButton('mobile-dfinder', () => this.callbacks.onDungeonFinder());
     this.bindButton('mobile-quest', () => this.callbacks.onQuestLog());
-    this.bindButton('mobile-char', () => this.callbacks.onCharacter());
-    this.bindButton('mobile-bags', () => this.callbacks.onBags());
     this.bindButton('mobile-meters', () => this.callbacks.onMeters());
     this.bindButton('mobile-crafting', () => this.callbacks.onCrafting());
-    this.bindButton('mobile-spellbook', () => this.callbacks.onSpellbook());
     this.bindButton('mobile-bar-editor', () => this.callbacks.onBarEditor());
     this.bindButton('mobile-talents', () => this.callbacks.onTalents());
-    this.bindButton('mobile-map', () => this.callbacks.onMap());
     this.bindButton('mobile-leaderboard', () => this.callbacks.onLeaderboard());
     this.bindButton('mobile-daily-rewards', () => this.callbacks.onDailyRewards());
     this.bindButton('mobile-wocmarket', () => this.callbacks.onWocMarket());
     this.bindButton('mobile-deeds', () => this.callbacks.onDeeds());
+    this.bindButton('mobile-titles', () => this.callbacks.onTitles());
+    this.bindButton('mobile-reputation', () => this.callbacks.onReputation());
+    this.bindButton('mobile-cardduel', () => this.callbacks.onCardDuel());
+    this.bindButton('mobile-cosmetics', () => this.callbacks.onCosmetics());
     this.bindButton('mobile-reliquary', () => this.callbacks.onReliquary());
     this.bindButton('mobile-loot-explorer', () => this.callbacks.onLootExplorer());
-    this.bindButton('mobile-mounts', () => this.callbacks.onMountToggle());
     this.bindButton('mobile-professions', () => this.callbacks.onProfessions());
     this.bindButton('mobile-perfecting', () => this.callbacks.onPerfecting());
     this.bindButton('mobile-harvest-journal', () => this.callbacks.onHarvestJournal());

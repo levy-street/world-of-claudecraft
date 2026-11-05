@@ -1839,6 +1839,7 @@ export const zh_CN: EnTranslations = {
       "chat": "跳转到聊天"
     },
     "mobile": {
+      "groupRecord": "记录",
       "jump": "跳跃",
       "leaderboard": "排行榜",
       "dailyRewards": "商店",
@@ -3606,6 +3607,7 @@ export const zh_CN: EnTranslations = {
       }
     },
     "currencies": {
+      "walletChipAria": "{name}: {amount}",
       "intro": "这些都不占背包空间。金币照旧放在背包里。",
       "activities": "活动",
       "factions": "阵营",
@@ -6032,6 +6034,10 @@ export const zh_CN: EnTranslations = {
         "none": "无人",
         "title": "谁能在好友列表和公会名单中看到你在线，以及你的区域和地图位置。队伍成员始终能看到你。"
       },
+      "guildEvents": {
+        "heading": "公会活动",
+        "dateLabel": "Date"
+      },
       "billboard": {
         "label": "公会公告板",
         "empty": "公告板上还没有内容。",
@@ -6357,6 +6363,20 @@ export const zh_CN: EnTranslations = {
     },
     "professionsHub": {
       "tabOverview": "总览"
+    },
+    "activities": {
+      "title": "活动",
+      "close": "关闭活动",
+      "tabDungeons": "地下城与团队副本",
+      "tabPvp": "PvP"
+    },
+    "bookOfRealm": {
+      "title": "王国之书",
+      "close": "关闭王国之书",
+      "tabDeeds": "功绩",
+      "tabTitles": "头衔",
+      "tabReputation": "声望",
+      "tabRankings": "排行榜"
     },
     "professions": {
       "title": "专业",

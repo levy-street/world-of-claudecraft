@@ -74,6 +74,7 @@ import {
 import { dungeonDisplayName, tEntity, zoneDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import { captureFocusKey, FOCUS_KEY_ATTR, restoreFirstEnabled } from './focus_restore';
+import type { WindowHubStrip } from './hud/hub/window_hub_controller';
 import { formatNumber, type TranslationKey, t, tPlural } from './i18n';
 import type { InspectRemoteProfile } from './inspect_window';
 import type { PainterHostPresentation } from './painter_host';
@@ -87,6 +88,9 @@ const FINDER_LOADING_SIG = 'dfinder-loading';
 
 export interface DungeonFinderWindowDeps extends PainterHostPresentation {
   root(): HTMLElement;
+  /** The Activities strip (menu consolidation step 4), painted under the
+   *  title bar while this window is one of the hub's tabs. */
+  hubStrip?: WindowHubStrip;
   world(): IWorld;
   closeOthers(): void;
   captureFocus(): HTMLElement | null;
@@ -146,6 +150,11 @@ export class DungeonFinderWindow {
 
   get isOpen(): boolean {
     return this.deps.root().style.display === 'flex';
+  }
+
+  /** The root a hub tab switch carries its position onto. */
+  rootElement(): HTMLElement {
+    return this.deps.root();
   }
 
   toggle(): void {
@@ -233,6 +242,7 @@ export class DungeonFinderWindow {
       if (this.lastSig === FINDER_LOADING_SIG) return;
       this.lastSig = FINDER_LOADING_SIG;
       el.innerHTML = `${this.titleHtml()}<div class="df-note">${esc(t('hudChrome.finder.syncing'))}</div>`;
+      this.deps.hubStrip?.wire(el);
       el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
       return;
     }
@@ -406,6 +416,7 @@ export class DungeonFinderWindow {
   // ---- event wiring ----------------------------------------------------------
 
   private wire(el: HTMLElement, view: Extract<DungeonFinderViewModel, { kind: 'live' }>): void {
+    this.deps.hubStrip?.wire(el);
     const world = () => this.deps.world();
     const rerender = () => {
       this.lastSig = '';
@@ -738,9 +749,11 @@ export class DungeonFinderWindow {
   // ---- HTML builders ----------------------------------------------------------
 
   private titleHtml(): string {
+    const hub = this.deps.hubStrip;
     return (
-      `<div class="panel-title ui-win-head"><span id="dfinder-title" class="ui-win-title">${esc(finderTitle(this.tab, this.creatingGroup))}</span>` +
-      `<button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(t('hudChrome.finder.close'))}">${svgIcon('close')}</button></div>`
+      `<div class="panel-title ui-win-head"><span id="dfinder-title" class="ui-win-title">${esc(hub ? hub.title() : finderTitle(this.tab, this.creatingGroup))}</span>` +
+      `<button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(hub ? hub.closeLabel() : t('hudChrome.finder.close'))}">${svgIcon('close')}</button></div>` +
+      (hub?.html() ?? '')
     );
   }
 

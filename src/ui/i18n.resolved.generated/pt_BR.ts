@@ -1839,6 +1839,7 @@ export const pt_BR: EnTranslations = {
       "chat": "Pular para o chat"
     },
     "mobile": {
+      "groupRecord": "Record",
       "jump": "Pular",
       "leaderboard": "Classificação",
       "dailyRewards": "Loja",
@@ -3606,6 +3607,7 @@ export const pt_BR: EnTranslations = {
       }
     },
     "currencies": {
+      "walletChipAria": "{name}: {amount}",
       "intro": "Nenhuma delas ocupa espaço na mochila. As moedas continuam na sua mochila como sempre.",
       "activities": "Atividades",
       "factions": "Facções",
@@ -6032,6 +6034,10 @@ export const pt_BR: EnTranslations = {
         "none": "Ninguém",
         "title": "Quem vê você online em listas de amigos e na lista da guilda, com sua zona e posição no mapa. Seu grupo sempre vê você."
       },
+      "guildEvents": {
+        "heading": "Guild events",
+        "dateLabel": "Date"
+      },
       "billboard": {
         "label": "Mural da Guilda",
         "empty": "Ainda não há nada no mural.",
@@ -6357,6 +6363,20 @@ export const pt_BR: EnTranslations = {
     },
     "professionsHub": {
       "tabOverview": "Overview"
+    },
+    "activities": {
+      "title": "Activities",
+      "close": "Close Activities",
+      "tabDungeons": "Dungeons and Raids",
+      "tabPvp": "PvP"
+    },
+    "bookOfRealm": {
+      "title": "Book of the Realm",
+      "close": "Close the Book of the Realm",
+      "tabDeeds": "Deeds",
+      "tabTitles": "Titles",
+      "tabReputation": "Reputation",
+      "tabRankings": "Rankings"
     },
     "professions": {
       "title": "Profissões",

@@ -1839,6 +1839,7 @@ export const nl_NL: EnTranslations = {
       "chat": "Ga naar chat"
     },
     "mobile": {
+      "groupRecord": "Record",
       "jump": "Springen",
       "leaderboard": "Ranglijst",
       "dailyRewards": "Winkel",
@@ -3606,6 +3607,7 @@ export const nl_NL: EnTranslations = {
       }
     },
     "currencies": {
+      "walletChipAria": "{name}: {amount}",
       "intro": "Geen van deze nemen rugzakruimte in beslag. Munten blijven altijd in je rugzak.",
       "activities": "Activiteiten",
       "factions": "Facties",
@@ -6032,6 +6034,10 @@ export const nl_NL: EnTranslations = {
         "none": "Niemand",
         "title": "Wie ziet je online in vriendenlijsten en het gilderooster, met je zone en kaartpositie. Je groep ziet je altijd."
       },
+      "guildEvents": {
+        "heading": "Guild events",
+        "dateLabel": "Date"
+      },
       "billboard": {
         "label": "Gildeprikbord",
         "empty": "Nog niets op het prikbord.",
@@ -6357,6 +6363,20 @@ export const nl_NL: EnTranslations = {
     },
     "professionsHub": {
       "tabOverview": "Overview"
+    },
+    "activities": {
+      "title": "Activities",
+      "close": "Close Activities",
+      "tabDungeons": "Dungeons and Raids",
+      "tabPvp": "PvP"
+    },
+    "bookOfRealm": {
+      "title": "Book of the Realm",
+      "close": "Close the Book of the Realm",
+      "tabDeeds": "Deeds",
+      "tabTitles": "Titles",
+      "tabReputation": "Reputation",
+      "tabRankings": "Rankings"
     },
     "professions": {
       "title": "Beroepen",

@@ -1839,6 +1839,7 @@ export const da_DK: EnTranslations = {
       "chat": "Spring til chat"
     },
     "mobile": {
+      "groupRecord": "Record",
       "jump": "Hop",
       "leaderboard": "Rangliste",
       "dailyRewards": "Butik",
@@ -3606,6 +3607,7 @@ export const da_DK: EnTranslations = {
       }
     },
     "currencies": {
+      "walletChipAria": "{name}: {amount}",
       "intro": "Ingen af disse tager plads i din rygsæk. Mønter bliver som altid i din rygsæk.",
       "activities": "Aktiviteter",
       "factions": "Fraktioner",
@@ -6032,6 +6034,10 @@ export const da_DK: EnTranslations = {
         "none": "Ingen",
         "title": "Hvem der ser dig online på vennelister og laugsmandtal, med din zone og kortposition. Dit hold ser altid dig."
       },
+      "guildEvents": {
+        "heading": "Guild events",
+        "dateLabel": "Date"
+      },
       "billboard": {
         "label": "Laugsopslagstavle",
         "empty": "Der er intet på opslagstavlen endnu.",
@@ -6357,6 +6363,20 @@ export const da_DK: EnTranslations = {
     },
     "professionsHub": {
       "tabOverview": "Overview"
+    },
+    "activities": {
+      "title": "Activities",
+      "close": "Close Activities",
+      "tabDungeons": "Dungeons and Raids",
+      "tabPvp": "PvP"
+    },
+    "bookOfRealm": {
+      "title": "Book of the Realm",
+      "close": "Close the Book of the Realm",
+      "tabDeeds": "Deeds",
+      "tabTitles": "Titles",
+      "tabReputation": "Reputation",
+      "tabRankings": "Rankings"
     },
     "professions": {
       "title": "Erhverv",

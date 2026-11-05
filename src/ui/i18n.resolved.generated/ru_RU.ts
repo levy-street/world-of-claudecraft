@@ -1839,6 +1839,7 @@ export const ru_RU: EnTranslations = {
       "chat": "Перейти к чату"
     },
     "mobile": {
+      "groupRecord": "Летопись",
       "jump": "Прыжок",
       "leaderboard": "Рейтинг",
       "dailyRewards": "Магазин",
@@ -3606,6 +3607,7 @@ export const ru_RU: EnTranslations = {
       }
     },
     "currencies": {
+      "walletChipAria": "{name}: {amount}",
       "intro": "Ничто из этого не занимает место в сумке. Монеты остаются в сумке, как и раньше.",
       "activities": "Активности",
       "factions": "Фракции",
@@ -6032,6 +6034,10 @@ export const ru_RU: EnTranslations = {
         "none": "Никому",
         "title": "Кто видит, что вы в сети, в списках друзей и составе гильдии, вместе с вашей зоной и положением на карте. Группа видит вас всегда."
       },
+      "guildEvents": {
+        "heading": "События гильдии",
+        "dateLabel": "Date"
+      },
       "billboard": {
         "label": "Доска объявлений гильдии",
         "empty": "На доске объявлений пока пусто.",
@@ -6357,6 +6363,20 @@ export const ru_RU: EnTranslations = {
     },
     "professionsHub": {
       "tabOverview": "Обзор"
+    },
+    "activities": {
+      "title": "Занятия",
+      "close": "Закрыть занятия",
+      "tabDungeons": "Подземелья и рейды",
+      "tabPvp": "PvP"
+    },
+    "bookOfRealm": {
+      "title": "Книга королевства",
+      "close": "Закрыть Книгу королевства",
+      "tabDeeds": "Деяния",
+      "tabTitles": "Звания",
+      "tabReputation": "Репутация",
+      "tabRankings": "Рейтинг"
     },
     "professions": {
       "title": "Профессии",

@@ -1839,6 +1839,7 @@ export const en_XA: EnTranslations = {
       "chat": "[Šķíþ ţó Çĥáţ]"
     },
     "mobile": {
+      "groupRecord": "[Ŕéçóŕð]",
       "jump": "[Ĵúɱþ]",
       "leaderboard": "[Ŕáñķš]",
       "dailyRewards": "[Šţóŕé]",
@@ -3606,6 +3607,7 @@ export const en_XA: EnTranslations = {
       }
     },
     "currencies": {
+      "walletChipAria": "[{name}: {amount}]",
       "intro": "[Ñóñé óƒ ţĥéšé ţáķé ƀáĝ šþáçé. Çóíñ šţáýš íñ ýóúŕ ƀáĝ áš áļŵáýš.]",
       "activities": "[Áçţíʋíţíéš]",
       "factions": "[Ƒáçţíóñš]",
@@ -6032,6 +6034,10 @@ export const en_XA: EnTranslations = {
         "none": "[Ñó óñé]",
         "title": "[Ŵĥó šééš ýóú óñļíñé íñ ƒŕíéñðš ļíšţš áñð ţĥé ĝúíļð ŕóšţéŕ, ŵíţĥ ýóúŕ žóñé áñð ɱáþ þóšíţíóñ. Ýóúŕ þáŕţý áļŵáýš šééš ýóú.]"
       },
+      "guildEvents": {
+        "heading": "[Ĝúíļð éʋéñţš]",
+        "dateLabel": "[Ðáţé]"
+      },
       "billboard": {
         "label": "[Ĝúíļð Ɓíļļƀóáŕð]",
         "empty": "[Ñóţĥíñĝ óñ ţĥé ƀíļļƀóáŕð ýéţ.]",
@@ -6357,6 +6363,20 @@ export const en_XA: EnTranslations = {
     },
     "professionsHub": {
       "tabOverview": "[Óʋéŕʋíéŵ]"
+    },
+    "activities": {
+      "title": "[Áçţíʋíţíéš]",
+      "close": "[Çļóšé Áçţíʋíţíéš]",
+      "tabDungeons": "[Ðúñĝéóñš áñð Ŕáíðš]",
+      "tabPvp": "[ÞʋÞ]"
+    },
+    "bookOfRealm": {
+      "title": "[Ɓóóķ óƒ ţĥé Ŕéáļɱ]",
+      "close": "[Çļóšé ţĥé Ɓóóķ óƒ ţĥé Ŕéáļɱ]",
+      "tabDeeds": "[Ðééðš]",
+      "tabTitles": "[Ţíţļéš]",
+      "tabReputation": "[Ŕéþúţáţíóñ]",
+      "tabRankings": "[Ŕáñķíñĝš]"
     },
     "professions": {
       "title": "[Þŕóƒéššíóñš]",

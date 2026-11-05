@@ -178,7 +178,6 @@ import {
   RANKED_ARENA_LOSS_HONOR,
   RANKED_ARENA_WIN_HONOR,
 } from '../src/sim/pvp/honor';
-import { DOUBLE_HONOR_MULTIPLIER, DOUBLE_HONOR_WEEKDAYS } from '../src/sim/pvp/honor_event';
 import { FARM_RIFT_DROP_ITEM_IDS, RIFT_PATTERN_ITEM_IDS } from '../src/sim/rift/progression';
 import { Sim } from '../src/sim/sim';
 import {
@@ -186,7 +185,6 @@ import {
   FINDER_PROPOSAL_SECONDS,
 } from '../src/sim/social/dungeon_finder';
 import { CONSUME_DURATION, type DeedDef, DT } from '../src/sim/types';
-import { SYSTEM_EVENTS } from '../src/ui/calendar_view';
 import { DEED_IMAGE_IDS } from '../src/ui/deed_image_ids';
 import { entityTranslationKey } from '../src/ui/entity_i18n';
 import { esc } from '../src/ui/esc';
@@ -6380,13 +6378,11 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
     }
   });
 
-  it('guide.social.calendarBodyDoubleHonor names every realm day and the one weekend that pays (wiki completeness audit)', () => {
-    // Phase 20, the wiki completeness audit (2026-09-03). The predecessor
-    // guide.social.calendarBody listed six realm days where SYSTEM_EVENTS ships
-    // seven ids, and its 'not a bonus' close is false on the Double Honor
-    // Weekend (src/sim/pvp/honor_event.ts doubles Thornhollow Fields honor on
-    // the weekdays the calendar marks). Every name is read from SYSTEM_EVENTS
-    // in table order through the calendar window's own title keys.
+  it('the social page drops the event calendar with its window (menu consolidation step 4)', () => {
+    // The Event Calendar window left the game: its one live rule (the Double
+    // Honor Weekend) shows on the PvP tab and guild events moved to the Social
+    // window's Guild tab, so the guide's calendar section is gone and its keys
+    // are retired (scripts/i18n_retired_keys.mjs).
     setLanguage('en');
     const html =
       pageFor('social')?.render({
@@ -6394,55 +6390,10 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
         sub: 'social',
         titleKey: 'guide.nav.social',
       }) ?? '';
-    const body = t('guide.social.calendarBodyDoubleHonor' as never);
-    expect(html).toContain(esc(body));
-    const camel = (id: string) => id.replace(/_([a-z])/g, (_m, c: string) => c.toUpperCase());
-    const title = (id: string) => t(`hudChrome.calendar.events.${camel(id)}.title` as never);
-    const ids = [...new Set(SYSTEM_EVENTS.map((e) => e.id))];
-    const kindOf = (id: string) => SYSTEM_EVENTS.find((e) => e.id === id)?.rule.kind;
-    const weekly = ids.filter((id) => kindOf(id) === 'weekly').map(title);
-    const monthly = ids.filter((id) => kindOf(id) === 'monthly').map(title);
-    expect(body).toContain(
-      `the weekly ${weekly.slice(0, -1).join(', ')}, and ${weekly[weekly.length - 1]}`,
-    );
-    expect(body).toContain(`the monthly ${monthly.join(' and ')}`);
-    let cursor = -1;
-    for (const id of ids) {
-      const at = body.indexOf(title(id));
-      expect(at, `${id} is named, in SYSTEM_EVENTS order`).toBeGreaterThan(cursor);
-      cursor = at;
-    }
-    // The exception: the marked weekdays are the sim's window, 'double' is the
-    // multiplier in words, and the in-game calendar note makes the same claims.
-    const marked = SYSTEM_EVENTS.filter((e) => e.id === 'double_honor').map((e) =>
-      e.rule.kind === 'weekly' ? e.rule.weekday : -1,
-    );
-    expect([...marked].sort()).toEqual([...DOUBLE_HONOR_WEEKDAYS].sort());
-    expect(DOUBLE_HONOR_MULTIPLIER).toBe(2);
-    const field = t('hudChrome.bg.title' as never);
-    const exception = `all through the ${title('double_honor')}, ${field} Honor pays double and a played-out loss pays like a win`;
-    expect(body).toContain(`with one exception: ${exception}.`);
-    const note = t('hudChrome.calendar.events.doubleHonor.note' as never);
-    expect(note).toContain(`${field} Honor pays double`);
-    expect(note).toContain('a played-out loss pays like a win');
-    expect(body).toContain('Nothing else about your character changes because a day is marked.');
-    // Narrowness: the opening and the guild clause are the predecessor's bytes.
-    const predecessor = guideStrings.social.calendarBody;
-    expect(body.slice(0, body.indexOf('the weekly'))).toBe(
-      predecessor.slice(0, predecessor.indexOf('the weekly')),
-    );
-    const guildClause = predecessor.slice(
-      predecessor.indexOf(', and it is where guilds'),
-      predecessor.indexOf(' The realm days'),
-    );
-    expect(guildClause.length).toBeGreaterThan(40);
-    expect(body).toContain(guildClause);
-    expect(html).not.toContain('Arena Clash, and Fishing Derby');
-    expect(html).not.toContain(
-      'a prompt to gather, not a bonus; nothing about your character changes',
-    );
-    expect(html).not.toContain(esc(predecessor));
-    expect(RETIRED_KEYS).toContain('guide.social.calendarBody');
+    expect(html).not.toContain(esc(t('guide.social.calendarHeading' as never)));
+    expect(html).not.toContain('Press I to open the event calendar');
+    expect(RETIRED_KEYS).toContain('guide.social.calendarHeading');
+    expect(RETIRED_KEYS).toContain('guide.social.calendarBodyDoubleHonor');
   });
 
   it('guide.social.emotesBodyNamedTarget aims an emote by a typed name and calls the wheel key a default (wiki completeness audit)', () => {

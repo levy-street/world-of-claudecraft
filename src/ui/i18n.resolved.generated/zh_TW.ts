@@ -1839,6 +1839,7 @@ export const zh_TW: EnTranslations = {
       "chat": "跳至聊天"
     },
     "mobile": {
+      "groupRecord": "紀錄",
       "jump": "跳躍",
       "leaderboard": "排行榜",
       "dailyRewards": "商店",
@@ -3606,6 +3607,7 @@ export const zh_TW: EnTranslations = {
       }
     },
     "currencies": {
+      "walletChipAria": "{name}: {amount}",
       "intro": "這些都不佔背包空間。金幣照舊放在背包裡。",
       "activities": "活動",
       "factions": "陣營",
@@ -6032,6 +6034,10 @@ export const zh_TW: EnTranslations = {
         "none": "無人",
         "title": "誰能在好友名單和公會名單中看到你在線，以及你的區域和地圖位置。隊伍成員始終能看到你。"
       },
+      "guildEvents": {
+        "heading": "公會活動",
+        "dateLabel": "Date"
+      },
       "billboard": {
         "label": "公會公告板",
         "empty": "公告板上還沒有內容。",
@@ -6357,6 +6363,20 @@ export const zh_TW: EnTranslations = {
     },
     "professionsHub": {
       "tabOverview": "總覽"
+    },
+    "activities": {
+      "title": "活動",
+      "close": "關閉活動",
+      "tabDungeons": "地城與團隊副本",
+      "tabPvp": "PvP"
+    },
+    "bookOfRealm": {
+      "title": "王國之書",
+      "close": "關閉王國之書",
+      "tabDeeds": "功績",
+      "tabTitles": "頭銜",
+      "tabReputation": "聲望",
+      "tabRankings": "排行榜"
     },
     "professions": {
       "title": "專業",

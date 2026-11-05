@@ -1839,6 +1839,7 @@ export const tr_TR: EnTranslations = {
       "chat": "Sohbete Atla"
     },
     "mobile": {
+      "groupRecord": "Record",
       "jump": "Zıpla",
       "leaderboard": "Sıralama",
       "dailyRewards": "Mağaza",
@@ -3606,6 +3607,7 @@ export const tr_TR: EnTranslations = {
       }
     },
     "currencies": {
+      "walletChipAria": "{name}: {amount}",
       "intro": "Bunların hiçbiri çanta alanı kapmaz. Para her zaman çantanda kalır.",
       "activities": "Etkinlikler",
       "factions": "Fraksiyonlar",
@@ -6032,6 +6034,10 @@ export const tr_TR: EnTranslations = {
         "none": "Kimse",
         "title": "Kimin seni arkadaş listelerinde ve lonca çizelgesinde çevrimiçi göreceği, bölgen ve harita konumunla. Partun seni her zaman görür."
       },
+      "guildEvents": {
+        "heading": "Guild events",
+        "dateLabel": "Date"
+      },
       "billboard": {
         "label": "Lonca Panosu",
         "empty": "Panoda henüz bir şey yok.",
@@ -6357,6 +6363,20 @@ export const tr_TR: EnTranslations = {
     },
     "professionsHub": {
       "tabOverview": "Overview"
+    },
+    "activities": {
+      "title": "Activities",
+      "close": "Close Activities",
+      "tabDungeons": "Dungeons and Raids",
+      "tabPvp": "PvP"
+    },
+    "bookOfRealm": {
+      "title": "Book of the Realm",
+      "close": "Close the Book of the Realm",
+      "tabDeeds": "Deeds",
+      "tabTitles": "Titles",
+      "tabReputation": "Reputation",
+      "tabRankings": "Rankings"
     },
     "professions": {
       "title": "Meslekler",

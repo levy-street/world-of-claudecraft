@@ -48,6 +48,7 @@ export const PROFESSIONS_HUB: WindowHubSpec<ProfessionsHubTab> = {
   defaultTab: PROFESSIONS_HUB_DEFAULT_TAB,
   storageKey: PROFESSIONS_HUB_TAB_KEY,
   ariaLabelKey: 'hudChrome.professions.title',
+  closeKey: 'hudChrome.professions.close',
   stripClass: 'prof-hub-tabs',
   tabClass: PROFESSIONS_HUB_TAB_CLASS,
   focusPrefix: 'profHub',

@@ -3169,26 +3169,6 @@ export const TARGETS = [
     },
   },
   {
-    key: 'event-calendar',
-    label: 'Event Calendar window: recurring system-event rows',
-    when: ['ui/calendar_view.ts', 'ui/calendar_window.ts'],
-    // Saturday clock on purpose: the month grid rings "today" on a Saturday,
-    // the day both weekly PvP rows (Arena Clash, Double Honor Day) land on.
-    variants: [{ key: 'calendar-window', beforeLoad: saturdayClockSeed }],
-    async capture(page) {
-      const opened = await page.evaluate(() => {
-        const game = window.__game;
-        if (!game?.hud) return { ok: false, reason: 'offline world is unavailable' };
-        game.hud.toggleCalendar();
-        return { ok: true };
-      });
-      if (!opened.ok) return { skip: opened.reason };
-      const ready = await pollForSize(page, '#calendar-window');
-      if (!ready) return { skip: 'the calendar window never became visible' };
-      return { clip: '#calendar-window' };
-    },
-  },
-  {
     key: 'skill-milestone-plate',
     label: 'Banner: gathering skill milestone plate (#2934)',
     when: ['ui/hud/professions/skill_level_toast_view'],

@@ -81,8 +81,8 @@ describe('launcher toggle', () => {
 describe('the shared strip', () => {
   it('is a WAI-ARIA tablist on the ui-tabs primitives with exactly one selected tab', () => {
     const model = professionsHubStripModel('perfecting');
-    expect(model.stripClass).toBe('prof-hub-tabs ui-tabs');
-    expect(model.tabClass).toBe('prof-hub-tab ui-tab');
+    expect(model.stripClass).toBe('prof-hub-tabs window-hub-tabs ui-tabs');
+    expect(model.tabClass).toBe('prof-hub-tab window-hub-tab ui-tab');
     expect(model.ariaLabel).toBe('Professions');
     expect(model.tabs.map((tab) => [tab.id, tab.label, tab.selected])).toEqual([
       ['overview', 'Overview', false],

@@ -126,7 +126,6 @@ const WINDOW_MATRIX = [
   { toggle: 'toggleQuestLog', id: 'quest-log-window', widths: SPOT },
   { toggle: 'toggleBags', id: 'bags', widths: SPOT },
   { toggle: 'toggleCrafting', id: 'crafting-window', widths: [844] },
-  { toggle: 'toggleCalendar', id: 'calendar-window', widths: [844] },
   { toggle: 'toggleArena', id: 'arena-window', widths: [844] },
   { toggle: 'toggleLeaderboard', id: 'leaderboard-window', widths: [844] },
   { toggle: 'toggleSocial', id: 'social-window', widths: SPOT },

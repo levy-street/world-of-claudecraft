@@ -1839,6 +1839,7 @@ export const de_DE: EnTranslations = {
       "chat": "Zum Chat springen"
     },
     "mobile": {
+      "groupRecord": "Record",
       "jump": "Springen",
       "leaderboard": "Rangliste",
       "dailyRewards": "Shop",
@@ -3606,6 +3607,7 @@ export const de_DE: EnTranslations = {
       }
     },
     "currencies": {
+      "walletChipAria": "{name}: {amount}",
       "intro": "Keine davon belegt Taschenplatz. Münze bleibt wie gewohnt in deiner Tasche.",
       "activities": "Aktivitäten",
       "factions": "Fraktionen",
@@ -6032,6 +6034,10 @@ export const de_DE: EnTranslations = {
         "none": "Niemand",
         "title": "Wer sieht dich online in Freundeslisten und der Gildenliste, mit deiner Zone und Kartenposition. Deine Gruppe sieht dich immer."
       },
+      "guildEvents": {
+        "heading": "Guild events",
+        "dateLabel": "Date"
+      },
       "billboard": {
         "label": "Gildenpinnwand",
         "empty": "Noch nichts an der Pinnwand.",
@@ -6357,6 +6363,20 @@ export const de_DE: EnTranslations = {
     },
     "professionsHub": {
       "tabOverview": "Overview"
+    },
+    "activities": {
+      "title": "Activities",
+      "close": "Close Activities",
+      "tabDungeons": "Dungeons and Raids",
+      "tabPvp": "PvP"
+    },
+    "bookOfRealm": {
+      "title": "Book of the Realm",
+      "close": "Close the Book of the Realm",
+      "tabDeeds": "Deeds",
+      "tabTitles": "Titles",
+      "tabReputation": "Reputation",
+      "tabRankings": "Rankings"
     },
     "professions": {
       "title": "Berufe",
