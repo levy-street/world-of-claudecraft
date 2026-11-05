@@ -1160,7 +1160,16 @@ function duty(world, st, b, me) {
     (b.tankTarget === 'singer' || keeper(world) === b) &&
     alive(world.mobs.guardian) &&
     alive(world.mobs.singer);
-  if (coverSpot && !singerTank && !(rock?.soakers.has(b.pid) && rockRem < coverRem - 2.2))
+  // A Resonance carrier rings on everyone near it every second (heroic lets
+  // it overlap the Wrath): with health to spare it takes the Wrath in the
+  // open, away from the crowded shadows, rather than ring through them.
+  const ringing = hasAura(me, AURA.resonance) && me.hp / Math.max(1, me.mhp) > 0.6;
+  if (
+    coverSpot &&
+    !singerTank &&
+    !ringing &&
+    !(rock?.soakers.has(b.pid) && rockRem < coverRem - 2.2)
+  )
     return { goal: coverSpot, tol: 0.6, duty: 'cover' };
   // The marked player leads the charge through the cursed pillar.
   const g = world.mobs.guardian;
