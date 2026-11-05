@@ -23,9 +23,13 @@ const KEY = 'hudChrome.auraEffect.council';
 const pct = (frac: number): number => Math.round(Math.abs(frac) * 100);
 /** Heroic's damage factor; Mythic shares it (pinned), so one range names both. */
 const HM = COUNCIL_DIFFICULTY.heroic.damageMult;
-/** A tier's Wrath factor on top of its damage factor (council_wrath.ts). */
-const wrathMult = (tier: 'heroic' | 'mythic'): number =>
-  COUNCIL_DIFFICULTY[tier].damageMult * COUNCIL_DIFFICULTY[tier].wrathMult;
+/** A Wrath endpoint on a tier, rounded in the fight's two steps
+ *  (council_wrath.ts wrathRoll: the damage roll, then the Wrath factor). */
+const wrath = (value: number, tier: 'heroic' | 'mythic'): number =>
+  tierValue(
+    tierValue(value, COUNCIL_DIFFICULTY[tier].damageMult),
+    COUNCIL_DIFFICULTY[tier].wrathMult,
+  );
 
 /** The council aura's descriptor, or null when `a` is not one of them. */
 export function councilAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor | null {
@@ -119,8 +123,10 @@ export function councilAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescr
           share: pct(T.crowdShare),
           min: T.wrathMin,
           max: T.wrathMax,
-          ...tierRange('heroic', T.wrathMin, T.wrathMax, wrathMult('heroic')),
-          ...tierRange('mythic', T.wrathMin, T.wrathMax, wrathMult('mythic')),
+          heroicMin: wrath(T.wrathMin, 'heroic'),
+          heroicMax: wrath(T.wrathMax, 'heroic'),
+          mythicMin: wrath(T.wrathMin, 'mythic'),
+          mythicMax: wrath(T.wrathMax, 'mythic'),
         },
       };
     default:
