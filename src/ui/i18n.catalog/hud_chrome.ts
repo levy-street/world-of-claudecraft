@@ -10280,6 +10280,9 @@ export const hudChromeStrings = {
       guardian_pull: "Strangers in the Quarry. The Hammer's strength does not yield to flesh.",
       guardian_wrath: 'The mountain answers me! Hide, if the stone will have you!',
       guardian_rush: 'Stand in my path, then. The mountain does not turn aside.',
+      guardian_collapse: 'Then let the whole Quarry fall!',
+      guardian_slay_a: 'Crushed, as ore beneath the hammer.',
+      guardian_slay_b: 'One less hand to steal the strength.',
       guardian_death: 'My strength... I give it to the stone.',
       guardian_remember: 'The stone remembers. What was theirs is mine.',
       guardian_soul: 'I am the stone now. My wrath has no body left to fail.',
@@ -10289,6 +10292,9 @@ export const hudChromeStrings = {
       singer_song: 'Sing with me, and break!',
       singer_wake: 'Wake, sleeping stone. Rise where they stand!',
       singer_rock: 'Look up, little ones! The mountain is falling!',
+      singer_hush: 'You would silence the seam? It only sings louder.',
+      singer_slay_a: 'Your voice joins the seam now.',
+      singer_slay_b: 'Hear that? One note fewer.',
       singer_death: 'My song... runs into the rock...',
       singer_remember: 'The stone remembers. Listen, it still sings.',
       singer_soul: 'Listen. In the stone, my song never ends.',
@@ -10345,6 +10351,11 @@ export const hudChromeStrings = {
       guardian_drawn: 'The sky has chosen you. Run, and it follows.',
       guardian_isles: 'Winds, wall me in! The isles will keep my breath whole.',
       guardian_bulwark: 'My shield... torn open. Then feel the gale again!',
+      guardian_roar: 'Hear the summit roar!',
+      guardian_knot: 'Hold my storm, if your arms can bear it.',
+      guardian_slay_a: 'Another one given to the wind.',
+      guardian_slay_b: 'The sky does not catch the fallen.',
+      guardian_slay_c: 'Your last breath is mine.',
       guardian_wipe: 'Blown away, like dust from the summit.',
       guardian_death: 'The Breath... goes back... to the mountain...',
       thessaly_pull:
@@ -10374,6 +10385,10 @@ export const hudChromeStrings = {
       cross: 'Go, blades! Cut them from the warmth!',
       flurry: 'Every blade! Every edge! Leave nothing standing on my lake!',
       deepen: 'Feel it? The cold is going deeper.',
+      breath: 'Breathe in the deep cold.',
+      slay_a: 'Tempered... and broken.',
+      slay_b: 'Cool now. Quiet now.',
+      slay_c: 'The lake keeps what it takes.',
       wipe: 'Still. Silent. Quenched.',
       death: 'The cold... lets go... The Quench is yours.',
     },
@@ -10423,14 +10438,49 @@ export const hudChromeStrings = {
       seeds: 'Every spark I scatter takes root.',
       zones: 'The Hearth wakes beneath your feet.',
       cinder: 'Run, little ember. The flame is hungry.',
+      wheel: 'The Hearth turns! Keep pace with it, or burn!',
+      slay_a: 'Another spark goes home to the flame.',
+      slay_b: 'Burned clean.',
+      slay_c: 'The first flame takes its due.',
       wipe: 'Ash, all of you. The Hearth burns on.',
       death: 'The flame... sinks back... into the stone. Carry it well.',
     },
   },
   // The Smith's Heart's Masterless Strength (encounters/smith_heart/final*.ts):
-  // the raid warnings of its fight (the same English the sim sends). Wordy
-  // (M16): non-Latin fills in the overlays.
+  // the raid warnings of its fight (the same English the sim sends) and what
+  // it SAYS (final_voice.ts FINAL_LINES, the same English). Wordy (M16):
+  // non-Latin fills in the overlays.
   finalBoss: {
+    say: {
+      arrivalWake:
+        'Who wakes the heart of the mountain? Warm breath... here, where nothing breathes.',
+      arrivalRise:
+        'Stone, rise. Bind to us. The hand that shaped us is gone, so we shape ourselves.',
+      arrivalRoar: "We are the Smith's strength, and we have no master!",
+      pull: 'You carry the four veins in your blood. We will take them back, and seal the mountain over you.',
+      drinkHeat: 'The first flame fills us!',
+      drinkQuench: 'Cold water, harden us!',
+      drinkBreath: 'Breathe, bellows! Lift the storm!',
+      drinkHammer: 'Strike, Hammer! Make us heavy!',
+      burst: 'The vein runs over! Drown in it!',
+      anvil: 'Bear the weight of the world!',
+      call: 'Splinters of our strength, rise from the veins! Guard the heart!',
+      callAgain: 'Again! Every vein, give us your children!',
+      shattered: 'Our splinters... shattered. Then we fight with what remains.',
+      poured: 'Yes... pour into us. Every vein, one body.',
+      final: 'Enough! Every vein at once! The whole mountain falls on you!',
+      fury: 'No hand to stay us. No end to our strength!',
+      kneel: 'So this is how he felt... lying down... at last...',
+      rebirth: 'No. The mountain does not sleep twice!',
+      collapse: 'Fall, stone! If we cannot hold the mountain, no one stands on it!',
+      anvilsEnd: 'The Anvil ends. Everything ends.',
+      slay_a: 'Back into the stone.',
+      slay_b: 'Your blood returns to the vein.',
+      slay_c: 'One more warmth, sealed in.',
+      wipe: 'Sealed. Silent. As he wanted.',
+      death:
+        'The hand... was never coming back. One ember still burns... Take it, and let the mountain sleep.',
+    },
     warn: {
       enterHeat:
         'The Masterless Strength drinks the Heat! Dodge the fist, the swells and the whirls!',

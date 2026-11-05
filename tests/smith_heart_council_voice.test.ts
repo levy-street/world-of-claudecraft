@@ -83,7 +83,7 @@ describe('Hammer Council lines', () => {
         expect(t(councilLineKey(role, moment as CouncilMoment) as never)).toBe(text);
         n++;
       }
-    expect(n).toBe(17);
+    expect(n).toBe(23);
   });
 
   it('the pull: each member once, the Guardian first, a breath apart', () => {

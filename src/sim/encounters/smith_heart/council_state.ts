@@ -6,6 +6,7 @@
 
 import type { FloorMechanic } from './council_floor_gap';
 import type { CouncilDifficulty, CouncilRole } from './council_ids';
+import type { SlainWatch } from './voice_slain';
 
 /** A player mark counting down (Wake the Stone, Falling Rock). */
 export interface CouncilMark {
@@ -136,6 +137,9 @@ export interface CouncilFightState {
   /** The members' spoken lines (council_voice.ts): `<role>_<moment>` to the
    *  fight clock it was last said at. */
   said: Record<string, number>;
+  /** The players seen dead this pull and the pull's deaths (the kill lines'
+   *  watch, voice_slain.ts). */
+  slain: SlainWatch;
   /** Mechanic casts started (the deterministic salt of every pick). */
   casts: number;
   /** Mythic: the souls standing in pillars, in the order they took them. */

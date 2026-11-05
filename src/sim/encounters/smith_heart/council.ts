@@ -107,7 +107,7 @@ import {
   stepRises,
   stepRock,
 } from './council_stone';
-import { councilSay, sayFallen, stepCouncilVoice } from './council_voice';
+import { councilSay, sayFallen, stepCouncilVoice, watchCouncilSlain } from './council_voice';
 import {
   clearWrathBars,
   fillEnergy,
@@ -118,6 +118,7 @@ import {
   syncEnergyBars,
 } from './council_wrath';
 import { applyTierHealth, restoreTierHealth, tierPoolMult } from './tier_health';
+import { freshSlainWatch } from './voice_slain';
 
 // ---- the dev difficulty switches ------------------------------------------------------
 
@@ -216,6 +217,7 @@ function freshState(difficulty: CouncilDifficulty): CouncilFightState {
     fallen: [],
     lines: [],
     said: {},
+    slain: freshSlainWatch(),
     casts: 0,
     souls: [],
     soulsSpent: [],
@@ -561,6 +563,7 @@ export function tickHammerCouncil(ctx: SimContext, inst: InstanceSlot): void {
   }
   syncMemory(s);
   stepCouncilVoice(s);
+  watchCouncilSlain(s);
   stepBars(s);
   stepRush(s);
   stepCursed(s);

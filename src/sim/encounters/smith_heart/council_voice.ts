@@ -2,15 +2,16 @@
 // section 7.1, the voice lines): a boss yell to every player in the claim,
 // carrying its catalog key (`hudChrome.council.say.<role>_<moment>`) so the
 // client renders it through t(), with the English as the fallback and as the
-// key a future voice clip is found by (scripts/voices/extra_lines.mjs). The
-// voices themselves are auditions only (scripts/voices/raid_boss_voice_prompts.mjs
-// HAMMER_COUNCIL_VOICE_PROMPTS) until the designer picks one.
+// key its voice clip is found by (scripts/voices/smith_heart_voice_pack.mjs, the
+// raid's voice pack).
 //
 //   pull       each member once, a breath apart (the Guardian first)
-//   job lines  the Guardian's Wrath and Rush, the Singer's Wake, rock and
-//              song: spoken by the member itself (never an heir), at
-//              most once in SAY_EVERY seconds each, so a five-minute pull is
-//              never a chatter
+//   job lines  the Guardian's Wrath, Rush and mythic Quarry Collapse, the
+//              Singer's Wake, rock, song and a kicked song: spoken by the
+//              member itself (never an heir), at most once in SAY_EVERY
+//              seconds each, so a five-minute pull is never a chatter
+//   a kill     a player falls: a living member's kill line, the two in turn,
+//              at most one in SLAY_EVERY seconds (voice_slain.ts)
 //   a fall     the fallen's death line (on mythic its soul's line instead), and
 //              the first survivor's "the stone remembers"
 //   the end    the last to fall says its defeat line; a wipe, a survivor's
@@ -21,12 +22,17 @@ import { HAMMER_PIT } from '../../content/smith_heart_layout';
 import type { Entity } from '../../types';
 import { COUNCIL_ROLES, type CouncilRole } from './council_ids';
 import { type CouncilScope, living } from './council_scope';
+import { isSlayMoment, SLAY_EVERY, slayMoment, watchSlain } from './voice_slain';
 
 /** The moments a member speaks at. */
 export type CouncilMoment =
   | 'pull'
   | 'wrath'
   | 'rush'
+  | 'collapse'
+  | 'hush'
+  | 'slay_a'
+  | 'slay_b'
   | 'wake'
   | 'rock'
   | 'song'
@@ -44,6 +50,9 @@ export const COUNCIL_LINES: Readonly<Record<CouncilRole, Partial<Record<CouncilM
       pull: "Strangers in the Quarry. The Hammer's strength does not yield to flesh.",
       wrath: 'The mountain answers me! Hide, if the stone will have you!',
       rush: 'Stand in my path, then. The mountain does not turn aside.',
+      collapse: 'Then let the whole Quarry fall!',
+      slay_a: 'Crushed, as ore beneath the hammer.',
+      slay_b: 'One less hand to steal the strength.',
       death: 'My strength... I give it to the stone.',
       remember: 'The stone remembers. What was theirs is mine.',
       soul: 'I am the stone now. My wrath has no body left to fail.',
@@ -55,6 +64,9 @@ export const COUNCIL_LINES: Readonly<Record<CouncilRole, Partial<Record<CouncilM
       song: 'Sing with me, and break!',
       wake: 'Wake, sleeping stone. Rise where they stand!',
       rock: 'Look up, little ones! The mountain is falling!',
+      hush: 'You would silence the seam? It only sings louder.',
+      slay_a: 'Your voice joins the seam now.',
+      slay_b: 'Hear that? One note fewer.',
       death: 'My song... runs into the rock...',
       remember: 'The stone remembers. Listen, it still sings.',
       soul: 'Listen. In the stone, my song never ends.',
@@ -74,17 +86,34 @@ export const SAY_EVERY = 45;
 export const PULL_FIRST = 0.5;
 export const PULL_GAP = 4;
 
-const JOB_MOMENTS: ReadonlySet<CouncilMoment> = new Set(['wrath', 'rush', 'wake', 'rock', 'song']);
+const JOB_MOMENTS: ReadonlySet<CouncilMoment> = new Set([
+  'wrath',
+  'rush',
+  'collapse',
+  'wake',
+  'rock',
+  'song',
+  'hush',
+]);
+
+/** The players near the Quarry (dead or alive): who hears the council. */
+function quarryListeners(s: CouncilScope): Entity[] {
+  const o = s.ctx.instanceOriginOf(s.inst);
+  const out: Entity[] = [];
+  for (const meta of s.ctx.players.values()) {
+    const p = s.ctx.entities.get(meta.entityId);
+    if (!p) continue;
+    if (Math.hypot(p.pos.x - o.x - HAMMER_PIT.x, p.pos.z - o.z - HAMMER_PIT.z) > 120) continue;
+    out.push(p);
+  }
+  return out;
+}
 
 /** Speak one line from `from` (yell range: the whole claim's Quarry). */
 function yell(s: CouncilScope, from: Entity, role: CouncilRole, moment: CouncilMoment): void {
   const text = COUNCIL_LINES[role][moment];
   if (!text) return;
-  const o = s.ctx.instanceOriginOf(s.inst);
-  for (const meta of s.ctx.players.values()) {
-    const p = s.ctx.entities.get(meta.entityId);
-    if (!p) continue;
-    if (Math.hypot(p.pos.x - o.x - HAMMER_PIT.x, p.pos.z - o.z - HAMMER_PIT.z) > 120) continue;
+  for (const p of quarryListeners(s)) {
     s.ctx.emit({
       type: 'chat',
       fromPid: from.id,
@@ -93,7 +122,7 @@ function yell(s: CouncilScope, from: Entity, role: CouncilRole, moment: CouncilM
       text,
       textKey: councilLineKey(role, moment),
       channel: 'yell',
-      pid: meta.entityId,
+      pid: p.id,
     });
   }
 }
@@ -107,9 +136,12 @@ function yell(s: CouncilScope, from: Entity, role: CouncilRole, moment: CouncilM
 export function councilSay(s: CouncilScope, role: CouncilRole, moment: CouncilMoment): boolean {
   const body = s.bodies[role];
   if (!body || !COUNCIL_LINES[role][moment]) return false;
-  const tag = `${role}_${moment}`;
+  // The kill lines share one clock across both members.
+  const tag = isSlayMoment(moment) ? 'slay' : `${role}_${moment}`;
   const said = s.st.said[tag];
-  if (JOB_MOMENTS.has(moment)) {
+  if (isSlayMoment(moment)) {
+    if (said !== undefined && s.st.clock - said < SLAY_EVERY - 1e-9) return false;
+  } else if (JOB_MOMENTS.has(moment)) {
     if (said !== undefined && s.st.clock - said < SAY_EVERY - 1e-9) return false;
   } else if (said !== undefined) return false;
   s.st.said[tag] = s.st.clock;
@@ -135,4 +167,16 @@ export function sayFallen(s: CouncilScope, role: CouncilRole, soulTaken: boolean
     (r) => r !== role && living(s.bodies[r]) && s.st.said[`${r}_remember`] === undefined,
   );
   if (survivor) councilSay(s, survivor, 'remember');
+}
+
+/** Watch the Quarry for a player's fall (called every tick of the fight):
+ *  a living member says a kill line, the two in turn, each its own two in
+ *  turn. */
+export function watchCouncilSlain(s: CouncilScope): void {
+  if (watchSlain(s.st.slain, quarryListeners(s)) === 0) return;
+  const speakers = COUNCIL_ROLES.filter((r) => living(s.bodies[r]));
+  if (speakers.length === 0) return;
+  const n = s.st.slain.kills - 1;
+  const role = speakers[n % speakers.length];
+  councilSay(s, role, slayMoment(Math.floor(n / speakers.length) + 1, 2) as CouncilMoment);
 }

@@ -2,13 +2,15 @@
 // smith_heart.md section 7.2): yells to every player near the Cornice,
 // carrying their catalog key (`hudChrome.breathGuardian.say.<speaker>_<moment>`) so
 // the client renders them through t(), with the English as the fallback and
-// as the key a future voice clip is found by. The guardian's voice is an
-// audition still to come (the brief's later step); Thessaly keeps the
-// Highwatch captain's.
+// as the key its voice clip is found by (scripts/voices/smith_heart_voice_pack.mjs).
+// Thessaly keeps the Highwatch captain's voice.
 //
 //   guardian   the pull, its first blow, each indrawn breath (at most once in
 //              SAY_EVERY), the storm breaking, the cradle and the drawn
-//              lightning (once in SAY_EVERY each), a wipe, its fall
+//              lightning (once in SAY_EVERY each), the Summit Roar and
+//              mythic's Knotted Gale (once in SAY_EVERY each), a player's
+//              fall (its three kill lines in turn, at most one in
+//              SLAY_EVERY: voice_slain.ts), a wipe, its fall
 //   thessaly   the pull, each circle of calm (three lines in turn), the
 //              indrawn breath, the storm breaking, a player over the lip (at
 //              most once in SAY_EVERY), the victory, a wipe
@@ -18,6 +20,7 @@
 import type { Entity } from '../../types';
 import type { BreathScope } from './breath_scope';
 import { corniceListeners } from './breath_scope';
+import { isSlayMoment, SLAY_EVERY, slayMoment, watchSlain } from './voice_slain';
 
 export type BreathSpeaker = 'guardian' | 'thessaly';
 
@@ -37,7 +40,12 @@ export type BreathMoment =
   | 'death'
   | 'isles'
   | 'bulwark'
-  | 'victory';
+  | 'victory'
+  | 'roar'
+  | 'knot'
+  | 'slay_a'
+  | 'slay_b'
+  | 'slay_c';
 
 /** Every line, by speaker and moment (English source; the catalog's
  *  `hudChrome.breathGuardian.say.*` rows are the same text). */
@@ -52,6 +60,11 @@ export const BREATH_LINES: Readonly<Record<BreathSpeaker, Partial<Record<BreathM
       drawn: 'The sky has chosen you. Run, and it follows.',
       isles: 'Winds, wall me in! The isles will keep my breath whole.',
       bulwark: 'My shield... torn open. Then feel the gale again!',
+      roar: 'Hear the summit roar!',
+      knot: 'Hold my storm, if your arms can bear it.',
+      slay_a: 'Another one given to the wind.',
+      slay_b: 'The sky does not catch the fallen.',
+      slay_c: 'Your last breath is mine.',
       wipe: 'Blown away, like dust from the summit.',
       death: 'The Breath... goes back... to the mountain...',
     },
@@ -92,6 +105,8 @@ const REPEATING: ReadonlySet<BreathMoment> = new Set([
   'circle_b',
   'circle_c',
   'fall',
+  'roar',
+  'knot',
 ]);
 
 /** Speak one line from `from` to everyone near the Cornice. */
@@ -128,9 +143,11 @@ export function breathSay(
   moment: BreathMoment,
 ): boolean {
   if (!from || !BREATH_LINES[speaker][moment]) return false;
-  const tag = `${speaker}_${moment}`;
+  const tag = isSlayMoment(moment) ? 'slay' : `${speaker}_${moment}`;
   const said = s.st.said[tag];
-  if (REPEATING.has(moment)) {
+  if (isSlayMoment(moment)) {
+    if (said !== undefined && s.st.clock - said < SLAY_EVERY - 1e-9) return false;
+  } else if (REPEATING.has(moment)) {
     if (said !== undefined && s.st.clock - said < SAY_EVERY - 1e-9) return false;
   } else if (said !== undefined) return false;
   s.st.said[tag] = s.st.clock;
@@ -141,4 +158,11 @@ export function breathSay(
 /** Thessaly's circle line: her three in turn (the n-th circle's). */
 export function circleMoment(n: number): BreathMoment {
   return (['circle_a', 'circle_b', 'circle_c'] as const)[((n % 3) + 3) % 3];
+}
+
+/** Watch the Cornice for a player's fall (called every tick of the fight):
+ *  the guardian says its kill lines in turn. */
+export function watchBreathSlain(s: Pick<BreathScope, 'ctx' | 'inst' | 'st' | 'boss'>): void {
+  if (watchSlain(s.st.slain, corniceListeners(s.ctx, s.inst)) === 0) return;
+  breathSay(s, s.boss, 'guardian', slayMoment(s.st.slain.kills, 3));
 }

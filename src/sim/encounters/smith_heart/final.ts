@@ -128,6 +128,7 @@ import {
   living,
 } from './final_scope';
 import type { FinalFightState, FinalKitClocks } from './final_state';
+import { finalSay, freshFinalVoice, stepFinalVoice } from './final_voice';
 import { applyTierHealth, restoreTierHealth, tierPoolMult } from './tier_health';
 
 // ---- the dev difficulty switch ------------------------------------------------------------
@@ -226,6 +227,7 @@ function freshState(difficulty: FinalDifficulty): FinalFightState {
     anvil: null,
     cleaveSeen: 0,
     phase: freshPhase(),
+    voice: freshFinalVoice(),
   };
 }
 
@@ -404,6 +406,7 @@ function resetFinal(ctx: SimContext, inst: InstanceSlot, boss: Entity): void {
 
 function finishFinal(ctx: SimContext, inst: InstanceSlot, boss: Entity, st: FinalFightState): void {
   st.finished = true;
+  finalSay(scopeOf(ctx, inst, st, boss), 'death');
   cueOn(scopeOf(ctx, inst, st, boss), boss, FINAL_CUES.settle, 'arcane');
   clearFight(ctx, inst, boss, st);
 }
@@ -418,6 +421,7 @@ function beginFinal(ctx: SimContext, inst: InstanceSlot, boss: Entity): FinalFig
   const s = scopeOf(ctx, inst, st, boss);
   watchZone(s, true);
   showState(s);
+  finalSay(s, 'pull');
   return st;
 }
 
@@ -431,7 +435,12 @@ export function tickFinalBoss(ctx: SimContext, inst: InstanceSlot): void {
     return;
   }
   if (!fighting(boss)) {
-    if (st0) resetFinal(ctx, inst, boss);
+    if (st0) {
+      // The raid lies still on the Anvil: it says so.
+      if (!st0.finished && anvilPlayers(ctx, inst).length === 0)
+        finalSay(scopeOf(ctx, inst, st0, boss), 'wipe');
+      resetFinal(ctx, inst, boss);
+    }
     return;
   }
   const st = st0 ?? beginFinal(ctx, inst, boss);
@@ -476,6 +485,7 @@ export function tickFinalBoss(ctx: SimContext, inst: InstanceSlot): void {
   showState(s, frozen);
   showPhase(s);
   showHidden(s);
+  stepFinalVoice(s);
 }
 
 /** One tick of a stage that is not the quarter fight: the stride into the

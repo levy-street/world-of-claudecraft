@@ -52,7 +52,8 @@ import type { SimContext } from '../../sim_context';
 import { tickBreathGuardian } from './breath';
 import { noteSmithHeartKills } from './checkpoint_order';
 import { tickHammerCouncil } from './council';
-import { tickFinalBoss } from './final';
+import { finalBoss, tickFinalBoss } from './final';
+import { beginArrivalVoice, stepArrivalVoice } from './final_voice';
 import { tickHeatGuardian } from './heat';
 import { tickSmithHeartPortal } from './portal';
 import { tickQuenchGuardian } from './quench';
@@ -284,6 +285,8 @@ export function tickSmithHeartSeal(ctx: SimContext, inst: InstanceSlot): number 
   if (smithHeartPortalBitSet(value) && !smithHeartPortalBitSet(before)) {
     announce(ctx, inst, SMITH_HEART_PORTAL_OPEN_LOG);
   }
+  // The heart wakes: its arrival lines follow over the rebuild.
+  if (smithHeartAwakeBitSet(value) && !smithHeartAwakeBitSet(before)) beginArrivalVoice(ctx, inst);
   return value;
 }
 
@@ -307,5 +310,6 @@ export function tickSmithHeart(ctx: SimContext): void {
     const mask = value !== null ? value & SMITH_HEART_SEAL_FULL : smithHeartEarnedMask(ctx, inst);
     noteSmithHeartKills(inst, mask, SMITH_HEART_VEIN_BITS);
     if (value !== null) tickSmithHeartPortal(ctx, inst, smithHeartPortalBitSet(value));
+    stepArrivalVoice(ctx, inst, finalBoss(ctx, inst));
   }
 }

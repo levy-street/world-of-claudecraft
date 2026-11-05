@@ -334,8 +334,10 @@ export function stepRush(s: CouncilScope): RushOutcome | null {
     }
   }
   // Mythic: a miss with the curse still standing brings the Quarry down.
-  if (outcome === 'miss' && s.rules.missCollapse && cursedPillar(s) && !s.st.collapse)
+  if (outcome === 'miss' && s.rules.missCollapse && cursedPillar(s) && !s.st.collapse) {
     s.st.collapse = { stacks: 0, timer: T.collapseEvery };
+    councilSay(s, 'guardian', 'collapse');
+  }
   return outcome;
 }
 

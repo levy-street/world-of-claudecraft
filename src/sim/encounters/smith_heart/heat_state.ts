@@ -11,6 +11,7 @@ import type {
   HeatStage,
   HeatZoneState,
 } from './heat_ids';
+import type { SlainWatch } from './voice_slain';
 
 /** A bar the guardian runs for the fight. */
 export interface HeatBar {
@@ -208,4 +209,7 @@ export interface HeatFightState {
   casts: number;
   /** Lines said this pull: `<moment>` to the fight clock. */
   said: Record<string, number>;
+  /** The players seen dead this pull and the pull's deaths (the kill lines'
+   *  watch, voice_slain.ts). */
+  slain: SlainWatch;
 }

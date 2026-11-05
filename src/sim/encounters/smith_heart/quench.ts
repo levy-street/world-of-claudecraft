@@ -92,8 +92,9 @@ import {
 } from './quench_scope';
 import { clearSlashes, startSlashes, stepSlashes } from './quench_slash';
 import type { QuenchFightState } from './quench_state';
-import { quenchSay } from './quench_voice';
+import { quenchSay, watchQuenchSlain } from './quench_voice';
 import { applyTierHealth, restoreTierHealth, tierPoolMult } from './tier_health';
+import { freshSlainWatch } from './voice_slain';
 
 // ---- the dev difficulty switch ------------------------------------------------------------
 
@@ -166,6 +167,7 @@ function freshState(
     flurryDone: false,
     casts: 0,
     said: {},
+    slain: freshSlainWatch(),
   };
 }
 
@@ -361,6 +363,7 @@ export function tickQuenchGuardian(ctx: SimContext, inst: InstanceSlot): void {
   stepSlashes(s);
   stepFlurry(s);
   stepDeepening(s);
+  watchQuenchSlain(s);
   startBars(s);
 }
 

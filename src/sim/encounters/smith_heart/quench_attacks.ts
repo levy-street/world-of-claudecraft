@@ -17,6 +17,7 @@ import { addCold } from './quench_cold';
 import { inAttackReach } from './quench_geometry';
 import { QUENCH_CASTS, QUENCH_NAMES, QUENCH_TUNING as T } from './quench_ids';
 import { at, beginBar, frostHit, livePlayers, local, type QuenchScope, roll } from './quench_scope';
+import { quenchSay } from './quench_voice';
 
 /** The facing toward the guardian's tank (its current one if it has none). */
 function towardTank(s: QuenchScope): number {
@@ -31,6 +32,7 @@ export function startBreath(s: QuenchScope): boolean {
   const facing = towardTank(s);
   beginBar(s, QUENCH_CASTS.breath, T.breathCast, facing);
   s.st.breathTimer = T.breathEvery;
+  quenchSay(s, s.boss, 'breath');
   return true;
 }
 

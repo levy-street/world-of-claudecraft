@@ -92,9 +92,10 @@ import {
   stormDue,
 } from './breath_storm';
 import { clearAnchors, clearCalm, plantCalm, stepThessaly } from './breath_thessaly';
-import { breathSay, THESSALY_PULL_DELAY } from './breath_voice';
+import { breathSay, THESSALY_PULL_DELAY, watchBreathSlain } from './breath_voice';
 import { stepOverLip, stepVoidDeaths, tetherGuardian } from './breath_void';
 import { applyTierHealth, restoreTierHealth, tierPoolMult } from './tier_health';
+import { freshSlainWatch } from './voice_slain';
 
 // ---- the dev difficulty switch ------------------------------------------------------------
 
@@ -175,6 +176,7 @@ function freshState(boss: Entity, difficulty: BreathDifficulty): BreathFightStat
     heartRuns: 0,
     casts: 0,
     said: {},
+    slain: freshSlainWatch(),
   };
 }
 
@@ -375,6 +377,7 @@ export function tickBreathGuardian(ctx: SimContext, inst: InstanceSlot): void {
   stepStorm(s);
   stepHeart(s);
   stepOverLip(s);
+  watchBreathSlain(s);
   startWindBars(s);
   startStormBars(s);
 }

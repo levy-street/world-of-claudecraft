@@ -72,6 +72,7 @@ import {
   spawnBreathObject,
 } from './breath_scope';
 import type { BreathFightState, BreathHeart, BreathKnot, BreathPortal } from './breath_state';
+import { breathSay } from './breath_voice';
 
 type Side = 'A' | 'B' | 'C' | 'D';
 
@@ -184,6 +185,7 @@ export function startHeart(s: BreathScope, count: number): boolean {
     const side = SIDES[i];
     putMarker(p, MARK_AURA[side], PORTAL_NAME[side], T.heartMark, s.boss.id);
   });
+  breathSay(s, s.boss, 'guardian', 'knot');
   return true;
 }
 

@@ -79,7 +79,7 @@ import {
 } from './heat_scope';
 import { clearSeeds, dropSeeds, stepSeeds } from './heat_seeds';
 import type { HeatFightState } from './heat_state';
-import { heatSay } from './heat_voice';
+import { heatSay, watchHeatSlain } from './heat_voice';
 import {
   clearOverflowAdds,
   endOverflowAdds,
@@ -94,6 +94,7 @@ import {
 import { startWheel, stepWheel } from './heat_wheel';
 import { clearZones, startZones, stepZones } from './heat_zones';
 import { applyTierHealth, restoreTierHealth, tierPoolMult } from './tier_health';
+import { freshSlainWatch } from './voice_slain';
 
 // ---- the dev difficulty switch ------------------------------------------------------------
 
@@ -177,6 +178,7 @@ function freshState(difficulty: HeatDifficulty): HeatFightState {
     feeds: 0,
     casts: 0,
     said: {},
+    slain: freshSlainWatch(),
   };
 }
 
@@ -510,6 +512,7 @@ export function tickHeatGuardian(ctx: SimContext, inst: InstanceSlot): void {
   stepMarks(s);
   stepTrails(s);
   syncHunted(s);
+  watchHeatSlain(s);
   watchThresholds(s);
   startMechanics(s);
   holdStance(s);
