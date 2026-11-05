@@ -13,6 +13,10 @@
 // pure module (claim-local).
 //
 // IGNORE=drag  the tanks never move the boss on (the key mechanic: Overload)
+// START=40     a few seconds into the pull the leader jumps the boss to its
+//              second intermission (/dev heart final inter40): the raid then
+//              plays the 40 percent call and fights on into the 15 percent
+//              final phase (START=15 jumps straight to the final phase).
 
 import { HEART_ROOM } from '../../src/sim/content/smith_heart_layout';
 import {
@@ -58,6 +62,8 @@ import {
 } from './heart_raid_bots.mjs';
 
 const T = FINAL_TUNING;
+/** Where the pull jumps (START=40 or 15; empty: the whole fight). */
+const START = (process.env.START ?? '').trim();
 const SPLINTERS = new Set(Object.values(FINAL_ADD_MOBS));
 const L = (world, p) => ({ x: p.x - world.origin.x, z: p.z - world.origin.z });
 const W = (world, p) => ({ x: p.x + world.origin.x, z: p.z + world.origin.z });
@@ -175,6 +181,14 @@ export const final = {
     const b = world.mobs.boss;
     return b && !hasAura(b, FINAL_PHASE_AURAS.shield) ? b : null;
   },
+  plan(world, st) {
+    init(st);
+    if (!START || st.started || fightSec() < 6) return;
+    st.started = true;
+    const line = START === '15' ? '/dev heart final last' : '/dev heart final inter40';
+    world.leader.chat(line);
+    log(`START: the leader jumps the boss (${line})`);
+  },
   kickables(world) {
     return world.splinters
       .filter((m) => m.cast === FINAL_PHASE_CASTS.toll)
@@ -244,6 +258,10 @@ export const final = {
     note(
       `Overload bursts: ${st.bursts}; stages: ${st.stages.map((s) => `${fmtSec(s.t)} ${s.what}`).join(', ') || '-'}`,
     );
+    if (START)
+      note(
+        `Staged: the pull jumped to ${START === '15' ? 'the final phase' : 'the 40 percent call'} (START=${START})`,
+      );
     note(`Anvils: ${st.anvils ?? 0} (under each: ${(st.anvilUnder ?? []).join(', ') || '-'})`);
   },
   row(world, st) {
