@@ -14,52 +14,61 @@
 //
 // `src/sim`-pure: no DOM/Three, no wall clock, no rng.
 
-import { ITEMS } from '../data';
+import { MOBS } from '../data';
 import { mobLootSource } from '../loot/awarded_loot_hold';
 import { hasPendingLootRollForMob } from '../loot/loot_roll';
+import { isHarvestableCorpse } from '../professions/gathering';
 import type { SimContext } from '../sim_context';
 import { cloneItemInstancePayload, type Entity, type LootSlot } from '../types';
 
-/** A live slot only its listed players may take, holding a quest item. A
- *  shared-personal token slot (Heroic Marks) is not one: it pays everyone. */
-export function isPersonalQuestSlot(slot: LootSlot): boolean {
+/** A live slot only its listed players may take, rolled by one of this mob's
+ *  quest-gated loot entries (the questId branch of rollLoot). Classified from
+ *  the mob's own loot table, not the item kind, so a held roll award or any
+ *  other personal slot never reads as a quest slot. A shared-personal token
+ *  slot (Heroic Marks) is not one either: it pays everyone. */
+export function isPersonalQuestSlot(mob: Pick<Entity, 'templateId'>, slot: LootSlot): boolean {
   return (
     slot.count > 0 &&
     !!slot.personalFor &&
     slot.personalFor.length > 0 &&
     !slot.sharedPersonal &&
-    ITEMS[slot.itemId]?.kind === 'quest'
+    (MOBS[mob.templateId]?.loot?.some((e) => !!e.questId && e.itemId === slot.itemId) ?? false)
   );
 }
 
 /** Does this corpse hold loot that must stop a reset? A lootable body with no
- *  loot table still blocks (an open roll or a harvest grace window), as does
- *  copper or any live slot other than a personal quest slot. */
+ *  loot table still blocks (an open roll or a harvest grace window), as do an
+ *  open roll, an unclaimed harvest, copper, and any live slot other than a
+ *  personal quest slot. */
 export function corpseBlocksInstanceReset(ctx: SimContext, mob: Entity | undefined): boolean {
   if (!mob?.lootable) return false;
   if (!mob.loot || hasPendingLootRollForMob(ctx, mob.id)) return true;
   if (mob.loot.copper > 0) return true;
+  if (isHarvestableCorpse(MOBS[mob.templateId]?.componentTags) && mob.harvestClaimedBy === null) {
+    return true;
+  }
   return mob.loot.items.some(
     (slot) =>
       slot.count > 0 &&
       (!slot.personalFor || slot.personalFor.length > 0) &&
-      !isPersonalQuestSlot(slot),
+      !isPersonalQuestSlot(mob, slot),
   );
 }
 
-/** Hand each unclaimed personal quest slot on the claim's corpses to its
- *  recipients before the claim is freed. Only an online recipient whose bags
- *  fit it receives a copy; the slot is then emptied so nothing is granted
- *  twice. Iterates the claim's fixed mob list in order (deterministic). */
+/** Hand each unclaimed personal quest slot on the claim's lootable corpses to
+ *  its recipients before the claim is freed. Only an online recipient (not
+ *  logging out) whose bags fit it receives a copy; the slot is then emptied so
+ *  nothing is granted twice. Iterates the claim's fixed mob list in order. */
 export function deliverPersonalQuestLoot(ctx: SimContext, mobIds: readonly number[]): void {
   for (const id of mobIds) {
     const mob = ctx.entities.get(id);
-    if (!mob?.dead || !mob.loot) continue;
+    if (!mob?.dead || !mob.lootable || !mob.loot) continue;
     for (const slot of mob.loot.items) {
-      if (!isPersonalQuestSlot(slot)) continue;
+      if (!isPersonalQuestSlot(mob, slot)) continue;
       const lootOpts = { source: mobLootSource(mob) };
       for (const pid of slot.personalFor ?? []) {
-        if (!ctx.players.has(pid) || !ctx.entities.has(pid)) continue;
+        const meta = ctx.players.get(pid);
+        if (!meta || meta.leaving || !ctx.entities.has(pid)) continue;
         if (!ctx.canAddItem(slot.itemId, slot.count, pid, slot.instance)) continue;
         if (slot.instance) {
           ctx.addItemInstance(
