@@ -708,11 +708,34 @@ describe('hub practice coach reads the Details-style controls', () => {
     meters.onEvent(dmg(1, 100, 'Shadow Bolt'));
     meters.data.endEncounter();
     meters.render(true);
-    const before = meters.segmentPickCount;
+    const before = meters.segmentPickCount('dmg');
     (el('meters-window').querySelector('.mt-seg-trigger') as HTMLElement).click();
-    expect(meters.segmentPickCount).toBe(before);
+    expect(meters.segmentPickCount('dmg')).toBe(before);
     menus[0].select('1');
-    expect(meters.segmentPickCount).toBe(before + 1);
+    expect(meters.segmentPickCount('dmg')).toBe(before + 1);
     expect(meters.viewedEncounter('dmg')?.isCurrent).toBe(false);
+  });
+
+  it('counts a detached window pick against its own meter, never Damage', () => {
+    const { meters, el, menus } = setup();
+    meters.toggle();
+    meters.onEvent(heal(2, 50, 'Lesser Heal'));
+    meters.data.endEncounter();
+    meters.popOut('heal');
+    (el('heal-window').querySelector('.mt-seg-trigger') as HTMLElement).click();
+    menus.at(-1)!.select('1');
+    expect(meters.segmentPickCount('heal')).toBe(1);
+    expect(meters.segmentPickCount('dmg')).toBe(0);
+  });
+
+  it('points the meter switch at the visible back button inside a drill-down', () => {
+    const { meters, el } = setup();
+    meters.toggle();
+    meters.onEvent(dmg(1, 100, 'Shadow Bolt'));
+    meters.render(true);
+    (el('meters-window').querySelector('.mt-row') as HTMLElement).click();
+    const control = meters.tabSwitchElement('heal');
+    expect(control).toBe(el('meters-window').querySelector('.mt-back-btn'));
+    expect(control?.style.display).not.toBe('none');
   });
 });

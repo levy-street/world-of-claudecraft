@@ -1158,9 +1158,11 @@ interface PanelHost {
     onSelect: (act: string) => void,
   ): void;
   onNewWindow?(): void;
-  /** A player picked a segment (the segment menu or the paging arrows):
-   *  feeds Meters.segmentPickCount for the hub practice coach. */
-  onSegmentPicked?(): void;
+  /** A player picked a segment on a panel showing `tab` (the segment menu
+   *  or the paging arrows): feeds Meters.segmentPickCount for the hub
+   *  practice coach, per meter so a detached window's pick never credits
+   *  the Damage panel. */
+  onSegmentPicked?(tab: MeterTab): void;
   mainWindowRect?(): { left: number; top: number; width: number; height: number } | null;
   resetCurrent(): void;
   resetAll(): void;
@@ -1570,7 +1572,7 @@ export class MetersPanel {
         this.viewMode = 'overview';
         this.selectedPhase = null;
         this.render(true);
-        this.host.onSegmentPicked?.();
+        this.host.onSegmentPicked?.(this.tab);
       }
     });
   }
@@ -1885,11 +1887,14 @@ export class MetersPanel {
 
   /** The mode menu trigger, the visible way to switch this panel's meter
    *  (the .mt-tabs strip is hidden by the Details-style chrome), or null on a
-   *  locked (detached) panel, which has one fixed meter. Read by the hub
-   *  practice coach (hub_lesson_controller.ts) to glow its "switch meter"
-   *  step, never by anything on a per-frame path. */
+   *  locked (detached) panel, which has one fixed meter. Inside a drill-down
+   *  view the mode trigger is hidden, so the visible back button (the way
+   *  back to it) is returned instead. Read by the hub practice coach
+   *  (hub_lesson_controller.ts) to glow its "switch meter" step, never by
+   *  anything on a per-frame path. */
   get tabSwitchElement(): HTMLElement | null {
-    return this.spec.lockedTab ? null : this.modeTrigger;
+    if (this.spec.lockedTab) return null;
+    return this.viewMode === 'overview' ? this.modeTrigger : this.backTrigger;
   }
 
   /** The segment menu trigger: what a player opens to look back at a run
@@ -1932,7 +1937,7 @@ export class MetersPanel {
     this.viewIdx = Math.max(0, Math.min(max, this.viewIdx + dir));
     this.selectedPid = null;
     this.render(true);
-    this.host.onSegmentPicked?.();
+    this.host.onSegmentPicked?.(this.tab);
   }
 
   private refreshTabs(): void {
@@ -3183,8 +3188,8 @@ export class Meters {
   private readonly main: MetersPanel;
   private readonly detached = new Map<DetachableTab, MetersPanel>();
   private readonly partyPidsCache = new PartyPidsCache();
-  /** Player segment picks across every panel (PanelHost.onSegmentPicked). */
-  private segmentPicks = 0;
+  /** Player segment picks per meter (PanelHost.onSegmentPicked). */
+  private readonly segmentPicks = new Map<MeterTab, number>();
   /** Detached windows hidden along with the tabbed one, to restore on reopen. */
   private reopenDetached: DetachableTab[] = [];
   private settings: MetersSettings;
@@ -3238,7 +3243,7 @@ export class Meters {
               tabOpen: (tab: MeterTab) => this.tabOpen(tab),
               tabSwitchElement: (tab: MeterTab) => this.tabSwitchElement(tab),
               segmentPickerElement: (tab: MeterTab) => this.segmentPickerElement(tab),
-              segmentPickCount: () => this.segmentPickCount,
+              segmentPickCount: (tab: MeterTab) => this.segmentPickCount(tab),
               rowElementForPid: (tab: MeterTab, pid: number) => this.rowElementForPid(tab, pid),
               viewedEncounter: (tab: MeterTab) => this.viewedEncounter(tab),
               current: () => this.current(),
@@ -3254,8 +3259,8 @@ export class Meters {
     const host: PanelHost = {
       world,
       data: this.data,
-      onSegmentPicked: () => {
-        this.segmentPicks++;
+      onSegmentPicked: (tab) => {
+        this.segmentPicks.set(tab, (this.segmentPicks.get(tab) ?? 0) + 1);
       },
       sendChat: deps?.sendChat,
       petsByOwner: () => this.livePetsByOwner(),
@@ -3448,10 +3453,10 @@ export class Meters {
     return this.main.tabSwitchElement;
   }
 
-  /** Player segment picks so far, on any panel (the hub coach's "looked
-   *  back at a fight" edge; see HubLessonMetersPort.segmentPickCount). */
-  get segmentPickCount(): number {
-    return this.segmentPicks;
+  /** Player segment picks so far on panels showing `tab` (the hub coach's
+   *  "looked back at a fight" edge; see HubLessonMetersPort.segmentPickCount). */
+  segmentPickCount(tab: MeterTab): number {
+    return this.segmentPicks.get(tab) ?? 0;
   }
 
   /** The segment menu trigger of whichever panel is showing `tab`. */

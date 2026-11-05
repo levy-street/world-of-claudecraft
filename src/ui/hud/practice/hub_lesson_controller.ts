@@ -92,11 +92,11 @@ export interface HubLessonMetersPort {
   /** The segment picker (fight history menu trigger) of whichever panel is
    *  showing `tab`, or null while none is open. */
   segmentPickerElement(tab: HubMeterTab): HTMLElement | null;
-  /** Bumps once per player segment pick (the segment menu, or the paging
-   *  keys), on any panel. The coach reads its CHANGE as the real "I looked
-   *  back" interaction, never the viewed segment alone: a fight ending flips
-   *  the default view onto "Last fight" with no player action at all. */
-  segmentPickCount(): number;
+  /** Bumps once per player segment-menu pick on a panel showing `tab`
+   *  (never another meter's window). The coach reads its CHANGE as the real
+   *  "I looked back" interaction, never the viewed segment alone: a fight
+   *  ending flips the default view onto "Last fight" with no player action. */
+  segmentPickCount(tab: HubMeterTab): number;
   rowElementForPid(tab: HubMeterTab, pid: number): HTMLElement | null;
   /** Identity of whichever segment is CURRENTLY displayed on the panel
    *  showing `tab`, and whether it is the live "current" one, or null while
@@ -491,7 +491,7 @@ export class HubLessonController {
    *  counts as an inspection target. A pick made while the Damage panel is
    *  closed (or before eligibility) only re-baselines, never counts. */
   private readSegmentPick(damagePanelOpen: boolean): void {
-    const picks = this.deps.meters.segmentPickCount();
+    const picks = this.deps.meters.segmentPickCount('dmg');
     const picked = this.seenSegmentPicks !== null && picks !== this.seenSegmentPicks;
     this.seenSegmentPicks = picks;
     if (!picked || !damagePanelOpen) return;
@@ -603,13 +603,10 @@ export class HubLessonController {
       this.glow(this.visibleMobileControl('mobile-meters'));
     } else if (step.kind === 'open-tab') {
       this.glow(this.deps.meters.tabSwitchElement(tab));
-    } else if (
-      step.kind === 'read-row' ||
-      step.kind === 'view-breakdown' ||
-      step.kind === 'review-comparison'
-    ) {
+    } else if (step.kind === 'read-row' || step.kind === 'view-breakdown') {
       this.glow(this.deps.meters.rowElementForPid(tab, pid));
-    } else if (step.kind === 'inspect-history') {
+    } else if (step.kind === 'inspect-history' || step.kind === 'review-comparison') {
+      // Both ask the player to use the fight name menu (the segment picker).
       this.glow(
         this.deps.meters.segmentPickerElement(tab),
         this.deps.meters.rowElementForPid(tab, pid),

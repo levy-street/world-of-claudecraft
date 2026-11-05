@@ -20242,22 +20242,27 @@ export const TARGETS = [
       }
 
       // Stop and let the encounter close (meters.ts ENCOUNTER_END_SECONDS = 5),
-      // then use the real history "older segment" control to inspect the
-      // finished run: the sequence hub_lesson_view.ts's damage track requires
-      // before it will ask for a second, comparable attempt.
+      // then pick the finished run from the Damage window's real fight name
+      // menu (.mt-seg-trigger; the old arrows are hidden): the sequence
+      // hub_lesson_view.ts's damage track requires before it will ask for a
+      // second, comparable attempt.
       await page.evaluate(() => {
         window.__game.sim.player.autoAttack = false;
       });
       await wait(5800);
-      await page.evaluate(() => {
-        document.querySelector('.mt-prev')?.click();
-      });
+      const pickSegment = (act) =>
+        page.evaluate((a) => {
+          document.querySelector('#meters-window .mt-seg-trigger')?.click();
+          const item = document.querySelector(`#ctx-menu .ctx-item[data-act="${a}"]`);
+          if (!item) return false;
+          item.click();
+          return true;
+        }, act);
+      if (!(await pickSegment('1'))) throw new Error('fight name menu offered no Fight 1 row');
       await wait(300);
 
-      // Page back to the live view and land the comparison attempt.
-      await page.evaluate(() => {
-        document.querySelector('.mt-next')?.click();
-      });
+      // Pick Current again and land the comparison attempt.
+      if (!(await pickSegment('0'))) throw new Error('fight name menu offered no Current row');
       await wait(300);
       const attacked2 = await page.evaluate(() => {
         const player = window.__game?.sim?.player;
