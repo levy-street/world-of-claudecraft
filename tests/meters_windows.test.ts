@@ -675,3 +675,44 @@ describe('detachable meter windows', () => {
     expect(menus[0].items.map((i) => i.act)).toEqual(['current', 'all']);
   });
 });
+
+describe('hub practice coach reads the Details-style controls', () => {
+  // The .mt-tabs strip and the .mt-prev / .mt-next arrows are display:none
+  // in the shipped chrome (styles/hud.css), so the coach must point at the
+  // visible mode and segment menu triggers and see segment-menu picks.
+  beforeEach(() => {
+    document.body.innerHTML = '';
+    MeterFrame.clearActiveFrames();
+  });
+
+  it('points the meter switch at the mode menu trigger, never a hidden tab', () => {
+    const { meters, el } = setup();
+    meters.toggle();
+    expect(meters.tabSwitchElement('dmg')).toBeNull(); // already on Damage
+    const control = meters.tabSwitchElement('heal');
+    expect(control).toBe(el('meters-window').querySelector('.mt-mode-trigger'));
+    expect(control?.closest('.mt-tabs')).toBeNull();
+  });
+
+  it('points history at the segment menu trigger, never a hidden arrow', () => {
+    const { meters, el } = setup();
+    meters.toggle();
+    const control = meters.segmentPickerElement('dmg');
+    expect(control).toBe(el('meters-window').querySelector('.mt-seg-trigger'));
+    expect(control?.classList.contains('mt-prev')).toBe(false);
+  });
+
+  it('counts a segment menu pick, not merely opening the menu', () => {
+    const { meters, el, menus } = setup();
+    meters.toggle();
+    meters.onEvent(dmg(1, 100, 'Shadow Bolt'));
+    meters.data.endEncounter();
+    meters.render(true);
+    const before = meters.segmentPickCount;
+    (el('meters-window').querySelector('.mt-seg-trigger') as HTMLElement).click();
+    expect(meters.segmentPickCount).toBe(before);
+    menus[0].select('1');
+    expect(meters.segmentPickCount).toBe(before + 1);
+    expect(meters.viewedEncounter('dmg')?.isCurrent).toBe(false);
+  });
+});

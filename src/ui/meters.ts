@@ -1158,6 +1158,9 @@ interface PanelHost {
     onSelect: (act: string) => void,
   ): void;
   onNewWindow?(): void;
+  /** A player picked a segment (the segment menu or the paging arrows):
+   *  feeds Meters.segmentPickCount for the hub practice coach. */
+  onSegmentPicked?(): void;
   mainWindowRect?(): { left: number; top: number; width: number; height: number } | null;
   resetCurrent(): void;
   resetAll(): void;
@@ -1255,13 +1258,6 @@ export class MetersPanel {
   private settings: MetersSettings;
   private optionsDialog: MetersOptionsDialog | null = null;
   private readonly deps?: MetersDeps;
-  /** Resolved ONCE at construction (static children of `root`, never
-   *  rebuilt): tabButtonElement/historyArrowElement used to re-query on
-   *  every call, which the hub practice coach (hub_lesson_controller.ts)
-   *  was doing every 250ms while a lesson is active. */
-  private readonly tabButtonEls: Partial<Record<Tab, HTMLElement>> = {};
-  private readonly historyArrowEl: HTMLElement;
-
   constructor(
     private readonly spec: PanelSpec,
     private readonly host: PanelHost,
@@ -1372,7 +1368,6 @@ export class MetersPanel {
           `.mt-tab[data-tab="${tab}"]`,
         ) as HTMLElement | null;
         if (!tabButton) continue;
-        this.tabButtonEls[tab] = tabButton;
         tabButton.textContent = t(TAB_SHORT_LABEL_KEY[tab]);
         tabButton.addEventListener('click', () => {
           this.selectedMetric = tab;
@@ -1416,7 +1411,6 @@ export class MetersPanel {
     const next = this.root.querySelector('.mt-next') as HTMLElement | null;
     const close = this.root.querySelector('.mt-close') as HTMLElement | null;
     const reset = this.root.querySelector('.mt-reset') as HTMLElement | null;
-    this.historyArrowEl = prev as HTMLElement;
     if (prev) {
       prev.setAttribute('title', t('hud.meters.olderSegment'));
       prev.addEventListener('click', () => this.page(1));
@@ -1576,6 +1570,7 @@ export class MetersPanel {
         this.viewMode = 'overview';
         this.selectedPhase = null;
         this.render(true);
+        this.host.onSegmentPicked?.();
       }
     });
   }
@@ -1888,20 +1883,21 @@ export class MetersPanel {
     return this.tab;
   }
 
-  /** This panel's tab button for `tab`, or null on a locked (detached) panel,
-   *  which has no tab strip to click at all. Read by the hub practice coach
-   *  (hub_lesson_controller.ts) to glow the button its "switch tabs" step
-   *  names, never by anything on a per-frame path. */
-  tabButtonElement(tab: Tab): HTMLElement | null {
-    if (this.spec.lockedTab) return null;
-    return this.tabButtonEls[tab] ?? null;
+  /** The mode menu trigger, the visible way to switch this panel's meter
+   *  (the .mt-tabs strip is hidden by the Details-style chrome), or null on a
+   *  locked (detached) panel, which has one fixed meter. Read by the hub
+   *  practice coach (hub_lesson_controller.ts) to glow its "switch meter"
+   *  step, never by anything on a per-frame path. */
+  get tabSwitchElement(): HTMLElement | null {
+    return this.spec.lockedTab ? null : this.modeTrigger;
   }
 
-  /** The "older segment" paging arrow: what a player presses to look back at
-   *  a run that just finished. Read by the hub practice coach's inspect-run
-   *  step, same non-hot-path caveat as tabButtonElement. */
-  get historyArrowElement(): HTMLElement | null {
-    return this.historyArrowEl;
+  /** The segment menu trigger: what a player opens to look back at a run
+   *  that just finished (the .mt-prev / .mt-next arrows are hidden by the
+   *  Details-style chrome). Read by the hub practice coach's history steps,
+   *  same non-hot-path caveat as tabSwitchElement. */
+  get segmentPickerElement(): HTMLElement {
+    return this.segTrigger;
   }
 
   /** Identity of the encounter segment currently displayed on this panel, and
@@ -1936,6 +1932,7 @@ export class MetersPanel {
     this.viewIdx = Math.max(0, Math.min(max, this.viewIdx + dir));
     this.selectedPid = null;
     this.render(true);
+    this.host.onSegmentPicked?.();
   }
 
   private refreshTabs(): void {
@@ -3186,6 +3183,8 @@ export class Meters {
   private readonly main: MetersPanel;
   private readonly detached = new Map<DetachableTab, MetersPanel>();
   private readonly partyPidsCache = new PartyPidsCache();
+  /** Player segment picks across every panel (PanelHost.onSegmentPicked). */
+  private segmentPicks = 0;
   /** Detached windows hidden along with the tabbed one, to restore on reopen. */
   private reopenDetached: DetachableTab[] = [];
   private settings: MetersSettings;
@@ -3237,8 +3236,9 @@ export class Meters {
             meters: {
               anyWindowOpen: () => this.anyWindowOpen,
               tabOpen: (tab: MeterTab) => this.tabOpen(tab),
-              tabButtonElement: (tab: MeterTab) => this.tabButtonElement(tab),
-              historyArrowElement: (tab: MeterTab) => this.historyArrowElement(tab),
+              tabSwitchElement: (tab: MeterTab) => this.tabSwitchElement(tab),
+              segmentPickerElement: (tab: MeterTab) => this.segmentPickerElement(tab),
+              segmentPickCount: () => this.segmentPickCount,
               rowElementForPid: (tab: MeterTab, pid: number) => this.rowElementForPid(tab, pid),
               viewedEncounter: (tab: MeterTab) => this.viewedEncounter(tab),
               current: () => this.current(),
@@ -3254,6 +3254,9 @@ export class Meters {
     const host: PanelHost = {
       world,
       data: this.data,
+      onSegmentPicked: () => {
+        this.segmentPicks++;
+      },
       sendChat: deps?.sendChat,
       petsByOwner: () => this.livePetsByOwner(),
       partyPids: () => this.partyPids(),
@@ -3435,19 +3438,25 @@ export class Meters {
     return this.panelShowing(tab) !== null;
   }
 
-  /** The main window's tab-switch button for `tab`, only while a click on it
-   *  would actually change anything (the main window is open, on a
-   *  different tab, and `tab` is not already off in its own detached
-   *  window). Null otherwise: nothing to glow. */
-  tabButtonElement(tab: MeterTab): HTMLElement | null {
+  /** The main window's meter-switch control (its mode menu trigger), only
+   *  while switching onto `tab` would actually change anything (the main
+   *  window is open, on a different meter, and `tab` is not already off in
+   *  its own detached window). Null otherwise: nothing to glow. */
+  tabSwitchElement(tab: MeterTab): HTMLElement | null {
     if (!this.main.isOpen || this.main.activeTab === tab) return null;
     if (this.isDetached(tab)) return null;
-    return this.main.tabButtonElement(tab);
+    return this.main.tabSwitchElement;
   }
 
-  /** The "older segment" arrow of whichever panel is showing `tab`. */
-  historyArrowElement(tab: MeterTab): HTMLElement | null {
-    return this.panelShowing(tab)?.historyArrowElement ?? null;
+  /** Player segment picks so far, on any panel (the hub coach's "looked
+   *  back at a fight" edge; see HubLessonMetersPort.segmentPickCount). */
+  get segmentPickCount(): number {
+    return this.segmentPicks;
+  }
+
+  /** The segment menu trigger of whichever panel is showing `tab`. */
+  segmentPickerElement(tab: MeterTab): HTMLElement | null {
+    return this.panelShowing(tab)?.segmentPickerElement ?? null;
   }
 
   /** The local player's own row on whichever panel is showing `tab`. */
