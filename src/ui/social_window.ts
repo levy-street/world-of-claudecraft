@@ -1290,15 +1290,6 @@ export class SocialWindow {
     return head + this.billboardHtml(g) + this.guildEventsHtml() + toggle + body;
   }
 
-  // The guild billboard: the officer-set message pinned between the guild head
-  // and the roster. PLAIN ESCAPED TEXT only, deliberately: the message is
-  // player-controlled, so it is never linkified or rendered as HTML (phishing /
-  // XSS surface; nothing else in chat linkifies either). The message div IS the
-  // read view, so the edit row (input + save) renders only for editors (leader
-  // and officer, UX only; the server enforces the real gate): a member never
-  // sees a disabled duplicate of the text above it. With no message set,
-  // members get no billboard box at all; editors keep it (empty-state line +
-  // input) so the feature is discoverable and the first message can be written.
   // Guild events (menu consolidation step 4): the upcoming booked events,
   // soonest first, plus the booking form for ranks holding the events
   // permission. Event titles and notes are player text, escaped like the
@@ -1327,7 +1318,7 @@ export class SocialWindow {
               });
         return (
           `<div class="cal-event guild ui-card"><span class="cal-dot guild"></span>` +
-          `<span class="cal-event-text"><span class="cal-event-title">${esc(ev.title)} <span class="cal-event-when">${esc(`${date}, ${when}`)}</span></span>` +
+          `<span class="cal-event-text"><span class="cal-event-title">${esc(ev.title)} <span class="cal-event-when">${esc(t('hudChrome.social.guildEvents.when', { date, time: when }))}</span></span>` +
           (ev.note ? `<span class="cal-event-note">${esc(ev.note)}</span>` : '') +
           (ev.createdBy
             ? `<span class="cal-event-by">${esc(t('hudChrome.calendar.bookedBy', { name: ev.createdBy }))}</span>`
@@ -1387,6 +1378,15 @@ export class SocialWindow {
     this.deps.world().guildEventCreate(draft.day, draft.hour, draft.title, draft.note);
   }
 
+  // The guild billboard: the officer-set message pinned between the guild head
+  // and the roster. PLAIN ESCAPED TEXT only, deliberately: the message is
+  // player-controlled, so it is never linkified or rendered as HTML (phishing /
+  // XSS surface; nothing else in chat linkifies either). The message div IS the
+  // read view, so the edit row (input + save) renders only for editors (leader
+  // and officer, UX only; the server enforces the real gate): a member never
+  // sees a disabled duplicate of the text above it. With no message set,
+  // members get no billboard box at all; editors keep it (empty-state line +
+  // input) so the feature is discoverable and the first message can be written.
   private billboardHtml(g: NonNullable<GuildView['guild']>): string {
     if (!g.motd && !g.canEditMotd) return '';
     const message = g.motd
@@ -1586,8 +1586,6 @@ export class SocialWindow {
     return `${head}<div class="soc-who-list" role="table" aria-label="${esc(t('hudChrome.social.who.tab'))}">${header}${body}</div>`;
   }
 
-  // The add/action row changes with the tab (and guild membership). Inputs
-  // tagged data-suggest get the username typeahead.
   /** Paint the Discord strip in place: link state, the online count, the
    *  voice room, and the button that opens the full panel. Hidden when the
    *  build has no Discord entry. */
@@ -1611,7 +1609,7 @@ export class SocialWindow {
     const online = t('hudChrome.discord.online', { count: formatNumber(view.onlineCount) });
     const voice =
       view.voiceChannel !== null
-        ? ` <span class="soc-discord-voice">${esc(t('hudChrome.discord.voice.channel', { channel: view.voiceChannel }))} (${esc(formatNumber(view.voiceCount))})</span>`
+        ? ` <span class="soc-discord-voice">${esc(t('hudChrome.social.guildEvents.discordVoice', { channel: view.voiceChannel, count: formatNumber(view.voiceCount) }))}</span>`
         : '';
     strip.innerHTML =
       `<span class="soc-discord-icon" aria-hidden="true">${svgIcon('discord')}</span>` +
@@ -1622,6 +1620,8 @@ export class SocialWindow {
     });
   }
 
+  // The add/action row changes with the tab (and guild membership). Inputs
+  // tagged data-suggest get the username typeahead.
   private footer(): string {
     if (this.tab === 'who')
       return (

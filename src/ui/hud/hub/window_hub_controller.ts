@@ -49,6 +49,9 @@ export interface WindowHubDeps<T extends string> {
   /** True on the touch HUD, where every member is a full-screen sheet and no
    *  inline position may carry between them. */
   touch(): boolean;
+  /** Runs whenever a member makes room to open (prepare): Hud clears the
+   *  transient overlays (context menu, tooltip) a window open always cleared. */
+  beforeOpen?(): void;
 }
 
 /** What a member painter takes to show the shared strip: the markup to place
@@ -78,6 +81,13 @@ function applyPositionCarry(to: HTMLElement, carry: WindowHubPositionCarry): voi
 }
 
 export class WindowHubController<T extends string> {
+  /** The hub tab that held keyboard focus when a member last built its strip
+   *  markup: html() is called while the member assembles its rebuild, BEFORE
+   *  the innerHTML swap destroys the focused tab, and wire() puts focus back
+   *  on the fresh tab. So every member keeps a focused hub tab across its own
+   *  rebuilds, whether or not its restore ladder knows the focus keys. */
+  private pendingFocusTab: string | null = null;
+
   constructor(
     readonly spec: WindowHubSpec<T>,
     private readonly deps: WindowHubDeps<T>,
@@ -114,6 +124,7 @@ export class WindowHubController<T extends string> {
    *  own open path (its closeOthers dep), so a deep link that reaches a member
    *  directly (a chat link, a tracker click) still shows one tab at a time. */
   prepare(tab: T): void {
+    this.deps.beforeOpen?.();
     const current = this.activeTab();
     if (current !== null && current !== tab) {
       const from = this.deps.members()[current].rootElement();
@@ -140,7 +151,14 @@ export class WindowHubController<T extends string> {
   /** The strip seam a member painter is handed for its own tab. */
   stripFor(tab: T): WindowHubStrip {
     return {
-      html: () => windowHubStripHtml(this.spec, tab),
+      html: () => {
+        const focused = document.activeElement;
+        this.pendingFocusTab =
+          focused instanceof HTMLElement && focused.classList.contains(this.spec.tabClass)
+            ? (focused.dataset.tab ?? null)
+            : null;
+        return windowHubStripHtml(this.spec, tab);
+      },
       title: () => t(this.spec.ariaLabelKey),
       closeLabel: () => t(this.spec.closeKey),
       wire: (root) => {
@@ -157,6 +175,14 @@ export class WindowHubController<T extends string> {
           if (!isWindowHubTab(this.spec, id) || id === tab) return;
           this.open(id, focusFollow);
         });
+        const pending = this.pendingFocusTab;
+        this.pendingFocusTab = null;
+        if (pending === null) return;
+        const active = document.activeElement;
+        // Only reclaim focus the rebuild dropped (to the body or the root);
+        // never steal it from a control the member already restored.
+        if (active && active !== document.body && active !== root) return;
+        root.querySelector<HTMLElement>(`.${this.spec.tabClass}[data-tab="${pending}"]`)?.focus();
       },
     };
   }

@@ -6040,7 +6040,9 @@ export const en_XA: EnTranslations = {
       },
       "guildEvents": {
         "heading": "[Ĝúíļð éʋéñţš]",
-        "dateLabel": "[Ðáţé]"
+        "dateLabel": "[Ðáţé]",
+        "when": "[{date}, {time}]",
+        "discordVoice": "[Íñ {channel} ({count})]"
       },
       "billboard": {
         "label": "[Ĝúíļð Ɓíļļƀóáŕð]",

@@ -50,7 +50,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mobile.groupRecord",
     "hudChrome.professionsHub.tabOverview",
     "hudChrome.social.guildEvents.dateLabel",
-    "hudChrome.social.guildEvents.heading"
+    "hudChrome.social.guildEvents.discordVoice",
+    "hudChrome.social.guildEvents.heading",
+    "hudChrome.social.guildEvents.when"
   ],
   "es_ES": [
     "guide.arenaPage.coliseumBodyActivities",
@@ -93,7 +95,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mobile.groupRecord",
     "hudChrome.professionsHub.tabOverview",
     "hudChrome.social.guildEvents.dateLabel",
-    "hudChrome.social.guildEvents.heading"
+    "hudChrome.social.guildEvents.discordVoice",
+    "hudChrome.social.guildEvents.heading",
+    "hudChrome.social.guildEvents.when"
   ],
   "fr_FR": [
     "guide.arenaPage.coliseumBodyActivities",
@@ -136,7 +140,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mobile.groupRecord",
     "hudChrome.professionsHub.tabOverview",
     "hudChrome.social.guildEvents.dateLabel",
-    "hudChrome.social.guildEvents.heading"
+    "hudChrome.social.guildEvents.discordVoice",
+    "hudChrome.social.guildEvents.heading",
+    "hudChrome.social.guildEvents.when"
   ],
   "fr_CA": [
     "guide.arenaPage.coliseumBodyActivities",
@@ -179,7 +185,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mobile.groupRecord",
     "hudChrome.professionsHub.tabOverview",
     "hudChrome.social.guildEvents.dateLabel",
-    "hudChrome.social.guildEvents.heading"
+    "hudChrome.social.guildEvents.discordVoice",
+    "hudChrome.social.guildEvents.heading",
+    "hudChrome.social.guildEvents.when"
   ],
   "en_CA": [],
   "it_IT": [
@@ -223,7 +231,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mobile.groupRecord",
     "hudChrome.professionsHub.tabOverview",
     "hudChrome.social.guildEvents.dateLabel",
-    "hudChrome.social.guildEvents.heading"
+    "hudChrome.social.guildEvents.discordVoice",
+    "hudChrome.social.guildEvents.heading",
+    "hudChrome.social.guildEvents.when"
   ],
   "de_DE": [
     "guide.arenaPage.coliseumBodyActivities",
@@ -266,27 +276,37 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mobile.groupRecord",
     "hudChrome.professionsHub.tabOverview",
     "hudChrome.social.guildEvents.dateLabel",
-    "hudChrome.social.guildEvents.heading"
+    "hudChrome.social.guildEvents.discordVoice",
+    "hudChrome.social.guildEvents.heading",
+    "hudChrome.social.guildEvents.when"
   ],
   "zh_CN": [
     "hudChrome.activities.tabPvp",
     "hudChrome.currencies.walletChipAria",
-    "hudChrome.social.guildEvents.dateLabel"
+    "hudChrome.social.guildEvents.dateLabel",
+    "hudChrome.social.guildEvents.discordVoice",
+    "hudChrome.social.guildEvents.when"
   ],
   "zh_TW": [
     "hudChrome.activities.tabPvp",
     "hudChrome.currencies.walletChipAria",
-    "hudChrome.social.guildEvents.dateLabel"
+    "hudChrome.social.guildEvents.dateLabel",
+    "hudChrome.social.guildEvents.discordVoice",
+    "hudChrome.social.guildEvents.when"
   ],
   "ko_KR": [
     "hudChrome.activities.tabPvp",
     "hudChrome.currencies.walletChipAria",
-    "hudChrome.social.guildEvents.dateLabel"
+    "hudChrome.social.guildEvents.dateLabel",
+    "hudChrome.social.guildEvents.discordVoice",
+    "hudChrome.social.guildEvents.when"
   ],
   "ja_JP": [
     "hudChrome.activities.tabPvp",
     "hudChrome.currencies.walletChipAria",
-    "hudChrome.social.guildEvents.dateLabel"
+    "hudChrome.social.guildEvents.dateLabel",
+    "hudChrome.social.guildEvents.discordVoice",
+    "hudChrome.social.guildEvents.when"
   ],
   "pt_BR": [
     "guide.arenaPage.coliseumBodyActivities",
@@ -329,12 +349,16 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mobile.groupRecord",
     "hudChrome.professionsHub.tabOverview",
     "hudChrome.social.guildEvents.dateLabel",
-    "hudChrome.social.guildEvents.heading"
+    "hudChrome.social.guildEvents.discordVoice",
+    "hudChrome.social.guildEvents.heading",
+    "hudChrome.social.guildEvents.when"
   ],
   "ru_RU": [
     "hudChrome.activities.tabPvp",
     "hudChrome.currencies.walletChipAria",
-    "hudChrome.social.guildEvents.dateLabel"
+    "hudChrome.social.guildEvents.dateLabel",
+    "hudChrome.social.guildEvents.discordVoice",
+    "hudChrome.social.guildEvents.when"
   ],
   "cs_CZ": [
     "guide.arenaPage.coliseumBodyActivities",
@@ -377,7 +401,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mobile.groupRecord",
     "hudChrome.professionsHub.tabOverview",
     "hudChrome.social.guildEvents.dateLabel",
-    "hudChrome.social.guildEvents.heading"
+    "hudChrome.social.guildEvents.discordVoice",
+    "hudChrome.social.guildEvents.heading",
+    "hudChrome.social.guildEvents.when"
   ],
   "nl_NL": [
     "guide.arenaPage.coliseumBodyActivities",
@@ -420,7 +446,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mobile.groupRecord",
     "hudChrome.professionsHub.tabOverview",
     "hudChrome.social.guildEvents.dateLabel",
-    "hudChrome.social.guildEvents.heading"
+    "hudChrome.social.guildEvents.discordVoice",
+    "hudChrome.social.guildEvents.heading",
+    "hudChrome.social.guildEvents.when"
   ],
   "pl_PL": [
     "guide.arenaPage.coliseumBodyActivities",
@@ -463,7 +491,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mobile.groupRecord",
     "hudChrome.professionsHub.tabOverview",
     "hudChrome.social.guildEvents.dateLabel",
-    "hudChrome.social.guildEvents.heading"
+    "hudChrome.social.guildEvents.discordVoice",
+    "hudChrome.social.guildEvents.heading",
+    "hudChrome.social.guildEvents.when"
   ],
   "id_ID": [
     "guide.arenaPage.coliseumBodyActivities",
@@ -506,7 +536,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mobile.groupRecord",
     "hudChrome.professionsHub.tabOverview",
     "hudChrome.social.guildEvents.dateLabel",
-    "hudChrome.social.guildEvents.heading"
+    "hudChrome.social.guildEvents.discordVoice",
+    "hudChrome.social.guildEvents.heading",
+    "hudChrome.social.guildEvents.when"
   ],
   "tr_TR": [
     "guide.arenaPage.coliseumBodyActivities",
@@ -549,7 +581,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mobile.groupRecord",
     "hudChrome.professionsHub.tabOverview",
     "hudChrome.social.guildEvents.dateLabel",
-    "hudChrome.social.guildEvents.heading"
+    "hudChrome.social.guildEvents.discordVoice",
+    "hudChrome.social.guildEvents.heading",
+    "hudChrome.social.guildEvents.when"
   ],
   "sv_SE": [
     "guide.arenaPage.coliseumBodyActivities",
@@ -592,7 +626,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mobile.groupRecord",
     "hudChrome.professionsHub.tabOverview",
     "hudChrome.social.guildEvents.dateLabel",
-    "hudChrome.social.guildEvents.heading"
+    "hudChrome.social.guildEvents.discordVoice",
+    "hudChrome.social.guildEvents.heading",
+    "hudChrome.social.guildEvents.when"
   ],
   "vi_VN": [
     "guide.arenaPage.coliseumBodyActivities",
@@ -635,7 +671,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mobile.groupRecord",
     "hudChrome.professionsHub.tabOverview",
     "hudChrome.social.guildEvents.dateLabel",
-    "hudChrome.social.guildEvents.heading"
+    "hudChrome.social.guildEvents.discordVoice",
+    "hudChrome.social.guildEvents.heading",
+    "hudChrome.social.guildEvents.when"
   ],
   "da_DK": [
     "guide.arenaPage.coliseumBodyActivities",
@@ -678,6 +716,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mobile.groupRecord",
     "hudChrome.professionsHub.tabOverview",
     "hudChrome.social.guildEvents.dateLabel",
-    "hudChrome.social.guildEvents.heading"
+    "hudChrome.social.guildEvents.discordVoice",
+    "hudChrome.social.guildEvents.heading",
+    "hudChrome.social.guildEvents.when"
   ]
 };

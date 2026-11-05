@@ -404,6 +404,39 @@ export const RETIRED_KEYS = [
   'guide.controls.discord',
   'guide.social.calendarHeading',
   'guide.social.calendarBodyDoubleHonor',
+  // -- v0.46.0 menu consolidation, the HUD side. The Event Calendar window left the
+  // game (its guild booking strings live on in the Social Guild tab, so only these
+  // window-only rows retire), the Character sheet lost its Skills, Reputation and
+  // Currencies tabs, and the Groups bell now opens Activities under a successor label.
+  'hudChrome.calendar.close',
+  'hudChrome.calendar.dayAria',
+  'hudChrome.calendar.events.arenaClash.note',
+  'hudChrome.calendar.events.arenaClash.title',
+  'hudChrome.calendar.events.delveDay.note',
+  'hudChrome.calendar.events.delveDay.title',
+  'hudChrome.calendar.events.doubleHonor.note',
+  'hudChrome.calendar.events.doubleHonor.title',
+  'hudChrome.calendar.events.fishingDerby.note',
+  'hudChrome.calendar.events.fishingDerby.title',
+  'hudChrome.calendar.events.marketDay.note',
+  'hudChrome.calendar.events.marketDay.title',
+  'hudChrome.calendar.events.moongateCommunion.note',
+  'hudChrome.calendar.events.moongateCommunion.title',
+  'hudChrome.calendar.events.raidCall.note',
+  'hudChrome.calendar.events.raidCall.title',
+  'hudChrome.calendar.guildOnlyNote',
+  'hudChrome.calendar.keybindLabel',
+  'hudChrome.calendar.nextMonth',
+  'hudChrome.calendar.prevMonth',
+  'hudChrome.charSidebar.crafting',
+  'hudChrome.charSidebar.gathering',
+  'hudChrome.charSidebar.openProfessions',
+  'hudChrome.charSidebar.professions',
+  'hudChrome.charSidebar.reputation',
+  'hudChrome.charSidebar.skills',
+  'hudChrome.charSidebar.stats',
+  'hudChrome.expeditions.bellCount.one',
+  'hudChrome.expeditions.bellCount.other',
   // -- v0.46.0 menu consolidation, guide prose (the reword-is-a-new-key convention):
   // each key below described a rail button, a default key, or a window the hubs
   // absorbed, so its reviewed overlay rows would keep rendering a false fact. The

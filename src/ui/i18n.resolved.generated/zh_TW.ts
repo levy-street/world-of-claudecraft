@@ -6040,7 +6040,9 @@ export const zh_TW: EnTranslations = {
       },
       "guildEvents": {
         "heading": "公會活動",
-        "dateLabel": "Date"
+        "dateLabel": "Date",
+        "when": "{date}, {time}",
+        "discordVoice": "In {channel} ({count})"
       },
       "billboard": {
         "label": "公會公告板",

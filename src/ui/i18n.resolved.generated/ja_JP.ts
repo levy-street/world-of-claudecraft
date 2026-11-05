@@ -6040,7 +6040,9 @@ export const ja_JP: EnTranslations = {
       },
       "guildEvents": {
         "heading": "ギルドイベント",
-        "dateLabel": "Date"
+        "dateLabel": "Date",
+        "when": "{date}, {time}",
+        "discordVoice": "In {channel} ({count})"
       },
       "billboard": {
         "label": "ギルド掲示板",

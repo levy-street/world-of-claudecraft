@@ -6040,7 +6040,9 @@ export const ru_RU: EnTranslations = {
       },
       "guildEvents": {
         "heading": "События гильдии",
-        "dateLabel": "Date"
+        "dateLabel": "Date",
+        "when": "{date}, {time}",
+        "discordVoice": "In {channel} ({count})"
       },
       "billboard": {
         "label": "Доска объявлений гильдии",

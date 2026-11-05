@@ -206,6 +206,23 @@ export class LeaderboardWindow {
     return this.deps.root();
   }
 
+  /** The Book of the Realm's view of this window: the World Quests rankings
+   *  stand-in counts as the Rankings tab being shown, so the hub's toggle
+   *  closes it and a switch to another tab hides it. */
+  readonly hubMember = this.makeHubMember();
+
+  private makeHubMember() {
+    const shown = (): boolean => this.isOpen || (this.rankings?.isOpen ?? false);
+    return {
+      get isOpen(): boolean {
+        return shown();
+      },
+      open: (): void => this.open(),
+      close: (): void => this.close(),
+      rootElement: (): HTMLElement => this.rootElement(),
+    };
+  }
+
   /** Show the boards from the top (the Book of the Realm's Rankings tab, and
    *  the closed arm of toggle()). Already shown: nothing to do. */
   open(): void {

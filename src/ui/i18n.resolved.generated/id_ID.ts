@@ -6040,7 +6040,9 @@ export const id_ID: EnTranslations = {
       },
       "guildEvents": {
         "heading": "Guild events",
-        "dateLabel": "Date"
+        "dateLabel": "Date",
+        "when": "{date}, {time}",
+        "discordVoice": "In {channel} ({count})"
       },
       "billboard": {
         "label": "Papan Pengumuman Serikat",

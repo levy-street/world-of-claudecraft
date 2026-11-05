@@ -6040,7 +6040,9 @@ export const vi_VN: EnTranslations = {
       },
       "guildEvents": {
         "heading": "Guild events",
-        "dateLabel": "Date"
+        "dateLabel": "Date",
+        "when": "{date}, {time}",
+        "discordVoice": "In {channel} ({count})"
       },
       "billboard": {
         "label": "Bảng Tin Bang Hội",

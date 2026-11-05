@@ -3662,6 +3662,7 @@ export class Hud {
       case 'reputation-window':
       case 'loot-explorer-window':
       case 'leaderboard-window':
+      case 'world-quest-leaderboard-window':
         // The Book of the Realm's members: the hub closes the shown one
         // through its own painter, so focus returns to the opener.
         this.bookHub.close();
@@ -3770,7 +3771,6 @@ export class Hud {
       case 'referral-cards-window':
         this.referralCards.close();
         break;
-      case 'world-quest-leaderboard-window':
       case 'guild-board-window':
         this.guildBoardWindow.close();
         break;
@@ -5384,9 +5384,10 @@ export class Hud {
       reliquary: this.reliquaryWindow,
       reputation: this.reputationWindow,
       lootExplorer: this.lootExplorerWindow,
-      rankings: this.leaderboardWindow,
+      rankings: this.leaderboardWindow.hubMember,
     }),
     touch: () => document.body.classList.contains('mobile-touch'),
+    beforeOpen: () => this.closeOtherWindows(),
   });
   private readonly deedsWindow = new DeedsWindow({
     ...this.presentationBag,
@@ -5615,6 +5616,7 @@ export class Hud {
       cardDuel: this.cardDuelWindow,
     }),
     touch: () => document.body.classList.contains('mobile-touch'),
+    beforeOpen: () => this.closeOtherWindows(),
   });
   private readonly arenaWindow = new ArenaWindow({
     root: () => $('#arena-window'),
@@ -5637,7 +5639,7 @@ export class Hud {
     showOnMap: (x, z) => this.showFinderOnMap(x, z),
     hasBossGuide: RaidBossGuideWindow.hasJournal,
     openBossGuide: (d, m, diff) => this.raidBossGuideWindow.openJournal(d, m, diff),
-    openFinder: () => this.activitiesHub.toggle(),
+    openFinder: () => this.activitiesHub.toggle('dungeons'),
     maskPlayerText: (note) => this.maskChat(note),
     // An applicant in view gets the live card; anyone else their finder snapshot.
     inspectPlayer: (pid, profile) =>

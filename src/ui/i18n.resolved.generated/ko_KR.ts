@@ -6040,7 +6040,9 @@ export const ko_KR: EnTranslations = {
       },
       "guildEvents": {
         "heading": "길드 행사",
-        "dateLabel": "Date"
+        "dateLabel": "Date",
+        "when": "{date}, {time}",
+        "discordVoice": "In {channel} ({count})"
       },
       "billboard": {
         "label": "길드 게시판",

@@ -86,3 +86,32 @@ describe('prepare: a direct deep link into a member', () => {
     expect(hub.activeTab()).toBe('titles');
   });
 });
+
+describe('focus carry across a member rebuild', () => {
+  it('keeps keyboard focus on a hub tab when a member rebuilds its markup', () => {
+    // A member with NO restore ladder of its own (the Card Duel / Leaderboard
+    // shape): it builds its strip markup, swaps innerHTML, then wires.
+    const el = members.reputation.el;
+    const strip = hub.stripFor('reputation');
+    const rebuild = () => {
+      el.innerHTML = `<div class="panel-title"></div>${strip.html()}<p>body</p>`;
+      strip.wire(el);
+    };
+    rebuild();
+    el.querySelector<HTMLElement>('.realm-hub-tab[data-tab="rankings"]')?.focus();
+    rebuild();
+    expect(document.activeElement?.getAttribute('data-tab')).toBe('rankings');
+    expect(el.contains(document.activeElement)).toBe(true);
+  });
+
+  it('never steals focus a member already restored, nor reclaims it when no tab held it', () => {
+    const el = members.deeds.el;
+    const strip = hub.stripFor('deeds');
+    el.innerHTML = `${strip.html()}<button id="close">x</button>`;
+    strip.wire(el);
+    el.querySelector<HTMLElement>('#close')?.focus();
+    el.innerHTML = `${strip.html()}<button id="close">x</button>`;
+    strip.wire(el);
+    expect(document.activeElement?.getAttribute('data-tab')).toBeNull();
+  });
+});

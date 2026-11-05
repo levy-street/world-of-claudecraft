@@ -8021,6 +8021,10 @@ export const hudChromeStrings = {
     guildEvents: {
       heading: 'Guild events',
       dateLabel: 'Date',
+      // An event row's date and time, joined.
+      when: '{date}, {time}',
+      // The Social window's Discord strip: the featured voice room and its head count.
+      discordVoice: 'In {channel} ({count})',
     },
     billboard: {
       label: 'Guild Billboard',
@@ -8690,10 +8694,6 @@ export const hudChromeStrings = {
   professionsHub: {
     tabOverview: 'Overview',
   },
-  // Book of the Realm (menu consolidation step 2): one tabbed window over the
-  // permanent record (Deeds, Titles, Reliquary, Reputation, Loot Explorer,
-  // Rankings). The absorbed windows keep their own titles as tab labels where
-  // those are short; these are the hub's own words.
   // Activities (menu consolidation step 4): one tabbed window over the group
   // content windows (Dungeon Finder, PvP, Card Duel); the Groups bell is its
   // launcher.
@@ -8703,6 +8703,10 @@ export const hudChromeStrings = {
     tabDungeons: 'Dungeons and Raids',
     tabPvp: 'PvP',
   },
+  // Book of the Realm (menu consolidation step 2): one tabbed window over the
+  // permanent record (Deeds, Titles, Reliquary, Reputation, Loot Explorer,
+  // Rankings). The absorbed windows keep their own titles as tab labels where
+  // those are short; these are the hub's own words.
   bookOfRealm: {
     title: 'Book of the Realm',
     close: 'Close the Book of the Realm',
