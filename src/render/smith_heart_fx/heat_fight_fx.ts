@@ -830,7 +830,21 @@ export class HeatFightFx implements HeatFxHost {
     this.paintBolts(world);
     this.paintSigils(world);
     this.particles.update(this.clock);
-    this.audio.update(guardian, world.entities.get(world.playerId) ?? null);
+    const me = world.entities.get(world.playerId) ?? null;
+    // The nearest Rolling Cinder rolls in the sound's loop.
+    let cinder: Entity | null = null;
+    let best = Number.POSITIVE_INFINITY;
+    if (me)
+      for (const id of this.cinderIds) {
+        const c = world.entities.get(id);
+        if (!c || c.dead) continue;
+        const d = (c.pos.x - me.pos.x) ** 2 + (c.pos.z - me.pos.z) ** 2;
+        if (d < best) {
+          best = d;
+          cinder = c;
+        }
+      }
+    this.audio.update(guardian, me, cinder ? cinder.pos : null);
   }
 
   // ---- the scan -------------------------------------------------------------------------
@@ -1089,6 +1103,8 @@ export class HeatFightFx implements HeatFxHost {
       }
       slot.seen = true;
       if (slot.state !== of.state) {
+        // A red slice heating, then erupting: the Wheel's sound.
+        this.audio.wheel(of.state, e.pos.x, this.groundY(e.pos.x, e.pos.z), e.pos.z);
         slot.state = of.state;
         slot.born = this.clock;
       }
@@ -1229,6 +1245,7 @@ export class HeatFightFx implements HeatFxHost {
   dispose(): void {
     if (this.disposed) return;
     this.disposed = true;
+    this.audio.dispose();
     this.root.removeFromParent();
     this.particles.dispose();
     this.kit.dispose();

@@ -242,6 +242,7 @@ import {
   shouldPlayCombatImpactForTarget,
   shouldPlayCritSfxForTarget,
   shouldPlayMobVoiceSfxForEntity,
+  smithHeartSoundClaims,
   spellFxCue,
 } from './combat_sfx';
 import { compassView } from './compass';
@@ -10780,10 +10781,9 @@ export class Hud {
           this.combat(ev.sfxKey, ev.x, y, ev.z, 1.0, { cooldown: 0.08 });
           return;
         }
-        if (ev.fx !== 'nova') return;
-        // A per-ability nova recording is the whole read on the aimed path
-        // too, at the same 1.0 the entity-anchored spellfx path plays it;
-        // the generic burst keeps its school-flavored layer.
+        // A raid fight's own cue is never doubled (it sounds itself).
+        if (ev.fx !== 'nova' || smithHeartSoundClaims(ev.ability)) return;
+        // A per-ability nova recording is the whole read; else the generic burst.
         const novaKey = novaAbilityCue(ev.ability);
         if (novaKey !== 'spell_nova') {
           this.combat(novaKey, ev.x, y, ev.z, 1.0, { cooldown: 0.08 });
