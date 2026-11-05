@@ -4824,7 +4824,7 @@ export const tr_TR: EnTranslations = {
         "shell": "Absorbs the next {value} healing you receive.",
         "crushed": "Standing under the next Weight of the Anvil within {seconds} sec, you take your share {mult} times over. Let the other group share it.",
         "phaseCall": "Call of the Quarters: shielded in the centre for {seconds} sec while its Splinters live. Every Splinter deals {min} to {max} damage to the whole raid every {every} sec, {rise}% more with each pulse. Kill them all to break the shield early; any still alive when the call ends pours its element into it for the rest of the fight. Heroic: {heroicMin} to {heroicMax} damage. Mythic: {mythicMin} to {mythicMax} damage.",
-        "phaseFight": "At {first}% and {second}% health it strides into the centre, shielded, and calls a Splinter out of each of its fullest quarters. At {final}% all four quarters wake for its last stand.",
+        "phaseFight": "At {first}% and {second}% health it strides into the centre, shielded, and calls a Splinter out of each of its fullest quarters. At {final}% all four quarters wake for the end of the fight.",
         "phaseFinal": "All four quarters are awake: it stays in the central ring and casts Fire Whirls, Groaning Ice, Leaping Bolt and Weight of the Anvil in turn, one every {every} sec. After {enrage} sec it loses all restraint (Masterless Fury).",
         "phaseKneel": "It kneels. Nothing harms it.",
         "phaseRebirth": "The Heart beats. Nothing harms it until it rises at {percent}% health.",
