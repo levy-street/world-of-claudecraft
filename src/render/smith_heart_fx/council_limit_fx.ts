@@ -47,6 +47,8 @@ export class CouncilLimitFx {
   private readonly pillars: { x: number; z: number; r: number }[] = [];
   private readonly players: { x: number; z: number }[] = [];
   private readonly counts: number[] = [];
+  /** The first crowded pillar of the last lay (its sound's spot). */
+  readonly crowdedAt = { x: 0, z: 0 };
 
   constructor(
     private readonly h: CouncilFxHost,
@@ -80,22 +82,28 @@ export class CouncilLimitFx {
   }
 
   /** Lay the gems for a Wrath from (sx, sz): `limit` per pillar, `n` players read
-   *  through `playerAt`. Called at the host's shelter pace, never a frame. */
+   *  through `playerAt`. Called at the host's shelter pace, never a frame.
+   *  Returns how many pillars are crowded (the first at `crowdedAt`). */
   lay(
     sx: number,
     sz: number,
     limit: number,
     n: number,
     playerAt: (i: number, out: { x: number; z: number }) => void,
-  ): void {
+  ): number {
     const count = this.pillarsFx.shelters(this.pillars);
     while (this.players.length < n) this.players.push({ x: 0, z: 0 });
     for (let i = 0; i < n; i++) playerAt(i, this.players[i]);
     pillarShelterCounts(sx, sz, this.players, n, this.pillars, count, this.counts);
     let g = 0;
+    let crowded = 0;
     for (let i = 0; i < count; i++) {
       const pl = this.pillars[i];
       const runes = shelterRunes(this.counts[i], limit);
+      if (runes.over && crowded++ === 0) {
+        this.crowdedAt.x = pl.x;
+        this.crowdedAt.z = pl.z;
+      }
       const y = this.h.groundY(pl.x, pl.z) + GEM_Y;
       const yaw = Math.atan2(pl.x - sx, pl.z - sz);
       const r = pl.r + OFF_FACE;
@@ -121,6 +129,7 @@ export class CouncilLimitFx {
       m.instanceMatrix.needsUpdate = true;
     }
     if (this.gems.instanceColor) this.gems.instanceColor.needsUpdate = true;
+    return crowded;
   }
 
   hide(): void {

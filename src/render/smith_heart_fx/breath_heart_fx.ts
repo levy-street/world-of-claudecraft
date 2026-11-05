@@ -16,6 +16,7 @@
 // no light, no per-frame allocation. The plan's numbers: breath_heart_fx_core.ts.
 
 import * as THREE from 'three';
+import type { BreathKnotHeard } from '../../game/smith_heart_breath_audio';
 import {
   BREATH_CUES,
   knotOf,
@@ -230,6 +231,10 @@ interface FlightSlot {
 
 export class BreathHeartFx {
   private readonly knots: KnotSlot[] = [];
+  /** The Knotted Gale the fight's sound hears this frame (the most urgent),
+   *  or null (game/smith_heart_breath_audio.ts). */
+  heard: BreathKnotHeard | null = null;
+  private readonly heardKnot: BreathKnotHeard = { x: 0, y: 0, z: 0, held: false, fuse: 0 };
   /** One slot per side, in side order (A, B, C, D). */
   private readonly portals: PortalSlot[] = [];
   private readonly marks: MarkSlot[] = [];
@@ -728,6 +733,7 @@ export class BreathHeartFx {
   update(world: IWorld, dt: number): void {
     const h = this.h;
     const now = h.uTime.value;
+    this.heard = null;
     for (const k of this.knots) {
       const e = k.id >= 0 ? world.entities.get(k.id) : undefined;
       const of = e ? knotOf(e.templateId) : null;
@@ -743,10 +749,21 @@ export class BreathHeartFx {
         k.template = e.templateId;
         k.changedAt = now;
       }
-      const look = knotLook(liveFuse(of.fuse, now - k.changedAt));
+      const fuse = liveFuse(of.fuse, now - k.changedAt);
+      const look = knotLook(fuse);
       const held = of.state === 'held';
       const eAt = fxAnchor(e);
       const floor = h.groundY(eAt.x, eAt.z);
+      // The ball the sound hears: the one nearest its burst.
+      if (!this.heard || fuse < this.heard.fuse) {
+        const a = this.heardKnot;
+        a.x = eAt.x;
+        a.y = floor;
+        a.z = eAt.z;
+        a.held = held;
+        a.fuse = fuse;
+        this.heard = a;
+      }
       const y = floor + (held ? KNOT_CARRY_Y : KNOT_FLOAT_Y) + 0.15 * Math.sin(now * 3);
       const r = look.radius * (1 + 0.14 * look.throb * Math.sin(now * 14));
       k.crackle.value = look.crackle;

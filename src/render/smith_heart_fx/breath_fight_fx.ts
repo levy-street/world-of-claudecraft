@@ -1229,7 +1229,14 @@ export class BreathFightFx {
         gale = e.pos;
       }
     }
-    this.audio.update(this.windPhase, wind ? wind.pos : null, guardian, gale);
+    this.audio.update(
+      this.windPhase,
+      wind ? wind.pos : null,
+      guardian,
+      gale,
+      meE ?? null,
+      this.heart.heard,
+    );
   }
 
   // ---- the scan -------------------------------------------------------------------------
