@@ -126,6 +126,16 @@ export function quenchRingOf(templateId: string): { gaps: number; seed: number }
   return { gaps, seed };
 }
 
+/** Each vein's school on a cue (the element a sound or a light reads). */
+export const FINAL_VEIN_SCHOOL: Readonly<
+  Record<SmithHeartVein, 'fire' | 'frost' | 'nature' | 'physical'>
+> = {
+  heat: 'fire',
+  quench: 'frost',
+  breath: 'nature',
+  hammer: 'physical',
+};
+
 export const FINAL_PHASE_CUES = {
   /** The boss strides into the centre (spellfxAt at the centre). */
   leap: 'heart_final_leap',
@@ -169,6 +179,9 @@ export const FINAL_PHASE_CUES = {
   ringCrack: 'heart_final_ring_crack',
   /** The central ring breaks: the wipe (spellfxAt at the centre). */
   ringBreak: 'heart_final_ring_break',
+  /** A turn of the final phase's mix begins (spellfxAt at the centre, its
+   *  school the turn's element: FINAL_VEIN_SCHOOL). */
+  mixTurn: 'heart_final_mix_turn',
 } as const;
 
 /** The damage, aura and mob names (combat log, nameplates, the buff bar;

@@ -39,6 +39,7 @@ import { dropShield, pinCentre } from './final_intermission';
 import {
   FINAL_PHASE_AURAS as A,
   FINAL_MIX,
+  FINAL_VEIN_SCHOOL,
   furyScale,
   FINAL_PHASE_NAMES as N,
   FINAL_PHASES as P,
@@ -134,6 +135,8 @@ export function mixTurn(s: FinalScope): boolean {
     if (!bossFree(s)) return false;
     startAnvil(s);
   }
+  // The turn's tell: the room's own cue, in the turn's element (its sound's).
+  cueAt(s, Q.mixTurn, HEART_ROOM.x, HEART_ROOM.z, 40, FINAL_VEIN_SCHOOL[vein]);
   ph.mixTurn++;
   return true;
 }
