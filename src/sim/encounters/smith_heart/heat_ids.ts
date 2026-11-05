@@ -193,6 +193,9 @@ export type HeatDifficulty = 'normal' | 'heroic' | 'mythic';
 export interface HeatDifficultyRules {
   /** Every mechanic's damage, on top of the claim's own multiplier. */
   damageMult: number;
+  /** The boss's health pool against the template's, set at the pull
+   *  (tier_health.ts). */
+  healthMult: number;
   /** The overflows bring the Wellspawn (and the second, two Wellkeepers). */
   overflowAdds: boolean;
   /** A Hearthseed's burst hatches a Seedflame. */
@@ -208,6 +211,7 @@ export interface HeatDifficultyRules {
 export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRules>> = {
   normal: {
     damageMult: 1,
+    healthMult: 1,
     overflowAdds: false,
     seedHatch: false,
     bolts: 2,
@@ -216,6 +220,7 @@ export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRule
   },
   heroic: {
     damageMult: 1.25,
+    healthMult: 1.8,
     overflowAdds: true,
     seedHatch: true,
     bolts: 3,
@@ -225,6 +230,7 @@ export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRule
   // Heroic whole, plus the Wheel of the Hearth.
   mythic: {
     damageMult: 1.25,
+    healthMult: 1,
     overflowAdds: true,
     seedHatch: true,
     bolts: 3,

@@ -211,6 +211,9 @@ export type FinalDifficulty = 'normal' | 'heroic' | 'mythic';
 export interface FinalDifficultyRules {
   /** Every mechanic's damage, on top of the claim's own multiplier. */
   damageMult: number;
+  /** The boss's health pool against the template's, set at the pull
+   *  (tier_health.ts). */
+  healthMult: number;
   /** How a full Overload bar's burst reads on this tier (FINAL_OVERLOAD
    *  holds its numbers): survivable with healing, heavy, or lethal. */
   burstTier: 'survivable' | 'heavy' | 'lethal';
@@ -241,6 +244,7 @@ export interface FinalDifficultyRules {
 export const FINAL_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalDifficultyRules>> = {
   normal: {
     damageMult: 1,
+    healthMult: 1,
     burstTier: 'survivable',
     switchShock: false,
     embers: false,
@@ -256,6 +260,7 @@ export const FINAL_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalDifficultyR
   },
   heroic: {
     damageMult: 1.2,
+    healthMult: 1.8,
     burstTier: 'heavy',
     switchShock: true,
     embers: true,
@@ -271,6 +276,7 @@ export const FINAL_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalDifficultyR
   },
   mythic: {
     damageMult: 1.3,
+    healthMult: 1,
     burstTier: 'lethal',
     switchShock: true,
     embers: true,

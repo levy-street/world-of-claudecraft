@@ -223,6 +223,9 @@ export interface BreathDifficultyRules {
   gustThrow: number;
   /** Every mechanic's damage, on top of the claim's own multiplier. */
   damageMult: number;
+  /** The boss's health pool against the template's, set at the pull
+   *  (tier_health.ts). */
+  healthMult: number;
   /** An anchor that ran out leaves its player spent (no circle for a while). */
   calmSpent: boolean;
   /** Loose gales wander the Cornice after each indrawn breath. */
@@ -251,6 +254,7 @@ export const BREATH_DIFFICULTY: Readonly<Record<BreathDifficulty, BreathDifficul
     windSpeed: 3.2,
     gustThrow: 26,
     damageMult: 1,
+    healthMult: 1,
     calmSpent: false,
     looseGales: false,
     stormGusts: false,
@@ -266,6 +270,7 @@ export const BREATH_DIFFICULTY: Readonly<Record<BreathDifficulty, BreathDifficul
     windSpeed: 4.4,
     gustThrow: 30,
     damageMult: 1.25,
+    healthMult: 2.4,
     calmSpent: true,
     looseGales: true,
     stormGusts: true,
@@ -283,6 +288,7 @@ export const BREATH_DIFFICULTY: Readonly<Record<BreathDifficulty, BreathDifficul
     windSpeed: 4.4,
     gustThrow: 30,
     damageMult: 1.25,
+    healthMult: 1,
     calmSpent: true,
     looseGales: true,
     stormGusts: true,

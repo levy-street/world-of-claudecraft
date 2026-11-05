@@ -93,6 +93,7 @@ import {
 } from './heat_wellspawn';
 import { startWheel, stepWheel } from './heat_wheel';
 import { clearZones, startZones, stepZones } from './heat_zones';
+import { applyTierHealth, restoreTierHealth } from './tier_health';
 
 // ---- the dev difficulty switch ------------------------------------------------------------
 
@@ -448,6 +449,7 @@ function clearFight(
 /** The fight ended without the kill: the Hearth as it was. */
 function resetHeat(ctx: SimContext, inst: InstanceSlot, boss: Entity): void {
   clearFight(ctx, inst, boss, boss.smithHeartHeat ?? null);
+  restoreTierHealth(boss, boss.smithHeartHeat?.basePool);
   boss.smithHeartHeat = undefined;
 }
 
@@ -463,6 +465,7 @@ function finishHeat(ctx: SimContext, inst: InstanceSlot, boss: Entity, st: HeatF
 /** The pull: one state for the fight. */
 function beginHeat(ctx: SimContext, inst: InstanceSlot, boss: Entity): HeatFightState {
   const st = freshState(heatDifficulty(inst));
+  st.basePool = applyTierHealth(boss, HEAT_DIFFICULTY[st.difficulty].healthMult);
   boss.smithHeartHeat = st;
   const s = scopeOf(ctx, inst, st, boss);
   showState(s);

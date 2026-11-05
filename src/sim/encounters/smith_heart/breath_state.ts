@@ -185,6 +185,8 @@ export interface BreathRoar {
 export interface BreathFightState {
   kind: 'breath';
   difficulty: BreathDifficulty;
+  /** The boss's pool before its tier's (tier_health.ts), given back at a reset. */
+  basePool?: number;
   /** The guardian has fallen and the end was resolved. */
   finished: boolean;
   /** Seconds since the pull. */

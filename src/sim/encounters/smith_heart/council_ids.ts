@@ -266,6 +266,9 @@ export interface CouncilDifficultyRules {
   pillarPulse: boolean;
   /** Every mechanic's damage, on top of the claim's own multiplier. */
   damageMult: number;
+  /** The boss's health pool against the template's, set at the pull
+   *  (tier_health.ts). */
+  healthMult: number;
   /** The heir's random rise: seconds of warning on its locked spot. */
   heirRiseWarn: number;
   /** The Wrath's heir: seconds its energy takes to fill. */
@@ -296,6 +299,7 @@ export const COUNCIL_DIFFICULTY: Readonly<Record<CouncilDifficulty, CouncilDiffi
     songAfterWrath: true,
     pillarPulse: false,
     damageMult: 1,
+    healthMult: 1,
     heirRiseWarn: 2,
     heirFillSeconds: 35,
     rockOutlivesSinger: false,
@@ -311,6 +315,7 @@ export const COUNCIL_DIFFICULTY: Readonly<Record<CouncilDifficulty, CouncilDiffi
     songAfterWrath: false,
     pillarPulse: true,
     damageMult: 1.25,
+    healthMult: 2.6,
     heirRiseWarn: 2,
     heirFillSeconds: 35,
     rockOutlivesSinger: false,
@@ -327,6 +332,7 @@ export const COUNCIL_DIFFICULTY: Readonly<Record<CouncilDifficulty, CouncilDiffi
     songAfterWrath: false,
     pillarPulse: true,
     damageMult: 1.25,
+    healthMult: 1,
     heirRiseWarn: 1.5,
     heirFillSeconds: 30,
     rockOutlivesSinger: true,

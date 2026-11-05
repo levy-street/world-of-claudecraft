@@ -221,6 +221,8 @@ export interface FinalPhaseState {
 export interface FinalFightState {
   kind: 'final';
   difficulty: FinalDifficulty;
+  /** The boss's pool before its tier's (tier_health.ts), given back at a reset. */
+  basePool?: number;
   finished: boolean;
   clock: number;
   /** The zone the boss stands in now. */

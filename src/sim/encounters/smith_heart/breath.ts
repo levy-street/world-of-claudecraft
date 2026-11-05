@@ -94,6 +94,7 @@ import {
 import { clearAnchors, clearCalm, plantCalm, stepThessaly } from './breath_thessaly';
 import { breathSay, THESSALY_PULL_DELAY } from './breath_voice';
 import { stepOverLip, stepVoidDeaths, tetherGuardian } from './breath_void';
+import { applyTierHealth, restoreTierHealth } from './tier_health';
 
 // ---- the dev difficulty switch ------------------------------------------------------------
 
@@ -304,6 +305,7 @@ function clearFight(
 function resetBreath(ctx: SimContext, inst: InstanceSlot, boss: Entity): void {
   const st = boss.smithHeartBreath ?? null;
   clearFight(ctx, inst, boss, st);
+  restoreTierHealth(boss, st?.basePool);
   boss.smithHeartBreath = undefined;
 }
 
@@ -324,6 +326,7 @@ function finishBreath(
 /** The pull: one state for the fight, the wind about to stir. */
 function beginBreath(ctx: SimContext, inst: InstanceSlot, boss: Entity): BreathFightState {
   const st = freshState(boss, breathDifficulty(inst));
+  st.basePool = applyTierHealth(boss, BREATH_DIFFICULTY[st.difficulty].healthMult);
   boss.smithHeartBreath = st;
   setWind({ ctx, inst, st }, 'calm', T.firstGather, 0);
   breathSay({ ctx, inst, st }, boss, 'guardian', 'pull');

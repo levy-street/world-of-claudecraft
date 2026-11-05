@@ -117,6 +117,7 @@ import {
   startWrath,
   syncEnergyBars,
 } from './council_wrath';
+import { applyTierHealth, restoreTierHealth } from './tier_health';
 
 // ---- the dev difficulty switches ------------------------------------------------------
 
@@ -472,6 +473,7 @@ function resetCouncil(ctx: SimContext, inst: InstanceSlot, bodies: CouncilBodies
     dropAuraById(b, COUNCIL_AURAS.rushStunned);
     dropAuraById(b, COUNCIL_AURAS.rushExposed);
     if (b.dead && anyAlive) regrowHead(ctx, b, 1);
+    restoreTierHealth(b, st?.basePools?.[r]);
     b.resource = 0;
   }
   attach(bodies, undefined);
@@ -513,6 +515,12 @@ function beginCouncil(
   bodies: CouncilBodies,
 ): CouncilFightState {
   const st = freshState(councilDifficulty(inst));
+  const mult = COUNCIL_DIFFICULTY[st.difficulty].healthMult;
+  st.basePools = {};
+  for (const r of COUNCIL_ROLES) {
+    const b = bodies[r];
+    if (b) st.basePools[r] = applyTierHealth(b, mult);
+  }
   // A member already down when the pull began (a dev kill) has fallen.
   for (const r of COUNCIL_ROLES) if (bodies[r] && !living(bodies[r])) st.fallen.push(r);
   attach(bodies, st);

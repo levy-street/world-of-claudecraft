@@ -83,6 +83,8 @@ export interface CouncilRush {
 export interface CouncilFightState {
   kind: 'council';
   difficulty: CouncilDifficulty;
+  /** Each member's pool before its tier's (tier_health.ts), given back at a reset. */
+  basePools?: Partial<Record<CouncilRole, number>>;
   /** The council has fallen and the end was resolved. */
   finished: boolean;
   /** Seconds since the pull. */

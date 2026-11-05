@@ -103,6 +103,8 @@ export interface QuenchFlurry {
 export interface QuenchFightState {
   kind: 'quench';
   difficulty: QuenchDifficulty;
+  /** The boss's pool before its tier's (tier_health.ts), given back at a reset. */
+  basePool?: number;
   /** The guardian has fallen and the end was resolved. */
   finished: boolean;
   /** Seconds since the pull. */

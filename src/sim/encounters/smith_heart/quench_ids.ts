@@ -142,6 +142,9 @@ export type QuenchDifficulty = 'normal' | 'heroic' | 'mythic';
 export interface QuenchDifficultyRules {
   /** Every mechanic's damage, on top of the claim's own multiplier. */
   damageMult: number;
+  /** The boss's health pool against the template's, set at the pull
+   *  (tier_health.ts). */
+  healthMult: number;
   /** A shatter's splash: how far, and how much cold it adds. */
   splashR: number;
   splashCold: number;
@@ -159,6 +162,7 @@ export interface QuenchDifficultyRules {
 export const QUENCH_DIFFICULTY: Readonly<Record<QuenchDifficulty, QuenchDifficultyRules>> = {
   normal: {
     damageMult: 1,
+    healthMult: 1,
     splashR: 6,
     splashCold: 35,
     slashMarksLake: 1,
@@ -170,6 +174,7 @@ export const QUENCH_DIFFICULTY: Readonly<Record<QuenchDifficulty, QuenchDifficul
   // Contagious cold: a shatter splashes further and harder.
   heroic: {
     damageMult: 1.25,
+    healthMult: 2.8,
     splashR: 10,
     splashCold: 55,
     slashMarksLake: 2,
@@ -181,6 +186,7 @@ export const QUENCH_DIFFICULTY: Readonly<Record<QuenchDifficulty, QuenchDifficul
   // Every round one blade, slash after slash from where the last one ended.
   mythic: {
     damageMult: 1.25,
+    healthMult: 1,
     splashR: 10,
     splashCold: 55,
     slashMarksLake: 2,
