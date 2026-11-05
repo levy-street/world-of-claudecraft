@@ -330,6 +330,7 @@ describe('HubLessonController: the world bubble mirrors every guided step', () =
     expect(element.innerHTML).toContain(
       'Click the fight name on the meters window and pick your practice run.',
     );
+    expect(meters.segmentPickerEl.classList.contains('qd-coach')).toBe(true);
     expect(element.querySelector('.hlc-ack')).toBeNull();
     expect(bubble()!.innerHTML).toBe(element.innerHTML);
     expect(bubble()!.querySelector('.hlc-ack')).toBeNull();
@@ -443,7 +444,7 @@ describe('HubLessonController: history steps follow the segment menu', () => {
     meters.currentEnc = null;
     meters.viewedByTab.dmg = { startedAt: 100, isCurrent: false };
     tick(controller);
-    return { meters, controller, element };
+    return { meters, controller, element, player };
   }
 
   it('glows the mode menu trigger, not the hidden tab strip, for the switch step', () => {
@@ -484,6 +485,20 @@ describe('HubLessonController: history steps follow the segment menu', () => {
     expect(element.innerHTML).toContain('pick that finished run');
   });
 
+  it('never credits a pick made away from the yard on the first poll back', () => {
+    const { meters, controller, element, player } = toInspectHistory();
+    const home = { ...player.pos };
+    player.pos = { x: home.x + 5000, y: 0, z: home.z + 5000 };
+    tick(controller);
+    meters.pickSegment({ startedAt: 100, isCurrent: false });
+    tick(controller);
+    player.pos = home;
+    tick(controller);
+    expect(element.innerHTML).toContain('pick that finished run');
+  });
+
+  // Pins the controller's own closed-panel guard: the real Meters already
+  // returns no viewed segment for a closed panel, the fake does not.
   it('only re-baselines a pick made while the Damage panel is closed', () => {
     const { meters, controller, element } = toInspectHistory();
     meters.anyOpen = false;
@@ -515,8 +530,11 @@ describe('HubLessonController: history steps follow the segment menu', () => {
     meters.currentEnc = null;
     meters.viewedByTab.dmg = { startedAt: 200, isCurrent: false };
     tick(controller); // finished -> review-comparison
-    expect(element.innerHTML).toContain('Use the fight name menu to compare');
+    expect(element.innerHTML).toContain(
+      'Use the fight name menu to compare Total, DPS, and duration with your first run. Return to this run, then Done.',
+    );
     expect(meters.segmentPickerEl.classList.contains('qd-coach')).toBe(true);
+    expect(meters.rowEl.classList.contains('qd-coach')).toBe(true);
   });
 
   it('does not advance on a pick that lands on the wrong fight', () => {
