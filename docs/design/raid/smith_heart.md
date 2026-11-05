@@ -1436,21 +1436,20 @@ the meters harness, never shipped unmeasured.
 **Pools per tier (the second Heroic pass of 2026-11-05).** The raid has no Heroic tier of its
 own yet, so each boss's Heroic health rides its difficulty row (`healthMult`, applied at the
 pull by `encounters/smith_heart/tier_health.ts`; Normal keeps the template pool, Mythic uses at
-least Heroic's multiplier). Calibrated to a decent human raid, with the bot raid
+least Heroic's multiplier). Calibrated to a decent human raid with the bot raid
 (`scripts/heart_raid.mjs`) as the yardstick: the bots deal about 65 percent of a human raid's
-damage, so a decent human raid deals about 1,000 a second on Heroic (the previous tier's best
-gear) and 700 on Normal (fresh level-20 gear); a pool's human time is its health after the
-elite factor over that, plus the fight's fixed downtime, and `/dev heart pool <k>` (the bots'
-`POOL`) runs a fight on a scaled pool to check a kill on a human raid's clock. Normal (fresh level-20 gear) aims at 4
-to 5 minutes for humans, held where the bots still kill it before the soft enrage: the Guardian
-45,000, the Seam Singer 38,500, the Breath 80,000, the Quench 62,000, the Heat 64,000, the
-Masterless Strength 72,000. Heroic (the previous tier's best gear) aims at 6 to 7 minutes for
-humans: the Hammer Council 2.05, the Breath 1.95, the Quench 2.2, the Heat 1.45, the Masterless
-Strength 2.1. Heroic's key mechanics kill when ignored: Mountain's Wrath lands at about 110
-percent of a Heroic-geared cloth body on whoever no pillar hides (`wrathMult` 2.8), the
-Council's soft enrage waits for 8 Wraths (4 on Normal and Mythic), and the Quench's shatter
-lands twice as hard (`shatterMult` 2). Every number and why: the pass's notes
-(E:/woc/entregas/raid_corazon/heroico/NOTAS.md, "Segunda vuelta", outside the repo).
+damage, so a human kill takes about 0.65 of the bots' time, and a bot fight on a 0.65 pool
+(`/dev heart pool 0.65`, the bots' `POOL=0.65`) runs on a human raid's clock. Normal (fresh
+level-20 gear) aims at 4 to 5 minutes for humans (6 to 7 for the bots), held where the bots
+still kill it before the soft enrage: the Guardian 54,000, the Seam Singer 46,000, the Breath
+80,000, the Quench 62,000, the Heat 64,000, the Masterless Strength 72,000. Heroic (the previous
+tier's best gear) aims at 6 to 7 minutes for humans: the Hammer Council 1.85, the Breath 1.45,
+the Quench 2.2, the Heat 1.45, the Masterless Strength 2.1. Heroic's key mechanics kill when
+ignored: Mountain's Wrath lands at about 110 percent of a Heroic-geared cloth body on whoever
+no pillar hides (`wrathMult` 2.8), the Council's soft enrage waits for 8 Wraths (4 on Normal
+and Mythic), and the Quench's shatter lands twice as hard (`shatterMult` 2). Every number and
+why: the pass's notes (E:/woc/entregas/raid_corazon/heroico/NOTAS.md, "Segunda vuelta",
+outside the repo).
 
 ### 7.1 The Hammer Council (always first)
 
@@ -1506,7 +1505,7 @@ base (73,600), the Seam Singer 27,500 (63,250). The Slabwright's 19,500 went to 
 proportion, so the fight's length is unchanged. Measured (the bot raid of 2026-11-04,
 `scripts/heart_raid.mjs`): ten kit-geared bots dealt about 300 a second, so the pull ran past
 the soft enrage; cut 15 percent to the Guardian 27,200 and the Seam Singer 23,400. The
-second Heroic pass (2026-11-05, real class kits) raised them to 45,000 and 38,500 (see the
+second Heroic pass (2026-11-05, real class kits) raised them to 54,000 and 46,000 (see the
 pools per tier above).
 
 **Damage (sketch, unmeasured).** Anchored to the level-20 cloth reference (about 1,135 to
