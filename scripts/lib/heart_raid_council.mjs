@@ -1171,7 +1171,9 @@ function duty(world, st, b, me) {
       st.rushSpot?.pid === b.pid && st.rushSpot.n === st.rushes.length ? st.rushSpot : null;
     const was = plan;
     if (plan && now - plan.at0 > 400) {
-      if (rushStillGood(world, plan)) plan.at0 = now;
+      // A planned miss looks again for the cursed pillar's line (the pillar
+      // rises with the mark and may not have been seen yet).
+      if (rushStillGood(world, plan) && plan.kind !== 'miss') plan.at0 = now;
       else plan = null;
     }
     if (!plan) {
