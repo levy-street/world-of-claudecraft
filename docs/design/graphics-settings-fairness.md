@@ -655,7 +655,13 @@ player's explicit choice always wins over it. Once it has settled it holds: the 
 then changes only on something the player did (a preset, the render scale, the display,
 the window's size class, choosing Auto again), downward when the rhythm in force is
 demonstrably missed, or through a small per-session budget of probes that last a few
-frames. The one gameplay reading it takes, `player.inCombat`, only ever POSTPONES or
+frames. On iOS WebKit the automatic mode also has a platform top
+(`src/game/frame_cadence_platform_core.ts`): it reasons as if the display ran at 60 Hz,
+so a 120 Hz phone starts at 60 (the loading cover included) and never probes back above
+it. That is a memory-safety bound decided from the platform alone, never from the
+preset; it applies to every iOS player alike, shows what a 60 Hz phone shows, and an
+explicit choice still wins.
+The one gameplay reading it takes, `player.inCombat`, only ever POSTPONES or
 ABORTS a probe: a fight never changes what is drawn or when, it only keeps the automatic mode
 from spending frames during one (`src/game/frame_cadence_calm_core.ts`). The static-preset rule still holds in
 full for the HUD: the limit is never an input of `src/game/ui_effects_profile.ts` or

@@ -19,6 +19,7 @@ import {
   type FrameCadenceSnapshot,
   FrameCadenceWiring,
   frameCadenceBeaconFieldsFrom,
+  frameRateCapRowReadingFrom,
   parseFrameCeilingIntent,
   resolveFrameRateChoice,
   sharedFrameCadence,
@@ -240,6 +241,8 @@ function runHost(opts: {
   onFrame?: (nowMs: number, wiring: FrameCadenceWiring) => void;
   gate?: Partial<FrameCadenceGateView>;
   cover?: (nowMs: number) => boolean;
+  /** The platform's Auto top (frame_cadence_platform_core): 60 on iOS. */
+  autoTop?: 0 | 60;
 }) {
   let now = 0;
   const host: { pending: { at: number; timer: boolean } | null; timerCb: (() => void) | null } = {
@@ -252,6 +255,7 @@ function runHost(opts: {
   const renderedAt: number[] = [];
   const published = { target: -1, share: -1, hold: false };
   const saved: FrameCadenceAutoRecord[] = [];
+  const memoryHz: number[] = [];
   let clears = 0;
   let remembered: FrameCadenceAutoRecord | null =
     typeof opts.remembered === 'number'
@@ -289,17 +293,22 @@ function runHost(opts: {
     inCombat: () => opts.inCombat?.(now) ?? false,
     surfacePixels: () => opts.surfacePixels?.(now) ?? 1920 * 1080,
     autoMemory: {
-      load: () => {
+      load: (hz) => {
         loads++;
+        memoryHz.push(hz);
         return remembered;
       },
-      save: (_hz, record) => saved.push({ ...record }),
+      save: (hz, record) => {
+        memoryHz.push(hz);
+        saved.push({ ...record });
+      },
       clear: () => {
         clears++;
         remembered = null;
       },
       settingsSignature: () => opts.settingsSignature?.(now) ?? 'same',
     },
+    autoTop: opts.autoTop,
   });
   if (opts.intent === 'auto') wiring.setAuto();
   else wiring.setIntent(opts.intent);
@@ -349,6 +358,7 @@ function runHost(opts: {
     clears,
     intentLog,
     loads,
+    memoryHz,
   };
 }
 
@@ -541,9 +551,14 @@ describe('frame cadence wiring', () => {
 
 describe('the shared instance', () => {
   // A fresh module per case: the instance is a module singleton.
-  const bootWith = async (storedValue: number | null, search: string) => {
+  const bootWith = async (
+    storedValue: number | null,
+    search: string,
+    nav?: { userAgent: string; platform: string; maxTouchPoints: number },
+  ) => {
     vi.resetModules();
     vi.stubGlobal('location', { search });
+    if (nav) vi.stubGlobal('navigator', nav);
     vi.stubGlobal('localStorage', {
       getItem: (key: string) =>
         key === 'woc_settings' && storedValue !== null
@@ -569,6 +584,29 @@ describe('the shared instance', () => {
     expect(await bootWith(1, '')).toEqual({ auto: false, intent: 0 });
     expect(await bootWith(2, '')).toEqual({ auto: false, intent: 60 });
     expect(await bootWith(3, '')).toEqual({ auto: false, intent: 30 });
+  });
+
+  it('boots Auto under the iOS top on an iPhone and an iPad, explicit choices untouched', async () => {
+    const iphone = {
+      userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15',
+      platform: 'iPhone',
+      maxTouchPoints: 5,
+    };
+    const ipad = {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15',
+      platform: 'MacIntel',
+      maxTouchPoints: 5,
+    };
+    const android = {
+      userAgent: 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 Chrome/130.0',
+      platform: 'Linux armv8l',
+      maxTouchPoints: 5,
+    };
+    expect(await bootWith(0, '', iphone)).toEqual({ auto: true, intent: 60 });
+    expect(await bootWith(0, '', ipad)).toEqual({ auto: true, intent: 60 });
+    expect(await bootWith(0, '', android)).toEqual({ auto: true, intent: 0 });
+    expect(await bootWith(1, '', iphone)).toEqual({ auto: false, intent: 0 });
+    expect(await bootWith(0, '?fpscap=display', iphone)).toEqual({ auto: false, intent: 0 });
   });
 
   it('boots on the URL override over any stored choice', async () => {
@@ -1371,5 +1409,178 @@ describe('frame cadence beacon fields', () => {
       refreshHz: 0,
       targetFps: 30,
     });
+  });
+});
+
+describe('automatic frame rate limit under a platform top (iOS)', () => {
+  const PROMOTION = 1000 / 120;
+  const SIXTY = 1000 / 60;
+  const framesIn = (r: ReturnType<typeof runHost>, fromMs: number, toMs: number) =>
+    r.renderedAt.filter((t) => t >= fromMs && t < toMs).length;
+
+  it('control: without a top, Auto renders a light scene at 120 Hz', () => {
+    const r = runHost({ refreshMs: PROMOTION, costMs: 3, seconds: 30, intent: 'auto' });
+    expect(framesIn(r, 10_000, 20_000)).toBeGreaterThan(1150);
+    expect(r.wiring.snapshot().intent).toBe(0);
+  });
+
+  it('a ProMotion iPhone that holds 60 easily renders at 60 from its first second on', () => {
+    const seconds = 900;
+    const r = runHost({
+      refreshMs: PROMOTION,
+      costMs: 3,
+      seconds,
+      intent: 'auto',
+      autoTop: 60,
+      governorAtBaseline: () => true,
+    });
+    // The first seconds are the ones the top is for: still unread, already limited.
+    expect(framesIn(r, 0, 1_000)).toBeLessThanOrEqual(62);
+    expect(framesIn(r, 1_000, 5_000)).toBeLessThanOrEqual(242);
+    for (let s = 0; s < seconds; s += 10) {
+      expect(framesIn(r, s * 1000, (s + 10) * 1000)).toBeLessThanOrEqual(602);
+    }
+    for (const i of r.intervals) expect(i).toBeCloseTo(SIXTY, 1);
+    expect(r.intentLog.map((e) => e.intent)).not.toContain(0);
+    const snap = r.wiring.snapshot();
+    expect(snap.intent).toBe(60);
+    expect(snap.divisor).toBe(2);
+    expect(snap.auto).toBe(true);
+  });
+
+  it('an iPhone that cannot hold 60 steps straight to 30, and its probe returns to 60', () => {
+    let n = 0;
+    const seconds = 400;
+    const r = runHost({
+      refreshMs: PROMOTION,
+      costMs: () => (n++ % 2 === 0 ? 22 : 12),
+      seconds,
+      intent: 'auto',
+      autoTop: 60,
+    });
+    const snap = r.wiring.snapshot();
+    // One descent, straight from the top to 30 (not a no-op step to 60 first).
+    expect(snap.autoDescents).toBe(1);
+    expect(r.intentLog.map((e) => e.intent).slice(0, 2)).toEqual([60, 30]);
+    // A probe ran, and no second of the run ever rendered above the top.
+    expect(snap.autoProbes).toBeGreaterThanOrEqual(1);
+    for (let s = 1; s < seconds; s++) {
+      expect(framesIn(r, s * 1000, (s + 1) * 1000)).toBeLessThanOrEqual(62);
+    }
+    expect(snap.intent).toBe(30);
+    for (const i of r.intervals) expect(i).toBeCloseTo(1000 / 30, 1);
+    // The memory stays keyed by the REAL display rate, never the top.
+    expect(r.memoryHz.length).toBeGreaterThan(0);
+    for (const hz of r.memoryHz) expect(hz).toBeCloseTo(120, 0);
+  });
+
+  it('control: without the top, the same machine steps through 60 on a 120 Hz display', () => {
+    let n = 0;
+    const r = runHost({
+      refreshMs: PROMOTION,
+      costMs: () => (n++ % 2 === 0 ? 22 : 12),
+      seconds: 60,
+      intent: 'auto',
+    });
+    expect(r.intentLog.map((e) => e.intent).slice(0, 2)).toEqual([0, 60]);
+  });
+
+  it('the loading cover is held to the top too: the heaviest streaming seconds', () => {
+    const cover = (t: number) => t < 5_000;
+    const capped = runHost({
+      refreshMs: PROMOTION,
+      costMs: 3,
+      seconds: 10,
+      intent: 'auto',
+      autoTop: 60,
+      cover,
+    });
+    expect(framesIn(capped, 0, 5_000)).toBeLessThanOrEqual(305);
+    expect(framesIn(capped, 0, 5_000)).toBeGreaterThanOrEqual(290);
+    const open = runHost({ refreshMs: PROMOTION, costMs: 3, seconds: 10, intent: 'auto', cover });
+    expect(framesIn(open, 0, 5_000)).toBeGreaterThan(590);
+  });
+
+  it('a remembered 60 under the top is no verdict: it observes and spends no probe', () => {
+    const r = runHost({
+      refreshMs: PROMOTION,
+      costMs: 3,
+      seconds: 900,
+      intent: 'auto',
+      autoTop: 60,
+      remembered: 60,
+      governorAtBaseline: () => true,
+    });
+    const snap = r.wiring.snapshot();
+    expect(snap.autoPhase).toBe('observe');
+    expect(snap.autoProbes).toBe(0);
+    expect(snap.intent).toBe(60);
+  });
+
+  it('a remembered 30 under the top is restored and held', () => {
+    let n = 0;
+    const r = runHost({
+      refreshMs: PROMOTION,
+      costMs: () => (n++ % 2 === 0 ? 22 : 12),
+      seconds: 30,
+      intent: 'auto',
+      autoTop: 60,
+      remembered: 30,
+    });
+    expect(r.wiring.snapshot().intent).toBe(30);
+    expect(r.wiring.snapshot().autoPhase).toBe('held');
+  });
+
+  it('with no readable display rhythm the top still limits, by timer', () => {
+    const capped = runHost({
+      refreshMs: null,
+      costMs: 5,
+      seconds: 30,
+      intent: 'auto',
+      autoTop: 60,
+    });
+    expect(capped.timerArms).toBeGreaterThan(0);
+    expect(framesIn(capped, 20_000, 30_000)).toBeLessThanOrEqual(605);
+    expect(framesIn(capped, 20_000, 30_000)).toBeGreaterThan(540);
+    const open = runHost({ refreshMs: null, costMs: 5, seconds: 30, intent: 'auto' });
+    expect(framesIn(open, 20_000, 30_000)).toBeGreaterThan(1500);
+  });
+
+  it('the Auto options row says nothing on a 60 Hz iPhone and states the rate on 120 Hz', () => {
+    const sixty = runHost({
+      refreshMs: SIXTY,
+      costMs: 4,
+      seconds: 20,
+      intent: 'auto',
+      autoTop: 60,
+    });
+    expect(frameRateCapRowReadingFrom(sixty.wiring.snapshot(), 0)).toEqual({ kind: 'none' });
+    // An explicit 60 on the same display still reads as inert: the player chose it.
+    expect(frameRateCapRowReadingFrom(sixty.wiring.snapshot(), 2)).toEqual({ kind: 'inert' });
+    const promo = runHost({
+      refreshMs: PROMOTION,
+      costMs: 3,
+      seconds: 20,
+      intent: 'auto',
+      autoTop: 60,
+    });
+    expect(frameRateCapRowReadingFrom(promo.wiring.snapshot(), 0)).toEqual({
+      kind: 'paced',
+      fps: 60,
+      refreshHz: 120,
+    });
+  });
+
+  it('on a 60 Hz iPhone the top is inert: the same rhythm as without it', () => {
+    const r = runHost({ refreshMs: SIXTY, costMs: 4, seconds: 30, intent: 'auto', autoTop: 60 });
+    expect(r.wiring.snapshot().divisor).toBe(1);
+    expect(r.wiring.snapshot().targetIntervalMs).toBe(0);
+    expect(framesIn(r, 10_000, 20_000)).toBeGreaterThan(590);
+  });
+
+  it('an explicit Display choice is never clamped by the top', () => {
+    const r = runHost({ refreshMs: PROMOTION, costMs: 3, seconds: 20, intent: 0, autoTop: 60 });
+    expect(framesIn(r, 10_000, 20_000)).toBeGreaterThan(1150);
+    expect(r.wiring.snapshot().intent).toBe(0);
   });
 });

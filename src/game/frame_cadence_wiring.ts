@@ -52,6 +52,13 @@ import {
   frameCadenceShouldRender,
   frameCadenceSleepMs,
 } from './frame_cadence_core';
+import {
+  autoEffectiveIntent,
+  autoReadingHz,
+  autoRestoresUnderTop,
+  autoTopCeiling,
+  exemptSkipsUnderTop,
+} from './frame_cadence_platform_core';
 import { surfaceClassChanged } from './frame_cadence_surface_core';
 import {
   explicitCeilingIntent,
@@ -60,6 +67,7 @@ import {
   frameRateCapChoiceFromValue,
   frameRateCapReading,
 } from './frame_rate_cap_setting';
+import { mobilePlatform } from './mobile_preflight';
 import type { FrameHealthCadence } from './perf_frame_health_core';
 import { SETTINGS_CHANGE_EVENT, Settings } from './settings';
 
@@ -92,6 +100,9 @@ export interface FrameCadenceDeps {
   surfacePixels: () => number;
   /** The automatic mode's remembered verdict, keyed by what would invalidate it. */
   autoMemory: FrameCadenceAutoMemory;
+  /** The fastest ceiling Auto may hold on this platform (frame_cadence_platform_core),
+   *  0 or absent for the display's own rate. Explicit choices ignore it. */
+  autoTop?: FrameCeilingIntent;
 }
 
 export interface FrameCadenceSnapshot {
@@ -221,7 +232,17 @@ export class FrameCadenceWiring {
     this.frameCb?.(this.deps.now());
   };
 
-  constructor(private readonly deps: FrameCadenceDeps) {}
+  private readonly autoTop: FrameCeilingIntent;
+  private lastExemptRenderAt = 0;
+
+  constructor(private readonly deps: FrameCadenceDeps) {
+    this.autoTop = deps.autoTop ?? 0;
+  }
+
+  /** What Auto asks the cadence for: its verdict, clamped to the platform top. */
+  private autoIntent(): FrameCeilingIntent {
+    return autoEffectiveIntent(this.intent, this.autoTop);
+  }
 
   /** An explicit ceiling. It always wins: the automatic mode is switched off. */
   setIntent(intent: FrameCeilingIntent): void {
@@ -286,8 +307,11 @@ export class FrameCadenceWiring {
     this.lastCallbackAt = now;
     // The automatic ceiling only means something on a display whose slots can be
     // read; anywhere else Auto asks for nothing (an explicit choice still does).
+    // A platform top is the exception: it is a memory bound, not a verdict, so
+    // Auto limits by time to the top wherever the display is not read as paced
+    // (unread in the first seconds in the world, or never paced at all).
     const paced = this.estimator.verdict === 'paced';
-    const intent = this.auto && !paced ? 0 : this.intent;
+    const intent = this.auto ? (paced ? this.autoIntent() : this.autoTop) : this.intent;
     configureFrameCadence(this.cadence, intent, this.estimator.verdict, this.estimator.refreshMs);
     // Exempt callbacks are not paced, so nothing is published for them: the
     // governor must read a slow arrival frame as what it is.
@@ -295,6 +319,19 @@ export class FrameCadenceWiring {
     if (exempt) this.framesSinceExempt = 0;
     if (exempt) this.deps.publish(0, 0, holdQuality);
     else this.deps.publish(this.cadence.targetIntervalMs, this.cadence.missShare, holdQuality);
+    // Exempt spans (the loading cover, a held world draw) are where streaming
+    // work per frame is heaviest, so under a platform top they skip down to it
+    // too; they stay out of the cadence's readings as before.
+    if (exempt && this.auto && !gate.hidden) {
+      if (exemptSkipsUnderTop(this.lastExemptRenderAt, now, this.autoTop)) {
+        this.skipped++;
+        this.lastWasIdle = true;
+        this.deps.requestFrame(frame);
+        this.armedThisCallback = true;
+        return true;
+      }
+      this.lastExemptRenderAt = now;
+    }
     if (exempt || !frameCadenceActive(this.cadence)) {
       if (exempt) frameCadenceNoteExemptRender(this.cadence, now);
       else {
@@ -337,7 +374,7 @@ export class FrameCadenceWiring {
     if (!this.autoRestored) {
       this.autoRestored = true;
       const remembered = this.deps.autoMemory.load(refreshHz);
-      if (remembered !== null && remembered.ceiling !== 0) {
+      if (remembered !== null && autoRestoresUnderTop(remembered.ceiling, this.autoTop)) {
         restoreFrameCadenceAuto(this.autoState, remembered);
         this.intent = remembered.ceiling;
         return;
@@ -355,7 +392,7 @@ export class FrameCadenceWiring {
     }
     this.autoFrame.dtSeconds = dtSeconds;
     this.autoFrame.late = underCeiling ? this.cadence.lastLate : now - last > refreshMs * 1.5;
-    this.autoFrame.refreshHz = refreshHz;
+    this.autoFrame.refreshHz = autoReadingHz(refreshHz, this.autoTop);
     this.autoFrame.governorShedding = this.deps.governorShedding();
     this.autoFrame.governorAtBaseline = this.deps.governorAtBaseline();
     this.autoFrame.calm = stepFrameCadenceCalm(this.calm, this.deps.inCombat(), dtSeconds);
@@ -422,7 +459,7 @@ export class FrameCadenceWiring {
     out.autoProbesFailed = this.autoState.probesFailed;
     out.autoProbesInconclusive = this.autoState.probesInconclusive;
     out.autoFirstCeilingS = this.autoState.firstCeilingS;
-    out.intent = this.intent;
+    out.intent = this.auto ? this.autoIntent() : this.intent;
     out.verdict = this.estimator.verdict;
     out.refreshHz = this.estimator.refreshMs > 0 ? 1000 / this.estimator.refreshMs : 0;
     out.divisor = this.cadence.divisor;
@@ -527,6 +564,7 @@ export function sharedFrameCadence(): FrameCadenceWiring {
         ? 0
         : window.innerWidth * window.innerHeight * (window.devicePixelRatio || 1) ** 2,
     autoMemory: localFrameCadenceAutoMemory,
+    autoTop: autoTopCeiling(typeof navigator === 'undefined' ? 'other' : mobilePlatform()),
   });
   const search = typeof location === 'undefined' ? '' : location.search;
   if (applyStoredChoice(wiring, search).fromUrl) {
@@ -633,11 +671,20 @@ export function frameCadenceOverlayLine(): string {
 
 /** The options row's reading for a stored value, on the display as read now. */
 export function frameRateCapRowReading(storedValue: number): FrameRateCapReading {
-  const s = sharedFrameCadence().snapshot();
+  return frameRateCapRowReadingFrom(sharedFrameCadence().snapshot(), storedValue);
+}
+
+export function frameRateCapRowReadingFrom(
+  s: FrameCadenceSnapshot,
+  storedValue: number,
+): FrameRateCapReading {
   const explicit = explicitCeilingIntent(frameRateCapChoiceFromValue(storedValue));
   // Auto reads what it is doing right now, which is only known while it runs.
   const intent = explicit ?? (s.auto ? s.intent : 0);
-  return frameRateCapReading(intent, s.verdict, s.refreshHz, s.displayRead);
+  const reading = frameRateCapReading(intent, s.verdict, s.refreshHz, s.displayRead);
+  // An Auto ceiling the display already runs under (the iOS top on a 60 Hz
+  // phone) is no limit the player chose: say nothing rather than "inert".
+  return explicit === null && reading.kind === 'inert' ? { kind: 'none' } : reading;
 }
 
 /** The chosen cadence for the frame-health readers, or null when there is none.
