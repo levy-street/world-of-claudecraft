@@ -145,6 +145,9 @@ export interface QuenchDifficultyRules {
   /** The boss's health pool against the template's, set at the pull
    *  (tier_health.ts). */
   healthMult: number;
+  /** The shatter's own hit on the frozen player, on top of damageMult:
+   *  Heroic's half again harder, so a raid that never huddles bleeds out. */
+  shatterMult: number;
   /** A shatter's splash: how far, and how much cold it adds. */
   splashR: number;
   splashCold: number;
@@ -163,6 +166,7 @@ export const QUENCH_DIFFICULTY: Readonly<Record<QuenchDifficulty, QuenchDifficul
   normal: {
     damageMult: 1,
     healthMult: 1,
+    shatterMult: 1,
     splashR: 6,
     splashCold: 35,
     slashMarksLake: 1,
@@ -174,7 +178,8 @@ export const QUENCH_DIFFICULTY: Readonly<Record<QuenchDifficulty, QuenchDifficul
   // Contagious cold: a shatter splashes further and harder.
   heroic: {
     damageMult: 1.25,
-    healthMult: 2.0,
+    healthMult: 2.2,
+    shatterMult: 1.5,
     splashR: 10,
     splashCold: 55,
     slashMarksLake: 2,
@@ -186,7 +191,8 @@ export const QUENCH_DIFFICULTY: Readonly<Record<QuenchDifficulty, QuenchDifficul
   // Every round one blade, slash after slash from where the last one ended.
   mythic: {
     damageMult: 1.25,
-    healthMult: 1,
+    healthMult: 2.2,
+    shatterMult: 1,
     splashR: 10,
     splashCold: 55,
     slashMarksLake: 2,

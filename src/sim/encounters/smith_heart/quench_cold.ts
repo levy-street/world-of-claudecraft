@@ -211,7 +211,7 @@ export function shatter(s: QuenchScope, p: Entity): Entity[] {
     radius: s.rules.splashR,
     ability: QUENCH_CUES.shatter,
   });
-  frostHit(s, p, roll(s, T.shatterMin, T.shatterMax), QUENCH_NAMES.shatter);
+  frostHit(s, p, roll(s, T.shatterMin, T.shatterMax, s.rules.shatterMult), QUENCH_NAMES.shatter);
   if (!p.dead) brittle(s, p, T.brittlePct, T.brittleSeconds);
   quenchSay(s, s.boss, 'shatter');
   const splashed: Entity[] = [];

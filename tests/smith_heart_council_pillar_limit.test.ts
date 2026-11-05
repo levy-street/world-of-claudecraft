@@ -141,7 +141,7 @@ describe('Hammer Council: Narrow Shelter', () => {
     const f = pulled(5, 'heroic');
     const behind = hide(f, 5);
     const ev = land(f);
-    const mult = COUNCIL_DIFFICULTY.heroic.damageMult;
+    const mult = COUNCIL_DIFFICULTY.heroic.damageMult * COUNCIL_DIFFICULTY.heroic.wrathMult;
     for (const p of behind) {
       const hits = wrathOn(ev, p);
       expect(hits.length).toBe(1);
