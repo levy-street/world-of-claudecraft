@@ -517,14 +517,17 @@ async function openGameMenu(page) {
 
 // Open Esc options -> Interface -> the given tab by CLICKING the rendered controls
 // rather than reaching past them, so the shot proves the row is reachable the way a
-// player reaches it. The main-menu row is found by its data-menu-action hook (the
-// sub-view id options_main_menu.ts stamps on every plate), never by index: the
-// list's order shifts by host (the Unlock Interface row leads on desktop only).
+// player reaches it: the Game Menu's Settings row by its data-menu-action hook, then
+// the category's Settings rail button by its data-settings-category hook (issue
+// #1653), never by index: both lists shift by host.
 // tabIndex indexes INTERFACE_TAB_ORDER (general, frames, chat, combat).
 async function openInterfaceTab(page, tabIndex) {
   await openGameMenu(page);
   await page.evaluate(() => {
-    document.querySelector('#options-menu .opt-btn[data-menu-action="interface"]')?.click();
+    document.querySelector('#options-menu .opt-btn[data-menu-action="settings"]')?.click();
+    document
+      .querySelector('#options-menu .opt-rail-btn[data-settings-category="interface"]')
+      ?.click();
   });
   await wait(400);
   await page.evaluate((i) => {
@@ -5058,7 +5061,10 @@ export const TARGETS = [
         const win = document.querySelector('#options-menu');
         if (win && getComputedStyle(win).display !== 'none') hud.toggleOptionsMenu();
         hud.toggleOptionsMenu();
-        document.querySelector('#options-menu .opt-btn[data-menu-action="graphics"]')?.click();
+        document.querySelector('#options-menu .opt-btn[data-menu-action="settings"]')?.click();
+        document
+          .querySelector('#options-menu .opt-rail-btn[data-settings-category="graphics"]')
+          ?.click();
       });
       const open = await pollForSize(page, '#options-menu .set-rows');
       if (!open) return {};
@@ -5187,7 +5193,10 @@ export const TARGETS = [
       });
       await wait(400);
       await page.evaluate(() => {
-        document.querySelector('#options-menu .opt-btn[data-menu-action="graphics"]')?.click();
+        document.querySelector('#options-menu .opt-btn[data-menu-action="settings"]')?.click();
+        document
+          .querySelector('#options-menu .opt-rail-btn[data-settings-category="graphics"]')
+          ?.click();
       });
       // Poll the rendered dial rows, not the shell, so the shot never lands on
       // the main menu before the Graphics sub-panel paints.
@@ -5336,7 +5345,10 @@ export const TARGETS = [
       });
       await wait(400);
       await page.evaluate(() => {
-        document.querySelector('#options-menu .opt-btn[data-menu-action="keybinds"]')?.click();
+        document.querySelector('#options-menu .opt-btn[data-menu-action="settings"]')?.click();
+        document
+          .querySelector('#options-menu .opt-rail-btn[data-settings-category="keybinds"]')
+          ?.click();
       });
       const open = await pollForSize(page, '#options-menu .kb-cols');
       return open ? { clip: '#options-menu' } : {};
@@ -5358,7 +5370,10 @@ export const TARGETS = [
       });
       await wait(400);
       await page.evaluate(() => {
-        document.querySelector('#options-menu .opt-btn[data-menu-action="keybinds"]')?.click();
+        document.querySelector('#options-menu .opt-btn[data-menu-action="settings"]')?.click();
+        document
+          .querySelector('#options-menu .opt-rail-btn[data-settings-category="keybinds"]')
+          ?.click();
       });
       const open = await pollForSize(page, '#options-menu .kb-cols');
       return open ? { clip: '#options-menu' } : {};
@@ -5396,7 +5411,10 @@ export const TARGETS = [
       });
       await wait(400);
       await page.evaluate(() => {
-        document.querySelector('#options-menu .opt-btn[data-menu-action="keybinds"]')?.click();
+        document.querySelector('#options-menu .opt-btn[data-menu-action="settings"]')?.click();
+        document
+          .querySelector('#options-menu .opt-rail-btn[data-settings-category="keybinds"]')
+          ?.click();
       });
       const open = await pollForSize(page, '#options-menu .kb-cols');
       if (!open) return {};
@@ -12104,7 +12122,10 @@ export const TARGETS = [
         const win = document.querySelector('#options-menu');
         if (win && getComputedStyle(win).display !== 'none') hud.toggleOptionsMenu();
         hud.toggleOptionsMenu();
-        document.querySelector('#options-menu .opt-btn[data-menu-action="graphics"]')?.click();
+        document.querySelector('#options-menu .opt-btn[data-menu-action="settings"]')?.click();
+        document
+          .querySelector('#options-menu .opt-rail-btn[data-settings-category="graphics"]')
+          ?.click();
       });
       const open = await pollForSize(page, '#options-menu .set-rows');
       if (!open) return {};
@@ -12137,7 +12158,10 @@ export const TARGETS = [
         const win = document.querySelector('#options-menu');
         if (win && getComputedStyle(win).display !== 'none') hud.toggleOptionsMenu();
         hud.toggleOptionsMenu();
-        document.querySelector('#options-menu .opt-btn[data-menu-action="graphics"]')?.click();
+        document.querySelector('#options-menu .opt-btn[data-menu-action="settings"]')?.click();
+        document
+          .querySelector('#options-menu .opt-rail-btn[data-settings-category="graphics"]')
+          ?.click();
       });
       const open = await pollForSize(page, '#options-menu .set-rows');
       if (!open) return {};
@@ -12179,7 +12203,10 @@ export const TARGETS = [
         const win = document.querySelector('#options-menu');
         if (win && getComputedStyle(win).display !== 'none') hud.toggleOptionsMenu();
         hud.toggleOptionsMenu();
-        document.querySelector('#options-menu .opt-btn[data-menu-action="controller"]')?.click();
+        document.querySelector('#options-menu .opt-btn[data-menu-action="settings"]')?.click();
+        document
+          .querySelector('#options-menu .opt-rail-btn[data-settings-category="controller"]')
+          ?.click();
       });
       const open = await pollForSize(page, '#options-menu .set-rows');
       if (!open) return {};
@@ -12208,7 +12235,10 @@ export const TARGETS = [
         const win = document.querySelector('#options-menu');
         if (win && getComputedStyle(win).display !== 'none') hud.toggleOptionsMenu();
         hud.toggleOptionsMenu();
-        document.querySelector('#options-menu .opt-btn[data-menu-action="interface"]')?.click();
+        document.querySelector('#options-menu .opt-btn[data-menu-action="settings"]')?.click();
+        document
+          .querySelector('#options-menu .opt-rail-btn[data-settings-category="interface"]')
+          ?.click();
       });
       const open = await pollForSize(page, '#options-menu .set-rows');
       return open ? { clip: '#options-menu' } : {};
@@ -12230,7 +12260,10 @@ export const TARGETS = [
         const win = document.querySelector('#options-menu');
         if (win && getComputedStyle(win).display !== 'none') hud.toggleOptionsMenu();
         hud.toggleOptionsMenu();
-        document.querySelector('#options-menu .opt-btn[data-menu-action="interface"]')?.click();
+        document.querySelector('#options-menu .opt-btn[data-menu-action="settings"]')?.click();
+        document
+          .querySelector('#options-menu .opt-rail-btn[data-settings-category="interface"]')
+          ?.click();
       });
       let open = await pollForSize(page, '#options-menu .set-rows');
       if (!open) return {};
@@ -12386,7 +12419,10 @@ export const TARGETS = [
         const win = document.querySelector('#options-menu');
         if (win && getComputedStyle(win).display !== 'none') hud.toggleOptionsMenu();
         hud.toggleOptionsMenu();
-        document.querySelector('#options-menu .opt-btn[data-menu-action="interface"]')?.click();
+        document.querySelector('#options-menu .opt-btn[data-menu-action="settings"]')?.click();
+        document
+          .querySelector('#options-menu .opt-rail-btn[data-settings-category="interface"]')
+          ?.click();
       });
       const open = await pollForSize(page, '#options-menu .set-rows');
       if (!open) return {};
@@ -12415,7 +12451,10 @@ export const TARGETS = [
         const win = document.querySelector('#options-menu');
         if (win && getComputedStyle(win).display !== 'none') hud.toggleOptionsMenu();
         hud.toggleOptionsMenu();
-        document.querySelector('#options-menu .opt-btn[data-menu-action="keybinds"]')?.click();
+        document.querySelector('#options-menu .opt-btn[data-menu-action="settings"]')?.click();
+        document
+          .querySelector('#options-menu .opt-rail-btn[data-settings-category="keybinds"]')
+          ?.click();
       });
       const open = await pollForSize(page, '#options-menu .kb-actionbar-edit');
       const board = await pollForSize(page, '#options-menu .kbm-key', 6);
@@ -12441,7 +12480,10 @@ export const TARGETS = [
         const win = document.querySelector('#options-menu');
         if (win && getComputedStyle(win).display !== 'none') hud.toggleOptionsMenu();
         hud.toggleOptionsMenu();
-        document.querySelector('#options-menu .opt-btn[data-menu-action="keybinds"]')?.click();
+        document.querySelector('#options-menu .opt-btn[data-menu-action="settings"]')?.click();
+        document
+          .querySelector('#options-menu .opt-rail-btn[data-settings-category="keybinds"]')
+          ?.click();
       });
       const open = await pollForSize(page, '#options-menu .kb-transfer .set-toggle');
       if (!open) return {};
@@ -12468,7 +12510,10 @@ export const TARGETS = [
         const win = document.querySelector('#options-menu');
         if (win && getComputedStyle(win).display !== 'none') hud.toggleOptionsMenu();
         hud.toggleOptionsMenu();
-        document.querySelector('#options-menu .opt-btn[data-menu-action="keybinds"]')?.click();
+        document.querySelector('#options-menu .opt-btn[data-menu-action="settings"]')?.click();
+        document
+          .querySelector('#options-menu .opt-rail-btn[data-settings-category="keybinds"]')
+          ?.click();
       });
       const ready = await pollForSize(page, '#options-menu .kbm-popout');
       if (!ready) return {};
@@ -12522,7 +12567,10 @@ export const TARGETS = [
         const win = document.querySelector('#options-menu');
         if (win && getComputedStyle(win).display !== 'none') hud.toggleOptionsMenu();
         hud.toggleOptionsMenu();
-        document.querySelector('#options-menu .opt-btn[data-menu-action="keybinds"]')?.click();
+        document.querySelector('#options-menu .opt-btn[data-menu-action="settings"]')?.click();
+        document
+          .querySelector('#options-menu .opt-rail-btn[data-settings-category="keybinds"]')
+          ?.click();
       });
       await pollForSize(page, '#options-menu .kb-actionbar-edit');
       await page.evaluate(() => document.querySelector('.kb-actionbar-edit')?.click());
@@ -12559,7 +12607,10 @@ export const TARGETS = [
         hud.toggleOptionsMenu();
         // Auras sits under Overlays; a base commit that predates the Overlays row
         // still lists it on the Game Menu root, so the Overlays click is optional.
-        document.querySelector('#options-menu .opt-btn[data-menu-action="overlays"]')?.click();
+        document.querySelector('#options-menu .opt-btn[data-menu-action="settings"]')?.click();
+        document
+          .querySelector('#options-menu .opt-rail-btn[data-settings-category="overlays"]')
+          ?.click();
         document.querySelector('#options-menu .opt-btn[data-menu-action="auras"]')?.click();
       });
       const open = await pollForSize(page, '#options-menu .aura-settings-intro');
@@ -12631,7 +12682,10 @@ export const TARGETS = [
         hud.toggleOptionsMenu();
         // Auras sits under Overlays; a base commit that predates the Overlays row
         // still lists it on the Game Menu root, so the Overlays click is optional.
-        document.querySelector('#options-menu .opt-btn[data-menu-action="overlays"]')?.click();
+        document.querySelector('#options-menu .opt-btn[data-menu-action="settings"]')?.click();
+        document
+          .querySelector('#options-menu .opt-rail-btn[data-settings-category="overlays"]')
+          ?.click();
         document.querySelector('#options-menu .opt-btn[data-menu-action="auras"]')?.click();
       });
       // Poll the panel INTRO, not the proc grid: a class with no authored proc
@@ -12698,7 +12752,10 @@ export const TARGETS = [
         const win = document.querySelector('#options-menu');
         if (win && getComputedStyle(win).display !== 'none') hud.toggleOptionsMenu();
         hud.toggleOptionsMenu();
-        document.querySelector('#options-menu .opt-btn[data-menu-action="keybinds"]')?.click();
+        document.querySelector('#options-menu .opt-btn[data-menu-action="settings"]')?.click();
+        document
+          .querySelector('#options-menu .opt-rail-btn[data-settings-category="keybinds"]')
+          ?.click();
       });
       const open = await pollForSize(page, '#options-menu .kb-actionbar-edit');
       return open ? { clip: '#options-menu' } : {};
@@ -12719,7 +12776,10 @@ export const TARGETS = [
         const win = document.querySelector('#options-menu');
         if (win && getComputedStyle(win).display !== 'none') hud.toggleOptionsMenu();
         hud.toggleOptionsMenu();
-        document.querySelector('#options-menu .opt-btn[data-menu-action="keybinds"]')?.click();
+        document.querySelector('#options-menu .opt-btn[data-menu-action="settings"]')?.click();
+        document
+          .querySelector('#options-menu .opt-rail-btn[data-settings-category="keybinds"]')
+          ?.click();
       });
       await pollForSize(page, '#options-menu .kb-actionbar-edit');
       await page.evaluate(() => document.querySelector('.kb-actionbar-edit')?.click());
@@ -12747,7 +12807,10 @@ export const TARGETS = [
         const win = document.querySelector('#options-menu');
         if (win && getComputedStyle(win).display !== 'none') hud.toggleOptionsMenu();
         hud.toggleOptionsMenu();
-        document.querySelector('#options-menu .opt-btn[data-menu-action="keybinds"]')?.click();
+        document.querySelector('#options-menu .opt-btn[data-menu-action="settings"]')?.click();
+        document
+          .querySelector('#options-menu .opt-rail-btn[data-settings-category="keybinds"]')
+          ?.click();
       });
       await pollForSize(page, '#options-menu .kb-actionbar-edit');
       await page.evaluate(() => document.querySelector('.kb-actionbar-edit')?.click());

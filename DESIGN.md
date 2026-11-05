@@ -830,9 +830,20 @@ Every window adopts the grammar; these carry specific intent:
 - **Vendor** (`src/ui/hud/vendor/vendor_window.ts`): inventory uses a compact two-column
   `.ui-card` grid with sockets, price, stock state, and buy action composed from the shared
   primitives.
-- **Game Menu**: the Esc menu is a hub of full-width `.ui-btn` rows. Each destination opens
-  its per-view panel inside the same window grammar; return and destructive actions keep
-  their explicit hierarchy.
+- **Game Menu** (`options_main_menu_controller.ts` over `buildOptionsMenu` in
+  `options_view.ts`): the Esc menu is a short hub of full-width `.ui-btn` rows: Settings,
+  Unlock Interface (desktop), Help and Wiki, Report a Bug (online), Unstuck, Log Out, then
+  a compact two-column group of quick toggles and links (Nameplates, Music, Haptics on
+  touch, Discord, Donate, the Steam wishlist, each where it applies today), and Return to
+  Game last. Toggles carry `aria-pressed` plus a visible On/Off status; return and
+  destructive actions keep their explicit hierarchy.
+- **Settings view** (issue #1653; `options_settings_rail_controller.ts` over the pure
+  `options_settings_view.ts`): Settings opens a full-screen view (desktop and both touch
+  orientations) with a persistent category rail (Graphics, Interface, Key Bindings on
+  desktop only, Controller, Overlays, Audio, Transfer), so any category is one press from
+  any other; each category body is the existing sub-panel unchanged. The rail sits at the
+  inline start, and becomes a scrolling strip under the head on a portrait phone. Back
+  returns to the Game Menu; Esc and the close control return to the game.
 - **Store surfaces** (`daily_rewards_window.ts`, `woc_store_view.ts`,
   `claudium_window.ts`): product art provides the color; cards stay restrained blue-black
   with gold edges; rarity chips reuse the weapon-skin rarity colors; price and balance

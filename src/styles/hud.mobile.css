@@ -8387,6 +8387,45 @@
     font-size: 16px;
     white-space: nowrap;
   }
+  /* The full-screen Settings view on touch (components.css owns the desktop
+     geometry, whose !important inset already fills the sheet here). Landscape
+     keeps the rail at the inline start, narrower, inside the safe areas;
+     portrait turns it into a horizontally scrolling strip under the head so
+     the category body keeps the full width. Every rail button keeps the 40px
+     touch floor and the 16px font from the #options-menu .btn rule above. */
+  body.mobile-touch #ui > #options-menu.options-settings {
+    --opt-rail-w: calc(168px + env(safe-area-inset-left));
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-inline-end: env(safe-area-inset-right);
+  }
+  body.mobile-touch #options-menu.options-settings > .opt-rail {
+    padding-inline-start: calc(var(--window-pad, 12px) + env(safe-area-inset-left));
+  }
+  @media (orientation: portrait) {
+    body.mobile-touch #ui > #options-menu.options-settings {
+      padding-inline-start: 0;
+    }
+    body.mobile-touch #options-menu.options-settings > .opt-rail {
+      position: static;
+      flex: 0 0 auto;
+      flex-direction: row;
+      width: auto;
+      padding: var(--spacing-xs) var(--window-pad, 12px);
+      overflow-x: auto;
+      overflow-y: hidden;
+      overscroll-behavior-x: contain;
+      border-inline-end: 0;
+      border-block-end: 1px solid var(--gold-dim);
+    }
+    body.mobile-touch #options-menu.options-settings .opt-rail-title {
+      display: none;
+    }
+    body.mobile-touch #options-menu .opt-rail-btn.ui-btn {
+      width: auto;
+      white-space: nowrap;
+    }
+  }
   body.mobile-touch #report-window {
     left: 10px !important;
     right: 10px !important;

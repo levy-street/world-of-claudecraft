@@ -1489,47 +1489,44 @@ const DESKTOP_MENU = {
 };
 
 describe('options_view: main menu routing', () => {
-  it('routes each row to its sub-view, with unstuck before logout + close, omitting bug report offline', () => {
+  it('lists Settings, the help rows, Unstuck, Log Out and Return to Game, omitting bug report offline', () => {
     const offline = buildOptionsMenu(DESKTOP_MENU);
     expect(offline.map((e) => e.labelKey)).toEqual([
+      'hudChrome.options.settings',
       'hudChrome.interfaceUnlock.unlock',
-      'hud.options.keyBindings',
-      'hudChrome.controller.title',
-      'hud.options.graphics',
-      'hud.options.interface',
-      'hudChrome.options.overlays',
-      'hud.options.audio',
-      'hudChrome.fullTransfer.menu',
-      'nav.wiki',
+      'hudChrome.options.helpWiki',
       'hudChrome.unstuck.menuButton',
       'hud.options.logout',
       'hud.options.returnToGame',
     ]);
+    expect(offline[0]?.action).toEqual({ kind: 'settings' });
     expect(offline.at(-3)?.action).toEqual({ kind: 'unstuck' });
     expect(offline.at(-2)?.action).toEqual({ kind: 'logout' });
     expect(offline.at(-1)?.action).toEqual({ kind: 'close' });
-    // exactly one interface entry (no duplicates), routing to the interface view
-    const interfaceRows = offline.filter((e) => e.labelKey === 'hud.options.interface');
-    expect(interfaceRows).toHaveLength(1);
-    expect(interfaceRows[0].action).toEqual({ kind: 'goto', view: 'interface' });
-    // The three on-screen overlay panels sit one level down, behind one row.
-    expect(offline.find((e) => e.labelKey === 'hudChrome.options.overlays')?.action).toEqual({
-      kind: 'goto',
-      view: 'overlays',
-    });
-    for (const view of ['auras', 'cooldowns', 'performance']) {
+    // Every settings category left the root for the Settings view's rail
+    // (issue #1653): no row routes to a settings sub-view any more.
+    for (const view of [
+      'keybinds',
+      'controller',
+      'graphics',
+      'interface',
+      'overlays',
+      'auras',
+      'cooldowns',
+      'performance',
+      'audio',
+      'transfer',
+    ]) {
       expect(offline.some((e) => e.action.kind === 'goto' && e.action.view === view)).toBe(false);
     }
-    // The Wiki row is unconditional (offline play has a wiki too) and routes to
-    // the confirm-first external hop, never a sub-view.
-    const wikiRows = offline.filter((e) => e.labelKey === 'nav.wiki');
-    expect(wikiRows).toHaveLength(1);
-    expect(wikiRows[0].action).toEqual({ kind: 'wiki' });
-    // The full-settings Import / Export row routes to its own sub-view.
-    expect(offline.find((e) => e.labelKey === 'hudChrome.fullTransfer.menu')?.action).toEqual({
-      kind: 'goto',
-      view: 'transfer',
-    });
+    // The Help and Wiki row is unconditional (offline play has a wiki too) and
+    // routes to the confirm-first external hop, never a sub-view.
+    const wikiRows = offline.filter((e) => e.action.kind === 'wiki');
+    expect(wikiRows).toEqual([
+      { labelKey: 'hudChrome.options.helpWiki', action: { kind: 'wiki' } },
+    ]);
+    // No quick group without the host's hooks.
+    expect(offline.some((e) => e.group === 'quick')).toBe(false);
   });
 
   it('the Overlays list routes to Auras, Cooldown Manager and Performance, in that order', () => {
@@ -1550,26 +1547,26 @@ describe('options_view: main menu routing', () => {
     expect(optionsParentView('main')).toBe('main');
   });
 
-  it('leads with Unlock Interface, relabelled Lock Interface while the frames are loose', () => {
+  it('seats Unlock Interface right after Settings, relabelled Lock Interface while the frames are loose', () => {
     // Owner request for the frame lock-down: arranging frames is one press
     // from Esc, not three levels into Interface > Frames. The row is the
     // same action the Frames tab's row fires, so its label follows the same
     // rule (interfaceUnlockLabelKey), and only the label changes with state.
     const locked = buildOptionsMenu(DESKTOP_MENU);
-    expect(locked[0]).toEqual({
+    expect(locked[1]).toEqual({
       labelKey: 'hudChrome.interfaceUnlock.unlock',
       action: { kind: 'interfaceUnlock', unlocked: false },
     });
     expect(locked.filter((e) => e.action.kind === 'interfaceUnlock')).toHaveLength(1);
     const unlocked = buildOptionsMenu({ ...DESKTOP_MENU, interfaceUnlocked: true });
-    expect(unlocked[0]).toEqual({
+    expect(unlocked[1]).toEqual({
       labelKey: 'hudChrome.interfaceUnlock.lock',
       action: { kind: 'interfaceUnlock', unlocked: true },
     });
-    expect(unlocked.slice(1)).toEqual(locked.slice(1));
+    expect(unlocked.filter((_, i) => i !== 1)).toEqual(locked.filter((_, i) => i !== 1));
   });
 
-  it('omits the Unlock Interface row on the touch HUD, where Key Bindings leads again', () => {
+  it('omits the Unlock Interface row on the touch HUD, where Help and Wiki follows Settings', () => {
     // Frame editing is desktop-only (every gesture refuses touch layouts), the
     // same gate the Frames tab's row sits behind. Unavailable wins even if the
     // state somehow reads unlocked: the row must never appear on touch.
@@ -1581,8 +1578,8 @@ describe('options_view: main menu routing', () => {
         interfaceUnlocked,
       });
       expect(touch.some((e) => e.action.kind === 'interfaceUnlock')).toBe(false);
-      expect(touch[0]?.labelKey).toBe('hud.options.keyBindings');
-      expect(touch).toEqual(locked.slice(1));
+      expect(touch[1]?.labelKey).toBe('hudChrome.options.helpWiki');
+      expect(touch).toEqual(locked.filter((e) => e.action.kind !== 'interfaceUnlock'));
     }
   });
 
@@ -1602,13 +1599,10 @@ describe('options_view: main menu routing', () => {
     });
   });
 
-  it('adds the online-only Report a Bug row when bug reporting is available', () => {
+  it('adds the online-only Report a Bug row after Help and Wiki when bug reporting is available', () => {
     const online = buildOptionsMenu({ ...DESKTOP_MENU, bugReportAvailable: true });
-    const bug = online.find((e) => e.labelKey === 'hudChrome.bugReport.menuButton');
-    expect(bug?.action).toEqual({ kind: 'goto', view: 'bugreport' });
-    // The Wiki row keeps its place above the report row in both modes.
-    expect(online.find((e) => e.labelKey === 'nav.wiki')?.action).toEqual({ kind: 'wiki' });
-    expect(online.slice(-4)).toEqual([
+    expect(online.slice(2)).toEqual([
+      { labelKey: 'hudChrome.options.helpWiki', action: { kind: 'wiki' } },
       { labelKey: 'hudChrome.bugReport.menuButton', action: { kind: 'goto', view: 'bugreport' } },
       { labelKey: 'hudChrome.unstuck.menuButton', action: { kind: 'unstuck' } },
       { labelKey: 'hud.options.logout', action: { kind: 'logout' } },
@@ -1617,6 +1611,74 @@ describe('options_view: main menu routing', () => {
   });
 });
 
+// The quick toggles and links that left the mobile More tray: every one where
+// it applies, each gate on its own, always between Log Out and Return to Game.
+describe('options_view: Game Menu quick toggles and links', () => {
+  const ALL_ON = {
+    nameplates: true,
+    music: false,
+    haptics: true,
+    discord: true,
+    donate: true,
+    steamWishlist: true,
+  };
+
+  it('seats every toggle then every link, carrying state, before Return to Game', () => {
+    const rows = buildOptionsMenu({ ...DESKTOP_MENU, quick: ALL_ON });
+    const quick = rows.filter((e) => e.group === 'quick');
+    expect(quick).toEqual([
+      {
+        labelKey: 'hudChrome.options.nameplates',
+        action: { kind: 'toggle', toggle: 'nameplates', on: true },
+        group: 'quick',
+      },
+      {
+        labelKey: 'hud.options.music',
+        action: { kind: 'toggle', toggle: 'music', on: false },
+        group: 'quick',
+      },
+      {
+        labelKey: 'hudChrome.mobile.haptics',
+        action: { kind: 'toggle', toggle: 'haptics', on: true },
+        group: 'quick',
+      },
+      {
+        labelKey: 'hudChrome.discord.title',
+        action: { kind: 'link', link: 'discord' },
+        group: 'quick',
+      },
+      { labelKey: 'nav.donate', action: { kind: 'link', link: 'donate' }, group: 'quick' },
+      {
+        labelKey: 'hudChrome.steam.wishlist',
+        action: { kind: 'link', link: 'steamWishlist' },
+        group: 'quick',
+      },
+    ]);
+    // The group sits after Log Out and immediately before Return to Game.
+    const logout = rows.findIndex((e) => e.action.kind === 'logout');
+    expect(rows.slice(logout + 1, -1)).toEqual(quick);
+    expect(rows.at(-1)?.action).toEqual({ kind: 'close' });
+  });
+
+  it('drops Haptics off the touch layout (a null state)', () => {
+    const desktop = buildOptionsMenu({ ...DESKTOP_MENU, quick: { ...ALL_ON, haptics: null } });
+    expect(desktop.some((e) => e.action.kind === 'toggle' && e.action.toggle === 'haptics')).toBe(
+      false,
+    );
+    expect(
+      desktop.some((e) => e.action.kind === 'toggle' && e.action.toggle === 'nameplates'),
+    ).toBe(true);
+  });
+
+  it('drops each link on its own gate: Discord, Donate (native apps) and the Steam wishlist', () => {
+    for (const link of ['discord', 'donate', 'steamWishlist'] as const) {
+      const rows = buildOptionsMenu({ ...DESKTOP_MENU, quick: { ...ALL_ON, [link]: false } });
+      const links = rows.flatMap((e) => (e.action.kind === 'link' ? [e.action.link] : []));
+      expect(links).not.toContain(link);
+      expect(links).toHaveLength(2);
+    }
+  });
+});
 // ---------------------------------------------------------------------------
 // Cluster 2: bug report. The ONE IWorld slice the window reads, so it is the
 // ClientWorld-vs-Sim parity surface.

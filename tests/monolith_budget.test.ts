@@ -598,6 +598,9 @@ const MONOLITHS: MonolithRow[] = [
     // wc -l on the tree merged with release/v0.44.0. Exact count, zero slack.
     // Lowered when Deepglass and the Tidehold city left the Studio merge for
     // their own PR (v0.45.0); wc -l on the tree. Exact count, zero slack.
+    // Held at 2807 when the full-screen Settings view landed (issue #1653): the
+    // main menu's paint moved out to src/ui/options_main_menu_controller.ts and
+    // paid for the rail's wiring (src/ui/options_settings_rail_controller.ts).
     ceiling: 2807,
     seam: 'a pure view model (src/ui/options_view.ts) painted with the shared settings_controls.ts builders; sub-panels as sibling modules',
   },

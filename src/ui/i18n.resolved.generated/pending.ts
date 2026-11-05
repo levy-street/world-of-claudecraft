@@ -10,22 +10,46 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "hudChrome.options.helpWiki",
+    "hudChrome.options.nameplates",
+    "hudChrome.options.settings",
+    "hudChrome.options.settingsCategories",
     "hudChrome.professionsHub.tabOverview"
   ],
   "es_ES": [
+    "hudChrome.options.helpWiki",
+    "hudChrome.options.nameplates",
+    "hudChrome.options.settings",
+    "hudChrome.options.settingsCategories",
     "hudChrome.professionsHub.tabOverview"
   ],
   "fr_FR": [
+    "hudChrome.options.helpWiki",
+    "hudChrome.options.nameplates",
+    "hudChrome.options.settings",
+    "hudChrome.options.settingsCategories",
     "hudChrome.professionsHub.tabOverview"
   ],
   "fr_CA": [
+    "hudChrome.options.helpWiki",
+    "hudChrome.options.nameplates",
+    "hudChrome.options.settings",
+    "hudChrome.options.settingsCategories",
     "hudChrome.professionsHub.tabOverview"
   ],
   "en_CA": [],
   "it_IT": [
+    "hudChrome.options.helpWiki",
+    "hudChrome.options.nameplates",
+    "hudChrome.options.settings",
+    "hudChrome.options.settingsCategories",
     "hudChrome.professionsHub.tabOverview"
   ],
   "de_DE": [
+    "hudChrome.options.helpWiki",
+    "hudChrome.options.nameplates",
+    "hudChrome.options.settings",
+    "hudChrome.options.settingsCategories",
     "hudChrome.professionsHub.tabOverview"
   ],
   "zh_CN": [],
@@ -33,31 +57,67 @@ export const pending: Record<string, readonly string[]> = {
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
+    "hudChrome.options.helpWiki",
+    "hudChrome.options.nameplates",
+    "hudChrome.options.settings",
+    "hudChrome.options.settingsCategories",
     "hudChrome.professionsHub.tabOverview"
   ],
   "ru_RU": [],
   "cs_CZ": [
+    "hudChrome.options.helpWiki",
+    "hudChrome.options.nameplates",
+    "hudChrome.options.settings",
+    "hudChrome.options.settingsCategories",
     "hudChrome.professionsHub.tabOverview"
   ],
   "nl_NL": [
+    "hudChrome.options.helpWiki",
+    "hudChrome.options.nameplates",
+    "hudChrome.options.settings",
+    "hudChrome.options.settingsCategories",
     "hudChrome.professionsHub.tabOverview"
   ],
   "pl_PL": [
+    "hudChrome.options.helpWiki",
+    "hudChrome.options.nameplates",
+    "hudChrome.options.settings",
+    "hudChrome.options.settingsCategories",
     "hudChrome.professionsHub.tabOverview"
   ],
   "id_ID": [
+    "hudChrome.options.helpWiki",
+    "hudChrome.options.nameplates",
+    "hudChrome.options.settings",
+    "hudChrome.options.settingsCategories",
     "hudChrome.professionsHub.tabOverview"
   ],
   "tr_TR": [
+    "hudChrome.options.helpWiki",
+    "hudChrome.options.nameplates",
+    "hudChrome.options.settings",
+    "hudChrome.options.settingsCategories",
     "hudChrome.professionsHub.tabOverview"
   ],
   "sv_SE": [
+    "hudChrome.options.helpWiki",
+    "hudChrome.options.nameplates",
+    "hudChrome.options.settings",
+    "hudChrome.options.settingsCategories",
     "hudChrome.professionsHub.tabOverview"
   ],
   "vi_VN": [
+    "hudChrome.options.helpWiki",
+    "hudChrome.options.nameplates",
+    "hudChrome.options.settings",
+    "hudChrome.options.settingsCategories",
     "hudChrome.professionsHub.tabOverview"
   ],
   "da_DK": [
+    "hudChrome.options.helpWiki",
+    "hudChrome.options.nameplates",
+    "hudChrome.options.settings",
+    "hudChrome.options.settingsCategories",
     "hudChrome.professionsHub.tabOverview"
   ]
 };

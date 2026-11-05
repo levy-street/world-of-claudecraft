@@ -21128,6 +21128,77 @@
   body.mobile-touch #options-menu.gfx-wide .gfx-card-wide .set-rows {
     grid-template-columns: 1fr;
   }
+  /* The Game Menu's quick toggles and links (Nameplates, Music, Haptics,
+     Discord, Donate, the Steam wishlist; options_main_menu_controller.ts): a
+     compact two-column group under a hairline, ahead of Return to Game. The
+     label leads at the inline start so the On/Off status or the link chevron
+     (both pinned to the inline end) never sits on top of it. */
+  .opt-quick {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+    margin-top: 4px;
+    padding-top: 10px;
+    border-top: 1px solid var(--gold-dim);
+  }
+  #options-menu .opt-quick > .opt-btn.ui-btn {
+    text-align: start;
+    padding-inline-end: 34px;
+  }
+  .opt-btn-toggle[aria-pressed="false"] .opt-btn-status {
+    color: var(--color-text-muted);
+  }
+  /* The full-screen Settings view (issue #1653; options_settings_rail_controller.ts
+     over the pure options_settings_view.ts). The window fills the HUD, the
+     category rail runs down the inline start, and the open category's head,
+     body and foot fill the rest. The rail is placed absolutely inside the
+     root's inline-start padding rather than as a grid column, so every
+     sub-panel keeps appending its own children to the root unchanged. The
+     geometry is !important on purpose: the floating menu's spot rides inline
+     styles (OptionsWindowLayout, a title-bar drag, the resize grip) that an
+     ordinary rule cannot outrank, and the drag and resize gestures stand down
+     on .window-fullscreen (window_drag_handle.ts, window_resize.ts). The id
+     pair outranks the per-panel width rules (#options-menu:has(> ...)). */
+  #ui > #options-menu.options-settings {
+    --opt-rail-w: 220px;
+    inset: 0 !important;
+    width: auto !important;
+    height: auto !important;
+    max-width: none !important;
+    max-height: none !important;
+    transform: none !important;
+    box-sizing: border-box;
+    border-radius: 0;
+    padding-inline-start: var(--opt-rail-w);
+  }
+  #options-menu.options-settings > .opt-rail {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    box-sizing: border-box;
+    width: var(--opt-rail-w);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 0 var(--window-pad, 12px) var(--window-pad, 12px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    border-inline-end: 1px solid var(--gold-dim);
+    background: var(--panel-base);
+  }
+  .opt-rail-title {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    min-height: var(--win-head-h);
+  }
+  #options-menu .opt-rail-btn.ui-btn {
+    flex: 0 0 auto;
+    width: 100%;
+    min-height: 40px;
+    margin: 0;
+    text-align: start;
+  }
   /* ---------- UI theme picker ---------- */
   .set-seg.theme-presets {
     flex-wrap: wrap;

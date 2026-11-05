@@ -284,10 +284,10 @@ describe('classifyDiff', () => {
     ]);
     const captureSource = plan.specific[0].capture.toString();
     expect(captureSource).toContain('[aria-label="Cross"]');
-    // The Controller row by its data-menu-action hook, never by index: the
-    // main menu's order shifts by host (the Unlock Interface row leads on
-    // desktop only).
-    expect(captureSource).toContain('[data-menu-action="controller"]');
+    // Settings, then the Controller rail entry, both by their data hooks,
+    // never by index: the menu and the rail both shift by host.
+    expect(captureSource).toContain('[data-menu-action="settings"]');
+    expect(captureSource).toContain('[data-settings-category="controller"]');
     expect(captureSource).not.toContain('buttons[1]?.click()');
     expect(captureSource).toContain('#tutorial-greeting');
   });

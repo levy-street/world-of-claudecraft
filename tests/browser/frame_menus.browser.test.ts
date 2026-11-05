@@ -273,6 +273,11 @@ it('opens presets under real game mouse-focus cleanup and preserves Interface sc
     expect(before).toBeGreaterThan(0);
     root.querySelector<HTMLButtonElement>('[data-setting-key="aurasOnPlayerFrame"]')!.click();
     expect(root.querySelector('.ui-win-body')!.scrollTop).toBeCloseTo(before, 0);
+    // The floating Game Menu keeps an externally moved spot across a reopen.
+    // Frame options open in the full-screen Settings view (issue #1653), which
+    // is never measured as a requested spot, so the move happens on the menu.
+    win.close();
+    win.toggle();
     root.style.left = '80px';
     root.style.top = '15px';
     const moved = root.getBoundingClientRect();

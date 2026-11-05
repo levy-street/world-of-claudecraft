@@ -1315,11 +1315,18 @@ describe('client HTML shell', () => {
     // offline fallback (discordInviteUrl() itself falls back to
     // DEFAULT_DISCORD_INVITE_URL in discord_status.ts), and the Ko-fi page,
     // pinned to the shells' URLs.
-    expect(mainTs).toContain("const DONATE_URL = 'https://ko-fi.com/worldofclaudecraft';");
-    expect(mainTs).toContain("window.open(discordInviteUrl(), '_blank', 'noopener,noreferrer');");
-    expect(mainTs).toContain(
-      "onDonate: () => window.open(DONATE_URL, '_blank', 'noopener,noreferrer'),",
+    // The donate hop is shared with the Game Menu's Donate row, so it lives in
+    // src/ui/game_menu_hooks.ts and the tray callback reuses it.
+    const gameMenuHooks = readFileSync(
+      new URL('../src/ui/game_menu_hooks.ts', import.meta.url),
+      'utf8',
     );
+    expect(gameMenuHooks).toContain(
+      "export const DONATE_URL = 'https://ko-fi.com/worldofclaudecraft';",
+    );
+    expect(gameMenuHooks).toContain("window.open(DONATE_URL, '_blank', 'noopener,noreferrer');");
+    expect(mainTs).toContain("window.open(discordInviteUrl(), '_blank', 'noopener,noreferrer');");
+    expect(mainTs).toContain('onDonate: gameMenu.openDonatePage,');
     // Two Ko-fi taps per entry (the marketing donate-cta and the mobile
     // drawer): the in-game community tray's third one left with the tray's
     // GitHub/Donate links (owner request, the tray is wishlist-only now).
@@ -1808,8 +1815,15 @@ describe('client HTML shell', () => {
   });
 
   it('keeps the game menu free of duplicate and dev-only entries', () => {
-    const interfaceEntries = optionsViewTs.match(/labelKey: 'hud\.options\.interface'/g) ?? [];
-    expect(interfaceEntries).toHaveLength(1);
+    // The settings categories live in the Settings view's rail model now
+    // (issue #1653): exactly one Interface category there, none left on the
+    // Game Menu root.
+    const railTs = readFileSync(
+      new URL('../src/ui/options_settings_view.ts', import.meta.url),
+      'utf8',
+    );
+    expect(railTs.match(/'hud\.options\.interface'/g) ?? []).toHaveLength(1);
+    expect(optionsViewTs).not.toMatch(/labelKey: 'hud\.options\.interface'/);
     expect(optionsViewTs).not.toContain('Skin Select (dev)');
     expect(hudTs).not.toContain('Skin Select (dev)');
   });

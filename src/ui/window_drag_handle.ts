@@ -10,6 +10,9 @@ const NEVER_DRAG_SELECTOR =
 
 export function isWindowDragHandle(target: HTMLElement, win: HTMLElement): boolean {
   if (target.closest(NEVER_DRAG_SELECTOR)) return false;
+  // A full-screen view (the options window's Settings view) fills the HUD and
+  // has nowhere to move to; its title bar is chrome, not a handle.
+  if (win.classList.contains('window-fullscreen')) return false;
   const title = target.closest('.panel-title');
   if (title && win.contains(title)) return true;
   return win.id === 'map-window' && target === win;

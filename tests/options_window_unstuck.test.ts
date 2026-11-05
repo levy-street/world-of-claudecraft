@@ -22,6 +22,7 @@ class FakeElement {
     add: () => {},
     remove: () => {},
     toggle: () => {},
+    contains: () => false,
   };
   readonly dataset: Record<string, string> = {};
   className = '';

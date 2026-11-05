@@ -619,7 +619,12 @@ same file), and each module's header carries its own contract.
   window. A new setting is a declarative entry in the pure model (control kind, setting key,
   label key, value coercion) painted with the shared `settings_controls.ts` builders; a
   settings refresh re-runs the painter's `render()` view dispatcher, never a direct sub-panel
-  repaint.
+  repaint. The Esc menu's rows live in `options_main_menu_controller.ts`; every settings
+  category is a body of the full-screen Settings view, whose rail is
+  `options_settings_rail_controller.ts` over the pure `options_settings_view.ts` (a new
+  category is an id there plus its `render()` case; the rail seats itself through the
+  window shell, so a panel that rebuilds the root outside the shell must call the rail's
+  `mount` itself, as the Performance panel's `afterRender` does).
 - **window_drag.ts** (pure `window_drag_core.ts`) + **window_stack_state_core.ts** +
   **window_resize.ts** (pure
   `window_resize_core.ts`) + **movable_frame.ts** (pure
