@@ -241,7 +241,7 @@ describe('Sporemender Form in the saddle', () => {
     ride(sim, pid, e);
     cast(sim, e, 'sporemender_form');
     expect(inForm(e, 'form_sporemender')).toBe(true);
-    expect(moveSpeedMult(e)).toBeCloseTo(1 + MOUNTS.valorsteed.moveSpeedPct);
+    expect(moveSpeedMult(e)).toBeCloseTo(1 + ridingMoveSpeedPct(1));
 
     expect(toggleMount(sim.ctx, pid)).toBe(true);
     expect(e.mountKey).toBe('');
