@@ -1433,13 +1433,24 @@ health from a target fight length times measured raid DPS, damage anchored to th
 tanks' mitigated intake and the healers' throughput, every number calibrated with
 the meters harness, never shipped unmeasured.
 
-**Heroic pools (the bot raid's Heroic pass of 2026-11-05).** The raid has no Heroic tier of
-its own yet, so each boss's Heroic health rides its difficulty row (`healthMult`, applied at
-the pull by `encounters/smith_heart/tier_health.ts`; Normal and Mythic keep the template
-pool). Calibrated with the bot raid (`scripts/heart_raid.mjs`) in the previous tier's best gear
-(the Nythraxis top-parse loadouts) toward a 5 to 7 minute kill: the Hammer Council 2.0, the
-Breath 2.4, the Quench 2.0, the Heat 1.2, the Masterless Strength 1.4. Every number and why:
-the pass's notes (E:/woc/entregas/raid_corazon/heroico/NOTAS.md, outside the repo).
+**Pools per tier (the second Heroic pass of 2026-11-05).** The raid has no Heroic tier of its
+own yet, so each boss's Heroic health rides its difficulty row (`healthMult`, applied at the
+pull by `encounters/smith_heart/tier_health.ts`; Normal keeps the template pool, Mythic uses at
+least Heroic's multiplier). Calibrated to a decent human raid, with the bot raid
+(`scripts/heart_raid.mjs`) as the yardstick: the bots deal about 65 percent of a human raid's
+damage, so a decent human raid deals about 1,000 a second on Heroic (the previous tier's best
+gear) and 700 on Normal (fresh level-20 gear); a pool's human time is its health after the
+elite factor over that, plus the fight's fixed downtime, and `/dev heart pool <k>` (the bots'
+`POOL`) runs a fight on a scaled pool to check a kill on a human raid's clock. Normal (fresh level-20 gear) aims at 4
+to 5 minutes for humans, held where the bots still kill it before the soft enrage: the Guardian
+45,000, the Seam Singer 38,500, the Breath 80,000, the Quench 62,000, the Heat 64,000, the
+Masterless Strength 72,000. Heroic (the previous tier's best gear) aims at 6 to 7 minutes for
+humans: the Hammer Council 2.05, the Breath 1.95, the Quench 2.2, the Heat 1.45, the Masterless
+Strength 2.1. Heroic's key mechanics kill when ignored: Mountain's Wrath lands at about 110
+percent of a Heroic-geared cloth body on whoever no pillar hides (`wrathMult` 2.8), the
+Council's soft enrage waits for 8 Wraths (4 on Normal and Mythic), and the Quench's shatter
+lands twice as hard (`shatterMult` 2). Every number and why: the pass's notes
+(E:/woc/entregas/raid_corazon/heroico/NOTAS.md, "Segunda vuelta", outside the repo).
 
 ### 7.1 The Hammer Council (always first)
 
@@ -1494,7 +1505,9 @@ percent uptime: about 137,000 after the elite factor, split by role: the Guardia
 base (73,600), the Seam Singer 27,500 (63,250). The Slabwright's 19,500 went to the two in
 proportion, so the fight's length is unchanged. Measured (the bot raid of 2026-11-04,
 `scripts/heart_raid.mjs`): ten kit-geared bots dealt about 300 a second, so the pull ran past
-the soft enrage; cut 15 percent to the Guardian 27,200 and the Seam Singer 23,400.
+the soft enrage; cut 15 percent to the Guardian 27,200 and the Seam Singer 23,400. The
+second Heroic pass (2026-11-05, real class kits) raised them to 45,000 and 38,500 (see the
+pools per tier above).
 
 **Damage (sketch, unmeasured).** Anchored to the level-20 cloth reference (about 1,135 to
 1,345 health, `docs/design/class-health-table-2026-09-11.md`) and the dungeon rework's
@@ -1686,7 +1699,8 @@ second (the council's anchor): the Wind half runs to about 2.2 minutes, the Stor
 Measured (the bot raid of 2026-11-04, `scripts/heart_raid.mjs`): ten kit-geared bots killed
 Normal in 5:38 with no deaths at about 290 a second, and wiped twice to the Swelling Storm
 at 6:11 when the isle round ran long; the guardian's base health goes from 43,000 to 38,000
-so a sane raid kills it before the soft enrage bites.
+so a sane raid kills it before the soft enrage bites. The second Heroic pass (2026-11-05)
+raised it to 80,000 (see the pools per tier above).
 
 **Damage (sketch, unmeasured).** Anchored to the level-20 cloth reference (about 1,135 to
 1,345 health) and the dungeon rework's bands: the pin about 8 percent a second (leave the
@@ -1750,7 +1764,8 @@ no plates broken by the boss's fire (Korzul: here the RAID breaks the ice, in ro
 | Its fall | The Quench vein and the seal's quarter light as before (seal.ts reads the guardian's death); the shore ice falls and the lake refreezes whole (every hole gone), so the walk back is safe | `quench.ts` (`finishQuench`) |
 
 **Health (sketch, unmeasured).** 43,000 base (about 99,000 after the elite factor), the
-Breath's anchor: a 4 to 5 minute fight at the bot raid's measured 400 to 460 a second.
+Breath's anchor: a 4 to 5 minute fight at the bot raid's measured 400 to 460 a second. The
+second Heroic pass (2026-11-05) raised it to 62,000 (see the pools per tier).
 
 **Damage and cold (sketch, unmeasured).** Anchored to the level-20 cloth reference (about
 1,135 to 1,345 health): a shatter about 20 percent (plus Frost-Brittle), the water about
@@ -1839,7 +1854,8 @@ carries their state and time (a radius or half width in `scale`); the adds as mo
 marks as auras.
 
 **Health (sketch, unmeasured).** 43,000 base (about 99,000 after the elite factor), the other
-guardians' anchor. Two overflows of 20 s (Normal) add about 45 s to a 4 to 5 minute fight.
+guardians' anchor. Two overflows of 20 s (Normal) add about 45 s to a 4 to 5 minute fight. The
+second Heroic pass (2026-11-05) raised it to 64,000 (see the pools per tier).
 
 Role jobs: the tank holds it from the shore, inside its reach, and swaps on Cinder Grip;
 everyone stays within 20 yd in phase 1, leaves the fist's spot and stands in the gaps
@@ -1883,8 +1899,8 @@ Flare-Scorched, The First Wellspring, The First Flame and Wellspring Fire are pl
 `FINAL_DIFFICULTY` in `src/sim/encounters/smith_heart/final_ids.ts`, so a change is one
 number. The code is `src/sim/encounters/smith_heart/final*.ts`: the coordinator `final.ts`,
 the rules `final_rules.ts`, one module per quarter (`final_heat.ts`, `final_quench.ts`,
-`final_breath.ts`, `final_hammer.ts`), the scope and the leaf. Health 70,000 base (about
-161,000 after the elite factor). Its own swing cleave, Forge Fist (110 degrees, 9 yd, every
+`final_breath.ts`, `final_hammer.ts`), the scope and the leaf. Health 72,000 base (about
+166,000 after the elite factor; 70,000 until the second Heroic pass of 2026-11-05). Its own swing cleave, Forge Fist (110 degrees, 9 yd, every
 third landed swing), is its frontal; the sketch's Forge Wrath and Forge Pour are gone. It
 cannot be controlled or slowed: only its own Taking Root holds it.
 

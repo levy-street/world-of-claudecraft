@@ -263,7 +263,7 @@ export const FINAL_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalDifficultyR
     // tier's best came out of the 70 percent call too low to outlast the
     // Overload pulses, Vein Shock and the Anvil on two healers.
     damageMult: 1.1,
-    healthMult: 2.2,
+    healthMult: 2.1,
     burstTier: 'heavy',
     switchShock: true,
     embers: true,
@@ -279,7 +279,7 @@ export const FINAL_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalDifficultyR
   },
   mythic: {
     damageMult: 1.3,
-    healthMult: 2.2,
+    healthMult: 2.1,
     burstTier: 'lethal',
     switchShock: true,
     embers: true,

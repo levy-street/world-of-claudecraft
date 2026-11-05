@@ -319,7 +319,7 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
   // Rush). Hammerfall, its
   // frontal arc, stays: it reads well and keeps the raid off the tank's side.
   heart_hammer_guardian: {
-    ...boss('heart_hammer_guardian', 'Guardian of the Hammer', 42500, 0x8a6430, 3.2),
+    ...boss('heart_hammer_guardian', 'Guardian of the Hammer', 45000, 0x8a6430, 3.2),
     ccImmune: true,
     slowImmune: true,
     arcCleave: { every: 3, arcDeg: 110, range: 9, mult: 0.7, name: 'Hammerfall' },
@@ -336,7 +336,7 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
   // pressure is her bars. She carries the heir's Wrath declaration (the
   // Guardian fallen, she takes the Wrath).
   heart_seam_singer: {
-    ...boss('heart_seam_singer', 'The Seam Singer', 36500, 0xd8a24a, 2.0),
+    ...boss('heart_seam_singer', 'The Seam Singer', 38500, 0xd8a24a, 2.0),
     ccImmune: true,
     slowImmune: true,
     dmgBase: 24,
@@ -361,7 +361,7 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
   // record stays the look's numbers: the whole Cornice, the throw). Storm
   // Lance stays the trash kit's own line, on its own clock.
   heart_breath_guardian: {
-    ...boss('heart_breath_guardian', 'Guardian of the Breath', 74000, 0x5ab8e8, 3.4),
+    ...boss('heart_breath_guardian', 'Guardian of the Breath', 80000, 0x5ab8e8, 3.4),
     ccImmune: true,
     slowImmune: true,
     trashKit: {
@@ -580,7 +580,7 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
     },
   },
   heart_masterless_strength: {
-    ...boss('heart_masterless_strength', 'The Masterless Strength', 84000, 0xd8c8a0, 3.6),
+    ...boss('heart_masterless_strength', 'The Masterless Strength', 72000, 0xd8c8a0, 3.6),
     ccImmune: true,
     slowImmune: true,
     arcCleave: { every: 3, arcDeg: 110, range: 9, mult: 0.7, name: 'Forge Fist' },
