@@ -335,7 +335,7 @@ describe('the Stolen Supply Crates lie in the relocated bandit camps', () => {
     const seed = sim.cfg.seed;
     const def = GROUND_OBJECTS.find((g) => g.itemId === 'supply_crate');
     expect(def).toBeDefined();
-    expect(def?.positions).toHaveLength(6);
+    expect(def?.positions).toHaveLength(8);
     const banditCamps = CAMPS.filter((c) => c.mobId === 'vale_bandit');
     expect(banditCamps).toHaveLength(2);
     for (const p of def?.positions ?? []) {

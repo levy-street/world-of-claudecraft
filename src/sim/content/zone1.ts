@@ -1961,9 +1961,11 @@ export const ZONE1_OBJECTS: GroundObjectDef[] = [
       { x: 65, z: 23 },
       { x: 72, z: 15 },
       { x: 82, z: 22 },
+      { x: 88, z: 8 },
       { x: 106, z: 40 },
       { x: 110, z: 48 },
       { x: 116, z: 37 },
+      { x: 108, z: 33 },
     ],
   },
   {
