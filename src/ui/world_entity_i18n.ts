@@ -412,13 +412,15 @@ const MOB_IDS = [
   'heart_ring_warder',
   'heart_breath_warder',
   'heart_breath_caller',
+  // The Islands of the Wind's adds (encounters/smith_heart/breath_isles.ts).
+  'heart_gale_sentinel',
+  'heart_gale_mender',
   'heart_quench_warder',
   'heart_quench_caller',
   'heart_heat_warder',
   'heart_heat_caller',
   'heart_hammer_guardian',
-  // The Hammer Council's other two (encounters/smith_heart/council.ts).
-  'heart_slabwright',
+  // The Hammer Council's other member (encounters/smith_heart/council.ts).
   'heart_seam_singer',
   'heart_breath_guardian',
   'heart_quench_guardian',
@@ -429,7 +431,6 @@ const MOB_IDS = [
   'heart_heat_wellkeeper',
   'heart_heat_seedflame',
   'heart_heat_rolling_cinder',
-  'heart_stone_prison',
   // The Masterless Strength's Splinters (encounters/smith_heart/final_adds.ts).
   'heart_final_splinter_heat',
   'heart_final_splinter_quench',

@@ -13,7 +13,9 @@
 //                      god mode and stood alive on the void's floor). Its
 //                      body is laid back on the Cornice's floor by the gap
 //                      (voidCorpseSpot), so no resurrection lands in the
-//                      void again. A real game master (gm, or the profiler's
+//                      void again; a body the landing itself killed (a fall
+//                      off an isle, higher still) is laid back the same.
+//                      A real game master (gm, or the profiler's
 //                      invulnerable stand-in) is never killed, as the shared
 //                      wipe spares them (encounter_wipe.ts): set back on the
 //                      floor instead.
@@ -22,24 +24,40 @@
 //                      leaves the threat table at once (the guardian turns to
 //                      whoever is left; nobody left is a wipe), and a step the
 //                      mob AI took off the floor is undone, so it never walks
-//                      out through a gap after anyone.
+//                      out through a gap after anyone. A body the Islands
+//                      of the Wind took (riding a gale, or on an isle's
+//                      floor) is still in the fight and keeps its place: a
+//                      lone rider (a solo pull, the tank) dropped mid-air
+//                      read as a wipe and the reset set them back on the
+//                      Cornice, cutting the ride short (Jose's online
+//                      playtest of 2026-11-03).
 //
 // Zero rng; positions are claim-local yards.
 
-import { BREATH, SMITH_HEART_HEIGHTS } from '../../content/smith_heart_layout';
+import {
+  BREATH,
+  BREATH_ISLE_REACH,
+  BREATH_ISLES,
+  SMITH_HEART_FIELD,
+  SMITH_HEART_HEIGHTS,
+} from '../../content/smith_heart_layout';
 import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
 import type { Entity } from '../../types';
 import { thessalyOf } from './breath_gale';
 import {
   fellFromCornice,
-  gapAt,
   inBreathArena,
+  inClaimBand,
+  lipDistance,
+  nearCornice,
   onCorniceApproach,
   voidCorpseSpot,
 } from './breath_geometry';
 import { BREATH_CUES } from './breath_ids';
-import { type BreathScope, corniceListeners, raidWarn, voidCandidates } from './breath_scope';
+import { isleAt } from './breath_isle_geometry';
+import { type BreathScope, corniceListeners, voidCandidates } from './breath_scope';
+import type { BreathFightState } from './breath_state';
 import { breathSay } from './breath_voice';
 
 /** How far under the Cornice's floor a body counts as off it (yards): the
@@ -68,7 +86,6 @@ export function stepOverLip(s: Pick<BreathScope, 'ctx' | 'inst' | 'st' | 'boss'>
       radius: 2,
       ability: BREATH_CUES.fall,
     });
-    raidWarn(s, s.boss, 'fell', `${p.name} is swept into the void!`, { player: p.name });
     breathSay(s, thessalyOf(s.ctx, s.inst), 'thessaly', 'fall');
   }
 }
@@ -80,11 +97,19 @@ export function stepOverLip(s: Pick<BreathScope, 'ctx' | 'inst' | 'st' | 'boss'>
 export function stepVoidDeaths(ctx: SimContext, inst: InstanceSlot): void {
   const o = ctx.instanceOriginOf(inst);
   for (const p of voidCandidates(ctx, inst)) {
-    if (p.dead || p.ghost) continue;
+    if (p.ghost) continue;
     const lx = p.pos.x - o.x;
     const lz = p.pos.z - o.z;
     if (!fellFromCornice(lx, lz, p.pos.y, p.onGround)) continue;
     const back = voidCorpseSpot(lx, lz);
+    if (p.dead) {
+      // The landing's own hit killed it first (a fall from an isle, high
+      // over the Cornice): its body is laid back all the same, but only a
+      // body of THIS claim's summit (never one in the next slot's void).
+      if (p.pos.y < SMITH_HEART_FIELD.voidHeight + 3 && underSummit(lx, lz))
+        layOnFloor(ctx, p, o.x + back.x, o.z + back.z);
+      continue;
+    }
     if (p.gm || (p.profilerInvulnerable && ctx.devCommands)) {
       layOnFloor(ctx, p, o.x + back.x, o.z + back.z);
       continue;
@@ -105,6 +130,14 @@ export function stepVoidDeaths(ctx: SimContext, inst: InstanceSlot): void {
     }
     layOnFloor(ctx, p, o.x + back.x, o.z + back.z);
   }
+}
+
+/** Is claim-local (x, z) under this claim's summit: in its band, and under
+ *  the Cornice or an isle (as far as a fall off either carries a body)? */
+function underSummit(x: number, z: number): boolean {
+  if (!inClaimBand(z)) return false;
+  if (nearCornice(x, z)) return true;
+  return BREATH_ISLES.some((c, i) => Math.hypot(x - c.x, z - c.z) <= BREATH_ISLE_REACH[i] + 30);
 }
 
 /** Set a body (alive or dead) down on the floor at world (x, z), at rest. */
@@ -132,6 +165,17 @@ function keepable(x: number, z: number, y: number): boolean {
   return y > HIGH_CLIMB - OFF_FLOOR_DROP && onCorniceApproach(x, z);
 }
 
+/** Is `e` in the Islands of the Wind's part of the fight: riding a gale
+ *  (out or home), or standing on an isle's floor (claim-local x, z)? */
+export function inIslesFight(st: BreathFightState, e: Entity, x: number, z: number): boolean {
+  if (st.isles.rides.some((r) => r.playerId === e.id)) return true;
+  const i = isleAt(x, z);
+  return i >= 0 && Math.abs(e.pos.y - BREATH_ISLES[i].h) <= ISLE_FLOOR_SLACK;
+}
+
+/** How far over or under an isle's floor a body still stands on it. */
+const ISLE_FLOOR_SLACK = 4;
+
 /**
  * Hold the guardian to its Cornice (after the mob AI moved it this tick):
  * every threat entry off the floor is dropped (and the guardian turned to
@@ -144,7 +188,10 @@ export function tetherGuardian(s: Pick<BreathScope, 'ctx' | 'inst' | 'st' | 'bos
   let lost = false;
   const off = (id: number): boolean => {
     const e = ctx.entities.get(id);
-    return !e || e.dead || !keepable(e.pos.x - o.x, e.pos.z - o.z, e.pos.y);
+    if (!e || e.dead) return true;
+    const x = e.pos.x - o.x;
+    const z = e.pos.z - o.z;
+    return !keepable(x, z, e.pos.y) && !inIslesFight(st, e, x, z);
   };
   for (const id of [...boss.threat.keys()]) if (off(id)) boss.threat.delete(id);
   if (boss.aggroTargetId !== null && off(boss.aggroTargetId)) {
@@ -174,8 +221,8 @@ export function tetherGuardian(s: Pick<BreathScope, 'ctx' | 'inst' | 'st' | 'bos
   }
 }
 
-/** Is (x, z) by a gap (a body leaving the floor here went over its lip)? */
+/** Is (x, z) by an open lip (a body leaving the floor here went over it)?
+ *  Since the open rim, anywhere along the Cornice's edge but the climb. */
 function gapNear(x: number, z: number): boolean {
-  for (const dx of [-3, 0, 3]) for (const dz of [-3, 0, 3]) if (gapAt(x + dx, z + dz)) return true;
-  return false;
+  return lipDistance(x, z) <= 4 && !onCorniceApproach(x, z);
 }

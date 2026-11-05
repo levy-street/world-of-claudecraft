@@ -2,10 +2,10 @@ import { describe, expect, it, vi } from 'vitest';
 
 // The Mythic council's soul pillars (src/sim/encounters/smith_heart/
 // council_soul.ts) ride existing entity fields only: the soul, the pillar's
-// kind and its pips in the object's template id, the Walking Slab in its
-// position (its collider rebuilt from the mirrored entity), the Echo of Wrath
+// kind and its pips in the object's template id, the Echo of Wrath
 // and the Endless Song as the pillar's own bar, the song's count as a stack of
-// an aura on the pillar. The offline Sim reads them in place; this drives the
+// an aura on the pillar; the Guardian's cursed pillar (any tier) rides its own
+// template id and its collider is rebuilt from the mirrored entity. The offline Sim reads them in place; this drives the
 // REAL server snapshot path into the real online mirror (ClientWorld, on the
 // browser's stable timer wire) and checks each one arrives, the way the raid
 // bots (scripts/heart_council_raid.mjs) saw it over a live server. Db is
@@ -29,6 +29,7 @@ import { DUNGEONS, instanceOrigin, instanceSlotForZ } from '../src/sim/data';
 import {
   COUNCIL_AURAS,
   COUNCIL_CASTS,
+  COUNCIL_CURSED,
   COUNCIL_TUNING,
   councilSoulOf,
 } from '../src/sim/encounters/smith_heart/council_ids';
@@ -57,7 +58,7 @@ function joinAt(server: Any, id: number, name: string, stable: boolean) {
 }
 
 describe('the soul pillars over the wire', () => {
-  it('reach the online mirror: which soul, its pips, the Walking Slab, the Echo and the Endless Song', () => {
+  it('reach the online mirror: which soul, its pips, the Echo, the Endless Song, the cursed pillar', () => {
     const saved = process.env.ALLOW_DEV_COMMANDS;
     process.env.ALLOW_DEV_COMMANDS = '1';
     let server: Any;
@@ -115,29 +116,23 @@ describe('the soul pillars over the wire', () => {
     }
     expect(echoBar).toBe(COUNCIL_TUNING.echoCast);
 
-    // The Slabwright's soul walks toward the raid; the mirror and its
-    // collider follow it.
-    sim.chat('/dev heart council soul slabwright', a.pid);
+    // Mountain's Rush raises the cursed pillar: the mirror and its collider.
+    sim.chat('/dev heart council rush', a.pid);
     run(0.5);
-    const startAt = { ...soulOnServer('slabwright').pos };
-    for (const p of [a, b]) sim.meta(p.pid).moveInput.forward = true;
-    run(2);
-    for (const p of [a, b]) sim.meta(p.pid).moveInput.forward = false;
-    run(3);
-    const slabServer = soulOnServer('slabwright');
-    const slabClient = soulOnClient('slabwright');
-    expect(Math.hypot(slabServer.pos.x - startAt.x, slabServer.pos.z - startAt.z)).toBeGreaterThan(
-      2,
-    );
-    expect(
-      Math.hypot(slabClient.pos.x - slabServer.pos.x, slabClient.pos.z - slabServer.pos.z),
-    ).toBeLessThan(0.5);
+    const cursedServer = [...sim.entities.values()].find(
+      (e: Any) => e.kind === 'object' && e.templateId === COUNCIL_CURSED,
+    ) as Any;
+    expect(cursedServer).toBeDefined();
+    const cursedClient = client.entities.get(cursedServer.id);
+    expect(cursedClient?.templateId).toBe(COUNCIL_CURSED);
     const me = client.entities.get(b.pid);
     const o = instanceOrigin(DUNGEONS.smith_heart.index, instanceSlotForZ(me.pos.z));
     const wall = combatWallsAt(o.x, o.z).find(
-      (w: Any) => Math.hypot(w.x - (slabClient.pos.x - o.x), w.z - (slabClient.pos.z - o.z)) < 1,
+      (w: Any) =>
+        Math.hypot(w.x - (cursedClient.pos.x - o.x), w.z - (cursedClient.pos.z - o.z)) < 1,
     );
     expect(wall).toBeDefined();
+    run(COUNCIL_TUNING.rushCast + 2);
 
     // The Seam Singer's soul: the song's bar and its pulse count.
     sim.chat('/dev heart council soul singer', a.pid);
@@ -151,11 +146,10 @@ describe('the soul pillars over the wire', () => {
     // A struck pip, then the burst: gone from the mirror too.
     sim.chat('/dev heart council soulpip 1', a.pid);
     run(0.5);
-    for (const role of ['guardian', 'slabwright', 'singer'])
+    for (const role of ['guardian', 'singer'])
       expect(councilSoulOf(soulOnClient(role).templateId)?.pips).toBe(1);
     sim.chat('/dev heart council soulpip 0', a.pid);
     run(0.5);
-    for (const role of ['guardian', 'slabwright', 'singer'])
-      expect(soulOnClient(role)).toBeUndefined();
+    for (const role of ['guardian', 'singer']) expect(soulOnClient(role)).toBeUndefined();
   });
 });

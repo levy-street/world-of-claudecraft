@@ -6,12 +6,11 @@
 //
 //   a cue          one positioned one-shot (a pillar rising, cracking, falling,
 //                  the rock landing, a soul taking the stone, a pip struck, a
-//                  soul pillar bursting, the Echo's blast, a slab's crush, the
-//                  Wrath landing, a Seam Bolt, Hammer's Weight)
+//                  soul pillar bursting, the Echo's blast, Mountain's Rush
+//                  striking, the Wrath landing, a Seam Bolt, Hammer's Weight)
 //   a bar          its charge, sized to the bar (Mountain's Wrath, the Echo of
 //                  Wrath, the Song of the Seam)
 //   the rock       its fall, as the boulder comes into view over its soak
-//   the slab       a grinding loop while a Walking Slab drags itself
 //   the song       each Endless Song pulse louder and deeper as the song grows
 //
 // Every sample is the council's own (`heart_council_*`, scripts/sfx/
@@ -58,7 +57,20 @@ export const COUNCIL_CUE_SOUNDS: Readonly<Record<string, CouncilSound>> = {
   [COUNCIL_CUES.soulPip]: S('soul_pip', 1, 'source'),
   [COUNCIL_CUES.soulBurst]: S('soul_burst', 1, 'point'),
   [COUNCIL_CUES.echoBlast]: S('echo_blast', 1, 'source'),
-  [COUNCIL_CUES.slabCrush]: S('slab_crush', 1, 'target', 1, 0.3),
+  // Mountain's Rush's wind-up: the Guardian plants, a deep slowed thud at
+  // its feet before the run.
+  [COUNCIL_CUES.rushWindup]: S('rock_impact', 0.7, 'point', 0.62, 0.3),
+  // Mountain's Rush striking home (a pillar or the raid): the crush sample.
+  [COUNCIL_CUES.rushImpact]: S('slab_crush', 1, 'point', 1, 0.3),
+  // The cursed pillar: the rise's burst, a low dark hum, a soul pillar's
+  // burst as it breaks; the bond's pulse and Resonance's ring, the song's
+  // hum kept low; the mythic collapse, the rock's impact cooled down.
+  [COUNCIL_CUES.cursedRise]: S('pillar_rise', 0.95, 'source', 0.85),
+  [COUNCIL_CUES.cursedPulse]: S('pillar_pulse', 0.4, 'source', 0.75, 1.2),
+  [COUNCIL_CUES.cursedBreak]: S('soul_burst', 1, 'point', 0.9),
+  [COUNCIL_CUES.bondPulse]: S('song_pulse', 0.5, 'source', 0.8, 1),
+  [COUNCIL_CUES.resonancePulse]: S('song_pulse', 0.35, 'source', 1.15, 0.6),
+  [COUNCIL_CUES.quarryCollapse]: S('rock_impact', 0.45, 'point', 1.1, 0.5),
   // The song's pulse grows: songPulseSound below sets its gain and rate.
   [COUNCIL_CUES.songPulse]: S('song_pulse', 0.6, 'source'),
   // The Wrath landing (its nova on the caster), a Seam Bolt on its mark,
@@ -99,7 +111,6 @@ export const COUNCIL_BAR_SOUNDS: Readonly<Record<string, CouncilBarSound>> = {
   [COUNCIL_CASTS.wrath]: { key: 'heart_council_wrath_charge', seconds: 4, gain: 0.95 },
   [COUNCIL_CASTS.echo]: { key: 'heart_council_echo_charge', seconds: 3, gain: 0.95 },
   [COUNCIL_CASTS.song]: { key: 'heart_council_song_cast', seconds: 3, gain: 0.8 },
-  [COUNCIL_CASTS.songUnbroken]: { key: 'heart_council_song_cast', seconds: 3, gain: 0.8 },
 };
 
 /** A bar's charge sized to its bar: the rate that fits the sample to the
@@ -113,22 +124,11 @@ export function barSoundRate(sound: CouncilBarSound, barSeconds: number): number
  *  renderer's own lead, council_fx_core.ts ROCK_FALL_SECONDS). */
 export const ROCK_FALL_SOUND = { key: 'heart_council_rock_fall', lead: 1.2, gain: 0.9 } as const;
 
-/** The Walking Slab's grind: a loop while it drags itself. */
-export const SLAB_GRIND_SOUND = {
-  key: 'heart_council_slab_grind',
-  gain: 0.75,
-  /** Yards a frame it must move to count as dragging. */
-  moving: 0.004,
-  /** Seconds it keeps grinding after it stops (a pick between two goals). */
-  hold: 0.35,
-} as const;
-
 /** Every sample the council plays, for preloading once. */
 export const COUNCIL_SFX_KEYS: readonly string[] = [
   ...new Set([
     ...Object.values(COUNCIL_CUE_SOUNDS).map((s) => s.key),
     ...Object.values(COUNCIL_BAR_SOUNDS).map((s) => s.key),
     ROCK_FALL_SOUND.key,
-    SLAB_GRIND_SOUND.key,
   ]),
 ].sort();

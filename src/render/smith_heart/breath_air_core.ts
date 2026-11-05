@@ -2,18 +2,19 @@
 // paints it): the gale streaming over the summit from the north-west (wind
 // streaks and the grit it carries over every Breath walk), the storm's cloud
 // banks rolling past below the Cornice's rim and through the chasm under the
-// Wind Bridge, the bridge's gusts sweeping down its ramp in a steady rhythm,
-// and the lightning striking the Cornice's rods one after another.
+// Wind Bridge, and the bridge's gusts sweeping down its ramp in a steady
+// rhythm (the Cornice's lightning rods and their strikes went with the open
+// rim of 2026-11-03).
 //
-// Every motion runs in the shaders on the shared clock; the strike and gust
-// schedules below are the same arithmetic the shaders run (pinned by
-// tests/smith_heart_breath_kit.test.ts). Cosmetic: nothing here is a
+// Every motion runs in the shaders on the shared clock; the gust schedule
+// below is the same arithmetic the shaders run (pinned by
+// tests/smith_heart_breath_air.test.ts). Cosmetic: nothing here is a
 // telegraph, nothing lies over a walked floor thicker than a streak, the
 // clouds stay under the Cornice's walk and past its rim, and the low tier
-// builds a third of the particles (the strikes and the gusts' band stay).
+// builds a third of the particles (the gusts' band stays).
 // Three-free, DOM-free, deterministic (a hash, never rng).
 
-import { BREATH, SMITH_HEART_FIELD, WIND_BRIDGE } from '../../sim/content/smith_heart_layout';
+import { BREATH, WIND_BRIDGE } from '../../sim/content/smith_heart_layout';
 import { heartHash } from './heart_plan_core';
 
 /** The gale's heading over the summit (from the north-west, x z unit). */
@@ -22,11 +23,6 @@ export const BREATH_WIND: readonly [number, number] = [0.6, -0.8];
 /** The bridge's gust rhythm: one gust every PERIOD seconds, its band taking
  *  SWEEP seconds to run down the ramp from the high end to the low. */
 export const BREATH_GUST = { period: 8, sweep: 1.8, offset: 2.5 } as const;
-
-/** The strikes on the Cornice's rods: one every CELL seconds, round the
- *  rods in a fixed stride (coprime with their count), each visible for
- *  FLASH seconds. */
-export const BREATH_STRIKE = { cell: 7.5, flash: 0.42, stride: 5 } as const;
 
 /** A box of air the gale streams through. */
 export interface WindVolume {
@@ -53,12 +49,7 @@ export interface CloudCard {
 export interface BreathAirPlan {
   volumes: WindVolume[];
   clouds: CloudCard[];
-  /** The rods' crowns (where the strikes land), in the layout's order. */
-  crowns: { x: number; y: number; z: number }[];
 }
-
-/** How high a rod's crown stands over its foot (the kit's Kit_StormRod). */
-export const BREATH_ROD_CROWN = 20.6;
 
 /** The gust's state `t` seconds into the clock: which gust (its index), how
  *  far its band has run down the ramp (0 the high end, 1 the low; < 0 not
@@ -75,22 +66,8 @@ export function breathGustAt(t: number): { index: number; front: number; strengt
   return { index, front: front <= 1.4 ? front : -1, strength };
 }
 
-/** The strike `t` seconds into the clock: the rod it lands on (index into
- *  the crowns), and its phase (seconds since it landed; < 0 or past FLASH:
- *  none showing). */
-export function breathStrikeAt(t: number, rods: number): { rod: number; since: number } {
-  const k = Math.floor(t / BREATH_STRIKE.cell);
-  const at = k * BREATH_STRIKE.cell + fract(k * 0.618) * (BREATH_STRIKE.cell - 1);
-  const rod = rods > 0 ? (((k * BREATH_STRIKE.stride + 2) % rods) + rods) % rods : 0;
-  return { rod, since: t - at };
-}
-
-function fract(v: number): number {
-  return v - Math.floor(v);
-}
-
 /** The Breath's air. `density` thins the particles (1 full, the low tier a
- *  third); the clouds thin too, never the strikes or the gusts. */
+ *  third); the clouds thin too, never the gusts. */
 export function planBreathAir(density = 1): BreathAirPlan {
   const n = (v: number) => Math.max(1, Math.round(v * density));
   const C = BREATH.cornice;
@@ -105,7 +82,8 @@ export function planBreathAir(density = 1): BreathAirPlan {
       hd: C.rz,
       y0: C.h + 0.6,
       y1: C.h + 7,
-      streaks: n(90),
+      // The third pass: more and longer streaks, the gale read at a glance.
+      streaks: n(140),
       grit: n(46),
       gust: 0,
     },
@@ -156,8 +134,5 @@ export function planBreathAir(density = 1): BreathAirPlan {
       size: 14 + heartHash(i, 23) * 12,
     });
   }
-  const crowns = SMITH_HEART_FIELD.props
-    .filter((p) => p.kind === 'sh_lightning_rod')
-    .map((p) => ({ x: p.x, y: C.h + BREATH_ROD_CROWN, z: p.z }));
-  return { volumes, clouds, crowns };
+  return { volumes, clouds };
 }

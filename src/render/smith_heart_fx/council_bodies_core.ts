@@ -1,7 +1,7 @@
-// Pure plan of the Hammer Council's two provisional bodies (council_bodies.ts
-// paints them; docs/design/raid/smith_heart.md section 7.1): the Slabwright,
-// broad and blocky with slab shoulders, and the Seam Singer, tall and slender
-// with glowing ochre seam crystals. Like the Masterless Strength's colossus
+// Pure plan of the Hammer Council's provisional body (council_bodies.ts
+// paints it; docs/design/raid/smith_heart.md section 7.1): the Seam Singer,
+// tall and slender with glowing ochre seam crystals (the Guardian is the
+// shipped Hammer guardian's own model). Like the Masterless Strength's colossus
 // (final_fx_core.ts) each body is floating rock bound by threads of the vein's
 // light, but small: about 2 to 2.5 times a player.
 //
@@ -21,23 +21,21 @@ import { colossusArmIk, type V3 } from './final_fx_core';
 
 export type { V3 };
 
-/** The two bodies, by their sim template ids. */
+/** The provisional bodies, by their sim template ids. */
 export const COUNCIL_BODY_TEMPLATES = {
-  slabwright: 'heart_slabwright',
   singer: 'heart_seam_singer',
 } as const;
 export type CouncilBodyKind = keyof typeof COUNCIL_BODY_TEMPLATES;
 
 /** The kind a template draws as, or null. */
 export function councilBodyKindOf(templateId: string): CouncilBodyKind | null {
-  if (templateId === COUNCIL_BODY_TEMPLATES.slabwright) return 'slabwright';
   if (templateId === COUNCIL_BODY_TEMPLATES.singer) return 'singer';
   return null;
 }
 
 /** The kinds that wear a shipped model now (characters/manifest.ts): their provisional
  *  pieces never build or draw, and the pose still runs for their dust and rings. */
-export const COUNCIL_MODELLED: ReadonlySet<CouncilBodyKind> = new Set(['slabwright']);
+export const COUNCIL_MODELLED: ReadonlySet<CouncilBodyKind> = new Set<CouncilBodyKind>();
 
 /** The kits the pieces come from (render/smith_heart/heart_kit.ts urls). */
 export const COUNCIL_BODY_KITS = {
@@ -130,10 +128,8 @@ export interface CouncilBodyPlan {
 }
 
 /** The manifest heights times the template scales (characters/manifest.ts
- *  smith_heart_slabwright 2.15, smith_heart_seam_singer 2.5; content
- *  smith_heart.ts scales 2.2 and 2.0). */
+ *  smith_heart_seam_singer 2.5; content smith_heart.ts scale 2.0). */
 export const COUNCIL_BODY_HEIGHTS: Readonly<Record<CouncilBodyKind, number>> = {
-  slabwright: 2.15 * 2.2,
   singer: 2.5 * 2.0,
 };
 
@@ -145,11 +141,8 @@ export const COUNCIL_BODY_COLORS = {
   wrath: 0xfff0c8,
   dust: [0.72, 0.62, 0.48] as const,
   /** Each body's granite (LINEAR vertex rgb, so about twice as light on
-   *  screen): the Slabwright a warm umber dressed stone, a value darker than
-   *  the quarry it stands against; the Singer a cool dark slate the amber
-   *  crystals burn out of. */
+   *  screen): the Singer a cool dark slate the amber crystals burn out of. */
   granite: {
-    slabwright: [0.2, 0.15, 0.11] as const,
     singer: [0.11, 0.105, 0.12] as const,
   },
   spark: [1.0, 0.78, 0.4] as const,
@@ -171,121 +164,6 @@ function piece(
 ): CouncilBodyPiece {
   return { id, kit, node, joint, side, size, at, tilt, light };
 }
-
-/** The Slabwright: a mason's golem of dressed slabs, hulking. A heavy hip
- *  block over a floating plinth, a broad chest faced with a dressed slab and
- *  backed by a greater one, two cut slab shoulders standing proud like
- *  pauldrons (the widest thing on it), a squat head sunk between them, thick
- *  arms ending in block fists, a skirt of slab chips turning low. */
-const SLABWRIGHT: CouncilBodyPlan = {
-  kind: 'slabwright',
-  height: COUNCIL_BODY_HEIGHTS.slabwright,
-  hover: 0.3,
-  slots: {
-    base: v(0, 0.45, 0),
-    hip: v(0, 1.2, 0),
-    torso: v(0, 2.6, 0),
-    // The head stands up out of the pauldrons and a little forward (the
-    // review: sunk between them it read as a headless block).
-    head: v(0, 4.08, 0.48),
-    shoulder: v(1.75, 3.2, -0.1),
-  },
-  arm: { root: v(1.95, 3.0, 0), upper: 1.35, fore: 1.3, idle: v(2.35, 1.0, 0.5) },
-  skirt: { count: 7, r: 1.75, y: 0.7, spin: 0.35 },
-  halo: { count: 0, r: 0, y: 0, spin: 0 },
-  pieces: [
-    piece('plinth', 'hammer', 'Kit_FallenBlockA', 'base', 0, v(2.0, 0.5, 1.4), ZERO, v(0, 0.2, 0)),
-    piece('hip', 'hammer', 'Kit_CutBlockB', 'hip', 0, v(2.4, 1.1, 1.6), ZERO, ZERO, 'stone'),
-    piece('torso', 'heart', 'Kit_ColTorso', 'torso', 0, v(3.0, 2.2, 1.9)),
-    piece(
-      'chestSlab',
-      'hammer',
-      'Kit_SlabChunkA',
-      'torso',
-      0,
-      v(2.1, 1.4, 0.5),
-      v(0, 0.15, 0.95),
-      v(0.08, 0, 0),
-      'stone',
-    ),
-    piece(
-      'backSlab',
-      'hammer',
-      'Kit_SlabChunkB',
-      'torso',
-      0,
-      v(2.8, 2.2, 0.7),
-      v(0, 0.35, -1.1),
-      v(-0.14, 0, 0.04),
-      'stone',
-    ),
-    piece('head', 'heart', 'Kit_ColHead', 'head', 0, v(1.15, 1.05, 1.1)),
-    piece(
-      'shoulderL',
-      'hammer',
-      'Kit_CutBlockB',
-      'shoulder',
-      1,
-      v(1.8, 1.2, 1.9),
-      v(0.2, 0.15, 0),
-      v(0, 0, -0.2),
-      'stone',
-    ),
-    piece(
-      'shoulderR',
-      'hammer',
-      'Kit_CutBlockB',
-      'shoulder',
-      -1,
-      v(1.8, 1.2, 1.9),
-      v(0.2, 0.15, 0),
-      v(0, 0, -0.2),
-      'stone',
-    ),
-    piece('upperL', 'heart', 'Kit_ColUpperArm', 'upper', 1, v(0.95, 1.4, 0.95)),
-    piece('upperR', 'heart', 'Kit_ColUpperArm', 'upper', -1, v(0.95, 1.4, 0.95)),
-    piece('foreL', 'heart', 'Kit_ColForearm', 'fore', 1, v(1.05, 1.3, 1.05)),
-    piece('foreR', 'heart', 'Kit_ColForearm', 'fore', -1, v(1.05, 1.3, 1.05)),
-    piece(
-      'fistL',
-      'hammer',
-      'Kit_CutBlockA',
-      'hand',
-      1,
-      v(1.25, 1.1, 1.25),
-      ZERO,
-      v(0.2, 0.3, 0),
-      'stone',
-    ),
-    piece(
-      'fistR',
-      'hammer',
-      'Kit_CutBlockA',
-      'hand',
-      -1,
-      v(1.25, 1.1, 1.25),
-      ZERO,
-      v(0.2, -0.3, 0),
-      'stone',
-    ),
-    ...[0, 1, 2, 3, 4, 5, 6].map((i) =>
-      piece(
-        `chip${i}`,
-        'hammer',
-        ['Kit_SlabChunkA', 'Kit_SlabChunkC', 'Kit_FallenBlockB'][i % 3],
-        'skirt',
-        0,
-        v(0.6 + 0.15 * (i % 3), 0.42 + 0.08 * (i % 2), 0.55),
-        ZERO,
-        v(0.3 * (i % 2), i * 0.9, 0.2),
-        'stone',
-      ),
-    ),
-  ],
-  thread: COUNCIL_BODY_COLORS.ochre,
-  glow: COUNCIL_BODY_COLORS.ochre,
-  threadWidth: 0.15,
-};
 
 /** The Seam Singer: a tall, slender figure of seam stone, a long robe of
  *  shards trailing under it, a narrow chest with an amber heart crystal,
@@ -432,14 +310,13 @@ const SINGER: CouncilBodyPlan = {
 };
 
 export const COUNCIL_BODY_PLANS: Readonly<Record<CouncilBodyKind, CouncilBodyPlan>> = {
-  slabwright: SLABWRIGHT,
   singer: SINGER,
 };
 
 // ---- the casts ------------------------------------------------------------------------
 
-/** What a cast bar does to the body: the Slabwright raises its arms and
- *  slams (Wake the Stone, Falling Rock); the Singer sings, arms up, its
+/** What a cast bar does to the body: the Singer raises its arms and slams
+ *  (Wake the Stone, Falling Rock), sings, arms up, its
  *  crystals flaring (the song), or points one hand (Seam Bolt); either one
  *  hunches and gathers the Wrath it inherited. */
 export type CouncilBodyAction = 'idle' | 'swing' | 'raise' | 'sing' | 'point' | 'wrath';
@@ -449,7 +326,6 @@ export const COUNCIL_BODY_CASTS = {
   rock: 'heart_falling_rock',
   bolt: 'heart_seam_bolt',
   song: 'heart_song_of_the_seam',
-  songUnbroken: 'heart_song_of_the_seam_unbroken',
   wrath: 'heart_mountains_wrath',
 } as const;
 
@@ -460,8 +336,8 @@ export function councilCastAction(
   if (!castId) return null;
   const C = COUNCIL_BODY_CASTS;
   if (castId === C.wrath) return 'wrath';
-  if (kind === 'slabwright' && (castId === C.wake || castId === C.rock)) return 'raise';
-  if (castId === C.song || castId === C.songUnbroken) return 'sing';
+  if (kind === 'singer' && (castId === C.wake || castId === C.rock)) return 'raise';
+  if (castId === C.song) return 'sing';
   if (castId === C.bolt) return 'point';
   return null;
 }
@@ -481,19 +357,15 @@ export const COUNCIL_SWING_SECONDS = 0.8;
 
 /** The body's slow breath: its bob (yards), how far pieces drift off their
  *  joints, and the threads' stretch, by render time. The Singer sways more
- *  and slower; the Slabwright barely lifts. */
+ *  slowly. */
 export function councilBreath(
   kind: CouncilBodyKind,
   t: number,
   out: { bob: number; drift: number } = { bob: 0, drift: 0 },
 ): { bob: number; drift: number } {
-  if (kind === 'singer') {
-    out.bob = 0.12 * Math.sin(t * 0.8);
-    out.drift = 0.06 + 0.04 * Math.sin(t * 1.1 + 0.6);
-  } else {
-    out.bob = 0.06 * Math.sin(t * 1.1);
-    out.drift = 0.05 + 0.03 * Math.sin(t * 1.4 + 0.3);
-  }
+  void kind;
+  out.bob = 0.12 * Math.sin(t * 0.8);
+  out.drift = 0.06 + 0.04 * Math.sin(t * 1.1 + 0.6);
   return out;
 }
 
@@ -723,7 +595,6 @@ export function councilPlanWidth(plan: CouncilBodyPlan): number {
  *  elbows), and each ember's size as a share of the body's height. */
 export const COUNCIL_EMBER_JOINTS: readonly number[] = [1, 2, 4, 5, 6, 7];
 export const COUNCIL_EMBER_SIZE: Readonly<Record<CouncilBodyKind, number>> = {
-  slabwright: 0.26,
   singer: 0.17,
 };
 

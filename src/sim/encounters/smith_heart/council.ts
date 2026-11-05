@@ -1,34 +1,37 @@
 // The Hammer Council (docs/design/raid/smith_heart.md section 7.1): the
-// Quarry's first boss is three stone beings sharing the Hammer's strength, the
-// Guardian of the Hammer (the tank boss, council_wrath.ts), the Slabwright (the
-// pillar maker, council_stone.ts) and the Seam Singer (the caster,
-// council_song.ts), fought round the quarry's pillars (council_pillars.ts).
+// Quarry's first boss is two stone beings sharing the Hammer's strength, the
+// Guardian of the Hammer (the melee tank boss: Mountain's Wrath and Hammer's
+// Weight, council_wrath.ts; Mountain's Rush, council_rush.ts) and the Seam
+// Singer (the caster: Seam Bolt, the song and Resonance, council_song.ts;
+// Wake the Stone and Falling Rock, council_stone.ts), fought round the
+// quarry's pillars (council_pillars.ts). (The prototype's third member, the
+// Slabwright, left in the two-boss rework: "two melee bosses" was redundant.)
 //
-//   One pull       the three share one authored pack: pulling one pulls all
-//                  three, and a member whose foe fell is put back on the fight
-//                  with its siblings' hate while any of them fights.
-//   One wipe       the fight ends when no living member is fighting: every
-//                  fallen member stands up whole at its place (no reward twice,
+//   One pull       the two share one authored pack: pulling one pulls both,
+//                  and a member whose foe fell is put back on the fight with
+//                  its sibling's hate while the other fights.
+//   One wipe       the fight ends when no living member is fighting: a fallen
+//                  member stands up whole at its place (no reward twice,
 //                  Entity.regrown), the five columns stand whole again, the
 //                  risen pillars, marks, rubble and stacks go.
-//   One kill       complete only when all three are dead: the Slab, the heart
-//                  seal's Hammer vein and every credit wait on all three
+//   One kill       complete only when both are dead: the Slab, the heart
+//                  seal's Hammer vein and every credit wait on both
 //                  (content/smith_heart.ts gate, seal.ts). The risen pillars
-//                  sink back into the floor.
+//                  sink back into the floor and the columns stand again.
 //   The stone remembers
-//                  when one falls, each survivor gains a stack of Memory of
-//                  Stone (more damage dealt) and takes up the fallen one's job
-//                  in a worse form (council_scope.ts jobHolder): the pillars
-//                  under random players on a 2 s warning, the song on three
-//                  that no kick stops, a shorter Wrath. The last one carries
-//                  both.
+//                  when one falls, the survivor gains Memory of Stone (more
+//                  damage dealt) and takes up the fallen one's signature in a
+//                  weaker form (council_scope.ts jobHolder): the Guardian
+//                  fallen, the Singer casts a shorter, lighter Wrath; the
+//                  Singer fallen, the Guardian raises the pillars itself, less
+//                  often, under random players on a 2 s warning.
 //
-// Difficulty: the claim's (heroic Resonance overlaps Wrath, two marks for
-// Wake the Stone, the pillars pulse), with a dev switch for a run while the
-// raid has no heroic tier of its own (setCouncilDevHeroic). Mythic, a
+// Difficulty: the claim's (heroic: Resonance, the Wake and the Rush may overlap
+// the Wrath, three Wake marks, the pillars pulse), with a dev switch for a run
+// while the raid has no heroic tier of its own (setCouncilDevHeroic). Mythic, a
 // prototype behind its own dev switch until the game has a mythic tier
 // (setCouncilDevTier), is one more COUNCIL_DIFFICULTY row: stronger
-// inheritances, the rock outliving the Slabwright, and Soul in the Stone
+// inheritances, the rock outliving the Singer, and Soul in the Stone
 // (council_soul.ts: a fallen member's soul takes a pillar).
 //
 // Deterministic: every pick is hashed or ordered (roles, roster, entity ids);
@@ -44,6 +47,7 @@ import { addThreat, clearThreat } from '../../threat';
 import { DT, type Entity } from '../../types';
 import { regrowHead } from '../drowned_temple/hydra_regrowth';
 import { claimBoss, dropAuraById } from '../sunken_bastion/claim';
+import { clearBond, stepBond } from './council_bond';
 import { carryWrathHold, startFloorMechanics } from './council_floor';
 import {
   COUNCIL_AURAS,
@@ -65,16 +69,14 @@ import {
   settlePillars,
   stepRubble,
 } from './council_pillars';
-import { clearPrisons, landPrisonBar, startPrison, stepPrisons } from './council_prison';
+import { clearRush, landRush, startRush, stepCursed, stepRush } from './council_rush';
 import {
   type CouncilScope,
   damageMult,
   holdPlantedAt,
   living,
   quarryPlayers,
-  raidWarn,
 } from './council_scope';
-import { stepShoulder } from './council_shoulder';
 import {
   applyResonance,
   clearSong,
@@ -151,15 +153,14 @@ export function councilDifficulty(inst: InstanceSlot): CouncilDifficulty {
 
 export type CouncilBodies = Record<CouncilRole, Entity | null>;
 
-/** The claim's three council members (dead or alive), or null when the claim
- *  holds none of them. */
+/** The claim's two council members (dead or alive), or null when the claim
+ *  holds neither. */
 export function councilBodies(ctx: SimContext, inst: InstanceSlot): CouncilBodies | null {
   const b: CouncilBodies = {
     guardian: claimBoss(ctx, inst, COUNCIL_TEMPLATES.guardian),
-    slabwright: claimBoss(ctx, inst, COUNCIL_TEMPLATES.slabwright),
     singer: claimBoss(ctx, inst, COUNCIL_TEMPLATES.singer),
   };
-  return b.guardian || b.slabwright || b.singer ? b : null;
+  return b.guardian || b.singer ? b : null;
 }
 
 /** The council's shared state when a fight runs (or ran to its end). */
@@ -188,12 +189,14 @@ function freshState(difficulty: CouncilDifficulty): CouncilFightState {
     difficulty,
     finished: false,
     clock: 0,
-    shoulderWarnAt: 0,
-    prisonTimer: T.prisonFirst,
-    prisons: [],
     energy: 0,
     wraths: 0,
     weightTimer: T.weightFirst,
+    rushTimer: T.rushFirst,
+    rush: null,
+    cursed: null,
+    collapse: null,
+    bond: { pulses: 0, timer: T.bondPulseEvery },
     wakeTimer: T.wakeFirst,
     rockTimer: T.rockFirst,
     boltTimer: T.boltFirst,
@@ -202,7 +205,7 @@ function freshState(difficulty: CouncilDifficulty): CouncilFightState {
     pulseTimer: T.pulseEvery,
     quiet: 0,
     bars: {},
-    gaps: { guardian: 0, slabwright: 0, singer: 0 },
+    gaps: { guardian: 0, singer: 0 },
     kickable: null,
     wakeMarks: [],
     riseSpots: [],
@@ -238,14 +241,7 @@ function scopeOf(
 
 // ---- the stone remembers ----------------------------------------------------------------
 
-/** The lines the raid reads as each one falls (raid warnings). */
-const FALLEN_LINES: Readonly<Record<CouncilRole, string>> = {
-  guardian: 'The Guardian of the Hammer falls. Its wrath passes into the stone that remains!',
-  slabwright: 'The Slabwright falls. Now the stone rises where it will!',
-  singer: 'The Seam Singer falls. Its song passes on, and no one can stop it now!',
-};
-
-/** Memory of Stone on each living member: one stack per fallen member. */
+/** Memory of Stone on the living member: one stack per fallen member. */
 function syncMemory(s: CouncilScope): void {
   const fallen = s.st.fallen.length;
   for (const r of COUNCIL_ROLES) {
@@ -294,9 +290,14 @@ function noteFallen(s: CouncilScope, role: CouncilRole, dead: Entity): void {
     });
   }
   const survivor = COUNCIL_ROLES.map((r) => s.bodies[r]).find(living);
-  if (survivor) raidWarn(s, survivor, `fell_${role}`, FALLEN_LINES[role]);
-  // The Wrath's heir starts its own (shorter) fill from empty.
-  if (role === 'guardian') s.st.energy = 0;
+  // The Wrath's heir starts its own (shorter) fill from empty; the Rush dies
+  // with the Guardian.
+  if (role === 'guardian') {
+    s.st.energy = 0;
+    clearRush(s);
+  }
+  // No bond with the fallen: the survivor's ward lifts now.
+  clearBond(s);
   // Mythic: its soul takes the most intact pillar (council_soul.ts).
   const soul = survivor && s.rules.soulInTheStone ? takeSoul(s, role, dead) !== null : false;
   if (survivor) sayFallen(s, role, soul);
@@ -318,21 +319,20 @@ function landBar(s: CouncilScope, role: CouncilRole, body: Entity): void {
     case COUNCIL_CASTS.weight:
       landWeight(s, body, bar.targetId);
       return;
+    case COUNCIL_CASTS.rush:
+      landRush(s, body, bar.targetId);
+      return;
     case COUNCIL_CASTS.wake:
       landWake(s, body);
       return;
     case COUNCIL_CASTS.rock:
       landRockBar(s, body);
       return;
-    case COUNCIL_CASTS.prison:
-      landPrisonBar(s, body);
-      return;
     case COUNCIL_CASTS.bolt:
       landBolt(s, body, bar.targetId);
       return;
     case COUNCIL_CASTS.song:
-    case COUNCIL_CASTS.songUnbroken:
-      landSong(s, body, bar.heir);
+      landSong(s, body);
       return;
   }
 }
@@ -378,7 +378,7 @@ function startBars(s: CouncilScope): void {
   st.weightTimer -= DT;
   st.wakeTimer -= DT;
   st.rockTimer -= DT;
-  st.prisonTimer -= DT;
+  st.rushTimer -= DT;
   st.boltTimer -= DT;
   st.songTimer -= DT;
   if (st.songDue !== null) st.songDue -= DT;
@@ -387,17 +387,16 @@ function startBars(s: CouncilScope): void {
   if (st.songDue !== null && st.songDue < -T.songLateDrop) st.songDue = null;
   st.quiet = Math.max(0, st.quiet - DT);
   // The floor mechanics first, the Wrath at their head, one per floor gap
-  // (council_floor.ts: the Wrath, the Echo, Wake the Stone, the rock, the
-  // Walking Slab's start).
+  // (council_floor.ts: the Wrath, the Echo, Wake the Stone, the Rush, the
+  // rock).
   startFloorMechanics(s);
   // The song next: on normal it is owed only just after a Wrath.
   startSong(s);
-  if (st.prisonTimer <= 0) startPrison(s);
   if (st.weightTimer <= 0) startWeight(s);
   if (st.boltTimer <= 0) startBolt(s);
 }
 
-// ---- keeping the three together ---------------------------------------------------------
+// ---- keeping the two together ---------------------------------------------------------
 
 /** A living member out of the fight while a sibling fights (its foe fell, or
  *  the pack pull missed it) joins it again on the sibling's foe and hate. */
@@ -457,7 +456,8 @@ function resetCouncil(ctx: SimContext, inst: InstanceSlot, bodies: CouncilBodies
     const s = scopeOf(ctx, inst, st, bodies);
     clearStone(s);
     clearSong(s);
-    clearPrisons(s);
+    clearRush(s);
+    clearBond(s);
     clearRubble(ctx, inst, st);
     // The tank keeps no Weight past the fight.
     dropClaimWeight(ctx, inst);
@@ -468,7 +468,9 @@ function resetCouncil(ctx: SimContext, inst: InstanceSlot, bodies: CouncilBodies
     const b = bodies[r];
     if (!b) continue;
     dropAuraById(b, COUNCIL_AURAS.memory);
-    dropAuraById(b, COUNCIL_AURAS.shouldered);
+    // The Rush's reel (its stun, the extra damage) never outlives the fight.
+    dropAuraById(b, COUNCIL_AURAS.rushStunned);
+    dropAuraById(b, COUNCIL_AURAS.rushExposed);
     if (b.dead && anyAlive) regrowHead(ctx, b, 1);
     b.resource = 0;
   }
@@ -476,7 +478,7 @@ function resetCouncil(ctx: SimContext, inst: InstanceSlot, bodies: CouncilBodies
   restorePillars(ctx, inst);
 }
 
-/** All three are down: the end is resolved once; the risen stone sinks. */
+/** Both are down: the end is resolved once; the risen stone sinks. */
 function finishCouncil(
   ctx: SimContext,
   inst: InstanceSlot,
@@ -492,6 +494,8 @@ function finishCouncil(
   crumbleSouls(s);
   clearStone(s);
   clearSong(s);
+  clearRush(s);
+  clearBond(s);
   clearRubble(ctx, inst, st);
   clearBars(bodies);
   dropClaimWeight(ctx, inst);
@@ -502,7 +506,7 @@ function finishCouncil(
   }
 }
 
-/** The fight starts: one state for all three, the energy empty. */
+/** The fight starts: one state for both, the energy empty. */
 function beginCouncil(
   ctx: SimContext,
   inst: InstanceSlot,
@@ -548,10 +552,11 @@ export function tickHammerCouncil(ctx: SimContext, inst: InstanceSlot): void {
     if (b && !living(b) && !st.fallen.includes(r)) noteFallen(s, r, b);
   }
   syncMemory(s);
-  stepShoulder(s);
-  stepPrisons(s);
   stepCouncilVoice(s);
   stepBars(s);
+  stepRush(s);
+  stepCursed(s);
+  stepBond(s);
   fillEnergy(s);
   syncEnergyBars(s);
   stepRises(s);
@@ -659,14 +664,16 @@ export function councilDevTrigger(
     return startWake(s) ? 'Wake the Stone.' : 'No pillar can rise (the cap, or nobody holds it).';
   }
   if (verb === 'rock') {
-    cut('slabwright');
+    for (const r of COUNCIL_ROLES) cut(r);
     s.st.rock = null;
-    return startRock(s) ? 'Falling Rock.' : 'The Slabwright has fallen or is busy.';
+    return startRock(s) ? 'Falling Rock.' : 'Nobody can drop the rock (fallen or busy).';
   }
-  if (verb === 'prison') {
-    return startPrison(s)
-      ? 'Stone Prison.'
-      : 'The Slabwright has fallen, is busy or holds its blocks.';
+  if (verb === 'rush') {
+    cut('guardian');
+    s.st.rush = null;
+    return startRush(s)
+      ? "Mountain's Rush."
+      : 'The Guardian has fallen, or nobody but a tank stands on the floor.';
   }
   if (verb === 'bolt') {
     cut('singer');

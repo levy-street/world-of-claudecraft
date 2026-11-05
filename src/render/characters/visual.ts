@@ -186,6 +186,7 @@ import { createTurnInPlaceState, stepTurnInPlace } from './turn_in_place_core';
 import { warriorActionBlend } from './warrior_action_blend';
 import { WarriorActionProps } from './warrior_action_props';
 import { WarriorBodyEffects } from './warrior_body_effects';
+import { easeSink } from './water_sink_core';
 import { SPIN_ATTACK_VISUAL_DURATION, weaponAttackStyle } from './weapon_attack_style_core';
 import { fixedHandPropsShown, swappedClip, weaponLoadout } from './weapon_loadout_core';
 import {
@@ -1311,6 +1312,9 @@ export class CharacterVisual {
   private readonly harvestRecoil = new HarvestRecoil();
   private auraGlowColor = 0xffffff;
   private auraGlowIntensity = 0;
+  /** The drawn sink into water (setWaterSink) and where it is easing to. */
+  private waterSink = 0;
+  private waterSinkTarget = 0;
 
   private baseState: BaseState = 'idle';
   /** The seat facts of the last update (AnimState.seat): which chair clips the sit and
@@ -1865,6 +1869,8 @@ export class CharacterVisual {
       this.braceUntil = extendBrace(this.braceUntil, this.clock);
     }
     if (this.surfaceResponse.update(dt, this.root, this.height)) this.applyVisualMaterials();
+    if (this.waterSink !== this.waterSinkTarget)
+      this.waterSink = easeSink(this.waterSink, this.waterSinkTarget, dt);
     // A streamed armor file that landed (or a better tier of one): the dressing
     // attaches it (at once with no work queue behind this body, else as a unit
     // of it), and the re-dress that follows is here, on the per-frame path.
@@ -2298,7 +2304,9 @@ export class CharacterVisual {
     // as the character falling off the wall. Authored maps only: the built-in
     // world keeps the upright body it shipped with.
     this.poseWrap.rotation.z = isBuiltinWorldActive() ? 0 : (s.bankRoll ?? 0) * (1 - climb);
+    // (the rig root is the mount seat's; a body sunk in water rides the pose)
     this.poseWrap.position.y =
+      -this.waterSink +
       this.swimBlend * (swimRise + Math.sin(this.swimBobTime * 2 + this.bobPhase) * 0.08) +
       // Compress at the start of the pull, back to neutral as the body rises.
       CLIMB_BODY_DUCK * climb * (1 - env01(this.climbPhase, 0.1, 0.55));
@@ -3864,9 +3872,26 @@ export class CharacterVisual {
    *  no glow pulse, turn or entrance carries over from the last one. */
   resetForReuse(): void {
     this.turnState.seeded = false;
+    this.waterSink = 0;
+    this.waterSinkTarget = 0;
     this.entranceFor = undefined;
     this.wasSwimming = false;
     if (this.glowPulse?.reset() && !this.disposed) this.applyVisualMaterials();
+  }
+
+  /** Draw the body this far down into water it fell into (the Quench's
+   *  holes, smith_heart_fx/quench_glaze_core.ts quenchSinkOf), eased per frame;
+   *  0 stands it back on its feet. Presentation only. */
+  setWaterSink(depth: number): void {
+    this.waterSinkTarget = Math.max(0, depth);
+  }
+
+  /** A frost glaze held on the body's own material (the Quench's cold,
+   *  smith_heart_fx/quench_glaze_core.ts), or null to release it. Re-mounts
+   *  only on the on/off edge; while held, only its uniform moves. */
+  setFrostGlaze(glaze: { height: number; glow: number; bite: number; alpha: number } | null): void {
+    if (this.disposed) return;
+    if (this.surfaceResponse.setGlaze(glaze)) this.applyVisualMaterials();
   }
 
   clearElementResponse(): void {

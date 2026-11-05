@@ -322,10 +322,11 @@ describe('the merged head program under the guaranteed fragment uniform vectors'
       expect(uniformVectorRows(named(plain.uniforms, /Lights?\b|ambientLightColor/))).toBe(
         4 * carriers + 2 + 3 + 1,
       );
-      // the hit response adds its own seven and nothing else
+      // the hit response adds its own eight and nothing else (the eighth the held frost
+      // glaze, the Quench's cold painted on the body, 2026-11-04)
       const response = named(struck.uniforms, /^uSurface/);
-      expect(uniformVectorRows(response)).toBe(7);
-      expect(uniformVectorRows(struck.uniforms)).toBe(own + three + 7);
+      expect(uniformVectorRows(response)).toBe(8);
+      expect(uniformVectorRows(struck.uniforms)).toBe(own + three + 8);
       expect(named(plain.uniforms, /^uSurface/)).toEqual([]);
       for (const { uniforms, samplers } of [plain, struck]) {
         const rows = uniformVectorRows(uniforms);
@@ -344,19 +345,19 @@ describe('the merged head program under the guaranteed fragment uniform vectors'
       // browser suite reads a few fewer off the linked standard program: a driver drops what
       // a layer declares and leaves unread, the roughness and the metalness here; the camera
       // position is read, by the Gloamveil climb every rig material carries)
-      expect(uniformVectorRows(struck.uniforms)).toBe(lib === 'standard' ? 160 : 158);
+      expect(uniformVectorRows(struck.uniforms)).toBe(lib === 'standard' ? 161 : 159);
     },
   );
 
   it('prices a slot and a carrier at four vectors each: what the room left would take', () => {
     // arithmetic on the count above (the slot count is a constant: no program is rebuilt
-    // at another): four tables a slot, so the 64 vectors left under the limit are sixteen
-    // more slots and no more, or sixteen more carriers
+    // at another): four tables a slot, so the 63 vectors left under the limit (the held
+    // frost glaze took one) are fifteen more slots and no more, or fifteen more carriers
     const { uniforms } = mergedHeadUniforms('standard', carriers, true);
     const rows = uniformVectorRows(uniforms);
     const left = GUARANTEED_FRAGMENT_UNIFORM_VECTORS - rows;
-    expect(left).toBe(64);
-    expect(Math.floor(left / 4)).toBe(16);
+    expect(left).toBe(63);
+    expect(Math.floor(left / 4)).toBe(15);
     // ...and a carrier really costs four of it: the same program under four fewer
     const fewer = mergedHeadUniforms('standard', carriers - 4, true);
     expect(rows - uniformVectorRows(fewer.uniforms)).toBe(16);

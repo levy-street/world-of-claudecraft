@@ -3,7 +3,8 @@
 // the wind channels' jambs, the Wind Bridge's arch and its shelters, the low
 // walls along every Breath walk over the void, the landings' standing stones
 // and the plateau's inlays (its cracks, the strikes' scars, the Smith's wind
-// grooves). Never flatten or join: the runtime bakes each Kit_* node on its
+// grooves) and the Islands of the Wind (two floating islets, their drifting
+// stones). Never flatten or join: the runtime bakes each Kit_* node on its
 // own (src/render/smith_heart/heart_kit.ts) and places it over the Breath's
 // plan (src/render/smith_heart/breath_kit_plan_core.ts).
 //
@@ -40,6 +41,11 @@ export const SMITH_HEART_BREATH_KIT_PIECES = [
   'PlateauCrackB',
   'StrikeScar',
   'WindGroove',
+  // The Islands of the Wind (the third pass): two floating islets of the
+  // summit's granite and the stones that drift round them.
+  'WindIsleA',
+  'WindIsleB',
+  'IsleShard',
 ];
 
 export const ASSET = {
@@ -62,6 +68,7 @@ export function sourceFingerprint(root = ROOT) {
     'docs/design/raid/kit/shkit.py',
     'docs/design/raid/kit/ring_sculpt.py',
     'docs/design/raid/kit/breath_pieces.py',
+    'docs/design/raid/kit/breath_isles.py',
     'docs/design/raid/kit/build_smith_heart_breath_kit.py',
     'docs/design/raid/kit/build_smith_heart_hammer_kit.py',
     'scripts/assets/smith_heart_breath_kit/build.mjs',

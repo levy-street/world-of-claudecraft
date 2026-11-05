@@ -401,9 +401,11 @@ describe('isHarvestableCorpse', () => {
     // The Guardian of the Heat's four untagged adds (Wellspawn, Wellkeeper,
     // Seedflame, Rolling Cinder): 319.
     expect(untagged).toContain(MOBS.heart_heat_rolling_cinder);
-    // The Masterless Strength's four Splinters and the Hammer Council's Stone
-    // Prison block, untagged too: 324.
-    expect(untagged).toContain(MOBS.heart_stone_prison);
+    // The Masterless Strength's four Splinters, untagged too. (The Hammer
+    // Council's Slabwright and its Stone Prison block left in the two-boss
+    // rework: two fewer.)
+    expect(MOBS.heart_stone_prison).toBeUndefined();
+    expect(MOBS.heart_slabwright).toBeUndefined();
     // Thatchgrin, his strawling and crow adds, and the swelling gourd are
     // encounter bodies without harvest components.
     for (const id of [
@@ -413,7 +415,7 @@ describe('isHarvestableCorpse', () => {
       'gourdlight_swelling_gourd',
     ])
       expect(untagged).toContain(MOBS[id]);
-    expect(untagged).toHaveLength(328);
+    expect(untagged).toHaveLength(326);
     for (const m of untagged) expect(isHarvestableCorpse(m.componentTags)).toBe(false);
     // The three literals above are the load-bearing ones; this sum states that
     // they partition MOBS, so a template that fell out of all three would read

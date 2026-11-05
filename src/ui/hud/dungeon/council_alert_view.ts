@@ -4,29 +4,28 @@
 //  - Falling Rock on you: gather three or more, away from the pillars;
 //  - Wake the Stone on you: a pillar rises where you stand, so stand where the
 //    cover should go;
+//  - Mountain's Rush on you: lead the charge into the cursed pillar;
 //  - Hammer's Weight (a tank): the other tank takes the Guardian;
-//  - Resonance: by a pillar you crack it; the line turns urgent while a crack
-//    is climbing (the aura's value is the share of its 3 s stood).
-//  - Mythic, while a soul pillar stands: the rock and Resonance lines say
-//    their second duty (break its soul pips), and a climb on a soul pillar
-//    reads as the good news it is (stay), never as the urgent crack.
-// Every bar is the mark's own time left. Priority: the rock over the wake
-// over the Weight over Resonance. The painter is the shared encounter alert's
+//  - Resonance (a spread): move away from the group until it ends;
+//  - Mythic, while a soul pillar stands: the rock line says its second duty
+//    (break its soul pips).
+// Every bar is the mark's own time left. Priority: the Rush over the rock
+// over the wake over the Weight over Resonance. The painter is the shared encounter alert's
 // (encounter_alert_painter.ts); every decision is here.
 
 import { COUNCIL_AURAS, councilSoulOf } from '../../../sim/encounters/smith_heart/council_ids';
 import { formatNumber, t } from '../../i18n';
 import type { EncounterAlertHidden, EncounterAlertLive } from './encounter_alert_view';
 
-export type CouncilAlertKind = 'rock' | 'wake' | 'weight' | 'resonance' | 'cracking';
+export type CouncilAlertKind = 'rush' | 'rock' | 'wake' | 'weight' | 'resonance';
 
 /** Every kind class the painter toggles (the CSS keys on them). */
 export const COUNCIL_ALERT_KINDS: readonly CouncilAlertKind[] = [
+  'rush',
   'rock',
   'wake',
   'weight',
   'resonance',
-  'cracking',
 ];
 
 export type CouncilAlertLive = Omit<EncounterAlertLive, 'kind'> & { kind: CouncilAlertKind };
@@ -44,8 +43,8 @@ interface AlertAura {
 
 export interface CouncilAlertInput {
   auras: readonly AlertAura[];
-  /** Mythic: does a soul pillar stand (asked only while a rock or a
-   *  Resonance mark is on the player), and is this entity one? */
+  /** Mythic: does a soul pillar stand (asked only while a rock mark is on
+   *  the player), and is this entity one? */
   soul?: { stands(): boolean; is(id: number): boolean };
 }
 
@@ -121,6 +120,14 @@ export class CouncilSoulScan {
 }
 
 export function buildCouncilAlertView(input: CouncilAlertInput): CouncilAlertView {
+  const rush = auraOf(input.auras, COUNCIL_AURAS.rushMark);
+  if (rush)
+    return live(
+      'rush',
+      t('hudChrome.council.alert.rushTitle'),
+      t('hudChrome.council.alert.rushLine'),
+      rush,
+    );
   const rock = auraOf(input.auras, COUNCIL_AURAS.rockMark);
   if (rock)
     return live(
@@ -148,23 +155,12 @@ export function buildCouncilAlertView(input: CouncilAlertInput): CouncilAlertVie
       weight,
     );
   const res = auraOf(input.auras, COUNCIL_AURAS.resonance);
-  if (res) {
-    const cracking = (res.value ?? 0) > 0;
-    // The pillar it climbs on is its value2: a soul pillar's pip is the point.
-    const onSoul = cracking && !!res.value2 && (input.soul?.is(res.value2) ?? false);
-    const line = onSoul
-      ? t('hudChrome.council.alert.resonanceBreaking')
-      : cracking
-        ? t('hudChrome.council.alert.resonanceCracking')
-        : input.soul?.stands()
-          ? t('hudChrome.council.alert.resonanceLineSoul')
-          : t('hudChrome.council.alert.resonanceLine');
+  if (res)
     return live(
-      onSoul ? 'resonance' : cracking ? 'cracking' : 'resonance',
+      'resonance',
       t('hudChrome.council.alert.resonanceTitle'),
-      line,
+      t('hudChrome.council.alert.resonanceLine'),
       res,
     );
-  }
   return HIDDEN;
 }

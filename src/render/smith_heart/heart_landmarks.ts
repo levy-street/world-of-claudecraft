@@ -24,12 +24,13 @@
 
 import * as THREE from 'three';
 import type { SmithHeartVein } from '../../sim/content/smith_heart_layout';
-import { sharedUniforms } from '../gfx';
+import { GFX, sharedUniforms } from '../gfx';
 import { type HeartAirV3, type HeartAirV4, heartQuadGeometry } from './heart_air_quads';
 import { heartKitMeshes, SMITH_HEART_HEART_KIT_URL } from './heart_kit';
 import {
   HEART_LANDMARK_FRAME,
   heartBreathBolts,
+  heartLandmarkHaloSpots,
   heartLandmarkPoint,
   heartLandmarkSpots,
 } from './heart_landmarks_core';
@@ -37,6 +38,7 @@ import {
   BOLT_VERT,
   LANDMARK_BILLOW_VERT,
   LANDMARK_HALO_VERT,
+  LANDMARK_HEAT_BLOOM_VERT,
   LANDMARK_PLUME_VERT,
   landmarkGlowFrag,
 } from './heart_landmarks_glsl';
@@ -127,6 +129,17 @@ export function buildHeartLandmarks(lowGfx: boolean, centre: THREE.Vector3): Hea
   const A = HEART_LANDMARK_AIR;
   const rigs = new Map<SmithHeartVein, LandmarkRig>();
   const veins: SmithHeartVein[] = ['breath', 'quench', 'hammer', 'heat'];
+  // Every landmark's rock is painted in its vertex colours (landmark_paint.py,
+  // one sculpt grammar, landmark_crag.py): the shared stone's photographic
+  // fracture would turn that paint to camouflage. Built-in, no texture, one program.
+  const painted = GFX.standardMaterials
+    ? new THREE.MeshStandardMaterial({
+        name: 'smithHeartLandmarkPainted',
+        vertexColors: true,
+        metalness: 0,
+        roughness: 0.92,
+      })
+    : new THREE.MeshLambertMaterial({ name: 'smithHeartLandmarkPainted', vertexColors: true });
 
   for (const vein of veins) {
     const glow = new THREE.ShaderMaterial({
@@ -152,6 +165,9 @@ export function buildHeartLandmarks(lowGfx: boolean, centre: THREE.Vector3): Hea
       for (const m of piece.children) {
         if (!(m instanceof THREE.Mesh)) continue;
         if (m.name.endsWith(':glow')) m.material = glow;
+        // All four painted alike since the third round (the Heat's dark basalt
+        // through the shared stone's fracture read as pure black faces).
+        else if (m.name.endsWith(':stone')) m.material = painted;
         if (lowGfx) m.castShadow = false;
       }
       group.add(piece);
@@ -194,10 +210,23 @@ export function buildHeartLandmarks(lowGfx: boolean, centre: THREE.Vector3): Hea
     return { bases, params };
   };
   const halo = (vein: SmithHeartVein, color: number, size: number) => {
-    const spots = heartLandmarkSpots(vein);
-    const mat = airMat(`smithHeartLandmarkHalo:${vein}`, LANDMARK_HALO_VERT, color, 0xffffff, 0.5, {
-      uQuiet: { value: 0 },
-    });
+    // The Heat's is its crater's bloom alone (heartLandmarkHaloSpots).
+    const spots = heartLandmarkHaloSpots(vein);
+    const heat = vein === 'heat';
+    const mat = heat
+      ? airMat(
+          `smithHeartLandmarkHalo:${vein}`,
+          LANDMARK_HEAT_BLOOM_VERT,
+          color,
+          P.heat.hot,
+          0.42,
+          {
+            uQuiet: { value: 0 },
+          },
+        )
+      : airMat(`smithHeartLandmarkHalo:${vein}`, LANDMARK_HALO_VERT, color, 0xffffff, 0.5, {
+          uQuiet: { value: 0 },
+        });
     add(
       vein,
       `heartLandmarkHalo:${vein}`,
@@ -229,9 +258,11 @@ export function buildHeartLandmarks(lowGfx: boolean, centre: THREE.Vector3): Hea
       'heartLandmarkSmoke:heat',
       s.bases,
       s.params,
-      airMat('smithHeartLandmarkSmoke', LANDMARK_BILLOW_VERT, 0x5a2a1c, 0xff6a2a, 0.22, {
+      // Soot, lit only low by the crater (its lit salmon read as floating
+      // globes in the AAA review).
+      airMat('smithHeartLandmarkSmoke', LANDMARK_BILLOW_VERT, 0x241e1c, 0x6a3826, 0.16, {
         uRise: { value: 26 },
-        uSize: { value: 6.0 },
+        uSize: { value: 7.0 },
       }),
     );
     halo('heat', P.heat.color, 1.1);

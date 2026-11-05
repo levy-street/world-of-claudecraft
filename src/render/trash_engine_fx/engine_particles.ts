@@ -21,7 +21,6 @@ import {
   shockRingLook,
 } from '../gravewyrm_sanctum_fx/sanctum_fx_core';
 import {
-  DUST_FRAG,
   FIRE_FRAG,
   FIRE_VERT,
   GHOST_RAMP,
@@ -30,8 +29,11 @@ import {
   ParticlePool,
   type ParticleSpec,
 } from '../hollow_crypt/crypt_fx_particles';
+import { SMOKE_FRAG, SMOKE_VERT } from './engine_smoke_glsl';
 
 const RING_SLOTS = 14;
+/** The shock ring's hot crest, as a share of its radius. */
+const RING_CREST = 0.22;
 
 const RING_VERT = /* glsl */ `
 varying vec3 vLocal;
@@ -45,14 +47,16 @@ const RING_FRAG = /* glsl */ `
 uniform vec3 uColor;
 uniform float uAlpha;
 uniform float uSeed;
+uniform float uWake;
+uniform float uCrest;
 varying vec3 vLocal;
 float h(float n) { return fract(sin(n) * 43758.5453); }
 void main() {
   float r = length(vLocal.xz);
   float a = atan(vLocal.z, vLocal.x);
-  float lead = smoothstep(0.78, 0.96, r) * (1.0 - smoothstep(0.96, 1.0, r));
+  float lead = smoothstep(1.0 - uCrest, 1.0 - uCrest * 0.18, r) * (1.0 - smoothstep(1.0 - uCrest * 0.18, 1.0, r));
   float broken = 0.6 + 0.4 * h(floor(a * 13.0) + uSeed);
-  float wake = smoothstep(0.3, 0.95, r) * 0.22 * step(r, 1.0);
+  float wake = smoothstep(0.3, 0.95, r) * 0.22 * uWake * step(r, 1.0);
   gl_FragColor = vec4(uColor * (1.0 + lead * 1.3), (lead * broken + wake) * uAlpha);
 }
 `;
@@ -76,6 +80,7 @@ export const ENGINE_PARTICLE_STEPS: Readonly<EngineParticleSteps> = {
 };
 
 interface Ring {
+  strength: number;
   mesh: THREE.Mesh;
   mat: THREE.ShaderMaterial;
   born: number;
@@ -147,8 +152,8 @@ export class EngineParticles {
     this.pools = {
       smoke: pool(
         'trashEngineSmoke',
-        PARTICLE_VERT,
-        DUST_FRAG,
+        SMOKE_VERT,
+        SMOKE_FRAG,
         THREE.NormalBlending,
         1200,
         steps.smoke,
@@ -188,6 +193,8 @@ export class EngineParticles {
           uColor: { value: new THREE.Color() },
           uAlpha: { value: 0 },
           uSeed: { value: i * 7.3 },
+          uWake: { value: 1 },
+          uCrest: { value: RING_CREST },
         },
         vertexShader: RING_VERT,
         fragmentShader: RING_FRAG,
@@ -202,7 +209,7 @@ export class EngineParticles {
       mesh.visible = false;
       mesh.renderOrder = floorVfxRenderOrder('encounter', steps.ring);
       root.add(mesh);
-      this.rings.push({ mesh, mat, born: 0, radius: 0, span: 1, alive: false });
+      this.rings.push({ mesh, mat, born: 0, radius: 0, span: 1, alive: false, strength: 1 });
     }
   }
 
@@ -238,7 +245,7 @@ export class EngineParticles {
       s.az = 0;
       s.life = o.life * (0.7 + this.rand() * 0.6);
       s.drag = o.drag ?? 1.2;
-      s.floor = y - 0.6;
+      s.floor = o.floor ?? y - 0.6;
       s.size0 = o.size[0];
       s.size1 = o.size[1];
       s.spin = (this.rand() - 0.5) * 2;
@@ -252,8 +259,22 @@ export class EngineParticles {
   }
 
   /** A shock ring racing out to `radius` over `seconds`. */
-  shockRing(x: number, z: number, color: number, radius: number, seconds: number): void {
+  /** `look`: a room-sized wave's own crest and wake (the family's crest is a
+   *  share of the radius: at 90 yd it would cover the floor and burn it out).
+   *  `wake` scales the filled air behind it, `crest` is the crest's share of
+   *  the radius, `strength` scales the whole ring. */
+  shockRing(
+    x: number,
+    z: number,
+    color: number,
+    radius: number,
+    seconds: number,
+    look?: { wake: number; crest: number; strength: number },
+  ): void {
     const slot = this.rings.find((r) => !r.alive) ?? this.rings[0];
+    slot.mat.uniforms.uWake.value = look?.wake ?? 1;
+    slot.mat.uniforms.uCrest.value = look?.crest ?? RING_CREST;
+    slot.strength = look?.strength ?? 1;
     slot.alive = true;
     slot.born = this.clock;
     slot.radius = radius;
@@ -275,7 +296,7 @@ export class EngineParticles {
       }
       const look = shockRingLook(elapsed, r.radius, r.span);
       r.mesh.scale.setScalar(Math.max(0.01, look.radius));
-      r.mat.uniforms.uAlpha.value = look.alpha;
+      r.mat.uniforms.uAlpha.value = look.alpha * r.strength;
     }
     for (const p of this.poolList) p.update(clock);
   }

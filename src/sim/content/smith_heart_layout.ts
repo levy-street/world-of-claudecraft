@@ -46,7 +46,13 @@
 // the renderer (terrain, light rivers, the seal, the portal) read this one
 // record.
 
-import type { AuthoredFieldDef, FieldProp, FieldSurface } from '../instances/authored_field/types';
+import type {
+  AuthoredFieldDef,
+  FieldPolySurface,
+  FieldProp,
+  FieldSurface,
+} from '../instances/authored_field/types';
+import { bearingDeg, isleFloorSurfaces } from './smith_heart_isle_floor';
 
 /** The void under every floor: the fissures' depth (below the Quench Basin). */
 export const SMITH_HEART_VOID_HEIGHT = -70;
@@ -230,6 +236,53 @@ export const CORNICE_GAPS: readonly { deg: number; x: number; z: number; r: numb
     return { deg, x, z, r: CORNICE_GAP_R };
   });
 
+/** The Storm Cornice's open rim (the Guardian of the Breath's rework of
+ *  2026-11-03, the owner's call after the team's feedback): no wall, rail or
+ *  pillar stands round the Cornice any more; the whole lip is open to the
+ *  void, so a body blown or thrown off ANY edge falls. Only the climb's head
+ *  in the west (between these bearings) keeps its wall, so the walk up and
+ *  the corpse run never pass an open lip. Discs along the rim, each a break
+ *  in the wall (the field's `lipOpenings`), spaced to overlap. */
+export const CORNICE_WALLED_BEARINGS = { from: 248, to: 292 } as const;
+export const CORNICE_OPEN_RIM: readonly { x: number; z: number; r: number }[] = (() => {
+  const C = BREATH.cornice;
+  const out: { x: number; z: number; r: number }[] = [];
+  for (let deg = 0; deg < 360; deg += 5) {
+    if (deg >= CORNICE_WALLED_BEARINGS.from && deg <= CORNICE_WALLED_BEARINGS.to) continue;
+    const [x, z] = bearingPoint(C.x, C.z, deg, C.rx - 0.8, C.rz - 0.8);
+    out.push({ x, z, r: 6 });
+  }
+  // The wind channels' notches: their V sides run deep into the plateau.
+  for (const ch of CORNICE_CHANNELS) {
+    for (let k = 0; k <= ch.depth; k += 3) {
+      const [x, z] = bearingPoint(C.x, C.z, ch.deg, C.rx - k, C.rz - k);
+      out.push({ x, z, r: 7 });
+    }
+  }
+  return out;
+})();
+
+/** The Islands of the Wind (the Guardian of the Breath, design doc 7.2): two
+ *  floating islets off the Cornice's south rim (south-east and south-west,
+ *  out in the open air the summit's falling shoulders and its cap leave
+ *  round it (render/smith_heart/heart_walls_core.ts heartSummitOpen,
+ *  heartSummitCap: the third pass of 2026-11-03), clear of the wind
+ *  channels' notches and of the climb's head; inside the field's bounds and
+ *  the instance slot's band (local z under 250: past it a body is another
+ *  slot's), clear of the Heart's area and in a seal marker's reach), high
+ *  over the Cornice (seen from it against the sky over every far ridge,
+ *  their crags hanging over the void), reached only on a scripted
+ *  ride of the wind (encounters/smith_heart/breath_isles.ts). Each is a
+ *  hidden field surface (walkable; drawn by the fight's own floating rock,
+ *  render/smith_heart_fx/breath_isles_fx.ts) with an organic outline and a
+ *  ledge or two (smith_heart_isle_floor.ts ISLE_FLOOR_SPECS), its lip open
+ *  (BREATH_ISLE_LIPS: a body that walks off falls). `h` is its floor's
+ *  height, `r` its nominal reach (the rim swells past it and bites in). */
+export const BREATH_ISLES: readonly { id: string; x: number; z: number; r: number; h: number }[] = [
+  { id: 'breath_isle_southeast', x: 31, z: 139, r: 9, h: H.cornice + 26 },
+  { id: 'breath_isle_southwest', x: -28, z: 142, r: 9, h: H.cornice + 30 },
+];
+
 // ---- the main map: the Quench (east, low) -------------------------------------------
 
 /** The Quench: two landings, the Singing Ice sheet, the Quench Basin (its
@@ -363,10 +416,8 @@ export const SMITH_HEART_BOSS_SPOTS = {
   quench: { x: QUENCH.lake.x, z: QUENCH.lake.z },
   heat: { x: HEARTH_WELL.x, z: HEARTH_WELL.z },
   final: { x: HEART_ROOM.x, z: HEART_ROOM.z },
-  /** The Hammer Council's other two (section 7.1): the Slabwright and the
-   *  Seam Singer flank the Guardian a little behind it, well inside the
-   *  ring of columns. */
-  slabwright: { x: HAMMER_PIT.x + 3, z: HAMMER_PIT.z - 9 },
+  /** The Hammer Council's other member (section 7.1): the Seam Singer
+   *  stands a little behind the Guardian, well inside the ring of columns. */
   seamSinger: { x: HAMMER_PIT.x + 3, z: HAMMER_PIT.z + 9 },
 } as const;
 
@@ -536,6 +587,32 @@ function cornice(): FieldSurface {
   }
   return { kind: 'poly', id: 'storm_cornice', points, h: C.h, edge: 'rock', ground: 'scoured' };
 }
+
+/** A floating islet's floors: its organic outline and its ledges
+ *  (smith_heart_isle_floor.ts), hidden from the generic terrain (the fight
+ *  draws the floating rock). */
+function isleSurfaces(c: (typeof BREATH_ISLES)[number]): FieldPolySurface[] {
+  const C = BREATH.cornice;
+  return isleFloorSurfaces(c, bearingDeg(c.x, c.z, C.x, C.z));
+}
+
+/** How far each isle's rim reaches at its furthest (yards from its centre:
+ *  the tip of its tongue), in BREATH_ISLES order. What must stay open air
+ *  round an isle measures from this, never from its nominal `r`. */
+export const BREATH_ISLE_REACH: readonly number[] = BREATH_ISLES.map((c) => {
+  let reach = 0;
+  for (const s of isleSurfaces(c))
+    for (const [x, z] of s.points) reach = Math.max(reach, Math.hypot(x - c.x, z - c.z));
+  return reach;
+});
+
+/** The isles' open lips: one disc over each isle, past its furthest reach,
+ *  so no wall stands round an isle's rim (a body that walks off falls to the
+ *  void and dies, breath_void.ts stepVoidDeaths). Its ledges' steps are
+ *  under the field's cliffStep, never a wall either. */
+export const BREATH_ISLE_LIPS: readonly { x: number; z: number; r: number }[] = BREATH_ISLES.map(
+  (c, i) => ({ x: c.x, z: c.z, r: BREATH_ISLE_REACH[i] + 2 }),
+);
 
 /** The Ring as one flat annulus sector (clockwise from `fromDeg` to `toDeg`). */
 function ringSector(): FieldSurface {
@@ -740,6 +817,7 @@ const AUTHORED_SURFACES: FieldSurface[] = [
     { stairs: true, ground: 'scoured' },
   ),
   cornice(),
+  ...BREATH_ISLES.flatMap(isleSurfaces),
   // --- The Quench (east): descends to the Quench Basin --------------------------------
   path(
     'quench_mouth',
@@ -1030,21 +1108,6 @@ const ICE_SHELVES: FieldProp[] = [10, 60, 110, 300, 345].map((deg, i) => {
   };
 });
 
-/** The Storm Cornice's lightning rods, on the rim between the wind channels. */
-const LIGHTNING_RODS: FieldProp[] = [0, 50, 104, 155, 210, 305].map((deg) => {
-  const p = around(BREATH.cornice, deg, -5);
-  return { kind: 'sh_lightning_rod', ...p, rot: 0, r: 1.3, h: 24 };
-});
-
-/** The wind channels' cheek stones (phase 2G): two flanking each notch's
- *  mouth on the Cornice's rim, on colliders, clear of the walk to it. */
-const CHANNEL_JAMBS: FieldProp[] = CORNICE_CHANNELS.flatMap((ch) =>
-  [-1, 1].map((s) => {
-    const p = around(BREATH.cornice, ch.deg + s * (ch.halfDeg + 2.5), -2.4);
-    return { kind: 'sh_channel_jamb', ...p, rot: 0, r: 1.3, h: 9 };
-  }),
-);
-
 /** Wind-carved standing stones at the Breath's landings' rims (phase 2G), on
  *  colliders, between the walks that leave each landing. */
 const STORM_STONES: FieldProp[] = (
@@ -1123,29 +1186,11 @@ const PROPS: FieldProp[] = [
   }),
   { kind: 'sh_heart_seal', x: HEART_SEAL.x, z: HEART_SEAL.z, rot: 0 },
   // The Breath: wind shelters on the bridge's windward edge (phase 2 gusts
-  // push the raid against them, never off the arch), the cornice's lightning
-  // rods and its broken bellows.
+  // push the raid against them, never off the arch). The Cornice itself is
+  // bare (the rework of 2026-11-03: no rods, horns or cheek stones on it).
   { kind: 'sh_wind_shelter', x: -80, z: 140, rot: -0.75, hw: 2.4, hd: 0.7, h: 2 },
   { kind: 'sh_wind_shelter', x: -91, z: 152, rot: -0.75, hw: 2.4, hd: 0.7, h: 2 },
-  ...LIGHTNING_RODS,
-  ...CHANNEL_JAMBS,
   ...STORM_STONES,
-  {
-    kind: 'sh_broken_bellows',
-    ...around(BREATH.cornice, 240, -12),
-    rot: 0.5,
-    hw: 4.4,
-    hd: 7.5,
-    h: 7,
-  },
-  {
-    kind: 'sh_broken_bellows',
-    ...around(BREATH.cornice, 108, -13),
-    rot: 2.1,
-    hw: 4.4,
-    hd: 7.5,
-    h: 7,
-  },
   // The Quench: the basin's braziers, vents, sunk blades and ice shelves.
   ...LAKE_BRAZIERS,
   ...STEAM_VENTS,
@@ -1204,7 +1249,11 @@ export const SMITH_HEART_FIELD: AuthoredFieldDef = {
   bounds: { minX: -258, maxX: 248, minZ: -246, maxZ: 238 },
   voidHeight: SMITH_HEART_VOID_HEIGHT,
   cliffStep: 1.1,
-  lipOpenings: CORNICE_GAPS.map(({ x, z, r }) => ({ x, z, r })),
+  lipOpenings: [...CORNICE_GAPS, ...CORNICE_OPEN_RIM, ...BREATH_ISLE_LIPS].map(({ x, z, r }) => ({
+    x,
+    z,
+    r,
+  })),
   mapVoid: 'mist',
   surfaces: SURFACES,
   walls: [],

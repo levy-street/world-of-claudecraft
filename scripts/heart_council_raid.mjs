@@ -13,14 +13,14 @@
 // started with ALLOW_DEV_COMMANDS=1, which must never be set in production.
 //
 //   node scripts/heart_council_raid.mjs                       autonomous, normal
-//   DIFF=heroic ORDER=singer,guardian,slabwright node ...      any kill order
+//   DIFF=heroic ORDER=singer,guardian node ...                 any kill order
 //   JOIN=Jose JOIN_ROLE=dps node scripts/heart_council_raid.mjs
 //                                                              9 bots + a human
 //
 // Environment:
 //   DIFF        normal | heroic | mythic (the council's dev switches)
 //   ORDER       the damage dealers' kill order, any permutation of
-//               guardian,slabwright,singer (default guardian,slabwright,singer)
+//               guardian,singer (default guardian,singer)
 //   JOIN        a character name: the raid leader invites it and the bots wait
 //               for it in the raid and the instance, follow it to the Quarry
 //               and pull when it says "pull" in raid chat (or attacks)
@@ -54,14 +54,14 @@ import { WorldBot } from './lib/world_bot.mjs';
 const BASE = process.env.SERVER_URL ?? 'http://localhost:8787';
 const DIFF = (process.env.DIFF ?? 'normal').toLowerCase();
 if (!['normal', 'heroic', 'mythic'].includes(DIFF)) throw new Error(`DIFF: ${DIFF}`);
-const ROLES = ['guardian', 'slabwright', 'singer'];
-const ORDER = (process.env.ORDER ?? 'guardian,slabwright,singer')
+const ROLES = ['guardian', 'singer'];
+const ORDER = (process.env.ORDER ?? 'guardian,singer')
   .toLowerCase()
   .split(',')
   .map((s) => s.trim())
   .filter(Boolean);
 if (ORDER.length !== 3 || !ROLES.every((r) => ORDER.includes(r)))
-  throw new Error(`ORDER must name guardian, slabwright and singer once each: ${ORDER}`);
+  throw new Error(`ORDER must name guardian and singer once each: ${ORDER}`);
 const JOIN = (process.env.JOIN ?? '').trim();
 const JOIN_ROLE = (process.env.JOIN_ROLE ?? 'dps').toLowerCase();
 const GEAR = (process.env.GEAR ?? 'kit').toLowerCase();
@@ -86,7 +86,6 @@ const liveBots = [];
 // The council's wire ids (council_ids.ts).
 const TID = {
   guardian: 'heart_hammer_guardian',
-  slabwright: 'heart_slabwright',
   singer: 'heart_seam_singer',
 };
 const ROLE_OF_TID = Object.fromEntries(Object.entries(TID).map(([r, t]) => [t, r]));
@@ -97,7 +96,6 @@ const CAST = {
   rock: 'heart_falling_rock',
   bolt: 'heart_seam_bolt',
   song: 'heart_song_of_the_seam',
-  songUnbroken: 'heart_song_of_the_seam_unbroken',
   echo: 'heart_echo_of_wrath',
   endlessSong: 'heart_endless_song',
 };
@@ -119,8 +117,6 @@ const NAMES = {
   wake: 'Wake the Stone',
   rubble: 'Crumbled Stone',
   pulse: 'Restless Stone',
-  slab: 'Walking Slab',
-  grind: 'Stone Drag',
   endlessSong: 'Endless Song',
 };
 const RUBBLE = 'sh_council_rubble';
@@ -607,7 +603,7 @@ class World {
     this.bots = bots;
     this.leader = leader;
     this.pids = new Set();
-    this.council = { guardian: null, slabwright: null, singer: null };
+    this.council = { guardian: null, singer: null };
     this.councilIds = new Set();
     this.pillars = new Map();
     this.rubble = [];
@@ -798,7 +794,7 @@ async function fight(world, bots, byKey) {
     lastHit: new Map(),
     dmgTaken: new Map(),
     dmgDone: new Map(),
-    dmgDoneTo: { guardian: 0, slabwright: 0, singer: 0 },
+    dmgDoneTo: { guardian: 0, singer: 0 },
     healDone: new Map(),
     wraths: [],
     echoes: [],
@@ -820,13 +816,11 @@ async function fight(world, bots, byKey) {
     prevPillars: new Map(),
     prevCasts: new Map(),
     prevAuras: new Map(),
-    slabTrack: null,
     wire: {
       soulSeen: {},
       echoCastSeen: 0,
       songCastSeen: 0,
       songStacksMax: 0,
-      slabMoved: 0,
       stableMismatch: [],
     },
     errors: new Map(),
@@ -1040,12 +1034,6 @@ function trackState(world, st) {
     }
   }
   st.prevPillars = new Map([...world.pillars].map(([id, p]) => [id, { ...p }]));
-  // The Walking Slab: how far it has dragged itself.
-  const slab = world.soulPillars().find((p) => p.soul === 'slabwright');
-  if (slab) {
-    if (st.slabTrack && st.slabTrack.id === slab.id) st.wire.slabMoved += hypot(st.slabTrack, slab);
-    st.slabTrack = { id: slab.id, x: slab.x, z: slab.z };
-  }
   const song = world.soulPillars().find((p) => p.soul === 'singer');
   if (song) {
     const a = song.auras.find((x) => x.id === AURA.endlessSong);
@@ -1110,13 +1098,6 @@ function crackCause(world, st, p) {
     r.cracked.push(p.id);
     return 'Falling Rock';
   }
-  for (const pl of world.players.values()) {
-    if (pl.dead || !hasAura(pl, AURA.resonance)) continue;
-    if (faceDistance(p, pl) <= COUNCIL_REACH.resonance + 1.2) {
-      st.resonanceCracks = (st.resonanceCracks ?? 0) + 1;
-      return `Resonance (${pl.name})`;
-    }
-  }
   if (world.rubble.length > 0 || p.integrity <= 1) return 'unknown';
   return 'unknown';
 }
@@ -1148,10 +1129,8 @@ function castStarted(world, st, key, castId, e) {
     log('WAKE THE STONE cast');
   } else if (castId === CAST.rock) {
     log(`FALLING ROCK cast by the ${key}`);
-  } else if (castId === CAST.song || castId === CAST.songUnbroken) {
-    log(
-      `SONG OF THE SEAM by the ${key}${castId === CAST.songUnbroken ? ' (unbroken, no kick)' : ''}`,
-    );
+  } else if (castId === CAST.song) {
+    log(`SONG OF THE SEAM by the ${key}`);
   }
 }
 
@@ -1263,10 +1242,6 @@ function planMechanics(world, st) {
     // A human carries it: the soakers stack on them wherever they go.
     const h = world.players.get(st.rock.pid);
     if (h) st.rock.spot = { x: h.x, z: h.z };
-  } else if (st.rock?.trackSoul) {
-    // The Walking Slab moves: the soak follows it.
-    const soul = world.soulPillars().find((p) => p.soul === st.rock.soul);
-    if (soul) st.rock.spot = add(soul, unit(soul, st.rock.spot), soul.r + 4.8);
   }
 
   // Wake the Stone: each marked player carries the mark to a spot.
@@ -1325,26 +1300,15 @@ function planCover(world, st, casts, key, pre = false) {
   }
   for (const p of people) {
     if (assign.has(p.pid)) continue;
-    const carrier = hasAura(p, AURA.resonance);
-    const minFace = carrier
-      ? COUNCIL_REACH.resonance + 1.0
-      : HEROIC_PLUS
-        ? COUNCIL_REACH.pulse + 0.5
-        : 1.2;
+    const minFace = HEROIC_PLUS ? COUNCIL_REACH.pulse + 0.5 : 1.2;
     let best = null;
     let bestCost = Number.POSITIVE_INFINITY;
     for (const pl of cover) {
       if (forbidden.has(pl.id)) continue;
-      // Resonance carriers keep off the whole pillars even at Wrath.
       for (const spot of coverSpots(pl, cover, sources, minFace)) {
         if (!onFloor(spot, world.floor, 5)) continue;
         if (world.rubble.some((h) => hypot(h, spot) < h.r)) continue;
         if (world.riseSpots.some((h) => hypot(h, spot) < h.r)) continue;
-        if (
-          carrier &&
-          cover.some((q) => q !== pl && faceDistance(q, spot) < COUNCIL_REACH.resonance + 1)
-        )
-          continue;
         const travel = hypot(p, spot) / 7;
         if (travel > rem - 0.3) continue;
         // Prefer the pillars that will be spent anyway: a risen one (one
@@ -1471,7 +1435,6 @@ function planRock(world, st, marked) {
     spotOk: !!spot,
     soakers,
     soul: soul && spot ? soul.soul : null,
-    trackSoul: !!(soul && spot && soul.soul === 'slabwright'),
   };
 }
 
@@ -1512,12 +1475,6 @@ function act(world, st, b, mt) {
       i === 0 ? rock.spot : add(rock.spot, { x: Math.sin(i * 1.7), z: Math.cos(i * 1.7) }, 1.6);
     tol = 0.8;
     duty = 'soak';
-  } else if (hasAura(me, AURA.resonance) && DIFF === 'mythic' && world.soulPillars().length > 0) {
-    const soul = world.soulPillars().reduce((a, c) => (hypot(a, me) < hypot(c, me) ? a : c));
-    const face = soul.soul === 'slabwright' ? COUNCIL_REACH.slabGrind - 1.2 : 1.6;
-    goal = add(soul, unit(soul, me), soul.r + face);
-    tol = 0.7;
-    duty = 'break soul';
   }
   // Step out of a rise about to burst, rubble, or someone's Wake spot.
   const hazards = hazardsFor(world, st, b, me, duty);
@@ -1697,14 +1654,16 @@ function hazardsFor(world, st, b, me, duty) {
     if (pid === b.pid || !w.spot) continue;
     out.push({ ...w.spot, r: COUNCIL_REACH.riseKnock + 1.2 });
   }
+  // Resonance is a spread: a carrier keeps out of everyone's way, the rest
+  // keep out of each carrier's ring.
   const carrier = hasAura(me, AURA.resonance);
+  for (const pl of world.players.values()) {
+    if (pl.dead || pl.pid === b.pid) continue;
+    if (carrier || hasAura(pl, AURA.resonance))
+      out.push({ x: pl.x, z: pl.z, r: COUNCIL_REACH.resonance + 1 });
+  }
   for (const p of world.pillars.values()) {
-    if (p.soul === 'slabwright' && duty !== 'break soul' && duty !== 'soak')
-      out.push({ x: p.x, z: p.z, r: p.r + COUNCIL_REACH.slabGrind + 0.8 });
-    else if (!p.soul && carrier)
-      out.push({ x: p.x, z: p.z, r: p.r + COUNCIL_REACH.resonance + 1.2 });
-    else if (!p.soul && HEROIC_PLUS)
-      out.push({ x: p.x, z: p.z, r: p.r + COUNCIL_REACH.pulse + 0.6 });
+    if (!p.soul && HEROIC_PLUS) out.push({ x: p.x, z: p.z, r: p.r + COUNCIL_REACH.pulse + 0.6 });
   }
   const g = world.council.guardian;
   if (alive(g) && b.tankTarget !== 'guardian') {
@@ -1836,10 +1795,8 @@ function tankAssign(world, st, b, me) {
     const swapTo = gTank ? tanks.find((p) => p.pid !== gTank.pid) : null;
     if (gTank && swapTo && weighted(gTank) && !weighted(swapTo)) gTank = swapTo;
     st.gTankPid = gTank?.pid ?? null;
-    mine = gTank?.pid === b.pid ? ['guardian'] : ['slabwright', 'singer'];
+    mine = gTank?.pid === b.pid ? ['guardian'] : ['singer'];
     if (tanks.length < 2) mine = [...living];
-  } else if (living.length >= 2 && tanks.length >= 2) {
-    mine = tanks[0].pid === b.pid ? ['slabwright'] : ['singer'];
   } else {
     // One left (or one tank): whoever holds it keeps it.
     mine = [...living];
@@ -2172,9 +2129,7 @@ function writeReport(world, st) {
   note(
     `Falling Rocks: ${soaks.length} (${soaks.map((r) => `${r.who}: ${r.soakHits.length} under, ${r.soakHits.length ? Math.round(r.soakHits.reduce((a, h) => a + h.amount, 0) / r.soakHits.length) : 0} each${r.tremor ? ', TREMOR' : ''}${r.cracked.length ? `, cracked ${r.cracked.length}` : ''}`).join('; ')})`,
   );
-  note(
-    `Wake the Stone marks: ${st.wakes.length}; Resonance marks: ${st.resonance.length}; Resonance cracks: ${st.resonanceCracks ?? 0}`,
-  );
+  note(`Wake the Stone marks: ${st.wakes.length}; Resonance marks: ${st.resonance.length}`);
   const landed = st.kicks.filter((k) => k.result === 'landed').length;
   note(
     `Interrupts: ${landed} landed, ${st.kicks.length - landed} missed (${summarize(st.kicks.filter((k) => k.result !== 'landed').map((k) => k.result))})`,
@@ -2196,7 +2151,7 @@ function writeReport(world, st) {
         `  ${role}: tids ${[...rec.tids].join(' ')}; legacy ${[...rec.legacyTids].join(' ')}; cast frames ${rec.castSeenStable}; song stacks ${rec.auraStacksStable}`,
       );
     note(
-      `  echo bars seen ${st.wire.echoCastSeen}; endless song bars seen ${st.wire.songCastSeen}; song stacks max ${st.wire.songStacksMax}; Walking Slab dragged ${st.wire.slabMoved.toFixed(1)} yd`,
+      `  echo bars seen ${st.wire.echoCastSeen}; endless song bars seen ${st.wire.songCastSeen}; song stacks max ${st.wire.songStacksMax}`,
     );
     note(
       `  mismatches: ${st.wire.stableMismatch.length ? st.wire.stableMismatch.slice(0, 10).join(' | ') : 'none'}`,
@@ -2207,7 +2162,7 @@ function writeReport(world, st) {
     note(`Most frequent bot errors: ${errs.map(([k, n]) => `${k} x${n}`).join('; ')}`);
   note('');
   note(
-    '| Result | Time | Guardian | Slabwright | Singer | Wraths (hit) | Pillars rise/fall | Soaks (avg under) | Kicks ok/miss | Deaths | Raid DPS |',
+    '| Result | Time | Guardian | Singer | Wraths (hit) | Pillars rise/fall | Soaks (avg under) | Kicks ok/miss | Deaths | Raid DPS |',
   );
   note('|---|---|---|---|---|---|---|---|---|---|---|');
   const avgUnder = soaks.length
@@ -2215,7 +2170,7 @@ function writeReport(world, st) {
     : '-';
   const bd = (r) => (st.bossDeaths[r] !== undefined ? fmtSec(st.bossDeaths[r]) : 'alive');
   note(
-    `| ${st.result} | ${fmtSec(dur)} | ${bd('guardian')} | ${bd('slabwright')} | ${bd('singer')} | ${st.wraths.length} (${wrathHits}) | ${rises}/${falls} | ${soaks.length} (${avgUnder}) | ${landed}/${st.kicks.length - landed} | ${st.deaths.length} | ${(done / Math.max(1, dur)).toFixed(0)} |`,
+    `| ${st.result} | ${fmtSec(dur)} | ${bd('guardian')} | ${bd('singer')} | ${st.wraths.length} (${wrathHits}) | ${rises}/${falls} | ${soaks.length} (${avgUnder}) | ${landed}/${st.kicks.length - landed} | ${st.deaths.length} | ${(done / Math.max(1, dur)).toFixed(0)} |`,
   );
 
   fs.mkdirSync(LOG_DIR, { recursive: true });

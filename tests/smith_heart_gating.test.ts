@@ -195,8 +195,8 @@ describe("the Smith's Heart gating", () => {
     sim.tick();
     expect(state(sim, inst, 'hammer_pit_mouth')).toBe('open');
     expect(state(sim, inst, 'the_slab')).toBe('closed');
-    // The Hammer Council: two of the three down is not the fight won.
-    killOnly(sim, inst, [SMITH_HEART_GUARDIANS.hammer, 'heart_slabwright']);
+    // The Hammer Council: one of the two down is not the fight won.
+    killOnly(sim, inst, [SMITH_HEART_GUARDIANS.hammer]);
     sim.tick();
     expect(state(sim, inst, 'the_slab')).toBe('closed');
     expect(markers(sim, inst).every((m) => m === 0)).toBe(true);

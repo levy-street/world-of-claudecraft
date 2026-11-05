@@ -4749,33 +4749,41 @@ export const ja_JP: EnTranslations = {
       "council": {
         "wakeMark": "効果が切れると、立っている場所の床から柱が突き出し、{radius}ヤード以内の全員に{min}から{max}のダメージを与えて吹き飛ばす。レイドが遮蔽物を必要とする場所に立とう。ヒロイック・ミシック：ダメージ{heroic}%増加。",
         "rockMark": "効果が切れると岩が落ちてくる：{total}のダメージを{radius}ヤード以内の全員で分け合う。{soakers}人未満だと各自が{penalty}%多く受け、レイド全体が{tremorMin}から{tremorMax}を受ける。{radius}ヤード以内の柱はすべて欠けるので、遮蔽物から離れて受けよう。ミシック：{soulReach}ヤード以内の魂の柱は代わりに魂の印を一つ失い、印がなくなると砕ける。ヒロイック・ミシック：ダメージ{heroic}%増加。",
-        "resonance": "柱から{reach}ヤード以内に{seconds}秒続けて立つと柱が一つ欠け、そこにいる限り{seconds}秒ごとにまた欠ける。解除はできない：一番傷んだ柱のそばで山の怒りをやり過ごし、無傷の柱には近づかないこと。ミシック：魂の柱のそばで同じだけ待つと代わりに魂の印が一つ消え（鉱脈の歌い手の柱なら{singerSeconds}秒）、印がなくなると砕ける。",
+        "resonance": "{every}秒ごとに共鳴し、自分の{radius}ヤード以内の味方全員に{min}から{max}の自然ダメージを与える。効果が切れるまで全員から離れよう。ヒロイック・ミシック：ダメージ{heroic}%増加。",
+        "rushMark": "効果が切れると、槌の守護者は{windup}秒間身構えてから、あなたが立っていた場所を通り抜けて採石場の端まで一直線に突進する。行く手に柱があれば、最初の柱で止まる。呪われた柱へ誘導しよう：柱が砕け、守護者は{stun}秒間スタンし、{exposedSeconds}秒間受けるダメージが{exposed}%増加する。途中に遮蔽用の柱があれば、代わりにその柱が壊される。止まるまでに突進がぶつかった全員が{min}から{max}のダメージを受けて吹き飛ばされる。まだ進路上にいればあなたも同じだ。ミシック：柱に当たらなかった突進は、呪われた柱が砕けるまで採石場の崩落を引き起こす。",
+        "rushExposed": "受けるダメージが{pct}%増加：山の突進が呪われた柱を砕いた。",
+        "bond": "槌の評議会のもう一人が{reach}ヤード以内にいる間、受けるダメージが{pct}%減少。{every}秒ごとに石の絆がレイド全体に{min}から{max}のダメージを与え、そのたびに{growth}%増加する。二人を引き離そう。",
+        "collapse": "採石場が崩落している：{every}秒ごとにスタック1つにつき{min}から{max}のダメージを受け、そのたびにスタックが1つ増える。呪われた柱が砕けると終わる。",
         "memory": "与えるダメージが{pct}%増加：槌の評議会の倒れた仲間1人につき{per}%。",
-        "prisoned": "Shut in a block of stone: you cannot act. Your allies must break the block before this ends, or it crushes you.",
-        "pillarLimit": "Each pillar shields at most {limit} players from Mountain's Wrath. With more behind it, each of them takes {share}% of the blast.",
-        "shouldered": "Takes {pct}% less damage while another living member of the Hammer Council stands within {reach} yd. Pull the Slabwright away from them."
+        "pillarLimit": "各柱が山の怒りから守れるのは最大{limit}人まで。それより多く隠れると、全員が爆発の{share}%を受ける。"
       },
       "breathGuardian": {
-        "portalA": "When this ends, Portal A opens exactly where you stand. Stand near the Knotted Gale. You cannot carry it this round.",
-        "portalB": "When this ends, Portal B opens exactly where you stand. Stand at the lip of a gap. You cannot carry the Knotted Gale this round.",
-        "portalC": "When this ends, Portal C opens exactly where you stand. It links to Portal D only. Stand near the other Knotted Gale. You cannot carry it this round.",
-        "portalD": "When this ends, Portal D opens exactly where you stand. It links to Portal C only. Stand at the lip of a gap away from Portal B. You cannot carry the Knotted Gale this round.",
-        "laden": "You carry a Knotted Gale: you walk at {walk}% speed, you cannot blink, charge or leap, and no wind, pull, blast or throw can move you. Each portal takes you to its partner: A to B, C to D. Press Interact at the lip of any gap to throw it into the void. When this ends it bursts and kills everyone on the Cornice.",
-        "wind": "息吹の守護者の風が、吹く方向へ毎秒{speed}ヤードあなたを運ぶ。風に逆らって歩けば踏みとどまれ、詠唱は中断されない。縁の壁に押しつけられると毎秒{pinMin}から{pinMax}のダメージを受ける。壁が崩れた場所では止めるものがなく、虚空へ落ちる。",
-        "draw": "守護者が息を吸い込み、あなたを毎秒{speed}ヤード引き寄せる。口の前の渦は、そこに立つ者に{tick}秒ごとに{min}から{max}のダメージを与える。その後、ふいごの突風が岩棚の全員に{gustMin}から{gustMax}のダメージを与え、{throw}ヤード外へ吹き飛ばす。",
+        "portalA": "効果が切れると、あなたの立つ場所にポータルAが開く。結ばれた疾風の近くに立とう。このラウンドはそれを運べない。",
+        "portalB": "効果が切れると、あなたの立つ場所にポータルBが開く。岩棚の縁に立とう。このラウンドは結ばれた疾風を運べない。",
+        "portalC": "効果が切れると、あなたの立つ場所にポータルCが開く。ポータルDとだけつながる。もう一つの結ばれた疾風の近くに立とう。このラウンドはそれを運べない。",
+        "portalD": "効果が切れると、あなたの立つ場所にポータルDが開く。ポータルCとだけつながる。ポータルBから離れた岩棚の縁に立とう。このラウンドは結ばれた疾風を運べない。",
+        "laden": "結ばれた疾風を運んでいる：歩く速さは{walk}%になり、ブリンク・突進・跳躍はできず、風も吸引も爆風も吹き飛ばしもあなたを動かせない。各ポータルは対になるポータルへ運ぶ：AからB、CからD。岩棚の縁でインタラクトを押すと虚空へ投げ込む。これが切れると炸裂し、岩棚の全員が死ぬ。",
+        "wind": "息吹の守護者の風が、吹く方向へ毎秒{speed}ヤードあなたを運ぶ。風に逆らって歩けば踏みとどまれ、詠唱は中断されない。岩棚の周りに壁はない：縁から運び出されれば虚空へ落ちる。壁が残るのは登り口の上だけで、そこに押しつけられると毎秒{pinMin}から{pinMax}のダメージを受ける。",
+        "draw": "守護者が息を吸い込み、あなたを毎秒{speed}ヤード引き寄せる。口の前の渦は、そこに立つ者に{tick}秒ごとに{min}から{max}のダメージを与える。その後、頂の咆哮が岩棚の全員に{gustMin}から{gustMax}のダメージを与え、守護者から{throw}ヤード（ヒロイックでは{heroicThrow}ヤード）吹き飛ばす：守護者が縁の近くにいれば、レイドは岩棚の外へ放り出される。",
         "pinned": "風で縁の壁に押しつけられている：風が凪ぐか壁から離れるまで、毎秒{min}から{max}のダメージ。",
         "anchor": "テサリー隊長の凪があなたを支えている：風も吸引も爆風も吹き飛ばしも、あなたを動かせない。ダメージは受ける。",
         "spent": "錨の効果が切れた：これが消えるまで、テサリー隊長の凪の円はあなたを再び支えられない。",
         "drawn": "{every}秒ごとに足元へ雷が落ちる：{warn}秒後、{radius}ヤード以内の全員に{min}から{max}のダメージを与え、{charged}秒間毎秒{cmin}から{cmax}のダメージを与える帯電した地面を残す。動き続け、落雷を味方から離れた縁へ導こう。",
-        "cradled": "嵐の中へ持ち上げられ、{hold}秒間拘束される。その後の放電は{total}のダメージで、あなたと真下{radius}ヤード以内の全員で分け合う。分け合う人数が{soakers}人未満（ヒロイックでは{heroicSoakers}人）だと各自が{penalty}%多く受け、岩棚の全員が{bmin}から{bmax}を受ける。",
+        "cradled": "嵐の中へ持ち上げられ、守護者がゆりかごを維持する{hold}秒間拘束される。その間、守護者は他に何も唱えない。その後の放電は{total}のダメージで、あなたと真下{radius}ヤード以内の全員で分け合う。分け合う人数が{soakers}人未満だと各自が{penalty}%多く受け、岩棚の全員が{bmin}から{bmax}を受ける。ヒロイック：{heroicCount}人が同時に持ち上げられ、各放電は{heroicTotal}で{heroicSoakers}人を必要とする。レイドは分かれて受け止めよう。",
+        "bulwark": "風の盾があと{left}のダメージを吸収する。浮島の疾風の哨兵か疾風の癒し手が一体でも生きている間、毎秒その全体の{regrow}%が回復し、癒しの疾風のたびに{mend}%回復する。疾風の道に乗って浮島へ渡り、彼らを倒せ。{max}秒保たれると、岩棚の上で炸裂し{bmin}から{bmax}のダメージを与える。",
+        "riding": "風が決まった道筋で虚空の上をあなたを運んでいる：降ろされるまで行動できない。",
+        "windworn": "風に疲れ果てた：これが切れるまで、疾風の道はあなたを浮島へ運ばない。",
+        "thrown": "頂の咆哮に吹き飛ばされた：着地するまで動けない。",
+        "tossed": "吹きすさぶ旋風に吹き飛ばされた：突風が収まるまで動けない。",
         "stormForm": "裂けて雷の体となった：息吹の守護者が倒れるまで続く、戦いの嵐の後半。",
         "swell": "{every}秒ごとに膨れ上がる嵐が岩棚の全員に{min}から{max}のダメージを与え、前の脈動ごとに{growth}%ずつ強くなる：これまでに{stacks}回。"
       },
       "quenchGuardian": {
-        "cold": "あなたの冷気：{max}中{cold}。ひとりでいると約{fill}秒で満ちる。{radius}ヤード以内に他のプレイヤーが{others}人以上いれば、代わりに毎秒{fall}ずつ下がる。{max}に達すると{freeze}秒間霜に閉ざされ、その後氷が砕ける。",
+        "cold": "あなたの冷気：{max}中{cold}。ひとりでいると約{fill}秒で満ちる。{radius}ヤード以内に他のプレイヤーが{others}人以上いれば、代わりに毎秒{fall}ずつ下がる。冷たき棺などの無敵効果では止められない：効果中は温もりを与えることも受けることもできない。{max}に達すると{freeze}秒間霜に閉ざされ、その後氷が砕ける。",
         "warmth": "レイドと身を寄せ合っている：冷気が毎秒{fall}ずつ下がる。同じ場所に{linger}秒とどまった集団の下では氷が割れ、凍てつく水の穴が開く。動き続けよう。",
-        "frozen": "霜に閉ざされている：行動できない。効果が切れると氷が砕け、あなたは{min}から{max}の冷気ダメージを受けて霜脆化状態になり、{radius}ヤード以内の全員の冷気が{cold}上がる（ヒロイックでは{heroicRadius}ヤード、冷気{heroicCold}）。",
-        "brittle": "あらゆる攻撃から受けるダメージが{pct}%増加する。",
+        "frozen": "霜に閉ざされている：行動できず、あらゆる攻撃から受けるダメージが{pct}%増加し、冷たき棺などの無敵効果は霜に砕かれる。効果が切れると氷が砕け、あなたは{min}から{max}の冷気ダメージを受け、その後{seconds}秒間受けるダメージが{brittle}%増加する。{radius}ヤード以内の全員の冷気が{cold}上がる（ヒロイックでは{heroicRadius}ヤード、冷気{heroicCold}）。",
+        "brittle": "あらゆる攻撃から受けるダメージが{pct}%増加する。この効果中は、味方の砕けた氷の飛沫であなたの冷気が{cap}を超えることはない。",
+        "splashed": "味方の砕けた氷が飛び散った：冷気+{cold}。自分のゲージが満ちる前に集団へ戻れ。",
         "trapped": "氷を踏み抜き凍てつく水に落ちた：移動できず、毎秒{min}から{max}の冷気ダメージを受け、冷気が上がっていく。{seconds}秒後に縁へ這い上がる。水だけで死ぬことはない。",
         "awake": "鍛冶師の四本の剣が目覚めている。戦いの中で複数のプレイヤーが印を受け、剣がそれぞれを貫く線を順に飛ぶ。線は剣が飛ぶ{lock}秒前に固定され、線上の者に{min}から{max}の冷気ダメージを与え、冷え{cold}を加える。",
         "marked": "あなたは{count}人中{order}番目だ。剣があなたを貫く線を飛んでくる。線をレイドから離せ。線は剣が飛ぶ{lock}秒前に固定されるので、その時に線から外れないと{min}から{max}の冷気ダメージと冷え{cold}を受ける。",
@@ -7292,47 +7300,19 @@ export const ja_JP: EnTranslations = {
       "breathLine": "石のジャガーがテラスのこちら側に息を吐こうとしている。反対側へ渡れ"
     },
     "council": {
-      "warn": {
-        "wrath": "山の怒り！柱の陰に隠れろ！",
-        "shoulder": "The Slabwright hardens beside its kin: pull it away!",
-        "crowded": "Too many behind one pillar! It could not shield them all.",
-        "prison": "Stone Prison on {players}! Break them out!",
-        "enrage": "山の怒りが速まった！山の怒りがずっと早く来る。",
-        "weight": "{player}に槌の重み：タンク交代！",
-        "wake": "石の目覚め：{players}の足元に柱がせり上がる！遮蔽物が必要な場所に立て。",
-        "wakeHeir": "{players}の足元で石が目覚める：動け！",
-        "rock": "{player}に落石！遮蔽物から離れて一緒に受けろ！",
-        "song": "鉱脈の歌！詠唱を止めろ！",
-        "resonance": "{players}に共鳴：一番傷んだ柱を割れ、無傷の柱には近づくな！",
-        "fell_guardian": "槌の守護者が倒れた。その怒りは残された石へと移る！",
-        "fell_slabwright": "石板の匠が倒れた。これからは石が好きな場所にせり上がる！",
-        "fell_singer": "鉱脈の歌い手が倒れた。その歌は受け継がれ、もう誰にも止められない！",
-        "soul_guardian": "守護者の魂が石に宿った！その柱から怒りの残響が放たれる。",
-        "soul_slabwright": "石板の匠の魂が石に宿った！歩む石板が君たちを追って這い寄る。",
-        "soul_singer": "鉱脈の歌い手の魂が石に宿った！終わらぬ歌は脈打つたびに強まる。",
-        "echo": "怒りの残響！魂の柱との間に別の柱を挟め！",
-        "soulBreak_guardian": "守護者の魂の柱が砕けた！残響が静まる。",
-        "soulBreak_slabwright": "石板の匠の魂の柱が砕けた！歩む石板が止まる。",
-        "soulBreak_singer": "鉱脈の歌い手の魂の柱が砕けた！終わらぬ歌が途絶える。"
-      },
       "say": {
         "guardian_pull": "採石場によそ者か。槌の力は肉などに屈しはせぬ。",
         "guardian_wrath": "山が我に応える！石が匿ってくれるなら隠れるがいい！",
+        "guardian_rush": "ならば我が道に立つがいい。山は道を譲らぬ。",
         "guardian_death": "我が力を……石に託す。",
         "guardian_remember": "石は覚えている。あの者のものは、今や我がものだ。",
         "guardian_soul": "我はもはや石そのもの。我が怒りには、朽ちる体などない。",
         "guardian_wipe": "塵だ。肉はすべてそうなる。",
         "guardian_defeat": "槌の力は……お前たちが担え。",
-        "slabwright_pull": "壁に石が足りん。じっとしていろ、お前たちを積み込んでやる。",
-        "slabwright_wake": "そこに立て。お前の足元から石がせり上がる！",
-        "slabwright_rock": "上を見ろ、ちびども！山が落ちてくるぞ！",
-        "slabwright_death": "石板が……割れる……",
-        "slabwright_remember": "石は覚えている。仕事は俺が仕上げる。",
-        "slabwright_soul": "手はもうない。だがこの石をお前たちのもとへ引きずっていくぞ。",
-        "slabwright_wipe": "据えて、埋めた。いい仕事だ。",
-        "slabwright_defeat": "採石場が……静まる。",
         "singer_pull": "鉱脈の歌が聞こえる？ずっとあなたたちの声を待っていたの。",
         "singer_song": "一緒に歌って、そして砕けなさい！",
+        "singer_wake": "目覚めなさい、眠れる石よ。彼らの足元から立ち上がれ！",
+        "singer_rock": "上を見て、おちびさんたち！山が落ちてくるわ！",
         "singer_death": "私の歌が……岩へと流れていく……",
         "singer_remember": "石は覚えている。聞いて、まだ歌っている。",
         "singer_soul": "聞いて。石の中で、私の歌は終わらない。",
@@ -7341,59 +7321,38 @@ export const ja_JP: EnTranslations = {
       },
       "alert": {
         "wakeTitle": "石の目覚め！",
-        "wakeLine": "立っている場所に柱がせり上がる：レイドが必要な場所に遮蔽物を置こう",
+        "wakeLine": "立っている場所に柱が立ち上がる：レイドに遮蔽物が必要な場所へ移動しよう",
         "rockTitle": "落石！",
         "rockLine": "柱から離れ、少なくとも3人の味方を集めよう",
         "resonanceTitle": "共鳴",
-        "resonanceLine": "柱の近くにいると割ってしまう：一番傷んだ柱のそばで待とう",
-        "resonanceCracking": "柱を割っている：守るなら離れよう",
+        "resonanceLine": "近くの味方全員を傷つける：効果が切れるまで集団から離れよう",
+        "rushTitle": "山の突進！",
+        "rushLine": "守護者があなたに突進してくる：呪われた柱を間に挟もう",
         "rockLineSoul": "遮蔽物から離れ、魂の柱のそばで少なくとも3人の味方を集めよう",
-        "resonanceLineSoul": "魂の柱のそばで待って魂の印を砕こう、無傷の柱には近づかないこと",
-        "resonanceBreaking": "魂の印を砕いている：魂の柱のそばにとどまろう",
         "weightTitle": "槌の重み",
         "weightLine": "物理ダメージが倍になる：もう一人のタンクが守護者を引き受けよう",
         "timeAria": "残り{seconds}秒"
       }
     },
     "knotAlert": {
-      "aTitle": "You are Portal A!",
-      "aLine": "It opens at your feet in {seconds} sec. Stand near the Knotted Gale.",
-      "bTitle": "You are Portal B!",
-      "bLine": "It opens at your feet in {seconds} sec. Stand at the lip of a gap.",
-      "cTitle": "You are Portal C!",
-      "cLine": "It opens at your feet in {seconds} sec. Stand near the other Knotted Gale.",
-      "dTitle": "You are Portal D!",
-      "dLine": "It opens at your feet in {seconds} sec. Stand at a gap away from Portal B.",
-      "carryTitle": "You carry the Knotted Gale!",
-      "carryLine": "Each portal takes you to its partner: A to B, C to D. Throw it from the lip of a gap. It bursts in {seconds} sec.",
-      "lipTitle": "Throw it now!",
-      "lipLine": "You stand at the lip of a gap. It bursts in {seconds} sec.",
-      "throwKey": "Press {key} at the lip to throw",
-      "throwTap": "Tap here at the lip to throw",
-      "throwClick": "Click here at the lip to throw",
-      "throwAria": "Throw the Knotted Gale into the void"
+      "aTitle": "あなたはポータルA！",
+      "aLine": "{seconds}秒後に足元に開く。結ばれた疾風の近くに立とう。",
+      "bTitle": "あなたはポータルB！",
+      "bLine": "{seconds}秒後に足元に開く。岩棚の縁に立とう。",
+      "cTitle": "あなたはポータルC！",
+      "cLine": "{seconds}秒後に足元に開く。もう一つの結ばれた疾風の近くに立とう。",
+      "dTitle": "あなたはポータルD！",
+      "dLine": "{seconds}秒後に足元に開く。ポータルBから離れた縁に立とう。",
+      "carryTitle": "結ばれた疾風を運んでいる！",
+      "carryLine": "各ポータルは対へ運ぶ：AからB、CからD。岩棚の縁から投げ込め。{seconds}秒後に炸裂する。",
+      "lipTitle": "今だ、投げろ！",
+      "lipLine": "縁に立っている。{seconds}秒後に炸裂する。",
+      "throwKey": "縁で{key}を押して投げる",
+      "throwTap": "縁でここをタップして投げる",
+      "throwClick": "縁でここをクリックして投げる",
+      "throwAria": "結ばれた疾風を虚空へ投げ込む"
     },
     "breathGuardian": {
-      "warn": {
-        "inhale": "守護者が息を吸い込む！口の前の渦に入るな！",
-        "gust": "ふいごの突風！衝撃に備えろ！",
-        "gales": "はぐれ旋風が岩棚を駆け巡る！近づくな！",
-        "circle": "テサリー隊長が凪の円を置いた！入れるのは{seats}人まで。",
-        "fell": "{player}が虚空へ吹き飛ばされた！",
-        "storm": "嵐が裂ける！岩棚じゅうに雷が落ちてくる！",
-        "fork": "{player}に跳ねる雷撃！散開しろ！",
-        "cradle": "{player}が嵐の中へ持ち上げられた！その真下に集まれ！",
-        "drawn": "{player}に招雷！落雷を縁へ導け！",
-        "stormGust": "嵐の突風が集まる！風に備えろ！",
-        "knot": "A Knotted Gale falls! Carry it to a gap and throw it into the void!",
-        "knotPortals": "Portal A on {a}, Portal B on {b}!",
-        "knotPortals2": "Portal C on {c}, Portal D on {d}!",
-        "knotTaken": "{player} takes up the Knotted Gale!",
-        "knotDropped": "{player} falls! The Knotted Gale is free again!",
-        "knotFell": "{player} takes the Knotted Gale into the void!",
-        "knotThrown": "{player} hurls the Knotted Gale into the void!",
-        "knotBurst": "The Knotted Gale bursts!"
-      },
       "say": {
         "guardian_pull": "山の頂まで登り、その息吹を盗みに来たか？ならば我と共に息をせよ。",
         "guardian_blow": "風が向きを変えるのを感じよ。縁は思うより近いぞ。",
@@ -7401,9 +7360,12 @@ export const ja_JP: EnTranslations = {
         "guardian_storm": "息はもう十分だ。今こそ嵐を！",
         "guardian_cradle": "昇れ、小さき者よ。仲間に受け止めてもらうがいい。",
         "guardian_drawn": "空がお前を選んだ。逃げよ、雷は追ってくる。",
+        "guardian_isles": "風よ、我を囲め！ 浮島が我が息を守るだろう。",
+        "guardian_bulwark": "我が盾が……引き裂かれた。ならば再び疾風を味わえ！",
         "guardian_wipe": "吹き飛ばされた。頂の塵のように。",
         "guardian_death": "息吹は……山へ……還る……",
-        "thessaly_pull": "ハイウォッチは共に戦う！壁の裂け目に気をつけろ、風に押し出されるぞ！",
+        "thessaly_pull": "ハイウォッチはお前たちと共にある！ ここには壁がない、風に縁から放り出されるぞ！",
+        "thessaly_isles": "あの盾は浮島から力を得ている！ 風に乗って渡り、癒し手を倒して戻ってこい！",
         "thessaly_circle_a": "急げ、私の凪の中へ！入れるのは三人までだ！",
         "thessaly_circle_b": "ここだ！私と並べ、風をこの身で受け止める！",
         "thessaly_circle_c": "石の上に凪を！三人、今すぐ！",
@@ -7415,14 +7377,6 @@ export const ja_JP: EnTranslations = {
       }
     },
     "quenchGuardian": {
-      "warn": {
-        "rim": "岸の氷がせり上がる！湖の上へ移れ！",
-        "frozen": "{player}が凍りついた！氷が砕ける前に離れろ！",
-        "crack": "固まった集団の下で氷がきしむ！散らばれ！",
-        "wake": "鍛冶師の剣が湖から解き放たれる！狙いを見極めろ！",
-        "marks": "剣が{list}を狙う！レイドから離れて引きつけろ！",
-        "flurry": "すべての剣が一斉に狩りを始める！線を避けろ！"
-      },
       "say": {
         "pull": "我が湖に温かい血か。その温もりも長くは続かぬ。",
         "shatter": "芯まで凍った。さあ、砕けよ。",
@@ -7444,6 +7398,8 @@ export const ja_JP: EnTranslations = {
       "frozenTitle": "霜に閉ざされた！",
       "waterTitle": "氷の下！",
       "coldLine": "{radius}ヤード以内で他の{others}人以上と身を寄せて温まろう",
+      "splashTitle": "霜の飛沫！冷気+{cold}",
+      "immuneLine": "無敵効果でも冷気は止まらない：身を寄せ合え",
       "warmLine": "冷気が下がっている。{seconds}秒以内に集団ごと移動しないと氷が割れる",
       "frozenLine": "{seconds}秒後に氷が砕ける：近くの者は離れろ",
       "waterLine": "{seconds}秒後に這い上がる",
@@ -7458,7 +7414,7 @@ export const ja_JP: EnTranslations = {
         "keepers": "湧泉の守り手が現れた！引きつけて、その印を湧泉の落とし子から遠ざけろ！",
         "seeds": "炉床の種が降ってくる！まとめて落として走れ！",
         "zones": "目覚めの炎！炉床が帯ごとに燃え上がる：外へ出ろ！",
-        "wheel": "The Hearth turns! Get to the dark slice!",
+        "wheel": "炉床が回る！ 暗い区画へ移れ！",
         "cinder": "転がる燃え殻が落ちてきた！獲物に届く前に打ち返せ！"
       },
       "say": {
@@ -16944,7 +16900,7 @@ export const ja_JP: EnTranslations = {
       "sanctum_branding_iron": "焼き印",
       "sanctum_rime_breath": "霧氷のブレス",
       "heart_mountains_wrath": "山の怒り",
-      "heart_bellows_gust": "ふいごの突風",
+      "heart_bellows_gust": "頂の咆哮",
       "heart_storm_lance": "嵐の槍",
       "heart_quenching_breath": "焼き入れの息吹",
       "heart_forge_wrath": "炉の怒り",
@@ -16959,12 +16915,11 @@ export const ja_JP: EnTranslations = {
       "heart_rime_bolt": "Rime Bolt",
       "heart_ember_bolt": "残り火の矢",
       "heart_hammers_weight": "槌の重み",
+      "heart_mountains_rush": "山の突進",
       "heart_wake_the_stone": "石の目覚め",
       "heart_falling_rock": "落石",
-      "heart_stone_prison": "Stone Prison",
       "heart_seam_bolt": "鉱脈の矢",
       "heart_song_of_the_seam": "鉱脈の歌",
-      "heart_song_of_the_seam_unbroken": "鉱脈の歌",
       "heart_echo_of_wrath": "怒りの残響",
       "heart_endless_song": "終わらぬ歌",
       "heart_breath_inhale": "吸い込む息",
@@ -16972,6 +16927,9 @@ export const ja_JP: EnTranslations = {
       "heart_breath_forking_bolt": "跳ねる雷撃",
       "heart_breath_thunders_cradle": "雷のゆりかご",
       "heart_breath_drawn_lightning": "招雷",
+      "heart_breath_cradle_channel": "雷のゆりかご",
+      "heart_breath_gale_bulwark": "疾風の防壁",
+      "heart_breath_mending_gale": "癒しの疾風",
       "heart_quench_blades_wake": "剣の目覚め",
       "heart_quench_blades_hunt": "剣の狩り",
       "heart_heat_fist": "玄武岩の拳",
@@ -26920,6 +26878,12 @@ export const ja_JP: EnTranslations = {
       "heart_breath_caller": {
         "name": "息吹脈の呼び手"
       },
+      "heart_gale_sentinel": {
+        "name": "疾風の哨兵"
+      },
+      "heart_gale_mender": {
+        "name": "疾風の癒し手"
+      },
       "heart_quench_warder": {
         "name": "焼き入れ脈の番人"
       },
@@ -26934,9 +26898,6 @@ export const ja_JP: EnTranslations = {
       },
       "heart_hammer_guardian": {
         "name": "槌の守護者"
-      },
-      "heart_slabwright": {
-        "name": "石板の匠"
       },
       "heart_seam_singer": {
         "name": "鉱脈の歌い手"
@@ -26964,9 +26925,6 @@ export const ja_JP: EnTranslations = {
       },
       "heart_heat_rolling_cinder": {
         "name": "転がる燃え殻"
-      },
-      "heart_stone_prison": {
-        "name": "Stone Prison"
       },
       "heart_final_splinter_heat": {
         "name": "熱の欠片"

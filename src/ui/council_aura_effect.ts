@@ -52,23 +52,49 @@ export function councilAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescr
       return {
         key: `${KEY}.resonance`,
         nums: {
-          reach: T.resonanceReach,
-          seconds: T.resonanceCrackSeconds,
-          singerSeconds: T.singerSoulResonanceSeconds,
+          every: T.resonanceEvery,
+          min: T.resonanceMin,
+          max: T.resonanceMax,
+          radius: a.value2 && a.value2 > 0 ? a.value2 : T.resonanceRadius,
+          heroic: pct(COUNCIL_DIFFICULTY.heroic.damageMult - 1),
         },
+      };
+    case COUNCIL_AURAS.rushMark:
+      return {
+        key: `${KEY}.rushMark`,
+        nums: {
+          windup: T.rushWindup,
+          stun: T.rushStunSeconds,
+          exposed: pct(T.rushExposed),
+          exposedSeconds: T.rushExposedSeconds,
+          min: T.rushMin,
+          max: T.rushMax,
+        },
+      };
+    case COUNCIL_AURAS.rushExposed:
+      return { key: `${KEY}.rushExposed`, nums: { pct: pct(a.value) } };
+    case COUNCIL_AURAS.bond:
+      return {
+        key: `${KEY}.bond`,
+        nums: {
+          pct: pct(T.bondWard),
+          reach: T.bondReach,
+          every: T.bondPulseEvery,
+          min: T.bondPulseMin,
+          max: T.bondPulseMax,
+          growth: pct(T.bondPulseGrowth),
+        },
+      };
+    case COUNCIL_AURAS.collapse:
+      return {
+        key: `${KEY}.collapse`,
+        nums: { every: T.collapseEvery, min: T.collapseMin, max: T.collapseMax },
       };
     case COUNCIL_AURAS.memory:
       return {
         key: `${KEY}.memory`,
         nums: { pct: pct(a.value), per: pct(T.memoryPerFallen) },
       };
-    case COUNCIL_AURAS.shouldered:
-      return {
-        key: `${KEY}.shouldered`,
-        nums: { pct: pct(a.value), reach: T.shoulderReach },
-      };
-    case COUNCIL_AURAS.prisoned:
-      return { key: `${KEY}.prisoned`, nums: {} };
     case COUNCIL_AURAS.pillarLimit:
       return {
         key: `${KEY}.pillarLimit`,

@@ -383,18 +383,22 @@ describe("the Smith's Heart route", () => {
     expect(bad.slice(0, 10)).toEqual([]);
   });
 
-  it("opens the rim to the void only at the Storm Cornice's six gaps", () => {
+  it('opens the rim to the void only round the Storm Cornice (its open rim)', () => {
     // With every gate open, the only void a body can step into from the
-    // whole main map lies in a gap's throat; each gap opens onto it.
+    // whole main map lies off the Cornice's open rim (2026-11-03: no wall
+    // round it but at the climb's head), and every channel's throat is open.
     const seen = flood(ALL_GATES);
     const strays: string[] = [];
     const opened = new Set<number>();
     for (let z = minZ; z <= maxZ; z++)
       for (let x = minX; x <= maxX; x++) {
         if (!seen[cell(x, z)] || !voidCell(x, z)) continue;
+        const nearRim = (SMITH_HEART_FIELD.lipOpenings ?? []).some(
+          (o) => Math.hypot(x - o.x, z - o.z) <= o.r + 1.5,
+        );
+        if (!nearRim) strays.push(`(${x},${z})`);
         const g = CORNICE_GAPS.findIndex((p) => Math.hypot(x - p.x, z - p.z) <= p.r + 1.5);
-        if (g < 0) strays.push(`(${x},${z})`);
-        else opened.add(g);
+        if (g >= 0) opened.add(g);
       }
     expect(strays.slice(0, 10)).toEqual([]);
     expect(opened.size).toBe(CORNICE_GAPS.length);

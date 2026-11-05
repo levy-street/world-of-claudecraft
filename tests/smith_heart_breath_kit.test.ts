@@ -5,7 +5,9 @@
 //   - the shipped GLB is the current sources', inside its budget, crystal the
 //     only light; the pieces a body touches stay within their colliders, the
 //     walls and the inlays never stand over a walk, the arch never over its
-//     deck;
+//     deck; each floating isle's turf walk IS the sim's floor (its edge the
+//     isle's organic field polygon, its ledges at their heights, no
+//     floor-high ledge past it, nothing but grass standing on it);
 //   - the plan fits every Breath prop, walls every Breath walk over the void
 //     (never over a walk), lays the inlays flat on Breath floors, and leaves
 //     the bridge's drop to the arch (no mountain lip under it).
@@ -40,8 +42,10 @@ import {
   windBridgeFrame,
 } from '../src/render/smith_heart/breath_kit_plan_core';
 import { planHeartLips } from '../src/render/smith_heart/heart_rock_plan_core';
+import { ISLE_KIT } from '../src/render/smith_heart_fx/breath_isles_fx_core';
 import {
   BREATH,
+  BREATH_ISLES,
   CORNICE_CHANNELS,
   SMITH_HEART_FIELD,
   WIND_BRIDGE,
@@ -106,6 +110,8 @@ interface Shape {
   min: V3;
   max: V3;
   points: V3[];
+  /** Every triangle's corners (indices into `points`). */
+  tris: [number, number, number][];
   triangles: number;
   materials: Set<string>;
 }
@@ -136,6 +142,7 @@ beforeAll(async () => {
     const name = node.getName();
     if (!name.startsWith('Kit_')) continue;
     const points: V3[] = [];
+    const tris: [number, number, number][] = [];
     const materials = new Set<string>();
     let triangles = 0;
     const m = node.getWorldMatrix();
@@ -144,6 +151,13 @@ beforeAll(async () => {
       if (!a) continue;
       materials.add(prim.getMaterial()?.getName() ?? '');
       triangles += (prim.getIndices()?.getCount() ?? a.getCount()) / 3;
+      const base = points.length;
+      const idx = prim.getIndices();
+      const count = idx?.getCount() ?? a.getCount();
+      for (let k = 0; k + 2 < count; k += 3) {
+        const at = (j: number) => base + (idx ? idx.getScalar(k + j) : k + j);
+        tris.push([at(0), at(1), at(2)]);
+      }
       const e: number[] = [];
       for (let i = 0; i < a.getCount(); i++) {
         a.getElement(i, e);
@@ -161,7 +175,7 @@ beforeAll(async () => {
         min[k] = Math.min(min[k], p[k]);
         max[k] = Math.max(max[k], p[k]);
       }
-    shapes.set(name, { min, max, points, triangles, materials });
+    shapes.set(name, { min, max, points, tris, triangles, materials });
   }
 });
 
@@ -210,18 +224,30 @@ describe('Smith Heart Breath kit: the piece list and the shipped GLB', () => {
   });
 
   it.skipIf(!haveKit)('keeps every piece inside its triangle budget', () => {
-    let total = 0;
+    let rest = 0;
+    let isles = 0;
     for (const [name, s] of shapes) {
       expect(s.triangles, name).toBeGreaterThan(0);
+      // An isle is a whole landmark seen from all round and stood on (its
+      // crag and satellites, the shrine's turf walk, roots, vines, crystals,
+      // the arch or the tree): its own budget (the AAA pass of 2026-11-03,
+      // src/render/smith_heart/CLAUDE.md), two draws each.
       const cap = /Crack|Scar|Groove|Wall/.test(name)
         ? 1200
         : name === 'Kit_WindBridge'
           ? 12500
-          : 5000;
+          : /WindIsle/.test(name)
+            ? 15_000
+            : name === 'Kit_IsleShard'
+              ? 300
+              : 5000;
       expect(s.triangles, name).toBeLessThanOrEqual(cap);
-      total += s.triangles;
+      if (/WindIsle/.test(name)) isles += s.triangles;
+      else rest += s.triangles;
     }
-    expect(total).toBeLessThan(40_000);
+    // The isles keep their own budget; the rest of the kit its first 40,000.
+    expect(isles).toBeLessThanOrEqual(30_000);
+    expect(rest).toBeLessThan(40_000);
   });
 
   it.skipIf(!haveKit)('lights only crystal: the rods, the horns, the jambs, the stones', () => {
@@ -283,32 +309,180 @@ describe('Smith Heart Breath kit: the measures the plan relies on', () => {
   });
 });
 
+/** A point of the sim's frame round isle `i` in its kit piece's glTF frame
+ *  (x, z: the runtime turns the piece by ISLE_KIT's rot). */
+function toKit(i: number, x: number, z: number): [number, number] {
+  const isle = BREATH_ISLES[i];
+  const rot = ISLE_KIT[i].rot;
+  const dx = x - isle.x;
+  const dz = z - isle.z;
+  return [dx * Math.cos(rot) - dz * Math.sin(rot), dx * Math.sin(rot) + dz * Math.cos(rot)];
+}
+
+/** An isle's walkable floors (its organic outline and its ledges, the sim's
+ *  own polygons) in its kit piece's frame, each with its height over the
+ *  isle's floor. */
+function isleFloors(i: number): { poly: [number, number][]; rise: number }[] {
+  const isle = BREATH_ISLES[i];
+  const out: { poly: [number, number][]; rise: number }[] = [];
+  for (const q of F.surfaces) {
+    if (q.id !== isle.id && !q.id.startsWith(`${isle.id}_ledge_`)) continue;
+    if (q.kind !== 'poly') throw new Error(`no polygon for ${q.id}`);
+    out.push({ poly: q.points.map(([x, z]) => toKit(i, x, z)), rise: q.h - isle.h });
+  }
+  if (!out.length || out[0].rise !== 0) throw new Error(`no walk for ${isle.id}`);
+  return out;
+}
+
+/** An isle's walk (its whole outline) in its kit piece's frame. */
+function isleWalk(i: number): [number, number][] {
+  return isleFloors(i)[0].poly;
+}
+
+/** The sim's floor over the isle's at a kit point: the highest of its
+ *  floors within `reach` yards (a step's face stands right on a ledge's
+ *  edge), or -Infinity off the walk. */
+function floorNear(
+  floors: { poly: [number, number][]; rise: number }[],
+  x: number,
+  z: number,
+  reach: number,
+) {
+  let best = Number.NEGATIVE_INFINITY;
+  for (const f of floors) if (polySd(f.poly, x, z) < reach) best = Math.max(best, f.rise);
+  return best;
+}
+
+/** Signed distance from (x, z) to a polygon's edge, negative inside. */
+function polySd(poly: [number, number][], x: number, z: number): number {
+  let best = Infinity;
+  let inside = false;
+  for (let k = 0; k < poly.length; k++) {
+    const [ax, az] = poly[k];
+    const [bx, bz] = poly[(k + 1) % poly.length];
+    const ex = bx - ax;
+    const ez = bz - az;
+    const t = Math.max(0, Math.min(1, ((x - ax) * ex + (z - az) * ez) / (ex * ex + ez * ez)));
+    best = Math.min(best, Math.hypot(x - ax - ex * t, z - az - ez * t));
+    if (az > z !== bz > z && x < (bx - ax) * ((z - az) / (bz - az)) + ax) inside = !inside;
+  }
+  return inside ? -best : best;
+}
+
+describe('Smith Heart Breath kit: the Islands of the Wind', () => {
+  it.skipIf(!haveKit)(
+    "lays each isle's turf walk exactly on the sim's floors, nothing standing on it",
+    () => {
+      BREATH_ISLES.forEach((_, i) => {
+        const v = 'AB'[i];
+        const s = shape(`Kit_WindIsle${v}`);
+        const floors = isleFloors(i);
+        const walk = floors[0].poly;
+        // Nothing but ankle-high grass stands on the walk or a ledge (the
+        // shrine's flags lie flush, a step's rubble low), so a body never
+        // meets an unseen wall inside it.
+        for (const p of s.points) {
+          if (polySd(walk, p[0], p[2]) >= -0.05) continue;
+          const floor = floorNear(floors, p[0], p[2], 0.3);
+          expect(p[1] - floor, `${v} ${p}`).toBeLessThan(0.4);
+        }
+        // The turf reaches every corner of every floor of the sim's, at the
+        // height the sim stands a body there (the highest floor holding it:
+        // a ledge over the walk's own rim).
+        for (const f of floors)
+          for (const [x, z] of f.poly) {
+            const rise = floorNear(floors, x, z, 0.02);
+            const hit = s.points.some(
+              (p) => Math.abs(p[1] - rise) < 0.02 && Math.hypot(p[0] - x, p[2] - z) < 0.15,
+            );
+            expect(hit, `${v} corner ${x} ${z} at ${rise}`).toBe(true);
+          }
+        // And each ledge stands a stride up off the walk: the turf at its
+        // height a hand inside it, at the walk's a hand outside its step.
+        for (const f of floors.slice(1)) {
+          expect(f.rise).toBeGreaterThan(0.3);
+          expect(f.rise).toBeLessThanOrEqual(0.9 + 1e-6);
+        }
+        // No floor-high ledge past the rim: every face that lies flat near a
+        // floor's height lies on the walk (the old turf ran 0.7 yd past the
+        // sim's floor, an unseen wall at its edge).
+        let flat = 0;
+        const levels = floors.map((f) => f.rise);
+        for (const [a, b, c] of s.tris) {
+          const A = s.points[a];
+          const B = s.points[b];
+          const C = s.points[c];
+          const ux = B[0] - A[0];
+          const uy = B[1] - A[1];
+          const uz = B[2] - A[2];
+          const wx = C[0] - A[0];
+          const wy = C[1] - A[1];
+          const wz = C[2] - A[2];
+          const nx = uy * wz - uz * wy;
+          const ny = uz * wx - ux * wz;
+          const nz = ux * wy - uy * wx;
+          const len = Math.hypot(nx, ny, nz);
+          if (len < 1e-9 || ny / len < 0.9) continue;
+          const cy = (A[1] + B[1] + C[1]) / 3;
+          if (!levels.some((l) => cy > l - 0.35 && cy < l + 0.1)) continue;
+          flat++;
+          const cx = (A[0] + B[0] + C[0]) / 3;
+          const cz = (A[2] + B[2] + C[2]) / 3;
+          // Within a yard past the edge (a ledge that would read as more
+          // floor); the rim's fallen stones lie further out.
+          const sd = polySd(walk, cx, cz);
+          if (sd < 1.2) expect(sd, `${v} flat face at ${cx} ${cy} ${cz}`).toBeLessThan(0.25);
+        }
+        expect(flat, v).toBeGreaterThan(300);
+        // A crag hanging well under it, its crystal lit.
+        expect(s.min[1], v).toBeLessThan(-18);
+        expect(s.materials.has('KitGlow'), v).toBe(true);
+      });
+      expect(shape('Kit_IsleShard').max[1] - shape('Kit_IsleShard').min[1]).toBeLessThan(3);
+    },
+  );
+
+  it.skipIf(!haveKit)('keeps the drifting ring of stones clear of every satellite', () => {
+    // The kit's satellites stay inside 1.95 walks of the centre (the ring
+    // rides out past 2.05, breath_isles_fx_core.ts driftStone).
+    for (const v of ['A', 'B']) {
+      const s = shape(`Kit_WindIsle${v}`);
+      for (const p of s.points)
+        expect(Math.hypot(p[0], p[2]), `${v} ${p}`).toBeLessThan(BREATH_ISLES[0].r * 1.95);
+    }
+  });
+
+  it.skipIf(!haveKit)('makes each isle its own: two shapes, never one mirrored', () => {
+    const a = shape('Kit_WindIsleA');
+    const b = shape('Kit_WindIsleB');
+    expect(Math.abs(a.min[1] - b.min[1])).toBeGreaterThan(2);
+    // Their crags reach out differently (never one shape turned).
+    const reachA = [a.max[0] - a.min[0], a.max[2] - a.min[2]].sort((x, y) => x - y);
+    const reachB = [b.max[0] - b.min[0], b.max[2] - b.min[2]].sort((x, y) => x - y);
+    expect(Math.abs(reachA[0] - reachB[0]) + Math.abs(reachA[1] - reachB[1])).toBeGreaterThan(0.5);
+  });
+});
+
 describe('Smith Heart Breath kit: the plan', () => {
   it('fits every Breath prop with its piece, the bridge with its arch', () => {
     const props = F.props.filter((p) => BREATH_KIT_KINDS.has(p.kind));
     const plan = planBreathProps();
     const of = (piece: string) => plan.filter((p) => p.piece === piece).length;
-    const rods = F.props.filter((p) => p.kind === 'sh_lightning_rod').length;
-    expect(of('Kit_StormRod')).toBe(rods);
-    expect(of('Kit_StrikeScar')).toBe(rods);
-    expect(of('Kit_WindHorn')).toBe(2);
+    // The Cornice stands bare since the open rim (2026-11-03): no rod, horn
+    // or cheek stone.
+    for (const piece of ['Kit_StormRod', 'Kit_StrikeScar', 'Kit_WindHorn', 'Kit_ChannelJamb'])
+      expect(of(piece), piece).toBe(0);
     expect(of('Kit_WindShelter')).toBe(2);
-    expect(of('Kit_ChannelJamb')).toBe(CORNICE_CHANNELS.length * 2);
     expect(of('Kit_StormStone')).toBe(6);
     expect(of('Kit_WindBridge')).toBe(1);
-    expect(props.length).toBe(rods + 2 + 2 + CORNICE_CHANNELS.length * 2 + 6);
-    // The cheek stones and the standing stones stand on their colliders, on
-    // Breath floors.
+    expect(props.length).toBe(2 + 6);
+    // The standing stones stand on their colliders, on Breath floors.
     for (const p of F.props) {
-      if (p.kind !== 'sh_channel_jamb' && p.kind !== 'sh_storm_stone') continue;
+      if (p.kind !== 'sh_storm_stone') continue;
       expect(p.r ?? 0).toBeGreaterThan(1);
       const s = authoredFieldSurfaceAt(F, p.x, p.z);
       expect(BREATH_WALK_SURFACES.has(s?.id ?? ''), `${p.kind} on ${s?.id}`).toBe(true);
     }
-    // The horns' bells open to the rim.
-    const C = BREATH.cornice;
-    for (const h of plan.filter((p) => p.piece === 'Kit_WindHorn'))
-      expect(Math.sin(h.rot) * (h.x - C.x) + Math.cos(h.rot) * (h.z - C.z)).toBeGreaterThan(0);
     // The arch at the ramp's foot, its run along the ramp.
     const b = plan.find((p) => p.piece === 'Kit_WindBridge');
     const f = windBridgeFrame();
@@ -330,9 +504,11 @@ describe('Smith Heart Breath kit: the plan', () => {
             id,
         ),
       ).length;
-    // The bridge, the Cornice and every landing have their walls.
-    for (const id of ['wind_bridge', 'storm_cornice', 'breath_b1', 'breath_b2', 'breath_b3'])
+    // The bridge and every landing have their walls; the Cornice's rim is
+    // open but for the climb's head (2026-11-03).
+    for (const id of ['wind_bridge', 'breath_b1', 'breath_b2', 'breath_b3'])
       expect(near(id), id).toBeGreaterThan(1);
+    expect(near('storm_cornice')).toBeLessThanOrEqual(4);
     for (const w of walls)
       expect(wallClear(w.x, w.z, w.rot, w.stretch ?? 1), `${w.x} ${w.z}`).toBe(true);
   });

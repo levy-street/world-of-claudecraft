@@ -140,6 +140,14 @@ export function heartLandmarkSpots(vein: SmithHeartVein): HeartLandmarkPoint[] {
   return heartBreathHornTips();
 }
 
+/** The spots a landmark's halo glows on: every signature spot, but the
+ *  Heat's crater alone (the AAA pass's third round: its lava's feet wore
+ *  discs that read as salmon globes in the air). */
+export function heartLandmarkHaloSpots(vein: SmithHeartVein): HeartLandmarkPoint[] {
+  const spots = heartLandmarkSpots(vein);
+  return vein === 'heat' ? spots.slice(0, 1) : spots;
+}
+
 /** How awake a quarter's landmark is (0 to 1): its quarter's flood once it
  *  reaches the wall (the light runs out along the seams and the landmark
  *  erupts as it arrives), nothing while the quarter sleeps. */

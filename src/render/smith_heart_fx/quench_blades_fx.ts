@@ -9,7 +9,10 @@
 //    vein always showed it;
 //  - waking (the guardian's 4 s bar): trembling, light running up its
 //    fuller, then wrenched up out of the ice, the ice bursting upward round
-//    it, its point shown, standing upright;
+//    it, its point shown, standing upright; the point continues the piece's
+//    own section, axis and paint (quench_blade_tip_core.ts: Jose's playtest
+//    of 2026-11-04 read the old cone as a spike, not the sword's), and the
+//    lake's heaved plates the piece carries round its foot stay in the lake;
 //  - floating: upright a breath over the ice, bobbing, a blue light in it, its
 //    broad face turned along its line while it aims, blazing as it does;
 //  - flying (a slash): along its line on the sim's own eased curve (`slashEase`:
@@ -58,6 +61,13 @@ import {
 import { heartVeinGlowMaterial } from '../smith_heart/heart_room_kit';
 import { radialGlowTexture } from '../textures';
 import { EngineParticles } from '../trash_engine_fx/engine_particles';
+import { SOCKET_FRAG, SOCKET_VERT } from './quench_blade_socket_glsl';
+import {
+  BLADE_KIT_LEAN,
+  bladeTipMesh,
+  sampleBladeRamp,
+  splitKitBlade,
+} from './quench_blade_tip_core';
 import {
   BLADE_FLOAT_LIFT,
   BLADE_FOLLOW_RATE,
@@ -77,42 +87,12 @@ import {
 
 const SCAN_SEC = 0.1;
 /** The kit piece leans this far toward its +x (quench_pieces.py BLADE_LEAN). */
-const KIT_LEAN = 0.17;
+const KIT_LEAN = BLADE_KIT_LEAN;
 
 const _look: BladeLook = { lift: 0, upright: 0, light: 0, shake: 0 };
 const _e = new THREE.Euler();
 
-const SOCKET_VERT = /* glsl */ `
-varying vec2 vUv;
-void main() {
-  vUv = uv;
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-}
-`;
-/** The ring of broken ice a blade leaves in the lake once torn out. */
-const SOCKET_FRAG = /* glsl */ `
-uniform float uAlpha;
-uniform vec3 uDark;
-uniform vec3 uLight;
-varying vec2 vUv;
-float h(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
-void main() {
-  vec2 p = (vUv - 0.5) * 2.0;
-  float r = length(p);
-  float a = atan(p.y, p.x);
-  if (r > 1.0) discard;
-  // A dark heave of broken plates, radial cracks of light, open water deep in.
-  float cell = floor(a * 3.2 + 3.2) + floor(r * 4.0) * 13.0;
-  float plate = h(vec2(cell, 3.1));
-  float crack = 1.0 - smoothstep(0.0, 0.05, abs(fract(a * 1.9 + plate * 0.3) - 0.5) - 0.44);
-  float water = 1.0 - smoothstep(0.18, 0.34, r);
-  vec3 col = mix(uDark, uLight, crack * (1.0 - r) + plate * 0.25);
-  col = mix(col, uDark * 0.4, water);
-  float alpha = (1.0 - smoothstep(0.82, 1.0, r)) * uAlpha * (0.55 + 0.35 * plate + 0.3 * water);
-  gl_FragColor = vec4(col, alpha);
-  #include <colorspace_fragment>
-}
-`;
+// The socket's shaders: quench_blade_socket_glsl.ts.
 
 interface BladeView {
   /** The blade's home (QUENCH_BLADE_SPOTS index) when it is drawn at home. */
@@ -123,6 +103,9 @@ interface BladeView {
   frame: THREE.Group;
   /** The plain stand-in until the kit lands. */
   standIn: THREE.Mesh | null;
+  /** The lake's heaved plates round its foot (the kit piece's), drawn at its
+   *  home whatever the blade does; null until the kit lands. */
+  collar: THREE.Group | null;
   tip: THREE.Mesh;
   core: THREE.Sprite;
   halo: THREE.Sprite;
@@ -177,6 +160,14 @@ export class QuenchBladesFx {
   /** The claim's origin (world), while the player is in one. */
   private readonly origin = { x: 0, z: 0 };
   private kitBuilt = false;
+  /** The kit piece's meshes split into the blade's and the collar's (one
+   *  pair per source geometry, shared by the four blades). */
+  private readonly splits = new Map<
+    THREE.BufferGeometry,
+    { blade: THREE.BufferGeometry; collar: THREE.BufferGeometry | null }
+  >();
+  private tipGeo: THREE.BufferGeometry | null = null;
+  private tipPainted = false;
   private near = false;
   private scanTimer = 0;
   private clock = 0;
@@ -234,21 +225,15 @@ export class QuenchBladesFx {
     carrier.visible = false;
     carrier.frustumCulled = false;
     this.root.add(carrier);
-    // The point the sunk piece hides in the ice: a keen diamond of ice.
-    const tipGeo = new THREE.ConeGeometry(1, BLADE_TIP, 4, 3).rotateX(Math.PI);
-    tipGeo.rotateY(Math.PI / 4);
-    tipGeo.translate(0, -BLADE_TIP / 2, 0);
-    {
-      const pos = tipGeo.getAttribute('position') as THREE.BufferAttribute;
-      const col = new Float32Array(pos.count * 3);
-      for (let i = 0; i < pos.count; i++) {
-        pos.setXYZ(i, pos.getX(i) * 1.1, pos.getY(i), pos.getZ(i) * 0.46);
-        const k = Math.min(1, -pos.getY(i) / BLADE_TIP);
-        col.set([0.3 + 0.5 * k, 0.52 + 0.38 * k, 0.7 + 0.28 * k], i * 3);
-      }
-      tipGeo.setAttribute('color', new THREE.BufferAttribute(col, 3));
-      tipGeo.computeVertexNormals();
-    }
+    // The point the sunk piece hides in the ice: the blade's own section
+    // carried down its own axis to a keen point (quench_blade_tip_core.ts),
+    // painted with the piece's own paint once it is at hand.
+    const tip0 = bladeTipMesh(BLADE_TIP);
+    const tipGeo = new THREE.BufferGeometry();
+    tipGeo.setAttribute('position', new THREE.BufferAttribute(tip0.positions, 3));
+    tipGeo.setAttribute('color', new THREE.BufferAttribute(tip0.colors, 3));
+    tipGeo.computeVertexNormals();
+    this.tipGeo = tipGeo;
     this.geometries.push(tipGeo);
     const standInGeo = new THREE.BoxGeometry(2.2, 11, 0.9).translate(0, 5.5, 0);
     {
@@ -266,7 +251,9 @@ export class QuenchBladesFx {
       holder.name = `quenchBlade:${i}`;
       const frame = new THREE.Group();
       holder.add(frame);
-      const kit = kitsIn ? this.fitKit(i) : null;
+      const fitted = kitsIn ? this.fitKit(i) : null;
+      const kit = fitted?.kit ?? null;
+      const collar = fitted?.collar ?? null;
       let standIn: THREE.Mesh | null = null;
       if (kit) frame.add(kit);
       else {
@@ -307,6 +294,10 @@ export class QuenchBladesFx {
       socket.visible = false;
       socket.frustumCulled = false;
       this.root.add(holder, socket);
+      if (collar) {
+        collar.visible = false;
+        this.root.add(collar);
+      }
       holder.visible = false;
       this.blades.push({
         home: i,
@@ -314,6 +305,7 @@ export class QuenchBladesFx {
         holder,
         frame,
         standIn,
+        collar,
         tip,
         core,
         halo,
@@ -350,13 +342,92 @@ export class QuenchBladesFx {
   }
 
   /** The kit's sunk blade at its own size (origin at its foot on the ice),
-   *  its fuller's light on the blades' own glow. */
-  private fitKit(i: number): THREE.Group | null {
+   *  its fuller's light on the blades' own glow; the lake's heaved plates
+   *  round its foot split off into their own group (they stay in the lake;
+   *  same materials, so no new program). */
+  private fitKit(i: number): { kit: THREE.Group; collar: THREE.Group } | null {
     const kit = heartKitMeshes(QUENCH_KIT, 'Kit_SunkBlade');
     if (!kit) return null;
-    for (const m of kit.children)
-      if (m instanceof THREE.Mesh && m.name.endsWith(':glow')) m.material = this.glowMats[i];
-    return kit;
+    const collar = new THREE.Group();
+    collar.name = `smithHeartQuenchBladeCollar:${i}`;
+    for (const m of kit.children) {
+      if (!(m instanceof THREE.Mesh)) continue;
+      if (m.name.endsWith(':glow')) {
+        m.material = this.glowMats[i];
+        continue;
+      }
+      if (m.name.endsWith(':ice')) this.paintTip(m.geometry);
+      const split = this.splitOf(m.geometry);
+      m.geometry = split.blade;
+      if (!split.collar) continue;
+      const c = new THREE.Mesh(split.collar, m.material);
+      c.name = `${m.name}:collar`;
+      c.castShadow = m.castShadow;
+      c.receiveShadow = m.receiveShadow;
+      collar.add(c);
+    }
+    return { kit, collar };
+  }
+
+  /** A kit mesh's triangles parted into the blade's and the collar's
+   *  (quench_blade_tip_core.ts splitKitBlade), built once per source. */
+  private splitOf(src: THREE.BufferGeometry): {
+    blade: THREE.BufferGeometry;
+    collar: THREE.BufferGeometry | null;
+  } {
+    const had = this.splits.get(src);
+    if (had) return had;
+    const pos = src.getAttribute('position');
+    const xyz = new Float32Array(pos.count * 3);
+    for (let v = 0; v < pos.count; v++) {
+      xyz[v * 3] = pos.getX(v);
+      xyz[v * 3 + 1] = pos.getY(v);
+      xyz[v * 3 + 2] = pos.getZ(v);
+    }
+    const index = src.getIndex();
+    const parts = splitKitBlade(xyz, index ? index.array : null, pos.count);
+    // Our own copies of the attributes (the kit keeps its source geometry),
+    // so disposing ours never frees the kit's buffers.
+    const attrs: [string, THREE.BufferAttribute | THREE.InterleavedBufferAttribute][] = [];
+    for (const name of Object.keys(src.attributes))
+      attrs.push([name, src.getAttribute(name).clone()]);
+    const make = (idx: number[]) => {
+      const g = new THREE.BufferGeometry();
+      for (const [name, attr] of attrs) g.setAttribute(name, attr);
+      g.setIndex(idx);
+      g.computeBoundingSphere();
+      this.geometries.push(g);
+      return g;
+    };
+    const out = {
+      blade: make(parts.blade),
+      collar: parts.collar.length > 0 ? make(parts.collar) : null,
+    };
+    this.splits.set(src, out);
+    return out;
+  }
+
+  /** The point wears the piece's own paint across its width (sampled once). */
+  private paintTip(ice: THREE.BufferGeometry): void {
+    const geo = this.tipGeo;
+    const col = ice.getAttribute('color');
+    if (this.tipPainted || !geo || !col) return;
+    this.tipPainted = true;
+    const pos = ice.getAttribute('position');
+    const xyz = new Float32Array(pos.count * 3);
+    const rgb = new Float32Array(pos.count * 3);
+    for (let v = 0; v < pos.count; v++) {
+      xyz[v * 3] = pos.getX(v);
+      xyz[v * 3 + 1] = pos.getY(v);
+      xyz[v * 3 + 2] = pos.getZ(v);
+      rgb[v * 3] = col.getX(v);
+      rgb[v * 3 + 1] = col.getY(v);
+      rgb[v * 3 + 2] = col.getZ(v);
+    }
+    const painted = bladeTipMesh(BLADE_TIP, sampleBladeRamp(xyz, rgb, pos.count)).colors;
+    const attr = geo.getAttribute('color') as THREE.BufferAttribute;
+    (attr.array as Float32Array).set(painted);
+    attr.needsUpdate = true;
   }
 
   private upgradeKit(): void {
@@ -365,11 +436,11 @@ export class QuenchBladesFx {
     const staging = new THREE.Group();
     staging.name = 'smithHeartQuenchBladeStaging';
     staging.visible = false;
-    const fitted: (THREE.Group | null)[] = [];
+    const fitted: ({ kit: THREE.Group; collar: THREE.Group } | null)[] = [];
     for (let i = 0; i < this.blades.length; i++) {
       const kit = this.fitKit(i);
       fitted.push(kit);
-      if (kit) staging.add(kit);
+      if (kit) staging.add(kit.kit, kit.collar);
     }
     this.root.add(staging);
     const linked = this.compileGate ? this.compileGate(staging).catch(() => {}) : Promise.resolve();
@@ -383,7 +454,10 @@ export class QuenchBladesFx {
           b.frame.remove(b.standIn);
           b.standIn = null;
         }
-        b.frame.add(kit);
+        b.frame.add(kit.kit);
+        kit.collar.visible = false;
+        this.root.add(kit.collar);
+        b.collar = kit.collar;
       });
     });
   }
@@ -459,6 +533,7 @@ export class QuenchBladesFx {
   private hide(b: BladeView): void {
     b.holder.visible = false;
     b.socket.visible = false;
+    if (b.collar) b.collar.visible = false;
   }
 
   /** The line starting where (x, z) stands (its blade's own), if any. */
@@ -558,14 +633,23 @@ export class QuenchBladesFx {
     (this.glowMats[b.home].uniforms.uColor.value as THREE.Color)
       .setHex(C.bladeLight)
       .multiplyScalar(0.8 + 1.4 * Math.max(look.light, held ? 1.2 : 0));
-    // The torn socket at its home once it has risen out of the lake.
-    const torn = state !== 'sunk' && b.lift > 0.5;
-    b.socket.visible = torn;
-    if (torn) {
+    // The socket at its home the whole fight, along the blade's broad face:
+    // seated, the blade stands in its slot; torn out, the slot stays
+    // (quench_blade_socket_glsl.ts).
+    b.socket.visible = true;
+    {
       const hx = this.origin.x + home.x;
       const hz = this.origin.z + home.z;
       b.socket.position.set(hx, this.groundY(hx, hz) + 0.05, hz);
+      b.socket.rotation.y = home.rot;
       b.socketMat.uniforms.uAlpha.value = 1;
+      // The lake's heaved plates where the piece stood sunk (its sunk yaw,
+      // its foot on the ice), whatever the blade does.
+      if (b.collar) {
+        b.collar.visible = true;
+        b.collar.position.set(hx, this.groundY(hx, hz), hz);
+        b.collar.rotation.y = home.rot;
+      }
     }
     this.cosmetics(e, b, look, state, floor, dt);
     if (flying && !fresh) this.frostWake(lastX, lastZ, b.px, b.pz, floor, speed);

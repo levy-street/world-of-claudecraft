@@ -505,11 +505,19 @@ function scouredColor(base: Rgb, k: number, x: number, z: number, patch: number)
   const streak = fieldNoise(along * 0.025 + 31, across * 0.16 - 9, 2);
   const wet = Math.max(0, 0.42 - patch) * 1.6;
   const lichen = Math.max(0, patch - 0.66) * 1.4;
-  const t = k * (0.9 + streak * 0.22) * (1 - wet * 0.22);
+  // The painted world's big value groups (its M5 and M6, the third pass of
+  // 2026-11-03): broad drifts of warmer and cooler granite inside the one
+  // stone, pale wind-polished streaks, a cold blue-violet in the hollows
+  // (cool shadow, never black) and grey-green moss in sheltered drifts.
+  const drift = fieldNoise(x * 0.014 + 5, z * 0.014 - 11, 2);
+  const warm = Math.max(0, drift - 0.58) * 2.2;
+  const polish = Math.max(0, streak - 0.62) * 2.4;
+  const moss = Math.max(0, fieldNoise(x * 0.05 + 41, z * 0.05 + 7, 3) - 0.62) * 2.6;
+  const t = k * (0.88 + streak * 0.22 + polish * 0.16) * (1 - wet * 0.26);
   return [
-    base[0] * t - lichen * 0.02,
-    base[1] * t + lichen * 0.015,
-    base[2] * t * (1 + wet * 0.12) - lichen * 0.01,
+    base[0] * t * (1 + warm * 0.07 - wet * 0.04) - lichen * 0.02 - moss * 0.035,
+    base[1] * t * (1 + warm * 0.03 - wet * 0.02) + lichen * 0.015 + moss * 0.012,
+    base[2] * t * (1 + wet * 0.2 - warm * 0.05) - lichen * 0.01 - moss * 0.03,
   ];
 }
 
@@ -788,6 +796,12 @@ export interface FieldCliffOptions {
   /** Surfaces with no skirt at all (a kit's own rock stands there and can fall away:
    *  the Smith's Heart's Anvil). */
   noSkirt?: ReadonlySet<string>;
+  /** Surfaces whose drop into the void falls SHEER for its first `depth`
+   *  yards (no outward flare, no jag out past the lip), so nothing past the
+   *  walkable lip reads as more ground from above; the massif flares below
+   *  that (the Smith's Heart's Storm Cornice: Jose's playtest of 2026-11-04
+   *  saw rock past its red edge where a body still falls). */
+  sheer?: { surfaces: ReadonlySet<string>; depth: number };
   /** The faces' vertex paint (default `cliffColor`). */
   paint?: CliffPaint;
   /** Texture repeats per yard on the faces (default 0.12). */
@@ -1039,6 +1053,7 @@ export function planFieldCliffs(def: AuthoredFieldDef, opts: FieldCliffOptions):
     const skirt = ownedSkirtRing(def, index, ring);
     ring = skirt.ring;
     const shallow = opts.shallow?.surfaces.has(s.id) ? opts.shallow.depth : 0;
+    const sheer = opts.sheer?.surfaces.has(s.id) ? opts.sheer.depth : 0;
     const n = ring.length;
     const tops: number[] = [];
     const bottoms: number[] = [];
@@ -1082,10 +1097,15 @@ export function planFieldCliffs(def: AuthoredFieldDef, opts: FieldCliffOptions):
         const depth = top - y;
         const intoVoid = bottoms[k] <= opts.voidFloor + 0.01;
         const straight = r === 0 || !intoVoid || (masonry && depth < 3.2);
-        const jag = straight
-          ? 0
-          : (fieldNoise(ex * 0.35 + y * 0.21, ez * 0.35 - y * 0.17, 3) - 0.3) * 2.6;
-        const flare = straight ? 0 : Math.max(0, depth * opts.flare + jag);
+        // A sheer face: nothing out past the lip for its first yards, the
+        // flare growing in smoothly below them.
+        const sheerK = sheer > 0 ? Math.min(1, Math.max(0, (depth - sheer) / sheer)) : 1;
+        const jag =
+          straight || sheerK <= 0
+            ? 0
+            : (fieldNoise(ex * 0.35 + y * 0.21, ez * 0.35 - y * 0.17, 3) - 0.3) * 2.6 * sheerK;
+        const flare =
+          straight || sheerK <= 0 ? 0 : Math.max(0, Math.max(0, depth - sheer) * opts.flare + jag);
         // The massif never flares out over a neighbouring walkable floor at
         // or below the rock's height (it would stand through that floor's
         // walk): it pulls back toward its own lip there.

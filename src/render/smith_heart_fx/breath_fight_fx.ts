@@ -14,8 +14,9 @@
 //    rolling front of dust as a blow gathers (with the guardian turning and
 //    the gather's sound), full through the blow, dying in the calm, drawn
 //    inward to the guardian while it draws breath and as the storm breaks;
-//  - the six gaps' lips, burning the lethal red at all times, flaring when
-//    the wind blows their way;
+//  - the open rim's lethal lip (all round since 2026-11-03: no wall stands),
+//    a low red glow at all times, each stretch flaring when the wind blows
+//    its way;
 //  - through the shared floor telegraph, at each object's exact radius:
 //    Thessaly's circle (the calm's mint: filling as it lands, held, its free
 //    seats as pips on its rim, dimming when spent), the vortex (danger), the
@@ -53,6 +54,7 @@ import {
   calmOf,
   timedOf,
 } from '../../sim/encounters/smith_heart/breath_ids';
+import { ISLE_MOBS } from '../../sim/encounters/smith_heart/breath_isle_ids';
 import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
 import { fxAnchor } from '../attached_fx_anchor';
@@ -83,6 +85,7 @@ import {
   FORK_REACH,
   fxHash01,
   GALE_COLUMN,
+  GALE_CORE,
   gapLips,
   gapThreat,
   BREATH_FIGHT_POOLS as P,
@@ -95,7 +98,12 @@ import {
   type WindFieldLook,
   windFieldLook,
 } from './breath_fight_fx_core';
+import { FUNNEL_FRAG, GALE_FOOT_DUST, GALE_GRIT, WIND_FUNNEL_VERT } from './breath_gale_glsl';
 import { BreathHeartFx } from './breath_heart_fx';
+import { BreathInhaleStreams } from './breath_inhale_streams';
+import { BreathIslesFx } from './breath_isles_fx';
+import { BreathRoarFx } from './breath_roar_fx';
+import { BreathTossFx } from './breath_toss_fx';
 import { BreathWindStreaks } from './breath_wind_streaks';
 import { BREATH_TELEGRAPH_GLOW_STEP, type BreathTelegraphKind } from './painted_telegraph_core';
 import { BreathTelegraphs, type PaintedFan } from './painted_telegraphs';
@@ -249,12 +257,13 @@ void main() {
     k = (1.0 - smoothstep(0.05, 1.0, vUv.y)) * (0.45 + 0.55 * rise) * pulse;
   }
   vec3 col = mix(uColor, uGlow, g * 0.6 + 0.2);
-  float a = clamp(k * (0.6 + 0.4 * g), 0.0, 1.0);
+  // The whole rim is open: quiet it reads as a warning, never a wall.
+  float a = clamp(k * (0.34 + 0.66 * g), 0.0, 1.0);
   gl_FragColor = vec4(col * (1.0 + g), a);
   #include <colorspace_fragment>
 }
 `;
-/** A funnel of wind (the vortex, a loose gale): streaks spiralling up. */
+/** A plain uv pass (the calm's beams and the beacons). */
 const FUNNEL_VERT = /* glsl */ `
 varying vec2 vUv;
 void main() {
@@ -262,29 +271,7 @@ void main() {
   gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 }
 `;
-const FUNNEL_FRAG = /* glsl */ `
-uniform float uAlpha;
-uniform float uTime;
-uniform float uSpin;
-uniform vec3 uWind;
-uniform vec3 uShade;
-varying vec2 vUv;
-float h(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
-float n(vec2 p) {
-  vec2 i = floor(p);
-  vec2 f = fract(p);
-  f = f * f * (3.0 - 2.0 * f);
-  return mix(mix(h(i), h(i + vec2(1, 0)), f.x), mix(h(i + vec2(0, 1)), h(i + vec2(1, 1)), f.x), f.y);
-}
-void main() {
-  float sp = vUv.x * 6.0 + vUv.y * 3.0 - uTime * uSpin;
-  float bands = n(vec2(sp * 3.0, vUv.y * 4.0)) * 0.6 + n(vec2(sp * 7.0, vUv.y * 9.0)) * 0.4;
-  float fade = smoothstep(0.0, 0.08, vUv.y) * (1.0 - smoothstep(0.7, 1.0, vUv.y));
-  float a = uAlpha * fade * smoothstep(0.38, 0.82, bands);
-  gl_FragColor = vec4(mix(uShade, uWind, 0.3 + bands * 0.7), a);
-  #include <colorspace_fragment>
-}
-`;
+// The funnels of wind (the vortex, the loose gales): breath_gale_glsl.ts.
 /** A beam of light (the calm landing, the conductor's beacon): bright core,
  *  soft falling bands. \`uHot\` (the conductor's) runs white hot pulses of
  *  current down a saturated blue body (0: the calm's soft light, as ever). */
@@ -559,6 +546,7 @@ export class BreathFightFx {
   // Cosmetic and every-tier extras.
   private readonly vortexFunnel: Funnel;
   private readonly galeFunnels: Funnel[] = [];
+  private readonly galeCores: Funnel[] = [];
   private readonly calmBeams: Funnel[] = [];
   private readonly calmDomes: Funnel[] = [];
   private readonly seatPips: THREE.Sprite[] = [];
@@ -592,9 +580,18 @@ export class BreathFightFx {
   /** The audio's entity and ground reads, bound once (not per event). */
   /** Mythic's Knotted Gale, a part of this painter (breath_heart_fx.ts). */
   private readonly heart: BreathHeartFx;
+  /** The Islands of the Wind, a part of this painter (breath_isles_fx.ts). */
+  private readonly isles: BreathIslesFx;
+  /** The indrawn breath's streams into the maw (breath_inhale_streams.ts). */
+  private readonly inhale: BreathInhaleStreams;
+  /** The Summit Roar's wave and hits, the indrawn breath's pull (breath_roar_fx.ts). */
+  private readonly roar: BreathRoarFx;
+  private readonly toss: BreathTossFx;
   private readonly lookup = (id: number): Entity | undefined => this.world?.entities.get(id);
   private readonly groundAt = (x: number, z: number): number => this.groundY(x, z);
   private readonly cradledIds: number[] = [];
+  /** The cradle channel's next tether flicker (s). */
+  private tetherTimer = 0;
   private origin: { x: number; z: number } | null = null;
   private floorY = 0;
   private swell = 0;
@@ -767,17 +764,19 @@ export class BreathFightFx {
     this.drawnMarks = new MarkPool(markFans(2, 360, C.lethal, 'drawnMark'));
 
     // ---- funnels, beams, domes ----
-    const funnelMat = (name: string, spin: number) =>
+    const funnelMat = (name: string, spin: number, core = 0) =>
       new THREE.ShaderMaterial({
         name,
         uniforms: {
           uAlpha: { value: 0 },
           uTime: this.uTime,
           uSpin: { value: spin },
+          uCore: { value: core },
           uWind: { value: new THREE.Color(...C.wind) },
-          uShade: { value: new THREE.Color(0.5, 0.58, 0.66) },
+          uShade: { value: new THREE.Color(0.3, 0.34, 0.4) },
+          uGrit: { value: new THREE.Color(...GALE_CORE.dustColor) },
         },
-        vertexShader: FUNNEL_VERT,
+        vertexShader: WIND_FUNNEL_VERT,
         fragmentShader: FUNNEL_FRAG,
         transparent: true,
         depthWrite: false,
@@ -794,8 +793,8 @@ export class BreathFightFx {
       }
     }
     this.geometries.push(funnelGeo);
-    const funnel = (name: string, spin: number): Funnel => {
-      const mat = funnelMat(name, spin);
+    const funnel = (name: string, spin: number, core = 0): Funnel => {
+      const mat = funnelMat(name, spin, core);
       this.materials.push(mat);
       const mesh = new THREE.Mesh(funnelGeo, mat);
       mesh.name = name;
@@ -805,8 +804,11 @@ export class BreathFightFx {
       return { mesh, mat };
     };
     this.vortexFunnel = funnel('smithHeartBreathVortex', VORTEX_FUNNEL.spin);
-    for (let i = 0; i < P.gales; i++)
+    for (let i = 0; i < P.gales; i++) {
       this.galeFunnels.push(funnel('smithHeartBreathGale', GALE_COLUMN.spin));
+      // Its tighter, darker core spinning faster inside it (the same program).
+      this.galeCores.push(funnel('smithHeartBreathGaleCore', GALE_COLUMN.spin * GALE_CORE.spin, 1));
+    }
     const beamGeo = new THREE.CylinderGeometry(0.5, 0.5, 1, 18, 1, true).translate(0, 0.5, 0);
     const domeGeo = new THREE.SphereGeometry(1, 28, 12, 0, Math.PI * 2, 0, Math.PI / 2);
     this.geometries.push(beamGeo, domeGeo);
@@ -1010,6 +1012,42 @@ export class BreathFightFx {
       groundY: (x, z) => this.groundY(x, z),
       shakeNear: (x, z, amount, reach) => this.shakeNear(x, z, amount, reach),
     });
+    this.isles = new BreathIslesFx({
+      root: this.root,
+      local: this.local,
+      particles: this.particles,
+      uTime: this.uTime,
+      density: this.density,
+      geometries: this.geometries,
+      materials: this.materials,
+      groundY: (x, z) => this.groundY(x, z),
+      shakeNear: (x, z, amount, reach) => this.shakeNear(x, z, amount, reach),
+    });
+    this.inhale = new BreathInhaleStreams({
+      root: this.root,
+      particles: this.particles,
+      uTime: this.uTime,
+      density: this.density,
+      geometries: this.geometries,
+      materials: this.materials,
+    });
+    this.roar = new BreathRoarFx({
+      root: this.root,
+      particles: this.particles,
+      uTime: this.uTime,
+      density: this.density,
+      geometries: this.geometries,
+      materials: this.materials,
+      groundY: (x, z) => this.groundY(x, z),
+      shakeNear: (x, z, amount, reach) => this.shakeNear(x, z, amount, reach),
+      reducedMotion: () => this.reducedMotion(),
+    });
+    this.toss = new BreathTossFx({
+      particles: this.particles,
+      density: this.density,
+      groundY: (x, z) => this.groundY(x, z),
+      shakeNear: (x, z, amount, reach) => this.shakeNear(x, z, amount, reach),
+    });
     this.readyForEntry = attachSceneGroupGated(scene, this.root, compileGate, () => this.disposed)
       .then(() => {})
       .catch(() => {});
@@ -1101,6 +1139,8 @@ export class BreathFightFx {
     const world = this.world;
     this.audio.event(ev, this.lookup, this.groundAt);
     if (this.heart.handleEvent(ev, world, this.origin)) return true;
+    if (this.isles.handleEvent(ev, world)) return true;
+    if (this.roar.handleEvent(ev, world)) return true;
     if (ev.type === 'spellfxAt') {
       if (!breathFightClaims(ev.ability)) return false;
       const r = ev.radius ?? 3;
@@ -1124,23 +1164,8 @@ export class BreathFightFx {
     } else if (ev.ability === BREATH_CUES.anchor && src && dst) {
       this.beam(src, dst, ANCHOR_BEAM_SECONDS, 1.4, C.calm);
     } else if (ev.ability === BREATH_CUES.toss && dst) {
-      this.particles.puff(
-        fxAnchor(dst).x,
-        fxAnchor(dst).y + 0.6,
-        fxAnchor(dst).z,
-        Math.round(16 * this.density),
-        {
-          speed: 9,
-          up: 4,
-          life: 0.8,
-          size: [0.5, 1.6],
-          color: C.grit,
-          alpha: 0.6,
-          drag: 1.2,
-          radius: 0.8,
-        },
-      );
-      this.particles.shockRing(fxAnchor(dst).x, fxAnchor(dst).z, C.control, 3.5, 0.45);
+      // The shove: its burst, its slide's trail and a light kick (breath_toss_fx.ts).
+      this.toss.blow(world, src, dst);
     } else if (ev.ability === BREATH_CUES.swell && src) {
       // The storm swells: a ring rolling over the whole Cornice.
       this.particles.shockRing(fxAnchor(src).x, fxAnchor(src).z, 0xbfefff, 46, 1.6);
@@ -1179,6 +1204,14 @@ export class BreathFightFx {
     this.paintMarks(world, dt);
     this.paintBars(world);
     this.heart.update(world, dt);
+    this.isles.update(world, dt);
+    const g0 = this.guardianId >= 0 ? world.entities.get(this.guardianId) : undefined;
+    this.inhale.update(g0, dt);
+    const meE = world.entities.get(world.playerId);
+    const onCornice =
+      !!meE && !!this.origin && Math.abs(meE.pos.y - this.local.position.y - CORNICE_FLOOR_H) < 6;
+    this.roar.update(world, g0, onCornice, dt);
+    this.toss.update(world, dt);
     this.updateBolts();
     this.particles.update(this.clock);
     const guardian = this.guardianId >= 0 ? (world.entities.get(this.guardianId) ?? null) : null;
@@ -1229,6 +1262,7 @@ export class BreathFightFx {
       this.discover(world, origin);
     }
     this.heart.beginScan();
+    this.isles.beginScan();
     this.objectIds.length = 0;
     this.cradledIds.length = 0;
     this.guardianId = -1;
@@ -1244,9 +1278,12 @@ export class BreathFightFx {
         const kind = breathObjectKind(e.templateId);
         if (kind === 'wind') this.windId = e.id;
         else if (kind) this.objectIds.push(e.id);
-        else this.heart.takeObject(e);
+        else if (!this.isles.takeObject(e)) this.heart.takeObject(e);
       } else if (e.kind === 'mob') {
+        // The isles' adds (breath_isles_fx.ts); else the guardian.
+        if (this.isles.takeMob(e)) continue;
         this.guardianId = e.id;
+        this.isles.takeGuardian(e);
         let stacks = 0;
         for (const a of e.auras) if (a.id === BREATH_AURAS.swell) stacks = a.stacks ?? 1;
         this.swell = e.dead ? 0 : stacks;
@@ -1260,11 +1297,12 @@ export class BreathFightFx {
           else if (a.id === BREATH_AURAS.pinned) this.pinnedMarks.take(e.id);
           else if (a.id === BREATH_AURAS.drawn) this.drawnMarks.take(e.id);
           else if (a.id === BREATH_AURAS.cradled) this.cradledIds.push(e.id);
-          else this.heart.takeAura(e, a.id);
+          else if (!this.isles.takeAura(e, a.id)) this.heart.takeAura(e, a.id);
         }
       }
     }
     this.heart.endScan();
+    this.isles.endScan(world);
     this.anchorMarks.end();
     this.pinnedMarks.end();
     this.drawnMarks.end();
@@ -1284,7 +1322,10 @@ export class BreathFightFx {
       if (Math.abs(e.pos.x - origin.x) > 300 || Math.abs(e.pos.z - origin.z) > 260) continue;
       if (
         e.kind === 'object' ||
-        (e.kind === 'mob' && e.templateId === BREATH_GUARDIAN) ||
+        (e.kind === 'mob' &&
+          (e.templateId === BREATH_GUARDIAN ||
+            e.templateId === ISLE_MOBS.sentinel ||
+            e.templateId === ISLE_MOBS.mender)) ||
         (e.kind === 'npc' && e.templateId === BREATH_THESSALY_NPC)
       )
         ids.push(e.id);
@@ -1337,6 +1378,10 @@ export class BreathFightFx {
 
   private leave(): void {
     this.heart.leave();
+    this.isles.leave();
+    this.inhale.hide();
+    this.roar.leave();
+    this.toss.clear();
     this.origin = null;
     this.rosterSeen = Number.NaN;
     this.candidateIds.length = 0;
@@ -1359,7 +1404,13 @@ export class BreathFightFx {
       p.end();
     }
     this.vortexFunnel.mesh.visible = false;
-    for (const f of [...this.galeFunnels, ...this.calmBeams, ...this.calmDomes, ...this.beacons])
+    for (const f of [
+      ...this.galeFunnels,
+      ...this.galeCores,
+      ...this.calmBeams,
+      ...this.calmDomes,
+      ...this.beacons,
+    ])
       f.mesh.visible = false;
     for (const s of [...this.seatPips, ...this.beaconGlows]) s.visible = false;
     this.crown.visible = false;
@@ -1659,9 +1710,11 @@ export class BreathFightFx {
     for (let i = 0; i < this.galeFans.length; i++) {
       const s = this.galeFans[i];
       const f = this.galeFunnels[i];
+      const core = this.galeCores[i];
       const e = s.id >= 0 ? world.entities.get(s.id) : undefined;
       if (!e) {
         f.mesh.visible = false;
+        core.mesh.visible = false;
         continue;
       }
       const r = e.scale > 0 ? e.scale : T.galeR;
@@ -1672,17 +1725,43 @@ export class BreathFightFx {
       f.mesh.scale.set(r, GALE_COLUMN.height, r);
       f.mesh.rotation.y = this.clock * 2;
       f.mat.uniforms.uAlpha.value = this.detail ? 0.85 : 0.65;
-      if (this.rand() < dt * 24 * this.density) {
+      core.mesh.visible = true;
+      core.mesh.position.copy(f.mesh.position);
+      core.mesh.scale.set(
+        r * GALE_CORE.width,
+        GALE_COLUMN.height * GALE_CORE.height,
+        r * GALE_CORE.width,
+      );
+      core.mesh.rotation.y = -this.clock * 3;
+      core.mat.uniforms.uAlpha.value = this.detail ? 0.75 : 0.55;
+      // Grit thrown up and round the column, and dust rolling out at its foot.
+      if (this.rand() < dt * GALE_GRIT.rate * this.density) {
         const a = this.rand() * Math.PI * 2;
         this.particles.puff(eAt.x + Math.sin(a) * r, eAt.y + 0.5, eAt.z + Math.cos(a) * r, 1, {
           speed: 5,
           up: 6,
           life: 1,
-          size: [0.35, 0.2],
-          color: C.grit,
-          alpha: 0.85,
+          size: [...GALE_GRIT.size],
+          color: GALE_GRIT.color,
+          alpha: GALE_GRIT.alpha,
           dir: [Math.cos(a), 0.8, -Math.sin(a)],
           spread: 0.25,
+        });
+      }
+      // Soft billows swelling and overlapping into one skirt (never a ring of puffs).
+      if (this.rand() < dt * GALE_FOOT_DUST.rate * this.density) {
+        const a = this.rand() * Math.PI * 2;
+        const rr = r * (0.55 + 0.6 * this.rand());
+        this.particles.puff(eAt.x + Math.sin(a) * rr, eAt.y + 0.4, eAt.z + Math.cos(a) * rr, 1, {
+          speed: GALE_FOOT_DUST.speed,
+          up: 0.9,
+          life: GALE_FOOT_DUST.life,
+          size: [...GALE_FOOT_DUST.size],
+          color: GALE_FOOT_DUST.color,
+          alpha: GALE_FOOT_DUST.alpha,
+          dir: [Math.cos(a), 0.2, -Math.sin(a)],
+          spread: 0.5,
+          drag: GALE_FOOT_DUST.drag,
         });
       }
     }
@@ -1764,6 +1843,24 @@ export class BreathFightFx {
       if (this.rand() < dt * 16 * this.density)
         this.sparksAt(liftedAt.x, liftedAt.y + 1, liftedAt.z, 3);
     }
+    // The channel that holds them (every tier: the guardian casts nothing
+    // else while it runs): crackling tethers from its body to each lifted.
+    const g = this.guardianId >= 0 ? world.entities.get(this.guardianId) : undefined;
+    if (g && !g.dead && g.castingAbility === BREATH_CASTS.cradleHold) {
+      this.tetherTimer -= dt;
+      if (this.tetherTimer <= 0) {
+        this.tetherTimer = 0.11;
+        for (const id of this.cradledIds) {
+          const p = world.entities.get(id);
+          if (!p) continue;
+          this.beam(g, p, 0.16, 7);
+          if (p !== lifted && this.rand() < 0.5) {
+            const at = fxAnchor(p);
+            this.sparksAt(at.x, at.y + 1, at.z, 2);
+          }
+        }
+      }
+    } else this.tetherTimer = 0;
   }
 
   // ---- the players' marks -----------------------------------------------------------------
@@ -2061,6 +2158,7 @@ export class BreathFightFx {
     this.disposed = true;
     this.root.removeFromParent();
     this.audio.dispose();
+    this.isles.dispose();
     this.particles.dispose();
     this.kit.dispose();
     this.streaks.dispose();

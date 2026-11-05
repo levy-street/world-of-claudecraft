@@ -21,6 +21,11 @@ export const SMITH_HEART_PLACEHOLDER_LOOKS: Record<string, string> = {
   heart_breath_warder: 'mob_elemental',
   // Final: a hovering storm caller of slate and lightning.
   heart_breath_caller: 'mob_hoard_storm_caller',
+  // The Islands of the Wind's adds (encounters/smith_heart/breath_isles.ts).
+  // Final: a storm-blue stone warden of a floating isle.
+  heart_gale_sentinel: 'mob_elemental',
+  // Final: a hovering wind caller who mends the guardian's shield.
+  heart_gale_mender: 'mob_hoard_storm_caller',
   // Final: a rime-crusted warder of blue ice and frost-cracked stone.
   heart_quench_warder: 'mob_hoard_rime_elemental',
   // Final: a meltwater caller, ice-pale water held in a stone frame.
@@ -35,12 +40,10 @@ export const SMITH_HEART_PLACEHOLDER_LOOKS: Record<string, string> = {
   // ---- the four guardians -----------------------------------------------------
   // Final: a stone titan half-fused with the Pit's floor, a great hammer arm.
   heart_hammer_guardian: 'skel_golem',
-  // The Hammer Council's other two. The Slabwright has its own model now
-  // (manifest.ts). The Singer is still a bodyless target: its provisional body
-  // of the Heart kit's rock and crystal is drawn by
+  // The Hammer Council's other member: a bodyless target; its provisional
+  // body of the Heart kit's rock and crystal is drawn by
   // smith_heart_fx/council_bodies.ts (the Masterless Strength's pattern).
   // Final: its own model (the official pipeline), the same joints.
-  heart_slabwright: 'smith_heart_slabwright',
   heart_seam_singer: 'smith_heart_seam_singer',
   // The Guardian of the Breath: a bodyless target; its provisional body (a
   // living bellows of storm granite, crystal and lightning, its phase-2 storm
@@ -68,14 +71,13 @@ export const SMITH_HEART_PLACEHOLDER_LOOKS: Record<string, string> = {
   // The Rolling Cinder: a bodyless target under the ball of the first flame
   // smith_heart_fx/heat_cinder_fx.ts draws.
   heart_heat_rolling_cinder: 'smith_heart_rolling_cinder',
-  // Stone Prison's block: a bodyless target under the stone council_prison_fx.ts draws.
-  heart_stone_prison: 'smith_heart_stone_prison',
   // ---- the final boss -----------------------------------------------------------
-  // Phase 2J: the Masterless Strength is a bodyless target; its body (the
-  // colossus of the Heart kit's rock pieces round the crystal heart) is drawn
-  // by smith_heart_fx/final_fx.ts. Final: its own model (the official
-  // pipeline), the same joints and timeline.
-  heart_masterless_strength: 'smith_heart_colossus',
+  // Its own model (phase 2O, smith_heart_boss_looks.ts): the Quadrant
+  // Guardian, one rigged body in four element looks the quarter it stands in
+  // picks (smith_heart_fx/final_body_fx.ts). The Heart kit's rock pieces
+  // still fly in for the arrival (smith_heart_fx/final_fx.ts) and lock into
+  // it under the shockwave.
+  heart_masterless_strength: 'smith_heart_masterless_strength',
   // Its Splinters (part 2, encounters/smith_heart/final_adds.ts): the
   // nearest existing bodies of each element, tinted by their entity colour
   // and drawn two and a half times a player's size; their element's light is

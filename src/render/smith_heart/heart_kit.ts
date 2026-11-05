@@ -21,6 +21,7 @@ import { GFX } from '../gfx';
 import { markSharedGeometry, markSharedMaterial } from '../shared_resource';
 import { applySurfaceDetail } from '../worn_stone';
 import { applyHeartIceSheen } from './heart_ice_sheen';
+import { applyHeartIsleFill } from './heart_isle_fill';
 import type { HeartKitPlacement } from './heart_kit_core';
 import { applyRockCutaway } from './heart_rock_cutaway';
 
@@ -60,14 +61,18 @@ export const HEART_KIT_SLOTS: readonly HeartKitSlot[] = ['stone', 'glow', 'ice']
  *  with a heavier, broader triplanar fracture (big faces seen from far), or
  *  (the Anvil's ridges, phase 2L) as `spine`: the stone's own program drawn
  *  with no depth write, so a floor telegraph always shows over a ridge's
- *  spine (heart_quarters.ts draws it after the floors). */
-export type HeartKitMaterial = HeartKitSlot | 'rock' | 'spine';
+ *  spine (heart_quarters.ts draws it after the floors), or (the Breath's
+ *  floating isles, 2026-11-03) as `isle`: the stone with a shade floor and
+ *  the cloud sea's cool bounce on every face turned down (heart_isle_fill.ts),
+ *  so the hang the raid looks up at never sinks to black. */
+export type HeartKitMaterial = HeartKitSlot | 'rock' | 'spine' | 'isle';
 export const HEART_KIT_MATERIALS: readonly HeartKitMaterial[] = [
   'stone',
   'glow',
   'ice',
   'rock',
   'spine',
+  'isle',
 ];
 
 /** How long the interior waits for a kit before building with placeholders. */
@@ -254,7 +259,7 @@ export function heartKitSlotMaterial(slot: HeartKitMaterial): THREE.Material {
       m = new THREE.MeshLambertMaterial({ vertexColors: true, name: 'SmithHeartKitRock' });
       applyRockCutaway(m);
     }
-  } else if (slot === 'stone' || slot === 'spine') {
+  } else if (slot === 'stone' || slot === 'spine' || slot === 'isle') {
     if (GFX.standardMaterials) {
       const std = new THREE.MeshStandardMaterial({
         vertexColors: true,
@@ -272,6 +277,10 @@ export function heartKitSlotMaterial(slot: HeartKitMaterial): THREE.Material {
     if (slot === 'spine') {
       m.name = 'SmithHeartKitSpine';
       m.depthWrite = false;
+    }
+    if (slot === 'isle') {
+      m.name = 'SmithHeartKitIsle';
+      applyHeartIsleFill(m);
     }
   } else if (slot === 'ice') {
     m = GFX.standardMaterials
@@ -411,7 +420,11 @@ export function heartKitProgramWarmers(): THREE.Group {
 
 /** One plain Mesh per slot of a kit piece under a group (for the painters
  *  that move a single piece: the Slab's halves and chunks). */
-export function heartKitMeshes(url: string, piece: string): THREE.Group | null {
+export function heartKitMeshes(
+  url: string,
+  piece: string,
+  stoneAs: HeartKitMaterial = 'stone',
+): THREE.Group | null {
   const geo = heartKitPiece(url, piece);
   if (!geo) return null;
   const group = new THREE.Group();
@@ -419,7 +432,7 @@ export function heartKitMeshes(url: string, piece: string): THREE.Group | null {
   for (const slot of HEART_KIT_SLOTS) {
     const g = geo[slot];
     if (!g) continue;
-    const mesh = new THREE.Mesh(g, heartKitSlotMaterial(slot));
+    const mesh = new THREE.Mesh(g, heartKitSlotMaterial(slot === 'stone' ? stoneAs : slot));
     mesh.name = `${piece}:${slot}`;
     mesh.castShadow = slot !== 'glow';
     mesh.receiveShadow = slot !== 'glow';

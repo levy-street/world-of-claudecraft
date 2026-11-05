@@ -2,10 +2,11 @@
 // docs/design/raid/smith_heart.md sections 5.18 and 7.1): how a pillar shows
 // its integrity (its cracks, its lean, the pips round its foot), how it bursts
 // out of the floor and how it falls, the marks' footprints (Wake the Stone,
-// the heir's rising stone, the Falling Rock's soak, Resonance, Hammer's
-// Weight) and their colours, the rock's fall, the heroic pulse, the
-// inheritance's stream of light, the Wrath holder's gathering energy. The
-// sim's numbers are read here, never tuned.
+// the heir's rising stone, the Falling Rock's soak, Resonance's spread,
+// Mountain's Rush's mark and lane, Hammer's Weight) and their colours, the
+// rock's fall, the heroic pulse, the cursed pillar's light, Bond of the
+// Stone's thread, the inheritance's stream of light, the Wrath holder's
+// gathering energy. The sim's numbers are read here, never tuned.
 //
 // Three-free, DOM-free, deterministic (a hash, never rng).
 
@@ -15,6 +16,7 @@ import {
   COUNCIL_AURAS,
   COUNCIL_CASTS,
   COUNCIL_CUES,
+  COUNCIL_CURSED,
   COUNCIL_RISE_SPOT,
   COUNCIL_RUBBLE,
   type CouncilRole,
@@ -26,6 +28,7 @@ import {
   endlessSongMult,
   COUNCIL_TUNING as T,
 } from '../../sim/encounters/smith_heart/council_ids';
+import { rushReach } from '../../sim/encounters/smith_heart/council_rush_reach';
 import { TELEGRAPH_THREAT_COLORS } from '../floor_telegraph/telegraph_look_core';
 import { fxHash } from './hammer_fx_core';
 
@@ -33,6 +36,7 @@ export {
   COUNCIL_AURAS,
   COUNCIL_CASTS,
   COUNCIL_CUES,
+  COUNCIL_CURSED,
   COUNCIL_RISE_SPOT,
   COUNCIL_RUBBLE,
   councilPillarOf,
@@ -59,8 +63,13 @@ export const COUNCIL_FX_COLORS = {
   wake: TELEGRAPH_THREAT_COLORS.control,
   /** The rubble, the heroic pulse, the heir's rising stone: damage. */
   danger: TELEGRAPH_THREAT_COLORS.danger,
-  /** Resonance's ring: the vein's hum (an accent, never a damage rim). */
+  /** Resonance's shimmer and accent: the vein's hum (its ring's rim is the
+   *  danger colour: it hurts every ally inside). */
   resonance: 0xf0c070,
+  /** Mountain's Rush: the mark and the lane the charge tears through. */
+  rush: TELEGRAPH_THREAT_COLORS.lethal,
+  /** Bond of the Stone: the bright gold thread between the two members. */
+  bond: 0xffd25a,
   /** Hammer's Weight: the tank's mark, lethal if not swapped. */
   weight: TELEGRAPH_THREAT_COLORS.lethal,
   /** The pips: lit and spent. */
@@ -84,7 +93,7 @@ export const COUNCIL_FX_POOLS = {
   fallen: 4,
   /** Rubble lies 8 s: room for every pillar breaking inside that window. */
   rubble: T.pillarCap + 2,
-  marks: 8,
+  marks: 10,
   spots: 4,
   rocks: 2,
   rings: 6,
@@ -197,25 +206,6 @@ export function crackFlash(age: number): number {
   return age < 0.08 ? age / 0.08 : Math.max(0, 1 - (age - 0.08) / 0.82);
 }
 
-/** How hard a pillar shakes while a Resonance is cracking it (`share` of
- *  the 3 s stood, 0 to 1): yards of jitter and the seams' extra heat. */
-export function resonanceShake(
-  share: number,
-  clock: number,
-  out: { jitter: number; heat: number } = { jitter: 0, heat: 0 },
-): { jitter: number; heat: number } {
-  const s = Math.max(0, Math.min(1, share));
-  if (s <= 0) {
-    out.jitter = 0;
-    out.heat = 0;
-    return out;
-  }
-  const hum = 0.5 + 0.5 * Math.sin(clock * (18 + s * 22));
-  out.jitter = 0.02 + s * 0.06 * hum;
-  out.heat = 0.35 + s * 0.65 * hum;
-  return out;
-}
-
 // ---- the marks ---------------------------------------------------------------------------
 
 /** A player mark (an aura on them): the footprint it draws round them. */
@@ -228,6 +218,21 @@ export interface CouncilMarkSpec {
 }
 
 export const COUNCIL_MARK_SPECS: Readonly<Record<string, CouncilMarkSpec>> = {
+  // Resonance's spread: the ring each ally must keep out of (the aura's
+  // value2 carries the sim's radius: markRadius).
+  [COUNCIL_AURAS.resonance]: {
+    radius: T.resonanceRadius,
+    color: COUNCIL_FX_COLORS.danger,
+    accent: COUNCIL_FX_COLORS.resonance,
+    gather: false,
+  },
+  // Mountain's Rush: the charge's half width round the marked player.
+  [COUNCIL_AURAS.rushMark]: {
+    radius: T.rushHalfWidth,
+    color: COUNCIL_FX_COLORS.rush,
+    accent: COUNCIL_FX_COLORS.ochre,
+    gather: false,
+  },
   [COUNCIL_AURAS.wakeMark]: {
     radius: T.riseKnockRadius,
     color: COUNCIL_FX_COLORS.wake,
@@ -250,6 +255,12 @@ export const RISE_SPOT_SPEC = {
   color: COUNCIL_FX_COLORS.danger,
   accent: COUNCIL_FX_COLORS.ochre,
 } as const;
+
+/** A mark's radius: the sim's own off the aura (value2) when it carries one
+ *  (Resonance's ring, the Rush's half width), else the spec's. */
+export function markRadius(spec: CouncilMarkSpec, value2: number | undefined): number {
+  return value2 !== undefined && value2 > 0 ? value2 : spec.radius;
+}
 
 /** Fill of a timed mark: 0 as it begins, 1 as it lands. */
 export function markFill(remaining: number, duration: number): number {
@@ -322,14 +333,78 @@ export function soakCountdown(
   return out;
 }
 
-/** Resonance's ring round a marked player: its radius (the reach a pillar's
- *  face must be within) and its pulse. */
-export function resonanceRing(clock: number, cracking: boolean): { radius: number; pulse: number } {
-  const speed = cracking ? 9 : 3.2;
-  return {
-    radius: T.resonanceReach,
-    pulse: 0.55 + 0.45 * Math.sin(clock * speed),
-  };
+/** Resonance's carrier shimmer: its breath (0.1 to 1, quick: it rings every
+ *  second). */
+export function resonancePulseLook(clock: number): number {
+  return 0.55 + 0.45 * Math.sin(clock * 6.2832);
+}
+
+/** Mountain's Rush's lane from the Guardian (gx, gz) through the marked
+ *  player (tx, tz): its bearing (sim yaw), its length (the player's distance,
+ *  or `reach` when that runs further: the line goes on to the Quarry's edge,
+ *  `rushLaneReach`), its half width (the sim's own, the mark's value2 when it
+ *  rides, plus a body's girth: the hit's whole reach). Null when the two stand together. Fills `out`. */
+export function rushLane(
+  gx: number,
+  gz: number,
+  tx: number,
+  tz: number,
+  half: number,
+  out: { yaw: number; length: number; half: number },
+  reach = 0,
+): { yaw: number; length: number; half: number } | null {
+  const dx = tx - gx;
+  const dz = tz - gz;
+  const len = Math.hypot(dx, dz);
+  if (len < 0.5) return null;
+  out.yaw = Math.atan2(dx, dz);
+  out.length = Math.max(len, reach);
+  // Drawn to where a body is struck (the half width plus its girth), so the
+  // band on the floor is the whole hit: stand off it and the charge misses.
+  out.half = (half > 0 ? half : T.rushHalfWidth) + T.rushBody;
+  return out;
+}
+
+/** How far the Rush's line runs from the Guardian at world (gx, gz) toward
+ *  the marked player at world (tx, tz) before the Quarry's edge: the sim's
+ *  own rule (council_rush_reach.ts), so the lane on the floor is the path the
+ *  Guardian will run (a pillar on it still stops the run short). */
+export function rushLaneReach(gx: number, gz: number, tx: number, tz: number): number {
+  const def = DUNGEONS.smith_heart;
+  if (!def) return 0;
+  const o = instanceOrigin(def.index, instanceSlotForZ(gz));
+  return rushReach(gx - o.x, gz - o.z, tx - gx, tz - gz);
+}
+
+/** Is this object the Guardian's cursed pillar? */
+export function isCursedPillar(templateId: string): boolean {
+  return templateId === COUNCIL_CURSED;
+}
+
+/** The cursed pillar's light: a sickly crimson-magenta, far from the Wake
+ *  circle's violet, the souls' ember and sky blue and the Rush's lethal red,
+ *  so it reads as the one pillar that is no shelter. `core`/`edge` light its
+ *  cracks (linear 0..1), `hex` its sheath, its motes and its rings. */
+export const CURSED_COLORS = {
+  core: [1.0, 0.6, 0.82] as const,
+  edge: [0.78, 0.06, 0.4] as const,
+  hex: 0xd8327e,
+} as const;
+
+/** The cursed pillar's look: its cracks always open, its heat and sheath
+ *  breathing, flaring on a pulse (`sincePulse` seconds since its last).
+ *  Fills `out`. */
+export function cursedPillarLook(
+  clock: number,
+  sincePulse: number,
+  out: { crack: number; heat: number; glow: number } = { crack: 0, heat: 0, glow: 0 },
+): { crack: number; heat: number; glow: number } {
+  const flare = sincePulse >= 0 && sincePulse < 0.6 ? 1 - sincePulse / 0.6 : 0;
+  const breath = 0.5 + 0.5 * Math.sin(clock * 2.6);
+  out.crack = 0.7;
+  out.heat = 1 + 0.35 * breath + 0.9 * flare;
+  out.glow = 0.3 + 0.12 * breath + 0.5 * flare;
+  return out;
 }
 
 /** The heroic pulse's ring round a pillar: out to its reach past the face. */
@@ -380,7 +455,14 @@ export function councilClaims(ability: string | undefined): boolean {
     ability === COUNCIL_CUES.soulBurst ||
     ability === COUNCIL_CUES.echoBlast ||
     ability === COUNCIL_CUES.songPulse ||
-    ability === COUNCIL_CUES.slabCrush ||
+    ability === COUNCIL_CUES.rushWindup ||
+    ability === COUNCIL_CUES.rushImpact ||
+    ability === COUNCIL_CUES.cursedRise ||
+    ability === COUNCIL_CUES.cursedPulse ||
+    ability === COUNCIL_CUES.cursedBreak ||
+    ability === COUNCIL_CUES.bondPulse ||
+    ability === COUNCIL_CUES.resonancePulse ||
+    ability === COUNCIL_CUES.quarryCollapse ||
     ability === COUNCIL_CASTS.bolt ||
     ability === COUNCIL_CASTS.weight
   );
@@ -390,9 +472,9 @@ export function councilClaims(ability: string | undefined): boolean {
 
 /** Each soul's own light, far apart in hue so a soul pillar is told from a
  *  plain one AND from another soul at a glance, on every tier: the
- *  Guardian's wrath an ember red-orange, the Slabwright's stone a jade
- *  green, the Seam Singer's song a sky blue (none of them the Wake circle's
- *  violet or the soak's gold). `core`/`edge` light the cracks (linear 0..1),
+ *  Guardian's wrath an ember red-orange, the Seam Singer's song a sky blue
+ *  (neither the Wake circle's violet, the soak's gold or the cursed
+ *  pillar's crimson-magenta). `core`/`edge` light the cracks (linear 0..1),
  *  `hex` the glow, the pips and the rings. */
 export const SOUL_COLORS: Readonly<
   Record<
@@ -405,7 +487,6 @@ export const SOUL_COLORS: Readonly<
   >
 > = {
   guardian: { core: [1.0, 0.72, 0.42], edge: [1.0, 0.3, 0.1], hex: 0xff6a32 },
-  slabwright: { core: [0.78, 1.0, 0.82], edge: [0.22, 0.86, 0.5], hex: 0x52e08a },
   singer: { core: [0.55, 0.82, 1.0], edge: [0.12, 0.42, 1.0], hex: 0x5aa8ff },
 };
 
@@ -508,12 +589,6 @@ export function shadowPoint(
   return out;
 }
 
-/** The Walking Slab's footprints: under it (a crush, lethal) and near it
- *  (the grind, danger), past its face. */
-export function slabReach(pillarR: number): { crush: number; grind: number } {
-  return { crush: pillarR + T.slabCrushReach, grind: pillarR + T.slabGrindReach };
-}
-
 /** The Endless Song's look at `pulses` sung: its next pulse's multiplier
  *  (the sim's), the rings a pulse throws (1 to 4) and their brightness, and
  *  the floor ring round the pillar (yards past its face). */
@@ -543,88 +618,6 @@ export function songPulsesOf(nextMult: number): number {
 
 /** Seconds the soul takes to flow from the fallen into its pillar. */
 export const SOUL_TAKE_SECONDS = 1.8;
-
-// ---- mythic: the Walking Slab's own look ---------------------------------------------------
-
-/** The Walking Slab's claws round its foot (the Heart kit's Kit_SlabClaw):
- *  each one's bearing off the slab's heading (degrees) and whether it reaches
- *  ahead and pulls (the front pair) or pushes from behind. */
-export const SLAB_CLAWS: readonly { bear: number; ahead: boolean }[] = [
-  { bear: -36, ahead: true },
-  { bear: 36, ahead: true },
-  { bear: 112, ahead: false },
-  { bear: 180, ahead: false },
-  { bear: 248, ahead: false },
-];
-/** Where a claw grips the column (yards from its axis), and its talon's
- *  reach past that grip. */
-export const SLAB_CLAW_GRIP = 2.35;
-export const SLAB_CLAW_REACH = 3.9;
-/** Seconds of one pull while it drags at full pace. */
-export const SLAB_PULL_SECONDS = 1.15;
-/** The pull's phase when the front talons bite the floor (a gouge each). */
-export const SLAB_BITE_PHASE = 0.5;
-/** Seconds a gouge lies on the floor, fading. */
-export const SLAB_GOUGE_SECONDS = 7;
-
-const smooth01 = (a: number, b: number, x: number): number => {
-  const t = Math.max(0, Math.min(1, (x - a) / (b - a)));
-  return t * t * (3 - 2 * t);
-};
-
-/** One pull of the Walking Slab at `phase` (0 to 1), `drag` how hard it moves
- *  (0 still, 1 full pace): a front claw's swing about its grip (radians, up
- *  and out above 0, dug in below), a rear claw's, the column's rock forward
- *  (radians) and its lurch (yards ahead of its sim spot, a surge on the
- *  pull). The front claws reach out (0 to 0.42), slam down and bite (to 0.5),
- *  then haul the stone forward (0.5 to 1) while the rear ones push. Fills
- *  `out`; still, everything rests (claws dug, the column upright). */
-export function slabPull(
-  phase: number,
-  drag: number,
-  out: { front: number; rear: number; rock: number; lurch: number } = {
-    front: 0,
-    rear: 0,
-    rock: 0,
-    lurch: 0,
-  },
-): { front: number; rear: number; rock: number; lurch: number } {
-  const p = phase - Math.floor(phase);
-  const d = Math.max(0, Math.min(1, drag));
-  const reach = smooth01(0, 0.42, p) * (1 - smooth01(0.42, 0.5, p));
-  const haul = smooth01(0.5, 1, p);
-  out.front = d * (0.5 * reach - 0.16 * (p >= 0.5 ? 1 - haul * 0.6 : smooth01(0.42, 0.5, p)));
-  out.rear = d * (0.22 * Math.sin(Math.PI * haul) - 0.06);
-  out.rock = d * (0.07 * Math.sin(Math.PI * haul) - 0.02 * reach);
-  out.lurch = d * (0.32 * Math.sin(Math.PI * haul) - 0.1);
-  return out;
-}
-
-/** Where a claw's talon bites the floor, from the slab's centre (x, z) and
- *  heading: the claw's bearing, the grip and the reach. Fills `out`. */
-export function slabTalon(
-  x: number,
-  z: number,
-  heading: number,
-  bear: number,
-  scale: number,
-  out: { x: number; z: number } = { x: 0, z: 0 },
-): { x: number; z: number } {
-  const a = heading + (bear * Math.PI) / 180;
-  const r = (SLAB_CLAW_GRIP + SLAB_CLAW_REACH) * scale;
-  out.x = x + Math.sin(a) * r;
-  out.z = z + Math.cos(a) * r;
-  return out;
-}
-
-/** Shouldered Stone's shell as it closes on the Slabwright: `t` seconds since it
- *  hardened and the body's height give its scale (a third of its size to whole
- *  in 0.35 s). */
-export function shoulderShellScale(t: number, bodyHeight: number): number {
-  const whole = bodyHeight * 0.36;
-  const k = Math.min(1, Math.max(0, t / 0.35));
-  return whole * (0.33 + 0.67 * k * (2 - k));
-}
 
 /** Narrow Shelter's gems on one pillar: how many are lit, and whether it holds
  *  one too many. */
@@ -667,10 +660,4 @@ export function pillarShelterCounts(
     }
     if (best >= 0) out[best]++;
   }
-}
-
-/** Stone Prison's block at `health` (0 to 1): whole at full health, a little
- *  smaller as it breaks, always big enough to hold its player. */
-export function prisonBlockScale(health: number): number {
-  return 1.05 + 0.35 * Math.max(0, Math.min(1, health));
 }

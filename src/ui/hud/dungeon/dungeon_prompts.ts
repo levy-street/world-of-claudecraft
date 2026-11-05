@@ -216,11 +216,17 @@ export class DungeonPrompts {
       className: 'ui-panel-strong encounter-alert heart-council-alert',
       kinds: COUNCIL_ALERT_KINDS,
     });
-    this.quench = new EncounterAlert(deps, {
-      id: 'heart-quench-alert',
-      className: 'ui-panel-strong encounter-alert heart-quench-alert',
-      kinds: QUENCH_ALERT_KINDS,
-    });
+    // The cold bar is the player's own gauge, read the whole fight: docked on
+    // the player frame like a secondary resource bar (never the screen's
+    // middle; the owner's rule of 2026-11-04), the HUD layer the fallback.
+    this.quench = new EncounterAlert(
+      { ...deps, layer: () => quenchDock(deps.layer()) },
+      {
+        id: 'heart-quench-alert',
+        className: 'ui-panel-strong encounter-alert heart-quench-alert',
+        kinds: QUENCH_ALERT_KINDS,
+      },
+    );
     this.final = new EncounterAlert(deps, {
       id: 'heart-final-alert',
       className: 'ui-panel-strong encounter-alert heart-final-alert',
@@ -401,4 +407,10 @@ export class DungeonPrompts {
     this.temple.dispose();
     this.kitUse.dispose();
   }
+}
+
+/** Where the Quench cold bar docks: the player frame when the HUD has one,
+ *  else the HUD layer itself. */
+export function quenchDock(layer: HTMLElement | null): HTMLElement | null {
+  return layer?.ownerDocument.getElementById('player-frame') ?? layer;
 }

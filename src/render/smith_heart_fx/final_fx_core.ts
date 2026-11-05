@@ -408,6 +408,15 @@ export function arrivalLastLock(): number {
   return t;
 }
 export const ARRIVAL_WAVE_AT = arrivalLastLock() + ARRIVAL.waveDelay;
+/** How the shockwave lands on the room's pale floor: each ring's crest and
+ *  wake and the two flashes' peaks. Narrow crests carry the wave, the stone
+ *  reads through it (the family's wide crests and full flashes clipped the
+ *  whole floor to cream). */
+export const ARRIVAL_WAVE_LOOK = {
+  ring: { wake: 0.25, crest: 0.07, strength: 0.75 },
+  flash: 0.16,
+  core: 0.2,
+} as const;
 export const ARRIVAL_END = ARRIVAL_WAVE_AT + ARRIVAL.waveSeconds + ARRIVAL.settle;
 
 export type ArrivalPhase = 'rest' | 'tremble' | 'lift' | 'fly' | 'locked';

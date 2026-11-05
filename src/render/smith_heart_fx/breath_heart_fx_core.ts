@@ -125,6 +125,9 @@ export function portalSideLook(side: HeartPortalSide): PortalSideLook {
  *  first pair's beam at the waist, the second pair's braid above it, so two
  *  links that cross never merge into one. */
 export const LINK_Y = [1.4, 2.3] as const;
+/** The links' radius (yards): the first pair's round beam, the second pair's
+ *  braid wound a little wider, so both read from across the Cornice. */
+export const LINK_R = [0.42, 0.55] as const;
 
 /** The fuse now: the template's half second, run down since it last changed. */
 export function liveFuse(templateFuse: number, sinceChange: number): number {

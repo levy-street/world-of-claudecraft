@@ -88,6 +88,7 @@ import { dungeonReentryPoint } from './dungeon_checkpoints';
 import { nearestDungeonDoor } from './dungeon_door_selection';
 import { tickDungeonGates } from './dungeon_gates';
 import { applyDungeonSpawnMinibossTuning } from './dungeon_spawn_miniboss';
+import { encounterLockBarsEntry } from './encounter_lock';
 import {
   IGNIVAR_ENTRY_DENIED_NOTICE_SECONDS,
   ignivarRaidClaimsForKey,
@@ -712,6 +713,21 @@ export function enterDungeon(
     deny(r.meta.entityId, 'Instances can only be reset once every 5 minutes.');
     return false;
   }
+  // Encounter in progress (instances/encounter_lock.ts): nobody from outside,
+  // living or spirit, enters while a boss fight of the claim runs. After the
+  // lockout refusals above, whose reason outlasts the fight.
+  if (
+    inst &&
+    encounterLockBarsEntry(
+      ctx,
+      inst,
+      r.e,
+      r.meta.entityId,
+      instanceClaimContains(inst, r.e.pos),
+      !!options.preflightOnly,
+    )
+  )
+    return false;
   // The claim-wins rule above is silent, and silence is exactly the reported
   // confusion: a player who toggled the selection and walked back in landed in
   // the old-difficulty run with no explanation. A living player rejoining a

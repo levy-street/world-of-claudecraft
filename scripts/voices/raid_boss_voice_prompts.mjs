@@ -192,29 +192,6 @@ export const HAMMER_COUNCIL_VOICE_PROMPTS = [
     guidanceScale: 0.7,
   },
   {
-    npcId: 'heart-slabwright',
-    takeId: 'gruff-mason',
-    name: 'The Slabwright, Gruff Stone Mason',
-    voiceDescription:
-      'Native English with a broad, earthy working accent. Male-presenting, ageless. Perfect ' +
-      'audio quality. Persona: the Slabwright, a broad, blocky stone being with slab shoulders ' +
-      'who raises pillars and drops rock like a mason at work. Emotion: gruff, practical, darkly ' +
-      'amused. A non-human voice: a rough mid-low baritone with a dry gravel rasp and a short ' +
-      'chesty grunt on effort, quicker and blunter than the Guardian, as if every line is said ' +
-      'between two hammer blows. Clipped sentences, heavy stress, a craftsman proud of his ' +
-      'stonework. Never a cartoon dwarf, never an ogre, never a clean human.',
-    previewText: [
-      '[gruff, unhurried] More stone for the wall. Hold still, and I will set you in it.',
-      '[a grunt of effort] Stand there. The stone rises where you stand!',
-      '[barking, amused] Look up, little ones! The mountain is falling!',
-      '[low] The stone remembers. I will finish the work.',
-      '[dragging, strained] No hands left, but I will drag this stone to you.',
-      '[cracking apart] The slab... splits...',
-    ].join(' '),
-    visualReferences: COUNCIL_REFS,
-    guidanceScale: 0.7,
-  },
-  {
     npcId: 'heart-singer',
     takeId: 'resonant-seam',
     name: 'The Seam Singer, Resonant Seam',

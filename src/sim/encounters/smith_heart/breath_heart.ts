@@ -69,7 +69,6 @@ import {
   moveBreathObject,
   pickMarks,
   putMarker,
-  raidWarn,
   spawnBreathObject,
 } from './breath_scope';
 import type { BreathFightState, BreathHeart, BreathKnot, BreathPortal } from './breath_state';
@@ -135,7 +134,7 @@ export function startHeart(s: BreathScope, count: number): boolean {
   if (st.heart || s.players.length === 0) return false;
   st.casts++;
   const busy = new Set<number>();
-  if (st.cradle) busy.add(st.cradle.playerId);
+  for (const c of st.cradles) busy.add(c.playerId);
   if (st.drawn) busy.add(st.drawn.playerId);
   const pairs = count >= 2 ? 2 : 1;
   // The hashed pick in order: its first two are phase 1's A and B exactly.
@@ -185,22 +184,6 @@ export function startHeart(s: BreathScope, count: number): boolean {
     const side = SIDES[i];
     putMarker(p, MARK_AURA[side], PORTAL_NAME[side], T.heartMark, s.boss.id);
   });
-  raidWarn(
-    s,
-    s.boss,
-    'knot',
-    'A Knotted Gale falls! Carry it to a gap and throw it into the void!',
-  );
-  if (a && b)
-    raidWarn(s, s.boss, 'knotPortals', `Portal A on ${a.name}, Portal B on ${b.name}!`, {
-      a: a.name,
-      b: b.name,
-    });
-  if (c && d)
-    raidWarn(s, s.boss, 'knotPortals2', `Portal C on ${c.name}, Portal D on ${d.name}!`, {
-      c: c.name,
-      d: d.name,
-    });
   return true;
 }
 
@@ -379,7 +362,6 @@ function takeKnot(s: BreathScope, k: BreathKnot, p: Entity): void {
   dropAura(p, WIND_DRIFT_AURA);
   dropAura(p, WIND_PULL_AURA);
   cue(s, BREATH_CUES.knotTake, k.x, k.z, T.heartPickR);
-  raidWarn(s, s.boss, 'knotTaken', `${p.name} takes up the Knotted Gale!`, { player: p.name });
 }
 
 /** The wind never moves a carrier, but with it at their back (a blow or a
@@ -413,18 +395,12 @@ function stepCarriers(s: BreathScope, heart: BreathHeart): void {
     const at = local(s.ctx, s.inst, p);
     if (p.dead) {
       freeKnot(s, k, p, last ? { ...k, ...last } : undefined);
-      raidWarn(s, s.boss, 'knotDropped', `${p.name} falls! The Knotted Gale is free again!`, {
-        player: p.name,
-      });
       continue;
     }
     if (!onFloor(p, at)) {
       // Over a gap's lip: gone with them, which counts as thrown. Anywhere
       // else (a hearth, a teleport) it stays where they last stood.
       if (gapDistance(at.x, at.z) <= T.heartLipReach) {
-        raidWarn(s, s.boss, 'knotFell', `${p.name} takes the Knotted Gale into the void!`, {
-          player: p.name,
-        });
         loseKnot(s, heart, k, p);
       } else freeKnot(s, k, p, last ? { ...k, ...last } : undefined);
       continue;
@@ -454,9 +430,6 @@ function stepThrows(s: BreathScope, heart: BreathHeart): void {
       s.ctx.error(p.id, KNOT_NOT_AT_LIP_ERROR);
       continue;
     }
-    raidWarn(s, s.boss, 'knotThrown', `${p.name} hurls the Knotted Gale into the void!`, {
-      player: p.name,
-    });
     loseKnot(s, heart, k, p);
   }
 }
@@ -483,8 +456,8 @@ function stepPickups(s: BreathScope, heart: BreathHeart): void {
   }
 }
 
-/** A ball out of time: lethal whatever shields them (as council_prison.ts's
- *  crush: the damage path caps a huge hit), game masters excepted. */
+/** A ball out of time: lethal whatever shields them (the damage path caps
+ *  a huge hit, so a death follows it), game masters excepted. */
 function burst(s: BreathScope): void {
   const o = s.ctx.instanceOriginOf(s.inst);
   const heart = s.st.heart;
@@ -498,7 +471,6 @@ function burst(s: BreathScope): void {
     radius: BREATH.cornice.rx,
     ability: BREATH_CUES.knotBurst,
   });
-  raidWarn(s, s.boss, 'knotBurst', 'The Knotted Gale bursts!');
   for (const p of cornicePlayers(s.ctx, s.inst)) {
     if (p.gm || (p.profilerInvulnerable && s.ctx.devCommands)) continue;
     s.ctx.dealDamage(

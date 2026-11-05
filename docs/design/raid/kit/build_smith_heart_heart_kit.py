@@ -43,6 +43,7 @@ import shkit  # noqa: E402,F401  (puts the shared dungeon kit on the path)
 import heart_pieces as hp  # noqa: E402
 import quarter_pieces as qp  # noqa: E402
 import landmark_pieces as lp  # noqa: E402
+import anvil_piece as ap  # noqa: E402
 import quarter_split as qs  # noqa: E402
 from build_smith_heart_hammer_kit import camera, look, scale_figure  # noqa: E402
 from hckit import export_kit  # noqa: E402
@@ -90,6 +91,8 @@ BUILDERS = {
     'SlabClaw': lambda: hp.slab_claw(bpy),
     'SlabCollar': lambda: hp.slab_collar(bpy),
     'SlabFace': lambda: hp.slab_face(bpy),
+    # The Masterless Strength's great anvil (Weight of the Anvil).
+    'FinalAnvil': lambda: ap.final_anvil(bpy),
 }
 
 
@@ -208,7 +211,21 @@ def render_closeups(parts, folder, views=('front',)):
         size = max(3.0, (hi - lo).length)
         figure.location = (centre.x + (hi.x - lo.x) * 0.3, lo.y - 0.8, 1.0)
         for view in views:
-            look(cam, centre + dirs[view].normalized() * size * 1.05, centre)
+            if view == 'room' and obj.name.startswith('Kit_Landmark'):
+                # A raider's view: from the platform on the landmark's bearing, out
+                # at its wall (the AAA pass's third round).
+                import math
+                import quarter_geom as qg
+                a = math.radians(qg.LANDMARKS[obj.name[len('Kit_Landmark'):].lower()])
+                out = Vector((math.sin(a), -math.cos(a), 0.0))
+                cam.data.lens = 24
+                look(cam, out * 34.0 + Vector((0.0, 0.0, 5.0)), out * 74.0 + Vector((0.0, 0.0, 10.0)))
+                figure.location = tuple(out * 50.0 + Vector((0.0, 0.0, 1.0)))
+            elif view == 'room':
+                continue
+            else:
+                cam.data.lens = 35
+                look(cam, centre + dirs[view].normalized() * size * 1.05, centre)
             scene.render.filepath = os.path.join(folder, f'{obj.name}_{view}.png')
             bpy.ops.render.render(write_still=True)
     for o in parts:

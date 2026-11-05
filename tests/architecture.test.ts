@@ -1114,7 +1114,18 @@ const RENDER_PURE_CORES = [
   // guardian's effects.
   'src/render/smith_heart/breath_kit_plan_core.ts',
   'src/render/smith_heart/breath_air_core.ts',
+  // The Cornice's open sky (the Breath's third pass): the cloud sea, the far peaks.
+  'src/render/smith_heart/breath_summit_core.ts',
+  // The Breath's storm granite on its cliffs and mountain (vertex paint).
+  'src/render/smith_heart/breath_stone_core.ts',
+  // The Breath's storm granite on the rock kit, and the faces hung under its
+  // high walks (the AAA pass's third round).
+  'src/render/smith_heart/breath_rock_storm_core.ts',
+  'src/render/smith_heart/heart_rock_hang_core.ts',
+  // The roots of the mountain readable on the dark crown (the third round).
+  'src/render/smith_heart/heart_root_look_core.ts',
   'src/render/smith_heart_fx/breath_fx_core.ts',
+  'src/render/smith_heart_fx/breath_roar_fx_core.ts',
   'src/render/smith_heart_fx/breath_heart_fx_core.ts',
   // The Quench vein (phase 2H): its kit's plan, the shared lip walls, its
   // frost on the mountain, its air and weather, its guardian's effects.
@@ -1140,17 +1151,30 @@ const RENDER_PURE_CORES = [
   'src/render/smith_heart/heart_quarters_core.ts',
   // Phase 2M: the wall landmarks' frame, spots, eruption and lightning.
   'src/render/smith_heart/heart_landmarks_core.ts',
+  'src/render/smith_heart_fx/final_body_core.ts',
   'src/render/smith_heart_fx/final_fx_core.ts',
   'src/render/smith_heart_fx/final_kit_fx_core.ts',
   'src/render/smith_heart_fx/final_phase_fx_core.ts',
   'src/render/smith_heart/heart_collapse_core.ts',
   'src/render/smith_heart_fx/council_fx_core.ts',
+  'src/render/smith_heart_fx/breath_isles_fx_core.ts',
   'src/render/smith_heart_fx/council_bodies_core.ts',
+  // Bond of the Stone's tether and Mountain's Rush's wind-up, run and scar.
+  'src/render/smith_heart_fx/council_mechanic_look_core.ts',
   // The Guardian of the Breath's body (its storm form) and its fight's effects.
   'src/render/smith_heart_fx/breath_body_core.ts',
   'src/render/smith_heart_fx/breath_fight_fx_core.ts',
   'src/render/smith_heart_fx/quench_body_core.ts',
   'src/render/smith_heart_fx/quench_fight_fx_core.ts',
+  // The risen Quench blade's point continuing its kit piece, and the piece split.
+  'src/render/smith_heart_fx/quench_blade_tip_core.ts',
+  // The final boss's rebuild drawn into its own model.
+  'src/render/smith_heart_fx/final_arrival_core.ts',
+  'src/render/smith_heart_fx/quench_frost_fx_core.ts',
+  // The Quench's frost glaze painted on a body's own material.
+  'src/render/smith_heart_fx/quench_glaze_core.ts',
+  // A character drawn sunk into water it stands in.
+  'src/render/characters/water_sink_core.ts',
   'src/render/smith_heart_fx/heat_body_core.ts',
   'src/render/smith_heart_fx/heat_fight_fx_core.ts',
   // The Heat's floor ladder (every floor layer's unique rung) and its molten

@@ -1,6 +1,6 @@
 // The Smith's Heart pulls like a raid, not like a five-player run: pulling a
 // guardian brings only its own fight (the Hammer's is the Hammer Council: the
-// Guardian, the Slabwright and the Seam Singer, one authored pack), never
+// Guardian and the Seam Singer, one authored pack), never
 // every mob of the claim. The dungeons' premature-boss punish
 // (instances/boss_chain_pull.ts) stays off here, so the Hammer guardian on the
 // Quarry floor no longer wakes the Ring, the Breath, the Quench and the Heat.
@@ -43,6 +43,6 @@ describe("Smith's Heart guardian pull", () => {
       if (Math.hypot(e.pos.x - boss.pos.x, e.pos.z - boss.pos.z) > 600) continue;
       if (e.aiState !== 'idle') awake.push(e.templateId);
     }
-    expect(awake.sort()).toEqual(['heart_seam_singer', 'heart_slabwright']);
+    expect(awake.sort()).toEqual(['heart_seam_singer']);
   });
 });

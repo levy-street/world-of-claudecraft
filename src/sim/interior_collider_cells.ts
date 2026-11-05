@@ -90,7 +90,7 @@ let indexEnabled = true;
  * Declare that `list` is `base` followed by a short tail (`list =
  * base.concat(tail)`, both never mutated in place: the module's contract).
  * Its index then reuses the base's cells and files only the tail: a wall that
- * walks (the mythic Walking Slab) re-indexes a few cells, not the room's
+ * walks (a moving combat wall) re-indexes a few cells, not the room's
  * thousands. Exact: every cell keeps the input order (the tail comes last).
  */
 export function noteAppendedColliders(list: readonly Collider[], base: readonly Collider[]): void {

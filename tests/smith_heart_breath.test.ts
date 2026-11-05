@@ -11,11 +11,17 @@
 // Breath vein and the seal's quarter lit by its fall, and determinism.
 
 import { describe, expect, it } from 'vitest';
-import { BREATH, CORNICE_GAPS, SMITH_HEART_FIELD } from '../src/sim/content/smith_heart_layout';
+import {
+  BREATH,
+  CORNICE_GAPS,
+  CORNICE_WALLED_BEARINGS,
+  SMITH_HEART_FIELD,
+} from '../src/sim/content/smith_heart_layout';
 import {
   BLOW_BEARINGS,
   BREATH_AURAS,
   BREATH_CASTS,
+  BREATH_CUES,
   BREATH_DIFFICULTY,
   BREATH_NAMES,
   BREATH_OBJECTS,
@@ -166,13 +172,23 @@ describe('Guardian of the Breath: the push, the rim and the gaps', () => {
     // Its body is laid back on the floor by the gap (breath_void.ts), so a
     // resurrection never lands it in the void again.
     expect(victim.pos.y).toBeGreaterThan(BREATH.cornice.h - 1);
-    // Said once, with the place it went over.
-    const warn = ev.filter(
-      (e) =>
-        e.type === 'chat' &&
-        (e as { textKey?: string }).textKey === 'hudChrome.breathGuardian.warn.fell',
-    );
-    expect(warn.length).toBeGreaterThan(0);
+    // No banner (the owner's rule): Thessaly's yell and the fall's cue say it.
+    expect(ev.some((e) => e.type === 'chat' && e.channel === 'raidWarning')).toBe(false);
+    expect(ev.some((e) => e.type === 'spellfxAt' && e.ability === BREATH_CUES.fall)).toBe(true);
+  });
+
+  it('the rim is open everywhere now: a body blown off a stretch that once had a wall falls too', () => {
+    const f = pulled(3);
+    const victim = f.players[1];
+    victim.maxHp = 1200;
+    victim.hp = 1200;
+    // Bearing 160: a walled stretch before the rework of 2026-11-03.
+    const a = (160 * Math.PI) / 180;
+    f.put(victim, Math.sin(a) * 40, 196 + Math.cos(a) * 30);
+    f.dev('/dev heart breath blow 160');
+    until(f, () => victim.dead, 14);
+    expect(victim.dead).toBe(true);
+    expect(has(victim, BREATH_AURAS.pinned)).toBe(false);
   });
 
   it('walking out through a gap on a still Cornice kills too', () => {
@@ -273,12 +289,12 @@ describe('Guardian of the Breath: the push, the rim and the gaps', () => {
     }
   });
 
-  it('where the wall stands the wind pins a body and hurts it each second; never in the calm', () => {
+  it('where the wall stands (the climb head only) the wind pins a body and hurts it each second; never in the calm', () => {
     const f = pulled(3);
     const p = f.players[1];
-    const a = (160 * Math.PI) / 180;
-    f.put(p, Math.sin(a) * 40, 196 + Math.cos(a) * 30);
-    f.dev('/dev heart breath blow 180');
+    // Just south of the climb's head, where the west rim keeps its wall.
+    f.put(p, -44.5, 186.8);
+    f.dev('/dev heart breath blow 262');
     // Carried onto the wall, then held against it for the rest of the blow.
     until(f, () => has(p, BREATH_AURAS.pinned), 5);
     expect(has(p, BREATH_AURAS.pinned)).toBe(true);
@@ -294,7 +310,7 @@ describe('Guardian of the Breath: the push, the rim and the gaps', () => {
     expect(has(p, BREATH_AURAS.pinned)).toBe(false);
   });
 
-  it("the gaps are the rim's only open lips, six of them, the west walled", () => {
+  it("the whole rim is open but the climb's head; the six channel throats stay where they were", () => {
     // Six on every difficulty (Jose's playtest), the climb's side whole.
     expect(CORNICE_GAPS.map((g) => g.deg)).toEqual([22, 78, 128, 182, 228, 332]);
     for (const g of CORNICE_GAPS) {
@@ -306,17 +322,22 @@ describe('Guardian of the Breath: the push, the rim and the gaps', () => {
         expect(dist(g, { x, z })).toBeGreaterThan(g.r + 6);
       }
     }
-    const open = authoredFieldCliffRuns(SMITH_HEART_FIELD).filter((r) => r.open);
-    expect(open.length).toBeGreaterThan(0);
-    for (const r of open) {
+    // Every run of the Cornice's rim over the void is open, but the climb's
+    // head in the west (CORNICE_WALLED_BEARINGS).
+    const runs = authoredFieldCliffRuns(SMITH_HEART_FIELD).filter(
+      (r) => r.surface === 'storm_cornice' && r.low <= SMITH_HEART_FIELD.voidHeight + 1,
+    );
+    const open = runs.filter((r) => r.open);
+    expect(open.length).toBeGreaterThan(80);
+    for (const r of runs.filter((q) => !q.open)) {
       const mid = { x: (r.ax + r.bx) / 2, z: (r.az + r.bz) / 2 };
-      expect(CORNICE_GAPS.some((g) => dist(g, mid) <= g.r)).toBe(true);
+      const deg = ((Math.atan2(mid.x, mid.z - 196) * 180) / Math.PI + 360) % 360;
+      expect(deg).toBeGreaterThanOrEqual(CORNICE_WALLED_BEARINGS.from - 12);
+      expect(deg).toBeLessThanOrEqual(CORNICE_WALLED_BEARINGS.to + 12);
     }
-    expect(
-      new Set(
-        open.map((r) => CORNICE_GAPS.findIndex((g) => dist(g, { x: r.ax, z: r.az }) <= g.r + 0.5)),
-      ).size,
-    ).toBe(6);
+    // No rod, cheek stone or horn stands on the Cornice any more.
+    for (const kind of ['sh_lightning_rod', 'sh_channel_jamb', 'sh_broken_bellows'])
+      expect(SMITH_HEART_FIELD.props.some((q) => q.kind === kind)).toBe(false);
   });
 });
 
@@ -406,7 +427,8 @@ describe('Guardian of the Breath: the indrawn breath and Bellows Gust', () => {
     expect(hitsOf(ev, BREATH_NAMES.vortex, inFront.id).length).toBeGreaterThan(2);
     expect(f.objects(BREATH_OBJECTS.vortex)).toEqual([]);
     const near = dist(f.local(aside), f.local(boss));
-    const gust = f.tick(Math.round(T.gustCast / DT) + 2);
+    // The Roar's wave reaches them and slides their throw (breath_roar.ts).
+    const gust = f.tick(Math.round((T.gustCast + T.roarSlide + 0.6) / DT) + 2);
     expect(hitsOf(gust, BREATH_NAMES.gust, aside.id).length).toBe(1);
     expect(dist(f.local(aside), f.local(boss))).toBeGreaterThan(near + 8);
     expect(f.wind()?.phase).toBe('calm');
@@ -425,13 +447,7 @@ describe('Guardian of the Breath: the storm breaks at half health', () => {
     expect(f.wind()?.phase).toBe('break');
     f.tick(1);
     for (const p of f.players) expect(has(p, WIND_DRIFT_AURA)).toBe(false);
-    expect(
-      ev.some(
-        (e) =>
-          e.type === 'chat' &&
-          (e as { textKey?: string }).textKey === 'hudChrome.breathGuardian.warn.storm',
-      ),
-    ).toBe(true);
+    expect(ev.some((e) => e.type === 'chat' && e.channel === 'raidWarning')).toBe(false);
     f.tick(Math.round(T.stormCast / DT));
     expect(has(boss, BREATH_AURAS.stormForm)).toBe(true);
     expect(f.state()?.half).toBe('storm');
@@ -497,7 +513,7 @@ describe('Guardian of the Breath: the Storm', () => {
     const tid = f.state()?.bar?.targetId as number;
     const lifted = f.sim.ctx.entities.get(tid) as Entity;
     f.tick(Math.round(T.cradleCast / DT) + 1);
-    const c = f.state()?.cradle;
+    const c = f.state()?.cradles[0];
     expect(c?.playerId).toBe(tid);
     f.tick(20);
     expect(lifted.carriedBy).toBeDefined();
@@ -511,7 +527,7 @@ describe('Guardian of the Breath: the Storm', () => {
     others.slice(3).forEach((p, i) => {
       f.put(p, (c?.x ?? 0) + 15, (c?.z ?? 0) + 8 + i * 3);
     });
-    const ev = until(f, () => f.state()?.cradle === null, T.cradleHold + 1);
+    const ev = until(f, () => f.state()?.cradles.length === 0, T.cradleHold + 1);
     const share = cradleShare(4, BREATH_DIFFICULTY.normal.cradleSoakers);
     expect(share.backlash).toBe(false);
     const under = hitsOf(ev, BREATH_NAMES.cradle);
@@ -523,15 +539,17 @@ describe('Guardian of the Breath: the Storm', () => {
 
   it('too few under the Cradle: heavier shares and a backlash over the whole Cornice', () => {
     expect(cradleShare(2, 4).backlash).toBe(true);
-    expect(cradleShare(2, 4).each).toBe(Math.round((T.cradleTotal / 2) * T.cradlePenaltyMult));
+    expect(cradleShare(2, 4).each).toBe(
+      Math.round((BREATH_DIFFICULTY.normal.cradleTotal / 2) * T.cradlePenaltyMult),
+    );
     const f = storm(6);
     f.dev('/dev heart breath eye');
     const tid = f.state()?.bar?.targetId as number;
     f.tick(Math.round(T.cradleCast / DT) + 1);
-    const c = f.state()?.cradle;
+    const c = f.state()?.cradles[0];
     for (const p of f.players.filter((q) => q.id !== tid))
       f.put(p, (c?.x ?? 0) + 14, (c?.z ?? 0) + 10);
-    const ev = until(f, () => f.state()?.cradle === null, T.cradleHold + 1);
+    const ev = until(f, () => f.state()?.cradles.length === 0, T.cradleHold + 1);
     expect(hitsOf(ev, BREATH_NAMES.cradle)).toEqual([cradleShare(1, 4).each]);
     expect(hitsOf(ev, BREATH_NAMES.backlash).length).toBe(f.players.length);
   });
@@ -590,10 +608,11 @@ describe('Guardian of the Breath: heroic', () => {
   it('pins the push per tier: normal as it was, heroic and mythic harder and still walkable', () => {
     // Normal is exactly what Jose played; the harder tiers in the table.
     expect(BREATH_DIFFICULTY.normal.windSpeed).toBe(3.2);
-    expect(BREATH_DIFFICULTY.normal.gustThrow).toBe(18);
+    // The Summit Roar throws far since the rework (the team's feedback).
+    expect(BREATH_DIFFICULTY.normal.gustThrow).toBe(26);
     for (const tier of ['heroic', 'mythic'] as const) {
       expect(BREATH_DIFFICULTY[tier].windSpeed).toBe(4.4);
-      expect(BREATH_DIFFICULTY[tier].gustThrow).toBe(22);
+      expect(BREATH_DIFFICULTY[tier].gustThrow).toBe(30);
     }
   });
 
@@ -625,9 +644,11 @@ describe('Guardian of the Breath: heroic', () => {
       const aside = f.players[3];
       until(f, () => boss.castingAbility === BREATH_CASTS.gust, 8);
       const b = f.local(boss);
-      f.put(aside, b.x - 6, b.z);
+      // Toward the open south (the wave's throw slides a step a tick, so a
+      // heroic gale wandering across its way to the west could stop it).
+      f.put(aside, b.x, b.z - 6);
       const near = dist(f.local(aside), b);
-      f.tick(Math.round(T.gustCast / DT) + 2);
+      f.tick(Math.round((T.gustCast + T.roarSlide + 0.6) / DT) + 2);
       return { drift, headway, thrown: dist(f.local(aside), b) - near };
     };
     const normal = measure(false);
@@ -643,18 +664,21 @@ describe('Guardian of the Breath: heroic', () => {
 
   it('an anchor that ran out leaves its player spent; no circle takes them again (normal: none)', () => {
     for (const heroic of [false, true]) {
-      const f = pulled(4);
+      // Three, all seated: on the open rim the wind would carry anyone
+      // unanchored off the edge over 15 s.
+      const f = pulled(3);
       if (heroic) f.dev('/dev heart breath heroic');
       f.dev('/dev heart breath circle');
       const at = f.local(f.objects(BREATH_OBJECTS.calmPrefix)[0]);
       const p = f.players[1];
-      f.put(p, at.x, at.z);
+      for (const q of f.players) f.put(q, at.x, at.z);
       f.tick(Math.round(T.circleLand / DT) + 2);
       expect(has(p, BREATH_AURAS.anchor)).toBe(true);
       f.tick(Math.round(T.anchorSeconds / DT) + 2);
       expect(has(p, BREATH_AURAS.anchor)).toBe(false);
       expect(has(p, BREATH_AURAS.spent)).toBe(heroic);
-      // A new circle under them: the spent are refused.
+      // A new circle under them, in a calm: the spent are refused.
+      f.dev('/dev heart breath calm');
       f.dev('/dev heart breath circle');
       const again = f.local(f.objects(BREATH_OBJECTS.calmPrefix)[0]);
       f.put(p, again.x, again.z);
@@ -681,6 +705,8 @@ describe('Guardian of the Breath: heroic', () => {
     const before = f.local(p);
     const hits = hitsOf(f.tick(2), BREATH_NAMES.gale, p.id);
     expect(hits.length).toBe(1);
+    // The toss slides out over its moment (smith_heart_breath_gale_shove.test.ts).
+    f.tick(Math.round(T.galeSlide / DT));
     expect(dist(f.local(p), before)).toBeGreaterThan(3);
     // Normal: none.
     const n = pulled(4);
@@ -709,7 +735,11 @@ describe('Guardian of the Breath: heroic', () => {
   });
 
   it('mythic is heroic whole plus the Knotted Gale, behind its own dev switch', () => {
-    expect(BREATH_DIFFICULTY.mythic).toEqual({ ...BREATH_DIFFICULTY.heroic, stormHeart: true });
+    expect(BREATH_DIFFICULTY.mythic).toEqual({
+      ...BREATH_DIFFICULTY.heroic,
+      stormHeart: true,
+      windwornSeconds: 150,
+    });
     const f = pulled(2);
     expect(f.state()?.difficulty).toBe('normal');
     f.dev('/dev heart breath mythic');

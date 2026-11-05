@@ -38,6 +38,7 @@ import {
   KNOT_CARRY_Y,
   KNOT_FLOAT_Y,
   knotLook,
+  LINK_R,
   LINK_Y,
   liveFuse,
   markFill,
@@ -59,6 +60,7 @@ import {
   PORTAL_DISC_FRAG,
   PORTAL_FUNNEL_FRAG,
   PORTAL_LINK_FRAG,
+  PORTAL_LINK_VERT,
 } from './breath_heart_glsl';
 import { KIT_UV_VERT, ORB_CORE_FRAG, ORB_FRAG } from './final_kit_glsl';
 
@@ -325,6 +327,7 @@ export class BreathHeartFx {
               uColor: { value: ringColor },
               uAlpha: ringAlpha,
               uFill: { value: 0 },
+              uTime: h.uTime,
             },
             HEART_UV_VERT,
             HEART_RING_FRAG,
@@ -336,7 +339,12 @@ export class BreathHeartFx {
           floorQuad,
           shader(
             'smithHeartKnotLoad',
-            { uColor: { value: color(C.load) }, uAlpha: { value: 0.9 }, uFill: { value: 0.75 } },
+            {
+              uColor: { value: color(C.load) },
+              uAlpha: { value: 0.9 },
+              uFill: { value: 0.75 },
+              uTime: h.uTime,
+            },
             HEART_UV_VERT,
             HEART_RING_FRAG,
           ),
@@ -404,7 +412,7 @@ export class BreathHeartFx {
     for (const side of HEART_SIDES)
       faces[side] = shader(
         `smithHeartMarkLetter${side}`,
-        { uColor: { value: color(portalSideLook(side).color) } },
+        { uColor: { value: color(portalSideLook(side).color) }, uTime: h.uTime },
         FACING_VERT,
         FACING_FRAG,
         { blending: THREE.NormalBlending, depthTest: false, side: THREE.DoubleSide },
@@ -418,7 +426,7 @@ export class BreathHeartFx {
           floorQuad,
           shader(
             'smithHeartMarkRing',
-            { uColor: { value: ringColor }, uAlpha: { value: 1 }, uFill: fill },
+            { uColor: { value: ringColor }, uAlpha: { value: 1 }, uFill: fill, uTime: h.uTime },
             HEART_UV_VERT,
             HEART_RING_FRAG,
           ),
@@ -439,7 +447,8 @@ export class BreathHeartFx {
 
     // One link per pair: A's teal to B's violet in a soft beam; C's green to D's
     // rose in a braid of two twisting strands, riding higher.
-    const linkGeo = new THREE.PlaneGeometry(1, 1).rotateY(Math.PI / 2);
+    // A tube of light along z (PORTAL_LINK_VERT), round from every side.
+    const linkGeo = new THREE.CylinderGeometry(1, 1, 1, 18, 24, true).rotateX(Math.PI / 2);
     h.geometries.push(linkGeo);
     for (let pair = 0; pair < P.links; pair++) {
       const from = portalSideLook(HEART_SIDES[pair * 2]).color;
@@ -458,7 +467,7 @@ export class BreathHeartFx {
               uBraid: { value: pair },
               uLen: len,
             },
-            HEART_UV_VERT,
+            PORTAL_LINK_VERT,
             PORTAL_LINK_FRAG,
             { side: THREE.DoubleSide },
           ),
@@ -738,7 +747,7 @@ export class BreathHeartFx {
       const l = portalLink(a.pos.x, a.pos.z, b.pos.x, b.pos.z);
       link.mesh.position.set(l.mx, Math.max(a.pos.y, b.pos.y) + LINK_Y[pair], l.mz);
       link.mesh.rotation.set(0, l.yaw, 0);
-      link.mesh.scale.set(1, 1.1, Math.max(0.01, l.len));
+      link.mesh.scale.set(LINK_R[pair], LINK_R[pair], Math.max(0.01, l.len));
       link.len.value = l.len;
     }
     // Each marked player: the letter over them, the coming portal filling underfoot.

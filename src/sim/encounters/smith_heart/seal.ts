@@ -3,8 +3,8 @@
 // portal, derived every tick from the claim's own roster, never a timer and
 // never stored.
 //
-//   the Hammer ALWAYS FIRST: the Hammer Council's fall (all three: the
-//     Guardian, the Slabwright and the Seam Singer) splits the Slab (the gate
+//   the Hammer ALWAYS FIRST: the Hammer Council's fall (both: the Guardian
+//     and the Seam Singer) splits the Slab (the gate
 //     `the_slab`, bosses = the council); nothing past it is reachable before;
 //   the other three in ANY order: no gate orders the Breath, the Quench and
 //     the Heat against each other (each arena's mouth waits only on its own
@@ -50,6 +50,7 @@ import { instanceHalfWidthOf } from '../../instances/instance_footprint';
 import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
 import { tickBreathGuardian } from './breath';
+import { noteSmithHeartKills } from './checkpoint_order';
 import { tickHammerCouncil } from './council';
 import { tickFinalBoss } from './final';
 import { tickHeatGuardian } from './heat';
@@ -111,8 +112,8 @@ export function smithHeartLitCount(mask: number): number {
 }
 
 /** Is a vein's guardian fight won in this claim? The Hammer's is the Hammer
- *  Council's: its vein waits on all three (the Guardian, the Slabwright and
- *  the Seam Singer), never on the Guardian alone. */
+ *  Council's: its vein waits on both (the Guardian and the Seam Singer),
+ *  never on the Guardian alone. */
 export function smithHeartVeinWon(
   ctx: SimContext,
   inst: InstanceSlot,
@@ -301,6 +302,10 @@ export function tickSmithHeart(ctx: SimContext): void {
     tickHeatGuardian(ctx, inst);
     tickFinalBoss(ctx, inst);
     const value = tickSmithHeartSeal(ctx, inst);
+    // The kill order the death checkpoints read (checkpoint_order.ts): the
+    // markers' value carries the earned veins, the same mask the seal lit.
+    const mask = value !== null ? value & SMITH_HEART_SEAL_FULL : smithHeartEarnedMask(ctx, inst);
+    noteSmithHeartKills(inst, mask, SMITH_HEART_VEIN_BITS);
     if (value !== null) tickSmithHeartPortal(ctx, inst, smithHeartPortalBitSet(value));
   }
 }

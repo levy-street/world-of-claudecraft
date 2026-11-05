@@ -1,19 +1,17 @@
-// The Hammer Council's provisional bodies (plan: council_bodies_core.ts), hosted
-// by ../rift_death_zone.ts beside the raid's other fx. A kind in COUNCIL_MODELLED
-// (the Slabwright) wears its shipped model and keeps only this module's dust,
-// rings and shakes. The others are bodyless targets (characters/manifest.ts
-// smith_heart_slabwright, smith_heart_seam_singer): their click capsules,
+// The Hammer Council's provisional body (plan: council_bodies_core.ts),
+// hosted by ../rift_death_zone.ts beside the raid's other fx. A kind in
+// COUNCIL_MODELLED wears its shipped model and keeps only this module's dust,
+// rings and shakes. The Seam Singer is a bodyless target (characters/manifest.ts
+// smith_heart_seam_singer): its click capsule,
 // nameplates and bars come from the ordinary entity view, and this module
 // draws the bodies over them, read from IWorld (each body's position, facing,
 // cast bar, swings and death), so offline and online look the same:
 //  - the bodies: pieces of the Hammer kit's dressed stone and the Heart kit's
 //    rock and crystal, floating round their joints and stitched together by
-//    threads of the vein's ochre light. The Slabwright is broad and blocky,
-//    its slab shoulders standing proud, a skirt of chips turning low; the
-//    Seam Singer tall and slender, amber geodes breaking out of its
+//    threads of the vein's ochre light. The Seam Singer is tall and slender, amber geodes breaking out of its
 //    shoulders, back and crown, a halo of crystal shards turning round it;
 //  - the motion: a slow breath (the pieces drifting a little off their
-//    joints), a swing at the tank on each melee hit, the Slabwright's arms
+//    joints), a swing at the tank on each melee hit, the Singer's arms
 //    raised and slammed down over Wake the Stone and Falling Rock (dust and
 //    a ring where its fists strike), the Singer's arms opening over its song
 //    with its crystals flaring brighter with the bar (motes rising off them),
@@ -85,7 +83,7 @@ import {
 import { inSmithHeartClaim } from './council_fx_core';
 
 const SCAN_SEC = 0.1;
-const KINDS: readonly CouncilBodyKind[] = ['slabwright', 'singer'];
+const KINDS: readonly CouncilBodyKind[] = ['singer'];
 const SIDES = [1, -1] as const;
 /** Per-frame scratch (the pose allocates no point of its own). */
 const _jp: V3 = { x: 0, y: 0, z: 0 };
@@ -383,7 +381,7 @@ export class CouncilBodies {
   /** The kit's stone repainted a body's own granite: the Heart kit's rock is
    *  near-black for the Heart's ember night, and in the Quarry's low sun it
    *  read as a dark heap. A copy of the piece with its vertex paint pulled
-   *  toward a warm (the Slabwright) or a paler seam (the Singer) granite,
+   *  toward the Singer's paler seam granite,
    *  keeping a third of its own value variation (the beds, the chisel). */
   private warmStone(src: THREE.BufferGeometry, kind: CouncilBodyKind): THREE.BufferGeometry {
     const g = src.clone();
@@ -525,7 +523,7 @@ export class CouncilBodies {
       action = 'swing';
       k = (this.clock - rig.swingAt) / COUNCIL_SWING_SECONDS;
     }
-    // The Slabwright's slam lands as its raise bar ends.
+    // The slam lands as its raise bar ends.
     if (rig.lastAction === 'raise' && action !== 'raise' && rig.lastFill > COUNCIL_RAISE_SLAM_AT)
       this.slam(rig, e);
     rig.action = action;
@@ -745,7 +743,7 @@ export class CouncilBodies {
     });
   }
 
-  /** The Slabwright's fists strike the floor ahead: dust, chips, a ring. */
+  /** The fists strike the floor ahead: dust, chips, a ring. */
   private slam(rig: Rig, e: Entity): void {
     const eAt = fxAnchor(e);
     const reach = rig.plan.arm.upper + rig.plan.arm.fore;

@@ -24,12 +24,8 @@ import {
   SMITH_HEART_ROCK_KIT_URL,
   upgradeWhenHeartKitLands,
 } from './heart_kit';
-import {
-  planHeartLips,
-  planHeartNeedles,
-  planHeartRock,
-  planHeartUnderCliffs,
-} from './heart_rock_plan_core';
+import { planHeartHangs, planHeartRockLips, planHeartRockUnder } from './heart_rock_hang_core';
+import { planHeartNeedles, planHeartRock } from './heart_rock_plan_core';
 
 /** The rock's culling cell (yards). */
 const ROCK_CELL = 200;
@@ -46,15 +42,18 @@ export function heartRockKitReady(): boolean {
 
 /** The mountain's rock (instance-local). */
 export function buildHeartRock(lowGfx: boolean): THREE.Group {
-  const rock = [...planHeartRock(), ...planHeartUnderCliffs()];
-  const lips = planHeartLips();
+  // The Breath's high walks hang faces from brink to mist (the lips and
+  // under-walls they replace left out); the hangs are the Breath's alone.
+  const rock = [...planHeartRock(), ...planHeartRockUnder()];
+  const hangs = planHeartHangs();
+  const lips = planHeartRockLips();
   const needles = planHeartNeedles();
   // The Hammer vein's own rock is the painted kit's once it has landed.
   const painted = hammerEnvKitReady();
   const old = (p: { x: number; z: number }) => !painted || !hammerEnvOwnsRock(p);
   const group = instanceHeartKit(
     SMITH_HEART_ROCK_KIT_URL,
-    [...rock.filter(old), ...lips.filter(old), ...needles.filter(old)],
+    [...rock.filter(old), ...hangs, ...lips.filter(old), ...needles.filter(old)],
     lowGfx,
     'smithHeartRock',
     ROCK_CELL,

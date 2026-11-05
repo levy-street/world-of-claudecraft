@@ -4,7 +4,8 @@
 // offline and online look the same:
 //  - the telegraph, on EVERY graphics tier: Quenching Breath's cone at its
 //    exact angle and range, aimed where the bar locked it, through the
-//    shared floor telegraph, filling with the bar;
+//    shared floor telegraph, filling with the bar, dressed in the frost
+//    paint (painted_telegraphs.ts QuenchTelegraphs);
 //  - Quenching Breath on its bar: the cold drawn in to the guardian's maw,
 //    frost creeping out over the cone's floor, glints winking in it; when it
 //    lands, a freezing gust of mist sweeping out to the cone's end, ice
@@ -41,6 +42,8 @@ import { setRenderCategory } from '../renderer_diagnostics';
 import { heartKitSlotMaterial } from '../smith_heart/heart_kit';
 import { EngineParticles } from '../trash_engine_fx/engine_particles';
 import { ARC_CLEAVE_ABILITY, fxHash } from './hammer_fx_core';
+import { QUENCH_TELEGRAPH_GLOW_STEP } from './painted_telegraph_core';
+import { QuenchTelegraphs } from './painted_telegraphs';
 import {
   BREATH_FROST_SECONDS,
   BREATH_SWEEP_SECONDS,
@@ -281,7 +284,15 @@ export class QuenchFx {
     // The telegraph: the cone's footprint on every tier (the kit's curtain
     // only where the tier draws detail).
     this.kit = new TelegraphKit(this.root, detail);
-    for (let i = 0; i < QUENCH_FX_POOLS.telegraphs; i++) this.fans.push(this.kit.fan(10));
+    // Dressed in the frost paint (painted_telegraphs.ts: Jose's playtest of
+    // 2026-11-04, the cone read as a generic red cone): the lake freezing
+    // out from the maw with the bar, shards of ice along its flanks.
+    const paints = new QuenchTelegraphs(QUENCH_TELEGRAPH_GLOW_STEP, this.materials);
+    for (let i = 0; i < QUENCH_FX_POOLS.telegraphs; i++) {
+      const fan = this.kit.fan(10);
+      paints.dress(fan, 'breath');
+      this.fans.push(fan);
+    }
     // The frost left on the floor (one fan geometry, a material each: their
     // uniforms are their own frost's).
     const fanGeo = fanGeometry();

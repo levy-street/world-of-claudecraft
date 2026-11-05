@@ -4749,33 +4749,41 @@ export const zh_TW: EnTranslations = {
       "council": {
         "wakeMark": "結束時，一根石柱會從你腳下的地面衝出，對{radius}碼內的所有人造成{min}到{max}點傷害並將其擊退。站到團隊需要掩體的位置。英雄和傳奇難度：傷害提高{heroic}%。",
         "rockMark": "結束時，一塊巨石砸向你：{total}點傷害由{radius}碼內的所有人分擔。若不足{soakers}人分擔，每人多受{penalty}%傷害，且全團受到{tremorMin}到{tremorMax}點傷害。{radius}碼內的每根石柱都會損失一塊，所以要遠離掩體分擔。傳奇難度：{soulReach}碼內的靈魂石柱改為失去一個靈魂印記，印記耗盡時碎裂。英雄和傳奇難度：傷害提高{heroic}%。",
-        "resonance": "在石柱{reach}碼內連續站立{seconds}秒會震落它的一塊，之後每多待{seconds}秒再震落一塊。無法移除：在最破損的石柱旁躲過山岳之怒，遠離完好的石柱。傳奇難度：在靈魂石柱旁等待同樣的時間會改為擊碎它的一個靈魂印記（礦脈歌者的石柱為{singerSeconds}秒），印記耗盡時碎裂。",
+        "resonance": "每{every}秒你會發出共鳴，對你{radius}碼內的每名盟友造成{min}到{max}點自然傷害。在效果結束前遠離所有人。英雄和傳奇難度：傷害提高{heroic}%。",
+        "rushMark": "結束時，重錘守護者會先蓄勢{windup}秒，然後沿直線穿過你所站的位置，一直衝到採石場邊緣；若路上有石柱，則停在遇到的第一根石柱處。把它引向詛咒石柱：石柱碎裂，守護者被昏迷{stun}秒，並在{exposedSeconds}秒內受到的傷害提高{exposed}%。若路線上擋著一根掩護石柱，則改為摧毀那根石柱。它停下之前撞到的所有人會受到{min}到{max}點傷害並被擊退，如果你還在它的路線上，你也一樣。傳奇難度：沒有撞上任何石柱的衝鋒會引發採石場坍塌，直到詛咒石柱碎裂為止。",
+        "rushExposed": "受到的傷害提高{pct}%：山岳衝鋒撞碎了詛咒石柱。",
+        "bond": "重錘議會的另一名成員在{reach}碼內時，受到的傷害降低{pct}%。岩石之契每{every}秒對全團造成{min}到{max}點傷害，每次提高{growth}%。把他們拉開。",
+        "collapse": "採石場正在坍塌：每{every}秒，你每層受到{min}到{max}點傷害，且每次增加一層。詛咒石柱碎裂時結束。",
         "memory": "造成的傷害提高{pct}%：重錘議會每倒下一名成員提高{per}%。",
-        "prisoned": "Shut in a block of stone: you cannot act. Your allies must break the block before this ends, or it crushes you.",
-        "pillarLimit": "Each pillar shields at most {limit} players from Mountain's Wrath. With more behind it, each of them takes {share}% of the blast.",
-        "shouldered": "Takes {pct}% less damage while another living member of the Hammer Council stands within {reach} yd. Pull the Slabwright away from them."
+        "pillarLimit": "每根石柱最多只能為{limit}名玩家擋住山岳之怒。躲在後面的人更多時，每人承受衝擊的{share}%。"
       },
       "breathGuardian": {
-        "portalA": "When this ends, Portal A opens exactly where you stand. Stand near the Knotted Gale. You cannot carry it this round.",
-        "portalB": "When this ends, Portal B opens exactly where you stand. Stand at the lip of a gap. You cannot carry the Knotted Gale this round.",
-        "portalC": "When this ends, Portal C opens exactly where you stand. It links to Portal D only. Stand near the other Knotted Gale. You cannot carry it this round.",
-        "portalD": "When this ends, Portal D opens exactly where you stand. It links to Portal C only. Stand at the lip of a gap away from Portal B. You cannot carry the Knotted Gale this round.",
-        "laden": "You carry a Knotted Gale: you walk at {walk}% speed, you cannot blink, charge or leap, and no wind, pull, blast or throw can move you. Each portal takes you to its partner: A to B, C to D. Press Interact at the lip of any gap to throw it into the void. When this ends it bursts and kills everyone on the Cornice.",
-        "wind": "氣息守護者的風以每秒{speed}碼的速度將你帶往它吹去的方向。逆風而行便能站穩，它不會打斷你的施法。被壓在邊緣的牆上時，你每秒受到{pinMin}到{pinMax}點傷害。牆壁破損處沒有任何阻擋：你會墜入虛空。",
-        "draw": "守護者吸氣，以每秒{speed}碼的速度將你拉向牠。牠嘴前的漩渦每{tick}秒對站在其中的人造成{min}到{max}點傷害。隨後風箱狂風對崖台上的所有人造成{gustMin}到{gustMax}點傷害，並將他們向外擊飛{throw}碼。",
+        "portalA": "效果結束時，傳送門A會在你所站的位置打開。站在結風附近。本輪你無法攜帶它。",
+        "portalB": "效果結束時，傳送門B會在你所站的位置打開。站在崖台邊緣。本輪你無法攜帶結風。",
+        "portalC": "效果結束時，傳送門C會在你所站的位置打開。它只與傳送門D相連。站在另一團結風附近。本輪你無法攜帶它。",
+        "portalD": "效果結束時，傳送門D會在你所站的位置打開。它只與傳送門C相連。站在遠離傳送門B的崖台邊緣。本輪你無法攜帶結風。",
+        "laden": "你正攜帶結風：移動速度變為{walk}%，無法閃現、衝鋒或跳躍，風、拉扯、衝擊和擊飛都無法移動你。每個傳送門都會把你送到它的另一端：A到B，C到D。在崖台邊緣按下互動鍵，把它扔進虛空。效果結束時它會爆裂，殺死崖台上的所有人。",
+        "wind": "氣息守護者的風以每秒{speed}碼的速度將你帶往它吹去的方向。逆風而行便能站穩，它不會打斷你的施法。崖台四周沒有牆：被吹出邊緣，你會墜入虛空。只有攀登路口還立著牆，被壓在牆上時每秒受到{pinMin}到{pinMax}點傷害。",
+        "draw": "守護者深吸一口氣，以每秒{speed}碼的速度將你拉向它。它嘴前的漩渦每{tick}秒對站在其中的人造成{min}到{max}點傷害。隨後巔峰咆哮對崖台上的所有人造成{gustMin}到{gustMax}點傷害，並將他們從守護者身邊吹飛{throw}碼（英雄難度為{heroicThrow}碼）：守護者靠近邊緣時，團隊會被吹出崖台。",
         "pinned": "被風壓在邊緣的牆上：在風停歇或你離開牆邊之前，每秒受到{min}到{max}點傷害。",
         "anchor": "瑟薩莉隊長的寧靜穩住了你：風、拉扯、衝擊和擊飛都無法移動你。傷害照常生效。",
         "spent": "你的錨定已經耗盡：在此效果結束前，瑟薩莉隊長的寧靜之環無法再次錨定你。",
         "drawn": "每{every}秒會有一道閃電落在你所站之處：{warn}秒後對{radius}碼內的所有人造成{min}到{max}點傷害，並留下帶電的地面，在{charged}秒內每秒造成{cmin}到{cmax}點傷害。保持移動，把落雷引向遠離團隊的邊緣。",
-        "cradled": "被舉入風暴，持續{hold}秒。隨後的放電造成{total}點傷害，由你和你下方{radius}碼內的所有人分擔。分擔人數少於{soakers}人（英雄難度為{heroicSoakers}人）時，每人多承受{penalty}%，且崖台上的所有人受到{bmin}到{bmax}點傷害。",
+        "cradled": "被舉入風暴，在守護者引導搖籃的{hold}秒內被定住；其間守護者不會施放其他任何技能。隨後的放電造成{total}點傷害，由你和你下方{radius}碼內的所有人分擔。分擔人數少於{soakers}人時，每人多承受{penalty}%，且崖台上的所有人受到{bmin}到{bmax}點傷害。英雄難度：同時舉起{heroicCount}名玩家，每次放電{heroicTotal}點，需要{heroicSoakers}人分擔，團隊要分頭承受。",
+        "bulwark": "風之護盾還能吸收{left}點傷害。只要浮島上還有任一狂風哨兵或狂風癒者存活，它每秒恢復總量的{regrow}%，每次癒合之風恢復{mend}%。乘狂風之路飛往浮島，消滅它們。維持{max}秒後，它會在崖台上爆裂，造成{bmin}到{bmax}點傷害。",
+        "riding": "風沿著固定的路線帶你越過虛空：在被放下之前你無法行動。",
+        "windworn": "被風耗盡了力氣：效果結束前，狂風之路不會帶你前往浮島。",
+        "thrown": "被巔峰咆哮掀飛：落地之前無法移動。",
+        "tossed": "被遊蕩狂風掀飛：狂風放下你之前無法移動。",
         "stormForm": "撕裂為閃電之軀：戰鬥的風暴後半段，直到氣息守護者倒下。",
         "swell": "每{every}秒，膨脹的風暴對崖台上的所有人造成{min}到{max}點傷害，之前每次脈動使其增強{growth}%：目前已有{stacks}次。"
       },
       "quenchGuardian": {
-        "cold": "你的寒意：{cold}/{max}。獨自一人時約{fill}秒充滿。若{radius}碼內有{others}名或更多其他玩家，它反而每秒下降{fall}。達到{max}時你會被霜封{freeze}秒，隨後冰層碎裂。",
+        "cold": "你的寒意：{cold}/{max}。獨自一人時約{fill}秒充滿。若{radius}碼內有{others}名或更多其他玩家，則改為每秒下降{fall}。寒冰棺等免疫效果無法阻止它：免疫期間你既不提供也不獲得溫暖。達到{max}時你會被冰霜封住{freeze}秒，隨後冰層碎裂。",
         "warmth": "與團隊相擁取暖：寒意每秒下降{fall}。在同一處停留{linger}秒的人群，腳下冰面會裂成冰冷的水洞，所以要不斷移動。",
-        "frozen": "被霜封住：無法行動。效果結束時冰層碎裂：你受到{min}到{max}點冰霜傷害並陷入霜脆狀態，{radius}碼內的所有人獲得{cold}點寒意（英雄難度為{heroicRadius}碼、{heroicCold}點寒意）。",
-        "brittle": "受到的所有傷害提高{pct}%。",
+        "frozen": "被冰霜封住：你無法行動，受到的所有傷害提高{pct}%，冰霜會擊碎寒冰棺等免疫效果。效果結束時冰層碎裂：你受到{min}到{max}點冰霜傷害，隨後{seconds}秒內受到的傷害提高{brittle}%，{radius}碼內的所有人獲得{cold}點寒意（英雄難度為{heroicRadius}碼、{heroicCold}點寒意）。",
+        "brittle": "受到的所有傷害提高{pct}%。此效果持續期間，隊友碎冰的濺射無法讓你的寒意超過{cap}。",
+        "splashed": "隊友碎裂的冰濺到了你：寒意+{cold}。在你自己的寒意條充滿前回到人群中。",
         "trapped": "踏穿冰面掉進冰冷的水中：無法移動，每秒受到{min}到{max}點冰霜傷害，寒意不斷上升。{seconds}秒後你會爬上岸邊。僅憑冰水絕不會致死。",
         "awake": "鑄匠的四把利刃已甦醒。每一輪會有更多玩家被標記，利刃依次沿穿過他們的直線飛出。直線在利刃飛出前{lock}秒鎖定，隨後對線上的目標造成{min}到{max}點冰霜傷害，增加{cold}點寒冷。",
         "marked": "你是{count}人中的第{order}個：利刃將沿穿過你的直線飛來。把直線引離團隊。直線在利刃飛出前{lock}秒鎖定，屆時請離開，否則將受到{min}到{max}點冰霜傷害和{cold}點寒冷。",
@@ -7292,47 +7300,19 @@ export const zh_TW: EnTranslations = {
       "breathLine": "石美洲豹即將向平台的這一半吐息。跑到另一半去"
     },
     "council": {
-      "warn": {
-        "wrath": "山岳之怒！躲到石柱後面！",
-        "shoulder": "The Slabwright hardens beside its kin: pull it away!",
-        "crowded": "Too many behind one pillar! It could not shield them all.",
-        "prison": "Stone Prison on {players}! Break them out!",
-        "enrage": "山岳的怒火加速了！山岳之怒會來得更快。",
-        "weight": "{player}受到重錘之壓：換坦克！",
-        "wake": "喚醒岩石：石柱將在{players}腳下升起！站到需要掩體的地方。",
-        "wakeHeir": "岩石在{players}腳下甦醒：快移動！",
-        "rock": "落石砸向{player}！遠離掩體，一起分擔！",
-        "song": "礦脈之歌！打斷它！",
-        "resonance": "{players}獲得共鳴：去震裂最破損的石柱，遠離完好的石柱！",
-        "fell_guardian": "重錘守護者倒下了。它的怒火傳入了剩下的岩石！",
-        "fell_slabwright": "石板匠倒下了。現在岩石會隨意升起！",
-        "fell_singer": "礦脈歌者倒下了。它的歌聲被傳承下去，再也無法打斷！",
-        "soul_guardian": "守護者之魂附入了岩石！怒火迴響將從那根石柱中爆發。",
-        "soul_slabwright": "石板匠之魂附入了岩石！行走石板正拖著身軀向你們逼近。",
-        "soul_singer": "礦脈歌者之魂附入了岩石！無盡之歌每一次脈動都更加響亮。",
-        "echo": "怒火迴響！讓另一根石柱擋在你和靈魂石柱之間！",
-        "soulBreak_guardian": "守護者的靈魂石柱碎裂了！它的迴響歸於沉寂。",
-        "soulBreak_slabwright": "石板匠的靈魂石柱碎裂了！行走石板停了下來。",
-        "soulBreak_singer": "礦脈歌者的靈魂石柱碎裂了！無盡之歌歸於沉寂。"
-      },
       "say": {
         "guardian_pull": "採石場來了外人。鐵鎚之力絕不向血肉屈服。",
         "guardian_wrath": "群山回應了我！若岩石肯收留你們，就躲起來吧！",
+        "guardian_rush": "那就站在我的路上吧。群山從不繞行。",
         "guardian_death": "我的力量……交給岩石。",
         "guardian_remember": "岩石銘記。它們的一切，如今歸我。",
         "guardian_soul": "如今我即是岩石。我的怒火再無會倒下的軀體。",
         "guardian_wipe": "塵土。一切血肉終歸如此。",
         "guardian_defeat": "鐵鎚之力……由你們來承擔。",
-        "slabwright_pull": "牆還缺石頭。別動，我把你們砌進去。",
-        "slabwright_wake": "站在那兒。岩石會從你腳下升起！",
-        "slabwright_rock": "抬頭看，小傢伙們！山要塌了！",
-        "slabwright_death": "石板……裂開了……",
-        "slabwright_remember": "岩石銘記。這活兒我來幹完。",
-        "slabwright_soul": "我已沒有雙手，但我會把這塊石頭拖到你們面前。",
-        "slabwright_wipe": "砌好，埋好。幹得漂亮。",
-        "slabwright_defeat": "採石場……安靜了。",
         "singer_pull": "聽見礦脈在歌唱嗎？它等你們的聲音等了好久。",
         "singer_song": "與我同唱，然後碎裂吧！",
+        "singer_wake": "醒來吧，沉睡的岩石。在他們腳下升起！",
+        "singer_rock": "抬頭看，小傢伙們！山要塌下來了！",
         "singer_death": "我的歌……流入了岩石……",
         "singer_remember": "岩石銘記。聽，它仍在歌唱。",
         "singer_soul": "聽啊。在岩石之中，我的歌永不終結。",
@@ -7341,59 +7321,38 @@ export const zh_TW: EnTranslations = {
       },
       "alert": {
         "wakeTitle": "喚醒岩石！",
-        "wakeLine": "石柱會在你站的地方升起：把掩體放在團隊需要的位置",
+        "wakeLine": "石柱會在你站的地方升起：移動到團隊需要掩體的位置",
         "rockTitle": "落石！",
         "rockLine": "遠離石柱，讓至少三名隊友站到你身邊",
         "resonanceTitle": "共鳴",
-        "resonanceLine": "靠近石柱就會震裂它：在最破損的石柱旁等待",
-        "resonanceCracking": "正在震裂石柱：離開它以保住它",
+        "resonanceLine": "你會傷害身邊的每名盟友：在效果結束前遠離團隊",
+        "rushTitle": "山岳衝鋒！",
+        "rushLine": "守護者將衝向你：讓詛咒石柱擋在你和他之間",
         "rockLineSoul": "遠離掩體，在靈魂石柱旁聚集至少三名隊友",
-        "resonanceLineSoul": "在靈魂石柱旁等待以擊碎靈魂印記，不要靠近完好的石柱",
-        "resonanceBreaking": "正在擊碎靈魂印記：留在靈魂石柱旁",
         "weightTitle": "重錘之壓",
         "weightLine": "你受到雙倍物理傷害：另一名坦克必須接手守護者",
         "timeAria": "剩餘{seconds}秒"
       }
     },
     "knotAlert": {
-      "aTitle": "You are Portal A!",
-      "aLine": "It opens at your feet in {seconds} sec. Stand near the Knotted Gale.",
-      "bTitle": "You are Portal B!",
-      "bLine": "It opens at your feet in {seconds} sec. Stand at the lip of a gap.",
-      "cTitle": "You are Portal C!",
-      "cLine": "It opens at your feet in {seconds} sec. Stand near the other Knotted Gale.",
-      "dTitle": "You are Portal D!",
-      "dLine": "It opens at your feet in {seconds} sec. Stand at a gap away from Portal B.",
-      "carryTitle": "You carry the Knotted Gale!",
-      "carryLine": "Each portal takes you to its partner: A to B, C to D. Throw it from the lip of a gap. It bursts in {seconds} sec.",
-      "lipTitle": "Throw it now!",
-      "lipLine": "You stand at the lip of a gap. It bursts in {seconds} sec.",
-      "throwKey": "Press {key} at the lip to throw",
-      "throwTap": "Tap here at the lip to throw",
-      "throwClick": "Click here at the lip to throw",
-      "throwAria": "Throw the Knotted Gale into the void"
+      "aTitle": "你是傳送門A！",
+      "aLine": "{seconds}秒後在你腳下打開。站在結風附近。",
+      "bTitle": "你是傳送門B！",
+      "bLine": "{seconds}秒後在你腳下打開。站在崖台邊緣。",
+      "cTitle": "你是傳送門C！",
+      "cLine": "{seconds}秒後在你腳下打開。站在另一團結風附近。",
+      "dTitle": "你是傳送門D！",
+      "dLine": "{seconds}秒後在你腳下打開。站在遠離傳送門B的邊緣。",
+      "carryTitle": "你正攜帶結風！",
+      "carryLine": "每個傳送門都通往另一端：A到B，C到D。在崖台邊緣把它扔出去。{seconds}秒後爆裂。",
+      "lipTitle": "現在扔！",
+      "lipLine": "你站在邊緣。{seconds}秒後爆裂。",
+      "throwKey": "在邊緣按{key}投擲",
+      "throwTap": "在邊緣點按此處投擲",
+      "throwClick": "在邊緣點擊此處投擲",
+      "throwAria": "將結風扔進虛空"
     },
     "breathGuardian": {
-      "warn": {
-        "inhale": "守護者正在吸氣！別站在牠嘴前的漩渦裡！",
-        "gust": "風箱狂風！準備承受衝擊！",
-        "gales": "遊蕩的狂風橫掃崖台！離它們遠點！",
-        "circle": "瑟薩莉隊長布下了寧靜之環！最多可容{seats}人。",
-        "fell": "{player}被捲入了虛空！",
-        "storm": "風暴爆發了！閃電將落滿整個崖台！",
-        "fork": "跳躍雷擊落在{player}身上！散開！",
-        "cradle": "{player}被舉入了風暴！到他的下方集合！",
-        "drawn": "引雷落在{player}身上！把落雷引向邊緣！",
-        "stormGust": "風暴陣風正在聚集！頂住風！",
-        "knot": "A Knotted Gale falls! Carry it to a gap and throw it into the void!",
-        "knotPortals": "Portal A on {a}, Portal B on {b}!",
-        "knotPortals2": "Portal C on {c}, Portal D on {d}!",
-        "knotTaken": "{player} takes up the Knotted Gale!",
-        "knotDropped": "{player} falls! The Knotted Gale is free again!",
-        "knotFell": "{player} takes the Knotted Gale into the void!",
-        "knotThrown": "{player} hurls the Knotted Gale into the void!",
-        "knotBurst": "The Knotted Gale bursts!"
-      },
       "say": {
         "guardian_pull": "你們爬上山巔，是來偷走它的氣息嗎？那就與我一同呼吸吧。",
         "guardian_blow": "感受風向的轉變。邊緣比你想的更近。",
@@ -7401,9 +7360,12 @@ export const zh_TW: EnTranslations = {
         "guardian_storm": "氣息夠了。現在，迎接風暴！",
         "guardian_cradle": "升起吧，小傢伙。讓他們接住你。",
         "guardian_drawn": "天空選中了你。跑吧，它會緊隨而至。",
+        "guardian_isles": "風啊，將我圍起！浮島會護住我的氣息。",
+        "guardian_bulwark": "我的護盾……被撕開了。那就再嘗嘗狂風吧！",
         "guardian_wipe": "被吹散了，就像山巔的塵埃。",
         "guardian_death": "氣息……回歸……群山……",
-        "thessaly_pull": "高望與你們並肩！當心牆上的缺口：風會把你們從那裡扔出去！",
+        "thessaly_pull": "高望與你們同在！這上面沒有牆：風會把你們從邊緣吹下去！",
+        "thessaly_isles": "它的護盾靠浮島供能！乘風飛過去，解決癒者再回來！",
         "thessaly_circle_a": "快進我的寧靜之中！最多三人，不能再多！",
         "thessaly_circle_b": "這裡！站在我身邊，讓風撞碎在我們身上！",
         "thessaly_circle_c": "石上的寧靜！三個人，現在就來！",
@@ -7415,14 +7377,6 @@ export const zh_TW: EnTranslations = {
       }
     },
     "quenchGuardian": {
-      "warn": {
-        "rim": "岸冰隆起！快到湖面上去！",
-        "frozen": "{player}被凍透了！在冰碎裂之前離開！",
-        "crack": "抱團的人群下冰面在呻吟！散開！",
-        "wake": "鑄匠之刃掙脫湖面！注意它們瞄準何處！",
-        "marks": "利刃標記了{list}！把它們引離團隊！",
-        "flurry": "所有利刃同時出獵！躲開直線！"
-      },
       "say": {
         "pull": "我的湖上來了溫熱的血。它不會溫熱太久。",
         "shatter": "凍透了。現在，碎裂吧。",
@@ -7444,6 +7398,8 @@ export const zh_TW: EnTranslations = {
       "frozenTitle": "被霜封住！",
       "waterTitle": "在冰下！",
       "coldLine": "站到{radius}碼內有{others}名或更多其他玩家的地方取暖",
+      "splashTitle": "冰霜濺射！寒意+{cold}",
+      "immuneLine": "免疫效果擋不住寒意：快抱團",
       "warmLine": "寒意正在下降。{seconds}秒內移動人群，否則冰面會裂開",
       "frozenLine": "冰層將在{seconds}秒後碎裂：附近的人請離開",
       "waterLine": "{seconds}秒後爬上岸",
@@ -7458,7 +7414,7 @@ export const zh_TW: EnTranslations = {
         "keepers": "湧泉看守從湧泉中升起！坦住牠們，讓牠們的印記遠離湧泉之子！",
         "seeds": "爐心火種落下了！集中放下然後快跑！",
         "zones": "甦醒之火！爐心一圈接一圈地燃起：快出去！",
-        "wheel": "The Hearth turns! Get to the dark slice!",
+        "wheel": "爐心轉動了！快到暗色的扇區去！",
         "cinder": "滾動餘燼落下了！在它追上獵物之前把它打退！"
       },
       "say": {
@@ -16944,7 +16900,7 @@ export const zh_TW: EnTranslations = {
       "sanctum_branding_iron": "烙鐵",
       "sanctum_rime_breath": "霜凇吐息",
       "heart_mountains_wrath": "山岳之怒",
-      "heart_bellows_gust": "風箱狂風",
+      "heart_bellows_gust": "巔峰咆哮",
       "heart_storm_lance": "風暴長槍",
       "heart_quenching_breath": "淬火吐息",
       "heart_forge_wrath": "熔爐之怒",
@@ -16959,12 +16915,11 @@ export const zh_TW: EnTranslations = {
       "heart_rime_bolt": "Rime Bolt",
       "heart_ember_bolt": "餘燼箭",
       "heart_hammers_weight": "重錘之壓",
+      "heart_mountains_rush": "山岳衝鋒",
       "heart_wake_the_stone": "喚醒岩石",
       "heart_falling_rock": "落石",
-      "heart_stone_prison": "Stone Prison",
       "heart_seam_bolt": "礦脈箭",
       "heart_song_of_the_seam": "礦脈之歌",
-      "heart_song_of_the_seam_unbroken": "礦脈之歌",
       "heart_echo_of_wrath": "怒火迴響",
       "heart_endless_song": "無盡之歌",
       "heart_breath_inhale": "深吸之息",
@@ -16972,6 +16927,9 @@ export const zh_TW: EnTranslations = {
       "heart_breath_forking_bolt": "跳躍雷擊",
       "heart_breath_thunders_cradle": "雷霆搖籃",
       "heart_breath_drawn_lightning": "引雷",
+      "heart_breath_cradle_channel": "雷霆搖籃",
+      "heart_breath_gale_bulwark": "狂風壁壘",
+      "heart_breath_mending_gale": "癒合之風",
       "heart_quench_blades_wake": "諸刃甦醒",
       "heart_quench_blades_hunt": "利刃狩獵",
       "heart_heat_fist": "玄武岩之拳",
@@ -26920,6 +26878,12 @@ export const zh_TW: EnTranslations = {
       "heart_breath_caller": {
         "name": "息脈召喚者"
       },
+      "heart_gale_sentinel": {
+        "name": "狂風哨兵"
+      },
+      "heart_gale_mender": {
+        "name": "狂風癒者"
+      },
       "heart_quench_warder": {
         "name": "淬脈守衛"
       },
@@ -26934,9 +26898,6 @@ export const zh_TW: EnTranslations = {
       },
       "heart_hammer_guardian": {
         "name": "重錘守護者"
-      },
-      "heart_slabwright": {
-        "name": "石板匠"
       },
       "heart_seam_singer": {
         "name": "礦脈歌者"
@@ -26964,9 +26925,6 @@ export const zh_TW: EnTranslations = {
       },
       "heart_heat_rolling_cinder": {
         "name": "滾動餘燼"
-      },
-      "heart_stone_prison": {
-        "name": "Stone Prison"
       },
       "heart_final_splinter_heat": {
         "name": "熾熱碎片"

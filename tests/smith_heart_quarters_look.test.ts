@@ -31,9 +31,11 @@ import {
   HEART_LANDMARK_SPAN,
   heartBreathBolts,
   heartBreathHornTips,
+  heartLandmarkHaloSpots,
   heartLandmarkLit,
   heartLandmarkSpots,
 } from '../src/render/smith_heart/heart_landmarks_core';
+import { LANDMARK_HEAT_BLOOM_VERT } from '../src/render/smith_heart/heart_landmarks_glsl';
 import { buildHeartQuarters } from '../src/render/smith_heart/heart_quarters';
 import {
   clearHeartQuarterMemoryForTest,
@@ -559,5 +561,23 @@ describe('the edges awake (phase 2M)', () => {
     // The bolts and the halos (which quarter is awake) are never shed.
     expect(quads(lo, 'heartLandmarkBolts:breath')).toBe(quads(hi, 'heartLandmarkBolts:breath'));
     expect(quads(lo, 'heartLandmarkHalo:heat')).toBe(quads(hi, 'heartLandmarkHalo:heat'));
+  });
+
+  it("blooms the Heat's crater alone, a column of heat and never a globe in the air", () => {
+    // The AAA pass's third round: the discs on the lava's feet read as salmon globes.
+    expect(heartLandmarkHaloSpots('heat')).toEqual([heartLandmarkSpots('heat')[0]]);
+    expect(heartLandmarkHaloSpots('quench')).toEqual(heartLandmarkSpots('quench'));
+    const hi = buildHeartQuarters(false, () => null).group;
+    let mat: THREE.ShaderMaterial | null = null;
+    hi.traverse((o) => {
+      if (o.name === 'heartLandmarkHalo:heat')
+        mat = (o as THREE.Mesh).material as THREE.ShaderMaterial;
+    });
+    const shader = (mat as THREE.ShaderMaterial | null)?.vertexShader ?? '';
+    expect(shader).toBe(LANDMARK_HEAT_BLOOM_VERT);
+    // Tall and narrow, on the crater, never shown asleep.
+    expect(shader).toContain('vec2(0.6, 1.9)');
+    expect(shader).toContain('vFade = uLit * beat');
+    expect(shader).not.toContain('uQuiet * 0.35');
   });
 });

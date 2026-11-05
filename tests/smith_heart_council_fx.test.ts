@@ -2,7 +2,9 @@
 // council_fx_core.ts: a pillar's integrity on the model, its rise and its fall,
 // the marks read off the sim's own numbers, the rock's fall, the claimed cues)
 // and CouncilFx over a fake world (no DOM): it dresses the pillars, draws every
-// mark round its player, claims the council's own cues and disposes.
+// mark round its player, claims the council's own cues and disposes; the
+// two-boss rework's looks (Resonance's spread ring, Mountain's Rush's mark and
+// lane, the cursed pillar, Bond of the Stone's thread).
 
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
@@ -12,10 +14,14 @@ import {
   COUNCIL_FX_COLORS,
   COUNCIL_FX_POOLS,
   COUNCIL_MARK_SPECS,
+  CURSED_COLORS,
   councilClaims,
+  cursedPillarLook,
   energyLook,
   inheritArc,
+  isCursedPillar,
   markFill,
+  markRadius,
   PILLAR_RISE_SECONDS,
   pillarFall,
   pillarLook,
@@ -26,12 +32,16 @@ import {
   RISE_SPOT_SPEC,
   ROCK_FALL_SECONDS,
   rockFall,
+  rushLane,
+  SOUL_COLORS,
 } from '../src/render/smith_heart_fx/council_fx_core';
 import { DUNGEONS, instanceOrigin } from '../src/sim/data';
 import {
   COUNCIL_AURAS,
   COUNCIL_CASTS,
   COUNCIL_CUES,
+  COUNCIL_CURSED,
+  councilPillarOf,
   councilPillarTemplate,
   COUNCIL_TUNING as T,
 } from '../src/sim/encounters/smith_heart/council_ids';
@@ -115,6 +125,53 @@ describe('council_fx_core: integrity on the model', () => {
     expect(pillarLook(2)).toBe(pillarLook(2));
   });
 
+  it("Resonance's spread and the Rush's mark read the sim's radius, in a threat colour", () => {
+    const res = COUNCIL_MARK_SPECS[COUNCIL_AURAS.resonance];
+    expect(res.radius).toBe(T.resonanceRadius);
+    expect(res.color).toBe(TELEGRAPH_THREAT_COLORS.danger);
+    expect(res.gather).toBe(false);
+    const rush = COUNCIL_MARK_SPECS[COUNCIL_AURAS.rushMark];
+    expect(rush.radius).toBe(T.rushHalfWidth);
+    expect(rush.color).toBe(TELEGRAPH_THREAT_COLORS.lethal);
+    // The aura's value2 (the sim's own) wins; none rides: the spec's.
+    expect(markRadius(res, 9)).toBe(9);
+    expect(markRadius(res, 0)).toBe(T.resonanceRadius);
+    expect(markRadius(res, undefined)).toBe(T.resonanceRadius);
+  });
+
+  it("the Rush's lane runs from the Guardian to its mark at the hit's whole width", () => {
+    const out = { yaw: 0, length: 0, half: 0 };
+    const lane = rushLane(0, 0, 0, 12, 0, out);
+    expect(lane).toBe(out);
+    expect(out.yaw).toBeCloseTo(0);
+    expect(out.length).toBeCloseTo(12);
+    // Drawn to the hit's whole reach: the half width and a body's girth.
+    expect(out.half).toBe(T.rushHalfWidth + T.rushBody);
+    expect(out.half * 2).toBeGreaterThanOrEqual(5);
+    rushLane(0, 0, 5, 0, 3, out);
+    expect(out.yaw).toBeCloseTo(Math.PI / 2);
+    expect(out.half).toBe(3 + T.rushBody);
+    expect(rushLane(1, 1, 1.1, 1, 2, out)).toBeNull();
+  });
+
+  it('the cursed pillar is its own template with its own light', () => {
+    expect(isCursedPillar(COUNCIL_CURSED)).toBe(true);
+    expect(isCursedPillar(councilPillarTemplate(1, true))).toBe(false);
+    expect(councilPillarOf(COUNCIL_CURSED)).toBeNull();
+    for (const h of [
+      ...Object.values(SOUL_COLORS).map((c) => c.hex),
+      TELEGRAPH_THREAT_COLORS.control,
+      TELEGRAPH_THREAT_COLORS.lethal,
+      TELEGRAPH_THREAT_COLORS.danger,
+    ])
+      expect(CURSED_COLORS.hex).not.toBe(h);
+    const calm = { ...cursedPillarLook(0, 99) };
+    const pulsed = { ...cursedPillarLook(0, 0.05) };
+    expect(calm.crack).toBeGreaterThan(0.5);
+    expect(pulsed.glow).toBeGreaterThan(calm.glow);
+    expect(pulsed.heat).toBeGreaterThan(calm.heat);
+  });
+
   it("claims exactly the council's own cues", () => {
     for (const id of Object.values(COUNCIL_CUES)) expect(councilClaims(id), id).toBe(true);
     expect(councilClaims(COUNCIL_CASTS.bolt)).toBe(true);
@@ -179,7 +236,7 @@ describe('CouncilFx over a fake world', () => {
     });
     for (const e of [me, marked, column, risen, guardian]) entities.set(e.id, e);
     marked.auras.push(aura(COUNCIL_AURAS.rockMark, 3, 5));
-    me.auras.push(aura(COUNCIL_AURAS.resonance, 10, 15, 0.4, risen.id));
+    me.auras.push(aura(COUNCIL_AURAS.resonance, 4, 6, 0, T.resonanceRadius));
     const world = { entities, player: me, playerId: me.id } as unknown as IWorld;
     const scene = new THREE.Scene();
     let shaken = 0;
@@ -217,8 +274,8 @@ describe('CouncilFx over a fake world', () => {
     };
     expect(shown('smithHeartCouncilPillar')).toBe(2);
     expect(shown('smithHeartPillarPips')).toBe(2);
-    expect(shown('smithHeartResonanceRing')).toBe(1);
-    expect(shown('smithHeartResonanceThread')).toBe(1);
+    // Resonance: the shimmer on its carrier (its ring is a kit mark).
+    expect(shown('smithHeartResonanceBand')).toBe(1);
     // The soak reads from afar: its countdown rim, its beacon, and the rock's
     // shadow drawn by the stone paint under the marked player (its char pass,
     // so the fissures burn through it), heating as the rock comes.
@@ -271,5 +328,141 @@ describe('CouncilFx over a fake world', () => {
     expect(fx.handleEvent(wrath)).toBe(false);
     fx.dispose();
     expect(scene.getObjectByName('smith-heart-council-fx')).toBeUndefined();
+  });
+
+  it("draws the Rush's lane and mark, the cursed pillar, the bond's thread; claims their cues", () => {
+    const entities = new Map<number, Entity>();
+    const me = entity(1, 'player', 'warrior', 8, -160);
+    const marked = entity(2, 'player', 'mage', 0, -150);
+    const guardian = entity(20, 'mob', 'heart_hammer_guardian', 0, -175);
+    const singer = entity(21, 'mob', 'heart_seam_singer', 10, -175);
+    const cursed = entity(30, 'object', COUNCIL_CURSED, -12, -168);
+    for (const e of [me, marked, guardian, singer, cursed]) entities.set(e.id, e);
+    const world = { entities, player: me, playerId: me.id } as unknown as IWorld;
+    const scene = new THREE.Scene();
+    const gestures: [number, string][] = [];
+    const fx = new CouncilFx(
+      scene,
+      () => 0,
+      world,
+      undefined,
+      () => false,
+      () => {},
+      (id, g) => gestures.push([id, g]),
+    );
+    for (let i = 0; i < 6; i++) fx.update(1 / 30);
+    const root = scene.getObjectByName('smith-heart-council-fx');
+    const shown = (name: string) => {
+      let n = 0;
+      root?.traverse((c) => {
+        if (c.name !== name) return;
+        for (let o: THREE.Object3D | null = c; o; o = o.parent) if (!o.visible) return;
+        n++;
+      });
+      return n;
+    };
+    // The cursed pillar: a pillar with its own sheath of light and no pips.
+    expect(shown('smithHeartCouncilPillar')).toBe(1);
+    expect(shown('smithHeartPillarPips')).toBe(0);
+    expect(shown('smithHeartSoulGlow')).toBe(1);
+    // No bond, no Rush yet.
+    expect(shown('smithHeartCouncilBondThread')).toBe(0);
+    const paints = () => shown('smithHeartCouncilTelegraph');
+    const before = paints();
+    // The Guardian marks a player and charges: the mark round them and the lane.
+    Object.assign(guardian, {
+      castingAbility: COUNCIL_CASTS.rush,
+      castTargetId: marked.id,
+      castTotal: T.rushCast,
+      castRemaining: 2,
+    });
+    marked.auras.push(aura(COUNCIL_AURAS.rushMark, 2, T.rushCast, 0, T.rushHalfWidth));
+    guardian.auras.push(aura(COUNCIL_AURAS.bond, 10, 10));
+    for (let i = 0; i < 6; i++) fx.update(1 / 30);
+    expect(paints()).toBeGreaterThanOrEqual(before + 2);
+    // The bond: the tether (core, halo, shards) and its aura on both members
+    // (a sigil on the floor, a column of light), every tier.
+    expect(shown('smithHeartCouncilBondThread')).toBe(1);
+    expect(shown('smithHeartCouncilBondCore')).toBe(1);
+    expect(shown('smithHeartCouncilBondHalo')).toBe(1);
+    expect(shown('smithHeartCouncilBondShards')).toBe(1);
+    expect(shown('smithHeartCouncilBondSigil')).toBe(2);
+    expect(shown('smithHeartCouncilBondColumn')).toBe(2);
+    expect(shown('smithHeartCouncilBondChain')).toBe(1);
+    const nova = (ability: string, sourceId: number, targetId = sourceId): SimEvent =>
+      ({
+        type: 'spellfx',
+        sourceId,
+        targetId,
+        school: 'physical',
+        fx: 'nova',
+        ability,
+      }) as SimEvent;
+    const at = (ability: string, x: number, z: number, radius: number): SimEvent =>
+      ({ type: 'spellfxAt', x, z, school: 'physical', fx: 'burst', ability, radius }) as SimEvent;
+    expect(fx.handleEvent(nova(COUNCIL_CUES.bondPulse, guardian.id, singer.id))).toBe(true);
+    expect(fx.handleEvent(nova(COUNCIL_CUES.cursedPulse, cursed.id))).toBe(true);
+    expect(fx.handleEvent(nova(COUNCIL_CUES.resonancePulse, me.id))).toBe(true);
+    expect(fx.handleEvent(at(COUNCIL_CUES.quarryCollapse, me.pos.x, me.pos.z, 2))).toBe(true);
+    // The bar lands: the lane goes; the dash stops on the cursed pillar.
+    guardian.castingAbility = null;
+    guardian.castTargetId = null;
+    marked.auras.length = 0;
+    for (let i = 0; i < 6; i++) fx.update(1 / 30);
+    expect(paints()).toBe(before);
+    // The wind-up: the line fixed from the Guardian's feet to the cursed
+    // pillar's face; the lane stays lit at full through it and the run.
+    const run = Math.hypot(cursed.pos.x - guardian.pos.x, cursed.pos.z - guardian.pos.z) - 4;
+    const windup = {
+      ...at(COUNCIL_CUES.rushWindup, guardian.pos.x, guardian.pos.z, T.rushHalfWidth),
+      sourceId: guardian.id,
+      dirX: (cursed.pos.x - guardian.pos.x) / (run + 4),
+      dirZ: (cursed.pos.z - guardian.pos.z) / (run + 4),
+      speed: T.rushSpeed,
+      duration: run / T.rushSpeed,
+    } as SimEvent;
+    expect(fx.handleEvent(windup)).toBe(true);
+    expect(gestures).toEqual([[guardian.id, 'heart_mountains_rush_windup']]);
+    fx.update(1 / 30);
+    expect(paints()).toBe(before + 1);
+    expect(shown('smithHeartRushStar')).toBe(1);
+    expect(shown('smithHeartRushScar')).toBe(0);
+    // Into the run: the scar tears open behind the body.
+    for (let i = 0; i < Math.ceil((T.rushWindup + 0.2) * 30); i++) fx.update(1 / 30);
+    expect(paints()).toBe(before + 1);
+    expect(shown('smithHeartRushScar')).toBe(1);
+    const stop = at(COUNCIL_CUES.rushImpact, cursed.pos.x, cursed.pos.z, T.rushHalfWidth);
+    expect(fx.handleEvent(stop)).toBe(true);
+    fx.update(1 / 30);
+    // The stop: the locked lane goes, the scar and both stars stay a while.
+    expect(paints()).toBe(before);
+    expect(shown('smithHeartRushScar')).toBe(1);
+    expect(shown('smithHeartRushStar')).toBe(2);
+    entities.delete(cursed.id);
+    const brk = at(COUNCIL_CUES.cursedBreak, cursed.pos.x, cursed.pos.z, T.cursedR);
+    expect(fx.handleEvent(brk)).toBe(true);
+    for (let i = 0; i < 120; i++) fx.update(1 / 30);
+    expect(shown('smithHeartCouncilPillar')).toBe(0);
+    // The Rush's trace fades away.
+    for (let i = 0; i < 90; i++) fx.update(1 / 30);
+    expect(shown('smithHeartRushScar')).toBe(0);
+    expect(shown('smithHeartRushStar')).toBe(0);
+    // The bond breaks when they are pulled apart (neither wears it): every
+    // piece goes the same frame.
+    guardian.auras.length = 0;
+    fx.update(1 / 30);
+    expect(shown('smithHeartCouncilBondThread')).toBe(0);
+    expect(shown('smithHeartCouncilBondSigil')).toBe(0);
+    expect(shown('smithHeartCouncilBondColumn')).toBe(0);
+    expect(shown('smithHeartCouncilBondChain')).toBe(0);
+    // A Rush whose Guardian falls mid-run: the locked lane goes that frame,
+    // never lit over ground that no longer kills.
+    expect(fx.handleEvent(windup)).toBe(true);
+    fx.update(1 / 30);
+    expect(paints()).toBe(before + 1);
+    guardian.dead = true;
+    fx.update(1 / 30);
+    expect(paints()).toBe(before);
+    fx.dispose();
   });
 });

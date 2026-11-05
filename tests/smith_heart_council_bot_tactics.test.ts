@@ -87,13 +87,11 @@ describe('heart council tactics: the template ids', () => {
     expect(COUNCIL_REACH.risenR).toBe(COUNCIL_TUNING.risenR);
     expect(COUNCIL_REACH.rock).toBe(COUNCIL_TUNING.rockRadius);
     expect(COUNCIL_REACH.soulRock).toBe(COUNCIL_TUNING.soulRockReach);
-    expect(COUNCIL_REACH.resonance).toBe(COUNCIL_TUNING.resonanceReach);
+    expect(COUNCIL_REACH.resonance).toBe(COUNCIL_TUNING.resonanceRadius);
     expect(COUNCIL_REACH.pulse).toBe(COUNCIL_TUNING.pulseReach);
     expect(COUNCIL_REACH.riseGap).toBe(COUNCIL_TUNING.riseGap);
     expect(COUNCIL_REACH.riseClearOfBodies).toBe(COUNCIL_TUNING.riseClearOfBodies);
     expect(COUNCIL_REACH.riseKnock).toBe(COUNCIL_TUNING.riseKnockRadius);
-    expect(COUNCIL_REACH.slabCrush).toBe(COUNCIL_TUNING.slabCrushReach);
-    expect(COUNCIL_REACH.slabGrind).toBe(COUNCIL_TUNING.slabGrindReach);
     expect(COUNCIL_REACH.wrath).toBe(COUNCIL_TUNING.wrathRadius);
   });
 });
@@ -137,12 +135,12 @@ describe('heart council tactics: cover from the Wrath and the Echo', () => {
     expect(spots).toBeGreaterThan(100);
   });
 
-  it('keeps a Resonance carrier off the face it hides behind', () => {
+  it('keeps a cover spot off the face by the margin asked (the heroic pulse)', () => {
     const source = { x: HAMMER_PIT.x, z: HAMMER_PIT.z };
-    const spots = coverSpots(COLUMNS[2], COLUMNS, [source], COUNCIL_TUNING.resonanceReach + 1);
+    const spots = coverSpots(COLUMNS[2], COLUMNS, [source], COUNCIL_TUNING.pulseReach + 1);
     expect(spots.length).toBeGreaterThan(0);
     for (const spot of spots) {
-      expect(faceDistance(COLUMNS[2], spot)).toBeGreaterThan(COUNCIL_TUNING.resonanceReach);
+      expect(faceDistance(COLUMNS[2], spot)).toBeGreaterThan(COUNCIL_TUNING.pulseReach);
       expect(simPillarBetween(COLUMNS.map(asSim), source, spot)).not.toBeNull();
     }
   });
@@ -184,16 +182,6 @@ describe('heart council tactics: the Falling Rock and Wake the Stone', () => {
     if (!spot) return;
     expect(faceDistance(soul, spot)).toBeLessThanOrEqual(COUNCIL_TUNING.soulRockReach);
     for (const p of cover) expect(faceDistance(p, spot)).toBeGreaterThan(COUNCIL_TUNING.rockRadius);
-    // The Walking Slab: outside its grind as well.
-    const slab = { ...soul, soul: 'slabwright' as const };
-    const s2 = rockSpot({
-      from: { x: HAMMER_PIT.x, z: HAMMER_PIT.z },
-      cover,
-      soul: slab,
-      floor: FLOOR,
-    });
-    expect(s2).not.toBeNull();
-    if (s2) expect(faceDistance(slab, s2)).toBeGreaterThan(COUNCIL_TUNING.slabGrindReach);
   });
 
   it('carries a Wake mark between the holder and the raid, to a spot the server lets rise', () => {

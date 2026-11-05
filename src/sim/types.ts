@@ -8442,8 +8442,8 @@ export interface Entity extends ClientMirroredEntityFields {
    *  authority only; the client reads the fight from casts, auras and objects. */
   sanctumFight?: SanctumFightState;
   /** The Smith's Heart's Hammer Council fight (encounters/smith_heart/
-   *  council.ts): ONE state object shared by the Guardian, the Slabwright and
-   *  the Seam Singer while they fight. Sim authority only; the client reads
+   *  council.ts): ONE state object shared by the Guardian and the Seam
+   *  Singer while they fight. Sim authority only; the client reads
    *  the fight from casts, auras, the energy bar and the pillar objects. */
   smithHeartFight?: CouncilFightState;
   /** The Smith's Heart's Guardian of the Breath fight (encounters/smith_heart/
@@ -8572,6 +8572,9 @@ export interface Entity extends ClientMirroredEntityFields {
   // shown to this player, so the 20 Hz walk-in door trigger does not spam the
   // toast (instances/ignivar_entry.ts).
   ignivarEntryDeniedAt?: number;
+  // Sim time of the last "an encounter is in progress" door refusal shown to
+  // this released spirit, throttled the same way (instances/encounter_lock.ts).
+  encounterLockNoticeAt?: number;
   // Sim time of the last "the forge doors hold fast" Ignivar exit denial shown
   // to this player while a boss fight seals the room, throttled the same way:
   // the 20 Hz exit-portal walk-in trigger must not spam the toast
@@ -10507,7 +10510,8 @@ export type SimEvent = { pid?: number } & (
       // blast radius in yards; when set the renderer flashes a terrain-draped
       // AoE ring of this size under the burst so the impact area reads clearly
       radius?: number;
-      // 'orb' only: unit drift direction, yards-per-second speed, and lifetime
+      // 'orb' (and the Hammer Council's Mountain's Rush wind-up cue, its fixed
+      // line): unit drift direction, yards-per-second speed, and lifetime
       // in seconds of the roaming visual
       dirX?: number;
       dirZ?: number;

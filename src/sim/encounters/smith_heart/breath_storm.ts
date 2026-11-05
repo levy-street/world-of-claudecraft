@@ -10,12 +10,8 @@
 //   Leaping Bolt       a 2.5 s bar at a player: the bolt strikes them, then
 //                      jumps to the nearest player within 8 yd, again and
 //                      again (breath_ids.ts forkPath): spread.
-//   Thunder's Cradle   a 1.5 s bar at a player: they are lifted into the
-//                      storm (carried, an unbreakable stun) over a gather
-//                      circle; 6 s on, the discharge is split between
-//                      everyone under it, the lifted included. Too few under
-//                      it: each share heavier and a backlash over the whole
-//                      Cornice (lethal for one or two). Gather, then spread.
+//   Thunder's Cradle   breath_cradle.ts: lifted players over gather circles,
+//                      held by the guardian's channel (nothing else cast).
 //   Drawn Lightning    a 1 s bar at a player: for 10 s a strike falls at their
 //                      feet every 2 s, each leaving charged ground that bites
 //                      for 18 s: they lead the strikes to the edge.
@@ -26,10 +22,10 @@
 // Zero rng in every pick (hashed marks, hashed spots); the draws are the
 // damage rolls, in player order.
 
-import { carryBody, setDownBody } from '../../carried_body';
 import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
 import { DT, type Entity } from '../../types';
+import { cradled, releaseCradles, startCradle, stepCradles } from './breath_cradle';
 import { clearWindAuras, setWind, thessalyOf } from './breath_gale';
 import { barrageSpot, breathHash } from './breath_geometry';
 import {
@@ -38,7 +34,6 @@ import {
   BREATH_CUES,
   BREATH_NAMES,
   BREATH_OBJECTS,
-  cradleShare,
   forkPath,
   swellMult,
   BREATH_TUNING as T,
@@ -56,10 +51,10 @@ import {
   local,
   pickMarks,
   putMarker,
-  raidWarn,
   roll,
   spawnBreathObject,
 } from './breath_scope';
+import { clearShoves } from './breath_shove';
 import type { BreathFightState, BreathSpot } from './breath_state';
 import { clearCalm } from './breath_thessaly';
 import { breathSay } from './breath_voice';
@@ -81,9 +76,10 @@ export function startStorm(s: BreathScope): boolean {
   clearCalm(s.ctx, s.inst, st);
   dropBreathObject(s.ctx, s.inst, st.vortex?.objectId ?? null);
   st.vortex = null;
+  if (st.roar) clearShoves(s, st.roar.slides);
+  st.roar = null;
   setWind(s, 'break', T.stormCast, st.wind.bearing);
   beginBar(s, BREATH_CASTS.storm, T.stormCast, null);
-  raidWarn(s, s.boss, 'storm', 'The storm breaks! Lightning will fall across the Cornice!');
   breathSay(s, s.boss, 'guardian', 'storm');
   breathSay(s, thessalyOf(s.ctx, s.inst), 'thessaly', 'storm');
   return true;
@@ -252,7 +248,6 @@ export function startFork(s: BreathScope): boolean {
   if (!t) return false;
   beginBar(s, BREATH_CASTS.fork, T.forkCast, t.id);
   s.st.forkTimer = T.forkEvery;
-  raidWarn(s, s.boss, 'fork', `Leaping Bolt on ${t.name}! Spread out!`, { player: t.name });
   return true;
 }
 
@@ -286,152 +281,12 @@ export function landFork(s: BreathScope, targetId: number | null): Entity[] {
   return path;
 }
 
-// ---- Thunder's Cradle -----------------------------------------------------------------------
-
-/** Begin the Cradle on a hashed player (never one already held). Exported
- *  for the dev trigger. */
-export function startCradle(s: BreathScope): boolean {
-  if (s.st.cradle) return false;
-  const busy = new Set(s.st.drawn ? [s.st.drawn.playerId] : []);
-  const [t] = pickMarks(s, 1, busy);
-  if (!t) return false;
-  beginBar(s, BREATH_CASTS.cradle, T.cradleCast, t.id);
-  s.st.cradleTimer = T.cradleEvery;
-  return true;
-}
-
-/** The bar lands: its player is lifted over the gather circle. */
-export function landCradle(s: BreathScope, targetId: number | null): void {
-  const t = targetId !== null ? s.ctx.entities.get(targetId) : undefined;
-  if (!living(t) || t.carriedBy !== undefined) return;
-  const at = local(s.ctx, s.inst, t);
-  const e = spawnBreathObject(
-    s.ctx,
-    s.inst,
-    timedTemplate(BREATH_OBJECTS.cradlePrefix, T.cradleHold),
-    BREATH_NAMES.cradle,
-    at.x,
-    at.z,
-    T.cradleR,
-  );
-  carryBody(t, e.id);
-  s.ctx.applyAura(t, {
-    id: BREATH_AURAS.cradled,
-    name: BREATH_NAMES.cradle,
-    kind: 'stun',
-    remaining: T.cradleHold + 0.5,
-    duration: T.cradleHold + 0.5,
-    value: 0,
-    sourceId: s.boss.id,
-    school: 'nature',
-    unbreakableControl: true,
-    undispellable: true,
-  });
-  s.st.cradle = { playerId: t.id, objectId: e.id, x: at.x, z: at.z, remaining: T.cradleHold };
-  raidWarn(s, s.boss, 'cradle', `${t.name} is lifted into the storm! Gather beneath them!`, {
-    player: t.name,
-  });
-  breathSay(s, s.boss, 'guardian', 'cradle');
-}
-
-/** The lifted body hangs over its circle; at the end the discharge. */
-function stepCradle(s: BreathScope): void {
-  const c = s.st.cradle;
-  if (!c) return;
-  const o = s.ctx.instanceOriginOf(s.inst);
-  const t = s.ctx.entities.get(c.playerId);
-  const floor = s.ctx.groundPos(o.x + c.x, o.z + c.z).y;
-  c.remaining -= DT;
-  if (t && !t.dead && t.carriedBy === c.objectId) {
-    const k = Math.min(1, (T.cradleHold - c.remaining) / 0.8);
-    t.pos.x = o.x + c.x;
-    t.pos.z = o.z + c.z;
-    t.pos.y = floor + T.cradleLift * k * k * (3 - 2 * k);
-    s.ctx.rebucket(t);
-  }
-  if (c.remaining > 1e-9) return;
-  dischargeCradle(s, c, floor);
-}
-
-/** The discharge: split between everyone under the circle (the lifted one
- *  counts), heavier and with a backlash if too few gathered. Returns the
- *  soakers (the tests read it). */
-export function dischargeCradle(
-  s: BreathScope,
-  c: NonNullable<BreathFightState['cradle']>,
-  floor: number,
-): Entity[] {
-  const o = s.ctx.instanceOriginOf(s.inst);
-  const lifted = s.ctx.entities.get(c.playerId);
-  const under = livePlayers(s).filter((p) => {
-    if (p.id === c.playerId) return true;
-    const at = local(s.ctx, s.inst, p);
-    return Math.hypot(at.x - c.x, at.z - c.z) <= T.cradleR;
-  });
-  if (lifted && !lifted.dead && !under.includes(lifted)) under.push(lifted);
-  const share = cradleShare(under.length, s.rules.cradleSoakers);
-  s.ctx.emit({
-    type: 'spellfxAt',
-    x: o.x + c.x,
-    z: o.z + c.z,
-    school: 'nature',
-    fx: 'burst',
-    radius: T.cradleR,
-    ability: BREATH_CUES.discharge,
-  });
-  for (const p of under)
-    s.ctx.dealDamage(
-      s.boss,
-      p,
-      Math.max(1, Math.round(share.each * s.rules.damageMult * (s.boss.mechanicDamageMult ?? 1))),
-      false,
-      'nature',
-      BREATH_NAMES.cradle,
-      'hit',
-      true,
-    );
-  if (share.backlash)
-    for (const p of livePlayers(s))
-      s.ctx.dealDamage(
-        s.boss,
-        p,
-        roll(s, T.backlashMin, T.backlashMax),
-        false,
-        'nature',
-        BREATH_NAMES.backlash,
-        'hit',
-        true,
-      );
-  releaseCradle(s.ctx, s.inst, s.st, floor);
-  return under;
-}
-
-/** Set the lifted body down and take the circle away. */
-export function releaseCradle(
-  ctx: SimContext,
-  inst: InstanceSlot,
-  st: BreathFightState,
-  floor?: number,
-): void {
-  const c = st.cradle;
-  if (!c) return;
-  const o = ctx.instanceOriginOf(inst);
-  const t = ctx.entities.get(c.playerId);
-  if (t && t.carriedBy === c.objectId) {
-    setDownBody(t, floor ?? ctx.groundPos(o.x + c.x, o.z + c.z).y);
-    ctx.rebucket(t);
-  }
-  if (t) dropAura(t, BREATH_AURAS.cradled);
-  dropBreathObject(ctx, inst, c.objectId);
-  st.cradle = null;
-}
-
 // ---- Drawn Lightning ------------------------------------------------------------------------
 
 /** Begin Drawn Lightning on a hashed player. Exported for the dev trigger. */
 export function startDrawn(s: BreathScope): boolean {
   if (s.st.drawn) return false;
-  const busy = new Set(s.st.cradle ? [s.st.cradle.playerId] : []);
+  const busy = new Set(cradled(s.st));
   const [t] = pickMarks(s, 1, busy);
   if (!t) return false;
   beginBar(s, BREATH_CASTS.drawn, T.drawnCast, t.id);
@@ -444,9 +299,6 @@ export function landDrawn(s: BreathScope, targetId: number | null): void {
   if (!living(t)) return;
   putMarker(t, BREATH_AURAS.drawn, BREATH_NAMES.drawn, T.drawnSeconds, s.boss.id);
   s.st.drawn = { playerId: t.id, remaining: T.drawnSeconds, next: 0 };
-  raidWarn(s, s.boss, 'drawn', `Drawn Lightning on ${t.name}! Lead the strikes to the edge!`, {
-    player: t.name,
-  });
   breathSay(s, s.boss, 'guardian', 'drawn');
 }
 
@@ -511,7 +363,7 @@ function stepSwell(s: BreathScope): void {
  *  still lands). */
 export function stepStorm(s: BreathScope): void {
   stepSpots(s);
-  stepCradle(s);
+  stepCradles(s);
   stepDrawn(s);
   if (s.st.half !== 'storm') return;
   stepBarrage(s);
@@ -535,7 +387,7 @@ export function clearStorm(ctx: SimContext, inst: InstanceSlot, st: BreathFightS
   for (const sp of st.spots) dropBreathObject(ctx, inst, sp.objectId);
   st.spots = [];
   st.barrage = null;
-  releaseCradle(ctx, inst, st);
+  releaseCradles(ctx, inst, st);
   if (st.drawn) {
     const t = ctx.entities.get(st.drawn.playerId);
     if (t) dropAura(t, BREATH_AURAS.drawn);

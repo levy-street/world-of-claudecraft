@@ -4749,33 +4749,41 @@ export const ko_KR: EnTranslations = {
       "council": {
         "wakeMark": "효과가 끝나면 서 있는 자리의 바닥에서 기둥이 솟구쳐 {radius}야드 안의 모두에게 {min}에서 {max}의 피해를 주고 밀쳐냅니다. 공격대에 엄폐물이 필요한 곳에 서세요. 영웅·신화: 피해 {heroic}% 증가.",
         "rockMark": "효과가 끝나면 바위가 떨어집니다: {total}의 피해를 {radius}야드 안의 모두가 나눠 받습니다. {soakers}명 미만이면 각자 {penalty}% 더 받고 공격대 전체가 {tremorMin}에서 {tremorMax}의 피해를 받습니다. {radius}야드 안의 모든 기둥이 한 조각씩 깨지니 엄폐물에서 떨어져 나눠 맞으세요. 신화: {soulReach}야드 안의 영혼의 기둥은 대신 영혼 표식을 하나 잃고, 표식이 없어지면 부서집니다. 영웅·신화: 피해 {heroic}% 증가.",
-        "resonance": "기둥에서 {reach}야드 안에 {seconds}초 동안 계속 서 있으면 기둥이 한 조각 깨지고, 머무는 동안 {seconds}초마다 다시 깨집니다. 제거할 수 없습니다: 가장 손상된 기둥 옆에서 산의 분노를 버티고 멀쩡한 기둥에서는 떨어지세요. 신화: 영혼의 기둥 옆에서 같은 시간을 버티면 대신 영혼 표식이 하나 사라지고(광맥의 노래꾼의 기둥은 {singerSeconds}초), 표식이 없어지면 부서집니다.",
+        "resonance": "{every}초마다 울려 퍼져 자신의 {radius}야드 안에 있는 모든 아군에게 {min}에서 {max}의 자연 피해를 줍니다. 효과가 끝날 때까지 모두에게서 떨어지세요. 영웅·신화: 피해 {heroic}% 증가.",
+        "rushMark": "효과가 끝나면 망치의 수호자가 {windup}초 동안 자세를 잡은 뒤, 당신이 서 있던 곳을 지나 채석장 가장자리까지 일직선으로 돌진하며, 길을 막는 기둥이 있으면 첫 번째 기둥에서 멈춥니다. 저주받은 기둥으로 유인하세요: 기둥이 부서지고 수호자가 {stun}초 동안 기절하며 {exposedSeconds}초 동안 받는 피해가 {exposed}% 증가합니다. 경로에 엄폐용 기둥이 있으면 대신 그 기둥이 파괴됩니다. 멈추기 전까지 돌진에 부딪힌 모두가 {min}에서 {max}의 피해를 받고 밀려나며, 아직 경로 위에 있다면 당신도 마찬가지입니다. 신화: 기둥에 부딪히지 않은 돌진은 저주받은 기둥이 부서질 때까지 채석장 붕괴를 일으킵니다.",
+        "rushExposed": "받는 피해가 {pct}% 증가합니다: 산의 돌진이 저주받은 기둥을 부쉈습니다.",
+        "bond": "망치 의회의 다른 구성원이 {reach}야드 안에 있는 동안 받는 피해가 {pct}% 감소합니다. {every}초마다 돌의 결속이 공격대 전체에 {min}에서 {max}의 피해를 주며, 매번 {growth}%씩 증가합니다. 둘을 떼어 놓으세요.",
+        "collapse": "채석장이 무너지고 있습니다: {every}초마다 중첩 하나당 {min}에서 {max}의 피해를 받으며, 매번 중첩이 하나씩 쌓입니다. 저주받은 기둥이 부서지면 끝납니다.",
         "memory": "주는 피해가 {pct}% 증가합니다: 쓰러진 망치 의회 구성원 1명당 {per}%.",
-        "prisoned": "Shut in a block of stone: you cannot act. Your allies must break the block before this ends, or it crushes you.",
-        "pillarLimit": "Each pillar shields at most {limit} players from Mountain's Wrath. With more behind it, each of them takes {share}% of the blast.",
-        "shouldered": "Takes {pct}% less damage while another living member of the Hammer Council stands within {reach} yd. Pull the Slabwright away from them."
+        "pillarLimit": "기둥 하나는 산의 분노로부터 최대 {limit}명만 지켜 줍니다. 그보다 많이 숨으면 모두가 폭발의 {share}%를 받습니다."
       },
       "breathGuardian": {
-        "portalA": "When this ends, Portal A opens exactly where you stand. Stand near the Knotted Gale. You cannot carry it this round.",
-        "portalB": "When this ends, Portal B opens exactly where you stand. Stand at the lip of a gap. You cannot carry the Knotted Gale this round.",
-        "portalC": "When this ends, Portal C opens exactly where you stand. It links to Portal D only. Stand near the other Knotted Gale. You cannot carry it this round.",
-        "portalD": "When this ends, Portal D opens exactly where you stand. It links to Portal C only. Stand at the lip of a gap away from Portal B. You cannot carry the Knotted Gale this round.",
-        "laden": "You carry a Knotted Gale: you walk at {walk}% speed, you cannot blink, charge or leap, and no wind, pull, blast or throw can move you. Each portal takes you to its partner: A to B, C to D. Press Interact at the lip of any gap to throw it into the void. When this ends it bursts and kills everyone on the Cornice.",
-        "wind": "숨결의 수호자의 바람이 부는 방향으로 초당 {speed}야드씩 당신을 실어 갑니다. 바람을 거슬러 걸으면 버틸 수 있으며, 시전은 끊기지 않습니다. 가장자리 벽에 밀려 붙으면 매초 {pinMin}~{pinMax}의 피해를 입습니다. 벽이 무너진 곳에서는 막아 줄 것이 없어 공허로 떨어집니다.",
-        "draw": "수호자가 숨을 들이쉬며 초당 {speed}야드씩 당신을 끌어당깁니다. 입 앞의 소용돌이는 그 안에 선 이에게 {tick}초마다 {min}~{max}의 피해를 줍니다. 이어서 풀무 돌풍이 벼랑 위의 모두에게 {gustMin}~{gustMax}의 피해를 주고 {throw}야드 바깥으로 날려 보냅니다.",
+        "portalA": "효과가 끝나면 당신이 선 자리에 포털 A가 열립니다. 얽힌 질풍 가까이에 서세요. 이번 라운드에는 그것을 나를 수 없습니다.",
+        "portalB": "효과가 끝나면 당신이 선 자리에 포털 B가 열립니다. 벼랑 가장자리에 서세요. 이번 라운드에는 얽힌 질풍을 나를 수 없습니다.",
+        "portalC": "효과가 끝나면 당신이 선 자리에 포털 C가 열립니다. 포털 D와만 이어집니다. 다른 얽힌 질풍 가까이에 서세요. 이번 라운드에는 그것을 나를 수 없습니다.",
+        "portalD": "효과가 끝나면 당신이 선 자리에 포털 D가 열립니다. 포털 C와만 이어집니다. 포털 B에서 떨어진 벼랑 가장자리에 서세요. 이번 라운드에는 얽힌 질풍을 나를 수 없습니다.",
+        "laden": "얽힌 질풍을 나르고 있습니다: 이동 속도가 {walk}%가 되고, 점멸·돌진·도약을 할 수 없으며, 바람도 끌어당김도 폭발도 날려 보내기도 당신을 움직일 수 없습니다. 각 포털은 짝 포털로 데려갑니다: A에서 B, C에서 D. 벼랑 가장자리에서 상호작용을 누르면 공허로 던집니다. 이 효과가 끝나면 터져 벼랑 위의 모두가 죽습니다.",
+        "wind": "숨결의 수호자의 바람이 부는 방향으로 초당 {speed}야드씩 당신을 실어 갑니다. 바람을 거슬러 걸으면 버틸 수 있으며, 시전은 끊기지 않습니다. 벼랑 둘레에는 벽이 없습니다: 가장자리 밖으로 실려 가면 공허로 떨어집니다. 오르막 꼭대기에만 벽이 남아 있으며, 그곳에 밀려 붙으면 매초 {pinMin}~{pinMax}의 피해를 입습니다.",
+        "draw": "수호자가 숨을 들이쉬며 초당 {speed}야드씩 당신을 끌어당깁니다. 입 앞의 소용돌이는 그 안에 선 자에게 {tick}초마다 {min}~{max}의 피해를 줍니다. 이어서 정상의 포효가 벼랑 위의 모두에게 {gustMin}~{gustMax}의 피해를 주고 수호자에게서 {throw}야드(영웅 난이도는 {heroicThrow}야드) 날려 보냅니다: 수호자가 가장자리 가까이 있으면 공격대가 벼랑 밖으로 날아갑니다.",
         "pinned": "바람에 밀려 가장자리 벽에 붙어 있습니다: 바람이 잦아들거나 벽에서 벗어날 때까지 매초 {min}~{max}의 피해.",
         "anchor": "테살리 대장의 고요가 당신을 붙잡고 있습니다: 바람도, 끌어당김도, 폭발도, 날려 보내기도 당신을 움직일 수 없습니다. 피해는 그대로 받습니다.",
         "spent": "닻이 다했습니다: 이것이 끝날 때까지 테살리 대장의 고요의 원은 당신을 다시 붙잡을 수 없습니다.",
         "drawn": "{every}초마다 당신이 선 곳에 번개가 떨어집니다: {warn}초 뒤 {radius}야드 안의 모두에게 {min}~{max}의 피해를 주고, {charged}초 동안 매초 {cmin}~{cmax}의 피해를 주는 대전된 땅을 남깁니다. 계속 움직이며 낙뢰를 공격대에서 먼 가장자리로 유도하세요.",
-        "cradled": "폭풍 속으로 들어 올려져 {hold}초 동안 붙잡힙니다. 이후 방전이 {total}의 피해를 주며, 당신과 아래 {radius}야드 안의 모두가 나눠 받습니다. 나눠 받는 인원이 {soakers}명 미만이면(영웅 난이도는 {heroicSoakers}명) 각자 {penalty}% 더 받고 벼랑 위의 모두가 {bmin}~{bmax}의 피해를 받습니다.",
+        "cradled": "폭풍 속으로 들어 올려져, 수호자가 요람을 유지하는 {hold}초 동안 붙잡힙니다. 그동안 수호자는 다른 것을 시전하지 않습니다. 이후 방전이 {total}의 피해를 주며, 당신과 아래 {radius}야드 안의 모두가 나눠 받습니다. 나눠 받는 인원이 {soakers}명 미만이면 각자 {penalty}% 더 받고 벼랑 위의 모두가 {bmin}~{bmax}의 피해를 받습니다. 영웅: {heroicCount}명이 한꺼번에 들어 올려지며, 각 방전은 {heroicTotal}이고 {heroicSoakers}명이 필요하니 공격대가 나뉘어 받아야 합니다.",
+        "bulwark": "바람의 방패가 피해를 {left} 더 흡수합니다. 떠 있는 섬의 질풍 파수병이나 질풍 치유사가 하나라도 살아 있으면 매초 전체의 {regrow}%가 다시 차오르고, 치유의 질풍마다 {mend}%가 회복됩니다. 질풍의 길을 타고 섬으로 건너가 그들을 쓰러뜨리세요. {max}초 동안 유지되면 벼랑 위에서 터져 {bmin}~{bmax}의 피해를 줍니다.",
+        "riding": "바람이 정해진 길을 따라 공허 위로 당신을 실어 갑니다: 내려놓을 때까지 행동할 수 없습니다.",
+        "windworn": "바람에 지쳤습니다: 이 효과가 끝날 때까지 질풍의 길이 당신을 섬으로 데려가지 않습니다.",
+        "thrown": "정상의 포효에 날아갔습니다: 착지할 때까지 움직일 수 없습니다.",
+        "tossed": "떠도는 돌풍에 날아갔습니다: 돌풍이 내려놓을 때까지 움직일 수 없습니다.",
         "stormForm": "찢어져 번개의 몸이 되었습니다: 숨결의 수호자가 쓰러질 때까지 이어지는 전투의 폭풍 후반부.",
         "swell": "{every}초마다 부풀어 오르는 폭풍이 벼랑 위의 모두에게 {min}~{max}의 피해를 주며, 앞선 맥동마다 {growth}%씩 강해집니다: 지금까지 {stacks}번."
       },
       "quenchGuardian": {
-        "cold": "당신의 냉기: {max} 중 {cold}. 혼자 있으면 약 {fill}초 만에 가득 찹니다. {radius}미터 안에 다른 플레이어가 {others}명 이상 있으면 대신 매초 {fall}씩 내려갑니다. {max}에 이르면 {freeze}초 동안 서리에 갇히고, 그 뒤 얼음이 부서집니다.",
+        "cold": "당신의 냉기: {max} 중 {cold}. 혼자 있으면 약 {fill}초 만에 가득 찹니다. {radius}미터 안에 다른 플레이어가 {others}명 이상 있으면 대신 매초 {fall}씩 내려갑니다. 차가운 관 같은 무적 효과로는 막을 수 없습니다: 효과가 지속되는 동안에는 온기를 주지도 받지도 못합니다. {max}에 이르면 {freeze}초 동안 서리에 갇히고, 그 뒤 얼음이 부서집니다.",
         "warmth": "공격대와 함께 모여 있음: 냉기가 매초 {fall}씩 내려갑니다. 한 자리에 {linger}초 동안 머문 무리 아래의 얼음은 갈라져 얼어붙은 물웅덩이가 되니 계속 움직이세요.",
-        "frozen": "서리에 갇힘: 행동할 수 없습니다. 효과가 끝나면 얼음이 부서져 {min}~{max}의 냉기 피해를 입고 서리 취약 상태가 되며, {radius}미터 안의 모두가 냉기 {cold}을 얻습니다(영웅 난이도에서는 {heroicRadius}미터, 냉기 {heroicCold}).",
-        "brittle": "모든 공격으로부터 받는 피해가 {pct}% 증가합니다.",
+        "frozen": "서리에 갇힘: 행동할 수 없고 모든 공격으로부터 받는 피해가 {pct}% 증가하며, 서리가 차가운 관 같은 무적 효과를 깨뜨립니다. 효과가 끝나면 얼음이 부서져 {min}~{max}의 냉기 피해를 입고, 이후 {seconds}초 동안 받는 피해가 {brittle}% 증가하며, {radius}미터 안의 모두가 냉기 {cold}을 얻습니다(영웅 난이도에서는 {heroicRadius}미터, 냉기 {heroicCold}).",
+        "brittle": "모든 공격으로부터 받는 피해가 {pct}% 증가합니다. 이 효과가 지속되는 동안에는 아군의 얼음 파편이 당신의 냉기를 {cap} 넘게 올리지 못합니다.",
+        "splashed": "아군의 부서진 얼음이 튀었습니다: 냉기 +{cold}. 자신의 게이지가 가득 차기 전에 무리로 돌아가세요.",
         "trapped": "얼음을 뚫고 얼어붙은 물에 빠졌습니다: 움직일 수 없고, 매초 {min}~{max}의 냉기 피해를 입으며 냉기가 올라갑니다. {seconds}초 뒤 가장자리로 기어 올라옵니다. 물만으로는 절대 죽지 않습니다.",
         "awake": "대장장이의 네 칼날이 깨어 있습니다. 라운드마다 더 많은 플레이어가 표식을 받고, 칼날이 각자를 지나는 선을 따라 차례로 날아갑니다. 선은 칼날이 날아가기 {lock}초 전에 고정되며, 선 위의 대상에게 {min}~{max}의 냉기 피해를 주고 냉기를 {cold} 더합니다.",
         "marked": "{count}명 중 {order}번째입니다. 칼날이 당신을 지나는 선을 따라 날아옵니다. 선을 공격대에서 멀리 유도하세요. 선은 칼날이 날아가기 {lock}초 전에 고정되니 그때 비켜서세요. 그렇지 않으면 {min}~{max}의 냉기 피해와 냉기 {cold}를 받습니다.",
@@ -7292,47 +7300,19 @@ export const ko_KR: EnTranslations = {
       "breathLine": "돌 재규어가 테라스의 이쪽 절반에 숨결을 내뿜으려 합니다. 반대쪽 절반으로 건너가세요"
     },
     "council": {
-      "warn": {
-        "wrath": "산의 분노! 기둥 뒤에 숨으세요!",
-        "shoulder": "The Slabwright hardens beside its kin: pull it away!",
-        "crowded": "Too many behind one pillar! It could not shield them all.",
-        "prison": "Stone Prison on {players}! Break them out!",
-        "enrage": "산의 분노가 빨라집니다! 이제 산의 분노가 훨씬 빨리 옵니다.",
-        "weight": "{player}에게 망치의 무게: 탱커 교대!",
-        "wake": "돌 깨우기: {players} 아래에서 기둥이 솟아오릅니다! 엄폐물이 필요한 곳에 서세요.",
-        "wakeHeir": "{players} 아래에서 돌이 깨어납니다: 움직이세요!",
-        "rock": "{player}에게 낙석! 엄폐물에서 떨어져 함께 나눠 맞으세요!",
-        "song": "광맥의 노래! 차단하세요!",
-        "resonance": "{players}에게 공명: 가장 손상된 기둥을 깨고, 멀쩡한 기둥에서는 떨어지세요!",
-        "fell_guardian": "망치의 수호자가 쓰러졌습니다. 그 분노가 남은 돌에게 넘어갑니다!",
-        "fell_slabwright": "석판장이가 쓰러졌습니다. 이제 돌이 제멋대로 솟아오릅니다!",
-        "fell_singer": "광맥의 노래꾼이 쓰러졌습니다. 그 노래가 이어지며, 이제 아무도 막을 수 없습니다!",
-        "soul_guardian": "수호자의 영혼이 돌에 깃들었습니다! 그 기둥에서 분노의 메아리가 터져 나옵니다.",
-        "soul_slabwright": "석판장이의 영혼이 돌에 깃들었습니다! 걷는 석판이 여러분을 향해 끌려옵니다.",
-        "soul_singer": "광맥의 노래꾼의 영혼이 돌에 깃들었습니다! 끝없는 노래가 울릴 때마다 커집니다.",
-        "echo": "분노의 메아리! 영혼의 기둥과 자신 사이에 다른 기둥을 두세요!",
-        "soulBreak_guardian": "수호자의 영혼의 기둥이 부서졌습니다! 메아리가 잠잠해집니다.",
-        "soulBreak_slabwright": "석판장이의 영혼의 기둥이 부서졌습니다! 걷는 석판이 멈춥니다.",
-        "soulBreak_singer": "광맥의 노래꾼의 영혼의 기둥이 부서졌습니다! 끝없는 노래가 그칩니다."
-      },
       "say": {
         "guardian_pull": "채석장에 낯선 자들이라. 망치의 힘은 살덩이에 굴하지 않는다.",
         "guardian_wrath": "산이 내게 응답한다! 돌이 받아 준다면 숨어 보아라!",
+        "guardian_rush": "그렇다면 내 길을 막아 보아라. 산은 비켜 가지 않는다.",
         "guardian_death": "나의 힘을... 돌에 맡긴다.",
         "guardian_remember": "돌은 기억한다. 그들의 것은 이제 나의 것이다.",
         "guardian_soul": "이제 나는 돌이다. 나의 분노에는 쓰러질 몸이 없다.",
         "guardian_wipe": "먼지로다. 모든 살덩이가 그러하듯.",
         "guardian_defeat": "망치의 힘은... 이제 너희가 짊어져라.",
-        "slabwright_pull": "벽에 쓸 돌이 더 필요하지. 가만히 있어라, 너희를 쌓아 넣어 주마.",
-        "slabwright_wake": "거기 서라. 네가 선 자리에서 돌이 솟는다!",
-        "slabwright_rock": "위를 봐라, 꼬맹이들! 산이 무너진다!",
-        "slabwright_death": "석판이... 갈라진다...",
-        "slabwright_remember": "돌은 기억한다. 일은 내가 마무리하마.",
-        "slabwright_soul": "손은 남지 않았지만, 이 돌을 너희에게 끌고 가겠다.",
-        "slabwright_wipe": "쌓고, 묻었다. 잘된 일이다.",
-        "slabwright_defeat": "채석장이... 조용해진다.",
         "singer_pull": "광맥의 노래가 들리나요? 너무 오래 당신들의 목소리를 기다렸어요.",
         "singer_song": "나와 함께 노래하고, 부서지세요!",
+        "singer_wake": "깨어나라, 잠든 돌이여. 그들이 선 곳에서 솟아올라라!",
+        "singer_rock": "위를 봐요, 꼬마들! 산이 무너지고 있어요!",
         "singer_death": "나의 노래가... 바위로 흘러들어...",
         "singer_remember": "돌은 기억해요. 들어 봐요, 아직 노래하고 있어요.",
         "singer_soul": "들어 봐요. 돌 속에서 나의 노래는 끝나지 않아요.",
@@ -7341,59 +7321,38 @@ export const ko_KR: EnTranslations = {
       },
       "alert": {
         "wakeTitle": "돌 깨우기!",
-        "wakeLine": "서 있는 곳에서 기둥이 솟아오릅니다: 공격대에 필요한 곳에 엄폐물을 만드세요",
+        "wakeLine": "서 있는 곳에 기둥이 솟아오릅니다: 공격대에 엄폐물이 필요한 곳으로 이동하세요",
         "rockTitle": "낙석!",
         "rockLine": "기둥에서 떨어져 최소 세 명의 아군을 모으세요",
         "resonanceTitle": "공명",
-        "resonanceLine": "기둥 근처에 있으면 기둥을 깹니다: 가장 손상된 기둥 옆에서 기다리세요",
-        "resonanceCracking": "기둥을 깨는 중: 지키려면 멀어지세요",
+        "resonanceLine": "주변의 모든 아군에게 피해를 줍니다: 효과가 끝날 때까지 무리에서 떨어지세요",
+        "rushTitle": "산의 돌진!",
+        "rushLine": "수호자가 당신에게 돌진합니다: 저주받은 기둥을 당신과 수호자 사이에 두세요",
         "rockLineSoul": "엄폐물에서 떨어져 영혼의 기둥 옆에 아군을 3명 이상 모으세요",
-        "resonanceLineSoul": "영혼의 기둥 옆에서 기다려 영혼 표식을 깨세요. 멀쩡한 기둥 옆에는 가지 마세요",
-        "resonanceBreaking": "영혼 표식을 깨는 중: 영혼의 기둥 옆에 머무세요",
         "weightTitle": "망치의 무게",
         "weightLine": "받는 물리 피해가 두 배가 됩니다: 다른 탱커가 수호자를 맡아야 합니다",
         "timeAria": "{seconds}초 남음"
       }
     },
     "knotAlert": {
-      "aTitle": "You are Portal A!",
-      "aLine": "It opens at your feet in {seconds} sec. Stand near the Knotted Gale.",
-      "bTitle": "You are Portal B!",
-      "bLine": "It opens at your feet in {seconds} sec. Stand at the lip of a gap.",
-      "cTitle": "You are Portal C!",
-      "cLine": "It opens at your feet in {seconds} sec. Stand near the other Knotted Gale.",
-      "dTitle": "You are Portal D!",
-      "dLine": "It opens at your feet in {seconds} sec. Stand at a gap away from Portal B.",
-      "carryTitle": "You carry the Knotted Gale!",
-      "carryLine": "Each portal takes you to its partner: A to B, C to D. Throw it from the lip of a gap. It bursts in {seconds} sec.",
-      "lipTitle": "Throw it now!",
-      "lipLine": "You stand at the lip of a gap. It bursts in {seconds} sec.",
-      "throwKey": "Press {key} at the lip to throw",
-      "throwTap": "Tap here at the lip to throw",
-      "throwClick": "Click here at the lip to throw",
-      "throwAria": "Throw the Knotted Gale into the void"
+      "aTitle": "당신은 포털 A!",
+      "aLine": "{seconds}초 뒤 발밑에 열립니다. 얽힌 질풍 가까이에 서세요.",
+      "bTitle": "당신은 포털 B!",
+      "bLine": "{seconds}초 뒤 발밑에 열립니다. 벼랑 가장자리에 서세요.",
+      "cTitle": "당신은 포털 C!",
+      "cLine": "{seconds}초 뒤 발밑에 열립니다. 다른 얽힌 질풍 가까이에 서세요.",
+      "dTitle": "당신은 포털 D!",
+      "dLine": "{seconds}초 뒤 발밑에 열립니다. 포털 B에서 떨어진 가장자리에 서세요.",
+      "carryTitle": "얽힌 질풍을 나르는 중!",
+      "carryLine": "각 포털은 짝으로 데려갑니다: A에서 B, C에서 D. 벼랑 가장자리에서 던지세요. {seconds}초 뒤 터집니다.",
+      "lipTitle": "지금 던지세요!",
+      "lipLine": "가장자리에 서 있습니다. {seconds}초 뒤 터집니다.",
+      "throwKey": "가장자리에서 {key}를 눌러 던지기",
+      "throwTap": "가장자리에서 여기를 탭해 던지기",
+      "throwClick": "가장자리에서 여기를 클릭해 던지기",
+      "throwAria": "얽힌 질풍을 공허로 던지기"
     },
     "breathGuardian": {
-      "warn": {
-        "inhale": "수호자가 숨을 들이쉽니다! 입 앞의 소용돌이에 들어가지 마세요!",
-        "gust": "풀무 돌풍! 충격에 대비하세요!",
-        "gales": "떠도는 돌풍이 벼랑을 휩씁니다! 가까이 가지 마세요!",
-        "circle": "테살리 대장이 고요의 원을 펼쳤습니다! {seats}명까지 설 수 있습니다.",
-        "fell": "{player} 님이 공허로 휩쓸려 갔습니다!",
-        "storm": "폭풍이 터집니다! 벼랑 곳곳에 번개가 떨어집니다!",
-        "fork": "{player} 님에게 튀어 오르는 번개! 산개하세요!",
-        "cradle": "{player} 님이 폭풍 속으로 들어 올려졌습니다! 그 아래로 모이세요!",
-        "drawn": "{player} 님에게 끌려오는 번개! 낙뢰를 가장자리로 유도하세요!",
-        "stormGust": "폭풍 돌풍이 모입니다! 바람에 대비하세요!",
-        "knot": "A Knotted Gale falls! Carry it to a gap and throw it into the void!",
-        "knotPortals": "Portal A on {a}, Portal B on {b}!",
-        "knotPortals2": "Portal C on {c}, Portal D on {d}!",
-        "knotTaken": "{player} takes up the Knotted Gale!",
-        "knotDropped": "{player} falls! The Knotted Gale is free again!",
-        "knotFell": "{player} takes the Knotted Gale into the void!",
-        "knotThrown": "{player} hurls the Knotted Gale into the void!",
-        "knotBurst": "The Knotted Gale bursts!"
-      },
       "say": {
         "guardian_pull": "산의 꼭대기까지 올라와 그 숨결을 훔치려는가? 그렇다면 나와 함께 숨 쉬어라.",
         "guardian_blow": "바람이 방향을 바꾸는 것을 느껴라. 가장자리는 생각보다 가깝다.",
@@ -7401,9 +7360,12 @@ export const ko_KR: EnTranslations = {
         "guardian_storm": "숨은 이걸로 충분하다. 이제 폭풍이다!",
         "guardian_cradle": "올라라, 작은 것아. 저들이 너를 받아 주게 하라.",
         "guardian_drawn": "하늘이 너를 골랐다. 달아나라, 번개가 따라간다.",
+        "guardian_isles": "바람이여, 나를 둘러싸라! 섬들이 내 숨결을 지켜 주리라.",
+        "guardian_bulwark": "내 방패가... 찢어졌다. 그렇다면 다시 질풍을 맛보아라!",
         "guardian_wipe": "날려 갔구나. 산꼭대기의 먼지처럼.",
         "guardian_death": "숨결은... 산으로... 돌아간다...",
-        "thessaly_pull": "하이워치가 함께합니다! 벽의 틈을 조심하세요. 바람에 밀려 떨어집니다!",
+        "thessaly_pull": "하이워치가 함께한다! 여기엔 벽이 없어, 바람이 너희를 가장자리 밖으로 날려 버릴 거야!",
+        "thessaly_isles": "저 방패는 섬들에서 힘을 얻고 있어! 바람을 타고 건너가 치유사들을 쓰러뜨리고 돌아와!",
         "thessaly_circle_a": "어서 제 고요 속으로! 셋까지만, 그 이상은 안 됩니다!",
         "thessaly_circle_b": "여기요! 제 곁에 서서 바람을 함께 받아 냅시다!",
         "thessaly_circle_c": "돌 위에 고요를! 셋, 지금 당장!",
@@ -7415,14 +7377,6 @@ export const ko_KR: EnTranslations = {
       }
     },
     "quenchGuardian": {
-      "warn": {
-        "rim": "기슭의 얼음이 솟아오릅니다! 호수 위로 올라가세요!",
-        "frozen": "{player}님이 꽁꽁 얼어붙었습니다! 얼음이 깨지기 전에 물러나세요!",
-        "crack": "뭉친 무리 아래에서 얼음이 삐걱입니다! 흩어지세요!",
-        "wake": "대장장이의 칼날들이 호수에서 뜯겨 나옵니다! 어디를 겨누는지 살피세요!",
-        "marks": "칼날들이 {list}을(를) 표적으로 삼습니다! 공격대에서 멀리 유인하세요!",
-        "flurry": "모든 칼날이 한꺼번에 사냥에 나섭니다! 선을 피하세요!"
-      },
       "say": {
         "pull": "내 호수에 따뜻한 피라. 그 온기도 오래가지 않으리라.",
         "shatter": "속까지 얼었구나. 이제 부서져라.",
@@ -7444,6 +7398,8 @@ export const ko_KR: EnTranslations = {
       "frozenTitle": "서리에 갇힘!",
       "waterTitle": "얼음 아래!",
       "coldLine": "{radius}미터 안에 다른 {others}명 이상과 모여 몸을 녹이세요",
+      "splashTitle": "서리 파편! 냉기 +{cold}",
+      "immuneLine": "무적 효과로도 냉기는 막을 수 없습니다: 모이세요",
       "warmLine": "냉기가 내려가고 있습니다. {seconds}초 안에 무리를 옮기지 않으면 얼음이 갈라집니다",
       "frozenLine": "{seconds}초 뒤 얼음이 부서집니다: 가까이 있는 모두 물러나세요",
       "waterLine": "{seconds}초 뒤 기어 올라옵니다",
@@ -7458,7 +7414,7 @@ export const ko_KR: EnTranslations = {
         "keepers": "샘지기가 샘에서 솟아오른다! 붙잡아 두고 그 표식을 샘의 자식들에게서 떼어 놓아라!",
         "seeds": "화로 씨앗이 떨어진다! 한데 모아 떨어뜨리고 달려라!",
         "zones": "깨어나는 불! 화로가 띠마다 타오른다: 밖으로 나가라!",
-        "wheel": "The Hearth turns! Get to the dark slice!",
+        "wheel": "화로가 돈다! 어두운 조각으로 가라!",
         "cinder": "구르는 잉걸불이 떨어진다! 먹잇감에 닿기 전에 쳐내라!"
       },
       "say": {
@@ -16944,7 +16900,7 @@ export const ko_KR: EnTranslations = {
       "sanctum_branding_iron": "낙인 인두",
       "sanctum_rime_breath": "서리 숨결",
       "heart_mountains_wrath": "산의 분노",
-      "heart_bellows_gust": "풀무 돌풍",
+      "heart_bellows_gust": "정상의 포효",
       "heart_storm_lance": "폭풍 창",
       "heart_quenching_breath": "담금질의 숨결",
       "heart_forge_wrath": "화로의 분노",
@@ -16959,12 +16915,11 @@ export const ko_KR: EnTranslations = {
       "heart_rime_bolt": "Rime Bolt",
       "heart_ember_bolt": "잔불 화살",
       "heart_hammers_weight": "망치의 무게",
+      "heart_mountains_rush": "산의 돌진",
       "heart_wake_the_stone": "돌 깨우기",
       "heart_falling_rock": "낙석",
-      "heart_stone_prison": "Stone Prison",
       "heart_seam_bolt": "광맥 화살",
       "heart_song_of_the_seam": "광맥의 노래",
-      "heart_song_of_the_seam_unbroken": "광맥의 노래",
       "heart_echo_of_wrath": "분노의 메아리",
       "heart_endless_song": "끝없는 노래",
       "heart_breath_inhale": "들이쉬는 숨",
@@ -16972,6 +16927,9 @@ export const ko_KR: EnTranslations = {
       "heart_breath_forking_bolt": "튀어 오르는 번개",
       "heart_breath_thunders_cradle": "천둥의 요람",
       "heart_breath_drawn_lightning": "끌려오는 번개",
+      "heart_breath_cradle_channel": "천둥의 요람",
+      "heart_breath_gale_bulwark": "질풍의 방벽",
+      "heart_breath_mending_gale": "치유의 질풍",
       "heart_quench_blades_wake": "검의 각성",
       "heart_quench_blades_hunt": "칼날의 사냥",
       "heart_heat_fist": "현무암 주먹",
@@ -26920,6 +26878,12 @@ export const ko_KR: EnTranslations = {
       "heart_breath_caller": {
         "name": "숨결 광맥 부름꾼"
       },
+      "heart_gale_sentinel": {
+        "name": "질풍 파수병"
+      },
+      "heart_gale_mender": {
+        "name": "질풍 치유사"
+      },
       "heart_quench_warder": {
         "name": "담금질 광맥 파수꾼"
       },
@@ -26934,9 +26898,6 @@ export const ko_KR: EnTranslations = {
       },
       "heart_hammer_guardian": {
         "name": "망치의 수호자"
-      },
-      "heart_slabwright": {
-        "name": "석판장이"
       },
       "heart_seam_singer": {
         "name": "광맥의 노래꾼"
@@ -26964,9 +26925,6 @@ export const ko_KR: EnTranslations = {
       },
       "heart_heat_rolling_cinder": {
         "name": "구르는 잉걸불"
-      },
-      "heart_stone_prison": {
-        "name": "Stone Prison"
       },
       "heart_final_splinter_heat": {
         "name": "열기의 파편"

@@ -14,7 +14,7 @@ import {
 import { enterDungeon } from '../../src/sim/instances/dungeons';
 import type { InstanceSlot } from '../../src/sim/sim';
 import { Sim } from '../../src/sim/sim';
-import type { Entity, SimEvent, WorldContent } from '../../src/sim/types';
+import type { Entity, PlayerClass, SimEvent, WorldContent } from '../../src/sim/types';
 
 const WORLD: WorldContent = { ...BUILTIN_WORLD, camps: [], npcs: {}, groundObjects: [] };
 
@@ -36,8 +36,9 @@ export interface QuenchFight {
   tick: (n?: number, keepAlive?: boolean) => SimEvent[];
 }
 
-/** A claim with `n` warriors on the Frozen Lake, south of the guardian. */
-export function quenchFight(n = 6, seed = 29): QuenchFight {
+/** A claim with `n` warriors (or the given `classes`, by index) on the
+ *  Frozen Lake, south of the guardian. */
+export function quenchFight(n = 6, seed = 29, classes: PlayerClass[] = []): QuenchFight {
   const sim = new Sim({
     seed,
     playerClass: 'warrior',
@@ -46,7 +47,7 @@ export function quenchFight(n = 6, seed = 29): QuenchFight {
     devCommands: true,
   });
   const pids: number[] = [];
-  for (let i = 0; i < n; i++) pids.push(sim.addPlayer('warrior', `Raider${i + 1}`));
+  for (let i = 0; i < n; i++) pids.push(sim.addPlayer(classes[i] ?? 'warrior', `Raider${i + 1}`));
   if (!enterDungeon(sim.ctx, SMITH_HEART_DUNGEON, pids[0])) throw new Error('enter');
   const inst = sim.ctx.instances.find(
     (i) => i.dungeonId === SMITH_HEART_DUNGEON && i.partyKey !== null,

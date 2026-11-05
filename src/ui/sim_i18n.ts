@@ -1573,10 +1573,13 @@ const baseEnTable = {
     'A white-gold light runs out of the Hearth toward the heart seal.',
   'log.smithHeartClosed':
     'The cleft is choked with fallen rock. It is not open yet.',
+  // The "encounter in progress" door rule (src/sim/instances/encounter_lock.ts):
+  // a released spirit held outside while a boss fight of its claim runs.
+  'error.encounterInProgress': 'An encounter is in progress. You cannot enter until it ends.',
   // The Smith's Heart's sketch kits (content/smith_heart.ts): cast, swing
   // and cleave names. EXACT matcher through the mechanic reverse map.
   'mechanic.heartMountainsWrath': "Mountain's Wrath",
-  'mechanic.heartBellowsGust': 'Bellows Gust',
+  'mechanic.heartBellowsGust': 'Summit Roar',
   'mechanic.heartStormLance': 'Storm Lance',
   'mechanic.heartQuenchingBreath': 'Quenching Breath',
   'mechanic.heartForgeWrath': 'Forge Wrath',
@@ -1604,14 +1607,15 @@ const baseEnTable = {
   'mechanic.heartRestlessStone': 'Restless Stone',
   // Mythic: Soul in the Stone (encounters/smith_heart/council_soul.ts).
   'mechanic.heartEchoOfWrath': 'Echo of Wrath',
-  'mechanic.heartWalkingSlab': 'Walking Slab',
-  'mechanic.heartStoneDrag': 'Stone Drag',
   'mechanic.heartEndlessSong': 'Endless Song',
+  'mechanic.heartMountainsRush': "Mountain's Rush",
+  'mechanic.heartCursedPillar': 'Cursed Pillar',
+  'mechanic.heartQuarryCollapse': 'Quarry Collapse',
   'aura.heartResonance': 'Resonance',
   'aura.heartMemoryOfStone': 'Memory of Stone',
-  'aura.heartShoulderedStone': 'Shouldered Stone',
   'aura.heartNarrowShelter': 'Narrow Shelter',
-  'aura.heartStonePrison': 'Stone Prison',
+  'aura.heartBondOfTheStone': 'Bond of the Stone',
+  'aura.heartShatteredCharge': 'Shattered Charge',
   // The Guardian of the Breath (encounters/smith_heart/breath_ids.ts
   // BREATH_NAMES): its damage and aura names. EXACT through the mechanic
   // reverse map (Bellows Gust keeps its key; Charged Ground shares the Buried
@@ -1629,7 +1633,7 @@ const baseEnTable = {
   'aura.heartPortalC': 'Portal C',
   'aura.heartPortalD': 'Portal D',
   'log.heartKnotHop': 'The portal tears you across the Cornice, gale and all.',
-  'error.heartKnotNotAtLip': 'You must stand at the lip of a gap to throw the Knotted Gale.',
+  'error.heartKnotNotAtLip': 'You must stand at the edge of the Cornice to throw the Knotted Gale.',
   'mechanic.heartLooseGale': 'Loose Gale',
   'mechanic.heartBreakingStorm': 'Breaking Storm',
   'mechanic.heartLeapingBolt': 'Leaping Bolt',
@@ -1638,6 +1642,15 @@ const baseEnTable = {
   'mechanic.heartDrawnLightning': 'Drawn Lightning',
   'aura.heartStormUnbound': 'Storm Unbound',
   'mechanic.heartSwellingStorm': 'Swelling Storm',
+  // The Islands of the Wind (encounters/smith_heart/breath_isle_ids.ts
+  // ISLE_NAMES).
+  'aura.heartGaleBulwark': 'Gale Bulwark',
+  'mechanic.heartBulwarkBurst': 'Bulwark Burst',
+  'mechanic.heartMendingGale': 'Mending Gale',
+  'aura.heartRidingTheGale': 'Riding the Gale',
+  'aura.heartWindworn': 'Windworn',
+  'mechanic.heartGalePath': 'Gale Path',
+  'mechanic.heartHomewardGale': 'Homeward Gale',
   // The Guardian of the Quench (encounters/smith_heart/quench_ids.ts
   // QUENCH_NAMES): its damage and aura names. EXACT through the mechanic
   // reverse map (Quenching Breath and Tempering Strike keep their keys).
@@ -1646,6 +1659,7 @@ const baseEnTable = {
   'aura.heartEncasedInRime': 'Encased in Rime',
   'mechanic.heartShatteringCold': 'Shattering Cold',
   'aura.heartFrostBrittle': 'Frost-Brittle',
+  'aura.heartRimeSplash': 'Rime Splash',
   'mechanic.heartFreezingWater': 'Freezing Water',
   'aura.heartUnderTheIce': 'Under the Ice',
   'aura.heartBladesAwake': 'The Blades Awake',
@@ -27106,7 +27120,7 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Rime Breath': 'mechanic.sanctumRimeBreath',
   // The Smith's Heart's sketch kits (content/smith_heart.ts).
   "Mountain's Wrath": 'mechanic.heartMountainsWrath',
-  'Bellows Gust': 'mechanic.heartBellowsGust',
+  'Summit Roar': 'mechanic.heartBellowsGust',
   'Storm Lance': 'mechanic.heartStormLance',
   'Quenching Breath': 'mechanic.heartQuenchingBreath',
   'Forge Wrath': 'mechanic.heartForgeWrath',
@@ -27131,14 +27145,15 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Crumbled Stone': 'mechanic.heartCrumbledStone',
   'Restless Stone': 'mechanic.heartRestlessStone',
   'Echo of Wrath': 'mechanic.heartEchoOfWrath',
-  'Walking Slab': 'mechanic.heartWalkingSlab',
-  'Stone Drag': 'mechanic.heartStoneDrag',
   'Endless Song': 'mechanic.heartEndlessSong',
+  "Mountain's Rush": 'mechanic.heartMountainsRush',
+  'Cursed Pillar': 'mechanic.heartCursedPillar',
+  'Quarry Collapse': 'mechanic.heartQuarryCollapse',
   Resonance: 'aura.heartResonance',
   'Memory of Stone': 'aura.heartMemoryOfStone',
-  'Shouldered Stone': 'aura.heartShoulderedStone',
   'Narrow Shelter': 'aura.heartNarrowShelter',
-  'Stone Prison': 'aura.heartStonePrison',
+  'Bond of the Stone': 'aura.heartBondOfTheStone',
+  'Shattered Charge': 'aura.heartShatteredCharge',
   'Bellows Wind': 'aura.heartBellowsWind',
   'Indrawn Breath': 'aura.heartIndrawnBreath',
   'Pressed to the Rim': 'mechanic.heartPressedToTheRim',
@@ -27159,11 +27174,19 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Drawn Lightning': 'mechanic.heartDrawnLightning',
   'Storm Unbound': 'aura.heartStormUnbound',
   'Swelling Storm': 'mechanic.heartSwellingStorm',
+  'Gale Bulwark': 'aura.heartGaleBulwark',
+  'Bulwark Burst': 'mechanic.heartBulwarkBurst',
+  'Mending Gale': 'mechanic.heartMendingGale',
+  'Riding the Gale': 'aura.heartRidingTheGale',
+  Windworn: 'aura.heartWindworn',
+  'Gale Path': 'mechanic.heartGalePath',
+  'Homeward Gale': 'mechanic.heartHomewardGale',
   'Quenching Cold': 'aura.heartQuenchingCold',
   'Huddled Warmth': 'aura.heartHuddledWarmth',
   'Encased in Rime': 'aura.heartEncasedInRime',
   'Shattering Cold': 'mechanic.heartShatteringCold',
   'Frost-Brittle': 'aura.heartFrostBrittle',
+  'Rime Splash': 'aura.heartRimeSplash',
   'Freezing Water': 'mechanic.heartFreezingWater',
   'Under the Ice': 'aura.heartUnderTheIce',
   'The Blades Awake': 'aura.heartBladesAwake',

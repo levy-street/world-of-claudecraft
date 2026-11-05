@@ -14,7 +14,8 @@
 //      or a rock coming), each a dark trench with a molten core (orange to
 //      white hot toward the root) and a tight glow, only scored ahead of the
 //      front, the plates' seams opening, a lip of dust riding the front, the
-//      cores throbbing over the bar's last stretch; the live dressing heats
+//      cores throbbing over the bar's last stretch (a lane splits down its
+//      length instead, its whole band smouldering behind the front); the live dressing heats
 //      them (`uHeat`: a rock's crescendo, a crater cooling) and the char pass
 //      lays the Falling Rock's shadow under them (`uShadow`, `uShadowK`:
 //      rockShadowLook), so the cores burn through the dark;
@@ -71,6 +72,25 @@ ${PAINTED_TELEGRAPH_MEASURE_GLSL}
   float open = trench * swept;
   float scored = trench * (1.0 - swept) * 0.35;
   float lines = max(open, seamLine * (0.25 + 0.75 * swept));
+  if (uShape > 0.5) {
+    // A lane (Mountain's Rush): the split runs DOWN it, one jagged trench
+    // wandering along its middle and the plates between cracked open to
+    // both edges, so the whole band reads from a raid's camera across the
+    // Quarry (spokes from its foot thinned to a line over a long lane).
+    vec2 lq = vec2(vLocal.x * uHalf, vLocal.y * uLen);
+    float wob = (vn(vec2(lq.y * 0.3, uSeed)) - 0.5) * uHalf * 0.8
+              + (vn(vec2(lq.y * 1.4, uSeed + 2.7)) - 0.5) * 0.5;
+    float mid = abs(lq.x - wob);
+    float netD = cellNet(lq * 0.42 + vec2(uSeed, 1.7)).x / 0.42;
+    trenchW = (0.24 + 0.1 * vn(vec2(lq.y * 0.5, uSeed + 5.0))) * wk;
+    dArc = min(mid, netD * 1.35 + 0.1);
+    tipCut = smoothstep(0.2, 0.9, lq.y) * (1.0 - smoothstep(uLen - 0.6, uLen, lq.y));
+    trench = (1.0 - smoothstep(trenchW * 0.55, trenchW, dArc)) * tipCut;
+    coreLine = (1.0 - smoothstep(0.0, trenchW * 0.42, dArc)) * tipCut;
+    open = trench * swept;
+    scored = trench * (1.0 - swept) * 0.35;
+    lines = max(open, seamLine * (0.25 + 0.75 * swept));
+  }
   // The middle: the root every fissure splits out of (the impact point).
   float root = 1.0 - smoothstep(0.0, 0.85 * wk, r);
 #else
@@ -104,7 +124,7 @@ ${PAINTED_TELEGRAPH_MEASURE_GLSL}
   vec3 deep = vec3(0.1, 0.065, 0.045);
   float shade = 0.82 + 0.3 * plate.y;
 #if defined(CT_QUAKE)
-  float c = uChar * (0.66 + 0.3 * swept + 0.1 * uWarn + 0.15 * heat) * shade;
+  float c = uChar * (0.66 + 0.3 * swept + 0.1 * uWarn + 0.15 * heat + 0.12 * step(0.5, uShape)) * shade;
   float under = max(max(open, scored), seamLine * 0.7 * (0.3 + 0.7 * swept));
   under = max(under, root * swept * 0.6);
 #else
@@ -146,6 +166,11 @@ ${PAINTED_TELEGRAPH_RIM_GLSL}
     // The heat's shimmer along the cores.
     col += cHot * coreLine * 0.25 * heat * (0.5 + 0.5 * sin(uTime * 13.0 + r * 3.0 + uSeed));
   }
+  // A lane's whole band smoulders behind the front (the charge's path in
+  // the threat's own ember, never a wash past its edge).
+  float laneBody = step(0.5, uShape) * swept * smoothstep(0.0, 0.45, edge);
+  float smoulder = 0.75 + 0.25 * sin(uTime * 3.0 + vn(vP * 0.6 + uSeed) * 6.2832);
+  col += mix(cEmber, cLit, 0.2 + 0.3 * uWarn) * laneBody * 0.2 * uBody * halo * smoulder;
   // The front: a lip of split stone and dust racing out.
   float flick = uDetail > 0.0 ? 0.8 + 0.2 * vn(wp * 1.7 + vec2(uTime * 3.0, 0.0)) : 1.0;
   float seam = (1.0 - smoothstep(0.0, 0.22, abs(ahead))) * uFront;

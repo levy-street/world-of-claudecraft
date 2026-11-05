@@ -17,8 +17,8 @@ export const COUNCIL_REACH = {
   rock: 6,
   /** A soul pillar loses a pip to a rock landing within this of its face. */
   soulRock: 6,
-  /** Resonance cracks the pillar a carrier stands within this of (face). */
-  resonance: 3.5,
+  /** Resonance is a spread: every ally within this of a carrier is hurt. */
+  resonance: 7,
   /** Heroic: a pillar pulses on whoever stands within this of its face. */
   pulse: 3,
   /** Wake the Stone: a rise keeps this far from another pillar and from a
@@ -26,10 +26,6 @@ export const COUNCIL_REACH = {
   riseGap: 6.5,
   riseClearOfBodies: 4.5,
   riseKnock: 3,
-  /** The Walking Slab crushes within this of its face and grinds within the
-   *  second. */
-  slabCrush: 1.5,
-  slabGrind: 4,
   /** The Wrath and the Echo reach. */
   wrath: 45,
 };
@@ -37,7 +33,7 @@ export const COUNCIL_REACH = {
 const PILLAR = 'sh_council_pillar_';
 const RISEN = 'sh_council_risen_';
 const SOUL = 'sh_council_soul_';
-const ROLES = ['guardian', 'slabwright', 'singer'];
+const ROLES = ['guardian', 'singer'];
 
 /** A pillar's state from its template id (council_ids.ts councilPillarOf and
  *  councilSoulOf), or null when the id is no pillar. `integrity` is a soul
@@ -193,8 +189,8 @@ export function steer(from, goal, circles, clear = 0.9) {
 /**
  * Where to share a Falling Rock: a spot near `from` with every cover pillar's
  * face more than the rock's reach (plus `margin`) away, off the hazards, on
- * the floor; with `soul` (Mythic) inside the soul pillar's pip reach instead
- * (and outside the Walking Slab's grind when it is the slab). Null when no
+ * the floor; with `soul` (Mythic) inside the soul pillar's pip reach instead.
+ * Null when no
  * spot within `range` qualifies.
  */
 export function rockSpot({
@@ -220,8 +216,7 @@ export function rockSpot({
       if (hazards.some((h) => Math.hypot(at.x - h.x, at.z - h.z) < h.r)) continue;
       if (soul) {
         const f = faceDistance(soul, at);
-        const inner = soul.soul === 'slabwright' ? COUNCIL_REACH.slabGrind + 0.6 : 1.2;
-        if (f > COUNCIL_REACH.soulRock - margin || f < inner) continue;
+        if (f > COUNCIL_REACH.soulRock - margin || f < 1.2) continue;
       }
       const cost = r + (home ? homeWeight * Math.hypot(at.x - home.x, at.z - home.z) : 0);
       if (cost < bestCost) {

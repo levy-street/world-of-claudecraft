@@ -7,7 +7,11 @@
 //                          its gaps, the indrawn breath and Bellows Gust,
 //                          heroic's loose gales); Thessaly's circles of calm
 //                          anchor three at a time (breath_thessaly.ts);
-//                          Storm Lance stays the trash kit's own line.
+//                          the Islands of the Wind at the tier's marks (the
+//                          Gale Bulwark, the isles' adds, the rides:
+//                          breath_isles.ts); Storm Lance stays the trash
+//                          kit's own line. Since 2026-11-03 no wall stands
+//                          round the Cornice: every edge is a fall.
 //   The storm breaks (50)  the wind drawn in, the guardian frozen and torn
 //                          open into a body of lightning, a barrage of strikes
 //                          (breath_storm.ts).
@@ -36,6 +40,7 @@ import type { SimContext } from '../../sim_context';
 import { clearThreat } from '../../threat';
 import { DT, type Entity } from '../../types';
 import { claimBoss, clearCastIf } from '../sunken_bastion/claim';
+import { dischargeCradles, landCradle, startCradle } from './breath_cradle';
 import {
   clearGales,
   clearWindAuras,
@@ -61,6 +66,8 @@ import {
   type BreathDifficulty,
   BREATH_TUNING as T,
 } from './breath_ids';
+import { ISLE_DEV_VERBS, isleDevTrigger, isleReadout } from './breath_isle_dev';
+import { clearIsles, islesDue, startIsles, stepIsles } from './breath_isles';
 import {
   type BreathScope,
   corniceListeners,
@@ -70,14 +77,13 @@ import {
   holdPlanted,
   living,
 } from './breath_scope';
+import { clearShoves } from './breath_shove';
 import type { BreathFightState } from './breath_state';
 import {
   clearStorm,
-  landCradle,
   landDrawn,
   landFork,
   landStorm,
-  startCradle,
   startDrawn,
   startFork,
   startStorm,
@@ -150,6 +156,7 @@ function freshState(boss: Entity, difficulty: BreathDifficulty): BreathFightStat
     anchors: [],
     vortex: null,
     gales: [],
+    galeShoves: [],
     barrage: null,
     spots: [],
     forkTimer: T.forkFirst,
@@ -158,7 +165,9 @@ function freshState(boss: Entity, difficulty: BreathDifficulty): BreathFightStat
     swellTimer: T.swellEvery,
     swellPulses: 0,
     gustTimer: T.gustFirst,
-    cradle: null,
+    cradles: [],
+    isles: { next: 0, round: null, adds: [], paths: [], homes: [], rides: [], grace: {} },
+    roar: null,
     drawn: null,
     heart: null,
     heartTimer: T.heartFirst,
@@ -209,6 +218,9 @@ function landBar(s: BreathScope): void {
     case BREATH_CASTS.cradle:
       landCradle(s, bar.targetId);
       return;
+    case BREATH_CASTS.cradleHold:
+      dischargeCradles(s);
+      return;
     case BREATH_CASTS.drawn:
       landDrawn(s, bar.targetId);
       return;
@@ -256,8 +268,12 @@ function clearFight(
     clearGales(ctx, inst, st);
     clearStorm(ctx, inst, st);
     clearHeart(ctx, inst, st);
+    clearIsles(ctx, inst, st, boss);
     dropBreathObject(ctx, inst, st.vortex?.objectId ?? null);
     st.vortex = null;
+    // A throw still sliding lets go (its hold dropped, never left rooted).
+    if (st.roar) clearShoves({ ctx }, st.roar.slides);
+    st.roar = null;
     st.pinned = {};
   }
   clearWindAuras(ctx, inst, boss.id);
@@ -276,6 +292,7 @@ function clearFight(
     BREATH_CASTS.storm,
     BREATH_CASTS.fork,
     BREATH_CASTS.cradle,
+    BREATH_CASTS.cradleHold,
     BREATH_CASTS.drawn,
   );
   dropAura(boss, BREATH_AURAS.stormForm);
@@ -347,6 +364,8 @@ export function tickBreathGuardian(ctx: SimContext, inst: InstanceSlot): void {
   if (stormDue(s)) startStorm(s);
   stepWind(s);
   stepThessaly(s);
+  if (islesDue(s)) startIsles(s);
+  stepIsles(s);
   stepStorm(s);
   stepHeart(s);
   stepOverLip(s);
@@ -433,6 +452,7 @@ export function breathDevTrigger(
     const words = what.trim().split(/\s+/);
     return heartDevTrigger(s, verb === 'heart' ? words.slice(1) : words, pid);
   }
+  if (ISLE_DEV_VERBS.has(verb)) return isleDevTrigger(s, what.trim().split(/\s+/), pid);
   if (verb === 'phase2' || verb === 'p2' || verb === 'storm') {
     if (st.half !== 'wind') return 'The storm has already broken.';
     s.boss.hp = Math.min(s.boss.hp, Math.floor(s.boss.maxHp * T.stormAt));
@@ -474,7 +494,7 @@ export function breathDevTrigger(
       ? 'Captain Thessaly plants a circle of calm.'
       : 'Captain Thessaly is not here.';
   }
-  if (verb === 'inhale') {
+  if (verb === 'inhale' || verb === 'roar') {
     if (st.half !== 'wind') return 'The wind half is over (the storm has broken).';
     cutBar(s);
     s.boss.castingAbility = null;
@@ -512,5 +532,5 @@ export function breathReadout(ctx: SimContext, inst: InstanceSlot): string {
   const st = boss.smithHeartBreath;
   const obj = windObject(ctx, inst);
   if (!st) return `${head}; not fighting (wind ${obj?.templateId ?? 'missing'}).`;
-  return `${head}; ${st.half}, wind ${st.wind.phase} toward ${st.wind.bearing} (${st.wind.remaining.toFixed(1)} s), blows ${st.wind.blows}, inhale in ${Math.max(0, st.inhaleTimer).toFixed(0)} s, swell ${st.swellPulses}.`;
+  return `${head}; ${st.half}, wind ${st.wind.phase} toward ${st.wind.bearing} (${st.wind.remaining.toFixed(1)} s), blows ${st.wind.blows}, inhale in ${Math.max(0, st.inhaleTimer).toFixed(0)} s, swell ${st.swellPulses}; ${isleReadout(scopeOf(ctx, inst, st, boss))}`;
 }

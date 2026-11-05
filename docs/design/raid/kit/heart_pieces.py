@@ -114,10 +114,11 @@ HUB_R = 1.6
 PORTAL_BEARING = 315.0
 PORTAL_R = 8.4853
 PORTAL_HOLE = 3.5
-# The root's spine in the altar's frame (outward +Y, up +Z): a quadratic
-# Bezier from the altar's crown to the mountain's crown (heart_room_kit_plan_core.ts
-# HEART_ROOT_SPINE carries the same three points).
-ROOT_SPINE = ((0.0, 2.0, 6.3), (0.0, 22.0, 40.0), (0.0, 50.0, 52.0))
+# The root's spine in its own frame (outward +Y, up +Z, its origin in its landmark
+# behind the altar): a quadratic Bezier from deep in the landmark, under the walk's
+# height, to the mountain's crown (heart_room_kit_plan_core.ts HEART_ROOT_SPINE carries
+# the same three points).
+ROOT_SPINE = ((0.0, 2.0, -14.0), (0.0, 18.0, 36.0), (0.0, 50.0, 54.0))
 
 # ---- palette (sRGB) ----------------------------------------------------------------------
 GRANITE = (0.4, 0.39, 0.39)
@@ -911,8 +912,10 @@ def altar(bpy, vein):
         # mantle and the rime are laid over it below).
         f.put('frost', block(rng, (0.0, 0.1, 1.55), (4.0, 3.8, 1.4), cuts=12, chamfer=(0.8, 0.96),
                              R=rot(rz=0.12)), 0.16)
-        f.put('frost2', block(rng, (0.1, 0.5, 2.6), (2.4, 2.0, 2.4), cuts=12, chamfer=(0.76, 0.95),
-                              R=rot(rz=-0.3)), 0.2)
+        # The block runs up unbroken into the crown (the ice lies on it, it never
+        # holds a slab up by itself).
+        f.put('frost2', block(rng, (0.1, 0.4, 3.75), (2.6, 2.3, 4.5), cuts=12, chamfer=(0.76, 0.95),
+                              R=rot(rz=-0.3)), 0.3)
         f.put('frost', block(rng, (0.0, 0.2, 5.75), (2.9, 2.7, 0.9), cuts=12, chamfer=(0.78, 0.95),
                              R=rot(rz=-0.2, ry=0.05)), 0.12)
         f.sub(Ellipsoid((0.0, -0.3, 6.3), (1.0, 0.95, 0.6)), 0.12)
@@ -1032,79 +1035,79 @@ def _bez_d(t, P):
 
 
 def heart_root(bpy):
-    """A root of the mountain (see the module doc): three strands of rock
-    braided round its spine, thickening from the altar to the crown, knotted
-    here and there, its fingers gripping the altar's crown behind its heart;
-    pale crystal veins wound along it (the runtime tints them)."""
-    p = HSP('Kit_HeartRoot', seed=5601, ao=0.55, ao_dist=4.0, dust=0.0)
+    """A root of the mountain (see the module doc): one great braid of rock from the
+    crown down into its landmark. It leaves the mountain as a mass of strands parting and
+    reaching back into the rock (its far end stands well inside the crown), narrows along
+    its free span, and swells again where it plunges into the landmark, its toes spread
+    and gripping under the rim. Painted one rock, its strands' crests worn pale; the
+    vein's light lies in the grooves between them, top to bottom (the runtime tints it),
+    found on the rock by rays so no thread of it hangs free."""
+    from landmark_paint import hand_sculpt, paint_faces, stone_shader, surface_ribbon
+    p = HSP('Kit_HeartRoot', seed=5601, ao=0.6, ao_dist=4.0, dust=0.0)
     rng = np.random.default_rng(5601)
     S = ROOT_SPINE
-    f = Sculpt((-14.0, -3.0, 1.5), (14.0, 64.0, 68.0), 0.3)
+    f = Sculpt((-18.0, -10.0, -24.0), (18.0, 72.0, 78.0), 0.3)
     n1 = Noise(5603)
-    N = 40
-    spine = [_bez(k / N, S) for k in range(N + 1)]
+    N = 44
+
+    def girth(t):
+        # Thick where it enters the rock at both ends, narrowest on its free span.
+        return 2.5 + 2.3 * (1.0 - t / 0.42) ** 2 * (t < 0.42) + 3.4 * max(0.0, (t - 0.45) / 0.55) ** 1.5
+
+    def frame_at(t):
+        c = _bez(t, S)
+        d = _bez_d(t, S)
+        d = d / np.linalg.norm(d)
+        side = np.cross(d, (0.0, 0.0, 1.0))
+        side = side / max(1e-6, np.linalg.norm(side))
+        return c, d, side, np.cross(side, d)
+
     strands = []
-    for j in range(3):
+    for j in range(4):
         pts = []
         radii = []
         for k in range(N + 1):
             t = k / N
-            c = spine[k]
-            d = _bez_d(t, S)
-            d = d / np.linalg.norm(d)
-            side = np.cross(d, (0.0, 0.0, 1.0))
-            side = side / max(1e-6, np.linalg.norm(side))
-            up = np.cross(side, d)
-            ang = TAU * j / 3 + t * 5.5
-            spread = 0.9 + 3.6 * t ** 0.85
-            q = c + (side * math.cos(ang) + up * math.sin(ang)) * spread
-            pts.append(tuple(q))
-            radii.append(1.1 + 3.4 * t ** 0.8 + 0.25 * math.sin(k * 1.7 + j))
+            c, _d, side, up = frame_at(t)
+            ang = TAU * j / 4 + t * 4.4
+            spread = girth(t) * 0.62
+            pts.append(tuple(c + (side * math.cos(ang) + up * math.sin(ang)) * spread))
+            radii.append(girth(t) * (0.5 + 0.05 * math.sin(k * 0.9 + j * 1.7)))
         strands.append(pts)
-        f.put(('g0', 'g1', 'g3')[j], Polyline(pts, radii), 0.6)
-    f.put('bed', Polyline([tuple(q) for q in spine], [1.2 + 3.6 * (k / N) ** 0.85 for k in range(N + 1)]), 0.9)
-    # Knots where the strands bind.
-    for t in (0.22, 0.47, 0.71):
-        c = _bez(t, S)
-        f.put('g2', Ellipsoid(tuple(c), (2.4 + 5.0 * t, 2.4 + 5.0 * t, 2.0 + 4.2 * t)), 1.2)
-    # The fingers gripping the altar's crown behind its heart.
-    base = np.asarray(S[0])
-    for (fx, fy, fz) in ((-2.1, 1.0, 4.9), (-1.2, 2.3, 5.4), (1.2, 2.3, 5.4), (2.1, 1.0, 4.9), (0.0, 2.7, 5.6)):
-        mid = (base + np.array((fx, fy, fz))) / 2 + np.array((0.0, 0.3, 0.9))
-        f.put('g1', Polyline([tuple(base + np.array((0.0, 0.8, 0.6))), tuple(mid), (fx, fy, fz)], [0.7, 0.5, 0.28]),
-              0.3)
-    f.displace(lambda X, Y, Z: 0.35 * n1.fbm(X * 0.25, Y * 0.12, Z * 0.25, 3)
-               + 0.2 * (n1.ridged(X * 0.6, Y * 0.3, Z * 0.6, 2) - 0.45), band=1.2)
-    X, Y, Z = _axes(f)
-    # Never inside the altar's body under its crown.
-    _clamp(f, np.where((np.sqrt(X * X + Y * Y) < 3.1) & (Z < 4.7), 4.7 - Z, -1.0))
-    _mesh(bpy, p, f, 'HeartRoot', 9000)
-    prng = p.rng
-    # The veins: pale crystal laid along each strand's crown, and clusters
-    # breaking out at the knots.
-    for j, pts in enumerate(strands):
-        for k in range(2, N - 1, 2):
-            a = np.asarray(pts[k])
-            b = np.asarray(pts[k + 1])
-            t = k / N
-            r = 1.1 + 3.4 * t ** 0.8
-            up = np.array((0.0, -0.2, 1.0))
-            up = up / np.linalg.norm(up)
-            q = (a + b) / 2 + up * (r * 0.92)
-            seg = b - a
-            with p.as_kind(PAINT):
-                crystal(p, tuple(q), (0.28 + 0.4 * t, 0.28 + 0.4 * t, float(np.linalg.norm(seg)) * 1.05),
-                        PALE_HI if k % 4 else p.vary((0.8, 0.8, 0.82), 0.03), n=10, boxy=0.4, jitter=0.15,
-                        yaw=math.atan2(seg[0], -seg[1]), pitch=math.atan2(math.hypot(seg[0], seg[1]), seg[2]),
-                        mat=GLOW)
-    for t in (0.22, 0.47, 0.71):
-        c = _bez(t, S)
-        for k in range(5):
-            ang = prng.uniform(0, TAU)
-            d = (math.cos(ang), math.sin(ang) * 0.5, prng.uniform(-0.2, 0.9))
-            base = (c[0] + math.cos(ang) * (2.2 + 5.0 * t), c[1], c[2] + math.sin(ang) * (1.8 + 4.0 * t))
-            with p.as_kind(PAINT):
-                pale_crystal(p, base, d, prng.uniform(1.6, 3.6) * (0.6 + t), prng.uniform(0.3, 0.7) * (0.7 + t))
+        f.put('g1', Polyline(pts, radii), 0.3)
+    f.put('g1', Polyline([tuple(_bez(k / N, S)) for k in range(N + 1)], [girth(k / N) * 0.62 for k in range(N + 1)]), 0.5)
+    # The far end: strands parting and driving back into the mountain's rock.
+    far = np.asarray(_bez(1.0, S))
+    for (dx, dy, dz, r) in ((-9.0, 12.0, -7.0, 3.4), (10.0, 13.0, -4.0, 3.2), (-5.0, 15.0, 10.0, 3.0), (7.0, 14.0, 13.0, 2.8)):
+        mid = far - np.array((0.0, 12.0, 4.0))
+        f.put('g1', Polyline([tuple(mid), tuple((mid + far) / 2 + np.array((dx * 0.4, 0.0, dz * 0.4))),
+                              tuple(far + np.array((dx, dy * 0.4, dz)))], [r + 0.8, r, r * 0.8]), 0.8)
+    # The near end: toes spreading as it plunges into the landmark.
+    near = np.asarray(_bez(0.0, S))
+    for j in range(7):
+        a = TAU * j / 7 + float(rng.uniform(-0.25, 0.25))
+        reach = float(rng.uniform(6.0, 10.0))
+        mid = near + np.array((math.cos(a) * reach * 0.55, math.sin(a) * reach * 0.55, 5.0))
+        end = near + np.array((math.cos(a) * reach, math.sin(a) * reach, -4.0 - float(rng.uniform(0.0, 6.0))))
+        f.put('g1', Polyline([tuple(near + np.array((0.0, 0.0, 10.0))), tuple(mid), tuple(end)], [3.2, 2.2, 0.7]), 0.7)
+    f.displace(lambda X, Y, Z: 0.28 * n1.fbm(X * 0.2, Y * 0.1, Z * 0.2, 3)
+               + 0.16 * (n1.ridged(X * 0.5, Y * 0.22, Z * 0.5, 2) - 0.45), band=1.2)
+    made = hand_sculpt(bpy, p, f, 'HeartRoot', 7000, sharp=60.0, colours=HEART_COLOURS, kinds=HEART_KINDS)
+    paint_faces(p, made, stone_shader(
+        (0.15, 0.13, 0.14), (0.29, 0.26, 0.26), (0.5, 0.45, 0.4), (0.09, 0.09, 0.14),
+        edge=1.0, hollow=0.95, z_span=(8.0, 66.0)))
+    from mathutils.bvhtree import BVHTree
+    tree = BVHTree.FromBMesh(p.bm)
+    # The vein's light in the grooves between the strands, the whole length of the root.
+    for j in (0, 2):
+        rays = []
+        for k in range(1, 56):
+            t = k / 56
+            c, _d, side, up = frame_at(t)
+            ang = TAU * j / 4 + t * 4.4 + TAU / 8
+            out = side * math.cos(ang) + up * math.sin(ang)
+            rays.append((c + out * (girth(t) * 1.9 + 2.0), c))
+        surface_ribbon(p, tree, rays, 0.62, 0.92, reach=24.0, gap=3.2, lift=0.08)
     return p
 
 

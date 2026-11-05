@@ -254,10 +254,26 @@ export class RiftDeathZoneVisuals {
     this.heatFx = new HeatFx(scene, groundY, world, compileGate, reducedMotion, shake);
     this.heatFight = new HeatFightFx(scene, groundY, world, compileGate, reducedMotion, shake);
     this.heatBody = new HeatBody(scene, groundY, world, compileGate, reducedMotion, shake);
-    this.finalFx = new FinalFx(scene, groundY, world, compileGate, reducedMotion, shake);
+    this.finalFx = new FinalFx(
+      scene,
+      groundY,
+      world,
+      compileGate,
+      reducedMotion,
+      shake,
+      playGesture,
+    );
     this.finalKit = new FinalKitFx(scene, groundY, world, compileGate, reducedMotion, shake);
     this.finalPhase = new FinalPhaseFx(scene, groundY, world, compileGate, reducedMotion, shake);
-    this.councilFx = new CouncilFx(scene, groundY, world, compileGate, reducedMotion, shake);
+    this.councilFx = new CouncilFx(
+      scene,
+      groundY,
+      world,
+      compileGate,
+      reducedMotion,
+      shake,
+      playGesture,
+    );
     this.councilBodies = new CouncilBodies(
       scene,
       groundY,

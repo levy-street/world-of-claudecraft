@@ -1,7 +1,5 @@
-// The Hammer Council's player text: every raid warning the council calls
-// resolves through its catalog key to the very English the sim sends (so the
-// banner and the log never read a raw key or drift from the fight), the
-// personal alert's priorities, the marks' tooltips from the live tuning, and
+// The Hammer Council's player text: no raid warning banner (the mechanics
+// read in the world; the yells stay), the personal alert's priorities, the marks' tooltips from the live tuning, and
 // every cast and damage name re-localized.
 
 import { describe, expect, it } from 'vitest';
@@ -21,29 +19,26 @@ import { councilFight } from './helpers/council_fight';
 type Chat = Extract<SimEvent, { type: 'chat' }>;
 
 describe('Hammer Council raid warnings', () => {
-  it('every warning resolves its key to the English the sim sent', () => {
+  it('calls no raid warning banner: every mechanic reads in the world, the yells stay', () => {
     const f = councilFight(6);
     f.dev('/dev heart council pull');
     const events: SimEvent[] = [];
     events.push(...f.tick(20));
-    for (const cmd of ['wrath', 'weight', 'wake', 'rock', 'song']) {
+    for (const cmd of ['wrath', 'weight', 'wake', 'rock', 'song', 'rush']) {
       f.dev(`/dev heart council ${cmd}`);
       events.push(...f.tick(20 * 9));
     }
-    // A fallen member's line.
+    // A fallen member.
     const b = f.bodies();
-    if (b.slabwright) f.sim.ctx.handleDeath(b.slabwright, f.players[0]);
+    if (b.singer) f.sim.ctx.handleDeath(b.singer, f.players[0]);
     events.push(...f.tick(5));
-    const warns = events.filter(
-      (e): e is Chat => e.type === 'chat' && e.channel === 'raidWarning' && e.pid === f.pids[0],
+    const warns = events.filter((e): e is Chat => e.type === 'chat' && e.channel === 'raidWarning');
+    expect(warns).toEqual([]);
+    // The boss yells still carry the fight's voice.
+    const yells = events.filter(
+      (e): e is Chat => e.type === 'chat' && (e.textKey ?? '').startsWith('hudChrome.council.say.'),
     );
-    const keys = new Set(warns.map((w) => w.textKey));
-    for (const k of ['wrath', 'weight', 'wake', 'rock', 'song', 'resonance', 'fell_slabwright'])
-      expect(keys, k).toContain(`hudChrome.council.warn.${k}`);
-    for (const w of warns) {
-      expect(w.textKey?.startsWith('hudChrome.council.warn.')).toBe(true);
-      expect(t(w.textKey as never, w.textValues)).toBe(w.text);
-    }
+    expect(yells.length).toBeGreaterThan(0);
   });
 });
 
@@ -55,23 +50,26 @@ describe('Hammer Council alert', () => {
     value,
   });
 
-  it('the rock over the wake over the Weight over Resonance', () => {
+  it('the Rush over the rock over the wake over the Weight over Resonance', () => {
     const all = [
-      a(COUNCIL_AURAS.resonance, 10, 15),
+      a(COUNCIL_AURAS.resonance, 4, 6),
       a(COUNCIL_AURAS.weight, 20, 25),
       a(COUNCIL_AURAS.wakeMark),
       a(COUNCIL_AURAS.rockMark),
+      a(COUNCIL_AURAS.rushMark, 2, 3),
     ];
     const kind = (auras: typeof all) => {
       const v = buildCouncilAlertView({ auras });
       return v.visible ? v.kind : null;
     };
-    expect(kind(all)).toBe('rock');
+    expect(kind(all)).toBe('rush');
+    expect(kind(all.slice(0, 4))).toBe('rock');
     expect(kind(all.slice(0, 3))).toBe('wake');
     expect(kind(all.slice(0, 2))).toBe('weight');
     expect(kind(all.slice(0, 1))).toBe('resonance');
-    expect(kind([a(COUNCIL_AURAS.resonance, 10, 15, 0.4)])).toBe('cracking');
     expect(kind([])).toBeNull();
+    const res = buildCouncilAlertView({ auras: [a(COUNCIL_AURAS.resonance, 4, 6)] });
+    expect(res.visible && res.line).toBe(t('hudChrome.council.alert.resonanceLine'));
     const v = buildCouncilAlertView({ auras: [a(COUNCIL_AURAS.rockMark, 2.5, 5)] });
     expect(v.visible && v.progress).toBeCloseTo(0.5);
     expect(v.visible && v.title).toBe(t('hudChrome.council.alert.rockTitle'));
@@ -101,7 +99,25 @@ describe('Hammer Council tooltips and names', () => {
       kind: 'vulnerability',
       value: 0,
     });
-    expect(t(res?.key as never, res?.nums as never)).toContain(`${T.resonanceCrackSeconds} sec`);
+    const resText = t(res?.key as never, res?.nums as never);
+    expect(resText).toContain(`${T.resonanceRadius} yd`);
+    expect(resText).toContain(String(T.resonanceMin));
+    expect(resText).not.toMatch(/\{\w+\}/);
+    const rush = auraEffectDescriptor({
+      id: COUNCIL_AURAS.rushMark,
+      kind: 'vulnerability',
+      value: 0,
+    });
+    const rushText = t(rush?.key as never, rush?.nums as never);
+    expect(rushText).toContain(`${T.rushStunSeconds} sec`);
+    expect(rushText).toContain(`${Math.round(T.rushExposed * 100)}%`);
+    expect(rushText).toContain(String(T.rushMin));
+    expect(rushText).not.toMatch(/\{\w+\}/);
+    for (const id of [COUNCIL_AURAS.bond, COUNCIL_AURAS.collapse, COUNCIL_AURAS.rushExposed]) {
+      const d = auraEffectDescriptor({ id, kind: 'vulnerability', value: 0.5 });
+      expect(d?.key, id).toBeDefined();
+      expect(t(d?.key as never, d?.nums as never)).not.toMatch(/\{\w+\}/);
+    }
     const mem = auraEffectDescriptor({
       id: COUNCIL_AURAS.memory,
       kind: 'buff_dmg_done',

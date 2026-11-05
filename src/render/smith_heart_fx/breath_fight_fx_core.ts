@@ -19,7 +19,7 @@
 //
 // Three-free, DOM-free, deterministic (a hash, never rng).
 
-import { BREATH, CORNICE_GAPS, SMITH_HEART_FIELD } from '../../sim/content/smith_heart_layout';
+import { BREATH, SMITH_HEART_FIELD } from '../../sim/content/smith_heart_layout';
 import { DUNGEONS, instanceOrigin, instanceSlotForZ } from '../../sim/data';
 import {
   BREATH_CUES,
@@ -221,8 +221,11 @@ export function windPushes(phase: BreathWindPhase | null): boolean {
 
 // ---- the gaps --------------------------------------------------------------------------
 
-/** One gap's open lip: its segments (instance-local, each with the outward
- *  normal toward the void) and its bearing from the Cornice's middle. */
+/** One stretch of the open lip: its segments (instance-local, each with the
+ *  outward normal toward the void) and its bearing from the Cornice's
+ *  middle. Since the open rim (2026-11-03) the whole edge is lethal: it is
+ *  drawn as LIP_SECTORS stretches, each flaring on its own when the wind
+ *  blows its way. */
 export interface GapLip {
   deg: number;
   x: number;
@@ -230,18 +233,36 @@ export interface GapLip {
   segments: { ax: number; az: number; bx: number; bz: number; nx: number; nz: number }[];
 }
 
-/** The gaps' open lips, read off the field's own cliff runs (the runs
- *  the field builds no wall for), so the lip drawn IS the lip that kills. */
+/** How many stretches the open rim is drawn in (the lip shader's eight). */
+export const LIP_SECTORS = 8;
+
+/** The open rim's stretches, read off the field's own cliff runs (the runs
+ *  the field builds no wall for), so the lip drawn IS the lip that kills;
+ *  each run goes to the sector of its bearing. */
 export function gapLips(): GapLip[] {
-  const runs = authoredFieldCliffRuns(SMITH_HEART_FIELD).filter((r) => r.open);
-  return CORNICE_GAPS.map((g) => ({
-    deg: g.deg,
-    x: g.x,
-    z: g.z,
-    segments: runs
-      .filter((r) => Math.hypot((r.ax + r.bx) / 2 - g.x, (r.az + r.bz) / 2 - g.z) <= g.r + 2)
-      .map((r) => ({ ax: r.ax, az: r.az, bx: r.bx, bz: r.bz, nx: r.nx, nz: r.nz })),
-  }));
+  const C = BREATH.cornice;
+  const runs = authoredFieldCliffRuns(SMITH_HEART_FIELD).filter(
+    (r) => r.open && r.surface === 'storm_cornice',
+  );
+  const out: GapLip[] = [];
+  for (let k = 0; k < LIP_SECTORS; k++) {
+    const deg = (k + 0.5) * (360 / LIP_SECTORS);
+    const a = (deg * Math.PI) / 180;
+    out.push({
+      deg,
+      x: C.x + Math.sin(a) * C.rx,
+      z: C.z + Math.cos(a) * C.rz,
+      segments: [],
+    });
+  }
+  for (const r of runs) {
+    const mx = (r.ax + r.bx) / 2 - C.x;
+    const mz = (r.az + r.bz) / 2 - C.z;
+    const deg = ((Math.atan2(mx, mz) * 180) / Math.PI + 360) % 360;
+    const k = Math.min(LIP_SECTORS - 1, Math.floor(deg / (360 / LIP_SECTORS)));
+    out[k].segments.push({ ax: r.ax, az: r.az, bx: r.bx, bz: r.bz, nx: r.nx, nz: r.nz });
+  }
+  return out;
 }
 
 /** How hard a gap's lip burns (0 quiet, 1 the wind blowing at it): a lip
@@ -341,6 +362,16 @@ export function boltFlare(elapsed: number, seconds: number): number {
 
 /** A loose gale's column: its height and how its funnel widens up it. */
 export const GALE_COLUMN = { height: 10, topScale: 1.6, spin: 3.2 } as const;
+/** A gale's inner core (a share of its column's width and height, its spin a
+ *  multiple of the column's): a storm with a dark heart and a skirt of grit,
+ *  never a bare cone (its foot's dust is breath_gale_glsl.ts `GALE_FOOT_DUST`). */
+export const GALE_CORE = {
+  width: 0.5,
+  height: 0.85,
+  spin: 1.7,
+  /** The scoured grit: warmer and darker than the pale Cornice, so it reads on it. */
+  dustColor: [0.38, 0.34, 0.31] as const,
+} as const;
 /** The vortex's funnel before the guardian's mouth. */
 export const VORTEX_FUNNEL = { height: 6, topScale: 1.9, spin: 4.5 } as const;
 
@@ -364,6 +395,7 @@ const CLAIMED: ReadonlySet<string> = new Set([
   BREATH_CUES.calmLand,
   BREATH_CUES.anchor,
   BREATH_CUES.fall,
+  BREATH_CUES.roarHit,
 ]);
 
 /** Is this cue the fight painter's (the renderer's generic draw skipped)? */
@@ -400,7 +432,8 @@ export const BREATH_FIGHT_POOLS = {
   gales: 4,
   strikes: 14,
   charged: 14,
-  cradles: 1,
+  /** Heroic and mythic lift three at once (BREATH_DIFFICULTY cradleCount). */
+  cradles: 3,
   marks: 12,
   bolts: 10,
   beams: 12,

@@ -66,12 +66,14 @@ function seamMaterial(): THREE.Material {
   });
 }
 
-/** The curtain of crystal light: streaks of the vein's light rising out of
- *  the channel through stretched crystal facets, brightest at its foot, its
- *  crown ragged and drifting; sealed it runs faster and a white hem burns
- *  at its foot. The Heart Bridge's braids the four veins across its width
- *  round a white-gold heart. Blended over the scene (so it reads over the
- *  pale Breath and the dark Hearth alike), double sided, no texture. */
+/** The curtain of crystal light: an aurora rising out of the channel, soft
+ *  folds of the vein's light climbing and thinning to nothing, with no edge
+ *  anywhere (the foot melts into the channel's glow, the crown into the air,
+ *  the ends into the standing stones' shade); sealed it runs faster, brighter
+ *  and beats. The Heart Bridge's braids the four veins across its width round
+ *  a white-gold heart. Blended over the scene (so it reads over the pale
+ *  Breath and the dark Hearth alike), double sided, no texture. The sheet
+ *  itself hangs in folds (`VEIL_VERT`), so it never reads as a flat pane. */
 const VEIL_FRAG = /* glsl */ `
 uniform float uTime;
 uniform float uFilm;
@@ -83,6 +85,7 @@ uniform float uFour;
 uniform vec3 uColor;
 uniform vec3 uVeins[4];
 varying vec2 vUv;
+varying float vFold;
 float h21(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 float vn(vec2 p) {
   vec2 i = floor(p);
@@ -96,37 +99,25 @@ void main() {
   float yy = y * uHeight;
   float t = uTime * (1.0 + 0.9 * uSealed);
   // Its ends fade into the standing stones' shade.
-  float ends = smoothstep(0.0, 0.9, x) * smoothstep(0.0, 0.9, uWidth - x);
-  // Streaks of light rising, each its own pace.
-  float s1 = vn(vec2(x * 2.1, yy * 0.55 - t * 1.25));
-  float s2 = vn(vec2(x * 4.7 + 13.0, yy * 1.1 - t * 2.1));
-  float streak = smoothstep(0.42, 0.95, s1 * 0.62 + s2 * 0.48);
-  // Crystal facets: tall cells drifting up, their edges catching the light.
-  vec2 cp = vec2(x * 1.25, yy * 0.62 - t * 0.32);
-  vec2 ci = floor(cp);
-  vec2 cf = fract(cp);
-  float d1 = 9.0;
-  float d2 = 9.0;
-  float cell = 0.0;
-  for (int j = -1; j <= 1; j++) {
-    for (int i = -1; i <= 1; i++) {
-      vec2 o = vec2(float(i), float(j));
-      vec2 r = o + vec2(h21(ci + o), h21(ci + o + 7.7)) * 0.85 - cf;
-      float d = dot(r, r);
-      if (d < d1) { d2 = d1; d1 = d; cell = h21(ci + o + 3.1); }
-      else if (d < d2) { d2 = d; }
-    }
-  }
-  float edge = 1.0 - smoothstep(0.0, 0.16, sqrt(d2) - sqrt(d1));
-  float glint = smoothstep(0.82, 1.0, cell) * (0.5 + 0.5 * sin(uTime * 2.3 + cell * 40.0));
-  // The crown: ragged, drifting, standing at the curtain's rise.
-  float top = uRise * (0.86 + 0.13 * vn(vec2(x * 0.9, uTime * 0.45)));
-  float body = 1.0 - smoothstep(top - 0.16, top, y);
-  float hem = exp(-y * 9.0) * step(0.02, uRise);
-  float fade = 0.72 + 0.28 * (1.0 - y);
-  float a = (0.3 + 0.42 * streak + 0.34 * edge + 0.45 * glint) * body * fade;
-  a += hem * (0.55 + 0.4 * uSealed);
-  a = min(0.9, a * ends * min(uFilm, 1.0) * (1.0 + 0.25 * max(0.0, uFilm - 1.0)));
+  float ends = smoothstep(0.0, 2.2, x) * smoothstep(0.0, 2.2, uWidth - x);
+  // Long soft folds of light climbing, each its own pace, swaying as they
+  // rise; never a pattern, only value drifting across the sheet.
+  float sway = 0.7 * sin(yy * 0.9 - t * 0.5 + x * 0.21);
+  float f1 = vn(vec2((x + sway) * 0.85, yy * 0.16 - t * 0.34));
+  float f2 = vn(vec2((x - sway) * 2.3 + 13.0, yy * 0.34 - t * 0.62));
+  float f3 = vn(vec2(x * 5.5 + 31.0, yy * 0.7 - t * 1.1));
+  float folds = f1 * 0.58 + f2 * 0.3 + f3 * 0.12;
+  folds = smoothstep(0.26, 0.76, folds);
+  // Where the sheet turns from the eye its light gathers.
+  float gather = 0.72 + 0.5 * vFold;
+  // The crown: thins out unevenly, each fold reaching its own height.
+  float reach = uRise * (0.5 + 0.5 * vn(vec2(x * 0.62, uTime * 0.16)) + 0.2 * (folds - 0.5));
+  float crown = 1.0 - smoothstep(reach * 0.25, reach, y);
+  // The foot: no line, the light only gathers as it leaves the channel.
+  float foot = smoothstep(0.0, 0.2, y);
+  float a = (0.2 + 0.62 * folds) * gather * crown * foot;
+  a *= ends * min(uFilm, 1.0) * (1.0 + 0.3 * max(0.0, uFilm - 1.0));
+  a = min(0.78, a);
   if (a <= 0.004) discard;
   vec3 tint = uColor;
   if (uFour > 0.5) {
@@ -137,22 +128,33 @@ void main() {
     int b = int(floor(u));
     vec3 c0 = b == 0 ? uVeins[0] : b == 1 ? uVeins[1] : b == 2 ? uVeins[2] : uVeins[3];
     vec3 c1 = b == 0 ? uVeins[1] : b == 1 ? uVeins[2] : b == 2 ? uVeins[3] : uVeins[0];
-    tint = mix(uColor, mix(c0, c1, smoothstep(0.35, 0.65, k)), 0.6 + 0.3 * streak);
+    tint = mix(uColor, mix(c0, c1, smoothstep(0.2, 0.8, k)), 0.3 + 0.4 * folds);
   }
   // A luminous curtain over the bright veins and the dark alike: its own
-  // colour (blended over the scene, never just added to a pale floor), its
-  // facets and its foot white-hot, flaring while it is sealed.
-  vec3 col = tint * (1.15 + 0.35 * max(0.0, uFilm - 1.0) + 0.25 * streak);
-  col = mix(col, vec3(1.0, 0.98, 0.94), clamp(hem * 0.6 + glint * 0.45 + edge * 0.18, 0.0, 0.85));
+  // colour (blended over the scene, never just added to a pale floor), hotter
+  // low down and in the folds' hearts, flaring while it is sealed.
+  vec3 col = tint * (1.05 + 0.35 * max(0.0, uFilm - 1.0) + 0.3 * folds);
+  col = mix(col, vec3(1.0, 0.97, 0.9), clamp((1.0 - y) * (1.0 - y) * 0.42 * folds + 0.12 * uSealed, 0.0, 0.6));
   gl_FragColor = vec4(col, a);
   #include <colorspace_fragment>
 }
 `;
 const VEIL_VERT = /* glsl */ `
+uniform float uTime;
+uniform float uWidth;
 varying vec2 vUv;
+varying float vFold;
 void main() {
   vUv = uv;
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  // The sheet hangs in slow folds (yards, along its depth), pinned at both
+  // ends and at its foot in the channel.
+  float x = uv.x * uWidth;
+  float pin = smoothstep(0.0, 1.5, x) * smoothstep(0.0, 1.5, uWidth - x);
+  float s = sin(x * 1.05 + uTime * 0.42) + 0.6 * sin(x * 2.3 - uTime * 0.31);
+  vFold = 0.5 + 0.5 * cos(x * 1.05 + uTime * 0.42);
+  vec3 p = position;
+  p.z += s * 0.16 * pin * smoothstep(0.0, 0.5, uv.y);
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0);
 }
 `;
 
@@ -268,7 +270,8 @@ function buildRig(rig: HeartGateRig, width: number, gateId: string): GateRig {
   for (const part of parts) {
     if (part.role === 'veil') {
       veil = veilMaterial(gateId, part.w, part.h + 0.15);
-      const plane = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), veil);
+      // Enough columns for the sheet's folds (`VEIL_VERT`).
+      const plane = new THREE.Mesh(new THREE.PlaneGeometry(1, 1, 40, 2), veil);
       plane.name = 'smithHeartGateVeil';
       plane.scale.set(part.w, part.h + 0.15, 1);
       plane.position.set(part.x, part.y - 0.075, part.z);

@@ -84,6 +84,7 @@ import {
   type V3,
 } from './heat_body_core';
 import { heatParticleSteps } from './heat_floor_ladder_core';
+import { basaltRepaint } from './heat_shapes';
 
 const SCAN_SEC = 0.1;
 /** The giant's scale (the body's frame to the world). */
@@ -541,17 +542,7 @@ export class HeatBody {
   /** The Heart kit's colossus rock repainted the Hearth's basalt: a warm dark
    *  grey, the kit's own value variation kept, umber in the shade. */
   private basalt(src: THREE.BufferGeometry): THREE.BufferGeometry {
-    const g = src.clone();
-    const col = g.getAttribute('color');
-    if (col) {
-      const c = HEAT_BODY_COLORS.basalt;
-      const d = HEAT_BODY_COLORS.basaltShade;
-      for (let i = 0; i < col.count; i++) {
-        const v = Math.min(1, col.getX(i) * 1.4);
-        col.setXYZ(i, d[0] + (c[0] - d[0]) * v, d[1] + (c[1] - d[1]) * v, d[2] + (c[2] - d[2]) * v);
-      }
-      col.needsUpdate = true;
-    }
+    const g = basaltRepaint(src, HEAT_BODY_COLORS.basalt, HEAT_BODY_COLORS.basaltShade);
     this.geometries.push(g);
     return g;
   }

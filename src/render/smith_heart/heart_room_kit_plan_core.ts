@@ -70,7 +70,8 @@ export const HEART_ROOT_OUT = 18;
  *  back of its landmark, but the Hammer's. South of the Heart the crown of
  *  rock falls away toward the Quench's chasm (no rock high enough within a
  *  root's reach straight out), so the Hammer's rises from its landmark's
- *  east shoulder and runs south-east into the crown where it stands high.
+ *  east shoulder, clear of the great hammer's head, and runs south-east into
+ *  the crown where it stands high.
  *  `foot`: degrees round from the altar's bearing; `aim`: the root's world
  *  bearing (degrees clockwise from north), or null for straight out. */
 export const HEART_ROOT_AIM: Readonly<
@@ -78,7 +79,7 @@ export const HEART_ROOT_AIM: Readonly<
 > = {
   breath: { foot: 0, aim: null },
   quench: { foot: 0, aim: null },
-  hammer: { foot: -8, aim: 112 },
+  hammer: { foot: -17, aim: 112 },
   heat: { foot: 0, aim: null },
 };
 
@@ -125,14 +126,15 @@ export function heartAltarFrame(vein: SmithHeartVein): { x: number; z: number; r
   return { x: a.x, z: a.z, rot: face(a.x, a.z, HEART_ROOM.x, HEART_ROOM.z) };
 }
 
-/** The roots' spine in an altar's frame (yards: `out` away from the
- *  platform's centre, `up` over the floor): a quadratic Bezier from the
- *  altar's crown to the mountain's crown, the Blender piece's own points
- *  (heart_pieces.py ROOT_SPINE). */
+/** The roots' spine in a root's frame (yards: `out` away from the platform's
+ *  centre, `up` over its lift): a quadratic Bezier from deep inside its
+ *  landmark, under the walk's height, to the mountain's crown, the Blender
+ *  piece's own points (heart_pieces.py ROOT_SPINE). A root has no free end: it
+ *  plunges into the rock at both. */
 export const HEART_ROOT_SPINE: readonly { out: number; up: number }[] = [
-  { out: 2, up: 6.3 },
-  { out: 22, up: 40 },
-  { out: 50, up: 52 },
+  { out: 2, up: -14 },
+  { out: 18, up: 36 },
+  { out: 50, up: 54 },
 ];
 
 /** A point `t` (0 at the altar, 1 at the crown) along a vein's root, in

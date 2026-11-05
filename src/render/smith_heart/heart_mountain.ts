@@ -1,11 +1,18 @@
 // The Smith's Heart's mountain (heart_mountain_core.ts plans it): one indexed,
-// flat-shaded heightfield of rock round every floor, tinted by height (dark
+// heightfield of rock round every floor, tinted by height (dark
 // basalt down by the chasm, paler granite on the ridges where the storm light
 // catches it) with a hashed mottle. Static, one draw; the low tier builds it
 // on a coarser grid (fewer facets, the same mountain).
 
 import * as THREE from 'three';
-import { detailedSurfaceMat } from '../worn_stone';
+import { surfaceMat } from '../gfx';
+import {
+  BREATH_ROCK_GAIN,
+  BREATH_ROCK_MIX,
+  BREATH_ROCK_TONE,
+  breathStoneBed,
+  breathStoneWeight,
+} from './breath_stone_core';
 import type { HammerRockPaint } from './hammer_env_rock_paint';
 import {
   HAMMER_ROCK_GAIN,
@@ -47,6 +54,7 @@ const ROCK_HIGH = new THREE.Color(0x6a6766);
 const HAMMER_ROCK = new THREE.Color(HAMMER_ROCK_TONE);
 const QUENCH_ROCK = new THREE.Color(QUENCH_ROCK_TONE);
 const HEAT_ROCK = new THREE.Color(HEAT_ROCK_TONE);
+const BREATH_ROCK = new THREE.Color(BREATH_ROCK_TONE);
 const CROWN_ROCK = new THREE.Color(HEART_CROWN_TONE);
 
 /** A Hammer step's shade (a gain): its own tone of the bed, the ledge's
@@ -117,6 +125,13 @@ export function buildHeartMountain(lowGfx: boolean, paint?: HammerRockPaint | nu
       const soot = heatSootWeight(g.x0 + i * g.cell, g.z0 + j * g.cell);
       if (soot > 0)
         c.lerp(HEAT_ROCK, soot * HEAT_ROCK_MIX).multiplyScalar(1 + soot * (HEAT_ROCK_GAIN - 1));
+      // The Breath's storm granite: wind-carved slate, never a brown wall.
+      const storm = breathStoneWeight(g.x0 + i * g.cell, g.z0 + j * g.cell);
+      if (storm > 0)
+        c.lerp(BREATH_ROCK, storm * BREATH_ROCK_MIX).multiplyScalar(
+          (1 + storm * (BREATH_ROCK_GAIN - 1)) *
+            (1 + storm * breathStoneBed(g.x0 + i * g.cell, h, g.z0 + j * g.cell)),
+        );
       // The Heart's crown (phase 2J): a dark warm granite round the chamber.
       const crown = heartCrownWeight(g.x0 + i * g.cell, g.z0 + j * g.cell);
       if (crown > 0)
@@ -147,13 +162,11 @@ export function buildHeartMountain(lowGfx: boolean, paint?: HammerRockPaint | nu
   geometry.setIndex(index);
   geometry.computeVertexNormals();
   geometry.computeBoundingSphere();
-  // The shared triplanar rock (natural fracture) on the tiers that draw it:
-  // the faceted mass reads as stone, not as painted card.
-  const stone = detailedSurfaceMat(
-    { color: 0xffffff, vertexColors: true, roughness: 0.95, flatShading: true },
-    'rock',
-    { strength: 0.55 },
-  );
+  // The dark mass behind the rock kit, smooth and plain: faceted, the grid's
+  // faces turned from the light drew as black slits standing in the crown
+  // (seen through the kit's gaps); with the shared fracture, smooth normals
+  // scribbled black at every grazing angle.
+  const stone = surfaceMat({ color: 0xffffff, vertexColors: true, roughness: 0.95 });
   // The Hammer vein's stretch of it wears the vein's painted rock.
   const mesh = new THREE.Mesh(geometry, paint ? paint(stone) : stone);
   mesh.name = 'smithHeartMountain';

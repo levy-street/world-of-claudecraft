@@ -1,4 +1,4 @@
-// The Guardian of the Quench's player text: every raid warning and every line
+// The Guardian of the Quench's player text: no raid warning, every line
 // the guardian speaks resolves through its catalog key to the very English
 // the sim sends, the fight's auras' tooltips from the live tuning (the cold's
 // value off the aura itself), every bar and damage name re-localized, and the
@@ -24,7 +24,7 @@ import { quenchFight } from './helpers/quench_fight';
 type Chat = Extract<SimEvent, { type: 'chat' }>;
 
 describe('Guardian of the Quench: what the raid reads', () => {
-  it('every warning and every line resolves its key to the English the sim sent', () => {
+  it('calls no raid warning banner, and every line resolves its key to the English the sim sent', () => {
     const f = quenchFight(6);
     const events: SimEvent[] = [];
     f.dev('/dev heart quench pull');
@@ -44,14 +44,10 @@ describe('Guardian of the Quench: what the raid reads', () => {
     f.dev('/dev heart quench slash');
     events.push(...f.tick(20 * 6));
     const mine = events.filter((e): e is Chat => e.type === 'chat' && e.pid === f.pids[0]);
-    const warns = mine.filter((c) => c.channel === 'raidWarning');
-    const keys = new Set(warns.map((w) => w.textKey));
-    for (const k of ['rim', 'crack', 'frozen', 'wake', 'marks'])
-      expect(keys, k).toContain(`hudChrome.quenchGuardian.warn.${k}`);
-    for (const w of warns) {
-      expect(w.textKey?.startsWith('hudChrome.quenchGuardian.warn.')).toBe(true);
-      expect(t(w.textKey as never, w.textValues)).toBe(w.text);
-    }
+    // The owner's rule (2026-11-04): the fight's mechanics read in the
+    // world; no banner reaches the centre of the screen, whatever happens.
+    expect(mine.filter((c) => c.channel === 'raidWarning')).toEqual([]);
+    expect(events.filter((e) => e.type === 'chat' && e.channel === 'raidWarning')).toEqual([]);
     const yells = mine.filter((c) => c.channel === 'yell');
     expect(yells.length).toBeGreaterThan(4);
     for (const y of yells) expect(t(y.textKey as never)).toBe(y.text);

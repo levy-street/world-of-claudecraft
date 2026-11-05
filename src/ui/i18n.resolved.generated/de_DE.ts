@@ -4749,33 +4749,41 @@ export const de_DE: EnTranslations = {
       "council": {
         "wakeMark": "When this ends, a pillar bursts out of the floor where you stand, dealing {min} to {max} damage to everyone within {radius} yd and throwing them back. Stand where the raid needs cover. Heroic and Mythic: {heroic}% more damage.",
         "rockMark": "When this ends, a rock falls on you: {total} damage shared between everyone within {radius} yd. With fewer than {soakers} under it, each takes {penalty}% more and the whole raid takes {tremorMin} to {tremorMax}. Every pillar within {radius} yd loses a piece, so share it away from cover. Mythic: a soul pillar within {soulReach} yd loses a soul pip instead, and breaks at none. Heroic and Mythic: {heroic}% more damage.",
-        "resonance": "Standing within {reach} yd of a pillar for {seconds} sec in a row knocks a piece off it, and again every {seconds} sec you stay. Nothing removes it: wait out the Wrath by the most damaged pillar and keep off the whole ones. Mythic: by a soul pillar the same wait strikes off a soul pip instead ({singerSeconds} sec by the Seam Singer's), and it breaks at none.",
+        "resonance": "Every {every} sec you ring, dealing {min} to {max} Nature damage to each ally within {radius} yd of you. Move away from everyone until it ends. Heroic and Mythic: {heroic}% more damage.",
+        "rushMark": "When this ends, the Guardian of the Hammer braces for {windup} sec, then charges in a straight line through where you stood, on to the edge of the Quarry, and stops early at the first pillar in its way. Lead it into the Cursed Pillar: the pillar shatters, the Guardian is stunned for {stun} sec and takes {exposed}% more damage for {exposedSeconds} sec. A sheltering pillar in the way is destroyed instead. Everyone it runs into before it stops takes {min} to {max} damage and is thrown back, you too if you are still on its line. Mythic: a charge that hits no pillar starts the Quarry collapsing until the Cursed Pillar breaks.",
+        "rushExposed": "Takes {pct}% more damage: Mountain's Rush shattered the Cursed Pillar.",
+        "bond": "Takes {pct}% less damage while the other member of the Hammer Council stands within {reach} yd. Every {every} sec the bond deals {min} to {max} damage to the whole raid, {growth}% more each time. Pull them apart.",
+        "collapse": "The Quarry is collapsing: every {every} sec you take {min} to {max} damage for each stack, and a stack is added each time. It ends when the Cursed Pillar breaks.",
         "memory": "Deals {pct}% more damage: {per}% for each fallen member of the Hammer Council.",
-        "prisoned": "Shut in a block of stone: you cannot act. Your allies must break the block before this ends, or it crushes you.",
-        "pillarLimit": "Each pillar shields at most {limit} players from Mountain's Wrath. With more behind it, each of them takes {share}% of the blast.",
-        "shouldered": "Takes {pct}% less damage while another living member of the Hammer Council stands within {reach} yd. Pull the Slabwright away from them."
+        "pillarLimit": "Each pillar shields at most {limit} players from Mountain's Wrath. With more behind it, each of them takes {share}% of the blast."
       },
       "breathGuardian": {
         "portalA": "When this ends, Portal A opens exactly where you stand. Stand near the Knotted Gale. You cannot carry it this round.",
-        "portalB": "When this ends, Portal B opens exactly where you stand. Stand at the lip of a gap. You cannot carry the Knotted Gale this round.",
+        "portalB": "When this ends, Portal B opens exactly where you stand. Stand at the edge of the Cornice. You cannot carry the Knotted Gale this round.",
         "portalC": "When this ends, Portal C opens exactly where you stand. It links to Portal D only. Stand near the other Knotted Gale. You cannot carry it this round.",
-        "portalD": "When this ends, Portal D opens exactly where you stand. It links to Portal C only. Stand at the lip of a gap away from Portal B. You cannot carry the Knotted Gale this round.",
-        "laden": "You carry a Knotted Gale: you walk at {walk}% speed, you cannot blink, charge or leap, and no wind, pull, blast or throw can move you. Each portal takes you to its partner: A to B, C to D. Press Interact at the lip of any gap to throw it into the void. When this ends it bursts and kills everyone on the Cornice.",
-        "wind": "The Guardian of the Breath's wind carries you {speed} yd a second the way it blows. Walk against it to hold your ground; it does not interrupt your casts. Pressed against the rim's wall you take {pinMin} to {pinMax} damage every second. Where the wall is broken there is nothing to stop you: you fall into the void.",
-        "draw": "The Guardian draws breath and pulls you toward it, {speed} yd a second. Its vortex deals {min} to {max} damage every {tick} sec to whoever stands before its mouth. Then Bellows Gust deals {gustMin} to {gustMax} damage to everyone on the Cornice and throws them {throw} yd outward.",
+        "portalD": "When this ends, Portal D opens exactly where you stand. It links to Portal C only. Stand at the edge of the Cornice, away from Portal B. You cannot carry the Knotted Gale this round.",
+        "laden": "You carry a Knotted Gale: you walk at {walk}% speed, you cannot blink, charge or leap, and no wind, pull, blast or throw can move you. Each portal takes you to its partner: A to B, C to D. Press Interact at the edge of the Cornice to throw it into the void. When this ends it bursts and kills everyone on the Cornice.",
+        "wind": "The Guardian of the Breath's wind carries you {speed} yd a second the way it blows. Walk against it to hold your ground; it does not interrupt your casts. No wall stands round the Cornice: carried off its edge, you fall into the void. Only by the head of the climb does a wall still stand, and pressed against it you take {pinMin} to {pinMax} damage every second.",
+        "draw": "The Guardian draws breath and pulls you toward it, {speed} yd a second. Its vortex deals {min} to {max} damage every {tick} sec to whoever stands before its mouth. Then Summit Roar deals {gustMin} to {gustMax} damage to everyone on the Cornice and throws them {throw} yd away from it ({heroicThrow} on Heroic): with the Guardian near the edge, that throws the raid off the Cornice.",
         "pinned": "Pressed against the rim's wall by the wind: {min} to {max} damage every second until the wind falls calm or you walk clear of the wall.",
         "anchor": "Captain Thessaly's calm holds you: no wind, pull, blast or throw can move you. Damage still lands.",
         "spent": "Your anchor has run out: Captain Thessaly's circle of calm cannot anchor you again until this ends.",
         "drawn": "A lightning strike falls where you stand every {every} sec: after {warn} sec it deals {min} to {max} damage to everyone within {radius} yd and leaves charged ground that deals {cmin} to {cmax} every second for {charged} sec. Keep moving, and lead the strikes to the edge, away from the raid.",
-        "cradled": "Lifted into the storm and held for {hold} sec. Then the discharge deals {total} damage, split between you and everyone within {radius} yd beneath you. With fewer than {soakers} sharing it ({heroicSoakers} on Heroic), each takes {penalty}% more and everyone on the Cornice takes {bmin} to {bmax}.",
+        "cradled": "Lifted into the storm and held for {hold} sec while the Guardian channels the cradle; it casts nothing else meanwhile. Then the discharge deals {total} damage, split between you and everyone within {radius} yd beneath you. With fewer than {soakers} sharing it, each takes {penalty}% more and everyone on the Cornice takes {bmin} to {bmax}. Heroic: {heroicCount} players are lifted at once, each discharge {heroicTotal} wanting {heroicSoakers}, so the raid splits between them.",
+        "bulwark": "A shield of wind absorbs {left} more damage. While any Gale Sentinel or Gale Mender on the floating isles lives, it regrows {regrow}% of its whole every second, and each Mending Gale restores {mend}%. Ride a Gale Path to the isles and cut them down. Held for {max} sec, it bursts over the Cornice for {bmin} to {bmax} damage.",
+        "riding": "The wind carries you over the void on a fixed path: you cannot act until it sets you down.",
+        "windworn": "Worn out by the wind: no Gale Path will carry you to the isles until this ends.",
+        "thrown": "Thrown by the Summit Roar: you cannot move until the throw sets you down.",
+        "tossed": "Tossed by a Loose Gale: you cannot move until the gust sets you down.",
         "stormForm": "Torn open into a body of lightning: the Storm half of the fight, until the Guardian of the Breath falls.",
         "swell": "Every {every} sec the swelling storm deals {min} to {max} damage to everyone on the Cornice, {growth}% more for every pulse before it: {stacks} so far."
       },
       "quenchGuardian": {
-        "cold": "Your cold: {cold} of {max}. Alone it fills in about {fill} sec. Standing within {radius} yd of {others} or more other players lowers it by {fall} every second instead. At {max} you are Encased in Rime for {freeze} sec, then the ice shatters.",
+        "cold": "Your cold: {cold} of {max}. Alone it fills in about {fill} sec. Standing within {radius} yd of {others} or more other players lowers it by {fall} every second instead. Immunities such as Cold Coffin do not stop it: while one lasts you neither give nor take warmth. At {max} you are Encased in Rime for {freeze} sec, then the ice shatters.",
         "warmth": "Huddled with the raid: your cold falls by {fall} every second. A huddle that stays on one spot for {linger} sec cracks the ice beneath it into a hole of freezing water, so keep moving.",
-        "frozen": "Encased in rime: you cannot act. When it ends the ice shatters: you take {min} to {max} Frost damage and become Frost-Brittle, and everyone within {radius} yd of you gains {cold} cold ({heroicRadius} yd and {heroicCold} cold on Heroic).",
-        "brittle": "Takes {pct}% more damage from all sources.",
+        "frozen": "Encased in rime: you cannot act and take {pct}% more damage from all sources, and the rime cracks immunities such as Cold Coffin. When it ends the ice shatters: you take {min} to {max} Frost damage, then take {brittle}% more damage for {seconds} sec, and everyone within {radius} yd of you gains {cold} cold ({heroicRadius} yd and {heroicCold} cold on Heroic).",
+        "brittle": "Takes {pct}% more damage from all sources. While this lasts, a shattering ally's splash cannot take your cold past {cap}.",
+        "splashed": "An ally's shattering ice splashed you: +{cold} cold. Get back into a huddle before your own bar fills.",
         "trapped": "Fallen through the ice into freezing water: you cannot move, you take {min} to {max} Frost damage every second and your cold rises. After {seconds} sec you climb out on the edge. The water alone never kills you.",
         "awake": "The Smith's four blades are awake. Each round more players are marked, and a blade flies across the lake down a line through each in turn. It locks {lock} sec before the blade flies, then strikes anyone on it for {min} to {max} Frost damage and adds {cold} cold.",
         "marked": "You are number {order} of {count}: a blade will fly across the lake down the line through you. Lead the line away from the raid. It locks {lock} sec before the blade flies, so step off then, or take {min} to {max} Frost damage and {cold} cold.",
@@ -7292,47 +7300,19 @@ export const de_DE: EnTranslations = {
       "breathLine": "Der steinerne Jaguar haucht gleich über diese Terrassenhälfte. Wechselt in die andere Hälfte"
     },
     "council": {
-      "warn": {
-        "wrath": "Mountain's Wrath! Hide behind a pillar!",
-        "shoulder": "The Slabwright hardens beside its kin: pull it away!",
-        "crowded": "Too many behind one pillar! It could not shield them all.",
-        "prison": "Stone Prison on {players}! Break them out!",
-        "enrage": "The mountain's anger quickens! Mountain's Wrath comes much sooner now.",
-        "weight": "Hammer's Weight on {player}: swap tanks!",
-        "wake": "Wake the Stone: pillars rise under {players}! Stand where the cover should go.",
-        "wakeHeir": "The stone wakes under {players}: move!",
-        "rock": "Falling Rock on {player}! Share the blow, away from your cover!",
-        "song": "Song of the Seam! Interrupt it!",
-        "resonance": "Resonance on {players}: crack the weakest pillar, keep off the whole ones!",
-        "fell_guardian": "The Guardian of the Hammer falls. Its wrath passes into the stone that remains!",
-        "fell_slabwright": "The Slabwright falls. Now the stone rises where it will!",
-        "fell_singer": "The Seam Singer falls. Its song passes on, and no one can stop it now!",
-        "soul_guardian": "The Guardian's soul takes the stone! Its Echo of Wrath will strike from the pillar.",
-        "soul_slabwright": "The Slabwright's soul takes the stone! The Walking Slab drags itself after you.",
-        "soul_singer": "The Seam Singer's soul takes the stone! Its Endless Song grows with every pulse.",
-        "echo": "Echo of Wrath! Put another pillar between you and the soul pillar!",
-        "soulBreak_guardian": "The Guardian's soul pillar breaks! Its Echo falls silent.",
-        "soulBreak_slabwright": "The Slabwright's soul pillar breaks! The Walking Slab is still.",
-        "soulBreak_singer": "The Seam Singer's soul pillar breaks! The Endless Song falls silent."
-      },
       "say": {
         "guardian_pull": "Strangers in the Quarry. The Hammer's strength does not yield to flesh.",
         "guardian_wrath": "The mountain answers me! Hide, if the stone will have you!",
+        "guardian_rush": "Stand in my path, then. The mountain does not turn aside.",
         "guardian_death": "My strength... I give it to the stone.",
         "guardian_remember": "The stone remembers. What was theirs is mine.",
         "guardian_soul": "I am the stone now. My wrath has no body left to fail.",
         "guardian_wipe": "Dust. As all flesh becomes.",
         "guardian_defeat": "The Hammer's strength... is yours to carry.",
-        "slabwright_pull": "More stone for the wall. Hold still, and I will set you in it.",
-        "slabwright_wake": "Stand there. The stone rises where you stand!",
-        "slabwright_rock": "Look up, little ones! The mountain is falling!",
-        "slabwright_death": "The slab... splits...",
-        "slabwright_remember": "The stone remembers. I will finish the work.",
-        "slabwright_soul": "No hands left, but I will drag this stone to you.",
-        "slabwright_wipe": "Set, and buried. Good work.",
-        "slabwright_defeat": "The Quarry... falls quiet.",
         "singer_pull": "Hear the seam sing? It has waited so long for your voices.",
         "singer_song": "Sing with me, and break!",
+        "singer_wake": "Wake, sleeping stone. Rise where they stand!",
+        "singer_rock": "Look up, little ones! The mountain is falling!",
         "singer_death": "My song... runs into the rock...",
         "singer_remember": "The stone remembers. Listen, it still sings.",
         "singer_soul": "Listen. In the stone, my song never ends.",
@@ -7341,15 +7321,14 @@ export const de_DE: EnTranslations = {
       },
       "alert": {
         "wakeTitle": "Wake the Stone!",
-        "wakeLine": "A pillar rises where you stand: put the cover where the raid needs it",
+        "wakeLine": "A pillar will rise where you stand: move to where the raid needs cover",
         "rockTitle": "Falling Rock!",
         "rockLine": "Gather at least three allies on you, away from the pillars",
         "resonanceTitle": "Resonance",
-        "resonanceLine": "Near a pillar you crack it: wait by the most damaged one",
-        "resonanceCracking": "Cracking a pillar: move away to spare it",
+        "resonanceLine": "You hurt every ally near you: move away from the group until it ends",
+        "rushTitle": "Mountain's Rush!",
+        "rushLine": "The Guardian will charge at you: put the Cursed Pillar between you and him",
         "rockLineSoul": "Gather at least three allies on you, away from cover and beside a soul pillar",
-        "resonanceLineSoul": "Wait by a soul pillar to break its soul pips, never by the whole pillars",
-        "resonanceBreaking": "Breaking a soul pip: stay by the soul pillar",
         "weightTitle": "Hammer's Weight",
         "weightLine": "You take double physical damage: the other tank must take the Guardian",
         "timeAria": "{seconds} seconds left"
@@ -7359,41 +7338,21 @@ export const de_DE: EnTranslations = {
       "aTitle": "You are Portal A!",
       "aLine": "It opens at your feet in {seconds} sec. Stand near the Knotted Gale.",
       "bTitle": "You are Portal B!",
-      "bLine": "It opens at your feet in {seconds} sec. Stand at the lip of a gap.",
+      "bLine": "It opens at your feet in {seconds} sec. Stand at the edge of the Cornice.",
       "cTitle": "You are Portal C!",
       "cLine": "It opens at your feet in {seconds} sec. Stand near the other Knotted Gale.",
       "dTitle": "You are Portal D!",
-      "dLine": "It opens at your feet in {seconds} sec. Stand at a gap away from Portal B.",
+      "dLine": "It opens at your feet in {seconds} sec. Stand at the edge, away from Portal B.",
       "carryTitle": "You carry the Knotted Gale!",
-      "carryLine": "Each portal takes you to its partner: A to B, C to D. Throw it from the lip of a gap. It bursts in {seconds} sec.",
+      "carryLine": "Each portal takes you to its partner: A to B, C to D. Throw it from the edge of the Cornice. It bursts in {seconds} sec.",
       "lipTitle": "Throw it now!",
-      "lipLine": "You stand at the lip of a gap. It bursts in {seconds} sec.",
-      "throwKey": "Press {key} at the lip to throw",
-      "throwTap": "Tap here at the lip to throw",
-      "throwClick": "Click here at the lip to throw",
+      "lipLine": "You stand at the edge. It bursts in {seconds} sec.",
+      "throwKey": "Press {key} at the edge to throw",
+      "throwTap": "Tap here at the edge to throw",
+      "throwClick": "Click here at the edge to throw",
       "throwAria": "Throw the Knotted Gale into the void"
     },
     "breathGuardian": {
-      "warn": {
-        "inhale": "The Guardian draws breath! Keep out of the vortex before its mouth!",
-        "gust": "Bellows Gust! Brace for the blast!",
-        "gales": "Loose gales tear across the Cornice! Keep clear of them!",
-        "circle": "Captain Thessaly plants a circle of calm! {seats} may stand in it.",
-        "fell": "{player} is swept into the void!",
-        "storm": "The storm breaks! Lightning will fall across the Cornice!",
-        "fork": "Leaping Bolt on {player}! Spread out!",
-        "cradle": "{player} is lifted into the storm! Gather beneath them!",
-        "drawn": "Drawn Lightning on {player}! Lead the strikes to the edge!",
-        "stormGust": "A storm gust gathers! Brace against the wind!",
-        "knot": "A Knotted Gale falls! Carry it to a gap and throw it into the void!",
-        "knotPortals": "Portal A on {a}, Portal B on {b}!",
-        "knotPortals2": "Portal C on {c}, Portal D on {d}!",
-        "knotTaken": "{player} takes up the Knotted Gale!",
-        "knotDropped": "{player} falls! The Knotted Gale is free again!",
-        "knotFell": "{player} takes the Knotted Gale into the void!",
-        "knotThrown": "{player} hurls the Knotted Gale into the void!",
-        "knotBurst": "The Knotted Gale bursts!"
-      },
       "say": {
         "guardian_pull": "You climbed to the top of the mountain to steal its breath? Then breathe with me.",
         "guardian_blow": "Feel the wind turn. The edge is closer than you think.",
@@ -7401,9 +7360,12 @@ export const de_DE: EnTranslations = {
         "guardian_storm": "Enough breath. Now the storm!",
         "guardian_cradle": "Rise, little one. Let them catch you.",
         "guardian_drawn": "The sky has chosen you. Run, and it follows.",
+        "guardian_isles": "Winds, wall me in! The isles will keep my breath whole.",
+        "guardian_bulwark": "My shield... torn open. Then feel the gale again!",
         "guardian_wipe": "Blown away, like dust from the summit.",
         "guardian_death": "The Breath... goes back... to the mountain...",
-        "thessaly_pull": "Highwatch stands with you! Mind the gaps in the wall: the wind will throw you through them!",
+        "thessaly_pull": "Highwatch stands with you! There is no wall up here: the wind will throw you off the edge!",
+        "thessaly_isles": "Its shield feeds on the isles! Ride the gale out there, cut the menders down and come back!",
         "thessaly_circle_a": "Into my calm, quickly! It holds three, no more!",
         "thessaly_circle_b": "Here! Stand with me and let the wind break on us!",
         "thessaly_circle_c": "Calm on the stone! Three of you, now!",
@@ -7415,14 +7377,6 @@ export const de_DE: EnTranslations = {
       }
     },
     "quenchGuardian": {
-      "warn": {
-        "rim": "The shore ice heaves up! Get onto the lake!",
-        "frozen": "{player} is frozen solid! Step away before the ice shatters!",
-        "crack": "The ice groans under the huddle! Move apart!",
-        "wake": "The Smith's blades tear free of the lake! Watch where they aim!",
-        "marks": "The blades mark {list}! Lead them clear of the raid!",
-        "flurry": "Every blade hunts at once! Dodge the lines!"
-      },
       "say": {
         "pull": "Warm blood on my lake. It will not stay warm for long.",
         "shatter": "Frozen through. Now break.",
@@ -7444,6 +7398,8 @@ export const de_DE: EnTranslations = {
       "frozenTitle": "Encased in rime!",
       "waterTitle": "Under the ice!",
       "coldLine": "Stand within {radius} yd of {others} or more others to warm up",
+      "splashTitle": "Rime splash! +{cold} cold",
+      "immuneLine": "Your immunity does not stop the cold: huddle up",
       "warmLine": "Your cold is falling. Move the huddle within {seconds} sec or the ice cracks",
       "frozenLine": "The ice shatters in {seconds} sec: everyone close, step away",
       "waterLine": "Climbing out in {seconds} sec",
@@ -16944,7 +16900,7 @@ export const de_DE: EnTranslations = {
       "sanctum_branding_iron": "Brandeisen",
       "sanctum_rime_breath": "Raureifatem",
       "heart_mountains_wrath": "Mountain's Wrath",
-      "heart_bellows_gust": "Bellows Gust",
+      "heart_bellows_gust": "Summit Roar",
       "heart_storm_lance": "Storm Lance",
       "heart_quenching_breath": "Quenching Breath",
       "heart_forge_wrath": "Forge Wrath",
@@ -16959,12 +16915,11 @@ export const de_DE: EnTranslations = {
       "heart_rime_bolt": "Rime Bolt",
       "heart_ember_bolt": "Ember Bolt",
       "heart_hammers_weight": "Hammer's Weight",
+      "heart_mountains_rush": "Mountain's Rush",
       "heart_wake_the_stone": "Wake the Stone",
       "heart_falling_rock": "Falling Rock",
-      "heart_stone_prison": "Stone Prison",
       "heart_seam_bolt": "Seam Bolt",
       "heart_song_of_the_seam": "Song of the Seam",
-      "heart_song_of_the_seam_unbroken": "Song of the Seam",
       "heart_echo_of_wrath": "Echo of Wrath",
       "heart_endless_song": "Endless Song",
       "heart_breath_inhale": "Indrawn Breath",
@@ -16972,6 +16927,9 @@ export const de_DE: EnTranslations = {
       "heart_breath_forking_bolt": "Leaping Bolt",
       "heart_breath_thunders_cradle": "Thunder's Cradle",
       "heart_breath_drawn_lightning": "Drawn Lightning",
+      "heart_breath_cradle_channel": "Thunder's Cradle",
+      "heart_breath_gale_bulwark": "Gale Bulwark",
+      "heart_breath_mending_gale": "Mending Gale",
       "heart_quench_blades_wake": "The Blades Wake",
       "heart_quench_blades_hunt": "The Blades Hunt",
       "heart_heat_fist": "Basalt Fist",
@@ -26920,6 +26878,12 @@ export const de_DE: EnTranslations = {
       "heart_breath_caller": {
         "name": "Breath Vein Caller"
       },
+      "heart_gale_sentinel": {
+        "name": "Gale Sentinel"
+      },
+      "heart_gale_mender": {
+        "name": "Gale Mender"
+      },
       "heart_quench_warder": {
         "name": "Quench Vein Warder"
       },
@@ -26934,9 +26898,6 @@ export const de_DE: EnTranslations = {
       },
       "heart_hammer_guardian": {
         "name": "Guardian of the Hammer"
-      },
-      "heart_slabwright": {
-        "name": "The Slabwright"
       },
       "heart_seam_singer": {
         "name": "The Seam Singer"
@@ -26964,9 +26925,6 @@ export const de_DE: EnTranslations = {
       },
       "heart_heat_rolling_cinder": {
         "name": "Rolling Cinder"
-      },
-      "heart_stone_prison": {
-        "name": "Stone Prison"
       },
       "heart_final_splinter_heat": {
         "name": "Splinter of the Heat"

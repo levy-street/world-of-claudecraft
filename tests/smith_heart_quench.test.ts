@@ -91,7 +91,8 @@ describe('Guardian of the Quench: the shore ice', () => {
     expect(insideRimewall(198, -40)).toBe(false);
     f.dev('/dev heart quench pull');
     const pull = f.tick(2);
-    expect(warnKeys(pull)).toContain('hudChrome.quenchGuardian.warn.rim');
+    // No banner (the owner's rule): the yell carries the moment.
+    expect(warnKeys(pull).filter((k) => k.includes('.warn.'))).toEqual([]);
     expect(warnKeys(pull)).toContain('hudChrome.quenchGuardian.say.pull');
     const rising = f.objects(QUENCH_OBJECTS.rimRise);
     expect(rising.length).toBe(QUENCH_RIMEWALL.segments);
@@ -118,7 +119,7 @@ describe('Guardian of the Quench: the shore ice', () => {
 });
 
 describe('Guardian of the Quench: frostbite', () => {
-  it('rises alone (full in about 30 s) and falls with two or more others close; one is not enough', () => {
+  it('rises alone (full in about 24 s) and falls with two or more others close; one is not enough', () => {
     const f = pulled(6);
     const [, , a, b, c] = f.players;
     // Far apart, out of the guardian's reach.
@@ -150,7 +151,7 @@ describe('Guardian of the Quench: frostbite', () => {
     expect(coldStep(1)).toBeCloseTo(T.coldRise);
   });
 
-  it('at full the player freezes solid; 4 s on the ice shatters: the hit, the splash, Frost-Brittle, the bar reset', () => {
+  it('at full the player freezes solid (double damage taken); 6 s on the ice shatters: the hit, the splash, Frost-Brittle, the bar reset', () => {
     const f = pulled(6);
     const [, , a, near, far] = f.players;
     f.put(a, 182, 14);
@@ -163,10 +164,14 @@ describe('Guardian of the Quench: frostbite', () => {
     expect(aura(a, QUENCH_AURAS.frozen)?.kind).toBe('stun');
     expect(aura(a, QUENCH_AURAS.frozen)?.unbreakableControl).toBe(true);
     expect(coldOf(f, a)).toBe(0);
-    expect(warnKeys(ev0)).toContain('hudChrome.quenchGuardian.warn.frozen');
+    expect(warnKeys(ev0)).toEqual([]);
+    // Encased: double damage taken for the whole freeze.
+    expect(aura(a, QUENCH_AURAS.brittle)?.value).toBeCloseTo(T.frozenPct);
+    expect(aura(a, QUENCH_AURAS.frozen)?.duration).toBe(T.freezeSeconds);
     // Frozen: no cold while encased.
-    f.tick(ticks(2));
+    f.tick(ticks(T.freezeSeconds - 2));
     expect(coldOf(f, a)).toBe(0);
+    expect(has(a, QUENCH_AURAS.frozen)).toBe(true);
     const near0 = coldOf(f, near);
     const far0 = coldOf(f, far);
     const ev = until(f, () => !has(a, QUENCH_AURAS.frozen), 3);
@@ -200,11 +205,13 @@ describe('Guardian of the Quench: frostbite', () => {
     f.tick(1);
     setCold(f, b, 60);
     f.dev('/dev heart quench burst', a.id);
-    until(f, () => has(b, QUENCH_AURAS.frozen), 6);
+    until(f, () => has(b, QUENCH_AURAS.frozen), T.freezeSeconds + 1);
     expect(has(b, QUENCH_AURAS.frozen)).toBe(true);
-    // b's own shatter reaches c in turn (its cold jumps).
+    // b's own shatter reaches c in turn (its cold jumps; c starts the
+    // wait empty so its lone rise cannot freeze it first).
+    setCold(f, c, 0);
     const c0 = coldOf(f, c);
-    until(f, () => !has(b, QUENCH_AURAS.frozen), 6);
+    until(f, () => !has(b, QUENCH_AURAS.frozen), T.freezeSeconds + 1);
     expect(coldOf(f, c) - c0).toBeGreaterThan(R.splashCold - 2);
     expect(has(d, QUENCH_AURAS.frozen)).toBe(false);
   });
@@ -226,7 +233,7 @@ describe('Guardian of the Quench: the ice gives way', () => {
     const crack = f.objects(QUENCH_OBJECTS.crackPrefix)[0];
     expect(crackOf(crack.templateId)).toBe(T.crackWarn);
     expect(crack.scale).toBe(T.holeR);
-    expect(warnKeys(ev)).toContain('hudChrome.quenchGuardian.warn.crack');
+    expect(warnKeys(ev).filter((k) => k.includes('.warn.'))).toEqual([]);
     f.tick(ticks(T.crackWarn) - 2);
     expect(f.objects(QUENCH_OBJECTS.hole)).toEqual([]);
     f.tick(3);

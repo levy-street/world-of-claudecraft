@@ -22477,7 +22477,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.heart_heat_seedflame.name': '씨불',
   'entities.mobs.heart_heat_rolling_cinder.name': '구르는 잉걸불',
   'abilityUi.cast.heart_mountains_wrath': '산의 분노',
-  'abilityUi.cast.heart_bellows_gust': '풀무 돌풍',
+  'abilityUi.cast.heart_bellows_gust': '정상의 포효',
   'abilityUi.cast.heart_storm_lance': '폭풍 창',
   'abilityUi.cast.heart_quenching_breath': '담금질의 숨결',
   'hudChrome.auraEffect.heatGuardian.statePhase1':
@@ -22509,6 +22509,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.heatGuardian.warn.seeds': '화로 씨앗이 떨어진다! 한데 모아 떨어뜨리고 달려라!',
   'hudChrome.heatGuardian.warn.zones': '깨어나는 불! 화로가 띠마다 타오른다: 밖으로 나가라!',
   'hudChrome.heatGuardian.warn.cinder': '구르는 잉걸불이 떨어진다! 먹잇감에 닿기 전에 쳐내라!',
+  'hudChrome.heatGuardian.warn.wheel': '화로가 돈다! 어두운 조각으로 가라!',
   'hudChrome.heatGuardian.say.fist': '돌이 떨어지는 곳에 서라. 그리고 그 일부가 되어라.',
   'hudChrome.heatGuardian.say.sink': '샘이 너희를 맞으러 솟아오른다!',
   'hudChrome.heatGuardian.say.sinkAgain': '다시 화로가 넘친다. 다시 너희는 타오른다.',
@@ -22522,39 +22523,18 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.heart_forge_pour': '화로 붓기',
   'abilityUi.cast.heart_ember_bolt': '잔불 화살',
   // The Smith's Heart's Hammer Council (M16 fills).
-  'entities.mobs.heart_slabwright.name': '석판장이',
   'entities.mobs.heart_seam_singer.name': '광맥의 노래꾼',
   'abilityUi.cast.heart_hammers_weight': '망치의 무게',
   'abilityUi.cast.heart_wake_the_stone': '돌 깨우기',
   'abilityUi.cast.heart_falling_rock': '낙석',
   'abilityUi.cast.heart_seam_bolt': '광맥 화살',
   'abilityUi.cast.heart_song_of_the_seam': '광맥의 노래',
-  'abilityUi.cast.heart_song_of_the_seam_unbroken': '광맥의 노래',
-  'hudChrome.council.warn.wrath': '산의 분노! 기둥 뒤에 숨으세요!',
-  'hudChrome.council.warn.enrage': '산의 분노가 빨라집니다! 이제 산의 분노가 훨씬 빨리 옵니다.',
-  'hudChrome.council.warn.weight': '{player}에게 망치의 무게: 탱커 교대!',
-  'hudChrome.council.warn.wake':
-    '돌 깨우기: {players} 아래에서 기둥이 솟아오릅니다! 엄폐물이 필요한 곳에 서세요.',
-  'hudChrome.council.warn.wakeHeir': '{players} 아래에서 돌이 깨어납니다: 움직이세요!',
-  'hudChrome.council.warn.rock': '{player}에게 낙석! 엄폐물에서 떨어져 함께 나눠 맞으세요!',
-  'hudChrome.council.warn.song': '광맥의 노래! 차단하세요!',
-  'hudChrome.council.warn.resonance':
-    '{players}에게 공명: 가장 손상된 기둥을 깨고, 멀쩡한 기둥에서는 떨어지세요!',
-  'hudChrome.council.warn.fell_guardian':
-    '망치의 수호자가 쓰러졌습니다. 그 분노가 남은 돌에게 넘어갑니다!',
-  'hudChrome.council.warn.fell_slabwright':
-    '석판장이가 쓰러졌습니다. 이제 돌이 제멋대로 솟아오릅니다!',
-  'hudChrome.council.warn.fell_singer':
-    '광맥의 노래꾼이 쓰러졌습니다. 그 노래가 이어지며, 이제 아무도 막을 수 없습니다!',
   'hudChrome.council.alert.wakeTitle': '돌 깨우기!',
   'hudChrome.council.alert.wakeLine':
-    '서 있는 곳에서 기둥이 솟아오릅니다: 공격대에 필요한 곳에 엄폐물을 만드세요',
+    '서 있는 곳에 기둥이 솟아오릅니다: 공격대에 엄폐물이 필요한 곳으로 이동하세요',
   'hudChrome.council.alert.rockTitle': '낙석!',
   'hudChrome.council.alert.rockLine': '기둥에서 떨어져 최소 세 명의 아군을 모으세요',
   'hudChrome.council.alert.resonanceTitle': '공명',
-  'hudChrome.council.alert.resonanceLine':
-    '기둥 근처에 있으면 기둥을 깹니다: 가장 손상된 기둥 옆에서 기다리세요',
-  'hudChrome.council.alert.resonanceCracking': '기둥을 깨는 중: 지키려면 멀어지세요',
   'hudChrome.council.alert.weightTitle': '망치의 무게',
   'hudChrome.council.alert.weightLine':
     '받는 물리 피해가 두 배가 됩니다: 다른 탱커가 수호자를 맡아야 합니다',
@@ -22563,31 +22543,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '효과가 끝나면 서 있는 자리의 바닥에서 기둥이 솟구쳐 {radius}야드 안의 모두에게 {min}에서 {max}의 피해를 주고 밀쳐냅니다. 공격대에 엄폐물이 필요한 곳에 서세요. 영웅·신화: 피해 {heroic}% 증가.',
   'hudChrome.auraEffect.council.rockMark':
     '효과가 끝나면 바위가 떨어집니다: {total}의 피해를 {radius}야드 안의 모두가 나눠 받습니다. {soakers}명 미만이면 각자 {penalty}% 더 받고 공격대 전체가 {tremorMin}에서 {tremorMax}의 피해를 받습니다. {radius}야드 안의 모든 기둥이 한 조각씩 깨지니 엄폐물에서 떨어져 나눠 맞으세요. 신화: {soulReach}야드 안의 영혼의 기둥은 대신 영혼 표식을 하나 잃고, 표식이 없어지면 부서집니다. 영웅·신화: 피해 {heroic}% 증가.',
-  'hudChrome.auraEffect.council.resonance':
-    '기둥에서 {reach}야드 안에 {seconds}초 동안 계속 서 있으면 기둥이 한 조각 깨지고, 머무는 동안 {seconds}초마다 다시 깨집니다. 제거할 수 없습니다: 가장 손상된 기둥 옆에서 산의 분노를 버티고 멀쩡한 기둥에서는 떨어지세요. 신화: 영혼의 기둥 옆에서 같은 시간을 버티면 대신 영혼 표식이 하나 사라지고(광맥의 노래꾼의 기둥은 {singerSeconds}초), 표식이 없어지면 부서집니다.',
   'hudChrome.auraEffect.council.memory':
     '주는 피해가 {pct}% 증가합니다: 쓰러진 망치 의회 구성원 1명당 {per}%.',
   // The Hammer Council's mythic, Soul in the Stone (M16 fills).
   'abilityUi.cast.heart_echo_of_wrath': '분노의 메아리',
   'abilityUi.cast.heart_endless_song': '끝없는 노래',
-  'hudChrome.council.warn.soul_guardian':
-    '수호자의 영혼이 돌에 깃들었습니다! 그 기둥에서 분노의 메아리가 터져 나옵니다.',
-  'hudChrome.council.warn.soul_slabwright':
-    '석판장이의 영혼이 돌에 깃들었습니다! 걷는 석판이 여러분을 향해 끌려옵니다.',
-  'hudChrome.council.warn.soul_singer':
-    '광맥의 노래꾼의 영혼이 돌에 깃들었습니다! 끝없는 노래가 울릴 때마다 커집니다.',
-  'hudChrome.council.warn.echo': '분노의 메아리! 영혼의 기둥과 자신 사이에 다른 기둥을 두세요!',
-  'hudChrome.council.warn.soulBreak_guardian':
-    '수호자의 영혼의 기둥이 부서졌습니다! 메아리가 잠잠해집니다.',
-  'hudChrome.council.warn.soulBreak_slabwright':
-    '석판장이의 영혼의 기둥이 부서졌습니다! 걷는 석판이 멈춥니다.',
-  'hudChrome.council.warn.soulBreak_singer':
-    '광맥의 노래꾼의 영혼의 기둥이 부서졌습니다! 끝없는 노래가 그칩니다.',
   'hudChrome.council.alert.rockLineSoul':
     '엄폐물에서 떨어져 영혼의 기둥 옆에 아군을 3명 이상 모으세요',
-  'hudChrome.council.alert.resonanceLineSoul':
-    '영혼의 기둥 옆에서 기다려 영혼 표식을 깨세요. 멀쩡한 기둥 옆에는 가지 마세요',
-  'hudChrome.council.alert.resonanceBreaking': '영혼 표식을 깨는 중: 영혼의 기둥 옆에 머무세요',
   'hudChrome.council.say.guardian_pull':
     '채석장에 낯선 자들이라. 망치의 힘은 살덩이에 굴하지 않는다.',
   'hudChrome.council.say.guardian_wrath': '산이 내게 응답한다! 돌이 받아 준다면 숨어 보아라!',
@@ -22596,15 +22558,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.council.say.guardian_soul': '이제 나는 돌이다. 나의 분노에는 쓰러질 몸이 없다.',
   'hudChrome.council.say.guardian_wipe': '먼지로다. 모든 살덩이가 그러하듯.',
   'hudChrome.council.say.guardian_defeat': '망치의 힘은... 이제 너희가 짊어져라.',
-  'hudChrome.council.say.slabwright_pull':
-    '벽에 쓸 돌이 더 필요하지. 가만히 있어라, 너희를 쌓아 넣어 주마.',
-  'hudChrome.council.say.slabwright_wake': '거기 서라. 네가 선 자리에서 돌이 솟는다!',
-  'hudChrome.council.say.slabwright_rock': '위를 봐라, 꼬맹이들! 산이 무너진다!',
-  'hudChrome.council.say.slabwright_death': '석판이... 갈라진다...',
-  'hudChrome.council.say.slabwright_remember': '돌은 기억한다. 일은 내가 마무리하마.',
-  'hudChrome.council.say.slabwright_soul': '손은 남지 않았지만, 이 돌을 너희에게 끌고 가겠다.',
-  'hudChrome.council.say.slabwright_wipe': '쌓고, 묻었다. 잘된 일이다.',
-  'hudChrome.council.say.slabwright_defeat': '채석장이... 조용해진다.',
   'hudChrome.council.say.singer_pull':
     '광맥의 노래가 들리나요? 너무 오래 당신들의 목소리를 기다렸어요.',
   'hudChrome.council.say.singer_song': '나와 함께 노래하고, 부서지세요!',
@@ -22613,21 +22566,30 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.council.say.singer_soul': '들어 봐요. 돌 속에서 나의 노래는 끝나지 않아요.',
   'hudChrome.council.say.singer_wipe': '쉿. 광맥이 잠잠해졌어요.',
   'hudChrome.council.say.singer_defeat': '마지막 음이... 사라져요.',
+  // The Hammer Council's rework: Mountain's Rush, the Cursed Pillar, Bond of
+  // the Stone, Quarry Collapse and Resonance (M16 fills).
+  'abilityUi.cast.heart_mountains_rush': '산의 돌진',
+  'hudChrome.auraEffect.council.resonance':
+    '{every}초마다 울려 퍼져 자신의 {radius}야드 안에 있는 모든 아군에게 {min}에서 {max}의 자연 피해를 줍니다. 효과가 끝날 때까지 모두에게서 떨어지세요. 영웅·신화: 피해 {heroic}% 증가.',
+  'hudChrome.auraEffect.council.rushMark':
+    '효과가 끝나면 망치의 수호자가 {windup}초 동안 자세를 잡은 뒤, 당신이 서 있던 곳을 지나 채석장 가장자리까지 일직선으로 돌진하며, 길을 막는 기둥이 있으면 첫 번째 기둥에서 멈춥니다. 저주받은 기둥으로 유인하세요: 기둥이 부서지고 수호자가 {stun}초 동안 기절하며 {exposedSeconds}초 동안 받는 피해가 {exposed}% 증가합니다. 경로에 엄폐용 기둥이 있으면 대신 그 기둥이 파괴됩니다. 멈추기 전까지 돌진에 부딪힌 모두가 {min}에서 {max}의 피해를 받고 밀려나며, 아직 경로 위에 있다면 당신도 마찬가지입니다. 신화: 기둥에 부딪히지 않은 돌진은 저주받은 기둥이 부서질 때까지 채석장 붕괴를 일으킵니다.',
+  'hudChrome.auraEffect.council.rushExposed':
+    '받는 피해가 {pct}% 증가합니다: 산의 돌진이 저주받은 기둥을 부쉈습니다.',
+  'hudChrome.auraEffect.council.bond':
+    '망치 의회의 다른 구성원이 {reach}야드 안에 있는 동안 받는 피해가 {pct}% 감소합니다. {every}초마다 돌의 결속이 공격대 전체에 {min}에서 {max}의 피해를 주며, 매번 {growth}%씩 증가합니다. 둘을 떼어 놓으세요.',
+  'hudChrome.auraEffect.council.collapse':
+    '채석장이 무너지고 있습니다: {every}초마다 중첩 하나당 {min}에서 {max}의 피해를 받으며, 매번 중첩이 하나씩 쌓입니다. 저주받은 기둥이 부서지면 끝납니다.',
+  'hudChrome.auraEffect.council.pillarLimit':
+    '기둥 하나는 산의 분노로부터 최대 {limit}명만 지켜 줍니다. 그보다 많이 숨으면 모두가 폭발의 {share}%를 받습니다.',
+  'hudChrome.council.alert.resonanceLine':
+    '주변의 모든 아군에게 피해를 줍니다: 효과가 끝날 때까지 무리에서 떨어지세요',
+  'hudChrome.council.alert.rushTitle': '산의 돌진!',
+  'hudChrome.council.alert.rushLine':
+    '수호자가 당신에게 돌진합니다: 저주받은 기둥을 당신과 수호자 사이에 두세요',
+  'hudChrome.council.say.guardian_rush': '그렇다면 내 길을 막아 보아라. 산은 비켜 가지 않는다.',
+  'hudChrome.council.say.singer_wake': '깨어나라, 잠든 돌이여. 그들이 선 곳에서 솟아올라라!',
+  'hudChrome.council.say.singer_rock': '위를 봐요, 꼬마들! 산이 무너지고 있어요!',
   // The Smith's Heart's Guardian of the Breath and Captain Thessaly (M16 fills).
-  'hudChrome.breathGuardian.warn.inhale':
-    '수호자가 숨을 들이쉽니다! 입 앞의 소용돌이에 들어가지 마세요!',
-  'hudChrome.breathGuardian.warn.gust': '풀무 돌풍! 충격에 대비하세요!',
-  'hudChrome.breathGuardian.warn.gales': '떠도는 돌풍이 벼랑을 휩씁니다! 가까이 가지 마세요!',
-  'hudChrome.breathGuardian.warn.circle':
-    '테살리 대장이 고요의 원을 펼쳤습니다! {seats}명까지 설 수 있습니다.',
-  'hudChrome.breathGuardian.warn.fell': '{player} 님이 공허로 휩쓸려 갔습니다!',
-  'hudChrome.breathGuardian.warn.storm': '폭풍이 터집니다! 벼랑 곳곳에 번개가 떨어집니다!',
-  'hudChrome.breathGuardian.warn.fork': '{player} 님에게 튀어 오르는 번개! 산개하세요!',
-  'hudChrome.breathGuardian.warn.cradle':
-    '{player} 님이 폭풍 속으로 들어 올려졌습니다! 그 아래로 모이세요!',
-  'hudChrome.breathGuardian.warn.drawn':
-    '{player} 님에게 끌려오는 번개! 낙뢰를 가장자리로 유도하세요!',
-  'hudChrome.breathGuardian.warn.stormGust': '폭풍 돌풍이 모입니다! 바람에 대비하세요!',
   'hudChrome.breathGuardian.say.guardian_pull':
     '산의 꼭대기까지 올라와 그 숨결을 훔치려는가? 그렇다면 나와 함께 숨 쉬어라.',
   'hudChrome.breathGuardian.say.guardian_blow':
@@ -22639,7 +22601,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.breathGuardian.say.guardian_wipe': '날려 갔구나. 산꼭대기의 먼지처럼.',
   'hudChrome.breathGuardian.say.guardian_death': '숨결은... 산으로... 돌아간다...',
   'hudChrome.breathGuardian.say.thessaly_pull':
-    '하이워치가 함께합니다! 벽의 틈을 조심하세요. 바람에 밀려 떨어집니다!',
+    '하이워치가 함께한다! 여기엔 벽이 없어, 바람이 너희를 가장자리 밖으로 날려 버릴 거야!',
   'hudChrome.breathGuardian.say.thessaly_circle_a':
     '어서 제 고요 속으로! 셋까지만, 그 이상은 안 됩니다!',
   'hudChrome.breathGuardian.say.thessaly_circle_b': '여기요! 제 곁에 서서 바람을 함께 받아 냅시다!',
@@ -22652,10 +22614,16 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.breathGuardian.say.thessaly_victory':
     '숨결이 풀려났습니다. 하이워치는 이 등반을 기억할 겁니다.',
   'hudChrome.breathGuardian.say.thessaly_wipe': '물러나서 숨을 고르세요. 다시 갑니다.',
+  'hudChrome.breathGuardian.say.guardian_isles':
+    '바람이여, 나를 둘러싸라! 섬들이 내 숨결을 지켜 주리라.',
+  'hudChrome.breathGuardian.say.guardian_bulwark':
+    '내 방패가... 찢어졌다. 그렇다면 다시 질풍을 맛보아라!',
+  'hudChrome.breathGuardian.say.thessaly_isles':
+    '저 방패는 섬들에서 힘을 얻고 있어! 바람을 타고 건너가 치유사들을 쓰러뜨리고 돌아와!',
   'hudChrome.auraEffect.breathGuardian.wind':
-    '숨결의 수호자의 바람이 부는 방향으로 초당 {speed}야드씩 당신을 실어 갑니다. 바람을 거슬러 걸으면 버틸 수 있으며, 시전은 끊기지 않습니다. 가장자리 벽에 밀려 붙으면 매초 {pinMin}~{pinMax}의 피해를 입습니다. 벽이 무너진 곳에서는 막아 줄 것이 없어 공허로 떨어집니다.',
+    '숨결의 수호자의 바람이 부는 방향으로 초당 {speed}야드씩 당신을 실어 갑니다. 바람을 거슬러 걸으면 버틸 수 있으며, 시전은 끊기지 않습니다. 벼랑 둘레에는 벽이 없습니다: 가장자리 밖으로 실려 가면 공허로 떨어집니다. 오르막 꼭대기에만 벽이 남아 있으며, 그곳에 밀려 붙으면 매초 {pinMin}~{pinMax}의 피해를 입습니다.',
   'hudChrome.auraEffect.breathGuardian.draw':
-    '수호자가 숨을 들이쉬며 초당 {speed}야드씩 당신을 끌어당깁니다. 입 앞의 소용돌이는 그 안에 선 이에게 {tick}초마다 {min}~{max}의 피해를 줍니다. 이어서 풀무 돌풍이 벼랑 위의 모두에게 {gustMin}~{gustMax}의 피해를 주고 {throw}야드 바깥으로 날려 보냅니다.',
+    '수호자가 숨을 들이쉬며 초당 {speed}야드씩 당신을 끌어당깁니다. 입 앞의 소용돌이는 그 안에 선 자에게 {tick}초마다 {min}~{max}의 피해를 줍니다. 이어서 정상의 포효가 벼랑 위의 모두에게 {gustMin}~{gustMax}의 피해를 주고 수호자에게서 {throw}야드(영웅 난이도는 {heroicThrow}야드) 날려 보냅니다: 수호자가 가장자리 가까이 있으면 공격대가 벼랑 밖으로 날아갑니다.',
   'hudChrome.auraEffect.breathGuardian.pinned':
     '바람에 밀려 가장자리 벽에 붙어 있습니다: 바람이 잦아들거나 벽에서 벗어날 때까지 매초 {min}~{max}의 피해.',
   'hudChrome.auraEffect.breathGuardian.anchor':
@@ -22665,11 +22633,31 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.breathGuardian.drawn':
     '{every}초마다 당신이 선 곳에 번개가 떨어집니다: {warn}초 뒤 {radius}야드 안의 모두에게 {min}~{max}의 피해를 주고, {charged}초 동안 매초 {cmin}~{cmax}의 피해를 주는 대전된 땅을 남깁니다. 계속 움직이며 낙뢰를 공격대에서 먼 가장자리로 유도하세요.',
   'hudChrome.auraEffect.breathGuardian.cradled':
-    '폭풍 속으로 들어 올려져 {hold}초 동안 붙잡힙니다. 이후 방전이 {total}의 피해를 주며, 당신과 아래 {radius}야드 안의 모두가 나눠 받습니다. 나눠 받는 인원이 {soakers}명 미만이면(영웅 난이도는 {heroicSoakers}명) 각자 {penalty}% 더 받고 벼랑 위의 모두가 {bmin}~{bmax}의 피해를 받습니다.',
+    '폭풍 속으로 들어 올려져, 수호자가 요람을 유지하는 {hold}초 동안 붙잡힙니다. 그동안 수호자는 다른 것을 시전하지 않습니다. 이후 방전이 {total}의 피해를 주며, 당신과 아래 {radius}야드 안의 모두가 나눠 받습니다. 나눠 받는 인원이 {soakers}명 미만이면 각자 {penalty}% 더 받고 벼랑 위의 모두가 {bmin}~{bmax}의 피해를 받습니다. 영웅: {heroicCount}명이 한꺼번에 들어 올려지며, 각 방전은 {heroicTotal}이고 {heroicSoakers}명이 필요하니 공격대가 나뉘어 받아야 합니다.',
   'hudChrome.auraEffect.breathGuardian.stormForm':
     '찢어져 번개의 몸이 되었습니다: 숨결의 수호자가 쓰러질 때까지 이어지는 전투의 폭풍 후반부.',
   'hudChrome.auraEffect.breathGuardian.swell':
     '{every}초마다 부풀어 오르는 폭풍이 벼랑 위의 모두에게 {min}~{max}의 피해를 주며, 앞선 맥동마다 {growth}%씩 강해집니다: 지금까지 {stacks}번.',
+  'hudChrome.auraEffect.breathGuardian.bulwark':
+    '바람의 방패가 피해를 {left} 더 흡수합니다. 떠 있는 섬의 질풍 파수병이나 질풍 치유사가 하나라도 살아 있으면 매초 전체의 {regrow}%가 다시 차오르고, 치유의 질풍마다 {mend}%가 회복됩니다. 질풍의 길을 타고 섬으로 건너가 그들을 쓰러뜨리세요. {max}초 동안 유지되면 벼랑 위에서 터져 {bmin}~{bmax}의 피해를 줍니다.',
+  'hudChrome.auraEffect.breathGuardian.riding':
+    '바람이 정해진 길을 따라 공허 위로 당신을 실어 갑니다: 내려놓을 때까지 행동할 수 없습니다.',
+  'hudChrome.auraEffect.breathGuardian.windworn':
+    '바람에 지쳤습니다: 이 효과가 끝날 때까지 질풍의 길이 당신을 섬으로 데려가지 않습니다.',
+  'hudChrome.auraEffect.breathGuardian.thrown':
+    '정상의 포효에 날아갔습니다: 착지할 때까지 움직일 수 없습니다.',
+  'hudChrome.auraEffect.breathGuardian.tossed':
+    '떠도는 돌풍에 날아갔습니다: 돌풍이 내려놓을 때까지 움직일 수 없습니다.',
+  'hudChrome.auraEffect.breathGuardian.portalA':
+    '효과가 끝나면 당신이 선 자리에 포털 A가 열립니다. 얽힌 질풍 가까이에 서세요. 이번 라운드에는 그것을 나를 수 없습니다.',
+  'hudChrome.auraEffect.breathGuardian.portalB':
+    '효과가 끝나면 당신이 선 자리에 포털 B가 열립니다. 벼랑 가장자리에 서세요. 이번 라운드에는 얽힌 질풍을 나를 수 없습니다.',
+  'hudChrome.auraEffect.breathGuardian.portalC':
+    '효과가 끝나면 당신이 선 자리에 포털 C가 열립니다. 포털 D와만 이어집니다. 다른 얽힌 질풍 가까이에 서세요. 이번 라운드에는 그것을 나를 수 없습니다.',
+  'hudChrome.auraEffect.breathGuardian.portalD':
+    '효과가 끝나면 당신이 선 자리에 포털 D가 열립니다. 포털 C와만 이어집니다. 포털 B에서 떨어진 벼랑 가장자리에 서세요. 이번 라운드에는 얽힌 질풍을 나를 수 없습니다.',
+  'hudChrome.auraEffect.breathGuardian.laden':
+    '얽힌 질풍을 나르고 있습니다: 이동 속도가 {walk}%가 되고, 점멸·돌진·도약을 할 수 없으며, 바람도 끌어당김도 폭발도 날려 보내기도 당신을 움직일 수 없습니다. 각 포털은 짝 포털로 데려갑니다: A에서 B, C에서 D. 벼랑 가장자리에서 상호작용을 누르면 공허로 던집니다. 이 효과가 끝나면 터져 벼랑 위의 모두가 죽습니다.',
   'abilityUi.cast.heart_breath_inhale': '들이쉬는 숨',
   'abilityUi.cast.heart_breath_storm_break': '폭풍 붕괴',
   'abilityUi.cast.heart_breath_forking_bolt': '튀어 오르는 번개',
@@ -22680,22 +22668,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.heart_captain_thessaly.greeting':
     '발을 단단히 딛으세요, {className}. 풀무가 숨을 쉬면 제 고요 속으로 들어와 바람이 우리에게 부딪혀 흩어지게 하세요.',
   // The Smith's Heart's Guardian of the Quench (M16 fills).
-  'hudChrome.quenchGuardian.warn.rim': '기슭의 얼음이 솟아오릅니다! 호수 위로 올라가세요!',
-  'hudChrome.quenchGuardian.warn.frozen':
-    '{player}님이 꽁꽁 얼어붙었습니다! 얼음이 깨지기 전에 물러나세요!',
-  'hudChrome.quenchGuardian.warn.crack': '뭉친 무리 아래에서 얼음이 삐걱입니다! 흩어지세요!',
-  'hudChrome.quenchGuardian.warn.marks':
-    '칼날들이 {list}을(를) 표적으로 삼습니다! 공격대에서 멀리 유인하세요!',
   'hudChrome.auraEffect.quenchGuardian.marked':
     '{count}명 중 {order}번째입니다. 칼날이 당신을 지나는 선을 따라 날아옵니다. 선을 공격대에서 멀리 유도하세요. 선은 칼날이 날아가기 {lock}초 전에 고정되니 그때 비켜서세요. 그렇지 않으면 {min}~{max}의 냉기 피해와 냉기 {cold}를 받습니다.',
   'hudChrome.quenchAlert.markedTitle': '칼날이 당신을 노립니다! ({count}명 중 {order}번째)',
   'hudChrome.quenchAlert.markedLine': '선을 공격대에서 멀리 유도하고, 고정되면 비켜서세요.',
   'abilityUi.cast.heart_quench_blades_hunt': '칼날의 사냥',
-  'hudChrome.quenchGuardian.warn.flurry': '모든 칼날이 한꺼번에 사냥에 나섭니다! 선을 피하세요!',
   'hudChrome.quenchGuardian.say.flurry':
     '모든 칼날아! 모든 날이여! 내 호수 위에 서 있는 것을 남기지 마라!',
-  'hudChrome.quenchGuardian.warn.wake':
-    '대장장이의 칼날들이 호수에서 뜯겨 나옵니다! 어디를 겨누는지 살피세요!',
   'hudChrome.quenchGuardian.say.pull': '내 호수에 따뜻한 피라. 그 온기도 오래가지 않으리라.',
   'hudChrome.quenchGuardian.say.shatter': '속까지 얼었구나. 이제 부서져라.',
   'hudChrome.quenchGuardian.say.hole': '얼음은 모든 발걸음을 기억한다. 함께 서면, 꺼진다.',
@@ -22706,12 +22685,17 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.quenchGuardian.say.wipe': '고요하다. 잠잠하다. 담금질되었다.',
   'hudChrome.quenchGuardian.say.death': '냉기가... 물러난다... 담금질은 너희의 것이다.',
   'hudChrome.auraEffect.quenchGuardian.cold':
-    '당신의 냉기: {max} 중 {cold}. 혼자 있으면 약 {fill}초 만에 가득 찹니다. {radius}미터 안에 다른 플레이어가 {others}명 이상 있으면 대신 매초 {fall}씩 내려갑니다. {max}에 이르면 {freeze}초 동안 서리에 갇히고, 그 뒤 얼음이 부서집니다.',
+    '당신의 냉기: {max} 중 {cold}. 혼자 있으면 약 {fill}초 만에 가득 찹니다. {radius}미터 안에 다른 플레이어가 {others}명 이상 있으면 대신 매초 {fall}씩 내려갑니다. 차가운 관 같은 무적 효과로는 막을 수 없습니다: 효과가 지속되는 동안에는 온기를 주지도 받지도 못합니다. {max}에 이르면 {freeze}초 동안 서리에 갇히고, 그 뒤 얼음이 부서집니다.',
   'hudChrome.auraEffect.quenchGuardian.warmth':
     '공격대와 함께 모여 있음: 냉기가 매초 {fall}씩 내려갑니다. 한 자리에 {linger}초 동안 머문 무리 아래의 얼음은 갈라져 얼어붙은 물웅덩이가 되니 계속 움직이세요.',
   'hudChrome.auraEffect.quenchGuardian.frozen':
-    '서리에 갇힘: 행동할 수 없습니다. 효과가 끝나면 얼음이 부서져 {min}~{max}의 냉기 피해를 입고 서리 취약 상태가 되며, {radius}미터 안의 모두가 냉기 {cold}을 얻습니다(영웅 난이도에서는 {heroicRadius}미터, 냉기 {heroicCold}).',
-  'hudChrome.auraEffect.quenchGuardian.brittle': '모든 공격으로부터 받는 피해가 {pct}% 증가합니다.',
+    '서리에 갇힘: 행동할 수 없고 모든 공격으로부터 받는 피해가 {pct}% 증가하며, 서리가 차가운 관 같은 무적 효과를 깨뜨립니다. 효과가 끝나면 얼음이 부서져 {min}~{max}의 냉기 피해를 입고, 이후 {seconds}초 동안 받는 피해가 {brittle}% 증가하며, {radius}미터 안의 모두가 냉기 {cold}을 얻습니다(영웅 난이도에서는 {heroicRadius}미터, 냉기 {heroicCold}).',
+  'hudChrome.auraEffect.quenchGuardian.brittle':
+    '모든 공격으로부터 받는 피해가 {pct}% 증가합니다. 이 효과가 지속되는 동안에는 아군의 얼음 파편이 당신의 냉기를 {cap} 넘게 올리지 못합니다.',
+  'hudChrome.auraEffect.quenchGuardian.splashed':
+    '아군의 부서진 얼음이 튀었습니다: 냉기 +{cold}. 자신의 게이지가 가득 차기 전에 무리로 돌아가세요.',
+  'hudChrome.quenchAlert.splashTitle': '서리 파편! 냉기 +{cold}',
+  'hudChrome.quenchAlert.immuneLine': '무적 효과로도 냉기는 막을 수 없습니다: 모이세요',
   'hudChrome.auraEffect.quenchGuardian.trapped':
     '얼음을 뚫고 얼어붙은 물에 빠졌습니다: 움직일 수 없고, 매초 {min}~{max}의 냉기 피해를 입으며 냉기가 올라갑니다. {seconds}초 뒤 가장자리로 기어 올라옵니다. 물만으로는 절대 죽지 않습니다.',
   'hudChrome.auraEffect.quenchGuardian.awake':
@@ -25862,6 +25846,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.heart_final_shearing_blow': '베어 가르는 일격',
   'abilityUi.cast.heart_final_gale_pounce': '돌풍 덮치기',
   'abilityUi.cast.heart_final_rime_toll': '서리 종소리',
+  'abilityUi.cast.heart_breath_cradle_channel': '천둥의 요람',
+  'abilityUi.cast.heart_breath_gale_bulwark': '질풍의 방벽',
+  'abilityUi.cast.heart_breath_mending_gale': '치유의 질풍',
   'entities.mobs.heart_final_splinter_heat.name': '열기의 파편',
   'entities.mobs.heart_final_splinter_quench.name': '담금질의 파편',
   'entities.mobs.heart_final_splinter_breath.name': '숨결의 파편',
@@ -26137,4 +26124,24 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'seasonal.thatchgrin.wakeYell': '밭에 밤이 내린다! 누가 내 밭을 걷느냐?',
   'seasonal.thatchgrin.sleepYell': '해가 떴군. 기둥으로 돌아가 다시 지켜봐야지.',
   'seasonal.pumpkins.progress': '{label}: {current}/{total}',
+  'entities.mobs.heart_gale_sentinel.name': '질풍 파수병',
+  'entities.mobs.heart_gale_mender.name': '질풍 치유사',
+  'hudChrome.knotAlert.aTitle': '당신은 포털 A!',
+  'hudChrome.knotAlert.aLine': '{seconds}초 뒤 발밑에 열립니다. 얽힌 질풍 가까이에 서세요.',
+  'hudChrome.knotAlert.bTitle': '당신은 포털 B!',
+  'hudChrome.knotAlert.bLine': '{seconds}초 뒤 발밑에 열립니다. 벼랑 가장자리에 서세요.',
+  'hudChrome.knotAlert.cTitle': '당신은 포털 C!',
+  'hudChrome.knotAlert.cLine': '{seconds}초 뒤 발밑에 열립니다. 다른 얽힌 질풍 가까이에 서세요.',
+  'hudChrome.knotAlert.dTitle': '당신은 포털 D!',
+  'hudChrome.knotAlert.dLine':
+    '{seconds}초 뒤 발밑에 열립니다. 포털 B에서 떨어진 가장자리에 서세요.',
+  'hudChrome.knotAlert.carryTitle': '얽힌 질풍을 나르는 중!',
+  'hudChrome.knotAlert.carryLine':
+    '각 포털은 짝으로 데려갑니다: A에서 B, C에서 D. 벼랑 가장자리에서 던지세요. {seconds}초 뒤 터집니다.',
+  'hudChrome.knotAlert.lipTitle': '지금 던지세요!',
+  'hudChrome.knotAlert.lipLine': '가장자리에 서 있습니다. {seconds}초 뒤 터집니다.',
+  'hudChrome.knotAlert.throwKey': '가장자리에서 {key}를 눌러 던지기',
+  'hudChrome.knotAlert.throwTap': '가장자리에서 여기를 탭해 던지기',
+  'hudChrome.knotAlert.throwClick': '가장자리에서 여기를 클릭해 던지기',
+  'hudChrome.knotAlert.throwAria': '얽힌 질풍을 공허로 던지기',
 };

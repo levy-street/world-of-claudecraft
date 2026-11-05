@@ -10,20 +10,25 @@
 //                          kernel's wind aura (src/sim/wind_drift.ts): both
 //                          hosts step the same drift, a player walks against
 //                          it and keeps casting while it carries them.
-//   The rim                where the wall stands, a body pressed against it
-//                          takes a hit each second (Pressed to the Rim); at a
-//                          gap there is no wall: the body walks off the lip
-//                          and falls (the field's lipOpenings), on every
-//                          difficulty. Anyone who has gone over is the void's.
+//   The rim                open all round since 2026-11-03 (the field's
+//                          lipOpenings): a body carried off any edge falls,
+//                          on every difficulty. Only the climb's head keeps
+//                          a wall, where a body pressed against it takes a
+//                          hit each second (Pressed to the Rim).
 //   The indrawn breath     about every 45 s (between blows): a 5 s bar, the
 //                          wind turns and draws everyone toward the guardian
 //                          (the kernel's pull aura), a vortex before its mouth
-//                          bites whoever stands in it; then Bellows Gust (its
-//                          old id), a 1.5 s bar and a blast that hurts and
-//                          throws everyone outward (the anchored stay put).
+//                          bites whoever stands in it; then the Summit Roar
+//                          (Bellows Gust's id), a 1.5 s bar and a wave racing
+//                          out of its maw that hurts and throws each player far
+//                          from the guardian as it reaches them (26 yd, 30 on
+//                          heroic, slid over a moment: breath_roar.ts; tanked
+//                          by the edge, the raid goes over it; the anchored
+//                          stay put).
 //   Heroic                 three loose gales wander the Cornice after each
-//                          exhale, tossing whoever they touch (a throw can
-//                          carry a body out through a gap); in phase 2, short
+//                          exhale, tossing whoever they touch: a shove slid
+//                          over galeSlide (breath_shove.ts), never a blink (a
+//                          throw can carry a body out through a gap); in phase 2, short
 //                          gusts return now and then, telegraphed.
 //
 // The wind's phase, bearing and length ride ONE object's template id
@@ -48,6 +53,7 @@ import {
   calmSeconds,
   BREATH_TUNING as T,
 } from './breath_ids';
+import { startRoar, stepRoar } from './breath_roar';
 import {
   auraOf,
   type BreathScope,
@@ -61,11 +67,11 @@ import {
   local,
   moveBreathObject,
   putMarker,
-  raidWarn,
   roll,
   spawnBreathObject,
   throwPlayer,
 } from './breath_scope';
+import { beginShove, clearShoves, stepShoves } from './breath_shove';
 import type { BreathFightState } from './breath_state';
 import { breathSay } from './breath_voice';
 
@@ -166,7 +172,6 @@ function stepStormGusts(s: BreathScope): void {
   if (s.st.gustTimer > 1e-9) return;
   s.st.gustTimer = T.gustEvery;
   setWind(s, 'gustgather', T.gustGather, nextBearing(s.st));
-  raidWarn(s, s.boss, 'stormGust', 'A storm gust gathers! Brace against the wind!');
 }
 
 // ---- the push, the rim, the void -----------------------------------------------------------
@@ -332,7 +337,6 @@ export function startInhale(s: BreathScope, force = false): boolean {
   );
   v.facing = b.facing;
   s.st.vortex = { objectId: v.id, x: vx, z: vz, tick: T.vortexTick };
-  raidWarn(s, b, 'inhale', 'The Guardian draws breath! Keep out of the vortex before its mouth!');
   breathSay(s, b, 'guardian', 'inhale');
   breathSay(s, thessalyOf(s.ctx, s.inst), 'thessaly', 'inhale');
   return true;
@@ -367,11 +371,12 @@ export function landInhale(s: BreathScope): void {
   s.st.vortex = null;
   beginBar(s, BREATH_CASTS.gust, T.gustCast, null);
   setWind(s, 'exhale', T.gustCast, s.st.wind.bearing);
-  raidWarn(s, s.boss, 'gust', 'Bellows Gust! Brace for the blast!');
 }
 
-/** Bellows Gust lands: everyone on the Cornice is struck and thrown outward
- *  (the anchored keep their feet); heroic sets the loose gales running. */
+/** The Summit Roar (Bellows Gust's id) lands: its wave leaves the maw and
+ *  races out over the Cornice, striking and throwing each player as it
+ *  reaches them (breath_roar.ts; the anchored keep their feet); heroic sets
+ *  the loose gales running. */
 export function landGust(s: BreathScope): void {
   const b = s.boss;
   s.ctx.emit({
@@ -382,28 +387,7 @@ export function landGust(s: BreathScope): void {
     fx: 'nova',
     ability: BREATH_CUES.gust,
   });
-  for (const p of livePlayers(s)) {
-    s.ctx.dealDamage(
-      b,
-      p,
-      roll(s, T.gustMin, T.gustMax),
-      false,
-      'nature',
-      BREATH_NAMES.gust,
-      'hit',
-      true,
-    );
-    if (p.dead) continue;
-    let dx = p.pos.x - b.pos.x;
-    let dz = p.pos.z - b.pos.z;
-    let len = Math.hypot(dx, dz);
-    if (len < 1e-3) {
-      dx = Math.sin(b.facing);
-      dz = Math.cos(b.facing);
-      len = 1;
-    }
-    throwPlayer(s, p, dx / len, dz / len, s.rules.gustThrow);
-  }
+  startRoar(s);
   if (s.rules.looseGales) startGales(s);
   // The wind comes back: a calm, then the next blow's telegraph.
   beginCalm(s);
@@ -413,7 +397,9 @@ export function landGust(s: BreathScope): void {
 
 /** Set the loose gales running (heroic, after an exhale; the dev trigger). */
 export function startGales(s: BreathScope): void {
-  clearGales(s.ctx, s.inst, s.st);
+  // The old gales go; a toss still sliding slides on (never stopped dead).
+  for (const g of s.st.gales) dropBreathObject(s.ctx, s.inst, g.objectId);
+  s.st.gales = [];
   for (let k = 0; k < T.galeCount; k++) {
     const at = looseGalePos(k + s.st.casts, 0);
     const e = spawnBreathObject(
@@ -427,11 +413,12 @@ export function startGales(s: BreathScope): void {
     );
     s.st.gales.push({ objectId: e.id, k: k + s.st.casts, t: 0, tossed: {} });
   }
-  raidWarn(s, s.boss, 'gales', 'Loose gales tear across the Cornice! Keep clear of them!');
 }
 
 function stepGales(s: BreathScope): void {
   const st = s.st;
+  // The tosses slide on even once their gales have gone.
+  if (st.galeShoves.length > 0) stepShoves(s, st.galeShoves);
   if (st.gales.length === 0) return;
   const keep: typeof st.gales = [];
   for (const g of st.gales) {
@@ -470,9 +457,29 @@ function stepGales(s: BreathScope): void {
         'hit',
         true,
       );
-      if (!p.dead) {
+      // The toss SLIDES (Jose's playtest of 2026-11-04: a one-tick throw read
+      // as a sideways teleport): a shove eased out over galeSlide, held so
+      // the online client draws it (breath_shove.ts). A body still sliding
+      // (a toss, or the Summit Roar's throw) is not shoved again: two
+      // shoves never stack.
+      if (
+        !p.dead &&
+        !st.galeShoves.some((sl) => sl.id === p.id) &&
+        !st.roar?.slides.some((sl) => sl.id === p.id)
+      ) {
         const len = d > 1e-3 ? d : 1;
-        throwPlayer(s, p, d > 1e-3 ? dx / len : 0, d > 1e-3 ? dz / len : 1, T.galeThrow);
+        const shove = beginShove(
+          s,
+          p,
+          d > 1e-3 ? dx / len : 0,
+          d > 1e-3 ? dz / len : 1,
+          T.galeThrow,
+          T.galeSlide,
+          'out',
+          BREATH_AURAS.tossed,
+          BREATH_NAMES.gale,
+        );
+        if (shove) st.galeShoves.push(shove);
       }
     }
     keep.push(g);
@@ -483,6 +490,7 @@ function stepGales(s: BreathScope): void {
 export function clearGales(ctx: SimContext, inst: InstanceSlot, st: BreathFightState): void {
   for (const g of st.gales) dropBreathObject(ctx, inst, g.objectId);
   st.gales = [];
+  clearShoves({ ctx }, st.galeShoves);
 }
 
 // ---- the tick ---------------------------------------------------------------------------------
@@ -497,6 +505,7 @@ export function stepWind(s: BreathScope): void {
   syncWindAuras(s);
   stepPinned(s);
   stepVortex(s);
+  stepRoar(s);
   stepGales(s);
 }
 

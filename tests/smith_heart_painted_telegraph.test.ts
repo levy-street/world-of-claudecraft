@@ -71,8 +71,8 @@ describe('the painted telegraphs: which paint each footprint wears', () => {
       'rock',
       'rise',
       'echo',
-      'slabGrind',
-      'slabCrush',
+      'rush',
+      'resonance',
       'song',
       'crater',
     ];
@@ -300,9 +300,8 @@ describe('the dressing', () => {
     // the bar 11, strikes 12, marks 13; BreathFx's exhale ring 10.
     expect(BREATH_TELEGRAPH_GLOW_STEP).toBeGreaterThan(13);
     expect(BREATH_GUST_GLOW_STEP).toBeGreaterThan(13);
-    // CouncilFx's rubble 12, marks and spots 14, the souls' outer ring 16; the
-    // slab's gouges (19, normal blend) stay off it.
+    // CouncilFx's rubble 12, marks and spots 14, the Rush's lane 15, the
+    // souls' outer ring 16.
     expect(COUNCIL_TELEGRAPH_GLOW_STEP).toBeGreaterThan(16);
-    expect(COUNCIL_TELEGRAPH_GLOW_STEP).not.toBe(19);
   });
 });

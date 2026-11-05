@@ -4,6 +4,10 @@
 //  - the cold (the bar's aura: its value 0 to 100, its trend): rising, it
 //    says how to warm up; past three quarters it turns urgent; falling in a
 //    huddle, it says the huddle warms and the ice will crack under it;
+//    struck by an ally's shatter a moment ago, its title says the cold it
+//    took; sealed in an immunity (an Ice Block), its line says the cold still
+//    bites (immunities never give warmth: encounters/smith_heart/
+//    quench_bite.ts);
 //  - marked for a slash: the player's number in the round, the bar the time
 //    until their slash has landed, the line how to lead it;
 //  - encased in rime (the freeze): the bar is the time to the shatter and
@@ -40,6 +44,7 @@ const HIDDEN: EncounterAlertHidden = { visible: false };
 
 interface AlertAura {
   id: string;
+  kind?: string;
   remaining?: number;
   duration?: number;
   value?: number;
@@ -125,14 +130,18 @@ export function buildQuenchAlertView(input: QuenchAlertInput): QuenchAlertView {
     : value >= QUENCH_FREEZING_AT
       ? 'freezing'
       : 'cold';
-  const title =
-    kind === 'warm'
+  const splash = auraOf(input.auras, QUENCH_AURAS.splashed);
+  const sealed = input.auras.some((a) => a.kind === 'stasis');
+  const title = splash
+    ? t('hudChrome.quenchAlert.splashTitle', { cold: whole(splash.value ?? 0) })
+    : kind === 'warm'
       ? t('hudChrome.quenchAlert.warmTitle')
       : kind === 'freezing'
         ? t('hudChrome.quenchAlert.freezingTitle')
         : t('hudChrome.quenchAlert.coldTitle');
-  const line =
-    kind === 'warm'
+  const line = sealed
+    ? t('hudChrome.quenchAlert.immuneLine')
+    : kind === 'warm'
       ? t('hudChrome.quenchAlert.warmLine', { seconds: whole(T.strainLinger) })
       : t('hudChrome.quenchAlert.coldLine', {
           radius: whole(T.warmR),

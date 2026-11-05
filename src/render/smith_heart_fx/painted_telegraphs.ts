@@ -1,7 +1,9 @@
-// The Guardian of the Breath's and the Hammer Council's painted telegraphs:
+// The Guardian of the Breath's, the Hammer Council's and the Guardian of the
+// Quench's painted telegraphs:
 // the shared floor telegraph's pooled fans (../floor_telegraph) dressed in
 // their element's paint (painted_telegraph_core.ts; shaders
-// breath_telegraph_glsl.ts and council_telegraph_glsl.ts).
+// breath_telegraph_glsl.ts, council_telegraph_glsl.ts and
+// quench_telegraph_glsl.ts).
 //
 // As heat_telegraph.ts and final_telegraphs.ts do, the kit keeps everything a
 // player reads the area and the timing off (the drape at the sim's exact
@@ -32,9 +34,12 @@ import {
   COUNCIL_TELEGRAPH_LOOKS,
   type CouncilTelegraphKind,
   type PaintedTelegraphLook,
+  QUENCH_TELEGRAPH_LOOKS,
+  type QuenchTelegraphKind,
   type TelegraphPaintKind,
   telegraphSeed,
 } from './painted_telegraph_core';
+import { QUENCH_TELEGRAPH_FRAG } from './quench_telegraph_glsl';
 
 /** Each paint's shader source and its define. */
 const PAINT_SOURCE: Readonly<Record<TelegraphPaintKind, { frag: string; define: string }>> = {
@@ -44,6 +49,7 @@ const PAINT_SOURCE: Readonly<Record<TelegraphPaintKind, { frag: string; define: 
   calm: { frag: BREATH_TELEGRAPH_FRAG, define: 'BT_CALM' },
   quake: { frag: COUNCIL_TELEGRAPH_FRAG, define: 'CT_QUAKE' },
   rubble: { frag: COUNCIL_TELEGRAPH_FRAG, define: 'CT_RUBBLE' },
+  frost: { frag: QUENCH_TELEGRAPH_FRAG, define: 'QT_FROST' },
 };
 
 /** A dressed fan. */
@@ -178,5 +184,12 @@ export class BreathTelegraphs extends PaintedTelegraphs<BreathTelegraphKind> {
 export class CouncilTelegraphs extends PaintedTelegraphs<CouncilTelegraphKind> {
   constructor(glowStep: number, materials: THREE.Material[]) {
     super(COUNCIL_TELEGRAPH_LOOKS, glowStep, materials, 'smithHeartCouncil');
+  }
+}
+
+/** The Guardian of the Quench's frost paint. */
+export class QuenchTelegraphs extends PaintedTelegraphs<QuenchTelegraphKind> {
+  constructor(glowStep: number, materials: THREE.Material[]) {
+    super(QUENCH_TELEGRAPH_LOOKS, glowStep, materials, 'smithHeartQuench');
   }
 }

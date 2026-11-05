@@ -1,11 +1,10 @@
 // The Guardian of the Breath's per-tick scope (encounters/smith_heart/
 // breath.ts): the claim, the shared state, the guardian, the players on the
 // Storm Cornice, the difficulty's rules, and the plumbing every part of the
-// fight shares (the bar, the hashed marks, the damage rolls, the raid
-// warnings, the fight's objects, the void-safe throw). A leaf the fight's
-// modules (breath_gale.ts, breath_thessaly.ts, breath_storm.ts) and the
-// coordinator share, so none of them reaches into another. Zero rng but the
-// damage rolls.
+// fight shares: the bar, the hashed marks, the damage rolls, the fight's
+// objects, the void-safe throw. The fight calls no raid warning banner (the
+// owner's rule of 2026-11-03). A leaf the fight's modules share, so none of
+// them reaches into another. Zero rng but the damage rolls.
 
 import { BREATH, SMITH_HEART_FIELD } from '../../content/smith_heart_layout';
 import { authoredFieldHeight } from '../../instances/authored_field';
@@ -17,7 +16,6 @@ import { pickMarkTargets, startBar } from '../sunken_bastion/claim';
 import { inBreathArena, inClaimBand } from './breath_geometry';
 import { BREATH_AURAS, type BreathDifficultyRules } from './breath_ids';
 import type { BreathFightState } from './breath_state';
-import { local } from './fight_kit';
 
 // The shared plumbing (fight_kit.ts), under the names the Breath's modules use.
 export {
@@ -148,30 +146,6 @@ export function damageMult(s: BreathScope): number {
 /** A mechanic's damage roll (the only rng the fight draws). */
 export function roll(s: BreathScope, min: number, max: number, mult = 1): number {
   return Math.max(1, Math.round(s.ctx.rng.range(min, max) * damageMult(s) * mult));
-}
-
-/** A raid warning from `from` to every player near the Cornice (the big
- *  orange line, re-localized client-side by `textKey`). */
-export function raidWarn(
-  s: Pick<BreathScope, 'ctx' | 'inst'>,
-  from: Entity,
-  key: string,
-  text: string,
-  values?: Record<string, string>,
-): void {
-  for (const p of corniceListeners(s.ctx, s.inst)) {
-    s.ctx.emit({
-      type: 'chat',
-      fromPid: from.id,
-      from: from.name,
-      entityId: from.id,
-      text,
-      textKey: `hudChrome.breathGuardian.warn.${key}`,
-      ...(values ? { textValues: values } : {}),
-      channel: 'raidWarning',
-      pid: p.id,
-    });
-  }
 }
 
 /** Hold the guardian where its bar began (the mob AI may have walked it). */

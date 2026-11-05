@@ -2,8 +2,8 @@
 // its adapter smith_heart_council_audio.ts): every cue the council emits has
 // its own shipped sample, the HUD's generic nova never doubles one, the
 // Endless Song grows louder and deeper, a bar's charge plays once when the bar
-// starts (never late for one already running), the rock's fall as it comes
-// into view, and the Walking Slab grinds only while it drags.
+// starts (never late for one already running), and the rock's fall as it
+// comes into view.
 
 import { describe, expect, it } from 'vitest';
 import { SFX_CLIPS } from '../src/game/sfx_manifest.generated';
@@ -49,7 +49,7 @@ const ent = (id: number, x = 0, z = 0, extra: Partial<Entity> = {}) =>
   ({
     id,
     kind: 'mob',
-    templateId: 'heart_slabwright',
+    templateId: 'heart_seam_singer',
     dead: false,
     pos: { x, y: 0, z },
     auras: [],
@@ -71,7 +71,8 @@ describe('Hammer Council sounds: the plan', () => {
       expect(key.startsWith('heart_council_'), key).toBe(true);
       expect(Object.hasOwn(SFX_CLIPS, key), `${key} in the manifest`).toBe(true);
     }
-    expect(COUNCIL_SFX_KEYS.length).toBe(18);
+    // The Walking Slab's grind loop left with the Slabwright.
+    expect(COUNCIL_SFX_KEYS.length).toBe(17);
     expect(councilSoundClaims('frost_nova')).toBe(false);
     expect(councilSoundClaims(undefined)).toBe(false);
   });
@@ -198,30 +199,5 @@ describe('Hammer Council sounds: the adapter', () => {
     mark.remaining -= 0.5;
     a.update(0.05, byId);
     expect(plays.map((q) => q.key)).toEqual([ROCK_FALL_SOUND.key]);
-  });
-
-  it('the Walking Slab grinds only while it drags, and stops when it goes', () => {
-    const { sink, loops } = fakeSink();
-    const a = new CouncilAudio(sink);
-    const slab = ent(4, 0, 0, { kind: 'object' });
-    const byId = () => slab;
-    a.beginScan();
-    a.see(slab, 'slab');
-    a.endScan();
-    for (let i = 0; i < 10; i++) a.update(0.05, byId);
-    expect(loops.size).toBe(0);
-    for (let i = 0; i < 4; i++) {
-      slab.pos.x += T.slabSpeed / 20;
-      a.update(0.05, byId);
-    }
-    expect([...loops.values()]).toEqual(['heart_council_slab_grind']);
-    for (let i = 0; i < 20; i++) a.update(0.05, byId);
-    expect(loops.size).toBe(0);
-    slab.pos.x += 0.1;
-    a.update(0.05, byId);
-    expect(loops.size).toBe(1);
-    a.beginScan();
-    a.endScan();
-    expect(loops.size).toBe(0);
   });
 });

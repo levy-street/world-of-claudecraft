@@ -23036,7 +23036,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.heart_heat_seedflame.name': '籽焰',
   'entities.mobs.heart_heat_rolling_cinder.name': '滾動餘燼',
   'abilityUi.cast.heart_mountains_wrath': '山岳之怒',
-  'abilityUi.cast.heart_bellows_gust': '風箱狂風',
+  'abilityUi.cast.heart_bellows_gust': '巔峰咆哮',
   'abilityUi.cast.heart_storm_lance': '風暴長槍',
   'abilityUi.cast.heart_quenching_breath': '淬火吐息',
   'hudChrome.auraEffect.heatGuardian.statePhase1':
@@ -23065,6 +23065,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.heatGuardian.warn.seeds': '爐心火種落下了！集中放下然後快跑！',
   'hudChrome.heatGuardian.warn.zones': '甦醒之火！爐心一圈接一圈地燃起：快出去！',
   'hudChrome.heatGuardian.warn.cinder': '滾動餘燼落下了！在它追上獵物之前把它打退！',
+  'hudChrome.heatGuardian.warn.wheel': '爐心轉動了！快到暗色的扇區去！',
   'hudChrome.heatGuardian.say.fist': '站在岩石落下的地方，成為它的一部分。',
   'hudChrome.heatGuardian.say.sink': '湧泉升起來迎接你們了！',
   'hudChrome.heatGuardian.say.sinkAgain': '爐心再次滿溢。你們再次燃燒。',
@@ -23078,32 +23079,17 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.heart_forge_pour': '熔爐傾瀉',
   'abilityUi.cast.heart_ember_bolt': '餘燼箭',
   // The Smith's Heart's Hammer Council (M16 fills).
-  'entities.mobs.heart_slabwright.name': '石板匠',
   'entities.mobs.heart_seam_singer.name': '礦脈歌者',
   'abilityUi.cast.heart_hammers_weight': '重錘之壓',
   'abilityUi.cast.heart_wake_the_stone': '喚醒岩石',
   'abilityUi.cast.heart_falling_rock': '落石',
   'abilityUi.cast.heart_seam_bolt': '礦脈箭',
   'abilityUi.cast.heart_song_of_the_seam': '礦脈之歌',
-  'abilityUi.cast.heart_song_of_the_seam_unbroken': '礦脈之歌',
-  'hudChrome.council.warn.wrath': '山岳之怒！躲到石柱後面！',
-  'hudChrome.council.warn.enrage': '山岳的怒火加速了！山岳之怒會來得更快。',
-  'hudChrome.council.warn.weight': '{player}受到重錘之壓：換坦克！',
-  'hudChrome.council.warn.wake': '喚醒岩石：石柱將在{players}腳下升起！站到需要掩體的地方。',
-  'hudChrome.council.warn.wakeHeir': '岩石在{players}腳下甦醒：快移動！',
-  'hudChrome.council.warn.rock': '落石砸向{player}！遠離掩體，一起分擔！',
-  'hudChrome.council.warn.song': '礦脈之歌！打斷它！',
-  'hudChrome.council.warn.resonance': '{players}獲得共鳴：去震裂最破損的石柱，遠離完好的石柱！',
-  'hudChrome.council.warn.fell_guardian': '重錘守護者倒下了。它的怒火傳入了剩下的岩石！',
-  'hudChrome.council.warn.fell_slabwright': '石板匠倒下了。現在岩石會隨意升起！',
-  'hudChrome.council.warn.fell_singer': '礦脈歌者倒下了。它的歌聲被傳承下去，再也無法打斷！',
   'hudChrome.council.alert.wakeTitle': '喚醒岩石！',
-  'hudChrome.council.alert.wakeLine': '石柱會在你站的地方升起：把掩體放在團隊需要的位置',
+  'hudChrome.council.alert.wakeLine': '石柱會在你站的地方升起：移動到團隊需要掩體的位置',
   'hudChrome.council.alert.rockTitle': '落石！',
   'hudChrome.council.alert.rockLine': '遠離石柱，讓至少三名隊友站到你身邊',
   'hudChrome.council.alert.resonanceTitle': '共鳴',
-  'hudChrome.council.alert.resonanceLine': '靠近石柱就會震裂它：在最破損的石柱旁等待',
-  'hudChrome.council.alert.resonanceCracking': '正在震裂石柱：離開它以保住它',
   'hudChrome.council.alert.weightTitle': '重錘之壓',
   'hudChrome.council.alert.weightLine': '你受到雙倍物理傷害：另一名坦克必須接手守護者',
   'hudChrome.council.alert.timeAria': '剩餘{seconds}秒',
@@ -23111,22 +23097,11 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '結束時，一根石柱會從你腳下的地面衝出，對{radius}碼內的所有人造成{min}到{max}點傷害並將其擊退。站到團隊需要掩體的位置。英雄和傳奇難度：傷害提高{heroic}%。',
   'hudChrome.auraEffect.council.rockMark':
     '結束時，一塊巨石砸向你：{total}點傷害由{radius}碼內的所有人分擔。若不足{soakers}人分擔，每人多受{penalty}%傷害，且全團受到{tremorMin}到{tremorMax}點傷害。{radius}碼內的每根石柱都會損失一塊，所以要遠離掩體分擔。傳奇難度：{soulReach}碼內的靈魂石柱改為失去一個靈魂印記，印記耗盡時碎裂。英雄和傳奇難度：傷害提高{heroic}%。',
-  'hudChrome.auraEffect.council.resonance':
-    '在石柱{reach}碼內連續站立{seconds}秒會震落它的一塊，之後每多待{seconds}秒再震落一塊。無法移除：在最破損的石柱旁躲過山岳之怒，遠離完好的石柱。傳奇難度：在靈魂石柱旁等待同樣的時間會改為擊碎它的一個靈魂印記（礦脈歌者的石柱為{singerSeconds}秒），印記耗盡時碎裂。',
   'hudChrome.auraEffect.council.memory': '造成的傷害提高{pct}%：重錘議會每倒下一名成員提高{per}%。',
   // The Hammer Council's mythic, Soul in the Stone (M16 fills).
   'abilityUi.cast.heart_echo_of_wrath': '怒火迴響',
   'abilityUi.cast.heart_endless_song': '無盡之歌',
-  'hudChrome.council.warn.soul_guardian': '守護者之魂附入了岩石！怒火迴響將從那根石柱中爆發。',
-  'hudChrome.council.warn.soul_slabwright': '石板匠之魂附入了岩石！行走石板正拖著身軀向你們逼近。',
-  'hudChrome.council.warn.soul_singer': '礦脈歌者之魂附入了岩石！無盡之歌每一次脈動都更加響亮。',
-  'hudChrome.council.warn.echo': '怒火迴響！讓另一根石柱擋在你和靈魂石柱之間！',
-  'hudChrome.council.warn.soulBreak_guardian': '守護者的靈魂石柱碎裂了！它的迴響歸於沉寂。',
-  'hudChrome.council.warn.soulBreak_slabwright': '石板匠的靈魂石柱碎裂了！行走石板停了下來。',
-  'hudChrome.council.warn.soulBreak_singer': '礦脈歌者的靈魂石柱碎裂了！無盡之歌歸於沉寂。',
   'hudChrome.council.alert.rockLineSoul': '遠離掩體，在靈魂石柱旁聚集至少三名隊友',
-  'hudChrome.council.alert.resonanceLineSoul': '在靈魂石柱旁等待以擊碎靈魂印記，不要靠近完好的石柱',
-  'hudChrome.council.alert.resonanceBreaking': '正在擊碎靈魂印記：留在靈魂石柱旁',
   'hudChrome.council.say.guardian_pull': '採石場來了外人。鐵鎚之力絕不向血肉屈服。',
   'hudChrome.council.say.guardian_wrath': '群山回應了我！若岩石肯收留你們，就躲起來吧！',
   'hudChrome.council.say.guardian_death': '我的力量……交給岩石。',
@@ -23134,14 +23109,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.council.say.guardian_soul': '如今我即是岩石。我的怒火再無會倒下的軀體。',
   'hudChrome.council.say.guardian_wipe': '塵土。一切血肉終歸如此。',
   'hudChrome.council.say.guardian_defeat': '鐵鎚之力……由你們來承擔。',
-  'hudChrome.council.say.slabwright_pull': '牆還缺石頭。別動，我把你們砌進去。',
-  'hudChrome.council.say.slabwright_wake': '站在那兒。岩石會從你腳下升起！',
-  'hudChrome.council.say.slabwright_rock': '抬頭看，小傢伙們！山要塌了！',
-  'hudChrome.council.say.slabwright_death': '石板……裂開了……',
-  'hudChrome.council.say.slabwright_remember': '岩石銘記。這活兒我來幹完。',
-  'hudChrome.council.say.slabwright_soul': '我已沒有雙手，但我會把這塊石頭拖到你們面前。',
-  'hudChrome.council.say.slabwright_wipe': '砌好，埋好。幹得漂亮。',
-  'hudChrome.council.say.slabwright_defeat': '採石場……安靜了。',
   'hudChrome.council.say.singer_pull': '聽見礦脈在歌唱嗎？它等你們的聲音等了好久。',
   'hudChrome.council.say.singer_song': '與我同唱，然後碎裂吧！',
   'hudChrome.council.say.singer_death': '我的歌……流入了岩石……',
@@ -23149,17 +23116,27 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.council.say.singer_soul': '聽啊。在岩石之中，我的歌永不終結。',
   'hudChrome.council.say.singer_wipe': '噓。礦脈已歸於寂靜。',
   'hudChrome.council.say.singer_defeat': '最後一個音……消散了。',
+  // The Hammer Council's rework: Mountain's Rush, the Cursed Pillar, Bond of
+  // the Stone, Quarry Collapse and Resonance (M16 fills).
+  'abilityUi.cast.heart_mountains_rush': '山岳衝鋒',
+  'hudChrome.auraEffect.council.resonance':
+    '每{every}秒你會發出共鳴，對你{radius}碼內的每名盟友造成{min}到{max}點自然傷害。在效果結束前遠離所有人。英雄和傳奇難度：傷害提高{heroic}%。',
+  'hudChrome.auraEffect.council.rushMark':
+    '結束時，重錘守護者會先蓄勢{windup}秒，然後沿直線穿過你所站的位置，一直衝到採石場邊緣；若路上有石柱，則停在遇到的第一根石柱處。把它引向詛咒石柱：石柱碎裂，守護者被昏迷{stun}秒，並在{exposedSeconds}秒內受到的傷害提高{exposed}%。若路線上擋著一根掩護石柱，則改為摧毀那根石柱。它停下之前撞到的所有人會受到{min}到{max}點傷害並被擊退，如果你還在它的路線上，你也一樣。傳奇難度：沒有撞上任何石柱的衝鋒會引發採石場坍塌，直到詛咒石柱碎裂為止。',
+  'hudChrome.auraEffect.council.rushExposed': '受到的傷害提高{pct}%：山岳衝鋒撞碎了詛咒石柱。',
+  'hudChrome.auraEffect.council.bond':
+    '重錘議會的另一名成員在{reach}碼內時，受到的傷害降低{pct}%。岩石之契每{every}秒對全團造成{min}到{max}點傷害，每次提高{growth}%。把他們拉開。',
+  'hudChrome.auraEffect.council.collapse':
+    '採石場正在坍塌：每{every}秒，你每層受到{min}到{max}點傷害，且每次增加一層。詛咒石柱碎裂時結束。',
+  'hudChrome.auraEffect.council.pillarLimit':
+    '每根石柱最多只能為{limit}名玩家擋住山岳之怒。躲在後面的人更多時，每人承受衝擊的{share}%。',
+  'hudChrome.council.alert.resonanceLine': '你會傷害身邊的每名盟友：在效果結束前遠離團隊',
+  'hudChrome.council.alert.rushTitle': '山岳衝鋒！',
+  'hudChrome.council.alert.rushLine': '守護者將衝向你：讓詛咒石柱擋在你和他之間',
+  'hudChrome.council.say.guardian_rush': '那就站在我的路上吧。群山從不繞行。',
+  'hudChrome.council.say.singer_wake': '醒來吧，沉睡的岩石。在他們腳下升起！',
+  'hudChrome.council.say.singer_rock': '抬頭看，小傢伙們！山要塌下來了！',
   // The Smith's Heart's Guardian of the Breath and Captain Thessaly (M16 fills).
-  'hudChrome.breathGuardian.warn.inhale': '守護者正在吸氣！別站在牠嘴前的漩渦裡！',
-  'hudChrome.breathGuardian.warn.gust': '風箱狂風！準備承受衝擊！',
-  'hudChrome.breathGuardian.warn.gales': '遊蕩的狂風橫掃崖台！離它們遠點！',
-  'hudChrome.breathGuardian.warn.circle': '瑟薩莉隊長布下了寧靜之環！最多可容{seats}人。',
-  'hudChrome.breathGuardian.warn.fell': '{player}被捲入了虛空！',
-  'hudChrome.breathGuardian.warn.storm': '風暴爆發了！閃電將落滿整個崖台！',
-  'hudChrome.breathGuardian.warn.fork': '跳躍雷擊落在{player}身上！散開！',
-  'hudChrome.breathGuardian.warn.cradle': '{player}被舉入了風暴！到他的下方集合！',
-  'hudChrome.breathGuardian.warn.drawn': '引雷落在{player}身上！把落雷引向邊緣！',
-  'hudChrome.breathGuardian.warn.stormGust': '風暴陣風正在聚集！頂住風！',
   'hudChrome.breathGuardian.say.guardian_pull':
     '你們爬上山巔，是來偷走它的氣息嗎？那就與我一同呼吸吧。',
   'hudChrome.breathGuardian.say.guardian_blow': '感受風向的轉變。邊緣比你想的更近。',
@@ -23170,7 +23147,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.breathGuardian.say.guardian_wipe': '被吹散了，就像山巔的塵埃。',
   'hudChrome.breathGuardian.say.guardian_death': '氣息……回歸……群山……',
   'hudChrome.breathGuardian.say.thessaly_pull':
-    '高望與你們並肩！當心牆上的缺口：風會把你們從那裡扔出去！',
+    '高望與你們同在！這上面沒有牆：風會把你們從邊緣吹下去！',
   'hudChrome.breathGuardian.say.thessaly_circle_a': '快進我的寧靜之中！最多三人，不能再多！',
   'hudChrome.breathGuardian.say.thessaly_circle_b': '這裡！站在我身邊，讓風撞碎在我們身上！',
   'hudChrome.breathGuardian.say.thessaly_circle_c': '石上的寧靜！三個人，現在就來！',
@@ -23179,10 +23156,13 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.breathGuardian.say.thessaly_fall': '抓緊岩石！',
   'hudChrome.breathGuardian.say.thessaly_victory': '氣息自由了。高望會記住這次攀登。',
   'hudChrome.breathGuardian.say.thessaly_wipe': '退後，喘口氣。我們再來一次。',
+  'hudChrome.breathGuardian.say.guardian_isles': '風啊，將我圍起！浮島會護住我的氣息。',
+  'hudChrome.breathGuardian.say.guardian_bulwark': '我的護盾……被撕開了。那就再嘗嘗狂風吧！',
+  'hudChrome.breathGuardian.say.thessaly_isles': '它的護盾靠浮島供能！乘風飛過去，解決癒者再回來！',
   'hudChrome.auraEffect.breathGuardian.wind':
-    '氣息守護者的風以每秒{speed}碼的速度將你帶往它吹去的方向。逆風而行便能站穩，它不會打斷你的施法。被壓在邊緣的牆上時，你每秒受到{pinMin}到{pinMax}點傷害。牆壁破損處沒有任何阻擋：你會墜入虛空。',
+    '氣息守護者的風以每秒{speed}碼的速度將你帶往它吹去的方向。逆風而行便能站穩，它不會打斷你的施法。崖台四周沒有牆：被吹出邊緣，你會墜入虛空。只有攀登路口還立著牆，被壓在牆上時每秒受到{pinMin}到{pinMax}點傷害。',
   'hudChrome.auraEffect.breathGuardian.draw':
-    '守護者吸氣，以每秒{speed}碼的速度將你拉向牠。牠嘴前的漩渦每{tick}秒對站在其中的人造成{min}到{max}點傷害。隨後風箱狂風對崖台上的所有人造成{gustMin}到{gustMax}點傷害，並將他們向外擊飛{throw}碼。',
+    '守護者深吸一口氣，以每秒{speed}碼的速度將你拉向它。它嘴前的漩渦每{tick}秒對站在其中的人造成{min}到{max}點傷害。隨後巔峰咆哮對崖台上的所有人造成{gustMin}到{gustMax}點傷害，並將他們從守護者身邊吹飛{throw}碼（英雄難度為{heroicThrow}碼）：守護者靠近邊緣時，團隊會被吹出崖台。',
   'hudChrome.auraEffect.breathGuardian.pinned':
     '被風壓在邊緣的牆上：在風停歇或你離開牆邊之前，每秒受到{min}到{max}點傷害。',
   'hudChrome.auraEffect.breathGuardian.anchor':
@@ -23192,11 +23172,29 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.breathGuardian.drawn':
     '每{every}秒會有一道閃電落在你所站之處：{warn}秒後對{radius}碼內的所有人造成{min}到{max}點傷害，並留下帶電的地面，在{charged}秒內每秒造成{cmin}到{cmax}點傷害。保持移動，把落雷引向遠離團隊的邊緣。',
   'hudChrome.auraEffect.breathGuardian.cradled':
-    '被舉入風暴，持續{hold}秒。隨後的放電造成{total}點傷害，由你和你下方{radius}碼內的所有人分擔。分擔人數少於{soakers}人（英雄難度為{heroicSoakers}人）時，每人多承受{penalty}%，且崖台上的所有人受到{bmin}到{bmax}點傷害。',
+    '被舉入風暴，在守護者引導搖籃的{hold}秒內被定住；其間守護者不會施放其他任何技能。隨後的放電造成{total}點傷害，由你和你下方{radius}碼內的所有人分擔。分擔人數少於{soakers}人時，每人多承受{penalty}%，且崖台上的所有人受到{bmin}到{bmax}點傷害。英雄難度：同時舉起{heroicCount}名玩家，每次放電{heroicTotal}點，需要{heroicSoakers}人分擔，團隊要分頭承受。',
   'hudChrome.auraEffect.breathGuardian.stormForm':
     '撕裂為閃電之軀：戰鬥的風暴後半段，直到氣息守護者倒下。',
   'hudChrome.auraEffect.breathGuardian.swell':
     '每{every}秒，膨脹的風暴對崖台上的所有人造成{min}到{max}點傷害，之前每次脈動使其增強{growth}%：目前已有{stacks}次。',
+  'hudChrome.auraEffect.breathGuardian.bulwark':
+    '風之護盾還能吸收{left}點傷害。只要浮島上還有任一狂風哨兵或狂風癒者存活，它每秒恢復總量的{regrow}%，每次癒合之風恢復{mend}%。乘狂風之路飛往浮島，消滅它們。維持{max}秒後，它會在崖台上爆裂，造成{bmin}到{bmax}點傷害。',
+  'hudChrome.auraEffect.breathGuardian.riding':
+    '風沿著固定的路線帶你越過虛空：在被放下之前你無法行動。',
+  'hudChrome.auraEffect.breathGuardian.windworn':
+    '被風耗盡了力氣：效果結束前，狂風之路不會帶你前往浮島。',
+  'hudChrome.auraEffect.breathGuardian.thrown': '被巔峰咆哮掀飛：落地之前無法移動。',
+  'hudChrome.auraEffect.breathGuardian.tossed': '被遊蕩狂風掀飛：狂風放下你之前無法移動。',
+  'hudChrome.auraEffect.breathGuardian.portalA':
+    '效果結束時，傳送門A會在你所站的位置打開。站在結風附近。本輪你無法攜帶它。',
+  'hudChrome.auraEffect.breathGuardian.portalB':
+    '效果結束時，傳送門B會在你所站的位置打開。站在崖台邊緣。本輪你無法攜帶結風。',
+  'hudChrome.auraEffect.breathGuardian.portalC':
+    '效果結束時，傳送門C會在你所站的位置打開。它只與傳送門D相連。站在另一團結風附近。本輪你無法攜帶它。',
+  'hudChrome.auraEffect.breathGuardian.portalD':
+    '效果結束時，傳送門D會在你所站的位置打開。它只與傳送門C相連。站在遠離傳送門B的崖台邊緣。本輪你無法攜帶結風。',
+  'hudChrome.auraEffect.breathGuardian.laden':
+    '你正攜帶結風：移動速度變為{walk}%，無法閃現、衝鋒或跳躍，風、拉扯、衝擊和擊飛都無法移動你。每個傳送門都會把你送到它的另一端：A到B，C到D。在崖台邊緣按下互動鍵，把它扔進虛空。效果結束時它會爆裂，殺死崖台上的所有人。',
   'abilityUi.cast.heart_breath_inhale': '深吸之息',
   'abilityUi.cast.heart_breath_storm_break': '風暴破裂',
   'abilityUi.cast.heart_breath_forking_bolt': '跳躍雷擊',
@@ -23207,18 +23205,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.heart_captain_thessaly.greeting':
     '站穩腳跟，{className}。當風箱呼吸時，進入我的寧靜之中，讓風撞碎在我們身上。',
   // The Smith's Heart's Guardian of the Quench (M16 fills).
-  'hudChrome.quenchGuardian.warn.rim': '岸冰隆起！快到湖面上去！',
-  'hudChrome.quenchGuardian.warn.frozen': '{player}被凍透了！在冰碎裂之前離開！',
-  'hudChrome.quenchGuardian.warn.crack': '抱團的人群下冰面在呻吟！散開！',
-  'hudChrome.quenchGuardian.warn.marks': '利刃標記了{list}！把它們引離團隊！',
   'hudChrome.auraEffect.quenchGuardian.marked':
     '你是{count}人中的第{order}個：利刃將沿穿過你的直線飛來。把直線引離團隊。直線在利刃飛出前{lock}秒鎖定，屆時請離開，否則將受到{min}到{max}點冰霜傷害和{cold}點寒冷。',
   'hudChrome.quenchAlert.markedTitle': '利刃在追獵你！（{count}人中第{order}個）',
   'hudChrome.quenchAlert.markedLine': '把直線引離團隊，鎖定時立刻離開。',
   'abilityUi.cast.heart_quench_blades_hunt': '利刃狩獵',
-  'hudChrome.quenchGuardian.warn.flurry': '所有利刃同時出獵！躲開直線！',
   'hudChrome.quenchGuardian.say.flurry': '所有利刃！所有鋒刃！別讓任何人站在我的湖上！',
-  'hudChrome.quenchGuardian.warn.wake': '鑄匠之刃掙脫湖面！注意它們瞄準何處！',
   'hudChrome.quenchGuardian.say.pull': '我的湖上來了溫熱的血。它不會溫熱太久。',
   'hudChrome.quenchGuardian.say.shatter': '凍透了。現在，碎裂吧。',
   'hudChrome.quenchGuardian.say.hole': '冰記得每一步。聚在一起，它便會崩塌。',
@@ -23228,12 +23220,17 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.quenchGuardian.say.wipe': '靜止。無聲。淬火已成。',
   'hudChrome.quenchGuardian.say.death': '寒意……放手了……淬火歸你們了。',
   'hudChrome.auraEffect.quenchGuardian.cold':
-    '你的寒意：{cold}/{max}。獨自一人時約{fill}秒充滿。若{radius}碼內有{others}名或更多其他玩家，它反而每秒下降{fall}。達到{max}時你會被霜封{freeze}秒，隨後冰層碎裂。',
+    '你的寒意：{cold}/{max}。獨自一人時約{fill}秒充滿。若{radius}碼內有{others}名或更多其他玩家，則改為每秒下降{fall}。寒冰棺等免疫效果無法阻止它：免疫期間你既不提供也不獲得溫暖。達到{max}時你會被冰霜封住{freeze}秒，隨後冰層碎裂。',
   'hudChrome.auraEffect.quenchGuardian.warmth':
     '與團隊相擁取暖：寒意每秒下降{fall}。在同一處停留{linger}秒的人群，腳下冰面會裂成冰冷的水洞，所以要不斷移動。',
   'hudChrome.auraEffect.quenchGuardian.frozen':
-    '被霜封住：無法行動。效果結束時冰層碎裂：你受到{min}到{max}點冰霜傷害並陷入霜脆狀態，{radius}碼內的所有人獲得{cold}點寒意（英雄難度為{heroicRadius}碼、{heroicCold}點寒意）。',
-  'hudChrome.auraEffect.quenchGuardian.brittle': '受到的所有傷害提高{pct}%。',
+    '被冰霜封住：你無法行動，受到的所有傷害提高{pct}%，冰霜會擊碎寒冰棺等免疫效果。效果結束時冰層碎裂：你受到{min}到{max}點冰霜傷害，隨後{seconds}秒內受到的傷害提高{brittle}%，{radius}碼內的所有人獲得{cold}點寒意（英雄難度為{heroicRadius}碼、{heroicCold}點寒意）。',
+  'hudChrome.auraEffect.quenchGuardian.brittle':
+    '受到的所有傷害提高{pct}%。此效果持續期間，隊友碎冰的濺射無法讓你的寒意超過{cap}。',
+  'hudChrome.auraEffect.quenchGuardian.splashed':
+    '隊友碎裂的冰濺到了你：寒意+{cold}。在你自己的寒意條充滿前回到人群中。',
+  'hudChrome.quenchAlert.splashTitle': '冰霜濺射！寒意+{cold}',
+  'hudChrome.quenchAlert.immuneLine': '免疫效果擋不住寒意：快抱團',
   'hudChrome.auraEffect.quenchGuardian.trapped':
     '踏穿冰面掉進冰冷的水中：無法移動，每秒受到{min}到{max}點冰霜傷害，寒意不斷上升。{seconds}秒後你會爬上岸邊。僅憑冰水絕不會致死。',
   'hudChrome.auraEffect.quenchGuardian.awake':
@@ -24511,6 +24508,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.heart_final_shearing_blow': '劈裂重擊',
   'abilityUi.cast.heart_final_gale_pounce': '疾風撲擊',
   'abilityUi.cast.heart_final_rime_toll': '霜凇鐘鳴',
+  'abilityUi.cast.heart_breath_cradle_channel': '雷霆搖籃',
+  'abilityUi.cast.heart_breath_gale_bulwark': '狂風壁壘',
+  'abilityUi.cast.heart_breath_mending_gale': '癒合之風',
   'entities.mobs.heart_final_splinter_heat.name': '熾熱碎片',
   'entities.mobs.heart_final_splinter_quench.name': '淬火碎片',
   'entities.mobs.heart_final_splinter_breath.name': '吐息碎片',
@@ -24768,4 +24768,23 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'seasonal.thatchgrin.wakeYell': '夜幕降臨南瓜田！誰敢踏進我的田地？',
   'seasonal.thatchgrin.sleepYell': '太陽出來了。回到木樁上，繼續看守。',
   'seasonal.pumpkins.progress': '{label}：{current}/{total}',
+  'entities.mobs.heart_gale_sentinel.name': '狂風哨兵',
+  'entities.mobs.heart_gale_mender.name': '狂風癒者',
+  'hudChrome.knotAlert.aTitle': '你是傳送門A！',
+  'hudChrome.knotAlert.aLine': '{seconds}秒後在你腳下打開。站在結風附近。',
+  'hudChrome.knotAlert.bTitle': '你是傳送門B！',
+  'hudChrome.knotAlert.bLine': '{seconds}秒後在你腳下打開。站在崖台邊緣。',
+  'hudChrome.knotAlert.cTitle': '你是傳送門C！',
+  'hudChrome.knotAlert.cLine': '{seconds}秒後在你腳下打開。站在另一團結風附近。',
+  'hudChrome.knotAlert.dTitle': '你是傳送門D！',
+  'hudChrome.knotAlert.dLine': '{seconds}秒後在你腳下打開。站在遠離傳送門B的邊緣。',
+  'hudChrome.knotAlert.carryTitle': '你正攜帶結風！',
+  'hudChrome.knotAlert.carryLine':
+    '每個傳送門都通往另一端：A到B，C到D。在崖台邊緣把它扔出去。{seconds}秒後爆裂。',
+  'hudChrome.knotAlert.lipTitle': '現在扔！',
+  'hudChrome.knotAlert.lipLine': '你站在邊緣。{seconds}秒後爆裂。',
+  'hudChrome.knotAlert.throwKey': '在邊緣按{key}投擲',
+  'hudChrome.knotAlert.throwTap': '在邊緣點按此處投擲',
+  'hudChrome.knotAlert.throwClick': '在邊緣點擊此處投擲',
+  'hudChrome.knotAlert.throwAria': '將結風扔進虛空',
 };

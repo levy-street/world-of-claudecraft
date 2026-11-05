@@ -19,6 +19,8 @@ kit's slots (KitStone lit, KitGlow emissive, KitGlass unused). Game yards,
     body runs back to +Y (rock_sculpt.py);
   - Kit_RockLipA, B: on a walk's lip (z 0, nothing above -0.05), hanging
     40 yd, the face leaning out over the void (toward -Y) as it falls;
+  - Kit_RockHangA, B: on a high walk's lip (z 0, nothing above -0.05),
+    hanging 100 yd into the mist, battered out over the void;
   - Kit_Boulder*: the foot's centre.
 Deterministic: every random draw is seeded, nothing reads the clock.
 """
@@ -88,6 +90,19 @@ for (n, seed, W, H, D, kw) in WALL_SPECS:
 # The walks' sides where they fall into the chasm.
 BUILDERS['RockLipA'] = lip('RockLipA', 581, 12.0, 40.0, 4.0, 0.38)
 BUILDERS['RockLipB'] = lip('RockLipB', 587, 12.0, 40.0, 4.0, 0.38)
+
+
+def hang(name, seed, W, H, D, out, cols):
+    def make():
+        p = rs.RP(name, seed=seed, ao_dist=6.0)
+        return rs.rock_hang(bpy, p, name, seed, W, H, D, out=out, cols=cols)
+    return make
+
+
+# The great faces hung under the Breath's high walks the whole way into the
+# mist (the AAA pass's third round: src/render/smith_heart/heart_rock_hang_core.ts).
+BUILDERS['RockHangA'] = hang('RockHangA', 571, 30.0, 100.0, 10.0, 0.3, 3)
+BUILDERS['RockHangB'] = hang('RockHangB', 577, 30.0, 100.0, 10.0, 0.3, 3)
 # The crest's needles (phase 2F): the skyline's landmarks.
 BUILDERS['RockNeedleA'] = lambda: rs.needle(bpy, rs.RP('RockNeedleA', seed=591, ao_dist=6.0), 'RockNeedleA', 591,
                                             18.0, 72.0)

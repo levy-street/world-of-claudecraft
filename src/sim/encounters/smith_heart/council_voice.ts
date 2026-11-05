@@ -1,4 +1,4 @@
-// What the Hammer Council's three members SAY (docs/design/raid/smith_heart.md
+// What the Hammer Council's two members SAY (docs/design/raid/smith_heart.md
 // section 7.1, the voice lines): a boss yell to every player in the claim,
 // carrying its catalog key (`hudChrome.council.say.<role>_<moment>`) so the
 // client renders it through t(), with the English as the fallback and as the
@@ -7,8 +7,8 @@
 // HAMMER_COUNCIL_VOICE_PROMPTS) until the designer picks one.
 //
 //   pull       each member once, a breath apart (the Guardian first)
-//   job lines  the Guardian's Wrath, the Slabwright's Wake and rock, the
-//              Singer's song: spoken by the member itself (never an heir), at
+//   job lines  the Guardian's Wrath and Rush, the Singer's Wake, rock and
+//              song: spoken by the member itself (never an heir), at
 //              most once in SAY_EVERY seconds each, so a five-minute pull is
 //              never a chatter
 //   a fall     the fallen's death line (on mythic its soul's line instead), and
@@ -26,6 +26,7 @@ import { type CouncilScope, living } from './council_scope';
 export type CouncilMoment =
   | 'pull'
   | 'wrath'
+  | 'rush'
   | 'wake'
   | 'rock'
   | 'song'
@@ -42,25 +43,18 @@ export const COUNCIL_LINES: Readonly<Record<CouncilRole, Partial<Record<CouncilM
     guardian: {
       pull: "Strangers in the Quarry. The Hammer's strength does not yield to flesh.",
       wrath: 'The mountain answers me! Hide, if the stone will have you!',
+      rush: 'Stand in my path, then. The mountain does not turn aside.',
       death: 'My strength... I give it to the stone.',
       remember: 'The stone remembers. What was theirs is mine.',
       soul: 'I am the stone now. My wrath has no body left to fail.',
       wipe: 'Dust. As all flesh becomes.',
       defeat: "The Hammer's strength... is yours to carry.",
     },
-    slabwright: {
-      pull: 'More stone for the wall. Hold still, and I will set you in it.',
-      wake: 'Stand there. The stone rises where you stand!',
-      rock: 'Look up, little ones! The mountain is falling!',
-      death: 'The slab... splits...',
-      remember: 'The stone remembers. I will finish the work.',
-      soul: 'No hands left, but I will drag this stone to you.',
-      wipe: 'Set, and buried. Good work.',
-      defeat: 'The Quarry... falls quiet.',
-    },
     singer: {
       pull: 'Hear the seam sing? It has waited so long for your voices.',
       song: 'Sing with me, and break!',
+      wake: 'Wake, sleeping stone. Rise where they stand!',
+      rock: 'Look up, little ones! The mountain is falling!',
       death: 'My song... runs into the rock...',
       remember: 'The stone remembers. Listen, it still sings.',
       soul: 'Listen. In the stone, my song never ends.',
@@ -80,7 +74,7 @@ export const SAY_EVERY = 45;
 export const PULL_FIRST = 0.5;
 export const PULL_GAP = 4;
 
-const JOB_MOMENTS: ReadonlySet<CouncilMoment> = new Set(['wrath', 'wake', 'rock', 'song']);
+const JOB_MOMENTS: ReadonlySet<CouncilMoment> = new Set(['wrath', 'rush', 'wake', 'rock', 'song']);
 
 /** Speak one line from `from` (yell range: the whole claim's Quarry). */
 function yell(s: CouncilScope, from: Entity, role: CouncilRole, moment: CouncilMoment): void {
@@ -123,7 +117,7 @@ export function councilSay(s: CouncilScope, role: CouncilRole, moment: CouncilMo
   return true;
 }
 
-/** The pull's three lines, a breath apart (called every tick of the fight). */
+/** The pull's two lines, a breath apart (called every tick of the fight). */
 export function stepCouncilVoice(s: CouncilScope): void {
   COUNCIL_ROLES.forEach((role, i) => {
     if (s.st.clock + 1e-9 < PULL_FIRST + i * PULL_GAP) return;

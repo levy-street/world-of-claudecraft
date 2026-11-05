@@ -215,6 +215,7 @@ import { SANCTUM_BOSS_LOOKS, SANCTUM_BOSS_MOB_KEYS } from './sanctum_boss_looks'
 import { SANCTUM_MOB_KEYS, sanctumCreatureLooks } from './sanctum_creature_looks';
 import { seasonalTrickLooks } from './seasonal_trick_looks';
 import type { SeatClipSet } from './seat_clips';
+import { SMITH_HEART_BOSS_LOOKS } from './smith_heart_boss_looks';
 import { SMITH_HEART_PLACEHOLDER_LOOKS } from './smith_heart_placeholder_looks';
 import type { WeaponLoadout } from './weapon_loadout_core';
 import { WILDHEART_MOB_KEYS, wildheartPlaceholderLooks } from './wildheart_creature_looks';
@@ -4246,22 +4247,6 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.4,
   },
-  // The Masterless Strength (the Smith's Heart's final boss, phase 2J): a
-  // bodyless target, its click capsule, nameplate and bars over the colossus
-  // of rock pieces and crystal the raid's own effects draw
-  // (smith_heart_fx/final_fx.ts) until its own model ships. Bound off the
-  // goleling's rig (never seen); its height times the boss's scale (3.6) is
-  // the colossus's, so the nameplate rides over its head. Every Smith's Heart
-  // bodyless target binds ELEMENTAL_FLOATING, so each carries mob_elemental's
-  // Elemental_Attack donor (already loaded for the raid's elemental warders).
-  smith_heart_colossus: {
-    url: `${CREATURES}/golelingevolved.glb`,
-    height: 5.6,
-    clips: ELEMENTAL_FLOATING,
-    animUrls: [`${CREATURES}/elemental_ability_anims.glb`],
-    bodyless: true,
-    clickRadius: 4.4,
-  },
   // The Hammer Vein Warder (the Smith's Heart's first trash, design doc section 4), the
   // raid's first body of its own: Tripo P2 from the concept sheet, one UV island per rock on a
   // 1024 ETC1S atlas painted over in ChatGPT, and a stone rig built in Blender (every rock rigid to
@@ -4302,28 +4287,12 @@ export const VISUALS: Record<string, VisualDef> = {
     gaitWindDown: true,
     authoredAtlas: true,
   },
-  // The Hammer Council's Stone Prison and Seam Singer (the Smith's Heart's first
-  // boss, design doc 7.1): bodyless targets, their click capsules, nameplates
-  // and bars over the provisional bodies the raid's own effects draw
-  // (smith_heart_fx/council_bodies.ts) until their own models ship. Bound off the
-  // goleling's rig (never seen); height times the template's scale is the body's
-  // (about 2 to 2.5 times a player).
-  smith_heart_stone_prison: {
-    url: `${CREATURES}/golelingevolved.glb`,
-    height: 2.4,
-    clips: ELEMENTAL_FLOATING,
-    animUrls: [`${CREATURES}/elemental_ability_anims.glb`],
-    bodyless: true,
-    clickRadius: 1.6,
-  },
-  // The Slabwright, the Council's first body of its own: Tripo P2, one UV island per rock on a
-  // painted 1024 atlas in ETC1S, a stone rig built in Blender (every rock rigid to one bone; the
-  // tracks that only hold the rest pose are dropped at build, see the spec). Melee lands at
-  // 1.0 s, inside its 2.8 s swing. Wake the Stone and Falling Rock come down at 78 percent of their
-  // 1.2 s bars (where council_bodies.ts plays their dust and ring), Stone Prison claps at the end
-  // of its 1.5 s bar, Mountain's Wrath is built for the heirs' 3 s bar, and each finishes its
-  // recovery after the bar. It hovers, so no foot can slide: runRef is the template's 7 yd/s at 1x.
-  // smith_heart_fx/council_bodies.ts still plays its dust and rings (COUNCIL_MODELLED).
+  // The Slabwright's own body: Tripo P2, one UV island per rock on a painted 1024 atlas in ETC1S,
+  // a stone rig built in Blender (every rock rigid to one bone; the tracks that only hold the
+  // rest pose are dropped at build, see the spec). The Slabwright left the Hammer Council when
+  // the raid made it two bosses, so no template draws this now: the model is kept for reuse.
+  // Melee lands at 1.0 s, inside its 2.8 s swing; its casts come down at 78 percent of their
+  // bars and finish their recovery after; it hovers, so runRef is the old 7 yd/s at 1x.
   smith_heart_slabwright: {
     url: `${CREATURES}/heart_slabwright.glb`,
     height: 2.15,
@@ -4358,6 +4327,12 @@ export const VISUALS: Record<string, VisualDef> = {
     authoredAtlas: true,
     clickRadius: 1.4,
   },
+  // The Hammer Council's Seam Singer (the Smith's Heart's first boss, design
+  // doc 7.1): a bodyless target, its click capsule, nameplate and bars over the
+  // provisional rock-and-crystal body the raid's own effects draw
+  // (smith_heart_fx/council_bodies.ts) until its own model ships. Bound off
+  // the goleling's rig (never seen); height times the template's scale is the
+  // body's (about 2.5 times a player).
   smith_heart_seam_singer: {
     url: `${CREATURES}/golelingevolved.glb`,
     height: 2.5,
@@ -8361,6 +8336,8 @@ Object.assign(VISUALS, wildheartPlaceholderLooks(VISUALS));
 Object.assign(VISUALS, sanctumCreatureLooks(VISUALS));
 // The Gravewyrm Sanctum's three bosses (sanctum_boss_looks.ts).
 Object.assign(VISUALS, SANCTUM_BOSS_LOOKS);
+// The Smith's Heart's own boss models (smith_heart_boss_looks.ts).
+Object.assign(VISUALS, SMITH_HEART_BOSS_LOOKS);
 // Gourdlight Eve's trick bodies, the bat and the skeleton (seasonal_trick_looks.ts).
 Object.assign(VISUALS, seasonalTrickLooks(VISUALS));
 

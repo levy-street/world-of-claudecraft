@@ -66,6 +66,8 @@ import {
   HEART_WALL_PATH_CLEAR,
   heartFloorClearance,
   heartOpenAir,
+  heartSummitCap,
+  heartSummitOpen,
 } from './heart_walls_core';
 import { HEAT_KIT_SHALLOW } from './heat_kit_plan_core';
 import { RING_KIT_FASCIA_DEPTH, RING_KIT_FASCIA_SURFACES } from './ring_kit_plan_core';
@@ -352,6 +354,9 @@ function bandCandidates(): Candidate[][] {
     for (let x = Math.floor((b.minX - PAD) / GRID) * GRID; x <= b.maxX + PAD; x += GRID) {
       const c = clearOf(x, z);
       if (!Number.isFinite(c.back)) continue;
+      // The summit's shoulders fall away bare (heartSummitOpen): no face
+      // stands up round the Cornice's open rim.
+      if (heartSummitOpen(x, z, c.floor) > 0.3) continue;
       for (let i = 0; i < HEART_ROCK_BANDS.length; i++) {
         if (Math.abs(c.back - HEART_ROCK_BANDS[i].back) <= BAND_TOL) {
           out[i].push({ x, z, ...c });
@@ -460,6 +465,11 @@ function planBand(
         if (heartRockFrontPoints(q, piece).some((f) => clearOf(f.x, f.z).back < band.back - slack))
           continue;
         if (heartOpenAir(px, pz, piece.reach * k)) continue;
+        // Under the summit's cap: no face over the Cornice's horizon (its
+        // upper storey too).
+        const cap = heartSummitCap(px, pz);
+        if (foot + tall > cap) continue;
+        if (upper && upper.y + heartRockPieceOf(upper.piece).height * S.scale > cap) continue;
         // Its back never reaches over a walk behind it (a floor higher up
         // the mountain under its crest).
         if (backOverFloor(q, piece, foot, piece.height * S.scale)) continue;
@@ -542,7 +552,16 @@ export const HEART_ROCK_LIP = {
   push: 1.8,
   /** The steepest slope a lip follows (rise per yard). */
   maxShear: 1,
+  /** The Storm Cornice's open (lethal) rim: its lips tucked UNDER the
+   *  brink instead of set out past it (its field face falls sheer there:
+   *  heart_interior.ts `sheer`), their snowy tops this far under the floor,
+   *  so no rock past the red edge reads as ground (Jose's playtest of
+   *  2026-11-04: pale rock past the edge where a body still falls). */
+  corniceTuck: 2.6,
 } as const;
+
+/** The Storm Cornice's floor (the field surface whose rim tucks its lips). */
+const CORNICE_FLOOR = 'storm_cornice';
 
 /** Does a lip module hanging from (x, y, z) (along u, leaning out along n,
  *  `half` yards either way) stand through a walked floor? At each yard `w`
@@ -583,7 +602,7 @@ function lipCrossesFloor(
  *  islands', nor the Wind Bridge's and the anvil bridge's, whose arches the
  *  Breath and the Heat kits draw (phases 2G, 2I), nor the hidden
  *  surfaces'), chained end to end per surface. */
-function chasmChains(): FieldCliffRun[][] {
+export function chasmChains(): FieldCliffRun[][] {
   const F = SMITH_HEART_FIELD;
   const floating = new Set([
     ...SMITH_HEART_FLOATING_SURFACES,
@@ -678,8 +697,10 @@ export function planHeartLips(): HeartKitPlacement[] {
       const cz = (A.z + B.z) / 2;
       // The chord's middle sits inside a bending lip: set it out onto the lip.
       const bow = (M.x - cx) * nx + (M.z - cz) * nz;
-      const ox = cx + nx * (Math.max(0, bow) + HEART_ROCK_LIP.push);
-      const oz = cz + nz * (Math.max(0, bow) + HEART_ROCK_LIP.push);
+      const tuck = surface === CORNICE_FLOOR;
+      const push = tuck ? 0 : HEART_ROCK_LIP.push;
+      const ox = cx + nx * (Math.max(0, bow) + push);
+      const oz = cz + nz * (Math.max(0, bow) + push);
       const stretch = (chord + HEART_ROCK_LIP.overlap) / (HEART_ROCK_LIP.half * 2);
       const reachX = (HEART_ROCK_LIP.half + 2.6) * stretch;
       // The brink under the lowest of the floor over its whole body (its
@@ -700,7 +721,8 @@ export function planHeartLips(): HeartKitPlacement[] {
         ym -
         over -
         (stairs.has(surface) ? 0.3 : 0) -
-        (RING_KIT_FASCIA_SURFACES.has(surface) ? RING_KIT_FASCIA_DEPTH : 0);
+        (RING_KIT_FASCIA_SURFACES.has(surface) ? RING_KIT_FASCIA_DEPTH : 0) -
+        (tuck ? HEART_ROCK_LIP.corniceTuck : 0);
       // Not where another floor lies under its leaning face (a stair's foot
       // beside the arena it enters, a bridge's end): the rock would stand
       // through that floor.
@@ -839,6 +861,8 @@ export function planHeartNeedles(): HeartKitPlacement[] {
       const c = clearOf(x, z);
       if (!Number.isFinite(c.back) || c.back < R.back) continue;
       if (heartOpenAir(x, z, 16)) continue;
+      if (heartSummitOpen(x, z, c.floor) > 0) continue;
+      if (Number.isFinite(heartSummitCap(x, z))) continue;
       cands.push({ x, z, back: c.back });
     }
   }

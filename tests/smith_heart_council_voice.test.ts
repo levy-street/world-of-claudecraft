@@ -1,7 +1,7 @@
 // What the Hammer Council's members say (src/sim/encounters/smith_heart/
 // council_voice.ts) over a REAL Sim claim, and the mythic soul rule in the
 // player text (the Falling Rock and Resonance tooltips, the personal alert):
-// every line is a catalog key with the same English, the pull's three lines a
+// every line is a catalog key with the same English, the pull's two lines a
 // breath apart, a job line only from its own member and never chattering, a
 // fall's line (its soul's on mythic) and a survivor's memory, the last fall's
 // defeat and a wipe's line.
@@ -51,6 +51,7 @@ function quiet(st: CouncilFightState): void {
   st.songTimer = 999;
   st.songDue = null;
   st.pulseTimer = 999;
+  st.rushTimer = 999;
   st.energy = 0;
 }
 
@@ -82,7 +83,7 @@ describe('Hammer Council lines', () => {
         expect(t(councilLineKey(role, moment as CouncilMoment) as never)).toBe(text);
         n++;
       }
-    expect(n).toBe(22);
+    expect(n).toBe(17);
   });
 
   it('the pull: each member once, the Guardian first, a breath apart', () => {
@@ -93,7 +94,6 @@ describe('Hammer Council lines', () => {
     ];
     expect(keysOf(all)).toEqual([
       'hudChrome.council.say.guardian_pull',
-      'hudChrome.council.say.slabwright_pull',
       'hudChrome.council.say.singer_pull',
     ]);
     expect(all[0].text).toBe(COUNCIL_LINES.guardian.pull);
@@ -110,14 +110,14 @@ describe('Hammer Council lines', () => {
       st[timer] = 0;
       return keysOf(yells(f, f.tick(2)));
     };
-    expect(due('wakeTimer')).toEqual(['hudChrome.council.say.slabwright_wake']);
+    expect(due('wakeTimer')).toEqual(['hudChrome.council.say.singer_wake']);
     // The rock is its own line; a second rock inside SAY_EVERY says nothing.
     f.tick(20 * 8);
-    expect(due('rockTimer')).toEqual(['hudChrome.council.say.slabwright_rock']);
+    expect(due('rockTimer')).toEqual(['hudChrome.council.say.singer_rock']);
     f.tick(20 * 8);
     expect(due('rockTimer')).toEqual([]);
     f.tick(20 * SAY_EVERY);
-    expect(due('rockTimer')).toEqual(['hudChrome.council.say.slabwright_rock']);
+    expect(due('rockTimer')).toEqual(['hudChrome.council.say.singer_rock']);
   });
 
   it('an heir casting an inherited job says nothing of it', () => {
@@ -127,7 +127,7 @@ describe('Hammer Council lines', () => {
     quiet(st);
     st.energy = T.energyMax;
     const heard = keysOf(yells(f, f.tick(4)));
-    expect(st.bars.slabwright?.castId ?? st.bars.singer?.castId).toBe('heart_mountains_wrath');
+    expect(st.bars.singer?.castId).toBe('heart_mountains_wrath');
     expect(heard.some((k) => k?.endsWith('_wrath'))).toBe(false);
   });
 
@@ -138,21 +138,17 @@ describe('Hammer Council lines', () => {
       'hudChrome.council.say.singer_death',
       'hudChrome.council.say.guardian_remember',
     ]);
-    // The second fall: the survivor who has not said it yet.
+    // The second fall is the last: its defeat line.
     expect(keysOf(yells(f, kill(f, 'guardian')))).toEqual([
-      'hudChrome.council.say.guardian_death',
-      'hudChrome.council.say.slabwright_remember',
-    ]);
-    expect(keysOf(yells(f, kill(f, 'slabwright')))).toEqual([
-      'hudChrome.council.say.slabwright_defeat',
+      'hudChrome.council.say.guardian_defeat',
     ]);
   });
 
   it('on mythic a fallen member speaks as its soul takes the stone', () => {
     const { f } = pulled('mythic');
     f.tick(20 * 6);
-    expect(keysOf(yells(f, kill(f, 'slabwright')))).toEqual([
-      'hudChrome.council.say.slabwright_soul',
+    expect(keysOf(yells(f, kill(f, 'singer')))).toEqual([
+      'hudChrome.council.say.singer_soul',
       'hudChrome.council.say.guardian_remember',
     ]);
   });
@@ -169,11 +165,7 @@ describe('Hammer Council lines', () => {
 });
 
 describe('Hammer Council mythic in the player text', () => {
-  it('the Falling Rock and Resonance tooltips state the soul pip rule with live numbers', () => {
-    // The Resonance tooltip says "the same wait": the soul pillar's own reach
-    // and pace must stay those of a plain pillar's crack.
-    expect(T.soulResonanceSeconds).toBe(T.resonanceCrackSeconds);
-    expect(T.soulResonanceReach).toBe(T.resonanceReach);
+  it('the Falling Rock tooltip states the soul pip rule with live numbers', () => {
     const rock = auraEffectDescriptor({
       id: COUNCIL_AURAS.rockMark,
       kind: 'vulnerability',
@@ -184,14 +176,14 @@ describe('Hammer Council mythic in the player text', () => {
       `Mythic: a soul pillar within ${T.soulRockReach} yd loses a soul pip`,
     );
     expect(rockText).toContain('Heroic and Mythic: 25% more damage');
+    // Resonance is a spread now: it never touches a pillar, soul or not.
     const res = auraEffectDescriptor({
       id: COUNCIL_AURAS.resonance,
       kind: 'vulnerability',
       value: 0,
     });
     const resText = t(res?.key as never, res?.nums as never);
-    expect(resText).toContain('soul pip');
-    expect(resText).toContain(`${T.singerSoulResonanceSeconds} sec by the Seam Singer's`);
+    expect(resText).not.toContain('soul pip');
     expect(resText).not.toMatch(/\{\w+\}/);
   });
 
@@ -223,23 +215,12 @@ describe('Hammer Council mythic in the player text', () => {
     expect(line(buildCouncilAlertView({ auras: rock, soul: scan.frame(some) }))).toBe(
       t('hudChrome.council.alert.rockLineSoul'),
     );
+    // Resonance keeps its one line (it never touches a pillar).
     const res = [mark(COUNCIL_AURAS.resonance)];
     expect(line(buildCouncilAlertView({ auras: res, soul: scan.frame(some) }))).toBe(
-      t('hudChrome.council.alert.resonanceLineSoul'),
+      t('hudChrome.council.alert.resonanceLine'),
     );
-    // Climbing on a soul pillar is the point: stay; on a plain one: move.
-    const onSoul = buildCouncilAlertView({
-      auras: [mark(COUNCIL_AURAS.resonance, 0.4, 9)],
-      soul: scan.frame(some),
-    });
-    expect(line(onSoul)).toBe(t('hudChrome.council.alert.resonanceBreaking'));
-    expect(kindOf(onSoul)).toBe('resonance');
-    const onPlain = buildCouncilAlertView({
-      auras: [mark(COUNCIL_AURAS.resonance, 0.4, 7)],
-      soul: scan.frame(some),
-    });
-    expect(line(onPlain)).toBe(t('hudChrome.council.alert.resonanceCracking'));
-    expect(kindOf(onPlain)).toBe('cracking');
+    expect(kindOf(buildCouncilAlertView({ auras: res, soul: scan.frame(some) }))).toBe('resonance');
     // Without a world (the old call) nothing changes.
     expect(line(buildCouncilAlertView({ auras: rock }))).toBe(
       t('hudChrome.council.alert.rockLine'),

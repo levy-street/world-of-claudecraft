@@ -56,7 +56,16 @@ function mythic(n = 6, seed = 23): BreathFight {
   st.inhaleTimer = 999;
   st.circleTimer = 999;
   st.heartTimer = 999;
+  stillAir(f);
   return f;
+}
+
+/** Hold the wind calm: on the open rim (2026-11-03) an idle raid would be
+ *  carried off the edge by the blows these tests do not study. */
+function stillAir(f: BreathFight): void {
+  f.dev('/dev heart breath calm');
+  const st = f.state();
+  if (st) st.wind.remaining = 9999;
 }
 
 function round(f: BreathFight, form = '') {
@@ -140,6 +149,7 @@ describe('Knotted Gale: the row', () => {
       const f = breathFight(4);
       f.dev('/dev heart breath pull');
       if (tier) f.dev(`/dev heart breath ${tier}`);
+      stillAir(f);
       f.tick(ticks(30));
       expect(f.state()?.heart).toBeNull();
       expect(f.state()?.heartRuns).toBe(0);
@@ -799,19 +809,14 @@ describe('Knotted Gale: phase 2 two pairs of portals', () => {
     expect(near(h.knots[1], D)).toBe(true);
   });
 
-  it('the raid warning names all four, each re-localized through the catalog', () => {
+  it('calls no raid warning banner (the owner rule of 2026-11-03): the marks are personal alerts', () => {
     const f = mythic(8);
     f.tick(1);
-    const h2 = round(f, ' 2');
-    // The start's warnings ride out with the next tick's events.
+    round(f, ' 2');
     const warns = f
       .tick(1)
       .flatMap((e) => (e.type === 'chat' && e.channel === 'raidWarning' ? [e] : []));
-    const name = (id: number | null) => entity(f, id).name;
-    const pair2 = warns.find((w) => w.textKey === 'hudChrome.breathGuardian.warn.knotPortals2');
-    expect(pair2?.text).toBe(`Portal C on ${name(h2.markC)}, Portal D on ${name(h2.markD)}!`);
-    expect(warns.some((w) => w.textKey === 'hudChrome.breathGuardian.warn.knotPortals')).toBe(true);
-    for (const w of warns) expect(t(w.textKey as never, w.textValues)).toBe(w.text);
+    expect(warns).toEqual([]);
   });
 
   it('a group too small for four marks still plays the round', () => {
@@ -895,7 +900,7 @@ describe('Knotted Gale: phase 2 two pairs of portals', () => {
 });
 
 describe('Knotted Gale: the player text', () => {
-  it('names, warnings, hop and error all resolve through the catalog', () => {
+  it('names, hop and error all resolve through the catalog', () => {
     for (const n of [
       BREATH_NAMES.knot,
       BREATH_NAMES.laden,
@@ -915,10 +920,11 @@ describe('Knotted Gale: the player text', () => {
     f.put(p, spot.x, spot.z);
     f.sim.interact(p.id);
     const evs = f.tick(1);
-    const warns = evs.filter((e) => e.type === 'chat' && e.channel === 'raidWarning');
-    expect(warns.length).toBeGreaterThan(0);
-    for (const w of warns)
-      if (w.type === 'chat') expect(t(w.textKey as never, w.textValues)).toBe(w.text);
+    // The throw lands (no banner: the cue says it in the world).
+    expect(evs.some((e) => e.type === 'spellfxAt' && e.ability === BREATH_CUES.knotThrow)).toBe(
+      true,
+    );
+    expect(evs.some((e) => e.type === 'chat' && e.channel === 'raidWarning')).toBe(false);
     expect(h).toBeDefined();
   });
 

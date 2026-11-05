@@ -35,7 +35,6 @@ import {
   moveFightObject,
   putMarker,
   type QuenchScope,
-  raidWarn,
   roll,
   spawnFightObject,
 } from './quench_scope';
@@ -192,8 +191,6 @@ export function startSlashes(s: QuenchScope): boolean {
       value2: picked.length,
     });
   });
-  const list = picked.map((p, i) => `${i + 1}. ${p.name}`).join(', ');
-  raidWarn(s, s.boss, 'marks', `The blades mark ${list}! Lead them clear of the raid!`, { list });
   quenchSay(s, s.boss, 'cross');
   beginStep(s, slash);
   return true;

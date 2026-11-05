@@ -17,7 +17,7 @@ import { DT } from '../../types';
 import { syncQuenchWalls } from './quench_blades';
 import { insideRimewall, insideRimewallSpot, rimewallSegments } from './quench_geometry';
 import { QUENCH_CUES, QUENCH_NAMES, QUENCH_OBJECTS, QUENCH_TUNING as T } from './quench_ids';
-import { at, dropFightObject, type QuenchScope, raidWarn, spawnFightObject } from './quench_scope';
+import { at, dropFightObject, type QuenchScope, spawnFightObject } from './quench_scope';
 import type { QuenchFightState } from './quench_state';
 
 /** A slab's wall stands as long as the fight (it never runs out). */
@@ -49,7 +49,6 @@ export function raiseRim(s: QuenchScope): void {
     fx: 'nova',
     ability: QUENCH_CUES.rim,
   });
-  raidWarn(s, s.boss, 'rim', 'The shore ice heaves up! Get onto the lake!');
 }
 
 /** The ring rising; when it stands, it walls and whoever is still on the

@@ -1025,3 +1025,141 @@ def rock_lip_calm(bpy, p, name, seed, W, H, D, out=0.38, target=1100, voxel=0.2,
     add_sculpt(p, f, verts, faces, ROCK_COLOURS, ROCK_KINDS, smooth=True)
     p.open_back = True
     return p
+
+
+def rock_hang(bpy, p, name, seed, W, H, D, out=0.3, cols=2, target=2600, voxel=0.34, key=None):
+    """A great face hung under a high walk the whole way down into the mist
+    (the AAA pass's third round, 2026-11-04: under the Breath's high walks the
+    lips' forty yards ended in mid-air as hanging slabs over the field's own
+    flat face, a hundred yards tall). Origin on the lip (z 0, nothing above
+    -0.05), down H yards, its face battered OUT over the void by `out` per
+    yard of drop (in front of the field's own flaring face), its body D deep
+    back under the walk. The calm grammar of rock_wall turned to hang:
+    `cols` broad columns each turned its own way and bevelled back at its
+    edges, a deep cleft between them wandering down the whole drop, every
+    ROCK_LIFT a strong bed stepping out with a drip-edge over the lift below
+    (the world's beds line up piece to piece), great spalls off the columns,
+    the ends turned back into the mountain, the brink worn round. Returns p."""
+    def build():
+        rng = np.random.default_rng(seed)
+        lo = (-W / 2 - 3.0, -out * H - 6.0, -H - 0.6)
+        hi = (W / 2 + 3.0, D + 1.5, 1.0)
+        f = Sculpt(lo, hi, voxel)
+        nf = Noise(seed + 3)
+        bounds = _columns(rng, W, cols)
+        cuts = [b[1] for b in bounds[:-1]]
+        col = []
+        for i, (a, b) in enumerate(bounds):
+            hw = (b - a) / 2
+            # Each column falls in great slabs, each its own plane a little
+            # proud of or behind the one above (never one plank top to foot).
+            breaks = [0.0]
+            while breaks[-1] > -H:
+                breaks.append(breaks[-1] - float(rng.uniform(14.0, 30.0)))
+            # Each break a slanting fracture (never a level course).
+            slabs = [(z0, z1, float(rng.uniform(-1.6, 1.6)), float(rng.uniform(-0.05, 0.05)),
+                      float(rng.uniform(-0.45, 0.45)))
+                     for z0, z1 in zip(breaks[:-1], breaks[1:])]
+            col.append(dict(slabs=slabs, bph=float(rng.uniform(0.0, 0.6)) * ROCK_LIFT,
+                            a=a, b=b, c=(a + b) / 2, hw=hw, off=float(rng.uniform(0.0, 3.6)),
+                            tilt=float(rng.uniform(-0.16, 0.16)), bev=float(rng.uniform(0.74, 0.88)),
+                            bslope=float(rng.uniform(1.0, 1.7)), bedk=float(rng.uniform(0.5, 1.5)),
+                            sz=-float(rng.uniform(0.2, 0.7)) * H, sside=-1.0 if rng.random() < 0.5 else 1.0,
+                            sdepth=float(rng.uniform(0.25, 0.5)) * hw, sgz=float(rng.uniform(0.18, 0.35))))
+        cleft = [dict(x=x0, d=float(rng.uniform(3.4, 5.4)), w=float(rng.uniform(1.6, 2.8)),
+                      arc=float(rng.uniform(-2.0, 2.0)), ph=float(rng.uniform(0, TAU)),
+                      # Each dies out partway down (a row of faces never reads
+                      # as a fence of full-height stripes).
+                      z_end=-float(rng.uniform(0.55, 0.85) if k == 0 else rng.uniform(0.3, 0.6)) * H)
+                 for k, x0 in enumerate(cuts)]
+        n_lift = int(math.ceil(H / ROCK_LIFT)) + 2
+        strong = rng.random(n_lift) < 0.4
+        strong[0] = False
+        steps = np.where(strong, rng.uniform(0.8, 2.2, n_lift), 0.0)
+        outs = np.cumsum(steps)
+        wave_ph = float(rng.uniform(0, TAU))
+
+        def front_v(X, Z):
+            # Down from the brink: u counts the lifts, each column its beds a
+            # little higher or lower than its neighbour's (never one course
+            # across the whole face).
+            bph = np.zeros_like(X)
+            for c in col:
+                bph = np.where((X >= c['a'] - 1e-6) & (X <= c['b'] + 1e-6), c['bph'], bph)
+            u = np.maximum(-Z + bph, 0.0) / ROCK_LIFT
+            i = np.clip(np.floor(u).astype(np.int64), 0, n_lift - 1)
+            fr = u - np.floor(u)
+            v = Z * out - 0.6 + 0.9 * np.sin(X / W * 3.1 + wave_ph) + 0.6 * nf.fbm(X * 0.03, 0.0, Z * 0.022, 2)
+            # Each strong bed steps OUT under the one above (its top a lit
+            # ledge seen from the walk), a drip-edge just over the step.
+            bedk = np.ones_like(X)
+            for c in col:
+                bedk = np.where((X >= c['a'] - 1e-6) & (X <= c['b'] + 1e-6), c['bedk'], bedk)
+            stepv = outs[i] + steps[np.minimum(i + 1, n_lift - 1)] * _sstep(0.9, 1.0, fr)
+            v = v - stepv * bedk
+            colv = np.zeros_like(X)
+            for c in col:
+                inside = (X >= c['a'] - 1e-6) & (X <= c['b'] + 1e-6)
+                e = np.abs(X - c['c']) / c['hw']
+                w = (-c['off'] + c['tilt'] * (X - c['c'])
+                     + np.maximum(0.0, e - c['bev']) * c['hw'] * c['bslope'])
+                for (z0, z1, so, sl, st) in c['slabs']:
+                    za = z0 + st * (X - c['c'])
+                    zb = z1 + st * (X - c['c'])
+                    w = w + np.where((Z <= za) & (Z > zb), -so + sl * (Z - za), 0.0)
+                # A great fracture plane off one corner from partway down.
+                edge = c['c'] + c['sside'] * c['hw']
+                cut = (c['sside'] * (X - edge) + c['sdepth']) * 1.3 + (c['sz'] - Z) * c['sgz'] - c['off']
+                w = np.maximum(w, np.where(Z < c['sz'] + 6.0, cut, -1e3))
+                colv = np.where(inside, w, colv)
+            v = v + colv
+            for c in cleft:
+                xc = c['x'] + c['arc'] * np.sin(-Z / H * 2.4 + c['ph'])
+                w = c['w'] * (0.8 + 0.5 * np.clip(-Z / H, 0, 1))
+                v = v + c['d'] * np.maximum(0.0, 1.0 - np.abs(X - xc) / w) ** 1.2 * _sstep(
+                    c['z_end'] - 3.0, c['z_end'] + 3.0, Z)
+            # The ends turn back into the mountain.
+            t = np.abs(X) / (W / 2)
+            v = v + np.maximum(0.0, t - 0.8) * 4.0 + np.maximum(0.0, t - 0.92) ** 1.5 * D * 6.0
+            return v
+
+        f.put('g0', Body(front_v, lo, hi, D, half=W / 2 + 1.5), 0.0)
+        # Spalls knocked off the columns' faces.
+        for _ in range(int(rng.integers(6, 10))):
+            ex = float(rng.uniform(-W * 0.42, W * 0.42))
+            ez = -float(rng.uniform(5.0, H * 0.85))
+            fy = float(front_v(np.array([ex]), np.array([ez]))[0])
+            side = -1.0 if ex < 0 else 1.0
+            # Oblique, off a column's corner: a facet catching the light,
+            # never a round pit.
+            wedge(f, rng, (ex + side * 2.0, fy + 0.6, ez), (side * 1.0, -0.55, float(rng.uniform(-0.6, 0.5))),
+                  float(rng.uniform(3.5, 6.0)), k=0.2)
+        # A few partings down the faces beside the cleft.
+        for c in cleft:
+            for side in (-1.0, 1.0):
+                sx = c['x'] + side * float(rng.uniform(c['w'] + 1.0, c['w'] + 4.0))
+                pts = []
+                z = -float(rng.uniform(4.0, 20.0))
+                z_end = z - float(rng.uniform(16.0, 34.0))
+                while z > z_end:
+                    pts.append((sx, float(front_v(np.array([sx]), np.array([z]))[0]) + 0.05, z))
+                    sx += float(rng.uniform(-0.35, 0.35))
+                    z -= float(rng.uniform(1.8, 3.2))
+                if len(pts) > 1:
+                    f.groove(Polyline([(x, y + 0.3, zz) for (x, y, zz) in pts], 0.08), 0.4, 0.16)
+        weather(f, seed, amp=0.34, band=2.4, broad=0.8)
+        # The brink: worn round over the lip, nothing above it.
+        _X, Y, Z = _axes(f)
+        front_top = float(front_v(np.array([0.0]), np.array([-0.5]))[0])
+        out_of = np.maximum(0.0, front_top + 1.5 - Y)
+        top = -0.05 - 0.9 * out_of - 0.12 * out_of ** 2
+        cut = np.where(Z > -8.0, (Z - top) * 0.8, -50.0)
+        f.d = smax(f.d, (cut + np.zeros_like(f.d)).astype(np.float32), 0.4)
+        clamp_below(f, -H)
+        return f
+
+    f = _sculpt_once(key or name, build)
+    verts, faces = gs.mesh_sculpt(f, bpy, name, target)
+    add_sculpt(p, f, verts, faces, ROCK_COLOURS, ROCK_KINDS, smooth=True)
+    p.open_back = True
+    return p

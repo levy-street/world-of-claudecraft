@@ -36,6 +36,7 @@ import {
   cradleLook,
   gapLips,
   gapThreat,
+  LIP_SECTORS,
   strikeBoltPath,
   strikeFill,
   WIND_STREAKS,
@@ -118,8 +119,11 @@ describe('breath_fight_fx_core', () => {
   it('draws the field over the Cornice floor and the lips on its open runs only', () => {
     expect(corniceOutline().length).toBeGreaterThan(40);
     const lips = gapLips();
-    expect(lips).toHaveLength(CORNICE_GAPS.length);
-    const open = authoredFieldCliffRuns(SMITH_HEART_FIELD).filter((r) => r.open);
+    // The open rim (2026-11-03): the whole edge, in LIP_SECTORS stretches.
+    expect(lips).toHaveLength(LIP_SECTORS);
+    const open = authoredFieldCliffRuns(SMITH_HEART_FIELD).filter(
+      (r) => r.open && r.surface === 'storm_cornice',
+    );
     expect(lips.flatMap((l) => l.segments)).toHaveLength(open.length);
     for (const lip of lips) {
       expect(lip.segments.length).toBeGreaterThan(0);
@@ -135,9 +139,9 @@ describe('breath_fight_fx_core', () => {
         (s) =>
           Math.hypot(s.ax - e.x, s.az - e.z) < 0.05 || Math.hypot(s.bx - e.x, s.bz - e.z) < 0.05,
       );
-    // Two free ends per gap, every one on exactly one lip, facing out as it does.
-    expect(ends).toHaveLength(lips.length * 2);
-    for (const lip of lips) expect(ends.filter((e) => onLip(lip, e))).toHaveLength(2);
+    // The open rim runs unbroken round the Cornice but for the climb's head:
+    // two free ends, each on exactly one lip, facing out as it does.
+    expect(ends).toHaveLength(2);
     for (const e of ends) {
       const owners = lips.filter((l) => onLip(l, e));
       expect(owners).toHaveLength(1);

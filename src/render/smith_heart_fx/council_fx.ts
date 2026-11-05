@@ -3,7 +3,7 @@
 // IWorld (the pillar, rubble and rise-spot objects, the auras on the players,
 // the council's bars and energy, its events), so offline and online look the
 // same:
-//  - the pillars: the quarry's carved columns and the Slabwright's raised
+//  - the pillars: the quarry's carved columns and the Seam Singer's raised
 //    stone (the Hammer and rock kits' own pieces), each showing its integrity
 //    on the model on every tier: a network of seams that cracks open and
 //    burns hotter as it loses pieces, a lean that grows, the crown split
@@ -11,15 +11,20 @@
 //    one; a risen pillar bursts out of the floor with dust and shards; a
 //    fallen one tips, breaks and sinks into its rubble, which lies as a
 //    hazard footprint until it is gone; the council's fall sinks the risen
-//    ones;
+//    ones; the Guardian's cursed pillar burning crimson-magenta (no pips,
+//    no shelter), throbbing on its pulse and shattering on its break;
 //  - the marks: Wake the Stone's circle round its player (the knockback's
 //    reach, the control colour) with the ghost of the pillar it will raise
 //    growing in it; the heir's rising stone locked on the floor; the Falling
 //    Rock's soak (gold: gather in it) with the boulder dropping out of the
-//    sky over its last moments and its impact; Resonance's ring round its
-//    player (the reach a pillar's face must be within) and, while it
-//    cracks one, the thread of light to that pillar and the pillar humming;
-//    Hammer's Weight's slam on the tank and its mark at the tank's feet;
+//    sky over its last moments and its impact; Resonance's spread ring round
+//    its player (danger: every ally inside is hurt each second) with a
+//    shimmer on the body and a ring rolling out on each pulse; Mountain's
+//    Rush's mark round its player and the lane the Guardian will charge down
+//    (council_rush_fx.ts); Hammer's Weight's slam on the tank and its mark
+//    at the tank's feet;
+//  - Bond of the Stone's gold thread between the two members
+//    (council_bond_fx.ts); the mythic Quarry Collapse's falling rock;
 //  - the Seam Singer's bolt (an ochre shard), the heroic pillars' pulse
 //    rings, the inheritance's stream of stone light from the fallen to each
 //    survivor, and the Wrath holder's energy gathering round it.
@@ -61,6 +66,7 @@ import {
 } from '../smith_heart/heart_kit';
 import { radialGlowTexture } from '../textures';
 import { EngineParticles } from '../trash_engine_fx/engine_particles';
+import { CouncilBondFx } from './council_bond_fx';
 import {
   BOLT_SECONDS,
   COUNCIL_FX_COLORS as C,
@@ -78,11 +84,13 @@ import {
   INHERIT_SECONDS,
   inheritArc,
   inSmithHeartClaim,
+  isCursedPillar,
   markFill,
+  markRadius,
   COUNCIL_FX_POOLS as POOLS,
   RISE_SPOT_SPEC,
   ROCK_FALL_SECONDS,
-  resonanceRing,
+  resonancePulseLook,
   rockFall,
   SOUL_COLORS,
   SOUL_TAKE_SECONDS,
@@ -92,9 +100,8 @@ import {
 } from './council_fx_core';
 import { CouncilLimitFx } from './council_limit_fx';
 import { type CouncilFxHost, CouncilPillarsFx, RISEN_HEIGHT } from './council_pillars_fx';
-import { CouncilPrisonFx } from './council_prison_fx';
+import { CouncilRushFx } from './council_rush_fx';
 import { CouncilShelters } from './council_shelter_fx';
-import { CouncilShoulderFx } from './council_shoulder_fx';
 import { CouncilSoakFx } from './council_soak_fx';
 import { CouncilSoulFx } from './council_soul_fx';
 import { chunkGeometry, Rubble } from './hammer_fx';
@@ -110,7 +117,7 @@ import {
 import { CouncilTelegraphs, type PaintedFan } from './painted_telegraphs';
 
 /** What a soul pillar is to the council's sound. */
-const SOUL_SOUND = { guardian: 'echo', slabwright: 'slab', singer: 'song' } as const;
+const SOUL_SOUND = { guardian: 'echo', singer: 'song' } as const;
 
 const SCAN_SEC = 0.1;
 // ---- a soft additive band (the ghost pillar, Resonance, the threads) -----------------------
@@ -140,7 +147,7 @@ void main() {
 }
 `;
 
-// ---- a flat ring on the floor (Resonance's reach, the Weight's mark) ------------------------
+// ---- a flat ring on the floor (the Weight's mark, the energy's gauge) -----------------------
 
 const RING_VERT = /* glsl */ `
 varying vec2 vXZ;
@@ -210,14 +217,13 @@ interface RockSlot {
   rumbled: boolean;
 }
 
+/** Resonance's shimmer round its carrier (its floor ring is a mark). */
 interface RingSlot {
   playerId: number;
-  ring: THREE.Mesh;
-  ringMat: THREE.ShaderMaterial;
   band: THREE.Mesh;
   bandMat: THREE.ShaderMaterial;
-  thread: THREE.Mesh;
-  threadMat: THREE.ShaderMaterial;
+  /** When its last pulse rang (the host clock). */
+  pulseAt: number;
   seen: boolean;
 }
 
@@ -387,8 +393,10 @@ export class CouncilFx {
   private readonly shelters: CouncilShelters;
   /** The soak's countdown rim, beacon and the rock's shadow. */
   private readonly soak: CouncilSoakFx;
-  private readonly shoulder: CouncilShoulderFx;
-  private readonly prison: CouncilPrisonFx;
+  /** Bond of the Stone's thread between the two members. */
+  private readonly bond: CouncilBondFx;
+  /** Mountain's Rush's lane and impact, the Quarry Collapse's blows. */
+  private readonly rush: CouncilRushFx;
   private readonly limitFx: CouncilLimitFx;
   /** The players the Wrath's runes count (refilled at their pace). */
   private readonly limitPlayers: Entity[] = [];
@@ -433,6 +441,7 @@ export class CouncilFx {
     compileGate?: (target: THREE.Object3D) => Promise<unknown>,
     private readonly reducedMotion: () => boolean = () => false,
     private readonly shakeSink?: (amount: number) => void,
+    playGesture?: (entityId: number, gesture: string) => void,
   ) {
     this.root.name = 'smith-heart-council-fx';
     setRenderCategory(this.root, 'ui3d');
@@ -492,17 +501,14 @@ export class CouncilFx {
     this.pillarsFx = new CouncilPillarsFx(host, carrier);
     this.shelters = new CouncilShelters(host, this.pillarsFx);
     this.soak = new CouncilSoakFx(this.root, this.uTime, this.geometries, this.materials);
-    this.shoulder = new CouncilShoulderFx(host);
-    this.prison = new CouncilPrisonFx(host);
+    this.bond = new CouncilBondFx(host);
+    this.rush = new CouncilRushFx(host, playGesture);
     this.limitFx = new CouncilLimitFx(host, this.pillarsFx);
     this.soulFx = new CouncilSoulFx(host, this.pillarsFx, this.shelters);
     const bandGeo = new THREE.CylinderGeometry(1, 1, 1, 40, 1, true).translate(0, 0.5, 0);
     const ringGeo = new THREE.RingGeometry(0.93, 1, 96, 1).rotateX(-Math.PI / 2);
-    const threadGeo = new THREE.CylinderGeometry(1, 1, 1, 8, 1, true)
-      .translate(0, 0.5, 0)
-      .rotateX(Math.PI / 2);
     const shardGeo = new THREE.OctahedronGeometry(0.5, 0).scale(0.45, 0.45, 1.6);
-    this.geometries.push(bandGeo, ringGeo, threadGeo, shardGeo);
+    this.geometries.push(bandGeo, ringGeo, shardGeo);
     // ---- the marks and the heir's spots (a footprint and a ghost pillar) ----
     const ghostMat = (name: string, color: number, base = 0) => {
       const m = new THREE.ShaderMaterial({
@@ -594,7 +600,7 @@ export class CouncilFx {
         rumbled: false,
       });
     }
-    // ---- Resonance: the ring, the shimmer round the body, the thread ----
+    // ---- Resonance: the shimmer round the body (its ring is a mark) ----
     const ringMat = (name: string, color: number) => {
       const m = new THREE.ShaderMaterial({
         name,
@@ -618,15 +624,6 @@ export class CouncilFx {
       return m;
     };
     for (let i = 0; i < POOLS.rings; i++) {
-      const rm = ringMat('smithHeartResonanceRing', C.resonance);
-      rm.uniforms.uNotches.value = 12;
-      rm.uniforms.uSpin.value = 0.08;
-      const ring = new THREE.Mesh(ringGeo, rm);
-      ring.name = 'smithHeartResonanceRing';
-      ring.renderOrder = floorVfxRenderOrder('encounter', 22);
-      ring.visible = false;
-      ring.frustumCulled = false;
-      this.root.add(ring);
       const bm = ghostMat('smithHeartResonanceBand', C.resonance);
       bm.uniforms.uFlow.value = 6;
       const band = new THREE.Mesh(bandGeo, bm);
@@ -634,23 +631,7 @@ export class CouncilFx {
       band.visible = false;
       band.frustumCulled = false;
       this.root.add(band);
-      const tm = ghostMat('smithHeartResonanceThread', C.resonance);
-      tm.uniforms.uFlow.value = 14;
-      const thread = new THREE.Mesh(threadGeo, tm);
-      thread.name = 'smithHeartResonanceThread';
-      thread.visible = false;
-      thread.frustumCulled = false;
-      this.root.add(thread);
-      this.rings.push({
-        playerId: -1,
-        ring,
-        ringMat: rm,
-        band,
-        bandMat: bm,
-        thread,
-        threadMat: tm,
-        seen: false,
-      });
+      this.rings.push({ playerId: -1, band, bandMat: bm, pulseAt: -99, seen: false });
     }
     // ---- Hammer's Weight: the mark at the tank's feet and the stone over it ----
     for (let i = 0; i < POOLS.weights; i++) {
@@ -802,16 +783,37 @@ export class CouncilFx {
     );
     if (ev.type === 'spellfxAt') {
       if (!councilClaims(ev.ability)) return false;
-      if (ev.ability === COUNCIL_CUES.collapse)
+      if (ev.ability === COUNCIL_CUES.collapse) {
         this.pillarsFx.collapseAt(ev.x, ev.z, ev.radius ?? 4);
-      else if (ev.ability === COUNCIL_CUES.soulBurst) this.pillarsFx.soulBurstAt(ev.x, ev.z);
+        this.rush.pillarStruck(ev.x, ev.z, false);
+      } else if (ev.ability === COUNCIL_CUES.soulBurst) this.pillarsFx.soulBurstAt(ev.x, ev.z);
       else if (ev.ability === COUNCIL_CUES.rockImpact) this.rockImpact(ev.x, ev.z, ev.radius ?? 6);
       else if (ev.ability === COUNCIL_CUES.settle) this.pillarsFx.settleAt(ev.x, ev.z);
+      else if (ev.ability === COUNCIL_CUES.rushWindup)
+        this.rush.windup(
+          ev.sourceId,
+          ev.x,
+          ev.z,
+          ev.dirX ?? 0,
+          ev.dirZ ?? 0,
+          ev.speed ?? T.rushSpeed,
+          ev.duration ?? 0,
+        );
+      else if (ev.ability === COUNCIL_CUES.rushImpact)
+        this.rush.impactAt(ev.x, ev.z, ev.radius ?? T.rushHalfWidth);
+      else if (ev.ability === COUNCIL_CUES.cursedBreak) {
+        this.pillarsFx.cursedBreakAt(ev.x, ev.z, ev.radius ?? T.cursedR);
+        this.rush.pillarStruck(ev.x, ev.z, true);
+      } else if (ev.ability === COUNCIL_CUES.quarryCollapse) this.rush.collapseAt(ev.x, ev.z);
       return true;
     }
     if (ev.type !== 'spellfx' || !councilClaims(ev.ability)) return false;
     const ability = ev.ability;
-    if (ability === COUNCIL_CUES.rise) this.pillarsFx.rise(ev.sourceId);
+    if (ability === COUNCIL_CUES.rise || ability === COUNCIL_CUES.cursedRise)
+      this.pillarsFx.rise(ev.sourceId);
+    else if (ability === COUNCIL_CUES.cursedPulse) this.pillarsFx.cursedPulse(ev.sourceId);
+    else if (ability === COUNCIL_CUES.bondPulse) this.bond.pulse(ev.sourceId, ev.targetId);
+    else if (ability === COUNCIL_CUES.resonancePulse) this.resonancePulse(ev.sourceId);
     else if (ability === COUNCIL_CUES.crack) this.pillarsFx.cracked(ev.sourceId);
     else if (ability === COUNCIL_CUES.pulse) this.pillarsFx.pulse(ev.sourceId);
     else if (ability === COUNCIL_CUES.inherit) {
@@ -823,7 +825,6 @@ export class CouncilFx {
     } else if (ability === COUNCIL_CUES.soulPip) this.pillarsFx.soulPip(ev.sourceId);
     else if (ability === COUNCIL_CUES.echoBlast) this.soulFx.echoBlast(ev.sourceId);
     else if (ability === COUNCIL_CUES.songPulse) this.soulFx.songPulse(ev.sourceId);
-    else if (ability === COUNCIL_CUES.slabCrush) this.soulFx.slabCrush(ev.targetId);
     else if (ability === COUNCIL_CASTS.bolt) {
       this.startBolt(ev.sourceId, ev.targetId);
     } else if (ability === COUNCIL_CASTS.weight) {
@@ -844,7 +845,6 @@ export class CouncilFx {
       this.scanTimer = SCAN_SEC;
       this.scan(world);
     }
-    this.updateHumming(world);
     this.soulFx.update(dt, this.clock);
     this.pillarsFx.update(dt);
     this.updateMarks(world);
@@ -858,8 +858,8 @@ export class CouncilFx {
     this.updateStreams(world, dt);
     this.updateEnergy(world, dt);
     this.updateWrathShelters(world);
-    this.shoulder.update(dt);
-    this.prison.update();
+    this.bond.update(dt);
+    this.rush.update(dt);
     this.audio.update(dt, (id) => world.entities.get(id));
     this.debris.update(dt);
     this.particles.update(this.clock);
@@ -876,8 +876,8 @@ export class CouncilFx {
     // The pillars and the rubble.
     this.pillarsFx.beginScan();
     this.soulFx.beginScan();
-    this.shoulder.beginScan();
-    this.prison.beginScan();
+    this.bond.beginScan();
+    this.rush.beginScan();
     this.audio.beginScan();
     for (const m of this.marks) m.seen = false;
     for (const r of this.rocks) r.seen = false;
@@ -890,10 +890,11 @@ export class CouncilFx {
     if (here) {
       for (const e of world.entities.values()) {
         if (e.kind === 'mob') {
-          this.prison.see(e);
-          if (!e.dead && councilRoleOf(e.templateId) !== null) {
+          const role = e.dead ? null : councilRoleOf(e.templateId);
+          if (role !== null) {
             this.audio.see(e, 'member');
-            this.shoulder.see(e);
+            this.bond.see(e);
+            if (role === 'guardian') this.rush.seeGuardian(e);
           }
           if (
             holder < 0 &&
@@ -909,6 +910,7 @@ export class CouncilFx {
           const pillar = councilPillarOf(e.templateId);
           const soul = pillar ? null : councilSoulOf(e.templateId);
           if (pillar) this.pillarsFx.seePillar(e, pillar.integrity, pillar.risen);
+          else if (isCursedPillar(e.templateId)) this.pillarsFx.seePillar(e, 1, true, null, true);
           else if (soul) {
             this.pillarsFx.seePillar(e, soul.pips, soul.risen, soul.role);
             this.soulFx.seeSoul(e, soul.role);
@@ -919,8 +921,7 @@ export class CouncilFx {
         }
         if (e.kind !== 'player' || e.dead || e.auras.length === 0) continue;
         for (const a of e.auras) {
-          if (a.id === COUNCIL_AURAS.wakeMark || a.id === COUNCIL_AURAS.rockMark)
-            this.seeMark(e, a.id);
+          if (COUNCIL_MARK_SPECS[a.id]) this.seeMark(e, a.id);
           if (a.id === COUNCIL_AURAS.rockMark) {
             this.seeRock(e);
             this.audio.see(e, 'rock');
@@ -933,8 +934,8 @@ export class CouncilFx {
     // What the scan no longer saw.
     this.pillarsFx.endScan();
     this.soulFx.endScan();
-    this.shoulder.endScan();
-    this.prison.endScan();
+    this.bond.endScan();
+    this.rush.endScan();
     this.audio.endScan();
     for (const m of this.marks) {
       if (m.playerId >= 0 && !m.seen) this.freeMark(m);
@@ -966,19 +967,6 @@ export class CouncilFx {
 
   // ---- the pillars ----------------------------------------------------------------------------
 
-  /** The Resonance cracking each pillar now (from the marked players' auras). */
-  private updateHumming(world: IWorld): void {
-    const humming = this.pillarsFx.humming;
-    humming.clear();
-    for (const r of this.rings) {
-      if (r.playerId < 0) continue;
-      const p = world.entities.get(r.playerId);
-      const a = auraById(p, COUNCIL_AURAS.resonance);
-      if (!a?.value2 || a.value <= 0) continue;
-      humming.set(a.value2, Math.max(humming.get(a.value2) ?? 0, a.value));
-    }
-  }
-
   // ---- the marks ----------------------------------------------------------------------------
 
   private seeMark(e: Entity, auraId: string): void {
@@ -993,7 +981,16 @@ export class CouncilFx {
       m.playerId = e.id;
       m.auraId = auraId;
       this.kit.layOutFan(m.fan, 360, { color: spec.color, accent: spec.accent });
-      this.paints.setLook(m.paint, auraId === COUNCIL_AURAS.rockMark ? 'rock' : 'wake');
+      this.paints.setLook(
+        m.paint,
+        auraId === COUNCIL_AURAS.rockMark
+          ? 'rock'
+          : auraId === COUNCIL_AURAS.resonance
+            ? 'resonance'
+            : auraId === COUNCIL_AURAS.rushMark
+              ? 'rush'
+              : 'wake',
+      );
       m.fan.group.visible = true;
       m.ghost.visible = auraId === COUNCIL_AURAS.wakeMark;
     }
@@ -1016,17 +1013,18 @@ export class CouncilFx {
       const a = auraById(p, m.auraId);
       if (!p || !a) continue;
       const spec = COUNCIL_MARK_SPECS[m.auraId];
+      const radius = markRadius(spec, a.value2);
       const fill = markFill(a.remaining, a.duration);
       // The mark rides the player's drawn body, never the snapshot.
       const at = fxAnchor(p);
       const y = this.groundY(at.x, at.z);
       // Re-drape over the floor once the player has moved far enough; slide between.
       if (needsRedrape(at.x, at.z, m.drapedX, m.drapedZ)) {
-        this.kit.drapeFan(m.fan, this.groundY, at.x, y, at.z, 0, spec.radius);
+        this.kit.drapeFan(m.fan, this.groundY, at.x, y, at.z, 0, radius);
         m.drapedX = at.x;
         m.drapedZ = at.z;
       } else this.kit.placeFan(m.fan, at.x, y, at.z);
-      this.kit.paintFan(m.fan, paint(fill, this.clock, spec.radius));
+      this.kit.paintFan(m.fan, paint(fill, this.clock, radius));
       // The stone's live dressing: the rock's shadow under the soak and the
       // floor heating as it drops; the pillar's split heating as it comes.
       if (m.auraId === COUNCIL_AURAS.rockMark) {
@@ -1048,7 +1046,7 @@ export class CouncilFx {
       // The soak's motes stream in (gather); the wake's rise like dust.
       if (this.density > 0.5 && this.rand() < 0.4) {
         const ang = this.rand() * Math.PI * 2;
-        const r = spec.radius * (0.9 + this.rand() * 0.1);
+        const r = radius * (0.9 + this.rand() * 0.1);
         _markMote.speed = spec.gather ? 2.4 : 0.6;
         _markMote.up = spec.gather ? 0.6 : 1.8;
         const tint = spec.gather ? MOTE_GATHER : C.flash;
@@ -1284,7 +1282,7 @@ export class CouncilFx {
       r = this.rings.find((q) => q.playerId < 0);
       if (!r) return;
       r.playerId = e.id;
-      r.ring.visible = true;
+      r.pulseAt = -99;
       r.band.visible = true;
     }
     r.seen = true;
@@ -1292,40 +1290,37 @@ export class CouncilFx {
 
   private freeRing(r: RingSlot): void {
     r.playerId = -1;
-    r.ring.visible = false;
     r.band.visible = false;
-    r.thread.visible = false;
   }
 
   private updateRings(world: IWorld): void {
     for (const r of this.rings) {
       if (r.playerId < 0) continue;
       const p = world.entities.get(r.playerId);
-      const a = auraById(p, COUNCIL_AURAS.resonance);
-      if (!p || !a) continue;
-      const cracking = a.value > 0 && !!a.value2;
-      const look = resonanceRing(this.clock, cracking);
+      if (!p || !auraById(p, COUNCIL_AURAS.resonance)) continue;
       const at = fxAnchor(p);
       const y = this.groundY(at.x, at.z);
-      r.ring.position.set(at.x, y + 0.09, at.z);
-      r.ring.scale.setScalar(look.radius);
-      r.ringMat.uniforms.uAlpha.value = (cracking ? 0.95 : 0.7) * (0.6 + 0.4 * look.pulse);
+      const pulse = resonancePulseLook(this.clock);
+      const flare = Math.max(0, 1 - (this.clock - r.pulseAt) / 0.4);
       r.band.position.set(at.x, y, at.z);
-      r.band.scale.set(0.9, 2.4, 0.9);
-      r.bandMat.uniforms.uAlpha.value = 0.35 + 0.35 * look.pulse + (cracking ? 0.25 : 0);
-      // The thread to the pillar it is cracking.
-      const pillar = cracking && a.value2 ? this.pillarsFx.standing(a.value2) : null;
-      if (pillar) {
-        _v.set(at.x, y + 1.4, at.z);
-        _v2.set(pillar.x, pillar.y + Math.min(4, pillar.height * 0.35), pillar.z);
-        const len = _v.distanceTo(_v2);
-        r.thread.position.copy(_v);
-        r.thread.lookAt(_v2);
-        r.thread.scale.set(0.12 + 0.08 * look.pulse, 0.12 + 0.08 * look.pulse, len);
-        r.threadMat.uniforms.uAlpha.value = 0.5 + 0.5 * a.value;
-        r.thread.visible = true;
-      } else r.thread.visible = false;
+      r.band.scale.set(0.9 + 0.3 * flare, 2.4, 0.9 + 0.3 * flare);
+      r.bandMat.uniforms.uAlpha.value = 0.35 + 0.3 * pulse + 0.35 * flare;
     }
+  }
+
+  /** `heart_resonance_pulse`: the carrier rings: a ring rolls out to the
+   *  spread's radius (the danger colour) and the shimmer flares. */
+  private resonancePulse(playerId: number): void {
+    const p = this.world?.entities.get(playerId);
+    if (!p) return;
+    const at = fxAnchor(p);
+    const radius = markRadius(
+      COUNCIL_MARK_SPECS[COUNCIL_AURAS.resonance],
+      auraById(p, COUNCIL_AURAS.resonance)?.value2,
+    );
+    this.particles.shockRing(at.x, at.z, C.danger, radius, 0.45);
+    this.particles.shockRing(at.x, at.z, C.resonance, radius * 0.6, 0.3);
+    for (const r of this.rings) if (r.playerId === playerId) r.pulseAt = this.clock;
   }
 
   // ---- Hammer's Weight ---------------------------------------------------------------------------
@@ -1703,6 +1698,7 @@ export class CouncilFx {
   dispose(): void {
     if (this.disposed) return;
     this.disposed = true;
+    this.bond.dispose();
     this.root.removeFromParent();
     this.particles.dispose();
     this.kit.dispose();

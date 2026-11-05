@@ -24,6 +24,8 @@ import type { FireLightSink } from '../point_light_budget';
 import { buildBreathAir } from './breath_air';
 import { BREATH_KIT_KINDS, breathKitReady, dressBreath, ensureBreathKit } from './breath_kit';
 import { BREATH_KIT_KEEL, BREATH_KIT_SHALLOW } from './breath_kit_plan_core';
+import { CORNICE_SHEER, CORNICE_SURFACE } from './breath_stone_core';
+import { buildBreathSummit } from './breath_summit';
 import { buildHammerAir } from './hammer_air';
 import {
   hammerEnvFloorMaterial,
@@ -157,6 +159,10 @@ export async function buildSmithHeartInterior(
         ]),
         depth: BREATH_KIT_KEEL,
       },
+      // The Storm Cornice's open rim falls sheer (Jose's playtest of
+      // 2026-11-04: its skirt flared out pale past the red edge, rock that
+      // read as ground where a body still falls).
+      sheer: { surfaces: new Set([CORNICE_SURFACE]), depth: CORNICE_SHEER },
       // The Anvil's rock is the kit's own, and a quarter of it can really fall.
       ...(heartReady ? { noSkirt: new Set(HEART_KIT_NO_SKIRT) } : {}),
       ...(ringReady || heartReady || hammerEnvReady
@@ -223,6 +229,8 @@ export async function buildSmithHeartInterior(
   group.add(heartKitProgramWarmers());
   group.add(buildHammerAir(deps.lowGfx));
   group.add(buildBreathAir(deps.lowGfx));
+  // The Cornice's open sky: the cloud sea under the summit, the far peaks.
+  group.add(buildBreathSummit(deps.lowGfx));
   group.add(buildQuenchAir(deps.lowGfx));
   group.add(buildHeatAir(deps.lowGfx));
   group.add(buildHeatPour(deps.lowGfx));

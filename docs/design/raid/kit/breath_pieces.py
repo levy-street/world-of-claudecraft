@@ -117,11 +117,14 @@ class BreathPiece(SPiece):
     lichen and its pale rosettes only on the tops, no dust; crisp where the
     rock breaks, soft over a swell."""
 
-    def __init__(self, name, seed=0, lichen=1.0, **kw):
+    def __init__(self, name, seed=0, lichen=1.0, hang=0.0, **kw):
         kw.setdefault('ao', 0.75)
         kw.setdefault('dust', 0.0)
         super().__init__(name, seed=seed, **kw)
         self.lichen = lichen
+        # A hanging piece (an isle's crag): its stone darkens and cools
+        # toward its lowest point, this much at the very bottom.
+        self.hang = hang
 
     def finish(self, materials, parent):
         import bmesh
@@ -183,6 +186,13 @@ class BreathPiece(SPiece):
                     k = tone * bed * foot * under * wear
                     col = tuple(ch * k for ch in col)
                     col = mix(col, STORM_COOL, max(0.0, -c) * 0.35)
+                    if self.hang > 0.0 and p.z < 0.0 and floor < 0.0:
+                        deep = min(1.0, p.z / floor) ** 1.3
+                        col = mix(col, STORM_DEEP, self.hang * deep)
+                        # Its strata: soft bands of paler and darker beds,
+                        # warped so no band is a level line.
+                        band = math.sin(p.z * 1.05 + _fbm(p.x * 0.12, p.y * 0.12, p.z * 0.05) * 4.0)
+                        col = tuple(ch * (1.0 + 0.11 * band * min(1.0, -p.z * 0.4)) for ch in col)
                     if len(oh) and abs(n.z) < 0.6:
                         dx = oh[:, 0] - p.x
                         dy = oh[:, 1] - p.y
@@ -811,3 +821,8 @@ def wind_groove():
                 p.box((cx + ox, cy + oy, 0.014), (seg * rng.uniform(0.85, 1.0), 0.2, 0.028),
                       p.vary(STORM_PALE, 0.05), yaw=yaw)
     return p
+
+
+# ============================================================ the isles of the wind
+# The Islands of the Wind (Kit_WindIsleA, B, Kit_IsleShard) live in their own
+# module since their AAA pass of 2026-11-03: breath_isles.py.

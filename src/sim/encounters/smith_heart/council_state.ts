@@ -1,6 +1,5 @@
 // The Hammer Council's fight state (encounters/smith_heart/council.ts): ONE
-// object shared by the Guardian, the Slabwright and the Seam Singer while they
-// fight, as Entity.smithHeartFight on each. A type-only leaf so src/sim/types.ts
+// object shared by the Guardian and the Seam Singer while they fight, as Entity.smithHeartFight on each. A type-only leaf so src/sim/types.ts
 // can name it. Sim authority only: the client reads the fight from the bars
 // (castingAbility, castTargetId), the auras on the players, the energy bar
 // (the holder's resource) and the pillar, rubble and rise-spot objects.
@@ -23,13 +22,12 @@ export interface CouncilRiseSpot {
   objectId: number;
 }
 
-/** One player under Resonance: how long they have stood by one pillar. */
+/** One player under Resonance (a spread): its time left and the seconds to
+ *  its next ring. */
 export interface CouncilResonance {
   playerId: number;
   remaining: number;
-  /** Continuous seconds by `pillarId` (the 3 s crack restarts at 0). */
-  near: number;
-  pillarId: number | null;
+  tick: number;
 }
 
 /** A fallen pillar's rubble (instance-local centre). */
@@ -40,6 +38,9 @@ export interface CouncilRubble {
   r: number;
   remaining: number;
   tick: number;
+  /** It hurts whoever stands in it (false: a Wrath's or a Rush's clean
+   *  break, only a look). */
+  bites: boolean;
 }
 
 /** A bar one member runs for the council. */
@@ -63,13 +64,20 @@ export interface CouncilSoul {
   echo: number | null;
   /** The Endless Song: pulses sung. */
   pulses: number;
-  /** The Walking Slab: where it drags itself (instance-local), the seconds
-   *  to its next pick, its grind's clock, and who it last crushed when
-   *  (player id to the fight clock). */
-  goal: { x: number; z: number } | null;
-  retarget: number;
-  grind: number;
-  crushed: Record<number, number>;
+}
+
+/** Mountain's Rush in flight: the Guardian planted for its wind-up, then
+ *  dashing along its line (world points), where it stops, the pillar that
+ *  stops it (null: it reaches the marked spot), the marked player, the
+ *  wind-up's and the dash's seconds left, and who it has run through. */
+export interface CouncilRush {
+  targetId: number;
+  from: { x: number; z: number };
+  to: { x: number; z: number };
+  pillarId: number | null;
+  windup: number;
+  remaining: number;
+  struck: number[];
 }
 
 export interface CouncilFightState {
@@ -79,16 +87,25 @@ export interface CouncilFightState {
   finished: boolean;
   /** Seconds since the pull. */
   clock: number;
-  /** When Shouldered Stone may warn the raid again (on the fight's clock). */
-  shoulderWarnAt: number;
-  /** Seconds to Stone Prison's next bar, and the blocks standing. */
-  prisonTimer: number;
-  prisons: { playerId: number; blockId: number; remaining: number }[];
   /** The Wrath holder's energy, 0 to 100. */
   energy: number;
-  /** Wraths landed this pull (the soft enrage reads it). */
+  /** Wraths landed this pull (the soft enrage reads it; the first one
+   *  shatters the carved columns for the rest of the pull). */
   wraths: number;
   weightTimer: number;
+  /** Seconds to Mountain's Rush's next bar, and the dash in flight. */
+  rushTimer: number;
+  rush: CouncilRush | null;
+  /** The Guardian's cursed pillar standing (its entity id) and the seconds
+   *  to its next raid pulse, or null. */
+  cursed: { pillarId: number; pulse: number } | null;
+  /** Mythic: the Quarry collapsing after a Rush missed every pillar (its
+   *  stacks and the seconds to its next blow), until the cursed pillar
+   *  breaks; null while it holds. */
+  collapse: { stacks: number; timer: number } | null;
+  /** Bond of the Stone: the pulses sung while the two stand together (0
+   *  while apart), the seconds to the next, and when it may warn again. */
+  bond: { pulses: number; timer: number };
   wakeTimer: number;
   rockTimer: number;
   boltTimer: number;

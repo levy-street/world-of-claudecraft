@@ -16,6 +16,7 @@ import {
   BREATH_DIFFICULTY,
   BREATH_TUNING as T,
 } from '../sim/encounters/smith_heart/breath_ids';
+import { ISLE_AURAS, ISLE_TUNING as IT } from '../sim/encounters/smith_heart/breath_isle_ids';
 import { WIND_DRIFT_AURA, WIND_PULL_AURA } from '../sim/wind_drift';
 import type { AuraEffectDescriptor, AuraEffectInput } from './aura_effect';
 
@@ -46,6 +47,7 @@ export function breathAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescri
           gustMin: T.gustMin,
           gustMax: T.gustMax,
           throw: BREATH_DIFFICULTY.normal.gustThrow,
+          heroicThrow: BREATH_DIFFICULTY.heroic.gustThrow,
         },
       };
     case BREATH_AURAS.pinned:
@@ -83,15 +85,37 @@ export function breathAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescri
         key: `${KEY}.cradled`,
         nums: {
           hold: T.cradleHold,
-          total: T.cradleTotal,
+          total: BREATH_DIFFICULTY.normal.cradleTotal,
+          heroicTotal: BREATH_DIFFICULTY.heroic.cradleTotal,
           radius: T.cradleR,
           soakers: BREATH_DIFFICULTY.normal.cradleSoakers,
           heroicSoakers: BREATH_DIFFICULTY.heroic.cradleSoakers,
+          heroicCount: BREATH_DIFFICULTY.heroic.cradleCount,
           penalty: pct(T.cradlePenaltyMult - 1),
           bmin: T.backlashMin,
           bmax: T.backlashMax,
         },
       };
+    case ISLE_AURAS.bulwark:
+      return {
+        key: `${KEY}.bulwark`,
+        nums: {
+          left: Math.max(0, Math.round(a.value ?? 0)),
+          regrow: pct(IT.regrowShare),
+          mend: pct(IT.mendShare),
+          max: IT.bulwarkMax,
+          bmin: IT.burstMin,
+          bmax: IT.burstMax,
+        },
+      };
+    case ISLE_AURAS.riding:
+      return { key: `${KEY}.riding` };
+    case ISLE_AURAS.windworn:
+      return { key: `${KEY}.windworn` };
+    case BREATH_AURAS.thrown:
+      return { key: `${KEY}.thrown` };
+    case BREATH_AURAS.tossed:
+      return { key: `${KEY}.tossed` };
     case BREATH_AURAS.stormForm:
       return { key: `${KEY}.stormForm` };
     case BREATH_AURAS.swell:

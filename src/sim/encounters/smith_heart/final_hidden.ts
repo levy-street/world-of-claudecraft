@@ -16,7 +16,7 @@
 //                   elements run on; Masterless Fury does not: the collapse is
 //                   the enrage.
 //   The end         after the last quarter (120 s) the ring cracks, then breaks: a
-//                   wipe (council_prison.ts `crush`). A real kill ends the fight
+//                   wipe (a lethal blow whatever shields). A real kill ends the fight
 //                   as any kill does; a kill, a wipe or a reset leaves no floor
 //                   gone (the fallen mask lives on this fight's state and its aura).
 //

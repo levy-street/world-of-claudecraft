@@ -232,15 +232,12 @@ export const HEART_PROP_RECIPES: Readonly<Record<string, readonly HeartPart[]>> 
     part('box', 'bronze', 'ring', [0.8, 5, 0.8], [0, 13.6, -1.4], { tiltX: -0.6 }),
     part('gem', 'glow', 'ring', [1.1, 2, 1.1], [0, 16, -3]),
   ],
-  // The Breath: the bridge's wind shelters, the Cornice's lightning rods and
-  // its broken bellows.
+  // The Breath: the bridge's wind shelters (the Cornice stands bare).
   sh_wind_shelter: [
     part('box', 'stone', 'breath', [4.8, 2, 1.4], [0, 1, 0]),
     part('box', 'glow', 'breath', [4.2, 0.2, 0.2], [0, 1.6, 0.72]),
   ],
-  // A wind channel's cheek stone and a landing's standing stone (phase 2G
-  // stand-ins until the Breath kit lands).
-  sh_channel_jamb: [part('box', 'stone', 'breath', [2.4, 9, 1.4], [0, 4.5, 0])],
+  // A landing's standing stone (phase 2G stand-in until the Breath kit lands).
   sh_storm_stone: [
     part('box', 'stone', 'breath', [2.6, 7.5, 1.8], [0, 3.75, 0]),
     part('gem', 'glow', 'breath', [0.6, 1, 0.6], [0.3, 5.3, 0]),
@@ -250,24 +247,6 @@ export const HEART_PROP_RECIPES: Readonly<Record<string, readonly HeartPart[]>> 
   sh_frost_stone: [
     part('box', 'stone', 'quench', [3, 5.6, 2.4], [0, 2.8, 0]),
     part('gem', 'ice', 'quench', [0.8, 1.4, 0.8], [0.9, 3.4, 0.6]),
-  ],
-  sh_lightning_rod: [
-    part('cyl', 'stone', 'breath', [2.6, 2, 2.4], [0, 1, 0]),
-    part('cyl', 'bronze', 'breath', [0.9, 20, 0.5], [0, 12, 0]),
-    part('cyl', 'bronze', 'breath', [2, 0.35, 2], [0, 6, 0]),
-    part('cyl', 'bronze', 'breath', [1.8, 0.35, 1.8], [0, 10, 0]),
-    part('cyl', 'bronze', 'breath', [1.5, 0.35, 1.5], [0, 14, 0]),
-    part('cone', 'bronze', 'breath', [0.5, 3, 0], [0.6, 22.6, 0], { tiltZ: -0.35 }),
-    part('cone', 'bronze', 'breath', [0.5, 3, 0], [-0.6, 22.6, 0], { tiltZ: 0.35 }),
-    part('gem', 'glow', 'breath', [1.1, 2.8, 1.1], [0, 23.6, 0]),
-  ],
-  sh_broken_bellows: [
-    part('box', 'dark', 'breath', [8, 0.8, 13], [0, 0.4, 0]),
-    part('box', 'dark', 'breath', [6.8, 2.4, 10], [0, 2, -0.6], { tiltX: 0.14 }),
-    part('box', 'bronze', 'breath', [8, 0.8, 13], [0, 4.6, -1.2], { tiltX: 0.36 }),
-    part('cone', 'bronze', 'breath', [2.4, 3.6, 0], [0, 1.6, 6.6], { tiltX: Math.PI / 2 }),
-    part('box', 'bronze', 'breath', [8.4, 0.5, 0.6], [0, 1.2, 4.4]),
-    part('gem', 'glow', 'breath', [1.2, 1.6, 1.2], [2.6, 1, -4.8]),
   ],
   // The Quench: the basin's braziers, vents, colossal blades and ice shelves.
   sh_brazier: [
@@ -457,9 +436,6 @@ function veinMouth(id: string, vein: SmithHeartVein, deg: number): HeartLightSpo
  *  the casting floor's west lip and the Forge's east one). */
 export const HEAT_BRIDGE_CHASM = { x: -169, z: 0 } as const;
 
-/** Which of the Cornice's rods (in field order) carry a light. */
-const LIT_RODS: ReadonlySet<number> = new Set([1, 5]);
-
 function warm(id: string, x: number, z: number, lift: number, color: number): HeartLightSpot {
   return { id, x, z, lift, color, intensity: 3, range: 16 };
 }
@@ -479,7 +455,9 @@ export function planHeartLights(): HeartLightSpot[] {
     veinKey('key:quench', 'quench', QUENCH.lake),
     veinKey('key:heat', 'heat', SMITH_HEART_BOSS_SPOTS.heat),
     { ...veinMouth('mouth:hammer', 'hammer', 180), x: 0, z: -86 },
-    veinMouth('mouth:breath', 'breath', 0),
+    // The Breath's mouth: its light only shapes the stone (the halo hung in
+    // the open air with nothing under it; the jambs' crystals carry the glow).
+    { ...veinMouth('mouth:breath', 'breath', 0), noHalo: true },
     veinMouth('mouth:quench', 'quench', 90),
     veinMouth('mouth:heat', 'heat', 270),
     {
@@ -631,9 +609,6 @@ export function planHeartLights(): HeartLightSpot[] {
       }
     }
   }
-  // Two of the Cornice's lightning rods (east and west of the arena) carry
-  // their tip's storm light; the rest only glow.
-  let rod = 0;
   for (const p of SMITH_HEART_FIELD.props) {
     if (p.kind === 'sh_crucible') {
       // The fire crystal's clusters (phase 2I: the old crucibles' spots),
@@ -657,16 +632,6 @@ export function planHeartLights(): HeartLightSpot[] {
         ...warm(`brazier:${p.x}:${p.z}`, p.x, p.z, 3.2, HEART_PALETTE.coal),
         intensity: 7,
         range: 20,
-      });
-    } else if (p.kind === 'sh_lightning_rod' && LIT_RODS.has(rod++)) {
-      spots.push({
-        id: `rod:${p.x}:${p.z}`,
-        x: p.x,
-        z: p.z,
-        lift: 23,
-        color: SMITH_HEART_VEIN_COLORS.breath,
-        intensity: 4,
-        range: 30,
       });
     }
   }

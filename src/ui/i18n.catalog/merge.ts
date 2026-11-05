@@ -804,7 +804,7 @@ const mergeStringsEn = {
       // The Smith's Heart raid blockout's sketch kits (content/smith_heart.ts).
       // None of these bars can be kicked.
       heart_mountains_wrath: "Mountain's Wrath",
-      heart_bellows_gust: 'Bellows Gust',
+      heart_bellows_gust: 'Summit Roar',
       heart_storm_lance: 'Storm Lance',
       heart_quenching_breath: 'Quenching Breath',
       heart_forge_wrath: 'Forge Wrath',
@@ -821,14 +821,13 @@ const mergeStringsEn = {
       heart_rime_bolt: 'Rime Bolt',
       heart_ember_bolt: 'Ember Bolt',
       // The Hammer Council (encounters/smith_heart/council_ids.ts COUNCIL_CASTS).
-      // Seam Bolt and Song of the Seam can be kicked; an heir's song cannot.
+      // Seam Bolt, Song of the Seam and Wake the Stone can be kicked.
       heart_hammers_weight: "Hammer's Weight",
+      heart_mountains_rush: "Mountain's Rush",
       heart_wake_the_stone: 'Wake the Stone',
       heart_falling_rock: 'Falling Rock',
-      heart_stone_prison: 'Stone Prison',
       heart_seam_bolt: 'Seam Bolt',
       heart_song_of_the_seam: 'Song of the Seam',
-      heart_song_of_the_seam_unbroken: 'Song of the Seam',
       // Mythic: a soul pillar's own bars (council_soul.ts), never kicked.
       heart_echo_of_wrath: 'Echo of Wrath',
       heart_endless_song: 'Endless Song',
@@ -838,6 +837,11 @@ const mergeStringsEn = {
       heart_breath_forking_bolt: 'Leaping Bolt',
       heart_breath_thunders_cradle: "Thunder's Cradle",
       heart_breath_drawn_lightning: 'Drawn Lightning',
+      heart_breath_cradle_channel: "Thunder's Cradle",
+      // The Islands of the Wind (breath_isle_ids.ts ISLE_CASTS): the guardian's
+      // Bulwark is never kicked; the Gale Mender's Mending Gale can be.
+      heart_breath_gale_bulwark: 'Gale Bulwark',
+      heart_breath_mending_gale: 'Mending Gale',
       // The Guardian of the Quench's awakening (encounters/smith_heart/quench_ids.ts).
       heart_quench_blades_wake: 'The Blades Wake',
       heart_quench_blades_hunt: 'The Blades Hunt',
