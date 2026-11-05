@@ -1026,6 +1026,15 @@ function rolePosition(world, st, b, me, hazards, boss) {
       !boss.bad?.(world, st, at) &&
       sight.every((q) => hypot(at, q) <= reach + (q.reach ?? 0) && !world.blocks(at, q));
     if (b.goal && hypot(b.goal, want) < 9 && ok(b.goal)) return b.goal;
+    // A spot that still reaches and sees all it must (and is safe) is kept
+    // however far the arc's spot drifted (a dragged boss, a turning tank):
+    // a caster casts instead of chasing the arc. Healers keep it outright,
+    // the ranged while within 16 yd of the arc's spot.
+    const here = { x: b.self.x, z: b.self.z };
+    if (ok(here) && (role === 'healer' || hypot(here, want) < 16)) {
+      b.goal = here;
+      return here;
+    }
     if (!ok(want)) {
       let found = null;
       search: for (const dr of [0, -4, 4, -7, -10]) {
