@@ -68,6 +68,7 @@ const MOB_AURA_ICON_IDENTITIES: ReadonlyMap<string, string> = new Map([
   ['soulrot_rift_pact_acolyte', 'mob_soulrot'],
   ['spellvuln_rift_boss_arcane', 'mob_spell_vuln'],
   ['spellvuln_stormcrag_elemental', 'mob_spell_vuln'],
+  ['stackpoison_heart_final_splinter_hammer', 'mob_stack_poison'],
   ['stackpoison_heart_heat_guardian', 'mob_stack_poison'],
   ['stackpoison_mirefen_broodmother', 'mob_stack_poison'],
   ['stackpoison_rift_boss_venom', 'mob_stack_poison'],
