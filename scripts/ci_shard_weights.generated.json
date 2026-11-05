@@ -2,8 +2,8 @@
   "__provenance": {
     "run": "40304367651",
     "harvested": "2026-10-26",
-    "files": 6161,
-    "harvestedFiles": 6161,
+    "files": 6160,
+    "harvestedFiles": 6160,
     "carried": {}
   },
   "tests/_debug_i18n.test.ts": 142,
@@ -576,7 +576,6 @@
   "tests/building.test.ts": 14,
   "tests/burning_pact_markers.test.ts": 17,
   "tests/buyback_command.test.ts": 2066,
-  "tests/calendar_view.test.ts": 20,
   "tests/calibration_snapshot.test.ts": 5,
   "tests/camera_boom_colliders.test.ts": 1683,
   "tests/camera_boom_core.test.ts": 17,
