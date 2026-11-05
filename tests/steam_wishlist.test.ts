@@ -43,7 +43,6 @@ const SURFACES = [
     name: 'in-game community rail',
     marker: 'class="community-link steam-wishlist steam-wishlist-chip"',
   },
-  { name: 'mobile More tray', marker: 'id="mobile-steam-wishlist"' },
   // Every one of them is a plain link: nothing here needs client state, so the
   // reminder costs src/main.ts (a firewall at its monolith ceiling) nothing.
 ] as const;
@@ -183,15 +182,13 @@ describe('steam wishlist markup', () => {
         expect(tag, file).toContain('data-i18n-aria="hudChrome.steam.wishlistAria"');
         expect(tag, file).toContain('data-i18n-title="hudChrome.steam.wishlistAria"');
       }
-      // Three surfaces carry the full label; the More-tray pill is too narrow
-      // for it and carries the short caption with the full one as its name.
+      // Every surface carries the full label. The More-tray pill (the one
+      // short caption) left the tray for the Game Menu at the menu consolidation.
       expect(
         html.match(/data-i18n="hudChrome\.steam\.wishlist"/g)?.length,
         `${file} full label keys`,
-      ).toBe(SURFACES.length - 1);
-      expect(html, `${file} tray caption`).toMatch(
-        /id="mobile-steam-wishlist"[\s\S]*?data-i18n="hudChrome\.steam\.wishlistShort"/,
-      );
+      ).toBe(SURFACES.length);
+      expect(html, `${file} tray link`).not.toContain('id="mobile-steam-wishlist"');
     }
   });
 

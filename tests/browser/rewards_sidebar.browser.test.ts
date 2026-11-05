@@ -33,7 +33,6 @@ describe.each([
       const chest = document.querySelector<HTMLButtonElement>('#daily-rewards-button')!;
       chest.innerHTML =
         '<img class="daily-rewards-icon" src="/ui/daily-rewards/treasure_chest.webp" alt="">';
-      document.querySelector<HTMLButtonElement>('#mm-discord')!.hidden = false;
       hydrateIcons(document.body);
       await Promise.all([...document.images].map((img) => img.decode()));
 
@@ -46,7 +45,8 @@ describe.each([
       }
 
       const slot = chest.getBoundingClientRect();
-      const next = document.querySelector('#mm-cosmetics')!.getBoundingClientRect();
+      // The chest's rail neighbour since the menu consolidation is the Game Menu.
+      const next = document.querySelector('#mm-options')!.getBoundingClientRect();
       const icon = chest.querySelector('img')!.getBoundingClientRect();
       expect(slot.width).toBe(next.width);
       expect(slot.height).toBe(next.height);

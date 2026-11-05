@@ -544,6 +544,10 @@ export const vi_VN: EnTranslations = {
         "one": "Nhóm Mở: {count} thông báo",
         "other": "Nhóm Mở: {count} thông báo"
       },
+      "activitiesBellCount": {
+        "one": "Open Activities: {count} notification",
+        "other": "Open Activities: {count} notifications"
+      },
       "alerts": "Thông Báo",
       "groups": "Nhóm",
       "rewards": "Phần Thưởng",

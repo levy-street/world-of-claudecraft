@@ -72,10 +72,8 @@ describe('micro_menu_state_view: the open-window ring', () => {
         '#mm-bag',
         '#mm-char',
         '#mm-options',
-        // The four plain window toggles that were missing from the registry
-        // (2026-09 review): no ring and no aria-pressed until they landed here.
-        '#mm-cosmetics',
-        '#mm-loot-explorer',
+        // The hub launchers (menu consolidation, 2026-11-04).
+        '#mm-deeds',
         '#mm-professions',
         '#expedition-bell',
       ]),
@@ -130,17 +128,29 @@ describe('micro_menu_state_view: the count badges', () => {
 });
 
 describe('micro_menu_state_view: the registry is real', () => {
-  it('rings each of the late-added launchers from its own window', () => {
-    const cases: ReadonlyArray<readonly [string, string]> = [
-      ['#mm-cosmetics', 'cosmetics-window'],
-      ['#mm-loot-explorer', 'loot-explorer-window'],
+  it('rings the Book of the Realm and Activities launchers from ANY member window', () => {
+    const cases: ReadonlyArray<readonly [string, readonly string[]]> = [
+      [
+        '#mm-deeds',
+        [
+          'deeds-window',
+          'titles-window',
+          'reliquary-window',
+          'reputation-window',
+          'loot-explorer-window',
+          'leaderboard-window',
+        ],
+      ],
+      ['#expedition-bell', ['dungeon-finder-window', 'arena-window', 'card-duel-window']],
     ];
-    for (const [selector, windowId] of cases) {
-      const state = view().tick(openOnly(windowId), { talentPoints: 0 });
-      expect(
-        state.launchers.filter((l) => l.on).map((l) => l.selector),
-        `${windowId} must light ${selector} and nothing else`,
-      ).toEqual([selector]);
+    for (const [selector, windowIds] of cases) {
+      for (const windowId of windowIds) {
+        const state = view().tick(openOnly(windowId), { talentPoints: 0 });
+        expect(
+          state.launchers.filter((l) => l.on).map((l) => l.selector),
+          `${windowId} must light ${selector} and nothing else`,
+        ).toEqual([selector]);
+      }
     }
   });
 
@@ -184,15 +194,15 @@ describe('micro_menu_state_view: the registry is real', () => {
     }
   });
 
-  it('maps launchers to distinct windows except the explicit Groups bell alias', () => {
+  it('maps every launcher to its own windows: no window lights two launchers', () => {
+    // The Dungeon Finder button left the rail, so the Groups bell (the
+    // Activities launcher) is the finder window's only launcher now.
     expect(
       MICRO_MENU_LAUNCHERS.filter((l) => l.windowId === 'dungeon-finder-window').map(
         (l) => l.selector,
       ),
-    ).toEqual(['#mm-dfinder', '#expedition-bell']);
-    const windows = MICRO_MENU_LAUNCHERS.filter((l) => l.selector !== '#expedition-bell').map(
-      (l) => l.windowId,
-    );
+    ).toEqual(['#expedition-bell']);
+    const windows = MICRO_MENU_LAUNCHERS.flatMap((l) => [l.windowId, ...(l.memberWindowIds ?? [])]);
     expect(new Set(windows).size).toBe(windows.length);
     const selectors = MICRO_MENU_LAUNCHERS.map((l) => l.selector);
     expect(new Set(selectors).size).toBe(selectors.length);

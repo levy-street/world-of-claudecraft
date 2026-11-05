@@ -88,26 +88,20 @@ describe('promptWikiVisit', () => {
 describe('wiki launcher wiring pins', () => {
   const entries = ['index.html', 'play.html'] as const;
 
-  it('both entry documents carry the desktop micro button and the mobile More-tray twin', () => {
+  // Menu consolidation (2026-11-04): Wiki left the rail and the More tray;
+  // its one launcher is the Game Menu's Help and Wiki row, which keeps the
+  // same confirm-first opener (openWiki).
+  it('neither entry carries the old micro button or the More-tray tile', () => {
     for (const file of entries) {
       const html = readFileSync(new URL(`../${file}`, import.meta.url), 'utf8');
-      expect(html, `${file} lost #mm-wiki`).toContain('id="mm-wiki"');
-      expect(html, `${file} lost #mobile-wiki`).toContain('id="mobile-wiki"');
-      // The micro button has no text content, so a dropped data-icon hook
-      // would render it completely invisible with every suite green (the
-      // #mm-discord pin in client_shell.test.ts guards the same hazard).
-      // The mobile twin degrades to its .mobile-label text, but pin it too.
-      expect(html, `${file} lost #mm-wiki's icon hook`).toMatch(
-        /id="mm-wiki"[^>]*data-icon="wiki"/,
-      );
-      expect(html, `${file} lost #mobile-wiki's icon hook`).toMatch(
-        /id="mobile-wiki"[^>]*data-icon="wiki"/,
-      );
+      expect(html, `${file} still has #mm-wiki`).not.toContain('id="mm-wiki"');
+      expect(html, `${file} still has #mobile-wiki`).not.toContain('id="mobile-wiki"');
     }
   });
 
-  it('Hud binds the micro button to the confirm-first opener', () => {
+  it('Hud keeps the confirm-first opener and binds no micro button', () => {
     const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
-    expect(hud).toContain("$('#mm-wiki')?.addEventListener('click', () => this.openWiki());");
+    expect(hud).not.toContain("$('#mm-wiki')");
+    expect(hud).toContain('openWiki(): void {');
   });
 });

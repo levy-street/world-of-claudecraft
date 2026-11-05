@@ -38,6 +38,8 @@ games products in code comments, docs, commits, or player strings.
 | Curator ranks (cosmetic) | Renown board (scoring set) |
 
 Both are permanent prestige surfaces. They pair; they do not merge.
+(Amended at the menu consolidation, 2026-11-04: both windows are now tabs of the Book of the
+Realm, a shared presentation shell; the two sim systems stay separate and orthogonal.)
 
 ## Architecture
 

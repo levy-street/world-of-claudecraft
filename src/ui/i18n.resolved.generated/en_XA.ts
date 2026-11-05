@@ -544,6 +544,10 @@ export const en_XA: EnTranslations = {
         "one": "[Óþéñ Ĝŕóúþš: {count} ñóţíƒíçáţíóñ]",
         "other": "[Óþéñ Ĝŕóúþš: {count} ñóţíƒíçáţíóñš]"
       },
+      "activitiesBellCount": {
+        "one": "[Óþéñ Áçţíʋíţíéš: {count} ñóţíƒíçáţíóñ]",
+        "other": "[Óþéñ Áçţíʋíţíéš: {count} ñóţíƒíçáţíóñš]"
+      },
       "alerts": "[Áļéŕţš]",
       "groups": "[Ĝŕóúþš]",
       "rewards": "[Ŕéŵáŕðš]",

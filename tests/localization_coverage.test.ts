@@ -2025,7 +2025,11 @@ describe('i18n Localization Key Coverage', () => {
     // Note: the v0.7 layout moved damage meters from a mobile tray button to a
     // dedicated #meters-window, so there is no longer a mobile-meters button to
     // localize here (see client_shell.test.ts, which asserts no id="mobile-meters").
-    expect(html).toContain('data-i18n="hud.core.mobileMap"');
+    // The tray's Map tile left with the menu consolidation (the Quick Actions
+    // strip carries Map); the strip seat names it through the keybind label.
+    expect(html).toContain(
+      'id="mobile-menu-map" data-menu-index="2" data-i18n-title="hud.keybinds.actions.map"',
+    );
     expect(html).toContain('data-i18n-title="hud.core.closeMap"');
     expect(html).toContain('id="structured-data"');
   });

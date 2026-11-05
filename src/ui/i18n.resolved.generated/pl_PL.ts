@@ -544,6 +544,10 @@ export const pl_PL: EnTranslations = {
         "one": "Otwarte grupy: {count} powiadomienie",
         "other": "Otwarte grupy: powiadomienia: {count}"
       },
+      "activitiesBellCount": {
+        "one": "Open Activities: {count} notification",
+        "other": "Open Activities: {count} notifications"
+      },
       "alerts": "Powiadomienia",
       "groups": "Grupy",
       "rewards": "Nagrody",

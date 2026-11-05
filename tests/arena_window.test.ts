@@ -109,11 +109,13 @@ describe('arena_window: WCAG chrome (focusable controls + focus-return)', () => 
     // markDialogRoot(labelledBy: 'arena-title') is set once on open; both
     // title builders must therefore carry the id in every rebuilt panel.
     // W12: the shared title primitive is emitted on both labelled title spans.
+    // Inside Activities (menu consolidation step 4) the hub title leads via
+    // headTitle(); the id stays on the span either way.
     expect(code).toContain(
-      '<span id="arena-title" class="ui-win-title">${esc(t(\'hud.arena.title\'))}',
+      '<span id="arena-title" class="ui-win-title">${esc(this.headTitle(t(\'hud.arena.title\')))}',
     );
     expect(code).toContain(
-      '<span id="arena-title" class="ui-win-title">${esc(t(\'hudChrome.bg.title\'))}',
+      '<span id="arena-title" class="ui-win-title">${esc(this.headTitle(t(\'hudChrome.bg.title\')))}',
     );
   });
 });

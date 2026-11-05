@@ -125,7 +125,7 @@ describe('character sheet desktop geometry', () => {
       .soft(mastery.getBoundingClientRect().bottom, '.char-spec-mastery')
       .toBeLessThanOrEqual(rail.getBoundingClientRect().bottom + 1);
     expect.soft(footerBounds.bottom).toBeLessThanOrEqual(bounds.bottom + 1);
-    expect(root.querySelectorAll('.char-footer [role="tab"]')).toHaveLength(4);
+    expect(root.querySelectorAll('.char-footer [role="tab"]')).toHaveLength(2);
     const slots = Array.from(
       root.querySelectorAll<HTMLElement>('#equip-row-weapons [data-equip-slot]'),
       (slot) => slot.dataset.equipSlot,

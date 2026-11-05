@@ -35,16 +35,19 @@ function facet() {
 /** The rail plus the windows the registry names, as the entry documents seat them. */
 function mountRail(): void {
   document.body.innerHTML = '';
-  for (const { selector, windowId } of MICRO_MENU_LAUNCHERS) {
+  for (const { selector, windowId, memberWindowIds } of MICRO_MENU_LAUNCHERS) {
     const btn = document.createElement('button');
     btn.id = selector.slice(1);
     btn.className = 'micro-btn ui-icon-btn ui-icon-btn--micro';
     document.body.appendChild(btn);
-    if (document.getElementById(windowId)) continue;
-    const win = document.createElement('div');
-    win.id = windowId;
-    win.className = 'window panel';
-    document.body.appendChild(win);
+    // A hub launcher's member windows are seated too (menu consolidation).
+    for (const id of [windowId, ...(memberWindowIds ?? [])]) {
+      if (document.getElementById(id)) continue;
+      const win = document.createElement('div');
+      win.id = id;
+      win.className = 'window panel';
+      document.body.appendChild(win);
+    }
   }
 }
 
@@ -126,13 +129,13 @@ describe('microMenuWindowOpen: reads the shared open-window marker', () => {
 });
 
 describe('MicroMenuStatePainter: the open-window ring', () => {
-  it('rings both Groups launchers from their shared window', () => {
+  it('rings the Groups bell (the Activities launcher) from any Activities tab', () => {
     const painter = new MicroMenuStatePainter(facet().writers);
     const v = view();
     for (const open of [true, false]) {
-      openWindow('dungeon-finder-window', open);
+      openWindow('arena-window', open);
       painter.paint(v.tick(microMenuWindowOpen, { talentPoints: 0 }));
-      for (const id of ['mm-dfinder', 'expedition-bell']) {
+      for (const id of ['expedition-bell']) {
         const button = document.getElementById(id)!;
         expect(button.classList.contains('is-on')).toBe(open);
         expect(button.getAttribute('aria-pressed')).toBe(String(open));
@@ -227,7 +230,7 @@ describe('MicroMenuStatePainter: write elision', () => {
   });
 
   it('survives a launcher that is missing from the document', () => {
-    document.getElementById('mm-cardduel')?.remove();
+    document.getElementById('mm-options')?.remove();
     const { writers } = facet();
     const painter = new MicroMenuStatePainter(writers);
     expect(() =>

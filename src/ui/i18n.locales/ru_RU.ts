@@ -22617,6 +22617,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.retentionFooter': 'При смене специализации сохраняется 60% навыка.',
   'hudChrome.professions.tutorialLink': 'Обучение профессиям',
   'hudChrome.professionsHub.tabOverview': 'Обзор',
+  'hudChrome.expeditions.activitiesBellCount.one': 'Открыть занятия: {count} уведомление',
+  'hudChrome.expeditions.activitiesBellCount.other': 'Открыть занятия: {count} уведомлений',
   'hudChrome.mobile.groupRecord': 'Летопись',
   'hudChrome.social.guildEvents.heading': 'События гильдии',
   'hudChrome.activities.title': 'Занятия',

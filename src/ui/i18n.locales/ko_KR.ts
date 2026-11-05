@@ -20469,6 +20469,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.retentionFooter': '전문 기술 재설정 시 숙련도의 60%가 유지됩니다.',
   'hudChrome.professions.tutorialLink': '전문 기술 튜토리얼',
   'hudChrome.professionsHub.tabOverview': '개요',
+  'hudChrome.expeditions.activitiesBellCount.one': '활동 열기: 알림 {count}개',
+  'hudChrome.expeditions.activitiesBellCount.other': '활동 열기: 알림 {count}개',
   'hudChrome.mobile.groupRecord': '기록',
   'hudChrome.social.guildEvents.heading': '길드 행사',
   'hudChrome.activities.title': '활동',

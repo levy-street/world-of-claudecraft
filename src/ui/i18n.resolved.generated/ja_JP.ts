@@ -544,6 +544,10 @@ export const ja_JP: EnTranslations = {
         "one": "グループを開く：通知{count}件",
         "other": "グループを開く：通知{count}件"
       },
+      "activitiesBellCount": {
+        "one": "アクティビティを開く：通知{count}件",
+        "other": "アクティビティを開く：通知{count}件"
+      },
       "alerts": "通知",
       "groups": "グループ",
       "rewards": "報酬",

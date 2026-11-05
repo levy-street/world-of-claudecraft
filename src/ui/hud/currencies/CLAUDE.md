@@ -1,7 +1,10 @@
-# src/ui/hud/currencies/ - the Currencies tab
+# src/ui/hud/currencies/ - the currencies
 
-The character window's Currencies tab: every spendable balance that is not
-coin, so none of them has to sit in the bags to be seen.
+Every spendable balance that is not coin, so none of them has to sit in the
+bags to be seen. Since the menu consolidation (2026-11-04) the live surface is
+the Bags window's wallet strip (`currenciesWalletHtml`, one chip per currency,
+$WOC left to the purse's chip); the full `currenciesTabHtml` body is no longer
+painted by the Character sheet.
 
 - `currencies_view.ts` is the pure core (`UI_PURE_CORES`): the activity rows
   (the Heroic Marks balance, Honor with its lifetime total, Delve

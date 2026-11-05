@@ -544,6 +544,10 @@ export const id_ID: EnTranslations = {
         "one": "Kelompok Terbuka: {count} pemberitahuan",
         "other": "Kelompok Terbuka: {count} pemberitahuan"
       },
+      "activitiesBellCount": {
+        "one": "Open Activities: {count} notification",
+        "other": "Open Activities: {count} notifications"
+      },
       "alerts": "Pemberitahuan",
       "groups": "Kelompok",
       "rewards": "Hadiah",

@@ -21150,6 +21150,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.retentionFooter': '重置专业后保留60%的技能。',
   'hudChrome.professions.tutorialLink': '专业教程',
   'hudChrome.professionsHub.tabOverview': '总览',
+  'hudChrome.expeditions.activitiesBellCount.one': '打开活动：{count}条通知',
+  'hudChrome.expeditions.activitiesBellCount.other': '打开活动：{count}条通知',
   'hudChrome.mobile.groupRecord': '记录',
   'hudChrome.social.guildEvents.heading': '公会活动',
   'hudChrome.activities.title': '活动',

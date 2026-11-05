@@ -544,6 +544,10 @@ export const tr_TR: EnTranslations = {
         "one": "Açık Gruplar: {count} bildirim",
         "other": "Açık Gruplar: {count} bildirim"
       },
+      "activitiesBellCount": {
+        "one": "Open Activities: {count} notification",
+        "other": "Open Activities: {count} notifications"
+      },
       "alerts": "Uyarılar",
       "groups": "Gruplar",
       "rewards": "Ödüller",

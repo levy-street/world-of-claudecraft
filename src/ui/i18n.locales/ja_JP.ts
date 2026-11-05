@@ -20520,6 +20520,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.retentionFooter': 'リスペック時はスキルの60%を保持します。',
   'hudChrome.professions.tutorialLink': '専門技能チュートリアル',
   'hudChrome.professionsHub.tabOverview': '概要',
+  'hudChrome.expeditions.activitiesBellCount.one': 'アクティビティを開く：通知{count}件',
+  'hudChrome.expeditions.activitiesBellCount.other': 'アクティビティを開く：通知{count}件',
   'hudChrome.mobile.groupRecord': '記録',
   'hudChrome.social.guildEvents.heading': 'ギルドイベント',
   'hudChrome.activities.title': 'アクティビティ',

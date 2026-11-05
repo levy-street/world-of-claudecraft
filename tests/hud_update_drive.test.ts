@@ -8,7 +8,7 @@
 // cold. `Hud.update()` polls about half of them. `spellbookWindow.tickOpen()` runs EVERY
 // FRAME while the window is open; arena / dungeon_finder / card_duel `render()` on
 // the 250 ms band behind only a display check; social / market / mailbox / bank / bags /
-// deeds / professions / calendar get `refreshIfChanged()` on the 500 ms band.
+// deeds / professions / reputation get `refreshIfChanged()` on the 500 ms band.
 //
 // The repo's intended pattern is POLL CHEAPLY, REBUILD ON A SIGNATURE CHANGE, and it works.
 // What was missing is that nothing said WHICH windows are on a poll, on which band, or behind
@@ -1487,6 +1487,14 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the Book of Deeds window',
   },
   {
+    call: 'this.titlesWindow.refreshIfChanged',
+    band: 'slow',
+    gate: 'this.titlesWindow.isOpen',
+    surface: 'window',
+    guard: { kind: 'module', module: 'deeds_window.ts', proof: SIG_RETURN },
+    why: "the Book of the Realm's Titles tab (a second DeedsWindow in titles mode)",
+  },
+  {
     call: 'this.cosmeticsWindow.refreshIfChanged',
     band: 'slow',
     gate: 'this.cosmeticsWindow.isOpen',
@@ -1606,12 +1614,16 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'seats #right-tracker-stack below the minimap column, whose rendered height moves with the zone label and mobile chrome scale; a bounded layout read, elided write (tracker_stack_anchor.ts owns the cadence contract)',
   },
   {
-    call: 'this.calendarWindow.refreshIfChanged',
+    call: 'this.reputationWindow.refreshIfChanged',
     band: 'slow',
-    gate: 'this.calendarWindow.isOpen',
+    gate: 'this.reputationWindow.isOpen',
     surface: 'window',
-    guard: { kind: 'module', module: 'calendar_window.ts', proof: SIG_RETURN },
-    why: 'the guild calendar window',
+    guard: {
+      kind: 'module',
+      module: 'hud/reputation/reputation_window.ts',
+      proof: 'if (this.bodyHtml() === this.lastBody) return;',
+    },
+    why: "the Book of the Realm's Reputation tab (the body string is its signature)",
   },
   {
     call: 'this.updateMailIndicator',
@@ -1974,7 +1986,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // chrome 99 -> 100: the dungeon objectives tracker's medium-band paint
       // (hud/dungeon/dungeon_tracker_painter.ts), facet-routed like the deed strip.
       // window 53 -> 54: Lantern Hall's guild window (hud/guild_hall/guild_hall_window.ts).
-    ).toEqual({ window: 55, chrome: 101, none: 21 });
+    ).toEqual({ window: 56, chrome: 101, none: 21 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');
@@ -1999,7 +2011,9 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // refreshing instead of only closing.
       // The courier window owns both revision and content signature guards.
       // Lantern Hall's guild window owns its signature guard (hud/guild_hall/).
-      module: 32,
+      // The menu consolidation: the Book of the Realm's Titles tab (a second
+      // DeedsWindow) adds a row; the Reputation window replaces the Calendar's.
+      module: 33,
       // Phase 20's refreshCharSheetIfChanged and its siblings. Their latches are
       // HUD fields (lastCharSheetSig et al) because the cold char_window painter
       // holds no signature of its own to diff. The release's trade row left this
@@ -2043,12 +2057,14 @@ describe('Hud.update() drives exactly the registered set, on the registered band
     ).toEqual(
       [
         'arena_window.ts: if (ravenriftSig === this.lastSig) return;',
+        'hud/reputation/reputation_window.ts: if (this.bodyHtml() === this.lastBody) return;',
         'hud/referral_cards/referral_cards_controller.ts: if (this.lastRevision === revision && this.lastFriendshipInviter === inviter) return;',
         'bags_window.ts: if (!bagsMoneyRowStale(el.style.display, this.deps.world().copper, this.lastMoneyCopper)) return;',
         'bank_window.ts: if (sig === this.lastSig) return;',
-        'calendar_window.ts: if (sig === this.lastSig) return;',
         'card_duel_window.ts: if (sig === this.lastSig) return;',
         'daily_rewards_window.ts: if (!this.charterFit.changedFrom(this.deps.world().bankPurchasedSlots)) return;',
+        'deeds_window.ts: if (sig === this.lastSig) return;',
+        // The Book of the Realm's Titles tab is a second DeedsWindow in titles mode.
         'deeds_window.ts: if (sig === this.lastSig) return;',
         'dungeon_finder_proposal_popup.ts: if (view.sig !== this.lastSig) {',
         'dungeon_finder_window.ts: if (sig === this.lastSig) {',

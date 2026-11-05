@@ -544,6 +544,10 @@ export const zh_CN: EnTranslations = {
         "one": "打开队伍：{count}条通知",
         "other": "打开队伍：{count}条通知"
       },
+      "activitiesBellCount": {
+        "one": "打开活动：{count}条通知",
+        "other": "打开活动：{count}条通知"
+      },
       "alerts": "提醒",
       "groups": "队伍",
       "rewards": "奖励",

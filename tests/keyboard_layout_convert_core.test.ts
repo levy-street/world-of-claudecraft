@@ -182,10 +182,10 @@ describe('keyboard_layout_convert_core: converting a setup', () => {
     // Letter-named keys follow their letter; the number row never moves.
     expect(binds.map[0]).toBe('Semicolon');
     // Only the move and turn keys are pinned: the Emote Wheel's X and the
-    // Reliquary's Shift+X follow their letter like any other hotkey.
+    // Book of the Realm's Shift+Z follow their letter like any other hotkey.
     const dvorak = convertBindingsLayout(before, 'qwerty-us', 'dvorak', MOVEMENT).binds;
     expect(dvorak.emoteWheel[0]).toBe('KeyB');
-    expect(dvorak.reliquary[0]).toBe('Shift+KeyB');
+    expect(dvorak.deeds[0]).toBe('Shift+Slash');
     expect(binds.bags[0]).toBe('KeyB');
     expect(binds.slot0[0]).toBe('Digit1');
     expect(binds.slot9[0]).toBe('Digit0');

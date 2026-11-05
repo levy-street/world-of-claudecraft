@@ -1437,31 +1437,22 @@ describe('Guide deeds cross-page surfaces', () => {
     expect(GUIDE_DUNGEONS.every((d) => d.min !== null && d.max !== null)).toBe(true);
   });
 
-  it('lists the Book of Deeds bind on the controls page, matching the in-game default', () => {
+  it('lists the Book of the Realm bind on the controls page, matching the in-game default', () => {
+    // Menu consolidation (2026-11-04): Shift+Z opens the Book of the Realm,
+    // whose tabs include Deeds and the Reliquary, so the Reliquary's own
+    // Shift+X row left the page with its default.
     setLanguage('en');
     const deedsBind = BIND_ACTIONS.find((a) => a.id === 'deeds');
     expect(deedsBind?.defaults).toEqual(['Shift+KeyZ']);
-    expect(t('guide.controls.deeds')).toBe('Book of Deeds');
     const html = controlsPage.render({
       params: [],
       sub: 'reference/controls',
       titleKey: 'guide.nav.controls',
     });
     // the key glyph and the label render inside one table row
-    expect(html).toContain('<kbd>Shift+Z</kbd></td><td>Book of Deeds</td>');
-  });
-
-  it('lists The Reliquary bind on the controls page, matching the in-game default', () => {
-    setLanguage('en');
-    const reliquaryBind = BIND_ACTIONS.find((a) => a.id === 'reliquary');
-    expect(reliquaryBind?.defaults).toEqual(['Shift+KeyX']);
-    expect(t('guide.controls.reliquary')).toBe('The Reliquary');
-    const html = controlsPage.render({
-      params: [],
-      sub: 'reference/controls',
-      titleKey: 'guide.nav.controls',
-    });
-    expect(html).toContain('<kbd>Shift+X</kbd></td><td>The Reliquary</td>');
+    expect(html).toContain('<kbd>Shift+Z</kbd></td><td>Book of the Realm</td>');
+    expect(BIND_ACTIONS.find((a) => a.id === 'reliquary')?.defaults).toEqual([]);
+    expect(html).not.toContain('<kbd>Shift+X</kbd>');
   });
 
   it('cross-links the deeds catalog from the dungeons page', () => {
@@ -1626,16 +1617,18 @@ describe('Guide deeds cross-page surfaces', () => {
       titleKey: 'guide.nav.controls',
     });
     expect(html).toContain('<kbd>T</kbd></td><td>Crafting</td>');
-    expect(html).toContain('<kbd>I</kbd></td><td>Event Calendar</td>');
-    expect(html).toContain('<kbd>U</kbd></td><td>Discord</td>');
+    // The Event Calendar left the game and Discord moved into the Social
+    // window (menu consolidation), so their I and U rows are gone.
+    expect(html).not.toContain('<kbd>I</kbd>');
+    expect(html).not.toContain('<kbd>U</kbd>');
     expect(html).toContain('<kbd>Ctrl+1</kbd> <kbd>Ctrl+5</kbd>');
   });
 
   it('keeps the documented binds in step with the game defaults', () => {
     const defaults = new Map(BIND_ACTIONS.map((a) => [a.id, a.defaults]));
     expect(defaults.get('crafting')).toEqual(['KeyT']);
-    expect(defaults.get('calendar')).toEqual(['KeyI']);
-    expect(defaults.get('discord')).toEqual(['KeyU']);
+    expect(defaults.has('calendar')).toBe(false);
+    expect(defaults.get('discord')).toEqual([]);
     expect(defaults.get('petAttack')).toEqual(['Ctrl+Digit1']);
     expect(defaults.get('petAggressive')).toEqual(['Ctrl+Digit5']);
   });
@@ -1655,7 +1648,8 @@ describe('Guide controls reference completeness', () => {
     });
     expect(html).toContain('<kbd>Shift+P</kbd></td><td>Professions</td>');
     expect(html).toContain('<kbd>Shift+J</kbd></td><td>Target buffs and debuffs</td>');
-    expect(html).toContain('<kbd>Shift+I</kbd></td><td>Dungeon Finder</td>');
+    // Shift+I opens Activities (the Dungeon Finder is its first tab).
+    expect(html).toContain('<kbd>Shift+I</kbd></td><td>Activities</td>');
     expect(html).toContain('<kbd>`</kbd></td><td>Mount / Dismount</td>');
     expect(html).toContain('<kbd>Z</kbd></td><td>Sheathe/Unsheathe Weapon</td>');
   });
@@ -1726,7 +1720,7 @@ describe('Guide controls reference completeness', () => {
     // Anti-vacuous: the scrape really read keycaps, and the two shifted rows
     // this pin was written for are among them.
     expect(kbds.has('Shift+P')).toBe(true);
-    expect(kbds.has('Shift+X')).toBe(true);
+    expect(kbds.has('Shift+Z')).toBe(true);
   });
 
   it('keeps the second-wave binds in step with the game defaults', () => {

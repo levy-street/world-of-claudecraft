@@ -22,20 +22,21 @@ const entries = [
   ['play.html', read('../play.html')],
 ] as const;
 
-function colA(html: string): string {
-  const start = html.indexOf('id="side-buttons-col-a"');
-  const end = html.indexOf('id="side-buttons-col-b"', start);
+function column(html: string, col: 'a' | 'b'): string {
+  const start = html.indexOf(`id="side-buttons-col-${col}"`);
+  const end = html.indexOf('</div>', start);
   expect(start).toBeGreaterThan(-1);
   expect(end).toBeGreaterThan(start);
   return html.slice(start, end);
 }
+const rail = (html: string): string => column(html, 'a') + column(html, 'b');
 
 const action = (id: string) => BIND_ACTIONS.find((a) => a.id === id);
 
 describe('one Professions launcher on the rail', () => {
   it('ships #mm-professions with its Shift+P keycap in BOTH entries', () => {
     for (const [name, html] of entries) {
-      expect(colA(html), name).toMatch(
+      expect(rail(html), name).toMatch(
         /id="mm-professions"[^>]*data-i18n-title="hudChrome\.professions\.title"[^>]*><span class="keybind[^"]*">s-p<\/span>/,
       );
     }
@@ -64,45 +65,66 @@ describe('one Professions launcher on the rail', () => {
     );
   });
 
-  it('keeps the column within the rail height budget, Town Focus included', () => {
+  it('ships the consolidated twelve-button rail, six per column, within the height budget', () => {
+    // Menu consolidation (2026-11-04): 24 visible launchers became 12. Column A
+    // is the character's own windows, column B the hubs and the system row.
     const UNCOMPACTED_MICRO_PLUS_GAP_PX = 34;
     const COMPACT_MICRO_PLUS_GAP_PX = 25;
     const BOTTOM_ANCHOR_PX = 74;
     const UNCOMPACTED_BUDGET_PX = 660;
     const COMPACT_BUDGET_PX = 600;
-    const EXPECTED_IDS = [
-      'mm-char',
-      'mm-spell',
-      'mm-talents',
-      'mm-quest',
-      'mm-deeds',
+    const EXPECTED: Record<'a' | 'b', string[]> = {
+      a: ['mm-char', 'mm-bag', 'mm-spell', 'mm-talents', 'mm-quest', 'mm-map'],
+      b: [
+        'mm-deeds',
+        'mm-professions',
+        'expedition-bell',
+        'mm-social',
+        'daily-rewards-button',
+        'mm-options',
+      ],
+    };
+    for (const [name, html] of entries) {
+      for (const col of ['a', 'b'] as const) {
+        const buttons =
+          column(html, col).match(/<button[^>]*class="[^"]*\bmicro-btn\b[^"]*"[^>]*>/g) ?? [];
+        const visible = buttons.filter(
+          (b) => !/display:\s*none/.test(b) && !/\shidden(?=[\s>=])/.test(b),
+        );
+        expect(
+          visible.map((b) => /id="([^"]+)"/.exec(b)?.[1]),
+          `${name} column ${col}`,
+        ).toEqual(EXPECTED[col]);
+        // Town Focus (column A) and the $WOC Exchange (column B) are hidden in
+        // markup but revealed by state; budget for both.
+        const count = buttons.length;
+        expect(count * UNCOMPACTED_MICRO_PLUS_GAP_PX + BOTTOM_ANCHOR_PX, name).toBeLessThanOrEqual(
+          UNCOMPACTED_BUDGET_PX,
+        );
+        expect(count * COMPACT_MICRO_PLUS_GAP_PX + BOTTOM_ANCHOR_PX, name).toBeLessThanOrEqual(
+          COMPACT_BUDGET_PX,
+        );
+      }
+    }
+  });
+
+  it('removes the folded launchers from the rail and wires no click for them', () => {
+    const gone = [
       'mm-reliquary',
       'mm-loot-explorer',
       'mm-leaderboard',
-      'mm-professions',
-      'mm-bag',
-      'mm-map',
+      'mm-cosmetics',
+      'mm-arena',
+      'mm-dfinder',
+      'mm-cardduel',
+      'mm-emote',
+      'mm-discord',
+      'mm-wiki',
     ];
     for (const [name, html] of entries) {
-      const buttons = colA(html).match(/<button[^>]*class="[^"]*\bmicro-btn\b[^"]*"[^>]*>/g) ?? [];
-      const visible = buttons.filter(
-        (b) => !/display:\s*none/.test(b) && !/\shidden(?=[\s>=])/.test(b),
-      );
-      expect(
-        visible.map((b) => /id="([^"]+)"/.exec(b)?.[1]),
-        name,
-      ).toEqual(EXPECTED_IDS);
-      // Town Focus is hidden in markup but revealed in town; budget for it
-      // while it ships (its removal is its own change).
-      const townCount = buttons.filter((b) => /id="mm-town-focus"/.test(b)).length;
-      const count = visible.length + townCount;
-      expect(count * UNCOMPACTED_MICRO_PLUS_GAP_PX + BOTTOM_ANCHOR_PX, name).toBeLessThanOrEqual(
-        UNCOMPACTED_BUDGET_PX,
-      );
-      expect(count * COMPACT_MICRO_PLUS_GAP_PX + BOTTOM_ANCHOR_PX, name).toBeLessThanOrEqual(
-        COMPACT_BUDGET_PX,
-      );
+      for (const id of gone) expect(html.includes(`id="${id}"`), `${name} ${id}`).toBe(false);
     }
+    for (const id of gone) expect(hud, id).not.toContain(`$('#${id}')`);
   });
 });
 
@@ -156,7 +178,11 @@ describe('the hub keybinds', () => {
   });
 
   it('every professions opener on Hud lands on the hub at its tab', () => {
-    expect(hud).toMatch(/toggleProfessions\(\): void \{\s*this\.professionsHub\.toggle\(\);/);
+    // The plain press toggles the last tab; the More tray's Overview tile
+    // passes its tab through the same opener.
+    expect(hud).toMatch(
+      /toggleProfessions\(tab\?: ProfessionsHubTab\): void \{\s*this\.professionsHub\.toggle\(tab\);/,
+    );
     expect(hud).toMatch(
       /toggleCrafting\(\): void \{\s*this\.professionsHub\.toggle\('crafting'\);/,
     );

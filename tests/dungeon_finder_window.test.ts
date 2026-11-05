@@ -45,7 +45,10 @@ describe('dungeon finder window painter (source contract)', () => {
   });
 
   it('closes through close() with a real labelled close button', () => {
-    expect(src).toMatch(/data-close aria-label="\$\{esc\(t\('hudChrome\.finder\.close'\)\)\}"/);
+    // Inside Activities (menu consolidation step 4) the close names the hub.
+    expect(src).toMatch(
+      /data-close aria-label="\$\{esc\(hub \? hub\.closeLabel\(\) : t\('hudChrome\.finder\.close'\)\)\}"/,
+    );
   });
 
   it('escapes every interpolated name and uses t() for every label', () => {

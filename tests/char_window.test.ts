@@ -285,13 +285,13 @@ describe('char_window: profession art placements', () => {
     const tabs = [...root.querySelectorAll<HTMLElement>('.char-sidebar-tab')];
     expect(tabs.map((tab) => [tab.dataset.tab, tab.getAttribute('aria-selected')])).toEqual([
       ['stats', 'true'],
-      ['reputation', 'false'],
-      ['currencies', 'false'],
       ['progression', 'false'],
     ]);
-    // The Skills tab left the sheet with the Professions hub (menu
-    // consolidation step 1): the hub's Overview tab owns those rows.
-    expect(root.querySelector('[data-tab="skills"]')).toBeNull();
+    // The menu consolidation left the sheet two tabs: Skills, Reputation and
+    // Currencies moved to the Professions hub, the Book of the Realm and Bags.
+    for (const gone of ['skills', 'reputation', 'currencies']) {
+      expect(root.querySelector(`[data-tab="${gone}"]`), gone).toBeNull();
+    }
     expect(tabs.every((tab) => tab.closest('.char-footer') !== null)).toBe(true);
     // The sidebar panel scrolls and the Stats board holds no focusable
     // content, so it carries its own tab stop and takes its name from the

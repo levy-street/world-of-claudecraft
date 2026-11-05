@@ -489,7 +489,7 @@ function installMobileControlDom(): {
     ['mobile-more', new FakeElement()],
     ['mobile-extra-controls', new FakeElement()],
     ['mobile-emote', new FakeElement()],
-    ['mobile-mounts', new FakeElement()],
+    ['mobile-menu-mount', new FakeElement()],
     ['mobile-discord', new FakeElement()],
     ['mobile-donate', new FakeElement()],
     ['mobile-wiki', new FakeElement()],
@@ -531,7 +531,7 @@ function installMobileControlDom(): {
     moreButton: elements.get('mobile-more')!,
     moreModal: elements.get('mobile-extra-controls')!,
     emoteButton: elements.get('mobile-emote')!,
-    mountButton: elements.get('mobile-mounts')!,
+    mountButton: elements.get('mobile-menu-mount')!,
     discordButton: elements.get('mobile-discord')!,
     donateButton: elements.get('mobile-donate')!,
     wikiButton: elements.get('mobile-wiki')!,
@@ -1295,7 +1295,9 @@ describe('MobileControls pointer lifecycle', () => {
     expect(opens).toBe(1);
   });
 
-  it('fires the mount callback when the More-tray Mount button is tapped', () => {
+  // The More tray's Mount tile left with the menu consolidation (a Quick
+  // Actions duplicate); the strip's Mount seat runs the same callback.
+  it('fires the mount callback when the Quick Actions Mount button is tapped', () => {
     const { mountButton } = installMobileControlDom();
     const input = {
       setTouchMove: () => {},

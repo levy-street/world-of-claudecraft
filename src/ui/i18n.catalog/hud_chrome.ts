@@ -54,6 +54,12 @@ export const hudChromeStrings = {
       one: 'Open Groups: {count} notification',
       other: 'Open Groups: {count} notifications',
     },
+    // The bell opens Activities since the menu consolidation (successor of
+    // bellCount, which named the old Groups window).
+    activitiesBellCount: {
+      one: 'Open Activities: {count} notification',
+      other: 'Open Activities: {count} notifications',
+    },
     alerts: 'Alerts',
     groups: 'Groups',
     rewards: 'Rewards',

@@ -544,6 +544,10 @@ export const sv_SE: EnTranslations = {
         "one": "Öppna grupper: {count} avisering",
         "other": "Öppna grupper: {count} aviseringar"
       },
+      "activitiesBellCount": {
+        "one": "Open Activities: {count} notification",
+        "other": "Open Activities: {count} notifications"
+      },
       "alerts": "Aviseringar",
       "groups": "Grupper",
       "rewards": "Belöningar",

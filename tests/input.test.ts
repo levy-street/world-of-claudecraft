@@ -1421,8 +1421,16 @@ describe('Input Escape handling', () => {
 });
 
 describe('Input Discord keybind', () => {
-  it("dispatches onUiKey('discord') for the default U key", () => {
-    const { cb, windowListeners } = makeInput();
+  // Menu consolidation: Discord ships no default key any more (the Social
+  // window's Discord strip is its launcher); a player binding still works.
+  it("dispatches onUiKey('discord') for a player-bound key, and nothing for U by default", () => {
+    const fresh = makeInput();
+    fresh.windowListeners.get('keydown')!({ code: 'KeyU', repeat: false });
+    expect(fresh.cb.onUiKey).not.toHaveBeenCalledWith('discord');
+
+    const keybinds = new Keybinds();
+    expect(keybinds.bind('discord', 0, 'KeyU')).toBe(true);
+    const { cb, windowListeners } = makeInput(undefined, keybinds);
 
     windowListeners.get('keydown')!({ code: 'KeyU', repeat: false });
 
@@ -1430,7 +1438,9 @@ describe('Input Discord keybind', () => {
   });
 
   it('is a normal interface key: suppressed while a modal blocks game keys', () => {
-    const { cb, windowListeners } = makeInput();
+    const keybinds = new Keybinds();
+    expect(keybinds.bind('discord', 0, 'KeyU')).toBe(true);
+    const { cb, windowListeners } = makeInput(undefined, keybinds);
     (cb as any).canUseGameKeys = vi.fn(() => false);
 
     windowListeners.get('keydown')!({ code: 'KeyU', repeat: false });
@@ -1561,8 +1571,12 @@ describe('Input Harvest Journal, Perfecting, and Loot Explorer keybinds', () => 
     expect(cb.onUiKey).not.toHaveBeenCalledWith('perfecting');
   });
 
-  it("dispatches onUiKey('lootExplorer') for the default Shift+O chord", () => {
-    const { cb, windowListeners } = makeInput();
+  // Menu consolidation: the Loot Explorer is a Book of the Realm tab and ships
+  // no default chord; a player binding still dispatches it.
+  it("dispatches onUiKey('lootExplorer') for a player-bound Shift+O chord", () => {
+    const keybinds = new Keybinds();
+    expect(keybinds.bind('lootExplorer', 0, 'Shift+KeyO')).toBe(true);
+    const { cb, windowListeners } = makeInput(undefined, keybinds);
 
     windowListeners.get('keydown')!({
       code: 'KeyO',

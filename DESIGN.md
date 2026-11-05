@@ -642,6 +642,18 @@ Journal buttons left the rail and Shift+T and Shift+K no longer ship as defaults
 actions stay rebindable, and a binding a player already saved keeps working). A hub button's selected ring lights while any of its tabs
 is open. Each later hub records itself here when it lands.
 
+The rest of the consolidation (2026-11-04) took the rail from 24 visible buttons to 12, still
+two columns of six: Character, Bags, Spellbook, Talents, Quest Log and World Map; then the
+Book of the Realm (Shift+Z: Deeds, Titles, Reliquary, Reputation, Loot Explorer, Rankings),
+Professions, Activities (the Groups bell, Shift+I: Dungeons and Raids, PvP with G landing
+there, Card Duel), Friends and Guild, the WOC Store chest, the Game Menu, and the $WOC
+Exchange when enabled. The Emotes, Wiki, Discord and Cosmetics buttons left the rail (the
+emote wheel stays on X and the touch tray, Discord is a strip in Social, Cosmetics opens from
+the sheet footer), the Calendar window left the game, and K, I, U, Shift+X, Shift+O and Shift+Y
+no longer ship as defaults. The mobile More tray keeps one tile per destination, grouped
+under Record, Professions, Activities, Character and Store headings, each opening its hub
+already on its tab, so a hub never costs a tap on a phone.
+
 ### 7.10 Chat
 
 `#chatlog-wrap` keeps its bottom-left anchor, tab model (built-in Chat and Combat Log plus
@@ -775,21 +787,28 @@ Every window adopts the grammar; these carry specific intent:
   the existing `--bank-slot-quality` hook. Bank-docked behavior stays.
 - **Character** (`char_window.ts`): a sheet in four bands. The head; the body; a row
   of the five attribute tiles; and a footer that carries the tab strip (Character,
-  Reputation, Currencies, Progression) beside the Cosmetics and Share Player Card actions. The Character tab keeps the paperdoll and seats the Offense, Defense and Specialization
-  boards in a rail at its right that scrolls on the wheel; every other tab takes the whole
-  body: Reputation (`src/ui/hud/reputation/`, one card per faction with the standing pill
-  and tier bar on the quality ramp), Currencies (`src/ui/hud/currencies/`, the activity
-  currencies and the faction rows), Progression (milestones, title, Reliquary and Time
-  Played). The Specialization board is
+  Progression) beside the Cosmetics and Share Player Card actions. The Character tab keeps the paperdoll and seats the Offense, Defense and Specialization
+  boards in a rail at its right that scrolls on the wheel; Progression takes the whole
+  body (milestones, title, Reliquary and Time Played). On desktop, C opens the sheet with
+  the bags docked at its right (`char_bags_pairing_core.ts` `charBagsDocked`); B still
+  opens the bags alone. The Specialization board is
   a readout only (spec, role, mastery): the talents window owns the picker. Stat labels
   remain muted with parchment values;
   `item_compare.ts` continues to provide success and danger deltas. (Amended at the
   world-quest reputation work: the earlier note seated Stats, Progression and Skills in a
   300px side rail, which left no room for the reputation and currency surfaces. Amended
   again at the menu consolidation, 2026-11-04: the Professions tab left the sheet, because
-  the Professions hub's Overview tab owns the same gathering and crafting rows. The audit
-  plan takes the sheet to two tabs, Character and Progression, as later steps move
-  Reputation and Currencies out.)
+  the Professions hub's Overview tab owns the same gathering and crafting rows; then
+  Reputation moved to the Book of the Realm and Currencies to the Bags wallet strip,
+  leaving Character and Progression.)
+- **Bags wallet strip** (`src/ui/hud/currencies/currencies_tab_html.ts`
+  `currenciesWalletHtml`): the activity and faction currencies as one wrapping chip row
+  between the grid and the purse; $WOC stays on the purse's balance chip.
+- **Book of the Realm** and **Activities** (`src/ui/hud/hub/`): the same tab-group shell as
+  the Professions hub. The Book (Shift+Z) tabs Deeds, Titles, the Reliquary, Reputation,
+  the Loot Explorer and Rankings; Activities (the Groups bell, Shift+I) tabs Dungeons and
+  Raids, PvP and Card Duel. Every member's own open path routes through the hub, so a
+  deep link still shows one tab at a time.
 - **Professions hub** (`src/ui/hud/professions/professions_hub_*`): one tabbed window over
   the four professions windows. Each member window paints the shared `ui-tabs` strip under
   its title bar and shows the hub title; one member is shown at a time, a tab switch opens

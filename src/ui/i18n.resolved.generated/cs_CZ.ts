@@ -544,6 +544,10 @@ export const cs_CZ: EnTranslations = {
         "one": "Otevřené skupiny: {count} upozornění",
         "other": "Otevřené skupiny: {count} upozornění"
       },
+      "activitiesBellCount": {
+        "one": "Open Activities: {count} notification",
+        "other": "Open Activities: {count} notifications"
+      },
       "alerts": "Upozornění",
       "groups": "Skupiny",
       "rewards": "Odměny",

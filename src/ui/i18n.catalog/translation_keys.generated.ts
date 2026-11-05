@@ -14725,6 +14725,8 @@ export type TranslationKeyFlat =
   | 'hudChrome.epic.unlink'
   | 'hudChrome.expeditions.accept'
   | 'hudChrome.expeditions.acceptPlayer'
+  | 'hudChrome.expeditions.activitiesBellCount.one'
+  | 'hudChrome.expeditions.activitiesBellCount.other'
   | 'hudChrome.expeditions.alerts'
   | 'hudChrome.expeditions.available'
   | 'hudChrome.expeditions.awaitingReply'

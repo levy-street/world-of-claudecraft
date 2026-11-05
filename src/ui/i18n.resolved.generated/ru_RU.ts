@@ -544,6 +544,10 @@ export const ru_RU: EnTranslations = {
         "one": "Открыть группы: {count} уведомление",
         "other": "Открыть группы: {count} уведомлений"
       },
+      "activitiesBellCount": {
+        "one": "Открыть занятия: {count} уведомление",
+        "other": "Открыть занятия: {count} уведомлений"
+      },
       "alerts": "Уведомления",
       "groups": "Группы",
       "rewards": "Награды",

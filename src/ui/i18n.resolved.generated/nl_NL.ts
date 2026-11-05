@@ -544,6 +544,10 @@ export const nl_NL: EnTranslations = {
         "one": "Open groepen: {count} melding",
         "other": "Open groepen: {count} meldingen"
       },
+      "activitiesBellCount": {
+        "one": "Open Activities: {count} notification",
+        "other": "Open Activities: {count} notifications"
+      },
       "alerts": "Meldingen",
       "groups": "Groepen",
       "rewards": "Beloningen",

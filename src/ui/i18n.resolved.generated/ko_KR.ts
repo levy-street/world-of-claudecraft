@@ -544,6 +544,10 @@ export const ko_KR: EnTranslations = {
         "one": "그룹 열기: 알림 {count}개",
         "other": "그룹 열기: 알림 {count}개"
       },
+      "activitiesBellCount": {
+        "one": "활동 열기: 알림 {count}개",
+        "other": "활동 열기: 알림 {count}개"
+      },
       "alerts": "알림",
       "groups": "그룹",
       "rewards": "보상",

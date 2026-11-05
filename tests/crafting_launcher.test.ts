@@ -45,13 +45,14 @@ describe('mobile More-tray launcher', () => {
     for (const html of [indexHtml, playHtml]) {
       expect(html).toMatch(/id="mobile-crafting"[^>]*data-icon="crafting"/);
       expect(html).toMatch(/id="mobile-crafting"[^>]*data-i18n-title="hudChrome\.crafting\.title"/);
-      // Tray order mirrors the desktop rationale: right after Bags.
-      const bags = html.indexOf('id="mobile-bags"');
+      // The grouped tray (menu consolidation step 5): Crafting sits in the
+      // Professions group, right after the hub's Overview tile.
+      const overview = html.indexOf('id="mobile-professions"');
       const crafting = html.indexOf('id="mobile-crafting"');
-      const spellbook = html.indexOf('id="mobile-spellbook"');
-      expect(bags).toBeGreaterThan(-1);
-      expect(crafting).toBeGreaterThan(bags);
-      expect(spellbook).toBeGreaterThan(crafting);
+      const perfecting = html.indexOf('id="mobile-perfecting"');
+      expect(overview).toBeGreaterThan(-1);
+      expect(crafting).toBeGreaterThan(overview);
+      expect(perfecting).toBeGreaterThan(crafting);
     }
   });
 

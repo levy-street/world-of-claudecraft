@@ -943,7 +943,9 @@ describe('hud orchestration', () => {
     expect(hud).toContain("root: () => $('#reliquary-window')");
     expect(hud).toContain("...this.windowFocus('#reliquary-window')");
     expect(hud).toContain('toggleReliquary(): void');
-    expect(hud).toContain('this.reliquaryWindow.toggle()');
+    // A Book of the Realm tab since the menu consolidation: the toggle routes
+    // through the hub at the Reliquary tab.
+    expect(hud).toContain("this.bookHub.toggle('reliquary')");
   });
 
   it('polls refreshIfChanged on the slow band when open', () => {
@@ -954,22 +956,21 @@ describe('hud orchestration', () => {
 
   it('closes via Esc managed-window case and re-renders on language switch', () => {
     expect(hud).toContain("case 'reliquary-window':");
-    expect(hud).toContain('this.reliquaryWindow.close()');
+    expect(hud).toContain('this.bookHub.close()');
     expect(hud).toContain('if (this.reliquaryWindow.isOpen) this.reliquaryWindow.render()');
   });
 
-  it('wires minimap click and keybind label', () => {
-    expect(hud).toContain(
-      "$('#mm-reliquary')?.addEventListener('click', () => this.toggleReliquary())",
-    );
-    expect(sideButtons).toContain("['#mm-reliquary', 'reliquary', 'hudChrome.reliquary.title']");
+  it('has no rail button of its own: the Book of the Realm launcher carries it', () => {
+    expect(hud).not.toContain("$('#mm-reliquary')");
+    expect(sideButtons).not.toContain('#mm-reliquary');
+    expect(hud).toContain("closeOthers: () => this.bookHub.prepare('reliquary'),");
   });
 });
 
 describe('keybind and input dispatch', () => {
-  it('defaults to Shift+KeyX adjacent to deeds', () => {
+  it('stays a rebindable action with no default key (Shift+X freed)', () => {
     expect(keybindsSrc).toContain("id: 'reliquary'");
-    expect(keybindsSrc).toContain("defaults: ['Shift+KeyX']");
+    expect(keybindsSrc).not.toContain("defaults: ['Shift+KeyX']");
   });
 
   it('routes through input and main onUiKey', () => {
@@ -995,9 +996,7 @@ describe('entry HTML and i18n chrome', () => {
       ['play.html', playHtml],
     ] as const) {
       expect(html, name).toContain('id="reliquary-window"');
-      expect(html, name).toMatch(
-        /id="mm-reliquary"[^>]*data-i18n-title="hudChrome\.reliquary\.title"/,
-      );
+      expect(html, name).not.toContain('id="mm-reliquary"');
       expect(html, name).toContain('id="mobile-reliquary"');
       expect(html, name).toContain('data-i18n="hudChrome.mobile.reliquary"');
     }
