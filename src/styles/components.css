@@ -10022,7 +10022,9 @@
     /* Never overflow:hidden here: it drops a grid item's automatic minimum
        height to zero, and inside the height-capped scrolling grid the caption
        row then collapses to its border. A long loadout name wraps instead. */
-    min-height: min-content;
+    box-sizing: border-box;
+    line-height: 12px;
+    min-height: 16px;
     overflow-wrap: anywhere;
   }
   .bag-grid .bag-section-header.bag-section-quest {
@@ -10042,6 +10044,8 @@
     --bag-section-ink: var(--color-text-muted);
     margin: 2px 0 1px 8px;
     font-size: 9px;
+    line-height: 11px;
+    min-height: 15px;
     border-bottom-style: dotted;
   }
   .bag-sections-btn {
