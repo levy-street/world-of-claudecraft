@@ -36,7 +36,9 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { ruinAmountFromAuras } from '../../src/sim/combat/destruction';
 import { steer } from './heart_council_tactics.mjs';
+import { BUILDS, HEALERS, kitTable, PREPULL, rotate } from './heart_raid_kits.mjs';
 import { WorldBot } from './world_bot.mjs';
 
 // ---- configuration ------------------------------------------------------------------
@@ -46,7 +48,10 @@ export const DIFF = (process.env.DIFF ?? 'normal').toLowerCase();
 if (!['normal', 'heroic', 'mythic'].includes(DIFF)) throw new Error(`DIFF: ${DIFF}`);
 export const JOIN = (process.env.JOIN ?? '').trim();
 export const JOIN_ROLE = (process.env.JOIN_ROLE ?? 'dps').toLowerCase();
-export const GEAR = (process.env.GEAR ?? 'kit').toLowerCase();
+/** The raid's gear: a Heroic or Mythic raid wears the previous tier's best
+ *  (`bis`: the top Nythraxis parse loadouts), a Normal raid the fresh level-20
+ *  preset (`kit`), unless GEAR says otherwise. */
+export const GEAR = (process.env.GEAR ?? (DIFF === 'normal' ? 'kit' : 'bis')).toLowerCase();
 export const KICK_MISS = Number(process.env.KICK_MISS ?? 0.15);
 export const MAX_SECONDS = Number(process.env.MAX_SECONDS ?? 720);
 export const LOG_DIR = process.env.LOG_DIR ?? 'tmp/heart_raid';
@@ -94,124 +99,6 @@ export function segDist(p, a, b) {
 
 // ---- the raid -------------------------------------------------------------------------
 
-export const CAST_TIME = {
-  fireball: 1.5,
-  scorch: 1.5,
-  flash_heal: 1.5,
-  heal: 2.5,
-  prayer_of_healing: 3,
-  chain_heal: 2.5,
-  healing_wave: 1.5,
-  aimed_shot: 2.5,
-  measured_shot: 1.5,
-  shadow_bolt: 1.7,
-  immolate: 2,
-  chaos_bolt: 2.3,
-  lightning_bolt: 1.5,
-  lava_burst: 2,
-  chain_lightning: 2.5,
-};
-
-export const COST = {
-  fireball: 95,
-  scorch: 35,
-  combustion: 100,
-  fire_blast: 85,
-  counterspell: 45,
-  flash_heal: 63,
-  heal: 91,
-  renew: 75,
-  power_word_shield: 130,
-  prayer_of_healing: 145,
-  chain_heal: 48,
-  healing_wave: 39,
-  tidecall: 40,
-  lightning_bolt: 39,
-  lava_burst: 70,
-  chain_lightning: 80,
-  flame_shock: 44,
-  shadow_bolt: 62,
-  immolate: 46,
-  conflagrate: 40,
-  spell_lock: 35,
-  consecration: 35,
-  sunward_disc: 25,
-};
-
-const ROTATIONS = {
-  prot: (c) =>
-    c.pick([
-      ['shield_slam', c.dist <= 5],
-      ['revenge', c.res >= 20 && c.dist <= 5],
-      ['thunder_clap', c.res >= 20 && c.dist <= 6],
-      ['sunder_armor', c.res >= 25 && c.dist <= 5],
-    ]),
-  protection: (c) =>
-    c.pick([
-      ['holy_shield', true],
-      ['vowkeeper_strike', c.dist <= 5],
-      ['bastion_sweep', c.dist <= 6],
-      ['consecration', c.dist <= 6 && c.manaPct > 0.25],
-      ['sunward_disc', c.manaPct > 0.2],
-      ['hammer_of_grace', c.dist <= 19],
-    ]),
-  combat: (c) =>
-    c.pick([
-      ['adrenaline_rush', c.fightAge > 3],
-      ['slice_and_dice', c.combo >= 2 && !c.selfAura('slice_and_dice')],
-      ['eviscerate', c.combo >= 5],
-      ['sinister_strike', c.res >= 38],
-    ]),
-  arms: (c) =>
-    c.pick([
-      ['bloodrage', true],
-      ['execute', c.tPct < 0.2 && c.res >= 10],
-      ['mortal_strike', c.res >= 30],
-      ['overpower', c.res >= 15],
-      ['slam', true],
-    ]),
-  fire: (c) =>
-    c.pick([
-      ['combustion', c.fightAge > 5],
-      ['fire_blast', c.manaPct > 0.2 && c.dist <= 19],
-      ['fireball', c.manaPct > 0.06],
-      ['scorch', c.manaPct > 0.03],
-    ]),
-  marksmanship: (c) =>
-    c.pick([
-      ['serpent_sting', !c.targetAura('serpent_sting') && c.res >= 29],
-      ['rapid_fire', true],
-      ['arcane_shot', c.res >= 40],
-      ['aimed_shot', c.res >= 50],
-      ['measured_shot', true],
-    ]),
-  destruction: (c) =>
-    c.pick([
-      ['life_tap', c.manaPct < 0.25 && c.hpPct > 0.6],
-      ['immolate', !c.targetAura('immolate')],
-      ['conflagrate', c.targetAura('immolate')],
-      ['shadowburn', c.tPct < 0.2],
-      ['shadow_bolt', true],
-    ]),
-  elemental: (c) =>
-    c.pick([
-      ['flame_shock', !c.targetAura('flame_shock') && c.dist <= 19],
-      ['lava_burst', true],
-      ['chain_lightning', c.manaPct > 0.3],
-      ['lightning_bolt', true],
-    ]),
-};
-const OFF_GCD = new Set([
-  'holy_shield',
-  'fire_blast',
-  'combustion',
-  'bloodrage',
-  'adrenaline_rush',
-  'taunt',
-  'sacred_challenge',
-  'pummel',
-]);
-
 /** Interrupts: ability, range, cooldown, cost. */
 export const KICKS = {
   mage: { id: 'counterspell', range: 29, cd: 24, cost: 0 },
@@ -235,6 +122,9 @@ export const ROSTER = [
   { key: 'ele', role: 'dps', cls: 'shaman', spec: 'elemental', name: 'Oskari' },
 ];
 const STEP_OUT = { dps: 'ele', healer: 'h2', tank: 'ot' };
+const MANA_CLASSES = new Set(['priest', 'shaman', 'mage', 'warlock', 'paladin']);
+/** The raid's mana potion (425 mana, the shared two-minute potion clock). */
+const MANA_POTION = 'sunpetal_mana_draught';
 const KICK_ORDER = ['mage', 'hunter', 'ot', 'lock', 'rogue', 'arms', 'mt'];
 
 // ---- the fight log ----------------------------------------------------------------------
@@ -323,8 +213,18 @@ async function raidMain(boss) {
   await sleep(600);
   for (const b of bots) b.cmd({ cmd: 'setSpec', spec: b.spec.spec });
   await sleep(600);
+  // The spec's talent rows (scripts/lib/heart_raid_kits.mjs BUILDS) and the
+  // ability table the rotation reads, resolved by the sim with those rows.
+  for (const b of bots) {
+    const build = BUILDS[b.spec.key];
+    b.cmd({ cmd: 'applyTalents', alloc: { spec: build.spec, rows: { ...build.rows } } });
+    b.kit = kitTable(b.cls, b.spec.key);
+  }
+  await sleep(600);
   for (const b of bots)
     b.chat(GEAR === 'bis' ? `/dev bis ${b.spec.spec}` : `/dev kit ${b.spec.spec}`);
+  // Every mana user brings mana potions, as a raid does.
+  for (const b of bots) if (MANA_CLASSES.has(b.cls)) b.chat(`/dev give ${MANA_POTION} 6`);
   await flushAll(bots);
   await sleep(1200);
 
@@ -481,24 +381,27 @@ async function waitForPullCall(world, bots) {
 }
 
 async function prepullBuffs(world, bots, byKey) {
-  const self = (b, id) => b.cmd({ cmd: 'cast', ability: id });
-  const on = (b, id, pid) => b.cmd({ cmd: 'cast', ability: id, target: pid });
-  if (byKey.mt) self(byKey.mt, 'defensive_stance');
-  if (byKey.arms) self(byKey.arms, 'battle_stance');
-  if (byKey.hunter) self(byKey.hunter, 'aspect_of_the_hawk');
-  if (byKey.h2) self(byKey.h2, 'lifespring_weapon');
-  if (byKey.ele) self(byKey.ele, 'flametongue_weapon');
-  if (byKey.rogue) self(byKey.rogue, 'instant_poison');
-  await sleep(1600);
-  if (byKey.mage) self(byKey.mage, 'arcane_intellect');
-  if (byKey.arms) self(byKey.arms, 'battle_shout');
-  if (byKey.lock) self(byKey.lock, 'demon_skin');
-  if (byKey.h2) self(byKey.h2, 'lightning_shield');
-  const priest = byKey.h1;
-  if (priest) {
-    for (const m of priest.self?.party?.members ?? []) {
-      on(priest, 'power_word_fortitude', m.pid);
-      await sleep(1600);
+  // Each spec's own buffs and imbues (PREPULL), one round per list position,
+  // the cast-time ones (a summoned demon) given the time they need; a `*`
+  // buff goes on every raid member.
+  const rounds = Math.max(...bots.map((b) => (PREPULL[b.spec.key] ?? []).length));
+  for (let i = 0; i < rounds; i++) {
+    let wait = 1600;
+    for (const b of bots) {
+      const id = PREPULL[b.spec.key]?.[i];
+      if (!id || id.endsWith('*')) continue;
+      b.cmd({ cmd: 'cast', ability: id });
+      wait = Math.max(wait, ((b.kit?.get(id)?.castTime ?? 0) + 0.8) * 1000);
+    }
+    await sleep(wait);
+  }
+  for (const b of bots) {
+    for (const id of PREPULL[b.spec.key] ?? []) {
+      if (!id.endsWith('*')) continue;
+      for (const m of b.self?.party?.members ?? []) {
+        b.cmd({ cmd: 'cast', ability: id.slice(0, -1), target: m.pid });
+        await sleep(1600);
+      }
     }
   }
   const t0 = Date.now();
@@ -556,9 +459,15 @@ export class RaidWorld {
         this.mobIds.add(e.id);
       }
     }
-    // Hostile mobs in the fight that are no boss (the adds).
+    // Hostile mobs in the fight that are no boss (the adds): engaged, or in
+    // the arena (an add walking to its goal, the Heat's Wellspawn, never aggroes).
     this.adds = [...o.ents.values()].filter(
-      (e) => e.k === 'mob' && !this.roleOfTid[e.tid] && alive(e) && e.aggro != null,
+      (e) =>
+        e.k === 'mob' &&
+        !this.roleOfTid[e.tid] &&
+        alive(e) &&
+        !!e.h &&
+        (e.aggro != null || (this.center && hypot(e, this.center) < (this.reach ?? 60))),
     );
     const members = o.self.party?.members ?? [];
     const players = new Map();
@@ -598,15 +507,20 @@ export class RaidWorld {
     const side = perp(this.home);
     return add(add(this.prepull, side, ((i % 5) - 2) * 2.2), this.home, Math.floor(i / 5) * 2.2);
   }
-  /** Walk toward `goal` (round any obstacle in the way); true once there. */
-  moveTo(b, goal, tol = 1.0, faceAt = null) {
+  /** Walk toward `goal` (round any obstacle in the way); true once there. A
+   *  bot that arrived stays put while it is within `slack` more yards of the
+   *  goal, so a resting spot that drifts a little never sets it walking. */
+  moveTo(b, goal, tol = 1.0, faceAt = null, slack = 0) {
     if (!b.self || b.self.dead) return true;
     const d = hypot(b.self, goal);
-    if (d <= tol) {
-      b.stop(faceAt ? b.faceTo(faceAt) : undefined);
+    const settled = b.settled && hypot(b.settled, goal) <= slack + tol && d <= tol + slack;
+    if (d <= tol || settled) {
+      if (!settled) b.settled = { x: goal.x, z: goal.z };
+      if (b.moving || faceAt) b.stop(faceAt ? b.faceTo(faceAt) : undefined);
       b.moving = false;
       return true;
     }
+    b.settled = null;
     const circles = this.boss.obstacles?.(this) ?? [];
     const wp = circles.length ? steer(b.self, goal, circles) : goal;
     b.input({ f: 1 }, b.faceTo(wp));
@@ -756,6 +670,11 @@ function processEvents(world, bots, st) {
         const src = ev.sourceOwnerId ?? ev.sourceId;
         if (mine(b, src) && !world.pids.has(ev.targetId)) {
           st.dmgDone.set(src, (st.dmgDone.get(src) ?? 0) + amount);
+          st.dmgBy ??= new Map();
+          const byAb = st.dmgBy.get(src) ?? {};
+          const abKey = ev.sourceOwnerId ? 'pet' : (ev.ability ?? 'melee');
+          byAb[abKey] = (byAb[abKey] ?? 0) + amount;
+          st.dmgBy.set(src, byAb);
           const role = world.roles.find((r) => world.mobs[r]?.id === ev.targetId) ?? 'adds';
           st.dmgDoneTo[role] = (st.dmgDoneTo[role] ?? 0) + amount;
         }
@@ -818,6 +737,7 @@ function act(world, st, b, mt, boss) {
     b.tankTarget = world.roles[0];
     b.loose = { r: world.roles[0], m: world.mobs[world.roles[0]], onTank: false };
   }
+  noteCastResult(b, now);
   const d = boss.duty?.(world, st, b, me) ?? null;
   let goal = d?.goal ?? null;
   let tol = d?.tol ?? 1.0;
@@ -825,19 +745,29 @@ function act(world, st, b, mt, boss) {
   const hazards = boss.hazards?.(world, st, b, me) ?? [];
   const waitPull = role === 'tank' && b !== mt && !st.engagedAt;
   if (waitPull) goal = world.prepullSpot(b);
+  let slack = 0.6;
   if (!goal) {
     goal = rolePosition(world, st, b, me, hazards, boss);
     tol = role === 'tank' ? 1.5 : 1.0;
+    // A resting spot is a place, not a point: no step for a yard or two of drift.
+    // Melee follow a moving body, so only the ranged and healers rest loosely.
+    slack = role === 'tank' || b.spec.melee ? 0.8 : 2.5;
   }
   b.duty = duty;
   const faceAt = combatTarget(world, st, b, boss);
-  if (d?.hold) {
+  // A cast under way is finished before a step no mechanic asks for: the bot
+  // stands in no hazard and its resting spot is near.
+  const casting = !!b.self.cast && !b.kit?.get(b.self.cast)?.moving;
+  const inHazard = hazards.some((h) => hypot(h, b.self) < h.r) || !!boss.bad?.(world, st, b.self);
+  const finishCast =
+    casting && duty === 'role' && !waitPull && !inHazard && hypot(b.self, goal) < 8;
+  if (d?.hold || finishCast) {
     b.stop(faceAt ? b.faceTo(faceAt) : undefined);
     b.moving = false;
   } else if (d?.walk) {
     // A boss module steering the bot itself this tick (the wind, a path).
     d.walk(b);
-  } else world.moveTo(b, goal, tol, faceAt ?? null);
+  } else world.moveTo(b, goal, tol, faceAt ?? null, slack);
   b.ticks = (b.ticks ?? 0) + 1;
   if (b.moving) b.movingTicks = (b.movingTicks ?? 0) + 1;
   if (b.self.cast) b.castTicks = (b.castTicks ?? 0) + 1;
@@ -848,6 +778,7 @@ function act(world, st, b, mt, boss) {
     // A boss module's own action (an interact, a defensive).
     if (d.cast(b)) return;
   }
+  drinkPotion(b, now);
   if (b.self.cast) return;
   const kick = st.kick;
   if (kick && kick.kicker === b && !kick.sent && !kick.done) {
@@ -877,12 +808,14 @@ function act(world, st, b, mt, boss) {
   const rangeOk = b.spec.melee || role === 'tank' ? dist <= reach : dist <= 29 + (t.reach ?? 0);
   if (!rangeOk && role !== 'tank') return idle(b, 'range');
   if (b.cls === 'hunter' && dist < 8.5) return idle(b, 'dead zone');
-  if (b.moving && !(b.spec.melee || role === 'tank')) return idle(b, 'moving');
   if (!b.spec.melee && dist > 5.5 && world.blocks(b.self, t)) return idle(b, 'no line');
   const c = rotationContext(world, st, b, me, t, dist, stillFor);
-  const ability = ROTATIONS[b.spec.spec]?.(c);
-  if (ability) cast(b, ability);
-  else
+  const ability = rotate(b.spec.spec, c);
+  if (ability) {
+    // A spell with a bar faces the target first (a stand-still cast).
+    if (!b.moving) b.stop(b.faceTo(t));
+    cast(b, ability);
+  } else
     idle(b, (b.self.gcd ?? 0) > 0.05 ? 'gcd' : stillFor < 2 ? 'must move soon' : 'nothing ready');
 }
 
@@ -895,42 +828,88 @@ export function cast(b, id, target) {
   b.sentCount = b.sentCount ?? {};
   b.sentCount[id] = (b.sentCount[id] ?? 0) + 1;
   b.lastCastId = id;
+  b.pendingCast = { id, at: Date.now(), res: b.self?.res ?? 0 };
   b.cmd({ cmd: 'cast', ability: id, ...(target !== undefined ? { target } : {}) });
 }
+/** A cast the server turned down (no bar, no GCD, no cooldown, nothing paid a
+ *  moment later) is set aside for a second so the rotation tries the next. */
+function noteCastResult(b, now) {
+  const p = b.pendingCast;
+  if (!p || now - p.at < 250) return;
+  b.pendingCast = null;
+  const took =
+    !!b.self.cast ||
+    (b.self.gcd ?? 0) > 0.05 ||
+    cdLeft(b, p.id) > 0.05 ||
+    (b.self.res ?? 0) < p.res - 0.5;
+  if (!took) {
+    b.failed ??= {};
+    b.failed[p.id] = now;
+  }
+}
+function cdLeft(b, id) {
+  const v = b.self?.cds?.[id];
+  return typeof v === 'number' ? v : typeof v?.rem === 'number' ? v.rem : 0;
+}
 export function cdReady(b, id) {
-  const cds = b.self?.cds ?? {};
-  const cd =
-    typeof cds[id] === 'number' ? cds[id] : typeof cds[id]?.rem === 'number' ? cds[id].rem : 0;
-  return cd <= 0.05 && Date.now() - (b.lastSent[id] ?? 0) > 450;
+  return cdLeft(b, id) <= 0.05 && Date.now() - (b.lastSent[id] ?? 0) > 450;
+}
+/** A mana user below a third drinks a mana potion when the potion clock allows. */
+function drinkPotion(b, now) {
+  if (!MANA_CLASSES.has(b.cls) || b.self.rtype !== 'mana') return;
+  const mana = (b.self.res ?? 0) / Math.max(1, b.self.mres ?? 1);
+  if (mana > 0.35 || (b.self.pcd ?? 0) > 0 || now - (b.potionAt ?? 0) < 5000) return;
+  b.potionAt = now;
+  b.potions = (b.potions ?? 0) + 1;
+  b.cmd({ cmd: 'use', item: MANA_POTION });
 }
 
+/** True when the rotation may press `id` now: known at this level with these
+ *  rows, off cooldown, paid for, the GCD free (unless off it), not refused a
+ *  moment ago, and its bar fits the time the bot may stand still (or casts
+ *  on the move, or `opts.instant`: a proc made it instant). */
+function readyCheck(b, stillFor, id, opts) {
+  const k = b.kit?.get(id);
+  if (!k) return false;
+  if (!cdReady(b, id)) return false;
+  if (Date.now() - (b.failed?.[id] ?? 0) < 1200) return false;
+  if ((b.self.res ?? 0) < k.cost) return false;
+  if (!k.offGcd && (b.self.gcd ?? 0) > 0.05) return false;
+  const ct = opts?.instant ? 0 : k.castTime + k.channel;
+  if (ct > 0 && !k.moving && (b.moving || ct + 0.3 > stillFor)) return false;
+  return true;
+}
+function auraView(a) {
+  return a ? { stacks: a.stacks ?? 1, rem: a.rem ?? 0, value: a.value ?? 0 } : null;
+}
+/** The rotation's context (scripts/lib/heart_raid_kits.mjs) read from the
+ *  bot's own snapshot and its target. */
 function rotationContext(world, st, b, me, t, dist, stillFor) {
   const self = b.self;
-  const res = self.res ?? 0;
-  const mres = self.mres ?? 1;
-  const gcdFree = (self.gcd ?? 0) <= 0.05;
   return {
-    res,
+    res: self.res ?? 0,
+    mres: self.mres ?? 1,
+    manaPct: self.rtype === 'mana' ? (self.res ?? 0) / Math.max(1, self.mres ?? 1) : 1,
     combo: self.combo ?? 0,
-    manaPct: self.rtype === 'mana' ? res / mres : 1,
     hpPct: (self.hp ?? 1) / (self.mhp ?? 1),
     tPct: (t.hp ?? 1) / (t.mhp ?? 1),
-    dist,
-    fightAge: (Date.now() - st.pullAt) / 1000,
-    selfAura: (id) => hasAura(self, id),
-    targetAura: (id) =>
-      !!t.auras?.some((a) => a.id === id && (a.src === undefined || a.src === b.pid)),
-    pick: (list) => {
-      for (const [id, ok] of list) {
-        if (!ok || !cdReady(b, id)) continue;
-        if (self.rtype === 'mana' && res < (COST[id] ?? 0)) continue;
-        const ct = CAST_TIME[id] ?? 0;
-        if (ct > 0 && ct + 0.3 > stillFor) continue;
-        if (!gcdFree && !OFF_GCD.has(id)) continue;
-        return id;
-      }
-      return null;
-    },
+    // Melee-normalized: a bot inside the body's melee reach (its girth plus
+    // the boss module's reach, which a towering body stretches) reads within
+    // 5 yd, as the sim measures a short reach to the body's edge.
+    dist: Math.max(0, dist - (t.reach ?? 0) - ((world.boss.meleeReach?.(t) ?? 5.5) - 5.5)),
+    age: (Date.now() - st.pullAt) / 1000,
+    moving: !!b.moving,
+    stillFor,
+    devotion: self.pdev?.value ?? 0,
+    ruin: ruinAmountFromAuras(self.auras ?? []),
+    aura: (id) => auraView(self.auras?.find((a) => a.id === id || a.kind === id)),
+    tAura: (id) => auraView(t.auras?.find((a) => a.id === id && a.src === b.pid)),
+    ready: (id, opts) => readyCheck(b, stillFor, id, opts),
+    // A boss module's add that walks to a goal and slows when hit: worth a
+    // slow or a control while it wears none.
+    slow:
+      !!world.boss.wantSlow?.(world, t) &&
+      !(t.auras ?? []).some((a) => /slow|root|stun|incapac|fear|poly|snare/.test(a.kind ?? '')),
   };
 }
 
@@ -964,9 +943,13 @@ function threatOk(world, b, mob) {
   let tankHate = 0;
   for (const [id, v] of thr)
     if (id !== b.pid && world.players.get(id)?.tank) tankHate = Math.max(tankHate, v);
-  if (tankHate <= 0) return world.players.get(mob.aggro)?.tank ? true : holdThreat(b);
+  // No tank on its table: a loose add (on a healer, on a damage dealer)
+  // is everyone's to kill, threat or not.
+  if (tankHate <= 0) return true;
   const mine = thr.find(([id]) => id === b.pid)?.[1] ?? 0;
-  return mine < tankHate * (b.spec.melee ? 0.9 : 1.1) ? true : holdThreat(b);
+  // A decent raid rides the threat meter just under the switch (110 percent in
+  // melee, 130 at range).
+  return mine < tankHate * (b.spec.melee ? 1.0 : 1.2) ? true : holdThreat(b);
 }
 function holdThreat(b) {
   b.threatHolds = (b.threatHolds ?? 0) + 1;
@@ -1000,7 +983,8 @@ function rolePosition(world, st, b, me, hazards, boss) {
   const own = boss.roleSpot?.(world, st, b, me);
   if (own) {
     const bad = (at) => hazards.some((h) => hypot(h, at) < h.r) || boss.bad?.(world, st, at);
-    if (b.goal && hypot(b.goal, own) < 3 && !bad(b.goal)) return b.goal;
+    const keepWithin = b.spec.melee || role === 'tank' ? 1 : 3;
+    if (b.goal && hypot(b.goal, own) < keepWithin && !bad(b.goal)) return b.goal;
     b.goal = bad(own) ? (clearSpot(world, own, hazards) ?? own) : own;
     return b.goal;
   }
@@ -1075,7 +1059,8 @@ function rolePosition(world, st, b, me, hazards, boss) {
     }
   }
   const bad = (at) => hazards.some((h) => hypot(h, at) < h.r) || boss.bad?.(world, st, at);
-  const keep = b.goal && hypot(b.goal, want) < 3 && !bad(b.goal);
+  const keep =
+    b.goal && hypot(b.goal, want) < (b.spec.melee || role === 'tank' ? 1 : 3) && !bad(b.goal);
   if (keep) return b.goal;
   const clear = bad(want) ? clearSpot(world, want, hazards) : want;
   b.goal = clear ?? want;
@@ -1179,47 +1164,42 @@ function healerAct(world, st, b, me, stillFor) {
   const sees = (p) => p.pid === b.pid || !world.blocks(b.self, p);
   const now = Date.now();
   st.incoming ??= new Map();
-  const incoming = (p) => (st.incoming.get(p.pid) ?? 0) > now;
-  const members = world.living().filter((p) => hypot(p, b.self) <= 29 && sees(p));
-  if (members.length === 0) return idle(b, 'nobody in sight');
-  const frac = (p) => p.hp / Math.max(1, p.mhp);
-  const need = (p) => 1 - frac(p) + (p.tank ? 0.1 : 0) - (incoming(p) ? 0.25 : 0);
-  members.sort((x, y) => need(y) - need(x));
-  const low = members[0];
-  const lowF = 1 - frac(low);
-  const hurt = members.filter((p) => frac(p) < 0.75).length;
-  const mana = (b.self.res ?? 0) / Math.max(1, b.self.mres ?? 1);
-  const can = (id) =>
-    cdReady(b, id) &&
-    (CAST_TIME[id] ?? 0) + 0.3 <= stillFor &&
-    (b.self.res ?? 0) >= (COST[id] ?? 0);
-  const heal = (id, p) => {
-    if (p && CAST_TIME[id]) {
-      b.stop(b.faceTo(p));
-      st.incoming.set(p.pid, now + CAST_TIME[id] * 1000 + 300);
-    }
-    cast(b, id, p?.pid);
+  const living = world.living();
+  const inReach = living.filter((p) => hypot(p, b.self) <= 29 && sees(p));
+  if (inReach.length === 0) return idle(b, 'nobody in sight');
+  const members = inReach.map((p) => ({
+    pid: p.pid,
+    frac: p.hp / Math.max(1, p.mhp),
+    deficit: Math.max(0, p.mhp - p.hp),
+    tank: p.tank,
+    mainTank: p.pid === st.mainTankPid,
+    auras: (p.auras ?? []).map((a) => ({ id: a.id, kind: a.kind, mine: a.src === b.pid })),
+    near: living.filter((q) => q.pid !== p.pid && hypot(q, p) <= 10 && q.hp < q.mhp * 0.9).length,
+  }));
+  const h = {
+    members,
+    mana: (b.self.res ?? 0) / Math.max(1, b.self.mres ?? 1),
+    moving: !!b.moving,
+    incoming: (pid) => (st.incoming.get(pid) ?? 0) > now,
+    since: (id) => (now - (b.lastSent[id] ?? 0)) / 1000,
+    ready: (id, opts) => readyCheck(b, stillFor, id, opts),
   };
-  if (b.cls === 'priest') {
-    if (lowF > 0.5 && can('flash_heal')) return heal('flash_heal', low);
-    if (lowF > 0.45 && low.tank && !hasAura(low, 'power_word_shield') && can('power_word_shield'))
-      return heal('power_word_shield', low);
-    if (hurt >= 4 && mana > 0.25 && can('prayer_of_healing')) return heal('prayer_of_healing');
-    if (lowF > 0.22 && can('heal')) return heal('heal', low);
-    const tank = members.find((p) => p.tank && !hasAura(p, 'renew') && frac(p) < 0.92);
-    if (tank && mana > 0.3 && can('renew')) return heal('renew', tank);
-    return idle(b, healerWhy(b, lowF, mana, stillFor));
+  const pickHeal = HEALERS[b.spec.spec]?.(h) ?? null;
+  if (!pickHeal) return idle(b, healerWhy(b, h, stillFor));
+  const k = b.kit?.get(pickHeal.id);
+  const target = pickHeal.target !== undefined ? world.players.get(pickHeal.target) : null;
+  if (target && k && k.castTime > 0) {
+    b.stop(b.faceTo(target));
+    st.incoming.set(target.pid, now + k.castTime * 1000 + 300);
   }
-  if (lowF > 0.5 && can('tidecall')) return heal('tidecall', low);
-  if (hurt >= 3 && can('chain_heal')) return heal('chain_heal', low);
-  if (lowF > 0.15 && can('healing_wave')) return heal('healing_wave', low);
-  return idle(b, healerWhy(b, lowF, mana, stillFor));
+  cast(b, pickHeal.id, pickHeal.target);
 }
-function healerWhy(b, lowF, mana, stillFor) {
-  if (mana < 0.05) return 'out of mana';
+function healerWhy(b, h, stillFor) {
+  if (h.mana < 0.05) return 'out of mana';
   if (b.moving) return 'moving';
   if (stillFor < 1.8) return 'must move soon';
-  return lowF < 0.15 ? 'nobody hurt' : 'waiting';
+  const low = Math.min(...h.members.map((p) => p.frac));
+  return low > 0.9 ? 'nobody hurt' : 'waiting';
 }
 
 // ---- interrupts -------------------------------------------------------------------------
@@ -1368,6 +1348,18 @@ function writeReport(world, st, boss) {
     )
     .join(', ');
   note(`  per player DPS: ${per}`);
+  note(
+    `  top damage sources: ${[...(st.dmgBy ?? new Map()).entries()]
+      .map(
+        ([pid, m]) =>
+          `${world.players.get(pid)?.name ?? pid} ${Object.entries(m)
+            .sort((x, y) => y[1] - x[1])
+            .slice(0, 3)
+            .map(([k, v]) => `${k} ${Math.round(v / Math.max(1, dur))}`)
+            .join(' ')}`,
+      )
+      .join('; ')}`,
+  );
   const healedTotal = [...st.healDone.values()].reduce((a, b) => a + b, 0);
   const healed = [...st.healDone.entries()]
     .sort((a, b) => b[1] - a[1])
@@ -1393,6 +1385,29 @@ function writeReport(world, st, boss) {
   );
   note(
     `Time moving / casting: ${world.bots.map((b) => `${b.spec.key} ${pct((b.movingTicks ?? 0) / Math.max(1, b.ticks ?? 1))}/${pct((b.castTicks ?? 0) / Math.max(1, b.ticks ?? 1))}`).join(', ')}`,
+  );
+  note(
+    `Casts sent: ${world.bots
+      .map(
+        (b) =>
+          `${b.spec.key} ${Object.entries(b.sentCount ?? {})
+            .sort((x, y) => y[1] - x[1])
+            .slice(0, 6)
+            .map(([k, n]) => `${k} ${n}`)
+            .join(' ')}`,
+      )
+      .join('; ')}`,
+  );
+  note(
+    `Mana potions: ${
+      world.bots
+        .filter((b) => b.potions)
+        .map((b) => `${b.spec.key} ${b.potions}`)
+        .join(', ') || 'none'
+    }; mana at the end: ${world.bots
+      .filter((b) => b.self?.rtype === 'mana')
+      .map((b) => `${b.spec.key} ${pct((b.self.res ?? 0) / Math.max(1, b.self.mres ?? 1))}`)
+      .join(', ')}`,
   );
   boss.report?.(world, st, note);
   const landed = st.kicks.filter((k) => k.result === 'landed').length;
