@@ -183,7 +183,7 @@ describe('the Discord strip', () => {
     const strip = root.querySelector<HTMLElement>('.soc-discord-strip');
     expect(strip?.hidden).toBe(false);
     expect(strip?.textContent).toContain('aelric');
-    (strip?.querySelector('[data-open-discord]') as HTMLElement).click();
+    strip?.querySelector<HTMLElement>('[data-open-discord]')?.click();
     expect(openDiscord).toHaveBeenCalledTimes(1);
   });
 });
