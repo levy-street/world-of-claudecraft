@@ -42,15 +42,25 @@ class FakeMeters {
   };
   tooltipVisible = false;
   readonly rowEl = document.createElement('div');
-  readonly historyArrowEl = document.createElement('button');
-  readonly tabButtonEl = document.createElement('button');
+  readonly segmentPickerEl = document.createElement('button');
+  readonly tabSwitchEl = document.createElement('button');
+  segmentPicks: Record<HubMeterTab, number> = { dmg: 0, heal: 0, threat: 0 };
+
+  /** A player picking `viewed` from the segment menu of the panel showing
+   *  `tab` (the real Meters bumps that meter's pick count from the menu
+   *  callback, after the view moved). */
+  pickSegment(viewed: { startedAt: number; isCurrent: boolean }, tab: HubMeterTab = 'dmg'): void {
+    this.viewedByTab[tab] = viewed;
+    this.segmentPicks[tab]++;
+  }
 
   port(): HubLessonMetersPort {
     return {
       anyWindowOpen: () => this.anyOpen,
       tabOpen: (tab) => this.tabOpenState[tab],
-      tabButtonElement: () => this.tabButtonEl,
-      historyArrowElement: () => this.historyArrowEl,
+      tabSwitchElement: () => this.tabSwitchEl,
+      segmentPickerElement: () => this.segmentPickerEl,
+      segmentPickCount: (tab) => this.segmentPicks[tab],
       rowElementForPid: () => this.rowEl,
       viewedEncounter: (tab) => this.viewedByTab[tab],
       current: () => this.currentEnc,
@@ -256,7 +266,9 @@ describe('HubLessonController: the world bubble mirrors every guided step', () =
 
     meters.anyOpen = true;
     tick(controller);
-    expect(element.innerHTML).toContain('Switch to the Damage tab.');
+    expect(element.innerHTML).toContain(
+      'Click the meter name on the meters window, then choose Damage.',
+    );
     expect(bubble()!.innerHTML).toBe(element.innerHTML);
 
     meters.tabOpenState.dmg = true;
@@ -315,7 +327,10 @@ describe('HubLessonController: the world bubble mirrors every guided step', () =
     // needsTrackedRun is true, so the step falls back to "find your run".
     meters.viewedByTab.dmg = { startedAt: 999, isCurrent: false };
     tick(controller);
-    expect(element.innerHTML).toContain('Use the meter arrows to return to your practice run.');
+    expect(element.innerHTML).toContain(
+      'Click the fight name on the meters window and pick your practice run.',
+    );
+    expect(meters.segmentPickerEl.classList.contains('qd-coach')).toBe(true);
     expect(element.querySelector('.hlc-ack')).toBeNull();
     expect(bubble()!.innerHTML).toBe(element.innerHTML);
     expect(bubble()!.querySelector('.hlc-ack')).toBeNull();
@@ -396,5 +411,138 @@ describe('HubLessonController: the world bubble mirrors every guided step', () =
     expect(element.innerHTML).toBe('');
     expect(element.style.display).toBe('none');
     expect(() => tick(controller)).not.toThrow();
+  });
+});
+
+describe('HubLessonController: history steps follow the segment menu', () => {
+  // The Details-style meters chrome hides the .mt-tabs strip and the
+  // .mt-prev / .mt-next arrows; the coach must glow the visible mode and
+  // segment menu triggers and credit a pick from the segment menu, or the
+  // damage drill strands on "look back at that finished run".
+  function toInspectHistory() {
+    const { world, quests, player } = fakeWorld();
+    quests[HUB_DUMMY_DRILL_QUEST_ID] = 'active';
+    const meters = new FakeMeters();
+    const { controller, element } = makeController(world, meters, {
+      tooltipVisibleFor: () => meters.tooltipVisible,
+    });
+    player.targetId = DAMAGE_DUMMY_ID;
+    meters.anyOpen = true;
+    meters.tabOpenState.dmg = true;
+    tick(controller); // -> act
+    meters.currentEnc = enc(100, HUB_TRAINING_DUMMY_ID);
+    meters.viewedByTab.dmg = { startedAt: 100, isCurrent: true };
+    tick(controller); // -> read-row
+    element.querySelector<HTMLButtonElement>('.hlc-ack')!.click();
+    tick(controller); // -> view-breakdown
+    meters.tooltipVisible = true;
+    tick(controller); // -> end-run (still live)
+    meters.tooltipVisible = false;
+    // The fight ends: the live segment moves into history and the panel's
+    // default view flips onto "Last fight" on its own, with no player pick.
+    meters.historyList = [meters.currentEnc];
+    meters.currentEnc = null;
+    meters.viewedByTab.dmg = { startedAt: 100, isCurrent: false };
+    tick(controller);
+    return { meters, controller, element, player };
+  }
+
+  it('glows the mode menu trigger, not the hidden tab strip, for the switch step', () => {
+    const { world, quests, player } = fakeWorld();
+    quests[HUB_DUMMY_DRILL_QUEST_ID] = 'active';
+    const meters = new FakeMeters();
+    const { controller } = makeController(world, meters);
+    player.targetId = DAMAGE_DUMMY_ID;
+    meters.anyOpen = true;
+    tick(controller);
+    expect(meters.tabSwitchEl.classList.contains('qd-coach')).toBe(true);
+  });
+
+  it('asks for the segment menu, glows it, and does not count the automatic view flip', () => {
+    const { meters, controller, element } = toInspectHistory();
+    expect(element.innerHTML).toContain(
+      'Click the fight name on the meters window and pick that finished run.',
+    );
+    expect(meters.segmentPickerEl.classList.contains('qd-coach')).toBe(true);
+    tick(controller);
+    expect(element.innerHTML).toContain('pick that finished run');
+  });
+
+  it('advances once the player picks the finished run from the segment menu', () => {
+    const { meters, controller, element } = toInspectHistory();
+    meters.pickSegment({ startedAt: 100, isCurrent: false });
+    tick(controller);
+    expect(element.innerHTML).not.toContain('pick that finished run');
+    expect(element.innerHTML).toContain('Click the fight name and pick Current');
+  });
+
+  it('does not credit a pick made on another meter window', () => {
+    const { meters, controller, element } = toInspectHistory();
+    // The Damage panel already shows the finished run (the automatic flip);
+    // a pick on the detached Healing window must not count as looking back.
+    meters.pickSegment({ startedAt: 100, isCurrent: false }, 'heal');
+    tick(controller);
+    expect(element.innerHTML).toContain('pick that finished run');
+  });
+
+  it('never credits a pick made away from the yard on the first poll back', () => {
+    const { meters, controller, element, player } = toInspectHistory();
+    const home = { ...player.pos };
+    player.pos = { x: home.x + 5000, y: 0, z: home.z + 5000 };
+    tick(controller);
+    meters.pickSegment({ startedAt: 100, isCurrent: false });
+    tick(controller);
+    player.pos = home;
+    tick(controller);
+    expect(element.innerHTML).toContain('pick that finished run');
+  });
+
+  // Pins the controller's own closed-panel guard: the real Meters already
+  // returns no viewed segment for a closed panel, the fake does not.
+  it('only re-baselines a pick made while the Damage panel is closed', () => {
+    const { meters, controller, element } = toInspectHistory();
+    meters.anyOpen = false;
+    meters.tabOpenState.dmg = false;
+    meters.pickSegment({ startedAt: 100, isCurrent: false });
+    tick(controller);
+    meters.anyOpen = true;
+    meters.tabOpenState.dmg = true;
+    tick(controller);
+    expect(element.innerHTML).toContain('pick that finished run');
+  });
+
+  it('reads several picks between polls as one look at the final view', () => {
+    const { meters, controller, element } = toInspectHistory();
+    meters.pickSegment({ startedAt: 999, isCurrent: false });
+    meters.pickSegment({ startedAt: 100, isCurrent: false });
+    tick(controller);
+    expect(element.innerHTML).toContain('Click the fight name and pick Current');
+  });
+
+  it('glows the fight name menu for the comparison review it names', () => {
+    const { meters, controller, element } = toInspectHistory();
+    meters.pickSegment({ startedAt: 100, isCurrent: false });
+    tick(controller); // -> compare-again
+    meters.pickSegment({ startedAt: 200, isCurrent: true });
+    meters.currentEnc = enc(200, HUB_TRAINING_DUMMY_ID);
+    tick(controller); // second attempt lands live
+    meters.historyList = [meters.currentEnc, ...meters.historyList];
+    meters.currentEnc = null;
+    meters.viewedByTab.dmg = { startedAt: 200, isCurrent: false };
+    tick(controller); // finished -> review-comparison
+    expect(element.innerHTML).toContain(
+      'Use the fight name menu to compare Total, DPS, and duration with your first run. Return to this run, then Done.',
+    );
+    expect(meters.segmentPickerEl.classList.contains('qd-coach')).toBe(true);
+    expect(meters.rowEl.classList.contains('qd-coach')).toBe(true);
+  });
+
+  it('does not advance on a pick that lands on the wrong fight', () => {
+    const { meters, controller, element } = toInspectHistory();
+    meters.pickSegment({ startedAt: 999, isCurrent: false });
+    tick(controller);
+    meters.viewedByTab.dmg = { startedAt: 100, isCurrent: false };
+    tick(controller);
+    expect(element.innerHTML).toContain('pick that finished run');
   });
 });

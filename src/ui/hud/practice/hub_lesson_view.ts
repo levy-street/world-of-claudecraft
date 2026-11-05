@@ -4,7 +4,7 @@
 // classes, his optional healing drill afterward.
 //
 // This is deliberately NOT a wall-of-text tutorial card. Each step names one
-// real control (a keybind, a tab, a row, the history arrow) and the thin
+// real control (a keybind, the mode menu, a row, the segment menu) and the thin
 // controller (hub_lesson_controller.ts) glows that control and shows a
 // one-line prompt beside it, the same "press this next" idiom the Proving
 // Shore coach uses (coach_prompt_view.ts / styles/components.css .qd-coach)

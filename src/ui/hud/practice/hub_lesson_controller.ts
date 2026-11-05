@@ -86,8 +86,17 @@ export interface HubLessonEncounterLike {
 export interface HubLessonMetersPort {
   anyWindowOpen(): boolean;
   tabOpen(tab: HubMeterTab): boolean;
-  tabButtonElement(tab: HubMeterTab): HTMLElement | null;
-  historyArrowElement(tab: HubMeterTab): HTMLElement | null;
+  /** The control that switches the meters window onto `tab` (its mode
+   *  menu trigger), or null while no click on it would change anything. */
+  tabSwitchElement(tab: HubMeterTab): HTMLElement | null;
+  /** The segment picker (fight history menu trigger) of whichever panel is
+   *  showing `tab`, or null while none is open. */
+  segmentPickerElement(tab: HubMeterTab): HTMLElement | null;
+  /** Bumps once per player segment-menu pick on a panel showing `tab`
+   *  (never another meter's window). The coach reads its CHANGE as the real
+   *  "I looked back" interaction, never the viewed segment alone: a fight
+   *  ending flips the default view onto "Last fight" with no player action. */
+  segmentPickCount(tab: HubMeterTab): number;
   rowElementForPid(tab: HubMeterTab, pid: number): HTMLElement | null;
   /** Identity of whichever segment is CURRENTLY displayed on the panel
    *  showing `tab`, and whether it is the live "current" one, or null while
@@ -209,10 +218,10 @@ export class HubLessonController {
   /** Elements currently wearing the coach glow, cleared and reapplied every
    *  check so a target/quest/tab/language change never strands one. */
   private glowing: HTMLElement[] = [];
-  /** The history arrow listener is damage-only (healing never reads it):
-   *  ONE binding, never re-derived from the healing track's observation
-   *  (that double-bind used to unbind it on every other poll). */
-  private boundHistoryArrow: HTMLElement | null = null;
+  /** The last segmentPickCount this controller consumed: a different
+   *  reading on the next damage-track poll means the player picked a
+   *  segment since (damage only; healing never reads history). */
+  private seenSegmentPicks: number | null = null;
   /** Edge flags set by a real DOM interaction, consumed (and cleared) by
    *  the very next check. */
   private ackSeen: Partial<Record<HubLessonTrack, boolean>> = {};
@@ -307,7 +316,7 @@ export class HubLessonController {
     const center = hubLessonCenter();
     const inRange = planar(p.x, p.z, center.x, center.z) <= HUB_LESSON_RANGE;
     if (!inRange || isOnProvingShore(p.x, p.z)) {
-      this.bindHistoryListener(null);
+      this.seenSegmentPicks = null;
       this.historyViewedKeyNow = null;
       this.ackSeen = {};
       this.render(null);
@@ -407,7 +416,7 @@ export class HubLessonController {
   private observe(track: HubLessonTrack): HubLessonTrackObservation {
     const eligible = this.eligible(track);
     if (!eligible) {
-      if (track === 'damage') this.bindHistoryListener(null);
+      if (track === 'damage') this.seenSegmentPicks = null;
       return {
         eligible: false,
         targeting: false,
@@ -461,11 +470,7 @@ export class HubLessonController {
     const viewed = this.deps.meters.viewedEncounter(tab);
     const correctRow = rowEl !== null && trackedKey !== null && viewed?.startedAt === trackedKey;
     liveNow = trackedKey !== null && this.deps.meters.current()?.startedAt === trackedKey;
-    if (track === 'damage') {
-      const historyArrow =
-        anyWindowOpen && tabOpen ? this.deps.meters.historyArrowElement(tab) : null;
-      this.bindHistoryListener(historyArrow);
-    }
+    if (track === 'damage') this.readSegmentPick(anyWindowOpen && tabOpen);
 
     return {
       eligible: true,
@@ -481,21 +486,17 @@ export class HubLessonController {
     };
   }
 
-  /** Reads the CURRENTLY viewed segment at click time (the meters panel's
-   *  own click listener on this SAME element already ran and updated its
-   *  view index by the time this fires, since it was bound first): only a
-   *  genuinely non-current segment counts as an inspection target. */
-  private readonly onHistoryInteraction = (): void => {
+  /** Consumes a segment pick made since the last damage-track poll, then
+   *  reads the segment it landed on: only a genuinely non-current segment
+   *  counts as an inspection target. A pick made while the Damage panel is
+   *  closed (or before eligibility) only re-baselines, never counts. */
+  private readSegmentPick(damagePanelOpen: boolean): void {
+    const picks = this.deps.meters.segmentPickCount('dmg');
+    const picked = this.seenSegmentPicks !== null && picks !== this.seenSegmentPicks;
+    this.seenSegmentPicks = picks;
+    if (!picked || !damagePanelOpen) return;
     const info = this.deps.meters.viewedEncounter('dmg');
     this.historyViewedKeyNow = info && !info.isCurrent ? info.startedAt : null;
-  };
-
-  private bindHistoryListener(el: HTMLElement | null): void {
-    if (this.boundHistoryArrow === el) return;
-    if (this.boundHistoryArrow)
-      this.boundHistoryArrow.removeEventListener('click', this.onHistoryInteraction);
-    this.boundHistoryArrow = el;
-    if (el) el.addEventListener('click', this.onHistoryInteraction);
   }
 
   private readonly onAckClick = (track: HubLessonTrack): void => {
@@ -519,7 +520,6 @@ export class HubLessonController {
   dispose(): void {
     if (this.disposed) return;
     this.disposed = true;
-    this.bindHistoryListener(null);
     this.clearGlow();
     this.hidePrompt();
     if (this.prompt) this.prompt.remove();
@@ -598,20 +598,17 @@ export class HubLessonController {
     const tab = tabFor(step.track);
     const pid = this.deps.world.player.id;
     if (this.needsTrackedRun(step)) {
-      this.glow(this.deps.meters.historyArrowElement(tab));
+      this.glow(this.deps.meters.segmentPickerElement(tab));
     } else if (step.kind === 'open-window') {
       this.glow(this.visibleMobileControl('mobile-meters'));
     } else if (step.kind === 'open-tab') {
-      this.glow(this.deps.meters.tabButtonElement(tab));
-    } else if (
-      step.kind === 'read-row' ||
-      step.kind === 'view-breakdown' ||
-      step.kind === 'review-comparison'
-    ) {
+      this.glow(this.deps.meters.tabSwitchElement(tab));
+    } else if (step.kind === 'read-row' || step.kind === 'view-breakdown') {
       this.glow(this.deps.meters.rowElementForPid(tab, pid));
-    } else if (step.kind === 'inspect-history') {
+    } else if (step.kind === 'inspect-history' || step.kind === 'review-comparison') {
+      // Both ask the player to use the fight name menu (the segment picker).
       this.glow(
-        this.deps.meters.historyArrowElement(tab),
+        this.deps.meters.segmentPickerElement(tab),
         this.deps.meters.rowElementForPid(tab, pid),
       );
     } else if (

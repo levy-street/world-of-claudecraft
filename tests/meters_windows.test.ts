@@ -12,6 +12,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { beforeEach, describe, expect, it } from 'vitest';
 import type { SimEvent } from '../src/sim/types';
+import type { HubLessonMetersPort } from '../src/ui/hud/practice/hub_lesson_controller';
 import { Meters } from '../src/ui/meters';
 import { MeterFrame } from '../src/ui/meters_frame';
 import type { IWorld } from '../src/world_api';
@@ -673,5 +674,141 @@ describe('detachable meter windows', () => {
     resetBtn.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true }));
     expect(menus).toHaveLength(1);
     expect(menus[0].items.map((i) => i.act)).toEqual(['current', 'all']);
+  });
+});
+
+describe('hub practice coach reads the Details-style controls', () => {
+  // The .mt-tabs strip and the .mt-prev / .mt-next arrows are display:none
+  // in the shipped chrome (styles/hud.css), so the coach must point at the
+  // visible mode and segment menu triggers and see segment-menu picks.
+  beforeEach(() => {
+    document.body.innerHTML = '';
+    MeterFrame.clearActiveFrames();
+  });
+
+  it('points the meter switch at the mode menu trigger, never a hidden tab', () => {
+    const { meters, el } = setup();
+    meters.toggle();
+    expect(meters.tabSwitchElement('dmg')).toBeNull(); // already on Damage
+    const control = meters.tabSwitchElement('heal');
+    expect(control).toBe(el('meters-window').querySelector('.mt-mode-trigger'));
+    expect(control?.closest('.mt-tabs')).toBeNull();
+  });
+
+  it('points history at the segment menu trigger, never a hidden arrow', () => {
+    const { meters, el } = setup();
+    meters.toggle();
+    const control = meters.segmentPickerElement('dmg');
+    expect(control).toBe(el('meters-window').querySelector('.mt-seg-trigger'));
+    expect(control?.classList.contains('mt-prev')).toBe(false);
+  });
+
+  it('counts a segment menu pick, not merely opening the menu', () => {
+    const { meters, el, menus } = setup();
+    meters.toggle();
+    meters.onEvent(dmg(1, 100, 'Shadow Bolt'));
+    meters.data.endEncounter();
+    meters.render(true);
+    // The fight ending flips the view onto "Last fight" by itself: no pick.
+    expect(meters.viewedEncounter('dmg')?.isCurrent).toBe(false);
+    expect(meters.segmentPickCount('dmg')).toBe(0);
+    (el('meters-window').querySelector('.mt-seg-trigger') as HTMLElement).click();
+    expect(meters.segmentPickCount('dmg')).toBe(0);
+    menus[0].select('1');
+    expect(meters.segmentPickCount('dmg')).toBe(1);
+  });
+
+  it('counts the paging arrows as a pick too', () => {
+    const { meters, el } = setup();
+    meters.toggle();
+    meters.onEvent(dmg(1, 100, 'Shadow Bolt'));
+    meters.data.endEncounter();
+    (el('meters-window').querySelector('.mt-prev') as HTMLElement).click();
+    expect(meters.segmentPickCount('dmg')).toBe(1);
+  });
+
+  it('counts a main window pick against the meter it shows, not Damage', () => {
+    const { meters, el, menus } = setup();
+    meters.toggle();
+    meters.onEvent(heal(2, 50, 'Lesser Heal'));
+    meters.data.endEncounter();
+    (el('meters-window').querySelector('.mt-mode-trigger') as HTMLElement).click();
+    menus.at(-1)!.select('heal');
+    (el('meters-window').querySelector('.mt-seg-trigger') as HTMLElement).click();
+    menus.at(-1)!.select('1');
+    expect(meters.segmentPickCount('heal')).toBe(1);
+    expect(meters.segmentPickCount('dmg')).toBe(0);
+  });
+
+  it('wires the coach port to these same controls and counts', () => {
+    document.body.innerHTML = '';
+    const coach = document.createElement('div');
+    coach.id = 'hub-lesson-coach';
+    const { meters, el, menus } = setup();
+    document.body.appendChild(coach);
+    // Rebuild with the coach mounted and keybinds supplied, as the HUD does.
+    const live = new Meters(fakeWorld(), {
+      attachTooltip: () => {},
+      uiScale: () => 1,
+      isMobileLayout: () => false,
+      storage: new FakeStorage(),
+      keybinds: { primaryLabel: () => 'X' } as never,
+      openMenu: (items, _x, _y, onSelect) => {
+        menus.push({ items: [...items], select: onSelect });
+      },
+    });
+    void meters;
+    const port = (live as unknown as { hubLesson: { deps: { meters: HubLessonMetersPort } } })
+      .hubLesson.deps.meters;
+    live.toggle();
+    live.onEvent(dmg(1, 100, 'Shadow Bolt'));
+    live.data.endEncounter();
+    live.render(true);
+    const win = el('meters-window');
+    expect(port.tabSwitchElement('heal')).toBe(win.querySelector('.mt-mode-trigger'));
+    expect(port.segmentPickerElement('dmg')).toBe(win.querySelector('.mt-seg-trigger'));
+    expect(port.segmentPickCount('dmg')).toBe(0);
+    (win.querySelector('.mt-seg-trigger') as HTMLElement).click();
+    menus.at(-1)!.select('1');
+    expect(port.segmentPickCount('dmg')).toBe(1);
+    expect(port.segmentPickCount('heal')).toBe(0);
+  });
+
+  it('counts a detached window pick against its own meter, never Damage', () => {
+    const { meters, el, menus } = setup();
+    meters.toggle();
+    meters.onEvent(heal(2, 50, 'Lesser Heal'));
+    meters.data.endEncounter();
+    meters.popOut('heal');
+    (el('heal-window').querySelector('.mt-seg-trigger') as HTMLElement).click();
+    menus.at(-1)!.select('1');
+    expect(meters.segmentPickCount('heal')).toBe(1);
+    expect(meters.segmentPickCount('dmg')).toBe(0);
+    expect(meters.segmentPickerElement('heal')).toBe(
+      el('heal-window').querySelector('.mt-seg-trigger'),
+    );
+  });
+
+  it('counts a detached Threat window pick against Threat, never Damage', () => {
+    const { meters, el, menus } = setup();
+    meters.toggle();
+    meters.onEvent(dmg(1, 100, 'Shadow Bolt'));
+    meters.data.endEncounter();
+    meters.popOut('threat');
+    (el('threat-window').querySelector('.mt-seg-trigger') as HTMLElement).click();
+    menus.at(-1)!.select('1');
+    expect(meters.segmentPickCount('threat')).toBe(1);
+    expect(meters.segmentPickCount('dmg')).toBe(0);
+  });
+
+  it('points the meter switch at the visible back button inside a drill-down', () => {
+    const { meters, el } = setup();
+    meters.toggle();
+    meters.onEvent(dmg(1, 100, 'Shadow Bolt'));
+    meters.render(true);
+    (el('meters-window').querySelector('.mt-row') as HTMLElement).click();
+    const control = meters.tabSwitchElement('heal');
+    expect(control).toBe(el('meters-window').querySelector('.mt-back-btn'));
+    expect(control?.style.display).not.toBe('none');
   });
 });
