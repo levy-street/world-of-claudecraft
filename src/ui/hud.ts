@@ -2745,7 +2745,6 @@ export class Hud {
       if (
         target &&
         (this.emoteWheelEl?.contains(target) ||
-          document.getElementById('mm-emote')?.contains(target) ||
           document.getElementById('mobile-emote')?.contains(target))
       )
         return;
