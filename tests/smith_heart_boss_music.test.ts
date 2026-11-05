@@ -233,9 +233,49 @@ describe('a council sharing one cue', () => {
 
   it('a corpse of one dungeon boss never cuts another boss short', () => {
     const decision = instanceMusicDecision(
-      input(null, { entities: [mob('morthen', 7, true), mob('heart_quench_guardian', null)] }),
+      input(null, {
+        entities: [
+          mob('morthen', 7, true),
+          mob('heart_breath_guardian', 7, true),
+          mob('heart_quench_guardian', null),
+        ],
+      }),
     );
-    expect([...decision.slainBossTrackUrls]).toEqual([BOSS_TRACK_URLS.morthen]);
+    expect([...decision.slainBossTrackUrls]).toEqual([T.breath]);
+  });
+});
+
+describe("the immediate stop is the raid's own", () => {
+  it('every other boss keeps its cue through the 10 s grace after its kill', () => {
+    for (const boss of ['morthen', 'korzul_the_gravewyrm', 'mere_hydra_head_left']) {
+      const url = BOSS_TRACK_URLS[boss];
+      expect(url, boss).toBeTruthy();
+      const port = { resetForDungeonEntry: vi.fn(), update: vi.fn(), setBossCombat: vi.fn() };
+      const controller = new InstanceMusicController(port);
+      controller.update(input(null, { now: 20000, entities: [mob(boss, 7)] }));
+      expect(port.setBossCombat, boss).toHaveBeenLastCalledWith(true, url);
+      // Killed: the corpse never releases the cue early...
+      const dead = { entities: [mob(boss, null, true)] };
+      expect(instanceMusicDecision(input(null, dead)).slainBossTrackUrls.size, boss).toBe(0);
+      controller.update(input(null, { now: 20500, ...dead }));
+      expect(port.setBossCombat, boss).toHaveBeenLastCalledWith(true, url);
+      controller.update(input(null, { now: 29900, ...dead }));
+      expect(port.setBossCombat, boss).toHaveBeenLastCalledWith(true, url);
+      // ...the grace runs out as it always did.
+      controller.update(input(null, { now: 30000, ...dead }));
+      expect(port.setBossCombat, boss).toHaveBeenLastCalledWith(false);
+    }
+  });
+
+  it("every Smith's Heart boss releases its cue the moment it falls", () => {
+    for (const [boss, url] of Object.entries(SMITH_HEART_BOSS_TRACK_URLS)) {
+      const port = { resetForDungeonEntry: vi.fn(), update: vi.fn(), setBossCombat: vi.fn() };
+      const controller = new InstanceMusicController(port);
+      controller.update(input(null, { now: 20000, entities: [mob(boss, 7)] }));
+      expect(port.setBossCombat, boss).toHaveBeenLastCalledWith(true, url);
+      controller.update(input(null, { now: 20500, entities: [mob(boss, null, true)] }));
+      expect(port.setBossCombat, boss).toHaveBeenLastCalledWith(false);
+    }
   });
 });
 

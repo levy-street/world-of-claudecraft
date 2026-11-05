@@ -12,6 +12,7 @@ import { ALL_MUSIC_ZONES } from './music_zones';
 import { seasonalMusicZone } from './seasonal_music';
 import {
   isFinalStageTrack,
+  isSmithHeartBoss,
   SMITH_HEART_BOSS_TRACKS,
   smithHeartStageTrack,
 } from './smith_heart_boss_music';
@@ -134,7 +135,9 @@ export function instanceMusicDecision(input: InstanceMusicInput): InstanceMusicD
     if (entity.kind !== 'mob') continue;
     const ownTrack = bossTrackFor(entity.templateId);
     if (entity.dead) {
-      if (ownTrack !== null) {
+      // Only the Smith's Heart's bosses hand the mix back at their kill; every
+      // other boss keeps its cue through the 10 s grace, as before.
+      if (ownTrack !== null && isSmithHeartBoss(entity.templateId)) {
         slain ??= new Set();
         slain.add(ownTrack);
       }

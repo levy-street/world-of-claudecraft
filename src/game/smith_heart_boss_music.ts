@@ -71,6 +71,13 @@ export function smithHeartStageTrack(entity: StagedBossEntity): string | null {
   return STAGE_TRACK[finalStageOf(phase?.value)];
 }
 
+/** Whether a template is one of the raid's bosses: only their kill stops the
+ *  fight cue at once (instance_music.ts); every other boss holds its cue
+ *  through the aggro-gap grace. */
+export function isSmithHeartBoss(templateId: string): boolean {
+  return Object.hasOwn(SMITH_HEART_BOSS_TRACK_URLS, templateId);
+}
+
 /** Whether a cue is one of the final boss's stage cues. */
 export function isFinalStageTrack(url: string): boolean {
   return (
