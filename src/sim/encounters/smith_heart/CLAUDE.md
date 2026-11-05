@@ -131,4 +131,7 @@ Rules:
   `tests/smith_heart_heat.test.ts` (on `tests/helpers/heat_fight.ts`),
   `tests/smith_heart_heat_ui.test.ts`, `tests/smith_heart_heat_wire.test.ts`; the Masterless Strength: `tests/smith_heart_final.test.ts` (on `tests/helpers/final_fight.ts`: the rules, the kits per tier, determinism, the headless full fight), `tests/smith_heart_final_ui.test.ts` (warnings, tooltips, the Overload HUD, the alert), `tests/smith_heart_final_wire.test.ts` (the online mirror), `tests/smith_heart_final_dev.test.ts`; part 2: `tests/smith_heart_final_phase.test.ts` (the intermissions, each Splinter, the final phase, the poured elements, determinism, the full fight 100 to 0 per tier), `tests/smith_heart_final_phase_ui.test.ts`, `tests/smith_heart_final_phase_wire.test.ts`; the tier pools: `tests/smith_heart_tier_health.test.ts`. A live raid of bots fights every boss over a dev server:
   `scripts/heart_raid.mjs` (`BOSS=council|breath|quench|heat|final`; the shared raid
-  `scripts/lib/heart_raid_bots.mjs`, each boss's AI `scripts/lib/heart_raid_<boss>.mjs`).
+  `scripts/lib/heart_raid_bots.mjs`, each boss's AI `scripts/lib/heart_raid_<boss>.mjs`, the
+  class kits it plays, talents and rotations read off the sim's own level-20 resolution,
+  `scripts/lib/heart_raid_kits.mjs`, measured headless by `scripts/heart_raid_kit_probe.ts`;
+  Heroic and Mythic wear the previous tier's best, `/dev bis`).
