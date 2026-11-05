@@ -220,7 +220,7 @@ void main() {
   float top = 0.35 + 0.6 * t;
   // A bright lip low down fading fast upward, ragged: a wall of light you
   // read the wave by, never a sheet that hides the floor.
-  float a = uAlpha * (1.0 - smoothstep(top - 0.3, top, vUv.y)) * pow(1.0 - vUv.y, 1.6);
+  float a = uAlpha * (1.0 - smoothstep(top - 0.3, top, vUv.y)) * pow(max(1.0 - vUv.y, 0.0), 1.6);
   a *= 0.55 + 0.45 * t;
   if (a <= 0.003) discard;
   gl_FragColor = vec4(mix(uGold, uCore, 1.0 - vUv.y) * a * 1.4, a);

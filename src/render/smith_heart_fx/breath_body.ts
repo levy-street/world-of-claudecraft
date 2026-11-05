@@ -173,10 +173,10 @@ float n(vec3 p) {
     f.z);
 }
 void main() {
-  float fres = pow(1.0 - abs(dot(normalize(vN), normalize(vV))), 2.2);
+  float fres = pow(max(1.0 - abs(dot(normalize(vN), normalize(vV))), 0.0), 2.2);
   vec3 q = vP * 2.6 + vec3(0.0, -uTime * 3.4, 0.0);
   float vein = 1.0 - abs(n(q) * 2.0 - 1.0);
-  vein = pow(vein, 7.0);
+  vein = pow(max(vein, 0.0), 7.0);
   float flick = 0.75 + 0.25 * sin(uTime * 31.0 + vP.y * 3.0);
   vec3 col = mix(uEdge, uCore, clamp(vein * 1.4 + fres * 0.3, 0.0, 1.0));
   float a = uAlpha * clamp(0.18 + fres * 0.9 + vein * 1.1, 0.0, 1.0) * flick;
@@ -214,7 +214,7 @@ void main() {
   float t = uTime * 1.7;
   float r1 = 1.0 - abs(n(p + vec2(-t, t * 0.3)) * 2.0 - 1.0);
   float r2 = 1.0 - abs(n(p * 2.3 + vec2(t * 0.7, -t)) * 2.0 - 1.0);
-  float vein = pow(r1, 9.0) + pow(r2, 12.0) * 0.6;
+  float vein = pow(max(r1, 0.0), 9.0) + pow(max(r2, 0.0), 12.0) * 0.6;
   float flick = 0.7 + 0.3 * sin(uTime * 23.0 + span * 9.0);
   float membrane = 0.12 * (1.0 - span) + 0.06;
   float a = uAlpha * shape * clamp(membrane + vein * 1.6, 0.0, 1.0) * flick;

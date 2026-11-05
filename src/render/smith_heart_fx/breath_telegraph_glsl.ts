@@ -200,7 +200,7 @@ ${PAINTED_TELEGRAPH_MEASURE_GLSL}
   float ahead = yards + jag - fillYards;
   float swept = 1.0 - smoothstep(-0.12, 0.12, ahead);
   float reach = span * (0.45 + 0.51 * clamp(uFill, 0.0, 1.0));
-  float flare = uFill > 0.86 ? pow((uFill - 0.86) / 0.14, 2.0) : 0.0;
+  float flare = uFill > 0.86 ? pow(max((uFill - 0.86) / 0.14, 0.0), 2.0) : 0.0;
   flare *= 1.0 - landed;
   // Thick main arms on a big strike, finer on a small mark; thickening as
   // the bar fills.

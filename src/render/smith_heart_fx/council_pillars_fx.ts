@@ -229,7 +229,7 @@ uniform float uTime;
 uniform vec3 uColor;
 varying vec2 vUv;
 void main() {
-  float rise = pow(1.0 - vUv.y, 1.4);
+  float rise = pow(max(1.0 - vUv.y, 0.0), 1.4);
   float veins = 0.5 + 0.5 * sin(vUv.x * 6.2831853 * 5.0 + sin(vUv.y * 9.0 + uTime) * 1.4);
   float flow = 0.55 + 0.45 * sin(vUv.y * 18.0 - uTime * 3.4 + vUv.x * 12.566);
   float lace = smoothstep(0.55, 0.95, veins * flow);

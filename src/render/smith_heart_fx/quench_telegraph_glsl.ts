@@ -60,7 +60,7 @@ ${PAINTED_TELEGRAPH_MEASURE_GLSL}
   float spokeW = (0.04 + 0.06 * (1.0 - clamp(r / max(span, 0.01), 0.0, 1.0))) * wk;
   float spoke = (1.0 - smoothstep(spokeW * 0.5, spokeW, dArc)) * smoothstep(0.2, 0.8, r);
   // Rime feathers: dendrites growing in off the edges and riding the front.
-  float feather = pow(ridge(wp * 2.3 + vec2(fbm(wp * 0.7) * 2.0, uSeed)), 8.0);
+  float feather = pow(max(ridge(wp * 2.3 + vec2(fbm(wp * 0.7) * 2.0, uSeed)), 0.0), 8.0);
   float rimeBand = 1.0 - smoothstep(0.0, 0.55 + 0.9 * wk, edge);
   float frontBand = 1.0 - smoothstep(0.0, 0.9 * wk, abs(ahead));
   // Where along the nearest edge a point lies (yards), for the shards.

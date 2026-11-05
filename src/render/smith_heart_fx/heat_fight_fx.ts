@@ -357,8 +357,8 @@ void main() {
   // ends.
   float run = vn(vec2(vUv.y * 9.0 - uTime * 16.0, vUv.x * 6.0));
   float flick = vn(vec2(vUv.y * 24.0 - uTime * 30.0, vUv.x * 12.0 + uTime * 3.0));
-  float core = pow(vFace, 9.0);
-  float sheath = pow(vFace, 2.2) * smoothstep(0.3, 0.75, flick);
+  float core = pow(max(vFace, 0.0), 9.0);
+  float sheath = pow(max(vFace, 0.0), 2.2) * smoothstep(0.3, 0.75, flick);
   float taper = smoothstep(0.0, 0.08, vUv.y) * (0.55 + 0.45 * smoothstep(1.0, 0.85, vUv.y));
   vec3 col = mix(vec3(1.0, 0.5, 0.14), vec3(1.0, 0.95, 0.8), core * (0.7 + 0.3 * run));
   float a = (0.5 * sheath + 0.95 * core) * (0.75 + 0.25 * run) * taper * uAlpha;

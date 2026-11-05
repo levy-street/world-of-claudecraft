@@ -167,7 +167,7 @@ varying vec3 vView;
 varying vec3 vLocal;
 ${NOISE}
 void main() {
-  float f = pow(1.0 - abs(dot(normalize(vN), normalize(vView))), 2.2);
+  float f = pow(max(1.0 - abs(dot(normalize(vN), normalize(vView))), 0.0), 2.2);
   vec3 p = normalize(vLocal);
   float lon = atan(p.z, p.x);
   float lat = p.y;

@@ -169,6 +169,6 @@ describe('Knotted Gale: the portal letters read upright', () => {
     const glsl = await import('../src/render/smith_heart_fx/breath_heart_glsl');
     // Laid flat (one height for every vertex), turned by the camera's bearing.
     expect(glsl.FLOOR_FACING_VERT).toContain('cameraPosition.xz');
-    expect(glsl.FLOOR_FACING_VERT).toContain('vec4(xz.x, c.y, xz.y, 1.0)');
+    expect(glsl.FLOOR_FACING_VERT).toContain('wocCamRelView(vec3(xz.x, c.y, xz.y))');
   });
 });

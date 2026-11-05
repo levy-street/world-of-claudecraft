@@ -115,8 +115,8 @@ ${PAINTED_TELEGRAPH_MEASURE_GLSL}
                + 0.07 * (vn(vec2(ang * 4.8 - uFill * 3.0, uSeed + 3.0)) - 0.5);
     float rs = radial / max(uShadow * lump, 0.01);
     float k = clamp(uShadowK, 0.0, 1.0);
-    float soft = 0.55 - 0.47 * pow(k, 0.8);
-    shDark = 0.55 + 0.4 * pow(k, 0.6);
+    float soft = 0.55 - 0.47 * pow(max(k, 0.0), 0.8);
+    shDark = 0.55 + 0.4 * pow(max(k, 0.0), 0.6);
     sh = (1.0 - smoothstep(1.0 - soft, 1.0, rs)) * (0.78 + 0.22 * (1.0 - clamp(rs, 0.0, 1.0)));
   }
 #ifdef PT_CHAR

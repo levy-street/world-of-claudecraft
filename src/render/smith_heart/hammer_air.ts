@@ -146,7 +146,7 @@ uniform float uTime;
 varying vec2 vCorner;
 void main() {
   float t = vCorner.y * 0.5 + 0.5;
-  float across = pow(1.0 - smoothstep(0.0, 1.0, abs(vCorner.x)), 1.6);
+  float across = pow(max(1.0 - smoothstep(0.0, 1.0, abs(vCorner.x)), 0.0), 1.6);
   // Brightest up in the crack, thinning toward the floor.
   float along = smoothstep(0.0, 0.35, t) * (1.0 - smoothstep(0.8, 1.0, t)) * (0.45 + 0.55 * t);
   float shimmer = 0.85 + 0.15 * sin(uTime * 0.6 + vCorner.x * 3.0 + t * 5.0);

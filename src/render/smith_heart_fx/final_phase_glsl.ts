@@ -88,7 +88,7 @@ ${VEINS}
 void main() {
   vec3 n = normalize(vN);
   vec3 v = normalize(vView);
-  float fres = pow(1.0 - abs(dot(n, v)), 2.2);
+  float fres = pow(max(1.0 - abs(dot(n, v)), 0.0), 2.2);
   float a = atan(vObj.x, vObj.z);
   float h = vObj.y;
   // The four veins chasing up and round the dome.
@@ -182,7 +182,7 @@ void main() {
   // so the column reads as light, never a solid pipe.
   vec3 n = normalize(vN);
   vec3 v = normalize(vView);
-  float rim = pow(1.0 - abs(dot(n, v)), 1.6);
+  float rim = pow(max(1.0 - abs(dot(n, v)), 0.0), 1.6);
   float streak = smoothstep(0.6, 1.0, pn(vec2(a * 6.0, h * 2.0 - uTime * 6.0)));
   float foot = smoothstep(0.35, 0.0, h);
   vec3 col = uColor * (rim * 0.85 + streak * 0.35) * flame + mix(uColor, vec3(1.0), 0.5) * foot * rim;

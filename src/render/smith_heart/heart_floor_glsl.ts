@@ -277,7 +277,7 @@ function heartFloorScar(): string {
     vec2 sp = vHfP.xz;
     float sr = length(sp);
     float su = 1.0 - clamp((sr - ${f(Q.ringR)}) / ${f(Q.rimR - Q.ringR)}, 0.0, 1.0);
-    float sweep = ${f(Q.sweepDeg)} * pow(su, ${f(Q.power)});
+    float sweep = ${f(Q.sweepDeg)} * pow(max(su, 0.0), ${f(Q.power)});
     float sphi = mod(degrees(atan(sp.x, sp.y)) + sweep - (${f(first)}), 360.0);
     float si = floor(sphi / 90.0);
     float sa = si < 0.5 ? uHfAwake.x : si < 1.5 ? uHfAwake.y : si < 2.5 ? uHfAwake.z : uHfAwake.w;

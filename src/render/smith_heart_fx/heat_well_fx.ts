@@ -320,7 +320,7 @@ void main() {
   float bend = sin(h * 5.0 - uTime * 1.6 + a * 3.0) * 0.35;
   float wave = 0.5 + 0.5 * sin(a * 23.0 + bend * 6.0 + sin(a * 7.0 + uTime * 0.7));
   float rise = 0.5 + 0.5 * sin(h * 9.0 - uTime * 2.4 + a * 11.0);
-  float streak = pow(wave, 6.0) * (0.35 + 0.65 * rise);
+  float streak = pow(max(wave, 0.0), 6.0) * (0.35 + 0.65 * rise);
   float fade = smoothstep(0.0, 0.12, h) * (1.0 - smoothstep(0.3, 1.0, h));
   vec3 col = vec3(1.0, 0.74, 0.4) * streak * fade * 0.13 * uHeat;
   gl_FragColor = vec4(col, 1.0);

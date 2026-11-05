@@ -4,6 +4,8 @@
 // a positioned mesh, safe in the instance bands (tests/camera_relative_floor_shaders).
 // The ball itself is the Storm Orb's (final_kit_glsl.ts ORB_FRAG, ORB_CORE_FRAG).
 
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
+
 /** A plain uv and height pass. */
 export const HEART_UV_VERT = /* glsl */ `
 varying vec2 vUv;
@@ -31,7 +33,7 @@ void main() {
   if (r > 1.0) discard;
   float a = atan(p.y, p.x);
   float arms = 0.5 + 0.5 * sin(a * uArms + uSpin * (r * 11.0 - uTime * 5.0));
-  arms = pow(arms, 2.0);
+  arms = pow(max(arms, 0.0), 2.0);
   float rim = smoothstep(0.82, 0.96, r) * (1.0 - smoothstep(0.96, 1.0, r));
   rim += uRing2 * smoothstep(0.62, 0.68, r) * (1.0 - smoothstep(0.7, 0.76, r));
   float eye = 1.0 - smoothstep(0.0, 0.3, r);
@@ -50,8 +52,8 @@ uniform float uSpin;
 varying vec2 vUv;
 void main() {
   float bands = 0.5 + 0.5 * sin(uSpin * vUv.x * 37.7 + vUv.y * 9.0 - uTime * 7.0);
-  bands = pow(bands, 3.0);
-  float fade = pow(1.0 - vUv.y, 1.4) * smoothstep(0.0, 0.06, vUv.y);
+  bands = pow(max(bands, 0.0), 3.0);
+  float fade = pow(max(1.0 - vUv.y, 0.0), 1.4) * smoothstep(0.0, 0.06, vUv.y);
   gl_FragColor = vec4(uColor * (0.5 + 1.3 * bands), (0.15 + 0.75 * bands) * fade * uOpen);
 }
 `;
@@ -127,7 +129,7 @@ void main() {
  *  camera's bearing so it always reads upright to the viewer (a fixed decal
  *  read upside down from the far side; Part C of the bot pass, 2026-11-04).
  *  The shape's x/y in yards, scaled by the mesh. */
-export const FLOOR_FACING_VERT = /* glsl */ `
+export const FLOOR_FACING_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 void main() {
   vec3 c = (modelMatrix * vec4(0.0, 0.0, 0.0, 1.0)).xyz;
   vec2 toCam = cameraPosition.xz - c.xz;
@@ -136,7 +138,7 @@ void main() {
   vec2 right = vec2(-up.y, up.x);
   float s = length(modelMatrix[0].xyz);
   vec2 xz = c.xz + (right * position.x + up * position.y) * s;
-  gl_Position = projectionMatrix * viewMatrix * vec4(xz.x, c.y, xz.y, 1.0);
+  gl_Position = projectionMatrix * wocCamRelView(vec3(xz.x, c.y, xz.y));
 }
 `;
 
@@ -206,7 +208,7 @@ uniform vec3 uColor;
 varying vec2 vUv;
 void main() {
   float bands = 0.5 + 0.5 * sin(vUv.x * 62.8 + vUv.y * 14.0 - uTime * 24.0);
-  float fade = pow(1.0 - vUv.y, 1.2);
+  float fade = pow(max(1.0 - vUv.y, 0.0), 1.2);
   gl_FragColor = vec4(uColor * (0.8 + 1.2 * bands), (0.35 + 0.65 * bands) * fade * uAlpha);
 }
 `;
