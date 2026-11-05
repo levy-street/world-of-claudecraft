@@ -243,6 +243,7 @@ export const final = {
     note(
       `Overload bursts: ${st.bursts}; stages: ${st.stages.map((s) => `${fmtSec(s.t)} ${s.what}`).join(', ') || '-'}`,
     );
+    note(`Anvils: ${st.anvils ?? 0} (under each: ${(st.anvilUnder ?? []).join(', ') || '-'})`);
   },
   row(world, st) {
     init(st);
@@ -334,6 +335,17 @@ function lowest(world, not) {
 
 function track(world, st) {
   init(st);
+  // Weight of the Anvil: how many stood under it as it fell (its mark gone).
+  const anvil = world.o?.anvils[0] ?? null;
+  if (st.anvilSeen && !anvil) {
+    const a = st.anvilSeen;
+    const under = world.living().filter((p) => hypot(p, a) <= T.anvilR);
+    const crushed = under.filter((p) => hasAura(p, FINAL_AURAS.crushed)).length;
+    log(`ANVIL fell: ${under.length} under (${crushed} already Crushed)`);
+    st.anvils = (st.anvils ?? 0) + 1;
+    st.anvilUnder = [...(st.anvilUnder ?? []), under.length];
+  }
+  st.anvilSeen = anvil ? { x: anvil.x, z: anvil.z } : null;
   const z = zoneOfBoss(world);
   if (z !== st.prevZone && world.mobs.boss?.aggro != null) {
     st.zones.push({ t: fightSec(), zone: z });

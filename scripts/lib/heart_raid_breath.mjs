@@ -572,8 +572,10 @@ function roarSpot(world, st, b, me, g) {
     }
     if (!safe) continue;
     const land = L(world, add(g, d, r0 + THROW));
-    const margin = inBreathArena(land.x, land.z) ? lipDistance(land.x, land.z) : 2;
-    if (margin < 2) continue;
+    const margin = inBreathArena(land.x, land.z) ? lipDistance(land.x, land.z) : 0;
+    // Five yards of floor past the landing: the wind and the slide carry a
+    // thrown body a little further than the throw itself.
+    if (margin < 5) continue;
     const at = add(g, d, r0);
     const cost = hypot(me, at) - margin * 0.3;
     if (!best || cost < best.cost) best = { at, cost };
