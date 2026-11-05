@@ -118,7 +118,9 @@ describe('mob portrait source manifest', () => {
     // 375: plus the Guardian of the Heat's four (its Wellspawn, Wellkeeper,
     // Seedflame and Rolling Cinder).
     // 379: plus the four Gourdlight Eve encounter bodies.
-    expect(liveIds).toHaveLength(379);
+    // 384: the Smith's Heart final boss's four Splinters and the Breath isle's
+    // Gale Sentinel and Gale Mender, less the Slabwright the Council rework cut.
+    expect(liveIds).toHaveLength(384);
     expect(manifest.portraitCount).toBe(liveIds.length);
     expect(manifest.portraits.map((portrait) => portrait.id)).toEqual(liveIds);
     expect(manifest.schemaVersion).toBe(2);
