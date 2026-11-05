@@ -139,14 +139,15 @@ def stone_shader(low, mid, high, cool, *, cap=None, cap_at=(0.5, 0.9), bed=None,
     return shade
 
 
-def surface_ribbon(p, tree, pts, w, shade, slot=GLOW, lift=0.05, reach=9.0, gap=1.5, smooth=0, ease=0):
+def surface_ribbon(p, tree, pts, w, shade, slot=GLOW, lift=0.05, reach=9.0, gap=1.5, smooth=0, ease=0, colour=None):
     """A thin line of light laid on a surface: `pts` are (from, to) rays (each from
     outside the rock toward it); where one hits, the ribbon has a point there, turned to
     the surface; a ray that misses or jumps more than `gap` yards breaks the line, so no
     stretch of it ever hangs in the air. Single sided, facing out. `smooth` averages each
     point's normal with that many neighbours either side (a ribbon over rough rock
     otherwise twists face to face like a chain); `ease` likewise eases its points (over
-    faceted rock a line otherwise saws between the facets)."""
+    faceted rock a line otherwise saws between the facets). `colour`, if given, paints it
+    in that colour instead of the `shade` grey (an ember drawn in the stone slot)."""
     bm = p.bm
     run = []
 
@@ -190,7 +191,7 @@ def surface_ribbon(p, tree, pts, w, shade, slot=GLOW, lift=0.05, reach=9.0, gap=
                 fc.normal_flip()
             fc[p.keep] = 1
             faces.append(fc)
-        p._paint(faces, (shade, shade, shade), slot)
+        p._paint(faces, colour or (shade, shade, shade), slot)
         run.clear()
 
     for (a, b) in pts:

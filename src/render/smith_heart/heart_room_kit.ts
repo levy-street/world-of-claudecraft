@@ -161,7 +161,7 @@ export function buildHeartRoomKit(lowGfx: boolean): HeartRoomKit {
 ${heartRootEmissiveGlsl()}`,
     );
   };
-  rootPainted.customProgramCacheKey = () => 'smith-heart-root-painted|aaa3';
+  rootPainted.customProgramCacheKey = () => 'smith-heart-root-painted|aaa4';
   const glows = new Map<SmithHeartVein, THREE.ShaderMaterial>();
   const altars = new Map<SmithHeartVein, HeartFallAltar>();
   const roots = new Map<SmithHeartVein, HeartFallAltar>();

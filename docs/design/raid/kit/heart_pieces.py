@@ -81,7 +81,6 @@ from mathutils import Vector
 import gravewyrm_sculpt as gs
 from gravewyrm_sculpt import Sculpt, block
 from gwkit import add_sculpt, crystal, hull, mix, slab, sstep
-from heat_pieces import hex_column, _bundle_layout
 from hckit import GLOW, STONE
 from jaguar_head_sculpt import Ellipsoid, Noise, Polyline, RoundBox, RoundCone, Torus, rot
 from ring_pieces import (
@@ -863,117 +862,135 @@ def _altar_clamp(f):
     _clamp(f, np.where(Z < 3.0, np.sqrt(X * X + Y * Y) - 3.08, np.sqrt(X * X + Y * Y) - 3.45))
 
 
-# The Heat's altar painted by hand (the weak-spots pass of 2026-11-04: its basalt
-# read as one near-black lump on the dark crown): warm lit column faces climbing to
-# pale worn arrises and ash on the heads, the shade a cool violet-brown (never
-# black), the plinth's dressed stone its own warm grey, and embers burning in the
-# joints between the columns (the vein's glow, tinted and dimmed at runtime).
+# The Heat's altar (the hammer round of 2026-11-05: its bundle of tall basalt columns
+# crowned by an upright fire crystal read as a giant candle, the light's halo round the
+# crystal as a ball). Now a heap of forge rock: slag and clinker welled up over the
+# plinth, broad and lumpy at its foot and narrowing in irregular shelves to a broken
+# crown leaning back, the fire crystal half sunk in a socket in its upper front and
+# leaning out toward the platform, smaller crystals breaking out of its flanks. The heat
+# lives in the stone: the rock round the socket and in its deep creases painted hot, and
+# ember cracks running out from the socket down its faces, both in the stone slot in a
+# saturated ember colour the root's painted material burns (heart_root_look_core.ts
+# heartRootEmissiveGlsl, its ember term).
 HEAT_ALTAR_PAINT = dict(
-    low=(0.27, 0.21, 0.19), mid=(0.42, 0.33, 0.28), high=(0.66, 0.52, 0.41),
-    cool=(0.25, 0.2, 0.27), ash=(0.7, 0.65, 0.6), plinth=((0.42, 0.38, 0.35), (0.58, 0.53, 0.48)),
+    low=(0.23, 0.17, 0.15), mid=(0.37, 0.27, 0.22), high=(0.55, 0.42, 0.33),
+    cool=(0.25, 0.2, 0.27), ash=(0.66, 0.6, 0.55), plinth=((0.42, 0.38, 0.35), (0.58, 0.53, 0.48)),
+    ember=(1.0, 0.46, 0.13), core=(1.0, 0.7, 0.32),
 )
+# The fire crystal's socket: where its base sits in the rock (the piece's frame), and
+# the way it leans out of it.
+HEAT_ALTAR_SOCKET = (-0.6, -0.85, 4.2)
+HEAT_ALTAR_LEAN = (-0.62, -0.5, 0.62)
 
 
-def _heat_altar_paint(bpy, p, f, bundle=None):
+def _heat_altar_rock(f, rng):
+    """The forge rock's masses (see HEAT_ALTAR_PAINT): a lumpy skirt of slag over the
+    plinth, a broad body, two narrowing shelves and a broken crown set back and to one
+    side, the socket for the crystal cut into its upper front."""
+    for k in range(9):
+        a = TAU * k / 9 + float(rng.uniform(-0.25, 0.25))
+        r = float(rng.uniform(1.9, 2.25))
+        w = float(rng.uniform(1.4, 1.9))
+        f.put('basalt', block(rng, (math.sin(a) * r, -math.cos(a) * r, float(rng.uniform(1.0, 1.35))),
+                              (w, w * float(rng.uniform(0.8, 1.1)), float(rng.uniform(1.0, 1.5))), cuts=12,
+                              chamfer=(0.66, 0.9), R=rot(rz=-a + float(rng.uniform(-0.4, 0.4)),
+                                                         rx=float(rng.uniform(-0.25, 0.25))), top_tilt=0.4), 0.45)
+    f.put('basalt2', block(rng, (0.0, 0.15, 2.2), (4.0, 3.7, 2.8), cuts=16, chamfer=(0.66, 0.92),
+                           R=rot(rz=0.35), top_tilt=0.25), 0.6)
+    f.put('basalt', block(rng, (0.2, 0.35, 3.7), (3.1, 2.8, 2.0), cuts=14, chamfer=(0.66, 0.92),
+                          R=rot(rz=-0.45, ry=0.08), top_tilt=0.35), 0.5)
+    f.put('basalt2', block(rng, (0.2, 0.5, 4.75), (2.4, 2.1, 1.6), cuts=14, chamfer=(0.64, 0.9),
+                           R=rot(rz=0.8, ry=-0.1), top_tilt=0.4), 0.4)
+    # The crown: broken, leaning back and away from the crystal, the highest rock on
+    # the far side of the socket so the fire bursts out of a flank, never off a top.
+    f.put('basalt', block(rng, (0.85, 0.55, 5.15), (2.1, 1.9, 1.5), cuts=12, chamfer=(0.62, 0.9),
+                          R=rot(rz=0.3, ry=0.16, rx=0.12), top_tilt=0.45), 0.35)
+    f.put('basalt2', block(rng, (0.55, 0.95, 5.85), (1.25, 1.2, 1.3), cuts=10, chamfer=(0.6, 0.88),
+                           R=rot(rz=-0.6, ry=0.3), top_tilt=0.6), 0.25)
+    f.put('basalt2', block(rng, (-0.55, 1.0, 4.95), (1.2, 1.2, 1.2), cuts=10, chamfer=(0.62, 0.9),
+                           R=rot(rz=-0.5, ry=-0.25), top_tilt=0.5), 0.3)
+    # Ledges of clinker run round its flanks (strata), never a ring.
+    for (z, a0, a1) in ((2.75, -2.2, 0.9), (3.95, 0.4, 3.4), (1.85, 1.6, 4.4)):
+        pts = []
+        for j in range(7):
+            a = a0 + (a1 - a0) * j / 6
+            r = 2.05 - 0.28 * (z - 1.85) + 0.12 * math.sin(j * 1.7 + z)
+            pts.append((math.sin(a) * r, -math.cos(a) * r, z + 0.18 * math.sin(j * 2.3 + a0)))
+        f.groove(Polyline(pts, 0.02), 0.22, 0.16)
+    # The crystal's socket, opened in the upper front.
+    sx, sy, sz = HEAT_ALTAR_SOCKET
+    f.sub(Ellipsoid((sx, sy - 0.2, sz + 0.35), (0.85, 0.75, 1.05), rot(rx=0.45)), 0.3)
+
+
+def _heat_altar_paint(bpy, p, f):
     from landmark_paint import hand_sculpt, paint_faces, stone_shader, surface_ribbon
     A = HEAT_ALTAR_PAINT
     made = hand_sculpt(bpy, p, f, 'Altarheat', 5200, sharp=38.0, colours=HEART_COLOURS, kinds=HEART_KINDS)
-    columns = stone_shader(A['low'], A['mid'], A['high'], A['cool'], cap=A['ash'], cap_at=(0.72, 0.95),
-                           edge=1.0, hollow=0.9, z_span=(1.0, 6.4))
+    rock = stone_shader(A['low'], A['mid'], A['high'], A['cool'], cap=A['ash'], cap_at=(0.8, 0.97),
+                        edge=0.9, hollow=0.9, z_span=(0.8, 6.6))
     pl_lo, pl_hi = A['plinth']
+    sock = Vector(HEAT_ALTAR_SOCKET)
 
     def shade(q, n, c):
-        if q.z < 1.0:
+        if q.z < 0.62 or (q.z < 1.0 and math.hypot(q.x, q.y) > 2.45):
             # The plinth: dressed warm grey, its top lit, its foot in a cool shade.
             col = mix(pl_lo, pl_hi, sstep(0.2, 0.95, n.z * 0.5 + 0.5))
             col = mix(col, A['cool'], sstep(-0.1, -0.7, n.z) * 0.7)
             return mix(col, tuple(min(1.0, ch * 1.35 + 0.04) for ch in col), max(0.0, c) * 0.8)
-        col = columns(q, n, c)
-        # The fire's warmth up the faces that look in at the crystal's crown.
-        glow = sstep(3.2, 6.2, q.z) * max(0.0, -(q.x * n.x + q.y * n.y) / max(0.3, math.hypot(q.x, q.y)))
-        return mix(col, (0.78, 0.46, 0.26), 0.35 * glow)
+        col = rock(q, n, c)
+        # The heat in the stone: hot round the socket, smouldering deep in its creases
+        # (more toward the fire), the faces that look in at the crystal warmed.
+        d = (q - sock).length
+        hot = 1.0 - sstep(0.75, 1.9, d)
+        crease = max(0.0, -c - 0.12) * sstep(1.2, 4.8, q.z) * (1.0 - sstep(1.2, 3.6, d))
+        warm = (1.0 - sstep(1.2, 3.2, d)) * max(0.0, (sock - q).normalized().dot(n))
+        col = mix(col, (0.74, 0.42, 0.26), 0.45 * warm)
+        col = mix(col, A['ember'], min(1.0, 0.9 * hot + 1.3 * crease))
+        return mix(col, A['core'], 0.6 * (1.0 - sstep(0.55, 1.0, d)))
 
     paint_faces(p, made, shade)
     from mathutils.bvhtree import BVHTree
     tree = BVHTree.FromBMesh(p.bm)
-    # Embers in the joints (the weak-spots pass's second round: rays swung a fixed
-    # wobble across the columns, so every seam zigzagged face to face in the same
-    # beat). Now each seam runs up a real joint between two outer columns, aimed
-    # into its crease so it hugs it; joints are picked at random, each burns its own
-    # stretch (some long from the plinth, some short and high, one or two broken
-    # in two), and a few spill a short crack across a column's face.
+    # Ember cracks from the socket down and round the rock: each its own random walk
+    # round the axis (its own kinks and length, never a beat), ray cast onto the stone,
+    # widest near the fire; one or two fork.
     rng = np.random.default_rng(5537)
-    outer = [c for c in (bundle or []) if math.hypot(c[0], c[1]) > 0.9]
-    joints = []
-    for i, a in enumerate(outer):
-        for b in outer[i + 1:]:
-            gap = math.hypot(a[0] - b[0], a[1] - b[1])
-            mx_, my_ = (a[0] + b[0]) / 2, (a[1] + b[1]) / 2
-            rm = math.hypot(mx_, my_)
-            # Side by side round the bundle (a joint the raid can see), never one
-            # column behind the other.
-            if gap < 1.45 and rm > 0.8 and abs(((a[0] - b[0]) * mx_ + (a[1] - b[1]) * my_) / (gap * rm)) < 0.55:
-                joints.append(((a[0] + b[0]) / 2, (a[1] + b[1]) / 2, min(a[2], b[2]), (a[0] - b[0]) / gap,
-                               (a[1] - b[1]) / gap))
-    order = rng.permutation(len(joints))
-    for idx in order[:18]:
-        mx, my, top, tx, ty = joints[int(idx)]
-        r = math.hypot(mx, my)
-        ox, oy = mx / r, my / r
-        z0 = float(rng.uniform(1.15, 1.6)) if rng.random() < 0.55 else float(rng.uniform(2.2, 3.6))
-        z1 = min(top - 0.35, z0 + float(rng.uniform(1.2, 4.2)))
-        if z1 - z0 < 0.7:
-            continue
-        steps = max(4, int((z1 - z0) / 0.18))
-        cut = float(rng.uniform(0.35, 0.65)) if rng.random() < 0.3 else None
-        drift = float(rng.uniform(-0.04, 0.04))
-        runs = [[]]
-        for j in range(steps + 1):
-            t = j / steps
-            if cut is not None and abs(t - cut) < 0.06:
-                if runs[-1]:
-                    runs.append([])
-                continue
-            z = z0 + (z1 - z0) * t
-            sl = drift * t + 0.025 * math.sin(t * float(rng.uniform(3.0, 7.0)))
-            q = Vector((mx + tx * sl, my + ty * sl, z))
-            runs[-1].append((tuple(q + Vector((ox, oy, 0.0)) * 3.2), tuple(q - Vector((ox, oy, 0.0)) * 0.6)))
-        w = float(rng.uniform(0.07, 0.16))
-        for run in runs:
-            surface_ribbon(p, tree, run, w, 0.88, reach=6.0, gap=0.45, lift=0.03)
-        # A short crack spilling off across a column's face.
-        if rng.random() < 0.6:
-            zc = z0 + (z1 - z0) * float(rng.uniform(0.3, 0.8))
-            side = float(rng.choice((-1.0, 1.0)))
-            n = int(rng.integers(3, 6))
-            rays = []
-            for j in range(n):
-                s_ = side * (0.08 + 0.13 * j)
-                q = Vector((mx + tx * s_, my + ty * s_, zc - 0.16 * j - 0.05 * j * j))
-                rays.append((tuple(q + Vector((ox, oy, 0.0)) * 3.2), tuple(q - Vector((ox, oy, 0.0)) * 0.6)))
-            surface_ribbon(p, tree, rays, w * 0.7, 0.8, reach=6.0, gap=0.4, lift=0.03)
-    # Cracks down the columns' own faces: a random walk round each column (kinks of
-    # their own length and turn, never a beat), the fire showing through.
-    faces_ = [c for c in outer if c[2] > 3.0]
-    for idx in rng.permutation(len(faces_))[:7]:
-        cx, cy, top = faces_[int(idx)]
-        base = math.atan2(cy, cx)
-        a = base + float(rng.uniform(-0.6, 0.6))
-        z = float(rng.uniform(min(top - 0.6, 3.4), top - 0.4))
-        end = max(1.1, z - float(rng.uniform(1.4, 3.6)))
+    base = math.atan2(sock.x, -sock.y)
+    for k in range(9):
+        # Most leave the socket's lip and run down and out from it, fanning; two creep
+        # round the back.
+        side = 1.0 if k % 2 else -1.0
+        a = base + side * float(rng.uniform(0.15, 0.55)) if k < 7 else base + math.pi + float(rng.uniform(-1.0, 1.0))
+        z = float(rng.uniform(3.4, 3.9)) if k < 7 else float(rng.uniform(3.0, 4.2))
+        end = float(rng.uniform(1.0, 2.4))
         rays = []
+        fork = None
         while z > end:
-            seg = float(rng.uniform(0.25, 0.7))
-            turn = float(rng.normal(0.0, 0.32))
-            n = max(2, int(seg / 0.12))
-            for j in range(n):
-                a += turn / n
-                a = max(base - 0.95, min(base + 0.95, a))
-                z -= seg / n
-                o = Vector((math.cos(a), math.sin(a), 0.0))
-                q = Vector((cx, cy, z))
-                rays.append((tuple(q + o * 2.6), tuple(q)))
-        surface_ribbon(p, tree, rays, float(rng.uniform(0.06, 0.12)), 0.85, reach=4.0, gap=0.35, lift=0.03)
+            seg = float(rng.uniform(0.25, 0.6))
+            turn = float(rng.normal(side * 0.18, 0.28))
+            m = max(2, int(seg / 0.12))
+            for _ in range(m):
+                a += turn / m
+                z -= seg / m
+                o = Vector((math.sin(a), -math.cos(a), 0.0))
+                q = Vector((0.0, 0.2, z))
+                rays.append((tuple(q + o * 4.0), tuple(q)))
+            if fork is None and rng.random() < 0.22:
+                fork = (a, z)
+        w = float(rng.uniform(0.09, 0.16)) if k < 7 else float(rng.uniform(0.06, 0.1))
+        surface_ribbon(p, tree, rays, w, 0.9, slot=STONE, reach=5.0, gap=0.4, lift=0.03, colour=A['ember'])
+        if fork is not None:
+            fa, fz = fork
+            side = float(rng.choice((-1.0, 1.0)))
+            frays = []
+            for j in range(6):
+                fa += side * 0.09
+                fz -= 0.16
+                o = Vector((math.sin(fa), -math.cos(fa), 0.0))
+                q = Vector((0.0, 0.2, fz))
+                frays.append((tuple(q + o * 4.0), tuple(q)))
+            surface_ribbon(p, tree, frays, w * 0.6, 0.9, slot=STONE, reach=5.0, gap=0.4, lift=0.03,
+                           colour=A['ember'])
     return made
 
 
@@ -986,7 +1003,6 @@ def altar(bpy, vein):
     p = HSP('Kit_Altar' + vein.capitalize(), seed=seed, ao=0.6, ao_dist=1.6, dust=0.4)
     rng = np.random.default_rng(seed)
     f = Sculpt((-3.6, -3.6, -0.4), (3.6, 3.6, 8.6), 0.07)
-    heat_columns = []
     _plinth(f, rng)
     heart = (0.0, -0.4, 5.0)
     if vein == 'hammer':
@@ -1036,25 +1052,15 @@ def altar(bpy, vein):
         f.sub(Ellipsoid((0.0, -0.3, 6.3), (1.0, 0.95, 0.6)), 0.12)
         heart = (0.0, -0.3, 6.0)
     else:
-        # A bundle of the Hearth's basalt columns, stepped, split at its
-        # crown where the fire crystal bursts out.
-        for (cx, cy) in _bundle_layout(rng, 2.5, 0.62):
-            r = math.hypot(cx, cy)
-            if r > 2.25:
-                continue
-            top = 6.2 - r * 0.9 + float(rng.uniform(-0.5, 0.4))
-            if r < 0.7:
-                top = 5.0
-            heat_columns.append((cx, cy, max(2.0, top)))
-            f.put(('basalt', 'basalt2', 'basalt')[int(rng.integers(0, 3))],
-                  hex_column((cx, cy), 0.62, 0.8, max(2.0, top), phase=float(rng.uniform(0, 1)),
-                             top_tilt=(float(rng.uniform(-0.2, 0.2)), float(rng.uniform(-0.2, 0.2)))), 0.04)
-        heart = (0.0, -0.2, 5.2)
+        # A heap of forge rock, the fire crystal half sunk in its upper front
+        # (HEAT_ALTAR_PAINT).
+        _heat_altar_rock(f, rng)
+        heart = HEAT_ALTAR_SOCKET
     _weather(f, seed, amp=0.08, scale=0.7, band=0.35)
     f.cut_below(0.0)
     _altar_clamp(f)
     if vein == 'heat':
-        _heat_altar_paint(bpy, p, f, heat_columns)
+        _heat_altar_paint(bpy, p, f)
     else:
         _mesh(bpy, p, f, 'Altar' + vein, 5200)
     prng = p.rng
@@ -1077,9 +1083,27 @@ def altar(bpy, vein):
                 pale_crystal(p, (prng.uniform(-0.8, 0.8), prng.uniform(-0.6, 0.8), 6.4),
                              (math.cos(a) * 0.4, math.sin(a) * 0.4, 1.0), prng.uniform(0.7, 1.4),
                              prng.uniform(0.15, 0.24))
+    elif vein == 'heat':
+        # The fire crystal half sunk in its socket, leaning out toward the platform,
+        # its brood round it, and a few smaller crystals broken out of the flanks.
+        lean = Vector(HEAT_ALTAR_LEAN).normalized()
+        sock = Vector(heart)
+        with p.as_kind(PAINT):
+            pale_crystal(p, tuple(sock - lean * 0.9), tuple(lean), 3.2, 0.5, bright=0.12)
+        for k in range(5):
+            a = TAU * k / 5 + prng.uniform(-0.35, 0.35)
+            d = lean + Vector((math.cos(a) * 0.55, math.sin(a) * 0.4, math.sin(a) * 0.25))
+            foot = sock + Vector((math.cos(a) * 0.35, math.sin(a) * 0.2, math.sin(a) * 0.3)) - lean * 0.5
+            with p.as_kind(PAINT):
+                pale_crystal(p, tuple(foot), tuple(d), prng.uniform(1.0, 1.7), prng.uniform(0.17, 0.26))
+        for (a, z, L) in ((-1.35, 2.4, 1.3), (1.2, 2.9, 1.1), (2.5, 2.2, 0.9), (0.6, 1.9, 0.8)):
+            o = Vector((math.sin(a), -math.cos(a), 0.0))
+            foot = Vector((0.0, 0.2, z)) + o * 1.45
+            with p.as_kind(PAINT):
+                pale_crystal(p, tuple(foot), tuple(o + Vector((0.0, 0.0, 0.9))), L, prng.uniform(0.14, 0.2))
     else:
-        n = 7 if vein != 'heat' else 9
-        tall = {'breath': 2.0, 'quench': 1.7, 'heat': 2.6}[vein]
+        n = 7
+        tall = {'breath': 2.0, 'quench': 1.7}[vein]
         for k in range(n):
             a = TAU * k / max(1, n - 1) + prng.uniform(-0.3, 0.3)
             lean = 0.0 if k == 0 else 0.45
@@ -1122,14 +1146,6 @@ def altar(bpy, vein):
                 r = prng.uniform(0.5, 1.4)
                 crystal(p, (math.sin(a) * r, -math.cos(a) * r * 0.9, 6.2), (0.6, 0.45, 0.1), p.vary(RIME, 0.03), n=16,
                         boxy=1.0, jitter=0.05, yaw=prng.uniform(0, TAU))
-    elif vein == 'heat':
-        # Ash on the column heads, soot up the faces near the fire.
-        with p.as_kind(PAINT):
-            for k in range(10):
-                a = prng.uniform(0, TAU)
-                r = prng.uniform(1.0, 2.1)
-                crystal(p, (math.sin(a) * r, -math.cos(a) * r, 6.2 - r * 0.9 + 0.05), (0.9, 0.7, 0.1),
-                        p.vary(ASH, 0.04), n=16, boxy=1.0, jitter=0.05, yaw=prng.uniform(0, TAU))
     # Rubble round the plinth's foot.
     with p.as_kind(RAW):
         for k in range(12):
