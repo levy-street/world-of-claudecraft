@@ -25,6 +25,7 @@
 //   IGNORE      the boss's key mechanic the raid ignores on purpose (see each module)
 //   KICK_MISS   chance an assigned interrupter fumbles a kick (default 0.15)
 //   SEED        the script's own rolls (default: the clock)
+//   BOT_TAG     a second raid on the same server at once (its own accounts: hcbot_<key><tag>)
 //   ORDER       council only: the kill order, guardian,singer or singer,guardian
 
 import { runRaid } from './lib/heart_raid_bots.mjs';

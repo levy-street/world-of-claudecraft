@@ -52,6 +52,9 @@ export const JOIN_ROLE = (process.env.JOIN_ROLE ?? 'dps').toLowerCase();
  *  (`bis`: the top Nythraxis parse loadouts), a Normal raid the fresh level-20
  *  preset (`kit`), unless GEAR says otherwise. */
 export const GEAR = (process.env.GEAR ?? (DIFF === 'normal' ? 'kit' : 'bis')).toLowerCase();
+/** A second raid at once (its own ten accounts): BOT_TAG=b logs in as
+ *  hcbot_<key>b, so two bot raids can fight side by side on one server. */
+export const BOT_TAG = (process.env.BOT_TAG ?? '').replace(/[^a-z0-9]/gi, '');
 export const KICK_MISS = Number(process.env.KICK_MISS ?? 0.15);
 export const MAX_SECONDS = Number(process.env.MAX_SECONDS ?? 720);
 export const LOG_DIR = process.env.LOG_DIR ?? 'tmp/heart_raid';
@@ -182,7 +185,7 @@ async function raidMain(boss) {
     Object.assign(
       new WorldBot({
         base: BASE,
-        username: `hcbot_${r.key}`,
+        username: `hcbot_${r.key}${BOT_TAG}`,
         password: 'councilbot22',
         name: r.name,
         cls: r.cls,
@@ -1449,7 +1452,7 @@ function writeReport(world, st, boss) {
   const stamp = new Date().toISOString().replace(/[-:]/g, '').replace('T', '-').slice(0, 13);
   const file = path.join(
     LOG_DIR,
-    `${boss.key}_${DIFF}${IGNORE ? `_ignore-${IGNORE}` : ''}_${stamp}.txt`,
+    `${boss.key}_${DIFF}${IGNORE ? `_ignore-${IGNORE}` : ''}${process.env.START ? `_start${process.env.START}` : ''}_${stamp}${BOT_TAG ? `_${BOT_TAG}` : ''}.txt`,
   );
   fs.writeFileSync(file, `${lines.join('\n')}\n`);
   console.log(`\nfight log written: ${file}`);
