@@ -19,4 +19,11 @@ describe('short reach to a towering body', () => {
     expect(effectivePlayerAttackRange({ kind: 'mob', templateId: HEAT }, 30)).toBe(30);
     expect(effectivePlayerAttackRange({ kind: 'mob', templateId: 'forest_wolf' }, 8)).toBe(8);
   });
+  it("keeps an older dungeon's towering boss at its tuned short reach", () => {
+    const old = Object.entries(MOBS).find(
+      ([id, m]) => (m.bodyRadius ?? 0) > 0 && !id.startsWith('heart_'),
+    );
+    expect(old, 'a non-raid template with a body radius').toBeTruthy();
+    expect(effectivePlayerAttackRange({ kind: 'mob', templateId: old?.[0] ?? '' }, 8)).toBe(8);
+  });
 });

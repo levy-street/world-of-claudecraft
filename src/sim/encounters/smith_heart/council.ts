@@ -41,6 +41,7 @@
 // the pillar, rubble and rise-spot objects, `spellfx` cues), so the online
 // client mirrors the whole fight with no wire or IWorld change.
 
+import { instanceHalfWidthOf } from '../../instances/instance_footprint';
 import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
 import { addThreat, clearThreat } from '../../threat';
@@ -445,9 +446,11 @@ function clearBars(bodies: CouncilBodies): void {
 /** Lift Hammer's Weight off this claim's players (never another claim's). */
 function dropClaimWeight(ctx: SimContext, inst: InstanceSlot): void {
   const o = ctx.instanceOriginOf(inst);
+  // The claim's one shape in x (instances/instance_footprint.ts).
+  const half = instanceHalfWidthOf(inst.dungeonId);
   for (const meta of ctx.players.values()) {
     const p = ctx.entities.get(meta.entityId);
-    if (!p || Math.abs(p.pos.x - o.x) >= 300 || Math.abs(p.pos.z - o.z) >= 250) continue;
+    if (!p || Math.abs(p.pos.x - o.x) >= half || Math.abs(p.pos.z - o.z) >= 250) continue;
     dropAuraById(p, COUNCIL_AURAS.weight);
   }
 }

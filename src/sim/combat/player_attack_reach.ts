@@ -1,3 +1,4 @@
+import { SMITH_HEART_MOBS } from '../content/smith_heart';
 import { MOBS } from '../data';
 import { VARKHUL_BOSS_ID } from '../ignivar_raid_ids';
 import { IGNIVAR_BOSS_ID, MELEE_RANGE } from '../types';
@@ -58,8 +59,14 @@ export function effectivePlayerAttackRange(
   // A short-reach ability (a taunt, an 8 yd strike) measures to the body's
   // edge too, or a tank standing where its melee lands could never Goad it
   // (the Guardian of the Heat from its wellspring's lip). Long-range spells
-  // keep their authored range.
-  if (baseRange > MELEE_RANGE && baseRange <= SHORT_REACH && target.kind === 'mob') {
+  // keep their authored range. Scoped to the Smith's Heart's bodies: the
+  // older dungeons' towering bosses keep the reach they were tuned with.
+  if (
+    baseRange > MELEE_RANGE &&
+    baseRange <= SHORT_REACH &&
+    target.kind === 'mob' &&
+    SMITH_HEART_MOBS[target.templateId] !== undefined
+  ) {
     const r = MOBS[target.templateId]?.bodyRadius;
     if (r !== undefined && r > 0) return baseRange + r + bonus;
   }

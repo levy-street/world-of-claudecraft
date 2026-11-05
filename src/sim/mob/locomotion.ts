@@ -351,8 +351,9 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
   }
 
   // The standing eye ward, reconciled with the clock every alive tick (mob/eye_ward.ts).
-  // Before the special-template early returns on purpose: the ward must exist in every
-  // state the mob can be alive in, idle included. Guarded on the template field and
+  // Before the special-template early returns below on purpose: the ward must exist in
+  // every state the mob can be alive in, idle included (the hoard goblin and the Heat's
+  // walkers above return earlier, and neither carries a ward). Guarded on the template field and
   // draws no rng, so every other mob pays one map lookup.
   tickEyeWard(ctx, mob);
 
