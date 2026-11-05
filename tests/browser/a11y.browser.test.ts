@@ -102,6 +102,8 @@ function leaderboardWindow(leaderboard: () => Promise<LeaderboardPage>): {
   const win = new LeaderboardWindow(
     stubDeps({
       root: () => root,
+      // stubDeps answers every missing dep with a no-op; outside a hub there is no strip.
+      hubStrip: undefined,
       world: () =>
         ({
           realm: 'Claudemoon',
@@ -215,6 +217,8 @@ describe('axe: pvp window', () => {
     new ArenaWindow(
       stubDeps({
         root: () => root,
+        // stubDeps answers every missing dep with a no-op; outside a hub there is no strip.
+        hubStrip: undefined,
         world: () =>
           ({
             arenaInfo: null,
@@ -1558,6 +1562,8 @@ describe('axe: reliquary window search, filters, and relic grid', () => {
     const win = new ReliquaryWindow(
       stubDeps({
         root: () => root,
+        // stubDeps answers every missing dep with a no-op; outside a hub there is no strip.
+        hubStrip: undefined,
         world: () => reliquaryWorld() as never,
         consumePeek: () => false,
         itemIcon: () => '<img alt="">',

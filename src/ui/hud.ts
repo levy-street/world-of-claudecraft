@@ -3430,15 +3430,14 @@ export class Hud {
     // The market docks its bags companion the same way (body.market-open, see
     // components.css): skip the cascade for that cluster too, or the inline
     // position the cascade bakes onto #bags beats the docking CSS the moment a
-    // second window is already open (PR #2107 review round 5). Desktop C docks
-    // the sheet and its bags the same way (body.char-bags-docked).
+    // second window is already open (PR #2107 review round 5).
     if (
-      (document.body.classList.contains('market-open') &&
-        (el.id === 'market-window' || el.id === 'bags')) ||
-      (document.body.classList.contains('char-bags-docked') &&
-        (el.id === 'char-window' || el.id === 'bags'))
+      document.body.classList.contains('market-open') &&
+      (el.id === 'market-window' || el.id === 'bags')
     )
       return;
+    const charDock = document.body.classList.contains('char-bags-docked'); // desktop C dock
+    if (charDock && (el.id === 'char-window' || el.id === 'bags')) return;
     const openCount = [...document.querySelectorAll<HTMLElement>('.window.panel')].filter(
       (win) => win !== el && this.isWindowVisible(win),
     ).length;
