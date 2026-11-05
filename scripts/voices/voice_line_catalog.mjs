@@ -7,6 +7,7 @@ export function collectVoiceLines({
   ESCORTS,
   IGNIVAR_DIALOGUE_LINES,
   VARKHUL_DIALOGUE_LINES,
+  SMITH_HEART_VOICE_LINES,
 }) {
   if (!Array.isArray(IGNIVAR_DIALOGUE_LINES) || !Array.isArray(VARKHUL_DIALOGUE_LINES)) {
     throw new Error('Raid boss dialogue catalogs are unavailable');
@@ -71,6 +72,17 @@ export function collectVoiceLines({
       text,
       voiceNpc: 'varkhul',
       source: `VARKHUL_DIALOGUE_LINES ${text}`,
+    });
+  }
+  // The Smith's Heart's speakers (src/sim/encounters/smith_heart/voice_lines.ts):
+  // each line in its own raid voice, rendered by
+  // scripts/render_smith_heart_voice_pack.mjs.
+  for (const line of SMITH_HEART_VOICE_LINES ?? []) {
+    lines.push({
+      key: yellKey(line.text),
+      text: line.text,
+      voiceNpc: line.voiceNpc,
+      source: `SMITH_HEART_VOICE_LINES ${line.id}`,
     });
   }
   for (const line of EXTRA_LINES) {

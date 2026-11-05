@@ -7,7 +7,8 @@
 //   node scripts/audition_raid_boss_voices.mjs --set council --out <dir>
 //
 // --set picks the briefs (ignivar, the default: the Ignivar raid's bosses;
-// council: the Smith's Heart's Hammer Council); --out writes the candidates
+// council: the Smith's Heart's Hammer Council; heart: the raid's new takes,
+// both Council members' second and two for every other boss); --out writes the candidates
 // somewhere other than tmp/raid-boss-voice-auditions (a review folder).
 
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
@@ -15,6 +16,7 @@ import path from 'node:path';
 import {
   HAMMER_COUNCIL_VOICE_PROMPTS,
   RAID_BOSS_VOICE_PROMPTS,
+  SMITH_HEART_NEW_VOICE_PROMPTS,
 } from './voices/raid_boss_voice_prompts.mjs';
 import {
   auditionRelativeDir,
@@ -40,8 +42,14 @@ const dryRun = args.includes('--dry-run');
 const set = optionValue('--set') ?? 'ignivar';
 const out = optionValue('--out');
 const allowedArgs = new Set(['--only', '--set', '--out', '--force', '--dry-run', only, set, out]);
-const SETS = { ignivar: RAID_BOSS_VOICE_PROMPTS, council: HAMMER_COUNCIL_VOICE_PROMPTS };
-if (!Object.hasOwn(SETS, set)) throw new Error(`Unknown set: ${set}. Expected ignivar or council.`);
+const SETS = {
+  ignivar: RAID_BOSS_VOICE_PROMPTS,
+  council: HAMMER_COUNCIL_VOICE_PROMPTS,
+  heart: SMITH_HEART_NEW_VOICE_PROMPTS,
+};
+if (!Object.hasOwn(SETS, set)) {
+  throw new Error(`Unknown set: ${set}. Expected ${Object.keys(SETS).join(', ')}.`);
+}
 const prompts = SETS[set];
 const outputRoot = out ? path.resolve(out) : path.join(root, 'tmp', 'raid-boss-voice-auditions');
 const unknown = args.find((arg) => !allowedArgs.has(arg));

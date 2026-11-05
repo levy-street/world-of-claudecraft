@@ -3,10 +3,18 @@
 //
 //   node scripts/finalize_raid_boss_voice.mjs --boss ignivar \
 //     --take forge-heavy-automaton --candidate 2
+//   node scripts/finalize_raid_boss_voice.mjs --boss heart-heat \
+//     --take hearth-titan --candidate 3 --dir <review folder>
+//
+// --dir reads the audition (and writes the receipt) in the review folder the
+// audition script wrote with --out, instead of tmp/raid-boss-voice-auditions.
 
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { RAID_BOSS_VOICE_PROMPTS } from './voices/raid_boss_voice_prompts.mjs';
+import {
+  RAID_BOSS_VOICE_PROMPTS,
+  SMITH_HEART_VOICE_PROMPTS,
+} from './voices/raid_boss_voice_prompts.mjs';
 import {
   buildVoiceFinalizationRequest,
   voiceIdFromFinalizationResponse,
@@ -27,7 +35,17 @@ function optionValue(name) {
 const boss = optionValue('--boss');
 const take = optionValue('--take');
 const candidateText = optionValue('--candidate');
-const allowedArgs = new Set(['--boss', '--take', '--candidate', boss, take, candidateText]);
+const dir = optionValue('--dir');
+const allowedArgs = new Set([
+  '--boss',
+  '--take',
+  '--candidate',
+  '--dir',
+  boss,
+  take,
+  candidateText,
+  dir,
+]);
 const unknown = args.find((arg) => !allowedArgs.has(arg));
 if (unknown) throw new Error(`Unknown argument: ${unknown}`);
 if (!boss || !take || !candidateText) {
@@ -36,12 +54,13 @@ if (!boss || !take || !candidateText) {
 const candidate = Number(candidateText);
 if (!Number.isInteger(candidate) || candidate < 1) throw new Error('--candidate must be positive');
 
-const prompt = RAID_BOSS_VOICE_PROMPTS.find(
+const prompt = [...RAID_BOSS_VOICE_PROMPTS, ...SMITH_HEART_VOICE_PROMPTS].find(
   (entry) => entry.npcId === boss && entry.takeId === take,
 );
 if (!prompt) throw new Error(`Unknown voice audition: ${boss}:${take}`);
 
-const auditionDir = path.join(root, 'tmp', 'raid-boss-voice-auditions', boss, take);
+const auditionRoot = dir ? path.resolve(dir) : path.join(root, 'tmp', 'raid-boss-voice-auditions');
+const auditionDir = path.join(auditionRoot, boss, take);
 const metadataPath = path.join(auditionDir, 'audition.json');
 const receiptPath = path.join(auditionDir, `finalized-candidate-${candidate}.json`);
 if (!existsSync(metadataPath)) throw new Error(`Missing audition metadata: ${metadataPath}`);
