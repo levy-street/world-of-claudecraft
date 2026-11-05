@@ -354,9 +354,10 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
   // breath.ts): a living bellows of granite, crystal and storm. Phase 1 the
   // Wind (its blows across the Cornice, the gaps in the rim, Thessaly's
   // circles, the indrawn breath and the exhale), at half health the storm
-  // breaks, phase 2 the Storm. Every number a SKETCH (unmeasured): 43,000
-  // base (about 99,000 after the elite factor) for a 4 to 5 minute fight at
-  // the bot raid's measured 400 to 460 a second. Bellows Gust is the exhale
+  // breaks, phase 2 the Storm. Every number a SKETCH (bot-measured, never
+  // with players): 80,000 base (about 184,000 after the elite factor) for a
+  // 4 to 5 minute Normal fight; Heroic's own multiplier is its difficulty
+  // row's (tier_health.ts). Bellows Gust is the exhale
   // now (encounter-driven: the fight casts it after the indrawn breath; its
   // record stays the look's numbers: the whole Cornice, the throw). Storm
   // Lance stays the trash kit's own line, on its own clock.
@@ -396,9 +397,10 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
   // quench.ts): an ice guardian of living stone and the lake's cold, no
   // metal. "Together, but not for too long": the cold bar, the huddle's
   // warmth and the ice it breaks, at half health the Smith's four blades
-  // awake and echo its attacks. Every number a SKETCH (unmeasured): 43,000
-  // base (about 99,000 after the elite factor) for a 4 to 5 minute fight at
-  // the bot raid's measured 400 to 460 a second. Tempering Strike stays its
+  // awake and echo its attacks. Every number a SKETCH (bot-measured, never
+  // with players): 62,000 base (about 143,000 after the elite factor) for a
+  // 4 to 5 minute Normal fight; Heroic's own multiplier is its difficulty
+  // row's (tier_health.ts). Tempering Strike stays its
   // swing cleave (the fight watches for it to raise the echoes); Quenching
   // Breath is encounter-driven (the fight starts and lands it on its own
   // clock; the record keeps the look's numbers).
@@ -435,9 +437,9 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
   // Hearth. "The well of the first flame": Basalt Fist and its Molten Swells,
   // Hearth Flare, two overflows, Hearthseeds, Wakefire and the Rolling
   // Cinders (heroic adds the overflows' adds and the Seedflames). Every number a
-  // SKETCH (unmeasured): 43,000 base (about 99,000 after the elite factor)
-  // for a 4 to 5 minute fight at the bot raid's measured 400 to 460 a second,
-  // like the other guardians. Its body reaches the wellspring's lip
+  // SKETCH (bot-measured, never with players): 64,000 base (about 147,000
+  // after the elite factor) for a 4 to 5 minute Normal fight, like the other
+  // guardians; Heroic's own multiplier is its difficulty row's. Its body reaches the wellspring's lip
   // (bodyRadius: melee strikes it from the shore); Cinder Grip is its own
   // stacking burn on every landed swing (the stackPoison seam), so the tanks
   // swap; every other mechanic is the encounter's.
@@ -555,8 +557,8 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
   // encounter's (encounters/smith_heart/final*.ts): the four quarters' rules
   // and kits. Its own swing cleave, Forge Fist, is its frontal (Mythic's Heat
   // quarter leaves fire where it strikes, the Quench's slows); the sketch's
-  // Forge Wrath and Forge Pour are gone. Health a SKETCH: 70,000 base (about
-  // 161,000 after the elite factor), the guardians' anchor scaled for the
+  // Forge Wrath and Forge Pour are gone. Health a SKETCH: 72,000 base (about
+  // 166,000 after the elite factor), the guardians' anchor scaled for the
   // raid's last fight. It cannot be controlled or slowed: only its own Taking
   // Root holds it.
   // Its Splinters (part 2, encounters/smith_heart/final_adds.ts): one rises

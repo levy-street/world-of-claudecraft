@@ -7,7 +7,7 @@ guardian's and the Slab's effects, section 5.9) and phase 2C (the Hammer vein's 
 round and the North Stair, section 5.10), through the Breath (phase 2G, section 5.14), the
 Quench (phase 2H, section 5.15), the Heat, now the Hearth (phase 2I, section 5.16), the Heart (phase 2J) and the Hammer Council's playable prototype (the first boss as three, sections 5.18 and 7.1) implemented on `feature/smith-heart-raid`, dev builds only. The per-room phases (Blender
 kits, own creatures, set pieces, boss kits), the quest and the loot are specified here
-and not built. The name is provisional and has not been IP-checked yet.
+and not built. The name is provisional; it and the raid's other proper nouns were web-checked on 2026-11-05 (`docs/design/naming-audit.md`, "The Smith's Heart raid").
 
 At a glance: a ten-player level 20 raid (2 tanks, 2 healers, 6 damage), one
 instance slot inside Stormcrag holding two areas no floor joins: the main map (the
