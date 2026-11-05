@@ -146,7 +146,8 @@ export interface QuenchDifficultyRules {
    *  (tier_health.ts). */
   healthMult: number;
   /** The shatter's own hit on the frozen player, on top of damageMult:
-   *  Heroic's half again harder, so a raid that never huddles bleeds out. */
+   *  Heroic's twice as hard (1.5 still let a raid that never huddled kill
+   *  it), so a raid that never huddles bleeds out. */
   shatterMult: number;
   /** A shatter's splash: how far, and how much cold it adds. */
   splashR: number;
@@ -179,7 +180,7 @@ export const QUENCH_DIFFICULTY: Readonly<Record<QuenchDifficulty, QuenchDifficul
   heroic: {
     damageMult: 1.25,
     healthMult: 2.2,
-    shatterMult: 1.5,
+    shatterMult: 2,
     splashR: 10,
     splashCold: 55,
     slashMarksLake: 2,

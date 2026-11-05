@@ -1,7 +1,7 @@
 // The Smith's Heart Heroic key mechanics must matter (the second Heroic pass,
 // E:/woc/entregas/raid_corazon/heroico/NOTAS.md "Segunda vuelta"): an unhidden
 // Mountain's Wrath on Heroic kills a Heroic-geared cloth body (about 110
-// percent of its health), and the Quench's shatter lands half again harder on
+// percent of its health), and the Quench's shatter lands twice as hard on
 // Heroic. Normal and Mythic keep their numbers. Over REAL Sim claims.
 
 import { describe, expect, it } from 'vitest';
@@ -127,10 +127,10 @@ describe("Smith's Heart Heroic: the Council's soft enrage comes after the lethal
   });
 });
 
-describe("Smith's Heart Heroic: the Quench's shatter lands half again harder", () => {
-  it('the tier factor: Heroic 1.5, Normal and Mythic untouched', () => {
+describe("Smith's Heart Heroic: the Quench's shatter lands twice as hard", () => {
+  it('the tier factor: Heroic 2, Normal and Mythic untouched', () => {
     expect(QUENCH_DIFFICULTY.normal.shatterMult).toBe(1);
-    expect(QUENCH_DIFFICULTY.heroic.shatterMult).toBe(1.5);
+    expect(QUENCH_DIFFICULTY.heroic.shatterMult).toBe(2);
     expect(QUENCH_DIFFICULTY.mythic.shatterMult).toBe(1);
   });
 
