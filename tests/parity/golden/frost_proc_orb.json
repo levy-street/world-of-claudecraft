@@ -15,8 +15,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1012,
-      "state": "1d9ae481",
+      "nextId": 1014,
+      "state": "44769d15",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -65,7 +65,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1004,
+          "entityId": 1006,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -121,7 +121,7 @@
           "fiveSecondRule": 99,
           "healPower": 13,
           "hp": 54,
-          "id": 1004,
+          "id": 1006,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -165,9 +165,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 1013,
-      "state": "d60ce3ba",
-      "events": "2e58cdfb",
+      "nextId": 1015,
+      "state": "c74bbc0a",
+      "events": "d627260d",
       "rng": {
         "draws": 1,
         "digest": "cf5e57a1"
@@ -176,9 +176,9 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 1013,
-      "state": "5447eba3",
-      "events": "74bccb9b",
+      "nextId": 1015,
+      "state": "390d2a95",
+      "events": "7e6a2239",
       "rng": {
         "draws": 2,
         "digest": "6d172bb5"
@@ -187,9 +187,9 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 1013,
-      "state": "f4faa6ce",
-      "events": "eb94ef71",
+      "nextId": 1015,
+      "state": "380eae70",
+      "events": "18da64e1",
       "rng": {
         "draws": 150,
         "digest": "478ace8d"
@@ -198,9 +198,9 @@
     {
       "tick": 80,
       "time": 4,
-      "nextId": 1013,
-      "state": "a452e70a",
-      "events": "849c9d6d",
+      "nextId": 1015,
+      "state": "3eb909b2",
+      "events": "0dc6268f",
       "rng": {
         "draws": 316,
         "digest": "650546d2"
@@ -209,9 +209,9 @@
     {
       "tick": 84,
       "time": 4.2,
-      "nextId": 1013,
-      "state": "c4bae465",
-      "events": "8606ddc2",
+      "nextId": 1015,
+      "state": "1b67d497",
+      "events": "6a84974a",
       "rng": {
         "draws": 356,
         "digest": "6ca1a356"
@@ -296,7 +296,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1004,
+          "entityId": 1006,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -354,7 +354,7 @@
               "name": "Icicles",
               "remaining": 29.95,
               "school": "frost",
-              "sourceId": 1004,
+              "sourceId": 1006,
               "stacks": 5
             }
           ],
@@ -374,7 +374,7 @@
           "fiveSecondRule": 0.25,
           "healPower": 41,
           "hp": 665,
-          "id": 1004,
+          "id": 1006,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -407,7 +407,7 @@
             "sta": 52,
             "str": 10
           },
-          "targetId": 1012,
+          "targetId": 1014,
           "templateId": "mage",
           "weapon": {
             "max": 6,
@@ -425,7 +425,7 @@
               "name": "Frostglobe",
               "remaining": 2.25,
               "school": "frost",
-              "sourceId": 1004,
+              "sourceId": 1006,
               "value": 0.7
             },
             {
@@ -435,7 +435,7 @@
               "name": "Rimelance",
               "remaining": 8.95,
               "school": "frost",
-              "sourceId": 1004,
+              "sourceId": 1006,
               "value": 0.6
             }
           ],
@@ -448,7 +448,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 499781,
-          "id": 1012,
+          "id": 1014,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -474,11 +474,11 @@
             "z": -54
           },
           "stats": {},
-          "tappedById": 1004,
+          "tappedById": 1006,
           "templateId": "training_dummy",
           "threat": [
             [
-              1004,
+              1006,
               219
             ]
           ],
@@ -491,8 +491,8 @@
     {
       "tick": 84,
       "time": 4.2,
-      "nextId": 1013,
-      "state": "c4bae465",
+      "nextId": 1015,
+      "state": "1b67d497",
       "events": "741638a5",
       "rng": {
         "draws": 356,
@@ -578,7 +578,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1004,
+          "entityId": 1006,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -636,7 +636,7 @@
               "name": "Icicles",
               "remaining": 29.95,
               "school": "frost",
-              "sourceId": 1004,
+              "sourceId": 1006,
               "stacks": 5
             }
           ],
@@ -656,7 +656,7 @@
           "fiveSecondRule": 0.25,
           "healPower": 41,
           "hp": 665,
-          "id": 1004,
+          "id": 1006,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -689,7 +689,7 @@
             "sta": 52,
             "str": 10
           },
-          "targetId": 1012,
+          "targetId": 1014,
           "templateId": "mage",
           "weapon": {
             "max": 6,
@@ -707,7 +707,7 @@
               "name": "Frostglobe",
               "remaining": 2.25,
               "school": "frost",
-              "sourceId": 1004,
+              "sourceId": 1006,
               "value": 0.7
             },
             {
@@ -717,7 +717,7 @@
               "name": "Rimelance",
               "remaining": 8.95,
               "school": "frost",
-              "sourceId": 1004,
+              "sourceId": 1006,
               "value": 0.6
             }
           ],
@@ -730,7 +730,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 499781,
-          "id": 1012,
+          "id": 1014,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -756,11 +756,11 @@
             "z": -54
           },
           "stats": {},
-          "tappedById": 1004,
+          "tappedById": 1006,
           "templateId": "training_dummy",
           "threat": [
             [
-              1004,
+              1006,
               219
             ]
           ],

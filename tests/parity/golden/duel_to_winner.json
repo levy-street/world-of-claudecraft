@@ -14,7 +14,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1011,
+      "nextId": 1013,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -28,9 +28,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 1013,
-      "state": "abaa542f",
-      "events": "06829997",
+      "nextId": 1015,
+      "state": "c079b14d",
+      "events": "ab7a023d",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -39,9 +39,9 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 1013,
-      "state": "ec3f223c",
-      "events": "9ae0362e",
+      "nextId": 1015,
+      "state": "00febdb2",
+      "events": "b11e214e",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -50,9 +50,9 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 1013,
-      "state": "6605ebb9",
-      "events": "9a9aae3a",
+      "nextId": 1015,
+      "state": "393df9fb",
+      "events": "135b9142",
       "rng": {
         "draws": 138,
         "digest": "64bc5cfe"
@@ -61,9 +61,9 @@
     {
       "tick": 61,
       "time": 3.05,
-      "nextId": 1013,
-      "state": "02983a5e",
-      "events": "89c38ba7",
+      "nextId": 1015,
+      "state": "2371fdbc",
+      "events": "c6dec147",
       "rng": {
         "draws": 153,
         "digest": "204932bc"
@@ -111,7 +111,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1013,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -191,7 +191,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1012,
+          "entityId": 1014,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -246,7 +246,7 @@
               "name": "Battle Stance",
               "remaining": 3596.95,
               "school": "physical",
-              "sourceId": 1011
+              "sourceId": 1013
             }
           ],
           "blockChance": 0.05,
@@ -260,7 +260,7 @@
           "fiveSecondRule": 102.05,
           "healPower": 5,
           "hp": 100,
-          "id": 1011,
+          "id": 1013,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -310,7 +310,7 @@
           "fiveSecondRule": 102.05,
           "healPower": 13,
           "hp": 54,
-          "id": 1012,
+          "id": 1014,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -354,9 +354,9 @@
     {
       "tick": 61,
       "time": 3.05,
-      "nextId": 1013,
-      "state": "329bc88d",
-      "events": "5bce3312",
+      "nextId": 1015,
+      "state": "9a3cfcff",
+      "events": "6ee5de92",
       "rng": {
         "draws": 153,
         "digest": "204932bc"
@@ -407,7 +407,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1013,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -489,7 +489,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1012,
+          "entityId": 1014,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -544,7 +544,7 @@
               "name": "Battle Stance",
               "remaining": 3596.95,
               "school": "physical",
-              "sourceId": 1011
+              "sourceId": 1013
             }
           ],
           "blockChance": 0.05,
@@ -558,7 +558,7 @@
           "fiveSecondRule": 102.05,
           "healPower": 5,
           "hp": 100,
-          "id": 1011,
+          "id": 1013,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -608,7 +608,7 @@
           "fiveSecondRule": 102.05,
           "healPower": 13,
           "hp": 1,
-          "id": 1012,
+          "id": 1014,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -652,9 +652,9 @@
     {
       "tick": 80,
       "time": 4,
-      "nextId": 1013,
-      "state": "e424977e",
-      "events": "c5b06381",
+      "nextId": 1015,
+      "state": "f1c414b8",
+      "events": "653b3219",
       "rng": {
         "draws": 299,
         "digest": "2293cc11"
@@ -663,8 +663,8 @@
     {
       "tick": 100,
       "time": 5,
-      "nextId": 1013,
-      "state": "3e68e371",
+      "nextId": 1015,
+      "state": "93112fcb",
       "events": "741638a5",
       "rng": {
         "draws": 518,
@@ -674,8 +674,8 @@
     {
       "tick": 101,
       "time": 5.05,
-      "nextId": 1013,
-      "state": "c078bfd8",
+      "nextId": 1015,
+      "state": "b2701ada",
       "events": "741638a5",
       "rng": {
         "draws": 524,
@@ -733,7 +733,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1013,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -822,7 +822,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1012,
+          "entityId": 1014,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -878,7 +878,7 @@
               "name": "Battle Stance",
               "remaining": 3594.95,
               "school": "physical",
-              "sourceId": 1011
+              "sourceId": 1013
             }
           ],
           "blockChance": 0.05,
@@ -892,7 +892,7 @@
           "fiveSecondRule": 104.05,
           "healPower": 5,
           "hp": 100,
-          "id": 1011,
+          "id": 1013,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -942,7 +942,7 @@
           "fiveSecondRule": 104.05,
           "healPower": 13,
           "hp": 7,
-          "id": 1012,
+          "id": 1014,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
