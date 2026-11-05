@@ -3430,10 +3430,13 @@ export class Hud {
     // The market docks its bags companion the same way (body.market-open, see
     // components.css): skip the cascade for that cluster too, or the inline
     // position the cascade bakes onto #bags beats the docking CSS the moment a
-    // second window is already open (PR #2107 review round 5).
+    // second window is already open (PR #2107 review round 5). Desktop C docks
+    // the sheet and its bags the same way (body.char-bags-docked).
     if (
-      document.body.classList.contains('market-open') &&
-      (el.id === 'market-window' || el.id === 'bags')
+      (document.body.classList.contains('market-open') &&
+        (el.id === 'market-window' || el.id === 'bags')) ||
+      (document.body.classList.contains('char-bags-docked') &&
+        (el.id === 'char-window' || el.id === 'bags'))
     )
       return;
     const openCount = [...document.querySelectorAll<HTMLElement>('.window.panel')].filter(
@@ -5373,9 +5376,8 @@ export class Hud {
     closeOthers: () => this.closeOtherWindows('#courier-window'),
     hideTooltip: () => this.hideTooltip(),
   });
-  // The Book of the Realm (menu consolidation step 2): one tabbed window over the
-  // record windows (src/ui/hud/hub/). Each member's closeOthers routes through
-  // bookHub.prepare, so a deep link still shows one tab at a time.
+  // The Book of the Realm (src/ui/hud/hub/): members' closeOthers route through
+  // bookHub.prepare, so even a deep link shows one tab at a time.
   private readonly bookHub = new WindowHubController(BOOK_OF_REALM, {
     members: () => ({
       deeds: this.deedsWindow,

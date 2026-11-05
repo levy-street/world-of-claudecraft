@@ -551,8 +551,7 @@ export class OptionsWindow {
     this.keyboardBoard = null;
   }
 
-  /** Called by main.ts when a drag settles on the live overlay: push the dropped
-   *  normalized position into the open panel's sliders so they do not lag the drag. */
+  /** main.ts, after an overlay drag settles: sync the open panel's sliders to it. */
   onPerfOverlayMoved(x: number, y: number): void {
     this.perfSettings?.syncPosition(x, y);
   }
@@ -626,12 +625,6 @@ export class OptionsWindow {
       default:
         this.renderMain();
     }
-    // Every panelTitle() sub-view carries a [data-back] control in its title
-    // bar; wire it once here so a new sub-view cannot forget it. The main menu
-    // renders none (this no-ops) and Performance wires its own back listener in
-    // buildTitle (it rerender()s internally, which would drop a listener added
-    // here).
-    el.querySelector('[data-back]')?.addEventListener('click', () => this.goBack());
     // Every sub-view is a window shell now (head, one scrolling .ui-win-body,
     // an optional pinned foot), and a shell needs the inline flex: no stylesheet
     // display can outrank the inline one a `.window` is opened with, so the
@@ -670,11 +663,12 @@ export class OptionsWindow {
     this.frameOptionsId = null;
     audio.click();
     this.view = this.overlayPanels.parentView(this.view);
-    this.capturingKey = null;
-    this.conflictingKey = null;
+    this.endKeybindSession(); // Back out of Key Bindings disarms a capture, like the rail
     this.keybindNote = '';
     this.render();
-    this.deps.focusFirstInteractive(this.deps.root());
+    const row = this.deps.root().querySelector<HTMLElement>('[data-menu-action="settings"]');
+    if (row && this.view === 'main') row.focus();
+    else this.deps.focusFirstInteractive(this.deps.root());
   }
 
   private panelTitle(title: string): string {
@@ -1055,6 +1049,10 @@ export class OptionsWindow {
   // The window shell (options_window_shell.ts): head, then the ONE scrolling body.
   private viewShell(title: string, bodyClass?: string): HTMLElement {
     const body = mountViewShell(this.deps.root(), this.panelTitle(title), bodyClass);
+    // [data-back] is wired on EVERY shell mount, so a self-repaint without
+    // render() (a key capture) keeps a live Back (Performance wires its own).
+    const back = this.deps.root().querySelector('[data-back]');
+    back?.addEventListener('click', () => this.goBack());
     this.settingsRail.mount(this.deps.root(), this.view);
     return body;
   }

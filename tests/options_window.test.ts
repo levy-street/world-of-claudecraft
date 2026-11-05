@@ -765,10 +765,13 @@ describe('options_window: title-bar back control', () => {
     expect(body).toContain("t('hud.options.back')");
   });
 
-  it('wires [data-back] centrally in render() and routes every back path to goBack()', () => {
-    expect(painter).toContain(
-      "el.querySelector('[data-back]')?.addEventListener('click', () => this.goBack());",
-    );
+  it('wires [data-back] centrally in viewShell() and routes every back path to goBack()', () => {
+    // Wired on every shell mount, not only in render(): a panel that repaints
+    // itself (a key capture repaints Key Bindings directly) keeps a live Back.
+    const shell = painter.slice(painter.indexOf('  private viewShell('));
+    const shellBody = shell.slice(0, shell.indexOf('\n  }\n'));
+    expect(shellBody).toContain("const back = this.deps.root().querySelector('[data-back]');");
+    expect(shellBody).toContain("back?.addEventListener('click', () => this.goBack());");
     // the five footer Back buttons (the shared settingsViewFooter, which
     // Audio/Controller/Interface feed into; the graphics inline action row,
     // which replaces it for that view; bug report; keybinds; import / export)
@@ -790,11 +793,15 @@ describe('options_window: title-bar back control', () => {
     // One level up (optionsParentView, pinned in options_view.test.ts): an
     // overlay panel returns to the Overlays list, every other view to the root.
     expect(body).toContain('this.view = this.overlayPanels.parentView(this.view);');
-    expect(body).toContain('this.capturingKey = null;');
+    // Back out of Key Bindings disarms a capture the way a rail press does.
+    expect(body).toContain('this.endKeybindSession();');
     expect(body).toContain("this.keybindNote = '';");
     expect(body).toContain('this.render();');
     // WCAG: the tapped control is destroyed by the re-render, so focus must land
     // in the re-rendered menu rather than falling to <body>.
+    // Back to the Esc menu lands on its Settings row; any other parent view
+    // takes its first interactive control.
+    expect(body).toContain('[data-menu-action="settings"]');
     expect(body).toContain('this.deps.focusFirstInteractive(this.deps.root());');
     expect(body).not.toContain('this.close()');
   });

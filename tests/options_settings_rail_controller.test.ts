@@ -242,6 +242,39 @@ describe('options window: the full-screen Settings view', () => {
     expect(current(root)).toBe('audio');
   });
 
+  it('Back out of Key Bindings disarms a capture too, and lands on the Settings row', () => {
+    const captureKey = vi.fn();
+    openWindow(root, { options: () => optionsDeps(captureKey) as never });
+    openSettings(root);
+    press(root, '.opt-rail-btn[data-settings-category="keybinds"]');
+    root
+      .querySelector<HTMLButtonElement>('.kb-rows > .kb-row:not(.kb-toggle-row) > button.kb-key')
+      ?.click();
+    expect(captureKey).toHaveBeenCalledWith(expect.any(Function));
+    captureKey.mockClear();
+    press(root, '[data-back]');
+    expect(captureKey).toHaveBeenLastCalledWith(null);
+    expect(title(root)).toBe(t('hud.options.gameMenu'));
+    // A keyboard player returns to the row they left from, not the close X.
+    expect(document.activeElement).toBe(
+      root.querySelector('.opt-btn[data-menu-action="settings"]'),
+    );
+  });
+
+  it('carries a focused rail button across a panel rebuild', () => {
+    const { window } = openWindow(root);
+    openSettings(root);
+    press(root, '.opt-rail-btn[data-settings-category="audio"]');
+    const audioBtn = () =>
+      root.querySelector<HTMLElement>('.opt-rail-btn[data-settings-category="audio"]');
+    audioBtn()?.focus();
+    const before = audioBtn();
+    // A settings refresh re-runs render(), which re-mints the rail.
+    (window as unknown as { render(): void }).render();
+    expect(audioBtn(), 'the rail was rebuilt').not.toBe(before);
+    expect(document.activeElement).toBe(audioBtn());
+  });
+
   it('never offers Key Bindings on the touch layout or the native shell', () => {
     const arms: Array<() => void> = [
       () => setInterfaceMode('touch'),

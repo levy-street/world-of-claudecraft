@@ -8416,9 +8416,10 @@
      touch floor and the 16px font from the #options-menu .btn rule above. */
   body.mobile-touch #ui > #options-menu.options-settings {
     --opt-rail-w: calc(168px + env(safe-area-inset-left));
-    padding-top: env(safe-area-inset-top);
-    padding-bottom: env(safe-area-inset-bottom);
-    padding-inline-end: env(safe-area-inset-right);
+    /* max(): a phone with no insets keeps the sheet's own padding. */
+    padding-top: max(var(--window-pad, 12px), env(safe-area-inset-top));
+    padding-bottom: max(var(--window-pad, 12px), env(safe-area-inset-bottom));
+    padding-inline-end: max(var(--window-pad, 12px), env(safe-area-inset-right));
   }
   body.mobile-touch #options-menu.options-settings > .opt-rail {
     padding-inline-start: calc(var(--window-pad, 12px) + env(safe-area-inset-left));

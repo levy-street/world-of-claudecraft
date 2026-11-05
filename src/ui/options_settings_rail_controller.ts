@@ -59,6 +59,8 @@ export class OptionsSettingsRail {
 
   /** Seat the rail after the head of a freshly painted Settings view (no-op
    *  for a view outside Settings). Idempotent: a repaint replaces it. */
+  private focusedCategory: string | null = null;
+
   mount(root: HTMLElement, view: 'main' | OptionsPanelId): void {
     root.querySelector(':scope > .opt-rail')?.remove();
     if (settingsCategoryOf(view) === null) return;
@@ -97,6 +99,21 @@ export class OptionsSettingsRail {
     const head = root.querySelector(':scope > .ui-win-head, :scope > .panel-title');
     if (head) head.after(nav);
     else root.prepend(nav);
+    // A panel rebuild empties the root (old rail included) before this runs, so
+    // the rail tracks its own focus: a rail button that held focus when the
+    // rebuild dropped it to the body gets it back, by category, instead of
+    // leaving keyboard focus outside the trap.
+    nav.addEventListener('focusin', (e) => {
+      this.focusedCategory = (e.target as HTMLElement).dataset.settingsCategory ?? null;
+    });
+    nav.addEventListener('focusout', (e) => {
+      if (e.relatedTarget) this.focusedCategory = null;
+    });
+    const active = document.activeElement;
+    if (this.focusedCategory !== null && (!active || active === document.body || active === root)) {
+      const category = this.focusedCategory;
+      buttons.find((b) => b.dataset.settingsCategory === category)?.focus();
+    }
   }
 
   /** Put focus on the open category's rail button (after a rail press or on
