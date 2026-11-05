@@ -315,7 +315,7 @@ export const COUNCIL_DIFFICULTY: Readonly<Record<CouncilDifficulty, CouncilDiffi
     songAfterWrath: false,
     pillarPulse: true,
     damageMult: 1.25,
-    healthMult: 2.6,
+    healthMult: 2.0,
     heirRiseWarn: 2,
     heirFillSeconds: 35,
     rockOutlivesSinger: false,

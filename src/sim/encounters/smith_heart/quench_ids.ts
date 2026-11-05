@@ -174,7 +174,7 @@ export const QUENCH_DIFFICULTY: Readonly<Record<QuenchDifficulty, QuenchDifficul
   // Contagious cold: a shatter splashes further and harder.
   heroic: {
     damageMult: 1.25,
-    healthMult: 2.8,
+    healthMult: 2.0,
     splashR: 10,
     splashCold: 55,
     slashMarksLake: 2,
