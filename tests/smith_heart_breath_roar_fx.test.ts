@@ -14,11 +14,17 @@ import {
 import {
   inhaleScreenWind,
   ROAR_SPEED,
+  ROAR_THROW,
   ROAR_TRAIL_SECONDS,
+  roarLanding,
   roarReach,
   roarWaveLook,
 } from '../src/render/smith_heart_fx/breath_roar_fx_core';
-import { BREATH_TUNING as T } from '../src/sim/encounters/smith_heart/breath_ids';
+import { inBreathArena } from '../src/sim/encounters/smith_heart/breath_geometry';
+import {
+  BREATH_DIFFICULTY,
+  BREATH_TUNING as T,
+} from '../src/sim/encounters/smith_heart/breath_ids';
 import { roarArrival } from '../src/sim/encounters/smith_heart/breath_roar';
 
 describe('the Summit Roar: its look', () => {
@@ -48,5 +54,27 @@ describe('the Summit Roar: its look', () => {
     expect(inhaleScreenWind(1, false)).toBe(0);
     expect(inhaleScreenWind(0, true)).toBeGreaterThan(0);
     expect(inhaleScreenWind(1, true)).toBeGreaterThan(inhaleScreenWind(0.3, true));
+  });
+});
+
+describe('the Summit Roar: where it flings you', () => {
+  it('throws straight away from the guardian, by the longest throw of any tier', () => {
+    expect(ROAR_THROW).toBe(
+      Math.max(BREATH_DIFFICULTY.normal.gustThrow, BREATH_DIFFICULTY.heroic.gustThrow),
+    );
+    const at = roarLanding(0, 192, 0, 198);
+    expect(at.x).toBeCloseTo(0, 6);
+    expect(at.z).toBeCloseTo(192 - ROAR_THROW, 6);
+  });
+
+  it('reads safe with floor behind you and over the void with the rim behind you', () => {
+    // East of the guardian, close in: the throw east lands on the Cornice.
+    const near = roarLanding(6, 198, 0, 198);
+    expect(inBreathArena(near.x, near.z)).toBe(true);
+    expect(near.overVoid).toBe(false);
+    // Out by the east rim: the same throw carries the body off the Cornice.
+    const far = roarLanding(30, 198, 0, 198);
+    expect(inBreathArena(far.x, far.z)).toBe(false);
+    expect(far.overVoid).toBe(true);
   });
 });

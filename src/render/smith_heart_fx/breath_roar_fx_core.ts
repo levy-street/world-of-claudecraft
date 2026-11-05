@@ -10,7 +10,8 @@
 // the front, the trails' grit and the screen's wind thin on the low tier,
 // and the screen's wind and the shakes go under reduced motion.
 
-import { BREATH_TUNING as T } from '../../sim/encounters/smith_heart/breath_ids';
+import { inBreathArena } from '../../sim/encounters/smith_heart/breath_geometry';
+import { BREATH_DIFFICULTY, BREATH_TUNING as T } from '../../sim/encounters/smith_heart/breath_ids';
 import { breathGuardianKit } from './breath_fx_core';
 
 /** How far the wave runs (the guardian's reach: the Cornice from its maw)
@@ -40,6 +41,43 @@ export function roarWaveLook(
     trail1: Math.max(0, front - 5),
     trail2: Math.max(0, front - 11),
   };
+}
+
+/** The Roar's longest throw on any tier (the client cannot tell the tier,
+ *  so the landing it shows is the farthest one: a spot that reads safe is). */
+export const ROAR_THROW = Math.max(
+  BREATH_DIFFICULTY.normal.gustThrow,
+  BREATH_DIFFICULTY.heroic.gustThrow,
+  BREATH_DIFFICULTY.mythic.gustThrow,
+);
+
+/** Where the Roar throws a body standing at claim-local (px, pz) with the
+ *  guardian at (gx, gz): straight away from the guardian, `ROAR_THROW` yards
+ *  (the sim's own rule, breath_roar.ts), and whether that spot lies off the
+ *  Cornice (over the void). The local player's landing marker while it draws
+ *  breath (the Heroic readability pass of 2026-11-05: nothing showed where
+ *  the blow flings you, so a body by an open lip read as safe). */
+export function roarLanding(
+  px: number,
+  pz: number,
+  gx: number,
+  gz: number,
+  throwYd: number = ROAR_THROW,
+): { x: number; z: number; overVoid: boolean } {
+  const dx = px - gx;
+  const dz = pz - gz;
+  const d = Math.hypot(dx, dz);
+  const ux = d > 1e-3 ? dx / d : 0;
+  const uz = d > 1e-3 ? dz / d : 1;
+  const x = px + ux * throwYd;
+  const z = pz + uz * throwYd;
+  // The whole path, not just its end: a throw over a bay lands in the void.
+  let overVoid = false;
+  for (let k = 1; k <= 6 && !overVoid; k++) {
+    const f = k / 6;
+    if (!inBreathArena(px + ux * throwYd * f, pz + uz * throwYd * f)) overVoid = true;
+  }
+  return { x, z, overVoid };
 }
 
 /** Seconds a struck body's trail streams behind it (its slide, and a

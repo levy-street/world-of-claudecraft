@@ -13,7 +13,11 @@
 //    spray of stone flung out of the maw, a jolt for whoever stands near;
 //  - each body the wave reaches (BREATH_CUES.roarHit): a white burst and a
 //    ring where it strikes, a hard shake if it is you, and a trail of wind
-//    and grit streaming behind the body as it is flung.
+//    and grit streaming behind the body as it is flung;
+//  - while it draws breath, where the Roar will fling YOU (roarLanding): a
+//    ring pulsing on the spot and a run of motes out to it, pale over the
+//    floor, red when the throw carries you over the void (every tier: it is
+//    what you act on).
 // The ring, the wall and the impacts on EVERY tier; the debris, the dust,
 // the trails' grit and the screen's wind thin on the low tier, the screen's
 // wind and the shakes go under reduced motion. Built in the constructor under
@@ -32,6 +36,7 @@ import {
   inhaleScreenWind,
   ROAR_SPEED,
   ROAR_TRAIL_SECONDS,
+  roarLanding,
   roarReach,
   roarWaveLook,
 } from './breath_roar_fx_core';
@@ -48,6 +53,12 @@ export interface BreathRoarHost {
   shakeNear(x: number, z: number, amount: number, reach?: number): void;
   reducedMotion(): boolean;
 }
+
+/** The landing marker's beat (seconds) and its colours: pale over the
+ *  floor, the danger red over the void. */
+const LANDING_EVERY = 0.35;
+const LANDING_SAFE = 0xe6f4ff;
+const LANDING_VOID = 0xff4436;
 
 const RING_FRAG = /* glsl */ `
 uniform float uTime;
@@ -173,6 +184,7 @@ export class BreathRoarFx {
   private readonly flung: Trail[] = [];
   private readonly reach = roarReach();
   private clock = 0;
+  private landingNext = 0;
   private suck = 0;
   private seed = 0x2b7d;
 
@@ -372,11 +384,55 @@ export class BreathRoarFx {
 
   /** One frame: `g` the guardian (or none in view), `onCornice` whether the
    *  local body stands in the fight's claim. */
-  update(world: IWorld, g: Entity | undefined, onCornice: boolean, dt: number): void {
+  update(
+    world: IWorld,
+    g: Entity | undefined,
+    onCornice: boolean,
+    dt: number,
+    origin: { x: number; z: number } | null = null,
+  ): void {
     this.clock += dt;
     this.updateWave(dt);
     this.updateTrails(world, dt);
     this.updateInhale(g, onCornice, dt);
+    this.updateLanding(world, g, onCornice, origin);
+  }
+
+  /** While the guardian draws breath: where the Roar throws the local body. */
+  private updateLanding(
+    world: IWorld,
+    g: Entity | undefined,
+    onCornice: boolean,
+    origin: { x: number; z: number } | null,
+  ): void {
+    const drawing = !!g && !g.dead && g.castingAbility === BREATH_CASTS.inhale;
+    const me = world.entities.get(world.playerId);
+    if (!drawing || !g || !onCornice || !origin || !me || me.dead) return;
+    if (this.clock < this.landingNext) return;
+    this.landingNext = this.clock + LANDING_EVERY;
+    const at = roarLanding(
+      me.pos.x - origin.x,
+      me.pos.z - origin.z,
+      g.pos.x - origin.x,
+      g.pos.z - origin.z,
+    );
+    const x = at.x + origin.x;
+    const z = at.z + origin.z;
+    const color = at.overVoid ? LANDING_VOID : LANDING_SAFE;
+    this.h.particles.shockRing(x, z, color, 2.2, LANDING_EVERY + 0.15);
+    for (let k = 1; k <= 5; k++) {
+      const f = k / 6;
+      const px = me.pos.x + (x - me.pos.x) * f;
+      const pz = me.pos.z + (z - me.pos.z) * f;
+      this.h.particles.puff(px, this.h.groundY(px, pz) + 0.3, pz, 1, {
+        speed: 0.2,
+        life: LANDING_EVERY + 0.1,
+        size: [0.55, 0.3],
+        color: at.overVoid ? [1, 0.32, 0.28] : [0.9, 0.96, 1],
+        alpha: 0.9,
+        pool: 'glow',
+      });
+    }
   }
 
   private updateWave(dt: number): void {

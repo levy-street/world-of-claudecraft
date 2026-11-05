@@ -1210,7 +1210,7 @@ export class BreathFightFx {
     const meE = world.entities.get(world.playerId);
     const onCornice =
       !!meE && !!this.origin && Math.abs(meE.pos.y - this.local.position.y - CORNICE_FLOOR_H) < 6;
-    this.roar.update(world, g0, onCornice, dt);
+    this.roar.update(world, g0, onCornice, dt, this.origin);
     this.toss.update(world, dt);
     this.updateBolts();
     this.particles.update(this.clock);
