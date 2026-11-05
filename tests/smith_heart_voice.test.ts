@@ -237,6 +237,8 @@ describe('the arrival', () => {
     return out;
   }
 
+  // Fifty-five sim seconds of a whole world: slow on a loaded runner, so a
+  // generous timeout (the assertion is the order and timing, not the speed).
   it('the heart speaks three lines over its rebuild, in order and on time, once', () => {
     const { sim, dev, inst } = arrive();
     expect(finalBoss(sim.ctx, inst)).not.toBeNull();
@@ -253,7 +255,7 @@ describe('the arrival', () => {
     dev('/dev heart arrival');
     expect(listen(sim, 20).map((h) => h.moment)).toEqual(ARRIVAL_LINE_AT.map((l) => l.moment));
     expect(Math.hypot(HEART_ROOM.x, HEART_ROOM.z)).toBeGreaterThan(0);
-  });
+  }, 120_000);
 });
 
 describe('the voice pack', () => {
