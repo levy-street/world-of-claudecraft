@@ -427,7 +427,8 @@ export const HEALERS = {
       return { id: 'chain_heal', target: cluster.pid };
     if (h.moving && low.frac < 0.8 && h.ready('tidecall'))
       return { id: 'tidecall', target: low.pid };
-    if (low.frac < 0.85 && h.ready('healing_wave')) return { id: 'healing_wave', target: low.pid };
+    // Mending Waters is cheap (39 mana): kept rolling on anyone short of 92 percent.
+    if (low.frac < 0.92 && h.ready('healing_wave')) return { id: 'healing_wave', target: low.pid };
     if (hurt.length >= 2 && cluster && h.ready('chain_heal'))
       return { id: 'chain_heal', target: cluster.pid };
     if (low.frac < 0.92 && h.ready('tidecall')) return { id: 'tidecall', target: low.pid };
