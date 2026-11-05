@@ -57,6 +57,7 @@ import {
   resolveEncounterFxScope,
   SWEEP_BASE_OPACITY,
 } from './rift_death_zone_core';
+import { setHeartKitCompileGate } from './smith_heart/heart_kit';
 import {
   BreathBody,
   BreathFightFx,
@@ -240,6 +241,8 @@ export class RiftDeathZoneVisuals {
   ) {
     // Effects pinned to a unit ride its drawn pose (attached_fx_anchor.ts).
     if (drawnPositions) this.uninstallDrawnPositions = installDrawnPositions(drawnPositions);
+    // A Heart kit that lands after its room is shown swaps in behind this gate.
+    setHeartKitCompileGate(compileGate ?? null);
     this.hoardGestures = new HoardBossGestures(world, playGesture);
     this.hoardPresentation = new HoardBossPresentation(world, shake);
     this.summonRise = new SummonRiseFx(playGesture);
@@ -643,6 +646,7 @@ export class RiftDeathZoneVisuals {
   dispose(): void {
     this.sync([]);
     this.disposed = true;
+    setHeartKitCompileGate(null);
     this.uninstallDrawnPositions?.();
     this.uninstallDrawnPositions = null;
     this.activeScope = null;

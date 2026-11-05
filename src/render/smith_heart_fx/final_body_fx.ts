@@ -111,6 +111,7 @@ interface Arc {
 export class FinalBodyFx {
   private readonly bolts: THREE.InstancedMesh;
   private readonly rocks: THREE.InstancedMesh;
+  private disposed = false;
   private readonly arcs: Arc[] = [];
   private readonly geometries: THREE.BufferGeometry[] = [];
   private readonly materials: THREE.Material[] = [];
@@ -875,6 +876,10 @@ export class FinalBodyFx {
   }
 
   dispose(): void {
+    if (this.disposed) return;
+    this.disposed = true;
+    this.rocks.dispose();
+    this.bolts.dispose();
     for (const g of this.geometries) g.dispose();
     for (const m of this.materials) m.dispose();
   }
