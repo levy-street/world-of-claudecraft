@@ -19,6 +19,7 @@
 // hit (the engine pitch-randomizes and alternates to avoid repetition).
 
 import { FURY_SFX } from './fury_sfx.mjs';
+import { SMITH_HEART_MECHANIC_SFX } from './smith_heart_mechanic_sfx.mjs';
 import { UI_SFX_CATALOG } from './ui_sfx.mjs';
 import { WARRIOR_CONTACT_SFX } from './warrior_contact_sfx.mjs';
 import { WARRIOR_FALLBACK_SFX } from './warrior_fallback_sfx.mjs';
@@ -1537,145 +1538,10 @@ export const SFX = [
   { key: 'spell_gurglegreen_cauldron', custom: true },
   { key: 'gurglegreen_bubble_loop', custom: true, loop: true },
   { key: 'spell_gurglegreen_quaff', custom: true },
-];
-
-// --- The Smith's Heart: the Guardian of the Heat, TAKES STILL TO GENERATE.
-// The ElevenLabs credits ran out before this fight's sounds were made, so
-// src/game/smith_heart_heat_audio_core.ts builds every Heat sound from the
-// pack's existing samples (pitched and layered). These are the prompts for
-// the fight's own takes: when credits return, move each row into SFX above
-// (then `npm run sfx:gen`, `npm run sfx:conform`, `npm run sfx:manifest`) and
-// point its cue at `heart_heat_<name>` (the 2026-10-27 rebuild: the fist, the
-// swells, the flare, the overflows, the seeds, Wakefire, the Rolling Cinder).
-// Deliberately NOT in SFX: a row there without its committed file fails the
-// manifest's conformance checks.
-export const HEAT_SFX_TO_GENERATE = [
-  {
-    key: 'heart_heat_fist_charge',
-    duration: 3,
-    prompt:
-      'A colossal fist of stone and crystal rising and drawing back over a burning pool: a deep grinding of basalt, a rising roar of fire gathering power for three seconds, crystal humming louder. Wordless, no music.',
-  },
-  {
-    key: 'heart_heat_fist_land',
-    duration: 2.5,
-    prompt:
-      'A gigantic fist of basalt slamming into a stone floor: a thunderous ground-shaking impact, rock cracking and bursting, a whoomph of white-gold fire, debris raining down. Single event, no music.',
-  },
-  {
-    key: 'heart_heat_swell',
-    duration: 3,
-    prompt:
-      'A wall of molten rock rolling fast across a stone floor: a heavy grinding surge of lava, a crackling roar of fire cresting, hissing spatter. No music.',
-  },
-  {
-    key: 'heart_heat_flare',
-    duration: 1,
-    prompt:
-      'A bolt of white-hot fire hurled across a hall and striking a body: a sharp searing whoosh and a crackling hit of flame. Single event, no music.',
-  },
-  {
-    key: 'heart_heat_sink',
-    duration: 2.5,
-    prompt:
-      'A giant of stone and fire sinking into a pool of lava: a huge deep gurgling plunge, molten rock heaving and splashing, a long bubbling settle. No music, no voice.',
-  },
-  {
-    key: 'heart_heat_rise',
-    duration: 3,
-    prompt:
-      'A giant of stone and fire rising out of a pool of lava: molten rock sheeting off stone, a deep heaving surge, a rising roar of flame. No music, no voice.',
-  },
-  {
-    key: 'heart_heat_river',
-    duration: 2,
-    prompt:
-      'A river of white-gold fire bursting out of a pool and rushing across stone: a short hot rush of flowing flame, crackling and hissing. Soft, no music.',
-  },
-  {
-    key: 'heart_heat_bolt',
-    duration: 0.8,
-    prompt:
-      'A small ember falling from above and striking: a short falling whistle and a soft crackling pop of fire. Single event, no music.',
-  },
-  {
-    key: 'heart_heat_spawn',
-    duration: 1.2,
-    prompt:
-      'A small creature of fire climbing out of cracked stone: a bubbling crackle of flame, stone scraping, a soft whoosh. No music, no voice.',
-  },
-  {
-    key: 'heart_heat_feed',
-    duration: 2,
-    prompt:
-      'A creature of fire diving into a great pool of flame and the pool flaring: a deep whoomph, a blast of fire roaring outward, a satisfied rumble. No music, no voice.',
-  },
-  {
-    key: 'heart_heat_kindling',
-    duration: 1,
-    prompt:
-      'A burning sigil marking a person: a bright crackling ignition, a rising hiss of kindling catching fire. Single event, no music.',
-  },
-  {
-    key: 'heart_heat_seed',
-    duration: 0.8,
-    prompt:
-      'A glowing seed of fire landing on stone: a soft heavy thud and a low throbbing hum of heat. No music.',
-  },
-  {
-    key: 'heart_heat_seed_burst',
-    duration: 1.5,
-    prompt:
-      'A seed of fire bursting: a deep concussive detonation of flame, a crackling shockwave rolling outward. Single event, no music.',
-  },
-  {
-    key: 'heart_heat_hatch',
-    duration: 1,
-    prompt:
-      'A small fire spirit hatching from a burst of flame: a crackling pop and a bright fluttering whoosh. No music, no voice.',
-  },
-  {
-    key: 'heart_heat_zone_build',
-    duration: 4,
-    prompt:
-      'A ring of stone floor heating toward ignition: a rising rumbling hiss of heat building for four seconds, cracks glowing and ticking. No music.',
-  },
-  {
-    key: 'heart_heat_ignite',
-    duration: 2,
-    prompt:
-      'A whole band of floor erupting into a sheet of fire: a massive roaring whoosh of flame bursting upward, a crackling tail. Single event, no music.',
-  },
-  {
-    key: 'heart_heat_cinder_land',
-    duration: 2,
-    prompt:
-      'A huge living fireball crashing down onto stone: a heavy thunderous impact, a burst of roaring flame, rock cracking. Single event, no music.',
-  },
-  {
-    key: 'heart_heat_cinder_roll',
-    duration: 3,
-    prompt:
-      'A great ball of fire rolling slowly across stone, loopable: a deep rumbling roll, crackling and hissing flame, a low menacing roar. No music.',
-  },
-  {
-    key: 'heart_heat_cinder_knock',
-    duration: 0.8,
-    prompt:
-      'A great ball of fire struck hard and knocked back: a heavy thump, a crack of cooling crust, a burst of sparks. Single event, no music.',
-  },
-  {
-    key: 'heart_heat_cinder_burst',
-    duration: 2,
-    prompt:
-      'A great ball of fire exploding on contact: a blinding thunderous blast of flame, a roaring shockwave, a long crackling tail. Single event, no music.',
-  },
-  {
-    key: 'heart_heat_settle',
-    duration: 3,
-    prompt:
-      'A great pool of fire settling calm after a battle: a long low sigh of dying flame, molten rock cooling and ticking, stone settling. No music.',
-  },
+  // The Smith's Heart: every mechanic's own sound (the Heat's whole fight, the
+  // Knotted Gale, the isles, the slashes, the final boss), scripts/sfx/
+  // smith_heart_mechanic_sfx.mjs.
+  ...SMITH_HEART_MECHANIC_SFX,
 ];
 
 // Family ids that have creature vocalizations (used by the integration layer to

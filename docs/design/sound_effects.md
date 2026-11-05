@@ -449,28 +449,35 @@ the shared `cast_frost` sample, soft, until the fight has a take of its own.
 | `heart_quench_cross` | heroic: two blades cross the lake | a doubled whoosh, ice splintering in the wake |
 | `heart_quench_rim` | the shore ice heaves up (lower and slower: it falls at the end) | a short grinding crack of ice plates |
 
-### The Smith's Heart: the Guardian of the Heat (spatial one-shots, borrowed)
-Played by `src/game/smith_heart_heat_audio.ts` (plan: `smith_heart_heat_audio_core.ts`) off
-the fight's own cues, Shed Heat's bar, the channel's brimming, the heat passing three
-quarters and the local player's own Crystal Burn; the HUD's generic nova, beam and burst
-never double one (`heatSoundClaims`). The ElevenLabs credits ran out before this fight, so
-it has NO samples of its own yet: every cue is layered and pitched at runtime from samples
-the pack already ships. The prompts for its own takes wait in `scripts/sfx/sfx_prompts.mjs`
-`HEAT_SFX_TO_GENERATE` (kept out of `SFX` until each has its file).
+### The Smith's Heart: every mechanic's own sound (the AAA pass)
+Jose's pass of 2026-11-05: every mechanic a player reacts to in the five fights has its own
+take, generated with the ElevenLabs Sound Effects API through `gen_sfx.mjs` from
+`scripts/sfx/smith_heart_mechanic_sfx.mjs` (spread into `SFX`). The catalog is the source of
+truth for each key's prompt; the tables above keep the first takes. The rules of the pass:
 
-| cue | when | borrowed layers (rate) |
-|---|---|---|
-| a ray | a Kindled Ray strikes a player | `cast_fire` (1.3) at the player, `ui_aura_glass_ping` (1.5) at the crystal |
-| a ray sent back | nobody near: into the guardian | `proj_fire` (0.7), `ui_aura_glass_ping` (0.8) |
-| the pulse | every Hearth Pulse (soft, never tiring) | `scorch` (0.72) |
-| the wind-up | the heat passes 90 | `heart_council_wrath_charge` (0.8), `heart_breath_swell` (0.75) |
-| Hearthburst | the overheat | `heart_council_wrath_blast` (0.9), `meteor` (0.8), `pyroblast` (0.7) |
-| a crystal rises / burns out | Shed Heat lands / a crystal's life ends | `heart_council_pillar_rise` (1.25) and `ui_aura_glass_ping` (0.7) / `heart_quench_shatter` (1.3) |
-| Shed Heat | its bar starts (fitted to the bar) | `heart_council_echo_charge` |
-| the channel | it brims / it flows | `hoard_tide_build` (0.8) / `hoard_tide_rush` (0.75) and `flamestrike` (0.8) |
-| embers, stoking, the fall | heroic embers / Stoked Hearth / the guardian falls | `rift_lava_tick` (0.9) / `heart_council_pillar_pulse` (0.6) / `heart_council_pillar_collapse` (0.8) |
-| the heat rising | the heat passes 75, in the local player's ear | `heart_breath_swell` (0.7) |
-| a burn | the local player's own Crystal Burn gains a stack | `rift_lava_tick` (1.25) |
+- **Two families, told apart by ear.** A WARNING (a mark on you, a line drawn, a floor
+  heating, a bar) swells with no hit; an IMPACT (a slam, a burst, an eruption, a strike) is a
+  hard transient. Pinned by `tests/smith_heart_mark_audio.test.ts` (the prompts' families).
+- **Personal marks** play in the marked player's own ear, one sting per element
+  (`heart_mark_stone`, `_storm`, `_frost`, `_fire`), through the shared
+  `src/game/smith_heart_mark_audio.ts` (`HeartMarkEar`); each fight's core names its marks.
+- **Priority voices.** Every raid mechanic cue plays with `priority: true`, which may use
+  `PRIORITY_VOICE_HEADROOM` voices past `MAX_VOICES` (`src/game/sfx.ts` `voiceCapFor`), so a
+  busy raid's spells never silence a warning. No graphics or audio preset gates them: they
+  ride the effects bus like every combat cue (only the player's own SFX volume moves them).
+- **One claim.** `src/game/smith_heart_audio_claims.ts` (`smithHeartSoundClaims`) keeps the
+  HUD's generic nova, beam and ground burst off every fight's cue (`combat_sfx.ts`
+  `spellFxCue` and the `hud.ts` spellfxAt path).
+- **Mix.** Each take is conformed like every generated cue; the loops sit a little under the
+  one-shots through `sfx_gain_map.json` trims, and each core sets its runtime gain.
+
+| fight | what is new |
+|---|---|
+| Hammer Council (`smith_heart_council_audio_core.ts`) | Mountain's Rush's wind-up (warning) and impact, Bond of the Stone's pulse, Resonance, Narrow Shelter's strain as a pillar crowds under the Wrath (warning), the marks (Rush, Wake, Rock, Resonance) |
+| Breath (`smith_heart_breath_audio_core.ts`) | the Knotted Gale (drop, take, carried loop, fuse warning, portals opening and crossed, throw, burst), the Summit Roar and its wave, the isles' rides (up, a loop in the rider's ears, down) and the Bulwark, the marks (Drawn Lightning, the portals) |
+| Quench (`smith_heart_quench_audio_core.ts`) | a slash's line (warning as drawn, a click at its lock, the flight), the cold past half and four fifths in the player's ear, the rime cracking an immunity, The Blades Hunt (its waking and a loop through its bar), the slash mark |
+| Heat (`smith_heart_heat_audio_core.ts`) | every cue its own take (the borrowed layers are gone; the fist and the cinder's burst keep a Council stone layer for weight), Wakefire's build, the Wheel of the Hearth (warning, eruption), the Rolling Cinder's roll loop, Cinder Grip's stacks in the tank's ear (loud from the swap), the marks |
+| Masterless Strength (`smith_heart_final_audio_core.ts`, new) | the quarter change, Vein Shock, the Overload (rising warning, pulse growing with the bar, burst), Heart Unbound, each quarter's kit (bars and footprints warn, cues strike), the intermissions, the final phase and each turn of its mix (the sim's `FINAL_PHASE_CUES.mixTurn` in the turn's element), Masterless Fury, Mythic's hidden phase (kneel, rebirth, a quarter cracking and falling, a body falling, the ring) and the floor rising back, the marks and the cold |
 
 ### Interface and personal event cues
 
