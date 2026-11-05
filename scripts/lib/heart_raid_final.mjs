@@ -47,6 +47,7 @@ import {
   DIFF,
   fightSec,
   fmtSec,
+  HEROIC_PLUS,
   hasAura,
   hypot,
   IGNORE,
@@ -296,11 +297,15 @@ function dragSpot(world, st) {
   // Heroic: a change while the raid is still Vein-Shaken hits three times
   // as hard, so the tanks wait the mark out unless the bar runs high.
   const shaken = world.living().some((p) => hasAura(p, FINAL_AURAS.shaken));
+  // Heroic's Hammer: the Anvil's soakers stay Crushed 30 s and the next
+  // Anvil falls 25 s later, so the boss leaves the Hammer once one has fallen.
+  const hammerDone =
+    z === 'hammer' && HEROIC_PLUS && (st.anvilFellAt ?? 0) > (st.zoneAt ?? Date.now());
   if (
     IGNORE !== 'drag' &&
     z !== 'ring' &&
     !rooted &&
-    bar(world, z) >= MOVE_AT &&
+    (bar(world, z) >= MOVE_AT || hammerDone) &&
     (!shaken || bar(world, z) >= 75) &&
     (!st.next || st.next === z)
   ) {
@@ -347,12 +352,14 @@ function track(world, st) {
     const crushed = under.filter((p) => hasAura(p, FINAL_AURAS.crushed)).length;
     log(`ANVIL fell: ${under.length} under (${crushed} already Crushed)`);
     st.anvils = (st.anvils ?? 0) + 1;
+    st.anvilFellAt = Date.now();
     st.anvilUnder = [...(st.anvilUnder ?? []), under.length];
   }
   st.anvilSeen = anvil ? { x: anvil.x, z: anvil.z } : null;
   const z = zoneOfBoss(world);
   if (z !== st.prevZone && world.mobs.boss?.aggro != null) {
     st.zones.push({ t: fightSec(), zone: z });
+    st.zoneAt = Date.now();
     log(`QUARTER: the boss drinks ${z}`);
     st.prevZone = z;
   }
