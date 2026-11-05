@@ -929,8 +929,8 @@ as it drops and its impact, the Seam Bolt, the song's swell; on mythic the soul 
 the Echo's charge and blast, Mountain's Rush striking home, the cursed pillar's rise, hum and
 break, the Bond's pulse, Resonance's ring, the Quarry's collapse, each Endless Song pulse louder and deeper as it grows, a pip struck, a soul pillar bursting.
 The heroic pulse is one soft hum, cooled. The members speak as boss yells
-(`council_voice.ts`, `hudChrome.council.say.*`); their voices are auditions only until the
-designer picks one (`scripts/audition_raid_boss_voices.mjs --set council`).
+(`council_voice.ts`, `hudChrome.council.say.*`) in two voices of their own (section 7.6, the
+voices).
 
 ### 5.19 The Guardian of the Breath's look (prototype)
 
@@ -970,8 +970,7 @@ gather's call before each blow, the gale's loop through it and a sigh into the c
 indrawn breath and the storm's breaking fitted to their bars, the exhale, the tear, a
 strike, the Leaping Bolt, the discharge, a loose gale's loop at the nearest, a toss, the
 circle landing, the swell, a fall over the lip. The guardian's and Thessaly's lines are
-boss yells (`breath_voice.ts`, `hudChrome.breathGuardian.say.*`); the guardian's voice is
-a later audition.
+boss yells (`breath_voice.ts`, `hudChrome.breathGuardian.say.*`), voiced (section 7.6).
 
 ### 5.20 The Guardian of the Quench's look (prototype)
 
@@ -1008,8 +1007,8 @@ staged kit swaps through the compile gate), fixed pools, no light.
 freeze, a shatter, a crack groaning, a hole opening, a plunge and a climb, the awakening's
 charge fitted to its bar and the blades tearing free, an echo, the crossing, the shore ice
 heaving, and a frosty breath in the player's own ear as their bar passes three quarters.
-The guardian's lines are boss yells (`quench_voice.ts`, `hudChrome.quenchGuardian.say.*`);
-its voice is a later audition.
+The guardian's lines are boss yells (`quench_voice.ts`, `hudChrome.quenchGuardian.say.*`),
+voiced (section 7.6).
 
 ### 5.21 The Anvil of the World's four quarters (phases 2K to 2N)
 
@@ -1899,8 +1898,8 @@ Flare-Scorched, The First Wellspring, The First Flame and Wellspring Fire are pl
   kits' look. **Part 2, built (28 Oct 2026, below "Part 2"):** the intermissions at 70 and
   40 percent with their Splinters, the poured elements, the 15 percent final phase's mix and
   its soft enrage. **Not built:** the Mythic hidden phase (its hook only), loot (the base
-  form's extra item: the state aura carries the base form as its hook), the final models,
-  the voice.
+  form's extra item: the state aura carries the base form as its hook), the final models.
+  The voice is built (section 7.6).
 
 **A PROTOTYPE, numbers unmeasured.** Every tunable lives in one table, `FINAL_TUNING` and
 `FINAL_DIFFICULTY` in `src/sim/encounters/smith_heart/final_ids.ts`, so a change is one
@@ -2065,6 +2064,50 @@ and Drawn Lightning are the guardians' own, already checked. None of Kurog Grimt
 (Primal Shift, Primal Break, Molten Rupture, Frost Binds, Enveloping Earth, Elemental Surge,
 Sundering Strike and the rest) is used; the quartered room and the elemental drags are
 inspired by a known raid encounter as a concept only.
+
+### 7.6 The voices
+
+Every boss speaks in a voice of its own (the designer's brief of 2026-11-05), the Ignivar
+way: ElevenLabs Voice Design auditions (`scripts/audition_raid_boss_voices.mjs --set heart`,
+the briefs in `scripts/voices/raid_boss_voice_prompts.mjs` `SMITH_HEART_VOICE_PROMPTS`,
+several candidates a boss), one finalized per speaker (`scripts/finalize_raid_boss_voice.mjs`,
+the ids in `scripts/voices/voice_ids.json`), every line synthesized with its performance
+direction and treated in its vein's colour (`scripts/render_smith_heart_voice_pack.mjs`, the
+directions in `scripts/voices/smith_heart_voice_pack.mjs`, the treatments in
+`raid_boss_voice_processing.mjs` `SMITH_HEART_VOICE_PROCESSING_PRESETS`: quarry grind,
+crystal shimmer, gust, frost crackle, flame flutter, and the Masterless Strength's choir of
+four), published under `public/audio/voice/<voice>/` and listed in the voice manifest by
+`scripts/gen_npc_lines.mjs`. Captain Thessaly keeps the Highwatch captain's voice.
+
+| Speaker | Voice (folder) | Lines |
+|---|---|---|
+| Guardian of the Hammer | `heart_hammer_guardian`, quarry stone | `council_voice.ts` |
+| The Seam Singer | `heart_seam_singer`, amber crystal | `council_voice.ts` |
+| Guardian of the Breath | `heart_breath_guardian`, storm horn | `breath_voice.ts` |
+| Captain Thessaly | `captain_thessaly` | `breath_voice.ts` |
+| Guardian of the Quench | `heart_quench_guardian`, glacial | `quench_voice.ts` |
+| Guardian of the Heat | `heart_heat_guardian`, hearth fire | `heat_voice.ts` |
+| The Masterless Strength | `heart_masterless_strength`, the four veins as one ("we") | `final_voice.ts` |
+
+The story the lines tell: each guardian carries out its last order blindly and, falling,
+gives its strength to the raid ("is yours to carry", "the Quench is yours", "carry it
+well"); the Masterless Strength, the four strengths with no hand to hold them, wakes to find
+them in the raid's blood and wants them back, to finish the Smith's last job and seal the
+mountain over everything that breathes; it dies knowing the hand is never coming back, and
+leaves its last ember (Duskwick) to the raid.
+
+Every line is a boss yell with a stable key (`hudChrome.<boss>.say.<moment>`, English in the
+catalog, the five non-Latin locales filled); the client finds its clip by the English
+(`src/ui/hud_voice_cues.ts` `yellVoiceKey`). The Masterless Strength's voice is an observer
+(`final_voice.ts` `stepFinalVoice`): it reads the fight after each tick and changes nothing;
+its three arrival lines follow the renderer's rebuild (`ARRIVAL_LINE_AT`). A player's fall
+gets a kill line (`voice_slain.ts`: two or three variants in turn, at most one in
+`SLAY_EVERY` seconds a boss); signature barks repeat at most once in their boss's
+`SAY_EVERY`. In the client (`src/ui/voice_events.ts` `voicedYellMix`) a raid line is mastered
+at -15 LUFS and played at 1.2, over the raid's -14 LUFS score at 0.6; it waits for the raid
+line before it instead of cutting it (a stale one is dropped); and it fades with its
+speaker's distance, full within 45 yd, silent at 160 (`SMITH_HEART_VOICE_FADE`). No mechanic's
+timing or number changed. Pinned by `tests/smith_heart_voice.test.ts`.
 
 ## 8. Loot hook (not wired in phase 1)
 
