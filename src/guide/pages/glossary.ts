@@ -59,7 +59,7 @@ export const GLOSSARY_TERMS: { slug: string; term: TranslationKey; def: Translat
   { slug: 'premade', term: 'guide.glossary.premadeTerm', def: 'guide.glossary.premadeDef' },
   { slug: 'deed', term: 'guide.glossary.deedTerm', def: 'guide.glossary.deedDef' },
   { slug: 'chronicle', term: 'guide.glossary.chronicleTerm', def: 'guide.glossary.chronicleDef' },
-  { slug: 'renown', term: 'guide.glossary.renownTerm', def: 'guide.glossary.renownDef' },
+  { slug: 'renown', term: 'guide.glossary.renownTerm', def: 'guide.glossary.renownDefRankings' },
   { slug: 'heroic', term: 'guide.glossary.heroicTerm', def: 'guide.glossary.heroicDef' },
   { slug: 'lockout', term: 'guide.glossary.lockoutTerm', def: 'guide.glossary.lockoutDef' },
   { slug: 'marks', term: 'guide.glossary.marksTerm', def: 'guide.glossary.marksDef' },

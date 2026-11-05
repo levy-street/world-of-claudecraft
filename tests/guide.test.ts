@@ -934,7 +934,7 @@ describe('Guide deeds spoiler safety', () => {
       'guide.deedsPage.featsBody',
       'guide.deedsPage.catalogHeading',
       'guide.deedsPage.catalogBody',
-      'guide.deedsPage.standingsNote',
+      'guide.deedsPage.standingsNoteRankings',
       'guide.deedsPage.colName',
       'guide.deedsPage.colRenown',
       'guide.deedsPage.colReward',
@@ -955,11 +955,21 @@ describe('Guide deeds spoiler safety', () => {
     }
     // The first Chronicler is sanctioned flavor: the page names Saul.
     expect(t('guide.deedsPage.chroniclesBody' as never)).toContain('Saul');
-    // The Renown standings live on the Leaderboard's Renown tab, NOT in the Book of
-    // Deeds window; the corrected copy is pinned so the old misdirection cannot return.
-    expect(t('guide.deedsPage.standingsNote' as never)).toContain('Leaderboard');
-    expect(t('guide.deedsPage.standingsNote' as never)).not.toContain('Book of Deeds');
-    expect(t('guide.glossary.renownDef' as never)).toContain('Leaderboard');
+    // The Renown standings live on the Renown board of the Rankings tab (the old
+    // Leaderboard window, folded into the Book of the Realm by the v0.46.0 menu
+    // consolidation), NOT in the deeds list itself; the corrected copy is pinned so
+    // neither the old misdirection nor the retired window name can return.
+    const rankings = t('hudChrome.bookOfRealm.tabRankings' as never);
+    const realm = t('hudChrome.bookOfRealm.title' as never);
+    const standings = t('guide.deedsPage.standingsNoteRankings' as never);
+    expect(standings).toContain(`open the ${rankings} tab of the ${realm} in game`);
+    expect(standings).not.toContain('Book of Deeds');
+    expect(standings).not.toContain('Leaderboard');
+    const renown = t('guide.glossary.renownDefRankings' as never);
+    expect(renown).toContain(`on the ${rankings} tab of the ${realm}`);
+    expect(renown).not.toContain('Leaderboard');
+    expect(RETIRED_KEYS).toContain('guide.deedsPage.standingsNote');
+    expect(RETIRED_KEYS).toContain('guide.glossary.renownDef');
     // The Book, Renown, and titles are character-scoped; only the realm leaderboard
     // aggregates Renown across an account (each deed counted once). The old copy wrongly
     // said deeds are "shown across your whole account" and feed the "same collection", so
@@ -6396,12 +6406,15 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
     expect(RETIRED_KEYS).toContain('guide.social.calendarBodyDoubleHonor');
   });
 
-  it('guide.social.emotesBodyNamedTarget aims an emote by a typed name and calls the wheel key a default (wiki completeness audit)', () => {
+  it('guide.social.emotesBodyMoreTray aims an emote by a typed name, calls the wheel key a default and puts the touch wheel in the More tray (wiki completeness audit, menu consolidation)', () => {
     // Phase 20, the wiki completeness audit (2026-09-03). The predecessor
     // guide.social.emotesBody said 'target a friend first to aim it at them';
     // the emote arm of src/sim/social/chat.ts aims by the typed name and never
     // reads the actor's target, and KeyX is only the emoteWheel row's default
     // in the rebindable BIND_ACTIONS registry. Driven through the real router.
+    // v0.46.0 menu consolidation: its successor emotesBodyNamedTarget sent
+    // players to an Emotes button in the rail, which the twelve-button rail no
+    // longer carries; emotesBodyMoreTray keeps only the touch tray tile.
     setLanguage('en');
     const html =
       pageFor('social')?.render({
@@ -6409,7 +6422,7 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
         sub: 'social',
         titleKey: 'guide.nav.social',
       }) ?? '';
-    const body = t('guide.social.emotesBodyNamedTarget' as never);
+    const body = t('guide.social.emotesBodyMoreTray' as never);
     expect(html).toContain(esc(body));
     type Ev = ReturnType<Sim['tick']>[number];
     const cfg = {
@@ -6454,9 +6467,15 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
     );
     const label = t('hudChrome.emoteWheel.label' as never);
     const more = t('hud.core.mobileMore' as never);
-    expect(body).toContain(
-      `The ${label} button in the rail of window buttons, or under ${more} on touch, opens the same wheel.`,
-    );
+    expect(body).toContain(`On touch, the ${label} tile in the ${more} tray opens the same wheel.`);
+    // The live markup agrees: the wheel's tile sits in the touch More tray and
+    // the desktop rail carries no emote button any more.
+    const indexHtml = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+    const grid = /<div id="mobile-extra-grid">([\s\S]*?)\n\s*<\/div>\n/.exec(indexHtml);
+    expect(grid?.[1] ?? '').toContain('id="mobile-emote"');
+    const rail = /<div id="side-buttons">([\s\S]*?)\r?\n {4}<\/div>\r?\n/.exec(indexHtml);
+    expect(rail).not.toBeNull();
+    expect(rail?.[1] ?? '').not.toContain('emote');
     // Narrowness: the opening clause is the predecessor's bytes.
     const predecessor = guideStrings.social.emotesBody;
     expect(body.startsWith(predecessor.slice(0, predecessor.indexOf('target a friend')))).toBe(
@@ -6465,6 +6484,10 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
     expect(html).not.toContain('target a friend first to aim it at them');
     expect(html).not.toContain(esc(predecessor));
     expect(RETIRED_KEYS).toContain('guide.social.emotesBody');
+    // NEGATIVE: the rail-button successor is retired and no longer renders.
+    expect(html).not.toContain('in the rail of window buttons');
+    expect(html).not.toContain(esc(guideStrings.social.emotesBodyNamedTarget));
+    expect(RETIRED_KEYS).toContain('guide.social.emotesBodyNamedTarget');
   });
 
   it('guide.social.finderBodyLeaderQueues states who queues a party and what a decline costs (wiki completeness audit)', () => {
@@ -6902,22 +6925,48 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
     // The unchanged 'four action buttons' clause stays bound to its constant.
     expect(MOBILE_ACTION_BUTTONS).toBe(4);
     expect(mobile).toContain('the attack button with four action buttons beside it');
-    // The More tray, read from the live markup: no Vale Cup button, and every
-    // window the prose names has one.
+    // The More tray, read from the live markup. v0.46.0 menu consolidation: the
+    // tray became a grouped index (its h3 group headings, in order) and the wiki
+    // and Discord tiles left it for the game menu, so mobileBodyTwoPages (which
+    // listed the wiki in the tray) was retired for mobileBodyGroupedMore.
     const indexHtml = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
     const grid = /<div id="mobile-extra-grid">([\s\S]*?)\n\s*<\/div>\n/.exec(indexHtml);
     expect(grid).not.toBeNull();
-    const trayIds = [...(grid as RegExpExecArray)[1].matchAll(/ id="(mobile-[a-z-]+)"/g)].map(
-      (m) => m[1] ?? '',
-    );
+    const gridHtml = (grid as RegExpExecArray)[1];
+    const trayIds = [...gridHtml.matchAll(/ id="(mobile-[a-z-]+)"/g)].map((m) => m[1] ?? '');
     expect(trayIds.length).toBeGreaterThan(0);
     expect(trayIds.some((id) => /vale|cup/.test(id))).toBe(false);
-    for (const id of ['mobile-dfinder', 'mobile-arena', 'mobile-emote', 'mobile-wiki']) {
+    for (const id of [
+      'mobile-deeds',
+      'mobile-titles',
+      'mobile-reliquary',
+      'mobile-reputation',
+      'mobile-loot-explorer',
+      'mobile-leaderboard',
+      'mobile-dfinder',
+      'mobile-arena',
+      'mobile-cardduel',
+      'mobile-emote',
+      'mobile-talents',
+      'mobile-cosmetics',
+    ]) {
       expect(trayIds, `${id} sits in the More tray`).toContain(id);
     }
+    for (const id of ['mobile-wiki', 'mobile-discord']) {
+      expect(trayIds, `${id} left the More tray`).not.toContain(id);
+    }
+    const groups = [
+      ...gridHtml.matchAll(/<h3 class="mobile-extra-group" data-i18n="([^"]+)"/g),
+    ].map((m) => t((m[1] ?? '') as never));
+    expect(groups).toEqual(['Record', 'Professions', 'Activities', 'Character', 'Store']);
     expect(mobile).toContain(
-      `the rest of your windows, the ${t('hudChrome.finder.title')}, ${t('hudChrome.pvp.mobileLabel')}, emotes and the wiki among them`,
+      `a More entry that sorts the rest of your windows into groups: ${groups[0]} (deeds, titles, the Reliquary, reputation, the Loot Explorer, and the rankings), ${groups[1]}, ${groups[2]} (dungeons and raids, PvP, and Card Duel), ${groups[3]} (emotes, talents, and cosmetics among them), and ${groups[4]}. The wiki and Discord sit in the game menu instead.`,
     );
+    expect(mobile).not.toContain('emotes and the wiki among them');
+    expect(mobile).not.toContain(
+      esc(guideStrings.interfacePage.mobileBodyTwoPages.split('\n\n')[2]),
+    );
+    expect(RETIRED_KEYS).toContain('guide.interfacePage.mobileBodyTwoPages');
     // NEGATIVE: the false clauses and the predecessor are gone from the section.
     for (const stale of [
       'seven pages',
@@ -6955,17 +7004,25 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
       return action as NonNullable<typeof action>;
     };
     const key = (id: string) => keyLabel(bind(id).defaults[0] ?? null);
-    // The four toggled windows carry their live default key and are edge binds.
-    const windows = [
-      ['The world map', 'map'],
-      ['the PvP window', 'arena'],
-      ['the leaderboard', 'leaderboard'],
-      ['the event calendar', 'calendar'],
-    ] as const;
-    for (const [words, id] of windows) {
-      expect(bind(id).kind).toBe('edge');
-      expect(beat).toContain(`${words} (${key(id)})`);
+    // v0.46.0 menu consolidation: the leaderboard ships no default key (it is the
+    // Rankings tab of the Book of the Realm now), the Event Calendar left the game
+    // with its I key, and PvP is an Activities tab described with that hub, so
+    // winMoreBodyNoValeCup was retired for winMoreBodyRankings. The world map
+    // keeps its live default key and edge bind.
+    expect(bind('map').kind).toBe('edge');
+    expect(beat).toContain(`The world map (${key('map')}) works the same way.`);
+    expect(bind('leaderboard').defaults).toEqual([]);
+    expect(BIND_ACTIONS.some((b) => b.id === 'calendar')).toBe(false);
+    expect(beat).toContain(
+      `The ${t('hudChrome.bookOfRealm.tabRankings')} tab of the ${t('hudChrome.bookOfRealm.title')} is worth a moment on your first visit`,
+    );
+    for (const stale of ['the leaderboard (K)', 'event calendar', '(I)', 'the PvP window (G)']) {
+      expect(beat, `stale clause "${stale}"`).not.toContain(stale);
     }
+    expect(beat).not.toContain(
+      esc(guideStrings.interfacePage.winMoreBodyNoValeCup.split('\n\n')[0]),
+    );
+    expect(RETIRED_KEYS).toContain('guide.interfacePage.winMoreBodyNoValeCup');
     // The emote wheel is the one held bind of the set, and the prose says so.
     expect(bind('emoteWheel').kind).toBe('held');
     expect(beat).toContain(`The emote wheel (${key('emoteWheel')}) is the exception: hold its key`);
@@ -6993,6 +7050,149 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
     }
     expect(beat).not.toContain(esc(guideStrings.interfacePage.winMoreBody));
     expect(RETIRED_KEYS).toContain('guide.interfacePage.winMoreBody');
+  });
+
+  it('the guide describes the consolidated menus: the twelve-button rail, the three hubs and where the moved panels went (v0.46.0 menu consolidation)', () => {
+    // The v0.46.0 menu consolidation cut the desktop rail to twelve buttons,
+    // folded Deeds, Titles, the Reliquary, Reputation, the Loot Explorer and the
+    // Leaderboard into the Book of the Realm (Shift+Z), the Dungeon Finder, PvP
+    // and Card Duel into Activities (Shift+I), and the professions windows into
+    // one Professions window; Currencies moved to the Bags wallet strip, guild
+    // events to the Social Guild tab, and the wiki left the rail and the More
+    // tray. Each stale sentence became a successor key; the predecessor is
+    // retired and must not render.
+    setLanguage('en');
+    const render = (id: string): string => {
+      const r = GUIDE_ROUTES.find((route) => route.id === id);
+      expect(r, `route ${id}`).toBeDefined();
+      const route = r as NonNullable<typeof r>;
+      return pageFor(id)?.render({ params: [], sub: route.sub, titleKey: route.navKey }) ?? '';
+    };
+    // The rail, read from the live markup: twelve shown buttons (the town-focus
+    // and $WOC Exchange launchers only join when they apply).
+    const indexHtml = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+    const rail = /<div id="side-buttons">([\s\S]*?)\r?\n {4}<\/div>\r?\n/.exec(indexHtml);
+    expect(rail).not.toBeNull();
+    const buttons = [...(rail?.[1] ?? '').matchAll(/<button[^>]*>/g)].map((m) => m[0]);
+    const shown = buttons.filter((b) => !/ hidden[ >]|display:none/.test(b));
+    expect(shown).toHaveLength(12);
+    for (const gone of ['mm-emote', 'mm-wiki', 'mm-discord', 'mm-cosmetics', 'mm-leaderboard']) {
+      expect(rail?.[1] ?? '', `${gone} left the rail`).not.toContain(`id="${gone}"`);
+    }
+    const bind = (id: string) => {
+      const action = BIND_ACTIONS.find((b) => b.id === id);
+      expect(action, `${id} is a bind`).toBeDefined();
+      return keyLabel((action as NonNullable<typeof action>).defaults[0] ?? null);
+    };
+    const iface = render('interface');
+    const ip = guideStrings.interfacePage;
+    expect(iface).toContain(esc(ip.railBodyTwelve.split('\n\n')[1] ?? ''));
+    expect(ip.railBodyTwelve).toContain(
+      'The first column covers your character, bags, spellbook, talents, quest log, and world map.',
+    );
+    // The hub titles carry the live default keys of the binds that open them.
+    expect(iface).toContain(`${t('hudChrome.bookOfRealm.title')} (${bind('deeds')})`);
+    expect(iface).toContain(`${t('hudChrome.activities.title')} (${bind('dungeonFinder')})`);
+    expect(iface).toContain(esc(ip.winRealmBody));
+    expect(iface).toContain(esc(ip.winActivitiesBody));
+    expect(ip.winActivitiesBody).toContain(`PvP, which ${bind('arena')} opens directly`);
+    expect(ip.winCraftingBodyTab).toContain(`which ${bind('crafting')} opens directly`);
+    for (const k of [
+      'keyWindowsBodyHubs',
+      'winCharBodyTwoTabs',
+      'winBagsBodyWallet',
+      'winProfessionsBodyHub',
+      'winCraftingBodyTab',
+      'winSocialBodyEvents',
+      'wikiBodyGameMenu',
+    ] as const) {
+      expect(iface, `${k} renders`).toContain(esc(ip[k]));
+    }
+    expect(ip.winCharBodyTwoTabs).toContain(
+      `Two tabs, ${t('hudChrome.charSidebar.character')} and ${t('hudChrome.charSidebar.progression')}.`,
+    );
+    expect(ip.winBagsBodyWallet).toContain('a wallet strip shows the other currencies you hold');
+    expect(ip.winSocialBodyEvents).toContain('The Guild tab also keeps an Events list');
+    expect(ip.wikiBodyGameMenu).toContain('Its button sits in the Game Menu');
+    // Other pages: each successor renders where its predecessor stood.
+    const pages: [string, string, string][] = [
+      ['social', guideStrings.social.guildBoardBodyRankings, guideStrings.social.guildBoardBody],
+      ['arena', guideStrings.arenaPage.coliseumBodyActivities, guideStrings.arenaPage.coliseumBody],
+      ['arena', guideStrings.arenaPage.ladderBodyBracketTab, guideStrings.arenaPage.ladderBody],
+      [
+        'thornhollow-fields',
+        guideStrings.thornhollowPage.queueBodyActivities,
+        guideStrings.thornhollowPage.queueBody,
+      ],
+      [
+        'factions',
+        guideStrings.factionsPage.readingBodyRealm,
+        guideStrings.factionsPage.readingBody,
+      ],
+      ['deeds', guideStrings.deedsPage.bookBodyTitlesTab, guideStrings.deedsPage.bookBody],
+      ['deeds', guideStrings.deedsPage.standingsNoteRankings, guideStrings.deedsPage.standingsNote],
+      ['reliquary', guideStrings.reliquaryPage.howBodyRealmTab, guideStrings.reliquaryPage.howBody],
+      ['glossary', guideStrings.glossary.renownDefRankings, guideStrings.glossary.renownDef],
+    ];
+    for (const [id, successor, predecessor] of pages) {
+      const html = render(id);
+      expect(html, `${id} renders its successor`).toContain(esc(successor));
+      expect(html, `${id} drops its predecessor`).not.toContain(esc(predecessor));
+    }
+    expect(guideStrings.arenaPage.coliseumBodyActivities).toContain(
+      `the PvP tab of the Activities window, which ${bind('arena')} opens directly`,
+    );
+    expect(guideStrings.thornhollowPage.queueBodyActivities).toContain(
+      `Press ${bind('arena')} to open the PvP tab of the Activities window`,
+    );
+    expect(guideStrings.reliquaryPage.howBodyRealmTab).toContain(
+      `(default ${bind('deeds')}) and turn to its Reliquary tab`,
+    );
+    expect(bind('reliquary')).toBe('');
+    // NEGATIVE: no rendered page still points at the retired launchers.
+    const all = ['interface', 'social', 'arena', 'thornhollow-fields', 'factions', 'deeds']
+      .concat(['reliquary', 'glossary'])
+      .map(render)
+      .join('\n');
+    for (const stale of [
+      'Open the PvP button',
+      'behind one button, marked PvP',
+      'The Leaderboard window',
+      'on the Leaderboard.',
+      'open the Leaderboard in game',
+      'The Reputation tab of the character sheet',
+      'default Shift+X',
+      'At the end of the rail sits the Titles and Borders shelf',
+      'Dungeon Finder (Shift+I)',
+      'Book of Deeds (Shift+Z)',
+      'one per window',
+      'on a phone it lives in the More tray',
+    ]) {
+      expect(all, `stale clause "${stale}"`).not.toContain(esc(stale));
+    }
+    for (const retired of [
+      'guide.interfacePage.keyWindowsBody',
+      'guide.interfacePage.winCharBody',
+      'guide.interfacePage.winBagsBody',
+      'guide.interfacePage.winProfessionsBody',
+      'guide.interfacePage.winCraftingBody',
+      'guide.interfacePage.winDeedsTitle',
+      'guide.interfacePage.winDeedsBody',
+      'guide.interfacePage.winSocialBody',
+      'guide.interfacePage.winFinderTitle',
+      'guide.interfacePage.winFinderBody',
+      'guide.interfacePage.wikiBody',
+      'guide.interfacePage.railBody',
+      'guide.social.guildBoardBody',
+      'guide.arenaPage.coliseumBody',
+      'guide.arenaPage.ladderBody',
+      'guide.thornhollowPage.queueBody',
+      'guide.factionsPage.readingBody',
+      'guide.deedsPage.bookBody',
+      'guide.reliquaryPage.howBody',
+    ]) {
+      expect(RETIRED_KEYS, retired).toContain(retired);
+    }
   });
 
   it('the interface page names the station masters, the three bank tabs, the buyback list and both market keepers (wiki completeness audit)', () => {
