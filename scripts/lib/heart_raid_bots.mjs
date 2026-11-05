@@ -61,6 +61,10 @@ export const LOG_DIR = process.env.LOG_DIR ?? 'tmp/heart_raid';
 /** A key mechanic the raid ignores on purpose (the proof that it matters). */
 export const IGNORE = (process.env.IGNORE ?? '').toLowerCase();
 export const HEROIC_PLUS = DIFF !== 'normal';
+/** POOL=0.65: every boss pool of the run times 0.65 (`/dev heart pool`), the
+ *  human-equivalent check: the bots deal about 65 percent of a decent human
+ *  raid's damage, so the fight then runs on a human raid's clock. */
+export const POOL = Number(process.env.POOL ?? 1);
 let seed = Number(process.env.SEED ?? Date.now()) >>> 0;
 /** mulberry32: the script's own rolls (kick fumbles, reaction times, slips). */
 export function rand() {
@@ -283,6 +287,7 @@ async function raidMain(boss) {
   await flushAll(bots);
   await sleep(800);
   for (const line of boss.setup(DIFF)) leader.chat(line);
+  leader.chat(`/dev heart pool ${POOL}`);
   await flushAll(bots);
   await sleep(600);
 
@@ -564,6 +569,9 @@ async function fight(world, bots, byKey, boss) {
   world.st = st;
   const mt = byKey[boss.opener ?? 'mt'] ?? byKey.mt ?? bots.find((b) => b.spec.role === 'tank');
   log(`PULL: ${mt.name} opens on the ${world.roles[0]} (${DIFF})`);
+  // Each body's health as it pulls (gear, talents and buffs in): the
+  // yardstick a one-shot is measured against.
+  log(`health at the pull: ${bots.map((b) => `${b.name} ${b.self?.mhp ?? '?'}`).join(', ')}`);
   fightStart = Date.now();
   st.pullAt = Date.now();
   const deadline = Date.now() + MAX_SECONDS * 1000;
@@ -1336,7 +1344,7 @@ function writeReport(world, st, boss) {
   note('');
   note('================ SUMMARY ================');
   note(
-    `${boss.title}, difficulty ${DIFF}, ${world.bots.length} bots${JOIN ? ` + ${JOIN}` : ''}, gear ${GEAR}${IGNORE ? `, the raid IGNORES ${IGNORE}` : ''}`,
+    `${boss.title}, difficulty ${DIFF}, ${world.bots.length} bots${JOIN ? ` + ${JOIN}` : ''}, gear ${GEAR}${IGNORE ? `, the raid IGNORES ${IGNORE}` : ''}${POOL !== 1 ? `, pools x${POOL} (human-equivalent)` : ''}`,
   );
   note(`Result: ${st.result.toUpperCase()} after ${fmtSec(dur)} (${dur.toFixed(0)} s)`);
   for (const r of world.roles) {
@@ -1452,7 +1460,7 @@ function writeReport(world, st, boss) {
   const stamp = new Date().toISOString().replace(/[-:]/g, '').replace('T', '-').slice(0, 13);
   const file = path.join(
     LOG_DIR,
-    `${boss.key}_${DIFF}${IGNORE ? `_ignore-${IGNORE}` : ''}${process.env.START ? `_start${process.env.START}` : ''}_${stamp}${BOT_TAG ? `_${BOT_TAG}` : ''}.txt`,
+    `${boss.key}_${DIFF}${IGNORE ? `_ignore-${IGNORE}` : ''}${process.env.START ? `_start${process.env.START}` : ''}${POOL !== 1 ? `_pool${POOL}` : ''}_${stamp}${BOT_TAG ? `_${BOT_TAG}` : ''}.txt`,
   );
   fs.writeFileSync(file, `${lines.join('\n')}\n`);
   console.log(`\nfight log written: ${file}`);

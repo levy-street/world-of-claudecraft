@@ -84,13 +84,62 @@ const RISE_SPOT = 'sh_council_rise_spot';
 const CURSED = 'sh_council_cursed';
 /** Narrow Shelter: how many one pillar shields (COUNCIL_DIFFICULTY). */
 const SHELTER = { normal: 5, heroic: 4, mythic: 3 }[DIFF];
+/** About what one unhidden Mountain's Wrath deals a cloth body here (the
+ *  Guardian's roll times damageMult and wrathMult): Heroic's kills (about
+ *  110 percent of a Heroic-geared cloth body), so nobody takes it by choice. */
+const WRATH_HIT = { normal: 480, heroic: 1650, mythic: 600 }[DIFF];
+const WRATH_LETHAL = WRATH_HIT > 1000;
 const RUSH_LANE = 2.5 + 1.0; // half width + girth, and a margin
 const BOND_REACH = 20;
 
 const rem = (e, id) => auraOf(e, id)?.rem ?? auraOf(e, id)?.remaining ?? 5;
 
-function pillarsKey(world) {
-  return [...world.pillars.values()].map((p) => `${p.id}:${p.integrity}`).join(',');
+function pillarsKey(world, st) {
+  const real = [...world.pillars.values()].map((p) => `${p.id}:${p.integrity}`).join(',');
+  const due = st ? risingCover(world, st, 99).map((p) => p.id) : [];
+  return `${real}|${due.join(',')}`;
+}
+
+/** The cover about to stand: each Wake the Stone mark's planned spot (the
+ *  pillar rises there as the mark runs out) and every rise the server has
+ *  already locked on the floor, when it stands within `within` seconds.
+ *  A raid that knows where its next pillars rise waits beside them instead
+ *  of finding the floor bare when the Wrath's bar begins. */
+function risingCover(world, st, within) {
+  const out = [];
+  const standing = [...world.pillars.values()];
+  const near = (at) => standing.some((q) => hypot(q, at) < 2) || out.some((q) => hypot(q, at) < 2);
+  for (const [pid, w] of st.wakePlan) {
+    if (!w.spot) continue;
+    const carrier = world.players.get(pid);
+    if (!carrier || carrier.dead) continue;
+    const due = rem(carrier, AURA.wake);
+    if (due > within || near(w.spot)) continue;
+    out.push({
+      id: `rise${pid}`,
+      x: w.spot.x,
+      z: w.spot.z,
+      r: COUNCIL_REACH.risenR,
+      risen: true,
+      integrity: 3,
+      soul: null,
+      rising: true,
+    });
+  }
+  for (const [i, q] of world.riseSpots.entries()) {
+    if (near(q)) continue;
+    out.push({
+      id: `spot${i}`,
+      x: q.x,
+      z: q.z,
+      r: COUNCIL_REACH.risenR,
+      risen: true,
+      integrity: 3,
+      soul: null,
+      rising: true,
+    });
+  }
+  return out;
 }
 
 export const council = {
@@ -393,6 +442,19 @@ function trackState(world, st) {
       }, 1100);
     }
   }
+  for (const r of ROLES) {
+    const m = world.mobs[r];
+    if (!alive(m) || m.cast !== CAST.wrath) continue;
+    const cover = coverPillars(world);
+    st.openAtLand = world
+      .living()
+      .filter((p) => !hiddenFrom(cover, [{ x: m.x, z: m.z }], p, 0))
+      .map((p) => {
+        const sp = st.activeCover?.assign.get(p.pid);
+        const gone = sp && !world.pillars.has(sp.pillar.id) ? ' (gone)' : '';
+        return `${p.name}${sp ? ` ${hypot(p, sp).toFixed(1)} yd off #${sp.pillar.id}${gone}` : ' unplaced'}`;
+      });
+  }
   const casters = [];
   for (const r of ROLES) if (world.mobs[r]) casters.push({ key: r, e: world.mobs[r] });
   for (const p of world.pillars.values()) casters.push({ key: `pillar#${p.id}`, e: p });
@@ -507,6 +569,10 @@ function castEnded(world, st, key, castId, e) {
   const rec = { t: fightSec(), caster: key, landedAt: Date.now(), hits: [] };
   if (castId === CAST.wrath) {
     if (!alive(e)) return;
+    // Who stood in the open the last tick before it landed, and how far
+    // from his planned spot (the plan's misses, the log's evidence).
+    if (st.openAtLand?.length) log(`  in the open as the Wrath lands: ${st.openAtLand.join(', ')}`);
+    st.openAtLand = null;
     st.wraths.push(rec);
   } else st.echoes.push(rec);
   setTimeout(() => {
@@ -552,7 +618,7 @@ function planMechanics(world, st) {
   else if (
     !st.activeCover ||
     st.activeCover.key !== key ||
-    st.activeCover.pillarsKey !== pillarsKey(world)
+    st.activeCover.pillarsKey !== pillarsKey(world, st)
   )
     st.activeCover = planCover(world, st, casts, key, pre);
 
@@ -627,17 +693,24 @@ function wakeSlot(world, st, p) {
 
 function planCover(world, st, casts, key, pre = false) {
   const sources = casts.map((c) => ({ x: c.x, z: c.z }));
-  const cover = coverPillars(world);
   const remS = Math.min(...casts.map((c) => c.rem));
+  // The standing cover and the pillars that rise before the blast lands
+  // (with a second to step in behind them).
+  const cover = coverPillars(world).concat(risingCover(world, st, remS - 1));
   const assign = new Map();
   const used = new Map();
-  const people = world.living().filter((p) => p.bot);
+  // A Wake the Stone carrier walks his pillar to its spot first (it rises
+  // under him as his mark runs out); the plan takes him once it stands.
+  const carrying = (p) => hasAura(p, AURA.wake) && st.wakePlan.get(p.pid)?.spot;
+  const people = world.living().filter((p) => p.bot && !carrying(p));
   const forbidden = new Set();
   const rockGroup = rockCover(world, st, cover, sources, remS);
   const soaking = new Set();
   if (rockGroup?.open) {
-    // No shadow with the room: the group soaks away from the cover.
-    for (const p of rockGroup.group) soaking.add(p.pid);
+    // No shadow with the room: the group soaks away from the cover, unless
+    // the Wrath kills (Heroic): then everyone hides and the rock lands
+    // where its mark hides (a cracked pillar costs less than five lives).
+    if (!WRATH_LETHAL) for (const p of rockGroup.group) soaking.add(p.pid);
   } else if (rockGroup) {
     for (const [pid, spot] of rockGroup.assign) {
       assign.set(pid, spot);
@@ -646,16 +719,33 @@ function planCover(world, st, casts, key, pre = false) {
     for (const q of cover)
       if (faceDistance(q, rockGroup.at) <= COUNCIL_REACH.rock + 1) forbidden.add(q.id);
   }
+  // A Resonance carrier rings on everyone near it: when the Wrath kills it
+  // takes a pillar of its own first (nobody else behind it), then the rest.
+  const ringing = (p) => WRATH_LETHAL && hasAura(p, AURA.resonance);
   // The nearest first: the far ones then take what is left in reach.
-  people.sort((a, b) => nearestCover(cover, a) - nearestCover(cover, b));
+  people.sort(
+    (a, b) =>
+      (ringing(b) ? 1 : 0) - (ringing(a) ? 1 : 0) ||
+      nearestCover(cover, a) - nearestCover(cover, b),
+  );
+  const alone = new Set();
+  // Where the ringing wait out the blast (their spots, or where they stand
+  // when no spot was found): nobody else hides within the ring's reach.
+  const rings = [];
   for (const p of people) {
     if (assign.has(p.pid) || soaking.has(p.pid)) continue;
-    const minFace = HEROIC_PLUS ? COUNCIL_REACH.pulse + 0.5 : 1.2;
+    // Heroic: a stride past the pulse ring the walk keeps clear of (its
+    // hazard reaches the face plus 3.6), or the bot stops short in the open.
+    const baseFace = HEROIC_PLUS ? COUNCIL_REACH.pulse + 1.0 : 1.2;
     let best = null;
     let bestCost = Number.POSITIVE_INFINITY;
     for (const pl of cover) {
-      if (forbidden.has(pl.id)) continue;
+      if (forbidden.has(pl.id) || alone.has(pl.id)) continue;
       if ((used.get(pl.id) ?? 0) >= SHELTER) continue;
+      if (ringing(p) && (used.get(pl.id) ?? 0) > 0) continue;
+      // A pillar still to rise throws whoever stands on its spot: wait just
+      // outside the throw.
+      const minFace = pl.rising ? Math.max(baseFace, COUNCIL_REACH.riseKnock + 3 - pl.r) : baseFace;
       for (const raw of coverSpots(pl, cover, sources, minFace)) {
         // The server counts a player against the FIRST pillar on the line
         // from the caster (council_wrath.ts landWrath), not the one he
@@ -665,6 +755,8 @@ function planCover(world, st, casts, key, pre = false) {
         if (forbidden.has(first.id) || (used.get(first.id) ?? 0) >= SHELTER) continue;
         const spot = first === pl ? raw : { ...raw, pillar: first };
         if (!onFloor(spot, world.floor, 5)) continue;
+        if (!ringing(p) && rings.some((q) => hypot(q, spot) < COUNCIL_REACH.resonance + 1))
+          continue;
         if (world.rubble.some((q) => hypot(q, spot) < q.r)) continue;
         if (world.riseSpots.some((q) => hypot(q, spot) < q.r)) continue;
         if (inLane(world, st, spot)) continue;
@@ -684,7 +776,9 @@ function planCover(world, st, casts, key, pre = false) {
     if (best) {
       assign.set(p.pid, best);
       used.set(best.pillar.id, (used.get(best.pillar.id) ?? 0) + 1);
+      if (ringing(p)) alone.add(best.pillar.id);
     }
+    if (ringing(p)) rings.push(best ?? { x: p.x, z: p.z });
   }
   const summary =
     [...used.entries()].map(([id, n]) => `#${id} x${n}`).join(', ') || 'no reachable cover';
@@ -696,7 +790,7 @@ function planCover(world, st, casts, key, pre = false) {
   else if (pre && !st.lastCoverLine?.startsWith('pre'))
     log(`  moving to cover early (the bar is due): ${line}`);
   st.lastCoverLine = pre ? `pre ${line}` : line;
-  return { key, pillarsKey: pillarsKey(world), assign, summary, sources, soaking };
+  return { key, pillarsKey: pillarsKey(world, st), assign, summary, sources, soaking };
 }
 
 function nearestCover(cover, p) {
@@ -1143,7 +1237,14 @@ function keeperDuty(world, st, b, me) {
 
 function duty(world, st, b, me) {
   init(st);
-  const kd = keeperDuty(world, st, b, me) ?? swapperDuty(world, st, b, me);
+  // Heroic's Wrath kills: through its bar a swap tank or the Singer's keeper
+  // without the health to take it in the open hides like everyone else.
+  const lethalBar =
+    WRATH_LETHAL &&
+    !!st.activeCover?.assign.get(b.pid) &&
+    coverCasts(world).length > 0 &&
+    me.hp <= WRATH_HIT * 1.2;
+  const kd = lethalBar ? null : (keeperDuty(world, st, b, me) ?? swapperDuty(world, st, b, me));
   if (kd) {
     // The keeper still dodges the Rush's lane.
     const lane = laneNow(world, st);
@@ -1159,11 +1260,12 @@ function duty(world, st, b, me) {
   const singerTank =
     (b.tankTarget === 'singer' || keeper(world) === b) &&
     alive(world.mobs.guardian) &&
-    alive(world.mobs.singer);
+    alive(world.mobs.singer) &&
+    me.hp > WRATH_HIT * 1.2;
   // A Resonance carrier rings on everyone near it every second (heroic lets
   // it overlap the Wrath): with health to spare it takes the Wrath in the
   // open, away from the crowded shadows, rather than ring through them.
-  const ringing = hasAura(me, AURA.resonance) && me.hp / Math.max(1, me.mhp) > 0.6;
+  const ringing = !WRATH_LETHAL && hasAura(me, AURA.resonance) && me.hp / Math.max(1, me.mhp) > 0.6;
   if (
     coverSpot &&
     !singerTank &&

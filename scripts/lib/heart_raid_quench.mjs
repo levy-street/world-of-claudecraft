@@ -43,11 +43,13 @@ import {
 const RULES = QUENCH_DIFFICULTY[DIFF];
 const T = QUENCH_TUNING;
 const LINE_HALF = 1.8 + 1.0;
-/** The huddles: who stands with whom (the tank's group by the guardian). */
+/** The huddles: who stands with whom (the tank's group by the guardian).
+ *  The ranged and the healers make one huddle of six: a huddle of three
+ *  goes cold for all three the moment one steps out for a slash or a
+ *  splash, one of six still warms everyone left. */
 const GROUPS = [
   ['mt', 'ot', 'rogue', 'arms'],
-  ['mage', 'hunter', 'lock'],
-  ['h1', 'h2', 'ele'],
+  ['mage', 'hunter', 'lock', 'h1', 'h2', 'ele'],
 ];
 /** How long a huddle holds one spot before it shifts (the ice strains 8 s). */
 const SHIFT_EVERY = 7000;
@@ -180,16 +182,20 @@ export const quench = {
       const g = world.mobs.guardian;
       const t = mt?.self && !mt.self.dead ? mt.self : null;
       if (!t || !alive(g)) return null;
-      // Beside the guardian, 50 to 65 degrees off the tank's line: within the
-      // tank's huddle reach yet out of the breath's 70 degree cone.
+      // Beside the guardian on ONE side, 41 to 57 degrees off the tank's
+      // line (out of the breath's 70 degree cone) and a stride nearer the
+      // guardian than the tank: the main tank keeps two of them within the
+      // warmth's 6 yd and each of them two others (on both sides, the main
+      // tank's neighbours stood 6 to 7 yd off and he froze).
       const r = Math.max(4, hypot(g, t));
       const f = Math.atan2(t.x - g.x, t.z - g.z);
-      const off = { ot: 1.15, rogue: 0.9, arms: -0.9 }[b.spec.key] ?? 1;
-      return add(g, { x: Math.sin(f + off), z: Math.cos(f + off) }, r);
+      const off = { ot: 0.72, rogue: 0.86, arms: 1.0 }[b.spec.key] ?? 0.86;
+      return add(g, { x: Math.sin(f + off), z: Math.cos(f + off) }, Math.max(3.5, r - 2));
     }
     const c = huddleSpot(world, st, gi);
     const i = GROUPS[gi].indexOf(b.spec.key);
-    return add(c, { x: Math.sin(i * 2.1), z: Math.cos(i * 2.1) }, 1.6);
+    const a = (i / GROUPS[gi].length) * Math.PI * 2;
+    return add(c, { x: Math.sin(a), z: Math.cos(a) }, 2.2);
   },
 
   statusLine(world) {
@@ -249,7 +255,7 @@ function huddleSpot(world, st, gi) {
   if (h && now - h.since < SHIFT_EVERY && ok(h.at)) return h.at;
   const g = world.mobs.guardian;
   const pivot = alive(g) && gi > 0 ? g : world.center;
-  const side = gi === 1 ? 1 : gi === 2 ? -1 : 0;
+  const side = 0;
   const base =
     gi === 0 ? world.tankSpot : add(add(pivot, world.home, 13), perp(world.home), side * 8);
   // Each shift jumps across the base (the strain's middle must leave 4 yd).

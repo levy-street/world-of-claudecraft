@@ -22,6 +22,7 @@
 //   GEAR        kit (the fresh level-20 preset, default) | bis (top-parse)
 //   MAX_SECONDS the fight's time limit (default 720)
 //   LOG_DIR     where the fight logs go (default tmp/heart_raid)
+//   POOL        every boss pool times this (0.65: the human-equivalent check)
 //   IGNORE      the boss's key mechanic the raid ignores on purpose (see each module)
 //   KICK_MISS   chance an assigned interrupter fumbles a kick (default 0.15)
 //   SEED        the script's own rolls (default: the clock)
