@@ -19,15 +19,19 @@ export const SMITH_HEART_PLACEHOLDER_LOOKS: Record<string, string> = {
   heart_ring_warder: 'skel_golem',
   // Final: a wind-scoured stone warder trailing storm-blue gusts.
   heart_breath_warder: 'mob_elemental',
-  // Final: a hovering storm caller of slate and lightning.
-  heart_breath_caller: 'mob_hoard_storm_caller',
+  // Final: a hovering storm caller of slate and lightning. (The hooded stone
+  // cantor, tinted storm-blue: the Buried Hoard's storm caller is a Rift-lane
+  // body, and borrowing it pulled it into the iOS entry stream.)
+  heart_breath_caller: 'mob_reedbound_acolyte',
   // The Islands of the Wind's adds (encounters/smith_heart/breath_isles.ts).
   // Final: a storm-blue stone warden of a floating isle.
   heart_gale_sentinel: 'mob_elemental',
   // Final: a hovering wind caller who mends the guardian's shield.
-  heart_gale_mender: 'mob_hoard_storm_caller',
-  // Final: a rime-crusted warder of blue ice and frost-cracked stone.
-  heart_quench_warder: 'mob_hoard_rime_elemental',
+  heart_gale_mender: 'mob_reedbound_acolyte',
+  // Final: a rime-crusted warder of blue ice and frost-cracked stone. (The
+  // stone goleling tinted ice-blue, like the other veins' warders; never a
+  // Rift-lane hoard body, see the Breath caller.)
+  heart_quench_warder: 'mob_elemental',
   // Final: a meltwater caller, ice-pale water held in a stone frame.
   heart_quench_caller: 'mob_water_elemental',
   // Final: a smith-fire warder of dark iron with a white-gold core. (The
@@ -83,7 +87,7 @@ export const SMITH_HEART_PLACEHOLDER_LOOKS: Record<string, string> = {
   // and drawn two and a half times a player's size; their element's light is
   // smith_heart_fx/final_phase_fx.ts's. Final: their own models.
   heart_final_splinter_heat: 'mob_elemental',
-  heart_final_splinter_quench: 'mob_hoard_rime_elemental',
-  heart_final_splinter_breath: 'mob_hoard_storm_caller',
+  heart_final_splinter_quench: 'mob_water_elemental',
+  heart_final_splinter_breath: 'mob_reedbound_acolyte',
   heart_final_splinter_hammer: 'skel_golem',
 };

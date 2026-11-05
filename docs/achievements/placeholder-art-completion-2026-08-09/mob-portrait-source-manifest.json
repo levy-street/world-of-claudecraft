@@ -5094,34 +5094,34 @@
       "id": "heart_breath_caller",
       "family": "elemental",
       "finderEncounter": false,
-      "visualKey": "mob_hoard_storm_caller",
+      "visualKey": "mob_reedbound_acolyte",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/hoard_storm_caller.glb",
-          "path": "public/models/creatures/hoard_storm_caller.glb",
-          "bytes": 2422196,
-          "sha256": "e85ac27e27bd7f5369dd3cebe1cabcd88fb292a414d5189c696d60b249c1d0b3"
+          "url": "models/creatures/stone_cantor.glb",
+          "path": "public/models/creatures/stone_cantor.glb",
+          "bytes": 289676,
+          "sha256": "a207f7ae80be94ff0762b17ccc119b42e24a855d4ca9fcd796f6779fa3c182b2"
         },
         "idle": "Idle",
-        "height": 4.4,
+        "height": 2.6,
         "yaw": null,
         "hover": null,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": null
+        "tintStrength": 0.2
       },
       "tint": {
-        "source": "none",
-        "authored": null,
-        "resolved": null,
-        "strength": null
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#5ab8e8",
+        "strength": 0.2
       },
-      "sourceFingerprint": "8cf942b5274c0cad5fe8a4797291ba5b32de7112c6ef36b4b1b63b4cd413a716",
+      "sourceFingerprint": "c2693941544d1f3d36ccc9a20ebd682be9de4a463280017bd249e201d22dffe8",
       "output": {
         "path": "public/ui/mobs/heart_breath_caller.webp",
-        "bytes": 2686,
-        "sha256": "6d9caac5b074e2a897389161e699872f462f9092e25368278e74c44e70da3a57"
+        "bytes": 2392,
+        "sha256": "d315276bc37a2f988f782bee6bf4faea1aa303d3777c42db82914332ef5a3828"
       }
     },
     {
@@ -5196,34 +5196,34 @@
       "id": "heart_final_splinter_breath",
       "family": "elemental",
       "finderEncounter": false,
-      "visualKey": "mob_hoard_storm_caller",
+      "visualKey": "mob_reedbound_acolyte",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/hoard_storm_caller.glb",
-          "path": "public/models/creatures/hoard_storm_caller.glb",
-          "bytes": 2422196,
-          "sha256": "e85ac27e27bd7f5369dd3cebe1cabcd88fb292a414d5189c696d60b249c1d0b3"
+          "url": "models/creatures/stone_cantor.glb",
+          "path": "public/models/creatures/stone_cantor.glb",
+          "bytes": 289676,
+          "sha256": "a207f7ae80be94ff0762b17ccc119b42e24a855d4ca9fcd796f6779fa3c182b2"
         },
         "idle": "Idle",
-        "height": 4.4,
+        "height": 2.6,
         "yaw": null,
         "hover": null,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": null
+        "tintStrength": 0.2
       },
       "tint": {
-        "source": "none",
-        "authored": null,
-        "resolved": null,
-        "strength": null
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#6ac8f0",
+        "strength": 0.2
       },
-      "sourceFingerprint": "8cf942b5274c0cad5fe8a4797291ba5b32de7112c6ef36b4b1b63b4cd413a716",
+      "sourceFingerprint": "cbc2b04bf68e667856ccfb9155dbf61addccca6284180112e14132bbc47c8c14",
       "output": {
         "path": "public/ui/mobs/heart_final_splinter_breath.webp",
-        "bytes": 2686,
-        "sha256": "6d9caac5b074e2a897389161e699872f462f9092e25368278e74c44e70da3a57"
+        "bytes": 2382,
+        "sha256": "3dc12494fbf6b00c6f0a528a85f46984b49ecea0cab35cb5e93ee753e8e8a3a6"
       }
     },
     {
@@ -5303,52 +5303,18 @@
       "id": "heart_final_splinter_quench",
       "family": "elemental",
       "finderEncounter": false,
-      "visualKey": "mob_hoard_rime_elemental",
+      "visualKey": "mob_water_elemental",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/hoard_rime_elemental.glb",
-          "path": "public/models/creatures/hoard_rime_elemental.glb",
-          "bytes": 794868,
-          "sha256": "d358238863159c91c58b8e81086b1954c8ad6f4d0f3931358acb825599259c5e"
+          "url": "models/creatures/water_elemental.glb",
+          "path": "public/models/creatures/water_elemental.glb",
+          "bytes": 255292,
+          "sha256": "8b02b114d81492d66d4f13791fc9a8945e2bbe48bb2f027afa332ebef6aac9b2"
         },
         "idle": "Idle",
-        "height": 3.9,
-        "yaw": -1.5707963267948966,
-        "hover": null,
-        "show": null,
-        "attach": [],
-        "weaponFix": null,
-        "tintStrength": 0.35
-      },
-      "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#9ad8ff",
-        "strength": 0.35
-      },
-      "sourceFingerprint": "2a2ae453a8bc86512ae04481d0e7ccd92f5d6df01d9972a69d9eaf9790158cbb",
-      "output": {
-        "path": "public/ui/mobs/heart_final_splinter_quench.webp",
-        "bytes": 2178,
-        "sha256": "9b6761b57c882f83114296074267f5559cab3fde7248303eb50cbac2ea9895bc"
-      }
-    },
-    {
-      "id": "heart_gale_mender",
-      "family": "elemental",
-      "finderEncounter": false,
-      "visualKey": "mob_hoard_storm_caller",
-      "renderSpec": {
-        "model": {
-          "url": "models/creatures/hoard_storm_caller.glb",
-          "path": "public/models/creatures/hoard_storm_caller.glb",
-          "bytes": 2422196,
-          "sha256": "e85ac27e27bd7f5369dd3cebe1cabcd88fb292a414d5189c696d60b249c1d0b3"
-        },
-        "idle": "Idle",
-        "height": 4.4,
+        "height": 2.65,
         "yaw": null,
-        "hover": null,
+        "hover": 0.12,
         "show": null,
         "attach": [],
         "weaponFix": null,
@@ -5360,11 +5326,45 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "8cf942b5274c0cad5fe8a4797291ba5b32de7112c6ef36b4b1b63b4cd413a716",
+      "sourceFingerprint": "2fb1fcf255a7121dfc23071eea85ef7178a54bbd0e7cae167e02284fafa873ab",
+      "output": {
+        "path": "public/ui/mobs/heart_final_splinter_quench.webp",
+        "bytes": 2348,
+        "sha256": "e35ea44865cce9303fbd6d4f4573eacfc9dc4cd7821f95bf7273892987c3b24a"
+      }
+    },
+    {
+      "id": "heart_gale_mender",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "mob_reedbound_acolyte",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/stone_cantor.glb",
+          "path": "public/models/creatures/stone_cantor.glb",
+          "bytes": 289676,
+          "sha256": "a207f7ae80be94ff0762b17ccc119b42e24a855d4ca9fcd796f6779fa3c182b2"
+        },
+        "idle": "Idle",
+        "height": 2.6,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.2
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#8fe0ff",
+        "strength": 0.2
+      },
+      "sourceFingerprint": "de287c2910ee185e317277caf6b9f028cb2a6aa10a21a8e629750520df4e465b",
       "output": {
         "path": "public/ui/mobs/heart_gale_mender.webp",
-        "bytes": 2686,
-        "sha256": "6d9caac5b074e2a897389161e699872f462f9092e25368278e74c44e70da3a57"
+        "bytes": 2396,
+        "sha256": "07a59feb17aa54bd95ae5a13fd6b28fd7b272962fa1c0d5028ce320bc798d20c"
       }
     },
     {
@@ -5818,34 +5818,34 @@
       "id": "heart_quench_warder",
       "family": "elemental",
       "finderEncounter": false,
-      "visualKey": "mob_hoard_rime_elemental",
+      "visualKey": "mob_elemental",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/hoard_rime_elemental.glb",
-          "path": "public/models/creatures/hoard_rime_elemental.glb",
-          "bytes": 794868,
-          "sha256": "d358238863159c91c58b8e81086b1954c8ad6f4d0f3931358acb825599259c5e"
+          "url": "models/creatures/golelingevolved.glb",
+          "path": "public/models/creatures/golelingevolved.glb",
+          "bytes": 85588,
+          "sha256": "156f4c2dcf93c6e52a738d8a93e09d1988f933fe4f2d1f9d30411b5eae7f2b94"
         },
-        "idle": "Idle",
-        "height": 3.9,
-        "yaw": -1.5707963267948966,
-        "hover": null,
+        "idle": "Flying_Idle",
+        "height": 2.2,
+        "yaw": null,
+        "hover": 0.3,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.35
+        "tintStrength": 0.4
       },
       "tint": {
         "source": "entity",
         "authored": "entity",
         "resolved": "#6aa8c8",
-        "strength": 0.35
+        "strength": 0.4
       },
-      "sourceFingerprint": "8880cab1449f1c2f6094805cce3d08b64afef1e9970278e8fd2ac5c493b96755",
+      "sourceFingerprint": "e4c15a7c2f26485b4958ac039968efda2681b17bf4d0a7704a3a77392023917d",
       "output": {
         "path": "public/ui/mobs/heart_quench_warder.webp",
-        "bytes": 2148,
-        "sha256": "770ba2402fe48f2b95e32cdd927df922656e7ec0fb03dfaf51eaa18cf24947e5"
+        "bytes": 2196,
+        "sha256": "c4cabd4adc9e7d908f81488d7864adb6e105f2e1cc3cf9ec0765fcb22433c902"
       }
     },
     {
