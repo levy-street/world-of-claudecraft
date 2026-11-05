@@ -8306,6 +8306,40 @@
     opacity: 0.5;
     cursor: default;
   }
+  /* The shop's goods tabs and search (vendor_goods_filter_core.ts): the bag
+     window's own chips and search field, stacked above the goods grid. */
+  .vendor-filter-bar {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0 0 8px;
+  }
+  .vendor-filter-bar .vendor-search {
+    width: 100%;
+    box-sizing: border-box;
+  }
+  /* A slot heading inside the goods grid (the bag caption's look). Pixel line
+     height and minimum so the row can never collapse to its border. */
+  .vendor-goods-caption {
+    grid-column: 1 / -1;
+    box-sizing: border-box;
+    min-height: 18px;
+    margin: 4px 0 0;
+    padding: 2px 4px 1px;
+    font-family: var(--ui-font);
+    font-size: 10px;
+    font-weight: 600;
+    line-height: 13px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text-light);
+    border-bottom: 1px solid color-mix(in srgb, var(--color-text-light) 35%, transparent);
+    pointer-events: none;
+    user-select: none;
+  }
+  .vendor-goods-grid .vendor-goods-none {
+    grid-column: 1 / -1;
+  }
   .vendor-section-title {
     margin-top: 8px;
     padding-top: 7px;

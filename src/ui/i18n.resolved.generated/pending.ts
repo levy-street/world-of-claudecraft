@@ -30,7 +30,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.paperdoll.pickerEmpty",
     "hudChrome.paperdoll.pickerHint",
     "hudChrome.paperdoll.pickerItemLevel",
-    "hudChrome.paperdoll.pickerTitle"
+    "hudChrome.paperdoll.pickerTitle",
+    "itemUi.vendor.filterGroupAria",
+    "itemUi.vendor.noGoodsMatch",
+    "itemUi.vendor.searchAria"
   ],
   "es_ES": [
     "hudChrome.bags.filterFavourite",
@@ -53,7 +56,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.paperdoll.pickerEmpty",
     "hudChrome.paperdoll.pickerHint",
     "hudChrome.paperdoll.pickerItemLevel",
-    "hudChrome.paperdoll.pickerTitle"
+    "hudChrome.paperdoll.pickerTitle",
+    "itemUi.vendor.filterGroupAria",
+    "itemUi.vendor.noGoodsMatch",
+    "itemUi.vendor.searchAria"
   ],
   "fr_FR": [
     "hudChrome.bags.filterFavourite",
@@ -76,7 +82,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.paperdoll.pickerEmpty",
     "hudChrome.paperdoll.pickerHint",
     "hudChrome.paperdoll.pickerItemLevel",
-    "hudChrome.paperdoll.pickerTitle"
+    "hudChrome.paperdoll.pickerTitle",
+    "itemUi.vendor.filterGroupAria",
+    "itemUi.vendor.noGoodsMatch",
+    "itemUi.vendor.searchAria"
   ],
   "fr_CA": [
     "hudChrome.bags.filterFavourite",
@@ -99,7 +108,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.paperdoll.pickerEmpty",
     "hudChrome.paperdoll.pickerHint",
     "hudChrome.paperdoll.pickerItemLevel",
-    "hudChrome.paperdoll.pickerTitle"
+    "hudChrome.paperdoll.pickerTitle",
+    "itemUi.vendor.filterGroupAria",
+    "itemUi.vendor.noGoodsMatch",
+    "itemUi.vendor.searchAria"
   ],
   "en_CA": [],
   "it_IT": [
@@ -123,7 +135,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.paperdoll.pickerEmpty",
     "hudChrome.paperdoll.pickerHint",
     "hudChrome.paperdoll.pickerItemLevel",
-    "hudChrome.paperdoll.pickerTitle"
+    "hudChrome.paperdoll.pickerTitle",
+    "itemUi.vendor.filterGroupAria",
+    "itemUi.vendor.noGoodsMatch",
+    "itemUi.vendor.searchAria"
   ],
   "de_DE": [
     "hudChrome.bags.filterFavourite",
@@ -146,7 +161,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.paperdoll.pickerEmpty",
     "hudChrome.paperdoll.pickerHint",
     "hudChrome.paperdoll.pickerItemLevel",
-    "hudChrome.paperdoll.pickerTitle"
+    "hudChrome.paperdoll.pickerTitle",
+    "itemUi.vendor.filterGroupAria",
+    "itemUi.vendor.noGoodsMatch",
+    "itemUi.vendor.searchAria"
   ],
   "zh_CN": [
     "hudChrome.paperdoll.pickerDeltaDown",
@@ -189,7 +207,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.paperdoll.pickerEmpty",
     "hudChrome.paperdoll.pickerHint",
     "hudChrome.paperdoll.pickerItemLevel",
-    "hudChrome.paperdoll.pickerTitle"
+    "hudChrome.paperdoll.pickerTitle",
+    "itemUi.vendor.filterGroupAria",
+    "itemUi.vendor.noGoodsMatch",
+    "itemUi.vendor.searchAria"
   ],
   "ru_RU": [
     "hudChrome.paperdoll.pickerDeltaDown",
@@ -217,7 +238,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.paperdoll.pickerEmpty",
     "hudChrome.paperdoll.pickerHint",
     "hudChrome.paperdoll.pickerItemLevel",
-    "hudChrome.paperdoll.pickerTitle"
+    "hudChrome.paperdoll.pickerTitle",
+    "itemUi.vendor.filterGroupAria",
+    "itemUi.vendor.noGoodsMatch",
+    "itemUi.vendor.searchAria"
   ],
   "nl_NL": [
     "hudChrome.bags.filterFavourite",
@@ -240,7 +264,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.paperdoll.pickerEmpty",
     "hudChrome.paperdoll.pickerHint",
     "hudChrome.paperdoll.pickerItemLevel",
-    "hudChrome.paperdoll.pickerTitle"
+    "hudChrome.paperdoll.pickerTitle",
+    "itemUi.vendor.filterGroupAria",
+    "itemUi.vendor.noGoodsMatch",
+    "itemUi.vendor.searchAria"
   ],
   "pl_PL": [
     "hudChrome.bags.filterFavourite",
@@ -263,7 +290,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.paperdoll.pickerEmpty",
     "hudChrome.paperdoll.pickerHint",
     "hudChrome.paperdoll.pickerItemLevel",
-    "hudChrome.paperdoll.pickerTitle"
+    "hudChrome.paperdoll.pickerTitle",
+    "itemUi.vendor.filterGroupAria",
+    "itemUi.vendor.noGoodsMatch",
+    "itemUi.vendor.searchAria"
   ],
   "id_ID": [
     "hudChrome.bags.filterFavourite",
@@ -286,7 +316,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.paperdoll.pickerEmpty",
     "hudChrome.paperdoll.pickerHint",
     "hudChrome.paperdoll.pickerItemLevel",
-    "hudChrome.paperdoll.pickerTitle"
+    "hudChrome.paperdoll.pickerTitle",
+    "itemUi.vendor.filterGroupAria",
+    "itemUi.vendor.noGoodsMatch",
+    "itemUi.vendor.searchAria"
   ],
   "tr_TR": [
     "hudChrome.bags.filterFavourite",
@@ -309,7 +342,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.paperdoll.pickerEmpty",
     "hudChrome.paperdoll.pickerHint",
     "hudChrome.paperdoll.pickerItemLevel",
-    "hudChrome.paperdoll.pickerTitle"
+    "hudChrome.paperdoll.pickerTitle",
+    "itemUi.vendor.filterGroupAria",
+    "itemUi.vendor.noGoodsMatch",
+    "itemUi.vendor.searchAria"
   ],
   "sv_SE": [
     "hudChrome.bags.filterFavourite",
@@ -332,7 +368,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.paperdoll.pickerEmpty",
     "hudChrome.paperdoll.pickerHint",
     "hudChrome.paperdoll.pickerItemLevel",
-    "hudChrome.paperdoll.pickerTitle"
+    "hudChrome.paperdoll.pickerTitle",
+    "itemUi.vendor.filterGroupAria",
+    "itemUi.vendor.noGoodsMatch",
+    "itemUi.vendor.searchAria"
   ],
   "vi_VN": [
     "hudChrome.bags.filterFavourite",
@@ -355,7 +394,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.paperdoll.pickerEmpty",
     "hudChrome.paperdoll.pickerHint",
     "hudChrome.paperdoll.pickerItemLevel",
-    "hudChrome.paperdoll.pickerTitle"
+    "hudChrome.paperdoll.pickerTitle",
+    "itemUi.vendor.filterGroupAria",
+    "itemUi.vendor.noGoodsMatch",
+    "itemUi.vendor.searchAria"
   ],
   "da_DK": [
     "hudChrome.bags.filterFavourite",
@@ -378,6 +420,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.paperdoll.pickerEmpty",
     "hudChrome.paperdoll.pickerHint",
     "hudChrome.paperdoll.pickerItemLevel",
-    "hudChrome.paperdoll.pickerTitle"
+    "hudChrome.paperdoll.pickerTitle",
+    "itemUi.vendor.filterGroupAria",
+    "itemUi.vendor.noGoodsMatch",
+    "itemUi.vendor.searchAria"
   ]
 };
