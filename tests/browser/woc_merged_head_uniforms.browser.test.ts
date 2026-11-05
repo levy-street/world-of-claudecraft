@@ -338,7 +338,8 @@ describe.each([
     }
     // the one sided define and the struck layer cost what they say: nothing, and the response's own
     expect(plain[0].rows).toBe(plain[1].rows);
-    expect(hit[0].rows - plain[0].rows).toBe(7);
+    // (seven, plus the held frost glaze's one vec4 the Smith's Heart's Quench added)
+    expect(hit[0].rows - plain[0].rows).toBe(8);
     for (const { visual } of bodies) {
       scene.remove(visual.root);
       visual.dispose();
