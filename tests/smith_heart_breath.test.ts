@@ -737,9 +737,6 @@ describe('Guardian of the Breath: heroic', () => {
   it('mythic is heroic whole plus the Knotted Gale, behind its own dev switch', () => {
     expect(BREATH_DIFFICULTY.mythic).toEqual({
       ...BREATH_DIFFICULTY.heroic,
-      // Mythic keeps the template pool (its numbers were left as they were
-      // when Heroic's pool was calibrated, 2026-11-05).
-      healthMult: 1,
       stormHeart: true,
       windwornSeconds: 150,
     });

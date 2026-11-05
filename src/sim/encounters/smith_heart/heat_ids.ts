@@ -220,7 +220,7 @@ export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRule
   },
   heroic: {
     damageMult: 1.25,
-    healthMult: 1.2,
+    healthMult: 1.45,
     overflowAdds: true,
     seedHatch: true,
     bolts: 3,
@@ -230,7 +230,7 @@ export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRule
   // Heroic whole, plus the Wheel of the Hearth.
   mythic: {
     damageMult: 1.25,
-    healthMult: 1,
+    healthMult: 1.45,
     overflowAdds: true,
     seedHatch: true,
     bolts: 3,

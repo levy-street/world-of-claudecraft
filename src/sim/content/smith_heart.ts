@@ -319,7 +319,7 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
   // Rush). Hammerfall, its
   // frontal arc, stays: it reads well and keeps the raid off the tank's side.
   heart_hammer_guardian: {
-    ...boss('heart_hammer_guardian', 'Guardian of the Hammer', 27200, 0x8a6430, 3.2),
+    ...boss('heart_hammer_guardian', 'Guardian of the Hammer', 42500, 0x8a6430, 3.2),
     ccImmune: true,
     slowImmune: true,
     arcCleave: { every: 3, arcDeg: 110, range: 9, mult: 0.7, name: 'Hammerfall' },
@@ -336,7 +336,7 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
   // pressure is her bars. She carries the heir's Wrath declaration (the
   // Guardian fallen, she takes the Wrath).
   heart_seam_singer: {
-    ...boss('heart_seam_singer', 'The Seam Singer', 23400, 0xd8a24a, 2.0),
+    ...boss('heart_seam_singer', 'The Seam Singer', 36500, 0xd8a24a, 2.0),
     ccImmune: true,
     slowImmune: true,
     dmgBase: 24,
@@ -361,7 +361,7 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
   // record stays the look's numbers: the whole Cornice, the throw). Storm
   // Lance stays the trash kit's own line, on its own clock.
   heart_breath_guardian: {
-    ...boss('heart_breath_guardian', 'Guardian of the Breath', 38000, 0x5ab8e8, 3.4),
+    ...boss('heart_breath_guardian', 'Guardian of the Breath', 74000, 0x5ab8e8, 3.4),
     ccImmune: true,
     slowImmune: true,
     trashKit: {
@@ -403,7 +403,7 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
   // Breath is encounter-driven (the fight starts and lands it on its own
   // clock; the record keeps the look's numbers).
   heart_quench_guardian: {
-    ...boss('heart_quench_guardian', 'Guardian of the Quench', 43000, 0x9ad8ff, 3),
+    ...boss('heart_quench_guardian', 'Guardian of the Quench', 62000, 0x9ad8ff, 3),
     ccImmune: true,
     slowImmune: true,
     arcCleave: {
@@ -442,7 +442,7 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
   // stacking burn on every landed swing (the stackPoison seam), so the tanks
   // swap; every other mechanic is the encounter's.
   heart_heat_guardian: {
-    ...boss('heart_heat_guardian', 'Guardian of the Heat', 43000, 0xffe6a0, 3),
+    ...boss('heart_heat_guardian', 'Guardian of the Heat', 64000, 0xffe6a0, 3),
     ccImmune: true,
     slowImmune: true,
     bodyRadius: HEARTH_WELL.r,
@@ -580,7 +580,7 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
     },
   },
   heart_masterless_strength: {
-    ...boss('heart_masterless_strength', 'The Masterless Strength', 70000, 0xd8c8a0, 3.6),
+    ...boss('heart_masterless_strength', 'The Masterless Strength', 84000, 0xd8c8a0, 3.6),
     ccImmune: true,
     slowImmune: true,
     arcCleave: { every: 3, arcDeg: 110, range: 9, mult: 0.7, name: 'Forge Fist' },
