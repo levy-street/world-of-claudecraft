@@ -530,6 +530,7 @@ import { esc } from './ui/esc';
 import { showFatalOverlay } from './ui/fatal_overlay_controller';
 import { FocusManager, type FocusTrapHandle } from './ui/focus_manager';
 import { syncBuildInfo, syncFooterLegalLinks } from './ui/footer_shell';
+import * as gameMenu from './ui/game_menu_hooks';
 import {
   attachGatherNodeHoverTooltip,
   gatherNodeToolGateFor,
@@ -1966,7 +1967,7 @@ async function startGame(
     onMenu: () => hud.toggleOptionsMenu(),
     onSocial: () => hud.toggleSocial(),
     onDiscord: () => openDiscordEntry(),
-    onDonate: () => window.open(DONATE_URL, '_blank', 'noopener,noreferrer'),
+    onDonate: gameMenu.openDonatePage,
     onWiki: () => hud.openWiki(),
     onEmotes: () => hud.toggleEmoteWheel(),
     onArena: () => hud.toggleArena(),
@@ -1997,11 +1998,8 @@ async function startGame(
     onCosmetics: () => hud.toggleCosmetics(),
     onPerfecting: () => hud.togglePerfecting(),
     onHarvestJournal: () => hud.toggleHarvestJournal(),
-    onNameplates: () => (renderer.showNameplates = !renderer.showNameplates),
-    onMusic: () => {
-      music.setEnabled(!music.enabled);
-      return music.enabled;
-    },
+    onNameplates: () => gameMenu.toggleNameplates(renderer),
+    onMusic: gameMenu.toggleMusic,
     onRecenterCamera: () => input.recenterCameraBehind(world.player.facing),
     onGroundAimMove: (x, y) => {
       if (!hud.isGroundAimActive()) return false;
@@ -2016,6 +2014,11 @@ async function startGame(
     },
   });
   mobileControls.start();
+  gameMenu.attachGameMenuHooks(
+    renderer,
+    mobileControls,
+    DISCORD_BUILD_ENABLED ? openDiscordEntry : null,
+  );
   const syncOverlayDiagnostics = (): void => {
     syncCharacterOpenDiagnostics();
     syncQuestDialogOpenDiagnostics();
@@ -7991,11 +7994,9 @@ function flashWalletError(message: string): void {
 // ── Discord login/onboarding ─────────────────────────────────────────────────
 // Discord UI is available on web and native unless explicitly disabled at build time.
 const DISCORD_BUILD_ENABLED = String(import.meta.env.VITE_DISCORD_DISABLED ?? '').trim() !== '1';
-// Community links for the mobile More tray. discordInviteUrl() itself now
-// falls back to DEFAULT_DISCORD_INVITE_URL (discord_status.ts) when the
-// server-fed value is not known yet (logged out, offline), so every caller
-// gets the fail-open behavior for free.
-const DONATE_URL = 'https://ko-fi.com/worldofclaudecraft';
+// discordInviteUrl() falls back to DEFAULT_DISCORD_INVITE_URL (discord_status.ts)
+// when the server-fed value is not known yet (logged out, offline), so every
+// caller gets the fail-open behavior for free. DONATE_URL: ui/game_menu_hooks.ts.
 
 // The OAuth flow itself (web popup, native handoff, and the in-game link-error
 // notice a failed relink now surfaces) lives in src/net/discord_oauth_flow.ts;

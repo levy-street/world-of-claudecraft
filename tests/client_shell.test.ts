@@ -1302,11 +1302,19 @@ describe('client HTML shell', () => {
       expect(entry, name).not.toContain('id="mm-discord"');
       expect(entry, name).not.toContain('id="mobile-discord"');
       expect(entry, name).not.toContain('id="mobile-donate"');
-      // The marketing donate-cta keeps its Ko-fi link on index; nothing in the
-      // game shell links it any more.
       expect(entry, name).not.toContain('https://github.com/sponsors/levy-street');
     }
-    expect(mainTs).toContain("const DONATE_URL = 'https://ko-fi.com/worldofclaudecraft';");
+    // The donate hop is shared by the Game Menu's Donate row, so it lives in
+    // src/ui/game_menu_hooks.ts (the marketing donate-cta keeps its Ko-fi link
+    // on index; nothing else in the game shell links it).
+    const gameMenuHooks = readFileSync(
+      new URL('../src/ui/game_menu_hooks.ts', import.meta.url),
+      'utf8',
+    );
+    expect(gameMenuHooks).toContain(
+      "export const DONATE_URL = 'https://ko-fi.com/worldofclaudecraft';",
+    );
+    expect(gameMenuHooks).toContain("window.open(DONATE_URL, '_blank', 'noopener,noreferrer');");
     expect(mainTs).toContain("window.open(discordInviteUrl(), '_blank', 'noopener,noreferrer');");
     // The hook is attached only where the build ships Discord, so the strip is
     // hidden (never a dead button) on a Discord-off build.
@@ -1758,8 +1766,15 @@ describe('client HTML shell', () => {
   });
 
   it('keeps the game menu free of duplicate and dev-only entries', () => {
-    const interfaceEntries = optionsViewTs.match(/labelKey: 'hud\.options\.interface'/g) ?? [];
-    expect(interfaceEntries).toHaveLength(1);
+    // The settings categories live in the Settings view's rail model now
+    // (issue #1653): exactly one Interface category there, none left on the
+    // Game Menu root.
+    const railTs = readFileSync(
+      new URL('../src/ui/options_settings_view.ts', import.meta.url),
+      'utf8',
+    );
+    expect(railTs.match(/'hud\.options\.interface'/g) ?? []).toHaveLength(1);
+    expect(optionsViewTs).not.toMatch(/labelKey: 'hud\.options\.interface'/);
     expect(optionsViewTs).not.toContain('Skin Select (dev)');
     expect(hudTs).not.toContain('Skin Select (dev)');
   });

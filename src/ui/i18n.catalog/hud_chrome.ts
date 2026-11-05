@@ -2871,6 +2871,14 @@ export const hudChromeStrings = {
     // The Game Menu row (and its sub-view title) that holds the three on-screen
     // overlay panels: Auras, Cooldown Manager and Performance Overlay.
     overlays: 'Overlays',
+    // The Game Menu's Settings row, the full-screen Settings view's rail
+    // heading, and the rail's accessible name (issue #1653).
+    settings: 'Settings',
+    settingsCategories: 'Settings categories',
+    // The Game Menu's help row (the confirm-first wiki hop).
+    helpWiki: 'Help and Wiki',
+    // The Game Menu's world-nameplates toggle (moved off the mobile More tray).
+    nameplates: 'Nameplates',
     // Adaptive browser-effects tier control (Graphics panel). Auto detects the
     // browser engine/version + device; the rest pin the CSS-effects tier.
     browserEffects: 'Browser Effects',

@@ -383,6 +383,25 @@ export class MobileControls {
     this.setActive(useTouchInterface() || isNativeAppShell());
   }
 
+  /** Whether the touch interface is up (the Game Menu's Haptics row gates on it). */
+  get touchActive(): boolean {
+    return this.active;
+  }
+
+  get hapticsEnabled(): boolean {
+    return this.hapticsOn;
+  }
+
+  /** Flip and persist the haptics preference, confirming with a pulse only when
+   *  enabling (so the player feels what they turned on). Returns the new state.
+   *  The one toggle both the tray button and the Game Menu row run. */
+  toggleHaptics(): boolean {
+    this.hapticsOn = !this.hapticsOn;
+    saveHapticsEnabled(this.hapticsOn);
+    if (this.hapticsOn) triggerHaptic(HAPTIC_CONFIRM, true);
+    return this.hapticsOn;
+  }
+
   start(): void {
     if (
       !this.root ||
@@ -705,11 +724,8 @@ export class MobileControls {
     bindTouchTap(button, (e) => {
       if (!this.active) return;
       e.preventDefault();
-      this.hapticsOn = !this.hapticsOn;
-      saveHapticsEnabled(this.hapticsOn);
+      this.toggleHaptics();
       this.syncHapticsButton(button);
-      // confirm with a pulse only when enabling, so the player feels what they turned on
-      if (this.hapticsOn) triggerHaptic(HAPTIC_CONFIRM, true);
     });
   }
 

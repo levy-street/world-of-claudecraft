@@ -9517,6 +9517,7 @@
   body.native-app .community-link.donate,
   body.native-app .social-link.donate,
   body.native-app #mobile-donate,
+  body.native-app #options-menu [data-menu-action="donate"],
   body.native-app #nav-btn-download,
   body.native-app:not(.seeker-wallet-enabled) .cs-wallet,
   body.native-app:not(.seeker-wallet-enabled) .cs-wallet-hidden-note,

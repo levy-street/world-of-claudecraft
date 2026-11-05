@@ -2,6 +2,10 @@ import { getUiScale } from './ui_scale';
 import { rememberWindowPos } from './window_reflow';
 
 type Centre = { x: number; y: number };
+// The full-screen Settings view (options_settings_rail_controller.ts) fills the
+// HUD from its own stylesheet rule, so it is never measured as a requested
+// centre nor re-centred: the floating Game Menu keeps the spot it had.
+const FULLSCREEN = 'window-fullscreen';
 /** Keep the requested centre across navigation, clamping and reopening, and retain tab scroll. */
 export class OptionsWindowLayout {
   private view: string | null = null;
@@ -11,12 +15,14 @@ export class OptionsWindowLayout {
   begin(el: HTMLElement, view: string, tab = '', frame: string | null = null): Centre | null {
     const key = `${view}:${view === 'interface' ? tab : ''}:${frame ?? ''}`;
     const visible = el.style.display !== 'none';
+    const fullscreen = el.classList.contains(FULLSCREEN);
     if (visible) {
       if (this.view) this.scroll.set(this.view, el.querySelector('.ui-win-body')?.scrollTop ?? 0);
       const box = el.getBoundingClientRect();
       // An external move (drag or viewport reflow) establishes a new requested centre.
       // Our own clamped placement must not accumulate drift on each Back/reopen.
       if (
+        !fullscreen &&
         box.width &&
         box.height &&
         (!this.placed ||
@@ -44,6 +50,7 @@ export class OptionsWindowLayout {
     const doc = el.ownerDocument;
     const viewport = doc.defaultView;
     if (!viewport || doc.body.classList.contains('mobile-touch')) return;
+    if (el.classList.contains(FULLSCREEN)) return;
     const box = el.getBoundingClientRect();
     if (!box.width || !box.height) return;
     this.centre = centre ?? { x: box.left + box.width / 2, y: box.top + box.height / 2 };

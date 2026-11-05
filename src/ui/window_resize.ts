@@ -63,6 +63,9 @@ export function isResizableWindow(el: HTMLElement): boolean {
 }
 
 function resizeStoodDown(el: HTMLElement): boolean {
+  // A full-screen view (the options window's Settings view) is sized by its
+  // stylesheet rule, never by a grip; the class toggles per view, so per press.
+  if (el.classList.contains('window-fullscreen')) return true;
   return (
     DESKTOP_ONLY_RESIZABLE_WINDOW_IDS.has(el.id) &&
     (el.ownerDocument?.body?.classList.contains('mobile-touch') ?? false)

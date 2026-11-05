@@ -16,7 +16,7 @@ import type { GuildEventInfo, IWorld } from '../src/world_api';
 let root: HTMLElement;
 let guildEventCreate: ReturnType<typeof vi.fn>;
 let guildEventRemove: ReturnType<typeof vi.fn>;
-let openDiscord: ReturnType<typeof vi.fn>;
+let openDiscord: ReturnType<typeof vi.fn<() => void>>;
 
 const today = isoDayOf(Date.now());
 const later = isoDayOf(Date.now() + 3 * 86_400_000);
@@ -93,7 +93,7 @@ beforeEach(() => {
   document.body.innerHTML = '';
   guildEventCreate = vi.fn();
   guildEventRemove = vi.fn();
-  openDiscord = vi.fn();
+  openDiscord = vi.fn<() => void>();
 });
 
 afterEach(() => {

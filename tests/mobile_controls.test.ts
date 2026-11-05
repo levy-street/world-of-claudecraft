@@ -808,6 +808,25 @@ describe('MobileControls setActive draft survival', () => {
     controls.refreshInterfaceMode();
     expect(chatInput.value).toBe('');
   });
+
+  // The Game Menu's Haptics row (src/ui/game_menu_hooks.ts) reads and flips the
+  // same state the tray button does, and gates on the touch layout being up.
+  it('exposes the touch gate and the one persisted haptics toggle the Game Menu row runs', () => {
+    installMobileControlDom();
+    setInterfaceMode('desktop');
+    const controls = new MobileControls(noopInputForActive(), mobileCallbacks());
+    controls.start();
+    expect(controls.touchActive).toBe(false);
+    setInterfaceMode('touch');
+    controls.refreshInterfaceMode();
+    expect(controls.touchActive).toBe(true);
+    const before = controls.hapticsEnabled;
+    expect(controls.toggleHaptics()).toBe(!before);
+    expect(controls.hapticsEnabled).toBe(!before);
+    expect(controls.toggleHaptics()).toBe(before);
+    expect(controls.hapticsEnabled).toBe(before);
+    setInterfaceMode('auto');
+  });
 });
 
 describe('MobileControls pointer lifecycle', () => {

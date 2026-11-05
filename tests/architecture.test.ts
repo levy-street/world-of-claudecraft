@@ -515,6 +515,8 @@ const UI_PURE_CORES = [
   'src/ui/weapon_proc_view.ts',
   'src/ui/controller_options_view.ts',
   'src/ui/options_view.ts',
+  // The full-screen Settings view's category rail model (issue #1653).
+  'src/ui/options_settings_view.ts',
   'src/ui/hud/loot_explorer/loot_explorer_view.ts',
   'src/ui/hud/vendor/vendor_view.ts',
   'src/ui/hud/vendor/heroic_vendor_view.ts',
@@ -3214,6 +3216,11 @@ const UI_DOM_MODULES = [
   // click handler and a class.
   'src/ui/host_diag_section_controller.ts',
   'src/ui/options_main_menu_controller.ts',
+  // The Settings view's category rail: mints the <nav> and its buttons
+  // (createElement); the decisions live in the pure options_settings_view.ts.
+  'src/ui/options_settings_rail_controller.ts',
+  // The Game Menu's quick links: the donate hop opens a tab (window.open).
+  'src/ui/game_menu_hooks.ts',
   'src/ui/hud/talking_head/talking_head_controller.ts',
   // Composes the dungeon prompt painters (they mount the DOM) and reads the UI
   // clock once a frame for the Sanctum's Ice Slab cover hint; the decisions

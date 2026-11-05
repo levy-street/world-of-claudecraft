@@ -62,6 +62,9 @@ export interface PerfSettingsHost {
    *  this is handed over unconditionally and the gate stays in one place
    *  (src/ui/host_diag_section_controller.ts). */
   hostDiag: HostDiagSectionDeps;
+  /** Runs after every (re)build, including this panel's own self-rerenders, so
+   *  the host can seat chrome the rebuild cleared (the Settings view's rail). */
+  afterRender?(container: HTMLElement): void;
 }
 
 const PERCENT = (v: number): string =>
@@ -126,6 +129,7 @@ export class PerfOverlaySettingsPanel {
     renderHostDiagSection(panel, this.host.hostDiag);
 
     container.appendChild(this.buildFooter());
+    this.host.afterRender?.(container);
   }
 
   /** Push a dropped drag position back into the X/Y sliders (no full re-render). */
