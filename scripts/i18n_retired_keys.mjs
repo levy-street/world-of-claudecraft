@@ -404,6 +404,35 @@ export const RETIRED_KEYS = [
   'guide.controls.discord',
   'guide.social.calendarHeading',
   'guide.social.calendarBodyDoubleHonor',
+  // -- v0.46.0 menu consolidation, guide prose (the reword-is-a-new-key convention):
+  // each key below described a rail button, a default key, or a window the hubs
+  // absorbed, so its reviewed overlay rows would keep rendering a false fact. The
+  // successor named after each arrow renders in its place, with its five non-Latin
+  // fills in the same change.
+  'guide.interfacePage.keyWindowsBody', // -> keyWindowsBodyHubs (not every window has a rail button)
+  'guide.interfacePage.winCharBody', // -> winCharBodyTwoTabs (two tabs, Cosmetics footer, C docks bags)
+  'guide.interfacePage.winBagsBody', // -> winBagsBodyWallet (the currencies wallet strip)
+  'guide.interfacePage.winProfessionsBody', // -> winProfessionsBodyHub (one tabbed window)
+  'guide.interfacePage.winCraftingBody', // -> winCraftingBodyTab (a tab of Professions)
+  'guide.interfacePage.winDeedsTitle', // -> winRealmTitle (Shift+Z opens the Book of the Realm)
+  'guide.interfacePage.winDeedsBody', // -> winRealmBody (its six tabs)
+  'guide.interfacePage.winSocialBody', // -> winSocialBodyEvents (guild Events, Discord strip)
+  'guide.interfacePage.winFinderTitle', // -> winActivitiesTitle (Shift+I opens Activities)
+  'guide.interfacePage.winFinderBody', // -> winActivitiesBody (its three tabs)
+  'guide.interfacePage.winMoreBodyNoValeCup', // -> winMoreBodyRankings (no K, no I calendar)
+  'guide.interfacePage.wikiBody', // -> wikiBodyGameMenu (no rail button, out of the More tray)
+  'guide.interfacePage.mobileBodyTwoPages', // -> mobileBodyGroupedMore (the grouped More tray)
+  'guide.interfacePage.railBody', // -> railBodyTwelve (the twelve-button rail)
+  'guide.social.emotesBodyNamedTarget', // -> emotesBodyMoreTray (no Emotes rail button)
+  'guide.social.guildBoardBody', // -> guildBoardBodyRankings (no Leaderboard window)
+  'guide.arenaPage.coliseumBody', // -> coliseumBodyActivities (no PvP rail button)
+  'guide.arenaPage.ladderBody', // -> ladderBodyBracketTab (no Leaderboard window)
+  'guide.thornhollowPage.queueBody', // -> queueBodyActivities (no PvP rail button)
+  'guide.factionsPage.readingBody', // -> readingBodyRealm (Reputation left the sheet)
+  'guide.deedsPage.bookBody', // -> bookBodyTitlesTab (Titles is its own tab)
+  'guide.deedsPage.standingsNote', // -> standingsNoteRankings (no Leaderboard window)
+  'guide.reliquaryPage.howBody', // -> howBodyRealmTab (Shift+X is not a default)
+  'guide.glossary.renownDef', // -> renownDefRankings (no Leaderboard window)
 ];
 
 export const RETIRED_KEY_SET = new Set(RETIRED_KEYS);

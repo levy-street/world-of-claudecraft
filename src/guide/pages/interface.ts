@@ -30,18 +30,18 @@ const FRAMES = [
 // Windows with a default key of their own. The key belongs in the copy (a player
 // is told it in game); the full rebindable table stays on the Controls page.
 const KEY_WINDOWS = [
-  ['guide.interfacePage.winCharTitle', 'guide.interfacePage.winCharBody'],
-  ['guide.interfacePage.winBagsTitle', 'guide.interfacePage.winBagsBody'],
+  ['guide.interfacePage.winCharTitle', 'guide.interfacePage.winCharBodyTwoTabs'],
+  ['guide.interfacePage.winBagsTitle', 'guide.interfacePage.winBagsBodyWallet'],
   ['guide.interfacePage.winSpellbookTitle', 'guide.interfacePage.winSpellbookBody'],
   ['guide.interfacePage.winTalentsTitle', 'guide.interfacePage.winTalentsBody'],
-  ['guide.interfacePage.winProfessionsTitle', 'guide.interfacePage.winProfessionsBody'],
-  ['guide.interfacePage.winCraftingTitle', 'guide.interfacePage.winCraftingBody'],
+  ['guide.interfacePage.winProfessionsTitle', 'guide.interfacePage.winProfessionsBodyHub'],
+  ['guide.interfacePage.winCraftingTitle', 'guide.interfacePage.winCraftingBodyTab'],
   ['guide.interfacePage.winQuestLogTitle', 'guide.interfacePage.winQuestLogBody'],
-  ['guide.interfacePage.winDeedsTitle', 'guide.interfacePage.winDeedsBody'],
-  ['guide.interfacePage.winSocialTitle', 'guide.interfacePage.winSocialBody'],
-  ['guide.interfacePage.winFinderTitle', 'guide.interfacePage.winFinderBody'],
+  ['guide.interfacePage.winRealmTitle', 'guide.interfacePage.winRealmBody'],
+  ['guide.interfacePage.winSocialTitle', 'guide.interfacePage.winSocialBodyEvents'],
+  ['guide.interfacePage.winActivitiesTitle', 'guide.interfacePage.winActivitiesBody'],
   ['guide.interfacePage.winMetersTitle', 'guide.interfacePage.winMetersBody'],
-  ['guide.interfacePage.winMoreTitle', 'guide.interfacePage.winMoreBodyNoValeCup'],
+  ['guide.interfacePage.winMoreTitle', 'guide.interfacePage.winMoreBodyRankings'],
 ] as const;
 
 export const interfacePage: GuidePage = {
@@ -87,7 +87,7 @@ export const interfacePage: GuidePage = {
         ${section('guide.interfacePage.aurasTitle', paras('guide.interfacePage.aurasBody'))}
         ${section('guide.interfacePage.actionBarsTitle', paras('guide.interfacePage.actionBarsBody'))}
         ${section('guide.interfacePage.minimapTitle', paras('guide.interfacePage.minimapBody'))}
-        ${section('guide.interfacePage.railTitle', paras('guide.interfacePage.railBody'))}
+        ${section('guide.interfacePage.railTitle', paras('guide.interfacePage.railBodyTwelve'))}
         ${section(
           'guide.interfacePage.mapTitle',
           paras('guide.interfacePage.mapBodyZoneFirst') +
@@ -99,7 +99,7 @@ export const interfacePage: GuidePage = {
 
         ${section(
           'guide.interfacePage.keyWindowsTitle',
-          paras('guide.interfacePage.keyWindowsBody') +
+          paras('guide.interfacePage.keyWindowsBodyHubs') +
             `<div class="guide-beat-grid">${windows}</div>`,
         )}
 
@@ -109,13 +109,13 @@ export const interfacePage: GuidePage = {
         )}
         ${section('guide.interfacePage.lootTitle', paras('guide.interfacePage.lootBody'))}
         ${section('guide.interfacePage.playerCardTitle', paras('guide.interfacePage.playerCardBody'))}
-        ${section('guide.interfacePage.wikiTitle', paras('guide.interfacePage.wikiBody'))}
+        ${section('guide.interfacePage.wikiTitle', paras('guide.interfacePage.wikiBodyGameMenu'))}
         ${section(
           'guide.interfacePage.mobileTitle',
           // The ring's page count and slot span interpolate from the live pure
           // core (the wiki completeness audit, 2026-09-03), so a ring retune
           // moves the page instead of rotting it.
-          paras('guide.interfacePage.mobileBodyTwoPages', {
+          paras('guide.interfacePage.mobileBodyGroupedMore', {
             pages: formatNumber(MOBILE_ACTION_PAGE_COUNT),
             slots: formatNumber(MOBILE_ACTION_SOURCE_SLOT_COUNT),
           }),
