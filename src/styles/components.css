@@ -10019,9 +10019,11 @@
     border-bottom: 1px solid color-mix(in srgb, var(--bag-section-ink) 35%, transparent);
     pointer-events: none;
     user-select: none;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    /* Never overflow:hidden here: it drops a grid item's automatic minimum
+       height to zero, and inside the height-capped scrolling grid the caption
+       row then collapses to its border. A long loadout name wraps instead. */
+    min-height: min-content;
+    overflow-wrap: anywhere;
   }
   .bag-grid .bag-section-header.bag-section-quest {
     --bag-section-ink: var(--color-quest);
