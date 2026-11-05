@@ -50,6 +50,7 @@ import {
   finalShiftStage,
   finalShiftStarts,
 } from './final_body_core';
+import { colossusChunk } from './final_kit_shapes';
 
 /** What the host lends: its particles, flashes, camera thud and dice. */
 export interface FinalBodyHost {
@@ -178,13 +179,17 @@ export class FinalBodyFx {
     this.bolts.visible = false;
     root.add(this.bolts);
     // The Hammer's floating rocks: one instanced draw, lit like the body.
-    const rockGeo = new THREE.IcosahedronGeometry(1, 0);
+    // Sculpted pieces of the colossus (final_kit_shapes.ts colossusChunk:
+    // knocked out of round, split flat, toned with a gold vein), never a bare
+    // polyhedron, which read as a placeholder cube in front of the hammer.
+    const rockGeo = colossusChunk();
     this.geometries.push(rockGeo);
     const rockMat = new THREE.MeshStandardMaterial({
-      color: 0x2e2622,
-      emissive: 0x8a3c0c,
-      emissiveIntensity: 0.25,
-      roughness: 0.95,
+      color: 0xffffff,
+      vertexColors: true,
+      emissive: 0x3a2410,
+      emissiveIntensity: 0.3,
+      roughness: 0.92,
       flatShading: true,
       name: 'smithHeartFinalBodyRocks',
     });
