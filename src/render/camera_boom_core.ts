@@ -24,14 +24,14 @@ export interface CameraBoomState {
   active: boolean;
 }
 
-/** Horizontal pull rate (1/s). Higher = tighter follow; ~70 ms of trail. */
-export const BOOM_OMEGA_XZ = 12;
-/** Vertical pull rate (1/s): softer, ~150 ms, the jump/land weight. */
-export const BOOM_OMEGA_Y = 6.5;
+/** Horizontal pull rate (1/s). Higher = tighter follow; ~35 ms of trail. */
+export const BOOM_OMEGA_XZ = 28;
+/** Vertical pull rate (1/s): softer, ~70 ms, the jump/land weight. */
+export const BOOM_OMEGA_Y = 14;
 /** The pivot never trails the avatar horizontally beyond this (yards). */
-export const BOOM_LEASH_XZ = 1.1;
+export const BOOM_LEASH_XZ = 0.45;
 /** Vertical trail cap: below the jump apex so arcs stay fully framed. */
-export const BOOM_LEASH_Y = 1.6;
+export const BOOM_LEASH_Y = 1.1;
 /** Beyond this the motion is a teleport: adopt the target outright. */
 export const BOOM_SNAP_DIST = 6;
 

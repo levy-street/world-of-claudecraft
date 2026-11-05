@@ -13,7 +13,7 @@ import {
 // effect before the first program links, and flipping it needs a reload.
 // Headless hosts without a location always run the stock look.
 const settings: CelShadingSettings | null =
-  typeof location === 'undefined' ? null : celShadingFromQuery(location.search, true);
+  typeof location === 'undefined' ? null : celShadingFromQuery(location.search, false);
 
 /** The session's cel look, or null for the stock look. */
 export function celShadingSettings(): CelShadingSettings | null {
