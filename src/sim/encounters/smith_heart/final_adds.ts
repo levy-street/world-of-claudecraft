@@ -77,6 +77,7 @@ import {
   spawnFightObject,
 } from './final_scope';
 import type { FinalAdd } from './final_state';
+import { tierPoolMult } from './tier_health';
 
 type School = 'fire' | 'frost' | 'nature' | 'physical' | 'arcane';
 
@@ -158,7 +159,7 @@ export function raiseSplinter(s: FinalScope, vein: SmithHeartVein): FinalAdd | n
     ctx.groundPos(o.x + spot.x, o.z + spot.z),
   );
   applyDungeonMobTuning(e, inst.dungeonId, difficulty);
-  const hp = phaseRules(s).addHealth;
+  const hp = Math.round(tierPoolMult(inst, phaseRules(s).addHealth));
   e.maxHp = hp;
   e.hp = hp;
   e.spawnPos = { ...e.pos };

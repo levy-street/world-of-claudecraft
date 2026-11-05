@@ -41,7 +41,7 @@ describe("Smith's Heart: a boss's pool per tier", () => {
     expect([dead.hp, dead.maxHp]).toEqual([0, 5000]);
   });
 
-  it('Normal keeps every template pool; Mythic is left as it was', () => {
+  it('Normal keeps every template pool; Mythic never has less than Heroic', () => {
     for (const rows of [
       COUNCIL_DIFFICULTY,
       BREATH_DIFFICULTY,
@@ -50,8 +50,8 @@ describe("Smith's Heart: a boss's pool per tier", () => {
       FINAL_DIFFICULTY,
     ]) {
       expect(rows.normal.healthMult).toBe(1);
-      expect(rows.mythic.healthMult).toBe(1);
       expect(rows.heroic.healthMult).toBeGreaterThan(1);
+      expect(rows.mythic.healthMult).toBeGreaterThanOrEqual(rows.heroic.healthMult);
     }
   });
 
@@ -68,6 +68,20 @@ describe("Smith's Heart: a boss's pool per tier", () => {
     expect(f.state()).toBeNull();
     expect(f.boss().maxHp).toBe(base);
     expect(f.boss().hp).toBe(base);
+  });
+
+  it('the dev pool scale (the bot raid human-equivalent check) multiplies the tier pool, and 1 clears it', () => {
+    const f = quenchFight(3);
+    const base = f.boss().maxHp;
+    expect(f.dev('/dev heart pool 0.65')).toBe(true);
+    expect(f.dev('/dev heart quench heroic')).toBe(true);
+    expect(f.dev('/dev heart quench pull')).toBe(true);
+    f.tick(2);
+    expect(f.boss().maxHp).toBe(Math.round(base * QUENCH_DIFFICULTY.heroic.healthMult * 0.65));
+    for (const p of f.players) f.sim.ctx.handleDeath(p, f.boss());
+    f.tick(60, false);
+    expect(f.boss().maxHp).toBe(base);
+    expect(f.dev('/dev heart pool 1')).toBe(true);
   });
 
   it('a Normal pull keeps the template pool', () => {

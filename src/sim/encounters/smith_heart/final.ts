@@ -128,7 +128,7 @@ import {
   living,
 } from './final_scope';
 import type { FinalFightState, FinalKitClocks } from './final_state';
-import { applyTierHealth, restoreTierHealth } from './tier_health';
+import { applyTierHealth, restoreTierHealth, tierPoolMult } from './tier_health';
 
 // ---- the dev difficulty switch ------------------------------------------------------------
 
@@ -410,7 +410,10 @@ function finishFinal(ctx: SimContext, inst: InstanceSlot, boss: Entity, st: Fina
 
 function beginFinal(ctx: SimContext, inst: InstanceSlot, boss: Entity): FinalFightState {
   const st = freshState(finalDifficulty(inst));
-  st.basePool = applyTierHealth(boss, FINAL_DIFFICULTY[st.difficulty].healthMult);
+  st.basePool = applyTierHealth(
+    boss,
+    tierPoolMult(inst, FINAL_DIFFICULTY[st.difficulty].healthMult),
+  );
   boss.smithHeartFinal = st;
   const s = scopeOf(ctx, inst, st, boss);
   watchZone(s, true);

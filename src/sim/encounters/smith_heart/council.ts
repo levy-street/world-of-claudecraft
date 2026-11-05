@@ -117,7 +117,7 @@ import {
   startWrath,
   syncEnergyBars,
 } from './council_wrath';
-import { applyTierHealth, restoreTierHealth } from './tier_health';
+import { applyTierHealth, restoreTierHealth, tierPoolMult } from './tier_health';
 
 // ---- the dev difficulty switches ------------------------------------------------------
 
@@ -315,7 +315,7 @@ function landBar(s: CouncilScope, role: CouncilRole, body: Entity): void {
   switch (bar.castId) {
     case COUNCIL_CASTS.wrath:
       landWrath(s, body, bar.heir);
-      carryWrathHold(s.st, bar.heir, s.rules.heirFillSeconds);
+      carryWrathHold(s.st, bar.heir, s.rules.heirFillSeconds, s.rules.enrageAfterWraths);
       return;
     case COUNCIL_CASTS.weight:
       landWeight(s, body, bar.targetId);
@@ -515,7 +515,7 @@ function beginCouncil(
   bodies: CouncilBodies,
 ): CouncilFightState {
   const st = freshState(councilDifficulty(inst));
-  const mult = COUNCIL_DIFFICULTY[st.difficulty].healthMult;
+  const mult = tierPoolMult(inst, COUNCIL_DIFFICULTY[st.difficulty].healthMult);
   st.basePools = {};
   for (const r of COUNCIL_ROLES) {
     const b = bodies[r];

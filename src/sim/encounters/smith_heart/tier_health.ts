@@ -8,7 +8,24 @@
 //
 // Pure over the entity: no rng, no clock. `src/sim`-pure.
 
+import type { InstanceSlot } from '../../sim';
 import type { Entity } from '../../types';
+
+/** DEV ONLY (`/dev heart pool <k>`): a run's pools times `k`, the bot
+ *  raid's human-equivalent check (bots deal about 65 percent of a decent
+ *  human raid's damage, so a 0.65 pool plays out a human raid's clock). */
+const devPoolScale = new WeakMap<InstanceSlot, number>();
+
+/** Set (or with 1, clear) a run's dev pool scale. */
+export function setTierHealthDevScale(inst: InstanceSlot, k: number): void {
+  if (k === 1) devPoolScale.delete(inst);
+  else devPoolScale.set(inst, k);
+}
+
+/** The pull's pool factor in `inst`: the tier's, times any dev scale. */
+export function tierPoolMult(inst: InstanceSlot, mult: number): number {
+  return mult * (devPoolScale.get(inst) ?? 1);
+}
 
 /** Scale `e`'s pool by `mult` for the fight; returns the pool to restore. */
 export function applyTierHealth(e: Entity, mult: number): number {

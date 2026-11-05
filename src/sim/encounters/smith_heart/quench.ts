@@ -93,7 +93,7 @@ import {
 import { clearSlashes, startSlashes, stepSlashes } from './quench_slash';
 import type { QuenchFightState } from './quench_state';
 import { quenchSay } from './quench_voice';
-import { applyTierHealth, restoreTierHealth } from './tier_health';
+import { applyTierHealth, restoreTierHealth, tierPoolMult } from './tier_health';
 
 // ---- the dev difficulty switch ------------------------------------------------------------
 
@@ -314,7 +314,10 @@ function finishQuench(
 /** The pull: one state for the fight, the shore ice rising. */
 function beginQuench(ctx: SimContext, inst: InstanceSlot, boss: Entity): QuenchFightState {
   const st = freshState(ctx, inst, boss, quenchDifficulty(inst));
-  st.basePool = applyTierHealth(boss, QUENCH_DIFFICULTY[st.difficulty].healthMult);
+  st.basePool = applyTierHealth(
+    boss,
+    tierPoolMult(inst, QUENCH_DIFFICULTY[st.difficulty].healthMult),
+  );
   boss.smithHeartQuench = st;
   const s = scopeOf(ctx, inst, st, boss);
   raiseRim(s);
