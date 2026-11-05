@@ -293,11 +293,15 @@ function dragSpot(world, st) {
   const z = zoneOfBoss(world);
   const rooted = hasAura(b, FINAL_AURAS.root);
   let target = st.next ?? (z === 'ring' ? lowest(world, null) : z);
+  // Heroic: a change while the raid is still Vein-Shaken hits three times
+  // as hard, so the tanks wait the mark out unless the bar runs high.
+  const shaken = world.living().some((p) => hasAura(p, FINAL_AURAS.shaken));
   if (
     IGNORE !== 'drag' &&
     z !== 'ring' &&
     !rooted &&
     bar(world, z) >= MOVE_AT &&
+    (!shaken || bar(world, z) >= 75) &&
     (!st.next || st.next === z)
   ) {
     const i = HEART_QUARTER_ORDER.indexOf(z);
