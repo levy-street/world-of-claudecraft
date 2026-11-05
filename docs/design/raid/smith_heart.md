@@ -1433,6 +1433,14 @@ health from a target fight length times measured raid DPS, damage anchored to th
 tanks' mitigated intake and the healers' throughput, every number calibrated with
 the meters harness, never shipped unmeasured.
 
+**Heroic pools (the bot raid's Heroic pass of 2026-11-05).** The raid has no Heroic tier of
+its own yet, so each boss's Heroic health rides its difficulty row (`healthMult`, applied at
+the pull by `encounters/smith_heart/tier_health.ts`; Normal and Mythic keep the template
+pool). Calibrated with the bot raid (`scripts/heart_raid.mjs`) in the previous tier's best gear
+(the Nythraxis top-parse loadouts) toward a 5 to 7 minute kill: the Hammer Council 2.0, the
+Breath 2.4, the Quench 2.0, the Heat 1.4, the Masterless Strength 1.4. Every number and why:
+the pass's notes (E:/woc/entregas/raid_corazon/heroico/NOTAS.md, outside the repo).
+
 ### 7.1 The Hammer Council (always first)
 
 The Quarry's first boss is two stone beings that share the Hammer's strength: the
@@ -1972,7 +1980,9 @@ table that the design left open is a design call Jose may veto.
 | The Mythic hidden phase | Not designed: `FINAL_PHASE_DIFFICULTY.hiddenPhase` (false everywhere) and `mythicHiddenPhase` are its clean hook | `final_last.ts` |
 | No adds from adds | No Splinter raises anything (pinned by the tests) | `final_adds.ts` |
 
-Splinter health per tier: 6,500 Normal, 7,000 Heroic, 7,500 Mythic (each its whole pool).
+Splinter health per tier: 6,500 Normal, 5,500 Heroic (7,000 until the Heroic pass of
+2026-11-05: three Splinters' growing pulses outran a decent raid's two healers before its
+damage could clear them), 7,500 Mythic (each its whole pool).
 Every mechanic's damage takes the tier's `damageMult` on top. Bodies: borrowed, retinted and
 drawn about 2.5 times a player (`render/characters/smith_heart_placeholder_looks.ts`: the
 Heat's the stone goleling in white-gold, the Quench's the rime elemental, the Breath's the

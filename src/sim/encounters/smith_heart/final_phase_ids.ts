@@ -287,7 +287,12 @@ export const FINAL_PHASE_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalPhase
   },
   heroic: {
     adds: 3,
-    addHealth: 7000,
+    // 7,000 until the Heroic pass of 2026-11-05: three Splinters' pulses
+    // (Splintered Strength, growing each pulse) outran a decent raid's two
+    // healers inside 25 s while its damage needed 32 s to clear them; 5,500
+    // ends the call before the pulses run away, still more to kill than
+    // Normal's two at 6,500.
+    addHealth: 5500,
     coalMarks: 1,
     ringGaps: 2,
     weightStep: 0.18,
