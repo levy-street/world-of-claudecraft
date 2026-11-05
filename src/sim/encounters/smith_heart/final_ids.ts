@@ -259,7 +259,10 @@ export const FINAL_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalDifficultyR
     tremors: 3,
   },
   heroic: {
-    damageMult: 1.2,
+    // 1.2 until the Heroic pass of 2026-11-05: the bot raid in the previous
+    // tier's best came out of the 70 percent call too low to outlast the
+    // Overload pulses, Vein Shock and the Anvil on two healers.
+    damageMult: 1.1,
     healthMult: 1.4,
     burstTier: 'heavy',
     switchShock: true,
