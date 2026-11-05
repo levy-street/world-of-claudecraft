@@ -669,12 +669,18 @@ HAMMER_CLUSTERS = (  # (d, r, z, n, main height, main radius, lean (radial, acro
 # The quarry's benches climbing back from the lip: (front, back, top).
 HAMMER_BENCHES = ((62.0, 66.6, 3.6), (66.2, 71.6, 7.8), (71.2, 77.2, 12.6), (76.8, 84.0, 18.0), (83.6, 94.0, 24.0))
 # The Hammer itself: the Smith's great stone hammer, driven into the crag where it fell.
-# Its head's centre (u, v, z in the frame), its half sizes (out, across, up), and the far
-# end of its haft.
-HAMMER_HEAD = (73.5, 0.0, 12.5)
-HAMMER_HEAD_HALF = (5.0, 10.5, 5.0)
-HAMMER_TILT = 0.42
-HAMMER_HAFT_END = (92.0, 2.5, 47.0)
+# Its head's centre (u, v, z in the frame), its half sizes (out, across, up), its tilt
+# back along its haft and its lean across, and its haft's length.
+# The hammer round of 2026-11-05: from the floor the Hammer altar stood in front of a
+# head sunk to its cheeks in the crag, its haft leaning far back out of sight, so the
+# hammer never read as one. The head now rides high on a heap of the rock it broke
+# (its lower edge over the altar's crown from the approach), its haft rising nearly
+# upright with a lean away from the Hammer's root: one T the room reads at a glance.
+HAMMER_HEAD = (80.0, 0.0, 17.5)
+HAMMER_HEAD_HALF = (5.4, 10.5, 5.6)
+HAMMER_TILT = 0.24
+HAMMER_LEAN = 0.15
+HAMMER_HAFT_LEN = 34.0
 HAMMER_CRACKS = ((-14.0, 15.0), (-62.0, 13.0), (14.0, 15.0), (58.0, 13.0), (118.0, 8.0), (156.0, 13.0), (-124.0, 8.0),
                  (-162.0, 13.0))
 
@@ -721,14 +727,29 @@ def _hammer_benches(f, F, rng, voxel_gap=0.6):
 
 def _hammer_rot(F):
     """The head's frame: its long axis across the wall, tilted back along its haft."""
-    return rot(rz=F.yaw(0.0), ry=HAMMER_TILT)
+    return rot(rz=F.yaw(0.0), ry=HAMMER_TILT, rx=-HAMMER_LEAN)
 
 
 def _hammer_crater(f, F, rng):
-    """Where it fell: the crag's face stove in round the head, fractures running out
-    across the benches, a few blocks thrown up and left leaning. Returns the fractures."""
+    """Where it fell: the crag's face stove in round the head, the broken rock heaped up
+    under it (the hammer round: the head rides on the heap, its lower edge clear of the
+    altar's crown from the floor), fractures running out across the benches from the
+    blow, a few blocks thrown up and left leaning against the heap. Returns the
+    fractures."""
     cu, cv, cz = HAMMER_HEAD
-    f.sub(Ellipsoid(F.at(cu - 3.0, cv, cz - 1.0), (10.0, 14.5, 8.5), rot(rz=F.yaw(0.0))), 0.6)
+    seat = cz - 6.0
+    # The hollow round the head (its shade frames the head from the room), then the
+    # heap of broken rock it sits in, its lower two yards buried.
+    f.sub(Ellipsoid(F.at(cu + 1.0, cv, cz - 0.5), (9.0, 14.5, 8.0), rot(rz=F.yaw(0.0))), 0.6)
+    # The blow stove the bench before it in (nothing stands in front of the head's face).
+    f.sub(Ellipsoid(F.at(cu - 8.5, cv, seat + 2.0), (5.0, 10.0, 4.5), rot(rz=F.yaw(0.0))), 0.8)
+    f.put('ochre', Ellipsoid(F.at(cu + 2.5, cv, seat - 1.5), (6.0, 13.0, 6.0), rot(rz=F.yaw(0.0))), 1.0)
+    for (v, du, dz, w) in ((-11.5, -2.0, 1.6, 3.4), (11.0, -1.6, 1.2, 3.6), (-13.0, 1.5, 3.0, 3.0),
+                           (12.5, 2.0, 2.6, 3.2)):
+        c = F.at(cu + du, cv + v, seat + dz)
+        f.put('ochre', block(rng, c, (w, w * 1.3, w * 0.9), cuts=10, chamfer=(0.72, 0.93),
+                             R=rot(rz=F.yaw(0.0) + float(rng.uniform(-0.5, 0.5)), rx=float(rng.uniform(-0.35, 0.35)),
+                                   ry=float(rng.uniform(-0.3, 0.3)))), 0.3)
     lines = []
     for (ang, L) in HAMMER_CRACKS:
         a = math.radians(ang)
@@ -738,8 +759,8 @@ def _hammer_crater(f, F, rng):
             t = k / 6
             wob = math.sin(t * 7.0 + ang) * 0.7 * t
             v = cv + math.cos(a) * (12.5 + L * t) + math.sin(a) * wob
-            z = cz - 1.0 + math.sin(a) * (7.5 + L * t * 0.7) - math.cos(a) * wob
-            u = cu - 7.0 + 0.42 * max(0.0, z)
+            z = seat - 1.0 + math.sin(a) * (7.5 + L * t * 0.7) - math.cos(a) * wob
+            u = cu - 9.5 + 0.42 * max(0.0, z)
             if z < -1.0:
                 break
             pts.append(F.at(u, v, z))
@@ -748,7 +769,7 @@ def _hammer_crater(f, F, rng):
             f.sub(Polyline(pts, radii[:len(pts)]), 0.16)
             lines.append((pts, radii[:len(pts)]))
     for (v, z, tilt) in ((-15.0, 8.0, 0.28), (15.5, 7.0, -0.24), (-10.0, 3.0, 0.18), (11.0, 2.6, -0.2)):
-        c = F.at(cu - 7.0 + 0.3 * z, cv + v, z)
+        c = F.at(cu - 9.5 + 0.3 * z, cv + v, z)
         f.put('ochre', block(rng, c, (float(rng.uniform(4.0, 5.0)), float(rng.uniform(6.0, 8.0)),
                                       float(rng.uniform(3.0, 4.0))), cuts=12, chamfer=(0.7, 0.93),
                              R=rot(rz=F.yaw(0.0) + tilt, rx=tilt * 1.2, ry=0.16)), 0.12)
@@ -808,14 +829,14 @@ def _hammer_itself(f, F):
             f.groove(Polyline(run, 0.02), 0.45, 0.34)
     chips = np.random.default_rng(6917)
     # The blow broke the faces' corners.
-    for _ in range(12):
+    for _ in range(7):
         sy = float(chips.choice((-1.0, 1.0)))
         sx = float(chips.choice((-1.0, 1.0)))
         sz = float(chips.choice((-1.0, 1.0)))
         o = (sx * hu * float(chips.uniform(0.75, 1.05)), sy * float(chips.uniform(8.6, 10.6)),
              sz * hz * float(chips.uniform(0.75, 1.05)))
-        f.sub(Ellipsoid(L(o), (float(chips.uniform(0.8, 1.6)), float(chips.uniform(0.7, 1.4)),
-                               float(chips.uniform(0.7, 1.4))), R), 0.22)
+        f.sub(Ellipsoid(L(o), (float(chips.uniform(0.8, 1.3)), float(chips.uniform(0.7, 1.1)),
+                               float(chips.uniform(0.7, 1.1))), R), 0.3)
     # The fall's crack down the front face, from the collar's shoulder to the foot.
     crack = []
     for k in range(9):
@@ -827,15 +848,16 @@ def _hammer_itself(f, F):
     inward = _mul3(R, (1.0, 0.0, 0.0))
     crack = [tuple(np.asarray(q) + inward * 0.18) for q in crack]
     across = Vector((math.cos(math.radians(F.bearing)), math.sin(math.radians(F.bearing)), 0.0))
-    # The haft.
-    end = F.at(*HAMMER_HAFT_END)
+    # The haft, square to the head (its own up), swelling into the socket, bound in
+    # three places, gripped at its end, a pommel on it.
     base = Vector(c)
-    tip = Vector(end)
-    pts = [tuple(base.lerp(tip, t)) for t in (0.0, 0.35, 0.7, 1.0)]
-    f.put('haft', Polyline(pts, [2.3, 1.9, 1.7, 1.55]), 0.35)
-    for t in (0.34, 0.5, 0.82):
-        f.put('head', Ellipsoid(tuple(base.lerp(tip, t)), (2.5, 2.5, 1.0), None), 0.12)
-    f.put('head', Ellipsoid(tuple(tip), (2.7, 2.7, 2.4), None), 0.25)
+    tip = Vector(L((0.0, 0.0, HAMMER_HAFT_LEN)))
+    pts = [tuple(base.lerp(tip, t)) for t in (0.0, 0.18, 0.5, 0.82, 1.0)]
+    f.put('haft', Polyline(pts, [2.9, 2.35, 2.05, 1.9, 1.85]), 0.35)
+    for t, (r, h) in ((0.22, (2.95, 0.75)), (0.27, (2.85, 0.6)), (0.55, (2.6, 0.9)), (0.74, (2.45, 0.5)),
+                      (0.79, (2.45, 0.5)), (0.84, (2.45, 0.5))):
+        f.put('head', Ellipsoid(tuple(base.lerp(tip, t)), (r, r, h), R), 0.12)
+    f.put('head', Ellipsoid(tuple(base.lerp(tip, 1.02)), (3.1, 3.1, 2.4), R), 0.3)
     return c, across, base, tip, crack
 
 
@@ -844,7 +866,7 @@ def landmark_hammer(bpy):
     p = HSP('Kit_LandmarkHammer', seed=6911, ao=0.45, ao_dist=3.0, dust=0.0)
     rng = np.random.default_rng(6911)
     d0, d1 = SPAN['hammer']
-    f = _arc_field(F, d0, d1, 59.0, 97.0, -31.0, 52.0, voxel=0.3)
+    f = _arc_field(F, d0, d1, 59.0, 97.0, -31.0, 60.0, voxel=0.3)
     _foot(f, F, rng, 'hammer')
     # The third round: the shared crag (landmark_crag.py) where the quarry's level
     # courses of worked blocks read as flat brown slabs.
@@ -875,13 +897,17 @@ def landmark_hammer(bpy):
         front = max(0.0, -(n.x * out_dir.x + n.y * out_dir.y))
         return mix(col, tuple(min(1.0, ch * 1.22 + 0.04) for ch in col), 0.55 * front)
 
+    # The hammer round (2026-11-05): the head and the haft in the Smith's own blue-grey
+    # granite, so the hammer stands apart from the warm ochre crag it lies in by hue (in
+    # the old near-matching stone it melted into the crag from the floor), its arrises
+    # pale, its courses and its bindings a darker slate.
     dressed = stone_shader(
-        (0.44, 0.41, 0.4), (0.6, 0.55, 0.5), (0.8, 0.73, 0.63), (0.4, 0.37, 0.46),
-        cap=(0.74, 0.67, 0.55), cap_at=(0.78, 0.97), edge=1.0, hollow=0.45, z_span=(4.0, 22.0),
+        (0.3, 0.32, 0.38), (0.47, 0.5, 0.56), (0.74, 0.76, 0.78), (0.27, 0.27, 0.37),
+        cap=(0.8, 0.79, 0.75), cap_at=(0.78, 0.97), edge=1.0, hollow=0.45, z_span=(8.0, 34.0),
         extra=head_light)
     course = stone_shader(
-        (0.32, 0.29, 0.29), (0.43, 0.38, 0.35), (0.6, 0.53, 0.45), (0.3, 0.28, 0.37),
-        edge=1.0, hollow=0.5, z_span=(4.0, 22.0), extra=head_light)
+        (0.21, 0.22, 0.28), (0.32, 0.34, 0.4), (0.5, 0.52, 0.56), (0.2, 0.2, 0.29),
+        edge=1.0, hollow=0.5, z_span=(8.0, 34.0), extra=head_light)
     R0 = Vector(head_c)
     hd = (h1 - h0).normalized()
     hl = (h1 - h0).length
@@ -892,9 +918,13 @@ def landmark_hammer(bpy):
         ac = abs(a)
         rad = (o - across * a).length
         t = o.dot(hd)
-        haft = (o - hd * t).length < 3.2 and -1.0 < t < hl + 3.5
+        haft = (o - hd * t).length < 3.4 and -1.0 < t < hl + 3.5
         head = ac < 11.4 and rad < 9.0
         if head and (ac < 1.4 or 8.4 < ac < 9.5):
+            return course(q, n, c)
+        # The haft's bindings and its grip.
+        tt = t / hl
+        if haft and not head and (abs(tt - 0.245) < 0.05 or abs(tt - 0.55) < 0.025 or 0.71 < tt < 0.87):
             return course(q, n, c)
         return dressed(q, n, c) if head or haft else crag(q, n, c)
 
