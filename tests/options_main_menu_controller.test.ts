@@ -290,7 +290,7 @@ describe('the Game Menu quick group', () => {
     attachGameMenuHooks(renderer, haptics, discord);
     expect(runQuickToggle('nameplates')).toBe(false);
     expect(renderer.showNameplates).toBe(false);
-    music.enabled = true;
+    (music as { enabled: boolean }).enabled = true;
     expect(runQuickToggle('music')).toBe(false);
     expect(music.setEnabled).toHaveBeenCalledWith(false);
     expect(runQuickToggle('haptics')).toBe(false);
