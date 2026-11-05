@@ -145,8 +145,8 @@ export const heat = {
     return world.tankSpot;
   },
   // Melee reaches the giant's body from the wellspring's lip.
-  meleeReach() {
-    return HEARTH_WELL.r + 2.5;
+  meleeReach(t) {
+    return t?.tid === heat.tids.guardian ? HEARTH_WELL.r + 2.5 : 5.5;
   },
   // The melee stand on the lip beside the tank (never in the burning well).
   roleSpot(world, st, b) {
@@ -163,9 +163,26 @@ export const heat = {
     const adds = world.adds.filter(
       (a) => a.tid === HEAT_MOBS.spawn || a.tid === HEAT_MOBS.seedflame,
     );
-    if (adds.length) return adds.sort((x, y) => wellGap(world, x) - wellGap(world, y))[0];
+    if (adds.length) {
+      // The Wellspawn slow with their health (fully at half): the damage
+      // dealers split over the ones still walking fast, nearest the wellspring
+      // first, and finish the slowed ones together once none walks fast.
+      const byGap = adds.sort((x, y) => wellGap(world, x) - wellGap(world, y));
+      const fast = byGap.filter(
+        (a) => a.tid === HEAT_MOBS.spawn && a.hp / Math.max(1, a.mhp) > HEAT_TUNING.spawnSlowAt,
+      );
+      if (fast.length > 1) {
+        const dps = world.bots.filter((x) => x.spec.role === 'dps');
+        return fast[Math.max(0, dps.indexOf(b)) % fast.length];
+      }
+      return byGap[0];
+    }
     const g = world.mobs.guardian;
     return g?.hostile === false ? null : g;
+  },
+  // A Wellspawn still walking fast is worth a slow or a control.
+  wantSlow(world, t) {
+    return t.tid === HEAT_MOBS.spawn && t.hp / Math.max(1, t.mhp) > HEAT_TUNING.spawnSlowAt;
   },
   tankAdd(a) {
     return a.tid === HEAT_MOBS.keeper;
