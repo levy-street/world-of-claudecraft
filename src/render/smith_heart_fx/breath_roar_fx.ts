@@ -419,7 +419,8 @@ export class BreathRoarFx {
     const x = at.x + origin.x;
     const z = at.z + origin.z;
     const color = at.overVoid ? LANDING_VOID : LANDING_SAFE;
-    this.h.particles.shockRing(x, z, color, 2.2, LANDING_EVERY + 0.15);
+    this.h.particles.shockRing(x, z, color, 3.2, LANDING_EVERY + 0.15);
+    this.h.particles.shockRing(x, z, color, 1.4, LANDING_EVERY + 0.15);
     for (let k = 1; k <= 5; k++) {
       const f = k / 6;
       const px = me.pos.x + (x - me.pos.x) * f;

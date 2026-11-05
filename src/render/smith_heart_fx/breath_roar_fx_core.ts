@@ -84,10 +84,15 @@ export function roarLanding(
  *  moment more). */
 export const ROAR_TRAIL_SECONDS = T.roarSlide + 0.35;
 
+/** The screen's wind at its strongest: held well under full so the floor,
+ *  the landing marker and the rim stay readable through the indrawn breath
+ *  (the Heroic readability pass of 2026-11-05: at full it washed them out). */
+export const INHALE_SCREEN_MAX = 0.6;
+
 /** The screen's wind while the guardian draws breath: 0 when not, rising
- *  with the bar to its full by the end (only for a body on the Cornice). */
+ *  with the bar to INHALE_SCREEN_MAX by the end (only for a body on the Cornice). */
 export function inhaleScreenWind(fill: number, drawing: boolean): number {
   if (!drawing) return 0;
   const f = Math.max(0, Math.min(1, fill));
-  return 0.35 + 0.65 * f * f;
+  return 0.2 + (INHALE_SCREEN_MAX - 0.2) * f * f;
 }
