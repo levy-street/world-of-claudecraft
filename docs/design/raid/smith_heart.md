@@ -462,8 +462,16 @@ progress and the way); only cosmetic motes and embers thin on the low tier
 ### 5.8 Areas: score, air, sky
 
 `smithHeartAreaAt` names the area of any point (hammer, ring, breath, quench, heat,
-heart). The score follows it (`SMITH_HEART_AREA_MUSIC`: each vein and the Heart borrow
-an existing cue whose brief fits until the raid has its own score). The Heart has its
+heart). The score follows it (`SMITH_HEART_AREA_MUSIC`): every area plays the raid's own
+halls theme (`dungeon_smith_heart`), kept per area so a vein can get a variation later.
+Each boss fight takes over with its own cue (`src/game/smith_heart_boss_music.ts`): the
+Council's two members share one, the three guardians one each, and the Masterless
+Strength follows its phase aura (the quarter fight and its intermissions; the 15 percent
+stride and final phase; Mythic's kneel, rebirth and collapse), a stage change
+crossfading the two loops (`BossLoopTrack`, 2.5 s). A kill hands the mix back at once;
+a wipe or reset after the usual 10 s aggro-gap grace. The tracks are generated
+(`scripts/generate_smith_heart_music.mjs`) and mastered into seamless loops
+(`scripts/master_music_loop.mjs`); pinned by `tests/smith_heart_boss_music.test.ts`. The Heart has its
 own fog and light state, `smithHeartCore` (`heart_environment.ts`), and so does the
 Hammer vein, `smithHeartHammer` (phase 2B: a warm quarry dusk, the key low from the
 south-west raking the terraces, the realm's blue sky light all but off), the Ring
