@@ -388,7 +388,11 @@ describe('the Vine Lasher: Entangling Lash', () => {
     const r = room();
     const lasher = engage(r, 'vine_lasher', 0, -8);
     const inLane = addPlayer(r, 'mage', 0, 6);
-    const aside = addPlayer(r, 'priest', 6, 6);
+    // Beside the lane AND past its 20 yd reach, so the hashed pick (keyed on the
+    // mob's entity id) can only land on the two lined-up players. At (6, 6) the
+    // priest sat 15 yd out, inside reach, and the pick depended on which id the
+    // lasher happened to draw.
+    const aside = addPlayer(r, 'priest', 16, 6);
     const def = MOBS.vine_lasher.trashKit?.line;
     if (!def) throw new Error('lash');
     run(r, def.first + 0.05, [lasher]);
