@@ -22493,9 +22493,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.heatGuardian.grip':
     '매초 화염 피해를 {total} 받습니다(중첩 {stacks}개마다 {per}). 수호자의 공격이 적중할 때마다 중첩이 하나씩 쌓이고(최대 {most}개) {seconds}초 동안 지속됩니다: 너무 무거워지기 전에 방어 전담을 교대하십시오.',
   'hudChrome.auraEffect.heatGuardian.kindling':
-    '{seconds}초 뒤 {trail}초 동안 불의 자취를 남깁니다. 자취마다 아군에게 매초 {min}~{max}의 화염 피해를 주고, 그 위에 선 샘의 자식의 생명력을 매초 {heal}% 회복시킵니다: 무리와 샘의 자식이 지나는 길에서 벗어나십시오.',
+    '{seconds}초 뒤 {trail}초 동안 불의 자취를 남깁니다. 자취마다 아군에게 매초 {min}~{max}의 화염 피해를 주고, 그 위에 선 샘의 자식의 생명력을 매초 {heal}% 회복시킵니다: 무리와 샘의 자식이 지나는 길에서 벗어나십시오. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해.',
   'hudChrome.auraEffect.heatGuardian.trail':
-    '잉걸불 자취를 남기고 있습니다: 폭 {radius}미터의 불이 {life}초 동안 타며, 그 안의 아군에게 매초 {min}~{max}의 화염 피해를 주고 그 안의 샘의 자식의 생명력을 매초 {heal}% 회복시킵니다.',
+    '잉걸불 자취를 남기고 있습니다: 폭 {radius}미터의 불이 {life}초 동안 타며, 그 안의 아군에게 매초 {min}~{max}의 화염 피해를 주고 그 안의 샘의 자식의 생명력을 매초 {heal}% 회복시킵니다. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해.',
   'hudChrome.auraEffect.heatGuardian.hunted':
     '구르는 잉걸불이나 씨불이 당신을 쫓고 있습니다. 구르는 잉걸불에 붙잡히면 죽고 {radius}미터 안의 모두가 불탑니다: 거리를 두고 아군이 때리게 하십시오. 한 번 칠 때마다 {knock}미터 밀려납니다(그 뒤 {crust}초 동안은 밀려나지 않습니다).',
   'hudChrome.auraEffect.heatGuardian.crust':
@@ -22540,9 +22540,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '받는 물리 피해가 두 배가 됩니다: 다른 탱커가 수호자를 맡아야 합니다',
   'hudChrome.council.alert.timeAria': '{seconds}초 남음',
   'hudChrome.auraEffect.council.wakeMark':
-    '효과가 끝나면 서 있는 자리의 바닥에서 기둥이 솟구쳐 {radius}야드 안의 모두에게 {min}에서 {max}의 피해를 주고 밀쳐냅니다. 공격대에 엄폐물이 필요한 곳에 서세요. 영웅·신화: 피해 {heroic}% 증가.',
+    '효과가 끝나면 서 있는 자리의 바닥에서 기둥이 솟구쳐 {radius}야드 안의 모두에게 {min}에서 {max}의 피해를 주고 밀쳐냅니다. 공격대에 엄폐물이 필요한 곳에 서세요. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해.',
   'hudChrome.auraEffect.council.rockMark':
-    '효과가 끝나면 바위가 떨어집니다: {total}의 피해를 {radius}야드 안의 모두가 나눠 받습니다. {soakers}명 미만이면 각자 {penalty}% 더 받고 공격대 전체가 {tremorMin}에서 {tremorMax}의 피해를 받습니다. {radius}야드 안의 모든 기둥이 한 조각씩 깨지니 엄폐물에서 떨어져 나눠 맞으세요. 신화: {soulReach}야드 안의 영혼의 기둥은 대신 영혼 표식을 하나 잃고, 표식이 없어지면 부서집니다. 영웅·신화: 피해 {heroic}% 증가.',
+    '효과가 끝나면 바위가 떨어집니다: {total}의 피해를 {radius}야드 안의 모두가 나눠 받습니다. {soakers}명 미만이면 각자 {penalty}% 더 받고 공격대 전체가 {tremorMin}에서 {tremorMax}의 피해를 받습니다. {radius}야드 안의 모든 기둥이 한 조각씩 깨지니 엄폐물에서 떨어져 나눠 맞으세요. 신화: {soulReach}야드 안의 영혼의 기둥은 대신 영혼 표식을 하나 잃고, 표식이 없어지면 부서집니다. 영웅·신화: 나눠 받는 피해 {heroicTotal}, 공격대 전체 피해 {heroicTremorMin}에서 {heroicTremorMax}.',
   'hudChrome.auraEffect.council.memory':
     '주는 피해가 {pct}% 증가합니다: 쓰러진 망치 의회 구성원 1명당 {per}%.',
   // The Hammer Council's mythic, Soul in the Stone (M16 fills).
@@ -22570,17 +22570,17 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   // the Stone, Quarry Collapse and Resonance (M16 fills).
   'abilityUi.cast.heart_mountains_rush': '산의 돌진',
   'hudChrome.auraEffect.council.resonance':
-    '{every}초마다 울려 퍼져 자신의 {radius}야드 안에 있는 모든 아군에게 {min}에서 {max}의 자연 피해를 줍니다. 효과가 끝날 때까지 모두에게서 떨어지세요. 영웅·신화: 피해 {heroic}% 증가.',
+    '{every}초마다 울려 퍼져 자신의 {radius}야드 안에 있는 모든 아군에게 {min}에서 {max}의 자연 피해를 줍니다. 효과가 끝날 때까지 모두에게서 떨어지세요. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해.',
   'hudChrome.auraEffect.council.rushMark':
-    '효과가 끝나면 망치의 수호자가 {windup}초 동안 자세를 잡은 뒤, 당신이 서 있던 곳을 지나 채석장 가장자리까지 일직선으로 돌진하며, 길을 막는 기둥이 있으면 첫 번째 기둥에서 멈춥니다. 저주받은 기둥으로 유인하세요: 기둥이 부서지고 수호자가 {stun}초 동안 기절하며 {exposedSeconds}초 동안 받는 피해가 {exposed}% 증가합니다. 경로에 엄폐용 기둥이 있으면 대신 그 기둥이 파괴됩니다. 멈추기 전까지 돌진에 부딪힌 모두가 {min}에서 {max}의 피해를 받고 밀려나며, 아직 경로 위에 있다면 당신도 마찬가지입니다. 신화: 기둥에 부딪히지 않은 돌진은 저주받은 기둥이 부서질 때까지 채석장 붕괴를 일으킵니다.',
+    '효과가 끝나면 망치의 수호자가 {windup}초 동안 자세를 잡은 뒤, 당신이 서 있던 곳을 지나 채석장 가장자리까지 일직선으로 돌진하며, 길을 막는 기둥이 있으면 첫 번째 기둥에서 멈춥니다. 저주받은 기둥으로 유인하세요: 기둥이 부서지고 수호자가 {stun}초 동안 기절하며 {exposedSeconds}초 동안 받는 피해가 {exposed}% 증가합니다. 경로에 엄폐용 기둥이 있으면 대신 그 기둥이 파괴됩니다. 멈추기 전까지 돌진에 부딪힌 모두가 {min}에서 {max}의 피해를 받고 밀려나며, 아직 경로 위에 있다면 당신도 마찬가지입니다. 신화: 기둥에 부딪히지 않은 돌진은 저주받은 기둥이 부서질 때까지 채석장 붕괴를 일으킵니다. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해.',
   'hudChrome.auraEffect.council.rushExposed':
     '받는 피해가 {pct}% 증가합니다: 산의 돌진이 저주받은 기둥을 부쉈습니다.',
   'hudChrome.auraEffect.council.bond':
-    '망치 의회의 다른 구성원이 {reach}야드 안에 있는 동안 받는 피해가 {pct}% 감소합니다. {every}초마다 돌의 결속이 공격대 전체에 {min}에서 {max}의 피해를 주며, 매번 {growth}%씩 증가합니다. 둘을 떼어 놓으세요.',
+    '망치 의회의 다른 구성원이 {reach}야드 안에 있는 동안 받는 피해가 {pct}% 감소합니다. {every}초마다 돌의 결속이 공격대 전체에 {min}에서 {max}의 피해를 주며, 매번 {growth}%씩 증가합니다. 둘을 떼어 놓으세요. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해.',
   'hudChrome.auraEffect.council.collapse':
     '채석장이 무너지고 있습니다: {every}초마다 중첩 하나당 {min}에서 {max}의 피해를 받으며, 매번 중첩이 하나씩 쌓입니다. 저주받은 기둥이 부서지면 끝납니다.',
   'hudChrome.auraEffect.council.pillarLimit':
-    '기둥 하나는 산의 분노로부터 최대 {limit}명만 지켜 줍니다. 그보다 많이 숨으면 모두가 폭발의 {share}%를 받습니다.',
+    '기둥 하나는 산의 분노로부터 최대 {limit}명만 지켜 줍니다. 그보다 많이 숨으면 모두가 폭발의 {share}%를 받습니다. 숨지 않은 대상은 일반에서 {min}에서 {max}, 영웅에서 {heroicMin}에서 {heroicMax}, 신화에서 {mythicMin}에서 {mythicMax}의 피해를 받습니다.',
   'hudChrome.council.alert.resonanceLine':
     '주변의 모든 아군에게 피해를 줍니다: 효과가 끝날 때까지 무리에서 떨어지세요',
   'hudChrome.council.alert.rushTitle': '산의 돌진!',
@@ -22621,25 +22621,25 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.breathGuardian.say.thessaly_isles':
     '저 방패는 섬들에서 힘을 얻고 있어! 바람을 타고 건너가 치유사들을 쓰러뜨리고 돌아와!',
   'hudChrome.auraEffect.breathGuardian.wind':
-    '숨결의 수호자의 바람이 부는 방향으로 초당 {speed}야드씩 당신을 실어 갑니다. 바람을 거슬러 걸으면 버틸 수 있으며, 시전은 끊기지 않습니다. 벼랑 둘레에는 벽이 없습니다: 가장자리 밖으로 실려 가면 공허로 떨어집니다. 오르막 꼭대기에만 벽이 남아 있으며, 그곳에 밀려 붙으면 매초 {pinMin}~{pinMax}의 피해를 입습니다.',
+    '숨결의 수호자의 바람이 부는 방향으로 초당 {speed}야드씩 당신을 실어 갑니다. 바람을 거슬러 걸으면 버틸 수 있으며, 시전은 끊기지 않습니다. 벼랑 둘레에는 벽이 없습니다: 가장자리 밖으로 실려 가면 공허로 떨어집니다. 오르막 꼭대기에만 벽이 남아 있으며, 그곳에 밀려 붙으면 매초 {pinMin}~{pinMax}의 피해를 입습니다. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해.',
   'hudChrome.auraEffect.breathGuardian.draw':
-    '수호자가 숨을 들이쉬며 초당 {speed}야드씩 당신을 끌어당깁니다. 입 앞의 소용돌이는 그 안에 선 자에게 {tick}초마다 {min}~{max}의 피해를 줍니다. 이어서 정상의 포효가 벼랑 위의 모두에게 {gustMin}~{gustMax}의 피해를 주고 수호자에게서 {throw}야드(영웅 난이도는 {heroicThrow}야드) 날려 보냅니다: 수호자가 가장자리 가까이 있으면 공격대가 벼랑 밖으로 날아갑니다.',
+    '수호자가 숨을 들이쉬며 초당 {speed}야드씩 당신을 끌어당깁니다. 입 앞의 소용돌이는 그 안에 선 자에게 {tick}초마다 {min}~{max}의 피해를 줍니다. 이어서 정상의 포효가 벼랑 위의 모두에게 {gustMin}~{gustMax}의 피해를 주고 수호자에게서 {throw}야드(영웅 난이도는 {heroicThrow}야드) 날려 보냅니다: 수호자가 가장자리 가까이 있으면 공격대가 벼랑 밖으로 날아갑니다. 영웅·신화: 각각 {heroicMin}에서 {heroicMax}, {heroicGustMin}에서 {heroicGustMax}의 피해.',
   'hudChrome.auraEffect.breathGuardian.pinned':
-    '바람에 밀려 가장자리 벽에 붙어 있습니다: 바람이 잦아들거나 벽에서 벗어날 때까지 매초 {min}~{max}의 피해.',
+    '바람에 밀려 가장자리 벽에 붙어 있습니다: 바람이 잦아들거나 벽에서 벗어날 때까지 매초 {min}~{max}의 피해. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해.',
   'hudChrome.auraEffect.breathGuardian.anchor':
     '테살리 대장의 고요가 당신을 붙잡고 있습니다: 바람도, 끌어당김도, 폭발도, 날려 보내기도 당신을 움직일 수 없습니다. 피해는 그대로 받습니다.',
   'hudChrome.auraEffect.breathGuardian.spent':
     '닻이 다했습니다: 이것이 끝날 때까지 테살리 대장의 고요의 원은 당신을 다시 붙잡을 수 없습니다.',
   'hudChrome.auraEffect.breathGuardian.drawn':
-    '{every}초마다 당신이 선 곳에 번개가 떨어집니다: {warn}초 뒤 {radius}야드 안의 모두에게 {min}~{max}의 피해를 주고, {charged}초 동안 매초 {cmin}~{cmax}의 피해를 주는 대전된 땅을 남깁니다. 계속 움직이며 낙뢰를 공격대에서 먼 가장자리로 유도하세요.',
+    '{every}초마다 당신이 선 곳에 번개가 떨어집니다: {warn}초 뒤 {radius}야드 안의 모두에게 {min}~{max}의 피해를 주고, {charged}초 동안 매초 {cmin}~{cmax}의 피해를 주는 대전된 땅을 남깁니다. 계속 움직이며 낙뢰를 공격대에서 먼 가장자리로 유도하세요. 영웅·신화: 각각 {heroicMin}에서 {heroicMax}, {heroicCMin}에서 {heroicCMax}의 피해.',
   'hudChrome.auraEffect.breathGuardian.cradled':
-    '폭풍 속으로 들어 올려져, 수호자가 요람을 유지하는 {hold}초 동안 붙잡힙니다. 그동안 수호자는 다른 것을 시전하지 않습니다. 이후 방전이 {total}의 피해를 주며, 당신과 아래 {radius}야드 안의 모두가 나눠 받습니다. 나눠 받는 인원이 {soakers}명 미만이면 각자 {penalty}% 더 받고 벼랑 위의 모두가 {bmin}~{bmax}의 피해를 받습니다. 영웅: {heroicCount}명이 한꺼번에 들어 올려지며, 각 방전은 {heroicTotal}이고 {heroicSoakers}명이 필요하니 공격대가 나뉘어 받아야 합니다.',
+    '폭풍 속으로 들어 올려져, 수호자가 요람을 유지하는 {hold}초 동안 붙잡힙니다. 그동안 수호자는 다른 것을 시전하지 않습니다. 이후 방전이 {total}의 피해를 주며, 당신과 아래 {radius}야드 안의 모두가 나눠 받습니다. 나눠 받는 인원이 {soakers}명 미만이면 각자 {penalty}% 더 받고 벼랑 위의 모두가 {bmin}~{bmax}의 피해를 받습니다. 영웅: {heroicCount}명이 한꺼번에 들어 올려지며, 각 방전은 {heroicTotal}이고 {heroicSoakers}명이 필요하니 공격대가 나뉘어 받아야 합니다. 영웅·신화: 반동 피해는 {heroicBMin}에서 {heroicBMax}입니다.',
   'hudChrome.auraEffect.breathGuardian.stormForm':
     '찢어져 번개의 몸이 되었습니다: 숨결의 수호자가 쓰러질 때까지 이어지는 전투의 폭풍 후반부.',
   'hudChrome.auraEffect.breathGuardian.swell':
-    '{every}초마다 부풀어 오르는 폭풍이 벼랑 위의 모두에게 {min}~{max}의 피해를 주며, 앞선 맥동마다 {growth}%씩 강해집니다: 지금까지 {stacks}번.',
+    '{every}초마다 부풀어 오르는 폭풍이 벼랑 위의 모두에게 {min}~{max}의 피해를 주며, 앞선 맥동마다 {growth}%씩 강해집니다: 지금까지 {stacks}번. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해.',
   'hudChrome.auraEffect.breathGuardian.bulwark':
-    '바람의 방패가 피해를 {left} 더 흡수합니다. 떠 있는 섬의 질풍 파수병이나 질풍 치유사가 하나라도 살아 있으면 매초 전체의 {regrow}%가 다시 차오르고, 치유의 질풍마다 {mend}%가 회복됩니다. 질풍의 길을 타고 섬으로 건너가 그들을 쓰러뜨리세요. {max}초 동안 유지되면 벼랑 위에서 터져 {bmin}~{bmax}의 피해를 줍니다.',
+    '바람의 방패가 피해를 {left} 더 흡수합니다. 떠 있는 섬의 질풍 파수병이나 질풍 치유사가 하나라도 살아 있으면 매초 전체의 {regrow}%가 다시 차오르고, 치유의 질풍마다 {mend}%가 회복됩니다. 질풍의 길을 타고 섬으로 건너가 그들을 쓰러뜨리세요. {max}초 동안 유지되면 벼랑 위에서 터져 {bmin}~{bmax}의 피해를 줍니다. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해.',
   'hudChrome.auraEffect.breathGuardian.riding':
     '바람이 정해진 길을 따라 공허 위로 당신을 실어 갑니다: 내려놓을 때까지 행동할 수 없습니다.',
   'hudChrome.auraEffect.breathGuardian.windworn':
@@ -22669,7 +22669,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '발을 단단히 딛으세요, {className}. 풀무가 숨을 쉬면 제 고요 속으로 들어와 바람이 우리에게 부딪혀 흩어지게 하세요.',
   // The Smith's Heart's Guardian of the Quench (M16 fills).
   'hudChrome.auraEffect.quenchGuardian.marked':
-    '{count}명 중 {order}번째입니다. 칼날이 당신을 지나는 선을 따라 날아옵니다. 선을 공격대에서 멀리 유도하세요. 선은 칼날이 날아가기 {lock}초 전에 고정되니 그때 비켜서세요. 그렇지 않으면 {min}~{max}의 냉기 피해와 냉기 {cold}를 받습니다.',
+    '{count}명 중 {order}번째입니다. 칼날이 당신을 지나는 선을 따라 날아옵니다. 선을 공격대에서 멀리 유도하세요. 선은 칼날이 날아가기 {lock}초 전에 고정되니 그때 비켜서세요. 그렇지 않으면 {min}~{max}의 냉기 피해와 냉기 {cold}를 받습니다. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해.',
   'hudChrome.quenchAlert.markedTitle': '칼날이 당신을 노립니다! ({count}명 중 {order}번째)',
   'hudChrome.quenchAlert.markedLine': '선을 공격대에서 멀리 유도하고, 고정되면 비켜서세요.',
   'abilityUi.cast.heart_quench_blades_hunt': '칼날의 사냥',
@@ -22689,7 +22689,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.quenchGuardian.warmth':
     '공격대와 함께 모여 있음: 냉기가 매초 {fall}씩 내려갑니다. 한 자리에 {linger}초 동안 머문 무리 아래의 얼음은 갈라져 얼어붙은 물웅덩이가 되니 계속 움직이세요.',
   'hudChrome.auraEffect.quenchGuardian.frozen':
-    '서리에 갇힘: 행동할 수 없고 모든 공격으로부터 받는 피해가 {pct}% 증가하며, 서리가 차가운 관 같은 무적 효과를 깨뜨립니다. 효과가 끝나면 얼음이 부서져 {min}~{max}의 냉기 피해를 입고, 이후 {seconds}초 동안 받는 피해가 {brittle}% 증가하며, {radius}미터 안의 모두가 냉기 {cold}을 얻습니다(영웅 난이도에서는 {heroicRadius}미터, 냉기 {heroicCold}).',
+    '서리에 갇힘: 행동할 수 없고 모든 공격으로부터 받는 피해가 {pct}% 증가하며, 서리가 차가운 관 같은 무적 효과를 깨뜨립니다. 효과가 끝나면 얼음이 부서져 {min}~{max}의 냉기 피해를 입고, 이후 {seconds}초 동안 받는 피해가 {brittle}% 증가하며, {radius}미터 안의 모두가 냉기 {cold}을 얻습니다(영웅 난이도에서는 {heroicRadius}미터, 냉기 {heroicCold}). 영웅: {heroicMin}에서 {heroicMax}의 피해. 신화: {mythicMin}에서 {mythicMax}의 피해.',
   'hudChrome.auraEffect.quenchGuardian.brittle':
     '모든 공격으로부터 받는 피해가 {pct}% 증가합니다. 이 효과가 지속되는 동안에는 아군의 얼음 파편이 당신의 냉기를 {cap} 넘게 올리지 못합니다.',
   'hudChrome.auraEffect.quenchGuardian.splashed':
@@ -22697,9 +22697,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.quenchAlert.splashTitle': '서리 파편! 냉기 +{cold}',
   'hudChrome.quenchAlert.immuneLine': '무적 효과로도 냉기는 막을 수 없습니다: 모이세요',
   'hudChrome.auraEffect.quenchGuardian.trapped':
-    '얼음을 뚫고 얼어붙은 물에 빠졌습니다: 움직일 수 없고, 매초 {min}~{max}의 냉기 피해를 입으며 냉기가 올라갑니다. {seconds}초 뒤 가장자리로 기어 올라옵니다. 물만으로는 절대 죽지 않습니다.',
+    '얼음을 뚫고 얼어붙은 물에 빠졌습니다: 움직일 수 없고, 매초 {min}~{max}의 냉기 피해를 입으며 냉기가 올라갑니다. {seconds}초 뒤 가장자리로 기어 올라옵니다. 물만으로는 절대 죽지 않습니다. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해.',
   'hudChrome.auraEffect.quenchGuardian.awake':
-    '대장장이의 네 칼날이 깨어 있습니다. 라운드마다 더 많은 플레이어가 표식을 받고, 칼날이 각자를 지나는 선을 따라 차례로 날아갑니다. 선은 칼날이 날아가기 {lock}초 전에 고정되며, 선 위의 대상에게 {min}~{max}의 냉기 피해를 주고 냉기를 {cold} 더합니다.',
+    '대장장이의 네 칼날이 깨어 있습니다. 라운드마다 더 많은 플레이어가 표식을 받고, 칼날이 각자를 지나는 선을 따라 차례로 날아갑니다. 선은 칼날이 날아가기 {lock}초 전에 고정되며, 선 위의 대상에게 {min}~{max}의 냉기 피해를 주고 냉기를 {cold} 더합니다. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해.',
   'hudChrome.auraEffect.quenchGuardian.deepening':
     '호수의 냉기가 {total}% 더 빠르게 오릅니다: 검이 깨어난 뒤 {every}초마다 {step}%씩(지금까지 {stacks}회).',
   'abilityUi.cast.heart_quench_blades_wake': '검의 각성',
@@ -25772,32 +25772,32 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.finalBoss.stateRing':
     '중앙 원 안에서는 어느 구역의 힘도 마시지 않습니다. 생명력이 {pct}%보다 높으면 그곳에서 매초 풀려난 심장 중첩을 얻습니다.',
   'hudChrome.auraEffect.finalBoss.overloadHeat':
-    '열기의 과부하, {value}% 찼습니다. 우두머리가 열기 구역에 서 있는 동안 차오르며(비어 있다가 가득 차기까지 {fill}초), {every}초마다 공격대에 맥동 피해를 줍니다: 비었을 때 {min}, 가득 찼을 때 최대 {max}. 가득 차기 직전에 공격대에 경고합니다. 가득 차면 터져 공격대 전체에 피해를 주고 비워집니다: 일반에서 {normalMin}~{normalMax}(치유로 버틸 수 있음), 영웅에서 {heroicMin}~{heroicMax}(강력함: 체력을 채우고 생존기를 사용), 신화에서 {mythicMin}~{mythicMax}(치명적: 강력한 개인 생존기 없이는 살아남을 수 없음). 구역을 떠나면 3분의 1 속도로 줄어듭니다.',
+    '열기의 과부하, {value}% 찼습니다. 우두머리가 열기 구역에 서 있는 동안 차오르며(비어 있다가 가득 차기까지 {fill}초), {every}초마다 공격대에 맥동 피해를 줍니다: 비었을 때 {min}, 가득 찼을 때 최대 {max}. 가득 차기 직전에 공격대에 경고합니다. 가득 차면 터져 공격대 전체에 피해를 주고 비워집니다: 일반에서 {normalMin}~{normalMax}(치유로 버틸 수 있음), 영웅에서 {heroicMin}~{heroicMax}(강력함: 체력을 채우고 생존기를 사용), 신화에서 {mythicMin}~{mythicMax}(치명적: 강력한 개인 생존기 없이는 살아남을 수 없음). 구역을 떠나면 3분의 1 속도로 줄어듭니다. 맥동 피해는 영웅에서 {heroicPulseMin}에서 {heroicPulseMax}, 신화에서 {mythicPulseMin}에서 {mythicPulseMax}입니다.',
   'hudChrome.auraEffect.finalBoss.overloadQuench':
-    '담금질의 과부하, {value}% 찼습니다. 우두머리가 담금질 구역에 서 있는 동안 차오르며(비어 있다가 가득 차기까지 {fill}초), {every}초마다 공격대에 맥동 피해를 줍니다: 비었을 때 {min}, 가득 찼을 때 최대 {max}. 가득 차기 직전에 공격대에 경고합니다. 가득 차면 터져 공격대 전체에 피해를 주고 비워집니다: 일반에서 {normalMin}~{normalMax}(치유로 버틸 수 있음), 영웅에서 {heroicMin}~{heroicMax}(강력함: 체력을 채우고 생존기를 사용), 신화에서 {mythicMin}~{mythicMax}(치명적: 강력한 개인 생존기 없이는 살아남을 수 없음). 구역을 떠나면 3분의 1 속도로 줄어듭니다.',
+    '담금질의 과부하, {value}% 찼습니다. 우두머리가 담금질 구역에 서 있는 동안 차오르며(비어 있다가 가득 차기까지 {fill}초), {every}초마다 공격대에 맥동 피해를 줍니다: 비었을 때 {min}, 가득 찼을 때 최대 {max}. 가득 차기 직전에 공격대에 경고합니다. 가득 차면 터져 공격대 전체에 피해를 주고 비워집니다: 일반에서 {normalMin}~{normalMax}(치유로 버틸 수 있음), 영웅에서 {heroicMin}~{heroicMax}(강력함: 체력을 채우고 생존기를 사용), 신화에서 {mythicMin}~{mythicMax}(치명적: 강력한 개인 생존기 없이는 살아남을 수 없음). 구역을 떠나면 3분의 1 속도로 줄어듭니다. 맥동 피해는 영웅에서 {heroicPulseMin}에서 {heroicPulseMax}, 신화에서 {mythicPulseMin}에서 {mythicPulseMax}입니다.',
   'hudChrome.auraEffect.finalBoss.overloadBreath':
-    '숨결의 과부하, {value}% 찼습니다. 우두머리가 숨결 구역에 서 있는 동안 차오르며(비어 있다가 가득 차기까지 {fill}초), {every}초마다 공격대에 맥동 피해를 줍니다: 비었을 때 {min}, 가득 찼을 때 최대 {max}. 가득 차기 직전에 공격대에 경고합니다. 가득 차면 터져 공격대 전체에 피해를 주고 비워집니다: 일반에서 {normalMin}~{normalMax}(치유로 버틸 수 있음), 영웅에서 {heroicMin}~{heroicMax}(강력함: 체력을 채우고 생존기를 사용), 신화에서 {mythicMin}~{mythicMax}(치명적: 강력한 개인 생존기 없이는 살아남을 수 없음). 구역을 떠나면 3분의 1 속도로 줄어듭니다.',
+    '숨결의 과부하, {value}% 찼습니다. 우두머리가 숨결 구역에 서 있는 동안 차오르며(비어 있다가 가득 차기까지 {fill}초), {every}초마다 공격대에 맥동 피해를 줍니다: 비었을 때 {min}, 가득 찼을 때 최대 {max}. 가득 차기 직전에 공격대에 경고합니다. 가득 차면 터져 공격대 전체에 피해를 주고 비워집니다: 일반에서 {normalMin}~{normalMax}(치유로 버틸 수 있음), 영웅에서 {heroicMin}~{heroicMax}(강력함: 체력을 채우고 생존기를 사용), 신화에서 {mythicMin}~{mythicMax}(치명적: 강력한 개인 생존기 없이는 살아남을 수 없음). 구역을 떠나면 3분의 1 속도로 줄어듭니다. 맥동 피해는 영웅에서 {heroicPulseMin}에서 {heroicPulseMax}, 신화에서 {mythicPulseMin}에서 {mythicPulseMax}입니다.',
   'hudChrome.auraEffect.finalBoss.overloadHammer':
-    '망치의 과부하, {value}% 찼습니다. 우두머리가 망치 구역에 서 있는 동안 차오르며(비어 있다가 가득 차기까지 {fill}초), {every}초마다 공격대에 맥동 피해를 줍니다: 비었을 때 {min}, 가득 찼을 때 최대 {max}. 가득 차기 직전에 공격대에 경고합니다. 가득 차면 터져 공격대 전체에 피해를 주고 비워집니다: 일반에서 {normalMin}~{normalMax}(치유로 버틸 수 있음), 영웅에서 {heroicMin}~{heroicMax}(강력함: 체력을 채우고 생존기를 사용), 신화에서 {mythicMin}~{mythicMax}(치명적: 강력한 개인 생존기 없이는 살아남을 수 없음). 구역을 떠나면 3분의 1 속도로 줄어듭니다.',
+    '망치의 과부하, {value}% 찼습니다. 우두머리가 망치 구역에 서 있는 동안 차오르며(비어 있다가 가득 차기까지 {fill}초), {every}초마다 공격대에 맥동 피해를 줍니다: 비었을 때 {min}, 가득 찼을 때 최대 {max}. 가득 차기 직전에 공격대에 경고합니다. 가득 차면 터져 공격대 전체에 피해를 주고 비워집니다: 일반에서 {normalMin}~{normalMax}(치유로 버틸 수 있음), 영웅에서 {heroicMin}~{heroicMax}(강력함: 체력을 채우고 생존기를 사용), 신화에서 {mythicMin}~{mythicMax}(치명적: 강력한 개인 생존기 없이는 살아남을 수 없음). 구역을 떠나면 3분의 1 속도로 줄어듭니다. 맥동 피해는 영웅에서 {heroicPulseMin}에서 {heroicPulseMax}, 신화에서 {mythicPulseMin}에서 {mythicPulseMax}입니다.',
   'hudChrome.auraEffect.finalBoss.root':
     '구역에 들어간 뒤 {seconds}초 동안 뿌리내립니다: 뿌리내림이 끝날 때까지 끌어낼 수 없습니다.',
   'hudChrome.auraEffect.finalBoss.unbound':
-    '중첩마다 매초 공격대 전체에 {per}의 피해를 주며(현재 {total}), 중앙 원 안에 서 있는 동안 매초 중첩이 쌓입니다. 원 밖으로 끌어내면 끝납니다.',
+    '중첩마다 매초 공격대 전체에 {per}의 피해를 주며(현재 {total}), 중앙 원 안에 서 있는 동안 매초 중첩이 쌓입니다. 원 밖으로 끌어내면 끝납니다. 영웅: 중첩당 {heroicPer}. 신화: 중첩당 {mythicPer}.',
   'hudChrome.auraEffect.finalBoss.shaken':
-    '이 효과가 지속되는 동안 구역 전환이 {mult}배 강하게 적중합니다({baseMin}~{baseMax} 대신 {min}~{max}의 피해). 전환할 때마다 {seconds}초로 갱신됩니다.',
+    '이 효과가 지속되는 동안 구역 전환이 {mult}배 강하게 적중합니다({baseMin}~{baseMax} 대신 {min}~{max}의 피해). 전환할 때마다 {seconds}초로 갱신됩니다. 영웅: {heroicMin}에서 {heroicMax}의 피해. 신화: {mythicMin}에서 {mythicMax}의 피해.',
   'hudChrome.auraEffect.finalBoss.cold':
-    '냉기 {value}/100. {reach}미터 안에 다른 플레이어가 {allies}명 미만이면 매초 {rise}씩 오르고, 모이면 내려갑니다. 100이 되면 서리에 갇힙니다: {freeze}초 동안 기절하고 {min}~{max}의 냉기 피해를 받습니다.',
+    '냉기 {value}/100. {reach}미터 안에 다른 플레이어가 {allies}명 미만이면 매초 {rise}씩 오르고, 모이면 내려갑니다. 100이 되면 서리에 갇힙니다: {freeze}초 동안 기절하고 {min}~{max}의 냉기 피해를 받습니다. 영웅: {heroicMin}에서 {heroicMax}의 피해. 신화: {mythicMin}에서 {mythicMax}의 피해.',
   'hudChrome.auraEffect.finalBoss.frozen':
     '기절 상태. 혼자 서 있다가 얼어붙었습니다: 담금질을 마시는 동안 다른 플레이어 {allies}명 이상의 {reach}미터 안에 머무르세요.',
   'hudChrome.auraEffect.finalBoss.underIce': '기절 상태: 깨지는 얼음 아래로 떨어졌습니다.',
   'hudChrome.auraEffect.finalBoss.numbing':
     '정면 공격으로 {seconds}초 동안 이동 속도가 {pct}% 감소합니다.',
   'hudChrome.auraEffect.finalBoss.ember':
-    '{seconds}초 후 발밑에 잉걸불이 떨어져 반경 {radius}미터 웅덩이로 {life}초 동안 타오르며, 그 안의 모두에게 매초 {min}~{max}의 화염 피해를 줍니다. 표식이 찍힌 다른 플레이어와 같은 구석에 모였다가 빠져나가세요.',
+    '{seconds}초 후 발밑에 잉걸불이 떨어져 반경 {radius}미터 웅덩이로 {life}초 동안 타오르며, 그 안의 모두에게 매초 {min}~{max}의 화염 피해를 줍니다. 표식이 찍힌 다른 플레이어와 같은 구석에 모였다가 빠져나가세요. 영웅: {heroicMin}에서 {heroicMax}의 피해. 신화: {mythicMin}에서 {mythicMax}의 피해.',
   'hudChrome.auraEffect.finalBoss.wind':
-    '강풍이 부는 방향으로 매초 {speed}미터씩 밀려납니다. 바람을 거슬러 걸으면 버틸 수 있습니다(시전은 끊기지 않습니다). 바람이 부는 동안 가장자리 {band}미터 안에 있으면 매초 {min}~{max}의 자연 피해를 받습니다.',
+    '강풍이 부는 방향으로 매초 {speed}미터씩 밀려납니다. 바람을 거슬러 걸으면 버틸 수 있습니다(시전은 끊기지 않습니다). 바람이 부는 동안 가장자리 {band}미터 안에 있으면 매초 {min}~{max}의 자연 피해를 받습니다. 영웅: {heroicMin}에서 {heroicMax}의 피해. 신화: {mythicMin}에서 {mythicMax}의 피해.',
   'hudChrome.auraEffect.finalBoss.drawn':
-    '{seconds}초 동안 매초 당신에게서 {reach}미터 안의 다른 모든 플레이어에게 번개가 튀어 각각 {min}~{max}의 자연 피해를 줍니다. 모두에게서 {reach}미터 떨어지세요.',
+    '{seconds}초 동안 매초 당신에게서 {reach}미터 안의 다른 모든 플레이어에게 번개가 튀어 각각 {min}~{max}의 자연 피해를 줍니다. 모두에게서 {reach}미터 떨어지세요. 영웅: {heroicMin}에서 {heroicMax}의 피해. 신화: {mythicMin}에서 {mythicMax}의 피해.',
   'hudChrome.auraEffect.finalBoss.shell': '다음에 받는 치유 {value}을(를) 흡수합니다.',
   'hudChrome.auraEffect.finalBoss.crushed':
     '{seconds}초 안에 다음 모루의 무게 아래에 서면 분담 피해를 {mult}배로 받습니다. 다른 조에게 맡기세요.',
@@ -25854,7 +25854,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.heart_final_splinter_breath.name': '숨결의 파편',
   'entities.mobs.heart_final_splinter_hammer.name': '망치의 파편',
   'hudChrome.auraEffect.finalBoss.phaseCall':
-    '네 구역의 부름: 파편이 살아 있는 동안 {seconds}초 동안 중앙에서 보호받습니다. 파편 하나마다 {every}초마다 공격대 전체에 {min}~{max}의 피해를 주며, 파동마다 {rise}%씩 강해집니다. 모두 처치하면 보호막이 일찍 깨집니다. 부름이 끝날 때 살아 있는 파편은 전투가 끝날 때까지 그 원소를 우두머리에게 쏟아붓습니다.',
+    '네 구역의 부름: 파편이 살아 있는 동안 {seconds}초 동안 중앙에서 보호받습니다. 파편 하나마다 {every}초마다 공격대 전체에 {min}~{max}의 피해를 주며, 파동마다 {rise}%씩 강해집니다. 모두 처치하면 보호막이 일찍 깨집니다. 부름이 끝날 때 살아 있는 파편은 전투가 끝날 때까지 그 원소를 우두머리에게 쏟아붓습니다. 영웅: {heroicMin}에서 {heroicMax}의 피해. 신화: {mythicMin}에서 {mythicMax}의 피해.',
   'hudChrome.finalBoss.warn.rebirth':
     '심장이 고동친다! 주인 없는 힘이 네 구역을 들이켜고 다시 일어선다!',
   'hudChrome.finalBoss.warn.unmade':
@@ -25888,15 +25888,15 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.finalBoss.pouredHammer':
     '망치가 쏟아부어졌습니다: 전투가 끝날 때까지 어디에 있든 {every}초마다 플레이어 발밑에서 진동 균열이 터집니다({times}회 쏟아부어짐).',
   'hudChrome.auraEffect.finalBoss.fury':
-    '주인 없는 분노: {every}초마다 공격대 전체에 {min}~{max}의 피해를 주며, 파동마다 {rise}%씩 강해집니다. 지금 처치하십시오.',
+    '주인 없는 분노: {every}초마다 공격대 전체에 {min}~{max}의 피해를 주며, 파동마다 {rise}%씩 강해집니다. 지금 처치하십시오. 영웅: {heroicMin}에서 {heroicMax}의 피해. 신화: {mythicMin}에서 {mythicMax}의 피해.',
   'hudChrome.auraEffect.finalBoss.coal':
-    '{seconds}초 후 석탄이 터집니다: 당신으로부터 {reach}미터 안의 다른 모든 플레이어에게 {min}~{max}의 화염 피해, 당신에게 {selfMin}~{selfMax}. 지금 무리를 떠나십시오.',
+    '{seconds}초 후 석탄이 터집니다: 당신으로부터 {reach}미터 안의 다른 모든 플레이어에게 {min}~{max}의 화염 피해, 당신에게 {selfMin}~{selfMax}. 지금 무리를 떠나십시오. 영웅: 각각 {heroicMin}에서 {heroicMax}, {heroicSelfMin}에서 {heroicSelfMax}의 피해. 신화: 각각 {mythicMin}에서 {mythicMax}, {mythicSelfMin}에서 {mythicSelfMax}.',
   'hudChrome.auraEffect.finalBoss.tether':
-    '숨결의 파편이 {seconds}초 동안 당신을 쫓습니다. 그 몰아치는 돌풍은 파편으로부터 {reach}미터 안의 다른 모든 사람에게 매초 {min}~{max}의 자연 피해를 줍니다: 파편을 무리에서 떼어 놓으십시오.',
+    '숨결의 파편이 {seconds}초 동안 당신을 쫓습니다. 그 몰아치는 돌풍은 파편으로부터 {reach}미터 안의 다른 모든 사람에게 매초 {min}~{max}의 자연 피해를 줍니다: 파편을 무리에서 떼어 놓으십시오. 영웅: {heroicMin}에서 {heroicMax}의 피해. 신화: {mythicMin}에서 {mythicMax}의 피해.',
   'hudChrome.auraEffect.finalBoss.chill':
     '{seconds}초 동안 이동 속도가 {pct}% 감소합니다: 담금질 고리를 틈이 아닌 곳으로 넘었습니다.',
   'hudChrome.auraEffect.finalBoss.weight':
-    '매초 {total}의 물리 피해를 입힙니다(중첩당 {per}). 중첩마다 망치의 파편이 당신을 {step}% 더 세게 칩니다(현재 {harder}%). {seconds}초 동안 지속되며, 탱커는 {swap}중첩에서 교대합니다.',
+    '매초 {total}의 물리 피해를 입힙니다(중첩당 {per}). 중첩마다 망치의 파편이 당신을 {step}% 더 세게 칩니다(현재 {harder}%). {seconds}초 동안 지속되며, 탱커는 {swap}중첩에서 교대합니다. 중첩당 받는 피해 증가는 영웅에서 {heroicStep}%, 신화에서 {mythicStep}%입니다.',
   'hudChrome.finalAlert.coalTitle': '터지는 석탄!',
   'hudChrome.finalAlert.coalLine':
     '무리를 떠나십시오: {seconds}초 후 {reach}미터 안의 모두에게 터집니다',
@@ -26164,10 +26164,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.heatGuardian.say.slay_a': '또 하나의 불티가 불꽃의 품으로 돌아간다.',
   'hudChrome.heatGuardian.say.slay_b': '깨끗이 태워졌다.',
   'hudChrome.heatGuardian.say.slay_c': '최초의 불꽃이 제 몫을 거둔다.',
-  'hudChrome.finalBoss.say.arrivalWake': '누가 산의 심장을 깨우는가? 따뜻한 숨결... 아무것도 숨 쉬지 않는 이곳에서.',
-  'hudChrome.finalBoss.say.arrivalRise': '돌이여, 일어나라. 우리에게 묶여라. 우리를 빚은 손은 떠났으니, 우리가 우리 자신을 빚는다.',
+  'hudChrome.finalBoss.say.arrivalWake':
+    '누가 산의 심장을 깨우는가? 따뜻한 숨결... 아무것도 숨 쉬지 않는 이곳에서.',
+  'hudChrome.finalBoss.say.arrivalRise':
+    '돌이여, 일어나라. 우리에게 묶여라. 우리를 빚은 손은 떠났으니, 우리가 우리 자신을 빚는다.',
   'hudChrome.finalBoss.say.arrivalRoar': '우리는 대장장이의 힘이며, 우리에게는 주인이 없다!',
-  'hudChrome.finalBoss.say.pull': '너희는 그 피 속에 네 줄기 광맥을 품고 있다. 우리가 그것을 되찾고, 너희 위로 산을 봉인하리라.',
+  'hudChrome.finalBoss.say.pull':
+    '너희는 그 피 속에 네 줄기 광맥을 품고 있다. 우리가 그것을 되찾고, 너희 위로 산을 봉인하리라.',
   'hudChrome.finalBoss.say.drinkHeat': '최초의 불꽃이 우리를 채운다!',
   'hudChrome.finalBoss.say.drinkQuench': '차가운 물이여, 우리를 단단하게 하라!',
   'hudChrome.finalBoss.say.drinkBreath': '불어라, 풀무여! 폭풍을 일으켜라!',
@@ -26176,17 +26179,20 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finalBoss.say.anvil': '세상의 무게를 짊어져라!',
   'hudChrome.finalBoss.say.call': '우리 힘의 파편들이여, 광맥에서 일어나라! 심장을 지켜라!',
   'hudChrome.finalBoss.say.callAgain': '다시! 모든 광맥이여, 너희의 자식들을 우리에게 바쳐라!',
-  'hudChrome.finalBoss.say.shattered': '우리의 파편이... 산산이 부서졌다. 그렇다면 남은 것으로 싸우리라.',
+  'hudChrome.finalBoss.say.shattered':
+    '우리의 파편이... 산산이 부서졌다. 그렇다면 남은 것으로 싸우리라.',
   'hudChrome.finalBoss.say.poured': '그래... 우리 안으로 쏟아져라. 모든 광맥이, 하나의 몸으로.',
   'hudChrome.finalBoss.say.final': '이제 그만! 모든 광맥을 한꺼번에! 산 전체가 너희 위로 무너진다!',
   'hudChrome.finalBoss.say.fury': '우리를 막을 손은 없다. 우리의 힘에는 끝이 없다!',
   'hudChrome.finalBoss.say.kneel': '이것이... 그분이 느낀 것인가... 눕는다는 것... 마침내...',
   'hudChrome.finalBoss.say.rebirth': '아니. 산은 두 번 잠들지 않는다!',
-  'hudChrome.finalBoss.say.collapse': '무너져라, 돌이여! 우리가 산을 지킬 수 없다면, 아무도 그 위에 서지 못한다!',
+  'hudChrome.finalBoss.say.collapse':
+    '무너져라, 돌이여! 우리가 산을 지킬 수 없다면, 아무도 그 위에 서지 못한다!',
   'hudChrome.finalBoss.say.anvilsEnd': '모루가 끝난다. 모든 것이 끝난다.',
   'hudChrome.finalBoss.say.slay_a': '돌 속으로 돌아가라.',
   'hudChrome.finalBoss.say.slay_b': '네 피는 광맥으로 돌아간다.',
   'hudChrome.finalBoss.say.slay_c': '또 하나의 온기를 봉인했다.',
   'hudChrome.finalBoss.say.wipe': '봉인되었다. 고요하다. 그분이 바란 대로.',
-  'hudChrome.finalBoss.say.death': '그 손은... 결코 돌아오지 않았다. 불씨 하나가 아직 타오른다... 그것을 가져가라. 그리고 산을 잠들게 하라.',
+  'hudChrome.finalBoss.say.death':
+    '그 손은... 결코 돌아오지 않았다. 불씨 하나가 아직 타오른다... 그것을 가져가라. 그리고 산을 잠들게 하라.',
 };

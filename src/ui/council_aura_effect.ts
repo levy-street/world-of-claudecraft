@@ -16,10 +16,16 @@ import {
   COUNCIL_TUNING as T,
 } from '../sim/encounters/smith_heart/council_ids';
 import type { AuraEffectDescriptor, AuraEffectInput } from './aura_effect';
+import { tierRange, tierValue } from './heart_tier_damage';
 
 const KEY = 'hudChrome.auraEffect.council';
 
 const pct = (frac: number): number => Math.round(Math.abs(frac) * 100);
+/** Heroic's damage factor; Mythic shares it (pinned), so one range names both. */
+const HM = COUNCIL_DIFFICULTY.heroic.damageMult;
+/** A tier's Wrath factor on top of its damage factor (council_wrath.ts). */
+const wrathMult = (tier: 'heroic' | 'mythic'): number =>
+  COUNCIL_DIFFICULTY[tier].damageMult * COUNCIL_DIFFICULTY[tier].wrathMult;
 
 /** The council aura's descriptor, or null when `a` is not one of them. */
 export function councilAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor | null {
@@ -31,7 +37,7 @@ export function councilAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescr
           radius: T.riseKnockRadius,
           min: T.riseMin,
           max: T.riseMax,
-          heroic: pct(COUNCIL_DIFFICULTY.heroic.damageMult - 1),
+          ...tierRange('heroic', T.riseMin, T.riseMax, HM),
         },
       };
     case COUNCIL_AURAS.rockMark:
@@ -45,7 +51,8 @@ export function councilAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescr
           tremorMin: T.rockTremorMin,
           tremorMax: T.rockTremorMax,
           soulReach: T.soulRockReach,
-          heroic: pct(COUNCIL_DIFFICULTY.heroic.damageMult - 1),
+          heroicTotal: tierValue(T.rockTotal, HM),
+          ...tierRange('heroicTremor', T.rockTremorMin, T.rockTremorMax, HM),
         },
       };
     case COUNCIL_AURAS.resonance:
@@ -56,7 +63,7 @@ export function councilAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescr
           min: T.resonanceMin,
           max: T.resonanceMax,
           radius: a.value2 && a.value2 > 0 ? a.value2 : T.resonanceRadius,
-          heroic: pct(COUNCIL_DIFFICULTY.heroic.damageMult - 1),
+          ...tierRange('heroic', T.resonanceMin, T.resonanceMax, HM),
         },
       };
     case COUNCIL_AURAS.rushMark:
@@ -69,6 +76,7 @@ export function councilAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescr
           exposedSeconds: T.rushExposedSeconds,
           min: T.rushMin,
           max: T.rushMax,
+          ...tierRange('heroic', T.rushMin, T.rushMax, HM),
         },
       };
     case COUNCIL_AURAS.rushExposed:
@@ -82,13 +90,19 @@ export function councilAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescr
           every: T.bondPulseEvery,
           min: T.bondPulseMin,
           max: T.bondPulseMax,
+          ...tierRange('heroic', T.bondPulseMin, T.bondPulseMax, HM),
           growth: pct(T.bondPulseGrowth),
         },
       };
     case COUNCIL_AURAS.collapse:
       return {
         key: `${KEY}.collapse`,
-        nums: { every: T.collapseEvery, min: T.collapseMin, max: T.collapseMax },
+        // A Mythic-only rule, so its range is Mythic's resolved one.
+        nums: {
+          every: T.collapseEvery,
+          min: tierValue(T.collapseMin, COUNCIL_DIFFICULTY.mythic.damageMult),
+          max: tierValue(T.collapseMax, COUNCIL_DIFFICULTY.mythic.damageMult),
+        },
       };
     case COUNCIL_AURAS.memory:
       return {
@@ -98,7 +112,16 @@ export function councilAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescr
     case COUNCIL_AURAS.pillarLimit:
       return {
         key: `${KEY}.pillarLimit`,
-        nums: { limit: a.value2 ?? 0, share: pct(T.crowdShare) },
+        // The Guardian's Wrath on whoever no pillar hides: the tier's damage
+        // factor times its own Wrath factor (Heroic's kills an unhidden cloth).
+        nums: {
+          limit: a.value2 ?? 0,
+          share: pct(T.crowdShare),
+          min: T.wrathMin,
+          max: T.wrathMax,
+          ...tierRange('heroic', T.wrathMin, T.wrathMax, wrathMult('heroic')),
+          ...tierRange('mythic', T.wrathMin, T.wrathMax, wrathMult('mythic')),
+        },
       };
     default:
       return null;

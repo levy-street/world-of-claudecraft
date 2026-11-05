@@ -10,7 +10,7 @@
 // the stacks and the poured count off the aura itself. Pinned by
 // tests/smith_heart_final_phase_ui.test.ts.
 
-import { FINAL_TUNING as T } from '../sim/encounters/smith_heart/final_ids';
+import { FINAL_DIFFICULTY, FINAL_TUNING as T } from '../sim/encounters/smith_heart/final_ids';
 import {
   FINAL_PHASE_AURAS as A,
   FINAL_PHASE_DIFFICULTY,
@@ -21,10 +21,16 @@ import {
   pouredAuraId,
 } from '../sim/encounters/smith_heart/final_phase_ids';
 import type { AuraEffectDescriptor, AuraEffectInput } from './aura_effect';
+import { tierRange } from './heart_tier_damage';
 
 const KEY = 'hudChrome.auraEffect.finalBoss';
 
 const pct = (frac: number): number => Math.round(Math.abs(frac) * 100);
+/** One tuned range's Heroic and Mythic resolved values under `<h>`/`<m>`. */
+const tiers = (min: number, max: number, h = 'heroic', m = 'mythic'): Record<string, number> => ({
+  ...tierRange(h, min, max, FINAL_DIFFICULTY.heroic.damageMult),
+  ...tierRange(m, min, max, FINAL_DIFFICULTY.mythic.damageMult),
+});
 
 /** The part-2 aura's descriptor, or null when `a` is not one of them. */
 export function finalPhaseAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor | null {
@@ -40,6 +46,7 @@ export function finalPhaseAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDe
             every: P.splinterEvery,
             min: P.splinterMin,
             max: P.splinterMax,
+            ...tiers(P.splinterMin, P.splinterMax),
             rise: pct(P.splinterRise),
           },
         };
@@ -106,6 +113,7 @@ export function finalPhaseAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDe
           every: P.furyEvery,
           min: Math.round(P.furyMin * furyScale(stacks)),
           max: Math.round(P.furyMax * furyScale(stacks)),
+          ...tiers(P.furyMin * furyScale(stacks), P.furyMax * furyScale(stacks)),
           rise: pct(P.furyRise),
         },
       };
@@ -120,6 +128,8 @@ export function finalPhaseAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDe
           max: P.coalMax,
           selfMin: P.coalSelfMin,
           selfMax: P.coalSelfMax,
+          ...tiers(P.coalMin, P.coalMax),
+          ...tiers(P.coalSelfMin, P.coalSelfMax, 'heroicSelf', 'mythicSelf'),
         },
       };
     case A.tether:
@@ -130,6 +140,7 @@ export function finalPhaseAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDe
           reach: P.buffetReach,
           min: P.buffetMin,
           max: P.buffetMax,
+          ...tiers(P.buffetMin, P.buffetMax),
         },
       };
     case A.chill:
@@ -142,6 +153,8 @@ export function finalPhaseAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDe
           per: P.weightPerTick,
           total: P.weightPerTick * stacks,
           step: pct(FINAL_PHASE_DIFFICULTY.normal.weightStep),
+          heroicStep: pct(FINAL_PHASE_DIFFICULTY.heroic.weightStep),
+          mythicStep: pct(FINAL_PHASE_DIFFICULTY.mythic.weightStep),
           harder: pct(FINAL_PHASE_DIFFICULTY.normal.weightStep * stacks),
           swap: P.weightSwap,
           seconds: P.weightSeconds,

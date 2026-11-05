@@ -23052,9 +23052,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.heatGuardian.grip':
     '每秒受到{total}點火焰傷害（{stacks}層中每層{per}點）。守護者每次命中都會疊加一層（最多{most}層），持續{seconds}秒：在灼燒過重之前換坦克。',
   'hudChrome.auraEffect.heatGuardian.kindling':
-    '{seconds}秒後你會在{trail}秒內留下火焰足跡。每一塊足跡每秒對友方造成{min}到{max}點火焰傷害，並為站在其中的湧泉之子每秒恢復{heal}%生命值：離開團隊和湧泉之子的路線。',
+    '{seconds}秒後你會在{trail}秒內留下火焰足跡。每一塊足跡每秒對友方造成{min}到{max}點火焰傷害，並為站在其中的湧泉之子每秒恢復{heal}%生命值：離開團隊和湧泉之子的路線。英雄和傳奇難度：{heroicMin}到{heroicMax}點傷害。',
   'hudChrome.auraEffect.heatGuardian.trail':
-    '你正在留下餘燼足跡：寬{radius}碼的火焰燃燒{life}秒，每秒對其中的友方造成{min}到{max}點火焰傷害，並為其中的湧泉之子每秒恢復{heal}%生命值。',
+    '你正在留下餘燼足跡：寬{radius}碼的火焰燃燒{life}秒，每秒對其中的友方造成{min}到{max}點火焰傷害，並為其中的湧泉之子每秒恢復{heal}%生命值。英雄和傳奇難度：{heroicMin}到{heroicMax}點傷害。',
   'hudChrome.auraEffect.heatGuardian.hunted':
     '一團滾動餘燼或籽焰正在追你。被滾動餘燼追上你會死亡，{radius}碼內的所有人都會被灼燒：保持距離，讓隊友擊打它，每次擊打都會把它打退{knock}碼（之後{crust}秒內無法再次打退）。',
   'hudChrome.auraEffect.heatGuardian.crust': '已冷卻變硬：此效果結束前，擊打無法將它打退。',
@@ -23094,9 +23094,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.council.alert.weightLine': '你受到雙倍物理傷害：另一名坦克必須接手守護者',
   'hudChrome.council.alert.timeAria': '剩餘{seconds}秒',
   'hudChrome.auraEffect.council.wakeMark':
-    '結束時，一根石柱會從你腳下的地面衝出，對{radius}碼內的所有人造成{min}到{max}點傷害並將其擊退。站到團隊需要掩體的位置。英雄和傳奇難度：傷害提高{heroic}%。',
+    '結束時，一根石柱會從你腳下的地面衝出，對{radius}碼內的所有人造成{min}到{max}點傷害並將其擊退。站到團隊需要掩體的位置。英雄和傳奇難度：{heroicMin}到{heroicMax}點傷害。',
   'hudChrome.auraEffect.council.rockMark':
-    '結束時，一塊巨石砸向你：{total}點傷害由{radius}碼內的所有人分擔。若不足{soakers}人分擔，每人多受{penalty}%傷害，且全團受到{tremorMin}到{tremorMax}點傷害。{radius}碼內的每根石柱都會損失一塊，所以要遠離掩體分擔。傳奇難度：{soulReach}碼內的靈魂石柱改為失去一個靈魂印記，印記耗盡時碎裂。英雄和傳奇難度：傷害提高{heroic}%。',
+    '結束時，一塊巨石砸向你：{total}點傷害由{radius}碼內的所有人分擔。若不足{soakers}人分擔，每人多受{penalty}%傷害，且全團受到{tremorMin}到{tremorMax}點傷害。{radius}碼內的每根石柱都會損失一塊，所以要遠離掩體分擔。傳奇難度：{soulReach}碼內的靈魂石柱改為失去一個靈魂印記，印記耗盡時碎裂。英雄和傳奇難度：分擔{heroicTotal}點傷害，全團受到{heroicTremorMin}到{heroicTremorMax}點傷害。',
   'hudChrome.auraEffect.council.memory': '造成的傷害提高{pct}%：重錘議會每倒下一名成員提高{per}%。',
   // The Hammer Council's mythic, Soul in the Stone (M16 fills).
   'abilityUi.cast.heart_echo_of_wrath': '怒火迴響',
@@ -23120,16 +23120,16 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   // the Stone, Quarry Collapse and Resonance (M16 fills).
   'abilityUi.cast.heart_mountains_rush': '山岳衝鋒',
   'hudChrome.auraEffect.council.resonance':
-    '每{every}秒你會發出共鳴，對你{radius}碼內的每名盟友造成{min}到{max}點自然傷害。在效果結束前遠離所有人。英雄和傳奇難度：傷害提高{heroic}%。',
+    '每{every}秒你會發出共鳴，對你{radius}碼內的每名盟友造成{min}到{max}點自然傷害。在效果結束前遠離所有人。英雄和傳奇難度：{heroicMin}到{heroicMax}點傷害。',
   'hudChrome.auraEffect.council.rushMark':
-    '結束時，重錘守護者會先蓄勢{windup}秒，然後沿直線穿過你所站的位置，一直衝到採石場邊緣；若路上有石柱，則停在遇到的第一根石柱處。把它引向詛咒石柱：石柱碎裂，守護者被昏迷{stun}秒，並在{exposedSeconds}秒內受到的傷害提高{exposed}%。若路線上擋著一根掩護石柱，則改為摧毀那根石柱。它停下之前撞到的所有人會受到{min}到{max}點傷害並被擊退，如果你還在它的路線上，你也一樣。傳奇難度：沒有撞上任何石柱的衝鋒會引發採石場坍塌，直到詛咒石柱碎裂為止。',
+    '結束時，重錘守護者會先蓄勢{windup}秒，然後沿直線穿過你所站的位置，一直衝到採石場邊緣；若路上有石柱，則停在遇到的第一根石柱處。把它引向詛咒石柱：石柱碎裂，守護者被昏迷{stun}秒，並在{exposedSeconds}秒內受到的傷害提高{exposed}%。若路線上擋著一根掩護石柱，則改為摧毀那根石柱。它停下之前撞到的所有人會受到{min}到{max}點傷害並被擊退，如果你還在它的路線上，你也一樣。傳奇難度：沒有撞上任何石柱的衝鋒會引發採石場坍塌，直到詛咒石柱碎裂為止。英雄和傳奇難度：{heroicMin}到{heroicMax}點傷害。',
   'hudChrome.auraEffect.council.rushExposed': '受到的傷害提高{pct}%：山岳衝鋒撞碎了詛咒石柱。',
   'hudChrome.auraEffect.council.bond':
-    '重錘議會的另一名成員在{reach}碼內時，受到的傷害降低{pct}%。岩石之契每{every}秒對全團造成{min}到{max}點傷害，每次提高{growth}%。把他們拉開。',
+    '重錘議會的另一名成員在{reach}碼內時，受到的傷害降低{pct}%。岩石之契每{every}秒對全團造成{min}到{max}點傷害，每次提高{growth}%。把他們拉開。英雄和傳奇難度：{heroicMin}到{heroicMax}點傷害。',
   'hudChrome.auraEffect.council.collapse':
     '採石場正在坍塌：每{every}秒，你每層受到{min}到{max}點傷害，且每次增加一層。詛咒石柱碎裂時結束。',
   'hudChrome.auraEffect.council.pillarLimit':
-    '每根石柱最多只能為{limit}名玩家擋住山岳之怒。躲在後面的人更多時，每人承受衝擊的{share}%。',
+    '每根石柱最多只能為{limit}名玩家擋住山岳之怒。躲在後面的人更多時，每人承受衝擊的{share}%。未躲藏者在普通難度受到{min}到{max}點傷害，英雄難度{heroicMin}到{heroicMax}點，傳奇難度{mythicMin}到{mythicMax}點。',
   'hudChrome.council.alert.resonanceLine': '你會傷害身邊的每名盟友：在效果結束前遠離團隊',
   'hudChrome.council.alert.rushTitle': '山岳衝鋒！',
   'hudChrome.council.alert.rushLine': '守護者將衝向你：讓詛咒石柱擋在你和他之間',
@@ -23160,25 +23160,25 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.breathGuardian.say.guardian_bulwark': '我的護盾……被撕開了。那就再嘗嘗狂風吧！',
   'hudChrome.breathGuardian.say.thessaly_isles': '它的護盾靠浮島供能！乘風飛過去，解決癒者再回來！',
   'hudChrome.auraEffect.breathGuardian.wind':
-    '氣息守護者的風以每秒{speed}碼的速度將你帶往它吹去的方向。逆風而行便能站穩，它不會打斷你的施法。崖台四周沒有牆：被吹出邊緣，你會墜入虛空。只有攀登路口還立著牆，被壓在牆上時每秒受到{pinMin}到{pinMax}點傷害。',
+    '氣息守護者的風以每秒{speed}碼的速度將你帶往它吹去的方向。逆風而行便能站穩，它不會打斷你的施法。崖台四周沒有牆：被吹出邊緣，你會墜入虛空。只有攀登路口還立著牆，被壓在牆上時每秒受到{pinMin}到{pinMax}點傷害。英雄和傳奇難度：{heroicMin}到{heroicMax}點傷害。',
   'hudChrome.auraEffect.breathGuardian.draw':
-    '守護者深吸一口氣，以每秒{speed}碼的速度將你拉向它。它嘴前的漩渦每{tick}秒對站在其中的人造成{min}到{max}點傷害。隨後巔峰咆哮對崖台上的所有人造成{gustMin}到{gustMax}點傷害，並將他們從守護者身邊吹飛{throw}碼（英雄難度為{heroicThrow}碼）：守護者靠近邊緣時，團隊會被吹出崖台。',
+    '守護者深吸一口氣，以每秒{speed}碼的速度將你拉向它。它嘴前的漩渦每{tick}秒對站在其中的人造成{min}到{max}點傷害。隨後巔峰咆哮對崖台上的所有人造成{gustMin}到{gustMax}點傷害，並將他們從守護者身邊吹飛{throw}碼（英雄難度為{heroicThrow}碼）：守護者靠近邊緣時，團隊會被吹出崖台。英雄和傳奇難度：分別為{heroicMin}到{heroicMax}點和{heroicGustMin}到{heroicGustMax}點傷害。',
   'hudChrome.auraEffect.breathGuardian.pinned':
-    '被風壓在邊緣的牆上：在風停歇或你離開牆邊之前，每秒受到{min}到{max}點傷害。',
+    '被風壓在邊緣的牆上：在風停歇或你離開牆邊之前，每秒受到{min}到{max}點傷害。英雄和傳奇難度：{heroicMin}到{heroicMax}點傷害。',
   'hudChrome.auraEffect.breathGuardian.anchor':
     '瑟薩莉隊長的寧靜穩住了你：風、拉扯、衝擊和擊飛都無法移動你。傷害照常生效。',
   'hudChrome.auraEffect.breathGuardian.spent':
     '你的錨定已經耗盡：在此效果結束前，瑟薩莉隊長的寧靜之環無法再次錨定你。',
   'hudChrome.auraEffect.breathGuardian.drawn':
-    '每{every}秒會有一道閃電落在你所站之處：{warn}秒後對{radius}碼內的所有人造成{min}到{max}點傷害，並留下帶電的地面，在{charged}秒內每秒造成{cmin}到{cmax}點傷害。保持移動，把落雷引向遠離團隊的邊緣。',
+    '每{every}秒會有一道閃電落在你所站之處：{warn}秒後對{radius}碼內的所有人造成{min}到{max}點傷害，並留下帶電的地面，在{charged}秒內每秒造成{cmin}到{cmax}點傷害。保持移動，把落雷引向遠離團隊的邊緣。英雄和傳奇難度：分別為{heroicMin}到{heroicMax}點和{heroicCMin}到{heroicCMax}點傷害。',
   'hudChrome.auraEffect.breathGuardian.cradled':
-    '被舉入風暴，在守護者引導搖籃的{hold}秒內被定住；其間守護者不會施放其他任何技能。隨後的放電造成{total}點傷害，由你和你下方{radius}碼內的所有人分擔。分擔人數少於{soakers}人時，每人多承受{penalty}%，且崖台上的所有人受到{bmin}到{bmax}點傷害。英雄難度：同時舉起{heroicCount}名玩家，每次放電{heroicTotal}點，需要{heroicSoakers}人分擔，團隊要分頭承受。',
+    '被舉入風暴，在守護者引導搖籃的{hold}秒內被定住；其間守護者不會施放其他任何技能。隨後的放電造成{total}點傷害，由你和你下方{radius}碼內的所有人分擔。分擔人數少於{soakers}人時，每人多承受{penalty}%，且崖台上的所有人受到{bmin}到{bmax}點傷害。英雄難度：同時舉起{heroicCount}名玩家，每次放電{heroicTotal}點，需要{heroicSoakers}人分擔，團隊要分頭承受。英雄和傳奇難度：反衝造成{heroicBMin}到{heroicBMax}點傷害。',
   'hudChrome.auraEffect.breathGuardian.stormForm':
     '撕裂為閃電之軀：戰鬥的風暴後半段，直到氣息守護者倒下。',
   'hudChrome.auraEffect.breathGuardian.swell':
-    '每{every}秒，膨脹的風暴對崖台上的所有人造成{min}到{max}點傷害，之前每次脈動使其增強{growth}%：目前已有{stacks}次。',
+    '每{every}秒，膨脹的風暴對崖台上的所有人造成{min}到{max}點傷害，之前每次脈動使其增強{growth}%：目前已有{stacks}次。英雄和傳奇難度：{heroicMin}到{heroicMax}點傷害。',
   'hudChrome.auraEffect.breathGuardian.bulwark':
-    '風之護盾還能吸收{left}點傷害。只要浮島上還有任一狂風哨兵或狂風癒者存活，它每秒恢復總量的{regrow}%，每次癒合之風恢復{mend}%。乘狂風之路飛往浮島，消滅它們。維持{max}秒後，它會在崖台上爆裂，造成{bmin}到{bmax}點傷害。',
+    '風之護盾還能吸收{left}點傷害。只要浮島上還有任一狂風哨兵或狂風癒者存活，它每秒恢復總量的{regrow}%，每次癒合之風恢復{mend}%。乘狂風之路飛往浮島，消滅它們。維持{max}秒後，它會在崖台上爆裂，造成{bmin}到{bmax}點傷害。英雄和傳奇難度：{heroicMin}到{heroicMax}點傷害。',
   'hudChrome.auraEffect.breathGuardian.riding':
     '風沿著固定的路線帶你越過虛空：在被放下之前你無法行動。',
   'hudChrome.auraEffect.breathGuardian.windworn':
@@ -23206,7 +23206,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '站穩腳跟，{className}。當風箱呼吸時，進入我的寧靜之中，讓風撞碎在我們身上。',
   // The Smith's Heart's Guardian of the Quench (M16 fills).
   'hudChrome.auraEffect.quenchGuardian.marked':
-    '你是{count}人中的第{order}個：利刃將沿穿過你的直線飛來。把直線引離團隊。直線在利刃飛出前{lock}秒鎖定，屆時請離開，否則將受到{min}到{max}點冰霜傷害和{cold}點寒冷。',
+    '你是{count}人中的第{order}個：利刃將沿穿過你的直線飛來。把直線引離團隊。直線在利刃飛出前{lock}秒鎖定，屆時請離開，否則將受到{min}到{max}點冰霜傷害和{cold}點寒冷。英雄和傳奇難度：{heroicMin}到{heroicMax}點傷害。',
   'hudChrome.quenchAlert.markedTitle': '利刃在追獵你！（{count}人中第{order}個）',
   'hudChrome.quenchAlert.markedLine': '把直線引離團隊，鎖定時立刻離開。',
   'abilityUi.cast.heart_quench_blades_hunt': '利刃狩獵',
@@ -23224,7 +23224,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.quenchGuardian.warmth':
     '與團隊相擁取暖：寒意每秒下降{fall}。在同一處停留{linger}秒的人群，腳下冰面會裂成冰冷的水洞，所以要不斷移動。',
   'hudChrome.auraEffect.quenchGuardian.frozen':
-    '被冰霜封住：你無法行動，受到的所有傷害提高{pct}%，冰霜會擊碎寒冰棺等免疫效果。效果結束時冰層碎裂：你受到{min}到{max}點冰霜傷害，隨後{seconds}秒內受到的傷害提高{brittle}%，{radius}碼內的所有人獲得{cold}點寒意（英雄難度為{heroicRadius}碼、{heroicCold}點寒意）。',
+    '被冰霜封住：你無法行動，受到的所有傷害提高{pct}%，冰霜會擊碎寒冰棺等免疫效果。效果結束時冰層碎裂：你受到{min}到{max}點冰霜傷害，隨後{seconds}秒內受到的傷害提高{brittle}%，{radius}碼內的所有人獲得{cold}點寒意（英雄難度為{heroicRadius}碼、{heroicCold}點寒意）。英雄難度：{heroicMin}到{heroicMax}點傷害。傳奇難度：{mythicMin}到{mythicMax}點傷害。',
   'hudChrome.auraEffect.quenchGuardian.brittle':
     '受到的所有傷害提高{pct}%。此效果持續期間，隊友碎冰的濺射無法讓你的寒意超過{cap}。',
   'hudChrome.auraEffect.quenchGuardian.splashed':
@@ -23232,9 +23232,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.quenchAlert.splashTitle': '冰霜濺射！寒意+{cold}',
   'hudChrome.quenchAlert.immuneLine': '免疫效果擋不住寒意：快抱團',
   'hudChrome.auraEffect.quenchGuardian.trapped':
-    '踏穿冰面掉進冰冷的水中：無法移動，每秒受到{min}到{max}點冰霜傷害，寒意不斷上升。{seconds}秒後你會爬上岸邊。僅憑冰水絕不會致死。',
+    '踏穿冰面掉進冰冷的水中：無法移動，每秒受到{min}到{max}點冰霜傷害，寒意不斷上升。{seconds}秒後你會爬上岸邊。僅憑冰水絕不會致死。英雄和傳奇難度：{heroicMin}到{heroicMax}點傷害。',
   'hudChrome.auraEffect.quenchGuardian.awake':
-    '鑄匠的四把利刃已甦醒。每一輪會有更多玩家被標記，利刃依次沿穿過他們的直線飛出。直線在利刃飛出前{lock}秒鎖定，隨後對線上的目標造成{min}到{max}點冰霜傷害，增加{cold}點寒冷。',
+    '鑄匠的四把利刃已甦醒。每一輪會有更多玩家被標記，利刃依次沿穿過他們的直線飛出。直線在利刃飛出前{lock}秒鎖定，隨後對線上的目標造成{min}到{max}點冰霜傷害，增加{cold}點寒冷。英雄和傳奇難度：{heroicMin}到{heroicMax}點傷害。',
   'hudChrome.auraEffect.quenchGuardian.deepening':
     '湖的寒意上升快了{total}%：自刃甦醒後每{every}秒再快{step}%（目前{stacks}次）。',
   'abilityUi.cast.heart_quench_blades_wake': '諸刃甦醒',
@@ -24443,31 +24443,31 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.finalBoss.stateRing':
     '身處中央圓環時，它不飲下任何一角的力量。生命值高於{pct}%時，它在那裡每秒獲得一層心之脫縛。',
   'hudChrome.auraEffect.finalBoss.overloadHeat':
-    '熾熱過載，已滿{value}%。首領站在熾熱區域時它會充能（從空到滿需{fill}秒），並每{every}秒對團隊造成脈衝傷害：空時{min}點，滿時最高{max}點。即將充滿時會警告團隊。充滿時會爆發，對整個團隊造成傷害並清空：普通難度{normalMin}至{normalMax}點（靠治療可以撐過），英雄難度{heroicMin}至{heroicMax}點（很重：先補滿血並使用減傷技能），史詩難度{mythicMin}至{mythicMax}點（致命：只有強力的個人減傷才能存活）。首領離開該區域後，它以三分之一的速度消退。',
+    '熾熱過載，已滿{value}%。首領站在熾熱區域時它會充能（從空到滿需{fill}秒），並每{every}秒對團隊造成脈衝傷害：空時{min}點，滿時最高{max}點。即將充滿時會警告團隊。充滿時會爆發，對整個團隊造成傷害並清空：普通難度{normalMin}至{normalMax}點（靠治療可以撐過），英雄難度{heroicMin}至{heroicMax}點（很重：先補滿血並使用減傷技能），史詩難度{mythicMin}至{mythicMax}點（致命：只有強力的個人減傷才能存活）。首領離開該區域後，它以三分之一的速度消退。其脈衝在英雄難度造成{heroicPulseMin}到{heroicPulseMax}點傷害，在傳奇難度造成{mythicPulseMin}到{mythicPulseMax}點傷害。',
   'hudChrome.auraEffect.finalBoss.overloadQuench':
-    '淬火過載，已滿{value}%。首領站在淬火區域時它會充能（從空到滿需{fill}秒），並每{every}秒對團隊造成脈衝傷害：空時{min}點，滿時最高{max}點。即將充滿時會警告團隊。充滿時會爆發，對整個團隊造成傷害並清空：普通難度{normalMin}至{normalMax}點（靠治療可以撐過），英雄難度{heroicMin}至{heroicMax}點（很重：先補滿血並使用減傷技能），史詩難度{mythicMin}至{mythicMax}點（致命：只有強力的個人減傷才能存活）。首領離開該區域後，它以三分之一的速度消退。',
+    '淬火過載，已滿{value}%。首領站在淬火區域時它會充能（從空到滿需{fill}秒），並每{every}秒對團隊造成脈衝傷害：空時{min}點，滿時最高{max}點。即將充滿時會警告團隊。充滿時會爆發，對整個團隊造成傷害並清空：普通難度{normalMin}至{normalMax}點（靠治療可以撐過），英雄難度{heroicMin}至{heroicMax}點（很重：先補滿血並使用減傷技能），史詩難度{mythicMin}至{mythicMax}點（致命：只有強力的個人減傷才能存活）。首領離開該區域後，它以三分之一的速度消退。其脈衝在英雄難度造成{heroicPulseMin}到{heroicPulseMax}點傷害，在傳奇難度造成{mythicPulseMin}到{mythicPulseMax}點傷害。',
   'hudChrome.auraEffect.finalBoss.overloadBreath':
-    '吐息過載，已滿{value}%。首領站在吐息區域時它會充能（從空到滿需{fill}秒），並每{every}秒對團隊造成脈衝傷害：空時{min}點，滿時最高{max}點。即將充滿時會警告團隊。充滿時會爆發，對整個團隊造成傷害並清空：普通難度{normalMin}至{normalMax}點（靠治療可以撐過），英雄難度{heroicMin}至{heroicMax}點（很重：先補滿血並使用減傷技能），史詩難度{mythicMin}至{mythicMax}點（致命：只有強力的個人減傷才能存活）。首領離開該區域後，它以三分之一的速度消退。',
+    '吐息過載，已滿{value}%。首領站在吐息區域時它會充能（從空到滿需{fill}秒），並每{every}秒對團隊造成脈衝傷害：空時{min}點，滿時最高{max}點。即將充滿時會警告團隊。充滿時會爆發，對整個團隊造成傷害並清空：普通難度{normalMin}至{normalMax}點（靠治療可以撐過），英雄難度{heroicMin}至{heroicMax}點（很重：先補滿血並使用減傷技能），史詩難度{mythicMin}至{mythicMax}點（致命：只有強力的個人減傷才能存活）。首領離開該區域後，它以三分之一的速度消退。其脈衝在英雄難度造成{heroicPulseMin}到{heroicPulseMax}點傷害，在傳奇難度造成{mythicPulseMin}到{mythicPulseMax}點傷害。',
   'hudChrome.auraEffect.finalBoss.overloadHammer':
-    '重錘過載，已滿{value}%。首領站在重錘區域時它會充能（從空到滿需{fill}秒），並每{every}秒對團隊造成脈衝傷害：空時{min}點，滿時最高{max}點。即將充滿時會警告團隊。充滿時會爆發，對整個團隊造成傷害並清空：普通難度{normalMin}至{normalMax}點（靠治療可以撐過），英雄難度{heroicMin}至{heroicMax}點（很重：先補滿血並使用減傷技能），史詩難度{mythicMin}至{mythicMax}點（致命：只有強力的個人減傷才能存活）。首領離開該區域後，它以三分之一的速度消退。',
+    '重錘過載，已滿{value}%。首領站在重錘區域時它會充能（從空到滿需{fill}秒），並每{every}秒對團隊造成脈衝傷害：空時{min}點，滿時最高{max}點。即將充滿時會警告團隊。充滿時會爆發，對整個團隊造成傷害並清空：普通難度{normalMin}至{normalMax}點（靠治療可以撐過），英雄難度{heroicMin}至{heroicMax}點（很重：先補滿血並使用減傷技能），史詩難度{mythicMin}至{mythicMax}點（致命：只有強力的個人減傷才能存活）。首領離開該區域後，它以三分之一的速度消退。其脈衝在英雄難度造成{heroicPulseMin}到{heroicPulseMax}點傷害，在傳奇難度造成{mythicPulseMin}到{mythicPulseMax}點傷害。',
   'hudChrome.auraEffect.finalBoss.root':
     '進入一個區域後紮根{seconds}秒：紮根結束前無法把它拖出去。',
   'hudChrome.auraEffect.finalBoss.unbound':
-    '每層每秒對整個團隊造成{per}點傷害（目前{total}點）；站在中央圓環內時每秒獲得一層。把它拖出圓環即可結束。',
+    '每層每秒對整個團隊造成{per}點傷害（目前{total}點）；站在中央圓環內時每秒獲得一層。把它拖出圓環即可結束。英雄難度：每層{heroicPer}點。傳奇難度：每層{mythicPer}點。',
   'hudChrome.auraEffect.finalBoss.shaken':
-    '持續期間，切換區域對你造成的傷害提高至{mult}倍（{min}至{max}點，而非{baseMin}至{baseMax}點）。每次切換都會將其刷新為{seconds}秒。',
+    '持續期間，切換區域對你造成的傷害提高至{mult}倍（{min}至{max}點，而非{baseMin}至{baseMax}點）。每次切換都會將其刷新為{seconds}秒。英雄難度：{heroicMin}到{heroicMax}點傷害。傳奇難度：{mythicMin}到{mythicMax}點傷害。',
   'hudChrome.auraEffect.finalBoss.cold':
-    '寒冷值{value}/100。{reach}碼內其他玩家少於{allies}名時每秒上升{rise}點，達到人數後下降。達到100時你會被霜封住：昏迷{freeze}秒並受到{min}至{max}點冰霜傷害。',
+    '寒冷值{value}/100。{reach}碼內其他玩家少於{allies}名時每秒上升{rise}點，達到人數後下降。達到100時你會被霜封住：昏迷{freeze}秒並受到{min}至{max}點冰霜傷害。英雄難度：{heroicMin}到{heroicMax}點傷害。傳奇難度：{mythicMin}到{mythicMax}點傷害。',
   'hudChrome.auraEffect.finalBoss.frozen':
     '昏迷。你因獨自站立而被凍結：在它飲下淬火時，保持在{allies}名或更多其他玩家的{reach}碼內。',
   'hudChrome.auraEffect.finalBoss.underIce': '昏迷：你從碎裂的冰面掉了下去。',
   'hudChrome.auraEffect.finalBoss.numbing': '被它的正面攻擊減速{pct}%，持續{seconds}秒。',
   'hudChrome.auraEffect.finalBoss.ember':
-    '{seconds}秒後餘燼會落在你的腳下，在{radius}碼的範圍內陰燃{life}秒，每秒對其中的任何人造成{min}至{max}點火焰傷害。與其他被標記的玩家站到同一個角落，然後離開。',
+    '{seconds}秒後餘燼會落在你的腳下，在{radius}碼的範圍內陰燃{life}秒，每秒對其中的任何人造成{min}至{max}點火焰傷害。與其他被標記的玩家站到同一個角落，然後離開。英雄難度：{heroicMin}到{heroicMax}點傷害。傳奇難度：{mythicMin}到{mythicMax}點傷害。',
   'hudChrome.auraEffect.finalBoss.wind':
-    '狂風每秒把你朝它吹的方向推動{speed}碼；頂著風走才能站穩（不會打斷施法）。狂風吹拂時，處於邊緣{band}碼以內會每秒受到{min}至{max}點自然傷害。',
+    '狂風每秒把你朝它吹的方向推動{speed}碼；頂著風走才能站穩（不會打斷施法）。狂風吹拂時，處於邊緣{band}碼以內會每秒受到{min}至{max}點自然傷害。英雄難度：{heroicMin}到{heroicMax}點傷害。傳奇難度：{mythicMin}到{mythicMax}點傷害。',
   'hudChrome.auraEffect.finalBoss.drawn':
-    '在{seconds}秒內，它每秒從你身上跳向{reach}碼內的其他每名玩家，對每人造成{min}至{max}點自然傷害。與所有人保持{reach}碼距離。',
+    '在{seconds}秒內，它每秒從你身上跳向{reach}碼內的其他每名玩家，對每人造成{min}至{max}點自然傷害。與所有人保持{reach}碼距離。英雄難度：{heroicMin}到{heroicMax}點傷害。傳奇難度：{mythicMin}到{mythicMax}點傷害。',
   'hudChrome.auraEffect.finalBoss.shell': '吸收你受到的下{value}點治療。',
   'hudChrome.auraEffect.finalBoss.crushed':
     '{seconds}秒內若站在下一次鐵砧之重下，你會承受{mult}倍的分攤傷害。讓另一組去分攤。',
@@ -24516,7 +24516,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.heart_final_splinter_breath.name': '吐息碎片',
   'entities.mobs.heart_final_splinter_hammer.name': '重錘碎片',
   'hudChrome.auraEffect.finalBoss.phaseCall':
-    '四角召喚：只要碎片還活著，它就在中央受到護盾保護{seconds}秒。每個碎片每{every}秒對整個團隊造成{min}至{max}點傷害，每次脈動提高{rise}%。將它們全部擊殺可提前打破護盾；召喚結束時仍存活的碎片會把自己的元素注入它體內，直到戰鬥結束。',
+    '四角召喚：只要碎片還活著，它就在中央受到護盾保護{seconds}秒。每個碎片每{every}秒對整個團隊造成{min}至{max}點傷害，每次脈動提高{rise}%。將它們全部擊殺可提前打破護盾；召喚結束時仍存活的碎片會把自己的元素注入它體內，直到戰鬥結束。英雄難度：{heroicMin}到{heroicMax}點傷害。傳奇難度：{mythicMin}到{mythicMax}點傷害。',
   'hudChrome.finalBoss.warn.rebirth': '心臟搏動！無主之力飲盡四方區域，再度站起！',
   'hudChrome.finalBoss.warn.unmade': '世界鐵砧正在崩塌！在最後一塊石頭墜落前擊殺無主之力！',
   'hudChrome.finalBoss.warn.crackHeat': '熾熱區域正在開裂！在它墜落前離開！',
@@ -24547,15 +24547,15 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.finalBoss.pouredHammer':
     '重錘注入其中：直到戰鬥結束，無論它站在哪裡，每{every}秒都會在玩家腳下迸發震顫裂隙（已注入{times}次）。',
   'hudChrome.auraEffect.finalBoss.fury':
-    '無主之怒：每{every}秒對整個團隊造成{min}至{max}點傷害，每次脈動提高{rise}%。立刻擊殺它。',
+    '無主之怒：每{every}秒對整個團隊造成{min}至{max}點傷害，每次脈動提高{rise}%。立刻擊殺它。英雄難度：{heroicMin}到{heroicMax}點傷害。傳奇難度：{mythicMin}到{mythicMax}點傷害。',
   'hudChrome.auraEffect.finalBoss.coal':
-    '{seconds}秒後煤塊爆裂：對你{reach}碼內的所有其他玩家造成{min}至{max}點火焰傷害，對你自己造成{selfMin}至{selfMax}點。現在就離開人群。',
+    '{seconds}秒後煤塊爆裂：對你{reach}碼內的所有其他玩家造成{min}至{max}點火焰傷害，對你自己造成{selfMin}至{selfMax}點。現在就離開人群。英雄難度：分別為{heroicMin}到{heroicMax}點和{heroicSelfMin}到{heroicSelfMax}點傷害。傳奇難度：分別為{mythicMin}到{mythicMax}點和{mythicSelfMin}到{mythicSelfMax}點。',
   'hudChrome.auraEffect.finalBoss.tether':
-    '吐息碎片追獵你{seconds}秒。它的狂襲之風每秒對它{reach}碼內的其他所有人造成{min}至{max}點自然傷害：把它從人群中拖走。',
+    '吐息碎片追獵你{seconds}秒。它的狂襲之風每秒對它{reach}碼內的其他所有人造成{min}至{max}點自然傷害：把它從人群中拖走。英雄難度：{heroicMin}到{heroicMax}點傷害。傳奇難度：{mythicMin}到{mythicMax}點傷害。',
   'hudChrome.auraEffect.finalBoss.chill':
     '移動速度降低{pct}%，持續{seconds}秒：你從缺口以外的地方穿過了淬火之環。',
   'hudChrome.auraEffect.finalBoss.weight':
-    '每秒造成{total}點物理傷害（每層{per}點）。每一層都讓重錘碎片對你的攻擊加重{step}%（目前{harder}%）。持續{seconds}秒；坦克在{swap}層時換坦。',
+    '每秒造成{total}點物理傷害（每層{per}點）。每一層都讓重錘碎片對你的攻擊加重{step}%（目前{harder}%）。持續{seconds}秒；坦克在{swap}層時換坦。英雄難度下每層使其傷害提高{heroicStep}%，傳奇難度下為{mythicStep}%。',
   'hudChrome.finalAlert.coalTitle': '爆裂煤塊！',
   'hudChrome.finalAlert.coalLine': '離開人群：{seconds}秒後會在{reach}碼內的所有人身上爆裂',
   'hudChrome.finalAlert.tetherTitle': '風之束縛！',
@@ -24808,9 +24808,11 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.heatGuardian.say.slay_b': '燒得乾乾淨淨。',
   'hudChrome.heatGuardian.say.slay_c': '最初的火焰收取它的代價。',
   'hudChrome.finalBoss.say.arrivalWake': '是誰喚醒了大山之心？溫熱的氣息……在這萬物無息之地。',
-  'hudChrome.finalBoss.say.arrivalRise': '岩石，起來。與我們相連。塑造我們的那隻手已經離去，所以我們塑造自己。',
+  'hudChrome.finalBoss.say.arrivalRise':
+    '岩石，起來。與我們相連。塑造我們的那隻手已經離去，所以我們塑造自己。',
   'hudChrome.finalBoss.say.arrivalRoar': '我們是鑄匠之力，而我們沒有主人！',
-  'hudChrome.finalBoss.say.pull': '你們的血中流著四條礦脈。我們會把它們奪回來，再把大山封在你們頭頂。',
+  'hudChrome.finalBoss.say.pull':
+    '你們的血中流著四條礦脈。我們會把它們奪回來，再把大山封在你們頭頂。',
   'hudChrome.finalBoss.say.drinkHeat': '最初的火焰充滿了我們！',
   'hudChrome.finalBoss.say.drinkQuench': '冷水啊，讓我們堅硬！',
   'hudChrome.finalBoss.say.drinkBreath': '吹吧，風箱！掀起風暴！',
@@ -24831,5 +24833,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finalBoss.say.slay_b': '你的血回歸礦脈。',
   'hudChrome.finalBoss.say.slay_c': '又一份溫暖，被封存了。',
   'hudChrome.finalBoss.say.wipe': '封存了。寂靜了。正如他所願。',
-  'hudChrome.finalBoss.say.death': '那隻手……再也不會回來了。還有一點餘燼在燃燒……帶上它，讓大山安眠吧。',
+  'hudChrome.finalBoss.say.death':
+    '那隻手……再也不會回來了。還有一點餘燼在燃燒……帶上它，讓大山安眠吧。',
 };
