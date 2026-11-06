@@ -894,12 +894,22 @@ export const guideStrings = {
     winQuestLogTitle: 'Quest log (L)',
     winQuestLogBody:
       'Every quest you have taken, its story, its objectives, and your progress, with a way to show any of it on the map and to pick which quests your tracker follows.',
+    // Menu consolidation step 8: the successor of winQuestLogBody (retired in
+    // scripts/i18n_retired_keys.mjs). The quests on offer nearby moved here from
+    // the World Map rail.
+    winQuestLogBodyAvailable:
+      'Every quest you have taken, its story, its objectives, and your progress, with a way to show any of it on the map and to pick which quests your tracker follows. An Available group lists the quests on offer near you, each with a way to show its quest giver on the map.',
     winDeedsTitle: 'Book of Deeds (Shift+Z)',
     winDeedsBody:
       'The record of what you have done, the titles and Renown it has paid you, and what is still open.',
     winRealmTitle: 'Book of the Realm (Shift+Z)',
     winRealmBody:
       'Your permanent record, in one tabbed window. Deeds holds what you have done, the Renown it has paid you, and what is still open; Titles is where you pick the title you wear and the border that frames your nameplate; and The Reliquary, Reputation, the Loot Explorer, and Rankings, the realm standings, each have a tab of their own.',
+    // Menu consolidation step 7: the Rewards window has no default key, so its
+    // title carries none.
+    winRewardsTitle: 'Rewards',
+    winRewardsBody:
+      "What you can claim, in one tabbed window behind the Rewards button in the rail, which shows a count when something is waiting. Vault is the Weekly Vault, whose rolls open at the Vault keeper; Weekly Quest shows the emissary's four offers, though you choose one by speaking to the emissary; and World Quests is today's board, with a way to show each quest on the map and the one replacement you get each day.",
     winSocialTitle: 'Friends and Guild (O)',
     winSocialBody:
       'Tabs for your friends, your guild and its roster, your raid, and the players you have ignored or blocked.',
@@ -970,8 +980,16 @@ export const guideStrings = {
       'Down in the bottom right corner of the screen, a long way from the minimap, sits a rail of small square buttons, one per window, arranged in two short columns side by side. Most of them are printed with their default key.\n\nThe first column covers your character, spellbook, talents, quest log, Book of Deeds, professions, world map, bags, and crafting. The second opens with the WOC Store and runs on through PvP, the Dungeon Finder, the Vale Cup, Card Duel, the leaderboard, emotes, music, friends and guild, this wiki, and the game menu. A few more join them only when they apply.',
     mobileBodyGroupedMore:
       'Touch controls appear on their own, and the layout sizes itself to your screen: a compact arrangement on a small phone, a standard one on a larger phone, and a roomier one on a tablet.\n\nYour abilities sit in a ring rather than a number row: the attack button with four action buttons beside it, and a page toggle that swaps the ring between its {pages} pages, which together reach all {slots} of your ability slots whether or not the extra desktop bars are switched on. The fifth arc position of that ring is your consumables seat: tap it to use what is seated there, or hold it, or swipe it inward, to open a row that fills itself from what you are carrying. Around the ring sit the buttons a touch player reaches for most, swapping target, using what is in front of you, and jumping.\n\nOne Quick Actions control sits at the bottom edge in place of a row of buttons. It opens onto everything else: mount, chat, map, bags, social, quests, character, spellbook, game menu, and a More entry that sorts the rest of your windows into groups: Record (deeds, titles, the Reliquary, reputation, the Loot Explorer, and the rankings), Professions, Activities (dungeons and raids, PvP, and Card Duel), Character (emotes, talents, and cosmetics among them), and Store. The wiki and Discord sit in the game menu instead. Windows fill the screen here rather than floating over it.\n\nMoving your unit frames is a desktop thing: on touch the layout places them for you.',
+    // Menu consolidation step 7: the successor of mobileBodyGroupedMore (retired in
+    // scripts/i18n_retired_keys.mjs). The More tray gained a Rewards group.
+    mobileBodyRewardsMore:
+      'Touch controls appear on their own, and the layout sizes itself to your screen: a compact arrangement on a small phone, a standard one on a larger phone, and a roomier one on a tablet.\n\nYour abilities sit in a ring rather than a number row: the attack button with four action buttons beside it, and a page toggle that swaps the ring between its {pages} pages, which together reach all {slots} of your ability slots whether or not the extra desktop bars are switched on. The fifth arc position of that ring is your consumables seat: tap it to use what is seated there, or hold it, or swipe it inward, to open a row that fills itself from what you are carrying. Around the ring sit the buttons a touch player reaches for most, swapping target, using what is in front of you, and jumping.\n\nOne Quick Actions control sits at the bottom edge in place of a row of buttons. It opens onto everything else: mount, chat, map, bags, social, quests, character, spellbook, game menu, and a More entry that sorts the rest of your windows into groups: Record (deeds, titles, the Reliquary, reputation, the Loot Explorer, and the rankings), Professions, Activities (dungeons and raids, PvP, and Card Duel), Character (emotes, talents, and cosmetics among them), Rewards (the Vault, the weekly quest, and world quests), and Store. The wiki and Discord sit in the game menu instead. Windows fill the screen here rather than floating over it.\n\nMoving your unit frames is a desktop thing: on touch the layout places them for you.',
     railBodyTwelve:
       'Down in the bottom right corner of the screen, a long way from the minimap, sits a rail of small square buttons arranged in two short columns side by side. Most of them are printed with their default key.\n\nThe first column covers your character, bags, spellbook, talents, quest log, and world map. The second opens the Book of the Realm, your professions, Activities (the Groups bell), and friends and guild, then the WOC Store and the game menu. A few more join them only when they apply.',
+    // Menu consolidation step 7: the successor of railBodyTwelve (retired in
+    // scripts/i18n_retired_keys.mjs). Rewards joined the first column.
+    railBodyThirteen:
+      'Down in the bottom right corner of the screen, a long way from the minimap, sits a rail of small square buttons arranged in two short columns side by side. Most of them are printed with their default key.\n\nThe first column covers your character, bags, spellbook, talents, quest log, world map, and Rewards. The second opens the Book of the Realm, your professions, Activities (the Groups bell), and friends and guild, then the WOC Store and the game menu. A few more join them only when they apply.',
   },
 
   // Slash Commands reference: the chat command surface, grouped by purpose.

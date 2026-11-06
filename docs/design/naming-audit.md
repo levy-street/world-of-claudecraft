@@ -1094,6 +1094,11 @@ near hits were unrelated novel series and a tabletop zine called The Realm).
 "Activities" is plain English UI vocabulary with no coined token. Verdict: both
 kept.
 
+Steps 7 and 8 (2026-11-06) added **Rewards** (the hub window and its rail button) with
+tabs **Vault**, **Weekly Quest** and **World Quests**, and a Quest Log group named
+**Available**. All are plain English UI words with no coined token; Vault and World Quests
+were already in the game (the Weekly Vault, the world-quest board). Verdict: kept.
+
 ## Recorded for the maintainer (stopping rule: no unilateral rename)
 
 STATUS 2026-08-20, SETTLED BY THE MAINTAINER, and the scope is narrow on purpose.

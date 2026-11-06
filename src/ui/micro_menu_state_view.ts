@@ -51,6 +51,12 @@ export const MICRO_MENU_LAUNCHERS: readonly MicroMenuLauncherSpec[] = [
     memberWindowIds: ['crafting-window', 'perfecting-window', 'harvest-journal-window'],
   },
   { selector: '#mm-map', windowId: 'map-window' },
+  {
+    selector: '#mm-rewards',
+    windowId: 'weekly-vault-window',
+    // Rewards (menu consolidation step 7): Vault, Weekly Quest, World Quests.
+    memberWindowIds: ['weekly-quests-window', 'world-quests-window'],
+  },
   { selector: '#mm-bag', windowId: 'bags' },
   {
     selector: '#expedition-bell',
@@ -64,7 +70,7 @@ export const MICRO_MENU_LAUNCHERS: readonly MicroMenuLauncherSpec[] = [
 ];
 
 /** Which count a badge shows. One member per shipped badge. */
-export type MicroMenuBadgeKind = 'talentPoints';
+export type MicroMenuBadgeKind = 'talentPoints' | 'rewards';
 
 /** One launcher that carries a corner count badge. */
 export interface MicroMenuBadgeSpec {
@@ -75,6 +81,8 @@ export interface MicroMenuBadgeSpec {
 /** The launchers that carry a count badge, in rail order. */
 export const MICRO_MENU_BADGES: readonly MicroMenuBadgeSpec[] = [
   { selector: '#mm-talents', kind: 'talentPoints' },
+  // Rewards (menu consolidation step 7): what the hub has waiting to claim.
+  { selector: '#mm-rewards', kind: 'rewards' },
 ];
 
 /** The live counts behind the badges above. */

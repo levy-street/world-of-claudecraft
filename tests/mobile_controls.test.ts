@@ -592,6 +592,7 @@ function mobileCallbacks() {
     onCardDuel: noop,
     onCosmetics: noop,
     onReliquary: noop,
+    onRewards: noop,
     onLootExplorer: noop,
     onProfessions: noop,
     onPerfecting: noop,

@@ -1853,6 +1853,9 @@ async function startGame(
           case 'dungeonFinder':
             hud.toggleActivities();
             break;
+          case 'rewards':
+            hud.toggleRewards();
+            break;
           case 'bgFlag':
             bgFlagKey();
             break;
@@ -1991,6 +1994,7 @@ async function startGame(
     onTitles: () => hud.toggleDeeds('titles'),
     onReputation: () => hud.toggleDeeds('reputation'),
     onReliquary: () => hud.toggleReliquary(),
+    onRewards: (tab) => hud.toggleRewards(tab),
     onLootExplorer: () => hud.toggleLootExplorer(),
     onMountToggle: () => world.toggleMounted(),
     onProfessions: () => hud.toggleProfessions('overview'),
@@ -2182,12 +2186,14 @@ async function startGame(
         break;
 
       case 'crafting':
-        // The controller panel has always OFFERED this bind (it lists every
-        // edge keybind action); the dispatch dropped it silently.
+        // The controller panel lists every edge action; this one used to drop silently.
         hud.toggleCrafting();
         break;
       case 'dungeonFinder':
         hud.toggleActivities();
+        break;
+      case 'rewards':
+        hud.toggleRewards();
         break;
       case 'sheathe':
         // The keyboard arm's exact rule, from the same module.

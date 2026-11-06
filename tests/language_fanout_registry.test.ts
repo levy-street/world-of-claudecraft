@@ -135,7 +135,10 @@ const FANOUT_ARMS: readonly string[] = [
   'this.hillBar.relocalize|',
   'this.syncDailyRewardsSurfaceLabels|',
   'this.wocMarketWindow.relocalize|',
+  // The Rewards hub's three tabs (menu consolidation step 7), each its own arm.
+  'this.rewards.vault.relocalize|',
   'this.weeklyQuestsWindow.relocalize|',
+  'this.rewards.worldQuests.relocalize|',
   'this.guildHallWindow.relocalize|',
   'this.storePromoCard.relocalize|',
   'this.refreshKeybindLabels|',
@@ -556,8 +559,14 @@ const ANSWERED: readonly AnsweredSurface[] = [
   {
     file: 'weekly_rewards_window.ts',
     memos: ['lastSignature'],
-    answer: 'this.bankWindow.render',
-    why: 'the Weekly Vault pane (PR 4052) is a TAB of the bank window, not a window of its own: lastSignature digests the vault ledger, the ready weeks, the claim flag and the reset edge, none of them text. bankWindow.render() rebuilds the rewards tab through WeeklyRewardsTab.renderInto, which re-reads every t() label and re-latches the signature in the current language, so the bank arm answers it',
+    answer: 'this.rewards.vault.relocalize',
+    why: "the Weekly Vault pane is the Rewards hub's Vault tab (menu consolidation step 7; it was the Bank's Rewards tab): lastSignature digests the vault ledger, the ready weeks, the claim flag and the reset edge, none of them text. WeeklyVaultWindow.relocalize() self-gates on the open window and rebuilds through WeeklyRewardsTab.renderInto, which re-reads every t() label and re-latches the signature in the current language",
+  },
+  {
+    file: 'hud/rewards/world_quests_window.ts',
+    memos: ['lastSig'],
+    answer: 'this.rewards.worldQuests.relocalize',
+    why: "the Rewards hub's World Quests tab: lastSig digests the board rows, the countdown minute and the i18n revision; relocalize() self-gates on the open window and rebuilds once, re-latching the signature in the current language",
   },
   {
     file: 'weekly_quests_window.ts',

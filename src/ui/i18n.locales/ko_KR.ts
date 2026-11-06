@@ -20473,6 +20473,23 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.retentionFooter': '전문 기술 재설정 시 숙련도의 60%가 유지됩니다.',
   'hudChrome.professions.tutorialLink': '전문 기술 튜토리얼',
   'hudChrome.professionsHub.tabOverview': '개요',
+  'guide.interfacePage.railBodyThirteen':
+    '화면 오른쪽 아래 구석, 미니맵에서 한참 떨어진 자리에 작은 사각 버튼들이 짧은 두 줄로 나란히 놓입니다. 대부분에는 기본 키가 함께 적혀 있습니다.\n\n첫째 줄에는 캐릭터, 가방, 주문서, 특성, 퀘스트 일지, 세계 지도, 보상이 있습니다. 둘째 줄에는 왕국의 서, 전문 기술, 활동(종 버튼), 친구와 길드가 놓이고, 이어서 WOC 상점과 게임 메뉴가 있습니다. 몇 가지는 해당될 때만 함께 나타납니다.',
+  'guide.interfacePage.mobileBodyRewardsMore':
+    '터치 조작은 알아서 나타나며, 배치는 화면 크기에 맞춰 스스로 조절됩니다. 작은 휴대전화에서는 촘촘하게, 큰 휴대전화에서는 표준으로, 태블릿에서는 한결 여유롭게 놓입니다.\n\n능력은 숫자 줄 대신 원환에 놓입니다. 공격 버튼 곁에 행동 버튼 네 개가 붙고, 페이지 전환 버튼이 원환을 페이지 {pages}개 사이에서 넘겨 줍니다. 이 페이지들을 합치면 데스크톱의 추가 단축바를 켜 두었든 아니든 능력 슬롯 {slots}칸 전부에 닿습니다. 그 원환의 다섯째 호 자리는 소모품 자리입니다. 탭하면 거기 놓인 것을 쓰고, 길게 누르거나 안쪽으로 밀면 지니고 있는 물품에서 스스로 채워지는 줄이 열립니다. 그 둘레에는 터치로 플레이할 때 가장 자주 찾는 버튼들이 놓입니다. 대상 바꾸기, 눈앞의 것 사용하기, 점프하기입니다.\n\n아래 가장자리에는 버튼 줄 대신 빠른 실행 조작 하나가 자리합니다. 나머지 모든 것이 여기서 열립니다. 탈것, 대화, 지도, 가방, 사교, 퀘스트, 캐릭터, 주문서, 게임 메뉴, 그리고 나머지 창을 묶음별로 정리한 더보기 항목이 있습니다. 묶음은 기록(업적, 칭호, 성물고, 평판, 전리품 탐색기, 순위), 전문 기술, 활동(던전 및 공격대, PvP, 카드 대결), 캐릭터(감정 표현, 특성, 외형 등), 보상(금고, 주간 퀘스트, 전역 퀘스트), 그리고 상점입니다. 위키와 Discord는 대신 게임 메뉴에 들어 있습니다. 이곳에서 창은 화면 위에 떠 있는 대신 화면을 가득 채웁니다.\n\n유닛 프레임을 옮기는 것은 데스크톱에서만 하는 일입니다. 터치에서는 배치가 알아서 자리를 잡아 줍니다.',
+  'guide.interfacePage.winQuestLogBodyAvailable':
+    '받아 둔 모든 퀘스트와 그 이야기, 목표, 진행 상황이 담기며, 그중 무엇이든 지도에 표시하고 추적기가 따라갈 퀘스트를 고를 수 있습니다. 수락 가능 묶음에는 근처에서 받을 수 있는 퀘스트가 나열되며, 각 퀘스트를 주는 인물을 지도에 표시할 수 있습니다.',
+  'guide.interfacePage.winRewardsTitle': '보상',
+  'guide.interfacePage.winRewardsBody':
+    '받을 수 있는 것들을 탭으로 나뉜 창 하나에 모은 것으로, 레일의 보상 버튼으로 엽니다. 받을 것이 있으면 버튼에 개수가 표시됩니다. 금고는 주간 금고로, 그 주의 보상은 금고지기에게서 엽니다. 주간 퀘스트에는 사절의 의뢰 네 가지가 나오지만, 고르는 것은 사절에게 말을 걸 때입니다. 전역 퀘스트는 오늘의 게시판으로, 각 퀘스트를 지도에 표시할 수 있고 하루에 한 번 교체할 수 있습니다.',
+  'hudChrome.rewards.title': '보상',
+  'hudChrome.rewards.close': '보상 닫기',
+  'hudChrome.rewards.tabVault': '금고',
+  'hudChrome.rewards.tabWeekly': '주간 퀘스트',
+  'hudChrome.rewards.tabWorldQuests': '전역 퀘스트',
+  'hudChrome.rewards.weeklyPickAt': '{zone}의 사절에게서 퀘스트를 선택하세요.',
+  'hudChrome.questLog.available': '수락 가능',
+  'hudChrome.mapAtlas.openQuestLog': '퀘스트 기록 열기',
   'hudChrome.expeditions.activitiesBellCount.one': '활동 열기: 알림 {count}개',
   'hudChrome.expeditions.activitiesBellCount.other': '활동 열기: 알림 {count}개',
   'hudChrome.mobile.groupRecord': '기록',

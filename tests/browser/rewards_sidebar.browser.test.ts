@@ -66,9 +66,12 @@ describe.each([
       expect(slot.right).toBeLessThanOrEqual(width);
       expect(slot.bottom).toBeLessThanOrEqual(height);
 
+      // The chest opens the WOC Store only: the spin-ready state it used to
+      // wear left with the daily spin (menu consolidation step 7).
       const idleBorder = getComputedStyle(chest).borderTopColor;
       chest.classList.add('spin-ready');
-      expect(getComputedStyle(chest).borderTopColor).not.toBe(idleBorder);
+      expect(getComputedStyle(chest).borderTopColor).toBe(idleBorder);
+      chest.classList.remove('spin-ready');
       chest.focus();
       expect(document.activeElement).toBe(chest);
       expect(getComputedStyle(chest).outlineStyle).not.toBe('none');

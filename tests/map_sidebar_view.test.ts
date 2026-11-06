@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { NPCS, QUESTS, zoneAt } from '../src/sim/data';
 import type { QuestProgress } from '../src/sim/types';
+import { availableQuestOffers } from '../src/ui/hud/quest/available_quests_view';
 import {
   buildMapSidebarView,
   DEFAULT_MAP_ATLAS_FILTERS,
@@ -66,8 +67,9 @@ function zoneOfferIds(zone: Zone): string[] {
 }
 
 /**
- * The rail's nearby rule, derived here from the content tables rather than read
- * back off the model: nearest four offers to `from`, one row per quest (the first
+ * The nearby-offer rule (the Quest Log's Available group since menu
+ * consolidation step 8; it was the World Map rail's list), derived here from the
+ * content tables rather than read back off the core: nearest four offers to `from`, one row per quest (the first
  * NPC that offers it wins), ties broken by questId.
  */
 function nearestOffers(
@@ -113,7 +115,7 @@ describe('map sidebar view', () => {
     expect(model.route).toMatchObject({ questId: 'q_wolves' });
   });
 
-  it('lists the closest available offers in the current zone without mutating the log', () => {
+  it('carries no offers list: the nearby offers are the Quest Log Available group', () => {
     const w = world(new Map(), new Set(['q_wolves']));
     const zone = zoneAt(w.player.pos.x, w.player.pos.z);
 
@@ -124,8 +126,10 @@ describe('map sidebar view', () => {
       selectedQuestId: null,
     });
 
-    expect(model.nearby.some((quest) => quest.questId === 'q_wolves')).toBe(true);
-    expect(model.nearby.find((quest) => quest.questId === 'q_wolves')?.zoneId).toBe(zone.id);
+    expect('nearby' in model).toBe(false);
+    const offers = availableQuestOffers(w, zone);
+    expect(offers.some((quest) => quest.questId === 'q_wolves')).toBe(true);
+    expect(offers.find((quest) => quest.questId === 'q_wolves')?.zoneId).toBe(zone.id);
     expect(w.questLog.size).toBe(0);
   });
 
@@ -201,26 +205,19 @@ describe.each([
     const available = new Set(zoneOfferIds(zone));
     const w = makeWorld([], available);
 
-    const model = buildMapSidebarView({
-      world: w,
-      zone,
-      filters: DEFAULT_MAP_ATLAS_FILTERS,
-      selectedQuestId: null,
-    });
+    const offers = availableQuestOffers(w, zone);
 
     const expected = nearestOffers(zone, w.player.pos, available);
-    expect(available.size, 'the zone has more offers than the rail can show').toBeGreaterThan(4);
+    expect(available.size, 'the zone has more offers than the group shows').toBeGreaterThan(4);
     expect(expected).toHaveLength(4);
-    expect(model.nearby.map((quest) => quest.questId)).toEqual(expected);
-    expect(model.nearby.every((quest) => quest.zoneId === zone.id)).toBe(true);
+    expect(offers.map((quest) => quest.questId)).toEqual(expected);
+    expect(offers.every((quest) => quest.zoneId === zone.id)).toBe(true);
     // An offer already in the log is an offer no longer: only `available` shows.
     const withoutWolves = new Set([...available].filter((id) => id !== 'q_wolves'));
-    const accepted = buildMapSidebarView({
-      world: makeWorld([progress('q_wolves', 'active', 1)], withoutWolves),
+    const accepted = availableQuestOffers(
+      makeWorld([progress('q_wolves', 'active', 1)], withoutWolves),
       zone,
-      filters: DEFAULT_MAP_ATLAS_FILTERS,
-      selectedQuestId: null,
-    }).nearby;
+    );
     expect(accepted.map((quest) => quest.questId)).toEqual(
       nearestOffers(zone, w.player.pos, withoutWolves),
     );

@@ -132,7 +132,6 @@ import {
 import { maxBuyCount } from '../sim/vendor_buy_stack';
 import type { SubscriptionStoreHooks } from '../subscription_contract';
 import {
-  type DailyRewardStatus,
   type IWorld,
   isOverheadEmoteId,
   OVERHEAD_EMOTES,
@@ -261,7 +260,6 @@ import { formatMinimapCoords } from './coords';
 import { formatCount } from './count_format';
 import { classCrestId } from './crest_icon_art';
 import { hydrateCrestImageFallbacks } from './crest_image_fallback';
-import { DailyRewardsLauncherPoll } from './daily_rewards_launcher_core';
 import { DailyRewardsWindow, type StoreSpendResult } from './daily_rewards_window';
 import { DayNightDialPainter } from './day_night_dial_painter';
 import { DeathRecapDialog } from './death_recap_dialog';
@@ -644,6 +642,7 @@ import { createReferralCardsHud } from './hud/referral_cards/referral_cards_hud_
 import { paintFactionTierCelebrations } from './hud/reputation/faction_tier_celebration_painter';
 import { advanceFactionTierObservation } from './hud/reputation/faction_tier_celebration_view';
 import { ReputationWindow } from './hud/reputation/reputation_window';
+import { createRewardsSurfaces, type RewardsTab } from './hud/rewards';
 import { RiftMapPainter } from './hud/rift';
 import { RiftFloorTrackerController } from './hud/rift/rift_floor_tracker_controller';
 import { RiftForgeWindow, riftForgeInReach } from './hud/rift_forge';
@@ -1012,7 +1011,6 @@ import { requestWalletVerify } from './wallet_verify_request';
 import { weaponProcEffectText } from './weapon_proc_text';
 import { weaponProcLines } from './weapon_proc_view';
 import { weaponTypeLabelKey } from './weapon_type_label';
-import { WeeklyQuestsWindow } from './weekly_quests_window';
 import { promptWikiVisit } from './wiki_link';
 import {
   installWindowDrag,
@@ -1408,14 +1406,9 @@ export class Hud {
   private readonly itemDragState = new ItemDragState();
   private suppressNextActionClick = false;
   private optionsHooks: OptionsHooks | null = null;
-  // The world-quest board opener: opens the map and unfolds the atlas rail on
-  // the release's mapAtlasSidebarCollapsed preference (the toggle lives in
-  // the rail, src/ui/map_sidebar_controller.ts).
+  // The atlas rail's fold on the touch HUD: folded every time the map opens.
   private readonly mapSidebarCollapse = new MapSidebarCollapse({
     settings: trackerCollapseSettings(() => this.optionsHooks, 'mapAtlasSidebarCollapsed'),
-    mapOpen: () => $('#map-window').style.display === 'block',
-    openMap: () => this.toggleMap(),
-    onChange: () => this.updateMapWindow(),
   });
   private reportHooks: ReportHooks | null = null;
   private bugReportHooks: BugReportHooks | null = null;
@@ -2133,7 +2126,7 @@ export class Hud {
   private lastHudSlowAt = 0;
   private dailyRewardsButtonEl: HTMLButtonElement | null = null;
   private storePromoCard: StorePromoCardController | null = null;
-  // Mobile More-tray entry mirroring the desktop chest button's hidden/spin-ready
+  // Mobile More-tray entry mirroring the desktop chest button's hidden
   // state (folded off the top-right rail so it never overlaps the buff/debuff bars).
   private mobileDailyRewardsButtonEl: HTMLButtonElement | null = null;
   // Per-element tier cadence stamps (graphics-tier knobs). Each gates a
@@ -2424,15 +2417,7 @@ export class Hud {
       click: () => audio.click(),
       onRepaintMap: () => this.repaintOpenMap(),
       onShowRoute: (route) => this.showFinderOnMap(route.x, route.z),
-      worldQuests: {
-        selectedId: () => this.mapMarkerInteraction.selectedWorldQuestId,
-        select: (questId) => {
-          this.mapMarkerInteraction.selectWorldQuest(questId);
-        },
-        confirmDialog: (title, body, okText, cancelText, onOk) =>
-          this.confirmDialog(title, body, okText, cancelText, onOk),
-        nowMs: () => Date.now(),
-      },
+      openQuestLog: () => this.questlogWindow.isOpen || this.toggleQuestLog(),
       settings: trackerCollapseSettings(() => this.optionsHooks, 'mapAtlasSidebarCollapsed'),
     });
     this.fiesta = new FiestaController({
@@ -2502,7 +2487,7 @@ export class Hud {
       openUnbind: (npcId) => this.openUnbind(npcId),
       openCrafting: (craftId) => this.openCrafting(craftId),
       openMarket: () => this.openMarket(),
-      openWorldQuestBoard: () => this.mapSidebarCollapse.openBoard(),
+      openWorldQuestBoard: () => this.rewards.hub.open('worldQuests'),
       openDelveBoard: (npcId) => this.openDelveBoard(npcId),
       openCardDuel: () => this.toggleCardDuel(),
       onOpenChange: (open) => this.onQuestDialogStateChange?.(open),
@@ -2866,9 +2851,8 @@ export class Hud {
       this.dailyRewardsButtonEl = dailyRewardsButton;
       this.mobileDailyRewardsButtonEl = mobileDailyRewardsButton;
       dailyRewardsButton.innerHTML =
-        '<img class="daily-rewards-icon" src="/ui/daily-rewards/treasure_chest.webp" alt="" draggable="false" decoding="async"><span class="daily-reward-count ui-badge ui-badge--corner" aria-hidden="true">1</span>';
+        '<img class="daily-rewards-icon" src="/ui/daily-rewards/treasure_chest.webp" alt="" draggable="false" decoding="async">';
       this.syncDailyRewardsSurfaceLabels();
-      dailyRewardsButton.classList.remove('spin-ready');
       this.applyDailyRewardsChestButtonVisibility();
       dailyRewardsButton.addEventListener('pointerdown', (event) => {
         event.preventDefault();
@@ -2881,7 +2865,6 @@ export class Hud {
         event.preventDefault();
         event.stopPropagation();
       });
-      this.dailyRewardsLauncher.refresh(true);
     }
     this.clock24 = (() => {
       try {
@@ -2939,6 +2922,7 @@ export class Hud {
     $('#mm-quest').addEventListener('click', () => this.toggleQuestLog());
     $('#mm-deeds').addEventListener('click', () => this.toggleDeeds());
     $('#mm-professions').addEventListener('click', () => this.toggleProfessions());
+    $('#mm-rewards').addEventListener('click', () => this.toggleRewards());
     // The always-on tracker headers share one delegation contract
     // (tracker_header_wiring.ts): a click or Enter/Space on the header flips
     // the persisted collapse, stopped before the game binds hijack the focused
@@ -3420,8 +3404,6 @@ export class Hud {
       (el.id === 'vendor-window' || el.id === 'bags')
     )
       return;
-    // Fixed vault and bank layouts must not inherit cascaded window positions.
-    if (el.id === 'bank-window' && document.body.classList.contains('weekly-vault-open')) return;
     if (
       document.body.classList.contains('bank-open') &&
       (el.id === 'bank-window' || el.id === 'bags')
@@ -3651,8 +3633,10 @@ export class Hud {
       case 'courier-window':
         this.courierWindow.close();
         break;
+      case 'weekly-vault-window':
       case 'weekly-quests-window':
-        this.weeklyQuestsWindow.close();
+      case 'world-quests-window':
+        this.rewards.hub.close();
         break;
       case 'guild-hall-window':
         this.guildHallWindow.close();
@@ -5589,12 +5573,24 @@ export class Hud {
     ],
     uiScale: () => getUiScale(),
   }).anchor;
-  private readonly weeklyQuestsWindow = new WeeklyQuestsWindow({
-    root: () => $('#weekly-quests-window'),
+  // Rewards (menu consolidation step 7): Vault, Weekly Quest and World Quests.
+  readonly rewards = createRewardsSurfaces({
     world: () => this.sim,
-    closeOthers: () => this.closeOtherWindows('#weekly-quests-window'),
-    ...this.windowFocus('#weekly-quests-window'),
+    root: (selector) => $(selector),
+    focus: (selector) => this.windowFocus(selector),
+    presentation: this.presentationBag,
+    touch: () => document.body.classList.contains('mobile-touch'),
+    beforeOpen: () => this.closeOtherWindows(),
+    onInventoryChanged: () => this.renderBags(),
+    hideTooltip: () => this.hideTooltip(),
+    showOnMap: (x, z) => this.showFinderOnMap(x, z),
+    selectedWorldQuest: () => this.mapMarkerInteraction.selectedWorldQuestId,
+    selectWorldQuest: (questId) => this.mapMarkerInteraction.selectWorldQuest(questId),
+    confirmDialog: (title, body, ok, cancel, onOk) =>
+      this.confirmDialog(title, body, ok, cancel, onOk),
+    nowMs: () => Date.now(),
   });
+  private readonly weeklyQuestsWindow = this.rewards.weekly;
   private readonly guildHallWindow = new GuildHallWindow({
     root: () => $('#guild-hall-window'),
     world: () => this.sim,
@@ -5939,10 +5935,6 @@ export class Hud {
     root: () => $('#daily-rewards-window'),
     world: () => this.sim,
     closeOthers: () => this.closeOtherWindows('#daily-rewards-window'),
-    // A status delivered here is as fresh as a fetch, so the poll adopts it.
-    onStatus: (status) => this.dailyRewardsLauncher.observeFresh(status),
-    onClose: () => this.dailyRewardsLauncher.refresh(true),
-    onWalletConnect: requestWalletVerify,
     ...this.claudiumPurchase,
     subscriptionHooks: () => this.claudiumHooks?.subscription,
     storeSnapshot: async () => {
@@ -6802,7 +6794,9 @@ export class Hud {
     this.relocalizeCoordinatorMemos();
     this.syncDailyRewardsSurfaceLabels();
     this.wocMarketWindow.relocalize();
+    this.rewards.vault.relocalize();
     this.weeklyQuestsWindow.relocalize();
+    this.rewards.worldQuests.relocalize();
     this.guildHallWindow.relocalize();
     // Self-gated on its own open check (root src/ui/CLAUDE.md); refreshes the
     // root accessible name and row labels, preserving the uncommitted draft
@@ -8381,8 +8375,7 @@ export class Hud {
   }
 
   private syncDailyRewardsSurfaceLabels(): void {
-    const storeEnabled = this.claudiumHooks !== null;
-    const titleKey = storeEnabled ? 'hudChrome.wocStore.title' : 'hudChrome.dailyRewards.title';
+    const titleKey = 'hudChrome.wocStore.title';
     const title = t(titleKey);
     for (const button of [this.dailyRewardsButtonEl, this.mobileDailyRewardsButtonEl]) {
       if (!button) continue;
@@ -8409,63 +8402,28 @@ export class Hud {
   private applyDailyRewardsChestButtonVisibility(show = this.showDailyRewardsChestButton()): void {
     const button = this.dailyRewardsButtonEl;
     if (!button) return;
-    const visible = this.dailyRewardsEnabled() && show;
+    // The chest opens the WOC Store and nothing else now (its daily-rewards
+    // stand-in is gone), so it shows only while the store's hooks are live.
+    const storeLive = this.dailyRewardsEnabled() && this.claudiumHooks !== null;
+    const visible = storeLive && show;
     button.toggleAttribute('hidden', !visible);
-    if (!visible) button.classList.remove('spin-ready');
     // The mobile More-tray entry is a menu row, not floating chrome: it stays
     // reachable whenever the feature itself is on, regardless of the
     // showDailyRewardsChestButton preference. Once promoted into the Seeker
     // shortcut grid, it becomes floating chrome and honors the same preference.
     const mobileButton = this.mobileDailyRewardsButtonEl;
-    const mobileVisible =
-      this.dailyRewardsEnabled() && (!this.mobileDailyRewardsButtonPromoted() || show);
+    const mobileVisible = storeLive && (!this.mobileDailyRewardsButtonPromoted() || show);
     mobileButton?.toggleAttribute('hidden', !mobileVisible);
-    if (!mobileVisible) mobileButton?.classList.remove('spin-ready');
   }
 
   setDailyRewardsChestButtonVisible(show: boolean): void {
     this.applyDailyRewardsChestButtonVisibility(show);
-    if (show) this.dailyRewardsLauncher.refresh(true);
   }
 
   setDailyRewardsChestButtonPreference(show: boolean): void {
     this.optionsHooks?.onSettingChange('showDailyRewardsChest', show);
     this.setDailyRewardsChestButtonVisible(show);
   }
-
-  private applyDailyRewardsLauncherStatus(status: DailyRewardStatus): void {
-    if (!this.dailyRewardsEnabled()) return;
-    const button = this.dailyRewardsButtonEl;
-    const spinReady =
-      status.enabled !== false && (!status.eligibility.eligible || !status.spin.claimed);
-    const mobileVisible =
-      !this.mobileDailyRewardsButtonPromoted() || this.showDailyRewardsChestButton();
-    this.mobileDailyRewardsButtonEl?.classList.toggle('spin-ready', mobileVisible && spinReady);
-    if (!button) return;
-    if (!this.showDailyRewardsChestButton()) {
-      button.hidden = true;
-      button.classList.remove('spin-ready');
-      return;
-    }
-    button.hidden = false;
-    button.classList.toggle('spin-ready', spinReady);
-  }
-
-  // The launcher's status poll (sequence guard, throttle stamp, fetch chain)
-  // lives beside its own predicate in daily_rewards_launcher_core.ts, the
-  // ClaudiumLauncherBalance precedent; the HUD keeps the DOM wiring only.
-  private readonly dailyRewardsLauncher = new DailyRewardsLauncherPoll({
-    enabled: () => this.dailyRewardsEnabled(),
-    mounted: () => !!(this.dailyRewardsButtonEl || this.mobileDailyRewardsButtonEl),
-    syncVisibility: () => this.applyDailyRewardsChestButtonVisibility(),
-    fetch: () => this.sim.dailyRewards(),
-    applyStatus: (status) => this.applyDailyRewardsLauncherStatus(status),
-    onFailure: () => {
-      this.dailyRewardsButtonEl?.classList.remove('spin-ready');
-      this.mobileDailyRewardsButtonEl?.classList.remove('spin-ready');
-    },
-    now: () => performance.now(),
-  });
 
   update(paint = true): void {
     const sim = this.sim;
@@ -8537,7 +8495,6 @@ export class Hud {
     this.bootcamp.update(sim, this.renderer, this.keybinds, this.optionsHooks?.gamepad ?? null);
     if (slowHud) this.updateRaidLockoutBadge();
     if (slowHud) this.updateInstanceDifficultyBadge();
-    if (slowHud) this.dailyRewardsLauncher.refresh();
     this.maybeRestoreActionBarLayout();
     this.resolvePendingLoadoutBar();
     this.syncActiveHotbarForm();
@@ -8556,6 +8513,7 @@ export class Hud {
       this.microMenuStatePainter.paint(
         this.microMenuStateView.tick(microMenuWindowOpen, {
           talentPoints: talGlow ? tp.total - tp.spent : 0,
+          rewards: this.rewards.claimCounts().total,
         }),
       );
     }
@@ -9380,7 +9338,10 @@ export class Hud {
     // Re-seat the tracker stack under the minimap column (bounded layout read).
     if (slowHud) this.trackerStackAnchor.apply();
     if (slowHud && this.reputationWindow.isOpen) this.reputationWindow.refreshIfChanged();
+    if (slowHud) this.rewards.recount();
+    if (slowHud && this.rewards.vault.isOpen) this.rewards.vault.refreshIfChanged();
     if (slowHud && this.weeklyQuestsWindow.isOpen) this.weeklyQuestsWindow.refreshIfChanged();
+    if (slowHud && this.rewards.worldQuests.isOpen) this.rewards.worldQuests.refreshIfChanged();
     if (slowHud && this.guildHallWindow.isOpen) this.guildHallWindow.refreshIfChanged();
     if (slowHud) this.updateMailIndicator();
     if (slowHud) this.updateMarketIndicator();
@@ -10255,6 +10216,7 @@ export class Hud {
 
   readonly toggleDungeonFinder = (): void => this.activitiesHub.toggle('dungeons');
   readonly toggleActivities = (tab?: ActivitiesTab): void => this.activitiesHub.toggle(tab);
+  readonly toggleRewards = (tab?: RewardsTab): void => this.rewards.hub.toggle(tab);
 
   toggleCardDuel(): void {
     this.activitiesHub.toggle('cardDuel');
@@ -10331,6 +10293,7 @@ export class Hud {
     this.mapZoneOverride = null;
     this.mapLevel = defaultMapLevel(mapWindowMode(this.sim)); // own instance plan, else zone
     this.mapHoverZone = null;
+    this.mapSidebarCollapse.foldOnOpen(this.isMobileLayout());
     el.style.display = 'block';
     this.updateMapWindow();
     this.syncAnyWindowOpenState();
@@ -11902,8 +11865,10 @@ export class Hud {
           this.openMailbox();
           break;
         case 'bank':
+          this.openBank();
+          break;
         case 'weekly_rewards':
-          this.openBank(ev.type === 'weekly_rewards' ? 'rewards' : undefined);
+          this.rewards.hub.open('vault');
           break;
         case 'courier':
           this.courierWindow.open();
@@ -15405,17 +15370,10 @@ export class Hud {
   // class drives the side-by-side desktop layout, and the bags window is force-opened
   // so items can be withdrawn into it. closeBank routes through the painter (which
   // fires onClosed) so focus returns to the opener (WCAG 2.4.3).
-  openBank(tab?: 'rewards'): void {
-    // Weekly rewards own the screen; ordinary bank storage keeps its bags companion.
+  openBank(): void {
     if (this.vendorOpen) this.closeVendor();
     if (this.openHeroicVendorNpcId !== null) this.closeHeroicVendor();
-    openBankCompanion(
-      this.bankWindow,
-      $('#bags'),
-      () => this.bagsWindow.close(),
-      () => this.renderBags(),
-      tab,
-    );
+    openBankCompanion(this.bankWindow, $('#bags'), () => this.renderBags());
   }
 
   closeBank(): void {
@@ -15627,7 +15585,6 @@ export class Hud {
       this.syncCharBagsPairing();
       return;
     }
-    if (document.body.classList.contains('weekly-vault-open')) this.closeBank();
     this.closeOtherWindows('#bags');
     // Record the opener (the minimap bag button / keybind focus) for the focus return.
     this.bagsWindow.noteOpener();
@@ -16455,18 +16412,13 @@ export class Hud {
   }
 
   toggleDailyRewards(): void {
-    if (!this.dailyRewardsEnabled()) return;
+    if (!this.dailyRewardsEnabled() || !this.claudiumHooks) return;
     this.dailyRewardsWindow.toggle();
-    // Close refreshes via onClose; force only the open direction here. The open
-    // force stays as the fallback for tabs that render without a status fetch
-    // (the store tab), where no onStatus push would arrive.
-    if (this.dailyRewardsWindow.isOpen) this.dailyRewardsLauncher.refresh(true);
   }
 
   openWocStore(tab: 'store' | 'memberships' = 'store'): void {
     if (!this.dailyRewardsEnabled()) return;
     this.dailyRewardsWindow.openStore(tab);
-    this.dailyRewardsLauncher.refresh(true);
   }
 
   /** Inject the $WOC Exchange hooks (main.ts, online, browser web + website
@@ -16522,6 +16474,7 @@ export class Hud {
   attachClaudium(hooks: ClaudiumHooks): void {
     this.claudiumHooks = hooks;
     this.syncDailyRewardsSurfaceLabels();
+    this.applyDailyRewardsChestButtonVisibility();
     this.claudiumBalance.reset();
     this.claudiumBalance.refresh(true);
   }

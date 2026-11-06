@@ -54,6 +54,7 @@ export const BIND_ACTION_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
   social: 'hud.keybinds.actions.social',
   arena: 'hud.keybinds.actions.arena',
   dungeonFinder: 'hudChrome.activities.title',
+  rewards: 'hudChrome.rewards.title',
   chat: 'hud.keybinds.actions.chat',
   // Combat/social target + emote-wheel actions. English-only chrome keys (the
   // `hud` catalog domain is tsc-locked to inline per-locale blocks).

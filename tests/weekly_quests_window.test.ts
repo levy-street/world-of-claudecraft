@@ -23,14 +23,25 @@ function rig(weeklyQuest: WeeklyQuestProgress | null = null) {
   };
   const closeOthers = vi.fn();
   const restoreFocus = vi.fn();
+  const showOnMap = vi.fn();
   const window = new WeeklyQuestsWindow({
     root: () => el,
     world: () => world as never,
     closeOthers,
     captureFocus: () => null,
     restoreFocus,
+    showOnMap,
   });
-  return { el, world, window, chooseWeeklyQuest, commendWeeklyQuest, closeOthers, restoreFocus };
+  return {
+    el,
+    world,
+    window,
+    chooseWeeklyQuest,
+    commendWeeklyQuest,
+    closeOthers,
+    restoreFocus,
+    showOnMap,
+  };
 }
 
 describe('weekly quests window', () => {
@@ -51,7 +62,8 @@ describe('weekly quests window', () => {
 
   it('confirms a pick through the inner dialog and sends exactly one command', () => {
     const r = rig();
-    r.window.open();
+    // The emissary's talk event: the one open the sim accepts a pick from.
+    r.window.open(true);
     (r.el.querySelector('[data-wk-choose="wk_raid"]') as HTMLButtonElement).click();
     const dialog = r.el.querySelector('.wk-dialog');
     expect(dialog).not.toBeNull();
@@ -116,5 +128,47 @@ describe('weekly quests window', () => {
     expect(r.el.querySelector('.wk-commend-note')?.textContent).toBe(
       "This week's commendation went to the Church Order.",
     );
+  });
+
+  // Menu consolidation step 7: the window is also the Rewards hub's Weekly
+  // Quest tab. The sim takes a pick only at the emissary, so a hub open reads
+  // the offers and says where the pick is made.
+  it('opens read-only from the Rewards hub: no live Choose, the emissary named with a map link', () => {
+    const r = rig();
+    r.window.open();
+    const choose = [...r.el.querySelectorAll<HTMLButtonElement>('[data-wk-choose]')];
+    expect(choose).toHaveLength(4);
+    expect(choose.every((b) => b.disabled)).toBe(true);
+    choose[0].click();
+    expect(r.el.querySelector('.wk-dialog')).toBeNull();
+    const remote = r.el.querySelector('.wk-remote');
+    expect(remote?.textContent).toContain('Eastbrook');
+    (r.el.querySelector('[data-wk-emissary-map]') as HTMLButtonElement).click();
+    expect(r.showOnMap).toHaveBeenCalledExactlyOnceWith(-72.28, -95.59);
+    expect(r.chooseWeeklyQuest).not.toHaveBeenCalled();
+  });
+
+  it('turns live when the emissary opens it, and read-only again on the next hub open', () => {
+    const r = rig();
+    r.window.open(true);
+    expect(r.el.querySelector('.wk-remote')).toBeNull();
+    expect(
+      [...r.el.querySelectorAll<HTMLButtonElement>('[data-wk-choose]')].some((b) => !b.disabled),
+    ).toBe(true);
+    r.window.close();
+    r.window.open();
+    expect(r.el.querySelector('.wk-remote')).not.toBeNull();
+    expect(
+      [...r.el.querySelectorAll<HTMLButtonElement>('[data-wk-choose]')].every((b) => b.disabled),
+    ).toBe(true);
+  });
+
+  it('still takes the commendation from a hub open (the sim has no range gate on it)', () => {
+    const r = rig({ questId: 'wk_raid', week: 'wk_2', count: 1, state: 'completed' });
+    r.window.open();
+    const church = r.el.querySelector<HTMLButtonElement>('[data-wk-commend="church_order"]');
+    expect(church?.disabled).toBe(false);
+    church?.click();
+    expect(r.commendWeeklyQuest).toHaveBeenCalledExactlyOnceWith('church_order');
   });
 });

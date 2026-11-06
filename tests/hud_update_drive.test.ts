@@ -305,13 +305,6 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the minimap instance difficulty badge and tooltip, value-diffed',
   },
   {
-    call: 'this.dailyRewardsLauncher.refresh',
-    band: 'slow',
-    gate: '',
-    surface: 'chrome',
-    why: 'the daily-rewards launcher button state (not the window). Bank Storage phase 15 moved the poll state machine out of hud.ts into daily_rewards_launcher_core.ts, where its throttle is executed-tested; a chrome row carries no guard field, so the pin lives there rather than here',
-  },
-  {
     call: 'this.maybeRestoreActionBarLayout',
     band: 'frame',
     gate: '',
@@ -1394,12 +1387,43 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the market window',
   },
   {
+    call: 'this.rewards.recount',
+    band: 'slow',
+    gate: '',
+    surface: 'none',
+    why: "recounts the Rewards rail pill (menu consolidation step 7) from the same reads the hub's tabs paint; no DOM write, the rail painter shows it on the medium band",
+  },
+  {
+    call: 'this.rewards.vault.refreshIfChanged',
+    band: 'slow',
+    gate: 'this.rewards.vault.isOpen',
+    surface: 'window',
+    guard: {
+      kind: 'module',
+      module: 'weekly_rewards_window.ts',
+      proof: 'if (signature !== this.lastSignature) {',
+    },
+    why: "the Rewards hub's Vault tab (the weekly rewards sheet, once the Bank's Rewards tab)",
+  },
+  {
     call: 'this.weeklyQuestsWindow.refreshIfChanged',
     band: 'slow',
     gate: 'this.weeklyQuestsWindow.isOpen',
     surface: 'window',
     guard: { kind: 'module', module: 'weekly_quests_window.ts', proof: SIG_RETURN },
-    why: 'the weekly emissary window (charge progress and the reset clock, minute-granular)',
+    why: "the weekly emissary window, also the Rewards hub's Weekly Quest tab (charge progress and the reset clock, minute-granular)",
+  },
+  {
+    call: 'this.rewards.worldQuests.refreshIfChanged',
+    band: 'slow',
+    gate: 'this.rewards.worldQuests.isOpen',
+    surface: 'window',
+    guard: {
+      kind: 'module',
+      module: 'hud/rewards/world_quests_window.ts',
+      proof: 'if (this.signature(this.view()) === this.lastSig) return;',
+    },
+    why: "the Rewards hub's World Quests tab (the day's board, once on the World Map rail; the expiry countdown is minute-granular)",
   },
   {
     call: 'this.guildHallWindow.refreshIfChanged',
@@ -1986,7 +2010,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // chrome 99 -> 100: the dungeon objectives tracker's medium-band paint
       // (hud/dungeon/dungeon_tracker_painter.ts), facet-routed like the deed strip.
       // window 53 -> 54: Lantern Hall's guild window (hud/guild_hall/guild_hall_window.ts).
-    ).toEqual({ window: 56, chrome: 101, none: 21 });
+    ).toEqual({ window: 58, chrome: 100, none: 22 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');
@@ -2013,7 +2037,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // Lantern Hall's guild window owns its signature guard (hud/guild_hall/).
       // The menu consolidation: the Book of the Realm's Titles tab (a second
       // DeedsWindow) adds a row; the Reputation window replaces the Calendar's.
-      module: 33,
+      module: 35,
       // Phase 20's refreshCharSheetIfChanged and its siblings. Their latches are
       // HUD fields (lastCharSheetSig et al) because the cold char_window painter
       // holds no signature of its own to diff. The release's trade row left this
@@ -2104,6 +2128,9 @@ describe('Hud.update() drives exactly the registered set, on the registered band
         'spellbook_window.ts: if (this.knownChanged(this.deps.world().known)) {',
         'target_auras_window.ts: if (this.cleared) return;',
         'weekly_quests_window.ts: if (sig === this.lastSig) return;',
+        // The Rewards hub's Vault and World Quests tabs (menu consolidation step 7).
+        'weekly_rewards_window.ts: if (signature !== this.lastSignature) {',
+        'hud/rewards/world_quests_window.ts: if (this.signature(this.view()) === this.lastSig) return;',
         'hud/guild_hall/guild_hall_window.ts: if (sig === this.lastSig) return;',
         'woc_market_window.ts: if (sig === this.lastSig && !this.walletRepaintDue) return;',
       ].sort(),

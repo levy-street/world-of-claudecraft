@@ -58,7 +58,6 @@ export const economy: GuidePage = {
           <p>${esc(t('guide.economy.mailHow'))}</p>
         </section>
 
-        ${section('guide.economy.dailyTitle', p('guide.economy.dailyBody'))}
 
         ${related([
           { href: hrefFor('gear'), key: 'guide.nav.gear' },

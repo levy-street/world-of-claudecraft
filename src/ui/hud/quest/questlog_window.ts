@@ -17,7 +17,7 @@
 // over QUALITY_COLOR, the fallback is a CSS token, so there is no literal
 // hex/px in TS).
 
-import { ITEMS, NPCS } from '../../../sim/data';
+import { ITEMS, NPCS, zoneAt } from '../../../sim/data';
 import type { IWorld } from '../../../world_api';
 import { markDialogRoot } from '../../dialog_root';
 import {
@@ -36,8 +36,13 @@ import { QuestTrackingState, sharedQuestTracking } from '../../quest_tracking_co
 import { svgIcon } from '../../ui_icons';
 import { referralQuestRows } from '../referral_cards/referral_cards_view';
 import { referralText } from '../referral_cards/referral_cards_window';
+import { availableQuestOffers, bucketAvailableQuestDistance } from './available_quests_view';
 import { questRewardChoiceHtml, questRewardChoiceModel } from './quest_reward_choice_view';
-import { buildQuestLogView, type QuestDetailModel } from './questlog_view';
+import {
+  buildQuestLogView,
+  type QuestDetailModel,
+  type QuestLogAvailableGroup,
+} from './questlog_view';
 
 /**
  * Hud-supplied glue. The quest log renders from IWorld + these callbacks plus the
@@ -125,6 +130,48 @@ export class QuestLogWindow {
     this.render();
   }
 
+  /** The Available group: nearby offers (the World Map rail's old list), each
+   *  with Show on Map at its giver, since the quest is not in the log yet. */
+  private availableSection(group: QuestLogAvailableGroup): HTMLElement {
+    const section = document.createElement('section');
+    section.className = `ql-group ql-available${group.collapsed ? ' is-collapsed' : ''}`;
+    const toggle = document.createElement('button');
+    toggle.type = 'button';
+    toggle.className = 'ql-group-toggle ui-btn';
+    toggle.dataset.questGroup = group.id;
+    toggle.setAttribute('aria-expanded', String(!group.collapsed));
+    toggle.innerHTML = `<span class="ql-group-chevron" aria-hidden="true">${svgIcon(group.collapsed ? 'next' : 'prev')}</span><span>${esc(t('hudChrome.questLog.available'))}</span><span class="ql-group-count">${esc(this.questNumber(group.offers.length))}</span>`;
+    toggle.addEventListener('click', () => {
+      if (this.collapsedGroups.has(group.id)) this.collapsedGroups.delete(group.id);
+      else this.collapsedGroups.add(group.id);
+      this.render();
+      this.deps.root().querySelector<HTMLElement>(`[data-quest-group="${group.id}"]`)?.focus();
+    });
+    section.appendChild(toggle);
+    if (group.collapsed) return section;
+    for (const offer of group.offers) {
+      const row = document.createElement('div');
+      row.className = 'ql-offer';
+      const level =
+        offer.minLevel === null
+          ? ''
+          : ` · ${t('hudChrome.mapAtlas.level', { level: this.questNumber(offer.minLevel) })}`;
+      const distance = t('hudChrome.mapAtlas.distance', {
+        distance: this.questNumber(bucketAvailableQuestDistance(offer.distance)),
+      });
+      row.innerHTML = `<span class="ql-offer-copy"><span class="ql-offer-title">${esc(questTitle(offer.questId))}</span><span class="ql-offer-meta quest-muted">${esc(`${zoneDisplayName(offer.zoneId)}${level} · ${distance}`)}</span></span>`;
+      const map = document.createElement('button');
+      map.type = 'button';
+      map.className = 'ui-btn ui-btn--sm';
+      map.dataset.questOfferMap = offer.questId;
+      map.textContent = t('hudChrome.finder.showOnMap');
+      map.addEventListener('click', () => this.deps.showOnMap(offer.x, offer.z));
+      row.appendChild(map);
+      section.appendChild(row);
+    }
+    return section;
+  }
+
   close(restoreFocus = true): void {
     const el = this.deps.root();
     el.style.display = 'none';
@@ -145,6 +192,7 @@ export class QuestLogWindow {
       playerClass: world.cfg.playerClass,
       completedCount: world.questsDone.size,
       collapsedGroupIds: [...this.collapsedGroups],
+      available: availableQuestOffers(world, zoneAt(world.player.pos.x, world.player.pos.z)),
     });
     this.selected = view.selectedQuestId;
 
@@ -198,6 +246,9 @@ export class QuestLogWindow {
       list.prepend(section);
     }
     for (const group of view.groups) {
+      if (group.id === 'completed' && view.available) {
+        list.appendChild(this.availableSection(view.available));
+      }
       if (view.empty && group.id === 'completed' && group.count === 0) continue;
       const section = document.createElement('section');
       section.className = `ql-group${group.dimmed ? ' is-dimmed' : ''}${group.collapsed ? ' is-collapsed' : ''}`;

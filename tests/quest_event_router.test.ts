@@ -100,7 +100,7 @@ describe('quest event router', () => {
     expect(hud.questDialog.open).toHaveBeenCalledWith(42);
     const weekly = { type: 'worldQuestWeeklyOpen' } as SimEvent;
     expect(applyQuestEventPresentation(hud, weekly)).toBe(false);
-    expect(hud.weeklyQuestsWindow.open).toHaveBeenCalledOnce();
+    expect(hud.weeklyQuestsWindow.open).toHaveBeenCalledExactlyOnceWith(true);
     expect(hud.log).not.toHaveBeenCalled();
   });
 
@@ -121,7 +121,7 @@ describe('quest event router', () => {
       '    text: string | readonly Node[],\n    color = ',
       '  showBanner(\n    text: string,',
       'if (applyQuestEventPresentation(this, ev)) continue;',
-      'private readonly weeklyQuestsWindow = new WeeklyQuestsWindow({',
+      'private readonly weeklyQuestsWindow = this.rewards.weekly;',
     ]) {
       expect(hudSource, anchor).toContain(anchor);
     }

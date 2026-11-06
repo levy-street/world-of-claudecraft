@@ -2,8 +2,14 @@
 // log insertion order as map_window_view so its numbers stay identical to the
 // gold objective badges painted on the map. DOM and localization stay in the
 // controller; this core only returns content identities, counts, and routes.
+//
+// Menu consolidation step 8 put the rail on a diet: it is the map's legend
+// (the numbered tracked quests with Show Route, the layer filters, the zone
+// summary) plus one link to the Quest Log. Untrack and the nearby offers moved
+// to the Quest Log (offers: hud/quest/available_quests_view.ts) and the
+// world-quest board to the Rewards hub.
 
-import { getActiveWorldContent, QUESTS, type ZoneDef } from '../sim/data';
+import { QUESTS, type ZoneDef } from '../sim/data';
 import { type QuestProgress, questObjectiveRequired } from '../sim/types';
 import type { IWorld } from '../world_api';
 import { ownEntry } from './known_item';
@@ -45,13 +51,6 @@ export interface MapAtlasQuestRow {
   required: number;
 }
 
-export interface MapAtlasNearbyQuest {
-  questId: string;
-  zoneId: string;
-  distance: number;
-  minLevel: number | null;
-}
-
 /** Where "Show Route" pans to. The resolution rule is shared with the quest log's
  *  "Show on Map" (quest_map_location_core), so the two controls never disagree. */
 export type MapAtlasRoute = QuestMapLocation;
@@ -62,13 +61,12 @@ export interface MapSidebarView {
   landmarkCount: number;
   filters: Readonly<MapAtlasFilters>;
   quests: MapAtlasQuestRow[];
-  nearby: MapAtlasNearbyQuest[];
   selectedQuestId: string | null;
   route: MapAtlasRoute | null;
 }
 
 export interface MapSidebarViewInput {
-  world: Pick<IWorld, 'player' | 'questLog' | 'questState' | 'entities'>;
+  world: Pick<IWorld, 'questLog' | 'entities'>;
   zone: ZoneDef;
   filters: Readonly<MapAtlasFilters>;
   selectedQuestId: string | null;
@@ -85,23 +83,12 @@ export function toggleMapAtlasFilter(
   return { ...filters, [id]: !filters[id] };
 }
 
-/** Yards per step of the offers list's rendered distance. A live distance moves
- *  every tick while the player walks, which is what made the rail rebuild its
- *  whole subtree four times a second; a bucketed one holds still until the
- *  reading really changes. */
-export const MAP_ATLAS_DISTANCE_BUCKET = 10;
-
 /** The default tracking set: nothing untracked, so every accepted quest shows. */
 const NO_UNTRACKED_QUESTS: ReadonlySet<string> = new Set<string>();
 
-export function bucketMapAtlasDistance(distance: number): number {
-  return Math.round(distance / MAP_ATLAS_DISTANCE_BUCKET) * MAP_ATLAS_DISTANCE_BUCKET;
-}
-
 /**
  * Everything the rail's markup is derived from, as one comparable string: the
- * whole view with the offers' distances bucketed, plus the chrome state the
- * view itself does not carry. Serialized wholesale rather than field by field
+ * whole view plus the chrome state the view itself does not carry. Serialized wholesale rather than field by field
  * so a view field added later cannot silently fall out of the comparison and
  * leave the rail stale, and the i18n revision rides along because the markup
  * this gates resolves every label through t().
@@ -112,23 +99,13 @@ export function mapSidebarSignature(
     shownRouteQuestId: string | null;
     i18nRevision: number;
     trackingRevision: number;
-    worldQuests?: unknown;
     /** The player's own collapse choice: folded in because it changes the
      *  toggle button's aria-expanded and title text, which the view itself
      *  carries no field for. */
     sidebarCollapsed: boolean;
   },
 ): string {
-  return JSON.stringify({
-    view: {
-      ...view,
-      nearby: view.nearby.map((quest) => ({
-        ...quest,
-        distance: bucketMapAtlasDistance(quest.distance),
-      })),
-    },
-    chrome,
-  });
+  return JSON.stringify({ view, chrome });
 }
 
 function primaryObjective(progress: QuestProgress): {
@@ -153,38 +130,6 @@ function primaryObjective(progress: QuestProgress): {
     current: progress.counts[objectiveIndex] ?? 0,
     required: questObjectiveRequired(quest, progress, objectiveIndex),
   };
-}
-
-function nearbyQuests(input: MapSidebarViewInput): MapAtlasNearbyQuest[] {
-  const { world, zone } = input;
-  const zoneMinX = zone.xMin ?? Number.NEGATIVE_INFINITY;
-  const zoneMaxX = zone.xMax ?? Number.POSITIVE_INFINITY;
-  const seen = new Set<string>();
-  const nearby: MapAtlasNearbyQuest[] = [];
-  // The loaded world's NPCs: a Studio map may move or drop a quest giver.
-  for (const npc of Object.values(getActiveWorldContent().npcs)) {
-    if (
-      npc.pos.x < zoneMinX ||
-      npc.pos.x >= zoneMaxX ||
-      npc.pos.z < zone.zMin ||
-      npc.pos.z >= zone.zMax
-    )
-      continue;
-    for (const questId of npc.questIds) {
-      if (seen.has(questId) || world.questState(questId) !== 'available') continue;
-      const quest = ownEntry(QUESTS, questId);
-      if (!quest) continue;
-      seen.add(questId);
-      nearby.push({
-        questId,
-        zoneId: zone.id,
-        distance: Math.hypot(npc.pos.x - world.player.pos.x, npc.pos.z - world.player.pos.z),
-        minLevel: quest.minLevel ?? null,
-      });
-    }
-  }
-  nearby.sort((a, b) => a.distance - b.distance || a.questId.localeCompare(b.questId));
-  return nearby.slice(0, 4);
 }
 
 export function buildMapSidebarView(input: MapSidebarViewInput): MapSidebarView {
@@ -220,7 +165,6 @@ export function buildMapSidebarView(input: MapSidebarViewInput): MapSidebarView 
     landmarkCount: input.zone.pois.filter((poi) => poi.hideOnMap !== true).length,
     filters: input.filters,
     quests,
-    nearby: nearbyQuests(input),
     selectedQuestId,
     route: questMapLocation(
       selectedQuestId,

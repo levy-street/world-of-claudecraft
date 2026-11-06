@@ -21161,6 +21161,23 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.retentionFooter': '重置專業後保留60%的技能。',
   'hudChrome.professions.tutorialLink': '專業教學',
   'hudChrome.professionsHub.tabOverview': '總覽',
+  'guide.interfacePage.railBodyThirteen':
+    '在畫面的右下角，離小地圖很遠的地方，坐著一排小小的方形按鈕，並排成兩短行。它們多半印著自己的預設按鍵。\n\n第一行是你的角色面板、背包、法術書、天賦、任務日誌、世界地圖與獎勵。第二行依序是王國之書、你的專業、活動（那顆鈴鐺）、好友與公會，接著是 WOC 商店與遊戲選單。另外還有幾顆只在適用時才會加入。',
+  'guide.interfacePage.mobileBodyRewardsMore':
+    '觸控操作會自己出現，版面也會依你的螢幕自行調整大小：小手機用緊湊的排法，大手機用標準的排法，平板則用寬鬆一些的排法。\n\n你的技能排成一圈，而不是一排數字鍵：攻擊按鈕旁邊有四顆動作按鈕，還有一顆換頁鈕，讓這一圈在它的 {pages} 頁之間切換，這幾頁合起來便能觸及你全部 {slots} 個技能格位，不論桌機版的額外動作列有沒有開啟。那一圈的第五個弧形位置是你的消耗品座位：點一下就使用座位上放著的東西，或者按住它、或把它向內滑，即可展開一排會自動從你身上帶的東西補上的消耗品。圈的周圍則是觸控玩家最常伸手去按的按鈕：切換目標、使用眼前的東西，以及跳躍。\n\n底部邊緣有一顆「快捷操作」控制鈕，取代了一整排按鈕。它通往其餘的一切：坐騎、聊天、地圖、背包、社交、任務、角色、法術書、遊戲選單，還有一個「更多」項目，把你其餘的視窗分組排好：紀錄（功績、頭銜、聖物庫、聲望、戰利品瀏覽器與排行榜）、專業、活動（地城與團隊副本、PvP 與紙牌對決）、角色（包括表情、天賦與外觀）、獎勵（寶庫、每週任務與世界任務）以及商店。wiki 與 Discord 則改放在遊戲選單裡。這裡的視窗會填滿整個畫面，而不是浮在畫面上。\n\n移動你的單位框架是桌機才有的事：在觸控裝置上，版面會替你安排好它們的位置。',
+  'guide.interfacePage.winQuestLogBodyAvailable':
+    '你接下的每一個任務、它的故事、它的目標與你的進度，並附有把其中任何一項標示在地圖上的方法，以及挑選追蹤面板要跟著哪些任務的方法。「可接任務」一欄列出你附近可接的任務，每一項都能把任務發布者標示在地圖上。',
+  'guide.interfacePage.winRewardsTitle': '獎勵',
+  'guide.interfacePage.winRewardsBody':
+    '你能領取的一切，都收在一個分頁視窗裡，就在按鈕列的「獎勵」按鈕後面；有東西可領時，按鈕上會顯示數字。「寶庫」就是每週寶庫，本週的獎勵要到寶庫看守那裡開啟；「每週任務」展示使者的四個委託，不過要選哪一個得去找使者本人；「世界任務」是今天的任務板，每個任務都能標示在地圖上，每天還能替換一個。',
+  'hudChrome.rewards.title': '獎勵',
+  'hudChrome.rewards.close': '關閉獎勵',
+  'hudChrome.rewards.tabVault': '寶庫',
+  'hudChrome.rewards.tabWeekly': '每週任務',
+  'hudChrome.rewards.tabWorldQuests': '世界任務',
+  'hudChrome.rewards.weeklyPickAt': '請在{zone}的使者處選擇你的任務。',
+  'hudChrome.questLog.available': '可接任務',
+  'hudChrome.mapAtlas.openQuestLog': '打開任務日誌',
   'hudChrome.expeditions.activitiesBellCount.one': '開啟活動：{count}則通知',
   'hudChrome.expeditions.activitiesBellCount.other': '開啟活動：{count}則通知',
   'hudChrome.mobile.groupRecord': '紀錄',

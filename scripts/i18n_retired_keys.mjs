@@ -466,6 +466,61 @@ export const RETIRED_KEYS = [
   'guide.deedsPage.standingsNote', // -> standingsNoteRankings (no Leaderboard window)
   'guide.reliquaryPage.howBody', // -> howBodyRealmTab (Shift+X is not a default)
   'guide.glossary.renownDef', // -> renownDefRankings (no Leaderboard window)
+  // -- v0.46.0 menu consolidation, steps 7 and 8. The WOC Store's daily-rewards
+  // body (the spin, tasks, leaderboard and wallet cards that stood in for a
+  // disabled store) is no longer a live feature and left with its views, and the
+  // World Map rail's Available Nearby list became the Quest Log's Available group.
+  'hudChrome.dailyRewards.close',
+  'hudChrome.dailyRewards.disabled',
+  'hudChrome.dailyRewards.disclaimer',
+  'hudChrome.dailyRewards.endsIn',
+  'hudChrome.dailyRewards.error',
+  'hudChrome.dailyRewards.history',
+  'hudChrome.dailyRewards.intro',
+  'hudChrome.dailyRewards.loading',
+  'hudChrome.dailyRewards.noHistory',
+  'hudChrome.dailyRewards.oneVsOneExcluded',
+  'hudChrome.dailyRewards.prize',
+  'hudChrome.dailyRewards.reason.banned',
+  'hudChrome.dailyRewards.reason.bannedUntil',
+  'hudChrome.dailyRewards.reason.eligible',
+  'hudChrome.dailyRewards.reason.no_wallet',
+  'hudChrome.dailyRewards.reason.price_unavailable',
+  'hudChrome.dailyRewards.reason.under_minimum',
+  'hudChrome.dailyRewards.remainingDaysHours',
+  'hudChrome.dailyRewards.remainingHoursMinutes',
+  'hudChrome.dailyRewards.remainingLessThanMinute',
+  'hudChrome.dailyRewards.remainingMinutes',
+  'hudChrome.dailyRewards.reset',
+  'hudChrome.dailyRewards.sol',
+  'hudChrome.dailyRewards.spinButton',
+  'hudChrome.dailyRewards.spinClaimed',
+  'hudChrome.dailyRewards.spinClose',
+  'hudChrome.dailyRewards.spinDialogTitle',
+  'hudChrome.dailyRewards.spinReady',
+  'hudChrome.dailyRewards.spinResult',
+  'hudChrome.dailyRewards.spinTitle',
+  'hudChrome.dailyRewards.taskMultiplier',
+  'hudChrome.dailyRewards.tasks',
+  'hudChrome.dailyRewards.title',
+  'hudChrome.dailyRewards.usd',
+  'hudChrome.dailyRewards.walletConnectBody',
+  'hudChrome.dailyRewards.walletConnectButton',
+  'hudChrome.dailyRewards.walletConnectTitle',
+  'hudChrome.dailyRewards.walletHoldBody',
+  'hudChrome.dailyRewards.walletHoldTitle',
+  'hudChrome.dailyRewards.walletPriceBody',
+  'hudChrome.dailyRewards.walletValue',
+  'hudChrome.mapAtlas.availableNearby',
+  'hudChrome.mapAtlas.noNearbyQuests',
+  // Guide prose for steps 7 and 8 (the reword-is-a-new-key convention): the rail
+  // gained Rewards, the More tray a Rewards group, the Quest Log an Available
+  // group, and the economy page's daily-rewards section left with the feature.
+  'guide.interfacePage.railBodyTwelve',
+  'guide.interfacePage.mobileBodyGroupedMore',
+  'guide.interfacePage.winQuestLogBody',
+  'guide.economy.dailyTitle',
+  'guide.economy.dailyBody',
 ];
 
 export const RETIRED_KEY_SET = new Set(RETIRED_KEYS);

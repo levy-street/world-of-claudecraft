@@ -4259,6 +4259,8 @@ export const hudChromeStrings = {
     tierReachedLine: 'You are now {tier} with the {faction}. Your faction title is now {title}.',
   },
   questLog: {
+    // Menu consolidation step 8: nearby quest offers, moved off the map rail.
+    available: 'Available',
     completed: 'Completed',
     zoneSummary: '{count} ({ready} ready)',
     shiftHint: 'Shift-click a quest to link it in chat.',
@@ -8711,6 +8713,16 @@ export const hudChromeStrings = {
     tabDungeons: 'Dungeons and Raids',
     tabPvp: 'PvP',
   },
+  // Rewards (menu consolidation step 7): one tabbed window for the weekly
+  // Vault, the emissary's weekly quest and today's world quests.
+  rewards: {
+    title: 'Rewards',
+    close: 'Close Rewards',
+    tabVault: 'Vault',
+    tabWeekly: 'Weekly Quest',
+    tabWorldQuests: 'World Quests',
+    weeklyPickAt: 'Choose your quest with the emissary in {zone}.',
+  },
   // Book of the Realm (menu consolidation step 2): one tabbed window over the
   // permanent record (Deeds, Titles, Reliquary, Reputation, Loot Explorer,
   // Rankings). The absorbed windows keep their own titles as tab labels where
@@ -10739,6 +10751,7 @@ export const hudChromeStrings = {
     // flip local quest tracking share them: the atlas rail's Untrack button and
     // the quest log's per-quest toggle, which is the way back from untracked.
     untrack: 'Untrack',
+    openQuestLog: 'Open Quest Log',
     track: 'Track',
     // The rail's world-quest section (src/ui/hud/map/world_quest_rail_*): the
     // day's board, the shared marker selection, and the one daily replacement,

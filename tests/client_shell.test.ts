@@ -2316,11 +2316,15 @@ describe('client HTML shell', () => {
     expect(html).toContain('<div id="mobile-extra-grid">');
     // The tray is a grouped deep-link index (menu consolidation step 5) in BOTH
     // entries (play.html historically lags index.html; these pins keep them in
-    // step): five group headings, the hub tabs' tiles, and none of the Quick
-    // Actions duplicates (Mount, Map, Bags, Character, Spellbook).
+    // step): six group headings (Rewards joined in step 7), the hub tabs'
+    // tiles, and none of the Quick Actions duplicates (Mount, Map, Bags,
+    // Character, Spellbook).
     for (const entry of [html, playHtml]) {
-      expect(entry.match(/class="mobile-extra-group"/g)).toHaveLength(5);
+      expect(entry.match(/class="mobile-extra-group"/g)).toHaveLength(6);
       for (const id of [
+        'mobile-rewards-vault',
+        'mobile-rewards-weekly',
+        'mobile-rewards-world-quests',
         'mobile-daily-rewards',
         'mobile-deeds',
         'mobile-titles',

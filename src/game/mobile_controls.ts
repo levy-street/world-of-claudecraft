@@ -164,6 +164,8 @@ export interface MobileControlCallbacks {
   onReputation(): void;
   /** Open The Reliquary window, folded into the More tray on mobile. */
   onReliquary(): void;
+  /** The Rewards hub on one tab (Vault, Weekly Quest, World Quests). */
+  onRewards(tab: 'vault' | 'weekly' | 'worldQuests'): void;
   /** Open the Loot Explorer window, folded into the More tray on mobile. */
   onLootExplorer(): void;
   /** Use the shared riding toggle from the More tray: dismount instantly or
@@ -578,6 +580,9 @@ export class MobileControls {
     this.bindButton('mobile-cardduel', () => this.callbacks.onCardDuel());
     this.bindButton('mobile-cosmetics', () => this.callbacks.onCosmetics());
     this.bindButton('mobile-reliquary', () => this.callbacks.onReliquary());
+    this.bindButton('mobile-rewards-vault', () => this.callbacks.onRewards('vault'));
+    this.bindButton('mobile-rewards-weekly', () => this.callbacks.onRewards('weekly'));
+    this.bindButton('mobile-rewards-world-quests', () => this.callbacks.onRewards('worldQuests'));
     this.bindButton('mobile-loot-explorer', () => this.callbacks.onLootExplorer());
     this.bindButton('mobile-professions', () => this.callbacks.onProfessions());
     this.bindButton('mobile-perfecting', () => this.callbacks.onPerfecting());

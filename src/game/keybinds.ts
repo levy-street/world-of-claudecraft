@@ -337,6 +337,15 @@ export const BIND_ACTIONS: BindAction[] = [
     kind: 'edge',
     defaults: ['Shift+KeyI'],
   },
+  {
+    // Rewards (menu consolidation step 7): the Vault, the weekly quest and
+    // today's world quests. Rebindable, no default key.
+    id: 'rewards',
+    label: 'Rewards',
+    category: 'Interface',
+    kind: 'edge',
+    defaults: [],
+  },
   // Mount / dismount toggle: Backquote avoids the release-owned KeyZ layers
   // for weapon sheathing and the Book of Deeds.
   {

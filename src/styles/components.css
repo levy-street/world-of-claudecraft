@@ -2734,6 +2734,32 @@
   .ql-group-line {
     cursor: default;
   }
+  /* The Available group (menu consolidation step 8): an offer is a plain row,
+     not a selectable quest, so it is a title and meta line beside its own
+     Show on Map rather than a .ql-item button. */
+  .ql-offer {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-xs);
+  }
+  .ql-offer-copy {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .ql-offer-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .ql-offer-meta {
+    font-size: 11px;
+  }
+  .ql-offer > .ui-btn {
+    flex: none;
+  }
 
   .ql-group-chevron {
     display: inline-flex;
@@ -5370,8 +5396,7 @@
   /* .lb-scope-note is the Renown tab's account-scope teaching line, visible
      on every deeds-board state (never a title-attr tooltip: touch has none). */
   .lb-total,
-  .lb-scope-note,
-  .dr-leaderboard-total {
+  .lb-scope-note {
     margin: 2px 0 8px;
     color: #b9ac82;
     font-size: 12px;
@@ -5756,468 +5781,9 @@
     max-height: 62vh;
     overflow-y: auto;
   }
-  .dr-summary {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
-    padding: 8px;
-  }
-  .dr-summary div {
-    display: grid;
-    gap: 2px;
-    padding: 8px;
-  }
-  .dr-summary span,
-  .dr-tasks small {
-    color: var(--color-text-muted);
-    font-size: 11px;
-  }
-  .dr-tasks small {
-    display: grid;
-    gap: 2px;
-  }
-  .dr-tasks small em {
-    color: var(--color-deed-banner-text);
-    font-style: normal;
-  }
-  .dr-intro {
-    margin: 0 0 10px;
-    color: var(--color-text-secondary);
-    font-size: 12px;
-    line-height: 1.4;
-  }
-  .dr-disclaimer {
-    margin: -4px 0 10px;
-    color: var(--color-text-muted);
-    font-size: 11px;
-    line-height: 1.35;
-  }
-  .dr-summary strong {
-    color: var(--color-deed-banner-text);
-    font-size: 13px;
-  }
-  .dr-summary p {
-    grid-column: 1 / -1;
-    margin: 2px 0 0;
-    font-size: 12px;
-  }
-  .dr-summary .dr-countdown {
-    grid-column: 1 / -1;
-  }
-  .dr-summary .dr-countdown span {
-    color: var(--color-deed-banner-text);
-    font-size: 12px;
-  }
-  .dr-ok {
-    color: var(--color-text-success);
-  }
-  .dr-lock,
+
   .dr-error {
     color: var(--color-warning);
-  }
-  .dr-section {
-    margin-top: 10px;
-    padding: 10px;
-  }
-  .dr-wallet-card {
-    margin-top: 10px;
-    padding: 10px;
-  }
-  .dr-wallet-card h3 {
-    margin: 0 0 4px;
-    color: var(--gold);
-    font-family: var(--title-font);
-    font-size: 12px;
-    letter-spacing: 0.3px;
-  }
-  .dr-wallet-card p {
-    margin: 0 0 8px;
-    color: var(--color-text-secondary);
-    font-size: 12px;
-    line-height: 1.35;
-  }
-  .dr-wallet-card [data-wallet-connect] {
-    padding-right: 18px;
-    padding-left: 18px;
-  }
-  .dr-section h3 {
-    margin: 0 0 6px;
-    color: var(--gold);
-    font-family: var(--title-font);
-    font-size: 12px;
-    letter-spacing: 0.3px;
-  }
-  .dr-spin {
-    display: grid;
-    grid-template-columns: 76px 1fr;
-    gap: 10px;
-    align-items: center;
-    padding: 8px;
-  }
-  .dr-spin p {
-    margin: 0 0 8px;
-    color: var(--color-text-secondary);
-    font-size: 12px;
-  }
-  .dr-wheel {
-    display: grid;
-    place-items: center;
-    width: 64px;
-    aspect-ratio: 1;
-    border: 2px solid var(--color-deed-banner-border);
-    border-radius: 50%;
-    color: var(--color-deed-banner-text);
-    font-family: var(--title-font);
-    font-size: 18px;
-    background: var(--color-card-lo);
-  }
-  .dr-spin-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 60;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    background: radial-gradient(
-      120% 120% at 50% 0%,
-      color-mix(in srgb, var(--color-ink-deep) 82%, transparent),
-      color-mix(in srgb, var(--color-keyline) 93%, transparent) 70%
-    );
-  }
-  .dr-spin-overlay.open {
-    display: flex;
-  }
-  .dr-spin-stage {
-    position: relative;
-    display: grid;
-    place-items: center;
-    width: min(520px, calc(100vw - 32px));
-    aspect-ratio: 1;
-    opacity: 0;
-    transform: scale(0.74);
-    animation: dr-spin-stage-in 620ms cubic-bezier(0.16, 1, 0.3, 1) both;
-  }
-  .dr-spin-close {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    z-index: 5;
-  }
-  .dr-spin-pointer {
-    position: absolute;
-    top: 10px;
-    left: 50%;
-    z-index: 3;
-    width: 0;
-    height: 0;
-    transform: translateX(-50%);
-    border-left: 18px solid transparent;
-    border-right: 18px solid transparent;
-    border-top: 32px solid var(--gold-dim);
-    filter: drop-shadow(0 2px 4px var(--color-keyline));
-  }
-  .dr-spin-wheel-big {
-    position: relative;
-    width: min(430px, 82vw);
-    aspect-ratio: 1;
-    border-radius: 50%;
-    border: 2px solid var(--border);
-    background:
-      radial-gradient(circle at 50% 50%, var(--color-card-lo) 0 21%, transparent 22%),
-      radial-gradient(
-        circle at 50% 50%,
-        transparent 0 54%,
-        color-mix(in srgb, var(--gold-dim) 19%, transparent) 55% 56%,
-        transparent 57%
-      ),
-      conic-gradient(
-        from -90deg,
-        color-mix(in srgb, var(--color-friendly) 30%, var(--color-card-lo)) 0deg 45deg,
-        color-mix(in srgb, var(--color-info) 30%, var(--color-card-lo)) 45deg 90deg,
-        color-mix(in srgb, var(--color-quality-epic) 30%, var(--color-card-lo)) 90deg 135deg,
-        color-mix(in srgb, var(--color-warning) 30%, var(--color-card-lo)) 135deg 180deg,
-        color-mix(in srgb, var(--color-friendly) 30%, var(--color-card-lo)) 180deg 225deg,
-        color-mix(in srgb, var(--color-info) 30%, var(--color-card-lo)) 225deg 270deg,
-        color-mix(in srgb, var(--color-quality-epic) 30%, var(--color-card-lo)) 270deg 315deg,
-        color-mix(in srgb, var(--color-warning) 30%, var(--color-card-lo)) 315deg 360deg
-      );
-    box-shadow:
-      0 0 0 8px var(--color-bg-input),
-      0 0 calc(34px * var(--fx-shadow, 1)) var(--color-keyline),
-      inset 0 0 34px var(--color-keyline),
-      inset 0 0 0 4px color-mix(in srgb, var(--gold-dim) 13%, transparent);
-    transform: rotate(calc(2160deg + var(--land-angle, 0deg)));
-    animation: dr-spin-wheel 5s cubic-bezier(0.16, 1, 0.3, 1) 700ms both;
-    will-change: transform;
-  }
-  .dr-spin-wheel-big::after {
-    content: "";
-    position: absolute;
-    inset: 23%;
-    border-radius: 50%;
-    border: 1px solid var(--border);
-    background: radial-gradient(circle, var(--color-card-hi), var(--color-keyline) 72%);
-    box-shadow: inset 0 0 20px var(--color-keyline);
-  }
-  .dr-spin-wheel-big span {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    z-index: 1;
-    width: 58px;
-    margin-left: -29px;
-    margin-top: -10px;
-    color: var(--color-text-secondary);
-    font-family: var(--title-font);
-    font-size: 13px;
-    text-align: center;
-    text-shadow: var(--title-shadow);
-    transform: rotate(calc(var(--i) * 45deg + 22.5deg)) translateY(-152px)
-      rotate(calc(var(--i) * -45deg - 22.5deg));
-  }
-  .dr-spin-result {
-    position: absolute;
-    z-index: 4;
-    display: grid;
-    place-items: center;
-    width: 168px;
-    height: 168px;
-    border-radius: 50%;
-    border: 1px solid var(--border);
-    background: var(--color-card-lo);
-    color: var(--tier-color);
-    font-family: var(--title-font);
-    font-size: 22px;
-    letter-spacing: 0.4px;
-    text-align: center;
-    text-shadow: var(--title-shadow);
-    opacity: 0;
-    transform: scale(0.72);
-    animation: dr-spin-result 620ms cubic-bezier(0.16, 1, 0.3, 1) 5.6s both;
-  }
-  .dr-spin-result::before {
-    content: "";
-    position: absolute;
-    inset: -18px;
-    border-radius: 50%;
-    border: 1px solid color-mix(in srgb, var(--tier-color) 70%, transparent);
-    opacity: 0;
-    transform: scale(0.7);
-    animation: dr-spin-ring 760ms cubic-bezier(0.16, 1, 0.3, 1) 5.62s both;
-  }
-  .dr-spin-result i,
-  .dr-spin-result b {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    opacity: 0;
-    background: var(--tier-color);
-    box-shadow: 0 0 calc(12px * var(--fx-shadow, 1)) var(--tier-color);
-  }
-  .dr-spin-result i {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    animation: dr-spin-particle 760ms cubic-bezier(0.16, 1, 0.3, 1) 5.62s both;
-  }
-  .dr-spin-result b {
-    width: 4px;
-    height: 14px;
-    border-radius: 4px;
-    transform: translate(-50%, -50%) scaleY(0.35);
-    animation: dr-spin-spark 840ms cubic-bezier(0.16, 1, 0.3, 1) 5.48s both;
-  }
-  .dr-spin-result i:nth-child(2) {
-    --tx: -96px;
-    --ty: -38px;
-  }
-  .dr-spin-result i:nth-child(3) {
-    --tx: -60px;
-    --ty: 78px;
-  }
-  .dr-spin-result i:nth-child(4) {
-    --tx: 8px;
-    --ty: -106px;
-  }
-  .dr-spin-result i:nth-child(5) {
-    --tx: 78px;
-    --ty: -70px;
-  }
-  .dr-spin-result i:nth-child(6) {
-    --tx: 104px;
-    --ty: 20px;
-  }
-  .dr-spin-result i:nth-child(7) {
-    --tx: 46px;
-    --ty: 92px;
-  }
-  .dr-spin-result i:nth-child(8) {
-    --tx: -110px;
-    --ty: 28px;
-  }
-  .dr-spin-result i:nth-child(9) {
-    --tx: 0;
-    --ty: 112px;
-  }
-  .dr-spin-result b:nth-of-type(1) {
-    --tx: -260px;
-    --ty: -14px;
-    --rot: 86deg;
-  }
-  .dr-spin-result b:nth-of-type(2) {
-    --tx: -146px;
-    --ty: -224px;
-    --rot: 28deg;
-  }
-  .dr-spin-result b:nth-of-type(3) {
-    --tx: 88px;
-    --ty: -248px;
-    --rot: -22deg;
-  }
-  .dr-spin-result b:nth-of-type(4) {
-    --tx: 270px;
-    --ty: -42px;
-    --rot: -82deg;
-  }
-  .dr-spin-result b:nth-of-type(5) {
-    --tx: 158px;
-    --ty: 218px;
-    --rot: -142deg;
-  }
-  .dr-spin-result b:nth-of-type(6) {
-    --tx: -114px;
-    --ty: 246px;
-    --rot: 152deg;
-  }
-  .dr-spin-result b:nth-of-type(7) {
-    --tx: -306px;
-    --ty: -76px;
-    --rot: 74deg;
-  }
-  .dr-spin-result b:nth-of-type(8) {
-    --tx: 230px;
-    --ty: 214px;
-    --rot: -132deg;
-  }
-  @keyframes dr-spin-stage-in {
-    to {
-      opacity: 1;
-      transform: scale(1);
-    }
-  }
-  @keyframes dr-spin-wheel {
-    from {
-      transform: rotate(0deg);
-    }
-    to {
-      transform: rotate(calc(2160deg + var(--land-angle, 0deg)));
-    }
-  }
-  @keyframes dr-spin-result {
-    to {
-      opacity: 1;
-      transform: scale(1);
-    }
-  }
-  @keyframes dr-spin-ring {
-    to {
-      opacity: 1;
-      transform: scale(1.08);
-    }
-  }
-  @keyframes dr-spin-particle {
-    55% {
-      opacity: 1;
-    }
-    100% {
-      opacity: 0;
-      transform: translate(calc(-50% + var(--tx, 0px)), calc(-50% + var(--ty, 0px))) scale(0.1);
-    }
-  }
-  @keyframes dr-spin-spark {
-    40% {
-      opacity: 1;
-    }
-    100% {
-      opacity: 0;
-      transform: translate(calc(-50% + var(--tx, 0px)), calc(-50% + var(--ty, 0px)))
-        rotate(var(--rot, 0deg)) scaleY(1);
-    }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .dr-spin-stage,
-    .dr-spin-wheel-big,
-    .dr-spin-result,
-    .dr-spin-result::before,
-    .dr-spin-result i,
-    .dr-spin-result b {
-      animation-duration: 1ms;
-      animation-delay: 1ms;
-    }
-  }
-  body.reduce-motion .dr-spin-stage,
-  body.reduce-motion .dr-spin-wheel-big,
-  body.reduce-motion .dr-spin-result,
-  body.reduce-motion .dr-spin-result::before,
-  body.reduce-motion .dr-spin-result i,
-  body.reduce-motion .dr-spin-result b {
-    animation-duration: 1ms;
-    animation-delay: 1ms;
-  }
-  .dr-tasks {
-    display: grid;
-    gap: 5px;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-  .dr-tasks li,
-  .dr-rank {
-    display: grid;
-    grid-template-columns: 86px 1fr 70px;
-    gap: 8px;
-    align-items: center;
-    padding: 6px 8px;
-    border-radius: var(--radius-xs);
-    background: color-mix(in srgb, var(--color-white) 3%, transparent);
-    font-size: 12px;
-  }
-  .dr-tasks li {
-    grid-template-columns: 1fr 1.5fr 58px;
-  }
-  .dr-tasks li.done {
-    outline: 1px solid var(--color-text-success);
-  }
-  .dr-tasks b,
-  .dr-rank strong {
-    color: var(--color-deed-banner-text);
-    text-align: right;
-  }
-  .dr-chest-toggle {
-    margin-top: 8px;
-  }
-  .dr-ranks {
-    display: grid;
-    gap: 4px;
-  }
-  .dr-leaderboard-ranks {
-    max-height: 222px;
-    overflow-y: auto;
-    padding-right: 2px;
-  }
-  .dr-rank span {
-    color: var(--color-text-muted);
-  }
-  .dr-rank b {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  .dr-rank.mine {
-    outline: 1px solid var(--color-deed-banner-border);
-    background: color-mix(in srgb, var(--gold) 13%, transparent);
   }
 
   /* ---------- claudium ---------- */
@@ -15235,13 +14801,9 @@
   .map-atlas-actions .ui-btn {
     min-width: 0;
   }
-  .map-atlas-nearby {
-    flex: 0 1 auto;
-    max-height: 148px;
-    overflow-y: auto;
-  }
-  /* The world-quest section (src/ui/hud/map/world_quest_rail_section.ts): the
-     same card rows as the tracked list, a state chip, and the faction name in
+  /* The world-quest board (src/ui/hud/map/world_quest_rail_section.ts, painted
+     by the Rewards hub's World Quests tab since menu consolidation step 7): the
+     same card rows as the map rail's tracked list, a state chip, and the faction name in
      the standing colour the Reputation tab uses. The reroll button is the gold
      primary because it is the section's one deliberate action; it stays
      disabled until a replaceable row is selected. */
@@ -15324,21 +14886,6 @@
   .map-atlas-wq-note {
     margin: 0;
     text-align: center;
-  }
-  .map-atlas-nearby-row {
-    width: 100%;
-    padding: 6px 2px;
-    display: flex;
-    justify-content: space-between;
-    gap: 8px;
-    border: 0;
-    border-bottom: 1px solid var(--color-border-showcase);
-    background: transparent;
-    color: var(--color-text-muted);
-    text-align: left;
-  }
-  .map-atlas-nearby-row > span:first-child {
-    color: var(--color-text-light);
   }
   .map-atlas-legend {
     display: flex;
@@ -15486,36 +15033,6 @@
     flex-direction: column;
     height: 820px;
     max-height: 88vh;
-  }
-  /* Inside the zoomed #ui: viewport lengths divide by --window-scale (raw vh
-     re-multiplies by the zoom and runs the vault off the bottom). The top is
-     the shared .window 10vh restated in the same units, so the sheet ends at
-     98% of the screen at any UI scale. */
-  #dungeon-finder-window.df-vault-mode {
-    top: calc(var(--app-vh, 100vh) * 0.1 / var(--window-scale));
-    width: min(980px, calc(var(--app-vw, 100vw) * 0.96 / var(--window-scale)));
-    height: min(780px, calc(var(--app-vh, 100vh) * 0.88 / var(--window-scale)));
-    max-height: min(780px, calc(var(--app-vh, 100vh) * 0.88 / var(--window-scale)));
-  }
-  .df-body-vault {
-    display: flex;
-    overflow: hidden;
-  }
-  .df-vault-container {
-    display: flex;
-    flex-direction: column;
-    flex: 1 1 auto;
-    min-height: 0;
-    min-width: 0;
-    overflow: hidden;
-  }
-  .df-vault-container .weekly-rewards {
-    flex: 1;
-    overflow-y: auto;
-    padding: 4px 12px 12px;
-  }
-  .weekly-preview-notice {
-    padding: 8px 14px;
   }
   #dungeon-finder-window:has(.df-body-catalogue) {
     --color-text-light: var(--color-finder-text);
@@ -15823,21 +15340,6 @@
     display: flex;
     overflow: hidden;
     container: finder-catalogue / inline-size;
-  }
-  .df-body-vault {
-    display: flex;
-    overflow-y: auto;
-  }
-  .df-vault-container {
-    display: flex;
-    flex-direction: column;
-    flex: 1 1 auto;
-    min-height: 0;
-  }
-  .df-vault-container .weekly-rewards {
-    flex: 1;
-    overflow-y: visible;
-    padding: 4px 12px 12px;
   }
   .df-cols {
     display: grid;
@@ -23927,6 +23429,18 @@
     color: var(--wk-gilt-text);
     font-weight: 600;
   }
+  /* The Rewards hub opens the board read-only: the pick is made at the
+     emissary, so this line names where and offers the map. */
+  #weekly-quests-window .wk-remote {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-align: center;
+    color: var(--wk-violet-text);
+    margin: 0 0 clamp(8px, 1.2cqw, 16px);
+  }
   #weekly-quests-window .wk-cards {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -26471,6 +25985,36 @@
     min-height: 0;
     overflow-y: auto;
   }
+  /* The Rewards hub's World Quests tab (menu consolidation step 7): the board
+     that sat on the World Map rail, on its own root, the Reputation window's
+     shape. Each open row carries a Show on Map beside its card. */
+  #world-quests-window {
+    width: min(90vw, 560px);
+    height: min(85vh, 640px);
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
+  }
+  #world-quests-window .world-quests-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 4px 12px 12px;
+  }
+  .map-atlas-wq-row {
+    display: flex;
+    align-items: stretch;
+    gap: 6px;
+  }
+  .map-atlas-wq-row > .map-atlas-wq {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .map-atlas-wq-row > .map-atlas-wq-map {
+    flex: none;
+    align-self: center;
+  }
   #loot-explorer-window {
     width: min(90vw, 760px);
     height: min(85vh, 760px);
@@ -26647,7 +26191,7 @@
     white-space: nowrap;
   }
   /* ---------- weekly rewards ---------- */
-  body.weekly-vault-open #bank-window {
+  #weekly-vault-window {
     left: calc(var(--app-vw, 100vw) * 0.04 / var(--window-scale));
     top: calc(var(--app-vh, 100vh) * 0.04 / var(--window-scale));
     right: auto;
@@ -28198,12 +27742,14 @@
     justify-content: flex-end;
   }
   @media (min-width: 1100px) and (min-height: 700px) {
-    /* #bank-window lives inside the zoomed #ui (`zoom: var(--ui-scale)`), so
+    /* #weekly-vault-window lives inside the zoomed #ui (`zoom: var(--ui-scale)`), so
        every viewport length divides by --window-scale, exactly as the base
        rule above does: raw vw/vh here re-multiply by the zoom and push the
        vault off-screen at any UI scale above 1. The 1080px cap is an author
-       length (already zoom space) and centres against the scaled viewport. */
-    body.weekly-vault-open #bank-window {
+       length (already zoom space) and centres against the scaled viewport.
+       (#weekly-vault-window is the Rewards hub's Vault tab, menu
+       consolidation step 7; the sheet used to borrow #bank-window.) */
+    #weekly-vault-window {
       left: calc(var(--app-vw, 100vw) * 0.02 / var(--window-scale));
       top: max(
         calc(var(--app-vh, 100vh) * 0.02 / var(--window-scale)),
@@ -28295,9 +27841,8 @@
        below derives from this container's height, so on a short scaled
        viewport (this media gate reads the real, unzoomed viewport) the tracks
        hold their size and the panel scrolls instead of collapsing every vault
-       to a sliver. Scoped to the bank sheet; the Dungeon Finder's read-only
-       vault keeps its fit-to-window sizing. */
-    body.weekly-vault-open #bank-window .weekly-tracks {
+       to a sliver. */
+    #weekly-vault-window .weekly-tracks {
       min-height: 480px;
     }
     .weekly-track,

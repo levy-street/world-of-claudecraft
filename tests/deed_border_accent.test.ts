@@ -1159,8 +1159,10 @@ describe('border accent graphics fairness (cosmetic identity, preset-identical)'
       // combat text crit and big-hit glows (tokens.css --glow-fct-crit x2,
       // --glow-fct-big, --glow-fct-big-crit) and the dungeon tracker completion flash add 6 decorative blurs: 119. Their
       // keyline (--fct-vivid-outline) is legibility and never rides the tier.
-      'the style graph owns 119 reviewed tier-shadow uses',
-    ).toHaveLength(119);
+      // Menu consolidation step 7 removed the daily spin's wheel and result
+      // blooms and the store chest's ready pulse with the feature: 113.
+      'the style graph owns 113 reviewed tier-shadow uses',
+    ).toHaveLength(113);
 
     for (const [name, body] of [
       [

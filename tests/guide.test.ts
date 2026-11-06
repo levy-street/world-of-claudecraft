@@ -6952,10 +6952,27 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
     const groups = [
       ...gridHtml.matchAll(/<h3 class="mobile-extra-group" data-i18n="([^"]+)"/g),
     ].map((m) => t((m[1] ?? '') as never));
-    expect(groups).toEqual(['Record', 'Professions', 'Activities', 'Character', 'Store']);
+    // Menu consolidation step 7 added a Rewards group (mobileBodyGroupedMore
+    // retired for mobileBodyRewardsMore).
+    expect(groups).toEqual([
+      'Record',
+      'Professions',
+      'Activities',
+      'Character',
+      'Rewards',
+      'Store',
+    ]);
+    for (const id of [
+      'mobile-rewards-vault',
+      'mobile-rewards-weekly',
+      'mobile-rewards-world-quests',
+    ]) {
+      expect(trayIds, `${id} sits in the More tray`).toContain(id);
+    }
     expect(mobile).toContain(
-      `a More entry that sorts the rest of your windows into groups: ${groups[0]} (deeds, titles, the Reliquary, reputation, the Loot Explorer, and the rankings), ${groups[1]}, ${groups[2]} (dungeons and raids, PvP, and Card Duel), ${groups[3]} (emotes, talents, and cosmetics among them), and ${groups[4]}. The wiki and Discord sit in the game menu instead.`,
+      `a More entry that sorts the rest of your windows into groups: ${groups[0]} (deeds, titles, the Reliquary, reputation, the Loot Explorer, and the rankings), ${groups[1]}, ${groups[2]} (dungeons and raids, PvP, and Card Duel), ${groups[3]} (emotes, talents, and cosmetics among them), ${groups[4]} (the Vault, the weekly quest, and world quests), and ${groups[5]}. The wiki and Discord sit in the game menu instead.`,
     );
+    expect(RETIRED_KEYS).toContain('guide.interfacePage.mobileBodyGroupedMore');
     expect(mobile).not.toContain('emotes and the wiki among them');
     expect(mobile).not.toContain(
       esc(guideStrings.interfacePage.mobileBodyTwoPages.split('\n\n')[2]),
@@ -7046,7 +7063,7 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
     expect(RETIRED_KEYS).toContain('guide.interfacePage.winMoreBody');
   });
 
-  it('the guide describes the consolidated menus: the twelve-button rail, the three hubs and where the moved panels went (v0.46.0 menu consolidation)', () => {
+  it('the guide describes the consolidated menus: the thirteen-button rail, the hubs and where the moved panels went (v0.46.0 menu consolidation)', () => {
     // The v0.46.0 menu consolidation cut the desktop rail to twelve buttons,
     // folded Deeds, Titles, the Reliquary, Reputation, the Loot Explorer and the
     // Leaderboard into the Book of the Realm (Shift+Z), the Dungeon Finder, PvP
@@ -7062,14 +7079,15 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
       const route = r as NonNullable<typeof r>;
       return pageFor(id)?.render({ params: [], sub: route.sub, titleKey: route.navKey }) ?? '';
     };
-    // The rail, read from the live markup: twelve shown buttons (the town-focus
-    // and $WOC Exchange launchers only join when they apply).
+    // The rail, read from the live markup: thirteen shown buttons since Rewards
+    // joined in step 7 (the town-focus and $WOC Exchange launchers only join
+    // when they apply).
     const indexHtml = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
     const rail = /<div id="side-buttons">([\s\S]*?)\r?\n {4}<\/div>\r?\n/.exec(indexHtml);
     expect(rail).not.toBeNull();
     const buttons = [...(rail?.[1] ?? '').matchAll(/<button[^>]*>/g)].map((m) => m[0]);
     const shown = buttons.filter((b) => !/ hidden[ >]|display:none/.test(b));
-    expect(shown).toHaveLength(12);
+    expect(shown).toHaveLength(13);
     for (const gone of ['mm-emote', 'mm-wiki', 'mm-discord', 'mm-cosmetics', 'mm-leaderboard']) {
       expect(rail?.[1] ?? '', `${gone} left the rail`).not.toContain(`id="${gone}"`);
     }
@@ -7080,10 +7098,21 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
     };
     const iface = render('interface');
     const ip = guideStrings.interfacePage;
-    expect(iface).toContain(esc(ip.railBodyTwelve.split('\n\n')[1] ?? ''));
-    expect(ip.railBodyTwelve).toContain(
-      'The first column covers your character, bags, spellbook, talents, quest log, and world map.',
+    expect(iface).toContain(esc(ip.railBodyThirteen.split('\n\n')[1] ?? ''));
+    expect(ip.railBodyThirteen).toContain(
+      'The first column covers your character, bags, spellbook, talents, quest log, world map, and Rewards.',
     );
+    expect(iface).not.toContain(esc(ip.railBodyTwelve.split('\n\n')[1] ?? ''));
+    expect(RETIRED_KEYS).toContain('guide.interfacePage.railBodyTwelve');
+    // Steps 7 and 8: the Rewards window and the Quest Log's Available group.
+    expect(iface).toContain(esc(ip.winRewardsTitle));
+    expect(iface).toContain(esc(ip.winRewardsBody));
+    expect(ip.winRewardsBody).toContain('you choose one by speaking to the emissary');
+    expect(iface).toContain(esc(ip.winQuestLogBodyAvailable));
+    // The successor extends its predecessor verbatim, so the retirement is the pin.
+    expect(RETIRED_KEYS).toContain('guide.interfacePage.winQuestLogBody');
+    // The economy page's daily-rewards section left with the feature.
+    expect(render('economy')).not.toContain(esc(guideStrings.economy.dailyBody));
     // The hub titles carry the live default keys of the binds that open them.
     expect(iface).toContain(`${t('hudChrome.bookOfRealm.title')} (${bind('deeds')})`);
     expect(iface).toContain(`${t('hudChrome.activities.title')} (${bind('dungeonFinder')})`);

@@ -654,6 +654,16 @@ no longer ship as defaults. The mobile More tray keeps one tile per destination,
 under Record, Professions, Activities, Character and Store headings, each opening its hub
 already on its tab, so a hub never costs a tap on a phone.
 
+Steps 7 and 8 (approved 2026-11-06) added Rewards as a plain rail button under the World Map
+(13 visible): one hub for what a player can claim, Vault (the weekly rewards sheet, which the
+Bank and the Dungeon Finder each painted before), Weekly Quest (the emissary's offers, read-only
+away from the emissary because the sim takes the pick only there) and World Quests (the day's
+board, moved off the World Map rail). Its corner pill counts ready Vault rolls, a finished
+weekly charge and completed world quests from the same reads the tabs paint. It has no default
+key (the `rewards` action is rebindable). The WOC Store keeps the chest beacon as its own
+window; its daily-spin fallback body is gone. The More tray gained a Rewards group before
+Store.
+
 ### 7.10 Chat
 
 `#chatlog-wrap` keeps its bottom-left anchor, tab model (built-in Chat and Combat Log plus
@@ -837,15 +847,18 @@ Every window adopts the grammar; these carry specific intent:
   mid-screen.
 - **Quest log** (`src/ui/hud/quest/questlog_window.ts`): quests group by zone. Each zone
   shows its count and has a collapse control; the detail pane keeps tracked state and
-  reward sockets.
+  reward sockets. An Available group (the nearby offers that were the World Map rail's
+  list) sits after the zones, each offer with Show on Map at its giver.
 - **World map** (`map_window_view.ts`, `map_window_painter.ts`): the canvas sits in a
-  dark inset atlas frame beside a 300px side rail. The rail lists the zone's quests with
-  numbers matching the map badges, then the World Quests board (today's quests with their
-  state, the selected quest's daily reroll behind a confirmation dialog, never one click),
-  then Available Nearby; it also carries filters, legend, Show Route, and Untrack. A Side
-  panel button under the map-level toggle folds the rail away (`mapSidebarCollapsed`,
-  `src/ui/hud/map/map_sidebar_collapse.ts`) so the map takes the whole window. Map
-  controls use `.ui-disc`; pins stay on the `--color-map-*` tokens with quest pins vivid.
+  dark inset atlas frame beside a 300px side rail. The rail is the map's legend: the zone
+  header, the zone's tracked quests with numbers matching the map badges and Show Route,
+  the filters, the legend, and one Open Quest Log link (menu consolidation step 8). Untrack
+  and the nearby offers live in the Quest Log (its Track toggle and Available group), the
+  World Quests board in the Rewards hub. A Side panel button under the map-level toggle
+  folds the rail away (`mapSidebarCollapsed`, `src/ui/hud/map/map_sidebar_collapse.ts`)
+  so the map takes the whole window, and on the touch HUD the rail starts folded each time
+  the map opens. Map controls use `.ui-disc`; pins stay on the `--color-map-*` tokens with
+  quest pins vivid.
 - **Vendor** (`src/ui/hud/vendor/vendor_window.ts`): inventory uses a compact two-column
   `.ui-card` grid with sockets, price, stock state, and buy action composed from the shared
   primitives.

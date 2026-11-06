@@ -32,6 +32,11 @@
     },
     { "icon": "professions", "motif": "Stone mortar and pestle with herb leaves" },
     { "icon": "questlog", "motif": "Unrolled scroll with a wax seal and a quill" },
+    {
+      "icon": "rewards",
+      "motif": "Gold rosette medal with a star on two red ribbon tails (the Rewards hub)",
+      "source": "Authored in-repo as layered SVG to the shared art direction (scripts/assets/chrome_rewards/rewards.svg, rendered onto the key by scripts/assets/chrome_rewards/render_source.mjs), then keyed and encoded by the same converter"
+    },
     { "icon": "social", "motif": "Two figures shoulder to shoulder before a banner" },
     { "icon": "spellbook", "motif": "Open spellbook with an arcane glow" },
     { "icon": "talents", "motif": "Talent tree, three gems joined by branches" }

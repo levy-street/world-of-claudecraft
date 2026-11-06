@@ -10,47 +10,37 @@ function harness(initial: boolean | null) {
       collapsed = next;
     }),
   };
-  const state = { mapOpen: false };
-  const onChange = vi.fn();
-  const openMap = vi.fn(() => {
-    state.mapOpen = true;
-  });
-  const collapse = new MapSidebarCollapse({
-    settings,
-    mapOpen: () => state.mapOpen,
-    openMap,
-    onChange,
-  });
-  return { settings, state, collapse, onChange, openMap };
+  return { settings, collapse: new MapSidebarCollapse({ settings }) };
 }
 
-describe('map sidebar collapse (the world-quest board opener)', () => {
-  it('expand is a no-op when the rail is shown and unfolds it when folded', () => {
+// Menu consolidation step 8: on the touch HUD the atlas rail starts folded
+// every time the map opens; the desktop rail keeps the player's choice.
+describe('map sidebar collapse (fold on open, touch only)', () => {
+  it('folds an unfolded rail when the map opens on the touch HUD', () => {
+    const h = harness(false);
+    h.collapse.foldOnOpen(true);
+    expect(h.settings.setCollapsed).toHaveBeenCalledWith(true);
+    expect(h.collapse.collapsed()).toBe(true);
+  });
+
+  it('leaves the desktop rail as the player left it', () => {
     const shown = harness(false);
-    shown.collapse.expand();
+    shown.collapse.foldOnOpen(false);
     expect(shown.settings.setCollapsed).not.toHaveBeenCalled();
-    expect(shown.onChange).not.toHaveBeenCalled();
+    expect(shown.collapse.collapsed()).toBe(false);
     const folded = harness(true);
-    folded.collapse.expand();
-    expect(folded.settings.setCollapsed).toHaveBeenCalledWith(false);
-    expect(folded.collapse.collapsed()).toBe(false);
-    expect(folded.onChange).toHaveBeenCalledTimes(1);
+    folded.collapse.foldOnOpen(false);
+    expect(folded.settings.setCollapsed).not.toHaveBeenCalled();
+    expect(folded.collapse.collapsed()).toBe(true);
   });
 
-  it('openBoard opens a closed map and always unfolds the rail', () => {
-    const h = harness(true);
-    h.collapse.openBoard();
-    expect(h.openMap).toHaveBeenCalledTimes(1);
-    expect(h.collapse.collapsed()).toBe(false);
-    h.collapse.openBoard();
-    expect(h.openMap).toHaveBeenCalledTimes(1);
-    expect(h.onChange).toHaveBeenCalledTimes(1);
-  });
-
-  it('reads as shown before the preference store exists', () => {
-    const h = harness(null);
-    expect(h.collapse.collapsed()).toBe(false);
-    h.collapse.expand();
-    expect(h.settings.setCollapsed).not.toHaveBeenCalled();
+  it('writes nothing when already folded, or before the settings port is attached', () => {
+    const folded = harness(true);
+    folded.collapse.foldOnOpen(true);
+    expect(folded.settings.setCollapsed).not.toHaveBeenCalled();
+    const detached = harness(null);
+    detached.collapse.foldOnOpen(true);
+    expect(detached.settings.setCollapsed).not.toHaveBeenCalled();
+    expect(detached.collapse.collapsed()).toBe(false);
   });
 });

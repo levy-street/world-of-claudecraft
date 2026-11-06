@@ -4,8 +4,8 @@
 # src/ui/hud/hub/: window hubs (tab groups over existing windows)
 
 The menu consolidation (2026-11-04) folds related windows into one tabbed
-window behind one launcher: the Professions hub, the Book of the Realm and
-Activities. A hub is a TAB GROUP, not a container: every member window keeps
+window behind one launcher: the Professions hub, the Book of the Realm,
+Activities and Rewards (`src/ui/hud/rewards/`, step 7, with its own notes). A hub is a TAB GROUP, not a container: every member window keeps
 its own id, root, `.window.panel` class, title bar, mobile full-screen CSS,
 focus trap, close routing and drivers. Exactly one member is shown at a time,
 and each member paints the one shared strip under its title bar.

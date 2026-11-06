@@ -35,28 +35,28 @@ const openOnly = (...ids: string[]) => {
 
 describe('micro_menu_state_view: the open-window ring', () => {
   it('lights only the launcher whose window is open', () => {
-    const state = view().tick(openOnly('map-window'), { talentPoints: 0 });
+    const state = view().tick(openOnly('map-window'), { talentPoints: 0, rewards: 0 });
     const on = state.launchers.filter((l) => l.on).map((l) => l.selector);
     expect(on).toEqual(['#mm-map']);
   });
 
   it('lights every open launcher and clears one that closed', () => {
     const v = view();
-    let state = v.tick(openOnly('bags', 'char-window'), { talentPoints: 0 });
+    let state = v.tick(openOnly('bags', 'char-window'), { talentPoints: 0, rewards: 0 });
     expect(
       state.launchers
         .filter((l) => l.on)
         .map((l) => l.selector)
         .sort(),
     ).toEqual(['#mm-bag', '#mm-char']);
-    state = v.tick(openOnly('bags'), { talentPoints: 0 });
+    state = v.tick(openOnly('bags'), { talentPoints: 0, rewards: 0 });
     expect(state.launchers.filter((l) => l.on).map((l) => l.selector)).toEqual(['#mm-bag']);
   });
 
   it('reuses one state object across ticks (no per-tick allocation)', () => {
     const v = view();
-    const first = v.tick(openOnly(), { talentPoints: 0 });
-    const second = v.tick(openOnly('spellbook'), { talentPoints: 3 });
+    const first = v.tick(openOnly(), { talentPoints: 0, rewards: 0 });
+    const second = v.tick(openOnly('spellbook'), { talentPoints: 3, rewards: 0 });
     expect(second).toBe(first);
     expect(second.launchers[0]).toBe(first.launchers[0]);
   });
@@ -87,29 +87,41 @@ describe('micro_menu_state_view: the open-window ring', () => {
 describe('micro_menu_state_view: the count badges', () => {
   it('shows the unspent talent points and hides the badge at zero', () => {
     const v = view();
-    let state = v.tick(openOnly(), { talentPoints: 0 });
-    expect(state.badges).toEqual([{ selector: '#mm-talents', count: 0, text: '', visible: false }]);
-    state = v.tick(openOnly(), { talentPoints: 4 });
+    let state = v.tick(openOnly(), { talentPoints: 0, rewards: 0 });
+    expect(state.badges).toEqual([
+      { selector: '#mm-talents', count: 0, text: '', visible: false },
+      { selector: '#mm-rewards', count: 0, text: '', visible: false },
+    ]);
+    state = v.tick(openOnly(), { talentPoints: 4, rewards: 0 });
     expect(state.badges[0]).toEqual({
       selector: '#mm-talents',
       count: 4,
       text: '4',
       visible: true,
     });
-    state = v.tick(openOnly(), { talentPoints: 0 });
+    state = v.tick(openOnly(), { talentPoints: 0, rewards: 0 });
     // Empty text IS the hidden state: `.mm-badge:empty` is display:none, so the
     // painter keeps to one elided write per badge.
     expect(state.badges[0]).toMatchObject({ text: '', visible: false });
   });
 
+  it('shows what the Rewards hub has waiting on its own launcher only', () => {
+    // Menu consolidation step 7: the claimable pill (rewards_view.ts counts it).
+    const state = view().tick(openOnly(), { talentPoints: 0, rewards: 3 });
+    expect(state.badges).toEqual([
+      { selector: '#mm-talents', count: 0, text: '', visible: false },
+      { selector: '#mm-rewards', count: 3, text: '3', visible: true },
+    ]);
+  });
+
   it('clamps a negative or fractional count to a whole non-negative value', () => {
     const v = view();
-    expect(v.tick(openOnly(), { talentPoints: -3 }).badges[0]).toMatchObject({
+    expect(v.tick(openOnly(), { talentPoints: -3, rewards: 0 }).badges[0]).toMatchObject({
       count: 0,
       text: '',
       visible: false,
     });
-    expect(v.tick(openOnly(), { talentPoints: 2.9 }).badges[0]).toMatchObject({
+    expect(v.tick(openOnly(), { talentPoints: 2.9, rewards: 0 }).badges[0]).toMatchObject({
       count: 2,
       text: '2',
       visible: true,
@@ -121,9 +133,9 @@ describe('micro_menu_state_view: the count badges', () => {
     // value memo here would keep rendering the old locale's digits.
     let locale = 'a';
     const v = createMicroMenuStateView((value) => `${locale}${value}`);
-    expect(v.tick(openOnly(), { talentPoints: 2 }).badges[0].text).toBe('a2');
+    expect(v.tick(openOnly(), { talentPoints: 2, rewards: 0 }).badges[0].text).toBe('a2');
     locale = 'b';
-    expect(v.tick(openOnly(), { talentPoints: 2 }).badges[0].text).toBe('b2');
+    expect(v.tick(openOnly(), { talentPoints: 2, rewards: 0 }).badges[0].text).toBe('b2');
   });
 });
 
@@ -145,7 +157,7 @@ describe('micro_menu_state_view: the registry is real', () => {
     ];
     for (const [selector, windowIds] of cases) {
       for (const windowId of windowIds) {
-        const state = view().tick(openOnly(windowId), { talentPoints: 0 });
+        const state = view().tick(openOnly(windowId), { talentPoints: 0, rewards: 0 });
         expect(
           state.launchers.filter((l) => l.on).map((l) => l.selector),
           `${windowId} must light ${selector} and nothing else`,
@@ -161,13 +173,13 @@ describe('micro_menu_state_view: the registry is real', () => {
       'perfecting-window',
       'harvest-journal-window',
     ]) {
-      const state = view().tick(openOnly(windowId), { talentPoints: 0 });
+      const state = view().tick(openOnly(windowId), { talentPoints: 0, rewards: 0 });
       expect(
         state.launchers.filter((l) => l.on).map((l) => l.selector),
         `${windowId} must light #mm-professions and nothing else`,
       ).toEqual(['#mm-professions']);
     }
-    const none = view().tick(() => false, { talentPoints: 0 });
+    const none = view().tick(() => false, { talentPoints: 0, rewards: 0 });
     expect(none.launchers.some((l) => l.on)).toBe(false);
   });
 

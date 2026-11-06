@@ -272,7 +272,8 @@ describe('axe: quest log window', () => {
           ({
             cfg: { playerClass: 'warrior' },
             talents: { spec: null },
-            player: { name: 'Aurelia' },
+            player: { name: 'Aurelia', pos: { x: 0, y: 0, z: 0 } },
+            questState: () => 'unavailable',
             questLog: new Map([[questId, progress]]),
             questsDone: new Set<string>(),
           }) as never,

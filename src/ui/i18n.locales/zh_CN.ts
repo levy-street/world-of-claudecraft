@@ -21154,6 +21154,23 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.retentionFooter': '重置专业后保留60%的技能。',
   'hudChrome.professions.tutorialLink': '专业教程',
   'hudChrome.professionsHub.tabOverview': '总览',
+  'guide.interfacePage.railBodyThirteen':
+    '在屏幕右下角，离小地图远远的地方，是一排小方块按钮，分作并排的两列短栏。它们大多印着自己的默认按键。\n\n第一列是你的角色、背包、法术书、天赋、任务日志、世界地图和奖励。第二列依次是王国之书、你的专业、活动（那只铃铛）、好友与公会，然后是 WOC 商店和游戏菜单。另有几个只在用得上时才加入其中。',
+  'guide.interfacePage.mobileBodyRewardsMore':
+    '触屏控制会自行出现，布局也会按你的屏幕自己调整：小手机上是紧凑排布，大屏手机上是标准排布，平板上则更宽松些。\n\n你的技能排成一圈，而不是一排数字：攻击按钮旁边是四个动作按钮，还有一个翻页开关，可以让这一圈在它的 {pages} 页之间切换，这几页合起来能触及你全部 {slots} 个技能格，无论额外的桌面端动作条是否开启。这一圈的第五个弧位是你的消耗品座：点按它就使用座上放着的东西，或者按住它、或向内滑动它，打开一排会自动从你身上带着的东西里补齐的消耗品。围着这一圈的是触屏玩家最常伸手去按的按钮：切换目标、使用面前的东西，以及跳跃。\n\n屏幕底缘只有一个“快捷操作”控件，取代了一排按钮。其余的一切都从它打开：坐骑、聊天、地图、背包、社交、任务、角色、法术书、游戏菜单，以及一个“更多”入口，把你其余的窗口分组排好：记录（功绩、头衔、圣物库、声望、战利品浏览器和排行榜）、专业、活动（地下城与团队副本、PvP 和纸牌对决）、角色（表情、天赋和外观等）、奖励（宝库、每周任务和世界任务）以及商店。维基和 Discord 则改放在游戏菜单里。这里的窗口会铺满整个屏幕，而不是浮在上面。\n\n移动单位框体是桌面端的事：在触屏上，布局会替你把它们安排好。',
+  'guide.interfacePage.winQuestLogBodyAvailable':
+    '你接下的每一个任务、它的故事、它的目标和你的进度，还可以把其中任意内容标到地图上，并挑选你的追踪器跟随哪些任务。“可接任务”一栏列出你附近可以接的任务，每一项都能把任务发布者标到地图上。',
+  'guide.interfacePage.winRewardsTitle': '奖励',
+  'guide.interfacePage.winRewardsBody':
+    '你能领取的一切，都收在一个分页窗口里，就在按钮栏的“奖励”按钮后面；有东西可领时，按钮上会显示数字。“宝库”就是每周宝库，本周的奖励要到宝库看守那里开启；“每周任务”展示使者的四个委托，不过要选哪一个得去找使者本人；“世界任务”是今天的任务板，每个任务都能标到地图上，每天还能替换一个。',
+  'hudChrome.rewards.title': '奖励',
+  'hudChrome.rewards.close': '关闭奖励',
+  'hudChrome.rewards.tabVault': '宝库',
+  'hudChrome.rewards.tabWeekly': '每周任务',
+  'hudChrome.rewards.tabWorldQuests': '世界任务',
+  'hudChrome.rewards.weeklyPickAt': '请在{zone}的使者处选择你的任务。',
+  'hudChrome.questLog.available': '可接任务',
+  'hudChrome.mapAtlas.openQuestLog': '打开任务日志',
   'hudChrome.expeditions.activitiesBellCount.one': '打开活动：{count}条通知',
   'hudChrome.expeditions.activitiesBellCount.other': '打开活动：{count}条通知',
   'hudChrome.mobile.groupRecord': '记录',

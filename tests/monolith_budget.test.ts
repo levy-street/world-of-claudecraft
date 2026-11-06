@@ -557,7 +557,10 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 17736 -> 17723 by the Professions hub (menu consolidation step 1):
     // the tab group lives in hud/professions/professions_hub_controller.ts and
     // the four member close cases fold into one hub close. wc -l, exact count.
-    ceiling: 17723,
+    // LOWERED 17723 -> 17675 by the Rewards hub (menu consolidation step 7):
+    // the hub and its three members build in hud/rewards/rewards_surfaces.ts,
+    // and the store chest's dead spin-badge poll left with the daily spin.
+    ceiling: 17675,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

@@ -49,6 +49,7 @@ export const CHROME_ART_IDS: ReadonlySet<UiIconName> = new Set<UiIconName>([
   'perfecting',
   'professions',
   'questlog',
+  'rewards',
   'social',
   'spellbook',
   'talents',

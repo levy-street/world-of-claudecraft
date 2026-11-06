@@ -112,6 +112,7 @@ export interface InputCallbacks {
       | 'arena'
       | 'bgFlag'
       | 'dungeonFinder'
+      | 'rewards'
       | 'leaderboard'
       | 'discord'
       | 'deeds'
@@ -1357,6 +1358,9 @@ export class Input {
         return;
       case 'dungeonFinder':
         this.cb.onUiKey('dungeonFinder');
+        return;
+      case 'rewards':
+        this.cb.onUiKey('rewards');
         return;
       case 'mount':
         this.cb.onUiKey('mount');

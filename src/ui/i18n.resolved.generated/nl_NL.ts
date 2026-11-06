@@ -3714,6 +3714,7 @@ export const nl_NL: EnTranslations = {
       "tierReachedLine": "Je bent nu {tier} met de {faction}. Je factiettitel is nu {title}."
     },
     "questLog": {
+      "available": "Available",
       "completed": "Voltooid",
       "zoneSummary": "{count} ({ready} gereed)",
       "shiftHint": "Houd Shift ingedrukt en klik op een missie om deze in de chat te koppelen."
@@ -6380,6 +6381,14 @@ export const nl_NL: EnTranslations = {
       "tabDungeons": "Dungeons and Raids",
       "tabPvp": "PvP"
     },
+    "rewards": {
+      "title": "Rewards",
+      "close": "Close Rewards",
+      "tabVault": "Vault",
+      "tabWeekly": "Weekly Quest",
+      "tabWorldQuests": "World Quests",
+      "weeklyPickAt": "Choose your quest with the emissary in {zone}."
+    },
     "bookOfRealm": {
       "title": "Book of the Realm",
       "close": "Close the Book of the Realm",
@@ -7624,6 +7633,7 @@ export const nl_NL: EnTranslations = {
       "distance": "{distance} meter",
       "showRoute": "Route weergeven",
       "untrack": "Ontsporen",
+      "openQuestLog": "Open Quest Log",
       "track": "Spoor",
       "worldQuests": {
         "heading": "Wereldquests vandaag",
@@ -9739,10 +9749,13 @@ export const nl_NL: EnTranslations = {
       "winCraftingBodyTab": "The Crafting tab of the Professions window, which T opens directly: your recipes, what each one needs, and what you can make right now with what you are carrying.",
       "winQuestLogTitle": "Questlogboek (L)",
       "winQuestLogBody": "Elke quest die je hebt aangenomen, zijn verhaal, zijn doelen en je voortgang, met een manier om elk ervan op de kaart te tonen en te kiezen welke quests je tracker volgt.",
+      "winQuestLogBodyAvailable": "Every quest you have taken, its story, its objectives, and your progress, with a way to show any of it on the map and to pick which quests your tracker follows. An Available group lists the quests on offer near you, each with a way to show its quest giver on the map.",
       "winDeedsTitle": "Boek der Daden (Shift+Z)",
       "winDeedsBody": "Het overzicht van wat je hebt gedaan, de titels en Roem die het je heeft opgeleverd, en wat nog openstaat.",
       "winRealmTitle": "Book of the Realm (Shift+Z)",
       "winRealmBody": "Your permanent record, in one tabbed window. Deeds holds what you have done, the Renown it has paid you, and what is still open; Titles is where you pick the title you wear and the border that frames your nameplate; and The Reliquary, Reputation, the Loot Explorer, and Rankings, the realm standings, each have a tab of their own.",
+      "winRewardsTitle": "Rewards",
+      "winRewardsBody": "What you can claim, in one tabbed window behind the Rewards button in the rail, which shows a count when something is waiting. Vault is the Weekly Vault, whose rolls open at the Vault keeper; Weekly Quest shows the emissary's four offers, though you choose one by speaking to the emissary; and World Quests is today's board, with a way to show each quest on the map and the one replacement you get each day.",
       "winSocialTitle": "Vrienden & Gilde (O)",
       "winSocialBody": "Tabbladen voor je vrienden, je gilde met zijn ledenlijst, je raid, en de spelers die je hebt genegeerd of geblokkeerd.",
       "winSocialBodyEvents": "Tabs for your friends, your guild and its roster, your raid, and the players you have ignored or blocked. The Guild tab also keeps an Events list: officers and the Guild Master book dated events there, and every member sees them. A Discord strip at the foot of the window opens the Discord panel.",
@@ -9772,7 +9785,9 @@ export const nl_NL: EnTranslations = {
       "railTitle": "De knoppenrij",
       "railBody": "Rechtsonder in de hoek van het scherm, een eind bij de minimap vandaan, staat een rij kleine vierkante knoppen, een per venster, opgesteld in twee korte kolommen naast elkaar. De meeste dragen hun standaardtoets als opschrift.\n\nDe eerste kolom bestrijkt je personage, spreukenboek, talenten, questlogboek, Boek der Daden, beroepen, wereldkaart, tassen en knutselen. De tweede begint met de WOC-winkel en loopt door via PvP, de Kerkerzoekmachine, de Dalbeker, Kaartduel, de ranglijst, emotes, muziek, vrienden en gilde, deze wiki, en het spelmenu. Een paar andere sluiten zich aan, alleen wanneer ze van toepassing zijn.",
       "mobileBodyGroupedMore": "Touch controls appear on their own, and the layout sizes itself to your screen: a compact arrangement on a small phone, a standard one on a larger phone, and a roomier one on a tablet.\n\nYour abilities sit in a ring rather than a number row: the attack button with four action buttons beside it, and a page toggle that swaps the ring between its {pages} pages, which together reach all {slots} of your ability slots whether or not the extra desktop bars are switched on. The fifth arc position of that ring is your consumables seat: tap it to use what is seated there, or hold it, or swipe it inward, to open a row that fills itself from what you are carrying. Around the ring sit the buttons a touch player reaches for most, swapping target, using what is in front of you, and jumping.\n\nOne Quick Actions control sits at the bottom edge in place of a row of buttons. It opens onto everything else: mount, chat, map, bags, social, quests, character, spellbook, game menu, and a More entry that sorts the rest of your windows into groups: Record (deeds, titles, the Reliquary, reputation, the Loot Explorer, and the rankings), Professions, Activities (dungeons and raids, PvP, and Card Duel), Character (emotes, talents, and cosmetics among them), and Store. The wiki and Discord sit in the game menu instead. Windows fill the screen here rather than floating over it.\n\nMoving your unit frames is a desktop thing: on touch the layout places them for you.",
-      "railBodyTwelve": "Down in the bottom right corner of the screen, a long way from the minimap, sits a rail of small square buttons arranged in two short columns side by side. Most of them are printed with their default key.\n\nThe first column covers your character, bags, spellbook, talents, quest log, and world map. The second opens the Book of the Realm, your professions, Activities (the Groups bell), and friends and guild, then the WOC Store and the game menu. A few more join them only when they apply."
+      "mobileBodyRewardsMore": "Touch controls appear on their own, and the layout sizes itself to your screen: a compact arrangement on a small phone, a standard one on a larger phone, and a roomier one on a tablet.\n\nYour abilities sit in a ring rather than a number row: the attack button with four action buttons beside it, and a page toggle that swaps the ring between its {pages} pages, which together reach all {slots} of your ability slots whether or not the extra desktop bars are switched on. The fifth arc position of that ring is your consumables seat: tap it to use what is seated there, or hold it, or swipe it inward, to open a row that fills itself from what you are carrying. Around the ring sit the buttons a touch player reaches for most, swapping target, using what is in front of you, and jumping.\n\nOne Quick Actions control sits at the bottom edge in place of a row of buttons. It opens onto everything else: mount, chat, map, bags, social, quests, character, spellbook, game menu, and a More entry that sorts the rest of your windows into groups: Record (deeds, titles, the Reliquary, reputation, the Loot Explorer, and the rankings), Professions, Activities (dungeons and raids, PvP, and Card Duel), Character (emotes, talents, and cosmetics among them), Rewards (the Vault, the weekly quest, and world quests), and Store. The wiki and Discord sit in the game menu instead. Windows fill the screen here rather than floating over it.\n\nMoving your unit frames is a desktop thing: on touch the layout places them for you.",
+      "railBodyTwelve": "Down in the bottom right corner of the screen, a long way from the minimap, sits a rail of small square buttons arranged in two short columns side by side. Most of them are printed with their default key.\n\nThe first column covers your character, bags, spellbook, talents, quest log, and world map. The second opens the Book of the Realm, your professions, Activities (the Groups bell), and friends and guild, then the WOC Store and the game menu. A few more join them only when they apply.",
+      "railBodyThirteen": "Down in the bottom right corner of the screen, a long way from the minimap, sits a rail of small square buttons arranged in two short columns side by side. Most of them are printed with their default key.\n\nThe first column covers your character, bags, spellbook, talents, quest log, world map, and Rewards. The second opens the Book of the Realm, your professions, Activities (the Groups bell), and friends and guild, then the WOC Store and the game menu. A few more join them only when they apply."
     },
     "commandsPage": {
       "intro": "Elk commando dat je in de chat kunt typen, gegroepeerd op waar het voor dient, met de bijbehorende korte vormen.",

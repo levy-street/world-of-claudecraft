@@ -4559,23 +4559,6 @@
   body.mobile-touch #daily-rewards-window {
     z-index: 95;
   }
-  /* Keep Daily Rewards in one vertical flow on touch. The rewards-only window
-     is width-capped for readability, while its body scrolls vertically and
-     suppresses horizontal overflow so no content is stranded off-screen. */
-  body.mobile-touch #daily-rewards-window:not(.store-active) {
-    width: min(560px, calc(var(--app-vw) / var(--ui-scale, 1) - 20px));
-  }
-  body.mobile-touch #daily-rewards-window:not(.store-active) .dr-body {
-    columns: initial;
-    overflow-x: hidden;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-  }
-  /* The spin overlay is appended directly to body. Keep it above the raised
-    mobile #ui window layer and the mobile window backdrop. */
-  body.mobile-touch .dr-spin-overlay {
-    z-index: 101;
-  }
   body.mobile-touch #daily-rewards-window {
     max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);
     overflow: hidden;
@@ -4584,27 +4567,7 @@
     max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 116px);
     padding: 10px;
   }
-  body.mobile-touch .dr-spin-stage {
-    width: min(360px, calc(var(--app-vw, 100vw) - 24px), calc(var(--app-vh, 100dvh) - 24px));
-  }
-  body.mobile-touch .dr-spin-wheel-big {
-    width: 300px;
-    max-width: 84%;
-  }
-  body.mobile-touch .dr-spin-wheel-big span {
-    transform: rotate(calc(var(--i) * 45deg + 22.5deg)) translateY(-106px)
-      rotate(calc(var(--i) * -45deg - 22.5deg));
-  }
-  body.mobile-touch .dr-spin-result {
-    width: 120px;
-    height: 120px;
-    font-size: 18px;
-  }
-  body.mobile-touch .dr-spin-pointer {
-    border-left-width: 13px;
-    border-right-width: 13px;
-    border-top-width: 24px;
-  }
+
   /* Mobile touch store */
   body.mobile-touch .woc-store-tabs button {
     min-width: 112px;
@@ -6697,6 +6660,7 @@
   body.mobile-touch #bar-editor,
   body.mobile-touch #loot-explorer-window,
   body.mobile-touch #reputation-window,
+  body.mobile-touch #world-quests-window,
   body.mobile-touch #options-menu,
   body.mobile-touch #options-menu.kb-wide,
   body.mobile-touch #options-menu.gfx-wide,
@@ -6719,7 +6683,8 @@
   body.mobile-touch #warfare-window,
   body.mobile-touch #quest-dialog,
   body.mobile-touch #loot-explorer-window,
-  body.mobile-touch #reputation-window {
+  body.mobile-touch #reputation-window,
+  body.mobile-touch #world-quests-window {
     width: clamp(320px, 76vw, 680px);
     max-width: calc(100vw - 20px);
   }
@@ -6769,7 +6734,8 @@
      shape: it has no split-screen pairing to keep visible underneath. The
      Reputation window takes the same clamp. */
   body.mobile-touch #loot-explorer-window,
-  body.mobile-touch #reputation-window {
+  body.mobile-touch #reputation-window,
+  body.mobile-touch #world-quests-window {
     max-height: calc(
       var(--app-vh) /
       var(--window-scale, 1) -
@@ -6950,7 +6916,7 @@
     overflow: hidden;
     z-index: 95;
   }
-  body.mobile-touch.weekly-vault-open #bank-window {
+  body.mobile-touch #weekly-vault-window {
     left: calc(max(10px, env(safe-area-inset-left)) / var(--window-scale, 1));
     right: calc(max(10px, env(safe-area-inset-right)) / var(--window-scale, 1));
     top: calc(max(10px, env(safe-area-inset-top)) / var(--window-scale, 1));
@@ -6959,13 +6925,13 @@
     height: auto;
     transform: none;
   }
-  body.mobile-touch.weekly-vault-open .weekly-rewards {
+  body.mobile-touch #weekly-vault-window .weekly-rewards {
     padding: 10px;
   }
-  body.mobile-touch.weekly-vault-open .weekly-rewards h2 {
+  body.mobile-touch #weekly-vault-window .weekly-rewards h2 {
     font-size: 20px;
   }
-  body.mobile-touch.weekly-vault-open .weekly-reset {
+  body.mobile-touch #weekly-vault-window .weekly-reset {
     padding: 8px 12px;
   }
   /* The paired-geometry box the bank AND market clusters share on touch (the

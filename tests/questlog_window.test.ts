@@ -11,7 +11,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { NPCS, QUESTS, zoneAt } from '../src/sim/data';
+import { getActiveWorldContent, NPCS, QUESTS, zoneAt } from '../src/sim/data';
 import { createReferralCard } from '../src/sim/referral_cards';
 import type { ReferralCardsSnapshot } from '../src/sim/referral_contract';
 import { QuestLogWindow } from '../src/ui/hud/quest/questlog_window';
@@ -47,7 +47,17 @@ function stubDeps<T extends object>(overrides: Partial<NoInfer<T>>): T {
   }) as T;
 }
 
-function renderQuestFixture(referral: ReferralCardsSnapshot | null = null): {
+/** Quest offers for the Available group: a player standing on a giver, and a
+ *  questState that reads only that giver's quests as available. */
+interface OfferFixture {
+  readonly pos: { x: number; y: number; z: number };
+  readonly available: ReadonlySet<string>;
+}
+
+function renderQuestFixture(
+  referral: ReferralCardsSnapshot | null = null,
+  offers: OfferFixture | null = null,
+): {
   root: HTMLElement;
   win: QuestLogWindow;
   questIds: [string, string];
@@ -102,7 +112,9 @@ function renderQuestFixture(referral: ReferralCardsSnapshot | null = null): {
         ({
           cfg: { playerClass: 'warrior' },
           talents: { spec: null },
-          player: { name: 'Aurelia' },
+          player: { name: 'Aurelia', pos: offers?.pos ?? { x: 0, y: 0, z: 0 } },
+          questState: (questId: string) =>
+            offers?.available.has(questId) ? 'available' : 'unavailable',
           questLog,
           questsDone: new Set<string>(),
           abandonQuest,
@@ -322,5 +334,52 @@ describe('questlog_window: W7 grouped-list interactions', () => {
     const onConfirm = confirmDialog.mock.calls[0][4] as () => void;
     onConfirm();
     expect(abandonQuest).toHaveBeenCalledWith(questB);
+  });
+});
+
+// Menu consolidation step 8: the World Map rail's "Available Nearby" list is
+// the Quest Log's Available group, after the zone groups and before the tally,
+// and each offer has Show on Map at its giver (the quest is not in the log, so
+// the selected-quest resolver cannot place it).
+describe('questlog_window: the Available group', () => {
+  const giver = Object.values(getActiveWorldContent().npcs).find(
+    (npc) => npc.questIds.length > 0 && QUESTS[npc.questIds[0]],
+  );
+  if (!giver) throw new Error('fixture needs a quest giver');
+  const questId = giver.questIds[0];
+  const offers: OfferFixture = {
+    pos: { x: giver.pos.x, y: 0, z: giver.pos.z },
+    available: new Set([questId]),
+  };
+
+  it('lists the offer before the completed tally with its zone, and pans to its giver', () => {
+    const { root, showOnMap } = renderQuestFixture(null, offers);
+    const group = root.querySelector('.ql-available');
+    expect(group).not.toBeNull();
+    const sections = [...root.querySelectorAll('.ql-group')];
+    const completed = sections.findIndex((section) => section.classList.contains('is-dimmed'));
+    expect(sections.indexOf(group as Element)).toBeLessThan(completed);
+    const row = group?.querySelector('.ql-offer');
+    expect(row?.textContent).toContain('·');
+    const map = group?.querySelector<HTMLButtonElement>(`[data-quest-offer-map="${questId}"]`);
+    expect(map).not.toBeNull();
+    map?.click();
+    expect(showOnMap).toHaveBeenCalledExactlyOnceWith(giver.pos.x, giver.pos.z);
+  });
+
+  it('collapses and expands like a zone group, keeping focus on its toggle', () => {
+    const { root } = renderQuestFixture(null, offers);
+    const toggle = root.querySelector<HTMLButtonElement>('[data-quest-group="available"]');
+    expect(toggle?.getAttribute('aria-expanded')).toBe('true');
+    toggle?.click();
+    const rebuilt = root.querySelector<HTMLButtonElement>('[data-quest-group="available"]');
+    expect(rebuilt?.getAttribute('aria-expanded')).toBe('false');
+    expect(root.querySelector('.ql-offer')).toBeNull();
+    expect(document.activeElement).toBe(rebuilt);
+  });
+
+  it('paints no Available group when nothing nearby is on offer', () => {
+    const { root } = renderQuestFixture(null, null);
+    expect(root.querySelector('.ql-available')).toBeNull();
   });
 });

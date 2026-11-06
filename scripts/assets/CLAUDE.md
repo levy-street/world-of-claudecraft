@@ -7,10 +7,11 @@
 
 Offline asset pipeline: optimize raw downloaded model packs into shipping files
 under `public/`. One sanctioned 2D exception lives here too: `chrome_crown/`
-holds the layered-SVG source and render script for the Reliquary launcher's
-painted chrome icon (its siblings were generated externally and have no
-committed source; a procedurally authored icon keeps its source in-repo, and
-the render feeds the normal `npm run assets:chrome` converter). Every other
+(the Reliquary launcher) and `chrome_rewards/` (the Rewards hub launcher) hold
+the layered-SVG source and render script for a painted chrome icon (their
+siblings were generated externally and have no committed source; a
+procedurally authored icon keeps its source in-repo, and the render feeds the
+normal `npm run assets:chrome` converter). Every other
 2D icon converter stays at `scripts/convert_*_webp.mjs` top level.
 Run manually (not part of `npm run build`):
 `node scripts/assets/build_assets.mjs scripts/assets/specs/<spec>.json`.

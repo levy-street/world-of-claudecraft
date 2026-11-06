@@ -17,6 +17,7 @@ export const SIDE_BUTTONS: readonly [selector: string, action: string, labelKey:
     ['#mm-deeds', 'deeds', 'hudChrome.bookOfRealm.title'],
     ['#mm-professions', 'professions', 'hudChrome.professions.title'],
     ['#mm-map', 'map', 'hud.core.mobileMap'],
+    ['#mm-rewards', 'rewards', 'hudChrome.rewards.title'],
     ['#mm-bag', 'bags', 'itemUi.bags.title'],
     ['#mm-social', 'social', 'hud.social.friendsTab'],
   ];

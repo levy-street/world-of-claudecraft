@@ -36,8 +36,9 @@ const KEY_WINDOWS = [
   ['guide.interfacePage.winTalentsTitle', 'guide.interfacePage.winTalentsBody'],
   ['guide.interfacePage.winProfessionsTitle', 'guide.interfacePage.winProfessionsBodyHub'],
   ['guide.interfacePage.winCraftingTitle', 'guide.interfacePage.winCraftingBodyTab'],
-  ['guide.interfacePage.winQuestLogTitle', 'guide.interfacePage.winQuestLogBody'],
+  ['guide.interfacePage.winQuestLogTitle', 'guide.interfacePage.winQuestLogBodyAvailable'],
   ['guide.interfacePage.winRealmTitle', 'guide.interfacePage.winRealmBody'],
+  ['guide.interfacePage.winRewardsTitle', 'guide.interfacePage.winRewardsBody'],
   ['guide.interfacePage.winSocialTitle', 'guide.interfacePage.winSocialBodyEvents'],
   ['guide.interfacePage.winActivitiesTitle', 'guide.interfacePage.winActivitiesBody'],
   ['guide.interfacePage.winMetersTitle', 'guide.interfacePage.winMetersBody'],
@@ -87,7 +88,7 @@ export const interfacePage: GuidePage = {
         ${section('guide.interfacePage.aurasTitle', paras('guide.interfacePage.aurasBody'))}
         ${section('guide.interfacePage.actionBarsTitle', paras('guide.interfacePage.actionBarsBody'))}
         ${section('guide.interfacePage.minimapTitle', paras('guide.interfacePage.minimapBody'))}
-        ${section('guide.interfacePage.railTitle', paras('guide.interfacePage.railBodyTwelve'))}
+        ${section('guide.interfacePage.railTitle', paras('guide.interfacePage.railBodyThirteen'))}
         ${section(
           'guide.interfacePage.mapTitle',
           paras('guide.interfacePage.mapBodyZoneFirst') +
@@ -115,7 +116,7 @@ export const interfacePage: GuidePage = {
           // The ring's page count and slot span interpolate from the live pure
           // core (the wiki completeness audit, 2026-09-03), so a ring retune
           // moves the page instead of rotting it.
-          paras('guide.interfacePage.mobileBodyGroupedMore', {
+          paras('guide.interfacePage.mobileBodyRewardsMore', {
             pages: formatNumber(MOBILE_ACTION_PAGE_COUNT),
             slots: formatNumber(MOBILE_ACTION_SOURCE_SLOT_COUNT),
           }),

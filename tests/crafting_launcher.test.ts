@@ -190,12 +190,13 @@ describe('side rail height budget', () => {
     }
   });
 
-  it('shows the ready daily-reward count through the shared corner badge primitive', () => {
-    // The Prompts board calls for the ready chest to carry a count, not glow alone.
-    expect(hud).toContain('daily-reward-count ui-badge ui-badge--corner');
-    expect(hudCss).toMatch(
-      /#daily-rewards-button\.spin-ready \.daily-reward-count \{\s*display: inline-flex;/,
-    );
+  it('carries no spin-ready count on the store chest (the daily spin is gone)', () => {
+    // Menu consolidation step 7: the chest opens the WOC Store only; the daily
+    // spin it used to advertise is no longer a live feature. Claimable rewards
+    // are the Rewards launcher's pill (#mm-rewards) now.
+    expect(hud).not.toContain('daily-reward-count');
+    expect(hud).not.toContain('spin-ready');
+    expect(hudCss).not.toContain('spin-ready');
   });
 
   // The rail's real footprint: two 34px .side-buttons-col columns plus the

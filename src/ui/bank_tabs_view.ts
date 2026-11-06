@@ -7,7 +7,7 @@
 // read as a second unrelated top level to a screen reader). Their
 // aria-controls are stamped below, once each panel exists.
 // Pure bank-pane tab markup; panel relationships are completed by the window.
-export type BankTabId = 'personal' | 'vault' | 'guild' | 'rewards' | 'account';
+export type BankTabId = 'personal' | 'vault' | 'guild' | 'account';
 
 import { t } from './i18n';
 import { tabStripHtml, tabStripModel } from './tab_strip_view';
@@ -15,7 +15,6 @@ export function bankTabsHtml(
   selected: BankTabId,
   available: { guild: boolean; vault: boolean; account?: boolean },
 ): string {
-  if (selected === 'rewards') return '';
   return tabStripHtml(
     tabStripModel({
       ariaLabel: t('hudChrome.bank.tabsAria'),
@@ -43,6 +42,6 @@ export function bankTabsHtml(
   );
 }
 
-export function bankWindowTitle(selected: BankTabId): string {
-  return t(selected === 'rewards' ? 'hudChrome.weeklyRewards.title' : 'hudChrome.bank.title');
+export function bankWindowTitle(): string {
+  return t('hudChrome.bank.title');
 }

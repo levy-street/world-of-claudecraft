@@ -20524,6 +20524,23 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.retentionFooter': 'リスペック時はスキルの60%を保持します。',
   'hudChrome.professions.tutorialLink': '専門技能チュートリアル',
   'hudChrome.professionsHub.tabOverview': '概要',
+  'guide.interfacePage.railBodyThirteen':
+    '画面の右下の隅、ミニマップからいちばん遠いところに、小さな四角いボタンが並ぶレールがあり、短い2列が横に並んでいます。ほとんどのボタンには、初期設定のキーが印字されています。\n\n1列目はキャラクター、バッグ、スペルブック、タレント、クエストログ、ワールドマップ、報酬です。2列目は王国の書、専門技能、アクティビティ（ベルのボタン）、フレンドとギルドに続き、WOCストアとゲームメニューが並びます。条件がそろったときだけ加わるボタンも、いくつかあります。',
+  'guide.interfacePage.mobileBodyRewardsMore':
+    'タッチ操作は自動的に現れ、配置は画面の大きさに合わせて整えられます。小さなスマートフォンではコンパクトに、大きなスマートフォンでは標準に、タブレットではゆったりと並びます。\n\nアビリティは数字列ではなく輪の形に並びます。攻撃ボタンとその脇の4つのアクションボタン、そして輪を{pages}つのページの間で切り替えるページトグルです。ページを合わせると{slots}個あるアビリティスロットのすべてに届き、デスクトップ用の追加バーを有効にしているかどうかは関係ありません。輪の5番目の弧の位置は消耗品の席です。タップすればそこに据えた品を使い、長押しするか内側へスワイプすれば、持ち物から自動で埋まる列が開きます。その周りには、タッチで遊ぶ人がいちばんよく使うボタン、ターゲットの切り替え、目の前のものへの対話、ジャンプが並びます。\n\n画面の下辺には、ボタンの列の代わりに「クイック操作」のコントロールが一つ置かれています。ここからそれ以外のすべてが開きます。騎乗、チャット、マップ、バッグ、ソーシャル、クエスト、キャラクター、スペルブック、ゲームメニュー、そして残りのウィンドウをグループに分けて並べた「その他」です。グループは記録（功績、称号、聖遺物庫、評判、戦利品ブラウザ、ランキング）、専門技能、アクティビティ（ダンジョンとレイド、PvP、カードデュエル）、キャラクター（エモート、タレント、コスメティックなど）、報酬（宝物庫、週間クエスト、ワールドクエスト）、ストアです。ウィキとDiscordは、代わりにゲームメニューに入っています。ここではウィンドウは浮かぶのではなく、画面いっぱいに開きます。\n\nユニットフレームの移動はデスクトップだけのものです。タッチでは、配置はゲームの側が決めてくれます。',
+  'guide.interfacePage.winQuestLogBodyAvailable':
+    '受注したすべてのクエストと、その物語、目標、そして進捗が並びます。どれでもマップ上に表示でき、トラッカーが追うクエストを選ぶこともできます。「受注可能」のグループには近くで受けられるクエストが並び、それぞれクエストを出す人物をマップ上に表示できます。',
+  'guide.interfacePage.winRewardsTitle': '報酬',
+  'guide.interfacePage.winRewardsBody':
+    '受け取れるものを一つのタブ付きウィンドウにまとめたもので、レールの報酬ボタンから開きます。受け取れるものがあるとボタンに数が表示されます。宝物庫は週間宝物庫で、その週の報酬は宝物庫の番人のもとで開きます。週間クエストには使者の4つの依頼が並びますが、選ぶのは使者に話しかけたときです。ワールドクエストは今日のボードで、それぞれのクエストをマップに表示でき、1日に1回だけ入れ替えられます。',
+  'hudChrome.rewards.title': '報酬',
+  'hudChrome.rewards.close': '報酬を閉じる',
+  'hudChrome.rewards.tabVault': '宝物庫',
+  'hudChrome.rewards.tabWeekly': '週間クエスト',
+  'hudChrome.rewards.tabWorldQuests': 'ワールドクエスト',
+  'hudChrome.rewards.weeklyPickAt': '{zone}の使者のもとでクエストを選んでください。',
+  'hudChrome.questLog.available': '受注可能',
+  'hudChrome.mapAtlas.openQuestLog': 'クエストログを開く',
   'hudChrome.expeditions.activitiesBellCount.one': 'アクティビティを開く：通知{count}件',
   'hudChrome.expeditions.activitiesBellCount.other': 'アクティビティを開く：通知{count}件',
   'hudChrome.mobile.groupRecord': '記録',
