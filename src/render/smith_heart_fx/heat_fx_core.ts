@@ -107,8 +107,9 @@ export function craterLook(
 
 // ---- the lanes and the swells -----------------------------------------------------------
 
-/** How tall a wave's wall stands at its full height (yards). */
-export const SWELL_HEIGHT = 3.4;
+/** How tall a wave's wall stands at its full height (yards): a heavy wave
+ *  over a player's head, lower than it is wide (pass 4: 3.4 to 3.8). */
+export const SWELL_HEIGHT = 3.8;
 
 /** A wave's wall `front` yards down its lane (`length` long, where it is
  *  drawn to): its height (yards), rising out of the spot over its first
