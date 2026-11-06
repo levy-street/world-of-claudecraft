@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "1397e24c97a6e462ef6e656cd061e555ebcb993803a42349f3ae173d0399ff2c",
+  "rendererFingerprint": "e926257141d63781ce4ace8422d92873eca8903e326b947f771c3bdfb3f641ad",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 6948984,
-      "sha256": "5020801dffacb250d1695e139b1d6d7d447785f6e147660d73a0161ad30e372e",
+      "bytes": 6949252,
+      "sha256": "94624bafa1aa49c39925f7c873f056ecf8cbab83d5a81c561418bb014a1ce4ff",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -5515,15 +5515,15 @@
       "visualKey": "smith_heart_heat_guardian",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/golelingevolved.glb",
-          "path": "public/models/creatures/golelingevolved.glb",
-          "bytes": 85588,
-          "sha256": "156f4c2dcf93c6e52a738d8a93e09d1988f933fe4f2d1f9d30411b5eae7f2b94"
+          "url": "models/creatures/smith_heart_heat_guardian.glb",
+          "path": "public/models/creatures/smith_heart_heat_guardian.glb",
+          "bytes": 1863516,
+          "sha256": "3ee1e0704785a13877a66ef2acc368f30bd604b358d75c737ddf7405cac7f12c"
         },
-        "idle": "Flying_Idle",
-        "height": 4.3,
+        "idle": "Idle",
+        "height": 6,
         "yaw": null,
-        "hover": null,
+        "hover": -1.4249999999999998,
         "show": null,
         "attach": [],
         "weaponFix": null,
@@ -5535,11 +5535,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "1364f773973696e313837587cf95c5ac59f4863f140ed9c713c9a1e10cef54f4",
+      "sourceFingerprint": "a0377f5ae53cb905bf5ed99574a64f9024d33b4c3451f9dfe44ebd4a9c58da7e",
       "output": {
         "path": "public/ui/mobs/heart_heat_guardian.webp",
-        "bytes": 2330,
-        "sha256": "da04f69981b3560b636c0473e89c2a109f8e19bb8b809182e649286d83c8af0d"
+        "bytes": 4508,
+        "sha256": "4789764fab6a168b9a0ec269dfbe347b3d95d8ce66963688f160567fb52bcab7"
       }
     },
     {
