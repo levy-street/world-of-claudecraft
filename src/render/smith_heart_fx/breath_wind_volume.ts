@@ -30,6 +30,9 @@ void main() {
   if (aLook.x <= 0.002) { gl_Position = vec4(2.0, 2.0, 2.0, 1.0); return; }
   vec3 right = vec3(viewMatrix[0][0], viewMatrix[1][0], viewMatrix[2][0]);
   vec3 up = vec3(viewMatrix[0][1], viewMatrix[1][1], viewMatrix[2][1]);
+  // A billow the camera stands in fades out (no screen-filling layers at melee).
+  float near = distance(cameraPosition, aCenter.xyz) / max(aCenter.w, 1e-3);
+  vAlpha *= smoothstep(0.6, 1.4, near);
   vec3 toCam = normalize(cameraPosition - aCenter.xyz);
   vec3 c = aCenter.xyz - toCam * uBack * aCenter.w;
   vec3 w = c + (right * position.x + up * position.y) * aCenter.w;

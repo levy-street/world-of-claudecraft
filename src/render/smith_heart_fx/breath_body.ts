@@ -820,6 +820,7 @@ export class BreathBody {
         const size =
           profileAt(cur.puffSize ?? cur.radius, u) *
           U *
+          (this.low ? 0.85 : 1) *
           (0.75 + 0.25 * radius) *
           fling *
           (1 + 0.1 * Math.sin(t * (0.6 + seed) + pi));
@@ -980,8 +981,8 @@ export class BreathBody {
       MIST.alpha = st > 0.5 ? 0.22 : 0.06;
       // The low tier keeps the storm's billows smaller (cosmetic fill).
       const big = d >= 1 && st > 0.5;
-      MIST.size[0] = big ? 10 : 7;
-      MIST.size[1] = big ? 16 : 12;
+      MIST.size[0] = d < 1 ? 5 : big ? 10 : 7;
+      MIST.size[1] = d < 1 ? 9 : big ? 16 : 12;
       this.particles.puff(p.x, p.y, p.z, 1, MIST);
     }
     // Glittering crystal dust round the body.
