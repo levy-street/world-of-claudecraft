@@ -72,9 +72,9 @@ describe('hud.css - ambient loops gate on --fx-ambient-anim + --motion-scale', (
   it('gives every ambient loop a play-state token (paused at low/reduced)', () => {
     const playStates =
       hudCss.match(/animation-play-state: var\(--fx-ambient-anim, running\);/g) ?? [];
-    // combat-flash, rest, talent, fiesta, party-badge, daily-rewards icon,
-    // ai-tag, steam-wishlist sheen. The separate chest glow was retired.
-    expect(playStates.length).toBe(8);
+    // combat-flash, rest, talent, fiesta, party-badge, ai-tag, steam-wishlist
+    // sheen. The chest glow and the daily-spin icon loop were retired.
+    expect(playStates.length).toBe(7);
   });
 
   it('calms each ambient duration by --motion-scale (near-zero, never 0, under reduced-motion)', () => {
