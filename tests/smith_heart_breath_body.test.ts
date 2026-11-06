@@ -422,8 +422,12 @@ describe('BreathBody over a fake world', () => {
     );
     const root = scene.getObjectByName('smith-heart-breath-body');
     expect(root).toBeDefined();
+    // The painter shows its own group; the gated root's reveal is the gate's.
+    const body = root?.getObjectByName('smithHeartBreathBodyFx');
+    expect(body?.parent).toBe(root);
+    expect(body?.visible).toBe(false);
     for (let i = 0; i < 6; i++) fx.update(1 / 20);
-    expect(root?.visible).toBe(true);
+    expect(body?.visible).toBe(true);
     expect(sent).toContain(BREATH_BODY_GESTURES.calm);
     // The living wind: every ribbon drawn round the body.
     const windMesh = root?.getObjectByName('smithHeartBreathWind') as THREE.Mesh;
@@ -481,7 +485,7 @@ describe('BreathBody over a fake world', () => {
     entities.delete(boss.id);
     world.entityRosterVersion++;
     fx.update(0.2);
-    expect(root?.visible).toBe(false);
+    expect(body?.visible).toBe(false);
     fx.dispose();
     fx.dispose();
     expect(scene.getObjectByName('smith-heart-breath-body')).toBeUndefined();

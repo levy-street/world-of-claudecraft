@@ -83,8 +83,8 @@ void main() {
     vec3 c2 = mix(uShade, uWind, 0.35 + 0.65 * m) + uEdge * core * core * 0.18;
     vec3 sc2 = mix(uStormShade, uStormBody, m) + uStormEdge * core * uFlash * 0.4;
     c2 = mix(c2, sc2, uStorm);
-    a2 *= 1.0 + 0.9 * uStorm;
-    gl_FragColor = vec4(c2, clamp(a2, 0.0, 0.55 + 0.2 * uStorm));
+    a2 *= 1.0 + 1.6 * uStorm;
+    gl_FragColor = vec4(c2, clamp(a2, 0.0, 0.55 + 0.25 * uStorm));
     return;
   }
   float s = vSeed * 31.0;
@@ -148,6 +148,7 @@ export class BreathRibbonPool {
   private readonly tan: THREE.BufferAttribute;
   private readonly shape: THREE.BufferAttribute;
   private readonly geo: THREE.BufferGeometry;
+  private readonly dyn: readonly THREE.BufferAttribute[];
 
   constructor(
     name: string,
@@ -174,6 +175,7 @@ export class BreathRibbonPool {
     geo.setAttribute('aSpine', this.spine);
     geo.setAttribute('aTan', this.tan);
     geo.setAttribute('aShape', this.shape);
+    this.dyn = [this.spine, this.tan, this.shape];
     const idx = new Uint32Array(ribbons * segments * 6);
     let k = 0;
     for (let r = 0; r < ribbons; r++)
@@ -240,9 +242,15 @@ export class BreathRibbonPool {
 
   /** Upload this frame's writes; `used` ribbons draw. */
   commit(used: number): void {
-    this.spine.needsUpdate = true;
-    this.tan.needsUpdate = true;
-    this.shape.needsUpdate = true;
+    // Only the ribbons in use upload (the rest of the pool is never drawn).
+    const verts = Math.max(0, used) * (this.segments + 1) * 2;
+    if (verts > 0) {
+      for (const at of this.dyn) {
+        at.clearUpdateRanges();
+        at.addUpdateRange(0, verts * at.itemSize);
+        at.needsUpdate = true;
+      }
+    }
     this.geo.setDrawRange(0, Math.max(0, used) * this.segments * 6);
     this.mesh.visible = used > 0;
   }

@@ -236,6 +236,26 @@ const DUST = {
   drag: 0.5,
   floor: -1e6,
 };
+const RISE = {
+  speed: 2,
+  up: 9,
+  life: 0.9,
+  size: [1.2, 0.3] as [number, number],
+  color: C.windEdge as readonly [number, number, number],
+  alpha: 0.4,
+  drag: 0.3,
+  floor: -1e6,
+};
+const CRACKLE = {
+  speed: 5,
+  life: 0.25,
+  size: [0.3, 0.05] as [number, number],
+  color: C.spark as readonly [number, number, number],
+  alpha: 1,
+  pool: 'glow' as const,
+  floor: -1e6,
+};
+const CLAWS = [S_CLAW_L, S_CLAW_R] as const;
 const DRAW_IN = {
   speed: 6,
   life: 0.5,
@@ -281,6 +301,9 @@ interface Arc {
 export class BreathBody {
   readonly readyForEntry: Promise<void>;
   private readonly root = new THREE.Group();
+  /** Everything drawn, under the gated root: the painter shows and hides
+   *  this, never the root (the compile gate owns the root's reveal). */
+  private readonly fx = new THREE.Group();
   private readonly uTime = { value: 0 };
   private readonly density: number;
   private readonly low: boolean;
@@ -355,6 +378,9 @@ export class BreathBody {
   ) {
     this.root.name = 'smith-heart-breath-body';
     setRenderCategory(this.root, 'ui3d');
+    this.fx.name = 'smithHeartBreathBodyFx';
+    this.fx.visible = false;
+    this.root.add(this.fx);
     const detail =
       resolveUiEffectsProfile({ presetLabel: GFX.tier, effectsQuality: 1, reduceMotion: false })
         .tier !== 'low';
@@ -363,7 +389,7 @@ export class BreathBody {
     this.arcCount = detail ? BREATH_ARCS.pool : BREATH_ARCS.poolLow;
     const hasDom = typeof document !== 'undefined';
     this.particles = new EngineParticles(
-      this.root,
+      this.fx,
       this.uTime,
       this.density,
       (x, z) => this.groundY(x, z),
@@ -401,7 +427,7 @@ export class BreathBody {
       this.materials,
       this.geometries,
     );
-    for (const p of [this.wind, this.bolts, this.slashes]) this.root.add(p.mesh);
+    for (const p of [this.wind, this.bolts, this.slashes]) this.fx.add(p.mesh);
     // The roar's cone of wind (an open cone, its tip at the mouth, along +z).
     const coneGeo = new THREE.CylinderGeometry(1, 0.08, 1, 32, 1, true)
       .translate(0, -0.5, 0)
@@ -428,10 +454,10 @@ export class BreathBody {
     this.cone.name = 'smithHeartBreathRoarCone';
     this.cone.frustumCulled = false;
     this.cone.visible = false;
-    this.root.add(this.cone);
+    this.fx.add(this.cone);
     // The stones and shards round it.
     this.orbit = new BreathBodyOrbit(
-      this.root,
+      this.fx,
       this.uTime,
       BREATH_BODY_POOLS.stones,
       BREATH_BODY_POOLS.shards,
@@ -470,7 +496,7 @@ export class BreathBody {
       const s = new THREE.Sprite(mat);
       s.name = name;
       s.visible = false;
-      this.root.add(s);
+      this.fx.add(s);
       return s;
     };
     for (let i = 0; i < 2; i++) this.eyes.push(mk(this.eyeMat, 'smithHeartBreathEye'));
@@ -577,7 +603,7 @@ export class BreathBody {
         this.storm = 0;
         this.trailFill = 0;
         this.orbit.setGlow(1);
-        this.root.visible = true;
+        this.fx.visible = true;
       } else if (
         this.windId < 0 &&
         e.kind === 'object' &&
@@ -591,7 +617,7 @@ export class BreathBody {
   private release(): void {
     this.entityId = -1;
     this.rosterSeen = Number.NaN;
-    this.root.visible = false;
+    this.fx.visible = false;
     this.hideBody();
   }
 
@@ -756,8 +782,10 @@ export class BreathBody {
         }
       }
       for (let k = 0; k < cur.ribbons; k++, r++) {
+        // The low tier's dropped strands are skipped, the kept packed in front
+        // (only those upload and draw).
         if (!breathRibbonKept(cur, k, this.low)) {
-          this.wind.clear(r);
+          r--;
           continue;
         }
         this.ribbon(r, cur, k, n, alpha, radius, spin, fling, shiver);
@@ -906,6 +934,10 @@ export class BreathBody {
       const p = this.sock[S_CORE];
       MIST.color = st > 0.5 ? C.stormCloud : C.wind;
       MIST.alpha = st > 0.5 ? 0.22 : 0.06;
+      // The low tier keeps the storm's billows smaller (cosmetic fill).
+      const big = d >= 1 && st > 0.5;
+      MIST.size[0] = big ? 7 : 5;
+      MIST.size[1] = big ? 12 : 9;
       this.particles.puff(p.x, p.y, p.z, 1, MIST);
     }
     // Glittering crystal dust round the body.
@@ -922,15 +954,7 @@ export class BreathBody {
     if (shiver > 0.5 && this.rand() < dt * 30 * shiver * d) {
       // The freeze's crackle: sparks off the pieces.
       const p = this.sock[Math.floor(this.rand() * this.sock.length)];
-      this.particles.puff(p.x, p.y, p.z, 3, {
-        speed: 5,
-        life: 0.25,
-        size: [0.3, 0.05],
-        color: C.spark,
-        alpha: 1,
-        pool: 'glow',
-        floor: -1e6,
-      });
+      this.particles.puff(p.x, p.y, p.z, 3, CRACKLE);
     }
   }
 
@@ -971,20 +995,12 @@ export class BreathBody {
       this.handMat.opacity = 0;
     }
     if (_act.action === 'channel') {
-      for (const si of [S_CLAW_L, S_CLAW_R]) {
+      RISE.color = this.storm > 0.5 ? C.stormEdge : C.windEdge;
+      for (const si of CLAWS) {
         const p = this.sock[si];
         if (this.rand() < dt * 30 * this.density) {
           const a = this.rand() * Math.PI * 2;
-          this.particles.puff(p.x + Math.cos(a) * U, p.y, p.z + Math.sin(a) * U, 1, {
-            speed: 2,
-            up: 9,
-            life: 0.9,
-            size: [1.2, 0.3],
-            color: this.storm > 0.5 ? C.stormEdge : C.windEdge,
-            alpha: 0.4,
-            drag: 0.3,
-            floor: -1e6,
-          });
+          this.particles.puff(p.x + Math.cos(a) * U, p.y, p.z + Math.sin(a) * U, 1, RISE);
         }
       }
       if (this.storm > 0.5 && this.rand() < dt * 10) this.spawnArc(S_CLAW_L, S_CLAW_R, 1);

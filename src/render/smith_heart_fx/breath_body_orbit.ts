@@ -174,11 +174,10 @@ export class BreathBodyOrbit {
     this.shardMat.uniforms.uStorm.value = storm;
     const keep = this.low ? BREATH_ORBIT_LOW : 1e9;
     const write = (mesh: THREE.InstancedMesh, count: number, base: number, shard: boolean) => {
-      for (let i = 0; i < count; i++) {
-        if (i >= keep) {
-          mesh.setMatrixAt(i, _m.makeScale(0, 0, 0));
-          continue;
-        }
+      // The low tier draws (and uploads) only the first few.
+      const n = Math.min(count, keep);
+      mesh.count = n;
+      for (let i = 0; i < n; i++) {
         breathOrbit(base + i, t, storm, _o);
         const yy = y + _o.y * (1 - drop) + (floor - y + _o.size) * drop;
         _p.set(x + _o.x * (1 + 0.3 * drop), yy, z + _o.z * (1 + 0.3 * drop));
@@ -188,6 +187,8 @@ export class BreathBodyOrbit {
         _s.setScalar(_o.size * Math.min(1, show));
         mesh.setMatrixAt(i, _m.compose(_p, _q, _s));
       }
+      mesh.instanceMatrix.clearUpdateRanges();
+      mesh.instanceMatrix.addUpdateRange(0, n * 16);
       mesh.instanceMatrix.needsUpdate = true;
     };
     write(this.stones, this.stoneCount, 0, false);
