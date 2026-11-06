@@ -14,6 +14,7 @@
 
 import { THESSALY_POST } from '../encounters/smith_heart/breath_geometry';
 import {
+  BREATH_BODY_RADIUS,
   BREATH_DIFFICULTY,
   BREATH_THESSALY_NPC,
   BREATH_TUNING,
@@ -366,6 +367,10 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
     ...boss('heart_breath_guardian', 'Guardian of the Breath', 80000, 0x5ab8e8, 3.4),
     ccImmune: true,
     slowImmune: true,
+    // Its own model stands some thirteen yards tall: melee strikes the body of
+    // wind round its chest and tail, not its pivot, and its claws settle the
+    // tank at the body's edge (mob_combat.ts, player_attack_reach.ts).
+    bodyRadius: BREATH_BODY_RADIUS,
     trashKit: {
       wingGust: {
         castId: C.breathGust,

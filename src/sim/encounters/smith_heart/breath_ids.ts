@@ -29,6 +29,11 @@
 
 /** The guardian (template id, frozen: its death lights the Breath vein). */
 export const BREATH_GUARDIAN = 'heart_breath_guardian';
+/** Its body's radius (yards; the template's bodyRadius): the column of wind
+ *  its chest, waist and tail plates float in, about thirteen yards tall since
+ *  its own model (render/smith_heart_fx/breath_body_core.ts). Melee strikes it
+ *  from this far out plus a melee reach, and its own swing settles there. */
+export const BREATH_BODY_RADIUS = 2.5;
 /** Captain Thessaly at the head of the Cornice climb (an NPC def with no
  *  quests: the Highwatch captain's name, look and voice). */
 export const BREATH_THESSALY_NPC = 'heart_captain_thessaly';
