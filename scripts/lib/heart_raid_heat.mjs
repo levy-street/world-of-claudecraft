@@ -27,6 +27,7 @@ import {
   swellLaneOf,
   WHEEL_ARCS_DEG,
   wheelOf,
+  ZONE_BANDS,
   zoneOf,
 } from '../../src/sim/encounters/smith_heart/heat_ids';
 import {
@@ -44,12 +45,9 @@ import {
 } from './heart_raid_bots.mjs';
 
 const T = HEAT_TUNING;
-/** Wakefire's bands round the wellspring (inner, outer), the last open. */
-const BANDS = [
-  [8, 19],
-  [19, 31],
-  [31, 60],
-];
+/** Wakefire's bands round the wellspring (inner, outer), the last open: the
+ *  sim's own (they follow the well's lip). */
+const BANDS = ZONE_BANDS;
 const STRIKERS = ['rogue', 'arms'];
 
 const L = (world, p) => ({ x: p.x - world.origin.x, z: p.z - world.origin.z });
@@ -89,8 +87,9 @@ export const heat = {
     world.home = unit(world.center, world.obs.self);
     world.tankSpot = add(world.center, world.home, HEARTH_WELL.r + 1.5);
     world.anchor = add(world.center, world.home, HEARTH_WELL.r + 2);
-    // Ranged at 13 to 17 yd from the well's middle: inside Hearth Flare's 20.
-    world.rangeScale = 0.62;
+    // Ranged about 7 yd past the lip (the bots' 20 yd ring scaled): out of the
+    // melee's band, inside Hearth Flare's reach (12 past the lip).
+    world.rangeScale = (HEARTH_WELL.r + 7) / 20;
     world.arcSpan = 1.5;
     world.prepull = add(world.center, world.home, 26);
     world.reach = 45;

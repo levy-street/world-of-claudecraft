@@ -61,7 +61,9 @@ const rung = (
 
 /** Every Heat floor layer's rung on the encounter band, bottom to top. */
 export const HEAT_FLOOR = {
-  // The wellspring and what the fight leaves lying on the floor.
+  // The wellspring and what the fight leaves lying on the floor. The pool's
+  // rung also carries the melee's shore terrace round its lip (pass 4,
+  // heat_well_shore.ts): opaque too, laid where the pool is not.
   wellPool: rung(0, 'heat_well_fx', 'opaque', false),
   wellRim: rung(1, 'heat_well_fx', 'additive', false),
   cinderTrack: rung(2, 'heat_cinder_fx', 'normal', false),
@@ -70,6 +72,8 @@ export const HEAT_FLOOR = {
   craterChar: rung(4, 'heat_fx', 'multiply', true),
   wakeChar: rung(5, 'heat_fx', 'multiply', true),
   riverChar: rung(6, 'heat_well_fx', 'multiply', true),
+  // Wakefire's rungs also carry a thrown Hearthseed's crater (pass 4,
+  // heat_meteor_fx.ts: the same root, the same commuting passes).
   zoneChar: rung(7, 'heat_fight_fx', 'multiply', true),
   craterGlow: rung(8, 'heat_fx', 'additive', true),
   wakeGlow: rung(9, 'heat_fx', 'additive', true),

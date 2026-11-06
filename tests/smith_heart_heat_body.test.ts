@@ -24,6 +24,7 @@ import {
   HEAT_BODY_SCALE,
   HEAT_BODY_URL,
   HEAT_FLAMES,
+  HEAT_FX_GROW,
   HEAT_MODEL_LAVA,
   HEAT_MODEL_UNITS,
   HEAT_ROCKS,
@@ -87,7 +88,7 @@ describe('the Guardian of the Heat model', () => {
     expect(visualKeyFor(g)).toBe(key);
   });
 
-  it('stands in its wellspring a giant: some seven players over the shore', () => {
+  it('stands in its wellspring a giant: some nine players over the shore', () => {
     expect(SMITH_HEART_MOBS[HEAT_GUARDIAN].scale).toBe(HEAT_BODY_SCALE);
     expect(def.height).toBe(HEAT_BODY_HEIGHT);
     expect(def.hover).toBe(HEAT_BODY_HOVER);
@@ -98,10 +99,14 @@ describe('the Guardian of the Heat model', () => {
       9,
     );
     const crown = HEAT_BODY_HEIGHT * HEAT_BODY_SCALE * (1 - HEAT_MODEL_LAVA / HEAT_MODEL_UNITS);
-    expect(crown / PLAYER).toBeGreaterThan(6);
-    expect(crown / PLAYER).toBeLessThan(9);
-    // Melee still reaches it from the shore (the sim's body is the pool's).
-    expect(HEARTH_WELL.r).toBeLessThan(10);
+    // Pass 4 grew it a third (scale 3 to 4) with its wellspring.
+    expect(crown / PLAYER).toBeGreaterThan(8);
+    expect(crown / PLAYER).toBeLessThan(11);
+    expect(HEAT_FX_GROW).toBeCloseTo(4 / 3, 9);
+    // Melee still reaches it from the shore (the sim's body is the pool's),
+    // and the pool grew with the body.
+    expect(HEARTH_WELL.r).toBeLessThan(12);
+    expect(HEARTH_WELL.r).toBeGreaterThan(10);
   });
 
   it('ships every clip it binds and KTX2 textures', () => {
@@ -376,12 +381,13 @@ describe('HeatBody over a fake world', () => {
     ])
       expect(root?.getObjectByName(name), name).toBeTruthy();
     expect(
-      (root?.getObjectByName('smithHeartHeatRocks') as THREE.InstancedMesh).isInstancedMesh,
+      ((root as THREE.Object3D).getObjectByName('smithHeartHeatRocks') as THREE.InstancedMesh)
+        .isInstancedMesh,
     ).toBe(true);
     (boss as { dead: boolean }).dead = true;
     for (let i = 0; i < 120; i++) body.update(1 / 20);
     // Cooled in death, its rocks burn again when it comes back.
-    const rockMat = (root?.getObjectByName('smithHeartHeatRocks') as THREE.Mesh)
+    const rockMat = ((root as THREE.Object3D).getObjectByName('smithHeartHeatRocks') as THREE.Mesh)
       .material as THREE.ShaderMaterial;
     expect(rockMat.uniforms.uGlow.value).toBeLessThan(0.05);
     (boss as { dead: boolean }).dead = false;

@@ -27,6 +27,7 @@ import {
   FINAL_PHASES,
 } from '../encounters/smith_heart/final_phase_ids';
 import {
+  HEAT_GUARDIAN_SCALE,
   HEAT_MOBS,
   HEAT_NAMES,
   HEAT_TUNING,
@@ -444,7 +445,7 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
   // stacking burn on every landed swing (the stackPoison seam), so the tanks
   // swap; every other mechanic is the encounter's.
   heart_heat_guardian: {
-    ...boss('heart_heat_guardian', 'Guardian of the Heat', 64000, 0xffe6a0, 3),
+    ...boss('heart_heat_guardian', 'Guardian of the Heat', 64000, 0xffe6a0, HEAT_GUARDIAN_SCALE),
     ccImmune: true,
     slowImmune: true,
     bodyRadius: HEARTH_WELL.r,

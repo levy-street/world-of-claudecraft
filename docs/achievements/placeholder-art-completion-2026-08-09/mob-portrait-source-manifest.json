@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "e926257141d63781ce4ace8422d92873eca8903e326b947f771c3bdfb3f641ad",
+  "rendererFingerprint": "bc131ae15c0bec51ecd63368d21f3af63230819928fa7017448ed010c20abf2f",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 6949252,
-      "sha256": "94624bafa1aa49c39925f7c873f056ecf8cbab83d5a81c561418bb014a1ce4ff",
+      "bytes": 6949812,
+      "sha256": "cf08c6d1d02d78c1376c442151e2728b4235b028c82a8c01c266cd0473b7a4ec",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -5517,8 +5517,8 @@
         "model": {
           "url": "models/creatures/smith_heart_heat_guardian.glb",
           "path": "public/models/creatures/smith_heart_heat_guardian.glb",
-          "bytes": 1863516,
-          "sha256": "3ee1e0704785a13877a66ef2acc368f30bd604b358d75c737ddf7405cac7f12c"
+          "bytes": 1901352,
+          "sha256": "1779c45fcacd49d6a56883cf204568c9bd1c5c78f2a3daf21cfa6415214da053"
         },
         "idle": "Idle",
         "height": 6,
@@ -5535,7 +5535,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "a0377f5ae53cb905bf5ed99574a64f9024d33b4c3451f9dfe44ebd4a9c58da7e",
+      "sourceFingerprint": "f410b4465dd6e762a0f76bdfe3bc34736a2c05c21f3b1ec62cba122f1d1ccfc1",
       "output": {
         "path": "public/ui/mobs/heart_heat_guardian.webp",
         "bytes": 4508,

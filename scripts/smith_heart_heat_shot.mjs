@@ -31,7 +31,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 const ENTRY = { x: -196, z: -210 };
 /** The wellspring's middle, the guardian's spot (instance-local). */
-const BOSS = { x: -224, z: 0 };
+const BOSS = { x: -220, z: 0 };
 
 const browser = await puppeteer.launch({
   executablePath: BROWSER_PATH,

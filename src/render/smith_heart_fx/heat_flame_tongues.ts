@@ -16,7 +16,7 @@
 
 import * as THREE from 'three';
 import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
-import { HEAT_SOCKETS, heatSocketIndex } from './heat_body_core';
+import { HEAT_FX_GROW, HEAT_SOCKETS, heatSocketIndex } from './heat_body_core';
 import {
   fireRampGlsl,
   HEAT_TONGUE_LOW,
@@ -262,10 +262,11 @@ export class HeatFlameTongues {
       const t = HEAT_TONGUES[i];
       const s = this.socketOf[i];
       const p = sock[s];
-      const x = t.off[0];
-      const z = t.off[2];
+      // The recipe is in yards on the body it was tuned at; it grows with it.
+      const x = t.off[0] * HEAT_FX_GROW;
+      const z = t.off[2] * HEAT_FX_GROW;
       const bx = p.x + x * cosY + z * sinY;
-      const by = p.y + t.off[1];
+      const by = p.y + t.off[1] * HEAT_FX_GROW;
       const bz = p.z - x * sinY + z * cosY;
       // Out under the lava (a socket sunk past the surface goes dark).
       const want = this.kept[i] ? Math.max(0, Math.min(1, (by - lavaY) / 1.2)) : 0;
@@ -273,7 +274,13 @@ export class HeatFlameTongues {
       const v = this.vel[s];
       tongueLean(v.x, v.y, v.z, _lean);
       const k = boost[s] ?? 1;
-      const h = t.h * tongueFlicker(clock, t.seed) * _lean.stretch * k * (0.55 + 0.45 * strength);
+      const h =
+        HEAT_FX_GROW *
+        t.h *
+        tongueFlicker(clock, t.seed) *
+        _lean.stretch *
+        k *
+        (0.55 + 0.45 * strength);
       b[i * 3] = bx;
       b[i * 3 + 1] = by;
       b[i * 3 + 2] = bz;
@@ -284,7 +291,11 @@ export class HeatFlameTongues {
       a[i * 3] = (_lean.x + ox) * h;
       a[i * 3 + 1] = h;
       a[i * 3 + 2] = (_lean.z + oz) * h;
-      sh[i * 4] = t.w * (0.7 + 0.3 * k) * (0.92 + 0.16 * tongueFlicker(clock * 1.3, t.seed + 0.5));
+      sh[i * 4] =
+        HEAT_FX_GROW *
+        t.w *
+        (0.7 + 0.3 * k) *
+        (0.92 + 0.16 * tongueFlicker(clock * 1.3, t.seed + 0.5));
       sh[i * 4 + 1] = t.seed;
       sh[i * 4 + 2] = Math.min(1, t.heat * heat);
       sh[i * 4 + 3] = this.lit[i] * strength;

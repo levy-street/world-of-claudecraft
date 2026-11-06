@@ -108,7 +108,7 @@ import {
   SMITH_HEART_FINAL_BOSS,
   SMITH_HEART_GUARDIANS,
 } from '../content/smith_heart';
-import { SMITH_HEART_ANCHORS } from '../content/smith_heart_layout';
+import { HEARTH_WELL, SMITH_HEART_ANCHORS } from '../content/smith_heart_layout';
 import { DUNGEONS, instanceOrigin } from '../data';
 import {
   breathDevTrigger,
@@ -196,8 +196,9 @@ const BREATH_PULL_SPOT = { x: -14, z: 198 } as const;
  *  a few strides south of the guardian. */
 const QUENCH_PULL_SPOT = { x: 198, z: -11 } as const;
 /** Where `/dev heart heat pull` sets the player down: on the Hearth's shore,
- *  in front of the guardian's wellspring and inside its reach. */
-const HEAT_PULL_SPOT = { x: -214.5, z: 2 } as const;
+ *  in front of the guardian's wellspring, past its lip (its fire) and inside
+ *  its reach (the lip follows HEARTH_WELL, grown in pass 4). */
+export const HEAT_PULL_SPOT = { x: HEARTH_WELL.x + HEARTH_WELL.r + 1.7, z: 2 } as const;
 
 function log(ctx: SimContext, pid: number, text: string): void {
   ctx.emit({ type: 'log', text, pid });

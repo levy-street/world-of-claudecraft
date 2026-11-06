@@ -17,7 +17,12 @@
 // gathering, the death's cooling. Node-only (RENDER_PURE_CORES): no three.js,
 // no DOM, deterministic (a hash, never rng).
 
-import { HEAT_AURAS, HEAT_GUARDIAN, HEAT_STAGES } from '../../sim/encounters/smith_heart/heat_ids';
+import {
+  HEAT_AURAS,
+  HEAT_GUARDIAN,
+  HEAT_GUARDIAN_SCALE,
+  HEAT_STAGES,
+} from '../../sim/encounters/smith_heart/heat_ids';
 import type { V3 } from './final_fx_core';
 
 export type { V3 };
@@ -39,6 +44,7 @@ export const HEAT_BODY_CLIPS = [
   'Under',
   'Rise',
   'Death',
+  'Throw',
 ] as const;
 
 /** The model's own height (tip of the vortex to the crown's spike), in its
@@ -47,13 +53,20 @@ export const HEAT_BODY_CLIPS = [
 export const HEAT_MODEL_UNITS = 8;
 export const HEAT_MODEL_LAVA = 1.9;
 
-/** The drawn height at scale 1 (the template draws it at scale 3): the crown
- *  some thirteen yards over the lava, about seven players over the shore, the
- *  whole body about seventeen tall. */
+/** The drawn height at scale 1 (the template draws it at scale 4 since pass
+ *  4): the crown some eighteen yards over the lava, about nine players over
+ *  the shore, the whole body about twenty-four tall. */
 export const HEAT_BODY_HEIGHT = 6;
 
-/** The template's scale (content/smith_heart.ts) the fx reckon in. */
-export const HEAT_BODY_SCALE = 3;
+/** The template's scale (content/smith_heart.ts, the sim's
+ *  HEAT_GUARDIAN_SCALE) the fx reckon in. */
+export const HEAT_BODY_SCALE = HEAT_GUARDIAN_SCALE;
+
+/** How much bigger the body is drawn than the scale its fire was first tuned
+ *  at (3): every yard-sized piece of its fire (the tongues, the vortex, the
+ *  halos, the orbiting rocks, its bursts) grows by this, so the fire keeps
+ *  its proportions on the grown body. */
+export const HEAT_FX_GROW = HEAT_BODY_SCALE / 3;
 
 /** Yards a model unit is drawn at. */
 export const HEAT_YD_PER_UNIT = (HEAT_BODY_HEIGHT * HEAT_BODY_SCALE) / HEAT_MODEL_UNITS;
@@ -76,6 +89,13 @@ export const HEAT_BODY_CLIP = {
   riseBreach: 34 / 30,
   /** The death: it slumps onto the wellspring and goes still (Death). */
   deathSlump: 58 / 30,
+  /** The meteor throw (Throw, pass 4: the Hearthseeds): both hands plunge
+   *  into the lava and scoop, heave the molten rock high over its head and
+   *  fling it; the meteors leave its hands on the release and the clip
+   *  settles back to the Idle stance at its end. */
+  throwScoop: 17 / 30,
+  throwRelease: 34 / 30,
+  throwEnd: 84 / 30,
 } as const;
 
 /** Presentation gestures (the renderer's triggerAttack seam). Never sim ids. */
@@ -88,9 +108,11 @@ export const HEAT_BODY_GESTURES = {
   rise: 'smith_heart_heat_body_rise',
   /** Already standing (a view built while it does): the fighting stance. */
   stand: 'smith_heart_heat_body_stand',
-  /** Both hands gather the fire and throw it (Hearth Flare, the seeds, the
-   *  Wakefire). */
+  /** Both hands gather the fire and throw it (Hearth Flare, the Wakefire). */
   cast: 'smith_heart_heat_body_cast',
+  /** It scoops molten rock out of the wellspring and hurls the Hearthseeds
+   *  (the Throw clip; its meteors are heat_meteor_fx.ts's). */
+  throw: 'smith_heart_heat_body_throw',
 } as const;
 
 /** The stance gesture for the guardian's stage, given the stage seen a scan
@@ -267,15 +289,16 @@ export function heatRockOrbit(
   t: number,
   out: { x: number; y: number; z: number; size: number; spin: number },
 ): { x: number; y: number; z: number; size: number; spin: number } {
-  const r = 7.5 + 4.5 * heatBodyHash(i, 3);
+  const G = HEAT_FX_GROW;
+  const r = (7.5 + 4.5 * heatBodyHash(i, 3)) * G;
   const speed = (0.16 + 0.12 * heatBodyHash(i, 5)) * (heatBodyHash(i, 7) < 0.5 ? 1 : -1);
   const a = heatBodyHash(i, 11) * Math.PI * 2 + t * speed;
   const tilt = (heatBodyHash(i, 13) - 0.5) * 0.7;
-  const h = 6 + 7 * heatBodyHash(i, 17);
+  const h = (6 + 7 * heatBodyHash(i, 17)) * G;
   out.x = Math.cos(a) * r;
   out.z = Math.sin(a) * r;
-  out.y = h + Math.sin(a) * r * tilt + 0.6 * Math.sin(t * 0.9 + i * 1.7);
-  out.size = 0.55 + 0.6 * heatBodyHash(i, 19);
+  out.y = h + Math.sin(a) * r * tilt + 0.6 * G * Math.sin(t * 0.9 + i * 1.7);
+  out.size = (0.55 + 0.6 * heatBodyHash(i, 19)) * G;
   out.spin = t * (0.4 + 0.6 * heatBodyHash(i, 23)) + i;
   return out;
 }

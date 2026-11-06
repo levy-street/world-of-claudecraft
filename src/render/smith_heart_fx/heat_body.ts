@@ -46,6 +46,7 @@ import {
   HEAT_BODY_GESTURES,
   HEAT_BODY_POOLS,
   HEAT_CAST_GAP,
+  HEAT_FX_GROW,
   HEAT_GUARDIAN,
   HEAT_MODEL_COLORS,
   HEAT_MODEL_LAVA,
@@ -151,6 +152,9 @@ function vortexMaterial(name: string, spin: number, twist: number): THREE.Shader
     fog: false,
   });
 }
+
+/** The fire's growth with the body (heat_body_core.ts HEAT_FX_GROW). */
+const G = HEAT_FX_GROW;
 
 // ---- scratch (no allocation a frame) -------------------------------------------------------
 
@@ -338,8 +342,12 @@ export class HeatBody {
     );
     // The vortex of fire where the body meets the lava: two twisting sheaths,
     // counter-spun, flaring at the wellspring and wrapping the vortex to the belt.
-    const outerGeo = new THREE.CylinderGeometry(2.9, 3.3, 6.5, 32, 6, true).translate(0, 3.25, 0);
-    const innerGeo = new THREE.CylinderGeometry(2.3, 2.1, 4.8, 28, 5, true).translate(0, 2.4, 0);
+    const outerGeo = new THREE.CylinderGeometry(2.9, 3.3, 6.5, 32, 6, true)
+      .translate(0, 3.25, 0)
+      .scale(G, G, G);
+    const innerGeo = new THREE.CylinderGeometry(2.3, 2.1, 4.8, 28, 5, true)
+      .translate(0, 2.4, 0)
+      .scale(G, G, G);
     this.geometries.push(outerGeo, innerGeo);
     this.vortexOuterMat = vortexMaterial('smithHeartHeatVortexOuter', 0.9, 2.2);
     this.vortexInnerMat = vortexMaterial('smithHeartHeatVortexInner', -1.4, -2.8);
@@ -470,14 +478,28 @@ export class HeatBody {
       // Basalt Fist lands on its bar's end: the body's fist comes down with it.
       this.slamImpact();
     } else if (
-      (ev.type === 'spellfx' &&
-        ev.sourceId === this.entityId &&
-        (ev.ability === HEAT_CUES.flare || ev.ability === HEAT_CUES.ignite)) ||
-      (ev.type === 'spellfxAt' && ev.ability === HEAT_CUES.seed)
+      ev.type === 'spellfx' &&
+      ev.sourceId === this.entityId &&
+      (ev.ability === HEAT_CUES.flare || ev.ability === HEAT_CUES.ignite)
     ) {
       this.castGesture();
+    } else if (
+      ev.type === 'spellfx' &&
+      ev.sourceId === this.entityId &&
+      ev.ability === HEAT_CUES.seedThrow
+    ) {
+      // The Hearthseeds: it scoops the lava and hurls them (the meteors are
+      // heat_meteor_fx.ts's, leaving its hands on the clip's release).
+      this.throwGesture();
     }
     return false;
+  }
+
+  private throwGesture(): void {
+    if (this.under || this.deadAt >= 0) return;
+    // The throw owns the hands: no cast gathering over it.
+    this.lastCastGesture = this.clock + HEAT_BODY_CLIP.throwEnd - HEAT_CAST_GAP;
+    this.send(HEAT_BODY_GESTURES.throw);
   }
 
   private castGesture(): void {
@@ -690,11 +712,11 @@ export class HeatBody {
       const f = heatFlameFor(this.rand());
       const p = this.sock[heatSocketIndex(f.socket)];
       if (p.y < lava) continue;
-      FLAME.size[0] = f.size * (0.5 + 0.3 * this.rand());
-      FLAME.size[1] = f.size * 0.12;
-      FLAME.up = f.up * 1.2;
+      FLAME.size[0] = G * f.size * (0.5 + 0.3 * this.rand());
+      FLAME.size[1] = G * f.size * 0.12;
+      FLAME.up = G * f.up * 1.2;
       FLAME.color = this.rand() < 0.15 + 0.1 * this.phase ? C.flameHot : C.flameHeat;
-      this.particles.puff(p.x, p.y + f.size * 0.7, p.z, 1, FLAME);
+      this.particles.puff(p.x, p.y + G * f.size * 0.7, p.z, 1, FLAME);
     }
     if (stage !== HEAT_STAGES.under && this.rand() < dt * 26 * d * k) {
       const p = this.sock[Math.floor(this.rand() * this.sock.length)];
@@ -711,7 +733,7 @@ export class HeatBody {
     // The lava churning where it stands: bubbles thrown up round its foot.
     if (this.rand() < dt * (this.under ? 30 : 14) * d) {
       const a = this.rand() * Math.PI * 2;
-      const r = 1.5 + this.rand() * 3.5;
+      const r = G * (1.5 + this.rand() * 3.5);
       const v = this.sock[heatSocketIndex('vortexMid')];
       this.particles.puff(v.x + Math.cos(a) * r, this.lavaY + 0.2, v.z + Math.sin(a) * r, 1, CHURN);
     }
@@ -754,27 +776,27 @@ export class HeatBody {
     for (let i = 0; i < 2; i++) {
       const p = this.sock[i === 0 ? S_EYE_L : S_EYE_R];
       this.eyes[i].position.copy(p);
-      this.eyes[i].scale.set(1.6, 1.6, 1);
+      this.eyes[i].scale.set(1.6 * G, 1.6 * G, 1);
       this.eyes[i].visible = shown;
     }
     this.eyeMat.opacity = k * flick;
     const h = this.sock[S_HEART];
     this.heart.position.copy(h);
-    const hs = (3.2 + 0.5 * Math.sin(this.clock * 2.2)) * (0.6 + 0.4 * k);
+    const hs = G * (3.2 + 0.5 * Math.sin(this.clock * 2.2)) * (0.6 + 0.4 * k);
     this.heart.scale.set(hs, hs, 1);
     this.heartMat.opacity = 0.85 * k;
     this.heart.visible = shown;
     // The heat round it: a broad soft glow behind the chest.
     const b = this.sock[S_BACK];
-    this.halo.position.set(b.x, b.y - 1, b.z);
-    this.halo.scale.set(18, 20, 1);
+    this.halo.position.set(b.x, b.y - G, b.z);
+    this.halo.scale.set(18 * G, 20 * G, 1);
     this.haloMat.opacity = 0.05 * k;
     this.halo.visible = shown && this.density >= 1;
     if (charge >= 0 && shown) {
       const f = this.sock[S_FIST_R];
       this.fistOrb.position.copy(f);
       // A hot heart in the fist's fire, never a sun: the tongues carry the size.
-      const s = 1.6 + 1.6 * charge;
+      const s = G * (1.6 + 1.6 * charge);
       this.fistOrb.scale.set(s, s, 1);
       this.fistOrbMat.opacity = 0.25 + 0.35 * charge;
       this.fistOrb.visible = true;
@@ -787,11 +809,11 @@ export class HeatBody {
   /** Basalt Fist's bar: fire drawn into its right fist, its flames roaring. */
   private chargeFist(fill: number, dt: number): void {
     const f = this.sock[S_FIST_R];
-    this.drawInto(f, 4 + 3 * fill, dt * (14 + 30 * fill) * this.density);
+    this.drawInto(f, G * (4 + 3 * fill), dt * (14 + 30 * fill) * this.density);
     if (this.rand() < dt * 24 * fill * this.density) {
-      FLAME.size[0] = 2 + 2 * fill;
-      FLAME.size[1] = 0.4;
-      FLAME.up = 7;
+      FLAME.size[0] = G * (2 + 2 * fill);
+      FLAME.size[1] = 0.4 * G;
+      FLAME.up = 7 * G;
       FLAME.color = C.flameHot;
       this.particles.puff(f.x, f.y, f.z, 1, FLAME);
     }
@@ -830,11 +852,11 @@ export class HeatBody {
     _b.addVectors(l, r).multiplyScalar(0.5);
     if (look.gather > 0) {
       this.gather.position.copy(_b);
-      const s = 1.5 + 3.5 * look.gather;
+      const s = G * (1.5 + 3.5 * look.gather);
       this.gather.scale.set(s, s, 1);
       this.gatherMat.opacity = 0.25 + 0.45 * look.gather;
       this.gather.visible = true;
-      this.drawInto(_b, 5, dt * 60 * look.gather * this.density);
+      this.drawInto(_b, 5 * G, dt * 60 * look.gather * this.density);
     } else {
       this.gather.visible = false;
       this.gatherMat.opacity = 0;
@@ -927,7 +949,8 @@ export class HeatBody {
    *  ring racing over the floor, smoke rolling up. Punchy but bounded: the
    *  flash and the ring sit under HEAT_BURST's caps, the flame is the ramp's
    *  orange, never a white wash over the boss and the floor. */
-  private impact(x: number, y: number, z: number, big: number): void {
+  private impact(x: number, y: number, z: number, size: number): void {
+    const big = size * G;
     const gy = Math.max(y, this.groundY(x, z));
     this.flash(x, gy + 1, z, HEAT_BURST.flashSize * big, HEAT_BURST.flashLife);
     this.particles.puff(x, gy + 0.3, z, Math.round(34 * big), {
@@ -993,7 +1016,8 @@ export class HeatBody {
 
   /** It plunges under or breaches the wellspring: lava erupting round it,
    *  a column of orange flame, basalt thrown, smoke, a ring over the pool. */
-  private erupt(x: number, z: number, big: number, breach: boolean): void {
+  private erupt(x: number, z: number, size: number, breach: boolean): void {
+    const big = size * G;
     const y = this.lavaY + 0.3;
     this.flash(x, y + 4, z, HEAT_BURST.flashSize * 2 * big, HEAT_BURST.flashLife * 1.5);
     this.particles.puff(x, y, z, Math.round(60 * big), {

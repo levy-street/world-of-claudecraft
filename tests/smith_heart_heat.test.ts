@@ -138,10 +138,11 @@ describe('Guardian of the Heat: the ids and the geometry', () => {
     expect(inWell(HEARTH_WELL.x + HEARTH_WELL.r + 0.1, 0)).toBe(false);
     expect(beyondFlare(HEARTH_WELL.x + T.flareReach - 0.1, 0)).toBe(false);
     expect(beyondFlare(HEARTH_WELL.x + T.flareReach + 0.1, 0)).toBe(true);
-    expect(inBand(0, HEARTH_WELL.x + 10, 0)).toBe(true);
-    expect(inBand(1, HEARTH_WELL.x + 20, 0)).toBe(true);
-    expect(inBand(2, HEARTH_WELL.x + 40, 0)).toBe(true);
-    expect(inBand(0, HEARTH_WELL.x + 20, 0)).toBe(false);
+    const R = HEARTH_WELL.r;
+    expect(inBand(0, HEARTH_WELL.x + R + 2, 0)).toBe(true);
+    expect(inBand(1, HEARTH_WELL.x + R + 12, 0)).toBe(true);
+    expect(inBand(2, HEARTH_WELL.x + R + 30, 0)).toBe(true);
+    expect(inBand(0, HEARTH_WELL.x + R + 12, 0)).toBe(false);
     // The swells: away from the wellspring first, then either side.
     const spot = { x: HEARTH_WELL.x + 15, z: 0 };
     const [away, left, right] = swellBearings(spot);
@@ -189,7 +190,7 @@ describe('Guardian of the Heat: the guardian', () => {
   it('Cinder Grip stacks on its tank with every landed swing', () => {
     const f = pulled(2);
     const tank = f.players[0];
-    f.put(tank, HEARTH_WELL.x + 8, 0);
+    f.put(tank, HEARTH_WELL.x + HEARTH_WELL.r + 0.5, 0);
     f.tick(ticks(14));
     const grip = aura(tank, HEAT_AURAS.grip);
     expect(grip?.name).toBe(HEAT_NAMES.grip);
@@ -516,9 +517,9 @@ describe('Guardian of the Heat: phase 2', () => {
     f.dev('/dev heart heat phase 2');
     hold(f);
     const [p0, p1, p2] = f.players;
-    f.put(p0, HEARTH_WELL.x + 10, 0);
-    f.put(p1, HEARTH_WELL.x + 22, 0);
-    f.put(p2, HEARTH_WELL.x + 40, 0);
+    f.put(p0, HEARTH_WELL.x + HEARTH_WELL.r + 2, 0);
+    f.put(p1, HEARTH_WELL.x + HEARTH_WELL.r + 14, 0);
+    f.put(p2, HEARTH_WELL.x + HEARTH_WELL.r + 30, 0);
     const st = f.state();
     if (!st) throw new Error('no fight');
     f.dev('/dev heart heat zones');

@@ -75,6 +75,9 @@ export interface HeatSeed {
   x: number;
   z: number;
   life: number;
+  /** Seconds of its flight left (HEAT_TUNING.seedFlight at the throw): it
+   *  lands (the seed cue) when this runs out. */
+  flight: number;
 }
 
 /** A Wakefire band warning or burning. */

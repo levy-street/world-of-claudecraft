@@ -122,7 +122,10 @@ export const HEAT_CUES = {
   feed: 'heart_heat_feed',
   /** A Wellkeeper marks a player (spellfx 'beam', keeper to them). */
   kindling: 'heart_heat_kindling',
-  /** A Hearthseed lands (spellfxAt). */
+  /** The guardian heaves the Hearthseeds out of the wellspring (spellfx
+   *  'nova' on it): the throw's gesture and its meteors leave its hands. */
+  seedThrow: 'heart_heat_seed_throw',
+  /** A Hearthseed lands, HEAT_TUNING.seedFlight after the throw (spellfxAt). */
   seed: 'heart_heat_seed',
   /** A Hearthseed bursts (spellfxAt, its reach as the radius). */
   seedBurst: 'heart_heat_seed_burst',
@@ -257,6 +260,21 @@ export const HEAT_PHASE_KIT: Readonly<Record<HeatPhase, HeatPhaseKit>> = {
   3: { fist: true, flare: false, seeds: false, zones: true, cinders: true },
 };
 
+// ---- the wellspring's size -------------------------------------------------------------
+
+/** The first wellspring's burning lip (yards from its middle): the guardian's
+ *  body radius too, so melee strikes it from the shore round the lip. The
+ *  layout's HEARTH_WELL takes its radius from here, and every reach measured
+ *  from the well's middle (Hearth Flare's, Wakefire's bands, a Wellspawn's
+ *  feeding) is this plus its own margin, so the fight keeps its shape when the
+ *  well grows (pass 4 of 2026-11-06: 8 to 10.5 with the guardian's body). */
+export const HEAT_WELL_R = 10.5;
+
+/** The guardian's template scale (its drawn size; the renderer's fire
+ *  reckons in it): grown with the well in pass 4, 3 to 4. Its own swing's
+ *  reach follows its body radius (mob_combat.ts), never this alone. */
+export const HEAT_GUARDIAN_SCALE = 4;
+
 // ---- tuning (SKETCH, unmeasured) ------------------------------------------------------
 
 export const HEAT_TUNING = {
@@ -295,7 +313,7 @@ export const HEAT_TUNING = {
   // Hearth Flare (phase 1): everyone farther than flareReach from the
   // wellspring's middle (12 yd past its lip, the giant's reach) is struck.
   flareEvery: 4,
-  flareReach: 20,
+  flareReach: HEAT_WELL_R + 12,
   flareMin: 260,
   flareMax: 300,
   scorchedPct: 0.25,
@@ -334,7 +352,7 @@ export const HEAT_TUNING = {
   spawnSlowAt: 0.5,
   /** One reaching this far from the wellspring's middle feeds it (a yard and
    *  a half past its lip). */
-  spawnReach: 9.5,
+  spawnReach: HEAT_WELL_R + 1.5,
   feedHealPct: 0.03,
   feedMin: 380,
   feedMax: 420,
@@ -362,6 +380,11 @@ export const HEAT_TUNING = {
    *  square of the distance to nothing at the reach). */
   seedReach: 22,
   seedMax: 520,
+  /** A seed is thrown: the guardian heaves it out of the wellspring as it
+   *  falls (the seed's object and footprint show at once), and it strikes the
+   *  floor this long after (its landing cue). Its fuse (seedLife) still runs
+   *  from the throw, so the burst keeps its time. */
+  seedFlight: 2.2,
   // Wakefire (phases 2 and 3).
   zoneFirst: 16,
   zoneEvery: 34,
@@ -453,9 +476,9 @@ export function seedFalloff(d: number): number {
 /** Wakefire's three bands round the wellspring's middle: [inner, outer)
  *  yards. 0 near the guardian, 1 the middle, 2 the back. */
 export const ZONE_BANDS: readonly (readonly [number, number])[] = [
-  [8, 19],
-  [19, 31],
-  [31, 70],
+  [HEAT_WELL_R, HEAT_WELL_R + 11],
+  [HEAT_WELL_R + 11, HEAT_WELL_R + 23],
+  [HEAT_WELL_R + 23, 70],
 ];
 
 /** The Wheel of the Hearth: how many slices, and how many rounds in a run. */

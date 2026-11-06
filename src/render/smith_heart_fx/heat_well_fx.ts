@@ -66,8 +66,10 @@ import {
   wellBubbleLook,
   wellBubbleSlots,
 } from './heat_well_core';
+import { HeatWellShore } from './heat_well_shore';
 
-const LIP_STUMPS = 26;
+/** The lip's stumps: as many as the first well's 26 per its 8 yd of lip. */
+const LIP_STUMPS = Math.round((26 * HEARTH_WELL.r) / 8);
 const RIVER_STYLE = { color: TELEGRAPH_THREAT_COLORS.danger, accent: C.accent };
 const PAINT: TelegraphPaint = { fill: 0, clock: 0, range: 0 };
 const _well: WellLook = { heat: 0, surge: 0, boil: 0, pulse: 0 };
@@ -345,6 +347,8 @@ export class HeatWellFx {
   private readonly poolMat: THREE.ShaderMaterial;
   private readonly lip: THREE.InstancedMesh;
   private readonly rim: THREE.Mesh;
+  /** The melee's shore terrace round the lip (heat_well_shore.ts). */
+  private readonly shore: HeatWellShore;
   private readonly rimMat: THREE.ShaderMaterial;
   private readonly glow: THREE.Sprite;
   private readonly glowMat: THREE.SpriteMaterial;
@@ -458,6 +462,7 @@ export class HeatWellFx {
     this.rim.visible = false;
     this.rim.renderOrder = floorVfxRenderOrder('encounter', HEAT_FLOOR.wellRim.step);
     host.root.add(this.rim);
+    this.shore = new HeatWellShore(host, HEAT_WELL.r);
     this.glowMat = host.sprite(0xffc860, 'smithHeartHeatWellGlow');
     this.glow = new THREE.Sprite(this.glowMat);
     this.glow.name = 'smithHeartHeatWellGlow';
@@ -538,6 +543,7 @@ export class HeatWellFx {
       this.lip.setMatrixAt(i, _m.compose(_v, _q, _s));
     }
     this.lip.instanceMatrix.needsUpdate = true;
+    this.shore.place(this.x, this.y, this.z);
     this.shimmer.position.set(this.x, this.y - 0.1, this.z);
     this.shimmer.scale.set(this.r + 1.7, 4.5, this.r + 1.7);
     this.shimmer.visible = this.host.detail;
@@ -580,6 +586,7 @@ export class HeatWellFx {
     this.pool.scale.set(sw, 1, sw);
     this.pool.position.y = this.y + 0.08 + look.surge * 0.35;
     this.rimMat.uniforms.uHeat.value = 0.6 + 0.6 * look.heat + 0.35 * look.pulse;
+    this.shore.paint(0.75 + 0.35 * look.heat);
     this.shimmerMat.uniforms.uHeat.value = look.heat * (0.8 + 0.4 * look.pulse);
     // The glow breathes with the fight and throbs while the Hearth overflows.
     this.glow.position.set(this.x, this.y + 2.5, this.z);
@@ -716,6 +723,7 @@ export class HeatWellFx {
     this.pool.visible = false;
     this.lip.visible = false;
     this.rim.visible = false;
+    this.shore.hide();
     this.glow.visible = false;
     this.shimmer.visible = false;
     for (const s of this.rivers) {

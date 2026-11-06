@@ -71,7 +71,9 @@ export const HEAT_CUE_SOUNDS: Readonly<Record<string, readonly HeatSound[]>> = {
   // A Wellkeeper marks a player (the keeper's beam; the mark itself rings in
   // its player's ear).
   [HEAT_CUES.kindling]: [S('heart_heat_kindling', 0.6, 'target', 1, 0.3)],
-  // A Hearthseed lands; it bursts (a deep detonation).
+  // The guardian heaves the seeds out of the wellspring (a molten surge at
+  // its body), then each lands; it bursts (a deep detonation).
+  [HEAT_CUES.seedThrow]: [S('heart_heat_swell', 0.8, 'source', 0.85, 0.6)],
   [HEAT_CUES.seed]: [S('heart_heat_seed', 0.5, 'point', 1, 0.12)],
   [HEAT_CUES.seedBurst]: [S('heart_heat_seed_burst', 0.9, 'point', 1, 0.15)],
   [HEAT_CUES.hatch]: [S('heart_heat_hatch', 0.5, 'point', 1, 0.15)],

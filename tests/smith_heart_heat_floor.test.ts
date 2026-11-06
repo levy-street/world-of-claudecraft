@@ -397,6 +397,8 @@ describe('the Heat modules take every floor step from the ladder', () => {
     'src/render/smith_heart_fx/heat_well_fx.ts',
     'src/render/smith_heart_fx/heat_cinder_fx.ts',
     'src/render/smith_heart_fx/heat_body.ts',
+    'src/render/smith_heart_fx/heat_meteor_fx.ts',
+    'src/render/smith_heart_fx/heat_well_shore.ts',
   ];
   it('passes no literal step to the seam and builds no telegraph straight off the kit', () => {
     const bad: string[] = [];

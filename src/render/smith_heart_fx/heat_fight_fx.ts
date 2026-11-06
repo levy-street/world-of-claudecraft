@@ -84,6 +84,7 @@ import {
 import { HEAT_FLOOR, heatParticleSteps } from './heat_floor_ladder_core';
 import type { HeatFxHost } from './heat_fx_host';
 import { HEAT_LAVA_GLSL, HEAT_MOLTEN_GLSL, HEAT_NOISE_GLSL } from './heat_lava_glsl';
+import { HeatMeteorFx } from './heat_meteor_fx';
 import { moltenDecal } from './heat_molten_decal';
 import { HeatSeedField } from './heat_seed_field';
 import type { SeedMark } from './heat_seed_field_core';
@@ -419,6 +420,8 @@ export class HeatFightFx implements HeatFxHost {
   readonly groundY = (x: number, z: number): number => this.groundFn(x, z);
   private readonly well: HeatWellFx;
   private readonly cinder: HeatCinderFx;
+  /** The thrown Hearthseeds' meteors (the seeds themselves in the air). */
+  private readonly meteors: HeatMeteorFx;
   private readonly seeds: SeedSlot[] = [];
   /** Every live seed's footprint, one field (laid once per wave). */
   private readonly seedField: HeatSeedField;
@@ -499,6 +502,7 @@ export class HeatFightFx implements HeatFxHost {
 
     this.well = new HeatWellFx(this);
     this.cinder = new HeatCinderFx(this);
+    this.meteors = new HeatMeteorFx(this);
 
     // ---- the seeds ----
     const crystal = new THREE.OctahedronGeometry(1, 0);
@@ -705,6 +709,9 @@ export class HeatFightFx implements HeatFxHost {
     const src = this.world.entities.get(ev.sourceId);
     const dst = this.world.entities.get(ev.targetId);
     switch (ev.ability) {
+      case HEAT_CUES.seedThrow:
+        this.meteors.thrown();
+        break;
       case HEAT_CUES.flare:
         this.flareBolt(ev.sourceId, ev.targetId);
         break;
@@ -754,7 +761,8 @@ export class HeatFightFx implements HeatFxHost {
         this.shakeNear(x, z, 0.8, 90);
         break;
       case HEAT_CUES.seed:
-        this.particles.puff(x, y + 0.4, z, 10, SPARK);
+        // The seed strikes the floor: its meteor lands on this beat.
+        this.meteors.landAt(x, z);
         break;
       case HEAT_CUES.seedBurst:
         this.particles.shockRing(x, z, C.ring, r, 0.8);
@@ -824,6 +832,7 @@ export class HeatFightFx implements HeatFxHost {
     this.well.update(wellIds.length > 0 ? wellIds[0] : -1, guardian, list('river'), this.clock, dt);
     this.cinder.update(list('fall'), this.cinderIds, this.addIds, this.huntedIds, this.clock, dt);
     this.paintSeeds(world, dt);
+    this.meteors.update(guardian, dt);
     this.paintZones(world);
     this.paintWheel(world);
     this.paintPatches(world, dt);
@@ -938,8 +947,10 @@ export class HeatFightFx implements HeatFxHost {
       slot.x = e.pos.x;
       slot.z = e.pos.z;
       slot.reach = e.scale || T.seedReach;
+      this.meteors.seedSeen(id, e.pos.x, e.pos.z);
       reseed = true;
     }
+    this.meteors.forget(seeds);
     if (reseed) this.layOutSeeds();
     const zones = this.ids.get('zone') ?? [];
     for (const z of this.zones)
@@ -963,6 +974,7 @@ export class HeatFightFx implements HeatFxHost {
     this.candidateIds.length = 0;
     this.well.hide();
     this.cinder.hide();
+    this.meteors.hide();
     for (const s of this.seeds) {
       s.id = -1;
       s.laid = -1;
@@ -995,6 +1007,8 @@ export class HeatFightFx implements HeatFxHost {
       const eAt = fxAnchor(e);
       const look = seedLook(this.clock - s.born, s.life, _seed);
       if (s.laid >= 0) this.seedMarks[s.laid].fill = look.fill;
+      // Still in the air (its meteor): the footprint shows, the orb waits.
+      if (this.meteors.inFlight(s.id)) continue;
       const y = this.groundY(eAt.x, eAt.z);
       const size = 0.55 + 0.75 * look.size;
       _v.set(eAt.x, y + 1.1 + 0.15 * look.beat, eAt.z);
@@ -1252,6 +1266,7 @@ export class HeatFightFx implements HeatFxHost {
     this.well.dispose();
     this.cinder.dispose();
     this.seedOrbs.dispose();
+    this.meteors.dispose();
     this.patches.dispose();
     for (const g of this.geometries) g.dispose();
     for (const m of this.materials) m.dispose();

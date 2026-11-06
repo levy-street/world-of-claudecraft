@@ -105,7 +105,8 @@ const TOGGLES: readonly MeshToggleDef[] = [
 // the first wellspring, fighting bare-handed. Its swings alternate the right
 // and the left fist into the shore, Basalt Fist's bar hauls the right fist
 // high and drives it down on the bar's end, its fire is gathered and thrown
-// by a gesture, and the overflows plunge it under the lava (the Under stance,
+// by a gesture, the Hearthseeds are scooped out of the lava and hurled (the
+// Throw clip, its meteors the seeds themselves), and the overflows plunge it under the lava (the Under stance,
 // entered by its Sink) and burst it back out (the fighting stance, entered by
 // its Rise). The fire round it is smith_heart_fx/heat_body.ts's; the gesture
 // ids and the clip beats live in smith_heart_fx/heat_body_core.ts.
@@ -119,8 +120,8 @@ const HEAT_BASE: ClipMap = {
     Attack2: [HEAT_BODY_CLIP.attack],
     Slam: [HEAT_BODY_CLIP.slam],
   },
-  attackByAbility: { [HEAT_BODY_GESTURES.cast]: 'Cast' },
-  attackTimeScaleByAbility: { [HEAT_BODY_GESTURES.cast]: 1 },
+  attackByAbility: { [HEAT_BODY_GESTURES.cast]: 'Cast', [HEAT_BODY_GESTURES.throw]: 'Throw' },
+  attackTimeScaleByAbility: { [HEAT_BODY_GESTURES.cast]: 1, [HEAT_BODY_GESTURES.throw]: 1 },
   death: 'Death',
   cast: 'Cast',
   castByAbility: { [HEAT_CASTS.fist]: 'Slam' },
@@ -152,8 +153,9 @@ export const SMITH_HEART_BOSS_LOOKS: Record<string, VisualDef> = {
       // Dead, the lava in it cools to dark stone.
       deathFade: 4,
     },
-    // A swing never cuts the plunge, the breach, the cast or Basalt Fist's slam.
-    oneShotsHoldAttacks: ['Sink', 'Rise', 'Cast', 'Slam'],
+    // A swing never cuts the plunge, the breach, the cast, the meteor throw or
+    // Basalt Fist's slam.
+    oneShotsHoldAttacks: ['Sink', 'Rise', 'Cast', 'Slam', 'Throw'],
     castPlayOutHoldsAttacks: true,
     attackTimeScale: 1,
     deathTimeScale: 1,
