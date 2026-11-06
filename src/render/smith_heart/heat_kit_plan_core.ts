@@ -376,8 +376,14 @@ export function planHeatKit(): HeartKitPlacement[] {
 
 // ---- the fire crystals' light ------------------------------------------------------------
 
-/** The Heat kit's fire-crystal pieces (the clusters round the Hearth). */
-export const HEARTH_CRYSTAL_PIECES = ['Kit_FireCrystalA', 'Kit_FireCrystalB'] as const;
+/** The Heat kit's fire-crystal pieces: the clusters round the Hearth, and
+ *  the great cluster burning in the Hearth's own mouth behind the wellspring
+ *  (its glow slot is that crystal, found by hiding each glow piece in turn). */
+export const HEARTH_CRYSTAL_PIECES = [
+  'Kit_FireCrystalA',
+  'Kit_FireCrystalB',
+  'Kit_HearthMouth',
+] as const;
 
 /** A fire crystal's baked light warmed from the kit's white-gold to amber
  *  (Jose's review of 2026-11-06: beside the guardian's orange fire the pale

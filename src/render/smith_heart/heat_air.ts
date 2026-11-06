@@ -17,7 +17,12 @@ import { sharedUniforms } from '../gfx';
 import { type HeartAirV3, type HeartAirV4, heartQuadGeometry } from './heart_air_quads';
 import { FLAME_FRAG, FLAME_VERT, GLOW_FRAG, HALO_VERT } from './heart_fire_glsl';
 import { heartHash } from './heart_plan_core';
-import { HEAT_EMBERS, type HeatAirPlan, planHeatAir } from './heat_air_core';
+import {
+  HEAT_EMBERS,
+  type HeatAirPlan,
+  HEARTH_FIRE_COLORS as HF,
+  planHeatAir,
+} from './heat_air_core';
 
 type V3 = HeartAirV3;
 type V4 = HeartAirV4;
@@ -268,7 +273,7 @@ export function buildHeatAir(lowGfx: boolean): THREE.Group {
       'smithHeartHeatFlames',
       FLAME_VERT,
       FLAME_FRAG,
-      { uHot: col(0xfff2d2), uWarm: col(0xffc65a), uDeep: col(0xc8761e) },
+      { uHot: col(HF.hot), uWarm: col(HF.warm), uDeep: col(HF.deep) },
       true,
     ),
     9,
@@ -283,7 +288,7 @@ export function buildHeatAir(lowGfx: boolean): THREE.Group {
       EMBER_RISE_VERT,
       GLOW_FRAG,
       {
-        uColor: col(0xffc060),
+        uColor: col(HF.ember),
         uRise: { value: HEAT_EMBERS.rise },
         uDrift: { value: new THREE.Vector2(HEAT_EMBERS.drift[0], HEAT_EMBERS.drift[1]) },
       },
@@ -298,7 +303,7 @@ export function buildHeatAir(lowGfx: boolean): THREE.Group {
       plan.halos.map((h) => [h.x, h.y, h.z] as V3),
       plan.halos.map((h, i) => [heartHash(i, 1991), h.size, 0, 0] as V4),
     ),
-    airMaterial('smithHeartHeatHalos', HALO_VERT, GLOW_FRAG, { uColor: col(0xd08a32) }, true),
+    airMaterial('smithHeartHeatHalos', HALO_VERT, GLOW_FRAG, { uColor: col(HF.halo) }, true),
     8,
   );
   return group;
