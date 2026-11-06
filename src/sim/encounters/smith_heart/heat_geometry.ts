@@ -140,7 +140,9 @@ export function swellBearings(spot: HPoint): [number, number, number] {
 }
 
 /** Is (x, z) in a wave's wall: `front` yards down its lane, the wall
- *  `T.waveDepth` deep behind it? */
+ *  `T.waveDepth` deep behind it, never behind the lane's start (a wave just
+ *  out of the spot is shallower: it rises out of the crater, so it never
+ *  strikes back past the spot, where the drawn wall does not stand)? */
 export function inWave(
   ox: number,
   oz: number,
@@ -150,7 +152,9 @@ export function inWave(
   z: number,
 ): boolean {
   const f = laneFrame(ox, oz, facing, x, z);
-  return f.across <= T.laneHalf && f.along <= front && f.along >= front - T.waveDepth;
+  return (
+    f.across <= T.laneHalf && f.along >= 0 && f.along <= front && f.along >= front - T.waveDepth
+  );
 }
 
 /** The nearest body to `from` within `range` (the lower id on a tie), or

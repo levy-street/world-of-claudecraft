@@ -45,7 +45,7 @@ import {
   zoneOf,
   zoneTemplate,
 } from '../src/sim/encounters/smith_heart';
-import { DT, type Entity, type SimEvent } from '../src/sim/types';
+import { DT, type Entity, RUN_SPEED, type SimEvent } from '../src/sim/types';
 import { hitsOf } from './helpers/council_fight';
 import { HEAT_WAIT_SPOTS, type HeatFight, heatFight } from './helpers/heat_fight';
 
@@ -149,13 +149,19 @@ describe('Guardian of the Heat: the ids and the geometry', () => {
     expect(away).toBeCloseTo(Math.PI / 2, 9);
     expect(Math.abs(left - away)).toBeCloseTo(Math.PI / 2, 9);
     expect(Math.abs(right - away)).toBeCloseTo(Math.PI / 2, 9);
-    expect(inLane(spot.x, 0, away, T.laneLength, T.laneHalf, spot.x + 10, 2)).toBe(true);
-    expect(inLane(spot.x, 0, away, T.laneLength, T.laneHalf, spot.x + 10, 3)).toBe(false);
-    expect(inLane(spot.x, 0, away, T.laneLength, T.laneHalf, spot.x - 2, 0)).toBe(false);
-    // A wave's wall: its front and waveDepth behind it.
-    expect(inWave(spot.x, 0, away, 10, spot.x + 9, 0)).toBe(true);
-    expect(inWave(spot.x, 0, away, 10, spot.x + 6, 0)).toBe(false);
-    expect(inWave(spot.x, 0, away, 10, spot.x + 11, 0)).toBe(false);
+    const h = T.laneHalf;
+    expect(inLane(spot.x, 0, away, T.laneLength, h, spot.x + 10, h - 0.1)).toBe(true);
+    expect(inLane(spot.x, 0, away, T.laneLength, h, spot.x + 10, h + 0.1)).toBe(false);
+    expect(inLane(spot.x, 0, away, T.laneLength, h, spot.x - 2, 0)).toBe(false);
+    // A wave's wall: its front and waveDepth behind it, the lane's width.
+    expect(inWave(spot.x, 0, away, 20, spot.x + 19, 0)).toBe(true);
+    expect(inWave(spot.x, 0, away, 20, spot.x + 20 - T.waveDepth + 0.1, h - 0.1)).toBe(true);
+    expect(inWave(spot.x, 0, away, 20, spot.x + 20 - T.waveDepth - 0.1, 0)).toBe(false);
+    expect(inWave(spot.x, 0, away, 20, spot.x + 21, 0)).toBe(false);
+    expect(inWave(spot.x, 0, away, 20, spot.x + 18, h + 0.1)).toBe(false);
+    // A wave just out of the spot never strikes back past it.
+    expect(inWave(spot.x, 0, away, 0.5, spot.x + 0.2, 0)).toBe(true);
+    expect(inWave(spot.x, 0, away, 0.5, spot.x - 4, 5)).toBe(false);
     for (const p of [...SHORE_POINTS, ...WELLSPAWN_SPOTS, ...HEAT_WAIT_SPOTS])
       expect(inHearthFloor(p.x, p.z)).toBe(true);
     expect(SHORE_POINTS.length).toBeGreaterThan(40);
@@ -163,6 +169,95 @@ describe('Guardian of the Heat: the ids and the geometry', () => {
       expect(beyondFlare(p.x, p.z)).toBe(false);
       expect(inWell(p.x, p.z)).toBe(false);
     }
+  });
+});
+
+describe('Guardian of the Heat: the pass-5 Molten Swells (wider, deeper, still fair)', () => {
+  it('rolls an 11 yd wide wall 5 yd deep (2.5 and 2.5 before the owner grew it)', () => {
+    expect(T.laneHalf * 2).toBe(11);
+    expect(T.waveDepth).toBe(5);
+  });
+
+  it('lets a player in the middle of a lane run out of it well inside the warning', () => {
+    // The lanes show with the fist's 3 s bar and the wave rolls 0.6 s later:
+    // at run speed the lane's middle to past its edge takes under a second.
+    const warning = T.fistCast + T.waveDelay;
+    const runOut = (T.laneHalf + 0.5) / RUN_SPEED;
+    expect(runOut).toBeLessThan(1);
+    expect(runOut * 3).toBeLessThan(warning);
+    // The fist's own target, at the spot itself, reaches a gap (clear of the
+    // fist's radius and both lanes it stands between) inside the bar.
+    const gap = Math.max(T.fistR, Math.hypot(T.laneHalf, T.laneHalf)) + 0.5;
+    expect(gap / RUN_SPEED).toBeLessThan(T.fistCast * 0.6);
+  });
+
+  it('never covers the room: wherever the fist lands most of the floor and the melee ring stay clear', () => {
+    for (const out of [1.5, 6, 14]) {
+      for (const deg of [0, 45, 90, 135, 180, 225, 270, 315]) {
+        const a = (deg * Math.PI) / 180;
+        const spot = {
+          x: HEARTH_WELL.x + Math.sin(a) * (HEARTH_WELL.r + out),
+          z: HEARTH_WELL.z + Math.cos(a) * (HEARTH_WELL.r + out),
+        };
+        if (!inHearthFloor(spot.x, spot.z)) continue;
+        const lanes = swellBearings(spot);
+        const struck = (x: number, z: number) =>
+          Math.hypot(x - spot.x, z - spot.z) <= T.fistR ||
+          lanes.some((b) => inLane(spot.x, spot.z, b, T.laneLength, T.laneHalf, x, z));
+        let floor = 0;
+        let hit = 0;
+        for (let x = -262; x <= -170; x += 1)
+          for (let z = -50; z <= 50; z += 1) {
+            if (!inHearthFloor(x, z) || wellDistance(x, z) < HEARTH_WELL.r) continue;
+            floor++;
+            if (struck(x, z)) hit++;
+          }
+        expect(hit / floor).toBeLessThan(0.25);
+        // The melee ring (the lip to 3 yd out): at least half of it is clear.
+        let ring = 0;
+        let ringHit = 0;
+        for (let k = 0; k < 360; k++) {
+          const r = (k * Math.PI) / 180;
+          const x = HEARTH_WELL.x + Math.sin(r) * (HEARTH_WELL.r + 1.5);
+          const z = HEARTH_WELL.z + Math.cos(r) * (HEARTH_WELL.r + 1.5);
+          if (!inHearthFloor(x, z)) continue;
+          ring++;
+          if (struck(x, z)) ringHit++;
+        }
+        expect(ringHit / ring).toBeLessThan(0.5);
+      }
+    }
+  });
+});
+
+describe('Guardian of the Heat: the pass-5 wall in a live fight', () => {
+  it('strikes 4.5 yd across the lane and 4.5 yd behind the front, not 6 across', () => {
+    const f = pulled(5);
+    const [, victim, across45, across6, behind] = f.players;
+    const spot = { x: HEARTH_WELL.x + 16, z: 0 };
+    f.put(victim, spot.x, spot.z);
+    expect(f.dev('/dev heart heat fist', victim.id)).toBe(true);
+    // Down the lane away from the wellspring (+x), 14 yd out (clear of the
+    // side lanes, which cover 5.5 yd either side of the spot's line).
+    f.put(across45, spot.x + 14, 4.5);
+    f.put(across6, spot.x + 14, -6);
+    f.tick(ticks(T.fistCast + T.waveDelay + 0.05));
+    // Half a yard behind where the front will be when it is 14.2 yd out,
+    // the wall 5 yd deep reaches back over it as it passes.
+    let roll: SimEvent[] = [];
+    for (let i = 0; i < ticks(1.4); i++) roll = roll.concat(f.tick(1));
+    // The front is about 14.5 yd out: step the one behind into the wall's
+    // back (4.5 yd behind the front, the wall 5 deep), not its front.
+    const front = f.objects(HEAT_OBJECTS.wave).find((w) => Math.abs(w.facing - Math.PI / 2) < 0.01);
+    expect(front).toBeTruthy();
+    const o = f.world(spot.x, 0);
+    const out = (front?.pos.x ?? 0) - o.x;
+    f.put(behind, spot.x + out - 4.5, 0.5);
+    const last = f.tick(1);
+    roll = roll.concat(last);
+    expect(hitsOf(roll, HEAT_NAMES.swell, across45.id).length).toBe(1);
+    expect(hitsOf(roll, HEAT_NAMES.swell, across6.id)).toEqual([]);
+    expect(hitsOf(last, HEAT_NAMES.swell, behind.id).length).toBe(1);
   });
 });
 

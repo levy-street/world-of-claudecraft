@@ -116,7 +116,14 @@ export const final = {
         t.startsWith(HEAT_OBJECTS.fistPrefix) ||
         t === HEAT_OBJECTS.wave
       )
-        o.danger.push({ ...at, r: at.r + (t.startsWith(FINAL_OBJECTS.whirlPrefix) ? 2 : 1.3) });
+        o.danger.push({
+          ...at,
+          // A wave's wall is waveDepth deep behind its object: the circle
+          // must cover the box's corners (as the Heat guardian's bots do).
+          r:
+            at.r +
+            (t.startsWith(FINAL_OBJECTS.whirlPrefix) ? 2 : t === HEAT_OBJECTS.wave ? 2.5 : 1.3),
+        });
       else if (swellLaneOf(t)) {
         const d = { x: Math.sin(at.f), z: Math.cos(at.f) };
         o.lanes.push({

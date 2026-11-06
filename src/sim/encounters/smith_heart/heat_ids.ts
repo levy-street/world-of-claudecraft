@@ -300,14 +300,17 @@ export const HEAT_TUNING = {
   fistR: 6,
   fistMin: 2500,
   fistMax: 2700,
-  /** Three lanes from the spot: away from the wellspring and to either side. */
+  /** Three lanes from the spot: away from the wellspring and to either side.
+   *  Pass 5 (2026-11-06, the owner's call): 11 yd wide (2.5 either side
+   *  before), a wall a raid reads as a wave; from the lane's middle a player
+   *  runs out of it in under a second, the warning is 3.6 s before it rolls. */
   laneLength: 32,
-  laneHalf: 2.5,
+  laneHalf: 5.5,
   /** The waves start rolling this long after the fist lands. */
   waveDelay: 0.6,
   waveSpeed: 10,
-  /** A wave's wall is this deep along its lane. */
-  waveDepth: 2.5,
+  /** A wave's wall is this deep along its lane (2.5 before pass 5). */
+  waveDepth: 5,
   waveMin: 380,
   waveMax: 440,
   // Hearth Flare (phase 1): everyone farther than flareReach from the
