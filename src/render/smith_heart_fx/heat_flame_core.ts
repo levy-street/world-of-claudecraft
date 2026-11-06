@@ -42,14 +42,14 @@ interface SocketFire {
 }
 
 const SOCKET_FIRE: readonly SocketFire[] = [
-  { socket: 'shoulderL', count: 5, ring: 1.3, w: 2.8, h: 6.2, heat: 0.92, lowCount: 2 },
-  { socket: 'shoulderR', count: 5, ring: 1.3, w: 2.8, h: 6.2, heat: 0.92, lowCount: 2 },
-  { socket: 'back', count: 5, ring: 1.8, w: 3.4, h: 7.4, heat: 0.88, lowCount: 2 },
+  { socket: 'shoulderL', count: 6, ring: 1.4, w: 2.9, h: 4.6, heat: 0.92, lowCount: 2 },
+  { socket: 'shoulderR', count: 6, ring: 1.4, w: 2.9, h: 4.6, heat: 0.92, lowCount: 2 },
+  { socket: 'back', count: 5, ring: 1.8, w: 3.4, h: 5.8, heat: 0.88, lowCount: 2 },
   { socket: 'fistL', count: 4, ring: 0.8, w: 2.2, h: 4.4, heat: 0.95, lowCount: 1 },
   { socket: 'fistR', count: 4, ring: 0.8, w: 2.2, h: 4.4, heat: 0.95, lowCount: 1 },
-  { socket: 'hornL', count: 2, ring: 0.35, w: 1.3, h: 3.2, heat: 0.8, lowCount: 1 },
-  { socket: 'hornR', count: 2, ring: 0.35, w: 1.3, h: 3.2, heat: 0.8, lowCount: 1 },
-  { socket: 'crown', count: 3, ring: 0.5, w: 1.6, h: 4.2, heat: 0.85, lowCount: 1 },
+  { socket: 'hornL', count: 2, ring: 0.35, w: 1.4, h: 2.6, heat: 0.8, lowCount: 1 },
+  { socket: 'hornR', count: 2, ring: 0.35, w: 1.4, h: 2.6, heat: 0.8, lowCount: 1 },
+  { socket: 'crown', count: 3, ring: 0.5, w: 1.7, h: 3.4, heat: 0.85, lowCount: 1 },
   { socket: 'vortexHigh', count: 6, ring: 2.4, w: 2.6, h: 4.6, heat: 0.78, lowCount: 2 },
 ];
 
@@ -61,7 +61,8 @@ export const HEAT_TONGUES: readonly HeatTongue[] = (() => {
     for (let i = 0; i < f.count; i++) {
       const a = (i / f.count) * Math.PI * 2 + heatBodyHash(n, 41) * 1.2;
       const r = f.ring * (0.55 + 0.45 * heatBodyHash(n, 43));
-      const k = 0.78 + 0.44 * heatBodyHash(n, 47);
+      // Varied heights: many short licks under a few tall tongues.
+      const k = 0.55 + 0.75 * heatBodyHash(n, 47) ** 1.6;
       out.push({
         socket: f.socket,
         off: [Math.cos(a) * r, (heatBodyHash(n, 53) - 0.35) * f.ring * 0.6, Math.sin(a) * r * 0.7],
@@ -89,7 +90,7 @@ export const TONGUE_MAX_LEAN = 0.85;
 
 /** How far a tongue fans out from its socket (its tip's outward reach as a
  *  share of its height, before its own seed varies it). */
-export const TONGUE_SPLAY = 0.22;
+export const TONGUE_SPLAY = 0.34;
 
 /** Yards of tip trail per yard a second the socket moves. */
 export const TONGUE_DRAG = 0.16;

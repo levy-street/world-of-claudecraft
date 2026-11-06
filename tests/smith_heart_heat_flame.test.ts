@@ -7,9 +7,15 @@
 // under fixed caps so a slam never washes out the frame; the circling rocks
 // and the flung basalt are dark stone with glowing cracks.
 
+import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { gateObjectPlan } from '../src/render/gate_objects';
+import { HEARTH_FIRE_COLORS as HF } from '../src/render/smith_heart/heat_air_core';
+import {
+  HEARTH_CRYSTAL_PIECES,
+  warmHearthGlow,
+} from '../src/render/smith_heart/heat_kit_plan_core';
 import { HEAT_MODEL_COLORS, HEAT_SOCKETS } from '../src/render/smith_heart_fx/heat_body_core';
 import { HeatBodyRocks } from '../src/render/smith_heart_fx/heat_body_rocks';
 import {
@@ -33,7 +39,7 @@ describe('heat_flame_core: the tongues', () => {
     for (const t of HEAT_TONGUES) {
       expect(ids.has(t.socket), t.socket).toBe(true);
       expect(t.w).toBeGreaterThan(0);
-      expect(t.h).toBeGreaterThan(t.w);
+      expect(t.h).toBeGreaterThan(t.w * 0.5);
       expect(t.heat).toBeGreaterThan(0);
       expect(t.heat).toBeLessThanOrEqual(1);
     }
@@ -239,5 +245,42 @@ describe("the Heat fight's objects", () => {
     expect(gateObjectPlan({ templateId: 'mailbox', dungeonId: null, pos: { x: 0, z: 0 } })).toBe(
       null,
     );
+  });
+});
+
+describe("the Hearth's own fire and crystals (Hearth only)", () => {
+  it('burns the Hearth flames orange-red with a yellow core, the Quench bowls untouched', () => {
+    for (const hex of [HF.warm, HF.deep, HF.ember, HF.halo]) {
+      const [r, g, b] = rgb(hex);
+      expect(g / r).toBeLessThan(0.55);
+      expect(b).toBeLessThan(g);
+    }
+    // Only the core keeps its yellow.
+    const [hr, hg] = rgb(HF.hot);
+    expect(hg / hr).toBeGreaterThan(0.7);
+    // The Heat's material reads the Hearth palette; the Quench room's fire
+    // bowls keep their own uniforms on the shared shader, byte for byte.
+    const heat = readFileSync('src/render/smith_heart/heat_air.ts', 'utf8');
+    expect(heat).toContain('uHot: col(HF.hot), uWarm: col(HF.warm), uDeep: col(HF.deep)');
+    const quench = readFileSync('src/render/smith_heart/quench_air.ts', 'utf8');
+    expect(quench).toContain('{ uHot: col(0xfff0c8), uWarm: col(0xffa040), uDeep: col(0xb03a10) }');
+    expect(quench).not.toContain('HEARTH_FIRE_COLORS');
+  });
+
+  it("warms the Hearth's great mouth crystal and its clusters to amber", () => {
+    expect(HEARTH_CRYSTAL_PIECES).toContain('Kit_HearthMouth');
+    expect(HEARTH_CRYSTAL_PIECES).toContain('Kit_FireCrystalA');
+    const c: [number, number, number] = [1, 0.9, 0.62];
+    warmHearthGlow(c);
+    expect(c[1] / c[0]).toBeLessThan(0.6);
+    expect(c[2]).toBeLessThan(c[1]);
+  });
+
+  it('keeps the shoulders and crown in short licks under a few taller tongues', () => {
+    for (const id of ['shoulderL', 'shoulderR', 'crown', 'hornL']) {
+      const hs = HEAT_TONGUES.filter((t) => t.socket === id).map((t) => t.h);
+      expect(Math.max(...hs), id).toBeLessThan(6);
+      if (hs.length > 2) expect(Math.max(...hs) / Math.min(...hs), id).toBeGreaterThan(1.2);
+    }
   });
 });

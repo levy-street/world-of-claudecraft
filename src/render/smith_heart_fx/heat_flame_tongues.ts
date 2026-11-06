@@ -54,8 +54,14 @@ void main() {
   float sl = length(side);
   side = sl > 1e-4 ? side / sl : vec3(1.0, 0.0, 0.0);
   float s = aShape.y * 40.0;
-  float wob = sin(uTime * 4.3 + s + v * 5.0) * 0.6 + sin(uTime * 7.1 + s * 1.3 - v * 8.0) * 0.4;
-  spine += side * wob * 0.08 * hgt * v * v;
+  // An S-bend travelling up the tongue (the body sways one way, the tip
+  // whips back), and a flick of the tip on its own faster clock: roaring
+  // fire, never a straight spike.
+  float sBend = sin(v * 5.2 - uTime * 3.6 + s) * (0.6 + 0.4 * sin(uTime * 1.3 + s * 0.7));
+  float flick = sin(uTime * 9.3 + s * 2.1) * 0.5 + sin(uTime * 13.7 + s * 3.3) * 0.3;
+  spine += side * (sBend * 0.16 * v + flick * 0.12 * v * v * v) * hgt;
+  // The curl reaches into depth too, so the tongue never reads flat.
+  spine += toCam * sin(v * 4.1 - uTime * 2.7 + s * 1.9) * 0.08 * hgt * v;
   spine -= toCam * uBack;
   vec3 w = spine + side * position.x * aShape.x * uWiden;
   gl_Position = projectionMatrix * wocCamRelView(w);
