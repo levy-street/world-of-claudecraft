@@ -41,7 +41,7 @@ import { clearThreat } from '../../threat';
 import { DT, type Entity } from '../../types';
 import { claimBoss, clearCastIf } from '../sunken_bastion/claim';
 import { callCinder, clearCinders, dropStrayHunted, stepCinders, syncHunted } from './heat_cinders';
-import { clearFist, landFist, startFist, stepSwells } from './heat_fist';
+import { clearFist, landFist, startFist, stepSwells, wakefireHoldsFist } from './heat_fist';
 import { flare, stepFlare, stepWellFire } from './heat_flare';
 import {
   HEAT_AURAS,
@@ -149,6 +149,7 @@ function freshState(difficulty: HeatDifficulty): HeatFightState {
     bar: null,
     gap: 0,
     fistTimer: T.fistFirst,
+    fistHeld: 0,
     fists: 0,
     fist: null,
     swells: [],
@@ -400,7 +401,12 @@ function startMechanics(s: HeatScope): void {
   }
   if (kit.fist) {
     st.fistTimer -= DT;
-    if (st.fistTimer <= 1e-9 && guardianFree(s)) startFist(s);
+    // Due, it waits out Wakefire (heat_fist.ts wakefireHoldsFist), and
+    // the wait comes off the next one's.
+    if (st.fistTimer <= 1e-9 && guardianFree(s)) {
+      if (wakefireHoldsFist(st, kit.zones)) st.fistHeld += DT;
+      else startFist(s);
+    }
   }
 }
 
@@ -549,6 +555,7 @@ function jumpToPhase(s: HeatScope, phase: number): string | null {
   setWell(s.ctx, s.inst, 'calm');
   enterPhase(s, phase);
   s.st.fistTimer = T.fistFirst;
+  s.st.fistHeld = 0;
   return `The Guardian of the Heat fights in phase ${phase}.`;
 }
 
@@ -629,5 +636,5 @@ export function heatReadout(ctx: SimContext, inst: InstanceSlot, pid: number): s
   const me = ctx.entities.get(pid);
   const grip = me ? (auraOf(me, HEAT_AURAS.grip)?.stacks ?? 0) : 0;
   const over = st.overflow ? `, overflow ${st.overflow.n} (${st.overflow.clock.toFixed(0)} s)` : '';
-  return `${head}; phase ${st.phase} (${st.stage}${over}), next fist in ${Math.max(0, st.fistTimer).toFixed(0)} s, seeds ${st.seeds.length}, zones ${st.zones.length}, cinders ${st.cinders.length}, Wellspawn ${st.spawn.length}, keepers ${st.keepers.length}, fed ${st.feeds}, your Cinder Grip ${grip}.`;
+  return `${head}; phase ${st.phase} (${st.stage}${over}), next fist in ${Math.max(0, st.fistTimer).toFixed(0)} s${st.fistHeld > 0 ? ' (held by Wakefire)' : ''}, seeds ${st.seeds.length}, zones ${st.zones.length}, cinders ${st.cinders.length}, Wellspawn ${st.spawn.length}, keepers ${st.keepers.length}, fed ${st.feeds}, your Cinder Grip ${grip}.`;
 }

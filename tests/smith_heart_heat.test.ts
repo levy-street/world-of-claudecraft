@@ -13,6 +13,7 @@ import { SMITH_HEART_GUARDIANS, SMITH_HEART_MOBS } from '../src/sim/content/smit
 import { HEARTH_WELL } from '../src/sim/content/smith_heart_layout';
 import {
   beyondFlare,
+  FIST_SPAN,
   HEAT_AURAS,
   HEAT_CASTS,
   HEAT_CUES,
@@ -39,6 +40,7 @@ import {
   swellLaneTemplate,
   HEAT_TUNING as T,
   WELLSPAWN_SPOTS,
+  wakefireHoldsFist,
   wellDistance,
   wellOf,
   wellTemplate,
@@ -550,6 +552,99 @@ describe('Guardian of the Heat: the overflows', () => {
     kid.pos.z = t0.pos.z;
     f.tick(ticks(1));
     expect(kid.hp).toBeGreaterThan(before + kid.maxHp * T.trailHealPct * 0.8);
+  });
+});
+
+describe('Guardian of the Heat: Basalt Fist waits out Wakefire', () => {
+  it('holds a due fist while a run lays bands, a band warns or burns, or a run is near', () => {
+    const quiet = { zoneRun: null, zones: [], zoneTimer: 30 };
+    expect(wakefireHoldsFist(quiet, true)).toBe(false);
+    expect(
+      wakefireHoldsFist({ ...quiet, zoneRun: { order: [0, 1, 2], next: 1, stepIn: 1 } }, true),
+    ).toBe(true);
+    const band = { objectId: 1, band: 0, state: 'burn' as const, remaining: 1, tick: 0 };
+    expect(wakefireHoldsFist({ ...quiet, zones: [band] }, true)).toBe(true);
+    // The next run starting before its swells are done holds it too...
+    expect(wakefireHoldsFist({ ...quiet, zoneTimer: FIST_SPAN - 0.1 }, true)).toBe(true);
+    expect(wakefireHoldsFist({ ...quiet, zoneTimer: FIST_SPAN + 0.1 }, true)).toBe(false);
+    // ...but not in a phase without Wakefire (its timer never runs there).
+    expect(wakefireHoldsFist({ ...quiet, zoneTimer: 0 }, false)).toBe(false);
+    // The swells' whole run: the bar, the delay, the lane and the wall.
+    expect(FIST_SPAN).toBeCloseTo(
+      T.fistCast + T.waveDelay + (T.laneLength + T.waveDepth) / T.waveSpeed,
+      9,
+    );
+  });
+
+  it('a due fist waits for the run to end, then comes at once', () => {
+    const f = pulled(3);
+    f.dev('/dev heart heat phase 2');
+    hold(f);
+    const st = f.state();
+    if (!st) throw new Error('no fight');
+    st.zoneTimer = 0.01;
+    st.fistTimer = 0.5;
+    let begun = -1;
+    for (let i = 0; i < ticks(20) && begun < 0; i++) {
+      f.tick(1);
+      for (const p of f.players) p.hp = p.maxHp;
+      if (f.objects(HEAT_OBJECTS.fistPrefix).length > 0) {
+        begun = i * DT;
+        // Never while a band is on the floor or the run still lays them.
+        expect(st.zones).toEqual([]);
+        expect(st.zoneRun).toBeNull();
+      }
+    }
+    // The run: three bands 2.5 s apart, each warning 4 s and burning 2.
+    const run = 2 * T.zoneStep + T.zoneWarn + T.zoneBurn;
+    expect(begun).toBeGreaterThan(run - 0.2);
+    expect(begun).toBeLessThan(run + 0.5);
+  });
+
+  it('is never starved and keeps its 22 s rhythm round the runs (phases 2 and 3, Mythic too)', () => {
+    const run = 2 * T.zoneStep + T.zoneWarn + T.zoneBurn;
+    for (const [phase, tier] of [
+      [2, ''],
+      [3, ''],
+      [2, 'mythic'],
+    ] as const) {
+      const f = pulled(3);
+      if (tier) f.dev(`/dev heart heat ${tier}`);
+      f.dev(`/dev heart heat phase ${phase}`);
+      const st = f.state();
+      if (!st) throw new Error('no fight');
+      const starts: number[] = [];
+      let had = false;
+      const seconds = 240;
+      for (let i = 0; i < ticks(seconds); i++) {
+        // Only Wakefire (and Mythic's Wheel) and the fist run.
+        st.seedTimer = 999;
+        st.flareTimer = 999;
+        st.cinderTimer = 999;
+        f.tick(1);
+        for (const p of f.players) p.hp = p.maxHp;
+        f.boss().hp = f.boss().maxHp;
+        const has = f.objects(HEAT_OBJECTS.fistPrefix).length > 0;
+        if (has && !had) {
+          starts.push(i * DT);
+          expect(st.zones).toEqual([]);
+          expect(st.zoneRun).toBeNull();
+        }
+        // No swell rolls while a band is on the floor.
+        if (st.zones.length > 0) expect(st.swells).toEqual([]);
+        had = has;
+      }
+      // The rhythm: about one every 22 s over the whole stretch (a flat
+      // 34 s, one a run, would be 7).
+      expect(starts.length).toBeGreaterThanOrEqual(Math.floor(seconds / T.fistEvery) - 1);
+      for (let k = 1; k < starts.length; k++) {
+        const gap = starts[k] - starts[k - 1];
+        // Never starved: at most its cadence, a whole run and the lookahead.
+        expect(gap).toBeLessThanOrEqual(T.fistEvery + run + FIST_SPAN + DT);
+        // Never two on top of each other.
+        expect(gap).toBeGreaterThanOrEqual(T.fistEvery / 2 - DT);
+      }
+    }
   });
 });
 

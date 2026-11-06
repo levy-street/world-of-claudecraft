@@ -14,6 +14,12 @@
 //                  strikes each player it rolls over once. The raid stands in
 //                  the gaps between the lanes (the side toward the guardian
 //                  is always clear).
+//   Held           (pass 5, the owner's call) the fist never comes while
+//                  Wakefire warns or burns, nor when its swells would still
+//                  roll as the next run begins: its due cast waits for the
+//                  run to end (at most one run and the lookahead, so it is
+//                  never starved), and the next comes that much sooner (never
+//                  under half the cadence), so the 22 s rhythm holds.
 //
 // Deterministic: the target is hashed (pickPlayers), the bearings are the
 // geometry's; the only rng draws are the damage rolls, in player order.
@@ -45,8 +51,24 @@ import {
   roll,
   spawnFightObject,
 } from './heat_scope';
-import type { HeatSwell } from './heat_state';
+import type { HeatFightState, HeatSwell } from './heat_state';
 import { heatSay } from './heat_voice';
+
+/** How long a Basalt Fist holds the floor from its cast: its bar, the
+ *  swells' delay and their roll to the lane's end and past it. */
+export const FIST_SPAN = T.fistCast + T.waveDelay + (T.laneLength + T.waveDepth) / T.waveSpeed;
+
+/** Does Wakefire hold a due Basalt Fist back? While a run is laying its
+ *  bands or any band warns or burns, and (where the phase runs Wakefire,
+ *  `zonesOn`) when the next run would begin before the fist's swells are
+ *  done, so the raid never dodges a lane and a band at once. */
+export function wakefireHoldsFist(
+  st: Pick<HeatFightState, 'zoneRun' | 'zones' | 'zoneTimer'>,
+  zonesOn: boolean,
+): boolean {
+  if (st.zoneRun || st.zones.length > 0) return true;
+  return zonesOn && st.zoneTimer < FIST_SPAN;
+}
 
 /** Where the fist comes down for a player standing at `p`: their spot,
  *  pushed out of the wellspring onto the shore. */
@@ -70,6 +92,9 @@ export function startFist(s: HeatScope, forced?: HPoint): boolean {
     aim = at(s, victim);
   }
   st.fists++;
+  // Time spent waiting out Wakefire comes off the next one's wait.
+  st.fistTimer = Math.max(T.fistEvery / 2, T.fistEvery - st.fistHeld);
+  st.fistHeld = 0;
   const spot = fistSpot(aim);
   const obj = spawnFightObject(
     s.ctx,

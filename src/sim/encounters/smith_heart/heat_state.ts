@@ -177,6 +177,10 @@ export interface HeatFightState {
   /** Breath after a bar before the next begins. */
   gap: number;
   fistTimer: number;
+  /** Seconds the due fist has waited out Wakefire (heat_fist.ts
+   *  wakefireHoldsFist): the next one comes that much sooner, so the
+   *  fight keeps its 22 s rhythm round the runs. */
+  fistHeld: number;
   fists: number;
   fist: HeatFist | null;
   swells: HeatSwell[];

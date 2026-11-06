@@ -67,7 +67,7 @@ Quench's, then the Heat's, then the Masterless Strength's, then the seal and the
 | `heat_geometry.ts` | PURE over the layout (no SimContext, for the bots and the renderer to reuse): the Hearth's floor (`inHearthFloor`, `floorReach`), the wellspring (`wellDistance`, `inWell`, `beyondFlare`), Wakefire's bands (`inBand`), the lanes and a wave's wall (`inLane`, `inWave`, `swellBearings`), the posts (`WELLSPAWN_SPOTS`, `WELLKEEPER_SPOTS`, `SHORE_POINTS`). |
 | `heat_state.ts` | Type-only: `HeatFightState` (`Entity.smithHeartHeat` on the guardian). |
 | `heat_scope.ts` | The per-tick scope: the players on the Hearth's floor and its listeners, the bar, the rolls, the fire hit, the cues, the raid warnings (`hudChrome.heatGuardian.warn.*`), the hashed picks, the adds it raises (`spawnHeatMob`). |
-| `heat_fist.ts` | Basalt Fist (its bar, spot and three lanes) and the Molten Swells rolling down them. |
+| `heat_fist.ts` | Basalt Fist (its bar, spot and three lanes) and the Molten Swells rolling down them; a due fist waits out Wakefire (`wakefireHoldsFist`, `FIST_SPAN`), the wait coming off the next one's. |
 | `heat_flare.ts` | Hearth Flare (phase 1 on everyone out of reach, then only on the guardian's own target), Flare-Scorched, the wellspring's own fire. |
 | `heat_overflow.ts` | The overflows' rivers and Falling Cinders. |
 | `heat_wellspawn.ts` | Heroic's overflow adds: the Wellspawn walking to the wellspring (slowing with their health, feeding it), the Wellkeepers' Kindling Marks and Cinder Trails. |
