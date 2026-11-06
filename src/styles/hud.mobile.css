@@ -2340,9 +2340,8 @@
      only shows while the store is live, the $WOC Exchange only when enabled),
      so its heading leaves with them rather than labelling nothing. Anchored on
      the heading, never a root. */
-  body.mobile-touch
-    #mobile-extra-grid
-    .mobile-extra-group[data-i18n='hudChrome.mobile.dailyRewards']:not(
+  body.mobile-touch #mobile-extra-grid
+    .mobile-extra-group[data-i18n="hudChrome.mobile.dailyRewards"]:not(
       :has(~ .mobile-btn:not([hidden]))
     ) {
     display: none;
