@@ -2316,9 +2316,35 @@
     grid-template-columns: repeat(4, minmax(0, 1fr));
     /* No chrome-scale here: the More tray is a TRANSIENT modal, not persistent
        chrome, so shrinking it frees no world view. Keep its pills at the 40px
-       touch floor regardless of the persistent-HUD chrome scale. */
-    grid-auto-rows: 40px;
+       touch floor regardless of the persistent-HUD chrome scale. Rows size to
+       content: the pills carry their own 40px height, and the group headings
+       (menu consolidation step 5) are short full-width rows. */
+    grid-auto-rows: auto;
     gap: 6px;
+  }
+  /* The tray is a grouped index of the game (Record, Professions, Activities,
+     Character, Store): each heading spans the row above its tiles. */
+  body.mobile-touch #mobile-extra-grid .mobile-extra-group {
+    grid-column: 1 / -1;
+    margin: 4px 2px 0;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
+  }
+  body.mobile-touch #mobile-extra-grid .mobile-extra-group:first-child {
+    margin-top: 0;
+  }
+  /* Store is the last group and both of its tiles can be hidden (the chest
+     only shows while the store is live, the $WOC Exchange only when enabled),
+     so its heading leaves with them rather than labelling nothing. Anchored on
+     the heading, never a root. */
+  body.mobile-touch #mobile-extra-grid
+    .mobile-extra-group[data-i18n="hudChrome.mobile.dailyRewards"]:not(
+      :has(~ .mobile-btn:not([hidden]))
+    ) {
+    display: none;
   }
   body.mobile-touch #mobile-extra-controls .mobile-btn {
     width: 100%;
@@ -4543,23 +4569,6 @@
   body.mobile-touch #daily-rewards-window {
     z-index: 95;
   }
-  /* Keep Daily Rewards in one vertical flow on touch. The rewards-only window
-     is width-capped for readability, while its body scrolls vertically and
-     suppresses horizontal overflow so no content is stranded off-screen. */
-  body.mobile-touch #daily-rewards-window:not(.store-active) {
-    width: min(560px, calc(var(--app-vw) / var(--ui-scale, 1) - 20px));
-  }
-  body.mobile-touch #daily-rewards-window:not(.store-active) .dr-body {
-    columns: initial;
-    overflow-x: hidden;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-  }
-  /* The spin overlay is appended directly to body. Keep it above the raised
-    mobile #ui window layer and the mobile window backdrop. */
-  body.mobile-touch .dr-spin-overlay {
-    z-index: 101;
-  }
   body.mobile-touch #daily-rewards-window {
     max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);
     overflow: hidden;
@@ -4568,27 +4577,7 @@
     max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 116px);
     padding: 10px;
   }
-  body.mobile-touch .dr-spin-stage {
-    width: min(360px, calc(var(--app-vw, 100vw) - 24px), calc(var(--app-vh, 100dvh) - 24px));
-  }
-  body.mobile-touch .dr-spin-wheel-big {
-    width: 300px;
-    max-width: 84%;
-  }
-  body.mobile-touch .dr-spin-wheel-big span {
-    transform: rotate(calc(var(--i) * 45deg + 22.5deg)) translateY(-106px)
-      rotate(calc(var(--i) * -45deg - 22.5deg));
-  }
-  body.mobile-touch .dr-spin-result {
-    width: 120px;
-    height: 120px;
-    font-size: 18px;
-  }
-  body.mobile-touch .dr-spin-pointer {
-    border-left-width: 13px;
-    border-right-width: 13px;
-    border-top-width: 24px;
-  }
+
   /* Mobile touch store */
   body.mobile-touch .woc-store-tabs button {
     min-width: 112px;
@@ -4806,7 +4795,6 @@
   body.mobile-touch #commission-board-window,
   body.mobile-touch #market-window,
   body.mobile-touch #quest-dialog,
-  body.mobile-touch #calendar-window,
   body.mobile-touch #weekly-quests-window,
   body.mobile-touch #guild-hall-window,
   body.mobile-touch #crafting-window,
@@ -5316,6 +5304,16 @@
     max-height: calc(var(--app-vh) * 0.34 / var(--ui-scale, 1));
     overflow-y: auto;
   }
+  /* A window-hub strip scrolls sideways on a phone rather than wrapping, and
+     each tab keeps the 40px touch floor. */
+  body.mobile-touch .window-hub-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+  body.mobile-touch .window-hub-tab {
+    min-height: 40px;
+    white-space: nowrap;
+  }
   body.mobile-touch .crafting-tabs {
     flex-wrap: nowrap;
     overflow-x: auto;
@@ -5553,7 +5551,7 @@
      height: min(640px, ...) clamp (components.css) here too, not only in the
      docked pairing below: the mobile sheet owns its height on every arm, so
      the desktop clamp can never mis-size the sheet against the viewport (the
-     mailbox/calendar tall-list rule below makes the same move). */
+     mailbox tall-list rule below makes the same move). */
   body.mobile-touch #market-window {
     height: auto;
     max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);
@@ -5621,16 +5619,15 @@
     min-height: 40px;
     min-width: 40px;
   }
-  /* Phase 5: the tall list windows (mailbox, calendar) are flex columns with an
-     inner scroll body (#mailbox-body, .cal-day-pane) and overflow:hidden on the
+  /* Phase 5: the tall list window (mailbox) is a flex column with an
+     inner scroll body (#mailbox-body) and overflow:hidden on the
      shell. Edge-pinned they take the full available height (the #bags
      template) so the inner body keeps a usable, touch-scrollable height under the
      header instead of the sheet's overflow-y:auto fighting the inner flex scroll.
      #market-window used to follow this same inner-scroll shape, but PR #2107
      switched it to scroll the whole sheet instead (see body.mobile-touch
      #market-window below), so it is no longer this pattern's example. */
-  body.mobile-touch #mailbox-window,
-  body.mobile-touch #calendar-window {
+  body.mobile-touch #mailbox-window {
     height: auto;
     max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);
     overflow: hidden;
@@ -6462,18 +6459,6 @@
   body.mobile-touch #char-window .char-sidebar-tab {
     min-height: 40px;
   }
-  @media (max-width: 720px) {
-    body.mobile-touch #char-window .char-skills,
-    body.mobile-touch #char-window .char-skill-list {
-      grid-template-columns: minmax(0, 1fr);
-    }
-    body.mobile-touch #char-window .char-skill-name {
-      font-size: 16px;
-    }
-    body.mobile-touch #char-window .char-open-professions {
-      justify-self: stretch;
-    }
-  }
   @media (orientation: landscape) {
     body.mobile-touch #char-window {
       padding-left: calc(var(--window-pad) + env(safe-area-inset-left));
@@ -6684,6 +6669,8 @@
   body.mobile-touch #spellbook,
   body.mobile-touch #bar-editor,
   body.mobile-touch #loot-explorer-window,
+  body.mobile-touch #reputation-window,
+  body.mobile-touch #world-quests-window,
   body.mobile-touch #options-menu,
   body.mobile-touch #options-menu.kb-wide,
   body.mobile-touch #options-menu.gfx-wide,
@@ -6705,7 +6692,9 @@
   body.mobile-touch #vendor-window,
   body.mobile-touch #warfare-window,
   body.mobile-touch #quest-dialog,
-  body.mobile-touch #loot-explorer-window {
+  body.mobile-touch #loot-explorer-window,
+  body.mobile-touch #reputation-window,
+  body.mobile-touch #world-quests-window {
     width: clamp(320px, 76vw, 680px);
     max-width: calc(100vw - 20px);
   }
@@ -6752,8 +6741,11 @@
     );
   }
   /* Loot Explorer scrolls as one unit (toolbar included), the train/unbind
-     shape: it has no split-screen pairing to keep visible underneath. */
-  body.mobile-touch #loot-explorer-window {
+     shape: it has no split-screen pairing to keep visible underneath. The
+     Reputation window takes the same clamp. */
+  body.mobile-touch #loot-explorer-window,
+  body.mobile-touch #reputation-window,
+  body.mobile-touch #world-quests-window {
     max-height: calc(
       var(--app-vh) /
       var(--window-scale, 1) -
@@ -6934,7 +6926,9 @@
     overflow: hidden;
     z-index: 95;
   }
-  body.mobile-touch.weekly-vault-open #bank-window {
+  body.mobile-touch #weekly-vault-window {
+    position: fixed;
+    z-index: 95;
     left: calc(max(10px, env(safe-area-inset-left)) / var(--window-scale, 1));
     right: calc(max(10px, env(safe-area-inset-right)) / var(--window-scale, 1));
     top: calc(max(10px, env(safe-area-inset-top)) / var(--window-scale, 1));
@@ -6943,13 +6937,13 @@
     height: auto;
     transform: none;
   }
-  body.mobile-touch.weekly-vault-open .weekly-rewards {
+  body.mobile-touch #weekly-vault-window .weekly-rewards {
     padding: 10px;
   }
-  body.mobile-touch.weekly-vault-open .weekly-rewards h2 {
+  body.mobile-touch #weekly-vault-window .weekly-rewards h2 {
     font-size: 20px;
   }
-  body.mobile-touch.weekly-vault-open .weekly-reset {
+  body.mobile-touch #weekly-vault-window .weekly-reset {
     padding: 8px 12px;
   }
   /* The paired-geometry box the bank AND market clusters share on touch (the
@@ -7344,7 +7338,8 @@
      --ui-scale, and under-fills below uiScale 1). The entry list
      (.deeds-scroll) is the internal scroll container; the title bar, summary,
      category chips, and filter bar stay pinned chrome. */
-  body.mobile-touch #deeds-window {
+  body.mobile-touch #deeds-window,
+  body.mobile-touch #titles-window {
     position: fixed;
     left: max(10px, env(safe-area-inset-left));
     right: max(10px, env(safe-area-inset-right));
@@ -7378,7 +7373,9 @@
     min-height: 0;
   }
   body.mobile-touch #deeds-window .deeds-titles,
-  body.mobile-touch #deeds-window .deeds-borders {
+  body.mobile-touch #deeds-window .deeds-borders,
+  body.mobile-touch #titles-window .deeds-titles,
+  body.mobile-touch #titles-window .deeds-borders {
     /* Preserve five CSS pixels of air beyond the selected row's focus ring
        at the landscape-phone DPR instead of merging adjacent metal or
        clipping the ring against either scroll shelf edge. */
@@ -8389,6 +8386,46 @@
     font-size: 16px;
     white-space: nowrap;
   }
+  /* The full-screen Settings view on touch (components.css owns the desktop
+     geometry, whose !important inset already fills the sheet here). Landscape
+     keeps the rail at the inline start, narrower, inside the safe areas;
+     portrait turns it into a horizontally scrolling strip under the head so
+     the category body keeps the full width. Every rail button keeps the 40px
+     touch floor and the 16px font from the #options-menu .btn rule above. */
+  body.mobile-touch #ui > #options-menu.options-settings {
+    --opt-rail-w: calc(168px + env(safe-area-inset-left));
+    /* max(): a phone with no insets keeps the sheet's own padding. */
+    padding-top: max(var(--window-pad, 12px), env(safe-area-inset-top));
+    padding-bottom: max(var(--window-pad, 12px), env(safe-area-inset-bottom));
+    padding-inline-end: max(var(--window-pad, 12px), env(safe-area-inset-right));
+  }
+  body.mobile-touch #options-menu.options-settings > .opt-rail {
+    padding-inline-start: calc(var(--window-pad, 12px) + env(safe-area-inset-left));
+  }
+  @media (orientation: portrait) {
+    body.mobile-touch #ui > #options-menu.options-settings {
+      padding-inline-start: 0;
+    }
+    body.mobile-touch #options-menu.options-settings > .opt-rail {
+      position: static;
+      flex: 0 0 auto;
+      flex-direction: row;
+      width: auto;
+      padding: var(--spacing-xs) var(--window-pad, 12px);
+      overflow-x: auto;
+      overflow-y: hidden;
+      overscroll-behavior-x: contain;
+      border-inline-end: 0;
+      border-block-end: 1px solid var(--gold-dim);
+    }
+    body.mobile-touch #options-menu.options-settings .opt-rail-title {
+      display: none;
+    }
+    body.mobile-touch #options-menu .opt-rail-btn.ui-btn {
+      width: auto;
+      white-space: nowrap;
+    }
+  }
   body.mobile-touch #report-window {
     left: 10px !important;
     right: 10px !important;
@@ -8528,10 +8565,13 @@
     min-height: 40px;
     box-sizing: border-box;
   }
-  /* Calendar: the month prev/next nav, the per-event delete, and the add-event button. */
-  body.mobile-touch #calendar-window .cal-nav-btn,
-  body.mobile-touch #calendar-window .cal-event-del,
-  body.mobile-touch #calendar-window .cal-add-btn {
+  /* The Social window's Discord strip button keeps the touch floor. */
+  body.mobile-touch #social-window .soc-discord-open {
+    min-height: 40px;
+  }
+  /* Guild events (Social Guild tab): the per-event delete and the add-event button. */
+  body.mobile-touch #social-window .cal-event-del,
+  body.mobile-touch #social-window .cal-add-btn {
     min-width: 40px;
     min-height: 40px;
     box-sizing: border-box;
@@ -9246,9 +9286,9 @@
       /* 4 columns in landscape too (issue 1577 round 2 (4)), matching the base
          tier so each More-tray pill stays narrow on a wide landscape phone.
          No chrome-scale on the rows (see the base-tier rule): transient modal,
-         always held at the 40px floor. */
+         the pills hold their own 40px height and the group headings size to content. */
       grid-template-columns: repeat(4, minmax(0, 1fr));
-      grid-auto-rows: 40px;
+      grid-auto-rows: auto;
       gap: 5px;
     }
     /* The base square map can dip into the fixed Jump/Interact/combat row on a

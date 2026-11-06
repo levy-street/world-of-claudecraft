@@ -370,33 +370,6 @@ describe('DailyRewardsWindow store refresh behavior', () => {
     return { root, window, internals, resolveStatus, paint };
   }
 
-  it('cannot let a stale Rewards request repaint the shared body after selecting Store', async () => {
-    const h = pendingRewardsHarness();
-    const pending = h.window.render();
-
-    h.window.openStore();
-    h.resolveStatus(rewardStatus());
-    await pending;
-
-    expect(h.internals.tab).toBe('store');
-    expect(h.paint).not.toHaveBeenCalled();
-  });
-
-  it('cannot let a stale Rewards request repaint after Store close and rapid reopen', async () => {
-    const h = pendingRewardsHarness();
-    const pending = h.window.render();
-
-    h.window.close();
-    h.window.openStore();
-    h.resolveStatus(rewardStatus());
-    await pending;
-
-    expect(h.root.style.display).toBe('block');
-    expect(h.internals.tab).toBe('store');
-    expect(h.paint).not.toHaveBeenCalled();
-    h.window.close();
-  });
-
   it('lets only the newest snapshot write state or clear its loading indicator', async () => {
     type Snapshot = { available: boolean; balance: number | null; items: WocStoreItemInput[] };
     let resolveFirst!: (snapshot: Snapshot) => void;
@@ -576,45 +549,6 @@ describe('DailyRewardsWindow store refresh behavior', () => {
 
     expect(writes).toBe(2);
     expect(html).toContain('1,250');
-  });
-
-  it('restores unchanged store markup after the rewards tab occupied the shared body', () => {
-    let writes = 0;
-    const body = {
-      dataset: {},
-      innerHTML: '',
-      querySelector: () => null,
-      querySelectorAll: () => [],
-    };
-    Object.defineProperty(body, 'innerHTML', {
-      get: () => '',
-      set: () => {
-        writes += 1;
-      },
-    });
-    const window = new DailyRewardsWindow({
-      root: () => rootStub(body),
-      world: worldStub,
-      closeOthers: () => undefined,
-      captureFocus: () => null,
-      restoreFocus: () => undefined,
-    });
-    Object.assign(window as unknown as Record<string, unknown>, {
-      storeBalance: 750,
-      armorySections: [],
-    });
-
-    const paintStore = (
-      window as unknown as { paintStore(body: HTMLElement): void }
-    ).paintStore.bind(window);
-    const paintRewards = (
-      window as unknown as { paint(view: { kind: 'error'; message: string }): void }
-    ).paint.bind(window);
-    paintStore(body as unknown as HTMLElement);
-    paintRewards({ kind: 'error', message: 'unavailable' });
-    paintStore(body as unknown as HTMLElement);
-
-    expect(writes).toBe(3);
   });
 
   it('reads subscription status on Memberships entry but never on background polls', async () => {

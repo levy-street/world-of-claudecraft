@@ -544,6 +544,10 @@ export const cs_CZ: EnTranslations = {
         "one": "Otevřené skupiny: {count} upozornění",
         "other": "Otevřené skupiny: {count} upozornění"
       },
+      "activitiesBellCount": {
+        "one": "Open Activities: {count} notification",
+        "other": "Open Activities: {count} notifications"
+      },
       "alerts": "Upozornění",
       "groups": "Skupiny",
       "rewards": "Odměny",
@@ -1839,6 +1843,7 @@ export const cs_CZ: EnTranslations = {
       "chat": "Přeskočit na chat"
     },
     "mobile": {
+      "groupRecord": "Record",
       "jump": "Skok",
       "leaderboard": "Žebříčky",
       "dailyRewards": "Obchod",
@@ -2744,6 +2749,10 @@ export const cs_CZ: EnTranslations = {
       "clickMoveRight": "Pravé kliknutí",
       "version": "v{version} ({build})",
       "overlays": "Překryvy",
+      "settings": "Settings",
+      "settingsCategories": "Settings categories",
+      "helpWiki": "Help and Wiki",
+      "nameplates": "Nameplates",
       "browserEffects": "Efekty prohlížeče",
       "browserEffectsAuto": "Automaticky",
       "browserEffectsFull": "Plné",
@@ -3606,6 +3615,7 @@ export const cs_CZ: EnTranslations = {
       }
     },
     "currencies": {
+      "walletChipAria": "{name}: {amount}",
       "intro": "Žádná z nich nezabírá místo v brašně. Mince zůstávají v brašně jako obvykle.",
       "activities": "Aktivity",
       "factions": "Frakce",
@@ -3704,6 +3714,8 @@ export const cs_CZ: EnTranslations = {
       "tierReachedLine": "Nyní jsi {tier} u frakce {faction}. Tvůj frakční titul je nyní {title}."
     },
     "questLog": {
+      "available": "Available",
+      "offerMeta": "{zone} · {level}",
       "completed": "Dokončeno",
       "zoneSummary": "{count} ({ready} připraveno)",
       "shiftHint": "Kliknutím se stisknutou klávesou Shift na úkol jej propojíte v chatu."
@@ -6032,6 +6044,12 @@ export const cs_CZ: EnTranslations = {
         "none": "Nikdo",
         "title": "Kdo tě vidí jako online v seznamech přátel a v seznamu cechu, tvoji zónu a pozici na mapě. Tvá skupina tě vždy vidí."
       },
+      "guildEvents": {
+        "heading": "Guild events",
+        "dateLabel": "Date",
+        "when": "{date}, {time}",
+        "discordVoice": "In {channel} ({count})"
+      },
       "billboard": {
         "label": "Cechovní nástěnka",
         "empty": "Na nástěnce zatím nic není.",
@@ -6354,6 +6372,31 @@ export const cs_CZ: EnTranslations = {
       "armorKitUse": "Použití: Posílí tvou hrudní zbroj, zvýší obranu o 12 na 1 hodinu.",
       "sharpeningStoneUse": "Použití: Nabrousí tvou zbraň v hlavní ruce, zvyšuje útočnou moc o 6 na 30 minut.",
       "manaElixirUse": "Použití: Zvyšuje duch o 6 na 1 hodinu."
+    },
+    "professionsHub": {
+      "tabOverview": "Overview"
+    },
+    "activities": {
+      "title": "Activities",
+      "close": "Close Activities",
+      "tabDungeons": "Dungeons and Raids",
+      "tabPvp": "PvP"
+    },
+    "rewards": {
+      "title": "Rewards",
+      "close": "Close Rewards",
+      "tabVault": "Vault",
+      "tabWeekly": "Weekly Quest",
+      "tabWorldQuests": "World Quests",
+      "weeklyPickAt": "Choose your quest with the emissary in {zone}."
+    },
+    "bookOfRealm": {
+      "title": "Book of the Realm",
+      "close": "Close the Book of the Realm",
+      "tabDeeds": "Deeds",
+      "tabTitles": "Titles",
+      "tabReputation": "Reputation",
+      "tabRankings": "Rankings"
     },
     "professions": {
       "title": "Profese",
@@ -7591,6 +7634,7 @@ export const cs_CZ: EnTranslations = {
       "distance": "{distance} yardů",
       "showRoute": "Zobrazit trasu",
       "untrack": "Untrack",
+      "openQuestLog": "Open Quest Log",
       "track": "Dráha",
       "worldQuests": {
         "heading": "Dnešní světové úkoly",
@@ -9687,31 +9731,45 @@ export const cs_CZ: EnTranslations = {
       "chatBody": "Vlevo dole. Stisknutím Enter začneš psát a dalším Enter odešleš.\n\nDvě záložky jsou tu vždy: Chat, souhrnný záznam všeho, co se řekne kolem tebe, a Bojový záznam, písemný záznam tvého souboje. Tlačítko plus přidává další, jednu na kanál: Říct, Křik, Skupina, Obecné, Svět, Hledání skupiny, Cech a Důstojník, a k tomu záložku Šepot, která na jednom místě shromažďuje každý šepot, který pošleš i přijmeš. Psaní v záložce kanálu odešle zprávu do tohoto kanálu, aniž bys musel znovu psát příkaz.\n\nCelé okno lze přetáhnout jinam a změnit mu velikost, a pamatuje si, kde jsi ho nechal.",
       "keyWindowsTitle": "Okna, která otevíráš klávesou",
       "keyWindowsBody": "Každé z nich má výchozí klávesu a tlačítko v liště v pravém dolním rohu. Stiskni klávesu znovu, nebo Esc, a okno se zavře.",
+      "keyWindowsBodyHubs": "Each of these has a default key, and most also have a button in the rail in the bottom right corner. Several are tabbed windows that gather related panels together, and a key can open one straight onto its tab. Press the key again, or Esc, to close it.",
       "winCharTitle": "Panel postavy (C)",
       "winCharBody": "Na jedné straně tvá nasazená výbava, na druhé tvé atributy a statistiky, které živí, s popiskem u každé hodnoty, který říká, co dělá pro tvou třídu. Nese také tvůj celoživotní odehraný čas, s malým okem vedle něj, které číslo skryje, kdybys ho raději nezobrazoval, a tlačítko, které sestaví tvou kartu hráče.",
+      "winCharBodyTwoTabs": "Two tabs, Character and Progression. Character shows your equipped gear on one side, your attributes and the stats they feed on the other, with a tooltip on every value that says what it does for your class. The sheet also carries your lifetime Time Played, with a small eye beside it that hides the number when you would rather not show it, and its footer holds the Cosmetics button and the button that composes your player card. On desktop, C opens your bags docked beside the sheet, so gear can be dragged straight onto your character.",
       "winBagsTitle": "Batohy (B)",
       "winBagsBody": "Všechno, co u sebe nosíš, v jednom vaku se čtyřmi sloty na batohy. Kategorie napříč horní částí ho zúží na Zbraně, Brnění, Spotřební, Materiály, Nástroje, Úkolové nebo Jezdecká zvířata, a vyhledávací pole filtruje podle jména. Rozbalovací nabídka řazení přeuspořádá to, na co se díváš, podle Nedávných, Kvality nebo Názvu, a tuto volbu si hra pamatuje mezi relacemi. Samostatné tlačítko Řadit jedním stiskem srovná skutečné buňky vaku, vymaže kategorie i hledání, takže vidíš celý srovnaný batoh.",
+      "winBagsBodyWallet": "Everything you are carrying, in one pack with four bag sockets. Category chips across the top narrow it to weapons, armor, consumables, materials, tools, quest items, or mounts, and a search box filters by name. A sort dropdown reorders what you are looking at by most recent, quality, or name, and that choice is remembered between sessions. A separate Sort button tidies the real cells of the pack in one press, clearing the chips and the search so you see the whole tidied bag. Under the grid, a wallet strip shows the other currencies you hold, Honor and the marks you earn among them, each as a small chip with its count.",
       "winSpellbookTitle": "Kniha kouzel (P)",
       "winSpellbookBody": "Každá schopnost tvé třídy, naučená i teprve čekající, v pořadí. Právě odsud přetahuješ schopnosti na své akční lišty.",
       "winTalentsTitle": "Talenty (N)",
       "winTalentsBody": "Tady volíš svou specializaci a procházíš svých šest talentových řad, tři možnosti, které každá nabízí, a to, co dělá každá z nich. Řady, na které jsi ještě nedosáhl(a), se zobrazují vedle těch, ze kterých už si můžeš vybírat.",
       "winProfessionsTitle": "Profese (Shift+P)",
       "winProfessionsBody": "Co ses naučil, jak jsi v čem zručný, a jak daleko se to ještě dá dotáhnout.",
+      "winProfessionsBodyHub": "One tabbed window for your trades. Overview shows what you have learned, how skilled you are at each, and how far each one can still go; Crafting, Perfecting, and the Harvest Journal sit beside it as tabs of the same window.",
       "winCraftingTitle": "Výroba (T)",
       "winCraftingBody": "Tvé recepty, co každý z nich potřebuje, a co dokážeš vyrobit hned teď z toho, co u sebe máš.",
+      "winCraftingBodyTab": "The Crafting tab of the Professions window, which T opens directly: your recipes, what each one needs, and what you can make right now with what you are carrying.",
       "winQuestLogTitle": "Deník úkolů (L)",
       "winQuestLogBody": "Každý úkol, který jsi přijal, jeho příběh, cíle a tvůj postup, s možností zobrazit cokoli z toho na mapě a vybrat, které úkoly tvůj tracker sleduje.",
+      "winQuestLogBodyAvailable": "Every quest you have taken, its story, its objectives, and your progress, with a way to show any of it on the map and to pick which quests your tracker follows. An Available group lists the quests on offer near you, each with a way to show its quest giver on the map.",
       "winDeedsTitle": "Kniha skutků (Shift+Z)",
       "winDeedsBody": "Záznam toho, co jsi dokázal, tituly a Věhlas, které ti to vyneslo, a to, co ještě zbývá.",
+      "winRealmTitle": "Book of the Realm (Shift+Z)",
+      "winRealmBody": "Your permanent record, in one tabbed window. Deeds holds what you have done, the Renown it has paid you, and what is still open; Titles is where you pick the title you wear and the border that frames your nameplate; and The Reliquary, Reputation, the Loot Explorer, and Rankings, the realm standings, each have a tab of their own.",
+      "winRewardsTitle": "Rewards",
+      "winRewardsBody": "What you can claim, in one tabbed window behind the Rewards button in the rail, which shows a count when something is waiting. Vault is the Weekly Vault, whose rolls open at the Vault keeper; Weekly Quest shows the emissary's four offers, though you choose one by speaking to the emissary; and World Quests is today's board, with a way to show each quest on the map and the one replacement you get each day.",
       "winSocialTitle": "Přátelé a cech (O)",
       "winSocialBody": "Záložky pro tvé přátele, tvůj cech a jeho seznam členů, tvůj raid a hráče, které jsi ignoroval nebo zablokoval.",
+      "winSocialBodyEvents": "Tabs for your friends, your guild and its roster, your raid, and the players you have ignored or blocked. The Guild tab also keeps an Events list: officers and the Guild Master book dated events there, and every member sees them. A Discord strip at the foot of the window opens the Discord panel.",
       "winFinderTitle": "Hledač dungeonů (Shift+I)",
       "winFinderBody": "Katalog skupinového obsahu, do kterého se můžeš zařadit do fronty. Zaškrtni aktivity, které chceš, přidej se do fronty sám nebo vyvěs nabídku pro vlastní skupinu, a přijmi, jakmile se skupina sejde.",
+      "winActivitiesTitle": "Activities (Shift+I)",
+      "winActivitiesBody": "Group content in one tabbed window, also opened by the Groups bell in the rail. Dungeons and Raids is the Dungeon Finder: tick the activities you want, join a queue on your own or post a listing for your own group, and accept when a group comes together. PvP, which G opens directly, holds the arenas and Thornhollow Fields, and Card Duel is where you queue for and play the Card Master's game.",
       "winMetersTitle": "Měřiče poškození (Shift+H)",
       "winMetersBody": "Poškození, léčení a hrozba pro tebe i každého s tebou, uchovávané v úsecích, takže se můžeš podívat i na předposlední souboj. Panely léčení a hrozby lze vytáhnout ven, aby stály samostatně.",
       "winMoreTitle": "A pár dalších",
       "winMoreBody": "Mapa světa (M), okno PvP (G), Pohár údolí (Y), žebříček (K), kalendář událostí (I) a kruh emotů (X) fungují všechny stejně. Žebříček stojí při první návštěvě za chvilku pozornosti: drží záložku pro hráče, jednu pro cechy, jednu, která řadí celé účty podle Věhlasu z Knihy skutků, a jednu pro denní žebříček.\n\nKlikni pravým tlačítkem na jiného hráče, na jeho jmenovku nebo na jeho jméno v chatu, a Informace o hráči na něj otevřou kartu: výbavu, kterou nosí, s popisky, a veřejné detaily jeho postavy. Je to jen pohled, nic víc, a vyžaduje, aby byl dost blízko na to, aby ho bylo vidět.",
       "winMoreBodyNoValeCup": "Mapa světa (M), okno PvP (G), žebříček (K) a kalendář událostí (I) fungují stejně. Výjimkou je kolo emocí (X): podrž klávesu, kolo se objeví, a pusť ji nad emocí, kterou chceš přehrát. Na žebříček stojí za to se při první návštěvě podívat: má kartu hráčů, cechů, celých účtů seřazených podle Renomé z Knihy skutků, denních pořadí a kartu Vývojáři pro lidi, kteří hru stavějí, pokud nevypneš Zobrazovat odznaky vývojářů.\n\nZaměř jiného hráče a klikni pravým tlačítkem na jeho rámeček cíle, na dotyku dvojklepni nebo ho dlouze podrž, případně klikni pravým na jeho jméno v chatu. Informace o hráči otevřou kartu s jeho výbavou a tooltipy i veřejnými údaji postavy. Je to jen pohled. K prohlédnutí výbavy musí být hráč dost blízko. Vyhledáš-li jméno z chatu, když je daleko, dostaneš jen veřejnou polovinu karty: portrét, jméno, úroveň, třídu a cech.",
+      "winMoreBodyRankings": "The world map (M) works the same way. The emote wheel (X) is the exception: hold its key and the wheel appears, then let go over an emote to play it. The Rankings tab of the Book of the Realm is worth a moment on your first visit: it keeps a board for players, one for guilds, one that ranks whole accounts by Renown from their deeds, one for the daily standings, one for World Quests, and a Developers tab for the people who build the game, there unless you switch Show Developer Badges off.\n\nTarget another player and right-click the target frame (on touch, double-tap or long-press it), or right-click their name in chat, and Player Info opens a card on them: the gear they are wearing, with tooltips, and the public details of their character. It is a look, nothing more. The gear needs them close enough to see: look a name up from chat while they are far away and you get the public half of the card instead, their portrait, name, level, class, and guild.",
       "worldWindowsTitle": "Okna, která ti otevírá svět",
       "worldWindowsBody": "Některá okna nikdy neotevřeš klávesou: otevřou se, když promluvíš se správnou osobou nebo na něco správného klikneš.\n\nObchodník otevře okno obchodníka, se svými zásobami k nákupu a záložkou Zpětný odkup, která drží to, co jsi naposledy prodal(a), pro případ, žes to prodal(a) omylem. U zásob je řada tlačítek na množství, takže stack reagentů koupíš jedním stiskem po pěti nebo deseti místo deseti stisků, a když ani jedno nesedí, je tu i vlastní množství. Trenér tvé třídy otevře seznam toho, co se můžeš naučit teď a co tě ještě čeká.\n\nBankéř otevře tvůj trezor, truhlici s dalšími sloty, které si můžeš dokoupit. Pokud tvůj cech otevřel banku, druhá záložka ji tam ukáže: kdokoli z členů se může podívat dovnitř, i bez oprávnění cokoli vybrat, takže se nikdo nemusí ptát, co cech drží, hodnosti rozhodují, kdo smí vkládat, vybírat a přesouvat cechovní peníze, a deník zaznamenává každý pohyb.\n\nSchránka Havraní pošty otevře tvé dopisy, s tím, co dorazilo na jedné záložce a formulářem pro odesílání na druhé, včetně příloh. Světový trh u Kupce má vlastní okno: procházej a nakupuj na jedné záložce, vystavuj vlastní zboží na druhé a vybírej, co se prodalo, na třetí. Obchodování tváří v tvář s jiným hráčem otevře obchodní okno s jednou stranou pro každého.",
       "worldWindowsBodyStationMaster": "Některá okna nikdy neotevřeš klávesou: objeví se, když promluvíš se správnou osobou nebo klikneš na správnou věc.\n\nObchodník otevře okno prodejce se zbožím a seznamem zpětného odkupu dole ve stejném panelu, který obsahuje věci naposledy prodané omylem. Řada tlačítek množství dovolí vzít ze zásoby reagencií pět nebo deset kusů jedním stiskem místo deseti stisků a vlastní množství je k dispozici, když se nehodí ani jedno. Schopnosti třídy trenéra nepotřebují, přicházejí s úrovněmi; zdejší trenéři jsou místní mistři řemeslných stanic. Trénink u některého z nich otevře recepty, které můžeš naučit teď, které už znáš a které stále zamyká vyšší dovednost.\n\nBankéř otevře banku s osobní kartou pro schránku dodatečných slotů, které lze dokupovat, a kartou Trezor pro řemeslné materiály podle druhu. Má-li cech banku, zobrazí se karta Cech: každý člen může nahlédnout i bez práva cokoli vybrat, hodnosti určují, kdo smí vkládat, vybírat a přesouvat cechovní mince, a protokol zaznamená každý pohyb.\n\nSchránka Havraní pošty otevře dopisy, na jedné kartě přijaté a na jiné formulář pro odeslání včetně příloh. Světový trh u Obchodníka v Eastbrooku nebo dražitele Vosse v Highwatchi má vlastní okno: na jedné kartě procházet a nakupovat, na druhé vystavit vlastní zboží a na třetí vyzvednout prodeje. Obchod tváří v tvář s hráčem otevře okno výměny s jednou stranou pro každého hráče.",
@@ -9721,11 +9779,16 @@ export const cs_CZ: EnTranslations = {
       "playerCardBody": "Tlačítko na tvém panelu postavy sestaví kartu hráče: obrázek s detailním záběrem tvé postavy, výbavou, kterou máš na sobě, a tvými statistikami, připravený k uložení nebo sdílení. Je to snímek na pochlubení se novou sadou a ve hře nic nemění.",
       "wikiTitle": "Tlačítko wiki",
       "wikiBody": "Tahle wiki je ve hře na jedno kliknutí. Tlačítko na ni sedí s ostatními v liště v pravém dolním rohu, má svůj řádek v herním menu na Esc, a na telefonu žije v přihrádce Více. Protože tě otevření předá tvému prohlížeči, tlačítko si vždy nejdřív vyžádá potvrzení, takže tě náhodné klepnutí uprostřed boje z něj nikdy nemůže vytáhnout. Hra za ní běží dál.",
+      "wikiBodyGameMenu": "This wiki is one click away in game. Its button sits in the Game Menu, which Esc opens on desktop and the Quick Actions control opens on touch. Because opening it hands you over to your browser, the button always asks you to confirm first, so an accidental tap in a fight can never pull you out of one. The game keeps running behind it.",
       "mobileTitle": "Na telefonu nebo tabletu",
       "mobileBody": "Dotykové ovládání se objeví samo od sebe a rozvržení se přizpůsobí tvé obrazovce: kompaktní uspořádání na malém telefonu, standardní na větším telefonu a prostornější na tabletu.\n\nTvé schopnosti sedí v kruhu místo v číselné řadě: tlačítko útoku s pěti akčními tlačítky vedle sebe a přepínač stránek, který kruh prochází zbytkem tvých slotů, až sedm stránek, jakmile máš zapnuté všechny tři akční lišty. Kolem nich sedí tlačítka, po kterých dotykový hráč sahá nejčastěji: přepnutí cíle, použití toho, co je před tebou, a skok, plus vysouvací řada tvých spotřebních předmětů, která se sama plní tím, co u sebe nosíš.\n\nPodél spodního okraje jsou Chat, Sociální, Úkoly, Nastavení a Více. Více otevře přihrádku se zbytkem tvých oken, včetně tvé postavy, Hledače dungeonů, PvP, Poháru údolí, emotů a wiki. Okna tu vyplňují celou obrazovku, místo aby se nad ní vznášela.\n\nPřesouvání tvých rámů jednotek je desktopová záležitost: na dotyku ti rozvržení umístí rámy samo.",
       "mobileBodyTwoPages": "Dotykové ovládání se objeví samo a rozložení se přizpůsobí obrazovce: kompaktní na malém telefonu, standardní na větším telefonu a prostornější na tabletu.\n\nSchopnosti máš v kruhu místo řady čísel: tlačítko útoku se čtyřmi akčními tlačítky vedle a přepínač stránky, který kruh přepíná mezi jeho {pages} stránkami, dohromady dosahujícími všech {slots} slotů schopností, ať jsou další desktopové lišty zapnuté, nebo ne. Pátá pozice oblouku kruhu je pro spotřební předměty: klepni na ni pro použití, podrž ji nebo táhni dovnitř a otevřeš řadu, která se sama naplní z toho, co neseš. Kolem kruhu jsou tlačítka, po kterých dotykový hráč sahá nejčastěji: změna cíle, použití věci před tebou a skok.\n\nDole místo řady tlačítek sedí jedno tlačítko Rychlých akcí. Otevře vše ostatní: jízdní zvíře, chat, mapu, brašny, společenské funkce, úkoly, postavu, knihu kouzel, herní nabídku a položku Další s ostatními okny, mezi nimi Dungeon Finder, PvP, emoce a wiki. Okna zde vyplní obrazovku místo plavání nad ní.\n\nPřesouvání rámečků jednotek patří desktopu: na dotyku je rozložení umístí za tebe.",
       "railTitle": "Lišta tlačítek",
-      "railBody": "Dole v pravém dolním rohu obrazovky, daleko od minimapy, sedí lišta malých čtvercových tlačítek, jedno na okno, uspořádaných do dvou krátkých sloupců vedle sebe. Většina z nich nese potištěnou svou výchozí klávesu.\n\nPrvní sloupec pokrývá tvou postavu, knihu kouzel, talenty, deník úkolů, Knihu skutků, profese, mapu světa, batohy a výrobu. Druhý začíná Obchodem WOC a pokračuje přes PvP, Hledače dungeonů, Pohár údolí, Karetní souboj, žebříček, emoty, hudbu, přátele a cech, tuto wiki a herní menu. Pár dalších se k nim přidá, jen když se hodí."
+      "railBody": "Dole v pravém dolním rohu obrazovky, daleko od minimapy, sedí lišta malých čtvercových tlačítek, jedno na okno, uspořádaných do dvou krátkých sloupců vedle sebe. Většina z nich nese potištěnou svou výchozí klávesu.\n\nPrvní sloupec pokrývá tvou postavu, knihu kouzel, talenty, deník úkolů, Knihu skutků, profese, mapu světa, batohy a výrobu. Druhý začíná Obchodem WOC a pokračuje přes PvP, Hledače dungeonů, Pohár údolí, Karetní souboj, žebříček, emoty, hudbu, přátele a cech, tuto wiki a herní menu. Pár dalších se k nim přidá, jen když se hodí.",
+      "mobileBodyGroupedMore": "Touch controls appear on their own, and the layout sizes itself to your screen: a compact arrangement on a small phone, a standard one on a larger phone, and a roomier one on a tablet.\n\nYour abilities sit in a ring rather than a number row: the attack button with four action buttons beside it, and a page toggle that swaps the ring between its {pages} pages, which together reach all {slots} of your ability slots whether or not the extra desktop bars are switched on. The fifth arc position of that ring is your consumables seat: tap it to use what is seated there, or hold it, or swipe it inward, to open a row that fills itself from what you are carrying. Around the ring sit the buttons a touch player reaches for most, swapping target, using what is in front of you, and jumping.\n\nOne Quick Actions control sits at the bottom edge in place of a row of buttons. It opens onto everything else: mount, chat, map, bags, social, quests, character, spellbook, game menu, and a More entry that sorts the rest of your windows into groups: Record (deeds, titles, the Reliquary, reputation, the Loot Explorer, and the rankings), Professions, Activities (dungeons and raids, PvP, and Card Duel), Character (emotes, talents, and cosmetics among them), and Store. The wiki and Discord sit in the game menu instead. Windows fill the screen here rather than floating over it.\n\nMoving your unit frames is a desktop thing: on touch the layout places them for you.",
+      "mobileBodyRewardsMore": "Touch controls appear on their own, and the layout sizes itself to your screen: a compact arrangement on a small phone, a standard one on a larger phone, and a roomier one on a tablet.\n\nYour abilities sit in a ring rather than a number row: the attack button with four action buttons beside it, and a page toggle that swaps the ring between its {pages} pages, which together reach all {slots} of your ability slots whether or not the extra desktop bars are switched on. The fifth arc position of that ring is your consumables seat: tap it to use what is seated there, or hold it, or swipe it inward, to open a row that fills itself from what you are carrying. Around the ring sit the buttons a touch player reaches for most, swapping target, using what is in front of you, and jumping.\n\nOne Quick Actions control sits at the bottom edge in place of a row of buttons. It opens onto everything else: mount, chat, map, bags, social, quests, character, spellbook, game menu, and a More entry that sorts the rest of your windows into groups: Record (deeds, titles, the Reliquary, reputation, the Loot Explorer, and the rankings), Professions, Activities (dungeons and raids, PvP, and Card Duel), Character (emotes, talents, and cosmetics among them), Rewards (the Vault, the weekly quest, and world quests), and Store. The wiki and Discord sit in the game menu instead. Windows fill the screen here rather than floating over it.\n\nMoving your unit frames is a desktop thing: on touch the layout places them for you.",
+      "railBodyTwelve": "Down in the bottom right corner of the screen, a long way from the minimap, sits a rail of small square buttons arranged in two short columns side by side. Most of them are printed with their default key.\n\nThe first column covers your character, bags, spellbook, talents, quest log, and world map. The second opens the Book of the Realm, your professions, Activities (the Groups bell), and friends and guild, then the WOC Store and the game menu. A few more join them only when they apply.",
+      "railBodyThirteen": "Down in the bottom right corner of the screen, a long way from the minimap, sits a rail of small square buttons arranged in two short columns side by side. Most of them are printed with their default key.\n\nThe first column covers your character, bags, spellbook, talents, quest log, world map, and Rewards. The second opens the Book of the Realm, your professions, Activities (the Groups bell), and friends and guild, then the WOC Store and the game menu. A few more join them only when they apply."
     },
     "commandsPage": {
       "intro": "Každý příkaz, který můžeš napsat do chatu, seřazený podle účelu, s jeho krátkými tvary.",
@@ -9882,6 +9945,7 @@ export const cs_CZ: EnTranslations = {
       "deedDef": "Úspěch zaznamenaný v Knize skutků. Jeho vykonání uděluje Věhlas a některé dávají kosmetický titul nebo rámeček jmenovky.",
       "renownTerm": "Věhlas",
       "renownDef": "Celoživotní skóre, které tvé skutky dohromady tvoří. Jen stoupá a říše z něj vede pořadí na žebříčku.",
+      "renownDefRankings": "The lifetime score your deeds add up to. It only ever climbs, and the realm keeps standings of it on the Rankings tab of the Book of the Realm.",
       "heroicTerm": "Hrdinský",
       "heroicDef": "Těžší verze dungeonu nebo raidu, vyladěná pro vybavené endgame party. Hrdinští bossové upouštějí vylepšenou kořist a poslední boss platí Hrdinskými známkami.",
       "lockoutTerm": "Zámek",
@@ -10532,8 +10596,10 @@ export const cs_CZ: EnTranslations = {
       "duelsBody": "Vyzvi libovolného hráče, kterého potkáš, na přátelský duel. V sázce je jen hrdost, takže je to nejsnazší cesta, jak se naučit matchup nebo vyřešit přátelskou hádku.",
       "coliseumHeading": "Popelavé koloseum",
       "coliseumBody": "Koloseum je aréna říše, kde se v hodnocených zápasech utkáváš s ostatními hráči, jeden na jednoho nebo dva na dva. Každá kategorie si drží vlastní pořadí, takže výhra tě po tom žebříku zvedne před očima celé říše. Hodnocená hra se otevírá na úrovni 15 a platí to i pro tvého partnera: pokud je někdo z vás níž, fronta zůstane zavřená, dokud nesplníte oba. Celé hráč proti hráči bydlí za jediným tlačítkem označeným PvP: otevři ho a vyber záložku, Thornhollowská pole, jeden na jednoho nebo dva na dva, a pak se přihlas sám nebo se svým partnerem. Dokud jsi ve frontě nebo v zápase, ostatní záložky zůstávají zamčené, takže nikdy nemůžeš být ve dvou frontách naráz.",
+      "coliseumBodyActivities": "The Coliseum is the realm's arena, where you face other players in ranked matches, one on one or two on two. Each bracket keeps its own standing, so a win lifts you up that ladder for the whole realm to see. Ranked play opens at level 15, and that applies to your partner too: if either of you is below it, the queue stays closed until you both qualify. All of player versus player lives on the PvP tab of the Activities window, which G opens directly: pick a tab there, Thornhollow Fields, one on one, or two on two, then sign up alone or with your partner. While you are queued or in a match, the other tabs stay locked, so you can never sit in two queues at once.",
       "ladderHeading": "Stoupání po žebříku",
       "ladderBody": "Hodnocené hraní sleduje tvoje postavení v čase. Podívej se na žebříček, kde sedíš a kdo drží vrchol světa.",
+      "ladderBodyBracketTab": "Ranked play tracks your standing over time. Each bracket keeps its ladder on its own tab of the PvP window, so check it to see where you sit and who holds the top of the realm.",
       "rewardsHeading": "Co vyplácí hodnocené hraní",
       "rewardsBody": "Hodnocená výhra vyplácí čest, měnu boje hráč proti hráči, a prohra tě nestojí nic než hodnocení. Čest má odměňovat opravdové zápasy: porazit stejného soupeře nebo stejný tým znovu ve stejný den už nic nevyplatí, dlouhý vítězný den vyplácí za každou další výhru trochu méně, a zápas, který tvůj soupeř vzdá, sice pohne tvým hodnocením, ale nevyplatí žádnou čest. Tento den patří jen cti a obrací se podle vlastních hodin, ne podle denního resetu instancí říše.",
       "rewardsBodyLossShare": "Hodnocené vítězství vyplácí Čest, měnu hráč proti hráči, a dohraný zápas, který prohraješ, stále vyplatí její menší podíl, stejně jako remíza, takže prohra tě doopravdy stojí jen hodnocení. Čest má odměňovat skutečné zápasy: opakované poražení stejného soupeře nebo týmu ve stejný den už nic dalšího nevyplatí a stejně tak další prohra s nimi. Dlouhý vítězný den platí první sérii výher celou odměnou, potom ji půlí, dál ji půlí znovu a na této hodnotě zůstane. Zápas, který soupeř vzdá, ti sice posune hodnocení, ale nevyplatí vůbec žádnou Čest. Den patří vlastnímu času říše a přetočí se při nočním resetu říše, stejné hranici, kdy se mažou všechny denní uzamčení.",
@@ -10580,6 +10646,7 @@ export const cs_CZ: EnTranslations = {
       "intro": "Žebříčkové bojiště na zajetí vlajky pro 5 na 5, odehrávající se v ohrazené kotlině starého porostu pod Thornpeakem, kde si dvě zbořené tvrze hledí přes délku rokle a mezi nimi leží starší nádvoří, které nikdy žádná z nich neovládla. Dva pětičlenné týmy, dvě tvrze, jeden cíl: ukradni nepřátelskou vlajku a dones ji domů dřív, než oni donesou tvou.",
       "queueHeading": "Vstup do fronty",
       "queueBody": "Thornhollowská pole se otevírají na úrovni 20 a každý člen skupiny na ni musí dosáhnout, než se skupina může přihlásit. Otevři tlačítko PvP a vyber záložku Thornhollowská pole, tedy tu, na které se otevře, a pak vstup do fronty sám, nebo přiveď skupinu až pěti a přihlaste se společně: skupiny zůstávají vždy v jednom týmu a zbylá místa se doplní osamělými šampiony. Jakmile stojí připraveno deset, zápas usadí oba týmy u jejich pevností na krátký nástup, než vlajky ožijí. Pokud by proti skupině čtyř nebo pěti jinak stáli jen sólo přihlášení, párování zápas na chvíli podrží, aby vidělo, jestli se objeví druhá skupina, takže skupina té velikosti občas počká pár okamžiků déle, než se brány otevřou. To čekání je krátké a nakonec vždy povolí, takže kvůli němu nikdo ve frontě neuvázne.",
+      "queueBodyActivities": "Thornhollow Fields opens at level 20, and every member of a party has to meet it before the party can queue. Press G to open the PvP tab of the Activities window and pick the Thornhollow Fields tab, which comes first, then enter the queue solo, or bring a party of up to five and queue together: parties are always kept on one team, and the remaining seats fill with solo champions. When ten stand ready, the match seats both teams at their keeps for a short form-up before the flags go live. If a group of four or five would otherwise face nothing but solo queuers, the matchmaker holds the match briefly to see whether a second group turns up, so a party that size sometimes waits a few moments longer before the gates open. That wait is short and always gives way in the end, so nobody is left sitting in the queue for it.",
       "fieldHeading": "Bojiště",
       "fieldBody": "Ohrazené bojiště pod širým nebem rozdělené na tři komory: každý tým má před svou tvrzí vlastní pole a mezi nimi leží ohrazené Zpustlé nádvoří. Dvě hradby se táhnou přes celou šířku a každý přesun mezi komorami vede přes sporný přechod: široká hlavní brána, nebo vrátnice, malá místnost obkročmo nad hradbou, jejíž posunuté dveře vynucují úkrok kolem rohu vhodného na přepad. Každá tvrz je uzavřená kromě svého ústí, takže každý běh s vlajkou začíná i končí stejným průchodem, a nízká barikáda láme přímý útok na něj. Nádvoří ukrývá zříceninu s dutým srdcem a dvě boční Runy zrychlení; další dvě čekají na přístupových cestách k vlajkám. Bojová nebo Ochranná runa (větší způsobené poškození, nebo menší utrpěné poškození, na pár sekund) čeká u nádvorního ústí každé hlavní brány: obě podložky otevírají zápas na stejné straně a s každým převzetím se prohodí.",
       "flagsHeading": "Vlajky",
@@ -10618,6 +10685,7 @@ export const cs_CZ: EnTranslations = {
       "quartermastersBody": "Každá frakce má u svého centra intendanta: Intendanta Vaelena za Hlídku trhlin v Drifthavenu, Templářku Altheu za Církevní řád v eastbrookské kapli a Konstruktéra Tobrina za Automaty ve Wyrmwatchi. Každý prodává malou zásobu šperků, zbroje, zbraní a tašek, odemykanou stupeň po stupni, jak roste tvé postavení u dané frakce, a vše se platí obyčejnou mincí.",
       "readingHeading": "Kde to najdeš",
       "readingBody": "Záložka Pověst na listu postavy (C) ukazuje každou frakci s jejím aktuálním postavením, ukazatelem postupu k dalšímu stupni a titulem, který ti to postavení vyneslo. Chatový záznam hlásí každý zisk postavení, jak přichází, a dosažení nového stupně zobrazí na obrazovce oslavný banner.",
+      "readingBodyRealm": "The Reputation tab of the Book of the Realm (Shift+Z) shows each faction with its current standing, a bar toward the next tier, and the title that standing has earned you. The chat log reports every standing gain as it lands, and reaching a new tier shows a celebration banner on screen.",
       "deedsHeading": "Skutky",
       "deedsBody": "Kniha skutků sleduje i tvé postavení: dosažení Důvěryhodného u frakce a dosažení Šampiona u frakce každé zapíše skutek, a dosažení Šampiona u všech tří je vlastní skutek sám o sobě. Jako každý skutek jsou i tyto jen kosmetické, nikdy ne moc, a skutky za Šampiona udělují titul, který si můžeš nosit."
     },
@@ -10636,6 +10704,7 @@ export const cs_CZ: EnTranslations = {
       "catalogHeading": "Úplný soupis skutků",
       "catalogBody": "Zde je každý skutek, který Kniha pojme, seřazený podle kategorií. Ty tajné tu záměrně chybí a čekají, až je objevíš. Otevři si Knihu skutků ve hře a uvidíš přesně, co který z nich žádá.",
       "standingsNote": "Říše vedou průběžný součet Věhlasu za každý účet: žebříček řadí celé účty podle celoživotního Věhlasu a každý skutek se počítá jednou za všechny postavy, přičemž zobrazuje jen Věhlas, takže skutky bez Věhlasu žebříčkem nikdy nepohnou, i když se v tvé Knize počítají. Chceš-li vidět, kdo kde stojí, otevři v herním menu Žebříček a přejdi na záložku Věhlas; pořadí je tam, nikoli na wiki.",
+      "standingsNoteRankings": "The realms keep a running tally of Renown across every account: the board ranks whole accounts by lifetime Renown, counting each deed once across all your characters, and it shows Renown alone, so deeds that carry none never move the standings even though they count in your Book. To see who stands where, open the Rankings tab of the Book of the Realm in game and turn to its Renown board; the standings live there, not on the wiki.",
       "catHeading": "{label} ({count})",
       "colName": "Skutek",
       "colRenown": "Věhlas",
@@ -10656,6 +10725,7 @@ export const cs_CZ: EnTranslations = {
       },
       "bookHeading": "Uvnitř Knihy",
       "bookBody": "Kniha řadí každý skutek do kategorií, mezi kterými můžeš přepínat, s vyhledávacím polem a filtry na vše: na to, co jsi už vykonal, na to, co ještě ne, a na ty, které máš skoro hotové. Lišta Nedávné nahoře drží tvé poslední odemčené skutky, a kliknutím na jeden skočíš rovnou na jeho kartu, stejně jako kliknutím na název skutku, který někdo napíše do chatu. Vedle ní tě Skoro tam nasměruje na hrstku těch, které máš nejblíž dokončení. V říši navíc každý skutek nese svou vzácnost, podíl dobrodruhů, kteří ho vykonali, takže na první pohled poznáš, které jsou běžné a které jsou opravdová dřina; offline svět nemá žádnou populaci ke spočítání, takže neukazuje nic. Na konci lišty sedí police Tituly, kde si zvolíš ten, který nosíš.",
+      "bookBodyTitlesTab": "The Book sorts every deed into categories you can flip between, with a search box and filters for everything, for what you have earned, for what you have not, and for the ones you are nearly done with. A Recent strip near the top holds your latest unlocks, and clicking one jumps straight to its card, as does clicking a deed name someone posts in chat. Beside it, Nearly there points you at the handful you are closest to finishing. Out in a realm each deed also carries its rarity, the share of adventurers who have earned it, so you can see at a glance which ones are common and which are a real climb; the offline world has no population to count, so it shows none. The titles and borders your deeds pay out have a tab of their own, Titles, beside Deeds in the Book of the Realm, with a picker for each: one for the title you wear, one for the border that frames your nameplate.",
       "platformHeading": "Achievementy Steam a Epic",
       "platformBody": "Pokud si z desktopové aplikace propojíš účet Steam nebo Epic Games, skutky, které vykonáš, se navenek promítnou jako achievementy na daném účtu. Herní svět zůstává tou hlavní autoritou: skutek vykonáš tady, zaznamená se u tvé postavy a achievement následuje až potom. Ne každý skutek má odpovídající achievement, a pokud nedorazí hned, dožene se při tvém dalším přihlášení. Propojení je vždy jen propojení, nikdy způsob, jak se přihlásit."
     },
@@ -10663,6 +10733,7 @@ export const cs_CZ: EnTranslations = {
       "intro": "Relikviář je muzeum jedinečné kořisti, kterou jsi zkatalogizoval: vytoužené kousky z dungeonů, profesní trofeje, jezdecká zvířata, vzhledy zbraní a tituly. Ke Knize skutků patří tak, jako patří síň trofejí k knize úspěchů.",
       "howHeading": "Jak sbírka funguje",
       "howBody": "Otevři Relikviář ve hře (výchozí Shift+X). Každá police obsahuje stránky jedinečných relikvií. Silueta se vyplní, jakmile kterákoli postava na tvém účtu ten kus poprvé získá, a stránka se rozsvítí, když jsou vyplněny všechny relikvie na ní. Několik stránek je označeno Vyřazené nebo Osobní: stojí mimo dokončení, takže nikdy neblokují polici ani celý katalog. Živé nálezy se ohlásí a obnoví otevřené okno; postup sdílejí všechny postavy na účtu, takže relikvie, kterou najde jedna postava, vyplní stránku všem.",
+      "howBodyRealmTab": "Open the Book of the Realm in game (default Shift+Z) and turn to its Reliquary tab. Each shelf holds pages of unique relics. Fill a silhouette when any character on your account obtains that piece for the first time, and illuminate a page when every relic on it is filled. A few pages are labeled Retired or Personal: they sit outside completion, so they never gate a shelf or the whole catalog. Live finds toast and refresh the open window; progress is shared by every character on the account, so a relic one character finds fills the page for all of them.",
       "ranksHeading": "Hodnosti Kurátora",
       "ranksBody": "Hodnosti Kurátora rostou s každou zkatalogizovanou jedinečnou relikvií a udělují výhradně kosmetické tituly a rámečky. Nikdy nedávají bojovou sílu, šanci na kořist ani vyrovnání smůly. Vzhledy zbraní vázané na účet se do hodnosti Kurátora nezapočítávají, aby prestiž zůstala vázaná na postavu, a relikvie z Vyřazených či Osobních stránek se do ní nezapočítávají také.",
       "retiredTag": "Vyřazená",
@@ -11336,6 +11407,7 @@ export const cs_CZ: EnTranslations = {
       "slashBody": "Pár každodenních příkazů stojí za zapamatování: /w Jméno pošle šeptem zprávu a /r odpoví na tu poslední, kterou jsi dostal, /invite pozve někoho do party, /follow tě zařadí do kroku za přítelem, /roll hodí kostkou před zraky skupiny, /who ukáže, kdo je online, a /afk tě označí jako nepřítomného. Pro celý seznam napiš ve hře /help.",
       "emotesBody": "Tvá postava umí promluvit i beze slov: napiš emote jako /wave, /dance, /cheer nebo /bow, nejdřív si zaměř přítele, ať ho namíříš na něj, nebo podrž X a otevři kolo emotů pro rychlý výraz nad hlavou.",
       "emotesBodyNamedTarget": "Tvoje postava může mluvit i beze slov: napiš emoci jako /wave, /dance, /cheer nebo /bow, přidej jméno a namiř ji na někoho, třeba /wave Aleph, nebo podrž X, výchozí klávesu kola emocí, a otevři rychlé kolečko s výrazem nad hlavou. Tlačítko Emoce v liště tlačítek oken, na dotyku pod Další, otevře stejné kolečko.",
+      "emotesBodyMoreTray": "Your character can also speak without words: type an emote like /wave, /dance, /cheer, or /bow, add a name to aim it at someone, as in /wave Aleph, or hold X, the emote wheel's default key, to open the emote wheel for a quick overhead expression. On touch, the Emotes tile in the More tray opens the same wheel.",
       "calendarHeading": "Kalendář událostí",
       "calendarBody": "Stiskni I a otevři kalendář událostí. Označuje dny říše, kolem kterých se vyplatí plánovat, týdenní Svolání raidu, Tržní den, Arénový střet a Rybářské klání, plus měsíční Den výprav a Měsíční bránu společenství, a je to místo, kde si cechy vedou rozvrh: vůdce cechu a důstojníci do něj mohou zapisovat události a každý člen je vidí na téže stránce. Dny říše jsou pobídkou ke shromáždění, ne bonusem; na tvé postavě se nic nemění tím, že je den označený.",
       "calendarBodyDoubleHonor": "Stiskni I pro otevření kalendáře událostí. Označuje dny říše, kolem kterých stojí za to plánovat, týdenní Raidový poplach, Den trhu, Střet arény, Víkend dvojnásobné Hrdosti a Rybářský turnaj, měsíční Den delve a Obřad měsíční brány a cechy si v něm drží rozvrh: vedoucí cechu a důstojníci mohou události rezervovat a každý člen je vidí na stejné stránce. Dny říše jsou výzvou ke sběru, nikoli bonusem, s jednou výjimkou: po celý Víkend dvojnásobné Hrdosti dávají Hrdinská pole Thornhollowu dvojnásobnou Hrdost a prohraná hra, která je dohraná, platí jako výhra. Nic jiného se postavě nemění jen proto, že je den označený.",
@@ -11355,6 +11427,7 @@ export const cs_CZ: EnTranslations = {
       "finderMore": "Podívej se, co je uvnitř každého dungeonu",
       "blockBody": "Zablokování je tvrdší nástroj, pro hráče, který tě nenechá na pokoji. Zablokování mu usekne pozvánky, šeptání i poštu stejně jako chat, udělá vás pro sebe navzájem neviditelné v /who a vyřadí ho z tvého seznamu přátel, pokud na něm byl. Zablokuj z menu po kliknutí pravým tlačítkem na jeho jméno, nebo příkazem /block, /unblock to zase zruší a /blocklist ukáže, kdo je na seznamu.",
       "guildBoardBody": "Cechy mají žebříček taky. Okno Žebříček vede vedle žebříčků hráčů i tabuli Cechy, která řadí cechy podle toho, co jejich členové společně vydělali, takže rušný cech vidí, kde stojí.",
+      "guildBoardBodyRankings": "Guilds are ranked too. The Rankings tab of the Book of the Realm keeps a Guilds board beside the player boards, ranking guilds on what their members have earned together, so a busy guild can see where it stands.",
       "guildBankHeading": "Cechovní banka",
       "guildBankBody": "Cech si drží i vlastní trezor. Zajdi k bankéři v jednom z centrálních měst, otevři si banku a přepni na záložku Cech: najdeš tam pokladnici mincí a sdílený sklad předmětů, které cech vlastní společně. Otevřít ho a podívat se dovnitř může každý člen a panel jasně říká, kdo může udělat víc. Jednat, tedy vkládat mince i zboží a zase je vydávat, mohou jen mistr cechu a důstojníci, a každý vklad i výběr se zapíše do záznamu, který si cech může přečíst, takže se nic nepohne bez stopy.",
       "guildBankRulesBody": "Sklad předmětů začíná zavřený. Otevře ho důstojník z vlastní kapsy a cech ho pak může rozšířit platbou z pokladnice. Úkolové předměty, cokoli vázané k duši a výbava, kterou neodebere ani Trh, do něj nepatří, stejně jako do pošty a na Trh, takže banka je pro zboží, které si ještě může vyměnit majitele.",

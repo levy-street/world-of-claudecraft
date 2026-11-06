@@ -11,14 +11,18 @@
 export interface MicroMenuLauncherSpec {
   readonly selector: string;
   readonly windowId: string;
+  /** A hub launcher's other member windows (menu consolidation): the ring is
+   *  on while ANY of `windowId` or these is open, because a hub shows one
+   *  member window per tab and the launcher opens all of them. */
+  readonly memberWindowIds?: readonly string[];
 }
 
 /**
  * Every micro-menu launcher that OPENS A WINDOW, paired with that window's element
  * id. The ring means exactly one thing, "this button's window is open", which is why
- * the rail's other buttons are deliberately absent: `#mm-emote` opens the emote
- * wheel (not a `.window`),
- * and `#mm-wiki` / `#mm-discord` leave the game entirely.
+ * the rail carries nothing else (the menu consolidation moved the emote wheel,
+ * the wiki link and Discord off it). A hub launcher lists its other member
+ * windows so its ring stays on whichever tab is shown.
  */
 export const MICRO_MENU_LAUNCHERS: readonly MicroMenuLauncherSpec[] = [
   { selector: '#mm-char', windowId: 'char-window' },
@@ -26,31 +30,47 @@ export const MICRO_MENU_LAUNCHERS: readonly MicroMenuLauncherSpec[] = [
   { selector: '#mm-talents', windowId: 'talents-window' },
   { selector: '#mm-town-focus', windowId: 'town-focus-window' },
   { selector: '#mm-quest', windowId: 'quest-log-window' },
-  { selector: '#mm-deeds', windowId: 'deeds-window' },
-  { selector: '#mm-reliquary', windowId: 'reliquary-window' },
-  { selector: '#mm-loot-explorer', windowId: 'loot-explorer-window' },
-  { selector: '#mm-cosmetics', windowId: 'cosmetics-window' },
-  { selector: '#mm-professions', windowId: 'professions-window' },
-  { selector: '#mm-harvest-journal', windowId: 'harvest-journal-window' },
-  // The one launcher whose window ships in no markup entry: the Perfecting
-  // painter mints #perfecting-window on first open (still a .window.panel, so
-  // Hud's window observer stamps data-window-open on it like any other).
-  { selector: '#mm-perfecting', windowId: 'perfecting-window' },
+  {
+    selector: '#mm-deeds',
+    windowId: 'deeds-window',
+    // The Book of the Realm (menu consolidation step 2).
+    memberWindowIds: [
+      'titles-window',
+      'reliquary-window',
+      'reputation-window',
+      'loot-explorer-window',
+      'leaderboard-window',
+    ],
+  },
+  {
+    selector: '#mm-professions',
+    windowId: 'professions-window',
+    // One member ships in no markup entry: the Perfecting painter mints
+    // #perfecting-window on first open (still a .window.panel, so Hud's
+    // window observer stamps data-window-open on it like any other).
+    memberWindowIds: ['crafting-window', 'perfecting-window', 'harvest-journal-window'],
+  },
   { selector: '#mm-map', windowId: 'map-window' },
+  {
+    selector: '#mm-rewards',
+    windowId: 'weekly-vault-window',
+    // Rewards (menu consolidation step 7): Vault, Weekly Quest, World Quests.
+    memberWindowIds: ['weekly-quests-window', 'world-quests-window'],
+  },
   { selector: '#mm-bag', windowId: 'bags' },
-  { selector: '#mm-crafting', windowId: 'crafting-window' },
-  { selector: '#mm-arena', windowId: 'arena-window' },
-  { selector: '#mm-dfinder', windowId: 'dungeon-finder-window' },
-  { selector: '#expedition-bell', windowId: 'dungeon-finder-window' },
-  { selector: '#mm-cardduel', windowId: 'card-duel-window' },
-  { selector: '#mm-leaderboard', windowId: 'leaderboard-window' },
+  {
+    selector: '#expedition-bell',
+    windowId: 'dungeon-finder-window',
+    // Activities (menu consolidation step 4): the bell is the hub's launcher.
+    memberWindowIds: ['arena-window', 'card-duel-window'],
+  },
   { selector: '#mm-wocmarket', windowId: 'woc-market-window' },
   { selector: '#mm-social', windowId: 'social-window' },
   { selector: '#mm-options', windowId: 'options-menu' },
 ];
 
 /** Which count a badge shows. One member per shipped badge. */
-export type MicroMenuBadgeKind = 'talentPoints';
+export type MicroMenuBadgeKind = 'talentPoints' | 'rewards';
 
 /** One launcher that carries a corner count badge. */
 export interface MicroMenuBadgeSpec {
@@ -61,6 +81,8 @@ export interface MicroMenuBadgeSpec {
 /** The launchers that carry a count badge, in rail order. */
 export const MICRO_MENU_BADGES: readonly MicroMenuBadgeSpec[] = [
   { selector: '#mm-talents', kind: 'talentPoints' },
+  // Rewards (menu consolidation step 7): what the hub has waiting to claim.
+  { selector: '#mm-rewards', kind: 'rewards' },
 ];
 
 /** The live counts behind the badges above. */
@@ -116,7 +138,13 @@ export function createMicroMenuStateView(
   return {
     tick(isWindowOpen, counts) {
       for (let i = 0; i < launchers.length; i++) {
-        launchers[i].on = isWindowOpen(MICRO_MENU_LAUNCHERS[i].windowId);
+        const spec = MICRO_MENU_LAUNCHERS[i];
+        let on = isWindowOpen(spec.windowId);
+        const members = spec.memberWindowIds;
+        if (!on && members) {
+          for (let m = 0; m < members.length && !on; m++) on = isWindowOpen(members[m]);
+        }
+        launchers[i].on = on;
       }
       for (let i = 0; i < badges.length; i++) {
         const badge = badges[i];

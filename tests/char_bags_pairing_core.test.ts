@@ -4,7 +4,12 @@
 // vendor clusters already own the bags companion, so the pairing stands down there.
 
 import { describe, expect, it } from 'vitest';
-import { type CharBagsPairingState, charBagsPaired } from '../src/ui/char_bags_pairing_core';
+import {
+  type CharBagsPairingState,
+  charBagsDocked,
+  charBagsPaired,
+  charToggleBagsAction,
+} from '../src/ui/char_bags_pairing_core';
 
 const OPEN: CharBagsPairingState = {
   touch: true,
@@ -20,7 +25,7 @@ describe('charBagsPaired', () => {
     expect(charBagsPaired(OPEN)).toBe(true);
   });
 
-  it('never pairs on desktop (free-floating windows already show both)', () => {
+  it('never pairs 50/50 on desktop (it docks instead, below)', () => {
     expect(charBagsPaired({ ...OPEN, touch: false })).toBe(false);
   });
 
@@ -33,5 +38,35 @@ describe('charBagsPaired', () => {
     expect(charBagsPaired({ ...OPEN, bankOpen: true })).toBe(false);
     expect(charBagsPaired({ ...OPEN, vendorOpen: true })).toBe(false);
     expect(charBagsPaired({ ...OPEN, marketOpen: true })).toBe(false);
+  });
+});
+
+// Desktop C (menu consolidation step 3): the sheet opens with the bags docked
+// beside it, and closing the sheet takes docked bags with it; B alone and the
+// touch HUD are untouched.
+describe('charBagsDocked and charToggleBagsAction (desktop)', () => {
+  const DESK: CharBagsPairingState = { ...OPEN, touch: false };
+
+  it('docks on desktop only, with both windows up and no other cluster', () => {
+    expect(charBagsDocked(DESK)).toBe(true);
+    expect(charBagsDocked({ ...DESK, touch: true })).toBe(false);
+    expect(charBagsDocked({ ...DESK, bagsShown: false })).toBe(false);
+    expect(charBagsDocked({ ...DESK, bankOpen: true })).toBe(false);
+    expect(charBagsDocked({ ...DESK, marketOpen: true })).toBe(false);
+  });
+
+  it('opens the bags when C opens the sheet without them', () => {
+    expect(charToggleBagsAction({ ...DESK, bagsShown: false }, false)).toBe('open');
+    expect(charToggleBagsAction(DESK, false)).toBeNull();
+  });
+
+  it('closes the bags with the sheet only when they were docked beside it', () => {
+    expect(charToggleBagsAction({ ...DESK, charOpen: false }, true)).toBe('close');
+    expect(charToggleBagsAction({ ...DESK, charOpen: false }, false)).toBeNull();
+  });
+
+  it('never moves the bags on touch or while another cluster owns them', () => {
+    expect(charToggleBagsAction({ ...OPEN, bagsShown: false }, false)).toBeNull();
+    expect(charToggleBagsAction({ ...DESK, bagsShown: false, vendorOpen: true }, false)).toBeNull();
   });
 });

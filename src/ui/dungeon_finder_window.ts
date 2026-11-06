@@ -74,11 +74,11 @@ import {
 import { dungeonDisplayName, tEntity, zoneDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import { captureFocusKey, FOCUS_KEY_ATTR, restoreFirstEnabled } from './focus_restore';
+import type { WindowHubStrip } from './hud/hub/window_hub_controller';
 import { formatNumber, type TranslationKey, t, tPlural } from './i18n';
 import type { InspectRemoteProfile } from './inspect_window';
 import type { PainterHostPresentation } from './painter_host';
 import { svgIcon } from './ui_icons';
-import { createWeeklyRewardsTab, type WeeklyRewardsTab } from './weekly_rewards_window';
 
 // Render-skip sentinel for the pre-sync note (online, before the first `df`
 // snapshot lands). A live sig is always JSON (starts with '['), so this token
@@ -87,6 +87,9 @@ const FINDER_LOADING_SIG = 'dfinder-loading';
 
 export interface DungeonFinderWindowDeps extends PainterHostPresentation {
   root(): HTMLElement;
+  /** The Activities strip (menu consolidation step 4), painted under the
+   *  title bar while this window is one of the hub's tabs. */
+  hubStrip?: WindowHubStrip;
   world(): IWorld;
   closeOthers(): void;
   captureFocus(): HTMLElement | null;
@@ -135,17 +138,16 @@ export class DungeonFinderWindow {
   // Clock slots refreshed in place between structural rebuilds.
   private clockSlots = new Map<string, HTMLElement>();
   private lastClockText = new Map<string, string>();
-  private readonly vaultPane: WeeklyRewardsTab;
 
-  constructor(private readonly deps: DungeonFinderWindowDeps) {
-    this.vaultPane = createWeeklyRewardsTab(
-      { ...deps, onInventoryChanged: () => {} },
-      { readOnly: true },
-    );
-  }
+  constructor(private readonly deps: DungeonFinderWindowDeps) {}
 
   get isOpen(): boolean {
     return this.deps.root().style.display === 'flex';
+  }
+
+  /** The root a hub tab switch carries its position onto. */
+  rootElement(): HTMLElement {
+    return this.deps.root();
   }
 
   toggle(): void {
@@ -183,7 +185,6 @@ export class DungeonFinderWindow {
       return;
     }
     this.deps.hideTooltip();
-    this.vaultPane.close();
     el.style.display = 'none';
     this.clockSlots.clear();
     this.lastClockText.clear();
@@ -233,6 +234,7 @@ export class DungeonFinderWindow {
       if (this.lastSig === FINDER_LOADING_SIG) return;
       this.lastSig = FINDER_LOADING_SIG;
       el.innerHTML = `${this.titleHtml()}<div class="df-note">${esc(t('hudChrome.finder.syncing'))}</div>`;
+      this.deps.hubStrip?.wire(el);
       el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
       return;
     }
@@ -261,11 +263,6 @@ export class DungeonFinderWindow {
     const sig = `${view.sig}|${groups?.sig ?? ''}|${this.pane}|${JSON.stringify([this.category, this.search, this.eligibleOnly, selection, this.creatingGroup, this.boardFilter, this.stagedGuildOnly])}`;
     if (sig === this.lastSig) {
       this.updateClocks(view.clocks);
-      if (this.tab === 'vault')
-        this.vaultPane.refreshIfChanged(() => {
-          this.lastSig = '';
-          this.render();
-        });
       return;
     }
     this.lastSig = sig;
@@ -298,7 +295,6 @@ export class DungeonFinderWindow {
       ),
     ].map((node) => node.dataset.groupDisclosure ?? 'rules');
     const bodyScroll = el.querySelector('.df-body')?.scrollTop ?? 0;
-    const vaultScroll = el.querySelector('#weekly-rewards-panel')?.scrollTop ?? 0;
     const caret =
       focused === 'guide-search'
         ? el.querySelector<HTMLInputElement>('[data-guide-search]')?.selectionStart
@@ -315,19 +311,12 @@ export class DungeonFinderWindow {
       this.eligibleOnly,
       labels,
     );
-    el.classList.toggle('df-vault-mode', view.tab === 'vault');
     el.innerHTML = this.liveHtml(
       { ...view, rows: visibleRows, detail: visibleRows.length > 0 ? view.detail : null },
       allRows,
       selection,
     );
     this.wire(el, view);
-    if (view.tab === 'vault') {
-      const container = el.querySelector<HTMLElement>('#df-vault-container');
-      if (container) this.vaultPane.renderInto(container);
-      const panel = el.querySelector('#weekly-rewards-panel');
-      if (panel) panel.scrollTop = vaultScroll;
-    } else this.vaultPane.close();
     for (const node of el.querySelectorAll<HTMLDetailsElement>(
       'details[data-group-disclosure], details[data-shop-rules]',
     ))
@@ -406,6 +395,7 @@ export class DungeonFinderWindow {
   // ---- event wiring ----------------------------------------------------------
 
   private wire(el: HTMLElement, view: Extract<DungeonFinderViewModel, { kind: 'live' }>): void {
+    this.deps.hubStrip?.wire(el);
     const world = () => this.deps.world();
     const rerender = () => {
       this.lastSig = '';
@@ -738,9 +728,11 @@ export class DungeonFinderWindow {
   // ---- HTML builders ----------------------------------------------------------
 
   private titleHtml(): string {
+    const hub = this.deps.hubStrip;
     return (
-      `<div class="panel-title ui-win-head"><span id="dfinder-title" class="ui-win-title">${esc(finderTitle(this.tab, this.creatingGroup))}</span>` +
-      `<button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(t('hudChrome.finder.close'))}">${svgIcon('close')}</button></div>`
+      `<div class="panel-title ui-win-head"><span id="dfinder-title" class="ui-win-title">${esc(hub ? hub.title() : finderTitle(this.tab, this.creatingGroup))}</span>` +
+      `<button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(hub ? hub.closeLabel() : t('hudChrome.finder.close'))}">${svgIcon('close')}</button></div>` +
+      (hub?.html() ?? '')
     );
   }
 
@@ -757,7 +749,6 @@ export class DungeonFinderWindow {
         !this.creatingGroup &&
         view.board.canCreate &&
         view.board.createOptions.length > 0,
-      !this.creatingGroup,
     );
     const proposal = view.queue.proposal ? this.proposalHtml(view.queue) : '';
     const body =
@@ -765,14 +756,12 @@ export class DungeonFinderWindow {
         ? this.catalogueHtml(view.rows, view.detail, selection)
         : view.tab === 'queue'
           ? quickMatchHtml(view.queue)
-          : view.tab === 'vault'
-            ? '<div class="df-vault-container" id="df-vault-container"></div>'
-            : this.boardHtml(view.board, view.queue);
+          : this.boardHtml(view.board, view.queue);
     const toolbar =
       view.tab === 'catalogue'
         ? adventureToolbarHtml(allRows, this.category, this.search, this.eligibleOnly)
         : '';
-    return `${this.titleHtml() + navigation + proposal + toolbar}<div class="df-body${view.tab === 'catalogue' ? ' df-body-catalogue' : ''}${view.tab === 'vault' ? ' df-body-vault' : ''}">${body}</div>`;
+    return `${this.titleHtml() + navigation + proposal + toolbar}<div class="df-body${view.tab === 'catalogue' ? ' df-body-catalogue' : ''}">${body}</div>`;
   }
 
   // --- catalogue -----------------------------------------------------------

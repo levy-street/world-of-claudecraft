@@ -214,3 +214,31 @@ describe('buildQuestLogView: ClientWorld-vs-Sim parity', () => {
     expect(buildQuestLogView(i)).toEqual(buildQuestLogView(i));
   });
 });
+
+// Menu consolidation step 8: nearby offers moved off the World Map rail into
+// an Available group, carried beside the zone groups (an offer is not a log
+// entry, so it is not a QuestLogItem).
+describe('questlog_view: the Available group', () => {
+  const offer = {
+    questId: QUEST_A.id,
+    zoneId: 'eastbrook_vale',
+    distance: 12,
+    minLevel: 1,
+    x: 1,
+    z: 2,
+  };
+
+  it('is null with no offers, so the painter draws nothing', () => {
+    expect(buildQuestLogView(input()).available).toBeNull();
+    expect(buildQuestLogView(input({ available: [] })).available).toBeNull();
+  });
+
+  it('carries the offers and its own collapse state under the id "available"', () => {
+    const open = buildQuestLogView(input({ available: [offer] })).available;
+    expect(open).toEqual({ id: 'available', collapsed: false, offers: [offer] });
+    const shut = buildQuestLogView(
+      input({ available: [offer], collapsedGroupIds: ['available'] }),
+    ).available;
+    expect(shut?.collapsed).toBe(true);
+  });
+});

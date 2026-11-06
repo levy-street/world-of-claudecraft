@@ -20,6 +20,7 @@ import { NPCS, QUESTS, zoneAt } from '../../../sim/data';
 import { questFixedReward } from '../../../sim/quests/quest_reward_choice';
 import type { PlayerClass, QuestProgress } from '../../../sim/types';
 import { questObjectiveRequired } from '../../../sim/types';
+import type { AvailableQuestOffer } from './available_quests_view';
 
 /** One row in the quest list column. */
 export interface QuestLogItem {
@@ -67,12 +68,22 @@ export interface QuestDetailModel {
   turnInNpcId: string;
 }
 
+/** The Available group (menu consolidation step 8): quest offers nearby, the
+ *  World Map rail's old "Available Nearby" list. Null when nothing is on offer. */
+export interface QuestLogAvailableGroup {
+  readonly id: 'available';
+  readonly collapsed: boolean;
+  readonly offers: readonly AvailableQuestOffer[];
+}
+
 /** The full quest-log view-model. */
 export interface QuestLogView {
   /** The title summary counts (active = open quests, completed = turned in). */
   summary: { active: number; completed: number };
   items: QuestLogItem[];
   groups: QuestLogGroup[];
+  /** Offers to pick up, painted after the zone groups and before the tally. */
+  available: QuestLogAvailableGroup | null;
   /** The resolved selection (falls back to the first quest when stale / unset). */
   selectedQuestId: string | null;
   detail: QuestDetailModel | null;
@@ -90,6 +101,8 @@ export interface QuestLogInput {
   /** sim.questsDone.size, for the title summary. */
   completedCount: number;
   collapsedGroupIds?: readonly string[];
+  /** Nearby offers (available_quests_view.ts); omitted means none. */
+  available?: readonly AvailableQuestOffer[];
 }
 
 /**
@@ -179,6 +192,10 @@ export function buildQuestLogView(input: QuestLogInput): QuestLogView {
     summary,
     items,
     groups,
+    available:
+      input.available && input.available.length > 0
+        ? { id: 'available', collapsed: collapsed.has('available'), offers: input.available }
+        : null,
     selectedQuestId,
     detail,
     empty: quests.length === 0,

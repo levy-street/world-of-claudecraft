@@ -1,8 +1,9 @@
-// The map rail's world-quest section painter: a cold string builder the
-// MapSidebarController splices between the tracked-quest actions and the
-// "available nearby" list. Every value passes through esc() and every string is
-// a catalog key; the row and button carry data attributes the controller's one
-// click dispatcher reads (`data-map-wq`, `data-map-wq-reroll`).
+// The world-quest board painter: a cold string builder the Rewards hub's World
+// Quests tab paints (it was a section of the World Map rail until the menu
+// consolidation, step 7, moved the board off the map). Every value passes
+// through esc() and every string is a catalog key; the row and buttons carry
+// data attributes the window's one click dispatcher reads (`data-map-wq`,
+// `data-map-wq-reroll`, and `data-wq-show-map` beside each open row).
 
 import { zoneDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
@@ -16,7 +17,7 @@ const factionKey = (id: WorldQuestRailRow['factionId']): TranslationKey =>
 const stateKey = (state: WorldQuestRailRow['state']): TranslationKey =>
   `hudChrome.mapAtlas.worldQuests.state.${state}` as TranslationKey;
 
-function rowHtml(row: WorldQuestRailRow): string {
+function rowHtml(row: WorldQuestRailRow, showOnMap: boolean): string {
   const classes = [
     'map-atlas-wq',
     'ui-card',
@@ -33,11 +34,22 @@ function rowHtml(row: WorldQuestRailRow): string {
   const replaced = row.replacement
     ? `<span class="map-atlas-wq-replaced">${esc(t('hudChrome.mapAtlas.worldQuests.replacement'))}</span>`
     : '';
-  return `<button type="button" class="${classes}" data-map-wq="${esc(row.questId)}" aria-pressed="${row.selected}"><span class="map-atlas-wq-copy"><span class="map-atlas-wq-title">${esc(worldQuestDisplayName(row.questId))}</span><span class="map-atlas-wq-meta"><span>${esc(zoneDisplayName(row.zoneId))}</span><span class="map-atlas-wq-faction is-${esc(row.factionId)}">${esc(t(factionKey(row.factionId)))}</span></span></span>${chip}${replaced}</button>`;
+  const button = `<button type="button" class="${classes}" data-map-wq="${esc(row.questId)}" aria-pressed="${row.selected}"><span class="map-atlas-wq-copy"><span class="map-atlas-wq-title">${esc(worldQuestDisplayName(row.questId))}</span><span class="map-atlas-wq-meta"><span>${esc(zoneDisplayName(row.zoneId))}</span><span class="map-atlas-wq-faction is-${esc(row.factionId)}">${esc(t(factionKey(row.factionId)))}</span></span></span>${chip}${replaced}</button>`;
+  if (!showOnMap) return button;
+  // A finished quest has no map pin left to pan to, so it carries no button.
+  const map =
+    row.state === 'completed'
+      ? ''
+      : `<button type="button" class="map-atlas-wq-map ui-btn ui-btn--sm" data-wq-show-map="${esc(row.questId)}">${esc(t('hudChrome.finder.showOnMap'))}</button>`;
+  return `<div class="map-atlas-wq-row">${button}${map}</div>`;
 }
 
 /** The section's markup: heading with the day's count, the rows, the reroll control. */
-export function worldQuestRailSectionHtml(view: WorldQuestRailView, nowMs: number): string {
+export function worldQuestRailSectionHtml(
+  view: WorldQuestRailView,
+  nowMs: number,
+  opts: { readonly showOnMap?: boolean } = {},
+): string {
   const count = t('hudChrome.mapAtlas.worldQuests.count', {
     done: whole(view.completed),
     total: whole(view.total),
@@ -46,7 +58,7 @@ export function worldQuestRailSectionHtml(view: WorldQuestRailView, nowMs: numbe
     view.expiresAtMs > nowMs
       ? `<p class="map-atlas-wq-expiry ui-meta ui-muted">${esc(worldQuestTimeRemainingText(view.expiresAtMs, nowMs))}</p>`
       : '';
-  const rows = view.rows.map(rowHtml).join('');
+  const rows = view.rows.map((row) => rowHtml(row, opts.showOnMap === true)).join('');
   const list =
     rows || `<p class="map-atlas-empty">${esc(t('hudChrome.mapAtlas.worldQuests.empty'))}</p>`;
   const reroll = view.reroll;

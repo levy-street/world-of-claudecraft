@@ -188,7 +188,9 @@ describe('hud wiring', () => {
   });
 
   it('routes Esc through the painter close (WCAG focus return)', () => {
-    expect(hud).toMatch(/case 'deeds-window':[\s\S]{0,200}?this\.deedsWindow\.close\(\);/);
+    // A Book of the Realm member (menu consolidation step 2): the hub closes
+    // the shown member through that member's own painter close().
+    expect(hud).toMatch(/case 'deeds-window':[\s\S]{0,600}?this\.bookHub\.close\(\);/);
   });
 
   it('refreshes on the slow band and repaints on language switch', () => {
@@ -676,21 +678,20 @@ describe('entry HTMLs', () => {
     expect(chrome).toMatch(/deeds: 'Deeds',/);
   });
 
-  it('ships the side-menu Deeds button in BOTH game entries, under the quest log', () => {
+  it('ships the Book of the Realm rail button (#mm-deeds) in BOTH game entries', () => {
     for (const html of [indexHtml, playHtml]) {
       expect(html).toMatch(/id="mm-deeds"[^>]*data-icon="book"/);
-      expect(html).toMatch(/id="mm-deeds"[^>]*data-i18n-title="hudChrome\.deeds\.title"/);
-      // Dock order: quest log, then deeds, then map.
-      const quest = html.indexOf('id="mm-quest"');
+      expect(html).toMatch(/id="mm-deeds"[^>]*data-i18n-title="hudChrome\.bookOfRealm\.title"/);
+      // The Book leads the hub column (menu consolidation): the rail's column
+      // B opens with it, ahead of Professions.
       const deeds = html.indexOf('id="mm-deeds"');
-      const map = html.indexOf('id="mm-map"');
-      expect(quest).toBeGreaterThan(-1);
-      expect(deeds).toBeGreaterThan(quest);
-      expect(map).toBeGreaterThan(deeds);
+      const professions = html.indexOf('id="mm-professions"');
+      expect(deeds).toBeGreaterThan(html.indexOf('id="side-buttons-col-b"'));
+      expect(professions).toBeGreaterThan(deeds);
     }
     // hud.ts binds the click and repaints the keycap from the live binding.
     expect(hud).toContain("$('#mm-deeds').addEventListener('click', () => this.toggleDeeds());");
-    expect(sideButtons).toContain("['#mm-deeds', 'deeds', 'hudChrome.deeds.title'],");
+    expect(sideButtons).toContain("['#mm-deeds', 'deeds', 'hudChrome.bookOfRealm.title'],");
   });
 });
 
@@ -748,7 +749,8 @@ describe('touch open chain (More tray -> Hud)', () => {
       "this.bindButton('mobile-deeds', () => this.callbacks.onDeeds());",
     );
     expect(mobileControlsSrc).toContain('onDeeds(): void;');
-    expect(mainSrc).toContain('onDeeds: () => hud.toggleDeeds(),');
+    // The tray tile opens the Book of the Realm on its Deeds tab.
+    expect(mainSrc).toContain("onDeeds: () => hud.toggleDeeds('deeds'),");
   });
 });
 
@@ -787,7 +789,10 @@ describe('touch long-press peek', () => {
 
 describe('mobile layout (hud.mobile.css)', () => {
   it('pins the standalone full-screen window inside the safe-area insets', () => {
-    const block = hudMobile.match(/body\.mobile-touch #deeds-window \{([^}]*)\}/)?.[1] as string;
+    // The Titles tab (a second DeedsWindow on #titles-window) shares the rule.
+    const block = hudMobile.match(
+      /body\.mobile-touch #deeds-window,\s*body\.mobile-touch #titles-window \{([^}]*)\}/,
+    )?.[1] as string;
     expect(block).toBeTruthy();
     expect(block).toContain('position: fixed;');
     expect(block).toContain('left: max(10px, env(safe-area-inset-left));');
@@ -955,7 +960,8 @@ describe('chrome keys and CSS floors', () => {
     )?.[1];
     const shelfRule = components.match(/\.deeds-titles,\n {2}\.deeds-borders \{([^}]*)\}/)?.[1];
     const touchShelfRule = hudMobile.match(
-      /body\.mobile-touch #deeds-window \.deeds-titles,\n {2}body\.mobile-touch #deeds-window \.deeds-borders \{([^}]*)\}/,
+      // The Titles tab's root (#titles-window) shares the rule.
+      /body\.mobile-touch #deeds-window \.deeds-titles,\n {2}body\.mobile-touch #deeds-window \.deeds-borders,[^{]*\{([^}]*)\}/,
     )?.[1];
     expect(focusRule, 'global focus-ring rule missing').toBeTruthy();
     expect(shelfRule, 'desktop cosmetic shelf rule missing').toBeTruthy();
@@ -1146,9 +1152,12 @@ describe('chrome keys and CSS floors', () => {
       },
       {
         rel: 'hud.mobile',
+        // The Book of the Realm's Titles tab root shares the touch shelf rule.
         selectors: [
           'body.mobile-touch #deeds-window .deeds-titles',
           'body.mobile-touch #deeds-window .deeds-borders',
+          'body.mobile-touch #titles-window .deeds-titles',
+          'body.mobile-touch #titles-window .deeds-borders',
         ],
         declarations: ['gap: 10px', 'padding-inline: 10px'],
       },

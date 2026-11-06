@@ -3,19 +3,12 @@ import { touchBagsShown } from './mobile_hud_layout';
 
 /** Bank and bags share a layout lifecycle, while each keeps its own focus owner. */
 export function openBankCompanion(
-  bank: { isOpen: boolean; close(): void; open(tab?: 'rewards'): void },
+  bank: { open(): void },
   bags: HTMLElement,
-  closeBags: () => void,
   renderBags: () => void,
-  tab?: 'rewards',
 ): void {
-  const classes = document.body.classList;
-  if (bank.isOpen && classes.contains('weekly-vault-open') !== (tab === 'rewards')) bank.close();
-  if (tab === 'rewards') closeBags();
-  classes.toggle('weekly-vault-open', tab === 'rewards');
-  classes.toggle('bank-open', tab !== 'rewards');
-  bank.open(tab);
-  if (tab === 'rewards') return;
+  document.body.classList.add('bank-open');
+  bank.open();
   renderBags();
   bags.style.display = 'flex';
 }
@@ -27,7 +20,7 @@ export function closeBankBags(
 ): void {
   const classes = document.body.classList;
   const closeMobileBags = touchBagsShown(classes, bags.style.display);
-  classes.remove('bank-open', 'weekly-vault-open');
+  classes.remove('bank-open');
   if (closeMobileBags) {
     dismissBagPrompts();
     bags.style.display = 'none';

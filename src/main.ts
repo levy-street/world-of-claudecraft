@@ -530,6 +530,7 @@ import { esc } from './ui/esc';
 import { showFatalOverlay } from './ui/fatal_overlay_controller';
 import { FocusManager, type FocusTrapHandle } from './ui/focus_manager';
 import { syncBuildInfo, syncFooterLegalLinks } from './ui/footer_shell';
+import * as gameMenu from './ui/game_menu_hooks';
 import {
   attachGatherNodeHoverTooltip,
   gatherNodeToolGateFor,
@@ -1850,7 +1851,10 @@ async function startGame(
             hud.toggleArena();
             break;
           case 'dungeonFinder':
-            hud.toggleDungeonFinder();
+            hud.toggleActivities();
+            break;
+          case 'rewards':
+            hud.toggleRewards();
             break;
           case 'bgFlag':
             bgFlagKey();
@@ -1862,9 +1866,6 @@ async function startGame(
             break;
           case 'leaderboard':
             hud.toggleLeaderboard();
-            break;
-          case 'calendar':
-            hud.toggleCalendar();
             break;
           case 'discord':
             toggleDiscordPanel();
@@ -1969,7 +1970,7 @@ async function startGame(
     onMenu: () => hud.toggleOptionsMenu(),
     onSocial: () => hud.toggleSocial(),
     onDiscord: () => openDiscordEntry(),
-    onDonate: () => window.open(DONATE_URL, '_blank', 'noopener,noreferrer'),
+    onDonate: gameMenu.openDonatePage,
     onWiki: () => hud.openWiki(),
     onEmotes: () => hud.toggleEmoteWheel(),
     onArena: () => hud.toggleArena(),
@@ -1989,16 +1990,20 @@ async function startGame(
     onMap: () => hud.toggleMap(),
     onLeaderboard: () => hud.toggleLeaderboard(),
     onDailyRewards: () => hud.toggleDailyRewards(),
-    onDeeds: () => hud.toggleDeeds(),
+    onDeeds: () => hud.toggleDeeds('deeds'),
+    onTitles: () => hud.toggleDeeds('titles'),
+    onReputation: () => hud.toggleDeeds('reputation'),
     onReliquary: () => hud.toggleReliquary(),
+    onRewards: (tab) => hud.toggleRewards(tab),
     onLootExplorer: () => hud.toggleLootExplorer(),
     onMountToggle: () => world.toggleMounted(),
-    onProfessions: () => hud.toggleProfessions(),
-    onNameplates: () => (renderer.showNameplates = !renderer.showNameplates),
-    onMusic: () => {
-      music.setEnabled(!music.enabled);
-      return music.enabled;
-    },
+    onProfessions: () => hud.toggleProfessions('overview'),
+    onCardDuel: () => hud.toggleCardDuel(),
+    onCosmetics: () => hud.toggleCosmetics(),
+    onPerfecting: () => hud.togglePerfecting(),
+    onHarvestJournal: () => hud.toggleHarvestJournal(),
+    onNameplates: () => gameMenu.toggleNameplates(renderer),
+    onMusic: gameMenu.toggleMusic,
     onRecenterCamera: () => input.recenterCameraBehind(world.player.facing),
     onGroundAimMove: (x, y) => {
       if (!hud.isGroundAimActive()) return false;
@@ -2013,6 +2018,11 @@ async function startGame(
     },
   });
   mobileControls.start();
+  gameMenu.attachGameMenuHooks(
+    renderer,
+    mobileControls,
+    DISCORD_BUILD_ENABLED ? openDiscordEntry : null,
+  );
   const syncOverlayDiagnostics = (): void => {
     syncCharacterOpenDiagnostics();
     syncQuestDialogOpenDiagnostics();
@@ -2171,20 +2181,19 @@ async function startGame(
       case 'leaderboard':
         hud.toggleLeaderboard();
         break;
-      case 'calendar':
-        hud.toggleCalendar();
-        break;
       case 'discord':
         toggleDiscordPanel();
         break;
 
       case 'crafting':
-        // The controller panel has always OFFERED this bind (it lists every
-        // edge keybind action); the dispatch dropped it silently.
+        // The controller panel lists every edge action; this one used to drop silently.
         hud.toggleCrafting();
         break;
       case 'dungeonFinder':
-        hud.toggleDungeonFinder();
+        hud.toggleActivities();
+        break;
+      case 'rewards':
+        hud.toggleRewards();
         break;
       case 'sheathe':
         // The keyboard arm's exact rule, from the same module.
@@ -2964,11 +2973,10 @@ async function startGame(
       crossHotbarSet: () => gamepad.getCrossHotbarSet(),
     },
   });
-  // Desktop discoverability for the Discord link/panel: the micro-menu button
-  // (#mm-discord) mirrors the mobile "More" tray entry (onDiscord), opening the
-  // account panel when logged in and falling through to the community invite
-  // otherwise, so it is a live affordance offline too (not gated on `online`).
-  hud.attachDiscordHook(() => openDiscordEntry());
+  // The Social window's Discord strip opens the account panel when logged in
+  // and falls through to the community invite otherwise (not gated on
+  // `online`); a build with Discord off attaches nothing, hiding the strip.
+  if (DISCORD_BUILD_ENABLED) hud.attachDiscordHook(() => openDiscordEntry());
   if (online) {
     // Issue #2416: chain onto whatever onReconnected enterWorld already armed
     // (the reconnect overlay teardown), rather than replacing it: hud does not
@@ -7992,11 +8000,9 @@ function flashWalletError(message: string): void {
 // ── Discord login/onboarding ─────────────────────────────────────────────────
 // Discord UI is available on web and native unless explicitly disabled at build time.
 const DISCORD_BUILD_ENABLED = String(import.meta.env.VITE_DISCORD_DISABLED ?? '').trim() !== '1';
-// Community links for the mobile More tray. discordInviteUrl() itself now
-// falls back to DEFAULT_DISCORD_INVITE_URL (discord_status.ts) when the
-// server-fed value is not known yet (logged out, offline), so every caller
-// gets the fail-open behavior for free.
-const DONATE_URL = 'https://ko-fi.com/worldofclaudecraft';
+// discordInviteUrl() falls back to DEFAULT_DISCORD_INVITE_URL (discord_status.ts)
+// when the server-fed value is not known yet (logged out, offline), so every
+// caller gets the fail-open behavior for free. DONATE_URL: ui/game_menu_hooks.ts.
 
 // The OAuth flow itself (web popup, native handoff, and the in-game link-error
 // notice a failed relink now surfaces) lives in src/net/discord_oauth_flow.ts;

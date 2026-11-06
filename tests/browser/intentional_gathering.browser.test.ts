@@ -231,6 +231,8 @@ function mount(mobile: boolean) {
   const professions = new ProfessionsWindow(
     stubDeps({
       root: () => profRoot,
+      // stubDeps answers every missing dep with a no-op; outside the hub there is no strip.
+      hubStrip: undefined,
       world: live,
       consumePeek: () => false,
       itemIcon: () => '',

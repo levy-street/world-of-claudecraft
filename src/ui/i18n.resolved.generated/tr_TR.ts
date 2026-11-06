@@ -544,6 +544,10 @@ export const tr_TR: EnTranslations = {
         "one": "Açık Gruplar: {count} bildirim",
         "other": "Açık Gruplar: {count} bildirim"
       },
+      "activitiesBellCount": {
+        "one": "Open Activities: {count} notification",
+        "other": "Open Activities: {count} notifications"
+      },
       "alerts": "Uyarılar",
       "groups": "Gruplar",
       "rewards": "Ödüller",
@@ -1839,6 +1843,7 @@ export const tr_TR: EnTranslations = {
       "chat": "Sohbete Atla"
     },
     "mobile": {
+      "groupRecord": "Record",
       "jump": "Zıpla",
       "leaderboard": "Sıralama",
       "dailyRewards": "Mağaza",
@@ -2744,6 +2749,10 @@ export const tr_TR: EnTranslations = {
       "clickMoveRight": "Sağ Tık",
       "version": "v{version} ({build})",
       "overlays": "Bindirmeler",
+      "settings": "Settings",
+      "settingsCategories": "Settings categories",
+      "helpWiki": "Help and Wiki",
+      "nameplates": "Nameplates",
       "browserEffects": "Tarayıcı Efektleri",
       "browserEffectsAuto": "Otomatik",
       "browserEffectsFull": "Tam",
@@ -3606,6 +3615,7 @@ export const tr_TR: EnTranslations = {
       }
     },
     "currencies": {
+      "walletChipAria": "{name}: {amount}",
       "intro": "Bunların hiçbiri çanta alanı kapmaz. Para her zaman çantanda kalır.",
       "activities": "Etkinlikler",
       "factions": "Fraksiyonlar",
@@ -3704,6 +3714,8 @@ export const tr_TR: EnTranslations = {
       "tierReachedLine": "Artık {faction} ile {tier} sınıfındasın. Senin lonca unvanı şimdi {title}."
     },
     "questLog": {
+      "available": "Available",
+      "offerMeta": "{zone} · {level}",
       "completed": "Tamamlanmış",
       "zoneSummary": "{count} ({ready} hazır)",
       "shiftHint": "Sohbete bağlamak için bir göreve Shift tuşunu basılı tutarak tıklayın."
@@ -6032,6 +6044,12 @@ export const tr_TR: EnTranslations = {
         "none": "Kimse",
         "title": "Kimin seni arkadaş listelerinde ve lonca çizelgesinde çevrimiçi göreceği, bölgen ve harita konumunla. Partun seni her zaman görür."
       },
+      "guildEvents": {
+        "heading": "Guild events",
+        "dateLabel": "Date",
+        "when": "{date}, {time}",
+        "discordVoice": "In {channel} ({count})"
+      },
       "billboard": {
         "label": "Lonca Panosu",
         "empty": "Panoda henüz bir şey yok.",
@@ -6354,6 +6372,31 @@ export const tr_TR: EnTranslations = {
       "armorKitUse": "Kullanım: Göğüs zırhını güçlendirer ve 1 saat boyunca Zırh değerini 12 artırır.",
       "sharpeningStoneUse": "Kullanım: Ana silahını taharuz eder, 30 dk. boyunca Saldırı Gücünü 6 artırır.",
       "manaElixirUse": "Kullanım: Ruh değerini 1 saat boyunca 6 artırır."
+    },
+    "professionsHub": {
+      "tabOverview": "Overview"
+    },
+    "activities": {
+      "title": "Activities",
+      "close": "Close Activities",
+      "tabDungeons": "Dungeons and Raids",
+      "tabPvp": "PvP"
+    },
+    "rewards": {
+      "title": "Rewards",
+      "close": "Close Rewards",
+      "tabVault": "Vault",
+      "tabWeekly": "Weekly Quest",
+      "tabWorldQuests": "World Quests",
+      "weeklyPickAt": "Choose your quest with the emissary in {zone}."
+    },
+    "bookOfRealm": {
+      "title": "Book of the Realm",
+      "close": "Close the Book of the Realm",
+      "tabDeeds": "Deeds",
+      "tabTitles": "Titles",
+      "tabReputation": "Reputation",
+      "tabRankings": "Rankings"
     },
     "professions": {
       "title": "Meslekler",
@@ -7591,6 +7634,7 @@ export const tr_TR: EnTranslations = {
       "distance": "{distance} yarda",
       "showRoute": "Rotayı Göster",
       "untrack": "Takibi kaldır",
+      "openQuestLog": "Open Quest Log",
       "track": "İzlemek",
       "worldQuests": {
         "heading": "Bugün dünya görevleri",
@@ -9687,31 +9731,45 @@ export const tr_TR: EnTranslations = {
       "chatBody": "Sol alt köşe. Yazmaya başlamak için Enter'a, göndermek için tekrar Enter'a bas.\n\nHer zaman iki sekme vardır: çevrende söylenen her şeyin birleşik kaydı olan Sohbet ve dövüşünün yazılı kaydı olan Savaş. Artı düğmesi kanal başına bir tane olmak üzere daha fazlasını ekler: Söyle, Bağır, Grup, Genel, Dünya, LFG, Lonca ve Subay; ayrıca gönderdiğin ve aldığın her fısıltıyı tek bir yerde toplayan bir Fısıltı sekmesi. Bir kanal sekmesinde yazmak, komutu yeniden yazmana gerek kalmadan o kanala gönderir.\n\nKutunun tamamı başka bir yere sürüklenebilir ve yeniden boyutlandırılabilir, bıraktığın yeri hatırlar.",
       "keyWindowsTitle": "Bir tuşla açtığın pencereler",
       "keyWindowsBody": "Bunların her birinin varsayılan bir tuşu ve sağ alt köşedeki rayda bir düğmesi vardır. Kapatmak için tuşa tekrar bas ya da Esc'e bas.",
+      "keyWindowsBodyHubs": "Each of these has a default key, and most also have a button in the rail in the bottom right corner. Several are tabbed windows that gather related panels together, and a key can open one straight onto its tab. Press the key again, or Esc, to close it.",
       "winCharTitle": "Karakter sayfası (C)",
       "winCharBody": "Bir yanda kuşandığın teçhizat, diğer yanda niteliklerin ve besledikleri istatistikler; her değerin sınıfın için ne yaptığını söyleyen bir ipucu kutusuyla birlikte. Ayrıca ömür boyu Oynama Süreni taşır, göstermek istemediğinde sayıyı gizleyen küçük bir göz simgesiyle birlikte, bir de oyuncu kartını oluşturan düğmeyi.",
+      "winCharBodyTwoTabs": "Two tabs, Character and Progression. Character shows your equipped gear on one side, your attributes and the stats they feed on the other, with a tooltip on every value that says what it does for your class. The sheet also carries your lifetime Time Played, with a small eye beside it that hides the number when you would rather not show it, and its footer holds the Cosmetics button and the button that composes your player card. On desktop, C opens your bags docked beside the sheet, so gear can be dragged straight onto your character.",
       "winBagsTitle": "Çantalar (B)",
       "winBagsBody": "Taşıdığın her şey, dört çanta yuvası olan tek bir pakette. Üstteki kategori etiketleri onu silahlara, zırha, sarf malzemelerine, malzemelere, aletlere, görev eşyalarına ya da bineklere daraltır ve bir arama kutusu ada göre filtreler. Bir sıralama açılır menüsü, baktığını en sona eklenen, kalite ya da ada göre yeniden sıralar ve bu tercih oturumlar arasında hatırlanır. Ayrı bir Sırala düğmesi, etiketleri ve aramayı temizleyerek paketin gerçek hücrelerini tek bir basışla düzenler, böylece tüm düzenlenmiş çantayı görürsün.",
+      "winBagsBodyWallet": "Everything you are carrying, in one pack with four bag sockets. Category chips across the top narrow it to weapons, armor, consumables, materials, tools, quest items, or mounts, and a search box filters by name. A sort dropdown reorders what you are looking at by most recent, quality, or name, and that choice is remembered between sessions. A separate Sort button tidies the real cells of the pack in one press, clearing the chips and the search so you see the whole tidied bag. Under the grid, a wallet strip shows the other currencies you hold, Honor and the marks you earn among them, each as a small chip with its count.",
       "winSpellbookTitle": "Büyü kitabı (P)",
       "winSpellbookBody": "Sınıfının sahip olduğu, öğrenilmiş ve henüz gelecek olan her yetenek, sırasıyla. Yetenekleri eylem çubuklarına buradan sürüklersin.",
       "winTalentsTitle": "Yetenekler (N)",
       "winTalentsBody": "Uzmanlığınızı seçtiğiniz ve altı yetenek sıranızın her birinin sunduğu üç seçenekle bunların ne işe yaradığını gördüğünüz yer. Henüz ulaşmadığınız sıralar, şu an seçebildiklerinizin yanında gösterilir.",
       "winProfessionsTitle": "Meslekler (Shift+P)",
       "winProfessionsBody": "Neler öğrendiğin, her birinde ne kadar becerikli olduğun ve her birinin daha ne kadar ilerleyebileceği.",
+      "winProfessionsBodyHub": "One tabbed window for your trades. Overview shows what you have learned, how skilled you are at each, and how far each one can still go; Crafting, Perfecting, and the Harvest Journal sit beside it as tabs of the same window.",
       "winCraftingTitle": "Üretim (T)",
       "winCraftingBody": "Tariflerin, her birinin neye ihtiyaç duyduğu ve taşıdıklarınla şu anda ne üretebileceğin.",
+      "winCraftingBodyTab": "The Crafting tab of the Professions window, which T opens directly: your recipes, what each one needs, and what you can make right now with what you are carrying.",
       "winQuestLogTitle": "Görev günlüğü (L)",
       "winQuestLogBody": "Aldığın her görev, hikayesi, hedefleri ve ilerlemenle birlikte; herhangi birini haritada gösterme ve takipçinin hangi görevleri izleyeceğini seçme yoluyla.",
+      "winQuestLogBodyAvailable": "Every quest you have taken, its story, its objectives, and your progress, with a way to show any of it on the map and to pick which quests your tracker follows. An Available group lists the quests on offer near you, each with a way to show its quest giver on the map.",
       "winDeedsTitle": "Yiğitlikler Kitabı (Shift+Z)",
       "winDeedsBody": "Yaptıklarının kaydı, sana ödediği unvanlar ve Ün, ve hâlâ açık olanlar.",
+      "winRealmTitle": "Book of the Realm (Shift+Z)",
+      "winRealmBody": "Your permanent record, in one tabbed window. Deeds holds what you have done, the Renown it has paid you, and what is still open; Titles is where you pick the title you wear and the border that frames your nameplate; and The Reliquary, Reputation, the Loot Explorer, and Rankings, the realm standings, each have a tab of their own.",
+      "winRewardsTitle": "Rewards",
+      "winRewardsBody": "What you can claim, in one tabbed window behind the Rewards button in the rail, which shows a count when something is waiting. Vault is the Weekly Vault, whose rolls open at the Vault keeper; Weekly Quest shows the emissary's four offers, though you choose one by speaking to the emissary; and World Quests is today's board, with a way to show each quest on the map and the one replacement you get each day.",
       "winSocialTitle": "Arkadaşlar ve Lonca (O)",
       "winSocialBody": "Arkadaşların, loncan ve üye listesi, akının, ve yok saydığın ya da engellediğin oyuncular için sekmeler.",
+      "winSocialBodyEvents": "Tabs for your friends, your guild and its roster, your raid, and the players you have ignored or blocked. The Guild tab also keeps an Events list: officers and the Guild Master book dated events there, and every member sees them. A Discord strip at the foot of the window opens the Discord panel.",
       "winFinderTitle": "Zindan Bulucu (Shift+I)",
       "winFinderBody": "Sıraya girebileceğin grup içeriğinin kataloğu. İstediğin etkinlikleri işaretle, tek başına bir sıraya katıl ya da kendi grubun için bir ilan ver ve bir grup bir araya geldiğinde kabul et.",
+      "winActivitiesTitle": "Activities (Shift+I)",
+      "winActivitiesBody": "Group content in one tabbed window, also opened by the Groups bell in the rail. Dungeons and Raids is the Dungeon Finder: tick the activities you want, join a queue on your own or post a listing for your own group, and accept when a group comes together. PvP, which G opens directly, holds the arenas and Thornhollow Fields, and Card Duel is where you queue for and play the Card Master's game.",
       "winMetersTitle": "Hasar sayaçları (Shift+H)",
       "winMetersBody": "Senin ve yanındaki herkesin hasarı, iyileştirmesi ve tehdidi, bir önceki dövüşe bile dönüp bakabilmen için dilimler halinde tutulur. İyileştirme ve tehdit panelleri kendi başlarına durmaları için dışarı çekilebilir.",
       "winMoreTitle": "Ve birkaçı daha",
       "winMoreBody": "Dünya haritası (M), PvP penceresi (G), Vadi Kupası (Y), lider tablosu (K), etkinlik takvimi (I) ve ifade çarkı (X) hepsi aynı şekilde çalışır. Lider tablosu ilk ziyaretinde bir an ayırmaya değer: oyuncular için bir sekme, loncalar için bir sekme, tüm hesapları Yiğitlikler Kitabı'ndaki Ün'e göre sıralayan bir sekme ve günlük sıralama için bir sekme tutar.\n\nBaşka bir oyuncuya, isim etiketinde ya da sohbette adının üzerinde sağ tıkla; Oyuncu Bilgisi onun hakkında bir kart açar: ipucu kutularıyla birlikte kuşandığı teçhizat ve karakterinin herkese açık ayrıntıları. Bu yalnızca bir bakıştır, başka bir şey değildir ve görebilmen için onun yeterince yakında olması gerekir.",
       "winMoreBodyNoValeCup": "Dünya haritası (M), PvP penceresi (G), liderlik tablosu (K) ve etkinlik takvimi (I) aynı şekilde çalışır. İfade çarkı (X) istisnadır: çark görünene kadar tuşa basılı tut, sonra ifadeyi oynatmak için imleci onun üzerinde bırak. İlk ziyaretinde liderlik tablosuna bir an ayır: oyuncular, loncalar, Yiğitlikler Kitabı'ndan Şöhrete göre tüm hesapları sıralayan bir sekme, günlük sıralamalar ve oyunu yapan kişiler için Geliştiriciler sekmesi vardır; Geliştirici Rozetlerini Göster'i kapatırsan sonuncusu görünmez.\n\nBaşka bir oyuncuyu hedefle ve hedef çerçevesine sağ tıkla, dokunmatikte çift dokun veya uzun bas, ya da sohbette adına sağ tıkla; Oyuncu Bilgisi, giydiği teçhizatı araç ipuçlarıyla ve karakterinin herkese açık ayrıntılarını gösteren bir kart açar. Bu yalnızca bir bakıştır. Teçhizatı görmek için yeterince yakında olması gerekir; uzaktaki bir oyuncunun adını sohbetten ararsan kartın yalnızca herkese açık yarısını, yani portresini, adını, seviyesini, sınıfını ve loncasını görürsün.",
+      "winMoreBodyRankings": "The world map (M) works the same way. The emote wheel (X) is the exception: hold its key and the wheel appears, then let go over an emote to play it. The Rankings tab of the Book of the Realm is worth a moment on your first visit: it keeps a board for players, one for guilds, one that ranks whole accounts by Renown from their deeds, one for the daily standings, one for World Quests, and a Developers tab for the people who build the game, there unless you switch Show Developer Badges off.\n\nTarget another player and right-click the target frame (on touch, double-tap or long-press it), or right-click their name in chat, and Player Info opens a card on them: the gear they are wearing, with tooltips, and the public details of their character. It is a look, nothing more. The gear needs them close enough to see: look a name up from chat while they are far away and you get the public half of the card instead, their portrait, name, level, class, and guild.",
       "worldWindowsTitle": "Dünyanın sizin için açtığı pencereler",
       "worldWindowsBody": "Bazı pencereler için hiçbir tuşa basmazsınız: doğru kişiyle konuştuğunuzda ya da doğru şeye tıkladığınızda kendiliğinden açılırlar.\n\nBir tüccar, satın alınabilecek stokla birlikte, yanlışlıkla sattığınız eşyaları tutan bir geri alım sekmesiyle Tüccar penceresini açar. Stokla birlikte bir dizi miktar düğmesi durur, böylece bir yığın malzeme on kez basmak yerine beşer ya da onar basışla alınır; ikisi de uymadığında özel bir miktar seçeneği de vardır. Bir sınıf eğitmeni, şu anda öğrenebilecekleriniz ile önünüzde bekleyenlerin listesini açar.\n\nBir bankacı kasanızı açar: satın alarak genişletebileceğiniz ekstra yuvaların bulunduğu o kasayı. Loncanız bir banka açtıysa oradaki ikinci bir sekme onu gösterir: bir şey çıkarma izni olmasa da her üye içine bakabilir, böylece kimse loncanın ne tuttuğunu sormak zorunda kalmaz; kimin para yatırıp çekebileceğine ve lonca parasını taşıyabileceğine rütbeler karar verir, bir günlük de her hareketi kaydeder.\n\nBir Kuzgun Postası kutusu mektuplarınızı açar: gelenler bir sekmede, ekleriyle birlikte gönderme formu bir başka sekmede. Tüccar'daki Dünya Pazarı'nın kendi penceresi vardır: bir sekmesinde göz atıp satın alırsınız, bir başkasında kendi mallarınızı listelersiniz, üçüncüsünde satılanları toplarsınız. Başka bir oyuncuyla yüz yüze takas yapmak, her biri için bir tarafı olan bir takas penceresi açar.",
       "worldWindowsBodyStationMaster": "Bazı pencereleri hiçbir tuşla açmazsın; doğru kişiyle konuştuğunda veya doğru şeye tıkladığında açılırlar.\n\nBir tüccar, satın alacağın stokla birlikte aynı panelin altında en son sattıklarını tutan bir geri satın alma listesi olan satıcı penceresini açar. Stok yanında miktar düğmeleri vardır; böylece reaktif yığını beşer veya onar almak için on basış yerine tek basışla alınır, ikisi de uymadığında özel miktar girilir. Sınıf yeteneklerin eğitmen istemez, seviyelerinle gelir; buradaki eğitmenler üretim istasyonlarının yerleşik ustalarıdır. Birinde Eğitim'i açmak, şimdi öğretebilecekleri, zaten bildiklerin ve daha fazla beceri arkasında kilitli tarifleri gösterir.\n\nBir bankacı, satın alabileceğin ek yuvalı güçlü sandık için Kişisel sekmesi ve üretim malzemelerini türe göre saklayan Hazine sekmesiyle bankanı açar. Loncan banka açtıysa Lonca sekmesi onu gösterir: her üye bir şey alma izni olmadan da içine bakabilir, rütbeler lonca parasını yatırıp çekip taşıyabilecekleri belirler ve günlük her hareketi kaydeder.\n\nBir Kuzgun Postası kutusu, gelen mektupların bir sekmede ve ekleriyle gönderim formunun başka sekmede olduğu mektuplarını açar. Doğudere'deki Tüccar veya Yükseknöbet'teki Müzayedeci Voss yanındaki Dünya Pazarı kendi penceresine sahiptir: bir sekmede gezinip satın al, diğerinde mallarını listele, üçüncüde satılanları topla. Başka bir oyuncuyla yüz yüze takas, her oyuncuya bir taraf veren takas penceresini açar.",
@@ -9721,11 +9779,16 @@ export const tr_TR: EnTranslations = {
       "playerCardBody": "Karakter sayfandaki bir düğme bir oyuncu kartı oluşturur: karakterinin bir yakın çekimi, kuşandığın teçhizat ve istatistiklerinle birlikte, kaydetmeye ya da paylaşmaya hazır bir görsel. Yeni bir seti göstermek için bir anlık görüntüdür ve oyunda hiçbir şeyi değiştirmez.",
       "wikiTitle": "Wiki düğmesi",
       "wikiBody": "Bu wiki oyunun içinden tek bir tıklama uzaklıktadır. Bir düğmesi sağ alt köşedeki raydaki diğerleriyle birlikte durur, Esc oyun menüsünde bir sırası vardır ve telefonda Daha Fazla tepsisinde yaşar. Açmak seni tarayıcına devrettiği için düğme her zaman önce onay ister, böylece bir dövüşteki kazara bir dokunuş seni asla dışarı çıkaramaz. Oyun arkasında çalışmaya devam eder.",
+      "wikiBodyGameMenu": "This wiki is one click away in game. Its button sits in the Game Menu, which Esc opens on desktop and the Quick Actions control opens on touch. Because opening it hands you over to your browser, the button always asks you to confirm first, so an accidental tap in a fight can never pull you out of one. The game keeps running behind it.",
       "mobileTitle": "Telefonda ya da tablette",
       "mobileBody": "Dokunmatik denetimler kendiliğinden belirir ve düzen kendini ekranına göre boyutlandırır: küçük bir telefonda kompakt bir düzen, daha büyük bir telefonda standart bir düzen ve bir tablette daha ferah bir düzen.\n\nYeteneklerin bir sayı sırası yerine bir halkada durur: yanında beş eylem düğmesi olan saldırı düğmesi ve halkayı geri kalan yuvaların arasında değiştiren bir sayfa geçişi, üç eylem çubuğunun tamamını açtığında yedi sayfaya kadar. Etraflarında dokunmatik bir oyuncunun en çok başvurduğu düğmeler durur: hedef değiştirme, önündekini kullanma ve zıplama, ayrıca taşıdıklarından kendiliğinden dolan, dışarı çekilebilen bir sarf malzemesi sırası.\n\nAlt kenar boyunca Sohbet, Sosyal, Görevler, Ayarlar ve Daha Fazla bulunur. Daha Fazla, karakterin, Zindan Bulucu, PvP, Vadi Kupası, ifadeler ve wiki dahil geri kalan pencerelerini tutan bir tepsi açar. Pencereler burada üzerine yüzmek yerine ekranı doldurur.\n\nBirim çerçevelerini taşımak masaüstüne özgü bir şeydir: dokunmatikte düzen onları senin için yerleştirir.",
       "mobileBodyTwoPages": "Dokunmatik kontroller kendiliğinden görünür ve düzen ekranına göre boyutlanır: küçük telefonda kompakt, büyük telefonda standart, tablette daha ferah bir düzen.\n\nYeteneklerin sayı sırası yerine bir halkada durur: yanında dört eylem düğmesi bulunan saldırı düğmesi ve halkayı {pages} sayfası arasında değiştiren sayfa düğmesi; bunlar, ek masaüstü çubukları açık olsun ya da olmasın, toplam {slots} yetenek yuvasına ulaşır. Halkanın beşinci yay konumu sarf malzemeleri içindir: oradakini kullanmak için dokun, basılı tut veya içeri kaydır; taşıdıklarınla kendini dolduran bir satır açılır. Halkanın çevresinde dokunmatik oyuncunun en sık kullandığı düğmeler bulunur: hedef değiştirme, önündekini kullanma ve zıplama.\n\nBir Hızlı Eylemler denetimi düğme sırasının yerine alt kenarda durur. Binek, sohbet, harita, çantalar, sosyal, görevler, karakter, büyü kitabı, oyun menüsü ve diğer pencereleri, Zindan Bulucu'yu, PvP'yi, ifadeleri ve wiki'yi içeren Daha Fazla girişini açar. Burada pencereler üstte yüzmek yerine ekranı doldurur.\n\nBirim çerçevelerini taşımak masaüstüne özgüdür; dokunmatikte düzen onları senin için yerleştirir.",
       "railTitle": "Düğme rayı",
-      "railBody": "Ekranın sağ alt köşesinde, mini haritadan epey uzakta, pencere başına bir tane olmak üzere, yan yana iki kısa sütun halinde düzenlenmiş küçük kare düğmelerden oluşan bir ray durur. Çoğunun üzerinde varsayılan tuşu yazılıdır.\n\nİlk sütun karakterini, büyü kitabını, yeteneklerini, görev günlüğünü, Yiğitlikler Kitabı'nı, mesleklerini, dünya haritanı, çantalarını ve üretimi kapsar. İkincisi WOC Mağazası ile açılır ve PvP, Zindan Bulucu, Vadi Kupası, Kart Düellosu, lider tablosu, ifadeler, müzik, arkadaşlar ve lonca, bu wiki ve oyun menüsüyle devam eder. Yalnızca geçerli olduklarında birkaçı daha onlara katılır."
+      "railBody": "Ekranın sağ alt köşesinde, mini haritadan epey uzakta, pencere başına bir tane olmak üzere, yan yana iki kısa sütun halinde düzenlenmiş küçük kare düğmelerden oluşan bir ray durur. Çoğunun üzerinde varsayılan tuşu yazılıdır.\n\nİlk sütun karakterini, büyü kitabını, yeteneklerini, görev günlüğünü, Yiğitlikler Kitabı'nı, mesleklerini, dünya haritanı, çantalarını ve üretimi kapsar. İkincisi WOC Mağazası ile açılır ve PvP, Zindan Bulucu, Vadi Kupası, Kart Düellosu, lider tablosu, ifadeler, müzik, arkadaşlar ve lonca, bu wiki ve oyun menüsüyle devam eder. Yalnızca geçerli olduklarında birkaçı daha onlara katılır.",
+      "mobileBodyGroupedMore": "Touch controls appear on their own, and the layout sizes itself to your screen: a compact arrangement on a small phone, a standard one on a larger phone, and a roomier one on a tablet.\n\nYour abilities sit in a ring rather than a number row: the attack button with four action buttons beside it, and a page toggle that swaps the ring between its {pages} pages, which together reach all {slots} of your ability slots whether or not the extra desktop bars are switched on. The fifth arc position of that ring is your consumables seat: tap it to use what is seated there, or hold it, or swipe it inward, to open a row that fills itself from what you are carrying. Around the ring sit the buttons a touch player reaches for most, swapping target, using what is in front of you, and jumping.\n\nOne Quick Actions control sits at the bottom edge in place of a row of buttons. It opens onto everything else: mount, chat, map, bags, social, quests, character, spellbook, game menu, and a More entry that sorts the rest of your windows into groups: Record (deeds, titles, the Reliquary, reputation, the Loot Explorer, and the rankings), Professions, Activities (dungeons and raids, PvP, and Card Duel), Character (emotes, talents, and cosmetics among them), and Store. The wiki and Discord sit in the game menu instead. Windows fill the screen here rather than floating over it.\n\nMoving your unit frames is a desktop thing: on touch the layout places them for you.",
+      "mobileBodyRewardsMore": "Touch controls appear on their own, and the layout sizes itself to your screen: a compact arrangement on a small phone, a standard one on a larger phone, and a roomier one on a tablet.\n\nYour abilities sit in a ring rather than a number row: the attack button with four action buttons beside it, and a page toggle that swaps the ring between its {pages} pages, which together reach all {slots} of your ability slots whether or not the extra desktop bars are switched on. The fifth arc position of that ring is your consumables seat: tap it to use what is seated there, or hold it, or swipe it inward, to open a row that fills itself from what you are carrying. Around the ring sit the buttons a touch player reaches for most, swapping target, using what is in front of you, and jumping.\n\nOne Quick Actions control sits at the bottom edge in place of a row of buttons. It opens onto everything else: mount, chat, map, bags, social, quests, character, spellbook, game menu, and a More entry that sorts the rest of your windows into groups: Record (deeds, titles, the Reliquary, reputation, the Loot Explorer, and the rankings), Professions, Activities (dungeons and raids, PvP, and Card Duel), Character (emotes, talents, and cosmetics among them), Rewards (the Vault, the weekly quest, and world quests), and Store. The wiki and Discord sit in the game menu instead. Windows fill the screen here rather than floating over it.\n\nMoving your unit frames is a desktop thing: on touch the layout places them for you.",
+      "railBodyTwelve": "Down in the bottom right corner of the screen, a long way from the minimap, sits a rail of small square buttons arranged in two short columns side by side. Most of them are printed with their default key.\n\nThe first column covers your character, bags, spellbook, talents, quest log, and world map. The second opens the Book of the Realm, your professions, Activities (the Groups bell), and friends and guild, then the WOC Store and the game menu. A few more join them only when they apply.",
+      "railBodyThirteen": "Down in the bottom right corner of the screen, a long way from the minimap, sits a rail of small square buttons arranged in two short columns side by side. Most of them are printed with their default key.\n\nThe first column covers your character, bags, spellbook, talents, quest log, world map, and Rewards. The second opens the Book of the Realm, your professions, Activities (the Groups bell), and friends and guild, then the WOC Store and the game menu. A few more join them only when they apply."
     },
     "commandsPage": {
       "intro": "Sohbete yazabileceğin her komut, ne işe yaradığına göre gruplanmış, kısa biçimleriyle birlikte.",
@@ -9882,6 +9945,7 @@ export const tr_TR: EnTranslations = {
       "deedDef": "Yiğitlikler Kitabı'na kaydedilen bir başarım. Birini kazanmak Ün verir ve bazıları kozmetik bir unvan ya da isim levhası çerçevesi kazandırır.",
       "renownTerm": "Ün",
       "renownDef": "Yiğitliklerinin topladığı ömür boyu puan. Yalnızca yükselir ve diyar, sıralamalarını Lider Tablosu'nda tutar.",
+      "renownDefRankings": "The lifetime score your deeds add up to. It only ever climbs, and the realm keeps standings of it on the Rankings tab of the Book of the Realm.",
       "heroicTerm": "Kahramanca",
       "heroicDef": "Bir zindanın ya da akının daha zorlu sürümü; donanımlı son oyun grupları için ayarlanmış. Kahramanca şefler yükseltilmiş ganimet düşürür ve son şef Kahramanca Nişanları öder.",
       "lockoutTerm": "Kilitlenme",
@@ -10532,8 +10596,10 @@ export const tr_TR: EnTranslations = {
       "duelsBody": "Karşılaştığın herhangi bir oyuncuyu dostane bir düelloya davet et. Gururdan başka kaybedilecek bir şey yok, bu yüzden bir eşleşmeyi öğrenmenin ya da dostça bir tartışmayı çözmenin en kolay yoludur.",
       "coliseumHeading": "Kül Kolezyumu",
       "coliseumBody": "Kolezyum diyarın arenasıdır; orada diğer oyuncularla dereceli maçlarda, birebir ya da ikiye iki karşılaşırsın. Her kategori kendi sıralamasını tutar, dolayısıyla bir galibiyet seni tüm diyarın gözü önünde o merdivende yükseltir. Dereceli oyun 15. seviyede açılır ve bu partnerin için de geçerlidir: ikinizden biri altındaysa, ikiniz de yeterli olana dek sıra kapalı kalır. Tüm oyuncuya karşı oyuncu, PvP işaretli tek bir düğmenin ardında yaşar: onu aç ve bir sekme seç, Dikenvadi Ovası, birebir ya da ikiye iki, sonra tek başına ya da partnerinle kaydol. Sırada ya da bir maçtayken diğer sekmeler kilitli kalır, böylece asla aynı anda iki sırada bulunamazsın.",
+      "coliseumBodyActivities": "The Coliseum is the realm's arena, where you face other players in ranked matches, one on one or two on two. Each bracket keeps its own standing, so a win lifts you up that ladder for the whole realm to see. Ranked play opens at level 15, and that applies to your partner too: if either of you is below it, the queue stays closed until you both qualify. All of player versus player lives on the PvP tab of the Activities window, which G opens directly: pick a tab there, Thornhollow Fields, one on one, or two on two, then sign up alone or with your partner. While you are queued or in a match, the other tabs stay locked, so you can never sit in two queues at once.",
       "ladderHeading": "Merdiveni tırmanmak",
       "ladderBody": "Dereceli oyun, konumunu zaman içinde takip eder. Nerede durduğunu ve diyarın zirvesini kimin tuttuğunu görmek için lider tablosuna bak.",
+      "ladderBodyBracketTab": "Ranked play tracks your standing over time. Each bracket keeps its ladder on its own tab of the PvP window, so check it to see where you sit and who holds the top of the realm.",
       "rewardsHeading": "Dereceli oyun ne öder",
       "rewardsBody": "Dereceli bir galibiyet, oyuncuya karşı oyuncu para birimi olan Onur öder, bir mağlubiyet ise sana puandan başka bir şey kaybettirmez. Onur, gerçek maçları ödüllendirmek için tasarlanmıştır: aynı gün aynı rakibi ya da aynı takımı tekrar yenmek artık hiçbir şey ödemez, uzun bir galibiyet günü ilerledikçe galibiyet başına biraz daha az öder, ve rakibinin çekildiği bir maç puanını yine de değiştirir ama hiç Onur ödemez. O gün Onur’un kendi günüdür ve diyarın örnek sıfırlamasıyla değil, kendi saatiyle yenilenir.",
       "rewardsBodyLossShare": "Dereceli bir galibiyet, oyuncuya karşı oyuncu para birimi olan Onur'u öder; sonuna kadar oynadığın bir yenilgi ve beraberlik de onun daha küçük bir payını öder, bu yüzden bir yenilginin gerçekten kaybettirdiği tek şey derecelendirmedir. Onur gerçek maçları ödüllendirmek içindir: aynı rakibi veya aynı takımı aynı gün tekrar yenmek daha fazla ödeme yapmaz, onlara tekrar yenilmek de yapmaz. Uzun bir galibiyet günü ilk galibiyetler dizisinde tam ödeme yapar, sonra galibiyet ödemesini yarıya indirir, ileride bir kez daha yarıya indirir ve orada kalır. Rakibinin hükmen bıraktığı maç dereceni yine değiştirir ama hiç Onur ödemez. Gün, diyarın kendi günüdür: her günlük kilidin açıldığı sınır olan diyarın gece sıfırlanma saatinde yenilenir.",
@@ -10580,6 +10646,7 @@ export const tr_TR: EnTranslations = {
       "intro": "Dikenzirve'nin altındaki eski ormanda, surlarla çevrili bir vadide oynanan, dereceli 5v5 sancak kapma savaş alanı; burada iki yıkık kale bir vadinin boyunca karşı karşıya durur ve ikisinin arasında hiçbirinin hiç ele geçiremediği daha eski bir avlu bulunur. Beşer kişilik iki takım, iki kale, tek hedef: düşman sancağını çal ve seninkini çalmadan onu eve taşı.",
       "queueHeading": "Sıraya girmek",
       "queueBody": "Dikenvadi Ovası 20. seviyede açılır ve grup kaydolabilmeden önce grubun her üyesinin bunu karşılaması gerekir. PvP düğmesini aç ve zaten üzerinde açıldığı Dikenvadi Ovası sekmesini seç, sonra tek başına sıraya gir ya da en fazla beş kişilik bir grup getirip birlikte kaydolun: gruplar her zaman aynı takımda tutulur ve kalan yerler tek başına gelen şampiyonlarla dolar. On kişi hazır olduğunda maç, bayraklar devreye girmeden önce kısa bir toplanma için iki takımı da kalelerine yerleştirir. Dört ya da beş kişilik bir grup aksi halde yalnızca tek başına kaydolanlarla karşılaşacaksa, eşleştirme ikinci bir grubun çıkıp çıkmayacağını görmek için maçı kısaca bekletir, dolayısıyla bu büyüklükte bir grup kapılar açılmadan önce bazen birkaç an daha bekler. O bekleyiş kısadır ve sonunda daima geri adım atar, böylece kimse onun yüzünden sırada takılı kalmaz.",
+      "queueBodyActivities": "Thornhollow Fields opens at level 20, and every member of a party has to meet it before the party can queue. Press G to open the PvP tab of the Activities window and pick the Thornhollow Fields tab, which comes first, then enter the queue solo, or bring a party of up to five and queue together: parties are always kept on one team, and the remaining seats fill with solo champions. When ten stand ready, the match seats both teams at their keeps for a short form-up before the flags go live. If a group of four or five would otherwise face nothing but solo queuers, the matchmaker holds the match briefly to see whether a second group turns up, so a party that size sometimes waits a few moments longer before the gates open. That wait is short and always gives way in the end, so nobody is left sitting in the queue for it.",
       "fieldHeading": "Saha",
       "fieldBody": "Üç bölmeye ayrılmış, surlarla çevrili, açık havada bir saha: her takımın kendi kalesinin önünde kendi sahası vardır ve surlarla çevrili Yıkık Avlu ikisinin arasında yer alır. İki sur sahanın tüm genişliğini kaplar ve bölmeler arasındaki her geçiş, tartışmalı bir geçit noktasından yapılır: geniş ana kapı ya da kapı kulesi, surun üzerine kurulu ve kaydırılmış kapılarıyla bir pusu köşesinin yanından dolanmayı zorunlu kılan küçük bir oda. Her kale, ağzı dışında kapalıdır, bu yüzden her sancak koşusu aynı açıklıktan başlar ve biter; alçak bir barikat da içine doğrudan hücumu böler. Avlu, boş kalpli harabeyi ve iki yandaki Koşu Rünü'nü barındırır; diğer iki Koşu Rünü ise sancak yaklaşımlarında bekler. Her ana kapının avluya açılan ağzında bir Savaş ya da Siper Rünü (birkaç saniye boyunca daha fazla hasar verme ya da daha az hasar alma) bekler: ikisi de maça aynı yüzle başlar ve her ele geçirmede taraf değiştirir.",
       "flagsHeading": "Sancaklar",
@@ -10618,6 +10685,7 @@ export const tr_TR: EnTranslations = {
       "quartermastersBody": "Her çete kendi merkezinde bir çeyiz hakkanı tutar: Drifthaven'de Rift İzlemesi için Çeyiz Hakkanı Vaelen, Doğudere şapelde Kilise Düzeni için Tapınak Nişancısı Althea ve Wyrmwatch'te Otomatlar için Usta Tobrin. Her biri küçük mücevher, zırh, silah ve çanta deposu satıyor, o çetelede durmanız büyüdükçe sırada açılmış ve sıradan paraya karşı ödenir.",
       "readingHeading": "Nerede Oku",
       "readingBody": "Karakter sayfasının İtibar sekmesi (C), her çete gösterir, mevcut durumu, sonraki seviye yönü bir çubuk, ve o durumun kazandığı unvanı. Sohbet günlüğü her durmanı kazancı indirir ve yeni seviye ulaşmak ekran üzerinde kutlama afişi gösterir.",
+      "readingBodyRealm": "The Reputation tab of the Book of the Realm (Shift+Z) shows each faction with its current standing, a bar toward the next tier, and the title that standing has earned you. The chat log reports every standing gain as it lands, and reaching a new tier shows a celebration banner on screen.",
       "deedsHeading": "İşler",
       "deedsBody": "İşlerin Kitabı ayrıca durmanızı tutar: bir çetelede Güvenilir'e ulaşmak ve bir çetelede Şampiyon'a ulaşmak işlemi kaydeder, ve üç çetelede de Şampiyon'a ulaşmak kendi işlemidir. Her işleme gibi bunlar kozmetik, hiçbir zaman güç değildir, ve Şampiyon işleri sizin giyebileceğiniz bir unvan verir."
     },
@@ -10636,6 +10704,7 @@ export const tr_TR: EnTranslations = {
       "catalogHeading": "Yiğitliklerin tam sicili",
       "catalogBody": "İşte Kitabın alabileceği bütün yiğitlikler, kategorilere göre derlenmiş. Gizli olanlar bilerek dışarıda bırakıldı; onları bulmak sana düşüyor. Her birinin tam olarak ne istediğini görmek için oyun içinde Yiğitlikler Kitabı'nı aç.",
       "standingsNote": "Diyarlar her hesabın ömür boyu Ün'ünü sürekli olarak kaydeder: sıralama, tüm karakterlerindeki her yiğitliği bir kez sayarak hesapları ömür boyu Ün'lerine göre sıralar ve yalnızca Ün'ü gösterir; bu nedenle Ün taşımayan yiğitlikler Kitabında sayılsa da sıralamayı hiç etkilemez. Kimin nerede durduğunu görmek için oyun içinde Lider Tablosunu aç ve Ün sekmesine geç; sıralama orada yaşar, wiki'de değil.",
+      "standingsNoteRankings": "The realms keep a running tally of Renown across every account: the board ranks whole accounts by lifetime Renown, counting each deed once across all your characters, and it shows Renown alone, so deeds that carry none never move the standings even though they count in your Book. To see who stands where, open the Rankings tab of the Book of the Realm in game and turn to its Renown board; the standings live there, not on the wiki.",
       "catHeading": "{label} ({count})",
       "colName": "Yiğitlik",
       "colRenown": "Ün",
@@ -10656,6 +10725,7 @@ export const tr_TR: EnTranslations = {
       },
       "bookHeading": "Kitabın içinde",
       "bookBody": "Kitap, her yiğitliği aralarında geçiş yapabileceğin kategorilere ayırır; her şey için, kazandıkların için, kazanmadıkların için ve bitirmene ramak kalanlar için bir arama kutusu ve filtreler sunar. Üstte bir En Son şeridi en yeni açtıklarını tutar; birine tıklamak doğrudan kartına götürür, tıpkı birinin sohbette paylaştığı bir yiğitlik adına tıklamak gibi. Yanında, Az Kaldı seni bitirmene en yakın olduğun avuç dolusu yiğitliğe yönlendirir. Bir diyarda her yiğitlik ayrıca kendi enderliğini, onu kazanan maceracıların payını taşır, böylece hangilerinin yaygın hangilerinin gerçek bir tırmanış olduğunu bir bakışta görürsün; çevrimdışı dünyanın sayacak bir nüfusu olmadığından orada hiçbir şey göstermez. Rafın sonunda, takacağın unvanı seçtiğin Unvanlar rafı bulunur.",
+      "bookBodyTitlesTab": "The Book sorts every deed into categories you can flip between, with a search box and filters for everything, for what you have earned, for what you have not, and for the ones you are nearly done with. A Recent strip near the top holds your latest unlocks, and clicking one jumps straight to its card, as does clicking a deed name someone posts in chat. Beside it, Nearly there points you at the handful you are closest to finishing. Out in a realm each deed also carries its rarity, the share of adventurers who have earned it, so you can see at a glance which ones are common and which are a real climb; the offline world has no population to count, so it shows none. The titles and borders your deeds pay out have a tab of their own, Titles, beside Deeds in the Book of the Realm, with a picker for each: one for the title you wear, one for the border that frames your nameplate.",
       "platformHeading": "Steam ve Epic başarımları",
       "platformBody": "Masaüstü uygulamasından bir Steam ya da Epic Games hesabı bağlarsan, kazandığın yiğitlikler o hesapta başarım olarak dışa yansıtılır. Oyun dünyası yetkeyi elinde tutmaya devam eder: yiğitliği burada kazanırsın, karakterine kaydedilir ve başarım daha sonra onu izler. Her yiğitliğin karşılığı bir başarım yoktur ve biri hemen gelmezse bir sonraki girişinde yetişir. Bağlamak yalnızca bir bağlantıdır, asla giriş yapmanın bir yolu değildir."
     },
@@ -10663,6 +10733,7 @@ export const tr_TR: EnTranslations = {
       "intro": "Yadigârlık, kataloğuna geçirdiğin benzersiz ganimetlerin müzesidir: zindanların peşine düşülen parçaları, meslek ödülleri, binekler, silah görünümleri ve unvanlar. Bir ödül salonu bir başarı kitabıyla nasıl eşleşirse, o da Yiğitlikler Kitabı'yla öyle eşleşir.",
       "howHeading": "Koleksiyon nasıl işler",
       "howBody": "Oyunda Kutsal Emanetliği aç (varsayılan Shift+X). Her raf, benzersiz emanet sayfaları barındırır. Hesabındaki herhangi bir karakter o parçayı ilk kez elde ettiğinde siluet dolar; sayfadaki her emanet dolduğunda sayfa aydınlanır. Birkaç sayfa Emekli veya Kişisel olarak etiketlidir: tamamlamanın dışında kalırlar, bu yüzden hiçbir zaman bir rafı ya da tüm kataloğu kilitlemezler. Anlık bulunanlar bir bildirim çıkarır ve açık pencereyi tazeler; ilerleme hesaptaki tüm karakterler arasında paylaşılır, dolayısıyla bir karakterin bulduğu emanet sayfayı herkes için doldurur.",
+      "howBodyRealmTab": "Open the Book of the Realm in game (default Shift+Z) and turn to its Reliquary tab. Each shelf holds pages of unique relics. Fill a silhouette when any character on your account obtains that piece for the first time, and illuminate a page when every relic on it is filled. A few pages are labeled Retired or Personal: they sit outside completion, so they never gate a shelf or the whole catalog. Live finds toast and refresh the open window; progress is shared by every character on the account, so a relic one character finds fills the page for all of them.",
       "ranksHeading": "Küratör dereceleri",
       "ranksBody": "Küratör dereceleri kataloğa giren her benzersiz yadigârla yükselir ve yalnızca kozmetik unvanlar ile çerçeveler verir. Asla savaş gücü, ganimet şansı ya da şanssızlık telafisi vermez. Hesaba bağlı silah görünümleri Küratör derecesine puan yazmaz, böylece itibar karaktere bağlı kalır; Kaldırıldı ya da Kişisel sayfalardaki yadigârlar da bu dereceye hiçbir puan yazmaz.",
       "retiredTag": "Kaldırıldı",
@@ -11336,6 +11407,7 @@ export const tr_TR: EnTranslations = {
       "slashBody": "Birkaç günlük komutu ezberlemeye değer: /w İsim bir fısıltı gönderir ve /r aldığın sonuncuyu yanıtlar, /invite birini grubuna çağırır, /follow bir arkadaşın peşine takılır, /roll grubun görmesi için zar atar, /who kimin çevrimiçi olduğunu gösterir ve /afk seni uzakta olarak işaretler. Tam liste için oyunda /help yaz.",
       "emotesBody": "Karakterin sözcükler olmadan da konuşabilir: /wave, /dance, /cheer ya da /bow gibi bir ifade yaz, ona yöneltmek için önce bir arkadaşı hedefle ya da baş üstünde hızlı bir ifade için X'e basılı tutup ifade tekerini aç.",
       "emotesBodyNamedTarget": "Karakteriniz kelimeler olmadan da konuşabilir: /wave, /dance, /cheer veya /bow gibi bir ifade yazıp /wave Aleph örneğindeki gibi bir isim ekleyerek hedef seçin; hızlı bir baş üstü ifade için X tuşunu, ifade çarkının varsayılan tuşunu basılı tutun. Pencere düğmeleri şeridindeki veya dokunmatik ekranda More altındaki Emotes düğmesi de aynı çarkı açar.",
+      "emotesBodyMoreTray": "Your character can also speak without words: type an emote like /wave, /dance, /cheer, or /bow, add a name to aim it at someone, as in /wave Aleph, or hold X, the emote wheel's default key, to open the emote wheel for a quick overhead expression. On touch, the Emotes tile in the More tray opens the same wheel.",
       "calendarHeading": "Etkinlik takvimi",
       "calendarBody": "Etkinlik takvimini açmak için I'ya bas. Çevresinde plan yapmaya değer diyar günlerini işaretler: haftalık Akın Çağrısı, Pazar Günü, Arena Kapışması ve Balık Yarışması, ayrıca aylık Mağara Günü ve Ay Kapısı Ayini; ve loncaların takvimlerini tuttukları yer de burasıdır: lonca lideri ve subaylar üzerine etkinlik kaydedebilir ve her üye onları aynı sayfada görür. Diyar günleri bir araya gelmek için bir çağrıdır, bonus değil; bir gün işaretli diye karakterinde hiçbir şey değişmez.",
       "calendarBodyDoubleHonor": "Etkinlik takvimini açmak için I tuşuna basın. Takvim, planlamaya değer diyar günlerini işaretler: haftalık Baskın Çağrısı, Pazar Günü, Arena Çatışması, Çifte Onur Hafta Sonu ve Balıkçılık Derbisi; aylık Keşif Günü ile Ay Kapısı Komünyonu da buradadır. Loncalar programlarını burada tutar; lonca lideri ve subaylar etkinlik ekleyebilir, her üye aynı sayfada görür. Diyar günleri bonus değil, toplanma hatırlatıcısıdır. Tek istisna Çifte Onur Hafta Sonu’dur: Thornhollow Fields Onuru boyunca iki kat öder ve oynanmış bir yenilgi galibiyet gibi sayılır. İşaretlenmiş gün karakterinizin başka hiçbir özelliğini değiştirmez.",
@@ -11355,6 +11427,7 @@ export const tr_TR: EnTranslations = {
       "finderMore": "Her zindanın içinde neler olduğunu gör",
       "blockBody": "Engelle, seni rahat bırakmayacak bir oyuncu için daha ağır araçtır. Bir engelleme, sohbetinin yanı sıra davetlerini, fısıltılarını ve postalarını da keser, ikinizi /who içinde birbirinize görünmez yapar ve arkadaş listendeyse oradan da düşürür. Adının üzerindeki sağ tık menüsünden ya da /block ile engelle, /unblock engeli tekrar kaldırır ve /blocklist kimin listede olduğunu gösterir.",
       "guildBoardBody": "Loncalar da sıralanır. Lider Tablosu penceresi, oyuncu tablolarının yanında bir Loncalar tablosu tutar; loncaları üyelerinin birlikte kazandıklarına göre sıralar, böylece hareketli bir lonca nerede durduğunu görebilir.",
+      "guildBoardBodyRankings": "Guilds are ranked too. The Rankings tab of the Book of the Realm keeps a Guilds board beside the player boards, ranking guilds on what their members have earned together, so a busy guild can see where it stands.",
       "guildBankHeading": "Lonca bankası",
       "guildBankBody": "Bir loncanın da kendine ait bir kasası vardır. Merkez kasabalardan birindeki bir bankacının yanına git, bankanı aç ve Lonca sekmesine geç: orada bir para hazinesi ve loncanın ortaklaşa sahip olduğu, ortak bir eşya deposu bulursun. Her üye onu açıp içinde ne olduğuna bakabilir ve panel kimin daha fazlasını yapabileceğini açıkça belirtir. Yalnızca lonca lideri ve subaylar işlem yapabilir, para ve mal koyup çıkarabilir; her yatırma ve çekme işlemi loncanın okuyabileceği bir günlüğe yazılır, böylece hiçbir şey kayıt dışı hareket etmez.",
       "guildBankRulesBody": "Eşya deposu kapalı başlar. Bir subay onu kendi cebinden açar ve lonca daha sonra hazineden ödeyerek genişletebilir. Görev eşyaları, ruha bağlı herhangi bir şey ve Pazar'ın kabul etmeyeceği teçhizat, tıpkı posta ve Pazar'da olduğu gibi, deponun dışında kalır; yani banka hâlâ el değiştirebilen mallar içindir.",

@@ -544,6 +544,10 @@ export const sv_SE: EnTranslations = {
         "one": "Öppna grupper: {count} avisering",
         "other": "Öppna grupper: {count} aviseringar"
       },
+      "activitiesBellCount": {
+        "one": "Open Activities: {count} notification",
+        "other": "Open Activities: {count} notifications"
+      },
       "alerts": "Aviseringar",
       "groups": "Grupper",
       "rewards": "Belöningar",
@@ -1839,6 +1843,7 @@ export const sv_SE: EnTranslations = {
       "chat": "Hoppa till chatt"
     },
     "mobile": {
+      "groupRecord": "Record",
       "jump": "Hoppa",
       "leaderboard": "Ranking",
       "dailyRewards": "Butik",
@@ -2744,6 +2749,10 @@ export const sv_SE: EnTranslations = {
       "clickMoveRight": "Högerklick",
       "version": "v{version} ({build})",
       "overlays": "Överlägg",
+      "settings": "Settings",
+      "settingsCategories": "Settings categories",
+      "helpWiki": "Help and Wiki",
+      "nameplates": "Nameplates",
       "browserEffects": "Webbläsareffekter",
       "browserEffectsAuto": "Auto",
       "browserEffectsFull": "Fullständig",
@@ -3606,6 +3615,7 @@ export const sv_SE: EnTranslations = {
       }
     },
     "currencies": {
+      "walletChipAria": "{name}: {amount}",
       "intro": "Ingen av dessa tar upp väskeutrymme. Mynt stannar i din väska som vanligt.",
       "activities": "Aktiviteter",
       "factions": "Fraktioner",
@@ -3704,6 +3714,8 @@ export const sv_SE: EnTranslations = {
       "tierReachedLine": "Du är nu {tier} med {faction}. Din fraktionstittel är nu {title}."
     },
     "questLog": {
+      "available": "Available",
+      "offerMeta": "{zone} · {level}",
       "completed": "Slutförd",
       "zoneSummary": "{count} ({ready} redo)",
       "shiftHint": "Skift-klicka på ett uppdrag för att länka det i chatten."
@@ -6032,6 +6044,12 @@ export const sv_SE: EnTranslations = {
         "none": "Ingen",
         "title": "Vem som ser dig online i vännernas listor och gildsamlandet, med din zon och kartposition. Ditt lag ser alltid dig."
       },
+      "guildEvents": {
+        "heading": "Guild events",
+        "dateLabel": "Date",
+        "when": "{date}, {time}",
+        "discordVoice": "In {channel} ({count})"
+      },
       "billboard": {
         "label": "Gillets anslagstavla",
         "empty": "Inget på anslagstavlan än.",
@@ -6354,6 +6372,31 @@ export const sv_SE: EnTranslations = {
       "armorKitUse": "Användning: Förstärker din bröstrustning, ökar rustning med 12 för 1 timme.",
       "sharpeningStoneUse": "Användning: Skärper ditt huvudhandsväpen, ökar attackkraft med 6 för 30 min.",
       "manaElixirUse": "Användning: Ökar anden med 6 för 1 timme."
+    },
+    "professionsHub": {
+      "tabOverview": "Overview"
+    },
+    "activities": {
+      "title": "Activities",
+      "close": "Close Activities",
+      "tabDungeons": "Dungeons and Raids",
+      "tabPvp": "PvP"
+    },
+    "rewards": {
+      "title": "Rewards",
+      "close": "Close Rewards",
+      "tabVault": "Vault",
+      "tabWeekly": "Weekly Quest",
+      "tabWorldQuests": "World Quests",
+      "weeklyPickAt": "Choose your quest with the emissary in {zone}."
+    },
+    "bookOfRealm": {
+      "title": "Book of the Realm",
+      "close": "Close the Book of the Realm",
+      "tabDeeds": "Deeds",
+      "tabTitles": "Titles",
+      "tabReputation": "Reputation",
+      "tabRankings": "Rankings"
     },
     "professions": {
       "title": "Yrken",
@@ -7591,6 +7634,7 @@ export const sv_SE: EnTranslations = {
       "distance": "{distance} meter",
       "showRoute": "Visa rutt",
       "untrack": "Spåra inte",
+      "openQuestLog": "Open Quest Log",
       "track": "Spår",
       "worldQuests": {
         "heading": "Världsuppdrag idag",
@@ -9687,31 +9731,45 @@ export const sv_SE: EnTranslations = {
       "chatBody": "Nere till vänster. Tryck på Enter för att börja skriva och Enter igen för att skicka.\n\nTvå flikar finns alltid: Chatt, den samlade loggen över allt som sägs runt omkring dig, och Stridslogg, den skriftliga redogörelsen för din strid. Plus-knappen lägger till fler, en per kanal: Säg, Ropa, Grupp, Allmänt, Världen, LFG, Gille och Officer, samt en Viska-flik som samlar varenda viskning du skickar och tar emot på ett ställe. Att skriva i en kanalflik skickar till den kanalen utan att du behöver skriva om kommandot.\n\nHela rutan kan dras till en annan plats och ändra storlek, och den kommer ihåg var du lämnade den.",
       "keyWindowsTitle": "Fönster du öppnar med en tangent",
       "keyWindowsBody": "Var och en av dessa har en standardtangent och en knapp i raden nere i högra hörnet. Tryck på tangenten igen, eller Esc, för att stänga den.",
+      "keyWindowsBodyHubs": "Each of these has a default key, and most also have a button in the rail in the bottom right corner. Several are tabbed windows that gather related panels together, and a key can open one straight onto its tab. Press the key again, or Esc, to close it.",
       "winCharTitle": "Karaktärsblad (C)",
       "winCharBody": "Din utrustade utrustning på ena sidan, dina egenskaper och de statistikvärden de föder på den andra, med ett verktygstips på varje värde som berättar vad det gör för din klass. Den bär också din totala speltid, med ett litet öga bredvid som döljer siffran när du hellre inte vill visa den, och knappen som sätter ihop ditt spelarkort.",
+      "winCharBodyTwoTabs": "Two tabs, Character and Progression. Character shows your equipped gear on one side, your attributes and the stats they feed on the other, with a tooltip on every value that says what it does for your class. The sheet also carries your lifetime Time Played, with a small eye beside it that hides the number when you would rather not show it, and its footer holds the Cosmetics button and the button that composes your player card. On desktop, C opens your bags docked beside the sheet, so gear can be dragged straight onto your character.",
       "winBagsTitle": "Väskor (B)",
       "winBagsBody": "Allt du bär på, i en enda packning med fyra väskfack. Kategorichips längst upp snävar in det till vapen, rustning, förbrukningsvaror, material, verktyg, uppdragsföremål eller riddjur, och en sökruta filtrerar på namn. En sorteringsmeny ordnar om det du tittar på efter senast, kvalitet eller namn, och det valet kommer ihåg mellan sessioner. En separat Sortera-knapp städar de faktiska rutorna i packningen med ett enda tryck, rensar chipsen och sökningen så att du ser hela den uppstädade väskan.",
+      "winBagsBodyWallet": "Everything you are carrying, in one pack with four bag sockets. Category chips across the top narrow it to weapons, armor, consumables, materials, tools, quest items, or mounts, and a search box filters by name. A sort dropdown reorders what you are looking at by most recent, quality, or name, and that choice is remembered between sessions. A separate Sort button tidies the real cells of the pack in one press, clearing the chips and the search so you see the whole tidied bag. Under the grid, a wallet strip shows the other currencies you hold, Honor and the marks you earn among them, each as a small chip with its count.",
       "winSpellbookTitle": "Trollformelsbok (P)",
       "winSpellbookBody": "Varje förmåga din klass har, inlärda och ännu att komma, i ordning. Det är här du drar förmågor till dina handlingsfält.",
       "winTalentsTitle": "Talanger (N)",
       "winTalentsBody": "Där du väljer din specialisering, och dina sex talangrader med de tre alternativ som var och en erbjuder och vad varje alternativ gör. Rader du ännu inte har nått visas bredvid dem du kan välja nu.",
       "winProfessionsTitle": "Yrken (Shift+P)",
       "winProfessionsBody": "Vad du har lärt dig, hur skicklig du är i varje, och hur mycket längre var och en fortfarande kan nå.",
+      "winProfessionsBodyHub": "One tabbed window for your trades. Overview shows what you have learned, how skilled you are at each, and how far each one can still go; Crafting, Perfecting, and the Harvest Journal sit beside it as tabs of the same window.",
       "winCraftingTitle": "Hantverk (T)",
       "winCraftingBody": "Dina recept, vad vart och ett kräver, och vad du kan tillverka just nu med det du bär på dig.",
+      "winCraftingBodyTab": "The Crafting tab of the Professions window, which T opens directly: your recipes, what each one needs, and what you can make right now with what you are carrying.",
       "winQuestLogTitle": "Uppdragslogg (L)",
       "winQuestLogBody": "Varje uppdrag du har tagit, dess berättelse, dess mål och dina framsteg, med ett sätt att visa vad som helst av det på kartan och att välja vilka uppdrag din spårare följer.",
+      "winQuestLogBodyAvailable": "Every quest you have taken, its story, its objectives, and your progress, with a way to show any of it on the map and to pick which quests your tracker follows. An Available group lists the quests on offer near you, each with a way to show its quest giver on the map.",
       "winDeedsTitle": "Bedrifternas bok (Shift+Z)",
       "winDeedsBody": "Uppteckningen över vad du har uträttat, titlarna och Ryktbarheten den har betalat ut till dig, och vad som fortfarande står öppet.",
+      "winRealmTitle": "Book of the Realm (Shift+Z)",
+      "winRealmBody": "Your permanent record, in one tabbed window. Deeds holds what you have done, the Renown it has paid you, and what is still open; Titles is where you pick the title you wear and the border that frames your nameplate; and The Reliquary, Reputation, the Loot Explorer, and Rankings, the realm standings, each have a tab of their own.",
+      "winRewardsTitle": "Rewards",
+      "winRewardsBody": "What you can claim, in one tabbed window behind the Rewards button in the rail, which shows a count when something is waiting. Vault is the Weekly Vault, whose rolls open at the Vault keeper; Weekly Quest shows the emissary's four offers, though you choose one by speaking to the emissary; and World Quests is today's board, with a way to show each quest on the map and the one replacement you get each day.",
       "winSocialTitle": "Vänner och gille (O)",
       "winSocialBody": "Flikar för dina vänner, ditt gille och dess roster, din raid, och de spelare du har ignorerat eller blockerat.",
+      "winSocialBodyEvents": "Tabs for your friends, your guild and its roster, your raid, and the players you have ignored or blocked. The Guild tab also keeps an Events list: officers and the Guild Master book dated events there, and every member sees them. A Discord strip at the foot of the window opens the Discord panel.",
       "winFinderTitle": "Fängelsehålsletaren (Shift+I)",
       "winFinderBody": "Katalogen över gruppinnehåll du kan ställa dig i kö för. Kryssa i de aktiviteter du vill ha, gå med i en kö själv eller lägg upp en annons för din egen grupp, och acceptera när en grupp kommer samman.",
+      "winActivitiesTitle": "Activities (Shift+I)",
+      "winActivitiesBody": "Group content in one tabbed window, also opened by the Groups bell in the rail. Dungeons and Raids is the Dungeon Finder: tick the activities you want, join a queue on your own or post a listing for your own group, and accept when a group comes together. PvP, which G opens directly, holds the arenas and Thornhollow Fields, and Card Duel is where you queue for and play the Card Master's game.",
       "winMetersTitle": "Skademätare (Shift+H)",
       "winMetersBody": "Skada, läkning och hot för dig och alla med dig, sparade i segment så att du kan titta tillbaka på striden före den senaste. Läknings- och hotpanelerna kan dras ut för att stå för sig själva.",
       "winMoreTitle": "Och några till",
       "winMoreBody": "Världskartan (M), PvP-fönstret (G), Dalcupen (Y), Topplistan (K), Händelsekalendern (I) och emotehjulet (X) fungerar alla på samma sätt. Topplistan är värd en stund vid ditt första besök: den har en flik för spelare, en för gillen, en som rankar hela konton efter Ryktbarhet från Bedrifternas bok, och en för de dagliga ställningarna.\n\nHögerklicka på en annan spelare, på deras namnskylt eller på deras namn i chatten, så öppnar Spelarinfo ett kort om dem: utrustningen de bär, med verktygstips, och de offentliga detaljerna om deras karaktär. Det är bara en titt, inget mer, och det kräver att de är tillräckligt nära för att synas.",
       "winMoreBodyNoValeCup": "Världskartan (M), PvP-fönstret (G), topplistan (K) och händelsekalendern (I) fungerar alla på samma sätt. Emotehjulet (X) är undantaget: håll ned dess tangent så visas hjulet och släpp sedan över en emote för att använda den. Topplistan är värd en stund vid första besöket: den har en flik för spelare, en för gillen, en som rangordnar hela konton efter anseende från Bedrifternas bok, en för dagens ställning och fliken Utvecklare för människorna som bygger spelet. Den visas om du inte stänger av Visa utvecklarmärken.\n\nVälj en annan spelare som mål och högerklicka på målramen (med pekstyrning dubbeltrycker eller långtrycker du på den), eller högerklicka på spelarens namn i chatten, så öppnar Spelarinformation ett kort om spelaren: utrustningen den bär, med verktygstips, och karaktärens offentliga uppgifter. Det är bara en titt, inget mer. Utrustningen kräver att spelaren är nära nog för att synas: söker du på ett namn från chatten medan spelaren är långt borta får du i stället den offentliga halvan av kortet, porträtt, namn, nivå, klass och gille.",
+      "winMoreBodyRankings": "The world map (M) works the same way. The emote wheel (X) is the exception: hold its key and the wheel appears, then let go over an emote to play it. The Rankings tab of the Book of the Realm is worth a moment on your first visit: it keeps a board for players, one for guilds, one that ranks whole accounts by Renown from their deeds, one for the daily standings, one for World Quests, and a Developers tab for the people who build the game, there unless you switch Show Developer Badges off.\n\nTarget another player and right-click the target frame (on touch, double-tap or long-press it), or right-click their name in chat, and Player Info opens a card on them: the gear they are wearing, with tooltips, and the public details of their character. It is a look, nothing more. The gear needs them close enough to see: look a name up from chat while they are far away and you get the public half of the card instead, their portrait, name, level, class, and guild.",
       "worldWindowsTitle": "Fönster som världen öppnar åt dig",
       "worldWindowsBody": "Vissa fönster trycker du aldrig upp med en tangent: de öppnas när du pratar med rätt person eller klickar på rätt sak.\n\nEn handlare öppnar köpmansfönstret, med deras lager att köpa från och en flik för Återköp som håller det du senast sålde, ifall du sålde det av misstag. En rad antalsknappar sitter bredvid lagret, så en stapel reagenser blir ett enda tryck fem eller tio åt gången i stället för tio tryck, och ett eget antal finns där när ingetdera passar. En klasstränare öppnar listan över vad du kan lära dig nu och vad som fortfarande ligger framför dig.\n\nEn kamrer öppnar ditt valv, kassakistan med extra platser du kan köpa fler av. Om ditt gille har öppnat en bank visar en andra flik den: varje medlem kan titta i den även utan tillåtelse att ta ut något, så ingen behöver fråga vad gillet håller på, graderna avgör vem som får sätta in, ta ut och flytta gillets pengar, och en logg för in varje rörelse.\n\nEn brevlåda från Korpposten öppnar dina brev, med det som har kommit på en flik och ett formulär för att skicka på en annan, bilagor och allt. Världsmarknaden hos Köpmannen har sitt eget fönster: bläddra och köp på en flik, lista dina egna varor på en annan, och hämta ut det som sålts på en tredje. Att handla ansikte mot ansikte med en annan spelare öppnar ett handelsfönster med varsin sida.",
       "worldWindowsBodyStationMaster": "Vissa fönster öppnar du aldrig med en tangent: de öppnas när du pratar med rätt person eller klickar på rätt sak.\n\nEn handlare öppnar köpmansfönstret, med varor att köpa och en återköpslista längst ned i samma panel med det du senast sålde, om du sålde det av misstag. En rad antalsknappar finns vid varorna, så en stapel reagenser blir ett tryck för fem eller tio åt gången i stället för tio tryck, och ett eget antal finns när ingetdera passar. Dina klassförmågor behöver ingen tränare, de kommer med dina nivåer; tränarna här är de fasta mästarna vid tillverkningsstationerna, och Träning hos en av dem öppnar recepten de kan lära dig nu, dem du redan kan och dem som fortfarande är låsta bakom mer skicklighet.\n\nEn bankir öppnar din bank, med fliken Personlig för kassakistan med extra platser som du kan köpa fler av och fliken Valv som lagrar dina tillverkningsmaterial efter sort. Om ditt gille har öppnat en bank visas dess gillesflik där: varje medlem kan titta in även utan tillstånd att ta ut något, så ingen behöver fråga vad gillet förvarar, grader avgör vem som får sätta in, ta ut och flytta gillets mynt och en logg registrerar varje rörelse.\n\nEn brevlåda från Korpposten öppnar dina brev, med det som kommit på en flik och ett formulär för att skicka på en annan, bilagor och allt. Världsmarknaden, hos Köpmannen i Östbäck eller Auktionsförrättare Voss uppe i Högvakt, har ett eget fönster: bläddra och köp på en flik, lista dina egna varor på en annan och hämta ut det som sålts på en tredje. Handel ansikte mot ansikte med en annan spelare öppnar ett handelsfönster med varsin sida.",
@@ -9721,11 +9779,16 @@ export const sv_SE: EnTranslations = {
       "playerCardBody": "En knapp på ditt karaktärsblad sätter ihop ett spelarkort: en bild med en närbild av din karaktär, utrustningen du bär och dina egenskaper, redo att sparas eller delas. Det är en ögonblicksbild för att visa upp ett nytt set, och den ändrar ingenting i spelet.",
       "wikiTitle": "Wiki-knappen",
       "wikiBody": "Den här wikin är ett klick bort i spelet. En knapp för den sitter tillsammans med de andra i raden nere i högra hörnet, det finns en rad för den i Esc-spelmenyn, och på en telefon bor den i Mer-brickan. Eftersom att öppna den lämnar över dig till din webbläsare ber knappen alltid om en bekräftelse först, så ett oavsiktligt tryck mitt i en strid aldrig kan dra dig ut ur den. Spelet fortsätter köra bakom den.",
+      "wikiBodyGameMenu": "This wiki is one click away in game. Its button sits in the Game Menu, which Esc opens on desktop and the Quick Actions control opens on touch. Because opening it hands you over to your browser, the button always asks you to confirm first, so an accidental tap in a fight can never pull you out of one. The game keeps running behind it.",
       "mobileTitle": "På telefon eller surfplatta",
       "mobileBody": "Pekkontroller dyker upp av sig själva, och layouten anpassar sig efter din skärm: en kompakt uppställning på en liten telefon, en standarduppställning på en större telefon, och en rymligare på en surfplatta.\n\nDina förmågor sitter i en ring i stället för en sifferrad: anfallsknappen med fem handlingsknappar bredvid sig, och en sidväxlare som byter ringen genom resten av dina platser, upp till sju sidor när alla tre handlingsfält är påslagna. Runt omkring dem sitter de knappar en pekspelare når efter mest: byta mål, använda det som är framför dig, och hoppa, plus en utdragbar rad med dina förbrukningsvaror som fyller sig själv från det du bär.\n\nLängs nederkanten finns Chatt, Socialt, Uppdrag, Inställningar och Mer. Mer öppnar en bricka som rymmer resten av dina fönster, bland annat din karaktär, Fängelsehålsletaren, PvP, Dalcupen, emotes och wikin. Fönster fyller skärmen här snarare än flyter ovanpå den.\n\nAtt flytta dina enhetsramar är en skrivbordsgrej: på touch placerar layouten dem åt dig.",
       "mobileBodyTwoPages": "Pekkontroller visas av sig själva och layouten anpassar sin storlek efter din skärm: kompakt på en liten telefon, normal på en större telefon och rymligare på en surfplatta.\n\nDina förmågor ligger i en ring i stället för på en sifferrad: attackknappen med fyra åtgärdsknappar intill sig och en sidväxlare som byter ringen mellan dess {pages} sidor. Tillsammans når de alla {slots} av dina förmågeplatser, oavsett om de extra skrivbordsraderna är påslagna eller inte. Ringens femte bågposition är platsen för dina förbrukningsvaror: tryck på den för att använda det som ligger där, eller håll kvar fingret eller svep inåt för att öppna en rad som fylls av det du bär med dig. Runt ringen finns knapparna en pekspelare oftast behöver: byt mål, använd det som står framför dig och hoppa.\n\nEn kontroll för Snabbåtgärder sitter vid nederkanten i stället för en knapprad. Den öppnar allt annat: riddjur, chatt, karta, väskor, socialt, uppdrag, karaktär, besvärjelsebok, spelmeny och posten Mer, som bland annat rymmer resten av dina fönster, fängelsehålesökaren, PvP, emoter och wikin. Fönster fyller skärmen här i stället för att sväva ovanpå den.\n\nAtt flytta dina enhetsramar hör till skrivbordet: med pekstyrning placerar layouten dem åt dig.",
       "railTitle": "Knappraden",
-      "railBody": "Nere i skärmens nedre högra hörn, långt från minikartan, sitter en rad av små fyrkantiga knappar, en per fönster, ordnade i två korta kolumner sida vid sida. De flesta av dem är märkta med sin standardtangent.\n\nDen första kolumnen täcker din karaktär, trollformelsbok, talanger, uppdragslogg, Bedrifternas bok, yrken, världskarta, väskor och hantverk. Den andra öppnar med WOC-butiken och fortsätter genom PvP, Fängelsehålsletaren, Dalcupen, Kortduell, topplistan, emotes, musik, vänner och gille, den här wikin och spelmenyn. Några till ansluter bara när de gäller."
+      "railBody": "Nere i skärmens nedre högra hörn, långt från minikartan, sitter en rad av små fyrkantiga knappar, en per fönster, ordnade i två korta kolumner sida vid sida. De flesta av dem är märkta med sin standardtangent.\n\nDen första kolumnen täcker din karaktär, trollformelsbok, talanger, uppdragslogg, Bedrifternas bok, yrken, världskarta, väskor och hantverk. Den andra öppnar med WOC-butiken och fortsätter genom PvP, Fängelsehålsletaren, Dalcupen, Kortduell, topplistan, emotes, musik, vänner och gille, den här wikin och spelmenyn. Några till ansluter bara när de gäller.",
+      "mobileBodyGroupedMore": "Touch controls appear on their own, and the layout sizes itself to your screen: a compact arrangement on a small phone, a standard one on a larger phone, and a roomier one on a tablet.\n\nYour abilities sit in a ring rather than a number row: the attack button with four action buttons beside it, and a page toggle that swaps the ring between its {pages} pages, which together reach all {slots} of your ability slots whether or not the extra desktop bars are switched on. The fifth arc position of that ring is your consumables seat: tap it to use what is seated there, or hold it, or swipe it inward, to open a row that fills itself from what you are carrying. Around the ring sit the buttons a touch player reaches for most, swapping target, using what is in front of you, and jumping.\n\nOne Quick Actions control sits at the bottom edge in place of a row of buttons. It opens onto everything else: mount, chat, map, bags, social, quests, character, spellbook, game menu, and a More entry that sorts the rest of your windows into groups: Record (deeds, titles, the Reliquary, reputation, the Loot Explorer, and the rankings), Professions, Activities (dungeons and raids, PvP, and Card Duel), Character (emotes, talents, and cosmetics among them), and Store. The wiki and Discord sit in the game menu instead. Windows fill the screen here rather than floating over it.\n\nMoving your unit frames is a desktop thing: on touch the layout places them for you.",
+      "mobileBodyRewardsMore": "Touch controls appear on their own, and the layout sizes itself to your screen: a compact arrangement on a small phone, a standard one on a larger phone, and a roomier one on a tablet.\n\nYour abilities sit in a ring rather than a number row: the attack button with four action buttons beside it, and a page toggle that swaps the ring between its {pages} pages, which together reach all {slots} of your ability slots whether or not the extra desktop bars are switched on. The fifth arc position of that ring is your consumables seat: tap it to use what is seated there, or hold it, or swipe it inward, to open a row that fills itself from what you are carrying. Around the ring sit the buttons a touch player reaches for most, swapping target, using what is in front of you, and jumping.\n\nOne Quick Actions control sits at the bottom edge in place of a row of buttons. It opens onto everything else: mount, chat, map, bags, social, quests, character, spellbook, game menu, and a More entry that sorts the rest of your windows into groups: Record (deeds, titles, the Reliquary, reputation, the Loot Explorer, and the rankings), Professions, Activities (dungeons and raids, PvP, and Card Duel), Character (emotes, talents, and cosmetics among them), Rewards (the Vault, the weekly quest, and world quests), and Store. The wiki and Discord sit in the game menu instead. Windows fill the screen here rather than floating over it.\n\nMoving your unit frames is a desktop thing: on touch the layout places them for you.",
+      "railBodyTwelve": "Down in the bottom right corner of the screen, a long way from the minimap, sits a rail of small square buttons arranged in two short columns side by side. Most of them are printed with their default key.\n\nThe first column covers your character, bags, spellbook, talents, quest log, and world map. The second opens the Book of the Realm, your professions, Activities (the Groups bell), and friends and guild, then the WOC Store and the game menu. A few more join them only when they apply.",
+      "railBodyThirteen": "Down in the bottom right corner of the screen, a long way from the minimap, sits a rail of small square buttons arranged in two short columns side by side. Most of them are printed with their default key.\n\nThe first column covers your character, bags, spellbook, talents, quest log, world map, and Rewards. The second opens the Book of the Realm, your professions, Activities (the Groups bell), and friends and guild, then the WOC Store and the game menu. A few more join them only when they apply."
     },
     "commandsPage": {
       "intro": "Varje kommando du kan skriva i chatten, grupperat efter vad det används till, med sina korta former.",
@@ -9882,6 +9945,7 @@ export const sv_SE: EnTranslations = {
       "deedDef": "En prestation som tecknas ner i Bedrifternas bok. Att förtjäna en ger Ryktbarhet, och somliga ger en kosmetisk titel eller namnskyltsram.",
       "renownTerm": "Ryktbarhet",
       "renownDef": "Livstidspoängen som dina bedrifter summerar till. Den bara klättrar, och riket håller en ställning över den på topplistan.",
+      "renownDefRankings": "The lifetime score your deeds add up to. It only ever climbs, and the realm keeps standings of it on the Rankings tab of the Book of the Realm.",
       "heroicTerm": "Heroisk",
       "heroicDef": "Den svårare versionen av en fängelsehåla eller raiden, avstämd för välrustade slutspelsgrupper. Heroiska bossar släpper uppgraderat byte, och den sista bossen betalar ut Heroiska märken.",
       "lockoutTerm": "Spärr",
@@ -10532,8 +10596,10 @@ export const sv_SE: EnTranslations = {
       "duelsBody": "Utmana vilken spelare du än möter till en vänskaplig duell. Inget står på spel utom stoltheten, så det är det enklaste sättet att lära sig en matchning eller göra upp en vänskaplig tvist.",
       "coliseumHeading": "Det askgråa colosseumet",
       "coliseumBody": "Kolosseum är rikets arena, där du möter andra spelare i rankade matcher, en mot en eller två mot två. Varje klass håller sin egen ställning, så en seger lyfter dig på den stegen inför hela riket. Rankat spel öppnar på nivå 15, och det gäller din partner också: är någon av er under den står kön stängd tills ni båda kvalificerar er. Allt spelare mot spelare bor bakom en enda knapp, märkt PvP: öppna den och välj en flik, Törnhålefälten, en mot en eller två mot två, och anmäl dig sedan ensam eller med din partner. Medan du står i kö eller är i en match förblir de andra flikarna låsta, så du kan aldrig stå i två köer samtidigt.",
+      "coliseumBodyActivities": "The Coliseum is the realm's arena, where you face other players in ranked matches, one on one or two on two. Each bracket keeps its own standing, so a win lifts you up that ladder for the whole realm to see. Ranked play opens at level 15, and that applies to your partner too: if either of you is below it, the queue stays closed until you both qualify. All of player versus player lives on the PvP tab of the Activities window, which G opens directly: pick a tab there, Thornhollow Fields, one on one, or two on two, then sign up alone or with your partner. While you are queued or in a match, the other tabs stay locked, so you can never sit in two queues at once.",
       "ladderHeading": "Klättra på rankingstegen",
       "ladderBody": "Rankat spel följer din ställning över tid. Kolla topplistan för att se var du befinner dig och vem som håller rikets topp.",
+      "ladderBodyBracketTab": "Ranked play tracks your standing over time. Each bracket keeps its ladder on its own tab of the PvP window, so check it to see where you sit and who holds the top of the realm.",
       "rewardsHeading": "Vad rankat spel betalar",
       "rewardsBody": "En rankad vinst betalar Heder, valutan för spelare mot spelare, och en förlust kostar dig ingenting annat än ställning. Heder är tänkt att belöna riktiga matcher: att besegra samma motståndare eller samma lag igen samma dag betalar inget mer, en lång vinstdag ger lite mindre Heder per vinst ju längre den pågår, och en match din motståndare ger förlorad flyttar ändå din ställning men betalar ingen Heder alls. Den dagen är Hederns egen, och den rullar över på sin egen klocka snarare än med rikets instansåterställning.",
       "rewardsBodyLossShare": "En rankad vinst ger Heder, valutan för spelare mot spelare, och en förlust som du spelar till slutet ger fortfarande en mindre andel, liksom oavgjort, så rankning är det enda en förlust egentligen kostar dig. Heder ska belöna riktiga matcher: att besegra samma motståndare eller samma lag igen samma dag ger inget mer, och det gör inte heller att förlora mot dem igen. En lång vinstdag betalar fullt för sin första följd av segrar, halverar sedan vad en vinst ger, halverar det igen längre in och stannar där. En match som din motståndare lämnar påverkar fortfarande din rankning men ger ingen Heder alls. Dagen tillhör riket: den rullar över vid rikets nattliga återställningstid, samma gräns där alla dagliga låsningar nollställs.",
@@ -10580,6 +10646,7 @@ export const sv_SE: EnTranslations = {
       "intro": "Ett rankat slagfält för fem mot fem där man erövrar flaggan, utkämpat i en murad sänka i den gamla skogen nedanför Törntoppen, där två förfallna fästningar möter varandra utmed en ravin och en äldre gård ligger mellan dem som ingen av dem någonsin har hållit. Två lag om fem, två fästningar, ett mål: stjäl fiendens banér och spring det hem innan de springer med ditt.",
       "queueHeading": "Ställa sig i kö",
       "queueBody": "Törnhålefälten öppnar på nivå 20, och varje medlem i en grupp måste nå den innan gruppen kan anmäla sig. Öppna knappen PvP och välj fliken Törnhålefälten, den flik den öppnar på, och gå sedan in i kön ensam, eller ta med en grupp på upp till fem och anmäl er tillsammans: grupper hålls alltid i samma lag, och de återstående platserna fylls med ensamma mästare. När tio står redo placerar matchen båda lagen vid sina fästen för en kort uppställning innan flaggorna går live. Skulle en grupp om fyra eller fem annars möta bara ensamanmälda håller matchningen tillbaka matchen en kort stund för att se om en andra grupp dyker upp, så en grupp av den storleken väntar ibland några ögonblick längre innan portarna öppnas. Den väntan är kort och ger alltid med sig till slut, så ingen blir sittande i kön för den.",
+      "queueBodyActivities": "Thornhollow Fields opens at level 20, and every member of a party has to meet it before the party can queue. Press G to open the PvP tab of the Activities window and pick the Thornhollow Fields tab, which comes first, then enter the queue solo, or bring a party of up to five and queue together: parties are always kept on one team, and the remaining seats fill with solo champions. When ten stand ready, the match seats both teams at their keeps for a short form-up before the flags go live. If a group of four or five would otherwise face nothing but solo queuers, the matchmaker holds the match briefly to see whether a second group turns up, so a party that size sometimes waits a few moments longer before the gates open. That wait is short and always gives way in the end, so nobody is left sitting in the queue for it.",
       "fieldHeading": "Fältet",
       "fieldBody": "Ett murat fält i det fria, format i tre kammare: varje lag har sitt eget fält framför sin fästning, och den murade Ruingården ligger mellan dem. Två murar spänner över hela bredden, och varje förflyttning mellan kamrarna passerar en omstridd korsning: den breda huvudporten, eller porthuset, ett litet rum som spänner över muren, vars förskjutna dörrar tvingar fram en avstickare förbi ett bakhållshörn. Varje fästning är stängd utom sin mynning, så varje flaggspring börjar och slutar genom samma öppning, och en låg barrikad bryter den raka stormningen in i den. Gården rymmer ruinen i hålans hjärta och de två flankernas Fartrunor; de andra två väntar vid flaggornas infarter. En Stridsruna eller Värnruna (mer skada utdelad, eller mindre skada tagen, i några sekunder) väntar vid varje huvudports mynning mot gården: båda plattorna öppnar matchen på samma sida och byter sida vid varje tagning.",
       "flagsHeading": "Flaggor",
@@ -10618,6 +10685,7 @@ export const sv_SE: EnTranslations = {
       "quartermastersBody": "Varje fraktion håller en intendent vid sitt nav: Fördelningsintendent Vaelen för Riftväktarna i Drifthaven, Templar Althea för Kyrkoorden vid Eastbrook kapell, och Kunstner Tobrin för Automaterna i Wyrmwatch. Var och en säljer ett litet lager av smycken, rustning, vapen och väskor, upplåsta nivå för nivå när ditt anseende med den fraktionen växer, och betalas för i vanligt mynt.",
       "readingHeading": "Där du läser det",
       "readingBody": "Anseende-fliken på karaktärbladet (C) visar varje fraktion med sitt nuvarande anseende, en stapel mot nästa nivå, och den titel som anseendet har tjänat du. Chattloggen rapporterar varje anseeendvikande när det landar, och att nå en ny nivå visar en celebrationbanner på skärmen.",
+      "readingBodyRealm": "The Reputation tab of the Book of the Realm (Shift+Z) shows each faction with its current standing, a bar toward the next tier, and the title that standing has earned you. The chat log reports every standing gain as it lands, and reaching a new tier shows a celebration banner on screen.",
       "deedsHeading": "Gärningar",
       "deedsBody": "Boken över gärningar håller också räkningen av ditt anseende: att nå Betrodd med en fraktion och nå Champion med en fraktion registrerar varje gärning, och att nå Champion med alla tre är en gärning i sig själv. Liksom varje gärning är dessa kosmetiska, aldrig kraft, och Champion gärningsmålen ger en titel du kan bära."
     },
@@ -10636,6 +10704,7 @@ export const sv_SE: EnTranslations = {
       "catalogHeading": "Den fullständiga bedriftsrullan",
       "catalogBody": "Här är alla bedrifter boken rymmer, ordnade efter kategori. De hemliga är utelämnade med flit och väntar på att du ska hitta dem. Öppna Bedrifternas bok i spelet för att se exakt vad var och en kräver.",
       "standingsNote": "Riken håller löpande räkning på Ryktbarhet för varje konto: tavlan rankar hela konton efter livstids Ryktbarhet, räknar varje bedrift en gång över alla dina karaktärer, och den visar enbart Ryktbarhet, så bedrifter utan Ryktbarhet påverkar aldrig ställningen trots att de räknas i din Bok. För att se vem som står var, öppna Topplistan i spelet och välj dess Ryktbarhets-flik; ställningen finns där, inte på wikin.",
+      "standingsNoteRankings": "The realms keep a running tally of Renown across every account: the board ranks whole accounts by lifetime Renown, counting each deed once across all your characters, and it shows Renown alone, so deeds that carry none never move the standings even though they count in your Book. To see who stands where, open the Rankings tab of the Book of the Realm in game and turn to its Renown board; the standings live there, not on the wiki.",
       "catHeading": "{label} ({count})",
       "colName": "Bedrift",
       "colRenown": "Ryktbarhet",
@@ -10656,6 +10725,7 @@ export const sv_SE: EnTranslations = {
       },
       "bookHeading": "Inuti Boken",
       "bookBody": "Boken sorterar varje bedrift i kategorier du kan växla mellan, med en sökruta och filter för allt, för det du har fullbordat, för det du inte har, och för de du nästan är klara med. En Nyligen-rad högst upp håller dina senaste upplåsningar, och att klicka på en hoppar direkt till dess kort, precis som att klicka på ett bedriftsnamn någon delar i chatten. Bredvid den pekar Nästan framme dig mot den handfull du är närmast att fullborda. Ute i ett rike bär varje bedrift också sin sällsynthet, andelen äventyrare som har fullbordat den, så du kan se med en blick vilka som är vanliga och vilka som är en verklig utmaning; offlinevärlden har ingen befolkning att räkna, så den visar ingenting. Längst ut på raden sitter Titelhyllan, där du väljer den du bär.",
+      "bookBodyTitlesTab": "The Book sorts every deed into categories you can flip between, with a search box and filters for everything, for what you have earned, for what you have not, and for the ones you are nearly done with. A Recent strip near the top holds your latest unlocks, and clicking one jumps straight to its card, as does clicking a deed name someone posts in chat. Beside it, Nearly there points you at the handful you are closest to finishing. Out in a realm each deed also carries its rarity, the share of adventurers who have earned it, so you can see at a glance which ones are common and which are a real climb; the offline world has no population to count, so it shows none. The titles and borders your deeds pay out have a tab of their own, Titles, beside Deeds in the Book of the Realm, with a picker for each: one for the title you wear, one for the border that frames your nameplate.",
       "platformHeading": "Steam- och Epic-prestationer",
       "platformBody": "Om du länkar ett Steam- eller Epic Games-konto från skrivbordsappen speglas bedrifterna du tjänar in utåt som prestationer på det kontot. Spelvärlden förblir den avgörande auktoriteten: du tjänar bedriften här, den registreras på din karaktär, och prestationen följer efter. Inte varje bedrift har en matchande prestation, och om en inte dyker upp direkt hinner den ikapp nästa gång du loggar in. Att länka är bara någonsin en länk, aldrig ett sätt att logga in."
     },
@@ -10663,6 +10733,7 @@ export const sv_SE: EnTranslations = {
       "intro": "Relikvariet är museet över det unika byte du har katalogiserat: eftertraktade fynd ur fängelsehålor, yrkestroféer, riddjur, vapenutseenden och titlar. Det hör ihop med Bedrifternas bok på samma sätt som en trofésal hör ihop med en bragdbok.",
       "howHeading": "Så fungerar samlingen",
       "howBody": "Öppna Relikgömman i spelet (standard Skift+X). Varje hylla rymmer sidor med unika reliker. En siluett fylls när vilken rollperson som helst på ditt konto får föremålet för första gången, och en sida lyses upp när varje relik på den är fylld. Några sidor är märkta Utgången eller Personlig: de står utanför fullbordan och spärrar därför aldrig en hylla eller hela katalogen. Fynd ger en avisering direkt och uppdaterar det öppna fönstret; framstegen delas av alla rollpersoner på kontot, så en relik som en rollperson hittar fyller sidan för alla.",
+      "howBodyRealmTab": "Open the Book of the Realm in game (default Shift+Z) and turn to its Reliquary tab. Each shelf holds pages of unique relics. Fill a silhouette when any character on your account obtains that piece for the first time, and illuminate a page when every relic on it is filled. A few pages are labeled Retired or Personal: they sit outside completion, so they never gate a shelf or the whole catalog. Live finds toast and refresh the open window; progress is shared by every character on the account, so a relic one character finds fills the page for all of them.",
       "ranksHeading": "Intendent-grader",
       "ranksBody": "Intendent-graderna stiger med varje unik katalogiserad relik och ger uteslutande kosmetiska titlar och ramar. De ger aldrig stridsstyrka, byteschans eller oturskompensation. Vapenutseenden knutna till kontot ger inga poäng mot Intendent-graden, så att anseendet förblir knutet till rollpersonen, och reliker på Utgångna eller Personliga sidor ger inte heller några poäng mot den.",
       "retiredTag": "Utgången",
@@ -11336,6 +11407,7 @@ export const sv_SE: EnTranslations = {
       "slashBody": "Några vardagskommandon är värda att lägga på minnet: /w Namn skickar en viskning och /r svarar på den senaste du fick, /invite bjuder in någon i din grupp, /follow faller in i steg bakom en vän, /roll kastar tärning för gruppen att se, /who visar vilka som är online, och /afk markerar dig som borta. Skriv /help i spelet för hela listan.",
       "emotesBody": "Din karaktär kan också tala utan ord: skriv en emote som /wave, /dance, /cheer eller /bow, rikta den mot en vän genom att välja denne först, eller håll in X för att öppna emotehjulet för ett snabbt uttryck ovanför huvudet.",
       "emotesBodyNamedTarget": "Din karaktär kan också tala utan ord. Skriv en gest som /wave, /dance, /cheer eller /bow och lägg till ett namn för att rikta den mot någon, till exempel /wave Aleph. Du kan också hålla ned X, gesthjulets standardtangent, för att öppna hjulet och snabbt visa ett uttryck ovanför huvudet. Knappen Gester i raden med fönsterknappar, eller under Mer på pekskärm, öppnar samma hjul.",
+      "emotesBodyMoreTray": "Your character can also speak without words: type an emote like /wave, /dance, /cheer, or /bow, add a name to aim it at someone, as in /wave Aleph, or hold X, the emote wheel's default key, to open the emote wheel for a quick overhead expression. On touch, the Emotes tile in the More tray opens the same wheel.",
       "calendarHeading": "Händelsekalendern",
       "calendarBody": "Tryck I för att öppna evenemangskalendern. Den markerar de rikesdagar det lönar sig att planera kring, det veckovisa Raidkallet, Marknadsdagen, Arenadusten och Fisketävlingen, plus den månatliga Delve-dagen och Månportskommunionen, och det är där gillen håller sitt schema: gillesledaren och officerarna kan boka evenemang på den, och varje medlem ser dem på samma sida. Rikesdagarna är en uppmaning att samlas, inte en bonus; ingenting med din rollperson ändras för att en dag är markerad.",
       "calendarBodyDoubleHonor": "Tryck på I för att öppna evenemangskalendern. Den visar rikets dagar som är värda att planera kring: veckans Raidkallelse, Marknadsdag, Arenadrabbning, Dubbel Heder-helg och Fisketävling samt månadens Delve-dag och Månportskommunion. Där finns också gillets schema: gillesledaren och officerarna kan boka evenemang, och alla medlemmar ser dem på samma sida. Rikets dagar uppmuntrar till att samlas snarare än att ge bonusar, med ett undantag: under hela Dubbel Heder-helgen ger Törnhålefälten dubbelt så mycket heder, och en färdigspelad förlust ger lika mycket som en seger. Inget annat hos din karaktär ändras för att en dag är markerad.",
@@ -11355,6 +11427,7 @@ export const sv_SE: EnTranslations = {
       "finderMore": "Se vad som finns inuti varje fängelsehåla",
       "blockBody": "Blockera är det tyngre verktyget, för en spelare som inte lämnar dig ifred. En blockering stänger av deras inbjudningar, viskningar och post liksom deras chatt, gör er osynliga för varandra i /who, och tar bort dem från din vänlista om de fanns på den. Blockera från högerklicksmenyn på deras namn eller med /block, /unblock hävdar den igen, och /blocklist visar vilka som är på den.",
       "guildBoardBody": "Gillen rankas också. Topplistan håller en flik för Gillen bredvid spelarflikarna, och rankar gillen efter vad deras medlemmar har tjänat tillsammans, så att ett aktivt gille kan se var det står.",
+      "guildBoardBodyRankings": "Guilds are ranked too. The Rankings tab of the Book of the Realm keeps a Guilds board beside the player boards, ranking guilds on what their members have earned together, so a busy guild can see where it stands.",
       "guildBankHeading": "Gillesbanken",
       "guildBankBody": "Ett gille håller också ett eget valv. Gå fram till en bankir i en av knutpunktsstäderna, öppna din bank, och växla till fliken Gille: där hittar du en kassa med mynt och ett gemensamt lager av föremål som gillet äger tillsammans. Alla medlemmar kan öppna den och se vad som finns inuti, och panelen säger tydligt vem som kan göra mer. Bara gilleledaren och officerarna kan agera, sätta in och ta ut mynt och varor, och varje insättning och uttag skrivs in i en logg gillet kan läsa, så inget flyttas utan en notering.",
       "guildBankRulesBody": "Föremålsförrådet börjar stängt. En officer öppnar det ur egen ficka, och gillet kan betala från kassan för att utöka det senare. Uppdragsföremål, allt som är själsbundet, och utrustning Marknaden inte tar emot hålls utanför det, precis som posten och Marknaden, så banken är till för varor som fortfarande kan byta ägare.",

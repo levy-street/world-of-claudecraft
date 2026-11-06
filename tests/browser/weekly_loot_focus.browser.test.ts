@@ -40,7 +40,7 @@ function fixture(cls: PlayerClass = 'paladin') {
   return { world, state, setWeeklyLootSpec };
 }
 function mount(world: IWorld) {
-  const root = host('bank-window');
+  const root = host('weekly-vault-window');
   root.style.display = 'flex';
   const pane = new WeeklyRewardsTab({
     world: () => world,

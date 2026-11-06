@@ -6,12 +6,21 @@
 // inner confirm dialog, the one wall-clock read (the reset countdown), and the
 // click that sends the authoritative pick through IWorld. It holds no Sim
 // reference and reaches Hud only through its deps.
+//
+// It is also the Rewards hub's Weekly Quest tab (menu consolidation step 7).
+// The offers are readable anywhere, but the pick stays at the emissary exactly
+// as the sim gates it (`chooseWeeklyQuest` needs the NPC in talk range), so a
+// hub open paints the cards read-only and says where the emissary stands; only
+// the emissary's own talk event opens the window with live Choose buttons.
 import { audio } from '../game/audio';
 import { WEEKLY_QUESTS_BY_ID } from '../sim/content/weekly_quests';
 import type { FactionId } from '../sim/factions';
 import type { IWorld } from '../world_api';
 import { markDialogRoot } from './dialog_root';
+import { zoneDisplayName } from './entity_i18n';
 import { esc } from './esc';
+import type { WindowHubStrip } from './hud/hub/window_hub_controller';
+import { weeklyEmissaryPoint } from './hud/rewards/rewards_view';
 import { t } from './i18n';
 import { svgIcon } from './ui_icons';
 import {
@@ -28,6 +37,10 @@ export interface WeeklyQuestsWindowDeps {
   closeOthers(): void;
   captureFocus(): HTMLElement | null;
   restoreFocus(target: HTMLElement | null): void;
+  /** The Rewards strip, painted under the title bar. */
+  hubStrip?: WindowHubStrip;
+  /** Pan the map to the emissary (the read-only tab's pointer to the NPC). */
+  showOnMap?(x: number, z: number): void;
 }
 
 export class WeeklyQuestsWindow {
@@ -35,6 +48,9 @@ export class WeeklyQuestsWindow {
   private dialogQuestId: string | null = null;
   private lastSig = '';
   private openerFocus: HTMLElement | null = null;
+  // True only when the emissary's talk event opened the window: the one case
+  // the sim accepts a pick from, so the one case the Choose buttons are live.
+  private atEmissary = false;
 
   constructor(private readonly deps: WeeklyQuestsWindowDeps) {}
 
@@ -42,8 +58,16 @@ export class WeeklyQuestsWindow {
     return this.opened;
   }
 
-  /** The emissary's talk event: open (or repaint) the window. */
-  open(): void {
+  /** The root a hub tab switch carries its position onto. */
+  rootElement(): HTMLElement {
+    return this.deps.root();
+  }
+
+  /** Open (or repaint) the window. `atEmissary` is the emissary's talk event;
+   *  a hub tab or launcher opens it read-only. */
+  open(atEmissary = false): void {
+    if (this.atEmissary !== atEmissary) this.dialogQuestId = null;
+    this.atEmissary = atEmissary;
     if (!this.opened) {
       this.deps.closeOthers();
       this.openerFocus = this.deps.captureFocus();
@@ -80,6 +104,7 @@ export class WeeklyQuestsWindow {
       this.dialogQuestId,
       world.factions,
       world.player.level,
+      this.atEmissary,
     ]);
   }
 
@@ -104,9 +129,13 @@ export class WeeklyQuestsWindow {
     const root = this.deps.root();
     const world = this.deps.world();
     const view = buildWeeklyQuestsView(world, Date.now());
+    const hub = this.deps.hubStrip;
     markDialogRoot(root, { labelledBy: 'weekly-quests-title' });
     const dialog =
-      this.dialogQuestId && WEEKLY_QUESTS_BY_ID[this.dialogQuestId] && !world.weeklyQuest
+      this.atEmissary &&
+      this.dialogQuestId &&
+      WEEKLY_QUESTS_BY_ID[this.dialogQuestId] &&
+      !world.weeklyQuest
         ? buildWeeklyQuestDialog(
             WEEKLY_QUESTS_BY_ID[this.dialogQuestId],
             world.player.level,
@@ -115,16 +144,23 @@ export class WeeklyQuestsWindow {
         : null;
     if (!dialog) this.dialogQuestId = null;
     root.innerHTML =
-      `<div class="panel-title wk-title"><span id="weekly-quests-title">${esc(view.title)}</span>` +
-      `<button type="button" class="x-btn" data-close aria-label="${esc(t('hudChrome.weekly.close'))}">${svgIcon('close')}</button></div>` +
+      `<div class="panel-title wk-title"><span id="weekly-quests-title">${esc(hub ? hub.title() : view.title)}</span>` +
+      `<button type="button" class="x-btn" data-close aria-label="${esc(hub ? hub.closeLabel() : t('hudChrome.weekly.close'))}">${svgIcon('close')}</button></div>` +
+      (hub?.html() ?? '') +
       `<div class="wk-sub">${esc(view.subtitle)} <b>${esc(view.resetText)}</b></div>` +
+      (this.atEmissary ? '' : this.remoteNoteHtml()) +
       `<div class="wk-cards">${view.cards.map((card) => this.cardHtml(card)).join('')}</div>` +
       // The finished charge swaps the footer line for the commendation strip.
       (view.commendation
         ? this.commendHtml(view.commendation)
         : `<div class="wk-foot">${esc(view.footer)}</div>`) +
       (dialog ? this.dialogHtml(dialog, view) : '');
+    hub?.wire(root);
     root.querySelector('[data-close]')?.addEventListener('click', () => this.close());
+    root.querySelector('[data-wk-emissary-map]')?.addEventListener('click', () => {
+      const point = weeklyEmissaryPoint();
+      this.deps.showOnMap?.(point.x, point.z);
+    });
     root.querySelectorAll<HTMLButtonElement>('[data-wk-choose]').forEach((button) => {
       button.addEventListener('click', () => {
         this.dialogQuestId = button.dataset.wkChoose ?? null;
@@ -157,13 +193,13 @@ export class WeeklyQuestsWindow {
   }
 
   private cardHtml(card: WeeklyQuestCardView): string {
-    const disabled = card.state !== 'open';
+    const disabled = card.state !== 'open' || !this.atEmissary;
     const buttonClass =
       card.state === 'active'
         ? 'wk-btn wk-btn-active'
         : card.state === 'completed'
           ? 'wk-btn wk-btn-done'
-          : card.state === 'locked'
+          : card.state === 'locked' || !this.atEmissary
             ? 'wk-btn wk-btn-locked'
             : 'wk-btn';
     return (
@@ -177,6 +213,16 @@ export class WeeklyQuestsWindow {
       `<button type="button" class="${buttonClass}" data-wk-choose="${esc(card.id)}"${disabled ? ' disabled' : ''}>${esc(card.buttonLabel)}</button>` +
       `</section>`
     );
+  }
+
+  // The read-only line a hub open shows: where the pick is made, and a way there.
+  private remoteNoteHtml(): string {
+    const point = weeklyEmissaryPoint();
+    const where = t('hudChrome.rewards.weeklyPickAt', { zone: zoneDisplayName(point.zoneId) });
+    const map = this.deps.showOnMap
+      ? ` <button type="button" class="wk-btn wk-btn-map" data-wk-emissary-map>${esc(t('hudChrome.finder.showOnMap'))}</button>`
+      : '';
+    return `<div class="wk-remote ui-meta">${esc(where)}${map}</div>`;
   }
 
   // The commendation strip in the footer's slot: one button per faction, off

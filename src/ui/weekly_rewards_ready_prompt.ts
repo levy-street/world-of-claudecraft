@@ -47,7 +47,7 @@ export function showWeeklyRewardsReadyPrompt(
     if (!dismissed) handle.dismiss();
   });
   stack.append(prompt);
-  // The containing bank window becomes visible after its initial render.
+  // The containing Vault window becomes visible after its initial render.
   const focusTimer = setTimeout(() => {
     if (!dismissed && prompt.isConnected) open.focus();
   }, 0);

@@ -26,10 +26,10 @@ import { t } from '../src/ui/i18n';
 import { OptionsWindow } from '../src/ui/options_window';
 
 const BOOL_SETTING_KEYS = new Set(['waterRipples']);
-// The Graphics row by its data-menu-action hook, never by index: the main
-// menu's order shifts by host (the Unlock Interface row leads on desktop only).
-const GRAPHICS_ROW =
-  '#options-menu .opt-btn[data-menu-action="graphics"], .opt-btn[data-menu-action="graphics"]';
+// The Esc menu's Settings row by its data-menu-action hook, never by index
+// (the menu's order shifts by host): a fresh window's Settings view opens on
+// its first category, Graphics.
+const GRAPHICS_ROW = '.opt-btn[data-menu-action="settings"]';
 
 function installShell(): { send(state: DesktopGpuBackendState): void } {
   let push: ((state: DesktopGpuBackendState) => void) | null = null;

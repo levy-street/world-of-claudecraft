@@ -95,8 +95,8 @@ describe('bank_window: load-bearing behaviors preserved', () => {
   });
 
   it('open() is idempotent while already open (a re-interact must not re-capture focus)', () => {
-    expect(painter).toMatch(/open\(initialTab\?: 'rewards'\): void \{\s*if \(this\.opened\) \{/);
-    const openBody = painter.slice(painter.indexOf("open(initialTab?: 'rewards'): void {"));
+    expect(painter).toMatch(/open\(\): void \{\s*if \(this\.opened\) return;/);
+    const openBody = painter.slice(painter.indexOf('  open(): void {'));
     expect(openBody.indexOf('return;')).toBeLessThan(openBody.indexOf('this.deps.captureFocus()'));
   });
 
@@ -244,7 +244,7 @@ describe('bank_window: modal prompt a11y contract', () => {
     // else reds when a cleanup pass deletes it, so the pin is a source
     // scrape on the open() region (the first-derive walk over the content
     // tables must land on the open path, not inside a click handler).
-    const openBody = painter.slice(painter.indexOf("open(initialTab?: 'rewards'): void {"));
+    const openBody = painter.slice(painter.indexOf('  open(): void {'));
     expect(openBody.slice(0, 1200)).toContain('vaultMaterialIds();');
   });
 
@@ -309,7 +309,10 @@ describe('bank_window: the bag-socket row (phase 07 source pins)', () => {
 describe('bank_window: hud.ts wiring', () => {
   it('opens the bank on the bank SimEvent', () => {
     expect(hud).toContain("case 'bank':");
-    expect(hud).toContain("this.openBank(ev.type === 'weekly_rewards' ? 'rewards' : undefined);");
+    expect(hud).toContain("case 'bank':\n          this.openBank();");
+    // The Weekly Vault keeper opens the Rewards hub on its Vault tab now (menu
+    // consolidation step 7), not a weekly mode of the bank.
+    expect(hud).toContain("case 'weekly_rewards':\n          this.rewards.hub.open('vault');");
   });
 
   it('routes the managed-window close through the painter (focus return)', () => {
@@ -318,10 +321,10 @@ describe('bank_window: hud.ts wiring', () => {
   });
 
   it('toggles the bank-open docking body class on open and close', () => {
-    expect(lifecycle).toContain("classes.toggle('bank-open', tab !== 'rewards')");
-    expect(lifecycle).toContain("classes.remove('bank-open', 'weekly-vault-open')");
+    expect(lifecycle).toContain("document.body.classList.add('bank-open');");
+    expect(lifecycle).toContain("classes.remove('bank-open');");
     expect(hud).toMatch(
-      /openBankCompanion\(\s*this\.bankWindow,\s*\$\('#bags'\),\s*\(\) => this\.bagsWindow\.close\(\),\s*\(\) => this\.renderBags\(\),\s*tab,?\s*\)/,
+      /openBankCompanion\(\s*this\.bankWindow,\s*\$\('#bags'\),\s*\(\) => this\.renderBags\(\),?\s*\)/,
     );
     expect(hud).toMatch(
       /closeBankBags\(\s*\$\('#bags'\),\s*\(\) => this\.cancelPetFeed\(\),\s*\(\) => this\.renderBags\(\),?\s*\)/,
@@ -350,7 +353,7 @@ describe('bank_window: hud.ts wiring', () => {
     // precedence (vendor first) strands the bank at half-width with its x-btn
     // hidden and no touch close affordance.
     expect(hud).toMatch(
-      /openBank\(tab\?: 'rewards'\): void \{[\s\S]{0,600}?if \(this\.vendorOpen\) this\.closeVendor\(\);[\s\S]{0,600}?openBankCompanion\(/,
+      /openBank\(\): void \{[\s\S]{0,600}?if \(this\.vendorOpen\) this\.closeVendor\(\);[\s\S]{0,600}?openBankCompanion\(/,
     );
     expect(hud).toMatch(
       /openVendor\(npcId: number, opener\?: HTMLElement \| null\): void \{[\s\S]{0,600}?if \(this\.bankWindowOpen\) this\.closeBank\(\);/,
@@ -367,7 +370,7 @@ describe('bank_window: hud.ts wiring', () => {
       /openHeroicVendor\(npcId: number, opener\?: HTMLElement \| null\): void \{[\s\S]{0,600}?if \(this\.bankWindowOpen\) this\.closeBank\(\);/,
     );
     expect(hud).toMatch(
-      /openBank\(tab\?: 'rewards'\): void \{[\s\S]{0,600}?if \(this\.openHeroicVendorNpcId !== null\) this\.closeHeroicVendor\(\);[\s\S]{0,600}?openBankCompanion\(/,
+      /openBank\(\): void \{[\s\S]{0,600}?if \(this\.openHeroicVendorNpcId !== null\) this\.closeHeroicVendor\(\);[\s\S]{0,600}?openBankCompanion\(/,
     );
   });
 
@@ -1084,21 +1087,13 @@ describe('the gilded tokens and the forced-colors fill pin (phase 08 QA)', () =>
   });
 });
 
-describe('standalone weekly vault host', () => {
-  it('closes bags on entry and closes the vault before a bags toggle', () => {
-    const open = hud.slice(
-      hud.indexOf("  openBank(tab?: 'rewards')"),
-      hud.indexOf('  closeBank():'),
-    );
+describe('no weekly vault mode on the bank (menu consolidation step 7)', () => {
+  it('opens the bank with its bags and leaves the Vault to the Rewards hub', () => {
+    const open = hud.slice(hud.indexOf('  openBank(): void {'), hud.indexOf('  closeBank():'));
     expect(open).toContain('openBankCompanion(');
-    expect(lifecycle).toContain("if (tab === 'rewards') closeBags();");
-    expect(lifecycle).toContain("classes.toggle('bank-open', tab !== 'rewards')");
-    expect(lifecycle.indexOf("if (tab === 'rewards') return;")).toBeLessThan(
-      lifecycle.indexOf('  renderBags();'),
-    );
-    expect(hud).toContain(
-      "if (document.body.classList.contains('weekly-vault-open')) this.closeBank();",
-    );
-    expect(lifecycle).toContain("classes.remove('bank-open', 'weekly-vault-open')");
+    expect(painter).not.toContain('weeklyPane');
+    expect(painter).not.toContain("'rewards'");
+    expect(lifecycle).not.toContain('weekly-vault-open');
+    expect(hud).not.toContain('weekly-vault-open');
   });
 });

@@ -55,6 +55,7 @@ export type UiIconName =
   | 'donate'
   | 'chest'
   // hand-authored geometrics
+  | 'rewards'
   | 'close'
   | 'prev'
   | 'next'
@@ -180,6 +181,10 @@ const ICONS: Record<UiIconName, string> = {
   chest:
     '<path d="M112 144h288v-24c0-31-25-56-56-56H168c-31 0-56 25-56 56v24zm32 0v-24c0-13 11-24 24-24h176c13 0 24 11 24 24v24H144zM72 176h368v96H72zM96 272h320v168H96zM232 176h48v264h-48zM216 256h80v72h-80z"/>',
   // ── hand-authored geometrics ─────────────────────────────────────────────
+  // The Rewards hub: a rosette medal on two ribbon tails (the ring is a
+  // counter-wound subpath, so it cuts a hole without a fill-rule).
+  rewards:
+    '<path d="M256 72a128 128 0 1 1 0 256a128 128 0 1 1 0-256zm0 40a88 88 0 1 0 0 176a88 88 0 1 0 0-176zm0 34l20 41 45 7-33 32 8 45-40-21-40 21 8-45-33-32 45-7zM186 312l-48 160 58-26 36 52 26-156c-26-4-50-14-72-30zm140 0c-22 16-46 26-72 30l26 156 36-52 58 26z"/>',
   close:
     '<path d="M115 80 256 221 397 80 432 115 291 256 432 397 397 432 256 291 115 432 80 397 221 256 80 115Z"/>',
   // hand-authored: a waste bin (lid, body, two staves). The destructive-but-quiet

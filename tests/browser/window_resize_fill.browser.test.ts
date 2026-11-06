@@ -76,6 +76,8 @@ async function openLeaderboard(): Promise<HTMLElement> {
   const win = new LeaderboardWindow(
     stubDeps({
       root: () => root,
+      // stubDeps answers every missing dep with a no-op; outside a hub there is no strip.
+      hubStrip: undefined,
       world: () =>
         ({
           realm: 'Claudemoon',

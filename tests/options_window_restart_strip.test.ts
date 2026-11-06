@@ -107,10 +107,11 @@ function openWindow(
   return window;
 }
 
-// By the row's data-menu-action hook, never by index: the main menu's order
-// shifts by host (the Unlock Interface row leads on desktop only).
+// Through the Esc menu's Settings row, then the category's rail button, both
+// by their data hooks, never by index: the menu's order shifts by host.
 function goTo(root: HTMLElement, view: 'graphics' | 'interface'): void {
-  root.querySelector<HTMLButtonElement>(`.opt-btn[data-menu-action="${view}"]`)?.click();
+  root.querySelector<HTMLButtonElement>('.opt-btn[data-menu-action="settings"]')?.click();
+  root.querySelector<HTMLButtonElement>(`.opt-rail-btn[data-settings-category="${view}"]`)?.click();
 }
 
 /** A second window on a fresh root: the menu buttons live on the menu view only,

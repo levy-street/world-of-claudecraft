@@ -170,7 +170,7 @@ export class ExpeditionController {
     this.deps.writers.setAttr(
       this.bell,
       'aria-label',
-      tPlural('hudChrome.expeditions.bellCount', attention, { count }),
+      tPlural('hudChrome.expeditions.activitiesBellCount', attention, { count }),
     );
     this.deps.writers.setText(this.badge, count);
     this.deps.writers.setStyleProp(this.badge, 'display', attention ? '' : 'none');

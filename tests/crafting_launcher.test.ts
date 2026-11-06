@@ -24,26 +24,19 @@ const indexHtml = read('../index.html');
 const playHtml = read('../play.html');
 const hudCss = read('../src/styles/hud.css');
 
-describe('desktop micro-menu launcher', () => {
-  it('ships the side-menu Crafting button in BOTH game entries, under Bags', () => {
+describe('desktop launcher (the Professions hub)', () => {
+  it('ships no standalone Crafting rail button: Crafting is a Professions hub tab', () => {
+    // Menu consolidation step 1: the rail's one Professions button opens the
+    // hub, and T keeps landing on its Crafting tab.
     for (const html of [indexHtml, playHtml]) {
-      expect(html).toMatch(/id="mm-crafting"[^>]*data-icon="crafting"/);
-      expect(html).toMatch(/id="mm-crafting"[^>]*data-i18n-title="hudChrome\.crafting\.title"/);
-      // Dock order: bags, then crafting, then the arena activity cluster.
-      const bag = html.indexOf('id="mm-bag"');
-      const crafting = html.indexOf('id="mm-crafting"');
-      const arena = html.indexOf('id="mm-arena"');
-      expect(bag).toBeGreaterThan(-1);
-      expect(crafting).toBeGreaterThan(bag);
-      expect(arena).toBeGreaterThan(crafting);
+      expect(html).not.toContain('id="mm-crafting"');
+      expect(html).toMatch(/id="mm-professions"[^>]*data-icon="professions"/);
     }
-  });
-
-  it('binds the click and repaints the keycap from the live binding', () => {
-    expect(hud).toContain(
-      "$('#mm-crafting').addEventListener('click', () => this.toggleCrafting());",
+    expect(sideButtons).not.toContain("'#mm-crafting'");
+    expect(hud).not.toContain("$('#mm-crafting')");
+    expect(hud).toMatch(
+      /toggleCrafting\(\): void \{\s*this\.professionsHub\.toggle\('crafting'\);/,
     );
-    expect(sideButtons).toContain("['#mm-crafting', 'crafting', 'hudChrome.crafting.title'],");
   });
 });
 
@@ -52,13 +45,14 @@ describe('mobile More-tray launcher', () => {
     for (const html of [indexHtml, playHtml]) {
       expect(html).toMatch(/id="mobile-crafting"[^>]*data-icon="crafting"/);
       expect(html).toMatch(/id="mobile-crafting"[^>]*data-i18n-title="hudChrome\.crafting\.title"/);
-      // Tray order mirrors the desktop rationale: right after Bags.
-      const bags = html.indexOf('id="mobile-bags"');
+      // The grouped tray (menu consolidation step 5): Crafting sits in the
+      // Professions group, right after the hub's Overview tile.
+      const overview = html.indexOf('id="mobile-professions"');
       const crafting = html.indexOf('id="mobile-crafting"');
-      const spellbook = html.indexOf('id="mobile-spellbook"');
-      expect(bags).toBeGreaterThan(-1);
-      expect(crafting).toBeGreaterThan(bags);
-      expect(spellbook).toBeGreaterThan(crafting);
+      const perfecting = html.indexOf('id="mobile-perfecting"');
+      expect(overview).toBeGreaterThan(-1);
+      expect(crafting).toBeGreaterThan(overview);
+      expect(perfecting).toBeGreaterThan(crafting);
     }
   });
 
@@ -128,7 +122,9 @@ describe('gossip Crafting shortcut launcher (station masters)', () => {
     expect(body).toContain('this.sim.craftingIdentity.knownRecipes');
     expect(body).toContain('this.selectedCraftTab = craftId;');
     expect(body).toContain('this.persistCraftingTab();');
-    expect(body).toContain('this.renderCrafting();');
+    // The paint now rides the hub's Crafting member (showCrafting), so the
+    // shortcut lands on the hub tab like every other crafting opener.
+    expect(body).toContain("this.professionsHub.open('crafting');");
     // The gossip route's focus handoff: the dialog released its trap without
     // restoring, so openCrafting must land focus on the selected tab.
     expect(body).toContain("querySelector('.crafting-tab.sel')");
@@ -194,12 +190,13 @@ describe('side rail height budget', () => {
     }
   });
 
-  it('shows the ready daily-reward count through the shared corner badge primitive', () => {
-    // The Prompts board calls for the ready chest to carry a count, not glow alone.
-    expect(hud).toContain('daily-reward-count ui-badge ui-badge--corner');
-    expect(hudCss).toMatch(
-      /#daily-rewards-button\.spin-ready \.daily-reward-count \{\s*display: inline-flex;/,
-    );
+  it('carries no spin-ready count on the store chest (the daily spin is gone)', () => {
+    // Menu consolidation step 7: the chest opens the WOC Store only; the daily
+    // spin it used to advertise is no longer a live feature. Claimable rewards
+    // are the Rewards launcher's pill (#mm-rewards) now.
+    expect(hud).not.toContain('daily-reward-count');
+    expect(hud).not.toContain('spin-ready');
+    expect(hudCss).not.toContain('spin-ready');
   });
 
   // The rail's real footprint: two 34px .side-buttons-col columns plus the
@@ -344,18 +341,17 @@ describe('side rail height budget', () => {
   });
 });
 
-describe('desktop launcher behavior (jsdom)', () => {
-  it('a click on #mm-crafting fires the toggle wiring and hydrateIcons materializes the glyph', () => {
-    // The source pin above proves hud.ts wires #mm-crafting to this.toggleCrafting();
-    // this drives a faithful copy of that wiring over the real button markup to
-    // prove the element is clickable and the click path fires, and that the
-    // data-icon resolves to a registered glyph (deeds_window.test.ts pairs the
-    // same source-pin plus jsdom-behavior approach).
+describe('More-tray launcher behavior (jsdom)', () => {
+  it('a tap on #mobile-crafting fires the wiring and hydrateIcons materializes the glyph', () => {
+    // The source pins above prove the tray tile routes to hud.toggleCrafting()
+    // (the hub's Crafting tab); this drives a faithful copy of that wiring over
+    // the real tile markup to prove it is clickable and that data-icon resolves
+    // to a registered glyph (the desktop rail button left with the hub).
     document.body.innerHTML =
-      '<div id="side-buttons">' +
-      '<button type="button" class="micro-btn" id="mm-crafting" title="Crafting" aria-label="Crafting" data-icon="crafting"><span class="keybind">t</span></button>' +
+      '<div id="mobile-extra-controls">' +
+      '<button type="button" class="mobile-btn" id="mobile-crafting" title="Crafting" aria-label="Crafting" data-icon="crafting"><span class="mobile-label">Crafting</span></button>' +
       '</div><div id="crafting-window" hidden></div>';
-    const btn = document.getElementById('mm-crafting') as HTMLButtonElement;
+    const btn = document.getElementById('mobile-crafting') as HTMLButtonElement;
 
     let toggles = 0;
     btn.addEventListener('click', () => {
@@ -364,8 +360,6 @@ describe('desktop launcher behavior (jsdom)', () => {
     btn.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     expect(toggles).toBe(1);
 
-    // data-icon="crafting" must resolve to a registered glyph: hydrateIcons is a
-    // no-op for unknown names, so a missing registration would leave no svg.
     hydrateIcons(document.body);
     expect(btn.querySelector('.ui-icon')).not.toBeNull();
   });

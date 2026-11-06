@@ -1,6 +1,6 @@
 // The HUD's one path to the public wiki (the /wiki guide SPA). Confirm-first:
-// every entry point (the #mm-wiki micro button, the Esc-menu row, the mobile
-// More tray) routes through promptWikiVisit, which shows the shared confirm
+// every entry point (the Game Menu's Help and Wiki row, since the menu
+// consolidation took it off the rail and the More tray) routes through promptWikiVisit, which shows the shared confirm
 // dialog and only opens the wiki on OK, so an accidental tap can never yank a
 // mid-fight player out of the game (the browser hop is the interruption, and
 // it is not cancelable once taken).

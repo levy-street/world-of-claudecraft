@@ -180,6 +180,16 @@ export interface RingArc {
   endAngle: number;
 }
 
+/** The SVG path for an arc on the unit ring (the professions window's craft
+ *  wheel draws it inside a -1.25..1.25 viewBox with a non-scaling stroke). */
+export function ringArcPath(arc: RingArc): string {
+  const x1 = Math.cos(arc.startAngle);
+  const y1 = Math.sin(arc.startAngle);
+  const x2 = Math.cos(arc.endAngle);
+  const y2 = Math.sin(arc.endAngle);
+  return `M ${x1.toFixed(4)} ${y1.toFixed(4)} A 1 1 0 0 1 ${x2.toFixed(4)} ${y2.toFixed(4)}`;
+}
+
 /** The chord from the hobby craft to the craft it sits opposite on the ring
  *  (one of the majors for any canonical hobby choice). */
 export interface RingChord {

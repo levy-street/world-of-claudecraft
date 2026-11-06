@@ -1352,7 +1352,9 @@ describe('Masterwrought art completion evidence', () => {
       ],
       [
         '| HUD chrome launcher icons (`public/ui/chrome/*.webp`',
-        'd93e1808bea695afe46fbae5d9f98ee0a90a704b8e3b70a2bbac431a3fa96896',
+        // Re-pinned for menu consolidation step 7: the row now also names the
+        // Rewards rosette authored in-repo under scripts/assets/chrome_rewards/.
+        '7fae085e8a9a86e94e8e3c029599a37f2cebfa9db99e4fd986e45393f5700ff8',
       ],
       [
         '| Map and minimap marker paintings (`public/ui/map-markers/*.webp`)',

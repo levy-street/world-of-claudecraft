@@ -67,10 +67,10 @@ describe('unified Groups notification bell', () => {
     expect(document.getElementById('expedition-hud')).toBeNull();
     const bell = document.getElementById('expedition-bell')!;
     expect(bell.getAttribute('aria-controls')).toBe('dungeon-finder-window');
-    expect(bell.getAttribute('aria-label')).toBe('Open Groups: 1 notification');
+    expect(bell.getAttribute('aria-label')).toBe('Open Activities: 1 notification');
     expect(badge()?.textContent).toBe('1');
     bell.click();
-    expect(bell.getAttribute('aria-label')).toBe('Open Groups: 0 notifications');
+    expect(bell.getAttribute('aria-label')).toBe('Open Activities: 0 notifications');
     expect(deps.openFinder).toHaveBeenCalledOnce();
     expect(document.getElementById('expedition-panel')).toBeNull();
     expect(document.querySelector('[data-expedition-notice]')).toBeNull();

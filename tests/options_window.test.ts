@@ -154,8 +154,20 @@ describe('options_window: hotkey setup row', () => {
   it('never leaves a key capture armed behind a closed or rebuilt panel', () => {
     const close = painter.slice(painter.indexOf('  close(): void {'));
     const body = close.slice(0, close.indexOf('\n  }\n'));
-    expect(body).toContain('if (this.capturingKey) this.deps.options()?.captureKey(null);');
-    expect(body).toContain('this.keyboardBoard?.dispose();');
+    expect(body).toContain('this.endKeybindSession();');
+    // The one teardown both the close path and a Settings rail press (which
+    // can leave Key Bindings mid-capture) run: disarm the row capture, drop the
+    // conflict, dispose the board.
+    const end = painter.slice(painter.indexOf('private endKeybindSession(): void {'));
+    const endBody = end.slice(0, end.indexOf('\n  }\n'));
+    expect(endBody).toContain('this.dropKeyCapture();');
+    expect(endBody).toContain('this.keyboardBoard?.dispose();');
+    const drop = painter.slice(painter.indexOf('private dropKeyCapture(): void {'));
+    expect(drop.slice(0, drop.indexOf('\n  }\n'))).toContain(
+      'if (this.capturingKey) this.deps.options()?.captureKey(null);',
+    );
+    const rail = painter.slice(painter.indexOf('new OptionsSettingsRail('));
+    expect(rail.slice(0, rail.indexOf('\n  });\n'))).toContain('this.endKeybindSession();');
     const keybinds = painter.slice(
       painter.indexOf('private renderKeybinds(): void {'),
       painter.indexOf('private beginCapture('),
@@ -753,10 +765,13 @@ describe('options_window: title-bar back control', () => {
     expect(body).toContain("t('hud.options.back')");
   });
 
-  it('wires [data-back] centrally in render() and routes every back path to goBack()', () => {
-    expect(painter).toContain(
-      "el.querySelector('[data-back]')?.addEventListener('click', () => this.goBack());",
-    );
+  it('wires [data-back] centrally in viewShell() and routes every back path to goBack()', () => {
+    // Wired on every shell mount, not only in render(): a panel that repaints
+    // itself (a key capture repaints Key Bindings directly) keeps a live Back.
+    const shell = painter.slice(painter.indexOf('  private viewShell('));
+    const shellBody = shell.slice(0, shell.indexOf('\n  }\n'));
+    expect(shellBody).toContain("const back = this.deps.root().querySelector('[data-back]');");
+    expect(shellBody).toContain("back?.addEventListener('click', () => this.goBack());");
     // the five footer Back buttons (the shared settingsViewFooter, which
     // Audio/Controller/Interface feed into; the graphics inline action row,
     // which replaces it for that view; bug report; keybinds; import / export)
@@ -778,11 +793,15 @@ describe('options_window: title-bar back control', () => {
     // One level up (optionsParentView, pinned in options_view.test.ts): an
     // overlay panel returns to the Overlays list, every other view to the root.
     expect(body).toContain('this.view = this.overlayPanels.parentView(this.view);');
-    expect(body).toContain('this.capturingKey = null;');
+    // Back out of Key Bindings disarms a capture the way a rail press does.
+    expect(body).toContain('this.endKeybindSession();');
     expect(body).toContain("this.keybindNote = '';");
     expect(body).toContain('this.render();');
     // WCAG: the tapped control is destroyed by the re-render, so focus must land
     // in the re-rendered menu rather than falling to <body>.
+    // Back to the Esc menu lands on its Settings row; any other parent view
+    // takes its first interactive control.
+    expect(body).toContain('[data-menu-action="settings"]');
     expect(body).toContain('this.deps.focusFirstInteractive(this.deps.root());');
     expect(body).not.toContain('this.close()');
   });
@@ -845,20 +864,25 @@ describe('options_window: uiScale slider commits on release (#1558)', () => {
 });
 
 describe('options_window: settings shows the running version (#1541)', () => {
+  // The main view's paint moved with the menu list to
+  // options_main_menu_controller.ts (paintOptionsMainMenu); renderMain hands it
+  // the shell body.
   it('renders the version + build id from the shared app_version source', () => {
     // Reuse the single build source, not a re-declared __APP_* global.
-    expect(painter).toContain("import { appVersionInfo } from './app_version'");
-    expect(painter).toContain('appVersionInfo()');
+    expect(mainMenu).toContain("import { appVersionInfo } from './app_version'");
+    expect(mainMenu).toContain('appVersionInfo()');
+    const renderMain = painter.slice(painter.indexOf('private renderMain(): void {'));
+    expect(renderMain.slice(0, renderMain.indexOf('\n  }\n'))).toContain('paintOptionsMainMenu(');
   });
 
-  it('paints the version as a t() label in the main menu (renderMain)', () => {
-    const renderMain = painter.slice(painter.indexOf('private renderMain(): void {'));
-    const body = renderMain.slice(0, renderMain.indexOf('\n  }\n'));
+  it('paints the version as a t() label in the main menu (paintOptionsMainMenu)', () => {
+    const paint = mainMenu.slice(mainMenu.indexOf('export function paintOptionsMainMenu('));
+    const body = paint.slice(0, paint.indexOf('\n}\n'));
     // The label is an i18n key with version+build passed as values (no concat).
     expect(body).toContain("t('hudChrome.options.version', { version, build })");
     // Rendered as the .opt-version secondary line appended after the button list.
     expect(body).toContain("'opt-version'");
-    const listAppend = body.indexOf('scroll.appendChild(list)');
+    const listAppend = body.indexOf('body.appendChild(buildOptionsMenuList(');
     expect(listAppend).toBeGreaterThanOrEqual(0);
     expect(body.indexOf("'opt-version'")).toBeGreaterThan(listAppend);
   });

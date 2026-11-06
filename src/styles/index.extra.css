@@ -68,11 +68,6 @@
   color: #9fe6c2;
 }
 
-/* Unread-claimable badge on the side-rail Discord button. */
-#mm-discord {
-  position: relative;
-}
-
 /* Discord info line under the target frame healthbar (nickname + tag chips). */
 .uf-discord {
   display: none;

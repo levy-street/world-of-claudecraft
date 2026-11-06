@@ -41,7 +41,8 @@ function setup(withPrompt = false) {
   const host = document.createElement('div');
   const progress = document.createElement('div');
   const root = document.createElement('div');
-  root.id = 'bank-window';
+  // The Rewards hub's Vault tab (menu consolidation step 7; it was #bank-window).
+  root.id = 'weekly-vault-window';
   root.append(host, progress);
   document.body.append(root);
   if (withPrompt) {

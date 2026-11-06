@@ -86,16 +86,23 @@ Kept at `src/ui/` root on purpose; do not pull them in without a reason:
   aria-hidden decoration beside accessible text).
 
 ## Named siblings and recorded decisions
-- Openers (revised at the Phase 18 sweep): a professions window that is a
-  standalone player destination takes a col-a side-rail tile plus a keybind
-  (the Perfecting tile under Crafting on Shift+T is the seven-piece exemplar;
-  the Harvest Journal tile rides its pre-existing Shift+K; every seam is
-  pinned in `tests/professions_rail_tiles.test.ts`, because the recorded bug
-  class is a keybind wired at one of the two main.ts dispatch sites and dead
-  at the other). The commission board deliberately keeps the older shape, the
-  crafting window's title-bar button (`.crafting-orders-btn`): it is
+- Openers (revised at the menu consolidation, 2026-11-04): the four player
+  destinations (Overview, Crafting, Perfecting, Harvest Journal) are TABS of
+  one Professions hub (`professions_hub_view.ts` decides, the cold
+  `professions_hub_controller.ts` applies). The hub has ONE rail tile
+  (`#mm-professions`, Shift+P); T lands on Crafting; the Perfecting and
+  Harvest Journal actions stay rebindable with no default key. Every opener
+  on `Hud` (and every cross-link, the gossip `openCrafting(craftId)` route
+  included) goes through the hub at its tab, never straight to a member's
+  own `open()`, or the shown member would not be closed first. A member
+  window keeps its own id, root, focus trap and clock, and takes the
+  `hubStrip` dep to paint the shared strip. A NEW professions destination is
+  a new hub tab, not a new rail tile. The launch surface is pinned in
+  `tests/professions_hub_launchers.test.ts` (both main.ts dispatch sites
+  included, the recorded silent-drop bug class). The commission board keeps
+  the crafting window's title-bar button (`.crafting-orders-btn`): it is
   crafting's own sub-surface (posting an order needs the recipe context), not
-  a standalone destination, so it earns no tile and no keybind.
+  a standalone destination, so it earns no tab.
 - `professions_view.ts`'s simplified-mode body keeps the gathering rows a
   player has used plus Farming while a bed is planted. Do not restructure that
   reachability path without a maintainer ruling.

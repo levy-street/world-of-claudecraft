@@ -1,6 +1,6 @@
-# src/ui/hud/reputation/ - the Reputation tab
+# src/ui/hud/reputation/ - the Reputation window
 
-The character window's Reputation tab: one row per allied faction (World Quests
+The Book of the Realm's Reputation tab (once the Character sheet's): one row per allied faction (World Quests
 Stage 1, section 04 of the scope), the day summary and the faction title.
 
 - `reputation_view.ts` is the pure core (`UI_PURE_CORES`): rows, the day summary
@@ -8,6 +8,10 @@ Stage 1, section 04 of the scope), the day summary and the faction title.
   quest log and the expiry. It re-derives nothing the sim owns: tiers, thresholds,
   the tier-internal progress and the level-15 cap all come from
   `src/sim/factions.ts` (`standingProgress`, `maxStandingForLevel`).
+- `reputation_window.ts` is the window (menu consolidation step 2): the tab moved
+  out of the Character sheet into the Book of the Realm as its Reputation tab,
+  on its own `#reputation-window` root. It reuses the tab painter unchanged and
+  repaints on the slow band only when the body string would change.
 - `reputation_tab_html.ts` is the thin painter: a cold string builder the window
   calls on render. Faction names, hub names, tier labels and the per-faction
   standing titles are catalog keys (`hudChrome.reputation.*`), never the English

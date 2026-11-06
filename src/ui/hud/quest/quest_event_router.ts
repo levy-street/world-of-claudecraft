@@ -25,7 +25,7 @@ interface QuestEventHost {
     bannerClass?: 'deed',
   ): unknown;
   questDialog: { refresh(): void; open(npcId: number): void };
-  weeklyQuestsWindow: { open(): void };
+  weeklyQuestsWindow: { open(atEmissary?: boolean): void };
   guildHallWindow: { open(tab: 'contracts' | 'quartermaster'): void; refreshIfChanged(): void };
   dungeonFinderWindow: { open(): void };
   showError(text: string): void;
@@ -40,7 +40,7 @@ export function applyQuestEventPresentation(hud: object, ev: SimEvent): boolean 
   // The two world-quest events that open a window (an investigation's
   // dialogue, the weekly board) carry no presentation of their own.
   if (ev.type === 'worldQuestInvestigationDialogue') h.questDialog.open(ev.targetId);
-  else if (ev.type === 'worldQuestWeeklyOpen') h.weeklyQuestsWindow.open();
+  else if (ev.type === 'worldQuestWeeklyOpen') h.weeklyQuestsWindow.open(true);
   // Lantern Hall's residents (src/sim/highwatch_guild.ts) and its two systems' answers
   if (applyGuildHallEvent(h, ev)) return true;
   // A read treasure map opens its parchment (a re-read has no log line, so

@@ -17,7 +17,7 @@ export const thornhollowFields: GuidePage = {
     return `
       <article class="guide-article guide-thornhollow-fields">
         ${pageHeader('guide.thornhollowPage.heading', 'guide.thornhollowPage.intro')}
-        ${section('guide.thornhollowPage.queueHeading', `<p>${esc(t('guide.thornhollowPage.queueBody'))}</p>`)}
+        ${section('guide.thornhollowPage.queueHeading', `<p>${esc(t('guide.thornhollowPage.queueBodyActivities'))}</p>`)}
         ${section('guide.thornhollowPage.fieldHeading', `<p>${esc(t('guide.thornhollowPage.fieldBody'))}</p>`)}
         ${section(
           'guide.thornhollowPage.flagsHeading',

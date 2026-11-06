@@ -508,18 +508,44 @@ export type OptionsPanelId =
 
 export type OptionsMenuAction =
   | { kind: 'goto'; view: OptionsPanelId }
+  /** Open the full-screen Settings view on its entry category. */
+  | { kind: 'settings' }
   /** The Unlock Interface action, carrying the state it was built from so the
    *  painter's establishing paint has ONE source (the core); a press then
    *  repaints from the seam's answer. */
   | { kind: 'interfaceUnlock'; unlocked: boolean }
+  /** A quick on/off toggle (the rows that left the mobile More tray), carrying
+   *  the state it was built from; a press repaints from the seam's answer. */
+  | { kind: 'toggle'; toggle: GameMenuToggleId; on: boolean }
+  /** A quick outbound link (the community links that left the More tray). */
+  | { kind: 'link'; link: GameMenuLinkId }
   | { kind: 'wiki' }
   | { kind: 'unstuck' }
   | { kind: 'logout' }
   | { kind: 'close' };
 
+export type GameMenuToggleId = 'nameplates' | 'music' | 'haptics';
+export type GameMenuLinkId = 'discord' | 'donate' | 'steamWishlist';
+
 export interface OptionsMenuEntry {
   labelKey: TranslationKey;
   action: OptionsMenuAction;
+  /** Set on the quick toggles and links, which the painter seats as one
+   *  compact group ahead of Return to Game. */
+  group?: 'quick';
+}
+
+/** The quick group's per-host state. A toggle reads null where it does not
+ *  apply (Haptics off the touch layout); a link reads false where it is hidden
+ *  today (Discord on a Discord-less build, Donate on the native apps, the Steam
+ *  wishlist wherever steamWishlistSuppressed hides it). */
+export interface GameMenuQuickState {
+  nameplates: boolean | null;
+  music: boolean | null;
+  haptics: boolean | null;
+  discord: boolean;
+  donate: boolean;
+  steamWishlist: boolean;
 }
 
 export interface OptionsMenuOpts {
@@ -534,35 +560,61 @@ export interface OptionsMenuOpts {
   /** Whether the frames are loose right now. The row labels itself "Lock
    *  interface" while they are, exactly as the Frames tab's row does. */
   interfaceUnlocked: boolean;
+  /** The quick toggles and links; omitted on a host that wires none. */
+  quick?: GameMenuQuickState;
 }
 
-/** The main Esc-menu button list. Unlock Interface leads (owner request: the
- *  frames lock down by default, so the way to arrange them is one press from
- *  Esc rather than three levels into Interface > Frames); it is an ACTION the
- *  painter repaints in place, not a sub-view. */
-export function buildOptionsMenu(opts: OptionsMenuOpts): OptionsMenuEntry[] {
+const TOGGLE_LABEL_KEYS: Readonly<Record<GameMenuToggleId, TranslationKey>> = {
+  nameplates: 'hudChrome.options.nameplates',
+  music: 'hud.options.music',
+  haptics: 'hudChrome.mobile.haptics',
+};
+
+const LINK_LABEL_KEYS: Readonly<Record<GameMenuLinkId, TranslationKey>> = {
+  discord: 'hudChrome.discord.title',
+  donate: 'nav.donate',
+  steamWishlist: 'hudChrome.steam.wishlist',
+};
+
+/** The quick group: the toggles, then the links, each only where it applies. */
+function quickEntries(q: GameMenuQuickState): OptionsMenuEntry[] {
   const entries: OptionsMenuEntry[] = [];
+  for (const toggle of ['nameplates', 'music', 'haptics'] as const) {
+    const on = q[toggle];
+    if (on === null) continue;
+    entries.push({
+      labelKey: TOGGLE_LABEL_KEYS[toggle],
+      action: { kind: 'toggle', toggle, on },
+      group: 'quick',
+    });
+  }
+  for (const link of ['discord', 'donate', 'steamWishlist'] as const) {
+    if (!q[link]) continue;
+    entries.push({
+      labelKey: LINK_LABEL_KEYS[link],
+      action: { kind: 'link', link },
+      group: 'quick',
+    });
+  }
+  return entries;
+}
+
+/** The Esc (Game Menu) button list (issue #1653): Settings leads, opening the
+ *  full-screen Settings view whose rail holds every settings category; then
+ *  Unlock Interface (desktop; an ACTION the painter repaints in place, not a
+ *  sub-view), Help and Wiki, Report a Bug (online), Unstuck, Log Out, the
+ *  quick toggles and links, and Return to Game last. */
+export function buildOptionsMenu(opts: OptionsMenuOpts): OptionsMenuEntry[] {
+  const entries: OptionsMenuEntry[] = [
+    { labelKey: 'hudChrome.options.settings', action: { kind: 'settings' } },
+  ];
   if (opts.interfaceUnlockAvailable)
     entries.push({
       labelKey: interfaceUnlockLabelKey(opts.interfaceUnlocked),
       action: { kind: 'interfaceUnlock', unlocked: opts.interfaceUnlocked },
     });
-  entries.push(
-    { labelKey: 'hud.options.keyBindings', action: { kind: 'goto', view: 'keybinds' } },
-    { labelKey: 'hudChrome.controller.title', action: { kind: 'goto', view: 'controller' } },
-    { labelKey: 'hud.options.graphics', action: { kind: 'goto', view: 'graphics' } },
-    { labelKey: 'hud.options.interface', action: { kind: 'goto', view: 'interface' } },
-    // Auras, Cooldown Manager and Performance Overlay share one row: each is a
-    // floating on-screen overlay, so they sit together one level down.
-    { labelKey: 'hudChrome.options.overlays', action: { kind: 'goto', view: 'overlays' } },
-    { labelKey: 'hud.options.audio', action: { kind: 'goto', view: 'audio' } },
-    // Full settings export/import: its own sub-panel, since the code it carries
-    // spans every family (the Interface tab's rows carry only their own).
-    { labelKey: 'hudChrome.fullTransfer.menu', action: { kind: 'goto', view: 'transfer' } },
-    // The wiki row sits with the help-shaped entries (above Report a Bug /
-    // Unstuck); it opens the confirm-first external hop, never a sub-panel.
-    { labelKey: 'nav.wiki', action: { kind: 'wiki' } },
-  );
+  // The wiki row opens the confirm-first external hop, never a sub-panel.
+  entries.push({ labelKey: 'hudChrome.options.helpWiki', action: { kind: 'wiki' } });
   if (opts.bugReportAvailable)
     entries.push({
       labelKey: 'hudChrome.bugReport.menuButton',
@@ -570,6 +622,7 @@ export function buildOptionsMenu(opts: OptionsMenuOpts): OptionsMenuEntry[] {
     });
   entries.push({ labelKey: 'hudChrome.unstuck.menuButton', action: { kind: 'unstuck' } });
   entries.push({ labelKey: 'hud.options.logout', action: { kind: 'logout' } });
+  if (opts.quick) entries.push(...quickEntries(opts.quick));
   entries.push({ labelKey: 'hud.options.returnToGame', action: { kind: 'close' } });
   return entries;
 }
@@ -593,7 +646,8 @@ export function buildOverlaysMenu(): OptionsMenuEntry[] {
 }
 
 /** Where a sub-view's Back control lands: an overlay panel returns to the
- *  Overlays list it was opened from, everything else to the Game Menu root. */
+ *  Overlays list it was opened from, everything else (each Settings category
+ *  and Report a Bug) to the Game Menu root. */
 export function optionsParentView(view: 'main' | OptionsPanelId): 'main' | 'overlays' {
   return (OVERLAY_PANEL_IDS as readonly string[]).includes(view) ? 'overlays' : 'main';
 }

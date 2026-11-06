@@ -28,7 +28,7 @@ async function mount() {
 }
 
 describe('frame refinements', () => {
-  it('centres actual menu navigation and its Back action at enlarged UI scale', async () => {
+  it('fills the HUD for Settings and Back restores the floating menu spot at enlarged UI scale', async () => {
     await mount();
     document.documentElement.style.setProperty('--ui-scale', '1.25');
     const root = document.createElement('div');
@@ -49,11 +49,16 @@ describe('frame refinements', () => {
     );
     win.toggle();
     const before = root.getBoundingClientRect();
-    await page.getByRole('button', { name: 'Interface', exact: true }).click();
+    await page.getByRole('button', { name: 'Settings', exact: true }).click();
+    // The Settings view (issue #1653) fills the HUD instead of re-centring as a
+    // floating window: it spans the whole #ui box from its top-left corner.
     const after = root.getBoundingClientRect();
-    expect(after.height).not.toBe(before.height);
-    expect(after.left + after.width / 2).toBeCloseTo(before.left + before.width / 2, 0);
-    expect(after.top + after.height / 2).toBeCloseTo(before.top + before.height / 2, 0);
+    const ui = document.getElementById('ui')!.getBoundingClientRect();
+    expect(after.width).toBeGreaterThan(before.width);
+    expect(after.left).toBeCloseTo(ui.left, 0);
+    expect(after.top).toBeCloseTo(ui.top, 0);
+    expect(after.width).toBeCloseTo(ui.width, 0);
+    expect(after.height).toBeCloseTo(ui.height, 0);
     await page.getByRole('button', { name: 'Back', exact: true }).first().click();
     const back = root.getBoundingClientRect();
     expect(back.left).toBeCloseTo(before.left, 0);

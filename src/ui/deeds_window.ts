@@ -42,6 +42,7 @@ import { markDialogRoot } from './dialog_root';
 import { poiMarkLabel } from './entity_i18n';
 import { esc } from './esc';
 import { focusedWithin } from './focus_restore';
+import type { WindowHubStrip } from './hud/hub/window_hub_controller';
 import {
   formatDateTime,
   formatList,
@@ -133,6 +134,13 @@ export interface DeedsWindowDeps extends PainterHostPresentation {
   restoreFocus(target: HTMLElement | null): void;
   /** The watch set changed: repaint the HUD deed tracker now. */
   onWatchChanged(): void;
+  /** The Book of the Realm strip (menu consolidation step 2), painted under
+   *  the title bar while this window is one of the hub's tabs. */
+  hubStrip?: WindowHubStrip;
+  /** 'titles' renders only the worn title and border shelf (the Book of the
+   *  Realm's Titles tab, a second instance on its own root); 'deeds' (the
+   *  default) is the Book of Deeds. */
+  mode?: 'deeds' | 'titles';
 }
 
 export class DeedsWindow {
@@ -165,7 +173,18 @@ export class DeedsWindow {
   private flashDeedId: string | null = null;
   private reattachFlash = false;
 
-  constructor(private readonly deps: DeedsWindowDeps) {}
+  constructor(private readonly deps: DeedsWindowDeps) {
+    if (deps.mode === 'titles') this.category = 'titles';
+  }
+
+  private get titlesMode(): boolean {
+    return this.deps.mode === 'titles';
+  }
+
+  /** The root a hub tab switch carries its position onto. */
+  rootElement(): HTMLElement {
+    return this.deps.root();
+  }
 
   get isOpen(): boolean {
     return this.opened;
@@ -179,6 +198,8 @@ export class DeedsWindow {
 
   open(category?: DeedDisplayCategory | 'titles'): void {
     if (category) this.category = category;
+    if (this.titlesMode) this.category = 'titles';
+    else if (this.deps.hubStrip && this.category === 'titles') this.category = 'progression';
     if (this.opened) {
       // Re-opening at a section (a chronicler interact while already open)
       // re-renders in place; the open bookkeeping must not re-run.
@@ -189,8 +210,10 @@ export class DeedsWindow {
     this.openerFocus = this.deps.captureFocus();
     this.opened = true;
     this.lastSig = '';
-    this.fetchRarity();
-    this.fetchRecent();
+    if (!this.titlesMode) {
+      this.fetchRarity();
+      this.fetchRecent();
+    }
     this.render();
     this.deps.root().style.display = 'flex';
     // A jump-to-deed open already put the reading position on the landed card
@@ -371,18 +394,28 @@ export class DeedsWindow {
     // take focus; those fall through to the Close fallback below.
     const refocusSel = hadFocus && searchFocus === null ? refocusSelector(active) : null;
     this.deps.hideTooltip();
-    markDialogRoot(el, { label: t('hudChrome.deeds.title') });
+    const hub = this.deps.hubStrip;
+    const title = hub ? hub.title() : t('hudChrome.deeds.title');
+    markDialogRoot(el, { label: title });
     const prevScrollTop = el.querySelector('.deeds-scroll')?.scrollTop ?? 0;
 
     const model = this.buildModel();
+    // The Titles tab is the shelf alone: no search, summary, rail or filters.
+    const search = this.titlesMode
+      ? ''
+      : `<input type="search" class="deed-search ui-input" value="${esc(this.search)}" placeholder="${esc(t('hudChrome.deeds.searchPlaceholder'))}" aria-label="${esc(t('hudChrome.deeds.searchAria'))}">`;
+    const body = this.titlesMode
+      ? `<div class="deeds-body deeds-body--titles"><div class="deeds-scroll">${this.titlesHtml(model)}</div></div>`
+      : this.summaryHtml(model) +
+        `<div class="deeds-body">${this.railHtml(model)}<div class="deeds-scroll">${this.contentHtml(model)}</div></div>` +
+        this.filterBarHtml();
     el.innerHTML =
-      `<div class="panel-title ui-win-head"><span class="ui-win-title">${esc(t('hudChrome.deeds.title'))}</span>` +
-      `<input type="search" class="deed-search ui-input" value="${esc(this.search)}" placeholder="${esc(t('hudChrome.deeds.searchPlaceholder'))}" aria-label="${esc(t('hudChrome.deeds.searchAria'))}">` +
-      `<button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(t('hudChrome.deeds.close'))}">${svgIcon('close')}</button></div>` +
-      this.summaryHtml(model) +
-      `<div class="deeds-body">${this.railHtml(model)}<div class="deeds-scroll">${this.contentHtml(model)}</div></div>` +
-      this.filterBarHtml();
+      `<div class="panel-title ui-win-head"><span class="ui-win-title">${esc(title)}</span>${search}` +
+      `<button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(hub ? hub.closeLabel() : t('hudChrome.deeds.close'))}">${svgIcon('close')}</button></div>` +
+      (hub?.html() ?? '') +
+      body;
 
+    hub?.wire(el);
     this.wire(el);
     const scroll = el.querySelector('.deeds-scroll');
     if (scroll) scroll.scrollTop = prevScrollTop;
@@ -537,6 +570,11 @@ export class DeedsWindow {
       })
       .join('');
     const titlesOn = this.category === 'titles';
+    // Inside the Book of the Realm the shelf is its own Titles tab, so the
+    // rail drops it; the standalone Book keeps it.
+    if (this.deps.hubStrip) {
+      return `<nav class="deeds-rail ui-seg" aria-label="${esc(t('hudChrome.deeds.categoriesAria'))}">${rows}</nav>`;
+    }
     // The shelf holds both worn cosmetics, so the rail names both: a player
     // hunting for the border picker must be able to see where it lives.
     const titlesRow =

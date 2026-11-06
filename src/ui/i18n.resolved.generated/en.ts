@@ -544,6 +544,10 @@ export const en: EnTranslations = {
         "one": "Open Groups: {count} notification",
         "other": "Open Groups: {count} notifications"
       },
+      "activitiesBellCount": {
+        "one": "Open Activities: {count} notification",
+        "other": "Open Activities: {count} notifications"
+      },
       "alerts": "Alerts",
       "groups": "Groups",
       "rewards": "Rewards",
@@ -1839,6 +1843,7 @@ export const en: EnTranslations = {
       "chat": "Skip to Chat"
     },
     "mobile": {
+      "groupRecord": "Record",
       "jump": "Jump",
       "leaderboard": "Ranks",
       "dailyRewards": "Store",
@@ -2744,6 +2749,10 @@ export const en: EnTranslations = {
       "clickMoveRight": "Right Click",
       "version": "v{version} ({build})",
       "overlays": "Overlays",
+      "settings": "Settings",
+      "settingsCategories": "Settings categories",
+      "helpWiki": "Help and Wiki",
+      "nameplates": "Nameplates",
       "browserEffects": "Browser Effects",
       "browserEffectsAuto": "Auto",
       "browserEffectsFull": "Full",
@@ -3606,6 +3615,7 @@ export const en: EnTranslations = {
       }
     },
     "currencies": {
+      "walletChipAria": "{name}: {amount}",
       "intro": "None of these take bag space. Coin stays in your bag as always.",
       "activities": "Activities",
       "factions": "Factions",
@@ -3704,6 +3714,8 @@ export const en: EnTranslations = {
       "tierReachedLine": "You are now {tier} with the {faction}. Your faction title is now {title}."
     },
     "questLog": {
+      "available": "Available",
+      "offerMeta": "{zone} · {level}",
       "completed": "Completed",
       "zoneSummary": "{count} ({ready} ready)",
       "shiftHint": "Shift-click a quest to link it in chat."
@@ -6032,6 +6044,12 @@ export const en: EnTranslations = {
         "none": "No one",
         "title": "Who sees you online in friends lists and the guild roster, with your zone and map position. Your party always sees you."
       },
+      "guildEvents": {
+        "heading": "Guild events",
+        "dateLabel": "Date",
+        "when": "{date}, {time}",
+        "discordVoice": "In {channel} ({count})"
+      },
       "billboard": {
         "label": "Guild Billboard",
         "empty": "Nothing on the billboard yet.",
@@ -6354,6 +6372,31 @@ export const en: EnTranslations = {
       "armorKitUse": "Use: Reinforces your chest armor, increasing Armor by 12 for 1 hour.",
       "sharpeningStoneUse": "Use: Sharpens your main hand weapon, increasing Attack Power by 6 for 30 min.",
       "manaElixirUse": "Use: Increases Spirit by 6 for 1 hour."
+    },
+    "professionsHub": {
+      "tabOverview": "Overview"
+    },
+    "activities": {
+      "title": "Activities",
+      "close": "Close Activities",
+      "tabDungeons": "Dungeons and Raids",
+      "tabPvp": "PvP"
+    },
+    "rewards": {
+      "title": "Rewards",
+      "close": "Close Rewards",
+      "tabVault": "Vault",
+      "tabWeekly": "Weekly Quest",
+      "tabWorldQuests": "World Quests",
+      "weeklyPickAt": "Choose your quest with the emissary in {zone}."
+    },
+    "bookOfRealm": {
+      "title": "Book of the Realm",
+      "close": "Close the Book of the Realm",
+      "tabDeeds": "Deeds",
+      "tabTitles": "Titles",
+      "tabReputation": "Reputation",
+      "tabRankings": "Rankings"
     },
     "professions": {
       "title": "Professions",
@@ -7591,6 +7634,7 @@ export const en: EnTranslations = {
       "distance": "{distance} yards",
       "showRoute": "Show Route",
       "untrack": "Untrack",
+      "openQuestLog": "Open Quest Log",
       "track": "Track",
       "worldQuests": {
         "heading": "World quests today",
@@ -9687,31 +9731,45 @@ export const en: EnTranslations = {
       "chatBody": "Bottom left. Press Enter to start typing and Enter again to send.\n\nTwo tabs are always there: Chat, the combined log of everything said around you, and Combat, the written record of your fight. The plus button adds more, one per channel: Say, Yell, Party, General, World, LFG, Guild, and Officer, plus a Whisper tab that gathers every whisper you send and receive in one place. Typing in a channel tab sends to that channel without you retyping the command.\n\nThe whole box can be dragged to another spot and resized, and it remembers where you left it.",
       "keyWindowsTitle": "Windows you open with a key",
       "keyWindowsBody": "Each of these has a default key and a button in the rail in the bottom right corner. Press the key again, or Esc, to close it.",
+      "keyWindowsBodyHubs": "Each of these has a default key, and most also have a button in the rail in the bottom right corner. Several are tabbed windows that gather related panels together, and a key can open one straight onto its tab. Press the key again, or Esc, to close it.",
       "winCharTitle": "Character sheet (C)",
       "winCharBody": "Your equipped gear on one side, your attributes and the stats they feed on the other, with a tooltip on every value that says what it does for your class. It also carries your lifetime Time Played, with a small eye beside it that hides the number when you would rather not show it, and the button that composes your player card.",
+      "winCharBodyTwoTabs": "Two tabs, Character and Progression. Character shows your equipped gear on one side, your attributes and the stats they feed on the other, with a tooltip on every value that says what it does for your class. The sheet also carries your lifetime Time Played, with a small eye beside it that hides the number when you would rather not show it, and its footer holds the Cosmetics button and the button that composes your player card. On desktop, C opens your bags docked beside the sheet, so gear can be dragged straight onto your character.",
       "winBagsTitle": "Bags (B)",
       "winBagsBody": "Everything you are carrying, in one pack with four bag sockets. Category chips across the top narrow it to weapons, armor, consumables, materials, tools, quest items, or mounts, and a search box filters by name. A sort dropdown reorders what you are looking at by most recent, quality, or name, and that choice is remembered between sessions. A separate Sort button tidies the real cells of the pack in one press, clearing the chips and the search so you see the whole tidied bag.",
+      "winBagsBodyWallet": "Everything you are carrying, in one pack with four bag sockets. Category chips across the top narrow it to weapons, armor, consumables, materials, tools, quest items, or mounts, and a search box filters by name. A sort dropdown reorders what you are looking at by most recent, quality, or name, and that choice is remembered between sessions. A separate Sort button tidies the real cells of the pack in one press, clearing the chips and the search so you see the whole tidied bag. Under the grid, a wallet strip shows the other currencies you hold, Honor and the marks you earn among them, each as a small chip with its count.",
       "winSpellbookTitle": "Spellbook (P)",
       "winSpellbookBody": "Every ability your class has, learned and still to come, in order. This is where you drag abilities onto your action bars.",
       "winTalentsTitle": "Talents (N)",
       "winTalentsBody": "Where you choose your specialization, and your six talent rows with the three options each one offers and what every option does. Rows you have not reached yet are shown beside the ones you can pick now.",
       "winProfessionsTitle": "Professions (Shift+P)",
       "winProfessionsBody": "What you have learned, how skilled you are at each, and how far each one can still go.",
+      "winProfessionsBodyHub": "One tabbed window for your trades. Overview shows what you have learned, how skilled you are at each, and how far each one can still go; Crafting, Perfecting, and the Harvest Journal sit beside it as tabs of the same window.",
       "winCraftingTitle": "Crafting (T)",
       "winCraftingBody": "Your recipes, what each one needs, and what you can make right now with what you are carrying.",
+      "winCraftingBodyTab": "The Crafting tab of the Professions window, which T opens directly: your recipes, what each one needs, and what you can make right now with what you are carrying.",
       "winQuestLogTitle": "Quest log (L)",
       "winQuestLogBody": "Every quest you have taken, its story, its objectives, and your progress, with a way to show any of it on the map and to pick which quests your tracker follows.",
+      "winQuestLogBodyAvailable": "Every quest you have taken, its story, its objectives, and your progress, with a way to show any of it on the map and to pick which quests your tracker follows. An Available group lists the quests on offer near you, each with a way to show its quest giver on the map.",
       "winDeedsTitle": "Book of Deeds (Shift+Z)",
       "winDeedsBody": "The record of what you have done, the titles and Renown it has paid you, and what is still open.",
+      "winRealmTitle": "Book of the Realm (Shift+Z)",
+      "winRealmBody": "Your permanent record, in one tabbed window. Deeds holds what you have done, the Renown it has paid you, and what is still open; Titles is where you pick the title you wear and the border that frames your nameplate; and The Reliquary, Reputation, the Loot Explorer, and Rankings, the realm standings, each have a tab of their own.",
+      "winRewardsTitle": "Rewards",
+      "winRewardsBody": "What you can claim, in one tabbed window behind the Rewards button in the rail, which shows a count when something is waiting. Vault is the Weekly Vault, whose rolls open at the Vault keeper; Weekly Quest shows the emissary's four offers, though you choose one by speaking to the emissary; and World Quests is today's board, with a way to show each quest on the map and the one replacement you get each day.",
       "winSocialTitle": "Friends and Guild (O)",
       "winSocialBody": "Tabs for your friends, your guild and its roster, your raid, and the players you have ignored or blocked.",
+      "winSocialBodyEvents": "Tabs for your friends, your guild and its roster, your raid, and the players you have ignored or blocked. The Guild tab also keeps an Events list: officers and the Guild Master book dated events there, and every member sees them. A Discord strip at the foot of the window opens the Discord panel.",
       "winFinderTitle": "Dungeon Finder (Shift+I)",
       "winFinderBody": "The catalogue of group content you can queue for. Tick the activities you want, join a queue on your own or post a listing for your own group, and accept when a group comes together.",
+      "winActivitiesTitle": "Activities (Shift+I)",
+      "winActivitiesBody": "Group content in one tabbed window, also opened by the Groups bell in the rail. Dungeons and Raids is the Dungeon Finder: tick the activities you want, join a queue on your own or post a listing for your own group, and accept when a group comes together. PvP, which G opens directly, holds the arenas and Thornhollow Fields, and Card Duel is where you queue for and play the Card Master's game.",
       "winMetersTitle": "Damage meters (Shift+H)",
       "winMetersBody": "Damage, healing, and threat for you and everyone with you, kept in segments so you can look back at the fight before last. The healing and threat panels can be pulled out to stand on their own.",
       "winMoreTitle": "And a few more",
       "winMoreBody": "The world map (M), the PvP window (G), the Vale Cup (Y), the leaderboard (K), the event calendar (I), and the emote wheel (X) all work the same way. The leaderboard is worth a moment on your first visit: it keeps a tab for players, one for guilds, one that ranks whole accounts by Renown from the Book of Deeds, and one for the daily standings.\n\nRight-click another player, on their nameplate or on their name in chat, and Player Info opens a card on them: the gear they are wearing, with tooltips, and the public details of their character. It is a look, nothing more, and it needs them to be close enough to see.",
       "winMoreBodyNoValeCup": "The world map (M), the PvP window (G), the leaderboard (K), and the event calendar (I) all work the same way. The emote wheel (X) is the exception: hold its key and the wheel appears, then let go over an emote to play it. The leaderboard is worth a moment on your first visit: it keeps a tab for players, one for guilds, one that ranks whole accounts by Renown from the Book of Deeds, one for the daily standings, and a Developers tab for the people who build the game, there unless you switch Show Developer Badges off.\n\nTarget another player and right-click the target frame (on touch, double-tap or long-press it), or right-click their name in chat, and Player Info opens a card on them: the gear they are wearing, with tooltips, and the public details of their character. It is a look, nothing more. The gear needs them close enough to see: look a name up from chat while they are far away and you get the public half of the card instead, their portrait, name, level, class, and guild.",
+      "winMoreBodyRankings": "The world map (M) works the same way. The emote wheel (X) is the exception: hold its key and the wheel appears, then let go over an emote to play it. The Rankings tab of the Book of the Realm is worth a moment on your first visit: it keeps a board for players, one for guilds, one that ranks whole accounts by Renown from their deeds, one for the daily standings, one for World Quests, and a Developers tab for the people who build the game, there unless you switch Show Developer Badges off.\n\nTarget another player and right-click the target frame (on touch, double-tap or long-press it), or right-click their name in chat, and Player Info opens a card on them: the gear they are wearing, with tooltips, and the public details of their character. It is a look, nothing more. The gear needs them close enough to see: look a name up from chat while they are far away and you get the public half of the card instead, their portrait, name, level, class, and guild.",
       "worldWindowsTitle": "Windows the world opens for you",
       "worldWindowsBody": "Some windows you never press a key for: they open when you talk to the right person or click the right thing.\n\nA merchant opens the vendor window, with their stock to buy from and a buyback tab holding what you last sold, in case you sold it by mistake. A row of quantity buttons sits with the stock, so a stack of reagents is one press at five or ten at a time rather than ten presses, and a custom amount is there when neither suits. A class trainer opens the list of what you can learn now and what is still ahead of you.\n\nA banker opens your vault, the strongbox of extra slots you can buy more of. If your guild has opened a bank, a second tab there shows it: every member can look inside even without permission to take anything out, so nobody has to ask what the guild is holding, ranks decide who may deposit, withdraw, and move the guild's coin, and a log records every movement.\n\nA Ravenpost mailbox opens your letters, with what has arrived on one tab and a form for sending on another, attachments and all. The World Market at the Merchant has its own window: browse and buy on one tab, list your own goods on another, and collect what has sold on a third. Trading face to face with another player opens a trade window with a side each.",
       "worldWindowsBodyStationMaster": "Some windows you never press a key for: they open when you talk to the right person or click the right thing.\n\nA merchant opens the vendor window, with their stock to buy from and a buyback list at the foot of the same panel holding what you last sold, in case you sold it by mistake. A row of quantity buttons sits with the stock, so a stack of reagents is one press at five or ten at a time rather than ten presses, and a custom amount is there when neither suits. Your class abilities need no trainer, they come with your levels; the trainers here are the resident masters of the crafting stations, and Training on one of them opens the recipes they can teach you now, the ones you already know, and the ones still locked behind more skill.\n\nA banker opens your bank, with a Personal tab for the strongbox of extra slots you can buy more of and a Vault tab that stores your crafting materials by kind. If your guild has opened a bank, a Guild tab there shows it: every member can look inside even without permission to take anything out, so nobody has to ask what the guild is holding, ranks decide who may deposit, withdraw, and move the guild's coin, and a log records every movement.\n\nA Ravenpost mailbox opens your letters, with what has arrived on one tab and a form for sending on another, attachments and all. The World Market, at the Merchant in Eastbrook or Auctioneer Voss up in Highwatch, has its own window: browse and buy on one tab, list your own goods on another, and collect what has sold on a third. Trading face to face with another player opens a trade window with a side each.",
@@ -9721,11 +9779,16 @@ export const en: EnTranslations = {
       "playerCardBody": "A button on your character sheet composes a player card: a picture with a close-up of your character, the gear you are wearing, and your stats, ready to save or share. It is a snapshot for showing off a new set, and it changes nothing in the game.",
       "wikiTitle": "The Wiki button",
       "wikiBody": "This wiki is one click away in game. A button for it sits with the others in the rail in the bottom right corner, there is a row for it in the Esc game menu, and on a phone it lives in the More tray. Because opening it hands you over to your browser, the button always asks you to confirm first, so an accidental tap in a fight can never pull you out of one. The game keeps running behind it.",
+      "wikiBodyGameMenu": "This wiki is one click away in game. Its button sits in the Game Menu, which Esc opens on desktop and the Quick Actions control opens on touch. Because opening it hands you over to your browser, the button always asks you to confirm first, so an accidental tap in a fight can never pull you out of one. The game keeps running behind it.",
       "mobileTitle": "On a phone or a tablet",
       "mobileBody": "Touch controls appear on their own, and the layout sizes itself to your screen: a compact arrangement on a small phone, a standard one on a larger phone, and a roomier one on a tablet.\n\nYour abilities sit in a ring rather than a number row: the attack button with four action buttons beside it, and a page toggle that swaps the ring through the rest of your slots, up to seven pages once you have all three action bars switched on. The fifth arc position of that ring is your consumables seat: tap it to use what is seated there, or hold it, or swipe it inward, to open a row that fills itself from what you are carrying. Around the ring sit the buttons a touch player reaches for most, swapping target, using what is in front of you, and jumping.\n\nOne Quick Actions control sits at the bottom edge in place of a row of buttons. It opens onto everything else: mount, chat, map, bags, social, quests, character, spellbook, settings, and a More entry holding the rest of your windows, the Dungeon Finder, PvP, the Vale Cup, emotes and the wiki among them. Windows fill the screen here rather than floating over it.\n\nMoving your unit frames is a desktop thing: on touch the layout places them for you.",
       "mobileBodyTwoPages": "Touch controls appear on their own, and the layout sizes itself to your screen: a compact arrangement on a small phone, a standard one on a larger phone, and a roomier one on a tablet.\n\nYour abilities sit in a ring rather than a number row: the attack button with four action buttons beside it, and a page toggle that swaps the ring between its {pages} pages, which together reach all {slots} of your ability slots whether or not the extra desktop bars are switched on. The fifth arc position of that ring is your consumables seat: tap it to use what is seated there, or hold it, or swipe it inward, to open a row that fills itself from what you are carrying. Around the ring sit the buttons a touch player reaches for most, swapping target, using what is in front of you, and jumping.\n\nOne Quick Actions control sits at the bottom edge in place of a row of buttons. It opens onto everything else: mount, chat, map, bags, social, quests, character, spellbook, game menu, and a More entry holding the rest of your windows, the Dungeon Finder, PvP, emotes and the wiki among them. Windows fill the screen here rather than floating over it.\n\nMoving your unit frames is a desktop thing: on touch the layout places them for you.",
       "railTitle": "The button rail",
-      "railBody": "Down in the bottom right corner of the screen, a long way from the minimap, sits a rail of small square buttons, one per window, arranged in two short columns side by side. Most of them are printed with their default key.\n\nThe first column covers your character, spellbook, talents, quest log, Book of Deeds, professions, world map, bags, and crafting. The second opens with the WOC Store and runs on through PvP, the Dungeon Finder, the Vale Cup, Card Duel, the leaderboard, emotes, music, friends and guild, this wiki, and the game menu. A few more join them only when they apply."
+      "railBody": "Down in the bottom right corner of the screen, a long way from the minimap, sits a rail of small square buttons, one per window, arranged in two short columns side by side. Most of them are printed with their default key.\n\nThe first column covers your character, spellbook, talents, quest log, Book of Deeds, professions, world map, bags, and crafting. The second opens with the WOC Store and runs on through PvP, the Dungeon Finder, the Vale Cup, Card Duel, the leaderboard, emotes, music, friends and guild, this wiki, and the game menu. A few more join them only when they apply.",
+      "mobileBodyGroupedMore": "Touch controls appear on their own, and the layout sizes itself to your screen: a compact arrangement on a small phone, a standard one on a larger phone, and a roomier one on a tablet.\n\nYour abilities sit in a ring rather than a number row: the attack button with four action buttons beside it, and a page toggle that swaps the ring between its {pages} pages, which together reach all {slots} of your ability slots whether or not the extra desktop bars are switched on. The fifth arc position of that ring is your consumables seat: tap it to use what is seated there, or hold it, or swipe it inward, to open a row that fills itself from what you are carrying. Around the ring sit the buttons a touch player reaches for most, swapping target, using what is in front of you, and jumping.\n\nOne Quick Actions control sits at the bottom edge in place of a row of buttons. It opens onto everything else: mount, chat, map, bags, social, quests, character, spellbook, game menu, and a More entry that sorts the rest of your windows into groups: Record (deeds, titles, the Reliquary, reputation, the Loot Explorer, and the rankings), Professions, Activities (dungeons and raids, PvP, and Card Duel), Character (emotes, talents, and cosmetics among them), and Store. The wiki and Discord sit in the game menu instead. Windows fill the screen here rather than floating over it.\n\nMoving your unit frames is a desktop thing: on touch the layout places them for you.",
+      "mobileBodyRewardsMore": "Touch controls appear on their own, and the layout sizes itself to your screen: a compact arrangement on a small phone, a standard one on a larger phone, and a roomier one on a tablet.\n\nYour abilities sit in a ring rather than a number row: the attack button with four action buttons beside it, and a page toggle that swaps the ring between its {pages} pages, which together reach all {slots} of your ability slots whether or not the extra desktop bars are switched on. The fifth arc position of that ring is your consumables seat: tap it to use what is seated there, or hold it, or swipe it inward, to open a row that fills itself from what you are carrying. Around the ring sit the buttons a touch player reaches for most, swapping target, using what is in front of you, and jumping.\n\nOne Quick Actions control sits at the bottom edge in place of a row of buttons. It opens onto everything else: mount, chat, map, bags, social, quests, character, spellbook, game menu, and a More entry that sorts the rest of your windows into groups: Record (deeds, titles, the Reliquary, reputation, the Loot Explorer, and the rankings), Professions, Activities (dungeons and raids, PvP, and Card Duel), Character (emotes, talents, and cosmetics among them), Rewards (the Vault, the weekly quest, and world quests), and Store. The wiki and Discord sit in the game menu instead. Windows fill the screen here rather than floating over it.\n\nMoving your unit frames is a desktop thing: on touch the layout places them for you.",
+      "railBodyTwelve": "Down in the bottom right corner of the screen, a long way from the minimap, sits a rail of small square buttons arranged in two short columns side by side. Most of them are printed with their default key.\n\nThe first column covers your character, bags, spellbook, talents, quest log, and world map. The second opens the Book of the Realm, your professions, Activities (the Groups bell), and friends and guild, then the WOC Store and the game menu. A few more join them only when they apply.",
+      "railBodyThirteen": "Down in the bottom right corner of the screen, a long way from the minimap, sits a rail of small square buttons arranged in two short columns side by side. Most of them are printed with their default key.\n\nThe first column covers your character, bags, spellbook, talents, quest log, world map, and Rewards. The second opens the Book of the Realm, your professions, Activities (the Groups bell), and friends and guild, then the WOC Store and the game menu. A few more join them only when they apply."
     },
     "commandsPage": {
       "intro": "Every command you can type into chat, grouped by what it is for, with its short forms.",
@@ -9882,6 +9945,7 @@ export const en: EnTranslations = {
       "deedDef": "An achievement recorded in the Book of Deeds. Earning one grants Renown, and some grant a cosmetic title or nameplate border.",
       "renownTerm": "Renown",
       "renownDef": "The lifetime score your deeds add up to. It only ever climbs, and the realm keeps standings of it on the Leaderboard.",
+      "renownDefRankings": "The lifetime score your deeds add up to. It only ever climbs, and the realm keeps standings of it on the Rankings tab of the Book of the Realm.",
       "heroicTerm": "Heroic",
       "heroicDef": "The harder version of a dungeon or the raid, tuned for geared endgame parties. Heroic bosses drop upgraded loot, and the final boss pays Heroic Marks.",
       "lockoutTerm": "Lockout",
@@ -10532,8 +10596,10 @@ export const en: EnTranslations = {
       "duelsBody": "Challenge any player you meet to a friendly duel. Nothing is on the line but pride, so it is the easiest way to learn a matchup or settle a friendly argument.",
       "coliseumHeading": "The Ashen Coliseum",
       "coliseumBody": "The Coliseum is the realm's arena, where you face other players in ranked matches, one on one or two on two. Each bracket keeps its own standing, so a win lifts you up that ladder for the whole realm to see. Ranked play opens at level 15, and that applies to your partner too: if either of you is below it, the queue stays closed until you both qualify. All of player versus player lives behind one button, marked PvP: open it and pick a tab, Thornhollow Fields, one on one, or two on two, then sign up alone or with your partner. While you are queued or in a match, the other tabs stay locked, so you can never sit in two queues at once.",
+      "coliseumBodyActivities": "The Coliseum is the realm's arena, where you face other players in ranked matches, one on one or two on two. Each bracket keeps its own standing, so a win lifts you up that ladder for the whole realm to see. Ranked play opens at level 15, and that applies to your partner too: if either of you is below it, the queue stays closed until you both qualify. All of player versus player lives on the PvP tab of the Activities window, which G opens directly: pick a tab there, Thornhollow Fields, one on one, or two on two, then sign up alone or with your partner. While you are queued or in a match, the other tabs stay locked, so you can never sit in two queues at once.",
       "ladderHeading": "Climbing the ladder",
       "ladderBody": "Ranked play tracks your standing over time. Check the leaderboard to see where you sit and who holds the top of the realm.",
+      "ladderBodyBracketTab": "Ranked play tracks your standing over time. Each bracket keeps its ladder on its own tab of the PvP window, so check it to see where you sit and who holds the top of the realm.",
       "rewardsHeading": "What ranked play pays",
       "rewardsBody": "A ranked win pays Honor, the player versus player currency, and a loss costs you nothing but rating. Honor is meant to reward real matches: beating the same opponent or the same team again on the same day pays nothing further, a long winning day pays a little less per win as it goes on, and a match your opponent forfeits still moves your rating but pays no Honor at all. That day is Honor's own, and it rolls over on its own clock rather than with the realm's instance reset.",
       "rewardsBodyLossShare": "A ranked win pays Honor, the player versus player currency, and a loss you play to the end still pays a smaller share of it, as does a draw, so rating is the only thing a loss really costs you. Honor is meant to reward real matches: beating the same opponent or the same team again on the same day pays nothing further (nor does losing to them again), a long winning day pays in full for its first stretch of wins and then halves what a win pays, halving it again deeper in and staying there, and a match your opponent forfeits still moves your rating but pays no Honor at all. That day is the realm's own: it rolls over at the realm's nightly reset hour, the same boundary every daily lockout clears on.",
@@ -10580,6 +10646,7 @@ export const en: EnTranslations = {
       "intro": "A ranked 5v5 capture-the-flag battleground fought in a walled hollow in the old growth below Thornpeak, where two ruined keeps face each other down the length of a ravine and an older courtyard sits between them that neither has ever held. Two teams of five, two keeps, one goal: steal the enemy banner and run it home before they run yours.",
       "queueHeading": "Queueing up",
       "queueBody": "Thornhollow Fields opens at level 20, and every member of a party has to meet it before the party can queue. Open the PvP button and pick the Thornhollow Fields tab, which is the one it opens on, then enter the queue solo, or bring a party of up to five and queue together: parties are always kept on one team, and the remaining seats fill with solo champions. When ten stand ready, the match seats both teams at their keeps for a short form-up before the flags go live. If a group of four or five would otherwise face nothing but solo queuers, the matchmaker holds the match briefly to see whether a second group turns up, so a party that size sometimes waits a few moments longer before the gates open. That wait is short and always gives way in the end, so nobody is left sitting in the queue for it.",
+      "queueBodyActivities": "Thornhollow Fields opens at level 20, and every member of a party has to meet it before the party can queue. Press G to open the PvP tab of the Activities window and pick the Thornhollow Fields tab, which comes first, then enter the queue solo, or bring a party of up to five and queue together: parties are always kept on one team, and the remaining seats fill with solo champions. When ten stand ready, the match seats both teams at their keeps for a short form-up before the flags go live. If a group of four or five would otherwise face nothing but solo queuers, the matchmaker holds the match briefly to see whether a second group turns up, so a party that size sometimes waits a few moments longer before the gates open. That wait is short and always gives way in the end, so nobody is left sitting in the queue for it.",
       "fieldHeading": "The field",
       "fieldBody": "A walled, open-air field carved into three chambers: each team has its own field before its keep, and the walled Ruin Courtyard sits between them. Two curtain walls span the full width, and every move between chambers passes a contested crossing: the wide main gate, or the gatehouse, a small room straddling the wall whose offset doors force a jog past an ambush corner. Each keep is sealed except its mouth, so every flag run starts and ends through the same opening, and a low barricade breaks the straight charge into it. The courtyard holds the hollow heart ruin and the two flank Sprint Runes; the other two wait on the flag approaches. A Battle or Ward Rune (more damage dealt, or less damage taken, for a few seconds) waits at each main gate's courtyard mouth: both pads open the match on the same face and flip with every claim.",
       "flagsHeading": "Flags",
@@ -10618,6 +10685,7 @@ export const en: EnTranslations = {
       "quartermastersBody": "Each faction keeps a quartermaster at its hub: Quartermaster Vaelen for the Rift Watch in Drifthaven, Templar Althea for the Church Order at the Eastbrook chapel, and Artificer Tobrin for the Automatons in Wyrmwatch. Each sells a small stock of jewelry, armor, weapons and bags, unlocked tier by tier as your standing with that faction grows, and paid for in ordinary coin.",
       "readingHeading": "Where to read it",
       "readingBody": "The Reputation tab of the character sheet (C) shows each faction with its current standing, a bar toward the next tier, and the title that standing has earned you. The chat log reports every standing gain as it lands, and reaching a new tier shows a celebration banner on screen.",
+      "readingBodyRealm": "The Reputation tab of the Book of the Realm (Shift+Z) shows each faction with its current standing, a bar toward the next tier, and the title that standing has earned you. The chat log reports every standing gain as it lands, and reaching a new tier shows a celebration banner on screen.",
       "deedsHeading": "Deeds",
       "deedsBody": "The Book of Deeds keeps score of your standing too: reaching Trusted with a faction and reaching Champion with a faction each record a deed, and reaching Champion with all three is a deed of its own. Like every deed these are cosmetic, never power, and the Champion deeds grant a title you can wear."
     },
@@ -10636,6 +10704,7 @@ export const en: EnTranslations = {
       "catalogHeading": "The full roll of deeds",
       "catalogBody": "Here is every deed the Book can hold, gathered by category. The secret ones are left out on purpose, waiting for you to find them. Open the Book of Deeds in game to see exactly what each one asks.",
       "standingsNote": "The realms keep a running tally of Renown across every account: the board ranks whole accounts by lifetime Renown, counting each deed once across all your characters, and it shows Renown alone, so deeds that carry none never move the standings even though they count in your Book. To see who stands where, open the Leaderboard in game and turn to its Renown tab; the standings live there, not on the wiki.",
+      "standingsNoteRankings": "The realms keep a running tally of Renown across every account: the board ranks whole accounts by lifetime Renown, counting each deed once across all your characters, and it shows Renown alone, so deeds that carry none never move the standings even though they count in your Book. To see who stands where, open the Rankings tab of the Book of the Realm in game and turn to its Renown board; the standings live there, not on the wiki.",
       "catHeading": "{label} ({count})",
       "colName": "Deed",
       "colRenown": "Renown",
@@ -10656,6 +10725,7 @@ export const en: EnTranslations = {
       },
       "bookHeading": "Inside the Book",
       "bookBody": "The Book sorts every deed into categories you can flip between, with a search box and filters for everything, for what you have earned, for what you have not, and for the ones you are nearly done with. A Recent strip near the top holds your latest unlocks, and clicking one jumps straight to its card, as does clicking a deed name someone posts in chat. Beside it, Nearly there points you at the handful you are closest to finishing. Out in a realm each deed also carries its rarity, the share of adventurers who have earned it, so you can see at a glance which ones are common and which are a real climb; the offline world has no population to count, so it shows none. At the end of the rail sits the Titles and Borders shelf, with a picker for each: one for the title you wear, one for the border that frames your nameplate.",
+      "bookBodyTitlesTab": "The Book sorts every deed into categories you can flip between, with a search box and filters for everything, for what you have earned, for what you have not, and for the ones you are nearly done with. A Recent strip near the top holds your latest unlocks, and clicking one jumps straight to its card, as does clicking a deed name someone posts in chat. Beside it, Nearly there points you at the handful you are closest to finishing. Out in a realm each deed also carries its rarity, the share of adventurers who have earned it, so you can see at a glance which ones are common and which are a real climb; the offline world has no population to count, so it shows none. The titles and borders your deeds pay out have a tab of their own, Titles, beside Deeds in the Book of the Realm, with a picker for each: one for the title you wear, one for the border that frames your nameplate.",
       "platformHeading": "Steam and Epic achievements",
       "platformBody": "If you link a Steam or Epic Games account from the desktop app, the deeds you earn are mirrored outward as achievements on that account. The game world stays the authority: you earn the deed here, it is recorded on your character, and the achievement follows after. Not every deed has a matching achievement, and if one does not arrive right away it catches up the next time you log in. Linking is only ever a link, never a way to sign in."
     },
@@ -10663,6 +10733,7 @@ export const en: EnTranslations = {
       "intro": "The Reliquary is the museum of unique spoils you have catalogued: dungeon chase uniques, profession trophies, mounts, weapon skins, and titles. It pairs with the Book of Deeds the way a trophy hall pairs with an achievement book.",
       "howHeading": "How the collection works",
       "howBody": "Open The Reliquary in game (default Shift+X). Each shelf holds pages of unique relics. Fill a silhouette when any character on your account obtains that piece for the first time, and illuminate a page when every relic on it is filled. A few pages are labeled Retired or Personal: they sit outside completion, so they never gate a shelf or the whole catalog. Live finds toast and refresh the open window; progress is shared by every character on the account, so a relic one character finds fills the page for all of them.",
+      "howBodyRealmTab": "Open the Book of the Realm in game (default Shift+Z) and turn to its Reliquary tab. Each shelf holds pages of unique relics. Fill a silhouette when any character on your account obtains that piece for the first time, and illuminate a page when every relic on it is filled. A few pages are labeled Retired or Personal: they sit outside completion, so they never gate a shelf or the whole catalog. Live finds toast and refresh the open window; progress is shared by every character on the account, so a relic one character finds fills the page for all of them.",
       "ranksHeading": "Curator ranks",
       "ranksBody": "Curator ranks rise with unique catalogued fills and grant only cosmetic titles and borders. They never grant combat power, drop rate, or pity. Account weapon skins do not score Curator rank so prestige stays character-durable, and relics on Retired or Personal pages score nothing toward it either.",
       "retiredTag": "Retired",
@@ -11336,6 +11407,7 @@ export const en: EnTranslations = {
       "slashBody": "A few everyday commands are worth memorizing: /w Name sends a whisper and /r answers the last one you received, /invite asks someone into your party, /follow falls in step behind a friend, /roll casts dice for the group to see, /who shows who is online, and /afk marks you away. Type /help in the game for the full list.",
       "emotesBody": "Your character can also speak without words: type an emote like /wave, /dance, /cheer, or /bow, target a friend first to aim it at them, or hold X to open the emote wheel for a quick overhead expression.",
       "emotesBodyNamedTarget": "Your character can also speak without words: type an emote like /wave, /dance, /cheer, or /bow, add a name to aim it at someone, as in /wave Aleph, or hold X, the emote wheel's default key, to open the emote wheel for a quick overhead expression. The Emotes button in the rail of window buttons, or under More on touch, opens the same wheel.",
+      "emotesBodyMoreTray": "Your character can also speak without words: type an emote like /wave, /dance, /cheer, or /bow, add a name to aim it at someone, as in /wave Aleph, or hold X, the emote wheel's default key, to open the emote wheel for a quick overhead expression. On touch, the Emotes tile in the More tray opens the same wheel.",
       "calendarHeading": "The event calendar",
       "calendarBody": "Press I to open the event calendar. It marks the realm days worth planning around, the weekly Raid Call, Market Day, Arena Clash, and Fishing Derby, plus the monthly Delve Day and Moongate Communion, and it is where guilds keep their schedule: the guild leader and officers can book events on it, and every member sees them on the same page. The realm days are a prompt to gather, not a bonus; nothing about your character changes because a day is marked.",
       "calendarBodyDoubleHonor": "Press I to open the event calendar. It marks the realm days worth planning around, the weekly Raid Call, Market Day, Arena Clash, Double Honor Weekend, and Fishing Derby, plus the monthly Delve Day and Moongate Communion, and it is where guilds keep their schedule: the guild leader and officers can book events on it, and every member sees them on the same page. The realm days are a prompt to gather rather than a bonus, with one exception: all through the Double Honor Weekend, Thornhollow Fields Honor pays double and a played-out loss pays like a win. Nothing else about your character changes because a day is marked.",
@@ -11355,6 +11427,7 @@ export const en: EnTranslations = {
       "finderMore": "See what is inside each dungeon",
       "blockBody": "Block is the heavier tool, for a player who will not leave you alone. A block cuts their invites, their whispers, and their mail as well as their chat, makes the two of you invisible to each other in /who, and drops them from your friends list if they were on it. Block from the right-click menu on their name or with /block, /unblock lifts it again, and /blocklist shows who is on it.",
       "guildBoardBody": "Guilds are ranked too. The Leaderboard window keeps a Guilds board beside the player boards, ranking guilds on what their members have earned together, so a busy guild can see where it stands.",
+      "guildBoardBodyRankings": "Guilds are ranked too. The Rankings tab of the Book of the Realm keeps a Guilds board beside the player boards, ranking guilds on what their members have earned together, so a busy guild can see where it stands.",
       "guildBankHeading": "The guild bank",
       "guildBankBody": "A guild also keeps a vault of its own. Step up to a banker in one of the hub towns, open your bank, and switch to the Guild tab: there you will find a treasury of coin and a pooled store of items the guild owns together. Every member can open it and look at what is inside, and the pane says plainly who can do more. Only the guild leader and officers can act, putting coin and goods in and handing them back out, and every deposit and withdrawal is written into a log the guild can read, so nothing moves without a record.",
       "guildBankRulesBody": "The item store starts closed. An officer opens it out of their own pocket, and the guild can pay from the treasury to widen it later. Quest items, anything soulbound, and gear the Market will not take stay out of it, the same as the mail and the Market, so the bank is for goods that can still change hands.",

@@ -45,6 +45,7 @@ import {
   type BgWindowView,
   buildBgWindowView,
 } from './hud/battleground';
+import type { WindowHubStrip } from './hud/hub/window_hub_controller';
 import {
   bindWorldPvpRewardProgress,
   buildWorldPvpWindowView,
@@ -91,6 +92,9 @@ export interface ArenaWindowDeps {
   closeOthers(): void;
   captureFocus(): HTMLElement | null;
   restoreFocus(target: HTMLElement | null): void;
+  /** The Activities strip (menu consolidation step 4), painted under the
+   *  title bar while this window is one of the hub's tabs. */
+  hubStrip?: WindowHubStrip;
 }
 
 export interface ThornhollowPrewarmHooks {
@@ -125,6 +129,16 @@ export class ArenaWindow {
 
   get isOpen(): boolean {
     return this.deps.root().style.display === 'block';
+  }
+
+  /** The root a hub tab switch carries its position onto. */
+  rootElement(): HTMLElement {
+    return this.deps.root();
+  }
+
+  /** Show the window (the Activities tab); already shown: nothing to do. */
+  open(): void {
+    if (!this.isOpen) this.toggle();
   }
 
   /** Open if closed, close if open (the classic G keybind / minimap button). */
@@ -391,6 +405,7 @@ export class ArenaWindow {
 
   /** Close + tab-strip wiring shared by every panel state. */
   private wireChrome(el: HTMLElement): void {
+    this.deps.hubStrip?.wire(el);
     el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
     el.querySelectorAll('[data-bracket]').forEach((btn) => {
       btn.addEventListener('click', () => {
@@ -412,15 +427,24 @@ export class ArenaWindow {
     const tag = bracket
       ? ` <span class="arena-bracket-tag">${esc(this.tabLabel(bracket))}</span>`
       : '';
-    return `<div class="panel-title ui-win-head"><span id="arena-title" class="ui-win-title">${esc(t('hud.arena.title'))}${tag}</span><button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(t('hud.arena.close'))}">${svgIcon('close')}</button></div>`;
+    return `<div class="panel-title ui-win-head"><span id="arena-title" class="ui-win-title">${esc(this.headTitle(t('hud.arena.title')))}${tag}</span><button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(this.closeLabel())}">${svgIcon('close')}</button></div>`;
   }
 
   private worldTitleHtml(): string {
-    return `<div class="panel-title ui-win-head"><span id="arena-title" class="ui-win-title">${esc(t('hudChrome.worldPvp.title'))}</span><button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(t('hud.arena.close'))}">${svgIcon('close')}</button></div>`;
+    return `<div class="panel-title ui-win-head"><span id="arena-title" class="ui-win-title">${esc(this.headTitle(t('hudChrome.worldPvp.title')))}</span><button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(this.closeLabel())}">${svgIcon('close')}</button></div>`;
   }
 
   private bgTitleHtml(): string {
-    return `<div class="panel-title ui-win-head"><span id="arena-title" class="ui-win-title">${esc(t('hudChrome.bg.title'))} <span class="bg-mode-tag ui-chip">${esc(t('hudChrome.bg.modeTag'))}</span></span><button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(t('hud.arena.close'))}">${svgIcon('close')}</button></div>`;
+    return `<div class="panel-title ui-win-head"><span id="arena-title" class="ui-win-title">${esc(this.headTitle(t('hudChrome.bg.title')))} <span class="bg-mode-tag ui-chip">${esc(t('hudChrome.bg.modeTag'))}</span></span><button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(this.closeLabel())}">${svgIcon('close')}</button></div>`;
+  }
+
+  /** Inside Activities the hub's title leads; the mode tag still follows. */
+  private headTitle(own: string): string {
+    return this.deps.hubStrip?.title() ?? own;
+  }
+
+  private closeLabel(): string {
+    return this.deps.hubStrip?.closeLabel() ?? t('hud.arena.close');
   }
 
   private stripHtml(strip: PvpTabsModel): string {
@@ -428,7 +452,10 @@ export class ArenaWindow {
     // than disabled (which would drop them from the accessibility tree).
     const btn = (tab: { id: PvpTabId; active: boolean; locked: boolean }): string =>
       `<button class="arena-bracket ui-seg-tab${tab.active ? ' active is-on' : ''}${tab.locked ? ' locked' : ''}" data-bracket="${tab.id}" aria-pressed="${tab.active ? 'true' : 'false'}"${tab.locked ? ' aria-disabled="true"' : ''}>${esc(this.tabLabel(tab.id))}</button>`;
-    return `<div class="arena-brackets ui-seg">${strip.tabs.map(btn).join('')}</div>`;
+    return (
+      (this.deps.hubStrip?.html() ?? '') +
+      `<div class="arena-brackets ui-seg">${strip.tabs.map(btn).join('')}</div>`
+    );
   }
 
   private bgBodyHtml(view: Extract<BgWindowView, { kind: 'live' }>): string {

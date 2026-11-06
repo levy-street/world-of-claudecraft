@@ -1083,6 +1083,22 @@ the major game wikis (Wowhead, warcraft.wiki.gg, RuneScape, UESP, Guild Wars 2).
 | the Gourdsworn | the title of Gourdlight Eve's whole-event meta deed (`feat_gourdlight_eve_complete`, round 12) | KEEP. Quoted exact-phrase searches for "Gourdsworn" and "the Gourdsworn", plus a coined-token search scoped to Wowhead, warcraft.wiki.gg, the RuneScape and OSRS wikis, the FFXIV wiki, the GW2 wiki, UESP, the PoE wiki and the Diablo wiki, returned no hit in any game. The nearest results were different tokens: WoW's "Death Foursworn" achievement, GW2's "Bladesworn" specialization, ESL's "Guildsworn" card and the unrelated games "Godsworn", "Crowsworn" and "Ironsworn". WoW's Hallow's End title is "the Hallowed", a different word; "-sworn" is a shared English suffix. |
 | Gourdlight, Start to Finish / Every Doorstep / At Hester's Beck and Call / Three Towns Startled | the round 12 whole-event meta and its three section Feats | KEEP. Plain English phrases built on this event's own names (Gourdlight, Hester); no coined token beyond those already audited above. |
 
+### The menu consolidation hub names (web-checked 2026-11-05)
+
+Two new player-visible window names shipped with the menu consolidation:
+**Book of the Realm** (the tabbed record window on Shift+Z) and **Activities**
+(the group-content window behind the Groups bell). An exact-phrase search for
+"Book of the Realm", generally and against the Fandom, Wowhead, Guild Wars 2 and
+RuneScape wikis, found no game window, item or lore book by that name (the only
+near hits were unrelated novel series and a tabletop zine called The Realm).
+"Activities" is plain English UI vocabulary with no coined token. Verdict: both
+kept.
+
+Steps 7 and 8 (2026-11-06) added **Rewards** (the hub window and its rail button) with
+tabs **Vault**, **Weekly Quest** and **World Quests**, and a Quest Log group named
+**Available**. All are plain English UI words with no coined token; Vault and World Quests
+were already in the game (the Weekly Vault, the world-quest board). Verdict: kept.
+
 ## Recorded for the maintainer (stopping rule: no unilateral rename)
 
 STATUS 2026-08-20, SETTLED BY THE MAINTAINER, and the scope is narrow on purpose.

@@ -256,7 +256,7 @@ export class WeeklyRewardClaimController {
       this.startClaim = () => start.click();
       if (!start.disabled && !this.readyPromptShown) {
         this.dismissReadyPrompt = showWeeklyRewardsReadyPrompt(
-          host.closest<HTMLElement>('#bank-window') ?? host,
+          host.closest<HTMLElement>('#weekly-vault-window') ?? host,
           () => this.startClaim?.(),
           () => this.startButton?.focus(),
         );

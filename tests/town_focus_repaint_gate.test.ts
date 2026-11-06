@@ -1295,11 +1295,11 @@ describe('Town Focus focus-system wiring (source pins)', () => {
   });
 
   it('routes the managed close (Escape / closeAll / gamepad) through that one path', () => {
-    // The end anchor leans on `crafting-window` being the very next case (it is).
-    // A case inserted between them widens the region, which reds the negative
-    // half LOUDLY rather than passing it vacuously, so this is maintenance cost
-    // and not a coverage hole.
-    const arm = region("case 'town-focus-window':", "case 'crafting-window':");
+    // The end anchor leans on `commission-board-window` being the very next case
+    // (it is). A case inserted between them widens the region, which reds the
+    // negative half LOUDLY rather than passing it vacuously, so this is
+    // maintenance cost and not a coverage hole.
+    const arm = region("case 'town-focus-window':", "case 'commission-board-window':");
     expect(arm).toContain('this.closeTownFocus();');
     // Pure belt, and worth naming as such so nobody upgrades it thinking it is
     // the gate: the refusal has obvious dead alternates (`el.hidden = true`, a

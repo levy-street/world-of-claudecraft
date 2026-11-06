@@ -45,7 +45,10 @@ describe('dungeon finder window painter (source contract)', () => {
   });
 
   it('closes through close() with a real labelled close button', () => {
-    expect(src).toMatch(/data-close aria-label="\$\{esc\(t\('hudChrome\.finder\.close'\)\)\}"/);
+    // Inside Activities (menu consolidation step 4) the close names the hub.
+    expect(src).toMatch(
+      /data-close aria-label="\$\{esc\(hub \? hub\.closeLabel\(\) : t\('hudChrome\.finder\.close'\)\)\}"/,
+    );
   });
 
   it('escapes every interpolated name and uses t() for every label', () => {
@@ -157,17 +160,17 @@ describe('dungeon finder window painter (source contract)', () => {
     );
   });
 
-  it('supports the vault tab to preview the Great Vault in read-only mode', () => {
+  it('carries no Vault tab: the Weekly Vault is the Rewards hub tab now', () => {
+    // Menu consolidation step 7: the finder's read-only copy of the Vault is
+    // gone; the Rewards hub paints the sheet once.
     const navigation = readFileSync(
       resolve(process.cwd(), 'src/ui/dungeon_finder_navigation.ts'),
       'utf8',
     );
-    expect(navigation).toContain('data-tab="vault"');
-    expect(navigation).toContain("t('hudChrome.weeklyRewards.title')");
-    expect(src).toContain('createWeeklyRewardsTab(');
-    expect(src).toContain('readOnly: true');
-    expect(src).toContain("el.classList.toggle('df-vault-mode', view.tab === 'vault')");
-    expect(src).toContain('this.vaultPane.close()');
+    expect(navigation).not.toContain('data-tab="vault"');
+    expect(src).not.toContain('createWeeklyRewardsTab(');
+    expect(src).not.toContain('df-vault-mode');
+    expect(src).not.toContain('vaultPane');
   });
 });
 
@@ -219,11 +222,10 @@ describe('dungeon finder window stylesheet contract', () => {
     expect(hud).toContain("$('#dungeon-finder-window').style.display === 'flex'");
   });
 
-  it('defines .df-vault-mode and preview notice styling with token variables', () => {
-    expect(components).toContain('#dungeon-finder-window.df-vault-mode');
-    expect(components).toContain('.df-body-vault');
-    expect(components).toContain('.df-vault-container');
-    expect(components).toContain('.weekly-preview-notice');
+  it('carries no finder Vault styling', () => {
+    expect(components).not.toContain('df-vault-mode');
+    expect(components).not.toContain('.df-body-vault');
+    expect(components).not.toContain('.df-vault-container');
   });
 });
 

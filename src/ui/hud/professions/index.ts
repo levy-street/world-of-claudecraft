@@ -61,6 +61,8 @@ export * from './profession_log_tones';
 export * from './profession_tutorial_view';
 export * from './profession_tutorial_window';
 export * from './professions_harvest_entry_controller';
+export * from './professions_hub_controller';
+export * from './professions_hub_view';
 export * from './professions_view';
 export * from './professions_window';
 export * from './reagent_suffix_view';

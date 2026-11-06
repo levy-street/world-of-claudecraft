@@ -118,7 +118,7 @@ export const deeds: GuidePage = {
 
         <section class="guide-block">
           <h2>${esc(t('guide.deedsPage.bookHeading'))}</h2>
-          <p>${esc(t('guide.deedsPage.bookBody'))}</p>
+          <p>${esc(t('guide.deedsPage.bookBodyTitlesTab'))}</p>
         </section>
 
         <section class="guide-block">
@@ -152,7 +152,7 @@ export const deeds: GuidePage = {
           ${catalog}
         </section>
 
-        <p class="guide-callout">${esc(t('guide.deedsPage.standingsNote'))}</p>
+        <p class="guide-callout">${esc(t('guide.deedsPage.standingsNoteRankings'))}</p>
         ${related([
           { href: hrefFor('how-to-play'), key: 'guide.nav.howToPlay' },
           { href: hrefFor('world'), key: 'guide.nav.world' },

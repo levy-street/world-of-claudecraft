@@ -9372,14 +9372,6 @@
     pointer-events: auto;
     touch-action: manipulation;
   }
-  #daily-rewards-button.spin-ready {
-    border-color: var(--gold);
-  }
-  #daily-rewards-button.spin-ready .daily-rewards-icon {
-    animation: daily-rewards-icon-pulse 1.6s ease-in-out infinite;
-    animation-duration: calc(1.6s * var(--motion-scale, 1));
-    animation-play-state: var(--fx-ambient-anim, running);
-  }
   #daily-rewards-button .daily-rewards-icon {
     position: relative;
     z-index: 1;
@@ -9392,16 +9384,6 @@
     pointer-events: none;
     filter: drop-shadow(0 1px 2px color-mix(in srgb, var(--color-keyline) 70%, transparent));
   }
-  /* The ready count rides the shared corner badge, pulled in to the 34x30 launcher. */
-  #daily-rewards-button .daily-reward-count {
-    top: -2px;
-    right: -2px;
-    z-index: 2;
-    display: none;
-  }
-  #daily-rewards-button.spin-ready .daily-reward-count {
-    display: inline-flex;
-  }
   #daily-rewards-button:hover,
   #daily-rewards-button:focus-visible {
     border-color: var(--gold);
@@ -9410,30 +9392,6 @@
   #daily-rewards-button:focus-visible {
     outline: 2px solid var(--color-border-focus);
     outline-offset: 2px;
-  }
-  @keyframes daily-rewards-icon-pulse {
-    0%,
-    100% {
-      filter: drop-shadow(
-          0 2px calc(2px * var(--fx-shadow, 1))
-            color-mix(in srgb, var(--color-keyline) 70%, transparent)
-        )
-        drop-shadow(
-          0 0 calc(4px * var(--fx-shadow, 1)) color-mix(in srgb, var(--gold) 35%, transparent)
-        )
-        brightness(1);
-    }
-    50% {
-      filter: drop-shadow(
-          0 2px calc(2px * var(--fx-shadow, 1))
-            color-mix(in srgb, var(--color-keyline) 70%, transparent)
-        )
-        drop-shadow(
-          0 0 calc(14px * var(--fx-shadow, 1))
-            color-mix(in srgb, var(--color-glint) 80%, transparent)
-        )
-        brightness(1.16) saturate(1.12);
-    }
   }
   /* the lockout panel rows inside the shared tooltip box */
   .rl-panel-title {
@@ -9517,6 +9475,7 @@
   body.native-app .community-link.donate,
   body.native-app .social-link.donate,
   body.native-app #mobile-donate,
+  body.native-app #options-menu [data-menu-action="donate"],
   body.native-app #nav-btn-download,
   body.native-app:not(.seeker-wallet-enabled) .cs-wallet,
   body.native-app:not(.seeker-wallet-enabled) .cs-wallet-hidden-note,

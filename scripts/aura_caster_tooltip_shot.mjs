@@ -155,7 +155,10 @@ const toggled = await page.evaluate(() => {
   const win = document.querySelector('#options-menu');
   if (win && getComputedStyle(win).display !== 'none') hud.toggleOptionsMenu();
   hud.toggleOptionsMenu();
-  document.querySelector('#options-menu .opt-btn[data-menu-action="interface"]')?.click();
+  document.querySelector('#options-menu .opt-btn[data-menu-action="settings"]')?.click();
+  document
+    .querySelector('#options-menu .opt-rail-btn[data-settings-category="interface"]')
+    ?.click();
   // showAuraCaster lives in the 'frames' tab (INTERFACE_TAB_ORDER index 1),
   // beside alwaysShowAllBuffs.
   const framesTab = document.querySelectorAll('#options-menu .opt-tab')[1];

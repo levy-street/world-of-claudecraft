@@ -34,6 +34,7 @@ import { deedName } from './deed_i18n';
 import { markDialogRoot } from './dialog_root';
 import { esc } from './esc';
 import { captureFocusKey, focusedWithin, restoreFirstEnabled } from './focus_restore';
+import type { WindowHubStrip } from './hud/hub/window_hub_controller';
 import {
   formatDateTime,
   formatList,
@@ -150,6 +151,9 @@ const SHELF_FILTER_LABEL_KEYS: Record<ReliquaryOwnedFilter, TranslationKey> = {
 export interface ReliquaryWindowDeps extends PainterHostPresentation {
   /** The #reliquary-window root (Hud owns the id). */
   root(): HTMLElement;
+  /** The Book of the Realm strip (menu consolidation step 2), painted under
+   *  the title bar while this window is one of the hub's tabs. */
+  hubStrip?: WindowHubStrip;
   /** The live world (offline Sim or online ClientWorld mirror). */
   world(): IWorld;
   closeOthers(): void;
@@ -269,6 +273,11 @@ export class ReliquaryWindow {
   private pinnedKey = '';
 
   constructor(private readonly deps: ReliquaryWindowDeps) {}
+
+  /** The root a hub tab switch carries its position onto. */
+  rootElement(): HTMLElement {
+    return this.deps.root();
+  }
 
   get isOpen(): boolean {
     return this.opened;
@@ -570,7 +579,9 @@ export class ReliquaryWindow {
         ? { start: searchEl.selectionStart, end: searchEl.selectionEnd }
         : null;
     this.deps.hideTooltip();
-    markDialogRoot(el, { label: t('hudChrome.reliquary.title') });
+    const hub = this.deps.hubStrip;
+    const title = hub ? hub.title() : t('hudChrome.reliquary.title');
+    markDialogRoot(el, { label: title });
     const prevScrollTop = el.querySelector('.reliquary-scroll')?.scrollTop ?? 0;
 
     const input = prebuilt ?? this.buildInput();
@@ -603,9 +614,10 @@ export class ReliquaryWindow {
     // browse-mode AT reading a false "tracker is full" state on every open.
     this.anyAtCap = false;
     el.innerHTML =
-      `<div class="panel-title ui-win-head"><span class="ui-win-title">${esc(t('hudChrome.reliquary.title'))}</span>` +
+      `<div class="panel-title ui-win-head"><span class="ui-win-title">${esc(title)}</span>` +
       `<input type="search" class="reliquary-search ui-input" data-focus-key="search" value="${esc(this.search)}" placeholder="${esc(t('hudChrome.reliquary.searchPlaceholder'))}" aria-label="${esc(t('hudChrome.reliquary.searchAria'))}">` +
-      `<button type="button" class="x-btn ui-x-btn" data-close data-focus-key="close" aria-label="${esc(t('hudChrome.reliquary.close'))}">${svgIcon('close')}</button></div>` +
+      `<button type="button" class="x-btn ui-x-btn" data-close data-focus-key="close" aria-label="${esc(hub ? hub.closeLabel() : t('hudChrome.reliquary.close'))}">${svgIcon('close')}</button></div>` +
+      (hub?.html() ?? '') +
       this.summaryHtml(model) +
       `<div class="reliquary-body">${this.railHtml(model)}<div class="reliquary-scroll">${this.contentHtml(model, flash)}</div></div>`;
 
@@ -615,6 +627,7 @@ export class ReliquaryWindow {
     // aria-describedby, so it must resolve on every paint.
     const live = this.ensureLiveRegion(el);
     el.append(live, this.ensureCapNote(el));
+    hub?.wire(el);
     this.wire(el, model);
     const scroll = el.querySelector('.reliquary-scroll');
     if (scroll) scroll.scrollTop = prevScrollTop;

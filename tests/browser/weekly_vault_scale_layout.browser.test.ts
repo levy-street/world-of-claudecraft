@@ -1,12 +1,13 @@
 // The Weekly Vault sheet's fit to the screen, measured in a REAL browser.
 //
-// The bug: on a wide desktop the vault takes over #bank-window with a
-// near-full-screen box, but that rule sized it in raw vw/vh. #bank-window
-// lives inside #ui, which carries `zoom: var(--ui-scale)`, so at any UI scale
+// The bug: on a wide desktop the vault takes a near-full-screen box (on
+// #weekly-vault-window, the Rewards hub's Vault tab since menu consolidation
+// step 7; it borrowed #bank-window before), but that rule sized it in raw
+// vw/vh. The window lives inside #ui, which carries `zoom: var(--ui-scale)`, so at any UI scale
 // above 1 the zoom re-multiplied the box and the vault ran off the right and
 // bottom of the screen. The fix divides every viewport length by
 // --window-scale, as the base vault rule (and the shared .window clamp)
-// already did; the Dungeon Finder's read-only vault had the same raw-vh bug.
+// already did.
 // Two follow-ons are pinned here too: on a short screen at a high UI scale
 // the track grid keeps a floor (the vault art is sized from its height) and
 // the panel scrolls, so the "View possible loot" button must ride the status
@@ -30,12 +31,7 @@ const MIN_ART = 100;
 
 let pane: WeeklyRewardsTab | null = null;
 
-async function mountVault(
-  width: number,
-  height: number,
-  uiScale: number,
-  host: 'bank' | 'dungeon-finder' = 'bank',
-): Promise<HTMLElement> {
+async function mountVault(width: number, height: number, uiScale: number): Promise<HTMLElement> {
   await page.viewport(width, height);
   const root = document.documentElement.style;
   root.setProperty('--app-vw', `${width}px`);
@@ -46,16 +42,10 @@ async function mountVault(
   const win = document.createElement('div');
   win.className = 'window panel ui-window';
   win.style.display = 'flex';
-  // The title row bank_window.ts / dungeon_finder_window.ts paint above the pane.
+  // The title row weekly_vault_window.ts paints above the pane.
   win.innerHTML =
     '<div class="panel-title ui-win-head"><span class="ui-win-title">The Weekly Vault</span></div>';
-  if (host === 'bank') {
-    document.body.classList.add('weekly-vault-open');
-    win.id = 'bank-window';
-  } else {
-    win.id = 'dungeon-finder-window';
-    win.classList.add('df-vault-mode');
-  }
+  win.id = 'weekly-vault-window';
   ui.appendChild(win);
   document.body.appendChild(ui);
 
@@ -94,7 +84,6 @@ afterEach(() => {
   pane?.close();
   pane = null;
   cleanup();
-  document.body.classList.remove('weekly-vault-open');
   for (const prop of ['--app-vw', '--app-vh', '--ui-scale'])
     document.documentElement.style.removeProperty(prop);
 });
@@ -177,14 +166,4 @@ describe('weekly vault sheet scales with the screen', () => {
       check();
     },
   );
-
-  it('the Dungeon Finder vault stays on screen at a high UI scale', async () => {
-    const win = await mountVault(1920, 1080, 1.5, 'dungeon-finder');
-    const box = win.getBoundingClientRect();
-    expect(box.top).toBeGreaterThanOrEqual(-SLACK);
-    expect(box.bottom).toBeLessThanOrEqual(1080 + SLACK);
-    expect(box.right).toBeLessThanOrEqual(1920 + SLACK);
-    // Its own sizing, untouched by the bank sheet's track floor.
-    expect(box.height).toBeCloseTo(1080 * 0.88, 0);
-  });
 });
