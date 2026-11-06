@@ -17,9 +17,11 @@ import {
   effectivePlayerAttackRange,
 } from '../src/sim/combat/player_attack_reach';
 import { SMITH_HEART_MOBS } from '../src/sim/content/smith_heart';
+import { inBreathArena } from '../src/sim/encounters/smith_heart/breath_geometry';
 import { BREATH_BODY_RADIUS, BREATH_GUARDIAN } from '../src/sim/encounters/smith_heart/breath_ids';
 import { combatProfileForMob, scaledDefaultMobMeleeRange } from '../src/sim/mob_combat';
 import { MELEE_RANGE } from '../src/sim/types';
+import { breathFight } from './helpers/breath_fight';
 
 const target = { kind: 'mob', templateId: BREATH_GUARDIAN };
 
@@ -57,5 +59,20 @@ describe('the Guardian of the Breath reaches as big as it is drawn', () => {
     const shoulder = BREATH_SOCKETS.find((s) => s.id === 'shoulderL');
     expect(BREATH_BODY_RADIUS).toBeLessThan((shoulder?.at[0] ?? 0) * BREATH_YD_PER_UNIT * 1.3);
     expect(BREATH_BODY_HEIGHT * BREATH_BODY_SCALE).toBeGreaterThan(BREATH_BODY_RADIUS * 4);
+  });
+});
+
+describe('in the fight, the tighter settle never drags it off its ground', () => {
+  it('follows its tank across the Cornice and never off the floor', () => {
+    const f = breathFight(4);
+    expect(f.dev('/dev heart breath pull')).toBe(true);
+    const tank = f.players[0];
+    const g0 = f.local(f.boss());
+    f.put(tank, g0.x - 14, g0.z);
+    for (let i = 0; i < 20 * 8; i++) {
+      f.tick(1);
+      const g = f.local(f.boss());
+      expect(inBreathArena(g.x, g.z), `tick ${i}`).toBe(true);
+    }
   });
 });

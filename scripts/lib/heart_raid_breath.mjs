@@ -13,6 +13,7 @@
 // IGNORE=roar   the raid stands anywhere for the Summit Roar (the key mechanic)
 // IGNORE=knot   mythic: nobody carries the Knotted Gale
 
+import { BODY_EDGE_MELEE_REACH } from '../../src/sim/combat/player_attack_reach';
 import { BREATH, BREATH_ISLES } from '../../src/sim/content/smith_heart_layout';
 import {
   inBreathArena,
@@ -23,6 +24,7 @@ import {
 } from '../../src/sim/encounters/smith_heart/breath_geometry';
 import {
   BREATH_AURAS,
+  BREATH_BODY_RADIUS,
   BREATH_CASTS,
   BREATH_DIFFICULTY,
   BREATH_OBJECTS,
@@ -174,8 +176,10 @@ export const breath = {
   tankAdd(a) {
     return a.tid !== ISLE_MOBS.sentinel && a.tid !== ISLE_MOBS.mender;
   },
+  // Melee reaches the guardian's body from its edge (its template's
+  // bodyRadius plus a melee reach, as the sim measures it).
   meleeReach() {
-    return 6.5;
+    return BREATH_BODY_RADIUS + BODY_EDGE_MELEE_REACH;
   },
   targets(world, st, b) {
     const me = world.players.get(b.pid);
