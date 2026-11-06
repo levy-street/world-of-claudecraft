@@ -178,6 +178,7 @@ const AUTHORED_ATLAS_DEFS = [
   'mob_healing_tide_totem',
   // the Smith's Heart's Masterless Strength (its own rigged model)
   'smith_heart_masterless_strength',
+  'smith_heart_heat_guardian',
   'mob_hoard_abyssal_maw',
   'mob_hoard_hoarfrost_warden',
   'mob_hoard_emberforge_tyrant',
