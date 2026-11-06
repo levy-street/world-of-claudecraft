@@ -14,11 +14,17 @@ import type * as THREE from 'three';
 import {
   ensureHeartKit,
   heartKitLoaded,
+  heartKitPiece,
   instanceHeartKit,
   SMITH_HEART_HEAT_KIT_URL,
   upgradeWhenHeartKitLands,
 } from './heart_kit';
-import { HEAT_KIT_KINDS, planHeatKit } from './heat_kit_plan_core';
+import {
+  HEARTH_CRYSTAL_PIECES,
+  HEAT_KIT_KINDS,
+  planHeatKit,
+  warmHearthGlow,
+} from './heat_kit_plan_core';
 
 /** The Heat's culling cell (yards): the hall, the casting floor, the Forge. */
 const HEAT_CELL = 70;
@@ -35,8 +41,33 @@ export function heatKitReady(): boolean {
 
 export { HEAT_KIT_KINDS };
 
+const WARMED = 'heatHearthWarmed';
+const _c: [number, number, number] = [0, 0, 0];
+
+/** Warm the fire crystals' baked light to amber, once per baked piece (its
+ *  vertex colours only: the shared glow material and its program are
+ *  untouched). */
+function warmHearthCrystals(): void {
+  for (const name of HEARTH_CRYSTAL_PIECES) {
+    const g = heartKitPiece(SMITH_HEART_HEAT_KIT_URL, name)?.glow;
+    if (!g || g.userData[WARMED]) continue;
+    const col = g.getAttribute('color');
+    if (!col) continue;
+    for (let i = 0; i < col.count; i++) {
+      _c[0] = col.getX(i);
+      _c[1] = col.getY(i);
+      _c[2] = col.getZ(i);
+      warmHearthGlow(_c);
+      col.setXYZ(i, _c[0], _c[1], _c[2]);
+    }
+    col.needsUpdate = true;
+    g.userData[WARMED] = true;
+  }
+}
+
 /** The Heat's kit dressing (instance-local). */
 export function buildHeatKit(lowGfx: boolean): THREE.Group {
+  warmHearthCrystals();
   return instanceHeartKit(
     SMITH_HEART_HEAT_KIT_URL,
     planHeatKit(),

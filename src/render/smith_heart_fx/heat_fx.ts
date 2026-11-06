@@ -63,8 +63,9 @@ import { heartVeinGlowMaterial } from '../smith_heart/heart_room_kit';
 import { radialGlowTexture } from '../textures';
 import { EngineParticles } from '../trash_engine_fx/engine_particles';
 import { inSmithHeartClaim } from './council_fx_core';
-import { HEAT_BODY_COLORS } from './heat_body_core';
+import { HEAT_BODY_COLORS, HEAT_MODEL_COLORS } from './heat_body_core';
 import { heatClaimOrigin } from './heat_fight_fx_core';
+import { HEAT_BURST } from './heat_flame_core';
 import { HEAT_FLOOR, heatParticleSteps } from './heat_floor_ladder_core';
 import {
   HEAT_FX_COLORS as C,
@@ -83,6 +84,8 @@ import { moltenDecal } from './heat_molten_decal';
 import { basaltColumn, basaltRepaint, crystalPrism, swellWallGeometry } from './heat_shapes';
 import { HeatTelegraphs } from './heat_telegraph';
 
+/** The fist trail's heat on the pyre ramp (its orange). */
+const FIST_TRAIL_HEAT = [0.55, 0, 0] as const;
 const SCAN_SEC = 0.1;
 
 /** The nearer of two bodies to (x, z) (either may be missing). */
@@ -109,15 +112,29 @@ const _fist: FistLook = { fill: 0, height: 0, shown: false, crack: 0 };
 const _crater = { flash: 0, glow: 0 };
 const PAINT: TelegraphPaint = { fill: 0, clock: 0, range: 0 };
 
+/** The fire trailing the plunging fist: orange flame on the pyre ramp, never
+ *  a glow ball (Jose's review of 2026-11-06: the old additive glow trail
+ *  stacked into a sun over the guardian's head). */
 const TRAIL_PUFF = {
   speed: 1.5,
   up: 3,
-  life: 0.7,
-  size: [2.4, 0.6] as [number, number],
-  color: C.fire,
-  alpha: 0.9,
-  pool: 'glow' as const,
-  radius: 2.2,
+  life: 0.6,
+  size: [2.2, 0.5] as [number, number],
+  color: FIST_TRAIL_HEAT,
+  alpha: 0.85,
+  pool: 'pyre' as const,
+  radius: 2,
+};
+/** Dark smoke torn off the fist as it falls. */
+const TRAIL_SMOKE = {
+  speed: 0.8,
+  up: 1.5,
+  life: 1.6,
+  size: [2, 4.5] as [number, number],
+  color: [0.1, 0.08, 0.07] as const,
+  alpha: 0.45,
+  drag: 0.8,
+  radius: 1.8,
 };
 const SPRAY_DIR: [number, number, number] = [0, 1, 0];
 const SPRAY_PUFF = {
@@ -239,7 +256,7 @@ void main() {
   float crack = 1.0 - smoothstep(0.0, 0.06 + 0.04 * (1.0 - r), line * (0.35 + r));
   crack *= step(r, 0.6 + 0.4 * hh2(vec2(id, 3.0)));
   float bowl = 1.0 - smoothstep(0.0, 0.55, r);
-  float m = max(crack * 0.95, bowl * 0.75) * uGlow + uFlash * (1.0 - r);
+  float m = max(crack * 0.95, bowl * 0.75) * uGlow + uFlash * 0.55 * (1.0 - r);
   vec3 col = mix(vec3(0.05, 0.04, 0.035), molten(clamp(m, 0.0, 1.0)), smoothstep(0.02, 0.2, m));
   float alpha = (1.0 - smoothstep(0.75, 1.0, r)) * (0.75 + 0.25 * uGlow);
   gl_FragColor = vec4(col, alpha * max(uGlow, uFlash) + (1.0 - r) * 0.25 * uGlow);
@@ -360,16 +377,16 @@ export class HeatFx {
 
     // ---- the fists ----
     const stone = heartKitSlotMaterial('stone');
-    const glow = heartVeinGlowMaterial(0xffd27a, 'smithHeartHeatFistCrystal');
+    const glow = heartVeinGlowMaterial(0xff9a40, 'smithHeartHeatFistCrystal');
     this.materials.push(glow);
     const column = basaltColumn(0.5, 1);
     const prism = crystalPrism(0.35, 1.6);
     this.geometries.push(column, prism);
     const haloMat = new THREE.SpriteMaterial({
       map: this.glowTex,
-      color: 0xffd27a,
+      color: 0xff8a3a,
       transparent: true,
-      opacity: 0.42,
+      opacity: 0.16,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
       fog: false,
@@ -484,7 +501,7 @@ export class HeatFx {
       this.root.add(mesh);
       const flashMat = new THREE.SpriteMaterial({
         map: this.glowTex,
-        color: 0xfff4dc,
+        color: HEAT_MODEL_COLORS.flash,
         transparent: true,
         opacity: 0,
         blending: THREE.AdditiveBlending,
@@ -636,14 +653,27 @@ export class HeatFx {
     slot.mesh.visible = true;
     slot.flash.position.set(x, y + 2, z);
     slot.flash.visible = true;
-    this.particles.shockRing(x, z, C.ring, r * 3.2, 0.9);
-    this.particles.shockRing(x, z, C.ringGold, r * 1.8, 0.6);
+    // A ring racing out over the floor and a hot one round the crater, under
+    // the bursts' caps: punchy, never a floor burned out to white.
+    this.particles.shockRing(x, z, HEAT_MODEL_COLORS.ring, r * 2.6, 0.9, HEAT_BURST.ring);
+    this.particles.shockRing(x, z, C.ringGold, r * 1.5, 0.6, HEAT_BURST.ring);
+    // Dark basalt flung out of the crater.
+    this.particles.puff(x, y + 0.8, z, 20, {
+      speed: 9,
+      up: 7,
+      life: 1.3,
+      size: [0.8, 0.6],
+      color: C.crust,
+      alpha: 1,
+      gravity: 20,
+      radius: r * 0.4,
+    });
     // Basalt flung up and molten drops, a column of smoke.
-    this.particles.puff(x, y + 1, z, 46, {
+    this.particles.puff(x, y + 1, z, 34, {
       speed: 12,
       up: 8,
       life: 1.1,
-      size: [0.7, 0.16],
+      size: [0.45, 0.1],
       color: C.spark,
       alpha: 1,
       pool: 'glow',
@@ -860,13 +890,21 @@ export class HeatFx {
       _q.setFromAxisAngle(_v.set(Math.cos(s.yaw), 0, -Math.sin(s.yaw)), -0.35);
       s.fist.quaternion.copy(_q);
       s.fist.rotateY(s.yaw);
-      if (this.rand() < dt * 40 * this.density)
+      if (this.rand() < dt * 22 * this.density)
         this.particles.puff(
           s.fist.position.x,
           s.fist.position.y + 2,
           s.fist.position.z,
           1,
           TRAIL_PUFF,
+        );
+      if (this.rand() < dt * 8 * this.density)
+        this.particles.puff(
+          s.fist.position.x,
+          s.fist.position.y + 3,
+          s.fist.position.z,
+          1,
+          TRAIL_SMOKE,
         );
       // The cracks of light under the spot (cosmetic over the telegraph).
       if (this.rand() < dt * 10 * look.crack * this.density)
@@ -950,8 +988,9 @@ export class HeatFx {
       }
       c.mat.uniforms.uGlow.value = look.glow;
       c.mat.uniforms.uFlash.value = look.flash;
-      c.flashMat.opacity = look.flash;
-      const fs = 6 + 18 * (1 - look.flash);
+      // A short pop on the crater, never a screen of light.
+      c.flashMat.opacity = look.flash * HEAT_BURST.flashPeak;
+      const fs = 5 + 7 * (1 - look.flash);
       c.flash.scale.set(fs, fs, 1);
       c.flash.visible = look.flash > 0.01;
       if (look.glow > 0.2 && this.rand() < 0.15 * this.density)

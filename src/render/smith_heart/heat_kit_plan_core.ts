@@ -373,3 +373,20 @@ export function planHeatKit(): HeartKitPlacement[] {
     ...planHeatDressing(),
   ];
 }
+
+// ---- the fire crystals' light ------------------------------------------------------------
+
+/** The Heat kit's fire-crystal pieces (the clusters round the Hearth). */
+export const HEARTH_CRYSTAL_PIECES = ['Kit_FireCrystalA', 'Kit_FireCrystalB'] as const;
+
+/** A fire crystal's baked light warmed from the kit's white-gold to amber
+ *  (Jose's review of 2026-11-06: beside the guardian's orange fire the pale
+ *  crystals clashed), a touch dimmer, its hue kept by channel so the facets'
+ *  shading reads. Linear rgb in place. */
+export function warmHearthGlow(c: [number, number, number]): [number, number, number] {
+  const lum = Math.max(c[0], c[1], c[2]);
+  c[0] = lum * 0.92;
+  c[1] = Math.min(c[1], lum) * 0.5;
+  c[2] = Math.min(c[2], lum) * 0.16;
+  return c;
+}
