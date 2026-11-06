@@ -367,8 +367,27 @@ describe('HeatBody over a fake world', () => {
     body.update(1 / 20);
     expect(sent[sent.length - 1]).toBe(HEAT_BODY_GESTURES.rise);
     state(HEAT_STAGES.fight);
+    // The living fire, the rocks and the debris pool all hang off the gated root.
+    for (const name of [
+      'smithHeartHeatTongues',
+      'smithHeartHeatTongueSmoke',
+      'smithHeartHeatRocks',
+      'smithHeartHeatDebris',
+    ])
+      expect(root?.getObjectByName(name), name).toBeTruthy();
+    expect(
+      (root?.getObjectByName('smithHeartHeatRocks') as THREE.InstancedMesh).isInstancedMesh,
+    ).toBe(true);
     (boss as { dead: boolean }).dead = true;
     for (let i = 0; i < 120; i++) body.update(1 / 20);
+    // Cooled in death, its rocks burn again when it comes back.
+    const rockMat = (root?.getObjectByName('smithHeartHeatRocks') as THREE.Mesh)
+      .material as THREE.ShaderMaterial;
+    expect(rockMat.uniforms.uGlow.value).toBeLessThan(0.05);
+    (boss as { dead: boolean }).dead = false;
+    body.update(1 / 20);
+    expect(rockMat.uniforms.uGlow.value).toBe(1);
+    body.dispose();
     body.dispose();
     expect(scene.getObjectByName('smith-heart-heat-body')).toBeUndefined();
   });

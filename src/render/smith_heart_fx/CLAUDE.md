@@ -70,6 +70,9 @@ offline and online look the same. The interior's static dressing and air are
 | `heat_fx.ts` | `HeatFx`: the fist's spot (`lethal`) and its three lanes (`danger`, clipped at the floor's edge) through the shared floor telegraph in the molten paint (`heat_telegraph.ts`) on every tier, filling with the bar; the giant fist plunging out of the smoke; the crater, rings and shake on its cue; the rolling walls of molten rock and their crusting wakes. |
 | `heat_body_core.ts` | PURE (`RENDER_PURE_CORES`): the Guardian of the Heat's provisional body (design doc 7.4): a giant of the first flame in columnar basalt and white-gold crystal (Heart kit colossus basalt repainted, Heat kit fire crystal), drawn `HEAT_BODY_SCALE` times its frame and sunk to its waist (`HEAT_HALF_SUNK`; all the way under through an overflow, `HEAT_FULL_SUNK`); the stages, then Basalt Fist's bar, then the one-shots (`heatBodyAction`, `heatSink`, `heatBodyLook`), its fire whitening phase by phase (`heatWhiteness`), the arms, the fall, the state aura's read (`heatBodyState`). |
 | `heat_body.ts` | `HeatBody`: the giant over the bodyless guardian, sunk in the wellspring, plunging under and climbing out with a splash, lava dripping off it, the fist's orb flaring, embers and haze, the fall in smoke. |
+| `heat_flame_core.ts` | PURE (`RENDER_PURE_CORES`): the Heat guardian's living fire (Jose's review of 2026-11-06): the tongues each burning socket holds (`HEAT_TONGUES`, the low tier's `HEAT_TONGUE_LOW`), the lick trailing the bone's motion (`tongueLean`, capped at `TONGUE_MAX_LEAN`), the breathing (`tongueFlicker`), the fire's ramp red to orange with yellow only at the core (`HEAT_FIRE_RAMP`, `fireRamp`, `fireRampGlsl`), the bursts' caps (`HEAT_BURST`: a short flash on its point, a faint-waked ring, the basalt flung). |
+| `heat_flame_tongues.ts` | `HeatFlameTongues`, a part of `HeatBody`: the tongues as camera-facing ribbons round a bent spine (no card edge), a smoke-dark normal-blend layer under an additive fire layer (domain-warped noise eroding from the tips), two draws. |
+| `heat_body_rocks.ts` | `HeatBodyRocks`, a part of `HeatBody`: the circling rocks and the basalt the blows fling, dark basalt split by breathing lava cracks (one unlit shader, cooled through `uGlow` in death), the thrown chunks landing and sinking away. |
 | `heat_fight_fx_core.ts` | PURE (`RENDER_PURE_CORES`): the Heat fight's look: the objects' kinds (`heatObjectKind`), the claimed cues (all of `HEAT_CUES`), the wellspring calm and overflowing (`wellLook`), a river (`riverLook`), a seed's throb (`seedLook`), a Wakefire band (`zoneLook`, `zoneRadii`), a cinder's fall (`fallLook`), a burning patch (`patchLook`), the palette, the pools. |
 | `heat_fight_fx.ts` | `HeatFightFx` (the `HeatFxHost` of its parts): the Hearthseeds (their orbs and glows; every footprint through `HeatSeedField`), Wakefire's bands (each ring at its exact radii, building, erupting), the burning patches, Hearth Flare's bolts, the Kindling Marks' sigils; sparks, embers, haze and smoke cosmetic. Feeds `../../game/smith_heart_heat_audio.ts`. |
 | `heat_well_core.ts` | PURE (`RENDER_PURE_CORES`): the wellspring's motion: the convection flow (`wellFlowAt`, `wellOutflow`) carried by a two-phase flow map (`wellFlowPhases`) so its warp stays under `wellFlowMaxDrift` at any clock (the old `flow * t` swirl tore the pool into a sunburst as the session ran), the crust's thickness (`wellCrust`), the bubbles' lives (`stepWellBubbles`, `wellBubbleLook`). |
@@ -116,9 +119,13 @@ Rules:
   `tests/smith_heart_heat_floor.test.ts`.
 - The Guardian of the Heat's rise spots, crystal reach rings, rays, the burn on bodies, the
   channel's lane (brimming and flowing), the embers' rims and the wind-up's floor glow and body
-  flash draw on EVERY tier (`HeatFightFx`, `HeatBody`); sparks, embers, haze, smoke and the
-  wind-up's gathering rings (`windupGather`) thin or go on the low tier, the shakes go under
-  reduced motion. Its fire is the Hearth's white-gold, never volcanic red.
+  flash draw on EVERY tier (`HeatFightFx`, `HeatBody`); sparks, embers, haze, smoke, the
+  body's tongues past the first few per socket, its rocks and debris and the wind-up's
+  gathering rings (`windupGather`) thin or go on the low tier, the shakes go under reduced
+  motion. The fight's floor and telegraphs keep the Hearth's white-gold; the modeled body's
+  own fire burns orange-red with yellow only at its cores (`heat_flame_core.ts`, Jose's
+  review of 2026-11-06), and every burst stays under `HEAT_BURST`'s caps (a slam never
+  washes out the frame).
 - The Quench guardian's cone is actionable and drawn by `QuenchFx` through the shared floor
   telegraph on EVERY tier (threat colour `danger`, the vein's pale ice as the accent); its
   frost, mist and ice are cosmetic and thin.

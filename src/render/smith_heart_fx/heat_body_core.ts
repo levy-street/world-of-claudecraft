@@ -343,23 +343,28 @@ export const HEAT_BODY_COLORS = {
   smoke: [0.28, 0.25, 0.23] as const,
 } as const;
 
-/** The modeled body's own fire (Jose's concept: orange lava round a
- *  yellow-white core, dark smoke): what the effects layer paints round it. A
- *  flame's first channel is its heat on the pyre ramp (orange to white). */
+/** The modeled body's own fire (Jose's concept: orange-red flame round a
+ *  yellow core, dark smoke; his review of 2026-11-06 moved it off the pale
+ *  yellow of the first pass): what the effects layer paints round it. A
+ *  flame puff's first channel is its heat on the pyre ramp (held in the
+ *  ramp's orange, never its white top). The tongues' own ramp is
+ *  heat_flame_core.ts HEAT_FIRE_RAMP. */
 export const HEAT_MODEL_COLORS = {
-  flameHeat: [0.74, 0, 0] as const,
-  flameHot: [0.9, 0, 0] as const,
-  lava: [1.0, 0.45, 0.08] as const,
-  ember: [1.0, 0.62, 0.18] as const,
-  spark: [1.0, 0.86, 0.5] as const,
-  smoke: [0.16, 0.12, 0.1] as const,
+  flameHeat: [0.56, 0, 0] as const,
+  flameHot: [0.66, 0, 0] as const,
+  lava: [1.0, 0.36, 0.05] as const,
+  ember: [1.0, 0.46, 0.1] as const,
+  spark: [1.0, 0.66, 0.26] as const,
+  smoke: [0.11, 0.085, 0.075] as const,
   ash: [0.3, 0.26, 0.24] as const,
-  haze: [1.0, 0.6, 0.3] as const,
-  glow: 0xff7a1e,
-  core: 0xffd070,
-  eye: 0xfff0a0,
-  rock: 0x1c1310,
-  rockGlow: 0xff4a0c,
+  haze: [1.0, 0.5, 0.25] as const,
+  glow: 0xff5414,
+  core: 0xff9a3c,
+  eye: 0xffc860,
+  /** An impact's short flash (orange-gold, never white). */
+  flash: 0xffa65a,
+  /** The shockwave racing over the floor. */
+  ring: 0xff6a24,
 } as const;
 
 /** Pools at full density. */
@@ -367,4 +372,7 @@ export const HEAT_BODY_POOLS = {
   sockets: HEAT_SOCKETS.length,
   rocks: HEAT_ROCKS,
   flashes: 4,
+  /** The basalt chunks the blows fling (the low tier keeps fewer). */
+  debris: 28,
+  debrisLow: 10,
 } as const;

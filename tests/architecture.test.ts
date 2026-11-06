@@ -1184,6 +1184,8 @@ const RENDER_PURE_CORES = [
   // A character drawn sunk into water it stands in.
   'src/render/characters/water_sink_core.ts',
   'src/render/smith_heart_fx/heat_body_core.ts',
+  // The Heat guardian's living fire: its tongues, lick, ramp and bursts' caps.
+  'src/render/smith_heart_fx/heat_flame_core.ts',
   'src/render/smith_heart_fx/heat_fight_fx_core.ts',
   // The Heat's floor ladder (every floor layer's unique rung) and its molten
   // telegraphs' looks.
