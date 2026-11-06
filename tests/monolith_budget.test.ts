@@ -2676,7 +2676,10 @@ const MONOLITHS: MonolithRow[] = [
     // Held by extracting the pane tab model and markup to bank_tabs_view.
     // Weekly reward host binding now lives with the weekly pane.
     // Account panel eligibility and request guards moved beside its painter.
-    ceiling: 1782,
+    // LOWERED 1782 -> 1771 by the bag tabs change: the category-chip label
+    // table it duplicated from the bags window moved to the shared
+    // src/ui/bag_category_labels.ts. Exact count, zero slack.
+    ceiling: 1771,
     seam: 'a pure view-core plus a thin painter sibling (src/ui/CLAUDE.md)',
   },
   {

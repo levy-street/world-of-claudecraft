@@ -2,11 +2,14 @@
 //
 // The consumer half of the pure-core + thin-consumer split: it paints
 // #vendor-window from the structured VendorView (vendor_view.ts) and wires the
-// buy / buyback / close actions. It owns no state. The cross-window
+// buy / buyback / close actions. Its one piece of state is the goods tab and
+// search of the open shop (goodsFilters below), view state like the scroll
+// position it restores; Hud resets it on every open. The cross-window
 // orchestration (which windows to close, bag re-centring, mobile teardown)
 // stays in Hud because it needs Hud's private state; this module only renders
 // one panel and reports clicks back through the injected callbacks.
 
+import { audio } from '../../../game/audio';
 import { ITEMS } from '../../../sim/data';
 import {
   FACTION_CURRENCY_IDS,
@@ -17,6 +20,11 @@ import {
 import { ridingMoveSpeedPct } from '../../../sim/riding_training';
 import type { ItemInstancePayload } from '../../../sim/types';
 import type { VendorBuyOptions } from '../../../sim/vendor_buy_stack';
+import { BAG_CATEGORY_LABEL_KEYS } from '../../bag_category_labels';
+import type { BagCategory } from '../../bag_filter';
+import { EMPTY_BAG_GEAR_SET_INDEX } from '../../bag_gear_sets_core';
+import { bagSectionLabel } from '../../bag_sections_core';
+import { captureSearchCaret, restoreSearchCaret } from '../../bank_search_focus';
 import { currencyIconHtml } from '../../currency_art';
 import { markDialogRoot } from '../../dialog_root';
 import { itemDisplayName } from '../../entity_i18n';
@@ -30,6 +38,14 @@ import { svgIcon } from '../../ui_icons';
 import { wornItemCellParts } from '../../worn_item_cell_view';
 import { gatheringProfessionNameKey } from '../professions/gathering_profession_name';
 import { showBuyQuantityPrompt } from './buy_quantity_prompt_window';
+import {
+  buildVendorGoodsEntries,
+  DEFAULT_VENDOR_GOODS_FILTER,
+  effectiveVendorTab,
+  type VendorGoodsFilter,
+  vendorGoodsSearchable,
+  vendorGoodsTabs,
+} from './vendor_goods_filter_core';
 import {
   VENDOR_MULTIPLES,
   type VendorGoodsRow,
@@ -67,6 +83,9 @@ export interface VendorWindowDeps extends PainterHostPresentation {
     craftedRecipeId: string | undefined,
   ): void;
   onSellJunk(): void;
+  /** A goods tab changed: Hud re-runs its fresh build (stock gates, purse,
+   *  Sell Junk quote) and calls renderVendorWindow again, the onQtyChange rule. */
+  onFilterChange(): void;
   onClose(): void;
   sellJunk: {
     enabled: boolean;
@@ -164,6 +183,271 @@ function goodsPriceHtml(row: VendorGoodsRow, deps: VendorWindowDeps): string {
   return parts.join('<span aria-hidden="true"> + </span>');
 }
 
+// The goods filter is view state of ONE open shop: kept per window element
+// (like the scroll position the rebuild restores), reset when a different
+// vendor opens, and never persisted. A tab or search must survive the
+// buy-driven rebuild Hud runs after every purchase, which is why it lives here
+// rather than in a local of renderVendorWindow.
+const goodsFilters = new WeakMap<HTMLElement, { vendor: string; filter: VendorGoodsFilter }>();
+
+/** Forget the open shop's tab and search: Hud calls this on every vendor open,
+ *  so walking away and back always starts on All with an empty search (the
+ *  purchase-multiple reset beside it in openVendor). */
+export function resetVendorGoodsFilter(el: HTMLElement): void {
+  goodsFilters.delete(el);
+}
+
+function goodsFilterFor(el: HTMLElement, vendorName: string): VendorGoodsFilter {
+  const held = goodsFilters.get(el);
+  if (held && held.vendor === vendorName) return held.filter;
+  const filter = { ...DEFAULT_VENDOR_GOODS_FILTER };
+  goodsFilters.set(el, { vendor: vendorName, filter });
+  return filter;
+}
+
+/** The name a goods row shows, which is also what the shop search matches. */
+function goodsRowName(row: VendorGoodsRow): string {
+  return row.ridingRank
+    ? t(row.ridingRank === 1 ? 'itemUi.vendor.basicRiding' : 'itemUi.vendor.advancedRiding')
+    : itemDisplayName(row.item);
+}
+
+/** The tab chips and the search box above the goods grid. A chip rebuilds the
+ *  whole window (the pressed state moves); a search keystroke refills only the
+ *  grid, so the box keeps focus and caret through typing and composition. */
+function buildGoodsFilterBar(
+  el: HTMLElement,
+  vendorName: string,
+  view: VendorView,
+  deps: VendorWindowDeps,
+  filter: VendorGoodsFilter,
+  tabs: readonly BagCategory[],
+  searchable: boolean,
+  goodsGrid: HTMLElement,
+): HTMLElement {
+  const bar = document.createElement('div');
+  bar.className = 'vendor-filter-bar';
+  if (tabs.length > 0) {
+    const active = effectiveVendorTab(view.goods, filter);
+    const chips = document.createElement('div');
+    chips.className = 'bag-chips vendor-chips';
+    chips.setAttribute('role', 'group');
+    chips.setAttribute('aria-label', t('itemUi.vendor.filterGroupAria'));
+    for (const category of tabs) {
+      const chip = document.createElement('button');
+      chip.type = 'button';
+      chip.className = `bag-chip ui-chip${category === active ? ' active' : ''}`;
+      chip.textContent = t(BAG_CATEGORY_LABEL_KEYS[category]);
+      chip.setAttribute('aria-pressed', category === active ? 'true' : 'false');
+      chip.dataset.focusKey = `vchip:${category}`;
+      chip.addEventListener('click', () => {
+        if (category === active) return;
+        filter.category = category;
+        audio.click();
+        deps.onFilterChange();
+      });
+      chips.appendChild(chip);
+    }
+    bar.appendChild(chips);
+  }
+  if (searchable) {
+    const search = document.createElement('input');
+    search.type = 'search';
+    search.className = 'bag-search vendor-search ui-input';
+    search.placeholder = t('hudChrome.bags.searchPlaceholder');
+    search.setAttribute('aria-label', t('itemUi.vendor.searchAria'));
+    search.value = filter.search;
+    search.dataset.focusKey = 'vendor-search';
+    search.addEventListener('input', () => {
+      filter.search = search.value;
+      deps.hideTooltip();
+      goodsGrid.replaceChildren();
+      fillGoodsGrid(goodsGrid, el, view, deps, filter);
+    });
+    bar.appendChild(search);
+  }
+  return bar;
+}
+
+/** Paint the goods (headings, rows, Buy Stack tiles) into the grid. */
+function fillGoodsGrid(
+  goodsGrid: HTMLElement,
+  el: HTMLElement,
+  view: VendorView,
+  deps: VendorWindowDeps,
+  filter: VendorGoodsFilter,
+): void {
+  const entries = buildVendorGoodsEntries(view.goods, filter, goodsRowName);
+  if (view.goods.length > 0 && entries.length === 0) {
+    const none = document.createElement('div');
+    none.className = 'vendor-empty vendor-goods-none';
+    none.textContent = t('itemUi.vendor.noGoodsMatch');
+    goodsGrid.appendChild(none);
+    return;
+  }
+  for (const entry of entries) {
+    if (entry.kind === 'caption') {
+      // A slot heading spanning the grid: not a button, not a focus stop.
+      const caption = document.createElement('div');
+      caption.className = 'vendor-goods-caption';
+      caption.setAttribute('role', 'presentation');
+      const label = bagSectionLabel({ kind: 'slot', group: entry.group }, EMPTY_BAG_GEAR_SET_INDEX);
+      caption.textContent = 'text' in label ? label.text : t(label.key, label.values);
+      goodsGrid.appendChild(caption);
+    } else {
+      appendGoodsRow(goodsGrid, el, entry.row, deps);
+    }
+  }
+}
+
+/** One goods row, plus its Buy Stack tile when the row offers one. */
+function appendGoodsRow(
+  goodsGrid: HTMLElement,
+  el: HTMLElement,
+  goods: VendorGoodsRow,
+  deps: VendorWindowDeps,
+): void {
+  const { itemId, item, quantity } = goods;
+  const row = document.createElement('button');
+  row.type = 'button';
+  // An unmet wield requirement is ADVISORY (R22): the row sells like any
+  // other, and .vendor-locked survives purely as the style hook that tints
+  // the requirement sub-line so the number reads as "not yet met" rather
+  // than decoration. Never disabled for it: the sale is real, the gate is
+  // at the harvest.
+  row.className = goods.requirementUnmet
+    ? 'vendor-item ui-card vendor-locked'
+    : 'vendor-item ui-card';
+  // Item identity for the island coach's press-this-next glow (bootcamp.ts
+  // toggles .qd-coach by this attribute; distinct from the focus-key
+  // namespace, which stays focus_restore's alone).
+  row.dataset.coachItem = itemId;
+  // The disable state tracks the SELECTED multiple (phase 21): a count row
+  // gates on the whole-count total; force-1 and custom rows keep the 1x
+  // baseline (the custom prompt's typed amount decides the rest).
+  const countBuy = goods.countBuy;
+  const lockedByFaction = goods.requirementUnmet && !!goods.factionRequirement;
+  row.disabled = lockedByFaction || (countBuy ? !countBuy.affordable : !goods.affordable);
+  const price = countBuy ? formatLocalizedMoney(countBuy.copper) : goodsPriceText(goods.price);
+  const itemName = goodsRowName(goods);
+  const stack =
+    quantity > 1
+      ? ` ${t('itemUi.bags.stackCount', { count: formatNumber(quantity, { maximumFractionDigits: 0 }) })}`
+      : '';
+  const requirement = goods.ridingRank
+    ? t('itemUi.vendor.ridingSpeed', {
+        speed: formatNumber(ridingMoveSpeedPct(goods.ridingRank) * 100),
+      })
+    : goods.requirementUnmet
+      ? requirementText(goods)
+      : '';
+  // Every row gets a buy aria-label (the purchase deny is retired, so the
+  // promise is true of every row), and an aria-label REPLACES the button's
+  // content as its accessible name: a requirement-unmet row must fold the
+  // advisory into the name itself or screen-reader users never hear what
+  // the sighted sub-line says. One combined key, never two concatenated
+  // t() results. A count row's name states qty and TOTAL price
+  // (acceptance f), through the same combined-key rule.
+  const countText = countBuy
+    ? formatNumber(countBuy.count, { maximumFractionDigits: 0 })
+    : undefined;
+  row.setAttribute(
+    'aria-label',
+    countBuy
+      ? requirement
+        ? t('itemUi.vendor.buyCountAriaWithRequirement', {
+            count: countText as string,
+            item: `${itemName}${stack}`,
+            price,
+            requirement,
+          })
+        : t('itemUi.vendor.buyCountAria', {
+            count: countText as string,
+            item: `${itemName}${stack}`,
+            price,
+          })
+      : requirement
+        ? t('itemUi.vendor.buyAriaWithRequirement', {
+            item: `${itemName}${stack}`,
+            price,
+            requirement,
+          })
+        : t('itemUi.vendor.buyAria', { item: `${itemName}${stack}`, price }),
+  );
+  // The count chip reuses the control row's own multiple key ({count}x), so
+  // it reads in the row's grammar (5x = five purchases) and can never sit
+  // beside the name's units-per-purchase "x5" wearing the same face; the
+  // price cell shows the whole-count total the click will charge.
+  const qtyChip = countBuy
+    ? `<span class="vi-qty">${esc(t('itemUi.vendor.qtyMultiple', { count: countText as string }))}</span>`
+    : '';
+  const priceHtml = countBuy ? deps.moneyHtml(countBuy.copper) : goodsPriceHtml(goods, deps);
+  row.innerHTML = `<span class="ui-socket ui-socket--bag">${deps.itemIcon(item)}</span><span class="vi-name" style="color:${itemNameColor(item)}">${esc(itemName)}${esc(stack)}${requirement ? `<span class="vi-sub ui-muted">${esc(requirement)}</span>` : ''}</span><span class="vi-price ui-money">${qtyChip}${priceHtml}</span>`;
+  row.dataset.focusKey = `buy:${itemId}`;
+  // Ctrl/Cmd-click requests a bulk purchase (#2374) and wins over the
+  // selected multiple (an explicit stack request), the desktop mirror of
+  // the "Buy Stack" tile below; both funnel through the same
+  // onBuy(itemId, { bulk: true }). Otherwise the click follows the
+  // selection: a fixed multiple sends its count, 'custom' opens the
+  // countFit-capped prompt (Q19), and 1x stays the plain buy.
+  row.addEventListener('click', (ev) => {
+    if (goods.ridingRank) {
+      deps.onBuy(itemId, { expectedRidingTier: goods.ridingRank === 1 ? 0 : 1 });
+    } else if (ev.ctrlKey || ev.metaKey) {
+      deps.onBuy(itemId, { bulk: true });
+    } else if (countBuy) {
+      deps.onBuy(itemId, { count: countBuy.count });
+    } else if (goods.customBuy) {
+      showBuyQuantityPrompt(el, item, deps.buyCustomMax(itemId), (count) =>
+        deps.onBuy(itemId, { count }),
+      );
+    } else {
+      deps.onBuy(itemId, undefined);
+    }
+  });
+  // No appended requirement line in the tooltip: the shared item tooltip
+  // (deps.itemTooltip -> gatherToolTooltipLines) already renders the same
+  // "Requires {craft} {skill}" sentence on every requirement-carrying
+  // tool, and the painter appending it again showed the line twice on
+  // every gated row. The at-a-glance signal stays the .vi-sub row line.
+  deps.attachTooltip(
+    row,
+    () =>
+      `${goods.ridingRank ? `<div class="tt-title">${esc(itemName)}</div><div class="tt-sub">${esc(requirement)}</div>` : deps.itemTooltip(item)}<div class="tt-sub">${esc(t('itemUi.tooltip.clickBuy'))}</div>`,
+  );
+  goodsGrid.appendChild(row);
+  // A separate, always-visible tile (never a nested <button>, never hidden
+  // behind a modifier key) so the bulk purchase is reachable identically on
+  // touch and desktop: the mobile-parity affordance for the ctrl-click
+  // gesture above. Only offered when the row actually qualifies for a bulk
+  // purchase of more than one unit (see bulkQuantity in vendor_view.ts).
+  if (goods.bulkQuantity !== undefined && goods.bulkQuantity > 1) {
+    const bulkRow = document.createElement('button');
+    bulkRow.type = 'button';
+    bulkRow.className = 'vendor-item vendor-item-bulk ui-card';
+    bulkRow.disabled = !goods.bulkAffordable;
+    const bulkCount = formatNumber(goods.bulkQuantity, { maximumFractionDigits: 0 });
+    const bulkCopper = Math.max(0, item.buyValue ?? 0) * goods.bulkQuantity;
+    const bulkPrice = formatLocalizedMoney(bulkCopper);
+    bulkRow.setAttribute(
+      'aria-label',
+      t('itemUi.vendor.buyStackAria', { item: itemName, count: bulkCount, price: bulkPrice }),
+    );
+    bulkRow.innerHTML = `<span class="ui-socket ui-socket--bag">${deps.itemIcon(item)}</span><span class="vi-name" style="color:${itemNameColor(item)}">${esc(t('itemUi.vendor.buyStack', { count: bulkCount }))}</span><span class="vi-price ui-money">${deps.moneyHtml(bulkCopper)}</span>`;
+    // Its own focus key: a keyboard bulk buy rebuilds the grid under the
+    // finger exactly like the ordinary row's buy, and without a key the
+    // restore ladder cannot find the tile again (focus fell to <body>).
+    bulkRow.dataset.focusKey = `buy-stack:${itemId}`;
+    bulkRow.addEventListener('click', () => deps.onBuy(itemId, { bulk: true }));
+    deps.attachTooltip(
+      bulkRow,
+      () =>
+        `${deps.itemTooltip(item)}<div class="tt-sub">${esc(t('itemUi.vendor.buyStack', { count: bulkCount }))}</div>`,
+    );
+    goodsGrid.appendChild(bulkRow);
+  }
+}
+
 /** Paint the vendor panel from a prepared view. */
 export function renderVendorWindow(
   el: HTMLElement,
@@ -191,6 +475,10 @@ export function renderVendorWindow(
     ? [...focusedGrid.querySelectorAll('button')].indexOf(focused as HTMLButtonElement)
     : -1;
   const scrollTop = el.scrollTop;
+  // A focused search box keeps its caret (and an IME composition's anchor)
+  // through a rebuild it did not start: an online purse or bag echo repaints
+  // the whole window mid-typing (bank_search_focus.ts, the bank's same fix).
+  const searchCaret = captureSearchCaret(el, focused);
   markDialogRoot(el, { label: t('itemUi.vendor.goodsTitle', { name: vendorName }) });
   el.innerHTML = `<div class="panel-title ui-win-head"><span class="ui-win-title">${esc(t('itemUi.vendor.goodsTitle', { name: vendorName }))}</span><button type="button" class="x-btn ui-x-btn" data-close data-focus-key="close" aria-label="${esc(t('itemUi.vendor.close'))}">${svgIcon('close')}</button></div>`;
 
@@ -245,154 +533,23 @@ export function renderVendorWindow(
     el.appendChild(qtyRow);
   }
 
+  // The shop's tabs and search (vendor_goods_filter_core.ts): the bags'
+  // categories and slot headings carried over to the counter. Offered only
+  // when the stock can fill them, so a small shop looks exactly as before.
+  const filter = goodsFilterFor(el, vendorName);
+  const tabs = vendorGoodsTabs(view.goods);
+  const searchable = vendorGoodsSearchable(view.goods);
   // Landscape layout: goods tile up in a multi-column grid instead of one
   // full-width row per item (see .vendor-goods-grid in components.css).
   const goodsGrid = document.createElement('div');
   goodsGrid.className = 'vendor-goods-grid';
   goodsGrid.dataset.grid = 'goods';
-  for (const goods of view.goods) {
-    const { itemId, item, quantity } = goods;
-    const row = document.createElement('button');
-    row.type = 'button';
-    // An unmet wield requirement is ADVISORY (R22): the row sells like any
-    // other, and .vendor-locked survives purely as the style hook that tints
-    // the requirement sub-line so the number reads as "not yet met" rather
-    // than decoration. Never disabled for it: the sale is real, the gate is
-    // at the harvest.
-    row.className = goods.requirementUnmet
-      ? 'vendor-item ui-card vendor-locked'
-      : 'vendor-item ui-card';
-    // Item identity for the island coach's press-this-next glow (bootcamp.ts
-    // toggles .qd-coach by this attribute; distinct from the focus-key
-    // namespace, which stays focus_restore's alone).
-    row.dataset.coachItem = itemId;
-    // The disable state tracks the SELECTED multiple (phase 21): a count row
-    // gates on the whole-count total; force-1 and custom rows keep the 1x
-    // baseline (the custom prompt's typed amount decides the rest).
-    const countBuy = goods.countBuy;
-    const lockedByFaction = goods.requirementUnmet && !!goods.factionRequirement;
-    row.disabled = lockedByFaction || (countBuy ? !countBuy.affordable : !goods.affordable);
-    const price = countBuy ? formatLocalizedMoney(countBuy.copper) : goodsPriceText(goods.price);
-    const itemName = goods.ridingRank
-      ? t(goods.ridingRank === 1 ? 'itemUi.vendor.basicRiding' : 'itemUi.vendor.advancedRiding')
-      : itemDisplayName(item);
-    const stack =
-      quantity > 1
-        ? ` ${t('itemUi.bags.stackCount', { count: formatNumber(quantity, { maximumFractionDigits: 0 }) })}`
-        : '';
-    const requirement = goods.ridingRank
-      ? t('itemUi.vendor.ridingSpeed', {
-          speed: formatNumber(ridingMoveSpeedPct(goods.ridingRank) * 100),
-        })
-      : goods.requirementUnmet
-        ? requirementText(goods)
-        : '';
-    // Every row gets a buy aria-label (the purchase deny is retired, so the
-    // promise is true of every row), and an aria-label REPLACES the button's
-    // content as its accessible name: a requirement-unmet row must fold the
-    // advisory into the name itself or screen-reader users never hear what
-    // the sighted sub-line says. One combined key, never two concatenated
-    // t() results. A count row's name states qty and TOTAL price
-    // (acceptance f), through the same combined-key rule.
-    const countText = countBuy
-      ? formatNumber(countBuy.count, { maximumFractionDigits: 0 })
-      : undefined;
-    row.setAttribute(
-      'aria-label',
-      countBuy
-        ? requirement
-          ? t('itemUi.vendor.buyCountAriaWithRequirement', {
-              count: countText as string,
-              item: `${itemName}${stack}`,
-              price,
-              requirement,
-            })
-          : t('itemUi.vendor.buyCountAria', {
-              count: countText as string,
-              item: `${itemName}${stack}`,
-              price,
-            })
-        : requirement
-          ? t('itemUi.vendor.buyAriaWithRequirement', {
-              item: `${itemName}${stack}`,
-              price,
-              requirement,
-            })
-          : t('itemUi.vendor.buyAria', { item: `${itemName}${stack}`, price }),
+  if (tabs.length > 0 || searchable) {
+    el.appendChild(
+      buildGoodsFilterBar(el, vendorName, view, deps, filter, tabs, searchable, goodsGrid),
     );
-    // The count chip reuses the control row's own multiple key ({count}x), so
-    // it reads in the row's grammar (5x = five purchases) and can never sit
-    // beside the name's units-per-purchase "x5" wearing the same face; the
-    // price cell shows the whole-count total the click will charge.
-    const qtyChip = countBuy
-      ? `<span class="vi-qty">${esc(t('itemUi.vendor.qtyMultiple', { count: countText as string }))}</span>`
-      : '';
-    const priceHtml = countBuy ? deps.moneyHtml(countBuy.copper) : goodsPriceHtml(goods, deps);
-    row.innerHTML = `<span class="ui-socket ui-socket--bag">${deps.itemIcon(item)}</span><span class="vi-name" style="color:${itemNameColor(item)}">${esc(itemName)}${esc(stack)}${requirement ? `<span class="vi-sub ui-muted">${esc(requirement)}</span>` : ''}</span><span class="vi-price ui-money">${qtyChip}${priceHtml}</span>`;
-    row.dataset.focusKey = `buy:${itemId}`;
-    // Ctrl/Cmd-click requests a bulk purchase (#2374) and wins over the
-    // selected multiple (an explicit stack request), the desktop mirror of
-    // the "Buy Stack" tile below; both funnel through the same
-    // onBuy(itemId, { bulk: true }). Otherwise the click follows the
-    // selection: a fixed multiple sends its count, 'custom' opens the
-    // countFit-capped prompt (Q19), and 1x stays the plain buy.
-    row.addEventListener('click', (ev) => {
-      if (goods.ridingRank) {
-        deps.onBuy(itemId, { expectedRidingTier: goods.ridingRank === 1 ? 0 : 1 });
-      } else if (ev.ctrlKey || ev.metaKey) {
-        deps.onBuy(itemId, { bulk: true });
-      } else if (countBuy) {
-        deps.onBuy(itemId, { count: countBuy.count });
-      } else if (goods.customBuy) {
-        showBuyQuantityPrompt(el, item, deps.buyCustomMax(itemId), (count) =>
-          deps.onBuy(itemId, { count }),
-        );
-      } else {
-        deps.onBuy(itemId, undefined);
-      }
-    });
-    // No appended requirement line in the tooltip: the shared item tooltip
-    // (deps.itemTooltip -> gatherToolTooltipLines) already renders the same
-    // "Requires {craft} {skill}" sentence on every requirement-carrying
-    // tool, and the painter appending it again showed the line twice on
-    // every gated row. The at-a-glance signal stays the .vi-sub row line.
-    deps.attachTooltip(
-      row,
-      () =>
-        `${goods.ridingRank ? `<div class="tt-title">${esc(itemName)}</div><div class="tt-sub">${esc(requirement)}</div>` : deps.itemTooltip(item)}<div class="tt-sub">${esc(t('itemUi.tooltip.clickBuy'))}</div>`,
-    );
-    goodsGrid.appendChild(row);
-    // A separate, always-visible tile (never a nested <button>, never hidden
-    // behind a modifier key) so the bulk purchase is reachable identically on
-    // touch and desktop: the mobile-parity affordance for the ctrl-click
-    // gesture above. Only offered when the row actually qualifies for a bulk
-    // purchase of more than one unit (see bulkQuantity in vendor_view.ts).
-    if (goods.bulkQuantity !== undefined && goods.bulkQuantity > 1) {
-      const bulkRow = document.createElement('button');
-      bulkRow.type = 'button';
-      bulkRow.className = 'vendor-item vendor-item-bulk ui-card';
-      bulkRow.disabled = !goods.bulkAffordable;
-      const bulkCount = formatNumber(goods.bulkQuantity, { maximumFractionDigits: 0 });
-      const bulkCopper = Math.max(0, item.buyValue ?? 0) * goods.bulkQuantity;
-      const bulkPrice = formatLocalizedMoney(bulkCopper);
-      bulkRow.setAttribute(
-        'aria-label',
-        t('itemUi.vendor.buyStackAria', { item: itemName, count: bulkCount, price: bulkPrice }),
-      );
-      bulkRow.innerHTML = `<span class="ui-socket ui-socket--bag">${deps.itemIcon(item)}</span><span class="vi-name" style="color:${itemNameColor(item)}">${esc(t('itemUi.vendor.buyStack', { count: bulkCount }))}</span><span class="vi-price ui-money">${deps.moneyHtml(bulkCopper)}</span>`;
-      // Its own focus key: a keyboard bulk buy rebuilds the grid under the
-      // finger exactly like the ordinary row's buy, and without a key the
-      // restore ladder cannot find the tile again (focus fell to <body>).
-      bulkRow.dataset.focusKey = `buy-stack:${itemId}`;
-      bulkRow.addEventListener('click', () => deps.onBuy(itemId, { bulk: true }));
-      deps.attachTooltip(
-        bulkRow,
-        () =>
-          `${deps.itemTooltip(item)}<div class="tt-sub">${esc(t('itemUi.vendor.buyStack', { count: bulkCount }))}</div>`,
-      );
-      goodsGrid.appendChild(bulkRow);
-    }
   }
+  fillGoodsGrid(goodsGrid, el, view, deps, filter);
   if (view.goods.length > 0) el.appendChild(goodsGrid);
 
   const sellJunk = document.createElement('button');
@@ -479,6 +636,7 @@ export function renderVendorWindow(
   el.querySelector('[data-close]')?.addEventListener('click', () => deps.onClose());
   el.style.display = 'block';
   el.scrollTop = scrollTop;
+  if (restoreSearchCaret(el, searchCaret)) return;
   // Scroll first, then restore (the family contract): the exact control when
   // it survived the rebuild, else the stable neighbors, so a keyboard buy of
   // the last stack cannot drop focus to <body>.

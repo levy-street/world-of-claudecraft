@@ -182,7 +182,7 @@ describe('bags_window: load-bearing behaviors preserved', () => {
     // counts or section rules inline.
     expect(painter).toContain('bagQuestItemCount(');
     expect(painter).toContain('bagNoMatchKind(');
-    expect(painter).toContain('buildBagListRows(');
+    expect(painter).toContain('buildBagSectionRows(');
     expect(painter).toContain('hudChrome.bags.noQuestItems');
     expect(painter).toContain('hudChrome.bags.filterQuestCountAria');
     expect(painter).toContain('bag-chip-count');
@@ -198,18 +198,19 @@ describe('bags_window: load-bearing behaviors preserved', () => {
   });
 
   it('never inserts section headers into the manual cells drop-target stream', () => {
-    // Locked decision 7: the model.cells loop must not call buildBagListRows
-    // or buildSectionHeader. Section headers live only on the derived list path
-    // after the cells early-return.
+    // Locked decision 7: the model.cells loop must not call the row builders
+    // (buildBagSectionRows, buildBagListRows) or buildSectionHeader. Captions live
+    // only on the derived list path after the cells early-return.
     const fillStart = painter.indexOf('private fillGrid(');
     const fillEnd = painter.indexOf('private buildStackCell(');
     const fill = painter.slice(fillStart, fillEnd);
     const cellsBranch = fill.slice(
-      fill.indexOf('if (model.cells.length > 0)'),
+      fill.indexOf('if (model.cells.length > 0'),
       fill.indexOf('// Derived list:'),
     );
     expect(cellsBranch).toContain('buildStackCell');
     expect(cellsBranch).not.toContain('buildBagListRows');
+    expect(cellsBranch).not.toContain('buildBagSectionRows');
     expect(cellsBranch).not.toContain('buildSectionHeader');
     expect(cellsBranch).not.toContain('bag-section-header');
   });

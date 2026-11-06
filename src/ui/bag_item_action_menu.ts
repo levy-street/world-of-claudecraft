@@ -126,6 +126,9 @@ export interface CtxMenuSeam {
   element(): HTMLElement;
   place(el: HTMLElement, x: number, y: number, reserveRight: number, reserveBottom: number): void;
   bind(onActivate: (act: string) => void): void;
+  /** Close the popup through the HUD's own teardown (the opener and the picker
+   *  class reset), when the seam's host offers one. */
+  close?(): void;
 }
 
 /** WHICH bag copy the menu was opened on. An index alone is not enough: it is
@@ -878,20 +881,32 @@ export class BagItemActionMenu {
     if (openGroup) html += '</div>';
     el.innerHTML = html;
     el.style.display = 'block';
-    const naturalReserve = 80 + rows.length * (this.deps.isMobileLayout() ? 48 : 32);
-    // A picker box is height-capped by CSS, so reserve the capped box, not the
-    // full list estimate (the estimate ignores the UI scale divisor, which only
-    // over-reserves; keepPopupOnScreen pulls back any residual overflow).
-    const cappedReserve = this.deps.isMobileLayout()
-      ? window.innerHeight * PICKER_MAX_HEIGHT_VIEWPORT_FRACTION
-      : Math.min(
-          window.innerHeight * PICKER_MAX_HEIGHT_VIEWPORT_FRACTION,
-          PICKER_MAX_HEIGHT_DESKTOP_PX,
-        );
-    const reserveBottom = picker
-      ? Math.min(naturalReserve, Math.round(cappedReserve) + 24)
-      : naturalReserve;
-    this.deps.ctxMenu.place(el, x, y, picker ? 410 : 190, reserveBottom);
+    const reserve = ctxMenuReserve(rows.length, this.deps.isMobileLayout(), picker);
+    this.deps.ctxMenu.place(el, x, y, reserve.right, reserve.bottom);
     this.deps.ctxMenu.bind(onActivate);
   }
+}
+
+/** The room a #ctx-menu popup of `rowCount` rows reserves to the right of and
+ *  below its anchor point, shared by every painter that opens the popup (this
+ *  menu, the paperdoll slot picker). A picker box is height-capped by CSS, so it
+ *  reserves the capped box, not the full list estimate (the estimate ignores the
+ *  UI scale divisor, which only over-reserves; keepPopupOnScreen pulls back any
+ *  residual overflow). */
+export function ctxMenuReserve(
+  rowCount: number,
+  mobile: boolean,
+  picker: boolean,
+): { right: number; bottom: number } {
+  const naturalReserve = 80 + rowCount * (mobile ? 48 : 32);
+  const cappedReserve = mobile
+    ? window.innerHeight * PICKER_MAX_HEIGHT_VIEWPORT_FRACTION
+    : Math.min(
+        window.innerHeight * PICKER_MAX_HEIGHT_VIEWPORT_FRACTION,
+        PICKER_MAX_HEIGHT_DESKTOP_PX,
+      );
+  return {
+    right: picker ? 410 : 190,
+    bottom: picker ? Math.min(naturalReserve, Math.round(cappedReserve) + 24) : naturalReserve,
+  };
 }

@@ -23,10 +23,10 @@ import { guildBankRungsBought } from '../sim/guild_bank';
 import { vaultMaterialIds } from '../sim/materials_vault';
 import type { IWorld } from '../world_api';
 import * as accountBank from './account_bank_window';
+import { BAG_CATEGORY_LABEL_KEYS } from './bag_category_labels';
 import {
   BAG_CATEGORIES,
   BAG_SORTS,
-  type BagCategory,
   type BagFilterState,
   type BagSort,
   bagFilterIsDefault,
@@ -149,20 +149,9 @@ const BANK_FILTER_KEY = 'woc_bank_filter';
 // forbids here), so it self-expires rather than lingering across later data refreshes.
 const DEPOSIT_STATUS_MS = 4_000;
 
-// The category chips and sort options REUSE the bags' generic label keys (All / Weapons
-// / Recent / ...): those strings are not bags-specific, so duplicating them into the
-// catalog would only add untranslated debt. The bank adds only its OWN aria labels
+// The category chips and sort options REUSE the bags' generic label keys (the chip
+// table is shared, bag_category_labels.ts); the bank adds only its OWN aria labels
 // (filterGroupAria / sortAria / searchAria) where the bags wording names "bags".
-const BANK_CATEGORY_LABEL_KEYS: Record<BagCategory, TranslationKey> = {
-  all: 'hudChrome.bags.filterAll',
-  weapon: 'hudChrome.bags.filterWeapon',
-  armor: 'hudChrome.bags.filterArmor',
-  consumable: 'hudChrome.bags.filterConsumable',
-  material: 'hudChrome.bags.filterMaterial',
-  tool: 'hudChrome.bags.filterTool',
-  quest: 'hudChrome.bags.filterQuest',
-  mount: 'hudChrome.bags.filterMount',
-};
 const BANK_SORT_LABEL_KEYS: Record<BagSort, TranslationKey> = {
   recent: 'hudChrome.bags.sortRecent',
   quality: 'hudChrome.bags.sortQuality',
@@ -1092,7 +1081,7 @@ export class BankWindow {
         const chip = document.createElement('button');
         chip.type = 'button';
         chip.className = `bag-chip ui-chip${this.filter.category === category ? ' active' : ''}`;
-        chip.textContent = t(BANK_CATEGORY_LABEL_KEYS[category]);
+        chip.textContent = t(BAG_CATEGORY_LABEL_KEYS[category]);
         chip.setAttribute('aria-pressed', this.filter.category === category ? 'true' : 'false');
         chip.addEventListener('click', () => {
           if (this.filter.category === category) return;

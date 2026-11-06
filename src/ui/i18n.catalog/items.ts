@@ -264,6 +264,11 @@ const itemStringsEn = {
       qtyMultipleAria: 'Buy {count} at a time',
       qtyCustom: 'Custom',
       qtyCustomAria: 'Choose a custom amount to buy',
+      // The shop's goods tabs and search (vendor_goods_filter_core.ts). The tab
+      // labels and the search placeholder reuse the bag window's own keys.
+      filterGroupAria: 'Filter goods',
+      searchAria: "Search this vendor's goods",
+      noGoodsMatch: 'No goods match',
       // The count-aware row labels (acceptance: aria names qty and total
       // price). The requirement sibling folds the R22 advisory into the name
       // exactly like buyAriaWithRequirement: one combined key, never two

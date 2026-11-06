@@ -29,13 +29,14 @@ import type { MaterialComposition } from '../sim/material_sources';
 import { vaultMaterialIds } from '../sim/materials_vault';
 import type { EquipSlot, InvSlot, ItemDef, ItemInstancePayload } from '../sim/types';
 import type { IWorld } from '../world_api';
+import { BAG_CATEGORY_LABEL_KEYS } from './bag_category_labels';
 import { bagCornerMark, bagRimClasses } from './bag_corner_mark_view';
 import {
   BAG_CATEGORIES,
   BAG_SORTS,
-  type BagCategory,
   type BagFilterState,
   type BagSort,
+  bagJunkItemCount,
   bagOrderIsManual,
   bagQuestItemCount,
   DEFAULT_BAG_FILTER,
@@ -43,12 +44,27 @@ import {
   serializeBagFilter,
 } from './bag_filter';
 import { bagFineMark } from './bag_fine_mark_view';
+import { type BagGearSetIndex, buildBagGearSetIndex } from './bag_gear_sets_core';
 import { bagInstanceGlyphKind } from './bag_instance_glyph_view';
 import type { BagMenuTarget } from './bag_item_action_menu';
 import { bagItemHasContextActions } from './bag_item_context_menu';
 import { bagQuestMarkKind, bagQuestMarkProgressFromLog } from './bag_quest_mark_view';
 import { BagQuestTrackerHighlight } from './bag_quest_tracker_highlight';
 import { bagQuestTrackerHighlightId } from './bag_quest_tracker_highlight_view';
+import {
+  type BagSectionKey,
+  bagSectionClass,
+  bagSectionLabel,
+  bagSectionsReplaceCells,
+  buildBagSectionRows,
+  parseBagSectionsPref,
+} from './bag_sections_core';
+import {
+  BAG_VIEW_SIZES,
+  type BagViewSize,
+  bagViewSizeClass,
+  parseBagViewSize,
+} from './bag_view_size_core';
 import {
   type BagDestroyAction,
   type BagMode,
@@ -67,7 +83,6 @@ import {
   bankDepositOpensPrompt,
   buildBagBar,
   buildBagGrid,
-  buildBagListRows,
   carriedPools,
   materialsOnlyEmptyCells,
   resolveDepositSubmit,
@@ -138,6 +153,11 @@ import { dropOnWorld } from './world_drop_target';
 import { wornItemCellParts } from './worn_item_cell_view';
 
 const BAG_FILTER_KEY = 'woc_bag_filter';
+// The bag view size (bag_view_size_core.ts), kept apart from the filter key so an
+// older build that parses woc_bag_filter never sees a field it does not know.
+const BAG_VIEW_SIZE_KEY = 'woc_bag_view_size';
+// The All view's Sections toggle (bag_sections_core.ts), its own key like the size.
+const BAG_SECTIONS_KEY = 'woc_bag_sections';
 
 // Sort settle ripple: how long an armed settle waits for the tidied grid to
 // arrive before giving up (the bank deposit status timeout-backstop pattern:
@@ -203,15 +223,10 @@ const QUALITY_DEFAULT_COLOR = 'var(--color-quality-default)';
 // its per-copy flag (bound is the flag a player checks before trading). The
 // rim/wash/seal are salience for sighted scanning, not new information.
 
-const BAG_CATEGORY_LABEL_KEYS: Record<BagCategory, TranslationKey> = {
-  all: 'hudChrome.bags.filterAll',
-  weapon: 'hudChrome.bags.filterWeapon',
-  armor: 'hudChrome.bags.filterArmor',
-  consumable: 'hudChrome.bags.filterConsumable',
-  material: 'hudChrome.bags.filterMaterial',
-  tool: 'hudChrome.bags.filterTool',
-  quest: 'hudChrome.bags.filterQuest',
-  mount: 'hudChrome.bags.filterMount',
+const BAG_VIEW_SIZE_LABEL_KEYS: Record<BagViewSize, TranslationKey> = {
+  compact: 'hudChrome.bags.viewSizeCompact',
+  large: 'hudChrome.bags.viewSizeLarge',
+  list: 'hudChrome.bags.viewSizeList',
 };
 const BAG_SORT_LABEL_KEYS: Record<BagSort, TranslationKey> = {
   recent: 'hudChrome.bags.sortRecent',
@@ -374,6 +389,24 @@ export class BagsWindow {
       return parseBagFilter(localStorage.getItem(BAG_FILTER_KEY));
     } catch {
       return { ...DEFAULT_BAG_FILTER };
+    }
+  })();
+
+  // Presentation-only view size (compact / large / list), persisted on its own key.
+  private viewSize: BagViewSize = (() => {
+    try {
+      return parseBagViewSize(localStorage.getItem(BAG_VIEW_SIZE_KEY));
+    } catch {
+      return parseBagViewSize(null);
+    }
+  })();
+
+  // The All view's Sections toggle: off keeps the real hand-arranged cells.
+  private sectionsOn: boolean = (() => {
+    try {
+      return parseBagSectionsPref(localStorage.getItem(BAG_SECTIONS_KEY));
+    } catch {
+      return parseBagSectionsPref(null);
     }
   })();
 
@@ -830,6 +863,8 @@ export class BagsWindow {
     // Quest chip badge: total stack count of quest items (bagQuestItemCount).
     // Only painted when N > 0 so an empty bag of quest pieces stays quiet.
     const questCount = bagQuestItemCount(world.inventory, (id) => knownItemDef(ITEMS, id));
+    // Junk chip badge: what Sell Junk would take (bagJunkItemCount), same quiet-at-0 rule.
+    const junkCount = bagJunkItemCount(world.inventory, (id) => knownItemDef(ITEMS, id));
 
     const chips = document.createElement('div');
     chips.className = 'bag-chips';
@@ -847,6 +882,13 @@ export class BagsWindow {
         chip.setAttribute(
           'aria-label',
           t('hudChrome.bags.filterQuestCountAria', { count: countText }),
+        );
+      } else if (category === 'junk' && junkCount > 0) {
+        const countText = formatNumber(junkCount, { maximumFractionDigits: 0 });
+        chip.innerHTML = `${esc(label)}<span class="bag-chip-count bag-chip-count-junk" aria-hidden="true">${esc(countText)}</span>`;
+        chip.setAttribute(
+          'aria-label',
+          t('hudChrome.bags.filterJunkCountAria', { count: countText }),
         );
       } else {
         chip.textContent = label;
@@ -901,6 +943,60 @@ export class BagsWindow {
       this.render();
     });
     tools.appendChild(sort);
+
+    // The view size (compact grid, large grid, or a named list): presentation only,
+    // persisted on its own key, and it rebuilds the window so every cell repaints at
+    // the new size. Same select idiom (and focus key) as the sort beside it.
+    const size = document.createElement('select');
+    size.className = 'bag-size ui-btn';
+    size.dataset.focusKey = 'bag-size';
+    size.setAttribute('aria-label', t('hudChrome.bags.viewSizeAria'));
+    for (const option of BAG_VIEW_SIZES) {
+      const opt = document.createElement('option');
+      opt.value = option;
+      opt.textContent = t(BAG_VIEW_SIZE_LABEL_KEYS[option]);
+      size.appendChild(opt);
+    }
+    // Set after the options exist: flagging an option selected before it joins
+    // the select is not honoured by every DOM (happy-dom keeps the first one).
+    size.value = this.viewSize;
+    size.addEventListener('change', () => {
+      this.viewSize = parseBagViewSize(size.value);
+      try {
+        localStorage.setItem(BAG_VIEW_SIZE_KEY, this.viewSize);
+      } catch {
+        /* storage unavailable (private mode); the size still applies in-session */
+      }
+      audio.click();
+      this.render();
+    });
+    tools.appendChild(size);
+
+    // Sections (All view only): group the bag under category captions, with slot
+    // sub-headings under Weapons and Armor. The other tabs caption themselves.
+    if (this.filter.category === 'all') {
+      const sections = document.createElement('button');
+      sections.type = 'button';
+      sections.className = `bag-sections-btn ui-btn${this.sectionsOn ? ' active' : ''}`;
+      sections.dataset.focusKey = 'bag-sections';
+      sections.textContent = t('hudChrome.bags.sectionsButton');
+      sections.setAttribute('aria-pressed', this.sectionsOn ? 'true' : 'false');
+      this.deps.attachTooltip(
+        sections,
+        () => `<div class="tt-sub">${esc(t('hudChrome.bags.sectionsHint'))}</div>`,
+      );
+      sections.addEventListener('click', () => {
+        this.sectionsOn = !this.sectionsOn;
+        try {
+          localStorage.setItem(BAG_SECTIONS_KEY, this.sectionsOn ? 'on' : 'off');
+        } catch {
+          /* storage unavailable (private mode); the toggle still applies in-session */
+        }
+        audio.click();
+        this.render();
+      });
+      tools.appendChild(sections);
+    }
 
     // The one-shot clean-up button (world.sortInventory): unlike the view-only
     // dropdown beside it, this rearranges the REAL cells (server-side online,
@@ -968,15 +1064,20 @@ export class BagsWindow {
   // without rebuilding the filter bar and stealing input focus.
   private fillGrid(grid: HTMLElement): void {
     const world = this.deps.world();
+    // Saved loadout gear sets: Favorites lists their pieces under each set's name.
+    const gearSets = buildBagGearSetIndex(world.loadouts ?? []);
     const model = buildBagGrid(
       world.inventory,
       (id) => knownItemDef(ITEMS, id),
       this.filter,
       world.bagCapacity,
+      { gearSets },
     );
     // Settle bookkeeping rides every paint: the class never persists across a
     // repaint (each replay would re-run the animation on the fresh nodes).
     grid.classList.remove('bag-grid-settle');
+    for (const option of BAG_VIEW_SIZES) grid.classList.remove(bagViewSizeClass(option));
+    grid.classList.add(bagViewSizeClass(this.viewSize));
     const settle = this.consumeSortSettle(bagSortSignature(world.inventory));
     if (model.state === 'empty') {
       grid.innerHTML = `<div class="bag-empty">${esc(t('itemUi.bags.empty'))}</div>`;
@@ -1000,7 +1101,7 @@ export class BagsWindow {
     // Soft Quest section headers are NEVER inserted here: bagOrderIsManual is true,
     // and a header node in the cell stream would shift bagIndex drop targets
     // (state.md locked decision 7). Rim/seal alone marks quest stacks in this view.
-    if (model.cells.length > 0) {
+    if (model.cells.length > 0 && !bagSectionsReplaceCells(this.filter, this.sectionsOn)) {
       // The trailing empties past the general pool's headroom are painted as
       // materials-only squares (issue #3795): counted down from the END so
       // exactly generalFree plain empties remain, wherever the holes sit.
@@ -1034,18 +1135,20 @@ export class BagsWindow {
       if (settle) this.applySortSettle(grid);
       return;
     }
-    // Derived list: soft Quest section headers only when buildBagListRows allows
-    // them (not manual All+recent; mixed quest + non-quest). Section rows are not
-    // drop targets and carry no bag cell index. No `continue` in this loop: the
-    // R34 pin holds fillGrid to zero continues so an unknown stack can never be
-    // skipped (tests/bags_window.test.ts).
-    for (const row of buildBagListRows(
+    // Derived list: captions from bag_sections_core.ts (slot sub-headings on
+    // Weapons and Armor, gear sets on Favorites, categories on All with Sections
+    // on, else the soft Quest caption buildBagListRows always allowed). Caption
+    // rows are not drop targets and carry no bag cell index. No `continue` in
+    // this loop: the R34 pin holds fillGrid to zero continues so an unknown
+    // stack can never be skipped (tests/bags_window.test.ts).
+    for (const row of buildBagSectionRows(
       model.visible,
       (id) => knownItemDef(ITEMS, id),
       this.filter,
+      { sectionsOn: this.sectionsOn, gearSets },
     )) {
       if (row.kind === 'section') {
-        grid.appendChild(this.buildSectionHeader(row.section));
+        grid.appendChild(this.buildSectionHeader(row.key, row.level, gearSets));
       } else {
         const s = row.slot;
         const item = knownItemDef(ITEMS, s.itemId);
@@ -1054,18 +1157,32 @@ export class BagsWindow {
         );
       }
     }
-    for (let i = 0; i < model.emptyCells; i++) grid.appendChild(this.buildEmptyCell(null));
+    // The free squares trail the list. In Sections mode they are the whole bag's
+    // free space, so the last ones keep their materials-only mark (issue #3795),
+    // counted the same way the cells branch counts them.
+    const materialsOnlyTail =
+      model.emptyCells > 0
+        ? materialsOnlyEmptyCells(world.bags, world.inventory, model.emptyCells)
+        : 0;
+    for (let i = 0; i < model.emptyCells; i++) {
+      grid.appendChild(this.buildEmptyCell(null, i >= model.emptyCells - materialsOnlyTail));
+    }
     if (settle) this.applySortSettle(grid);
   }
 
-  // Soft parchment section caption for a derived bag list (Quest grouping). Not a
-  // drop target, not focusable, not counted as a bag cell.
-  private buildSectionHeader(_section: 'quest'): HTMLElement {
+  // Soft parchment caption for a derived bag list. Not a drop target, not
+  // focusable, not counted as a bag cell. A gear-set caption is the player's own
+  // loadout name, set as text (never parsed as markup, never routed through t()).
+  private buildSectionHeader(
+    key: BagSectionKey,
+    level: 1 | 2,
+    gearSets: BagGearSetIndex,
+  ): HTMLElement {
     const el = document.createElement('div');
-    el.className = 'bag-section-header bag-section-quest';
+    el.className = `bag-section-header ${bagSectionClass(key)}${level === 2 ? ' bag-section-sub' : ''}`;
     el.setAttribute('role', 'presentation');
-    // Reuse the Quest chip label so the section and filter share one string.
-    el.textContent = t(BAG_CATEGORY_LABEL_KEYS.quest);
+    const label = bagSectionLabel(key, gearSets);
+    el.textContent = 'text' in label ? label.text : t(label.key, label.values);
     return el;
   }
 
@@ -1157,7 +1274,7 @@ export class BagsWindow {
       // .bi-quest-seal-ready (static; optional pulse is CSS-only).
       const cornerSeal = cornerMarkHtml(cornerMark, { questReady });
       const lockSeal = lockMarkHtml(locked);
-      row.innerHTML = `${this.deps.itemIcon(item, parts.quality)}${parts.qualityBadge}${cornerSeal}${lockSeal}<span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
+      row.innerHTML = `${this.deps.itemIcon(item, parts.quality)}${parts.qualityBadge}${cornerSeal}${lockSeal}<span class="bi-name" aria-hidden="true">${esc(itemName)}</span><span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
       // An item mid-cooldown (the firebottle's 5s throw pacing, the faction
       // quartermaster goods in ITEM_BASE_COOLDOWNS) paints a draining curtain on
       // its slot. The bag is a cold window with no per-frame driver, so the sweep
@@ -1556,7 +1673,7 @@ export class BagsWindow {
     // marks are def-free (instance payload only) and do apply, minted through
     // the shared item_instance_glyph_mark helper.
     const instanceMark = instanceGlyphMarkHtml(glyphKind);
-    row.innerHTML = `${unknownItemIconHtml(s.itemId)}${instanceMark}<span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
+    row.innerHTML = `${unknownItemIconHtml(s.itemId)}${instanceMark}<span class="bi-name" aria-hidden="true">${esc(s.itemId)}</span><span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
     if (canDeposit) {
       row.addEventListener('click', (ev) => {
         // The same peek and trailing-synthetic-click dance as the known cell:
@@ -1718,8 +1835,15 @@ export class BagsWindow {
     if (to === null || !bagOrderIsManual(this.filter)) {
       // A filtered / searched / sorted grid is a derived LIST: its squares hold no bag
       // position, so a drop there would move a stack the player never aimed at. Say so
-      // instead of doing nothing, which is indistinguishable from a broken drag.
-      this.deps.showError(t('hudChrome.bags.reorderNeedsRecent'));
+      // instead of doing nothing, which is indistinguishable from a broken drag. With
+      // Sections on, the plain All view is a list too, and the fix is the toggle.
+      this.deps.showError(
+        t(
+          bagOrderIsManual(this.filter) && this.sectionsOn
+            ? 'hudChrome.bags.reorderNeedsSectionsOff'
+            : 'hudChrome.bags.reorderNeedsRecent',
+        ),
+      );
       return;
     }
     const world = this.deps.world();

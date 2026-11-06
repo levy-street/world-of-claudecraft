@@ -9,6 +9,7 @@ import {
   BAG_CATEGORIES,
   type BagFilterState,
   bagFilterIsDefault,
+  bagJunkItemCount,
   bagOrderIsManual,
   bagQuestItemCount,
   DEFAULT_BAG_FILTER,
@@ -366,8 +367,10 @@ describe('BAG_CATEGORIES', () => {
       'armor',
       'consumable',
       'material',
-      'tool',
       'quest',
+      'favourite',
+      'junk',
+      'tool',
       'mount',
     ]);
   });
@@ -501,9 +504,13 @@ describe('chip reachability census: the All-only set, pinned', () => {
   // the same reason the apex set is here: a kind 'recipe' teaching item is not
   // gear, a consumable, or a material, so it matches no chip and reaching it
   // through All is the settled behavior rather than a gap.
+  // The Junk chip (2026-11, the bag tabs change) rescued every grey
+  // vendor-sellable oddment the 2026-08-01 settlement had left All-only: it
+  // matches exactly what Sell Junk sells (junkSellableSlot), so the poor trash
+  // and trophy leftovers (bogiron_nugget, chipped_tusk, cracked_fetish, the
+  // pearls, the soggy footwear, ...) now have a home and left this list.
   const ALL_ONLY = [
     'allied_vanguard_duffel',
-    'amber_hide',
     // masterwrought Phase 11l removed the five promoted trophy drops
     // (bandit_bandana, cracked_ogre_tusk, cracked_wyrm_scale, mudfin_scale,
     // tallow_candle): the trophy recipes are their consumers, so all five
@@ -511,26 +518,14 @@ describe('chip reachability census: the All-only set, pinned', () => {
     // review round removed emberwing_cinderscale and old_cragmaws_pelt the
     // same way: the two leather trophy recipes consume them, so both derive
     // IN too.
-    // Back since the 11l QA output-excluded it (with the cracked fetish
-    // below): no recipe consumes the bogiron nugget, so it is poor grey
-    // trash outside the material set again, All-only exactly as before the
-    // phase.
-    'bogiron_nugget',
-    'briny_idol',
     'burlap_reagent_pouch',
-    // Back since the phase's sixth fix round output-excluded it: no recipe
-    // consumes the chipped tusk, so it is poor grey trash outside the
-    // material set again, All-only exactly as before the phase.
-    'chipped_tusk',
     'clockwork_tinkers_pack', // the Automaton quartermaster's bag
-    'cracked_fetish',
     'dawnhold_posy',
     // Masterwrought Phase 13 (2026-08-27): the promotion writ, rare
     // kind-junk consumed by the promotion itself (no use/equip/place
     // predicate claims it), so it reads under All exactly like the other
     // ruled junk; the Materials chip correctly skips a non-material.
     'deed_of_making',
-    'deepfen_pearl',
     'duskweave_bag',
     'foragers_haversack',
     // Formula scrolls follow the existing bag-side kind-'recipe' ruling.
@@ -542,7 +537,6 @@ describe('chip reachability census: the All-only set, pinned', () => {
     'formula_lastflame_zeal',
     'formula_piston_drive',
     'formula_riftwalkers_grace',
-    'frayed_prayer_beads',
     'gleamstag_charm',
     'gravewoven_bag',
     'guardian_core',
@@ -550,16 +544,12 @@ describe('chip reachability census: the All-only set, pinned', () => {
     // click PLACES (never uses or equips), so no chip predicate claims it;
     // All-only is the honest home (the tonic settlement's shape).
     'harvest_feast',
-    'inert_storm_shard',
     'last_keep_signet',
     'linen_pouch',
     'loombound_reagent_satchel',
     'membership_token',
     'mistcallers_duffel',
-    'moonpale_scale',
     'necromancers_reagent_satchel',
-    'ogre_toe_ring',
-    'pale_pearl',
     // Masterwrought phase 11: the 28 apex patterns. Kind 'recipe' is
     // deliberately All-only in the BAG window (the phase 02 chip-count
     // restraint decision, first to revisit if the chip rail earns another
@@ -643,10 +633,6 @@ describe('chip reachability census: the All-only set, pinned', () => {
     'sageleaf_feast',
     'schematic_clockwork_shock_bomb',
     'silkspun_satchel',
-    'soft_down',
-    'soggy_boot',
-    'soggy_moccasin',
-    'stag_antler',
     'stonepot_feast',
     // Masterwrought phase 08: the apex bag joins the bag-kind rows;
     // forgefold_plating, sunspun_bolt, wyrmfall_core, and wyrmhide_cording
@@ -655,7 +641,6 @@ describe('chip reachability census: the All-only set, pinned', () => {
     // seasoned_stock, whose consumers are the apex role foods and the Laden
     // Hearth.
     'sunspun_haversack',
-    'tangled_weed',
     'travelers_knapsack',
     'warspice_feast',
     'wayfarers_backpack',
@@ -668,5 +653,60 @@ describe('chip reachability census: the All-only set, pinned', () => {
       .map((d) => d.id)
       .sort();
     expect(allOnly).toEqual([...ALL_ONLY]);
+  });
+});
+
+describe('matchesCategory: the slot-aware Favourites and Junk chips', () => {
+  const locked = { count: 1, instance: { locked: true } };
+  const plain = { count: 1 };
+
+  it('Favourites is exactly a player-locked copy, whatever its kind', () => {
+    expect(matchesCategory(ITEMS.blade, 'favourite', locked)).toBe(true);
+    expect(matchesCategory(ITEMS.potion, 'favourite', locked)).toBe(true);
+    expect(matchesCategory(ITEMS.blade, 'favourite', plain)).toBe(false);
+    expect(
+      matchesCategory(ITEMS.blade, 'favourite', { count: 1, instance: { signer: 'Ana' } }),
+    ).toBe(false);
+    // A def alone is never a favourite: the lock lives on the copy.
+    expect(matchesCategory(ITEMS.blade, 'favourite')).toBe(false);
+  });
+
+  it('Junk is exactly what Sell Junk would sell (junkSellableSlot)', () => {
+    expect(matchesCategory(ITEMS.pelt, 'junk', plain)).toBe(true);
+    // A locked gray copy is protected from the sweep, so it is not junk...
+    expect(matchesCategory(ITEMS.pelt, 'junk', locked)).toBe(false);
+    // ...and it is a favourite instead.
+    expect(matchesCategory(ITEMS.pelt, 'favourite', locked)).toBe(true);
+    // A bound gray copy cannot be sold either.
+    expect(matchesCategory(ITEMS.pelt, 'junk', { count: 1, instance: { boundTo: 7 } })).toBe(false);
+    // Non-gray items are never junk.
+    expect(matchesCategory(ITEMS.dagger, 'junk', plain)).toBe(false);
+    expect(matchesCategory(ITEMS.relic, 'junk', plain)).toBe(false);
+    // Without a slot the def is judged as one plain copy.
+    expect(matchesCategory(ITEMS.pelt, 'junk')).toBe(true);
+  });
+
+  it('applyBagFilter reads each stack copy for the slot-aware chips', () => {
+    const inv: InvSlot[] = [
+      { itemId: 'pelt', count: 3 },
+      { itemId: 'pelt', count: 1, instance: { locked: true } },
+      { itemId: 'blade', count: 1, instance: { locked: true } },
+      { itemId: 'blade', count: 1 },
+    ];
+    const favourite = applyBagFilter(inv, lookup, { ...DEFAULT_BAG_FILTER, category: 'favourite' });
+    expect(favourite).toEqual([inv[1], inv[2]]);
+    const junk = applyBagFilter(inv, lookup, { ...DEFAULT_BAG_FILTER, category: 'junk' });
+    expect(junk).toEqual([inv[0]]);
+  });
+
+  it('bagJunkItemCount sums the counts of sellable junk stacks only', () => {
+    const inv: InvSlot[] = [
+      { itemId: 'pelt', count: 3 },
+      { itemId: 'pelt', count: 2, instance: { locked: true } },
+      { itemId: 'blade', count: 1 },
+      { itemId: 'no_such_item', count: 9 },
+    ];
+    expect(bagJunkItemCount(inv, lookup)).toBe(3);
+    expect(bagJunkItemCount([], lookup)).toBe(0);
   });
 });

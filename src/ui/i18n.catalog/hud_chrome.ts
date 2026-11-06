@@ -4762,6 +4762,14 @@ export const hudChromeStrings = {
     trinketSlot: 'Trinket',
     unequipAria: 'Unequip {item}',
     unequipHint: 'Click ×, right-click, or drag to bags to unequip',
+    // The slot picker (slot_picker_controller.ts): click a slot to list what fits.
+    pickerHint: 'Click to see what you can equip here',
+    pickerTitle: 'Equip: {slot}',
+    pickerEmpty: 'Nothing in your bags fits this slot',
+    pickerItemLevel: 'Item Level {n}',
+    pickerDeltaUp: '+{n}',
+    pickerDeltaDown: '-{n}',
+    pickerDeltaSame: '=',
     // The helmet-visibility eye on the head socket: each string is the action
     // the press performs (so the shown-state button says "Hide helmet").
     hideHelmAria: 'Hide helmet',
@@ -5312,6 +5320,7 @@ export const hudChromeStrings = {
     // that grid is a derived list, its squares hold no bag position, so honoring the drop
     // would move a stack the player never aimed at. Say so instead of doing nothing.
     reorderNeedsRecent: 'Clear the filter and sort by Recent to rearrange your bags',
+    reorderNeedsSectionsOff: 'Turn Sections off to rearrange your bags',
     // Refusal when a drag would move a locked stack, or drop onto one: a locked
     // item is pinned to its bag slot (src/sim/inventory_order.ts isCellPinned).
     reorderLocked: 'Locked items stay in their bag slot. Unlock it to move it.',
@@ -5357,7 +5366,27 @@ export const hudChromeStrings = {
     // visible count badge is aria-hidden, so this whole phrase carries the
     // number for assistive tech. {count} is already formatNumber'd by the host.
     filterQuestCountAria: 'Quest, {count} items',
+    // The player's locked copies (src/sim/item_lock.ts): the lock IS the
+    // favorite mark, so this chip shows exactly what Lock Item protected.
+    filterFavourite: 'Favorites',
+    // Exactly what the vendor's Sell Junk would sell (junkSellableSlot).
+    filterJunk: 'Junk',
+    // Accessible name for the Junk chip when it has a count badge (the badge
+    // itself is aria-hidden). {count} is already formatNumber'd by the host.
+    filterJunkCountAria: 'Junk, {count} items',
     filterMount: 'Mounts',
+    // The bag view size select (bag_view_size_core.ts): presentation only.
+    viewSizeAria: 'Bag view size',
+    viewSizeCompact: 'Compact',
+    viewSizeLarge: 'Large',
+    viewSizeList: 'List',
+    // Bag captions (bag_sections_core.ts). Slot captions reuse the itemUi.slots keys.
+    sectionsButton: 'Sections',
+    sectionsHint: 'Group your bags under headings by item type and slot',
+    sectionOneHand: 'One-Hand',
+    sectionOther: 'Other',
+    sectionLocked: 'Locked',
+    sectionGearSetFallback: 'Set {n}',
     sortAria: 'Sort bag items',
     sortRecent: 'Recent',
     sortQuality: 'Quality',

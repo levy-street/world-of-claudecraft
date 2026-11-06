@@ -356,3 +356,36 @@ describe('filterBankSlots: a copy CHOSEN name is what search and the name-sort r
 
 // The "showing everything" predicate is the shared bagFilterIsDefault, consolidated
 // into bag_filter.ts (one copy for bags and bank) and pinned in bag_filter.test.ts.
+
+describe('filterBankSlots: the slot-aware Favorites and Junk chips', () => {
+  const slot = (
+    slotIndex: number,
+    itemId: string,
+    instance?: BankSlotModel['instance'],
+  ): BankSlotModel => ({
+    slotIndex,
+    itemId,
+    count: 1,
+    showCount: false,
+    qualityKey: 'common',
+    instance,
+  });
+  const models = [
+    slot(3, 'pelt'),
+    slot(8, 'pelt', { locked: true }),
+    slot(11, 'blade', { locked: true }),
+    slot(14, 'blade'),
+  ];
+
+  it('Favorites keeps exactly the locked copies, with their real slot indices', () => {
+    expect(
+      indices(filterBankSlots(models, lookup, state({ category: 'favourite' }), nameOf)),
+    ).toEqual([8, 11]);
+  });
+
+  it('Junk keeps exactly the unlocked grey copy (what Sell Junk would take)', () => {
+    expect(indices(filterBankSlots(models, lookup, state({ category: 'junk' }), nameOf))).toEqual([
+      3,
+    ]);
+  });
+});

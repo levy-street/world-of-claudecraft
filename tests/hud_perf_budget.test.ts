@@ -1046,6 +1046,14 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
     reflowAllow: { '.getBoundingClientRect': 1 },
     driverAllow: {},
   },
+  // The paperdoll slot picker: ONE slot-row rect, read only when the picker is
+  // opened from the keyboard (there is no pointer to anchor to). One read per
+  // press, never on a repaint; a click anchors on the event's own coordinates.
+  {
+    file: 'slot_picker_controller.ts',
+    reflowAllow: { '.getBoundingClientRect': 1 },
+    driverAllow: {},
+  },
   // The scroll pair is the shape repeated across the windows: read the position before a
   // rebuild, write it back after, so the list does not jump under the player. Legitimate and
   // stable, granted per file, and the count is what makes a THIRD read in the same file (the

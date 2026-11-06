@@ -75,6 +75,7 @@ function deps(overrides: Partial<VendorWindowDeps> = {}): VendorWindowDeps {
     buyCustomMax: () => 0,
     onBuyBack: () => {},
     onSellJunk: () => {},
+    onFilterChange: () => {},
     onClose: () => {},
     sellJunk: { enabled: false, proceeds: 0 },
     ...overrides,

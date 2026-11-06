@@ -177,7 +177,7 @@ import {
   isToggleAuraKind,
 } from './auras_view';
 import { claudiumLauncherHtml } from './bag_currency_html';
-import { BagItemActionMenu, CTX_MENU_PICKER_CLASS } from './bag_item_action_menu';
+import { BagItemActionMenu, CTX_MENU_PICKER_CLASS, type CtxMenuSeam } from './bag_item_action_menu';
 import { bagSlotsLineKey, bagsWindowShown } from './bags_view';
 import { BagsWindow, dismissBagPrompts } from './bags_window';
 import { BankWindow } from './bank_window';
@@ -660,7 +660,7 @@ import {
   sellJunkButtonState,
   type VendorMultiple,
 } from './hud/vendor/vendor_view';
-import { renderVendorWindow } from './hud/vendor/vendor_window';
+import { renderVendorWindow, resetVendorGoodsFilter } from './hud/vendor/vendor_window';
 import { buildWarfareVendorView, warfareShopViewer } from './hud/vendor/warfare_vendor_view';
 import {
   renderWarfareVendorWindow,
@@ -5290,17 +5290,20 @@ export class Hud {
   // Composes the shared #ctx-menu popup family (placePopupAt + keepPopupOnScreen,
   // bindContextMenuActions) and the one confirm-dialog family; the bags window
   // opens it via the openItemActionMenu dep above.
+  // One #ctx-menu seam, shared by the bag item menu and the paperdoll slot picker.
+  private readonly ctxMenuSeam: CtxMenuSeam = {
+    element: () => $('#ctx-menu'),
+    place: (element, x, y, reserveRight, reserveBottom) => {
+      this.placePopupAt(element, x, y, reserveRight, reserveBottom);
+      this.keepPopupOnScreen(element);
+    },
+    bind: (onActivate) => this.bindContextMenuActions(onActivate),
+    close: () => this.closeContextMenu(),
+  };
   private readonly bagItemActionMenu = new BagItemActionMenu({
     openMaterialSources: openMaterialSourcesDialog,
     world: () => this.sim,
-    ctxMenu: {
-      element: () => $('#ctx-menu'),
-      place: (element, x, y, reserveRight, reserveBottom) => {
-        this.placePopupAt(element, x, y, reserveRight, reserveBottom);
-        this.keepPopupOnScreen(element);
-      },
-      bind: (onActivate) => this.bindContextMenuActions(onActivate),
-    },
+    ctxMenu: this.ctxMenuSeam,
     confirmDialog: (title, body, okText, cancelText, onOk) =>
       this.confirmDialog(title, body, okText, cancelText, onOk),
     slotName: (slot) => itemSlotName(slot),
@@ -5734,6 +5737,9 @@ export class Hud {
     dragState: this.itemDragState,
     renderBags: () => this.renderBags(),
     showError: (text) => this.showError(text),
+    ctxMenu: this.ctxMenuSeam,
+    isMobileLayout: () => this.isMobileLayout(),
+    consumePeek: () => this.peekGuard.consume(),
     helmSlotAvailable: () => helmSlotAvailableForEntity(this.sim.player, modularLookFor),
     helmHidden: () => this.sim.player?.helmHidden ?? false,
     toggleHelm: () => {
@@ -14408,6 +14414,7 @@ export class Hud {
     // still aims at the previous merchant and the window repaints under a
     // held inert.
     dismissBuyQuantityPrompts($('#vendor-window'));
+    resetVendorGoodsFilter($('#vendor-window'));
     this.openVendorNpcId = npcId;
     this.vendorQtyMultiple = 1;
     document.body.classList.add('vendor-open');
@@ -14470,6 +14477,7 @@ export class Hud {
           this.vendorQtyMultiple = multiple;
           this.renderVendor();
         },
+        onFilterChange: () => this.renderVendor(),
         // The custom prompt's cap (Q19): the sim's own bag-fit math in row
         // units, read from the live IWorld inventory at click time. An
         // unknown id (a stale bundle behind the server) caps at 0 and the

@@ -1708,6 +1708,15 @@
     justify-content: center;
     position: relative;
   }
+  /* On the player's own sheet a press opens the slot picker
+     (slot_picker_controller.ts); the inspect window's rows have no picker. */
+  #char-window .equip-slot[data-equip-slot] {
+    cursor: var(--cursor-point);
+  }
+  #char-window .equip-slot[data-equip-slot]:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
   /* Fixed-width text box so every row unit is the same width and its icon lands at
      the identical x within the column (part of the centering contract). */
   .equip-slot > div {
@@ -8297,6 +8306,40 @@
     opacity: 0.5;
     cursor: default;
   }
+  /* The shop's goods tabs and search (vendor_goods_filter_core.ts): the bag
+     window's own chips and search field, stacked above the goods grid. */
+  .vendor-filter-bar {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0 0 8px;
+  }
+  .vendor-filter-bar .vendor-search {
+    width: 100%;
+    box-sizing: border-box;
+  }
+  /* A slot heading inside the goods grid (the bag caption's look). Pixel line
+     height and minimum so the row can never collapse to its border. */
+  .vendor-goods-caption {
+    grid-column: 1 / -1;
+    box-sizing: border-box;
+    min-height: 18px;
+    margin: 4px 0 0;
+    padding: 2px 4px 1px;
+    font-family: var(--ui-font);
+    font-size: 10px;
+    font-weight: 600;
+    line-height: 13px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text-light);
+    border-bottom: 1px solid color-mix(in srgb, var(--color-text-light) 35%, transparent);
+    pointer-events: none;
+    user-select: none;
+  }
+  .vendor-goods-grid .vendor-goods-none {
+    grid-column: 1 / -1;
+  }
   .vendor-section-title {
     margin-top: 8px;
     padding-top: 7px;
@@ -9492,6 +9535,67 @@
   .bag-item:hover {
     filter: brightness(1.25);
   }
+  /* Bag view size (src/ui/bag_view_size_core.ts; the painter stamps one
+     .bag-size-* class on .bag-grid). Presentation only: every size keeps the
+     real cell order and drop indices. Compact is the classic grid above, so it
+     needs no rule. The item name rides every stack cell but only List shows it
+     (the cell's accessible name already carries it, so it is aria-hidden). */
+  .bag-item .bi-name {
+    display: none;
+  }
+  .bag-grid.bag-size-large {
+    grid-template-columns: repeat(auto-fill, minmax(var(--socket-size-bag-large), 1fr));
+  }
+  /* The cell is a .ui-socket--bag, whose width/height come from --ui-socket-size
+     (library.css), so the larger grid re-points that one variable. */
+  .bag-grid.bag-size-large .bag-item {
+    --ui-socket-size: var(--socket-size-bag-large);
+  }
+  .bag-grid.bag-size-list {
+    grid-template-columns: repeat(auto-fill, minmax(var(--bag-list-row-min), 1fr));
+  }
+  /* List rows: the icon keeps a square on the leading edge and the name fills
+     the rest. Every mark is pinned to that icon square, so a corner glyph, the
+     lock, the quality badge, the count and a cooldown curtain all read exactly
+     as they do on a grid cell. Empty squares stay as blank rows: each is a real
+     cell, so dragging a stack onto one still parks it there. */
+  .bag-grid.bag-size-list .bag-item {
+    width: auto;
+    height: auto;
+    aspect-ratio: auto;
+    min-height: calc(var(--bag-list-icon) + 4px);
+    padding: 0 6px 0 calc(var(--bag-list-icon) + 10px);
+    display: flex;
+    align-items: center;
+    text-align: start;
+  }
+  .bag-grid.bag-size-list .bag-item .item-icon {
+    width: var(--bag-list-icon);
+    height: var(--bag-list-icon);
+  }
+  .bag-grid.bag-size-list .bag-item .bi-name {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 12px;
+    color: var(--bag-slot-quality, var(--color-text-light));
+  }
+  .bag-grid.bag-size-list .bag-item > .loot-quality-badge {
+    right: auto;
+    left: calc(var(--bag-list-icon) + 1px);
+    transform: translateX(-100%);
+  }
+  .bag-grid.bag-size-list .bag-item .bi-count {
+    right: auto;
+    left: 2px;
+    width: var(--bag-list-icon);
+    text-align: end;
+  }
+  .bag-grid.bag-size-list .bag-item .bag-cd-curtain {
+    right: auto;
+    width: calc(var(--bag-list-icon) + 4px);
+  }
   /* An unknown-id stack (stale-client fallback cell) exposes no click action,
      so it must not wear the click affordance: no hover lift, and the themed
      arrow cursor WHENEVER the cell is not draggable (trade or vendor open).
@@ -9930,10 +10034,13 @@
     background: color-mix(in srgb, var(--color-quest) 85%, var(--color-keyline));
     color: var(--color-keyline);
   }
-  /* Soft Quest section header in a derived bag list only (not All+recent
-     manual cells). Thin parchment caption using quest gold; not a drop
-     target. Spans the full grid row via grid-column. */
+  /* Section captions in a derived bag list only (never the All+recent manual
+     cells unless Sections is on; bag_sections_core.ts). Thin parchment
+     caption, not a drop target, spanning the full grid row via grid-column.
+     The neutral base serves slot and category captions; Quest keeps its gold,
+     a gear set reads gold like the loadout it came from, and Junk greys out. */
   .bag-grid .bag-section-header {
+    --bag-section-ink: var(--color-text-light);
     grid-column: 1 / -1;
     margin: 4px 0 2px;
     padding: 2px 4px 1px;
@@ -9942,10 +10049,54 @@
     font-weight: 600;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: var(--color-quest);
-    border-bottom: 1px solid color-mix(in srgb, var(--color-quest) 35%, transparent);
+    color: var(--bag-section-ink);
+    border-bottom: 1px solid color-mix(in srgb, var(--bag-section-ink) 35%, transparent);
     pointer-events: none;
     user-select: none;
+    /* Never overflow:hidden here: it drops a grid item's automatic minimum
+       height to zero, and inside the height-capped scrolling grid the caption
+       row then collapses to its border. A long loadout name wraps instead. */
+    box-sizing: border-box;
+    line-height: 12px;
+    min-height: 16px;
+    overflow-wrap: anywhere;
+  }
+  .bag-grid .bag-section-header.bag-section-quest {
+    --bag-section-ink: var(--color-quest);
+  }
+  .bag-grid .bag-section-header.bag-section-gearset {
+    --bag-section-ink: var(--gold);
+    /* A loadout name is the player's own text: keep its case. */
+    text-transform: none;
+    letter-spacing: 0.02em;
+  }
+  .bag-grid .bag-section-header.bag-section-junk {
+    --bag-section-ink: var(--color-quality-poor);
+  }
+  /* A slot caption nested under a category caption (All with Sections on). */
+  .bag-grid .bag-section-header.bag-section-sub {
+    --bag-section-ink: var(--color-text-muted);
+    margin: 2px 0 1px 8px;
+    font-size: 9px;
+    line-height: 11px;
+    min-height: 15px;
+    border-bottom-style: dotted;
+  }
+  .bag-sections-btn {
+    flex: none;
+    cursor: var(--cursor-point);
+    white-space: nowrap;
+  }
+  .bag-sections-btn.active {
+    color: var(--gold);
+    border-color: var(--gold-dim);
+  }
+  .bag-sections-btn:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  body.mobile-touch .bag-sections-btn {
+    min-height: 40px;
   }
   body.mobile-touch .bag-chip {
     min-height: 40px;
@@ -9954,7 +10105,8 @@
   body.mobile-touch .bag-search {
     min-height: 40px;
   }
-  body.mobile-touch .bag-sort {
+  body.mobile-touch .bag-sort,
+  body.mobile-touch .bag-size {
     min-height: 40px;
   }
   .bag-tools {
@@ -9974,7 +10126,9 @@
     outline: 2px solid var(--color-border-focus);
     outline-offset: 2px;
   }
-  .bag-sort {
+  /* The view-size select (bag_view_size_core.ts) rides the sort select shape. */
+  .bag-sort,
+  .bag-size {
     flex: none;
     cursor: var(--cursor-point);
   }

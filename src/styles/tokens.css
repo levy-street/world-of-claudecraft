@@ -1026,6 +1026,11 @@
     --socket-row-gap: 6px;
     --socket-art-inset: 1px;
     --socket-size-bag: 40px;
+    /* The bag view sizes (src/ui/bag_view_size_core.ts): the Large grid's socket
+       and the List view's row (minimum row width and its leading icon). */
+    --socket-size-bag-large: 56px;
+    --bag-list-row-min: 170px;
+    --bag-list-icon: 40px;
     --socket-size-bank: 32px;
     --socket-size-stance: 40px;
     --action-rail-w: calc(12 * var(--socket-size) + 11 * var(--socket-gap));
