@@ -68,10 +68,11 @@ export const BREATH_MODEL_CROWN = 9.37;
 /** The template's scale (content/smith_heart.ts heart_breath_guardian). */
 export const BREATH_BODY_SCALE = 3.4;
 
-/** The drawn height at scale 1: the whole body about thirteen yards, the
- *  crown some twelve over the Cornice, six players and more (the provisional
- *  body stood three and a half). */
-export const BREATH_BODY_HEIGHT = 3.75;
+/** The drawn height at scale 1: the whole body some eighteen yards, the
+ *  crown about seventeen over the Cornice, near nine players (the provisional
+ *  body stood three and a half; the Heat guardian's crown is about eighteen
+ *  over its lava): as imposing as the Heat. */
+export const BREATH_BODY_HEIGHT = 5.3;
 
 /** Yards a model unit is drawn at. */
 export const BREATH_YD_PER_UNIT = (BREATH_BODY_HEIGHT * BREATH_BODY_SCALE) / BREATH_MODEL_UNITS;
@@ -240,6 +241,10 @@ export interface BreathCurrent {
   /** A soft body strand: wide, smooth, glowing from within (the volume the
    *  torn filaments stream over), not a filament. */
   soft?: boolean;
+  /** Billows of storm air along it (breath_wind_volume.ts): how many, and
+   *  their size (model units, per path point). The body's solid volume. */
+  puffs?: number;
+  puffSize?: readonly number[];
 }
 
 export const BREATH_CURRENTS: readonly BreathCurrent[] = [
@@ -254,6 +259,8 @@ export const BREATH_CURRENTS: readonly BreathCurrent[] = [
     width: 0.55,
     alpha: 0.62,
     spin: 0.32,
+    puffs: 16,
+    puffSize: [1.4, 2.5, 2.0, 1.6, 1.35, 1.1, 0.9],
     tailCurl: true,
   },
   // The arms: out of the chest, through the empty shoulder and elbow, along
@@ -267,6 +274,8 @@ export const BREATH_CURRENTS: readonly BreathCurrent[] = [
     width: 0.38,
     alpha: 0.58,
     spin: 0.42,
+    puffs: 7,
+    puffSize: [1.7, 1.4, 1.1, 1.0, 0.95, 0.6],
   },
   {
     id: 'armR',
@@ -277,6 +286,8 @@ export const BREATH_CURRENTS: readonly BreathCurrent[] = [
     width: 0.38,
     alpha: 0.58,
     spin: -0.42,
+    puffs: 7,
+    puffSize: [1.7, 1.4, 1.1, 1.0, 0.95, 0.6],
   },
   // The shoulders: the air the pauldrons float on, up to their crystals.
   {
@@ -288,6 +299,8 @@ export const BREATH_CURRENTS: readonly BreathCurrent[] = [
     width: 0.48,
     alpha: 0.5,
     spin: 0.3,
+    puffs: 3,
+    puffSize: [1.5, 1.8, 1.7, 0.9],
   },
   {
     id: 'shoulderR',
@@ -298,6 +311,8 @@ export const BREATH_CURRENTS: readonly BreathCurrent[] = [
     width: 0.48,
     alpha: 0.5,
     spin: -0.3,
+    puffs: 3,
+    puffSize: [1.5, 1.8, 1.7, 0.9],
   },
   // The neck and the head: up behind the mask to its crown and the halo.
   {
@@ -309,6 +324,8 @@ export const BREATH_CURRENTS: readonly BreathCurrent[] = [
     width: 0.42,
     alpha: 0.45,
     spin: 0.36,
+    puffs: 3,
+    puffSize: [1.6, 1.4, 1.2, 1.0, 0.6],
   },
   // The volume under the filaments: wide soft strands of glowing air down
   // the trunk and the tail, along the arms and over the shoulders.
@@ -388,6 +405,14 @@ export function breathRibbonKept(current: BreathCurrent, ribbon: number, low: bo
   if (!low) return true;
   return ribbon < Math.max(1, Math.ceil(current.ribbons / 2));
 }
+/** Every billow of the body volume (a current's billows together). */
+export const BREATH_PUFF_COUNT = BREATH_CURRENTS.reduce((a, c) => a + (c.puffs ?? 0), 0);
+/** The low tier keeps every other billow (cosmetic volume; the body still
+ *  reads, thinner). */
+export function breathPuffKept(index: number, low: boolean): boolean {
+  return !low || index % 2 === 0;
+}
+
 /** Segments along every ribbon (and the wind tail's curl, in path units). */
 export const BREATH_RIBBON_SEGMENTS = 28;
 export const BREATH_TAIL_CURL = { points: 3, reach: 0.9, drop: 0.12 } as const;
@@ -455,7 +480,7 @@ export const BREATH_ARC_PAIRS: readonly [BreathSocketId, BreathSocketId][] = [
 ];
 
 /** The arcs' pool, their life and how often a new one leaps (a second). */
-export const BREATH_ARCS = { pool: 8, poolLow: 4, life: 0.22, rate: 14, segments: 14 } as const;
+export const BREATH_ARCS = { pool: 12, poolLow: 5, life: 0.24, rate: 22, segments: 14 } as const;
 
 /** Lightning from A to B: `segs + 1` points (flat xyz into `out`), jagged by
  *  midpoint displacement off a hash of `seed`, `jag` its kink as a share of
@@ -753,14 +778,14 @@ export function breathOrbit(
  *  Cornice, white edges), the storm (a dark cloud core, blue-white
  *  lightning), the crystals' cyan. Linear 0..1, hex for the glows. */
 export const BREATH_BODY_COLORS = {
-  wind: [0.5, 0.68, 0.94] as const,
-  windEdge: [0.9, 0.97, 1.0] as const,
-  windShade: [0.22, 0.34, 0.58] as const,
-  cloud: [0.78, 0.85, 0.95] as const,
-  storm: [0.11, 0.12, 0.19] as const,
-  stormEdge: [0.5, 0.7, 1.0] as const,
-  stormShade: [0.035, 0.04, 0.07] as const,
-  stormCloud: [0.13, 0.14, 0.2] as const,
+  wind: [0.24, 0.36, 0.58] as const,
+  windEdge: [0.8, 0.96, 1.0] as const,
+  windShade: [0.035, 0.065, 0.13] as const,
+  cloud: [0.5, 0.58, 0.72] as const,
+  storm: [0.06, 0.075, 0.15] as const,
+  stormEdge: [0.55, 0.78, 1.0] as const,
+  stormShade: [0.012, 0.016, 0.04] as const,
+  stormCloud: [0.07, 0.08, 0.14] as const,
   dust: [0.72, 0.94, 1.0] as const,
   spark: [0.78, 0.92, 1.0] as const,
   grit: [0.58, 0.62, 0.66] as const,
@@ -787,6 +812,7 @@ export const BREATH_BURST = {
 export const BREATH_BODY_POOLS = {
   sockets: BREATH_SOCKETS.length,
   ribbons: BREATH_RIBBON_COUNT,
+  puffs: BREATH_PUFF_COUNT,
   arcs: BREATH_ARCS.pool,
   stones: BREATH_STONES,
   shards: BREATH_SHARDS,

@@ -31,6 +31,7 @@ import {
   BREATH_MODEL_CROWN,
   BREATH_MODEL_UNITS,
   BREATH_ORBIT_LOW,
+  BREATH_PUFF_COUNT,
   BREATH_RIBBON_COUNT,
   BREATH_SHARDS,
   BREATH_SOCKETS,
@@ -39,6 +40,7 @@ import {
   breathBodyAction,
   breathDeathLook,
   breathOrbit,
+  breathPuffKept,
   breathRibbonKept,
   breathStanceGesture,
   breathWindLook,
@@ -102,7 +104,7 @@ describe('the Guardian of the Breath model', () => {
     expect(visualKeyFor(g)).toBe(key);
   });
 
-  it('towers over the Cornice: its crown five to seven players up', () => {
+  it('towers over the Cornice like the Heat: its crown eight to ten players up', () => {
     expect(SMITH_HEART_MOBS[BREATH_GUARDIAN].scale).toBe(BREATH_BODY_SCALE);
     expect(def.height).toBe(BREATH_BODY_HEIGHT);
     expect(BREATH_YD_PER_UNIT).toBeCloseTo(
@@ -110,8 +112,8 @@ describe('the Guardian of the Breath model', () => {
       9,
     );
     const crown = BREATH_MODEL_CROWN * BREATH_YD_PER_UNIT;
-    expect(crown / PLAYER).toBeGreaterThan(5);
-    expect(crown / PLAYER).toBeLessThan(7);
+    expect(crown / PLAYER).toBeGreaterThan(8);
+    expect(crown / PLAYER).toBeLessThan(10);
     // Clearly bigger than the provisional body (2.0 x 3.4: three and a half players).
     expect(crown).toBeGreaterThan(2.0 * 3.4 * 1.5);
   });
@@ -235,8 +237,15 @@ describe('breath_body_core: the wind plan', () => {
     const trunk = BREATH_CURRENTS.find((c) => c.id === 'trunk');
     expect(trunk?.path.at(-1)).toBe('tip');
     expect(trunk?.tailCurl).toBe(true);
-    // The soft strands give it a body under the filaments.
+    // The soft strands and the billows give it a body under the filaments.
     expect(BREATH_CURRENTS.some((c) => c.soft)).toBe(true);
+    for (const c of BREATH_CURRENTS)
+      if (c.puffs) expect(c.puffSize?.length ?? c.radius.length, c.id).toBe(c.path.length);
+    expect(BREATH_PUFF_COUNT).toBeGreaterThan(30);
+    expect(
+      Array.from({ length: BREATH_PUFF_COUNT }, (_, i) => breathPuffKept(i, true)).filter(Boolean)
+        .length,
+    ).toBeLessThan(BREATH_PUFF_COUNT);
     for (const [a, b] of BREATH_ARC_PAIRS) expect(ids.has(a) && ids.has(b)).toBe(true);
   });
 
@@ -436,6 +445,12 @@ describe('BreathBody over a fake world', () => {
     const spine = windMesh.geometry.getAttribute('aSpine') as THREE.BufferAttribute;
     const p = new THREE.Vector3(spine.getX(0), spine.getY(0), spine.getZ(0));
     expect(Math.hypot(p.x - boss.pos.x, p.z - boss.pos.z)).toBeLessThan(12);
+    // The body's volume: billows of storm air along its currents.
+    const volume = root?.getObjectByName('smithHeartBreathVolume') as THREE.Mesh;
+    expect(volume.visible).toBe(true);
+    expect((volume.geometry as THREE.InstancedBufferGeometry).instanceCount).toBe(
+      BREATH_PUFF_COUNT,
+    );
     // The orbiters circle it.
     const stones = root?.getObjectByName('smithHeartBreathStones') as THREE.InstancedMesh;
     expect(stones.isInstancedMesh).toBe(true);
@@ -481,6 +496,7 @@ describe('BreathBody over a fake world', () => {
     boss.dead = true;
     for (let i = 0; i < 60; i++) fx.update(1 / 20);
     expect(windMesh.visible).toBe(false);
+    expect(volume.visible).toBe(false);
     // Leaving the world frees it.
     entities.delete(boss.id);
     world.entityRosterVersion++;

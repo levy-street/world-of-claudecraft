@@ -55,7 +55,7 @@ describe('the Summit Roar: its look', () => {
     expect(inhaleScreenWind(0, true)).toBeGreaterThan(0);
     expect(inhaleScreenWind(1, true)).toBeGreaterThan(inhaleScreenWind(0.3, true));
     // Never so strong that the floor and the landing marker wash out.
-    expect(inhaleScreenWind(1, true)).toBeLessThanOrEqual(0.6);
+    expect(inhaleScreenWind(1, true)).toBeLessThanOrEqual(0.4);
   });
 });
 

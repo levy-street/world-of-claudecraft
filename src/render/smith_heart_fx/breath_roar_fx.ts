@@ -102,8 +102,10 @@ void main() {
   // Streaks of wind and grit torn up and out (vUv.x round, vUv.y up).
   float streak = smoothstep(0.45, 0.95, n(vec2(vUv.x * 160.0, vUv.y * 2.0 - uTime * 3.0)));
   float foot = 1.0 - smoothstep(0.0, 1.0, vUv.y);
-  float k = (0.25 + streak * 0.9) * foot * uAlpha;
-  gl_FragColor = vec4(mix(uColor, uCore, streak * foot) * (1.0 + 0.4 * k), clamp(k, 0.0, 1.0));
+  // Capped (the Breath model pass): a wind front you read through, never a
+  // white wall over the boss, the raid and the throw markers.
+  float k = (0.05 + streak * 0.5) * foot * uAlpha;
+  gl_FragColor = vec4(mix(uColor, uCore, streak * foot * 0.6), clamp(k, 0.0, 0.32));
   #include <colorspace_fragment>
 }
 `;
@@ -152,7 +154,7 @@ void main() {
   float edge = smoothstep(0.55, 1.05, max(abs(vPos.x), abs(vPos.y)));
   float k = streak * thin * step(0.5, h(vec2(lane, 11.0))) * edge * uStrength;
   float haze = edge * 0.12 * uStrength;
-  gl_FragColor = vec4(uColor, clamp(k * 0.55 + haze, 0.0, 0.7));
+  gl_FragColor = vec4(uColor, clamp(k * 0.4 + haze, 0.0, 0.45));
 }
 `;
 
@@ -456,7 +458,7 @@ export class BreathRoarFx {
     this.trailMats[0].uniforms.uAlpha.value = look.alpha * 0.55 * (look.trail1 > 0.5 ? 1 : 0);
     this.trailMats[1].uniforms.uAlpha.value = look.alpha * 0.3 * (look.trail2 > 0.5 ? 1 : 0);
     this.wall.scale.set(r, look.height, r);
-    this.wallMat.uniforms.uAlpha.value = look.alpha * 0.8;
+    this.wallMat.uniforms.uAlpha.value = look.alpha * 0.6;
     // Dust boiling along the front as it runs (cosmetic).
     if (look.front < this.reach) {
       w.dust += dt * 70 * this.h.density;

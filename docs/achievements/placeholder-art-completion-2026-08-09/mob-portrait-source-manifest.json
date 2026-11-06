@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "9ff25a5481fed902c71344fec4c9805c4890d626515021e56035903db289bef7",
+  "rendererFingerprint": "ce1c6a3e8fa5ac7d53daad7d7176618e5ca69669f1cb84d8a93148db58d59e26",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -39,7 +39,7 @@
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
       "bytes": 6950499,
-      "sha256": "1b04c29dae210cb7f76778ff79c02fd8883f3be8150da71fe58a08b5ff7cd051",
+      "sha256": "b309da50780b934be6509ded0f1808db122bc8c271e82772c3dc5f0e8260f71d",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -5133,11 +5133,11 @@
         "model": {
           "url": "models/creatures/smith_heart_breath_guardian.glb",
           "path": "public/models/creatures/smith_heart_breath_guardian.glb",
-          "bytes": 1098776,
-          "sha256": "9cdfedb32e9857cf7209037ca680ff5b749f743607783049c63d3694ffd23c43"
+          "bytes": 1098060,
+          "sha256": "7531ca1c57aea12cfbd6982be965e644ba505ae97cc8c12d586f174381d0d2c5"
         },
         "idle": "Idle",
-        "height": 3.75,
+        "height": 5.3,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -5151,7 +5151,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "4ac3b6bf376e733872126c19049c1794be299df13e35718ab8c15bf11ab2271a",
+      "sourceFingerprint": "3fd74d48bb733812660834724ee70d9a826ba997fc1fd054c2e3a6a132e00bf5",
       "output": {
         "path": "public/ui/mobs/heart_breath_guardian.webp",
         "bytes": 4618,

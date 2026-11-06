@@ -66,6 +66,7 @@ import {
   BREATH_BURST,
   BREATH_CURRENTS,
   BREATH_GUARDIAN,
+  BREATH_PUFF_COUNT,
   BREATH_RIBBON_COUNT,
   BREATH_RIBBON_SEGMENTS,
   BREATH_SOCKETS,
@@ -79,6 +80,7 @@ import {
   breathBodyAction,
   breathBodyHash,
   breathDeathLook,
+  breathPuffKept,
   breathRibbonKept,
   breathSocketIndex,
   breathStanceGesture,
@@ -96,6 +98,7 @@ import {
   retryBreathBodySockets,
 } from './breath_body_sockets';
 import { BreathRibbonPool, boltUniforms, windUniforms } from './breath_wind_ribbons';
+import { BreathWindVolume } from './breath_wind_volume';
 import { inSmithHeartClaim } from './council_fx_core';
 
 const SCAN_SEC = 0.1;
@@ -206,7 +209,7 @@ const CLOUD = {
   speed: 0.7,
   up: 0.4,
   life: 2.2,
-  size: [2.5, 5] as [number, number],
+  size: [3.5, 7] as [number, number],
   color: C.cloud as readonly [number, number, number],
   alpha: 0.14,
   drag: 0.8,
@@ -217,7 +220,7 @@ const MIST = {
   speed: 0.6,
   up: 0.5,
   life: 2.6,
-  size: [5, 9] as [number, number],
+  size: [7, 12] as [number, number],
   color: C.wind as readonly [number, number, number],
   alpha: 0.1,
   drag: 0.8,
@@ -314,6 +317,7 @@ export class BreathBody {
   private readonly sock: THREE.Vector3[] = BREATH_SOCKETS.map(() => new THREE.Vector3());
   private readonly wind: BreathRibbonPool;
   private readonly windU: ReturnType<typeof windUniforms>;
+  private readonly volume: BreathWindVolume;
   private readonly bolts: BreathRibbonPool;
   private readonly slashes: BreathRibbonPool;
   private readonly cone: THREE.Mesh;
@@ -427,7 +431,17 @@ export class BreathBody {
       this.materials,
       this.geometries,
     );
-    for (const p of [this.wind, this.bolts, this.slashes]) this.fx.add(p.mesh);
+    // The body's volume under the currents (billows of storm air).
+    this.volume = new BreathWindVolume(
+      BREATH_PUFF_COUNT,
+      this.windU,
+      this.materials,
+      this.geometries,
+    );
+    this.fx.add(this.volume.mesh);
+    for (const p of [this.wind, this.bolts, this.slashes]) {
+      this.fx.add(p.mesh);
+    }
     // The roar's cone of wind (an open cone, its tip at the mouth, along +z).
     const coneGeo = new THREE.CylinderGeometry(1, 0.08, 1, 32, 1, true)
       .translate(0, -0.5, 0)
@@ -623,6 +637,7 @@ export class BreathBody {
 
   private hideBody(): void {
     this.wind.commit(0);
+    this.volume.commit(0);
     this.bolts.commit(0);
     this.slashes.commit(0);
     this.cone.visible = false;
@@ -752,9 +767,12 @@ export class BreathBody {
   ): void {
     if (alpha <= 0.01) {
       this.wind.commit(0);
+      this.volume.commit(0);
       return;
     }
     let r = 0;
+    let pi = 0;
+    let pu = 0;
     const t = this.clock;
     for (let ci = 0; ci < BREATH_CURRENTS.length; ci++) {
       const cur = BREATH_CURRENTS[ci];
@@ -790,8 +808,34 @@ export class BreathBody {
         }
         this.ribbon(r, cur, k, n, alpha, radius, spin, fling, shiver);
       }
+      // The billows of its body along this current (the low tier every other).
+      const puffs = cur.puffs ?? 0;
+      for (let j = 0; j < puffs; j++, pi++) {
+        if (!breathPuffKept(pi, this.low)) continue;
+        const u = (j + 0.5) / puffs;
+        splineAt(_pts, n, u, _sp);
+        const seed = breathBodyHash(pi, 13);
+        const a = seed * Math.PI * 2 + t * cur.spin * spin * 1.2;
+        const out = profileAt(cur.radius, u) * U * radius * fling * 0.35;
+        const size =
+          profileAt(cur.puffSize ?? cur.radius, u) *
+          U *
+          (0.75 + 0.25 * radius) *
+          fling *
+          (1 + 0.1 * Math.sin(t * (0.6 + seed) + pi));
+        this.volume.set(
+          pu++,
+          _sp[0] + Math.cos(a) * out,
+          _sp[1] + Math.sin(a * 0.7) * out * 0.5,
+          _sp[2] + Math.sin(a) * out,
+          size,
+          (0.85 + 0.15 * seed) * alpha,
+          seed,
+        );
+      }
     }
     this.wind.commit(r);
+    this.volume.commit(pu);
   }
 
   private ribbon(
@@ -859,7 +903,7 @@ export class BreathBody {
         ty,
         tz,
         w,
-        cur.alpha * fade * alpha,
+        Math.min(0.95, cur.alpha * 1.25) * fade * alpha,
         along / U,
         cur.soft ? seed + 2 : seed,
       );
@@ -936,8 +980,8 @@ export class BreathBody {
       MIST.alpha = st > 0.5 ? 0.22 : 0.06;
       // The low tier keeps the storm's billows smaller (cosmetic fill).
       const big = d >= 1 && st > 0.5;
-      MIST.size[0] = big ? 7 : 5;
-      MIST.size[1] = big ? 12 : 9;
+      MIST.size[0] = big ? 10 : 7;
+      MIST.size[1] = big ? 16 : 12;
       this.particles.puff(p.x, p.y, p.z, 1, MIST);
     }
     // Glittering crystal dust round the body.
@@ -1150,7 +1194,7 @@ export class BreathBody {
       const seed = s.seed + Math.floor(age * 30);
       arcPath(seed, pa.x, pa.y, pa.z, pb.x, pb.y, pb.z, ARC_SEG, 0.22, _arc);
       const k = 1 - age / s.life;
-      this.boltStrip(i, 0.34 * U * s.width, Math.min(1, k * 1.6), seed);
+      this.boltStrip(i, 0.45 * U * s.width, Math.min(1, k * 1.6), seed);
       used = i + 1;
     }
     const cb = this.castBolt;

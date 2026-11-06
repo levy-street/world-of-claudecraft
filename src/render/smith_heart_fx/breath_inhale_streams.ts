@@ -93,7 +93,7 @@ export class BreathInhaleStreams {
     const on = this.strength > 0.02 && !!g;
     for (const m of this.meshes) m.visible = on;
     if (!on || !g) return;
-    this.mat.uniforms.uGlow.value = this.strength * 0.8;
+    this.mat.uniforms.uGlow.value = this.strength * 0.5;
     this.mat.uniforms.uFlow.value = 1.4 + 2.2 * fill;
     const t = this.h.uTime.value;
     // The maw: the war-horn mouth of its mask (its model's socket).

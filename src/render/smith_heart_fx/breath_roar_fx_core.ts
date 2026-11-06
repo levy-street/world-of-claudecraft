@@ -86,8 +86,9 @@ export const ROAR_TRAIL_SECONDS = T.roarSlide + 0.35;
 
 /** The screen's wind at its strongest: held well under full so the floor,
  *  the landing marker and the rim stay readable through the indrawn breath
- *  (the Heroic readability pass of 2026-11-05: at full it washed them out). */
-export const INHALE_SCREEN_MAX = 0.6;
+ *  (the Heroic readability pass of 2026-11-05: at full it washed them out;
+ *  the Breath model pass of 2026-11-06 lowered it again beside its body). */
+export const INHALE_SCREEN_MAX = 0.4;
 
 /** The screen's wind while the guardian draws breath: 0 when not, rising
  *  with the bar to INHALE_SCREEN_MAX by the end (only for a body on the Cornice). */

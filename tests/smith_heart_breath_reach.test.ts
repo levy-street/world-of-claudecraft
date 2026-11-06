@@ -1,5 +1,5 @@
 // The Guardian of the Breath's reach at its own model's size (sim, design doc
-// 7.2): the model stands some thirteen yards tall (render/smith_heart_fx/
+// 7.2): the model stands some eighteen yards tall (render/smith_heart_fx/
 // breath_body_core.ts), so melee strikes the column of wind round its chest
 // and tail (its bodyRadius) rather than its pivot, short-reach abilities
 // measure to that edge too, and its own swing settles the tank at the body's

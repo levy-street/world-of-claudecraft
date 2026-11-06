@@ -582,7 +582,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/creatures/sanctum_sledge_hauler.glb": "/media/models/creatures/sanctum_sledge_hauler.c82d225ff3dd.glb",
   "models/creatures/sanctum_thawcaller.glb": "/media/models/creatures/sanctum_thawcaller.4a0b35c1aeac.glb",
   "models/creatures/sledge_tusker_sledge.glb": "/media/models/creatures/sledge_tusker_sledge.7e597b0de8fc.glb",
-  "models/creatures/smith_heart_breath_guardian.glb": "/media/models/creatures/smith_heart_breath_guardian.9cdfedb32e98.glb",
+  "models/creatures/smith_heart_breath_guardian.glb": "/media/models/creatures/smith_heart_breath_guardian.7531ca1c57ae.glb",
   "models/creatures/smith_heart_heat_guardian.glb": "/media/models/creatures/smith_heart_heat_guardian.1779c45fcacd.glb",
   "models/creatures/smith_heart_masterless_strength.glb": "/media/models/creatures/smith_heart_masterless_strength.fe2c92391de1.glb",
   "models/creatures/spider.glb": "/media/models/creatures/spider.5becf8b6510f.glb",
