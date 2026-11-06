@@ -32,6 +32,7 @@ import { fxAnchor } from '../attached_fx_anchor';
 import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import type { EngineParticles } from '../trash_engine_fx/engine_particles';
+import { breathSocketPoint } from './breath_body_sockets';
 import {
   inhaleScreenWind,
   ROAR_SPEED,
@@ -40,6 +41,8 @@ import {
   roarReach,
   roarWaveLook,
 } from './breath_roar_fx_core';
+
+const _maw = new THREE.Vector3();
 
 /** What BreathFightFx lends this part (a type-only seam). */
 export interface BreathRoarHost {
@@ -539,11 +542,11 @@ export class BreathRoarFx {
     this.screen.visible = this.suck > 0.02;
     this.screenMat.uniforms.uStrength.value = this.suck;
     if (!drawing || !g) return;
-    const a = fxAnchor(g);
-    const s = Math.max(1, g.scale ?? 1);
-    const mx = a.x + Math.sin(g.facing) * 1.2 * s;
-    const mz = a.z + Math.cos(g.facing) * 1.2 * s;
-    const my = g.pos.y + 2.2 * s;
+    // The maw: the war-horn mouth of its mask (its model's socket).
+    const maw = breathSocketPoint(g, 'mouth', _maw);
+    const mx = maw.x;
+    const mz = maw.z;
+    const my = maw.y;
     (this.screenMat.uniforms.uMaw.value as THREE.Vector3).set(mx, my, mz);
     // Grit and stones torn up and sucked into the maw, dust dragged along
     // the ground in long runs (cosmetic; the pull itself reads on the

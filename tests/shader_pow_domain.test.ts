@@ -303,7 +303,6 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   'src/render/smith_heart/heart_sky.ts': 1,
   'src/render/smith_heart/quench_air.ts': 1,
   'src/render/smith_heart/quench_lake_ice.ts': 1,
-  'src/render/smith_heart_fx/breath_body.ts': 4,
   'src/render/smith_heart_fx/breath_fight_fx.ts': 2,
   'src/render/smith_heart_fx/breath_heart_glsl.ts': 4,
   'src/render/smith_heart_fx/breath_isles_glsl.ts': 1,

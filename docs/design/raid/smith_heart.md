@@ -935,8 +935,10 @@ voices).
 ### 5.19 The Guardian of the Breath's look (prototype)
 
 The fight's effects are `src/render/smith_heart_fx/breath_fight_fx.ts` (pure plan
-`breath_fight_fx_core.ts`) and its provisional body `breath_body.ts` (pure plan
-`breath_body_core.ts`), both hosted by `rift_death_zone.ts` beside `BreathFx` (which keeps
+`breath_fight_fx_core.ts`) and its body's wind `breath_body.ts` (pure plan
+`breath_body_core.ts`; since 2026-11-06 the solid pieces are its own rigged model,
+`characters/smith_heart_boss_looks.ts`, and this module draws the living wind between
+them and the storm of phase 2), both hosted by `rift_death_zone.ts` beside `BreathFx` (which keeps
 Storm Lance and Bellows Gust) and read from IWorld only. The vein's art rule holds: living
 granite, crystal and storm, no metal, no machinery; the "bellows" is a creature that
 breathes (the old brass chains are gone with 2G's rule).

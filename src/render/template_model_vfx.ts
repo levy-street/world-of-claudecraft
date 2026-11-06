@@ -6,6 +6,8 @@ import type * as THREE from 'three';
 import { buddyTemplateId } from '../sim/content/buddy_mobs';
 import { IGNIVAR_BOSS_ID } from '../sim/types';
 import { attachIgnivarModelVfx } from './ignivar_model_vfx';
+import { BREATH_GUARDIAN } from './smith_heart_fx/breath_body_core';
+import { attachBreathBodySockets } from './smith_heart_fx/breath_body_sockets';
 import { HEAT_GUARDIAN } from './smith_heart_fx/heat_body_core';
 import { attachHeatBodySockets } from './smith_heart_fx/heat_body_sockets';
 import { attachSpritesBuddyFlame } from './sprites_buddy_flame';
@@ -25,4 +27,6 @@ export function attachTemplateModelVfx(
   else if (templateId === SPRITES_BUDDY_TEMPLATE_ID) attachSpritesBuddyFlame(root, reducedMotion);
   // The Guardian of the Heat's fire sockets (read by smith_heart_fx/heat_body.ts).
   else if (templateId === HEAT_GUARDIAN) attachHeatBodySockets(root);
+  // The Guardian of the Breath's wind sockets (read by smith_heart_fx/breath_body.ts).
+  else if (templateId === BREATH_GUARDIAN) attachBreathBodySockets(root);
 }

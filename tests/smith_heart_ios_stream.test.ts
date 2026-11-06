@@ -16,6 +16,7 @@ import {
   dungeonCharacterBodyUrls,
 } from '../src/render/characters/rift_body_stream_core';
 import { MASTERLESS_STRENGTH_URL } from '../src/render/characters/smith_heart_boss_looks';
+import { BREATH_BODY_URL } from '../src/render/smith_heart_fx/breath_body_core';
 import { HEAT_BODY_URL } from '../src/render/smith_heart_fx/heat_body_core';
 import { SMITH_HEART_MOBS } from '../src/sim/content/smith_heart';
 
@@ -32,6 +33,12 @@ describe("the Smith's Heart and the iOS entry stream", () => {
     expect(dungeonCharacterBodyUrls('smith_heart')).toContain(HEAT_BODY_URL);
     expect(ios.onDemand).toContain(HEAT_BODY_URL);
     expect(ios.postEntry).not.toContain(HEAT_BODY_URL);
+  });
+
+  it("loads the Breath guardian's body at the raid's arrival, not at entry", () => {
+    expect(dungeonCharacterBodyUrls('smith_heart')).toContain(BREATH_BODY_URL);
+    expect(ios.onDemand).toContain(BREATH_BODY_URL);
+    expect(ios.postEntry).not.toContain(BREATH_BODY_URL);
   });
 
   it('borrows no Rift-lane body for a placeholder look', () => {

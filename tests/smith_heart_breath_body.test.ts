@@ -1,42 +1,56 @@
-// The Guardian of the Breath's provisional body (src/render/smith_heart_fx/
-// breath_body_core.ts and breath_body.ts): it stands imposing (at least 2.5
-// times a player, matching the manifest and the template), its pieces are
-// real nodes of their kits (no metal, no machinery: storm granite, rock and
-// crystal), sided pieces in pairs; the fight's bars and the wind's phases map
-// to their motions; every pose, the storm's shard orbit and the fall are
-// finite; the storm body tears out to its orbit; and BreathBody over a fake
-// world dresses the guardian only inside the raid, turns to the wind's
-// bearing as a blow gathers, wears the storm body while the aura holds,
-// never claims an event, falls with a dead body, and disposes.
+// The Guardian of the Breath's own model (characters/smith_heart_boss_looks.ts,
+// the pure plan src/render/smith_heart_fx/breath_body_core.ts and its wind
+// breath_body.ts): the rigged GLB of floating armor pieces replaces the
+// bodyless provisional body, ships every clip it binds with KTX2 textures,
+// stands six players and more tall, plays its own clips for the Indrawn
+// Breath (the whole bar), the Summit Roar and the bolt casts (landing on the
+// bar's end), the channels, and Storm Breaks into the storm stance's clip set;
+// the wind's sockets sit on real bones at the offsets the GLB's rest pose
+// gives; the currents wind through those sockets; the painter draws the wind
+// over the model, sends its stance, claims no event, and disposes.
 
+import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
-import { VISUALS } from '../src/render/characters/manifest';
+import { VISUALS, visualKeyFor } from '../src/render/characters/manifest';
+import { SMITH_HEART_BOSS_LOOKS } from '../src/render/characters/smith_heart_boss_looks';
 import { SMITH_HEART_PLACEHOLDER_LOOKS } from '../src/render/characters/smith_heart_placeholder_looks';
+import { gateObjectPlan } from '../src/render/gate_objects';
 import { BreathBody } from '../src/render/smith_heart_fx/breath_body';
 import {
-  BREAK_FREEZE_AT,
+  arcPath,
   BREAK_TEAR_AT,
-  BREATH_ARM,
+  BREATH_ARC_PAIRS,
+  BREATH_BODY_CLIP,
+  BREATH_BODY_CLIPS,
+  BREATH_BODY_GESTURES,
   BREATH_BODY_HEIGHT,
-  BREATH_BODY_PIECES,
-  BREATH_FALL,
-  BREATH_THREAD_PAIRS,
-  type BreathBodyAction,
-  breathArm,
+  BREATH_BODY_SCALE,
+  BREATH_BODY_URL,
+  BREATH_CURRENTS,
+  BREATH_MODEL_CROWN,
+  BREATH_MODEL_UNITS,
+  BREATH_ORBIT_LOW,
+  BREATH_RIBBON_COUNT,
+  BREATH_SHARDS,
+  BREATH_SOCKETS,
+  BREATH_STONES,
+  BREATH_YD_PER_UNIT,
   breathBodyAction,
-  breathBodyLook,
-  breathBodyTop,
-  breathElbowPole,
-  breathFacesWind,
-  breathFallProgress,
-  breathFallRest,
-  breathWristTarget,
+  breathDeathLook,
+  breathOrbit,
+  breathRibbonKept,
+  breathStanceGesture,
+  breathWindLook,
+  profileAt,
+  ribbonFade,
+  splineAt,
   stormFormOn,
-  stormShardSlot,
-  stormTearProgress,
 } from '../src/render/smith_heart_fx/breath_body_core';
-import { colossusArmIk } from '../src/render/smith_heart_fx/final_fx_core';
+import {
+  breathSocketPoint,
+  clearBreathBodySockets,
+} from '../src/render/smith_heart_fx/breath_body_sockets';
 import { SMITH_HEART_MOBS } from '../src/sim/content/smith_heart';
 import { DUNGEONS, instanceOrigin } from '../src/sim/data';
 import {
@@ -44,210 +58,301 @@ import {
   BREATH_CASTS,
   BREATH_CUES,
   BREATH_GUARDIAN,
+  BREATH_OBJECTS,
+  BREATH_TUNING,
   breathWindTemplate,
 } from '../src/sim/encounters/smith_heart/breath_ids';
+import { ISLE_CASTS } from '../src/sim/encounters/smith_heart/breath_isle_ids';
 import type { Entity, SimEvent } from '../src/sim/types';
 import type { IWorld } from '../src/world_api';
 
 const PLAYER = 1.9;
-const ACTIONS: BreathBodyAction[] = [
-  'idle',
-  'swing',
-  'gather',
-  'blow',
-  'calm',
-  'inhale',
-  'gust',
-  'cast',
-  'break',
-  'storm',
-];
-const finite = (p: { x: number; y: number; z: number }) =>
-  Number.isFinite(p.x) && Number.isFinite(p.y) && Number.isFinite(p.z);
 
-const KIT_NODES = {
-  breath: [
-    'Kit_StormRod',
-    'Kit_WindHorn',
-    'Kit_ChannelJamb',
-    'Kit_WindShelter',
-    'Kit_StormStone',
-    'Kit_BreathWallA',
-    'Kit_BreathWallB',
-  ],
-  heart: [
-    'Kit_ColHip',
-    'Kit_ColTorso',
-    'Kit_ColHead',
-    'Kit_ColShoulder',
-    'Kit_ColUpperArm',
-    'Kit_ColForearm',
-    'Kit_ColFist',
-    'Kit_ColShardA',
-    'Kit_ColShardB',
-    'Kit_ColShardC',
-    'Kit_HeartCrystal',
-  ],
-} as const;
+interface GlbNode {
+  name?: string;
+  children?: number[];
+  translation?: [number, number, number];
+  rotation?: [number, number, number, number];
+  scale?: [number, number, number];
+}
+function glbJson(rel: string): {
+  nodes: GlbNode[];
+  animations: { name: string }[];
+  images?: { mimeType?: string }[];
+  meshes?: unknown[];
+  extensionsUsed?: string[];
+} {
+  const buf = readFileSync(`public/${rel}`);
+  expect(buf.readUInt32LE(0)).toBe(0x46546c67);
+  const len = buf.readUInt32LE(12);
+  return JSON.parse(buf.subarray(20, 20 + len).toString('utf8'));
+}
 
-describe('breath_body_core: the plan', () => {
-  it('stands imposing, matching the manifest and the template', () => {
-    const look = SMITH_HEART_PLACEHOLDER_LOOKS[BREATH_GUARDIAN];
-    expect(look).toBe('smith_heart_breath_guardian');
-    const visual = VISUALS[look];
-    expect(visual?.bodyless).toBe(true);
-    expect(BREATH_BODY_HEIGHT).toBeCloseTo(
-      (visual?.height ?? 0) * (SMITH_HEART_MOBS[BREATH_GUARDIAN]?.scale ?? 0),
+const glb = glbJson(BREATH_BODY_URL);
+const key = SMITH_HEART_PLACEHOLDER_LOOKS[BREATH_GUARDIAN];
+const def = VISUALS[key];
+
+describe('the Guardian of the Breath model', () => {
+  it('replaces the bodyless provisional body with its own rigged one', () => {
+    expect(key).toBe('smith_heart_breath_guardian');
+    expect(def).toBe(SMITH_HEART_BOSS_LOOKS.smith_heart_breath_guardian);
+    expect(def.url).toBe(BREATH_BODY_URL);
+    expect(def.bodyless).toBeFalsy();
+    const g = { kind: 'mob', templateId: BREATH_GUARDIAN } as Parameters<typeof visualKeyFor>[0];
+    expect(visualKeyFor(g)).toBe(key);
+  });
+
+  it('towers over the Cornice: its crown five to seven players up', () => {
+    expect(SMITH_HEART_MOBS[BREATH_GUARDIAN].scale).toBe(BREATH_BODY_SCALE);
+    expect(def.height).toBe(BREATH_BODY_HEIGHT);
+    expect(BREATH_YD_PER_UNIT).toBeCloseTo(
+      (BREATH_BODY_HEIGHT * BREATH_BODY_SCALE) / BREATH_MODEL_UNITS,
+      9,
     );
-    expect(BREATH_BODY_HEIGHT / PLAYER).toBeGreaterThanOrEqual(2.5);
-    // Its crown is about its height (the nameplate rides over it).
-    expect(Math.abs(breathBodyTop() - BREATH_BODY_HEIGHT)).toBeLessThan(0.6);
+    const crown = BREATH_MODEL_CROWN * BREATH_YD_PER_UNIT;
+    expect(crown / PLAYER).toBeGreaterThan(5);
+    expect(crown / PLAYER).toBeLessThan(7);
+    // Clearly bigger than the provisional body (2.0 x 3.4: three and a half players).
+    expect(crown).toBeGreaterThan(2.0 * 3.4 * 1.5);
   });
 
-  it('is storm granite, rock and crystal: every piece a real kit node, sided in pairs', () => {
-    const ids = new Set<string>();
-    for (const p of BREATH_BODY_PIECES) {
-      expect(KIT_NODES[p.kit] as readonly string[], p.id).toContain(p.node);
-      expect(ids.has(p.id), p.id).toBe(false);
-      ids.add(p.id);
-      expect(p.size.x * p.size.y * p.size.z).toBeGreaterThan(0);
-    }
-    for (const j of ['lung', 'shoulder', 'upper', 'fore', 'hand', 'horn'] as const) {
-      const sided = BREATH_BODY_PIECES.filter((p) => p.joint === j);
-      expect(sided.map((p) => p.side).sort(), j).toEqual([-1, 1]);
-    }
-    // The bellows are two plates, the mouth a wind-horn, the wings fluted blades.
-    expect(BREATH_BODY_PIECES.filter((p) => p.joint === 'lung').map((p) => p.node)).toEqual([
-      'Kit_WindShelter',
-      'Kit_WindShelter',
-    ]);
-    expect(BREATH_BODY_PIECES.find((p) => p.joint === 'mouth')?.node).toBe('Kit_WindHorn');
-    expect(BREATH_BODY_PIECES.filter((p) => p.joint === 'wing')).toHaveLength(4);
-    for (const [a, b] of BREATH_THREAD_PAIRS) expect(a).not.toBe(b);
-  });
-});
-
-describe('breath_body_core: the motion', () => {
-  it('maps the bars and the wind to their motions', () => {
-    const at = (
-      castId: string | null,
-      windPhase: Parameters<typeof breathBodyAction>[0]['windPhase'],
-      storm = false,
-    ) =>
-      breathBodyAction({ castId, castFill: 0.5, windPhase, windFill: 0.5, stormForm: storm })
-        .action;
-    expect(at(BREATH_CASTS.inhale, null)).toBe('inhale');
-    expect(at(BREATH_CASTS.gust, null)).toBe('gust');
-    expect(at(BREATH_CASTS.storm, null)).toBe('break');
-    expect(at(BREATH_CASTS.fork, null, true)).toBe('cast');
-    expect(at(BREATH_CASTS.lance, 'blow')).toBe('cast');
-    expect(at(null, 'gather')).toBe('gather');
-    expect(at(null, 'blow')).toBe('blow');
-    expect(at(null, 'calm')).toBe('calm');
-    expect(at(null, null)).toBe('idle');
-    expect(at(null, 'storm', true)).toBe('storm');
-    expect(at(null, 'gust', true)).toBe('blow');
-    expect(breathFacesWind('gather')).toBe(true);
-    expect(breathFacesWind('blow')).toBe(true);
-    expect(breathFacesWind('inhale')).toBe(false);
+  it('ships every clip it binds, one mesh, and KTX2 textures', () => {
+    const names = glb.animations.map((a) => a.name);
+    for (const c of BREATH_BODY_CLIPS) expect(names, c).toContain(c);
+    expect(glb.meshes?.length).toBe(1);
+    expect(glb.extensionsUsed).toContain('KHR_texture_basisu');
+    expect(glb.images?.length).toBeGreaterThan(0);
+    for (const im of glb.images ?? []) expect(im.mimeType).toBe('image/ktx2');
+    const named = (c: typeof def.clips) => [
+      c.idle,
+      c.walk,
+      c.run,
+      c.death,
+      c.cast ?? c.idle,
+      ...c.attack,
+      ...Object.values(c.attackByAbility ?? {}),
+      ...Object.values(c.castByAbility ?? {}),
+    ];
+    const stances = Object.values(def.phaseClips ?? {}).map((p) => p.clips);
+    for (const c of [def.clips, ...stances])
+      for (const n of named(c)) expect(names, n).toContain(n);
   });
 
-  it('breathes: the bellows fill as a blow gathers and empty through it', () => {
-    const g0 = breathBodyLook('gather', 0, 0).swell;
-    const g1 = breathBodyLook('gather', 1, 0).swell;
-    expect(g1).toBeGreaterThan(g0);
-    const b0 = breathBodyLook('blow', 0, 0);
-    const b1 = breathBodyLook('blow', 1, 0);
-    expect(b0.swell).toBeGreaterThan(b1.swell);
-    expect(b0.mouth).toBeGreaterThan(0.5);
-    // The indrawn breath swells past full; the storm bar freezes, then tears.
-    expect(breathBodyLook('inhale', 1, 0).swell).toBeGreaterThan(1.2);
-    expect(
-      breathBodyLook('break', (BREAK_FREEZE_AT + BREAK_TEAR_AT) / 2, 0).jitter,
-    ).toBeGreaterThan(0);
-    expect(breathBodyLook('break', BREAK_FREEZE_AT * 0.5, 0).tear).toBe(0);
-    expect(breathBodyLook('break', 1, 0).tear).toBeGreaterThan(0);
-    expect(breathBodyLook('storm', 0, 0).tear).toBe(1);
+  it('plays its own clips: the breath, the roar, the bolts on the bar end, the channels', () => {
+    const c = def.clips;
+    expect(c.attack).toEqual(['Attack', 'Attack2']);
+    expect(c.castByAbility?.[BREATH_CASTS.inhale]).toBe('Inhale');
+    expect(c.castByAbility?.[BREATH_CASTS.gust]).toBe('Roar');
+    expect(c.castByAbility?.[BREATH_CASTS.storm]).toBe('StormBreaks');
+    expect(c.castByAbility?.[BREATH_CASTS.fork]).toBe('Cast');
+    expect(c.castByAbility?.[BREATH_CASTS.cradleHold]).toBe('Channel');
+    expect(c.castByAbility?.[ISLE_CASTS.bulwark]).toBe('Channel');
+    const T = c.castTimeScaleByAbility ?? {};
+    expect(T[BREATH_CASTS.inhale]).toBeCloseTo(
+      BREATH_BODY_CLIP.inhale / BREATH_TUNING.inhaleCast,
+      9,
+    );
+    expect(T[BREATH_CASTS.gust]).toBeCloseTo(BREATH_BODY_CLIP.roar / BREATH_TUNING.gustCast, 9);
+    expect(T[BREATH_CASTS.storm]).toBeCloseTo(
+      BREATH_BODY_CLIP.breakEnd / BREATH_TUNING.stormCast,
+      9,
+    );
+    expect(T[BREATH_CASTS.fork]).toBeCloseTo(
+      BREATH_BODY_CLIP.castRelease / BREATH_TUNING.forkCast,
+      9,
+    );
+    // The channels loop; every timed bar is locked to its bar.
+    const sync = def.castClipSync as readonly string[];
+    for (const b of [BREATH_CASTS.inhale, BREATH_CASTS.gust, BREATH_CASTS.storm, BREATH_CASTS.fork])
+      expect(sync, b).toContain(b);
+    expect(sync).not.toContain(BREATH_CASTS.cradleHold);
+    for (const one of ['Roar', 'StormBreaks', 'Cast'])
+      expect(def.oneShotsHoldAttacks, one).toContain(one);
+    expect(def.glowPulses?.deathFade).toBeGreaterThan(0);
   });
 
-  it('keeps every pose finite and the wrists in the arm reach', () => {
-    for (const action of ACTIONS)
-      for (const k of [0, 0.3, 0.6, 0.88, 0.95, 1])
-        for (const side of [1, -1] as const) {
-          const w = breathWristTarget(action, side, k, 1);
-          expect(finite(w), `${action} ${k}`).toBe(true);
-          const arm = breathArm(side, w);
-          expect(finite(arm.elbow) && finite(arm.wrist)).toBe(true);
-          const look = breathBodyLook(action, k, 1.3);
-          for (const v of Object.values(look)) expect(Number.isFinite(v)).toBe(true);
-        }
+  it('wears the storm as a stance: the same motions on the exploded spacing', () => {
+    const P = def.phaseClips ?? {};
+    const calm = P[BREATH_BODY_GESTURES.calm]?.clips;
+    const storm = P[BREATH_BODY_GESTURES.storm]?.clips;
+    expect(calm).toBe(def.clips);
+    expect(storm?.idle).toBe('StormIdle');
+    expect(storm?.attack).toEqual(['StormAttack', 'StormAttack2']);
+    expect(storm?.death).toBe('StormDeath');
+    expect(storm?.castByAbility?.[BREATH_CASTS.fork]).toBe('StormCast');
+    expect(storm?.castByAbility?.[BREATH_CASTS.cradleHold]).toBe('StormChannel');
+    // No stance plays a one-shot on the swap: Storm Breaks itself is the bar's clip.
+    expect(P[BREATH_BODY_GESTURES.storm]?.enter).toBeUndefined();
+    expect(breathStanceGesture(true)).toBe(BREATH_BODY_GESTURES.storm);
+    expect(breathStanceGesture(false)).toBe(BREATH_BODY_GESTURES.calm);
+    for (const g of Object.values(BREATH_BODY_GESTURES))
+      expect(g.startsWith('smith_heart_breath_body_')).toBe(true);
   });
 
-  it("solves the arm as the colossus does, into the caller's scratch (no allocation)", () => {
-    const wrist = { x: 0, y: 0, z: 0 };
-    const arm = { elbow: { x: 0, y: 0, z: 0 }, wrist: { x: 0, y: 0, z: 0 } };
-    const act = { action: 'idle' as BreathBodyAction, k: 0 };
-    for (const action of ACTIONS)
-      for (const k of [0, 0.5, 1])
-        for (const side of [1, -1] as const) {
-          // The out-params come back as the very objects passed in.
-          expect(breathWristTarget(action, side, k, 1, wrist)).toBe(wrist);
-          expect(breathArm(side, wrist, arm)).toBe(arm);
-          const ref = colossusArmIk(
-            { x: side * BREATH_ARM.root.x, y: BREATH_ARM.root.y, z: BREATH_ARM.root.z },
-            wrist,
-            BREATH_ARM.upper,
-            BREATH_ARM.fore,
-            breathElbowPole(side),
-          );
-          for (const axis of ['x', 'y', 'z'] as const) {
-            expect(arm.elbow[axis]).toBeCloseTo(ref.elbow[axis], 9);
-            expect(arm.wrist[axis]).toBeCloseTo(ref.wrist[axis], 9);
-          }
-        }
-    const input = {
-      castId: BREATH_CASTS.inhale,
-      castFill: 0.4,
-      windPhase: null,
-      windFill: 0,
-      stormForm: false,
-    };
-    expect(breathBodyAction(input, act)).toBe(act);
-    expect(act).toEqual({ action: 'inhale', k: 0.4 });
-    const fall = { k: 0, landed: false };
-    expect(breathFallProgress(9, 0, fall)).toBe(fall);
-    expect(fall.landed).toBe(true);
-  });
-
-  it('tears the shell out to rings of shards round the storm core', () => {
-    expect(stormTearProgress(0, 0.25)).toBeCloseTo(0.25);
-    expect(stormTearProgress(10, 0.25)).toBeCloseTo(1);
-    const radii = new Set<number>();
-    for (let i = 0; i < BREATH_BODY_PIECES.length; i++) {
-      const s = stormShardSlot(i, 2.4);
-      expect(finite(s)).toBe(true);
-      const r = Math.hypot(s.x, s.z);
-      expect(r).toBeGreaterThan(2.5);
-      expect(r).toBeLessThan(4.5);
-      radii.add(Math.round(r * 10));
-    }
-    expect(radii.size).toBe(3);
-    expect(stormFormOn([{ id: BREATH_AURAS.stormForm }])).toBe(true);
-    expect(stormFormOn([{ id: 'other' }])).toBe(false);
-  });
-
-  it("falls round where it stood, every piece landing by the fall's end", () => {
-    BREATH_BODY_PIECES.forEach((p, i) => {
-      const rest = breathFallRest(i, { x: 1, y: 5, z: 0.5 });
-      expect(finite(rest.at) && finite(rest.tilt)).toBe(true);
-      expect(Math.hypot(rest.at.x, rest.at.z)).toBeLessThan(5.5);
-      expect(breathFallProgress(BREATH_FALL.end, rest.delay).landed).toBe(true);
-      expect(p.id.length).toBeGreaterThan(0);
+  it('hangs every socket on a real bone, at the offset the rest pose gives', () => {
+    const parent = new Map<number, number>();
+    glb.nodes.forEach((n, i) => {
+      for (const c of n.children ?? []) parent.set(c, i);
     });
+    const local = (n: GlbNode) =>
+      new THREE.Matrix4().compose(
+        new THREE.Vector3(...(n.translation ?? [0, 0, 0])),
+        new THREE.Quaternion(...(n.rotation ?? [0, 0, 0, 1])),
+        new THREE.Vector3(...(n.scale ?? [1, 1, 1])),
+      );
+    const world = (i: number) => {
+      const m = local(glb.nodes[i]);
+      for (let p = parent.get(i); p !== undefined; p = parent.get(p))
+        m.premultiply(local(glb.nodes[p]));
+      return m;
+    };
+    for (const s of BREATH_SOCKETS) {
+      const i = glb.nodes.findIndex((n) => n.name === s.bone);
+      expect(i, s.bone).toBeGreaterThanOrEqual(0);
+      const p = new THREE.Vector3(...s.at).applyMatrix4(world(i).invert());
+      expect(p.x, s.id).toBeCloseTo(s.local[0], 2);
+      expect(p.y, s.id).toBeCloseTo(s.local[1], 2);
+      expect(p.z, s.id).toBeCloseTo(s.local[2], 2);
+    }
   });
 });
 
-describe('BreathBody', () => {
+describe('breath_body_core: the wind plan', () => {
+  it('winds every current through real sockets', () => {
+    const ids = new Set(BREATH_SOCKETS.map((s) => s.id));
+    let ribbons = 0;
+    for (const c of BREATH_CURRENTS) {
+      expect(c.radius.length, c.id).toBe(c.path.length);
+      for (const p of c.path) expect(ids.has(p), `${c.id}:${p}`).toBe(true);
+      ribbons += c.ribbons;
+      // The low tier keeps at least one strand of every current, never all of a thick one.
+      const kept = Array.from({ length: c.ribbons }, (_, k) => breathRibbonKept(c, k, true));
+      expect(kept.filter(Boolean).length, c.id).toBeGreaterThan(0);
+      if (c.ribbons > 2) expect(kept.filter(Boolean).length, c.id).toBeLessThan(c.ribbons);
+    }
+    expect(ribbons).toBe(BREATH_RIBBON_COUNT);
+    // The trunk runs down every tail plate to the tip and curls on over the floor.
+    const trunk = BREATH_CURRENTS.find((c) => c.id === 'trunk');
+    expect(trunk?.path.at(-1)).toBe('tip');
+    expect(trunk?.tailCurl).toBe(true);
+    // The soft strands give it a body under the filaments.
+    expect(BREATH_CURRENTS.some((c) => c.soft)).toBe(true);
+    for (const [a, b] of BREATH_ARC_PAIRS) expect(ids.has(a) && ids.has(b)).toBe(true);
+  });
+
+  it('runs its spline through its points and fades its strands at both ends', () => {
+    const pts = new Float32Array([0, 0, 0, 1, 2, 0, 2, 0, 1]);
+    const out = new Float32Array(6);
+    splineAt(pts, 3, 0, out);
+    expect([out[0], out[1], out[2]]).toEqual([0, 0, 0]);
+    splineAt(pts, 3, 1, out);
+    expect(out[0]).toBeCloseTo(2, 6);
+    expect(out[2]).toBeCloseTo(1, 6);
+    splineAt(pts, 3, 0.5, out);
+    expect(out[1]).toBeCloseTo(2, 6);
+    expect(profileAt([1, 3], 0.5)).toBeCloseTo(2, 9);
+    expect(ribbonFade(0)).toBe(0);
+    expect(ribbonFade(1)).toBe(0);
+    expect(ribbonFade(0.5)).toBe(1);
+  });
+
+  it('jags its lightning between two points and lands on both', () => {
+    const out = new Float32Array(15 * 3);
+    arcPath(77, 0, 0, 0, 10, 0, 0, 14, 0.2, out);
+    expect([out[0], out[1], out[2]]).toEqual([0, 0, 0]);
+    expect(out[14 * 3]).toBeCloseTo(10, 6);
+    expect(Math.abs(out[14 * 3 + 1])).toBeLessThan(1e-6);
+    let kinked = 0;
+    for (let i = 1; i < 14; i++) {
+      expect(Math.hypot(out[i * 3 + 1], out[i * 3 + 2])).toBeLessThan(10 * 0.2 * 1.2);
+      if (Math.abs(out[i * 3 + 1]) > 0.05) kinked++;
+    }
+    expect(kinked).toBeGreaterThan(4);
+  });
+
+  it('reads the bars and the wind into an action', () => {
+    const at = (castId: string | null, stormForm = false) =>
+      breathBodyAction({ castId, castFill: 0.5, windPhase: null, windFill: 0.3, stormForm }).action;
+    expect(at(BREATH_CASTS.inhale)).toBe('inhale');
+    expect(at(BREATH_CASTS.gust)).toBe('roar');
+    expect(at(BREATH_CASTS.storm)).toBe('break');
+    expect(at(BREATH_CASTS.fork, true)).toBe('cast');
+    expect(at(BREATH_CASTS.cradleHold, true)).toBe('channel');
+    expect(at(ISLE_CASTS.bulwark)).toBe('channel');
+    expect(at(null, true)).toBe('storm');
+    expect(at(null)).toBe('idle');
+    expect(
+      breathBodyAction({
+        castId: null,
+        castFill: 0,
+        windPhase: 'blow',
+        windFill: 0.2,
+        stormForm: false,
+      }).action,
+    ).toBe('blow');
+  });
+
+  it('draws the wind in for the breath, flings it out with the roar, tears it into the storm', () => {
+    expect(breathWindLook('inhale', 1, 0).radius).toBeLessThan(
+      breathWindLook('inhale', 0, 0).radius,
+    );
+    expect(breathWindLook('inhale', 1, 0).drawIn).toBeGreaterThan(0.9);
+    expect(breathWindLook('roar', 0.5, 0).radius).toBeLessThan(1);
+    expect(breathWindLook('roar', 1, 0).radius).toBeGreaterThan(1.3);
+    expect(breathWindLook('roar', 1, 0).drawIn).toBe(0);
+    expect(breathWindLook('break', 0.2, 0).storm).toBe(0);
+    expect(breathWindLook('break', BREAK_TEAR_AT - 0.01, 0).storm).toBeLessThan(0.4);
+    expect(breathWindLook('break', 1, 0).storm).toBe(1);
+    expect(breathWindLook('storm', 0, 3).storm).toBe(1);
+    expect(breathWindLook('idle', 0, 1).storm).toBe(0);
+    // The tear falls where the Storm Breaks clip flings the pieces out.
+    expect(BREAK_TEAR_AT).toBeCloseTo(BREATH_BODY_CLIP.breakTear / BREATH_BODY_CLIP.breakEnd, 9);
+  });
+
+  it('dies in a gust: the wind out first, the glow after, the orbiters dropping', () => {
+    expect(breathDeathLook(0).wind).toBe(1);
+    expect(breathDeathLook(2).wind).toBe(0);
+    expect(breathDeathLook(1).fling).toBeGreaterThan(breathDeathLook(0).fling);
+    expect(breathDeathLook(1).glow).toBeGreaterThan(breathDeathLook(2).glow);
+    expect(breathDeathLook(0).drop).toBe(0);
+    expect(breathDeathLook(3).drop).toBe(1);
+  });
+
+  it('circles its stones and shards round the chest, wider in the storm', () => {
+    expect(BREATH_ORBIT_LOW).toBeLessThan(BREATH_STONES);
+    expect(BREATH_ORBIT_LOW).toBeLessThan(BREATH_SHARDS);
+    const o = { x: 0, y: 0, z: 0, size: 0, spin: 0 };
+    for (let i = 0; i < BREATH_STONES + BREATH_SHARDS; i++)
+      for (const t of [0, 3.3, 47]) {
+        breathOrbit(i, t, 0, o);
+        expect(Number.isFinite(o.x + o.y + o.z + o.size + o.spin)).toBe(true);
+        const calm = Math.hypot(o.x, o.z);
+        expect(calm).toBeGreaterThan(2.5 * BREATH_YD_PER_UNIT);
+        expect(o.y).toBeGreaterThan(0);
+        breathOrbit(i, t, 1, o);
+        expect(Math.hypot(o.x, o.z)).toBeGreaterThan(calm);
+      }
+  });
+
+  it('never hangs the loot sparkle over its fight objects', () => {
+    for (const templateId of [
+      breathWindTemplate('blow', 90, 10),
+      `${BREATH_OBJECTS.strikePrefix}12`,
+      `${BREATH_OBJECTS.calmPrefix}landing_20`,
+      BREATH_OBJECTS.vortex,
+    ]) {
+      const plan = gateObjectPlan({ templateId, dungeonId: 'smith_heart', pos: { x: 0, z: 0 } });
+      expect(plan && 'encounterAnchor' in plan, templateId).toBe(true);
+    }
+  });
+
+  it('knows its storm body by its aura', () => {
+    expect(stormFormOn([{ id: BREATH_AURAS.stormForm }])).toBe(true);
+    expect(stormFormOn([])).toBe(false);
+  });
+});
+
+describe('BreathBody over a fake world', () => {
   const o = instanceOrigin(DUNGEONS.smith_heart.index, 0);
   function entity(
     id: number,
@@ -264,7 +369,7 @@ describe('BreathBody', () => {
       pos: { x: o.x + x, y: 60, z: o.z + z },
       prevPos: { x: o.x + x, y: 60, z: o.z + z },
       facing: 0,
-      scale: 1,
+      scale: BREATH_BODY_SCALE,
       hp: 100,
       maxHp: 100,
       dead: false,
@@ -277,7 +382,16 @@ describe('BreathBody', () => {
     } as unknown as Entity;
   }
 
-  it('dresses the guardian, turns to the wind, wears the storm, never claims, falls, disposes', () => {
+  it('finds the mouth on the mask high over the Cornice before the model loads', () => {
+    clearBreathBodySockets();
+    const g = entity(2, 'mob', BREATH_GUARDIAN, 0, 198);
+    const m = breathSocketPoint(g, 'mouth', new THREE.Vector3());
+    expect(m.y - g.pos.y).toBeGreaterThan(8);
+    // Facing 0 is +z: the mouth stands before the body.
+    expect(m.z - g.pos.z).toBeGreaterThan(0.5);
+  });
+
+  it('winds the wind round the guardian, sends its stance, wears the storm, dies, disposes', () => {
     const entities = new Map<number, Entity>();
     const me = entity(1, 'player', 'warrior', -10, 190);
     const boss = entity(2, 'mob', BREATH_GUARDIAN, 0, 198);
@@ -291,6 +405,7 @@ describe('BreathBody', () => {
     } as unknown as IWorld & { entityRosterVersion: number };
     const scene = new THREE.Scene();
     let shaken = 0;
+    const sent: string[] = [];
     const fx = new BreathBody(
       scene,
       () => 60,
@@ -300,31 +415,27 @@ describe('BreathBody', () => {
       (a) => {
         shaken += a;
       },
+      (id, g) => {
+        expect(id).toBe(boss.id);
+        sent.push(g);
+      },
     );
     const root = scene.getObjectByName('smith-heart-breath-body');
     expect(root).toBeDefined();
-    const body = root?.getObjectByName('smithHeartBreathBody');
-    // No kit here: every piece wears its stand-in stone (a kit that never
-    // lands still leaves a body), the crystals casting no shadow.
-    const standIns: THREE.Mesh[] = [];
-    body?.traverse((o) => {
-      if (o instanceof THREE.Mesh && o.name === 'smithHeartBreathStandIn') standIns.push(o);
-    });
-    expect(standIns).toHaveLength(BREATH_BODY_PIECES.length);
-    BREATH_BODY_PIECES.forEach((def) => {
-      const holder = body?.getObjectByName(`breathBody:${def.id}`);
-      const s = holder?.children.find((c) => c.name === 'smithHeartBreathStandIn') as
-        | THREE.Mesh
-        | undefined;
-      expect(s, def.id).toBeDefined();
-      if (def.light === 'crystal') expect(s?.castShadow, def.id).toBe(false);
-    });
-    fx.update(0.2);
-    expect(body?.visible).toBe(true);
-    // As the blow gathers it turns its mouth to the bearing (90: east, +x).
-    for (let i = 0; i < 60; i++) fx.update(1 / 30);
-    expect(Math.abs((body?.rotation.y ?? 0) - Math.PI / 2)).toBeLessThan(0.2);
-    // A swing never claims.
+    for (let i = 0; i < 6; i++) fx.update(1 / 20);
+    expect(root?.visible).toBe(true);
+    expect(sent).toContain(BREATH_BODY_GESTURES.calm);
+    // The living wind: every ribbon drawn round the body.
+    const windMesh = root?.getObjectByName('smithHeartBreathWind') as THREE.Mesh;
+    expect(windMesh.visible).toBe(true);
+    expect(windMesh.geometry.drawRange.count).toBeGreaterThan(0);
+    const spine = windMesh.geometry.getAttribute('aSpine') as THREE.BufferAttribute;
+    const p = new THREE.Vector3(spine.getX(0), spine.getY(0), spine.getZ(0));
+    expect(Math.hypot(p.x - boss.pos.x, p.z - boss.pos.z)).toBeLessThan(12);
+    // The orbiters circle it.
+    const stones = root?.getObjectByName('smithHeartBreathStones') as THREE.InstancedMesh;
+    expect(stones.isInstancedMesh).toBe(true);
+    // A swing and the roar's cue never claim; the roar blasts its cone.
     const swing = {
       type: 'damage',
       sourceId: boss.id,
@@ -335,67 +446,44 @@ describe('BreathBody', () => {
       ability: null,
     } as SimEvent;
     expect(fx.handleEvent(swing)).toBe(false);
-    // The storm bar, its tear, then the storm body.
-    boss.castingAbility = BREATH_CASTS.storm;
-    boss.castTotal = 4;
-    boss.castRemaining = 4;
-    for (let i = 0; i < 120; i++) {
-      boss.castRemaining = Math.max(0, boss.castRemaining - 1 / 30);
-      fx.update(1 / 30);
-    }
-    boss.castingAbility = null;
-    boss.auras.push({ id: BREATH_AURAS.stormForm } as Entity['auras'][number]);
-    const tear = {
+    const roar = {
       type: 'spellfx',
       sourceId: boss.id,
       targetId: boss.id,
       school: 'nature',
       fx: 'nova',
-      ability: BREATH_CUES.tear,
+      ability: BREATH_CUES.gust,
     } as SimEvent;
-    expect(fx.handleEvent(tear)).toBe(false);
-    for (let i = 0; i < 60; i++) fx.update(1 / 30);
-    expect(root?.getObjectByName('smithHeartBreathStormCore')?.visible).toBe(true);
+    expect(fx.handleEvent(roar)).toBe(false);
+    fx.update(1 / 20);
+    expect(root?.getObjectByName('smithHeartBreathRoarCone')?.visible).toBe(true);
     expect(shaken).toBeGreaterThan(0);
-    // Death: it stays drawn (fallen) while its corpse lies.
+    expect(sent).toContain(BREATH_BODY_GESTURES.flare);
+    // The storm bar runs out, its tear, then the storm stance and its lightning.
+    boss.castingAbility = BREATH_CASTS.storm;
+    boss.castTotal = 4;
+    boss.castRemaining = 4;
+    for (let i = 0; i < 80; i++) {
+      boss.castRemaining = Math.max(0, boss.castRemaining - 1 / 20);
+      fx.update(1 / 20);
+    }
+    boss.castingAbility = null;
+    boss.auras.push({ id: BREATH_AURAS.stormForm } as Entity['auras'][number]);
+    for (let i = 0; i < 40; i++) fx.update(1 / 20);
+    expect(sent[sent.length - 1]).toBe(BREATH_BODY_GESTURES.storm);
+    const bolts = root?.getObjectByName('smithHeartBreathBolts') as THREE.Mesh;
+    expect(bolts.visible).toBe(true);
+    // Death: the wind thrown off and gone.
     boss.dead = true;
-    for (let i = 0; i < 90; i++) fx.update(1 / 30);
-    expect(body?.visible).toBe(true);
+    for (let i = 0; i < 60; i++) fx.update(1 / 20);
+    expect(windMesh.visible).toBe(false);
     // Leaving the world frees it.
     entities.delete(boss.id);
     world.entityRosterVersion++;
     fx.update(0.2);
-    expect(body?.visible).toBe(false);
-    // Discovery walks the roster on a membership change only: a guardian
-    // the walk has not been told of stays undrawn until the version moves.
-    boss.dead = false;
-    entities.set(boss.id, boss);
-    fx.update(0.2);
-    expect(body?.visible).toBe(false);
-    world.entityRosterVersion++;
-    fx.update(0.2);
-    expect(body?.visible).toBe(true);
+    expect(root?.visible).toBe(false);
+    fx.dispose();
     fx.dispose();
     expect(scene.getObjectByName('smith-heart-breath-body')).toBeUndefined();
-  });
-
-  it('first seen already in the storm, it wears the torn body whole', () => {
-    const entities = new Map<number, Entity>();
-    const me = entity(1, 'player', 'warrior', -10, 190);
-    const boss = entity(2, 'mob', BREATH_GUARDIAN, 0, 198);
-    boss.auras.push({ id: BREATH_AURAS.stormForm } as Entity['auras'][number]);
-    for (const e of [me, boss]) entities.set(e.id, e);
-    const world = {
-      entities,
-      entityRosterVersion: 1,
-      player: me,
-      playerId: me.id,
-    } as unknown as IWorld;
-    const scene = new THREE.Scene();
-    const fx = new BreathBody(scene, () => 60, world);
-    fx.update(0.2);
-    fx.update(1 / 30);
-    expect(scene.getObjectByName('smithHeartBreathStormCore')?.visible).toBe(true);
-    fx.dispose();
   });
 });

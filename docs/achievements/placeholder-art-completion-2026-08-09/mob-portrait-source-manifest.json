@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "bc131ae15c0bec51ecd63368d21f3af63230819928fa7017448ed010c20abf2f",
+  "rendererFingerprint": "9ff25a5481fed902c71344fec4c9805c4890d626515021e56035903db289bef7",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 6949812,
-      "sha256": "cf08c6d1d02d78c1376c442151e2728b4235b028c82a8c01c266cd0473b7a4ec",
+      "bytes": 6950499,
+      "sha256": "1b04c29dae210cb7f76778ff79c02fd8883f3be8150da71fe58a08b5ff7cd051",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -5131,13 +5131,13 @@
       "visualKey": "smith_heart_breath_guardian",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/golelingevolved.glb",
-          "path": "public/models/creatures/golelingevolved.glb",
-          "bytes": 85588,
-          "sha256": "156f4c2dcf93c6e52a738d8a93e09d1988f933fe4f2d1f9d30411b5eae7f2b94"
+          "url": "models/creatures/smith_heart_breath_guardian.glb",
+          "path": "public/models/creatures/smith_heart_breath_guardian.glb",
+          "bytes": 1098776,
+          "sha256": "9cdfedb32e9857cf7209037ca680ff5b749f743607783049c63d3694ffd23c43"
         },
-        "idle": "Flying_Idle",
-        "height": 2,
+        "idle": "Idle",
+        "height": 3.75,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -5151,11 +5151,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "feca244fd6ab57da0eb2f55818454d44a2cddf27bc5436ab996a17bd2df610d8",
+      "sourceFingerprint": "4ac3b6bf376e733872126c19049c1794be299df13e35718ab8c15bf11ab2271a",
       "output": {
         "path": "public/ui/mobs/heart_breath_guardian.webp",
-        "bytes": 2330,
-        "sha256": "da04f69981b3560b636c0473e89c2a109f8e19bb8b809182e649286d83c8af0d"
+        "bytes": 4618,
+        "sha256": "df99ff26caeabfd0209fc04ad49abf37adb158c196c107351a3b3dd3d22123f0"
       }
     },
     {

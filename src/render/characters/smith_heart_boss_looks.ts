@@ -12,8 +12,16 @@
 // are sent by smith_heart_fx/final_body_fx.ts; their ids and the clip beats
 // live in smith_heart_fx/final_body_core.ts.
 
+import { BREATH_CASTS, BREATH_TUNING } from '../../sim/encounters/smith_heart/breath_ids';
+import { ISLE_CASTS } from '../../sim/encounters/smith_heart/breath_isle_ids';
 import { FINAL_CASTS, FINAL_TUNING } from '../../sim/encounters/smith_heart/final_ids';
 import { HEAT_CASTS, HEAT_TUNING } from '../../sim/encounters/smith_heart/heat_ids';
+import {
+  BREATH_BODY_CLIP,
+  BREATH_BODY_GESTURES,
+  BREATH_BODY_HEIGHT,
+  BREATH_BODY_URL,
+} from '../smith_heart_fx/breath_body_core';
 import {
   FINAL_BODY_CLIP,
   FINAL_BODY_ELEMENTS,
@@ -134,7 +142,106 @@ const HEAT_BASE: ClipMap = {
 /** Under the wellspring through an overflow. */
 const HEAT_UNDER: ClipMap = { ...HEAT_BASE, idle: 'Under', walk: 'Under', run: 'Under' };
 
+// The Guardian of the Breath (the Storm Cornice, design doc 7.2): floating
+// pieces of ancient armor held together by living wind, one bone a piece, so
+// every piece trails and overshoots on its own. Its claws swipe in turn; the
+// Indrawn Breath runs its whole bar (pieces drawn in, the mask to the raid);
+// the Summit Roar's thrust lands on the bar's end and its follow-through plays
+// out; the bolt casts point on their bar's end; the channels (the Thunder's
+// Cradle's hold, the Gale Bulwark) raise both arms and hold. At half health
+// Storm Breaks runs the 4 s bar and leaves every piece flung out to the wider
+// spacing the storm stance keeps: the same motions, crackling (no model
+// swap). The wind round it is smith_heart_fx/breath_body.ts's; the gesture ids
+// and the clip beats live in smith_heart_fx/breath_body_core.ts.
+const BREATH_BOLT_CASTS = [
+  BREATH_CASTS.fork,
+  BREATH_CASTS.drawn,
+  BREATH_CASTS.cradle,
+  BREATH_CASTS.lance,
+] as const;
+const BREATH_LANCE_CAST = 2;
+const breathBarScale = (c: string): number => {
+  if (c === BREATH_CASTS.fork)
+    return onBarEnd(BREATH_BODY_CLIP.castRelease, BREATH_TUNING.forkCast);
+  if (c === BREATH_CASTS.drawn)
+    return onBarEnd(BREATH_BODY_CLIP.castRelease, BREATH_TUNING.drawnCast);
+  if (c === BREATH_CASTS.cradle)
+    return onBarEnd(BREATH_BODY_CLIP.castRelease, BREATH_TUNING.cradleCast);
+  return onBarEnd(BREATH_BODY_CLIP.castRelease, BREATH_LANCE_CAST);
+};
+
+function breathClips(storm: boolean): ClipMap {
+  const p = storm ? 'Storm' : '';
+  const cast = `${p}Cast`;
+  const channel = `${p}Channel`;
+  return {
+    idle: `${p}Idle`,
+    walk: `${p}Move`,
+    run: `${p}Move`,
+    attack: [`${p}Attack`, `${p}Attack2`],
+    contacts: {
+      [`${p}Attack`]: [BREATH_BODY_CLIP.attack],
+      [`${p}Attack2`]: [BREATH_BODY_CLIP.attack],
+    },
+    death: `${p}Death`,
+    cast,
+    castByAbility: {
+      [BREATH_CASTS.inhale]: 'Inhale',
+      [BREATH_CASTS.gust]: 'Roar',
+      [BREATH_CASTS.storm]: 'StormBreaks',
+      [BREATH_CASTS.cradleHold]: channel,
+      [ISLE_CASTS.bulwark]: channel,
+      ...Object.fromEntries(BREATH_BOLT_CASTS.map((c) => [c, cast])),
+    },
+    castTimeScaleByAbility: {
+      [BREATH_CASTS.inhale]: onBarEnd(BREATH_BODY_CLIP.inhale, BREATH_TUNING.inhaleCast),
+      [BREATH_CASTS.gust]: onBarEnd(BREATH_BODY_CLIP.roar, BREATH_TUNING.gustCast),
+      [BREATH_CASTS.storm]: onBarEnd(BREATH_BODY_CLIP.breakEnd, BREATH_TUNING.stormCast),
+      ...Object.fromEntries(BREATH_BOLT_CASTS.map((c) => [c, breathBarScale(c)])),
+    },
+    castPlayOut: ['Roar', cast],
+  };
+}
+
+const BREATH_CALM = breathClips(false);
+const BREATH_STORM = breathClips(true);
+
 export const SMITH_HEART_BOSS_LOOKS: Record<string, VisualDef> = {
+  smith_heart_breath_guardian: {
+    url: BREATH_BODY_URL,
+    height: BREATH_BODY_HEIGHT,
+    clips: BREATH_CALM,
+    phaseClips: {
+      [BREATH_BODY_GESTURES.calm]: { clips: BREATH_CALM },
+      [BREATH_BODY_GESTURES.storm]: { clips: BREATH_STORM },
+    },
+    castClipSync: [
+      BREATH_CASTS.inhale,
+      BREATH_CASTS.gust,
+      BREATH_CASTS.storm,
+      ...BREATH_BOLT_CASTS,
+    ],
+    glowPulses: {
+      // Its eyes, crystals and spiral flare at the indrawn breath's end, the
+      // roar and the storm tearing open.
+      pulses: [
+        { gesture: BREATH_BODY_GESTURES.flare, rise: 0.15, hold: 0.35, fall: 0.9, peak: 1.9 },
+      ],
+      // Dead, the wind gone, its light goes out.
+      deathFade: 3,
+    },
+    // A swing never cuts the roar, the storm breaking or a bolt's cast.
+    oneShotsHoldAttacks: ['Roar', 'StormBreaks', 'Cast', 'StormCast'],
+    castPlayOutHoldsAttacks: true,
+    // It glides: its Move loop read at its own pace (the template's speed).
+    walkRef: 7,
+    runRef: 7,
+    attackTimeScale: 1,
+    deathTimeScale: 1,
+    authoredAtlas: true,
+    selfIllumination: 0.06,
+    clickRadius: 3.4,
+  },
   smith_heart_heat_guardian: {
     url: HEAT_BODY_URL,
     height: HEAT_BODY_HEIGHT,

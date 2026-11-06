@@ -249,7 +249,15 @@ export class RiftDeathZoneVisuals {
     this.hammerFx = new HammerFx(scene, groundY, world, compileGate, reducedMotion, shake);
     this.breathFx = new BreathFx(scene, groundY, world, compileGate, reducedMotion, shake);
     this.breathFight = new BreathFightFx(scene, groundY, world, compileGate, reducedMotion, shake);
-    this.breathBody = new BreathBody(scene, groundY, world, compileGate, reducedMotion, shake);
+    this.breathBody = new BreathBody(
+      scene,
+      groundY,
+      world,
+      compileGate,
+      reducedMotion,
+      shake,
+      playGesture,
+    );
     this.quenchFx = new QuenchFx(scene, groundY, world, compileGate, reducedMotion, shake);
     this.quenchFight = new QuenchFightFx(scene, groundY, world, compileGate, reducedMotion, shake);
     this.quenchBlades = new QuenchBladesFx(scene, groundY, world, compileGate, reducedMotion);

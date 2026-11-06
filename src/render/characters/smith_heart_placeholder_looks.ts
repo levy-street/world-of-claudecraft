@@ -49,10 +49,9 @@ export const SMITH_HEART_PLACEHOLDER_LOOKS: Record<string, string> = {
   // smith_heart_fx/council_bodies.ts (the Masterless Strength's pattern).
   // Final: its own model (the official pipeline), the same joints.
   heart_seam_singer: 'smith_heart_seam_singer',
-  // The Guardian of the Breath: a bodyless target; its provisional body (a
-  // living bellows of storm granite, crystal and lightning, its phase-2 storm
-  // body too) is drawn by smith_heart_fx/breath_body.ts. Final: its own model
-  // (the official pipeline), the same joints.
+  // The Guardian of the Breath: its own model (smith_heart_boss_looks.ts),
+  // floating pieces of ancient armor held together by living wind; the wind
+  // (and its phase-2 storm) is drawn by smith_heart_fx/breath_body.ts.
   heart_breath_guardian: 'smith_heart_breath_guardian',
   // The Guardian of the Quench: a bodyless target; its provisional body (an
   // ice guardian of frost granite and clear lake ice, the lake's cold light
