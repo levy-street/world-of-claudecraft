@@ -3715,6 +3715,7 @@ export const sv_SE: EnTranslations = {
     },
     "questLog": {
       "available": "Available",
+      "offerMeta": "{zone} · {level}",
       "completed": "Slutförd",
       "zoneSummary": "{count} ({ready} redo)",
       "shiftHint": "Skift-klicka på ett uppdrag för att länka det i chatten."

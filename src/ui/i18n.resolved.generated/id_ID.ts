@@ -3715,6 +3715,7 @@ export const id_ID: EnTranslations = {
     },
     "questLog": {
       "available": "Available",
+      "offerMeta": "{zone} · {level}",
       "completed": "Selesai",
       "zoneSummary": "{count} ({ready} siap)",
       "shiftHint": "Shift-klik misi untuk menghubungkannya dalam obrolan."

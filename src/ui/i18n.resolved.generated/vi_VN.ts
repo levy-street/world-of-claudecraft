@@ -3715,6 +3715,7 @@ export const vi_VN: EnTranslations = {
     },
     "questLog": {
       "available": "Available",
+      "offerMeta": "{zone} · {level}",
       "completed": "Hoàn thành",
       "zoneSummary": "{count} ({ready} sẵn sàng)",
       "shiftHint": "Shift-click vào một nhiệm vụ để liên kết nó trong cuộc trò chuyện."

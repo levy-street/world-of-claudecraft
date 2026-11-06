@@ -3715,6 +3715,7 @@ export const en_CA: EnTranslations = {
     },
     "questLog": {
       "available": "Available",
+      "offerMeta": "{zone} · {level}",
       "completed": "Completed",
       "zoneSummary": "{count} ({ready} ready)",
       "shiftHint": "Shift-click a quest to link it in chat."

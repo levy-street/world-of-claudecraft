@@ -1,10 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { getActiveWorldContent, QUESTS, ZONES, zoneAt } from '../src/sim/data';
 import {
-  AVAILABLE_QUEST_DISTANCE_BUCKET,
   AVAILABLE_QUEST_LIMIT,
   availableQuestOffers,
-  bucketAvailableQuestDistance,
 } from '../src/ui/hud/quest/available_quests_view';
 
 // Menu consolidation step 8: the World Map rail's "Available Nearby" list moved
@@ -84,15 +82,5 @@ describe('availableQuestOffers', () => {
       1,
     );
     expect(offers).toHaveLength(1);
-  });
-});
-
-describe('bucketAvailableQuestDistance', () => {
-  it('rounds to the bucket so a walking player does not move the rendered yards', () => {
-    expect(AVAILABLE_QUEST_DISTANCE_BUCKET).toBe(10);
-    expect(bucketAvailableQuestDistance(0)).toBe(0);
-    expect(bucketAvailableQuestDistance(14.9)).toBe(10);
-    expect(bucketAvailableQuestDistance(15)).toBe(20);
-    expect(bucketAvailableQuestDistance(41)).toBe(40);
   });
 });

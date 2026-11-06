@@ -36,7 +36,7 @@ import { QuestTrackingState, sharedQuestTracking } from '../../quest_tracking_co
 import { svgIcon } from '../../ui_icons';
 import { referralQuestRows } from '../referral_cards/referral_cards_view';
 import { referralText } from '../referral_cards/referral_cards_window';
-import { availableQuestOffers, bucketAvailableQuestDistance } from './available_quests_view';
+import { type AvailableQuestOffer, availableQuestOffers } from './available_quests_view';
 import { questRewardChoiceHtml, questRewardChoiceModel } from './quest_reward_choice_view';
 import {
   buildQuestLogView,
@@ -77,6 +77,14 @@ export interface QuestLogWindowDeps extends PainterHostPresentation {
   openReferralCards?(): void;
 }
 
+/** The Available group's repaint key: which quests are on offer, not where. */
+function offersSig(offers: readonly AvailableQuestOffer[]): string {
+  return offers
+    .map((offer) => offer.questId)
+    .sort()
+    .join('|');
+}
+
 export class QuestLogWindow {
   // The selected quest id. Hud's "/share" command reads it through `selectedQuestId`
   // (it links the selected quest into party chat), so the painter owns the single
@@ -84,6 +92,8 @@ export class QuestLogWindow {
   private selected: string | null = null;
   private openerFocus: HTMLElement | null = null;
   private readonly collapsedGroups = new Set<string>(['completed']);
+  // The Available group's offer set as last painted (refreshIfChanged).
+  private lastOffersSig = '';
 
   constructor(private readonly deps: QuestLogWindowDeps) {}
 
@@ -152,14 +162,15 @@ export class QuestLogWindow {
     for (const offer of group.offers) {
       const row = document.createElement('div');
       row.className = 'ql-offer';
-      const level =
+      const zone = zoneDisplayName(offer.zoneId);
+      const meta =
         offer.minLevel === null
-          ? ''
-          : ` · ${t('hudChrome.mapAtlas.level', { level: this.questNumber(offer.minLevel) })}`;
-      const distance = t('hudChrome.mapAtlas.distance', {
-        distance: this.questNumber(bucketAvailableQuestDistance(offer.distance)),
-      });
-      row.innerHTML = `<span class="ql-offer-copy"><span class="ql-offer-title">${esc(questTitle(offer.questId))}</span><span class="ql-offer-meta quest-muted">${esc(`${zoneDisplayName(offer.zoneId)}${level} · ${distance}`)}</span></span>`;
+          ? zone
+          : t('hudChrome.questLog.offerMeta', {
+              zone,
+              level: t('hudChrome.mapAtlas.level', { level: this.questNumber(offer.minLevel) }),
+            });
+      row.innerHTML = `<span class="ql-offer-copy"><span class="ql-offer-title">${esc(questTitle(offer.questId))}</span><span class="ql-offer-meta quest-muted">${esc(meta)}</span></span>`;
       const map = document.createElement('button');
       map.type = 'button';
       map.className = 'ui-btn ui-btn--sm';
@@ -170,6 +181,21 @@ export class QuestLogWindow {
       section.appendChild(row);
     }
     return section;
+  }
+
+  /** The nearby offers for the Available group, from where the player stands. */
+  private offers(): AvailableQuestOffer[] {
+    const world = this.deps.world();
+    return availableQuestOffers(world, zoneAt(world.player.pos.x, world.player.pos.z));
+  }
+
+  /** Slow band, while open: repaint when the SET of nearby offers changes (a
+   *  new zone, a level reached, a quest taken). Order and distance stay out of
+   *  the signature, so walking around repaints nothing. */
+  refreshIfChanged(): void {
+    if (!this.isOpen) return;
+    if (offersSig(this.offers()) === this.lastOffersSig) return;
+    this.render();
   }
 
   close(restoreFocus = true): void {
@@ -192,8 +218,9 @@ export class QuestLogWindow {
       playerClass: world.cfg.playerClass,
       completedCount: world.questsDone.size,
       collapsedGroupIds: [...this.collapsedGroups],
-      available: availableQuestOffers(world, zoneAt(world.player.pos.x, world.player.pos.z)),
+      available: this.offers(),
     });
+    this.lastOffersSig = offersSig(view.available?.offers ?? []);
     this.selected = view.selectedQuestId;
 
     markDialogRoot(el, { labelledBy: 'quest-log-title' });

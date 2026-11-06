@@ -17201,6 +17201,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.pvp.mobileLabel'
   | 'hudChrome.questLog.available'
   | 'hudChrome.questLog.completed'
+  | 'hudChrome.questLog.offerMeta'
   | 'hudChrome.questLog.shiftHint'
   | 'hudChrome.questLog.zoneSummary'
   | 'hudChrome.questShare.accepted'

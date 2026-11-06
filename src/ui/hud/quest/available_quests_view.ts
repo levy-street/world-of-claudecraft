@@ -12,7 +12,7 @@ import { ownEntry } from '../../known_item';
 export interface AvailableQuestOffer {
   readonly questId: string;
   readonly zoneId: string;
-  /** Yards from the player to the giver. */
+  /** Yards from the player to the giver (the nearest-first order). */
   readonly distance: number;
   readonly minLevel: number | null;
   /** The giver's position (Show on Map). */
@@ -22,15 +22,6 @@ export interface AvailableQuestOffer {
 
 /** How many offers the group lists (the rail showed the same four). */
 export const AVAILABLE_QUEST_LIMIT = 4;
-
-/** Yards per step of a rendered distance. A live distance moves every tick
- *  while the player walks; a bucketed one holds still until the reading
- *  really changes, so a repaint signature over it stays quiet. */
-export const AVAILABLE_QUEST_DISTANCE_BUCKET = 10;
-
-export function bucketAvailableQuestDistance(distance: number): number {
-  return Math.round(distance / AVAILABLE_QUEST_DISTANCE_BUCKET) * AVAILABLE_QUEST_DISTANCE_BUCKET;
-}
 
 export function availableQuestOffers(
   world: Pick<IWorld, 'player' | 'questState'>,

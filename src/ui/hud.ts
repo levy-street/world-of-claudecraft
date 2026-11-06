@@ -9342,6 +9342,7 @@ export class Hud {
     if (slowHud && this.rewards.vault.isOpen) this.rewards.vault.refreshIfChanged();
     if (slowHud && this.weeklyQuestsWindow.isOpen) this.weeklyQuestsWindow.refreshIfChanged();
     if (slowHud && this.rewards.worldQuests.isOpen) this.rewards.worldQuests.refreshIfChanged();
+    if (slowHud && this.questlogWindow.isOpen) this.questlogWindow.refreshIfChanged();
     if (slowHud && this.guildHallWindow.isOpen) this.guildHallWindow.refreshIfChanged();
     if (slowHud) this.updateMailIndicator();
     if (slowHud) this.updateMarketIndicator();

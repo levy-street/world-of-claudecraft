@@ -3715,6 +3715,7 @@ export const ru_RU: EnTranslations = {
     },
     "questLog": {
       "available": "Доступные",
+      "offerMeta": "{zone} · {level}",
       "completed": "Завершённые",
       "zoneSummary": "{count} (готово: {ready})",
       "shiftHint": "Щёлкните задание с Shift, чтобы отправить ссылку в чат."

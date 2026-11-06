@@ -6,14 +6,17 @@
 // the tabs paint).
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { WorldQuestProgress } from '../src/sim/types';
+import { emptyWeeklyRewards } from '../src/sim/weekly_rewards';
 import { worldQuestCycleForResetDay } from '../src/sim/world_quest_rotation';
 import { activeWorldQuestsForCycle } from '../src/sim/world_quests';
 import { createRewardsSurfaces } from '../src/ui/hud/rewards/rewards_surfaces';
 import { worldQuestMapPoint } from '../src/ui/hud/rewards/rewards_view';
+import { WeeklyVaultWindow } from '../src/ui/hud/rewards/weekly_vault_window';
 import { WorldQuestsWindow } from '../src/ui/hud/rewards/world_quests_window';
 
 const cycle = worldQuestCycleForResetDay('2026-08-31');
 const board = activeWorldQuestsForCycle(cycle);
+const NOW = 1_000_000_000;
 
 function worldStub(log: Array<[string, WorldQuestProgress['state']]> = []) {
   return {
@@ -23,7 +26,8 @@ function worldStub(log: Array<[string, WorldQuestProgress['state']]> = []) {
     ),
     worldQuestReplacements: {},
     worldQuestRerollCycle: '',
-    worldQuestExpiresAtMs: Date.now() + 3_600_000,
+    // Mid-minute, so the countdown minute in the repaint signature holds still.
+    worldQuestExpiresAtMs: NOW + 3_600_000 - 30_000,
     player: { level: 60, name: 'Ari' },
     canRerollWorldQuest: vi.fn(() => ({ canReroll: true })),
     rerollWorldQuest: vi.fn(() => true),
@@ -50,7 +54,7 @@ function worldQuestsRig(log: Array<[string, WorldQuestProgress['state']]> = []) 
   const win = new WorldQuestsWindow({
     root: () => el,
     world: () => world as never,
-    nowMs: () => Date.now(),
+    nowMs: () => NOW,
     selectedId: () => selected,
     select: (questId) => {
       selected = questId;
@@ -138,7 +142,7 @@ describe('Rewards hub composition', () => {
       selectedWorldQuest: () => null,
       selectWorldQuest: vi.fn(),
       confirmDialog: vi.fn(),
-      nowMs: () => Date.now(),
+      nowMs: () => NOW,
     });
     return { world, surfaces };
   }
@@ -168,5 +172,51 @@ describe('Rewards hub composition', () => {
     expect(surfaces.claimCounts().total).toBe(1);
     surfaces.recount();
     expect(surfaces.claimCounts()).toEqual({ vault: 2, weekly: 1, worldQuests: 1, total: 4 });
+  });
+});
+
+describe('Vault tab', () => {
+  it('keeps the player place (scroll and focus) when its signature repaints the sheet', () => {
+    const el = root('weekly-vault-window');
+    const state = emptyWeeklyRewards(604800000);
+    state.world = 8;
+    const info = {
+      state,
+      nowMs: 1000,
+      playerLevel: 20,
+      canClaim: false,
+      worldQuestsAvailable: true,
+      readyWeeks: 0,
+    };
+    const world = { cfg: { playerClass: 'mage' }, weeklyRewardInfo: info };
+    const win = new WeeklyVaultWindow({
+      root: () => el,
+      world: () => world as never,
+      presentation: { itemIcon: () => '', attachTooltip: vi.fn() } as never,
+      onInventoryChanged: vi.fn(),
+      hideTooltip: vi.fn(),
+      closeOthers: vi.fn(),
+      captureFocus: () => null,
+      restoreFocus: vi.fn(),
+    });
+    win.open();
+    const panel = el.querySelector<HTMLElement>('#weekly-rewards-panel');
+    expect(panel).not.toBeNull();
+    if (!panel) return;
+    panel.scrollTop = 40;
+    const loot = el.querySelector<HTMLElement>('[data-focus-key="weekly-possible-loot"]');
+    loot?.focus();
+    // A changed signature (one more world quest) repaints the whole sheet.
+    world.weeklyRewardInfo = { ...info, state: { ...state, world: 9 } };
+    win.refreshIfChanged();
+    const rebuilt = el.querySelector<HTMLElement>('#weekly-rewards-panel');
+    expect(rebuilt).not.toBe(panel);
+    expect(rebuilt?.scrollTop).toBe(40);
+    if (loot) {
+      expect(document.activeElement).toBe(
+        el.querySelector('[data-focus-key="weekly-possible-loot"]'),
+      );
+    }
+    win.close();
   });
 });

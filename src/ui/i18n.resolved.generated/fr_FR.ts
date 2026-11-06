@@ -3715,6 +3715,7 @@ export const fr_FR: EnTranslations = {
     },
     "questLog": {
       "available": "Available",
+      "offerMeta": "{zone} · {level}",
       "completed": "Complété",
       "zoneSummary": "{count} ({ready} prêt)",
       "shiftHint": "Maj-cliquez sur une quête pour la lier dans le chat."

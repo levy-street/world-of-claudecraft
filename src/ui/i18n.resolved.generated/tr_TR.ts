@@ -3715,6 +3715,7 @@ export const tr_TR: EnTranslations = {
     },
     "questLog": {
       "available": "Available",
+      "offerMeta": "{zone} · {level}",
       "completed": "Tamamlanmış",
       "zoneSummary": "{count} ({ready} hazır)",
       "shiftHint": "Sohbete bağlamak için bir göreve Shift tuşunu basılı tutarak tıklayın."

@@ -3715,6 +3715,7 @@ export const ko_KR: EnTranslations = {
     },
     "questLog": {
       "available": "수락 가능",
+      "offerMeta": "{zone} · {level}",
       "completed": "완료됨",
       "zoneSummary": "{count}개（완료 {ready}개）",
       "shiftHint": "Shift를 누른 채 퀘스트를 클릭하면 채팅에 링크됩니다."

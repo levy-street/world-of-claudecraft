@@ -3715,6 +3715,7 @@ export const de_DE: EnTranslations = {
     },
     "questLog": {
       "available": "Available",
+      "offerMeta": "{zone} · {level}",
       "completed": "Vollendet",
       "zoneSummary": "{count} ({ready} bereit)",
       "shiftHint": "Klicken Sie bei gedrückter Umschalttaste auf eine Quest, um sie im Chat zu verknüpfen."

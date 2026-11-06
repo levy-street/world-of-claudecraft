@@ -3715,6 +3715,7 @@ export const en_XA: EnTranslations = {
     },
     "questLog": {
       "available": "[Áʋáíļáƀļé]",
+      "offerMeta": "[{zone} · {level}]",
       "completed": "[Çóɱþļéţéð]",
       "zoneSummary": "[{count} ({ready} ŕéáðý)]",
       "shiftHint": "[Šĥíƒţ-çļíçķ á ɋúéšţ ţó ļíñķ íţ íñ çĥáţ.]"

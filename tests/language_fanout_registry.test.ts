@@ -441,6 +441,12 @@ const ANSWERED: readonly AnsweredSurface[] = [
     why: 'the Skull Bag pane is mounted only inside the open bags window; the bags language arm rebuilds that window, remounts the pane, resets lastSignature, and repaints the title, row labels, aria labels and buttons in the new locale',
   },
   {
+    file: 'hud/quest/questlog_window.ts',
+    memos: ['lastOffersSig'],
+    answer: 'this.questlogWindow.render',
+    why: "the Available group's offer set (quest ids only, no text); the fan-out's render() of the open log rebuilds it with fresh t() and re-latches the signature (menu consolidation step 8)",
+  },
+  {
     file: 'hud/reputation/reputation_window.ts',
     memos: ['lastBody'],
     answer: 'this.reputationWindow.relocalize',

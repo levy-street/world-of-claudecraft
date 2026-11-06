@@ -3715,6 +3715,7 @@ export const pl_PL: EnTranslations = {
     },
     "questLog": {
       "available": "Available",
+      "offerMeta": "{zone} · {level}",
       "completed": "Zakończony",
       "zoneSummary": "{count} ({ready} gotowy)",
       "shiftHint": "Kliknij zadanie, przytrzymując klawisz Shift, aby połączyć je na czacie."

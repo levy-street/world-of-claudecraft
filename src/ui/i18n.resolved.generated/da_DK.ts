@@ -3715,6 +3715,7 @@ export const da_DK: EnTranslations = {
     },
     "questLog": {
       "available": "Available",
+      "offerMeta": "{zone} · {level}",
       "completed": "Færdiggjort",
       "zoneSummary": "{count} ({ready} klar)",
       "shiftHint": "Shift-klik på en quest for at linke den i chat."

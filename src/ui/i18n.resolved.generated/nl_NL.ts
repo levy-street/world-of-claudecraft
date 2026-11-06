@@ -3715,6 +3715,7 @@ export const nl_NL: EnTranslations = {
     },
     "questLog": {
       "available": "Available",
+      "offerMeta": "{zone} · {level}",
       "completed": "Voltooid",
       "zoneSummary": "{count} ({ready} gereed)",
       "shiftHint": "Houd Shift ingedrukt en klik op een missie om deze in de chat te koppelen."

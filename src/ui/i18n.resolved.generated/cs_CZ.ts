@@ -3715,6 +3715,7 @@ export const cs_CZ: EnTranslations = {
     },
     "questLog": {
       "available": "Available",
+      "offerMeta": "{zone} · {level}",
       "completed": "Dokončeno",
       "zoneSummary": "{count} ({ready} připraveno)",
       "shiftHint": "Kliknutím se stisknutou klávesou Shift na úkol jej propojíte v chatu."

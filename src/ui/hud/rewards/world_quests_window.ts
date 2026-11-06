@@ -121,7 +121,8 @@ export class WorldQuestsWindow {
     this.render();
   }
 
-  /** Self-gated language-switch arm: the signature is locale-free. */
+  /** Self-gated language-switch arm: repaints at once rather than on the next
+   *  slow tick (the signature carries the i18n revision either way). */
   relocalize(): void {
     if (this.opened) this.render();
   }

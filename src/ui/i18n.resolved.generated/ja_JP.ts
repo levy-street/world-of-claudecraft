@@ -3715,6 +3715,7 @@ export const ja_JP: EnTranslations = {
     },
     "questLog": {
       "available": "受注可能",
+      "offerMeta": "{zone} · {level}",
       "completed": "完了済み",
       "zoneSummary": "{count}件（{ready}件完了）",
       "shiftHint": "Shiftキーを押しながらクエストをクリックするとチャットにリンクできます。"

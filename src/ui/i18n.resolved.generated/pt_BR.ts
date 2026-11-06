@@ -3715,6 +3715,7 @@ export const pt_BR: EnTranslations = {
     },
     "questLog": {
       "available": "Available",
+      "offerMeta": "{zone} · {level}",
       "completed": "Concluído",
       "zoneSummary": "{count} ({ready} pronto)",
       "shiftHint": "Clique com a tecla Shift pressionada em uma missão para vinculá-la ao bate-papo."

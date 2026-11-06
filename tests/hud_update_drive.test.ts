@@ -1426,6 +1426,18 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: "the Rewards hub's World Quests tab (the day's board, once on the World Map rail; the expiry countdown is minute-granular)",
   },
   {
+    call: 'this.questlogWindow.refreshIfChanged',
+    band: 'slow',
+    gate: 'this.questlogWindow.isOpen',
+    surface: 'window',
+    guard: {
+      kind: 'module',
+      module: 'hud/quest/questlog_window.ts',
+      proof: 'if (offersSig(this.offers()) === this.lastOffersSig) return;',
+    },
+    why: "the Quest Log's Available group (menu consolidation step 8): repaints when the set of nearby offers changes, never as the player walks",
+  },
+  {
     call: 'this.guildHallWindow.refreshIfChanged',
     band: 'slow',
     gate: 'this.guildHallWindow.isOpen',
@@ -2010,7 +2022,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // chrome 99 -> 100: the dungeon objectives tracker's medium-band paint
       // (hud/dungeon/dungeon_tracker_painter.ts), facet-routed like the deed strip.
       // window 53 -> 54: Lantern Hall's guild window (hud/guild_hall/guild_hall_window.ts).
-    ).toEqual({ window: 58, chrome: 100, none: 22 });
+    ).toEqual({ window: 59, chrome: 100, none: 22 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');
@@ -2037,7 +2049,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // Lantern Hall's guild window owns its signature guard (hud/guild_hall/).
       // The menu consolidation: the Book of the Realm's Titles tab (a second
       // DeedsWindow) adds a row; the Reputation window replaces the Calendar's.
-      module: 35,
+      module: 36,
       // Phase 20's refreshCharSheetIfChanged and its siblings. Their latches are
       // HUD fields (lastCharSheetSig et al) because the cold char_window painter
       // holds no signature of its own to diff. The release's trade row left this
@@ -2131,6 +2143,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
         // The Rewards hub's Vault and World Quests tabs (menu consolidation step 7).
         'weekly_rewards_window.ts: if (signature !== this.lastSignature) {',
         'hud/rewards/world_quests_window.ts: if (this.signature(this.view()) === this.lastSig) return;',
+        'hud/quest/questlog_window.ts: if (offersSig(this.offers()) === this.lastOffersSig) return;',
         'hud/guild_hall/guild_hall_window.ts: if (sig === this.lastSig) return;',
         'woc_market_window.ts: if (sig === this.lastSig && !this.walletRepaintDue) return;',
       ].sort(),

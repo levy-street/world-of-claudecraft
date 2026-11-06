@@ -14,7 +14,10 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { getActiveWorldContent, NPCS, QUESTS, zoneAt } from '../src/sim/data';
 import { createReferralCard } from '../src/sim/referral_cards';
 import type { ReferralCardsSnapshot } from '../src/sim/referral_contract';
+import { questTitle as questTitleOf } from '../src/ui/entity_display_core';
+import { zoneDisplayName } from '../src/ui/entity_i18n';
 import { QuestLogWindow } from '../src/ui/hud/quest/questlog_window';
+import { formatNumber, t } from '../src/ui/i18n';
 import { questMapLocation } from '../src/ui/quest_map_location_core';
 import { QuestTrackingState } from '../src/ui/quest_tracking_core';
 
@@ -360,7 +363,7 @@ describe('questlog_window: the Available group', () => {
     const completed = sections.findIndex((section) => section.classList.contains('is-dimmed'));
     expect(sections.indexOf(group as Element)).toBeLessThan(completed);
     const row = group?.querySelector('.ql-offer');
-    expect(row?.textContent).toContain('·');
+    expect(row?.textContent).toContain(questTitleOf(questId));
     const map = group?.querySelector<HTMLButtonElement>(`[data-quest-offer-map="${questId}"]`);
     expect(map).not.toBeNull();
     map?.click();
@@ -376,6 +379,40 @@ describe('questlog_window: the Available group', () => {
     expect(rebuilt?.getAttribute('aria-expanded')).toBe('false');
     expect(root.querySelector('.ql-offer')).toBeNull();
     expect(document.activeElement).toBe(rebuilt);
+  });
+
+  it('names the zone (and the level when the quest has one) with no live distance', () => {
+    const { root } = renderQuestFixture(null, offers);
+    const meta = root.querySelector('.ql-offer-meta')?.textContent ?? '';
+    const zone = zoneDisplayName(zoneAt(giver.pos.x, giver.pos.z).id);
+    const minLevel = QUESTS[questId].minLevel;
+    expect(meta).toBe(
+      minLevel === undefined
+        ? zone
+        : t('hudChrome.questLog.offerMeta', {
+            zone,
+            level: t('hudChrome.mapAtlas.level', {
+              level: formatNumber(minLevel, { maximumFractionDigits: 0 }),
+            }),
+          }),
+    );
+    expect(meta).not.toMatch(/yd|yards/i);
+  });
+
+  it('refreshes on the slow band when the offer set changes, and not as the player walks', () => {
+    const available = new Set(offers.available);
+    const pos = { ...offers.pos };
+    const fixture = renderQuestFixture(null, { pos, available });
+    const before = fixture.root.querySelector('.ql-available');
+    expect(before).not.toBeNull();
+    // Walking a few yards moves no offer in or out: nothing repaints.
+    pos.x += 3;
+    fixture.win.refreshIfChanged();
+    expect(fixture.root.querySelector('.ql-available')).toBe(before);
+    // The quest is taken: it no longer reads available, so the group leaves.
+    available.delete(questId);
+    fixture.win.refreshIfChanged();
+    expect(fixture.root.querySelector('.ql-available')).toBeNull();
   });
 
   it('paints no Available group when nothing nearby is on offer', () => {

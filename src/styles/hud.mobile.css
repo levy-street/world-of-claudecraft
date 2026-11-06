@@ -6917,6 +6917,8 @@
     z-index: 95;
   }
   body.mobile-touch #weekly-vault-window {
+    position: fixed;
+    z-index: 95;
     left: calc(max(10px, env(safe-area-inset-left)) / var(--window-scale, 1));
     right: calc(max(10px, env(safe-area-inset-right)) / var(--window-scale, 1));
     top: calc(max(10px, env(safe-area-inset-top)) / var(--window-scale, 1));

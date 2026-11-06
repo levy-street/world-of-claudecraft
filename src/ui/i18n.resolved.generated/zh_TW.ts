@@ -3715,6 +3715,7 @@ export const zh_TW: EnTranslations = {
     },
     "questLog": {
       "available": "可接任務",
+      "offerMeta": "{zone} · {level}",
       "completed": "已完成",
       "zoneSummary": "{count}個（{ready}個可交付）",
       "shiftHint": "按住 Shift 點擊任務可將其連結到聊天中。"
