@@ -326,6 +326,11 @@ describe('HeatBody over a fake world', () => {
     for (let i = 0; i < 6; i++) body.update(1 / 20);
     const root = scene.getObjectByName('smith-heart-heat-body');
     expect(root?.visible).toBe(true);
+    // The painter shows its own group under the gated root (the gate owns the
+    // root's reveal).
+    const fxGroup = root?.getObjectByName('smithHeartHeatBodyFx');
+    expect(fxGroup?.parent).toBe(root);
+    expect(fxGroup?.visible).toBe(true);
     expect(sent).toContain(HEAT_BODY_GESTURES.stand);
     // The vortex of fire stands at the wellspring, round the guardian.
     const vortex = scene.getObjectByName('smithHeartHeatVortex');

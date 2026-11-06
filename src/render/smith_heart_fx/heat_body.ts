@@ -255,6 +255,9 @@ interface Flash {
 export class HeatBody {
   readonly readyForEntry: Promise<void>;
   private readonly root = new THREE.Group();
+  /** Everything drawn, under the gated root: the painter shows and hides
+   *  this, never the root (the compile gate owns the root's reveal). */
+  private readonly fx = new THREE.Group();
   private readonly uTime = { value: 0 };
   private readonly density: number;
   private readonly particles: EngineParticles;
@@ -322,6 +325,9 @@ export class HeatBody {
   ) {
     this.root.name = 'smith-heart-heat-body';
     setRenderCategory(this.root, 'ui3d');
+    this.fx.name = 'smithHeartHeatBodyFx';
+    this.fx.visible = false;
+    this.root.add(this.fx);
     const detail =
       resolveUiEffectsProfile({ presetLabel: GFX.tier, effectsQuality: 1, reduceMotion: false })
         .tier !== 'low';
@@ -329,7 +335,7 @@ export class HeatBody {
     this.rockCount = detail ? HEAT_BODY_POOLS.rocks : HEAT_ROCKS_LOW;
     const hasDom = typeof document !== 'undefined';
     this.particles = new EngineParticles(
-      this.root,
+      this.fx,
       this.uTime,
       this.density,
       (x, z) => this.groundY(x, z),
@@ -357,7 +363,7 @@ export class HeatBody {
       m.name = 'smithHeartHeatVortex';
       m.frustumCulled = false;
       m.visible = false;
-      this.root.add(m);
+      this.fx.add(m);
     }
     const glowTex = hasDom ? radialGlowTexture() : null;
     this.glowTex = glowTex;
@@ -390,7 +396,7 @@ export class HeatBody {
       const s = new THREE.Sprite(mat);
       s.name = name;
       s.visible = false;
-      this.root.add(s);
+      this.fx.add(s);
       return s;
     };
     for (let i = 0; i < 2; i++) this.eyes.push(mk(this.eyeMat, 'smithHeartHeatEye'));
@@ -412,7 +418,7 @@ export class HeatBody {
     // The living fire on its sockets (heat_flame_tongues.ts): the body's
     // flames themselves; the pooled puffs only lick off them.
     this.tongues = new HeatFlameTongues(
-      this.root,
+      this.fx,
       this.uTime,
       !detail,
       this.materials,
@@ -421,7 +427,7 @@ export class HeatBody {
     // The molten rocks circling it and the basalt its blows fling: dark
     // basalt split by glowing cracks of lava (heat_body_rocks.ts).
     this.stones = new HeatBodyRocks(
-      this.root,
+      this.fx,
       this.uTime,
       HEAT_BODY_POOLS.rocks,
       detail ? HEAT_BODY_POOLS.debris : HEAT_BODY_POOLS.debrisLow,
@@ -444,7 +450,7 @@ export class HeatBody {
       carrier.visible = false;
       carrier.frustumCulled = false;
       carrier.name = 'smithHeartHeatCarrier';
-      this.root.add(carrier);
+      this.fx.add(carrier);
     }
     this.readyForEntry = attachSceneGroupGated(scene, this.root, compileGate, () => this.disposed)
       .then(() => {})
@@ -560,7 +566,7 @@ export class HeatBody {
       this.castAt = -99;
       this.castReleased = true;
       this.breachAt = -1;
-      this.root.visible = true;
+      this.fx.visible = true;
       break;
     }
   }
@@ -568,7 +574,7 @@ export class HeatBody {
   private release(): void {
     this.entityId = -1;
     this.rosterSeen = Number.NaN;
-    this.root.visible = false;
+    this.fx.visible = false;
     this.hideBody();
   }
 
