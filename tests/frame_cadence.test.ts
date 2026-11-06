@@ -1467,6 +1467,8 @@ describe('automatic frame rate limit under a platform top (iOS)', () => {
     for (let s = 1; s < seconds; s++) {
       expect(framesIn(r, s * 1000, (s + 1) * 1000)).toBeLessThanOrEqual(62);
     }
+    // The probe went back up to the top, and only to the top.
+    expect(r.intentLog.slice(2).map((e) => e.intent)).toContain(60);
     expect(snap.intent).toBe(30);
     for (const i of r.intervals) expect(i).toBeCloseTo(1000 / 30, 1);
     // The memory stays keyed by the REAL display rate, never the top.
@@ -1501,6 +1503,55 @@ describe('automatic frame rate limit under a platform top (iOS)', () => {
     expect(framesIn(open, 0, 5_000)).toBeGreaterThan(590);
   });
 
+  it('a held world draw is held to the top as well', () => {
+    const r = runHost({
+      refreshMs: PROMOTION,
+      costMs: 3,
+      seconds: 10,
+      intent: 'auto',
+      autoTop: 60,
+      gate: { worldDrawHeld: true },
+    });
+    expect(framesIn(r, 2_000, 8_000)).toBeLessThanOrEqual(363);
+    expect(framesIn(r, 2_000, 8_000)).toBeGreaterThanOrEqual(350);
+  });
+
+  it('the exempt skip is for Auto only: an explicit Display choice keeps the full cover rate', () => {
+    const r = runHost({
+      refreshMs: PROMOTION,
+      costMs: 3,
+      seconds: 10,
+      intent: 0,
+      autoTop: 60,
+      cover: (t) => t < 5_000,
+    });
+    expect(framesIn(r, 0, 5_000)).toBeGreaterThan(590);
+  });
+
+  it('a hidden exempt span is not skipped by the top', () => {
+    const r = runHost({
+      refreshMs: PROMOTION,
+      costMs: 3,
+      seconds: 10,
+      intent: 'auto',
+      autoTop: 60,
+      gate: { hidden: true, desktopApp: true },
+    });
+    expect(framesIn(r, 2_000, 8_000)).toBeGreaterThan(700);
+  });
+
+  it('on a 60 Hz iPhone the loading cover keeps every slot', () => {
+    const r = runHost({
+      refreshMs: SIXTY,
+      costMs: 3,
+      seconds: 10,
+      intent: 'auto',
+      autoTop: 60,
+      cover: (t) => t < 5_000,
+    });
+    expect(framesIn(r, 0, 5_000)).toBeGreaterThan(295);
+  });
+
   it('a remembered 60 under the top is no verdict: it observes and spends no probe', () => {
     const r = runHost({
       refreshMs: PROMOTION,
@@ -1518,17 +1569,21 @@ describe('automatic frame rate limit under a platform top (iOS)', () => {
   });
 
   it('a remembered 30 under the top is restored and held', () => {
-    let n = 0;
+    // A light scene: nothing but the restore can produce a held 30 here.
     const r = runHost({
       refreshMs: PROMOTION,
-      costMs: () => (n++ % 2 === 0 ? 22 : 12),
+      costMs: 3,
       seconds: 30,
       intent: 'auto',
       autoTop: 60,
       remembered: 30,
     });
-    expect(r.wiring.snapshot().intent).toBe(30);
-    expect(r.wiring.snapshot().autoPhase).toBe('held');
+    const snap = r.wiring.snapshot();
+    expect(snap.intent).toBe(30);
+    expect(snap.autoPhase).toBe('held');
+    expect(snap.autoDescents).toBe(0);
+    expect(r.intentLog[r.intentLog.length - 1].intent).toBe(30);
+    expect(framesIn(r, 20_000, 30_000)).toBeLessThanOrEqual(302);
   });
 
   it('with no readable display rhythm the top still limits, by timer', () => {
@@ -1569,6 +1624,18 @@ describe('automatic frame rate limit under a platform top (iOS)', () => {
       fps: 60,
       refreshHz: 120,
     });
+  });
+
+  it('the Auto row never reads inert, top or not: a remembered 60 on a 60 Hz display says nothing', () => {
+    const r = runHost({
+      refreshMs: SIXTY,
+      costMs: 4,
+      seconds: 20,
+      intent: 'auto',
+      remembered: 60,
+    });
+    expect(r.wiring.snapshot().intent).toBe(60);
+    expect(frameRateCapRowReadingFrom(r.wiring.snapshot(), 0)).toEqual({ kind: 'none' });
   });
 
   it('on a 60 Hz iPhone the top is inert: the same rhythm as without it', () => {

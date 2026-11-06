@@ -16,8 +16,9 @@
 
 import type { FrameCeilingIntent } from './frame_cadence_core';
 
-/** The platform reading this core needs: the same one `GFX.iosMemoryProfile`
- *  is set from (every iOS WebKit host, iPads included). */
+/** The platform reading this core needs: `mobilePlatform()`, the same rule
+ *  (iPhone/iPad/iPod UA, or a touch MacIntel iPad) `GFX.iosMemoryProfile`
+ *  applies, so every iOS WebKit host, iPads included. */
 export type FrameCadencePlatform = 'ios' | 'android' | 'other';
 
 /** The fastest ceiling Auto may choose here, 0 meaning the display's own rate. */
