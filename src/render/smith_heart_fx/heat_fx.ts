@@ -83,7 +83,7 @@ import { HEAT_LAVA_GLSL, HEAT_MOLTEN_GLSL, HEAT_NOISE_GLSL } from './heat_lava_g
 import { moltenDecal } from './heat_molten_decal';
 import { basaltColumn, basaltRepaint, crystalPrism } from './heat_shapes';
 import { HeatSwells } from './heat_swell_fx';
-import { HeatTelegraphs } from './heat_telegraph';
+import { HeatTelegraphs, setLaneSpent } from './heat_telegraph';
 
 /** The fist trail's heat on the pyre ramp (its orange). */
 const FIST_TRAIL_HEAT = [0.55, 0, 0] as const;
@@ -380,6 +380,7 @@ export class HeatFx {
         materials: this.materials,
         groundY: (x, z) => this.groundY(x, z),
         rand: () => this.rand(),
+        reducedMotion: () => this.reducedMotion(),
         shakeNear: (x, z, a, r) => this.shakeNear(x, z, a, r),
       },
       P.lanes,
@@ -730,6 +731,7 @@ export class HeatFx {
           LANE_STYLE,
         );
         slot.lane.group.visible = true;
+        setLaneSpent(slot.lane, 0);
         this.swells.lay(
           this.lanes.indexOf(slot),
           e.pos.x,
@@ -858,13 +860,17 @@ export class HeatFx {
         if (along < T.laneLength - 0.05) s.rollAt = this.clock - Math.max(0, along) / T.waveSpeed;
       }
       const front = swellFront(this.clock - s.rollAt);
-      // The lane fades as its wave leaves it behind (still on every tier).
+      // Ahead of the wall the lane keeps warning at full strength (still on
+      // every tier); behind it, it clears (below).
       PAINT.fill = 1;
       PAINT.clock = this.clock;
       PAINT.range = s.length;
       PAINT.front = 0;
-      PAINT.fade = Math.max(0.25, 1 - front / (s.length + T.waveDepth));
+      PAINT.fade = 1;
       this.kit.paintLane(s.lane, PAINT);
+      // Behind the wall's back the lane is spent (the sim strikes only the
+      // wall's box): its warning clears there, leaving the scorched trail.
+      setLaneSpent(s.lane, Math.max(0, Math.min(front, s.length) - T.waveDepth));
       // The wave itself, standing in the sim's hit box (heat_swell_fx.ts).
       this.swells.paint(i, front, swellHeight(front, s.length), dt);
     }

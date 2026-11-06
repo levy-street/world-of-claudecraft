@@ -28,7 +28,10 @@ describe('the Molten Swells: the wall is the hit area', () => {
       expect(y).toBeGreaterThanOrEqual(0);
       expect(y).toBeLessThanOrEqual(1);
     }
-    expect(SWELL_PROFILE[0]).toEqual([0, 0]);
+    // The foot on the floor (at most a yard or so behind the front line),
+    // the back foot at the box's back.
+    expect(SWELL_PROFILE[0][1]).toBe(0);
+    expect(SWELL_PROFILE[0][0]).toBeGreaterThan(-0.2);
     expect(SWELL_PROFILE[SWELL_PROFILE.length - 1]).toEqual([-1, 0]);
     // The lip hooks right to the front line.
     const lip = SWELL_PROFILE[Math.round(SWELL_LIP_V * (SWELL_PROFILE.length - 1))];

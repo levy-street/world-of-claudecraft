@@ -98,11 +98,14 @@ void main() {
   // Plates of crust over the molten core: cracks between them, burning.
   vec3 p = vP * 1.6;
   vec2 q = vec2(p.x + 0.6 * p.y, p.z - 0.5 * p.y);
-  float edge = cellEdge(q * 0.85 + 3.1);
+  // Warped, and some seams sealed: plates of uneven size, not a net.
+  vec2 wq = q * 0.85 + 3.1 + (vec2(vn(q * 1.3), vn(q * 1.3 + 5.7)) - 0.5) * 1.1;
+  float edge = cellEdge(wq);
   float crack = 1.0 - smoothstep(0.03, 0.16, edge);
+  crack *= smoothstep(0.22, 0.5, vn(q * 1.7 + 7.0));
   float churn = fbm(q * 2.2 + vec2(uTime * 0.9, -uTime * 0.7));
   vec3 V = normalize(cameraPosition - vW);
-  float rim = pow(1.0 - abs(dot(normalize(vN), V)), 2.5);
+  float rim = pow(max(1.0 - abs(dot(normalize(vN), V)), 0.0), 2.5);
   float m = max(crack * (0.75 + 0.25 * churn), 0.08 + 0.12 * churn) + rim * 0.35;
   gl_FragColor = vec4(rockRamp(clamp(m, 0.0, 1.0)), 1.0);
   #include <colorspace_fragment>

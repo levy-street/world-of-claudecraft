@@ -101,7 +101,7 @@ void main() {
 #endif
   // The tongue: a round root drawn to ragged licks, swaying more up high.
   float x = (uv.x - 0.5) * 2.0 + warp.x * 1.1 * uv.y;
-  float halfW = mix(0.8, 0.05, pow(uv.y, 0.8));
+  float halfW = mix(0.8, 0.05, pow(clamp(uv.y, 0.0, 1.0), 0.8));
   float shape = 1.0 - smoothstep(halfW * 0.2, halfW, abs(x));
   float root = smoothstep(0.0, 0.16, uv.y);
   float I = shape * root * (0.45 + 0.8 * n) - uv.y * 0.38;

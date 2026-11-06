@@ -28,32 +28,35 @@ export const HEAT_SWELL_LOOK = {
 } as const;
 
 /** The wave's cross-section, front foot to back foot, as (z, y): z in
- *  [-1, 0] (0 the wave's front, -1 its back foot, waveDepth behind), y in
- *  [0, 1] (its full height). The face rises out of a boiling foot into the
- *  hollow under the curl, the lip hooks forward to the front line, the crest
- *  rolls over and the back slopes down to the floor. */
+ *  [-1, 0] (0 the wave's front line, -1 its back foot, waveDepth behind), y
+ *  in [0, 1] (its full height). The foot churns a little behind the front
+ *  line; the face rises out of it, hollowing under the curl, and the lip
+ *  hooks over the foot right to the front line (the hit box's front), then
+ *  the crest rolls over and the long back slopes down to the floor. */
 export const SWELL_PROFILE: readonly (readonly [number, number])[] = [
-  [0, 0],
-  [-0.08, 0.1],
-  [-0.17, 0.24],
-  [-0.24, 0.4],
-  [-0.24, 0.54],
-  [-0.17, 0.63],
-  [-0.07, 0.66],
-  [0, 0.64],
-  [-0.02, 0.76],
-  [-0.1, 0.9],
-  [-0.24, 0.99],
-  [-0.38, 1.0],
-  [-0.52, 0.9],
-  [-0.66, 0.7],
-  [-0.8, 0.44],
-  [-0.92, 0.18],
+  [-0.12, 0],
+  [-0.2, 0.1],
+  [-0.3, 0.22],
+  [-0.36, 0.36],
+  [-0.36, 0.48],
+  [-0.3, 0.57],
+  [-0.18, 0.62],
+  [-0.06, 0.62],
+  [0, 0.58],
+  [-0.01, 0.7],
+  [-0.06, 0.82],
+  [-0.15, 0.93],
+  [-0.28, 0.99],
+  [-0.41, 1.0],
+  [-0.54, 0.93],
+  [-0.67, 0.76],
+  [-0.8, 0.52],
+  [-0.91, 0.25],
   [-1, 0],
 ];
 
 /** The profile's share at the lip's tip (the shader's white-hot line). */
-export const SWELL_LIP_V = 7 / (SWELL_PROFILE.length - 1);
+export const SWELL_LIP_V = 8 / (SWELL_PROFILE.length - 1);
 
 /** The along-lane box the wall stands in for a wave whose front is `front`
  *  yards down a lane drawn `length` long: [near, far] yards from the lane's
@@ -81,5 +84,5 @@ export function swellTrailFade(since: number): number {
  *  middle, rolling down to the floor at the lane's edges (a wave, not a box). */
 export function swellDroop(x: number): number {
   const a = Math.min(1, Math.abs(x));
-  return 1 - a ** 6;
+  return 1 - a ** 4;
 }

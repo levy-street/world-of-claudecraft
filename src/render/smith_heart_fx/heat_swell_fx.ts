@@ -1,5 +1,6 @@
-// The Guardian of the Heat's Molten Swells, the waves themselves (pass 4;
-// plan: heat_swell_core.ts), a part of HeatFx: HeatFx owns the lanes (their
+// The Guardian of the Heat's Molten Swells, the waves themselves (pass 4,
+// grown in pass 5 to an 11 yd wall three players tall; plan:
+// heat_swell_core.ts), a part of HeatFx: HeatFx owns the lanes (their
 // telegraph, the sim's wave objects and the clock) and hands each lane slot's
 // wave here to draw:
 //  - the wall: a heavy curling wave of molten rock standing exactly in the
@@ -7,11 +8,14 @@
 //    curl, a white-hot lip hooking over the front line, the crest breaking
 //    into gold, plates of dark crust with glowing seams riding its back, its
 //    crest rippling along its length, its ends rolling down to the floor;
-//  - the spray: drops and blobs of molten rock torn off the crest and thrown
-//    ahead, fire foaming at its foot, embers climbing, smoke off its back;
+//  - the spray: drops and blobs of molten rock torn off the crest and the lip
+//    and thrown ahead, molten drips running off the face, a churning foot
+//    throwing droplets and foaming fire, embers climbing, a heat haze over the
+//    crest, smoke off its back;
 //  - the floor: the box under the wall burning white-gold (the hit area, read
-//    from above too), and behind it a scorched trail cooling from gold to
-//    crust, cracks still glowing, that lingers and fades once the lane is gone;
+//    from above too), and behind it a scorched trail that is NOT the lane's
+//    paint: a short molten seam at the wall's heel, then dark cooling crust
+//    split by ragged glowing cracks, lingering and fading once the lane goes;
 //  - the origin: the ground heaving where the swells break out of the fist's
 //    crater (a rumble ring, basalt kicked up, a shake).
 // The walls and the floor boxes draw on every tier; the spray, the embers,
@@ -47,23 +51,26 @@ export interface HeatSwellHost {
   readonly materials: THREE.Material[];
   groundY(x: number, z: number): number;
   rand(): number;
+  reducedMotion(): boolean;
   shakeNear(x: number, z: number, amount: number, reach?: number): void;
 }
 
 type Puff = Parameters<EngineParticles['puff']>[4];
+/** The half width the wall's paint and spray were tuned on (pass 4's lane). */
+const SPAN_UNIT = 2.5;
 const _foot = { near: 0, far: 0 };
 const _spray = { x: 0, y: 0, z: 0, sin: 0, cos: 1, half: 1, k: 0 };
 const FWD: [number, number, number] = [0, 0, 0];
 
 /** Drops torn off the crest and flung ahead of the wave. */
-const DROP = {
-  speed: 6,
-  up: 5,
-  life: 0.8,
-  size: [0.55, 0.14] as [number, number],
+const DROP: Puff = {
+  speed: 7.5,
+  up: 6,
+  life: 0.85,
+  size: [0.75, 0.18] as [number, number],
   color: C.spark,
   alpha: 1,
-  pool: 'glow' as const,
+  pool: 'glow',
   dir: FWD,
   spread: 0.55,
   gravity: 18,
@@ -71,14 +78,14 @@ const DROP = {
   radius: 0.4,
 };
 /** Heavier blobs of molten rock thrown off the lip. */
-const BLOB = {
-  speed: 4.5,
-  up: 4,
-  life: 0.9,
-  size: [1.15, 0.4] as [number, number],
+const BLOB: Puff = {
+  speed: 5.5,
+  up: 4.5,
+  life: 0.95,
+  size: [1.6, 0.5] as [number, number],
   color: C.fire,
   alpha: 1,
-  pool: 'glow' as const,
+  pool: 'glow',
   dir: FWD,
   spread: 0.4,
   gravity: 20,
@@ -87,10 +94,10 @@ const BLOB = {
 };
 /** Fire foaming at the wave's foot as it bulldozes the floor. */
 const FOAM = {
-  speed: 1.6,
-  up: 2.4,
-  life: 0.45,
-  size: [2.3, 0.45] as [number, number],
+  speed: 2,
+  up: 3,
+  life: 0.5,
+  size: [3.2, 0.6] as [number, number],
   color: [0.62, 0, 0] as const,
   alpha: 0.9,
   pool: 'pyre' as const,
@@ -98,34 +105,73 @@ const FOAM = {
 };
 /** The crest frothing into flame as it breaks. */
 const CREST = {
-  speed: 1.2,
-  up: 2.8,
-  life: 0.5,
-  size: [2.1, 0.4] as [number, number],
+  speed: 1.6,
+  up: 3.4,
+  life: 0.55,
+  size: [2.9, 0.5] as [number, number],
   color: [0.55, 0, 0] as const,
   alpha: 0.9,
   pool: 'pyre' as const,
   radius: 0.3,
 };
 const EMBER = {
-  speed: 1,
-  up: 4.2,
-  life: 1.5,
-  size: [0.24, 0.05] as [number, number],
+  speed: 1.2,
+  up: 5,
+  life: 1.6,
+  size: [0.3, 0.06] as [number, number],
   color: C.spark,
   alpha: 1,
   pool: 'glow' as const,
-  radius: 0.6,
+  radius: 0.8,
 };
 const SMOKE = {
-  speed: 0.6,
-  up: 2.2,
-  life: 2.2,
-  size: [2.3, 5.8] as [number, number],
+  speed: 0.7,
+  up: 2.6,
+  life: 2.4,
+  size: [3.2, 7.5] as [number, number],
   color: [0.1, 0.085, 0.075] as const,
   alpha: 0.42,
   drag: 0.8,
-  radius: 0.8,
+  radius: 1,
+};
+/** Molten drips running off the lip and falling down the open face. */
+const DRIP: Puff = {
+  speed: 0.5,
+  up: 0.4,
+  life: 0.75,
+  size: [0.42, 0.22] as [number, number],
+  color: C.fire,
+  alpha: 1,
+  pool: 'glow',
+  gravity: 16,
+  drag: 0.2,
+  radius: 0.15,
+};
+/** Droplets the churning foot throws ahead as it bulldozes the floor. */
+const KICK = {
+  speed: 6,
+  up: 3.2,
+  life: 0.6,
+  size: [0.5, 0.15] as [number, number],
+  color: C.spark,
+  alpha: 1,
+  pool: 'glow' as const,
+  dir: FWD,
+  spread: 0.7,
+  gravity: 20,
+  drag: 0.3,
+  radius: 0.3,
+};
+/** The heat haze shimmering over the crest (faint, wide, rising). */
+const HAZE = {
+  speed: 0.4,
+  up: 2.8,
+  life: 1.6,
+  size: [3.5, 7] as [number, number],
+  color: [0.95, 0.72, 0.5] as const,
+  alpha: 0.06,
+  drag: 0.8,
+  radius: 1.2,
 };
 
 // ---- the wall ---------------------------------------------------------------------------
@@ -134,7 +180,7 @@ const SMOKE = {
  *  drooping to the floor. uv.x across, uv.y along the profile (0 the front
  *  foot, 1 the back foot). The mesh is laid at the wave's front, scaled (half
  *  width, height, waveDepth). */
-export function swellCurlGeometry(across = 28): THREE.BufferGeometry {
+export function swellCurlGeometry(across = 44): THREE.BufferGeometry {
   const P = SWELL_PROFILE;
   const rows = P.length;
   const g = new THREE.BufferGeometry();
@@ -198,6 +244,7 @@ const WALL_FRAG = /* glsl */ `
 uniform float uTime;
 uniform float uHeat;
 uniform float uSeed;
+uniform float uSpan;
 varying vec2 vUv;
 varying vec3 vW;
 varying vec3 vN;
@@ -212,12 +259,14 @@ vec3 waveRamp(float m) {
   vec3 c = mix(crust, ember, smoothstep(0.08, 0.38, m));
   c = mix(c, orange, smoothstep(0.35, 0.68, m));
   c = mix(c, gold, smoothstep(0.72, 0.98, m));
-  return c * (1.0 + 0.9 * smoothstep(0.45, 1.0, m));
+  return c * (1.0 + 0.6 * smoothstep(0.5, 1.0, m));
 }
 void main() {
   float v = vUv.y;
   float lipV = ${SWELL_LIP_V.toFixed(4)};
-  float across = vUv.x * 9.0 + uSeed;
+  // Across in pass 4's units (a 5 yd lane), so the streaks and plates keep
+  // their size on any width.
+  float across = vUv.x * 9.0 * uSpan + uSeed;
   // The open face (the front foot up into the curl) and the back (past the
   // crest, sloping down to its foot).
   float face = 1.0 - smoothstep(lipV - 0.02, lipV + 0.04, v);
@@ -225,11 +274,17 @@ void main() {
   // Molten streaks pouring up the face into the curl.
   float flow = fbm(vec2(across * 1.1, v * 9.0 - uTime * 2.4));
   float streak = smoothstep(0.45, 0.75, fbm(vec2(across * 2.6, v * 4.0 - uTime * 3.1)));
-  float mFace = 0.44 + 0.2 * flow + 0.22 * streak;
+  // Deep red low in the hollow, heating to orange toward the lip; skins of
+  // cooling crust ride up the face and tear (a wall of rock, not a glow).
+  float rise = smoothstep(0.05, lipV, v);
+  float mFace = 0.24 + 0.16 * flow + 0.26 * streak * rise + 0.22 * rise;
+  float skin = smoothstep(0.56, 0.72, fbm(vec2(across * 0.8, v * 3.2 - uTime * 1.5) + 4.0));
+  mFace = mix(mFace, 0.08 + 0.06 * flow, skin * 0.8 * (1.0 - smoothstep(lipV - 0.12, lipV, v)));
   // Plates of dark crust riding the back, their seams alight (wider and
   // hotter near the crest, where the crust tears).
-  vec2 cp = vec2(across * 0.75, v * 4.2 + uTime * 0.4);
-  float seam = cellEdge(cp);
+  vec2 cp = vec2(across * 0.75, v * 6.0 + uTime * 0.4);
+  // Warped, uneven plates (not a net).
+  float seam = cellEdge(cp + (vec2(vn(cp * 1.3), vn(cp * 1.3 + 5.7)) - 0.5) * 0.9);
   float nearCrest = 1.0 - smoothstep(0.66, 0.98, v);
   float plate = smoothstep(0.03 + 0.05 * nearCrest, 0.12 + 0.08 * nearCrest, seam);
   float grain = vn(cp * 6.0) * 0.08;
@@ -239,11 +294,13 @@ void main() {
   float crestHot = smoothstep(lipV - 0.04, lipV, v) * (1.0 - smoothstep(lipV + 0.02, 0.66, v));
   m = max(m, crestHot * (0.66 + 0.14 * flow));
   // The lip: the one gold line.
-  float lip = 1.0 - smoothstep(0.0, 0.045, abs(v - lipV));
-  m = max(m, lip * (0.86 + 0.1 * flow));
+  float lip = 1.0 - smoothstep(0.0, 0.05, abs(v - lipV));
+  float lipCore = 1.0 - smoothstep(0.0, 0.018, abs(v - lipV));
+  m = max(m, lip * (0.82 + 0.1 * flow));
+  m = max(m, lipCore);
   // The boiling foot at the front, where it bulldozes the floor.
   float foot = 1.0 - smoothstep(0.0, 0.09, v);
-  m = max(m, foot * (0.62 + 0.18 * vn(vec2(across * 3.0, uTime * 6.0))));
+  m = max(m, foot * (0.5 + 0.2 * vn(vec2(across * 3.0, uTime * 6.0))));
   // Down-facing and back-facing crust darkens (a body, not a ribbon).
   float down = clamp(-vN.y, 0.0, 1.0);
   m *= 1.0 - 0.4 * down * back;
@@ -270,7 +327,12 @@ void main() {
 }
 `;
 /** uv.y 0 at the lane's start, 1 at its drawn end; uv.x across (0..1, the
- *  lane's exact width). uNear..uFar: the wall's box (the hit area). */
+ *  lane's exact width). uNear..uFar: the wall's box (the hit area).
+ *
+ *  The trail behind the box is drawn unlike the lane's telegraph (pale cells
+ *  of light): a short molten seam at the wall's heel, then a dark cooling
+ *  crust split by ragged, branching cracks (ridged noise, never a cell net)
+ *  that glow ember to orange and go out as the crust cools and fades. */
 const WAKE_FRAG = /* glsl */ `
 uniform float uTime;
 uniform float uLen;
@@ -292,24 +354,44 @@ vec3 trailRamp(float m) {
   c = mix(c, orange, smoothstep(0.32, 0.65, m));
   return mix(c, gold, smoothstep(0.7, 1.0, m));
 }
+// Ragged cracks in the cooling crust: a warped plate field with uneven
+// seams, some sealed, and fine hairlines between (1 at a crack's line).
+float crackLines(vec2 p) {
+  vec2 w = vec2(vn(p * 0.7 + 3.7), vn(p * 0.7 + 9.1)) - 0.5;
+  float e = cellEdge(p * 0.38 + w * 0.9);
+  float width = 0.025 + 0.05 * vn(p * 0.9 + 1.3);
+  float seam = (1.0 - smoothstep(0.0, width, e)) * smoothstep(0.28, 0.5, vn(p * 0.5 + 5.0));
+  float hair = 1.0 - abs(vn(p * 2.2 + w * 3.0) * 2.0 - 1.0);
+  return max(seam, smoothstep(0.94, 0.99, hair) * 0.45);
+}
 void main() {
   float along = vUv.y * uLen;
   float across = abs(vUv.x - 0.5) * 2.0;
   if (along > uFar) discard;
   // The box under the wall: the hit area, burning white-gold edge to edge.
   float inBox = step(uNear, along);
-  float lvl = lavaLevel(vW.xz, vec2(0.0), uTime * 0.4, 1.0);
-  float box = inBox * (0.7 + 0.18 * lvl);
-  // Behind it the trail: cooling from gold to crust, its cracks glowing,
-  // ragged at its edges, fading once its lane is gone.
+  // Behind it the trail, ragged at its edges.
   float behind = uNear - along;
-  float heat = (1.0 - inBox) * pow(1.0 - clamp(behind / uCool, 0.0, 1.0), 1.3);
-  float cracks = 1.0 - smoothstep(0.0, 0.07, cellEdge(vW.xz * 0.9));
+  // The molten surface shows only in the box and the heel's seam.
+  float lvl = 0.0;
+  if (inBox > 0.5 || behind < 3.4) lvl = lavaLevel(vW.xz, vec2(0.0), uTime * 0.4, 1.0);
+  float box = inBox * (0.7 + 0.18 * lvl);
+  float out_ = 1.0 - inBox;
   float rag = vn(vec2(along * 0.7, vUv.x * 6.0)) * 0.22;
-  float trail = (1.0 - inBox) * (1.0 - smoothstep(0.78 - rag, 1.0 - rag * 0.5, across));
-  float m = max(box, trail * max(heat * (0.5 + 0.5 * lvl), cracks * 0.55 * (0.3 + 0.7 * heat)));
+  float trail = out_ * (1.0 - smoothstep(0.8 - rag, 1.0 - rag * 0.5, across));
+  // How hot the crust still is (1 at the heel, 0 a cooling run back).
+  float heat = out_ * pow(1.0 - clamp(behind / uCool, 0.0, 1.0), 1.2);
+  // The seam at the heel: still molten for a couple of yards, breaking up.
+  float seam = out_ * (1.0 - smoothstep(0.4, 2.6 + 0.8 * rag, behind));
+  float seamM = seam * (0.5 + 0.4 * lvl);
+  // The cracks: glowing while the crust is hot, dying to a dull ember line.
+  float crack = crackLines(vW.xz * 0.55);
+  float crackM = crack * (0.22 + 0.5 * heat) * (0.75 + 0.25 * vn(vW.xz * 0.8 + uTime * 0.6));
+  float m = max(box, trail * max(seamM, crackM));
   vec3 col = trailRamp(clamp(m, 0.0, 1.0)) * 1.25;
-  float a = max(box * 0.95, trail * (0.5 + 0.45 * heat)) * mix(1.0, uFade, 1.0 - inBox);
+  // The crust itself is dark (a char over the floor, not a glow); the cracks
+  // and the seam carry the light.
+  float a = max(box * 0.95, trail * max(0.62 + 0.25 * heat, seam)) * mix(1.0, uFade, out_);
   gl_FragColor = vec4(col, a);
   #include <colorspace_fragment>
 }
@@ -350,7 +432,12 @@ export class HeatSwells {
     for (let i = 0; i < count; i++) {
       const wallMat = new THREE.ShaderMaterial({
         name: 'smithHeartHeatSwellWall',
-        uniforms: { uTime: host.uTime, uHeat: { value: 1 }, uSeed: { value: i * 3.7 } },
+        uniforms: {
+          uTime: host.uTime,
+          uHeat: { value: 1 },
+          uSeed: { value: i * 3.7 },
+          uSpan: { value: 1 },
+        },
         vertexShader: WALL_VERT,
         fragmentShader: WALL_FRAG,
         side: THREE.DoubleSide,
@@ -432,6 +519,7 @@ export class HeatSwells {
     s.wake.position.set(x, y + 0.05, z);
     s.wake.rotation.y = facing;
     s.wake.scale.set(half * 2, 1, length);
+    s.wallMat.uniforms.uSpan.value = half / SPAN_UNIT;
     const u = s.wakeMat.uniforms;
     u.uLen.value = length;
     u.uNear.value = 0;
@@ -478,31 +566,43 @@ export class HeatSwells {
     _spray.sin = sin;
     _spray.cos = cos;
     _spray.half = s.half;
-    _spray.k = dt * this.host.density;
-    // Two tries a frame at the high rates.
-    for (let k = 0; k < 2; k++) {
-      this.emit(40, T.waveDepth * 0.15, h * 0.72, DROP);
-      this.emit(14, T.waveDepth * 0.1, h * 0.7, BLOB);
-      this.emit(24, 0.1, 0.25, FOAM);
-      this.emit(20, T.waveDepth * 0.3, h * 0.92, CREST);
-    }
-    this.emit(14, T.waveDepth * 0.3, h * 0.95, EMBER);
-    this.emit(10, T.waveDepth * 0.85, h * 0.45, SMOKE);
+    // What falls off the wall falls to the floor (not the height it left at).
+    DROP.floor = gy;
+    BLOB.floor = gy;
+    DRIP.floor = gy;
+    // Rates a second for pass 4's 5 yd wall, scaled with the width (capped),
+    // thinned to a third under reduced motion; a long frame emits no more
+    // than a frame's worth at 20 fps (no burst evicting the pools).
+    const motion = this.host.reducedMotion() ? 1 / 3 : 1;
+    _spray.k = Math.min(dt, 0.05) * this.host.density * motion * Math.min(1.8, s.half / SPAN_UNIT);
+    const d = T.waveDepth;
+    this.emit(50, d * 0.12, h * 0.72, DROP);
+    this.emit(20, d * 0.08, h * 0.68, BLOB);
+    this.emit(22, d * 0.04, h * 0.6, DRIP);
+    this.emit(40, 0.1, 0.25, FOAM);
+    this.emit(20, 0.05, 0.3, KICK);
+    this.emit(30, d * 0.3, h * 0.92, CREST);
+    this.emit(10, d * 0.3, h * 0.95, EMBER);
+    this.emit(10, d * 0.8, h * 0.45, SMOKE);
+    if (this.host.density >= 1) this.emit(3, d * 0.35, h * 0.9, HAZE);
   }
 
-  /** One try at `rate` a second: a puff `back` yards behind the front, `up`
-   *  over the floor, somewhere across the wave (its frame in `_spray`). */
+  /** `rate` puffs a second (this frame's share; its fraction a roll): each
+   *  `back` yards behind the front, `up` over the floor, somewhere across the
+   *  wave (its frame in `_spray`). */
   private emit(rate: number, back: number, up: number, o: Puff): void {
     const host = this.host;
-    if (host.rand() >= _spray.k * rate) return;
-    const side = (host.rand() - 0.5) * 2 * _spray.half * 0.85;
-    host.particles.puff(
-      _spray.x - _spray.sin * back + _spray.cos * side,
-      _spray.y + up,
-      _spray.z - _spray.cos * back - _spray.sin * side,
-      1,
-      o,
-    );
+    for (let left = _spray.k * rate; left > 0; left--) {
+      if (left < 1 && host.rand() >= left) return;
+      const side = (host.rand() - 0.5) * 2 * _spray.half * 0.85;
+      host.particles.puff(
+        _spray.x - _spray.sin * back + _spray.cos * side,
+        _spray.y + up,
+        _spray.z - _spray.cos * back - _spray.sin * side,
+        1,
+        o,
+      );
+    }
   }
 
   /** Lane `i` gone (its wave spent): the wall drops, the trail fades. */
@@ -539,7 +639,7 @@ export class HeatSwells {
     this.lastOrigin = this.clock;
     const host = this.host;
     const y = host.groundY(x, z);
-    host.particles.shockRing(x, z, C.ringGold, 9, 0.8);
+    host.particles.shockRing(x, z, C.ringGold, 12, 0.8);
     host.particles.puff(x, y + 0.5, z, 18, {
       speed: 7,
       up: 6,
