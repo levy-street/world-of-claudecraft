@@ -2739,6 +2739,7 @@
      Show on Map rather than a .ql-item button. */
   .ql-offer {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: var(--spacing-xs);
     padding: var(--spacing-xs);
@@ -2750,15 +2751,14 @@
     min-width: 0;
   }
   .ql-offer-title {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    overflow-wrap: anywhere;
   }
   .ql-offer-meta {
     font-size: 11px;
   }
   .ql-offer > .ui-btn {
     flex: none;
+    margin-left: auto;
   }
 
   .ql-group-chevron {
@@ -26203,6 +26203,13 @@
     transform: none;
     box-sizing: border-box;
     overflow: hidden;
+    /* The column #bank-window gave the sheet when it borrowed that root: title
+       bar, then the Rewards strip, then the scrolling panel. */
+    flex-direction: column;
+  }
+  #weekly-vault-window > .panel-title,
+  #weekly-vault-window > .rewards-hub-tabs {
+    flex: none;
   }
   .weekly-rewards {
     display: flex;

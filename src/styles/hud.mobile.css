@@ -2336,6 +2336,17 @@
   body.mobile-touch #mobile-extra-grid .mobile-extra-group:first-child {
     margin-top: 0;
   }
+  /* Store is the last group and both of its tiles can be hidden (the chest
+     only shows while the store is live, the $WOC Exchange only when enabled),
+     so its heading leaves with them rather than labelling nothing. Anchored on
+     the heading, never a root. */
+  body.mobile-touch
+    #mobile-extra-grid
+    .mobile-extra-group[data-i18n='hudChrome.mobile.dailyRewards']:not(
+      :has(~ .mobile-btn:not([hidden]))
+    ) {
+    display: none;
+  }
   body.mobile-touch #mobile-extra-controls .mobile-btn {
     width: 100%;
     height: 40px;

@@ -199,7 +199,7 @@ export class WeeklyQuestsWindow {
         ? 'wk-btn wk-btn-active'
         : card.state === 'completed'
           ? 'wk-btn wk-btn-done'
-          : card.state === 'locked'
+          : card.state === 'locked' || !this.atEmissary
             ? 'wk-btn wk-btn-locked'
             : 'wk-btn';
     return (
