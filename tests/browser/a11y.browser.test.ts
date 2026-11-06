@@ -1191,6 +1191,7 @@ describe('axe: vendor window advisory rows', () => {
       buyCustomMax: () => 0,
       onBuyBack: () => {},
       onSellJunk: () => {},
+      onFilterChange: () => {},
       onClose: () => {},
       sellJunk: { enabled: false, proceeds: 0 },
     });

@@ -660,7 +660,7 @@ import {
   sellJunkButtonState,
   type VendorMultiple,
 } from './hud/vendor/vendor_view';
-import { renderVendorWindow } from './hud/vendor/vendor_window';
+import { renderVendorWindow, resetVendorGoodsFilter } from './hud/vendor/vendor_window';
 import { buildWarfareVendorView, warfareShopViewer } from './hud/vendor/warfare_vendor_view';
 import {
   renderWarfareVendorWindow,
@@ -14414,6 +14414,7 @@ export class Hud {
     // still aims at the previous merchant and the window repaints under a
     // held inert.
     dismissBuyQuantityPrompts($('#vendor-window'));
+    resetVendorGoodsFilter($('#vendor-window'));
     this.openVendorNpcId = npcId;
     this.vendorQtyMultiple = 1;
     document.body.classList.add('vendor-open');
@@ -14476,6 +14477,7 @@ export class Hud {
           this.vendorQtyMultiple = multiple;
           this.renderVendor();
         },
+        onFilterChange: () => this.renderVendor(),
         // The custom prompt's cap (Q19): the sim's own bag-fit math in row
         // units, read from the live IWorld inventory at click time. An
         // unknown id (a stale bundle behind the server) caps at 0 and the

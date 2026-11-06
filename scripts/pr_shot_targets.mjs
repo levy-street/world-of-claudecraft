@@ -5659,6 +5659,66 @@ export const TARGETS = [
     },
   },
   {
+    key: 'vendor-goods-tabs',
+    label: 'Shop goods tabs, search and slot headings (Quartermaster Bree)',
+    when: ['ui/hud/vendor/vendor_goods_filter_core'],
+    // Lowest preset. Quartermaster Bree stocks food, armor of several slots,
+    // tools and a material, so her counter offers tabs and (at her stock size)
+    // the search box. Each variant opens her shop, then clicks a tab or types
+    // into the search through the real controls.
+    variants: [
+      { key: 'desktop-armor-tab', tab: 'armor' },
+      { key: 'mobile-all', mobile: true },
+      { key: 'desktop-all' },
+      { key: 'desktop-search', search: 'potion' },
+    ].map((v) => ({
+      ...v,
+      async beforeLoad(page) {
+        await page.evaluateOnNewDocument(() => {
+          localStorage.setItem('woc_settings', JSON.stringify({ graphicsPreset: 1 }));
+        });
+      },
+    })),
+    async capture(page, variant) {
+      // The shop must open on a settled world, not under the loading curtain.
+      await waitForCurtainStreak(page);
+      const setup = await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        if (!sim) return { ok: false, reason: 'no sim' };
+        const vendor = [...sim.entities.values()].find(
+          (e) => e.templateId === 'quartermaster_bree',
+        );
+        if (!vendor) return { ok: false, reason: 'no vendor entity' };
+        const p = sim.player;
+        if (!p?.pos) return { ok: false, reason: 'no player' };
+        p.pos.x = vendor.pos.x + 2;
+        p.pos.z = vendor.pos.z;
+        p.prevPos = { ...p.pos };
+        const el = document.querySelector('#vendor-window');
+        if (el) el.style.display = 'none';
+        game.hud.openVendor(vendor.id);
+        return { ok: true };
+      });
+      if (!setup.ok) throw new Error(`vendor-goods-tabs setup failed: ${setup.reason}`);
+      if (!(await pollForSize(page, '#vendor-window'))) {
+        throw new Error('vendor window did not open');
+      }
+      // Moving beside the vendor can raise the curtain again for a beat.
+      await waitForCurtainStreak(page, 1500);
+      await wait(400);
+      if (variant?.tab) {
+        await page.click(`#vendor-window [data-focus-key="vchip:${variant.tab}"]`);
+        await wait(300);
+      }
+      if (variant?.search) {
+        await page.type('#vendor-window .vendor-search', variant.search);
+        await wait(300);
+      }
+      return { clip: '#vendor-window' };
+    },
+  },
+  {
     key: 'char-slot-picker',
     label: 'Character sheet slot picker: click a slot to list what fits, best first',
     when: ['ui/slot_picker_core', 'ui/slot_picker_controller'],

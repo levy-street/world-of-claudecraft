@@ -39,11 +39,19 @@ export interface VendorGoodsFilter {
 
 export const DEFAULT_VENDOR_GOODS_FILTER: VendorGoodsFilter = { category: 'all', search: '' };
 
+/** Whether a goods row belongs under `category`. A riding lesson is filed with
+ *  the mounts it serves (its def is a tool-kind token, which would otherwise
+ *  list "Riding Training" under Tools and give a stablemaster a tab row). */
+export function vendorRowMatches(row: VendorGoodsRow, category: BagCategory): boolean {
+  if (row.ridingRank) return category === 'all' || category === 'mount';
+  return matchesCategory(row.item, category);
+}
+
 /** The tabs this stock can fill, All first, in the bag rail's order. Empty when
  *  the whole stock is one kind (or less), where a tab row would only repeat All. */
 export function vendorGoodsTabs(goods: readonly VendorGoodsRow[]): BagCategory[] {
   const present = SHOP_CATEGORIES.filter(
-    (c) => c !== 'all' && goods.some((g) => matchesCategory(g.item, c)),
+    (c) => c !== 'all' && goods.some((g) => vendorRowMatches(g, c)),
   );
   return present.length >= 2 ? ['all', ...present] : [];
 }
@@ -76,8 +84,7 @@ export function buildVendorGoodsEntries(
   const query = vendorGoodsSearchable(goods) ? filter.search.trim().toLowerCase() : '';
   const visible = goods.filter(
     (g) =>
-      matchesCategory(g.item, category) &&
-      (query === '' || nameOf(g).toLowerCase().includes(query)),
+      vendorRowMatches(g, category) && (query === '' || nameOf(g).toLowerCase().includes(query)),
   );
   const groups = visible.map((g) => (g.ridingRank ? null : bagSlotGroup(g.item)));
   const distinct = new Set(groups);

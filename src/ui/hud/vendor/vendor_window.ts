@@ -2,11 +2,14 @@
 //
 // The consumer half of the pure-core + thin-consumer split: it paints
 // #vendor-window from the structured VendorView (vendor_view.ts) and wires the
-// buy / buyback / close actions. It owns no state. The cross-window
+// buy / buyback / close actions. Its one piece of state is the goods tab and
+// search of the open shop (goodsFilters below), view state like the scroll
+// position it restores; Hud resets it on every open. The cross-window
 // orchestration (which windows to close, bag re-centring, mobile teardown)
 // stays in Hud because it needs Hud's private state; this module only renders
 // one panel and reports clicks back through the injected callbacks.
 
+import { audio } from '../../../game/audio';
 import { ITEMS } from '../../../sim/data';
 import {
   FACTION_CURRENCY_IDS,
@@ -21,6 +24,7 @@ import { BAG_CATEGORY_LABEL_KEYS } from '../../bag_category_labels';
 import type { BagCategory } from '../../bag_filter';
 import { EMPTY_BAG_GEAR_SET_INDEX } from '../../bag_gear_sets_core';
 import { bagSectionLabel } from '../../bag_sections_core';
+import { captureSearchCaret, restoreSearchCaret } from '../../bank_search_focus';
 import { currencyIconHtml } from '../../currency_art';
 import { markDialogRoot } from '../../dialog_root';
 import { itemDisplayName } from '../../entity_i18n';
@@ -79,6 +83,9 @@ export interface VendorWindowDeps extends PainterHostPresentation {
     craftedRecipeId: string | undefined,
   ): void;
   onSellJunk(): void;
+  /** A goods tab changed: Hud re-runs its fresh build (stock gates, purse,
+   *  Sell Junk quote) and calls renderVendorWindow again, the onQtyChange rule. */
+  onFilterChange(): void;
   onClose(): void;
   sellJunk: {
     enabled: boolean;
@@ -183,6 +190,13 @@ function goodsPriceHtml(row: VendorGoodsRow, deps: VendorWindowDeps): string {
 // rather than in a local of renderVendorWindow.
 const goodsFilters = new WeakMap<HTMLElement, { vendor: string; filter: VendorGoodsFilter }>();
 
+/** Forget the open shop's tab and search: Hud calls this on every vendor open,
+ *  so walking away and back always starts on All with an empty search (the
+ *  purchase-multiple reset beside it in openVendor). */
+export function resetVendorGoodsFilter(el: HTMLElement): void {
+  goodsFilters.delete(el);
+}
+
 function goodsFilterFor(el: HTMLElement, vendorName: string): VendorGoodsFilter {
   const held = goodsFilters.get(el);
   if (held && held.vendor === vendorName) return held.filter;
@@ -229,7 +243,8 @@ function buildGoodsFilterBar(
       chip.addEventListener('click', () => {
         if (category === active) return;
         filter.category = category;
-        renderVendorWindow(el, vendorName, view, deps);
+        audio.click();
+        deps.onFilterChange();
       });
       chips.appendChild(chip);
     }
@@ -460,6 +475,10 @@ export function renderVendorWindow(
     ? [...focusedGrid.querySelectorAll('button')].indexOf(focused as HTMLButtonElement)
     : -1;
   const scrollTop = el.scrollTop;
+  // A focused search box keeps its caret (and an IME composition's anchor)
+  // through a rebuild it did not start: an online purse or bag echo repaints
+  // the whole window mid-typing (bank_search_focus.ts, the bank's same fix).
+  const searchCaret = captureSearchCaret(el, focused);
   markDialogRoot(el, { label: t('itemUi.vendor.goodsTitle', { name: vendorName }) });
   el.innerHTML = `<div class="panel-title ui-win-head"><span class="ui-win-title">${esc(t('itemUi.vendor.goodsTitle', { name: vendorName }))}</span><button type="button" class="x-btn ui-x-btn" data-close data-focus-key="close" aria-label="${esc(t('itemUi.vendor.close'))}">${svgIcon('close')}</button></div>`;
 
@@ -617,6 +636,7 @@ export function renderVendorWindow(
   el.querySelector('[data-close]')?.addEventListener('click', () => deps.onClose());
   el.style.display = 'block';
   el.scrollTop = scrollTop;
+  if (restoreSearchCaret(el, searchCaret)) return;
   // Scroll first, then restore (the family contract): the exact control when
   // it survived the rebuild, else the stable neighbors, so a keyboard buy of
   // the last stack cannot drop focus to <body>.
