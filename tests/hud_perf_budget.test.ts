@@ -1310,6 +1310,14 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
     ],
   },
   { file: 'reliquary_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
+  // The Rewards hub's Vault tab (menu consolidation step 7): the scroll pair the
+  // bank's rewards tab held, read before a signature repaint and written back
+  // after, so a claim or a reveal does not throw the player to the top.
+  {
+    file: 'hud/rewards/weekly_vault_window.ts',
+    reflowAllow: { '.scrollTop': 2 },
+    driverAllow: {},
+  },
   { file: 'hud/cosmetics/cosmetics_window.ts', reflowAllow: {}, driverAllow: {} },
   // Cold rebuild only, after the unchanged-signature return: preserve the rail
   // and detail scroll positions plus the unified Groups body across structural updates.

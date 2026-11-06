@@ -65,16 +65,17 @@ describe('one Professions launcher on the rail', () => {
     );
   });
 
-  it('ships the consolidated twelve-button rail, six per column, within the height budget', () => {
-    // Menu consolidation (2026-11-04): 24 visible launchers became 12. Column A
-    // is the character's own windows, column B the hubs and the system row.
+  it('ships the consolidated thirteen-button rail, seven and six, within the height budget', () => {
+    // Menu consolidation (2026-11-04): 24 visible launchers became 12, and
+    // Rewards joined column A in step 7 (2026-11-06). Column A is the
+    // character's own windows plus Rewards, column B the hubs and the system row.
     const UNCOMPACTED_MICRO_PLUS_GAP_PX = 34;
     const COMPACT_MICRO_PLUS_GAP_PX = 25;
     const BOTTOM_ANCHOR_PX = 74;
     const UNCOMPACTED_BUDGET_PX = 660;
     const COMPACT_BUDGET_PX = 600;
     const EXPECTED: Record<'a' | 'b', string[]> = {
-      a: ['mm-char', 'mm-bag', 'mm-spell', 'mm-talents', 'mm-quest', 'mm-map'],
+      a: ['mm-char', 'mm-bag', 'mm-spell', 'mm-talents', 'mm-quest', 'mm-map', 'mm-rewards'],
       b: [
         'mm-deeds',
         'mm-professions',
