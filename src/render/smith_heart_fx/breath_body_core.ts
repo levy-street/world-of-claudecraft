@@ -259,8 +259,8 @@ export const BREATH_CURRENTS: readonly BreathCurrent[] = [
     width: 0.55,
     alpha: 0.62,
     spin: 0.32,
-    puffs: 16,
-    puffSize: [1.4, 2.5, 2.0, 1.6, 1.35, 1.1, 0.9],
+    puffs: 26,
+    puffSize: [1.7, 2.9, 2.5, 2.0, 1.7, 1.4, 1.1],
     tailCurl: true,
   },
   // The arms: out of the chest, through the empty shoulder and elbow, along
@@ -274,8 +274,8 @@ export const BREATH_CURRENTS: readonly BreathCurrent[] = [
     width: 0.38,
     alpha: 0.58,
     spin: 0.42,
-    puffs: 7,
-    puffSize: [1.7, 1.4, 1.1, 1.0, 0.95, 0.6],
+    puffs: 10,
+    puffSize: [2.0, 1.7, 1.4, 1.25, 1.15, 0.75],
   },
   {
     id: 'armR',
@@ -286,8 +286,8 @@ export const BREATH_CURRENTS: readonly BreathCurrent[] = [
     width: 0.38,
     alpha: 0.58,
     spin: -0.42,
-    puffs: 7,
-    puffSize: [1.7, 1.4, 1.1, 1.0, 0.95, 0.6],
+    puffs: 10,
+    puffSize: [2.0, 1.7, 1.4, 1.25, 1.15, 0.75],
   },
   // The shoulders: the air the pauldrons float on, up to their crystals.
   {
@@ -299,8 +299,8 @@ export const BREATH_CURRENTS: readonly BreathCurrent[] = [
     width: 0.48,
     alpha: 0.5,
     spin: 0.3,
-    puffs: 3,
-    puffSize: [1.5, 1.8, 1.7, 0.9],
+    puffs: 5,
+    puffSize: [1.8, 2.1, 2.0, 1.1],
   },
   {
     id: 'shoulderR',
@@ -311,8 +311,8 @@ export const BREATH_CURRENTS: readonly BreathCurrent[] = [
     width: 0.48,
     alpha: 0.5,
     spin: -0.3,
-    puffs: 3,
-    puffSize: [1.5, 1.8, 1.7, 0.9],
+    puffs: 5,
+    puffSize: [1.8, 2.1, 2.0, 1.1],
   },
   // The neck and the head: up behind the mask to its crown and the halo.
   {
@@ -324,8 +324,8 @@ export const BREATH_CURRENTS: readonly BreathCurrent[] = [
     width: 0.42,
     alpha: 0.45,
     spin: 0.36,
-    puffs: 3,
-    puffSize: [1.6, 1.4, 1.2, 1.0, 0.6],
+    puffs: 4,
+    puffSize: [1.9, 1.7, 1.5, 1.2, 0.7],
   },
   // The volume under the filaments: wide soft strands of glowing air down
   // the trunk and the tail, along the arms and over the shoulders.
@@ -407,10 +407,28 @@ export function breathRibbonKept(current: BreathCurrent, ribbon: number, low: bo
 }
 /** Every billow of the body volume (a current's billows together). */
 export const BREATH_PUFF_COUNT = BREATH_CURRENTS.reduce((a, c) => a + (c.puffs ?? 0), 0);
-/** The low tier keeps every other billow (cosmetic volume; the body still
- *  reads, thinner). */
-export function breathPuffKept(index: number, low: boolean): boolean {
-  return !low || index % 2 === 0;
+/** The low tier keeps every other billow of each current (left and right
+ *  alike; cosmetic volume, the body still reads, thinner), drawn at
+ *  BREATH_PUFF_LOW_SIZE. */
+export function breathPuffKept(indexInCurrent: number, low: boolean): boolean {
+  return !low || indexInCurrent % 2 === 0;
+}
+export const BREATH_PUFF_LOW_SIZE = 0.7;
+
+/** The billows' total quad area (model units squared, at full size): the
+ *  fill the volume costs, pinned by the test so it cannot creep. */
+export function breathPuffArea(low: boolean): number {
+  let a = 0;
+  for (const c of BREATH_CURRENTS) {
+    const n = c.puffs ?? 0;
+    const sizes = c.puffSize ?? c.radius;
+    for (let j = 0; j < n; j++) {
+      if (!breathPuffKept(j, low)) continue;
+      const s = profileAt(sizes, (j + 0.5) / n) * (low ? BREATH_PUFF_LOW_SIZE : 1);
+      a += s * s;
+    }
+  }
+  return a;
 }
 
 /** Segments along every ribbon (and the wind tail's curl, in path units). */

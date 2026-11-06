@@ -105,7 +105,7 @@ void main() {
   // Capped (the Breath model pass): a wind front you read through, never a
   // white wall over the boss, the raid and the throw markers.
   float k = (0.05 + streak * 0.5) * foot * uAlpha;
-  gl_FragColor = vec4(mix(uColor, uCore, streak * foot * 0.6), clamp(k, 0.0, 0.32));
+  gl_FragColor = vec4(mix(uColor, uCore, streak * foot * 0.6), clamp(k, 0.0, 0.18));
   #include <colorspace_fragment>
 }
 `;

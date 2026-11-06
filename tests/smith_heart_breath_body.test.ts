@@ -40,6 +40,7 @@ import {
   breathBodyAction,
   breathDeathLook,
   breathOrbit,
+  breathPuffArea,
   breathPuffKept,
   breathRibbonKept,
   breathStanceGesture,
@@ -242,10 +243,19 @@ describe('breath_body_core: the wind plan', () => {
     for (const c of BREATH_CURRENTS)
       if (c.puffs) expect(c.puffSize?.length ?? c.radius.length, c.id).toBe(c.path.length);
     expect(BREATH_PUFF_COUNT).toBeGreaterThan(30);
-    expect(
-      Array.from({ length: BREATH_PUFF_COUNT }, (_, i) => breathPuffKept(i, true)).filter(Boolean)
-        .length,
-    ).toBeLessThan(BREATH_PUFF_COUNT);
+    // The volume's fill is capped (both tiers), the low tier well under half.
+    expect(breathPuffArea(false)).toBeLessThan(200);
+    expect(breathPuffArea(true)).toBeLessThan(breathPuffArea(false) * 0.35);
+    // Left and right keep the same billows on the low tier, the trunk thins.
+    const kept = (id: string) => {
+      const c = BREATH_CURRENTS.find((x) => x.id === id);
+      return Array.from({ length: c?.puffs ?? 0 }, (_, k) => breathPuffKept(k, true)).filter(
+        Boolean,
+      ).length;
+    };
+    expect(kept('armL')).toBe(kept('armR'));
+    expect(kept('shoulderL')).toBe(kept('shoulderR'));
+    expect(kept('trunk')).toBeLessThan(BREATH_CURRENTS[0].puffs ?? 0);
     for (const [a, b] of BREATH_ARC_PAIRS) expect(ids.has(a) && ids.has(b)).toBe(true);
   });
 

@@ -67,6 +67,7 @@ import {
   BREATH_CURRENTS,
   BREATH_GUARDIAN,
   BREATH_PUFF_COUNT,
+  BREATH_PUFF_LOW_SIZE,
   BREATH_RIBBON_COUNT,
   BREATH_RIBBON_SEGMENTS,
   BREATH_SOCKETS,
@@ -811,16 +812,16 @@ export class BreathBody {
       // The billows of its body along this current (the low tier every other).
       const puffs = cur.puffs ?? 0;
       for (let j = 0; j < puffs; j++, pi++) {
-        if (!breathPuffKept(pi, this.low)) continue;
+        if (!breathPuffKept(j, this.low)) continue;
         const u = (j + 0.5) / puffs;
         splineAt(_pts, n, u, _sp);
         const seed = breathBodyHash(pi, 13);
         const a = seed * Math.PI * 2 + t * cur.spin * spin * 1.2;
-        const out = profileAt(cur.radius, u) * U * radius * fling * 0.35;
+        const out = profileAt(cur.radius, u) * U * radius * fling * 0.3;
         const size =
           profileAt(cur.puffSize ?? cur.radius, u) *
           U *
-          (this.low ? 0.85 : 1) *
+          (this.low ? BREATH_PUFF_LOW_SIZE : 1) *
           (0.75 + 0.25 * radius) *
           fling *
           (1 + 0.1 * Math.sin(t * (0.6 + seed) + pi));
@@ -830,7 +831,7 @@ export class BreathBody {
           _sp[1] + Math.sin(a * 0.7) * out * 0.5,
           _sp[2] + Math.sin(a) * out,
           size,
-          (0.85 + 0.15 * seed) * alpha,
+          (0.92 + 0.08 * seed) * alpha,
           seed,
         );
       }

@@ -33,6 +33,8 @@ void main() {
   // A billow the camera stands in fades out (no screen-filling layers at melee).
   float near = distance(cameraPosition, aCenter.xyz) / max(aCenter.w, 1e-3);
   vAlpha *= smoothstep(0.6, 1.4, near);
+  // Faded out: collapse it (never rasterize an invisible screen-filling quad).
+  if (vAlpha <= 0.002) { gl_Position = vec4(2.0, 2.0, 2.0, 1.0); return; }
   vec3 toCam = normalize(cameraPosition - aCenter.xyz);
   vec3 c = aCenter.xyz - toCam * uBack * aCenter.w;
   vec3 w = c + (right * position.x + up * position.y) * aCenter.w;
@@ -74,7 +76,8 @@ void main() {
   float n = fbm(q * 1.7 + vec2(s, s * 0.6));
   float n2 = fbm(q * 3.3 + vec2(-t * 1.6, s));
   float r = length(p) + (n - 0.5) * 0.55;
-  float shape = 1.0 - smoothstep(0.35, 0.98, r);
+  // A thick, near-opaque core with a soft torn edge (painted cloud).
+  float shape = 1.0 - smoothstep(0.55, 0.98, r);
   if (shape <= 0.0) discard;
   // Lit from above and to the side: a bright cyan-white rim there, the body
   // shaded dark blue-grey away from it.
@@ -86,8 +89,10 @@ void main() {
   vec3 sc = mix(uStormShade, uStormBody, clamp(lit * 0.6 + n2 * 0.3, 0.0, 1.0));
   sc = mix(sc, uStormEdge, clamp(rim * (0.25 + 0.9 * uFlash), 0.0, 1.0));
   col = mix(col, sc, uStorm);
-  float a = vAlpha * shape * (0.7 + 0.3 * n);
-  gl_FragColor = vec4(col, clamp(a, 0.0, 0.92));
+  float a = vAlpha * shape * (0.88 + 0.12 * n);
+  // Capped under opaque: the billows draw in one unsorted instanced call, so
+  // an overlap out of order still blends instead of painting over.
+  gl_FragColor = vec4(col, clamp(a, 0.0, 0.9));
 }
 `;
 
