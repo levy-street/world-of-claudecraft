@@ -59,10 +59,9 @@ export const SMITH_HEART_PLACEHOLDER_LOOKS: Record<string, string> = {
   // in its heart) is drawn by smith_heart_fx/quench_body.ts. Final: its own
   // model (the official pipeline), the same joints.
   heart_quench_guardian: 'smith_heart_quench_guardian',
-  // The Guardian of the Heat: a bodyless target; its provisional body (a
-  // being of the first flame in columnar basalt and white-gold crystal, never
-  // a forge) is drawn by smith_heart_fx/heat_body.ts. Final: its own model
-  // (the official pipeline), the same joints.
+  // The Guardian of the Heat: its own model (smith_heart_boss_looks.ts), a
+  // giant of basalt and lava in the first wellspring; its fire is drawn by
+  // smith_heart_fx/heat_body.ts.
   heart_heat_guardian: 'smith_heart_heat_guardian',
   // Its adds (encounters/smith_heart/heat*.ts). Final: their own models.
   // The Wellspawn: a child of the first flame, the stone goleling tinted

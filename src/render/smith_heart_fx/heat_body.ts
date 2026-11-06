@@ -1,39 +1,35 @@
-// The Guardian of the Heat's provisional body (plan: heat_body_core.ts),
-// hosted by ../rift_death_zone.ts beside the raid's other fx. The guardian is
-// a bodyless target (characters/manifest.ts smith_heart_heat_guardian): its
-// click capsule, nameplate and bars come from the ordinary entity view, and
-// this module draws the body over it, read from IWorld (its position, facing,
-// cast bar, swings, resource (the Hearth's heat), auras and death, and its
-// cues), so offline and online look the same:
-//  - the body: a being of the first flame, dark columnar basalt (the Heart
-//    kit's colossus rock repainted the Hearth's sooted basalt, fire in its
-//    joints) on legs of bundled basalt columns, a mane and a crown of
-//    white-gold crystal prisms, pauldrons of fire-split boulders, fists of
-//    crystal on beds of column stumps, crystal breaking out of its chest
-//    round a white-gold heart, threads of the first flame between its joints;
-//  - the wellspring: a giant, it stands sunk to its waist in the first
-//    wellspring the whole fight (molten rock sheeting off it where it meets
-//    the pool), sinks all the way under as the Hearth overflows and rises
-//    again with lava pouring off it; its fire burns whiter as the fight
-//    deepens;
-//  - the motion: its breathing flame, a swipe on each melee hit, Basalt
-//    Fist's fist of crystal lifted high and driven down;
-//  - the death: the threads flare and go out, every piece falls and tumbles
-//    to the floor, the flame sinking out of them in smoke.
+// The Guardian of the Heat's fire (plan: heat_body_core.ts), hosted by
+// ../rift_death_zone.ts beside the raid's other fx. The body itself is its own
+// rigged model (characters/smith_heart_boss_looks.ts): this module is the half
+// of the boss that is fire, read from IWorld (the guardian's drawn position,
+// facing, cast bar, swings, auras, death and the fight's cues) and from the
+// sockets hung on the model's bones (heat_body_sockets.ts), so offline and
+// online look the same:
+//  - the stance: the gestures that plunge the rig under the wellspring, hold
+//    it there, burst it back out and throw its fire (Hearth Flare, the seeds,
+//    the Wakefire), sent through the renderer's gesture seam and re-sent so a
+//    rebuilt view holds the right stance;
+//  - the burning body: flames roaring off its shoulders, back, fists, horns
+//    and crown, embers, dark smoke and a heat haze rising off it, its eyes and
+//    the ring in its chest alight, a living vortex of fire where its body
+//    meets the lava, the lava churning round it, molten rocks circling it;
+//  - every blow: a fist slammed on the shore throws a lava splash, a burst of
+//    flame, a shockwave and smoke; Basalt Fist's fist gathers fire through its
+//    bar and lands on the bar's end; the cast gathers fire between its hands
+//    and throws it; the plunge and the breach erupt; the death flares, slumps
+//    and cools to smoke.
 // Presentation only: the fight's telegraphs are heat_fx.ts's and
-// heat_fight_fx.ts's, on every tier. The body, its poses and its depth in the
-// wellspring never thin; the embers, the haze, the lava's drips,
-// the smoke and the shakes thin on the low tier and under reduced motion.
+// heat_fight_fx.ts's, on every tier. The low tier and reduced motion thin the
+// flames, the smoke, the rocks and the shakes; nothing here is a warning a
+// player reacts to.
 //
 // Rules (src/render/CLAUDE.md): every material is built in the constructor
-// under the root before its gated attach (the kits' pieces, which land later,
-// draw with the kits' own shared slot materials linked by their program
-// warmers, and this module's glows each have a hidden carrier); no light;
-// fixed pools; no per-frame allocation.
+// under the root before its gated attach (the shaders each have a hidden
+// carrier); no light; fixed pools; no per-frame allocation.
 
 import * as THREE from 'three';
 import { resolveUiEffectsProfile } from '../../game/ui_effects_profile';
-import { HEAT_CUES } from '../../sim/encounters/smith_heart/heat_ids';
+import { HEAT_CASTS, HEAT_CUES, HEAT_STAGES } from '../../sim/encounters/smith_heart/heat_ids';
 import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
 import { fxAnchor } from '../attached_fx_anchor';
@@ -42,231 +38,248 @@ import { attachSceneGroupGated } from '../gated_scene_attach';
 import { GFX } from '../gfx';
 import { getFlameTex } from '../ignivar_fire_vfx';
 import { setRenderCategory } from '../renderer_diagnostics';
-import {
-  ensureHeartKit,
-  heartKitLoaded,
-  heartKitMeshes,
-  heartKitProgramWarmers,
-  heartKitSlotMaterial,
-} from '../smith_heart/heart_kit';
-import { heartVeinGlowMaterial } from '../smith_heart/heart_room_kit';
 import { radialGlowTexture } from '../textures';
 import { EngineParticles } from '../trash_engine_fx/engine_particles';
 import { inSmithHeartClaim } from './council_fx_core';
 import {
-  HEAT_BODY_COLORS,
-  HEAT_BODY_KITS,
-  HEAT_BODY_PIECES,
+  HEAT_BODY_CLIP,
+  HEAT_BODY_GESTURES,
   HEAT_BODY_POOLS,
-  HEAT_BODY_SCALE,
-  HEAT_FALL,
-  HEAT_FLAME_JOINTS,
+  HEAT_CAST_GAP,
   HEAT_GUARDIAN,
-  HEAT_RIG_JOINTS,
-  HEAT_SLOTS,
-  HEAT_THREAD_PAIRS,
-  type HeatArmJoints,
-  type HeatBodyAction,
-  type HeatBodyActionState,
-  type HeatBodyInput,
-  type HeatBodyLook,
-  type HeatBodyPiece,
-  HJ,
-  heatArm,
-  heatBodyAction,
+  HEAT_MODEL_COLORS,
+  HEAT_MODEL_LAVA,
+  HEAT_ROCKS_LOW,
+  HEAT_SOCKETS,
+  HEAT_YD_PER_UNIT,
+  type HeatSocketId,
   heatBodyHash,
-  heatBodyLook,
   heatBodyState,
-  heatFallProgress,
-  heatFallRest,
-  heatWristTarget,
-  restJoint,
-  type V3,
+  heatCastLook,
+  heatDeathLook,
+  heatFlameFor,
+  heatFlameRate,
+  heatRockOrbit,
+  heatSocketIndex,
+  heatStanceGesture,
 } from './heat_body_core';
+import { clearHeatBodySockets, heatBodySockets, retryHeatBodySockets } from './heat_body_sockets';
 import { heatParticleSteps } from './heat_floor_ladder_core';
-import { basaltRepaint } from './heat_shapes';
 
 const SCAN_SEC = 0.1;
-/** The giant's scale (the body's frame to the world). */
-const BS = HEAT_BODY_SCALE;
-/** A thread colour change smaller than this is not re-uploaded. */
-const THREAD_COLOR_EPS = 1 / 512;
-const HEAD_JOINTS = [HJ.head, HJ.mouth] as const;
-/** Where molten rock drips off it. */
-const LAVA_JOINTS = [
-  HJ.hip,
-  HJ.hipL,
-  HJ.hipR,
-  HJ.chest,
-  HJ.shoulderL,
-  HJ.shoulderR,
-  HJ.elbowL,
-  HJ.elbowR,
-  HJ.wristL,
-  HJ.wristR,
-] as const;
-const LEAN_JOINTS = [
-  HJ.chest,
-  HJ.head,
-  HJ.mouth,
-  HJ.back,
-  HJ.shoulderL,
-  HJ.shoulderR,
-  HJ.elbowL,
-  HJ.elbowR,
-  HJ.wristL,
-  HJ.wristR,
-] as const;
+const C = HEAT_MODEL_COLORS;
+const S_FIST_L = heatSocketIndex('fistL');
+const S_FIST_R = heatSocketIndex('fistR');
+const S_EYE_L = heatSocketIndex('eyeL');
+const S_EYE_R = heatSocketIndex('eyeR');
+const S_HEART = heatSocketIndex('heart');
+const S_BACK = heatSocketIndex('back');
+const S_SHOULDER_L = heatSocketIndex('shoulderL');
+const S_SHOULDER_R = heatSocketIndex('shoulderR');
+const SMOKE_SOCKETS = [S_SHOULDER_L, S_SHOULDER_R, S_BACK, heatSocketIndex('crown')] as const;
 
-const _m = new THREE.Matrix4();
-const _q = new THREE.Quaternion();
-const _q2 = new THREE.Quaternion();
+// ---- the vortex of fire round its lower body (one shader, two layers) -------------------------
+
+const VORTEX_VERT = /* glsl */ `
+  uniform float uTime;
+  uniform float uTwist;
+  varying vec2 vUv;
+  varying float vFacing;
+  void main() {
+    vUv = uv;
+    vec3 p = position;
+    float h = uv.y;
+    float a = uTwist * h + uTime * 0.6;
+    float c = cos(a), s = sin(a);
+    p.xz = mat2(c, -s, s, c) * p.xz;
+    p.xz *= 1.0 + 0.08 * sin(uTime * 3.1 + h * 9.0 + uv.x * 18.0);
+    vec4 mv = modelViewMatrix * vec4(p, 1.0);
+    vec3 n = normalize(normalMatrix * normal);
+    vFacing = abs(dot(n, normalize(-mv.xyz)));
+    gl_Position = projectionMatrix * mv;
+  }
+`;
+
+const VORTEX_FRAG = /* glsl */ `
+  uniform float uTime;
+  uniform float uSpin;
+  uniform float uAlpha;
+  uniform vec3 uLow;
+  uniform vec3 uHigh;
+  varying vec2 vUv;
+  varying float vFacing;
+  float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+  float noise(vec2 p) {
+    vec2 i = floor(p), f = fract(p);
+    vec2 u = f * f * (3.0 - 2.0 * f);
+    return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), u.x),
+               mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x), u.y);
+  }
+  void main() {
+    float h = vUv.y;
+    vec2 q = vec2(vUv.x * 7.0 + h * 3.0 + uTime * uSpin, h * 3.4 - uTime * 1.9);
+    float n = noise(q) * 0.62 + noise(q * 2.3 + 4.1) * 0.38;
+    float tongue = smoothstep(0.32 + 0.45 * h, 0.9, n);
+    float fade = smoothstep(0.0, 0.1, h) * (1.0 - smoothstep(0.45, 1.0, h));
+    float k = tongue * fade * (0.45 + 0.55 * vFacing);
+    vec3 col = mix(uLow, uHigh, smoothstep(0.55, 0.95, n) * (1.0 - h * 0.6));
+    gl_FragColor = vec4(col * (1.0 + 2.2 * k), min(1.0, k * uAlpha * 1.35));
+  }
+`;
+
+function vortexMaterial(name: string, spin: number, twist: number): THREE.ShaderMaterial {
+  return new THREE.ShaderMaterial({
+    name,
+    uniforms: {
+      uTime: { value: 0 },
+      uSpin: { value: spin },
+      uTwist: { value: twist },
+      uAlpha: { value: 0 },
+      uLow: { value: new THREE.Color(0xff4a08) },
+      uHigh: { value: new THREE.Color(0xffd27a) },
+    },
+    vertexShader: VORTEX_VERT,
+    fragmentShader: VORTEX_FRAG,
+    transparent: true,
+    depthWrite: false,
+    side: THREE.DoubleSide,
+    blending: THREE.AdditiveBlending,
+    toneMapped: false,
+    fog: false,
+  });
+}
+
+// ---- scratch (no allocation a frame) -------------------------------------------------------
+
 const _a = new THREE.Vector3();
 const _b = new THREE.Vector3();
+const _m = new THREE.Matrix4();
+const _q = new THREE.Quaternion();
 const _s = new THREE.Vector3();
-const _up = new THREE.Vector3(0, 1, 0);
-const _x = new THREE.Vector3(1, 0, 0);
-const _box = new THREE.Box3();
-const _size = new THREE.Vector3();
-const _centre = new THREE.Vector3();
-const _rest: V3 = { x: 0, y: 0, z: 0 };
-const _wrist: V3 = { x: 0, y: 0, z: 0 };
-const _arm: HeatArmJoints = { elbow: { x: 0, y: 0, z: 0 }, wrist: { x: 0, y: 0, z: 0 } };
-const _act: HeatBodyActionState = { action: 'idle', k: 0 };
-const _actIn: HeatBodyInput = {
-  castId: null,
-  castFill: 0,
-  phase: 0,
-  stage: 0,
-  stageFill: 0,
-  sinceSlam: Number.POSITIVE_INFINITY,
-  sinceSwing: Number.POSITIVE_INFINITY,
-};
+const _e = new THREE.Euler();
 const _state = { phase: 0, stage: 0, fill: 0 };
-const _fall = { k: 0, landed: false };
-const _look: HeatBodyLook = {
-  swell: 0,
-  lift: 0,
-  lean: 0,
-  glow: 0,
-  white: 0,
-  flash: 0,
-  tremble: 0,
-  haze: 0,
-  sink: 0,
-  pour: 0,
+const _orbit = { x: 0, y: 0, z: 0, size: 1, spin: 0 };
+const _dir: [number, number, number] = [0, 1, 0];
+
+/** The per-frame puffs' options, written in place. */
+const FLAME = {
+  speed: 0.8,
+  up: 5,
+  life: 0.55,
+  size: [3, 0.6] as [number, number],
+  color: C.flameHeat as readonly [number, number, number],
+  alpha: 1,
+  pool: 'pyre' as const,
+  radius: 0.5,
 };
-/** The per-frame puffs' options, written in place (no allocation a frame). */
-const EMBER_DIR: [number, number, number] = [0, 1, 0];
 const EMBER = {
-  speed: 1.2,
-  up: 3,
-  life: 0.9,
-  size: [0.42, 0.08] as [number, number],
-  color: HEAT_BODY_COLORS.ember as readonly [number, number, number],
+  speed: 1.6,
+  up: 4,
+  life: 1.4,
+  size: [0.32, 0.06] as [number, number],
+  color: C.ember as readonly [number, number, number],
   alpha: 1,
   pool: 'glow' as const,
-  dir: EMBER_DIR,
-  spread: 0.4,
+  radius: 1.2,
+  drag: 0.6,
 };
-const FLAME = {
-  speed: 0.6,
-  up: 2.6,
-  life: 0.5,
-  size: [1.8, 0.4] as [number, number],
-  color: HEAT_BODY_COLORS.ember as readonly [number, number, number],
-  alpha: 0.85,
-  pool: 'glow' as const,
+const SMOKE = {
+  speed: 0.8,
+  up: 3.2,
+  life: 3.2,
+  size: [3.5, 9] as [number, number],
+  color: C.smoke as readonly [number, number, number],
+  alpha: 0.32,
+  drag: 0.7,
+  radius: 1,
 };
 const HAZE = {
   speed: 0.4,
-  up: 1.8,
-  life: 1.6,
-  size: [3.6, 7.5] as [number, number],
-  color: HEAT_BODY_COLORS.haze as readonly [number, number, number],
-  alpha: 0.08,
+  up: 2.6,
+  life: 1.8,
+  size: [4, 9] as [number, number],
+  color: C.haze as readonly [number, number, number],
+  alpha: 0.05,
   drag: 0.8,
+  radius: 2,
 };
-/** Molten rock dripping and sheeting off it (gold, falling). */
-const LAVA_DIR: [number, number, number] = [0, -1, 0];
-const LAVA = {
-  speed: 2.5,
-  life: 0.7,
-  size: [1.1, 0.35] as [number, number],
-  color: HEAT_BODY_COLORS.ember as readonly [number, number, number],
+const CHURN = {
+  speed: 2.4,
+  up: 4,
+  life: 0.8,
+  size: [0.9, 0.25] as [number, number],
+  color: C.lava as readonly [number, number, number],
   alpha: 1,
   pool: 'glow' as const,
-  dir: LAVA_DIR,
-  spread: 0.25,
-  gravity: 9,
+  gravity: 12,
+  radius: 0.4,
 };
-const STREAM_DIR: [number, number, number] = [0, -1, 0];
-const STREAM = {
-  speed: 7,
-  life: 0.35,
-  size: [1.0, 0.3] as [number, number],
-  color: HEAT_BODY_COLORS.spark as readonly [number, number, number],
+const DRAW_IN = {
+  speed: 6,
+  life: 0.5,
+  size: [0.5, 0.12] as [number, number],
+  color: C.spark as readonly [number, number, number],
   alpha: 1,
   pool: 'glow' as const,
-  dir: STREAM_DIR,
-  spread: 0.12,
+  dir: _dir,
+  spread: 0.08,
+  drag: 0,
 };
 
-interface PieceView {
-  def: HeatBodyPiece;
-  index: number;
-  holder: THREE.Group;
-  standIn: THREE.Mesh | null;
-  pos: THREE.Vector3;
-  quat: THREE.Quaternion;
-  diedPos: THREE.Vector3;
-  diedQuat: THREE.Quaternion;
-  rest: { at: V3; tilt: THREE.Quaternion; delay: number } | null;
-  landed: boolean;
+interface Flash {
+  sprite: THREE.Sprite;
+  mat: THREE.SpriteMaterial;
+  born: number;
+  life: number;
+  size: number;
 }
 
 export class HeatBody {
   readonly readyForEntry: Promise<void>;
   private readonly root = new THREE.Group();
-  private readonly group = new THREE.Group();
   private readonly uTime = { value: 0 };
   private readonly density: number;
   private readonly particles: EngineParticles;
   private readonly geometries: THREE.BufferGeometry[] = [];
   private readonly materials: THREE.Material[] = [];
-  private readonly pieces: PieceView[] = [];
-  private readonly threads: THREE.InstancedMesh;
-  private readonly crystalMat: THREE.ShaderMaterial;
-  private readonly fireMat: THREE.ShaderMaterial;
-  private readonly haloMat: THREE.SpriteMaterial;
-  private readonly eyeMat: THREE.SpriteMaterial;
-  private readonly heartGlowMat: THREE.SpriteMaterial;
-  private readonly auraMat: THREE.SpriteMaterial;
-  private readonly orbMat: THREE.SpriteMaterial;
+  /** Live socket places this frame (world), in HEAT_SOCKETS order. */
+  private readonly sock: THREE.Vector3[] = HEAT_SOCKETS.map(() => new THREE.Vector3());
+  private readonly vortexOuter: THREE.Mesh;
+  private readonly vortexInner: THREE.Mesh;
+  private readonly vortexOuterMat: THREE.ShaderMaterial;
+  private readonly vortexInnerMat: THREE.ShaderMaterial;
   private readonly eyes: THREE.Sprite[] = [];
-  private readonly heartGlow: THREE.Sprite;
-  private readonly aura: THREE.Sprite;
-  private readonly orb: THREE.Sprite;
-  private readonly joints: THREE.Vector3[] = [];
-  private readonly glowColor = new THREE.Color();
-  private readonly gold = new THREE.Color(HEAT_BODY_COLORS.gold);
-  private readonly whiteC = new THREE.Color(HEAT_BODY_COLORS.white);
-  private readonly threadColor = new THREE.Color();
-  private readonly threadShown = new THREE.Color(Number.NaN, Number.NaN, Number.NaN);
-  private readonly standInGeo: THREE.BufferGeometry;
-  private readonly compileGate?: (target: THREE.Object3D) => Promise<unknown>;
+  private readonly eyeMat: THREE.SpriteMaterial;
+  private readonly heart: THREE.Sprite;
+  private readonly heartMat: THREE.SpriteMaterial;
+  private readonly halo: THREE.Sprite;
+  private readonly haloMat: THREE.SpriteMaterial;
+  private readonly fistOrb: THREE.Sprite;
+  private readonly fistOrbMat: THREE.SpriteMaterial;
+  private readonly gather: THREE.Sprite;
+  private readonly gatherMat: THREE.SpriteMaterial;
+  private readonly flashes: Flash[] = [];
+  private readonly rocks: THREE.InstancedMesh;
+  private readonly rockCount: number;
   private readonly glowTex: THREE.Texture | null;
-  private kitBuilt = false;
-  private rosterSeen = Number.NaN;
   private entityId = -1;
+  private rosterSeen = Number.NaN;
   private yaw = 0;
-  private swingAt = -99;
-  private swingSide: -1 | 1 = 1;
-  private slamAt = -99;
-  /** Its stage a frame ago (a change is a splash: it sinks, rises, tears free). */
+  private lavaY = 0;
   private stageSeen = -1;
+  private phase = 1;
+  private under = false;
+  /** Seconds the body has spent climbing back out (rocks and fire return). */
+  private outFor = 99;
+  private castAt = -99;
+  private lastCastGesture = -99;
+  private castReleased = true;
+  private readonly swings: number[] = [];
+  private breachAt = -1;
+  private slumpAt = -1;
   private deadAt = -1;
   private seenAlive = false;
+  private gestureTimer = 0;
   private scanTimer = 0;
   private clock = 0;
   private seed = 0x5e7a;
@@ -279,14 +292,15 @@ export class HeatBody {
     compileGate?: (target: THREE.Object3D) => Promise<unknown>,
     private readonly reducedMotion: () => boolean = () => false,
     private readonly shakeSink?: (amount: number) => void,
+    private readonly playGesture?: (entityId: number, gesture: string) => void,
   ) {
-    this.compileGate = compileGate;
     this.root.name = 'smith-heart-heat-body';
     setRenderCategory(this.root, 'ui3d');
     const detail =
       resolveUiEffectsProfile({ presetLabel: GFX.tier, effectsQuality: 1, reduceMotion: false })
         .tier !== 'low';
     this.density = detail ? 1 : 0.35;
+    this.rockCount = detail ? HEAT_BODY_POOLS.rocks : HEAT_ROCKS_LOW;
     const hasDom = typeof document !== 'undefined';
     this.particles = new EngineParticles(
       this.root,
@@ -300,32 +314,21 @@ export class HeatBody {
       // fight's floor marks under it).
       heatParticleSteps('heat_body'),
     );
-    const carrierGeo = new THREE.BufferGeometry();
-    carrierGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(9), 3));
-    carrierGeo.setAttribute(
-      'normal',
-      new THREE.BufferAttribute(new Float32Array([0, 1, 0, 0, 1, 0, 0, 1, 0]), 3),
-    );
-    carrierGeo.setAttribute('color', new THREE.BufferAttribute(new Float32Array(9).fill(1), 3));
-    carrierGeo.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(6), 2));
-    this.geometries.push(carrierGeo);
-    // The stand-in every piece wears until its kit lands: a unit rock in the
-    // Hearth's basalt.
-    const standIn = new THREE.IcosahedronGeometry(0.5, 1);
-    const g = HEAT_BODY_COLORS.basalt;
-    const n = standIn.getAttribute('position').count;
-    const col = new Float32Array(n * 3);
-    for (let i = 0; i < n; i++) {
-      const shade = 0.75 + 0.5 * heatBodyHash(i, 7);
-      col[i * 3] = g[0] * shade;
-      col[i * 3 + 1] = g[1] * shade;
-      col[i * 3 + 2] = g[2] * shade;
+    // The vortex of fire where the body meets the lava: two twisting sheaths,
+    // counter-spun, flaring at the wellspring and wrapping the vortex to the belt.
+    const outerGeo = new THREE.CylinderGeometry(2.9, 3.3, 6.5, 32, 6, true).translate(0, 3.25, 0);
+    const innerGeo = new THREE.CylinderGeometry(2.3, 2.1, 4.8, 28, 5, true).translate(0, 2.4, 0);
+    this.geometries.push(outerGeo, innerGeo);
+    this.vortexOuterMat = vortexMaterial('smithHeartHeatVortexOuter', 0.9, 2.2);
+    this.vortexInnerMat = vortexMaterial('smithHeartHeatVortexInner', -1.4, -2.8);
+    this.vortexOuter = new THREE.Mesh(outerGeo, this.vortexOuterMat);
+    this.vortexInner = new THREE.Mesh(innerGeo, this.vortexInnerMat);
+    for (const m of [this.vortexOuter, this.vortexInner]) {
+      m.name = 'smithHeartHeatVortex';
+      m.frustumCulled = false;
+      m.visible = false;
+      this.root.add(m);
     }
-    standIn.setAttribute('color', new THREE.BufferAttribute(col, 3));
-    this.standInGeo = standIn;
-    this.geometries.push(standIn);
-    this.crystalMat = heartVeinGlowMaterial(HEAT_BODY_COLORS.fire, 'smithHeartHeatCrystal');
-    this.fireMat = heartVeinGlowMaterial(HEAT_BODY_COLORS.gold, 'smithHeartHeatSeams');
     const glowTex = hasDom ? radialGlowTexture() : null;
     this.glowTex = glowTex;
     const sprite = (color: number, opacity: number, name: string) =>
@@ -339,212 +342,86 @@ export class HeatBody {
         fog: false,
         name,
       });
-    this.haloMat = sprite(HEAT_BODY_COLORS.fire, 0.45, 'smithHeartHeatHalo');
-    this.eyeMat = sprite(HEAT_BODY_COLORS.white, 0.95, 'smithHeartHeatEye');
-    this.heartGlowMat = sprite(HEAT_BODY_COLORS.fire, 0.7, 'smithHeartHeatHeart');
-    this.auraMat = sprite(HEAT_BODY_COLORS.white, 0, 'smithHeartHeatAura');
-    this.orbMat = sprite(HEAT_BODY_COLORS.white, 0, 'smithHeartHeatOrb');
-    const threadMat = new THREE.MeshBasicMaterial({
-      color: 0xffffff,
-      transparent: true,
-      opacity: 0.9,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-      toneMapped: false,
-      fog: false,
-      name: 'smithHeartHeatThreads',
-    });
+    this.eyeMat = sprite(C.eye, 0, 'smithHeartHeatEye');
+    this.heartMat = sprite(C.core, 0, 'smithHeartHeatHeart');
+    this.haloMat = sprite(C.glow, 0, 'smithHeartHeatHalo');
+    this.fistOrbMat = sprite(C.core, 0, 'smithHeartHeatFistOrb');
+    this.gatherMat = sprite(C.core, 0, 'smithHeartHeatGather');
     this.materials.push(
-      this.crystalMat,
-      this.fireMat,
-      this.haloMat,
+      this.vortexOuterMat,
+      this.vortexInnerMat,
       this.eyeMat,
-      this.heartGlowMat,
-      this.auraMat,
-      this.orbMat,
-      threadMat,
+      this.heartMat,
+      this.haloMat,
+      this.fistOrbMat,
+      this.gatherMat,
     );
-    for (const m of [this.crystalMat, this.fireMat]) {
+    const mk = (mat: THREE.SpriteMaterial, name: string) => {
+      const s = new THREE.Sprite(mat);
+      s.name = name;
+      s.visible = false;
+      this.root.add(s);
+      return s;
+    };
+    for (let i = 0; i < 2; i++) this.eyes.push(mk(this.eyeMat, 'smithHeartHeatEye'));
+    this.heart = mk(this.heartMat, 'smithHeartHeatHeart');
+    this.halo = mk(this.haloMat, 'smithHeartHeatHalo');
+    this.fistOrb = mk(this.fistOrbMat, 'smithHeartHeatFistOrb');
+    this.gather = mk(this.gatherMat, 'smithHeartHeatGather');
+    for (let i = 0; i < HEAT_BODY_POOLS.flashes; i++) {
+      const mat = sprite(0xffe2a0, 0, 'smithHeartHeatFlash');
+      this.materials.push(mat);
+      this.flashes.push({
+        sprite: mk(mat, 'smithHeartHeatFlash'),
+        mat,
+        born: -99,
+        life: 0,
+        size: 1,
+      });
+    }
+    // The molten rocks circling it: rough chunks of dark basalt, unlit (the
+    // Hearth's warm light and haze never wash them out), trailing embers.
+    const rockGeo = new THREE.IcosahedronGeometry(1, 0);
+    const rp = rockGeo.getAttribute('position') as THREE.BufferAttribute;
+    for (let i = 0; i < rp.count; i++) {
+      const k = 0.75 + 0.5 * heatBodyHash(i, 29);
+      rp.setXYZ(i, rp.getX(i) * k, rp.getY(i) * k * 0.85, rp.getZ(i) * k);
+    }
+    this.geometries.push(rockGeo);
+    const rockMat = new THREE.MeshBasicMaterial({
+      color: C.rock,
+      fog: false,
+      name: 'smithHeartHeatRock',
+    });
+    this.materials.push(rockMat);
+    this.rocks = new THREE.InstancedMesh(rockGeo, rockMat, HEAT_BODY_POOLS.rocks);
+    this.rocks.name = 'smithHeartHeatRocks';
+    this.rocks.frustumCulled = false;
+    this.rocks.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+    for (let i = 0; i < HEAT_BODY_POOLS.rocks; i++)
+      this.rocks.setMatrixAt(i, _m.makeScale(0, 0, 0));
+    this.rocks.visible = false;
+    this.root.add(this.rocks);
+    // Hidden carriers so the gate links every shader before the first frame
+    // that draws it (the sprites and the rocks are their own carriers).
+    const carrierGeo = new THREE.BufferGeometry();
+    carrierGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(9), 3));
+    carrierGeo.setAttribute(
+      'normal',
+      new THREE.BufferAttribute(new Float32Array([0, 1, 0, 0, 1, 0, 0, 1, 0]), 3),
+    );
+    carrierGeo.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(6), 2));
+    this.geometries.push(carrierGeo);
+    for (const m of [this.vortexOuterMat, this.vortexInnerMat]) {
       const carrier = new THREE.Mesh(carrierGeo, m);
       carrier.visible = false;
       carrier.frustumCulled = false;
       carrier.name = 'smithHeartHeatCarrier';
       this.root.add(carrier);
     }
-    this.group.name = 'smithHeartHeatBody';
-    this.group.scale.setScalar(BS);
-    this.group.visible = false;
-    this.root.add(this.group);
-    const threadGeo = new THREE.CylinderGeometry(1, 1, 1, 6, 1, true).translate(0, 0.5, 0);
-    this.geometries.push(threadGeo);
-    this.threads = new THREE.InstancedMesh(threadGeo, threadMat, HEAT_BODY_POOLS.threads);
-    this.threads.name = 'smithHeartHeatThreads';
-    this.threads.frustumCulled = false;
-    this.threads.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-    for (let k = 0; k < HEAT_BODY_POOLS.threads; k++) {
-      this.threads.setMatrixAt(k, _m.makeScale(0, 0, 0));
-      this.threads.setColorAt(k, this.threadColor.setHex(HEAT_BODY_COLORS.thread));
-    }
-    this.group.add(this.threads);
-    for (let k = 0; k < HEAT_RIG_JOINTS; k++)
-      this.joints.push(new THREE.Vector3().copy(restJoint(k, _rest)));
-    for (let k = 0; k < 2; k++) {
-      const s = new THREE.Sprite(this.eyeMat);
-      s.scale.set(0.6, 0.6, 1);
-      s.name = 'smithHeartHeatEye';
-      this.eyes.push(s);
-      this.group.add(s);
-    }
-    this.heartGlow = new THREE.Sprite(this.heartGlowMat);
-    this.heartGlow.scale.set(2.8, 2.8, 1);
-    this.heartGlow.name = 'smithHeartHeatHeartGlow';
-    this.group.add(this.heartGlow);
-    // The Crushing Fist's white glow round the whole body (every tier: the
-    // tank's warning on the body itself), and the white-hot fist it draws
-    // back and the slam's flash in its hand.
-    this.aura = new THREE.Sprite(this.auraMat);
-    this.aura.scale.set(10, 10, 1);
-    this.aura.position.set(0, 4, 0.4);
-    this.aura.name = 'smithHeartHeatAura';
-    this.group.add(this.aura);
-    this.orb = new THREE.Sprite(this.orbMat);
-    this.orb.scale.set(0.1, 0.1, 1);
-    this.orb.name = 'smithHeartHeatOrb';
-    this.group.add(this.orb);
-    this.root.add(heartKitProgramWarmers());
-    const kitsIn = this.kitsLoaded();
-    this.buildPieces(kitsIn);
-    this.kitBuilt = kitsIn;
     this.readyForEntry = attachSceneGroupGated(scene, this.root, compileGate, () => this.disposed)
       .then(() => {})
       .catch(() => {});
-    if (!kitsIn && hasDom)
-      void Promise.all([ensureHeartKit(HEAT_BODY_KITS.heat), ensureHeartKit(HEAT_BODY_KITS.heart)])
-        .then(() => {
-          if (!this.disposed && this.kitsLoaded()) this.upgradeKit();
-        })
-        .catch(() => {});
-  }
-
-  private kitsLoaded(): boolean {
-    return heartKitLoaded(HEAT_BODY_KITS.heat) && heartKitLoaded(HEAT_BODY_KITS.heart);
-  }
-
-  private buildPieces(withKit: boolean): void {
-    HEAT_BODY_PIECES.forEach((def, index) => {
-      const holder = new THREE.Group();
-      holder.name = `heatBody:${def.id}`;
-      const kit = withKit ? this.fitKit(def) : null;
-      let standIn: THREE.Mesh | null = null;
-      if (kit) holder.add(kit);
-      else {
-        standIn = new THREE.Mesh(
-          this.standInGeo,
-          def.light === 'crystal' ? this.crystalMat : heartKitSlotMaterial('stone'),
-        );
-        standIn.name = 'smithHeartHeatStandIn';
-        standIn.scale.set(def.size.x, def.to !== undefined ? 1 : def.size.y, def.size.z);
-        standIn.rotation.set(def.tilt.x, def.tilt.y, def.tilt.z);
-        standIn.castShadow = def.light !== 'crystal';
-        standIn.receiveShadow = def.light !== 'crystal';
-        holder.add(standIn);
-      }
-      this.group.add(holder);
-      this.pieces.push({
-        def,
-        index,
-        holder,
-        standIn,
-        pos: new THREE.Vector3(),
-        quat: new THREE.Quaternion(),
-        diedPos: new THREE.Vector3(),
-        diedQuat: new THREE.Quaternion(),
-        rest: null,
-        landed: false,
-      });
-    });
-  }
-
-  /** One piece's kit shape fitted to its box (centred on its holder); null
-   *  when the kit has no such node. A limb's box is its unit length. */
-  private fitKit(def: HeatBodyPiece): THREE.Group | null {
-    const kit = heartKitMeshes(HEAT_BODY_KITS[def.kit], def.node);
-    if (!kit) return null;
-    for (const m of kit.children) {
-      if (!(m instanceof THREE.Mesh)) continue;
-      if (def.light === 'crystal') {
-        m.material = this.crystalMat;
-        m.castShadow = false;
-        m.receiveShadow = false;
-      } else if (m.name.endsWith(':glow')) {
-        m.material = this.fireMat;
-        m.castShadow = false;
-      } else if (m.name.endsWith(':stone') && def.kit === 'heart')
-        m.geometry = this.basalt(m.geometry);
-    }
-    _box.setFromObject(kit);
-    _box.getSize(_size);
-    _box.getCenter(_centre);
-    const limb = def.to !== undefined;
-    const sx = def.size.x / Math.max(1e-3, _size.x);
-    const sy = (limb ? 1 : def.size.y) / Math.max(1e-3, _size.y);
-    const sz = def.size.z / Math.max(1e-3, _size.z);
-    kit.scale.set(sx, sy, sz);
-    kit.position.set(-_centre.x * sx, -_centre.y * sy, -_centre.z * sz);
-    const content = new THREE.Group();
-    content.name = 'smithHeartHeatKitPiece';
-    const tilt = new THREE.Group();
-    tilt.rotation.set(def.tilt.x, def.tilt.y, def.tilt.z);
-    tilt.add(kit);
-    content.add(tilt);
-    if (def.light === 'crystal') {
-      const halo = new THREE.Sprite(this.haloMat);
-      const s = Math.max(def.size.x, def.size.y, def.size.z) * 1.8;
-      halo.scale.set(s, s, 1);
-      halo.name = 'smithHeartHeatCrystalHalo';
-      content.add(halo);
-    }
-    return content;
-  }
-
-  /** The kits landed after the body was built: fit every piece into one
-   *  hidden staging group, link it through the compile gate, then swap. */
-  private upgradeKit(): void {
-    if (this.kitBuilt || this.disposed) return;
-    this.kitBuilt = true;
-    const staging = new THREE.Group();
-    staging.name = 'smithHeartHeatKitStaging';
-    staging.visible = false;
-    const fitted: (THREE.Group | null)[] = [];
-    for (const p of this.pieces) {
-      const kit = this.fitKit(p.def);
-      fitted.push(kit);
-      if (kit) staging.add(kit);
-    }
-    this.root.add(staging);
-    const linked = this.compileGate ? this.compileGate(staging).catch(() => {}) : Promise.resolve();
-    void linked.then(() => {
-      staging.removeFromParent();
-      if (this.disposed) return;
-      for (let i = 0; i < this.pieces.length; i++) {
-        const p = this.pieces[i];
-        const kit = fitted[i];
-        if (!kit) continue;
-        if (p.standIn) {
-          p.holder.remove(p.standIn);
-          p.standIn = null;
-        }
-        p.holder.add(kit);
-      }
-    });
-  }
-
-  /** The Heart kit's colossus rock repainted the Hearth's basalt: a warm dark
-   *  grey, the kit's own value variation kept, umber in the shade. */
-  private basalt(src: THREE.BufferGeometry): THREE.BufferGeometry {
-    const g = basaltRepaint(src, HEAT_BODY_COLORS.basalt, HEAT_BODY_COLORS.basaltShade);
-    this.geometries.push(g);
-    return g;
   }
 
   private rand(): number {
@@ -552,7 +429,7 @@ export class HeatBody {
     return (this.seed >>> 0) / 4294967296;
   }
 
-  private shakeNear(x: number, z: number, amount: number, reach = 45): void {
+  private shakeNear(x: number, z: number, amount: number, reach = 60): void {
     if (!this.shakeSink || !this.world || this.reducedMotion()) return;
     const me = this.world.entities.get(this.world.playerId);
     if (!me) return;
@@ -560,14 +437,37 @@ export class HeatBody {
     if (d < reach) this.shakeSink(amount * (1 - (d / reach) * 0.7));
   }
 
+  private send(gesture: string): void {
+    if (this.entityId >= 0) this.playGesture?.(this.entityId, gesture);
+  }
+
   /** Never claims an event: the renderer's own draws still play under these. */
   handleEvent(ev: SimEvent): boolean {
     if (!this.world || this.disposed || this.entityId < 0) return false;
     if (ev.type === 'damage' && ev.ability === null && ev.sourceId === this.entityId) {
-      this.swingAt = this.clock;
-      this.swingSide = this.swingSide === 1 ? -1 : 1;
-    } else if (ev.type === 'spellfxAt' && ev.ability === HEAT_CUES.fist) this.slamAt = this.clock;
+      // A plain swing: its fist meets the shore on the clip's contact beat.
+      if (this.swings.length < 4) this.swings.push(this.clock + HEAT_BODY_CLIP.attack);
+    } else if (ev.type === 'spellfxAt' && ev.ability === HEAT_CUES.fist) {
+      // Basalt Fist lands on its bar's end: the body's fist comes down with it.
+      this.slamImpact();
+    } else if (
+      (ev.type === 'spellfx' &&
+        ev.sourceId === this.entityId &&
+        (ev.ability === HEAT_CUES.flare || ev.ability === HEAT_CUES.ignite)) ||
+      (ev.type === 'spellfxAt' && ev.ability === HEAT_CUES.seed)
+    ) {
+      this.castGesture();
+    }
     return false;
+  }
+
+  private castGesture(): void {
+    if (this.under || this.deadAt >= 0) return;
+    if (this.clock - this.lastCastGesture < HEAT_CAST_GAP) return;
+    this.lastCastGesture = this.clock;
+    this.castAt = this.clock;
+    this.castReleased = false;
+    this.send(HEAT_BODY_GESTURES.cast);
   }
 
   update(dt: number): void {
@@ -579,12 +479,15 @@ export class HeatBody {
     if (this.scanTimer <= 0) {
       this.scanTimer = SCAN_SEC;
       this.scan(world);
+      // A view whose model was still loading gets its sockets on the scan tick.
+      retryHeatBodySockets();
     }
     if (this.entityId >= 0) {
       const e = world.entities.get(this.entityId);
       if (!e) this.release();
       else this.pose(e, dt);
     }
+    this.updateFlashes();
     this.particles.update(this.clock);
   }
 
@@ -606,11 +509,14 @@ export class HeatBody {
       this.entityId = e.id;
       this.yaw = e.facing;
       this.deadAt = -1;
+      this.slumpAt = -1;
       this.seenAlive = false;
-      this.swingAt = -99;
-      this.slamAt = -99;
+      this.swings.length = 0;
       this.stageSeen = -1;
-      this.group.visible = true;
+      this.castAt = -99;
+      this.castReleased = true;
+      this.breachAt = -1;
+      this.root.visible = true;
       break;
     }
   }
@@ -618,412 +524,492 @@ export class HeatBody {
   private release(): void {
     this.entityId = -1;
     this.rosterSeen = Number.NaN;
-    this.group.visible = false;
+    this.root.visible = false;
+    this.hideBody();
+  }
+
+  private hideBody(): void {
+    this.vortexOuter.visible = false;
+    this.vortexInner.visible = false;
+    this.rocks.visible = false;
+    for (const s of this.eyes) s.visible = false;
+    this.heart.visible = false;
+    this.halo.visible = false;
+    this.fistOrb.visible = false;
+    this.gather.visible = false;
+  }
+
+  // ---- the sockets -------------------------------------------------------------------------
+
+  /** Where each socket is this frame: the model's own bones when its view is
+   *  up, else its rest place round the guardian (a view still loading). */
+  private readSockets(e: Entity): void {
+    const set = heatBodySockets();
+    const eAt = fxAnchor(e);
+    const sinY = Math.sin(this.yaw);
+    const cosY = Math.cos(this.yaw);
+    for (let i = 0; i < HEAT_SOCKETS.length; i++) {
+      const p = set?.points[i];
+      if (p) {
+        p.getWorldPosition(this.sock[i]);
+        continue;
+      }
+      const at = HEAT_SOCKETS[i].at;
+      const x = at[0] * HEAT_YD_PER_UNIT;
+      const z = at[2] * HEAT_YD_PER_UNIT;
+      this.sock[i].set(
+        eAt.x + x * cosY + z * sinY,
+        eAt.y + (at[1] - HEAT_MODEL_LAVA) * HEAT_YD_PER_UNIT,
+        eAt.z - x * sinY + z * cosY,
+      );
+    }
   }
 
   // ---- the pose ------------------------------------------------------------------------------
 
   private pose(e: Entity, dt: number): void {
     const eAt = fxAnchor(e);
-    this.group.position.set(eAt.x, eAt.y, eAt.z);
+    this.lavaY = eAt.y;
+    this.yaw += wrapAngle(e.facing - this.yaw) * Math.min(1, dt * 5);
+    this.readSockets(e);
     if (e.dead) {
-      this.poseDead(e);
+      this.poseDead(e, dt);
       return;
     }
     if (this.deadAt >= 0) {
+      // Revived (a reset): the fire comes back.
       this.deadAt = -1;
-      for (const p of this.pieces) {
-        p.rest = null;
-        p.landed = false;
-      }
+      this.slumpAt = -1;
     }
     this.seenAlive = true;
     const st = heatBodyState(e.auras, _state);
-    const cast = e.castingAbility;
-    const fill = e.castTotal > 0 ? Math.max(0, Math.min(1, 1 - e.castRemaining / e.castTotal)) : 1;
-    _actIn.castId = cast;
-    _actIn.castFill = fill;
-    _actIn.phase = st.phase;
-    _actIn.stage = st.stage;
-    _actIn.stageFill = st.fill;
-    _actIn.sinceSlam = this.clock - this.slamAt;
-    _actIn.sinceSwing = this.clock - this.swingAt;
-    heatBodyAction(_actIn, _act);
-    const look = heatBodyLook(_act.action, _act.k, this.clock, Math.max(1, st.phase), _look);
+    this.phase = Math.max(1, st.phase);
     if (st.stage !== this.stageSeen) {
-      // It plunges into the wellspring or heaves up out of it: a splash.
-      if (this.stageSeen >= 0 && st.stage !== 0) this.splash(e, st.stage);
+      const prev = this.stageSeen;
+      this.send(heatStanceGesture(st.stage, prev));
+      if (prev >= 0 && st.stage === HEAT_STAGES.sinking) this.erupt(eAt.x, eAt.z, 1.2, false);
+      if (prev >= 0 && st.stage === HEAT_STAGES.rising) {
+        this.erupt(eAt.x, eAt.z, 0.8, false);
+        this.breachAt = this.clock + HEAT_BODY_CLIP.riseBreach;
+      }
+      if (st.stage === HEAT_STAGES.fight) this.outFor = prev < 0 ? 99 : 0;
       this.stageSeen = st.stage;
+      this.gestureTimer = 1;
     }
-    this.group.position.y = eAt.y - look.sink * BS;
-    this.yaw += wrapAngle(e.facing - this.yaw) * Math.min(1, dt * 5);
-    this.group.rotation.y = this.yaw;
-    if (look.tremble > 0 && !this.reducedMotion()) {
-      this.group.position.x += (this.rand() - 0.5) * look.tremble * 2;
-      this.group.position.z += (this.rand() - 0.5) * look.tremble * 2;
+    // Re-sent for a view rebuilt mid-stage (idempotent: the stance held).
+    this.gestureTimer -= dt;
+    if (this.gestureTimer <= 0) {
+      this.gestureTimer = 1;
+      this.send(heatStanceGesture(st.stage, st.stage));
     }
-    this.poseJoints(_act.action, _act.k, look);
-    for (const p of this.pieces) this.posePiece(p, look);
-    this.poseThreads(1, look);
-    this.poseLights(_act.action, _act.k, look);
-    this.glow(look);
-    this.cosmetics(e, _act.action, _act.k, look, dt);
+    this.under = st.stage === HEAT_STAGES.under || st.stage === HEAT_STAGES.sinking;
+    if (st.stage === HEAT_STAGES.rising) this.outFor = st.fill * 3;
+    else if (st.stage === HEAT_STAGES.fight) this.outFor += dt;
+    if (this.breachAt > 0 && this.clock >= this.breachAt) {
+      this.breachAt = -1;
+      this.erupt(eAt.x, eAt.z, 1.5, true);
+    }
+    // The plain swings' fists land.
+    for (let i = this.swings.length - 1; i >= 0; i--) {
+      if (this.clock < this.swings[i]) continue;
+      this.swings.splice(i, 1);
+      const fi = this.sock[S_FIST_L].y < this.sock[S_FIST_R].y ? S_FIST_L : S_FIST_R;
+      const f = this.sock[fi];
+      this.impact(f.x, Math.max(f.y, this.lavaY), f.z, 1);
+    }
+    const casting = e.castingAbility === HEAT_CASTS.fist;
+    const fill = e.castTotal > 0 ? Math.max(0, Math.min(1, 1 - e.castRemaining / e.castTotal)) : 0;
+    this.burn(st.stage, dt, 1);
+    this.vortex(eAt, dt, this.under ? 0.55 : 1);
+    this.lights(1, casting ? fill : -1);
+    this.castFx(dt);
+    if (casting) this.chargeFist(fill, dt);
+    this.orbitRocks(eAt, 1);
   }
 
-  private poseJoints(action: HeatBodyAction, k: number, look: HeatBodyLook): void {
-    const J = this.joints;
-    const S = HEAT_SLOTS;
-    const bob = 0.08 * Math.sin(this.clock * 1.2);
-    const sw = 0.1 * (look.swell - 0.5);
-    J[HJ.hip].set(S.hip.x, S.hip.y + bob * 0.5, S.hip.z);
-    J[HJ.hipL].set(S.hipJoint.x, S.hipJoint.y + bob * 0.5, S.hipJoint.z);
-    J[HJ.hipR].set(-S.hipJoint.x, S.hipJoint.y + bob * 0.5, S.hipJoint.z);
-    J[HJ.kneeL].set(S.knee.x, S.knee.y + bob * 0.3, S.knee.z);
-    J[HJ.kneeR].set(-S.knee.x, S.knee.y + bob * 0.3, S.knee.z);
-    J[HJ.footL].set(S.foot.x, S.foot.y, S.foot.z);
-    J[HJ.footR].set(-S.foot.x, S.foot.y, S.foot.z);
-    J[HJ.chest].set(S.chest.x, S.chest.y + bob + sw, S.chest.z);
-    J[HJ.head].set(S.head.x, S.head.y + bob, S.head.z);
-    J[HJ.mouth].set(S.mouth.x, S.mouth.y + bob, S.mouth.z);
-    J[HJ.back].set(S.back.x, S.back.y + bob, S.back.z);
-    J[HJ.shoulderL].set(S.shoulder.x + 0.6 * sw, S.shoulder.y + bob, S.shoulder.z);
-    J[HJ.shoulderR].set(-J[HJ.shoulderL].x, J[HJ.shoulderL].y, J[HJ.shoulderL].z);
+  /** The flames, embers, smoke and haze off the body, the lava churning at
+   *  its foot (cosmetic, thinned on the low tier). `k` the fire's strength. */
+  private burn(stage: number, dt: number, k: number): void {
+    const d = this.density;
+    const lava = this.lavaY + 0.4;
+    const out = Math.min(1, this.outFor / 1.5);
+    const rate = heatFlameRate(this.phase, this.under) * d * k * (0.35 + 0.65 * out);
+    let n = rate * dt;
+    while (n > 0) {
+      if (n < 1 && this.rand() > n) break;
+      n -= 1;
+      const f = heatFlameFor(this.rand());
+      const p = this.sock[heatSocketIndex(f.socket)];
+      if (p.y < lava) continue;
+      FLAME.size[0] = f.size * (1.1 + 0.5 * this.rand());
+      FLAME.size[1] = f.size * 0.2;
+      FLAME.up = f.up;
+      FLAME.color = this.rand() < 0.2 + 0.12 * this.phase ? C.flameHot : C.flameHeat;
+      this.particles.puff(p.x, p.y, p.z, 1, FLAME);
+    }
+    if (stage !== HEAT_STAGES.under && this.rand() < dt * 26 * d * k) {
+      const p = this.sock[Math.floor(this.rand() * this.sock.length)];
+      if (p.y > lava) this.particles.puff(p.x, p.y, p.z, 1, EMBER);
+    }
+    if (!this.under && this.rand() < dt * 5 * d * k) {
+      const p = this.sock[SMOKE_SOCKETS[Math.floor(this.rand() * SMOKE_SOCKETS.length)]];
+      this.particles.puff(p.x, p.y + 2, p.z, 1, SMOKE);
+    }
+    if (d >= 1 && !this.under && this.rand() < dt * 4 * k) {
+      const p = this.sock[S_BACK];
+      this.particles.puff(p.x, p.y + 4, p.z, 1, HAZE);
+    }
+    // The lava churning where it stands: bubbles thrown up round its foot.
+    if (this.rand() < dt * (this.under ? 30 : 14) * d) {
+      const a = this.rand() * Math.PI * 2;
+      const r = 1.5 + this.rand() * 3.5;
+      const v = this.sock[heatSocketIndex('vortexMid')];
+      this.particles.puff(v.x + Math.cos(a) * r, this.lavaY + 0.2, v.z + Math.sin(a) * r, 1, CHURN);
+    }
+  }
+
+  /** The vortex of fire round its lower body, flaring at the lava. */
+  private vortex(eAt: { x: number; y: number; z: number }, dt: number, alpha: number): void {
+    const v = this.sock[heatSocketIndex('vortexMid')];
+    const x = this.under ? eAt.x : v.x;
+    const z = this.under ? eAt.z : v.z;
+    const a = alpha * (0.85 + 0.15 * Math.sin(this.clock * 2.3));
+    this.vortexLayer(this.vortexOuter, this.vortexOuterMat, x, z, dt * 0.5, a);
+    this.vortexLayer(this.vortexInner, this.vortexInnerMat, x, z, dt * -0.8, a);
+    // Under the lava the sheath squats into a boiling ring.
+    const sq = this.under ? 0.45 : 1;
+    this.vortexOuter.scale.set(1, sq, 1);
+    this.vortexInner.scale.set(1, sq, 1);
+  }
+
+  private vortexLayer(
+    mesh: THREE.Mesh,
+    mat: THREE.ShaderMaterial,
+    x: number,
+    z: number,
+    spin: number,
+    alpha: number,
+  ): void {
+    mesh.position.set(x, this.lavaY - 0.4, z);
+    mesh.rotation.y += spin;
+    mat.uniforms.uTime.value = this.clock;
+    mat.uniforms.uAlpha.value = alpha;
+    mesh.visible = alpha > 0.01;
+  }
+
+  /** The eyes, the heart's ring, the heat glow round it and Basalt Fist's
+   *  gathering fist (`charge` its bar, -1 none). */
+  private lights(k: number, charge: number): void {
+    const shown = !this.under && k > 0.02;
+    const flick = 0.9 + 0.1 * Math.sin(this.clock * 13.7) * Math.sin(this.clock * 5.3);
     for (let i = 0; i < 2; i++) {
-      const side: -1 | 1 = i === 0 ? 1 : -1;
-      const target = heatWristTarget(action, side, k, this.swingSide, _wrist);
-      const arm = heatArm(side, target, _arm);
-      J[HJ.elbowL + i].set(arm.elbow.x, arm.elbow.y + bob, arm.elbow.z);
-      J[HJ.wristL + i].set(arm.wrist.x, arm.wrist.y + bob, arm.wrist.z);
+      const p = this.sock[i === 0 ? S_EYE_L : S_EYE_R];
+      this.eyes[i].position.copy(p);
+      this.eyes[i].scale.set(1.6, 1.6, 1);
+      this.eyes[i].visible = shown;
     }
-    const neckY = J[HJ.chest].y + 1.1;
-    _q.setFromAxisAngle(_x, -look.lift);
-    for (let h = 0; h < HEAD_JOINTS.length; h++) {
-      const i = HEAD_JOINTS[h];
-      _a.set(J[i].x, J[i].y - neckY, J[i].z).applyQuaternion(_q);
-      J[i].set(_a.x, _a.y + neckY, _a.z);
-    }
-    const hipY = J[HJ.hip].y;
-    const cl = Math.cos(look.lean);
-    const sl = Math.sin(look.lean);
-    for (const i of LEAN_JOINTS) {
-      // The hands braced on the wellspring's lip stay down there.
-      if ((i === HJ.wristL || i === HJ.wristR) && J[i].y < hipY) continue;
-      const y = J[i].y - hipY;
-      const z = J[i].z;
-      J[i].y = hipY + y * cl - z * sl;
-      J[i].z = y * sl + z * cl;
+    this.eyeMat.opacity = k * flick;
+    const h = this.sock[S_HEART];
+    this.heart.position.copy(h);
+    const hs = (3.2 + 0.5 * Math.sin(this.clock * 2.2)) * (0.6 + 0.4 * k);
+    this.heart.scale.set(hs, hs, 1);
+    this.heartMat.opacity = 0.85 * k;
+    this.heart.visible = shown;
+    // The heat round it: a broad soft glow behind the chest.
+    const b = this.sock[S_BACK];
+    this.halo.position.set(b.x, b.y - 1, b.z);
+    this.halo.scale.set(18, 20, 1);
+    this.haloMat.opacity = 0.08 * k;
+    this.halo.visible = shown && this.density >= 1;
+    if (charge >= 0 && shown) {
+      const f = this.sock[S_FIST_R];
+      this.fistOrb.position.copy(f);
+      const s = 2.2 + 3 * charge;
+      this.fistOrb.scale.set(s, s, 1);
+      this.fistOrbMat.opacity = 0.3 + 0.5 * charge;
+      this.fistOrb.visible = true;
+    } else {
+      this.fistOrbMat.opacity = 0;
+      this.fistOrb.visible = false;
     }
   }
 
-  private posePiece(p: PieceView, look: HeatBodyLook): void {
-    const def = p.def;
-    const J = this.joints;
-    if (def.to !== undefined) {
-      const from = J[def.joint];
-      const to = J[def.to];
-      _a.subVectors(to, from);
-      const len = _a.length() || 1;
-      _a.divideScalar(len);
-      p.pos.copy(from).addScaledVector(_a, len * 0.5);
-      p.quat.setFromUnitVectors(_up, _a);
-      p.holder.position.copy(p.pos);
-      p.holder.quaternion.copy(p.quat);
-      p.holder.scale.set(1, len * def.size.y, 1);
+  /** Basalt Fist's bar: fire drawn into its right fist, its flames roaring. */
+  private chargeFist(fill: number, dt: number): void {
+    const f = this.sock[S_FIST_R];
+    this.drawInto(f, 4 + 3 * fill, dt * (20 + 50 * fill) * this.density);
+    if (this.rand() < dt * 40 * fill * this.density) {
+      FLAME.size[0] = 3 + 3 * fill;
+      FLAME.size[1] = 0.6;
+      FLAME.up = 6;
+      FLAME.color = C.flameHot;
+      this.particles.puff(f.x, f.y, f.z, 1, FLAME);
+    }
+  }
+
+  /** Sparks streaming into `p` from a ring `r` yards out. */
+  private drawInto(p: THREE.Vector3, r: number, rate: number): void {
+    let n = rate;
+    while (n > 0) {
+      if (n < 1 && this.rand() > n) break;
+      n -= 1;
+      _a.set(this.rand() - 0.5, this.rand() - 0.5, this.rand() - 0.5)
+        .normalize()
+        .multiplyScalar(r);
+      _dir[0] = -_a.x / r;
+      _dir[1] = -_a.y / r;
+      _dir[2] = -_a.z / r;
+      DRAW_IN.speed = r / DRAW_IN.life;
+      this.particles.puff(p.x + _a.x, p.y + _a.y, p.z + _a.z, 1, DRAW_IN);
+    }
+  }
+
+  /** The cast: fire gathered between the hands, then thrown out before it. */
+  private castFx(dt: number): void {
+    const age = this.clock - this.castAt;
+    const look = heatCastLook(age);
+    if (look.done || age < 0 || this.under) {
+      this.gather.visible = false;
+      this.gatherMat.opacity = 0;
       return;
     }
-    const j = J[def.joint];
-    _a.set(def.at.x, def.at.y, def.at.z);
-    _q2.setFromAxisAngle(_x, look.lean);
-    if (def.head) {
-      _q.setFromAxisAngle(_x, -look.lift);
-      _a.applyQuaternion(_q);
-      p.quat.copy(_q2).multiply(_q);
-    } else if (def.joint === HJ.hip || def.joint === HJ.footL || def.joint === HJ.footR) {
-      p.quat.identity();
+    const l = this.sock[S_FIST_L];
+    const r = this.sock[S_FIST_R];
+    _b.addVectors(l, r).multiplyScalar(0.5);
+    if (look.gather > 0) {
+      this.gather.position.copy(_b);
+      const s = 1.5 + 6 * look.gather;
+      this.gather.scale.set(s, s, 1);
+      this.gatherMat.opacity = 0.3 + 0.65 * look.gather;
+      this.gather.visible = true;
+      this.drawInto(_b, 5, dt * 60 * look.gather * this.density);
     } else {
-      _a.applyQuaternion(_q2);
-      p.quat.copy(_q2);
+      this.gather.visible = false;
+      this.gatherMat.opacity = 0;
     }
-    p.pos.copy(j).add(_a);
-    if (def.joint === HJ.wristL || def.joint === HJ.wristR) {
-      const elbow = J[def.joint === HJ.wristL ? HJ.elbowL : HJ.elbowR];
-      _b.subVectors(j, elbow).normalize();
-      p.pos.copy(j).addScaledVector(_b, def.size.y * 0.35);
-      p.quat.setFromUnitVectors(_up, _b);
+    if (!this.castReleased && look.release > 0) {
+      this.castReleased = true;
+      this.flash(_b.x, _b.y, _b.z, 14, 0.4);
+      _dir[0] = Math.sin(this.yaw);
+      _dir[1] = 0.12;
+      _dir[2] = Math.cos(this.yaw);
+      this.particles.puff(_b.x, _b.y, _b.z, 36, {
+        speed: 16,
+        life: 0.6,
+        size: [3.2, 0.8],
+        color: C.flameHot,
+        alpha: 1,
+        pool: 'pyre',
+        dir: _dir,
+        spread: 0.3,
+      });
+      this.particles.puff(_b.x, _b.y, _b.z, 30, {
+        speed: 14,
+        life: 0.9,
+        size: [0.45, 0.08],
+        color: C.spark,
+        alpha: 1,
+        pool: 'glow',
+        dir: _dir,
+        spread: 0.5,
+        gravity: 4,
+      });
     }
-    p.holder.position.copy(p.pos);
-    p.holder.quaternion.copy(p.quat);
-    const s = def.id === 'torso' ? 1 + 0.05 * (look.swell - 0.5) : 1;
-    p.holder.scale.setScalar(s);
   }
 
-  private poseThreads(alpha: number, look: HeatBodyLook): void {
-    const J = this.joints;
-    const w = 0.12 * (1 + Math.min(2, look.glow - 0.9) * 0.3) * Math.max(0, alpha);
-    let n = 0;
-    for (let t = 0; t < HEAT_THREAD_PAIRS.length; t++) {
-      const i = HEAT_THREAD_PAIRS[t][0];
-      const j = HEAT_THREAD_PAIRS[t][1];
-      _a.copy(J[i]);
-      _b.subVectors(J[j], J[i]);
-      const len = _b.length();
-      if (len < 1e-4 || w <= 0) {
-        this.threads.setMatrixAt(n++, _m.makeScale(0, 0, 0));
+  /** The molten rocks circling it (sunk away while it is under; `k` 1 shown). */
+  private orbitRocks(eAt: { x: number; y: number; z: number }, k: number): void {
+    const out = this.under ? 0 : Math.min(1, this.outFor / 2);
+    const show = out * k;
+    this.rocks.visible = show > 0.01;
+    if (!this.rocks.visible) return;
+    for (let i = 0; i < HEAT_BODY_POOLS.rocks; i++) {
+      if (i >= this.rockCount) {
+        this.rocks.setMatrixAt(i, _m.makeScale(0, 0, 0));
         continue;
       }
-      _q.setFromUnitVectors(_up, _b.divideScalar(len));
-      _s.set(w, len, w);
-      this.threads.setMatrixAt(n++, _m.compose(_a, _q, _s));
+      const o = heatRockOrbit(i, this.clock, _orbit);
+      const y = this.lavaY + o.y * show - (1 - show) * 2;
+      _a.set(eAt.x + o.x, y, eAt.z + o.z);
+      _q.setFromEuler(_e.set(o.spin, o.spin * 0.7, o.spin * 0.3));
+      _s.setScalar(o.size * show);
+      this.rocks.setMatrixAt(i, _m.compose(_a, _q, _s));
+      if (this.rand() < 0.06 * this.density) this.particles.puff(_a.x, _a.y, _a.z, 1, EMBER);
     }
-    for (; n < HEAT_BODY_POOLS.threads; n++) this.threads.setMatrixAt(n, _m.makeScale(0, 0, 0));
-    this.threads.instanceMatrix.needsUpdate = true;
+    this.rocks.instanceMatrix.needsUpdate = true;
   }
 
-  /** The eyes, the heart's glow, the wind-up's aura and the knell's sphere. */
-  private poseLights(action: HeatBodyAction, k: number, look: HeatBodyLook): void {
-    const head = this.joints[HJ.head];
-    const chest = this.joints[HJ.chest];
-    _q.setFromAxisAngle(_x, -look.lift);
-    _q2.setFromAxisAngle(_x, look.lean);
-    for (let i = 0; i < 2; i++) {
-      const side = i === 0 ? 1 : -1;
-      _a.set(side * 0.33, 0.12, 0.74)
-        .applyQuaternion(_q)
-        .applyQuaternion(_q2);
-      this.eyes[i].position.copy(head).add(_a);
-    }
-    _a.set(0, 0.05, 1.2).applyQuaternion(_q2);
-    this.heartGlow.position.copy(chest).add(_a);
-    const s = 2.4 + 0.8 * Math.min(4, look.glow);
-    this.heartGlow.scale.set(s, s, 1);
-    // The slam's flash: a white glow round the whole body.
-    const as = 9 + 4 * look.flash;
-    this.aura.scale.set(as, as * 1.15, 1);
-    // Only through the flash: idle, the body's own glow and haze carry it (a
-    // standing screen-wide additive halo would be overdraw for nothing).
-    this.auraMat.opacity = Math.min(0.8, look.flash * 0.6);
-    this.aura.visible = this.auraMat.opacity > 0.02;
-    // The white-hot fist, flaring as Basalt Fist comes down.
-    if (action === 'fist' || action === 'slam') {
-      const w = this.joints[HJ.wristR];
-      this.orb.position.set(w.x, w.y, w.z);
-      const size = action === 'fist' ? 1 + 2.4 * k : 3.4 * (1 - k) + 0.4;
-      this.orb.scale.set(size, size, 1);
-      this.orbMat.opacity = action === 'fist' ? 0.3 + 0.6 * k : 1 - k;
-      this.orb.visible = true;
-    } else {
-      // A spent sprite still costs a draw: hide it.
-      this.orbMat.opacity = 0;
-      this.orb.visible = false;
-    }
+  // ---- the bursts ------------------------------------------------------------------------------
+
+  private flash(x: number, y: number, z: number, size: number, life: number): void {
+    let slot = this.flashes[0];
+    for (const f of this.flashes) if (f.born + f.life < slot.born + slot.life) slot = f;
+    slot.born = this.clock;
+    slot.life = life;
+    slot.size = size;
+    slot.sprite.position.set(x, y, z);
+    slot.sprite.visible = true;
   }
 
-  /** The crystals', seams' and threads' light: gold toward white with heat. */
-  private glow(look: HeatBodyLook): void {
-    const g = Math.min(4, look.glow);
-    this.glowColor
-      .copy(this.gold)
-      .lerp(this.whiteC, Math.max(0, Math.min(1, look.white + look.flash * 0.5)));
-    _s.set(this.glowColor.r, this.glowColor.g, this.glowColor.b);
-    (this.crystalMat.uniforms.uColor.value as THREE.Color)
-      .copy(this.glowColor)
-      .multiplyScalar(Math.min(2.6, 0.6 + g * 0.5));
-    (this.fireMat.uniforms.uColor.value as THREE.Color)
-      .copy(this.glowColor)
-      .multiplyScalar(Math.min(3, 0.7 + g * 0.55));
-    this.haloMat.opacity = Math.min(0.5, 0.08 + g * 0.09);
-    this.heartGlowMat.opacity = Math.min(0.95, 0.3 + g * 0.18);
-    this.heartGlowMat.color.copy(this.glowColor);
-    this.eyeMat.opacity = Math.min(1, 0.65 + g * 0.12);
-    this.auraMat.color.copy(this.glowColor);
-    this.threadColor.setRGB(_s.x, _s.y, _s.z).multiplyScalar(0.7 + g * 0.35);
-    const tc = this.threadColor;
-    const shown = this.threadShown;
-    if (
-      !(Math.abs(tc.r - shown.r) < THREAD_COLOR_EPS) ||
-      !(Math.abs(tc.g - shown.g) < THREAD_COLOR_EPS) ||
-      !(Math.abs(tc.b - shown.b) < THREAD_COLOR_EPS)
-    ) {
-      shown.copy(tc);
-      for (let i = 0; i < HEAT_BODY_POOLS.threads; i++) this.threads.setColorAt(i, tc);
-      if (this.threads.instanceColor) this.threads.instanceColor.needsUpdate = true;
-    }
-  }
-
-  /** A joint's world place (for the puffs). */
-  private worldOf(e: Entity, j: THREE.Vector3, out: THREE.Vector3): THREE.Vector3 {
-    const eAt = fxAnchor(e);
-    const sinY = Math.sin(this.yaw);
-    const cosY = Math.cos(this.yaw);
-    return out.set(
-      eAt.x + (j.x * cosY + j.z * sinY) * BS,
-      this.group.position.y + j.y * BS,
-      eAt.z + (-j.x * sinY + j.z * cosY) * BS,
-    );
-  }
-
-  /** The flames, embers and haze off it, the lava sheeting off it (cosmetic,
-   *  thinned on the low tier). */
-  private cosmetics(
-    e: Entity,
-    action: HeatBodyAction,
-    k: number,
-    look: HeatBodyLook,
-    dt: number,
-  ): void {
-    const eAt = fxAnchor(e);
-    const d = this.density;
-    const heat = Math.min(1, look.white + 0.2);
-    // Tongues of the first flame licking up from its joints (the ones above
-    // the lava), whiter as the fight deepens.
-    const flameRate = dt * (18 + 30 * heat + 24 * look.flash) * d;
-    if (action !== 'under' && this.rand() < flameRate) {
-      const j = this.joints[HEAT_FLAME_JOINTS[Math.floor(this.rand() * HEAT_FLAME_JOINTS.length)]];
-      if (j.y > look.sink) {
-        this.worldOf(e, j, _a);
-        FLAME.color = look.white > 0.6 ? HEAT_BODY_COLORS.spark : HEAT_BODY_COLORS.ember;
-        FLAME.size[0] = 2.0 + 1.8 * heat;
-        this.particles.puff(_a.x, _a.y, _a.z, 1, FLAME);
+  private updateFlashes(): void {
+    for (const f of this.flashes) {
+      const t = (this.clock - f.born) / Math.max(1e-3, f.life);
+      if (t >= 1 || t < 0) {
+        if (f.sprite.visible) {
+          f.sprite.visible = false;
+          f.mat.opacity = 0;
+        }
+        continue;
       }
-    }
-    if (action !== 'under' && this.rand() < dt * (4 + 10 * heat) * d) {
-      this.worldOf(e, this.joints[HJ.back], _a);
-      this.particles.puff(
-        _a.x + (this.rand() - 0.5) * 2,
-        _a.y + 1.5 * this.rand(),
-        _a.z + (this.rand() - 0.5) * 2,
-        1,
-        EMBER,
-      );
-    }
-    // The heat's haze rising off it (thin, shed on the low tier).
-    if (d >= 1 && this.rand() < dt * 5 * look.haze) {
-      this.particles.puff(
-        eAt.x + (this.rand() - 0.5) * 3 * BS,
-        this.group.position.y + (3 + this.rand() * 3) * BS,
-        eAt.z + (this.rand() - 0.5) * 3,
-        1,
-        HAZE,
-      );
-    }
-    // Molten rock sheeting off it: drips at the wellspring's line, and off
-    // its arms and shoulders as it climbs out.
-    if (look.pour > 0 && this.rand() < dt * 50 * look.pour * d) {
-      const j = this.joints[LAVA_JOINTS[Math.floor(this.rand() * LAVA_JOINTS.length)]];
-      if (j.y > look.sink) {
-        this.worldOf(e, j, _a);
-        this.particles.puff(_a.x, _a.y, _a.z, 1, LAVA);
-      }
-    }
-    if (action === 'fist' && k > 0.2 && this.rand() < dt * 30 * d) {
-      this.worldOf(e, this.joints[HJ.wristR], _a);
-      this.particles.puff(_a.x, _a.y, _a.z, 1, STREAM);
+      const s = f.size * (0.6 + 0.6 * t);
+      f.sprite.scale.set(s, s, 1);
+      f.mat.opacity = (1 - t) ** 1.5;
     }
   }
 
-  /** It plunges into the wellspring, or heaves up out of it: the lava thrown
-   *  up round it, a ring over the pool. */
-  private splash(e: Entity, stage: number): void {
-    const eAt = fxAnchor(e);
-    const y = this.groundY(eAt.x, eAt.z) + 0.4;
-    const big = stage === 1 ? 1.2 : 1;
-    this.particles.puff(eAt.x, y, eAt.z, Math.round(36 * big), {
-      speed: 8 * big,
-      up: 7,
+  /** A fist slammed on the shore: the lava thrown up, flame, a shockwave, smoke. */
+  private impact(x: number, y: number, z: number, big: number): void {
+    const gy = Math.max(y, this.groundY(x, z));
+    this.particles.puff(x, gy + 0.3, z, Math.round(40 * big), {
+      speed: 9 * big,
+      up: 9,
       life: 1.1,
-      size: [0.7, 0.18],
-      color: HEAT_BODY_COLORS.ember,
+      size: [1.2, 0.3],
+      color: C.lava,
       alpha: 1,
       pool: 'glow',
-      gravity: 14,
-      radius: 7,
+      gravity: 18,
+      radius: 1.5 * big,
     });
-    this.particles.shockRing(eAt.x, eAt.z, HEAT_BODY_COLORS.fire, 16 * big, 1);
-    this.shakeNear(eAt.x, eAt.z, 0.5 * big, 60);
+    this.particles.puff(x, gy + 0.5, z, Math.round(18 * big), {
+      speed: 3.5 * big,
+      up: 6,
+      life: 0.7,
+      size: [4 * big, 1],
+      color: C.flameHot,
+      alpha: 1,
+      pool: 'pyre',
+      radius: 1.8 * big,
+    });
+    this.particles.puff(x, gy + 0.6, z, Math.round(12 * big), {
+      speed: 2.5 * big,
+      up: 2.2,
+      life: 2.4,
+      size: [3.5 * big, 8 * big],
+      color: C.smoke,
+      alpha: 0.38,
+      drag: 1,
+      radius: 2 * big,
+    });
+    this.particles.puff(x, gy + 0.4, z, Math.round(26 * big), {
+      speed: 13 * big,
+      up: 5,
+      life: 0.8,
+      size: [0.4, 0.07],
+      color: C.spark,
+      alpha: 1,
+      pool: 'glow',
+      gravity: 12,
+    });
+    this.particles.shockRing(x, z, C.glow, 11 * big, 0.75);
+    this.particles.shockRing(x, z, C.core, 6 * big, 0.4);
+    this.flash(x, gy + 1.2, z, 9 * big, 0.32);
+    this.shakeNear(x, z, 0.45 * big);
+  }
+
+  /** Basalt Fist lands: its right fist comes down on the bar's end. */
+  private slamImpact(): void {
+    if (this.entityId < 0 || this.under) return;
+    const f = this.sock[S_FIST_R];
+    this.impact(f.x, Math.max(f.y, this.lavaY), f.z, 1.6);
+  }
+
+  /** It plunges under or breaches the wellspring: lava erupting round it. */
+  private erupt(x: number, z: number, big: number, breach: boolean): void {
+    const y = this.lavaY + 0.3;
+    this.particles.puff(x, y, z, Math.round(70 * big), {
+      speed: 8 * big,
+      up: breach ? 18 : 13,
+      life: 1.4,
+      size: [1.5, 0.4],
+      color: C.lava,
+      alpha: 1,
+      pool: 'glow',
+      gravity: 15,
+      radius: 3.5,
+    });
+    this.particles.puff(x, y + 1, z, Math.round(40 * big), {
+      speed: 4,
+      up: breach ? 12 : 8,
+      life: 0.9,
+      size: [6, 1.5],
+      color: C.flameHot,
+      alpha: 1,
+      pool: 'pyre',
+      radius: 4,
+    });
+    this.particles.puff(x, y + 2, z, Math.round(24 * big), {
+      speed: 2,
+      up: 4,
+      life: 3.6,
+      size: [5, 13],
+      color: C.smoke,
+      alpha: 0.42,
+      drag: 0.7,
+      radius: 4,
+    });
+    this.particles.shockRing(x, z, C.glow, 22 * big, 1.1);
+    this.particles.shockRing(x, z, C.core, 12 * big, 0.6);
+    this.flash(x, y + 5, z, 18 * big, 0.45);
+    this.shakeNear(x, z, 0.7 * big, 70);
   }
 
   // ---- the death -----------------------------------------------------------------------------
 
-  private poseDead(e: Entity): void {
+  private poseDead(e: Entity, dt: number): void {
     const eAt = fxAnchor(e);
     if (this.deadAt < 0) {
-      this.deadAt = this.seenAlive ? this.clock : this.clock - HEAT_FALL.end - 1;
-      if (!this.seenAlive) {
-        const rest = heatBodyLook('idle', 0, 0, 1);
-        this.poseJoints('idle', 0, rest);
-        for (const p of this.pieces) this.posePiece(p, rest);
-      }
-      for (const p of this.pieces) {
-        p.diedPos.copy(p.pos);
-        p.diedQuat.copy(p.quat);
-        const r = heatFallRest(p.index, p.pos);
-        p.rest = {
-          at: r.at,
-          tilt: new THREE.Quaternion().setFromEuler(new THREE.Euler(r.tilt.x, r.tilt.y, r.tilt.z)),
-          delay: r.delay,
-        };
-        p.landed = !this.seenAlive;
-      }
-      this.auraMat.opacity = 0;
-      this.orbMat.opacity = 0;
+      this.deadAt = this.seenAlive ? this.clock : this.clock - 10;
+      this.slumpAt = this.seenAlive ? this.clock + HEAT_BODY_CLIP.deathSlump : -1;
+      this.swings.length = 0;
+      this.castAt = -99;
       if (this.seenAlive) {
-        this.particles.puff(eAt.x, eAt.y + 4, eAt.z, 24, {
-          speed: 6,
-          up: 2,
-          life: 0.9,
-          size: [0.4, 0.08],
-          color: HEAT_BODY_COLORS.spark,
+        const h = this.sock[S_HEART];
+        this.flash(h.x, h.y, h.z, 20, 0.6);
+        this.particles.puff(h.x, h.y, h.z, 60, {
+          speed: 9,
+          up: 4,
+          life: 1.6,
+          size: [0.5, 0.08],
+          color: C.spark,
           alpha: 1,
           pool: 'glow',
-          radius: 1.4,
+          gravity: 5,
+          radius: 2,
         });
-        this.particles.shockRing(eAt.x, eAt.z, HEAT_BODY_COLORS.fire, 10, 0.8);
-        this.shakeNear(eAt.x, eAt.z, 0.5, 50);
+        this.particles.shockRing(eAt.x, eAt.z, C.glow, 18, 1);
+        this.shakeNear(eAt.x, eAt.z, 0.6);
       }
     }
-    this.group.rotation.y = this.yaw;
     const t = this.clock - this.deadAt;
-    for (const p of this.pieces) {
-      const rest = p.rest;
-      if (!rest) continue;
-      const fall = heatFallProgress(t, rest.delay, _fall);
-      const k = fall.k;
-      p.pos.set(
-        p.diedPos.x + (rest.at.x - p.diedPos.x) * k,
-        p.diedPos.y + (rest.at.y - p.diedPos.y) * k + Math.sin(Math.PI * k) * 0.4,
-        p.diedPos.z + (rest.at.z - p.diedPos.z) * k,
-      );
-      p.quat.copy(p.diedQuat).slerp(rest.tilt, Math.min(1, k * 1.2));
-      p.holder.position.copy(p.pos);
-      p.holder.quaternion.copy(p.quat);
-      if (fall.landed && !p.landed) {
-        p.landed = true;
-        _a.copy(p.pos).multiplyScalar(BS).applyAxisAngle(_up, this.yaw);
-        const x = eAt.x + _a.x;
-        const z = eAt.z + _a.z;
-        const size = Math.max(p.def.size.x, p.def.size.z);
-        // The flame sinking out of it in smoke.
-        this.particles.puff(x, this.groundY(x, z) + 0.3, z, Math.round(2 + size * 2), {
-          speed: 1.2 + size * 0.6,
-          up: 1.6,
-          life: 1.6,
-          size: [0.6 + size * 0.3, 1.6 + size * 0.6],
-          color: HEAT_BODY_COLORS.smoke,
-          alpha: 0.4,
-          drag: 1.4,
-        });
-      }
+    if (this.slumpAt > 0 && this.clock >= this.slumpAt) {
+      // It crashes down on the wellspring.
+      this.slumpAt = -1;
+      const h = this.sock[S_HEART];
+      this.impact(h.x, this.lavaY, h.z, 1.4);
     }
-    const fade = Math.max(0, 1 - t / 0.6);
-    this.poseThreads(fade * 1.5, _look);
-    const dim = Math.max(0.04, 1 - t / HEAT_FALL.end);
-    this.glowColor.setHex(HEAT_BODY_COLORS.gold).multiplyScalar(0.5 * dim);
-    (this.crystalMat.uniforms.uColor.value as THREE.Color).copy(this.glowColor);
-    this.glowColor.setHex(HEAT_BODY_COLORS.gold).multiplyScalar(0.3 * dim);
-    (this.fireMat.uniforms.uColor.value as THREE.Color).copy(this.glowColor);
-    this.haloMat.opacity = 0.4 * fade;
-    this.heartGlowMat.opacity = 0.7 * fade;
-    this.eyeMat.opacity = fade;
+    const look = heatDeathLook(t);
+    this.under = false;
+    this.burn(HEAT_STAGES.fight, dt, look.flame);
+    // The flame sinking out of it in smoke.
+    if (look.smoke > 0 && this.rand() < dt * 20 * look.smoke * this.density) {
+      const p = this.sock[Math.floor(this.rand() * this.sock.length)];
+      this.particles.puff(p.x, p.y + 1, p.z, 1, SMOKE);
+    }
+    this.vortex(eAt, dt, look.glow * 0.8);
+    this.lights(look.glow, -1);
+    this.gather.visible = false;
+    this.orbitRocks(eAt, look.glow);
   }
 
   dispose(): void {
@@ -1033,7 +1019,8 @@ export class HeatBody {
     this.particles.dispose();
     for (const g of this.geometries) g.dispose();
     for (const m of this.materials) m.dispose();
-    this.threads.dispose();
+    this.rocks.dispose();
     this.glowTex?.dispose();
+    clearHeatBodySockets();
   }
 }

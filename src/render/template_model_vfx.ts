@@ -6,6 +6,8 @@ import type * as THREE from 'three';
 import { buddyTemplateId } from '../sim/content/buddy_mobs';
 import { IGNIVAR_BOSS_ID } from '../sim/types';
 import { attachIgnivarModelVfx } from './ignivar_model_vfx';
+import { HEAT_GUARDIAN } from './smith_heart_fx/heat_body_core';
+import { attachHeatBodySockets } from './smith_heart_fx/heat_body_sockets';
 import { attachSpritesBuddyFlame } from './sprites_buddy_flame';
 
 const SPRITES_BUDDY_TEMPLATE_ID = buddyTemplateId('sprites');
@@ -21,4 +23,6 @@ export function attachTemplateModelVfx(
   if (templateId === IGNIVAR_BOSS_ID) attachIgnivarModelVfx(root);
   // The sprite buddy's live flames, which step themselves as they draw.
   else if (templateId === SPRITES_BUDDY_TEMPLATE_ID) attachSpritesBuddyFlame(root, reducedMotion);
+  // The Guardian of the Heat's fire sockets (read by smith_heart_fx/heat_body.ts).
+  else if (templateId === HEAT_GUARDIAN) attachHeatBodySockets(root);
 }

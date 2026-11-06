@@ -13,6 +13,7 @@
 // live in smith_heart_fx/final_body_core.ts.
 
 import { FINAL_CASTS, FINAL_TUNING } from '../../sim/encounters/smith_heart/final_ids';
+import { HEAT_CASTS, HEAT_TUNING } from '../../sim/encounters/smith_heart/heat_ids';
 import {
   FINAL_BODY_CLIP,
   FINAL_BODY_ELEMENTS,
@@ -21,6 +22,13 @@ import {
   FINAL_BODY_NODES,
 } from '../smith_heart_fx/final_body_core';
 import { FORGE_FIST_CUE } from '../smith_heart_fx/final_fx_core';
+import {
+  HEAT_BODY_CLIP,
+  HEAT_BODY_GESTURES,
+  HEAT_BODY_HEIGHT,
+  HEAT_BODY_HOVER,
+  HEAT_BODY_URL,
+} from '../smith_heart_fx/heat_body_core';
 import type { MeshToggleDef } from './gesture_mesh_toggles';
 import type { ClipMap, VisualDef } from './manifest';
 
@@ -93,7 +101,66 @@ const TOGGLES: readonly MeshToggleDef[] = [
   })),
 ];
 
+// The Guardian of the Heat (the Hearth, design doc 7.4): one rigged mesh in
+// the first wellspring, fighting bare-handed. Its swings alternate the right
+// and the left fist into the shore, Basalt Fist's bar hauls the right fist
+// high and drives it down on the bar's end, its fire is gathered and thrown
+// by a gesture, and the overflows plunge it under the lava (the Under stance,
+// entered by its Sink) and burst it back out (the fighting stance, entered by
+// its Rise). The fire round it is smith_heart_fx/heat_body.ts's; the gesture
+// ids and the clip beats live in smith_heart_fx/heat_body_core.ts.
+const HEAT_BASE: ClipMap = {
+  idle: 'Idle',
+  walk: 'Idle',
+  run: 'Idle',
+  attack: ['Attack', 'Attack2'],
+  contacts: {
+    Attack: [HEAT_BODY_CLIP.attack],
+    Attack2: [HEAT_BODY_CLIP.attack],
+    Slam: [HEAT_BODY_CLIP.slam],
+  },
+  attackByAbility: { [HEAT_BODY_GESTURES.cast]: 'Cast' },
+  attackTimeScaleByAbility: { [HEAT_BODY_GESTURES.cast]: 1 },
+  death: 'Death',
+  cast: 'Cast',
+  castByAbility: { [HEAT_CASTS.fist]: 'Slam' },
+  castTimeScaleByAbility: {
+    [HEAT_CASTS.fist]: onBarEnd(HEAT_BODY_CLIP.slam, HEAT_TUNING.fistCast),
+  },
+  castPlayOut: ['Slam'],
+};
+
+/** Under the wellspring through an overflow. */
+const HEAT_UNDER: ClipMap = { ...HEAT_BASE, idle: 'Under', walk: 'Under', run: 'Under' };
+
 export const SMITH_HEART_BOSS_LOOKS: Record<string, VisualDef> = {
+  smith_heart_heat_guardian: {
+    url: HEAT_BODY_URL,
+    height: HEAT_BODY_HEIGHT,
+    hover: HEAT_BODY_HOVER,
+    clips: HEAT_BASE,
+    phaseClips: {
+      [HEAT_BODY_GESTURES.sink]: { clips: HEAT_UNDER, enter: 'Sink' },
+      [HEAT_BODY_GESTURES.under]: { clips: HEAT_UNDER },
+      [HEAT_BODY_GESTURES.rise]: { clips: HEAT_BASE, enter: 'Rise' },
+      [HEAT_BODY_GESTURES.stand]: { clips: HEAT_BASE },
+    },
+    castClipSync: [HEAT_CASTS.fist],
+    glowPulses: {
+      // The fire flares through its cracks as it gathers and throws it.
+      pulses: [{ gesture: HEAT_BODY_GESTURES.cast, rise: 0.4, hold: 0.2, fall: 0.6, peak: 1.7 }],
+      // Dead, the lava in it cools to dark stone.
+      deathFade: 4,
+    },
+    // A swing never cuts the plunge, the breach, the cast or Basalt Fist's slam.
+    oneShotsHoldAttacks: ['Sink', 'Rise', 'Cast', 'Slam'],
+    castPlayOutHoldsAttacks: true,
+    attackTimeScale: 1,
+    deathTimeScale: 1,
+    authoredAtlas: true,
+    selfIllumination: 0.05,
+    clickRadius: 3.2,
+  },
   smith_heart_masterless_strength: {
     url: MASTERLESS_STRENGTH_URL,
     height: FINAL_BODY_HEIGHT,
