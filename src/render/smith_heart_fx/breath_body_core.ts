@@ -415,6 +415,22 @@ export function breathPuffKept(indexInCurrent: number, low: boolean): boolean {
 }
 export const BREATH_PUFF_LOW_SIZE = 0.7;
 
+/** Fill `order[0..n)` with 0..n-1 sorted by `dist` far first (insertion
+ *  sort in place: a few dozen billows, no allocation). */
+export function breathSortFarFirst(order: Uint16Array, dist: Float32Array, n: number): void {
+  for (let i = 0; i < n; i++) order[i] = i;
+  for (let i = 1; i < n; i++) {
+    const v = order[i];
+    const d = dist[v];
+    let j = i - 1;
+    while (j >= 0 && dist[order[j]] < d) {
+      order[j + 1] = order[j];
+      j--;
+    }
+    order[j + 1] = v;
+  }
+}
+
 /** The billows' total quad area (model units squared, at full size): the
  *  fill the volume costs, pinned by the test so it cannot creep. */
 export function breathPuffArea(low: boolean): number {
@@ -796,9 +812,9 @@ export function breathOrbit(
  *  Cornice, white edges), the storm (a dark cloud core, blue-white
  *  lightning), the crystals' cyan. Linear 0..1, hex for the glows. */
 export const BREATH_BODY_COLORS = {
-  wind: [0.24, 0.36, 0.58] as const,
-  windEdge: [0.8, 0.96, 1.0] as const,
-  windShade: [0.035, 0.065, 0.13] as const,
+  wind: [0.13, 0.28, 0.6] as const,
+  windEdge: [0.62, 0.94, 1.0] as const,
+  windShade: [0.015, 0.04, 0.12] as const,
   cloud: [0.5, 0.58, 0.72] as const,
   storm: [0.06, 0.075, 0.15] as const,
   stormEdge: [0.55, 0.78, 1.0] as const,

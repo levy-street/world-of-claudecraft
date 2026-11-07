@@ -80,7 +80,8 @@ void main() {
     float m = fbm(vec2(vUv.x * 0.32 - tt * 0.7 + s2, across * 1.1 + s2 * 0.3));
     float core = 1.0 - smoothstep(0.0, 1.0, abs(across + (m - 0.5) * 0.4));
     float a2 = vAlpha * core * core * (0.3 + 0.7 * m);
-    vec3 c2 = mix(uShade, uWind, 0.35 + 0.65 * m) + uEdge * core * core * 0.18;
+    // The currents' inner glow: cyan light running down their middle.
+    vec3 c2 = mix(uShade, uWind, 0.35 + 0.65 * m) + uEdge * core * core * 0.38;
     vec3 sc2 = mix(uStormShade, uStormBody, m) + uStormEdge * core * uFlash * 0.4;
     c2 = mix(c2, sc2, uStorm);
     a2 *= 1.0 + 1.6 * uStorm;

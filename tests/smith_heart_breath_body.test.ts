@@ -43,6 +43,7 @@ import {
   breathPuffArea,
   breathPuffKept,
   breathRibbonKept,
+  breathSortFarFirst,
   breathStanceGesture,
   breathWindLook,
   profileAt,
@@ -273,6 +274,15 @@ describe('breath_body_core: the wind plan', () => {
     expect(ribbonFade(0)).toBe(0);
     expect(ribbonFade(1)).toBe(0);
     expect(ribbonFade(0.5)).toBe(1);
+  });
+
+  it('sorts its billows far first, in place', () => {
+    const order = new Uint16Array(6);
+    const dist = new Float32Array([4, 9, 1, 9, 0, 6]);
+    breathSortFarFirst(order, dist, 5);
+    expect(Array.from(order.subarray(0, 5)).map((i) => dist[i])).toEqual([9, 9, 4, 1, 0]);
+    expect(new Set(order.subarray(0, 5)).size).toBe(5);
+    breathSortFarFirst(order, dist, 0);
   });
 
   it('jags its lightning between two points and lands on both', () => {

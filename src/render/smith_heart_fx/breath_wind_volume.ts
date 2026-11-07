@@ -15,6 +15,7 @@
 
 import * as THREE from 'three';
 import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
+import { breathSortFarFirst } from './breath_body_core';
 
 const VOLUME_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 attribute vec4 aCenter; // xyz, size (yards)
@@ -82,17 +83,23 @@ void main() {
   // Lit from above and to the side: a bright cyan-white rim there, the body
   // shaded dark blue-grey away from it.
   float lit = clamp(0.5 + 0.55 * dot(normalize(p + vec2(0.0001)), normalize(vec2(-0.45, 0.9))), 0.0, 1.0);
-  float rim = smoothstep(0.45, 0.85, r) * lit;
+  float rim = smoothstep(0.4, 0.85, r) * lit;
   vec3 col = mix(uShade, uWind, clamp(lit * 0.65 + n2 * 0.3 - 0.1, 0.0, 1.0));
-  col = mix(col, uEdge, clamp(rim * (0.6 + 0.6 * n2), 0.0, 1.0));
+  // Darker undersides, and a dark backing band round the shadowed edge: the
+  // silhouette holds against the pale cliffs and sky.
+  col *= mix(1.0, 0.5, smoothstep(0.35, -0.75, p.y));
+  float band = smoothstep(0.6, 0.84, r) * (1.0 - smoothstep(0.86, 0.98, r)) * (1.0 - lit);
+  col = mix(col, uShade * 0.55, clamp(band * 0.8, 0.0, 1.0));
+  // A strong cyan rim light on the lit side.
+  col = mix(col, uEdge, clamp(rim * (0.8 + 0.7 * n2), 0.0, 1.0));
   // The storm: near-black deep blue, the rim lit by the lightning.
   vec3 sc = mix(uStormShade, uStormBody, clamp(lit * 0.6 + n2 * 0.3, 0.0, 1.0));
   sc = mix(sc, uStormEdge, clamp(rim * (0.25 + 0.9 * uFlash), 0.0, 1.0));
   col = mix(col, sc, uStorm);
   float a = vAlpha * shape * (0.88 + 0.12 * n);
-  // Capped under opaque: the billows draw in one unsorted instanced call, so
-  // an overlap out of order still blends instead of painting over.
-  gl_FragColor = vec4(col, clamp(a, 0.0, 0.9));
+  // Sorted back to front every frame (breathSortFarFirst), so the cores can
+  // stand near opaque.
+  gl_FragColor = vec4(col, clamp(a, 0.0, 0.94));
 }
 `;
 
@@ -102,6 +109,12 @@ export class BreathWindVolume {
   private readonly center: THREE.InstancedBufferAttribute;
   private readonly look: THREE.InstancedBufferAttribute;
   private readonly geo: THREE.InstancedBufferGeometry;
+  /** This frame's billows as written (staged, then uploaded far first). */
+  private readonly stage: Float32Array;
+  private readonly order: Uint16Array;
+  private readonly dist: Float32Array;
+  /** Where the camera stood at the last draw (sorting uses it a frame on). */
+  private readonly eye = new THREE.Vector3();
 
   constructor(
     readonly capacity: number,
@@ -139,17 +152,43 @@ export class BreathWindVolume {
     this.mesh.name = 'smithHeartBreathVolume';
     this.mesh.frustumCulled = false;
     this.mesh.visible = false;
+    this.stage = new Float32Array(capacity * 6);
+    this.order = new Uint16Array(capacity);
+    this.dist = new Float32Array(capacity);
+    const eye = this.eye;
+    this.mesh.onBeforeRender = (_r, _s, camera) => {
+      eye.setFromMatrixPosition(camera.matrixWorld);
+    };
   }
 
   /** Write billow `i`: its centre, size (yards), alpha and seed. */
   set(i: number, x: number, y: number, z: number, size: number, alpha: number, seed: number): void {
-    this.center.setXYZW(i, x, y, z, size);
-    this.look.setXY(i, alpha, seed);
+    const o = i * 6;
+    const st = this.stage;
+    st[o] = x;
+    st[o + 1] = y;
+    st[o + 2] = z;
+    st[o + 3] = size;
+    st[o + 4] = alpha;
+    st[o + 5] = seed;
   }
 
   /** Upload this frame's writes; `used` billows draw. */
   commit(used: number): void {
     const n = Math.max(0, Math.min(this.capacity, used));
+    // Far first (one instanced draw, normal blend: the nearer billows paint last).
+    const st = this.stage;
+    const e = this.eye;
+    for (let i = 0; i < n; i++) {
+      const o = i * 6;
+      this.dist[i] = (st[o] - e.x) ** 2 + (st[o + 1] - e.y) ** 2 + (st[o + 2] - e.z) ** 2;
+    }
+    breathSortFarFirst(this.order, this.dist, n);
+    for (let k = 0; k < n; k++) {
+      const o = this.order[k] * 6;
+      this.center.setXYZW(k, st[o], st[o + 1], st[o + 2], st[o + 3]);
+      this.look.setXY(k, st[o + 4], st[o + 5]);
+    }
     if (n > 0) {
       this.center.clearUpdateRanges();
       this.center.addUpdateRange(0, n * 4);
