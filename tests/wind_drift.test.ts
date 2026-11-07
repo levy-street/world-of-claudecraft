@@ -27,6 +27,7 @@ import {
 import {
   WIND_DRIFT_AURA,
   WIND_PULL_AURA,
+  WIND_PULL_EASE,
   WIND_PULL_STOP,
   windDrift,
   windDriftSpeed,
@@ -116,6 +117,15 @@ describe('wind drift: the pure read', () => {
     expect(out.z).toBeCloseTo(4, 9);
     const near = { x: 0, y: 0, z: 10 - WIND_PULL_STOP * 0.9 };
     expect(windDrift({ auras: [pull(0, 10, 4)], pos: near }, out)).toBe(false);
+    // It settles into the stop, never a wall (Jose's playtest of 2026-11-07):
+    // full speed until WIND_PULL_EASE short of it, then in proportion to the
+    // yards still left.
+    const edge = { x: 0, y: 0, z: 10 - WIND_PULL_STOP - WIND_PULL_EASE };
+    expect(windDrift({ auras: [pull(0, 10, 4)], pos: edge }, out)).toBe(true);
+    expect(out.z).toBeCloseTo(4, 9);
+    const half = { x: 0, y: 0, z: 10 - WIND_PULL_STOP - WIND_PULL_EASE / 2 };
+    expect(windDrift({ auras: [pull(0, 10, 4)], pos: half }, out)).toBe(true);
+    expect(out.z).toBeCloseTo(2, 9);
     // Worn together, the pull wins (the indrawn breath replaces the blow).
     expect(
       windDrift({ auras: [wind(Math.PI / 2, 3), pull(0, 10, 4)], pos: { x: 0, y: 0, z: 0 } }, out),

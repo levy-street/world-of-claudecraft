@@ -369,9 +369,10 @@ export const BREATH_TUNING = {
    *  (yards a second; the whole Cornice in about three seconds, so every
    *  client sees it travel and reach each body in turn), and how long a
    *  struck body takes to slide its throw (seconds: seen flying, never a
-   *  blink). */
+   *  blink; eased like a blow, breath_shove.ts 'knock': 0.8 s linear until
+   *  2026-11-07, 1 s now so the settle reads). */
   roarSpeed: 30,
-  roarSlide: 0.8,
+  roarSlide: 1,
   // Heroic: the loose gales after each indrawn breath.
   galeCount: 3,
   galeSeconds: 20,

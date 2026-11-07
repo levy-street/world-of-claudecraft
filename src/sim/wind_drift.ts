@@ -19,7 +19,11 @@
 //                    value2 = its speed in yards a second.
 //   WIND_PULL_AURA   a pull toward a point (an indrawn breath): value, value2
 //                    = the world x and z it draws toward, value3 = its speed;
-//                    it never draws a body closer than WIND_PULL_STOP.
+//                    it never draws a body closer than WIND_PULL_STOP, and
+//                    eases off over the last WIND_PULL_EASE yards before it
+//                    (a body drawn in settles there, never stopped dead: Jose's
+//                    playtest of 2026-11-07). A function of the position
+//                    alone, so both hosts still step it bit for bit.
 //
 // Both ride a quiet `internal_cd` marker (no stat, no speed: never a slow a
 // cleanse would strip). Pure: no SimContext, no rng.
@@ -34,6 +38,9 @@ export const WIND_DRIFT_AURA = 'wind_drift';
 export const WIND_PULL_AURA = 'wind_draw';
 /** A pull never draws a body closer than this to its point (yards). */
 export const WIND_PULL_STOP = 3.5;
+/** Over this many yards before WIND_PULL_STOP the pull eases off, in
+ *  proportion to the distance still left (a settle, not a wall). */
+export const WIND_PULL_EASE = 1.5;
 
 /**
  * The drift carrying `e` this tick, in yards a second, written into `out`.
@@ -56,8 +63,9 @@ export function windDrift(
       const dz = tz - e.pos.z;
       const len = Math.hypot(dx, dz);
       if (!(speed > 0) || len <= WIND_PULL_STOP) return false;
-      out.x = (dx / len) * speed;
-      out.z = (dz / len) * speed;
+      const ease = Math.min(1, (len - WIND_PULL_STOP) / WIND_PULL_EASE);
+      out.x = (dx / len) * speed * ease;
+      out.z = (dz / len) * speed * ease;
       return true;
     }
     if (a.id === WIND_DRIFT_AURA && drift === null) drift = a;

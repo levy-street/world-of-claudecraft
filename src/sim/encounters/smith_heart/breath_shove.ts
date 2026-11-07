@@ -8,10 +8,15 @@
 // server-driven step every tick with no override bumps the override epoch:
 // the prediction flaps and the throw reads jerky).
 //
-//   linear   the Summit Roar's throw: the same step every tick.
+//   linear   the same step every tick (the Summit Roar's throw until
+//            2026-11-07: it read as a sled that stopped dead).
 //   out      a loose gale's toss (Jose's playtest of 2026-11-04: it read as a
 //            sideways teleport): a shove that starts fast and settles, eased
 //            out over its seconds.
+//   knock    the Summit Roar's throw (Jose's playtest of 2026-11-07): a blow,
+//            not a shove; cubic out, three times the throw's mean pace off
+//            the blow, settling to a stop on the feet. The renderer lifts
+//            the body on a short arc while it slides (render/thrown_hop.ts).
 //
 // The anchored and the Knotted Gale's carrier keep their feet (heldFast):
 // they are never held and never slide. Zero rng.
@@ -20,7 +25,7 @@ import { DT, type Entity } from '../../types';
 import { type BreathScope, heldFast, throwPlayer } from './breath_scope';
 import { dropAura } from './fight_kit';
 
-export type BreathShoveEase = 'linear' | 'out';
+export type BreathShoveEase = 'linear' | 'out' | 'knock';
 
 /** A shove in flight (state: rides the fight's state, in tick order). */
 export interface BreathShove {
@@ -44,7 +49,9 @@ export interface BreathShove {
 /** The share of the throw done after `t` (0..1) of its ticks. */
 export function shoveEase(ease: BreathShoveEase, t: number): number {
   const u = Math.max(0, Math.min(1, t));
-  return ease === 'linear' ? u : 1 - (1 - u) * (1 - u);
+  if (ease === 'linear') return u;
+  const r = 1 - u;
+  return ease === 'out' ? 1 - r * r : 1 - r * r * r;
 }
 
 /** The yards slid on tick `k` (0-based) of `n` for a `yards` throw. */
@@ -112,11 +119,14 @@ export function stepShoves(s: BreathScope, list: BreathShove[]): void {
     sl.k++;
     sl.step = sl.k < sl.n ? shoveStep(sl.ease, sl.yards, sl.k, sl.n) : sl.left;
     if (!p.onGround && sl.left > 1e-6) {
-      // Carried past an open lip into the air: the rest of the throw rides
-      // on as its flight at the slide's pace, and the fall takes it from here.
-      const secs = Math.max(DT, (sl.n - sl.k) * DT);
-      p.vx = (sl.ux * sl.left) / secs;
-      p.vz = (sl.uz * sl.left) / secs;
+      // Carried past an open lip into the air: the throw rides on as its
+      // flight at the pace it had (this tick's step, so an eased throw does
+      // not slow off the lip), held to the throw's mean pace at most (the
+      // flight a linear throw always had: the fall lands where the void
+      // still counts it), and the fall takes it from here.
+      const pace = Math.min(step, sl.yards / sl.n) / DT;
+      p.vx = sl.ux * pace;
+      p.vz = sl.uz * pace;
       dropAura(p, sl.aura);
       list.splice(i, 1);
       continue;

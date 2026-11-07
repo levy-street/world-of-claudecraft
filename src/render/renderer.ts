@@ -883,6 +883,7 @@ import { refreshTextureAnisotropy } from './texture_anisotropy';
 import { runTexturePrepLane } from './texture_prep_lane';
 import { sweepMaterialTextures, sweepObjectTextures } from './texture_prewarm';
 import { TextureResidencyLedger } from './texture_residency_ledger';
+import { thrownHopLift } from './thrown_hop';
 import {
   groundSpeedFromFrame,
   hasTravelFormAura,
@@ -9863,7 +9864,9 @@ export class Renderer {
       // entities interpolate on their own measured cadence via
       // remoteEntityAlpha (unknown-cadence fallback).
       const rp = entityRenderPose(sim, e, ea, isSelf ? selfPos : null, v);
-      const { x, y, z, deck } = rp; // a passenger rides the drawn deck (deck_frame.ts)
+      const hop = thrownHopLift(v, e.auras, this.time); // a thrown body's arc (thrown_hop.ts)
+      const { x, z, deck } = rp; // a passenger rides the drawn deck (deck_frame.ts)
+      const y = rp.y + hop;
       v.group.position.set(x, y, z);
       let facing = rp.facing;
       if (ignivarBossFacingLocked(e)) facing = e.facing;
@@ -10473,9 +10476,10 @@ export class Renderer {
       const airborne =
         !visuallyDead &&
         !swimming &&
-        (animFromDisplay && this.selfRender.predictor && !inRift
-          ? !this.selfRender.predictor.onGround
-          : !e.onGround || v.airborneHeurFrames >= 2);
+        (hop > 0 ||
+          (animFromDisplay && this.selfRender.predictor && !inRift
+            ? !this.selfRender.predictor.onGround
+            : !e.onGround || v.airborneHeurFrames >= 2));
       // Grounded presentation polish, both display-only (see the cores).
       // Vertical smoothing absorbs the step-up the solver performs inside a
       // single tick, so the body strides onto a kerb instead of teleporting up
