@@ -2242,7 +2242,7 @@ export const cs_CZ: EnTranslations = {
     "hubLesson": {
       "target": "Začni výběrem figuríny jako cíle.",
       "openWindow": "Otevři {meters}.",
-      "openWindowTouch": "Otevři {menu} → {more} → {meters}.",
+      "openWindowTouch": "Otevři {menu} → {meters}.",
       "openTab": "Přepni na správnou kartu.",
       "openTabDamage": "Přepni na kartu Poškození.",
       "openTabHealing": "Přepni na kartu Léčení.",

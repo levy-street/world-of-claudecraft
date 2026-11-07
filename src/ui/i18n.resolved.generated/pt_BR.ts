@@ -2242,7 +2242,7 @@ export const pt_BR: EnTranslations = {
     "hubLesson": {
       "target": "Mire no boneco para começar.",
       "openWindow": "Abra {meters}.",
-      "openWindowTouch": "Abra {menu} → {more} → {meters}.",
+      "openWindowTouch": "Abra {menu} → {meters}.",
       "openTab": "Mude para a aba da direita.",
       "openTabDamage": "Mude para a aba Dano.",
       "openTabHealing": "Mude para a aba Cura.",

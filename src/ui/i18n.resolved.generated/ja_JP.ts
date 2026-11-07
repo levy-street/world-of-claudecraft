@@ -2242,7 +2242,7 @@ export const ja_JP: EnTranslations = {
     "hubLesson": {
       "target": "まずダミーを標的にしよう。",
       "openWindow": "{meters}を開こう。",
-      "openWindowTouch": "{menu} → {more} → {meters}を開こう。",
+      "openWindowTouch": "{menu} → {meters}を開こう。",
       "openTab": "正しいタブに切り替えよう。",
       "openTabDamage": "ダメージタブに切り替えよう。",
       "openTabHealing": "ヒーリングタブに切り替えよう。",

@@ -2242,7 +2242,7 @@ export const zh_TW: EnTranslations = {
     "hubLesson": {
       "target": "先將假人設為目標。",
       "openWindow": "打開{meters}。",
-      "openWindowTouch": "打開{menu} → {more} → {meters}。",
+      "openWindowTouch": "打開{menu} → {meters}。",
       "openTab": "切換到正確的頁籤。",
       "openTabDamage": "切換到傷害頁籤。",
       "openTabHealing": "切換到治療頁籤。",

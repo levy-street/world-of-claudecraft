@@ -18688,7 +18688,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.hubLesson.openTabDamage': 'Přepni na kartu Poškození.',
   'hudChrome.hubLesson.openTabHealing': 'Přepni na kartu Léčení.',
   'hudChrome.hubLesson.openWindow': 'Otevři {meters}.',
-  'hudChrome.hubLesson.openWindowTouch': 'Otevři {menu} → {more} → {meters}.',
+  'hudChrome.hubLesson.openWindowTouch': 'Otevři {menu} → {meters}.',
   'hudChrome.hubLesson.readRow': 'Přečti si svůj řádek a pak stiskni Pokračovat.',
   'hudChrome.hubLesson.readRowDamage':
     'Celkem je veškeré tvé poškození v tomto běhu. DPS je poškození za sekundu běhu. Sleduj svůj řádek a pak Pokračuj.',

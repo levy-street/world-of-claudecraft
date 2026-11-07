@@ -22200,7 +22200,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.talkingHead.label': 'Диалог',
   'hudChrome.hubLesson.target': 'Сначала возьми манекен в цель.',
   'hudChrome.hubLesson.openWindow': 'Открой {meters}.',
-  'hudChrome.hubLesson.openWindowTouch': 'Открой {menu} → {more} → {meters}.',
+  'hudChrome.hubLesson.openWindowTouch': 'Открой {menu} → {meters}.',
   'hudChrome.hubLesson.openTab': 'Переключись на нужную вкладку.',
   'hudChrome.hubLesson.openTabDamage': 'Переключись на вкладку Урон.',
   'hudChrome.hubLesson.openTabHealing': 'Переключись на вкладку Лечение.',

@@ -2242,7 +2242,7 @@ export const tr_TR: EnTranslations = {
     "hubLesson": {
       "target": "Başlamak için kuklayı hedefle.",
       "openWindow": "{meters} aç.",
-      "openWindowTouch": "{menu} → {more} → {meters} aç.",
+      "openWindowTouch": "{menu} → {meters} aç.",
       "openTab": "Sağdaki sekmeye geç.",
       "openTabDamage": "Hasar sekmesine geç.",
       "openTabHealing": "İyileştirme sekmesine geç.",

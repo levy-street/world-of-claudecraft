@@ -20112,7 +20112,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.talkingHead.label': '会話',
   'hudChrome.hubLesson.target': 'まずダミーを標的にしよう。',
   'hudChrome.hubLesson.openWindow': '{meters}を開こう。',
-  'hudChrome.hubLesson.openWindowTouch': '{menu} → {more} → {meters}を開こう。',
+  'hudChrome.hubLesson.openWindowTouch': '{menu} → {meters}を開こう。',
   'hudChrome.hubLesson.openTab': '正しいタブに切り替えよう。',
   'hudChrome.hubLesson.openTabDamage': 'ダメージタブに切り替えよう。',
   'hudChrome.hubLesson.openTabHealing': 'ヒーリングタブに切り替えよう。',

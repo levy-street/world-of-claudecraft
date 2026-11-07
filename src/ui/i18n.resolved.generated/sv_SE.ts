@@ -2242,7 +2242,7 @@ export const sv_SE: EnTranslations = {
     "hubLesson": {
       "target": "Välj träningsdockan som mål för att börja.",
       "openWindow": "Öppna {meters}.",
-      "openWindowTouch": "Öppna {menu}, sedan {more}, sedan {meters}.",
+      "openWindowTouch": "Öppna {menu}, sedan {meters}.",
       "openTab": "Byt till rätt flik.",
       "openTabDamage": "Byt till fliken Skada.",
       "openTabHealing": "Byt till fliken Läkning.",

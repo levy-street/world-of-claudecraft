@@ -2242,7 +2242,7 @@ export const vi_VN: EnTranslations = {
     "hubLesson": {
       "target": "Nhắm vào hình nộm để bắt đầu.",
       "openWindow": "Mở {meters}.",
-      "openWindowTouch": "Mở {menu} → {more} → {meters}.",
+      "openWindowTouch": "Mở {menu} → {meters}.",
       "openTab": "Chuyển sang thẻ bên phải.",
       "openTabDamage": "Chuyển sang thẻ Sát thương.",
       "openTabHealing": "Chuyển sang thẻ Hồi máu.",

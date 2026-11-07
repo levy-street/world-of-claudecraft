@@ -2242,7 +2242,7 @@ export const en: EnTranslations = {
     "hubLesson": {
       "target": "Target the dummy to begin.",
       "openWindow": "Open {meters}.",
-      "openWindowTouch": "Open {menu} → {more} → {meters}.",
+      "openWindowTouch": "Open {menu} → {meters}.",
       "openTab": "Switch to the right tab.",
       "openTabDamage": "Switch to the Damage tab.",
       "openTabHealing": "Switch to the Healing tab.",

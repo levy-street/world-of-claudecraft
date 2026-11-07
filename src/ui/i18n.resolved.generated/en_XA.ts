@@ -2242,7 +2242,7 @@ export const en_XA: EnTranslations = {
     "hubLesson": {
       "target": "[Ţáŕĝéţ ţĥé ðúɱɱý ţó ƀéĝíñ.]",
       "openWindow": "[Óþéñ {meters}.]",
-      "openWindowTouch": "[Óþéñ {menu} → {more} → {meters}.]",
+      "openWindowTouch": "[Óþéñ {menu} → {meters}.]",
       "openTab": "[Šŵíţçĥ ţó ţĥé ŕíĝĥţ ţáƀ.]",
       "openTabDamage": "[Šŵíţçĥ ţó ţĥé Ðáɱáĝé ţáƀ.]",
       "openTabHealing": "[Šŵíţçĥ ţó ţĥé Ĥéáļíñĝ ţáƀ.]",

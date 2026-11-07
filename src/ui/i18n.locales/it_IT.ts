@@ -16954,7 +16954,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.hubLesson.openTabDamage': 'Passa alla scheda Danni.',
   'hudChrome.hubLesson.openTabHealing': 'Passa alla scheda Cure.',
   'hudChrome.hubLesson.openWindow': 'Apri {meters}.',
-  'hudChrome.hubLesson.openWindowTouch': 'Apri {menu} → {more} → {meters}.',
+  'hudChrome.hubLesson.openWindowTouch': 'Apri {menu} → {meters}.',
   'hudChrome.hubLesson.readRow': 'Leggi la tua riga, poi premi Continua.',
   'hudChrome.hubLesson.readRowDamage':
     'Totale è tutti i danni di questa sessione. DPS è il danno al secondo durante la sessione. Guarda la tua riga, poi Continua.',

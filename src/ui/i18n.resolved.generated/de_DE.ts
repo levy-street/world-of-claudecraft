@@ -2242,7 +2242,7 @@ export const de_DE: EnTranslations = {
     "hubLesson": {
       "target": "Visiere die Puppe an, um zu beginnen.",
       "openWindow": "Öffne {meters}.",
-      "openWindowTouch": "Öffne {menu} → {more} → {meters}.",
+      "openWindowTouch": "Öffne {menu} → {meters}.",
       "openTab": "Wechsle zum rechten Reiter.",
       "openTabDamage": "Wechsle zum Reiter Schaden.",
       "openTabHealing": "Wechsle zum Reiter Heilung.",

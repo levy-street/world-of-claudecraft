@@ -2242,7 +2242,7 @@ export const it_IT: EnTranslations = {
     "hubLesson": {
       "target": "Seleziona il manichino per iniziare.",
       "openWindow": "Apri {meters}.",
-      "openWindowTouch": "Apri {menu} → {more} → {meters}.",
+      "openWindowTouch": "Apri {menu} → {meters}.",
       "openTab": "Passa alla scheda destra.",
       "openTabDamage": "Passa alla scheda Danni.",
       "openTabHealing": "Passa alla scheda Cure.",

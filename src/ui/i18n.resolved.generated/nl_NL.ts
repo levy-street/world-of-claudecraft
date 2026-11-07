@@ -2242,7 +2242,7 @@ export const nl_NL: EnTranslations = {
     "hubLesson": {
       "target": "Richt je op de oefenpop om te beginnen.",
       "openWindow": "Open {meters}.",
-      "openWindowTouch": "Open {menu} → {more} → {meters}.",
+      "openWindowTouch": "Open {menu} → {meters}.",
       "openTab": "Schakel naar het tabblad rechts.",
       "openTabDamage": "Schakel naar het tabblad Schade.",
       "openTabHealing": "Schakel naar het tabblad Genezing.",

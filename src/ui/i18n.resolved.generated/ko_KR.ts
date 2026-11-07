@@ -2242,7 +2242,7 @@ export const ko_KR: EnTranslations = {
     "hubLesson": {
       "target": "먼저 허수아비를 대상으로 삼으세요.",
       "openWindow": "{meters}을(를) 여세요.",
-      "openWindowTouch": "{menu} → {more} → {meters}을(를) 여세요.",
+      "openWindowTouch": "{menu} → {meters}을(를) 여세요.",
       "openTab": "올바른 탭으로 전환하세요.",
       "openTabDamage": "피해량 탭으로 전환하세요.",
       "openTabHealing": "치유 탭으로 전환하세요.",

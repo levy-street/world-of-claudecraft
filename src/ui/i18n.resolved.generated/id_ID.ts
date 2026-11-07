@@ -2242,7 +2242,7 @@ export const id_ID: EnTranslations = {
     "hubLesson": {
       "target": "Targetkan boneka untuk memulai.",
       "openWindow": "Buka {meters}.",
-      "openWindowTouch": "Buka {menu} → {more} → {meters}.",
+      "openWindowTouch": "Buka {menu} → {meters}.",
       "openTab": "Beralih ke tab kanan.",
       "openTabDamage": "Beralih ke tab Kerusakan.",
       "openTabHealing": "Beralih ke tab Penyembuhan.",

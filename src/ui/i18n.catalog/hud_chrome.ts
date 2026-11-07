@@ -2080,11 +2080,9 @@ export const hudChromeStrings = {
   hubLesson: {
     target: 'Target the dummy to begin.',
     openWindow: 'Open {meters}.',
-    // Touch has no keyboard shortcut: the real path is the labels the actual
-    // touch controls carry (hudChrome.mobile.quickActionsLabel "Actions",
-    // hud.core.mobileMore "More", hud.keybinds.actions.meters "Damage
-    // Meters"), not a guessed "Menu" name for the anchor.
-    openWindowTouch: 'Open {menu} → {more} → {meters}.',
+    // Touch has no keyboard shortcut: tapping Actions opens the dialog that
+    // contains Damage Meters, so do not send players through a separate More step.
+    openWindowTouch: 'Open {menu} → {meters}.',
     // Neutral fallback for a track this file forgets to override (never
     // shown in practice: every real step below resolves through the
     // track-specific pair instead).

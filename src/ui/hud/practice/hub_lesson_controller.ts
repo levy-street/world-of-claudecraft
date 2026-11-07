@@ -634,7 +634,6 @@ export class HubLessonController {
     const text = esc(
       t(wrongRun ? 'hudChrome.hubLesson.findRun' : this.textKeyFor(step), {
         menu: t('hudChrome.mobile.quickActionsLabel'),
-        more: t('hud.core.mobileMore'),
         meters: t('hud.keybinds.actions.meters'),
       }),
     );

@@ -18870,7 +18870,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.hubLesson.openTabDamage': 'Chuyển sang thẻ Sát thương.',
   'hudChrome.hubLesson.openTabHealing': 'Chuyển sang thẻ Hồi máu.',
   'hudChrome.hubLesson.openWindow': 'Mở {meters}.',
-  'hudChrome.hubLesson.openWindowTouch': 'Mở {menu} → {more} → {meters}.',
+  'hudChrome.hubLesson.openWindowTouch': 'Mở {menu} → {meters}.',
   'hudChrome.hubLesson.readRow': 'Đọc hàng của bạn, rồi nhấn Tiếp tục.',
   'hudChrome.hubLesson.readRowDamage':
     'Tổng là toàn bộ sát thương bạn gây ra trong lượt này. DPS là sát thương mỗi giây trong lượt. Xem hàng của bạn, rồi nhấn Tiếp tục.',

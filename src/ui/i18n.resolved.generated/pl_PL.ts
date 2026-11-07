@@ -2242,7 +2242,7 @@ export const pl_PL: EnTranslations = {
     "hubLesson": {
       "target": "Wybierz manekina jako cel, aby zacząć.",
       "openWindow": "Otwórz {meters}.",
-      "openWindowTouch": "Otwórz {menu}, potem {more}, potem {meters}.",
+      "openWindowTouch": "Otwórz {menu}, potem {meters}.",
       "openTab": "Przełącz na właściwą kartę.",
       "openTabDamage": "Przełącz na kartę Obrażenia.",
       "openTabHealing": "Przełącz na kartę Leczenie.",

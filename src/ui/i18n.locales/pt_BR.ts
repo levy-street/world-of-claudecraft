@@ -16866,7 +16866,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.hubLesson.openTabDamage': 'Mude para a aba Dano.',
   'hudChrome.hubLesson.openTabHealing': 'Mude para a aba Cura.',
   'hudChrome.hubLesson.openWindow': 'Abra {meters}.',
-  'hudChrome.hubLesson.openWindowTouch': 'Abra {menu} → {more} → {meters}.',
+  'hudChrome.hubLesson.openWindowTouch': 'Abra {menu} → {meters}.',
   'hudChrome.hubLesson.readRow': 'Leia sua linha e pressione Continuar.',
   'hudChrome.hubLesson.readRowDamage':
     'Total é todo o seu dano nesta rodada. DPS é o dano por segundo durante a rodada. Observe sua linha e pressione Continuar.',

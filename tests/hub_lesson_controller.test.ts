@@ -141,6 +141,7 @@ function tick(controller: HubLessonController, ms = 300): void {
 
 beforeEach(() => {
   document.body.innerHTML = '';
+  document.body.className = '';
   now = 0;
 });
 
@@ -263,6 +264,17 @@ describe('HubLessonController: the world bubble mirrors every guided step', () =
     tick(controller);
     expect(element.innerHTML).toContain('Attack the dummy to start the measurement.');
     expect(bubble()!.innerHTML).toBe(element.innerHTML);
+  });
+
+  it('gives the current touch path to Damage Meters without the removed More step', () => {
+    document.body.classList.add('mobile-touch');
+    const { player, controller, element } = accept();
+    player.targetId = DAMAGE_DUMMY_ID;
+
+    tick(controller);
+
+    expect(element.innerHTML).toContain('Open Actions → Damage Meters.');
+    expect(element.innerHTML).not.toContain('More');
   });
 
   it('read-row Continue works from the bubble copy, identically to the tracker copy', () => {

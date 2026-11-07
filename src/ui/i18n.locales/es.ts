@@ -19032,7 +19032,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.hubLesson.openTabDamage': 'Cambia a la pestaña Daño.',
   'hudChrome.hubLesson.openTabHealing': 'Cambia a la pestaña Curación.',
   'hudChrome.hubLesson.openWindow': 'Abre {meters}.',
-  'hudChrome.hubLesson.openWindowTouch': 'Abre {menu} → {more} → {meters}.',
+  'hudChrome.hubLesson.openWindowTouch': 'Abre {menu} → {meters}.',
   'hudChrome.hubLesson.readRow': 'Lee tu fila y pulsa Continuar.',
   'hudChrome.hubLesson.readRowDamage':
     'Total es todo tu daño en esta sesión. DPS es el daño por segundo durante la sesión. Mira tu fila y pulsa Continuar.',

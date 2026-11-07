@@ -19023,7 +19023,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.hubLesson.openTabDamage': 'Beralih ke tab Kerusakan.',
   'hudChrome.hubLesson.openTabHealing': 'Beralih ke tab Penyembuhan.',
   'hudChrome.hubLesson.openWindow': 'Buka {meters}.',
-  'hudChrome.hubLesson.openWindowTouch': 'Buka {menu} → {more} → {meters}.',
+  'hudChrome.hubLesson.openWindowTouch': 'Buka {menu} → {meters}.',
   'hudChrome.hubLesson.readRow': 'Baca barismu, lalu tekan Lanjutkan.',
   'hudChrome.hubLesson.readRowDamage':
     'Total adalah seluruh kerusakanmu dalam percobaan ini. DPS adalah kerusakan per detik selama percobaan. Perhatikan barismu, lalu Lanjutkan.',

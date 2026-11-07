@@ -20061,7 +20061,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.talkingHead.label': '대화',
   'hudChrome.hubLesson.target': '먼저 허수아비를 대상으로 삼으세요.',
   'hudChrome.hubLesson.openWindow': '{meters}을(를) 여세요.',
-  'hudChrome.hubLesson.openWindowTouch': '{menu} → {more} → {meters}을(를) 여세요.',
+  'hudChrome.hubLesson.openWindowTouch': '{menu} → {meters}을(를) 여세요.',
   'hudChrome.hubLesson.openTab': '올바른 탭으로 전환하세요.',
   'hudChrome.hubLesson.openTabDamage': '피해량 탭으로 전환하세요.',
   'hudChrome.hubLesson.openTabHealing': '치유 탭으로 전환하세요.',

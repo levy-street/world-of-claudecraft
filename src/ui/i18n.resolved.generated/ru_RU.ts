@@ -2242,7 +2242,7 @@ export const ru_RU: EnTranslations = {
     "hubLesson": {
       "target": "Сначала возьми манекен в цель.",
       "openWindow": "Открой {meters}.",
-      "openWindowTouch": "Открой {menu} → {more} → {meters}.",
+      "openWindowTouch": "Открой {menu} → {meters}.",
       "openTab": "Переключись на нужную вкладку.",
       "openTabDamage": "Переключись на вкладку Урон.",
       "openTabHealing": "Переключись на вкладку Лечение.",

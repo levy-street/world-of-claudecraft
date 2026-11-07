@@ -2242,7 +2242,7 @@ export const da_DK: EnTranslations = {
     "hubLesson": {
       "target": "Vælg træningsdukken som mål for at begynde.",
       "openWindow": "Åbn {meters}.",
-      "openWindowTouch": "Åbn {menu}, derefter {more}, derefter {meters}.",
+      "openWindowTouch": "Åbn {menu}, derefter {meters}.",
       "openTab": "Skift til den rigtige fane.",
       "openTabDamage": "Skift til fanen Skade.",
       "openTabHealing": "Skift til fanen Helbredelse.",

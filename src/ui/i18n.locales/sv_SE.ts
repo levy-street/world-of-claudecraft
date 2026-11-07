@@ -18795,7 +18795,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.hubLesson.openTabDamage': 'Byt till fliken Skada.',
   'hudChrome.hubLesson.openTabHealing': 'Byt till fliken Läkning.',
   'hudChrome.hubLesson.openWindow': 'Öppna {meters}.',
-  'hudChrome.hubLesson.openWindowTouch': 'Öppna {menu}, sedan {more}, sedan {meters}.',
+  'hudChrome.hubLesson.openWindowTouch': 'Öppna {menu}, sedan {meters}.',
   'hudChrome.hubLesson.readRow': 'Läs din rad och tryck sedan på Fortsätt.',
   'hudChrome.hubLesson.readRowDamage':
     'Totalt är all din skada under körningen. DPS är skada per sekund under körningen. Titta på din rad och fortsätt sedan.',

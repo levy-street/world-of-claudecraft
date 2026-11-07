@@ -20768,7 +20768,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.talkingHead.label': '對話',
   'hudChrome.hubLesson.target': '先將假人設為目標。',
   'hudChrome.hubLesson.openWindow': '打開{meters}。',
-  'hudChrome.hubLesson.openWindowTouch': '打開{menu} → {more} → {meters}。',
+  'hudChrome.hubLesson.openWindowTouch': '打開{menu} → {meters}。',
   'hudChrome.hubLesson.openTab': '切換到正確的頁籤。',
   'hudChrome.hubLesson.openTabDamage': '切換到傷害頁籤。',
   'hudChrome.hubLesson.openTabHealing': '切換到治療頁籤。',
