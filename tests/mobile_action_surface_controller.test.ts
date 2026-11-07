@@ -295,6 +295,73 @@ describe('mobile action surface controller', () => {
     expect(document.getElementById('mobile-action-ring')?.dataset.actionSurface).toBe('combat');
   });
 
+  it('switches to the combat layout when a mob is selected on the utility layout', () => {
+    const controller = buildMobileActionSurface({
+      writers,
+      t: (key) => key,
+      consumePeekGuard: vi.fn(),
+      hideTooltip: vi.fn(),
+      clickSfx: vi.fn(),
+    });
+    const ring = document.getElementById('mobile-action-ring');
+    const mode = document.getElementById('mobile-action-mode') as HTMLButtonElement;
+    const liveMob = { hostile: true, dead: false };
+
+    controller?.update(false, 1, null);
+    expect(ring?.dataset.actionSurface).toBe('utility');
+
+    controller?.update(false, 1, liveMob);
+    expect(ring?.dataset.actionSurface, 'selecting a mob arms the combat layout').toBe('combat');
+
+    // An explicit choice still holds while the same selection persists.
+    mode.click();
+    controller?.update(false, 1, liveMob);
+    expect(ring?.dataset.actionSurface).toBe('utility');
+
+    // Clearing the selection returns to the automatic utility layout.
+    controller?.update(false, 1, null);
+    expect(ring?.dataset.actionSurface).toBe('utility');
+  });
+
+  it('ignores a dead or friendly selection', () => {
+    const controller = buildMobileActionSurface({
+      writers,
+      t: (key) => key,
+      consumePeekGuard: vi.fn(),
+      hideTooltip: vi.fn(),
+      clickSfx: vi.fn(),
+    });
+    const ring = document.getElementById('mobile-action-ring');
+
+    controller?.update(false, 1, { hostile: true, dead: true });
+    expect(ring?.dataset.actionSurface, 'a corpse is not combat intent').toBe('utility');
+
+    controller?.update(false, 1, { hostile: false, dead: false });
+    expect(ring?.dataset.actionSurface, 'a friendly NPC is not combat intent').toBe('utility');
+  });
+
+  it('stays on the combat layout while combat outlives the selected mob', () => {
+    const controller = buildMobileActionSurface({
+      writers,
+      t: (key) => key,
+      consumePeekGuard: vi.fn(),
+      hideTooltip: vi.fn(),
+      clickSfx: vi.fn(),
+    });
+    const ring = document.getElementById('mobile-action-ring');
+    const liveMob = { hostile: true, dead: false };
+
+    controller?.update(false, 1, liveMob);
+    expect(ring?.dataset.actionSurface).toBe('combat');
+
+    controller?.update(true, 1, liveMob);
+    controller?.update(true, 1, null);
+    expect(ring?.dataset.actionSurface, 'combat still forces the combat layout').toBe('combat');
+
+    controller?.update(false, 1, null);
+    expect(ring?.dataset.actionSurface).toBe('utility');
+  });
+
   it('does not rewrite an unchanged state and can relocalize labels', () => {
     const setText = vi.fn((el: HTMLElement, text: string) => {
       el.textContent = text;

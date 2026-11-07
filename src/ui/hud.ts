@@ -9069,7 +9069,7 @@ export class Hud {
     if (this.isMobileLayout() && this.mobileActionRingView && this.mobileActionRingPainter) {
       const mobileActionPage = this.currentMobileActionPage();
       const mobileActionSourceSlotCount = MOBILE_ACTION_SOURCE_SLOT_COUNT;
-      this.mobileActionSurface?.update(p.inCombat, sim.playerId);
+      this.mobileActionSurface?.update(p.inCombat, sim.playerId, target);
       this.mobileActionRingPainter.paint(
         this.mobileActionRingView.tick(actionBarWorld),
         mobileActionPage,

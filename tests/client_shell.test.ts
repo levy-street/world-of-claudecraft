@@ -3257,6 +3257,7 @@ describe('client HTML shell', () => {
         '    --mobile-ring-toggle-size: max(40px, calc(46px * var(--mobile-chrome-scale, 1)));\n' +
         '    --mobile-ring-secondary-size: calc(50px * var(--mobile-chrome-scale, 1));\n' +
         '    --mobile-ring-hollow: calc(88px * var(--mobile-chrome-scale, 1));\n' +
+        '    --mobile-mode-inward-shift: 62px;\n' +
         '    right: max(14px, env(safe-area-inset-right));\n' +
         '    bottom: calc(10px + env(safe-area-inset-bottom));\n' +
         '  }',

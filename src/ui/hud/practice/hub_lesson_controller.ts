@@ -55,6 +55,7 @@ import type { IWorld } from '../../../world_api';
 import { nearestMob } from '../../coach_prompt_view';
 import { esc } from '../../esc';
 import { type TranslationKey, t } from '../../i18n';
+import { mobileUtilityGlowTarget } from '../action_bar/mobile_action_surface_controller';
 import {
   advanceHubLesson,
   HUB_LESSON_START,
@@ -619,8 +620,12 @@ export class HubLessonController {
       this.abilitySlot(step.track) === 'missing'
     ) {
       // The resolved heal isn't on the bar at all: point at the Spellbook,
-      // never an unrelated slot (see the module header and healChip()).
-      this.glow(this.visibleMobileControl('mobile-menu-spellbook'));
+      // never an unrelated slot (see the module header and healChip()). On
+      // touch that is a shortcut on the utility ring's second page, so the
+      // ring's own control wins; the strip path stays for builds without it.
+      this.glow(
+        mobileUtilityGlowTarget('spellbook') ?? this.visibleMobileControl('mobile-menu-spellbook'),
+      );
     } else if (step.kind === 'act' || step.kind === 'compare-again') {
       const slot = this.abilitySlot(step.track);
       this.glow(typeof slot === 'number' ? (this.deps.actionButtonForSlot?.(slot) ?? null) : null);

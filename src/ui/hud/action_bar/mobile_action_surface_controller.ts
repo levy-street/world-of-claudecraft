@@ -1,3 +1,4 @@
+import { currentInputHintMode } from '../../../game/input_hint_mode';
 import type { InterpolationValues, TranslationKey } from '../../i18n';
 import type { PainterHostWriters } from '../../painter_host';
 import { bindTouchTap } from '../../touch_tap';
@@ -42,9 +43,31 @@ export interface MobileActionSurfaceDeps {
   showUtilitySurface?(): void;
 }
 
+/** The little the layout switch reads off the current target. */
+export interface MobileActionSurfaceTarget {
+  hostile: boolean;
+  dead: boolean;
+}
+
 export interface MobileActionSurface {
-  update(inCombat: boolean, playerId: number): void;
+  update(inCombat: boolean, playerId: number, target?: MobileActionSurfaceTarget | null): void;
   relocalize(): void;
+}
+
+/** The control a lesson should pulse to reach a utility shortcut on the touch
+ *  ring: the shortcut itself when its page is up, the layout switch while the
+ *  ring shows combat, and the page toggle when the shortcut waits on the other
+ *  utility page. Null off touch, or when the ring markup is absent (an older
+ *  cached shell), which leaves the caller on its previous path. */
+export function mobileUtilityGlowTarget(actionId: MobileUtilityActionId): HTMLElement | null {
+  if (currentInputHintMode() !== 'touch') return null;
+  const ring = document.getElementById(RING_ID);
+  if (!ring) return null;
+  if (ring.dataset.actionSurface !== 'utility') return document.getElementById(MODE_ID);
+  const shortcut = document
+    .getElementById(UTILITY_ID)
+    ?.querySelector<HTMLElement>(`${UTILITY_BUTTON_SELECTOR}[data-utility-action="${actionId}"]`);
+  return shortcut ?? document.getElementById(UTILITY_PAGE_TOGGLE_ID);
 }
 
 /** Builds touch-only utility shortcuts, page switching, and the combat mode switch. */
@@ -122,6 +145,7 @@ export function buildMobileActionSurface(
   const painter = new MobileActionSurfacePainter({ writers: deps.writers, elements, t: deps.t });
   let preference: MobileActionModePreference = MOBILE_ACTION_MODE_AUTO;
   let inCombat = false;
+  let engaging = false;
   let utilityPage = 0;
   let playerId: number | null = null;
   let visibleSurface: 'combat' | 'utility' | null = null;
@@ -186,16 +210,23 @@ export function buildMobileActionSurface(
   });
 
   return {
-    update(nextInCombat, nextPlayerId): void {
+    update(nextInCombat, nextPlayerId, target = null): void {
       if (playerId !== nextPlayerId) {
         playerId = nextPlayerId;
         preference = MOBILE_ACTION_MODE_AUTO;
         utilityPage = 0;
         inCombat = false;
+        engaging = false;
       }
-      if (nextInCombat !== inCombat) {
-        preference = nextInCombat ? MOBILE_ACTION_MODE_COMBAT : MOBILE_ACTION_MODE_AUTO;
+      // A selected mob is combat intent even before the first swing lands: the
+      // utility layout has no attack controls, so targeting one switches to the
+      // combat layout exactly like entering combat does. An explicit layout
+      // choice still holds while that selection persists.
+      const nextEngaging = nextInCombat || (target?.hostile === true && !target.dead);
+      if (nextEngaging !== engaging) {
+        preference = nextEngaging ? MOBILE_ACTION_MODE_COMBAT : MOBILE_ACTION_MODE_AUTO;
       }
+      engaging = nextEngaging;
       inCombat = nextInCombat;
       render();
     },

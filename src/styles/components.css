@@ -1031,6 +1031,9 @@
   #mobile-interact.qd-coach,
   #mobile-jump.qd-coach,
   #mobile-action-attack.qd-coach,
+  #mobile-action-mode.qd-coach,
+  #mobile-action-page-toggle.qd-coach,
+  #mobile-utility-page-toggle.qd-coach,
   #mobile-menu-anchor.qd-coach,
   .mobile-menu-item.qd-coach,
   .mobile-action-slot.qd-coach {

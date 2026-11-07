@@ -859,6 +859,12 @@
     --mobile-ring-toggle-size: calc(52px * var(--mobile-chrome-scale, 1));
     --mobile-ring-secondary-size: calc(56px * var(--mobile-chrome-scale, 1));
     --mobile-ring-hollow: calc(104px * var(--mobile-chrome-scale, 1));
+    /* How far the layout switch moves inward from the ring's attack centre
+       line so it clears the top-right minimap column (clock, compass, disc)
+       instead of sitting under it. The tiers whose height leaves no room for
+       the switch above the arc set this (see the compact and standard tier
+       blocks); tablet has room and keeps 0. */
+    --mobile-mode-inward-shift: 0px;
     position: absolute;
     right: max(18px, env(safe-area-inset-right));
     bottom: calc(20px + env(safe-area-inset-bottom));
@@ -947,9 +953,17 @@
     visibility: hidden;
     pointer-events: none;
   }
+  /* The layout switch: a Jump-sized circle above the fifth seat, wearing the
+     same swap-arrows glyph as the page toggle and the Combat/Utility caption
+     the painter already writes underneath. */
   body.mobile-touch #mobile-action-ring #mobile-action-mode {
-    --mobile-action-mode-width: calc(84px * var(--mobile-chrome-scale, 1));
-    right: calc(var(--mobile-ring-attack-size) / 2 - var(--mobile-action-mode-width) / 2);
+    right: calc(
+      var(--mobile-ring-attack-size) /
+      2 -
+      var(--mobile-ring-secondary-size) /
+      2 +
+      var(--mobile-mode-inward-shift, 0px)
+    );
     bottom: calc(
       var(--mobile-ring-attack-size) /
       2 +
@@ -958,13 +972,10 @@
       2 +
       10px
     );
-    width: var(--mobile-action-mode-width);
-    height: max(40px, calc(40px * var(--mobile-chrome-scale, 1)));
-    padding: 0 6px;
-    border-radius: 999px;
-    font-size: 11px;
-    line-height: 1;
-    white-space: nowrap;
+    width: var(--mobile-ring-secondary-size);
+    height: var(--mobile-ring-secondary-size);
+    color: var(--color-mobile-btn-warm);
+    border-color: var(--color-mobile-btn-warm-rim);
     z-index: 2;
   }
   /* Primary attack toggle: bottom-right anchor of the cluster, largest button. */
@@ -1141,13 +1152,15 @@
   }
   body.mobile-touch #mobile-target-cycle:active,
   body.mobile-touch #mobile-action-ring #mobile-interact:active,
-  body.mobile-touch #mobile-action-ring #mobile-jump:active {
+  body.mobile-touch #mobile-action-ring #mobile-jump:active,
+  body.mobile-touch #mobile-action-ring #mobile-action-mode:active {
     border-color: var(--gold);
     color: var(--color-white);
   }
   body.mobile-touch #mobile-target-cycle .ui-icon,
   body.mobile-touch #mobile-action-ring #mobile-interact .ui-icon,
-  body.mobile-touch #mobile-action-ring #mobile-jump .ui-icon {
+  body.mobile-touch #mobile-action-ring #mobile-jump .ui-icon,
+  body.mobile-touch #mobile-action-ring #mobile-action-mode .ui-icon {
     width: 22px;
     height: 22px;
   }
@@ -1157,7 +1170,8 @@
   }
   body.mobile-touch #mobile-target-cycle .mobile-label,
   body.mobile-touch #mobile-action-ring #mobile-interact .mobile-label,
-  body.mobile-touch #mobile-action-ring #mobile-jump .mobile-label {
+  body.mobile-touch #mobile-action-ring #mobile-jump .mobile-label,
+  body.mobile-touch #mobile-action-ring #mobile-action-mode .mobile-action-mode-label {
     display: block;
     margin-top: 1px;
     font-size: 8px;
@@ -4510,7 +4524,13 @@
     right: auto;
   }
   body.mobile-touch.mobile-left-handed #mobile-action-ring #mobile-action-mode {
-    left: calc(var(--mobile-ring-attack-size) / 2 - var(--mobile-action-mode-width) / 2);
+    left: calc(
+      var(--mobile-ring-attack-size) /
+      2 -
+      var(--mobile-ring-secondary-size) /
+      2 +
+      var(--mobile-mode-inward-shift, 0px)
+    );
     right: auto;
   }
   body.mobile-touch.mobile-left-handed #mobile-action-ring #mobile-jump {
@@ -9914,7 +9934,12 @@
      radius keeps the equal-chord arc rule: 160 * 2 * sin(11.25deg) = 62.4 =
      action-size 54 + an 8.4px edge gap. Every var also folds in the 0.85
      mobile-chrome-scale; the toggle (46 * 0.85 = 39.1) is clamped back to the 40px
-     touch floor with max(), and target/use (50 * 0.85 = 42.5) clear it. */
+     touch floor with max(), and target/use (50 * 0.85 = 42.5) clear it.
+     The layout switch also shifts inward here: the compact minimap column
+     (clock, compass, 0.57-scaled disc) is ~88px wide against the viewport's
+     right edge, and a short landscape phone leaves only ~40px between the
+     column's bottom and the arc's top, so the switch moves past the column's
+     left edge instead of sitting under the clock and compass. */
   body.mobile-touch.hud-mobile-compact #mobile-action-ring {
     --mobile-ring-attack-size: calc(84px * var(--mobile-chrome-scale, 1));
     --mobile-ring-action-size: var(--menu-btn-size);
@@ -9922,6 +9947,7 @@
     --mobile-ring-toggle-size: max(40px, calc(46px * var(--mobile-chrome-scale, 1)));
     --mobile-ring-secondary-size: calc(50px * var(--mobile-chrome-scale, 1));
     --mobile-ring-hollow: calc(88px * var(--mobile-chrome-scale, 1));
+    --mobile-mode-inward-shift: 62px;
     right: max(14px, env(safe-area-inset-right));
     bottom: calc(10px + env(safe-area-inset-bottom));
   }
@@ -10022,6 +10048,15 @@
     body.mobile-touch.hud-mobile-compact.mobile-left-handed #swingbar-offhand,
     body.mobile-touch.hud-mobile-compact.mobile-left-handed #pet-frame {
       left: calc(50% + 44px);
+    }
+  }
+  /* Standard at the short end of its height band (481-500px tall): the same
+     ~107px-wide minimap column leaves under 20px between its bottom and the
+     arc's top, so the switch shifts inward past the column's left edge only
+     there. Taller standard viewports keep it on the fifth seat's centre line. */
+  @media (max-height: 520px) {
+    body.mobile-touch.hud-mobile-standard #mobile-action-ring {
+      --mobile-mode-inward-shift: 73px;
     }
   }
   /* Tablet: a large viewport can afford a bigger, easier-to-hit cluster than

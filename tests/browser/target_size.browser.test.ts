@@ -154,13 +154,17 @@ describe('mobile target-size: in-game touch controls are >=40x40 in landscape', 
   });
 
   it.each([
-    { layout: 'standard', classes: [] },
-    { layout: 'compact', classes: ['hud-mobile-compact'] },
-    { layout: 'left-handed', classes: ['mobile-left-handed'] },
-    { layout: 'compact left-handed', classes: ['hud-mobile-compact', 'mobile-left-handed'] },
+    { layout: 'standard', classes: [], inwardShift: 0 },
+    { layout: 'compact', classes: ['hud-mobile-compact'], inwardShift: 62 },
+    { layout: 'left-handed', classes: ['mobile-left-handed'], inwardShift: 0 },
+    {
+      layout: 'compact left-handed',
+      classes: ['hud-mobile-compact', 'mobile-left-handed'],
+      inwardShift: 62,
+    },
   ])(
-    'keeps the mode switch directly above the utility fifth seat in $layout layout',
-    ({ classes }) => {
+    'seats the mode switch above the utility fifth seat in $layout layout, clear of the minimap column',
+    ({ classes, inwardShift }) => {
       document.body.classList.add(...classes);
       const ring = el('div', {
         id: 'mobile-action-ring',
@@ -191,12 +195,15 @@ describe('mobile target-size: in-game touch controls are >=40x40 in landscape', 
       const gap = shortcuts[4].getBoundingClientRect().top - mode.getBoundingClientRect().bottom;
       expect(gap, `mode-to-utility gap ${gap}px`).toBeGreaterThanOrEqual(0);
       expect(gap, `mode-to-utility gap ${gap}px`).toBeLessThanOrEqual(56);
-      expect(
-        mode.getBoundingClientRect().left + mode.getBoundingClientRect().width / 2,
-      ).toBeCloseTo(
-        shortcuts[4].getBoundingClientRect().left + shortcuts[4].getBoundingClientRect().width / 2,
-        0,
-      );
+      // The switch sits on the fifth seat's centre line wherever the minimap
+      // column leaves vertical room for it. On compact the column's bottom
+      // nearly touches the arc, so the switch shifts inward past the column
+      // instead; the expected centre carries that tier's shift.
+      const modeCenter = mode.getBoundingClientRect().left + mode.getBoundingClientRect().width / 2;
+      const seatCenter =
+        shortcuts[4].getBoundingClientRect().left + shortcuts[4].getBoundingClientRect().width / 2;
+      const inwardDirection = classes.includes('mobile-left-handed') ? 1 : -1;
+      expect(modeCenter).toBeCloseTo(seatCenter + inwardDirection * inwardShift, 0);
       const utilityFoodRect = shortcuts[4].getBoundingClientRect();
       const combatFoodRect = foodSeat.getBoundingClientRect();
       expect(utilityFoodRect.left).toBeCloseTo(combatFoodRect.left, 0);

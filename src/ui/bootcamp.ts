@@ -90,6 +90,7 @@ import {
   VEER_OFF_YD,
 } from './coach_prompt_view';
 import { tEntity } from './entity_i18n';
+import { mobileUtilityGlowTarget } from './hud/action_bar/mobile_action_surface_controller';
 import {
   panelLineDurationMs,
   routeSpeech,
@@ -515,26 +516,14 @@ export class BootcampOverlay {
     syncGlow('#mm-bag', () => ringEquip);
     syncGlow('#mm-char', () => this.ringPhase === 'admire');
 
-    // The visible ask's own mobile cluster button (coachGlowButtonId): the
-    // bubble shows the button's picture, the button itself pulses gold, and
-    // the two find each other (CX: the picture alone did not read).
-    syncGlow('#mobile-interact', () => this.promptButtonGlow === 'mobile-interact');
-    syncGlow('#mobile-jump', () => this.promptButtonGlow === 'mobile-jump');
-    syncGlow('#mobile-action-attack', () => this.promptButtonGlow === 'mobile-action-attack');
-    // The drill and caster kill asks: the primary ring slot (bar slot 1)
-    // whose art the bubble's chip repeats.
-    syncGlow(
-      '.mobile-action-slot[data-mobile-index="0"]',
-      () => this.promptButtonGlow === 'mobile-slot-primary',
-    );
-
     // Touch: the bags and the character sheet live behind the Quick Actions
     // strip, so the PATH glows, not just the destination (CX: "it is not
     // clear at all what I need to do"). The anchor pulses while a bag or
-    // sheet lesson waits and the strip is closed; the strip's own Bags or
-    // Character item pulses once it is open (a closed strip's items are
-    // unrendered, so the always-on want is harmless); the item's context
-    // menu row pulses once the bags are up and the menu is open.
+    // sheet lesson waits, the strip is closed, and the ring itself cannot
+    // carry the ask (another utility page, or the combat layout); the strip's
+    // own Bags or Character item pulses once it is open (a closed strip's
+    // items are unrendered, so the always-on want is harmless); the item's
+    // context menu row pulses once the bags are up and the menu is open.
     const touch = currentInputHintMode() === 'touch';
     const bagsEl = document.getElementById('bags');
     // bagsWindowShown, never a literal display compare: the bags open as
@@ -547,9 +536,61 @@ export class BootcampOverlay {
     const wantsChar = this.ringPhase === 'admire' && !charOpen;
     const anchorEl = document.getElementById('mobile-menu-anchor');
     const stripOpen = anchorEl?.getAttribute('aria-expanded') === 'true';
-    syncGlow('#mobile-menu-anchor', () => touch && (wantsBags || wantsChar) && !stripOpen);
-    syncGlow('#mobile-menu-bags', () => touch && wantsBags);
-    syncGlow('#mobile-menu-char', () => touch && wantsChar);
+
+    // The touch ring carries two layouts. A lesson about a combat control has
+    // to reach the combat layout first, so the layout switch itself pulses
+    // whenever the ring is showing the other one.
+    const ringSurface = touch
+      ? (document.getElementById('mobile-action-ring')?.dataset.actionSurface ?? null)
+      : null;
+    const onUtilityLayout = ringSurface === 'utility';
+    const wantsCombatControl =
+      this.promptButtonGlow === 'mobile-action-attack' ||
+      this.promptButtonGlow === 'mobile-slot-primary';
+    const modeGlows = touch && onUtilityLayout && wantsCombatControl;
+    // Bags and the character sheet are first-class shortcuts on the utility
+    // ring, so those asks point at the ring: the shortcut itself when its page
+    // is up, the layout switch in front of it while combat shows, and the page
+    // toggle when the shortcut waits on the other utility page. A build without
+    // the ring markup keeps the Quick Actions strip path.
+    const bagGlow = wantsBags ? mobileUtilityGlowTarget('bags') : null;
+    const charGlow = wantsChar ? mobileUtilityGlowTarget('char') : null;
+    const bagsViaQuickActions = touch && wantsBags && bagGlow === null;
+    const charViaQuickActions = touch && wantsChar && charGlow === null;
+
+    // The visible ask's own mobile cluster button (coachGlowButtonId): the
+    // bubble shows the button's picture, the button itself pulses gold, and
+    // the two find each other (CX: the picture alone did not read).
+    syncGlow('#mobile-interact', () => this.promptButtonGlow === 'mobile-interact');
+    syncGlow('#mobile-jump', () => this.promptButtonGlow === 'mobile-jump');
+    // On the utility layout the same data-mobile-index names a utility
+    // shortcut (Mount at index 0), so the combat asks move to the layout
+    // switch rather than lighting a shortcut that is not the lesson.
+    const modeEl = document.getElementById('mobile-action-mode');
+    const pageToggleEl = document.getElementById('mobile-utility-page-toggle');
+    syncGlowEl(modeEl, modeGlows || bagGlow === modeEl || charGlow === modeEl);
+    syncGlowEl(pageToggleEl, bagGlow === pageToggleEl || charGlow === pageToggleEl);
+    syncGlow(
+      '#mobile-utility-actions .mobile-utility-action',
+      (el) => el === bagGlow || el === charGlow,
+    );
+    syncGlow(
+      '#mobile-action-attack',
+      () => this.promptButtonGlow === 'mobile-action-attack' && !onUtilityLayout,
+    );
+    // The drill and caster kill asks: the primary ring slot (bar slot 1)
+    // whose art the bubble's chip repeats.
+    syncGlow(
+      '#mobile-action-ring .mobile-action-slot:not(.mobile-utility-action)[data-mobile-index="0"]',
+      () => this.promptButtonGlow === 'mobile-slot-primary' && !onUtilityLayout,
+    );
+
+    syncGlow(
+      '#mobile-menu-anchor',
+      () => touch && (charViaQuickActions || bagsViaQuickActions) && !stripOpen,
+    );
+    syncGlow('#mobile-menu-bags', () => bagsViaQuickActions);
+    syncGlow('#mobile-menu-char', () => charViaQuickActions);
     // The lesson item's own menu row (Use for the lure and the rite stone,
     // Equip for the pouch and the ring): the default row IS that verb.
     syncGlow(
@@ -642,7 +683,13 @@ export class BootcampOverlay {
     const objective = uiLesson ? null : this.currentObjectivePos();
     let plan: ObjectiveGlowPlan | null = null;
     if (uiLesson) {
-      plan = uiLessonGlow();
+      // On touch the ring answers a bag or sheet ask itself: the Bags shortcut
+      // (or the layout switch that reveals it) pulses gold right where the
+      // finger goes, so a full-width wash along the bottom edge is a second,
+      // vaguer cue pointing at nothing in particular. Desktop keeps it: the bag
+      // slots there really do line the bottom bar.
+      const ringAnswers = currentInputHintMode() === 'touch' && this.bagSheetLesson(world);
+      plan = ringAnswers ? null : uiLessonGlow();
     } else if (objective && p) {
       // Ask the renderer where the objective actually lands, so the cue
       // appears ONLY when it is genuinely off screen and points the way the
@@ -672,20 +719,26 @@ export class BootcampOverlay {
   }
 
   /** True while the coach is asking for a BAGS or CHARACTER-SHEET press: the
-   *  ring's two steps, and the pouch buckle-on. Both already pulse the menu
-   *  buttons and the bag stack; the edge glow joins them at the bottom
-   *  rather than pointing across the island at a turn-in NPC. */
+   *  ring's two steps, the pouch buckle-on, and the death lesson's rite stone.
+   *  All of them already pulse a control; on desktop the edge glow joins them
+   *  at the bottom rather than pointing across the island at a turn-in NPC. */
   private uiLesson(world: IWorld): boolean {
-    if (this.ringPhase !== null) return true;
+    if (this.bagSheetLesson(world)) return true;
     const focus = this.lastFocus;
-    // Only while the pouch is still in the bags: once it is socketed the
-    // lesson is over and the answer is the walk to the turn-in, not the row
-    // of buttons along the bottom (CX).
-    if (pouchLessonActive(focus, world.bags)) return true;
     // The death lesson's first beat is "open your bags and use the stone";
     // once they are dead or a ghost the answer is the death screen's own
     // buttons, which are also centre/bottom, so the bloom stays put.
     return focus?.questId === DEATH_LESSON_QUEST_ID && focus.state === 'active';
+  }
+
+  /** The bag/sheet half of uiLesson: the steps the touch ring answers with its
+   *  own Bags shortcut or the layout switch in front of it. */
+  private bagSheetLesson(world: IWorld): boolean {
+    if (this.ringPhase !== null) return true;
+    // Only while the pouch is still in the bags: once it is socketed the
+    // lesson is over and the answer is the walk to the turn-in, not the row
+    // of buttons along the bottom (CX).
+    return pouchLessonActive(this.lastFocus, world.bags);
   }
 
   /** Where the coach is currently pointing, or null when it points nowhere
@@ -1042,6 +1095,8 @@ export class BootcampOverlay {
       'mobile-interact',
       'mobile-jump',
       'mobile-action-attack',
+      'mobile-action-mode',
+      'mobile-utility-page-toggle',
       'mobile-menu-anchor',
       'mobile-menu-bags',
       'mobile-menu-char',
@@ -1208,18 +1263,24 @@ const GLOW_PULSE_MS = 900;
  *  keeps a recreated row's pulse continuous. */
 function syncGlow(selector: string, want: (el: HTMLElement) => boolean): void {
   for (const el of document.querySelectorAll<HTMLElement>(selector)) {
-    const on = want(el);
-    el.classList.toggle('qd-coach', on);
-    // Windows that repaint per frame (the quest tracker) recreate their rows,
-    // and a recreated node restarts the pulse animation from zero: a strobe,
-    // not a pulse. A negative delay seeded from the shared wall clock resumes
-    // every node mid-cycle, so the glow breathes continuously no matter how
-    // often its element is rebuilt.
-    if (on) {
-      el.style.animationDelay = `-${(performance.now() % GLOW_PULSE_MS).toFixed(0)}ms`;
-    } else if (el.style.animationDelay) {
-      el.style.animationDelay = '';
-    }
+    syncGlowEl(el, want(el));
+  }
+}
+
+/** The same toggle for one already-resolved element (the layout-aware ring
+ *  targets, which are picked by the DOM contract rather than a selector). */
+function syncGlowEl(el: HTMLElement | null, on: boolean): void {
+  if (!el) return;
+  el.classList.toggle('qd-coach', on);
+  // Windows that repaint per frame (the quest tracker) recreate their rows,
+  // and a recreated node restarts the pulse animation from zero: a strobe,
+  // not a pulse. A negative delay seeded from the shared wall clock resumes
+  // every node mid-cycle, so the glow breathes continuously no matter how
+  // often its element is rebuilt.
+  if (on) {
+    el.style.animationDelay = `-${(performance.now() % GLOW_PULSE_MS).toFixed(0)}ms`;
+  } else if (el.style.animationDelay) {
+    el.style.animationDelay = '';
   }
 }
 
