@@ -7351,6 +7351,7 @@ export const ko_KR: EnTranslations = {
       "dLine": "{seconds}초 뒤 발밑에 열립니다. 포털 B에서 떨어진 가장자리에 서세요.",
       "carryTitle": "얽힌 질풍을 나르는 중!",
       "carryLine": "각 포털은 짝으로 데려갑니다: A에서 B, C에서 D. 벼랑 가장자리에서 던지세요. {seconds}초 뒤 터집니다.",
+      "loosedLine": "The portal has loosed it. Throw it from the edge of the Cornice. It bursts in {seconds} sec.",
       "lipTitle": "지금 던지세요!",
       "lipLine": "가장자리에 서 있습니다. {seconds}초 뒤 터집니다.",
       "throwKey": "가장자리에서 {key}를 눌러 던지기",

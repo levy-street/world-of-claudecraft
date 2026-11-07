@@ -210,6 +210,10 @@ export const KNOT_HOP_TEXT = 'The portal tears you across the Cornice, gale and 
 /** The error a throw away from any gap reads (same matcher). */
 export const KNOT_NOT_AT_LIP_ERROR =
   'You must stand at the edge of the Cornice to throw the Knotted Gale.';
+/** The error a throw of a ball not yet carried through a portal reads (same
+ *  matcher). */
+export const KNOT_NOT_LOOSED_ERROR =
+  'The Knotted Gale clings to the Cornice: carry it through a portal before you throw it.';
 
 // ---- difficulty -----------------------------------------------------------------------
 
@@ -449,8 +453,13 @@ export const BREATH_TUNING = {
   /** How far below the Cornice a fallen body is dead for sure (yards). */
   voidDepth: 25,
   // Mythic: the Knotted Gale (breath_heart.ts).
-  /** A ball's fuse, and how long the marks run before their portals open. */
-  heartFuse: 20,
+  /** A ball's fuse, and how long the marks run before their portals open.
+   *  Jose's playtest of 2026-11-07: the carrier walks at half speed and the
+   *  fuse is halved, 20 s to 10 s. The portals open at 5 s, so a portal by
+   *  the ball and one at a lip throw it with about 4 s to spare; a portal
+   *  27 yd or more off the ball (an 8 s walk at half speed, after a 2 s run
+   *  to take it up) is the burst. */
+  heartFuse: 10,
   heartMark: 5,
   /** Phase 1: the first ball, the rest, at most this many; a start waits out
    *  the indrawn breath and any time too short for a whole fuse before it. */
@@ -460,16 +469,15 @@ export const BREATH_TUNING = {
   /** Phase 2 (two balls): seconds after the barrage, then this often. */
   heartStormFirst: 15,
   heartStormEvery: 60,
-  /** The carrier's walk. NOT Jose's "about half": at half speed the walk from
-   *  the farthest floor to a gap takes 9 s of a 20 s fuse and nobody needs a
-   *  portal (the Cornice is too small; tests/smith_heart_breath_heart.test.ts
-   *  pins the walk's length). A quarter makes a badly placed portal the burst
-   *  the design asks for. */
-  // The open rim (2026-11-03) brought every lip nearer: a fifth. At a fifth a
-  // ball dropped at heartFar crawled to a lip in 11 s of its 20 s fuse (phase
-  // 2's second ball above all: the storm has no tailwind), so no portal was
-  // needed (2026-11-04); a tenth makes the nearest drop a whole fuse's crawl.
-  heartWalkMult: 0.1,
+  /** The carrier's walk: half a run (Jose's call of 2026-11-07: a tenth read
+   *  as standing still). At half speed the Cornice is too small for the
+   *  fuse to force the portals (its deepest floor is 23 yd from a lip, a
+   *  6 s walk; the nearest drop, heartFar, a 4 s one), so the portals are
+   *  forced by the rule instead: a ball only goes over a lip once it has
+   *  been carried through a portal (BreathKnot.loosed;
+   *  tests/smith_heart_breath_heart.test.ts pins the walk's length). Before:
+   *  a tenth (2026-11-04), a fifth (2026-11-03), a quarter. */
+  heartWalkMult: 0.5,
   /** How near a ball a player takes it up, and a portal's mouth (yards). */
   heartPickR: 2.5,
   heartPortalR: 2.5,
@@ -486,8 +494,9 @@ export const BREATH_TUNING = {
   heartFar: 16,
   heartApart: 20,
   /** The carrier's walk with the wind at their back (facing within
-   *  `heartTailCone` degrees of where it blows): the load rides it a little. */
-  heartTailMult: 0.45,
+   *  `heartTailCone` degrees of where it blows): the load rides it a little
+   *  (above heartWalkMult, never below it). */
+  heartTailMult: 0.65,
   heartTailCone: 60,
 } as const;
 

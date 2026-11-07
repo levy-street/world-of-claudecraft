@@ -3,6 +3,7 @@
 // mechanic's objects and marks: the same fight state a player acts on.
 
 import { describe, expect, it } from 'vitest';
+import { knotFuseWarnDue } from '../src/game/smith_heart_breath_audio_core';
 import {
   burstLook,
   FLIGHT_LOOK,
@@ -15,6 +16,7 @@ import {
   HEART_SIDES,
   heartObjectKind,
   heartRungs,
+  KNOT_THROB_AT,
   knotLook,
   LINK_R,
   LINK_Y,
@@ -58,6 +60,13 @@ describe('Knotted Gale: the look', () => {
     expect(end.danger).toBe(1);
     expect(full.throb).toBe(0);
     expect(knotLook(1).throb).toBeGreaterThan(0);
+    // The 10 s fuse (2026-11-07): the throb and the fuse's warning wait for
+    // the last 3 s, never the portals opening at 5 s.
+    expect(KNOT_THROB_AT).toBe(3);
+    expect(knotLook(T.heartFuse - T.heartMark).throb).toBe(0);
+    expect(knotLook(KNOT_THROB_AT - 0.5).throb).toBeGreaterThan(0);
+    expect(knotFuseWarnDue(5.05, 4.95)).toBe(false);
+    expect(knotFuseWarnDue(3.05, 2.95)).toBe(true);
     let last = Number.POSITIVE_INFINITY;
     for (let f = T.heartFuse; f >= 0; f -= 1) {
       const r = knotLook(f).ringR;

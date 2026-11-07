@@ -5963,7 +5963,7 @@ export const hudChromeStrings = {
       portalD:
         'When this ends, Portal D opens exactly where you stand. It links to Portal C only. Stand at the edge of the Cornice, away from Portal B. You cannot carry the Knotted Gale this round.',
       laden:
-        'You carry a Knotted Gale: you walk at {walk}% speed, you cannot blink, charge or leap, and no wind, pull, blast or throw can move you. Each portal takes you to its partner: A to B, C to D. Press Interact at the edge of the Cornice to throw it into the void. When this ends it bursts and kills everyone on the Cornice.',
+        'You carry a Knotted Gale: you walk at {walk}% speed, you cannot blink, charge or leap, and no wind, pull, blast or throw can move you. Each portal takes you to its partner: A to B, C to D. Once you have carried it through a portal, press Interact at the edge of the Cornice to throw it into the void. When this ends it bursts and kills everyone on the Cornice.',
       wind: "The Guardian of the Breath's wind carries you {speed} yd a second the way it blows. Walk against it to hold your ground; it does not interrupt your casts. No wall stands round the Cornice: carried off its edge, you fall into the void. Only by the head of the climb does a wall still stand, and pressed against it you take {pinMin} to {pinMax} damage every second. Heroic and Mythic: {heroicMin} to {heroicMax} damage.",
       draw: 'The Guardian draws breath and pulls you toward it, {speed} yd a second. Its vortex deals {min} to {max} damage every {tick} sec to whoever stands before its mouth. Then Summit Roar deals {gustMin} to {gustMax} damage to everyone on the Cornice and throws them {throw} yd away from it ({heroicThrow} on Heroic): with the Guardian near the edge, that throws the raid off the Cornice. Heroic and Mythic: {heroicMin} to {heroicMax} and {heroicGustMin} to {heroicGustMax} damage respectively.',
       pinned:
@@ -10332,7 +10332,9 @@ export const hudChromeStrings = {
     dLine: 'It opens at your feet in {seconds} sec. Stand at the edge, away from Portal B.',
     carryTitle: 'You carry the Knotted Gale!',
     carryLine:
-      'Each portal takes you to its partner: A to B, C to D. Throw it from the edge of the Cornice. It bursts in {seconds} sec.',
+      'Walk it into a portal: each takes you to its partner, A to B, C to D. Only then can you throw it from the edge of the Cornice. It bursts in {seconds} sec.',
+    loosedLine:
+      'The portal has loosed it. Throw it from the edge of the Cornice. It bursts in {seconds} sec.',
     lipTitle: 'Throw it now!',
     lipLine: 'You stand at the edge. It bursts in {seconds} sec.',
     throwKey: 'Press {key} at the edge to throw',

@@ -152,6 +152,8 @@ export interface KnotLook {
 }
 
 const RING_START = 9;
+/** The fuse left (seconds) from which the ball throbs. */
+export const KNOT_THROB_AT = 3;
 
 /** The ball at `fuse` seconds left. */
 export function knotLook(fuse: number): KnotLook {
@@ -164,7 +166,9 @@ export function knotLook(fuse: number): KnotLook {
     spin: 1.2 + 7 * urge * urge,
     ringR: T.heartPickR + (RING_START - T.heartPickR) * left,
     danger: Math.max(0, Math.min(1, (urge - 0.5) * 2)),
-    throb: fuse < 5 ? 1 - fuse / 5 : 0,
+    // The last 3 s (since the fuse was halved to 10 s, 2026-11-07: 5 s throbbed
+    // from the moment the portals opened).
+    throb: fuse < KNOT_THROB_AT ? 1 - fuse / KNOT_THROB_AT : 0,
   };
 }
 

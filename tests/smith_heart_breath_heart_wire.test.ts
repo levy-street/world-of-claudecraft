@@ -134,6 +134,8 @@ describe('the Knotted Gale over the wire', () => {
       1,
     );
 
+    // Through a portal with the ball: loosed, and the mirrored load says so.
+    expect(mirror().auras.find((x: Any) => x.id === BREATH_AURAS.laden)?.value2).toBe(1);
     // The throw is the ordinary interact command; the round leaves the mirror.
     sim.interact(a.pid);
     run(0.2);
