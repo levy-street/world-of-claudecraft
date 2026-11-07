@@ -61,9 +61,9 @@ describe('mobile target-size: in-game touch controls are >=40x40 in landscape', 
     const interact = el('button', { id: 'mobile-interact' });
     ring.append(mode, interact);
     const utility = el('div', { id: 'mobile-utility-actions' });
-    const shortcuts = Array.from({ length: 4 }, (_, index) =>
+    const shortcuts = Array.from({ length: 5 }, (_, index) =>
       el('button', {
-        class: 'mobile-action-slot mobile-utility-action',
+        class: `mobile-action-slot mobile-utility-action${index === 4 ? ' mobile-ring-seat' : ''}`,
         'data-mobile-index': String(index),
       }),
     );
@@ -88,9 +88,9 @@ describe('mobile target-size: in-game touch controls are >=40x40 in landscape', 
     const interact = el('button', { id: 'mobile-interact' });
     ring.append(mode, interact);
     const utility = el('div', { id: 'mobile-utility-actions' });
-    const shortcuts = Array.from({ length: 4 }, (_, index) =>
+    const shortcuts = Array.from({ length: 5 }, (_, index) =>
       el('button', {
-        class: 'mobile-action-slot mobile-utility-action',
+        class: `mobile-action-slot mobile-utility-action${index === 4 ? ' mobile-ring-seat' : ''}`,
         'data-mobile-index': String(index),
       }),
     );
@@ -159,7 +159,7 @@ describe('mobile target-size: in-game touch controls are >=40x40 in landscape', 
     { layout: 'left-handed', classes: ['mobile-left-handed'] },
     { layout: 'compact left-handed', classes: ['hud-mobile-compact', 'mobile-left-handed'] },
   ])(
-    'keeps the mode switch directly above the shared Interact button in $layout layout',
+    'keeps the mode switch directly above the utility fifth seat in $layout layout',
     ({ classes }) => {
       document.body.classList.add(...classes);
       const ring = el('div', {
@@ -175,34 +175,41 @@ describe('mobile target-size: in-game touch controls are >=40x40 in landscape', 
       const attack = el('button', { id: 'mobile-action-attack' });
       const mode = el('button', { id: 'mobile-action-mode' });
       const interact = el('button', { id: 'mobile-interact' });
+      const foodSeat = el('button', { id: 'mobile-consumable-seat', class: 'mobile-ring-seat' });
       ring.append(...combatSlots, attack, mode, interact);
       const utility = el('div', { id: 'mobile-utility-actions' });
-      const shortcuts = Array.from({ length: 4 }, (_, index) =>
+      const shortcuts = Array.from({ length: 5 }, (_, index) =>
         el('button', {
-          class: 'mobile-action-slot mobile-utility-action',
+          class: `mobile-action-slot mobile-utility-action${index === 4 ? ' mobile-ring-seat' : ''}`,
           'data-mobile-index': String(index),
         }),
       );
       utility.append(...shortcuts);
-      ring.appendChild(utility);
+      ring.append(foodSeat, utility);
       document.body.append(ring);
 
-      const gap = interact.getBoundingClientRect().top - mode.getBoundingClientRect().bottom;
+      const gap = shortcuts[4].getBoundingClientRect().top - mode.getBoundingClientRect().bottom;
       expect(gap, `mode-to-utility gap ${gap}px`).toBeGreaterThanOrEqual(0);
       expect(gap, `mode-to-utility gap ${gap}px`).toBeLessThanOrEqual(56);
       expect(
         mode.getBoundingClientRect().left + mode.getBoundingClientRect().width / 2,
       ).toBeCloseTo(
-        interact.getBoundingClientRect().left + interact.getBoundingClientRect().width / 2,
+        shortcuts[4].getBoundingClientRect().left + shortcuts[4].getBoundingClientRect().width / 2,
         0,
       );
+      const utilityFoodRect = shortcuts[4].getBoundingClientRect();
+      const combatFoodRect = foodSeat.getBoundingClientRect();
+      expect(utilityFoodRect.left).toBeCloseTo(combatFoodRect.left, 0);
+      expect(utilityFoodRect.top).toBeCloseTo(combatFoodRect.top, 0);
+      expect(utilityFoodRect.width).toBeCloseTo(combatFoodRect.width, 0);
+      expect(utilityFoodRect.height).toBeCloseTo(combatFoodRect.height, 0);
       const attackRect = attack.getBoundingClientRect();
       const interactRect = interact.getBoundingClientRect();
       expect(interactRect.left).toBeCloseTo(attackRect.left, 0);
       expect(interactRect.top).toBeCloseTo(attackRect.top, 0);
       expect(interactRect.width).toBeCloseTo(attackRect.width, 0);
       expect(interactRect.height).toBeCloseTo(attackRect.height, 0);
-      for (let index = 0; index < shortcuts.length; index++) {
+      for (let index = 0; index < combatSlots.length; index++) {
         const combatRect = combatSlots[index].getBoundingClientRect();
         const utilityRect = shortcuts[index].getBoundingClientRect();
         expect(utilityRect.left, `utility slot ${index} left`).toBeCloseTo(combatRect.left, 0);
@@ -229,13 +236,46 @@ describe('mobile target-size: in-game touch controls are >=40x40 in landscape', 
     const targetCycle = el('button', { id: 'mobile-target-cycle' });
     const interact = el('button', { id: 'mobile-interact' });
     const toggle = el('button', { id: 'mobile-action-page-toggle' });
-    ring.append(slot, attack, targetCycle, interact, toggle);
+    const utilityToggle = el('button', { id: 'mobile-utility-page-toggle' });
+    ring.append(slot, attack, targetCycle, interact, toggle, utilityToggle);
     document.body.appendChild(ring);
     expectAtLeastFloor(slot, '.mobile-action-slot');
     expectAtLeastFloor(attack, '#mobile-action-attack');
     expectAtLeastFloor(targetCycle, '#mobile-target-cycle');
     expectAtLeastFloor(interact, '#mobile-interact');
     expectAtLeastFloor(toggle, '#mobile-action-page-toggle');
+    expectAtLeastFloor(utilityToggle, '#mobile-utility-page-toggle');
+    expect(measure(utilityToggle)).toEqual(measure(toggle));
+    expect(utilityToggle.getBoundingClientRect().left).toBeCloseTo(
+      toggle.getBoundingClientRect().left,
+      0,
+    );
+    expect(utilityToggle.getBoundingClientRect().top).toBeCloseTo(
+      toggle.getBoundingClientRect().top,
+      0,
+    );
+  });
+
+  it('keeps Jump available at the same ring seat in utility and combat layouts', () => {
+    const ring = el('div', {
+      id: 'mobile-action-ring',
+      'data-action-surface': 'utility',
+    });
+    const jump = el('button', { id: 'mobile-jump' });
+    ring.append(jump);
+    document.body.append(ring);
+
+    expect(getComputedStyle(jump).visibility).toBe('visible');
+    expect(getComputedStyle(jump).pointerEvents).not.toBe('none');
+    expectAtLeastFloor(jump, 'utility #mobile-jump');
+    const utilityRect = jump.getBoundingClientRect();
+
+    ring.dataset.actionSurface = 'combat';
+    const combatRect = jump.getBoundingClientRect();
+    expect(combatRect.left).toBeCloseTo(utilityRect.left, 0);
+    expect(combatRect.top).toBeCloseTo(utilityRect.top, 0);
+    expect(combatRect.width).toBeCloseTo(utilityRect.width, 0);
+    expect(combatRect.height).toBeCloseTo(utilityRect.height, 0);
   });
 
   it('the compact-tier ring keeps every control at the floor (smallest sizes)', () => {
@@ -250,13 +290,24 @@ describe('mobile target-size: in-game touch controls are >=40x40 in landscape', 
     const targetCycle = el('button', { id: 'mobile-target-cycle' });
     const interact = el('button', { id: 'mobile-interact' });
     const toggle = el('button', { id: 'mobile-action-page-toggle' });
-    ring.append(slot, attack, targetCycle, interact, toggle);
+    const utilityToggle = el('button', { id: 'mobile-utility-page-toggle' });
+    ring.append(slot, attack, targetCycle, interact, toggle, utilityToggle);
     document.body.appendChild(ring);
     expectAtLeastFloor(slot, 'compact .mobile-action-slot');
     expectAtLeastFloor(attack, 'compact #mobile-action-attack');
     expectAtLeastFloor(targetCycle, 'compact #mobile-target-cycle');
     expectAtLeastFloor(interact, 'compact #mobile-interact');
     expectAtLeastFloor(toggle, 'compact #mobile-action-page-toggle');
+    expectAtLeastFloor(utilityToggle, 'compact #mobile-utility-page-toggle');
+    expect(measure(utilityToggle)).toEqual(measure(toggle));
+    expect(utilityToggle.getBoundingClientRect().left).toBeCloseTo(
+      toggle.getBoundingClientRect().left,
+      0,
+    );
+    expect(utilityToggle.getBoundingClientRect().top).toBeCloseTo(
+      toggle.getBoundingClientRect().top,
+      0,
+    );
   });
 
   it('the compact-tier tracker count chip: a 24px visual whose ::after hit extension is LIVE on all four sides', () => {

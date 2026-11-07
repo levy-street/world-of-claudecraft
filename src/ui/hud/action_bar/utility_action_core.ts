@@ -11,7 +11,14 @@ export const MOBILE_UTILITY_ACTION_IDS = [
   'more',
 ] as const;
 
-export type MobileUtilityActionId = (typeof MOBILE_UTILITY_ACTION_IDS)[number];
+export type MobileUtilityActionId =
+  | (typeof MOBILE_UTILITY_ACTION_IDS)[number]
+  | 'dfinder'
+  | 'crafting';
 
-export const MOBILE_UTILITY_ACTION_SLOT_COUNT = 4;
-export const DEFAULT_MOBILE_UTILITY_ACTIONS = ['mount', 'map', 'chat', 'bags'] as const;
+export const MOBILE_UTILITY_ACTION_SLOT_COUNT = 5;
+export const MOBILE_UTILITY_ACTION_PAGES = [
+  ['mount', 'map', 'bags', 'char', 'quest'],
+  ['chat', 'social', 'dfinder', 'spellbook', 'crafting'],
+] as const satisfies readonly (readonly MobileUtilityActionId[])[];
+export const DEFAULT_MOBILE_UTILITY_ACTIONS = MOBILE_UTILITY_ACTION_PAGES[0];

@@ -1,25 +1,29 @@
 export const MOBILE_ACTION_MODE_AUTO = 'auto' as const;
 export const MOBILE_ACTION_MODE_COMBAT = 'combat' as const;
+export const MOBILE_ACTION_MODE_UTILITY = 'utility' as const;
 
 export type MobileActionModePreference =
   | typeof MOBILE_ACTION_MODE_AUTO
-  | typeof MOBILE_ACTION_MODE_COMBAT;
+  | typeof MOBILE_ACTION_MODE_COMBAT
+  | typeof MOBILE_ACTION_MODE_UTILITY;
 export type MobileActionSurface = 'combat' | 'utility';
 
-/** Active combat always wins; otherwise the explicit combat pin overrides the
- *  default utility surface. Target selection is intentionally not an input. */
+/** Explicit layout choices override automatic combat detection. */
 export function resolveMobileActionSurface(
   inCombat: boolean,
   preference: MobileActionModePreference,
 ): MobileActionSurface {
-  return inCombat || preference === MOBILE_ACTION_MODE_COMBAT ? 'combat' : 'utility';
+  if (preference === MOBILE_ACTION_MODE_COMBAT) return 'combat';
+  if (preference === MOBILE_ACTION_MODE_UTILITY) return 'utility';
+  return inCombat ? 'combat' : 'utility';
 }
 
-/** Toggle between automatic mode and a combat UI pin. */
+/** Switch to the opposite of the currently displayed action layout. */
 export function mobileActionModeAfterToggle(
   preference: MobileActionModePreference,
+  inCombat: boolean,
 ): MobileActionModePreference {
-  return preference === MOBILE_ACTION_MODE_AUTO
-    ? MOBILE_ACTION_MODE_COMBAT
-    : MOBILE_ACTION_MODE_AUTO;
+  return resolveMobileActionSurface(inCombat, preference) === 'combat'
+    ? MOBILE_ACTION_MODE_UTILITY
+    : MOBILE_ACTION_MODE_COMBAT;
 }

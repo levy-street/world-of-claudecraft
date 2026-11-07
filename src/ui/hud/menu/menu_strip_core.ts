@@ -17,7 +17,6 @@
 // Chat follows it, the action a player reaches for mid-session more than the rest
 // and the one the control's own tap used to run.
 
-import type { MobileUtilityActionId } from '../action_bar/utility_action_core';
 import type { TranslationKey } from '../../i18n';
 import {
   STRIP_CAPTION_HALF_PX,
@@ -28,6 +27,7 @@ import {
   stripCancelIsLive,
   stripCaptionCenterX,
 } from '../action_bar/radial_action_core';
+import type { MobileUtilityActionId } from '../action_bar/utility_action_core';
 
 /** The strip roster's stable ids. Order is load-bearing (it IS the row order). */
 export type MenuActionId = MobileUtilityActionId;

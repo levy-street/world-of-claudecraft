@@ -930,25 +930,34 @@
     width: 100%;
     height: 100%;
   }
-  body.mobile-touch #mobile-action-ring[data-action-surface="utility"] > .mobile-action-slot:not(.mobile-utility-action),
+  body.mobile-touch
+    #mobile-action-ring[data-action-surface="utility"]
+    > .mobile-action-slot:not(.mobile-utility-action),
   body.mobile-touch #mobile-action-ring[data-action-surface="utility"] #mobile-action-attack,
   body.mobile-touch #mobile-action-ring[data-action-surface="utility"] #mobile-target-cycle,
-  body.mobile-touch #mobile-action-ring[data-action-surface="utility"] #mobile-jump,
   body.mobile-touch #mobile-action-ring[data-action-surface="utility"] #mobile-consumable-seat,
   body.mobile-touch #mobile-action-ring[data-action-surface="utility"] #mobile-action-page-toggle,
   body.mobile-touch #mobile-action-ring[data-action-surface="utility"] #mobile-stance-anchor {
     visibility: hidden;
     pointer-events: none;
   }
+  body.mobile-touch
+    #mobile-action-ring:not([data-action-surface="utility"])
+    #mobile-utility-page-toggle {
+    visibility: hidden;
+    pointer-events: none;
+  }
   body.mobile-touch #mobile-action-ring #mobile-action-mode {
     --mobile-action-mode-width: calc(84px * var(--mobile-chrome-scale, 1));
-    right: calc(
+    right: calc(var(--mobile-ring-attack-size) / 2 - var(--mobile-action-mode-width) / 2);
+    bottom: calc(
       var(--mobile-ring-attack-size) /
-      2 -
-      var(--mobile-action-mode-width) /
-      2
+      2 +
+      var(--mobile-ring-radius) +
+      var(--mobile-ring-action-size) /
+      2 +
+      10px
     );
-    bottom: calc(var(--mobile-ring-attack-size) + 10px);
     width: var(--mobile-action-mode-width);
     height: max(40px, calc(40px * var(--mobile-chrome-scale, 1)));
     padding: 0 6px;
@@ -1043,10 +1052,9 @@
     );
   }
   /* The arc's fifth seat (90deg, due up over the attack button) holds the
-     consumables control: it shows the first carried consumable, a tap uses it,
-     and a hold or a leftward swipe opens the row below. It sizes off the same
-     --menu-btn-size as the four action seats, so the arc's equal-chord spacing
-     is unchanged; the radial ring itself is the four seats below it. */
+     consumables control in combat and the fifth action on either utility page.
+     Its size and position are shared by both controls, and the mode switch sits
+     above it. */
   body.mobile-touch .mobile-ring-seat {
     width: var(--menu-btn-size);
     height: var(--menu-btn-size);
@@ -1156,7 +1164,7 @@
     font-family: var(--ui-font);
     color: var(--color-mobile-btn-caption);
   }
-  /* Page-cycle toggle: the gold swap badge at the hollow trio's 90deg seat
+  /* Page-cycle toggles: the active layout's gold swap badge uses the hollow trio's 90deg seat
      (due up over the attack centre on the --mobile-ring-hollow circle, to the
      Target button's upper right), spaced a full 45deg chord off Target and
      clear of the arc's top button so a page flip never fat-fingers a cast.
@@ -1184,6 +1192,22 @@
        garbled multi-line stack instead of clipping. */
     overflow: hidden;
   }
+  body.mobile-touch #mobile-utility-page-toggle {
+    right: calc(var(--mobile-ring-attack-size) / 2 - var(--mobile-ring-toggle-size) / 2);
+    bottom: calc(
+      var(--mobile-ring-attack-size) /
+      2 +
+      var(--mobile-ring-hollow) -
+      var(--mobile-ring-toggle-size) /
+      2
+    );
+    width: var(--mobile-ring-toggle-size);
+    height: var(--mobile-ring-toggle-size);
+    font-family: var(--ui-font);
+    color: var(--color-mobile-btn-warm);
+    border-color: var(--color-mobile-btn-warm-rim);
+    overflow: hidden;
+  }
   body.mobile-touch #mobile-action-page-toggle .mobile-action-page-indicator {
     font-size: 20px;
     font-weight: bold;
@@ -1197,6 +1221,16 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
+  body.mobile-touch #mobile-utility-page-toggle .mobile-action-page-indicator {
+    font-size: 20px;
+    font-weight: bold;
+    line-height: 1;
+    text-shadow: var(--title-shadow);
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
   body.mobile-touch #mobile-action-page-toggle .ui-icon {
     order: 2;
     width: 15px;
@@ -1204,7 +1238,18 @@
     margin-top: 2px;
     color: var(--color-mobile-btn-caption);
   }
+  body.mobile-touch #mobile-utility-page-toggle .ui-icon {
+    order: 2;
+    width: 15px;
+    height: 15px;
+    margin-top: 2px;
+    color: var(--color-mobile-btn-caption);
+  }
   body.mobile-touch #mobile-action-page-toggle:active {
+    border-color: var(--gold);
+    color: var(--color-white);
+  }
+  body.mobile-touch #mobile-utility-page-toggle:active {
     border-color: var(--gold);
     color: var(--color-white);
   }
@@ -4430,6 +4475,10 @@
     left: calc(var(--mobile-ring-attack-size) / 2 - var(--mobile-ring-toggle-size) / 2);
     right: auto;
   }
+  body.mobile-touch.mobile-left-handed #mobile-utility-page-toggle {
+    left: calc(var(--mobile-ring-attack-size) / 2 - var(--mobile-ring-toggle-size) / 2);
+    right: auto;
+  }
   /* Target swap and Use keep their crescent-hollow seats, mirrored with the
      ring (same cos factors as their right-handed rules: 0.7071 for Target at
      135deg, due left for Use at 180deg). */
@@ -4454,17 +4503,14 @@
     );
     right: auto;
   }
-  body.mobile-touch.mobile-left-handed #mobile-action-ring[data-action-surface="utility"] #mobile-interact {
+  body.mobile-touch.mobile-left-handed
+    #mobile-action-ring[data-action-surface="utility"]
+    #mobile-interact {
     left: 0;
     right: auto;
   }
   body.mobile-touch.mobile-left-handed #mobile-action-ring #mobile-action-mode {
-    left: calc(
-      var(--mobile-ring-attack-size) /
-      2 -
-      var(--mobile-action-mode-width) /
-      2
-    );
+    left: calc(var(--mobile-ring-attack-size) / 2 - var(--mobile-action-mode-width) / 2);
     right: auto;
   }
   body.mobile-touch.mobile-left-handed #mobile-action-ring #mobile-jump {
@@ -9897,6 +9943,9 @@
      clipped the digit's top pixels instead of showing it in full. Shrink the
      digit to fit the compact floor with room to spare. */
   body.mobile-touch.hud-mobile-compact #mobile-action-page-toggle .mobile-action-page-indicator {
+    font-size: 15px;
+  }
+  body.mobile-touch.hud-mobile-compact #mobile-utility-page-toggle .mobile-action-page-indicator {
     font-size: 15px;
   }
   body.mobile-touch.hud-mobile-compact.mobile-left-handed #mobile-action-ring {

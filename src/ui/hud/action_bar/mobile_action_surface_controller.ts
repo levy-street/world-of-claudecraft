@@ -1,19 +1,21 @@
-import type { TranslationKey } from '../../i18n';
+import type { InterpolationValues, TranslationKey } from '../../i18n';
 import type { PainterHostWriters } from '../../painter_host';
 import { bindTouchTap } from '../../touch_tap';
 import { hydrateIcons } from '../../ui_icons';
 import { MENU_STRIP_ITEMS } from '../menu/menu_strip_core';
 import {
   MOBILE_ACTION_MODE_AUTO,
+  MOBILE_ACTION_MODE_COMBAT,
   type MobileActionModePreference,
   mobileActionModeAfterToggle,
+  resolveMobileActionSurface,
 } from './mobile_action_mode_core';
 import {
   type MobileActionSurfaceElements,
   MobileActionSurfacePainter,
 } from './mobile_action_surface_painter';
 import {
-  DEFAULT_MOBILE_UTILITY_ACTIONS,
+  MOBILE_UTILITY_ACTION_PAGES,
   MOBILE_UTILITY_ACTION_SLOT_COUNT,
   type MobileUtilityActionId,
 } from './utility_action_core';
@@ -21,13 +23,19 @@ import {
 const RING_ID = 'mobile-action-ring';
 const UTILITY_ID = 'mobile-utility-actions';
 const MODE_ID = 'mobile-action-mode';
+const UTILITY_PAGE_TOGGLE_ID = 'mobile-utility-page-toggle';
 const MODE_LABEL_SELECTOR = '.mobile-action-mode-label';
+const PAGE_INDICATOR_SELECTOR = '.mobile-action-page-indicator';
 const UTILITY_BUTTON_SELECTOR = '.mobile-utility-action';
 const UTILITY_SLOT_DATASET = 'utilitySlot';
+const ADDITIONAL_UTILITY_ACTIONS = [
+  { id: 'dfinder', elementId: 'mobile-dfinder' },
+  { id: 'crafting', elementId: 'mobile-crafting' },
+] as const satisfies readonly { id: MobileUtilityActionId; elementId: string }[];
 
 export interface MobileActionSurfaceDeps {
   writers: PainterHostWriters;
-  t(key: TranslationKey): string;
+  t(key: TranslationKey, values?: InterpolationValues): string;
   consumePeekGuard(): boolean;
   hideTooltip(): void;
   clickSfx(): void;
@@ -39,7 +47,7 @@ export interface MobileActionSurface {
   relocalize(): void;
 }
 
-/** Builds the touch-only utility shortcuts and the automatic/combat mode switch. */
+/** Builds touch-only utility shortcuts, page switching, and the combat mode switch. */
 export function buildMobileActionSurface(
   deps: MobileActionSurfaceDeps,
 ): MobileActionSurface | null {
@@ -47,6 +55,11 @@ export function buildMobileActionSurface(
   const utility = ring?.querySelector<HTMLElement>(`#${UTILITY_ID}`) ?? null;
   const modeButton = document.getElementById(MODE_ID) as HTMLButtonElement | null;
   const modeLabel = modeButton?.querySelector<HTMLElement>(MODE_LABEL_SELECTOR) ?? null;
+  const utilityPageButton = document.getElementById(
+    UTILITY_PAGE_TOGGLE_ID,
+  ) as HTMLButtonElement | null;
+  const utilityPageIndicator =
+    utilityPageButton?.querySelector<HTMLElement>(PAGE_INDICATOR_SELECTOR) ?? null;
   const utilityButtons = Array.from(
     document.querySelectorAll<HTMLButtonElement>(UTILITY_BUTTON_SELECTOR),
   ).sort(
@@ -59,6 +72,9 @@ export function buildMobileActionSurface(
     !modeButton ||
     !ring.contains(modeButton) ||
     !modeLabel ||
+    !utilityPageButton ||
+    !ring.contains(utilityPageButton) ||
+    !utilityPageIndicator ||
     utilityButtons.length !== MOBILE_UTILITY_ACTION_SLOT_COUNT
   ) {
     return null;
@@ -72,16 +88,23 @@ export function buildMobileActionSurface(
     ring,
     modeButton,
     modeLabel,
+    utilityPageButton,
+    utilityPageIndicator,
     utilityButtons: utilityButtons.map((button) => ({
       button,
     })),
   };
   if (elements.utilityButtons.length !== MOBILE_UTILITY_ACTION_SLOT_COUNT) return null;
-  const actions = DEFAULT_MOBILE_UTILITY_ACTIONS;
   const targets = new Map(
     MENU_STRIP_ITEMS.map((item) => [item.id, document.getElementById(item.elementId)] as const),
   );
+  for (const { id, elementId } of ADDITIONAL_UTILITY_ACTIONS) {
+    targets.set(id, document.getElementById(elementId));
+  }
   if (MENU_STRIP_ITEMS.some((item) => targets.get(item.id) === null)) return null;
+  if (MOBILE_UTILITY_ACTION_PAGES.some((page) => page.some((actionId) => !targets.get(actionId)))) {
+    return null;
+  }
   const syncIcon = (index: number, actionId: MobileUtilityActionId): void => {
     const slot = utilityIconSlots[index];
     if (!slot) return;
@@ -95,23 +118,27 @@ export function buildMobileActionSurface(
     slot.dataset.icon = icon;
     hydrateIcons(utilityButtons[index]);
   };
-  actions.forEach((actionId, index) => {
-    syncIcon(index, actionId);
-  });
 
   const painter = new MobileActionSurfacePainter({ writers: deps.writers, elements, t: deps.t });
   let preference: MobileActionModePreference = MOBILE_ACTION_MODE_AUTO;
   let inCombat = false;
+  let utilityPage = 0;
   let playerId: number | null = null;
   let visibleSurface: 'combat' | 'utility' | null = null;
 
+  const renderUtilityPage = (): void => {
+    MOBILE_UTILITY_ACTION_PAGES[utilityPage].forEach((actionId, index) => {
+      syncIcon(index, actionId);
+    });
+    painter.paint(inCombat, preference, utilityPage);
+  };
   const render = (): void => {
-    const surface = inCombat || preference !== MOBILE_ACTION_MODE_AUTO ? 'combat' : 'utility';
+    const surface = resolveMobileActionSurface(inCombat, preference);
     if (surface !== visibleSurface) {
       visibleSurface = surface;
       if (surface === 'utility') deps.showUtilitySurface?.();
     }
-    painter.paint(inCombat, preference);
+    renderUtilityPage();
   };
   bindTouchTap(modeButton, () => {
     if (deps.consumePeekGuard()) {
@@ -120,9 +147,21 @@ export function buildMobileActionSurface(
     }
     deps.hideTooltip();
     deps.clickSfx();
-    preference = mobileActionModeAfterToggle(preference);
+    preference = mobileActionModeAfterToggle(preference, inCombat);
     render();
     modeButton.blur();
+  });
+
+  bindTouchTap(utilityPageButton, () => {
+    if (deps.consumePeekGuard()) {
+      deps.hideTooltip();
+      return;
+    }
+    deps.hideTooltip();
+    deps.clickSfx();
+    utilityPage = (utilityPage + 1) % MOBILE_UTILITY_ACTION_PAGES.length;
+    renderUtilityPage();
+    utilityPageButton.blur();
   });
 
   elements.utilityButtons.forEach(({ button }, index) => {
@@ -131,7 +170,7 @@ export function buildMobileActionSurface(
         deps.hideTooltip();
         return;
       }
-      const actionId = actions[index];
+      const actionId = MOBILE_UTILITY_ACTION_PAGES[utilityPage][index];
       deps.hideTooltip();
       targets.get(actionId)?.click();
       button.blur();
@@ -143,12 +182,17 @@ export function buildMobileActionSurface(
       if (playerId !== nextPlayerId) {
         playerId = nextPlayerId;
         preference = MOBILE_ACTION_MODE_AUTO;
+        utilityPage = 0;
+        inCombat = false;
+      }
+      if (nextInCombat !== inCombat) {
+        preference = nextInCombat ? MOBILE_ACTION_MODE_COMBAT : MOBILE_ACTION_MODE_AUTO;
       }
       inCombat = nextInCombat;
       render();
     },
     relocalize(): void {
-      painter.relocalize(inCombat, preference);
+      painter.relocalize(inCombat, preference, utilityPage);
     },
   };
 }

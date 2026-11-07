@@ -28,25 +28,28 @@ beforeEach(() => {
     <div id="mobile-action-surface">
       <div id="mobile-action-ring">
         <button id="mobile-action-mode"><span class="mobile-action-mode-label"></span></button>
+        <button id="mobile-utility-page-toggle"><span class="mobile-action-page-indicator"></span></button>
         <div id="mobile-utility-actions">
         ${Array.from(
-          { length: 4 },
+          { length: 5 },
           (_, slot) =>
-            `<button class="mobile-action-slot mobile-utility-action" data-mobile-index="${slot}" data-utility-slot="${slot}"><span class="mobile-utility-icon" data-icon="${['mount', 'map', 'chat', 'bags'][slot]}"></span></button>`,
+            `<button class="mobile-action-slot mobile-utility-action${slot === 4 ? ' mobile-ring-seat' : ''}" data-mobile-index="${slot}" data-utility-slot="${slot}"><span class="mobile-utility-icon"></span></button>`,
         ).join('')}
         </div>
       </div>
     </div>
     ${MENU_STRIP_ITEMS.map(
       ({ elementId, id }) =>
-        `<button id="${elementId}" data-icon="${{ mount: 'mount', chat: 'chat', map: 'map', bags: 'bags', social: 'social', quest: 'questlog', char: 'character', spellbook: 'spellbook', settings: 'menu', more: 'more' }[id]}"></button>`,
+        `<button id="${elementId}" data-icon="${{ mount: 'mount', chat: 'chat', map: 'map', bags: 'bags', social: 'social', quest: 'questlog', char: 'character', spellbook: 'spellbook', settings: 'menu', more: 'more', dfinder: 'dfinder', crafting: 'crafting' }[id]}"></button>`,
     ).join('')}
+    <button id="mobile-dfinder" data-icon="dfinder"></button>
+    <button id="mobile-crafting" data-icon="crafting"></button>
   `;
   hydrateIcons(document);
 });
 
 describe('mobile action surface controller', () => {
-  it('switches between surfaces and routes each default shortcut once', () => {
+  it('switches between surfaces and routes both utility pages through existing buttons', () => {
     const calls = new Map<string, number>();
     const showUtilitySurface = vi.fn();
     for (const { id, elementId } of MENU_STRIP_ITEMS) {
@@ -54,9 +57,15 @@ describe('mobile action surface controller', () => {
         calls.set(id, (calls.get(id) ?? 0) + 1);
       });
     }
+    for (const id of ['dfinder', 'crafting']) {
+      document.getElementById(`mobile-${id}`)?.addEventListener('click', () => {
+        calls.set(id, (calls.get(id) ?? 0) + 1);
+      });
+    }
     const controller = buildMobileActionSurface({
       writers,
-      t: (key) => key,
+      t: (key, values) =>
+        key === 'hudChrome.mobile.actionPageIndicator' ? `${values?.page}/${values?.count}` : key,
       consumePeekGuard: vi.fn(),
       hideTooltip: vi.fn(),
       clickSfx: vi.fn(),
@@ -69,21 +78,63 @@ describe('mobile action surface controller', () => {
     expect(document.getElementById('mobile-action-ring')?.dataset.actionSurface).toBe('utility');
     expect(showUtilitySurface).toHaveBeenCalledTimes(1);
     expect(
+      document.querySelector('#mobile-utility-page-toggle .mobile-action-page-indicator')
+        ?.textContent,
+    ).toBe('1/2');
+    expect(
       Array.from(document.querySelectorAll<HTMLButtonElement>('.mobile-utility-action'), (button) =>
         button.getAttribute('aria-label'),
       ),
     ).toEqual([
       'hudChrome.mounts.mount',
       'hud.core.mobileMap',
-      'hud.core.mobileChat',
       'hud.keybinds.actions.bags',
+      'hud.keybinds.actions.char',
+      'questUi.tracker.title',
     ]);
     expect(document.querySelector('.mobile-utility-action .mobile-label')).toBeNull();
 
     for (const button of document.querySelectorAll<HTMLButtonElement>('.mobile-utility-action')) {
       button.click();
     }
-    expect([...calls.values()]).toEqual([1, 1, 1, 1]);
+    expect([...calls.values()]).toEqual([1, 1, 1, 1, 1]);
+
+    const pageToggle = document.getElementById('mobile-utility-page-toggle') as HTMLButtonElement;
+    pageToggle.click();
+    expect(
+      document.querySelector('#mobile-utility-page-toggle .mobile-action-page-indicator')
+        ?.textContent,
+    ).toBe('2/2');
+    expect(
+      Array.from(
+        document.querySelectorAll<HTMLElement>('.mobile-utility-icon'),
+        (icon) => icon.dataset.icon,
+      ),
+    ).toEqual(['chat', 'social', 'dfinder', 'spellbook', 'crafting']);
+    expect(
+      Array.from(document.querySelectorAll<HTMLButtonElement>('.mobile-utility-action'), (button) =>
+        button.getAttribute('aria-label'),
+      ),
+    ).toEqual([
+      'hud.core.mobileChat',
+      'hud.core.mobileSocial',
+      'hudChrome.finder.title',
+      'abilityUi.spellbook.title',
+      'hudChrome.crafting.title',
+    ]);
+    for (const button of document.querySelectorAll<HTMLButtonElement>('.mobile-utility-action')) {
+      button.click();
+    }
+    expect([...calls.values()]).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+
+    pageToggle.click();
+    expect(
+      Array.from(
+        document.querySelectorAll<HTMLElement>('.mobile-utility-icon'),
+        (icon) => icon.dataset.icon,
+      ),
+    ).toEqual(['mount', 'map', 'bags', 'character', 'questlog']);
+    expect([...calls.values()]).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
 
     controller?.update(true, 1);
     expect(document.getElementById('mobile-action-ring')?.dataset.actionSurface).toBe('combat');
@@ -94,8 +145,8 @@ describe('mobile action surface controller', () => {
 
   it('routes non-primary touch taps through the existing action button', () => {
     const calls = vi.fn();
-    const bags = document.getElementById('mobile-menu-bags');
-    bags?.addEventListener('click', calls);
+    const character = document.getElementById('mobile-menu-char');
+    character?.addEventListener('click', calls);
     const controller = buildMobileActionSurface({
       writers,
       t: (key) => key,
@@ -139,18 +190,20 @@ describe('mobile action surface controller', () => {
       buttons.map(
         (button) => button.querySelector<HTMLElement>('.mobile-utility-icon')?.dataset.icon,
       ),
-    ).toEqual(['mount', 'map', 'chat', 'bags']);
+    ).toEqual(['mount', 'map', 'bags', 'character', 'questlog']);
     expect(buttons.map((button) => button.getAttribute('aria-label'))).toEqual([
       'hudChrome.mounts.mount',
       'hud.core.mobileMap',
-      'hud.core.mobileChat',
       'hud.keybinds.actions.bags',
+      'hud.keybinds.actions.char',
+      'questUi.tracker.title',
     ]);
     expect(buttons.map((button) => button.getAttribute('title'))).toEqual([
       'hudChrome.mounts.mount',
       'hud.core.mobileMap',
-      'hud.core.mobileChat',
       'hud.keybinds.actions.bags',
+      'hud.keybinds.actions.char',
+      'questUi.tracker.title',
     ]);
     expect(document.querySelector('.mobile-utility-action-label')).toBeNull();
     expect(buttons[0].querySelector('.mobile-utility-icon > .ui-icon')).not.toBeNull();
@@ -182,6 +235,64 @@ describe('mobile action surface controller', () => {
     controller?.update(false, 2);
     expect(mode.getAttribute('aria-pressed')).toBe('false');
     expect(document.getElementById('mobile-action-ring')?.dataset.actionSurface).toBe('utility');
+  });
+
+  it('lets the player return to utility while combat is forcing the combat layout', () => {
+    const controller = buildMobileActionSurface({
+      writers,
+      t: (key) => key,
+      consumePeekGuard: vi.fn(),
+      hideTooltip: vi.fn(),
+      clickSfx: vi.fn(),
+    });
+    const mode = document.getElementById('mobile-action-mode') as HTMLButtonElement;
+
+    controller?.update(false, 1);
+    controller?.update(true, 1);
+    expect(document.getElementById('mobile-action-ring')?.dataset.actionSurface).toBe('combat');
+    expect(mode.querySelector('.mobile-action-mode-label')?.textContent).toBe(
+      'hudChrome.mobile.actionModeUtility',
+    );
+    expect(mode.getAttribute('aria-label')).toBe('hudChrome.mobile.actionModeUtility');
+
+    mode.click();
+    controller?.update(true, 1);
+    expect(document.getElementById('mobile-action-ring')?.dataset.actionSurface).toBe('utility');
+    expect(mode.querySelector('.mobile-action-mode-label')?.textContent).toBe(
+      'hudChrome.mobile.actionModeCombat',
+    );
+    expect(mode.getAttribute('aria-label')).toBe('hudChrome.mobile.actionModeCombat');
+
+    mode.click();
+    controller?.update(true, 1);
+    expect(document.getElementById('mobile-action-ring')?.dataset.actionSurface).toBe('combat');
+    expect(mode.querySelector('.mobile-action-mode-label')?.textContent).toBe(
+      'hudChrome.mobile.actionModeUtility',
+    );
+  });
+
+  it("auto-switches once on each combat entry without overriding the player's choice mid-combat", () => {
+    const controller = buildMobileActionSurface({
+      writers,
+      t: (key) => key,
+      consumePeekGuard: vi.fn(),
+      hideTooltip: vi.fn(),
+      clickSfx: vi.fn(),
+    });
+    const mode = document.getElementById('mobile-action-mode') as HTMLButtonElement;
+
+    controller?.update(false, 1);
+    controller?.update(true, 1);
+    expect(document.getElementById('mobile-action-ring')?.dataset.actionSurface).toBe('combat');
+
+    mode.click();
+    controller?.update(true, 1);
+    expect(document.getElementById('mobile-action-ring')?.dataset.actionSurface).toBe('utility');
+
+    controller?.update(false, 1);
+    expect(document.getElementById('mobile-action-ring')?.dataset.actionSurface).toBe('utility');
+    controller?.update(true, 1);
+    expect(document.getElementById('mobile-action-ring')?.dataset.actionSurface).toBe('combat');
   });
 
   it('does not rewrite an unchanged state and can relocalize labels', () => {

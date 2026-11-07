@@ -1544,6 +1544,7 @@ describe('client HTML shell', () => {
       expect(entry).toContain('id="mobile-action-ring"');
       expect(entry).toContain('id="mobile-action-attack"');
       expect(entry).toContain('id="mobile-action-page-toggle"');
+      expect(entry).toContain('id="mobile-utility-page-toggle"');
       // FOUR radial action buttons: each carries a centre tap plus 4 flick
       // directions, so 4 x 5 x 2 pages reaches all 33 configurable slots.
       const slotMatches = [
@@ -1558,13 +1559,25 @@ describe('client HTML shell', () => {
       );
       const utilitySlots = [
         ...ring.matchAll(
-          /class="mobile-action-slot mobile-utility-action"[^>]*data-mobile-index="(\d)"/g,
+          /class="mobile-action-slot mobile-utility-action(?: mobile-ring-seat)?"[^>]*data-mobile-index="(\d)"/g,
         ),
       ];
-      expect(utilitySlots.map((match) => match[1])).toEqual(['0', '1', '2', '3']);
+      expect(utilitySlots.map((match) => match[1])).toEqual(['0', '1', '2', '3', '4']);
       expect(ring).toContain('id="mobile-utility-actions" role="group"');
+      expect(ring).toMatch(
+        /data-mobile-index="2" data-utility-slot="2" data-i18n-title="hud\.keybinds\.actions\.bags"/,
+      );
+      expect(ring).toMatch(
+        /data-mobile-index="3" data-utility-slot="3" data-i18n-title="hud\.keybinds\.actions\.char"/,
+      );
+      expect(ring).toMatch(
+        /data-mobile-index="4" data-utility-slot="4" data-i18n-title="questUi\.tracker\.title"/,
+      );
       expect(ring).not.toContain('mobile-utility-action-label');
       expect(ring).not.toContain('class="mobile-action-slot mobile-utility-action mobile-label"');
+      expect(ring).toContain(
+        'class="mobile-action-slot mobile-utility-action mobile-ring-seat" data-mobile-index="4" data-utility-slot="4"',
+      );
       expect(ring).toContain('id="mobile-action-mode"');
       expect(ring).toContain('data-i18n="hudChrome.mobile.actionModeCombat">Combat</span>');
       // Utility mode reuses the same Interact control; there is no second copy
@@ -3143,6 +3156,7 @@ describe('client HTML shell', () => {
       expect(ring, name).toContain('id="mobile-interact"');
       expect(ring, name).toContain('id="mobile-jump"');
       expect(ring, name).toContain('id="mobile-action-page-toggle"');
+      expect(ring, name).toContain('id="mobile-utility-page-toggle"');
       expect(ring, name).toContain('data-i18n="hudChrome.mobile.targetCycleShort"');
       expect(ring, name).toContain('data-i18n="hud.core.mobileUse"');
       expect(ring, name).toContain('data-i18n="hudChrome.mobile.jump"');
@@ -3212,6 +3226,15 @@ describe('client HTML shell', () => {
       'body.mobile-touch #mobile-action-page-toggle {\n    right: calc(var(--mobile-ring-attack-size) / 2 - var(--mobile-ring-toggle-size) / 2);',
     );
     expect(hudMobileCss).toContain(
+      'body.mobile-touch #mobile-utility-page-toggle {\n    right: calc(var(--mobile-ring-attack-size) / 2 - var(--mobile-ring-toggle-size) / 2);',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #mobile-action-ring[data-action-surface="utility"] #mobile-action-page-toggle,',
+    );
+    expect(hudMobileCss).toMatch(
+      /#mobile-action-ring:not\(\[data-action-surface="utility"\]\)\s+#mobile-utility-page-toggle\s+\{\s+visibility: hidden;\s+pointer-events: none;/,
+    );
+    expect(hudMobileCss).toContain(
       'body.mobile-touch.mobile-left-handed #mobile-target-cycle {\n    left: calc(',
     );
     expect(hudMobileCss).toContain(
@@ -3219,6 +3242,9 @@ describe('client HTML shell', () => {
     );
     expect(hudMobileCss).toContain(
       'body.mobile-touch.mobile-left-handed #mobile-action-page-toggle {\n    left: calc(',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch.mobile-left-handed #mobile-utility-page-toggle {\n    left: calc(',
     );
     // The tier var packs are pinned as WHOLE blocks (selector + every value):
     // a bare-literal pin would still pass if the compact and tablet packs were
