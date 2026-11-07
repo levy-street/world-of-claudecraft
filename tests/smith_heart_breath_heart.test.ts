@@ -1076,7 +1076,8 @@ describe('Knotted Gale: the player text', () => {
       ...base,
       auras: [{ id: BREATH_AURAS.laden, remaining: 10, duration: 20 }],
     });
-    expect(c.visible && c.kind === 'carry' && c.pressable && c.key === 'F').toBe(true);
+    // Not yet loosed: no throw key shown.
+    expect(c.visible && c.kind === 'carry' && c.pressable && c.key === '').toBe(true);
     // Not yet through a portal: walk it into one (even standing at a lip).
     const g = CORNICE_GAPS[0];
     const spot = lip(g);
@@ -1087,14 +1088,21 @@ describe('Knotted Gale: the player text', () => {
       auras: [{ id: BREATH_AURAS.laden, remaining: 5, duration: 10 }],
     });
     expect(tied.visible && tied.kind === 'carry').toBe(true);
-    if (tied.visible) expect(tied.line).toContain('portal');
+    if (tied.visible) {
+      expect(tied.line).toContain('portal');
+      expect(tied.hint).toBe('');
+    }
     // Loosed: the throw, louder at the lip.
     const loose = buildKnotAlertView({
       ...base,
       auras: [{ id: BREATH_AURAS.laden, remaining: 5, duration: 10, value2: 1 }],
     });
     expect(loose.visible && loose.kind === 'carry').toBe(true);
-    if (loose.visible) expect(loose.line).toContain('loosed');
+    if (loose.visible) {
+      expect(loose.line).toContain('loosed');
+      expect(loose.hint).toContain('F');
+      expect(loose.key).toBe('F');
+    }
     const ready = buildKnotAlertView({
       ...atLip,
       auras: [{ id: BREATH_AURAS.laden, remaining: 5, duration: 10, value2: 1 }],

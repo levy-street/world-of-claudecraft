@@ -156,12 +156,15 @@ export function buildKnotAlertView(input: KnotAlertInput): KnotAlertView {
     kind: lip ? 'lip' : 'carry',
     title,
     line: t(line, { seconds }),
-    hint: input.touch
-      ? t('hudChrome.knotAlert.throwTap')
-      : key
-        ? t('hudChrome.knotAlert.throwKey', { key })
-        : t('hudChrome.knotAlert.throwClick'),
-    key,
+    // The throw's button says so only once the ball can be thrown.
+    hint: !loosed
+      ? ''
+      : input.touch
+        ? t('hudChrome.knotAlert.throwTap')
+        : key
+          ? t('hudChrome.knotAlert.throwKey', { key })
+          : t('hudChrome.knotAlert.throwClick'),
+    key: loosed ? key : '',
     pressable: true,
     buttonAria: t('hudChrome.knotAlert.throwAria'),
   };
