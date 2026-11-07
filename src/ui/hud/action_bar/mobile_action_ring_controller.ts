@@ -41,6 +41,10 @@ import {
 import { type HotbarAction, handleMobileAttackTap, hotbarPetCommand } from './hotbar';
 import { MOBILE_ACTION_BUTTONS } from './mobile_action_page_view';
 import { MobileActionRingPainter } from './mobile_action_ring_painter';
+import {
+  buildMobileActionSurface,
+  type MobileActionSurface,
+} from './mobile_action_surface_controller';
 import type { RadialDirection, RadialPlacement } from './radial_action_core';
 import { RadialGesture } from './radial_gesture_controller';
 import { RADIAL_PETAL_DIRECTIONS, RadialPetalPainter } from './radial_petal_painter';
@@ -98,7 +102,7 @@ export interface MobileActionRingDeps {
   attackNearest: (() => void) | null;
   attackTapState(): { autoAttack: boolean; hasLiveHostileTarget: boolean };
   hideTooltip(): void;
-  consumePeekGuard(): void;
+  consumePeekGuard(): boolean;
   bindEmpoweredHold(btn: HTMLButtonElement, resolveSlot: () => number): void;
 }
 
@@ -109,6 +113,7 @@ export interface MobileActionRing {
   gesture: RadialGesture;
   attackBtn: HTMLButtonElement;
   slotBtns: HTMLButtonElement[];
+  surface: MobileActionSurface | null;
 }
 
 /** Mint the per-slot child nodes ActionBarPainter writes into. Build-time DOM,
@@ -267,6 +272,14 @@ export function buildMobileActionRing(deps: MobileActionRingDeps): MobileActionR
     petals?.ring,
   );
   ringPainter = painter;
+  const surface = buildMobileActionSurface({
+    writers: deps.writers,
+    t,
+    consumePeekGuard: deps.consumePeekGuard,
+    hideTooltip: deps.hideTooltip,
+    clickSfx: () => audio.click(),
+    showUtilitySurface: () => gesture.cancel(),
+  });
 
   return {
     // The petal layer reads the SAME world snapshot the ring ticks against, so
@@ -281,6 +294,7 @@ export function buildMobileActionRing(deps: MobileActionRingDeps): MobileActionR
     gesture,
     attackBtn,
     slotBtns,
+    surface,
   };
 }
 

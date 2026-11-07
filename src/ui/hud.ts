@@ -450,7 +450,6 @@ import {
 import { buildMobileActionRing } from './hud/action_bar/mobile_action_ring_controller';
 import type { MobileActionRingPainter } from './hud/action_bar/mobile_action_ring_painter';
 import type { MobileActionSurface } from './hud/action_bar/mobile_action_surface_controller';
-import { buildMobileActionSurface } from './hud/action_bar/mobile_action_surface_controller';
 import { petSlotText } from './hud/action_bar/pet_slot_core';
 import { playerStealthed } from './hud/action_bar/player_stealthed';
 import { RADIAL_DIRECTIONS, type RadialDirection } from './hud/action_bar/radial_action_core';
@@ -7961,15 +7960,7 @@ export class Hud {
     this.mobileRingSlotBtns = ring.slotBtns;
     this.mobileActionRingView = ring.view;
     this.mobileActionRingPainter = ring.painter;
-    this.mobileActionSurface =
-      buildMobileActionSurface({
-        writers: this.writerFacet,
-        t,
-        consumePeekGuard: () => this.peekGuard.consume(),
-        hideTooltip: () => this.hideTooltip(),
-        clickSfx: () => audio.click(),
-        showUtilitySurface: () => ring.gesture.cancel(),
-      }) ?? undefined;
+    this.mobileActionSurface = ring.surface ?? undefined;
   }
 
   // The consumables seat: the ring's 5th arc position plus the row a hold or a

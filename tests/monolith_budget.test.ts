@@ -554,7 +554,9 @@ const MONOLITHS: MonolithRow[] = [
     // Honor and companions. Measured after recovery integration, zero slack.
     // Main ce21c7a66f5 sync: parent pins 18043 (Halloween) and 17733 (main).
     // Exact combined count; the three seasonal wiring lines are preserved.
-    ceiling: 17736,
+    // LOWERED 17736 -> 17732: mobile utility surface construction now composes
+    // from mobile_action_ring_controller.ts instead of growing the coordinator.
+    ceiling: 17732,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

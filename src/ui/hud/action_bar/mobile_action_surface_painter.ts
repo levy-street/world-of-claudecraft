@@ -36,9 +36,15 @@ export class MobileActionSurfacePainter {
   private lastUtilityPage = -1;
   constructor(private readonly deps: MobileActionSurfacePainterDeps) {}
 
-  paint(inCombat: boolean, preference: MobileActionModePreference, utilityPage: number): void {
+  paint(
+    inCombat: boolean,
+    preference: MobileActionModePreference,
+    utilityPage: number,
+    force = false,
+  ): void {
     const surface = resolveMobileActionSurface(inCombat, preference);
     if (
+      !force &&
       surface === this.lastSurface &&
       preference === this.lastPreference &&
       utilityPage === this.lastUtilityPage
@@ -49,16 +55,6 @@ export class MobileActionSurfacePainter {
     this.lastPreference = preference;
     this.lastUtilityPage = utilityPage;
     this.paintState(surface, preference, utilityPage);
-  }
-
-  relocalize(inCombat: boolean, preference: MobileActionModePreference, utilityPage: number): void {
-    this.lastSurface = null;
-    this.lastPreference = null;
-    this.lastUtilityPage = -1;
-    this.paintState(resolveMobileActionSurface(inCombat, preference), preference, utilityPage);
-    this.lastSurface = resolveMobileActionSurface(inCombat, preference);
-    this.lastPreference = preference;
-    this.lastUtilityPage = utilityPage;
   }
 
   private paintState(

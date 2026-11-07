@@ -126,10 +126,18 @@ export function buildMobileActionSurface(
   let playerId: number | null = null;
   let visibleSurface: 'combat' | 'utility' | null = null;
 
+  // Icons are PAGE state, not frame state: sync them only when the page changes
+  // (including the first render). The combat/utility switch only hides the
+  // container in CSS, and relocalize only rewrites labels, so neither needs a
+  // resync. This keeps the per-frame path free of dataset reads.
+  let syncedPage = -1;
   const renderUtilityPage = (): void => {
-    MOBILE_UTILITY_ACTION_PAGES[utilityPage].forEach((actionId, index) => {
-      syncIcon(index, actionId);
-    });
+    if (syncedPage !== utilityPage) {
+      MOBILE_UTILITY_ACTION_PAGES[utilityPage].forEach((actionId, index) => {
+        syncIcon(index, actionId);
+      });
+      syncedPage = utilityPage;
+    }
     painter.paint(inCombat, preference, utilityPage);
   };
   const render = (): void => {
@@ -192,7 +200,7 @@ export function buildMobileActionSurface(
       render();
     },
     relocalize(): void {
-      painter.relocalize(inCombat, preference, utilityPage);
+      painter.paint(inCombat, preference, utilityPage, true);
     },
   };
 }
