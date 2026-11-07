@@ -410,6 +410,18 @@ describe('the density model covers the shipped world', () => {
       'crypt_remembrance_candle',
       'dragonkin_egg',
       'gourdlight_swelling_gourd',
+      // The Smith's Heart's encounter adds (raised by its fights, never camped):
+      // the final boss's four Splinters, the Breath isles' two, the Heat's four.
+      'heart_final_splinter_breath',
+      'heart_final_splinter_hammer',
+      'heart_final_splinter_heat',
+      'heart_final_splinter_quench',
+      'heart_gale_mender',
+      'heart_gale_sentinel',
+      'heart_heat_rolling_cinder',
+      'heart_heat_seedflame',
+      'heart_heat_wellkeeper',
+      'heart_heat_wellspawn',
       'hoard_abyssal_tentacle',
       'hoard_bloat_cap',
       'hoard_bound_pulsar',

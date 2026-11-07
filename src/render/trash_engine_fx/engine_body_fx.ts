@@ -20,6 +20,7 @@
 
 import * as THREE from 'three';
 import type { Entity, FreezeStackDef, SimEvent } from '../../sim/types';
+import { fxAnchor } from '../attached_fx_anchor';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { surfaceMat } from '../gfx';
 import { FLAME_HEAT } from '../gravewyrm_sanctum_fx/sanctum_fx_core';
@@ -498,7 +499,8 @@ export class EngineBodyFx {
       const rate = target > slot.shown ? 6 : 1.5;
       slot.shown += (target - slot.shown) * Math.min(1, dt * rate);
       const bh = h.bodyHeight(e);
-      const gy = h.groundY(e.pos.x, e.pos.z);
+      const eAt = fxAnchor(e);
+      const gy = h.groundY(eAt.x, eAt.z);
       const count = rimeCrystals(slot.shown, CRYSTALS);
       const climb = rimeClimb(slot.shown);
       for (let k = 0; k < CRYSTALS; k++) {
@@ -509,7 +511,7 @@ export class EngineBodyFx {
         const seat = this.seats[k];
         const y = gy + bh * climb * seat.rise;
         const r = bh * seat.out * (0.75 + 0.25 * (1 - seat.rise));
-        this.p.set(e.pos.x + Math.sin(seat.angle) * r, y, e.pos.z + Math.cos(seat.angle) * r);
+        this.p.set(eAt.x + Math.sin(seat.angle) * r, y, eAt.z + Math.cos(seat.angle) * r);
         // Points lean out from the body, up and away.
         this.e.set(Math.cos(seat.angle) * seat.tilt, 0, -Math.sin(seat.angle) * seat.tilt);
         this.q.setFromEuler(this.e);
@@ -518,7 +520,7 @@ export class EngineBodyFx {
         this.m.compose(this.p, this.q, this.s);
         this.crystals.setMatrixAt(base + k, this.m);
       }
-      slot.glow.position.set(e.pos.x, gy + 0.14, e.pos.z);
+      slot.glow.position.set(eAt.x, gy + 0.14, eAt.z);
       const g = bh * (0.7 + 0.5 * slot.shown);
       slot.glow.scale.set(g, 1, g);
       slot.glowMat.opacity = 0.25 + 0.45 * slot.shown;
@@ -526,7 +528,7 @@ export class EngineBodyFx {
       slot.emit += dt * (4 + 14 * slot.shown) * h.density;
       while (slot.emit >= 1) {
         slot.emit -= 1;
-        h.puff(e.pos.x, gy + bh * climb * h.rand(), e.pos.z, 1, {
+        h.puff(eAt.x, gy + bh * climb * h.rand(), eAt.z, 1, {
           speed: 0.3,
           up: -0.2,
           life: 1.4,
@@ -537,7 +539,7 @@ export class EngineBodyFx {
           drag: 1.4,
         });
         if (h.rand() < 0.4)
-          h.puff(e.pos.x, gy + bh * climb * h.rand(), e.pos.z, 1, {
+          h.puff(eAt.x, gy + bh * climb * h.rand(), eAt.z, 1, {
             speed: 0.2,
             up: 0.5,
             life: 0.9,
@@ -595,11 +597,12 @@ export class EngineBodyFx {
         slot.glyph.visible = false;
         continue;
       }
+      const eAt = fxAnchor(e);
       const bh = h.bodyHeight(e);
-      const gy = h.groundY(e.pos.x, e.pos.z);
+      const gy = h.groundY(eAt.x, eAt.z);
       const cy = gy + bh * 0.62;
       const k = brandFlicker(clock, e.id);
-      slot.glyph.position.set(e.pos.x, cy, e.pos.z);
+      slot.glyph.position.set(eAt.x, cy, eAt.z);
       const u = slot.glyphMat.uniforms;
       u.uSize.value = bh * 0.34 * (0.96 + 0.04 * k);
       u.uAlpha.value = Math.min(1, 0.8 * k);
@@ -608,7 +611,7 @@ export class EngineBodyFx {
       slot.emit += dt * 22 * h.density;
       while (slot.emit >= 1) {
         slot.emit -= 1;
-        h.puff(e.pos.x, cy - 0.1, e.pos.z, 1, {
+        h.puff(eAt.x, cy - 0.1, eAt.z, 1, {
           speed: 0.2,
           up: 1.3,
           life: 0.45,
@@ -619,7 +622,7 @@ export class EngineBodyFx {
           radius: bh * 0.12,
         });
         if (h.rand() < 0.45)
-          h.puff(e.pos.x, cy, e.pos.z, 1, {
+          h.puff(eAt.x, cy, eAt.z, 1, {
             speed: 0.6,
             up: 1.8,
             life: 0.8,
@@ -630,7 +633,7 @@ export class EngineBodyFx {
             radius: bh * 0.15,
           });
         if (h.rand() < 0.15)
-          h.puff(e.pos.x, cy + 0.4, e.pos.z, 1, {
+          h.puff(eAt.x, cy + 0.4, eAt.z, 1, {
             speed: 0.3,
             up: 1.2,
             life: 1.4,

@@ -48,6 +48,7 @@ import {
 } from './data';
 import { createNpc, recalcPlayerStats } from './entity';
 import { releaseSpiritInDelve } from './entity_roster';
+import { clearEncounterLockNotice } from './instances/encounter_lock';
 import { dungeonDoorPos } from './moved_objects';
 import { restorePetOnOwnerRevive } from './pet/pet_owner_revive';
 import { cancelProfessionSessionOnDisplacement } from './professions/session_teardown';
@@ -335,6 +336,8 @@ function releaseAtNearestGraveyard(
   p.corpsePos = { x: p.pos.x, y: p.pos.y, z: p.pos.z };
   p.corpseInstanceId = ctx.instanceClaimIdAt(p.pos);
   p.ghost = true; // p.dead stays true
+  // A new spirit's first door refusal always speaks (instances/encounter_lock.ts).
+  clearEncounterLockNotice(p);
   p.pos = ctx.groundPos(gy.x, gy.z);
   p.prevPos = { ...p.pos };
   ctx.rebucket(p);
@@ -522,6 +525,8 @@ function reviveAt(
   p.ghost = false;
   p.corpsePos = null;
   p.corpseInstanceId = null;
+  // A new life's first door refusal always speaks (instances/encounter_lock.ts).
+  clearEncounterLockNotice(p);
   // The PvP Resurrect offer belonged to that death, whichever way back was taken.
   p.pvpResurrect = false;
   p.pvpResurrectWait = 0;

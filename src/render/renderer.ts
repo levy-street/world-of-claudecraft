@@ -160,8 +160,8 @@ import {
   setCharacterCullShadow,
 } from './character_cull_core';
 import {
+  applyCharacterBodyTints,
   type CharacterWeaponAura,
-  characterRuneTintColor,
   characterVeilboundState,
   characterWeaponAuraInto,
   characterWeaponAuraMode,
@@ -3057,7 +3057,7 @@ export class Renderer {
         this.scene,
         this.groundSample,
         this.worldCompileGate(),
-        this.sim, (amount) => this.addShake(amount), () => this.reducedMotion(), (id, gesture) => this.triggerAttack(id, gesture),
+        this.sim, (amount) => this.addShake(amount), () => this.reducedMotion(), (id, gesture) => this.triggerAttack(id, gesture), (id) => this.views.get(id)?.group.position,
       );
     });
     this.hillRingVisuals = new HillRingVisuals(this.scene, gate, (x, z) =>
@@ -10303,7 +10303,7 @@ export class Renderer {
       // Metamorphosis is no longer a tint on the base rig: it has its own lazy
       // CharacterVisual driven by formVisibility.metamorph above.
       active.setAscended(veilboundState !== 'none');
-      active.setRuneTint(characterRuneTintColor(e));
+      applyCharacterBodyTints(active, e, performance.now() / 1000);
       // saddle lift: the rider (click proxy included, a root child) sits at
       // the seat height while mounted; 0 whenever the mount is absent/hidden.
       // seatFwd slides the rider along facing onto saddles that sit off the

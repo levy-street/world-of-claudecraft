@@ -77,6 +77,7 @@ import { isFerryPassenger } from '../sim/ferry_passenger';
 import { moveSpeedMult, type PlayerMotionDeps, stepPlayerMotion } from '../sim/player_motion';
 import { slipperyGrip } from '../sim/slippery_ground';
 import { DT, type Entity, type MoveInput, RUN_SPEED, type SimEvent } from '../sim/types';
+import { windDriftSpeed } from '../sim/wind_drift';
 import type { DelveRunInfo } from '../world_api/delves';
 import type { RiftFloorView } from '../world_api/dungeons';
 import { resolvedRiftFloorPlan, riftLiftFor } from './self_motion_rift_lift';
@@ -404,12 +405,14 @@ export class SelfMotionPredictor {
     // aboard; this legacy one does not).
     // Slippery ground (src/sim/slippery_ground.ts) carries a ground velocity
     // the server never mirrors: the reconciling pipeline stands down on it
-    // (a movement override), and so does this one.
+    // (a movement override), and so does this one. An encounter's wind
+    // (src/sim/wind_drift.ts) is predicted by the reconciling pipeline only.
     if (
       !frame.enabled ||
       hasValkyrsCallingFlightAura(self) ||
       self.riftSliding ||
       slipperyGrip(self) > 0 ||
+      windDriftSpeed(self) > 0 ||
       isFerryPassenger(self)
     ) {
       this.reset();

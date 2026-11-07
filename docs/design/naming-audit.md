@@ -1083,6 +1083,26 @@ the major game wikis (Wowhead, warcraft.wiki.gg, RuneScape, UESP, Guild Wars 2).
 | the Gourdsworn | the title of Gourdlight Eve's whole-event meta deed (`feat_gourdlight_eve_complete`, round 12) | KEEP. Quoted exact-phrase searches for "Gourdsworn" and "the Gourdsworn", plus a coined-token search scoped to Wowhead, warcraft.wiki.gg, the RuneScape and OSRS wikis, the FFXIV wiki, the GW2 wiki, UESP, the PoE wiki and the Diablo wiki, returned no hit in any game. The nearest results were different tokens: WoW's "Death Foursworn" achievement, GW2's "Bladesworn" specialization, ESL's "Guildsworn" card and the unrelated games "Godsworn", "Crowsworn" and "Ironsworn". WoW's Hallow's End title is "the Hallowed", a different word; "-sworn" is a shared English suffix. |
 | Gourdlight, Start to Finish / Every Doorstep / At Hester's Beck and Call / Three Towns Startled | the round 12 whole-event meta and its three section Feats | KEEP. Plain English phrases built on this event's own names (Gourdlight, Hester); no coined token beyond those already audited above. |
 
+### The Smith's Heart raid (web-checked 2026-11-05)
+
+The raid's player-visible proper nouns (`src/sim/content/smith_heart.ts` and the
+encounters' `*_ids.ts` name tables). The raid is still dev-gated
+(`SMITH_HEART_PLAYABLE = false`), so these verdicts land before any player sees a name.
+Each distinctive name was searched as an exact phrase on the open web and by its coined
+token against the major game wikis (Wowhead, warcraft.wiki.gg, RuneScape, UESP, Guild
+Wars 2).
+
+| Name | Where | Verdict |
+|---|---|---|
+| The Smith's Heart | the raid | KEEP. No exact-phrase hit in any game; the nearest is the unrelated title "Smith & Dungeon". Plain English. |
+| The Masterless Strength | the final boss | KEEP. No hit; the nearest is the card game "Masterless", a different name and role. |
+| The Seam Singer | the Hammer Council's second boss | KEEP. No hit in any game wiki. |
+| Wellspawn, Wellkeeper, Seedflame | the Heat guardian's adds | KEEP. No hit for any of the three tokens; nearest are different tokens ("Floraspawn", "Seed of Flame", "Siegespawn"). |
+| Gale Sentinel, Gale Mender, Rolling Cinder | the Breath isles' adds and the Heat's hunting cinder | KEEP. No hit on the wikis above; ESO's "Covenant Mender" and similar share only the generic word. |
+| Splinter of the Heat / Quench / Breath / Hammer | the final boss's adds | KEEP. Plain English built on the raid's own element names. |
+| Mountain's Wrath, Summit Roar, Storm Lance, Forge Fist, Tempering Strike, Bellows Wind | boss abilities | KEEP. Shared fantasy English; no distinctive match in the same role. |
+| Hammerfall | the Hammer Guardian's cleave | KEEP (borderline, recorded for the reviewer). WoW's Hammerfall is an orc town, a different role (a place, not an ability); the game already ships "Hammerfall Meteors" (Varkhul), and the word is shared English (also a band and a novel). |
+
 ## Recorded for the maintainer (stopping rule: no unilateral rename)
 
 STATUS 2026-08-20, SETTLED BY THE MAINTAINER, and the scope is narrow on purpose.

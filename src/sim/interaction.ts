@@ -43,6 +43,7 @@ import {
   interactObjectForQuests,
   tryStartNythraxisWardChannel,
 } from './encounters/nythraxis';
+import { tryThrowKnot } from './encounters/smith_heart/breath_heart';
 import { tryCageStruggle } from './encounters/sunken_bastion/turnkey';
 import { trySpearWrench } from './encounters/wildheart_basin/zulgar_spear';
 import { tryStartEscort } from './escort';
@@ -522,6 +523,8 @@ export function interact(
   // Pinned by Zulgar's Hunting Spear: the press is the victim's own pull on
   // it (only while nobody stands free to help), never anything else.
   if (trySpearWrench(ctx, p)) return;
+  // Carrying a Knotted Gale: the press is the throw (at the lip of a gap).
+  if (tryThrowKnot(ctx, p)) return;
   if (p.targetId !== null) {
     const target = ctx.entities.get(p.targetId);
     if (

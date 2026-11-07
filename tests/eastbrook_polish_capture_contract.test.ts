@@ -740,7 +740,9 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // No capture was retaken.
   // Re-minted for v0.45.4 graphics and dungeon loading optimizations in renderer.ts.
   // No capture was retaken.
-  'f79dd14b173b432d7056d797f2184116e645d03474c03ef9d8000cdeb5dd80b9';
+  // Re-minted for the Smith's Heart raid's renderer wiring (its death-zone and
+  // drawn-position hooks). No capture was retaken.
+  '44b2a57438aa0f392c29e7feb79b4e7b55a35581ab13f4eb2652a38bd0c371b3';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

@@ -215,6 +215,8 @@ import { SANCTUM_BOSS_LOOKS, SANCTUM_BOSS_MOB_KEYS } from './sanctum_boss_looks'
 import { SANCTUM_MOB_KEYS, sanctumCreatureLooks } from './sanctum_creature_looks';
 import { seasonalTrickLooks } from './seasonal_trick_looks';
 import type { SeatClipSet } from './seat_clips';
+import { SMITH_HEART_BOSS_LOOKS } from './smith_heart_boss_looks';
+import { SMITH_HEART_PLACEHOLDER_LOOKS } from './smith_heart_placeholder_looks';
 import type { WeaponLoadout } from './weapon_loadout_core';
 import { WILDHEART_MOB_KEYS, wildheartPlaceholderLooks } from './wildheart_creature_looks';
 import { type WocFit, wocAnimsUrl, wocBaseUrl } from './woc_armor_core';
@@ -4245,6 +4247,45 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.4,
   },
+  // The Hammer Council's Seam Singer (the Smith's Heart's first boss, design
+  // doc 7.1): a bodyless target, its click capsule, nameplate and bars over the
+  // provisional rock-and-crystal body the raid's own effects draw
+  // (smith_heart_fx/council_bodies.ts) until its own model ships. Bound off
+  // the goleling's rig (never seen); height times the template's scale is the
+  // body's (about 2.5 times a player).
+  smith_heart_seam_singer: {
+    url: `${CREATURES}/golelingevolved.glb`,
+    height: 2.5,
+    clips: ELEMENTAL_FLOATING,
+    animUrls: [`${CREATURES}/elemental_ability_anims.glb`],
+    bodyless: true,
+    clickRadius: 1.0,
+  },
+  // The Guardian of the Quench (the Frozen Lake, design doc 7.3): a bodyless
+  // target, its click capsule, nameplate and bars over the provisional ice
+  // guardian of frost granite and lake ice the raid's own effects draw
+  // (smith_heart_fx/quench_body.ts) until its own model ships. Height times
+  // the template's scale (3) is the body's crown, about three and a half
+  // players.
+  smith_heart_quench_guardian: {
+    url: `${CREATURES}/golelingevolved.glb`,
+    height: 2.3,
+    clips: ELEMENTAL_FLOATING,
+    animUrls: [`${CREATURES}/elemental_ability_anims.glb`],
+    bodyless: true,
+    clickRadius: 1.6,
+  },
+  // The Guardian of the Heat's Rolling Cinder (design doc 7.4): a bodyless
+  // target, its click capsule, nameplate and bars round the great ball of the
+  // first flame the raid's own effects draw (smith_heart_fx/heat_cinder_fx.ts).
+  smith_heart_rolling_cinder: {
+    url: `${CREATURES}/golelingevolved.glb`,
+    height: 1.9,
+    clips: ELEMENTAL_FLOATING,
+    animUrls: [`${CREATURES}/elemental_ability_anims.glb`],
+    bodyless: true,
+    clickRadius: 2.2,
+  },
   mob_ignivar: {
     url: `${CREATURES}/ignivar_herald.glb`,
     authoredAtlas: true, // baked Tripo/contributor atlas: low-tier floor rides the map
@@ -8187,6 +8228,8 @@ Object.assign(VISUALS, wildheartPlaceholderLooks(VISUALS));
 Object.assign(VISUALS, sanctumCreatureLooks(VISUALS));
 // The Gravewyrm Sanctum's three bosses (sanctum_boss_looks.ts).
 Object.assign(VISUALS, SANCTUM_BOSS_LOOKS);
+// The Smith's Heart's own boss models (smith_heart_boss_looks.ts).
+Object.assign(VISUALS, SMITH_HEART_BOSS_LOOKS);
 // Gourdlight Eve's trick bodies, the bat and the skeleton (seasonal_trick_looks.ts).
 Object.assign(VISUALS, seasonalTrickLooks(VISUALS));
 
@@ -8478,6 +8521,7 @@ const MOB_KEYS: Record<string, string> = {
   ...WILDHEART_MOB_KEYS,
   ...SANCTUM_MOB_KEYS,
   ...SANCTUM_BOSS_MOB_KEYS,
+  ...SMITH_HEART_PLACEHOLDER_LOOKS,
   ...Object.fromEntries(
     ALL_CLASSES.map((cls) => [`tideglass_reflection_${cls}`, `temple_reflection_${cls}`]),
   ),
@@ -8614,6 +8658,9 @@ const NPC_KEYS: Record<string, string> = {
   marshal_redbrook: 'npc_knight',
   warden_fenwick: 'npc_knight',
   captain_thessaly: 'npc_knight',
+  // Captain Thessaly at the head of the Storm Cornice (the Smith's Heart's
+  // Guardian of the Breath): the same captain, the same knight.
+  heart_captain_thessaly: 'npc_knight',
   // The two WARFARE quartermasters (one stock, two placements). Both sell the
   // game's most prestigious armor and both fell through to the tinted villager
   // body before this, which read as a townsperson selling epics; the armored

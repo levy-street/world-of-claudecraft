@@ -1,0 +1,582 @@
+// /dev heart: playtest helpers for the Smith's Heart raid
+// (ALLOW_DEV_COMMANDS only: handleDevChat is reached through the
+// ctx.devCommands gate like every /dev branch, and the raid's own door is
+// dev-only too, encounters/smith_heart/entry.ts).
+//
+//   /dev heart                       this help line
+//   /dev heart enter [normal]        claim a fresh run and step in at the Cleft
+//   /dev heart tp <area|boss>        jump inside the run (enters first)
+//   /dev heart kill <what>           kill a vein's fight (hammer: the whole
+//                                    Hammer Council; breath, quench,
+//                                    heat), the final boss (final), all four
+//                                    guardians (guardians), one pack (pack h1
+//                                    to h3, r1 to r8, b1 to b3, q1 to q3, f1
+//                                    to f3), every pack (trash), or all
+//   /dev heart gates                 open every gate of this run
+//   /dev heart portal                force the seal's portal open for this run
+//   /dev heart seal                  print the gating readout (mask, slabOpen,
+//                                    sealLit, ringClear, portalOpen, awake)
+//   /dev heart arrival               replay the arrival scene: the heart goes
+//                                    back to sleep a moment and wakes again
+//                                    (with a living player in the Heart)
+//   /dev heart final quarter <breath|quench|hammer|heat|ring>
+//                                    move the final boss (and its home) into
+//                                    the middle of that quarter of the Anvil
+//                                    of the World, or onto the central ring's
+//                                    centre (ring also pulls it onto you: the
+//                                    final phase's look is a fight's); the
+//                                    quarter it stands in wakes (phase 2K)
+//   /dev heart final [what]          the Masterless Strength (enters first):
+//                                    its readout, pull, reset, normal,
+//                                    heroic or mythic, fill [vein|all] [pct],
+//                                    burst, shock, root, unroot, or one
+//                                    ability now (fist, whirl, embers,
+//                                    freeze, cold <n>, ice, wind [deg], bolt,
+//                                    drawn, orbs, tremor, anvil, shell);
+//                                    sim/dev/smith_heart_final_dev.ts
+//   /dev heart reset                 free the run and claim a fresh one
+//   /dev heart council               the Hammer Council's readout
+//   /dev heart council <what>        pull (both onto you), reset (whole
+//                                    again, the five columns too), heroic
+//                                    [on|off] or mythic [on|off] (this run's
+//                                    council; one tier at a time), energy <n>,
+//                                    wrath, weight, rush, wake, rock, bolt,
+//                                    song, resonance [n] (force one mechanic
+//                                    now), soul guardian|singer (that
+//                                    member's soul takes a pillar now),
+//                                    soulpip <n> (leave every soul pillar at
+//                                    n pips; 0 bursts them)
+//   /dev heart kill guardian|singer|council
+//                                    one council member (to test each kill
+//                                    order) or both (= hammer)
+//   /dev heart breath                the Guardian of the Breath's readout
+//   /dev heart breath <what>         pull (onto the Cornice and pull it),
+//                                    reset (whole again, the wind still),
+//                                    heroic [on|off] or mythic [on|off] (this
+//                                    run's fight), phase2 (the storm breaks
+//                                    now), blow [deg|n|ne|e|se|s|sw|w|nw],
+//                                    calm, circle (Thessaly's), inhale (or roar),
+//                                    isles [0|1] (the Gale Bulwark and its isles),
+//                                    ride [0|1] and home (ride the gale now),
+//                                    killisle, bulwark (break it), windworn off,
+//                                    chain,
+//                                    eye, conductor, tornado, gust [deg] (a
+//                                    phase-2 gust; in the Wind half it plays,
+//                                    then the blows resume); our names work too: fork,
+//                                    cradle, drawn, gale
+//   /dev heart quench                the Guardian of the Quench's readout
+//   /dev heart quench <what>         pull (onto the Frozen Lake and pull it),
+//                                    reset (whole again, the lake whole),
+//                                    heroic [on|off] or mythic [on|off] (this
+//                                    run's fight), phase2 (the other blades
+//                                    wake now, the guardian at half), blades
+//                                    (all four awake at once, no bar), cold <n>
+//                                    (set my cold bar), burst (freeze me
+//                                    solid now), splash (my ice shatters
+//                                    now), chain [n] (the others to n cold,
+//                                    then I freeze), immune (a Cold Coffin's
+//                                    stasis on me: the cold still bites),
+//                                    huddle (the others gather round me),
+//                                    hole (open a hole under me),
+//                                    crack (crack the ice under me), breath
+//                                    (Quenching Breath now), slash (a round of
+//                                    slashes now), flurry (The Blades Hunt now)
+//   /dev heart heat                  the Guardian of the Heat's readout
+//   /dev heart heat <what>           pull (onto the Hearth's shore and pull
+//                                    it), reset (whole again in its
+//                                    wellspring, the Hearth calm), heroic
+//                                    [on|off] or mythic [on|off] (this run's
+//                                    fight), phase <1-3> (jump to a phase),
+//                                    intermission (it sinks and the Hearth
+//                                    overflows now), fist (Basalt Fist where
+//                                    I stand), flare (Hearth Flare now),
+//                                    seeds (Hearthseeds fall), zones (a
+//                                    Wakefire run), ember (a Rolling Cinder
+//                                    falls)
+//
+// Areas: cleft, gallery, pit (or hammer), balcony, ring, ringse, ringsw,
+// breath, bridge, cornice (or breathboss), quench, ice, lake (or quenchboss),
+// heat, forge, anvil (or heatboss), heart or portal (the Seal Dais, beside
+// the portal), heartroom or final (the Heart's Arrival Terrace, outside the
+// final boss's reach). Each guardian's name lands beside it, on its floor.
+// Kills credit through handleDeath, so the gates, the seal and the portal
+// follow on the next tick.
+
+import {
+  SMITH_HEART_COUNCIL_PACK,
+  SMITH_HEART_DUNGEON,
+  SMITH_HEART_FINAL_BOSS,
+  SMITH_HEART_GUARDIANS,
+} from '../content/smith_heart';
+import { HEARTH_WELL, SMITH_HEART_ANCHORS } from '../content/smith_heart_layout';
+import { DUNGEONS, instanceOrigin } from '../data';
+import {
+  breathDevTrigger,
+  breathGuardian,
+  breathReadout,
+  COUNCIL_TEMPLATE_IDS,
+  councilBodies,
+  councilDevTrigger,
+  councilReadout,
+  councilState,
+  heatDevTrigger,
+  heatGuardian,
+  heatReadout,
+  quenchDevTrigger,
+  quenchGuardian,
+  quenchReadout,
+  replaySmithHeartArrivalForDev,
+  SMITH_HEART_AWAKE_BIT,
+  setSmithHeartPortalDevOpen,
+  smithHeartProgress,
+  smithHeartSealMaskOf,
+} from '../encounters/smith_heart';
+import { setTierHealthDevScale } from '../encounters/smith_heart/tier_health';
+import { setDungeonGatesDevOpen } from '../instances/dungeon_gates';
+import { enterDungeon, freeInstance, leaveDungeon } from '../instances/dungeons';
+import { instanceHalfWidthOf } from '../instances/instance_footprint';
+import type { InstanceSlot } from '../sim';
+import type { SimContext } from '../sim_context';
+import { displacePlayerForDev } from './dev_displace';
+import { smithHeartFinalDevTrigger } from './smith_heart_final_dev';
+
+const A = SMITH_HEART_ANCHORS;
+
+/** `/dev heart tp` targets (instance-local). Boss aliases share the anchor
+ *  that stands beside the boss on its floor. */
+export const SMITH_HEART_DEV_AREAS: Readonly<Record<string, { x: number; z: number }>> = {
+  cleft: A.cleft,
+  gallery: A.gallery,
+  pit: A.pit,
+  hammer: A.pit,
+  balcony: A.balcony,
+  ring: A.ring,
+  ringse: A.ringSouthEast,
+  ringsw: A.ringSouthWest,
+  breath: A.breath,
+  bridge: A.bridge,
+  cornice: A.cornice,
+  breathboss: A.cornice,
+  quench: A.quench,
+  ice: A.ice,
+  lake: A.lake,
+  quenchboss: A.lake,
+  heat: A.heat,
+  forge: A.forge,
+  anvil: A.anvil,
+  heatboss: A.anvil,
+  heart: A.portal,
+  portal: A.portal,
+  heartroom: A.heartRoom,
+  final: A.heartRoom,
+};
+
+/** `/dev heart kill` boss names to template ids. */
+const BOSS_ALIASES: Readonly<Record<string, string>> = {
+  ...SMITH_HEART_GUARDIANS,
+  guardian: SMITH_HEART_GUARDIANS.hammer,
+  singer: 'heart_seam_singer',
+  final: SMITH_HEART_FINAL_BOSS,
+};
+
+/** The four vein fights' bodies: the Hammer's is the whole council. */
+const GUARDIAN_IDS: ReadonlySet<string> = new Set([
+  ...Object.values(SMITH_HEART_GUARDIANS),
+  ...COUNCIL_TEMPLATE_IDS,
+]);
+const COUNCIL_IDS: ReadonlySet<string> = new Set(COUNCIL_TEMPLATE_IDS);
+
+const HELP =
+  '[dev] /dev heart enter [normal] | tp <cleft|gallery|pit|hammer|balcony|ring|ringse|ringsw|breath|bridge|cornice|breathboss|quench|ice|lake|quenchboss|heat|forge|anvil|heatboss|heart|portal|heartroom|final> | kill <hammer|guardian|singer|council|breath|quench|heat|final|guardians|pack <id>|trash|all> | gates | portal | seal | pool <k> | arrival | final [pull|reset|normal|heroic|mythic|quarter <breath|quench|hammer|heat|ring>|fill [vein|all] [pct]|burst|shock|root|unroot|fist|whirl|embers|freeze|cold <n>|ice|wind [deg]|bolt|drawn|orbs|tremor|anvil|shell] | reset | council [pull|reset|heroic [on|off]|mythic [on|off]|energy <n>|wrath|weight|rush|wake|rock|bolt|song|resonance [n]|soul <guardian|singer>|soulpip <n>] | breath [pull|reset|heroic [on|off]|mythic [on|off]|phase2|blow [deg|n|e|s|w]|calm|circle|inhale|roar|chain|eye|conductor|tornado|gust [deg]|isles [0|1]|ride [0|1]|home|killisle|bulwark|windworn|heart [2|portal a|b|c|d|carry|burst]] | quench [pull|reset|heroic [on|off]|mythic [on|off]|phase2|blades|cold <n>|burst|splash|chain [n]|immune|huddle|hole|crack|breath|slash|flurry] | heat [pull|reset|heroic [on|off]|mythic [on|off]|phase <1-3>|intermission|fist|flare|seeds|zones|ember]';
+
+/** Where `/dev heart breath pull` sets the player down: on the Cornice, a
+ *  few strides west of the guardian. */
+const BREATH_PULL_SPOT = { x: -14, z: 198 } as const;
+/** Where `/dev heart quench pull` sets the player down: on the Frozen Lake,
+ *  a few strides south of the guardian. */
+const QUENCH_PULL_SPOT = { x: 198, z: -11 } as const;
+/** Where `/dev heart heat pull` sets the player down: on the Hearth's shore,
+ *  in front of the guardian's wellspring, past its lip (its fire) and inside
+ *  its reach (the lip follows HEARTH_WELL, grown in pass 4). */
+export const HEAT_PULL_SPOT = { x: HEARTH_WELL.x + HEARTH_WELL.r + 1.7, z: 2 } as const;
+
+function log(ctx: SimContext, pid: number, text: string): void {
+  ctx.emit({ type: 'log', text, pid });
+}
+
+/** The live Smith's Heart claim whose slot holds the player, or null. Reads
+ *  the raid's own claim half width (instances/instance_footprint.ts: the
+ *  field runs past |x| 250, wider than the generic envelope). */
+function claimFor(ctx: SimContext, pid: number): InstanceSlot | null {
+  const e = ctx.entities.get(pid);
+  if (!e) return null;
+  const index = DUNGEONS[SMITH_HEART_DUNGEON].index;
+  for (const inst of ctx.instances) {
+    if (inst.dungeonId !== SMITH_HEART_DUNGEON) continue;
+    if (inst.partyKey === null || inst.exitId === null) continue;
+    const o = instanceOrigin(index, inst.slot);
+    const half = instanceHalfWidthOf(SMITH_HEART_DUNGEON);
+    if (Math.abs(e.pos.x - o.x) < half && Math.abs(e.pos.z - o.z) < 250) return inst;
+  }
+  return null;
+}
+
+function ensureInside(ctx: SimContext, pid: number): InstanceSlot | null {
+  const inside = claimFor(ctx, pid);
+  if (inside) return inside;
+  if (!enterDungeon(ctx, SMITH_HEART_DUNGEON, pid, true)) return null;
+  return claimFor(ctx, pid);
+}
+
+/** Kill the placements a `/dev heart kill` names. Returns how many fell, or
+ *  -1 when `what` names nothing. */
+export function killSmithHeartMatching(
+  ctx: SimContext,
+  pid: number,
+  inst: InstanceSlot,
+  named: string,
+): number {
+  let what = named;
+  const packArg = /^pack\s+(\S+)$/.exec(what);
+  const packId = packArg ? packArg[1] : null;
+  // The Hammer's vein is its whole fight: `hammer` kills both.
+  if (what === 'hammer') what = 'council';
+  const boss = BOSS_ALIASES[what];
+  const spawns = DUNGEONS[SMITH_HEART_DUNGEON].spawns;
+  if (
+    what !== 'all' &&
+    what !== 'trash' &&
+    what !== 'guardians' &&
+    what !== 'council' &&
+    boss === undefined &&
+    (packId === null || !spawns.some((s) => s.packId === packId))
+  ) {
+    return -1;
+  }
+  const killer = ctx.entities.get(pid) ?? null;
+  let killed = 0;
+  spawns.forEach((spawn, i) => {
+    const hit =
+      what === 'all' ||
+      (what === 'trash' &&
+        spawn.packId !== undefined &&
+        spawn.packId !== SMITH_HEART_COUNCIL_PACK) ||
+      (what === 'guardians' && GUARDIAN_IDS.has(spawn.mobId)) ||
+      (what === 'council' && COUNCIL_IDS.has(spawn.mobId)) ||
+      (boss !== undefined && spawn.mobId === boss) ||
+      (packId !== null && spawn.packId === packId);
+    if (!hit) return;
+    const mob = ctx.entities.get(inst.mobIds[i]);
+    if (!mob || mob.dead) return;
+    ctx.handleDeath(mob, killer);
+    killed++;
+  });
+  return killed;
+}
+
+/** Is this claim's heart awake (its seal markers carry the arrival)? */
+function heartAwake(ctx: SimContext, inst: InstanceSlot): boolean {
+  for (const id of inst.objectIds) {
+    const e = ctx.entities.get(id);
+    const m = e ? smithHeartSealMaskOf(e.templateId) : null;
+    if (m !== null) return (m & SMITH_HEART_AWAKE_BIT) !== 0;
+  }
+  return false;
+}
+
+/** The `/dev heart seal` readout line for one claim. */
+export function smithHeartSealReadout(ctx: SimContext, inst: InstanceSlot): string {
+  const p = smithHeartProgress(ctx, inst);
+  return `[dev] Heart seal: mask ${p.mask}, slabOpen ${p.slabOpen}, sealLit ${p.sealLit}, ringClear ${p.ringClear}, portalOpen ${p.portalOpen}, awake ${heartAwake(ctx, inst)}.`;
+}
+
+/** Handles `/dev heart ...`; returns false for any other line. */
+export function handleSmithHeartDevChat(ctx: SimContext, raw: string, pid: number): boolean {
+  const m = /^\/dev\s+heart(?:\s+(\S+))?(?:\s+(.*?))?\s*$/i.exec(raw);
+  if (!m) return false;
+  const verb = (m[1] ?? '').toLowerCase();
+  const arg = (m[2] ?? '').toLowerCase().replace(/\s+/g, ' ');
+  if (verb === 'enter') {
+    // The blockout has one tier; heroic waits for phase 2.
+    ctx.setDungeonDifficulty('normal', pid);
+    if (enterDungeon(ctx, SMITH_HEART_DUNGEON, pid, true))
+      log(ctx, pid, "[dev] Entering the Smith's Heart (normal).");
+    return true;
+  }
+  if (verb === 'tp') {
+    const area = SMITH_HEART_DEV_AREAS[arg];
+    if (!area) {
+      ctx.error(pid, HELP);
+      return true;
+    }
+    const inst = ensureInside(ctx, pid);
+    const e = ctx.entities.get(pid);
+    if (!inst || !e) {
+      ctx.error(pid, "[dev] Could not enter the Smith's Heart.");
+      return true;
+    }
+    // groundPos reads the authored field's floor height for the instance.
+    const o = instanceOrigin(DUNGEONS[SMITH_HEART_DUNGEON].index, inst.slot);
+    displacePlayerForDev(ctx, e, o.x + area.x, o.z + area.z);
+    log(ctx, pid, `[dev] Smith's Heart: ${arg}.`);
+    return true;
+  }
+  if (verb === 'kill') {
+    const what = arg || 'all';
+    const inst = ensureInside(ctx, pid);
+    if (!inst) return true;
+    const n = killSmithHeartMatching(ctx, pid, inst, what);
+    if (n < 0) {
+      ctx.error(pid, HELP);
+      return true;
+    }
+    log(ctx, pid, `[dev] Killed ${n} Smith's Heart mob${n === 1 ? '' : 's'} (${what}).`);
+    return true;
+  }
+  if (verb === 'pool') {
+    // The bot raid's human-equivalent check: every boss pool (and the final
+    // boss's Splinters) of this run times k, until `/dev heart pool 1`.
+    const k = Number(arg);
+    const inst = ensureInside(ctx, pid);
+    if (!inst) return true;
+    if (!Number.isFinite(k) || k < 0.1 || k > 5) {
+      ctx.error(pid, '[dev] /dev heart pool <0.1 to 5> (1 clears).');
+      return true;
+    }
+    setTierHealthDevScale(inst, k);
+    log(ctx, pid, `[dev] Smith's Heart pools of this run times ${k} from the next pull.`);
+    return true;
+  }
+  if (verb === 'gates') {
+    const inst = ensureInside(ctx, pid);
+    if (!inst) return true;
+    setDungeonGatesDevOpen(inst, true);
+    log(ctx, pid, "[dev] Every Smith's Heart gate is open for this run.");
+    return true;
+  }
+  if (verb === 'portal') {
+    const inst = ensureInside(ctx, pid);
+    if (!inst) return true;
+    setSmithHeartPortalDevOpen(inst, true);
+    log(ctx, pid, "[dev] The heart seal's portal is forced open for this run.");
+    return true;
+  }
+  if (verb === 'seal') {
+    const inst = claimFor(ctx, pid);
+    if (!inst) {
+      ctx.error(pid, "[dev] Not inside a Smith's Heart run (/dev heart enter).");
+      return true;
+    }
+    log(ctx, pid, smithHeartSealReadout(ctx, inst));
+    return true;
+  }
+  if (verb === 'arrival') {
+    const inst = claimFor(ctx, pid);
+    if (!inst) {
+      ctx.error(pid, "[dev] Not inside a Smith's Heart run (/dev heart enter).");
+      return true;
+    }
+    replaySmithHeartArrivalForDev(ctx, inst);
+    log(ctx, pid, '[dev] The heart sleeps a moment; it wakes again with the raid in the Heart.');
+    return true;
+  }
+  if (verb === 'final') {
+    const inst = ensureInside(ctx, pid);
+    if (!inst) return true;
+    const reply = smithHeartFinalDevTrigger(ctx, inst, arg, pid);
+    if (reply === null) {
+      ctx.error(pid, HELP);
+      return true;
+    }
+    log(ctx, pid, `[dev] ${reply}`);
+    return true;
+  }
+  if (verb === 'council') {
+    const inst = ensureInside(ctx, pid);
+    if (!inst) return true;
+    if (!arg) {
+      log(ctx, pid, councilReadout(ctx, inst));
+      return true;
+    }
+    const pullAll = (): number => {
+      const me = ctx.entities.get(pid);
+      const bodies = councilBodies(ctx, inst);
+      if (!me || !bodies) return 0;
+      let n = 0;
+      for (const b of [bodies.guardian, bodies.singer]) {
+        if (b && !b.dead && ctx.aggroMob(b, me, false)) n++;
+      }
+      return n;
+    };
+    if (arg === 'pull') {
+      log(ctx, pid, `[dev] The Hammer Council wakes (${pullAll()} pulled).`);
+      return true;
+    }
+    // A mechanic forced on a council nobody has pulled pulls it first (an
+    // unpulled council resets its fight on the next tick).
+    const verbName = arg.split(' ')[0];
+    const bodies = councilBodies(ctx, inst);
+    if (
+      verbName !== 'reset' &&
+      verbName !== 'heroic' &&
+      verbName !== 'mythic' &&
+      bodies &&
+      !councilState(bodies)
+    )
+      pullAll();
+    const reply = councilDevTrigger(ctx, inst, arg);
+    if (reply === null) {
+      ctx.error(pid, HELP);
+      return true;
+    }
+    log(ctx, pid, `[dev] ${reply}`);
+    return true;
+  }
+  if (verb === 'breath') {
+    const inst = ensureInside(ctx, pid);
+    if (!inst) return true;
+    if (!arg) {
+      log(ctx, pid, breathReadout(ctx, inst));
+      return true;
+    }
+    const me = ctx.entities.get(pid);
+    const boss = breathGuardian(ctx, inst);
+    const pull = (): boolean => {
+      if (!me || !boss || boss.dead) return false;
+      return ctx.aggroMob(boss, me, false);
+    };
+    const verbName = arg.split(' ')[0];
+    if (verbName === 'pull') {
+      const o = instanceOrigin(DUNGEONS[SMITH_HEART_DUNGEON].index, inst.slot);
+      if (me) displacePlayerForDev(ctx, me, o.x + BREATH_PULL_SPOT.x, o.z + BREATH_PULL_SPOT.z);
+      log(
+        ctx,
+        pid,
+        pull()
+          ? '[dev] The Guardian of the Breath wakes on the Storm Cornice.'
+          : '[dev] The Guardian of the Breath cannot be pulled (fallen, or not in this run).',
+      );
+      return true;
+    }
+    // A mechanic forced on a guardian nobody pulled pulls it first (an
+    // unpulled guardian resets its fight on the next tick).
+    if (
+      verbName !== 'reset' &&
+      verbName !== 'heroic' &&
+      verbName !== 'mythic' &&
+      boss &&
+      !boss.dead &&
+      !boss.inCombat
+    )
+      pull();
+    const reply = breathDevTrigger(ctx, inst, arg, pid);
+    if (reply === null) {
+      ctx.error(pid, HELP);
+      return true;
+    }
+    log(ctx, pid, `[dev] ${reply}`);
+    return true;
+  }
+  if (verb === 'quench') {
+    const inst = ensureInside(ctx, pid);
+    if (!inst) return true;
+    if (!arg) {
+      log(ctx, pid, quenchReadout(ctx, inst, pid));
+      return true;
+    }
+    const me = ctx.entities.get(pid);
+    const boss = quenchGuardian(ctx, inst);
+    const pull = (): boolean => {
+      if (!me || !boss || boss.dead) return false;
+      return ctx.aggroMob(boss, me, false);
+    };
+    const verbName = arg.split(' ')[0];
+    if (verbName === 'pull') {
+      const o = instanceOrigin(DUNGEONS[SMITH_HEART_DUNGEON].index, inst.slot);
+      if (me) displacePlayerForDev(ctx, me, o.x + QUENCH_PULL_SPOT.x, o.z + QUENCH_PULL_SPOT.z);
+      log(
+        ctx,
+        pid,
+        pull()
+          ? '[dev] The Guardian of the Quench wakes on the Frozen Lake.'
+          : '[dev] The Guardian of the Quench cannot be pulled (fallen, or not in this run).',
+      );
+      return true;
+    }
+    // A mechanic forced on a guardian nobody pulled pulls it first (an
+    // unpulled guardian resets its fight on the next tick).
+    if (
+      verbName !== 'reset' &&
+      verbName !== 'heroic' &&
+      verbName !== 'mythic' &&
+      boss &&
+      !boss.dead &&
+      !boss.inCombat
+    )
+      pull();
+    const reply = quenchDevTrigger(ctx, inst, arg, pid);
+    if (reply === null) {
+      ctx.error(pid, HELP);
+      return true;
+    }
+    log(ctx, pid, `[dev] ${reply}`);
+    return true;
+  }
+  if (verb === 'heat') {
+    const inst = ensureInside(ctx, pid);
+    if (!inst) return true;
+    if (!arg) {
+      log(ctx, pid, heatReadout(ctx, inst, pid));
+      return true;
+    }
+    const me = ctx.entities.get(pid);
+    const boss = heatGuardian(ctx, inst);
+    const pull = (): boolean => {
+      if (!me || !boss || boss.dead) return false;
+      return ctx.aggroMob(boss, me, false);
+    };
+    const verbName = arg.split(' ')[0];
+    if (verbName === 'pull') {
+      const o = instanceOrigin(DUNGEONS[SMITH_HEART_DUNGEON].index, inst.slot);
+      if (me) displacePlayerForDev(ctx, me, o.x + HEAT_PULL_SPOT.x, o.z + HEAT_PULL_SPOT.z);
+      log(
+        ctx,
+        pid,
+        pull()
+          ? '[dev] The Guardian of the Heat wakes in the Hearth.'
+          : '[dev] The Guardian of the Heat cannot be pulled (fallen, or not in this run).',
+      );
+      return true;
+    }
+    // A mechanic forced on a guardian nobody pulled pulls it first (an
+    // unpulled guardian resets its fight on the next tick).
+    if (
+      verbName !== 'reset' &&
+      verbName !== 'heroic' &&
+      verbName !== 'mythic' &&
+      boss &&
+      !boss.dead &&
+      !boss.inCombat
+    )
+      pull();
+    const reply = heatDevTrigger(ctx, inst, arg, pid);
+    if (reply === null) {
+      ctx.error(pid, HELP);
+      return true;
+    }
+    log(ctx, pid, `[dev] ${reply}`);
+    return true;
+  }
+  if (verb === 'reset') {
+    const inst = claimFor(ctx, pid);
+    if (inst) {
+      leaveDungeon(ctx, pid);
+      freeInstance(ctx, inst);
+    }
+    if (enterDungeon(ctx, SMITH_HEART_DUNGEON, pid, true))
+      log(ctx, pid, "[dev] Smith's Heart reset: a fresh run.");
+    return true;
+  }
+  ctx.error(pid, HELP);
+  return true;
+}

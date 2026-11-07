@@ -1,0 +1,1727 @@
+// The Hammer Council's effects (plan: council_fx_core.ts), hosted by
+// ../rift_death_zone.ts beside the guardians'. Presentation only, read from
+// IWorld (the pillar, rubble and rise-spot objects, the auras on the players,
+// the council's bars and energy, its events), so offline and online look the
+// same:
+//  - the pillars: the quarry's carved columns and the Seam Singer's raised
+//    stone (the Hammer and rock kits' own pieces), each showing its integrity
+//    on the model on every tier: a network of seams that cracks open and
+//    burns hotter as it loses pieces, a lean that grows, the crown split
+//    loose at the last piece, three pips round its foot that go dark one by
+//    one; a risen pillar bursts out of the floor with dust and shards; a
+//    fallen one tips, breaks and sinks into its rubble, which lies as a
+//    hazard footprint until it is gone; the council's fall sinks the risen
+//    ones; the Guardian's cursed pillar burning crimson-magenta (no pips,
+//    no shelter), throbbing on its pulse and shattering on its break;
+//  - the marks: Wake the Stone's circle round its player (the knockback's
+//    reach, the control colour) with the ghost of the pillar it will raise
+//    growing in it; the heir's rising stone locked on the floor; the Falling
+//    Rock's soak (gold: gather in it) with the boulder dropping out of the
+//    sky over its last moments and its impact; Resonance's spread ring round
+//    its player (danger: every ally inside is hurt each second) with a
+//    shimmer on the body and a ring rolling out on each pulse; Mountain's
+//    Rush's mark round its player and the lane the Guardian will charge down
+//    (council_rush_fx.ts); Hammer's Weight's slam on the tank and its mark
+//    at the tank's feet;
+//  - Bond of the Stone's gold thread between the two members
+//    (council_bond_fx.ts); the mythic Quarry Collapse's falling rock;
+//  - the Seam Singer's bolt (an ochre shard), the heroic pillars' pulse
+//    rings, the inheritance's stream of stone light from the fallen to each
+//    survivor, and the Wrath holder's energy gathering round it.
+// Every footprint, ring, pip, crack and lean draws on every tier (the static
+// preset sheds only the dust, grit and debris); reduced motion drops the
+// shakes.
+//
+// Rules (src/render/CLAUDE.md): every material is built in the constructor
+// under one root before its gated attach (the kits' pieces, which land later,
+// draw with the kits' shared slot materials, linked with the interior); no
+// light; fixed pools, no per-frame allocation; the footprints ride the floor
+// ladder's encounter band through the shared floor telegraph.
+
+import * as THREE from 'three';
+import { sfx } from '../../game/sfx';
+import { CouncilAudio } from '../../game/smith_heart_council_audio';
+import { resolveUiEffectsProfile } from '../../game/ui_effects_profile';
+import {
+  type CouncilRole,
+  COUNCIL_TUNING as T,
+} from '../../sim/encounters/smith_heart/council_ids';
+import type { Aura, Entity, SimEvent } from '../../sim/types';
+import type { IWorld } from '../../world_api';
+import { fxAnchor, needsRedrape } from '../attached_fx_anchor';
+import { type TelegraphFan, TelegraphKit } from '../floor_telegraph';
+import { floorVfxRenderOrder } from '../floor_vfx_layer';
+import { attachSceneGroupGated } from '../gated_scene_attach';
+import { GFX } from '../gfx';
+import { getFlameTex } from '../ignivar_fire_vfx';
+import { setRenderCategory } from '../renderer_diagnostics';
+import {
+  ensureHeartKit,
+  heartKitLoaded,
+  heartKitMeshes,
+  heartKitProgramWarmers,
+  SMITH_HEART_HAMMER_KIT_URL,
+  SMITH_HEART_HEART_KIT_URL,
+  SMITH_HEART_ROCK_KIT_URL,
+} from '../smith_heart/heart_kit';
+import { radialGlowTexture } from '../textures';
+import { EngineParticles } from '../trash_engine_fx/engine_particles';
+import { CouncilBondFx } from './council_bond_fx';
+import {
+  BOLT_SECONDS,
+  COUNCIL_FX_COLORS as C,
+  COUNCIL_AURAS,
+  COUNCIL_CASTS,
+  COUNCIL_CUES,
+  COUNCIL_MARK_SPECS,
+  COUNCIL_RUBBLE,
+  councilClaims,
+  councilPillarOf,
+  councilRiseSpotSeconds,
+  councilRoleOf,
+  councilSoulOf,
+  energyLook,
+  INHERIT_SECONDS,
+  inheritArc,
+  inSmithHeartClaim,
+  isCursedPillar,
+  markFill,
+  markRadius,
+  COUNCIL_FX_POOLS as POOLS,
+  RISE_SPOT_SPEC,
+  ROCK_FALL_SECONDS,
+  resonancePulseLook,
+  rockFall,
+  SOUL_COLORS,
+  SOUL_TAKE_SECONDS,
+  soakCountdown,
+  WEIGHT_DROP_SECONDS,
+  wakeGhost,
+} from './council_fx_core';
+import { CouncilLimitFx } from './council_limit_fx';
+import { type CouncilFxHost, CouncilPillarsFx, RISEN_HEIGHT } from './council_pillars_fx';
+import { CouncilRushFx } from './council_rush_fx';
+import { CouncilShelters } from './council_shelter_fx';
+import { CouncilSoakFx } from './council_soak_fx';
+import { CouncilSoulFx } from './council_soul_fx';
+import { chunkGeometry, Rubble } from './hammer_fx';
+import type { CouncilTelegraphKind } from './painted_telegraph_core';
+import {
+  COUNCIL_TELEGRAPH_GLOW_STEP,
+  craterFade,
+  craterHeat,
+  craterPit,
+  ROCK_CRATER,
+  rockCrescendo,
+} from './painted_telegraph_core';
+import { CouncilTelegraphs, type PaintedFan } from './painted_telegraphs';
+
+/** What a soul pillar is to the council's sound. */
+const SOUL_SOUND = { guardian: 'echo', singer: 'song' } as const;
+
+const SCAN_SEC = 0.1;
+// ---- a soft additive band (the ghost pillar, Resonance, the threads) -----------------------
+
+const BAND_VERT = /* glsl */ `
+varying vec2 vUv;
+void main() {
+  vUv = uv;
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+}
+`;
+const BAND_FRAG = /* glsl */ `
+uniform float uAlpha;
+uniform float uTime;
+uniform float uFlow;
+uniform float uBase;
+uniform vec3 uColor;
+varying vec2 vUv;
+void main() {
+  float rise = 1.0 - vUv.y;
+  float ripple = 0.6 + 0.4 * sin(vUv.y * 22.0 - uTime * uFlow + vUv.x * 6.2831853 * 3.0);
+  // \`uBase\` clears the band's foot (the ghost pillar: the split floor under
+  // it reads through).
+  float a = uAlpha * rise * ripple * mix(1.0, smoothstep(0.0, 0.45, vUv.y), uBase);
+  gl_FragColor = vec4(uColor * (0.8 + 0.6 * ripple), a);
+  #include <colorspace_fragment>
+}
+`;
+
+// ---- a flat ring on the floor (the Weight's mark, the energy's gauge) -----------------------
+
+const RING_VERT = /* glsl */ `
+varying vec2 vXZ;
+void main() {
+  vXZ = position.xz;
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+}
+`;
+/** A ring of `uNotches` dashes (0: whole) turning with time; `uFill` of it
+ *  lit (the Weight's time left), the rest dim. */
+const RING_FRAG = /* glsl */ `
+uniform float uAlpha;
+uniform float uTime;
+uniform float uNotches;
+uniform float uSpin;
+uniform float uFill;
+uniform vec3 uColor;
+varying vec2 vXZ;
+void main() {
+  float a = atan(vXZ.x, vXZ.y);
+  float t = fract(a / 6.2831853 + 0.5 + uTime * uSpin);
+  float dash = uNotches > 0.5 ? step(0.35, fract(t * uNotches)) : 1.0;
+  float lit = step(fract(a / 6.2831853 + 0.5), uFill);
+  float a2 = uAlpha * mix(0.25, 1.0, dash) * mix(0.35, 1.0, lit);
+  gl_FragColor = vec4(uColor, a2);
+  #include <colorspace_fragment>
+}
+`;
+
+interface MarkSlot {
+  key: string;
+  playerId: number;
+  auraId: string;
+  fan: TelegraphFan;
+  /** The fan's stone paint (Wake the Stone's split, or the rock's). */
+  paint: PaintedFan<CouncilTelegraphKind>;
+  ghost: THREE.Mesh;
+  ghostMat: THREE.ShaderMaterial;
+  seen: boolean;
+  /** Where the fan was last draped (NaN: not yet). */
+  drapedX: number;
+  drapedZ: number;
+}
+
+interface SpotSlot {
+  id: number;
+  fan: TelegraphFan;
+  /** The fan's stone paint (the heir's rising stone). */
+  paint: PaintedFan<CouncilTelegraphKind>;
+  ghost: THREE.Mesh;
+  ghostMat: THREE.ShaderMaterial;
+  born: number;
+  /** Its warning (the spot's template carries it: mythic's is shorter). */
+  seconds: number;
+  seen: boolean;
+  x: number;
+  y: number;
+  z: number;
+}
+
+interface RockSlot {
+  playerId: number;
+  mesh: THREE.Group;
+  spinAxis: THREE.Vector3;
+  seen: boolean;
+  /** The floor has rumbled for this drop (once per fall). */
+  rumbled: boolean;
+}
+
+/** Resonance's shimmer round its carrier (its floor ring is a mark). */
+interface RingSlot {
+  playerId: number;
+  band: THREE.Mesh;
+  bandMat: THREE.ShaderMaterial;
+  /** When its last pulse rang (the host clock). */
+  pulseAt: number;
+  seen: boolean;
+}
+
+interface WeightSlot {
+  playerId: number;
+  ring: THREE.Mesh;
+  ringMat: THREE.ShaderMaterial;
+  stone: THREE.Group | null;
+  seen: boolean;
+}
+
+interface BoltSlot {
+  alive: boolean;
+  born: number;
+  sourceId: number;
+  targetId: number;
+  from: THREE.Vector3;
+  mesh: THREE.Mesh;
+}
+
+interface StreamSlot {
+  alive: boolean;
+  born: number;
+  sourceId: number;
+  targetId: number;
+  from: THREE.Vector3;
+  acc: number;
+  /** Mythic: a soul flowing into its pillar (its colour, its arrival). */
+  soul: CouncilRole | null;
+}
+
+interface DropSlot {
+  alive: boolean;
+  born: number;
+  targetId: number;
+  mesh: THREE.Group | null;
+}
+
+const _v = new THREE.Vector3();
+const _v2 = new THREE.Vector3();
+const _m = new THREE.Matrix4();
+const _s = new THREE.Vector3();
+const _id = new THREE.Quaternion();
+/** Per-frame scratch (the frame allocates nothing). */
+const _paint = { fill: 0, clock: 0, range: 0 };
+const _arc = { along: 0, lift: 0 };
+const _moteColor: [number, number, number] = [1, 0.8, 0.36];
+const _moteDir: [number, number, number] = [0, 1, 0];
+const MOTE_GATHER = [1, 0.82, 0.4] as const;
+const _markMote = {
+  speed: 0,
+  up: 0,
+  life: 0.9,
+  size: [0.3, 0.1] as const,
+  color: _moteColor as readonly [number, number, number],
+  alpha: 0.85,
+  pool: 'glow' as const,
+  dir: _moteDir as readonly [number, number, number],
+  spread: 0.2,
+};
+const _beadMote = {
+  speed: 0.6,
+  life: 0.6,
+  size: [0.6, 0.15] as const,
+  color: _moteColor as readonly [number, number, number],
+  alpha: 0.95,
+  pool: 'glow' as const,
+};
+const _ember = {
+  speed: 0.6,
+  up: 0,
+  life: 1,
+  size: [0.3, 0.08] as const,
+  color: _moteColor as readonly [number, number, number],
+  alpha: 0.9,
+  pool: 'glow' as const,
+};
+const ROCK_GRIT = {
+  speed: 0.5,
+  life: 0.7,
+  size: [0.8, 2.2] as const,
+  color: C.dust,
+  alpha: 0.45,
+};
+/** A pebble hopping off the floor as the rock drops (the ground shaking). */
+const ROCK_PEBBLE = {
+  speed: 0.6,
+  up: 3.2,
+  gravity: 14,
+  life: 0.55,
+  size: [0.32, 0.22] as const,
+  color: [0.36, 0.27, 0.19] as const,
+  alpha: 0.95,
+  drag: 0.4,
+};
+/** Dust lifting off the stone under the falling rock. */
+const ROCK_LIFT_DUST = {
+  speed: 0.4,
+  up: 1.1,
+  life: 1.1,
+  size: [0.9, 2.4] as const,
+  color: [0.62, 0.52, 0.4] as const,
+  alpha: 0.4,
+  drag: 1.6,
+};
+/** The impact's dust wall: rolling out low over the floor from the rim. */
+const _wallDir: [number, number, number] = [1, 0.12, 0];
+const ROCK_DUST_WALL = {
+  speed: 8,
+  life: 1.5,
+  size: [1.8, 4.5] as const,
+  color: [0.34, 0.25, 0.17] as const,
+  alpha: 0.65,
+  drag: 2.2,
+  dir: _wallDir as readonly [number, number, number],
+  spread: 0.25,
+};
+const _cd = { left: 0, beacon: 0, shadow: 0, dark: 0, near: 0 };
+const _pit = { share: 0, near: 0 };
+
+/** An entity's aura by id (an indexed loop: no closure a frame). */
+function auraById(e: Entity | undefined, id: string): Aura | undefined {
+  if (!e) return undefined;
+  const auras = e.auras;
+  for (let i = 0; i < auras.length; i++) if (auras[i].id === id) return auras[i];
+  return undefined;
+}
+
+/** The one reused paint of a fan (fill, clock, range). */
+function paint(fill: number, clock: number, range: number): typeof _paint {
+  _paint.fill = fill;
+  _paint.clock = clock;
+  _paint.range = range;
+  return _paint;
+}
+/** Beads in one inheritance stream. */
+const BEADS = 26;
+const _beadColor = new THREE.Color();
+/** A soul's colour as particle rgb (0..1), built once per soul. */
+const SOUL_RGB_CACHE: Partial<Record<CouncilRole, [number, number, number]>> = {};
+function _soulRgb(soul: CouncilRole): [number, number, number] {
+  let c = SOUL_RGB_CACHE[soul];
+  if (!c) {
+    const hex = SOUL_COLORS[soul].hex;
+    c = [((hex >> 16) & 255) / 255, ((hex >> 8) & 255) / 255, (hex & 255) / 255];
+    SOUL_RGB_CACHE[soul] = c;
+  }
+  return c;
+}
+
+export class CouncilFx {
+  readonly readyForEntry: Promise<void>;
+  private readonly root = new THREE.Group();
+  private readonly uTime = { value: 0 };
+  private readonly density: number;
+  private readonly detail: boolean;
+  private readonly particles: EngineParticles;
+  private readonly debris: Rubble;
+  private readonly kit: TelegraphKit;
+  /** The kit's fans dressed in the stone (painted_telegraphs.ts). */
+  private readonly paints: CouncilTelegraphs;
+  private readonly geometries: THREE.BufferGeometry[] = [];
+  private readonly materials: THREE.Material[] = [];
+  private readonly pillarsFx: CouncilPillarsFx;
+  private readonly soulFx: CouncilSoulFx;
+  /** The real safe shadows behind the pillars, for the Wrath and the Echo. */
+  private readonly shelters: CouncilShelters;
+  /** The soak's countdown rim, beacon and the rock's shadow. */
+  private readonly soak: CouncilSoakFx;
+  /** Bond of the Stone's thread between the two members. */
+  private readonly bond: CouncilBondFx;
+  /** Mountain's Rush's lane and impact, the Quarry Collapse's blows. */
+  private readonly rush: CouncilRushFx;
+  private readonly limitFx: CouncilLimitFx;
+  /** The players the Wrath's runes count (refilled at their pace). */
+  private readonly limitPlayers: Entity[] = [];
+  /** When the Wrath's shelters were last laid (the host clock), or -1. */
+  private wrathLaidAt = -1;
+  /** The council's sounds (game/smith_heart_council_audio.ts), fed by this
+   *  painter's cues, scan and frame. */
+  private readonly audio = new CouncilAudio(sfx);
+  private readonly marks: MarkSlot[] = [];
+  private readonly spots: SpotSlot[] = [];
+  private readonly rocks: RockSlot[] = [];
+  /** The craters the rocks leave (split stone settling, cosmetic). */
+  private readonly craters: {
+    fan: TelegraphFan;
+    paint: PaintedFan<CouncilTelegraphKind>;
+    born: number;
+    r: number;
+  }[] = [];
+  private readonly rings: RingSlot[] = [];
+  private readonly weights: WeightSlot[] = [];
+  private readonly bolts: BoltSlot[] = [];
+  private readonly streams: StreamSlot[] = [];
+  private readonly drops: DropSlot[] = [];
+  private readonly halo: THREE.Sprite;
+  private readonly haloMat: THREE.SpriteMaterial;
+  /** The energy's gauge on the floor round its holder (every tier). */
+  private readonly gauge: THREE.Mesh;
+  private readonly gaugeMat: THREE.ShaderMaterial;
+  /** The inheritance's beads of stone light (one instanced draw). */
+  private readonly beads: THREE.InstancedMesh;
+  private haloHolder = -1;
+  private readonly glowTex: THREE.Texture | null;
+  private seed = 0x3c11;
+  private scanTimer = 0;
+  private clock = 0;
+  private disposed = false;
+
+  constructor(
+    scene: THREE.Scene,
+    private readonly groundY: (x: number, z: number) => number,
+    private readonly world?: IWorld,
+    compileGate?: (target: THREE.Object3D) => Promise<unknown>,
+    private readonly reducedMotion: () => boolean = () => false,
+    private readonly shakeSink?: (amount: number) => void,
+    playGesture?: (entityId: number, gesture: string) => void,
+  ) {
+    this.root.name = 'smith-heart-council-fx';
+    setRenderCategory(this.root, 'ui3d');
+    this.detail =
+      resolveUiEffectsProfile({ presetLabel: GFX.tier, effectsQuality: 1, reduceMotion: false })
+        .tier !== 'low';
+    this.density = this.detail ? 1 : 0.4;
+    const hasDom = typeof document !== 'undefined';
+    this.particles = new EngineParticles(
+      this.root,
+      this.uTime,
+      this.density,
+      (x, z) => this.groundY(x, z),
+      () => this.rand(),
+      () => this.reducedMotion(),
+      hasDom ? getFlameTex() : null,
+    );
+    const chunk = chunkGeometry();
+    this.geometries.push(chunk);
+    this.debris = new Rubble(
+      this.root,
+      Math.round(POOLS.debris * (this.detail ? 1 : 0.5)),
+      chunk,
+      (x, z) => this.groundY(x, z),
+      () => this.rand(),
+    );
+    this.kit = new TelegraphKit(this.root, this.detail);
+    this.paints = new CouncilTelegraphs(COUNCIL_TELEGRAPH_GLOW_STEP, this.materials);
+    const paints = this.paints;
+    // A one-triangle carrier for every material that waits on a kit's piece.
+    const carrier = new THREE.BufferGeometry();
+    carrier.setAttribute('position', new THREE.BufferAttribute(new Float32Array(9), 3));
+    carrier.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(6), 2));
+    carrier.setAttribute(
+      'normal',
+      new THREE.BufferAttribute(new Float32Array([0, 1, 0, 0, 1, 0, 0, 1, 0]), 3),
+    );
+    this.geometries.push(carrier);
+    const host: CouncilFxHost = {
+      root: this.root,
+      entity: (id) => this.world?.entities.get(id),
+      uTime: this.uTime,
+      particles: this.particles,
+      debris: this.debris,
+      kit: this.kit,
+      paints,
+      groundY: (x, z) => this.groundY(x, z),
+      rand: () => this.rand(),
+      now: () => this.clock,
+      density: this.density,
+      detail: this.detail,
+      reducedMotion: () => this.reducedMotion(),
+      shakeNear: (x, z, amount, reach) => this.shakeNear(x, z, amount, reach),
+      geometries: this.geometries,
+      materials: this.materials,
+    };
+    this.pillarsFx = new CouncilPillarsFx(host, carrier);
+    this.shelters = new CouncilShelters(host, this.pillarsFx);
+    this.soak = new CouncilSoakFx(this.root, this.uTime, this.geometries, this.materials);
+    this.bond = new CouncilBondFx(host);
+    this.rush = new CouncilRushFx(host, playGesture);
+    this.limitFx = new CouncilLimitFx(host, this.pillarsFx);
+    this.soulFx = new CouncilSoulFx(host, this.pillarsFx, this.shelters);
+    const bandGeo = new THREE.CylinderGeometry(1, 1, 1, 40, 1, true).translate(0, 0.5, 0);
+    const ringGeo = new THREE.RingGeometry(0.93, 1, 96, 1).rotateX(-Math.PI / 2);
+    const shardGeo = new THREE.OctahedronGeometry(0.5, 0).scale(0.45, 0.45, 1.6);
+    this.geometries.push(bandGeo, ringGeo, shardGeo);
+    // ---- the marks and the heir's spots (a footprint and a ghost pillar) ----
+    const ghostMat = (name: string, color: number, base = 0) => {
+      const m = new THREE.ShaderMaterial({
+        name,
+        uniforms: {
+          uAlpha: { value: 0 },
+          uTime: this.uTime,
+          uFlow: { value: 3 },
+          uBase: { value: base },
+          uColor: { value: new THREE.Color(color) },
+        },
+        vertexShader: BAND_VERT,
+        fragmentShader: BAND_FRAG,
+        transparent: true,
+        depthWrite: false,
+        side: THREE.DoubleSide,
+        blending: THREE.AdditiveBlending,
+        toneMapped: false,
+      });
+      this.materials.push(m);
+      return m;
+    };
+    for (let i = 0; i < POOLS.marks; i++) {
+      const fan = this.kit.fan(14);
+      fan.group.visible = false;
+      const paint = paints.dress(fan, 'wake');
+      const gm = ghostMat('smithHeartWakeGhost', C.ochre, 1);
+      const ghost = new THREE.Mesh(bandGeo, gm);
+      ghost.name = 'smithHeartWakeGhost';
+      ghost.visible = false;
+      ghost.frustumCulled = false;
+      this.root.add(ghost);
+      this.marks.push({
+        key: '',
+        playerId: -1,
+        auraId: '',
+        fan,
+        paint,
+        ghost,
+        ghostMat: gm,
+        seen: false,
+        drapedX: Number.NaN,
+        drapedZ: Number.NaN,
+      });
+    }
+    for (let i = 0; i < POOLS.spots; i++) {
+      const fan = this.kit.fan(14);
+      this.kit.layOutFan(fan, 360, { color: RISE_SPOT_SPEC.color, accent: RISE_SPOT_SPEC.accent });
+      fan.group.visible = false;
+      const paint = paints.dress(fan, 'rise');
+      const gm = ghostMat('smithHeartRiseGhost', C.ochre, 1);
+      const ghost = new THREE.Mesh(bandGeo, gm);
+      ghost.name = 'smithHeartRiseGhost';
+      ghost.visible = false;
+      ghost.frustumCulled = false;
+      this.root.add(ghost);
+      this.spots.push({
+        id: -1,
+        fan,
+        paint,
+        ghost,
+        ghostMat: gm,
+        born: -99,
+        seconds: RISE_SPOT_SPEC.seconds,
+        seen: false,
+        x: 0,
+        y: 0,
+        z: 0,
+      });
+    }
+    for (let i = 0; i < POOLS.rocks; i++) {
+      const fan = this.kit.fan(12);
+      this.kit.layOutFan(fan, 360, { color: ROCK_CRATER.color, accent: ROCK_CRATER.accent });
+      fan.group.visible = false;
+      const paint = paints.dress(fan, 'crater');
+      this.craters.push({ fan, paint, born: -99, r: 1 });
+    }
+    // ---- the falling rocks (a boulder of the rock kit once it lands) ----
+    for (let i = 0; i < POOLS.rocks; i++) {
+      const mesh = new THREE.Group();
+      mesh.name = 'smithHeartFallingRock';
+      mesh.visible = false;
+      this.root.add(mesh);
+      this.rocks.push({
+        playerId: -1,
+        mesh,
+        spinAxis: new THREE.Vector3(1, 0.3, 0.2).normalize(),
+        seen: false,
+        rumbled: false,
+      });
+    }
+    // ---- Resonance: the shimmer round the body (its ring is a mark) ----
+    const ringMat = (name: string, color: number) => {
+      const m = new THREE.ShaderMaterial({
+        name,
+        uniforms: {
+          uAlpha: { value: 0 },
+          uTime: this.uTime,
+          uNotches: { value: 0 },
+          uSpin: { value: 0 },
+          uFill: { value: 1 },
+          uColor: { value: new THREE.Color(color) },
+        },
+        vertexShader: RING_VERT,
+        fragmentShader: RING_FRAG,
+        transparent: true,
+        depthWrite: false,
+        side: THREE.DoubleSide,
+        blending: THREE.AdditiveBlending,
+        toneMapped: false,
+      });
+      this.materials.push(m);
+      return m;
+    };
+    for (let i = 0; i < POOLS.rings; i++) {
+      const bm = ghostMat('smithHeartResonanceBand', C.resonance);
+      bm.uniforms.uFlow.value = 6;
+      const band = new THREE.Mesh(bandGeo, bm);
+      band.name = 'smithHeartResonanceBand';
+      band.visible = false;
+      band.frustumCulled = false;
+      this.root.add(band);
+      this.rings.push({ playerId: -1, band, bandMat: bm, pulseAt: -99, seen: false });
+    }
+    // ---- Hammer's Weight: the mark at the tank's feet and the stone over it ----
+    for (let i = 0; i < POOLS.weights; i++) {
+      const rm = ringMat('smithHeartWeightRing', C.weight);
+      rm.uniforms.uNotches.value = 6;
+      rm.uniforms.uSpin.value = -0.05;
+      const ring = new THREE.Mesh(ringGeo, rm);
+      ring.name = 'smithHeartWeightRing';
+      ring.renderOrder = floorVfxRenderOrder('encounter', 23);
+      ring.visible = false;
+      ring.frustumCulled = false;
+      this.root.add(ring);
+      this.weights.push({ playerId: -1, ring, ringMat: rm, stone: null, seen: false });
+    }
+    for (let i = 0; i < POOLS.weights; i++) {
+      this.drops.push({ alive: false, born: -99, targetId: -1, mesh: null });
+    }
+    // ---- the Seam Bolts ----
+    const boltMat = new THREE.MeshBasicMaterial({
+      color: 0xffd27a,
+      transparent: true,
+      opacity: 0.95,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      toneMapped: false,
+      name: 'smithHeartSeamBolt',
+    });
+    this.materials.push(boltMat);
+    for (let i = 0; i < POOLS.bolts; i++) {
+      const mesh = new THREE.Mesh(shardGeo, boltMat);
+      mesh.name = 'smithHeartSeamBolt';
+      mesh.visible = false;
+      mesh.frustumCulled = false;
+      this.root.add(mesh);
+      this.bolts.push({
+        alive: false,
+        born: -99,
+        sourceId: -1,
+        targetId: -1,
+        from: new THREE.Vector3(),
+        mesh,
+      });
+    }
+    for (let i = 0; i < POOLS.streams; i++) {
+      this.streams.push({
+        alive: false,
+        born: -99,
+        sourceId: -1,
+        targetId: -1,
+        from: new THREE.Vector3(),
+        acc: 0,
+        soul: null,
+      });
+    }
+    // ---- the Wrath holder's gathering energy ----
+    const glowTex = hasDom ? radialGlowTexture() : null;
+    this.glowTex = glowTex;
+    this.haloMat = new THREE.SpriteMaterial({
+      map: glowTex,
+      color: 0xffb860,
+      transparent: true,
+      opacity: 0,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      fog: false,
+      name: 'smithHeartCouncilEnergy',
+    });
+    this.materials.push(this.haloMat);
+    this.halo = new THREE.Sprite(this.haloMat);
+    this.halo.visible = false;
+    this.root.add(this.halo);
+    this.gaugeMat = ringMat('smithHeartCouncilEnergyGauge', C.ochre);
+    this.gaugeMat.uniforms.uNotches.value = 20;
+    const gaugeGeo = new THREE.RingGeometry(0.86, 1, 120, 1).rotateX(-Math.PI / 2);
+    this.geometries.push(gaugeGeo);
+    this.gauge = new THREE.Mesh(gaugeGeo, this.gaugeMat);
+    this.gauge.name = 'smithHeartCouncilEnergyGauge';
+    this.gauge.renderOrder = floorVfxRenderOrder('encounter', 21);
+    this.gauge.visible = false;
+    this.gauge.frustumCulled = false;
+    this.root.add(this.gauge);
+    const beadGeo = new THREE.IcosahedronGeometry(0.42, 1);
+    this.geometries.push(beadGeo);
+    // White, tinted per bead (the inheritance's ochre, a soul's own colour):
+    // every instance carries its colour from the start, so the program is
+    // the same one the gate linked.
+    const beadMat = new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: 0.9,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      toneMapped: false,
+      name: 'smithHeartInheritBeads',
+    });
+    this.materials.push(beadMat);
+    this.beads = new THREE.InstancedMesh(beadGeo, beadMat, POOLS.streams * BEADS);
+    this.beads.name = 'smithHeartInheritBeads';
+    this.beads.frustumCulled = false;
+    this.beads.visible = false;
+    this.beads.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+    const ochre = new THREE.Color(0xffc070);
+    for (let i = 0; i < POOLS.streams * BEADS; i++) {
+      this.beads.setMatrixAt(i, _m.makeScale(0, 0, 0));
+      this.beads.setColorAt(i, ochre);
+    }
+    this.root.add(this.beads);
+    // The kit's slot programs, so a council piece that shows before the
+    // interior's gate settles links nothing in a live frame.
+    this.root.add(heartKitProgramWarmers());
+    this.readyForEntry = attachSceneGroupGated(scene, this.root, compileGate, () => this.disposed)
+      .then(() => {})
+      .catch(() => {});
+    if (hasDom) {
+      for (const url of [
+        SMITH_HEART_HAMMER_KIT_URL,
+        SMITH_HEART_ROCK_KIT_URL,
+        SMITH_HEART_HEART_KIT_URL,
+      ])
+        void ensureHeartKit(url);
+    }
+  }
+
+  private rand(): number {
+    this.seed = (Math.imul(this.seed, 1664525) + 1013904223) | 0;
+    return (this.seed >>> 0) / 4294967296;
+  }
+
+  private shakeNear(x: number, z: number, amount: number, reach = 50): void {
+    if (!this.shakeSink || !this.world || this.reducedMotion()) return;
+    const me = this.world.entities.get(this.world.playerId);
+    if (!me) return;
+    const d = Math.hypot(me.pos.x - x, me.pos.z - z);
+    if (d < reach) this.shakeSink(amount * (1 - (d / reach) * 0.7));
+  }
+
+  // ---- kit pieces ----------------------------------------------------------------------------
+
+  // ---- events -------------------------------------------------------------------------------
+
+  /** Claims the council's own cues (the renderer's generic draw is skipped). */
+  handleEvent(ev: SimEvent): boolean {
+    if (!this.world || this.disposed) return false;
+    const world = this.world;
+    this.audio.event(
+      ev,
+      (id) => world.entities.get(id),
+      (x, z) => this.groundY(x, z),
+    );
+    if (ev.type === 'spellfxAt') {
+      if (!councilClaims(ev.ability)) return false;
+      if (ev.ability === COUNCIL_CUES.collapse) {
+        this.pillarsFx.collapseAt(ev.x, ev.z, ev.radius ?? 4);
+        this.rush.pillarStruck(ev.x, ev.z, false);
+      } else if (ev.ability === COUNCIL_CUES.soulBurst) this.pillarsFx.soulBurstAt(ev.x, ev.z);
+      else if (ev.ability === COUNCIL_CUES.rockImpact) this.rockImpact(ev.x, ev.z, ev.radius ?? 6);
+      else if (ev.ability === COUNCIL_CUES.settle) this.pillarsFx.settleAt(ev.x, ev.z);
+      else if (ev.ability === COUNCIL_CUES.rushWindup)
+        this.rush.windup(
+          ev.sourceId,
+          ev.x,
+          ev.z,
+          ev.dirX ?? 0,
+          ev.dirZ ?? 0,
+          ev.speed ?? T.rushSpeed,
+          ev.duration ?? 0,
+        );
+      else if (ev.ability === COUNCIL_CUES.rushImpact)
+        this.rush.impactAt(ev.x, ev.z, ev.radius ?? T.rushHalfWidth);
+      else if (ev.ability === COUNCIL_CUES.cursedBreak) {
+        this.pillarsFx.cursedBreakAt(ev.x, ev.z, ev.radius ?? T.cursedR);
+        this.rush.pillarStruck(ev.x, ev.z, true);
+      } else if (ev.ability === COUNCIL_CUES.quarryCollapse) this.rush.collapseAt(ev.x, ev.z);
+      return true;
+    }
+    if (ev.type !== 'spellfx' || !councilClaims(ev.ability)) return false;
+    const ability = ev.ability;
+    if (ability === COUNCIL_CUES.rise || ability === COUNCIL_CUES.cursedRise)
+      this.pillarsFx.rise(ev.sourceId);
+    else if (ability === COUNCIL_CUES.cursedPulse) this.pillarsFx.cursedPulse(ev.sourceId);
+    else if (ability === COUNCIL_CUES.bondPulse) this.bond.pulse(ev.sourceId, ev.targetId);
+    else if (ability === COUNCIL_CUES.resonancePulse) this.resonancePulse(ev.sourceId);
+    else if (ability === COUNCIL_CUES.crack) this.pillarsFx.cracked(ev.sourceId);
+    else if (ability === COUNCIL_CUES.pulse) this.pillarsFx.pulse(ev.sourceId);
+    else if (ability === COUNCIL_CUES.inherit) {
+      this.startStream(ev.sourceId, ev.targetId, null);
+    } else if (ability === COUNCIL_CUES.soulTake) {
+      const src = this.world.entities.get(ev.sourceId);
+      const role = src ? councilRoleOf(src.templateId) : null;
+      this.startStream(ev.sourceId, ev.targetId, role ?? 'guardian');
+    } else if (ability === COUNCIL_CUES.soulPip) this.pillarsFx.soulPip(ev.sourceId);
+    else if (ability === COUNCIL_CUES.echoBlast) this.soulFx.echoBlast(ev.sourceId);
+    else if (ability === COUNCIL_CUES.songPulse) this.soulFx.songPulse(ev.sourceId);
+    else if (ability === COUNCIL_CASTS.bolt) {
+      this.startBolt(ev.sourceId, ev.targetId);
+    } else if (ability === COUNCIL_CASTS.weight) {
+      this.startDrop(ev.targetId);
+    }
+    return true;
+  }
+
+  // ---- the frame ----------------------------------------------------------------------------
+
+  update(dt: number): void {
+    const world = this.world;
+    if (!world || this.disposed) return;
+    this.clock += dt;
+    this.uTime.value = this.clock;
+    this.scanTimer -= dt;
+    if (this.scanTimer <= 0) {
+      this.scanTimer = SCAN_SEC;
+      this.scan(world);
+    }
+    this.soulFx.update(dt, this.clock);
+    this.pillarsFx.update(dt);
+    this.updateMarks(world);
+    this.updateSpots();
+    this.updateRocks(world);
+    this.updateCraters();
+    this.updateRings(world);
+    this.updateWeights(world);
+    this.updateDrops(world);
+    this.updateBolts(world, dt);
+    this.updateStreams(world, dt);
+    this.updateEnergy(world, dt);
+    this.updateWrathShelters(world);
+    this.bond.update(dt);
+    this.rush.update(dt);
+    this.audio.update(
+      dt,
+      (id) => world.entities.get(id),
+      this.inRaid(world) ? (world.entities.get(world.playerId) ?? null) : null,
+    );
+    this.debris.update(dt);
+    this.particles.update(this.clock);
+  }
+
+  /** In the Smith's Heart at all (one cheap read of the local player). */
+  private inRaid(world: IWorld): boolean {
+    const me = world.entities.get(world.playerId);
+    return !!me && inSmithHeartClaim(me.pos.x, me.pos.z);
+  }
+
+  private scan(world: IWorld): void {
+    const here = this.inRaid(world);
+    // The pillars and the rubble.
+    this.pillarsFx.beginScan();
+    this.soulFx.beginScan();
+    this.bond.beginScan();
+    this.rush.beginScan();
+    this.audio.beginScan();
+    for (const m of this.marks) m.seen = false;
+    for (const r of this.rocks) r.seen = false;
+    for (const r of this.rings) r.seen = false;
+    for (const w of this.weights) w.seen = false;
+    for (const sp of this.spots) sp.seen = false;
+    // The Wrath holder (the member whose energy is not empty), found here at
+    // the scan's pace, never by a walk a frame.
+    let holder = -1;
+    if (here) {
+      for (const e of world.entities.values()) {
+        if (e.kind === 'mob') {
+          const role = e.dead ? null : councilRoleOf(e.templateId);
+          if (role !== null) {
+            this.audio.see(e, 'member');
+            this.bond.see(e);
+            if (role === 'guardian') this.rush.seeGuardian(e);
+          }
+          if (
+            holder < 0 &&
+            !e.dead &&
+            e.resourceType === 'energy' &&
+            e.resource > 0 &&
+            councilRoleOf(e.templateId) !== null
+          )
+            holder = e.id;
+          continue;
+        }
+        if (e.kind === 'object') {
+          const pillar = councilPillarOf(e.templateId);
+          const soul = pillar ? null : councilSoulOf(e.templateId);
+          if (pillar) this.pillarsFx.seePillar(e, pillar.integrity, pillar.risen);
+          else if (isCursedPillar(e.templateId)) this.pillarsFx.seePillar(e, 1, true, null, true);
+          else if (soul) {
+            this.pillarsFx.seePillar(e, soul.pips, soul.risen, soul.role);
+            this.soulFx.seeSoul(e, soul.role);
+            this.audio.see(e, SOUL_SOUND[soul.role]);
+          } else if (e.templateId === COUNCIL_RUBBLE) this.pillarsFx.seeRubble(e);
+          else if (councilRiseSpotSeconds(e.templateId) !== null) this.seeSpot(e);
+          continue;
+        }
+        if (e.kind !== 'player' || e.dead || e.auras.length === 0) continue;
+        for (const a of e.auras) {
+          if (COUNCIL_MARK_SPECS[a.id]) this.seeMark(e, a.id);
+          if (a.id === COUNCIL_AURAS.rockMark) {
+            this.seeRock(e);
+            this.audio.see(e, 'rock');
+          } else if (a.id === COUNCIL_AURAS.resonance) this.seeRing(e);
+          else if (a.id === COUNCIL_AURAS.weight) this.seeWeight(e);
+        }
+      }
+    }
+    this.haloHolder = holder;
+    // What the scan no longer saw.
+    this.pillarsFx.endScan();
+    this.soulFx.endScan();
+    this.bond.endScan();
+    this.rush.endScan();
+    this.audio.endScan();
+    for (const m of this.marks) {
+      if (m.playerId >= 0 && !m.seen) this.freeMark(m);
+    }
+    for (const r of this.rocks) {
+      if (r.playerId >= 0 && !r.seen) {
+        r.playerId = -1;
+        r.mesh.visible = false;
+      }
+    }
+    for (const r of this.rings) {
+      if (r.playerId >= 0 && !r.seen) this.freeRing(r);
+    }
+    for (const w of this.weights) {
+      if (w.playerId >= 0 && !w.seen) {
+        w.playerId = -1;
+        w.ring.visible = false;
+        if (w.stone) w.stone.visible = false;
+      }
+    }
+    for (const sp of this.spots) {
+      if (sp.id >= 0 && !sp.seen) {
+        sp.id = -1;
+        sp.fan.group.visible = false;
+        sp.ghost.visible = false;
+      }
+    }
+  }
+
+  // ---- the pillars ----------------------------------------------------------------------------
+
+  // ---- the marks ----------------------------------------------------------------------------
+
+  private seeMark(e: Entity, auraId: string): void {
+    const key = `${e.id}|${auraId}`;
+    let m = this.marks.find((q) => q.key === key);
+    if (!m) {
+      m = this.marks.find((q) => q.playerId < 0);
+      if (!m) return;
+      const spec = COUNCIL_MARK_SPECS[auraId];
+      if (!spec) return;
+      m.key = key;
+      m.playerId = e.id;
+      m.auraId = auraId;
+      this.kit.layOutFan(m.fan, 360, { color: spec.color, accent: spec.accent });
+      this.paints.setLook(
+        m.paint,
+        auraId === COUNCIL_AURAS.rockMark
+          ? 'rock'
+          : auraId === COUNCIL_AURAS.resonance
+            ? 'resonance'
+            : auraId === COUNCIL_AURAS.rushMark
+              ? 'rush'
+              : 'wake',
+      );
+      m.fan.group.visible = true;
+      m.ghost.visible = auraId === COUNCIL_AURAS.wakeMark;
+    }
+    m.seen = true;
+  }
+
+  private freeMark(m: MarkSlot): void {
+    m.key = '';
+    m.drapedX = Number.NaN;
+    m.drapedZ = Number.NaN;
+    m.playerId = -1;
+    m.fan.group.visible = false;
+    m.ghost.visible = false;
+  }
+
+  private updateMarks(world: IWorld): void {
+    for (const m of this.marks) {
+      if (m.playerId < 0) continue;
+      const p = world.entities.get(m.playerId);
+      const a = auraById(p, m.auraId);
+      if (!p || !a) continue;
+      const spec = COUNCIL_MARK_SPECS[m.auraId];
+      const radius = markRadius(spec, a.value2);
+      const fill = markFill(a.remaining, a.duration);
+      // The mark rides the player's drawn body, never the snapshot.
+      const at = fxAnchor(p);
+      const y = this.groundY(at.x, at.z);
+      // Re-drape over the floor once the player has moved far enough; slide between.
+      if (needsRedrape(at.x, at.z, m.drapedX, m.drapedZ)) {
+        this.kit.drapeFan(m.fan, this.groundY, at.x, y, at.z, 0, radius);
+        m.drapedX = at.x;
+        m.drapedZ = at.z;
+      } else this.kit.placeFan(m.fan, at.x, y, at.z);
+      this.kit.paintFan(m.fan, paint(fill, this.clock, radius));
+      // The stone's live dressing: the rock's shadow under the soak and the
+      // floor heating as it drops; the pillar's split heating as it comes.
+      if (m.auraId === COUNCIL_AURAS.rockMark) {
+        const duration = a.duration > 0 ? a.duration : T.rockMarkSeconds;
+        soakCountdown(a.remaining, duration, _cd);
+        this.paints.live(
+          m.paint,
+          rockCrescendo(a.remaining, ROCK_FALL_SECONDS),
+          _cd.shadow,
+          _cd.near,
+        );
+      } else this.paints.live(m.paint, 0.6 * fill * fill);
+      if (m.ghost.visible) {
+        const g = wakeGhost(fill);
+        m.ghost.position.set(at.x, y, at.z);
+        m.ghost.scale.set(T.risenR, RISEN_HEIGHT * g.height, T.risenR);
+        m.ghostMat.uniforms.uAlpha.value = 0.5 * g.glow;
+      }
+      // The soak's motes stream in (gather); the wake's rise like dust.
+      if (this.density > 0.5 && this.rand() < 0.4) {
+        const ang = this.rand() * Math.PI * 2;
+        const r = radius * (0.9 + this.rand() * 0.1);
+        _markMote.speed = spec.gather ? 2.4 : 0.6;
+        _markMote.up = spec.gather ? 0.6 : 1.8;
+        const tint = spec.gather ? MOTE_GATHER : C.flash;
+        _moteColor[0] = tint[0];
+        _moteColor[1] = tint[1];
+        _moteColor[2] = tint[2];
+        _moteDir[0] = spec.gather ? -Math.sin(ang) : 0;
+        _moteDir[1] = spec.gather ? 0 : 1;
+        _moteDir[2] = spec.gather ? -Math.cos(ang) : 0;
+        const mx = at.x + Math.sin(ang) * r;
+        this.particles.puff(mx, y + 0.2, at.z + Math.cos(ang) * r, 1, _markMote);
+      }
+    }
+  }
+
+  private seeSpot(e: Entity): void {
+    let sp = this.spots.find((q) => q.id === e.id);
+    if (!sp) {
+      sp = this.spots.find((q) => q.id < 0);
+      if (!sp) return;
+      sp.id = e.id;
+      sp.x = e.pos.x;
+      sp.z = e.pos.z;
+      sp.y = this.groundY(sp.x, sp.z);
+      sp.born = this.clock;
+      sp.seconds = councilRiseSpotSeconds(e.templateId) ?? RISE_SPOT_SPEC.seconds;
+      sp.fan.group.visible = true;
+      sp.ghost.visible = true;
+      this.kit.drapeFan(sp.fan, this.groundY, sp.x, sp.y, sp.z, 0, RISE_SPOT_SPEC.radius);
+    }
+    sp.seen = true;
+  }
+
+  private updateSpots(): void {
+    for (const sp of this.spots) {
+      if (sp.id < 0) continue;
+      const fill = Math.min(1, (this.clock - sp.born) / sp.seconds);
+      this.kit.paintFan(sp.fan, paint(fill, this.clock, RISE_SPOT_SPEC.radius));
+      this.paints.live(sp.paint, 0.6 * fill * fill);
+      const g = wakeGhost(fill);
+      sp.ghost.position.set(sp.x, sp.y, sp.z);
+      sp.ghost.scale.set(T.risenR, RISEN_HEIGHT * g.height, T.risenR);
+      sp.ghostMat.uniforms.uAlpha.value = 0.55 * g.glow;
+    }
+  }
+
+  private seeRock(e: Entity): void {
+    let r = this.rocks.find((q) => q.playerId === e.id);
+    if (!r) {
+      r = this.rocks.find((q) => q.playerId < 0);
+      if (!r) return;
+      r.playerId = e.id;
+    }
+    // Dressed on any scan the kit is in (it may land after the mark).
+    if (r.mesh.children.length === 0 && heartKitLoaded(SMITH_HEART_ROCK_KIT_URL)) {
+      const b = heartKitMeshes(SMITH_HEART_ROCK_KIT_URL, 'Kit_BoulderA');
+      if (b) {
+        const box = this.pillarsFx.boxOf(SMITH_HEART_ROCK_KIT_URL, 'Kit_BoulderA');
+        const size = box ? Math.max(box.max.x - box.min.x, box.max.z - box.min.z) : 4;
+        b.scale.setScalar(3.4 / Math.max(0.1, size));
+        r.mesh.add(b);
+      }
+    }
+    r.seen = true;
+  }
+
+  private updateRocks(world: IWorld): void {
+    for (let i = 0; i < this.rocks.length; i++) {
+      const r = this.rocks[i];
+      if (r.playerId < 0) {
+        this.soak.hide(i);
+        continue;
+      }
+      const p = world.entities.get(r.playerId);
+      const a = auraById(p, COUNCIL_AURAS.rockMark);
+      if (!p || !a) {
+        r.mesh.visible = false;
+        this.soak.hide(i);
+        continue;
+      }
+      const at = fxAnchor(p);
+      const y = this.groundY(at.x, at.z);
+      const duration = a.duration > 0 ? a.duration : T.rockMarkSeconds;
+      this.soak.paint(i, at.x, y, at.z, T.rockRadius, a.remaining, duration);
+      const fall = rockFall(a.remaining, duration);
+      // The last drop: the floor rumbles once, grit and pebbles hop off the
+      // stone under the shadow (cosmetic: the soak's rim keeps the area).
+      if (a.remaining > ROCK_FALL_SECONDS) r.rumbled = false;
+      else {
+        if (!r.rumbled) {
+          r.rumbled = true;
+          this.shakeNear(at.x, at.z, 0.16, 30);
+        }
+        const drop = 1 - a.remaining / ROCK_FALL_SECONDS;
+        if (this.density > 0.5 && this.rand() < 0.35 + 0.6 * drop) {
+          const ang = this.rand() * Math.PI * 2;
+          const rr = Math.sqrt(this.rand()) * T.rockRadius * 0.8;
+          const px = at.x + Math.sin(ang) * rr;
+          const pz = at.z + Math.cos(ang) * rr;
+          this.particles.puff(px, this.groundY(px, pz) + 0.1, pz, 2, ROCK_PEBBLE);
+          if (this.rand() < 0.5)
+            this.particles.puff(px, this.groundY(px, pz) + 0.2, pz, 1, ROCK_LIFT_DUST);
+        }
+      }
+      r.mesh.visible = fall.visible;
+      if (!fall.visible) continue;
+      r.mesh.position.set(at.x, y + 1.6 + fall.height, at.z);
+      r.mesh.quaternion.setFromAxisAngle(r.spinAxis, fall.spin);
+      // A trail of grit off the falling stone.
+      if (this.density > 0.5 && this.rand() < 0.6)
+        this.particles.puff(
+          r.mesh.position.x,
+          r.mesh.position.y + 1,
+          r.mesh.position.z,
+          1,
+          ROCK_GRIT,
+        );
+    }
+  }
+
+  private updateCraters(): void {
+    for (const c of this.craters) {
+      if (!c.fan.group.visible) continue;
+      const fade = craterFade(this.clock - c.born);
+      if (fade <= 0) {
+        c.fan.group.visible = false;
+        continue;
+      }
+      this.kit.paintFan(c.fan, { fill: 1, clock: this.clock, range: c.r, fade, front: 0 });
+      const pit = craterPit(this.clock - c.born, _pit);
+      this.paints.live(c.paint, craterHeat(this.clock - c.born), pit.share, pit.near);
+    }
+  }
+
+  private rockImpact(x: number, z: number, radius: number): void {
+    const y = this.groundY(x, z);
+    // The crater: the floor split where the rock came down.
+    let crater = this.craters[0];
+    for (const c of this.craters) if (c.born < crater.born) crater = c;
+    crater.born = this.clock;
+    crater.r = radius * ROCK_CRATER.share;
+    crater.fan.group.visible = true;
+    this.kit.drapeFan(crater.fan, this.groundY, x, y, z, this.rand() * Math.PI * 2, crater.r);
+    // Dark from this very frame: the pit and the hot cores are painted now,
+    // not on the next update (the impact never reads as a pale flash).
+    this.kit.paintFan(crater.fan, {
+      fill: 1,
+      clock: this.clock,
+      range: crater.r,
+      fade: 1,
+      front: 0,
+    });
+    const pit = craterPit(0, _pit);
+    this.paints.live(crater.paint, craterHeat(0), pit.share, pit.near);
+    for (const r of this.rocks) if (r.mesh.visible && r.playerId < 0) r.mesh.visible = false;
+    const n = Math.round(40 * this.density * (this.reducedMotion() ? 0.5 : 1));
+    for (let i = 0; i < n; i++) {
+      const a = this.rand() * Math.PI * 2;
+      const sp = 6 + this.rand() * 12;
+      this.debris.throw(
+        x + Math.sin(a),
+        y + 1,
+        z + Math.cos(a),
+        Math.sin(a) * sp,
+        5 + this.rand() * 9,
+        Math.cos(a) * sp,
+        0.3 + this.rand() * 0.8,
+      );
+    }
+    // A brief hot flash at the core (orange white, small: never a pale wash
+    // over the zone), a hot ring racing out past the crater, a dust ring.
+    this.particles.shockRing(x, z, 0xff8a2a, radius * 1.25, 0.28);
+    this.particles.shockRing(x, z, 0x5a3820, radius * 2, 1.1);
+    this.particles.puff(x, y + 0.5, z, 4, {
+      speed: 2,
+      life: 0.14,
+      size: [1.6, 3],
+      color: [1, 0.78, 0.45],
+      alpha: 0.85,
+      pool: 'glow',
+    });
+    this.particles.puff(x, y + 0.3, z, 5, {
+      speed: 3,
+      life: 0.3,
+      size: [1.2, 2.4],
+      color: [1, 0.42, 0.1],
+      alpha: 0.75,
+      pool: 'glow',
+      radius: radius * 0.25,
+    });
+    // Hot sparks off the split stone, and a wall of dust rolling out low.
+    this.particles.puff(x, y + 0.6, z, 26, {
+      speed: 11,
+      up: 5,
+      gravity: 16,
+      life: 0.7,
+      size: [0.35, 0.08],
+      color: [1, 0.72, 0.32],
+      alpha: 1,
+      pool: 'glow',
+      drag: 0.6,
+    });
+    const wall = Math.round(18 * (this.reducedMotion() ? 0.5 : 1));
+    for (let i = 0; i < wall; i++) {
+      const a = (i / wall) * Math.PI * 2 + this.rand() * 0.3;
+      _wallDir[0] = Math.sin(a);
+      _wallDir[2] = Math.cos(a);
+      const wx = x + Math.sin(a) * radius * 0.85;
+      const wz = z + Math.cos(a) * radius * 0.85;
+      this.particles.puff(wx, this.groundY(wx, wz) + 0.5, wz, 1, ROCK_DUST_WALL);
+    }
+    // A dark plume of grit thrown up from the pit (narrow, rising: it leaves
+    // the crater's floor clear).
+    this.particles.puff(x, y + 1.2, z, 10, {
+      speed: 1.5,
+      up: 5,
+      life: 1.4,
+      size: [1.2, 3.2],
+      color: [0.3, 0.22, 0.16],
+      alpha: 0.6,
+      drag: 1.8,
+      dir: [0, 1, 0],
+      spread: 0.25,
+    });
+    this.shakeNear(x, z, 0.85, 45);
+  }
+
+  // ---- Resonance --------------------------------------------------------------------------------
+
+  private seeRing(e: Entity): void {
+    let r = this.rings.find((q) => q.playerId === e.id);
+    if (!r) {
+      r = this.rings.find((q) => q.playerId < 0);
+      if (!r) return;
+      r.playerId = e.id;
+      r.pulseAt = -99;
+      r.band.visible = true;
+    }
+    r.seen = true;
+  }
+
+  private freeRing(r: RingSlot): void {
+    r.playerId = -1;
+    r.band.visible = false;
+  }
+
+  private updateRings(world: IWorld): void {
+    for (const r of this.rings) {
+      if (r.playerId < 0) continue;
+      const p = world.entities.get(r.playerId);
+      if (!p || !auraById(p, COUNCIL_AURAS.resonance)) continue;
+      const at = fxAnchor(p);
+      const y = this.groundY(at.x, at.z);
+      const pulse = resonancePulseLook(this.clock);
+      const flare = Math.max(0, 1 - (this.clock - r.pulseAt) / 0.4);
+      r.band.position.set(at.x, y, at.z);
+      r.band.scale.set(0.9 + 0.3 * flare, 2.4, 0.9 + 0.3 * flare);
+      r.bandMat.uniforms.uAlpha.value = 0.35 + 0.3 * pulse + 0.35 * flare;
+    }
+  }
+
+  /** `heart_resonance_pulse`: the carrier rings: a ring rolls out to the
+   *  spread's radius (the danger colour) and the shimmer flares. */
+  private resonancePulse(playerId: number): void {
+    const p = this.world?.entities.get(playerId);
+    if (!p) return;
+    const at = fxAnchor(p);
+    const radius = markRadius(
+      COUNCIL_MARK_SPECS[COUNCIL_AURAS.resonance],
+      auraById(p, COUNCIL_AURAS.resonance)?.value2,
+    );
+    this.particles.shockRing(at.x, at.z, C.danger, radius, 0.45);
+    this.particles.shockRing(at.x, at.z, C.resonance, radius * 0.6, 0.3);
+    for (const r of this.rings) if (r.playerId === playerId) r.pulseAt = this.clock;
+  }
+
+  // ---- Hammer's Weight ---------------------------------------------------------------------------
+
+  private seeWeight(e: Entity): void {
+    let w = this.weights.find((q) => q.playerId === e.id);
+    if (!w) {
+      w = this.weights.find((q) => q.playerId < 0);
+      if (!w) return;
+      w.playerId = e.id;
+      w.ring.visible = true;
+      if (w.stone) w.stone.visible = true;
+    }
+    // Dressed on any scan the kit is in (it may land after the mark).
+    if (!w.stone && heartKitLoaded(SMITH_HEART_HAMMER_KIT_URL)) {
+      const s = heartKitMeshes(SMITH_HEART_HAMMER_KIT_URL, 'Kit_SlabChunkB');
+      if (s) {
+        s.scale.setScalar(0.9);
+        for (const c of s.children) if (c instanceof THREE.Mesh) c.castShadow = false;
+        this.root.add(s);
+        w.stone = s;
+      }
+    }
+    w.seen = true;
+  }
+
+  private updateWeights(world: IWorld): void {
+    for (const w of this.weights) {
+      if (w.playerId < 0) continue;
+      const p = world.entities.get(w.playerId);
+      const a = auraById(p, COUNCIL_AURAS.weight);
+      if (!p || !a) continue;
+      // The mark and the stone ride the tank's drawn body, never the snapshot.
+      const at = fxAnchor(p);
+      const y = this.groundY(at.x, at.z);
+      w.ring.position.set(at.x, y + 0.1, at.z);
+      w.ring.scale.setScalar(1.7);
+      w.ringMat.uniforms.uFill.value = a.duration > 0 ? a.remaining / a.duration : 1;
+      w.ringMat.uniforms.uAlpha.value = 0.9;
+      if (w.stone) {
+        w.stone.position.set(at.x, y + 3.6 + Math.sin(this.clock * 1.6) * 0.15, at.z);
+        w.stone.rotation.y = this.clock * 0.5;
+      }
+    }
+  }
+
+  private startDrop(targetId: number): void {
+    const d = this.drops.find((q) => !q.alive) ?? this.drops[0];
+    d.alive = true;
+    d.born = this.clock;
+    d.targetId = targetId;
+    if (!d.mesh && heartKitLoaded(SMITH_HEART_HAMMER_KIT_URL)) {
+      const m = heartKitMeshes(SMITH_HEART_HAMMER_KIT_URL, 'Kit_SlabChunkA');
+      if (m) {
+        m.scale.setScalar(1.6);
+        this.root.add(m);
+        d.mesh = m;
+      }
+    }
+    if (d.mesh) d.mesh.visible = true;
+  }
+
+  private updateDrops(world: IWorld): void {
+    for (const d of this.drops) {
+      if (!d.alive) continue;
+      const t = (this.clock - d.born) / WEIGHT_DROP_SECONDS;
+      const p = world.entities.get(d.targetId);
+      if (!p) {
+        d.alive = false;
+        if (d.mesh) d.mesh.visible = false;
+        continue;
+      }
+      const at = fxAnchor(p);
+      const y = this.groundY(at.x, at.z);
+      if (t < 1) {
+        if (d.mesh) {
+          d.mesh.position.set(at.x, y + 7 * (1 - t * t) + 0.8, at.z);
+          d.mesh.rotation.set(0.4, this.clock, 0.2);
+        }
+        continue;
+      }
+      d.alive = false;
+      if (d.mesh) d.mesh.visible = false;
+      const n = Math.round(26 * this.density);
+      for (let i = 0; i < n; i++) {
+        const a = this.rand() * Math.PI * 2;
+        const sp = 4 + this.rand() * 8;
+        this.debris.throw(
+          at.x,
+          y + 1.2,
+          at.z,
+          Math.sin(a) * sp,
+          4 + this.rand() * 6,
+          Math.cos(a) * sp,
+          0.25 + this.rand() * 0.6,
+        );
+      }
+      this.particles.shockRing(at.x, at.z, C.weight, 4.5, 0.4);
+      this.particles.puff(at.x, y + 1, at.z, 16, {
+        speed: 5,
+        up: 1,
+        life: 1.6,
+        size: [1.5, 4.5],
+        color: C.dust,
+        alpha: 0.5,
+      });
+      this.particles.puff(at.x, y + 1.6, at.z, 8, {
+        speed: 3,
+        life: 0.35,
+        size: [2, 4],
+        color: [1, 0.55, 0.35],
+        alpha: 0.7,
+        pool: 'glow',
+      });
+      this.shakeNear(at.x, at.z, 0.45, 30);
+    }
+  }
+
+  // ---- Seam Bolt ----------------------------------------------------------------------------------
+
+  private startBolt(sourceId: number, targetId: number): void {
+    const src = this.world?.entities.get(sourceId);
+    if (!src) return;
+    const b = this.bolts.find((q) => !q.alive) ?? this.bolts[0];
+    b.alive = true;
+    b.born = this.clock;
+    b.sourceId = sourceId;
+    b.targetId = targetId;
+    const at = fxAnchor(src);
+    b.from.set(at.x, this.groundY(at.x, at.z) + 4, at.z);
+    b.mesh.visible = true;
+  }
+
+  private updateBolts(world: IWorld, dt: number): void {
+    for (const b of this.bolts) {
+      if (!b.alive) continue;
+      const t = (this.clock - b.born) / BOLT_SECONDS;
+      const target = world.entities.get(b.targetId);
+      if (!target) {
+        b.alive = false;
+        b.mesh.visible = false;
+        continue;
+      }
+      const at = fxAnchor(target);
+      _v2.set(at.x, this.groundY(at.x, at.z) + 1.3, at.z);
+      if (t >= 1) {
+        b.alive = false;
+        b.mesh.visible = false;
+        this.particles.puff(_v2.x, _v2.y, _v2.z, 12, {
+          speed: 5,
+          life: 0.4,
+          size: [0.4, 0.1],
+          color: [1, 0.78, 0.4],
+          alpha: 1,
+          pool: 'glow',
+        });
+        this.particles.puff(_v2.x, _v2.y, _v2.z, 4, {
+          speed: 1.5,
+          life: 0.6,
+          size: [1.2, 2.6],
+          color: C.dust,
+          alpha: 0.4,
+        });
+        continue;
+      }
+      const e = t * t * (3 - 2 * t);
+      _v.lerpVectors(b.from, _v2, e);
+      _v.y += Math.sin(t * Math.PI) * 1.6;
+      b.mesh.position.copy(_v);
+      b.mesh.lookAt(_v2);
+      b.mesh.rotateZ(this.clock * 9);
+      if (this.rand() < dt * 70 * this.density) {
+        this.particles.puff(_v.x, _v.y, _v.z, 1, {
+          speed: 0.4,
+          life: 0.35,
+          size: [0.35, 0.05],
+          color: [1, 0.74, 0.32],
+          alpha: 0.9,
+          pool: 'glow',
+        });
+      }
+    }
+  }
+
+  // ---- the stone remembers ------------------------------------------------------------------------
+
+  private startStream(sourceId: number, targetId: number, soul: CouncilRole | null): void {
+    const src = this.world?.entities.get(sourceId);
+    if (!src) return;
+    const s = this.streams.find((q) => !q.alive) ?? this.streams[0];
+    s.alive = true;
+    s.born = this.clock;
+    s.sourceId = sourceId;
+    s.targetId = targetId;
+    s.acc = 0;
+    s.soul = soul;
+    const at = fxAnchor(src);
+    s.from.set(at.x, this.groundY(at.x, at.z) + 2.5, at.z);
+    // The beads take the stream's colour (one write per stream, not a frame).
+    _beadColor.setHex(soul ? SOUL_COLORS[soul].hex : 0xffc070);
+    const base = this.streams.indexOf(s) * BEADS;
+    for (let i = 0; i < BEADS; i++) this.beads.setColorAt(base + i, _beadColor);
+    if (this.beads.instanceColor) this.beads.instanceColor.needsUpdate = true;
+    // The fallen gives up its light (a soul tears free: brighter, its colour).
+    this.particles.puff(s.from.x, s.from.y, s.from.z, soul ? 30 : 16, {
+      speed: soul ? 5 : 3,
+      up: 2,
+      life: 1,
+      size: [1.6, 3.6],
+      color: soul ? _soulRgb(soul) : C.flash,
+      alpha: 0.7,
+      pool: 'glow',
+    });
+    this.particles.shockRing(s.from.x, s.from.z, soul ? SOUL_COLORS[soul].hex : C.ochre, 6, 0.7);
+  }
+
+  private updateStreams(world: IWorld, dt: number): void {
+    let any = false;
+    for (let k = 0; k < this.streams.length; k++) {
+      const s = this.streams[k];
+      const base = k * BEADS;
+      const age = this.clock - s.born;
+      const span = s.soul ? SOUL_TAKE_SECONDS : INHERIT_SECONDS;
+      const target = s.alive ? world.entities.get(s.targetId) : undefined;
+      if (!s.alive || !target || age > span) {
+        if (s.alive && target && s.soul) {
+          // The soul arrives: its stone wakes.
+          this.pillarsFx.soulAwake(s.targetId, s.soul);
+        } else if (s.alive && target) {
+          // It arrives: the survivor flares with the fallen one's light.
+          const at = fxAnchor(target);
+          const y = this.groundY(at.x, at.z) + 3;
+          this.particles.puff(at.x, y, at.z, 24, {
+            speed: 5,
+            up: 1,
+            life: 0.8,
+            size: [2, 5],
+            color: [1, 0.76, 0.38],
+            alpha: 0.85,
+            pool: 'glow',
+          });
+          this.particles.shockRing(at.x, at.z, C.ochre, 7, 0.7);
+          this.shakeNear(at.x, at.z, 0.2, 30);
+        }
+        s.alive = false;
+        for (let i = 0; i < BEADS; i++) this.beads.setMatrixAt(base + i, _m.makeScale(0, 0, 0));
+        continue;
+      }
+      any = true;
+      const at = fxAnchor(target);
+      _v2.set(at.x, this.groundY(at.x, at.z) + (s.soul ? 6 : 3), at.z);
+      // A river of beads of stone light along the arc, its head racing out
+      // to the survivor and its tail still leaving the fallen (every tier:
+      // it is the inheritance's tell).
+      const head = Math.min(1.25, age / (span * 0.7));
+      for (let i = 0; i < BEADS; i++) {
+        const u = head - i * 0.05;
+        if (u < 0 || u > 1) {
+          this.beads.setMatrixAt(base + i, _m.makeScale(0, 0, 0));
+          continue;
+        }
+        const arc = inheritArc(u, _arc);
+        _v.lerpVectors(s.from, _v2, arc.along);
+        _v.y += arc.lift + Math.sin(this.clock * 9 + i) * 0.15;
+        const size = (1.9 - (i / BEADS) * 1.3) * (0.85 + 0.15 * Math.sin(this.clock * 14 + i));
+        _s.setScalar(size);
+        this.beads.setMatrixAt(base + i, _m.compose(_v, _id, _s));
+      }
+      s.acc += dt * 30 * this.density;
+      while (s.acc >= 1) {
+        s.acc -= 1;
+        const arc = inheritArc(Math.min(1, Math.max(0, head - this.rand() * 0.4)), _arc);
+        _v.lerpVectors(s.from, _v2, arc.along);
+        _v.y += arc.lift;
+        if (s.soul) {
+          const c = _soulRgb(s.soul);
+          _moteColor[0] = c[0];
+          _moteColor[1] = c[1];
+          _moteColor[2] = c[2];
+        } else {
+          _moteColor[0] = 1;
+          _moteColor[1] = 0.72 + this.rand() * 0.2;
+          _moteColor[2] = 0.36;
+        }
+        this.particles.puff(_v.x, _v.y, _v.z, 1, _beadMote);
+      }
+    }
+    this.beads.visible = any;
+    if (any) this.beads.instanceMatrix.needsUpdate = true;
+  }
+
+  // ---- the energy -----------------------------------------------------------------------------------
+
+  private updateEnergy(world: IWorld, dt: number): void {
+    // The holder comes from the scan; the frame only re-reads that one body.
+    const e = this.haloHolder >= 0 ? world.entities.get(this.haloHolder) : undefined;
+    if (!e || e.dead || e.resource <= 0) {
+      this.halo.visible = false;
+      this.gauge.visible = false;
+      return;
+    }
+    const look = energyLook(e.resource);
+    const at = fxAnchor(e);
+    const y = this.groundY(at.x, at.z);
+    // The gauge round its feet fills with the energy, white-hot near full.
+    this.gauge.position.set(at.x, y + 0.08, at.z);
+    this.gauge.scale.setScalar(Math.max(4, (e.scale ?? 1) * 1.7));
+    this.gaugeMat.uniforms.uFill.value = e.resource / T.energyMax;
+    (this.gaugeMat.uniforms.uColor.value as THREE.Color).setHex(look.crackle ? 0xfff0c8 : C.ochre);
+    this.gaugeMat.uniforms.uAlpha.value = look.crackle
+      ? 0.75 + 0.25 * Math.sin(this.clock * 12)
+      : 0.7;
+    this.gauge.visible = true;
+    const tall = (e.scale ?? 1) * 1.6;
+    // Over its head (a halo inside the body would be hidden by it).
+    this.halo.position.set(at.x, y + tall * 1.9, at.z);
+    const size = 3 + look.glow * 6 + (look.crackle ? Math.sin(this.clock * 20) * 0.6 : 0);
+    this.halo.scale.set(size, size, 1);
+    this.haloMat.opacity = 0.15 + look.glow * 0.55;
+    this.halo.visible = true;
+    if (this.rand() < dt * look.embers * this.density) {
+      const a = this.rand() * Math.PI * 2;
+      const r = 1 + this.rand() * 2.5;
+      _ember.up = 2.4 + look.glow * 3;
+      _moteColor[0] = 1;
+      _moteColor[1] = look.crackle ? 0.92 : 0.7;
+      _moteColor[2] = look.crackle ? 0.7 : 0.32;
+      this.particles.puff(at.x + Math.sin(a) * r, y + 0.4, at.z + Math.cos(a) * r, 1, _ember);
+    }
+  }
+
+  /** Narrow Shelter's gems for this Wrath, when its caster wears the limit. */
+  private layLimit(world: IWorld, caster: Entity): void {
+    const limit = auraById(caster, COUNCIL_AURAS.pillarLimit)?.value2 ?? 0;
+    if (limit <= 0) {
+      this.limitFx.hide();
+      this.audio.shelter(0, 0, 0, 0);
+      return;
+    }
+    this.limitPlayers.length = 0;
+    for (const p of world.entities.values()) {
+      if (p.kind !== 'player' || p.dead) continue;
+      if (Math.hypot(p.pos.x - caster.pos.x, p.pos.z - caster.pos.z) > T.wrathRadius) continue;
+      this.limitPlayers.push(p);
+    }
+    const players = this.limitPlayers;
+    const crowded = this.limitFx.lay(
+      caster.pos.x,
+      caster.pos.z,
+      limit,
+      players.length,
+      (i, out) => {
+        out.x = players[i].pos.x;
+        out.z = players[i].pos.z;
+      },
+    );
+    // A pillar one too many hide behind groans (Narrow Shelter's warning).
+    const at = this.limitFx.crowdedAt;
+    this.audio.shelter(crowded, at.x, this.groundY(at.x, at.z), at.z);
+  }
+
+  /** Mountain's Wrath's bar on its holder: the real shadow behind every
+   *  pillar that covers from it, laid as the bar begins and again as the
+   *  pillars change, fading in over the bar's first moments. */
+  private updateWrathShelters(world: IWorld): void {
+    const e = this.haloHolder >= 0 ? world.entities.get(this.haloHolder) : undefined;
+    const casting = !!e && !e.dead && e.castingAbility === COUNCIL_CASTS.wrath && e.castTotal > 0;
+    if (!casting || !e) {
+      if (this.wrathLaidAt >= 0) {
+        this.shelters.hide('wrath');
+        this.limitFx.hide();
+        this.audio.shelter(0, 0, 0, 0);
+        this.wrathLaidAt = -1;
+      }
+      return;
+    }
+    if (this.wrathLaidAt < 0 || this.clock - this.wrathLaidAt > 0.25) {
+      this.wrathLaidAt = this.clock;
+      this.shelters.lay('wrath', e.pos.x, e.pos.z, T.wrathRadius);
+      this.layLimit(world, e);
+    }
+    const fill = Math.max(0, Math.min(1, 1 - e.castRemaining / e.castTotal));
+    this.shelters.paint('wrath', Math.min(0.92, 0.45 + fill * 2));
+  }
+
+  dispose(): void {
+    if (this.disposed) return;
+    this.disposed = true;
+    this.bond.dispose();
+    this.root.removeFromParent();
+    this.particles.dispose();
+    this.kit.dispose();
+    for (const g of this.geometries) g.dispose();
+    for (const m of this.materials) m.dispose();
+    this.debris.mesh.dispose();
+    this.beads.dispose();
+    this.glowTex?.dispose();
+    this.audio.dispose();
+  }
+}

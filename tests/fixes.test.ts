@@ -730,15 +730,17 @@ describe('the Hollow Crypt doors', () => {
 describe('dungeon instance placement and targetability', () => {
   it('places every dungeon entry and mob spawn on unblocked instance ground', () => {
     for (const dungeon of DUNGEON_LIST) {
-      const ignivarRaidRoom = isIgnivarRaidRoom(dungeon.id);
-      const sim = ignivarRaidRoom
+      // The Smith's Heart's entry is still dev-gated (encounters/smith_heart/
+      // entry.ts), so it rides the Ignivar rooms' dev raid path.
+      const devRaidRoom = isIgnivarRaidRoom(dungeon.id) || dungeon.id === 'smith_heart';
+      const sim = devRaidRoom
         ? new Sim({ seed: SEED, playerClass: 'warrior', devCommands: true })
         : makeSim();
       if (dungeon.id === 'nythraxis_boss_arena') {
         sim.players.get(sim.playerId)?.questsDone.add('q_nythraxis_bound_guardian');
         formRaid(sim);
       }
-      if (ignivarRaidRoom) {
+      if (devRaidRoom) {
         formRaid(sim);
         expect(enterDungeon(sim.ctx, dungeon.id, sim.playerId, true)).toBe(true);
       } else {

@@ -523,6 +523,12 @@
     --color-field-map-snow: #dfe9f1;
     --color-field-map-ice: #7fb3cf;
     --color-field-map-slate: #4a5058;
+    --color-field-map-quarry: #8a6e4e;
+    --color-field-map-paving: #7d7266;
+    --color-field-map-scoured: #8e9298;
+    --color-field-map-rime: #8a96a6;
+    --color-field-map-lake-ice: #4f7690;
+    --color-field-map-hearth: #4a423c;
     --color-field-map-crevasse: #2e6f9e;
     --color-field-map-crevasse-deep: #0d1f33;
     --color-field-map-wall: #4b433a;
@@ -1388,6 +1394,10 @@
     --color-breath-drowning-soft: rgb(255 60 40 / 40%);
     /* Breath text keeps its cool high-contrast parchment tint. */
     --color-breath-label: #eaf4ff;
+    /* The Knotted Gale's second pair of portals (phase 2): Portal C in the
+       storm's spring green, Portal D in its rose, the floor's own colours. */
+    --color-knot-portal-c: #a8ff3e;
+    --color-knot-portal-d: #ff5ab0;
 
     /* chat */
     /* Multiplies the player's chat opacity while the dock is idle. */

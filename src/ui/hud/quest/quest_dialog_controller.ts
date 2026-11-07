@@ -1,3 +1,4 @@
+import type { VoiceFade } from '../../../game/voice';
 import { isGuildServiceNpc } from '../../../sim/content/highwatch_guild';
 import { isOnProvingShore } from '../../../sim/content/proving_shore';
 import { DELVES, ITEMS, NPCS, QUESTS } from '../../../sim/data';
@@ -120,7 +121,8 @@ export interface QuestDialogControllerDeps {
   voice: {
     play(key: string): void;
     isPlaying(): boolean;
-    setDistance(distance: number | null): void;
+    /** The source's distance (null: gone) and its fade (null: an NPC's). */
+    setDistance(distance: number | null, fade?: VoiceFade | null): void;
   };
 }
 
@@ -161,6 +163,8 @@ export class QuestDialogController {
   // across re-renders so a refresh never snaps the check back to the default.
   private rewardPick: { questId: string; itemId: string } | null = null;
   private voiceNpcId: number | null = null;
+  /** The current voice source's fade (null: a talked-to NPC's). */
+  private voiceFade: VoiceFade | null = null;
   private openState = false;
 
   constructor(private readonly deps: QuestDialogControllerDeps) {}
@@ -202,6 +206,7 @@ export class QuestDialogController {
     this.deps.closeTransient();
     this.deps.voice.play(`greeting__${npc.templateId}`);
     this.voiceNpcId = npc.id;
+    this.voiceFade = null;
     this.renderGossip(npc);
   }
 
@@ -347,7 +352,7 @@ export class QuestDialogController {
     }
     const world = this.deps.world();
     const npc = world.entities.get(this.voiceNpcId);
-    this.deps.voice.setDistance(npc ? dist2d(world.player.pos, npc.pos) : null);
+    this.deps.voice.setDistance(npc ? dist2d(world.player.pos, npc.pos) : null, this.voiceFade);
   }
 
   updateProximity(): void {
@@ -359,6 +364,17 @@ export class QuestDialogController {
 
   clearVoiceSource(): void {
     this.voiceNpcId = null;
+    this.voiceFade = null;
+  }
+
+  /** An overheard yell took the voice: with a fade, its speaker is the
+   *  source the per-frame update fades it by (a raid boss's line); without,
+   *  it plays at full (every other yell). */
+  setYellSource(speakerId: number | undefined, fade: VoiceFade | null): void {
+    this.clearVoiceSource();
+    if (fade === null || speakerId === undefined) return;
+    this.voiceNpcId = speakerId;
+    this.voiceFade = fade;
   }
 
   private ensureFocusTrap(): void {
@@ -805,6 +821,7 @@ export class QuestDialogController {
       state === 'ready' ? `quest__${questId}__complete` : `quest__${questId}__offer`,
     );
     this.voiceNpcId = npc.id;
+    this.voiceFade = null;
     markDialogRoot(this.deps.element, { labelledBy: 'quest-dialog-title' });
     let html = `<div class="panel-title ui-win-head"><span class="ui-win-title" id="quest-dialog-title">${esc(this.deps.text.questTitle(questId))}${this.deps.text.suggestedPlayers(quest.suggestedPlayers)}</span><button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(t('questUi.dialog.close'))}">${svgIcon('close')}</button></div>`;
     if (state === 'available' && quest.minLevel) {

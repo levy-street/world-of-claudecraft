@@ -150,6 +150,7 @@ describe('remastered soundtrack catalog', () => {
       'dungeon_hollow_crypt',
       'dungeon_sunken_bastion',
       'dungeon_gravewyrm_sanctum',
+      'dungeon_smith_heart',
       'ignivar_forge_approach',
       'ignivar_raid_arena',
       'ignivar_inner_crucible',

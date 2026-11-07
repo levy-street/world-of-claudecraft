@@ -79,6 +79,14 @@ const AUTHENTICATED_NODE_CLIENTS = [
     authSend: 'ws.send(JSON.stringify(worldAuthMessage(this.token, this.characterId)))',
   },
   {
+    // The shared raid-bot client (scripts/heart_council_raid.mjs); the spread
+    // carries the optional stable timer-wire capability for the one bot that
+    // reads the soul pillars the way the browser client does.
+    path: 'scripts/lib/world_bot.mjs',
+    authSend: '...worldAuthMessage(this.token, this.charId), ...authExtra',
+    tightSend: 'ws.send(JSON.stringify({...worldAuthMessage(this.token,this.charId),...authExtra})',
+  },
+  {
     path: 'scripts/load_players.mjs',
     authSend: 'ws.send(JSON.stringify(worldAuthMessage(this.token, this.characterId)));',
   },

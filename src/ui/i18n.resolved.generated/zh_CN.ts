@@ -4746,6 +4746,100 @@ export const zh_CN: EnTranslations = {
         "creepingRime": "移动速度降低{pct}%，每层{per}%。每次霜凇吐息都会叠加一层并将持续时间重置为{seconds}秒。叠到{max}层时你会被冻结（冰封）{freeze}秒，并清除所有层数。",
         "icedOver": "被蔓延霜凇冻结：无法移动或行动。"
       },
+      "council": {
+        "wakeMark": "结束时，一根石柱会从你脚下的地面冲出，对{radius}码内的所有人造成{min}到{max}点伤害并将其击退。站到团队需要掩体的位置。英雄和史诗难度：{heroicMin}到{heroicMax}点伤害。",
+        "rockMark": "结束时，一块巨石砸向你：{total}点伤害由{radius}码内的所有人分担。若不足{soakers}人分担，每人多受{penalty}%伤害，且全团受到{tremorMin}到{tremorMax}点伤害。{radius}码内的每根石柱都会损失一块，所以要远离掩体分担。史诗难度：{soulReach}码内的灵魂石柱改为失去一个灵魂印记，印记耗尽时碎裂。英雄和史诗难度：分担{heroicTotal}点伤害，全团受到{heroicTremorMin}到{heroicTremorMax}点伤害。",
+        "resonance": "每{every}秒你会发出共鸣，对你{radius}码内的每名盟友造成{min}到{max}点自然伤害。在效果结束前远离所有人。英雄和史诗难度：{heroicMin}到{heroicMax}点伤害。",
+        "rushMark": "结束时，重锤守护者会先蓄势{windup}秒，然后沿直线穿过你所站的位置，一直冲到采石场边缘；若路上有石柱，则停在遇到的第一根石柱处。把它引向诅咒石柱：石柱碎裂，守护者被昏迷{stun}秒，并在{exposedSeconds}秒内受到的伤害提高{exposed}%。若路线上挡着一根掩护石柱，则改为摧毁那根石柱。它停下之前撞到的所有人会受到{min}到{max}点伤害并被击退，如果你还在它的路线上，你也一样。史诗难度：没有撞上任何石柱的冲锋会引发采石场坍塌，直到诅咒石柱碎裂为止。英雄和史诗难度：{heroicMin}到{heroicMax}点伤害。",
+        "rushExposed": "受到的伤害提高{pct}%：山岳冲锋撞碎了诅咒石柱。",
+        "bond": "重锤议会的另一名成员在{reach}码内时，受到的伤害降低{pct}%。岩石之契每{every}秒对全团造成{min}到{max}点伤害，每次提高{growth}%。把他们拉开。英雄和史诗难度：{heroicMin}到{heroicMax}点伤害。",
+        "collapse": "采石场正在坍塌：每{every}秒，你每层受到{min}到{max}点伤害，且每次增加一层。诅咒石柱碎裂时结束。",
+        "memory": "造成的伤害提高{pct}%：重锤议会每倒下一名成员提高{per}%。",
+        "pillarLimit": "每根石柱最多只能为{limit}名玩家挡住山岳之怒。躲在后面的人更多时，每人承受冲击的{share}%。未躲藏者在普通难度受到{min}到{max}点伤害，英雄难度{heroicMin}到{heroicMax}点，史诗难度{mythicMin}到{mythicMax}点。"
+      },
+      "breathGuardian": {
+        "portalA": "效果结束时，传送门A会在你所站的位置打开。站在结风附近。本轮你无法携带它。",
+        "portalB": "效果结束时，传送门B会在你所站的位置打开。站在崖台边缘。本轮你无法携带结风。",
+        "portalC": "效果结束时，传送门C会在你所站的位置打开。它只与传送门D相连。站在另一团结风附近。本轮你无法携带它。",
+        "portalD": "效果结束时，传送门D会在你所站的位置打开。它只与传送门C相连。站在远离传送门B的崖台边缘。本轮你无法携带结风。",
+        "laden": "你正携带结风：移动速度变为{walk}%，无法闪现、冲锋或跳跃，风、拉扯、冲击和击飞都无法移动你。每个传送门都会把你送到它的另一端：A到B，C到D。在崖台边缘按下交互键，把它扔进虚空。效果结束时它会爆裂，杀死崖台上的所有人。",
+        "wind": "气息守护者的风以每秒{speed}码的速度将你带往它吹去的方向。逆风而行便能站稳，它不会打断你的施法。崖台四周没有墙：被吹出边缘，你会坠入虚空。只有攀登路口还立着墙，被压在墙上时每秒受到{pinMin}到{pinMax}点伤害。英雄和史诗难度：{heroicMin}到{heroicMax}点伤害。",
+        "draw": "守护者深吸一口气，以每秒{speed}码的速度将你拉向它。它嘴前的漩涡每{tick}秒对站在其中的人造成{min}到{max}点伤害。随后巅峰咆哮对崖台上的所有人造成{gustMin}到{gustMax}点伤害，并将他们从守护者身边吹飞{throw}码（英雄难度为{heroicThrow}码）：守护者靠近边缘时，团队会被吹出崖台。英雄和史诗难度：分别为{heroicMin}到{heroicMax}点和{heroicGustMin}到{heroicGustMax}点伤害。",
+        "pinned": "被风压在边缘的墙上：在风停歇或你离开墙边之前，每秒受到{min}到{max}点伤害。英雄和史诗难度：{heroicMin}到{heroicMax}点伤害。",
+        "anchor": "瑟萨莉队长的宁静稳住了你：风、拉扯、冲击和击飞都无法移动你。伤害照常生效。",
+        "spent": "你的锚定已经耗尽：在此效果结束前，瑟萨莉队长的宁静之环无法再次锚定你。",
+        "drawn": "每{every}秒会有一道闪电落在你所站之处：{warn}秒后对{radius}码内的所有人造成{min}到{max}点伤害，并留下带电的地面，在{charged}秒内每秒造成{cmin}到{cmax}点伤害。保持移动，把落雷引向远离团队的边缘。英雄和史诗难度：分别为{heroicMin}到{heroicMax}点和{heroicCMin}到{heroicCMax}点伤害。",
+        "cradled": "被举入风暴，在守护者引导摇篮的{hold}秒内被定住；其间守护者不会施放其他任何技能。随后的放电造成{total}点伤害，由你和你下方{radius}码内的所有人分担。分担人数少于{soakers}人时，每人多承受{penalty}%，且崖台上的所有人受到{bmin}到{bmax}点伤害。英雄难度：同时举起{heroicCount}名玩家，每次放电{heroicTotal}点，需要{heroicSoakers}人分担，团队要分头承受。英雄和史诗难度：反冲造成{heroicBMin}到{heroicBMax}点伤害。",
+        "bulwark": "风之护盾还能吸收{left}点伤害。只要浮岛上还有任一狂风哨兵或狂风愈者存活，它每秒恢复总量的{regrow}%，每次愈合之风恢复{mend}%。乘狂风之路飞往浮岛，消灭它们。维持{max}秒后，它会在崖台上爆裂，造成{bmin}到{bmax}点伤害。英雄和史诗难度：{heroicMin}到{heroicMax}点伤害。",
+        "riding": "风沿着固定的路线带你越过虚空：在被放下之前你无法行动。",
+        "windworn": "被风耗尽了力气：效果结束前，狂风之路不会带你前往浮岛。",
+        "thrown": "被巅峰咆哮掀飞：落地之前无法移动。",
+        "tossed": "被游荡狂风掀飞：狂风放下你之前无法移动。",
+        "stormForm": "撕裂为闪电之躯：战斗的风暴后半段，直到气息守护者倒下。",
+        "swell": "每{every}秒，膨胀的风暴对崖台上的所有人造成{min}到{max}点伤害，之前每次脉动使其增强{growth}%：目前已有{stacks}次。英雄和史诗难度：{heroicMin}到{heroicMax}点伤害。"
+      },
+      "quenchGuardian": {
+        "cold": "你的寒意：{cold}/{max}。独自一人时约{fill}秒充满。若{radius}码内有{others}名或更多其他玩家，则改为每秒下降{fall}。寒冰棺等免疫效果无法阻止它：免疫期间你既不提供也不获得温暖。达到{max}时你会被冰霜封住{freeze}秒，随后冰层碎裂。",
+        "warmth": "与团队相拥取暖：寒意每秒下降{fall}。在同一处停留{linger}秒的人群，脚下冰面会裂成冰冷的水洞，所以要不断移动。",
+        "frozen": "被冰霜封住：你无法行动，受到的所有伤害提高{pct}%，冰霜会击碎寒冰棺等免疫效果。效果结束时冰层碎裂：你受到{min}到{max}点冰霜伤害，随后{seconds}秒内受到的伤害提高{brittle}%，{radius}码内的所有人获得{cold}点寒意（英雄难度为{heroicRadius}码、{heroicCold}点寒意）。英雄难度：{heroicMin}到{heroicMax}点伤害。史诗难度：{mythicMin}到{mythicMax}点伤害。",
+        "brittle": "受到的所有伤害提高{pct}%。此效果持续期间，队友碎冰的溅射无法让你的寒意超过{cap}。",
+        "splashed": "队友碎裂的冰溅到了你：寒意+{cold}。在你自己的寒意条充满前回到人群中。",
+        "trapped": "踏穿冰面掉进冰冷的水中：无法移动，每秒受到{min}到{max}点冰霜伤害，寒意不断上升。{seconds}秒后你会爬上岸边。仅凭冰水绝不会致死。英雄和史诗难度：{heroicMin}到{heroicMax}点伤害。",
+        "awake": "铸匠的四把利刃已苏醒。每一轮会有更多玩家被标记，利刃依次沿穿过他们的直线飞出。直线在利刃飞出前{lock}秒锁定，随后对线上的目标造成{min}到{max}点冰霜伤害，增加{cold}点寒冷。英雄和史诗难度：{heroicMin}到{heroicMax}点伤害。",
+        "marked": "你是{count}人中的第{order}个：利刃将沿穿过你的直线飞来。把直线引离团队。直线在利刃飞出前{lock}秒锁定，届时请离开，否则将受到{min}到{max}点冰霜伤害和{cold}点寒冷。英雄和史诗难度：{heroicMin}到{heroicMax}点伤害。",
+        "deepening": "湖的寒意上升快了{total}%：自刃苏醒后每{every}秒再快{step}%（目前{stacks}次）。"
+      },
+      "heatGuardian": {
+        "statePhase1": "半身沉在涌泉之中，从不移动。玄武岩之拳砸向岸上的一点，三道熔岩涌浪从那里滚滚而出；炉心闪焰会击中所有距离涌泉超过{reach}码的人。生命值降到70%时它会沉下，炉心随之满溢。英雄难度下伤害提高{heroicPct}%。",
+        "statePhase2": "半身沉在涌泉之中，从不移动。玄武岩之拳仍在继续；炉心火种落在团队脚下，片刻后爆裂，苏醒之火将涌泉周围的地面一圈接一圈地点燃。生命值降到40%时它会再次沉下，炉心再度满溢。英雄难度下伤害提高{heroicPct}%。",
+        "statePhase3": "半身沉在涌泉之中，从不移动。玄武岩之拳与苏醒之火仍在继续，滚动余烬会坠落并追逐玩家：击中它就能把它打退。英雄难度下伤害提高{heroicPct}%。",
+        "stateUnder": "沉入涌泉之中：炉心满溢期间无法被攻击或伤害。满溢结束后它会再次升起。",
+        "scorched": "受到的火焰、冰霜、自然、暗影和奥术伤害提高{pct}%。每{every}秒，炉心闪焰会击中所有距离涌泉超过{reach}码的人并刷新此效果。",
+        "grip": "每秒受到{total}点火焰伤害（{stacks}层中每层{per}点）。守护者每次命中都会叠加一层（最多{most}层），持续{seconds}秒：在灼烧过重之前换坦克。",
+        "kindling": "{seconds}秒后你会在{trail}秒内留下火焰足迹。每一块足迹每秒对友方造成{min}到{max}点火焰伤害，并为站在其中的涌泉之子每秒恢复{heal}%生命值：离开团队和涌泉之子的路线。英雄和史诗难度：{heroicMin}到{heroicMax}点伤害。",
+        "trail": "你正在留下余烬足迹：宽{radius}码的火焰燃烧{life}秒，每秒对其中的友方造成{min}到{max}点火焰伤害，并为其中的涌泉之子每秒恢复{heal}%生命值。英雄和史诗难度：{heroicMin}到{heroicMax}点伤害。",
+        "hunted": "一团滚动余烬或籽焰正在追你。被滚动余烬追上你会死亡，{radius}码内的所有人都会被灼烧：保持距离，让队友击打它，每次击打都会把它打退{knock}码（之后{crust}秒内无法再次打退）。",
+        "crust": "已冷却变硬：此效果结束前，击打无法将它打退。"
+      },
+      "finalBoss": {
+        "stateHeat": "饮下炽热：玄武岩之拳砸向一名玩家所在的位置，三道熔岩涌浪从那里滚滚而出，火焰旋风在地面上穿行。英雄难度下，余烬印记会在远程玩家脚下落下火焰；史诗难度下，它的正面攻击会留下熔炉之火。",
+        "stateQuench": "饮下淬火：{reach}码内其他玩家少于{allies}名的人会越来越冷并被冻结。英雄难度下，被标记玩家脚下的冰面会碎裂；史诗难度下，它的正面攻击会减速{slow}%。",
+        "stateBreath": "饮下吐息：狂风把团队推向边缘，跳跃雷击会在彼此相距{jump}码以内的玩家之间跳跃。英雄难度下，引雷会标记玩家；史诗难度下，每个风暴宝珠都必须由一名玩家拾取。",
+        "stateHammer": "饮下重锤：震颤裂痕在玩家脚下爆发，铁砧之重把伤害分摊给标记内的所有人。英雄难度下，石壳会吸收治疗，铁砧的分摊者会被粉碎；史诗难度下，铁砧的标记会绕着它旋转。",
+        "stateRing": "身处中央圆环时，它不饮下任何一角的力量。生命值高于{pct}%时，它在那里每秒获得一层心之脱缚。",
+        "overloadHeat": "炽热过载，已满{value}%。首领站在炽热区域时它会充能（从空到满需{fill}秒），并每{every}秒对团队造成脉冲伤害：空时{min}点，满时最高{max}点。即将充满时会警告团队。充满时会爆发，对整个团队造成伤害并清空：普通难度{normalMin}至{normalMax}点（靠治疗可以撑过），英雄难度{heroicMin}至{heroicMax}点（很重：先抬满血并使用减伤技能），史诗难度{mythicMin}至{mythicMax}点（致命：只有强力的个人减伤才能存活）。首领离开该区域后，它以三分之一的速度消退。其脉冲在英雄难度造成{heroicPulseMin}到{heroicPulseMax}点伤害，在史诗难度造成{mythicPulseMin}到{mythicPulseMax}点伤害。",
+        "overloadQuench": "淬火过载，已满{value}%。首领站在淬火区域时它会充能（从空到满需{fill}秒），并每{every}秒对团队造成脉冲伤害：空时{min}点，满时最高{max}点。即将充满时会警告团队。充满时会爆发，对整个团队造成伤害并清空：普通难度{normalMin}至{normalMax}点（靠治疗可以撑过），英雄难度{heroicMin}至{heroicMax}点（很重：先抬满血并使用减伤技能），史诗难度{mythicMin}至{mythicMax}点（致命：只有强力的个人减伤才能存活）。首领离开该区域后，它以三分之一的速度消退。其脉冲在英雄难度造成{heroicPulseMin}到{heroicPulseMax}点伤害，在史诗难度造成{mythicPulseMin}到{mythicPulseMax}点伤害。",
+        "overloadBreath": "吐息过载，已满{value}%。首领站在吐息区域时它会充能（从空到满需{fill}秒），并每{every}秒对团队造成脉冲伤害：空时{min}点，满时最高{max}点。即将充满时会警告团队。充满时会爆发，对整个团队造成伤害并清空：普通难度{normalMin}至{normalMax}点（靠治疗可以撑过），英雄难度{heroicMin}至{heroicMax}点（很重：先抬满血并使用减伤技能），史诗难度{mythicMin}至{mythicMax}点（致命：只有强力的个人减伤才能存活）。首领离开该区域后，它以三分之一的速度消退。其脉冲在英雄难度造成{heroicPulseMin}到{heroicPulseMax}点伤害，在史诗难度造成{mythicPulseMin}到{mythicPulseMax}点伤害。",
+        "overloadHammer": "重锤过载，已满{value}%。首领站在重锤区域时它会充能（从空到满需{fill}秒），并每{every}秒对团队造成脉冲伤害：空时{min}点，满时最高{max}点。即将充满时会警告团队。充满时会爆发，对整个团队造成伤害并清空：普通难度{normalMin}至{normalMax}点（靠治疗可以撑过），英雄难度{heroicMin}至{heroicMax}点（很重：先抬满血并使用减伤技能），史诗难度{mythicMin}至{mythicMax}点（致命：只有强力的个人减伤才能存活）。首领离开该区域后，它以三分之一的速度消退。其脉冲在英雄难度造成{heroicPulseMin}到{heroicPulseMax}点伤害，在史诗难度造成{mythicPulseMin}到{mythicPulseMax}点伤害。",
+        "root": "进入一个区域后扎根{seconds}秒：扎根结束前无法把它拖出去。",
+        "unbound": "每层每秒对整个团队造成{per}点伤害（当前{total}点）；站在中央圆环内时每秒获得一层。把它拖出圆环即可结束。英雄难度：每层{heroicPer}点。史诗难度：每层{mythicPer}点。",
+        "shaken": "持续期间，切换区域对你造成的伤害提高至{mult}倍（{min}至{max}点，而非{baseMin}至{baseMax}点）。每次切换都会将其刷新为{seconds}秒。英雄难度：{heroicMin}到{heroicMax}点伤害。史诗难度：{mythicMin}到{mythicMax}点伤害。",
+        "cold": "寒冷值{value}/100。{reach}码内其他玩家少于{allies}名时每秒上升{rise}点，达到人数后下降。达到100时你会被霜封住：昏迷{freeze}秒并受到{min}至{max}点冰霜伤害。英雄难度：{heroicMin}到{heroicMax}点伤害。史诗难度：{mythicMin}到{mythicMax}点伤害。",
+        "frozen": "昏迷。你因独自站立而被冻结：在它饮下淬火时，保持在{allies}名或更多其他玩家的{reach}码内。",
+        "underIce": "昏迷：你从碎裂的冰面掉了下去。",
+        "numbing": "被它的正面攻击减速{pct}%，持续{seconds}秒。",
+        "ember": "{seconds}秒后余烬会落在你的脚下，在{radius}码的范围内阴燃{life}秒，每秒对其中的任何人造成{min}至{max}点火焰伤害。与其他被标记的玩家站到同一个角落，然后离开。英雄难度：{heroicMin}到{heroicMax}点伤害。史诗难度：{mythicMin}到{mythicMax}点伤害。",
+        "wind": "狂风每秒把你朝它吹的方向推动{speed}码；顶着风走才能站稳（不会打断施法）。狂风吹拂时，处于边缘{band}码以内会每秒受到{min}至{max}点自然伤害。英雄难度：{heroicMin}到{heroicMax}点伤害。史诗难度：{mythicMin}到{mythicMax}点伤害。",
+        "drawn": "在{seconds}秒内，它每秒从你身上跳向{reach}码内的其他每名玩家，对每人造成{min}至{max}点自然伤害。与所有人保持{reach}码距离。英雄难度：{heroicMin}到{heroicMax}点伤害。史诗难度：{mythicMin}到{mythicMax}点伤害。",
+        "shell": "吸收你受到的下{value}点治疗。",
+        "crushed": "{seconds}秒内若站在下一次铁砧之重下，你会承受{mult}倍的分摊伤害。让另一组去分摊。",
+        "phaseCall": "四角召唤：只要碎片还活着，它就在中央受到护盾保护{seconds}秒。每个碎片每{every}秒对整个团队造成{min}到{max}点伤害，每次脉动提高{rise}%。将它们全部击杀可提前打破护盾；召唤结束时仍存活的碎片会把自己的元素注入它体内，直到战斗结束。英雄难度：{heroicMin}到{heroicMax}点伤害。史诗难度：{mythicMin}到{mythicMax}点伤害。",
+        "phaseFight": "生命值降到{first}%和{second}%时，它会在护盾保护下走入中央，从最满的几个角各召出一个碎片。降到{final}%时四个角全部苏醒，开始最后的抵抗。",
+        "phaseFinal": "四个角已全部苏醒：它停留在中央圆环，每{every}秒依次施放一种技能：火焰旋风、呻吟之冰、跳跃闪电、铁砧之重。{enrage}秒后它将失去一切克制（无主之怒）。",
+        "phaseKneel": "它跪下了。任何攻击都无法伤害它。",
+        "phaseRebirth": "心脏正在搏动。在它以{percent}%生命值站起之前，任何攻击都无法伤害它。",
+        "unmade": "每{every}秒铁砧的一整块区域坠落，过载条最满的区域最先，坠落前有{warn}秒裂纹警告。站在其上的人会一同坠落并死亡。最后一块区域坠落{ring}秒后，中央圆环破碎，所有人死亡。",
+        "shield": "聚集之力：免疫所有伤害，且无法被选为目标。",
+        "pouredHeat": "炽热注入其中：直到战斗结束，无论它站在哪里，每{every}秒都会掀起火焰旋风（已注入{times}次）。",
+        "pouredQuench": "淬火注入其中：直到战斗结束，{reach}码内其他玩家少于{allies}名的人在任何地方都会变冷，速度为淬火之角的{share}%（已注入{times}次）。",
+        "pouredBreath": "吐息注入其中：直到战斗结束，无论它站在哪里，每{every}秒都会施放跳跃闪电，在彼此相距{jump}码内的玩家之间跳跃（已注入{times}次）。",
+        "pouredHammer": "重锤注入其中：直到战斗结束，无论它站在哪里，每{every}秒都会在玩家脚下迸发震颤裂隙（已注入{times}次）。",
+        "fury": "无主之怒：每{every}秒对整个团队造成{min}到{max}点伤害，每次脉动提高{rise}%。立刻击杀它。英雄难度：{heroicMin}到{heroicMax}点伤害。史诗难度：{mythicMin}到{mythicMax}点伤害。",
+        "coal": "{seconds}秒后煤块爆裂：对你{reach}码内的所有其他玩家造成{min}到{max}点火焰伤害，对你自己造成{selfMin}到{selfMax}点。现在就离开人群。英雄难度：分别为{heroicMin}到{heroicMax}点和{heroicSelfMin}到{heroicSelfMax}点伤害。史诗难度：分别为{mythicMin}到{mythicMax}点和{mythicSelfMin}到{mythicSelfMax}点。",
+        "tether": "吐息碎片追猎你{seconds}秒。它的狂袭之风每秒对它{reach}码内的其他所有人造成{min}到{max}点自然伤害：把它从人群中拖走。英雄难度：{heroicMin}到{heroicMax}点伤害。史诗难度：{mythicMin}到{mythicMax}点伤害。",
+        "chill": "移动速度降低{pct}%，持续{seconds}秒：你从缺口以外的地方穿过了淬火之环。",
+        "weight": "每秒造成{total}点物理伤害（每层{per}点）。每一层都让重锤碎片对你的攻击加重{step}%（当前{harder}%）。持续{seconds}秒；坦克在{swap}层时换坦。英雄难度下每层使其伤害提高{heroicStep}%，史诗难度下为{mythicStep}%。"
+      },
       "sharedPyre": "造成相当于每名玩家最大生命值 {total}% 的伤害，由圈内玩家分摊（{players} 名玩家时每人承受 {perPlayer}%）。",
       "varkhulSharedPyre": "造成相当于每名玩家最大生命值 {total}% 的伤害，由圈内玩家分摊（{players} 名玩家时每人承受 {perPlayer}%）。每缺少一名玩家，还会对整个团队（包括圈内玩家）造成最大生命值 {missingPenalty}% 的伤害。",
       "makersBrand": "持续 {duration} 秒，每层使你受到瓦尔库尔的伤害提高 {pct}%。最多叠加 {max} 层。坦克应在 {swap} 层时换坦。",
@@ -7204,6 +7298,266 @@ export const zh_CN: EnTranslations = {
       "glyphLightingLine": "留在符文上直到它被点亮。离开就要重新开始",
       "breathTitle": "神像吐息！",
       "breathLine": "石美洲豹即将向平台的这一半吐息。跑到另一半去"
+    },
+    "council": {
+      "say": {
+        "guardian_pull": "采石场来了外人。铁锤之力绝不向血肉屈服。",
+        "guardian_wrath": "群山回应了我！若岩石肯收留你们，就躲起来吧！",
+        "guardian_rush": "那就站在我的路上吧。群山从不绕行。",
+        "guardian_collapse": "那就让整座采石场崩塌吧！",
+        "guardian_slay_a": "碎了，就像铁锤下的矿石。",
+        "guardian_slay_b": "又少了一只偷取力量的手。",
+        "guardian_death": "我的力量……交给岩石。",
+        "guardian_remember": "岩石铭记。它们的一切，如今归我。",
+        "guardian_soul": "如今我即是岩石。我的怒火再无会倒下的躯体。",
+        "guardian_wipe": "尘土。一切血肉终归如此。",
+        "guardian_defeat": "铁锤之力……由你们来承担。",
+        "singer_pull": "听见矿脉在歌唱吗？它等你们的声音等了好久。",
+        "singer_song": "与我同唱，然后碎裂吧！",
+        "singer_wake": "醒来吧，沉睡的岩石。在他们脚下升起！",
+        "singer_rock": "抬头看，小家伙们！山要塌下来了！",
+        "singer_hush": "你想让矿脉沉默？它只会唱得更响。",
+        "singer_slay_a": "你的声音，如今也融入矿脉了。",
+        "singer_slay_b": "听见了吗？少了一个音符。",
+        "singer_death": "我的歌……流入了岩石……",
+        "singer_remember": "岩石铭记。听，它仍在歌唱。",
+        "singer_soul": "听啊。在岩石之中，我的歌永不终结。",
+        "singer_wipe": "嘘。矿脉已归于寂静。",
+        "singer_defeat": "最后一个音……消散了。"
+      },
+      "alert": {
+        "wakeTitle": "唤醒岩石！",
+        "wakeLine": "石柱会在你站的地方升起：移动到团队需要掩体的位置",
+        "rockTitle": "落石！",
+        "rockLine": "远离石柱，让至少三名队友站到你身边",
+        "resonanceTitle": "共鸣",
+        "resonanceLine": "你会伤害身边的每名盟友：在效果结束前远离团队",
+        "rushTitle": "山岳冲锋！",
+        "rushLine": "守护者将冲向你：让诅咒石柱挡在你和他之间",
+        "rockLineSoul": "远离掩体，在灵魂石柱旁聚集至少三名队友",
+        "weightTitle": "重锤之压",
+        "weightLine": "你受到双倍物理伤害：另一名坦克必须接手守护者",
+        "timeAria": "剩余{seconds}秒"
+      }
+    },
+    "knotAlert": {
+      "aTitle": "你是传送门A！",
+      "aLine": "{seconds}秒后在你脚下打开。站在结风附近。",
+      "bTitle": "你是传送门B！",
+      "bLine": "{seconds}秒后在你脚下打开。站在崖台边缘。",
+      "cTitle": "你是传送门C！",
+      "cLine": "{seconds}秒后在你脚下打开。站在另一团结风附近。",
+      "dTitle": "你是传送门D！",
+      "dLine": "{seconds}秒后在你脚下打开。站在远离传送门B的边缘。",
+      "carryTitle": "你正携带结风！",
+      "carryLine": "每个传送门都通往另一端：A到B，C到D。在崖台边缘把它扔出去。{seconds}秒后爆裂。",
+      "lipTitle": "现在扔！",
+      "lipLine": "你站在边缘。{seconds}秒后爆裂。",
+      "throwKey": "在边缘按{key}投掷",
+      "throwTap": "在边缘点按此处投掷",
+      "throwClick": "在边缘点击此处投掷",
+      "throwAria": "将结风扔进虚空"
+    },
+    "breathGuardian": {
+      "say": {
+        "guardian_pull": "你们爬上山巅，是来偷走它的气息吗？那就与我一同呼吸吧。",
+        "guardian_blow": "感受风向的转变。边缘比你想的更近。",
+        "guardian_inhale": "靠近些。所有人。",
+        "guardian_storm": "气息够了。现在，迎接风暴！",
+        "guardian_cradle": "升起吧，小家伙。让他们接住你。",
+        "guardian_drawn": "天空选中了你。跑吧，它会紧随而至。",
+        "guardian_isles": "风啊，将我围起！浮岛会护住我的气息。",
+        "guardian_bulwark": "我的护盾……被撕开了。那就再尝尝狂风吧！",
+        "guardian_roar": "听啊，山巅在咆哮！",
+        "guardian_knot": "来接住我的风暴吧，如果你的双臂撑得住。",
+        "guardian_slay_a": "又一个交给了风。",
+        "guardian_slay_b": "天空不会接住坠落的人。",
+        "guardian_slay_c": "你最后一口气，归我了。",
+        "guardian_wipe": "被吹散了，就像山巅的尘埃。",
+        "guardian_death": "气息……回归……群山……",
+        "thessaly_pull": "高望与你们同在！这上面没有墙：风会把你们从边缘吹下去！",
+        "thessaly_isles": "它的护盾靠浮岛供能！乘风飞过去，干掉愈者再回来！",
+        "thessaly_circle_a": "快进我的宁静之中！最多三人，不能再多！",
+        "thessaly_circle_b": "这里！站在我身边，让风撞碎在我们身上！",
+        "thessaly_circle_c": "石上的宁静！三个人，现在就来！",
+        "thessaly_inhale": "它在吸气！绕到它的两侧，千万别站在它嘴前！",
+        "thessaly_storm": "风暴要爆发了！我的宁静挡不住这个。散开！",
+        "thessaly_fall": "抓紧岩石！",
+        "thessaly_victory": "气息自由了。高望会记住这次攀登。",
+        "thessaly_wipe": "退后，喘口气。我们再来一次。"
+      }
+    },
+    "quenchGuardian": {
+      "say": {
+        "pull": "我的湖上来了温热的血。它不会温热太久。",
+        "shatter": "冻透了。现在，碎裂吧。",
+        "hole": "冰记得每一步。聚在一起，它便会崩塌。",
+        "wake": "铸匠之刃，醒来！在冰面上猎杀他们！",
+        "cross": "去吧，利刃！将他们与温暖斩断！",
+        "flurry": "所有利刃！所有锋刃！别让任何人站在我的湖上！",
+        "deepen": "感觉到了吗？寒意正越来越深。",
+        "breath": "吸入这深寒吧。",
+        "slay_a": "淬火……然后碎裂。",
+        "slay_b": "凉了。安静了。",
+        "slay_c": "湖泊留下它夺走的一切。",
+        "wipe": "静止。无声。淬火已成。",
+        "death": "寒意……放手了……淬火归你们了。"
+      }
+    },
+    "quenchAlert": {
+      "markedTitle": "利刃在追猎你！（{count}人中第{order}个）",
+      "markedLine": "把直线引离团队，锁定时立刻离开。",
+      "coldTitle": "寒意",
+      "freezingTitle": "快冻僵了！",
+      "warmTitle": "抱团取暖",
+      "frozenTitle": "被霜封住！",
+      "waterTitle": "在冰下！",
+      "coldLine": "站到{radius}码内有{others}名或更多其他玩家的地方取暖",
+      "splashTitle": "冰霜溅射！寒意+{cold}",
+      "immuneLine": "免疫效果挡不住寒意：快抱团",
+      "warmLine": "寒意正在下降。{seconds}秒内移动人群，否则冰面会裂开",
+      "frozenLine": "冰层将在{seconds}秒后碎裂：附近的人请离开",
+      "waterLine": "{seconds}秒后爬上岸",
+      "coldBar": "寒意 {cold} / {max}",
+      "coldAria": "寒意 {cold}/{max}",
+      "timeAria": "剩余{seconds}秒"
+    },
+    "heatGuardian": {
+      "warn": {
+        "overflow": "守护者沉下，炉心满溢了！躲开熔岩之河！",
+        "wellspawn": "涌泉之子爬出来了！在它们抵达涌泉之前减速并消灭它们！",
+        "keepers": "涌泉看守从涌泉中升起！坦住它们，让它们的印记远离涌泉之子！",
+        "seeds": "炉心火种落下了！集中放下然后快跑！",
+        "zones": "苏醒之火！炉心一圈接一圈地燃起：快出去！",
+        "wheel": "炉心转动了！快到暗色的扇区去！",
+        "cinder": "滚动余烬落下了！在它追上猎物之前把它打退！"
+      },
+      "say": {
+        "pull": "你们走进了最初的火焰。没有什么能毫无改变地离开。",
+        "fist": "站在岩石落下的地方，成为它的一部分。",
+        "sink": "涌泉升起来迎接你们了！",
+        "sinkAgain": "炉心再次满溢。你们再次燃烧。",
+        "feed": "是的……回到火焰的怀抱吧。",
+        "rise": "我随最初之火一同升起！",
+        "seeds": "我撒下的每一颗火星都会生根。",
+        "zones": "炉心在你们脚下苏醒。",
+        "cinder": "跑吧，小小的火星。火焰饿了。",
+        "wheel": "炉心在转动！跟上它的步伐，否则就燃烧吧！",
+        "slay_a": "又一点火星回到了火焰之中。",
+        "slay_b": "烧得干干净净。",
+        "slay_c": "最初的火焰收取它的代价。",
+        "wipe": "都化为灰烬吧。炉心依旧燃烧。",
+        "death": "火焰……沉回……岩石之中。好好带着它。"
+      }
+    },
+    "finalBoss": {
+      "say": {
+        "arrivalWake": "是谁唤醒了大山之心？温热的气息……在这万物无息之地。",
+        "arrivalRise": "岩石，起来。与我们相连。塑造我们的那只手已经离去，所以我们塑造自己。",
+        "arrivalRoar": "我们是铸匠之力，而我们没有主人！",
+        "pull": "你们的血中流着四条矿脉。我们会把它们夺回来，再把大山封在你们头顶。",
+        "drinkHeat": "最初的火焰充满了我们！",
+        "drinkQuench": "冷水啊，让我们坚硬！",
+        "drinkBreath": "吹吧，风箱！掀起风暴！",
+        "drinkHammer": "击打吧，铁锤！让我们沉重！",
+        "burst": "矿脉满溢了！在其中溺亡吧！",
+        "anvil": "承受世界的重量吧！",
+        "call": "我们力量的碎片，从矿脉中升起！守护心脏！",
+        "callAgain": "再来！每一条矿脉，把你们的孩子交给我们！",
+        "shattered": "我们的碎片……粉碎了。那就用剩下的来战斗。",
+        "poured": "是的……流入我们。所有矿脉，合为一体。",
+        "final": "够了！所有矿脉一齐涌来！整座大山都将压在你们身上！",
+        "fury": "没有手能阻止我们。我们的力量没有尽头！",
+        "kneel": "原来……他当时就是这种感觉……躺下……终于……",
+        "rebirth": "不。大山不会第二次沉睡！",
+        "collapse": "崩塌吧，岩石！如果我们守不住大山，谁也别想站在上面！",
+        "anvilsEnd": "铁砧终结了。一切都终结了。",
+        "slay_a": "回到岩石里去吧。",
+        "slay_b": "你的血回归矿脉。",
+        "slay_c": "又一份温暖，被封存了。",
+        "wipe": "封存了。寂静了。正如他所愿。",
+        "death": "那只手……再也不会回来了。还有一点余烬在燃烧……带上它，让大山安眠吧。"
+      },
+      "warn": {
+        "enterHeat": "无主之力饮下了炽热！躲开拳头、涌浪和旋风！",
+        "enterQuench": "无主之力饮下了淬火！靠在一起，否则会冻结！",
+        "enterBreath": "无主之力饮下了吐息！散开并顶着风走！",
+        "enterHammer": "无主之力饮下了重锤！离开裂痕，分摊铁砧！",
+        "burst": "过载！力量冲破了铁砧！",
+        "burstHeavy": "过载！力量冲破了铁砧！稳住并治疗！",
+        "burstLethal": "过载！力量冲破了铁砧！无人能够幸存！",
+        "nearFull": "一条过载条即将充满！把力量拖往下一区域，或在爆发前把团队抬满血！",
+        "nearFullHeavy": "一条过载条即将充满！把力量拖往下一区域：爆发伤害很重，抬满血并使用减伤技能！",
+        "nearFullLethal": "一条过载条即将充满！立刻把力量拖往下一区域：爆发会杀死整个团队！",
+        "unbound": "力量在中央脱缚了！把它拖出去！",
+        "embers": "余烬落向远程！把印记集中到一个角落，然后离开！",
+        "ice": "冰面在你脚下呻吟！在它碎裂之前离开！",
+        "wind": "吐息聚起了狂风！顶着风走，远离边缘！",
+        "drawn": "引雷！被标记的人与所有人保持8码距离！",
+        "orbs": "风暴宝珠！每个由一名玩家在它爆发前踩上去！",
+        "anvil": "铁砧之重！分摊它：所有未被粉碎的人站到标记下！",
+        "intermission": "无主之力在中央聚集力量！它的碎片升起了：在召唤结束前击杀它们！",
+        "toll": "霜凇钟鸣！打断淬火碎片！",
+        "coal": "爆裂煤块！被标记者要在爆裂前把它带离人群！",
+        "pounce": "疾风扑击！被盯上的人要把吐息碎片拖离人群！",
+        "poured": "碎片注入了无主之力！它们的元素会一直留到最后！",
+        "release": "护盾破了！把无主之力拖出中央！",
+        "final": "无主之力大步踏入铁砧的中心！",
+        "awaken": "四个角全部苏醒！无主之力一口气饮下所有力量！",
+        "furySoon": "无主之力即将失去一切克制！全力输出！",
+        "fury": "无主之怒！它在撕裂铁砧：立刻击杀它！",
+        "rebirth": "心脏搏动！无主之力饮尽四方区域，再度站起！",
+        "unmade": "世界铁砧正在崩塌！在最后一块石头坠落前击杀无主之力！",
+        "crackHeat": "炽热区域正在开裂！在它坠落前离开！",
+        "crackQuench": "淬火区域正在开裂！在它坠落前离开！",
+        "crackBreath": "吐息区域正在开裂！在它坠落前离开！",
+        "crackHammer": "重锤区域正在开裂！在它坠落前离开！",
+        "ringCrack": "只剩中央圆环，而它也在开裂！立刻击杀它！"
+      }
+    },
+    "finalOverload": {
+      "kneeling": "它跪下了",
+      "rising": "心脏搏动",
+      "fallsIn": "{quarter}将在 {seconds} 后坠落",
+      "ringFallsIn": "圆环将在 {seconds} 后破碎",
+      "allFallen": "什么也不剩了",
+      "title": "过载",
+      "heat": "Heat",
+      "quench": "淬火",
+      "breath": "吐息",
+      "hammer": "重锤",
+      "rooted": "扎根 {seconds}",
+      "free": "可以拖动",
+      "shaken": "动摇 {seconds}",
+      "unbound": "脱缚 x{stacks}",
+      "barAria": "{quarter}过载 百分之{pct}",
+      "activeAria": "当前区域：{quarter}",
+      "groupAria": "无主之力：过载条",
+      "titleCall": "四角召唤",
+      "titleFinal": "四角皆醒",
+      "titleUnmade": "崩解的铁砧",
+      "call": "护盾 {seconds}",
+      "splinters": "碎片 {count}",
+      "striding": "正走向中央",
+      "enrage": "狂暴倒计时 {seconds}",
+      "fury": "无主之怒 x{stacks}",
+      "poured": "已注入：{elements}",
+      "pouredTimes": "{quarter} x{times}"
+    },
+    "finalAlert": {
+      "frozenLine": "{seconds}秒后解冻：然后与两名或更多其他人站在一起",
+      "emberTitle": "余烬印记！",
+      "emberLine": "{seconds}秒后余烬落在你脚下：与其他被标记的人去同一个角落",
+      "drawnTitle": "引雷！",
+      "drawnLine": "{seconds}秒内与所有人保持{reach}码距离",
+      "crushedTitle": "粉碎",
+      "crushedLine": "避开下一次铁砧之重（{seconds}秒）",
+      "coalTitle": "爆裂煤块！",
+      "coalLine": "离开人群：{seconds}秒后会在{reach}码内的所有人身上爆裂",
+      "tetherTitle": "风之束缚！",
+      "tetherLine": "吐息碎片在追猎你：把它从人群中拖走（{seconds}秒）",
+      "weightTitle": "渐增重压 x{stacks}",
+      "weightLine": "每一层都让它的攻击更重：{swap}层时换坦"
     },
     "sanctumAlert": {
       "quenchTitle": "身陷淬火之水！",
@@ -16591,6 +16945,40 @@ export const zh_CN: EnTranslations = {
       "sanctum_counterweight_lash": "配重尾鞭",
       "sanctum_branding_iron": "烙铁",
       "sanctum_rime_breath": "霜凇吐息",
+      "heart_mountains_wrath": "山岳之怒",
+      "heart_bellows_gust": "巅峰咆哮",
+      "heart_storm_lance": "风暴长枪",
+      "heart_quenching_breath": "淬火吐息",
+      "heart_forge_wrath": "熔炉之怒",
+      "heart_forge_pour": "熔炉倾泻",
+      "heart_final_leaping_bolt": "跳跃雷击",
+      "heart_final_anvil": "铁砧之重",
+      "heart_final_call": "四角召唤",
+      "heart_final_shearing_blow": "劈裂重击",
+      "heart_final_rime_toll": "霜凇钟鸣",
+      "heart_final_gale_pounce": "疾风扑击",
+      "heart_gale_bolt": "Gale Bolt",
+      "heart_rime_bolt": "Rime Bolt",
+      "heart_ember_bolt": "余烬箭",
+      "heart_hammers_weight": "重锤之压",
+      "heart_mountains_rush": "山岳冲锋",
+      "heart_wake_the_stone": "唤醒岩石",
+      "heart_falling_rock": "落石",
+      "heart_seam_bolt": "矿脉箭",
+      "heart_song_of_the_seam": "矿脉之歌",
+      "heart_echo_of_wrath": "怒火回响",
+      "heart_endless_song": "无尽之歌",
+      "heart_breath_inhale": "深吸之息",
+      "heart_breath_storm_break": "风暴破裂",
+      "heart_breath_forking_bolt": "跳跃雷击",
+      "heart_breath_thunders_cradle": "雷霆摇篮",
+      "heart_breath_drawn_lightning": "引雷",
+      "heart_breath_cradle_channel": "雷霆摇篮",
+      "heart_breath_gale_bulwark": "狂风壁垒",
+      "heart_breath_mending_gale": "愈合之风",
+      "heart_quench_blades_wake": "诸刃苏醒",
+      "heart_quench_blades_hunt": "利刃狩猎",
+      "heart_heat_fist": "玄武岩之拳",
       "kituse_sanctum_topple_brazier": "推倒火盆",
       "trash_demo_nova": "测试新星",
       "trash_demo_nova_unstoppable": "测试新星",
@@ -26524,6 +26912,78 @@ export const zh_CN: EnTranslations = {
       "sanctum_shackle_bellows": {
         "name": "风箱镣铐"
       },
+      "heart_hammer_warder": {
+        "name": "锤脉守卫"
+      },
+      "heart_ring_warder": {
+        "name": "环炉守卫"
+      },
+      "heart_breath_warder": {
+        "name": "息脉守卫"
+      },
+      "heart_breath_caller": {
+        "name": "息脉召唤者"
+      },
+      "heart_gale_sentinel": {
+        "name": "狂风哨兵"
+      },
+      "heart_gale_mender": {
+        "name": "狂风愈者"
+      },
+      "heart_quench_warder": {
+        "name": "淬脉守卫"
+      },
+      "heart_quench_caller": {
+        "name": "淬脉召唤者"
+      },
+      "heart_heat_warder": {
+        "name": "热脉守卫"
+      },
+      "heart_heat_caller": {
+        "name": "热脉召唤者"
+      },
+      "heart_hammer_guardian": {
+        "name": "重锤守护者"
+      },
+      "heart_seam_singer": {
+        "name": "矿脉歌者"
+      },
+      "heart_breath_guardian": {
+        "name": "吐息守护者"
+      },
+      "heart_quench_guardian": {
+        "name": "淬火守护者"
+      },
+      "heart_heat_guardian": {
+        "name": "炽热守护者"
+      },
+      "heart_masterless_strength": {
+        "name": "无主之力"
+      },
+      "heart_heat_wellspawn": {
+        "name": "涌泉之子"
+      },
+      "heart_heat_wellkeeper": {
+        "name": "涌泉看守"
+      },
+      "heart_heat_seedflame": {
+        "name": "籽焰"
+      },
+      "heart_heat_rolling_cinder": {
+        "name": "滚动余烬"
+      },
+      "heart_final_splinter_heat": {
+        "name": "炽热碎片"
+      },
+      "heart_final_splinter_quench": {
+        "name": "淬火碎片"
+      },
+      "heart_final_splinter_breath": {
+        "name": "吐息碎片"
+      },
+      "heart_final_splinter_hammer": {
+        "name": "重锤碎片"
+      },
       "thorn_sprout": {
         "name": "荆棘幼芽"
       },
@@ -26939,6 +27399,11 @@ export const zh_CN: EnTranslations = {
         "name": "瑟萨莉队长",
         "title": "高望队长",
         "greeting": "这面墙已经站了两百年，{className}。只要我守着它，它就不会倒，虽然它正在呻吟。"
+      },
+      "heart_captain_thessaly": {
+        "name": "瑟萨莉队长",
+        "title": "高望队长",
+        "greeting": "站稳脚跟，{className}。当风箱呼吸时，进入我的宁静之中，让风撞碎在我们身上。"
       },
       "brother_aldric_highwatch": {
         "name": "奥德里克修士",
@@ -30433,6 +30898,11 @@ export const zh_CN: EnTranslations = {
         "name": "墓龙圣所",
         "enterText": "空气变得冰冷。下方有庞然之物在呼吸...",
         "leaveText": "你踉跄回到山风之中。"
+      },
+      "smith_heart": {
+        "name": "铁匠之心",
+        "enterText": "群山在你周围低鸣，宛如一座为夜晚封住的熔炉……",
+        "leaveText": "你爬回风暴岩的狂风之中。"
       },
       "nythraxis_crypt": {
         "name": "废弃墓穴",

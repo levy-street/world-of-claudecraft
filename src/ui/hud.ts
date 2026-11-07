@@ -28,7 +28,7 @@ import {
   nonSelfRepaintDue,
   targetFrameNonSelfIntervalMs,
 } from '../game/ui_tier_knobs';
-import { voice, voiceDistanceGain } from '../game/voice';
+import { voice, voiceFadeGain } from '../game/voice';
 import type { ClaudiumStoreItem } from '../net/economy_sdk';
 import { castBarState, consumeBarState, mountSummonBarState } from '../render/cast_bar';
 import {
@@ -220,7 +220,7 @@ import {
   resolvePlayerSocialFlags,
   serializeIgnoreList,
 } from './chat_ignore_core';
-import { CHAT_TEMPLATE_KEYS, localizeChatBody } from './chat_templates';
+import { CHAT_TEMPLATE_KEYS, localizeChatBody, raidWarningSpeaker } from './chat_templates';
 import { wireChromeFocus } from './chrome_focus_wiring';
 import { ClaudiumLauncherBalance } from './claudium_launcher_balance_core';
 import { createClaudiumPurchaseFacet } from './claudium_purchase_bridge';
@@ -242,6 +242,7 @@ import {
   shouldPlayCombatImpactForTarget,
   shouldPlayCritSfxForTarget,
   shouldPlayMobVoiceSfxForEntity,
+  smithHeartSoundClaims,
   spellFxCue,
 } from './combat_sfx';
 import { compassView } from './compass';
@@ -995,7 +996,7 @@ import { knownItemIconHtml } from './unknown_item_icon';
 import { unstuckFeedback } from './unstuck_feedback';
 import { vendorSellConfirmPolicyFrom } from './vendor_sell_confirm_policy';
 import { visibleVendorStock } from './vendor_stock_gate_core';
-import { nextVoicedYell, type VoicedYellState, voicedYellGain } from './voice_events';
+import { nextVoicedYell, type VoicedYellState, voicedYellMix } from './voice_events';
 import { onWalletUiChange, walletConnectionView } from './wallet_balance';
 import { requestWalletVerify } from './wallet_verify_request';
 import { weaponProcEffectText } from './weapon_proc_text';
@@ -2498,8 +2499,7 @@ export class Hud {
       voice: {
         play: (key) => voice.play(key),
         isPlaying: () => voice.isPlaying(),
-        setDistance: (distance) =>
-          voice.setDistanceGain(distance === null ? 0 : voiceDistanceGain(distance)),
+        setDistance: (distance, fade) => voice.setDistanceGain(voiceFadeGain(distance, fade)),
       },
     });
     this.lootWindow = new LootWindowController({
@@ -10780,10 +10780,9 @@ export class Hud {
           this.combat(ev.sfxKey, ev.x, y, ev.z, 1.0, { cooldown: 0.08 });
           return;
         }
-        if (ev.fx !== 'nova') return;
-        // A per-ability nova recording is the whole read on the aimed path
-        // too, at the same 1.0 the entity-anchored spellfx path plays it;
-        // the generic burst keeps its school-flavored layer.
+        // A raid fight's own cue is never doubled (it sounds itself).
+        if (ev.fx !== 'nova' || smithHeartSoundClaims(ev.ability)) return;
+        // A per-ability nova recording is the whole read; else the generic burst.
         const novaKey = novaAbilityCue(ev.ability);
         if (novaKey !== 'spell_nova') {
           this.combat(novaKey, ev.x, y, ev.z, 1.0, { cooldown: 0.08 });
@@ -12085,7 +12084,7 @@ export class Hud {
               {
                 const text = localizeChatBody(ev);
                 this.chatLogFrom(
-                  ev.from,
+                  raidWarningSpeaker(ev, bubbleSpeaker),
                   text,
                   CHAT_TEMPLATE_KEYS.raidWarning,
                   'raidWarning',
@@ -12106,7 +12105,7 @@ export class Hud {
                   bubbleSpeaker?.templateId,
                   ev.classId,
                 ),
-                localizeAuthoredYellText(ev.text, bubbleSpeaker?.kind, ev.classId),
+                localizeAuthoredYellText(localizeChatBody(ev), bubbleSpeaker?.kind, ev.classId),
                 CHAT_TEMPLATE_KEYS.yell,
                 'yell',
                 ev.fromPid,
@@ -12243,7 +12242,7 @@ export class Hud {
           if (bubbleStyle && typeof bubbleSpeakerId === 'number') {
             const visibleText =
               ev.channel === 'yell'
-                ? localizeAuthoredYellText(ev.text, bubbleSpeaker?.kind, ev.classId)
+                ? localizeAuthoredYellText(localizeChatBody(ev), bubbleSpeaker?.kind, ev.classId)
                 : ev.text;
             const masked = this.maskChat(this.chatLinkPlainText(visibleText));
             const bubble = ev.channel === 'emote' ? `${ev.from} ${masked}` : masked;
@@ -12259,10 +12258,10 @@ export class Hud {
             );
             this.lastVoicedYell = voiced.state;
             if (voiced.play) {
-              voice.play(voiced.state.key, { gain: voicedYellGain(ev.from) });
-              // A distinct overheard yell, not a dialogue: do not let the per-frame
-              // distance fade attenuate it by a talked-to NPC's position.
-              this.questDialog.clearVoiceSource();
+              const mix = voicedYellMix(ev.from, ev.text);
+              voice.play(voiced.state.key, mix.play);
+              // An overheard yell, not a dialogue: a raid boss's fades with its distance.
+              this.questDialog.setYellSource(bubbleSpeakerId, mix.fade);
             }
           }
           break;

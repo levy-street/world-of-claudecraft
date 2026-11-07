@@ -6,6 +6,11 @@
 //
 // A boss with a dedicated production of its own is a row in
 // BOSS_TRACK_URLS; every other boss fight keeps the shared default loop.
+// Switching from one playing track to another (a staged boss's next cue,
+// smith_heart_boss_music.ts) crossfades the two streamed elements instead of
+// cutting.
+
+import { SMITH_HEART_BOSS_TRACK_URLS } from './smith_heart_boss_music';
 
 /** The shared boss-fight loop every boss without its own track plays. */
 export const DEFAULT_BOSS_TRACK_URL = '/audio/dungeon-boss-fight.mp3';
@@ -32,7 +37,20 @@ export const BOSS_TRACK_URLS: Readonly<Record<string, string>> = {
   mere_hydra_head_right: '/audio/music/boss_mere_hydra.mp3?v=046af2f68534',
   tideglass_colossus: '/audio/music/boss_tideglass_colossus.mp3?v=d18a194458a7',
   ysolei: '/audio/music/boss_ysolei.mp3?v=82d59ef43e4d',
+  // The Smith's Heart raid's own score.
+  ...SMITH_HEART_BOSS_TRACK_URLS,
 };
+
+/** How long a switch between two playing fight tracks crossfades. */
+export const BOSS_TRACK_CROSSFADE_MS = 2500;
+
+/** An outgoing element still sounding under the crossfade. */
+interface FadingElement {
+  el: HTMLAudioElement;
+  startedAt: number;
+}
+
+const wallClock = (): number => (typeof performance !== 'undefined' ? performance.now() : 0);
 
 /** The fight track for a boss template, or null when it has none of its own. */
 export function bossTrackFor(templateId: string): string | null {
@@ -42,6 +60,9 @@ export function bossTrackFor(templateId: string): string | null {
 export class BossLoopTrack {
   private url = DEFAULT_BOSS_TRACK_URL;
   private el: HTMLAudioElement | null = null;
+  private fading: FadingElement[] = [];
+  /** When the current element's fade-in began, or null for full level. */
+  private fadeInFrom: number | null = null;
   private buffer: AudioBuffer | null = null;
   private source: AudioBufferSourceNode | null = null;
   private loading = false;
@@ -54,6 +75,8 @@ export class BossLoopTrack {
     return this.buffer !== null;
   }
 
+  constructor(private readonly now: () => number = wallClock) {}
+
   /** Take over the mix, then point the loop at the requested track. */
   retarget(
     url: string,
@@ -61,7 +84,15 @@ export class BossLoopTrack {
   ): void {
     if (streamsToPause) for (const stream of streamsToPause) stream.el?.pause();
     if (url === this.url) return;
-    this.el?.pause();
+    const playing = this.el !== null && !this.el.paused;
+    if (playing && this.el) {
+      // A track already sounding hands over under a crossfade.
+      this.fading.push({ el: this.el, startedAt: this.now() });
+      this.fadeInFrom = this.now();
+    } else {
+      this.el?.pause();
+      this.fadeInFrom = null;
+    }
     this.stopSource();
     this.el = null;
     this.buffer = null;
@@ -79,8 +110,47 @@ export class BossLoopTrack {
     return el;
   }
 
+  /**
+   * Set the streamed level: the current element at `target` (ramped up while
+   * it fades in), each outgoing one ramped down from it and released once
+   * silent. Called whenever the director applies boss playback.
+   */
+  setVolume(target: number): void {
+    const now = this.now();
+    let rampIn = 1;
+    if (this.fadeInFrom !== null) {
+      rampIn = Math.min(1, (now - this.fadeInFrom) / BOSS_TRACK_CROSSFADE_MS);
+      if (rampIn >= 1) this.fadeInFrom = null;
+    }
+    if (this.el) this.el.volume = clampVolume(target * Math.sin((rampIn * Math.PI) / 2));
+    if (this.fading.length === 0) return;
+    const still: FadingElement[] = [];
+    for (const f of this.fading) {
+      const t = Math.min(1, (now - f.startedAt) / BOSS_TRACK_CROSSFADE_MS);
+      if (t >= 1) {
+        releaseElement(f.el);
+        continue;
+      }
+      f.el.volume = clampVolume(target * Math.cos((t * Math.PI) / 2));
+      still.push(f);
+    }
+    this.fading = still;
+  }
+
+  /** Elements still fading out (for tests and diagnostics). */
+  get fadingCount(): number {
+    return this.fading.length;
+  }
+
   pause(): void {
     this.el?.pause();
+    this.dropFading();
+  }
+
+  private dropFading(): void {
+    for (const f of this.fading) releaseElement(f.el);
+    this.fading = [];
+    this.fadeInFrom = null;
   }
 
   /** Back to the top, for a fresh dungeon run. */
@@ -92,6 +162,7 @@ export class BossLoopTrack {
         /* browser may reject seeking before metadata */
       }
     }
+    this.dropFading();
     this.stopSource();
   }
 
@@ -134,5 +205,20 @@ export class BossLoopTrack {
     }
     this.source.disconnect();
     this.source = null;
+  }
+}
+
+function clampVolume(v: number): number {
+  return Math.min(1, Math.max(0, v));
+}
+
+/** Stop an outgoing element for good and let it drop its buffered media. */
+function releaseElement(el: HTMLAudioElement): void {
+  try {
+    el.pause();
+    el.removeAttribute('src');
+    el.load();
+  } catch {
+    /* best-effort: the element is being discarded either way */
   }
 }

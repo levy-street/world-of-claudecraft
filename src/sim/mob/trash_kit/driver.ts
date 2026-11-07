@@ -17,6 +17,7 @@
 
 import { isLockedOut, isSilenced } from '../../combat/cc';
 import { DUNGEONS, MOBS } from '../../data';
+import { instanceHalfWidthOf } from '../../instances/instance_footprint';
 import { applyKnockback } from '../../knockback';
 import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
@@ -238,11 +239,12 @@ function clearCast(mob: Entity, castId: string): void {
 /** The players standing in a claim (the boss-add spawner's footprint). */
 function claimPlayers(ctx: SimContext, inst: InstanceSlot): Entity[] {
   const o = ctx.instanceOriginOf(inst);
+  const halfWidth = instanceHalfWidthOf(inst.dungeonId);
   const out: Entity[] = [];
   for (const meta of ctx.players.values()) {
     const e = ctx.entities.get(meta.entityId);
     if (!e) continue;
-    if (Math.abs(e.pos.x - o.x) < 120 && Math.abs(e.pos.z - o.z) < 250) out.push(e);
+    if (Math.abs(e.pos.x - o.x) < halfWidth && Math.abs(e.pos.z - o.z) < 250) out.push(e);
   }
   return out;
 }
@@ -770,6 +772,8 @@ function tryStartCast(
     if (!def || (st.timers[key] ?? 0) > 0) continue;
     // A heroic-only cast never starts on normal (TrashKitCast.heroicOnly).
     if (def.heroicOnly && inst.difficulty !== 'heroic') continue;
+    // An encounter-driven cast is its encounter's to start (TrashKitCast).
+    if (def.encounterDriven) continue;
     const physical = isPhysicalCast(key);
     if (!physical && (isSilenced(mob) || isLockedOut(mob, def.school as Aura['school']))) continue;
     const ext = extensionOf(key);

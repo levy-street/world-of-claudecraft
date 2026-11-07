@@ -54,6 +54,10 @@ const ALL_IDS: DungeonPromptId[] = [
   'wildheart',
   'sanctum',
   'crypt',
+  'council',
+  'quench',
+  'final',
+  'knot',
   'temple',
   'kitUse',
 ];
@@ -70,6 +74,10 @@ describe('dungeon prompt policy: what the hints setting governs', () => {
       wildheart: true,
       sanctum: true,
       crypt: true,
+      council: true,
+      quench: false,
+      final: false,
+      knot: false,
       temple: true,
       kitUse: false,
     });
@@ -85,11 +93,16 @@ describe('dungeon prompt policy: what the hints setting governs', () => {
     expect(dungeonPromptEnabled('wildheart', false)).toBe(false);
     expect(dungeonPromptEnabled('sanctum', false)).toBe(false);
     expect(dungeonPromptEnabled('crypt', false)).toBe(false);
+    expect(dungeonPromptEnabled('council', false)).toBe(false);
     expect(dungeonPromptEnabled('temple', false)).toBe(false);
     // The prompts a player presses or steers by are never governed by it.
     expect(dungeonPromptEnabled('cage', false)).toBe(true);
     expect(dungeonPromptEnabled('chain', false)).toBe(true);
     expect(dungeonPromptEnabled('kitUse', false)).toBe(true);
+    // The Guardian of the Quench's cold bar is the player's own gauge.
+    expect(dungeonPromptEnabled('quench', false)).toBe(true);
+    // So is the Masterless Strength's (the same cold, and marks to move for).
+    expect(dungeonPromptEnabled('final', false)).toBe(true);
   });
 });
 
@@ -101,6 +114,10 @@ describe('dungeon prompt policy: the shared slot', () => {
     wildheart: false,
     sanctum: false,
     crypt: false,
+    council: false,
+    quench: false,
+    final: false,
+    knot: false,
     temple: false,
     cryptSoft: false,
     wildheartSoft: false,
@@ -118,6 +135,9 @@ describe('dungeon prompt policy: the shared slot', () => {
       'wildheart',
       'sanctum',
       'crypt',
+      'council',
+      'quench',
+      'final',
       'temple',
     ] as const) {
       expect(usePromptYields({ ...none, [id]: true }), id).toBe(true);

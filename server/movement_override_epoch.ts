@@ -1,6 +1,7 @@
 import type { PlayerMeta, Sim } from '../src/sim/sim';
 import { slipperyGrip } from '../src/sim/slippery_ground';
 import { DT, type Entity, RUN_SPEED, type Vec3 } from '../src/sim/types';
+import { windDriftSpeed } from '../src/sim/wind_drift';
 import { ferryMovementFrame } from './transport_head';
 
 const OVERRIDE_CC_KINDS = new Set(['stun', 'root', 'incapacitate', 'polymorph']);
@@ -22,6 +23,11 @@ export interface MovementOverrideSignature {
    *  does not carry, so the client stands its prediction down on the ice and
    *  draws the authoritative slide; the edge bumps the epoch both ways. */
   slippery?: boolean;
+  /** The speed of an encounter's wind carrying the body (src/sim/
+   *  wind_drift.ts), yd/s; NOT an override: both hosts step it. Kept so the
+   *  step check allows the wind of the tick before too (a blow ends after
+   *  the step it carried). */
+  windSpeed?: number;
 }
 
 export interface MovementOverrideSessionState {
@@ -99,6 +105,7 @@ export function fillOverrideSignature(
   target.braced = entity.bracing === true;
   target.moveSpeedMult = moveSpeedMult;
   target.slippery = slipperyGrip(entity) > 0;
+  target.windSpeed = windDriftSpeed(entity);
   return target;
 }
 
@@ -129,6 +136,7 @@ function positionDiscontinuous(
   moveSpeedMult: number,
   previousActive: boolean,
   previousMoveSpeedMult: number,
+  previousWindSpeed: number,
 ): boolean {
   const dx = position.x - previousPosition.x;
   const dy = position.y - previousPosition.y;
@@ -145,7 +153,12 @@ function positionDiscontinuous(
   if (active || previousActive) {
     return false;
   }
-  const maxIntentStep = RUN_SPEED * Math.max(moveSpeedMult, previousMoveSpeedMult) * DT;
+  // An encounter's wind (src/sim/wind_drift.ts) carries the body on top of
+  // its walk; both hosts step it, so it is no server-driven jump. The wind of
+  // the tick before counts too: a blow's aura is taken off after the step it
+  // carried.
+  const wind = Math.max(windDriftSpeed(entity), previousWindSpeed);
+  const maxIntentStep = (RUN_SPEED * Math.max(moveSpeedMult, previousMoveSpeedMult) + wind) * DT;
   return Math.hypot(dx, dz) > maxIntentStep + POSITION_EPSILON;
 }
 
@@ -171,6 +184,7 @@ export function updateMovementOverrideEpochs(
     const previousBits = signature ? overrideBits(signature) : 0;
     const previousActive = previousBits !== 0;
     const previousMoveSpeedMult = signature?.moveSpeedMult ?? 0;
+    const previousWindSpeed = signature?.windSpeed ?? 0;
     const nextSignature = signature
       ? fillOverrideSignature(signature, entity, meta, moveSpeedMult)
       : computeOverrideSignature(entity, meta, moveSpeedMult);
@@ -193,6 +207,7 @@ export function updateMovementOverrideEpochs(
           moveSpeedMult,
           previousActive,
           previousMoveSpeedMult,
+          previousWindSpeed,
         ));
     if (signatureChanged || discontinuous) session.movementOverrideEpoch++;
     session.movementOverrideSignature = nextSignature;

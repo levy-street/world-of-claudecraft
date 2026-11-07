@@ -35,6 +35,11 @@ import { tickTempleEncounters } from '../encounters/drowned_temple';
 import { tickSanctumEncounters } from '../encounters/gravewyrm_sanctum';
 import { tickCryptEncounters } from '../encounters/hollow_crypt';
 import { clearIgnivarEncounterAuras } from '../encounters/ignivar';
+import {
+  SMITH_HEART_CLOSED_TEXT,
+  smithHeartEntryOpen,
+  tickSmithHeart,
+} from '../encounters/smith_heart';
 import { tickBastionEncounters } from '../encounters/sunken_bastion';
 import { clearVarkhulEncounterAuras } from '../encounters/varkhul';
 import { tickWildheartEncounters } from '../encounters/wildheart_basin';
@@ -83,6 +88,7 @@ import { dungeonReentryPoint } from './dungeon_checkpoints';
 import { nearestDungeonDoor } from './dungeon_door_selection';
 import { tickDungeonGates } from './dungeon_gates';
 import { applyDungeonSpawnMinibossTuning } from './dungeon_spawn_miniboss';
+import { encounterLockBarsEntry } from './encounter_lock';
 import {
   IGNIVAR_ENTRY_DENIED_NOTICE_SECONDS,
   ignivarRaidClaimsForKey,
@@ -91,6 +97,7 @@ import {
 } from './ignivar_entry';
 import { ignivarExitRoom, ignivarExitSealed } from './ignivar_exit';
 import { tickIgnivarLavaHazard } from './ignivar_lava_hazard';
+import { INSTANCE_FOOTPRINT_HALF_WIDTH, instanceHalfWidthOf } from './instance_footprint';
 import { emitFirstRaidBossRoomWelcome } from './raid_boss_room_welcome';
 import {
   durableMemberKey,
@@ -106,6 +113,7 @@ const RAID_ALLOWED_DUNGEON_IDS = new Set([
   'nythraxis_crypt',
   'nythraxis_boss_arena',
   ...IGNIVAR_RAID_ROOM_IDS,
+  'smith_heart',
 ]);
 
 export { RAID_REQUIRED_DUNGEON_IDS };
@@ -260,10 +268,11 @@ export function instanceClaimIdAt(ctx: SimContext, pos: Vec3): number | null {
 }
 
 // The generic instance-footprint HALF-WIDTH (x extent either side of a slot
-// origin). Exported because vault_craft_gate.ts claimWestReach derives its
-// west-reach envelope from this same constant: a bare literal widened here
+// origin) and the per-dungeon widening live in the leaf instance_footprint.ts;
+// re-exported here because vault_craft_gate.ts claimWestReach derives its
+// west-reach envelope from the same symbols: a bare literal widened here
 // would silently under-estimate that gate's reach and fail it open.
-export const INSTANCE_FOOTPRINT_HALF_WIDTH = 120;
+export { INSTANCE_FOOTPRINT_HALF_WIDTH, instanceHalfWidthOf };
 
 // The one dungeon whose claim footprint is WIDER than the generic envelope
 // (the circle arm in instanceClaimContains below). Exported for the same
@@ -273,15 +282,13 @@ export const WIDE_CLAIM_DUNGEON_ID = 'nythraxis_boss_arena';
 
 // The one instance-footprint envelope (shared by occupancy, position lookup,
 // and the kill-lockout sweep): is `pos` inside the slot anchored at `origin`?
-function instanceContains(origin: { x: number; z: number }, pos: Vec3): boolean {
-  return (
-    Math.abs(pos.x - origin.x) < INSTANCE_FOOTPRINT_HALF_WIDTH && Math.abs(pos.z - origin.z) < 250
-  );
+function instanceContains(origin: { x: number; z: number }, pos: Vec3, halfWidth: number): boolean {
+  return Math.abs(pos.x - origin.x) < halfWidth && Math.abs(pos.z - origin.z) < 250;
 }
 
 export function instanceClaimContains(inst: InstanceSlot, pos: Vec3): boolean {
   const origin = instanceOriginOf(inst);
-  if (instanceContains(origin, pos)) return true;
+  if (instanceContains(origin, pos, instanceHalfWidthOf(inst.dungeonId))) return true;
   if (inst.dungeonId !== WIDE_CLAIM_DUNGEON_ID) return false;
   // Looked up through the SAME constant the guard above compares, never a
   // second hard-coded id: a rename via the constant would otherwise leave
@@ -411,6 +418,11 @@ export function enterDungeon(
   // resurrect at its arrival point (below). A fresh corpse (dead, spirit not yet released)
   // cannot move, so it never reaches the door.
   if (r.e.dead && !r.e.ghost) return false;
+  // The Smith's Heart is a phase 1 blockout: dev builds only.
+  if (!smithHeartEntryOpen(ctx, dungeonId)) {
+    deny(r.meta.entityId, SMITH_HEART_CLOSED_TEXT);
+    return false;
+  }
   const party = ctx.partyOf(r.meta.entityId) ?? options.finderParty;
   // The raid return route (instances/raid_return.ts): a raider who cleared a
   // run and still holds its lock, but no longer belongs to a raid that owns
@@ -701,6 +713,21 @@ export function enterDungeon(
     deny(r.meta.entityId, 'Instances can only be reset once every 5 minutes.');
     return false;
   }
+  // Encounter in progress (instances/encounter_lock.ts): nobody from outside,
+  // living or spirit, enters while a boss fight of the claim runs. After the
+  // lockout refusals above, whose reason outlasts the fight.
+  if (
+    inst &&
+    encounterLockBarsEntry(
+      ctx,
+      inst,
+      r.e,
+      r.meta.entityId,
+      instanceClaimContains(inst, r.e.pos),
+      !!options.preflightOnly,
+    )
+  )
+    return false;
   // The claim-wins rule above is silent, and silence is exactly the reported
   // confusion: a player who toggled the selection and walked back in landed in
   // the old-difficulty run with no explanation. A living player rejoining a
@@ -1643,6 +1670,8 @@ export function updateInstances(ctx: SimContext): void {
   // The Hollow Crypt's finale (encounters/hollow_crypt): Morthen's entrance
   // and the Knellwyrm, same slot.
   tickCryptEncounters(ctx);
+  // The Smith's Heart's seal and its portal (encounters/smith_heart), same slot.
+  tickSmithHeart(ctx);
   // The optional lore guides (dungeon_guide): after every encounter, so a boss
   // pulled or killed this tick already reads as such. Draws no shared rng.
   tickDungeonGuides(ctx);

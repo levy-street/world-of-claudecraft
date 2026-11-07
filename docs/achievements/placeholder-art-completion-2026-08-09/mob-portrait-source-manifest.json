@@ -6,17 +6,17 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "532fc34f78cc7e81214d84272c92ef971055f56c64167c72f31472e31e43ed34",
+  "rendererFingerprint": "ce1c6a3e8fa5ac7d53daad7d7176618e5ca69669f1cb84d8a93148db58d59e26",
   "renderEnv": {
     "schemaVersion": 1,
-    "platform": "darwin",
-    "arch": "arm64",
+    "platform": "win32",
+    "arch": "x64",
     "gpuVendor": "Google Inc. (Google)",
-    "gpuRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)",
+    "gpuRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
     "browserMajor": "156",
-    "browserVersion": "Chrome/156.0.8078.48",
+    "browserVersion": "Edg/156.0.4314.58",
     "requestedBackend": "swiftshader",
-    "fingerprint": "9d557a3eb124d4b56ba598134261e432742c42c2c3e6c918df522c59de3d290d"
+    "fingerprint": "1fa7c946843b473ca28607b5f42b16260be5c23febad302a3d5c6cf1a79c0358"
   },
   "renderer": {
     "trackedFiles": [
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 6838630,
-      "sha256": "4c29a199cbeb82ff592f4067d793ffb6f810e7708ddbe97b8f663f44810f4c22",
+      "bytes": 6950499,
+      "sha256": "b309da50780b934be6509ded0f1808db122bc8c271e82772c3dc5f0e8260f71d",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -51,7 +51,7 @@
       "backdrop": "scripts/lib/mob_portrait_background.mjs"
     }
   },
-  "portraitCount": 360,
+  "portraitCount": 384,
   "portraits": [
     {
       "id": "acolyte_tessa",
@@ -5088,6 +5088,837 @@
         "path": "public/ui/mobs/healing_dummy_tank.webp",
         "bytes": 1762,
         "sha256": "d2c2d550dbb31b97be04cc46277cc9aa7f8fe13f3094b515bef89a1dec68284c"
+      }
+    },
+    {
+      "id": "heart_breath_caller",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "mob_reedbound_acolyte",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/stone_cantor.glb",
+          "path": "public/models/creatures/stone_cantor.glb",
+          "bytes": 289676,
+          "sha256": "a207f7ae80be94ff0762b17ccc119b42e24a855d4ca9fcd796f6779fa3c182b2"
+        },
+        "idle": "Idle",
+        "height": 2.6,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.2
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#5ab8e8",
+        "strength": 0.2
+      },
+      "sourceFingerprint": "c2693941544d1f3d36ccc9a20ebd682be9de4a463280017bd249e201d22dffe8",
+      "output": {
+        "path": "public/ui/mobs/heart_breath_caller.webp",
+        "bytes": 2392,
+        "sha256": "d315276bc37a2f988f782bee6bf4faea1aa303d3777c42db82914332ef5a3828"
+      }
+    },
+    {
+      "id": "heart_breath_guardian",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "smith_heart_breath_guardian",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/smith_heart_breath_guardian.glb",
+          "path": "public/models/creatures/smith_heart_breath_guardian.glb",
+          "bytes": 1098060,
+          "sha256": "7531ca1c57aea12cfbd6982be965e644ba505ae97cc8c12d586f174381d0d2c5"
+        },
+        "idle": "Idle",
+        "height": 5.3,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "3fd74d48bb733812660834724ee70d9a826ba997fc1fd054c2e3a6a132e00bf5",
+      "output": {
+        "path": "public/ui/mobs/heart_breath_guardian.webp",
+        "bytes": 4618,
+        "sha256": "df99ff26caeabfd0209fc04ad49abf37adb158c196c107351a3b3dd3d22123f0"
+      }
+    },
+    {
+      "id": "heart_breath_warder",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "mob_elemental",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/golelingevolved.glb",
+          "path": "public/models/creatures/golelingevolved.glb",
+          "bytes": 85588,
+          "sha256": "156f4c2dcf93c6e52a738d8a93e09d1988f933fe4f2d1f9d30411b5eae7f2b94"
+        },
+        "idle": "Flying_Idle",
+        "height": 2.2,
+        "yaw": null,
+        "hover": 0.3,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.4
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#3f7f9f",
+        "strength": 0.4
+      },
+      "sourceFingerprint": "abad2b3613788543b20b90fd42073f14b4da338fbbb5eec0a4accd1414a64f26",
+      "output": {
+        "path": "public/ui/mobs/heart_breath_warder.webp",
+        "bytes": 2170,
+        "sha256": "a2aa674abf0f3348dbf9e245a9de05ea4888ba234336a23cc05d0cab44bdabf3"
+      }
+    },
+    {
+      "id": "heart_final_splinter_breath",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "mob_reedbound_acolyte",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/stone_cantor.glb",
+          "path": "public/models/creatures/stone_cantor.glb",
+          "bytes": 289676,
+          "sha256": "a207f7ae80be94ff0762b17ccc119b42e24a855d4ca9fcd796f6779fa3c182b2"
+        },
+        "idle": "Idle",
+        "height": 2.6,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.2
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#6ac8f0",
+        "strength": 0.2
+      },
+      "sourceFingerprint": "cbc2b04bf68e667856ccfb9155dbf61addccca6284180112e14132bbc47c8c14",
+      "output": {
+        "path": "public/ui/mobs/heart_final_splinter_breath.webp",
+        "bytes": 2382,
+        "sha256": "3dc12494fbf6b00c6f0a528a85f46984b49ecea0cab35cb5e93ee753e8e8a3a6"
+      }
+    },
+    {
+      "id": "heart_final_splinter_hammer",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "skel_golem",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/enemies/skeleton_golem.glb",
+          "path": "public/models/chars/enemies/skeleton_golem.glb",
+          "bytes": 292776,
+          "sha256": "5ea6cd76ee8cfe1380ff056cd226c9403c49f17b5d280a504448efa82990c1f5"
+        },
+        "idle": "Idle",
+        "height": 3.4,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": [
+          {
+            "node": "Skeleton_Golem_Axe",
+            "rotY": 3.141592653589793
+          }
+        ],
+        "tintStrength": 0.25
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#c8903c",
+        "strength": 0.25
+      },
+      "sourceFingerprint": "c43a8e241f892a49134e5119bd364534522879afc06451e8dbb39fbd74052239",
+      "output": {
+        "path": "public/ui/mobs/heart_final_splinter_hammer.webp",
+        "bytes": 3056,
+        "sha256": "b7a7c7d3dfacfabc003c0c9fa9ae466b2ab268fbca4137c2d80fadf423f4d826"
+      }
+    },
+    {
+      "id": "heart_final_splinter_heat",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "mob_elemental",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/golelingevolved.glb",
+          "path": "public/models/creatures/golelingevolved.glb",
+          "bytes": 85588,
+          "sha256": "156f4c2dcf93c6e52a738d8a93e09d1988f933fe4f2d1f9d30411b5eae7f2b94"
+        },
+        "idle": "Flying_Idle",
+        "height": 2.2,
+        "yaw": null,
+        "hover": 0.3,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.4
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#ffd27a",
+        "strength": 0.4
+      },
+      "sourceFingerprint": "192318ce89a80aa9b81bcb7ab35560af0b13bae5ee13e371d8b8676ca798dac5",
+      "output": {
+        "path": "public/ui/mobs/heart_final_splinter_heat.webp",
+        "bytes": 2510,
+        "sha256": "9163eb951db870283915a74cf85d5b24f2b2da217620d7a008886bb95eae1009"
+      }
+    },
+    {
+      "id": "heart_final_splinter_quench",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "mob_water_elemental",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/water_elemental.glb",
+          "path": "public/models/creatures/water_elemental.glb",
+          "bytes": 255292,
+          "sha256": "8b02b114d81492d66d4f13791fc9a8945e2bbe48bb2f027afa332ebef6aac9b2"
+        },
+        "idle": "Idle",
+        "height": 2.65,
+        "yaw": null,
+        "hover": 0.12,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "2fb1fcf255a7121dfc23071eea85ef7178a54bbd0e7cae167e02284fafa873ab",
+      "output": {
+        "path": "public/ui/mobs/heart_final_splinter_quench.webp",
+        "bytes": 2348,
+        "sha256": "e35ea44865cce9303fbd6d4f4573eacfc9dc4cd7821f95bf7273892987c3b24a"
+      }
+    },
+    {
+      "id": "heart_gale_mender",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "mob_reedbound_acolyte",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/stone_cantor.glb",
+          "path": "public/models/creatures/stone_cantor.glb",
+          "bytes": 289676,
+          "sha256": "a207f7ae80be94ff0762b17ccc119b42e24a855d4ca9fcd796f6779fa3c182b2"
+        },
+        "idle": "Idle",
+        "height": 2.6,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.2
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#8fe0ff",
+        "strength": 0.2
+      },
+      "sourceFingerprint": "de287c2910ee185e317277caf6b9f028cb2a6aa10a21a8e629750520df4e465b",
+      "output": {
+        "path": "public/ui/mobs/heart_gale_mender.webp",
+        "bytes": 2396,
+        "sha256": "07a59feb17aa54bd95ae5a13fd6b28fd7b272962fa1c0d5028ce320bc798d20c"
+      }
+    },
+    {
+      "id": "heart_gale_sentinel",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "mob_elemental",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/golelingevolved.glb",
+          "path": "public/models/creatures/golelingevolved.glb",
+          "bytes": 85588,
+          "sha256": "156f4c2dcf93c6e52a738d8a93e09d1988f933fe4f2d1f9d30411b5eae7f2b94"
+        },
+        "idle": "Flying_Idle",
+        "height": 2.2,
+        "yaw": null,
+        "hover": 0.3,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.4
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#4f9fc8",
+        "strength": 0.4
+      },
+      "sourceFingerprint": "3c69300bc6693c5f6d285edd6afea2f69835739ac7e3e7969d5315cc3160fd9f",
+      "output": {
+        "path": "public/ui/mobs/heart_gale_sentinel.webp",
+        "bytes": 2186,
+        "sha256": "ec7e3006a1ec3e962dc419210db02b016d9d3af1a9d912d8fe982e2ab7c3f324"
+      }
+    },
+    {
+      "id": "heart_hammer_guardian",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "skel_golem",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/enemies/skeleton_golem.glb",
+          "path": "public/models/chars/enemies/skeleton_golem.glb",
+          "bytes": 292776,
+          "sha256": "5ea6cd76ee8cfe1380ff056cd226c9403c49f17b5d280a504448efa82990c1f5"
+        },
+        "idle": "Idle",
+        "height": 3.4,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": [
+          {
+            "node": "Skeleton_Golem_Axe",
+            "rotY": 3.141592653589793
+          }
+        ],
+        "tintStrength": 0.25
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#8a6430",
+        "strength": 0.25
+      },
+      "sourceFingerprint": "d9f30fbc3a0b91e15be023a566ca4c58dc9c6c78631087fdf33e0e2d482ce246",
+      "output": {
+        "path": "public/ui/mobs/heart_hammer_guardian.webp",
+        "bytes": 3020,
+        "sha256": "cf43bec6f30945c6cd0715a8de6eb8bba19a6faed1a7152842ede607d3a4ad81"
+      }
+    },
+    {
+      "id": "heart_hammer_warder",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "mob_elemental",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/golelingevolved.glb",
+          "path": "public/models/creatures/golelingevolved.glb",
+          "bytes": 85588,
+          "sha256": "156f4c2dcf93c6e52a738d8a93e09d1988f933fe4f2d1f9d30411b5eae7f2b94"
+        },
+        "idle": "Flying_Idle",
+        "height": 2.2,
+        "yaw": null,
+        "hover": 0.3,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.4
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#8a6430",
+        "strength": 0.4
+      },
+      "sourceFingerprint": "b3a9acb4f3435047fc043fbeb4ab4c179a0cfa551f6080952d026a661826c194",
+      "output": {
+        "path": "public/ui/mobs/heart_hammer_warder.webp",
+        "bytes": 2310,
+        "sha256": "63e815c81c791c048a19bf03ef698e5f515f693231b49f6db27cd926ce4be716"
+      }
+    },
+    {
+      "id": "heart_heat_caller",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "mob_glimmerwisp",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/glimmerwisp.glb",
+          "path": "public/models/creatures/glimmerwisp.glb",
+          "bytes": 162784,
+          "sha256": "25010f4fcd2a0aba2a7ea3f01ceba83d7fb8731a2c9e7d292db8d1f211e6f1ef"
+        },
+        "idle": "Flying_Idle",
+        "height": 1.6,
+        "yaw": -1.5707963267948966,
+        "hover": 0.4,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "664655b90882d6a00c538c49f641294ebb440276b508eb2a21dd8e800ed9528f",
+      "output": {
+        "path": "public/ui/mobs/heart_heat_caller.webp",
+        "bytes": 2276,
+        "sha256": "a0677b9068d23c1dcdc7030b8e3b00edfcd709c5d5e3494fb9cc73480ebd19b0"
+      }
+    },
+    {
+      "id": "heart_heat_guardian",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "smith_heart_heat_guardian",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/smith_heart_heat_guardian.glb",
+          "path": "public/models/creatures/smith_heart_heat_guardian.glb",
+          "bytes": 1901352,
+          "sha256": "1779c45fcacd49d6a56883cf204568c9bd1c5c78f2a3daf21cfa6415214da053"
+        },
+        "idle": "Idle",
+        "height": 6,
+        "yaw": null,
+        "hover": -1.4249999999999998,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "f410b4465dd6e762a0f76bdfe3bc34736a2c05c21f3b1ec62cba122f1d1ccfc1",
+      "output": {
+        "path": "public/ui/mobs/heart_heat_guardian.webp",
+        "bytes": 4508,
+        "sha256": "4789764fab6a168b9a0ec269dfbe347b3d95d8ce66963688f160567fb52bcab7"
+      }
+    },
+    {
+      "id": "heart_heat_rolling_cinder",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "smith_heart_rolling_cinder",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/golelingevolved.glb",
+          "path": "public/models/creatures/golelingevolved.glb",
+          "bytes": 85588,
+          "sha256": "156f4c2dcf93c6e52a738d8a93e09d1988f933fe4f2d1f9d30411b5eae7f2b94"
+        },
+        "idle": "Flying_Idle",
+        "height": 1.9,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "a844bd09c5bfae673703190e103522e5a253f2194c52936303ff8aad90be676d",
+      "output": {
+        "path": "public/ui/mobs/heart_heat_rolling_cinder.webp",
+        "bytes": 2330,
+        "sha256": "da04f69981b3560b636c0473e89c2a109f8e19bb8b809182e649286d83c8af0d"
+      }
+    },
+    {
+      "id": "heart_heat_seedflame",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "mob_glimmerwisp",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/glimmerwisp.glb",
+          "path": "public/models/creatures/glimmerwisp.glb",
+          "bytes": 162784,
+          "sha256": "25010f4fcd2a0aba2a7ea3f01ceba83d7fb8731a2c9e7d292db8d1f211e6f1ef"
+        },
+        "idle": "Flying_Idle",
+        "height": 1.6,
+        "yaw": -1.5707963267948966,
+        "hover": 0.4,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "664655b90882d6a00c538c49f641294ebb440276b508eb2a21dd8e800ed9528f",
+      "output": {
+        "path": "public/ui/mobs/heart_heat_seedflame.webp",
+        "bytes": 2276,
+        "sha256": "a0677b9068d23c1dcdc7030b8e3b00edfcd709c5d5e3494fb9cc73480ebd19b0"
+      }
+    },
+    {
+      "id": "heart_heat_warder",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "mob_elemental",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/golelingevolved.glb",
+          "path": "public/models/creatures/golelingevolved.glb",
+          "bytes": 85588,
+          "sha256": "156f4c2dcf93c6e52a738d8a93e09d1988f933fe4f2d1f9d30411b5eae7f2b94"
+        },
+        "idle": "Flying_Idle",
+        "height": 2.2,
+        "yaw": null,
+        "hover": 0.3,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.4
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#c8a050",
+        "strength": 0.4
+      },
+      "sourceFingerprint": "8375f48eda1bef34416920d6086b6dacbd22b3545934761566a9af7949692191",
+      "output": {
+        "path": "public/ui/mobs/heart_heat_warder.webp",
+        "bytes": 2416,
+        "sha256": "a1aa2c0ca8dbf92b40fde1fdd512a2501b580e1811994f257ef2522077f5ebeb"
+      }
+    },
+    {
+      "id": "heart_heat_wellkeeper",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "mob_elemental",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/golelingevolved.glb",
+          "path": "public/models/creatures/golelingevolved.glb",
+          "bytes": 85588,
+          "sha256": "156f4c2dcf93c6e52a738d8a93e09d1988f933fe4f2d1f9d30411b5eae7f2b94"
+        },
+        "idle": "Flying_Idle",
+        "height": 2.2,
+        "yaw": null,
+        "hover": 0.3,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.4
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#ffb04a",
+        "strength": 0.4
+      },
+      "sourceFingerprint": "cc92549bb7465b8522e52c812ccd85776ede3e57c16488a36000b906d2dcaf6d",
+      "output": {
+        "path": "public/ui/mobs/heart_heat_wellkeeper.webp",
+        "bytes": 2612,
+        "sha256": "10a098c6fd434089a15f373e300d838e2538afd0cfcf1ddfb4d5d91e5fbf26ec"
+      }
+    },
+    {
+      "id": "heart_heat_wellspawn",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "mob_elemental",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/golelingevolved.glb",
+          "path": "public/models/creatures/golelingevolved.glb",
+          "bytes": 85588,
+          "sha256": "156f4c2dcf93c6e52a738d8a93e09d1988f933fe4f2d1f9d30411b5eae7f2b94"
+        },
+        "idle": "Flying_Idle",
+        "height": 2.2,
+        "yaw": null,
+        "hover": 0.3,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.4
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#ffd27a",
+        "strength": 0.4
+      },
+      "sourceFingerprint": "192318ce89a80aa9b81bcb7ab35560af0b13bae5ee13e371d8b8676ca798dac5",
+      "output": {
+        "path": "public/ui/mobs/heart_heat_wellspawn.webp",
+        "bytes": 2510,
+        "sha256": "9163eb951db870283915a74cf85d5b24f2b2da217620d7a008886bb95eae1009"
+      }
+    },
+    {
+      "id": "heart_masterless_strength",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "smith_heart_masterless_strength",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/smith_heart_masterless_strength.glb",
+          "path": "public/models/creatures/smith_heart_masterless_strength.glb",
+          "bytes": 1459444,
+          "sha256": "fe2c92391de187acf916344a9b27f6ae9a25f2ad860c27d9681c249d1600e646"
+        },
+        "idle": "Idle",
+        "height": 5.6,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "8047855b321a185578f3299619f4944cf490b846ae717242815714e95bda8748",
+      "output": {
+        "path": "public/ui/mobs/heart_masterless_strength.webp",
+        "bytes": 4870,
+        "sha256": "551013d2d17d7d48582229075055544919298b16f509dbfcfe5b06fbeb825825"
+      }
+    },
+    {
+      "id": "heart_quench_caller",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "mob_water_elemental",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/water_elemental.glb",
+          "path": "public/models/creatures/water_elemental.glb",
+          "bytes": 255292,
+          "sha256": "8b02b114d81492d66d4f13791fc9a8945e2bbe48bb2f027afa332ebef6aac9b2"
+        },
+        "idle": "Idle",
+        "height": 2.65,
+        "yaw": null,
+        "hover": 0.12,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "2fb1fcf255a7121dfc23071eea85ef7178a54bbd0e7cae167e02284fafa873ab",
+      "output": {
+        "path": "public/ui/mobs/heart_quench_caller.webp",
+        "bytes": 2348,
+        "sha256": "e35ea44865cce9303fbd6d4f4573eacfc9dc4cd7821f95bf7273892987c3b24a"
+      }
+    },
+    {
+      "id": "heart_quench_guardian",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "smith_heart_quench_guardian",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/golelingevolved.glb",
+          "path": "public/models/creatures/golelingevolved.glb",
+          "bytes": 85588,
+          "sha256": "156f4c2dcf93c6e52a738d8a93e09d1988f933fe4f2d1f9d30411b5eae7f2b94"
+        },
+        "idle": "Flying_Idle",
+        "height": 2.3,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "1fa38c2eddb303ae3406af38ce0d4e273a30a7f20d778c44daa13ccb8b2bc939",
+      "output": {
+        "path": "public/ui/mobs/heart_quench_guardian.webp",
+        "bytes": 2330,
+        "sha256": "da04f69981b3560b636c0473e89c2a109f8e19bb8b809182e649286d83c8af0d"
+      }
+    },
+    {
+      "id": "heart_quench_warder",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "mob_elemental",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/golelingevolved.glb",
+          "path": "public/models/creatures/golelingevolved.glb",
+          "bytes": 85588,
+          "sha256": "156f4c2dcf93c6e52a738d8a93e09d1988f933fe4f2d1f9d30411b5eae7f2b94"
+        },
+        "idle": "Flying_Idle",
+        "height": 2.2,
+        "yaw": null,
+        "hover": 0.3,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.4
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#6aa8c8",
+        "strength": 0.4
+      },
+      "sourceFingerprint": "e4c15a7c2f26485b4958ac039968efda2681b17bf4d0a7704a3a77392023917d",
+      "output": {
+        "path": "public/ui/mobs/heart_quench_warder.webp",
+        "bytes": 2196,
+        "sha256": "c4cabd4adc9e7d908f81488d7864adb6e105f2e1cc3cf9ec0765fcb22433c902"
+      }
+    },
+    {
+      "id": "heart_ring_warder",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "skel_golem",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/enemies/skeleton_golem.glb",
+          "path": "public/models/chars/enemies/skeleton_golem.glb",
+          "bytes": 292776,
+          "sha256": "5ea6cd76ee8cfe1380ff056cd226c9403c49f17b5d280a504448efa82990c1f5"
+        },
+        "idle": "Idle",
+        "height": 3.4,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": [
+          {
+            "node": "Skeleton_Golem_Axe",
+            "rotY": 3.141592653589793
+          }
+        ],
+        "tintStrength": 0.25
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#6a6460",
+        "strength": 0.25
+      },
+      "sourceFingerprint": "e6ebf478b95255d1c8aedead6e42d41e733712eb0f298296db19093da0f8b1c0",
+      "output": {
+        "path": "public/ui/mobs/heart_ring_warder.webp",
+        "bytes": 2998,
+        "sha256": "5b8295a75ef00e05f25ca9d9f85837b27556838f56c1bf087c28e21647834c59"
+      }
+    },
+    {
+      "id": "heart_seam_singer",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "smith_heart_seam_singer",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/golelingevolved.glb",
+          "path": "public/models/creatures/golelingevolved.glb",
+          "bytes": 85588,
+          "sha256": "156f4c2dcf93c6e52a738d8a93e09d1988f933fe4f2d1f9d30411b5eae7f2b94"
+        },
+        "idle": "Flying_Idle",
+        "height": 2.5,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "d4c1f19fdc77a678cf3bc563dee2afefb0cde3c1b12b9e590a96d5a5c2cf0a3d",
+      "output": {
+        "path": "public/ui/mobs/heart_seam_singer.webp",
+        "bytes": 2330,
+        "sha256": "da04f69981b3560b636c0473e89c2a109f8e19bb8b809182e649286d83c8af0d"
       }
     },
     {

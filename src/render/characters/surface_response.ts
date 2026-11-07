@@ -12,6 +12,9 @@ export function surfaceResponseUniforms() {
     uSurfaceHeight: { value: 2 },
     uSurfaceContact: { value: new THREE.Vector2(0.56, -0.28) },
     uSurfaceRight: { value: new THREE.Vector2(1, 0) },
+    // A held glaze painted over whatever transient runs: (height share it has
+    // climbed, rim light, bite, strength); strength 0 draws nothing.
+    uSurfaceGlaze: { value: new THREE.Vector4() },
   };
 }
 type Uniforms = ReturnType<typeof surfaceResponseUniforms>;
@@ -38,7 +41,8 @@ export function createSurfaceResponseMaterial(
       `varying vec3 vSurfacePoint;
       uniform float uSurfaceAge,uSurfaceKind,uSurfaceAmount,uSurfaceHeight;
       uniform vec3 uSurfaceOrigin;
-      uniform vec2 uSurfaceContact,uSurfaceRight;\n` + shader.fragmentShader;
+      uniform vec2 uSurfaceContact,uSurfaceRight;
+      uniform vec4 uSurfaceGlaze;\n` + shader.fragmentShader;
     shader.fragmentShader = shader.fragmentShader.replace(
       '#include <color_fragment>',
       /* glsl */ `
@@ -108,6 +112,25 @@ export function createSurfaceResponseMaterial(
         diffuseColor.rgb=mix(diffuseColor.rgb,vec3(0.16,0.004,0.012),wound*0.96);
         surfaceEmission=vec3(0.8,0.018,0.035)*cut*surfaceFade*pow(max(0.0,1.0-uSurfaceAge),2.0)*1.6;
       }
+      // The held frost glaze (the Quench's cold, CharacterSurfaceResponse
+      // setGlaze): the body's own colours chilled and filmed with rime from the
+      // feet up to the height the cold has climbed, a ragged white front of
+      // frost at its edge; its rim light, glints and bite are emission, below.
+      float glazeCoat=0.0;
+      if(uSurfaceGlaze.w>0.001) {
+        // The front: a gentle wave round the body, never the grain (its patches read as camouflage).
+        float glazeEdge=uSurfaceGlaze.x+sin(surfaceP.x*9.0+surfaceP.z*7.0)*0.03;
+        glazeCoat=(1.0-smoothstep(glazeEdge-0.16,glazeEdge,surfaceHeight))*uSurfaceGlaze.w;
+        // A smooth film over a deeper blue body, the rime thicker and paler low
+        // (never blotches, never a flat grey: the frozen body keeps its icy
+        // contrast; the rim and the glints below carry the detail).
+        float glazeFrost=0.2+0.55*(1.0-smoothstep(0.0,0.8,surfaceHeight));
+        vec3 glazeIce=mix(vec3(0.3,0.5,0.78),vec3(0.86,0.95,1.0),glazeFrost);
+        diffuseColor.rgb=mix(diffuseColor.rgb,diffuseColor.rgb*vec3(0.42,0.6,0.92)+glazeIce*0.34,glazeCoat*0.76);
+        float glazeFront=(1.0-smoothstep(0.0,0.05,abs(surfaceHeight-glazeEdge+0.05)))*uSurfaceGlaze.w*step(glazeEdge,1.0);
+        diffuseColor.rgb=mix(diffuseColor.rgb,vec3(0.92,0.97,1.0),glazeFront*0.5);
+        glazeCoat=max(glazeCoat,glazeFront);
+      }
     `,
     );
     shader.fragmentShader = shader.fragmentShader.replace(
@@ -117,6 +140,27 @@ export function createSurfaceResponseMaterial(
     shader.fragmentShader = shader.fragmentShader.replace(
       '#include <emissivemap_fragment>',
       '#include <emissivemap_fragment>\ntotalEmissiveRadiance+=surfaceEmission;',
+    );
+    // The glaze's own light (its cold rim, its glints, the bite's veins) joins the
+    // emission after the lights, before three sums them, so the emissive stage the
+    // merged head's tint pins stays exactly the hit response's.
+    shader.fragmentShader = shader.fragmentShader.replace(
+      '#include <lights_fragment_end>',
+      /* glsl */ `#include <lights_fragment_end>
+      if(glazeCoat>0.001) {
+        vec3 glazeView=normalize(vViewPosition);
+        float glazeRim=1.0-clamp(abs(dot(normal,glazeView)),0.0,1.0);
+        glazeRim*=glazeRim*glazeRim;
+        // A glint is a point of rime in its cell (never the whole cell, which drew squares).
+        vec3 glazeCell=floor(surfaceP*24.0);
+        float glazeSeed=fract(sin(dot(glazeCell,vec3(12.9898,78.233,37.719)))*43758.5453);
+        vec3 glazeAt=vec3(glazeSeed,fract(glazeSeed*13.7),fract(glazeSeed*71.3))*0.6+0.2;
+        float glazePoint=1.0-smoothstep(0.03,0.13,length(fract(surfaceP*24.0)-glazeAt));
+        float glazeTwinkle=fract(glazeSeed*7.0+dot(glazeView,vec3(3.1,5.7,4.3))+dot(surfaceP,vec3(1.3,0.7,1.1)));
+        float glazeGlint=step(0.86,glazeSeed)*smoothstep(0.8,0.97,glazeTwinkle)*glazePoint;
+        totalEmissiveRadiance+=vec3(0.42,0.72,1.0)*glazeCoat*(glazeRim*(0.55+0.5*uSurfaceGlaze.y)+glazeGlint*2.2);
+        totalEmissiveRadiance+=vec3(0.62,0.9,1.0)*surfaceVein*uSurfaceGlaze.z*glazeCoat*0.9;
+      }`,
     );
   };
   material.customProgramCacheKey = () => `${previousKey}:surface-response-v4`;
@@ -129,7 +173,27 @@ export class CharacterSurfaceResponse {
   readonly uniforms = surfaceResponseUniforms();
   private age = 0;
   private duration = 2.5;
-  active = false;
+  /** A hit's short treatment is running. */
+  private transient = false;
+  /** A held glaze (setGlaze) is on. */
+  private glazed = false;
+  /** Whether the rig wears the surface program (a hit's treatment or a held glaze). */
+  get active(): boolean {
+    return this.transient || this.glazed;
+  }
+  /** Hold a glaze over the body (the Quench's frost, quench_glaze_core.ts), or
+   *  release it with null. True on the on/off edge: the rig re-mounts its
+   *  materials then (the same program as every hit treatment, so it rides the
+   *  same gated swap); while held, only the uniform moves. */
+  setGlaze(glaze: { height: number; glow: number; bite: number; alpha: number } | null): boolean {
+    const on = glaze !== null && glaze.alpha > 0.001;
+    const was = this.active;
+    this.glazed = on;
+    if (glaze && on)
+      this.uniforms.uSurfaceGlaze.value.set(glaze.height, glaze.glow, glaze.bite, glaze.alpha);
+    else this.uniforms.uSurfaceGlaze.value.set(0, 0, 0, 0);
+    return was !== this.active;
+  }
   trigger(school: string, strength: number, contact?: MeleeImpactProfile): boolean {
     const kind =
       school === 'fire'
@@ -156,8 +220,11 @@ export class CharacterSurfaceResponse {
                             ? 10
                             : -1;
     if (kind < 0 || !Number.isFinite(strength) || strength <= 0) return false;
+    // A held frost glaze already paints the cold on the body: a frost hit's
+    // grainy coat over it read as camouflage blotches (the AAA review).
+    if (kind === 1 && this.glazed) return false;
     const edge = !this.active;
-    this.active = true;
+    this.transient = true;
     this.age = 0;
     this.duration =
       kind === 5 || kind >= 7
@@ -190,18 +257,21 @@ export class CharacterSurfaceResponse {
   }
   update(dt: number, root: THREE.Object3D, height: number): boolean {
     if (!this.active) return false;
-    this.age += Number.isFinite(dt) ? Math.max(0, dt) : 0;
     root.getWorldPosition(this.uniforms.uSurfaceOrigin.value);
     const matrix = root.matrixWorld.elements;
     this.uniforms.uSurfaceRight.value.set(matrix[0], matrix[2]).normalize();
     this.uniforms.uSurfaceHeight.value = Math.max(0.1, height);
+    if (!this.transient) return false;
+    this.age += Number.isFinite(dt) ? Math.max(0, dt) : 0;
     this.uniforms.uSurfaceAge.value = Math.min(1, this.age / this.duration);
     if (this.age < this.duration) return false;
     this.clear();
-    return true;
+    // A held glaze keeps the program: nothing to re-mount.
+    return !this.glazed;
   }
+  /** End a hit's treatment (a held glaze stays). */
   clear(): void {
-    this.active = false;
+    this.transient = false;
     this.age = 0;
     this.uniforms.uSurfaceAmount.value = 0;
   }

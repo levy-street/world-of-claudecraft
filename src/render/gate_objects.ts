@@ -27,6 +27,9 @@ import {
   type IgnivarRaidGatePlan,
   ignivarRaidGatePlan,
 } from './ignivar_raid_gate';
+import { isHeartSealMarker, observeHeartSealMarker } from './smith_heart/heart_seal_core';
+import { breathObjectKind } from './smith_heart_fx/breath_fight_fx_core';
+import { heatObjectKind } from './smith_heart_fx/heat_fight_fx_core';
 import { isTrashEngineObject } from './trash_engine_fx/trash_engine_fx_core';
 
 export interface DungeonGateAnchorPlan {
@@ -72,6 +75,24 @@ export function gateObjectPlan(e: GateEntityLike): GateObjectPlan | null {
     observeSanctumStoryMarker(e, sharedUniforms.uTime.value);
     return { encounterAnchor: true, height: 2 };
   }
+  // The Smith's Heart's seal markers: the seal and the light-rivers read the
+  // lit-vein mask they carry (render/smith_heart). A template swap rebuilds
+  // the view, so every vein lighting is reported here.
+  if (isHeartSealMarker(e.templateId)) {
+    observeHeartSealMarker(e, sharedUniforms.uTime.value);
+    return { encounterAnchor: true, height: 2 };
+  }
+  // The Guardian of the Heat's fight objects (the fist's spot, the swells'
+  // lanes and waves, the seeds, the Wakefire, the cinders): drawn from the
+  // world by ./smith_heart_fx (HeatFx, HeatFightFx). Without this they fell
+  // through to the generic ground object and its loot sparkle, scaled by the
+  // spot's radius: a star-crossed sun hanging over the fist's spot all bar.
+  if (heatObjectKind(e.templateId) !== null) return { encounterAnchor: true, height: 2 };
+  // The Guardian of the Breath's fight objects (the wind, the calm circles, the
+  // vortex, the loose gales, the strikes, the charged ground, the cradles):
+  // drawn from the world by ./smith_heart_fx (BreathFightFx), never the loot
+  // sparkle (the same star-crossed sun over every strike of the storm).
+  if (breathObjectKind(e.templateId) !== null) return { encounterAnchor: true, height: 2 };
   if (dungeonGateStateOf(e.templateId) === null || !e.dungeonId) return null;
   const def = DUNGEONS[e.dungeonId];
   if (!def) return null;

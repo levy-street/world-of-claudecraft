@@ -54,6 +54,7 @@
 import { DUNGEON_X_THRESHOLD, DUNGEONS, instanceOriginX, isRiftPos, RIFT_BAND_X_MIN } from './data';
 import {
   INSTANCE_FOOTPRINT_HALF_WIDTH,
+  instanceHalfWidthOf,
   instanceInfoAt,
   WIDE_CLAIM_DUNGEON_ID,
 } from './instances/dungeons';
@@ -77,7 +78,7 @@ import { drawableVaultProjection } from './vault_material_sources';
  *  real claim read (instanceInfoAt) one yard west of the edge this predicts
  *  for every registered def. */
 export function claimWestReach(def: { id: string; spawns: readonly { x: number }[] }): number {
-  if (def.id !== WIDE_CLAIM_DUNGEON_ID) return INSTANCE_FOOTPRINT_HALF_WIDTH;
+  if (def.id !== WIDE_CLAIM_DUNGEON_ID) return instanceHalfWidthOf(def.id);
   let reach = INSTANCE_FOOTPRINT_HALF_WIDTH;
   for (const spawn of def.spawns) reach = Math.max(reach, NYTHRAXIS_ROOM_RADIUS - spawn.x);
   return reach;

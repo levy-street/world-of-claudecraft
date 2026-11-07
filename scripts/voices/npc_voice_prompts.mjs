@@ -236,6 +236,74 @@ export const VOICE_PROMPTS = [
       'chest. By ember, stone, and anvil, I will unmake you. Master... I have failed you.',
   },
 
+  // -- The Smith's Heart raid (src/sim/encounters/smith_heart/voice_lines.ts) --
+  // Designed through the raid boss auditions (scripts/voices/raid_boss_voice_prompts.mjs
+  // SMITH_HEART_VOICE_PROMPTS) and rendered by scripts/render_smith_heart_voice_pack.mjs;
+  // each description is its chosen take's.
+  {
+    npcId: 'heart_hammer_guardian',
+    name: 'Guardian of the Hammer',
+    voiceDescription:
+      'A war-leader of living quarry stone the size of a gatehouse. A huge, chesty basso ' +
+      'profundo with a coarse gravel grain, every word struck like a hammer on rock, clipped ' +
+      'battle commands, a war cry that fills a quarry. Non-human, never a robot or a beast.',
+    sampleText:
+      "Strangers in the Quarry. The Hammer's strength does not yield to flesh. The mountain " +
+      'answers me! Hide, if the stone will have you!',
+  },
+  {
+    npcId: 'heart_seam_singer',
+    name: 'The Seam Singer',
+    voiceDescription:
+      'A slender being of stone and amber crystal whose voice is the humming of an ore seam. A ' +
+      'clear alto with a soft crystalline shimmer and a cave echo, slow melodic phrasing that ' +
+      'almost sings, a sudden cutting edge on commands. Serene, eerie, quietly cruel.',
+    sampleText:
+      'Hear the seam sing? It has waited so long for your voices. Sing with me, and break!',
+  },
+  {
+    npcId: 'heart_breath_guardian',
+    name: 'Guardian of the Breath',
+    voiceDescription:
+      'A colossus of storm stone that breathes the mountain wind. A resonant, hollow voice with ' +
+      'a howling, horn-like timbre and rushing air around every word, as if spoken through a ' +
+      'great stone horn; thunderous bursts on commands, a sighing hush between them.',
+    sampleText:
+      'You climbed to the top of the mountain to steal its breath? Then breathe with me. Enough ' +
+      'breath. Now the storm!',
+  },
+  {
+    npcId: 'heart_quench_guardian',
+    name: 'Guardian of the Quench',
+    voiceDescription:
+      'A giant of frost-bound granite and lake ice who keeps the frozen lake where steel was ' +
+      'tempered. A low, cold contralto, very calm and very slow, crisp consonants like cracking ' +
+      'ice, a breathy frost on every exhale; it rises to a hard, ringing command.',
+    sampleText:
+      'Warm blood on my lake. It will not stay warm for long. Blades of the Smith, wake! Hunt ' +
+      'them across the ice!',
+  },
+  {
+    npcId: 'heart_heat_guardian',
+    name: 'Guardian of the Heat',
+    voiceDescription:
+      'A giant of black basalt and white-gold crystal sunk to its waist in the first wellspring ' +
+      'of fire. An enormous, resonant bass with a deep chest roar and a crackling, ember-dry ' +
+      'texture, slow words that swell like a furnace breathing. Ancient, warm, overwhelming.',
+    sampleText:
+      'You walk into the first flame. Nothing leaves it unchanged. I rise with the first fire!',
+  },
+  {
+    npcId: 'heart_masterless_strength',
+    name: 'The Masterless Strength',
+    voiceDescription:
+      'The crystal heart of a mountain, the four strengths of a vanished smith speaking as one ' +
+      '("we"). A deep, resonant, layered voice like a choir of one, a hollow cathedral echo, a ' +
+      'humming crystal overtone and shifting rock beneath; slow and ceremonial, erupting in fury.',
+    sampleText:
+      "Who wakes the heart of the mountain? We are the Smith's strength, and we have no master!",
+  },
+
   // -- Eldershine, the Veiled Hollow (src/sim/content/realm.ts) -------------
   {
     npcId: 'keeper_saelwyn',
@@ -1103,6 +1171,9 @@ export const VOICE_ALIAS = {
   shadow_sentry_south: 'lampman_cobb',
   shadow_watch_east: 'lampman_cobb',
   shadow_watch_west: 'lampman_cobb',
+  // Captain Thessaly herself, recurring inside the Smith's Heart raid
+  // (content/smith_heart.ts) where she fights beside the raid on the Storm Cornice.
+  heart_captain_thessaly: 'captain_thessaly',
   // Keeper Liora wardens a hedge maze of wisps and speaks her instructions with
   // the same unhurried, luminous calm as the keeper of the sealed hollow.
   wisp_maze_keeper: 'keeper_saelwyn',

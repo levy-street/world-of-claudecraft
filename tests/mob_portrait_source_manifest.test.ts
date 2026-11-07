@@ -112,7 +112,15 @@ describe('mob portrait source manifest', () => {
     // The 2026-10-09 reviewed renderer receipt captures all 355 current rows.
     // 356: plus the Hunting Spear of the Zulgar hunt rework (the usable body a
     // teammate pulls out, wildheart_hunting_spear).
-    expect(liveIds).toHaveLength(360);
+    // 371: plus the Smith's Heart raid's fifteen (its eight vein warders and
+    // callers, the Council's three, the three guardians and the final boss;
+    // the bodyless bosses show their hidden placeholder rig, like the Spear).
+    // 375: plus the Guardian of the Heat's four (its Wellspawn, Wellkeeper,
+    // Seedflame and Rolling Cinder).
+    // 379: plus the four Gourdlight Eve encounter bodies.
+    // 384: the Smith's Heart final boss's four Splinters and the Breath isle's
+    // Gale Sentinel and Gale Mender, less the Slabwright the Council rework cut.
+    expect(liveIds).toHaveLength(384);
     expect(manifest.portraitCount).toBe(liveIds.length);
     expect(manifest.portraits.map((portrait) => portrait.id)).toEqual(liveIds);
     expect(manifest.schemaVersion).toBe(2);

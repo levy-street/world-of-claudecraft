@@ -378,6 +378,107 @@ in and out never steps (`tests/tavern_ambience_core.test.ts`). The clip is a cus
 master baked as a seamless 16-bar loop; regenerate it with
 `node scripts/gen_tavern_ambience_sfx.mjs`, then `npm run sfx:manifest`.
 
+### The Smith's Heart: the Hammer Council (spatial one-shots, one loop)
+Played by `src/game/smith_heart_council_audio.ts` (plan: `smith_heart_council_audio_core.ts`)
+off the council's own cues, cast bars and marks; the HUD's generic nova never doubles one
+(`councilSoundClaims`). Generated with the ElevenLabs Sound Effects API through `gen_sfx.mjs`.
+
+| key | when | prompt summary |
+|---|---|---|
+| `heart_council_wrath_charge` | Mountain's Wrath's bar starts (fitted to the bar) | an earthquake rumble building to a peak |
+| `heart_council_wrath_blast` | the Wrath lands | a huge stone shockwave, dust and gravel rushing out |
+| `heart_council_pillar_rise` | a pillar bursts out of the floor | violent grinding crack, a deep locking thud |
+| `heart_council_pillar_crack` | a pillar loses a piece | a sharp rock fracture with a gritty trickle |
+| `heart_council_pillar_collapse` | a pillar falls (and, softer, the risen ones sinking) | a column toppling into a crash of rubble |
+| `heart_council_pillar_pulse` | heroic: the pillars pulse (low, cooled) | one soft deep thrum |
+| `heart_council_rock_fall` | the boulder comes into view over its soak | a deep descending whoosh |
+| `heart_council_rock_impact` | the rock lands (softer and higher: Hammer's Weight's slab) | a giant boulder crunching into stone |
+| `heart_council_seam_bolt` | a Seam Bolt lands | a glassy whoosh into a ringing crystal break |
+| `heart_council_song_cast` | the Song of the Seam's bar starts | an ore vein's ringing hum swelling, wordless |
+| `heart_council_soul_take` | mythic: a soul flows into its pillar (softer: the stone remembers) | a ghostly rush sinking into rock |
+| `heart_council_echo_charge` | mythic: the Echo of Wrath's bar starts | a rising rumble with ember crackle |
+| `heart_council_echo_blast` | mythic: the Echo lands | a fiery stone boom with rolling dust |
+| `heart_council_slab_grind` | mythic: loop while the Walking Slab drags | continuous heavy stone grinding |
+| `heart_council_slab_crush` | mythic: the slab crushes a player | a heavy crunching slam |
+| `heart_council_song_pulse` | mythic: each Endless Song pulse, louder and deeper as it grows | a deep bell-like ring of stone |
+| `heart_council_soul_pip` | mythic: a soul pip is struck off | a crystal chip with a bright spark |
+| `heart_council_soul_burst` | mythic: a soul pillar bursts | a shattering crack and a ghostly whoosh rising away |
+
+### The Smith's Heart: the Guardian of the Breath (spatial one-shots, two loops)
+Played by `src/game/smith_heart_breath_audio.ts` (plan: `smith_heart_breath_audio_core.ts`)
+off the fight's own cues, the wind object's phases and the guardian's bars; the HUD's
+generic nova and burst never double one (`breathSoundClaims`). Generated with the
+ElevenLabs Sound Effects API through `gen_sfx.mjs`.
+
+| key | when | prompt summary |
+|---|---|---|
+| `heart_breath_gather` | a blow (or a phase-2 gust) gathers | a gale's howl rising through hollow stone, a vast breath drawn |
+| `heart_breath_blow_loop` | loop while the wind blows | a steady roaring gale over a summit, grit hissing |
+| `heart_breath_calm` | the blow dies into the calm | the gale falling to a long sigh |
+| `heart_breath_inhale` | the indrawn breath's bar starts (fitted to it) | air sucked into a vast stone throat, a vortex rising |
+| `heart_breath_exhale` | Bellows Gust (the exhale) lands | a colossal whump of air hurled outward |
+| `heart_breath_storm_break` | the storm breaking's bar starts | the wind drawn to silence, static building, stone straining |
+| `heart_breath_tear` | the guardian tears open into lightning | a shell bursting, a thunderclap, a roar of lightning |
+| `heart_breath_strike` | a barrage or conductor strike lands (cooled) | a close searing crack and a thunder snap |
+| `heart_breath_fork` | each leg of the Forking Bolt | rapid electric zaps leaping |
+| `heart_breath_discharge` | the Thunder's Cradle discharges | a blinding bolt into the ground, a deep boom |
+| `heart_breath_gale_loop` | heroic: loop at the nearest loose gale | a small whirling tornado over stone |
+| `heart_breath_toss` | a loose gale tosses a player | a whoosh flinging into the air |
+| `heart_breath_calm_land` | Thessaly's circle lands (softer and higher: an anchor taken) | a soft bright chime, the wind hushed |
+| `heart_breath_swell` | the swelling storm pulses (cooled) | rolling thunder, distant crackle |
+| `heart_breath_fall` | a player goes over a gap's lip | wind howling down past a cliff into a chasm |
+
+### The Smith's Heart: the Guardian of the Quench (spatial one-shots)
+Played by `src/game/smith_heart_quench_audio.ts` (plan: `smith_heart_quench_audio_core.ts`)
+off the fight's own cues, the cracks as they appear and the guardian's awakening bar; the
+HUD's generic nova and burst never double one (`quenchSoundClaims`). Generated with the
+ElevenLabs Sound Effects API. The local player's cold warning (past three quarters) borrows
+the shared `cast_frost` sample, soft, until the fight has a take of its own.
+
+| key | when | prompt summary |
+|---|---|---|
+| `heart_quench_freeze` | a player is encased in rime | ice crystallizing fast round a body, a hard crackling lock |
+| `heart_quench_shatter` | the ice shatters off them | a block of ice bursting into tinkling shards |
+| `heart_quench_crack` | a crack appears under a huddle (cooled) | thick lake ice groaning and splitting |
+| `heart_quench_hole` | the crack gives way into open water | ice breaking through, a slosh of freezing water |
+| `heart_quench_plunge` | a player falls under the ice | a heavy plunge into icy water |
+| `heart_quench_climb` | a player climbs out on the rim | water pouring off, a scramble onto ice |
+| `heart_quench_wake_charge` | the blades' awakening bar starts (fitted to the bar) | deep ice straining, a crystalline hum building |
+| `heart_quench_wake` | the blades tear free | a huge ice crack, shards bursting up, a ringing glass tail |
+| `heart_quench_echo` | the blades echo an attack (one voice, cooled) | a resonant icy whoosh with a glassy echo |
+| `heart_quench_cross` | heroic: two blades cross the lake | a doubled whoosh, ice splintering in the wake |
+| `heart_quench_rim` | the shore ice heaves up (lower and slower: it falls at the end) | a short grinding crack of ice plates |
+
+### The Smith's Heart: every mechanic's own sound (the AAA pass)
+Jose's pass of 2026-11-05: every mechanic a player reacts to in the five fights has its own
+take, generated with the ElevenLabs Sound Effects API through `gen_sfx.mjs` from
+`scripts/sfx/smith_heart_mechanic_sfx.mjs` (spread into `SFX`). The catalog is the source of
+truth for each key's prompt; the tables above keep the first takes. The rules of the pass:
+
+- **Two families, told apart by ear.** A WARNING (a mark on you, a line drawn, a floor
+  heating, a bar) swells with no hit; an IMPACT (a slam, a burst, an eruption, a strike) is a
+  hard transient. Pinned by `tests/smith_heart_mark_audio.test.ts` (the prompts' families).
+- **Personal marks** play in the marked player's own ear, one sting per element
+  (`heart_mark_stone`, `_storm`, `_frost`, `_fire`), through the shared
+  `src/game/smith_heart_mark_audio.ts` (`HeartMarkEar`); each fight's core names its marks.
+- **Priority voices.** Every raid mechanic cue plays with `priority: true`, which may use
+  `PRIORITY_VOICE_HEADROOM` voices past `MAX_VOICES` (`src/game/sfx.ts` `voiceCapFor`), so a
+  busy raid's spells never silence a warning. No graphics or audio preset gates them: they
+  ride the effects bus like every combat cue (only the player's own SFX volume moves them).
+- **One claim.** `src/game/smith_heart_audio_claims.ts` (`smithHeartSoundClaims`) keeps the
+  HUD's generic nova, beam and ground burst off every fight's cue (`combat_sfx.ts`
+  `spellFxCue` and the `hud.ts` spellfxAt path).
+- **Mix.** Each take is conformed like every generated cue; the loops sit a little under the
+  one-shots through `sfx_gain_map.json` trims, and each core sets its runtime gain.
+
+| fight | what is new |
+|---|---|
+| Hammer Council (`smith_heart_council_audio_core.ts`) | Mountain's Rush's wind-up (warning) and impact, Bond of the Stone's pulse, Resonance, Narrow Shelter's strain as a pillar crowds under the Wrath (warning), the marks (Rush, Wake, Rock, Resonance) |
+| Breath (`smith_heart_breath_audio_core.ts`) | the Knotted Gale (drop, take, carried loop, fuse warning, portals opening and crossed, throw, burst), the Summit Roar and its wave, the isles' rides (up, a loop in the rider's ears, down) and the Bulwark, the marks (Drawn Lightning, the portals) |
+| Quench (`smith_heart_quench_audio_core.ts`) | a slash's line (warning as drawn, a click at its lock, the flight), the cold past half and four fifths in the player's ear, the rime cracking an immunity, The Blades Hunt (its waking and a loop through its bar), the slash mark |
+| Heat (`smith_heart_heat_audio_core.ts`) | every cue its own take (the borrowed layers are gone; the fist and the cinder's burst keep a Council stone layer for weight), Wakefire's build, the Wheel of the Hearth (warning, eruption), the Rolling Cinder's roll loop, Cinder Grip's stacks in the tank's ear (loud from the swap), the marks |
+| Masterless Strength (`smith_heart_final_audio_core.ts`, new) | the quarter change, Vein Shock, the Overload (rising warning, pulse growing with the bar, burst), Heart Unbound, each quarter's kit (bars and footprints warn, cues strike), the intermissions, the final phase and each turn of its mix (the sim's `FINAL_PHASE_CUES.mixTurn` in the turn's element), Masterless Fury, Mythic's hidden phase (kneel, rebirth, a quarter cracking and falling, a body falling, the ring) and the floor rising back, the marks and the cold |
+
 ### Interface and personal event cues
 
 These cues are non-positional, preload at startup, and keep the existing
