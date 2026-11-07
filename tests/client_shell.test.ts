@@ -1538,6 +1538,66 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).not.toContain('.mobile-action-slot.drop-target');
   });
 
+  it('leads the More tray with Settings, Edit Bars, Quest Log, Social, and Chat in both entries', () => {
+    // The tray is the complete utility surface: every action the touch ring
+    // offers on either page has a tray twin, led by the setup and social
+    // entries a player looks for first. The three new entries reuse the
+    // catalog keys the strip already localizes, so no new strings ship.
+    for (const [name, entry] of [
+      ['index.html', html],
+      ['play.html', playHtml],
+    ] as const) {
+      const gridStart = entry.indexOf('<div id="mobile-extra-grid">');
+      const gridEnd = entry.indexOf('</div>', gridStart);
+      expect(gridStart, name).toBeGreaterThan(-1);
+      const grid = entry.slice(gridStart, gridEnd);
+      const order = [
+        'id="mobile-tray-settings"',
+        'id="mobile-bar-editor"',
+        'id="mobile-tray-quest"',
+        'id="mobile-tray-social"',
+        'id="mobile-chat"',
+      ];
+      let previous = -1;
+      for (const id of order) {
+        const at = grid.indexOf(id);
+        expect(at, `${name}: ${id} missing or out of order in the More tray`).toBeGreaterThan(
+          previous,
+        );
+        previous = at;
+      }
+      // Labels come from the existing catalog keys, never new literals.
+      expect(grid, name).toContain('data-i18n="hud.core.mobileSettings">Settings<');
+      expect(grid, name).toContain('data-i18n="questUi.log.title">Quest Log<');
+      expect(grid, name).toContain('data-i18n="hud.core.mobileSocial">Social<');
+      // Every utility action on either ring page has a tray twin.
+      for (const id of [
+        'id="mobile-mounts"',
+        'id="mobile-map"',
+        'id="mobile-bags"',
+        'id="mobile-char"',
+        'id="mobile-chat"',
+        'id="mobile-tray-social"',
+        'id="mobile-dfinder"',
+        'id="mobile-spellbook"',
+        'id="mobile-crafting"',
+        'id="mobile-tray-quest"',
+      ]) {
+        expect(grid, `${name}: ${id} missing from the More tray`).toContain(id);
+      }
+    }
+    // The tray twins route to the same callbacks as the strip entries.
+    expect(mobileControlsTs).toContain(
+      "this.bindButton('mobile-tray-settings', () => this.callbacks.onMenu());",
+    );
+    expect(mobileControlsTs).toContain(
+      "this.bindButton('mobile-tray-quest', () => this.callbacks.onQuestLog());",
+    );
+    expect(mobileControlsTs).toContain(
+      "this.bindButton('mobile-tray-social', () => this.callbacks.onSocial());",
+    );
+  });
+
   it('carries identical mobile-action-ring markup in BOTH entries', () => {
     for (const entry of [html, playHtml]) {
       expect(entry).toContain('id="actionbar3"');

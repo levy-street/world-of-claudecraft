@@ -549,6 +549,12 @@ export class MobileControls {
     this.bindButton('mobile-crafting', () => this.callbacks.onCrafting());
     this.bindButton('mobile-spellbook', () => this.callbacks.onSpellbook());
     this.bindButton('mobile-bar-editor', () => this.callbacks.onBarEditor());
+    // The tray also carries the strip's Settings, Quest Log, and Social entries,
+    // so every action the touch ring offers on either utility page is reachable
+    // from More too. Each routes to the same callback its strip twin uses.
+    this.bindButton('mobile-tray-settings', () => this.callbacks.onMenu());
+    this.bindButton('mobile-tray-quest', () => this.callbacks.onQuestLog());
+    this.bindButton('mobile-tray-social', () => this.callbacks.onSocial());
     this.bindButton('mobile-talents', () => this.callbacks.onTalents());
     this.bindButton('mobile-map', () => this.callbacks.onMap());
     this.bindButton('mobile-leaderboard', () => this.callbacks.onLeaderboard());

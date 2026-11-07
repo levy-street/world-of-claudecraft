@@ -472,6 +472,9 @@ function installMobileControlDom(): {
   wikiButton: FakeElement;
   chatButton: FakeElement;
   barEditorButton: FakeElement;
+  traySettingsButton: FakeElement;
+  trayQuestButton: FakeElement;
+  traySocialButton: FakeElement;
   windowTarget: EventTarget;
 } {
   const autorunTarget = new FakeElement();
@@ -515,6 +518,9 @@ function installMobileControlDom(): {
     ['mobile-wiki', new FakeElement()],
     ['mobile-chat', new FakeElement()],
     ['mobile-bar-editor', new FakeElement()],
+    ['mobile-tray-settings', new FakeElement()],
+    ['mobile-tray-quest', new FakeElement()],
+    ['mobile-tray-social', new FakeElement()],
     // The chat composer, so exitChatReply (value clear + blur) is exercised in the
     // fake DOM: the setActive draft-survival test reads its .value.
     ['chat-input', new FakeElement()],
@@ -557,6 +563,9 @@ function installMobileControlDom(): {
     wikiButton: elements.get('mobile-wiki')!,
     chatButton: elements.get('mobile-chat')!,
     barEditorButton: elements.get('mobile-bar-editor')!,
+    traySettingsButton: elements.get('mobile-tray-settings')!,
+    trayQuestButton: elements.get('mobile-tray-quest')!,
+    traySocialButton: elements.get('mobile-tray-social')!,
     windowTarget,
   };
 }
@@ -1307,6 +1316,41 @@ describe('MobileControls pointer lifecycle', () => {
     barEditorButton.dispatchEvent(new Event('click', { bubbles: true, cancelable: true }));
 
     expect(opens).toBe(1);
+  });
+
+  it('routes the More-tray Settings, Quest Log, and Social entries to their callbacks', () => {
+    // The tray mirrors the Quick Actions strip so the same three destinations
+    // are reachable without the swipe or hold gesture.
+    const { traySettingsButton, trayQuestButton, traySocialButton } = installMobileControlDom();
+    const input = {
+      setTouchMove: () => {},
+      clearTouchMove: () => {},
+      setTouchLook: () => {},
+      setTouchLookVector: () => {},
+    } as unknown as Input;
+
+    let settings = 0;
+    let quest = 0;
+    let social = 0;
+    const callbacks = {
+      ...mobileCallbacks(),
+      onMenu: () => {
+        settings += 1;
+      },
+      onQuestLog: () => {
+        quest += 1;
+      },
+      onSocial: () => {
+        social += 1;
+      },
+    };
+    new MobileControls(input, callbacks).start();
+
+    for (const button of [traySettingsButton, trayQuestButton, traySocialButton]) {
+      button.dispatchEvent(new Event('click', { bubbles: true, cancelable: true }));
+    }
+
+    expect([settings, quest, social]).toEqual([1, 1, 1]);
   });
 
   it('fires the mount callback when the More-tray Mount button is tapped', () => {
