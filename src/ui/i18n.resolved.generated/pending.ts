@@ -9,25 +9,145 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.mobile.actionModeAutoAria",
+    "hudChrome.mobile.actionModeCombat",
+    "hudChrome.mobile.actionModePinAria",
+    "hudChrome.mobile.actionModePinned",
+    "hudChrome.mobile.actionModeUtility",
+    "hudChrome.mobile.emptyUtilityAction",
+    "hudChrome.mobile.utilityActions"
+  ],
+  "es_ES": [
+    "hudChrome.mobile.actionModeAutoAria",
+    "hudChrome.mobile.actionModeCombat",
+    "hudChrome.mobile.actionModePinAria",
+    "hudChrome.mobile.actionModePinned",
+    "hudChrome.mobile.actionModeUtility",
+    "hudChrome.mobile.emptyUtilityAction",
+    "hudChrome.mobile.utilityActions"
+  ],
+  "fr_FR": [
+    "hudChrome.mobile.actionModeAutoAria",
+    "hudChrome.mobile.actionModeCombat",
+    "hudChrome.mobile.actionModePinAria",
+    "hudChrome.mobile.actionModePinned",
+    "hudChrome.mobile.actionModeUtility",
+    "hudChrome.mobile.emptyUtilityAction",
+    "hudChrome.mobile.utilityActions"
+  ],
+  "fr_CA": [
+    "hudChrome.mobile.actionModeAutoAria",
+    "hudChrome.mobile.actionModeCombat",
+    "hudChrome.mobile.actionModePinAria",
+    "hudChrome.mobile.actionModePinned",
+    "hudChrome.mobile.actionModeUtility",
+    "hudChrome.mobile.emptyUtilityAction",
+    "hudChrome.mobile.utilityActions"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.mobile.actionModeAutoAria",
+    "hudChrome.mobile.actionModeCombat",
+    "hudChrome.mobile.actionModePinAria",
+    "hudChrome.mobile.actionModePinned",
+    "hudChrome.mobile.actionModeUtility",
+    "hudChrome.mobile.emptyUtilityAction",
+    "hudChrome.mobile.utilityActions"
+  ],
+  "de_DE": [
+    "hudChrome.mobile.actionModeAutoAria",
+    "hudChrome.mobile.actionModeCombat",
+    "hudChrome.mobile.actionModePinAria",
+    "hudChrome.mobile.actionModePinned",
+    "hudChrome.mobile.actionModeUtility",
+    "hudChrome.mobile.emptyUtilityAction",
+    "hudChrome.mobile.utilityActions"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.mobile.actionModeAutoAria",
+    "hudChrome.mobile.actionModeCombat",
+    "hudChrome.mobile.actionModePinAria",
+    "hudChrome.mobile.actionModePinned",
+    "hudChrome.mobile.actionModeUtility",
+    "hudChrome.mobile.emptyUtilityAction",
+    "hudChrome.mobile.utilityActions"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.mobile.actionModeAutoAria",
+    "hudChrome.mobile.actionModeCombat",
+    "hudChrome.mobile.actionModePinAria",
+    "hudChrome.mobile.actionModePinned",
+    "hudChrome.mobile.actionModeUtility",
+    "hudChrome.mobile.emptyUtilityAction",
+    "hudChrome.mobile.utilityActions"
+  ],
+  "nl_NL": [
+    "hudChrome.mobile.actionModeAutoAria",
+    "hudChrome.mobile.actionModeCombat",
+    "hudChrome.mobile.actionModePinAria",
+    "hudChrome.mobile.actionModePinned",
+    "hudChrome.mobile.actionModeUtility",
+    "hudChrome.mobile.emptyUtilityAction",
+    "hudChrome.mobile.utilityActions"
+  ],
+  "pl_PL": [
+    "hudChrome.mobile.actionModeAutoAria",
+    "hudChrome.mobile.actionModeCombat",
+    "hudChrome.mobile.actionModePinAria",
+    "hudChrome.mobile.actionModePinned",
+    "hudChrome.mobile.actionModeUtility",
+    "hudChrome.mobile.emptyUtilityAction",
+    "hudChrome.mobile.utilityActions"
+  ],
+  "id_ID": [
+    "hudChrome.mobile.actionModeAutoAria",
+    "hudChrome.mobile.actionModeCombat",
+    "hudChrome.mobile.actionModePinAria",
+    "hudChrome.mobile.actionModePinned",
+    "hudChrome.mobile.actionModeUtility",
+    "hudChrome.mobile.emptyUtilityAction",
+    "hudChrome.mobile.utilityActions"
+  ],
+  "tr_TR": [
+    "hudChrome.mobile.actionModeAutoAria",
+    "hudChrome.mobile.actionModeCombat",
+    "hudChrome.mobile.actionModePinAria",
+    "hudChrome.mobile.actionModePinned",
+    "hudChrome.mobile.actionModeUtility",
+    "hudChrome.mobile.emptyUtilityAction",
+    "hudChrome.mobile.utilityActions"
+  ],
+  "sv_SE": [
+    "hudChrome.mobile.actionModeAutoAria",
+    "hudChrome.mobile.actionModeCombat",
+    "hudChrome.mobile.actionModePinAria",
+    "hudChrome.mobile.actionModePinned",
+    "hudChrome.mobile.actionModeUtility",
+    "hudChrome.mobile.emptyUtilityAction",
+    "hudChrome.mobile.utilityActions"
+  ],
+  "vi_VN": [
+    "hudChrome.mobile.actionModeAutoAria",
+    "hudChrome.mobile.actionModeCombat",
+    "hudChrome.mobile.actionModePinAria",
+    "hudChrome.mobile.actionModePinned",
+    "hudChrome.mobile.actionModeUtility",
+    "hudChrome.mobile.emptyUtilityAction",
+    "hudChrome.mobile.utilityActions"
+  ],
+  "da_DK": [
+    "hudChrome.mobile.actionModeAutoAria",
+    "hudChrome.mobile.actionModeCombat",
+    "hudChrome.mobile.actionModePinAria",
+    "hudChrome.mobile.actionModePinned",
+    "hudChrome.mobile.actionModeUtility",
+    "hudChrome.mobile.emptyUtilityAction",
+    "hudChrome.mobile.utilityActions"
+  ]
 };

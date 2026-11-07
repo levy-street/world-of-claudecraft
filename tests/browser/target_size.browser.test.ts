@@ -52,6 +52,170 @@ function el(tag: string, attrs: Record<string, string> = {}): HTMLElement {
 }
 
 describe('mobile target-size: in-game touch controls are >=40x40 in landscape', () => {
+  it('the utility shortcuts and mode switch clear the touch-size floor', () => {
+    const ring = el('div', {
+      id: 'mobile-action-ring',
+      'data-action-surface': 'utility',
+    });
+    const mode = el('button', { id: 'mobile-action-mode' });
+    const interact = el('button', { id: 'mobile-interact' });
+    ring.append(mode, interact);
+    const utility = el('div', { id: 'mobile-utility-actions' });
+    const shortcuts = Array.from({ length: 4 }, (_, index) =>
+      el('button', {
+        class: 'mobile-action-slot mobile-utility-action',
+        'data-mobile-index': String(index),
+      }),
+    );
+    utility.append(...shortcuts);
+    ring.append(utility);
+    document.body.append(ring);
+
+    expectAtLeastFloor(mode, '#mobile-action-mode');
+    expectAtLeastFloor(interact, 'utility #mobile-interact');
+    shortcuts.forEach((button, index) => {
+      expectAtLeastFloor(button, `.mobile-utility-action[${index}]`);
+    });
+  });
+
+  it('utility shortcuts and mode switch keep their touch-size floor on compact landscape', () => {
+    document.body.className = 'mobile-touch game-active hud-mobile-compact';
+    const ring = el('div', {
+      id: 'mobile-action-ring',
+      'data-action-surface': 'utility',
+    });
+    const mode = el('button', { id: 'mobile-action-mode' });
+    const interact = el('button', { id: 'mobile-interact' });
+    ring.append(mode, interact);
+    const utility = el('div', { id: 'mobile-utility-actions' });
+    const shortcuts = Array.from({ length: 4 }, (_, index) =>
+      el('button', {
+        class: 'mobile-action-slot mobile-utility-action',
+        'data-mobile-index': String(index),
+      }),
+    );
+    utility.append(...shortcuts);
+    ring.append(utility);
+    document.body.append(ring);
+
+    expectAtLeastFloor(mode, 'compact #mobile-action-mode');
+    expectAtLeastFloor(interact, 'compact utility #mobile-interact');
+    shortcuts.forEach((button, index) => {
+      expectAtLeastFloor(button, `compact .mobile-utility-action[${index}]`);
+    });
+  });
+
+  it('keeps the mode switch available while utility mode hides combat buttons', () => {
+    const ring = el('div', {
+      id: 'mobile-action-ring',
+      'data-action-surface': 'utility',
+    });
+    const slot = el('button', { class: 'mobile-action-slot', 'data-mobile-index': '0' });
+    const mode = el('button', { id: 'mobile-action-mode' });
+    const interact = el('button', { id: 'mobile-interact' });
+    const attack = el('button', { id: 'mobile-action-attack' });
+    ring.append(slot, mode, interact, attack);
+    const utility = el('div', { id: 'mobile-utility-actions' });
+    const shortcut = el('button', {
+      class: 'mobile-action-slot mobile-utility-action',
+      'data-mobile-index': '0',
+    });
+    utility.appendChild(shortcut);
+    ring.append(utility);
+    document.body.append(ring);
+
+    expect(getComputedStyle(slot).visibility).toBe('hidden');
+    expect(getComputedStyle(mode).visibility).toBe('visible');
+    expect(getComputedStyle(mode).pointerEvents).toBe('auto');
+    expect(getComputedStyle(shortcut).display).toBe('flex');
+    expect(getComputedStyle(interact).visibility).toBe('visible');
+    expect(getComputedStyle(interact).pointerEvents).toBe('auto');
+    expect(getComputedStyle(attack).visibility).toBe('hidden');
+
+    ring.setAttribute('data-action-surface', 'combat');
+    expect(getComputedStyle(slot).visibility).toBe('visible');
+  });
+
+  it('lets utility shortcuts receive touches inside the click-through mobile controls layer', () => {
+    const controls = el('div', { id: 'mobile-controls' });
+    controls.style.pointerEvents = 'none';
+    const ring = el('div', {
+      id: 'mobile-action-ring',
+      'data-action-surface': 'utility',
+    });
+    const utility = el('div', { id: 'mobile-utility-actions' });
+    const shortcut = el('button', { class: 'mobile-btn mobile-utility-action' });
+    utility.appendChild(shortcut);
+    ring.appendChild(utility);
+    controls.appendChild(ring);
+    document.body.appendChild(controls);
+
+    expect(getComputedStyle(shortcut).pointerEvents).toBe('auto');
+  });
+
+  it.each([
+    { layout: 'standard', classes: [] },
+    { layout: 'compact', classes: ['hud-mobile-compact'] },
+    { layout: 'left-handed', classes: ['mobile-left-handed'] },
+    { layout: 'compact left-handed', classes: ['hud-mobile-compact', 'mobile-left-handed'] },
+  ])(
+    'keeps the mode switch directly above the shared Interact button in $layout layout',
+    ({ classes }) => {
+      document.body.classList.add(...classes);
+      const ring = el('div', {
+        id: 'mobile-action-ring',
+        'data-action-surface': 'utility',
+      });
+      const combatSlots = Array.from({ length: 4 }, (_, index) =>
+        el('button', {
+          class: 'mobile-action-slot',
+          'data-mobile-index': String(index),
+        }),
+      );
+      const attack = el('button', { id: 'mobile-action-attack' });
+      const mode = el('button', { id: 'mobile-action-mode' });
+      const interact = el('button', { id: 'mobile-interact' });
+      ring.append(...combatSlots, attack, mode, interact);
+      const utility = el('div', { id: 'mobile-utility-actions' });
+      const shortcuts = Array.from({ length: 4 }, (_, index) =>
+        el('button', {
+          class: 'mobile-action-slot mobile-utility-action',
+          'data-mobile-index': String(index),
+        }),
+      );
+      utility.append(...shortcuts);
+      ring.appendChild(utility);
+      document.body.append(ring);
+
+      const gap = interact.getBoundingClientRect().top - mode.getBoundingClientRect().bottom;
+      expect(gap, `mode-to-utility gap ${gap}px`).toBeGreaterThanOrEqual(0);
+      expect(gap, `mode-to-utility gap ${gap}px`).toBeLessThanOrEqual(56);
+      expect(
+        mode.getBoundingClientRect().left + mode.getBoundingClientRect().width / 2,
+      ).toBeCloseTo(
+        interact.getBoundingClientRect().left + interact.getBoundingClientRect().width / 2,
+        0,
+      );
+      const attackRect = attack.getBoundingClientRect();
+      const interactRect = interact.getBoundingClientRect();
+      expect(interactRect.left).toBeCloseTo(attackRect.left, 0);
+      expect(interactRect.top).toBeCloseTo(attackRect.top, 0);
+      expect(interactRect.width).toBeCloseTo(attackRect.width, 0);
+      expect(interactRect.height).toBeCloseTo(attackRect.height, 0);
+      for (let index = 0; index < shortcuts.length; index++) {
+        const combatRect = combatSlots[index].getBoundingClientRect();
+        const utilityRect = shortcuts[index].getBoundingClientRect();
+        expect(utilityRect.left, `utility slot ${index} left`).toBeCloseTo(combatRect.left, 0);
+        expect(utilityRect.top, `utility slot ${index} top`).toBeCloseTo(combatRect.top, 0);
+        expect(utilityRect.width, `utility slot ${index} width`).toBeCloseTo(combatRect.width, 0);
+        expect(utilityRect.height, `utility slot ${index} height`).toBeCloseTo(
+          combatRect.height,
+          0,
+        );
+      }
+    },
+  );
+
   it('mobile action-ring controls (slot, attack, page toggle, Target swap, Use)', () => {
     // The paged action ring replaced the desktop #actionbar on touch (which is
     // display:none under body.mobile-touch); its sizes resolve from the

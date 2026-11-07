@@ -896,6 +896,68 @@
     cursor: var(--cursor-point);
     box-shadow: var(--mobile-btn-edge), var(--mobile-btn-shadow);
   }
+  body.mobile-touch #mobile-utility-actions {
+    position: absolute;
+    inset: 0;
+    display: none;
+    pointer-events: none;
+  }
+  body.mobile-touch #mobile-action-ring[data-action-surface="utility"] #mobile-utility-actions {
+    display: block;
+  }
+  body.mobile-touch #mobile-utility-actions .mobile-utility-action {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--color-socket-rim);
+    border-radius: 50%;
+    background: var(--mobile-btn-fill);
+    color: var(--color-mobile-btn-ink);
+    cursor: var(--cursor-point);
+    box-shadow: var(--mobile-btn-edge), var(--mobile-btn-shadow);
+    pointer-events: auto;
+  }
+  body.mobile-touch #mobile-utility-actions .mobile-utility-icon {
+    display: flex;
+    width: 52%;
+    height: 52%;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
+  body.mobile-touch #mobile-utility-actions .mobile-utility-icon > .ui-icon {
+    width: 100%;
+    height: 100%;
+  }
+  body.mobile-touch #mobile-action-ring[data-action-surface="utility"] > .mobile-action-slot:not(.mobile-utility-action),
+  body.mobile-touch #mobile-action-ring[data-action-surface="utility"] #mobile-action-attack,
+  body.mobile-touch #mobile-action-ring[data-action-surface="utility"] #mobile-target-cycle,
+  body.mobile-touch #mobile-action-ring[data-action-surface="utility"] #mobile-jump,
+  body.mobile-touch #mobile-action-ring[data-action-surface="utility"] #mobile-consumable-seat,
+  body.mobile-touch #mobile-action-ring[data-action-surface="utility"] #mobile-action-page-toggle,
+  body.mobile-touch #mobile-action-ring[data-action-surface="utility"] #mobile-stance-anchor {
+    visibility: hidden;
+    pointer-events: none;
+  }
+  body.mobile-touch #mobile-action-ring #mobile-action-mode {
+    --mobile-action-mode-width: calc(84px * var(--mobile-chrome-scale, 1));
+    right: calc(
+      var(--mobile-ring-attack-size) /
+      2 -
+      var(--mobile-action-mode-width) /
+      2
+    );
+    bottom: calc(var(--mobile-ring-attack-size) + 10px);
+    width: var(--mobile-action-mode-width);
+    height: max(40px, calc(40px * var(--mobile-chrome-scale, 1)));
+    padding: 0 6px;
+    border-radius: 999px;
+    font-size: 11px;
+    line-height: 1;
+    white-space: nowrap;
+    z-index: 2;
+  }
   /* Primary attack toggle: bottom-right anchor of the cluster, largest button. */
   body.mobile-touch #mobile-action-attack {
     right: 0;
@@ -1036,6 +1098,12 @@
     );
     bottom: calc(var(--mobile-ring-attack-size) / 2 - var(--mobile-ring-secondary-size) / 2);
   }
+  body.mobile-touch #mobile-action-ring[data-action-surface="utility"] #mobile-interact {
+    right: 0;
+    bottom: 0;
+    width: var(--mobile-ring-attack-size);
+    height: var(--mobile-ring-attack-size);
+  }
   /* Jump: a right-thumb seat on the ring's bottom row, one arc-seat past the
      180deg action slot on Use's row, so a player can hold the move joystick
      with the left thumb and jump with the right. Its circle-edge gap to that
@@ -1074,6 +1142,10 @@
   body.mobile-touch #mobile-action-ring #mobile-jump .ui-icon {
     width: 22px;
     height: 22px;
+  }
+  body.mobile-touch #mobile-action-ring[data-action-surface="utility"] #mobile-interact .ui-icon {
+    width: 44%;
+    height: 44%;
   }
   body.mobile-touch #mobile-target-cycle .mobile-label,
   body.mobile-touch #mobile-action-ring #mobile-interact .mobile-label,
@@ -4378,6 +4450,19 @@
       2 +
       var(--mobile-ring-hollow) -
       var(--mobile-ring-secondary-size) /
+      2
+    );
+    right: auto;
+  }
+  body.mobile-touch.mobile-left-handed #mobile-action-ring[data-action-surface="utility"] #mobile-interact {
+    left: 0;
+    right: auto;
+  }
+  body.mobile-touch.mobile-left-handed #mobile-action-ring #mobile-action-mode {
+    left: calc(
+      var(--mobile-ring-attack-size) /
+      2 -
+      var(--mobile-action-mode-width) /
       2
     );
     right: auto;

@@ -20,14 +20,21 @@ describe('MobileMoreDialogController', () => {
     const open = vi.fn((_options: FocusTrapOptions) => handle);
     const restore = vi.fn();
     const anchor = element();
+    const actionTrigger = element();
     const controller = new MobileMoreDialogController(
       { open, restore } as unknown as Pick<FocusManager, 'open' | 'restore'>,
-      { trigger: () => trigger, dialog: () => dialog, fallback: () => anchor },
+      {
+        trigger: () => trigger,
+        actionTrigger: () => actionTrigger,
+        dialog: () => dialog,
+        fallback: () => anchor,
+      },
     );
 
     controller.sync(true);
     controller.sync(true);
     expect(trigger.getAttribute('aria-expanded')).toBe('true');
+    expect(actionTrigger.getAttribute('aria-expanded')).toBe('true');
     expect(dialog.getAttribute('aria-hidden')).toBe('false');
     expect(open).toHaveBeenCalledOnce();
     expect(open).toHaveBeenCalledWith({
@@ -40,6 +47,7 @@ describe('MobileMoreDialogController', () => {
     controller.sync(false);
     controller.sync(false);
     expect(trigger.getAttribute('aria-expanded')).toBe('false');
+    expect(actionTrigger.getAttribute('aria-expanded')).toBe('false');
     expect(dialog.getAttribute('aria-hidden')).toBe('true');
     expect(release).toHaveBeenCalledOnce();
     // The trap never restores on its own any more: the controller does it, so

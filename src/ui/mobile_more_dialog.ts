@@ -2,6 +2,8 @@ import type { FocusManager, FocusTrapHandle } from './focus_manager';
 
 export interface MobileMoreDialogElements {
   trigger: () => HTMLElement | null;
+  /** Additional trigger that opens the dialog without owning focus restoration. */
+  actionTrigger?: () => HTMLElement | null;
   dialog: () => HTMLElement | null;
   /**
    * The always-visible control focus falls back to when the trigger cannot take
@@ -28,8 +30,10 @@ export class MobileMoreDialogController {
 
   sync(open: boolean, restoreFocus = true): void {
     const trigger = this.elements.trigger();
+    const actionTrigger = this.elements.actionTrigger?.();
     const dialog = this.elements.dialog();
     trigger?.setAttribute('aria-expanded', open ? 'true' : 'false');
+    actionTrigger?.setAttribute('aria-expanded', open ? 'true' : 'false');
     dialog?.setAttribute('aria-hidden', open ? 'false' : 'true');
     if (this.open === open) return;
     this.open = open;

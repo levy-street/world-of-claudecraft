@@ -69,6 +69,13 @@ beforeEach(() => {
         { length: 4 },
         (_, index) => `<button class="mobile-action-slot" data-mobile-index="${index}"></button>`,
       ).join('')}
+      <div id="mobile-utility-actions">
+        ${Array.from(
+          { length: 4 },
+          (_, index) =>
+            `<button class="mobile-action-slot mobile-utility-action" data-mobile-index="${index}"></button>`,
+        ).join('')}
+      </div>
       <button id="mobile-action-page-toggle"><span class="mobile-action-page-indicator"></span></button>
     </div>
     <div id="mobile-action-radial">

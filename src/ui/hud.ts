@@ -449,6 +449,8 @@ import {
 } from './hud/action_bar/mobile_action_page_view';
 import { buildMobileActionRing } from './hud/action_bar/mobile_action_ring_controller';
 import type { MobileActionRingPainter } from './hud/action_bar/mobile_action_ring_painter';
+import type { MobileActionSurface } from './hud/action_bar/mobile_action_surface_controller';
+import { buildMobileActionSurface } from './hud/action_bar/mobile_action_surface_controller';
 import { petSlotText } from './hud/action_bar/pet_slot_core';
 import { playerStealthed } from './hud/action_bar/player_stealthed';
 import { RADIAL_DIRECTIONS, type RadialDirection } from './hud/action_bar/radial_action_core';
@@ -1320,6 +1322,7 @@ export class Hud {
   private mobileActionPage = 0;
   private mobileActionRingView: ActionBarView | undefined;
   private mobileActionRingPainter: MobileActionRingPainter | undefined;
+  private mobileActionSurface: MobileActionSurface | undefined;
   /** The warrior/paladin choice bar in both its shapes (desktop row, touch
    *  radial), behind the hud/stance seam. Built with the action bars. */
   private stanceBar!: StanceBarController;
@@ -1466,6 +1469,7 @@ export class Hud {
   private readonly focusManager = new FocusManager();
   private readonly mobileMoreDialog = new MobileMoreDialogController(this.focusManager, {
     trigger: () => document.getElementById('mobile-more'),
+    actionTrigger: () => document.getElementById('mobile-menu-anchor'),
     dialog: () => document.getElementById('mobile-extra-controls'),
     fallback: () => document.getElementById('mobile-menu-anchor'),
   });
@@ -2772,7 +2776,8 @@ export class Hud {
       if (document.body.classList.contains('mobile-more-open')) {
         const more = document.getElementById('mobile-more');
         const extra = document.getElementById('mobile-extra-controls');
-        if (!more?.contains(target) && !extra?.contains(target)) {
+        const anchor = document.getElementById('mobile-menu-anchor');
+        if (!more?.contains(target) && !extra?.contains(target) && !anchor?.contains(target)) {
           document.body.classList.remove('mobile-more-open');
           document.getElementById('mobile-controls')?.classList.remove('expanded');
           more?.classList.remove('active');
@@ -6763,6 +6768,7 @@ export class Hud {
   }
 
   private refreshLocalizedDynamicUi(): void {
+    this.mobileActionSurface?.relocalize();
     this.auraTracks.relocalize();
     this.focusTargets.relocalize();
     refreshHudFrameGroupLabels(document, HUD_FRAME_SPECS);
@@ -7955,6 +7961,15 @@ export class Hud {
     this.mobileRingSlotBtns = ring.slotBtns;
     this.mobileActionRingView = ring.view;
     this.mobileActionRingPainter = ring.painter;
+    this.mobileActionSurface =
+      buildMobileActionSurface({
+        writers: this.writerFacet,
+        t,
+        consumePeekGuard: () => this.peekGuard.consume(),
+        hideTooltip: () => this.hideTooltip(),
+        clickSfx: () => audio.click(),
+        showUtilitySurface: () => ring.gesture.cancel(),
+      }) ?? undefined;
   }
 
   // The consumables seat: the ring's 5th arc position plus the row a hold or a
@@ -9063,6 +9078,7 @@ export class Hud {
     if (this.isMobileLayout() && this.mobileActionRingView && this.mobileActionRingPainter) {
       const mobileActionPage = this.currentMobileActionPage();
       const mobileActionSourceSlotCount = MOBILE_ACTION_SOURCE_SLOT_COUNT;
+      this.mobileActionSurface?.update(p.inCombat, sim.playerId);
       this.mobileActionRingPainter.paint(
         this.mobileActionRingView.tick(actionBarWorld),
         mobileActionPage,

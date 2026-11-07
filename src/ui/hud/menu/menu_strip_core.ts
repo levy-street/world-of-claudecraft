@@ -7,8 +7,8 @@
 //
 // The control (Quick Actions) replaces the old five-button row (Chat, Social,
 // Quests, Settings, More), which sat further from either thumb than anything else
-// in the HUD. It runs NO action of its own: a tap opens the ten-item strip, and a
-// hold or a rightward swipe opens it and picks in one gesture.
+// in the HUD. Ordinary activation opens More directly; a hold or rightward swipe
+// opens this ten-item strip and can pick in one gesture.
 //
 // The roster is ordered by how often a player reaches for it, because swipe
 // distance IS the cost: item 0 is one flick away, item 9 is the length of the row.
@@ -17,6 +17,7 @@
 // Chat follows it, the action a player reaches for mid-session more than the rest
 // and the one the control's own tap used to run.
 
+import type { MobileUtilityActionId } from '../action_bar/utility_action_core';
 import type { TranslationKey } from '../../i18n';
 import {
   STRIP_CAPTION_HALF_PX,
@@ -29,17 +30,7 @@ import {
 } from '../action_bar/radial_action_core';
 
 /** The strip roster's stable ids. Order is load-bearing (it IS the row order). */
-export type MenuActionId =
-  | 'mount'
-  | 'chat'
-  | 'map'
-  | 'bags'
-  | 'social'
-  | 'quest'
-  | 'char'
-  | 'spellbook'
-  | 'settings'
-  | 'more';
+export type MenuActionId = MobileUtilityActionId;
 
 export interface MenuStripItem {
   id: MenuActionId;
@@ -126,11 +117,11 @@ export interface MenuStripReleaseInput {
 }
 
 /**
- * The release rule. A bare tap OPENS the row as a persistent menu, so the player
- * who never learns the gesture still reaches every item with two ordinary taps;
- * the control has no action of its own to run instead. Once the row is OPEN, a
- * release back in the anchor's own band means the player looked and chose
- * nothing, so back out instead of opening something they did not pick.
+ * The release rule. A bare tap resolves to 'open'; the gesture adapter routes
+ * that activation to More when supplied, or to the sticky strip otherwise.
+ * Once the row is OPEN, a release back in the anchor's own band means the player
+ * looked and chose nothing, so back out instead of opening something they did
+ * not pick.
  */
 export function resolveMenuStripRelease(input: MenuStripReleaseInput): MenuStripOutcome {
   if (input.count <= 0) return { kind: 'open' };

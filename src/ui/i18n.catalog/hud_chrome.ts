@@ -1332,6 +1332,13 @@ export const hudChromeStrings = {
     // the shared action_bar_view core, so no per-slot key lives here.
     actionRing: 'Combat actions',
     actionPageToggle: 'Switch action page',
+    utilityActions: 'Utility actions',
+    actionModeUtility: 'Utility',
+    actionModeCombat: 'Combat',
+    actionModePinned: 'Combat',
+    actionModePinAria: 'Pin combat',
+    actionModeAutoAria: 'Use auto mode',
+    emptyUtilityAction: 'Empty shortcut',
     // The bare page number ("1"/"2", painted big and gold over the swap-arrows
     // glyph) rather than "Page 1 of 2": the toggle button already carries the
     // full "Switch action page" accessible name via actionPageToggle above, so
@@ -1373,22 +1380,14 @@ export const hudChromeStrings = {
     menuControlAriaTap:
       'Menus. Tap to open the menu row: mounts, map, bags and more. Tap again for chat.',
     menuLabel: 'Menu',
-    // Quick Actions: ONE seat replacing the five-button row (Chat, Social,
-    // Quests, Settings, More) that sat at top-left, further from either thumb
-    // than anything else in the HUD. quickActions names both the control and the
-    // strip it opens; quickActionsAria is the control's own accessible name,
-    // which has to TEACH the gesture because a touch device has no hover to
-    // discover it with. The ten strip items reuse the accessible names their own
-    // buttons already carry, and the live caption reuses those buttons' label
-    // keys, so no per-item key lives here. All four are WORDY by M16, so the five
-    // non-Latin overlays carry real fills.
+    // Quick Actions replaces the old five-button row. The live Actions anchor
+    // uses this concise name because ordinary activation opens the More dialog;
+    // swipe gestures remain an optional shortcut to the strip.
     quickActions: 'Quick Actions',
+    // Legacy gesture-specific names retained for locale compatibility. The
+    // Actions anchor no longer uses them.
     quickActionsAria:
       'Quick Actions. Tap to open the row of mount, chat, map, bags and more, or hold and swipe right to pick one.',
-    // The SAME control under settings.touchTapMenus, where the row is opened and
-    // chosen from with separate taps rather than one gesture, so the swipe
-    // sentence above would teach something the control does not do;
-    // menu_control_controller.ts swaps the name when the setting flips.
     quickActionsAriaTap:
       'Quick Actions. Tap to open the row of mount, chat, map, bags and more, then tap an item. Tap the control again to close.',
     quickActionsLabel: 'Actions',

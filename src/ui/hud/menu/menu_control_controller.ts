@@ -4,28 +4,15 @@
 // reachable chrome in the HUD, and buried Mount two taps behind the More modal
 // (issue #2739); the strip puts Mount at the shortest gesture on the control.
 //
-// Nothing here reimplements an action, and the control itself runs none: every
-// strip item is a REAL button the touch HUD already binds, so a pick activates
-// that button and the action runs through its existing handler, while the
-// control's own tap only opens the row. Chat is one of those items now (the tray
-// button it used to run keeps the press-and-hold log peek), which is why this
-// module takes no default-action callback at all.
-//
-// The ANCHOR'S ACCESSIBLE NAME depends on the MODE, which is why this module
-// owns it rather than the static markup alone. A touch device has no hover to
-// discover the gesture with, so the name teaches it; under settings.touchTapMenus
-// the row is opened and chosen from with separate taps, so the swipe sentence
-// would teach a screen-reader user something the control does not do. It is
-// rewritten on the settings broadcast and again after a language switch, because
-// the shell's data-i18n-aria pass re-stamps the gesture-mode name on every locale
-// change.
+// Nothing here reimplements an action: every strip item is a REAL button the
+// touch HUD already binds, so a swipe pick activates that button and its existing
+// handler. An ordinary activation is delegated to the More dialog toggle.
 //
 // The static markup lives in index.html / play.html (#mobile-menu-anchor,
 // #mobile-menu-strip). On a build that omits it, buildMobileMenuControl returns
 // null and the control silently stays unbuilt, exactly like the ring.
-
-import { SETTINGS_CHANGE_EVENT } from '../../../game/settings';
-import { type TranslationKey, t } from '../../i18n';
+//
+import { t } from '../../i18n';
 import { makeWriterFacet, type PainterHostWriters } from '../../painter_host';
 import { tapMenusEnabled } from '../tap_menu';
 import { MENU_STRIP_ITEMS } from './menu_strip_core';
@@ -37,19 +24,15 @@ const STRIP_ID = 'mobile-menu-strip';
 const CANCEL_ID = 'mobile-menu-cancel';
 const CAPTION_ID = 'mobile-menu-caption';
 const CAPTION_TEXT_SELECTOR = '.tt-title';
-const ARIA_LABEL_ATTR = 'aria-label';
 /** The left-handed HUD mirror, which reseats the control against the opposite
  *  screen edge (hud.mobile.css). Read as the CLASS rather than as the setting so
  *  the row can only ever grow the way the anchor was actually placed. */
 const LEFT_HANDED_CLASS = 'mobile-left-handed';
-/** The two accessible names, one per mode. The gesture one is also the static
- *  markup's `data-i18n-aria`, so an unbuilt control still says something true. */
-const GESTURE_ARIA_KEY: TranslationKey = 'hudChrome.mobile.quickActionsAria';
-const TAP_ARIA_KEY: TranslationKey = 'hudChrome.mobile.quickActionsAriaTap';
-
 export interface MobileMenuControlDeps {
   /** The player opened the strip and chose nothing. */
   onCancel?(): void;
+  /** Run for an ordinary anchor activation instead of opening the sticky row. */
+  onAnchorActivate?(): void;
   /**
    * Optional writer facet. The control is gesture-driven cold chrome with no
    * per-frame HUD paint behind it, and its composition point (MobileControls,
@@ -109,6 +92,7 @@ export function buildMobileMenuControl(deps: MobileMenuControlDeps = {}): Mobile
     writers,
     tapMenus: () => tapMenusEnabled(),
     leftHanded: () => document.body.classList.contains(LEFT_HANDED_CLASS),
+    onAnchorActivate: deps.onAnchorActivate,
     pick: (index, source) => {
       // A gesture release never touched the item, so activating the real button
       // is what runs the action, through the handler the old row or the More
@@ -128,18 +112,5 @@ export function buildMobileMenuControl(deps: MobileMenuControlDeps = {}): Mobile
     },
   });
   gesture.attach();
-
-  // Deliberately NOT the elided writer: the shell's translatePage() pass writes
-  // this same attribute from data-i18n-aria without going through any facet, so
-  // an elided writer's cache would disagree with the DOM and skip the correction.
-  // A cold path either way (a settings flip, a language switch), never a frame.
-  const syncAnchorName = (): void => {
-    anchor.setAttribute(ARIA_LABEL_ATTR, t(tapMenusEnabled() ? TAP_ARIA_KEY : GESTURE_ARIA_KEY));
-  };
-  syncAnchorName();
-  window.addEventListener(SETTINGS_CHANGE_EVENT, syncAnchorName);
-  // After the shell's own translatePage() pass, which re-stamps the gesture-mode
-  // name from data-i18n-aria and would otherwise leave tap mode mislabelled.
-  document.addEventListener('woc:languagechange', syncAnchorName);
   return { gesture, anchor };
 }

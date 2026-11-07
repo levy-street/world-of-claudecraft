@@ -13,13 +13,11 @@
 // the other's directory for its own gesture layer. Registered in
 // tests/architecture.test.ts UI_DOM_MODULES.
 //
-// The gesture: pointerdown arms, a quick tap runs the control's DEFAULT action,
-// a swipe along the row's direction past the deadzone walks it, and a stationary
-// hold of RADIAL_REVEAL_MS reveals the row as a learning affordance. Choosing
-// never waits for the reveal. Releasing back in the anchor's own X band with the
-// row open cancels; the Y a thumb arc wandered to is ignored on purpose, because
-// that arc is a curve and demanding a straight path would reject perfectly clear
-// gestures.
+// The gesture: pointerdown arms, a swipe along the row's direction past the
+// deadzone walks it, and a stationary hold of RADIAL_REVEAL_MS reveals the row
+// as a learning affordance. Choosing never waits for the reveal. An ordinary
+// activation runs onAnchorActivate when supplied, otherwise the release rule
+// decides between the control's default action and its sticky row.
 //
 // Two things that cost real time when they are missing:
 //   - Pointer capture is MANDATORY: the finger leaves the anchor long before the
@@ -34,13 +32,12 @@
 //
 // STICKY MODE is the non-gesture path, for VoiceOver / TalkBack / Switch
 // Control: activation opens the row as a persistent, focusable menu of real
-// buttons instead of a drag. The touchTapMenus setting is that same path
-// promoted to a player option: with it on, a press opens the row instead of
-// arming the drag, a press on the anchor with the row open runs the default
-// action, and a press outside dismisses. A control with NO default action of its
-// own (anchorRole 'toggle') reaches the same row from a bare tap in either mode
-// and closes it on the next press. Every rule is tap_menu_core.ts's, shared with
-// the radial so the three menus cannot drift.
+// buttons instead of a drag. A consumer may supply onAnchorActivate to route
+// ordinary activation to another control, as Quick Actions does for More. The
+// touchTapMenus setting promotes the shared tap path to a player option: with it
+// on, a press follows the anchor role instead of arming a drag, and outside
+// presses dismiss where the shared rule says they should. Every press rule is
+// tap_menu_core.ts's, shared with the radial so the menus cannot drift.
 
 import type { PainterHostWriters } from '../painter_host';
 import {
@@ -96,8 +93,8 @@ export interface StripMetrics {
 }
 
 /** What a release on the anchor means, in the one shape both rows share. A row
- *  whose control has no default action of its own answers 'open' instead, which
- *  turns the bare tap into the sticky menu rather than an action. */
+ *  whose control has no default action of its own answers 'open'; the adapter
+ *  can route that ordinary activation elsewhere or open the sticky menu. */
 export type StripGestureOutcome =
   | { kind: 'pick'; index: number }
   | { kind: 'default' }
@@ -137,6 +134,8 @@ export interface StripGestureDeps {
   /** What a press on THIS control means beyond opening its row. Defaults to
    *  'action'; the rule itself is tap_menu_core.ts's, never restated here. */
   anchorRole?: TapMenuAnchorRole;
+  /** Route an ordinary anchor activation instead of opening the sticky row. */
+  onAnchorActivate?(): void;
   /** Row items open right now. */
   count(): number;
   /** Travel between adjacent items as the finger sees it. */
@@ -267,13 +266,13 @@ export class StripGesture {
     window.addEventListener('pointercancel', release);
     // Assistive technologies activate a button with a plain click and emit no
     // pointer events at all, so a click our own drag handling did not just
-    // produce is the non-gesture path asking for the menu.
+    // produce follows the same ordinary-activation route.
     anchor.addEventListener('click', () => {
       if (this.suppressClick) {
         this.suppressClick = false;
         return;
       }
-      this.openSticky();
+      this.activateAnchor();
     });
     this.deps.items.forEach((btn, index) => {
       btn.addEventListener('click', () => {
@@ -319,10 +318,7 @@ export class StripGesture {
     registerTouchMenu(() => this.closeIfOpen());
   }
 
-  /**
-   * Open the row as a persistent, focusable menu. Assistive activation calls
-   * this, and so does a tap-mode press.
-   */
+  /** Open the row as a persistent, focusable menu. */
   openSticky(): void {
     if (this.sticky || this.drag || this.deps.count() <= 0) return;
     this.sticky = this.measure();
@@ -383,13 +379,18 @@ export class StripGesture {
     });
   }
 
-  /** An anchor press the gesture layer does NOT own: open the row, close it
-   *  again, or run the control's default action. Never arms the drag. */
+  private activateAnchor(): void {
+    if (this.deps.onAnchorActivate) this.deps.onAnchorActivate();
+    else this.openSticky();
+  }
+
+  /** An anchor press the gesture layer does NOT own: route an activation, close
+   *  the row, or run the control's default action. Never arms the drag. */
   private onAnchorPress(e: PointerEvent, press: TapMenuPress): void {
     this.suppressClick = true;
     if (e.pointerType === 'touch') e.preventDefault();
     if (press.kind === 'open') {
-      this.openSticky();
+      this.activateAnchor();
       return;
     }
     if (press.kind === 'dismiss') {
@@ -562,9 +563,8 @@ export class StripGesture {
     this.cancelDrag();
     if (outcome.kind === 'pick') this.deps.onPick(outcome.index, 'gesture');
     else if (outcome.kind === 'default') this.deps.onDefault?.();
-    // The drag is already dropped above, so the row can take the anchor's own
-    // press as its opening one.
-    else if (outcome.kind === 'open') this.openSticky();
+    // Drop the drag before routing the ordinary activation.
+    else if (outcome.kind === 'open') this.activateAnchor();
     else this.deps.onCancel();
   }
 
