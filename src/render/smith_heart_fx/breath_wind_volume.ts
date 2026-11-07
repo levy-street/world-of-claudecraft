@@ -155,9 +155,12 @@ export class BreathWindVolume {
     this.stage = new Float32Array(capacity * 6);
     this.order = new Uint16Array(capacity);
     this.dist = new Float32Array(capacity);
-    const eye = this.eye;
+    // The view camera only: the minimap's overhead orthographic capture (and
+    // any other orthographic pass) also draws the scene and must not re-aim
+    // the sort.
     this.mesh.onBeforeRender = (_r, _s, camera) => {
-      eye.setFromMatrixPosition(camera.matrixWorld);
+      if ((camera as THREE.PerspectiveCamera).isPerspectiveCamera)
+        this.eye.setFromMatrixPosition(camera.matrixWorld);
     };
   }
 

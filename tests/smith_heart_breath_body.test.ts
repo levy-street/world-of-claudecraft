@@ -55,6 +55,7 @@ import {
   breathSocketPoint,
   clearBreathBodySockets,
 } from '../src/render/smith_heart_fx/breath_body_sockets';
+import { BreathWindVolume } from '../src/render/smith_heart_fx/breath_wind_volume';
 import { SMITH_HEART_MOBS } from '../src/sim/content/smith_heart';
 import { DUNGEONS, instanceOrigin } from '../src/sim/data';
 import {
@@ -283,6 +284,38 @@ describe('breath_body_core: the wind plan', () => {
     expect(Array.from(order.subarray(0, 5)).map((i) => dist[i])).toEqual([9, 9, 4, 1, 0]);
     expect(new Set(order.subarray(0, 5)).size).toBe(5);
     breathSortFarFirst(order, dist, 0);
+  });
+
+  it('uploads its billows far first from the view camera, never the minimap', () => {
+    const v = new BreathWindVolume(3, {}, [], []);
+    v.set(0, 0, 0, 1, 2, 0.5, 0.1);
+    v.set(1, 0, 0, 9, 3, 0.6, 0.2);
+    v.set(2, 0, 0, 5, 4, 0.7, 0.3);
+    const view = new THREE.PerspectiveCamera();
+    view.updateMatrixWorld();
+    const draw = (cam: THREE.Camera) =>
+      v.mesh.onBeforeRender(
+        {} as THREE.WebGLRenderer,
+        new THREE.Scene(),
+        cam,
+        v.mesh.geometry,
+        v.material,
+        null as unknown as THREE.Group,
+      );
+    draw(view);
+    // An overhead orthographic capture far up the other side re-aims nothing.
+    const map = new THREE.OrthographicCamera();
+    map.position.set(0, 0, 500);
+    map.updateMatrixWorld();
+    draw(map);
+    v.commit(3);
+    const c = v.mesh.geometry.getAttribute('aCenter') as THREE.BufferAttribute;
+    const l = v.mesh.geometry.getAttribute('aLook') as THREE.BufferAttribute;
+    expect([c.getZ(0), c.getZ(1), c.getZ(2)]).toEqual([9, 5, 1]);
+    // Each billow's size, alpha and seed travel with its centre.
+    expect(c.getW(0)).toBe(3);
+    expect(l.getX(0)).toBeCloseTo(0.6, 6);
+    expect(l.getY(2)).toBeCloseTo(0.1, 6);
   });
 
   it('jags its lightning between two points and lands on both', () => {
