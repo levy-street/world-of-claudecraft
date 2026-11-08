@@ -419,8 +419,8 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
     ...boss('heart_quench_guardian', 'Guardian of the Quench', 62000, 0x9ad8ff, 3),
     ccImmune: true,
     slowImmune: true,
-    // Her own model stands some eleven yards tall: melee strikes the column of
-    // her gown, not her pivot, and her fists settle the tank at its edge
+    // Her own model stands some eleven yards tall: her fists settle the tank
+    // at the column of her gown, short-reach abilities reach her from its edge
     // (mob_combat.ts, player_attack_reach.ts).
     bodyRadius: QUENCH_BODY_RADIUS,
     arcCleave: {

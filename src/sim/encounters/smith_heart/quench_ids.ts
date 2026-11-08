@@ -28,8 +28,10 @@
 export const QUENCH_GUARDIAN = 'heart_quench_guardian';
 /** Her body's radius (yards; the template's bodyRadius): the column of her gown
  *  round her hips, the crown some eleven yards up since her own model
- *  (render/smith_heart_fx/quench_body_core.ts). Melee strikes her from this far
- *  out plus a melee reach, and her own swing settles the tank at its edge. */
+ *  (render/smith_heart_fx/quench_body_core.ts). Her fists settle the tank at its
+ *  edge (3.5 yards off, not the scale's 8.8) and short-reach abilities reach
+ *  her from it; plain melee keeps its own 5 yards from her pivot, already past
+ *  this edge (player_attack_reach.ts bodyEdgeMeleeRange). */
 export const QUENCH_BODY_RADIUS = 2;
 
 // ---- casts, auras, objects, cues --------------------------------------------------
