@@ -245,6 +245,34 @@ export class CharacterSurfaceResponse {
     this.uniforms.uSurfaceContact.value.set(contact?.height ?? 0.56, contact?.angle ?? -0.28);
     return edge;
   }
+  /** Scale the clones' own light by `scale` over their sources' (a glow
+   *  pulse's level, VisualDef.glowPulses: the surface program outranks the
+   *  pulse's clones, so a dead body glazed into a statue would otherwise get
+   *  its full light back the moment the glaze mounts). */
+  emissiveScale(scale: number, takes: (source: THREE.Material) => boolean): void {
+    if (scale === this.lastScale && this.scaledCount === this.srcs.length) return;
+    this.lastScale = scale;
+    this.scaledCount = this.srcs.length;
+    for (let i = 0; i < this.srcs.length; i++) {
+      const s = this.srcs[i] as THREE.Material & { emissiveIntensity?: number };
+      const c = this.clones[i] as THREE.Material & { emissiveIntensity?: number };
+      if (s.emissiveIntensity === undefined) continue;
+      // Only the materials the pulse itself flares (glow_pulse_core.ts).
+      c.emissiveIntensity = takes(s) ? s.emissiveIntensity * scale : s.emissiveIntensity;
+    }
+  }
+  /** The visual disposed the clones: forget them. */
+  forget(): void {
+    this.materials.clear();
+    this.srcs.length = 0;
+    this.clones.length = 0;
+    this.scaledCount = 0;
+  }
+  /** The clones in arrays (the per-frame scale walks these, no iterator). */
+  private readonly srcs: THREE.Material[] = [];
+  private readonly clones: THREE.Material[] = [];
+  private lastScale = 1;
+  private scaledCount = 0;
   material(source: THREE.Material): THREE.Material {
     if (
       !(source as THREE.MeshStandardMaterial).isMeshStandardMaterial &&
@@ -255,6 +283,8 @@ export class CharacterSurfaceResponse {
     if (!material) {
       material = createSurfaceResponseMaterial(source, this.uniforms);
       this.materials.set(source, material);
+      this.srcs.push(source);
+      this.clones.push(material);
     }
     return material;
   }
