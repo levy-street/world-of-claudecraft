@@ -44,7 +44,9 @@ export const QUENCH_BODY_CLIPS = [
   'Attack',
   'Attack2',
   'Strike',
-  'StrikeWind',
+  'StrikeRaise',
+  'StrikeSlam',
+  'StrikeSpent',
   'Breath',
   'Wake',
   'WakeHold',
@@ -75,10 +77,17 @@ export const QUENCH_BODY_CLIP = {
   /** Tempering Strike: both fists hammered down on the ice (Strike, the
    *  fallback when no wind-up was seen). */
   strike: 12 / 30,
-  /** Tempering Strike read before it lands (StrikeWind, round 2): both fists
-   *  raised over her head as the cold gathers on her bracers, held, then
-   *  hammered down a second in, on the cleaving swing. */
-  strikeWind: 30 / 30,
+  /** Tempering Strike read before it lands, true to what happens (round 3):
+   *  StrikeRaise lifts both fists high over her crown on the wind-up cue
+   *  (at the top by `strikeRaiseTop`) and holds them for the swing's outcome
+   *  (lowering on its own from `strikeRaiseHold`); StrikeSlam hammers them
+   *  on the ice when the cleave fires (contact `strikeSlam` in), StrikeSpent
+   *  brings them down as a plain backhand when the swing is avoided (its fist
+   *  through the swing `strikeSpent` in). */
+  strikeRaiseTop: 22 / 30,
+  strikeRaiseHold: 48 / 30,
+  strikeSlam: 4 / 30,
+  strikeSpent: 6 / 30,
   /** Quenching Breath: reared back through the bar, the cold thrown out of
    *  her mouth on the bar's end (Breath; its exhale plays out after it). */
   breath: 75 / 30,
@@ -101,9 +110,14 @@ export const QUENCH_BODY_GESTURES = {
   slash: 'smith_heart_quench_body_slash',
   /** Her eyes, crown and heart flare (the breath loosed, the blades thrown). */
   flare: 'smith_heart_quench_body_flare',
-  /** Tempering Strike's wind-up: fists over her head, then the slam
-   *  (StrikeWind), on the fight's wind-up cue a second before the cleave. */
-  strikeWind: 'smith_heart_quench_body_strike_wind',
+  /** Tempering Strike's wind-up: fists raised high over her crown and held
+   *  (StrikeRaise), on the fight's wind-up cue a second before the swing. */
+  strikeRaise: 'smith_heart_quench_body_strike_raise',
+  /** The cleave fired: the raised fists hammer the ice (StrikeSlam). */
+  strikeSlam: 'smith_heart_quench_body_strike_slam',
+  /** The cued swing was avoided: the raised fists come down as a plain
+   *  swing, never a slam on nothing (StrikeSpent). */
+  strikeSpent: 'smith_heart_quench_body_strike_spent',
 } as const;
 
 /** The bars that play a clip timed onto the bar's end, and the beat that lands
@@ -243,8 +257,8 @@ export interface QuenchBodyInput {
   sinceBreath: number;
   /** Seconds since Tempering Strike's cue, Infinity: never. */
   sinceStrike: number;
-  /** Seconds since Tempering Strike's wind-up cue (absent or Infinity:
-   *  never). */
+  /** Seconds since Tempering Strike's wind-up cue while it still waits on
+   *  the swing's outcome (absent or Infinity: none waiting). */
   sinceWind?: number;
   /** Seconds since the blades were thrown awake (the wake bar's end). */
   sinceWake: number;
@@ -259,8 +273,10 @@ export interface QuenchBodyActionState {
 export const QUENCH_EXHALE_SECONDS = 1.1;
 export const QUENCH_THROWN_SECONDS = 1.4;
 export const QUENCH_STRIKE_SECONDS = 1.0;
-/** Seconds the wind-up reads for: its fists reach the ice at its end. */
-export const QUENCH_WIND_SECONDS = QUENCH_BODY_CLIP.strikeWind;
+/** Seconds from the wind-up cue to the swing (its look builds over this),
+ *  and the longest it waits on the swing's outcome. */
+export const QUENCH_WIND_SECONDS = 1;
+export const QUENCH_WIND_HOLD = 1.6;
 
 const clamp01 = (t: number) => Math.max(0, Math.min(1, t));
 const ease = (t: number) => {
@@ -289,9 +305,9 @@ export function quenchBodyAction(
   } else if (input.sinceBreath < QUENCH_EXHALE_SECONDS) {
     out.action = 'exhale';
     out.k = input.sinceBreath / QUENCH_EXHALE_SECONDS;
-  } else if ((input.sinceWind ?? Number.POSITIVE_INFINITY) < QUENCH_WIND_SECONDS) {
+  } else if ((input.sinceWind ?? Number.POSITIVE_INFINITY) < QUENCH_WIND_HOLD) {
     out.action = 'windup';
-    out.k = (input.sinceWind ?? 0) / QUENCH_WIND_SECONDS;
+    out.k = clamp01((input.sinceWind ?? 0) / QUENCH_WIND_SECONDS);
   } else if (input.sinceStrike < QUENCH_STRIKE_SECONDS) {
     out.action = 'strike';
     out.k = input.sinceStrike / QUENCH_STRIKE_SECONDS;
@@ -356,11 +372,13 @@ export function quenchGlowLook(
       out.plume = 0;
       break;
     case 'windup':
-      // Fists over her head: the cold gathers on her bracers, blazing to the
-      // slam; her heart and eyes harden with it.
+      // Fists over her crown: the cold gathers on her bracers, blazing to the
+      // swing; her heart, eyes and crown flare with it (round 3: seen from
+      // behind too).
       out.bracers = 0.8 + 2.2 * p * p;
-      out.heart = out.heart + 0.6 * p;
+      out.heart = out.heart + 0.9 * p;
       out.eyes = 1 + 0.7 * p;
+      out.crown = Math.max(out.crown, 0.9 + 1.8 * p);
       out.plume = 0;
       break;
     case 'strike':

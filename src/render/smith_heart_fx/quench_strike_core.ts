@@ -15,9 +15,23 @@ const clamp01 = (t: number) => Math.max(0, Math.min(1, t));
  *  clip's contact, frame 30 at 30 fps; the sim cues it this far ahead). */
 export const QUENCH_STRIKE_WIND = 1;
 
-/** A wind-up seen this recently owns the cleave's own cue (the clip is
- *  already slamming: the hit never restarts it). */
+/** A wind-up seen this recently owns the swing's outcome (round 3): the
+ *  cleave's own cue then plays the slam from her raised fists (StrikeSlam), an
+ *  avoided swing's cue a plain swing (StrikeSpent). Past it the raise has
+ *  lowered on its own (the StrikeRaise clip's hold). */
 export const QUENCH_STRIKE_WIND_OWNS = 1.6;
+
+/** Tempering Strike's spikes ripple out behind the cracks (round 3: the
+ *  cracks were hidden under spikes that all stood at once): the first spike
+ *  waits `lead` seconds after the fists land (the cracks open first), the
+ *  farthest `lead + sweep`. */
+export const QUENCH_STRIKE_RIPPLE = { lead: 0.16, sweep: 0.32 } as const;
+
+/** Seconds after the fists land that a spike `reach` (0..1 of the strike's
+ *  range) out begins to rise. */
+export function quenchStrikeSpikeDelay(reach: number): number {
+  return QUENCH_STRIKE_RIPPLE.lead + QUENCH_STRIKE_RIPPLE.sweep * clamp01(reach);
+}
 
 /** The wind-up `t` seconds after its cue: the cold gathering on her bracers
  *  (0..1, building to the slam) and their glow (past 1 blazing). */

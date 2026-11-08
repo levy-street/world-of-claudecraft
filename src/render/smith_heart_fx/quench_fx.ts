@@ -25,6 +25,7 @@
 
 import * as THREE from 'three';
 import { resolveUiEffectsProfile } from '../../game/ui_effects_profile';
+import { QUENCH_CUES } from '../../sim/encounters/smith_heart/quench_ids';
 import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
 import { fxAnchor } from '../attached_fx_anchor';
@@ -44,6 +45,7 @@ import { EngineParticles } from '../trash_engine_fx/engine_particles';
 import { ARC_CLEAVE_ABILITY, fxHash } from './hammer_fx_core';
 import { QUENCH_TELEGRAPH_GLOW_STEP } from './painted_telegraph_core';
 import { QuenchTelegraphs } from './painted_telegraphs';
+import { QUENCH_BODY_CLIP } from './quench_body_core';
 import { QUENCH_BREATH_COLORS } from './quench_breath_core';
 import {
   BREATH_FROST_SECONDS,
@@ -66,6 +68,7 @@ import {
   strikeSpikes,
 } from './quench_fx_core';
 import { quenchSpikeGeometry } from './quench_spike_geometry';
+import { QUENCH_STRIKE_WIND_OWNS, quenchStrikeSpikeDelay } from './quench_strike_core';
 
 const SCAN_SEC = 0.1;
 const C = QUENCH_FX_COLORS;
@@ -194,6 +197,9 @@ interface SpikeSet {
   live: boolean;
   /** Breath: the spikes rise as the gust's front passes them. */
   sweep: boolean;
+  /** Tempering Strike (round 3): the spikes ripple out behind the cracks
+   *  opening under her fists (quenchStrikeSpikeDelay), never all at once. */
+  ripple: boolean;
   shattered: boolean;
   /** The laid-out spikes' reach and arc stretched by these (1: as laid out). */
   reachK: number;
@@ -232,6 +238,12 @@ export class QuenchFx {
   private seed = 0x51c3;
   private scanTimer = 0;
   private clock = 0;
+  /** Tempering Strike's wind-up cue (render time): a cleave inside its
+   *  window slams from her raised fists (a fast contact). */
+  private windAt = -99;
+  /** A strike whose fists are still coming down: its spikes rise on the
+   *  contact, where the body opens the cracks (round 3: never before them). */
+  private readonly pendingStrike = { live: false, id: -1, at: 0, x: 0, z: 0, yaw: 0 };
   private disposed = false;
   private readonly m = new THREE.Matrix4();
   private readonly q = new THREE.Quaternion();
@@ -343,6 +355,7 @@ export class QuenchFx {
         born: -99,
         live: false,
         sweep: breath,
+        ripple: !breath,
         shattered: false,
         reachK: 1,
         arcK: 1,
@@ -395,9 +408,28 @@ export class QuenchFx {
         if (c) this.endCharge(c);
         this.breathAt(e.pos.x, e.pos.z, e.facing);
       }
+    } else if (ev.fx === 'windup' && ev.ability === QUENCH_CUES.strikeReady) {
+      this.windAt = this.clock;
+    } else if (ev.fx === 'windup' && ev.ability === QUENCH_CUES.strikeSpent) {
+      // The wound swing was avoided: her fists came down as a plain swing, so
+      // the next cleave (if one comes soon) is the short Strike, as QuenchBody
+      // plays it.
+      this.windAt = -99;
     } else if (ev.fx === 'windup' && ev.ability === ARC_CLEAVE_ABILITY) {
       const e = this.world.entities.get(ev.sourceId);
-      if (e && e.templateId === QUENCH_GUARDIAN) this.strikeAt(e.pos.x, e.pos.z, e.facing);
+      if (e && e.templateId === QUENCH_GUARDIAN) {
+        // On her fists' contact: the fast slam from her raised fists, or the
+        // short Strike's beat when no wind-up was seen.
+        const wound = this.clock - this.windAt < QUENCH_STRIKE_WIND_OWNS;
+        this.windAt = -99;
+        const p = this.pendingStrike;
+        p.live = true;
+        p.id = e.id;
+        p.at = this.clock + (wound ? QUENCH_BODY_CLIP.strikeSlam : QUENCH_BODY_CLIP.strike);
+        p.x = e.pos.x;
+        p.z = e.pos.z;
+        p.yaw = e.facing;
+      }
     }
     return false;
   }
@@ -411,11 +443,22 @@ export class QuenchFx {
     if (this.scanTimer <= 0) {
       this.scanTimer = SCAN_SEC;
       for (const e of world.entities.values()) {
-        if (e.templateId !== QUENCH_GUARDIAN || e.dead || this.charges.has(e.id)) continue;
+        if (e.templateId !== QUENCH_GUARDIAN) continue;
+        // A bar that takes her body lets a wind-up go (QuenchBody drops it
+        // too; the fight cues the held swing afresh).
+        if (e.castingAbility !== null) this.windAt = -99;
+        if (e.dead || this.charges.has(e.id)) continue;
         if (e.castingAbility === QUENCHING_BREATH) this.startCharge(e);
       }
     }
     this.updateCharges(world, dt);
+    const ps = this.pendingStrike;
+    if (ps.live && this.clock >= ps.at) {
+      ps.live = false;
+      // Never for a guardian gone or dead in the meantime.
+      const g = world.entities.get(ps.id);
+      if (g && !g.dead) this.strikeAt(ps.x, ps.z, ps.yaw);
+    }
     this.updateFrosts();
     this.updateSpikes();
     this.particles.update(this.clock);
@@ -618,7 +661,8 @@ export class QuenchFx {
         spread: 0.5,
       });
     }
-    this.particles.shockRing(x + Math.sin(yaw) * 3, z + Math.cos(yaw) * 3, C.ring, range, 0.35);
+    // Faint: the cracks opening under her fists carry the impact (round 3).
+    this.particles.shockRing(x + Math.sin(yaw) * 3, z + Math.cos(yaw) * 3, C.ring, range, 0.16);
     this.shakeNear(x, z, 0.3, 30);
   }
 
@@ -654,7 +698,13 @@ export class QuenchFx {
         const sp = set.spikes[k];
         // The breath's ice rises as its front reaches each shard.
         const reach = Math.hypot(sp.x, sp.z) / Math.max(1, this.sim.breathRange);
-        const local = set.sweep ? age - reach * BREATH_SWEEP_SECONDS : age;
+        // The strike's ice ripples out behind the cracks under her fists.
+        const local = set.sweep
+          ? age - reach * BREATH_SWEEP_SECONDS
+          : set.ripple
+            ? age -
+              quenchStrikeSpikeDelay(Math.hypot(sp.x, sp.z) / Math.max(1, this.sim.strikeRange))
+            : age;
         const hold = set.sweep ? 0.9 : 0;
         const rise =
           local < 0
@@ -676,13 +726,18 @@ export class QuenchFx {
         this.e.set(sp.lean, set.yaw + sp.yaw, 0, 'YXZ');
         this.q.setFromEuler(this.e);
         const h = sp.height * (0.2 + 0.8 * rise);
-        this.s.set(1.2 + sp.height * 0.25, h, 1.2 + sp.height * 0.25);
+        // The strike's spikes slimmer than the breath's: the cracks read
+        // between them.
+        const w = set.ripple ? 0.75 + sp.height * 0.18 : 1.2 + sp.height * 0.25;
+        this.s.set(w, h, w);
         set.mesh.setMatrixAt(k, this.m.compose(this.v, this.q, this.s));
       }
       set.mesh.instanceMatrix.needsUpdate = true;
       // The shatter: the spikes burst into shards and mist, once.
       const shatterAt =
-        STRIKE_RISE_SECONDS + STRIKE_HOLD_SECONDS + (set.sweep ? 0.9 + BREATH_SWEEP_SECONDS : 0);
+        STRIKE_RISE_SECONDS +
+        STRIKE_HOLD_SECONDS +
+        (set.sweep ? 0.9 + BREATH_SWEEP_SECONDS : set.ripple ? quenchStrikeSpikeDelay(1) : 0);
       if (!set.shattered && age >= shatterAt) {
         set.shattered = true;
         this.shatter(set);

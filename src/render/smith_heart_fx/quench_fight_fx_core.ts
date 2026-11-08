@@ -103,6 +103,8 @@ const CLAIMED: ReadonlySet<string> = new Set([
   // Her wind-up before Tempering Strike: the body raises her fists
   // (quench_body.ts), never a generic swing.
   QUENCH_CUES.strikeReady,
+  // ...and its avoided swing: the body brings her fists down itself.
+  QUENCH_CUES.strikeSpent,
 ]);
 
 export function quenchFightClaims(ability: string | null | undefined): boolean {

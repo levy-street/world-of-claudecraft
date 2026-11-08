@@ -217,10 +217,12 @@ const BREATH_CALM = breathClips(false);
 // one rigged mesh, her gown and her hair on their own bone chains (their sway
 // and follow-through baked into every clip). She walks with a slow regal step
 // under the gown; her swings alternate a right backhand and a left hook, the
-// ice bracers leading; Tempering Strike raises both fists over her head on
-// the fight's wind-up cue a second ahead of the cleave and hammers them down on
-// it (StrikeWind; the cleave's own cue plays the short Strike only when no
-// wind-up was seen); Quenching Breath rears her back through its bar
+// ice bracers leading; Tempering Strike raises both fists high over her crown
+// on the fight's wind-up cue a second ahead of the cleaving swing and holds
+// them for its outcome (StrikeRaise): the cleave hammers them on the ice
+// (StrikeSlam), an avoided swing brings them down as a plain backhand
+// (StrikeSpent); the cleave's own cue plays the short Strike only when no
+// wind-up was seen; Quenching Breath rears her back through its bar
 // and throws the cold out of her mouth on the bar's end, the exhale playing
 // out; the Blades Wake raises both arms through its 4 s bar and throws them
 // down on its end; the Blades Hunt holds them up. Her taunt at the pull and
@@ -236,17 +238,22 @@ const QUENCH_CLIPS: ClipMap = {
     Attack: [QUENCH_BODY_CLIP.attack],
     Attack2: [QUENCH_BODY_CLIP.attack],
     Strike: [QUENCH_BODY_CLIP.strike],
-    StrikeWind: [QUENCH_BODY_CLIP.strikeWind],
+    StrikeSlam: [QUENCH_BODY_CLIP.strikeSlam],
+    StrikeSpent: [QUENCH_BODY_CLIP.strikeSpent],
   },
   attackByAbility: {
     [ARC_CLEAVE_ABILITY]: 'Strike',
-    [QUENCH_BODY_GESTURES.strikeWind]: 'StrikeWind',
+    [QUENCH_BODY_GESTURES.strikeRaise]: 'StrikeRaise',
+    [QUENCH_BODY_GESTURES.strikeSlam]: 'StrikeSlam',
+    [QUENCH_BODY_GESTURES.strikeSpent]: 'StrikeSpent',
     [QUENCH_BODY_GESTURES.taunt]: 'Taunt',
     [QUENCH_BODY_GESTURES.slash]: 'Slash',
   },
   attackTimeScaleByAbility: {
     [ARC_CLEAVE_ABILITY]: 1,
-    [QUENCH_BODY_GESTURES.strikeWind]: 1,
+    [QUENCH_BODY_GESTURES.strikeRaise]: 1,
+    [QUENCH_BODY_GESTURES.strikeSlam]: 1,
+    [QUENCH_BODY_GESTURES.strikeSpent]: 1,
     [QUENCH_BODY_GESTURES.taunt]: 1,
     [QUENCH_BODY_GESTURES.slash]: 1,
   },
@@ -314,7 +321,7 @@ export const SMITH_HEART_BOSS_LOOKS: Record<string, VisualDef> = {
         // Tempering Strike's wind-up: the cold gathers on her raised bracers
         // and her cracks, blazing to the slam a second on.
         {
-          gesture: QUENCH_BODY_GESTURES.strikeWind,
+          gesture: QUENCH_BODY_GESTURES.strikeRaise,
           rise: 0.9,
           hold: 0.15,
           fall: 0.7,
@@ -326,7 +333,16 @@ export const SMITH_HEART_BOSS_LOOKS: Record<string, VisualDef> = {
     },
     // A swing never cuts the breath, the wake, the strike (its wind-up held
     // through the swing it slams on), the taunt or a slash's command.
-    oneShotsHoldAttacks: ['Breath', 'Wake', 'Strike', 'StrikeWind', 'Taunt', 'Slash'],
+    oneShotsHoldAttacks: [
+      'Breath',
+      'Wake',
+      'Strike',
+      'StrikeRaise',
+      'StrikeSlam',
+      'StrikeSpent',
+      'Taunt',
+      'Slash',
+    ],
     castPlayOutHoldsAttacks: true,
     // Her slow regal walk: its Move loop read at the template's own speed.
     walkRef: 7,

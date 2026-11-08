@@ -175,10 +175,14 @@ describe('Quenching Breath: the blast', () => {
 });
 
 describe('Tempering Strike: the wind-up and the cracks', () => {
-  it("slams on the sim's own wind-up lead, the clip's contact", () => {
+  it("waits on the sim's own wind-up lead with her fists up, then slams fast", () => {
     expect(QUENCH_STRIKE_WIND).toBeCloseTo(T.strikeWindup, 9);
-    expect(QUENCH_BODY_CLIP.strikeWind).toBeCloseTo(QUENCH_STRIKE_WIND, 9);
-    // The wind-up owns the cleave's cue a little past its slam, never the next.
+    // Round 3: her fists are up before the swing and held past it; the slam
+    // from up there lands a beat after the cleave, never a second later.
+    expect(QUENCH_BODY_CLIP.strikeRaiseTop).toBeLessThan(QUENCH_STRIKE_WIND);
+    expect(QUENCH_BODY_CLIP.strikeSlam).toBeLessThan(0.2);
+    expect(QUENCH_BODY_CLIP.strikeSpent).toBeLessThan(0.25);
+    // The wind-up owns the swing's outcome a little past it, never the next.
     expect(QUENCH_STRIKE_WIND_OWNS).toBeGreaterThan(QUENCH_STRIKE_WIND);
     expect(QUENCH_STRIKE_WIND_OWNS).toBeLessThan(2);
   });

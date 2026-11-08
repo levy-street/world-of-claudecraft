@@ -37,6 +37,11 @@ export const QUENCH_WAKE_COLUMN = {
   shellR1: 3.6,
   coreR: 1.3,
   footR: 8.5,
+  /** Round 3: where the beam leaves her crown it flares, so a close or low
+   *  camera that loses the column's top still reads the power: a corona of
+   *  light rays on a ring round the beam (yards across) and a burst. */
+  crownHaloR: 7.5,
+  crownFlare: 10,
 } as const;
 
 export interface QuenchWakeColumnLook {

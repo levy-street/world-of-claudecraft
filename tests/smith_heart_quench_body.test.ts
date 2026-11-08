@@ -169,11 +169,18 @@ describe('the Guardian of the Quench model', () => {
     expect(c.castByAbility?.[QUENCH_CASTS.wake]).toBe('Wake');
     expect(c.castByAbility?.[QUENCH_CASTS.flurry]).toBe('WakeHold');
     expect(c.attackByAbility?.[ARC_CLEAVE_ABILITY]).toBe('Strike');
-    // Round 2: Tempering Strike read before it lands, its slam a second in.
-    expect(c.attackByAbility?.[QUENCH_BODY_GESTURES.strikeWind]).toBe('StrikeWind');
-    expect(c.attackTimeScaleByAbility?.[QUENCH_BODY_GESTURES.strikeWind]).toBe(1);
-    expect(c.contacts?.StrikeWind).toEqual([QUENCH_BODY_CLIP.strikeWind]);
-    expect(QUENCH_BODY_CLIP.strikeWind).toBeCloseTo(T.strikeWindup, 9);
+    // Round 3: Tempering Strike raised before it lands, then true to its
+    // outcome: the slam for a cleave, a plain swing for an avoided one.
+    expect(c.attackByAbility?.[QUENCH_BODY_GESTURES.strikeRaise]).toBe('StrikeRaise');
+    expect(c.attackByAbility?.[QUENCH_BODY_GESTURES.strikeSlam]).toBe('StrikeSlam');
+    expect(c.attackByAbility?.[QUENCH_BODY_GESTURES.strikeSpent]).toBe('StrikeSpent');
+    for (const g of ['strikeRaise', 'strikeSlam', 'strikeSpent'] as const)
+      expect(c.attackTimeScaleByAbility?.[QUENCH_BODY_GESTURES[g]]).toBe(1);
+    expect(c.contacts?.StrikeSlam).toEqual([QUENCH_BODY_CLIP.strikeSlam]);
+    expect(c.contacts?.StrikeSpent).toEqual([QUENCH_BODY_CLIP.strikeSpent]);
+    // The raise is at its top before the swing comes, and holds past it.
+    expect(QUENCH_BODY_CLIP.strikeRaiseTop).toBeLessThan(T.strikeWindup);
+    expect(QUENCH_BODY_CLIP.strikeRaiseHold).toBeGreaterThan(T.strikeWindup + 0.3);
     expect(c.attackByAbility?.[QUENCH_BODY_GESTURES.taunt]).toBe('Taunt');
     expect(c.attackByAbility?.[QUENCH_BODY_GESTURES.slash]).toBe('Slash');
     const TS = c.castTimeScaleByAbility ?? {};
@@ -186,13 +193,22 @@ describe('the Guardian of the Quench model', () => {
     for (const b of Object.keys(QUENCH_SYNCED_CASTS)) expect(sync, b).toContain(b);
     // The hunt's long bar loops its held pose, never synced.
     expect(sync).not.toContain(QUENCH_CASTS.flurry);
-    for (const one of ['Breath', 'Wake', 'Strike', 'StrikeWind', 'Taunt', 'Slash'])
+    for (const one of [
+      'Breath',
+      'Wake',
+      'Strike',
+      'StrikeRaise',
+      'StrikeSlam',
+      'StrikeSpent',
+      'Taunt',
+      'Slash',
+    ])
       expect(def.oneShotsHoldAttacks, one).toContain(one);
     expect(c.castPlayOut).toEqual(['Breath', 'Wake']);
     expect(def.glowPulses?.deathFade).toBeGreaterThan(0);
     expect(def.glowPulses?.pulses.map((p) => p.gesture)).toEqual([
       QUENCH_BODY_GESTURES.flare,
-      QUENCH_BODY_GESTURES.strikeWind,
+      QUENCH_BODY_GESTURES.strikeRaise,
     ]);
     for (const g of Object.values(QUENCH_BODY_GESTURES))
       expect(g.startsWith('smith_heart_quench_body_')).toBe(true);
@@ -264,7 +280,11 @@ describe('quench_body_core: her light and her cold', () => {
     expect(quenchBodyAction({ ...IDLE, sinceStrike: 5 }).action).toBe('idle');
     // The wind-up reads through its second, then the slam's aftermath.
     expect(quenchBodyAction({ ...IDLE, sinceWind: 0.5 })).toEqual({ action: 'windup', k: 0.5 });
-    expect(quenchBodyAction({ ...IDLE, sinceWind: 1.2, sinceStrike: 0.2 }).action).toBe('strike');
+    // Round 3: still waiting on the swing's outcome past the lead, held at
+    // full; resolved (the body stops reporting it) or past the hold, the
+    // strike's own look follows.
+    expect(quenchBodyAction({ ...IDLE, sinceWind: 1.2 })).toEqual({ action: 'windup', k: 1 });
+    expect(quenchBodyAction({ ...IDLE, sinceWind: 1.7, sinceStrike: 0.2 }).action).toBe('strike');
     expect(quenchBodyAction({ ...IDLE, castId: QUENCH_CASTS.breath, sinceWind: 0.5 }).action).toBe(
       'breath',
     );
@@ -477,16 +497,41 @@ describe('QuenchBody over a fake world', () => {
     const cracks = root?.getObjectsByProperty('name', 'smithHeartQuenchStrikeCracks') ?? [];
     expect(cracks.some((c) => c.visible)).toBe(true);
     for (let i = 0; i < 80; i++) fx.update(1 / 20);
-    // The wind-up cue raises her fists a second ahead; the cleave's own cue
-    // on the swing is then claimed, so the hit never restarts the gesture.
+    // The wind-up cue raises her fists a second ahead and lays the tell
+    // (every tier); the cleave's own cue on the swing is then claimed and
+    // slams from the raised fists.
+    const windRing = root?.getObjectByName('smithHeartQuenchWindupRing');
+    const fistFlare = root?.getObjectByName('smithHeartQuenchWindupFist');
+    const spiral = root?.getObjectByName('smithHeartQuenchWindupSpiral');
+    for (let i = 0; i < 60; i++) fx.update(1 / 20);
+    expect(cracks.some((c) => c.visible)).toBe(false);
     expect(fx.handleEvent(cue(QUENCH_CUES.strikeReady, 'windup'))).toBe(false);
-    expect(sent).toContain(QUENCH_BODY_GESTURES.strikeWind);
+    expect(sent.at(-1)).toBe(QUENCH_BODY_GESTURES.strikeRaise);
     for (let i = 0; i < 20; i++) fx.update(1 / 20);
+    expect(windRing?.visible).toBe(true);
+    expect(fistFlare?.visible).toBe(true);
+    expect(spiral?.visible).toBe(true);
+    // No slam while she only holds her fists up.
+    expect(cracks.some((c) => c.visible)).toBe(false);
     expect(fx.handleEvent(cue(ARC_CLEAVE_ABILITY, 'windup'))).toBe(true);
-    // Her fists reach the ice on the clip's beat: the lake cracks open.
-    fx.update(1 / 20);
+    expect(sent.at(-1)).toBe(QUENCH_BODY_GESTURES.strikeSlam);
+    // Her fists reach the ice on the slam's contact: the lake cracks open.
+    for (let i = 0; i < 4; i++) fx.update(1 / 20);
     expect(cracks.some((c) => c.visible)).toBe(true);
-    for (let i = 0; i < 40; i++) fx.update(1 / 20);
+    for (let i = 0; i < 60; i++) fx.update(1 / 20);
+    expect(windRing?.visible).toBe(false);
+    expect(fx.handleEvent(cue(ARC_CLEAVE_ABILITY, 'windup'))).toBe(false);
+    for (let i = 0; i < 80; i++) fx.update(1 / 20);
+    // An avoided cued swing: a plain swing from the raised fists, the tell
+    // falls away, and the lake never cracks.
+    expect(fx.handleEvent(cue(QUENCH_CUES.strikeReady, 'windup'))).toBe(false);
+    for (let i = 0; i < 20; i++) fx.update(1 / 20);
+    expect(fx.handleEvent(cue(QUENCH_CUES.strikeSpent, 'windup'))).toBe(false);
+    expect(sent.at(-1)).toBe(QUENCH_BODY_GESTURES.strikeSpent);
+    for (let i = 0; i < 30; i++) fx.update(1 / 20);
+    expect(cracks.some((c) => c.visible)).toBe(false);
+    expect(windRing?.visible).toBe(false);
+    // A cleave long after (no wind-up waiting) is the short Strike, unclaimed.
     expect(fx.handleEvent(cue(ARC_CLEAVE_ABILITY, 'windup'))).toBe(false);
     // The breath's streaks of wind leave her mouth's way down the cone.
     expect(fx.handleEvent(cue(QUENCH_CASTS.breath))).toBe(false);

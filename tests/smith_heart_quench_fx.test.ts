@@ -11,6 +11,7 @@ import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { QuenchFx } from '../src/render/smith_heart_fx';
 import { ARC_CLEAVE_ABILITY } from '../src/render/smith_heart_fx/hammer_fx_core';
+import { QUENCH_BODY_CLIP } from '../src/render/smith_heart_fx/quench_body_core';
 import {
   BREATH_FROST_SECONDS,
   breathBlastLook,
@@ -22,6 +23,7 @@ import {
   strikeSpikes,
 } from '../src/render/smith_heart_fx/quench_fx_core';
 import { SMITH_HEART_MOBS } from '../src/sim/content/smith_heart';
+import { QUENCH_CUES } from '../src/sim/encounters/smith_heart/quench_ids';
 import type { Entity, SimEvent } from '../src/sim/types';
 import type { IWorld } from '../src/world_api';
 
@@ -166,7 +168,11 @@ describe("the Quench guardian's effects", () => {
       ability: ARC_CLEAVE_ABILITY,
     } as SimEvent;
     expect(fx.handleEvent(strike)).toBe(false);
+    // Round 3: the ice waits on her fists' contact (the short Strike's beat
+    // here, no wind-up seen), never rising before them.
     fx.update(1 / 30);
+    expect(shown(root, 'smithHeartQuenchStrikeIce')).toBe(0);
+    for (let i = 0; i < Math.ceil(QUENCH_BODY_CLIP.strike * 30) + 1; i++) fx.update(1 / 30);
     expect(shown(root, 'smithHeartQuenchStrikeIce')).toBe(1);
     expect(telegraphsShown(root)).toBe(0);
     // A swing cleave from anyone else lifts nothing.
@@ -178,6 +184,32 @@ describe("the Quench guardian's effects", () => {
     expect(shown(root, 'smithHeartQuenchStrikeIce')).toBe(0);
     expect(shown(root, 'smithHeartQuenchBreathIce')).toBe(0);
     expect(shown(root, 'smithHeartQuenchFrost')).toBe(0);
+    // Round 3: after her wind-up the ice rises on the fast slam's contact; a
+    // wind-up spent on an avoided swing leaves the next cleave the short
+    // Strike's timing (as her body plays it), never the ice before the fists.
+    const cue = (ability: string) => ({ ...strike, ability }) as SimEvent;
+    const fast = Math.ceil(QUENCH_BODY_CLIP.strikeSlam * 30) + 1;
+    expect(fx.handleEvent(cue(QUENCH_CUES.strikeReady))).toBe(false);
+    for (let i = 0; i < 20; i++) fx.update(1 / 30);
+    fx.handleEvent(strike);
+    for (let i = 0; i < fast; i++) fx.update(1 / 30);
+    expect(shown(root, 'smithHeartQuenchStrikeIce')).toBe(1);
+    for (let i = 0; i < 150; i++) fx.update(1 / 30);
+    expect(shown(root, 'smithHeartQuenchStrikeIce')).toBe(0);
+    fx.handleEvent(cue(QUENCH_CUES.strikeReady));
+    for (let i = 0; i < 20; i++) fx.update(1 / 30);
+    fx.handleEvent(cue(QUENCH_CUES.strikeSpent));
+    fx.handleEvent(strike);
+    for (let i = 0; i < fast; i++) fx.update(1 / 30);
+    expect(shown(root, 'smithHeartQuenchStrikeIce')).toBe(0);
+    for (let i = 0; i < Math.ceil(QUENCH_BODY_CLIP.strike * 30); i++) fx.update(1 / 30);
+    expect(shown(root, 'smithHeartQuenchStrikeIce')).toBe(1);
+    // Dead before her fists land: no ice.
+    for (let i = 0; i < 150; i++) fx.update(1 / 30);
+    fx.handleEvent(strike);
+    boss.dead = true;
+    for (let i = 0; i < 20; i++) fx.update(1 / 30);
+    expect(shown(root, 'smithHeartQuenchStrikeIce')).toBe(0);
     fx.dispose();
     expect(scene.getObjectByName('smith-heart-quench-fx')).toBeUndefined();
   });

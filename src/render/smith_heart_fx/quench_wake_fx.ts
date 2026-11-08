@@ -5,6 +5,9 @@
 // crown into the dark, inside a deep blue shell streaked with spiralling light that stands
 // DARK against the white lake and the pale walls (additive light alone washed
 // out to a pale curtain there), and a ring flashing on the ice at its foot.
+// Where the beam leaves her crown it flares (round 3): a corona of turning
+// rays on a ring round it and a burst of light, so a close or low camera that
+// loses the column's top still reads the power at her crown.
 // Held, dimmer, through the Blades Hunt. The throw-down is QuenchWakeThrow's
 // (quench_wake_throw.ts). Cosmetic: the blades' own warnings are
 // QuenchBladesFx's and QuenchFightFx's, on every tier.
@@ -139,6 +142,29 @@ void main() {
 }
 `;
 
+/** The corona at her crown: a ring of light with rays turning out of it, a
+ *  disc laid level round the beam (seen from below as from above). */
+const HALO_FRAG = /* glsl */ `
+uniform float uTime;
+uniform float uAlpha;
+uniform vec3 uCore;
+uniform vec3 uHot;
+varying vec2 vLocal;
+void main() {
+  float r = length(vLocal);
+  if (r > 1.0) discard;
+  float ang = atan(vLocal.y, vLocal.x);
+  float cd = (r - 0.32) * 11.0;
+  float ring = exp(-cd * cd);
+  float rays = pow(max(sin(ang * 12.0 + uTime * 1.3), 0.0), 6.0)
+    + 0.6 * pow(max(sin(ang * 7.0 - uTime * 0.9 + 1.7), 0.0), 8.0);
+  rays *= smoothstep(0.18, 0.34, r) * (1.0 - smoothstep(0.45, 1.0, r));
+  float a = uAlpha * clamp(ring + rays * 0.7, 0.0, 1.0);
+  vec3 col = mix(uCore, uHot, ring * 0.5);
+  gl_FragColor = vec4(col * a * 0.7, a);
+}
+`;
+
 const _look: QuenchWakeColumnLook = { shell: 0, core: 0, rise: 0, foot: 0 };
 const color = (c: readonly [number, number, number]) => new THREE.Color(c[0], c[1], c[2]);
 
@@ -149,12 +175,17 @@ export class QuenchWakeFx {
   private readonly coreMat: THREE.ShaderMaterial;
   private readonly foot: THREE.Mesh;
   private readonly footMat: THREE.ShaderMaterial;
+  private readonly halo: THREE.Mesh;
+  private readonly haloMat: THREE.ShaderMaterial;
+  private readonly flare: THREE.Sprite;
+  private readonly flareMat: THREE.SpriteMaterial;
 
   constructor(
     parent: THREE.Object3D,
     private readonly uTime: { value: number },
     materials: THREE.Material[],
     geometries: THREE.BufferGeometry[],
+    glowTex: THREE.Texture | null = null,
   ) {
     const shellGeo = new THREE.CylinderGeometry(
       COL.shellR1,
@@ -231,7 +262,35 @@ export class QuenchWakeFx {
       polygonOffsetUnits: -2,
       fog: false,
     });
-    materials.push(this.shellMat, this.coreMat, this.footMat);
+    this.haloMat = new THREE.ShaderMaterial({
+      name: 'smithHeartQuenchWakeHalo',
+      uniforms: {
+        uTime,
+        uAlpha: { value: 0 },
+        uCore: { value: color(C.core) },
+        uHot: { value: color(C.hot) },
+      },
+      vertexShader: FOOT_VERT,
+      fragmentShader: HALO_FRAG,
+      transparent: true,
+      depthWrite: false,
+      side: THREE.DoubleSide,
+      blending: THREE.CustomBlending,
+      blendSrc: THREE.OneFactor,
+      blendDst: THREE.OneFactor,
+      fog: false,
+    });
+    this.flareMat = new THREE.SpriteMaterial({
+      name: 'smithHeartQuenchWakeFlare',
+      map: glowTex,
+      color: color(C.core),
+      transparent: true,
+      opacity: 0,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      fog: false,
+    });
+    materials.push(this.shellMat, this.coreMat, this.footMat, this.haloMat, this.flareMat);
     const mk = (geo: THREE.BufferGeometry, mat: THREE.ShaderMaterial, name: string) => {
       const m = new THREE.Mesh(geo, mat);
       m.name = name;
@@ -247,6 +306,13 @@ export class QuenchWakeFx {
     this.core = mk(coreGeo, this.coreMat, 'smithHeartQuenchWakeCore');
     // The core after the shell (its light over the dark edge).
     this.core.renderOrder = 1;
+    this.halo = mk(footGeo, this.haloMat, 'smithHeartQuenchWakeHalo');
+    this.halo.renderOrder = 2;
+    this.flare = new THREE.Sprite(this.flareMat);
+    this.flare.name = 'smithHeartQuenchWakeFlare';
+    this.flare.visible = false;
+    this.flare.renderOrder = 2;
+    parent.add(this.flare);
   }
 
   /** The column at (x, y, z), `amount` 0..1 (it climbs and brightens with it). */
@@ -267,11 +333,24 @@ export class QuenchWakeFx {
     this.coreMat.uniforms.uAlpha.value = look.core;
     this.coreMat.uniforms.uRise.value = look.rise;
     this.footMat.uniforms.uAlpha.value = look.foot;
+    // The flare where the beam leaves her crown, swelling with the core.
+    const crownY = y + COL.coreFrom;
+    const pulse = 0.9 + 0.1 * Math.sin(this.uTime.value * 7);
+    this.halo.visible = look.core > 0.02;
+    this.halo.position.set(x, crownY, z);
+    this.halo.scale.setScalar(COL.crownHaloR * (0.6 + 0.4 * look.core));
+    this.haloMat.uniforms.uAlpha.value = look.core;
+    this.flare.visible = look.core > 0.02;
+    this.flare.position.set(x, crownY + 0.5, z);
+    this.flare.scale.setScalar(COL.crownFlare * look.core * pulse);
+    this.flareMat.opacity = Math.min(0.9, look.core * 0.75);
   }
 
   hide(): void {
     this.shell.visible = false;
     this.core.visible = false;
     this.foot.visible = false;
+    this.halo.visible = false;
+    this.flare.visible = false;
   }
 }

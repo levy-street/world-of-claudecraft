@@ -23,11 +23,15 @@
 //    in a palette compensated for the Quench grade (quench_breath_core.ts; the
 //    cone, its frost and its ice are QuenchFx's);
 //  - Tempering Strike: on the fight's wind-up cue a second ahead of the
-//    cleaving swing her fists rise over her head as the cold gathers on her
-//    bracers (StrikeWind; the hit's own cue then never restarts it), and as
-//    both fists hit the ice the lake cracks open (quench_strike_cracks.ts), a
-//    short flash on the fists only (never a white-out of the screen), shards
-//    and snow thrown (its spikes are QuenchFx's);
+//    cleaving swing her fists rise high over her crown and hold (StrikeRaise)
+//    while a tell reads from every side (quench_strike_windup_fx.ts: a frost
+//    ring closing on her, the cleave's arc frosting over, cold light spiralling
+//    into her fists); the swing's outcome then picks the gesture: the cleave
+//    hammers the fists on the ice (StrikeSlam), where the lake cracks open
+//    (quench_strike_cracks.ts), a short flash on the fists only (never a
+//    white-out), shards and snow thrown (its spikes are QuenchFx's); an
+//    avoided swing (QUENCH_CUES.strikeSpent) brings them down as a plain
+//    swing and the gathered cold falls away, no slam on nothing;
 //  - the Blades Wake: arms raised, her crown and heart blaze, a beam of cold
 //    power climbs round her, a bright cyan core in a deep blue shell with snow
 //    and shards spiralling up it and a ring flashing at its foot
@@ -58,6 +62,7 @@ import {
   QUENCH_CASTS,
   QUENCH_CUES,
   QUENCH_OBJECTS,
+  QUENCH_TUNING,
 } from '../../sim/encounters/smith_heart/quench_ids';
 import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
@@ -113,11 +118,11 @@ import { holdQuenchStatueGlaze } from './quench_statue_glaze';
 import {
   QUENCH_STRIKE_COLORS,
   QUENCH_STRIKE_CRACKS,
-  QUENCH_STRIKE_WIND,
   QUENCH_STRIKE_WIND_OWNS,
   quenchStrikeWindLook,
 } from './quench_strike_core';
 import { QuenchStrikeCracks } from './quench_strike_cracks';
+import { QuenchStrikeWindup } from './quench_strike_windup_fx';
 import { QuenchWakeFx } from './quench_wake_fx';
 import { QuenchWakeThrow } from './quench_wake_throw';
 
@@ -132,6 +137,8 @@ const S_EYES = [S('eyeL'), S('eyeR')] as const;
 const S_CROWN = [S('crown'), S('crownL'), S('crownR')] as const;
 const S_BRACERS = [S('bracerL'), S('bracerR')] as const;
 const S_HANDS = [S('handL'), S('handR')] as const;
+/** Tempering Strike's arc (the cleave's own numbers): the wind-up frosts it. */
+const STRIKE_HALF_ARC = (QUENCH_TUNING.strikeArcDeg * Math.PI) / 360;
 const S_HEM = QUENCH_HEM.map((id) => S(id));
 const S_TIPS = QUENCH_HAIR_TIPS.map((id) => S(id));
 /** Her height in yards (the climbing frost and the snow round her read it). */
@@ -327,6 +334,10 @@ export class QuenchBody {
   private readonly throwFx: QuenchWakeThrow;
   private readonly streaks: QuenchBreathStreaks;
   private readonly cracks: QuenchStrikeCracks;
+  private readonly windup: QuenchStrikeWindup;
+  /** The live fists and bracers this frame (the wind-up's tell reads them). */
+  private readonly handsAt: THREE.Vector3[];
+  private readonly bracersAt: THREE.Vector3[];
   private readonly heartCore: THREE.Sprite;
   private readonly heartHalo: THREE.Sprite;
   private readonly heartMat: THREE.SpriteMaterial;
@@ -352,10 +363,13 @@ export class QuenchBody {
   private seed = 0x4c1e;
   private strikeAt = -99;
   private strikeHit = true;
-  /** Tempering Strike's wind-up cue (the StrikeWind clip's start) and
-   *  whether its slam has landed yet. */
+  /** Seconds from the strike's cue to its fists on the ice (the slam from
+   *  her raised fists, or the short Strike when no wind-up was seen). */
+  private strikeContact: number = QUENCH_BODY_CLIP.strike;
+  /** Tempering Strike's wind-up cue (StrikeRaise) and whether it still waits
+   *  on the swing's outcome. */
   private windAt = -99;
-  private windHit = true;
+  private windPending = false;
   private breathAt = -99;
   /** The cone's bearing as the breath landed (QuenchFx lays its ice on it):
    *  the blast keeps it while she turns back to her tank. */
@@ -416,9 +430,9 @@ export class QuenchBody {
       this.materials,
       this.geometries,
     );
-    this.wake = new QuenchWakeFx(this.fx, this.uTime, this.materials, this.geometries);
     const glowTex = hasDom ? radialGlowTexture() : null;
     this.glowTex = glowTex;
+    this.wake = new QuenchWakeFx(this.fx, this.uTime, this.materials, this.geometries, glowTex);
     this.throwFx = new QuenchWakeThrow(
       this.fx,
       this.uTime,
@@ -445,6 +459,9 @@ export class QuenchBody {
       this.materials,
       this.geometries,
     );
+    this.windup = new QuenchStrikeWindup(this.fx, glowTex, this.materials, this.geometries);
+    this.handsAt = [this.sock[S_HANDS[0]], this.sock[S_HANDS[1]]];
+    this.bracersAt = [this.sock[S_BRACERS[0]], this.sock[S_BRACERS[1]]];
     const sprite = (color: number, name: string) =>
       new THREE.SpriteMaterial({
         map: glowTex,
@@ -518,24 +535,42 @@ export class QuenchBody {
     if (this.entityId >= 0) this.playGesture?.(this.entityId, gesture);
   }
 
-  /** Claims one event only: the cleave's own cue while her wind-up already
-   *  plays its slam (the renderer would restart the gesture on the hit).
-   *  Every other cue's own draws still play under these. */
+  /** Claims one event only: the cleave's own cue while her wind-up waits on
+   *  it (she slams from her raised fists; the renderer's short Strike would
+   *  restart the gesture). Every other cue's own draws still play under these. */
   handleEvent(ev: SimEvent): boolean {
     if (!this.world || this.disposed || this.entityId < 0) return false;
     if (ev.type !== 'spellfx' || ev.sourceId !== this.entityId) return false;
     if (ev.fx === 'windup' && ev.ability === QUENCH_CUES.strikeReady) {
-      // Tempering Strike read before it lands: fists over her head now, the
-      // slam a second on, on the cleaving swing.
+      // Tempering Strike read before it lands: fists high over her crown now,
+      // held for the swing's outcome a second on.
       this.windAt = this.clock;
-      this.windHit = false;
-      this.send(QUENCH_BODY_GESTURES.strikeWind);
+      this.windPending = true;
+      this.windup.begin(this.clock);
+      this.send(QUENCH_BODY_GESTURES.strikeRaise);
     } else if (ev.fx === 'windup' && ev.ability === ARC_CLEAVE_ABILITY) {
-      if (this.clock - this.windAt < QUENCH_STRIKE_WIND_OWNS) return true;
-      // No wind-up seen (a swing that came at once): the short slam, her
-      // fists landing on its clip's beat.
       this.strikeAt = this.clock;
       this.strikeHit = false;
+      if (this.windPending && this.clock - this.windAt < QUENCH_STRIKE_WIND_OWNS) {
+        // The cleave fired: the raised fists hammer the ice.
+        this.windPending = false;
+        this.windup.end('slam', this.clock);
+        this.strikeContact = QUENCH_BODY_CLIP.strikeSlam;
+        this.send(QUENCH_BODY_GESTURES.strikeSlam);
+        return true;
+      }
+      // No wind-up seen (a swing that came at once): the short Strike, her
+      // fists landing on its clip's beat.
+      this.strikeContact = QUENCH_BODY_CLIP.strike;
+    } else if (ev.fx === 'windup' && ev.ability === QUENCH_CUES.strikeSpent) {
+      // The cued swing was dodged, parried or missed: no cleave, so no slam.
+      // Her raised fists come down as a plain swing and the cold falls away.
+      if (this.windPending) {
+        this.windPending = false;
+        this.windup.end('spent', this.clock);
+        this.send(QUENCH_BODY_GESTURES.strikeSpent);
+        this.spentFx();
+      }
     } else if (ev.ability === QUENCH_CASTS.breath) {
       this.breathAt = this.clock;
       this.breathYaw = this.world.entities.get(this.entityId)?.facing ?? 0;
@@ -630,7 +665,8 @@ export class QuenchBody {
     this.strikeAt = -99;
     this.strikeHit = true;
     this.windAt = -99;
-    this.windHit = true;
+    this.windPending = false;
+    this.windup.hide();
     this.breathAt = -99;
     this.wakeAt = -99;
     this.rime.reset();
@@ -656,6 +692,7 @@ export class QuenchBody {
     this.throwFx.hide();
     this.streaks.hide();
     this.cracks.hide();
+    this.windup.hide();
     this.rime.hide();
   }
 
@@ -703,7 +740,16 @@ export class QuenchBody {
     _actIn.sinceBreath = this.clock - this.breathAt;
     _actIn.sinceStrike = this.clock - this.strikeAt;
     _actIn.sinceWake = this.clock - this.wakeAt;
-    _actIn.sinceWind = this.clock - this.windAt;
+    // A wind-up still waiting on its swing: a bar that took her body, or a
+    // hold that ran out, lets it go (the fight cues the held swing afresh).
+    if (
+      this.windPending &&
+      (e.castingAbility !== null || this.clock - this.windAt >= QUENCH_STRIKE_WIND_OWNS)
+    ) {
+      this.windPending = false;
+      this.windup.end('spent', this.clock);
+    }
+    _actIn.sinceWind = this.windPending ? this.clock - this.windAt : Number.POSITIVE_INFINITY;
     quenchBodyAction(_actIn, _act);
     const look = quenchGlowLook(_act.action, _act.k, this.clock, awake, _look);
     if (_act.action === 'breath' && _act.k > 0.95) this.flaredBreath = true;
@@ -713,6 +759,18 @@ export class QuenchBody {
     this.gatherFx(dt, look.gather);
     this.exhaleFx(e, dt);
     this.windFx(dt);
+    this.windup.update(
+      this.clock,
+      eAt.x,
+      this.groundY(eAt.x, eAt.z),
+      eAt.z,
+      e.facing,
+      this.handsAt,
+      this.bracersAt,
+      STRIKE_HALF_ARC,
+      QUENCH_TUNING.strikeRange,
+      U,
+    );
     this.strikeFx(e);
     this.wakeFx(e, dt, look.column);
     const gy = this.groundY(eAt.x, eAt.z);
@@ -921,7 +979,8 @@ export class QuenchBody {
   /** Tempering Strike's wind-up: the cold drawn in to her raised bracers,
    *  crystals forming on them, building to the slam. */
   private windFx(dt: number): void {
-    const look = quenchStrikeWindLook(this.clock - this.windAt, _wind);
+    if (!this.windPending) return;
+    const look = quenchStrikeWindLook(Math.min(this.clock - this.windAt, 0.99), _wind);
     if (look.gather <= 0.02) return;
     this.accGather += dt * 70 * look.gather;
     while (this.accGather >= 1) {
@@ -945,22 +1004,32 @@ export class QuenchBody {
     }
   }
 
-  /** Tempering Strike: her fists land on the ice, on the wind-up's slam (a
-   *  second after its cue) or, with no wind-up seen, on the short clip's
-   *  beat. Either way it lands once. */
+  /** Tempering Strike: her fists land on the ice on the slam's contact (from
+   *  her raised fists, or the short Strike's when no wind-up was seen), once,
+   *  and only ever for a cleave that fired. */
   private strikeFx(e: Entity): void {
-    let due = false;
-    if (!this.windHit && this.clock - this.windAt >= QUENCH_STRIKE_WIND) {
-      this.windHit = true;
-      // A bar that took her body over in the meantime cancels the slam (the
-      // fight cues the held swing afresh).
-      due = e.castingAbility === null;
-    }
-    if (!this.strikeHit && this.clock - this.strikeAt >= QUENCH_BODY_CLIP.strike) {
+    if (!this.strikeHit && this.clock - this.strikeAt >= this.strikeContact) {
       this.strikeHit = true;
-      due = true;
+      this.slam(e);
     }
-    if (due) this.slam(e);
+  }
+
+  /** An avoided swing: the cold gathered on her fists scatters off them. */
+  private spentFx(): void {
+    for (const p of this.handsAt) {
+      this.particles.puff(p.x, p.y, p.z, 14, {
+        speed: 4,
+        up: -1,
+        life: 0.9,
+        size: [0.35, 0.08],
+        color: QUENCH_STRIKE_COLORS.gather,
+        alpha: 1,
+        pool: 'glow',
+        gravity: 6,
+        drag: 0.6,
+        floor: -1e6,
+      });
+    }
   }
 
   /** The fists on the ice: the lake cracks open from a shattered crater
@@ -1082,6 +1151,8 @@ export class QuenchBody {
     holdQuenchStatueGlaze(e.id, quenchStatueGlaze(t, _glaze));
     this.lights(0.6 * d.glow, 0.8 * d.glow, 0.6 * d.glow, 0.5 * d.glow, 0, d.glow);
     this.wake.hide();
+    this.windPending = false;
+    this.windup.hide();
     // Glints climbing her with the frost.
     const eAt = fxAnchor(e);
     const gy = this.groundY(eAt.x, eAt.z);
