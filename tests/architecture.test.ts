@@ -3446,6 +3446,7 @@ const UI_DOM_MODULES = [
   'src/ui/weekly_vault_reveal_controller.ts',
   'src/ui/wiki_link.ts',
   'src/ui/window_drag.ts',
+  'src/ui/window_drag_handle.ts',
   'src/ui/window_open_state.ts',
   'src/ui/window_reflow.ts',
   'src/ui/window_resize.ts',

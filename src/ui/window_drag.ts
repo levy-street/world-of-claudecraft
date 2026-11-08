@@ -6,8 +6,13 @@
 // left/top layout cycle on every pointer event, which could expose the WebGL canvas
 // while two large store windows overlapped on high-DPI Chromium displays.
 
-import { draggedWindowPosition, type WindowDragPosition } from './window_drag_core';
+import {
+  draggedWindowPosition,
+  WINDOW_DRAG_MARGIN,
+  type WindowDragPosition,
+} from './window_drag_core';
 import { isCoarsePointerDefault, resizeGripAt } from './window_resize';
+import { RESIZE_ENGAGE_SLOP, RESIZE_ENGAGE_SLOP_TOUCH } from './window_resize_core';
 
 export interface WindowDragDeps {
   getScale(): number;
@@ -54,12 +59,39 @@ interface DragSession {
   moved: boolean;
 }
 
+/**
+ * A touch-layout title press that has not travelled the engage slop yet. On the
+ * touch HUD nearly every window is an edge-pinned CSS sheet
+ * (src/styles/hud.mobile.css), and the drag's pin writes inline left/top plus
+ * right/bottom:auto, which unpins two of its edges. Pinning at pointerdown made
+ * a plain title TAP shrink-wrap the window to its content: the Book of Deeds
+ * blew out to 1152x8184 with its close button off-screen, the leaderboard
+ * collapsed to 26px. So on touch the drag waits for real travel (the same slop
+ * the resize grip uses), and when it engages it first locks the window's
+ * current on-screen size inline, so the pin moves the window without resizing
+ * it. A tap leaves the window untouched.
+ */
+interface PendingTouchDrag {
+  el: HTMLElement;
+  target: HTMLElement;
+  pointerId: number;
+  downX: number;
+  downY: number;
+  slop: number;
+}
+
+/** True while the touch HUD is up (body.mobile-touch toggles at runtime). */
+function touchLayout(el: HTMLElement): boolean {
+  return el.ownerDocument?.body?.classList.contains('mobile-touch') ?? false;
+}
+
 export function installWindowDrag(deps: WindowDragDeps): WindowDragController {
   const requestFrame =
     deps.requestFrame ??
     ((callback: FrameRequestCallback) => window.requestAnimationFrame(callback));
   const cancelFrame = deps.cancelFrame ?? ((id: number) => window.cancelAnimationFrame(id));
   let session: DragSession | null = null;
+  let pending: PendingTouchDrag | null = null;
 
   const clearSession = (commit: boolean) => {
     const drag = session;
@@ -107,7 +139,45 @@ export function installWindowDrag(deps: WindowDragDeps): WindowDragController {
     event.preventDefault();
     deps.hideTooltip();
 
+    if (touchLayout(el)) {
+      // Record the press only; engageDrag runs once it travels the slop.
+      pending = {
+        el,
+        target,
+        pointerId: event.pointerId,
+        downX: event.clientX,
+        downY: event.clientY,
+        slop: event.pointerType === 'mouse' ? RESIZE_ENGAGE_SLOP : RESIZE_ENGAGE_SLOP_TOUCH,
+      };
+      return;
+    }
+    engageDrag(el, target, event.pointerId, event.clientX, event.clientY, false);
+  };
+
+  /** Pin the window and open the drag session. `lockSize` (the touch path)
+   *  first writes the window's current on-screen size inline, so the pin's
+   *  right/bottom:auto cannot resize an edge-pinned sheet. The grab offset is
+   *  measured from the PRESS point, so the window follows the finger from
+   *  where it was grabbed rather than jumping by the slop. */
+  const engageDrag = (
+    el: HTMLElement,
+    target: HTMLElement,
+    pointerId: number,
+    downX: number,
+    downY: number,
+    lockSize: boolean,
+  ) => {
     const initialRect = el.getBoundingClientRect();
+    if (lockSize) {
+      // Capped at the viewport less the drag margin on both sides: a sheet that
+      // fills the screen (the inset-0 character sheet) would otherwise be held
+      // at the margin by draggedWindowPosition and spill off the far edge.
+      const z = Math.max(Number.EPSILON, deps.getScale());
+      const maxW = window.innerWidth / z - WINDOW_DRAG_MARGIN * 2;
+      const maxH = window.innerHeight / z - WINDOW_DRAG_MARGIN * 2;
+      el.style.width = `${Math.min(initialRect.width / z, maxW)}px`;
+      el.style.height = `${Math.min(initialRect.height / z, maxH)}px`;
+    }
     deps.pinWindow(el, initialRect);
     // Pinning can clamp a previously centered or off-screen window. Measure the
     // resulting baseline once, then do no layout reads for the rest of the drag.
@@ -116,13 +186,13 @@ export function installWindowDrag(deps: WindowDragDeps): WindowDragController {
     const start = { left: rect.left / scale, top: rect.top / scale };
     session = {
       el,
-      pointerId: event.pointerId,
+      pointerId,
       scale,
       start,
       current: start,
       rendered: start,
-      grabOffsetX: event.clientX - rect.left,
-      grabOffsetY: event.clientY - rect.top,
+      grabOffsetX: downX - rect.left,
+      grabOffsetY: downY - rect.top,
       windowWidth: rect.width / scale,
       windowHeight: rect.height / scale,
       frameId: null,
@@ -132,13 +202,28 @@ export function installWindowDrag(deps: WindowDragDeps): WindowDragController {
     document.body.classList.add('window-drag-active');
     el.dataset.windowMoved = '1';
     try {
-      target.setPointerCapture?.(event.pointerId);
+      target.setPointerCapture?.(pointerId);
     } catch {
       /* synthetic or legacy pointer without active capture */
     }
   };
 
   const onPointerMove = (event: PointerEvent) => {
+    const press = pending;
+    if (press && press.pointerId === event.pointerId) {
+      // A swallowed pointerup must not strand the pending press: no buttons
+      // down means it already ended, so drop it instead of engaging.
+      if (event.buttons === 0) {
+        pending = null;
+        return;
+      }
+      const travelled =
+        Math.abs(event.clientX - press.downX) >= press.slop ||
+        Math.abs(event.clientY - press.downY) >= press.slop;
+      if (!travelled) return;
+      pending = null;
+      engageDrag(press.el, press.target, press.pointerId, press.downX, press.downY, true);
+    }
     const drag = session;
     if (!drag || drag.pointerId !== event.pointerId) return;
     event.preventDefault();
@@ -164,6 +249,8 @@ export function installWindowDrag(deps: WindowDragDeps): WindowDragController {
   };
 
   const onPointerEnd = (event: PointerEvent) => {
+    // A touch press that never travelled the slop was a tap: nothing to undo.
+    if (pending?.pointerId === event.pointerId) pending = null;
     if (session?.pointerId === event.pointerId) clearSession(true);
   };
 
@@ -174,10 +261,12 @@ export function installWindowDrag(deps: WindowDragDeps): WindowDragController {
 
   return {
     cancel(el) {
+      if (pending && (!el || pending.el === el)) pending = null;
       if (!session || (el && session.el !== el)) return;
       clearSession(true);
     },
     destroy() {
+      pending = null;
       clearSession(true);
       document.removeEventListener('pointerdown', onPointerDown);
       document.removeEventListener('pointermove', onPointerMove);

@@ -3466,10 +3466,19 @@ describe('client HTML shell', () => {
     // non-auto height over-constrains the box, so the browser drops `bottom` and
     // the sheet renders off the bottom of a landscape phone.
     expect(hudMobileCss).toContain(
-      'body.mobile-touch #bags {\n    position: fixed;\n    left: max(10px, env(safe-area-inset-left));\n    right: max(10px, env(safe-area-inset-right));\n    top: max(10px, env(safe-area-inset-top));\n    bottom: max(10px, env(safe-area-inset-bottom));\n    width: auto;',
+      'body.mobile-touch #bags {\n    position: fixed;\n    left: max(10px, env(safe-area-inset-left));\n    right: auto;\n    top: max(10px, env(safe-area-inset-top));\n    bottom: max(10px, env(safe-area-inset-bottom));\n    width: fit-content;',
     );
     expect(hudMobileCss).toMatch(
       /body\.mobile-touch #bags \{[^}]*height: auto;[^}]*transform: none;/,
+    );
+    // Standalone the sheet is content-width from the edge away from the action
+    // ring, so the ring stays visible as a drop target, capped at the viewport;
+    // the left-handed layout moves the ring left, so the sheet mirrors right.
+    const bagsStart = hudMobileCss.indexOf('body.mobile-touch #bags {');
+    const bagsBlock = hudMobileCss.slice(bagsStart, hudMobileCss.indexOf('}', bagsStart));
+    expect(bagsBlock).toContain('max-width: calc(var(--app-vw) / var(--ui-scale, 1) - 20px);');
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch.mobile-left-handed #bags {\n    left: auto;\n    right: max(10px, env(safe-area-inset-right));\n  }',
     );
     expect(hudMobileCss).toContain('body.mobile-touch #bags .bag-grid {\n    min-height: 150px;');
     expect(hudMobileCss).not.toContain(
@@ -3480,16 +3489,16 @@ describe('client HTML shell', () => {
 
   it('combines Trader and Bags into a mobile split-pane modal', () => {
     expect(hudMobileCss).toContain(
-      'body.mobile-touch.vendor-open #vendor-window,\n  body.mobile-touch.vendor-open #bags {\n    position: fixed;\n    top: max(10px, env(safe-area-inset-top));\n    bottom: calc(72px + env(safe-area-inset-bottom));',
+      'body.mobile-touch.vendor-open #vendor-window,\n  body.mobile-touch.vendor-open #bags {\n    position: fixed;\n    top: max(10px, env(safe-area-inset-top)) !important;\n    bottom: calc(72px + env(safe-area-inset-bottom)) !important;',
     );
     // The split point divides the shared --app-vw box by the live uiScale: #ui's
     // zoom multiplies author lengths, so a raw 50vw only tiles at scale 1 (the
     // halves gap above 1 and overlap below 1; the 2026-07-07 bank QA finding).
     expect(hudMobileCss).toContain(
-      'body.mobile-touch.vendor-open #vendor-window {\n    left: max(10px, env(safe-area-inset-left));\n    right: calc(var(--app-vw) / var(--ui-scale, 1) / 2);',
+      'body.mobile-touch.vendor-open #vendor-window {\n    left: max(10px, env(safe-area-inset-left)) !important;\n    right: calc(var(--app-vw) / var(--ui-scale, 1) / 2) !important;',
     );
     expect(hudMobileCss).toContain(
-      'body.mobile-touch.vendor-open #bags {\n    left: calc(var(--app-vw) / var(--ui-scale, 1) / 2);\n    right: max(10px, env(safe-area-inset-right));',
+      'body.mobile-touch.vendor-open #bags {\n    left: calc(var(--app-vw) / var(--ui-scale, 1) / 2) !important;\n    right: max(10px, env(safe-area-inset-right)) !important;',
     );
     expect(hudMobileCss).toContain(
       'body.mobile-touch.vendor-open #vendor-window .panel-title,\n  body.mobile-touch.vendor-open #bags .panel-title {\n    height: 47px;\n    min-height: 47px;',
