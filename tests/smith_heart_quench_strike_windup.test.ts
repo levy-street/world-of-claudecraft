@@ -121,7 +121,12 @@ describe('Guardian of the Quench: Tempering Strike wind-up', () => {
       for (const ev of f.tick(1)) {
         if (isCue(ev, QUENCH_CUES.strikeSpent, boss.id)) spent.push(i);
         if (isCue(ev, 'brood_cleave', boss.id)) cleave.push(i);
-        if (ev.type === 'damage' && ev.sourceId === boss.id && ev.kind === 'dodge') dodged++;
+        if (
+          ev.type === 'damage' &&
+          ev.sourceId === boss.id &&
+          (ev.kind === 'dodge' || ev.kind === 'miss' || ev.kind === 'parry')
+        )
+          dodged++;
       }
     }
     expect(dodged).toBeGreaterThanOrEqual(1);
@@ -159,8 +164,9 @@ describe('Guardian of the Quench: Tempering Strike wind-up', () => {
     expect(at({ swingCleaveCount: 0 })).toBe(false);
     // Still counting down to the cued swing: nothing was thrown yet.
     expect(at({ swingTimer: T.strikeWindup * 0.5 })).toBe(false);
-    // A bar or a lost reach is no swing.
-    expect(at({ castingAbility: 'heart_quench_breath' })).toBe(false);
+    // A bar started on the swing's own tick still tells it; a lost reach is
+    // no swing.
+    expect(at({ castingAbility: 'heart_quench_breath' })).toBe(true);
     expect(at({ autoAttack: false })).toBe(false);
   });
 

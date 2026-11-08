@@ -36,7 +36,11 @@ export function strikeWindupDue(boss: {
 
 /** Was the cued cleaving swing just thrown and avoided? Its count still
  *  waits on the cleave while a fresh swing wait has begun, her target still
- *  in reach and no bar on her (a landed swing would have moved the count on). */
+ *  in reach (a landed swing would have moved the count on). A bar started on
+ *  the very tick of the swing still tells it (the body lets the raise go for
+ *  the bar either way). Invariant this reads: nothing but a swing lifts her
+ *  swing timer past `strikeWindup` while the count waits (the bars clamp it to
+ *  0.6, under the lead); a new timer raise above it must swing first. */
 export function strikeSpentDue(boss: {
   swingCleaveCount?: number;
   autoAttack: boolean;
@@ -46,7 +50,6 @@ export function strikeSpentDue(boss: {
   return (
     (boss.swingCleaveCount ?? 0) === T.strikeEvery - 1 &&
     boss.autoAttack &&
-    boss.castingAbility === null &&
     boss.swingTimer > T.strikeWindup
   );
 }
