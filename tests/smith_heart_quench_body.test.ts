@@ -507,10 +507,17 @@ describe('QuenchBody over a fake world', () => {
     expect(cracks.some((c) => c.visible)).toBe(false);
     expect(fx.handleEvent(cue(QUENCH_CUES.strikeReady, 'windup'))).toBe(false);
     expect(sent.at(-1)).toBe(QUENCH_BODY_GESTURES.strikeRaise);
-    for (let i = 0; i < 20; i++) fx.update(1 / 20);
+    for (let i = 0; i < 14; i++) fx.update(1 / 20);
     expect(windRing?.visible).toBe(true);
     expect(fistFlare?.visible).toBe(true);
     expect(spiral?.visible).toBe(true);
+    // The downswing a breath before the swing (round 4): the spirals let go
+    // of her forearms, the ring and the flare stay (the telegraph).
+    for (let i = 0; i < 6; i++) fx.update(1 / 20);
+    expect(sent).toContain(QUENCH_BODY_GESTURES.strikeFall);
+    expect(spiral?.visible).toBe(false);
+    expect(windRing?.visible).toBe(true);
+    expect(fistFlare?.visible).toBe(true);
     // No slam while she only holds her fists up.
     expect(cracks.some((c) => c.visible)).toBe(false);
     expect(fx.handleEvent(cue(ARC_CLEAVE_ABILITY, 'windup'))).toBe(true);

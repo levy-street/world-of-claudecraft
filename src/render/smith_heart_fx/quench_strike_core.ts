@@ -9,17 +9,59 @@
 // on the fists only (QUENCH_BURST).
 // Node-only (RENDER_PURE_CORES): no three.js, no DOM, deterministic.
 
+import { QUENCH_TUNING } from '../../sim/encounters/smith_heart/quench_ids';
+
 const clamp01 = (t: number) => Math.max(0, Math.min(1, t));
 
 /** Seconds from the wind-up cue to the fists on the ice (the StrikeWind
  *  clip's contact, frame 30 at 30 fps; the sim cues it this far ahead). */
-export const QUENCH_STRIKE_WIND = 1;
+export const QUENCH_STRIKE_WIND = QUENCH_TUNING.strikeWindup;
 
 /** A wind-up seen this recently owns the swing's outcome (round 3): the
  *  cleave's own cue then plays the slam from her raised fists (StrikeSlam), an
  *  avoided swing's cue a plain swing (StrikeSpent). Past it the raise has
  *  lowered on its own (the StrikeRaise clip's hold). */
 export const QUENCH_STRIKE_WIND_OWNS = 1.6;
+
+/** Round 4: her fists meet the ice on the frame the cleave lands. The fight
+ *  cues the wind-up exactly `strikeWindup` seconds before the swing (a fixed
+ *  countdown of her swing timer), so the body starts the downswing
+ *  (StrikeFall) `lead` seconds ahead of it: on the swing her fists are low
+ *  over the ice in front of her, crouched. The cleave's cue then finishes the
+ *  blow on its own frame (StrikeSlam's contact is its first frame, faded in
+ *  over `slamFade`); an avoided swing's cue sweeps them aside over the ice
+ *  without touching it (StrikeSpent, no cracks). No outcome `grace` seconds
+ *  past the swing (her target left her reach, a bar took her): she lets the
+ *  blow go the same plain way. The sim's damage is never delayed: only the
+ *  downswing's start moves earlier. */
+export const QUENCH_STRIKE_FALL = {
+  lead: 6 / 30,
+  grace: 0.35,
+  slamFade: 0.02,
+  spentFade: 0.08,
+} as const;
+
+/** What the downswing does `sinceWind` seconds after the wind-up cue, for a
+ *  wind-up still waiting on its swing: 'fall' once (the downswing begins),
+ *  'release' once the swing is overdue (let the blow go), else null. */
+export function quenchStrikeFallStep(
+  sinceWind: number,
+  fallen: boolean,
+  casting: boolean,
+): 'fall' | 'release' | null {
+  if (!fallen) {
+    if (casting) return null;
+    return sinceWind >= QUENCH_STRIKE_WIND - QUENCH_STRIKE_FALL.lead ? 'fall' : null;
+  }
+  return sinceWind >= QUENCH_STRIKE_WIND + QUENCH_STRIKE_FALL.grace ? 'release' : null;
+}
+
+/** Has the downswing begun `sinceWind` seconds after the wind-up cue (so the
+ *  outcome lands from her low fists, StrikeSlam / StrikeSpent), or does the
+ *  outcome come early and play from her raised fists (the High clips)? */
+export function quenchStrikeFallen(sinceWind: number): boolean {
+  return sinceWind >= QUENCH_STRIKE_WIND - QUENCH_STRIKE_FALL.lead;
+}
 
 /** Tempering Strike's spikes ripple out behind the cracks (round 3: the
  *  cracks were hidden under spikes that all stood at once): the first spike

@@ -28,6 +28,7 @@ import {
   QUENCH_TUNING,
 } from '../../sim/encounters/smith_heart/quench_ids';
 import type { V3 } from './final_fx_core';
+import { QUENCH_STRIKE_FALL } from './quench_strike_core';
 
 export type { V3 };
 export { QUENCH_GUARDIAN };
@@ -45,8 +46,11 @@ export const QUENCH_BODY_CLIPS = [
   'Attack2',
   'Strike',
   'StrikeRaise',
+  'StrikeFall',
   'StrikeSlam',
   'StrikeSpent',
+  'StrikeSlamHigh',
+  'StrikeSpentHigh',
   'Breath',
   'Wake',
   'WakeHold',
@@ -83,11 +87,22 @@ export const QUENCH_BODY_CLIP = {
    *  (lowering on its own from `strikeRaiseHold`); StrikeSlam hammers them
    *  on the ice when the cleave fires (contact `strikeSlam` in), StrikeSpent
    *  brings them down as a plain backhand when the swing is avoided (its fist
-   *  through the swing `strikeSpent` in). */
+   *  through the swing `strikeSpent` in). Round 4: the downswing is its own
+   *  clip, StrikeFall, started `strikeFall` ahead of the swing (her fists low
+   *  over the ice in front of her, crouched, on the swing's frame); StrikeSlam
+   *  then lands them on its FIRST frame (contact 0, the cleave's own frame)
+   *  and StrikeSpent sweeps them aside over the ice from that low pose. */
   strikeRaiseTop: 22 / 30,
   strikeRaiseHold: 48 / 30,
-  strikeSlam: 4 / 30,
-  strikeSpent: 6 / 30,
+  strikeFall: QUENCH_STRIKE_FALL.lead,
+  strikeSlam: 0,
+  strikeSpent: 5 / 30,
+  /** The same outcomes arriving before the downswing began (a wind-up cue
+   *  delivered late on a lagging client): from her raised fists, the slam
+   *  lands on frame 4 (StrikeSlamHigh), the sweep passes on frame 6
+   *  (StrikeSpentHigh). */
+  strikeSlamHigh: 4 / 30,
+  strikeSpentHigh: 6 / 30,
   /** Quenching Breath: reared back through the bar, the cold thrown out of
    *  her mouth on the bar's end (Breath; its exhale plays out after it). */
   breath: 75 / 30,
@@ -113,11 +128,19 @@ export const QUENCH_BODY_GESTURES = {
   /** Tempering Strike's wind-up: fists raised high over her crown and held
    *  (StrikeRaise), on the fight's wind-up cue a second before the swing. */
   strikeRaise: 'smith_heart_quench_body_strike_raise',
+  /** The downswing, a breath before the swing (StrikeFall): her fists driven
+   *  down to low over the ice, held there for the swing's outcome. */
+  strikeFall: 'smith_heart_quench_body_strike_fall',
   /** The cleave fired: the raised fists hammer the ice (StrikeSlam). */
   strikeSlam: 'smith_heart_quench_body_strike_slam',
   /** The cued swing was avoided: the raised fists come down as a plain
    *  swing, never a slam on nothing (StrikeSpent). */
   strikeSpent: 'smith_heart_quench_body_strike_spent',
+  /** The cleave fired before the downswing began: the slam from her raised
+   *  fists (StrikeSlamHigh). */
+  strikeSlamHigh: 'smith_heart_quench_body_strike_slam_high',
+  /** An avoided swing told before the downswing began (StrikeSpentHigh). */
+  strikeSpentHigh: 'smith_heart_quench_body_strike_spent_high',
 } as const;
 
 /** The bars that play a clip timed onto the bar's end, and the beat that lands
@@ -340,6 +363,22 @@ export function newGlowLook(): QuenchGlowLook {
 export const QUENCH_BREATH_PERIOD = 4;
 
 /** The look of `action` at `k`, on render time `t`, written into `out`. */
+/** Round 4: the width (model units) of the glint drawn on each eye for an
+ *  eye light `eyes` (quenchGlowLook). Kept well under half her face's width
+ *  (about 0.6 units) even flaring, so the painted face (sockets, brows, lips)
+ *  still reads around her burning eyes at gameplay distance. */
+export function quenchEyeGlintSize(eyes: number): number {
+  return 0.16 + 0.1 * Math.max(0, Math.min(2, eyes));
+}
+
+/** Round 4: the width (model units) of the soft halo round her heart for a
+ *  heart light `heart` (capped at 2.4 by the painter). Its rim stays under her
+ *  chin at rest (her heart sits about 1.9 units under her eyes), so it frames
+ *  the star in her chest without washing her face pale; flaring, it swells. */
+export function quenchHeartHaloSize(heart: number): number {
+  return 1.6 + 1.1 * Math.max(0, Math.min(2.4, heart));
+}
+
 export function quenchGlowLook(
   action: QuenchBodyAction,
   k: number,

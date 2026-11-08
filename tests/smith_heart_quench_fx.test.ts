@@ -190,7 +190,9 @@ describe("the Quench guardian's effects", () => {
     const cue = (ability: string) => ({ ...strike, ability }) as SimEvent;
     const fast = Math.ceil(QUENCH_BODY_CLIP.strikeSlam * 30) + 1;
     expect(fx.handleEvent(cue(QUENCH_CUES.strikeReady))).toBe(false);
-    for (let i = 0; i < 20; i++) fx.update(1 / 30);
+    // The swing comes `strikeWindup` after its cue (round 4: the downswing has
+    // begun by then, so the slam lands on its first frame).
+    for (let i = 0; i < 30; i++) fx.update(1 / 30);
     fx.handleEvent(strike);
     for (let i = 0; i < fast; i++) fx.update(1 / 30);
     expect(shown(root, 'smithHeartQuenchStrikeIce')).toBe(1);

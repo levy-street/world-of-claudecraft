@@ -68,7 +68,11 @@ import {
   strikeSpikes,
 } from './quench_fx_core';
 import { quenchSpikeGeometry } from './quench_spike_geometry';
-import { QUENCH_STRIKE_WIND_OWNS, quenchStrikeSpikeDelay } from './quench_strike_core';
+import {
+  QUENCH_STRIKE_WIND_OWNS,
+  quenchStrikeFallen,
+  quenchStrikeSpikeDelay,
+} from './quench_strike_core';
 
 const SCAN_SEC = 0.1;
 const C = QUENCH_FX_COLORS;
@@ -258,6 +262,10 @@ export class QuenchFx {
     compileGate?: (target: THREE.Object3D) => Promise<unknown>,
     private readonly reducedMotion: () => boolean = () => false,
     private readonly shakeSink?: (amount: number) => void,
+    /** Seconds from the cleave's cue to her fists on the ice as her body
+     *  decided it for that cue (QuenchBody.strikeContactNow, handled first),
+     *  so the spikes and the fists never disagree; absent, judged here. */
+    private readonly strikeContactOf?: () => number,
   ) {
     this.root.name = 'smith-heart-quench-fx';
     setRenderCategory(this.root, 'ui3d');
@@ -420,12 +428,21 @@ export class QuenchFx {
       if (e && e.templateId === QUENCH_GUARDIAN) {
         // On her fists' contact: the fast slam from her raised fists, or the
         // short Strike's beat when no wind-up was seen.
-        const wound = this.clock - this.windAt < QUENCH_STRIKE_WIND_OWNS;
+        const windAt = this.windAt;
+        const wound = this.clock - windAt < QUENCH_STRIKE_WIND_OWNS;
         this.windAt = -99;
         const p = this.pendingStrike;
         p.live = true;
         p.id = e.id;
-        p.at = this.clock + (wound ? QUENCH_BODY_CLIP.strikeSlam : QUENCH_BODY_CLIP.strike);
+        p.at =
+          this.clock +
+          (this.strikeContactOf
+            ? this.strikeContactOf()
+            : !wound
+              ? QUENCH_BODY_CLIP.strike
+              : quenchStrikeFallen(this.clock - windAt)
+                ? QUENCH_BODY_CLIP.strikeSlam
+                : QUENCH_BODY_CLIP.strikeSlamHigh);
         p.x = e.pos.x;
         p.z = e.pos.z;
         p.yaw = e.facing;

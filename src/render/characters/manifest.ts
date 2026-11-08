@@ -477,6 +477,11 @@ export interface ClipMap {
    *  are held until the listed contact (attack_swing_core.ts contactDelaySec; the FCT painter
    *  and contact_queue.ts). Absent or unlisted = the effects play at once. */
   contacts?: Readonly<Record<string, readonly number[]>>;
+  /** Seconds a named one-shot crossfades in over, in place of the standard one-shot fade
+   *  (0.1 s). For a blow whose contact is its first frame, played on the event that lands it
+   *  from a pose already low over its mark (the Quench queen's StrikeSlam): a short fade puts
+   *  the fists on the ice on the damage's own frame. Absent = the standard fade. */
+  oneShotFade?: Readonly<Record<string, number>>;
   /** Clips minted at load by cutting a GLB clip in two at `at` seconds, under
    *  the given names, for a cast that must HOLD one half and release the other
    *  (the hunter's timed shots: the aim half is the generic cast clip held at

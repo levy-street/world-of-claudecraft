@@ -45,6 +45,7 @@ import {
   QUENCH_BODY_HEIGHT,
   QUENCH_BODY_URL,
 } from '../smith_heart_fx/quench_body_core';
+import { QUENCH_STRIKE_FALL } from '../smith_heart_fx/quench_strike_core';
 import type { MeshToggleDef } from './gesture_mesh_toggles';
 import type { ClipMap, VisualDef } from './manifest';
 
@@ -221,7 +222,8 @@ const BREATH_CALM = breathClips(false);
 // on the fight's wind-up cue a second ahead of the cleaving swing and holds
 // them for its outcome (StrikeRaise): the cleave hammers them on the ice
 // (StrikeSlam), an avoided swing brings them down as a plain backhand
-// (StrikeSpent); the cleave's own cue plays the short Strike only when no
+// (StrikeSpent); a breath before the swing the downswing begins (StrikeFall),
+// so the slam lands its fists on the cleave's own frame; the cleave's own cue plays the short Strike only when no
 // wind-up was seen; Quenching Breath rears her back through its bar
 // and throws the cold out of her mouth on the bar's end, the exhale playing
 // out; the Blades Wake raises both arms through its 4 s bar and throws them
@@ -240,20 +242,34 @@ const QUENCH_CLIPS: ClipMap = {
     Strike: [QUENCH_BODY_CLIP.strike],
     StrikeSlam: [QUENCH_BODY_CLIP.strikeSlam],
     StrikeSpent: [QUENCH_BODY_CLIP.strikeSpent],
+    StrikeSlamHigh: [QUENCH_BODY_CLIP.strikeSlamHigh],
+    StrikeSpentHigh: [QUENCH_BODY_CLIP.strikeSpentHigh],
+  },
+  // The slam lands on its first frame, played on the cleave's own frame from
+  // the downswing's low pose: a short fade puts her fists on the ice at once.
+  oneShotFade: {
+    StrikeSlam: QUENCH_STRIKE_FALL.slamFade,
+    StrikeSpent: QUENCH_STRIKE_FALL.spentFade,
   },
   attackByAbility: {
     [ARC_CLEAVE_ABILITY]: 'Strike',
     [QUENCH_BODY_GESTURES.strikeRaise]: 'StrikeRaise',
+    [QUENCH_BODY_GESTURES.strikeFall]: 'StrikeFall',
     [QUENCH_BODY_GESTURES.strikeSlam]: 'StrikeSlam',
     [QUENCH_BODY_GESTURES.strikeSpent]: 'StrikeSpent',
+    [QUENCH_BODY_GESTURES.strikeSlamHigh]: 'StrikeSlamHigh',
+    [QUENCH_BODY_GESTURES.strikeSpentHigh]: 'StrikeSpentHigh',
     [QUENCH_BODY_GESTURES.taunt]: 'Taunt',
     [QUENCH_BODY_GESTURES.slash]: 'Slash',
   },
   attackTimeScaleByAbility: {
     [ARC_CLEAVE_ABILITY]: 1,
     [QUENCH_BODY_GESTURES.strikeRaise]: 1,
+    [QUENCH_BODY_GESTURES.strikeFall]: 1,
     [QUENCH_BODY_GESTURES.strikeSlam]: 1,
     [QUENCH_BODY_GESTURES.strikeSpent]: 1,
+    [QUENCH_BODY_GESTURES.strikeSlamHigh]: 1,
+    [QUENCH_BODY_GESTURES.strikeSpentHigh]: 1,
     [QUENCH_BODY_GESTURES.taunt]: 1,
     [QUENCH_BODY_GESTURES.slash]: 1,
   },
@@ -338,8 +354,11 @@ export const SMITH_HEART_BOSS_LOOKS: Record<string, VisualDef> = {
       'Wake',
       'Strike',
       'StrikeRaise',
+      'StrikeFall',
       'StrikeSlam',
       'StrikeSpent',
+      'StrikeSlamHigh',
+      'StrikeSpentHigh',
       'Taunt',
       'Slash',
     ],

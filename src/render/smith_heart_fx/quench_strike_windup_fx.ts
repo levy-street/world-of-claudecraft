@@ -84,7 +84,9 @@ void main() {
   gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 }
 `;
-/** Cold light flowing up the strand into the fist. */
+/** Cold light flowing up the strand into the fist: travelling streaks over a
+ *  faint trace (round 4: an even glow along the whole helix read as a coiled
+ *  spring round her arm). */
 const SPIRAL_FRAG = /* glsl */ `
 uniform float uAlpha;
 uniform float uTime;
@@ -92,9 +94,9 @@ uniform vec3 uCrest;
 uniform vec3 uHot;
 varying float vS;
 void main() {
-  float f = fract(vS * 3.0 - uTime * 2.4);
-  float pulse = smoothstep(0.0, 0.12, f) * (1.0 - smoothstep(0.12, 0.55, f));
-  float a = uAlpha * (0.4 + 0.6 * pulse) * smoothstep(0.0, 0.2, vS);
+  float f = fract(vS * 4.0 - uTime * 2.4);
+  float pulse = smoothstep(0.0, 0.1, f) * (1.0 - smoothstep(0.1, 0.45, f));
+  float a = uAlpha * (0.1 + 0.9 * pulse) * smoothstep(0.0, 0.2, vS);
   vec3 col = mix(uCrest, uHot, vS * vS * 0.8 + pulse * 0.3);
   gl_FragColor = vec4(col * a, a);
 }
@@ -129,6 +131,7 @@ export class QuenchStrikeWindup {
   private startAt = -99;
   private endKind: QuenchWindupEnd = 'pending';
   private endAt = -99;
+  private fallAt = -1;
   private live = false;
 
   constructor(
@@ -229,7 +232,13 @@ export class QuenchStrikeWindup {
     this.startAt = clock;
     this.endKind = 'pending';
     this.endAt = -99;
+    this.fallAt = -1;
     this.live = true;
+  }
+
+  /** The downswing began (round 4): the spirals let go, the flare shrinks. */
+  fall(clock: number): void {
+    if (this.live && this.endKind === 'pending' && this.fallAt < 0) this.fallAt = clock;
   }
 
   /** The swing's outcome: the slam, or a spent (avoided) swing. */
@@ -256,7 +265,13 @@ export class QuenchStrikeWindup {
   ): void {
     if (!this.live) return;
     const t = clock - this.startAt;
-    const look = quenchWindupLook(t, this.endKind, clock - this.endAt, _look);
+    const look = quenchWindupLook(
+      t,
+      this.endKind,
+      clock - this.endAt,
+      _look,
+      this.fallAt < 0 ? -1 : clock - this.fallAt,
+    );
     if (look.alpha <= 0 && t > W.rise) {
       this.hide();
       return;

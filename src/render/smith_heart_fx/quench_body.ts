@@ -97,7 +97,9 @@ import {
   type QuenchSocketId,
   quenchBodyAction,
   quenchDeathLook,
+  quenchEyeGlintSize,
   quenchGlowLook,
+  quenchHeartHaloSize,
   quenchSocketIndex,
   quenchStatueGlaze,
 } from './quench_body_core';
@@ -119,9 +121,11 @@ import {
   QUENCH_STRIKE_COLORS,
   QUENCH_STRIKE_CRACKS,
   QUENCH_STRIKE_WIND_OWNS,
+  quenchStrikeFallStep,
   quenchStrikeWindLook,
 } from './quench_strike_core';
 import { QuenchStrikeCracks } from './quench_strike_cracks';
+import { QUENCH_WINDUP } from './quench_strike_windup_core';
 import { QuenchStrikeWindup } from './quench_strike_windup_fx';
 import { QuenchWakeFx } from './quench_wake_fx';
 import { QuenchWakeThrow } from './quench_wake_throw';
@@ -370,6 +374,8 @@ export class QuenchBody {
    *  on the swing's outcome. */
   private windAt = -99;
   private windPending = false;
+  /** The downswing (StrikeFall) begun for the wind-up still waiting. */
+  private windFallen = false;
   private breathAt = -99;
   /** The cone's bearing as the breath landed (QuenchFx lays its ice on it):
    *  the blast keeps it while she turns back to her tank. */
@@ -535,6 +541,13 @@ export class QuenchBody {
     if (this.entityId >= 0) this.playGesture?.(this.entityId, gesture);
   }
 
+  /** Seconds from the last cleave cue to her fists on the ice, as decided on
+   *  that cue (the slam from the downswing, from her raised fists, or the
+   *  short Strike): QuenchFx times the strike's spikes on it. */
+  strikeContactNow(): number {
+    return this.strikeContact;
+  }
+
   /** Claims one event only: the cleave's own cue while her wind-up waits on
    *  it (she slams from her raised fists; the renderer's short Strike would
    *  restart the gesture). Every other cue's own draws still play under these. */
@@ -546,17 +559,23 @@ export class QuenchBody {
       // held for the swing's outcome a second on.
       this.windAt = this.clock;
       this.windPending = true;
+      this.windFallen = false;
       this.windup.begin(this.clock);
       this.send(QUENCH_BODY_GESTURES.strikeRaise);
     } else if (ev.fx === 'windup' && ev.ability === ARC_CLEAVE_ABILITY) {
       this.strikeAt = this.clock;
       this.strikeHit = false;
       if (this.windPending && this.clock - this.windAt < QUENCH_STRIKE_WIND_OWNS) {
-        // The cleave fired: the raised fists hammer the ice.
+        // The cleave fired: the fists hammer the ice, on this very frame from
+        // the downswing, or from the raised fists when the outcome came first.
         this.windPending = false;
         this.windup.end('slam', this.clock);
-        this.strikeContact = QUENCH_BODY_CLIP.strikeSlam;
-        this.send(QUENCH_BODY_GESTURES.strikeSlam);
+        this.strikeContact = this.windFallen
+          ? QUENCH_BODY_CLIP.strikeSlam
+          : QUENCH_BODY_CLIP.strikeSlamHigh;
+        this.send(
+          this.windFallen ? QUENCH_BODY_GESTURES.strikeSlam : QUENCH_BODY_GESTURES.strikeSlamHigh,
+        );
         return true;
       }
       // No wind-up seen (a swing that came at once): the short Strike, her
@@ -568,7 +587,9 @@ export class QuenchBody {
       if (this.windPending) {
         this.windPending = false;
         this.windup.end('spent', this.clock);
-        this.send(QUENCH_BODY_GESTURES.strikeSpent);
+        this.send(
+          this.windFallen ? QUENCH_BODY_GESTURES.strikeSpent : QUENCH_BODY_GESTURES.strikeSpentHigh,
+        );
         this.spentFx();
       }
     } else if (ev.ability === QUENCH_CASTS.breath) {
@@ -652,7 +673,10 @@ export class QuenchBody {
     if (slash && this.entityId >= 0 && this.clock - this.slashAt > QUENCH_SLASH_GAP) {
       this.slashAt = this.clock;
       const g = world.entities.get(this.entityId);
-      if (g && !g.dead && !g.castingAbility) this.send(QUENCH_BODY_GESTURES.slash);
+      // Never while her fists are up for Tempering Strike (round 4: the point
+      // cut the held wind-up online, and the slam then came from nowhere).
+      if (g && !g.dead && !g.castingAbility && !this.windPending)
+        this.send(QUENCH_BODY_GESTURES.slash);
     }
   }
 
@@ -740,8 +764,29 @@ export class QuenchBody {
     _actIn.sinceBreath = this.clock - this.breathAt;
     _actIn.sinceStrike = this.clock - this.strikeAt;
     _actIn.sinceWake = this.clock - this.wakeAt;
+    // The downswing a breath before the swing (her fists low over the ice on
+    // its frame), or, the swing overdue, the blow let go as a plain sweep.
+    if (this.windPending) {
+      const step = quenchStrikeFallStep(
+        this.clock - this.windAt,
+        this.windFallen,
+        e.castingAbility !== null,
+      );
+      if (step === 'fall') {
+        this.windFallen = true;
+        this.windup.fall(this.clock);
+        this.send(QUENCH_BODY_GESTURES.strikeFall);
+      } else if (step === 'release') {
+        this.windPending = false;
+        this.windup.end('spent', this.clock);
+        this.send(QUENCH_BODY_GESTURES.strikeSpent);
+        this.spentFx();
+      }
+    }
     // A wind-up still waiting on its swing: a bar that took her body, or a
     // hold that ran out, lets it go (the fight cues the held swing afresh).
+    // Before the downswing the raise just lowers on its own (no gesture); once
+    // fallen, the 'release' step above has already let the blow go.
     if (
       this.windPending &&
       (e.castingAbility !== null || this.clock - this.windAt >= QUENCH_STRIKE_WIND_OWNS)
@@ -754,7 +799,13 @@ export class QuenchBody {
     const look = quenchGlowLook(_act.action, _act.k, this.clock, awake, _look);
     if (_act.action === 'breath' && _act.k > 0.95) this.flaredBreath = true;
     else if (_act.action !== 'breath') this.flaredBreath = false;
-    this.lights(look.heart, look.eyes, look.crown, look.bracers, look.gather, 1);
+    // On the downswing her bracers pass in front of her face and her crown
+    // bows forward over it: their glow sprites dim so they never blot her
+    // out (round 4).
+    const falling = this.windPending && this.windFallen;
+    const bracers = falling ? look.bracers * QUENCH_WINDUP.fallFist : look.bracers;
+    const crown = falling ? Math.min(look.crown, 0.9) : look.crown;
+    this.lights(look.heart, look.eyes, crown, bracers, look.gather, 1);
     this.ambient(e, dt, look.plume, 1);
     this.gatherFx(dt, look.gather);
     this.exhaleFx(e, dt);
@@ -795,13 +846,18 @@ export class QuenchBody {
     const hc = Math.min(2.4, heart);
     this.heartCore.scale.setScalar((0.9 + 0.5 * hc) * U);
     this.heartMat.opacity = Math.min(1, 0.55 + 0.25 * hc) * life;
-    this.heartHalo.scale.setScalar((2.6 + 1.6 * hc) * U);
+    // Round 4: the halo kept under her chin (it washed her face pale from
+    // every distance); the core and the cracks still blaze.
+    this.heartHalo.scale.setScalar(quenchHeartHaloSize(hc) * U);
     this.haloMat.opacity = Math.min(0.85, 0.22 + 0.2 * hc) * life;
     for (let i = 0; i < 2; i++) {
       const s = this.eyes[i];
       s.visible = life > 0.01;
       s.position.copy(this.sock[S_EYES[i]]);
-      s.scale.setScalar((0.45 + 0.25 * Math.min(2, eyes)) * U);
+      // Round 4: a tight glint on each eye, never a glow wider than her face
+      // (it washed her painted features into a pale blur at any distance);
+      // the eyes' own light is painted in her emissive map.
+      s.scale.setScalar(quenchEyeGlintSize(eyes) * U);
     }
     this.eyeMat.opacity = Math.min(1, 0.6 + 0.3 * eyes) * life;
     for (let i = 0; i < this.crown.length; i++) {

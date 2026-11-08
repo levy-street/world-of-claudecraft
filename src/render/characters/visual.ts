@@ -6155,7 +6155,9 @@ export class CharacterVisual {
     this.beginAction(
       a,
       prev,
-      name === this.def.clips.rushArrival ? 0.04 : warriorActionBlend(this.key, name, ONESHOT_FADE),
+      name === this.def.clips.rushArrival
+        ? 0.04
+        : (this.def.clips.oneShotFade?.[name] ?? warriorActionBlend(this.key, name, ONESHOT_FADE)),
     );
     this.current = a;
     this.currentIsOneShot = true;

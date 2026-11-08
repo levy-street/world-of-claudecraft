@@ -41,6 +41,12 @@ export const QUENCH_WINDUP = {
   spiralRadius: 1.1,
   /** The fists' flare (model units across at full strength). */
   fistFlare: 6,
+  /** Round 4: once the downswing begins (StrikeFall) the fists leave the sky
+   *  for the ice in front of her: over `fallDim` seconds the spirals let go
+   *  of her forearms and the flare shrinks to `fallFist` of itself, so the
+   *  falling fists never blot out her face and body. */
+  fallDim: 0.12,
+  fallFist: 0.25,
 } as const;
 
 /** How the wind-up ended (or not yet). */
@@ -64,12 +70,14 @@ export function newWindupLook(): QuenchWindupLook {
 }
 
 /** The tell `t` seconds after the wind-up cue, its `end` seen `sinceEnd`
- *  seconds ago (pending: ignored), written into `out`. */
+ *  seconds ago (pending: ignored), the downswing begun `sinceFall` seconds ago
+ *  (negative: not yet), written into `out`. */
 export function quenchWindupLook(
   t: number,
   end: QuenchWindupEnd,
   sinceEnd: number,
   out: QuenchWindupLook = newWindupLook(),
+  sinceFall = -1,
 ): QuenchWindupLook {
   const W = QUENCH_WINDUP;
   out.alpha = 0;
@@ -90,7 +98,12 @@ export function quenchWindupLook(
   out.arc = ease(Math.min(1, k * 1.25));
   out.spiral = ease(Math.min(1, k * 2.2));
   out.fist = 0.45 + 0.55 * k * k;
-  // The slam bursts the fists' light as the tell drops away.
+  if (sinceFall >= 0) {
+    const f = clamp01(sinceFall / W.fallDim);
+    out.spiral *= 1 - f;
+    out.fist *= 1 - (1 - W.fallFist) * f;
+  }
+  // The slam bursts the fists' light (down on the ice now) as the tell drops away.
   if (end === 'slam' && since > 0) out.fist *= 1 + 0.8 * fade;
   return out;
 }
