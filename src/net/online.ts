@@ -250,6 +250,7 @@ import {
   type MountRaceMirror,
   mountRaceViewAt,
 } from './mount_race_wire';
+import { accountOwnsMountSkin } from './mount_skin_ownership';
 import {
   encodeAnalogMoveInput,
   flushMovementFrameV2Outbox,
@@ -4027,7 +4028,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
   }
   changeMountSkin(skinId: string | null): void {
     // Optimistic own-entity nudge (the identity wire reconciles); an unowned id skips the send.
-    if (skinId !== null && !this.accountCosmetics.mountSkinIds.includes(skinId)) return;
+    if (skinId !== null && !accountOwnsMountSkin(this.accountCosmetics, skinId)) return;
     const p = this.entities.get(this.playerId);
     if (p) p.mountSkinId = skinId;
     this.cmd({ cmd: 'change_mount_skin', skin: skinId });
