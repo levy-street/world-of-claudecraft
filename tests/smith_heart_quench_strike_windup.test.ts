@@ -9,6 +9,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   QUENCH_CUES,
+  strikeSpentDue,
   strikeWindupDue,
   QUENCH_TUNING as T,
 } from '../src/sim/encounters/smith_heart';
@@ -88,6 +89,79 @@ describe('Guardian of the Quench: Tempering Strike wind-up', () => {
       const before = ready.filter((r) => r < c && r >= c - ticks(T.strikeWindup) - 2);
       expect(before.length, `cleave at tick ${c}`).toBe(1);
     }
+  });
+
+  it('tells an avoided cleaving swing once (her fists come down as a plain swing), never a landed one', () => {
+    const f = quenchFight(3);
+    expect(f.dev('/dev heart quench pull')).toBe(true);
+    f.tick(ticks(T.rimRise) + 2);
+    const st = f.state();
+    if (!st) throw new Error('no fight');
+    st.breathTimer = 999;
+    const boss = f.boss();
+    const b = f.local(boss);
+    const tank = f.players[0];
+    f.put(tank, b.x, b.z + 3);
+    f.put(f.players[1], b.x + 14, b.z - 10);
+    f.put(f.players[2], b.x - 14, b.z - 10);
+    // Wait for a wind-up, then make the tank dodge everything until it resolves.
+    let cued = false;
+    for (let i = 0; i < ticks(40) && !cued; i++) {
+      st.breathTimer = 999;
+      for (const ev of f.tick(1)) if (isCue(ev, QUENCH_CUES.strikeReady, boss.id)) cued = true;
+    }
+    expect(cued).toBe(true);
+    const spent: number[] = [];
+    const cleave: number[] = [];
+    const ready: number[] = [];
+    let dodged = 0;
+    for (let i = 0; i < ticks(1.5); i++) {
+      st.breathTimer = 999;
+      tank.dodgeChance = 1;
+      for (const ev of f.tick(1)) {
+        if (isCue(ev, QUENCH_CUES.strikeSpent, boss.id)) spent.push(i);
+        if (isCue(ev, 'brood_cleave', boss.id)) cleave.push(i);
+        if (ev.type === 'damage' && ev.sourceId === boss.id && ev.kind === 'dodge') dodged++;
+      }
+    }
+    expect(dodged).toBeGreaterThanOrEqual(1);
+    expect(cleave).toEqual([]);
+    expect(spent.length).toBe(1);
+    // Back to a plain tank: the held swing is cued again and lands its cleave,
+    // with no spent cue for it.
+    const spentAfter: number[] = [];
+    for (let i = 0; i < ticks(8); i++) {
+      st.breathTimer = 999;
+      tank.dodgeChance = 0;
+      for (const ev of f.tick(1)) {
+        if (isCue(ev, QUENCH_CUES.strikeSpent, boss.id)) spentAfter.push(i);
+        if (isCue(ev, QUENCH_CUES.strikeReady, boss.id)) ready.push(i);
+        if (isCue(ev, 'brood_cleave', boss.id)) cleave.push(i);
+      }
+    }
+    expect(cleave.length).toBeGreaterThanOrEqual(1);
+    expect(ready.length).toBeGreaterThanOrEqual(1);
+    const firstCleave = cleave[0];
+    expect(spentAfter.filter((t) => t <= firstCleave)).toEqual([]);
+  });
+
+  it('calls a swing spent only when the count still waits after a fresh swing wait began', () => {
+    const at = (o: Partial<Parameters<typeof strikeSpentDue>[0]>) =>
+      strikeSpentDue({
+        swingCleaveCount: T.strikeEvery - 1,
+        autoAttack: true,
+        swingTimer: T.strikeWindup + 1.5,
+        castingAbility: null,
+        ...o,
+      });
+    expect(at({})).toBe(true);
+    // A landed swing moved the count on (the cleave fired).
+    expect(at({ swingCleaveCount: 0 })).toBe(false);
+    // Still counting down to the cued swing: nothing was thrown yet.
+    expect(at({ swingTimer: T.strikeWindup * 0.5 })).toBe(false);
+    // A bar or a lost reach is no swing.
+    expect(at({ castingAbility: 'heart_quench_breath' })).toBe(false);
+    expect(at({ autoAttack: false })).toBe(false);
   });
 
   it('is due only for the cleaving swing, in reach, under a second out, with no bar', () => {

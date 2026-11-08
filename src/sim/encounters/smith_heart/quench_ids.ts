@@ -117,6 +117,11 @@ export const QUENCH_CUES = {
    *  presentation cue only (quench_strike_windup.ts); the cleave's own cue
    *  stays the template's on the hit. */
   strikeReady: 'heart_quench_strike_ready',
+  /** The cued cleaving swing resolved WITHOUT the cleave (dodged, parried or
+   *  missed: the count waits), spellfx 'windup' on the guardian: her raised
+   *  fists come down as a plain swing, never the slam (quench_strike_windup.ts).
+   *  Presentation only. */
+  strikeSpent: 'heart_quench_strike_spent',
   /** The rime cracks a player's immunity (an Ice Block's stasis) as they
    *  freeze or shatter: the cold bites through (spellfx 'nova' on them). */
   bite: 'heart_quench_bite',
