@@ -1335,10 +1335,10 @@ export const hudChromeStrings = {
     utilityActions: 'Utility actions',
     actionModeUtility: 'Utility',
     actionModeCombat: 'Combat',
-    actionModePinned: 'Combat',
-    actionModePinAria: 'Pin combat',
-    actionModeAutoAria: 'Use auto mode',
-    emptyUtilityAction: 'Empty shortcut',
+    // The layout switch's accessible name. The visible caption is the bare
+    // destination ("Utility"/"Combat"); "{mode}" carries it so a screen reader
+    // hears what activating the button does, not just a noun.
+    actionModeSwitchTo: 'Switch to {mode} layout',
     // The bare page number ("1"/"2", painted big and gold over the swap-arrows
     // glyph) rather than "Page 1 of 2": the toggle button already carries the
     // full "Switch action page" accessible name via actionPageToggle above, so

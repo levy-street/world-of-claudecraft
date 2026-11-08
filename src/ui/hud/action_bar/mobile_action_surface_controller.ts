@@ -5,7 +5,6 @@ import { bindTouchTap } from '../../touch_tap';
 import { hydrateIcons } from '../../ui_icons';
 import { MENU_STRIP_ITEMS } from '../menu/menu_strip_core';
 import {
-  MOBILE_ACTION_MODE_AUTO,
   MOBILE_ACTION_MODE_COMBAT,
   type MobileActionModePreference,
   mobileActionModeAfterToggle,
@@ -143,8 +142,7 @@ export function buildMobileActionSurface(
   };
 
   const painter = new MobileActionSurfacePainter({ writers: deps.writers, elements, t: deps.t });
-  let preference: MobileActionModePreference = MOBILE_ACTION_MODE_AUTO;
-  let inCombat = false;
+  let preference: MobileActionModePreference = MOBILE_ACTION_MODE_COMBAT;
   let engaging = false;
   let utilityPage = 0;
   let playerId: number | null = null;
@@ -162,10 +160,10 @@ export function buildMobileActionSurface(
       });
       syncedPage = utilityPage;
     }
-    painter.paint(inCombat, preference, utilityPage);
+    painter.paint(preference, utilityPage);
   };
   const render = (): void => {
-    const surface = resolveMobileActionSurface(inCombat, preference);
+    const surface = resolveMobileActionSurface(preference);
     if (surface !== visibleSurface) {
       visibleSurface = surface;
       if (surface === 'utility') deps.showUtilitySurface?.();
@@ -179,7 +177,7 @@ export function buildMobileActionSurface(
     }
     deps.hideTooltip();
     deps.clickSfx();
-    preference = mobileActionModeAfterToggle(preference, inCombat);
+    preference = mobileActionModeAfterToggle(preference);
     render();
     modeButton.blur();
   });
@@ -213,25 +211,23 @@ export function buildMobileActionSurface(
     update(nextInCombat, nextPlayerId, target = null): void {
       if (playerId !== nextPlayerId) {
         playerId = nextPlayerId;
-        preference = MOBILE_ACTION_MODE_AUTO;
+        preference = MOBILE_ACTION_MODE_COMBAT;
         utilityPage = 0;
-        inCombat = false;
         engaging = false;
       }
       // A selected mob is combat intent even before the first swing lands: the
       // utility layout has no attack controls, so targeting one switches to the
-      // combat layout exactly like entering combat does. An explicit layout
-      // choice still holds while that selection persists.
+      // combat layout exactly like entering combat does. The switch is one-way
+      // on purpose: when combat ends the player stays on the combat layout,
+      // where the consumable seat they reach for after a fight lives. Only an
+      // explicit tap moves them to utility.
       const nextEngaging = nextInCombat || (target?.hostile === true && !target.dead);
-      if (nextEngaging !== engaging) {
-        preference = nextEngaging ? MOBILE_ACTION_MODE_COMBAT : MOBILE_ACTION_MODE_AUTO;
-      }
+      if (nextEngaging && !engaging) preference = MOBILE_ACTION_MODE_COMBAT;
       engaging = nextEngaging;
-      inCombat = nextInCombat;
       render();
     },
     relocalize(): void {
-      painter.paint(inCombat, preference, utilityPage, true);
+      painter.paint(preference, utilityPage, true);
     },
   };
 }

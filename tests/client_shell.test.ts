@@ -1639,7 +1639,11 @@ describe('client HTML shell', () => {
         'class="mobile-action-slot mobile-utility-action mobile-ring-seat" data-mobile-index="4" data-utility-slot="4"',
       );
       expect(ring).toContain('id="mobile-action-mode"');
-      expect(ring).toContain('data-i18n="hudChrome.mobile.actionModeCombat">Combat</span>');
+      // The switch shows the layout a tap leads to, so the static first paint
+      // (combat is the home layout) names Utility. It is a switch, not a
+      // state toggle, so no aria-pressed ships with it.
+      expect(ring).toContain('data-i18n="hudChrome.mobile.actionModeUtility">Utility</span>');
+      expect(ring).not.toContain('id="mobile-action-mode" aria-pressed');
       // Utility mode reuses the same Interact control; there is no second copy
       // whose click behavior could drift from the combat-layout handler.
       expect(ring.match(/id="mobile-interact"/g)).toHaveLength(1);

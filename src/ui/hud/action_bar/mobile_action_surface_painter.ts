@@ -2,7 +2,6 @@ import type { InterpolationValues, TranslationKey } from '../../i18n';
 import type { PainterHostWriters } from '../../painter_host';
 import { MENU_STRIP_ITEMS } from '../menu/menu_strip_core';
 import {
-  MOBILE_ACTION_MODE_AUTO,
   type MobileActionModePreference,
   type MobileActionSurface,
   resolveMobileActionSurface,
@@ -13,6 +12,7 @@ const PAGE_INDICATOR_KEY: TranslationKey = 'hudChrome.mobile.actionPageIndicator
 const PAGE_TOGGLE_ARIA_KEY: TranslationKey = 'hudChrome.mobile.actionPageToggle';
 const MODE_UTILITY_KEY: TranslationKey = 'hudChrome.mobile.actionModeUtility';
 const MODE_COMBAT_KEY: TranslationKey = 'hudChrome.mobile.actionModeCombat';
+const MODE_SWITCH_KEY: TranslationKey = 'hudChrome.mobile.actionModeSwitchTo';
 
 export interface MobileActionSurfaceElements {
   ring: HTMLElement;
@@ -31,50 +31,32 @@ export interface MobileActionSurfacePainterDeps {
 
 /** Paints utility accessible names and the current mode without per-frame writes. */
 export class MobileActionSurfacePainter {
-  private lastSurface: MobileActionSurface | null = null;
   private lastPreference: MobileActionModePreference | null = null;
   private lastUtilityPage = -1;
   constructor(private readonly deps: MobileActionSurfacePainterDeps) {}
 
-  paint(
-    inCombat: boolean,
-    preference: MobileActionModePreference,
-    utilityPage: number,
-    force = false,
-  ): void {
-    const surface = resolveMobileActionSurface(inCombat, preference);
-    if (
-      !force &&
-      surface === this.lastSurface &&
-      preference === this.lastPreference &&
-      utilityPage === this.lastUtilityPage
-    ) {
+  paint(preference: MobileActionModePreference, utilityPage: number, force = false): void {
+    if (!force && preference === this.lastPreference && utilityPage === this.lastUtilityPage) {
       return;
     }
-    this.lastSurface = surface;
     this.lastPreference = preference;
     this.lastUtilityPage = utilityPage;
-    this.paintState(surface, preference, utilityPage);
+    this.paintState(resolveMobileActionSurface(preference), utilityPage);
   }
 
-  private paintState(
-    surface: MobileActionSurface,
-    preference: MobileActionModePreference,
-    utilityPage: number,
-  ): void {
+  private paintState(surface: MobileActionSurface, utilityPage: number): void {
     const { writers, elements, t } = this.deps;
     writers.setAttr(elements.ring, 'data-action-surface', surface);
 
+    // The caption names the layout the tap leads to (the swap-arrows glyph
+    // makes that read as a switch), while the accessible name spells the action
+    // out: "Utility" alone does not say what activating the button does.
     const nextModeKey = surface === 'combat' ? MODE_UTILITY_KEY : MODE_COMBAT_KEY;
     const modeText = t(nextModeKey);
     writers.setText(elements.modeLabel, modeText);
-    writers.setAttr(
-      elements.modeButton,
-      'aria-pressed',
-      String(preference !== MOBILE_ACTION_MODE_AUTO),
-    );
-    writers.setAttr(elements.modeButton, 'aria-label', modeText);
-    writers.setAttr(elements.modeButton, 'title', modeText);
+    const switchText = t(MODE_SWITCH_KEY, { mode: modeText });
+    writers.setAttr(elements.modeButton, 'aria-label', switchText);
+    writers.setAttr(elements.modeButton, 'title', switchText);
 
     for (let i = 0; i < elements.utilityButtons.length; i++) {
       const { button } = elements.utilityButtons[i];
