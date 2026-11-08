@@ -12,10 +12,13 @@ import {
 } from '../../src/sim/data';
 import { weaponHand } from '../../src/sim/equipment_rules';
 import { npcRoleFor } from '../../src/sim/npc_role';
+import { WORLD_PVP_SKULL_BAG_ITEM_ID } from '../../src/sim/pvp/world_pvp_trophy';
 import { type ItemDef, type MobFamily, questTurnInNpcIds } from '../../src/sim/types';
 import { t } from '../../src/ui/i18n';
 import { abilityIndexGroup } from './ability_access';
+import { companionByCreature } from './companion_sources';
 import { type ArticleTools, words } from './entity_format';
+import { wikiItemKind } from './wiki_item_kind';
 
 type Writer = Pick<ArticleTools, 'add' | 'section' | 'bullets' | 'link' | 'titleBy'> & {
   reserve(title: string): string;
@@ -135,8 +138,14 @@ function itemPortal(w: Writer) {
       };
       c.file('Weapons', hands[weaponHand(item) ?? 'onehand'], entry);
     } else {
-      const [section, label] = kinds[item.kind];
-      c.file(section, label, entry);
+      const [section, label] = kinds[item.id === WORLD_PVP_SKULL_BAG_ITEM_ID ? 'bag' : item.kind];
+      c.file(
+        section,
+        label,
+        item.kind === 'junk' && item.id !== WORLD_PVP_SKULL_BAG_ITEM_ID
+          ? { ...entry, section: wikiItemKind(item) }
+          : entry,
+      );
     }
     for (const craft of ingredients.get(id) ?? [])
       c.file('Ingredients by profession', craft + ' ingredients', entry);
@@ -168,6 +177,10 @@ function enemyPortal(w: Writer) {
     const m = MOBS[id];
     const family = families[m.family];
     const entry = { title, name: m.name, section: family };
+    if (companionByCreature.has(id)) {
+      c.file('Friendly creatures', 'Cosmetic companions', entry);
+      continue;
+    }
     const rank = m.boss
       ? 'Bosses'
       : m.rare

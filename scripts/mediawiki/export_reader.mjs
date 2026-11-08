@@ -11,7 +11,7 @@ if (!output) throw Error('Pass the output HTML path.');
 const html = await readFile('encyclopedia.html', 'utf8');
 const styles = Object.fromEntries(
   await Promise.all(
-    ['reader', 'hover_tooltip'].map(async (name) => [
+    ['reader', 'hover_tooltip', 'directory_layout'].map(async (name) => [
       name,
       await readFile('mediawiki/reader/' + name + '.css', 'utf8'),
     ]),
@@ -69,7 +69,7 @@ await writeFile(
   resolve(output),
   html
     .replace(
-      /<link rel="stylesheet" href="\.\/mediawiki\/reader\/(reader|hover_tooltip)\.css"[^>]*>/g,
+      /<link rel="stylesheet" href="\.\/mediawiki\/reader\/(reader|hover_tooltip|directory_layout)\.css"[^>]*>/g,
       (_, name) => '<style>' + styles[name] + '</style>',
     )
     .replace(

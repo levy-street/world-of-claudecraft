@@ -1,7 +1,9 @@
 import { layoutArticle, sectionRoute } from './article_layout.js';
 import { browseTrails, directoryLink, isCollection, isDirectory, subjects } from './browse.js';
 import { directoryArt } from './directory_art.js';
+import { layoutDirectory } from './directory_layout.js';
 import { mountWikiTooltips } from './hover_tooltip.js';
+import { mountRelatedPages, relatedPageIndex } from './related_pages.js';
 import { tooltipLookup } from './tooltip_content.js';
 
 const escapeHtml = (text) =>
@@ -18,7 +20,9 @@ function safeChart(markup, mapUrl) {
   const chart = document.createElement('div');
   chart.className = 'woc-map';
   chart.setAttribute('role', 'img');
-  chart.setAttribute('aria-label', 'Quest route map. The numbered locations are listed below.');
+  chart.setAttribute('aria-label', 'Route map. Its marked locations are listed below.');
+  if (/^[\d.]+\s*\/\s*[\d.]+$/.test(parsed.style.aspectRatio))
+    chart.style.aspectRatio = parsed.style.aspectRatio;
   const zone = parsed.dataset.zone;
   if (zone && /^[a-z0-9_]+$/.test(zone)) {
     const url = mapUrl(zone);
@@ -29,7 +33,7 @@ function safeChart(markup, mapUrl) {
     }
   }
   for (const source of parsed.children) {
-    if (!['woc-pin', 'woc-radius'].includes(source.className)) continue;
+    if (!['woc-pin', 'woc-radius', 'woc-landmark'].includes(source.className)) continue;
     const pin = document.createElement('span');
     pin.className = source.className;
     for (const prop of ['left', 'top', 'width', 'height'])
@@ -84,7 +88,13 @@ function renderBody(body, mapUrl, indexIcon, directoryClass, groupTile) {
     const header = line.match(/^(={2,3})\s*(.+?)\s*\1$/);
     if (header) {
       const id = 'part-' + headings.length;
-      headings.push([id, header[2]]);
+      headings.push([
+        id,
+        header[2].replace(
+          /\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g,
+          (_, target, label) => label ?? target,
+        ),
+      ]);
       const tag = header[1].length === 3 ? 'h3' : 'h2';
       output.push('<' + tag + ' id="' + id + '">' + inline(header[2]) + '</' + tag + '>');
       continue;
@@ -112,7 +122,12 @@ function renderBody(body, mapUrl, indexIcon, directoryClass, groupTile) {
         rows = [line.slice(2)];
       while (i + 1 < lines.length && lines[i + 1].startsWith(line.slice(0, 2)))
         rows.push(lines[++i].slice(2));
-      const listClass = type === 'ul' ? directoryClass?.(rows) : '';
+      const listClass =
+        type === 'ul'
+          ? directoryClass?.(rows)
+          : headings.at(-1)?.[1] === 'Action route'
+            ? 'route-flow'
+            : '';
       output.push(
         '<' +
           type +
@@ -241,6 +256,7 @@ export async function openReader({ seedUrl, packed, cardsUrl, packedCards, asset
       entries.filter(([key]) => pages.has(key)),
     ]);
     const trails = browseTrails(pages);
+    const related = relatedPageIndex(pages);
     const tileArt = new Map();
     for (const [title, page] of pages) {
       if (!isDirectory(page)) continue;
@@ -272,6 +288,8 @@ export async function openReader({ seedUrl, packed, cardsUrl, packedCards, asset
       );
     };
     const wideNav = window.matchMedia('(min-width: 768px)');
+    const drawer = document.querySelector('.browse-drawer');
+    if (drawer) drawer.open = wideNav.matches;
     nav.innerHTML =
       groups
         .map(
@@ -296,9 +314,17 @@ export async function openReader({ seedUrl, packed, cardsUrl, packedCards, asset
     function openNavGroups(open) {
       for (const group of nav.querySelectorAll('details')) group.open = open;
     }
-    wideNav.addEventListener('change', (event) => openNavGroups(event.matches));
+    wideNav.addEventListener('change', (event) => {
+      openNavGroups(event.matches);
+      if (drawer) drawer.open = event.matches;
+      const contents = view.querySelector('.directory-contents');
+      if (contents) contents.open = event.matches;
+    });
     nav.addEventListener('click', (event) => {
-      if (!wideNav.matches && event.target.closest('a')) openNavGroups(false);
+      if (!wideNav.matches && event.target.closest('a')) {
+        openNavGroups(false);
+        if (drawer) drawer.open = false;
+      }
     });
     document.documentElement.style.setProperty('--cover', 'url("' + cover + '")');
     let timer;
@@ -310,6 +336,7 @@ export async function openReader({ seedUrl, packed, cardsUrl, packedCards, asset
       }
     }
     function search(q, limit = 70) {
+      view.classList.remove('wiki-directory', 'activity-directory');
       const search = q.toLocaleLowerCase('en').trim(),
         terms = search.split(/\s+/).filter(Boolean);
       const named = all.filter((p) => terms.every((t) => p.sort.includes(t)));
@@ -349,6 +376,7 @@ export async function openReader({ seedUrl, packed, cardsUrl, packedCards, asset
       document.querySelector('#more')?.addEventListener('click', () => search(q, limit + 100));
     }
     function show() {
+      view.classList.remove('wiki-directory', 'activity-directory');
       const current = route();
       for (const a of nav.querySelectorAll('a')) {
         if (a.hash === href(current)) a.setAttribute('aria-current', 'page');
@@ -434,7 +462,9 @@ export async function openReader({ seedUrl, packed, cardsUrl, packedCards, asset
         directoryClass,
         groupTile,
       );
-      const category = page.categories.find((c) => c !== current && pages.has(c));
+      const category =
+        page.categories.find((c) => pages.get(c)?.categories.includes('Raids')) ??
+        page.categories.find((c) => c !== current && pages.has(c));
       const parents =
         trails.get(current) ??
         (category ? [...(trails.get(category) ?? []), { title: category, label: category }] : []);
@@ -449,7 +479,9 @@ export async function openReader({ seedUrl, packed, cardsUrl, packedCards, asset
         ) +
         '<h1>' +
         escapeHtml(
-          current.replace(/ \((?:Items|Abilities|NPCs|Enemies) index\)(?: \(\d+\))?$/, ''),
+          current === 'Dungeons'
+            ? 'Dungeons and raids'
+            : current.replace(/ \((?:Items|Abilities|NPCs|Enemies) index\)(?: \(\d+\))?$/, ''),
         ) +
         '</h1></div><div class="tags">' +
         page.categories
@@ -482,14 +514,17 @@ export async function openReader({ seedUrl, packed, cardsUrl, packedCards, asset
         '</article><p class="foot">' +
         link('Main Page', 'Return to the encyclopedia') +
         '</p>';
-      if (directory) addIndexFilter(view);
-      else if (current !== 'All Pages')
+      if (directory) {
+        layoutDirectory(view, page, wideNav.matches);
+        addIndexFilter(view);
+      } else if (current !== 'All Pages')
         layoutArticle(
           view,
           page,
           wideNav.matches,
           page.categories.find((c) => pages.get(c)?.categories.includes('Zones')),
         );
+      if (current !== 'All Pages') mountRelatedPages(view, page, related, pages);
       loadArt();
       for (const a of view.querySelectorAll('[data-part]')) {
         a.addEventListener('click', (e) => {
@@ -523,6 +558,9 @@ export async function openReader({ seedUrl, packed, cardsUrl, packedCards, asset
         return false;
       }
       if (!target) return false;
+      for (let node = target.parentElement; node; node = node.parentElement) {
+        if (node.tagName === 'DETAILS') node.open = true;
+      }
       target.scrollIntoView({ block: 'start', behavior: 'instant' });
       target.focus({ preventScroll: true });
       return true;

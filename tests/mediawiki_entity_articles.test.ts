@@ -3,6 +3,7 @@ import { addEntityArticles } from '../scripts/mediawiki/entity_articles';
 import type { ArticleKind, ArticleTools } from '../scripts/mediawiki/entity_format';
 import { questRoute } from '../scripts/mediawiki/quest_route';
 import {
+  ABILITIES,
   CLASSES,
   DUNGEONS,
   getActiveWorldContent,
@@ -25,7 +26,7 @@ function articles() {
     class: CLASSES,
     dungeon: DUNGEONS,
     zone: Object.fromEntries(ZONES.map((z) => [z.id, z])),
-    ability: {},
+    ability: ABILITIES,
   };
   const titleBy = Object.fromEntries(
     Object.entries(registries).map(([kind, defs]) => [
@@ -40,7 +41,6 @@ function articles() {
     table: (rows) => rows.map((r) => r.join(': ')).join('\n'),
     bullets: (rows) => rows.join('\n'),
     link: (title, label) => '[[' + title + '|' + label + ']]',
-    kindWording: (kind) => (kind === 'recipe' ? 'pattern' : kind),
     money: (n) => (n ?? 0) + ' copper',
   };
   addEntityArticles(w);
@@ -52,6 +52,26 @@ describe('encyclopedia entity articles', () => {
     expect(pages.size).toBe(
       Object.keys(QUESTS).length + Object.keys(MOBS).length + Object.keys(ITEMS).length,
     );
+    expect(pages.get('item/iron_ore')).toContain('Type: Material');
+    expect(pages.get('item/fine_iron_ore')).toContain('Type: Fine Material');
+    expect(pages.get('item/pvp_skull_bag')).toContain('Type: Bag');
+    const held = Object.values(ITEMS).find((i) => i.kind === 'held_offhand')!;
+    expect(pages.get('item/' + held.id)).toContain('Slot: Off Hand');
+    expect(pages.get('item/' + held.id)).not.toContain('held_offhand');
+    expect(pages.get('item/conjured_water')).toContain(
+      '[[ability/conjure_water|' + ABILITIES.conjure_water.name + ']]',
+    );
+    expect(pages.get('mob/nythraxis_scourge_of_thornpeak')).toContain('0.1% per kill');
+    expect(pages.get('mob/nythraxis_scourge_of_thornpeak')).toContain('1% alone');
+    expect(pages.get('mob/buddy_crystal_lich')).toContain('cosmetic companion');
+    expect(pages.get('mob/buddy_crystal_lich')).not.toContain('Base stats');
+    for (const id of [
+      'ignivar_herald_of_the_last_flame',
+      'varkhul_forgefather_of_the_last_flame',
+    ]) {
+      expect(pages.get('mob/' + id)).toContain('0.05% per kill');
+      expect(pages.get('mob/' + id)).toContain('0.5% alone');
+    }
     expect(pages.get('mob/balgath_cyclops')).toContain('next dawn');
     expect(pages.get('item/emissary_cache')).toContain('equally likely');
     expect(pages.get('item/legendary_cowl_of_event_horizon')).toContain('hoard');
@@ -74,6 +94,7 @@ describe('encyclopedia entity articles', () => {
     expect(pages.get('mob/forest_wolf')).toContain(
       wolf.maxHp + ' health, ' + wolf.stats.armor + ' armor',
     );
+    expect(pages.get('mob/forest_wolf')).toContain('54 health');
     expect(pages.get('item/ps_lustrous_pearl')).toContain('mob/mister_crabs');
     expect(pages.get('item/bastion_sigil')).toContain('1,000 maximum health');
     expect(pages.get('mob/nythraxis_scourge_of_thornpeak')).toContain('Heroic encounter');

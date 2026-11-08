@@ -99,21 +99,24 @@ export function indexActivityItems(
     append(
       sources,
       id,
-      'Rank C rift final boss: 1 in ' + normal.length + ' chance in its guaranteed gear slot.',
+      'First group to clear a rank C natural rift: 1 in ' +
+        normal.length +
+        ' chance in its guaranteed shared final-boss gear slot.',
     );
   for (const id of heroic)
     append(
       sources,
       id,
-      'Rank B, A or S rift final boss: 1 in ' +
+      'First group to clear a rank B, A or S natural rift: 1 in ' +
         heroic.length +
-        ' chance per heroic gear slot. S may roll a second slot.',
+        ' chance per shared Heroic gear slot. S may roll a second slot. Loot the final corpse.',
     );
   for (const id of RIFT_LEGENDARY_ITEM_IDS)
     append(
       sources,
       id,
-      pct(RIFT_LEGENDARY_CHANCE_S) + ' independent chance from the final boss of a rank S rift.',
+      pct(RIFT_LEGENDARY_CHANCE_S) +
+        ' independent shared chance from the final boss for the first group to clear a rank S natural rift.',
     );
   const pools: readonly [readonly string[], number, string][] = [
     [RIFT_BLUE_MOUNT_REINS, RIFT_BLUE_MOUNT_CHANCE, 'A'],
@@ -127,7 +130,7 @@ export function indexActivityItems(
       append(
         sources,
         id,
-        'The rank ' +
+        'For the first group to finish the natural rift, the rank ' +
           rank +
           ' rift final boss has a ' +
           pct(chance) +

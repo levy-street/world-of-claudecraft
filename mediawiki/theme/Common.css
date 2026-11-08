@@ -534,3 +534,13 @@ body {
   vertical-align: middle;
   margin-right: 0.3em;
 }
+.woc-landmark {
+  position: absolute;
+  transform: translate(-50%, 14px);
+  color: #fff4d6;
+  background: #18251ddd;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font: 600 11px / 16px system-ui;
+  white-space: nowrap;
+}

@@ -25,6 +25,7 @@ await writeFile(
   sourcePath,
   `
 import { writeFileSync } from 'node:fs';
+import { linkArticleMentions } from '../../scripts/mediawiki/article_mentions';
 import { tooltipCatalog } from '../../scripts/mediawiki/tooltip_catalog';
 import { ABILITIES, CLASSES, DUNGEON_LIST, ITEMS, MOBS, NPCS, QUESTS, ZONES, zoneContaining, BUILTIN_WORLD } from '../../src/sim/data';
 import { addCatalogPortals } from '../../scripts/mediawiki/catalog_portals';
@@ -39,6 +40,8 @@ import { addSystemArticles } from '../../scripts/mediawiki/system_articles';
 import { addEntityArticles, questZoneName } from '../../scripts/mediawiki/entity_articles';
 import { npcArticle } from '../../scripts/mediawiki/npc_article';
 import { dungeonDetails } from '../../scripts/mediawiki/dungeon_article';
+import { addDungeonCatalog } from '../../scripts/mediawiki/dungeon_catalog';
+import { dungeonRecovery } from '../../scripts/mediawiki/dungeon_recovery';
 import { coreSystemRules } from '../../scripts/mediawiki/core_system_rules';
 import { questMap } from '../../scripts/mediawiki/quest_map';
 import { addRotatingQuests } from '../../scripts/mediawiki/rotating_quest_articles';
@@ -70,13 +73,6 @@ function money(copper) {
 
 function link(title, label = title) {
   return title === label ? '[[' + title + ']]' : '[[' + title + '|' + label + ']]';
-}
-
-function kindWording(kind) {
-  // kind 'recipe' is the physical PATTERN item (it teaches a recipe when
-  // used), so prose, facts, and categories say 'pattern': an item page must
-  // never read as the recipe it teaches. Every other kind is its own word.
-  return kind === 'recipe' ? 'pattern' : kind;
 }
 
 function section(title, body) {
@@ -198,14 +194,7 @@ const zoneDirectories = addQuestDirectory({ ...writer, reserve });
 const sortedZones = [...ZONES].sort((a,b) => a.levelRange[0]-b.levelRange[0] || a.levelRange[1]-b.levelRange[1] || a.name.localeCompare(b.name,'en'));
 add('Zones', section('Regions by level',bullets(sortedZones.map(z=>link(titleBy.zone.get(z.id)) + ' · '+(z.levelRange[0]===z.levelRange[1]?'Level '+z.levelRange[0]:'Levels '+z.levelRange.join(' to '))+' · '+z.hub.name))),['Portals']);
 add('Classes',section('Playable classes',bullets(Object.keys(CLASSES).sort().map(id=>link(titleBy.class.get(id))))),['Portals']);
-const groupRooms = (rooms) => bullets(rooms.map(d=>link(titleBy.dungeon.get(d.id))+' · '+d.suggestedPlayers+' suggested players'));
-const rooms = [...DUNGEON_LIST].sort((a,b)=>a.name.localeCompare(b.name,'en'));
-const dungeonSections = [
-  ['Dungeon entrances', rooms.filter(d=>d.overworldDoor!==false && d.suggestedPlayers<=5)],
-  ['Raid entrances', rooms.filter(d=>d.overworldDoor!==false && d.suggestedPlayers>5)],
-  ['Connected rooms',rooms.filter(d=>d.overworldDoor===false)],
-];
-add('Dungeons',dungeonSections.filter(([,ds])=>ds.length).map(([name,ds])=>section(name,groupRooms(ds))).join(''),['Portals']);
+const raidParents = addDungeonCatalog({ ...writer, reserve });
 
 for (const zone of ZONES) {
   const npcs = Object.entries(BUILTIN_WORLD.npcs).filter(([, npc]) => (!npc.dynamic || npc.fixedPost) && zoneContaining(npc.pos.x,npc.pos.z)?.id === zone.id).map(([id]) => titleBy.npc.get(id));
@@ -216,19 +205,19 @@ for (const zone of ZONES) {
 }
 
 for (const [id, cls] of Object.entries(CLASSES)) {
-  add(titleBy.class.get(id), section('Overview', cls.name + ' starts with ' + (ITEMS[cls.startWeapon]?.name ?? cls.startWeapon) + ' and uses ' + cls.resourceType + '.') + section('Starting weapon', link(titleBy.item.get(cls.startWeapon), ITEMS[cls.startWeapon]?.name ?? cls.startWeapon)) + section('Build choices', link('Specializations') + ' · ' + link('Talent choices')) + section('Stats', table(Object.entries(cls.baseStats).map(([k, v]) => [k.toUpperCase(), String(v)]))) + classAbilitySections(id, writer), ['Classes']);
+  add(titleBy.class.get(id), section('Overview', cls.name + ' is a playable class that uses ' + cls.resourceType + ' to power its abilities. New characters start with ' + link(titleBy.item.get(cls.startWeapon), ITEMS[cls.startWeapon]?.name ?? cls.startWeapon) + '.') + section('Build choices', link('Specializations') + ' · ' + link('Talent choices')) + section('Starting statistics', table(Object.entries(cls.baseStats).map(([k, v]) => [({ str: 'Strength', agi: 'Agility', sta: 'Stamina', int: 'Intellect', spi: 'Spirit', armor: 'Armor' })[k] ?? k, String(v)]))) + classAbilitySections(id, writer), ['Classes']);
 }
 
 for (const dungeon of DUNGEON_LIST) {
   const bosses = dungeon.spawns.map((s) => MOBS[s.mobId]).filter((mob) => mob?.boss);
-  add(titleBy.dungeon.get(dungeon.id), section('Overview', dungeon.enterText) + dungeonDetails(dungeon,dungeonWriter) + section('Bosses', bullets(bosses.map((mob) => link(titleBy.mob.get(mob.id), mob.name)))) + section('Spawn list', bullets(dungeon.spawns.map((spawn) => link(titleBy.mob.get(spawn.mobId), MOBS[spawn.mobId]?.name ?? spawn.mobId) + ' at ' + spawn.x + ', ' + spawn.z))), ['Dungeons']);
+  add(titleBy.dungeon.get(dungeon.id), (raidParents.has(dungeon.id) ? 'Part of ' + link(raidParents.get(dungeon.id)) + '. See the raid overview for its entrance, complete route and encounters.\\n\\n' : '') + section('Overview', dungeon.enterText) + dungeonDetails(dungeon,dungeonWriter) + section('Bosses', bullets(bosses.map((mob) => link(titleBy.mob.get(mob.id), mob.name)))) + dungeonRecovery(dungeon, writer) + section('Spawn list', bullets(dungeon.spawns.map((spawn) => link(titleBy.mob.get(spawn.mobId), MOBS[spawn.mobId]?.name ?? spawn.mobId) + ' at ' + spawn.x + ', ' + spawn.z))), ['Dungeons', ...(raidParents.has(dungeon.id) ? [raidParents.get(dungeon.id)] : [])]);
 }
 
 for (const [id,npc] of Object.entries(NPCS)) {
-  add(titleBy.npc.get(id),npcArticle(npc,{...writer,money,kindWording}),['NPCs']);
+  add(titleBy.npc.get(id),npcArticle(npc,{...writer,money}),['NPCs']);
 }
 
-addEntityArticles({ ...writer, money, kindWording });
+addEntityArticles({ ...writer, money });
 for (const [id, ability] of visibleAbilities) {
   add(titleBy.ability.get(id), abilityArticle(ability, writer), ['Abilities', abilityIndexGroup(ability)]);
 }
@@ -246,7 +235,8 @@ for(const page of pages) {
   const path = illustrations.get(page.title);
   if(path) page.text = '<woc-art path="' + path + '" />\\n' + page.text;
 }
-const seedTimestamp = process.env.MEDIAWIKI_SEED_TIMESTAMP ?? '2026-11-04T03:00:00Z';
+linkArticleMentions(pages);
+const seedTimestamp = process.env.MEDIAWIKI_SEED_TIMESTAMP ?? '2026-11-05T00:00:01Z';
 const now = new Date(seedTimestamp).toISOString().replace(/\\.\\d{3}Z$/, 'Z');
 const body = pages.map((page, index) => \`
   <page>

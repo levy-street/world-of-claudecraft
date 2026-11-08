@@ -53,7 +53,7 @@ export function addPetAndTravelRules(w: SystemWriter) {
       'Commands',
       list([
         `An eligible melee pet can Growl once every ${PET_GROWL_INTERVAL} seconds. A manual taunt from outside 5 yards waits until the pet closes to melee range. Ranged pets cannot force a taunt.`,
-        `Revive Pet returns a dead pet to your side with ${percent(PET_REVIVE_HP_FRACTION)} of maximum health rounded to the nearest whole point, with a minimum of 1.`,
+        `If your pet was alive when you died, it returns on your resurrection with ${percent(PET_REVIVE_HP_FRACTION)} of maximum health rounded to the nearest whole point, with a minimum of 1. A Hunter using the Patch Up spell directly revives the pet at 50% instead.`,
         'Demon Heal costs 55 mana. For 5 seconds it heals the living demon each second for 8% of its maximum health rounded up, capped at the health missing.',
       ]),
     ),
@@ -146,7 +146,8 @@ export function addPetAndTravelRules(w: SystemWriter) {
   }
   w.describe(
     'Companions',
-    `With buddy auto-loot enabled, your companion searches for the nearest lootable corpse within ${BUDDY_LOOT_RANGE} yards of you that you personally tapped or that holds loot reserved for you. It walks to the corpse to pick up what you can carry. It skips other players' free-for-all corpses, stops while you are dead and does not collect in raid instances.`,
+    'Open Cosmetics and select a collected companion. Choose Summon to have it follow this character. Choose Dismiss to send it away. Online, your collection is shared across your account.',
+    `With your companion summoned, right-click its target frame (double-tap on touch) and choose Enable Autoloot. Your companion then searches for the nearest lootable corpse within ${BUDDY_LOOT_RANGE} yards of you that you personally tapped or that holds loot reserved for you. It walks to the corpse to pick up what you can carry. It skips other players' free-for-all corpses, stops while you are dead and does not collect in raid instances.`,
   );
   w.describe(
     'Overworld passages',

@@ -16,6 +16,7 @@ import {
 } from '../../src/sim/content/guild_contracts';
 import { RETIRED_HEROIC_ITEMS } from '../../src/sim/content/heroic_loot';
 import {
+  HOARD_BASE_ITEM_IDS,
   HOARD_BOSS_LOOT_TABLES,
   HOARD_LOOT_CLASS_BIAS,
   hoardLootTierForMap,
@@ -32,7 +33,9 @@ import {
   REFERRAL_RAPTOR_REINS,
   REFERRAL_SLIME_REINS,
 } from '../../src/sim/content/referral_rewards';
+import { CAVE_THEMES } from '../../src/sim/content/rift/cave_themes';
 import { RIFT_GEM_IDS } from '../../src/sim/content/rift/items';
+import { RIFT_THEMES } from '../../src/sim/content/rift/themes';
 import { EVENT_SKIN_TOKEN_ID } from '../../src/sim/content/skins';
 import {
   TREASURE_MAP_ITEM_IDS,
@@ -98,7 +101,7 @@ export function indexSpecialItemSources(w: ArticleTools, sources: Map<string, Se
   for (const id of RIFT_GEM_IDS)
     add(
       id,
-      'Personal reward from a rank A or S rift final boss, or a rift with crafting material bias of at least 0.5. Gem colors cycle in participant order. Socket in a Riftbound ring for ' +
+      'Personal corpse loot for the first group to clear a natural rank A or S rift, or a natural rift with crafting material bias of at least 0.5. Gem colors cycle in participant order. Socket in a Riftbound ring for ' +
         RIFT_GEM_RATING +
         ' ' +
         words(RIFT_GEM_RATING_STAT[id]) +
@@ -129,6 +132,8 @@ export function indexSpecialItemSources(w: ArticleTools, sources: Map<string, Se
   );
   for (const [boss, items] of Object.entries(HOARD_BOSS_LOOT_TABLES))
     for (const rarity of TREASURE_MAP_RARITIES) {
+      const themes = rarity === 'common' || rarity === 'rare' ? CAVE_THEMES : RIFT_THEMES;
+      if (!themes.some((theme) => theme.boss === boss)) continue;
       const tier = hoardLootTierForMap(rarity);
       for (const base of items) {
         const item = hoardLootVariantId(base, tier);
@@ -150,6 +155,22 @@ export function indexSpecialItemSources(w: ArticleTools, sources: Map<string, Se
         );
       }
     }
+  for (const rarity of ['common', 'rare'] as const)
+    for (const base of HOARD_BASE_ITEM_IDS)
+      add(
+        hoardLootVariantId(base, 'rare'),
+        'Open a ' +
+          ref(w, 'item', TREASURE_MAP_ITEM_IDS[rarity]) +
+          ' cave hoard reward chest. Its cave guardian uses the shared pool of all ' +
+          HOARD_BASE_ITEM_IDS.length +
+          ' hoard pieces. Owner gear chance ' +
+          pct(VAULT_PAYOUTS[rarity].gearChance) +
+          ', guest gear chance ' +
+          pct(VAULT_GUEST_GEAR_CHANCE[rarity]) +
+          '; successful selections favor class-appropriate pieces ' +
+          pct(HOARD_LOOT_CLASS_BIAS) +
+          ' of the time when available.',
+      );
   for (const row of MARKET_HOUSE_STOCK)
     add(
       row.itemId,

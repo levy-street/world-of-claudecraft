@@ -123,9 +123,6 @@ const sections = [
       'Thornhollow battleground',
       'King of the Hill',
       'Honor and Warfare gear',
-      'Fiesta arena',
-      'Fiesta augments',
-      'Fiesta power-ups',
     ],
   },
   {
@@ -141,8 +138,22 @@ const sections = [
   },
   {
     title: 'Events and minigames',
-    intro: 'Look up a seasonal activity, a card duel, a race or an arena challenge.',
-    topics: ['Gourdlight Eve', 'The Card Master', 'Mount racing', 'Protect Yumi'],
+    intro:
+      'Visit the Card Master for a duel, or check the activities offered while Gourdlight Eve is active.',
+    topics: ['Gourdlight Eve', 'The Card Master'],
+  },
+  {
+    title: 'Retired and unavailable activities',
+    intro:
+      'Look up former rules and deeds. The Mount racing entry also explains the stable course retained in the riding lesson data.',
+    topics: [
+      'Protect Yumi',
+      'Fiesta arena',
+      'Fiesta augments',
+      'Fiesta power-ups',
+      'Vale Cup',
+      'Mount racing',
+    ],
   },
   {
     title: 'Account and play options',
@@ -153,7 +164,9 @@ const sections = [
 
 export function systemDirectory(groups: ReadonlyMap<string, { title: string }>): string {
   const remaining = new Set(groups.keys());
-  const body = ['Choose a topic below to find its rules, requirements and rewards.'];
+  const body = [
+    'Choose a system for its starting point, requirements, steps and rewards. Retired activities are listed separately with their former rules.',
+  ];
   for (const section of sections) {
     const links: string[] = [];
     for (const topic of section.topics) {

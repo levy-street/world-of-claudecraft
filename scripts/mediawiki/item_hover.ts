@@ -37,7 +37,7 @@ import {
   tooltipEffectiveQuality,
   vendorSellTooltipLine,
 } from '../../src/ui/item_instance_tooltip';
-import { itemKindLabel, itemQualityLabel } from '../../src/ui/item_kind_label';
+import { itemQualityLabel } from '../../src/ui/item_kind_label';
 import { itemLevelTooltipLines } from '../../src/ui/item_level_tooltip';
 import { itemSetMemberCounts, itemSetTooltipModel } from '../../src/ui/item_set_tooltip_view';
 import { itemSlotLabel } from '../../src/ui/item_slot_labels';
@@ -62,6 +62,8 @@ import { trinketTooltipLines } from '../../src/ui/trinket_tooltip_view';
 import { weaponProcEffectText } from '../../src/ui/weapon_proc_text';
 import { weaponProcLines } from '../../src/ui/weapon_proc_view';
 import { weaponTypeLabelKey } from '../../src/ui/weapon_type_label';
+
+import { wikiItemKind } from './wiki_item_kind';
 
 const setSizes = itemSetMemberCounts();
 const trinketExample = { attackPower: 0, rangedPower: 0, spellPower: 0, healPower: 0, maxHp: 1000 };
@@ -137,7 +139,7 @@ function card(item: ItemDef, mode: 'full' | 'embedded' | 'noset'): string {
     const kind = esc(
       t('itemUi.tooltip.qualityKind', {
         quality: itemQualityLabel(quality),
-        kind: itemKindLabel(item.kind, item.id),
+        kind: wikiItemKind(item),
       }),
     );
     const heroic =

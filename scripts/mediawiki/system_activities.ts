@@ -19,17 +19,10 @@ import {
   MEMBERSHIP_DURATION_SECONDS,
   MEMBERSHIP_XP_MULTIPLIER,
 } from '../../src/sim/content/membership';
-import { MOUNT_RACE_COURSE } from '../../src/sim/content/mounts';
-import {
-  REFERRAL_BAG,
-  REFERRAL_FOG_TRINKET,
-  REFERRAL_HOLLOW_TRINKET,
-  REFERRAL_RAPTOR_REINS,
-  REFERRAL_SLIME_REINS,
-} from '../../src/sim/content/referral_rewards';
+import { MOUNT_RACE_COURSE, MOUNT_RACE_START_PLATFORM } from '../../src/sim/content/mounts';
 import { COURIER_MAX_LEG_SECONDS } from '../../src/sim/courier/motion';
 import { COURIER_CAPACITY } from '../../src/sim/courier/types';
-import { DUNGEONS, ITEMS, QUESTS } from '../../src/sim/data';
+import { ITEMS } from '../../src/sim/data';
 import {
   VAULT_BASE_CAP,
   VAULT_UPGRADE_PRICES,
@@ -59,7 +52,6 @@ import {
   WORLD_PVP_STAKE_FRACTION,
   worldPvpPairMultiplier,
 } from '../../src/sim/pvp/world_pvp_rules';
-import { REFERRAL_MILESTONES } from '../../src/sim/referral_cards';
 import {
   RIFT_BAND_GEM_SLOTS,
   RIFT_BAND_MAX_UPGRADE,
@@ -104,6 +96,7 @@ import {
 } from '../../src/sim/social/yumi';
 import { DELVE_COMPANION_HEAL_INTERVAL } from '../../src/sim/types';
 import { WEEKLY_THRESHOLDS } from '../../src/sim/weekly_rewards';
+import { addReferralGuide } from './referral_guide';
 import { heading, list, percent, type SystemWriter } from './system_writer';
 
 export function addActivityRules(w: SystemWriter) {
@@ -179,35 +172,7 @@ export function addActivityRules(w: SystemWriter) {
       MEMBERSHIP_XP_MULTIPLIER +
       ', rounding down. The weapon is separate from the armor set. A qualifying referral set uses the same bonus; the two bonuses do not stack.',
   );
-  const milestoneReward = {
-    tutorial: item(REFERRAL_BAG),
-    hollow: item(REFERRAL_HOLLOW_TRINKET),
-    fogbinder: `upgrade the trinket to ${item(REFERRAL_FOG_TRINKET)}`,
-    gravewyrm: 'basic riding training',
-    raid: item(REFERRAL_SLIME_REINS),
-  };
-  w.describe(
-    'Referral cards',
-    'Start together in a party on characters below level 5 who have yet to complete the tutorial. Stay in the same party for credit. The card has five stamps; you can earn them out of order but redeem them in order.',
-    list(
-      REFERRAL_MILESTONES.map(
-        (m) =>
-          (m.questId
-            ? 'Complete ' +
-              QUESTS[m.questId].name +
-              (m.dungeonId
-                ? ` (a repeat clear also credits an eligible character who already turned the quest in): ${DUNGEONS[m.dungeonId].name}`
-                : '')
-            : 'Both assigned characters qualify for the same raid boss kill') +
-          ': ' +
-          milestoneReward[m.id] +
-          '.',
-      ),
-    ),
-    'Inviters earn ' +
-      item(REFERRAL_RAPTOR_REINS) +
-      ' when one friend completes a card. Five completed friends unlock Flicker and Glimmer.',
-  );
+  addReferralGuide(w);
   w.describe(
     'Gourdlight Eve',
     'Talk to a participating townsperson within ' +
@@ -388,12 +353,22 @@ export function addActivityRules(w: SystemWriter) {
   );
   w.describe(
     'Protect Yumi',
-    `Play three against three or five against five. Destroy the enemy team's ${YUMI_HP}-health cat while defending your own. Both cats relocate every ${YUMI_TELEPORT_EVERY} seconds. A defeated player returns after ${YUMI_RESPAWN_SECONDS} seconds.`,
+    heading(
+      'Former match rules',
+      `Teams of three or five tried to destroy the enemy team's ${YUMI_HP}-health cat while defending their own. Both cats relocate every ${YUMI_TELEPORT_EVERY} seconds. A defeated player returns after ${YUMI_RESPAWN_SECONDS} seconds.`,
+    ),
     `After ${YUMI_SUDDEN_AT / 60} minutes, teleporting stops. Sudden death starts at step 1 and advances every ${YUMI_SUDDEN_STEP} seconds. Each step adds ${percent(YUMI_SUDDEN_RAMP)} of normal damage taken. Every ${YUMI_SUDDEN_BLEED_EVERY} seconds both cats also lose ${percent(YUMI_SUDDEN_BLEED_PCT)} of their maximum health per step, rounded up. A simultaneous lethal pulse compares health immediately before the pulse, then total enemy-cat damage, then breaks a remaining tie at random.`,
   );
   w.describe(
+    'Vale Cup',
+    'Eastbrook’s boarball matches tracked goals, keeper saves, wins and guild victories. Previously earned deeds remain in the [[Book of Deeds]]. They award zero Renown and are excluded from completion totals.',
+  );
+  w.describe(
     'Mount racing',
-    `On the glowing square behind the start arch, start the race and wait for the countdown. Jump over all ${MOUNT_RACE_COURSE.jumps.length} bars in any order and cross the finish arch within ${MOUNT_RACE_COURSE.timeLimitSeconds} seconds. Crossing in either direction counts while airborne. A missed bar can be retried. Dying, dismounting or leaving the paddock ends the attempt.`,
+    heading(
+      'Stable course rules',
+      `The course attached to ${w.entity('quest', 'q_riding_lessons', 'Riding Lessons')} at the Galecrest stables used the glowing square at (x ${Math.round(MOUNT_RACE_START_PLATFORM.x)}, z ${Math.round(MOUNT_RACE_START_PLATFORM.z)}). The Start Race button began a countdown. Riders had to jump all ${MOUNT_RACE_COURSE.jumps.length} bars in any order, then cross the finish arch at (x ${MOUNT_RACE_COURSE.arch.x}, z ${MOUNT_RACE_COURSE.arch.z}) within ${MOUNT_RACE_COURSE.timeLimitSeconds} seconds. Crossing a bar counted in either direction while airborne. Riders could retry a missed bar. Dying, dismounting or leaving the paddock ended the attempt.`,
+    ),
   );
   w.describe(
     'Guild contracts',

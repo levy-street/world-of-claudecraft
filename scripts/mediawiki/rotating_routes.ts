@@ -67,7 +67,7 @@ import {
 import { WORLD_QUEST_LEY_TIMER_SECONDS } from '../../src/sim/world_quests';
 import { questMap, type RoutePoint } from './quest_map';
 
-export function worldRoute(quest: WorldQuestDef) {
+export function worldRouteData(quest: WorldQuestDef) {
   const obj = quest.objective;
   const points: RoutePoint[] = [
     { step: 'Start', frame: 'Overworld', label: 'Enter the active quest area', ...quest.area },
@@ -429,6 +429,11 @@ export function worldRoute(quest: WorldQuestDef) {
   if (points.length === 1)
     point('Complete the activity inside this circle', quest.area, 1, quest.area.radius);
   instructions.push('Completion pays automatically. There is no hand-in NPC.');
+  return { instructions, alternatives, points, extraMaps };
+}
+
+export function worldRoute(quest: WorldQuestDef) {
+  const { instructions, alternatives, points, extraMaps } = worldRouteData(quest);
   return (
     [...instructions, ...alternatives].map((s) => '* ' + s).join('\n') +
     '\n\n' +
@@ -439,7 +444,7 @@ export function worldRoute(quest: WorldQuestDef) {
 
 // Physical travel can cross several private rooms before a credited raid boss.
 // A room's doorPos is only an overworld pin when overworldDoor is enabled.
-function entranceRoute(dest: DungeonDef): DungeonDef[] {
+export function entranceRoute(dest: DungeonDef): DungeonDef[] {
   const path = [dest];
   while (path[0].overworldDoor === false) {
     const inside = path[0];

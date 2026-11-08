@@ -105,7 +105,17 @@ describe('the searchable player encyclopedia', () => {
       pages.filter((p) => p.includes('[[Category:' + category + ']]'));
     expect(count('Items').length).toBe(Object.keys(ITEMS).length);
     expect(count('Mobs').length).toBe(Object.keys(MOBS).length);
-    const routes = pages.filter((p) => p.includes('== Route map =='));
+    const systemMaps = count('Gameplay Systems').filter((p) => p.includes('== Route map =='));
+    expect(systemMaps).toHaveLength(count('Gameplay Systems').length - 6);
+    for (const page of systemMaps)
+      expect(page).toMatch(/class=&quot;woc-map&quot;|=== Action route ===/);
+    // Dungeon and raid entrance pages carry route maps too; count quest pages only.
+    const questCategories = ['Quests', 'World quests', 'Weekly quests'];
+    const routes = pages.filter(
+      (p) =>
+        p.includes('== Route map ==') &&
+        questCategories.some((c) => p.includes('[[Category:' + c + ']]')),
+    );
     expect(routes.length).toBe(
       Object.keys(QUESTS).length + WORLD_QUESTS.length + WEEKLY_QUESTS.length,
     );

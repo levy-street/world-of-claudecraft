@@ -188,7 +188,7 @@ export function addRiftAndHoardRules(w: SystemWriter) {
   );
   w.describe(
     'Rift first-clear rewards',
-    'The first group to finish the same natural rift wins the first-clear extras. Other groups can still finish their own run and loot ordinary drops. The clear adds a shared gear roll on the final corpse and a personal class-appropriate band and Rift Essence for each winner. At the standard loot multiplier, ranks C, B, A and S pay 1, 2, 3 and 4 personal Essence respectively. With a custom loot multiplier, clamp it to 0.5 to 2, multiply by that base, round to the nearest integer and clamp the result to 1 to 8. A and S also grant each winner a gem; so can other ranks when the crafting-material bias is at least 0.5.',
+    "The first group to finish the same natural rift wins its completion rewards. Other groups can finish their own run and keep ordinary enemy or mid-run chest drops, but receive none of the completion gear, mounts, bands, Essence or gems listed here. The winning group loots shared gear and each winner's reserved class band and Rift Essence from the final corpse. At the standard loot multiplier, ranks C, B, A and S pay 1, 2, 3 and 4 personal Essence respectively. With a custom loot multiplier, clamp it to 0.5 to 2, multiply by that base, round to the nearest integer and clamp the result to 1 to 8. A and S also place a personal gem on the corpse for each winner; so can other ranks when the crafting-material bias is at least 0.5.",
     heading(
       'Gear and bonus copper',
       list([
@@ -214,7 +214,7 @@ export function addRiftAndHoardRules(w: SystemWriter) {
   );
   w.describe(
     'Buried hoards',
-    `The map owner's copper payout is ${percent(VAULT_OWNER_COPPER_BONUS)} higher than a guest's. If the gear roll succeeds, a ${percent(HOARD_LOOT_CLASS_BIAS)} roll favors the wearer's usable items when available; otherwise the game chooses uniformly from that boss's table. Each map opens a single room. Its rarity fixes the encounter budget even when the number of living players changes.`,
+    `The map owner's copper payout is ${percent(VAULT_OWNER_COPPER_BONUS)} higher than a guest's. If the gear roll succeeds, a ${percent(HOARD_LOOT_CLASS_BIAS)} roll favors the wearer's usable items when available; otherwise the game chooses uniformly from that boss's table. Each map opens a private hoard. Common and rare maps lead into a cave. Epic and legendary maps lead into an open valley. Its rarity fixes the encounter budget even when the number of living players changes.`,
   );
   for (const theme of [...RIFT_THEMES, ...CAVE_THEMES]) {
     const small = CAVE_THEMES.includes(theme),

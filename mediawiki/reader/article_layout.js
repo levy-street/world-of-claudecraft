@@ -1,13 +1,16 @@
+import { organizeReferenceDetails } from './article_disclosures.js';
+
 // Arrange the rendered wikitext without reinterpreting game values or their links.
 const factSections = {
   Zones: 'Facts',
   Items: 'Facts',
   Mobs: 'Facts',
-  Classes: 'Stats',
+  Classes: 'Starting statistics',
   NPCs: 'Details',
   Abilities: 'Learn and use',
   Quests: 'Quest brief',
   Dungeons: 'Entry',
+  Raids: 'Entry',
 };
 const boxTitles = {
   Zones: 'Zone information',
@@ -18,6 +21,7 @@ const boxTitles = {
   Abilities: 'Ability information',
   Quests: 'Quest information',
   Dungeons: 'Dungeon information',
+  Raids: 'Raid information',
   'Book of Deeds': 'Deed information',
 };
 
@@ -185,6 +189,7 @@ export function layoutArticle(view, page, wide, zoneName) {
       }
     }
   }
+  organizeReferenceDetails(article);
   const toc = contents(article, page.title, wide);
   const front = element('div', 'wiki-opening');
   if (introduction) front.append(introduction);

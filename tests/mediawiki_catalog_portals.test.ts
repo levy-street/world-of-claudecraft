@@ -76,6 +76,10 @@ describe('catalog portals', () => {
     expect(memberships('Items', 'item/wolf_fang').some((s) => s.includes('ingredients'))).toBe(
       true,
     );
+    expect(memberships('Items', 'item/pvp_skull_bag')).toContain('reserved/Bags (Items index)');
+    const goods = pages.get('reserved/Trade goods and junk (Items index)')!;
+    expect(goods).toContain('== Fine Material ==');
+    expect(goods).toContain('== Material ==');
     const odell = memberships('NPCs', 'npc/foreman_odell');
     expect(odell).toEqual(
       expect.arrayContaining([

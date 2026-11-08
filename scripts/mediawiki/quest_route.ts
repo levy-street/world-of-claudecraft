@@ -175,11 +175,11 @@ export function questRoute(quest: QuestDef): QuestRoute {
         if (b.id === SIGNPOST_NOTICEBOARD_ID) point(b, b.name);
     if (id === 'train_valorsteed') {
       npc('stablemaster_marla');
-      point(MOUNT_RACE_START_PLATFORM, 'Mount up and ride onto the start platform');
+      point(MOUNT_RACE_START_PLATFORM, 'Glowing start platform');
       point(MOUNT_RACE_COURSE.arch, 'Start and finish arch');
       for (const [i, j] of MOUNT_RACE_COURSE.jumps.entries()) point(j, 'Clear jump ' + (i + 1));
       note(
-        'Start the riding lesson with the stablemaster, mount, then finish the show-jumping course in order.',
+        `The quest records a solo training course. Stand on the glowing square and choose Start Race to borrow the training Valorsteed. After the countdown, jump all ${MOUNT_RACE_COURSE.jumps.length} bars in any order and ride through the finish arch within ${MOUNT_RACE_COURSE.timeLimitSeconds} seconds. The separate [[Mount racing]] activity is retired from live play.`,
       );
     }
     if (id === 'ps_passing_stone')

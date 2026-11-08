@@ -2,7 +2,6 @@ import { GUIDE_RELIQUARY } from '../../src/guide/content.generated';
 import { AUGMENTS, POWERUPS } from '../../src/sim/content/augments';
 import { BUDDIES } from '../../src/sim/content/buddies';
 import { TUG_HONOR_OFFER } from '../../src/sim/content/buddy_offers';
-import { BUDDY_BOSS_DROPS } from '../../src/sim/content/buddy_sources';
 import { CLUE_HUNTS, CLUE_STEP_RADIUS } from '../../src/sim/content/clue_hunts';
 import { DEEDS } from '../../src/sim/content/deeds';
 import { GUILD_CONTRACTS, GUILD_QUARTERMASTER_STOCK } from '../../src/sim/content/guild_contracts';
@@ -22,7 +21,8 @@ import {
   VAULT_PORTAL_LIFETIME,
 } from '../../src/sim/content/treasure_maps';
 import { isGrantableWeaponSkin, WEAPON_SKIN_LIST } from '../../src/sim/content/weapon_skins';
-import { DELVE_LIST, ITEM_SETS, ITEMS, MOBS, QUESTS, ZONES } from '../../src/sim/data';
+import { DELVE_LIST, ITEM_SETS, ITEMS, MOBS, NPCS, QUESTS, ZONES } from '../../src/sim/data';
+import { CURATOR_RANK_DEFS } from '../../src/sim/reliquary';
 import {
   ADVANCED_RIDING_FEE_COPPER,
   BASIC_RIDING_FEE_COPPER,
@@ -32,7 +32,9 @@ import { deedDisplayCategory } from '../../src/ui/deeds_view';
 import { armorySkinStrings } from '../../src/ui/i18n.catalog/armory';
 import { clueStrings } from '../../src/ui/i18n.catalog/clues';
 import { guideStrings } from '../../src/ui/i18n.catalog/guide';
+import { companionBossSources, companionRollText } from './companion_sources';
 import { deedLead, deedRequirements } from './deed_requirements';
+import { retiredDeedActivity } from './system_availability';
 import { heading, list, percent, type SystemWriter, words } from './system_writer';
 
 export function addExpeditionCollections(w: SystemWriter) {
@@ -94,7 +96,7 @@ export function addExpeditionCollections(w: SystemWriter) {
     );
   }
   for (const b of Object.values(BUDDIES)) {
-    const sources = BUDDY_BOSS_DROPS.filter((s) => s.key === b.key);
+    const sources = companionBossSources.filter((s) => s.key === b.key);
     const articleTitle = w.article(
       'Companions',
       b.name,
@@ -103,37 +105,58 @@ export function addExpeditionCollections(w: SystemWriter) {
       b.key === 'sprites'
         ? 'Earned when five friends complete referral cards. See [[Referral cards]].'
         : '',
-      b.key === TUG_HONOR_OFFER.buddy ? `Costs ${TUG_HONOR_OFFER.priceHonor} Honor.` : '',
-      list(
-        sources.map(
-          (s) =>
-            mob(s.bossId) +
-            ': ' +
-            (s.heroicOnly
-              ? `${percent(s.chance)} on Heroic only.`
-              : percent(s.chance) +
-                ' on Normal, ' +
-                percent(s.heroicChance ?? s.chance) +
-                ' on Heroic.'),
-        ),
-      ),
+      b.key === TUG_HONOR_OFFER.buddy
+        ? 'Buy this account unlock for ' +
+            TUG_HONOR_OFFER.priceHonor.toLocaleString('en-US') +
+            ' Honor from ' +
+            Object.values(NPCS)
+              .filter((n) => n.warfareVendor)
+              .map((n) => w.entity('npc', n.id, n.name))
+              .join(' or ') +
+            '.'
+        : '',
+      list(sources.map((s) => mob(s.bossId) + '. ' + companionRollText(s.fullGroupChance))),
     );
     w.registerArt('companion', b.key, articleTitle);
   }
   const deeds = Object.values(DEEDS).filter((d) => !d.hidden);
   const titles = new Map(deeds.map((d) => [d.id, w.reserveArticle(d.name, 'Deed')]));
   for (const [id, title] of titles) w.registerArt('deed', id, title);
+  w.describe(
+    'The Reliquary',
+    heading(
+      'Curator ranks',
+      'Curator rank counts distinct catalogued entries, not duplicate copies. Rank rewards are cosmetic and award no Renown.\n\n' +
+        '{| class="wikitable"\n! Rank !! Distinct entries !! Seal and reward\n' +
+        CURATOR_RANK_DEFS.map(
+          (rank) =>
+            '|-\n| ' +
+            rank.rank +
+            ' || ' +
+            rank.threshold +
+            ' || ' +
+            words(rank.sealId) +
+            (rank.deedId ? '; ' + w.entity('deed', rank.deedId) : '; first Curator seal'),
+        ).join('\n') +
+        '\n|}',
+    ),
+  );
+
   for (const d of deeds) {
+    const retiredActivity = retiredDeedActivity(d.id);
     w.article(
       {
         owner: 'Book of Deeds',
         title: titles.get(d.id),
+        retired: Boolean(retiredActivity),
         section: guideStrings.deedsPage.cat[deedDisplayCategory(d.category)],
       },
       d.name,
       'Deed',
-      deedLead(d),
-      heading('How to earn', deedRequirements(w, d)),
+      retiredActivity
+        ? `'''Retired deed.''' [[${retiredActivity}]] is closed. Existing earners keep the deed. New players cannot earn it.`
+        : deedLead(d),
+      heading(retiredActivity ? 'Original requirement' : 'How to earn', deedRequirements(w, d)),
       heading(
         'Reward',
         'Awards ' +
@@ -198,9 +221,9 @@ export function addExpeditionCollections(w: SystemWriter) {
                 case 'zone':
                   return w.entity('zone', h.sourceId);
                 case 'deed':
-                  return DEEDS[h.sourceId]?.name ?? words(h.sourceId);
+                  return w.entity('deed', h.sourceId, DEEDS[h.sourceId]?.name);
                 case 'quest':
-                  return QUESTS[h.sourceId]?.name ?? words(h.sourceId);
+                  return w.entity('quest', h.sourceId, QUESTS[h.sourceId]?.name);
                 default:
                   return `${words(h.sourceKind)} (${words(h.sourceId)})`;
               }

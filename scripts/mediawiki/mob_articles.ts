@@ -1,9 +1,5 @@
 import { BUDDIES } from '../../src/sim/content/buddies';
 import {
-  BUDDY_WORLD_REVEAL_DISTANCE,
-  buddyBossDropsFor,
-} from '../../src/sim/content/buddy_sources';
-import {
   THATCHGRIN_CORPSE_SECONDS,
   THATCHGRIN_HP_CAP_RATIO,
   THATCHGRIN_HP_STEP_RATIO,
@@ -21,16 +17,17 @@ import {
 import { createMob } from '../../src/sim/entity';
 import { heroicLootItemId } from '../../src/sim/loot/heroic_item';
 import { MAX_AGGRO_RADIUS } from '../../src/sim/mob/aggro_ranges';
-import { spawnOpenWorldMob } from '../../src/sim/mob/open_world_tuning';
 import { resolveRespawnSeconds } from '../../src/sim/respawn_policy';
 import { thatchgrinSpawnTemplate } from '../../src/sim/seasonal/scarecrow';
 import { resolveScarecrowField } from '../../src/sim/seasonal/scarecrow_field';
 import type { LootEntry } from '../../src/sim/types';
 import { WORLD_BOSS_CORPSE_SECONDS, WORLD_BOSSES } from '../../src/sim/world_boss';
 import { WORLD_SEED } from '../../src/sim/world_seed';
+import { companionBossSources, companionByCreature, companionRollText } from './companion_sources';
 import { journalArticles } from './encounter_articles';
 import { type ArticleTools, append, lines, pct, ref, words } from './entity_format';
 import { mobMechanicLines } from './mob_mechanics';
+import { releasedCampStats } from './released_camp_stats';
 
 const coinRange = (copper: number) =>
   Math.ceil(copper * 0.6) + ' to ' + Math.ceil(copper * 1.4) + ' copper';
@@ -115,6 +112,23 @@ export function addMobArticles(w: ArticleTools, itemSources: Map<string, Set<str
       if (o.type === 'kill')
         append(hunted, o.targetMobId, ref(w, 'quest', q.id) + ' (required: ' + o.count + ').');
   for (const m of Object.values(MOBS)) {
+    const companion = companionByCreature.get(m.id);
+    if (companion) {
+      const title = w.titleBy.companion?.get(companion.key);
+      const guide = title ? w.link(title, companion.name) : w.link('Companions');
+      w.add(
+        w.titleBy.mob.get(m.id)!,
+        w.section(
+          'Overview',
+          companion.name +
+            ' is a cosmetic companion. It follows its owner and takes no part in combat. See ' +
+            guide +
+            ' for how to collect it.',
+        ),
+        ['Mobs', 'Companion creatures'],
+      );
+      continue;
+    }
     const facts: [string, string][] = [
       ['Family', words(m.family)],
       ['Base swing interval', m.attackSpeed + ' sec'],
@@ -166,7 +180,7 @@ export function addMobArticles(w: ArticleTools, itemSources: Map<string, Set<str
     if (m.aggroRadius > 0 && !m.dummy)
       facts.push([
         'Ordinary detection',
-        'Add 1.5 yd per level the creature exceeds the player. Subtract 1.5 yd per level the player exceeds it. Clamp between 4 and ' +
+        'Add 1.5 yd per level the creature exceeds the player. Subtract 1.5 yd per level the player exceeds it. The final distance cannot be less than 4 yd or more than ' +
           MAX_AGGRO_RADIUS +
           ' yd.',
       ]);
@@ -175,11 +189,11 @@ export function addMobArticles(w: ArticleTools, itemSources: Map<string, Set<str
     if (m.seasonalEvent) facts.push(['Event', words(m.seasonalEvent)]);
     if (m.xpMult !== undefined) facts.push(['Experience multiplier', String(m.xpMult)]);
     const stats: [string, string][] = [];
+    const campMob = getActiveWorldContent().camps.some((c) => c.mobId === m.id);
     for (let lvl = m.minLevel; lvl <= m.maxLevel; lvl++) {
-      const campMob = getActiveWorldContent().camps.some((c) => c.mobId === m.id);
       const pos = { x: 0, y: 0, z: 0 };
       const entity = campMob
-        ? spawnOpenWorldMob(1, m, lvl, pos)
+        ? releasedCampStats(m, lvl)
         : createMob(1, m.id === THATCHGRIN_ID ? thatchgrinSpawnTemplate(m) : m, lvl, pos);
       if (schedule) entity.maxHp = schedule.hpScale.base;
       if (m.id === THATCHGRIN_ID && lvl === m.maxLevel) {
@@ -218,9 +232,11 @@ export function addMobArticles(w: ArticleTools, itemSources: Map<string, Set<str
           entity.weapon.max +
           ' base weapon damage.' +
           (entity.mechanicDamageMult
-            ? ' Mechanic damage × ' + entity.mechanicDamageMult + '.'
+            ? ' Mechanic damage × ' + Number(entity.mechanicDamageMult.toFixed(5)) + '.'
             : '') +
-          (entity.mechanicHealMult ? ' Mechanic healing × ' + entity.mechanicHealMult + '.' : ''),
+          (entity.mechanicHealMult
+            ? ' Mechanic healing × ' + Number(entity.mechanicHealMult.toFixed(5)) + '.'
+            : ''),
       ]);
     }
     const drops: string[] = [];
@@ -230,7 +246,14 @@ export function addMobArticles(w: ArticleTools, itemSources: Map<string, Set<str
     ] as const)
       for (const e of entries) {
         // The runtime quest-drop branch awards only item slots. A quest-gated copper-only row produces nothing.
-        if (e.questId && !e.itemId) continue;
+        if (
+          e.questId &&
+          (!e.itemId ||
+            !QUESTS[e.questId]?.objectives.some(
+              (o) => o.type === 'collect' && o.itemId === e.itemId,
+            ))
+        )
+          continue;
         const text = lootLine(w, e, heroicOnly, instanceMobs.has(m.id));
         drops.push(text);
         if (!e.itemId) continue;
@@ -247,17 +270,13 @@ export function addMobArticles(w: ArticleTools, itemSources: Map<string, Set<str
       drops.unshift(
         'Each eligible contributor rolls personally. Across all shared gear pools a player can win at most one gear item on the kill.',
       );
-    for (const row of buddyBossDropsFor(m.id)) {
-      const rates = row.heroicOnly
-        ? pct(row.heroicChance ?? row.chance) + ' on Heroic only'
-        : pct(row.chance) + ' on Normal and ' + pct(row.heroicChance ?? row.chance) + ' on Heroic';
+    for (const row of companionBossSources.filter((s) => s.bossId === m.id)) {
+      const name = BUDDIES[row.key].name;
+      const title = w.titleBy.companion?.get(row.key);
       drops.push(
-        BUDDIES[row.key].name +
-          ' companion: ' +
-          rates +
-          ' per eligible player. Reveals after leaving the instance or moving ' +
-          BUDDY_WORLD_REVEAL_DISTANCE +
-          ' yd from an overworld kill.',
+        (title ? w.link(title, name) : name) +
+          ' companion. ' +
+          companionRollText(row.fullGroupChance),
       );
     }
     const info =

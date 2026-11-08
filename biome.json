@@ -60,6 +60,7 @@
     },
     {
       "includes": [
+        "mediawiki/seed/pages.tooltips.json",
         "docs/achievements/placeholder-art-completion-2026-08-09/accepted-art.json",
         "docs/achievements/placeholder-art-completion-2026-08-09/mob-portrait-source-manifest.json",
         "docs/achievements/placeholder-art-completion-2026-08-09/weapons-a-generation-record.json",

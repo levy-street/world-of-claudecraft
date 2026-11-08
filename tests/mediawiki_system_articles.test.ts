@@ -36,6 +36,27 @@ function render() {
 }
 describe('system encyclopedia', () => {
   const { pages, byCategory } = render();
+  it('marks retired modes, their mechanics and their deeds on direct visits', () => {
+    const directory = pages.get('Gameplay Systems')!;
+    const retired = directory.split('== Retired and unavailable activities ==')[1].split('==')[0];
+    for (const title of ['Protect Yumi', 'Fiesta arena', 'Vale Cup', 'Mount racing']) {
+      expect(retired).toContain('[[' + title + ']]');
+      expect(directory.split('== Retired and unavailable activities ==')[0]).not.toContain(
+        '[[' + title + ']]',
+      );
+    }
+    for (const group of ['Fiesta augments', 'Fiesta power-ups']) {
+      for (const title of byCategory.get(group)!) expect(pages.get(title)).toMatch(/^'''Retired/);
+    }
+    for (const name of ['Boots on the Pitch', 'Party Crasher']) {
+      const title = name + ' (Deed)';
+      expect(pages.get(title)).toMatch(/^'''Retired deed/);
+      expect(pages.get(title)).toContain('== Original requirement ==');
+      expect(pages.get('Book of Deeds')).toContain(`[[${title}|${name}]] (retired)`);
+    }
+    expect(pages.get('Mount racing')).toContain('7 bars in any order');
+    expect(pages.get('Gourdlight Eve')).toContain('Seasonal event');
+  });
   it('gives every public entry in its registries a reachable article', () => {
     for (const [name, count] of [
       ['Hoard encounters', RIFT_THEMES.length + CAVE_THEMES.length],
@@ -52,12 +73,46 @@ describe('system encyclopedia', () => {
       for (const title of entries) expect(pages.get(name)).toContain(`[[${title}|`);
     }
   });
+  it('gives every available system its entry point, prerequisites, ordered actions and outcome', () => {
+    const systems = byCategory.get('Gameplay Systems')!;
+    const retired = new Set([
+      'Protect Yumi',
+      'Fiesta arena',
+      'Fiesta augments',
+      'Fiesta power-ups',
+      'Vale Cup',
+      'Mount racing',
+    ]);
+    for (const title of systems) {
+      const body = pages.get(title)!;
+      if (retired.has(title)) {
+        expect(body, title).toMatch(/^'''Retired/);
+        expect(body, title).not.toContain('== Getting started ==');
+      } else if (title === 'Referral cards') {
+        expect(body).toContain('== How to start a card ==');
+      } else {
+        expect(body, title).toMatch(
+          /== Getting started ==[\s\S]+'''Where to go\.'''.+[\s\S]+'''What you need\.'''.+[\s\S]+=== Step by step ===\n# .+[\s\S]+\n# .+[\s\S]+'''What you get\.'''.+/,
+        );
+      }
+    }
+  });
   it('resolves numeric tokens and display labels before publishing', () => {
     const unresolved = [...pages].flatMap(([title, body]) => {
       const tokens = body.match(/\{[a-zA-Z]\w*\}|\bundefined\b|\bNaN\b/g);
       return tokens ? [[title, tokens]] : [];
     });
     expect(unresolved).toEqual([]);
+  });
+  it('links each profession to its recipes and separates listed skill from the ability to craft', () => {
+    const pick = 'Osmium Mining Pick (Recipe)';
+    expect(pages.get('Engineering')).toContain(`Skill 75: [[${pick}|`);
+    expect(pages.get(pick)).toContain('attempt it below its listed skill of 75');
+    expect(pages.get(pick)).toContain('From skill 100 until 125: 0.5 skill per craft');
+    expect(pages.get('Crafting stations')).toContain('x 7, z 660');
+    for (const title of byCategory.get('Crafting recipes') ?? []) {
+      expect(pages.get(title)).toContain('== Skill gain ==');
+    }
   });
   it('publishes verifiable progression, crafting and collection details', () => {
     expect(pages.get('Dungeon Finder')).toContain('moderated note of up to 120 characters');

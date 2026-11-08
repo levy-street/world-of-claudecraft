@@ -16,7 +16,7 @@ import { RETIRED_HEROIC_ITEMS } from '../../src/sim/content/heroic_loot';
 import { HEROIC_VENDOR_NPC_ID, HEROIC_VENDOR_STOCK } from '../../src/sim/content/heroic_vendor';
 import { CRUCIBLE_VENDOR_NPC_ID, CRUCIBLE_VENDOR_STOCK } from '../../src/sim/content/ignivar_loot';
 import { ITEM_SETS } from '../../src/sim/content/item_sets';
-import { MOUNTS } from '../../src/sim/content/mounts';
+import { isDeveloperMount, MOUNTS } from '../../src/sim/content/mounts';
 import { MOBILE_CRAFTING_STATION_DURATION_TICKS } from '../../src/sim/content/professions';
 import { RELIQUARY_PAGES, reliquaryRelicSource } from '../../src/sim/content/reliquary';
 import { MECH_CHROMAS, SKIN_RANK_ROLL_WEIGHTS, SKIN_RANKS } from '../../src/sim/content/skins';
@@ -50,6 +50,7 @@ import { itemLevel } from '../../src/sim/item_level';
 import { requiredLevelFor } from '../../src/sim/item_level_req';
 import { gatheringSupplyHintsForItem } from '../../src/sim/professions/gathering_supply';
 import { wieldRequirementFor } from '../../src/sim/professions/wield_gate';
+import { RETIRED_ZONE1_ITEM_IDS } from '../../src/sim/removed_zone1_content';
 import {
   CONSUME_DURATION,
   CONSUME_TICKS,
@@ -61,6 +62,7 @@ import {
 } from '../../src/sim/types';
 import { factionRewardTooltipLines } from '../../src/ui/hud/faction_reward_tooltip_view';
 import { itemCombatTooltipLines } from '../../src/ui/item_combat_tooltip_view';
+import { itemSlotLabel } from '../../src/ui/item_slot_labels';
 import {
   seasonalItemSourceText,
   seasonalItemTooltipText,
@@ -72,8 +74,10 @@ import {
 } from '../../src/ui/trinket_tooltip_view';
 import { indexActivityItems } from './activity_item_sources';
 import { type ArticleTools, append, lines, pct, recipeLabel, ref, words } from './entity_format';
+import { itemAcquisitionArticle, itemAcquisitionIndex } from './item_acquisition';
 import { indexSpecialItemSources } from './special_item_sources';
 import { vendorOfferText } from './vendor_offer';
+import { wikiItemKind } from './wiki_item_kind';
 
 // Each reused HUD builder emits escaped single-line divs. Keep their player-facing
 
@@ -453,6 +457,12 @@ function effects(w: ArticleTools, item: ItemDef): string[] {
 }
 
 export function addItemArticles(w: ArticleTools, sources: Map<string, Set<string>>) {
+  const acquisition = itemAcquisitionIndex(w);
+  const vendorStock = new Set(
+    Object.values(NPCS)
+      .filter((n) => !n.devVendor)
+      .flatMap((n) => n.vendorItems ?? []),
+  );
   const uses = new Map<string, Set<string>>();
   indexActivityItems(w, sources, uses);
   indexSpecialItemSources(w, sources);
@@ -531,8 +541,9 @@ export function addItemArticles(w: ArticleTools, sources: Map<string, Set<string
         r.resultCount +
         ' with ' +
         words(r.professionId) +
-        ' at skill ' +
+        ' (listed skill ' +
         r.skillReq +
+        ')' +
         '. Base ingredients: ' +
         r.reagents.map((a) => a.count + ' ' + ref(w, 'item', a.itemId)).join(', ') +
         '.' +
@@ -567,7 +578,7 @@ export function addItemArticles(w: ArticleTools, sources: Map<string, Set<string
 
   for (const item of Object.values(ITEMS)) {
     const quality = item.quality ?? 'common',
-      kind = w.kindWording(item.kind);
+      kind = wikiItemKind(item);
 
     const facts: [string, string][] = [
       ['Type', kind],
@@ -585,7 +596,10 @@ export function addItemArticles(w: ArticleTools, sources: Map<string, Set<string
     if (ilvl !== undefined) facts.push(['Base item level', String(ilvl)]);
 
     if (item.slot) {
-      facts.push(['Slot', words(item.slot)], ['Required level', String(requiredLevelFor(item))]);
+      facts.push(
+        ['Slot', itemSlotLabel(item.slot)],
+        ['Required level', String(requiredLevelFor(item))],
+      );
 
       const cs = (Object.keys(CLASSES) as PlayerClass[]).filter((c) => canEquipItem(c, item));
 
@@ -601,11 +615,16 @@ export function addItemArticles(w: ArticleTools, sources: Map<string, Set<string
 
     if (item.kind === 'weapon')
       facts.push(
-        ['Weapon hand', words(weaponHand(item) ?? 'onehand')],
+        [
+          'Weapon hand',
+          { onehand: 'One-handed', twohand: 'Two-handed', mainhand: 'Main hand only' }[
+            weaponHand(item) ?? 'onehand'
+          ],
+        ],
         ['Dagger', item.weapon.dagger ? 'Yes' : 'No'],
       );
 
-    if ((item.buyValue ?? 0) > 0 && !item.teachesRiding)
+    if (vendorStock.has(item.id) && (item.buyValue ?? 0) > 0 && !item.teachesRiding)
       facts.push(['Vendor copper price per unit', w.money(item.buyValue)]);
 
     if (item.priceHonor) facts.push(['Honor cost', String(item.priceHonor)]);
@@ -648,8 +667,15 @@ export function addItemArticles(w: ArticleTools, sources: Map<string, Set<string
 
     if (item.seasonalEvent) facts.push(['Event', words(item.seasonalEvent)]);
 
-    if (RETIRED_HEROIC_ITEMS[item.id])
-      facts.push(['Availability', 'Retired gear retained for existing owners.']);
+    const availability = RETIRED_HEROIC_ITEMS[item.id]
+      ? "'''Retired gear.''' This former Heroic drop was removed from loot tables. Existing copies still work."
+      : RETIRED_ZONE1_ITEM_IDS.some((id) => id === item.id)
+        ? "'''Retired drop.''' Existing copies still work and may be traded by their owners."
+        : item.id === 'chunk_of_ore'
+          ? "'''Retired tutorial item.''' Existing copies remain in older characters’ bags."
+          : item.kind === 'mount' && isDeveloperMount(item.mount)
+            ? "'''Developer grant.''' Developers can grant these reins. They have no ordinary gameplay source."
+            : '';
 
     if (item.heroicOf || item.relicOf)
       facts.push(['Base item', ref(w, 'item', (item.heroicOf ?? item.relicOf)!)]);
@@ -670,19 +696,21 @@ export function addItemArticles(w: ArticleTools, sources: Map<string, Set<string
 
     w.add(
       w.titleBy.item.get(item.id)!,
-      w.section(
-        'Overview',
-        item.name +
-          ' is a ' +
-          quality +
-          ' ' +
-          kind +
-          (item.slot ? ' for ' + words(item.slot) : '') +
-          '.',
-      ) +
+      (availability ? availability + '\n\n' : '') +
+        w.section(
+          'Overview',
+          item.name +
+            ' is ' +
+            (/^[aeiou]/i.test(quality) ? 'an ' : 'a ') +
+            quality +
+            '-quality ' +
+            kind.toLowerCase() +
+            '.',
+        ) +
         w.section('Facts', w.table(facts)) +
+        itemAcquisitionArticle(w, item, acquisition.get(item.id) ?? [], ways) +
         lines(w, 'Equipment and use', effects(w, item)) +
-        lines(w, 'Sources', ways.length ? ways : ['Acquisition unverified for this release.']) +
+        lines(w, 'Sources', ways) +
         lines(w, 'Used for', Array.from(uses.get(item.id) ?? [])),
       ['Items', kind, quality],
     );

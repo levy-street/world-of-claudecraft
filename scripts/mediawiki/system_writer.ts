@@ -1,4 +1,8 @@
+import { systemIntroduction } from './article_editorial';
+import { systemWalkthrough } from './play_path';
+import { activityNotice } from './system_availability';
 import { systemDirectory } from './system_directory';
+import { systemRouteMap } from './system_routes';
 
 /** A system and its entries share one index. Existing game entities resolve through the seed's title maps. */
 export interface SystemWikiContext {
@@ -30,11 +34,14 @@ export function percent(value: number): string {
 export function systemWriter(ctx: SystemWikiContext) {
   const add = (title: string, body: string, categories: string[]) =>
     ctx.add(title, body.replace(/\s*[\u2013\u2014\u2015]\s*/g, ', '), categories);
-  const groups = new Map<string, { title: string; body: string; entries: Map<string, string[]> }>();
+  const groups = new Map<
+    string,
+    { name: string; title: string; body: string; entries: Map<string, string[]> }
+  >();
   const group = (name: string) => {
     let found = groups.get(name);
     if (!found) {
-      found = { title: ctx.unique(name), body: '', entries: new Map() };
+      found = { name, title: ctx.unique(name), body: '', entries: new Map() };
       groups.set(name, found);
     }
     return found;
@@ -61,7 +68,7 @@ export function systemWriter(ctx: SystemWikiContext) {
         : (label ?? words(id));
     },
     article(
-      grouping: string | { owner: string; section: string; title?: string },
+      grouping: string | { owner: string; section: string; title?: string; retired?: boolean },
       name: string,
       suffix: string,
       ...paragraphs: string[]
@@ -72,24 +79,41 @@ export function systemWriter(ctx: SystemWikiContext) {
       const title =
         (typeof grouping === 'string' ? undefined : grouping.title) ??
         ctx.unique(`${name} (${suffix})`);
-      add(title, `${paragraphs.filter(Boolean).join('\n\n')}\n\nSee [[${owner.title}]].`, [
-        groupName,
-      ]);
+      const notice = activityNotice(groupName);
+      const guide =
+        notice.startsWith("'''Retired") || (typeof grouping !== 'string' && grouping.retired)
+          ? `See [[${owner.title}]] for the activity's history or availability.`
+          : `Related guide: [[${owner.title}]].`;
+      add(title, [notice, ...paragraphs, guide].filter(Boolean).join('\n\n'), [groupName]);
       const entries = owner.entries.get(section) ?? [];
-      entries.push(`[[${title}|${name}]]`);
+      const retired = typeof grouping !== 'string' && grouping.retired;
+      entries.push(`[[${title}|${name}]]` + (retired ? ' (retired)' : ''));
       owner.entries.set(section, entries);
       return title;
     },
     finish() {
       const index = [...groups.values()].sort((a, b) => a.title.localeCompare(b.title, 'en'));
       for (const page of index) {
+        const notice = activityNotice(page.name);
+        const walkthrough = systemWalkthrough(page.name, notice);
+        const routeMap = systemRouteMap(page.name, notice);
+        const { lead, rest } = walkthrough
+          ? systemIntroduction(page.body, page.name)
+          : { lead: '', rest: page.body };
+        const rulesHeading =
+          walkthrough && rest.trim() && !rest.trimStart().startsWith('==')
+            ? '== Rules and details ==\n'
+            : '';
         const categories = ['Systems', 'Gameplay Systems'];
         const sections = [...page.entries].sort(([a], [b]) => a.localeCompare(b, 'en'));
         if (sections.some(([name]) => name !== 'Entries'))
           categories.push('Collection directories');
         add(
           page.title,
-          page.body +
+          (notice ? notice + '\n\n' : '') +
+            (walkthrough
+              ? lead + walkthrough + routeMap + rulesHeading + rest
+              : page.body + routeMap) +
             sections.map(([name, entries]) => heading(name, list(entries.sort()))).join(''),
           categories,
         );

@@ -1,5 +1,7 @@
+import { FINDER_CLASS_ROLES } from '../../src/sim/content/dungeon_finder';
 import { FACTION_VENDOR_GATES, FACTION_VENDOR_STOCK } from '../../src/sim/content/faction_vendors';
-import { ITEMS, ZONES } from '../../src/sim/data';
+import { MAILBOXES } from '../../src/sim/content/mailboxes';
+import { ITEMS, ZONES, zoneContaining } from '../../src/sim/data';
 import {
   FACTION_TIER_TITLES,
   FACTIONS,
@@ -8,6 +10,13 @@ import {
   STANDING_THRESHOLDS,
   STANDING_TIERS,
 } from '../../src/sim/factions';
+import {
+  MAIL_ATTACHMENT_EXPIRY_SECONDS,
+  MAIL_DELIVERY_SECONDS,
+  MAIL_ESCROW_COPPER_MIN,
+  MAIL_MAX_ATTACHMENTS,
+  MAIL_POSTAGE,
+} from '../../src/sim/mail/post_office';
 import { MAX_LEVEL, PRESTIGE_XP_PER_RANK, xpForLevel } from '../../src/sim/types';
 import { guideStrings as guide } from '../../src/ui/i18n.catalog/guide';
 import { addActivityRules } from './system_activities';
@@ -17,6 +26,7 @@ import { addRecoveryAndFinder } from './system_recovery';
 import { addRiftAndHoardRules } from './system_rifts';
 import { addTradeSkills } from './system_trades';
 import { heading, list, type SystemWikiContext, systemWriter } from './system_writer';
+import { talentLoadoutGuide } from './talent_loadout_guide';
 
 export function addSystemArticles(ctx: SystemWikiContext): string[] {
   const w = systemWriter(ctx);
@@ -76,7 +86,32 @@ export function addSystemArticles(ctx: SystemWikiContext): string[] {
   w.describe('Trading', economy.tradeBody);
   w.describe('World Market', economy.marketBody);
   w.describe('Banking', economy.bankBody);
-  w.describe('Mail', economy.mailBody);
+  w.describe(
+    'Mail',
+    economy.mailBody,
+    heading(
+      'Send a letter',
+      list([
+        'Click a Ravenpost mailbox and open the Send tab. In To, enter the name of the character you are writing to.',
+        `Enter your message. To send goods, click an item in your bags and set its quantity under Parcels. A letter holds up to ${MAIL_MAX_ATTACHMENTS} item stacks. Use Attach coin to send money as well.`,
+        `Choose Send letter. You pay ${MAIL_POSTAGE} copper in postage plus any coin you attached. The items leave your bags when you send. Delivery takes ${MAIL_DELIVERY_SECONDS} seconds.`,
+      ]),
+    ),
+    heading(
+      'Collect a parcel',
+      `At any Ravenpost mailbox, open Inbox, choose the letter, then select Take attachments. A player letter with goods or at least ${MAIL_ESCROW_COPPER_MIN} copper attached returns to its sender if left unclaimed for ${MAIL_ATTACHMENT_EXPIRY_SECONDS / 86400} days.`,
+    ),
+    'Purchased membership tokens and annual membership mount reins can be collected directly from their delivery window, wherever you are. If your bags are full, the purchased reward goes into inventory overflow.',
+    heading(
+      'Where to find a mailbox',
+      list(
+        MAILBOXES.map(({ x, z }) => {
+          const zone = zoneContaining(x, z);
+          return `${zone ? zone.hub.name + ', ' + w.entity('zone', zone.id) + ': ' : ''}x ${x}, z ${z}.`;
+        }),
+      ),
+    ),
+  );
   w.describe(
     'Vendors and currencies',
     economy.coinBody,
@@ -98,8 +133,7 @@ export function addSystemArticles(ctx: SystemWikiContext): string[] {
   w.describe('Ashen Coliseum', arena.coliseumBody, arena.ladderBody, arena.rewardsBodyLossShare);
   w.describe(
     'Honor and Warfare gear',
-    arena.honorBody,
-    arena.quartermastersBody,
+    'Honor is a currency earned in eligible PvP activities. Your character sheet tracks it separately from gold. Both quartermasters sell the same stock. Check the price on the offer: Season 1 entry gear costs gold, while other goods, including the two Warfare trinkets, cost Honor.',
     arena.warfareBodyStatsStay,
     arena.warfareTradeBodyRatingSpent,
   );
@@ -138,7 +172,26 @@ export function addSystemArticles(ctx: SystemWikiContext): string[] {
     gear.bindOnTradeBody,
     gear.uniqueBody,
   );
-  w.describe('Dungeon Finder', dungeons.finderRolesBody);
+  w.describe(
+    'Dungeon Finder',
+    'Roles are determined by class. You can select any role your class supports, regardless of which talents you have chosen. Every queued member must meet the activity level range.',
+    heading(
+      'Who can queue for each role',
+      list(
+        Object.entries(FINDER_CLASS_ROLES).map(
+          ([role, classes]) =>
+            (role === 'dps' ? 'Damage' : role === 'tank' ? 'Tank' : 'Healer') +
+            ': ' +
+            classes
+              .map((id) => {
+                const title = id[0].toUpperCase() + id.slice(1);
+                return `[[${title}]]`;
+              })
+              .join(', '),
+        ),
+      ),
+    ),
+  );
   w.describe(
     'Heroic difficulty',
     dungeons.heroicHowBody,
@@ -175,7 +228,7 @@ export function addSystemArticles(ctx: SystemWikiContext): string[] {
     quests.partyBody,
     quests.typeEscortBody,
   );
-  w.describe('Clue hunts', quests.cluesEarnBody, quests.cluesHuntBody, quests.cluesCasketBody);
+  w.describe('Clue hunts', quests.cluesHuntBody, quests.cluesCasketBody);
   w.describe('The Card Master', quests.cardMasterBody);
   w.describe(
     'Book of Deeds',
@@ -192,15 +245,15 @@ export function addSystemArticles(ctx: SystemWikiContext): string[] {
     mounts.whereBody,
     mounts.rideBody,
     mounts.breaksBody,
-    mounts.raceBody,
+    '[[Mount racing]] is retired from live play. See its historical rules for the solo jumping course used in [[Riding Lessons]].',
   );
   w.describe(
     'Professions',
-    trades.whatBody,
-    trades.ringBody,
+    'Every character can gather and try the ten crafts. For example, a new engineer can learn Bronze Hoe from Tinker Gizzel at skill 0. Your crafting archetype sets which recipe tiers can raise your skill. You keep the skills and recipes you already earned when you change archetype.',
+    'Each craft has its own skill bar and reaches 125. You can keep making items at the cap. Open [[Crafting recipes]] to compare recipes by profession.',
     trades.archetypeChooseBody,
     trades.archetypeSwitchBody,
-    trades.stationsBody,
+    'Eastbrook has the forge, kitchens, loom and toolworks. Fenbridge has the tannery and Highwatch has the apothecary. Use [[Crafting stations]] for their coordinates. The recipe determines whether you need a bench. You can apply equipment enchants in the field, while Enchanting recipes for gathering-tool charms use the toolworks.',
     trades.provenanceBody,
   );
   w.describe(
@@ -256,6 +309,7 @@ export function addSystemArticles(ctx: SystemWikiContext): string[] {
     'Specialization and talents',
     guide.talentsPage.whatBody,
     'See [[Specializations]] and [[Talent choices]] for each class.',
+    talentLoadoutGuide(),
   );
   w.describe(
     'Faction standing',

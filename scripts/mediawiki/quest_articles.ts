@@ -15,6 +15,7 @@ import {
   questTurnInNpcIds,
   TICK_RATE,
 } from '../../src/sim/types';
+import { questObjectiveText } from './article_editorial';
 import { type ArticleTools, append, lines, recipeLabel, ref, words } from './entity_format';
 import { type QuestRoute, questRoute } from './quest_route';
 
@@ -84,6 +85,18 @@ function target(w: ArticleTools, o: QuestObjective): string {
 export function addQuestArticles(w: ArticleTools, itemSources: Map<string, Set<string>>) {
   for (const quest of Object.values(QUESTS)) {
     const zone = questZoneName(quest);
+    const dungeonClosed =
+      quest.gatedWithDungeon && DUNGEONS[quest.gatedWithDungeon]?.guideVisible === false;
+    const closed = quest.retired || dungeonClosed;
+    const availability = quest.retired
+      ? "'''Retired quest.''' You can finish it if it is already in your quest log. The quest giver no longer offers it."
+      : dungeonClosed
+        ? `'''Unavailable for new starts.''' The quest giver can offer this quest only when ${ref(w, 'dungeon', quest.gatedWithDungeon!)} is open for this quest.`
+        : quest.seasonalEvent
+          ? "'''Seasonal quest.''' The quest giver offers it only during " +
+            words(quest.seasonalEvent) +
+            '.'
+          : '';
     const route = questRoute(quest);
 
     const facts: [string, string][] = [
@@ -147,7 +160,7 @@ export function addQuestArticles(w: ArticleTools, itemSources: Map<string, Set<s
             ' per previous switch'
           : String(o.count);
 
-      return o.label + ' (required: ' + count + ')' + (t ? '. Target: ' + t : '');
+      return questObjectiveText(o, t, count);
     });
 
     if (quest.objectives.some((o) => o.type === 'collect'))
@@ -169,7 +182,9 @@ export function addQuestArticles(w: ArticleTools, itemSources: Map<string, Set<s
       const text = [
         fixed ? 'Receive ' + ref(w, 'item', fixed) + '.' : '',
         choice.length
-          ? 'Choose one of ' + choice.map((id) => ref(w, 'item', id)).join(', ') + '.'
+          ? (choice.length === 1 ? 'Receive ' : 'Choose one of ') +
+            choice.map((id) => ref(w, 'item', id)).join(', ') +
+            '.'
           : '',
       ]
         .filter(Boolean)
@@ -185,7 +200,9 @@ export function addQuestArticles(w: ArticleTools, itemSources: Map<string, Set<s
         append(
           itemSources,
           itemId,
-          'Quest reward from ' + ref(w, 'quest', quest.id) + '. See the class reward list.',
+          (closed ? 'Only if you already hold the quest. Reward from ' : 'Quest reward from ') +
+            ref(w, 'quest', quest.id) +
+            '. See the class reward list.',
         );
     }
 
@@ -273,16 +290,17 @@ export function addQuestArticles(w: ArticleTools, itemSources: Map<string, Set<s
           break;
 
         case 'interact':
-          action = o.targetNpcId ? 'Speak to ' + what + '.' : o.label + ' (required: ' + n + ').';
+          action = o.targetNpcId
+            ? 'Speak to ' + what + '.'
+            : questObjectiveText(o, what, String(n));
           break;
 
         case 'event':
-          action = o.label + ' (required: ' + n + ').';
+          action = questObjectiveText(o, what, String(n));
           break;
       }
 
-      if (quest.resolvedObjectiveCounts === 'archetypeAmends' && i === 0)
-        action = objectives[0] + '.';
+      if (quest.resolvedObjectiveCounts === 'archetypeAmends' && i === 0) action = objectives[0];
 
       if (places.length) {
         const spot = places[0];
@@ -312,7 +330,7 @@ export function addQuestArticles(w: ArticleTools, itemSources: Map<string, Set<s
 
     const directions = w.section(
       'Walkthrough',
-      'Accept the quest from ' +
+      (closed ? 'Original quest giver: ' : 'Accept the quest from ') +
         ref(w, 'npc', quest.giverNpcId) +
         '.' +
         (quest.requiredItems?.length
@@ -351,7 +369,8 @@ export function addQuestArticles(w: ArticleTools, itemSources: Map<string, Set<s
 
     w.add(
       w.titleBy.quest.get(quest.id)!,
-      w.section('Quest brief', w.table(facts)) +
+      (availability ? availability + '\n\n' : '') +
+        w.section('Quest brief', w.table(facts)) +
         lines(w, 'Objectives', objectives) +
         directions +
         w.section(

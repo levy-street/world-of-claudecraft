@@ -60,6 +60,15 @@ describe('deed requirements in the player encyclopedia', () => {
   it('publishes the earned condition on every public deed while retaining hidden deed visibility', () => {
     const deeds = [...pages].filter(([title]) => title.includes('(Deed)'));
     expect(deeds).toHaveLength(Object.values(DEEDS).filter((deed) => !deed.hidden).length);
-    for (const [, body] of deeds) expect(body).toContain('== How to earn ==');
+    const archived = deeds.filter(([, body]) => body.startsWith("'''Retired deed.'''"));
+    expect(archived).toHaveLength(18);
+    for (const [, body] of deeds) {
+      if (body.startsWith("'''Retired deed.'''")) {
+        expect(body).toContain('New players cannot earn it.');
+        expect(body).toContain('== Original requirement ==');
+      } else {
+        expect(body).toContain('== How to earn ==');
+      }
+    }
   });
 });

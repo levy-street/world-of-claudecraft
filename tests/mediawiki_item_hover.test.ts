@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { itemHover } from '../scripts/mediawiki/item_hover';
+import { wikiItemKind } from '../scripts/mediawiki/wiki_item_kind';
 import { ITEMS } from '../src/sim/data';
 import { itemDisplayName } from '../src/ui/entity_i18n';
 import { esc } from '../src/ui/esc';
@@ -9,6 +10,11 @@ import { instanceTitleHtml, vendorSellTooltipLine } from '../src/ui/item_instanc
 import { seasonalItemTooltipText } from '../src/ui/seasonal_item_tooltip';
 
 describe('encyclopedia item hovers', () => {
+  it('uses companion names for both collectible item types', () => {
+    expect(wikiItemKind({ kind: 'buddy', id: 'example' })).toBe('Companion');
+    expect(wikiItemKind({ kind: 'buddy_cosmetic', id: 'example' })).toBe('Companion cosmetic');
+  });
+
   it('renders every item without a DOM, with the HUD title and no unresolved values or player comparisons', () => {
     for (const item of Object.values(ITEMS)) {
       const html = itemHover(item);

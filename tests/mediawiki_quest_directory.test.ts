@@ -35,7 +35,6 @@ function harness() {
     table: (rows) => rows.map((pair) => pair.join(' | ')).join('\n'),
     bullets: (rows) => rows.map((line) => '* ' + line).join('\n'),
     money: (n) => (n ?? 0) + ' copper',
-    kindWording: (s) => s,
   };
   return { w, pages };
 }

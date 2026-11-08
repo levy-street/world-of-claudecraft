@@ -7,6 +7,7 @@
   <title>Player Encyclopedia | World of ClaudeCraft</title>
   <meta name="description" content="A searchable field guide to the items, enemies, quests and mechanics of World of ClaudeCraft.">
   <link rel="stylesheet" href="./mediawiki/reader/reader.css">
+  <link rel="stylesheet" href="./mediawiki/reader/directory_layout.css">
   <link rel="stylesheet" href="./mediawiki/reader/hover_tooltip.css">
 </head>
 <body data-woc-site="encyclopedia">
@@ -42,7 +43,7 @@
     <aside class="reader-rail" aria-label="Article finder">
       <label for="lookup">Search the encyclopedia</label>
       <search class="searchbox"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5"/><path d="m15 15 5 5"/></svg><textarea id="lookup" rows="1" wrap="soft" spellcheck="false" placeholder="Search articles..." autocomplete="off"></textarea></search>
-      <nav aria-label="Browse articles" id="navigation"></nav>
+      <details class="browse-drawer" open><summary>Browse the wiki</summary><nav aria-label="Browse articles" id="navigation"></nav></details>
     </aside>
     <main id="view" tabindex="-1"><p role="status">Opening the encyclopedia...</p></main>
   </div>
