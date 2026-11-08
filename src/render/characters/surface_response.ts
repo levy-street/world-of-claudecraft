@@ -148,6 +148,9 @@ export function createSurfaceResponseMaterial(
       '#include <lights_fragment_end>',
       /* glsl */ `#include <lights_fragment_end>
       if(glazeCoat>0.001) {
+        // A body glazed whole (frozen solid, the Quench guardian's statue) is
+        // sealed in the ice: its own light dies under it.
+        totalEmissiveRadiance*=1.0-0.85*glazeCoat*smoothstep(1.0,1.05,uSurfaceGlaze.x);
         vec3 glazeView=normalize(vViewPosition);
         float glazeRim=1.0-clamp(abs(dot(normal,glazeView)),0.0,1.0);
         glazeRim*=glazeRim*glazeRim;

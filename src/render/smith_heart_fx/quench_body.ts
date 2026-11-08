@@ -31,8 +31,9 @@
 //    dying, a burst of crystals as the last of her freezes, mist off the
 //    statue (the lake's refreeze is QuenchFightFx's).
 // Presentation only: the fight's telegraphs are quench_fx.ts's and
-// quench_fight_fx.ts's, on every tier. The low tier and reduced motion thin
-// the mist, the snow, the glitter, the vapour, the rime and the shakes;
+// quench_fight_fx.ts's, on every tier. The low tier thins the mist, the snow,
+// the glitter, the vapour and the rime; reduced motion the particles and the
+// shakes;
 // nothing here is a warning a player reacts to.
 //
 // Rules (src/render/CLAUDE.md): every material is built in the constructor
@@ -523,8 +524,10 @@ export class QuenchBody {
 
   private adopt(e: Entity): void {
     this.entityId = e.id;
-    this.deadAt = -1;
-    this.sealed = false;
+    // Found already dead (back in view of the statue): sealed at once, never
+    // the climb and its burst replayed.
+    this.deadAt = e.dead ? this.clock - 30 : -1;
+    this.sealed = e.dead;
     this.strikeAt = -99;
     this.strikeHit = true;
     this.breathAt = -99;

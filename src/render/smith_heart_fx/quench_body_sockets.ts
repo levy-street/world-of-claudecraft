@@ -75,7 +75,9 @@ export function attachQuenchBodySockets(root: THREE.Object3D): void {
 
 /** The live sockets (the latest view's, while it is still in the scene). */
 export function quenchBodySockets(): QuenchBodySocketSet | null {
-  if (latest && (!latest.root.parent || !latest.root.visible)) return null;
+  // A view retired from the scene is let go (never kept alive by this module).
+  if (latest && !latest.root.parent) latest = null;
+  if (latest && !latest.root.visible) return null;
   return latest;
 }
 
