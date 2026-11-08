@@ -276,9 +276,9 @@ export const VOICE_PROMPTS = [
     npcId: 'heart_quench_guardian',
     name: 'Guardian of the Quench',
     voiceDescription:
-      'A giant of frost-bound granite and lake ice who keeps the frozen lake where steel was ' +
-      'tempered. A low, cold contralto, very calm and very slow, crisp consonants like cracking ' +
-      'ice, a breathy frost on every exhale; it rises to a hard, ringing command.',
+      'An ancient ice queen of dark stone in a gown of ice who keeps the frozen lake where steel ' +
+      'was tempered. A clear, cool, elegant alto, calm and composed, precise diction with an icy ' +
+      'shimmer on long vowels; she rises to a ringing, imperious command.',
     sampleText:
       'Warm blood on my lake. It will not stay warm for long. Blades of the Smith, wake! Hunt ' +
       'them across the ice!',

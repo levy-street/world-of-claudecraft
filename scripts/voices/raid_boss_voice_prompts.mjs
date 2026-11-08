@@ -373,6 +373,54 @@ export const SMITH_HEART_NEW_VOICE_PROMPTS = [
     visualReferences: HEART_REFS,
     guidanceScale: 0.66,
   },
+  // The Quencher, the ice queen of her own model (2026-11-08): three regal
+  // takes of an ancient queen of the lake, calm, cold and commanding.
+  {
+    npcId: 'heart-quench',
+    takeId: 'ice-queen',
+    name: 'Guardian of the Quench, Ice Queen',
+    voiceDescription:
+      'Native English, female, ageless. Perfect audio quality. Persona: the Guardian of the ' +
+      'Quench, an ancient ice queen, a regal giantess of dark stone in a gown of ice with a crown ' +
+      'of ice shards, who cooled every blade the smith forged in her lake. Emotion: calm, cold, ' +
+      'commanding, utterly certain. A rich, low mezzo-soprano, poised and imperious, every word ' +
+      'measured and crystal clear, a faint frosty breath between lines; she never hurries; her ' +
+      'command rings like ice cracking across a lake. Regal, never a witch, never a whisper ' +
+      'throughout, never robotic.',
+    previewText: QUENCH_PREVIEW,
+    visualReferences: HEART_REFS,
+    guidanceScale: 0.7,
+  },
+  {
+    npcId: 'heart-quench',
+    takeId: 'frozen-sovereign',
+    name: 'Guardian of the Quench, Frozen Sovereign',
+    voiceDescription:
+      'Native English, female, ageless. Perfect audio quality. Persona: an ancient queen of ice ' +
+      'who has ruled a frozen lake since the first steel was tempered in it. Emotion: majestic, ' +
+      'serene, pitiless. A deep, velvety contralto with royal gravity, slow and deliberate, the ' +
+      'stillness of deep winter in every pause, a soft resonance as if spoken in a vast frozen ' +
+      'hall; her commands are sharp and absolute. A queen, never a hag, never sweet, never ' +
+      'robotic.',
+    previewText: QUENCH_PREVIEW,
+    visualReferences: HEART_REFS,
+    guidanceScale: 0.7,
+  },
+  {
+    npcId: 'heart-quench',
+    takeId: 'lake-empress',
+    name: 'Guardian of the Quench, Lake Empress',
+    voiceDescription:
+      'Native English, female, ageless. Perfect audio quality. Persona: the empress of a frozen ' +
+      'lake, an immortal ice queen crowned in frost, elegant and dangerous. Emotion: cold, ' +
+      'composed, faintly amused, then fierce. A clear, cool, elegant alto with a crystalline ' +
+      'edge, precise diction, a hint of an icy shimmer on long vowels, the calm of someone who ' +
+      'has never lost; it rises to a ringing, imperious command. Regal and cold, never a witch ' +
+      'cackle, never breathy, never robotic.',
+    previewText: QUENCH_PREVIEW,
+    visualReferences: HEART_REFS,
+    guidanceScale: 0.7,
+  },
   {
     npcId: 'heart-heat',
     takeId: 'hearth-titan',
