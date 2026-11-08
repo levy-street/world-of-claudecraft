@@ -5,17 +5,19 @@
 // faces the Summit Roar on a bearing whose throw lands on the floor, rides the
 // Gale Paths to the Islands of the Wind and kills the adds, then in the storm
 // spreads for the Leaping Bolt, gathers under Thunder's Cradle, leads Drawn
-// Lightning away and dodges the strikes. Mythic: the Knotted Gale's portal
-// marks stand by the ball and at a lip, a third player carries it through and
-// throws it. Reads only what the server sends; the geometry is the sim's own
+// Lightning away and dodges the strikes. Heroic and Mythic: the Knotted Gale's
+// portal marks stand by the ball and at a lip, a third player carries it to the
+// nearest lip and throws it (through the portals only when that way is
+// shorter: no portal is needed since 2026-11-08). Reads only what the server sends; the geometry is the sim's own
 // pure module (claim-local, so every spot is shifted by the claim's origin).
 //
 // IGNORE=roar   the raid stands anywhere for the Summit Roar (the key mechanic)
-// IGNORE=knot   mythic: nobody carries the Knotted Gale
+// IGNORE=knot   heroic and mythic: nobody carries the Knotted Gale
 
 import { BODY_EDGE_MELEE_REACH } from '../../src/sim/combat/player_attack_reach';
 import { BREATH, BREATH_ISLES } from '../../src/sim/content/smith_heart_layout';
 import {
+  edgeWalk,
   inBreathArena,
   lipDistance,
   nearestLipSpot,
@@ -445,8 +447,25 @@ function plan(world, st) {
       }
       const cur = st.carrier.get(k.id);
       const cp = cur && world.players.get(cur);
-      if (cp && !cp.dead) continue;
-      const busy = new Set([...st.carrier.values()]);
+      // A carrier who made no headway toward it in 4 s (lifted by the Cradle,
+      // stunned, held up) hands it to the nearest free bot: the fuse does not wait.
+      st.carrierSince ??= new Map();
+      if (cp && !cp.dead) {
+        const since = st.carrierSince.get(k.id);
+        const now = { t: fightSec(), d: hypot(cp, k) };
+        if (!since) {
+          st.carrierSince.set(k.id, now);
+          continue;
+        }
+        if (now.t - since.t < 4) continue;
+        if (since.d - now.d >= 4) {
+          st.carrierSince.set(k.id, now);
+          continue;
+        }
+        log(`KNOTTED GALE: ${cp.name} is held up; the ball goes to another`);
+      }
+      const busy = new Set([...st.carrier.values()].filter((pid) => pid !== cur));
+      if (cp && !cp.dead) busy.add(cur);
       const free = world
         .living()
         .filter(
@@ -460,6 +479,7 @@ function plan(world, st) {
         .sort((a, b) => hypot(a, k) - hypot(b, k));
       if (free[0]) {
         st.carrier.set(k.id, free[0].pid);
+        st.carrierSince.set(k.id, { t: fightSec(), d: hypot(free[0], k) });
         log(`KNOTTED GALE: ${free[0].name} goes to carry the ball`);
       }
     }
@@ -653,7 +673,7 @@ function isleDuty(world, st, b, me, isle) {
   return { goal: land, tol: 1.5, duty: 'isle fight' };
 }
 
-// ---- the Knotted Gale (Mythic) ------------------------------------------------------
+// ---- the Knotted Gale (Heroic and Mythic) -------------------------------------------
 
 function myMark(me) {
   for (const side of ['A', 'B', 'C', 'D']) if (hasAura(me, MARK[side])) return side;
@@ -678,6 +698,29 @@ function lipSpotFor(world, from, avoidSides = []) {
     .filter(Boolean)
     .map((p) => L(world, p));
   return W(world, nearestLipSpot(l.x, l.z, avoid, 12));
+}
+
+/** The walk to the edge from `from`: the sim's own shortest way over the floor
+ *  (breath_geometry.ts edgeWalk, claim-local) to the nearest throwable lip, and
+ *  its length (Infinity off the floor). */
+function edgeRoute(world, from) {
+  const l = L(world, from);
+  const path = edgeWalk(l.x, l.z);
+  let length = path.length > 0 ? Math.hypot(path[0].x - l.x, path[0].z - l.z) : Infinity;
+  for (let i = 1; i < path.length; i++)
+    length += Math.hypot(path[i].x - path[i - 1].x, path[i].z - path[i - 1].z);
+  return { path, length };
+}
+
+/** The next waypoint of a walk (world space), advancing past those reached. */
+function walkStep(world, route, me) {
+  const l = L(world, me);
+  while (
+    route.next < route.path.length - 1 &&
+    Math.hypot(route.path[route.next].x - l.x, route.path[route.next].z - l.z) < 1
+  )
+    route.next++;
+  return W(world, route.path[route.next]);
 }
 
 function knotDuty(world, st, b, me) {
@@ -728,17 +771,44 @@ function knotDutyInner(world, st, b, me) {
   };
   if (inBreathArena(l.x, l.z) && lipDistance(l.x, l.z) <= BREATH_TUNING.heartLipReach - 0.3)
     return { goal: me, hold: true, duty: 'throw', cast: press };
-  // Which pair: the portal nearest the ball is the way in, its partner the way out.
+  // The walk to the edge: the sim's shortest way over the floor to the
+  // nearest lip, unless the portals (the one nearest the ball in, its
+  // partner out, then its lip) are a clearly shorter way. Chosen once per
+  // carry (and once more when the portals open), so the walk never dithers.
+  st.knotRoute ??= new Map();
   const open = Object.entries(o.portals);
-  if (open.length === 0) return { goal: me, hold: true, duty: 'wait for the portals' };
-  const [inSide, inP] = open.sort((x, y) => hypot(x[1], ball) - hypot(y[1], ball))[0];
-  const out = o.portals[PARTNER[inSide]];
-  if (out && hypot(me, out) < 4) {
-    // Out at the far mouth: on to the lip right beside it.
-    const lip = lipSpotFor(world, me);
-    return { goal: lip, tol: 0.4, duty: 'carry to the lip' };
+  let route = st.knotRoute.get(b.pid);
+  if (route?.ball !== ball.id) route = undefined;
+  if (!route || (route.way === 'walk' && !route.sawPortals && open.length > 0)) {
+    const walk = edgeRoute(world, me);
+    let way = 'walk';
+    if (open.length > 0) {
+      const [inSide, inP] = open.sort((x, y) => hypot(x[1], ball) - hypot(y[1], ball))[0];
+      const out = o.portals[PARTNER[inSide]];
+      if (out) {
+        const via = hypot(me, inP) + edgeRoute(world, out).length;
+        if (via + 3 < walk.length) way = inSide;
+      }
+    }
+    route = { ball: ball.id, way, sawPortals: open.length > 0, path: walk.path, next: 0 };
+    st.knotRoute.set(b.pid, route);
+    log(
+      `  knot: ${me.name} takes the ${way === 'walk' ? `walk to the edge (${walk.length.toFixed(1)} yd)` : `portal ${way}`}`,
+    );
   }
-  return { goal: inP, tol: 0.3, duty: 'carry to the portal' };
+  if (route.way !== 'walk') {
+    const inP = o.portals[route.way];
+    const out = o.portals[PARTNER[route.way]];
+    if (out && hypot(me, out) < 4) {
+      // Out at the far mouth: on to the lip beside it.
+      route.way = 'walk';
+      route.path = edgeRoute(world, me).path;
+      route.next = 0;
+    } else if (inP) return { goal: inP, tol: 0.3, duty: 'carry to the portal' };
+  }
+  if (route.path.length === 0)
+    return { goal: lipSpotFor(world, me), tol: 0.4, duty: 'walk to the edge' };
+  return { goal: walkStep(world, route, me), tol: 0.3, duty: 'walk to the edge' };
 }
 
 export default breath;
