@@ -36,8 +36,9 @@ describe('weekly reward pane', () => {
     expect(root.querySelector('.weekly-track-world')?.textContent).toContain(
       '8 World Quests Completed',
     );
+    root.querySelector<HTMLButtonElement>('[data-focus-key="weekly-loot-content:world"]')!.click();
     const pool = root.querySelector('#weekly-pool-world')!;
-    expect(pool.textContent).toContain('Normal Nythraxis equipment. No raid clears required.');
+    expect(pool.textContent).toContain('Normal Nythraxis equipment for your class and loot focus.');
     expect(pool.textContent).not.toContain('Choose a defeated boss');
     expect(pool.querySelectorAll('.weekly-loot')).toHaveLength(
       weeklyLootPool('world', 'mage').length,
@@ -135,7 +136,8 @@ describe('weekly reward pane', () => {
     expect(root.querySelectorAll('.weekly-possible-loot-button')).toHaveLength(1);
     expect(poolButton.textContent).toBe('View possible loot');
     expect(root.querySelector('.weekly-track .weekly-pool')).toBeNull();
-    expect(root.querySelectorAll('.weekly-possible-loot .weekly-pool')).toHaveLength(6);
+    // One pool at a time, chosen by the content and difficulty pickers.
+    expect(root.querySelectorAll('.weekly-possible-loot .weekly-pool')).toHaveLength(1);
     const poolId = poolButton.getAttribute('aria-controls');
     expect(poolButton.getAttribute('aria-expanded')).toBe('false');
     expect(root.querySelector<HTMLElement>(`#${poolId}`)?.hidden).toBe(true);
@@ -232,87 +234,66 @@ describe('weekly reward pane', () => {
     pane.renderInto(root);
     expect(root.querySelector('.weekly-heroic-upgrade')).toBeNull();
   });
-  // The Dungeon Finder's preview is where players plan runs, so its possible-loot
-  // catalog lists every table before any boss dies; the keeper keeps cleared-only.
-  const noKillsPane = (readOnly: boolean, playerLevel = 60) => {
+  // View possible loot is a catalog of what vaults CAN roll, so a character with
+  // no boss kills at level 1 still sees every raid and dungeon table.
+  const noKillsPane = (playerLevel = 1) => {
     const state = emptyWeeklyRewards(604800000);
     state.bossUnlocks = {};
+    state.weeklyBossUnlocks = {};
     const root = document.createElement('div');
-    const pane = new WeeklyRewardsTab(
-      {
-        world: () =>
-          ({
-            cfg: { playerClass: 'warrior' },
-            weeklyRewardInfo: {
-              state,
-              nowMs: 1000,
-              playerLevel,
-              canClaim: !readOnly,
-              worldQuestsAvailable: true,
-              readyWeeks: 0,
-            },
-          }) as IWorld,
-        presentation: {
-          itemIcon: () => '',
-          attachTooltip: vi.fn(),
-        } as unknown as PainterHostPresentation,
-        onInventoryChanged: vi.fn(),
-      },
-      { readOnly },
-    );
+    const pane = new WeeklyRewardsTab({
+      world: () =>
+        ({
+          cfg: { playerClass: 'warrior' },
+          weeklyRewardInfo: {
+            state,
+            nowMs: 1000,
+            playerLevel,
+            canClaim: true,
+            worldQuestsAvailable: true,
+            readyWeeks: 0,
+          },
+        }) as IWorld,
+      presentation: {
+        itemIcon: () => '',
+        attachTooltip: vi.fn(),
+      } as unknown as PainterHostPresentation,
+      onInventoryChanged: vi.fn(),
+    });
     pane.renderInto(root);
-    pane.close();
-    return root;
+    return { root, pane };
   };
   const tableNames = (root: Element, pool: string) =>
     [...root.querySelectorAll(`#weekly-pool-${pool} summary > span:first-of-type`)].map(
       (el) => el.textContent,
     );
+  const pick = (root: Element, key: string) =>
+    root.querySelector<HTMLButtonElement>(`[data-focus-key="${key}"]`)!.click();
 
-  it('previews every raid and dungeon table in read-only mode before any boss kill', () => {
-    const root = noKillsPane(true);
-    for (const pool of ['dungeon', 'dungeon_heroic'])
-      expect(tableNames(root, pool)).toEqual(
-        expect.arrayContaining([
-          'The Hollow Crypt',
-          'The Sunken Bastion',
-          'The Drowned Temple',
-          'Gravewyrm Sanctum',
-          'The Wildheart Basin',
-        ]),
-      );
-    for (const pool of ['raid', 'raid_heroic'])
-      expect(tableNames(root, pool)).toHaveLength(
-        WEEKLY_BOSS_TABLES.filter((table) => table.category === 'raid').length,
-      );
-    const dungeon = root.querySelector('#weekly-pool-dungeon')!;
-    expect(dungeon.textContent).toContain('All tables these vaults can roll from.');
-    expect(dungeon.textContent).not.toContain('No eligible');
-    expect(dungeon.querySelectorAll('.weekly-loot').length).toBeGreaterThan(0);
-    // PvP has no boss tables, so it keeps its own rule.
-    const pvp = root.querySelector('#weekly-pool-pvp')!;
-    expect(pvp.textContent).not.toContain('All tables these vaults can roll from.');
-    expect(pvp.textContent).toContain('For raids and dungeons, select one or more tables');
-  });
-
-  it('keeps the level filter in the read-only preview', () => {
-    const root = noKillsPane(true, 1);
-    expect(tableNames(root, 'raid_heroic')).toEqual([]);
-    expect(root.querySelector('#weekly-pool-raid_heroic')!.textContent).toContain(
-      'No eligible loot at your current level.',
+  it('lists every raid and dungeon table before any boss kill, at any level', () => {
+    const { root, pane } = noKillsPane();
+    expect(tableNames(root, 'raid')).toHaveLength(
+      new Set(WEEKLY_BOSS_TABLES.filter((table) => table.category === 'raid').map((t) => t.bossId))
+        .size,
     );
+    pick(root, 'weekly-loot-content:dungeon');
+    pick(root, 'weekly-loot-difficulty:heroic');
+    expect(tableNames(root, 'dungeon_heroic')).toEqual(
+      expect.arrayContaining(['The Hollow Crypt', 'Gravewyrm Sanctum', 'The Wildheart Basin']),
+    );
+    expect(root.querySelector('#weekly-pool-dungeon_heroic')!.textContent).not.toContain(
+      'No eligible',
+    );
+    pane.close();
   });
 
-  it('explains an empty keeper catalog by missing boss clears, not by level', () => {
-    const root = noKillsPane(false);
-    for (const pool of ['raid', 'raid_heroic', 'dungeon', 'dungeon_heroic']) {
-      const group = root.querySelector(`#weekly-pool-${pool}`)!;
-      expect(group.querySelectorAll('details')).toHaveLength(0);
-      expect(group.textContent).toContain(
-        'No eligible equipment from your recorded boss clears at this difficulty.',
-      );
-      expect(group.textContent).not.toContain('No eligible loot at your current level.');
-      expect(group.textContent).not.toContain('All tables these vaults can roll from.');
-    }
+  it('keeps the picked content and difficulty when the sheet repaints', () => {
+    const { root, pane } = noKillsPane();
+    pick(root, 'weekly-loot-content:dungeon');
+    pick(root, 'weekly-loot-difficulty:heroic');
+    root.replaceChildren();
+    pane.renderInto(root);
+    expect(root.querySelector('#weekly-pool-dungeon_heroic')).not.toBeNull();
+    pane.close();
   });
 });

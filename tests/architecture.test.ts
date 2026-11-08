@@ -504,6 +504,7 @@ const UI_PURE_CORES = [
   'src/ui/storage_rung_echo_core.ts',
   'src/ui/vault_view.ts',
   'src/ui/weekly_rewards_view.ts',
+  'src/ui/weekly_loot_catalog_view.ts',
   'src/ui/bank_tabs_view.ts',
   'src/ui/character_membership_view.ts',
   'src/ui/account_bank_view.ts',

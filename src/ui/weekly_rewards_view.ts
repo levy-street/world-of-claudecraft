@@ -1,12 +1,4 @@
-import type { PlayerClass } from '../sim/types';
-import { weeklyRewardAvailability } from '../sim/weekly_reward_availability';
-import { WEEKLY_BOSS_TABLES, type WeeklyBossUnlocks } from '../sim/weekly_reward_tables';
-import {
-  earnedWeeklyRolls,
-  WEEKLY_POOL_IDS,
-  WEEKLY_THRESHOLDS,
-  type WeeklyRewardInfo,
-} from '../sim/weekly_rewards';
+import { WEEKLY_THRESHOLDS, type WeeklyRewardInfo } from '../sim/weekly_rewards';
 import { formatNumber, t } from './i18n';
 
 export function weeklyCountdown(resetAtMs: number, nowMs: number): string {
@@ -19,24 +11,7 @@ export function weeklyCountdown(resetAtMs: number, nowMs: number): string {
     seconds: n(total % 60),
   });
 }
-/** Heroic unlocks include Normal; used only for the read-only loot catalog. */
-const EVERY_WEEKLY_BOSS_UNLOCK: WeeklyBossUnlocks = Object.freeze(
-  Object.fromEntries(WEEKLY_BOSS_TABLES.map(({ bossId }) => [bossId, 2])),
-);
-
-export type WeeklyLootCatalog = 'eligible' | 'all';
-
-export function buildWeeklyRewardsView(
-  info: WeeklyRewardInfo,
-  playerClass: PlayerClass,
-  options: { catalog?: WeeklyLootCatalog } = {},
-) {
-  const catalog = options.catalog ?? 'eligible';
-  const bossUnlocks =
-    catalog === 'all'
-      ? EVERY_WEEKLY_BOSS_UNLOCK
-      : (info.state.weeklyBossUnlocks ?? info.state.bossUnlocks);
-  const earned = earnedWeeklyRolls(info.state);
+export function buildWeeklyRewardsView(info: WeeklyRewardInfo) {
   const progress = [
     info.state.raidClears.length,
     info.state.dungeons.length,
@@ -49,7 +24,6 @@ export function buildWeeklyRewardsView(
   };
   return (['raid', 'dungeon', 'world', 'pvp'] as const).map((category, index) => ({
     category,
-    catalog,
     progress: progress[index],
     thresholds: WEEKLY_THRESHOLDS[category],
     available: category !== 'world' || info.worldQuestsAvailable,
@@ -64,32 +38,6 @@ export function buildWeeklyRewardsView(
         completed && tiered ? (heroic === required ? 'heroic' : 'normal') : null;
       const heroicRemaining = difficulty === 'normal' ? required - heroic : 0;
       return { required, completed, difficulty, heroic, normal, heroicRemaining };
-    }),
-    pools: WEEKLY_POOL_IDS.flatMap((pool, poolIndex) => {
-      if (pool !== category && pool !== `${category}_heroic`) return [];
-      const availability = weeklyRewardAvailability(
-        {
-          resetAtMs: 0,
-          choices: [],
-          bossUnlocks,
-          raidUnlocks: info.state.raidUnlocks,
-        },
-        { pool },
-        playerClass,
-        info.playerLevel,
-        info.state.lootSpec,
-      );
-      const tables = availability.tables;
-      const items = [...new Set(tables.flatMap((table) => table.items))].sort();
-      return [
-        {
-          pool,
-          tables,
-          emptyReason: availability.reason,
-          items,
-          earned: earned[poolIndex],
-        },
-      ];
     }),
   }));
 }

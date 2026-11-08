@@ -3578,6 +3578,15 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weeklyRewards.worldPoolRule': '普通難度 Nythraxis 裝備。無需通關團隊副本。',
   'hudChrome.weeklyRewards.previewPoolRule':
     '這些寶庫可抽取的全部戰利品表。擊敗首領會永久解鎖其戰利品，供今後的寶庫抽取。地城戰利品表僅包含你擊敗的首領，英雄難度擊殺同時解鎖普通難度。抽取時排除已抽取過的物品。所需等級比你的等級高出超過 {maxLevelOffset} 級的裝備不予顯示。',
+  'hudChrome.weeklyRewards.catalogContent': '內容',
+  'hudChrome.weeklyRewards.catalogDifficulty': '難度',
+  'hudChrome.weeklyRewards.catalogBossRule':
+    '此類寶庫可以擲取的所有物品表，依你的職業和戰利品偏好篩選。開啟寶庫時，你可以從當週在此難度下擊敗的首領中選擇（英雄難度擊殺同時解鎖普通難度），擲取結果不包括重複物品、傳說物品以及需求等級比你高出 {maxLevelOffset} 級以上的裝備。',
+  'hudChrome.weeklyRewards.catalogWorldRule':
+    '適合你的職業和戰利品偏好的普通難度尼斯拉克西斯裝備。無需團隊副本通關。擲取結果不包括重複物品以及需求等級比你高出 {maxLevelOffset} 級以上的裝備。',
+  'hudChrome.weeklyRewards.catalogPvpRule':
+    '適合你的職業和戰利品偏好的 WARFARE 裝備。列出的每件物品機會均等，擲取結果不包括重複物品以及需求等級比你高出 {maxLevelOffset} 級以上的裝備。',
+  'hudChrome.weeklyRewards.catalogEmpty': '這些戰利品中沒有適合你職業的物品。',
   'hudChrome.weeklyRewards.selectionPoolRule':
     '團隊副本和地城獎勵需在開啟前選擇一個或多個戰利品表。地城戰利品表彙整了你在此難度下擊敗的首領的戰利品。抽取時排除重複物品、傳說物品，以及所需等級比你的等級高出超過 {maxLevelOffset} 級的裝備。',
   'questUi.worldQuest.puzzleRetry': '重試',

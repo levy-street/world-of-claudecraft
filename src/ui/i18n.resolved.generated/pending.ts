@@ -68,7 +68,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.social.guildEvents.dateLabel",
     "hudChrome.social.guildEvents.discordVoice",
     "hudChrome.social.guildEvents.heading",
-    "hudChrome.social.guildEvents.when"
+    "hudChrome.social.guildEvents.when",
+    "hudChrome.weeklyRewards.catalogBossRule",
+    "hudChrome.weeklyRewards.catalogContent",
+    "hudChrome.weeklyRewards.catalogDifficulty",
+    "hudChrome.weeklyRewards.catalogEmpty",
+    "hudChrome.weeklyRewards.catalogPvpRule",
+    "hudChrome.weeklyRewards.catalogWorldRule"
   ],
   "es_ES": [
     "guide.arenaPage.coliseumBodyActivities",
@@ -129,7 +135,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.social.guildEvents.dateLabel",
     "hudChrome.social.guildEvents.discordVoice",
     "hudChrome.social.guildEvents.heading",
-    "hudChrome.social.guildEvents.when"
+    "hudChrome.social.guildEvents.when",
+    "hudChrome.weeklyRewards.catalogBossRule",
+    "hudChrome.weeklyRewards.catalogContent",
+    "hudChrome.weeklyRewards.catalogDifficulty",
+    "hudChrome.weeklyRewards.catalogEmpty",
+    "hudChrome.weeklyRewards.catalogPvpRule",
+    "hudChrome.weeklyRewards.catalogWorldRule"
   ],
   "fr_FR": [
     "guide.arenaPage.coliseumBodyActivities",
@@ -190,7 +202,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.social.guildEvents.dateLabel",
     "hudChrome.social.guildEvents.discordVoice",
     "hudChrome.social.guildEvents.heading",
-    "hudChrome.social.guildEvents.when"
+    "hudChrome.social.guildEvents.when",
+    "hudChrome.weeklyRewards.catalogBossRule",
+    "hudChrome.weeklyRewards.catalogContent",
+    "hudChrome.weeklyRewards.catalogDifficulty",
+    "hudChrome.weeklyRewards.catalogEmpty",
+    "hudChrome.weeklyRewards.catalogPvpRule",
+    "hudChrome.weeklyRewards.catalogWorldRule"
   ],
   "fr_CA": [
     "guide.arenaPage.coliseumBodyActivities",
@@ -251,7 +269,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.social.guildEvents.dateLabel",
     "hudChrome.social.guildEvents.discordVoice",
     "hudChrome.social.guildEvents.heading",
-    "hudChrome.social.guildEvents.when"
+    "hudChrome.social.guildEvents.when",
+    "hudChrome.weeklyRewards.catalogBossRule",
+    "hudChrome.weeklyRewards.catalogContent",
+    "hudChrome.weeklyRewards.catalogDifficulty",
+    "hudChrome.weeklyRewards.catalogEmpty",
+    "hudChrome.weeklyRewards.catalogPvpRule",
+    "hudChrome.weeklyRewards.catalogWorldRule"
   ],
   "en_CA": [],
   "it_IT": [
@@ -313,7 +337,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.social.guildEvents.dateLabel",
     "hudChrome.social.guildEvents.discordVoice",
     "hudChrome.social.guildEvents.heading",
-    "hudChrome.social.guildEvents.when"
+    "hudChrome.social.guildEvents.when",
+    "hudChrome.weeklyRewards.catalogBossRule",
+    "hudChrome.weeklyRewards.catalogContent",
+    "hudChrome.weeklyRewards.catalogDifficulty",
+    "hudChrome.weeklyRewards.catalogEmpty",
+    "hudChrome.weeklyRewards.catalogPvpRule",
+    "hudChrome.weeklyRewards.catalogWorldRule"
   ],
   "de_DE": [
     "guide.arenaPage.coliseumBodyActivities",
@@ -374,7 +404,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.social.guildEvents.dateLabel",
     "hudChrome.social.guildEvents.discordVoice",
     "hudChrome.social.guildEvents.heading",
-    "hudChrome.social.guildEvents.when"
+    "hudChrome.social.guildEvents.when",
+    "hudChrome.weeklyRewards.catalogBossRule",
+    "hudChrome.weeklyRewards.catalogContent",
+    "hudChrome.weeklyRewards.catalogDifficulty",
+    "hudChrome.weeklyRewards.catalogEmpty",
+    "hudChrome.weeklyRewards.catalogPvpRule",
+    "hudChrome.weeklyRewards.catalogWorldRule"
   ],
   "zh_CN": [
     "hudChrome.activities.tabPvp",
@@ -467,7 +503,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.social.guildEvents.dateLabel",
     "hudChrome.social.guildEvents.discordVoice",
     "hudChrome.social.guildEvents.heading",
-    "hudChrome.social.guildEvents.when"
+    "hudChrome.social.guildEvents.when",
+    "hudChrome.weeklyRewards.catalogBossRule",
+    "hudChrome.weeklyRewards.catalogContent",
+    "hudChrome.weeklyRewards.catalogDifficulty",
+    "hudChrome.weeklyRewards.catalogEmpty",
+    "hudChrome.weeklyRewards.catalogPvpRule",
+    "hudChrome.weeklyRewards.catalogWorldRule"
   ],
   "ru_RU": [
     "hudChrome.activities.tabPvp",
@@ -536,7 +578,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.social.guildEvents.dateLabel",
     "hudChrome.social.guildEvents.discordVoice",
     "hudChrome.social.guildEvents.heading",
-    "hudChrome.social.guildEvents.when"
+    "hudChrome.social.guildEvents.when",
+    "hudChrome.weeklyRewards.catalogBossRule",
+    "hudChrome.weeklyRewards.catalogContent",
+    "hudChrome.weeklyRewards.catalogDifficulty",
+    "hudChrome.weeklyRewards.catalogEmpty",
+    "hudChrome.weeklyRewards.catalogPvpRule",
+    "hudChrome.weeklyRewards.catalogWorldRule"
   ],
   "nl_NL": [
     "guide.arenaPage.coliseumBodyActivities",
@@ -597,7 +645,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.social.guildEvents.dateLabel",
     "hudChrome.social.guildEvents.discordVoice",
     "hudChrome.social.guildEvents.heading",
-    "hudChrome.social.guildEvents.when"
+    "hudChrome.social.guildEvents.when",
+    "hudChrome.weeklyRewards.catalogBossRule",
+    "hudChrome.weeklyRewards.catalogContent",
+    "hudChrome.weeklyRewards.catalogDifficulty",
+    "hudChrome.weeklyRewards.catalogEmpty",
+    "hudChrome.weeklyRewards.catalogPvpRule",
+    "hudChrome.weeklyRewards.catalogWorldRule"
   ],
   "pl_PL": [
     "guide.arenaPage.coliseumBodyActivities",
@@ -658,7 +712,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.social.guildEvents.dateLabel",
     "hudChrome.social.guildEvents.discordVoice",
     "hudChrome.social.guildEvents.heading",
-    "hudChrome.social.guildEvents.when"
+    "hudChrome.social.guildEvents.when",
+    "hudChrome.weeklyRewards.catalogBossRule",
+    "hudChrome.weeklyRewards.catalogContent",
+    "hudChrome.weeklyRewards.catalogDifficulty",
+    "hudChrome.weeklyRewards.catalogEmpty",
+    "hudChrome.weeklyRewards.catalogPvpRule",
+    "hudChrome.weeklyRewards.catalogWorldRule"
   ],
   "id_ID": [
     "guide.arenaPage.coliseumBodyActivities",
@@ -719,7 +779,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.social.guildEvents.dateLabel",
     "hudChrome.social.guildEvents.discordVoice",
     "hudChrome.social.guildEvents.heading",
-    "hudChrome.social.guildEvents.when"
+    "hudChrome.social.guildEvents.when",
+    "hudChrome.weeklyRewards.catalogBossRule",
+    "hudChrome.weeklyRewards.catalogContent",
+    "hudChrome.weeklyRewards.catalogDifficulty",
+    "hudChrome.weeklyRewards.catalogEmpty",
+    "hudChrome.weeklyRewards.catalogPvpRule",
+    "hudChrome.weeklyRewards.catalogWorldRule"
   ],
   "tr_TR": [
     "guide.arenaPage.coliseumBodyActivities",
@@ -780,7 +846,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.social.guildEvents.dateLabel",
     "hudChrome.social.guildEvents.discordVoice",
     "hudChrome.social.guildEvents.heading",
-    "hudChrome.social.guildEvents.when"
+    "hudChrome.social.guildEvents.when",
+    "hudChrome.weeklyRewards.catalogBossRule",
+    "hudChrome.weeklyRewards.catalogContent",
+    "hudChrome.weeklyRewards.catalogDifficulty",
+    "hudChrome.weeklyRewards.catalogEmpty",
+    "hudChrome.weeklyRewards.catalogPvpRule",
+    "hudChrome.weeklyRewards.catalogWorldRule"
   ],
   "sv_SE": [
     "guide.arenaPage.coliseumBodyActivities",
@@ -841,7 +913,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.social.guildEvents.dateLabel",
     "hudChrome.social.guildEvents.discordVoice",
     "hudChrome.social.guildEvents.heading",
-    "hudChrome.social.guildEvents.when"
+    "hudChrome.social.guildEvents.when",
+    "hudChrome.weeklyRewards.catalogBossRule",
+    "hudChrome.weeklyRewards.catalogContent",
+    "hudChrome.weeklyRewards.catalogDifficulty",
+    "hudChrome.weeklyRewards.catalogEmpty",
+    "hudChrome.weeklyRewards.catalogPvpRule",
+    "hudChrome.weeklyRewards.catalogWorldRule"
   ],
   "vi_VN": [
     "guide.arenaPage.coliseumBodyActivities",
@@ -902,7 +980,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.social.guildEvents.dateLabel",
     "hudChrome.social.guildEvents.discordVoice",
     "hudChrome.social.guildEvents.heading",
-    "hudChrome.social.guildEvents.when"
+    "hudChrome.social.guildEvents.when",
+    "hudChrome.weeklyRewards.catalogBossRule",
+    "hudChrome.weeklyRewards.catalogContent",
+    "hudChrome.weeklyRewards.catalogDifficulty",
+    "hudChrome.weeklyRewards.catalogEmpty",
+    "hudChrome.weeklyRewards.catalogPvpRule",
+    "hudChrome.weeklyRewards.catalogWorldRule"
   ],
   "da_DK": [
     "guide.arenaPage.coliseumBodyActivities",
@@ -963,6 +1047,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.social.guildEvents.dateLabel",
     "hudChrome.social.guildEvents.discordVoice",
     "hudChrome.social.guildEvents.heading",
-    "hudChrome.social.guildEvents.when"
+    "hudChrome.social.guildEvents.when",
+    "hudChrome.weeklyRewards.catalogBossRule",
+    "hudChrome.weeklyRewards.catalogContent",
+    "hudChrome.weeklyRewards.catalogDifficulty",
+    "hudChrome.weeklyRewards.catalogEmpty",
+    "hudChrome.weeklyRewards.catalogPvpRule",
+    "hudChrome.weeklyRewards.catalogWorldRule"
   ]
 };

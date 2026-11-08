@@ -26550,9 +26550,53 @@
     outline-offset: -2px;
   }
   .weekly-possible-loot {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+    display: flex;
+    flex-direction: column;
     gap: var(--spacing-sm);
+  }
+  /* The possible-loot pickers: content first, then Normal or Heroic for raids
+     and dungeons, so one pool shows at a time. */
+  .weekly-loot-pickers {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-sm) var(--spacing-md);
+  }
+  .weekly-loot-picker {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs);
+  }
+  .weekly-loot-choice {
+    min-height: 36px;
+    height: auto;
+    padding: var(--spacing-xs) 14px;
+    white-space: normal;
+  }
+  /* The library's pressed fill carries the text colour; the accent only marks
+     the edge, so the label never sits gold on gold. */
+  .weekly-loot-choice[aria-pressed="true"] {
+    border-color: var(--color-accent);
+    box-shadow: inset 0 -2px 0 var(--color-accent);
+  }
+  /* Forced colors strip the fill and the inset edge, so the pressed choice
+     would read the same as the rest: pin it to the system highlight pair
+     (the .vendor-qty-btn precedent). */
+  @media (forced-colors: active) {
+    .weekly-loot-choice[aria-pressed="true"] {
+      background: Highlight;
+      color: HighlightText;
+      forced-color-adjust: none;
+    }
+  }
+  .weekly-loot-tables {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+    align-items: start;
+    gap: var(--spacing-sm);
+  }
+  .weekly-loot-tables .weekly-loot-table {
+    margin-top: 0;
   }
   .weekly-possible-loot[hidden] {
     display: none;
@@ -27649,10 +27693,6 @@
   }
   .weekly-table-option input {
     flex: 0 0 auto;
-  }
-  .weekly-loot-category {
-    min-width: 0;
-    padding: 12px;
   }
   .weekly-loot-table {
     margin-top: 8px;

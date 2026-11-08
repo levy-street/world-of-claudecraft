@@ -7,8 +7,12 @@ import { esc } from './esc';
 import { FOCUS_KEY_ATTR } from './focus_restore';
 import { formatNumber, t } from './i18n';
 import type { PainterHostPresentation } from './painter_host';
+import {
+  DEFAULT_WEEKLY_LOOT_SELECTION,
+  type WeeklyLootSelection,
+} from './weekly_loot_catalog_view';
 import { WeeklyRewardClaimController } from './weekly_reward_claim_controller';
-import { appendWeeklyLootCategory } from './weekly_reward_loot_catalog_controller';
+import { renderWeeklyLootCatalog } from './weekly_reward_loot_catalog_controller';
 import { appendWeeklyLootFocus } from './weekly_reward_loot_focus_controller';
 import { buildWeeklyRewardsView, weeklyCountdown } from './weekly_rewards_view';
 
@@ -38,6 +42,8 @@ export class WeeklyRewardsTab {
   private timerText = '';
   private lastSignature = '';
   private expanded = new Set<string>();
+  /** The possible-loot picker's content and difficulty, kept across repaints. */
+  private lootSelection: WeeklyLootSelection = DEFAULT_WEEKLY_LOOT_SELECTION;
   private readonly claimFlow: WeeklyRewardClaimController;
   constructor(
     private readonly deps: {
@@ -115,9 +121,7 @@ export class WeeklyRewardsTab {
       info.playerLevel,
       !!info.state.vaults[0] && info.state.vaults[0].resetAtMs <= info.nowMs,
     ]);
-    const rows = buildWeeklyRewardsView(info, world.cfg.playerClass, {
-      catalog: this.options?.readOnly ? 'all' : 'eligible',
-    });
+    const rows = buildWeeklyRewardsView(info);
     panel.innerHTML = `<header class="weekly-rewards-header"><div class="weekly-vault-crest" aria-hidden="true"><img src="${chromeIconUrl('chest')}" alt="" draggable="false"></div><div class="weekly-vault-intro"><h2>${esc(t('hudChrome.weeklyRewards.title'))}</h2><p>${esc(t('hudChrome.weeklyRewards.intro'))}</p></div><div class="weekly-reset"><span>${esc(t('hudChrome.weeklyRewards.nextReset'))}</span><strong data-weekly-countdown role="timer"></strong></div></header>`;
     this.timer = panel.querySelector('[data-weekly-countdown]');
     this.refreshCountdown();
@@ -198,10 +202,18 @@ export class WeeklyRewardsTab {
           },
         )
         .join('')}</div></div>`;
-      appendWeeklyLootCategory(allPools, row, this.deps.presentation, this.expanded);
-
       tracks.appendChild(section);
     }
+    renderWeeklyLootCatalog(allPools, {
+      playerClass: world.cfg.playerClass,
+      lootSpec: info.state.lootSpec,
+      presentation: this.deps.presentation,
+      expanded: this.expanded,
+      selection: () => this.lootSelection,
+      select: (selection) => {
+        this.lootSelection = selection;
+      },
+    });
     const claimHost = document.createElement('div');
     panel.append(claimHost, tracks);
     parent.appendChild(panel);

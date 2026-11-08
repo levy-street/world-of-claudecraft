@@ -1,60 +1,147 @@
 import { ITEMS } from '../sim/data';
+import type { PlayerClass } from '../sim/types';
 import { WEEKLY_REWARD_MAX_LEVEL_OFFSET } from '../sim/weekly_reward_options';
-import { needsWeeklyBossTable } from '../sim/weekly_reward_tables';
 import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import { FOCUS_KEY_ATTR } from './focus_restore';
 import { formatNumber, t } from './i18n';
 import type { PainterHostPresentation } from './painter_host';
+import {
+  WEEKLY_LOOT_CONTENT,
+  WEEKLY_LOOT_DIFFICULTIES,
+  type WeeklyLootContent,
+  type WeeklyLootSelection,
+  weeklyLootCatalogView,
+  weeklyLootHasDifficulty,
+} from './weekly_loot_catalog_view';
 import { weeklyRewardTableName } from './weekly_reward_table_picker_controller';
-import type { buildWeeklyRewardsView } from './weekly_rewards_view';
 
-/** Content categories contain difficulty sections and collapsible loot tables. */
-export function appendWeeklyLootCategory(
-  host: HTMLElement,
-  row: ReturnType<typeof buildWeeklyRewardsView>[number],
-  presentation: PainterHostPresentation,
-  expanded: Set<string>,
-): void {
-  const category = document.createElement('section');
-  category.className = 'weekly-loot-category ui-well';
-  const heading = document.createElement('h3');
-  heading.textContent = t(`hudChrome.weeklyRewards.category.${row.category}`);
-  category.append(heading);
-  for (const pool of row.pools) {
+export interface WeeklyLootCatalogDeps {
+  readonly playerClass: PlayerClass;
+  readonly lootSpec?: string;
+  readonly presentation: PainterHostPresentation;
+  /** Open table keys, kept by the Vault so a repaint keeps them open. */
+  readonly expanded: Set<string>;
+  readonly selection: () => WeeklyLootSelection;
+  readonly select: (selection: WeeklyLootSelection) => void;
+}
+
+const RULE_KEY = {
+  raid: 'hudChrome.weeklyRewards.catalogBossRule',
+  dungeon: 'hudChrome.weeklyRewards.catalogBossRule',
+  world: 'hudChrome.weeklyRewards.catalogWorldRule',
+  pvp: 'hudChrome.weeklyRewards.catalogPvpRule',
+} as const satisfies Record<WeeklyLootContent, string>;
+
+function segmented(
+  labelKey: 'hudChrome.weeklyRewards.catalogContent' | 'hudChrome.weeklyRewards.catalogDifficulty',
+  className: string,
+): HTMLDivElement {
+  const group = document.createElement('div');
+  group.className = `weekly-loot-picker ${className}`;
+  group.setAttribute('role', 'group');
+  group.setAttribute('aria-label', t(labelKey));
+  return group;
+}
+
+function choiceButton(
+  choices: Map<string, HTMLButtonElement>,
+  label: string,
+  focusKey: string,
+  pressed: boolean,
+  onPick: () => void,
+): HTMLButtonElement {
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'weekly-loot-choice ui-btn';
+  button.textContent = label;
+  button.setAttribute(FOCUS_KEY_ATTR, focusKey);
+  button.setAttribute('aria-pressed', String(pressed));
+  button.addEventListener('click', onPick);
+  choices.set(focusKey, button);
+  return button;
+}
+
+/** The possible-loot catalog: pick a content type, then (for raids and dungeons)
+ *  a difficulty, and see every table that pool can roll, filtered by class and
+ *  the loot focus. Picking repaints only this host. */
+export function renderWeeklyLootCatalog(host: HTMLElement, deps: WeeklyLootCatalogDeps): void {
+  const paint = (focusKey?: string) => {
+    host.replaceChildren();
+    // The picker buttons by focus key, so the pressed one regains focus after
+    // this repaint without splicing a key into a selector.
+    const choices = new Map<string, HTMLButtonElement>();
+    const selection = deps.selection();
+    const pick = (next: WeeklyLootSelection, key: string) => {
+      deps.select(next);
+      paint(key);
+    };
+    const content = segmented('hudChrome.weeklyRewards.catalogContent', 'weekly-loot-content');
+    for (const id of WEEKLY_LOOT_CONTENT) {
+      const key = `weekly-loot-content:${id}`;
+      content.append(
+        choiceButton(
+          choices,
+          t(`hudChrome.weeklyRewards.category.${id}`),
+          key,
+          id === selection.content,
+          () => pick({ ...selection, content: id }, key),
+        ),
+      );
+    }
+    const bar = document.createElement('div');
+    bar.className = 'weekly-loot-pickers';
+    bar.append(content);
+    if (weeklyLootHasDifficulty(selection.content)) {
+      const difficulty = segmented(
+        'hudChrome.weeklyRewards.catalogDifficulty',
+        'weekly-loot-difficulty',
+      );
+      for (const id of WEEKLY_LOOT_DIFFICULTIES) {
+        const key = `weekly-loot-difficulty:${id}`;
+        difficulty.append(
+          choiceButton(
+            choices,
+            t(`hudChrome.weeklyRewards.${id}`),
+            key,
+            id === selection.difficulty,
+            () => pick({ ...selection, difficulty: id }, key),
+          ),
+        );
+      }
+      bar.append(difficulty);
+    }
+    const view = weeklyLootCatalogView(selection, deps.playerClass, deps.lootSpec);
     const group = document.createElement('section');
     group.className = 'weekly-pool';
-    group.id = `weekly-pool-${pool.pool}`;
+    group.id = `weekly-pool-${view.pool}`;
     const title = document.createElement('h4');
-    title.textContent = t(`hudChrome.weeklyRewards.pool.${pool.pool}`);
+    title.textContent = t(`hudChrome.weeklyRewards.pool.${view.pool}`);
     const rule = document.createElement('p');
-    rule.textContent = t(
-      pool.pool === 'world'
-        ? 'hudChrome.weeklyRewards.worldPoolRule'
-        : row.catalog === 'all' && needsWeeklyBossTable(pool.pool)
-          ? 'hudChrome.weeklyRewards.previewPoolRule'
-          : 'hudChrome.weeklyRewards.selectionPoolRule',
-      { maxLevelOffset: formatNumber(WEEKLY_REWARD_MAX_LEVEL_OFFSET) },
-    );
+    rule.className = 'weekly-pool-rule';
+    rule.textContent = t(RULE_KEY[selection.content], {
+      maxLevelOffset: formatNumber(WEEKLY_REWARD_MAX_LEVEL_OFFSET),
+    });
     group.append(title, rule);
-    if (!pool.tables.length) {
+    // Defensive: no class or focus empties a pool with today's content
+    // (pinned in tests/weekly_loot_catalog_view.test.ts), but new content could.
+    if (view.empty) {
       const empty = document.createElement('p');
+      empty.className = 'weekly-pool-empty';
       empty.textContent = t(
-        pool.emptyReason === 'focus'
+        view.empty === 'focus'
           ? 'hudChrome.weeklyRewards.noFocusedLoot'
-          : pool.emptyReason === 'level'
-            ? 'hudChrome.weeklyRewards.noLevelLoot'
-            : pool.emptyReason === 'exhausted'
-              ? 'hudChrome.weeklyRewards.tablesExhausted'
-              : 'hudChrome.weeklyRewards.noTables',
+          : 'hudChrome.weeklyRewards.catalogEmpty',
       );
       group.append(empty);
     }
-    for (const table of pool.tables) {
-      const key = `weekly-catalog:${pool.pool}:${table.id}`;
+    const tables = document.createElement('div');
+    tables.className = 'weekly-loot-tables';
+    for (const table of view.tables) {
+      const key = `weekly-catalog:${view.pool}:${table.id}`;
       const details = document.createElement('details');
       details.className = 'weekly-loot-table ui-card';
-      details.open = expanded.has(key);
+      details.open = deps.expanded.has(key);
       const summary = document.createElement('summary');
       summary.tabIndex = 0;
       summary.addEventListener('keydown', (event) => {
@@ -70,14 +157,12 @@ export function appendWeeklyLootCategory(
         table.items.length === 1
           ? 'hudChrome.weeklyRewards.tableItem'
           : 'hudChrome.weeklyRewards.tableItemCount',
-        {
-          count: formatNumber(table.items.length),
-        },
+        { count: formatNumber(table.items.length) },
       );
       summary.append(name, count);
       details.addEventListener('toggle', () => {
-        if (details.open) expanded.add(key);
-        else expanded.delete(key);
+        if (details.open) deps.expanded.add(key);
+        else deps.expanded.delete(key);
       });
       const list = document.createElement('div');
       list.className = 'weekly-loot-list';
@@ -86,15 +171,17 @@ export function appendWeeklyLootCategory(
         const cell = document.createElement('button');
         cell.type = 'button';
         cell.className = `weekly-loot ui-btn quality-${item.quality}`;
-        cell.setAttribute(FOCUS_KEY_ATTR, `weekly-item:${pool.pool}:${table.id}:${id}`);
-        cell.innerHTML = `${presentation.itemIcon(item)}<span>${esc(itemDisplayName(item))}</span>`;
-        presentation.attachTooltip(cell, () => presentation.itemTooltip(item));
+        cell.setAttribute(FOCUS_KEY_ATTR, `weekly-item:${view.pool}:${table.id}:${id}`);
+        cell.innerHTML = `${deps.presentation.itemIcon(item)}<span>${esc(itemDisplayName(item))}</span>`;
+        deps.presentation.attachTooltip(cell, () => deps.presentation.itemTooltip(item));
         list.append(cell);
       }
       details.append(summary, list);
-      group.append(details);
+      tables.append(details);
     }
-    category.append(group);
-  }
-  host.append(category);
+    group.append(tables);
+    host.append(bar, group);
+    if (focusKey) choices.get(focusKey)?.focus();
+  };
+  paint();
 }

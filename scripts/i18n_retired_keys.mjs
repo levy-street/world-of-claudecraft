@@ -521,6 +521,12 @@ export const RETIRED_KEYS = [
   'guide.interfacePage.winQuestLogBody',
   'guide.economy.dailyTitle',
   'guide.economy.dailyBody',
+  // The Weekly Vault's possible-loot catalog became a content and difficulty
+  // picker over every table a vault can roll; its old per-pool rule lines left
+  // with the clears-only and preview lists they described.
+  'hudChrome.weeklyRewards.selectionPoolRule',
+  'hudChrome.weeklyRewards.previewPoolRule',
+  'hudChrome.weeklyRewards.worldPoolRule',
 ];
 
 export const RETIRED_KEY_SET = new Set(RETIRED_KEYS);

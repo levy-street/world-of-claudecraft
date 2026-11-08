@@ -3578,6 +3578,15 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weeklyRewards.worldPoolRule': '普通难度 Nythraxis 装备。无需通关团队副本。',
   'hudChrome.weeklyRewards.previewPoolRule':
     '这些宝库可抽取的全部战利品表。击败首领会永久解锁其战利品，供今后的宝库抽取。地下城战利品表仅包含你击败的首领，英雄难度击杀同时解锁普通难度。抽取时排除已抽取过的物品。所需等级比你的等级高出超过 {maxLevelOffset} 级的装备不予显示。',
+  'hudChrome.weeklyRewards.catalogContent': '内容',
+  'hudChrome.weeklyRewards.catalogDifficulty': '难度',
+  'hudChrome.weeklyRewards.catalogBossRule':
+    '此类宝库可以掷取的所有物品表，按你的职业和战利品偏好筛选。打开宝库时，你可以从当周在此难度下击败的首领中选择（英雄难度击杀同时解锁普通难度），掷取结果不包括重复物品、传说物品以及需求等级比你高出 {maxLevelOffset} 级以上的装备。',
+  'hudChrome.weeklyRewards.catalogWorldRule':
+    '适合你的职业和战利品偏好的普通难度尼斯拉克西斯装备。无需团队副本通关。掷取结果不包括重复物品以及需求等级比你高出 {maxLevelOffset} 级以上的装备。',
+  'hudChrome.weeklyRewards.catalogPvpRule':
+    '适合你的职业和战利品偏好的 WARFARE 装备。列出的每件物品机会均等，掷取结果不包括重复物品以及需求等级比你高出 {maxLevelOffset} 级以上的装备。',
+  'hudChrome.weeklyRewards.catalogEmpty': '这些战利品中没有适合你职业的物品。',
   'hudChrome.weeklyRewards.selectionPoolRule':
     '团队副本和地下城奖励需在开启前选择一个或多个战利品表。地下城战利品表汇总了你在此难度下击败的首领的战利品。抽取时排除重复物品、传说物品，以及所需等级比你的等级高出超过 {maxLevelOffset} 级的装备。',
   'questUi.worldQuest.puzzleRetry': '重试',

@@ -3,9 +3,7 @@ import { page } from 'vitest/browser';
 import type { PlayerClass } from '../../src/sim/types';
 import { emptyWeeklyRewards } from '../../src/sim/weekly_rewards';
 import type { PainterHostPresentation } from '../../src/ui/painter_host';
-import { appendWeeklyLootCategory } from '../../src/ui/weekly_reward_loot_catalog_controller';
 import { appendWeeklyLootFocus } from '../../src/ui/weekly_reward_loot_focus_controller';
-import { buildWeeklyRewardsView } from '../../src/ui/weekly_rewards_view';
 import { WeeklyRewardsTab } from '../../src/ui/weekly_rewards_window';
 import type { IWorld } from '../../src/world_api';
 import { axeSeriousViolations, cleanup, host } from './_harness';
@@ -102,7 +100,7 @@ describe('Weekly Vault loot focus', () => {
     }
   });
 
-  it('refreshes the catalog after an acknowledged preference and explains missing boss clears', () => {
+  it('refreshes the catalog after an acknowledged preference, listing loot with no boss clears', () => {
     const { world, state } = fixture();
     const { root, pane } = mount(world);
     state.lootSpec = 'protection';
@@ -113,43 +111,22 @@ describe('Weekly Vault loot focus', () => {
     pane.refreshIfChanged(repaint);
     expect(repaint).toHaveBeenCalledTimes(1);
     expect(root.querySelector('select')?.value).toBe('protection');
-    expect(root.querySelector('#weekly-pool-raid')?.textContent).toContain(
-      'No eligible equipment from your recorded boss clears at this difficulty.',
-    );
+    // Possible loot, not eligible loot: the catalog lists tables before any kill.
+    expect(root.querySelectorAll('#weekly-pool-raid details').length).toBeGreaterThan(0);
+    expect(root.querySelector('#weekly-pool-raid')?.textContent).not.toContain('No eligible');
     pane.refreshIfChanged(repaint);
     expect(repaint).toHaveBeenCalledTimes(1);
   });
 
-  it('explains level-ineligible loot without blaming the selected focus', () => {
+  it('lists loot above the character level, since the catalog shows what can roll', () => {
     const { world, state } = fixture('mage');
     state.lootSpec = 'frost';
     world.weeklyRewardInfo!.playerLevel = 1;
     const { root } = mount(world);
+    root.querySelector<HTMLButtonElement>('[data-focus-key="weekly-loot-content:world"]')!.click();
     const pool = root.querySelector('#weekly-pool-world')!;
-    expect(pool.textContent).toContain('No eligible loot at your current level.');
-    expect(pool.textContent).not.toContain('Choose another focus.');
-  });
-
-  it('explains a focus-empty catalog projection with a change-focus instruction', () => {
-    const { world } = fixture();
-    const row = buildWeeklyRewardsView(world.weeklyRewardInfo!, 'paladin')[2];
-    const root = host('weekly-focus-empty');
-    appendWeeklyLootCategory(
-      root,
-      {
-        ...row,
-        pools: row.pools.map((pool) => ({
-          ...pool,
-          tables: [],
-          items: [],
-          emptyReason: 'focus',
-        })),
-      },
-      {} as PainterHostPresentation,
-      new Set(),
-    );
-    expect(root.textContent).toContain('No eligible loot. Choose another focus.');
-    expect(root.textContent).not.toContain('No eligible loot at your current level.');
+    expect(pool.querySelectorAll('details')).toHaveLength(1);
+    expect(pool.textContent).not.toContain('No eligible');
   });
 
   it('keeps the same week open and preserves rolled attribution when the focus changes', () => {

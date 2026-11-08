@@ -2026,6 +2026,15 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'ノーマル難易度のNythraxis装備。レイドのクリアは不要です。',
   'hudChrome.weeklyRewards.previewPoolRule':
     'これらの宝物庫で抽選できるすべてのテーブルです。ボスを撃破すると、今後の宝物庫でその戦利品が恒久的に解放されます。ダンジョンのテーブルには撃破したボスの戦利品だけが含まれ、ヒロイックでの撃破はノーマルも解放します。すでに抽選されたアイテムは抽選から除外されます。必要レベルが自分のレベルより{maxLevelOffset}を超えて高い装備は表示されません。',
+  'hudChrome.weeklyRewards.catalogContent': 'コンテンツ',
+  'hudChrome.weeklyRewards.catalogDifficulty': '難易度',
+  'hudChrome.weeklyRewards.catalogBossRule':
+    'この種類の宝物庫がロールできるすべての戦利品テーブルです（クラスと戦利品フォーカスで絞り込み）。宝物庫を開くときは、その週にこの難易度で倒したボスから選びます（ヒロイックの撃破でノーマルも解放されます）。ロールでは重複、レジェンダリーアイテム、あなたのレベルより {maxLevelOffset} レベルを超えて高い装備は除外されます。',
+  'hudChrome.weeklyRewards.catalogWorldRule':
+    'あなたのクラスと戦利品フォーカスに合うノーマルのニスラクシス装備です。レイドのクリアは不要です。ロールでは重複とあなたのレベルより {maxLevelOffset} レベルを超えて高い装備は除外されます。',
+  'hudChrome.weeklyRewards.catalogPvpRule':
+    'あなたのクラスと戦利品フォーカスに合う WARFARE 装備です。一覧のアイテムはすべて同じ確率で、ロールでは重複とあなたのレベルより {maxLevelOffset} レベルを超えて高い装備は除外されます。',
+  'hudChrome.weeklyRewards.catalogEmpty': 'この戦利品にはあなたのクラスに合うものがありません。',
   'hudChrome.weeklyRewards.selectionPoolRule':
     'レイドとダンジョンの報酬は、開ける前にテーブルを1つ以上選んでください。ダンジョンのテーブルには、この難易度で撃破したボスの戦利品がまとめられています。重複アイテム、レジェンダリーアイテム、必要レベルが自分のレベルより{maxLevelOffset}を超えて高い装備は抽選から除外されます。',
   'questUi.worldQuest.puzzleRetry': 'もう一度',
