@@ -17,24 +17,33 @@
 //    shows, the flare of her light as the breath is loosed and the blades are
 //    thrown awake;
 //  - Quenching Breath: through its bar the heart blazes and the cold is drawn
-//    into her mouth; when it lands a dense blast of freezing wind, snow and ice
-//    shards pours out of it down the cone (the cone, its frost and its ice are
-//    QuenchFx's);
-//  - Tempering Strike: as both fists hit the ice, a short flash on the fists
-//    only (never a white-out of the screen), a shockwave of frost, shards and
-//    snow thrown (its spikes are QuenchFx's);
-//  - the Blades Wake: arms raised, her crown and heart blaze, a column of cold
-//    light and snow spirals up round her; thrown down, a frost wave and a
-//    bright line racing to each blade (quench_wake_fx.ts);
+//    into her mouth; when it lands a blast of freezing wind pours down the
+//    cone, thin at her (her face and heart stay seen) and thick down it: streaks
+//    of wind (quench_breath_streaks.ts), ice-blue mist, dense snow and shards,
+//    in a palette compensated for the Quench grade (quench_breath_core.ts; the
+//    cone, its frost and its ice are QuenchFx's);
+//  - Tempering Strike: on the fight's wind-up cue a second ahead of the
+//    cleaving swing her fists rise over her head as the cold gathers on her
+//    bracers (StrikeWind; the hit's own cue then never restarts it), and as
+//    both fists hit the ice the lake cracks open (quench_strike_cracks.ts), a
+//    short flash on the fists only (never a white-out of the screen), shards
+//    and snow thrown (its spikes are QuenchFx's);
+//  - the Blades Wake: arms raised, her crown and heart blaze, a beam of cold
+//    power climbs round her, a bright cyan core in a deep blue shell with snow
+//    and shards spiralling up it and a ring flashing at its foot
+//    (quench_wake_fx.ts); thrown down, a frost shockwave and ice spikes race
+//    out over the lake and a line races to each blade, crystals sprouting
+//    along it, each blade flaring as it arrives (quench_wake_throw.ts);
 //  - the death: frost climbs her from the feet up into an ice statue (her own
 //    material, quench_statue_glaze.ts), glints climbing with it, her light
 //    dying, a burst of crystals as the last of her freezes, mist off the
 //    statue (the lake's refreeze is QuenchFightFx's).
 // Presentation only: the fight's telegraphs are quench_fx.ts's and
 // quench_fight_fx.ts's, on every tier. The low tier thins the mist, the snow,
-// the glitter, the vapour and the rime; reduced motion the particles and the
-// shakes;
-// nothing here is a warning a player reacts to.
+// the glitter, the vapour, the rime, the streaks and the throw's crystals and
+// spikes; reduced motion the particles and the shakes; nothing here is a
+// warning a player reacts to. The one event it claims is the cleave's own cue
+// when her wind-up already plays its slam.
 //
 // Rules (src/render/CLAUDE.md): every material is built in the constructor
 // under the root before its gated attach (the sprites, the rime, the column
@@ -77,7 +86,6 @@ import {
   QUENCH_RIME_STEP,
   QUENCH_SLASH_GAP,
   QUENCH_SOCKETS,
-  QUENCH_WAKE_LINE_SECONDS,
   QUENCH_YD_PER_UNIT,
   type QuenchBodyActionState,
   type QuenchBodyInput,
@@ -87,16 +95,31 @@ import {
   quenchGlowLook,
   quenchSocketIndex,
   quenchStatueGlaze,
-  quenchWakeLineLook,
 } from './quench_body_core';
 import {
   clearQuenchBodySockets,
   quenchBodySockets,
   retryQuenchBodySockets,
 } from './quench_body_sockets';
+import {
+  QUENCH_BREATH_COLORS as BC,
+  QUENCH_BREATH_STREAK,
+  quenchBreathBlast,
+  quenchBreathMistAt,
+} from './quench_breath_core';
+import { QuenchBreathStreaks } from './quench_breath_streaks';
 import { QuenchRimeSteps } from './quench_rime_steps';
 import { holdQuenchStatueGlaze } from './quench_statue_glaze';
+import {
+  QUENCH_STRIKE_COLORS,
+  QUENCH_STRIKE_CRACKS,
+  QUENCH_STRIKE_WIND,
+  QUENCH_STRIKE_WIND_OWNS,
+  quenchStrikeWindLook,
+} from './quench_strike_core';
+import { QuenchStrikeCracks } from './quench_strike_cracks';
 import { QuenchWakeFx } from './quench_wake_fx';
+import { QuenchWakeThrow } from './quench_wake_throw';
 
 const SCAN_SEC = 0.1;
 const C = QUENCH_BODY_COLORS;
@@ -128,6 +151,8 @@ const _actIn: QuenchBodyInput = {
 };
 const _look = newGlowLook();
 const _glaze = { height: 0, glow: 0, bite: 0, alpha: 0 };
+const _wind = { gather: 0, bracers: 0 };
+const _mist = { along: 0, size: 0, alpha: 0 };
 
 /** The per-frame puffs' options, written in place where they aim. */
 const HEM_MIST = {
@@ -187,6 +212,19 @@ const PLUME = {
   drag: 0.7,
   floor: -1e6,
 };
+/** Tempering Strike's wind-up: the cold drawn in to her bracers. */
+const GATHER = {
+  speed: 6,
+  life: 0.45,
+  size: [0.4, 0.06] as [number, number],
+  color: QUENCH_STRIKE_COLORS.gather as readonly [number, number, number],
+  alpha: 1,
+  pool: 'glow' as const,
+  dir: _dir,
+  spread: 0.04,
+  drag: 0,
+  floor: -1e6,
+};
 const DRAW_IN = {
   speed: 9,
   life: 0.55,
@@ -199,24 +237,38 @@ const DRAW_IN = {
   drag: 0,
   floor: -1e6,
 };
+/** The blast's mist, born down the cone (never a ball at her mouth). */
 const BLAST = {
-  speed: 19,
-  up: 0,
-  life: 1.15,
+  speed: 9,
+  up: 0.4,
+  life: 1.2,
   size: [1.2, 5] as [number, number],
-  color: C.mist as readonly [number, number, number],
+  color: BC.mist as readonly [number, number, number],
   alpha: 0.2,
   dir: _dir,
-  spread: 0.42,
-  drag: 0.9,
+  spread: 0.45,
+  drag: 1.1,
+  floor: -1e6,
+};
+/** Dense snow in the wind, down the cone. */
+const BLAST_SNOW = {
+  speed: 20,
+  up: 0,
+  life: 0.9,
+  size: [0.32, 0.22] as [number, number],
+  color: BC.snow as readonly [number, number, number],
+  alpha: 0.95,
+  dir: _dir,
+  spread: 0.32,
+  drag: 0.5,
   floor: -1e6,
 };
 const BLAST_SHARDS = {
   speed: 24,
   up: 0,
   life: 0.85,
-  size: [0.5, 0.12] as [number, number],
-  color: C.shard as readonly [number, number, number],
+  size: [0.55, 0.12] as [number, number],
+  color: BC.shard as readonly [number, number, number],
   alpha: 1,
   pool: 'glow' as const,
   dir: _dir,
@@ -227,19 +279,19 @@ const BLAST_SHARDS = {
 };
 const SPIRAL = {
   speed: 2.5,
-  up: 9,
+  up: 11,
   life: 1.5,
   size: [0.5, 0.18] as [number, number],
-  color: C.snow as readonly [number, number, number],
+  color: BC.snow as readonly [number, number, number],
   alpha: 0.9,
   drag: 0.3,
   floor: -1e6,
 };
 const SPIRAL_GLOW = {
   speed: 2,
-  up: 11,
+  up: 14,
   life: 1.2,
-  size: [0.35, 0.06] as [number, number],
+  size: [0.85, 0.12] as [number, number],
   color: C.glitter as readonly [number, number, number],
   alpha: 1,
   pool: 'glow' as const,
@@ -272,6 +324,9 @@ export class QuenchBody {
   private readonly sock: THREE.Vector3[] = QUENCH_SOCKETS.map(() => new THREE.Vector3());
   private readonly rime: QuenchRimeSteps;
   private readonly wake: QuenchWakeFx;
+  private readonly throwFx: QuenchWakeThrow;
+  private readonly streaks: QuenchBreathStreaks;
+  private readonly cracks: QuenchStrikeCracks;
   private readonly heartCore: THREE.Sprite;
   private readonly heartHalo: THREE.Sprite;
   private readonly heartMat: THREE.SpriteMaterial;
@@ -297,7 +352,14 @@ export class QuenchBody {
   private seed = 0x4c1e;
   private strikeAt = -99;
   private strikeHit = true;
+  /** Tempering Strike's wind-up cue (the StrikeWind clip's start) and
+   *  whether its slam has landed yet. */
+  private windAt = -99;
+  private windHit = true;
   private breathAt = -99;
+  /** The cone's bearing as the breath landed (QuenchFx lays its ice on it):
+   *  the blast keeps it while she turns back to her tank. */
+  private breathYaw = 0;
   private wakeAt = -99;
   private slashAt = -99;
   private deadAt = -1;
@@ -312,6 +374,9 @@ export class QuenchBody {
   private accDraw = 0;
   private accSpiral = 0;
   private accClimb = 0;
+  private accGather = 0;
+  private accStreak = 0;
+  private accBlast = 0;
   private disposed = false;
 
   constructor(
@@ -351,15 +416,35 @@ export class QuenchBody {
       this.materials,
       this.geometries,
     );
-    this.wake = new QuenchWakeFx(
+    this.wake = new QuenchWakeFx(this.fx, this.uTime, this.materials, this.geometries);
+    const glowTex = hasDom ? radialGlowTexture() : null;
+    this.glowTex = glowTex;
+    this.throwFx = new QuenchWakeThrow(
       this.fx,
       this.uTime,
+      this.particles,
+      (x, z) => this.groundY(x, z),
       QUENCH_BODY_POOLS.lines,
+      this.low,
+      glowTex,
       this.materials,
       this.geometries,
     );
-    const glowTex = hasDom ? radialGlowTexture() : null;
-    this.glowTex = glowTex;
+    this.streaks = new QuenchBreathStreaks(
+      this.fx,
+      detail ? QUENCH_BREATH_STREAK.pool : QUENCH_BREATH_STREAK.poolLow,
+      BC.streakDeep,
+      BC.streakCore,
+      BC.streakHot,
+      this.materials,
+      this.geometries,
+    );
+    this.cracks = new QuenchStrikeCracks(
+      this.fx,
+      QUENCH_STRIKE_CRACKS.pool,
+      this.materials,
+      this.geometries,
+    );
     const sprite = (color: number, name: string) =>
       new THREE.SpriteMaterial({
         map: glowTex,
@@ -433,16 +518,27 @@ export class QuenchBody {
     if (this.entityId >= 0) this.playGesture?.(this.entityId, gesture);
   }
 
-  /** Never claims an event: the renderer's own draws still play under these. */
+  /** Claims one event only: the cleave's own cue while her wind-up already
+   *  plays its slam (the renderer would restart the gesture on the hit).
+   *  Every other cue's own draws still play under these. */
   handleEvent(ev: SimEvent): boolean {
     if (!this.world || this.disposed || this.entityId < 0) return false;
     if (ev.type !== 'spellfx' || ev.sourceId !== this.entityId) return false;
-    if (ev.fx === 'windup' && ev.ability === ARC_CLEAVE_ABILITY) {
-      // Tempering Strike: her fists land on the clip's beat.
+    if (ev.fx === 'windup' && ev.ability === QUENCH_CUES.strikeReady) {
+      // Tempering Strike read before it lands: fists over her head now, the
+      // slam a second on, on the cleaving swing.
+      this.windAt = this.clock;
+      this.windHit = false;
+      this.send(QUENCH_BODY_GESTURES.strikeWind);
+    } else if (ev.fx === 'windup' && ev.ability === ARC_CLEAVE_ABILITY) {
+      if (this.clock - this.windAt < QUENCH_STRIKE_WIND_OWNS) return true;
+      // No wind-up seen (a swing that came at once): the short slam, her
+      // fists landing on its clip's beat.
       this.strikeAt = this.clock;
       this.strikeHit = false;
     } else if (ev.ability === QUENCH_CASTS.breath) {
       this.breathAt = this.clock;
+      this.breathYaw = this.world.entities.get(this.entityId)?.facing ?? 0;
       this.send(QUENCH_BODY_GESTURES.flare);
     } else if (ev.ability === QUENCH_CUES.wake) {
       this.wakeAt = this.clock;
@@ -475,6 +571,9 @@ export class QuenchBody {
     }
     this.updateFlashes();
     this.rime.update(this.clock);
+    this.throwFx.update(this.clock);
+    this.streaks.update(this.clock);
+    this.cracks.update(this.clock);
     this.particles.update(this.clock);
   }
 
@@ -530,6 +629,8 @@ export class QuenchBody {
     this.sealed = e.dead;
     this.strikeAt = -99;
     this.strikeHit = true;
+    this.windAt = -99;
+    this.windHit = true;
     this.breathAt = -99;
     this.wakeAt = -99;
     this.rime.reset();
@@ -552,6 +653,9 @@ export class QuenchBody {
     for (const s of this.crown) s.visible = false;
     for (const s of this.bracers) s.visible = false;
     this.wake.hide();
+    this.throwFx.hide();
+    this.streaks.hide();
+    this.cracks.hide();
     this.rime.hide();
   }
 
@@ -599,6 +703,7 @@ export class QuenchBody {
     _actIn.sinceBreath = this.clock - this.breathAt;
     _actIn.sinceStrike = this.clock - this.strikeAt;
     _actIn.sinceWake = this.clock - this.wakeAt;
+    _actIn.sinceWind = this.clock - this.windAt;
     quenchBodyAction(_actIn, _act);
     const look = quenchGlowLook(_act.action, _act.k, this.clock, awake, _look);
     if (_act.action === 'breath' && _act.k > 0.95) this.flaredBreath = true;
@@ -606,8 +711,9 @@ export class QuenchBody {
     this.lights(look.heart, look.eyes, look.crown, look.bracers, look.gather, 1);
     this.ambient(e, dt, look.plume, 1);
     this.gatherFx(dt, look.gather);
-    this.exhaleFx(e);
-    this.strikeFx();
+    this.exhaleFx(e, dt);
+    this.windFx(dt);
+    this.strikeFx(e);
     this.wakeFx(e, dt, look.column);
     const gy = this.groundY(eAt.x, eAt.z);
     this.rime.step(eAt.x, gy, eAt.z, this.clock);
@@ -740,67 +846,164 @@ export class QuenchBody {
     }
   }
 
-  /** Quenching Breath loosed: a dense blast of freezing wind, snow and shards
-   *  out of her mouth down the cone (QuenchFx draws the cone and its ice). */
-  private exhaleFx(e: Entity): void {
+  /** Quenching Breath loosed: the wind tears down the cone (QuenchFx draws
+   *  the cone and its ice). Thin at her: streaks are born a few yards out,
+   *  the mist only from a fifth of the way down, thickening outward; at her
+   *  mouth only a narrow jet of shards, so her face and her heart stay seen. */
+  private exhaleFx(e: Entity, dt: number): void {
     const age = this.clock - this.breathAt;
-    if (age < 0 || age > 0.75) return;
+    const strong = quenchBreathBlast(age);
+    if (strong <= 0) return;
     const m = this.sock[S_MOUTH];
     const eAt = fxAnchor(e);
     const gy = this.groundY(eAt.x, eAt.z);
-    // Aimed down from the mouth to the cone's middle on the ice.
-    const reach = QUENCH_BREATH_CONE.range * 0.55;
-    const tx = eAt.x + Math.sin(e.facing) * reach;
-    const tz = eAt.z + Math.cos(e.facing) * reach;
-    const dx = tx - m.x;
-    const dy = gy + 1 - m.y;
-    const dz = tz - m.z;
-    const d = Math.hypot(dx, dy, dz) || 1;
-    _dir[0] = dx / d;
-    _dir[1] = dy / d;
-    _dir[2] = dz / d;
-    const strong = age < 0.35 ? 1 : 1 - (age - 0.35) / 0.4;
-    BLAST.spread = Math.tan(QUENCH_BREATH_CONE.halfArc) * 0.7;
-    BLAST_SHARDS.spread = BLAST.spread * 0.85;
-    this.particles.puff(m.x, m.y, m.z, Math.round(9 * strong), BLAST);
-    this.particles.puff(m.x, m.y, m.z, Math.round(7 * strong), BLAST_SHARDS);
+    const yaw = this.breathYaw;
+    const fx = Math.sin(yaw);
+    const fz = Math.cos(yaw);
+    const range = QUENCH_BREATH_CONE.range;
+    const half = QUENCH_BREATH_CONE.halfArc;
+    // The jet: from her mouth down to the cone's middle on the ice.
+    const reach = range * 0.55;
+    const dx0 = eAt.x + fx * reach - m.x;
+    const dy0 = gy + 1 - m.y;
+    const dz0 = eAt.z + fz * reach - m.z;
+    const d0 = Math.hypot(dx0, dy0, dz0) || 1;
+    const jx = dx0 / d0;
+    const jy = dy0 / d0;
+    const jz = dz0 / d0;
+    _dir[0] = jx;
+    _dir[1] = jy;
+    _dir[2] = jz;
+    BLAST_SHARDS.spread = Math.tan(half) * 0.45;
+    this.particles.puff(m.x, m.y, m.z, Math.round(6 * strong), BLAST_SHARDS);
+    // The streaks of wind, born out of her face's way, fanned over the cone.
+    this.accStreak += dt * QUENCH_BREATH_STREAK.rate * strong;
+    while (this.accStreak >= 1) {
+      this.accStreak -= 1;
+      const a = yaw + (this.rand() * 2 - 1) * half * 0.9;
+      const tr = range * (0.45 + this.rand() * 0.55);
+      const tx = eAt.x + Math.sin(a) * tr;
+      const tz = eAt.z + Math.cos(a) * tr;
+      const ty = gy + 0.4 + this.rand() * 2.2;
+      const ox = m.x + jx * QUENCH_BREATH_STREAK.bornOut;
+      const oy = m.y + jy * QUENCH_BREATH_STREAK.bornOut;
+      const oz = m.z + jz * QUENCH_BREATH_STREAK.bornOut;
+      const sx = tx - ox;
+      const sy = ty - oy;
+      const sz = tz - oz;
+      const sd = Math.hypot(sx, sy, sz) || 1;
+      this.streaks.emit(this.clock, ox, oy, oz, sx / sd, sy / sd, sz / sd, this.rand());
+    }
+    // The mist and the snow, born down the cone and blown on out of it.
+    this.accBlast += dt * 70 * strong;
+    while (this.accBlast >= 1) {
+      this.accBlast -= 1;
+      const look = quenchBreathMistAt(this.rand(), _mist);
+      const a = yaw + (this.rand() * 2 - 1) * half * look.along * 0.95;
+      const r = range * look.along;
+      const px = eAt.x + Math.sin(a) * r;
+      const pz = eAt.z + Math.cos(a) * r;
+      _dir[0] = Math.sin(a);
+      _dir[1] = 0.04;
+      _dir[2] = Math.cos(a);
+      BLAST.size[0] = look.size * 0.5;
+      BLAST.size[1] = look.size;
+      BLAST.alpha = look.alpha;
+      this.particles.puff(px, gy + 0.6 + look.size * 0.25, pz, 1, BLAST);
+      if (this.rand() < 0.8) this.particles.puff(px, gy + 0.8 + this.rand() * 3, pz, 2, BLAST_SNOW);
+    }
     if (age < 1 / 30) {
-      this.flash(m.x, m.y, m.z, 4.5, 0.4);
+      this.flash(m.x, m.y, m.z, 3.5, 0.35);
       this.shakeNear(m.x, m.z, 0.35);
     }
   }
 
-  /** Tempering Strike: her fists land on the ice on the clip's beat. */
-  private strikeFx(): void {
-    if (this.strikeHit || this.clock - this.strikeAt < QUENCH_BODY_CLIP.strike) return;
-    this.strikeHit = true;
+  /** Tempering Strike's wind-up: the cold drawn in to her raised bracers,
+   *  crystals forming on them, building to the slam. */
+  private windFx(dt: number): void {
+    const look = quenchStrikeWindLook(this.clock - this.windAt, _wind);
+    if (look.gather <= 0.02) return;
+    this.accGather += dt * 70 * look.gather;
+    while (this.accGather >= 1) {
+      this.accGather -= 1;
+      const p = this.sock[S_BRACERS[this.rand() < 0.5 ? 0 : 1]];
+      const a = this.rand() * Math.PI * 2;
+      const el = (this.rand() - 0.5) * 1.6;
+      const r = (2.2 + this.rand() * 2.6) * U;
+      const x = p.x + Math.cos(a) * r * Math.cos(el);
+      const y = p.y + Math.sin(el) * r;
+      const z = p.z + Math.sin(a) * r * Math.cos(el);
+      const dx = p.x - x;
+      const dy = p.y - y;
+      const dz = p.z - z;
+      const d = Math.hypot(dx, dy, dz) || 1;
+      _dir[0] = dx / d;
+      _dir[1] = dy / d;
+      _dir[2] = dz / d;
+      GATHER.speed = d / GATHER.life;
+      this.particles.puff(x, y, z, 1, GATHER);
+    }
+  }
+
+  /** Tempering Strike: her fists land on the ice, on the wind-up's slam (a
+   *  second after its cue) or, with no wind-up seen, on the short clip's
+   *  beat. Either way it lands once. */
+  private strikeFx(e: Entity): void {
+    let due = false;
+    if (!this.windHit && this.clock - this.windAt >= QUENCH_STRIKE_WIND) {
+      this.windHit = true;
+      // A bar that took her body over in the meantime cancels the slam (the
+      // fight cues the held swing afresh).
+      due = e.castingAbility === null;
+    }
+    if (!this.strikeHit && this.clock - this.strikeAt >= QUENCH_BODY_CLIP.strike) {
+      this.strikeHit = true;
+      due = true;
+    }
+    if (due) this.slam(e);
+  }
+
+  /** The fists on the ice: the lake cracks open from a shattered crater
+   *  (no bright ring over it: QuenchFx's spikes carry the arc), a short flash
+   *  on the fists only, shards and snow thrown. */
+  private slam(e: Entity): void {
     const a = this.sock[S_HANDS[0]];
     const b = this.sock[S_HANDS[1]];
     const x = (a.x + b.x) / 2;
     const z = (a.z + b.z) / 2;
     const gy = this.groundY(x, z);
-    this.flash(x, gy + 1.2, z, QUENCH_BURST.flashMax * 0.7, QUENCH_BURST.flashPeak);
-    this.particles.shockRing(x, z, C.ring, 9, 0.55);
-    this.particles.shockRing(x, z, C.ring, 15, 1.1, { wake: 0.6, crest: 0.12, strength: 0.7 });
-    this.particles.puff(x, gy + 0.6, z, 36, {
-      speed: 10,
-      up: 7,
+    this.cracks.open(x, gy, z, e.facing, this.clock);
+    this.flash(x, gy + 1.2, z, QUENCH_BURST.flashMax * 0.55, QUENCH_BURST.flashPeak * 0.8);
+    this.particles.puff(x, gy + 0.6, z, 44, {
+      speed: 11,
+      up: 8,
       life: 1.1,
-      size: [0.55, 0.15],
-      color: C.shard,
+      size: [0.6, 0.15],
+      color: BC.shard,
       alpha: 1,
       pool: 'glow',
       gravity: 16,
       drag: 0.4,
       floor: gy + 0.1,
     });
-    this.particles.puff(x, gy + 0.5, z, 14, {
+    this.particles.puff(x, gy + 0.6, z, 26, {
+      speed: 8,
+      up: 5,
+      life: 1.3,
+      size: [0.34, 0.22],
+      color: BC.snow,
+      alpha: 0.95,
+      gravity: 6,
+      drag: 0.6,
+      floor: gy + 0.1,
+    });
+    this.particles.puff(x, gy + 0.5, z, 16, {
       speed: 6,
       up: 1.4,
       life: 1.5,
-      size: [1.2, 3.6],
-      color: C.mist,
-      alpha: 0.2,
+      size: [1.2, 3.8],
+      color: BC.mist,
+      alpha: 0.26,
       drag: 1.0,
       radius: 1.5,
       floor: gy + 0.2,
@@ -808,82 +1011,61 @@ export class QuenchBody {
     this.shakeNear(x, z, 0.6);
   }
 
-  /** The Blades Wake: the column through the bar, the spiral of snow. */
+  /** The Blades Wake: the beam through the bar, snow and shards spiralling
+   *  up it the whole height of the column. */
   private wakeFx(e: Entity, dt: number, column: number): void {
     const eAt = fxAnchor(e);
     const gy = this.groundY(eAt.x, eAt.z);
     this.wake.setColumn(eAt.x, gy, eAt.z, column);
-    if (column > 0.02) {
-      this.accSpiral += dt * 70 * column;
-      while (this.accSpiral >= 1) {
-        this.accSpiral -= 1;
-        const a = this.clock * 3.2 + this.rand() * 0.9 + (this.rand() < 0.5 ? 0 : Math.PI);
-        const r = (3.4 + this.rand() * 0.8) * U;
-        const h = gy + this.rand() * BODY_H * 0.3;
-        const glow = this.rand() < 0.4;
-        this.particles.puff(
-          eAt.x + Math.cos(a) * r,
-          h,
-          eAt.z + Math.sin(a) * r,
-          1,
-          glow ? SPIRAL_GLOW : SPIRAL,
-        );
-      }
+    if (column <= 0.02) return;
+    this.accSpiral += dt * 120 * column;
+    while (this.accSpiral >= 1) {
+      this.accSpiral -= 1;
+      const a = this.clock * 3.2 + this.rand() * 0.9 + (this.rand() < 0.5 ? 0 : Math.PI);
+      const r = (3.6 + this.rand() * 1.2) * U;
+      const h = gy + this.rand() * BODY_H * 1.4 * column;
+      const glow = this.rand() < 0.45;
+      this.particles.puff(
+        eAt.x + Math.cos(a) * r,
+        h,
+        eAt.z + Math.sin(a) * r,
+        1,
+        glow ? SPIRAL_GLOW : SPIRAL,
+      );
     }
-    // The throw's lines racing out to each blade.
-    const age = this.clock - this.wakeAt;
-    if (age >= 0 && age < QUENCH_WAKE_LINE_SECONDS) {
-      const l = quenchWakeLineLook(age);
-      for (let i = 0; i < QUENCH_BODY_POOLS.lines; i++) {
-        if (i >= this.bladeCount) {
-          this.wake.setLine(i, 0, 0, 0, 0, gy, 0, 0);
-          continue;
-        }
-        this.wake.setLine(
-          i,
-          eAt.x,
-          eAt.z,
-          this.blades[i * 2],
-          this.blades[i * 2 + 1],
-          gy,
-          l.head,
-          l.alpha,
-        );
-      }
-    } else
-      for (let i = 0; i < QUENCH_BODY_POOLS.lines; i++) this.wake.setLine(i, 0, 0, 0, 0, 0, 0, 0);
   }
 
-  /** The blades thrown awake: the frost wave out to them, a flash at her heart. */
+  /** The blades thrown awake: the throw (the frost shockwave, the spikes,
+   *  the lines to the blades), a flash at her heart, frost rolling out. */
   private wakeThrown(e: Entity): void {
     const eAt = fxAnchor(e);
-    let reach = 18;
-    if (this.bladeCount > 0) {
-      reach = 0;
-      for (let i = 0; i < this.bladeCount; i++)
-        reach = Math.max(
-          reach,
-          Math.hypot(this.blades[i * 2] - eAt.x, this.blades[i * 2 + 1] - eAt.z),
-        );
-    }
-    this.particles.shockRing(eAt.x, eAt.z, C.ring, reach + 2, 1.1, {
-      wake: 0.5,
-      crest: 0.08,
-      strength: 0.85,
-    });
+    this.throwFx.begin(eAt.x, eAt.z, this.blades, this.bladeCount, this.clock);
     const h = this.sock[S_HEART];
     this.flash(h.x, h.y, h.z, QUENCH_BURST.flashMax, QUENCH_BURST.flashPeak);
     const gy = this.groundY(eAt.x, eAt.z);
     this.particles.puff(eAt.x, gy + 0.6, eAt.z, 40, {
-      speed: 12,
+      speed: 14,
       up: 0.6,
       life: 1.6,
       size: [2.2, 7],
-      color: C.mist,
-      alpha: 0.26,
+      color: BC.mist,
+      alpha: 0.3,
       drag: 0.8,
       radius: 3,
       floor: gy + 0.2,
+    });
+    this.particles.puff(eAt.x, gy + 1, eAt.z, 50, {
+      speed: 16,
+      up: 6,
+      life: 1.2,
+      size: [0.6, 0.14],
+      color: BC.shard,
+      alpha: 1,
+      pool: 'glow',
+      gravity: 12,
+      drag: 0.4,
+      radius: 3,
+      floor: gy + 0.1,
     });
     this.shakeNear(eAt.x, eAt.z, 0.55);
   }
@@ -991,6 +1173,8 @@ export class QuenchBody {
     for (const g of this.geometries) g.dispose();
     for (const m of this.materials) m.dispose();
     this.rime.mesh.dispose();
+    this.throwFx.dispose();
+    this.streaks.dispose();
     this.glowTex?.dispose();
     clearQuenchBodySockets();
   }

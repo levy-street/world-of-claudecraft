@@ -43,7 +43,6 @@ import {
   quenchGlowLook,
   quenchRimeLook,
   quenchStatueGlaze,
-  quenchWakeLineLook,
 } from '../src/render/smith_heart_fx/quench_body_core';
 import {
   clearQuenchBodySockets,
@@ -65,6 +64,7 @@ import {
   warmthLinks,
 } from '../src/render/smith_heart_fx/quench_fight_fx_core';
 import { quenchStatueGlazeFor } from '../src/render/smith_heart_fx/quench_statue_glaze';
+import { quenchWakeLine } from '../src/render/smith_heart_fx/quench_wake_core';
 import { SMITH_HEART_MOBS } from '../src/sim/content/smith_heart';
 import { QUENCH_RIMEWALL } from '../src/sim/content/smith_heart_layout';
 import { DUNGEONS, instanceOrigin } from '../src/sim/data';
@@ -169,6 +169,11 @@ describe('the Guardian of the Quench model', () => {
     expect(c.castByAbility?.[QUENCH_CASTS.wake]).toBe('Wake');
     expect(c.castByAbility?.[QUENCH_CASTS.flurry]).toBe('WakeHold');
     expect(c.attackByAbility?.[ARC_CLEAVE_ABILITY]).toBe('Strike');
+    // Round 2: Tempering Strike read before it lands, its slam a second in.
+    expect(c.attackByAbility?.[QUENCH_BODY_GESTURES.strikeWind]).toBe('StrikeWind');
+    expect(c.attackTimeScaleByAbility?.[QUENCH_BODY_GESTURES.strikeWind]).toBe(1);
+    expect(c.contacts?.StrikeWind).toEqual([QUENCH_BODY_CLIP.strikeWind]);
+    expect(QUENCH_BODY_CLIP.strikeWind).toBeCloseTo(T.strikeWindup, 9);
     expect(c.attackByAbility?.[QUENCH_BODY_GESTURES.taunt]).toBe('Taunt');
     expect(c.attackByAbility?.[QUENCH_BODY_GESTURES.slash]).toBe('Slash');
     const TS = c.castTimeScaleByAbility ?? {};
@@ -181,11 +186,14 @@ describe('the Guardian of the Quench model', () => {
     for (const b of Object.keys(QUENCH_SYNCED_CASTS)) expect(sync, b).toContain(b);
     // The hunt's long bar loops its held pose, never synced.
     expect(sync).not.toContain(QUENCH_CASTS.flurry);
-    for (const one of ['Breath', 'Wake', 'Strike', 'Taunt', 'Slash'])
+    for (const one of ['Breath', 'Wake', 'Strike', 'StrikeWind', 'Taunt', 'Slash'])
       expect(def.oneShotsHoldAttacks, one).toContain(one);
     expect(c.castPlayOut).toEqual(['Breath', 'Wake']);
     expect(def.glowPulses?.deathFade).toBeGreaterThan(0);
-    expect(def.glowPulses?.pulses.map((p) => p.gesture)).toEqual([QUENCH_BODY_GESTURES.flare]);
+    expect(def.glowPulses?.pulses.map((p) => p.gesture)).toEqual([
+      QUENCH_BODY_GESTURES.flare,
+      QUENCH_BODY_GESTURES.strikeWind,
+    ]);
     for (const g of Object.values(QUENCH_BODY_GESTURES))
       expect(g.startsWith('smith_heart_quench_body_')).toBe(true);
   });
@@ -254,6 +262,12 @@ describe('quench_body_core: her light and her cold', () => {
     expect(quenchBodyAction({ ...IDLE, sinceBreath: 0.2 }).action).toBe('exhale');
     expect(quenchBodyAction({ ...IDLE, sinceStrike: 0.2 }).action).toBe('strike');
     expect(quenchBodyAction({ ...IDLE, sinceStrike: 5 }).action).toBe('idle');
+    // The wind-up reads through its second, then the slam's aftermath.
+    expect(quenchBodyAction({ ...IDLE, sinceWind: 0.5 })).toEqual({ action: 'windup', k: 0.5 });
+    expect(quenchBodyAction({ ...IDLE, sinceWind: 1.2, sinceStrike: 0.2 }).action).toBe('strike');
+    expect(quenchBodyAction({ ...IDLE, castId: QUENCH_CASTS.breath, sinceWind: 0.5 }).action).toBe(
+      'breath',
+    );
   });
 
   it('blazes her heart through the breath and her crown through the wake', () => {
@@ -268,7 +282,19 @@ describe('quench_body_core: her light and her cold', () => {
     expect(rest.column).toBe(0);
     // Awake, her crown burns brighter at rest.
     expect(quenchGlowLook('idle', 0, 0, true, newGlowLook()).crown).toBeGreaterThan(rest.crown);
-    for (const a of ['idle', 'strike', 'breath', 'exhale', 'wake', 'thrown', 'hunt'] as const)
+    // The wind-up blazes her bracers to the slam.
+    const wind = quenchGlowLook('windup', 1, 0, false, newGlowLook());
+    expect(wind.bracers).toBeGreaterThan(rest.bracers * 4);
+    for (const a of [
+      'idle',
+      'windup',
+      'strike',
+      'breath',
+      'exhale',
+      'wake',
+      'thrown',
+      'hunt',
+    ] as const)
       for (const k of [0, 0.5, 1]) {
         const l = quenchGlowLook(a, k, 1.3, false, newGlowLook());
         for (const v of Object.values(l)) expect(Number.isFinite(v), a).toBe(true);
@@ -299,9 +325,10 @@ describe('quench_body_core: her light and her cold', () => {
   });
 
   it("races the wake's lines out to the blades, then lets them go", () => {
-    expect(quenchWakeLineLook(0).head).toBe(0);
-    expect(quenchWakeLineLook(0.6).head).toBeCloseTo(1, 5);
-    expect(quenchWakeLineLook(2).alpha).toBe(0);
+    expect(quenchWakeLine(0).head).toBe(0);
+    expect(quenchWakeLine(0.6).head).toBeCloseTo(1, 5);
+    expect(quenchWakeLine(1.5).alpha).toBe(1);
+    expect(quenchWakeLine(3).alpha).toBe(0);
   });
 
   it('never hangs the loot sparkle over her fight objects', () => {
@@ -433,16 +460,39 @@ describe('QuenchBody over a fake world', () => {
     boss.castTotal = T.wakeCast;
     boss.castRemaining = 1;
     fx.update(1 / 20);
-    expect(root?.getObjectByName('smithHeartQuenchWakeColumn')?.visible).toBe(true);
+    expect(root?.getObjectByName('smithHeartQuenchWakeShell')?.visible).toBe(true);
+    expect(root?.getObjectByName('smithHeartQuenchWakeCore')?.visible).toBe(true);
+    expect(root?.getObjectByName('smithHeartQuenchWakeFoot')?.visible).toBe(true);
     boss.castingAbility = null;
     expect(fx.handleEvent(cue(QUENCH_CUES.wake))).toBe(false);
     fx.update(0.2);
     expect(sent).toContain(QUENCH_BODY_GESTURES.flare);
     expect(root?.getObjectByName('smithHeartQuenchWakeLine')?.visible).toBe(true);
+    expect(root?.getObjectByName('smithHeartQuenchWakeSpikes')?.visible).toBe(true);
+    expect(root?.getObjectByName('smithHeartQuenchWakeWave')?.visible).toBe(true);
     expect(shaken).toBeGreaterThan(0);
-    // Tempering Strike lands on the clip's beat, never claimed.
+    // Tempering Strike with no wind-up seen: the short slam, never claimed.
     expect(fx.handleEvent(cue(ARC_CLEAVE_ABILITY, 'windup'))).toBe(false);
+    for (let i = 0; i < 20; i++) fx.update(1 / 20);
+    const cracks = root?.getObjectsByProperty('name', 'smithHeartQuenchStrikeCracks') ?? [];
+    expect(cracks.some((c) => c.visible)).toBe(true);
+    for (let i = 0; i < 80; i++) fx.update(1 / 20);
+    // The wind-up cue raises her fists a second ahead; the cleave's own cue
+    // on the swing is then claimed, so the hit never restarts the gesture.
+    expect(fx.handleEvent(cue(QUENCH_CUES.strikeReady, 'windup'))).toBe(false);
+    expect(sent).toContain(QUENCH_BODY_GESTURES.strikeWind);
+    for (let i = 0; i < 20; i++) fx.update(1 / 20);
+    expect(fx.handleEvent(cue(ARC_CLEAVE_ABILITY, 'windup'))).toBe(true);
+    // Her fists reach the ice on the clip's beat: the lake cracks open.
+    fx.update(1 / 20);
+    expect(cracks.some((c) => c.visible)).toBe(true);
+    for (let i = 0; i < 40; i++) fx.update(1 / 20);
+    expect(fx.handleEvent(cue(ARC_CLEAVE_ABILITY, 'windup'))).toBe(false);
+    // The breath's streaks of wind leave her mouth's way down the cone.
     expect(fx.handleEvent(cue(QUENCH_CASTS.breath))).toBe(false);
+    fx.update(1 / 20);
+    fx.update(1 / 20);
+    expect(root?.getObjectByName('smithHeartQuenchBreathStreaks')?.visible).toBe(true);
     for (let i = 0; i < 20; i++) fx.update(1 / 20);
     // Death: the statue's frost held on her own body, climbing.
     boss.dead = true;

@@ -722,8 +722,8 @@ export class RiftDeathZoneVisuals {
     this.breathBody.handleEvent(event);
     const breath = this.breathFight.handleEvent(event);
     this.quenchFx.handleEvent(event);
-    this.quenchBody.handleEvent(event);
-    const quench = this.quenchFight.handleEvent(event);
+    const quenchBody = this.quenchBody.handleEvent(event);
+    const quench = this.quenchFight.handleEvent(event) || quenchBody;
     this.heatFx.handleEvent(event);
     this.heatBody.handleEvent(event);
     const heat = this.heatFight.handleEvent(event);

@@ -1,21 +1,37 @@
-// QuenchWakeFx, a part of QuenchBody (quench_body.ts): the Blades Wake on the
-// Guardian of the Quench's own body. Through the 4 s bar, as both her arms rise
-// to the sky, a column of cold light climbs round her, streaked and spiralling
-// with snow (quench_body_core.ts quenchGlowLook `column`); when her arms are
-// thrown down, a bright line races over the ice from her feet to each of the
-// four blades as they tear free (quenchWakeLineLook). Held, dimmer, through the
-// Blades Hunt. Cosmetic: the blades' own warnings are QuenchBladesFx's and
-// QuenchFightFx's, on every tier.
+// QuenchWakeFx, a part of QuenchBody (quench_body.ts): the Blades Wake's
+// column on the Guardian of the Quench's own body (plan: quench_wake_core.ts).
+// Through the 4 s bar, as both her arms rise to the sky, a beam of cold power
+// climbs round her: a dense bright cyan core shooting up from over her
+// crown into the dark, inside a deep blue shell streaked with spiralling light that stands
+// DARK against the white lake and the pale walls (additive light alone washed
+// out to a pale curtain there), and a ring flashing on the ice at its foot.
+// Held, dimmer, through the Blades Hunt. The throw-down is QuenchWakeThrow's
+// (quench_wake_throw.ts). Cosmetic: the blades' own warnings are
+// QuenchBladesFx's and QuenchFightFx's, on every tier.
 //
 // Rules (src/render/CLAUDE.md): every geometry and material built in the
-// constructor under the owner's gated root; fixed pools; no per-frame
-// allocation; no light.
+// constructor under the owner's gated root; no per-frame allocation; no light.
 
 import * as THREE from 'three';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
-import { QUENCH_BODY_COLORS as C, QUENCH_YD_PER_UNIT } from './quench_body_core';
+import {
+  QUENCH_WAKE_COLORS as C,
+  QUENCH_WAKE_COLUMN as COL,
+  type QuenchWakeColumnLook,
+  quenchWakeColumnLook,
+} from './quench_wake_core';
 
-const COLUMN_VERT = /* glsl */ `
+const NOISE = /* glsl */ `
+float h21(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+float vnoise(vec2 p) {
+  vec2 i = floor(p), f = fract(p);
+  vec2 u = f * f * (3.0 - 2.0 * f);
+  return mix(mix(h21(i), h21(i + vec2(1.0, 0.0)), u.x),
+             mix(h21(i + vec2(0.0, 1.0)), h21(i + vec2(1.0, 1.0)), u.x), u.y);
+}
+`;
+
+const TUBE_VERT = /* glsl */ `
 varying vec2 vUv;
 varying float vFacing;
 void main() {
@@ -26,180 +42,236 @@ void main() {
   gl_Position = projectionMatrix * mv;
 }
 `;
-const COLUMN_FRAG = /* glsl */ `
+
+/** The shell: deep blue at its silhouette (dark on the pale room), streaks of
+ *  cyan light spiralling up it, all but clear where it faces the camera so
+ *  she stays seen through it. Normal blending: it can darken, never wash. */
+const SHELL_FRAG = /* glsl */ `
 uniform float uTime;
 uniform float uAlpha;
 uniform float uRise;
-uniform vec3 uColor;
+uniform vec3 uDeep;
+uniform vec3 uMid;
+uniform vec3 uCore;
 varying vec2 vUv;
 varying float vFacing;
-float h21(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
-float vnoise(vec2 p) {
-  vec2 i = floor(p), f = fract(p);
-  vec2 u = f * f * (3.0 - 2.0 * f);
-  return mix(mix(h21(i), h21(i + vec2(1.0, 0.0)), u.x),
-             mix(h21(i + vec2(0.0, 1.0)), h21(i + vec2(1.0, 1.0)), u.x), u.y);
-}
+${NOISE}
 void main() {
-  // vUv.x round the column, vUv.y up it. Streaks climbing and twisting.
-  float u = vUv.x + vUv.y * 0.35 - uTime * 0.12;
-  float streak = vnoise(vec2(u * 26.0, vUv.y * 2.0 - uTime * 2.6));
-  float band = vnoise(vec2(u * 7.0 + 4.0, vUv.y * 5.0 - uTime * 1.4));
-  float s = smoothstep(0.45, 0.95, streak) * 0.85 + band * 0.35;
-  // It climbs with the bar: nothing above its rising top.
-  float top = smoothstep(uRise, uRise - 0.18, vUv.y);
-  float foot = smoothstep(0.0, 0.08, vUv.y);
-  float fade = 1.0 - smoothstep(0.65, 1.0, vUv.y);
-  // Thin where it faces the camera (she stays seen through it), bright at its
-  // silhouette; streaks, never a sheet.
-  float edge = 0.22 + 0.78 * (1.0 - vFacing);
-  float a = uAlpha * s * top * foot * (0.35 + 0.65 * fade) * edge;
-  gl_FragColor = vec4(uColor * (0.8 + 0.9 * s), clamp(a, 0.0, 0.6));
+  float u = vUv.x + vUv.y * 0.55 - uTime * 0.16;
+  float streak = vnoise(vec2(u * 24.0, vUv.y * 2.4 - uTime * 2.4));
+  float band = vnoise(vec2(u * 7.0 + 3.0, vUv.y * 4.5 - uTime * 1.2));
+  float s = smoothstep(0.5, 0.95, streak);
+  // Three ribbons of light winding up it.
+  float helix = fract(vUv.x * 3.0 + vUv.y * 2.2 - uTime * 0.55);
+  float ribbon = smoothstep(0.0, 0.05, helix) * (1.0 - smoothstep(0.08, 0.16, helix));
+  s = max(s, ribbon * (0.7 + 0.3 * band));
+  float top = smoothstep(uRise, uRise - 0.16, vUv.y);
+  float foot = smoothstep(0.0, 0.04, vUv.y);
+  float fade = 1.0 - smoothstep(0.62, 1.0, vUv.y);
+  // Dark at its silhouette, all but clear where it faces the camera.
+  float edge = smoothstep(0.25, 0.85, 1.0 - vFacing);
+  float body = edge * (0.75 + 0.25 * band);
+  float lit = s * (0.15 + 0.85 * edge);
+  float a = uAlpha * top * foot * (0.35 + 0.65 * fade) * max(body, lit * 0.8);
+  vec3 col = mix(uDeep, uMid, band * 0.35);
+  col = mix(col, uCore, lit * 0.85);
+  // The climbing top burns brighter.
+  col = mix(col, uCore, smoothstep(uRise - 0.08, uRise, vUv.y) * 0.5);
+  gl_FragColor = vec4(col, clamp(a, 0.0, 0.92));
 }
 `;
 
-const LINE_VERT = /* glsl */ `
+/** The core beam: a dense bright cyan shaft, white at its heart, rippling up. */
+const CORE_FRAG = /* glsl */ `
+uniform float uTime;
+uniform float uAlpha;
+uniform float uRise;
+uniform vec3 uCore;
+uniform vec3 uHot;
 varying vec2 vUv;
+varying float vFacing;
+${NOISE}
 void main() {
-  vUv = uv;
+  float heart = vFacing * vFacing;
+  float ripple = vnoise(vec2(vUv.x * 10.0, vUv.y * 9.0 - uTime * 6.0));
+  float top = smoothstep(uRise, uRise - 0.08, vUv.y);
+  float foot = smoothstep(0.0, 0.06, vUv.y);
+  float fade = 1.0 - smoothstep(0.5, 1.0, vUv.y);
+  float a = uAlpha * top * foot * (0.3 + 0.7 * fade) * (0.25 + 0.75 * heart) * (0.7 + 0.45 * ripple);
+  // A saturated cyan, a paler heart, never pushed to white (the Quench's
+  // tone curve turns an over-bright white cream).
+  vec3 col = mix(uCore, uHot, heart * 0.45);
+  gl_FragColor = vec4(col * a * 0.6, a);
+}
+`;
+
+const FOOT_VERT = /* glsl */ `
+varying vec2 vLocal;
+void main() {
+  vLocal = position.xz;
   gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 }
 `;
-/** A line racing over the ice: a hot head at uHead, a frost trail behind it. */
-const LINE_FRAG = /* glsl */ `
-uniform float uHead;
+/** The ring on the ice at the column's foot: a deep blue band, a bright cyan
+ *  crest, rime spokes turning inside it. */
+const FOOT_FRAG = /* glsl */ `
+uniform float uTime;
 uniform float uAlpha;
-uniform vec3 uColor;
-varying vec2 vUv;
+uniform vec3 uDeep;
+uniform vec3 uCore;
+uniform vec3 uHot;
+varying vec2 vLocal;
+${NOISE}
 void main() {
-  float across = 1.0 - abs(vUv.y * 2.0 - 1.0);
-  float core = smoothstep(0.55, 1.0, across);
-  float soft = smoothstep(0.0, 1.0, across);
-  float behind = step(vUv.x, uHead);
-  float head = exp(-abs(vUv.x - uHead) * 18.0);
-  float trail = behind * (0.35 + 0.65 * smoothstep(uHead - 0.6, uHead, vUv.x));
-  float a = uAlpha * (core * (trail + head * 1.6) + soft * head * 0.8);
-  gl_FragColor = vec4(uColor * (1.0 + head * 1.4), clamp(a, 0.0, 1.0));
+  float r = length(vLocal);
+  float ang = atan(vLocal.y, vLocal.x);
+  float cd = (r - 0.78) * 14.0;
+  float crest = exp(-cd * cd);
+  float band = smoothstep(0.6, 0.7, r) * (1.0 - smoothstep(0.88, 0.99, r));
+  float spokes = smoothstep(0.7, 1.0, sin(ang * 18.0 + uTime * 1.5) * 0.5 + 0.5)
+    * smoothstep(0.3, 0.6, r) * (1.0 - smoothstep(0.62, 0.7, r));
+  float rime = vnoise(vec2(ang * 9.0, r * 14.0 - uTime * 0.8));
+  float inner = (1.0 - smoothstep(0.0, 0.62, r)) * 0.35 * rime;
+  float a = uAlpha * clamp(band * 0.95 + crest + spokes * 0.6 + inner, 0.0, 1.0);
+  vec3 col = mix(uDeep, uCore, clamp(crest * 1.2 + spokes * 0.6 + inner, 0.0, 1.0));
+  col = mix(col, uHot, crest * 0.5);
+  gl_FragColor = vec4(col, clamp(a, 0.0, 0.95));
 }
 `;
 
-/** The column's size in model units (her own height, a little wider than her
- *  gown's hem). */
-const COLUMN_H = 15;
-const COLUMN_R0 = 4.2;
-const COLUMN_R1 = 2.6;
+const _look: QuenchWakeColumnLook = { shell: 0, core: 0, rise: 0, foot: 0 };
+const color = (c: readonly [number, number, number]) => new THREE.Color(c[0], c[1], c[2]);
 
 export class QuenchWakeFx {
-  private readonly column: THREE.Mesh;
-  private readonly columnMat: THREE.ShaderMaterial;
-  private readonly lines: THREE.Mesh[] = [];
-  private readonly lineMats: THREE.ShaderMaterial[] = [];
+  private readonly shell: THREE.Mesh;
+  private readonly shellMat: THREE.ShaderMaterial;
+  private readonly core: THREE.Mesh;
+  private readonly coreMat: THREE.ShaderMaterial;
+  private readonly foot: THREE.Mesh;
+  private readonly footMat: THREE.ShaderMaterial;
 
   constructor(
     parent: THREE.Object3D,
-    uTime: { value: number },
-    lineCount: number,
+    private readonly uTime: { value: number },
     materials: THREE.Material[],
     geometries: THREE.BufferGeometry[],
   ) {
-    const U = QUENCH_YD_PER_UNIT;
-    const geo = new THREE.CylinderGeometry(COLUMN_R1 * U, COLUMN_R0 * U, COLUMN_H * U, 40, 1, true);
-    geo.translate(0, (COLUMN_H * U) / 2, 0);
-    geometries.push(geo);
-    this.columnMat = new THREE.ShaderMaterial({
-      name: 'smithHeartQuenchWakeColumn',
+    const shellGeo = new THREE.CylinderGeometry(
+      COL.shellR1,
+      COL.shellR0,
+      COL.height,
+      48,
+      6,
+      true,
+    ).translate(0, COL.height / 2, 0);
+    const coreGeo = new THREE.CylinderGeometry(
+      COL.coreR * 0.7,
+      COL.coreR,
+      COL.coreHeight,
+      20,
+      4,
+      true,
+    ).translate(0, COL.coreFrom + COL.coreHeight / 2, 0);
+    // A unit disc scaled to the ring's reach (the shader reads its own radius).
+    const footGeo = new THREE.CircleGeometry(1, 64).rotateX(-Math.PI / 2);
+    geometries.push(shellGeo, coreGeo, footGeo);
+    this.shellMat = new THREE.ShaderMaterial({
+      name: 'smithHeartQuenchWakeShell',
       uniforms: {
         uTime,
         uAlpha: { value: 0 },
         uRise: { value: 0 },
-        uColor: { value: new THREE.Color(C.column[0], C.column[1], C.column[2]) },
+        uDeep: { value: color(C.deep) },
+        uMid: { value: color(C.mid) },
+        uCore: { value: color(C.core) },
       },
-      vertexShader: COLUMN_VERT,
-      fragmentShader: COLUMN_FRAG,
+      vertexShader: TUBE_VERT,
+      fragmentShader: SHELL_FRAG,
       transparent: true,
       depthWrite: false,
       side: THREE.DoubleSide,
-      blending: THREE.AdditiveBlending,
       fog: false,
     });
-    materials.push(this.columnMat);
-    this.column = new THREE.Mesh(geo, this.columnMat);
-    this.column.name = 'smithHeartQuenchWakeColumn';
-    this.column.frustumCulled = false;
-    this.column.visible = false;
-    parent.add(this.column);
-    // A unit strip along +x, one per blade (stretched and turned when drawn).
-    const lineGeo = new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2).translate(0.5, 0, 0);
-    geometries.push(lineGeo);
-    for (let i = 0; i < lineCount; i++) {
-      const mat = new THREE.ShaderMaterial({
-        name: 'smithHeartQuenchWakeLine',
-        uniforms: {
-          uHead: { value: 0 },
-          uAlpha: { value: 0 },
-          uColor: { value: new THREE.Color(C.ring) },
-        },
-        vertexShader: LINE_VERT,
-        fragmentShader: LINE_FRAG,
-        transparent: true,
-        depthWrite: false,
-        blending: THREE.AdditiveBlending,
-        fog: false,
-      });
-      materials.push(mat);
-      const m = new THREE.Mesh(lineGeo, mat);
-      m.name = 'smithHeartQuenchWakeLine';
+    this.coreMat = new THREE.ShaderMaterial({
+      name: 'smithHeartQuenchWakeCore',
+      uniforms: {
+        uTime,
+        uAlpha: { value: 0 },
+        uRise: { value: 0 },
+        uCore: { value: color(C.core) },
+        uHot: { value: color(C.hot) },
+      },
+      vertexShader: TUBE_VERT,
+      fragmentShader: CORE_FRAG,
+      transparent: true,
+      depthWrite: false,
+      side: THREE.DoubleSide,
+      // Premultiplied light added over the shell: the core burns, the shell
+      // keeps the dark edge round it.
+      blending: THREE.CustomBlending,
+      blendSrc: THREE.OneFactor,
+      blendDst: THREE.OneFactor,
+      fog: false,
+    });
+    this.footMat = new THREE.ShaderMaterial({
+      name: 'smithHeartQuenchWakeFoot',
+      uniforms: {
+        uTime,
+        uAlpha: { value: 0 },
+        uDeep: { value: color(C.deep) },
+        uCore: { value: color(C.core) },
+        uHot: { value: color(C.hot) },
+      },
+      vertexShader: FOOT_VERT,
+      fragmentShader: FOOT_FRAG,
+      transparent: true,
+      depthWrite: false,
+      polygonOffset: true,
+      polygonOffsetFactor: -2,
+      polygonOffsetUnits: -2,
+      fog: false,
+    });
+    materials.push(this.shellMat, this.coreMat, this.footMat);
+    const mk = (geo: THREE.BufferGeometry, mat: THREE.ShaderMaterial, name: string) => {
+      const m = new THREE.Mesh(geo, mat);
+      m.name = name;
       m.frustumCulled = false;
       m.visible = false;
-      m.renderOrder = floorVfxRenderOrder('encounter', 5);
       parent.add(m);
-      this.lines.push(m);
-      this.lineMats.push(mat);
-    }
+      return m;
+    };
+    this.foot = mk(footGeo, this.footMat, 'smithHeartQuenchWakeFoot');
+    this.foot.renderOrder = floorVfxRenderOrder('encounter', 5);
+    this.foot.scale.setScalar(COL.footR);
+    this.shell = mk(shellGeo, this.shellMat, 'smithHeartQuenchWakeShell');
+    this.core = mk(coreGeo, this.coreMat, 'smithHeartQuenchWakeCore');
+    // The core after the shell (its light over the dark edge).
+    this.core.renderOrder = 1;
   }
 
   /** The column at (x, y, z), `amount` 0..1 (it climbs and brightens with it). */
   setColumn(x: number, y: number, z: number, amount: number): void {
-    if (amount <= 0.01) {
-      this.column.visible = false;
+    const look = quenchWakeColumnLook(amount, this.uTime.value, _look);
+    if (look.shell <= 0) {
+      this.hide();
       return;
     }
-    this.column.visible = true;
-    this.column.position.set(x, y, z);
-    this.columnMat.uniforms.uAlpha.value = 0.5 + 0.5 * amount;
-    this.columnMat.uniforms.uRise.value = 0.15 + 1.0 * amount;
-  }
-
-  /** Line `i` from (x0, z0) to (x1, z1) at height y, its head `head` of the
-   *  way (0..1), `alpha` its brightness (0 hides it). */
-  setLine(
-    i: number,
-    x0: number,
-    z0: number,
-    x1: number,
-    z1: number,
-    y: number,
-    head: number,
-    alpha: number,
-  ): void {
-    const m = this.lines[i];
-    if (!m) return;
-    if (alpha <= 0.01) {
-      m.visible = false;
-      return;
-    }
-    const len = Math.hypot(x1 - x0, z1 - z0);
-    m.visible = true;
-    m.position.set(x0, y + 0.1, z0);
-    m.rotation.set(0, -Math.atan2(z1 - z0, x1 - x0), 0);
-    m.scale.set(len, 1, 1.4);
-    const u = this.lineMats[i].uniforms;
-    u.uHead.value = head;
-    u.uAlpha.value = alpha;
+    this.shell.visible = true;
+    this.core.visible = true;
+    this.foot.visible = true;
+    this.shell.position.set(x, y, z);
+    this.core.position.set(x, y, z);
+    this.foot.position.set(x, y + 0.12, z);
+    this.shellMat.uniforms.uAlpha.value = look.shell;
+    this.shellMat.uniforms.uRise.value = look.rise;
+    this.coreMat.uniforms.uAlpha.value = look.core;
+    this.coreMat.uniforms.uRise.value = look.rise;
+    this.footMat.uniforms.uAlpha.value = look.foot;
   }
 
   hide(): void {
-    this.column.visible = false;
-    for (const m of this.lines) m.visible = false;
+    this.shell.visible = false;
+    this.core.visible = false;
+    this.foot.visible = false;
   }
 }

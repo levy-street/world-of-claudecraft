@@ -44,6 +44,7 @@ import { EngineParticles } from '../trash_engine_fx/engine_particles';
 import { ARC_CLEAVE_ABILITY, fxHash } from './hammer_fx_core';
 import { QUENCH_TELEGRAPH_GLOW_STEP } from './painted_telegraph_core';
 import { QuenchTelegraphs } from './painted_telegraphs';
+import { QUENCH_BREATH_COLORS } from './quench_breath_core';
 import {
   BREATH_FROST_SECONDS,
   BREATH_SWEEP_SECONDS,
@@ -64,6 +65,7 @@ import {
   strikeRise,
   strikeSpikes,
 } from './quench_fx_core';
+import { quenchSpikeGeometry } from './quench_spike_geometry';
 
 const SCAN_SEC = 0.1;
 const C = QUENCH_FX_COLORS;
@@ -156,26 +158,6 @@ void main() {
 function fanGeometry(): THREE.BufferGeometry {
   const g = new THREE.CircleGeometry(1, 48, 0, Math.PI * 2);
   g.rotateX(-Math.PI / 2);
-  return g;
-}
-
-/** A spike of ice: a six-sided blade tapering to its tip, deep at the root
- *  and pale at the tip (the kit's ice material reads the vertex colour). */
-function spikeGeometry(): THREE.BufferGeometry {
-  const g = new THREE.ConeGeometry(0.32, 1, 6, 2).translate(0, 0.5, 0);
-  const pos = g.attributes.position;
-  const col = new Float32Array(pos.count * 3);
-  const deep = new THREE.Color().setRGB(...C.iceDeep);
-  const pale = new THREE.Color().setRGB(...C.ice);
-  const c = new THREE.Color();
-  for (let i = 0; i < pos.count; i++) {
-    // Flatten it to a blade a little, so it reads as a shard, not a cone.
-    pos.setZ(i, pos.getZ(i) * 0.55);
-    c.copy(deep).lerp(pale, Math.min(1, pos.getY(i) * 1.2));
-    col.set([c.r, c.g, c.b], i * 3);
-  }
-  g.setAttribute('color', new THREE.BufferAttribute(col, 3));
-  g.computeVertexNormals();
   return g;
 }
 
@@ -335,7 +317,7 @@ export class QuenchFx {
       });
     }
     // The spikes of ice (the guardian's strikes and breath).
-    const spike = spikeGeometry();
+    const spike = quenchSpikeGeometry();
     this.geometries.push(spike);
     const iceMat = heartKitSlotMaterial('ice');
     for (let i = 0; i < QUENCH_FX_POOLS.spikes + QUENCH_FX_POOLS.breaths; i++) {
@@ -544,21 +526,25 @@ export class QuenchFx {
     const half = (arcDeg * Math.PI) / 360;
     // The frost: the whole cone frosted, staying a while.
     this.layFrost(x, z, yaw, 'breath', 1, BREATH_FROST_SECONDS);
-    // The freezing gust: mist billowing out along the cone.
+    // The freezing gust: mist billowing out along the cone, born clear of
+    // the guardian's body (her face and heart stay seen through the blast)
+    // in the breath's ice blue, compensated for the Quench grade
+    // (quench_breath_core.ts: the round-1 white read cream on screen).
     const n = Math.round(30 * this.density * (this.reducedMotion() ? 0.5 : 1));
     for (let i = 0; i < n; i++) {
       const a = yaw + (this.rand() * 2 - 1) * half * 0.9;
+      const out = 5.5 + this.rand() * 2;
       this.particles.puff(
-        x + Math.sin(a) * 2.5,
-        y + 1.6 + this.rand() * 2,
-        z + Math.cos(a) * 2.5,
+        x + Math.sin(a) * out,
+        y + 1 + this.rand() * 1.6,
+        z + Math.cos(a) * out,
         1,
         {
           speed: (R / BREATH_SWEEP_SECONDS) * (0.55 + this.rand() * 0.5),
           life: 1.2,
           size: [1.6, 5.5],
-          color: C.mist,
-          alpha: 0.5,
+          color: QUENCH_BREATH_COLORS.mist,
+          alpha: 0.36,
           dir: [Math.sin(a), -0.05, Math.cos(a)],
           spread: 0.08,
           drag: 1.4,

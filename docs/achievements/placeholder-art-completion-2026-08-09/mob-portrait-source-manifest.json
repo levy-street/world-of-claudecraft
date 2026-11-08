@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "c8b28df55bee65a6a82c03517736f619266dbbb088d5fc3625289e538a7d09e9",
+  "rendererFingerprint": "5cf2b27ba8755b74d026f15900bb5e366b2d8805152a4ed6e3ad71198c5dfc1e",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 6951324,
-      "sha256": "1134cc273ae31db88a3bc307ed5b9473aeef4020b07ad1c91f86026b02ac9e8f",
+      "bytes": 6951468,
+      "sha256": "35370e7dda1e34f4523cf59c60672862b60495fe99c21e083b1adb5a46394f6d",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -5789,8 +5789,8 @@
         "model": {
           "url": "models/creatures/smith_heart_quench_guardian.glb",
           "path": "public/models/creatures/smith_heart_quench_guardian.glb",
-          "bytes": 1316400,
-          "sha256": "a277bbab514afc83c1bfd1551710c2149d860d62e391b7d5f6e1771e62351c2e"
+          "bytes": 1377304,
+          "sha256": "af64cabc01b4ab9f4b4176a47bcc92b38f4700ef8d6753093ccf228c4a766c51"
         },
         "idle": "Idle",
         "height": 3.6,
@@ -5807,11 +5807,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "08cd461503cbfdaf0d4109d2c99133bdd96a6a85d2defa516c811bc483500ab1",
+      "sourceFingerprint": "30e16e9c4c6672ed38ec75a96d58641615bc70fee0955a7136788524718236fd",
       "output": {
         "path": "public/ui/mobs/heart_quench_guardian.webp",
-        "bytes": 3206,
-        "sha256": "1d96ae87fb31e7de6e8334b3c1f71a2142f98ec625c58f062b1c488ca48477dd"
+        "bytes": 3184,
+        "sha256": "6e079e21dca25a1050cdc9562b1d7a2c58c39316f70588aa471483ebe7e94dc9"
       }
     },
     {

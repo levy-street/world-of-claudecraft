@@ -44,6 +44,7 @@ export const QUENCH_BODY_CLIPS = [
   'Attack',
   'Attack2',
   'Strike',
+  'StrikeWind',
   'Breath',
   'Wake',
   'WakeHold',
@@ -71,8 +72,13 @@ export const QUENCH_BODY_CLIP = {
   /** A swing's fist meets the tank (Attack: the right backhand; Attack2: the
    *  left hook). */
   attack: 16 / 30,
-  /** Tempering Strike: both fists hammered down on the ice (Strike). */
+  /** Tempering Strike: both fists hammered down on the ice (Strike, the
+   *  fallback when no wind-up was seen). */
   strike: 12 / 30,
+  /** Tempering Strike read before it lands (StrikeWind, round 2): both fists
+   *  raised over her head as the cold gathers on her bracers, held, then
+   *  hammered down a second in, on the cleaving swing. */
+  strikeWind: 30 / 30,
   /** Quenching Breath: reared back through the bar, the cold thrown out of
    *  her mouth on the bar's end (Breath; its exhale plays out after it). */
   breath: 75 / 30,
@@ -95,6 +101,9 @@ export const QUENCH_BODY_GESTURES = {
   slash: 'smith_heart_quench_body_slash',
   /** Her eyes, crown and heart flare (the breath loosed, the blades thrown). */
   flare: 'smith_heart_quench_body_flare',
+  /** Tempering Strike's wind-up: fists over her head, then the slam
+   *  (StrikeWind), on the fight's wind-up cue a second before the cleave. */
+  strikeWind: 'smith_heart_quench_body_strike_wind',
 } as const;
 
 /** The bars that play a clip timed onto the bar's end, and the beat that lands
@@ -215,7 +224,15 @@ export const QUENCH_HAIR_TIPS: readonly QuenchSocketId[] = ['tipL', 'tipR', 'tip
 
 // ---- what she is doing ---------------------------------------------------------------------
 
-export type QuenchBodyAction = 'idle' | 'strike' | 'breath' | 'exhale' | 'wake' | 'thrown' | 'hunt';
+export type QuenchBodyAction =
+  | 'idle'
+  | 'windup'
+  | 'strike'
+  | 'breath'
+  | 'exhale'
+  | 'wake'
+  | 'thrown'
+  | 'hunt';
 
 /** The fight's state as the body reads it (mirrored entity state, plus the
  *  painter's own clocks of the cues it saw). */
@@ -226,6 +243,9 @@ export interface QuenchBodyInput {
   sinceBreath: number;
   /** Seconds since Tempering Strike's cue, Infinity: never. */
   sinceStrike: number;
+  /** Seconds since Tempering Strike's wind-up cue (absent or Infinity:
+   *  never). */
+  sinceWind?: number;
   /** Seconds since the blades were thrown awake (the wake bar's end). */
   sinceWake: number;
 }
@@ -239,6 +259,8 @@ export interface QuenchBodyActionState {
 export const QUENCH_EXHALE_SECONDS = 1.1;
 export const QUENCH_THROWN_SECONDS = 1.4;
 export const QUENCH_STRIKE_SECONDS = 1.0;
+/** Seconds the wind-up reads for: its fists reach the ice at its end. */
+export const QUENCH_WIND_SECONDS = QUENCH_BODY_CLIP.strikeWind;
 
 const clamp01 = (t: number) => Math.max(0, Math.min(1, t));
 const ease = (t: number) => {
@@ -267,6 +289,9 @@ export function quenchBodyAction(
   } else if (input.sinceBreath < QUENCH_EXHALE_SECONDS) {
     out.action = 'exhale';
     out.k = input.sinceBreath / QUENCH_EXHALE_SECONDS;
+  } else if ((input.sinceWind ?? Number.POSITIVE_INFINITY) < QUENCH_WIND_SECONDS) {
+    out.action = 'windup';
+    out.k = (input.sinceWind ?? 0) / QUENCH_WIND_SECONDS;
   } else if (input.sinceStrike < QUENCH_STRIKE_SECONDS) {
     out.action = 'strike';
     out.k = input.sinceStrike / QUENCH_STRIKE_SECONDS;
@@ -328,6 +353,14 @@ export function quenchGlowLook(
     case 'exhale':
       out.heart = 2.6 - 1.6 * p;
       out.eyes = 1.6 - 0.7 * p;
+      out.plume = 0;
+      break;
+    case 'windup':
+      // Fists over her head: the cold gathers on her bracers, blazing to the
+      // slam; her heart and eyes harden with it.
+      out.bracers = 0.8 + 2.2 * p * p;
+      out.heart = out.heart + 0.6 * p;
+      out.eyes = 1 + 0.7 * p;
       out.plume = 0;
       break;
     case 'strike':
@@ -429,23 +462,7 @@ export function quenchRimeLook(
   return out;
 }
 
-// ---- the Blades Wake: the column and the lines to the blades ---------------------------------
-
-/** The wake's throw `age` seconds after her arms come down: how far along
- *  (0..1) the bright line racing to each blade is, its brightness, and the
- *  frost wave's reach (share of the way to the blades). */
-export function quenchWakeLineLook(age: number): { head: number; alpha: number; wave: number } {
-  const run = 0.55;
-  const head = clamp01(age / run);
-  return {
-    head: 1 - (1 - head) ** 2,
-    alpha: age < 0 ? 0 : clamp01(1 - (age - run) / 0.9),
-    wave: clamp01(age / 1.1),
-  };
-}
-
-/** Seconds the throw's lines and wave read for. */
-export const QUENCH_WAKE_LINE_SECONDS = 1.5;
+// ---- the Blades Wake (its column and its throw: quench_wake_core.ts) ------------------------
 
 /** Are the blades awake (the marker on the guardian)? */
 export function bladesAwakeOn(auras: readonly { id: string }[]): boolean {
@@ -475,7 +492,8 @@ export function quenchBodyHash(a: number, b: number): number {
 export const QUENCH_BODY_COLORS = {
   heart: 0xd8f6ff,
   heartHalo: 0x6fd2ff,
-  eye: 0xbff2ff,
+  /** A clean cyan (round 2: her eyes read cyan at gameplay distance). */
+  eye: 0x86f2ff,
   crown: 0x9fe6ff,
   bracer: 0x7fdcff,
   flash: 0xcdeeff,

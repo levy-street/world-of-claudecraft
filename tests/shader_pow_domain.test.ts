@@ -327,6 +327,7 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   'src/render/smith_heart_fx/quench_fight_fx.ts': 2,
   'src/render/smith_heart_fx/quench_frost_fx.ts': 1,
   'src/render/smith_heart_fx/quench_telegraph_glsl.ts': 1,
+  'src/render/smith_heart_fx/quench_wake_throw.ts': 1,
 };
 
 // Generated locale bundles are megabytes of prose with no shader in them; a
