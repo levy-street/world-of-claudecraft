@@ -658,8 +658,9 @@ Steps 7 and 8 (approved 2026-11-06) added Rewards as a plain rail button under t
 (13 visible): one hub for what a player can claim, Vault (the weekly rewards sheet, which the
 Bank and the Dungeon Finder each painted before), Weekly Quest (the emissary's offers, read-only
 away from the emissary because the sim takes the pick only there) and World Quests (the day's
-board, moved off the World Map rail). Its corner pill counts ready Vault rolls, a finished
-weekly charge and completed world quests from the same reads the tabs paint. It has no default
+board, moved off the World Map rail). Its corner pill counts only claimable rewards, ready Vault
+rolls and a finished weekly charge, from the same reads the tabs paint (world quests pay on
+completion, so they add nothing). It has no default
 key (the `rewards` action is rebindable). The WOC Store keeps the chest beacon as its own
 window; its daily-spin fallback body is gone. The More tray gained a Rewards group before
 Store.

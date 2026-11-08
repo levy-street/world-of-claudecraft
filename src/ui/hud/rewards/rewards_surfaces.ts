@@ -18,7 +18,7 @@ import {
   rewardsClaimCounts,
 } from './rewards_view';
 import { WeeklyVaultWindow } from './weekly_vault_window';
-import { WorldQuestsWindow, worldQuestBoardView } from './world_quests_window';
+import { WorldQuestsWindow } from './world_quests_window';
 
 export interface RewardsSurfaceHost {
   world(): IWorld;
@@ -97,7 +97,6 @@ export function createRewardsSurfaces(host: RewardsSurfaceHost): RewardsSurfaces
     return rewardsClaimCounts({
       vaultReadyWeeks: world.weeklyRewardInfo?.readyWeeks,
       weeklyQuest: world.weeklyQuest,
-      worldQuestsCompleted: worldQuestBoardView(world, null).completed,
     });
   };
   let counts: RewardsClaimCounts | null = null;

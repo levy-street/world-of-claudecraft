@@ -30,23 +30,20 @@ describe('Rewards hub spec (menu consolidation step 7)', () => {
 });
 
 describe('rewardsClaimCounts: the rail pill', () => {
-  it('sums the three claimable sources and reports each one', () => {
-    expect(
-      rewardsClaimCounts({
-        vaultReadyWeeks: 2,
-        weeklyQuest: weekly('completed'),
-        worldQuestsCompleted: 1,
-      }),
-    ).toEqual({ vault: 2, weekly: 1, worldQuests: 1, total: 4 });
+  it('sums the two claimable sources and reports each one', () => {
+    expect(rewardsClaimCounts({ vaultReadyWeeks: 2, weeklyQuest: weekly('completed') })).toEqual({
+      vault: 2,
+      weekly: 1,
+      total: 3,
+    });
   });
 
   it('counts each arm on its own (per-dimension negatives)', () => {
-    const none = { vaultReadyWeeks: 0, weeklyQuest: null, worldQuestsCompleted: 0 };
+    const none = { vaultReadyWeeks: 0, weeklyQuest: null };
     expect(rewardsClaimCounts(none).total).toBe(0);
     expect(rewardsClaimCounts({ ...none, vaultReadyWeeks: 3 })).toMatchObject({
       vault: 3,
       weekly: 0,
-      worldQuests: 0,
       total: 3,
     });
     expect(rewardsClaimCounts({ ...none, weeklyQuest: weekly('completed') })).toMatchObject({
@@ -54,28 +51,18 @@ describe('rewardsClaimCounts: the rail pill', () => {
       weekly: 1,
       total: 1,
     });
-    expect(rewardsClaimCounts({ ...none, worldQuestsCompleted: 2 })).toMatchObject({
-      worldQuests: 2,
-      total: 2,
-    });
   });
 
   it('reads a missing, negative or fractional count as whole and non-negative', () => {
-    expect(
-      rewardsClaimCounts({ vaultReadyWeeks: null, weeklyQuest: null, worldQuestsCompleted: -2 })
-        .total,
-    ).toBe(0);
+    expect(rewardsClaimCounts({ vaultReadyWeeks: null, weeklyQuest: null }).total).toBe(0);
+    expect(rewardsClaimCounts({ vaultReadyWeeks: -2, weeklyQuest: null }).total).toBe(0);
     expect(
       rewardsClaimCounts({
-        vaultReadyWeeks: undefined,
+        vaultReadyWeeks: Number.NaN,
         weeklyQuest: null,
-        worldQuestsCompleted: Number.NaN,
       }).total,
     ).toBe(0);
-    expect(
-      rewardsClaimCounts({ vaultReadyWeeks: 2.7, weeklyQuest: null, worldQuestsCompleted: 0 })
-        .vault,
-    ).toBe(2);
+    expect(rewardsClaimCounts({ vaultReadyWeeks: 2.7, weeklyQuest: null }).vault).toBe(2);
   });
 });
 

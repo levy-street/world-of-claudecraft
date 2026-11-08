@@ -31,14 +31,14 @@ export const REWARDS: WindowHubSpec<RewardsTab> = {
   focusPrefix: 'rewardsHub',
 };
 
-/** What each tab has waiting, and the pill's total. */
+/** What each tab has waiting to CLAIM, and the pill's total. World Quests has no
+ *  arm: a world quest pays its reward the moment it completes (into the bags, or
+ *  by mail when they are full), so there is never anything left to claim there. */
 export interface RewardsClaimCounts {
   /** Weekly Vault batches ready to open (`weeklyRewardInfo.readyWeeks`). */
   readonly vault: number;
   /** 1 while the week's charge is finished and its commendation unclaimed. */
   readonly weekly: number;
-  /** Today's board quests finished (the World Quests tab's own count). */
-  readonly worldQuests: number;
   readonly total: number;
 }
 
@@ -46,8 +46,6 @@ export interface RewardsClaimInput {
   /** `IWorld.weeklyRewardInfo?.readyWeeks`; null when the read is absent. */
   readonly vaultReadyWeeks: number | null | undefined;
   readonly weeklyQuest: WeeklyQuestProgress | null;
-  /** The World Quests tab's completed count (`buildWorldQuestRailView().completed`). */
-  readonly worldQuestsCompleted: number;
 }
 
 const whole = (value: number | null | undefined): number =>
@@ -62,8 +60,7 @@ export function weeklyQuestClaimable(progress: WeeklyQuestProgress | null): bool
 export function rewardsClaimCounts(input: RewardsClaimInput): RewardsClaimCounts {
   const vault = whole(input.vaultReadyWeeks);
   const weekly = weeklyQuestClaimable(input.weeklyQuest) ? 1 : 0;
-  const worldQuests = whole(input.worldQuestsCompleted);
-  return { vault, weekly, worldQuests, total: vault + weekly + worldQuests };
+  return { vault, weekly, total: vault + weekly };
 }
 
 export interface RewardsMapPoint {

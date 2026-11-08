@@ -164,14 +164,15 @@ describe('Rewards hub composition', () => {
 
   it('counts the pill from the same reads the tabs paint, as of the last recount', () => {
     const { world, surfaces } = hubRig();
-    expect(surfaces.claimCounts()).toEqual({ vault: 0, weekly: 0, worldQuests: 1, total: 1 });
+    // The rig's board has a completed world quest: already paid, so not counted.
+    expect(surfaces.claimCounts()).toEqual({ vault: 0, weekly: 0, total: 0 });
     world.weeklyRewardInfo = { readyWeeks: 2 };
     world.weeklyQuest = { state: 'completed' };
     // Cached until the slow band recounts, so the medium-band rail paint never
     // walks the board.
-    expect(surfaces.claimCounts().total).toBe(1);
+    expect(surfaces.claimCounts().total).toBe(0);
     surfaces.recount();
-    expect(surfaces.claimCounts()).toEqual({ vault: 2, weekly: 1, worldQuests: 1, total: 4 });
+    expect(surfaces.claimCounts()).toEqual({ vault: 2, weekly: 1, total: 3 });
   });
 });
 

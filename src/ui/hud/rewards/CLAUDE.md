@@ -15,11 +15,11 @@ the `src/ui/hud/hub/` sense: three member windows, one shown at a time.
 | World Quests | `world_quests_window.ts` (`#world-quests-window`) over the board's own view and markup in `src/ui/hud/map/` | a section of the World Map rail |
 
 ## Load-bearing rules
-- **The pill and the tabs read the same inputs through the same functions.**
-  `rewardsClaimCounts` (`rewards_view.ts`) takes the Vault's `readyWeeks`, the
+- **The pill counts only what is waiting to be claimed, from the tabs' own reads.**
+  `rewardsClaimCounts` (`rewards_view.ts`) takes the Vault's `readyWeeks` and the
   weekly charge's finished-and-unclaimed rule (the commendation strip's own
-  rule) and the World Quests tab's `completed` count from
-  `worldQuestBoardView`. Never count from a second source.
+  rule). World Quests adds nothing: a world quest pays on completion, so a
+  finished one has nothing left to claim. Never count from a second source.
 - **The pick stays where the sim gates it.** `chooseWeeklyQuest` needs the
   emissary in talk range, so only the emissary's talk event opens the Weekly
   Quest member with live Choose buttons (`open(true)`); any hub open paints the
