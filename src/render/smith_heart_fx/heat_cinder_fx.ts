@@ -121,13 +121,13 @@ void main() {
   float facing = clamp(dot(normalize(vN), v), 0.0, 1.0);
   vec2 p = vec2(atan(vL.z, vL.x) * 2.2 + uSeed, vL.y * 2.2);
   float lvl = lavaLevel(p * 2.0, vec2(0.0, -2.2), uTime, 1.2);
-  float m = mix(lvl, 1.0, pow(facing, 3.0) * 0.6);
+  float m = mix(lvl, 1.0, pow(max(facing, 0.0), 3.0) * 0.6);
   // The crust: plates spread over it as it cools hard.
   float plate = smoothstep(0.08, 0.2, cellEdge(p * 1.6));
   m = mix(m, m * 0.18, plate * uCrust);
   vec3 col = molten(clamp(m, 0.0, 1.0));
   // A bright limb of fire round its silhouette.
-  col += vec3(1.0, 0.75, 0.35) * pow(1.0 - facing, 2.0) * (1.0 - 0.7 * uCrust) * 1.4;
+  col += vec3(1.0, 0.75, 0.35) * pow(max(1.0 - facing, 0.0), 2.0) * (1.0 - 0.7 * uCrust) * 1.4;
   gl_FragColor = vec4(col, 1.0);
   #include <colorspace_fragment>
 }

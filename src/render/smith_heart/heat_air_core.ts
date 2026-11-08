@@ -25,6 +25,19 @@ import { lipChains } from './lip_walls_core';
  *  fissure toward the Ring (x z, yards a second). */
 export const HEAT_EMBERS = { rise: 1.7, drift: [0.45, 0.06] as const } as const;
 
+/** The Hearth's own fire in the air (its great flames, embers and halos),
+ *  on the Guardian of the Heat's palette (Jose's review of 2026-11-06): deep
+ *  red at the frayed edges, orange through the body, yellow only at the
+ *  core. Its own material's uniforms: the Quench room's fire bowls share the
+ *  shader, never these colours. */
+export const HEARTH_FIRE_COLORS = {
+  hot: 0xffc860,
+  warm: 0xff6a1c,
+  deep: 0x8a1c06,
+  ember: 0xff8a30,
+  halo: 0xc85a1c,
+} as const;
+
 /** A box of air the embers fill. */
 export interface EmberVolume {
   x: number;

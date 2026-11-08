@@ -5,6 +5,7 @@
 // fight's objects (quench_ids.ts says which).
 
 import type { QuenchDifficulty } from './quench_ids';
+import type { SlainWatch } from './voice_slain';
 
 /** A bar the guardian runs for the fight. */
 export interface QuenchBar {
@@ -103,6 +104,8 @@ export interface QuenchFlurry {
 export interface QuenchFightState {
   kind: 'quench';
   difficulty: QuenchDifficulty;
+  /** The boss's pool before its tier's (tier_health.ts), given back at a reset. */
+  basePool?: number;
   /** The guardian has fallen and the end was resolved. */
   finished: boolean;
   /** Seconds since the pull. */
@@ -136,4 +139,7 @@ export interface QuenchFightState {
   casts: number;
   /** Lines said this pull: `<moment>` to the fight clock. */
   said: Record<string, number>;
+  /** The players seen dead this pull and the pull's deaths (the kill lines'
+   *  watch, voice_slain.ts). */
+  slain: SlainWatch;
 }

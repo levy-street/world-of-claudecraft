@@ -29,6 +29,11 @@
 
 /** The guardian (template id, frozen: its death lights the Breath vein). */
 export const BREATH_GUARDIAN = 'heart_breath_guardian';
+/** Its body's radius (yards; the template's bodyRadius): the column of wind
+ *  its chest, waist and tail plates float in, about eighteen yards tall since
+ *  its own model (render/smith_heart_fx/breath_body_core.ts). Melee strikes it
+ *  from this far out plus a melee reach, and its own swing settles there. */
+export const BREATH_BODY_RADIUS = 3.5;
 /** Captain Thessaly at the head of the Cornice climb (an NPC def with no
  *  quests: the Highwatch captain's name, look and voice). */
 export const BREATH_THESSALY_NPC = 'heart_captain_thessaly';
@@ -223,6 +228,9 @@ export interface BreathDifficultyRules {
   gustThrow: number;
   /** Every mechanic's damage, on top of the claim's own multiplier. */
   damageMult: number;
+  /** The boss's health pool against the template's, set at the pull
+   *  (tier_health.ts). */
+  healthMult: number;
   /** An anchor that ran out leaves its player spent (no circle for a while). */
   calmSpent: boolean;
   /** Loose gales wander the Cornice after each indrawn breath. */
@@ -251,6 +259,7 @@ export const BREATH_DIFFICULTY: Readonly<Record<BreathDifficulty, BreathDifficul
     windSpeed: 3.2,
     gustThrow: 26,
     damageMult: 1,
+    healthMult: 1,
     calmSpent: false,
     looseGales: false,
     stormGusts: false,
@@ -266,6 +275,7 @@ export const BREATH_DIFFICULTY: Readonly<Record<BreathDifficulty, BreathDifficul
     windSpeed: 4.4,
     gustThrow: 30,
     damageMult: 1.25,
+    healthMult: 1.65,
     calmSpent: true,
     looseGales: true,
     stormGusts: true,
@@ -283,6 +293,7 @@ export const BREATH_DIFFICULTY: Readonly<Record<BreathDifficulty, BreathDifficul
     windSpeed: 4.4,
     gustThrow: 30,
     damageMult: 1.25,
+    healthMult: 1.65,
     calmSpent: true,
     looseGales: true,
     stormGusts: true,
@@ -454,8 +465,11 @@ export const BREATH_TUNING = {
    *  portal (the Cornice is too small; tests/smith_heart_breath_heart.test.ts
    *  pins the walk's length). A quarter makes a badly placed portal the burst
    *  the design asks for. */
-  // The open rim (2026-11-03) brought every lip nearer: a fifth now.
-  heartWalkMult: 0.2,
+  // The open rim (2026-11-03) brought every lip nearer: a fifth. At a fifth a
+  // ball dropped at heartFar crawled to a lip in 11 s of its 20 s fuse (phase
+  // 2's second ball above all: the storm has no tailwind), so no portal was
+  // needed (2026-11-04); a tenth makes the nearest drop a whole fuse's crawl.
+  heartWalkMult: 0.1,
   /** How near a ball a player takes it up, and a portal's mouth (yards). */
   heartPickR: 2.5,
   heartPortalR: 2.5,

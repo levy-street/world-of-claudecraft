@@ -228,6 +228,26 @@ export function throwOffset(
   return true;
 }
 
+/** The thrown ball's look in flight (the weak-spots pass's second round: a small pale
+ *  additive orb shrinking to nothing was lost against the Cornice's pale sky). It flies
+ *  as the ball the raid just carried (the Storm Orb's shell, its core and its knot of
+ *  wind), held large, ringed by a dark storm halo that cuts it out of a pale sky, and
+ *  trailing a wake of teal ghosts along its own arc. `scale` is the ball's radius at
+ *  `t` seconds; the halo is `halo` times it. */
+export const FLIGHT_LOOK = { start: 1.55, end: 1.05, halo: 1.45, spin: 9 } as const;
+export function flightScale(t: number): number {
+  const k = Math.max(0, Math.min(1, t / THROW_ARC.seconds));
+  return FLIGHT_LOOK.start + (FLIGHT_LOOK.end - FLIGHT_LOOK.start) * k;
+}
+
+/** The wake: `ghosts` copies of the ball strung back along its arc, each `step`
+ *  seconds behind the last, smaller and fainter the further back. */
+export const FLIGHT_TRAIL = { ghosts: 7, step: 0.06 } as const;
+export function flightGhost(i: number): { lag: number; scale: number; alpha: number } {
+  const k = (i + 1) / (FLIGHT_TRAIL.ghosts + 1);
+  return { lag: (i + 1) * FLIGHT_TRAIL.step, scale: 0.62 * (1 - 0.75 * k), alpha: 0.6 * (1 - k) };
+}
+
 /** The burst's timeline: the flash dying and the wall rushing out across the
  *  Cornice. Null once it has passed. */
 export const BURST_SECONDS = 1.6;

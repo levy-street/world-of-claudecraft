@@ -94,10 +94,10 @@ void main() {
 #if defined(FT_FROST)
   // Ice fractures: angular plates, and shards running in from the rim.
   float plates = 1.0 - smoothstep(0.0, 0.06, cellEdge(vP * uCells + vec2(3.1, 7.7)));
-  float shards = pow(ridge(vec2(ang * 7.0, radial * 2.2) + 1.7), 16.0) * smoothstep(0.15, 0.9, radial);
+  float shards = pow(max(ridge(vec2(ang * 7.0, radial * 2.2) + 1.7), 0.0), 16.0) * smoothstep(0.15, 0.9, radial);
   float lines = max(plates, shards * 0.9);
   // Rime feathers: dendrites growing in off the edge.
-  float feather = pow(ridge(vP * 2.6 + vec2(fbm(vP * 0.8) * 2.4, 0.0)), 7.0);
+  float feather = pow(max(ridge(vP * 2.6 + vec2(fbm(vP * 0.8) * 2.4, 0.0)), 0.0), 7.0);
   float rimeZone = 1.0 - smoothstep(0.0, 0.8 + 2.2 * uFill, edge);
   vec3 cDim = vec3(0.30, 0.46, 0.62);
   vec3 cLit = vec3(0.62, 0.86, 1.0);
@@ -108,8 +108,8 @@ void main() {
 #elif defined(FT_STORM)
   // Storm streaks riding round with the wind, forks crawling out.
   float t9 = floor(uTime * 11.0);
-  float forkA = pow(ridge(vec2(ang * 4.0 + hh2(vec2(t9, 1.3)) * 6.0, radial * 3.0)), 18.0);
-  float forkB = pow(ridge(vP * 0.9 + vec2(t9 * 0.37, 0.0)), 24.0);
+  float forkA = pow(max(ridge(vec2(ang * 4.0 + hh2(vec2(t9, 1.3)) * 6.0, radial * 3.0)), 0.0), 18.0);
+  float forkB = pow(max(ridge(vP * 0.9 + vec2(t9 * 0.37, 0.0)), 0.0), 24.0);
   float streak = smoothstep(0.55, 1.0, sin(ang * 22.0 + radial * 9.0 - uTime * 6.0)) * 0.6;
   float lines = max(forkA * smoothstep(0.1, 0.5, radial), forkB);
   float feather = streak;
@@ -124,7 +124,7 @@ void main() {
   // Granite fissures: big jagged plates splitting, gold in the splits.
   vec2 wp = vP * uCells + vec2(fbm(vP * 0.35) * 1.6, fbm(vP * 0.35 + 7.0) * 1.6);
   float lines = 1.0 - smoothstep(0.0, 0.085, cellEdge(wp + 5.3));
-  float feather = pow(ridge(vP * 1.7 + 3.0), 10.0);
+  float feather = pow(max(ridge(vP * 1.7 + 3.0), 0.0), 10.0);
   float rimeZone = 1.0;
   vec3 cDim = vec3(0.42, 0.3, 0.14);
   vec3 cLit = vec3(1.0, 0.76, 0.32);

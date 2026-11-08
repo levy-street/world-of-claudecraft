@@ -81,6 +81,8 @@ const INTERIOR_MOBS: Readonly<Record<string, Readonly<Record<string, MobTemplate
   gravewyrm_sanctum: GRAVEWYRM_SANCTUM_MOBS,
   drowned_temple: { ...TEMPLE_DUNGEON_MOBS, ...DROWNED_TEMPLE_MOBS },
   wildheart: WILDHEART_MOBS,
+  // The Smith's Heart raid: its own bodies (the final boss) load behind the
+  // raid's arrival cover, never in the iOS post-entry stream.
   smith_heart: SMITH_HEART_MOBS,
 };
 

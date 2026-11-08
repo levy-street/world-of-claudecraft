@@ -46,6 +46,7 @@
 // the renderer (terrain, light rivers, the seal, the portal) read this one
 // record.
 
+import { HEAT_WELL_R } from '../encounters/smith_heart/heat_ids';
 import type {
   AuthoredFieldDef,
   FieldPolySurface,
@@ -333,9 +334,11 @@ export const GIANT_ANVIL = { x: -236, z: 0, hw: 3.2, hd: 8.5, h: 9 } as const;
 /** The first wellspring (design doc 7.4): the pool of the first flame
  *  before the altar-stone, where the giant Guardian of the Heat stands sunk to
  *  its waist the whole fight (it never leaves it). `r` its burning lip
- *  (the guardian's body radius too: melee strikes it from the shore). Its
- *  back lip clears the altar-stone's east face. Instance-local. */
-export const HEARTH_WELL = { x: -224, z: 0, r: 8 } as const;
+ *  (HEAT_WELL_R: the guardian's body radius too, melee strikes it from the
+ *  shore). Its back lip clears the altar-stone's east face (pass 4 grew it
+ *  from 8 to 10.5 and moved its middle 4 yd east: its lip's basalt stumps
+ *  clear the stone). Instance-local. */
+export const HEARTH_WELL = { x: -220, z: 0, r: HEAT_WELL_R } as const;
 
 // ---- the Heart: the separate final room ---------------------------------------------
 
@@ -494,7 +497,7 @@ export const LIGHT_RIVERS: Readonly<Record<SmithHeartVein, readonly { x: number;
     { x: 9, z: 0 },
   ],
   heat: [
-    { x: -210, z: 0 },
+    { x: -206, z: 0 },
     { x: -174, z: 0 },
     { x: -104, z: 0 },
     { x: -78, z: 0 },

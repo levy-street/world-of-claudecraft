@@ -148,7 +148,10 @@ export function landSong(s: CouncilScope, singer: Entity): void {
 export function songKicked(s: CouncilScope, singer: Entity, castId: string): void {
   s.st.quiet = T.kickQuiet;
   // A kicked Wake simply raises nothing (no marks follow it).
-  if (castId === COUNCIL_CASTS.song) applyResonance(s, singer, T.songKickedMarks);
+  if (castId === COUNCIL_CASTS.song) {
+    applyResonance(s, singer, T.songKickedMarks);
+    councilSay(s, 'singer', 'hush');
+  }
 }
 
 /** One tick of every Resonance: each second it rings on every ally within

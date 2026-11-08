@@ -211,6 +211,9 @@ export type FinalDifficulty = 'normal' | 'heroic' | 'mythic';
 export interface FinalDifficultyRules {
   /** Every mechanic's damage, on top of the claim's own multiplier. */
   damageMult: number;
+  /** The boss's health pool against the template's, set at the pull
+   *  (tier_health.ts). */
+  healthMult: number;
   /** How a full Overload bar's burst reads on this tier (FINAL_OVERLOAD
    *  holds its numbers): survivable with healing, heavy, or lethal. */
   burstTier: 'survivable' | 'heavy' | 'lethal';
@@ -241,6 +244,7 @@ export interface FinalDifficultyRules {
 export const FINAL_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalDifficultyRules>> = {
   normal: {
     damageMult: 1,
+    healthMult: 1,
     burstTier: 'survivable',
     switchShock: false,
     embers: false,
@@ -255,7 +259,11 @@ export const FINAL_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalDifficultyR
     tremors: 3,
   },
   heroic: {
-    damageMult: 1.2,
+    // 1.2 until the Heroic pass of 2026-11-05: the bot raid in the previous
+    // tier's best came out of the 70 percent call too low to outlast the
+    // Overload pulses, Vein Shock and the Anvil on two healers.
+    damageMult: 1.1,
+    healthMult: 2.1,
     burstTier: 'heavy',
     switchShock: true,
     embers: true,
@@ -271,6 +279,7 @@ export const FINAL_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalDifficultyR
   },
   mythic: {
     damageMult: 1.3,
+    healthMult: 2.1,
     burstTier: 'lethal',
     switchShock: true,
     embers: true,
@@ -315,9 +324,13 @@ export const FINAL_OVERLOAD = {
   pulseEvery: 4,
   /** A pulse: this much at an empty bar, rising by `pulseRise` at a full one
    *  (harder each pulse while it fills). */
-  pulseMin: 60,
-  pulseMax: 70,
-  pulseRise: 300,
+  // 60 to 70 until the bot raid of 2026-11-04: even an empty bar's pulse on
+  // all ten was as much as two level-20 healers put out, before any kit.
+  pulseMin: 35,
+  pulseMax: 40,
+  // 300 until the bot raid of 2026-11-04: a bar two thirds full pulsed about
+  // 250 every 4 s on everyone, which wiped a raid that moved the boss on time.
+  pulseRise: 70,
   /** A bar this full (0 to 1) warns the raid once per fill. */
   warnAt: 0.85,
   /** The burst of a full bar, per difficulty (then it is empty again). */

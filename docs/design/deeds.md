@@ -238,6 +238,14 @@ completionist trap that drags veterans back through the tutorial. If the
 island ever gains real conquerable content (a rare, a delve), that content
 authors deeds like any other.
 
+One deferral, not an exemption: **the Smith's Heart** raid ships dev-gated
+(`SMITH_HEART_PLAYABLE = false` in `src/sim/content/smith_heart.ts`: no
+overworld door, no loot, hidden from the Guide), so no player can earn a
+deed there yet and authoring them now would break the no-unearnable-deeds
+rule. Its deeds (and its Reliquary pages, once it drops unique loot) land in
+the change that flips the flag; `tests/smith_heart_launch_guard.test.ts`
+reds if the flag flips without them.
+
 ## The account ledger (the Book is account-wide)
 
 The Book of Deeds is shared across every character on an account, and every

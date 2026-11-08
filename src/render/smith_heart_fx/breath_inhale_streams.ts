@@ -11,10 +11,12 @@
 import * as THREE from 'three';
 import { BREATH_CASTS } from '../../sim/encounters/smith_heart/breath_ids';
 import type { Entity } from '../../sim/types';
-import { fxAnchor } from '../attached_fx_anchor';
 import type { EngineParticles } from '../trash_engine_fx/engine_particles';
+import { breathSocketPoint } from './breath_body_sockets';
 import { ISLE_RGB } from './breath_isles_fx_core';
 import { ISLE_RIBBON_FRAG, ISLE_UV_VERT } from './breath_isles_glsl';
+
+const _maw = new THREE.Vector3();
 
 export interface InhaleHost {
   readonly root: THREE.Group;
@@ -91,15 +93,14 @@ export class BreathInhaleStreams {
     const on = this.strength > 0.02 && !!g;
     for (const m of this.meshes) m.visible = on;
     if (!on || !g) return;
-    this.mat.uniforms.uGlow.value = this.strength * 0.8;
+    this.mat.uniforms.uGlow.value = this.strength * 0.5;
     this.mat.uniforms.uFlow.value = 1.4 + 2.2 * fill;
     const t = this.h.uTime.value;
-    const a = fxAnchor(g);
-    const s = Math.max(1, g.scale ?? 1);
-    // The maw: before the body, at its chest.
-    const mx = a.x + Math.sin(g.facing) * 1.2 * s;
-    const mz = a.z + Math.cos(g.facing) * 1.2 * s;
-    const my = g.pos.y + 2.2 * s;
+    // The maw: the war-horn mouth of its mask (its model's socket).
+    const maw = breathSocketPoint(g, 'mouth', _maw);
+    const mx = maw.x;
+    const mz = maw.z;
+    const my = maw.y;
     for (let k = 0; k < STREAMS; k++) {
       const ang = (k / STREAMS) * Math.PI * 2 + Math.sin(t * 0.4 + k) * 0.12;
       const sx = mx + Math.sin(ang) * REACH;

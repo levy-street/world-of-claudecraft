@@ -1,44 +1,45 @@
-// The Guardian of the Breath's provisional body (plan: breath_body_core.ts),
-// hosted by ../rift_death_zone.ts beside the raid's other fx. The guardian is
-// a bodyless target (characters/manifest.ts smith_heart_breath_guardian): its
-// click capsule, nameplate and bars come from the ordinary entity view, and
-// this module draws the body over it, read from IWorld (its position, facing,
-// cast bar, swings, auras and death, and the wind object's phase and bearing),
-// so offline and online look the same:
-//  - the body: a living bellows of the Breath kit's storm granite and the
-//    Heart kit's rock and crystal, stitched by threads of the vein's teal
-//    light: a barrel chest between two bellows plates, a wind-horn mouth,
-//    fluted wind-blade wings, crystal spines, heavy arms ending in
-//    wind-carved claws, and below the waist a whirl of loose stones turning
-//    in its own wind;
-//  - the motion: its slow breath (the bellows swelling and falling in), a
-//    swipe at the tank on each melee hit; as a blow gathers it turns its
-//    mouth to the wind's bearing and draws breath, then exhales the whole
-//    blow through the horn (the bellows emptying, wind pouring off its
-//    lips); the indrawn breath swells it past full, head flung back, its
-//    heart blazing; the exhale's bar hunches it and throws it wide; a cast
-//    raises one arm to the storm and thrusts the other at its mark;
-//  - the storm breaking (its 4 s bar): it draws the wind in, freezes and
-//    trembles with light tearing through every seam, and tears open: every
-//    stone flies out into rings of shards turning round a core of living
-//    lightning (a storm figure, two lightning wings, a white crystal heart,
-//    arcs leaping from the core to the shards) for the rest of the fight;
-//  - the death: the threads (or the core) flare and go out, every piece
-//    falls and tumbles to the floor round where it stood.
+// The Guardian of the Breath's wind (plan: breath_body_core.ts), hosted by
+// ../rift_death_zone.ts beside the raid's other fx. The solid pieces are its
+// own rigged model (characters/smith_heart_boss_looks.ts): this module is the
+// half of the boss that is AIR, read from IWorld (the guardian's drawn
+// position, facing, cast bar, swings, auras, death and the fight's cues, the
+// wind object's phase) and from the sockets hung on the model's bones
+// (breath_body_sockets.ts), so offline and online look the same:
+//  - the stance: the calm wind or the storm, sent through the renderer's
+//    gesture seam (re-sent so a rebuilt view holds the right one), and the
+//    flare of its eyes, crystals and spiral at the big moments;
+//  - the living body: currents of pale air wound from piece to piece (the
+//    trunk down every tail plate into a curl over the floor, the arms through
+//    their empty shoulders and elbows, the shoulders, the neck and the head,
+//    two great wisps round it all), an inner glow, its eyes and the spiral in
+//    its chest alight, cloud wisps off the tail, mist and crystal dust, stones
+//    and crystal shards circling it;
+//  - every move: a claw swipe leaves a slash of wind and a gust where it
+//    lands; the Indrawn Breath draws the currents in tight and pours air into
+//    the mouth; the Summit Roar blasts a cone of wind out of it; the casts
+//    gather the storm in the raised hand and loose a bolt from the pointing
+//    one; the channels raise a vortex off both hands;
+//  - the storm breaking (its 4 s bar): the wind drawn in, frozen with crackling
+//    light, torn apart with a flash, a ring and a burst of lightning; through
+//    phase 2 the same currents are a dark storm cloud lit by lightning arcing
+//    piece to piece, a crackling heart in its chest;
+//  - the death: the wind thrown off in one last gust and gone, the glow out,
+//    the stones and shards dropping.
 // Presentation only: the fight's telegraphs are breath_fight_fx.ts's and
-// breath_fx.ts's, on every tier; the motes, sparks, dust and shakes here thin
-// on the low tier and under reduced motion; the body, its poses and its
-// storm form never do (which form it wears is actionable: phase 2).
+// breath_fx.ts's, on every tier. The low tier and reduced motion thin the
+// ribbons, the dust, the clouds, the orbiters and the shakes; nothing here is
+// a warning a player reacts to (which body it wears, calm or storm, is the
+// model's own clip set and stays on every tier).
 //
 // Rules (src/render/CLAUDE.md): every material is built in the constructor
-// under the root before its gated attach (the kits' pieces, which land
-// later, draw with the kits' own shared slot materials linked by their
-// program warmers, and this module's glows each have a hidden carrier); no
-// light; fixed pools; no per-frame allocation.
+// under the root before its gated attach (the ribbons, the cone and the
+// orbiters are their own carriers, hidden until drawn); no light; fixed
+// pools; no per-frame allocation.
 
 import * as THREE from 'three';
 import { resolveUiEffectsProfile } from '../../game/ui_effects_profile';
 import {
+  BREATH_CASTS,
   BREATH_CUES,
   BREATH_OBJECTS,
   type BreathWindPhase,
@@ -47,79 +48,152 @@ import {
 import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
 import { fxAnchor } from '../attached_fx_anchor';
-import { wrapAngle } from '../facing_smooth';
 import { attachSceneGroupGated } from '../gated_scene_attach';
 import { GFX } from '../gfx';
 import { getFlameTex } from '../ignivar_fire_vfx';
 import { setRenderCategory } from '../renderer_diagnostics';
-import {
-  ensureHeartKit,
-  heartKitLoaded,
-  heartKitMeshes,
-  heartKitProgramWarmers,
-  heartKitSlotMaterial,
-} from '../smith_heart/heart_kit';
-import { heartVeinGlowMaterial } from '../smith_heart/heart_room_kit';
 import { radialGlowTexture } from '../textures';
 import { EngineParticles } from '../trash_engine_fx/engine_particles';
 import {
+  arcPath,
+  BREAK_TEAR_AT,
+  BREATH_ARC_PAIRS,
+  BREATH_ARCS,
+  BREATH_BODY_CLIP,
   BREATH_BODY_COLORS,
-  BREATH_BODY_KITS,
-  BREATH_BODY_PIECES,
+  BREATH_BODY_GESTURES,
   BREATH_BODY_POOLS,
-  BREATH_EMBER_JOINTS,
-  BREATH_FALL,
+  BREATH_BURST,
+  BREATH_CURRENTS,
   BREATH_GUARDIAN,
-  BREATH_RIG_JOINTS,
-  BREATH_SLOTS,
-  BREATH_SWING_SECONDS,
-  BREATH_THREAD_PAIRS,
-  type BreathArmJoints,
-  type BreathBodyAction,
+  BREATH_PUFF_COUNT,
+  BREATH_PUFF_LOW_SIZE,
+  BREATH_RIBBON_COUNT,
+  BREATH_RIBBON_SEGMENTS,
+  BREATH_SOCKETS,
+  BREATH_SYNCED_CASTS,
+  BREATH_TAIL_CURL,
+  BREATH_YD_PER_UNIT,
   type BreathBodyActionState,
   type BreathBodyInput,
-  type BreathBodyLook,
-  type BreathBodyPiece,
-  breathArm,
+  type BreathCurrent,
+  type BreathSocketId,
   breathBodyAction,
   breathBodyHash,
-  breathBodyLook,
-  breathFacesWind,
-  breathFallProgress,
-  breathFallRest,
-  breathWristTarget,
-  STORM_CORE,
+  breathDeathLook,
+  breathPuffKept,
+  breathRibbonKept,
+  breathSocketIndex,
+  breathStanceGesture,
+  breathWindLook,
+  newWindLook,
+  profileAt,
+  ribbonFade,
+  splineAt,
   stormFormOn,
-  stormShardSlot,
-  stormTearProgress,
-  type V3,
-  whirlSlot,
 } from './breath_body_core';
+import { BreathBodyOrbit } from './breath_body_orbit';
+import {
+  breathBodySockets,
+  clearBreathBodySockets,
+  retryBreathBodySockets,
+} from './breath_body_sockets';
+import { BreathRibbonPool, boltUniforms, windUniforms } from './breath_wind_ribbons';
+import { BreathWindVolume } from './breath_wind_volume';
 import { inSmithHeartClaim } from './council_fx_core';
 
 const SCAN_SEC = 0.1;
-const ARC_POINTS = 9;
-/** The joints that lift with the head (the head, the mouth). */
-const HEAD_JOINTS = [3, 10] as const;
-/** A thread colour change smaller than this is not re-uploaded. */
-const THREAD_COLOR_EPS = 1 / 512;
+const C = BREATH_BODY_COLORS;
+const U = BREATH_YD_PER_UNIT;
+const SEG = BREATH_RIBBON_SEGMENTS;
+const S = (id: BreathSocketId) => breathSocketIndex(id);
+const S_MOUTH = S('mouth');
+const S_EYE_L = S('eyeL');
+const S_EYE_R = S('eyeR');
+const S_HEART = S('heart');
+const S_CORE = S('core');
+const S_HALO = S('halo');
+const S_CLAW_L = S('clawL');
+const S_CLAW_R = S('clawR');
+const S_HAND_L = S('handL');
+const S_HAND_R = S('handR');
+const S_TIP = S('tip');
+const TAIL = [S('waist'), S('tail1'), S('tail2'), S('tail3'), S('tip')] as const;
+const GLOW_AT = [S('core'), S('armL'), S('armR'), S('waist'), S('tail2'), S('neck')] as const;
+const CRYSTALS = [S('spikeL'), S('spikeR'), S('crown'), S_CLAW_L, S_CLAW_R, S_HALO] as const;
+/** Each current's path as socket indices (read once). */
+const PATHS = BREATH_CURRENTS.map((c) => c.path.map((id) => breathSocketIndex(id)));
+const MAX_PATH = Math.max(...BREATH_CURRENTS.map((c) => c.path.length)) + BREATH_TAIL_CURL.points;
+/** The claw trail's length (frames kept) for the swipe's slash. */
+const TRAIL = 9;
+const ARC_SEG = BREATH_ARCS.segments;
+/** The bars whose end looses a bolt from the pointing hand. */
+const BOLT_CASTS = new Set(
+  Object.keys(BREATH_SYNCED_CASTS).filter(
+    (c) => c !== BREATH_CASTS.inhale && c !== BREATH_CASTS.gust && c !== BREATH_CASTS.storm,
+  ),
+);
 
-const _m = new THREE.Matrix4();
-const _q = new THREE.Quaternion();
-const _q2 = new THREE.Quaternion();
-const _e = new THREE.Euler();
+// ---- the roar's blast: a cone of wind out of the war-horn mouth -----------------------------
+
+const CONE_VERT = /* glsl */ `
+varying vec2 vUv;
+varying float vFacing;
+void main() {
+  vUv = uv;
+  vec4 mv = modelViewMatrix * vec4(position, 1.0);
+  vec3 n = normalize(normalMatrix * normal);
+  vFacing = abs(dot(n, normalize(-mv.xyz)));
+  gl_Position = projectionMatrix * mv;
+}
+`;
+const CONE_FRAG = /* glsl */ `
+uniform float uTime;
+uniform float uAge;
+uniform float uAlpha;
+uniform vec3 uWind;
+uniform vec3 uEdge;
+varying vec2 vUv;
+varying float vFacing;
+float h21(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+float vnoise(vec2 p) {
+  vec2 i = floor(p), f = fract(p);
+  vec2 u = f * f * (3.0 - 2.0 * f);
+  return mix(mix(h21(i), h21(i + vec2(1.0, 0.0)), u.x),
+             mix(h21(i + vec2(0.0, 1.0)), h21(i + vec2(1.0, 1.0)), u.x), u.y);
+}
+void main() {
+  // vUv.y 1 at the mouth, 0 at the far rim; streaks racing outward.
+  float outward = 1.0 - vUv.y;
+  float n = vnoise(vec2(vUv.x * 22.0, outward * 3.0 - uTime * 7.0));
+  float n2 = vnoise(vec2(vUv.x * 9.0 + 3.0, outward * 1.6 - uTime * 4.0));
+  float streak = smoothstep(0.42, 0.9, n) * 0.8 + n2 * 0.35;
+  // The front of the blast rides out with its age; behind it the air thins.
+  float front = smoothstep(uAge - 0.25, uAge, outward) * (1.0 - smoothstep(uAge, uAge + 0.06, outward));
+  float body = (1.0 - smoothstep(0.0, uAge + 0.02, outward - 0.02)) * 0.55;
+  float a = uAlpha * (front * 0.9 + body * streak) * (0.35 + 0.65 * vFacing);
+  a *= smoothstep(0.0, 0.08, vUv.y);
+  vec3 col = mix(uWind, uEdge, clamp(front + streak * 0.5, 0.0, 1.0));
+  gl_FragColor = vec4(col, clamp(a, 0.0, 0.75));
+}
+`;
+
+// ---- scratch (no allocation a frame) -------------------------------------------------------
+
 const _a = new THREE.Vector3();
 const _b = new THREE.Vector3();
 const _c = new THREE.Vector3();
-const _s = new THREE.Vector3();
+const _n = new THREE.Vector3();
+const _bi = new THREE.Vector3();
+const _t = new THREE.Vector3();
+const _z = new THREE.Vector3(0, 0, 1);
 const _up = new THREE.Vector3(0, 1, 0);
-const _x = new THREE.Vector3(1, 0, 0);
-const _box = new THREE.Box3();
-const _size = new THREE.Vector3();
-const _centre = new THREE.Vector3();
-const _slot: V3 = { x: 0, y: 0, z: 0 };
-const _wrist: V3 = { x: 0, y: 0, z: 0 };
-const _arm: BreathArmJoints = { elbow: { x: 0, y: 0, z: 0 }, wrist: { x: 0, y: 0, z: 0 } };
+const _side = new THREE.Vector3(1, 0, 0);
+const _q = new THREE.Quaternion();
+const _sp = new Float32Array(6);
+const _pts = new Float32Array(MAX_PATH * 3);
+const _ring = new Float32Array((SEG + 1) * 3);
+const _arc = new Float32Array((ARC_SEG + 1) * 3);
 const _act: BreathBodyActionState = { action: 'idle', k: 0 };
 const _actIn: BreathBodyInput = {
   castId: null,
@@ -128,197 +202,174 @@ const _actIn: BreathBodyInput = {
   windFill: 0,
   stormForm: false,
 };
-const _fall = { k: 0, landed: false };
-const _look: BreathBodyLook = {
-  swell: 0,
-  lift: 0,
-  lean: 0,
-  spread: 0,
-  mouth: 0,
-  glow: 0,
-  jitter: 0,
-  tear: 0,
+const _look = newWindLook();
+const _dir: [number, number, number] = [0, 1, 0];
+
+/** The per-frame puffs' options, written in place. */
+const CLOUD = {
+  speed: 0.7,
+  up: 0.4,
+  life: 2.2,
+  size: [3.5, 7] as [number, number],
+  color: C.cloud as readonly [number, number, number],
+  alpha: 0.14,
+  drag: 0.8,
+  radius: 1.2,
+  floor: -1e6,
+};
+const MIST = {
+  speed: 0.6,
+  up: 0.5,
+  life: 2.6,
+  size: [7, 12] as [number, number],
+  color: C.wind as readonly [number, number, number],
+  alpha: 0.1,
+  drag: 0.8,
+  radius: 2.5,
+  floor: -1e6,
+};
+const DUST = {
+  speed: 1.4,
+  up: 0.6,
+  life: 1.7,
+  size: [0.22, 0.05] as [number, number],
+  color: C.dust as readonly [number, number, number],
+  alpha: 1,
+  pool: 'glow' as const,
+  radius: 2.5,
+  drag: 0.5,
+  floor: -1e6,
+};
+const RISE = {
+  speed: 2,
+  up: 9,
+  life: 0.9,
+  size: [1.2, 0.3] as [number, number],
+  color: C.windEdge as readonly [number, number, number],
+  alpha: 0.4,
+  drag: 0.3,
+  floor: -1e6,
+};
+const CRACKLE = {
+  speed: 5,
+  life: 0.25,
+  size: [0.3, 0.05] as [number, number],
+  color: C.spark as readonly [number, number, number],
+  alpha: 1,
+  pool: 'glow' as const,
+  floor: -1e6,
+};
+const CLAWS = [S_CLAW_L, S_CLAW_R] as const;
+const DRAW_IN = {
+  speed: 6,
+  life: 0.5,
+  size: [0.45, 0.1] as [number, number],
+  color: C.spark as readonly [number, number, number],
+  alpha: 1,
+  pool: 'glow' as 'glow' | undefined,
+  dir: _dir,
+  spread: 0.06,
+  drag: 0,
+  floor: -1e6,
+};
+const DRAW_MIST = {
+  speed: 6,
+  life: 0.6,
+  size: [1.8, 0.5] as [number, number],
+  color: C.windEdge as readonly [number, number, number],
+  alpha: 0.35,
+  pool: undefined as 'glow' | undefined,
+  dir: _dir,
+  spread: 0.08,
+  drag: 0,
+  floor: -1e6,
 };
 
-/** The storm core's skin: living lightning, bands racing up it, an edge of
- *  teal light (additive). */
-const CORE_VERT = /* glsl */ `
-varying vec3 vN;
-varying vec3 vV;
-varying vec3 vP;
-void main() {
-  vec4 wp = modelMatrix * vec4(position, 1.0);
-  vP = position;
-  vN = normalize(mat3(modelMatrix) * normal);
-  vV = normalize(cameraPosition - wp.xyz);
-  gl_Position = projectionMatrix * viewMatrix * wp;
+interface Flash {
+  sprite: THREE.Sprite;
+  mat: THREE.SpriteMaterial;
+  born: number;
+  life: number;
+  size: number;
 }
-`;
-const CORE_FRAG = /* glsl */ `
-uniform float uTime;
-uniform float uAlpha;
-uniform vec3 uCore;
-uniform vec3 uEdge;
-varying vec3 vN;
-varying vec3 vV;
-varying vec3 vP;
-float h(vec3 p) { return fract(sin(dot(p, vec3(127.1, 311.7, 74.7))) * 43758.5453); }
-float n(vec3 p) {
-  vec3 i = floor(p);
-  vec3 f = fract(p);
-  f = f * f * (3.0 - 2.0 * f);
-  return mix(
-    mix(mix(h(i), h(i + vec3(1, 0, 0)), f.x), mix(h(i + vec3(0, 1, 0)), h(i + vec3(1, 1, 0)), f.x), f.y),
-    mix(mix(h(i + vec3(0, 0, 1)), h(i + vec3(1, 0, 1)), f.x), mix(h(i + vec3(0, 1, 1)), h(i + vec3(1, 1, 1)), f.x), f.y),
-    f.z);
-}
-void main() {
-  float fres = pow(1.0 - abs(dot(normalize(vN), normalize(vV))), 2.2);
-  vec3 q = vP * 2.6 + vec3(0.0, -uTime * 3.4, 0.0);
-  float vein = 1.0 - abs(n(q) * 2.0 - 1.0);
-  vein = pow(vein, 7.0);
-  float flick = 0.75 + 0.25 * sin(uTime * 31.0 + vP.y * 3.0);
-  vec3 col = mix(uEdge, uCore, clamp(vein * 1.4 + fres * 0.3, 0.0, 1.0));
-  float a = uAlpha * clamp(0.18 + fres * 0.9 + vein * 1.1, 0.0, 1.0) * flick;
-  gl_FragColor = vec4(col * (1.0 + vein * 1.5), a);
-  #include <colorspace_fragment>
-}
-`;
-/** A lightning wing: forked veins of light across a membrane of storm. */
-const WING_VERT = /* glsl */ `
-varying vec2 vUv;
-void main() {
-  vUv = uv;
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-}
-`;
-const WING_FRAG = /* glsl */ `
-uniform float uTime;
-uniform float uAlpha;
-uniform vec3 uCore;
-uniform vec3 uEdge;
-varying vec2 vUv;
-float h(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
-float n(vec2 p) {
-  vec2 i = floor(p);
-  vec2 f = fract(p);
-  f = f * f * (3.0 - 2.0 * f);
-  return mix(mix(h(i), h(i + vec2(1, 0)), f.x), mix(h(i + vec2(0, 1)), h(i + vec2(1, 1)), f.x), f.y);
-}
-void main() {
-  // vUv.x 0 at the root, 1 at the tip; vUv.y 0 at the bottom edge.
-  float span = vUv.x;
-  float shape = smoothstep(0.0, 0.08, vUv.y) * (1.0 - smoothstep(0.55 + 0.45 * (1.0 - span), 1.0, vUv.y));
-  shape *= 1.0 - smoothstep(0.82, 1.0, span);
-  vec2 p = vec2(span * 6.0, vUv.y * 4.0 + span * 1.5);
-  float t = uTime * 1.7;
-  float r1 = 1.0 - abs(n(p + vec2(-t, t * 0.3)) * 2.0 - 1.0);
-  float r2 = 1.0 - abs(n(p * 2.3 + vec2(t * 0.7, -t)) * 2.0 - 1.0);
-  float vein = pow(r1, 9.0) + pow(r2, 12.0) * 0.6;
-  float flick = 0.7 + 0.3 * sin(uTime * 23.0 + span * 9.0);
-  float membrane = 0.12 * (1.0 - span) + 0.06;
-  float a = uAlpha * shape * clamp(membrane + vein * 1.6, 0.0, 1.0) * flick;
-  gl_FragColor = vec4(mix(uEdge, uCore, clamp(vein, 0.0, 1.0)) * (1.0 + vein), a);
-  #include <colorspace_fragment>
-}
-`;
-/** An arc: a crossed ribbon, bright core, soft edge. */
-const ARC_VERT = /* glsl */ `
-attribute float aEdge;
-varying float vEdge;
-void main() {
-  vEdge = aEdge;
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-}
-`;
-const ARC_FRAG = /* glsl */ `
-uniform float uAlpha;
-uniform vec3 uCore;
-uniform vec3 uEdge;
-varying float vEdge;
-void main() {
-  float e = abs(vEdge);
-  float core = 1.0 - smoothstep(0.0, 0.35, e);
-  float glow = 1.0 - smoothstep(0.2, 1.0, e);
-  gl_FragColor = vec4(mix(uEdge, uCore, core) * (0.8 + core * 1.6) * uAlpha, glow * uAlpha);
-  #include <colorspace_fragment>
-}
-`;
 
-interface PieceView {
-  def: BreathBodyPiece;
-  index: number;
-  /** A whirl stone's slot (read once from its id). */
-  orbit: number;
-  holder: THREE.Group;
-  /** The plain stone it wears until (or, a kit that never lands, instead of)
-   *  its kit piece. */
-  standIn: THREE.Mesh | null;
-  pos: THREE.Vector3;
-  quat: THREE.Quaternion;
-  diedPos: THREE.Vector3;
-  diedQuat: THREE.Quaternion;
-  rest: { at: V3; tilt: THREE.Quaternion; delay: number } | null;
-  landed: boolean;
+interface Arc {
+  born: number;
+  life: number;
+  a: number;
+  b: number;
+  seed: number;
+  width: number;
 }
 
 export class BreathBody {
   readonly readyForEntry: Promise<void>;
   private readonly root = new THREE.Group();
-  private readonly group = new THREE.Group();
-  private readonly core = new THREE.Group();
+  /** Everything drawn, under the gated root: the painter shows and hides
+   *  this, never the root (the compile gate owns the root's reveal). */
+  private readonly fx = new THREE.Group();
   private readonly uTime = { value: 0 };
   private readonly density: number;
+  private readonly low: boolean;
   private readonly particles: EngineParticles;
   private readonly geometries: THREE.BufferGeometry[] = [];
   private readonly materials: THREE.Material[] = [];
-  private readonly pieces: PieceView[] = [];
-  private readonly threads: THREE.InstancedMesh;
-  private readonly seamMat: THREE.ShaderMaterial;
-  private readonly crystalMat: THREE.ShaderMaterial;
-  private readonly haloMat: THREE.SpriteMaterial;
-  private readonly emberMat: THREE.SpriteMaterial;
-  private readonly embers: THREE.Sprite[] = [];
-  private readonly coreMat: THREE.ShaderMaterial;
-  private readonly wingMat: THREE.ShaderMaterial;
-  private readonly arcMat: THREE.ShaderMaterial;
-  private readonly arcGeo: THREE.BufferGeometry;
-  private readonly heartGlow: THREE.Sprite;
-  private readonly heartGlowMat: THREE.SpriteMaterial;
-  private readonly joints: THREE.Vector3[] = [];
-  private readonly glowColor = new THREE.Color();
-  private readonly stormColor = new THREE.Color(BREATH_BODY_COLORS.core);
-  private readonly threadColor = new THREE.Color();
-  /** The thread colour last uploaded (NaN: never). */
-  private readonly threadShown = new THREE.Color(Number.NaN, Number.NaN, Number.NaN);
-  /** The wind as last read (rewritten in place each frame). */
-  private readonly windNow: { phase: BreathWindPhase | null; bearing: number; fill: number } = {
-    phase: null,
-    bearing: 0,
-    fill: 0,
-  };
-  private readonly standInGeo: THREE.BufferGeometry;
-  private readonly compileGate?: (target: THREE.Object3D) => Promise<unknown>;
+  /** Live socket places this frame (world), in BREATH_SOCKETS order. */
+  private readonly sock: THREE.Vector3[] = BREATH_SOCKETS.map(() => new THREE.Vector3());
+  private readonly wind: BreathRibbonPool;
+  private readonly windU: ReturnType<typeof windUniforms>;
+  private readonly volume: BreathWindVolume;
+  private readonly bolts: BreathRibbonPool;
+  private readonly slashes: BreathRibbonPool;
+  private readonly cone: THREE.Mesh;
+  private readonly coneMat: THREE.ShaderMaterial;
+  private readonly orbit: BreathBodyOrbit;
+  private readonly eyes: THREE.Sprite[] = [];
+  private readonly eyeMat: THREE.SpriteMaterial;
+  private readonly heart: THREE.Sprite;
+  private readonly heartMat: THREE.SpriteMaterial;
+  private readonly mouth: THREE.Sprite;
+  private readonly mouthMat: THREE.SpriteMaterial;
+  private readonly glows: THREE.Sprite[] = [];
+  private readonly glowMat: THREE.SpriteMaterial;
+  private readonly glints: THREE.Sprite[] = [];
+  private readonly glintMat: THREE.SpriteMaterial;
+  private readonly hand: THREE.Sprite;
+  private readonly handMat: THREE.SpriteMaterial;
+  private readonly flashes: Flash[] = [];
+  private readonly arcs: Arc[] = [];
+  private readonly arcCount: number;
+  /** The cast's bolt out of the pointing claws (the pool's spare strip). */
+  private readonly castBolt = { live: false, seed: 0, born: 0, x: 0, y: 0, z: 0 };
+  /** The two claws' recent places (a ring of TRAIL frames each), their speed. */
+  private readonly trail: Float32Array = new Float32Array(2 * TRAIL * 3);
+  private trailHead = 0;
+  private trailFill = 0;
+  private readonly clawSpeed = new Float32Array(2);
   private readonly glowTex: THREE.Texture | null;
-  private kitBuilt = false;
-  /** The roster version the last discovery walk saw (NaN: walk next scan). */
-  private rosterSeen = Number.NaN;
   private entityId = -1;
   private windId = -1;
   private windTemplate = '';
   private windSince = 0;
-  private yaw = 0;
-  private swingAt = -99;
-  private swingSide: -1 | 1 = 1;
-  private stormSince = -1;
-  private stormFrom = 0.25;
-  private sawBreak = false;
-  private deadAt = -1;
-  private seenAlive = false;
-  private arcTimer = 0;
+  private readonly windNow = { phase: null as BreathWindPhase | null, fill: 0 };
+  private rosterSeen = Number.NaN;
+  private stance = '';
+  private gestureTimer = 0;
   private scanTimer = 0;
   private clock = 0;
-  private seed = 0x3b1d;
+  private seed = 0x6b1d;
+  /** 0 the calm wind, 1 the storm (eased; the tear drives it up). */
+  private storm = 0;
+  private flash = 0;
+  private lastCast: string | null = null;
+  private lastFill = 0;
+  private coneAt = -99;
+  private tearAt = -99;
+  private arcTimer = 0;
+  private readonly swings: number[] = [];
+  private deadAt = -1;
+  private seenAlive = false;
+  private flaredInhale = false;
   private disposed = false;
 
   constructor(
@@ -328,17 +379,22 @@ export class BreathBody {
     compileGate?: (target: THREE.Object3D) => Promise<unknown>,
     private readonly reducedMotion: () => boolean = () => false,
     private readonly shakeSink?: (amount: number) => void,
+    private readonly playGesture?: (entityId: number, gesture: string) => void,
   ) {
-    this.compileGate = compileGate;
     this.root.name = 'smith-heart-breath-body';
     setRenderCategory(this.root, 'ui3d');
+    this.fx.name = 'smithHeartBreathBodyFx';
+    this.fx.visible = false;
+    this.root.add(this.fx);
     const detail =
       resolveUiEffectsProfile({ presetLabel: GFX.tier, effectsQuality: 1, reduceMotion: false })
         .tier !== 'low';
+    this.low = !detail;
     this.density = detail ? 1 : 0.4;
+    this.arcCount = detail ? BREATH_ARCS.pool : BREATH_ARCS.poolLow;
     const hasDom = typeof document !== 'undefined';
     this.particles = new EngineParticles(
-      this.root,
+      this.fx,
       this.uTime,
       this.density,
       (x, z) => this.groundY(x, z),
@@ -346,373 +402,142 @@ export class BreathBody {
       () => this.reducedMotion(),
       hasDom ? getFlameTex() : null,
     );
-    // One hidden carrier triangle every glow material is drawn on, so the
-    // compile gate links their programs before any kit piece lands.
-    const carrierGeo = new THREE.BufferGeometry();
-    carrierGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(9), 3));
-    carrierGeo.setAttribute(
-      'normal',
-      new THREE.BufferAttribute(new Float32Array([0, 1, 0, 0, 1, 0, 0, 1, 0]), 3),
+    // The living currents (every tier keeps the body; the low tier fewer
+    // strands of it), the storm's lightning, the claws' slashes.
+    this.windU = windUniforms(this.uTime, C);
+    this.wind = new BreathRibbonPool(
+      'smithHeartBreathWind',
+      BREATH_RIBBON_COUNT,
+      SEG,
+      'wind',
+      this.windU,
+      this.materials,
+      this.geometries,
     );
-    carrierGeo.setAttribute('color', new THREE.BufferAttribute(new Float32Array(9).fill(1), 3));
-    carrierGeo.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(6), 2));
-    carrierGeo.setAttribute('aEdge', new THREE.BufferAttribute(new Float32Array(3), 1));
-    this.geometries.push(carrierGeo);
-    // The stand-in stone every piece wears until its kit lands (or, a kit
-    // that never lands, for good): a unit rock in the body's storm slate.
-    const standIn = new THREE.IcosahedronGeometry(0.5, 1);
-    const g = BREATH_BODY_COLORS.granite;
-    const n = standIn.getAttribute('position').count;
-    const col = new Float32Array(n * 3);
-    for (let i = 0; i < n; i++) {
-      const shade = 0.8 + 0.4 * breathBodyHash(i, 7);
-      col[i * 3] = g[0] * shade;
-      col[i * 3 + 1] = g[1] * shade;
-      col[i * 3 + 2] = g[2] * shade;
+    this.bolts = new BreathRibbonPool(
+      'smithHeartBreathBolts',
+      BREATH_ARCS.pool + 1,
+      ARC_SEG,
+      'bolt',
+      boltUniforms(this.uTime, C.lightning, C.lightningEdge),
+      this.materials,
+      this.geometries,
+    );
+    this.slashes = new BreathRibbonPool(
+      'smithHeartBreathSlash',
+      BREATH_BODY_POOLS.slashes,
+      TRAIL - 1,
+      'bolt',
+      boltUniforms(this.uTime, 0xd8ecff, 0x6aa4d8),
+      this.materials,
+      this.geometries,
+    );
+    // The body's volume under the currents (billows of storm air).
+    this.volume = new BreathWindVolume(
+      BREATH_PUFF_COUNT,
+      this.windU,
+      this.materials,
+      this.geometries,
+    );
+    this.fx.add(this.volume.mesh);
+    for (const p of [this.wind, this.bolts, this.slashes]) {
+      this.fx.add(p.mesh);
     }
-    standIn.setAttribute('color', new THREE.BufferAttribute(col, 3));
-    this.standInGeo = standIn;
-    this.geometries.push(standIn);
-    this.seamMat = heartVeinGlowMaterial(BREATH_BODY_COLORS.thread, 'smithHeartBreathSeams');
-    this.crystalMat = heartVeinGlowMaterial(BREATH_BODY_COLORS.glow, 'smithHeartBreathCrystal');
+    // The roar's cone of wind (an open cone, its tip at the mouth, along +z).
+    const coneGeo = new THREE.CylinderGeometry(1, 0.08, 1, 32, 1, true)
+      .translate(0, -0.5, 0)
+      .rotateX(-Math.PI / 2);
+    this.geometries.push(coneGeo);
+    this.coneMat = new THREE.ShaderMaterial({
+      name: 'smithHeartBreathRoarCone',
+      uniforms: {
+        uTime: this.uTime,
+        uAge: { value: 0 },
+        uAlpha: { value: 0 },
+        uWind: { value: new THREE.Color(C.wind[0], C.wind[1], C.wind[2]) },
+        uEdge: { value: new THREE.Color(C.windEdge[0], C.windEdge[1], C.windEdge[2]) },
+      },
+      vertexShader: CONE_VERT,
+      fragmentShader: CONE_FRAG,
+      transparent: true,
+      depthWrite: false,
+      side: THREE.DoubleSide,
+      fog: false,
+    });
+    this.materials.push(this.coneMat);
+    this.cone = new THREE.Mesh(coneGeo, this.coneMat);
+    this.cone.name = 'smithHeartBreathRoarCone';
+    this.cone.frustumCulled = false;
+    this.cone.visible = false;
+    this.fx.add(this.cone);
+    // The stones and shards round it.
+    this.orbit = new BreathBodyOrbit(
+      this.fx,
+      this.uTime,
+      BREATH_BODY_POOLS.stones,
+      BREATH_BODY_POOLS.shards,
+      this.low,
+      this.materials,
+      this.geometries,
+    );
     const glowTex = hasDom ? radialGlowTexture() : null;
     this.glowTex = glowTex;
-    const sprite = (color: number, opacity: number, name: string) =>
+    const sprite = (color: number, name: string) =>
       new THREE.SpriteMaterial({
         map: glowTex,
         color,
         transparent: true,
-        opacity,
+        opacity: 0,
         blending: THREE.AdditiveBlending,
         depthWrite: false,
         fog: false,
         name,
       });
-    this.haloMat = sprite(BREATH_BODY_COLORS.glow, 0.45, 'smithHeartBreathHalo');
-    this.emberMat = sprite(BREATH_BODY_COLORS.thread, 0.6, 'smithHeartBreathEmber');
-    this.heartGlowMat = sprite(BREATH_BODY_COLORS.core, 0, 'smithHeartBreathHeart');
-    const threadMat = new THREE.MeshBasicMaterial({
-      color: 0xffffff,
-      transparent: true,
-      opacity: 0.95,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-      toneMapped: false,
-      fog: false,
-      name: 'smithHeartBreathThreads',
-    });
-    this.coreMat = new THREE.ShaderMaterial({
-      name: 'smithHeartBreathStormCore',
-      uniforms: {
-        uTime: this.uTime,
-        uAlpha: { value: 0 },
-        uCore: { value: new THREE.Color(BREATH_BODY_COLORS.core) },
-        uEdge: { value: new THREE.Color(BREATH_BODY_COLORS.coreEdge) },
-      },
-      vertexShader: CORE_VERT,
-      fragmentShader: CORE_FRAG,
-      transparent: true,
-      depthWrite: false,
-      blending: THREE.AdditiveBlending,
-    });
-    this.wingMat = new THREE.ShaderMaterial({
-      name: 'smithHeartBreathStormWing',
-      uniforms: {
-        uTime: this.uTime,
-        uAlpha: { value: 0 },
-        uCore: { value: new THREE.Color(BREATH_BODY_COLORS.core) },
-        uEdge: { value: new THREE.Color(BREATH_BODY_COLORS.coreEdge) },
-      },
-      vertexShader: WING_VERT,
-      fragmentShader: WING_FRAG,
-      transparent: true,
-      depthWrite: false,
-      side: THREE.DoubleSide,
-      blending: THREE.AdditiveBlending,
-    });
-    this.arcMat = new THREE.ShaderMaterial({
-      name: 'smithHeartBreathStormArc',
-      uniforms: {
-        uAlpha: { value: 0 },
-        uCore: { value: new THREE.Color(BREATH_BODY_COLORS.core) },
-        uEdge: { value: new THREE.Color(BREATH_BODY_COLORS.coreEdge) },
-      },
-      vertexShader: ARC_VERT,
-      fragmentShader: ARC_FRAG,
-      transparent: true,
-      depthWrite: false,
-      side: THREE.DoubleSide,
-      blending: THREE.AdditiveBlending,
-    });
+    this.eyeMat = sprite(C.eye, 'smithHeartBreathEye');
+    this.heartMat = sprite(C.heart, 'smithHeartBreathHeart');
+    this.mouthMat = sprite(C.eye, 'smithHeartBreathMouth');
+    this.glowMat = sprite(C.heart, 'smithHeartBreathInnerGlow');
+    this.glintMat = sprite(C.crystal, 'smithHeartBreathGlint');
+    this.handMat = sprite(C.lightning, 'smithHeartBreathHandGather');
     this.materials.push(
-      this.seamMat,
-      this.crystalMat,
-      this.haloMat,
-      this.emberMat,
-      this.heartGlowMat,
-      threadMat,
-      this.coreMat,
-      this.wingMat,
-      this.arcMat,
+      this.eyeMat,
+      this.heartMat,
+      this.mouthMat,
+      this.glowMat,
+      this.glintMat,
+      this.handMat,
     );
-    for (const m of [this.seamMat, this.crystalMat, this.coreMat, this.wingMat, this.arcMat]) {
-      const carrier = new THREE.Mesh(carrierGeo, m);
-      carrier.visible = false;
-      carrier.frustumCulled = false;
-      carrier.name = 'smithHeartBreathCarrier';
-      this.root.add(carrier);
+    const mk = (mat: THREE.SpriteMaterial, name: string) => {
+      const s = new THREE.Sprite(mat);
+      s.name = name;
+      s.visible = false;
+      this.fx.add(s);
+      return s;
+    };
+    for (let i = 0; i < 2; i++) this.eyes.push(mk(this.eyeMat, 'smithHeartBreathEye'));
+    this.heart = mk(this.heartMat, 'smithHeartBreathHeart');
+    this.mouth = mk(this.mouthMat, 'smithHeartBreathMouth');
+    this.hand = mk(this.handMat, 'smithHeartBreathHandGather');
+    for (let i = 0; i < GLOW_AT.length; i++)
+      this.glows.push(mk(this.glowMat, 'smithHeartBreathInnerGlow'));
+    for (let i = 0; i < CRYSTALS.length; i++)
+      this.glints.push(mk(this.glintMat, 'smithHeartBreathGlint'));
+    for (let i = 0; i < BREATH_BODY_POOLS.flashes; i++) {
+      const mat = sprite(C.flash, 'smithHeartBreathFlash');
+      this.materials.push(mat);
+      this.flashes.push({
+        sprite: mk(mat, 'smithHeartBreathFlash'),
+        mat,
+        born: -99,
+        life: 0,
+        size: 1,
+      });
     }
-    for (const m of [this.haloMat, this.heartGlowMat]) {
-      const c = new THREE.Sprite(m);
-      c.visible = false;
-      c.name = 'smithHeartBreathCarrier';
-      this.root.add(c);
-    }
-    this.group.name = 'smithHeartBreathBody';
-    this.group.visible = false;
-    this.root.add(this.group);
-    // The threads of the vein's light between the joints.
-    const threadGeo = new THREE.CylinderGeometry(1, 1, 1, 6, 1, true).translate(0, 0.5, 0);
-    this.geometries.push(threadGeo);
-    this.threads = new THREE.InstancedMesh(threadGeo, threadMat, BREATH_BODY_POOLS.threads);
-    this.threads.name = 'smithHeartBreathThreads';
-    this.threads.frustumCulled = false;
-    this.threads.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-    for (let k = 0; k < BREATH_BODY_POOLS.threads; k++) {
-      this.threads.setMatrixAt(k, _m.makeScale(0, 0, 0));
-      this.threads.setColorAt(k, this.threadColor.setHex(BREATH_BODY_COLORS.thread));
-    }
-    this.group.add(this.threads);
-    for (let k = 0; k < BREATH_RIG_JOINTS; k++) this.joints.push(new THREE.Vector3());
-    const emberSize = 0.95;
-    for (let k = 0; k < BREATH_EMBER_JOINTS.length; k++) {
-      const s = new THREE.Sprite(this.emberMat);
-      s.scale.set(emberSize, emberSize, 1);
-      s.name = 'smithHeartBreathEmber';
-      this.embers.push(s);
-      this.group.add(s);
-    }
-    // The storm core (phase 2): the figure, its wings, its heart, its arcs.
-    this.core.name = 'smithHeartBreathStormCore';
-    this.core.visible = false;
-    this.group.add(this.core);
-    const torsoGeo = new THREE.IcosahedronGeometry(1, 3);
-    const headGeo = new THREE.IcosahedronGeometry(1, 2);
-    this.geometries.push(torsoGeo, headGeo);
-    const C = STORM_CORE;
-    const torso = new THREE.Mesh(torsoGeo, this.coreMat);
-    torso.position.set(0, C.torso.y, 0);
-    torso.scale.set(C.torso.rx, C.torso.ry, C.torso.rz);
-    const head = new THREE.Mesh(headGeo, this.coreMat);
-    head.position.set(0, C.head.y, 0.25);
-    head.scale.setScalar(C.head.r);
-    // A tapering tail of storm under it (where the whirl was).
-    const tailGeo = new THREE.ConeGeometry(0.9, 2.6, 18, 4, true);
-    tailGeo.rotateX(Math.PI);
-    this.geometries.push(tailGeo);
-    const tail = new THREE.Mesh(tailGeo, this.coreMat);
-    tail.position.set(0, 1.4, 0);
-    for (const m of [torso, head, tail]) {
-      m.frustumCulled = false;
-      m.name = 'smithHeartBreathStormFigure';
-      this.core.add(m);
-    }
-    for (const side of [1, -1]) {
-      const wingGeo = new THREE.PlaneGeometry(C.wingSpan / 2, C.wingHeight, 1, 1);
-      // Root at local x 0, the span out along +x (mirrored for the right).
-      wingGeo.translate(C.wingSpan / 4, 0, 0);
-      this.geometries.push(wingGeo);
-      const wing = new THREE.Mesh(wingGeo, this.wingMat);
-      wing.position.set(side * 0.6, C.wingY, -0.7);
-      wing.scale.x = side;
-      wing.rotation.set(0, side * 0.45, side * 0.18);
-      wing.frustumCulled = false;
-      wing.name = 'smithHeartBreathStormWing';
-      this.core.add(wing);
-    }
-    this.heartGlow = new THREE.Sprite(this.heartGlowMat);
-    this.heartGlow.position.set(0, C.heart.y, 0.5);
-    this.heartGlow.scale.set(3.2, 3.2, 1);
-    this.core.add(this.heartGlow);
-    // The arcs: crossed ribbons of ARC_POINTS each, rewritten in place.
-    const arcs = C.arcs;
-    const verts = arcs * 2 * ARC_POINTS * 2;
-    this.arcGeo = new THREE.BufferGeometry();
-    this.arcGeo.setAttribute(
-      'position',
-      new THREE.BufferAttribute(new Float32Array(verts * 3), 3).setUsage(THREE.DynamicDrawUsage),
-    );
-    const edge = new Float32Array(verts);
-    for (let i = 0; i < verts; i++) edge[i] = i % 2 === 0 ? -1 : 1;
-    this.arcGeo.setAttribute('aEdge', new THREE.BufferAttribute(edge, 1));
-    const idx: number[] = [];
-    for (let a = 0; a < arcs * 2; a++) {
-      const base = a * ARC_POINTS * 2;
-      for (let i = 0; i < ARC_POINTS - 1; i++) {
-        const k = base + i * 2;
-        idx.push(k, k + 2, k + 1, k + 1, k + 2, k + 3);
-      }
-    }
-    this.arcGeo.setIndex(idx);
-    this.geometries.push(this.arcGeo);
-    const arcMesh = new THREE.Mesh(this.arcGeo, this.arcMat);
-    arcMesh.frustumCulled = false;
-    arcMesh.name = 'smithHeartBreathStormArcs';
-    this.core.add(arcMesh);
-    this.root.add(heartKitProgramWarmers());
-    // Every piece is built here, under the root's own gate: its kit piece
-    // when the kits are in, else its stand-in stone (swapped for the kit
-    // through one gated unit when it lands: upgradeKit).
-    const kitsIn = this.kitsLoaded();
-    this.buildPieces(kitsIn);
-    this.kitBuilt = kitsIn;
+    for (let i = 0; i < BREATH_ARCS.pool; i++)
+      this.arcs.push({ born: -99, life: 0, a: 0, b: 0, seed: 0, width: 1 });
     this.readyForEntry = attachSceneGroupGated(scene, this.root, compileGate, () => this.disposed)
       .then(() => {})
       .catch(() => {});
-    if (!kitsIn && hasDom)
-      void Promise.all([
-        ensureHeartKit(BREATH_BODY_KITS.breath),
-        ensureHeartKit(BREATH_BODY_KITS.heart),
-      ])
-        .then(() => {
-          if (!this.disposed && this.kitsLoaded()) this.upgradeKit();
-        })
-        .catch(() => {});
-  }
-
-  private kitsLoaded(): boolean {
-    return heartKitLoaded(BREATH_BODY_KITS.breath) && heartKitLoaded(BREATH_BODY_KITS.heart);
-  }
-
-  /** Every piece's holder, wearing its kit piece (`withKit`) or its
-   *  stand-in stone. */
-  private buildPieces(withKit: boolean): void {
-    BREATH_BODY_PIECES.forEach((def, index) => {
-      const holder = new THREE.Group();
-      holder.name = `breathBody:${def.id}`;
-      const kit = withKit ? this.fitKit(def) : null;
-      let standIn: THREE.Mesh | null = null;
-      if (kit) holder.add(kit);
-      else {
-        standIn = new THREE.Mesh(
-          this.standInGeo,
-          def.light === 'crystal' ? this.crystalMat : heartKitSlotMaterial('stone'),
-        );
-        standIn.name = 'smithHeartBreathStandIn';
-        standIn.scale.set(def.size.x, def.size.y, def.size.z);
-        standIn.rotation.set(def.tilt.x, def.tilt.y, def.tilt.z);
-        standIn.castShadow = def.light !== 'crystal' && def.joint !== 'whirl';
-        standIn.receiveShadow = def.light !== 'crystal';
-        holder.add(standIn);
-      }
-      this.group.add(holder);
-      this.pieces.push({
-        def,
-        index,
-        orbit: Number(def.id.replace(/\D+/g, '')) || 0,
-        holder,
-        standIn,
-        pos: new THREE.Vector3(),
-        quat: new THREE.Quaternion(),
-        diedPos: new THREE.Vector3(),
-        diedQuat: new THREE.Quaternion(),
-        rest: null,
-        landed: false,
-      });
-    });
-  }
-
-  /** One piece's kit shape fitted to its box (centred on its holder), with
-   *  its crystal halo; null when the kit has no such node. */
-  private fitKit(def: BreathBodyPiece): THREE.Group | null {
-    const kit = heartKitMeshes(BREATH_BODY_KITS[def.kit], def.node);
-    if (!kit) return null;
-    for (const m of kit.children) {
-      if (!(m instanceof THREE.Mesh)) continue;
-      if (def.light === 'crystal') {
-        // Light, not rock: it neither casts nor takes a shadow.
-        m.material = this.crystalMat;
-        m.castShadow = false;
-        m.receiveShadow = false;
-      } else if (m.name.endsWith(':glow')) m.material = this.seamMat;
-      else if (m.name.endsWith(':stone')) m.geometry = this.stormStone(m.geometry);
-      if (def.joint === 'whirl') m.castShadow = false;
-    }
-    _box.setFromObject(kit);
-    _box.getSize(_size);
-    _box.getCenter(_centre);
-    const sx = def.size.x / Math.max(1e-3, _size.x);
-    const sy = def.size.y / Math.max(1e-3, _size.y);
-    const sz = def.size.z / Math.max(1e-3, _size.z);
-    kit.scale.set(sx, sy, sz);
-    kit.position.set(-_centre.x * sx, -_centre.y * sy, -_centre.z * sz);
-    const content = new THREE.Group();
-    content.name = 'smithHeartBreathKitPiece';
-    const tilt = new THREE.Group();
-    tilt.rotation.set(def.tilt.x, def.tilt.y, def.tilt.z);
-    tilt.add(kit);
-    if (def.side < 0) tilt.scale.x = -1;
-    content.add(tilt);
-    if (def.light === 'crystal' && def.joint !== 'whirl') {
-      const halo = new THREE.Sprite(this.haloMat);
-      const s = Math.max(def.size.x, def.size.y, def.size.z) * 1.6;
-      halo.scale.set(s, s, 1);
-      halo.name = 'smithHeartBreathCrystalHalo';
-      content.add(halo);
-    }
-    return content;
-  }
-
-  /** The kits landed after the body was built: fit every piece's kit shape
-   *  into one hidden staging group, link it through the compile gate (one
-   *  budgeted unit on the GPU queue, never a live frame), then swap each
-   *  stand-in for its kit piece. */
-  private upgradeKit(): void {
-    if (this.kitBuilt || this.disposed) return;
-    this.kitBuilt = true;
-    const staging = new THREE.Group();
-    staging.name = 'smithHeartBreathKitStaging';
-    staging.visible = false;
-    const fitted: (THREE.Group | null)[] = [];
-    for (const p of this.pieces) {
-      const kit = this.fitKit(p.def);
-      fitted.push(kit);
-      if (kit) staging.add(kit);
-    }
-    this.root.add(staging);
-    const linked = this.compileGate ? this.compileGate(staging).catch(() => {}) : Promise.resolve();
-    void linked.then(() => {
-      staging.removeFromParent();
-      if (this.disposed) return;
-      for (let i = 0; i < this.pieces.length; i++) {
-        const p = this.pieces[i];
-        const kit = fitted[i];
-        if (!kit) continue;
-        if (p.standIn) {
-          p.holder.remove(p.standIn);
-          p.standIn = null;
-        }
-        p.holder.add(kit);
-      }
-    });
-  }
-
-  /** The kit's pale granite repainted the body's darker storm slate (it
-   *  must read against the scoured Cornice it fights on), a third of its own
-   *  value variation kept. */
-  private stormStone(src: THREE.BufferGeometry): THREE.BufferGeometry {
-    const g = src.clone();
-    const col = g.getAttribute('color');
-    if (col) {
-      const c = BREATH_BODY_COLORS.granite;
-      for (let i = 0; i < col.count; i++) {
-        const shade = 0.5 + 0.6 * Math.min(1, col.getX(i) * 1.4);
-        col.setXYZ(i, c[0] * shade, c[1] * shade, c[2] * shade);
-      }
-      col.needsUpdate = true;
-    }
-    this.geometries.push(g);
-    return g;
   }
 
   private rand(): number {
@@ -720,7 +545,7 @@ export class BreathBody {
     return (this.seed >>> 0) / 4294967296;
   }
 
-  private shakeNear(x: number, z: number, amount: number, reach = 45): void {
+  private shakeNear(x: number, z: number, amount: number, reach = 55): void {
     if (!this.shakeSink || !this.world || this.reducedMotion()) return;
     const me = this.world.entities.get(this.world.playerId);
     if (!me) return;
@@ -728,15 +553,21 @@ export class BreathBody {
     if (d < reach) this.shakeSink(amount * (1 - (d / reach) * 0.7));
   }
 
+  private send(gesture: string): void {
+    if (this.entityId >= 0) this.playGesture?.(this.entityId, gesture);
+  }
+
   /** Never claims an event: the renderer's own draws still play under these. */
   handleEvent(ev: SimEvent): boolean {
     if (!this.world || this.disposed || this.entityId < 0) return false;
     if (ev.type === 'damage' && ev.ability === null && ev.sourceId === this.entityId) {
-      this.swingAt = this.clock;
-      this.swingSide = this.swingSide === 1 ? -1 : 1;
+      // A plain swing: its claws cross before it on the clip's beat.
+      if (this.swings.length < 4) this.swings.push(this.clock + BREATH_BODY_CLIP.attack);
+    } else if (ev.type === 'spellfx' && ev.ability === BREATH_CUES.gust) {
+      // The Summit Roar leaves its mouth.
+      this.roarBlast();
     } else if (ev.type === 'spellfx' && ev.ability === BREATH_CUES.tear) {
-      const e = this.world.entities.get(this.entityId);
-      if (e) this.tearBurst(e);
+      this.tear();
     }
     return false;
   }
@@ -750,12 +581,15 @@ export class BreathBody {
     if (this.scanTimer <= 0) {
       this.scanTimer = SCAN_SEC;
       this.scan(world);
+      // A view whose model was still loading gets its sockets on the scan tick.
+      retryBreathBodySockets();
     }
     if (this.entityId >= 0) {
       const e = world.entities.get(this.entityId);
       if (!e) this.release();
       else this.pose(e, dt);
     }
+    this.updateFlashes();
     this.particles.update(this.clock);
   }
 
@@ -771,20 +605,20 @@ export class BreathBody {
       return;
     }
     if (this.entityId >= 0 && this.windId >= 0) return;
-    // The discovery walk runs on a roster change only (an entity added or
-    // dropped), never on the scan's clock.
+    // The discovery walk runs on a roster change only, never on the clock.
     if (world.entityRosterVersion === this.rosterSeen) return;
     this.rosterSeen = world.entityRosterVersion;
     for (const e of world.entities.values()) {
       if (this.entityId < 0 && e.kind === 'mob' && e.templateId === BREATH_GUARDIAN) {
         this.entityId = e.id;
-        this.yaw = e.facing;
         this.deadAt = -1;
         this.seenAlive = false;
-        this.swingAt = -99;
-        this.stormSince = -1;
-        this.sawBreak = false;
-        this.group.visible = true;
+        this.swings.length = 0;
+        this.stance = '';
+        this.storm = 0;
+        this.trailFill = 0;
+        this.orbit.setGlow(1);
+        this.fx.visible = true;
       } else if (
         this.windId < 0 &&
         e.kind === 'object' &&
@@ -798,16 +632,29 @@ export class BreathBody {
   private release(): void {
     this.entityId = -1;
     this.rosterSeen = Number.NaN;
-    this.group.visible = false;
-    this.core.visible = false;
+    this.fx.visible = false;
+    this.hideBody();
   }
 
-  /** The wind object's phase, bearing and fill (its template is watched for
-   *  changes: a new phase restarts the fill). */
-  private wind(): { phase: BreathWindPhase | null; bearing: number; fill: number } {
+  private hideBody(): void {
+    this.wind.commit(0);
+    this.volume.commit(0);
+    this.bolts.commit(0);
+    this.slashes.commit(0);
+    this.cone.visible = false;
+    this.orbit.update(0, 0, 0, 0, 0, 0, 0, 0);
+    for (const s of this.eyes) s.visible = false;
+    for (const s of this.glows) s.visible = false;
+    for (const s of this.glints) s.visible = false;
+    this.heart.visible = false;
+    this.mouth.visible = false;
+    this.hand.visible = false;
+  }
+
+  /** The wind object's phase and fill (a new phase restarts the fill). */
+  private windPhase(): { phase: BreathWindPhase | null; fill: number } {
     const out = this.windNow;
     out.phase = null;
-    out.bearing = 0;
     out.fill = 0;
     const w = this.windId >= 0 ? this.world?.entities.get(this.windId) : undefined;
     if (!w) return out;
@@ -818,543 +665,823 @@ export class BreathBody {
     const of = breathWindOf(w.templateId);
     if (!of) return out;
     out.phase = of.phase;
-    out.bearing = (of.bearingDeg * Math.PI) / 180;
     out.fill = of.seconds > 0 ? Math.min(1, (this.clock - this.windSince) / of.seconds) : 0;
     return out;
+  }
+
+  // ---- the sockets -------------------------------------------------------------------------
+
+  /** Where each socket is this frame: the model's own bones when its view is
+   *  up, else its rest place round the guardian (a view still loading). */
+  private readSockets(e: Entity): void {
+    const set = breathBodySockets();
+    const eAt = fxAnchor(e);
+    const sinY = Math.sin(e.facing);
+    const cosY = Math.cos(e.facing);
+    for (let i = 0; i < BREATH_SOCKETS.length; i++) {
+      const p = set?.points[i];
+      if (p) {
+        p.getWorldPosition(this.sock[i]);
+        continue;
+      }
+      const at = BREATH_SOCKETS[i].at;
+      const x = at[0] * U;
+      const z = at[2] * U;
+      this.sock[i].set(eAt.x + x * cosY + z * sinY, eAt.y + at[1] * U, eAt.z - x * sinY + z * cosY);
+    }
   }
 
   // ---- the pose ------------------------------------------------------------------------------
 
   private pose(e: Entity, dt: number): void {
     const eAt = fxAnchor(e);
-    this.group.position.set(eAt.x, eAt.y, eAt.z);
+    this.readSockets(e);
+    this.trackClaws(dt);
     if (e.dead) {
-      this.poseDead(e);
+      this.poseDead(e, dt);
       return;
     }
     if (this.deadAt >= 0) {
-      // Stood up again (a wipe): whole at once.
+      // Up again (a wipe): the wind returns.
       this.deadAt = -1;
-      this.stormSince = -1;
-      for (const p of this.pieces) {
-        p.rest = null;
-        p.landed = false;
-      }
+      this.orbit.setGlow(1);
     }
     this.seenAlive = true;
-    const storm = stormFormOn(e.auras);
-    if (storm && this.stormSince < 0) {
-      this.stormSince = this.clock;
-      // Seen tearing open: on from where the bar left it; first seen already
-      // in the storm (arriving late, a reconnect): torn whole at once.
-      this.stormFrom = this.sawBreak ? Math.max(0.25, this.stormFrom) : 1;
-    } else if (!storm) {
-      this.stormSince = -1;
-      this.stormFrom = 0.25;
+    const stormOn = stormFormOn(e.auras);
+    // The stance: the calm wind or the storm, re-sent so a rebuilt view holds it.
+    const want = breathStanceGesture(stormOn);
+    this.gestureTimer -= dt;
+    if (want !== this.stance || this.gestureTimer <= 0) {
+      this.stance = want;
+      this.gestureTimer = 1;
+      this.send(want);
     }
-    const wind = this.wind();
+    const wind = this.windPhase();
     const fill = e.castTotal > 0 ? Math.max(0, Math.min(1, 1 - e.castRemaining / e.castTotal)) : 1;
     _actIn.castId = e.castingAbility;
     _actIn.castFill = fill;
     _actIn.windPhase = wind.phase;
     _actIn.windFill = wind.fill;
-    _actIn.stormForm = storm;
+    _actIn.stormForm = stormOn;
     breathBodyAction(_actIn, _act);
-    let action = _act.action;
-    let k = _act.k;
-    if (
-      (action === 'idle' || action === 'storm' || action === 'calm') &&
-      this.clock - this.swingAt < BREATH_SWING_SECONDS
-    ) {
-      action = storm ? 'storm' : 'swing';
-      k = (this.clock - this.swingAt) / BREATH_SWING_SECONDS;
+    const look = breathWindLook(_act.action, _act.k, this.clock, _look);
+    // The storm's hold on it: up through the tear, held through phase 2.
+    const stormWant = stormOn ? 1 : look.storm;
+    this.storm += (stormWant - this.storm) * Math.min(1, dt * (stormWant > this.storm ? 3 : 1.2));
+    if (_act.action === 'break' && _act.k >= BREAK_TEAR_AT) this.tear();
+    // A bar that just ended on its beat: the cast's bolt leaves the hand.
+    this.castEnded(e, fill);
+    if (_act.action === 'inhale' && _act.k > 0.94 && !this.flaredInhale) {
+      this.flaredInhale = true;
+      this.send(BREATH_BODY_GESTURES.flare);
+    } else if (_act.action !== 'inhale') this.flaredInhale = false;
+    // The swings' claws cross before it.
+    for (let i = this.swings.length - 1; i >= 0; i--) {
+      if (this.clock < this.swings[i]) continue;
+      this.swings.splice(i, 1);
+      this.swipeLands();
     }
-    const t = this.clock;
-    const look = breathBodyLook(action, k, t, _look);
-    if (storm) {
-      look.tear = stormTearProgress(this.clock - this.stormSince, this.stormFrom);
-      if (action === 'cast' || action === 'blow' || action === 'gather') look.glow += 0.6;
-    } else if (action === 'break') {
-      this.sawBreak = true;
-      this.stormFrom = Math.max(0.05, look.tear);
-    }
-    // The yaw: the mouth turned to the wind while it gathers and blows, else
-    // the entity's own facing (its tank).
-    const want = breathFacesWind(action) && wind.phase !== null ? wind.bearing : e.facing;
-    this.yaw += wrapAngle(want - this.yaw) * Math.min(1, dt * (breathFacesWind(action) ? 2.2 : 5));
-    this.group.rotation.y = this.yaw;
-    this.poseJoints(action, k, look);
-    for (const p of this.pieces) this.posePiece(p, look, t);
-    this.poseThreads(look.tear < 0.5 ? 1 - look.tear * 2 : 0, look);
-    for (let i = 0; i < BREATH_EMBER_JOINTS.length; i++) {
-      this.embers[i].visible = look.tear < 0.6;
-      this.embers[i].position.copy(this.joints[BREATH_EMBER_JOINTS[i]]);
-    }
-    this.poseCore(look, dt);
-    this.glow(look, storm);
-    this.cosmetics(e, action, k, look, dt);
+    this.flash = Math.max(0, this.flash - dt * 4);
+    this.windU.uFlash.value = this.flash;
+    this.windU.uStorm.value = this.storm;
+    this.windU.uFlow.value = look.flow;
+    this.currents(look.density, look.radius, look.spin, 1, look.shiver);
+    this.lights(look.glow, 1);
+    this.cosmetics(dt, look.drawIn, look.shiver, 1);
+    this.castFx(e, dt);
+    this.stormFx(dt);
+    this.slashFx();
+    this.coneFx(e);
+    this.orbit.update(eAt.x, eAt.y, eAt.z, this.clock, 1, this.storm, 0, eAt.y);
   }
 
-  /** The joints (body frame) for this frame's look. */
-  private poseJoints(action: BreathBodyAction, k: number, look: BreathBodyLook): void {
-    const J = this.joints;
-    const S = BREATH_SLOTS;
-    const bob = 0.12 * Math.sin(this.clock * 1.2);
-    J[0].set(S.whirl.x, S.whirl.y + bob * 0.5, S.whirl.z);
-    J[1].set(S.waist.x, S.waist.y + bob, S.waist.z);
-    J[2].set(S.chest.x, S.chest.y + bob + 0.1 * (look.swell - 0.5), S.chest.z);
-    J[3].set(S.head.x, S.head.y + bob, S.head.z);
-    J[4].set(S.shoulder.x + 0.15 * (look.swell - 0.5), S.shoulder.y + bob, S.shoulder.z);
-    J[5].set(-J[4].x, J[4].y, J[4].z);
-    J[10].set(S.mouth.x, S.mouth.y + bob, S.mouth.z);
-    J[11].set(S.spine.x, S.spine.y + bob, S.spine.z);
-    for (let i = 0; i < 2; i++) {
-      const side: -1 | 1 = i === 0 ? 1 : -1;
-      const target = breathWristTarget(action, side, k, this.swingSide, _wrist);
-      const arm = breathArm(side, target, _arm);
-      J[6 + i].set(arm.elbow.x, arm.elbow.y + bob, arm.elbow.z);
-      J[8 + i].set(arm.wrist.x, arm.wrist.y + bob, arm.wrist.z);
-    }
-    // The head lifts about the neck; the upper body leans about the waist.
-    const neckY = J[2].y + 1.1;
-    _q.setFromAxisAngle(_x, -look.lift);
-    for (let h = 0; h < HEAD_JOINTS.length; h++) {
-      const i = HEAD_JOINTS[h];
-      _a.set(J[i].x, J[i].y - neckY, J[i].z).applyQuaternion(_q);
-      J[i].set(_a.x, _a.y + neckY, _a.z);
-    }
-    const hipY = J[1].y;
-    const cl = Math.cos(look.lean);
-    const sl = Math.sin(look.lean);
-    for (let i = 2; i < BREATH_RIG_JOINTS; i++) {
-      const y = J[i].y - hipY;
-      const z = J[i].z;
-      J[i].y = hipY + y * cl - z * sl;
-      J[i].z = y * sl + z * cl;
-    }
-  }
+  // ---- the living wind ---------------------------------------------------------------------
 
-  /** One piece on its joint, or (torn) out on its orbit round the core. */
-  private posePiece(p: PieceView, look: BreathBodyLook, t: number): void {
-    const def = p.def;
-    const J = this.joints;
-    const side = def.side;
-    const mx = side < 0 ? -1 : 1;
-    const jit = look.jitter * 0.09;
-    _q2.setFromAxisAngle(_x, look.lean);
-    switch (def.joint) {
-      case 'upper':
-      case 'fore':
-      case 'hand': {
-        const i = side < 0 ? 1 : 0;
-        const root = J[4 + i];
-        const elbow = J[6 + i];
-        const wrist = J[8 + i];
-        if (def.joint === 'hand') {
-          _a.subVectors(wrist, elbow).normalize();
-          p.pos.copy(wrist).addScaledVector(_a, def.size.y * 0.42);
-          p.quat.setFromUnitVectors(_up, _a);
-        } else {
-          const from = def.joint === 'upper' ? root : elbow;
-          const to = def.joint === 'upper' ? elbow : wrist;
-          _a.subVectors(to, from);
-          const len = _a.length() || 1;
-          _a.divideScalar(len);
-          p.pos.copy(from).addScaledVector(_a, len * 0.5);
-          p.quat.setFromUnitVectors(_up, _a);
-        }
-        break;
-      }
-      case 'whirl': {
-        whirlSlot(p.orbit, t, _slot);
-        p.pos.set(_slot.x, _slot.y, _slot.z);
-        p.quat.setFromEuler(_e.set(t * 1.7 + p.orbit, t * 1.1 + p.orbit * 2, 0.4));
-        break;
-      }
-      default: {
-        const j =
-          def.joint === 'waist'
-            ? J[1]
-            : def.joint === 'chest' || def.joint === 'heart'
-              ? J[2]
-              : def.joint === 'head' || def.joint === 'horn'
-                ? J[3]
-                : def.joint === 'mouth'
-                  ? J[10]
-                  : def.joint === 'spine'
-                    ? J[11]
-                    : def.joint === 'shoulder'
-                      ? side < 0
-                        ? J[5]
-                        : J[4]
-                      : J[2];
-        const slot = BREATH_SLOTS[def.joint as keyof typeof BREATH_SLOTS];
-        // A piece's offset off its joint (side joints are its slot's own x).
-        let ox = def.at.x * mx;
-        let oy = def.at.y;
-        let oz = def.at.z;
-        if (def.joint === 'lung') {
-          // The bellows swell out and fall in with the breath.
-          ox = mx * (slot.x + 0.45 * (look.swell - 0.5));
-          oz = slot.z;
-        } else if (def.joint === 'heart') {
-          oy = slot.y - BREATH_SLOTS.chest.y;
-          oz = slot.z + 0.15 * (look.swell - 0.5);
-        } else if (def.joint === 'horn') {
-          ox = mx * slot.x;
-          oy = slot.y - BREATH_SLOTS.head.y;
-          oz = slot.z - BREATH_SLOTS.head.z;
-        } else if (def.joint === 'wing') {
-          ox = mx * (slot.x + def.at.x);
-          oy = slot.y - BREATH_SLOTS.chest.y + def.at.y;
-          oz = slot.z + def.at.z;
-        } else if (def.joint === 'shoulder') {
-          ox = 0;
-        }
-        _a.set(ox, oy, oz);
-        if (def.joint === 'head' || def.joint === 'horn' || def.joint === 'mouth') {
-          _q.setFromAxisAngle(_x, -look.lift);
-          _a.applyQuaternion(_q);
-          p.quat.copy(_q2).multiply(_q);
-        } else if (def.joint === 'waist') {
-          p.quat.identity();
-        } else {
-          _a.applyQuaternion(_q2);
-          p.quat.copy(_q2);
-        }
-        p.pos.copy(j).add(_a);
-        if (def.joint === 'lung') {
-          // The plate tips out with the swell.
-          _q.setFromEuler(_e.set(0, 0, mx * -0.22 * (look.swell - 0.5)));
-          p.quat.multiply(_q);
-        } else if (def.joint === 'wing') {
-          // The wings fan out with the spread, sweep back as they fold.
-          _q.setFromEuler(_e.set(0.25 * (look.spread - 0.5), 0, mx * -0.55 * (look.spread - 0.5)));
-          p.quat.multiply(_q);
-        }
-      }
-    }
-    if (jit > 0) {
-      p.pos.x += (breathBodyHash(p.index, Math.floor(t * 40)) - 0.5) * jit;
-      p.pos.y += (breathBodyHash(p.index + 50, Math.floor(t * 40)) - 0.5) * jit;
-      p.pos.z += (breathBodyHash(p.index + 90, Math.floor(t * 40)) - 0.5) * jit;
-    }
-    // Torn: out toward the piece's orbit round the storm core.
-    if (look.tear > 0) {
-      stormShardSlot(p.index, t, _slot);
-      const k = look.tear;
-      p.pos.set(
-        p.pos.x + (_slot.x - p.pos.x) * k,
-        p.pos.y + (_slot.y - p.pos.y) * k,
-        p.pos.z + (_slot.z - p.pos.z) * k,
-      );
-      _q.setFromEuler(_e.set(t * 0.7 + p.index, t * 0.5 + p.index * 1.7, t * 0.3));
-      p.quat.slerp(_q, k);
-    }
-    p.holder.position.copy(p.pos);
-    p.holder.quaternion.copy(p.quat);
-    // A torn shard shrinks a little (the core is what reads now).
-    const s = 1 - 0.25 * look.tear;
-    p.holder.scale.setScalar(def.joint === 'chest' ? s * (1 + 0.06 * (look.swell - 0.5)) : s);
-  }
-
-  /** The threads between the joints at `alpha` of their light. */
-  private poseThreads(alpha: number, look: BreathBodyLook): void {
-    const J = this.joints;
-    const w = 0.13 * (1 + look.mouth * 0.4) * Math.max(0, alpha);
-    let n = 0;
-    for (let t = 0; t < BREATH_THREAD_PAIRS.length; t++) {
-      const i = BREATH_THREAD_PAIRS[t][0];
-      const j = BREATH_THREAD_PAIRS[t][1];
-      _a.copy(J[i]);
-      _b.subVectors(J[j], J[i]);
-      const len = _b.length();
-      if (len < 1e-4 || w <= 0) {
-        this.threads.setMatrixAt(n++, _m.makeScale(0, 0, 0));
-        continue;
-      }
-      _q.setFromUnitVectors(_up, _b.divideScalar(len));
-      _s.set(w, len, w);
-      this.threads.setMatrixAt(n++, _m.compose(_a, _q, _s));
-    }
-    for (; n < BREATH_BODY_POOLS.threads; n++) this.threads.setMatrixAt(n, _m.makeScale(0, 0, 0));
-    this.threads.instanceMatrix.needsUpdate = true;
-  }
-
-  /** The storm core: its figure fading in as the shell tears, the arcs. */
-  private poseCore(look: BreathBodyLook, dt: number): void {
-    const a = Math.max(0, Math.min(1, (look.tear - 0.15) / 0.6));
-    this.core.visible = a > 0.01;
-    if (!this.core.visible) return;
-    this.coreMat.uniforms.uAlpha.value = a * (0.85 + 0.15 * Math.min(1, look.glow / 2));
-    this.wingMat.uniforms.uAlpha.value = a * 0.95;
-    this.heartGlowMat.opacity = a * (0.75 + 0.25 * Math.sin(this.clock * 9));
-    const pulse = 1 + 0.06 * Math.sin(this.clock * 5.3);
-    this.core.scale.set(1, pulse, 1);
-    this.arcTimer -= dt;
-    if (this.arcTimer <= 0) {
-      this.arcTimer = 1 / STORM_CORE.arcRate;
-      this.relayArcs(look);
-    }
-    this.arcMat.uniforms.uAlpha.value = a * (0.6 + 0.4 * this.rand());
-  }
-
-  /** Each arc leaps anew: from a point on the core to a torn shard. */
-  private relayArcs(look: BreathBodyLook): void {
-    const pos = this.arcGeo.getAttribute('position') as THREE.BufferAttribute;
-    const C = STORM_CORE;
-    const n = this.pieces.length;
-    for (let a = 0; a < C.arcs; a++) {
-      const target = n > 0 ? this.pieces[Math.floor(this.rand() * n)].pos : null;
-      _a.set(
-        (this.rand() - 0.5) * C.torso.rx * 1.4,
-        C.torso.y + (this.rand() - 0.5) * C.torso.ry * 1.4,
-        (this.rand() - 0.5) * C.torso.rz,
-      );
-      if (target && look.tear > 0.5) _b.copy(target);
-      else
-        _b.set(
-          (this.rand() - 0.5) * 6,
-          C.torso.y + (this.rand() - 0.3) * 5,
-          (this.rand() - 0.5) * 6,
-        );
-      const width = 0.08 + this.rand() * 0.06;
-      for (let pass = 0; pass < 2; pass++) {
-        const base = (a * 2 + pass) * ARC_POINTS * 2;
-        for (let i = 0; i < ARC_POINTS; i++) {
-          const t = i / (ARC_POINTS - 1);
-          const j = i === 0 || i === ARC_POINTS - 1 ? 0 : 0.55;
-          _c.set(
-            _a.x + (_b.x - _a.x) * t + (this.rand() - 0.5) * j,
-            _a.y + (_b.y - _a.y) * t + (this.rand() - 0.5) * j,
-            _a.z + (_b.z - _a.z) * t + (this.rand() - 0.5) * j,
-          );
-          const ox = pass === 0 ? width : 0;
-          const oy = pass === 0 ? 0 : width;
-          pos.setXYZ(base + i * 2, _c.x - ox, _c.y - oy, _c.z);
-          pos.setXYZ(base + i * 2 + 1, _c.x + ox, _c.y + oy, _c.z);
-        }
-      }
-    }
-    pos.needsUpdate = true;
-  }
-
-  /** The seams', crystals' and threads' light. */
-  private glow(look: BreathBodyLook, storm: boolean): void {
-    const white = storm ? 0.7 : Math.min(1, Math.max(0, (look.glow - 2.2) / 2.2));
-    this.glowColor
-      .setHex(BREATH_BODY_COLORS.thread)
-      .lerp(this.stormColor, white)
-      .multiplyScalar(Math.min(2.4, look.glow));
-    (this.seamMat.uniforms.uColor.value as THREE.Color).copy(this.glowColor);
-    this.glowColor
-      .setHex(BREATH_BODY_COLORS.glow)
-      .lerp(this.stormColor, white)
-      .multiplyScalar(Math.min(3, look.glow * 1.5));
-    (this.crystalMat.uniforms.uColor.value as THREE.Color).copy(this.glowColor);
-    this.haloMat.opacity = Math.min(0.75, 0.15 + look.glow * 0.16);
-    this.emberMat.opacity = Math.min(0.9, 0.3 + look.glow * 0.2);
-    this.threadColor
-      .setHex(BREATH_BODY_COLORS.thread)
-      .lerp(this.stormColor, white)
-      .multiplyScalar(1 + look.glow * 0.4);
-    // Uploaded only when it changed past the eye's step (it holds through a
-    // calm, a phase, the storm).
-    const tc = this.threadColor;
-    const shown = this.threadShown;
-    if (
-      !(Math.abs(tc.r - shown.r) < THREAD_COLOR_EPS) ||
-      !(Math.abs(tc.g - shown.g) < THREAD_COLOR_EPS) ||
-      !(Math.abs(tc.b - shown.b) < THREAD_COLOR_EPS)
-    ) {
-      shown.copy(tc);
-      for (let i = 0; i < BREATH_BODY_POOLS.threads; i++) this.threads.setColorAt(i, tc);
-      if (this.threads.instanceColor) this.threads.instanceColor.needsUpdate = true;
-    }
-  }
-
-  /** The breath pouring off its lips, the wind drawn into it, the storm's
-   *  sparks (cosmetic, thinned low). */
-  private cosmetics(
-    e: Entity,
-    action: BreathBodyAction,
-    k: number,
-    look: BreathBodyLook,
-    dt: number,
+  /** Wind every current round its path: `alpha` its density, `radius` a share
+   *  of its rest winding, `spin` its speed, `fling` (death) thrown out. */
+  private currents(
+    alpha: number,
+    radius: number,
+    spin: number,
+    fling: number,
+    shiver: number,
   ): void {
-    const eAt = fxAnchor(e);
-    const mouth = this.joints[10];
-    const sinY = Math.sin(this.yaw);
-    const cosY = Math.cos(this.yaw);
-    const mxW = eAt.x + mouth.x * cosY + mouth.z * sinY;
-    const mzW = eAt.z - mouth.x * sinY + mouth.z * cosY;
-    const myW = eAt.y + mouth.y;
-    if (look.mouth > 0 && this.rand() < dt * 22 * look.mouth * this.density) {
-      // Breath pouring out of the horn's bell, along its yaw.
-      this.particles.puff(mxW + sinY * 1.2, myW, mzW + cosY * 1.2, 2, {
-        speed: 14 + look.mouth * 8,
-        life: 0.8,
-        size: [0.6, 2.4],
-        color: BREATH_BODY_COLORS.wind,
-        alpha: 0.4,
-        dir: [sinY, -0.08, cosY],
-        spread: 0.18,
-        drag: 0.7,
-      });
+    if (alpha <= 0.01) {
+      this.wind.commit(0);
+      this.volume.commit(0);
+      return;
     }
-    if (
-      (action === 'inhale' || action === 'gather' || action === 'break') &&
-      this.rand() < dt * 30 * (0.3 + k) * this.density
-    ) {
-      // The air drawn into the horn from all round.
-      const a = this.rand() * Math.PI * 2;
-      const r = 4 + this.rand() * 5;
-      this.particles.puff(
-        mxW + Math.sin(a) * r,
-        myW + (this.rand() - 0.5) * 3,
-        mzW + Math.cos(a) * r,
-        1,
-        {
-          speed: 9,
-          life: 0.55,
-          size: [0.7, 0.15],
-          color: BREATH_BODY_COLORS.wind,
-          alpha: 0.35,
-          dir: [-Math.sin(a), 0, -Math.cos(a)],
-          spread: 0.1,
-        },
+    let r = 0;
+    let pi = 0;
+    let pu = 0;
+    const t = this.clock;
+    for (let ci = 0; ci < BREATH_CURRENTS.length; ci++) {
+      const cur = BREATH_CURRENTS[ci];
+      const path = PATHS[ci];
+      // The path's points (and the tail's curl over the floor).
+      let n = 0;
+      for (const si of path) {
+        const p = this.sock[si];
+        _pts[n * 3] = p.x;
+        _pts[n * 3 + 1] = p.y;
+        _pts[n * 3 + 2] = p.z;
+        n++;
+      }
+      if (cur.tailCurl) {
+        const tip = this.sock[S_TIP];
+        const floor = this.groundY(tip.x, tip.z) + 0.35;
+        const a0 = t * 0.9;
+        for (let k = 1; k <= BREATH_TAIL_CURL.points; k++) {
+          const a = a0 + k * 1.7;
+          const rr = BREATH_TAIL_CURL.reach * U * (0.6 + 0.5 * k) * radius * fling;
+          _pts[n * 3] = tip.x + Math.cos(a) * rr;
+          _pts[n * 3 + 1] = Math.max(floor, tip.y - BREATH_TAIL_CURL.drop * U * k);
+          _pts[n * 3 + 2] = tip.z + Math.sin(a) * rr;
+          n++;
+        }
+      }
+      for (let k = 0; k < cur.ribbons; k++, r++) {
+        // The low tier's dropped strands are skipped, the kept packed in front
+        // (only those upload and draw).
+        if (!breathRibbonKept(cur, k, this.low)) {
+          r--;
+          continue;
+        }
+        this.ribbon(r, cur, k, n, alpha, radius, spin, fling, shiver);
+      }
+      // The billows of its body along this current (the low tier every other).
+      const puffs = cur.puffs ?? 0;
+      for (let j = 0; j < puffs; j++, pi++) {
+        if (!breathPuffKept(j, this.low)) continue;
+        const u = (j + 0.5) / puffs;
+        splineAt(_pts, n, u, _sp);
+        const seed = breathBodyHash(pi, 13);
+        const a = seed * Math.PI * 2 + t * cur.spin * spin * 1.2;
+        const out = profileAt(cur.radius, u) * U * radius * fling * 0.3;
+        const size =
+          profileAt(cur.puffSize ?? cur.radius, u) *
+          U *
+          (this.low ? BREATH_PUFF_LOW_SIZE : 1) *
+          (0.75 + 0.25 * radius) *
+          fling *
+          (1 + 0.1 * Math.sin(t * (0.6 + seed) + pi));
+        this.volume.set(
+          pu++,
+          _sp[0] + Math.cos(a) * out,
+          _sp[1] + Math.sin(a * 0.7) * out * 0.5,
+          _sp[2] + Math.sin(a) * out,
+          size,
+          (0.92 + 0.08 * seed) * alpha,
+          seed,
+        );
+      }
+    }
+    this.wind.commit(r);
+    this.volume.commit(pu);
+  }
+
+  private ribbon(
+    r: number,
+    cur: BreathCurrent,
+    k: number,
+    n: number,
+    alpha: number,
+    radius: number,
+    spin: number,
+    fling: number,
+    shiver: number,
+  ): void {
+    const t = this.clock;
+    const seed = breathBodyHash(r, 7);
+    const phase0 = (k / cur.ribbons) * Math.PI * 2 + seed * 1.3;
+    const turn = cur.turns * Math.PI * 2;
+    const sp = cur.spin * spin * Math.PI * 2;
+    // Each strand breathes its own width and reach.
+    const breathe = 1 + 0.18 * Math.sin(t * (0.7 + seed) + r);
+    const shake = Math.floor(t * 30);
+    for (let i = 0; i <= SEG; i++) {
+      const u = i / SEG;
+      splineAt(_pts, n, u, _sp);
+      _t.set(_sp[3], _sp[4], _sp[5]);
+      if (_t.lengthSq() < 1e-8) _t.set(0, -1, 0);
+      _t.normalize();
+      // A frame round the path (the reference up, or sideways where it runs
+      // straight up and down).
+      const ref = Math.abs(_t.y) > 0.92 ? _side : _up;
+      _n.crossVectors(_t, ref).normalize();
+      _bi.crossVectors(_t, _n).normalize();
+      const th = phase0 + u * turn + t * sp;
+      const jitter = shiver > 0 ? (breathBodyHash(shake + i, r) - 0.5) * 0.18 * shiver : 0;
+      const rr = profileAt(cur.radius, u) * U * radius * fling * breathe * (1 + jitter);
+      const cs = Math.cos(th);
+      const sn = Math.sin(th);
+      _ring[i * 3] = _sp[0] + (_n.x * cs + _bi.x * sn) * rr;
+      _ring[i * 3 + 1] = _sp[1] + (_n.y * cs + _bi.y * sn) * rr;
+      _ring[i * 3 + 2] = _sp[2] + (_n.z * cs + _bi.z * sn) * rr;
+    }
+    let along = seed * 7;
+    for (let i = 0; i <= SEG; i++) {
+      const i0 = Math.max(0, i - 1);
+      const i1 = Math.min(SEG, i + 1);
+      const tx = _ring[i1 * 3] - _ring[i0 * 3];
+      const ty = _ring[i1 * 3 + 1] - _ring[i0 * 3 + 1];
+      const tz = _ring[i1 * 3 + 2] - _ring[i0 * 3 + 2];
+      if (i > 0)
+        along += Math.hypot(
+          _ring[i * 3] - _ring[i0 * 3],
+          _ring[i * 3 + 1] - _ring[i0 * 3 + 1],
+          _ring[i * 3 + 2] - _ring[i0 * 3 + 2],
+        );
+      const u = i / SEG;
+      const fade = ribbonFade(u);
+      const w = cur.width * U * (0.55 + 0.45 * fade) * breathe;
+      this.wind.point(
+        r,
+        i,
+        _ring[i * 3],
+        _ring[i * 3 + 1],
+        _ring[i * 3 + 2],
+        tx,
+        ty,
+        tz,
+        w,
+        Math.min(0.95, cur.alpha * 1.25) * fade * alpha,
+        along / U,
+        cur.soft ? seed + 2 : seed,
       );
     }
-    if ((look.tear > 0.2 || look.jitter > 0) && this.rand() < dt * 30 * this.density) {
-      // Sparks off the core and the trembling seams.
-      const y = eAt.y + 2 + this.rand() * 4;
-      this.particles.puff(eAt.x + (this.rand() - 0.5) * 3, y, eAt.z + (this.rand() - 0.5) * 3, 2, {
-        speed: 5,
-        life: 0.3,
-        size: [0.32, 0.06],
-        color: BREATH_BODY_COLORS.spark,
+  }
+
+  /** The eyes, the spiral, the mouth, the inner glow and the crystals' glints
+   *  (`k` 1 alive, falling to 0 in death). */
+  private lights(glow: number, k: number): void {
+    const shown = k > 0.02;
+    const flick = 0.9 + 0.1 * Math.sin(this.clock * 13.7) * Math.sin(this.clock * 5.3);
+    const st = this.storm;
+    for (let i = 0; i < 2; i++) {
+      const p = this.sock[i === 0 ? S_EYE_L : S_EYE_R];
+      this.eyes[i].position.copy(p);
+      const s = U * (0.55 + 0.12 * glow);
+      this.eyes[i].scale.set(s, s, 1);
+      this.eyes[i].visible = shown;
+    }
+    this.eyeMat.opacity = Math.min(1, 0.75 * k * flick * (0.8 + 0.2 * glow));
+    // The spiral in its chest: a steady cyan light; through the storm a
+    // crackling white heart.
+    const h = this.sock[S_HEART];
+    this.heart.position.copy(h);
+    const crackle = st > 0.5 ? 0.75 + 0.5 * breathBodyHash(Math.floor(this.clock * 24), 3) : 1;
+    const hs = U * (1.1 + 0.25 * Math.sin(this.clock * 2.2) + 0.25 * glow) * (1 + 0.35 * st);
+    this.heart.scale.set(hs, hs, 1);
+    this.heartMat.color.setHex(st > 0.5 ? C.lightning : C.heart);
+    this.heartMat.opacity = Math.min(0.85, 0.42 * k * glow * crackle);
+    this.heart.visible = shown;
+    const m = this.sock[S_MOUTH];
+    this.mouth.position.copy(m);
+    const ms = U * (0.6 + 0.35 * Math.max(0, glow - 1));
+    this.mouth.scale.set(ms, ms, 1);
+    this.mouthMat.opacity = Math.min(0.7, 0.18 * k * glow);
+    this.mouth.visible = shown;
+    // The light inside the wind: soft and wide, never a sun.
+    for (let i = 0; i < GLOW_AT.length; i++) {
+      const p = this.sock[GLOW_AT[i]];
+      const g = this.glows[i];
+      g.position.copy(p);
+      const s = U * (i === 0 ? 3.4 : 1.8) * (1 + 0.15 * Math.sin(this.clock * 1.3 + i));
+      g.scale.set(s, s, 1);
+      g.visible = shown && (i === 0 || this.density >= 1);
+    }
+    this.glowMat.color.setHex(st > 0.5 ? C.lightningEdge : C.heart);
+    this.glowMat.opacity = Math.min(0.24, 0.1 * k * glow * (1 + st));
+    for (let i = 0; i < CRYSTALS.length; i++) {
+      const p = this.sock[CRYSTALS[i]];
+      const g = this.glints[i];
+      g.position.copy(p);
+      const s = U * (0.75 + 0.2 * Math.sin(this.clock * 2.9 + i * 1.7));
+      g.scale.set(s, s, 1);
+      g.visible = shown;
+    }
+    this.glintMat.opacity = Math.min(0.6, 0.3 * k * glow);
+  }
+
+  /** Clouds off the tail, mist, crystal dust; streams drawn into the mouth
+   *  while it draws breath (cosmetic, thinned on the low tier). */
+  private cosmetics(dt: number, drawIn: number, shiver: number, k: number): void {
+    const d = this.density;
+    const st = this.storm;
+    // The cloud of its tail: soft billows peeling off the plates.
+    if (this.rand() < dt * 5 * d * k) {
+      const p = this.sock[TAIL[2 + Math.floor(this.rand() * (TAIL.length - 2))]];
+      CLOUD.color = st > 0.5 ? C.stormCloud : C.cloud;
+      CLOUD.alpha = st > 0.5 ? 0.3 : 0.14;
+      this.particles.puff(p.x, p.y, p.z, 1, CLOUD);
+    }
+    if (this.rand() < dt * (st > 0.5 ? 5 : 1.5) * d * k) {
+      const p = this.sock[S_CORE];
+      MIST.color = st > 0.5 ? C.stormCloud : C.wind;
+      MIST.alpha = st > 0.5 ? 0.22 : 0.06;
+      // The low tier keeps the storm's billows smaller (cosmetic fill).
+      const big = d >= 1 && st > 0.5;
+      MIST.size[0] = d < 1 ? 5 : big ? 10 : 7;
+      MIST.size[1] = d < 1 ? 9 : big ? 16 : 12;
+      this.particles.puff(p.x, p.y, p.z, 1, MIST);
+    }
+    // Glittering crystal dust round the body.
+    if (this.rand() < dt * 30 * d * k) {
+      const p = this.sock[Math.floor(this.rand() * this.sock.length)];
+      DUST.color = st > 0.5 ? C.spark : C.dust;
+      this.particles.puff(p.x, p.y, p.z, 1, DUST);
+    }
+    if (drawIn > 0.02) {
+      const m = this.sock[S_MOUTH];
+      this.drawInto(m, U * (3.5 + 2.5 * drawIn), dt * 50 * drawIn * d, DRAW_IN);
+      this.drawInto(m, U * (4 + 3 * drawIn), dt * 14 * drawIn * d, DRAW_MIST);
+    }
+    if (shiver > 0.5 && this.rand() < dt * 30 * shiver * d) {
+      // The freeze's crackle: sparks off the pieces.
+      const p = this.sock[Math.floor(this.rand() * this.sock.length)];
+      this.particles.puff(p.x, p.y, p.z, 3, CRACKLE);
+    }
+  }
+
+  /** Streams of `o` drawn into `p` from a shell `r` yards out. */
+  private drawInto(p: THREE.Vector3, r: number, rate: number, o: typeof DRAW_IN): void {
+    let n = rate;
+    while (n > 0) {
+      if (n < 1 && this.rand() > n) break;
+      n -= 1;
+      _a.set(this.rand() - 0.5, (this.rand() - 0.5) * 0.7, this.rand() - 0.5)
+        .normalize()
+        .multiplyScalar(r);
+      _dir[0] = -_a.x / r;
+      _dir[1] = -_a.y / r;
+      _dir[2] = -_a.z / r;
+      o.speed = r / o.life;
+      this.particles.puff(p.x + _a.x, p.y + _a.y, p.z + _a.z, 1, o);
+    }
+  }
+
+  /** The casts: the storm gathered in the raised hand while the bar fills;
+   *  the channels: a vortex rising off both hands. */
+  private castFx(e: Entity, dt: number): void {
+    const c = e.castingAbility;
+    const fill = e.castTotal > 0 ? Math.max(0, Math.min(1, 1 - e.castRemaining / e.castTotal)) : 0;
+    const casting = c !== null && BOLT_CASTS.has(c);
+    const l = this.sock[S_CLAW_L];
+    if (casting) {
+      this.hand.position.copy(l);
+      const s = U * (0.8 + 1.4 * fill);
+      this.hand.scale.set(s, s, 1);
+      this.handMat.opacity = 0.2 + 0.4 * fill;
+      this.hand.visible = true;
+      this.drawInto(l, U * (1.6 + 1.2 * fill), dt * (20 + 50 * fill) * this.density, DRAW_IN);
+      if (this.storm > 0.5 && this.rand() < dt * 18) this.spawnArc(S_CLAW_L, S_HAND_L, 0.6);
+    } else {
+      this.hand.visible = false;
+      this.handMat.opacity = 0;
+    }
+    if (_act.action === 'channel') {
+      RISE.color = this.storm > 0.5 ? C.stormEdge : C.windEdge;
+      for (const si of CLAWS) {
+        const p = this.sock[si];
+        if (this.rand() < dt * 30 * this.density) {
+          const a = this.rand() * Math.PI * 2;
+          this.particles.puff(p.x + Math.cos(a) * U, p.y, p.z + Math.sin(a) * U, 1, RISE);
+        }
+      }
+      if (this.storm > 0.5 && this.rand() < dt * 10) this.spawnArc(S_CLAW_L, S_CLAW_R, 1);
+    }
+  }
+
+  /** A bolt bar ended on its beat: the bolt leaves the pointing hand. */
+  private castEnded(e: Entity, fill: number): void {
+    const c = e.castingAbility;
+    const prev = this.lastCast;
+    if (prev !== null && prev !== c && this.lastFill > 0.85 && BOLT_CASTS.has(prev)) {
+      const p = this.sock[S_CLAW_R];
+      this.flashAt(p.x, p.y, p.z, BREATH_BURST.flashSize * 0.8, BREATH_BURST.flashLife);
+      this.particles.puff(p.x, p.y, p.z, 26, {
+        speed: 14,
+        life: 0.45,
+        size: [0.4, 0.06],
+        color: C.spark,
         alpha: 1,
         pool: 'glow',
+        floor: -1e6,
       });
+      // A bolt torn out of the pointing claws, forward and down.
+      const cb = this.castBolt;
+      cb.live = true;
+      cb.born = this.clock;
+      cb.seed = Math.floor(this.rand() * 1e6);
+      cb.x = p.x + Math.sin(e.facing) * 9 * U;
+      cb.y = p.y - 3 * U;
+      cb.z = p.z + Math.cos(e.facing) * 9 * U;
+    }
+    this.lastCast = c;
+    this.lastFill = c ? fill : 0;
+  }
+
+  // ---- the storm --------------------------------------------------------------------------
+
+  /** The storm breaks open: a short flash at the heart, a ring, a burst of
+   *  lightning to every piece, the cloud flung out (once per tear). */
+  private tear(): void {
+    if (this.entityId < 0 || this.clock - this.tearAt < 3) return;
+    this.tearAt = this.clock;
+    const h = this.sock[S_HEART];
+    this.flashAt(h.x, h.y, h.z, BREATH_BURST.flashSize * 1.8, BREATH_BURST.flashLife * 2);
+    this.flash = 1;
+    for (let i = 0; i < this.arcCount; i++) {
+      const pair = BREATH_ARC_PAIRS[(i * 3) % BREATH_ARC_PAIRS.length];
+      this.spawnArc(breathSocketIndex(pair[0]), breathSocketIndex(pair[1]), 1.6);
+    }
+    this.particles.puff(h.x, h.y, h.z, 40, {
+      speed: 12,
+      life: 1.6,
+      size: [3, 8],
+      color: C.stormCloud,
+      alpha: 0.45,
+      drag: 1,
+      radius: 2,
+      floor: -1e6,
+    });
+    this.particles.puff(h.x, h.y, h.z, 60, {
+      speed: 22,
+      life: 0.8,
+      size: [0.45, 0.06],
+      color: C.spark,
+      alpha: 1,
+      pool: 'glow',
+      floor: -1e6,
+    });
+    const g = this.groundY(h.x, h.z);
+    this.particles.shockRing(h.x, h.z, C.ring, 22, 1.1, BREATH_BURST.ring);
+    this.particles.puff(h.x, g + 0.4, h.z, 40, {
+      speed: 16,
+      life: 1.2,
+      size: [2, 5],
+      color: C.grit,
+      alpha: 0.35,
+      drag: 1.4,
+      radius: 3,
+    });
+    this.send(BREATH_BODY_GESTURES.flare);
+    this.shakeNear(h.x, h.z, 0.7);
+  }
+
+  /** Phase 2: lightning arcing piece to piece, its flash lighting the cloud. */
+  private stormFx(dt: number): void {
+    if (this.storm > 0.5) {
+      this.arcTimer -= dt * BREATH_ARCS.rate * (this.low ? 0.5 : 1) * this.storm;
+      while (this.arcTimer <= 0) {
+        this.arcTimer += 1;
+        const pair = BREATH_ARC_PAIRS[Math.floor(this.rand() * BREATH_ARC_PAIRS.length)];
+        this.spawnArc(breathSocketIndex(pair[0]), breathSocketIndex(pair[1]), 1);
+        if (this.rand() < 0.25) this.flash = Math.max(this.flash, 0.6);
+      }
+    }
+    this.drawArcs();
+  }
+
+  private spawnArc(a: number, b: number, width: number): void {
+    let slot = this.arcs[0];
+    for (let i = 0; i < this.arcCount; i++) {
+      const s = this.arcs[i];
+      if (s.born + s.life < slot.born + slot.life) slot = s;
+    }
+    slot.born = this.clock;
+    slot.life = BREATH_ARCS.life * (0.7 + 0.6 * this.rand());
+    slot.a = a;
+    slot.b = b;
+    slot.seed = Math.floor(this.rand() * 1e6);
+    slot.width = width;
+  }
+
+  private boltStrip(r: number, width: number, alpha: number, seed: number): void {
+    for (let i = 0; i <= ARC_SEG; i++) {
+      const i0 = Math.max(0, i - 1);
+      const i1 = Math.min(ARC_SEG, i + 1);
+      const u = i / ARC_SEG;
+      const taper = 0.35 + 0.65 * Math.sin(Math.PI * Math.min(1, 0.1 + u * 0.9));
+      this.bolts.point(
+        r,
+        i,
+        _arc[i * 3],
+        _arc[i * 3 + 1],
+        _arc[i * 3 + 2],
+        _arc[i1 * 3] - _arc[i0 * 3],
+        _arc[i1 * 3 + 1] - _arc[i0 * 3 + 1],
+        _arc[i1 * 3 + 2] - _arc[i0 * 3 + 2],
+        width * taper,
+        alpha,
+        u,
+        (seed % 997) / 997,
+      );
     }
   }
 
-  /** The tear: the shell bursts out, a flash of white, a shake. */
-  private tearBurst(e: Entity): void {
-    const eAt = fxAnchor(e);
-    const y = eAt.y + 4;
-    this.particles.puff(eAt.x, y, eAt.z, 36, {
+  private drawArcs(): void {
+    let used = 0;
+    for (let i = 0; i < BREATH_ARCS.pool; i++) {
+      const s = this.arcs[i];
+      const age = this.clock - s.born;
+      if (i >= this.arcCount || age < 0 || age > s.life) {
+        this.bolts.clear(i);
+        continue;
+      }
+      const pa = this.sock[s.a];
+      const pb = this.sock[s.b];
+      // Re-struck through its life: the bolt flickers to new shapes.
+      const seed = s.seed + Math.floor(age * 30);
+      arcPath(seed, pa.x, pa.y, pa.z, pb.x, pb.y, pb.z, ARC_SEG, 0.22, _arc);
+      const k = 1 - age / s.life;
+      this.boltStrip(i, 0.45 * U * s.width, Math.min(1, k * 1.6), seed);
+      used = i + 1;
+    }
+    const cb = this.castBolt;
+    const spare = BREATH_ARCS.pool;
+    if (cb.live) {
+      const age = this.clock - cb.born;
+      if (age > 0.35) {
+        cb.live = false;
+        this.bolts.clear(spare);
+      } else {
+        const p = this.sock[S_CLAW_R];
+        arcPath(
+          cb.seed + Math.floor(age * 30),
+          p.x,
+          p.y,
+          p.z,
+          cb.x,
+          cb.y,
+          cb.z,
+          ARC_SEG,
+          0.14,
+          _arc,
+        );
+        this.boltStrip(spare, 0.3 * U, 1 - age / 0.35, cb.seed);
+        used = spare + 1;
+      }
+    } else this.bolts.clear(spare);
+    this.bolts.commit(used);
+  }
+
+  // ---- the claws' slashes and the swipe's gust ----------------------------------------------
+
+  private trackClaws(dt: number): void {
+    const h = this.trailHead;
+    for (let c = 0; c < 2; c++) {
+      const p = this.sock[c === 0 ? S_CLAW_L : S_CLAW_R];
+      const o = (c * TRAIL + h) * 3;
+      if (this.trailFill > 0 && dt > 0) {
+        const prev = (c * TRAIL + ((h + TRAIL - 1) % TRAIL)) * 3;
+        const v =
+          Math.hypot(
+            p.x - this.trail[prev],
+            p.y - this.trail[prev + 1],
+            p.z - this.trail[prev + 2],
+          ) / dt;
+        this.clawSpeed[c] += (v - this.clawSpeed[c]) * Math.min(1, dt * 12);
+      }
+      this.trail[o] = p.x;
+      this.trail[o + 1] = p.y;
+      this.trail[o + 2] = p.z;
+    }
+    this.trailHead = (h + 1) % TRAIL;
+    this.trailFill = Math.min(TRAIL, this.trailFill + 1);
+  }
+
+  /** A slash of wind behind each claw that moves fast (a swipe, the roar's
+   *  fling, the cast's thrust). */
+  private slashFx(): void {
+    if (this.trailFill < TRAIL) {
+      this.slashes.commit(0);
+      return;
+    }
+    let used = 0;
+    for (let c = 0; c < 2; c++) {
+      const k = Math.max(0, Math.min(1, (this.clawSpeed[c] / U - 9) / 14));
+      if (k <= 0.02) {
+        this.slashes.clear(c);
+        continue;
+      }
+      for (let i = 0; i < TRAIL; i++) {
+        // Oldest first.
+        const j = (this.trailHead + i) % TRAIL;
+        const o = (c * TRAIL + j) * 3;
+        const on = (c * TRAIL + ((this.trailHead + Math.min(TRAIL - 1, i + 1)) % TRAIL)) * 3;
+        const op = (c * TRAIL + ((this.trailHead + Math.max(0, i - 1)) % TRAIL)) * 3;
+        const u = i / (TRAIL - 1);
+        this.slashes.point(
+          c,
+          i,
+          this.trail[o],
+          this.trail[o + 1],
+          this.trail[o + 2],
+          this.trail[on] - this.trail[op],
+          this.trail[on + 1] - this.trail[op + 1],
+          this.trail[on + 2] - this.trail[op + 2],
+          U * (0.25 + 0.75 * u) * 0.9,
+          k * u * 0.55,
+          u,
+          c * 0.37,
+        );
+      }
+      used = c + 1;
+    }
+    this.slashes.commit(used);
+  }
+
+  /** A swipe's claws cross before it: a gust bursting off the claw that moved,
+   *  a ring of dust where it reaches the floor, a light shake. */
+  private swipeLands(): void {
+    const ci = this.clawSpeed[0] >= this.clawSpeed[1] ? S_CLAW_L : S_CLAW_R;
+    const p = this.sock[ci];
+    const g = this.groundY(p.x, p.z);
+    this.particles.puff(p.x, p.y, p.z, 14, {
+      speed: 9,
+      life: 0.7,
+      size: [1.6, 4.5],
+      color: this.storm > 0.5 ? C.stormCloud : C.windEdge,
+      alpha: 0.32,
+      drag: 1.6,
+      radius: U * 0.6,
+      floor: -1e6,
+    });
+    this.particles.puff(p.x, p.y, p.z, 18, {
       speed: 12,
-      up: 2,
-      life: 0.9,
-      size: [0.4, 0.1],
-      color: BREATH_BODY_COLORS.spark,
+      life: 0.45,
+      size: [0.3, 0.05],
+      color: C.spark,
       alpha: 1,
       pool: 'glow',
+      floor: -1e6,
+    });
+    this.particles.puff(p.x, g + 0.3, p.z, 16, {
+      speed: 8,
+      life: 0.9,
+      size: [1.2, 3],
+      color: C.grit,
+      alpha: 0.3,
+      drag: 1.6,
       radius: 1.5,
     });
-    this.particles.puff(eAt.x, y, eAt.z, 16, {
-      speed: 8,
-      up: 1,
-      life: 1.6,
-      size: [2, 6],
-      color: BREATH_BODY_COLORS.dust,
-      alpha: 0.45,
-      drag: 1.6,
-      radius: 2,
+    this.particles.shockRing(p.x, p.z, C.ring, 7, 0.55, BREATH_BURST.ring);
+    if (this.storm > 0.5) this.spawnArc(ci, ci === S_CLAW_L ? S_HAND_L : S_HAND_R, 1.2);
+    this.shakeNear(p.x, p.z, 0.25);
+  }
+
+  // ---- the roar ---------------------------------------------------------------------------
+
+  /** The Summit Roar leaves the mouth: a cone of wind blasting out before it,
+   *  a short flash at the mouth only, streaks of air and grit. */
+  private roarBlast(): void {
+    const e = this.world?.entities.get(this.entityId);
+    if (!e || e.dead) return;
+    this.coneAt = this.clock;
+    const m = this.sock[S_MOUTH];
+    this.flashAt(m.x, m.y, m.z, BREATH_BURST.flashSize, BREATH_BURST.flashLife);
+    _dir[0] = Math.sin(e.facing);
+    _dir[1] = -0.18;
+    _dir[2] = Math.cos(e.facing);
+    this.particles.puff(m.x, m.y, m.z, 46, {
+      speed: 34,
+      life: 0.75,
+      size: [1.5, 4],
+      color: C.windEdge,
+      alpha: 0.4,
+      dir: _dir,
+      spread: 0.32,
+      drag: 0.6,
+      floor: -1e6,
     });
-    this.particles.shockRing(eAt.x, eAt.z, 0xe6faff, 14, 0.7);
-    this.particles.shockRing(eAt.x, eAt.z, 0x47b8ff, 26, 1.1);
-    this.shakeNear(eAt.x, eAt.z, 0.8, 70);
-    this.stormFrom = Math.max(this.stormFrom, 0.3);
+    this.particles.puff(m.x, m.y, m.z, 40, {
+      speed: 40,
+      life: 0.5,
+      size: [0.5, 0.08],
+      color: C.spark,
+      alpha: 1,
+      pool: 'glow',
+      dir: _dir,
+      spread: 0.25,
+      floor: -1e6,
+    });
+    this.send(BREATH_BODY_GESTURES.flare);
+    this.flash = Math.max(this.flash, 0.5);
+    this.shakeNear(m.x, m.z, 0.55);
+  }
+
+  private coneFx(e: Entity): void {
+    const age = this.clock - this.coneAt;
+    const life = 0.9;
+    if (age < 0 || age > life) {
+      this.cone.visible = false;
+      return;
+    }
+    const m = this.sock[S_MOUTH];
+    const k = age / life;
+    const len = U * (6 + 16 * (1 - (1 - k) ** 2));
+    const rad = len * 0.42;
+    this.cone.position.copy(m);
+    // Out along the facing, tipped a little down to the Cornice.
+    _c.set(Math.sin(e.facing), -0.2, Math.cos(e.facing)).normalize();
+    _q.setFromUnitVectors(_z, _c);
+    this.cone.quaternion.copy(_q);
+    this.cone.scale.set(rad, rad, len);
+    this.coneMat.uniforms.uAge.value = Math.min(1, k * 1.4);
+    this.coneMat.uniforms.uAlpha.value = (1 - k) ** 1.2;
+    this.cone.visible = true;
+  }
+
+  // ---- the bursts ------------------------------------------------------------------------------
+
+  private flashAt(x: number, y: number, z: number, size: number, life: number): void {
+    let slot = this.flashes[0];
+    for (const f of this.flashes) if (f.born + f.life < slot.born + slot.life) slot = f;
+    slot.born = this.clock;
+    slot.life = life;
+    slot.size = size;
+    slot.sprite.position.set(x, y, z);
+    slot.sprite.visible = true;
+  }
+
+  private updateFlashes(): void {
+    for (const f of this.flashes) {
+      const t = (this.clock - f.born) / Math.max(1e-3, f.life);
+      if (t >= 1 || t < 0) {
+        if (f.sprite.visible) {
+          f.sprite.visible = false;
+          f.mat.opacity = 0;
+        }
+        continue;
+      }
+      // A hard pop that dies fast: bright on its point, never the frame.
+      const s = f.size * (0.7 + 0.5 * t);
+      f.sprite.scale.set(s, s, 1);
+      f.mat.opacity = BREATH_BURST.flashPeak * (1 - t) ** 2;
+    }
   }
 
   // ---- the death -----------------------------------------------------------------------------
 
-  private poseDead(e: Entity): void {
+  private poseDead(e: Entity, dt: number): void {
     const eAt = fxAnchor(e);
     if (this.deadAt < 0) {
-      this.deadAt = this.seenAlive ? this.clock : this.clock - BREATH_FALL.end - 1;
-      if (!this.seenAlive) {
-        // Never posed alive: fall from the rest pose.
-        this.poseJoints('idle', 0, breathBodyLook('idle', 0, 0));
-        const rest = breathBodyLook('idle', 0, 0);
-        for (const p of this.pieces) this.posePiece(p, rest, 0);
-      }
-      for (const p of this.pieces) {
-        p.diedPos.copy(p.pos);
-        p.diedQuat.copy(p.quat);
-        const r = breathFallRest(p.index, p.pos);
-        p.rest = {
-          at: r.at,
-          tilt: new THREE.Quaternion().setFromEuler(new THREE.Euler(r.tilt.x, r.tilt.y, r.tilt.z)),
-          delay: r.delay,
-        };
-        p.landed = !this.seenAlive;
-        p.holder.scale.setScalar(1);
-      }
+      this.deadAt = this.seenAlive ? this.clock : this.clock - 10;
+      this.swings.length = 0;
       if (this.seenAlive) {
-        this.particles.puff(eAt.x, eAt.y + 4, eAt.z, 20, {
-          speed: 6,
-          up: 1,
-          life: 0.7,
-          size: [0.35, 0.08],
-          color: BREATH_BODY_COLORS.spark,
+        // The wind thrown off in one last gust.
+        const h = this.sock[S_CORE];
+        this.particles.puff(h.x, h.y, h.z, 50, {
+          speed: 14,
+          life: 1.8,
+          size: [3, 9],
+          color: this.storm > 0.5 ? C.stormCloud : C.cloud,
+          alpha: 0.32,
+          drag: 1.1,
+          radius: U * 1.5,
+          floor: -1e6,
+        });
+        this.particles.puff(h.x, h.y, h.z, 50, {
+          speed: 10,
+          life: 1.6,
+          size: [0.3, 0.05],
+          color: C.dust,
           alpha: 1,
           pool: 'glow',
-          radius: 1.2,
+          gravity: 4,
+          radius: U,
+          floor: -1e6,
         });
-        this.particles.shockRing(eAt.x, eAt.z, BREATH_BODY_COLORS.thread, 9, 0.8);
-        this.shakeNear(eAt.x, eAt.z, 0.5, 50);
+        this.particles.shockRing(eAt.x, eAt.z, C.ring, 18, 1, BREATH_BURST.ring);
+        this.shakeNear(eAt.x, eAt.z, 0.4);
       }
     }
-    this.group.rotation.y = this.yaw;
     const t = this.clock - this.deadAt;
-    for (const p of this.pieces) {
-      const rest = p.rest;
-      if (!rest) continue;
-      const fall = breathFallProgress(t, rest.delay, _fall);
-      const k = fall.k;
-      p.pos.set(
-        p.diedPos.x + (rest.at.x - p.diedPos.x) * k,
-        p.diedPos.y + (rest.at.y - p.diedPos.y) * k + Math.sin(Math.PI * k) * 0.4,
-        p.diedPos.z + (rest.at.z - p.diedPos.z) * k,
-      );
-      p.quat.copy(p.diedQuat).slerp(rest.tilt, Math.min(1, k * 1.2));
-      p.holder.position.copy(p.pos);
-      p.holder.quaternion.copy(p.quat);
-      if (fall.landed && !p.landed) {
-        p.landed = true;
-        _a.copy(p.pos).applyAxisAngle(_up, this.yaw);
-        const x = eAt.x + _a.x;
-        const z = eAt.z + _a.z;
-        const size = Math.max(p.def.size.x, p.def.size.y);
-        this.particles.puff(x, this.groundY(x, z) + 0.2, z, Math.round(2 + size * 2), {
-          speed: 1.5 + size,
-          up: 0.8,
-          life: 1.2,
-          size: [0.5 + size * 0.3, 1.2 + size * 0.6],
-          color: BREATH_BODY_COLORS.dust,
-          alpha: 0.4,
-          drag: 1.6,
-        });
-      }
-    }
-    const snapK = t / BREATH_FALL.snap;
-    this.poseThreads(snapK < 1 ? 1.5 * (1 - snapK) : 0, _look);
-    const fade = Math.max(0, 1 - snapK);
-    this.core.visible = this.stormSince >= 0 && fade > 0;
-    this.coreMat.uniforms.uAlpha.value = fade;
-    this.wingMat.uniforms.uAlpha.value = fade;
-    this.arcMat.uniforms.uAlpha.value = fade * 0.8;
-    this.heartGlowMat.opacity = fade;
-    const dim = Math.max(0.05, 1 - t / BREATH_FALL.end);
-    this.glowColor.setHex(BREATH_BODY_COLORS.thread).multiplyScalar(0.25 * dim);
-    (this.seamMat.uniforms.uColor.value as THREE.Color).copy(this.glowColor);
-    this.glowColor.setHex(BREATH_BODY_COLORS.glow).multiplyScalar(0.3 * dim);
-    (this.crystalMat.uniforms.uColor.value as THREE.Color).copy(this.glowColor);
-    this.haloMat.opacity = 0.4 * fade;
-    for (const s of this.embers) s.visible = t < BREATH_FALL.snap;
+    const look = breathDeathLook(t);
+    this.windU.uStorm.value = this.storm;
+    this.windU.uFlow.value = 1.6;
+    this.flash = 0;
+    this.windU.uFlash.value = 0;
+    this.currents(look.wind, 1, 1.4, look.fling, 0);
+    this.lights(1, look.glow);
+    this.cosmetics(dt, 0, 0, look.wind);
+    this.hand.visible = false;
+    this.cone.visible = false;
+    this.slashes.commit(0);
+    this.drawArcs();
+    this.orbit.setGlow(look.glow);
+    this.orbit.update(
+      eAt.x,
+      eAt.y,
+      eAt.z,
+      this.clock,
+      1,
+      this.storm,
+      look.drop,
+      this.groundY(eAt.x, eAt.z),
+    );
   }
 
   dispose(): void {
@@ -1364,7 +1491,7 @@ export class BreathBody {
     this.particles.dispose();
     for (const g of this.geometries) g.dispose();
     for (const m of this.materials) m.dispose();
-    this.threads.dispose();
     this.glowTex?.dispose();
+    clearBreathBodySockets();
   }
 }

@@ -63,6 +63,7 @@ uniform float uFalloff;
 uniform float uCells;
 uniform float uCrack;
 uniform float uRimK;
+uniform float uSpent;
 varying vec2 vLocal;
 varying vec2 vP;
 ${HEAT_NOISE_GLSL}
@@ -88,6 +89,10 @@ void main() {
   }
   float yards = radial * span;
   float fillYards = uFill * span;
+  // A lane's yards a wave has already rolled past (0 on everything else):
+  // spent, so its warning clears behind the wave.
+  float live = uShape > 0.5 ? smoothstep(uSpent - 1.2, uSpent, yards) : 1.0;
+  if (live <= 0.001) discard;
   // The front is a ragged line of cracks, not a ruler (under a yard).
   float jag = (vn(vP * 0.8) - 0.5) * 0.9 + (vn(vP * 2.3 + 4.1) - 0.5) * 0.35;
   float ahead = yards + jag - fillYards;
@@ -103,7 +108,7 @@ void main() {
   c *= 0.82 + 0.18 * vn(vP * 0.6) + 0.25 * joint;
   // Soft just inside the edge: the glow's hot line carries the exact edge.
   c *= smoothstep(-0.02, 0.35, edge);
-  c = clamp(c * uFade, 0.0, 0.9);
+  c = clamp(c * uFade * live, 0.0, 0.9);
   gl_FragColor = vec4(vec3(1.0 - c), 1.0);
 #else
   vec3 hot = vec3(1.0, 0.93, 0.8);
@@ -148,7 +153,7 @@ void main() {
     float mote = (1.0 - smoothstep(0.0, 0.09, length(f - o * 0.6))) * step(0.8, h);
     col += uAccent * mote * (0.35 + 0.35 * sin(uTime * 5.0 + h * 40.0)) * (0.3 + 0.7 * swept);
   }
-  gl_FragColor = vec4(col * uFade, 1.0);
+  gl_FragColor = vec4(col * uFade * live, 1.0);
 #endif
 }
 `;

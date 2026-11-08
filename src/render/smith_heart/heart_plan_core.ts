@@ -511,7 +511,11 @@ export function planHeartLights(): HeartLightSpot[] {
       range: 88,
     },
     // Each altar lights its own quarter of the platform (phase 2J: the
-    // altars stand taller, their vein's light over their quarter).
+    // altars stand taller, their vein's light over their quarter). The Heat's
+    // and the Hammer's carry no halo card (the hammer round of 2026-11-05): over
+    // the Heat's crystal it read as a ball hung in the air, and over the
+    // Hammer's lowered crown it sat in front of the great hammer's head. Their
+    // glow is the stone's own (the Heat's ember-painted rock, the Hammer's geode).
     ...HEART_ALTARS.map((a) => ({
       id: `altar:${a.vein}`,
       x: a.x,
@@ -520,6 +524,7 @@ export function planHeartLights(): HeartLightSpot[] {
       color: SMITH_HEART_VEIN_COLORS[a.vein],
       intensity: 11,
       range: 34,
+      ...(a.vein === 'heat' || a.vein === 'hammer' ? { noHalo: true } : {}),
     })),
     {
       id: 'return_portal',

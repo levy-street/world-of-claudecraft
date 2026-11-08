@@ -60,6 +60,14 @@ export const HEART_ALTAR_PIECES: Readonly<Record<SmithHeartVein, string>> = {
 /** The altars' rise (a placement's `rise`: taller, never wider than their
  *  colliders) and the roots' lift to grip their crowns. */
 export const HEART_ALTAR_RISE = 1.4;
+/** The Hammer's altar rises less (the hammer round of 2026-11-05): it stands on the
+ *  great hammer's line, and at full rise its crown hid the head from the approach. */
+export const HEART_ALTAR_RISE_HAMMER = 1.25;
+
+/** One altar's rise. */
+export function heartAltarRise(vein: SmithHeartVein): number {
+  return vein === 'hammer' ? HEART_ALTAR_RISE_HAMMER : HEART_ALTAR_RISE;
+}
 export const HEART_ROOT_LIFT = 6;
 /** Phase 2M: each root rises out of its quarter's wall landmark, this far
  *  behind the altar (out from the platform's centre), never across it, so
@@ -71,7 +79,9 @@ export const HEART_ROOT_OUT = 18;
  *  rock falls away toward the Quench's chasm (no rock high enough within a
  *  root's reach straight out), so the Hammer's rises from its landmark's
  *  east shoulder, clear of the great hammer's head, and runs south-east into
- *  the crown where it stands high.
+ *  the crown where it stands high. The hammer round (2026-11-05) set it a few
+ *  degrees further east and turned it to keep its grip on the lip, so its arm
+ *  stands off the hammer instead of crowding it.
  *  `foot`: degrees round from the altar's bearing; `aim`: the root's world
  *  bearing (degrees clockwise from north), or null for straight out. */
 export const HEART_ROOT_AIM: Readonly<
@@ -79,7 +89,7 @@ export const HEART_ROOT_AIM: Readonly<
 > = {
   breath: { foot: 0, aim: null },
   quench: { foot: 0, aim: null },
-  hammer: { foot: -17, aim: 112 },
+  hammer: { foot: -21, aim: 108 },
   heat: { foot: 0, aim: null },
 };
 
@@ -136,6 +146,24 @@ export const HEART_ROOT_SPINE: readonly { out: number; up: number }[] = [
   { out: 18, up: 36 },
   { out: 50, up: 54 },
 ];
+
+/** Where each root's arm clamps the platform's lip (the weak-spots pass's second
+ *  round; heart_pieces.py ROOT_GRIP_X, ROOT_RIM_Y): in the root's frame, `across`
+ *  its local +X and `out` along its outward run (negative: toward the platform).
+ *  Chosen where the straight roots' lip and the Hammer's (turned by its foot and
+ *  aim) cross, so the one Blender piece grips the rim under all four. */
+export const HEART_ROOT_GRIP = { across: 5.8, out: -12.3 } as const;
+
+/** The root's grip on the lip, instance-local (x, z). */
+export function heartRootGripPoint(vein: SmithHeartVein): { x: number; z: number } {
+  const f = heartRootFrame(vein);
+  const { across, out } = HEART_ROOT_GRIP;
+  // Local +X is (cos rot, -sin rot); outward (local -Z) is (-sin rot, -cos rot).
+  return {
+    x: f.x + Math.cos(f.rot) * across - Math.sin(f.rot) * out,
+    z: f.z - Math.sin(f.rot) * across - Math.cos(f.rot) * out,
+  };
+}
 
 /** A point `t` (0 at the altar, 1 at the crown) along a vein's root, in
  *  instance-local yards. */
@@ -221,7 +249,7 @@ export function planHeartVeinPieces(vein: SmithHeartVein): HeartKitPlacement[] {
       y: HEART_ROOM.h,
       z: f.z,
       rot: f.rot,
-      rise: HEART_ALTAR_RISE,
+      rise: heartAltarRise(vein),
     },
     {
       piece: 'Kit_HeartRoot',

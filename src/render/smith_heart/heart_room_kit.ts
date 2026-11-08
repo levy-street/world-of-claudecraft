@@ -102,6 +102,9 @@ export interface HeartRoomKit {
   setHeart(level: number): void;
   /** A vein's altar, moved with its quarter when it falls (heart_collapse_rig.ts). */
   altar(vein: SmithHeartVein): HeartFallAltar | null;
+  /** A vein's root of the mountain, torn out and dropped after its landmark
+   *  when its quarter falls (heart_quarters.ts, heart_collapse_core.ts heartRootFall). */
+  root(vein: SmithHeartVein): HeartFallAltar | null;
 }
 
 const tmp = new THREE.Matrix4();
@@ -158,9 +161,10 @@ export function buildHeartRoomKit(lowGfx: boolean): HeartRoomKit {
 ${heartRootEmissiveGlsl()}`,
     );
   };
-  rootPainted.customProgramCacheKey = () => 'smith-heart-root-painted|aaa3';
+  rootPainted.customProgramCacheKey = () => 'smith-heart-root-painted|aaa4';
   const glows = new Map<SmithHeartVein, THREE.ShaderMaterial>();
   const altars = new Map<SmithHeartVein, HeartFallAltar>();
+  const roots = new Map<SmithHeartVein, HeartFallAltar>();
   for (const vein of SMITH_HEART_VEINS) {
     const glow = heartVeinGlowMaterial(SMITH_HEART_VEIN_COLORS[vein], `smithHeartVeinGlow:${vein}`);
     glows.set(vein, glow);
@@ -172,6 +176,8 @@ ${heartRootEmissiveGlsl()}`,
       holder.matrix.copy(heartKitPlacementMatrix(p, tmp));
       if (p.piece === HEART_ALTAR_PIECES[vein])
         altars.set(vein, { holder, rest: holder.matrix.clone(), x: p.x, z: p.z });
+      if (p.piece === 'Kit_HeartRoot')
+        roots.set(vein, { holder, rest: holder.matrix.clone(), x: p.x, z: p.z });
       for (const m of holder.children) {
         if (!(m instanceof THREE.Mesh)) continue;
         if (m.name.endsWith(':glow')) m.material = glow;
@@ -200,5 +206,6 @@ ${heartRootEmissiveGlsl()}`,
       if (bedGlow.color.r !== k) bedGlow.color.setScalar(k);
     },
     altar: (vein) => altars.get(vein) ?? null,
+    root: (vein) => roots.get(vein) ?? null,
   };
 }

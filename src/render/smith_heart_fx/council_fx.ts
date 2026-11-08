@@ -860,7 +860,11 @@ export class CouncilFx {
     this.updateWrathShelters(world);
     this.bond.update(dt);
     this.rush.update(dt);
-    this.audio.update(dt, (id) => world.entities.get(id));
+    this.audio.update(
+      dt,
+      (id) => world.entities.get(id),
+      this.inRaid(world) ? (world.entities.get(world.playerId) ?? null) : null,
+    );
     this.debris.update(dt);
     this.particles.update(this.clock);
   }
@@ -1657,6 +1661,7 @@ export class CouncilFx {
     const limit = auraById(caster, COUNCIL_AURAS.pillarLimit)?.value2 ?? 0;
     if (limit <= 0) {
       this.limitFx.hide();
+      this.audio.shelter(0, 0, 0, 0);
       return;
     }
     this.limitPlayers.length = 0;
@@ -1666,10 +1671,19 @@ export class CouncilFx {
       this.limitPlayers.push(p);
     }
     const players = this.limitPlayers;
-    this.limitFx.lay(caster.pos.x, caster.pos.z, limit, players.length, (i, out) => {
-      out.x = players[i].pos.x;
-      out.z = players[i].pos.z;
-    });
+    const crowded = this.limitFx.lay(
+      caster.pos.x,
+      caster.pos.z,
+      limit,
+      players.length,
+      (i, out) => {
+        out.x = players[i].pos.x;
+        out.z = players[i].pos.z;
+      },
+    );
+    // A pillar one too many hide behind groans (Narrow Shelter's warning).
+    const at = this.limitFx.crowdedAt;
+    this.audio.shelter(crowded, at.x, this.groundY(at.x, at.z), at.z);
   }
 
   /** Mountain's Wrath's bar on its holder: the real shadow behind every
@@ -1682,6 +1696,7 @@ export class CouncilFx {
       if (this.wrathLaidAt >= 0) {
         this.shelters.hide('wrath');
         this.limitFx.hide();
+        this.audio.shelter(0, 0, 0, 0);
         this.wrathLaidAt = -1;
       }
       return;

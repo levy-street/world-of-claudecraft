@@ -26,6 +26,7 @@ import {
   zoneLook,
   zoneRadii,
 } from '../src/render/smith_heart_fx/heat_fight_fx_core';
+import { HEAT_METEOR } from '../src/render/smith_heart_fx/heat_meteor_core';
 import { HEARTH_WELL } from '../src/sim/content/smith_heart_layout';
 import { DUNGEONS, instanceOrigin } from '../src/sim/data';
 import {
@@ -233,9 +234,56 @@ describe('HeatFightFx over a fake world', () => {
     river.templateId = riverTemplate('flow', T.riverFlow);
     run(6);
     expect(shown('smithHeartHeatRiver')).toBe(1);
+    // The melee's shore terrace lies round the pool.
+    expect(shown('smithHeartHeatWellShore')).toBe(1);
+    // The guardian throws the seeds: a meteor per seed, in the air until the
+    // sim lands it, its orb only then (the footprint shows from the throw).
+    expect(
+      fx.handleEvent({
+        type: 'spellfx',
+        sourceId: boss.id,
+        targetId: boss.id,
+        school: 'fire',
+        fx: 'nova',
+        ability: HEAT_CUES.seedThrow,
+      } as SimEvent),
+    ).toBe(true);
     // Seeds under the raid, a Wakefire band, a cinder's fall, a trail patch.
     add(entity('object', heatTimed(HEAT_OBJECTS.seedPrefix, T.seedLife), -204, 4, T.seedReach));
     add(entity('object', heatTimed(HEAT_OBJECTS.seedPrefix, T.seedLife), -200, -4, T.seedReach));
+    bump();
+    run(4);
+    expect(shown('smithHeartHeatSeedField')).toBe(1);
+    expect(shown('smithHeartHeatSeeds')).toBe(0);
+    // Past the release, before the landing: both meteors fly.
+    run(Math.ceil((HEAT_METEOR.release + 0.15) * 20) - 4);
+    expect(shown('smithHeartHeatMeteors')).toBe(1);
+    let flying = 0;
+    scene.traverse((c) => {
+      if (c instanceof THREE.Sprite && c.visible && c.material.name === 'smithHeartHeatMeteorGlow')
+        flying++;
+    });
+    expect(flying).toBe(2);
+    expect(shown('smithHeartHeatSeeds')).toBe(0);
+    // The sim lands one: it strikes now, its crater glows, its orb shows.
+    expect(
+      fx.handleEvent({
+        type: 'spellfxAt',
+        x: o.x - 204,
+        z: o.z + 4,
+        radius: 1.5,
+        school: 'fire',
+        fx: 'burst',
+        ability: HEAT_CUES.seed,
+      } as unknown as SimEvent),
+    ).toBe(true);
+    run(1);
+    expect(shown('smithHeartHeatMeteorCrater')).toBe(1);
+    expect(shown('smithHeartHeatSeeds')).toBe(1);
+    // The other lands on its own beat.
+    run(Math.ceil((HEAT_METEOR.land - HEAT_METEOR.release) * 20) + 2);
+    expect(shown('smithHeartHeatMeteorCrater')).toBe(2);
+    expect(shown('smithHeartHeatMeteors')).toBe(0);
     add(entity('object', zoneTemplate(1, 'warn', T.zoneWarn), HEARTH_WELL.x, HEARTH_WELL.z));
     add(entity('object', heatTimed(HEAT_OBJECTS.fallPrefix, T.cinderFallWarn), -196, 0, 3));
     add(entity('object', heatTimed(HEAT_OBJECTS.trailPrefix, T.trailLife), -205, 6, T.trailR));

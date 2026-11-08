@@ -69,6 +69,8 @@ export class FinalTelegraphs {
       uCrack: { value: 1 },
       uRimK: { value: 1 },
       uInward: { value: 0 },
+      // The Heat paint's spent-lane clip (a fan never clips).
+      uSpent: { value: 0 },
     };
     // The kit's own uniform objects (the spread copies the references), so
     // its drape and paint calls drive both passes.

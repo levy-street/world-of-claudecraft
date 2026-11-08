@@ -119,12 +119,12 @@ varying vec3 vView;
 ${NOISE}
 void main() {
   vec3 n = normalize(vObj);
-  float fres = pow(1.0 - abs(dot(normalize(vN), normalize(vView))), 2.2);
+  float fres = pow(max(1.0 - abs(dot(normalize(vN), normalize(vView))), 0.0), 2.2);
   // Forks crawling over the sphere: ridged noise on two planes of its own
   // points, re-seeded in quick steps (the flicker of lightning).
   float t = floor(uTime * 10.0);
-  float f1 = pow(kridge(n.xy * 3.2 + vec2(t * 0.31, uTime * 0.4)), 14.0);
-  float f2 = pow(kridge(n.zy * 3.6 + vec2(-uTime * 0.5, t * 0.17)), 16.0);
+  float f1 = pow(max(kridge(n.xy * 3.2 + vec2(t * 0.31, uTime * 0.4)), 0.0), 14.0);
+  float f2 = pow(max(kridge(n.zy * 3.6 + vec2(-uTime * 0.5, t * 0.17)), 0.0), 16.0);
   float fork = max(f1, f2) * (0.5 + uCrackle * 1.1);
   float swirl = kfbm(n.xz * 2.0 + vec2(uTime * 0.3, -uTime * 0.25));
   vec3 col = uStorm * (0.25 + 0.9 * fres + 0.35 * swirl) + vec3(0.92, 0.9, 1.0) * fork;
@@ -172,7 +172,7 @@ float cellE(vec2 p) {
 }
 void main() {
   vec3 n = normalize(vN);
-  float fres = pow(1.0 - abs(dot(n, normalize(vView))), 1.8);
+  float fres = pow(max(1.0 - abs(dot(n, normalize(vView))), 0.0), 1.8);
   vec3 p = normalize(vObj);
   float seam = 1.0 - smoothstep(0.0, 0.08, cellE(vec2(atan(p.x, p.z) * 1.6, p.y * 2.6)));
   float key = 0.45 + 0.55 * max(0.0, n.y * 0.7 + 0.3);
@@ -191,7 +191,7 @@ varying vec3 vN;
 varying vec3 vView;
 void main() {
   vec3 n = normalize(vN);
-  float fres = pow(1.0 - abs(dot(n, normalize(vView))), 1.5);
+  float fres = pow(max(1.0 - abs(dot(n, normalize(vView))), 0.0), 1.5);
   float facet = 0.5 + 0.5 * abs(dot(n, normalize(vec3(0.3, 0.8, 0.5))));
   float glint = smoothstep(0.97, 1.0, sin((vObj.x + vObj.y * 1.3 + vObj.z) * 3.0 - uTime * 2.2));
   vec3 col = uFrost * (0.35 + facet * 0.45 + fres * 0.9) + vec3(1.0) * glint * 0.8;
@@ -230,7 +230,7 @@ void main() {
   // Streaks racing round with the wind, forks flickering through them.
   float streak = smoothstep(0.35, 1.0, sin(a * 60.0 - uTime * 10.0 + kn(vec2(a * 8.0, r)) * 4.0));
   float t = floor(uTime * 9.0);
-  float fork = pow(kridge(vec2(a * 14.0 + t * 1.7, r * 0.9)), 20.0);
+  float fork = pow(max(kridge(vec2(a * 14.0 + t * 1.7, r * 0.9)), 0.0), 20.0);
   float edgeLine = 1.0 - smoothstep(0.0, 0.35, abs(d));
   float halo = 1.0 - smoothstep(0.0, 2.0, abs(d));
   vec3 col = uColor * (edgeLine * 1.4 + halo * 0.25) + mix(uColor, vec3(1.0), 0.35) * edgeLine * 0.4;

@@ -107,15 +107,20 @@ export function craterLook(
 
 // ---- the lanes and the swells -----------------------------------------------------------
 
-/** How tall a wave's wall stands at its full height (yards). */
-export const SWELL_HEIGHT = 3.4;
+/** How tall a wave's wall stands at its full height (yards): a molten wall
+ *  about three players tall at its crest, still lower than it is wide
+ *  (pass 4: 3.8 over a 5 yd lane; pass 5: 6.2 over the 11 yd lane). */
+export const SWELL_HEIGHT = 6.2;
+
+/** Yards a wave takes to rise out of the spot and to sink at its lane's end. */
+const SWELL_RISE = 5;
 
 /** A wave's wall `front` yards down its lane (`length` long, where it is
  *  drawn to): its height (yards), rising out of the spot over its first
  *  yards and sinking over its lane's last. */
 export function swellHeight(front: number, length: number = T.laneLength): number {
-  const rise = smooth(front / 4);
-  const sink = smooth((length + T.waveDepth - front) / 4);
+  const rise = smooth(front / SWELL_RISE);
+  const sink = smooth((length + T.waveDepth - front) / SWELL_RISE);
   return SWELL_HEIGHT * rise * sink;
 }
 

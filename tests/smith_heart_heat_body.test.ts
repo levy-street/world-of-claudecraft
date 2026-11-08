@@ -1,45 +1,43 @@
-// The Guardian of the Heat's provisional body (the pure plan
-// src/render/smith_heart_fx/heat_body_core.ts and its painter heat_body.ts):
-// a giant of the first flame sunk to its waist in its wellspring (matching
-// the manifest and the template, melee reaching it from the shore), every
-// piece a real node of its kit, the stages owning the body (it sinks all the
-// way under through an overflow and climbs back), then Basalt Fist's bar,
-// then the one-shots; the fire whitens with the phase, every pose and the
-// fall are finite; the painter draws it over the bodyless guardian, sunk to
-// its waist, plunges it under with a splash, never claims an event, and
-// disposes.
+// The Guardian of the Heat's own model (characters/smith_heart_boss_looks.ts,
+// the pure plan src/render/smith_heart_fx/heat_body_core.ts and its fire
+// heat_body.ts): the rigged GLB replaces the bodyless provisional body, ships
+// every clip it binds with KTX2 textures, stands in its wellspring at the
+// giant's scale, plays its own clip for Basalt Fist's bar (landing on the
+// bar's end), the cast, the plunge and the breach; the fire's sockets sit on
+// real bones at the offsets the GLB's rest pose gives; the stance gestures
+// follow the guardian's stage; the painter draws the fire over the model,
+// sends the stance and cast gestures, claims no event, and disposes.
 
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
-import { VISUALS } from '../src/render/characters/manifest';
+import { VISUALS, visualKeyFor } from '../src/render/characters/manifest';
+import { SMITH_HEART_BOSS_LOOKS } from '../src/render/characters/smith_heart_boss_looks';
 import { SMITH_HEART_PLACEHOLDER_LOOKS } from '../src/render/characters/smith_heart_placeholder_looks';
 import { HeatBody } from '../src/render/smith_heart_fx';
 import {
-  HEAT_BODY_KITS,
-  HEAT_BODY_PIECES,
+  HEAT_BODY_CLIP,
+  HEAT_BODY_CLIPS,
+  HEAT_BODY_GESTURES,
+  HEAT_BODY_HEIGHT,
+  HEAT_BODY_HOVER,
   HEAT_BODY_SCALE,
-  HEAT_FALL,
-  HEAT_FULL_SUNK,
-  HEAT_HALF_SUNK,
-  HEAT_RIG_JOINTS,
-  HEAT_SLAM_SECONDS,
-  HEAT_SWING_SECONDS,
-  HEAT_THREAD_PAIRS,
-  type HeatBodyAction,
-  type HeatBodyInput,
-  HJ,
-  heatArm,
-  heatBodyAction,
-  heatBodyLook,
+  HEAT_BODY_URL,
+  HEAT_FLAMES,
+  HEAT_FX_GROW,
+  HEAT_MODEL_LAVA,
+  HEAT_MODEL_UNITS,
+  HEAT_ROCKS,
+  HEAT_ROCKS_LOW,
+  HEAT_SOCKETS,
   heatBodyState,
-  heatBodyTop,
-  heatFallProgress,
-  heatFallRest,
-  heatSink,
+  heatCastLook,
+  heatDeathLook,
+  heatFlameFor,
+  heatFlameRate,
+  heatRockOrbit,
+  heatStanceGesture,
   heatWhiteness,
-  heatWristTarget,
-  restJoint,
 } from '../src/render/smith_heart_fx/heat_body_core';
 import { SMITH_HEART_MOBS } from '../src/sim/content/smith_heart';
 import { HEARTH_WELL } from '../src/sim/content/smith_heart_layout';
@@ -50,187 +48,219 @@ import {
   HEAT_CUES,
   HEAT_GUARDIAN,
   HEAT_STAGES,
+  HEAT_TUNING,
 } from '../src/sim/encounters/smith_heart/heat_ids';
 import type { Entity, SimEvent } from '../src/sim/types';
 import type { IWorld } from '../src/world_api';
 
 const PLAYER = 1.9;
-const finite = (p: { x: number; y: number; z: number }) =>
-  Number.isFinite(p.x) && Number.isFinite(p.y) && Number.isFinite(p.z);
 
-function glbNodeNames(url: string): string[] {
-  const buf = readFileSync(`public${url}`);
+interface GlbNode {
+  name?: string;
+  children?: number[];
+  translation?: [number, number, number];
+  rotation?: [number, number, number, number];
+  scale?: [number, number, number];
+}
+function glbJson(rel: string): {
+  nodes: GlbNode[];
+  animations: { name: string }[];
+  images?: { mimeType?: string }[];
+  extensionsUsed?: string[];
+} {
+  const buf = readFileSync(`public/${rel}`);
   expect(buf.readUInt32LE(0)).toBe(0x46546c67);
   const len = buf.readUInt32LE(12);
-  const json = JSON.parse(buf.subarray(20, 20 + len).toString('utf8')) as {
-    nodes?: { name?: string }[];
-  };
-  return (json.nodes ?? []).map((n) => n.name ?? '');
+  return JSON.parse(buf.subarray(20, 20 + len).toString('utf8'));
 }
 
-const IDLE: HeatBodyInput = {
-  castId: null,
-  castFill: 0,
-  phase: 1,
-  stage: HEAT_STAGES.fight,
-  stageFill: 0,
-  sinceSlam: Number.POSITIVE_INFINITY,
-  sinceSwing: Number.POSITIVE_INFINITY,
-};
+const glb = glbJson(HEAT_BODY_URL);
+const key = SMITH_HEART_PLACEHOLDER_LOOKS[HEAT_GUARDIAN];
+const def = VISUALS[key];
 
-const ACTIONS: HeatBodyAction[] = ['idle', 'swing', 'fist', 'slam', 'sink', 'under', 'rise'];
-
-describe('heat_body_core: the provisional body', () => {
-  it('towers out of its wellspring, matching the manifest and the template', () => {
-    const look = SMITH_HEART_PLACEHOLDER_LOOKS[HEAT_GUARDIAN];
-    expect(look).toBe('smith_heart_heat_guardian');
-    const visual = VISUALS[look];
-    expect(visual?.bodyless).toBe(true);
-    const template = SMITH_HEART_MOBS[HEAT_GUARDIAN];
-    // What shows over the lava: the crown less the waist sunk, at its scale.
-    const shown = (heatBodyTop() - HEAT_HALF_SUNK) * HEAT_BODY_SCALE;
-    expect(Math.abs((visual?.height ?? 0) * (template?.scale ?? 0) - shown)).toBeLessThan(1.5);
-    // The Ragnaros scale: five players and more, waist up.
-    expect(shown / PLAYER).toBeGreaterThanOrEqual(5);
-    // Melee reaches it from the shore: its body is the pool's.
-    expect(template?.bodyRadius).toBe(HEARTH_WELL.r);
+describe('the Guardian of the Heat model', () => {
+  it('replaces the bodyless provisional body with its own rigged one', () => {
+    expect(key).toBe('smith_heart_heat_guardian');
+    expect(def).toBe(SMITH_HEART_BOSS_LOOKS.smith_heart_heat_guardian);
+    expect(def.url).toBe(HEAT_BODY_URL);
+    expect(def.bodyless).toBeFalsy();
+    const g = { kind: 'mob', templateId: HEAT_GUARDIAN } as Parameters<typeof visualKeyFor>[0];
+    expect(visualKeyFor(g)).toBe(key);
   });
 
-  it('is built of real kit nodes, nothing of a forge, each piece unique on a real joint', () => {
-    const nodes = {
-      heat: new Set(glbNodeNames(HEAT_BODY_KITS.heat)),
-      heart: new Set(glbNodeNames(HEAT_BODY_KITS.heart)),
+  it('stands in its wellspring a giant: some nine players over the shore', () => {
+    expect(SMITH_HEART_MOBS[HEAT_GUARDIAN].scale).toBe(HEAT_BODY_SCALE);
+    expect(def.height).toBe(HEAT_BODY_HEIGHT);
+    expect(def.hover).toBe(HEAT_BODY_HOVER);
+    // The hover sinks the model so the guardian's own position (the lava's
+    // surface) crosses it at its lava line.
+    expect(HEAT_BODY_HOVER).toBeCloseTo(
+      -(HEAT_MODEL_LAVA / HEAT_MODEL_UNITS) * HEAT_BODY_HEIGHT,
+      9,
+    );
+    const crown = HEAT_BODY_HEIGHT * HEAT_BODY_SCALE * (1 - HEAT_MODEL_LAVA / HEAT_MODEL_UNITS);
+    // Pass 4 grew it a third (scale 3 to 4) with its wellspring.
+    expect(crown / PLAYER).toBeGreaterThan(8);
+    expect(crown / PLAYER).toBeLessThan(11);
+    expect(HEAT_FX_GROW).toBeCloseTo(4 / 3, 9);
+    // Melee still reaches it from the shore (the sim's body is the pool's),
+    // and the pool grew with the body.
+    expect(HEARTH_WELL.r).toBeLessThan(12);
+    expect(HEARTH_WELL.r).toBeGreaterThan(10);
+  });
+
+  it('ships every clip it binds and KTX2 textures', () => {
+    const names = glb.animations.map((a) => a.name);
+    for (const c of HEAT_BODY_CLIPS) expect(names, c).toContain(c);
+    expect(glb.extensionsUsed).toContain('KHR_texture_basisu');
+    expect(glb.images?.length).toBeGreaterThan(0);
+    for (const im of glb.images ?? []) expect(im.mimeType).toBe('image/ktx2');
+    // Every clip the ClipMaps name is in the file.
+    const c = def.clips;
+    const named = [
+      c.idle,
+      c.walk,
+      c.run,
+      c.death,
+      c.cast,
+      ...c.attack,
+      ...Object.values(c.attackByAbility ?? {}),
+      ...Object.values(c.castByAbility ?? {}),
+      ...Object.values(def.phaseClips ?? {}).flatMap((p) => [
+        p.clips.idle,
+        p.enter ?? p.clips.idle,
+      ]),
+    ];
+    for (const n of named) expect(names, n).toContain(n);
+  });
+
+  it('plays its own clips: both fists, the slam on the bar end, the cast, the plunge, the breach', () => {
+    const c = def.clips;
+    expect(c.attack).toEqual(['Attack', 'Attack2']);
+    expect(c.castByAbility?.[HEAT_CASTS.fist]).toBe('Slam');
+    expect(c.castTimeScaleByAbility?.[HEAT_CASTS.fist]).toBeCloseTo(
+      HEAT_BODY_CLIP.slam / HEAT_TUNING.fistCast,
+      9,
+    );
+    expect(def.castClipSync).toEqual([HEAT_CASTS.fist]);
+    expect(c.attackByAbility?.[HEAT_BODY_GESTURES.cast]).toBe('Cast');
+    const P = def.phaseClips ?? {};
+    expect(P[HEAT_BODY_GESTURES.sink]?.enter).toBe('Sink');
+    expect(P[HEAT_BODY_GESTURES.rise]?.enter).toBe('Rise');
+    // The steady stances are the same vocabularies (so a re-send never replays
+    // the plunge or the breach).
+    expect(P[HEAT_BODY_GESTURES.under]?.clips).toBe(P[HEAT_BODY_GESTURES.sink]?.clips);
+    expect(P[HEAT_BODY_GESTURES.stand]?.clips).toBe(P[HEAT_BODY_GESTURES.rise]?.clips);
+    expect(P[HEAT_BODY_GESTURES.stand]?.clips).toBe(c);
+    expect(P[HEAT_BODY_GESTURES.under]?.clips.idle).toBe('Under');
+    for (const one of ['Sink', 'Rise', 'Slam', 'Cast'])
+      expect(def.oneShotsHoldAttacks, one).toContain(one);
+    expect(def.castPlayOutHoldsAttacks).toBe(true);
+    // Dead, the lava in it cools.
+    expect(def.glowPulses?.deathFade).toBeGreaterThan(0);
+  });
+
+  it('hangs every socket on a real bone, at the offset the rest pose gives', () => {
+    const parent = new Map<number, number>();
+    glb.nodes.forEach((n, i) => {
+      for (const c of n.children ?? []) parent.set(c, i);
+    });
+    const local = (n: GlbNode) =>
+      new THREE.Matrix4().compose(
+        new THREE.Vector3(...(n.translation ?? [0, 0, 0])),
+        new THREE.Quaternion(...(n.rotation ?? [0, 0, 0, 1])),
+        new THREE.Vector3(...(n.scale ?? [1, 1, 1])),
+      );
+    const world = (i: number) => {
+      const m = local(glb.nodes[i]);
+      for (let p = parent.get(i); p !== undefined; p = parent.get(p))
+        m.premultiply(local(glb.nodes[p]));
+      return m;
     };
-    const ids = new Set<string>();
-    expect(HEAT_BODY_PIECES.length).toBeGreaterThan(10);
-    for (const p of HEAT_BODY_PIECES) {
-      expect(nodes[p.kit].has(p.node), `${p.id}: ${p.kit} ${p.node}`).toBe(true);
-      expect(/anvil|bellows|hammer|crucible|chain|forge/i.test(p.node), p.node).toBe(false);
-      expect(ids.has(p.id), p.id).toBe(false);
-      ids.add(p.id);
-      expect(p.joint).toBeLessThan(HEAT_RIG_JOINTS);
-      if (p.to !== undefined) expect(p.to).toBeLessThan(HEAT_RIG_JOINTS);
-      expect(p.size.x * p.size.y * p.size.z).toBeGreaterThan(0);
+    for (const s of HEAT_SOCKETS) {
+      const i = glb.nodes.findIndex((n) => n.name === s.bone);
+      expect(i, s.bone).toBeGreaterThanOrEqual(0);
+      const p = new THREE.Vector3(...s.at).applyMatrix4(world(i).invert());
+      expect(p.x, s.id).toBeCloseTo(s.local[0], 2);
+      expect(p.y, s.id).toBeCloseTo(s.local[1], 2);
+      expect(p.z, s.id).toBeCloseTo(s.local[2], 2);
     }
-    // Both kits: the colossus basalt and the Hearth's crystal and columns;
-    // a white-gold heart of crystal in its chest.
-    expect(HEAT_BODY_PIECES.some((p) => p.kit === 'heart')).toBe(true);
-    expect(HEAT_BODY_PIECES.some((p) => p.kit === 'heat')).toBe(true);
-    expect(HEAT_BODY_PIECES.find((p) => p.id === 'core')?.light).toBe('crystal');
-    for (const [a, b] of HEAT_THREAD_PAIRS) {
-      expect(a).toBeLessThan(HEAT_RIG_JOINTS);
-      expect(b).toBeLessThan(HEAT_RIG_JOINTS);
+    // Every flame rides a socket.
+    for (const f of HEAT_FLAMES) expect(HEAT_SOCKETS.some((s) => s.id === f.socket)).toBe(true);
+  });
+});
+
+describe('heat_body_core: the fire plan', () => {
+  it('plunges on a transition and only holds a stance otherwise', () => {
+    const S = HEAT_STAGES;
+    const G = HEAT_BODY_GESTURES;
+    expect(heatStanceGesture(S.sinking, S.fight)).toBe(G.sink);
+    expect(heatStanceGesture(S.sinking, -1)).toBe(G.under);
+    expect(heatStanceGesture(S.sinking, S.sinking)).toBe(G.under);
+    expect(heatStanceGesture(S.under, S.sinking)).toBe(G.under);
+    expect(heatStanceGesture(S.rising, S.under)).toBe(G.rise);
+    expect(heatStanceGesture(S.rising, -1)).toBe(G.stand);
+    expect(heatStanceGesture(S.rising, S.rising)).toBe(G.stand);
+    expect(heatStanceGesture(S.fight, S.rising)).toBe(G.stand);
+    // Presentation gesture ids, never a sim id.
+    for (const g of Object.values(G)) expect(g.startsWith('smith_heart_heat_body_')).toBe(true);
+  });
+
+  it('burns hotter with the phase and never under the lava', () => {
+    expect(heatFlameRate(2, false)).toBeGreaterThan(heatFlameRate(1, false));
+    expect(heatFlameRate(3, false)).toBeGreaterThan(heatFlameRate(2, false));
+    expect(heatFlameRate(3, true)).toBe(0);
+    expect(heatWhiteness(3)).toBeGreaterThan(heatWhiteness(1));
+    // The shoulders roar more than the horns, and every flame is reachable.
+    const seen = new Map<string, number>();
+    for (let i = 0; i < 1000; i++) {
+      const f = heatFlameFor(i / 1000);
+      seen.set(f.socket, (seen.get(f.socket) ?? 0) + 1);
     }
+    for (const f of HEAT_FLAMES) expect(seen.get(f.socket), f.socket).toBeGreaterThan(0);
+    expect(seen.get('shoulderL') ?? 0).toBeGreaterThan(seen.get('hornL') ?? 0);
   });
 
-  it('rests symmetric, feet on the floor and head over the chest', () => {
-    for (let i = 0; i < HEAT_RIG_JOINTS; i++) expect(finite(restJoint(i)), `${i}`).toBe(true);
-    expect(restJoint(HJ.shoulderL).x).toBeCloseTo(-restJoint(HJ.shoulderR).x);
-    expect(restJoint(HJ.footL).y).toBeLessThan(0.5);
-    expect(restJoint(HJ.head).y).toBeGreaterThan(restJoint(HJ.chest).y);
+  it('gathers the cast to its release, then flashes and ends', () => {
+    expect(heatCastLook(0).gather).toBe(0);
+    const mid = heatCastLook(HEAT_BODY_CLIP.castRelease * 0.5);
+    const late = heatCastLook(HEAT_BODY_CLIP.castRelease * 0.95);
+    expect(late.gather).toBeGreaterThan(mid.gather);
+    expect(heatCastLook(HEAT_BODY_CLIP.castRelease + 0.01).release).toBeGreaterThan(0.9);
+    expect(heatCastLook(HEAT_BODY_CLIP.castRelease + 1).done).toBe(true);
   });
 
-  it('lets the stages own the body, then the fist, then the one-shots', () => {
-    expect(heatBodyAction(IDLE).action).toBe('idle');
-    expect(heatBodyAction({ ...IDLE, stage: HEAT_STAGES.sinking, stageFill: 0.4 })).toEqual({
-      action: 'sink',
-      k: 0.4,
-    });
-    expect(
-      heatBodyAction({ ...IDLE, stage: HEAT_STAGES.under, castId: HEAT_CASTS.fist }).action,
-    ).toBe('under');
-    expect(heatBodyAction({ ...IDLE, stage: HEAT_STAGES.rising, stageFill: 2 })).toEqual({
-      action: 'rise',
-      k: 1,
-    });
-    expect(
-      heatBodyAction({ ...IDLE, castId: HEAT_CASTS.fist, castFill: 0.5, sinceSlam: 0.1 }),
-    ).toEqual({ action: 'fist', k: 0.5 });
-    expect(heatBodyAction({ ...IDLE, sinceSlam: 0.1, sinceSwing: 0.1 }).action).toBe('slam');
-    expect(heatBodyAction({ ...IDLE, sinceSwing: 0.1 }).action).toBe('swing');
-    expect(heatBodyAction({ ...IDLE, sinceSlam: HEAT_SLAM_SECONDS + 0.01 }).action).toBe('idle');
-    expect(heatBodyAction({ ...IDLE, sinceSwing: HEAT_SWING_SECONDS + 0.01 }).action).toBe('idle');
+  it('cools in death: the flames out first, the smoke after, the glow last', () => {
+    expect(heatDeathLook(0).flame).toBe(1);
+    expect(heatDeathLook(3).flame).toBe(0);
+    expect(heatDeathLook(1.5).smoke).toBeGreaterThan(0.9);
+    expect(heatDeathLook(10).smoke).toBe(0);
+    expect(heatDeathLook(1).glow).toBeGreaterThan(heatDeathLook(2).glow);
   });
 
-  it('stands sunk to its waist, goes all the way under, climbs back', () => {
-    for (const a of ['idle', 'swing', 'fist', 'slam'] as const)
-      expect(heatSink(a, 0.5)).toBe(HEAT_HALF_SUNK);
-    expect(heatSink('under', 0)).toBe(HEAT_FULL_SUNK);
-    expect(heatSink('sink', 0)).toBeCloseTo(HEAT_HALF_SUNK, 9);
-    expect(heatSink('sink', 1)).toBeCloseTo(HEAT_FULL_SUNK, 9);
-    expect(heatSink('rise', 0)).toBeCloseTo(HEAT_FULL_SUNK, 9);
-    expect(heatSink('rise', 1)).toBeCloseTo(HEAT_HALF_SUNK, 9);
-    let last = 0;
-    for (let k = 0; k <= 1; k += 0.05) {
-      expect(heatSink('sink', k)).toBeGreaterThanOrEqual(last - 1e-9);
-      last = heatSink('sink', k);
-    }
-    // Fully under, nothing of it shows over the lava.
-    expect(HEAT_FULL_SUNK).toBeGreaterThanOrEqual(heatBodyTop());
-    // Waist deep: the hips under the lava, the chest over it.
-    expect(restJoint(HJ.hip).y).toBeLessThan(HEAT_HALF_SUNK + 0.6);
-    expect(restJoint(HJ.chest).y).toBeGreaterThan(HEAT_HALF_SUNK);
-  });
-
-  it('burns whiter with the phase and flashes as its fist lands', () => {
-    expect(heatWhiteness(2)).toBeGreaterThan(heatWhiteness(1));
-    expect(heatWhiteness(3)).toBeGreaterThan(heatWhiteness(2));
-    expect(heatWhiteness(9)).toBe(heatWhiteness(3));
-    expect(heatWhiteness(0)).toBe(heatWhiteness(1));
-    const early = heatBodyLook('idle', 0, 1, 1);
-    const late = heatBodyLook('idle', 0, 1, 3);
-    expect(late.glow).toBeGreaterThan(early.glow);
-    expect(late.white).toBeGreaterThan(early.white);
-    expect(late.haze).toBeGreaterThan(early.haze);
-    expect(early.flash).toBe(0);
-    expect(heatBodyLook('slam', 0, 0, 1).flash).toBeGreaterThan(0.5);
-    expect(heatBodyLook('fist', 1, 0, 1).glow).toBeGreaterThan(early.glow);
-  });
-
-  it('keeps every pose finite; the fist goes up over its head and comes down before it', () => {
-    for (const a of ACTIONS)
-      for (const k of [0, 0.25, 0.5, 0.75, 1]) {
-        const look = heatBodyLook(a, k, 3.7, 1 + 2 * k);
-        for (const v of Object.values(look)) expect(Number.isFinite(v), `${a} ${k}`).toBe(true);
-        for (const side of [1, -1] as const) {
-          const w = heatWristTarget(a, side, k);
-          expect(finite(w), `${a} ${k} ${side}`).toBe(true);
-          const arm = heatArm(side, w);
-          expect(finite(arm.elbow) && finite(arm.wrist), `${a} ${k}`).toBe(true);
-        }
+  it('circles its rocks round the chest, finite and clear of the body', () => {
+    expect(HEAT_ROCKS_LOW).toBeLessThan(HEAT_ROCKS);
+    const o = { x: 0, y: 0, z: 0, size: 0, spin: 0 };
+    for (let i = 0; i < HEAT_ROCKS; i++)
+      for (const t of [0, 3.3, 47]) {
+        heatRockOrbit(i, t, o);
+        expect(Number.isFinite(o.x + o.y + o.z + o.size + o.spin)).toBe(true);
+        expect(Math.hypot(o.x, o.z)).toBeGreaterThan(7);
+        expect(o.y).toBeGreaterThan(0);
       }
-    // The fist is its right (side -1): over its head at the top of the bar,
-    // then out and down before it at the hit.
-    expect(heatWristTarget('fist', -1, 0.8).y).toBeGreaterThan(restJoint(HJ.head).y);
-    const hit = heatWristTarget('fist', -1, 1);
-    expect(hit.z).toBeGreaterThan(1.5);
-    expect(hit.y).toBeLessThan(restJoint(HJ.chest).y);
   });
 
-  it('falls, and reads its phase and stage off its state aura', () => {
-    for (let i = 0; i < HEAT_BODY_PIECES.length; i++) {
-      const rest = heatFallRest(i, restJoint(HEAT_BODY_PIECES[i].joint));
-      expect(finite(rest.at) && finite(rest.tilt)).toBe(true);
-      expect(rest.delay + 0.75).toBeLessThanOrEqual(HEAT_FALL.end);
-      expect(heatFallProgress(HEAT_FALL.end, rest.delay).landed).toBe(true);
-    }
-    expect(heatBodyState([{ id: 'x' }])).toEqual({ phase: 0, stage: 0, fill: 0 });
+  it('reads its phase and stage off its state aura', () => {
     const st = heatBodyState([
-      { id: 'x' },
       { id: HEAT_AURAS.state, value: 2, value2: HEAT_STAGES.sinking, remaining: 1, duration: 4 },
     ]);
-    expect(st.phase).toBe(2);
-    expect(st.stage).toBe(HEAT_STAGES.sinking);
-    expect(st.fill).toBeCloseTo(0.75, 9);
-    // An untimed state (a phase's own aura) has no fill.
-    expect(
-      heatBodyState([{ id: HEAT_AURAS.state, value: 1, remaining: 1e9, duration: 1e9 }]).fill,
-    ).toBe(0);
+    expect(st).toEqual({ phase: 2, stage: HEAT_STAGES.sinking, fill: 0.75 });
+    expect(heatBodyState([])).toEqual({ phase: 0, stage: 0, fill: 0 });
   });
 });
 
 describe('HeatBody over a fake world', () => {
-  it('draws the giant sunk to its waist, plunges it under with a splash, claims nothing, disposes', () => {
+  it('burns over the guardian, sends its stance and cast gestures, claims nothing, disposes', () => {
     const o = instanceOrigin(DUNGEONS.smith_heart.index, 0);
     const entity = (id: number, kind: string, templateId: string, x: number, z: number) =>
       ({
@@ -241,7 +271,7 @@ describe('HeatBody over a fake world', () => {
         pos: { x: o.x + x, y: 0, z: o.z + z },
         prevPos: { x: o.x + x, y: 0, z: o.z + z },
         facing: 0,
-        scale: 1,
+        scale: HEAT_BODY_SCALE,
         hp: 100,
         maxHp: 100,
         dead: false,
@@ -267,6 +297,7 @@ describe('HeatBody over a fake world', () => {
     } as unknown as IWorld;
     const scene = new THREE.Scene();
     let shaken = 0;
+    const sent: string[] = [];
     const body = new HeatBody(
       scene,
       () => 0,
@@ -275,6 +306,10 @@ describe('HeatBody over a fake world', () => {
       () => false,
       (a) => {
         shaken += a;
+      },
+      (id, g) => {
+        expect(id).toBe(boss.id);
+        sent.push(g);
       },
     );
     const state = (stage: number, remaining = 1e9, duration = 1e9) => {
@@ -289,12 +324,36 @@ describe('HeatBody over a fake world', () => {
     };
     state(HEAT_STAGES.fight);
     for (let i = 0; i < 6; i++) body.update(1 / 20);
-    const group = scene.getObjectByName('smithHeartHeatBody');
-    expect(group?.visible).toBe(true);
-    expect(group?.position.x).toBeCloseTo(boss.pos.x, 6);
-    expect(group?.position.y).toBeCloseTo(-HEAT_HALF_SUNK * HEAT_BODY_SCALE, 6);
-    expect(group?.scale.x).toBeCloseTo(HEAT_BODY_SCALE, 9);
-    // Its fist lands: no claim.
+    const root = scene.getObjectByName('smith-heart-heat-body');
+    expect(root?.visible).toBe(true);
+    // The painter shows its own group under the gated root (the gate owns the
+    // root's reveal).
+    const fxGroup = root?.getObjectByName('smithHeartHeatBodyFx');
+    expect(fxGroup?.parent).toBe(root);
+    expect(fxGroup?.visible).toBe(true);
+    expect(sent).toContain(HEAT_BODY_GESTURES.stand);
+    // The vortex of fire stands at the wellspring, round the guardian.
+    const vortex = scene.getObjectByName('smithHeartHeatVortex');
+    expect(vortex?.visible).toBe(true);
+    expect(
+      Math.hypot(
+        (vortex?.position.x ?? 1e9) - boss.pos.x,
+        (vortex?.position.z ?? 1e9) - boss.pos.z,
+      ),
+    ).toBeLessThan(3);
+    // Hearth Flare strikes: it gathers and throws its fire (once in a volley).
+    const flare = {
+      type: 'spellfx',
+      sourceId: boss.id,
+      targetId: me.id,
+      school: 'fire',
+      fx: 'beam',
+      ability: HEAT_CUES.flare,
+    } as unknown as SimEvent;
+    expect(body.handleEvent(flare)).toBe(false);
+    expect(body.handleEvent(flare)).toBe(false);
+    expect(sent.filter((g) => g === HEAT_BODY_GESTURES.cast).length).toBe(1);
+    // Its fist lands: no claim, a burst and a shake.
     const land = {
       type: 'spellfxAt',
       x: boss.pos.x + 12,
@@ -305,15 +364,41 @@ describe('HeatBody over a fake world', () => {
       ability: HEAT_CUES.fist,
     } as unknown as SimEvent;
     expect(body.handleEvent(land)).toBe(false);
-    // The overflow: it sinks all the way under, a splash and a shake.
-    state(HEAT_STAGES.sinking, 0.01, 3);
-    body.update(1 / 20);
-    state(HEAT_STAGES.under);
-    for (let i = 0; i < 4; i++) body.update(1 / 20);
-    expect(group?.position.y).toBeCloseTo(-HEAT_FULL_SUNK * HEAT_BODY_SCALE, 6);
     expect(shaken).toBeGreaterThan(0);
+    // The overflow: it plunges under (the Sink), then holds there.
+    state(HEAT_STAGES.sinking, 2, 2.5);
+    body.update(1 / 20);
+    expect(sent).toContain(HEAT_BODY_GESTURES.sink);
+    state(HEAT_STAGES.under);
+    for (let i = 0; i < 30; i++) body.update(1 / 20);
+    expect(sent).toContain(HEAT_BODY_GESTURES.under);
+    // It climbs back out (the Rise).
+    state(HEAT_STAGES.rising, 2.5, 3);
+    body.update(1 / 20);
+    expect(sent[sent.length - 1]).toBe(HEAT_BODY_GESTURES.rise);
+    state(HEAT_STAGES.fight);
+    // The living fire, the rocks and the debris pool all hang off the gated root.
+    for (const name of [
+      'smithHeartHeatTongues',
+      'smithHeartHeatTongueSmoke',
+      'smithHeartHeatRocks',
+      'smithHeartHeatDebris',
+    ])
+      expect(root?.getObjectByName(name), name).toBeTruthy();
+    expect(
+      ((root as THREE.Object3D).getObjectByName('smithHeartHeatRocks') as THREE.InstancedMesh)
+        .isInstancedMesh,
+    ).toBe(true);
     (boss as { dead: boolean }).dead = true;
-    for (let i = 0; i < 80; i++) body.update(1 / 20);
+    for (let i = 0; i < 120; i++) body.update(1 / 20);
+    // Cooled in death, its rocks burn again when it comes back.
+    const rockMat = ((root as THREE.Object3D).getObjectByName('smithHeartHeatRocks') as THREE.Mesh)
+      .material as THREE.ShaderMaterial;
+    expect(rockMat.uniforms.uGlow.value).toBeLessThan(0.05);
+    (boss as { dead: boolean }).dead = false;
+    body.update(1 / 20);
+    expect(rockMat.uniforms.uGlow.value).toBe(1);
+    body.dispose();
     body.dispose();
     expect(scene.getObjectByName('smith-heart-heat-body')).toBeUndefined();
   });

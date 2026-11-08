@@ -102,7 +102,7 @@ void main() {
   float band = smoothstep(0.8, 0.9, r) * (1.0 - smoothstep(0.95, 1.0, r));
   float run = 0.55 + 0.45 * sin(a * 9.0 - uTime * 2.6 + vP.z * 20.0);
   float beads = smoothstep(0.82, 1.0, sin(a * 18.0 + uTime * 1.7 + vP.z * 7.0));
-  float floorGlow = pow(1.0 - r, 1.4) * 0.22;
+  float floorGlow = pow(max(1.0 - r, 0.0), 1.4) * 0.22;
   float breathe = 0.85 + 0.15 * sin(uTime * 3.1 + vP.z * 31.0);
   vec3 col = uWarm * (band * (0.7 + 0.6 * run) + floorGlow) + uCore * beads * band * 1.2;
   float alpha = (band * (0.75 + 0.25 * run) + floorGlow + beads * band * 0.5) * vP.x * breathe;

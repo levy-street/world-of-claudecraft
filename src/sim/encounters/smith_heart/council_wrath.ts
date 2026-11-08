@@ -58,7 +58,14 @@ export function fillEnergy(s: CouncilScope): void {
   const holder = jobHolder(s, 'wrath');
   if (!holder) return;
   if (s.st.bars[holder.role]?.castId === COUNCIL_CASTS.wrath) return;
-  const per = T.energyMax / councilFillSeconds(holder.heir, s.st.wraths, s.rules.heirFillSeconds);
+  const per =
+    T.energyMax /
+    councilFillSeconds(
+      holder.heir,
+      s.st.wraths,
+      s.rules.heirFillSeconds,
+      s.rules.enrageAfterWraths,
+    );
   s.st.energy = Math.min(T.energyMax, s.st.energy + per * DT);
 }
 
@@ -67,7 +74,14 @@ export function fillEnergy(s: CouncilScope): void {
 export function secondsToNextWrath(s: CouncilScope): number {
   const holder = jobHolder(s, 'wrath');
   if (!holder) return Number.POSITIVE_INFINITY;
-  const per = T.energyMax / councilFillSeconds(holder.heir, s.st.wraths, s.rules.heirFillSeconds);
+  const per =
+    T.energyMax /
+    councilFillSeconds(
+      holder.heir,
+      s.st.wraths,
+      s.rules.heirFillSeconds,
+      s.rules.enrageAfterWraths,
+    );
   const cast = holder.heir ? T.heirWrathCast : T.wrathCast;
   return Math.max(0, T.energyMax - s.st.energy) / per + cast;
 }
@@ -113,6 +127,15 @@ function wearPillarLimit(s: CouncilScope, caster: Entity): void {
   });
 }
 
+/** One Wrath hit's roll: the heir's shorter one or the Guardian's, times the
+ *  tier's Wrath factor (Heroic's kills an unhidden cloth body). */
+function wrathRoll(s: CouncilScope, caster: Entity, heir: boolean): number {
+  const amount = heir
+    ? roll(s, caster, T.heirWrathMin, T.heirWrathMax)
+    : roll(s, caster, T.wrathMin, T.wrathMax);
+  return Math.round(amount * s.rules.wrathMult);
+}
+
 /** The Wrath lands: who it strikes (whoever no pillar hides), then every
  *  pillar but a soul's shatters. Returns how many it struck (the tests read
  *  it). */
@@ -147,9 +170,7 @@ export function landWrath(s: CouncilScope, caster: Entity, heir: boolean): numbe
         pillarBetween(pillars, caster.pos, p.pos) === null &&
         pillarBetween(souls, caster.pos, p.pos) !== null);
     if (seen) {
-      const amount = heir
-        ? roll(s, caster, T.heirWrathMin, T.heirWrathMax)
-        : roll(s, caster, T.wrathMin, T.wrathMax);
+      const amount = wrathRoll(s, caster, heir);
       ctx.dealDamage(caster, p, amount, false, 'physical', COUNCIL_NAMES.wrath, 'hit', true);
       struck++;
       continue;
@@ -169,9 +190,7 @@ export function landWrath(s: CouncilScope, caster: Entity, heir: boolean): numbe
     if (!behind) continue;
     if (limit !== null && behind.length > limit) {
       for (const p of behind) {
-        const amount = heir
-          ? roll(s, caster, T.heirWrathMin, T.heirWrathMax)
-          : roll(s, caster, T.wrathMin, T.wrathMax);
+        const amount = wrathRoll(s, caster, heir);
         ctx.dealDamage(
           caster,
           p,

@@ -9,6 +9,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   COUNCIL_AURAS,
+  COUNCIL_DIFFICULTY,
   COUNCIL_ROLES,
   type CouncilFightState,
   type CouncilRole,
@@ -83,7 +84,7 @@ describe('Hammer Council lines', () => {
         expect(t(councilLineKey(role, moment as CouncilMoment) as never)).toBe(text);
         n++;
       }
-    expect(n).toBe(17);
+    expect(n).toBe(23);
   });
 
   it('the pull: each member once, the Guardian first, a breath apart', () => {
@@ -175,7 +176,10 @@ describe('Hammer Council mythic in the player text', () => {
     expect(rockText).toContain(
       `Mythic: a soul pillar within ${T.soulRockReach} yd loses a soul pip`,
     );
-    expect(rockText).toContain('Heroic and Mythic: 25% more damage');
+    // Each tier's resolved share, never a bare percent (heart_tier_damage.ts).
+    expect(rockText).toContain(
+      `Heroic and Mythic: ${Math.round(T.rockTotal * COUNCIL_DIFFICULTY.heroic.damageMult)} damage shared`,
+    );
     // Resonance is a spread now: it never touches a pillar, soul or not.
     const res = auraEffectDescriptor({
       id: COUNCIL_AURAS.resonance,

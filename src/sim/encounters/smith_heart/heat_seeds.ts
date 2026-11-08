@@ -1,10 +1,13 @@
 // The Guardian of the Heat's Hearthseeds (docs/design/raid/smith_heart.md
 // section 7.4), phase 2.
 //
-//   Hearthseeds  every 30 s (first 6 s into the phase) a seed of the first
-//                flame falls where each player stands (at most ten; the raid
-//                is stacked close to the guardian). Each glows and throbs for
-//                10 s, then bursts: the closer a player stands, the harder it
+//   Hearthseeds  every 30 s (first 6 s into the phase) the guardian heaves
+//                molten rock out of the wellspring and hurls a seed of the
+//                first flame where each player stands (at most ten; the raid
+//                is stacked close to the guardian): each spot shows at once,
+//                the seed strikes it seedFlight later (its landing cue: the
+//                thrown meteors land there then). Each glows and throbs for
+//                10 s from the throw, then bursts: the closer a player stands, the harder it
 //                strikes (falling off with the square of the distance, to
 //                nothing at 22 yd). So the raid drops them together and runs.
 //   Seedflames   heroic: each burst hatches a small fire elemental that hunts
@@ -27,6 +30,7 @@ import {
 import {
   at,
   cueAt,
+  cueOnBoss,
   dropFightObject,
   fireHit,
   type HeatScope,
@@ -60,11 +64,17 @@ export function dropSeeds(s: HeatScope): number {
       here.z,
       T.seedReach,
     );
-    st.seeds.push({ objectId: obj.id, x: here.x, z: here.z, life: T.seedLife });
-    cueAt(s, HEAT_CUES.seed, here.x, here.z, 1.5);
+    st.seeds.push({
+      objectId: obj.id,
+      x: here.x,
+      z: here.z,
+      life: T.seedLife,
+      flight: T.seedFlight,
+    });
     n++;
   }
   if (n > 0) {
+    cueOnBoss(s, HEAT_CUES.seedThrow);
     raidWarn(s, s.boss, 'seeds', 'Hearthseeds fall! Drop them together and run!');
     heatSay(s, s.boss, 'seeds');
   }
@@ -109,6 +119,14 @@ export function stepSeeds(s: HeatScope): void {
   if (st.seeds.length > 0) {
     const ripe: HeatSeed[] = [];
     for (const seed of st.seeds) {
+      if (seed.flight > 0) {
+        seed.flight -= DT;
+        if (seed.flight <= 1e-9) {
+          // Landed: once (a flight never counts down past its cue).
+          seed.flight = 0;
+          cueAt(s, HEAT_CUES.seed, seed.x, seed.z, 1.5);
+        }
+      }
       seed.life -= DT;
       if (seed.life <= 1e-9) ripe.push(seed);
     }

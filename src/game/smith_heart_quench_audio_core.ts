@@ -10,14 +10,28 @@
 //                the crossing, the shore ice heaving up, the lake refreezing)
 //   a crack      the ice groaning where a crack appears
 //   the bar      the awakening's charge fitted to its bar
-//   the cold     a frosty breath in the local player's ear as their own bar
-//                passes three quarters (their warning, once each rise)
+//   the cold     in the local player's ear: frost creeping as their own bar
+//                passes half, ice tightening (urgent) as it passes four
+//                fifths (each once a rise)
+//   a slash      its line drawn (a WARNING at the blade: an ice whine
+//                swelling), its lock a moment before it flies (a sharp click:
+//                step off now), the flight (the IMPACT: a screaming slash)
+//   the hunt     (mythic) The Blades Hunt: the blades waking to it, then a loop
+//                of circling blades while its bar runs; its own lines skip
+//                the slash's warning (the loop is the warning)
+//   the marks    a slash's mark on the local player, in their own ear
 //
 // Every sample is the fight's own (`heart_quench_*`, scripts/sfx/
-// sfx_prompts.mjs). Readable, punchy, never tiring: the four blades echo
-// together, so an echo is one voice, cooled.
+// sfx_prompts.mjs and smith_heart_mechanic_sfx.mjs). Readable, punchy, never
+// tiring: the blades fly one at a time, so a slash is one voice, cooled.
 
-import { QUENCH_CASTS, QUENCH_CUES } from '../sim/encounters/smith_heart/quench_ids';
+import {
+  QUENCH_AURAS,
+  QUENCH_CASTS,
+  QUENCH_CUES,
+  QUENCH_TUNING,
+} from '../sim/encounters/smith_heart/quench_ids';
+import { HEART_MARK, type HeartMarkSound } from './smith_heart_mark_audio';
 
 export interface QuenchSound {
   key: string;
@@ -43,12 +57,12 @@ export const QUENCH_CUE_SOUNDS: Readonly<Record<string, QuenchSound>> = {
   [QUENCH_CUES.plunge]: S('plunge', 0.9, 'target', 1, 0.15),
   [QUENCH_CUES.climb]: S('climb', 0.7, 'target', 1, 0.2),
   [QUENCH_CUES.wake]: S('wake', 1, 'source'),
-  // The four blades echo together: one voice, cooled.
-  [QUENCH_CUES.cross]: S('cross', 1, 'point', 1, 0.5),
+  // A blade flies its line (a slash, or one of The Blades Hunt's): the slash.
+  [QUENCH_CUES.cross]: S('slash', 1, 'point', 1, 0.15),
   [QUENCH_CUES.rim]: S('rim', 0.9, 'source', 1, 1),
   [QUENCH_CUES.thaw]: S('rim', 0.7, 'source', 0.85, 1),
-  // The rime cracking an immunity: the shatter's crack, smaller and higher.
-  [QUENCH_CUES.bite]: S('shatter', 0.7, 'target', 1.35, 0.3),
+  // The rime cracking an immunity (an Ice Block's stasis): its own take.
+  [QUENCH_CUES.bite]: S('bite', 0.9, 'target', 1, 0.3),
 };
 
 /** Is this event's ability one the fight's sound plays (the HUD's generic
@@ -60,9 +74,12 @@ export function quenchSoundClaims(ability: string | undefined): boolean {
 /** The ice groaning under a crack as it appears. */
 export const QUENCH_CRACK_SOUND = { key: 'heart_quench_crack', gain: 0.8, cooldown: 0.4 } as const;
 
-/** The local player's own cold past three quarters (the shared frost cast
- *  sample, soft, until the fight has a take of its own). */
-export const QUENCH_COLD_SOUND = { key: 'cast_frost', gain: 0.45, at: 75 } as const;
+/** The local player's own cold: a soft warning past half, an urgent one past
+ *  four fifths (a freeze comes at full). */
+export const QUENCH_COLD_SOUNDS = {
+  warn: { key: 'heart_quench_cold_warn', gain: 0.7, at: 50 },
+  danger: { key: 'heart_quench_cold_danger', gain: 1, at: 80 },
+} as const;
 
 /** A bar's charge: its sample and the sample's own length in seconds. */
 export interface QuenchBarSound {
@@ -81,18 +98,54 @@ export function quenchBarRate(sound: QuenchBarSound, barSeconds: number): number
   return Math.max(0.85, Math.min(1.2, sound.seconds / barSeconds));
 }
 
-/** Does the local player's cold crossing from `from` to `to` sound its
- *  warning (the rise past the mark; once until it falls back under)? */
-export function coldWarningDue(from: number, to: number): boolean {
-  return from < QUENCH_COLD_SOUND.at && to >= QUENCH_COLD_SOUND.at;
+/** Which warning the local player's cold crossing from `from` to `to`
+ *  sounds (the rise past a mark; the higher one when it leaps both; each once
+ *  until it falls back under), or null. */
+export function coldWarningDue(from: number, to: number): 'warn' | 'danger' | null {
+  const { warn, danger } = QUENCH_COLD_SOUNDS;
+  if (from < danger.at && to >= danger.at) return 'danger';
+  if (from < warn.at && to >= warn.at) return 'warn';
+  return null;
 }
+
+/** A slash's line: its WARNING as it is drawn, at its blade; its lock
+ *  (`lockAt` seconds before the blade flies, QUENCH_TUNING.slashLock). */
+export const QUENCH_SLASH_SOUNDS = {
+  warn: { key: 'heart_quench_slash_warn', gain: 0.95 },
+  lock: { key: 'heart_quench_slash_lock', gain: 1 },
+  lockAt: QUENCH_TUNING.slashLock,
+} as const;
+
+/** Has a line `elapsed` seconds into its `seconds` of warning reached its
+ *  lock? */
+export function slashLocked(elapsed: number, seconds: number): boolean {
+  return elapsed >= seconds - QUENCH_SLASH_SOUNDS.lockAt;
+}
+
+/** The Blades Hunt (mythic): its waking one-shot and the loop while its bar
+ *  runs. */
+export const QUENCH_HUNT_SOUNDS = {
+  start: { key: 'heart_quench_hunt_start', gain: 1 },
+  loop: { key: 'heart_quench_hunt_loop', gain: 0.7, fadeOut: 1.5 },
+} as const;
+
+/** A slash's mark on the local player, in their own ear. */
+export const QUENCH_MARK_SOUNDS: Readonly<Record<string, HeartMarkSound>> = {
+  [QUENCH_AURAS.marked]: HEART_MARK.frost,
+};
 
 /** Every sample the fight plays, for preloading once. */
 export const QUENCH_SFX_KEYS: readonly string[] = [
   ...new Set([
     ...Object.values(QUENCH_CUE_SOUNDS).map((s) => s.key),
     ...Object.values(QUENCH_BAR_SOUNDS).map((s) => s.key),
+    ...Object.values(QUENCH_MARK_SOUNDS).map((s) => s.key),
     QUENCH_CRACK_SOUND.key,
-    QUENCH_COLD_SOUND.key,
+    QUENCH_COLD_SOUNDS.warn.key,
+    QUENCH_COLD_SOUNDS.danger.key,
+    QUENCH_SLASH_SOUNDS.warn.key,
+    QUENCH_SLASH_SOUNDS.lock.key,
+    QUENCH_HUNT_SOUNDS.start.key,
+    QUENCH_HUNT_SOUNDS.loop.key,
   ]),
 ].sort();

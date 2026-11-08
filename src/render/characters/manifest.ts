@@ -4341,20 +4341,6 @@ export const VISUALS: Record<string, VisualDef> = {
     bodyless: true,
     clickRadius: 1.0,
   },
-  // The Guardian of the Breath (the Storm Cornice, design doc 7.2): a
-  // bodyless target, its click capsule, nameplate and bars over the
-  // provisional living bellows of storm granite and crystal the raid's own
-  // effects draw (smith_heart_fx/breath_body.ts) until its own model ships.
-  // Height times the template's scale (3.4) is the body's crown, about three
-  // and a half players.
-  smith_heart_breath_guardian: {
-    url: `${CREATURES}/golelingevolved.glb`,
-    height: 2.0,
-    clips: ELEMENTAL_FLOATING,
-    animUrls: [`${CREATURES}/elemental_ability_anims.glb`],
-    bodyless: true,
-    clickRadius: 1.6,
-  },
   // The Guardian of the Quench (the Frozen Lake, design doc 7.3): a bodyless
   // target, its click capsule, nameplate and bars over the provisional ice
   // guardian of frost granite and lake ice the raid's own effects draw
@@ -4368,20 +4354,6 @@ export const VISUALS: Record<string, VisualDef> = {
     animUrls: [`${CREATURES}/elemental_ability_anims.glb`],
     bodyless: true,
     clickRadius: 1.6,
-  },
-  // The Guardian of the Heat (the Hearth, design doc 7.4): a bodyless target,
-  // its click capsule, nameplate and bars over the provisional giant of the
-  // first flame in basalt and crystal the raid's own effects draw
-  // (smith_heart_fx/heat_body.ts) until its own model ships. It stands sunk
-  // to its waist in the first wellspring: height times the template's scale
-  // (3) is its crown over the lava, about seven players.
-  smith_heart_heat_guardian: {
-    url: `${CREATURES}/golelingevolved.glb`,
-    height: 4.3,
-    clips: ELEMENTAL_FLOATING,
-    animUrls: [`${CREATURES}/elemental_ability_anims.glb`],
-    bodyless: true,
-    clickRadius: 3.2,
   },
   // The Guardian of the Heat's Rolling Cinder (design doc 7.4): a bodyless
   // target, its click capsule, nameplate and bars round the great ball of the

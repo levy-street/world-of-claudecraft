@@ -57,6 +57,7 @@ import {
   calmTemplate,
   timedTemplate,
 } from '../src/sim/encounters/smith_heart/breath_ids';
+import { ISLE_CUES } from '../src/sim/encounters/smith_heart/breath_isle_ids';
 import { authoredFieldCliffRuns } from '../src/sim/instances/authored_field';
 import type { Entity, SimEvent } from '../src/sim/types';
 import type { IWorld } from '../src/world_api';
@@ -231,8 +232,27 @@ describe('smith_heart_breath_audio_core', () => {
   it('plays only samples the catalog holds, and claims its cues from the HUD', () => {
     const catalog = new Set(SFX.map((e: { key: string }) => e.key));
     for (const key of BREATH_SFX_KEYS) expect(catalog.has(key), key).toBe(true);
-    expect(BREATH_SFX_KEYS.length).toBe(15);
+    // The fight's fifteen first takes, the Knotted Gale's, the isles' and the
+    // Summit Roar's sixteen, and the shared storm mark.
+    expect(BREATH_SFX_KEYS.length).toBe(32);
     for (const cue of Object.keys(BREATH_CUE_SOUNDS)) expect(breathSoundClaims(cue)).toBe(true);
+    // Every Knotted Gale and isle cue sounds its own take (none borrowed).
+    for (const cue of [
+      BREATH_CUES.knotLand,
+      BREATH_CUES.knotTake,
+      BREATH_CUES.portalOpen,
+      BREATH_CUES.portalHop,
+      BREATH_CUES.knotThrow,
+      BREATH_CUES.knotBurst,
+      BREATH_CUES.roarHit,
+      ISLE_CUES.rideUp,
+      ISLE_CUES.rideDown,
+      ISLE_CUES.bulwarkUp,
+      ISLE_CUES.bulwarkBreak,
+    ])
+      expect(BREATH_CUE_SOUNDS[cue][0].key, cue).toMatch(
+        /heart_breath_(knot|portal|roar|ride|bulwark)_/,
+      );
     expect(breathSoundClaims('heart_council_pillar_rise')).toBe(false);
     const inhale = BREATH_BAR_SOUNDS[BREATH_CASTS.inhale];
     expect(breathBarRate(inhale, 5)).toBe(1);

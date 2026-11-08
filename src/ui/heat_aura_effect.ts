@@ -19,6 +19,7 @@ import {
   HEAT_TUNING as T,
 } from '../sim/encounters/smith_heart/heat_ids';
 import type { AuraEffectDescriptor, AuraEffectInput } from './aura_effect';
+import { tierRange } from './heart_tier_damage';
 
 const KEY = 'hudChrome.auraEffect.heatGuardian';
 
@@ -69,6 +70,7 @@ export function heatAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescript
           trail: T.trailSeconds,
           min: T.trailMin,
           max: T.trailMax,
+          ...tierRange('heroic', T.trailMin, T.trailMax, HEAT_DIFFICULTY.heroic.damageMult),
           heal: pct(T.trailHealPct),
         },
       };
@@ -80,6 +82,7 @@ export function heatAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescript
           life: T.trailLife,
           min: T.trailMin,
           max: T.trailMax,
+          ...tierRange('heroic', T.trailMin, T.trailMax, HEAT_DIFFICULTY.heroic.damageMult),
           heal: pct(T.trailHealPct),
         },
       };

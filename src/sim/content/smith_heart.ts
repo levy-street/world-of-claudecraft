@@ -14,6 +14,7 @@
 
 import { THESSALY_POST } from '../encounters/smith_heart/breath_geometry';
 import {
+  BREATH_BODY_RADIUS,
   BREATH_DIFFICULTY,
   BREATH_THESSALY_NPC,
   BREATH_TUNING,
@@ -27,6 +28,7 @@ import {
   FINAL_PHASES,
 } from '../encounters/smith_heart/final_phase_ids';
 import {
+  HEAT_GUARDIAN_SCALE,
   HEAT_MOBS,
   HEAT_NAMES,
   HEAT_TUNING,
@@ -318,7 +320,7 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
   // Rush). Hammerfall, its
   // frontal arc, stays: it reads well and keeps the raid off the tank's side.
   heart_hammer_guardian: {
-    ...boss('heart_hammer_guardian', 'Guardian of the Hammer', 32000, 0x8a6430, 3.2),
+    ...boss('heart_hammer_guardian', 'Guardian of the Hammer', 54000, 0x8a6430, 3.2),
     ccImmune: true,
     slowImmune: true,
     arcCleave: { every: 3, arcDeg: 110, range: 9, mult: 0.7, name: 'Hammerfall' },
@@ -335,7 +337,7 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
   // pressure is her bars. She carries the heir's Wrath declaration (the
   // Guardian fallen, she takes the Wrath).
   heart_seam_singer: {
-    ...boss('heart_seam_singer', 'The Seam Singer', 27500, 0xd8a24a, 2.0),
+    ...boss('heart_seam_singer', 'The Seam Singer', 46000, 0xd8a24a, 2.0),
     ccImmune: true,
     slowImmune: true,
     dmgBase: 24,
@@ -353,16 +355,21 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
   // breath.ts): a living bellows of granite, crystal and storm. Phase 1 the
   // Wind (its blows across the Cornice, the gaps in the rim, Thessaly's
   // circles, the indrawn breath and the exhale), at half health the storm
-  // breaks, phase 2 the Storm. Every number a SKETCH (unmeasured): 43,000
-  // base (about 99,000 after the elite factor) for a 4 to 5 minute fight at
-  // the bot raid's measured 400 to 460 a second. Bellows Gust is the exhale
+  // breaks, phase 2 the Storm. Every number a SKETCH (bot-measured, never
+  // with players): 80,000 base (about 184,000 after the elite factor) for a
+  // 4 to 5 minute Normal fight; Heroic's own multiplier is its difficulty
+  // row's (tier_health.ts). Bellows Gust is the exhale
   // now (encounter-driven: the fight casts it after the indrawn breath; its
   // record stays the look's numbers: the whole Cornice, the throw). Storm
   // Lance stays the trash kit's own line, on its own clock.
   heart_breath_guardian: {
-    ...boss('heart_breath_guardian', 'Guardian of the Breath', 43000, 0x5ab8e8, 3.4),
+    ...boss('heart_breath_guardian', 'Guardian of the Breath', 80000, 0x5ab8e8, 3.4),
     ccImmune: true,
     slowImmune: true,
+    // Its own model stands some eighteen yards tall: melee strikes the body of
+    // wind round its chest and tail, not its pivot, and its claws settle the
+    // tank at the body's edge (mob_combat.ts, player_attack_reach.ts).
+    bodyRadius: BREATH_BODY_RADIUS,
     trashKit: {
       wingGust: {
         castId: C.breathGust,
@@ -395,14 +402,15 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
   // quench.ts): an ice guardian of living stone and the lake's cold, no
   // metal. "Together, but not for too long": the cold bar, the huddle's
   // warmth and the ice it breaks, at half health the Smith's four blades
-  // awake and echo its attacks. Every number a SKETCH (unmeasured): 43,000
-  // base (about 99,000 after the elite factor) for a 4 to 5 minute fight at
-  // the bot raid's measured 400 to 460 a second. Tempering Strike stays its
+  // awake and echo its attacks. Every number a SKETCH (bot-measured, never
+  // with players): 62,000 base (about 143,000 after the elite factor) for a
+  // 4 to 5 minute Normal fight; Heroic's own multiplier is its difficulty
+  // row's (tier_health.ts). Tempering Strike stays its
   // swing cleave (the fight watches for it to raise the echoes); Quenching
   // Breath is encounter-driven (the fight starts and lands it on its own
   // clock; the record keeps the look's numbers).
   heart_quench_guardian: {
-    ...boss('heart_quench_guardian', 'Guardian of the Quench', 43000, 0x9ad8ff, 3),
+    ...boss('heart_quench_guardian', 'Guardian of the Quench', 62000, 0x9ad8ff, 3),
     ccImmune: true,
     slowImmune: true,
     arcCleave: {
@@ -434,14 +442,14 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
   // Hearth. "The well of the first flame": Basalt Fist and its Molten Swells,
   // Hearth Flare, two overflows, Hearthseeds, Wakefire and the Rolling
   // Cinders (heroic adds the overflows' adds and the Seedflames). Every number a
-  // SKETCH (unmeasured): 43,000 base (about 99,000 after the elite factor)
-  // for a 4 to 5 minute fight at the bot raid's measured 400 to 460 a second,
-  // like the other guardians. Its body reaches the wellspring's lip
+  // SKETCH (bot-measured, never with players): 64,000 base (about 147,000
+  // after the elite factor) for a 4 to 5 minute Normal fight, like the other
+  // guardians; Heroic's own multiplier is its difficulty row's. Its body reaches the wellspring's lip
   // (bodyRadius: melee strikes it from the shore); Cinder Grip is its own
   // stacking burn on every landed swing (the stackPoison seam), so the tanks
   // swap; every other mechanic is the encounter's.
   heart_heat_guardian: {
-    ...boss('heart_heat_guardian', 'Guardian of the Heat', 43000, 0xffe6a0, 3),
+    ...boss('heart_heat_guardian', 'Guardian of the Heat', 64000, 0xffe6a0, HEAT_GUARDIAN_SCALE),
     ccImmune: true,
     slowImmune: true,
     bodyRadius: HEARTH_WELL.r,
@@ -554,8 +562,8 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
   // encounter's (encounters/smith_heart/final*.ts): the four quarters' rules
   // and kits. Its own swing cleave, Forge Fist, is its frontal (Mythic's Heat
   // quarter leaves fire where it strikes, the Quench's slows); the sketch's
-  // Forge Wrath and Forge Pour are gone. Health a SKETCH: 70,000 base (about
-  // 161,000 after the elite factor), the guardians' anchor scaled for the
+  // Forge Wrath and Forge Pour are gone. Health a SKETCH: 72,000 base (about
+  // 166,000 after the elite factor), the guardians' anchor scaled for the
   // raid's last fight. It cannot be controlled or slowed: only its own Taking
   // Root holds it.
   // Its Splinters (part 2, encounters/smith_heart/final_adds.ts): one rises
@@ -579,7 +587,7 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
     },
   },
   heart_masterless_strength: {
-    ...boss('heart_masterless_strength', 'The Masterless Strength', 70000, 0xd8c8a0, 3.6),
+    ...boss('heart_masterless_strength', 'The Masterless Strength', 72000, 0xd8c8a0, 3.6),
     ccImmune: true,
     slowImmune: true,
     arcCleave: { every: 3, arcDeg: 110, range: 9, mult: 0.7, name: 'Forge Fist' },

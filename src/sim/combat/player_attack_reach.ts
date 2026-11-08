@@ -1,3 +1,4 @@
+import { SMITH_HEART_MOBS } from '../content/smith_heart';
 import { MOBS } from '../data';
 import { VARKHUL_BOSS_ID } from '../ignivar_raid_ids';
 import { IGNIVAR_BOSS_ID, MELEE_RANGE } from '../types';
@@ -9,6 +10,8 @@ export const RAID_BOSS_PLAYER_MELEE_RANGE = 8;
 export const HOARD_BOSS_PLAYER_MELEE_RANGE = 7;
 /** A player's melee reaches a big body from this far past its bodyRadius. */
 export const BODY_EDGE_MELEE_REACH = 3;
+/** Abilities this short (taunts, short strikes) reach a big body from its edge. */
+export const SHORT_REACH = 10;
 
 /** The melee reach a player has against a mob template that authors a
  *  bodyRadius (the towering dungeon bosses), or 0 when it authors none. */
@@ -52,6 +55,20 @@ export function effectivePlayerAttackRange(
   if (baseRange <= MELEE_RANGE && target.kind === 'mob') {
     const edge = bodyEdgeMeleeRange(target.templateId);
     if (edge > baseRange) return edge + bonus;
+  }
+  // A short-reach ability (a taunt, an 8 yd strike) measures to the body's
+  // edge too, or a tank standing where its melee lands could never Goad it
+  // (the Guardian of the Heat from its wellspring's lip). Long-range spells
+  // keep their authored range. Scoped to the Smith's Heart's bodies: the
+  // older dungeons' towering bosses keep the reach they were tuned with.
+  if (
+    baseRange > MELEE_RANGE &&
+    baseRange <= SHORT_REACH &&
+    target.kind === 'mob' &&
+    SMITH_HEART_MOBS[target.templateId] !== undefined
+  ) {
+    const r = MOBS[target.templateId]?.bodyRadius;
+    if (r !== undefined && r > 0) return baseRange + r + bonus;
   }
   return baseRange + bonus;
 }

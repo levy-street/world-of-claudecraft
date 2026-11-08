@@ -6,6 +6,7 @@
 
 import type { FloorMechanic } from './council_floor_gap';
 import type { CouncilDifficulty, CouncilRole } from './council_ids';
+import type { SlainWatch } from './voice_slain';
 
 /** A player mark counting down (Wake the Stone, Falling Rock). */
 export interface CouncilMark {
@@ -83,6 +84,8 @@ export interface CouncilRush {
 export interface CouncilFightState {
   kind: 'council';
   difficulty: CouncilDifficulty;
+  /** Each member's pool before its tier's (tier_health.ts), given back at a reset. */
+  basePools?: Partial<Record<CouncilRole, number>>;
   /** The council has fallen and the end was resolved. */
   finished: boolean;
   /** Seconds since the pull. */
@@ -134,6 +137,9 @@ export interface CouncilFightState {
   /** The members' spoken lines (council_voice.ts): `<role>_<moment>` to the
    *  fight clock it was last said at. */
   said: Record<string, number>;
+  /** The players seen dead this pull and the pull's deaths (the kill lines'
+   *  watch, voice_slain.ts). */
+  slain: SlainWatch;
   /** Mechanic casts started (the deterministic salt of every pick). */
   casts: number;
   /** Mythic: the souls standing in pillars, in the order they took them. */

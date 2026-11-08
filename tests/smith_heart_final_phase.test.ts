@@ -31,6 +31,7 @@ import {
   FINAL_PHASE_DIFFICULTY,
   FINAL_PHASE_OBJECTS,
   FINAL_STAGE_CODES,
+  FINAL_VEIN_SCHOOL,
   finalAddVein,
   finalStageOf,
   furyScale,
@@ -40,6 +41,7 @@ import {
   FINAL_PHASES as P,
   pickAddQuarters,
   pouredAuraId,
+  FINAL_PHASE_CUES as Q,
   quarterBit,
   quenchRingGaps,
   quenchRingOf,
@@ -478,6 +480,27 @@ describe('the final phase', () => {
       f.tick(1);
     }
     expect(seen).toEqual([...FINAL_MIX]);
+  });
+
+  it("tells each turn of the mix with the room's cue, in the turn's element", () => {
+    const f = finalFight(8);
+    f.pullIn('heat');
+    f.dev('/dev heart final last');
+    f.tick(sec(3.5));
+    const b = f.boss();
+    const c = f.local(b);
+    f.gather(c.x, c.z, 9);
+    const turns = f
+      .tick(sec(30))
+      .filter((e) => e.type === 'spellfxAt' && e.ability === Q.mixTurn) as Extract<
+      SimEvent,
+      { type: 'spellfxAt' }
+    >[];
+    // One cue a turn, in the mix's order, each in its element's school.
+    expect(turns.length).toBeGreaterThanOrEqual(FINAL_MIX.length);
+    expect(turns.slice(0, FINAL_MIX.length).map((e) => e.school)).toEqual(
+      FINAL_MIX.map((v) => FINAL_VEIN_SCHOOL[v]),
+    );
   });
 
   it('two minutes in, Masterless Fury pulses harder and harder (warned first)', () => {

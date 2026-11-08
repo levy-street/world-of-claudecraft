@@ -19,15 +19,19 @@ export const SMITH_HEART_PLACEHOLDER_LOOKS: Record<string, string> = {
   heart_ring_warder: 'skel_golem',
   // Final: a wind-scoured stone warder trailing storm-blue gusts.
   heart_breath_warder: 'mob_elemental',
-  // Final: a hovering storm caller of slate and lightning.
-  heart_breath_caller: 'mob_hoard_storm_caller',
+  // Final: a hovering storm caller of slate and lightning. (The hooded stone
+  // cantor, tinted storm-blue: the Buried Hoard's storm caller is a Rift-lane
+  // body, and borrowing it pulled it into the iOS entry stream.)
+  heart_breath_caller: 'mob_reedbound_acolyte',
   // The Islands of the Wind's adds (encounters/smith_heart/breath_isles.ts).
   // Final: a storm-blue stone warden of a floating isle.
   heart_gale_sentinel: 'mob_elemental',
   // Final: a hovering wind caller who mends the guardian's shield.
-  heart_gale_mender: 'mob_hoard_storm_caller',
-  // Final: a rime-crusted warder of blue ice and frost-cracked stone.
-  heart_quench_warder: 'mob_hoard_rime_elemental',
+  heart_gale_mender: 'mob_reedbound_acolyte',
+  // Final: a rime-crusted warder of blue ice and frost-cracked stone. (The
+  // stone goleling tinted ice-blue, like the other veins' warders; never a
+  // Rift-lane hoard body, see the Breath caller.)
+  heart_quench_warder: 'mob_elemental',
   // Final: a meltwater caller, ice-pale water held in a stone frame.
   heart_quench_caller: 'mob_water_elemental',
   // Final: a smith-fire warder of dark iron with a white-gold core. (The
@@ -45,20 +49,18 @@ export const SMITH_HEART_PLACEHOLDER_LOOKS: Record<string, string> = {
   // smith_heart_fx/council_bodies.ts (the Masterless Strength's pattern).
   // Final: its own model (the official pipeline), the same joints.
   heart_seam_singer: 'smith_heart_seam_singer',
-  // The Guardian of the Breath: a bodyless target; its provisional body (a
-  // living bellows of storm granite, crystal and lightning, its phase-2 storm
-  // body too) is drawn by smith_heart_fx/breath_body.ts. Final: its own model
-  // (the official pipeline), the same joints.
+  // The Guardian of the Breath: its own model (smith_heart_boss_looks.ts),
+  // floating pieces of ancient armor held together by living wind; the wind
+  // (and its phase-2 storm) is drawn by smith_heart_fx/breath_body.ts.
   heart_breath_guardian: 'smith_heart_breath_guardian',
   // The Guardian of the Quench: a bodyless target; its provisional body (an
   // ice guardian of frost granite and clear lake ice, the lake's cold light
   // in its heart) is drawn by smith_heart_fx/quench_body.ts. Final: its own
   // model (the official pipeline), the same joints.
   heart_quench_guardian: 'smith_heart_quench_guardian',
-  // The Guardian of the Heat: a bodyless target; its provisional body (a
-  // being of the first flame in columnar basalt and white-gold crystal, never
-  // a forge) is drawn by smith_heart_fx/heat_body.ts. Final: its own model
-  // (the official pipeline), the same joints.
+  // The Guardian of the Heat: its own model (smith_heart_boss_looks.ts), a
+  // giant of basalt and lava in the first wellspring; its fire is drawn by
+  // smith_heart_fx/heat_body.ts.
   heart_heat_guardian: 'smith_heart_heat_guardian',
   // Its adds (encounters/smith_heart/heat*.ts). Final: their own models.
   // The Wellspawn: a child of the first flame, the stone goleling tinted
@@ -83,7 +85,7 @@ export const SMITH_HEART_PLACEHOLDER_LOOKS: Record<string, string> = {
   // and drawn two and a half times a player's size; their element's light is
   // smith_heart_fx/final_phase_fx.ts's. Final: their own models.
   heart_final_splinter_heat: 'mob_elemental',
-  heart_final_splinter_quench: 'mob_hoard_rime_elemental',
-  heart_final_splinter_breath: 'mob_hoard_storm_caller',
+  heart_final_splinter_quench: 'mob_water_elemental',
+  heart_final_splinter_breath: 'mob_reedbound_acolyte',
   heart_final_splinter_hammer: 'skel_golem',
 };

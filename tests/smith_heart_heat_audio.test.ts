@@ -1,6 +1,6 @@
 // The Guardian of the Heat's sounds (src/game/smith_heart_heat_audio_core.ts
 // and its adapter smith_heart_heat_audio.ts): every sample it plays ships in
-// the manifest (the pack's own: no take of the fight's yet), every cue has a
+// the manifest (the fight's own takes since 2026-11-05), every cue has a
 // sound and the HUD's generic nova or beam never doubles one, a cue's layers
 // play at their body or their point, Basalt Fist's charge is fitted to its
 // bar once per bar, a Wakefire band's build rises at its place, and a mark
@@ -10,10 +10,13 @@ import { describe, expect, it } from 'vitest';
 import { SFX_CLIPS } from '../src/game/sfx_manifest.generated';
 import { HeatAudio, type HeatAudioSink } from '../src/game/smith_heart_heat_audio';
 import {
+  gripSound,
   HEAT_BAR_SOUNDS,
   HEAT_CUE_SOUNDS,
+  HEAT_GRIP_SOUND,
   HEAT_MARK_SOUNDS,
   HEAT_SFX_KEYS,
+  HEAT_WHEEL_SOUNDS,
   HEAT_ZONE_BUILD_SOUND,
   heatBarRate,
   heatSoundClaims,
@@ -60,8 +63,8 @@ describe('smith_heart_heat_audio', () => {
     expect(Object.keys(HEAT_CUE_SOUNDS).sort()).toEqual(Object.values(HEAT_CUES).sort());
     expect(heatSoundClaims('flamestrike')).toBe(false);
     expect(heatSoundClaims(undefined)).toBe(false);
-    // The fist lands with weight: layered.
-    expect(HEAT_CUE_SOUNDS[HEAT_CUES.fist].length).toBeGreaterThanOrEqual(3);
+    // The fist lands with weight: its own take, layered.
+    expect(HEAT_CUE_SOUNDS[HEAT_CUES.fist].length).toBeGreaterThanOrEqual(2);
     // The repeating small cues stay soft (they fire every few seconds).
     for (const cue of [HEAT_CUES.bolt, HEAT_CUES.river])
       for (const s of HEAT_CUE_SOUNDS[cue]) expect(s.gain, cue).toBeLessThanOrEqual(0.5);
@@ -165,17 +168,21 @@ describe('smith_heart_heat_audio', () => {
       body(1, 2, 3, { auras: ids.map((id) => ({ id })) as unknown as Entity['auras'] });
     const kindling = HEAT_MARK_SOUNDS[HEAT_AURAS.kindling];
     const hunted = HEAT_MARK_SOUNDS[HEAT_AURAS.hunted];
+    // Both are the fire sting, told apart by pitch.
+    expect(kindling.key).toBe('heart_mark_fire');
+    expect(hunted.rate).not.toBe(kindling.rate);
+    const of = (rate: number) => plays.filter((p) => p.rate === rate);
     audio.update(null, marked());
     audio.update(null, marked(HEAT_AURAS.kindling));
     audio.update(null, marked(HEAT_AURAS.kindling));
-    expect(plays.filter((p) => p.key === kindling.key)).toHaveLength(1);
-    expect(plays[0]).toMatchObject({ x: 2, z: 3 });
+    expect(of(kindling.rate)).toHaveLength(1);
+    expect(plays[0]).toMatchObject({ key: kindling.key, x: 2, z: 3 });
     audio.update(null, marked(HEAT_AURAS.kindling, HEAT_AURAS.hunted));
-    expect(plays.filter((p) => p.key === hunted.key)).toHaveLength(1);
+    expect(of(hunted.rate)).toHaveLength(1);
     audio.update(null, marked());
     audio.update(null, marked(HEAT_AURAS.kindling));
-    expect(plays.filter((p) => p.key === kindling.key)).toHaveLength(2);
-    // Someone else's marks are never mine: a dead player hears nothing new.
+    expect(of(kindling.rate)).toHaveLength(2);
+    // A dead player hears nothing new.
     audio.update(null, marked());
     audio.update(
       null,
@@ -184,6 +191,52 @@ describe('smith_heart_heat_audio', () => {
         auras: [{ id: HEAT_AURAS.hunted }] as unknown as Entity['auras'],
       }),
     );
-    expect(plays.filter((p) => p.key === hunted.key)).toHaveLength(1);
+    expect(of(hunted.rate)).toHaveLength(1);
+  });
+
+  it("sizzles each new stack of Cinder Grip in the tank's ear, loud and low from the swap", () => {
+    const { sink, plays } = fakeSink();
+    const audio = new HeatAudio(sink);
+    const gripped = (stacks: number) =>
+      body(1, 0, 0, {
+        auras: (stacks > 0 ? [{ id: HEAT_AURAS.grip, stacks }] : []) as unknown as Entity['auras'],
+      });
+    for (const n of [0, 1, 2, 2, 3, 4, 5, 5, 6, 0, 1]) audio.update(null, gripped(n));
+    const grips = plays.filter((p) => p.key === HEAT_GRIP_SOUND.key);
+    // 1, 2, 3, 4, 5, 6, then 1 again after it fell off.
+    expect(grips).toHaveLength(7);
+    expect(gripSound(4)).toEqual({ gain: HEAT_GRIP_SOUND.gain, rate: 1 });
+    expect(gripSound(HEAT_GRIP_SOUND.swapAt).gain).toBeGreaterThan(HEAT_GRIP_SOUND.gain);
+    expect(grips[4].rate).toBe(gripSound(5).rate);
+  });
+
+  it("heats and erupts the Wheel's red slices, never the safe one, and rolls the nearest cinder", () => {
+    const { sink, plays } = fakeSink();
+    const loops: string[] = [];
+    sink.loop = (id) => {
+      loops.push(id);
+    };
+    sink.unloop = (id) => {
+      loops.splice(loops.indexOf(id), 1);
+    };
+    const audio = new HeatAudio(sink);
+    audio.wheel('safe', 0, 0, 0);
+    expect(plays).toHaveLength(0);
+    audio.wheel('warn', 0, 0, 0);
+    audio.wheel('burn', 0, 0, 0);
+    expect(plays.map((p) => p.key)).toEqual([
+      HEAT_WHEEL_SOUNDS.warn.key,
+      HEAT_WHEEL_SOUNDS.burn.key,
+    ]);
+    audio.update(null, null, { x: 1, y: 0, z: 2 });
+    expect(loops).toHaveLength(1);
+    audio.update(null, null, null);
+    expect(loops).toHaveLength(0);
+  });
+
+  it("plays the fight's own takes, every one of them its own", () => {
+    for (const list of Object.values(HEAT_CUE_SOUNDS))
+      expect(list[0].key.startsWith('heart_heat_'), list[0].key).toBe(true);
+    expect(HEAT_BAR_SOUNDS[HEAT_CASTS.fist].key).toBe('heart_heat_fist_charge');
   });
 });

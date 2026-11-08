@@ -285,7 +285,7 @@ void main() {
   float bands = 0.7 + 0.3 * sin(vUv.y * 22.0 + uTime * 9.0);
   float edge = 1.0 - abs(vUv.x * 2.0 - 1.0);
   float a = uAlpha * bands * (1.0 - smoothstep(0.7, 1.0, vUv.y)) * (0.6 + 0.4 * edge);
-  float pulse = pow(0.5 + 0.5 * sin(vUv.y * 9.0 - uTime * 31.0), 8.0);
+  float pulse = pow(max(0.5 + 0.5 * sin(vUv.y * 9.0 - uTime * 31.0), 0.0), 8.0);
   vec3 col = uColor * (1.2 + bands * 0.5) + vec3(0.85, 0.93, 1.0) * pulse * 1.6 * uHot;
   gl_FragColor = vec4(col, a * (1.0 + 0.6 * pulse * uHot));
   #include <colorspace_fragment>
@@ -313,7 +313,7 @@ varying vec3 vN;
 varying vec3 vV;
 varying float vY;
 void main() {
-  float fres = pow(1.0 - abs(dot(normalize(vN), normalize(vV))), 2.6);
+  float fres = pow(max(1.0 - abs(dot(normalize(vN), normalize(vV))), 0.0), 2.6);
   float ripple = 0.8 + 0.2 * sin(vY * 9.0 - uTime * 2.5);
   gl_FragColor = vec4(uColor, uAlpha * (0.05 + fres * 0.7) * ripple);
   #include <colorspace_fragment>
@@ -1210,7 +1210,7 @@ export class BreathFightFx {
     const meE = world.entities.get(world.playerId);
     const onCornice =
       !!meE && !!this.origin && Math.abs(meE.pos.y - this.local.position.y - CORNICE_FLOOR_H) < 6;
-    this.roar.update(world, g0, onCornice, dt);
+    this.roar.update(world, g0, onCornice, dt, this.origin);
     this.toss.update(world, dt);
     this.updateBolts();
     this.particles.update(this.clock);
@@ -1229,7 +1229,14 @@ export class BreathFightFx {
         gale = e.pos;
       }
     }
-    this.audio.update(this.windPhase, wind ? wind.pos : null, guardian, gale);
+    this.audio.update(
+      this.windPhase,
+      wind ? wind.pos : null,
+      guardian,
+      gale,
+      meE ?? null,
+      this.heart.heard,
+    );
   }
 
   // ---- the scan -------------------------------------------------------------------------

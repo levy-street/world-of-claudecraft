@@ -17,6 +17,7 @@ import { HEART_FINAL_PHASE_SHARE } from '../sim/content/smith_heart_quarters';
 import { FINAL_WIND_TAG } from '../sim/encounters/smith_heart/final_breath';
 import {
   FINAL_AURAS,
+  FINAL_DIFFICULTY,
   finalZoneOf,
   FINAL_OVERLOAD as O,
   overloadAuraId,
@@ -25,10 +26,19 @@ import {
 import { WIND_DRIFT_AURA } from '../sim/wind_drift';
 import type { AuraEffectDescriptor, AuraEffectInput } from './aura_effect';
 import { finalPhaseAuraEffectDescriptor } from './final_phase_aura_effect';
+import { tierRange, tierValue } from './heart_tier_damage';
 
 const KEY = 'hudChrome.auraEffect.finalBoss';
 
 const pct = (frac: number): number => Math.round(Math.abs(frac) * 100);
+/** Heroic's and Mythic's damage factors (they differ on this fight). */
+const HM = FINAL_DIFFICULTY.heroic.damageMult;
+const MM = FINAL_DIFFICULTY.mythic.damageMult;
+/** One tuned range's Heroic and Mythic resolved values (heroicMin..mythicMax). */
+const tiers = (min: number, max: number): Record<string, number> => ({
+  ...tierRange('heroic', min, max, HM),
+  ...tierRange('mythic', min, max, MM),
+});
 
 const OVERLOAD_KEYS: Readonly<Record<string, string>> = {
   [overloadAuraId('heat')]: 'overloadHeat',
@@ -80,6 +90,8 @@ export function finalAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescrip
         heroicMax: O.burst.heroic.max,
         mythicMin: O.burst.mythic.min,
         mythicMax: O.burst.mythic.max,
+        ...tierRange('heroicPulse', O.pulseMin, O.pulseMax + O.pulseRise, HM),
+        ...tierRange('mythicPulse', O.pulseMin, O.pulseMax + O.pulseRise, MM),
       },
     };
   switch (a.id) {
@@ -91,7 +103,12 @@ export function finalAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescrip
       const stacks = Math.max(1, Math.round(a.stacks ?? a.value ?? 1));
       return {
         key: `${KEY}.unbound`,
-        nums: { per: T.unboundPerStack, total: T.unboundPerStack * stacks },
+        nums: {
+          per: T.unboundPerStack,
+          total: T.unboundPerStack * stacks,
+          heroicPer: tierValue(T.unboundPerStack, HM),
+          mythicPer: tierValue(T.unboundPerStack, MM),
+        },
       };
     }
     case FINAL_AURAS.shaken:
@@ -104,6 +121,7 @@ export function finalAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescrip
           baseMin: T.shockMin,
           baseMax: T.shockMax,
           seconds: T.shakenSeconds,
+          ...tiers(T.shockMin * T.shakenMult, T.shockMax * T.shakenMult),
         },
       };
     case FINAL_AURAS.cold:
@@ -117,6 +135,7 @@ export function finalAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescrip
           freeze: T.freezeSeconds,
           min: T.freezeMin,
           max: T.freezeMax,
+          ...tiers(T.freezeMin, T.freezeMax),
         },
       };
     case FINAL_AURAS.frozen:
@@ -137,12 +156,19 @@ export function finalAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescrip
           radius: T.emberR,
           min: T.emberMin,
           max: T.emberMax,
+          ...tiers(T.emberMin, T.emberMax),
         },
       };
     case FINAL_AURAS.drawn:
       return {
         key: `${KEY}.drawn`,
-        nums: { seconds: T.drawnSeconds, reach: T.drawnReach, min: T.drawnMin, max: T.drawnMax },
+        nums: {
+          seconds: T.drawnSeconds,
+          reach: T.drawnReach,
+          min: T.drawnMin,
+          max: T.drawnMax,
+          ...tiers(T.drawnMin, T.drawnMax),
+        },
       };
     case FINAL_AURAS.shell:
       return { key: `${KEY}.shell`, nums: { value: Math.round(a.value ?? T.shellAbsorb) } };
@@ -152,7 +178,13 @@ export function finalAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescrip
       if (a.value3 !== FINAL_WIND_TAG) return null;
       return {
         key: `${KEY}.wind`,
-        nums: { speed: a.value2 ?? T.windSpeed, band: T.rimBand, min: T.rimMin, max: T.rimMax },
+        nums: {
+          speed: a.value2 ?? T.windSpeed,
+          band: T.rimBand,
+          min: T.rimMin,
+          max: T.rimMax,
+          ...tiers(T.rimMin, T.rimMax),
+        },
       };
     default:
       return null;

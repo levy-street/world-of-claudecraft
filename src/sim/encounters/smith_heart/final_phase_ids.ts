@@ -126,6 +126,16 @@ export function quenchRingOf(templateId: string): { gaps: number; seed: number }
   return { gaps, seed };
 }
 
+/** Each vein's school on a cue (the element a sound or a light reads). */
+export const FINAL_VEIN_SCHOOL: Readonly<
+  Record<SmithHeartVein, 'fire' | 'frost' | 'nature' | 'physical'>
+> = {
+  heat: 'fire',
+  quench: 'frost',
+  breath: 'nature',
+  hammer: 'physical',
+};
+
 export const FINAL_PHASE_CUES = {
   /** The boss strides into the centre (spellfxAt at the centre). */
   leap: 'heart_final_leap',
@@ -169,6 +179,9 @@ export const FINAL_PHASE_CUES = {
   ringCrack: 'heart_final_ring_crack',
   /** The central ring breaks: the wipe (spellfxAt at the centre). */
   ringBreak: 'heart_final_ring_break',
+  /** A turn of the final phase's mix begins (spellfxAt at the centre, its
+   *  school the turn's element: FINAL_VEIN_SCHOOL). */
+  mixTurn: 'heart_final_mix_turn',
 } as const;
 
 /** The damage, aura and mob names (combat log, nameplates, the buff bar;
@@ -287,7 +300,12 @@ export const FINAL_PHASE_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalPhase
   },
   heroic: {
     adds: 3,
-    addHealth: 7000,
+    // 7,000 until the Heroic pass of 2026-11-05: three Splinters' pulses
+    // (Splintered Strength, growing each pulse) outran a decent raid's two
+    // healers inside 25 s while its damage needed 32 s to clear them; 5,500
+    // ends the call before the pulses run away, still more to kill than
+    // Normal's two at 6,500.
+    addHealth: 5500,
     coalMarks: 1,
     ringGaps: 2,
     weightStep: 0.18,

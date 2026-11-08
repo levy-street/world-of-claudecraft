@@ -57,6 +57,7 @@ import {
   resolveEncounterFxScope,
   SWEEP_BASE_OPACITY,
 } from './rift_death_zone_core';
+import { setHeartKitCompileGate } from './smith_heart/heart_kit';
 import {
   BreathBody,
   BreathFightFx,
@@ -240,20 +241,38 @@ export class RiftDeathZoneVisuals {
   ) {
     // Effects pinned to a unit ride its drawn pose (attached_fx_anchor.ts).
     if (drawnPositions) this.uninstallDrawnPositions = installDrawnPositions(drawnPositions);
+    // A Heart kit that lands after its room is shown swaps in behind this gate.
+    setHeartKitCompileGate(compileGate ?? null);
     this.hoardGestures = new HoardBossGestures(world, playGesture);
     this.hoardPresentation = new HoardBossPresentation(world, shake);
     this.summonRise = new SummonRiseFx(playGesture);
     this.hammerFx = new HammerFx(scene, groundY, world, compileGate, reducedMotion, shake);
     this.breathFx = new BreathFx(scene, groundY, world, compileGate, reducedMotion, shake);
     this.breathFight = new BreathFightFx(scene, groundY, world, compileGate, reducedMotion, shake);
-    this.breathBody = new BreathBody(scene, groundY, world, compileGate, reducedMotion, shake);
+    this.breathBody = new BreathBody(
+      scene,
+      groundY,
+      world,
+      compileGate,
+      reducedMotion,
+      shake,
+      playGesture,
+    );
     this.quenchFx = new QuenchFx(scene, groundY, world, compileGate, reducedMotion, shake);
     this.quenchFight = new QuenchFightFx(scene, groundY, world, compileGate, reducedMotion, shake);
     this.quenchBlades = new QuenchBladesFx(scene, groundY, world, compileGate, reducedMotion);
     this.quenchBody = new QuenchBody(scene, groundY, world, compileGate, reducedMotion, shake);
     this.heatFx = new HeatFx(scene, groundY, world, compileGate, reducedMotion, shake);
     this.heatFight = new HeatFightFx(scene, groundY, world, compileGate, reducedMotion, shake);
-    this.heatBody = new HeatBody(scene, groundY, world, compileGate, reducedMotion, shake);
+    this.heatBody = new HeatBody(
+      scene,
+      groundY,
+      world,
+      compileGate,
+      reducedMotion,
+      shake,
+      playGesture,
+    );
     this.finalFx = new FinalFx(
       scene,
       groundY,
@@ -643,6 +662,7 @@ export class RiftDeathZoneVisuals {
   dispose(): void {
     this.sync([]);
     this.disposed = true;
+    setHeartKitCompileGate(null);
     this.uninstallDrawnPositions?.();
     this.uninstallDrawnPositions = null;
     this.activeScope = null;

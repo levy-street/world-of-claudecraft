@@ -12,17 +12,21 @@
 //                  Wrath, the Song of the Seam)
 //   the rock       its fall, as the boulder comes into view over its soak
 //   the song       each Endless Song pulse louder and deeper as the song grows
+//   the shelter    a crowded pillar groaning under the Wrath (Narrow Shelter)
+//   the marks      a mark landing on the local player, in their own ear
 //
 // Every sample is the council's own (`heart_council_*`, scripts/sfx/
 // sfx_prompts.mjs). Readable, punchy, never tiring: a cue repeated every two
 // seconds (the heroic pulse) is kept low and cooled down.
 
 import {
+  COUNCIL_AURAS,
   COUNCIL_CASTS,
   COUNCIL_CUES,
   endlessSongMult,
   COUNCIL_TUNING as T,
 } from '../sim/encounters/smith_heart/council_ids';
+import { HEART_MARK, type HeartMarkSound, markSound } from './smith_heart_mark_audio';
 
 export interface CouncilSound {
   key: string;
@@ -57,19 +61,19 @@ export const COUNCIL_CUE_SOUNDS: Readonly<Record<string, CouncilSound>> = {
   [COUNCIL_CUES.soulPip]: S('soul_pip', 1, 'source'),
   [COUNCIL_CUES.soulBurst]: S('soul_burst', 1, 'point'),
   [COUNCIL_CUES.echoBlast]: S('echo_blast', 1, 'source'),
-  // Mountain's Rush's wind-up: the Guardian plants, a deep slowed thud at
-  // its feet before the run.
-  [COUNCIL_CUES.rushWindup]: S('rock_impact', 0.7, 'point', 0.62, 0.3),
-  // Mountain's Rush striking home (a pillar or the raid): the crush sample.
-  [COUNCIL_CUES.rushImpact]: S('slab_crush', 1, 'point', 1, 0.3),
+  // Mountain's Rush's wind-up (a WARNING: the Guardian plants and gathers,
+  // stone grinding, no hit) and its run striking home (the IMPACT: a giant's
+  // body slam), each its own take.
+  [COUNCIL_CUES.rushWindup]: S('rush_windup', 1, 'point', 1, 0.3),
+  [COUNCIL_CUES.rushImpact]: S('rush_impact', 1, 'point', 1, 0.3),
   // The cursed pillar: the rise's burst, a low dark hum, a soul pillar's
   // burst as it breaks; the bond's pulse and Resonance's ring, the song's
   // hum kept low; the mythic collapse, the rock's impact cooled down.
   [COUNCIL_CUES.cursedRise]: S('pillar_rise', 0.95, 'source', 0.85),
   [COUNCIL_CUES.cursedPulse]: S('pillar_pulse', 0.4, 'source', 0.75, 1.2),
   [COUNCIL_CUES.cursedBreak]: S('soul_burst', 1, 'point', 0.9),
-  [COUNCIL_CUES.bondPulse]: S('song_pulse', 0.5, 'source', 0.8, 1),
-  [COUNCIL_CUES.resonancePulse]: S('song_pulse', 0.35, 'source', 1.15, 0.6),
+  [COUNCIL_CUES.bondPulse]: S('bond_pulse', 0.6, 'source', 1, 1),
+  [COUNCIL_CUES.resonancePulse]: S('resonance', 0.5, 'source', 1, 0.6),
   [COUNCIL_CUES.quarryCollapse]: S('rock_impact', 0.45, 'point', 1.1, 0.5),
   // The song's pulse grows: songPulseSound below sets its gain and rate.
   [COUNCIL_CUES.songPulse]: S('song_pulse', 0.6, 'source'),
@@ -124,11 +128,36 @@ export function barSoundRate(sound: CouncilBarSound, barSeconds: number): number
  *  renderer's own lead, council_fx_core.ts ROCK_FALL_SECONDS). */
 export const ROCK_FALL_SOUND = { key: 'heart_council_rock_fall', lead: 1.2, gain: 0.9 } as const;
 
+/** Narrow Shelter: a pillar one too many hide behind groans (a WARNING,
+ *  heard as it crowds, never again until it clears). */
+export const SHELTER_STRAIN_SOUND = {
+  key: 'heart_council_shelter_strain',
+  gain: 0.9,
+  cooldown: 1.2,
+} as const;
+
+/** Does the crowded count going `from` to `to` sound the strain? Only as a
+ *  pillar newly crowds. */
+export function shelterStrainDue(from: number, to: number): boolean {
+  return to > from && to > 0;
+}
+
+/** The council's marks in the marked player's own ear: the Rush's mark, a
+ *  Wake the Stone mark, the Falling Rock's mark, Resonance. */
+export const COUNCIL_MARK_SOUNDS: Readonly<Record<string, HeartMarkSound>> = {
+  [COUNCIL_AURAS.rushMark]: HEART_MARK.stone,
+  [COUNCIL_AURAS.wakeMark]: markSound(HEART_MARK.stone, 0.8, 1.15),
+  [COUNCIL_AURAS.rockMark]: markSound(HEART_MARK.stone, 0.9, 0.85),
+  [COUNCIL_AURAS.resonance]: markSound(HEART_MARK.stone, 0.75, 1.3),
+};
+
 /** Every sample the council plays, for preloading once. */
 export const COUNCIL_SFX_KEYS: readonly string[] = [
   ...new Set([
     ...Object.values(COUNCIL_CUE_SOUNDS).map((s) => s.key),
     ...Object.values(COUNCIL_BAR_SOUNDS).map((s) => s.key),
+    ...Object.values(COUNCIL_MARK_SOUNDS).map((s) => s.key),
     ROCK_FALL_SOUND.key,
+    SHELTER_STRAIN_SOUND.key,
   ]),
 ].sort();

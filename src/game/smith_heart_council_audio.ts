@@ -14,11 +14,15 @@ import {
   barSoundRate,
   COUNCIL_BAR_SOUNDS,
   COUNCIL_CUE_SOUNDS,
+  COUNCIL_MARK_SOUNDS,
   COUNCIL_SFX_KEYS,
   type CouncilSound,
   ROCK_FALL_SOUND,
+  SHELTER_STRAIN_SOUND,
+  shelterStrainDue,
   songPulseSound,
 } from './smith_heart_council_audio_core';
+import { HeartMarkEar } from './smith_heart_mark_audio';
 
 export interface CouncilAudioSink {
   playAt(
@@ -26,7 +30,13 @@ export interface CouncilAudioSink {
     x: number,
     y: number,
     z: number,
-    opts?: { gain?: number; cooldown?: number; rate?: number; jitter?: boolean },
+    opts?: {
+      gain?: number;
+      cooldown?: number;
+      rate?: number;
+      jitter?: boolean;
+      priority?: boolean;
+    },
   ): boolean;
   loop(id: string, key: string, target: number, x?: number, y?: number, z?: number): void;
   unloop(id: string, fade?: number): void;
@@ -61,6 +71,9 @@ function auraOf(e: Entity, id: string) {
 export class CouncilAudio {
   private readonly watches: Watch[] = [];
   private preloaded = false;
+  private readonly marks = new HeartMarkEar(COUNCIL_MARK_SOUNDS);
+  /** Pillars crowded past Narrow Shelter at the last lay. */
+  private crowded = 0;
 
   constructor(private readonly sink: CouncilAudioSink) {
     for (let i = 0; i < MAX_WATCH; i++)
@@ -119,8 +132,23 @@ export class CouncilAudio {
       gain: sound.gain,
       rate: sound.rate,
       cooldown: sound.cooldown,
+      priority: true,
     });
     return true;
+  }
+
+  /** Narrow Shelter's count at a lay of the Wrath's gems: `crowded` pillars
+   *  over the limit, the first at (x, y, z); 0 when the bar ends. */
+  shelter(crowded: number, x: number, y: number, z: number): void {
+    if (shelterStrainDue(this.crowded, crowded)) {
+      this.preload();
+      this.sink.playAt(SHELTER_STRAIN_SOUND.key, x, y + 3, z, {
+        gain: SHELTER_STRAIN_SOUND.gain,
+        cooldown: SHELTER_STRAIN_SOUND.cooldown,
+        priority: true,
+      });
+    }
+    this.crowded = crowded;
   }
 
   // ---- the watch ----------------------------------------------------------------------------
@@ -159,8 +187,14 @@ export class CouncilAudio {
     w.id = -1;
   }
 
-  /** One frame: the bars starting, the rock coming into view. */
-  update(_dt: number, entityOf: (id: number) => Entity | undefined): void {
+  /** One frame: the bars starting, the rock coming into view, a mark landing
+   *  on the local player (`me`, null out of the raid). */
+  update(
+    _dt: number,
+    entityOf: (id: number) => Entity | undefined,
+    me: Entity | null = null,
+  ): void {
+    this.marks.update(me, this.sink);
     for (const w of this.watches) {
       if (w.id < 0) continue;
       const e = entityOf(w.id);
@@ -176,6 +210,7 @@ export class CouncilAudio {
           this.sink.playAt(ROCK_FALL_SOUND.key, e.pos.x, e.pos.y + 6, e.pos.z, {
             gain: ROCK_FALL_SOUND.gain,
             cooldown: 0.3,
+            priority: true,
           });
         }
         continue;
@@ -192,6 +227,7 @@ export class CouncilAudio {
             rate: barSoundRate(sound, e.castTotal),
             cooldown: 0.5,
             jitter: false,
+            priority: true,
           });
       }
     }

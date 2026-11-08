@@ -20,7 +20,7 @@ import {
 } from '../src/sim/encounters/gravewyrm_sanctum/korzul_emerge_plan';
 import { BELL_YARD, MARROW_ID } from '../src/sim/encounters/hollow_crypt';
 import { MORTHEN_SPOT } from '../src/sim/encounters/hollow_crypt/ids';
-import { gapAt } from '../src/sim/encounters/smith_heart/breath_geometry';
+import { gapAt, openLipAt } from '../src/sim/encounters/smith_heart/breath_geometry';
 import { VAEL_INTRO_STOPS } from '../src/sim/encounters/sunken_bastion/ids';
 import { clearDungeonGateStateForTest } from '../src/sim/instances/dungeon_gate_state';
 import {
@@ -770,9 +770,11 @@ describe('the boss-room seal delay: every sealing gate of every dungeon', () => 
           if (Math.abs(nx) > 400 || Math.abs(nz) > 500 || seen.has(key(nx, nz))) continue;
           seen.add(key(nx, nz));
           // The Storm Cornice is walled by a void, not colliders: a gap in its
-          // rim is a lethal fall (breath_geometry.ts), never a way out, so the
-          // flood stops at a gap's throat as it does at a wall.
-          if (dungeonId === 'smith_heart' && gapAt(nx, nz) !== null) continue;
+          // rim or its open lip (CORNICE_OPEN_RIM: no wall stands round the
+          // Cornice) is a lethal fall (breath_geometry.ts), never a way out, so
+          // the flood stops there as it does at a wall.
+          if (dungeonId === 'smith_heart' && (gapAt(nx, nz) !== null || openLipAt(nx, nz)))
+            continue;
           if (!isBlocked(WORLD_SEED, o.x + nx, o.z + nz, 0.5)) queue.push([nx, nz]);
         }
       }
@@ -886,9 +888,10 @@ describe('the boss-room seal delay: every sealing gate of every dungeon', () => 
     // Every file under src/sim/encounters that assigns a spawnPos. Each was
     // read for this suite: only korzul_emerge.ts moves a SEALING boss's home
     // (covered above); the rest re-home adds, shackles and raid bosses that
-    // have no sealing gate. The Smith's Heart's three: final_adds.ts and
-    // heat_scope.ts home freshly raised adds (the Splinters, the Heat's adds)
-    // where they rise; final.ts reHome
+    // have no sealing gate. The Smith's Heart's four: breath_isles.ts,
+    // final_adds.ts and heat_scope.ts home freshly raised adds (the Breath
+    // isles' Gale Sentinels and Menders, the Splinters, the Heat's adds) where
+    // they rise; final.ts reHome
     // sets the sealing final boss's home back to its authored spawn (HEART_ROOM,
     // the spawn the check above already reads), never a new spot. A file that
     // joins this list has not been read yet.
@@ -912,6 +915,7 @@ describe('the boss-room seal delay: every sealing gate of every dungeon', () => 
       'hollow_crypt/knellwyrm.ts',
       'ignivar.ts',
       'nythraxis.ts',
+      'smith_heart/breath_isles.ts',
       'smith_heart/final.ts',
       'smith_heart/final_adds.ts',
       'smith_heart/heat_scope.ts',

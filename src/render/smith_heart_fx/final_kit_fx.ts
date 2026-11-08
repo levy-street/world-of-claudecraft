@@ -34,6 +34,8 @@
 // its points through `modelViewMatrix` (camera-relative).
 
 import * as THREE from 'three';
+import { sfx } from '../../game/sfx';
+import { FinalAudio } from '../../game/smith_heart_final_audio';
 import { resolveUiEffectsProfile } from '../../game/ui_effects_profile';
 import { HEART_ROOM, inSmithHeartRoom } from '../../sim/content/smith_heart_layout';
 import { DUNGEONS, instanceOrigin, instanceSlotForZ } from '../../sim/data';
@@ -44,6 +46,7 @@ import {
   FINAL_CUES,
   FINAL_TUNING as T,
 } from '../../sim/encounters/smith_heart/final_ids';
+import { finalAddVein } from '../../sim/encounters/smith_heart/final_phase_ids';
 import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
 import { fxAnchor } from '../attached_fx_anchor';
@@ -184,6 +187,16 @@ export class FinalKitFx {
   private readonly seen = new Map<number, ObjSeen>();
   private readonly objectIds: number[] = [];
   private readonly playerIds: number[] = [];
+  /** The living Splinters (their bars are the sound's). */
+  private readonly splinterIds: number[] = [];
+  /** The whole fight's sound (game/smith_heart_final_audio.ts): every final
+   *  cue, the footprints as they appear, the bars, the Overload, the marks. */
+  private readonly audio = new FinalAudio(sfx);
+  private readonly lookup = (id: number): Entity | undefined => this.world?.entities.get(id);
+  private readonly groundAt = (x: number, z: number): number => this.groundY(x, z);
+  private readonly centre = { x: 0, y: 0, z: 0 };
+  private readonly galeAt = { x: 0, y: 0, z: 0 };
+  private galeBlowing = false;
   private rosterSeen = Number.NaN;
   private scanTimer = 0;
   private bossId = -1;
@@ -512,6 +525,7 @@ export class FinalKitFx {
   handleEvent(ev: SimEvent): boolean {
     if (!this.world || this.disposed) return false;
     if (ev.type !== 'spellfx' && ev.type !== 'spellfxAt') return false;
+    if (this.active) this.audio.event(ev, this.lookup, this.groundAt);
     if (!finalKitClaims(ev.ability)) return false;
     if (!this.active) return true;
     if (ev.type === 'spellfx') {
@@ -689,6 +703,7 @@ export class FinalKitFx {
     }
     if (!inHeart) {
       if (this.active) this.leave();
+      this.audio.update(null, this.splinterIds, this.lookup, null, null, null);
       this.particles.update(this.clock);
       return;
     }
@@ -708,6 +723,18 @@ export class FinalKitFx {
     this.paintArcs(world);
     this.paintShock();
     this.particles.update(this.clock);
+    const boss = this.bossId >= 0 ? (world.entities.get(this.bossId) ?? null) : null;
+    this.centre.x = this.originX + HEART_ROOM.x;
+    this.centre.z = this.originZ + HEART_ROOM.z;
+    this.centre.y = this.groundY(this.centre.x, this.centre.z);
+    this.audio.update(
+      boss,
+      this.splinterIds,
+      this.lookup,
+      this.galeBlowing ? this.galeAt : null,
+      me ?? null,
+      this.centre,
+    );
   }
 
   private scan(world: IWorld, dt: number): void {
@@ -718,15 +745,23 @@ export class FinalKitFx {
     this.rosterSeen = world.entityRosterVersion;
     this.objectIds.length = 0;
     this.playerIds.length = 0;
+    this.splinterIds.length = 0;
     this.bossId = -1;
     for (const e of world.entities.values()) {
       if (e.kind === 'player') this.playerIds.push(e.id);
       else if (e.kind === 'mob' && e.templateId === FINAL_BOSS) this.bossId = e.id;
-      else if (e.kind === 'object') {
+      else if (e.kind === 'mob' && finalAddVein(e.templateId) !== null) {
+        if (this.splinterIds.length < 4) this.splinterIds.push(e.id);
+      } else if (e.kind === 'object') {
         const kind = finalObjectKind(e.templateId);
         if (!kind) continue;
         this.objectIds.push(e.id);
-        if (!this.seen.has(e.id)) this.seen.set(e.id, { born: this.clock, kind });
+        if (!this.seen.has(e.id)) {
+          this.seen.set(e.id, { born: this.clock, kind });
+          // A footprint appearing: its warning (a whirl rising, the gale
+          // gathering, the ice groaning, an orb, a tremor crack).
+          this.audio.footprint(kind, e.pos.x, this.groundY(e.pos.x, e.pos.z), e.pos.z);
+        }
       }
     }
     for (const id of this.seen.keys()) if (!world.entities.has(id)) this.seen.delete(id);
@@ -772,6 +807,7 @@ export class FinalKitFx {
     let orb = 0;
     let anvilShown = false;
     let wind: Entity | null = null;
+    let blowing = false;
     for (const id of this.objectIds) {
       const e = world.entities.get(id);
       const info = this.seen.get(id);
@@ -926,6 +962,12 @@ export class FinalKitFx {
         case 'windWarn':
         case 'windBlow':
           wind = e;
+          if (kind === 'windBlow') {
+            blowing = true;
+            this.galeAt.x = x;
+            this.galeAt.y = y;
+            this.galeAt.z = z;
+          }
           break;
         default:
       }
@@ -941,6 +983,7 @@ export class FinalKitFx {
       ob.ring.visible = false;
     }
     if (!anvilShown) this.anvil.visible = false;
+    this.galeBlowing = blowing;
     this.paintWind(wind);
   }
 
@@ -1200,6 +1243,7 @@ export class FinalKitFx {
   dispose(): void {
     if (this.disposed) return;
     this.disposed = true;
+    this.audio.dispose();
     this.root.removeFromParent();
     this.particles.dispose();
     this.kit.dispose();

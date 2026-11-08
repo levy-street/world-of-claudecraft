@@ -2,8 +2,8 @@
 // 7.4): what keeps the raid pressed close in phase 1, and the wellspring's
 // own fire.
 //
-//   Hearth Flare     phase 1, every 4 s: everyone farther than 20 yd from the
-//                    wellspring's middle (12 yd past its lip, out of the
+//   Hearth Flare     phase 1, every 4 s: everyone farther than flareReach from
+//                    the wellspring's middle (12 yd past its lip, out of the
 //                    guardian's reach) is struck by a bolt of the first flame
 //                    and marked Flare-Scorched (25 percent more Fire and other
 //                    magic damage taken, 8 s). The opposite of the Breath's

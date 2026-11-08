@@ -122,7 +122,10 @@ export const HEAT_CUES = {
   feed: 'heart_heat_feed',
   /** A Wellkeeper marks a player (spellfx 'beam', keeper to them). */
   kindling: 'heart_heat_kindling',
-  /** A Hearthseed lands (spellfxAt). */
+  /** The guardian heaves the Hearthseeds out of the wellspring (spellfx
+   *  'nova' on it): the throw's gesture and its meteors leave its hands. */
+  seedThrow: 'heart_heat_seed_throw',
+  /** A Hearthseed lands, HEAT_TUNING.seedFlight after the throw (spellfxAt). */
   seed: 'heart_heat_seed',
   /** A Hearthseed bursts (spellfxAt, its reach as the radius). */
   seedBurst: 'heart_heat_seed_burst',
@@ -193,6 +196,9 @@ export type HeatDifficulty = 'normal' | 'heroic' | 'mythic';
 export interface HeatDifficultyRules {
   /** Every mechanic's damage, on top of the claim's own multiplier. */
   damageMult: number;
+  /** The boss's health pool against the template's, set at the pull
+   *  (tier_health.ts). */
+  healthMult: number;
   /** The overflows bring the Wellspawn (and the second, two Wellkeepers). */
   overflowAdds: boolean;
   /** A Hearthseed's burst hatches a Seedflame. */
@@ -208,6 +214,7 @@ export interface HeatDifficultyRules {
 export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRules>> = {
   normal: {
     damageMult: 1,
+    healthMult: 1,
     overflowAdds: false,
     seedHatch: false,
     bolts: 2,
@@ -216,6 +223,7 @@ export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRule
   },
   heroic: {
     damageMult: 1.25,
+    healthMult: 1.45,
     overflowAdds: true,
     seedHatch: true,
     bolts: 3,
@@ -225,6 +233,7 @@ export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRule
   // Heroic whole, plus the Wheel of the Hearth.
   mythic: {
     damageMult: 1.25,
+    healthMult: 1.45,
     overflowAdds: true,
     seedHatch: true,
     bolts: 3,
@@ -251,6 +260,21 @@ export const HEAT_PHASE_KIT: Readonly<Record<HeatPhase, HeatPhaseKit>> = {
   3: { fist: true, flare: false, seeds: false, zones: true, cinders: true },
 };
 
+// ---- the wellspring's size -------------------------------------------------------------
+
+/** The first wellspring's burning lip (yards from its middle): the guardian's
+ *  body radius too, so melee strikes it from the shore round the lip. The
+ *  layout's HEARTH_WELL takes its radius from here, and every reach measured
+ *  from the well's middle (Hearth Flare's, Wakefire's bands, a Wellspawn's
+ *  feeding) is this plus its own margin, so the fight keeps its shape when the
+ *  well grows (pass 4 of 2026-11-06: 8 to 10.5 with the guardian's body). */
+export const HEAT_WELL_R = 10.5;
+
+/** The guardian's template scale (its drawn size; the renderer's fire
+ *  reckons in it): grown with the well in pass 4, 3 to 4. Its own swing's
+ *  reach follows its body radius (mob_combat.ts), never this alone. */
+export const HEAT_GUARDIAN_SCALE = 4;
+
 // ---- tuning (SKETCH, unmeasured) ------------------------------------------------------
 
 export const HEAT_TUNING = {
@@ -276,26 +300,31 @@ export const HEAT_TUNING = {
   fistR: 6,
   fistMin: 2500,
   fistMax: 2700,
-  /** Three lanes from the spot: away from the wellspring and to either side. */
+  /** Three lanes from the spot: away from the wellspring and to either side.
+   *  Pass 5 (2026-11-06, the owner's call): 11 yd wide (2.5 either side
+   *  before), a wall a raid reads as a wave; from the lane's middle a player
+   *  runs out of it in under a second, the warning is 3.6 s before it rolls. */
   laneLength: 32,
-  laneHalf: 2.5,
+  laneHalf: 5.5,
   /** The waves start rolling this long after the fist lands. */
   waveDelay: 0.6,
   waveSpeed: 10,
-  /** A wave's wall is this deep along its lane. */
-  waveDepth: 2.5,
+  /** A wave's wall is this deep along its lane (2.5 before pass 5). */
+  waveDepth: 5,
   waveMin: 380,
   waveMax: 440,
   // Hearth Flare (phase 1): everyone farther than flareReach from the
   // wellspring's middle (12 yd past its lip, the giant's reach) is struck.
   flareEvery: 4,
-  flareReach: 20,
+  flareReach: HEAT_WELL_R + 12,
   flareMin: 260,
   flareMax: 300,
   scorchedPct: 0.25,
   scorchedSeconds: 8,
   // Cinder Grip (the template's stackPoison): per stack a second.
-  gripPerTick: 18,
+  // 18 until the bot raid of 2026-11-04: swapped at 5 stacks, both tanks still
+  // burned 90 a second each for 15 s, more than two level-20 healers keep up.
+  gripPerTick: 9,
   gripSeconds: 15,
   gripMaxStacks: 10,
   // The overflow's rivers and Falling Cinders.
@@ -326,7 +355,7 @@ export const HEAT_TUNING = {
   spawnSlowAt: 0.5,
   /** One reaching this far from the wellspring's middle feeds it (a yard and
    *  a half past its lip). */
-  spawnReach: 9.5,
+  spawnReach: HEAT_WELL_R + 1.5,
   feedHealPct: 0.03,
   feedMin: 380,
   feedMax: 420,
@@ -354,6 +383,11 @@ export const HEAT_TUNING = {
    *  square of the distance to nothing at the reach). */
   seedReach: 22,
   seedMax: 520,
+  /** A seed is thrown: the guardian heaves it out of the wellspring as it
+   *  falls (the seed's object and footprint show at once), and it strikes the
+   *  floor this long after (its landing cue). Its fuse (seedLife) still runs
+   *  from the throw, so the burst keeps its time. */
+  seedFlight: 2.2,
   // Wakefire (phases 2 and 3).
   zoneFirst: 16,
   zoneEvery: 34,
@@ -445,9 +479,9 @@ export function seedFalloff(d: number): number {
 /** Wakefire's three bands round the wellspring's middle: [inner, outer)
  *  yards. 0 near the guardian, 1 the middle, 2 the back. */
 export const ZONE_BANDS: readonly (readonly [number, number])[] = [
-  [8, 19],
-  [19, 31],
-  [31, 70],
+  [HEAT_WELL_R, HEAT_WELL_R + 11],
+  [HEAT_WELL_R + 11, HEAT_WELL_R + 23],
+  [HEAT_WELL_R + 23, 70],
 ];
 
 /** The Wheel of the Hearth: how many slices, and how many rounds in a run. */

@@ -23,6 +23,7 @@ import {
   overloadAuraId,
   FINAL_TUNING as T,
 } from '../src/sim/encounters/smith_heart/final_ids';
+import { QUIET_WARNINGS } from '../src/sim/encounters/smith_heart/final_scope';
 import type { Aura, SimEvent } from '../src/sim/types';
 import { WIND_DRIFT_AURA } from '../src/sim/wind_drift';
 import { auraEffectDescriptor } from '../src/ui/aura_effect';
@@ -71,22 +72,11 @@ describe('The Masterless Strength: what the raid reads', () => {
       (e): e is Chat => e.type === 'chat' && e.channel === 'raidWarning' && e.pid === f.pids[0],
     );
     const keys = new Set(warns.map((w) => w.textKey));
-    for (const k of [
-      'enterHeat',
-      'enterQuench',
-      'enterBreath',
-      'enterHammer',
-      'burstLethal',
-      'nearFullLethal',
-      'unbound',
-      'embers',
-      'wind',
-      'drawn',
-      'orbs',
-      'ice',
-      'anvil',
-    ])
+    for (const k of ['burstLethal', 'nearFullLethal', 'unbound', 'wind', 'orbs', 'ice', 'anvil'])
       expect(keys, k).toContain(`hudChrome.finalBoss.warn.${k}`);
+    // What the screen already says (the Overload panel's quarter, a mark's own
+    // alert) never takes the top of the screen.
+    for (const k of QUIET_WARNINGS) expect(keys, k).not.toContain(`hudChrome.finalBoss.warn.${k}`);
     for (const w of warns) expect(t(w.textKey as never)).toBe(w.text);
   });
 
@@ -272,6 +262,11 @@ describe('The Masterless Strength: the Overload bars', () => {
     expect(el).not.toBeNull();
     expect(el?.querySelectorAll('.ho-row').length).toBe(4);
     expect(el?.querySelector('.ho-row.is-heat.is-active .ho-pct')?.textContent).toBe('42%');
+    // The active quarter is said in text too, not by colour alone.
+    expect(el?.querySelector('.ho-row.is-heat')?.getAttribute('aria-current')).toBe('true');
+    expect(el?.querySelector('.ho-row.is-quench')?.getAttribute('aria-current')).toBe('false');
+    expect(el?.getAttribute('aria-description')).toBe(view.activeAria);
+    expect(view.activeAria).not.toBe('');
     const before = el?.innerHTML;
     const firstWrites = writes;
     expect(firstWrites).toBeGreaterThan(0);

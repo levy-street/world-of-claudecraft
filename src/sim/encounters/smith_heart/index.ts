@@ -62,6 +62,7 @@ export {
   tickHeatGuardian,
 } from './heat';
 export { heatCinderHitPoints } from './heat_cinder_ward';
+export { FIST_SPAN, wakefireHoldsFist } from './heat_fist';
 export * from './heat_geometry';
 export * from './heat_ids';
 export type { HeatFightState } from './heat_state';

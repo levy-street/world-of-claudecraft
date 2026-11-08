@@ -123,7 +123,10 @@ export function heartLandmarkSpots(vein: SmithHeartVein): HeartLandmarkPoint[] {
       at(21, 76, 18),
     ];
   if (vein === 'hammer')
-    return [at(0, 66.5, 12), at(17, 71.2, 18), at(-10, 72.2, 16), at(29, 68.8, 13)];
+    // The first on the gold crack down the great hammer's head (the hammer round of
+    // 2026-11-05 raised the head; the crystal that stood here moved off in the
+    // weak-spots pass's second round).
+    return [at(1.5, 73.5, 17.5), at(17, 71.2, 18), at(-10, 72.2, 16), at(29, 68.8, 13)];
   if (vein === 'quench')
     return [
       at(2, 73.6, 27),

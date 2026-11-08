@@ -20,6 +20,7 @@ import { DT } from '../../types';
 import { BREATH_AURAS, BREATH_CUES, BREATH_NAMES, BREATH_TUNING as T } from './breath_ids';
 import { type BreathScope, livePlayers, roll } from './breath_scope';
 import { beginShove, stepShoves } from './breath_shove';
+import { breathSay } from './breath_voice';
 
 /** Seconds the wave's front takes to reach `distance` yards. */
 export function roarArrival(distance: number): number {
@@ -34,6 +35,7 @@ export function startRoar(s: BreathScope): void {
   for (const p of livePlayers(s))
     reach = Math.max(reach, Math.hypot(p.pos.x - b.pos.x, p.pos.z - b.pos.z));
   s.st.roar = { x: b.pos.x, z: b.pos.z, r: 0, reach: reach + 1, struck: [], slides: [] };
+  breathSay(s, b, 'guardian', 'roar');
 }
 
 /** One tick of the wave: its front moves out, strikes whoever it reaches,

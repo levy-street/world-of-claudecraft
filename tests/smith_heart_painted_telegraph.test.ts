@@ -132,8 +132,8 @@ describe("the Falling Rock's approach: the shadow and the heat", () => {
   });
 
   it('the stone paint mirrors the shadow look', () => {
-    expect(COUNCIL_TELEGRAPH_FRAG).toContain('float soft = 0.55 - 0.47 * pow(k, 0.8);');
-    expect(COUNCIL_TELEGRAPH_FRAG).toContain('shDark = 0.55 + 0.4 * pow(k, 0.6);');
+    expect(COUNCIL_TELEGRAPH_FRAG).toContain('float soft = 0.55 - 0.47 * pow(max(k, 0.0), 0.8);');
+    expect(COUNCIL_TELEGRAPH_FRAG).toContain('shDark = 0.55 + 0.4 * pow(max(k, 0.0), 0.6);');
     // Drawn by the char pass (a multiply under the glow), so the fissures'
     // cores burn through it.
     const char = COUNCIL_TELEGRAPH_FRAG.split('#ifdef PT_CHAR')[1]?.split('#else')[0] ?? '';
@@ -202,7 +202,9 @@ describe('the lightning: reach and flare', () => {
 
   it('the shader mirrors the core (reach, flare, restrike rate)', () => {
     expect(BREATH_TELEGRAPH_FRAG).toContain('(0.45 + 0.51 * clamp(uFill, 0.0, 1.0))');
-    expect(BREATH_TELEGRAPH_FRAG).toContain('uFill > 0.86 ? pow((uFill - 0.86) / 0.14, 2.0)');
+    expect(BREATH_TELEGRAPH_FRAG).toContain(
+      'uFill > 0.86 ? pow(max((uFill - 0.86) / 0.14, 0.0), 2.0)',
+    );
     expect(BREATH_TELEGRAPH_FRAG).toContain(`uTime * ${BOLT_RESTRIKE_HZ.toFixed(1)}`);
   });
 

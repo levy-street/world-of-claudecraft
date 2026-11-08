@@ -29,6 +29,7 @@ export interface VoiceLineCatalogContent {
   >;
   IGNIVAR_DIALOGUE_LINES: readonly string[];
   VARKHUL_DIALOGUE_LINES: readonly string[];
+  SMITH_HEART_VOICE_LINES?: readonly { voiceNpc: string; id: string; text: string }[];
 }
 
 export function collectVoiceLines(content: VoiceLineCatalogContent): VoiceLineCatalogEntry[];

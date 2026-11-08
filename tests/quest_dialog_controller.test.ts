@@ -268,7 +268,8 @@ describe('QuestDialogController', () => {
     expect(test.element.style.display).toBe('block');
     expect(test.element.innerHTML).toContain('Hello');
     expect(test.voice.play).toHaveBeenCalledWith(`greeting__${test.entity.templateId}`);
-    expect(test.voice.setDistance).toHaveBeenCalledWith(0);
+    // A talked-to NPC fades on the dialogue curve (no fade of its own).
+    expect(test.voice.setDistance).toHaveBeenCalledWith(0, null);
     expect(test.focusFirst).toHaveBeenCalledTimes(1);
     expect(test.onOpenChange).toHaveBeenCalledWith(true);
     expect(test.onOpenChange.mock.invocationCallOrder[0]).toBeLessThan(

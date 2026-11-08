@@ -32,7 +32,7 @@ export function applyHeartIceSheen<T extends THREE.Material>(mat: T): T {
           // vViewPosition points from the fragment to the eye; normal is the
           // shading normal (view space) the lighting reads.
           float iceFacing = clamp( dot( normal, normalize( vViewPosition ) ), 0.0, 1.0 );
-          float iceGraze = pow( 1.0 - iceFacing, ${HEART_ICE_SHEEN.power.toFixed(2)} );
+          float iceGraze = pow(max(1.0 - iceFacing, 0.0), ${HEART_ICE_SHEEN.power.toFixed(2)} );
           totalEmissiveRadiance += vec3( ${r.toFixed(3)}, ${g.toFixed(3)}, ${b.toFixed(3)} )
             * iceGraze * ${HEART_ICE_SHEEN.strength.toFixed(3)} * ( 0.6 + 0.4 * diffuseColor.b );
           totalEmissiveRadiance += diffuseColor.rgb * ${HEART_ICE_INNER.toFixed(3)};

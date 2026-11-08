@@ -84,6 +84,7 @@ import {
 import { HEAT_FLOOR, heatParticleSteps } from './heat_floor_ladder_core';
 import type { HeatFxHost } from './heat_fx_host';
 import { HEAT_LAVA_GLSL, HEAT_MOLTEN_GLSL, HEAT_NOISE_GLSL } from './heat_lava_glsl';
+import { HeatMeteorFx } from './heat_meteor_fx';
 import { moltenDecal } from './heat_molten_decal';
 import { HeatSeedField } from './heat_seed_field';
 import type { SeedMark } from './heat_seed_field_core';
@@ -267,7 +268,11 @@ void main() {
 `;
 /** A slice of the Wheel of the Hearth: Wakefire's sheet clipped to its bearings,
  *  its rim along both straight edges too. A red slice builds and burns as a band
- *  does; the safe slice stays dark (no build, no burn) with a cool rim. */
+ *  does, under a pulsing wash of the lethal crimson (the Hearth's floor glows
+ *  orange-gold in every joint, so neither the danger orange nor the cracks alone
+ *  could tell it from the floor: the bot pass of 2026-11-04). The safe slice
+ *  (uSafe) is the one cool thing on the floor: a clear frost-blue sheet with
+ *  bright cold edges, read in one glance from any height. */
 const WHEEL_FRAG = /* glsl */ `
 uniform float uTime;
 uniform float uBuild;
@@ -275,6 +280,7 @@ uniform float uBurn;
 uniform vec3 uRim;
 uniform vec4 uClip;
 uniform vec4 uArc;
+uniform float uSafe;
 varying vec2 vUv;
 varying vec3 vW;
 ${HEAT_NOISE_GLSL}
@@ -292,14 +298,36 @@ void main() {
     1.0 - smoothstep(0.0, 0.7, edge),
     (1.0 - smoothstep(0.0, 0.03, y)) + smoothstep(0.97, 1.0, y)
   );
+  if (uSafe > 0.5) {
+    // The safe slice: a cool clear sheet, its frost brighter toward the edges and
+    // slowly breathing, a hard bright rim of cold light all round it.
+    float inner = 1.0 - smoothstep(0.0, 3.5, edge);
+    float frost = vn(vW.xz * 0.35 + vec2(uTime * 0.05, 0.0));
+    float breathe = 0.5 + 0.5 * sin(uTime * 2.2);
+    float rime = 1.0 - smoothstep(0.0, 0.06, cellEdge(vW.xz * 0.45));
+    vec3 sheet = mix(vec3(0.12, 0.34, 0.52), vec3(0.42, 0.78, 0.95), 0.45 * frost + 0.4 * inner);
+    sheet = mix(sheet, vec3(0.7, 0.9, 1.0), 0.45 * rime);
+    vec3 cool = mix(sheet, vec3(0.86, 0.97, 1.0), clamp(rims, 0.0, 1.0));
+    float ca = max(rims * 0.98, 0.5 + 0.12 * inner + 0.06 * breathe);
+    gl_FragColor = vec4(cool * (1.0 + 0.5 * clamp(rims, 0.0, 1.0)), clamp(ca, 0.0, 0.97));
+    #include <colorspace_fragment>
+    return;
+  }
   float joint = 1.0 - smoothstep(0.0, 0.07, cellEdge(vW.xz * 0.45));
   float spread = step(vn(vW.xz * 0.12) * 0.8 + 0.1, uBuild);
   float crack = joint * spread * (0.5 + 0.5 * uBuild);
   float lvl = lavaLevel(vW.xz, vec2(0.0, 1.5), uTime, 1.2);
   float m = max(crack * 0.75, uBurn * (0.55 + 0.6 * lvl));
   vec3 col = molten(clamp(m, 0.0, 1.0));
-  col = mix(col, uRim * 1.5, clamp(rims, 0.0, 1.0));
-  float wash = 0.12 + 0.18 * uBuild;
+  // A red slice reads red at a glance (the Hearth's floor already glows gold in
+  // every crack, so cracks alone hid the warning): a pulsing wash of the
+  // danger colour while it warns; the safe slice (no build) stays dark.
+  float warn = (1.0 - uBurn) * smoothstep(0.0, 0.05, uBuild);
+  float pulse = 0.5 + 0.5 * sin(uTime * 7.0);
+  vec3 blood = uRim * (0.38 + 0.22 * pulse);
+  col = mix(col, blood, 0.72 * warn * (1.0 - crack * 0.6));
+  col = mix(col, uRim * 1.6, clamp(rims, 0.0, 1.0));
+  float wash = 0.12 + 0.18 * uBuild + 0.5 * warn;
   float alpha = max(max(rims * 0.95, crack * 0.85), max(wash, uBurn * 0.92));
   gl_FragColor = vec4(col, clamp(alpha, 0.0, 0.96));
   #include <colorspace_fragment>
@@ -330,8 +358,8 @@ void main() {
   // ends.
   float run = vn(vec2(vUv.y * 9.0 - uTime * 16.0, vUv.x * 6.0));
   float flick = vn(vec2(vUv.y * 24.0 - uTime * 30.0, vUv.x * 12.0 + uTime * 3.0));
-  float core = pow(vFace, 9.0);
-  float sheath = pow(vFace, 2.2) * smoothstep(0.3, 0.75, flick);
+  float core = pow(max(vFace, 0.0), 9.0);
+  float sheath = pow(max(vFace, 0.0), 2.2) * smoothstep(0.3, 0.75, flick);
   float taper = smoothstep(0.0, 0.08, vUv.y) * (0.55 + 0.45 * smoothstep(1.0, 0.85, vUv.y));
   vec3 col = mix(vec3(1.0, 0.5, 0.14), vec3(1.0, 0.95, 0.8), core * (0.7 + 0.3 * run));
   float a = (0.5 * sheath + 0.95 * core) * (0.75 + 0.25 * run) * taper * uAlpha;
@@ -392,6 +420,8 @@ export class HeatFightFx implements HeatFxHost {
   readonly groundY = (x: number, z: number): number => this.groundFn(x, z);
   private readonly well: HeatWellFx;
   private readonly cinder: HeatCinderFx;
+  /** The thrown Hearthseeds' meteors (the seeds themselves in the air). */
+  private readonly meteors: HeatMeteorFx;
   private readonly seeds: SeedSlot[] = [];
   /** Every live seed's footprint, one field (laid once per wave). */
   private readonly seedField: HeatSeedField;
@@ -472,6 +502,7 @@ export class HeatFightFx implements HeatFxHost {
 
     this.well = new HeatWellFx(this);
     this.cinder = new HeatCinderFx(this);
+    this.meteors = new HeatMeteorFx(this);
 
     // ---- the seeds ----
     const crystal = new THREE.OctahedronGeometry(1, 0);
@@ -552,6 +583,7 @@ export class HeatFightFx implements HeatFxHost {
             uRim: { value: new THREE.Color(TELEGRAPH_THREAT_COLORS.danger) },
             uClip: { value: new THREE.Vector4(-1e9, 1e9, -1e9, 1e9) },
             uArc: { value: new THREE.Vector4() },
+            uSafe: { value: 0 },
           },
           charStep: HEAT_FLOOR.zoneChar.step,
           glowStep: HEAT_FLOOR.zoneGlow.step,
@@ -677,6 +709,9 @@ export class HeatFightFx implements HeatFxHost {
     const src = this.world.entities.get(ev.sourceId);
     const dst = this.world.entities.get(ev.targetId);
     switch (ev.ability) {
+      case HEAT_CUES.seedThrow:
+        this.meteors.thrown();
+        break;
       case HEAT_CUES.flare:
         this.flareBolt(ev.sourceId, ev.targetId);
         break;
@@ -726,7 +761,8 @@ export class HeatFightFx implements HeatFxHost {
         this.shakeNear(x, z, 0.8, 90);
         break;
       case HEAT_CUES.seed:
-        this.particles.puff(x, y + 0.4, z, 10, SPARK);
+        // The seed strikes the floor: its meteor lands on this beat.
+        this.meteors.landAt(x, z);
         break;
       case HEAT_CUES.seedBurst:
         this.particles.shockRing(x, z, C.ring, r, 0.8);
@@ -796,13 +832,28 @@ export class HeatFightFx implements HeatFxHost {
     this.well.update(wellIds.length > 0 ? wellIds[0] : -1, guardian, list('river'), this.clock, dt);
     this.cinder.update(list('fall'), this.cinderIds, this.addIds, this.huntedIds, this.clock, dt);
     this.paintSeeds(world, dt);
+    this.meteors.update(guardian, dt);
     this.paintZones(world);
     this.paintWheel(world);
     this.paintPatches(world, dt);
     this.paintBolts(world);
     this.paintSigils(world);
     this.particles.update(this.clock);
-    this.audio.update(guardian, world.entities.get(world.playerId) ?? null);
+    const me = world.entities.get(world.playerId) ?? null;
+    // The nearest Rolling Cinder rolls in the sound's loop.
+    let cinder: Entity | null = null;
+    let best = Number.POSITIVE_INFINITY;
+    if (me)
+      for (const id of this.cinderIds) {
+        const c = world.entities.get(id);
+        if (!c || c.dead) continue;
+        const d = (c.pos.x - me.pos.x) ** 2 + (c.pos.z - me.pos.z) ** 2;
+        if (d < best) {
+          best = d;
+          cinder = c;
+        }
+      }
+    this.audio.update(guardian, me, cinder ? cinder.pos : null);
   }
 
   // ---- the scan -------------------------------------------------------------------------
@@ -896,8 +947,10 @@ export class HeatFightFx implements HeatFxHost {
       slot.x = e.pos.x;
       slot.z = e.pos.z;
       slot.reach = e.scale || T.seedReach;
+      this.meteors.seedSeen(id, e.pos.x, e.pos.z);
       reseed = true;
     }
+    this.meteors.forget(seeds);
     if (reseed) this.layOutSeeds();
     const zones = this.ids.get('zone') ?? [];
     for (const z of this.zones)
@@ -921,6 +974,7 @@ export class HeatFightFx implements HeatFxHost {
     this.candidateIds.length = 0;
     this.well.hide();
     this.cinder.hide();
+    this.meteors.hide();
     for (const s of this.seeds) {
       s.id = -1;
       s.laid = -1;
@@ -953,6 +1007,8 @@ export class HeatFightFx implements HeatFxHost {
       const eAt = fxAnchor(e);
       const look = seedLook(this.clock - s.born, s.life, _seed);
       if (s.laid >= 0) this.seedMarks[s.laid].fill = look.fill;
+      // Still in the air (its meteor): the footprint shows, the orb waits.
+      if (this.meteors.inFlight(s.id)) continue;
       const y = this.groundY(eAt.x, eAt.z);
       const size = 0.55 + 0.75 * look.size;
       _v.set(eAt.x, y + 1.1 + 0.15 * look.beat, eAt.z);
@@ -1061,6 +1117,8 @@ export class HeatFightFx implements HeatFxHost {
       }
       slot.seen = true;
       if (slot.state !== of.state) {
+        // A red slice heating, then erupting: the Wheel's sound.
+        this.audio.wheel(of.state, e.pos.x, this.groundY(e.pos.x, e.pos.z), e.pos.z);
         slot.state = of.state;
         slot.born = this.clock;
       }
@@ -1082,7 +1140,8 @@ export class HeatFightFx implements HeatFxHost {
           o.z + HEARTH_FLOOR_BOX.z1,
         );
       }
-      (u.uRim.value as THREE.Color).setHex(safe ? WHEEL_SAFE_RIM : TELEGRAPH_THREAT_COLORS.danger);
+      (u.uRim.value as THREE.Color).setHex(safe ? WHEEL_SAFE_RIM : TELEGRAPH_THREAT_COLORS.lethal);
+      u.uSafe.value = safe ? 1 : 0;
       u.uBuild.value = look ? look.build : 0;
       u.uBurn.value = look ? look.burn : 0;
       slot.mesh.visible = true;
@@ -1200,12 +1259,14 @@ export class HeatFightFx implements HeatFxHost {
   dispose(): void {
     if (this.disposed) return;
     this.disposed = true;
+    this.audio.dispose();
     this.root.removeFromParent();
     this.particles.dispose();
     this.kit.dispose();
     this.well.dispose();
     this.cinder.dispose();
     this.seedOrbs.dispose();
+    this.meteors.dispose();
     this.patches.dispose();
     for (const g of this.geometries) g.dispose();
     for (const m of this.materials) m.dispose();

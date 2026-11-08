@@ -92,7 +92,7 @@ uniform float uAlpha;
 uniform vec3 uRim;
 varying vec2 vUv;
 void main() {
-  float up = pow(1.0 - vUv.y, 1.8);
+  float up = pow(max(1.0 - vUv.y, 0.0), 1.8);
   float along = 1.0 - smoothstep(0.55, 1.0, vUv.x);
   float shimmer = 0.75 + 0.25 * sin(vUv.x * 40.0 - uTime * 2.6 + vUv.y * 3.0);
   gl_FragColor = vec4(uRim, uAlpha * up * along * shimmer * 0.42);

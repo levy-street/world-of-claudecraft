@@ -68,11 +68,14 @@ describe('Hammer Council sounds: the plan', () => {
     for (const id of [COUNCIL_CASTS.wrath, COUNCIL_CASTS.bolt, COUNCIL_CASTS.weight])
       expect(councilSoundClaims(id), id).toBe(true);
     for (const key of COUNCIL_SFX_KEYS) {
-      expect(key.startsWith('heart_council_'), key).toBe(true);
+      // The council's own takes, and the raid's shared stone mark.
+      expect(key.startsWith('heart_council_') || key === 'heart_mark_stone', key).toBe(true);
       expect(Object.hasOwn(SFX_CLIPS, key), `${key} in the manifest`).toBe(true);
     }
-    // The Walking Slab's grind loop left with the Slabwright.
-    expect(COUNCIL_SFX_KEYS.length).toBe(17);
+    // The Walking Slab's grind loop left with the Slabwright; the Rush's two
+    // takes, the Bond's pulse, Resonance, Narrow Shelter's strain and the
+    // stone mark came with the AAA pass (the Rush no longer borrows the crush).
+    expect(COUNCIL_SFX_KEYS.length).toBe(22);
     expect(councilSoundClaims('frost_nova')).toBe(false);
     expect(councilSoundClaims(undefined)).toBe(false);
   });

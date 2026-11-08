@@ -1,13 +1,13 @@
 import { furyAudioClaimed } from '../game/fury_audio_core';
 import type { SfxId } from '../game/sfx_manifest.generated';
-import { breathSoundClaims } from '../game/smith_heart_breath_audio_core';
-import { councilSoundClaims } from '../game/smith_heart_council_audio_core';
-import { heatSoundClaims } from '../game/smith_heart_heat_audio_core';
-import { quenchSoundClaims } from '../game/smith_heart_quench_audio_core';
+import { smithHeartSoundClaims } from '../game/smith_heart_audio_claims';
 import { warriorRecoveryAudio } from '../game/warrior_recovery_core';
 import { ABILITIES, MOBS } from '../sim/data';
 import type { Aura, Entity, SimEvent } from '../sim/types';
 import { isAuraDebuff } from './auras_view';
+
+// The HUD's ground-burst path asks the same question (hud.ts spellfxAt).
+export { smithHeartSoundClaims };
 
 type DamageEvent = Extract<SimEvent, { type: 'damage' }>;
 type SpellFxEvent = Extract<SimEvent, { type: 'spellfx' }>;
@@ -490,14 +490,9 @@ export function impactCueForDamage(event: DamageEvent, target: Entity): SfxId | 
 
 export function spellFxCue(event: SpellFxEvent): { key: SfxId; anchorId: number } | null {
   if (furyAudioClaimed(event)) return null;
-  // The Hammer Council's cues play their own samples (smith_heart_council_audio.ts).
-  if (councilSoundClaims(event.ability)) return null;
-  // So do the Guardian of the Breath's (smith_heart_breath_audio.ts).
-  if (breathSoundClaims(event.ability)) return null;
-  // And the Guardian of the Quench's (smith_heart_quench_audio.ts).
-  if (quenchSoundClaims(event.ability)) return null;
-  // And the Guardian of the Heat's (smith_heart_heat_audio.ts).
-  if (heatSoundClaims(event.ability)) return null;
+  // The Smith's Heart's five fights play their own samples
+  // (src/game/smith_heart_*_audio.ts).
+  if (smithHeartSoundClaims(event.ability)) return null;
   if (event.fx === 'projectile') {
     if (event.school === 'physical') return { key: 'melee_bow', anchorId: event.sourceId };
     const school = magicSchool(event.school);

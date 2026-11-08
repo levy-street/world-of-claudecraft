@@ -70,7 +70,7 @@ varying vec2 vUv;
 void main() {
   // Faded at its foot, so the rock's shadow and the split floor under the
   // marked player read through it from above.
-  float up = pow(1.0 - vUv.y, 1.5) * smoothstep(0.0, 0.1, vUv.y);
+  float up = pow(max(1.0 - vUv.y, 0.0), 1.5) * smoothstep(0.0, 0.1, vUv.y);
   float flow = 0.7 + 0.3 * sin(vUv.y * 22.0 - uTime * 6.0 + vUv.x * 18.85);
   gl_FragColor = vec4(uColor, uAlpha * up * flow * 0.5);
   #include <colorspace_fragment>

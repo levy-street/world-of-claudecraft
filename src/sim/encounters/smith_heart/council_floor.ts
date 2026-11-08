@@ -40,7 +40,14 @@ export function clearOfWrath(s: CouncilScope, seconds: number): boolean {
   const holder = jobHolder(s, 'wrath');
   if (!holder) return true;
   if (s.st.bars[holder.role]?.castId === COUNCIL_CASTS.wrath) return false;
-  const per = T.energyMax / councilFillSeconds(holder.heir, s.st.wraths, s.rules.heirFillSeconds);
+  const per =
+    T.energyMax /
+    councilFillSeconds(
+      holder.heir,
+      s.st.wraths,
+      s.rules.heirFillSeconds,
+      s.rules.enrageAfterWraths,
+    );
   const toBar = Math.max(0, T.energyMax - s.st.energy) / per;
   return seconds + T.wrathGuardPad <= toBar + 1e-9;
 }
@@ -108,10 +115,11 @@ export function carryWrathHold(
   st: CouncilFightState,
   heir: boolean,
   heirFillSeconds: number,
+  enrageAfter?: number,
 ): void {
   const held = heldOf(st, 'wrath');
   if (held <= 0) return;
-  const fill = councilFillSeconds(heir, st.wraths, heirFillSeconds);
+  const fill = councilFillSeconds(heir, st.wraths, heirFillSeconds, enrageAfter);
   const next = nextAfterHold(fill, held, T.floorGap);
   st.energy = Math.max(0, Math.min(T.energyMax, T.energyMax * (1 - next / fill)));
 }

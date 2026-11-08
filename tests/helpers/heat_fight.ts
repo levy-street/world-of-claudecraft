@@ -3,6 +3,7 @@
 // Hearth's shore, and the handles the heat tests read.
 
 import { SMITH_HEART_DUNGEON } from '../../src/sim/content/smith_heart';
+import { HEARTH_WELL } from '../../src/sim/content/smith_heart_layout';
 import { BUILTIN_WORLD, DUNGEONS, instanceOrigin } from '../../src/sim/data';
 import { displacePlayerForDev } from '../../src/sim/dev/dev_displace';
 import { handleSmithHeartDevChat } from '../../src/sim/dev/smith_heart_dev';
@@ -16,14 +17,16 @@ const WORLD: WorldContent = { ...BUILTIN_WORLD, camps: [], npcs: {}, groundObjec
 
 /** Where the players wait: on the shore in front of the wellspring, inside
  *  the guardian's reach (no Hearth Flare), out of its fire. */
+const NEAR = HEARTH_WELL.x + HEARTH_WELL.r + 5;
+const LIP = HEARTH_WELL.x + HEARTH_WELL.r + 1;
 export const HEAT_WAIT_SPOTS: readonly { x: number; z: number }[] = [
-  { x: -211, z: -8 },
-  { x: -211, z: -4 },
-  { x: -211, z: 0 },
-  { x: -211, z: 4 },
-  { x: -211, z: 8 },
-  { x: -215, z: -12 },
-  { x: -215, z: 12 },
+  { x: NEAR, z: -8 },
+  { x: NEAR, z: -4 },
+  { x: NEAR, z: 0 },
+  { x: NEAR, z: 4 },
+  { x: NEAR, z: 8 },
+  { x: LIP, z: -12 },
+  { x: LIP, z: 12 },
 ];
 
 export interface HeatFight {

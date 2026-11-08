@@ -6,6 +6,7 @@
 
 import type { BreathDifficulty, BreathWindPhase } from './breath_ids';
 import type { BreathShove } from './breath_shove';
+import type { SlainWatch } from './voice_slain';
 
 /** The wind's clock (phase 1, and the heroic gusts of phase 2). */
 export interface BreathWind {
@@ -185,6 +186,8 @@ export interface BreathRoar {
 export interface BreathFightState {
   kind: 'breath';
   difficulty: BreathDifficulty;
+  /** The boss's pool before its tier's (tier_health.ts), given back at a reset. */
+  basePool?: number;
   /** The guardian has fallen and the end was resolved. */
   finished: boolean;
   /** Seconds since the pull. */
@@ -243,4 +246,7 @@ export interface BreathFightState {
   casts: number;
   /** Lines said this pull: `<speaker>_<moment>` to the fight clock. */
   said: Record<string, number>;
+  /** The players seen dead this pull and the pull's deaths (the kill lines'
+   *  watch, voice_slain.ts). */
+  slain: SlainWatch;
 }

@@ -63,8 +63,9 @@ import { heartVeinGlowMaterial } from '../smith_heart/heart_room_kit';
 import { radialGlowTexture } from '../textures';
 import { EngineParticles } from '../trash_engine_fx/engine_particles';
 import { inSmithHeartClaim } from './council_fx_core';
-import { HEAT_BODY_COLORS } from './heat_body_core';
+import { HEAT_BODY_COLORS, HEAT_MODEL_COLORS } from './heat_body_core';
 import { heatClaimOrigin } from './heat_fight_fx_core';
+import { HEAT_BURST } from './heat_flame_core';
 import { HEAT_FLOOR, heatParticleSteps } from './heat_floor_ladder_core';
 import {
   HEAT_FX_COLORS as C,
@@ -80,9 +81,12 @@ import {
 } from './heat_fx_core';
 import { HEAT_LAVA_GLSL, HEAT_MOLTEN_GLSL, HEAT_NOISE_GLSL } from './heat_lava_glsl';
 import { moltenDecal } from './heat_molten_decal';
-import { basaltColumn, basaltRepaint, crystalPrism, swellWallGeometry } from './heat_shapes';
-import { HeatTelegraphs } from './heat_telegraph';
+import { basaltColumn, basaltRepaint, crystalPrism } from './heat_shapes';
+import { HeatSwells } from './heat_swell_fx';
+import { HeatTelegraphs, setLaneSpent } from './heat_telegraph';
 
+/** The fist trail's heat on the pyre ramp (its orange). */
+const FIST_TRAIL_HEAT = [0.55, 0, 0] as const;
 const SCAN_SEC = 0.1;
 
 /** The nearer of two bodies to (x, z) (either may be missing). */
@@ -109,15 +113,29 @@ const _fist: FistLook = { fill: 0, height: 0, shown: false, crack: 0 };
 const _crater = { flash: 0, glow: 0 };
 const PAINT: TelegraphPaint = { fill: 0, clock: 0, range: 0 };
 
+/** The fire trailing the plunging fist: orange flame on the pyre ramp, never
+ *  a glow ball (Jose's review of 2026-11-06: the old additive glow trail
+ *  stacked into a sun over the guardian's head). */
 const TRAIL_PUFF = {
   speed: 1.5,
   up: 3,
-  life: 0.7,
-  size: [2.4, 0.6] as [number, number],
-  color: C.fire,
-  alpha: 0.9,
-  pool: 'glow' as const,
-  radius: 2.2,
+  life: 0.6,
+  size: [2.2, 0.5] as [number, number],
+  color: FIST_TRAIL_HEAT,
+  alpha: 0.85,
+  pool: 'pyre' as const,
+  radius: 2,
+};
+/** Dark smoke torn off the fist as it falls. */
+const TRAIL_SMOKE = {
+  speed: 0.8,
+  up: 1.5,
+  life: 1.6,
+  size: [2, 4.5] as [number, number],
+  color: [0.1, 0.08, 0.07] as const,
+  alpha: 0.45,
+  drag: 0.8,
+  radius: 1.8,
 };
 const SPRAY_DIR: [number, number, number] = [0, 1, 0];
 const SPRAY_PUFF = {
@@ -158,65 +176,6 @@ void main() {
   gl_Position = projectionMatrix * wocCamRelView(wp.xyz);
 }
 `;
-/** A rolling wall of molten rock (audit point 18: the whole wall glowed, a
- *  smooth gold egg): plates of dark crust riding its back with their seams
- *  alight, the curl's face open and boiling, a hot lip that tears into
- *  spatter, its foot sunk in its own wake. */
-const WALL_FRAG = /* glsl */ `
-uniform float uTime;
-uniform float uHeat;
-varying vec2 vUv;
-varying vec3 vW;
-${HEAT_NOISE_GLSL}
-${HEAT_MOLTEN_GLSL}
-${HEAT_LAVA_GLSL}
-void main() {
-  // Along the profile: 0 the back's foot, ~0.62 the crest, 1 the curl's lip.
-  float y = vUv.y;
-  float along = vW.x + vW.z;
-  float lvl = lavaLevel(vec2(along, y * 7.0), vec2(0.0, -1.3), uTime, 1.0);
-  // The back crusts over; the curl's face runs open.
-  float face = smoothstep(0.55, 0.82, y);
-  float lip = 1.0 - smoothstep(0.0, 0.06, abs(y - 0.66));
-  float m = lvl * mix(0.62, 1.05, face) + lip * 0.3 * (0.5 + 0.5 * lvl);
-  m *= uHeat;
-  // The lip tears into spatter; the foot sinks into the wake.
-  float tear = vn(vec2(along * 1.4, uTime * 1.7)) * 0.6 + vn(vec2(along * 4.0, uTime * 3.1)) * 0.4;
-  if (y > 0.86 + 0.14 * tear) discard;
-  float foot = smoothstep(0.0, 0.07, y);
-  float edge = smoothstep(0.0, 0.1, vUv.x) * smoothstep(1.0, 0.9, vUv.x);
-  vec3 col = molten(clamp(m, 0.0, 1.0)) * 0.82;
-  gl_FragColor = vec4(col, (0.94 * edge + 0.06) * foot);
-  #include <colorspace_fragment>
-}
-`;
-/** The molten wake down the lane behind a wave (uFront yards down it): hot at
- *  the wall, crusting dark over its cooling run, its edges ragged. */
-const WAKE_FRAG = /* glsl */ `
-uniform float uTime;
-uniform float uFront;
-uniform float uLen;
-uniform float uCool;
-varying vec2 vUv;
-varying vec3 vW;
-${HEAT_NOISE_GLSL}
-${HEAT_MOLTEN_GLSL}
-${HEAT_LAVA_GLSL}
-void main() {
-  float along = vUv.y * uLen;
-  float across = abs(vUv.x - 0.5) * 2.0;
-  float rag = vn(vec2(along * 0.6, vUv.x * 5.0)) * 0.25;
-  if (along > uFront || across > 1.0 - rag) discard;
-  float behind = uFront - along;
-  float heat = pow(1.0 - clamp(behind / uCool, 0.0, 1.0), 1.4);
-  float lvl = lavaLevel(vW.xz, vec2(0.0), uTime * 0.3, 1.0);
-  float m = clamp(heat * (0.55 + 0.55 * lvl), 0.0, 1.0);
-  vec3 col = molten(m);
-  float a = (0.55 + 0.4 * heat) * (1.0 - smoothstep(0.8, 1.0, across + rag));
-  gl_FragColor = vec4(col, a);
-  #include <colorspace_fragment>
-}
-`;
 /** The crater: a scorched bowl, molten cracks running out of it (uGlow their
  *  heat), a white flash at the hit (uFlash). */
 const CRATER_FRAG = /* glsl */ `
@@ -239,7 +198,7 @@ void main() {
   float crack = 1.0 - smoothstep(0.0, 0.06 + 0.04 * (1.0 - r), line * (0.35 + r));
   crack *= step(r, 0.6 + 0.4 * hh2(vec2(id, 3.0)));
   float bowl = 1.0 - smoothstep(0.0, 0.55, r);
-  float m = max(crack * 0.95, bowl * 0.75) * uGlow + uFlash * (1.0 - r);
+  float m = max(crack * 0.95, bowl * 0.75) * uGlow + uFlash * 0.55 * (1.0 - r);
   vec3 col = mix(vec3(0.05, 0.04, 0.035), molten(clamp(m, 0.0, 1.0)), smoothstep(0.02, 0.2, m));
   float alpha = (1.0 - smoothstep(0.75, 1.0, r)) * (0.75 + 0.25 * uGlow);
   gl_FragColor = vec4(col, alpha * max(uGlow, uFlash) + (1.0 - r) * 0.25 * uGlow);
@@ -278,10 +237,6 @@ interface LaneSlot {
    *  drawn where that object is, so it never trails the hit. */
   waveId: number;
   lane: TelegraphLane;
-  wall: THREE.Mesh;
-  wallMat: THREE.ShaderMaterial;
-  wake: THREE.Mesh;
-  wakeMat: THREE.ShaderMaterial;
 }
 
 interface CraterSlot {
@@ -307,6 +262,8 @@ export class HeatFx {
   private readonly glowTex: THREE.Texture | null;
   private readonly fists: FistSlot[] = [];
   private readonly lanes: LaneSlot[] = [];
+  /** The waves themselves (heat_swell_fx.ts), one per lane slot. */
+  private readonly swells: HeatSwells;
   private readonly craters: CraterSlot[] = [];
   private readonly objectIds: number[] = [];
   private readonly candidateIds: number[] = [];
@@ -360,16 +317,16 @@ export class HeatFx {
 
     // ---- the fists ----
     const stone = heartKitSlotMaterial('stone');
-    const glow = heartVeinGlowMaterial(0xffd27a, 'smithHeartHeatFistCrystal');
+    const glow = heartVeinGlowMaterial(0xff9a40, 'smithHeartHeatFistCrystal');
     this.materials.push(glow);
     const column = basaltColumn(0.5, 1);
     const prism = crystalPrism(0.35, 1.6);
     this.geometries.push(column, prism);
     const haloMat = new THREE.SpriteMaterial({
       map: this.glowTex,
-      color: 0xffd27a,
+      color: 0xff8a3a,
       transparent: true,
-      opacity: 0.42,
+      opacity: 0.16,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
       fog: false,
@@ -395,53 +352,10 @@ export class HeatFx {
         })
         .catch(() => {});
 
-    // ---- the lanes, their walls and wakes ----
-    const wallGeo = swellWallGeometry();
-    const wakeGeo = new THREE.PlaneGeometry(1, 1, 1, 1).rotateX(-Math.PI / 2).translate(0, 0, 0.5);
-    // uv.y 0 at the lane's start (z 0), 1 at its end (z 1).
-    const wuv = wakeGeo.getAttribute('uv') as THREE.BufferAttribute;
-    const wpos = wakeGeo.getAttribute('position') as THREE.BufferAttribute;
-    for (let i = 0; i < wuv.count; i++) wuv.setY(i, wpos.getZ(i));
-    this.geometries.push(wallGeo, wakeGeo);
+    // ---- the lanes and their waves ----
     for (let i = 0; i < P.lanes; i++) {
       const lane = telegraphs.lane('swell');
       lane.group.visible = false;
-      const wallMat = new THREE.ShaderMaterial({
-        name: 'smithHeartHeatSwellWall',
-        uniforms: { uTime: this.uTime, uHeat: { value: 1 } },
-        vertexShader: UV_VERT,
-        fragmentShader: WALL_FRAG,
-        transparent: true,
-        depthWrite: true,
-        side: THREE.DoubleSide,
-        toneMapped: false,
-      });
-      const wall = new THREE.Mesh(wallGeo, wallMat);
-      wall.name = 'smithHeartHeatSwellWall';
-      wall.frustumCulled = false;
-      wall.visible = false;
-      this.root.add(wall);
-      // The wake: char and glow passes (crossing wakes out of one crater
-      // compose the same from every angle).
-      const { mesh: wake, mat: wakeMat } = moltenDecal(
-        {
-          name: 'smithHeartHeatSwellWake',
-          geometry: wakeGeo,
-          vertexShader: UV_VERT,
-          fragmentShader: WAKE_FRAG,
-          uniforms: {
-            uTime: this.uTime,
-            uFront: { value: 0 },
-            uLen: { value: T.laneLength },
-            uCool: { value: T.waveSpeed * 2.5 },
-          },
-          charStep: HEAT_FLOOR.wakeChar.step,
-          glowStep: HEAT_FLOOR.wakeGlow.step,
-        },
-        this.materials,
-      );
-      this.root.add(wake);
-      this.materials.push(wallMat);
       this.lanes.push({
         id: -1,
         born: 0,
@@ -454,12 +368,23 @@ export class HeatFx {
         facing: 0,
         length: T.laneLength,
         lane,
-        wall,
-        wallMat,
-        wake,
-        wakeMat,
       });
     }
+    this.swells = new HeatSwells(
+      {
+        root: this.root,
+        particles: this.particles,
+        uTime: this.uTime,
+        density: this.density,
+        geometries: this.geometries,
+        materials: this.materials,
+        groundY: (x, z) => this.groundY(x, z),
+        rand: () => this.rand(),
+        reducedMotion: () => this.reducedMotion(),
+        shakeNear: (x, z, a, r) => this.shakeNear(x, z, a, r),
+      },
+      P.lanes,
+    );
 
     // ---- the craters ----
     const craterGeo = new THREE.PlaneGeometry(2, 2).rotateX(-Math.PI / 2);
@@ -484,7 +409,7 @@ export class HeatFx {
       this.root.add(mesh);
       const flashMat = new THREE.SpriteMaterial({
         map: this.glowTex,
-        color: 0xfff4dc,
+        color: HEAT_MODEL_COLORS.flash,
         transparent: true,
         opacity: 0,
         blending: THREE.AdditiveBlending,
@@ -619,8 +544,10 @@ export class HeatFx {
     if (!this.world || this.disposed || ev.type !== 'spellfxAt') return;
     if (ev.ability === HEAT_CUES.fist) this.impact(ev.x, ev.z, ev.radius ?? T.fistR);
     else if (ev.ability === HEAT_CUES.swell) {
+      // The swells break out of the crater: the ground heaves.
       const y = this.groundY(ev.x, ev.z);
       this.particles.puff(ev.x, y + 0.5, ev.z, 14, SPRAY_PUFF);
+      this.swells.origin(ev.x, ev.z);
     }
   }
 
@@ -636,14 +563,27 @@ export class HeatFx {
     slot.mesh.visible = true;
     slot.flash.position.set(x, y + 2, z);
     slot.flash.visible = true;
-    this.particles.shockRing(x, z, C.ring, r * 3.2, 0.9);
-    this.particles.shockRing(x, z, C.ringGold, r * 1.8, 0.6);
+    // A ring racing out over the floor and a hot one round the crater, under
+    // the bursts' caps: punchy, never a floor burned out to white.
+    this.particles.shockRing(x, z, HEAT_MODEL_COLORS.ring, r * 2.6, 0.9, HEAT_BURST.ring);
+    this.particles.shockRing(x, z, C.ringGold, r * 1.5, 0.6, HEAT_BURST.ring);
+    // Dark basalt flung out of the crater.
+    this.particles.puff(x, y + 0.8, z, 20, {
+      speed: 9,
+      up: 7,
+      life: 1.3,
+      size: [0.8, 0.6],
+      color: C.crust,
+      alpha: 1,
+      gravity: 20,
+      radius: r * 0.4,
+    });
     // Basalt flung up and molten drops, a column of smoke.
-    this.particles.puff(x, y + 1, z, 46, {
+    this.particles.puff(x, y + 1, z, 34, {
       speed: 12,
       up: 8,
       life: 1.1,
-      size: [0.7, 0.16],
+      size: [0.45, 0.1],
       color: C.spark,
       alpha: 1,
       pool: 'glow',
@@ -681,6 +621,7 @@ export class HeatFx {
       this.paintLanes(world, dt);
     }
     this.paintCraters();
+    this.swells.update();
     this.particles.update(this.clock);
   }
 
@@ -723,14 +664,16 @@ export class HeatFx {
         s.fan.group.visible = false;
         s.fist.visible = false;
       }
-    for (const s of this.lanes)
+    for (let i = 0; i < this.lanes.length; i++) {
+      const s = this.lanes[i];
       if (s.id >= 0 && !live.includes(s.id)) {
         s.id = -1;
         s.waveId = -1;
         s.lane.group.visible = false;
-        s.wall.visible = false;
-        s.wake.visible = false;
+        // Its wave is spent: the scorched trail lingers and fades.
+        this.swells.release(i);
       }
+    }
     const heatGuardian = this.guardianId >= 0 ? world.entities.get(this.guardianId) : undefined;
     const finalBoss = this.finalId >= 0 ? world.entities.get(this.finalId) : undefined;
     for (const id of live) {
@@ -788,10 +731,16 @@ export class HeatFx {
           LANE_STYLE,
         );
         slot.lane.group.visible = true;
-        slot.wake.position.set(e.pos.x, slot.y + 0.05, e.pos.z);
-        slot.wake.rotation.y = e.facing;
-        slot.wake.scale.set(half * 2.2, 1, slot.length);
-        slot.wakeMat.uniforms.uLen.value = slot.length;
+        setLaneSpent(slot.lane, 0);
+        this.swells.lay(
+          this.lanes.indexOf(slot),
+          e.pos.x,
+          slot.y,
+          e.pos.z,
+          e.facing,
+          half,
+          slot.length,
+        );
       }
       if (of.state === 'roll' && slot.rollAt < 0) slot.rollAt = this.clock;
     }
@@ -825,9 +774,8 @@ export class HeatFx {
       s.id = -1;
       s.waveId = -1;
       s.lane.group.visible = false;
-      s.wall.visible = false;
-      s.wake.visible = false;
     }
+    this.swells.hide();
     for (const c of this.craters) {
       c.at = -99;
       c.mesh.visible = false;
@@ -860,13 +808,21 @@ export class HeatFx {
       _q.setFromAxisAngle(_v.set(Math.cos(s.yaw), 0, -Math.sin(s.yaw)), -0.35);
       s.fist.quaternion.copy(_q);
       s.fist.rotateY(s.yaw);
-      if (this.rand() < dt * 40 * this.density)
+      if (this.rand() < dt * 22 * this.density)
         this.particles.puff(
           s.fist.position.x,
           s.fist.position.y + 2,
           s.fist.position.z,
           1,
           TRAIL_PUFF,
+        );
+      if (this.rand() < dt * 8 * this.density)
+        this.particles.puff(
+          s.fist.position.x,
+          s.fist.position.y + 3,
+          s.fist.position.z,
+          1,
+          TRAIL_SMOKE,
         );
       // The cracks of light under the spot (cosmetic over the telegraph).
       if (this.rand() < dt * 10 * look.crack * this.density)
@@ -883,10 +839,9 @@ export class HeatFx {
   // ---- the lanes and their swells ---------------------------------------------------------
 
   private paintLanes(world: IWorld, dt: number): void {
-    for (const s of this.lanes) {
+    for (let i = 0; i < this.lanes.length; i++) {
+      const s = this.lanes[i];
       if (s.id < 0) continue;
-      const e = world.entities.get(s.id);
-      const half = e?.scale || T.laneHalf;
       if (s.rollAt < 0) {
         PAINT.fill = Math.min(1, (this.clock - s.born) / Math.max(0.1, s.warn));
         PAINT.clock = this.clock;
@@ -894,8 +849,6 @@ export class HeatFx {
         PAINT.front = undefined;
         PAINT.fade = undefined;
         this.kit.paintLane(s.lane, PAINT);
-        s.wall.visible = false;
-        s.wake.visible = false;
         continue;
       }
       // The sim's wave object places the crest while it rolls (re-anchoring
@@ -907,34 +860,19 @@ export class HeatFx {
         if (along < T.laneLength - 0.05) s.rollAt = this.clock - Math.max(0, along) / T.waveSpeed;
       }
       const front = swellFront(this.clock - s.rollAt);
-      // The lane fades as its wave leaves it behind (still on every tier).
+      // Ahead of the wall the lane keeps warning at full strength (still on
+      // every tier); behind it, it clears (below).
       PAINT.fill = 1;
       PAINT.clock = this.clock;
       PAINT.range = s.length;
       PAINT.front = 0;
-      PAINT.fade = Math.max(0.25, 1 - front / (s.length + T.waveDepth));
+      PAINT.fade = 1;
       this.kit.paintLane(s.lane, PAINT);
-      const h = swellHeight(front, s.length);
-      const ahead = Math.min(front, s.length);
-      const wx = s.x + Math.sin(s.facing) * ahead;
-      const wz = s.z + Math.cos(s.facing) * ahead;
-      s.wall.visible = h > 0.05;
-      s.wall.position.set(wx, this.groundY(wx, wz), wz);
-      s.wall.rotation.y = s.facing;
-      s.wall.scale.set(half + 0.4, h, T.waveDepth + 1.2);
-      s.wallMat.uniforms.uHeat.value = 0.85 + 0.25 * (h / SWELL_HEIGHT);
-      s.wakeMat.uniforms.uFront.value = ahead;
-      s.wake.visible = true;
-      if (s.wall.visible && this.rand() < dt * 30 * this.density) {
-        const off = (this.rand() - 0.5) * 2 * half;
-        this.particles.puff(
-          wx + Math.cos(s.facing) * off,
-          s.wall.position.y + h * 0.95,
-          wz - Math.sin(s.facing) * off,
-          1,
-          SPRAY_PUFF,
-        );
-      }
+      // Behind the wall's back the lane is spent (the sim strikes only the
+      // wall's box): its warning clears there, leaving the scorched trail.
+      setLaneSpent(s.lane, Math.max(0, Math.min(front, s.length) - T.waveDepth));
+      // The wave itself, standing in the sim's hit box (heat_swell_fx.ts).
+      this.swells.paint(i, front, swellHeight(front, s.length), dt);
     }
   }
 
@@ -950,8 +888,9 @@ export class HeatFx {
       }
       c.mat.uniforms.uGlow.value = look.glow;
       c.mat.uniforms.uFlash.value = look.flash;
-      c.flashMat.opacity = look.flash;
-      const fs = 6 + 18 * (1 - look.flash);
+      // A short pop on the crater, never a screen of light.
+      c.flashMat.opacity = look.flash * HEAT_BURST.flashPeak;
+      const fs = 5 + 7 * (1 - look.flash);
       c.flash.scale.set(fs, fs, 1);
       c.flash.visible = look.flash > 0.01;
       if (look.glow > 0.2 && this.rand() < 0.15 * this.density)

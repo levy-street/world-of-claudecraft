@@ -234,6 +234,15 @@ const UI_PURE_CORES = [
   // The trinket auras' tooltip descriptor and their item-icon art map.
   'src/ui/trinket_aura_effect.ts',
   'src/ui/trinket_aura_art.ts',
+  // The Smith's Heart's aura tooltip descriptors and their per-tier damage
+  // rounding (pure: sim tuning in, a hudChrome key plus numbers out).
+  'src/ui/council_aura_effect.ts',
+  'src/ui/breath_aura_effect.ts',
+  'src/ui/quench_aura_effect.ts',
+  'src/ui/heat_aura_effect.ts',
+  'src/ui/final_aura_effect.ts',
+  'src/ui/final_phase_aura_effect.ts',
+  'src/ui/heart_tier_damage.ts',
   // The zone-entry chat line (welcome hint vs the town-done line); the
   // decision is the sim leaf src/sim/town_quests.ts, this maps it to text.
   'src/ui/zone_entry_line_core.ts',
@@ -1122,6 +1131,7 @@ const RENDER_PURE_CORES = [
   // high walks (the AAA pass's third round).
   'src/render/smith_heart/breath_rock_storm_core.ts',
   'src/render/smith_heart/heart_rock_hang_core.ts',
+  'src/render/smith_heart/heart_rock_gulf_core.ts',
   // The roots of the mountain readable on the dark crown (the third round).
   'src/render/smith_heart/heart_root_look_core.ts',
   'src/render/smith_heart_fx/breath_fx_core.ts',
@@ -1176,6 +1186,8 @@ const RENDER_PURE_CORES = [
   // A character drawn sunk into water it stands in.
   'src/render/characters/water_sink_core.ts',
   'src/render/smith_heart_fx/heat_body_core.ts',
+  // The Heat guardian's living fire: its tongues, lick, ramp and bursts' caps.
+  'src/render/smith_heart_fx/heat_flame_core.ts',
   'src/render/smith_heart_fx/heat_fight_fx_core.ts',
   // The Heat's floor ladder (every floor layer's unique rung) and its molten
   // telegraphs' looks.
@@ -1185,6 +1197,8 @@ const RENDER_PURE_CORES = [
   'src/render/smith_heart_fx/painted_telegraph_core.ts',
   // The wellspring's bounded flow and its bubbles; the Hearthseeds' one field.
   'src/render/smith_heart_fx/heat_well_core.ts',
+  'src/render/smith_heart_fx/heat_meteor_core.ts',
+  'src/render/smith_heart_fx/heat_swell_core.ts',
   'src/render/smith_heart_fx/heat_seed_field_core.ts',
   'src/render/drowned_temple/temple_rising_stair_core.ts',
   // The Mere Hydra's Tsunami: the breaking wave's profile, timeline, spray and foam.
@@ -1681,6 +1695,13 @@ const RENDER_PURE_CORES = [
 // reverse-completeness guard.
 const BARE_NAMED = [
   'src/ui/trinket_aura_effect.ts',
+  'src/ui/council_aura_effect.ts',
+  'src/ui/breath_aura_effect.ts',
+  'src/ui/quench_aura_effect.ts',
+  'src/ui/heat_aura_effect.ts',
+  'src/ui/final_aura_effect.ts',
+  'src/ui/final_phase_aura_effect.ts',
+  'src/ui/heart_tier_damage.ts',
   'src/ui/trinket_aura_art.ts',
   'src/ui/ability_tooltip_lines.ts',
   'src/ui/banner_queue.ts',
@@ -2809,6 +2830,7 @@ const EXPECTED_BARE_NAMED = [
   'src/ui/bag_item_context_menu.ts',
   'src/ui/bank_filter.ts',
   'src/ui/banner_queue.ts',
+  'src/ui/breath_aura_effect.ts',
   'src/ui/buddy_event_lines.ts',
   'src/ui/charter_fit_memory.ts',
   'src/ui/chat_bubble_style.ts',
@@ -2816,14 +2838,19 @@ const EXPECTED_BARE_NAMED = [
   'src/ui/clock.ts',
   'src/ui/compass.ts',
   'src/ui/coords.ts',
+  'src/ui/council_aura_effect.ts',
   'src/ui/duration_text.ts',
   'src/ui/fct_event.ts',
+  'src/ui/final_aura_effect.ts',
+  'src/ui/final_phase_aura_effect.ts',
   'src/ui/focus_order.ts',
   'src/ui/gather_rare_event_feedback.ts',
   'src/ui/gather_tool_tooltip.ts',
   'src/ui/guild_hide_offline.ts',
   'src/ui/guild_motd_login.ts',
   'src/ui/guild_tag.ts',
+  'src/ui/heart_tier_damage.ts',
+  'src/ui/heat_aura_effect.ts',
   'src/ui/hud/action_bar/hotbar_drag.ts',
   'src/ui/hud/aura_tracks/aura_track_catalog.ts',
   'src/ui/hud/aura_tracks/aura_track_descriptors.ts',
@@ -2859,6 +2886,7 @@ const EXPECTED_BARE_NAMED = [
   'src/ui/pet_action_icons.ts',
   'src/ui/purchase_intent_record.ts',
   'src/ui/quality_glow.ts',
+  'src/ui/quench_aura_effect.ts',
   'src/ui/quest_marker_tags.ts',
   'src/ui/realm_builder_name.ts',
   'src/ui/reliquary_cell_art.ts',

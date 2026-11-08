@@ -266,6 +266,17 @@ export interface CouncilDifficultyRules {
   pillarPulse: boolean;
   /** Every mechanic's damage, on top of the claim's own multiplier. */
   damageMult: number;
+  /** The boss's health pool against the template's, set at the pull
+   *  (tier_health.ts). */
+  healthMult: number;
+  /** Mountain's Wrath's hit on whoever no pillar hides (and the crowded
+   *  shelter's share of it), on top of damageMult: Heroic's lands at about
+   *  110 percent of a Heroic-geared cloth body, so ignoring cover kills. */
+  wrathMult: number;
+  /** The soft enrage: after this many Wraths the energy fills much faster
+   *  (enrageFillMult). Heroic's Wrath kills the unhidden, so its enrage
+   *  comes late enough for a decent raid's 6 to 7 minute kill. */
+  enrageAfterWraths: number;
   /** The heir's random rise: seconds of warning on its locked spot. */
   heirRiseWarn: number;
   /** The Wrath's heir: seconds its energy takes to fill. */
@@ -296,13 +307,16 @@ export const COUNCIL_DIFFICULTY: Readonly<Record<CouncilDifficulty, CouncilDiffi
     songAfterWrath: true,
     pillarPulse: false,
     damageMult: 1,
+    healthMult: 1,
+    wrathMult: 1,
+    enrageAfterWraths: 4,
     heirRiseWarn: 2,
     heirFillSeconds: 35,
     rockOutlivesSinger: false,
     soulInTheStone: false,
     pillarLimit: 5,
-    cursedPulseMin: 14,
-    cursedPulseMax: 18,
+    cursedPulseMin: 7,
+    cursedPulseMax: 9,
     missCollapse: false,
   },
   heroic: {
@@ -311,6 +325,9 @@ export const COUNCIL_DIFFICULTY: Readonly<Record<CouncilDifficulty, CouncilDiffi
     songAfterWrath: false,
     pillarPulse: true,
     damageMult: 1.25,
+    healthMult: 1.85,
+    wrathMult: 2.8,
+    enrageAfterWraths: 8,
     heirRiseWarn: 2,
     heirFillSeconds: 35,
     rockOutlivesSinger: false,
@@ -327,6 +344,9 @@ export const COUNCIL_DIFFICULTY: Readonly<Record<CouncilDifficulty, CouncilDiffi
     songAfterWrath: false,
     pillarPulse: true,
     damageMult: 1.25,
+    healthMult: 1.85,
+    wrathMult: 1,
+    enrageAfterWraths: 4,
     heirRiseWarn: 1.5,
     heirFillSeconds: 30,
     rockOutlivesSinger: true,
@@ -363,7 +383,8 @@ export const COUNCIL_TUNING = {
   // The Guardian: energy and Mountain's Wrath.
   energyMax: 100,
   energyFillSeconds: 55,
-  /** After this many Wraths the energy fills much faster (the soft enrage). */
+  /** After this many Wraths the energy fills much faster (the soft enrage;
+   *  the default, each tier's own is COUNCIL_DIFFICULTY's). */
   enrageAfterWraths: 4,
   enrageFillMult: 2.5,
   wrathCast: 4,
@@ -557,14 +578,16 @@ export function councilPillarRadius(risen: boolean): number {
 }
 
 /** Seconds the Wrath's energy takes to fill, by holder and Wraths landed
- *  (`heirSeconds`: the difficulty's heir fill, COUNCIL_DIFFICULTY). */
+ *  (`heirSeconds` and `enrageAfter`: the difficulty's heir fill and soft
+ *  enrage, COUNCIL_DIFFICULTY). */
 export function councilFillSeconds(
   heir: boolean,
   wraths: number,
   heirSeconds: number = COUNCIL_TUNING.heirFillSeconds,
+  enrageAfter: number = COUNCIL_TUNING.enrageAfterWraths,
 ): number {
   const base = heir ? heirSeconds : COUNCIL_TUNING.energyFillSeconds;
-  return wraths >= COUNCIL_TUNING.enrageAfterWraths ? base / COUNCIL_TUNING.enrageFillMult : base;
+  return wraths >= enrageAfter ? base / COUNCIL_TUNING.enrageFillMult : base;
 }
 
 /** How each soaker of a Falling Rock fares (pure): the share each takes and

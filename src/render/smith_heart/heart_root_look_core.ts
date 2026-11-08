@@ -19,6 +19,10 @@
 export const HEART_ROOT_LOOK = {
   shadeFloor: 0.26,
   rim: [0.42, 0.24, 0.12] as const,
+  /** The ember band (the hammer round of 2026-11-05): a painted colour whose red
+   *  stands this far over its blue (linear) starts and ends glowing, at this
+   *  strength. The roots' and the altar's rock paint stay under its start. */
+  ember: [0.45, 0.8, 1.6] as const,
 } as const;
 
 /** A dim vein's crystal: this share of its colour (lit, its colour times the
@@ -37,6 +41,10 @@ export function heartRootEmissiveGlsl(): string {
           // The heart's light from below: faces turned down take more of it.
           float rootLow = 0.55 + 0.45 * smoothstep( 0.3, -0.6, ( transpose( mat3( viewMatrix ) ) * normal ).y );
           totalEmissiveRadiance += vec3( ${L.rim.map(f).join(', ')} ) * rootRim * rootRim * rootLow;
+          // Embers painted into the stone (the Heat altar's socket and cracks): a
+          // saturated red-orange no rock paint reaches burns on its own.
+          float rootEmber = smoothstep( ${f(L.ember[0])}, ${f(L.ember[1])}, diffuseColor.r - diffuseColor.b );
+          totalEmissiveRadiance += diffuseColor.rgb * rootEmber * ${f(L.ember[2])};
         }`;
 }
 

@@ -24,6 +24,7 @@ import {
   SMITH_HEART_ROCK_KIT_URL,
   upgradeWhenHeartKitLands,
 } from './heart_kit';
+import { planHeartGulfWalls } from './heart_rock_gulf_core';
 import { planHeartHangs, planHeartRockLips, planHeartRockUnder } from './heart_rock_hang_core';
 import { planHeartNeedles, planHeartRock } from './heart_rock_plan_core';
 
@@ -44,7 +45,8 @@ export function heartRockKitReady(): boolean {
 export function buildHeartRock(lowGfx: boolean): THREE.Group {
   // The Breath's high walks hang faces from brink to mist (the lips and
   // under-walls they replace left out); the hangs are the Breath's alone.
-  const rock = [...planHeartRock(), ...planHeartRockUnder()];
+  // The Wind Bridge gulf's far walls are bands too (the weak-spots pass of 2026-11-04).
+  const rock = [...planHeartRock(), ...planHeartRockUnder(), ...planHeartGulfWalls()];
   const hangs = planHeartHangs();
   const lips = planHeartRockLips();
   const needles = planHeartNeedles();

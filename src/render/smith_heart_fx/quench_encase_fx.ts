@@ -107,7 +107,7 @@ void main() {
   float hy = clamp((vL.y + 1.2) / 2.6, 0.0, 1.0);
   if (hy > grow * 1.02) discard;
   vec3 n = normalize(vN);
-  float fres = pow(1.0 - abs(dot(n, normalize(vV))), 1.8);
+  float fres = pow(max(1.0 - abs(dot(n, normalize(vV))), 0.0), 1.8);
   float facet = h3(floor(n * 5.0 + 0.5));
   // The frost fog inside, thickest in the heart, drifting up.
   float fog = (1.0 - fres) * (0.45 + 0.4 * n3(vL * 2.4 + vec3(0.0, -uTime * 0.3, 0.0)));

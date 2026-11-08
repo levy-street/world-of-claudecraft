@@ -88,7 +88,7 @@ export function heartBeamMaterial(color: number, name: string, flow = 1): THREE.
         float up = 1.0 - vUv.y;
         float bands = 0.65 + 0.35 * sin((vUv.y * 9.0 - uTime * 2.6 * uFlow) * 3.14159);
         float streak = 0.75 + 0.25 * sin(vUv.x * 37.7 + vUv.y * 4.0 - uTime * 1.3 * uFlow);
-        float edge = pow(vRim, 1.3);
+        float edge = pow(max(vRim, 0.0), 1.3);
         float a = uK * up * up * bands * streak * (0.35 + 0.65 * edge);
         vec3 col = mix(uColor, vec3(1.0, 0.97, 0.9), 0.35 * up) * a;
         gl_FragColor = vec4(col, 1.0);
@@ -158,7 +158,7 @@ export function heartVortexMaterial(name: string): THREE.ShaderMaterial {
         float t = uTime * uSpin;
         // Four arms, each a log spiral drawn inward.
         float arm = ang * 4.0 / 6.2831853 + log(max(r, 0.02)) * 1.6 + t * 0.55;
-        float armMask = pow(0.5 + 0.5 * cos(arm * 6.2831853), 3.0);
+        float armMask = pow(max(0.5 + 0.5 * cos(arm * 6.2831853), 0.0), 3.0);
         float turb = vnoise(vec2(ang * 3.0 + t, r * 6.0 - t * 2.0));
         vec3 c = fourColour(floor(fract(arm) * 4.0) / 4.0 + 0.125 + turb * 0.05);
         float eye = smoothstep(0.32, 0.0, r);
@@ -200,10 +200,10 @@ export function heartFunnelMaterial(name: string): THREE.ShaderMaterial {
       varying vec2 vUv; varying float vRim;
       void main() {
         float twist = vUv.x * 4.0 + vUv.y * 2.4 - uTime * 0.35;
-        float strand = pow(0.5 + 0.5 * cos(twist * 6.2831853), 4.0);
+        float strand = pow(max(0.5 + 0.5 * cos(twist * 6.2831853), 0.0), 4.0);
         float n = vnoise(vec2(vUv.x * 12.0 + uTime * 0.4, vUv.y * 6.0 - uTime * 1.6));
         float fade = (1.0 - vUv.y) * smoothstep(0.0, 0.08, vUv.y);
-        float edge = 0.3 + 0.7 * pow(1.0 - vRim, 1.5);
+        float edge = 0.3 + 0.7 * pow(max(1.0 - vRim, 0.0), 1.5);
         vec3 c = fourColour(floor(fract(twist) * 4.0) / 4.0 + 0.125);
         c = mix(c, vec3(1.0, 0.95, 0.85), 0.08 + 0.22 * (1.0 - vUv.y) * n);
         float a = uK * fade * (strand * 0.85 + 0.12 * n) * edge;
@@ -313,14 +313,14 @@ export function heartCoreMaterial(name: string): THREE.ShaderMaterial {
         float t = uTime * 0.08;
         float churn = vnoise(uv * 3.0 + vec2(t, -t * 1.3)) * 0.6 + vnoise(uv * 7.0 - vec2(t * 2.0, t)) * 0.4;
         float ph = fract(uTime / uBeat);
-        float beat = exp(-pow((ph - 0.08) * 22.0, 2.0)) + 0.6 * exp(-pow((ph - 0.24) * 22.0, 2.0));
+        float beat = exp(-pow(max((ph - 0.08) * 22.0, 0.0), 2.0)) + 0.6 * exp(-pow(max((ph - 0.24) * 22.0, 0.0), 2.0));
         vec3 deep = vec3(0.55, 0.22, 0.05);
         vec3 hot = vec3(1.0, 0.86, 0.55);
         vec3 white = vec3(1.0, 0.98, 0.92);
         vec3 col = mix(deep, hot, smoothstep(0.25, 0.75, churn));
         col = mix(col, white, smoothstep(0.7, 0.95, churn) * 0.8);
         col *= 1.1 + beat * 0.9;
-        col += hot * pow(1.0 - vRim, 2.0) * (0.8 + beat);
+        col += hot * pow(max(1.0 - vRim, 0.0), 2.0) * (0.8 + beat);
         // The heart going dark: embers of it, never black.
         col *= mix(0.1, 1.0, uLevel);
         gl_FragColor = vec4(col, 1.0);
@@ -378,7 +378,7 @@ export function heartCrystalMaterial(name: string, color: number): THREE.ShaderM
       varying vec3 vShade; varying float vT; varying float vRim; varying float vH;
       void main() {
         float shade = vShade.r;
-        float rim = pow(1.0 - vRim, 2.0);
+        float rim = pow(max(1.0 - vRim, 0.0), 2.0);
         // Dark: smoky crystal, a breath of its colour in the facets.
         vec3 dark = mix(vec3(0.06, 0.06, 0.07), uColor * 0.22, 0.22) * (0.5 + 0.7 * shade) + uColor * rim * 0.06;
         // The light runs in from the rim (or up the spire) behind a hot front.

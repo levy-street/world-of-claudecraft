@@ -19,10 +19,13 @@ import {
 import { ISLE_AURAS, ISLE_TUNING as IT } from '../sim/encounters/smith_heart/breath_isle_ids';
 import { WIND_DRIFT_AURA, WIND_PULL_AURA } from '../sim/wind_drift';
 import type { AuraEffectDescriptor, AuraEffectInput } from './aura_effect';
+import { tierRange, tierValue } from './heart_tier_damage';
 
 const KEY = 'hudChrome.auraEffect.breathGuardian';
 
 const pct = (frac: number): number => Math.round(Math.abs(frac) * 100);
+/** Heroic's damage factor; Mythic shares it (pinned), so one range names both. */
+const HM = BREATH_DIFFICULTY.heroic.damageMult;
 
 /** The fight's aura's descriptor, or null when `a` is not one of them. */
 export function breathAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor | null {
@@ -34,6 +37,7 @@ export function breathAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescri
           speed: a.value2 ?? BREATH_DIFFICULTY.normal.windSpeed,
           pinMin: T.pinMin,
           pinMax: T.pinMax,
+          ...tierRange('heroic', T.pinMin, T.pinMax, HM),
         },
       };
     case WIND_PULL_AURA:
@@ -48,10 +52,15 @@ export function breathAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescri
           gustMax: T.gustMax,
           throw: BREATH_DIFFICULTY.normal.gustThrow,
           heroicThrow: BREATH_DIFFICULTY.heroic.gustThrow,
+          ...tierRange('heroic', T.vortexMin, T.vortexMax, HM),
+          ...tierRange('heroicGust', T.gustMin, T.gustMax, HM),
         },
       };
     case BREATH_AURAS.pinned:
-      return { key: `${KEY}.pinned`, nums: { min: T.pinMin, max: T.pinMax } };
+      return {
+        key: `${KEY}.pinned`,
+        nums: { min: T.pinMin, max: T.pinMax, ...tierRange('heroic', T.pinMin, T.pinMax, HM) },
+      };
     case BREATH_AURAS.portalA:
       return { key: `${KEY}.portalA` };
     case BREATH_AURAS.portalB:
@@ -78,6 +87,8 @@ export function breathAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescri
           cmin: T.chargedMin,
           cmax: T.chargedMax,
           charged: T.chargedSeconds,
+          ...tierRange('heroic', T.drawnMin, T.drawnMax, HM),
+          ...tierRange('heroicC', T.chargedMin, T.chargedMax, HM),
         },
       };
     case BREATH_AURAS.cradled:
@@ -86,7 +97,7 @@ export function breathAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescri
         nums: {
           hold: T.cradleHold,
           total: BREATH_DIFFICULTY.normal.cradleTotal,
-          heroicTotal: BREATH_DIFFICULTY.heroic.cradleTotal,
+          heroicTotal: tierValue(BREATH_DIFFICULTY.heroic.cradleTotal, HM),
           radius: T.cradleR,
           soakers: BREATH_DIFFICULTY.normal.cradleSoakers,
           heroicSoakers: BREATH_DIFFICULTY.heroic.cradleSoakers,
@@ -94,6 +105,7 @@ export function breathAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescri
           penalty: pct(T.cradlePenaltyMult - 1),
           bmin: T.backlashMin,
           bmax: T.backlashMax,
+          ...tierRange('heroicB', T.backlashMin, T.backlashMax, HM),
         },
       };
     case ISLE_AURAS.bulwark:
@@ -106,6 +118,7 @@ export function breathAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescri
           max: IT.bulwarkMax,
           bmin: IT.burstMin,
           bmax: IT.burstMax,
+          ...tierRange('heroic', IT.burstMin, IT.burstMax, HM),
         },
       };
     case ISLE_AURAS.riding:
@@ -125,6 +138,7 @@ export function breathAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescri
           every: T.swellEvery,
           min: T.swellMin,
           max: T.swellMax,
+          ...tierRange('heroic', T.swellMin, T.swellMax, HM),
           growth: pct(T.swellGrowth),
           stacks: a.stacks ?? 0,
         },

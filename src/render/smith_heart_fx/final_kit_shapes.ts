@@ -186,3 +186,52 @@ export function iceCrust(): THREE.BufferGeometry {
   merged.computeVertexNormals();
   return merged;
 }
+
+/** The colossus's own stone colours (the rig's Hammer body: warm granite with
+ *  gold veins), shared by the pieces that orbit it. */
+const CHUNK_TONE = {
+  under: [0.2, 0.17, 0.15],
+  face: [0.45, 0.39, 0.33],
+  top: [0.6, 0.53, 0.45],
+  vein: [0.95, 0.68, 0.26],
+} as const;
+
+/** A piece broken off the colossus, the floating rocks of its Hammer aura
+ *  (final_body_fx.ts): an icosphere knocked out of round per corner by a
+ *  hash, sheared flat on one side where it split from the body, faceted, and
+ *  toned per vertex (dark below, lit above, a gold vein across it). Unit
+ *  sized; one geometry the instanced draw scales and turns per piece. */
+export function colossusChunk(): THREE.BufferGeometry {
+  const base = new THREE.IcosahedronGeometry(1, 1);
+  const geo = base.toNonIndexed();
+  base.dispose();
+  const pos = geo.getAttribute('position') as THREE.BufferAttribute;
+  const colors = new Float32Array(pos.count * 3);
+  const v = new THREE.Vector3();
+  for (let i = 0; i < pos.count; i++) {
+    v.fromBufferAttribute(pos, i);
+    // One hash per corner (the same corner moves the same in every face).
+    const hx = Math.round(v.x * 89 + v.y * 37);
+    const hz = Math.round(v.z * 61 - v.y * 23);
+    v.multiplyScalar(0.78 + fxHash(hx, hz) * 0.42);
+    // The split face: everything past the cut is sheared onto one plane.
+    if (v.y < -0.42) v.y = -0.42 - (v.y + 0.42) * 0.08;
+    // A slab, not a ball: longer than it is deep.
+    v.set(v.x * 1.25, v.y * 0.85, v.z * 0.9);
+    pos.setXYZ(i, v.x, v.y, v.z);
+    const up = Math.max(0, Math.min(1, (v.y + 0.45) / 1.2));
+    const tone =
+      up < 0.5
+        ? CHUNK_TONE.under.map((c, k) => c + (CHUNK_TONE.face[k] - c) * (up / 0.5))
+        : CHUNK_TONE.face.map((c, k) => c + (CHUNK_TONE.top[k] - c) * ((up - 0.5) / 0.5));
+    // A gold vein: a thin band round a tilted plane through the piece.
+    const vein = Math.abs(v.x * 0.55 + v.y * 0.8 - v.z * 0.25 - 0.1) < 0.09;
+    const c = vein ? CHUNK_TONE.vein : tone;
+    colors[i * 3] = c[0];
+    colors[i * 3 + 1] = c[1];
+    colors[i * 3 + 2] = c[2];
+  }
+  geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+  geo.computeVertexNormals();
+  return geo;
+}

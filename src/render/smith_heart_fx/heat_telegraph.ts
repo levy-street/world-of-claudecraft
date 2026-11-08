@@ -25,6 +25,13 @@ import { applyCharBlend } from './heat_molten_decal';
 import { HEAT_TELEGRAPH_LOOKS, type HeatTelegraphKind } from './heat_telegraph_core';
 import { HEAT_TELEGRAPH_FRAG, HEAT_TELEGRAPH_VERT } from './heat_telegraph_glsl';
 
+/** How many yards of a dressed lane, from its start, a wave has already
+ *  rolled past (its warning clears there; 0 shows the whole lane). */
+export function setLaneSpent(lane: TelegraphLane, yards: number): void {
+  const u = (lane.floor.material as THREE.ShaderMaterial).uniforms?.uSpent;
+  if (u) u.value = yards;
+}
+
 /** An owner's three telegraph rungs (encounter steps). */
 export interface HeatTelegraphSteps {
   char: number;
@@ -70,6 +77,7 @@ export class HeatTelegraphs {
       uCells: { value: L.cells },
       uCrack: { value: L.crack },
       uRimK: { value: L.rim },
+      uSpent: { value: 0 },
     };
     const common = {
       uniforms,

@@ -35,6 +35,7 @@ import {
   spawnFightObject,
 } from './heat_scope';
 import type { HeatWheelRound } from './heat_state';
+import { heatSay } from './heat_voice';
 
 /** Run `run`'s safe slices: each a hashed one or two slices from the last, never the
  *  same, always on the shore. Pure. */
@@ -97,6 +98,7 @@ export function startWheel(s: HeatScope): void {
   beginRound(s, st.wheelSafes[0]);
   st.wheelNext = 1;
   raidWarn(s, s.boss, 'wheel', 'The Hearth turns! Get to the dark slice!');
+  heatSay(s, s.boss, 'wheel');
 }
 
 /** The players in a red slice of `round` now: on the shore, not in its safe slice. */

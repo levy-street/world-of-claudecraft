@@ -10,6 +10,12 @@ import {
 } from './music';
 import { ALL_MUSIC_ZONES } from './music_zones';
 import { seasonalMusicZone } from './seasonal_music';
+import {
+  isFinalStageTrack,
+  isSmithHeartBoss,
+  SMITH_HEART_BOSS_TRACKS,
+  smithHeartStageTrack,
+} from './smith_heart_boss_music';
 import { smithHeartMusicZoneAt } from './smith_heart_music';
 
 export interface InstanceMusicEntity {
@@ -17,6 +23,9 @@ export interface InstanceMusicEntity {
   dead: boolean;
   templateId: string;
   aggroTargetId: number | null;
+  // A staged boss's phase rides an aura (smith_heart_boss_music.ts); absent
+  // for callers that only know the template.
+  auras?: readonly { id: string; value: number }[];
 }
 
 // The slice of RiftFloorView the soundtrack needs: the floor's environment
@@ -67,6 +76,10 @@ export interface InstanceMusicDecision {
   // The engaged boss's own fight track (BOSS_TRACK_URLS), or null for the
   // shared default loop.
   bossTrackUrl: string | null;
+  // The own fight tracks of bosses lying dead here with no living boss
+  // sharing them: a kill hands the mix back at once instead of holding the
+  // track through the aggro-gap grace.
+  slainBossTrackUrls: ReadonlySet<string>;
   instanceId: string | null;
   crucibleFloor: CrucibleFloor | null;
 }
@@ -110,21 +123,41 @@ const RAID_BOSS_ID = 'nythraxis_scourge_of_thornpeak';
 const FALLBACK_DELVE_ID = 'collapsed_reliquary';
 const RECENT_COMBAT_MS = 5000;
 const RECENT_BOSS_COMBAT_MS = 10000;
+const NO_TRACKS: ReadonlySet<string> = new Set();
 
 export function instanceMusicDecision(input: InstanceMusicInput): InstanceMusicDecision {
   let aggroed = false;
   let bossEngaged = false;
   let bossTrackUrl: string | null = null;
+  let slain: Set<string> | null = null;
+  let living: Set<string> | null = null;
   for (const entity of input.entities) {
-    if (entity.kind !== 'mob' || entity.dead) continue;
+    if (entity.kind !== 'mob') continue;
+    const ownTrack = bossTrackFor(entity.templateId);
+    if (entity.dead) {
+      // Only the Smith's Heart's bosses hand the mix back at their kill; every
+      // other boss keeps its cue through the 10 s grace, as before.
+      if (ownTrack !== null && isSmithHeartBoss(entity.templateId)) {
+        slain ??= new Set();
+        slain.add(ownTrack);
+      }
+      continue;
+    }
+    if (ownTrack !== null) {
+      living ??= new Set();
+      living.add(ownTrack);
+    }
     if (entity.aggroTargetId === input.playerId) aggroed = true;
     if (entity.templateId === RAID_BOSS_ID && entity.aggroTargetId !== null) bossEngaged = true;
-    const track = bossTrackFor(entity.templateId);
+    const track = smithHeartStageTrack(entity) ?? ownTrack;
     if (track !== null && entity.aggroTargetId !== null) {
       bossEngaged = true;
       bossTrackUrl = track;
     }
   }
+
+  // A council shares one cue: it is slain only once no member stands.
+  if (slain && living) for (const track of living) slain.delete(track);
 
   const dungeon = dungeonAt(input.playerPos.x);
   const inRaidArena = dungeon?.id === RAID_ARENA_ID;
@@ -187,9 +220,18 @@ export function instanceMusicDecision(input: InstanceMusicInput): InstanceMusicD
     musicCombat: crucibleFloor === null && (inCombat || inRaidArena || inBattleground),
     bossEngaged: crucibleFloor === null && bossEngaged,
     bossTrackUrl: crucibleFloor === null ? bossTrackUrl : null,
+    slainBossTrackUrls: slain ?? NO_TRACKS,
     crucibleFloor,
     instanceId: musicInstanceId,
   };
+}
+
+/** Whether a held fight track belongs to a boss now lying dead. The final
+ *  boss's later cues are its own too, so its corpse releases them. */
+function isSlainTrack(slain: ReadonlySet<string>, url: string): boolean {
+  if (slain.size === 0) return false;
+  if (slain.has(url)) return true;
+  return slain.has(SMITH_HEART_BOSS_TRACKS.final) && isFinalStageTrack(url);
 }
 
 export class InstanceMusicController {
@@ -209,7 +251,11 @@ export class InstanceMusicController {
     this.lastInstanceId = decision.instanceId;
     if (decision.bossTrackUrl !== null) {
       this.bossTrack = { url: decision.bossTrackUrl, seenAt: input.now };
-    } else if (this.bossTrack && input.now - this.bossTrack.seenAt >= RECENT_BOSS_COMBAT_MS) {
+    } else if (
+      this.bossTrack &&
+      (input.now - this.bossTrack.seenAt >= RECENT_BOSS_COMBAT_MS ||
+        isSlainTrack(decision.slainBossTrackUrls, this.bossTrack.url))
+    ) {
       this.bossTrack = null;
     }
     if (this.bossTrack) this.music.setBossCombat(true, this.bossTrack.url);

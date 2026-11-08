@@ -41,6 +41,7 @@
 // the pillar, rubble and rise-spot objects, `spellfx` cues), so the online
 // client mirrors the whole fight with no wire or IWorld change.
 
+import { instanceHalfWidthOf } from '../../instances/instance_footprint';
 import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
 import { addThreat, clearThreat } from '../../threat';
@@ -107,7 +108,7 @@ import {
   stepRises,
   stepRock,
 } from './council_stone';
-import { councilSay, sayFallen, stepCouncilVoice } from './council_voice';
+import { councilSay, sayFallen, stepCouncilVoice, watchCouncilSlain } from './council_voice';
 import {
   clearWrathBars,
   fillEnergy,
@@ -117,6 +118,8 @@ import {
   startWrath,
   syncEnergyBars,
 } from './council_wrath';
+import { applyTierHealth, restoreTierHealth, tierPoolMult } from './tier_health';
+import { freshSlainWatch } from './voice_slain';
 
 // ---- the dev difficulty switches ------------------------------------------------------
 
@@ -215,6 +218,7 @@ function freshState(difficulty: CouncilDifficulty): CouncilFightState {
     fallen: [],
     lines: [],
     said: {},
+    slain: freshSlainWatch(),
     casts: 0,
     souls: [],
     soulsSpent: [],
@@ -314,7 +318,7 @@ function landBar(s: CouncilScope, role: CouncilRole, body: Entity): void {
   switch (bar.castId) {
     case COUNCIL_CASTS.wrath:
       landWrath(s, body, bar.heir);
-      carryWrathHold(s.st, bar.heir, s.rules.heirFillSeconds);
+      carryWrathHold(s.st, bar.heir, s.rules.heirFillSeconds, s.rules.enrageAfterWraths);
       return;
     case COUNCIL_CASTS.weight:
       landWeight(s, body, bar.targetId);
@@ -442,9 +446,11 @@ function clearBars(bodies: CouncilBodies): void {
 /** Lift Hammer's Weight off this claim's players (never another claim's). */
 function dropClaimWeight(ctx: SimContext, inst: InstanceSlot): void {
   const o = ctx.instanceOriginOf(inst);
+  // The claim's one shape in x (instances/instance_footprint.ts).
+  const half = instanceHalfWidthOf(inst.dungeonId);
   for (const meta of ctx.players.values()) {
     const p = ctx.entities.get(meta.entityId);
-    if (!p || Math.abs(p.pos.x - o.x) >= 300 || Math.abs(p.pos.z - o.z) >= 250) continue;
+    if (!p || Math.abs(p.pos.x - o.x) >= half || Math.abs(p.pos.z - o.z) >= 250) continue;
     dropAuraById(p, COUNCIL_AURAS.weight);
   }
 }
@@ -472,6 +478,7 @@ function resetCouncil(ctx: SimContext, inst: InstanceSlot, bodies: CouncilBodies
     dropAuraById(b, COUNCIL_AURAS.rushStunned);
     dropAuraById(b, COUNCIL_AURAS.rushExposed);
     if (b.dead && anyAlive) regrowHead(ctx, b, 1);
+    restoreTierHealth(b, st?.basePools?.[r]);
     b.resource = 0;
   }
   attach(bodies, undefined);
@@ -513,6 +520,12 @@ function beginCouncil(
   bodies: CouncilBodies,
 ): CouncilFightState {
   const st = freshState(councilDifficulty(inst));
+  const mult = tierPoolMult(inst, COUNCIL_DIFFICULTY[st.difficulty].healthMult);
+  st.basePools = {};
+  for (const r of COUNCIL_ROLES) {
+    const b = bodies[r];
+    if (b) st.basePools[r] = applyTierHealth(b, mult);
+  }
   // A member already down when the pull began (a dev kill) has fallen.
   for (const r of COUNCIL_ROLES) if (bodies[r] && !living(bodies[r])) st.fallen.push(r);
   attach(bodies, st);
@@ -553,6 +566,7 @@ export function tickHammerCouncil(ctx: SimContext, inst: InstanceSlot): void {
   }
   syncMemory(s);
   stepCouncilVoice(s);
+  watchCouncilSlain(s);
   stepBars(s);
   stepRush(s);
   stepCursed(s);

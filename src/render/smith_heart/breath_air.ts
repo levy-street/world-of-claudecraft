@@ -197,7 +197,7 @@ void main() {
   float ph = gustPhase(uTime);
   float front = 1.0 - ph / ${BREATH_GUST.sweep.toFixed(2)};
   float g = gustStrength(uTime);
-  float lead = exp(-pow((vAt.x - front) * 7.0, 2.0));
+  float lead = exp(-pow(max((vAt.x - front) * 7.0, 0.0), 2.0));
   float trail = smoothstep(front - 0.02, front + 0.06, vAt.x) * exp(-(vAt.x - front) * 3.0);
   float lines = smoothstep(0.55, 1.0, sin(vAt.y * 26.0 + sin(vAt.x * 9.0 + uTime) * 1.5) * 0.5 + 0.5);
   float flow = 0.5 + 0.5 * sin(vAt.x * 40.0 + uTime * 22.0 + vAt.y * 5.0);

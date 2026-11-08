@@ -106,7 +106,7 @@ void main() {
   float band = smoothstep(0.0, 0.12, run) * (1.0 - smoothstep(0.12, 0.45, run));
   float braid = abs(sin(vA * 1.5 + vT * 60.0 - uTime * 4.0));
   float seam = smoothstep(0.9, 1.0, braid);
-  float heart = pow(vFace, 2.2);
+  float heart = pow(max(vFace, 0.0), 2.2);
   vec3 col = mix(uColor, uHot, clamp(heart * 0.4 + band * 0.55, 0.0, 1.0));
   col = mix(col, uSeam, seam * 0.55 * (1.0 - band));
   float a = (0.35 + 0.65 * vFace) * (0.85 + 0.4 * band);
@@ -126,7 +126,7 @@ varying float vFace;
 void main() {
   float m = min(vT, 1.0 - vT);
   float shimmer = 0.8 + 0.2 * sin(m * 30.0 - uTime * 6.0);
-  float a = pow(vFace, 2.2) * 0.6 * shimmer * smoothstep(0.0, 0.05, m);
+  float a = pow(max(vFace, 0.0), 2.2) * 0.6 * shimmer * smoothstep(0.0, 0.05, m);
   gl_FragColor = vec4(uColor * uGlow, a);
   #include <colorspace_fragment>
 }
@@ -220,11 +220,11 @@ uniform vec3 uColor;
 varying vec2 vUv;
 void main() {
   float x = vUv.x * 6.2832;
-  float lanes = pow(0.5 + 0.5 * sin(x * 9.0 + sin(x * 3.0) * 1.7), 6.0);
+  float lanes = pow(max(0.5 + 0.5 * sin(x * 9.0 + sin(x * 3.0) * 1.7), 0.0), 6.0);
   float climb = fract(vUv.y * 1.6 - uTime * 0.9 + sin(x * 5.0) * 0.3);
   float streak = lanes * smoothstep(0.0, 0.25, climb) * (1.0 - smoothstep(0.25, 0.7, climb));
   float base = (1.0 - smoothstep(0.0, 0.35, vUv.y)) * 0.35;
-  float a = (streak * 0.9 + base) * pow(1.0 - vUv.y, 1.3) * smoothstep(0.0, 0.04, vUv.y);
+  float a = (streak * 0.9 + base) * pow(max(1.0 - vUv.y, 0.0), 1.3) * smoothstep(0.0, 0.04, vUv.y);
   gl_FragColor = vec4(uColor * uGlow, a);
   #include <colorspace_fragment>
 }

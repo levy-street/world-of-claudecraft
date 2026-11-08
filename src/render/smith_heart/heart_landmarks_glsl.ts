@@ -73,6 +73,16 @@ const HEAT_FALL = /* glsl */ `
     return;
   }`;
 
+/** The Heat's embers while its quarter sleeps (the weak-spots pass's second round:
+ *  asleep its veins and lava read as dark crimson, like dried blood): the hot cores
+ *  of its veins and its lava (the kit paints them 0.985 and up, their smoulder
+ *  below) keep a glow of their own, gold-orange over the red, however low the
+ *  quarter's idle, so they read as fire banked in the rock. Waking, the quarter's
+ *  own blaze takes over; the hidden phase's dark puts them out. */
+const HEAT_EMBER = /* glsl */ `
+  float ember = smoothstep(0.95, 0.985, vShade.r);
+  c += uHot * ember * (0.3 + uQuiet) * (1.0 - uLit) * (1.0 - uDark);`;
+
 /** A landmark's light (its kit glow slot): its quiet glow while its quarter
  *  sleeps, blazing with its element's life as its quarter wakes. */
 export function landmarkGlowFrag(vein: string): string {
@@ -100,6 +110,7 @@ void main() {
   vec3 c = uColor * (0.2 + 0.95 * vShade.r) * level * 1.5;
   c += mix(uColor, uHot, 0.5) * hot * uLit * (0.4 + 0.6 * vShade.r) * 1.1;
   c += white * smoothstep(0.92, 1.0, vShade.r) * 0.3 * uLit;
+  ${vein === 'heat' ? HEAT_EMBER : ''}
   vec3 dark = uColor * 0.05;
   gl_FragColor = vec4((dark + c) * (1.0 - 0.85 * uDark), 1.0);
   #include <colorspace_fragment>

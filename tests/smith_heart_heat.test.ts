@@ -13,6 +13,7 @@ import { SMITH_HEART_GUARDIANS, SMITH_HEART_MOBS } from '../src/sim/content/smit
 import { HEARTH_WELL } from '../src/sim/content/smith_heart_layout';
 import {
   beyondFlare,
+  FIST_SPAN,
   HEAT_AURAS,
   HEAT_CASTS,
   HEAT_CUES,
@@ -39,13 +40,14 @@ import {
   swellLaneTemplate,
   HEAT_TUNING as T,
   WELLSPAWN_SPOTS,
+  wakefireHoldsFist,
   wellDistance,
   wellOf,
   wellTemplate,
   zoneOf,
   zoneTemplate,
 } from '../src/sim/encounters/smith_heart';
-import { DT, type Entity, type SimEvent } from '../src/sim/types';
+import { DT, type Entity, RUN_SPEED, type SimEvent } from '../src/sim/types';
 import { hitsOf } from './helpers/council_fight';
 import { HEAT_WAIT_SPOTS, type HeatFight, heatFight } from './helpers/heat_fight';
 
@@ -138,23 +140,30 @@ describe('Guardian of the Heat: the ids and the geometry', () => {
     expect(inWell(HEARTH_WELL.x + HEARTH_WELL.r + 0.1, 0)).toBe(false);
     expect(beyondFlare(HEARTH_WELL.x + T.flareReach - 0.1, 0)).toBe(false);
     expect(beyondFlare(HEARTH_WELL.x + T.flareReach + 0.1, 0)).toBe(true);
-    expect(inBand(0, HEARTH_WELL.x + 10, 0)).toBe(true);
-    expect(inBand(1, HEARTH_WELL.x + 20, 0)).toBe(true);
-    expect(inBand(2, HEARTH_WELL.x + 40, 0)).toBe(true);
-    expect(inBand(0, HEARTH_WELL.x + 20, 0)).toBe(false);
+    const R = HEARTH_WELL.r;
+    expect(inBand(0, HEARTH_WELL.x + R + 2, 0)).toBe(true);
+    expect(inBand(1, HEARTH_WELL.x + R + 12, 0)).toBe(true);
+    expect(inBand(2, HEARTH_WELL.x + R + 30, 0)).toBe(true);
+    expect(inBand(0, HEARTH_WELL.x + R + 12, 0)).toBe(false);
     // The swells: away from the wellspring first, then either side.
     const spot = { x: HEARTH_WELL.x + 15, z: 0 };
     const [away, left, right] = swellBearings(spot);
     expect(away).toBeCloseTo(Math.PI / 2, 9);
     expect(Math.abs(left - away)).toBeCloseTo(Math.PI / 2, 9);
     expect(Math.abs(right - away)).toBeCloseTo(Math.PI / 2, 9);
-    expect(inLane(spot.x, 0, away, T.laneLength, T.laneHalf, spot.x + 10, 2)).toBe(true);
-    expect(inLane(spot.x, 0, away, T.laneLength, T.laneHalf, spot.x + 10, 3)).toBe(false);
-    expect(inLane(spot.x, 0, away, T.laneLength, T.laneHalf, spot.x - 2, 0)).toBe(false);
-    // A wave's wall: its front and waveDepth behind it.
-    expect(inWave(spot.x, 0, away, 10, spot.x + 9, 0)).toBe(true);
-    expect(inWave(spot.x, 0, away, 10, spot.x + 6, 0)).toBe(false);
-    expect(inWave(spot.x, 0, away, 10, spot.x + 11, 0)).toBe(false);
+    const h = T.laneHalf;
+    expect(inLane(spot.x, 0, away, T.laneLength, h, spot.x + 10, h - 0.1)).toBe(true);
+    expect(inLane(spot.x, 0, away, T.laneLength, h, spot.x + 10, h + 0.1)).toBe(false);
+    expect(inLane(spot.x, 0, away, T.laneLength, h, spot.x - 2, 0)).toBe(false);
+    // A wave's wall: its front and waveDepth behind it, the lane's width.
+    expect(inWave(spot.x, 0, away, 20, spot.x + 19, 0)).toBe(true);
+    expect(inWave(spot.x, 0, away, 20, spot.x + 20 - T.waveDepth + 0.1, h - 0.1)).toBe(true);
+    expect(inWave(spot.x, 0, away, 20, spot.x + 20 - T.waveDepth - 0.1, 0)).toBe(false);
+    expect(inWave(spot.x, 0, away, 20, spot.x + 21, 0)).toBe(false);
+    expect(inWave(spot.x, 0, away, 20, spot.x + 18, h + 0.1)).toBe(false);
+    // A wave just out of the spot never strikes back past it.
+    expect(inWave(spot.x, 0, away, 0.5, spot.x + 0.2, 0)).toBe(true);
+    expect(inWave(spot.x, 0, away, 0.5, spot.x - 4, 5)).toBe(false);
     for (const p of [...SHORE_POINTS, ...WELLSPAWN_SPOTS, ...HEAT_WAIT_SPOTS])
       expect(inHearthFloor(p.x, p.z)).toBe(true);
     expect(SHORE_POINTS.length).toBeGreaterThan(40);
@@ -162,6 +171,95 @@ describe('Guardian of the Heat: the ids and the geometry', () => {
       expect(beyondFlare(p.x, p.z)).toBe(false);
       expect(inWell(p.x, p.z)).toBe(false);
     }
+  });
+});
+
+describe('Guardian of the Heat: the pass-5 Molten Swells (wider, deeper, still fair)', () => {
+  it('rolls an 11 yd wide wall 5 yd deep (2.5 and 2.5 before the owner grew it)', () => {
+    expect(T.laneHalf * 2).toBe(11);
+    expect(T.waveDepth).toBe(5);
+  });
+
+  it('lets a player in the middle of a lane run out of it well inside the warning', () => {
+    // The lanes show with the fist's 3 s bar and the wave rolls 0.6 s later:
+    // at run speed the lane's middle to past its edge takes under a second.
+    const warning = T.fistCast + T.waveDelay;
+    const runOut = (T.laneHalf + 0.5) / RUN_SPEED;
+    expect(runOut).toBeLessThan(1);
+    expect(runOut * 3).toBeLessThan(warning);
+    // The fist's own target, at the spot itself, reaches a gap (clear of the
+    // fist's radius and both lanes it stands between) inside the bar.
+    const gap = Math.max(T.fistR, Math.hypot(T.laneHalf, T.laneHalf)) + 0.5;
+    expect(gap / RUN_SPEED).toBeLessThan(T.fistCast * 0.6);
+  });
+
+  it('never covers the room: wherever the fist lands most of the floor and the melee ring stay clear', () => {
+    for (const out of [1.5, 6, 14]) {
+      for (const deg of [0, 45, 90, 135, 180, 225, 270, 315]) {
+        const a = (deg * Math.PI) / 180;
+        const spot = {
+          x: HEARTH_WELL.x + Math.sin(a) * (HEARTH_WELL.r + out),
+          z: HEARTH_WELL.z + Math.cos(a) * (HEARTH_WELL.r + out),
+        };
+        if (!inHearthFloor(spot.x, spot.z)) continue;
+        const lanes = swellBearings(spot);
+        const struck = (x: number, z: number) =>
+          Math.hypot(x - spot.x, z - spot.z) <= T.fistR ||
+          lanes.some((b) => inLane(spot.x, spot.z, b, T.laneLength, T.laneHalf, x, z));
+        let floor = 0;
+        let hit = 0;
+        for (let x = -262; x <= -170; x += 1)
+          for (let z = -50; z <= 50; z += 1) {
+            if (!inHearthFloor(x, z) || wellDistance(x, z) < HEARTH_WELL.r) continue;
+            floor++;
+            if (struck(x, z)) hit++;
+          }
+        expect(hit / floor).toBeLessThan(0.25);
+        // The melee ring (the lip to 3 yd out): at least half of it is clear.
+        let ring = 0;
+        let ringHit = 0;
+        for (let k = 0; k < 360; k++) {
+          const r = (k * Math.PI) / 180;
+          const x = HEARTH_WELL.x + Math.sin(r) * (HEARTH_WELL.r + 1.5);
+          const z = HEARTH_WELL.z + Math.cos(r) * (HEARTH_WELL.r + 1.5);
+          if (!inHearthFloor(x, z)) continue;
+          ring++;
+          if (struck(x, z)) ringHit++;
+        }
+        expect(ringHit / ring).toBeLessThan(0.5);
+      }
+    }
+  });
+});
+
+describe('Guardian of the Heat: the pass-5 wall in a live fight', () => {
+  it('strikes 4.5 yd across the lane and 4.5 yd behind the front, not 6 across', () => {
+    const f = pulled(5);
+    const [, victim, across45, across6, behind] = f.players;
+    const spot = { x: HEARTH_WELL.x + 16, z: 0 };
+    f.put(victim, spot.x, spot.z);
+    expect(f.dev('/dev heart heat fist', victim.id)).toBe(true);
+    // Down the lane away from the wellspring (+x), 14 yd out (clear of the
+    // side lanes, which cover 5.5 yd either side of the spot's line).
+    f.put(across45, spot.x + 14, 4.5);
+    f.put(across6, spot.x + 14, -6);
+    f.tick(ticks(T.fistCast + T.waveDelay + 0.05));
+    // Half a yard behind where the front will be when it is 14.2 yd out,
+    // the wall 5 yd deep reaches back over it as it passes.
+    let roll: SimEvent[] = [];
+    for (let i = 0; i < ticks(1.4); i++) roll = roll.concat(f.tick(1));
+    // The front is about 14.5 yd out: step the one behind into the wall's
+    // back (4.5 yd behind the front, the wall 5 deep), not its front.
+    const front = f.objects(HEAT_OBJECTS.wave).find((w) => Math.abs(w.facing - Math.PI / 2) < 0.01);
+    expect(front).toBeTruthy();
+    const o = f.world(spot.x, 0);
+    const out = (front?.pos.x ?? 0) - o.x;
+    f.put(behind, spot.x + out - 4.5, 0.5);
+    const last = f.tick(1);
+    roll = roll.concat(last);
+    expect(hitsOf(roll, HEAT_NAMES.swell, across45.id).length).toBe(1);
+    expect(hitsOf(roll, HEAT_NAMES.swell, across6.id)).toEqual([]);
+    expect(hitsOf(last, HEAT_NAMES.swell, behind.id).length).toBe(1);
   });
 });
 
@@ -189,7 +287,7 @@ describe('Guardian of the Heat: the guardian', () => {
   it('Cinder Grip stacks on its tank with every landed swing', () => {
     const f = pulled(2);
     const tank = f.players[0];
-    f.put(tank, HEARTH_WELL.x + 8, 0);
+    f.put(tank, HEARTH_WELL.x + HEARTH_WELL.r + 0.5, 0);
     f.tick(ticks(14));
     const grip = aura(tank, HEAT_AURAS.grip);
     expect(grip?.name).toBe(HEAT_NAMES.grip);
@@ -457,6 +555,99 @@ describe('Guardian of the Heat: the overflows', () => {
   });
 });
 
+describe('Guardian of the Heat: Basalt Fist waits out Wakefire', () => {
+  it('holds a due fist while a run lays bands, a band warns or burns, or a run is near', () => {
+    const quiet = { zoneRun: null, zones: [], zoneTimer: 30 };
+    expect(wakefireHoldsFist(quiet, true)).toBe(false);
+    expect(
+      wakefireHoldsFist({ ...quiet, zoneRun: { order: [0, 1, 2], next: 1, stepIn: 1 } }, true),
+    ).toBe(true);
+    const band = { objectId: 1, band: 0, state: 'burn' as const, remaining: 1, tick: 0 };
+    expect(wakefireHoldsFist({ ...quiet, zones: [band] }, true)).toBe(true);
+    // The next run starting before its swells are done holds it too...
+    expect(wakefireHoldsFist({ ...quiet, zoneTimer: FIST_SPAN - 0.1 }, true)).toBe(true);
+    expect(wakefireHoldsFist({ ...quiet, zoneTimer: FIST_SPAN + 0.1 }, true)).toBe(false);
+    // ...but not in a phase without Wakefire (its timer never runs there).
+    expect(wakefireHoldsFist({ ...quiet, zoneTimer: 0 }, false)).toBe(false);
+    // The swells' whole run: the bar, the delay, the lane and the wall.
+    expect(FIST_SPAN).toBeCloseTo(
+      T.fistCast + T.waveDelay + (T.laneLength + T.waveDepth) / T.waveSpeed,
+      9,
+    );
+  });
+
+  it('a due fist waits for the run to end, then comes at once', () => {
+    const f = pulled(3);
+    f.dev('/dev heart heat phase 2');
+    hold(f);
+    const st = f.state();
+    if (!st) throw new Error('no fight');
+    st.zoneTimer = 0.01;
+    st.fistTimer = 0.5;
+    let begun = -1;
+    for (let i = 0; i < ticks(20) && begun < 0; i++) {
+      f.tick(1);
+      for (const p of f.players) p.hp = p.maxHp;
+      if (f.objects(HEAT_OBJECTS.fistPrefix).length > 0) {
+        begun = i * DT;
+        // Never while a band is on the floor or the run still lays them.
+        expect(st.zones).toEqual([]);
+        expect(st.zoneRun).toBeNull();
+      }
+    }
+    // The run: three bands 2.5 s apart, each warning 4 s and burning 2.
+    const run = 2 * T.zoneStep + T.zoneWarn + T.zoneBurn;
+    expect(begun).toBeGreaterThan(run - 0.2);
+    expect(begun).toBeLessThan(run + 0.5);
+  });
+
+  it('is never starved and keeps its 22 s rhythm round the runs (phases 2 and 3, Mythic too)', () => {
+    const run = 2 * T.zoneStep + T.zoneWarn + T.zoneBurn;
+    for (const [phase, tier] of [
+      [2, ''],
+      [3, ''],
+      [2, 'mythic'],
+    ] as const) {
+      const f = pulled(3);
+      if (tier) f.dev(`/dev heart heat ${tier}`);
+      f.dev(`/dev heart heat phase ${phase}`);
+      const st = f.state();
+      if (!st) throw new Error('no fight');
+      const starts: number[] = [];
+      let had = false;
+      const seconds = 240;
+      for (let i = 0; i < ticks(seconds); i++) {
+        // Only Wakefire (and Mythic's Wheel) and the fist run.
+        st.seedTimer = 999;
+        st.flareTimer = 999;
+        st.cinderTimer = 999;
+        f.tick(1);
+        for (const p of f.players) p.hp = p.maxHp;
+        f.boss().hp = f.boss().maxHp;
+        const has = f.objects(HEAT_OBJECTS.fistPrefix).length > 0;
+        if (has && !had) {
+          starts.push(i * DT);
+          expect(st.zones).toEqual([]);
+          expect(st.zoneRun).toBeNull();
+        }
+        // No swell rolls while a band is on the floor.
+        if (st.zones.length > 0) expect(st.swells).toEqual([]);
+        had = has;
+      }
+      // The rhythm: about one every 22 s over the whole stretch (a flat
+      // 34 s, one a run, would be 7).
+      expect(starts.length).toBeGreaterThanOrEqual(Math.floor(seconds / T.fistEvery) - 1);
+      for (let k = 1; k < starts.length; k++) {
+        const gap = starts[k] - starts[k - 1];
+        // Never starved: at most its cadence, a whole run and the lookahead.
+        expect(gap).toBeLessThanOrEqual(T.fistEvery + run + FIST_SPAN + DT);
+        // Never two on top of each other.
+        expect(gap).toBeGreaterThanOrEqual(T.fistEvery / 2 - DT);
+      }
+    }
+  });
+});
+
 describe('Guardian of the Heat: phase 2', () => {
   it('Hearthseeds fall under every player, throb 10 s, then burst less the farther away', () => {
     const f = pulled(3);
@@ -516,9 +707,9 @@ describe('Guardian of the Heat: phase 2', () => {
     f.dev('/dev heart heat phase 2');
     hold(f);
     const [p0, p1, p2] = f.players;
-    f.put(p0, HEARTH_WELL.x + 10, 0);
-    f.put(p1, HEARTH_WELL.x + 22, 0);
-    f.put(p2, HEARTH_WELL.x + 40, 0);
+    f.put(p0, HEARTH_WELL.x + HEARTH_WELL.r + 2, 0);
+    f.put(p1, HEARTH_WELL.x + HEARTH_WELL.r + 14, 0);
+    f.put(p2, HEARTH_WELL.x + HEARTH_WELL.r + 30, 0);
     const st = f.state();
     if (!st) throw new Error('no fight');
     f.dev('/dev heart heat zones');

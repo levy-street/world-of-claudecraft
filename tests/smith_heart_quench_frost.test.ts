@@ -329,7 +329,9 @@ describe('Quench frost pass: the harsher freeze', () => {
   it('the shatter is never lethal alone on Normal for a topped-up level-20 cloth body, but hurts', () => {
     const CLOTH = 1135;
     expect(T.shatterMax * QUENCH_DIFFICULTY.normal.damageMult).toBeLessThan(CLOTH * 0.4);
-    expect(T.shatterMax * QUENCH_DIFFICULTY.heroic.damageMult).toBeLessThan(CLOTH * 0.5);
+    // Heroic's is twice as hard (shatterMult): a heavy hit, still short of a kill.
+    const H = QUENCH_DIFFICULTY.heroic;
+    expect(T.shatterMax * H.damageMult * H.shatterMult).toBeLessThan(CLOTH * 0.9);
     expect(T.shatterMin).toBeGreaterThan(260);
     // The real roll on a 1,135-health body.
     const f = pulled(6);

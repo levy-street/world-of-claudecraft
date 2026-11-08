@@ -13,7 +13,11 @@
 //    spray of stone flung out of the maw, a jolt for whoever stands near;
 //  - each body the wave reaches (BREATH_CUES.roarHit): a white burst and a
 //    ring where it strikes, a hard shake if it is you, and a trail of wind
-//    and grit streaming behind the body as it is flung.
+//    and grit streaming behind the body as it is flung;
+//  - while it draws breath, where the Roar will fling YOU (roarLanding): a
+//    ring pulsing on the spot and a run of motes out to it, pale over the
+//    floor, red when the throw carries you over the void (every tier: it is
+//    what you act on).
 // The ring, the wall and the impacts on EVERY tier; the debris, the dust,
 // the trails' grit and the screen's wind thin on the low tier, the screen's
 // wind and the shakes go under reduced motion. Built in the constructor under
@@ -28,13 +32,17 @@ import { fxAnchor } from '../attached_fx_anchor';
 import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import type { EngineParticles } from '../trash_engine_fx/engine_particles';
+import { breathSocketPoint } from './breath_body_sockets';
 import {
   inhaleScreenWind,
   ROAR_SPEED,
   ROAR_TRAIL_SECONDS,
+  roarLanding,
   roarReach,
   roarWaveLook,
 } from './breath_roar_fx_core';
+
+const _maw = new THREE.Vector3();
 
 /** What BreathFightFx lends this part (a type-only seam). */
 export interface BreathRoarHost {
@@ -48,6 +56,12 @@ export interface BreathRoarHost {
   shakeNear(x: number, z: number, amount: number, reach?: number): void;
   reducedMotion(): boolean;
 }
+
+/** The landing marker's beat (seconds) and its colours: pale over the
+ *  floor, the danger red over the void. */
+const LANDING_EVERY = 0.35;
+const LANDING_SAFE = 0xe6f4ff;
+const LANDING_VOID = 0xff4436;
 
 const RING_FRAG = /* glsl */ `
 uniform float uTime;
@@ -88,8 +102,10 @@ void main() {
   // Streaks of wind and grit torn up and out (vUv.x round, vUv.y up).
   float streak = smoothstep(0.45, 0.95, n(vec2(vUv.x * 160.0, vUv.y * 2.0 - uTime * 3.0)));
   float foot = 1.0 - smoothstep(0.0, 1.0, vUv.y);
-  float k = (0.25 + streak * 0.9) * foot * uAlpha;
-  gl_FragColor = vec4(mix(uColor, uCore, streak * foot) * (1.0 + 0.4 * k), clamp(k, 0.0, 1.0));
+  // Capped (the Breath model pass): a wind front you read through, never a
+  // white wall over the boss, the raid and the throw markers.
+  float k = (0.05 + streak * 0.5) * foot * uAlpha;
+  gl_FragColor = vec4(mix(uColor, uCore, streak * foot * 0.6), clamp(k, 0.0, 0.18));
   #include <colorspace_fragment>
 }
 `;
@@ -138,7 +154,7 @@ void main() {
   float edge = smoothstep(0.55, 1.05, max(abs(vPos.x), abs(vPos.y)));
   float k = streak * thin * step(0.5, h(vec2(lane, 11.0))) * edge * uStrength;
   float haze = edge * 0.12 * uStrength;
-  gl_FragColor = vec4(uColor, clamp(k * 0.55 + haze, 0.0, 0.7));
+  gl_FragColor = vec4(uColor, clamp(k * 0.4 + haze, 0.0, 0.45));
 }
 `;
 
@@ -173,6 +189,7 @@ export class BreathRoarFx {
   private readonly flung: Trail[] = [];
   private readonly reach = roarReach();
   private clock = 0;
+  private landingNext = 0;
   private suck = 0;
   private seed = 0x2b7d;
 
@@ -372,11 +389,56 @@ export class BreathRoarFx {
 
   /** One frame: `g` the guardian (or none in view), `onCornice` whether the
    *  local body stands in the fight's claim. */
-  update(world: IWorld, g: Entity | undefined, onCornice: boolean, dt: number): void {
+  update(
+    world: IWorld,
+    g: Entity | undefined,
+    onCornice: boolean,
+    dt: number,
+    origin: { x: number; z: number } | null = null,
+  ): void {
     this.clock += dt;
     this.updateWave(dt);
     this.updateTrails(world, dt);
     this.updateInhale(g, onCornice, dt);
+    this.updateLanding(world, g, onCornice, origin);
+  }
+
+  /** While the guardian draws breath: where the Roar throws the local body. */
+  private updateLanding(
+    world: IWorld,
+    g: Entity | undefined,
+    onCornice: boolean,
+    origin: { x: number; z: number } | null,
+  ): void {
+    const drawing = !!g && !g.dead && g.castingAbility === BREATH_CASTS.inhale;
+    const me = world.entities.get(world.playerId);
+    if (!drawing || !g || !onCornice || !origin || !me || me.dead) return;
+    if (this.clock < this.landingNext) return;
+    this.landingNext = this.clock + LANDING_EVERY;
+    const at = roarLanding(
+      me.pos.x - origin.x,
+      me.pos.z - origin.z,
+      g.pos.x - origin.x,
+      g.pos.z - origin.z,
+    );
+    const x = at.x + origin.x;
+    const z = at.z + origin.z;
+    const color = at.overVoid ? LANDING_VOID : LANDING_SAFE;
+    this.h.particles.shockRing(x, z, color, 3.2, LANDING_EVERY + 0.15);
+    this.h.particles.shockRing(x, z, color, 1.4, LANDING_EVERY + 0.15);
+    for (let k = 1; k <= 5; k++) {
+      const f = k / 6;
+      const px = me.pos.x + (x - me.pos.x) * f;
+      const pz = me.pos.z + (z - me.pos.z) * f;
+      this.h.particles.puff(px, this.h.groundY(px, pz) + 0.3, pz, 1, {
+        speed: 0.2,
+        life: LANDING_EVERY + 0.1,
+        size: [0.55, 0.3],
+        color: at.overVoid ? [1, 0.32, 0.28] : [0.9, 0.96, 1],
+        alpha: 0.9,
+        pool: 'glow',
+      });
+    }
   }
 
   private updateWave(dt: number): void {
@@ -396,7 +458,7 @@ export class BreathRoarFx {
     this.trailMats[0].uniforms.uAlpha.value = look.alpha * 0.55 * (look.trail1 > 0.5 ? 1 : 0);
     this.trailMats[1].uniforms.uAlpha.value = look.alpha * 0.3 * (look.trail2 > 0.5 ? 1 : 0);
     this.wall.scale.set(r, look.height, r);
-    this.wallMat.uniforms.uAlpha.value = look.alpha * 0.8;
+    this.wallMat.uniforms.uAlpha.value = look.alpha * 0.6;
     // Dust boiling along the front as it runs (cosmetic).
     if (look.front < this.reach) {
       w.dust += dt * 70 * this.h.density;
@@ -482,11 +544,11 @@ export class BreathRoarFx {
     this.screen.visible = this.suck > 0.02;
     this.screenMat.uniforms.uStrength.value = this.suck;
     if (!drawing || !g) return;
-    const a = fxAnchor(g);
-    const s = Math.max(1, g.scale ?? 1);
-    const mx = a.x + Math.sin(g.facing) * 1.2 * s;
-    const mz = a.z + Math.cos(g.facing) * 1.2 * s;
-    const my = g.pos.y + 2.2 * s;
+    // The maw: the war-horn mouth of its mask (its model's socket).
+    const maw = breathSocketPoint(g, 'mouth', _maw);
+    const mx = maw.x;
+    const mz = maw.z;
+    const my = maw.y;
     (this.screenMat.uniforms.uMaw.value as THREE.Vector3).set(mx, my, mz);
     // Grit and stones torn up and sucked into the maw, dust dragged along
     // the ground in long runs (cosmetic; the pull itself reads on the

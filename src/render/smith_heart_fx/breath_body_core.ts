@@ -1,29 +1,25 @@
-// Pure plan of the Guardian of the Breath's provisional body (breath_body.ts
-// paints it; docs/design/raid/smith_heart.md sections 5.14 and 7.2). The
-// Breath vein's art rule: primal and divine, living granite, crystal and
-// storm, NOTHING metal and no machinery. The "bellows" is a creature that
-// breathes: a great chest of storm granite flanked by two bellows plates
-// (the Breath kit's scalloped windbreaks) that swell out and fall in with
-// every breath, a wind-horn for a mouth (its bell open forward, the vein's
-// light deep in its throat), wings of fluted wind-blades on its back, crystal
-// spines down its spine, heavy arms of the mountain's rock ending in
-// wind-carved claws, and no legs: below the waist it thins into a whirl of
-// loose stones turning in its own wind. About three and a half players tall.
+// The Guardian of the Breath's own model (docs/design/raid/smith_heart.md
+// sections 5.14 and 7.2): the pure half of breath_body.ts. Jose's concept,
+// built on the official pipeline (a three-view sheet of the solid pieces,
+// Tripo3D, a rig made for them in Blender, every clip authored for it at
+// 30 fps): a colossus of PURE AIR held together by floating pieces of ancient
+// armor that never touch: a stone face-mask with glowing eyes and a war-horn
+// mouth under a crystal crown, a bronze halo of runes, two granite pauldrons,
+// a chest plate with a glowing spiral, segmented bronze-banded bracers, clawed
+// granite hands with crystal claws, and a chain of tapering tail plates. One
+// bone carries each piece (no skin weights), so the arms' shoulders and elbows
+// are empty air and every piece trails and overshoots as if carried on wind.
+// At half health the storm breaks: the same model, its Storm Breaks clip
+// flings every piece out to a wider spacing it keeps for phase 2.
 //
-// At half health the storm breaks (its 'heart_breath_storm_break' bar): it
-// draws the wind in, freezes, and tears open. Through phase 2 it is a body of
-// LIGHTNING, a different shape and material: every stone flies off its joint
-// into a ring of shards turning round a core of living lightning (a tall
-// storm figure, lightning wings, a white crystal heart), arcs leaping from
-// the core to the shards.
-//
-// The JOINTS and the TIMELINES (the slots, the arms, the poses, the shell's
-// orbit) are kept apart from the PIECES (which kit node sits on which joint,
-// at what size), so the official pipeline's model replaces the pieces and
-// keeps the joints.
-//
-// Sizes in yards in the body's frame: x to its left, y up from its feet, z
-// forward (0 = +z). Three-free, DOM-free, deterministic (a hash, never rng).
+// The rig plays the motion (characters/smith_heart_boss_looks.ts binds the
+// clips); this module plans what the effects layer adds on top: the gesture
+// ids the stance swaps answer, the clip beats the bursts are timed to, the
+// sockets the wind rides (points on the model at rest, carried by their
+// bones), the currents of wind wound piece to piece that ARE its body, the
+// storm's lightning between the pieces, the orbiting stones and shards, and
+// the looks of every bar. Node-only (RENDER_PURE_CORES): no three.js, no DOM,
+// deterministic (a hash, never rng).
 
 import {
   BREATH_AURAS,
@@ -31,278 +27,536 @@ import {
   BREATH_GUARDIAN,
   type BreathWindPhase,
 } from '../../sim/encounters/smith_heart/breath_ids';
+import { ISLE_CASTS } from '../../sim/encounters/smith_heart/breath_isle_ids';
 import type { V3 } from './final_fx_core';
 
 export type { V3 };
-
 export { BREATH_GUARDIAN };
 
-/** The kits the pieces come from (render/smith_heart/heart_kit.ts urls). */
-export const BREATH_BODY_KITS = {
-  breath: '/models/props/smith_heart_breath_kit.glb',
-  heart: '/models/props/smith_heart_heart_kit.glb',
+// ---- the model -------------------------------------------------------------------------
+
+/** The shipped body (public/models/creatures). */
+export const BREATH_BODY_URL = 'models/creatures/smith_heart_breath_guardian.glb';
+
+/** Every clip the GLB carries: the calm wind's set, the transition, and the
+ *  storm's set (the same motions on the wider spacing, crackling). */
+export const BREATH_BODY_CLIPS = [
+  'Idle',
+  'Move',
+  'Attack',
+  'Attack2',
+  'Cast',
+  'Channel',
+  'Inhale',
+  'Roar',
+  'StormBreaks',
+  'StormIdle',
+  'StormMove',
+  'StormAttack',
+  'StormAttack2',
+  'StormCast',
+  'StormChannel',
+  'Death',
+  'StormDeath',
+] as const;
+
+/** The model's own height (the tail's tip to the halo's crystal) in its
+ *  authored units; the crown's crystals top out a little under it. */
+export const BREATH_MODEL_UNITS = 10;
+export const BREATH_MODEL_CROWN = 9.37;
+
+/** The template's scale (content/smith_heart.ts heart_breath_guardian). */
+export const BREATH_BODY_SCALE = 3.4;
+
+/** The drawn height at scale 1: the whole body some eighteen yards, the
+ *  crown about seventeen over the Cornice, near nine players (the provisional
+ *  body stood three and a half; the Heat guardian's crown is about eighteen
+ *  over its lava): as imposing as the Heat. */
+export const BREATH_BODY_HEIGHT = 5.3;
+
+/** Yards a model unit is drawn at. */
+export const BREATH_YD_PER_UNIT = (BREATH_BODY_HEIGHT * BREATH_BODY_SCALE) / BREATH_MODEL_UNITS;
+
+/** The clips' beats, in seconds at a time scale of 1 (frame / 30). */
+export const BREATH_BODY_CLIP = {
+  /** A claw swipe's crystal claws cross before it (Attack, Attack2). */
+  attack: 18 / 30,
+  /** The cast: the pointing hand thrusts out (Cast; played at release / bar
+   *  so it points on the bar's end, the bolt's launch). */
+  castRelease: 21 / 30,
+  /** The Indrawn Breath's clip runs the whole bar and holds its last pose. */
+  inhale: 150 / 30,
+  /** The Summit Roar's thrust: the mask and the arms flung forward (Roar;
+   *  played at thrust / bar so it lands on the bar's end). */
+  roar: 42 / 30,
+  /** Storm Breaks (the 4 s bar): drawn in, frozen, torn apart. */
+  breakFreeze: 66 / 30,
+  breakTear: 103 / 30,
+  breakEnd: 120 / 30,
+  /** The death: its last breath, then the pieces start falling. */
+  deathFall: 24 / 30,
 } as const;
-export type BreathBodyKit = keyof typeof BREATH_BODY_KITS;
 
-/** Feet to crown (yards): the manifest height (smith_heart_breath_guardian
- *  2.0) times the template's scale (content/smith_heart.ts 3.4). */
-export const BREATH_BODY_HEIGHT = 2.0 * 3.4;
+/** Presentation gestures (the renderer's triggerAttack seam). Never sim ids. */
+export const BREATH_BODY_GESTURES = {
+  /** The calm wind's stance (phase 1, and a wipe's reset). */
+  calm: 'smith_heart_breath_body_calm',
+  /** The storm's stance (its body torn open: phase 2). */
+  storm: 'smith_heart_breath_body_storm',
+  /** Its eyes, crystals and spiral flaring (the indrawn breath's end, the
+   *  roar, the storm tearing open). */
+  flare: 'smith_heart_breath_body_flare',
+} as const;
 
-/** A joint a piece rides. Side joints are mirrored; `whirl` pieces orbit
- *  under the waist. */
-export type BreathJoint =
-  | 'whirl'
-  | 'waist'
-  | 'chest'
-  | 'lung'
-  | 'heart'
-  | 'head'
+/** The stance gesture for the guardian's storm body. */
+export function breathStanceGesture(stormForm: boolean): string {
+  return stormForm ? BREATH_BODY_GESTURES.storm : BREATH_BODY_GESTURES.calm;
+}
+
+/** The bars that play a cast clip timed onto the bar's end, and the beat that
+ *  lands there. The Indrawn Breath and Storm Breaks run their whole bar. */
+export const BREATH_SYNCED_CASTS: Readonly<Record<string, number>> = {
+  [BREATH_CASTS.inhale]: BREATH_BODY_CLIP.inhale,
+  [BREATH_CASTS.gust]: BREATH_BODY_CLIP.roar,
+  [BREATH_CASTS.storm]: BREATH_BODY_CLIP.breakEnd,
+  [BREATH_CASTS.fork]: BREATH_BODY_CLIP.castRelease,
+  [BREATH_CASTS.drawn]: BREATH_BODY_CLIP.castRelease,
+  [BREATH_CASTS.cradle]: BREATH_BODY_CLIP.castRelease,
+  [BREATH_CASTS.lance]: BREATH_BODY_CLIP.castRelease,
+};
+
+/** The held channels (both arms raised, looping): the Thunder's Cradle's
+ *  hold and the Gale Bulwark. */
+export const BREATH_CHANNELS: readonly string[] = [BREATH_CASTS.cradleHold, ISLE_CASTS.bulwark];
+
+// ---- the sockets: points on the model at rest, carried by their bones -------------------
+
+export type BreathSocketId =
   | 'mouth'
-  | 'horn'
-  | 'wing'
-  | 'spine'
-  | 'shoulder'
-  | 'upper'
-  | 'fore'
-  | 'hand';
+  | 'eyeL'
+  | 'eyeR'
+  | 'crown'
+  | 'neck'
+  | 'halo'
+  | 'heart'
+  | 'core'
+  | 'back'
+  | 'shoulderL'
+  | 'shoulderR'
+  | 'spikeL'
+  | 'spikeR'
+  | 'armL'
+  | 'armR'
+  | 'elbowL'
+  | 'elbowR'
+  | 'wristL'
+  | 'wristR'
+  | 'handL'
+  | 'handR'
+  | 'clawL'
+  | 'clawR'
+  | 'waist'
+  | 'tail1'
+  | 'tail2'
+  | 'tail3'
+  | 'tip';
 
-/** How a piece is lit: plain stone, its ':glow' meshes on the body's light,
- *  or the whole piece a crystal. */
-export type BreathPieceLight = 'stone' | 'seam' | 'crystal';
+/** A socket: a point of the model at rest (`at`, its authored units, y up, its
+ *  face toward +z: the fallback while a view loads) and the same point in the
+ *  frame of the bone that carries it (`local`, read off the shipped GLB's rest
+ *  pose; tests/smith_heart_breath_body.test.ts re-derives it from the file).
+ *  Bone names as authored (the loader drops the dots: `hand.L` is `handL`). */
+export interface BreathSocket {
+  id: BreathSocketId;
+  bone: string;
+  at: readonly [number, number, number];
+  local: readonly [number, number, number];
+}
 
-export interface BreathBodyPiece {
+/** `at` authored in the Blender frame (x its left, y back, z up) and turned
+ *  into the model's (x, z, -y) here, so the numbers read against the .blend. */
+function sock(
+  id: BreathSocketId,
+  bone: string,
+  blender: readonly [number, number, number],
+  local: readonly [number, number, number],
+): BreathSocket {
+  const [x, y, z] = blender;
+  return { id, bone, at: [x, z, -y], local };
+}
+
+export const BREATH_SOCKETS: readonly BreathSocket[] = [
+  sock('mouth', 'head', [0, -0.85, 7.85], [0, 0.35, 0.9]),
+  sock('eyeL', 'head', [0.18, -0.78, 8.33], [0.18, 0.83, 0.83]),
+  sock('eyeR', 'head', [-0.18, -0.78, 8.33], [-0.18, 0.83, 0.83]),
+  sock('crown', 'head', [0, -0.1, 9.2], [0, 1.7, 0.15]),
+  sock('neck', 'head', [0, 0, 7.45], [0, -0.05, 0.05]),
+  sock('halo', 'halo', [0, 0.95, 9.0], [0, 0, 0.05]),
+  sock('heart', 'chest', [0, -1.2, 6.05], [0, 0.8, 1.2]),
+  sock('core', 'chest', [0, -0.2, 6.1], [0, 0.85, 0.2]),
+  sock('back', 'chest', [0, 0.35, 6.2], [0, 0.95, -0.35]),
+  sock('shoulderL', 'shoulder.L', [1.8, 0.35, 7.2], [-0.25, 0.75, -0.05]),
+  sock('shoulderR', 'shoulder.R', [-1.8, 0.35, 7.2], [0.25, 0.75, -0.05]),
+  sock('spikeL', 'shoulder.L', [2.05, 0.4, 8.3], [-1.35, 1, -0.1]),
+  sock('spikeR', 'shoulder.R', [-2.05, 0.4, 8.3], [1.35, 1, -0.1]),
+  sock('armL', 'upperarm.L', [1.2, 0.15, 6.25], [0, 0, 0]),
+  sock('armR', 'upperarm.R', [-1.2, 0.15, 6.25], [0, 0, 0]),
+  sock('elbowL', 'forearm.L', [1.6, 0.2, 5.6], [-0.003, 0.05, 0]),
+  sock('elbowR', 'forearm.R', [-1.6, 0.2, 5.6], [0.003, 0.05, 0]),
+  sock('wristL', 'forearm.L', [2.95, 0.2, 5.5], [0.003, 1.404, 0]),
+  sock('wristR', 'forearm.R', [-2.95, 0.2, 5.5], [-0.003, 1.404, 0]),
+  sock('handL', 'hand.L', [3.3, -0.3, 4.95], [0.07, 0.528, 0.035]),
+  sock('handR', 'hand.R', [-3.3, -0.3, 4.95], [-0.07, 0.528, 0.035]),
+  sock('clawL', 'claws.L', [3.95, -0.5, 4.45], [0.033, 0.582, 0.055]),
+  sock('clawR', 'claws.R', [-3.95, -0.5, 4.45], [-0.033, 0.582, 0.055]),
+  sock('waist', 'tail0', [0, -0.3, 4.75], [0, 0.15, 0.1]),
+  sock('tail1', 'tail1', [0, -0.16, 4.0], [0, 0.45, -0.02]),
+  sock('tail2', 'tail2', [0, -0.2, 3.0], [0, 0.5, 0]),
+  sock('tail3', 'tail3', [0, -0.2, 1.6], [0, 0.7, 0]),
+  sock('tip', 'tail3', [0, -0.2, 0.15], [0, 2.15, 0]),
+];
+
+/** A socket's index by id (the painter keeps its live points in this order). */
+export function breathSocketIndex(id: BreathSocketId): number {
+  return BREATH_SOCKETS.findIndex((s) => s.id === id);
+}
+
+// ---- the wind body: currents wound piece to piece ------------------------------------------
+
+/** One current of the wind body: `ribbons` streams wound round a path through
+ *  sockets, each `turns` times along it, `radius` (model units, per path
+ *  point) out from the path, `width` (model units) wide. `tailCurl` runs the
+ *  path on past its last socket in a curl over the floor (the wind tail). */
+export interface BreathCurrent {
   id: string;
-  kit: BreathBodyKit;
-  node: string;
-  joint: BreathJoint;
-  side: -1 | 0 | 1;
-  size: V3;
-  at: V3;
-  tilt: V3;
-  light: BreathPieceLight;
+  path: readonly BreathSocketId[];
+  radius: readonly number[];
+  ribbons: number;
+  turns: number;
+  width: number;
+  alpha: number;
+  /** Spin of the winding (turns a second; the sign is the hand). */
+  spin: number;
+  tailCurl?: boolean;
+  /** A soft body strand: wide, smooth, glowing from within (the volume the
+   *  torn filaments stream over), not a filament. */
+  soft?: boolean;
+  /** Billows of storm air along it (breath_wind_volume.ts): how many, and
+   *  their size (model units, per path point). The body's solid volume. */
+  puffs?: number;
+  puffSize?: readonly number[];
 }
 
-const v = (x: number, y: number, z: number): V3 => ({ x, y, z });
-const ZERO = v(0, 0, 0);
+export const BREATH_CURRENTS: readonly BreathCurrent[] = [
+  // The trunk: from the neck down through the chest, the waist and every
+  // tail plate to the tip and on into a curl over the floor.
+  {
+    id: 'trunk',
+    path: ['neck', 'core', 'waist', 'tail1', 'tail2', 'tail3', 'tip'],
+    radius: [0.55, 1.15, 0.85, 0.6, 0.5, 0.42, 0.34],
+    ribbons: 5,
+    turns: 2.6,
+    width: 0.55,
+    alpha: 0.62,
+    spin: 0.32,
+    puffs: 26,
+    puffSize: [1.7, 2.9, 2.5, 2.0, 1.7, 1.4, 1.1],
+    tailCurl: true,
+  },
+  // The arms: out of the chest, through the empty shoulder and elbow, along
+  // the bracer, wrapping the hand.
+  {
+    id: 'armL',
+    path: ['core', 'armL', 'elbowL', 'wristL', 'handL', 'clawL'],
+    radius: [0.7, 0.62, 0.5, 0.45, 0.42, 0.26],
+    ribbons: 3,
+    turns: 2.2,
+    width: 0.38,
+    alpha: 0.58,
+    spin: 0.42,
+    puffs: 10,
+    puffSize: [2.0, 1.7, 1.4, 1.25, 1.15, 0.75],
+  },
+  {
+    id: 'armR',
+    path: ['core', 'armR', 'elbowR', 'wristR', 'handR', 'clawR'],
+    radius: [0.7, 0.62, 0.5, 0.45, 0.42, 0.26],
+    ribbons: 3,
+    turns: 2.2,
+    width: 0.38,
+    alpha: 0.58,
+    spin: -0.42,
+    puffs: 10,
+    puffSize: [2.0, 1.7, 1.4, 1.25, 1.15, 0.75],
+  },
+  // The shoulders: the air the pauldrons float on, up to their crystals.
+  {
+    id: 'shoulderL',
+    path: ['core', 'armL', 'shoulderL', 'spikeL'],
+    radius: [0.6, 0.8, 0.85, 0.35],
+    ribbons: 2,
+    turns: 1.3,
+    width: 0.48,
+    alpha: 0.5,
+    spin: 0.3,
+    puffs: 5,
+    puffSize: [1.8, 2.1, 2.0, 1.1],
+  },
+  {
+    id: 'shoulderR',
+    path: ['core', 'armR', 'shoulderR', 'spikeR'],
+    radius: [0.6, 0.8, 0.85, 0.35],
+    ribbons: 2,
+    turns: 1.3,
+    width: 0.48,
+    alpha: 0.5,
+    spin: -0.3,
+    puffs: 5,
+    puffSize: [1.8, 2.1, 2.0, 1.1],
+  },
+  // The neck and the head: up behind the mask to its crown and the halo.
+  {
+    id: 'head',
+    path: ['core', 'neck', 'mouth', 'crown', 'halo'],
+    radius: [0.7, 0.6, 0.72, 0.5, 0.3],
+    ribbons: 2,
+    turns: 1.4,
+    width: 0.42,
+    alpha: 0.45,
+    spin: 0.36,
+    puffs: 4,
+    puffSize: [1.9, 1.7, 1.5, 1.2, 0.7],
+  },
+  // The volume under the filaments: wide soft strands of glowing air down
+  // the trunk and the tail, along the arms and over the shoulders.
+  {
+    id: 'trunkSoft',
+    path: ['neck', 'core', 'waist', 'tail1', 'tail2', 'tail3', 'tip'],
+    radius: [0.25, 0.55, 0.4, 0.3, 0.26, 0.22, 0.2],
+    ribbons: 3,
+    turns: 1.2,
+    width: 1.5,
+    alpha: 0.42,
+    spin: 0.16,
+    tailCurl: true,
+    soft: true,
+  },
+  {
+    id: 'armLSoft',
+    path: ['core', 'armL', 'elbowL', 'wristL', 'handL'],
+    radius: [0.3, 0.28, 0.22, 0.2, 0.18],
+    ribbons: 2,
+    turns: 0.9,
+    width: 0.95,
+    alpha: 0.38,
+    spin: 0.22,
+    soft: true,
+  },
+  {
+    id: 'armRSoft',
+    path: ['core', 'armR', 'elbowR', 'wristR', 'handR'],
+    radius: [0.3, 0.28, 0.22, 0.2, 0.18],
+    ribbons: 2,
+    turns: 0.9,
+    width: 0.95,
+    alpha: 0.38,
+    spin: -0.22,
+    soft: true,
+  },
+  {
+    id: 'shouldersSoft',
+    path: ['shoulderR', 'armR', 'core', 'armL', 'shoulderL'],
+    radius: [0.3, 0.35, 0.4, 0.35, 0.3],
+    ribbons: 2,
+    turns: 0.8,
+    width: 1.2,
+    alpha: 0.34,
+    spin: 0.12,
+    soft: true,
+  },
+  // Two great wisps sweeping round the whole body from the tail over a
+  // shoulder (the concept's long streams).
+  {
+    id: 'wispL',
+    path: ['tip', 'tail2', 'waist', 'core', 'shoulderL', 'spikeL'],
+    radius: [0.9, 1.4, 1.7, 1.9, 1.5, 0.8],
+    ribbons: 1,
+    turns: 1.1,
+    width: 0.75,
+    alpha: 0.36,
+    spin: 0.18,
+  },
+  {
+    id: 'wispR',
+    path: ['tip', 'tail2', 'waist', 'core', 'shoulderR', 'spikeR'],
+    radius: [0.9, 1.4, 1.7, 1.9, 1.5, 0.8],
+    ribbons: 1,
+    turns: 1.1,
+    width: 0.75,
+    alpha: 0.36,
+    spin: -0.18,
+  },
+];
 
-function piece(
-  id: string,
-  kit: BreathBodyKit,
-  node: string,
-  joint: BreathJoint,
-  side: -1 | 0 | 1,
-  size: V3,
-  at: V3 = ZERO,
-  tilt: V3 = ZERO,
-  light: BreathPieceLight = 'seam',
-): BreathBodyPiece {
-  return { id, kit, node, joint, side, size, at, tilt, light };
+/** Every ribbon of the wind body, in order (a current's ribbons together). */
+export const BREATH_RIBBON_COUNT = BREATH_CURRENTS.reduce((a, c) => a + c.ribbons, 0);
+/** The low tier keeps the first ribbons of each current (cosmetic volume). */
+export function breathRibbonKept(current: BreathCurrent, ribbon: number, low: boolean): boolean {
+  if (!low) return true;
+  return ribbon < Math.max(1, Math.ceil(current.ribbons / 2));
+}
+/** Every billow of the body volume (a current's billows together). */
+export const BREATH_PUFF_COUNT = BREATH_CURRENTS.reduce((a, c) => a + (c.puffs ?? 0), 0);
+/** The low tier keeps every other billow of each current (left and right
+ *  alike; cosmetic volume, the body still reads, thinner), drawn at
+ *  BREATH_PUFF_LOW_SIZE. */
+export function breathPuffKept(indexInCurrent: number, low: boolean): boolean {
+  return !low || indexInCurrent % 2 === 0;
+}
+export const BREATH_PUFF_LOW_SIZE = 0.7;
+
+/** Fill `order[0..n)` with 0..n-1 sorted by `dist` far first (insertion
+ *  sort in place: a few dozen billows, no allocation). */
+export function breathSortFarFirst(order: Uint16Array, dist: Float32Array, n: number): void {
+  for (let i = 0; i < n; i++) order[i] = i;
+  for (let i = 1; i < n; i++) {
+    const v = order[i];
+    const d = dist[v];
+    let j = i - 1;
+    while (j >= 0 && dist[order[j]] < d) {
+      order[j + 1] = order[j];
+      j--;
+    }
+    order[j + 1] = v;
+  }
 }
 
-/** The fixed joints (body frame; a side joint's x is its left one). */
-export const BREATH_SLOTS = {
-  whirl: v(0, 0.9, 0),
-  waist: v(0, 2.2, 0),
-  chest: v(0, 3.9, 0),
-  lung: v(1.75, 3.85, -0.1),
-  heart: v(0, 3.7, 1.05),
-  head: v(0, 5.55, 0.75),
-  mouth: v(0, 5.3, 1.9),
-  horn: v(0.65, 6.15, 0.45),
-  wing: v(1.15, 4.9, -1.05),
-  spine: v(0, 4.5, -1.35),
-  shoulder: v(2.15, 4.85, 0.05),
-} as const;
+/** The billows' total quad area (model units squared, at full size): the
+ *  fill the volume costs, pinned by the test so it cannot creep. */
+export function breathPuffArea(low: boolean): number {
+  let a = 0;
+  for (const c of BREATH_CURRENTS) {
+    const n = c.puffs ?? 0;
+    const sizes = c.puffSize ?? c.radius;
+    for (let j = 0; j < n; j++) {
+      if (!breathPuffKept(j, low)) continue;
+      const s = profileAt(sizes, (j + 0.5) / n) * (low ? BREATH_PUFF_LOW_SIZE : 1);
+      a += s * s;
+    }
+  }
+  return a;
+}
 
-/** The arm: the shoulder joint, its two lengths, the wrist at rest. */
-export const BREATH_ARM = {
-  root: v(2.3, 4.7, 0.1),
-  upper: 1.75,
-  fore: 1.7,
-  idle: v(2.8, 2.3, 0.9),
-} as const;
+/** Segments along every ribbon (and the wind tail's curl, in path units). */
+export const BREATH_RIBBON_SEGMENTS = 28;
+export const BREATH_TAIL_CURL = { points: 3, reach: 0.9, drop: 0.12 } as const;
 
-/** The whirl under its waist: how many loose stones, how far out, how fast. */
-export const BREATH_WHIRL = { count: 7, r: 1.55, y: 0.9, spin: 1.15 } as const;
+/** The position on a Catmull-Rom spline through `n` points (flat xyz in `p`)
+ *  at u (0..1), and its tangent (not normalized), written into `out`
+ *  (x, y, z, tx, ty, tz). Allocation-free. */
+export function splineAt(p: ArrayLike<number>, n: number, u: number, out: Float32Array): void {
+  const span = Math.max(1, n - 1);
+  const f = Math.max(0, Math.min(1, u)) * span;
+  const i = Math.min(span - 1, Math.floor(f));
+  const t = f - i;
+  const i0 = Math.max(0, i - 1);
+  const i2 = Math.min(n - 1, i + 1);
+  const i3 = Math.min(n - 1, i + 2);
+  const t2 = t * t;
+  const t3 = t2 * t;
+  for (let k = 0; k < 3; k++) {
+    const a = p[i0 * 3 + k];
+    const b = p[i * 3 + k];
+    const c = p[i2 * 3 + k];
+    const d = p[i3 * 3 + k];
+    out[k] =
+      0.5 * (2 * b + (c - a) * t + (2 * a - 5 * b + 4 * c - d) * t2 + (3 * b - a - 3 * c + d) * t3);
+    out[3 + k] =
+      0.5 * (c - a + 2 * (2 * a - 5 * b + 4 * c - d) * t + 3 * (3 * b - a - 3 * c + d) * t2);
+  }
+}
 
-/** The body's pieces (the Breath kit's storm granite and the Heart kit's
- *  rock and crystal). */
-export const BREATH_BODY_PIECES: readonly BreathBodyPiece[] = [
-  // The waist: two of the Cornice's rod drums stacked and turned.
-  piece('waist', 'breath', 'Kit_StormRod', 'waist', 0, v(1.9, 1.7, 1.7), ZERO, v(0, 0.4, 0)),
-  // The chest: the mountain's torso block, a broad barrel.
-  piece('chest', 'heart', 'Kit_ColTorso', 'chest', 0, v(3.0, 2.5, 2.3)),
-  // The bellows: two thick scalloped windbreaks either side of the chest,
-  // their scallops out, swelling with each breath.
-  piece('lungL', 'breath', 'Kit_WindShelter', 'lung', 1, v(1.0, 2.6, 2.7), ZERO, v(0, 1.57, 0.1)),
-  piece('lungR', 'breath', 'Kit_WindShelter', 'lung', -1, v(1.0, 2.6, 2.7), ZERO, v(0, 1.57, 0.1)),
-  // The lungs' light: a crystal heart set in the chest's front.
-  piece('heart', 'heart', 'Kit_HeartCrystal', 'heart', 0, v(1.0, 1.4, 0.8), ZERO, ZERO, 'crystal'),
-  // The head: a heavy brow of rock, two fluted horns raking back.
-  piece('head', 'heart', 'Kit_ColHead', 'head', 0, v(1.45, 1.3, 1.5)),
-  piece(
-    'hornL',
-    'breath',
-    'Kit_ChannelJamb',
-    'horn',
-    1,
-    v(0.35, 1.7, 0.45),
-    ZERO,
-    v(-0.65, 0, -0.35),
-  ),
-  piece(
-    'hornR',
-    'breath',
-    'Kit_ChannelJamb',
-    'horn',
-    -1,
-    v(0.35, 1.7, 0.45),
-    ZERO,
-    v(-0.65, 0, -0.35),
-  ),
-  // The mouth: a stone wind-horn, its bell open forward (the bellows' throat).
-  piece('mouth', 'breath', 'Kit_WindHorn', 'mouth', 0, v(1.15, 1.05, 2.1)),
-  // The wings: two pairs of fluted wind-blades fanning off its back.
-  piece('wingL', 'breath', 'Kit_ChannelJamb', 'wing', 1, v(0.6, 4.4, 0.95), ZERO, v(-0.3, 0, -0.6)),
-  piece(
-    'wingR',
-    'breath',
-    'Kit_ChannelJamb',
-    'wing',
-    -1,
-    v(0.6, 4.4, 0.95),
-    ZERO,
-    v(-0.3, 0, -0.6),
-  ),
-  piece(
-    'wingLowL',
-    'breath',
-    'Kit_ChannelJamb',
-    'wing',
-    1,
-    v(0.45, 3.0, 0.75),
-    v(0.55, -1.2, 0.2),
-    v(-0.45, 0, -1.05),
-  ),
-  piece(
-    'wingLowR',
-    'breath',
-    'Kit_ChannelJamb',
-    'wing',
-    -1,
-    v(0.45, 3.0, 0.75),
-    v(0.55, -1.2, 0.2),
-    v(-0.45, 0, -1.05),
-  ),
-  // The crystal spines down its back.
-  piece(
-    'spine0',
-    'heart',
-    'Kit_ColShardA',
-    'spine',
-    0,
-    v(0.55, 1.5, 0.5),
-    v(0, 1.0, 0.1),
-    v(-0.5, 0, 0),
-    'crystal',
-  ),
-  piece(
-    'spine1',
-    'heart',
-    'Kit_ColShardB',
-    'spine',
-    0,
-    v(0.5, 1.2, 0.45),
-    v(0, 0, 0),
-    v(-0.7, 0, 0),
-    'crystal',
-  ),
-  piece(
-    'spine2',
-    'heart',
-    'Kit_ColShardC',
-    'spine',
-    0,
-    v(0.42, 0.95, 0.4),
-    v(0, -0.9, -0.05),
-    v(-0.9, 0, 0),
-    'crystal',
-  ),
-  // The shoulders and the arms of the mountain's rock.
-  piece('shoulderL', 'heart', 'Kit_ColShoulder', 'shoulder', 1, v(1.5, 1.2, 1.5)),
-  piece('shoulderR', 'heart', 'Kit_ColShoulder', 'shoulder', -1, v(1.5, 1.2, 1.5)),
-  piece('upperL', 'heart', 'Kit_ColUpperArm', 'upper', 1, v(0.8, 1.85, 0.8)),
-  piece('upperR', 'heart', 'Kit_ColUpperArm', 'upper', -1, v(0.8, 1.85, 0.8)),
-  piece('foreL', 'heart', 'Kit_ColForearm', 'fore', 1, v(0.72, 1.75, 0.72)),
-  piece('foreR', 'heart', 'Kit_ColForearm', 'fore', -1, v(0.72, 1.75, 0.72)),
-  // The hands: wind-carved standing stones, twisted into claws.
-  piece('handL', 'breath', 'Kit_StormStone', 'hand', 1, v(0.85, 1.25, 0.75)),
-  piece('handR', 'breath', 'Kit_StormStone', 'hand', -1, v(0.85, 1.25, 0.75)),
-  // The whirl of loose stones under the waist.
-  ...Array.from({ length: BREATH_WHIRL.count }, (_, i) =>
-    piece(
-      `whirl${i}`,
-      i % 2 ? 'heart' : 'breath',
-      i % 2 ? (i % 4 === 1 ? 'Kit_ColShardA' : 'Kit_ColShardB') : 'Kit_StormStone',
-      'whirl',
-      0,
-      v(0.55 + 0.12 * (i % 3), 0.6 + 0.15 * (i % 2), 0.5),
-      ZERO,
-      v(0.3, i * 0.9, 0.4),
-      i % 2 ? 'crystal' : 'stone',
-    ),
-  ),
+/** A radius profile's value at u (linear between the path points). */
+export function profileAt(r: readonly number[], u: number): number {
+  const span = Math.max(1, r.length - 1);
+  const f = Math.max(0, Math.min(1, u)) * span;
+  const i = Math.min(span - 1, Math.floor(f));
+  const t = f - i;
+  return r[i] + (r[Math.min(r.length - 1, i + 1)] - r[i]) * t;
+}
+
+/** A ribbon's end fade: it thins in at both ends (never a cut edge). */
+export function ribbonFade(u: number): number {
+  const a = Math.max(0, Math.min(1, u / 0.12));
+  const b = Math.max(0, Math.min(1, (1 - u) / 0.18));
+  return a * a * (3 - 2 * a) * b * b * (3 - 2 * b);
+}
+
+// ---- the storm's lightning ----------------------------------------------------------------
+
+/** The arcs that leap between the pieces through phase 2 (socket pairs). */
+export const BREATH_ARC_PAIRS: readonly [BreathSocketId, BreathSocketId][] = [
+  ['heart', 'shoulderL'],
+  ['heart', 'shoulderR'],
+  ['shoulderL', 'wristL'],
+  ['shoulderR', 'wristR'],
+  ['wristL', 'clawL'],
+  ['wristR', 'clawR'],
+  ['heart', 'mouth'],
+  ['crown', 'halo'],
+  ['heart', 'waist'],
+  ['waist', 'tail2'],
+  ['tail2', 'tip'],
+  ['spikeL', 'crown'],
+  ['spikeR', 'crown'],
+  ['handL', 'heart'],
+  ['handR', 'heart'],
 ];
 
-/** The palette. The vein's teal is its light; never a threat colour. */
-export const BREATH_BODY_COLORS = {
-  /** The threads and seams: the Breath's teal. */
-  thread: 0x5ab8e8,
-  /** The crystals' hotter glow. */
-  glow: 0x9fe4ff,
-  /** The storm's lightning core: white with a teal edge. */
-  core: 0xe6faff,
-  coreEdge: 0x47b8ff,
-  /** Its storm granite (LINEAR vertex rgb): a cool slate, a value darker
-   *  than the pale scoured Cornice it stands on, so it reads against it. */
-  granite: [0.2, 0.22, 0.26] as const,
-  wind: [0.86, 0.93, 0.98] as const,
-  spark: [0.7, 0.93, 1.0] as const,
-  dust: [0.58, 0.62, 0.66] as const,
-} as const;
+/** The arcs' pool, their life and how often a new one leaps (a second). */
+export const BREATH_ARCS = { pool: 12, poolLow: 5, life: 0.24, rate: 22, segments: 14 } as const;
 
-/** The threads between the joints (indices into the rig's joint points). */
-export const BREATH_RIG_JOINTS = 12;
-/** 0 whirl, 1 waist, 2 chest, 3 head, 4 shoulderL, 5 shoulderR, 6 elbowL,
- *  7 elbowR, 8 wristL, 9 wristR, 10 mouth, 11 spine. */
-export const BREATH_THREAD_PAIRS: readonly [number, number][] = [
-  [0, 1],
-  [1, 2],
-  [2, 3],
-  [2, 4],
-  [2, 5],
-  [4, 6],
-  [5, 7],
-  [6, 8],
-  [7, 9],
-  [3, 10],
-  [2, 11],
-];
-
-/** The joints the embers of light sit on. */
-export const BREATH_EMBER_JOINTS: readonly number[] = [1, 2, 4, 5, 6, 7, 10];
+/** Lightning from A to B: `segs + 1` points (flat xyz into `out`), jagged by
+ *  midpoint displacement off a hash of `seed`, `jag` its kink as a share of
+ *  the length; the ends sit on A and B. */
+export function arcPath(
+  seed: number,
+  ax: number,
+  ay: number,
+  az: number,
+  bx: number,
+  by: number,
+  bz: number,
+  segs: number,
+  jag: number,
+  out: Float32Array,
+): void {
+  const len = Math.hypot(bx - ax, by - ay, bz - az) || 1;
+  for (let i = 0; i <= segs; i++) {
+    const u = i / segs;
+    // Two octaves of hashed kinks, zero at both ends.
+    const env = Math.sin(u * Math.PI);
+    const k1 = breathBodyHash(seed, i * 3 + 1) - 0.5;
+    const k2 = breathBodyHash(seed, i * 3 + 2) - 0.5;
+    const k3 = breathBodyHash(seed, i * 3 + 3) - 0.5;
+    const big = Math.sin(u * Math.PI * 2 + breathBodyHash(seed, 97) * 6.28) * 0.5;
+    const a = jag * len * env;
+    out[i * 3] = ax + (bx - ax) * u + (k1 + big * 0.6) * a;
+    out[i * 3 + 1] = ay + (by - ay) * u + (k2 + big * 0.4) * a;
+    out[i * 3 + 2] = az + (bz - az) * u + k3 * a;
+  }
+}
 
 // ---- what the body is doing -------------------------------------------------------------
 
 export type BreathBodyAction =
   | 'idle'
-  | 'swing'
   | 'gather'
   | 'blow'
-  | 'calm'
   | 'inhale'
-  | 'gust'
+  | 'roar'
   | 'cast'
+  | 'channel'
   | 'break'
   | 'storm';
 
@@ -331,7 +585,7 @@ export function breathBodyAction(
   out: BreathBodyActionState = { action: 'idle', k: 0 },
 ): BreathBodyActionState {
   const c = input.castId;
-  let action: BreathBodyAction = 'idle';
+  let action: BreathBodyAction = input.stormForm ? 'storm' : 'idle';
   let k = 0;
   if (c === BREATH_CASTS.storm) {
     action = 'break';
@@ -340,32 +594,19 @@ export function breathBodyAction(
     action = 'inhale';
     k = input.castFill;
   } else if (c === BREATH_CASTS.gust) {
-    action = 'gust';
+    action = 'roar';
     k = input.castFill;
-  } else if (
-    c === BREATH_CASTS.fork ||
-    c === BREATH_CASTS.cradle ||
-    c === BREATH_CASTS.drawn ||
-    c === BREATH_CASTS.lance
-  ) {
+  } else if (c !== null && BREATH_CHANNELS.includes(c)) {
+    action = 'channel';
+    k = input.castFill;
+  } else if (c !== null && BREATH_SYNCED_CASTS[c] !== undefined) {
     action = 'cast';
     k = input.castFill;
-  } else if (input.stormForm) {
-    if (input.windPhase === 'gust') {
-      action = 'blow';
-      k = input.windFill;
-    } else if (input.windPhase === 'gustgather') {
-      action = 'gather';
-      k = input.windFill;
-    } else action = 'storm';
-  } else if (input.windPhase === 'gather') {
+  } else if (input.windPhase === 'gather' || input.windPhase === 'gustgather') {
     action = 'gather';
     k = input.windFill;
-  } else if (input.windPhase === 'blow') {
+  } else if (input.windPhase === 'blow' || input.windPhase === 'gust') {
     action = 'blow';
-    k = input.windFill;
-  } else if (input.windPhase === 'calm') {
-    action = 'calm';
     k = input.windFill;
   }
   out.action = action;
@@ -373,24 +614,21 @@ export function breathBodyAction(
   return out;
 }
 
-/** Does the body turn its mouth to the wind's bearing in this action? */
-export function breathFacesWind(action: BreathBodyAction): boolean {
-  return action === 'gather' || action === 'blow';
-}
-
-/** The body's look for an action: the bellows' swell (0 empty, 1 full, over
- *  1 drawn in hard), the head's lift (radians back), the lean (forward), the
- *  wings' spread (0 folded, 1 open), the mouth's breath (how hard it blows),
- *  the light, a freeze's jitter and the storm's tearing (0..1). */
-export interface BreathBodyLook {
-  swell: number;
-  lift: number;
-  lean: number;
-  spread: number;
-  mouth: number;
+/** The wind body's look for an action: how dense the currents are (0..1),
+ *  how far out they wind (a share of their rest radius: the indrawn breath
+ *  pulls them in tight, the roar flings them out), how fast they flow and
+ *  spin, the eyes' and the spiral's light, the streams drawn into the mouth
+ *  (0..1), how far the storm has taken it (0 the calm, 1 the storm), and a
+ *  shiver (0..1). */
+export interface BreathWindLook {
+  density: number;
+  radius: number;
+  flow: number;
+  spin: number;
   glow: number;
-  jitter: number;
-  tear: number;
+  drawIn: number;
+  storm: number;
+  shiver: number;
 }
 
 const clamp01 = (t: number) => Math.max(0, Math.min(1, t));
@@ -400,114 +638,107 @@ const ease = (t: number) => {
 };
 
 /** When in the storm bar the drawing in turns to the freeze, and the freeze
- *  to the tearing. */
-export const BREAK_FREEZE_AT = 0.55;
-export const BREAK_TEAR_AT = 0.86;
-/** Seconds the shell takes to fly out to its orbit once the storm body is on. */
-export const STORM_TEAR_SECONDS = 1.3;
-/** Seconds of a melee swing's pose. */
-export const BREATH_SWING_SECONDS = 0.85;
+ *  to the tearing (the clip's own beats over its 4 s). */
+export const BREAK_FREEZE_AT = BREATH_BODY_CLIP.breakFreeze / BREATH_BODY_CLIP.breakEnd;
+export const BREAK_TEAR_AT = BREATH_BODY_CLIP.breakTear / BREATH_BODY_CLIP.breakEnd;
 
-/** The look of `action` at `k`, the slow idle breath on render time `t`. */
-export function breathBodyLook(
+/** The roar's thrust as a share of its bar (the clip's thrust lands on the
+ *  bar's end, so the blast is the bar's last instant and after it). */
+export function newWindLook(): BreathWindLook {
+  return { density: 1, radius: 1, flow: 1, spin: 1, glow: 1, drawIn: 0, storm: 0, shiver: 0 };
+}
+
+/** The look of `action` at `k` on render time `t`, written into `out`. */
+export function breathWindLook(
   action: BreathBodyAction,
   k: number,
   t: number,
-  out: BreathBodyLook = {
-    swell: 0,
-    lift: 0,
-    lean: 0,
-    spread: 0,
-    mouth: 0,
-    glow: 0,
-    jitter: 0,
-    tear: 0,
-  },
-): BreathBodyLook {
-  const idle = 0.5 + 0.22 * Math.sin((t * Math.PI * 2) / 4.4);
-  out.swell = idle;
-  out.lift = 0.04 * Math.sin((t * Math.PI * 2) / 4.4);
-  out.lean = 0;
-  out.spread = 0.45 + 0.1 * Math.sin((t * Math.PI * 2) / 4.4 + 0.6);
-  out.mouth = 0;
-  out.glow = 0.9 + 0.25 * idle;
-  out.jitter = 0;
-  out.tear = 0;
+  out: BreathWindLook = newWindLook(),
+): BreathWindLook {
+  const breath = Math.sin((t * Math.PI * 2) / 4);
+  out.density = 1;
+  out.radius = 1 + 0.06 * breath;
+  out.flow = 1;
+  out.spin = 1;
+  out.glow = 1 + 0.12 * breath;
+  out.drawIn = 0;
+  out.storm = 0;
+  out.shiver = 0;
   const p = clamp01(k);
   switch (action) {
     case 'gather':
-      // Drawing breath for the blow, turning to it.
-      out.swell = idle + (1.15 - idle) * ease(p);
-      out.lift = 0.18 * ease(p);
-      out.spread = 0.45 + 0.5 * ease(p);
-      out.glow = 1 + 0.6 * ease(p);
+      out.flow = 1 + 0.8 * ease(p);
+      out.glow = 1.1 + 0.3 * ease(p);
       break;
     case 'blow':
-      // A long steady exhale: the bellows falling in, wings back, head out.
-      out.swell = 1.15 - 1.0 * ease(p * 1.05);
-      out.lift = -0.08;
-      out.lean = 0.16;
-      out.spread = 0.95 - 0.25 * p;
-      out.mouth = 1 - 0.3 * p;
-      out.glow = 1.5 - 0.4 * p;
-      break;
-    case 'calm':
-      out.swell = 0.15 + (idle - 0.15) * ease(p * 2);
-      out.glow = 0.9 + 0.25 * idle * ease(p * 2);
+      out.flow = 1.9;
+      out.spin = 1.4;
+      out.glow = 1.3;
       break;
     case 'inhale':
-      // The great indrawn breath: swelling past full, head flung back,
-      // wings folding forward round it, its heart blazing.
-      out.swell = 0.3 + 1.15 * ease(p);
-      out.lift = 0.32 * ease(p);
-      out.lean = -0.1 * ease(p);
-      out.spread = 0.45 - 0.35 * ease(p);
+      // The currents drawn in tight and racing, every stream pouring into
+      // the mouth, the light swelling to the bar's end.
+      out.radius = 1 - 0.42 * ease(p);
+      out.flow = 1.4 + 1.6 * ease(p);
+      out.spin = 1.2 + 1.4 * ease(p);
       out.glow = 1.2 + 1.3 * ease(p);
+      out.drawIn = 0.35 + 0.65 * ease(p);
+      out.shiver = 0.6 * ease(p);
       break;
-    case 'gust':
-      // The exhale's blast gathered: hunched forward, everything held, then
-      // thrown out at the bar's end.
-      out.swell = 1.45 - 0.2 * ease(p) - (p > 0.88 ? 1.1 * ease((p - 0.88) / 0.12) : 0);
-      out.lift = 0.3 - 0.45 * ease(p);
-      out.lean = 0.35 * ease(p);
-      out.spread = 0.1 + (p > 0.88 ? 0.95 * ease((p - 0.88) / 0.12) : 0);
-      out.mouth = p > 0.88 ? 1.5 : 0.25 * p;
-      out.glow = 2.2;
+    case 'roar':
+      // Held drawn in, then flung out on the bar's end with the blast.
+      out.radius = 0.6 + (p > 0.93 ? 0.9 * ease((p - 0.93) / 0.07) : 0);
+      out.flow = 2.6;
+      out.spin = 2.2;
+      out.glow = 2.4;
+      out.drawIn = p < 0.93 ? 0.8 : 0;
+      out.shiver = p < 0.93 ? 0.8 : 0.2;
       break;
     case 'cast':
-      out.lean = 0.12 * ease(p);
+      out.flow = 1.3 + 0.5 * ease(p);
       out.glow = 1.2 + 0.8 * ease(p);
+      break;
+    case 'channel':
+      out.radius = 1.15;
+      out.flow = 1.8;
+      out.spin = 1.8;
+      out.glow = 1.5 + 0.15 * Math.sin(t * 5.3);
       break;
     case 'break':
       if (p < BREAK_FREEZE_AT) {
-        // Draws the whole wind in.
         const q = p / BREAK_FREEZE_AT;
-        out.swell = 0.4 + 1.2 * ease(q);
-        out.lift = 0.35 * ease(q);
-        out.spread = 0.45 + 0.55 * ease(q);
-        out.glow = 1.2 + 1.8 * ease(q);
+        out.radius = 1 - 0.45 * ease(q);
+        out.flow = 1.4 + 2 * ease(q);
+        out.spin = 1.2 + 1.6 * ease(q);
+        out.glow = 1.3 + 1.2 * ease(q);
+        out.drawIn = 0.5 + 0.5 * ease(q);
+        out.shiver = 0.4 * ease(q);
       } else if (p < BREAK_TEAR_AT) {
-        // Frozen, trembling, the light tearing through every seam.
         const q = (p - BREAK_FREEZE_AT) / (BREAK_TEAR_AT - BREAK_FREEZE_AT);
-        out.swell = 1.6;
-        out.lift = 0.35;
-        out.spread = 1;
-        out.glow = 3 + 1.5 * q;
-        out.jitter = 0.4 + 0.6 * q;
+        out.radius = 0.55;
+        out.flow = 3.4;
+        out.spin = 2.8;
+        out.glow = 2.5 + 1.0 * q;
+        out.drawIn = 1;
+        out.shiver = 0.6 + 0.4 * q;
+        out.storm = 0.35 * q;
       } else {
-        // Tearing open: the shell starts out toward its orbit.
         const q = (p - BREAK_TEAR_AT) / (1 - BREAK_TEAR_AT);
-        out.swell = 1.6 + 0.4 * q;
-        out.lift = 0.35;
-        out.spread = 1;
-        out.glow = 4.5;
-        out.jitter = 1;
-        out.tear = 0.25 * ease(q);
+        out.radius = 0.55 + 1.1 * ease(q * 1.6) - 0.15 * ease((q - 0.6) / 0.4);
+        out.flow = 3;
+        out.spin = 2.4;
+        out.glow = 3;
+        out.shiver = 1;
+        out.storm = 0.35 + 0.65 * ease(q * 1.4);
       }
       break;
     case 'storm':
-      out.tear = 1;
-      out.glow = 1.3 + 0.3 * Math.sin(t * 7.1) * Math.sin(t * 3.3);
+      out.radius = 1.12 + 0.06 * breath;
+      out.flow = 1.6;
+      out.spin = 1.5;
+      out.glow = 1.3 + 0.35 * Math.sin(t * 7.1) * Math.sin(t * 3.3);
+      out.storm = 1;
+      out.shiver = 0.3;
       break;
     default:
       break;
@@ -515,212 +746,114 @@ export function breathBodyLook(
   return out;
 }
 
-/** How far the shell has torn out toward its orbit `since` seconds after the
- *  storm body went on (0..1), from where the bar's tearing left it. */
-export function stormTearProgress(since: number, from = 0.25): number {
-  return from + (1 - from) * ease(since / STORM_TEAR_SECONDS);
+/** The death `t` seconds after it fell: the wind thrown off in one last gust
+ *  (the currents flung out and fading), the eyes, the spiral and the
+ *  crystals going dark, the stones and shards dropping. */
+export function breathDeathLook(t: number): {
+  wind: number;
+  fling: number;
+  glow: number;
+  drop: number;
+} {
+  const c = clamp01;
+  return {
+    wind: t < 0 ? 1 : c(1 - t / 1.6) ** 1.4,
+    fling: 1 + 1.8 * ease(t / 1.2),
+    glow: c(1 - t / 2.6) ** 1.2,
+    drop: ease((t - 0.4) / 1.4),
+  };
 }
 
-/** Where a piece of the torn shell turns in the storm (body frame): rings of
- *  shards round the core at three radii and heights, each ring the other way
- *  round, every shard tumbling. */
-export function stormShardSlot(index: number, t: number, out: V3 = v(0, 0, 0)): V3 {
-  const ring = index % 3;
-  const r = [2.7, 3.5, 4.3][ring];
-  const y = [5.6, 3.6, 1.8][ring] + 0.35 * Math.sin(t * 1.3 + index);
-  const spin = [0.55, -0.42, 0.33][ring];
-  const a = index * 2.399 + t * spin;
-  out.x = Math.sin(a) * r;
-  out.y = y;
-  out.z = Math.cos(a) * r;
+/** The cast `age` seconds after its bar's end (the clip points on it): the
+ *  bolt's flash at the pointing hand (0..1) and whether it is over. */
+export function breathCastLook(age: number): { release: number; done: boolean } {
+  if (age < 0) return { release: 0, done: false };
+  const r = age / 0.5;
+  return { release: Math.max(0, 1 - r), done: r >= 1 };
+}
+
+// ---- the orbiting stones and shards --------------------------------------------------------
+
+/** How many circle it: grey stones and crystal shards (cosmetic: the low tier
+ *  keeps the first few). */
+export const BREATH_STONES = 12;
+export const BREATH_SHARDS = 10;
+export const BREATH_ORBIT_LOW = 5;
+
+/** Orbiter `i`'s place `t` seconds in, in yards in the body's frame (x its
+ *  left, y up from its feet, z forward), its size and its tumble: each on its
+ *  own tilted ring round the chest, slow and bobbing; the storm (`storm` 0..1)
+ *  throws them wider and faster. */
+export function breathOrbit(
+  i: number,
+  t: number,
+  storm: number,
+  out: { x: number; y: number; z: number; size: number; spin: number },
+): { x: number; y: number; z: number; size: number; spin: number } {
+  const U = BREATH_YD_PER_UNIT;
+  const wide = 1 + 0.45 * clamp01(storm);
+  const r = (2.6 + 2.6 * breathBodyHash(i, 3)) * U * wide;
+  const speed =
+    (0.22 + 0.18 * breathBodyHash(i, 5)) * (breathBodyHash(i, 7) < 0.5 ? 1 : -1) * (1 + storm);
+  const a = breathBodyHash(i, 11) * Math.PI * 2 + t * speed;
+  const tilt = (breathBodyHash(i, 13) - 0.5) * 0.9;
+  const h = (2.5 + 6.5 * breathBodyHash(i, 17)) * U;
+  out.x = Math.cos(a) * r;
+  out.z = Math.sin(a) * r;
+  out.y = h + Math.sin(a) * r * tilt + 0.25 * U * Math.sin(t * 1.1 + i * 1.7);
+  out.size = (0.12 + 0.16 * breathBodyHash(i, 19)) * U;
+  out.spin = t * (0.6 + 1.2 * breathBodyHash(i, 23)) * (1 + storm) + i;
   return out;
 }
 
-/** The storm core's figure (body frame): its torso, head and heart, and the
- *  span of its lightning wings. */
-export const STORM_CORE = {
-  torso: { y: 3.9, rx: 1.15, ry: 2.1, rz: 0.95 },
-  head: { y: 6.1, r: 0.62 },
-  heart: { y: 4.1, r: 0.55 },
-  wingSpan: 6.4,
-  wingHeight: 4.2,
-  wingY: 5.2,
-  /** Arcs leaping from the core to the shards (a fixed pool). */
-  arcs: 10,
-  /** Times a second the arcs leap anew. */
-  arcRate: 9,
+// ---- the palette ------------------------------------------------------------------------
+
+/** Living wind (pale blue-white, a steel-blue body so it reads on the pale
+ *  Cornice, white edges), the storm (a dark cloud core, blue-white
+ *  lightning), the crystals' cyan. Linear 0..1, hex for the glows. */
+export const BREATH_BODY_COLORS = {
+  wind: [0.13, 0.28, 0.6] as const,
+  windEdge: [0.62, 0.94, 1.0] as const,
+  windShade: [0.015, 0.04, 0.12] as const,
+  cloud: [0.5, 0.58, 0.72] as const,
+  storm: [0.06, 0.075, 0.15] as const,
+  stormEdge: [0.55, 0.78, 1.0] as const,
+  stormShade: [0.012, 0.016, 0.04] as const,
+  stormCloud: [0.07, 0.08, 0.14] as const,
+  dust: [0.72, 0.94, 1.0] as const,
+  spark: [0.78, 0.92, 1.0] as const,
+  grit: [0.58, 0.62, 0.66] as const,
+  eye: 0x7fe8ff,
+  heart: 0x5ad2ff,
+  crystal: 0x9fe8ff,
+  lightning: 0xd8f2ff,
+  lightningEdge: 0x4aa8ff,
+  /** An impact's short flash (pale cyan, never white). */
+  flash: 0xa8e4ff,
+  ring: 0xb8e6ff,
 } as const;
 
-/** Where a loose stone of the whirl turns (body frame). */
-export function whirlSlot(index: number, t: number, out: V3 = v(0, 0, 0)): V3 {
-  const a = (index / BREATH_WHIRL.count) * Math.PI * 2 + t * BREATH_WHIRL.spin;
-  const r = BREATH_WHIRL.r * (0.75 + 0.25 * Math.sin(t * 1.7 + index));
-  out.x = Math.sin(a) * r;
-  out.y = BREATH_WHIRL.y + 0.45 * Math.sin(t * 2.1 + index * 1.3) + (index % 3) * 0.35;
-  out.z = Math.cos(a) * r;
-  return out;
-}
+/** Bounded bursts (the Heat pass's lesson: a flash on its point only, a ring
+ *  that never washes the floor). */
+export const BREATH_BURST = {
+  flashPeak: 0.55,
+  flashLife: 0.22,
+  flashSize: 5,
+  ring: { wake: 0.35, crest: 0.18, strength: 0.6 },
+} as const;
 
-/** `out` set `s` of the way from (ax, ay, az) to (bx, by, bz). */
-function lerpInto(
-  out: V3,
-  ax: number,
-  ay: number,
-  az: number,
-  bx: number,
-  by: number,
-  bz: number,
-  s: number,
-): V3 {
-  out.x = ax + (bx - ax) * s;
-  out.y = ay + (by - ay) * s;
-  out.z = az + (bz - az) * s;
-  return out;
-}
-
-/** Where one wrist (side 1 left, -1 right) wants to be (body frame) for an
- *  action at `k`, written into `out` (no allocation on the frame path). */
-export function breathWristTarget(
-  action: BreathBodyAction,
-  side: -1 | 1,
-  k: number,
-  swingSide: -1 | 1 = 1,
-  out: V3 = v(0, 0, 0),
-): V3 {
-  const I = BREATH_ARM.idle;
-  const R = BREATH_ARM.root;
-  const reach = BREATH_ARM.upper + BREATH_ARM.fore;
-  const ix = side * I.x;
-  const iy = I.y;
-  const iz = I.z;
-  const p = clamp01(k);
-  switch (action) {
-    case 'swing': {
-      if (side !== swingSide) return lerpInto(out, ix, iy, iz, ix, iy, iz, 0);
-      // Back, then down and through.
-      const bx = side * (R.x + 0.4);
-      const by = R.y + 0.6;
-      const bz = -0.6;
-      if (p < 0.4) return lerpInto(out, ix, iy, iz, bx, by, bz, ease(p / 0.4));
-      return lerpInto(
-        out,
-        bx,
-        by,
-        bz,
-        side * R.x * 0.4,
-        R.y - reach * 0.55,
-        reach * 0.66,
-        ease((p - 0.4) / 0.6),
-      );
-    }
-    case 'inhale':
-    case 'gather':
-      // The arms drawn out and back as the chest fills.
-      return lerpInto(out, ix, iy, iz, side * (R.x + reach * 0.55), R.y - 0.4, -0.6, ease(p));
-    case 'blow':
-      return lerpInto(out, ix, iy, iz, side * (R.x + reach * 0.4), R.y - 1.0, -0.9, 0.8);
-    case 'gust': {
-      // Clasped in before it, thrown wide as it blasts.
-      const cx = side * 0.9;
-      const cy = R.y - 1.3;
-      const cz = 1.6;
-      if (p < 0.88) return lerpInto(out, ix, iy, iz, cx, cy, cz, ease(p / 0.88));
-      return lerpInto(
-        out,
-        cx,
-        cy,
-        cz,
-        side * (R.x + reach * 0.8),
-        R.y + 0.4,
-        0.4,
-        ease((p - 0.88) / 0.12),
-      );
-    }
-    case 'cast':
-      // The left arm raised to the storm, the right thrust at the mark.
-      if (side === 1)
-        return lerpInto(out, ix, iy, iz, R.x * 0.7, R.y + reach * 0.85, 0.3, ease(p * 1.6));
-      return lerpInto(out, ix, iy, iz, -R.x * 0.45, R.y - 0.2, reach * 0.9, ease(p));
-    case 'break':
-      return lerpInto(
-        out,
-        ix,
-        iy,
-        iz,
-        side * (R.x + reach * 0.7),
-        R.y + reach * 0.45,
-        0.2,
-        ease(p / BREAK_FREEZE_AT),
-      );
-    default:
-      return lerpInto(out, ix, iy, iz, ix, iy, iz, 0);
-  }
-}
-
-/** The elbow's pole: out and back. */
-export function breathElbowPole(side: -1 | 1): V3 {
-  return v(side * 0.8, -0.2, -0.6);
-}
-
-/** One arm's solved joints (body frame). */
-export interface BreathArmJoints {
-  elbow: V3;
-  wrist: V3;
-}
-
-/** One arm's elbow and wrist (body frame) toward `wrist`, written into `out`:
- *  the same two-bone solve as colossusArmIk (pinned equal in the test), done
- *  in scalars so the frame path allocates nothing. */
-export function breathArm(
-  side: -1 | 1,
-  wrist: V3,
-  out: BreathArmJoints = { elbow: v(0, 0, 0), wrist: v(0, 0, 0) },
-): BreathArmJoints {
-  const R = BREATH_ARM.root;
-  const l1 = BREATH_ARM.upper;
-  const l2 = BREATH_ARM.fore;
-  const sx = side * R.x;
-  const sy = R.y;
-  const sz = R.z;
-  let dx = wrist.x - sx;
-  let dy = wrist.y - sy;
-  let dz = wrist.z - sz;
-  let d = Math.hypot(dx, dy, dz);
-  const reach = (l1 + l2) * 0.999;
-  const lo = Math.abs(l1 - l2) * 1.001 + 1e-6;
-  const dd = Math.max(lo, Math.min(reach, d || lo));
-  if (d < 1e-9) {
-    dx = 0;
-    dy = -1;
-    dz = 0;
-    d = 1;
-  }
-  const ux = dx / d;
-  const uy = dy / d;
-  const uz = dz / d;
-  out.wrist.x = sx + ux * dd;
-  out.wrist.y = sy + uy * dd;
-  out.wrist.z = sz + uz * dd;
-  // Along the line to the wrist, then out along the pole's part across it
-  // (the pole: out and back, breathElbowPole).
-  const a = (l1 * l1 - l2 * l2 + dd * dd) / (2 * dd);
-  const h = Math.sqrt(Math.max(0, l1 * l1 - a * a));
-  const polX = side * 0.8;
-  const polY = -0.2;
-  const polZ = -0.6;
-  const pd = polX * ux + polY * uy + polZ * uz;
-  let px = polX - ux * pd;
-  let py = polY - uy * pd;
-  let pz = polZ - uz * pd;
-  const pl = Math.hypot(px, py, pz) || 1;
-  px /= pl;
-  py /= pl;
-  pz /= pl;
-  out.elbow.x = sx + ux * a + px * h;
-  out.elbow.y = sy + uy * a + py * h;
-  out.elbow.z = sz + uz * a + pz * h;
-  return out;
-}
+/** Pools at full density. */
+export const BREATH_BODY_POOLS = {
+  sockets: BREATH_SOCKETS.length,
+  ribbons: BREATH_RIBBON_COUNT,
+  puffs: BREATH_PUFF_COUNT,
+  arcs: BREATH_ARCS.pool,
+  stones: BREATH_STONES,
+  shards: BREATH_SHARDS,
+  flashes: 4,
+  /** The slashes a claw swipe leaves (one live per hand, and a spare). */
+  slashes: 3,
+} as const;
 
 /** A small integer hash in [0, 1). */
 export function breathBodyHash(a: number, b: number): number {
@@ -730,54 +863,8 @@ export function breathBodyHash(a: number, b: number): number {
   return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
 }
 
-/** The fall: when the shell drops after its death, and where each piece lies
- *  (body frame), tumbled, round where it stood. */
-export const BREATH_FALL = { end: 2.6, snap: 0.5 } as const;
-
-export function breathFallRest(index: number, from: V3): { at: V3; tilt: V3; delay: number } {
-  const a = breathBodyHash(index, 31) * Math.PI * 2;
-  const r = 1.2 + breathBodyHash(index, 37) * 3.4;
-  return {
-    at: v(from.x * 0.5 + Math.sin(a) * r, 0.35, from.z * 0.5 + Math.cos(a) * r),
-    tilt: v(
-      (breathBodyHash(index, 41) - 0.5) * 2.4,
-      breathBodyHash(index, 43) * 6.28,
-      (breathBodyHash(index, 47) - 0.5) * 2.4,
-    ),
-    delay: Math.min(0.9, from.y * 0.07) + breathBodyHash(index, 53) * 0.25,
-  };
-}
-
-/** A piece's fall `t` seconds into the death: 0..1 and whether it landed. */
-export function breathFallProgress(
-  t: number,
-  delay: number,
-  out: { k: number; landed: boolean } = { k: 0, landed: false },
-): { k: number; landed: boolean } {
-  const k = clamp01((t - delay) / 0.75);
-  out.k = k * k;
-  out.landed = k >= 1;
-  return out;
-}
-
 /** Is the guardian in its storm body (the aura on it)? */
 export function stormFormOn(auras: readonly { id: string }[]): boolean {
   for (const a of auras) if (a.id === BREATH_AURAS.stormForm) return true;
   return false;
 }
-
-/** The tallest point of the body at rest (the nameplate rides over it). */
-export function breathBodyTop(): number {
-  let top = 0;
-  for (const p of BREATH_BODY_PIECES) {
-    if (p.joint === 'upper' || p.joint === 'fore' || p.joint === 'hand' || p.joint === 'whirl')
-      continue;
-    const slot = BREATH_SLOTS[p.joint as keyof typeof BREATH_SLOTS];
-    if (!slot) continue;
-    top = Math.max(top, slot.y + p.at.y + p.size.y / 2);
-  }
-  return top;
-}
-
-/** Pools at full density. */
-export const BREATH_BODY_POOLS = { threads: 11, arcs: STORM_CORE.arcs } as const;

@@ -7,7 +7,7 @@ guardian's and the Slab's effects, section 5.9) and phase 2C (the Hammer vein's 
 round and the North Stair, section 5.10), through the Breath (phase 2G, section 5.14), the
 Quench (phase 2H, section 5.15), the Heat, now the Hearth (phase 2I, section 5.16), the Heart (phase 2J) and the Hammer Council's playable prototype (the first boss as three, sections 5.18 and 7.1) implemented on `feature/smith-heart-raid`, dev builds only. The per-room phases (Blender
 kits, own creatures, set pieces, boss kits), the quest and the loot are specified here
-and not built. The name is provisional and has not been IP-checked yet.
+and not built. The name is provisional; it and the raid's other proper nouns were web-checked on 2026-11-05 (`docs/design/naming-audit.md`, "The Smith's Heart raid").
 
 At a glance: a ten-player level 20 raid (2 tanks, 2 healers, 6 damage), one
 instance slot inside Stormcrag holding two areas no floor joins: the main map (the
@@ -465,8 +465,16 @@ progress and the way); only cosmetic motes and embers thin on the low tier
 ### 5.8 Areas: score, air, sky
 
 `smithHeartAreaAt` names the area of any point (hammer, ring, breath, quench, heat,
-heart). The score follows it (`SMITH_HEART_AREA_MUSIC`: each vein and the Heart borrow
-an existing cue whose brief fits until the raid has its own score). The Heart has its
+heart). The score follows it (`SMITH_HEART_AREA_MUSIC`): every area plays the raid's own
+halls theme (`dungeon_smith_heart`), kept per area so a vein can get a variation later.
+Each boss fight takes over with its own cue (`src/game/smith_heart_boss_music.ts`): the
+Council's two members share one, the three guardians one each, and the Masterless
+Strength follows its phase aura (the quarter fight and its intermissions; the 15 percent
+stride and final phase; Mythic's kneel, rebirth and collapse), a stage change
+crossfading the two loops (`BossLoopTrack`, 2.5 s). A kill hands the mix back at once;
+a wipe or reset after the usual 10 s aggro-gap grace. The tracks are generated
+(`scripts/generate_smith_heart_music.mjs`) and mastered into seamless loops
+(`scripts/master_music_loop.mjs`); pinned by `tests/smith_heart_boss_music.test.ts`. The Heart has its
 own fog and light state, `smithHeartCore` (`heart_environment.ts`), and so does the
 Hammer vein, `smithHeartHammer` (phase 2B: a warm quarry dusk, the key low from the
 south-west raking the terraces, the realm's blue sky light all but off), the Ring
@@ -787,7 +795,7 @@ the sim untouched; rebuilt with the fight on 2026-10-27, section 7.4):
 | The first wellspring | `heat_well_fx.ts`: the pool at `HEARTH_WELL` (molten, boiling deeper each phase), a ring of basalt lip stumps, its burning rim; overflowing it heaves over its lip in slow swells |
 | Basalt Fist, on its bar | the giant rears its right fist over its head; the spot (the shared floor telegraph, `lethal`, its exact radius) fills with the bar, cracks of light race under it; the three lanes (`danger`) fill with it, clipped where the Hearth's floor ends (`floorReach`); a giant fist of basalt and crystal hangs in the smoke over the spot and plunges through the bar's last part |
 | Basalt Fist, landing | a white flash, rings, basalt flung up, a crater of molten cracks cooling over 6 s, a shake |
-| Molten Swell | a rolling wall of molten rock down each lane at the wave's own speed (drawn where the sim strikes), spray off its crest, a molten wake behind it crusting as it cools |
+| Molten Swell | a curling wall of molten rock about three players tall down each lane at the wave's own speed, filling the sim's box exactly (the lane's width, the wall's depth): a deep red face hollowing under a white-gold lip that hooks to the front line, skins of crust riding up the face, warped crust plates on its back, drops and blobs torn off the lip, drips off the face, a churning foot throwing droplets, a faint heat haze; behind it the lane's warning clears and a scorched trail stays, dark cooling crust with ragged glowing cracks (never the lane's paint), fading over 5 s |
 | Hearth Flare | a bolt of the first flame from the giant to each far player, sparks where it strikes |
 | The overflow | the giant plunges under with a splash (it climbs back out sheeting lava); each river's lane fills over its warning, then the fire runs down it and dies |
 | Wellspawn, Wellkeepers, Seedflames | placeholder bodies (`mob_elemental`, `mob_glimmerwisp`) with a gold glow; a Kindling Mark's sigil over the marked player; Cinder Trail patches |
@@ -924,14 +932,16 @@ as it drops and its impact, the Seam Bolt, the song's swell; on mythic the soul 
 the Echo's charge and blast, Mountain's Rush striking home, the cursed pillar's rise, hum and
 break, the Bond's pulse, Resonance's ring, the Quarry's collapse, each Endless Song pulse louder and deeper as it grows, a pip struck, a soul pillar bursting.
 The heroic pulse is one soft hum, cooled. The members speak as boss yells
-(`council_voice.ts`, `hudChrome.council.say.*`); their voices are auditions only until the
-designer picks one (`scripts/audition_raid_boss_voices.mjs --set council`).
+(`council_voice.ts`, `hudChrome.council.say.*`) in two voices of their own (section 7.6, the
+voices).
 
 ### 5.19 The Guardian of the Breath's look (prototype)
 
 The fight's effects are `src/render/smith_heart_fx/breath_fight_fx.ts` (pure plan
-`breath_fight_fx_core.ts`) and its provisional body `breath_body.ts` (pure plan
-`breath_body_core.ts`), both hosted by `rift_death_zone.ts` beside `BreathFx` (which keeps
+`breath_fight_fx_core.ts`) and its body's wind `breath_body.ts` (pure plan
+`breath_body_core.ts`; since 2026-11-06 the solid pieces are its own rigged model,
+`characters/smith_heart_boss_looks.ts`, and this module draws the living wind between
+them and the storm of phase 2), both hosted by `rift_death_zone.ts` beside `BreathFx` (which keeps
 Storm Lance and Bellows Gust) and read from IWorld only. The vein's art rule holds: living
 granite, crystal and storm, no metal, no machinery; the "bellows" is a creature that
 breathes (the old brass chains are gone with 2G's rule).
@@ -965,8 +975,7 @@ gather's call before each blow, the gale's loop through it and a sigh into the c
 indrawn breath and the storm's breaking fitted to their bars, the exhale, the tear, a
 strike, the Leaping Bolt, the discharge, a loose gale's loop at the nearest, a toss, the
 circle landing, the swell, a fall over the lip. The guardian's and Thessaly's lines are
-boss yells (`breath_voice.ts`, `hudChrome.breathGuardian.say.*`); the guardian's voice is
-a later audition.
+boss yells (`breath_voice.ts`, `hudChrome.breathGuardian.say.*`), voiced (section 7.6).
 
 ### 5.20 The Guardian of the Quench's look (prototype)
 
@@ -1003,8 +1012,8 @@ staged kit swaps through the compile gate), fixed pools, no light.
 freeze, a shatter, a crack groaning, a hole opening, a plunge and a climb, the awakening's
 charge fitted to its bar and the blades tearing free, an echo, the crossing, the shore ice
 heaving, and a frosty breath in the player's own ear as their bar passes three quarters.
-The guardian's lines are boss yells (`quench_voice.ts`, `hudChrome.quenchGuardian.say.*`);
-its voice is a later audition.
+The guardian's lines are boss yells (`quench_voice.ts`, `hudChrome.quenchGuardian.say.*`),
+voiced (section 7.6).
 
 ### 5.21 The Anvil of the World's four quarters (phases 2K to 2N)
 
@@ -1474,6 +1483,24 @@ health from a target fight length times measured raid DPS, damage anchored to th
 tanks' mitigated intake and the healers' throughput, every number calibrated with
 the meters harness, never shipped unmeasured.
 
+**Pools per tier (the second Heroic pass of 2026-11-05).** The raid has no Heroic tier of its
+own yet, so each boss's Heroic health rides its difficulty row (`healthMult`, applied at the
+pull by `encounters/smith_heart/tier_health.ts`; Normal keeps the template pool, Mythic uses at
+least Heroic's multiplier). Calibrated to a decent human raid with the bot raid
+(`scripts/heart_raid.mjs`) as the yardstick: the bots deal about 65 percent of a human raid's
+damage, so a human kill takes about 0.65 of the bots' time, and a bot fight on a 0.65 pool
+(`/dev heart pool 0.65`, the bots' `POOL=0.65`) runs on a human raid's clock. Normal (fresh
+level-20 gear) aims at 4 to 5 minutes for humans (6 to 7 for the bots), held where the bots
+still kill it before the soft enrage: the Guardian 54,000, the Seam Singer 46,000, the Breath
+80,000, the Quench 62,000, the Heat 64,000, the Masterless Strength 72,000. Heroic (the previous
+tier's best gear) aims at 6 to 7 minutes for humans: the Hammer Council 1.85, the Breath 1.65,
+the Quench 2.2, the Heat 1.45, the Masterless Strength 2.1. Heroic's key mechanics kill when
+ignored: Mountain's Wrath lands at about 110 percent of a Heroic-geared cloth body on whoever
+no pillar hides (`wrathMult` 2.8), the Council's soft enrage waits for 8 Wraths (4 on Normal
+and Mythic), and the Quench's shatter lands twice as hard (`shatterMult` 2). Every number and
+why: the pass's notes (E:/woc/entregas/raid_corazon/heroico/NOTAS.md, "Segunda vuelta",
+outside the repo).
+
 ### 7.1 The Hammer Council (always first)
 
 The Quarry's first boss is two stone beings that share the Hammer's strength: the
@@ -1497,7 +1524,7 @@ harness.
 | Narrow Shelter (Normal 5, Heroic 4, Mythic 3) | One pillar shields only so many players from the Wrath; with more behind it each of them takes half the blast (`crowdShare`) and the raid is warned. A risen pillar's shadow (2.2 yd round) fits five side by side a stride behind it (pinned per tier). The caster wears the limit through its bar (`heart_narrow_shelter`, `value2`) | `council_wrath.ts`, `council_limit_fx.ts` |
 | Hammer's Weight | The Guardian's: every 18 s (first at 10) a 1.5 s bar at the tank, then 2.2 times a swing through armor and +100 percent physical damage taken for 25 s: swap tanks | `council_wrath.ts` |
 | Hammerfall | Kept: the Guardian's frontal arc (110 degrees, 9 yd, 0.7 of a swing, every third swing) | template `arcCleave` |
-| Mountain's Rush and the cursed pillar | The Guardian's charge. Every 24 s (first at 16) a 3 s bar at one player who is no council member's tank (only tanks on the floor: no Rush); the player wears the mark and the lane is drawn from the Guardian. With the mark he raises ONE cursed pillar (if none stands) on a 15 yd ring round the middle. While it stands it pulses on the whole raid every 2 s: 14 to 18 on normal (a reminder), 40 to 48 on heroic and 48 to 56 on mythic before the tier's damage. It shelters nobody from a Wrath (its wall still blocks the sight line), the rock and Resonance never touch it, and only the Rush or a Wrath breaks it. When the bar lands the line is fixed at where the marked player stands; the Guardian plants for a 0.8 s wind-up (`rushWindup`, the `heart_mountains_rush_windup` cue: dust and cracks at his feet, the locked lane still lit) and then charges down it at a heavy run (22 yd a second, `rushSpeed`) and stops at the FIRST pillar on the line: the cursed pillar shatters, the Guardian is stunned 5 s and takes 50 percent more damage for 12 s; a sheltering pillar is taken whole instead and the curse keeps pulsing; a soul pillar stops it and stands. Anyone its body runs through on the way (each once, as it passes) takes 480 to 560 and a 10 yd throw, so a player can still step out of the lane during the wind-up and the run; with no pillar on the line that is the marked player if they stayed on it, and the cursed pillar stays. Mythic only: a miss sets the Quarry collapsing (every 2 s a raid-wide blow of 30 to 36 per stack, one more stack each time, up to 10) until the cursed pillar breaks. The Rush dies with the Guardian, and so does his cursed pillar | `council_rush.ts` |
+| Mountain's Rush and the cursed pillar | The Guardian's charge. Every 24 s (first at 16) a 3 s bar at one player who is no council member's tank (only tanks on the floor: no Rush); the player wears the mark and the lane is drawn from the Guardian. With the mark he raises ONE cursed pillar (if none stands) on a 15 yd ring round the middle. While it stands it pulses on the whole raid every 2 s: 7 to 9 on normal (a reminder; 14 to 18 until the bot raid of 2026-11-04 measured it as a quarter of the healing when the Rush can not reach it), 40 to 48 on heroic and 48 to 56 on mythic before the tier's damage. It shelters nobody from a Wrath (its wall still blocks the sight line), the rock and Resonance never touch it, and only the Rush or a Wrath breaks it. When the bar lands the line is fixed at where the marked player stands; the Guardian plants for a 0.8 s wind-up (`rushWindup`, the `heart_mountains_rush_windup` cue: dust and cracks at his feet, the locked lane still lit) and then charges down it at a heavy run (22 yd a second, `rushSpeed`) and stops at the FIRST pillar on the line: the cursed pillar shatters, the Guardian is stunned 5 s and takes 50 percent more damage for 12 s; a sheltering pillar is taken whole instead and the curse keeps pulsing; a soul pillar stops it and stands. Anyone its body runs through on the way (each once, as it passes) takes 480 to 560 and a 10 yd throw, so a player can still step out of the lane during the wind-up and the run; with no pillar on the line that is the marked player if they stayed on it, and the cursed pillar stays. Mythic only: a miss sets the Quarry collapsing (every 2 s a raid-wide blow of 30 to 36 per stack, one more stack each time, up to 10) until the cursed pillar breaks. The Rush dies with the Guardian, and so does his cursed pillar | `council_rush.ts` |
 | Wake the Stone | The Seam Singer's, and KICKABLE (nature, in `COUNCIL_KICK_SCHOOLS`): every 30 s (first at 20, and 6 s after each Wrath lands) a 2.5 s bar, then 2 players (3 on heroic and mythic, never more than the cap allows; never a tank while anyone else stands) wear a circle for 5 s; a fresh pillar bursts out where each STANDS (nudged to the nearest clear spot), 120 to 150 and a throw to everyone within 3 yd. A kick raises NOTHING (the trap: the raid that kicks by habit loses its cover); the raid is warned as the bar begins and when a kick cuts it. Her kick's silence and lockout hold the Wake too | `council_stone.ts`, `council_pillars.ts` (`raisePillar`) |
 | The Wrath guard | Normal only (`floorAvoidsWrath`): Wake the Stone and the Rush are not due while what they put on the floor would still run when the Wrath's bar begins (their floor time plus 2 s, `wrathGuardPad`), nor while that bar runs: they wait for it to land. Heroic and mythic let them overlap | `council_floor.ts` (`clearOfWrath`) |
 | Falling Rock | The Seam Singer's: every 25 s (first at 9) a 1.2 s bar, then one player wears the soak for 5 s; 1,350 split between everyone within 6 yd (fewer than 3 under it: each takes half as much again and the whole raid takes 140 to 170, the Rockfall Tremor); every pillar within 6 yd of its face loses a piece (never the cursed one) | `council_stone.ts` |
@@ -1525,7 +1552,11 @@ the enrage is meant to end the fight.
 Varkhul's measured adds DPS was a median of 696 on heroic), a 4.5 minute fight at about 85
 percent uptime: about 137,000 after the elite factor, split by role: the Guardian 32,000
 base (73,600), the Seam Singer 27,500 (63,250). The Slabwright's 19,500 went to the two in
-proportion, so the fight's length is unchanged.
+proportion, so the fight's length is unchanged. Measured (the bot raid of 2026-11-04,
+`scripts/heart_raid.mjs`): ten kit-geared bots dealt about 300 a second, so the pull ran past
+the soft enrage; cut 15 percent to the Guardian 27,200 and the Seam Singer 23,400. The
+second Heroic pass (2026-11-05, real class kits) raised them to 54,000 and 46,000 (see the
+pools per tier above).
 
 **Damage (sketch, unmeasured).** Anchored to the level-20 cloth reference (about 1,135 to
 1,345 health, `docs/design/class-health-table-2026-09-11.md`) and the dungeon rework's
@@ -1636,7 +1667,7 @@ table below disagree, this block wins. Every number stays a SKETCH (unmeasured).
   and the personal alerts (the Knotted Gale's marks).
 - **Phase 2** is unchanged (the team plays the new version before "more chaos").
 - **Mythic** keeps the Knotted Gale; its throw is now at any open lip, the carrier's walk a
-  fifth of a run (`heartWalkMult`), since every lip came nearer.
+  tenth of a run (`heartWalkMult`; a fifth until 2026-11-04: a ball dropped at `heartFar` walked to a lip in 11 s of its 20 s fuse): the nearest drop is a whole fuse's crawl, so every ball, phase 2's second one too, needs the portals.
 
 **The third pass of 2026-11-03 (the owner's review of the rework).** Where it and the block
 above disagree, this one wins.
@@ -1714,6 +1745,12 @@ the bots to reuse later).
 4.5 minute fight at about 85 percent uptime and the bot raid's measured 400 to 460 a
 second (the council's anchor): the Wind half runs to about 2.2 minutes, the Storm after.
 
+Measured (the bot raid of 2026-11-04, `scripts/heart_raid.mjs`): ten kit-geared bots killed
+Normal in 5:38 with no deaths at about 290 a second, and wiped twice to the Swelling Storm
+at 6:11 when the isle round ran long; the guardian's base health goes from 43,000 to 38,000
+so a sane raid kills it before the soft enrage bites. The second Heroic pass (2026-11-05)
+raised it to 80,000 (see the pools per tier above).
+
 **Damage (sketch, unmeasured).** Anchored to the level-20 cloth reference (about 1,135 to
 1,345 health) and the dungeon rework's bands: the pin about 8 percent a second (leave the
 wall), the vortex about 15 percent a second (never stand before the mouth), a strike about
@@ -1776,7 +1813,8 @@ no plates broken by the boss's fire (Korzul: here the RAID breaks the ice, in ro
 | Its fall | The Quench vein and the seal's quarter light as before (seal.ts reads the guardian's death); the shore ice falls and the lake refreezes whole (every hole gone), so the walk back is safe | `quench.ts` (`finishQuench`) |
 
 **Health (sketch, unmeasured).** 43,000 base (about 99,000 after the elite factor), the
-Breath's anchor: a 4 to 5 minute fight at the bot raid's measured 400 to 460 a second.
+Breath's anchor: a 4 to 5 minute fight at the bot raid's measured 400 to 460 a second. The
+second Heroic pass (2026-11-05) raised it to 62,000 (see the pools per tier).
 
 **Damage and cold (sketch, unmeasured).** Anchored to the level-20 cloth reference (about
 1,135 to 1,345 health): a shatter about 20 percent (plus Frost-Brittle), the water about
@@ -1836,18 +1874,18 @@ guardian cannot be pushed past an overflow before it happens.
 | Piece | Rule | Where |
 |---|---|---|
 | Phase 1 (100 to 70) | Basalt Fist and its Molten Swells, Hearth Flare, Cinder Grip on the tank | `heat_fist.ts`, `heat_flare.ts` |
-| Basalt Fist | Every 22 s (first 8 s in) a 3 s bar, planted, its facing locked on a spot on the shore where a hashed player (never the tank while anyone else stands) stood. The spot shows at its exact 6 yd radius; whoever is inside when the bar ends takes 2,500 to 2,700 (a kill at level 20). Phases 1 to 3 | `heat_fist.ts` |
-| Molten Swell | 0.6 s after the slam three walls of molten rock roll out of the spot, one straight away from the wellspring and one to either side: 32 yd at 10 yd a second, 5 yd wide, 380 to 440 to each player a wall rolls over (once). The lanes show with the spot, so the raid already knows the gaps to stand in (the side toward the guardian is always clear) | `heat_fist.ts` |
-| Hearth Flare | Phase 1, every 4 s: everyone farther than 20 yd from the wellspring's middle (12 yd past its lip) takes 260 to 300 and is Flare-Scorched (25 percent more Fire and other magic damage taken, 8 s). The raid fights close. In phases 2 and 3 it strikes only the guardian's own target when that one stands out of reach | `heat_flare.ts` |
+| Basalt Fist | Every 22 s (first 8 s in; since pass 5, the owner's call of 2026-11-06, a due fist waits while Wakefire lays its bands or any band warns or burns, and while the next run would begin before its swells are done (`wakefireHoldsFist`, `FIST_SPAN`); it then comes at once and the wait comes off the next one's, never under 11 s, so it waits at most one run and that lookahead and the fight keeps its 22 s rhythm) a 3 s bar, planted, its facing locked on a spot on the shore where a hashed player (never the tank while anyone else stands) stood. The spot shows at its exact 6 yd radius; whoever is inside when the bar ends takes 2,500 to 2,700 (a kill at level 20). Phases 1 to 3 | `heat_fist.ts` |
+| Molten Swell | 0.6 s after the slam three walls of molten rock roll out of the spot, one straight away from the wellspring and one to either side: 32 yd at 10 yd a second, 11 yd wide and 5 yd deep (pass 5, 2026-11-06, the owner's call: 5 and 2.5 before), 380 to 440 to each player a wall rolls over (once). The lanes show with the spot, so the raid already knows the gaps to stand in (the side toward the guardian is clear 5.5 yd past the spot's line, which near the lip is the wellspring itself: there the gaps are the diagonals). A wave just out of the spot never strikes back past it. Fair at the size: from a lane's middle a player is out in under a second at run speed, and the lanes show 3.6 s before a wave rolls; wherever the fist lands the three lanes and the spot cover under a quarter of the Hearth's floor and under half of the melee ring (pinned in `tests/smith_heart_heat.test.ts`) | `heat_fist.ts` |
+| Hearth Flare | Phase 1, every 4 s: everyone farther than 22.5 yd from the wellspring's middle (12 yd past its 10.5 yd lip) takes 260 to 300 and is Flare-Scorched (25 percent more Fire and other magic damage taken, 8 s). The raid fights close. In phases 2 and 3 it strikes only the guardian's own target when that one stands out of reach | `heat_flare.ts` |
 | Wellspring Fire | The whole fight: whoever stands inside the lip burns, 120 to 140 every half second | `heat_flare.ts` |
-| Cinder Grip | The tank's stacking burn: every landed swing adds a stack (18 Fire a second each, 15 s, at most 10). The tanks swap around 5 | content `stackPoison` |
+| Cinder Grip | The tank's stacking burn: every landed swing adds a stack (9 Fire a second each, 15 s, at most 10; 18 until the bot raid of 2026-11-04 measured both tanks burning 90 a second after a swap at 5). The tanks swap around 5 | content `stackPoison` |
 | The overflows | At 70 and at 40 percent: it sinks 2.5 s into the wellspring (untargetable, nothing harms it), the Hearth overflows, then it rises over 3 s, still out of reach. Every 4.5 s three rivers of the first flame run out of the wellspring across the shore (2.5 s of warning down their lanes, then 3 s of fire, 180 to 220 every half second, from nine hashed bearings); every 3 s Falling Cinders strike random players (140 to 170; two on Normal, three on Heroic). Normal: 20 s of it, a pure dodge and heal check | `heat_overflow.ts` |
 | Wellspawn (Heroic) | Four children of the flame climb out at the room's edge as the Hearth overflows and walk to the wellspring (3 yd a second, walked by the encounter). They slow as they lose health, crawling from half health down (15 percent of their speed), and every slow, root, stun and control works on them. One that reaches the lip feeds the guardian 3 percent of its health and blasts the raid for 380 to 420. The overflow lasts until they are gone (at least 8 s, at most 45 s); survivors dive in when it ends | `heat_wellspawn.ts` |
 | Wellkeepers (Heroic, second overflow) | Two keepers rise by the wellspring and must be tanked. Every 10 s each puts a Kindling Mark on a player; 5 s later that player trails fire for 8 s (Cinder Trail: patches 2.5 yd wide that burn 15 s, 80 to 95 a second to allies, and heal a Wellspawn in them 8 percent of its health a second). The marked player leaves the group and the children's path. They sink back when the overflow ends | `heat_wellspawn.ts` |
 | Phase 2 (70 to 40) | Hearthseeds, Wakefire, the fist | `heat_seeds.ts`, `heat_zones.ts` |
-| Hearthseeds | Every 30 s (first 6 s in) a seed falls where each player stands (at most ten). It throbs 10 s, then bursts: up to 520 at the seed, falling off with the square of the distance to nothing at 22 yd. The raid drops them together and runs | `heat_seeds.ts` |
+| Hearthseeds | Every 30 s (first 6 s in) the guardian scoops molten rock out of the wellspring and hurls a seed where each player stands (at most ten): each spot shows at once, the seed strikes it 2.2 s later (`seedFlight`; the thrown meteors are the seeds). It throbs 10 s, then bursts: up to 520 at the seed, falling off with the square of the distance to nothing at 22 yd. The raid drops them together and runs | `heat_seeds.ts` |
 | Seedflames (Heroic) | Each burst hatches a small fire elemental fixed on one hashed player; the raid burns them down together | `heat_seeds.ts` |
-| Wakefire | Phases 2 and 3, every 34 s (first 16 s into phase 2): the floor ignites in three bands round the wellspring (8 to 19 yd, 19 to 31, 31 and out), always from the guardian outward (melee, casters, the far shore). Each band warns 4 s, ignites (900 to 1,000 to everyone in it) and burns 2 s more (220 to 260 every half second); the next begins its warning 2.5 s after the last, so the raid steps into the band that has just burned | `heat_zones.ts` |
+| Wakefire | Phases 2 and 3, every 34 s (first 16 s into phase 2): the floor ignites in three bands round the wellspring (from its lip: 10.5 to 21.5 yd, 21.5 to 33.5, 33.5 and out), always from the guardian outward (melee, casters, the far shore). Each band warns 4 s, ignites (900 to 1,000 to everyone in it) and burns 2 s more (220 to 260 every half second); the next begins its warning 2.5 s after the last, so the raid steps into the band that has just burned | `heat_zones.ts` |
 | Phase 3 (40 to 0) | The Rolling Cinders, Wakefire, the fist | `heat_cinders.ts` |
 | Rolling Cinder | Every 45 s (first 8 s in) a great living fireball falls on the shore (2 s of warning, 300 to 340 within 4 yd, the spot burning 8 s; at most six burn at once, the oldest going out), then rolls after one hashed player (Hunted shows who; 3.2 yd a second on Normal, 4.4 on Heroic, nothing slows it). If it reaches them they die and those within 3 yd take 600 to 700; the cinder is spent. Its quarry gone, it picks another. It is a ward: any strike lands one point and knocks it 6 yd back, then Cooling Crust holds it against knockback for 5 s, so the raid assigns who strikes it and when. Nothing kills it | `heat_cinders.ts`, `heat_cinder_ward.ts` |
 | Wheel of the Hearth (Mythic) | Phases 2 and 3, every 40 s (first 24 s in): the shore round the wellspring is cut in four slices (`WHEEL_ARCS_DEG`). Three turn red, warn 4 s, erupt (900 to 1,000 to everyone in them past the lip) and burn 1.5 s more (220 to 260 every half second); the fourth stays dark. Three rounds back to back (`WHEEL_ROUNDS`): as one erupts the next shows, its safe slice one or two away, so the raid crosses as the fire dies | `heat_wheel.ts` |
@@ -1865,10 +1903,11 @@ carries their state and time (a radius or half width in `scale`); the adds as mo
 marks as auras.
 
 **Health (sketch, unmeasured).** 43,000 base (about 99,000 after the elite factor), the other
-guardians' anchor. Two overflows of 20 s (Normal) add about 45 s to a 4 to 5 minute fight.
+guardians' anchor. Two overflows of 20 s (Normal) add about 45 s to a 4 to 5 minute fight. The
+second Heroic pass (2026-11-05) raised it to 64,000 (see the pools per tier).
 
 Role jobs: the tank holds it from the shore, inside its reach, and swaps on Cinder Grip;
-everyone stays within 20 yd in phase 1, leaves the fist's spot and stands in the gaps
+everyone stays within 22.5 yd in phase 1, leaves the fist's spot and stands in the gaps
 between the lanes; through an overflow everyone dodges the rivers and heals through the
 bolts, and on Heroic the raid slows and burns the Wellspawn before they reach the lip while
 the marked player trails fire away from them; in phase 2 the raid drops the seeds together
@@ -1902,21 +1941,21 @@ Flare-Scorched, The First Wellspring, The First Flame and Wellspring Fire are pl
   kits' look. **Part 2, built (28 Oct 2026, below "Part 2"):** the intermissions at 70 and
   40 percent with their Splinters, the poured elements, the 15 percent final phase's mix and
   its soft enrage. **Not built:** the Mythic hidden phase (its hook only), loot (the base
-  form's extra item: the state aura carries the base form as its hook), the final models,
-  the voice.
+  form's extra item: the state aura carries the base form as its hook), the final models.
+  The voice is built (section 7.6).
 
 **A PROTOTYPE, numbers unmeasured.** Every tunable lives in one table, `FINAL_TUNING` and
 `FINAL_DIFFICULTY` in `src/sim/encounters/smith_heart/final_ids.ts`, so a change is one
 number. The code is `src/sim/encounters/smith_heart/final*.ts`: the coordinator `final.ts`,
 the rules `final_rules.ts`, one module per quarter (`final_heat.ts`, `final_quench.ts`,
-`final_breath.ts`, `final_hammer.ts`), the scope and the leaf. Health 70,000 base (about
-161,000 after the elite factor). Its own swing cleave, Forge Fist (110 degrees, 9 yd, every
+`final_breath.ts`, `final_hammer.ts`), the scope and the leaf. Health 72,000 base (about
+166,000 after the elite factor; 70,000 until the second Heroic pass of 2026-11-05). Its own swing cleave, Forge Fist (110 degrees, 9 yd, every
 third landed swing), is its frontal; the sketch's Forge Wrath and Forge Pour are gone. It
 cannot be controlled or slowed: only its own Taking Root holds it.
 
 | Rule | How it works (Normal unless said) | Where |
 |---|---|---|
-| Overload | One bar per quarter (every number in one table, `FINAL_OVERLOAD`). The bar of the quarter it stands in fills (empty to full in 60 s, slowed from 40 after Jose's playtest of 28 Oct 2026) and pulses the raid every 4 s, harder the fuller it is (60 to 70 at empty, up to 370 at full); at 85 percent it warns the raid once; full, it bursts on everyone and empties: 700 to 800 on Normal (survivable with healing), 1,050 to 1,200 on Heroic (heavy), 4,500 to 5,200 on Mythic (lethal: only a big personal defensive lives, effectively a wipe). The warning and the tooltip say which. Away from its quarter a bar drains at a third of the fill speed; in the ring nothing fills. Bouncing between two quarters bursts within about two and a half minutes; a rotation through four never passes one visit's fill | `final_ids.ts` `FINAL_OVERLOAD`, `final_rules.ts` |
+| Overload | One bar per quarter (every number in one table, `FINAL_OVERLOAD`). The bar of the quarter it stands in fills (empty to full in 60 s, slowed from 40 after Jose's playtest of 28 Oct 2026) and pulses the raid every 4 s, harder the fuller it is (35 to 40 at empty, up to 110 at full; 60 to 70 and up to 370 until the bot raid of 2026-11-04, whose pulses alone outran two healers and wiped a raid that moved the boss on time); at 85 percent it warns the raid once; full, it bursts on everyone and empties: 700 to 800 on Normal (survivable with healing), 1,050 to 1,200 on Heroic (heavy), 4,500 to 5,200 on Mythic (lethal: only a big personal defensive lives, effectively a wipe). The warning and the tooltip say which. Away from its quarter a bar drains at a third of the fill speed; in the ring nothing fills. Bouncing between two quarters bursts within about two and a half minutes; a rotation through four never passes one visit's fill | `final_ids.ts` `FINAL_OVERLOAD`, `final_rules.ts` |
 | Vein Shock (Heroic, Mythic) | Every quarter change hits the raid (180 to 220) and leaves Vein-Shaken (20 s) on everyone struck; a change while still shaken hits three times as hard | `final_rules.ts` |
 | Taking Root | On entering a NEW quarter (the pull's first one too) it roots for 10 s (15 in the sketch: Jose's playtest read it as a boss that will not follow): it cannot be dragged out; back into the quarter it just left (a dip into the ring) it does not root again. The HUD counts the root down, then reads "Can be dragged". Between roots it follows its tank: its long melee reach alone parked it ten yards short of a tank waiting past a ridge, so a free boss whose tank stands in another zone closes to 2 yd of it (`followTank`), and no planted bar begins while it is dragged or in the 3 s after its root lets go. A zone changes once the boss is 2 yd past a ridge's line (1.5 yd past the ring's edge), or at once when its tank already stands in the zone it stepped into, so a boss swaying on a ridge alone never flickers. Pinned walking (never teleporting) over every ridge, both ways, at three radii, offline and through the server's input frames (`tests/smith_heart_final_drag.test.ts`) | `final_rules.ts`, `final_scope.ts` |
 | Heart Unbound | In the central ring above 15 percent it gains a stack every second and every second deals 45 to the whole raid for each stack: drag it through, never park it | `final_rules.ts` |
@@ -1925,12 +1964,12 @@ cannot be controlled or slowed: only its own Taking Root holds it.
 
 | Quarter | Normal | Heroic adds | Mythic adds |
 |---|---|---|---|
-| Heat (dodge and place) | Basalt Fist every 16 s: a 3 s bar on a hashed player's spot (6 yd, 2,200 to 2,400), then three Molten Swells roll out of it (the Heat guardian's own objects, lanes and numbers, 32 yd or to the Anvil's rim). Fire Whirls every 13 s: three rise by hashed players (1.5 s of warning) and run 9 s across the floor, turning back off the rim (300 to 340, once a second at most) | Ember Mark every 22 s: up to three ranged players (12 yd or more from it, never the tank); 6 s later embers drop at their feet and smoulder 30 s (5 yd, 150 to 170 a second): stack the marks in one corner, then move out | Forge Fire: its frontal leaves a pool of fire (4 yd, 20 s) where it struck |
+| Heat (dodge and place) | Basalt Fist every 16 s: a 3 s bar on a hashed player's spot (6 yd, 2,200 to 2,400), then three Molten Swells roll out of it (the Heat guardian's own objects, lanes and numbers, 32 yd or to the Anvil's rim; 11 yd wide and 5 deep since its pass 5, shared on purpose so both read alike). Fire Whirls every 13 s: three rise by hashed players (1.5 s of warning) and run 9 s across the floor, turning back off the rim (300 to 340, once a second at most) | Ember Mark every 22 s: up to three ranged players (12 yd or more from it, never the tank); 6 s later embers drop at their feet and smoulder 30 s (5 yd, 150 to 170 a second): stack the marks in one corner, then move out | Forge Fire: its frontal leaves a pool of fire (4 yd, 20 s) where it struck |
 | Quench (stack, no split) | Quenching Cold: anyone with fewer than two other players within 10 yd grows cold (a bar, full in 5 s alone; it falls when huddled); full, Encased in Rime (stunned 4 s, 300 to 340). The cold goes once it leaves the quarter | Groaning Ice every 18 s: the floor cracks under two hashed players (4 yd); 3 s later it breaks and whoever stands on it falls Under the Ice (600 to 680, stunned 3 s) | Numbing Frost: its frontal slows everyone it strikes by 75 percent for 6 s |
 | Breath (spread) | Bellows Wind every 20 s: 2 s of gathering, then 8 s of gale toward a hashed bearing, carrying everyone 3.5 yd a second (the wind kernel's aura: both hosts step it, the online client predicts it); within 5 yd of the rim while it blows, Pressed to the Rim (220 to 260 a second). Leaping Bolt every 11 s: a 2 s bar on a hashed player; it leaps to every player within 6 yd of anyone struck, each leap half again as hard (300 to 340 first) | Drawn Lightning every 22 s: two marked players for 6 s; every second it arcs to everyone within 8 yd of them (200 to 230) | Storm Orbs every 25 s: three orbs round it; each must be stepped on within 8 s (one player: 250 to 280; two or more on it: each twice that), or it bursts on the whole raid (450 to 500) |
 | Hammer (the only group soak) | Tremor Cracks every 10 s: under three hashed players (4 yd), erupting 2.5 s later (500 to 560). Weight of the Anvil every 25 s: a 6 s bar, a 6 yd mark where a hashed player stood; 9,000 split between everyone under it (half as much again each with fewer than three); nobody under it: 1,500 to 1,600 to everyone | Stone Shell every 20 s: three hashed players absorb their next 600 healing. Crushed: everyone who shared the Anvil for 30 s; a Crushed player under the next Anvil takes their share three times over (two groups rotate). Four Tremor Cracks | The turning Anvil: its mark turns round the boss through its bar (11 yd out, 25 degrees a second) |
 
-Difficulty multiplies every mechanic's damage (Normal 1, Heroic 1.2, Mythic 1.3); Mythic
+Difficulty multiplies every mechanic's damage (Normal 1, Heroic 1.1, 1.2 until the bot raid's Heroic pass of 2026-11-05, Mythic 1.3); Mythic
 carries every Heroic rule. A new tier is one `FINAL_DIFFICULTY` row, never a branch on a
 tier's name. The raid has no heroic or mythic tier of its own yet: `/dev heart final
 heroic|mythic` switches a run (section 11).
@@ -2006,7 +2045,9 @@ table that the design left open is a design call Jose may veto.
 | The Mythic hidden phase | Not designed: `FINAL_PHASE_DIFFICULTY.hiddenPhase` (false everywhere) and `mythicHiddenPhase` are its clean hook | `final_last.ts` |
 | No adds from adds | No Splinter raises anything (pinned by the tests) | `final_adds.ts` |
 
-Splinter health per tier: 6,500 Normal, 7,000 Heroic, 7,500 Mythic (each its whole pool).
+Splinter health per tier: 6,500 Normal, 5,500 Heroic (7,000 until the Heroic pass of
+2026-11-05: three Splinters' growing pulses outran a decent raid's two healers before its
+damage could clear them), 7,500 Mythic (each its whole pool).
 Every mechanic's damage takes the tier's `damageMult` on top. Bodies: borrowed, retinted and
 drawn about 2.5 times a player (`render/characters/smith_heart_placeholder_looks.ts`: the
 Heat's the stone goleling in white-gold, the Quench's the rime elemental, the Breath's the
@@ -2066,6 +2107,50 @@ and Drawn Lightning are the guardians' own, already checked. None of Kurog Grimt
 (Primal Shift, Primal Break, Molten Rupture, Frost Binds, Enveloping Earth, Elemental Surge,
 Sundering Strike and the rest) is used; the quartered room and the elemental drags are
 inspired by a known raid encounter as a concept only.
+
+### 7.6 The voices
+
+Every boss speaks in a voice of its own (the designer's brief of 2026-11-05), the Ignivar
+way: ElevenLabs Voice Design auditions (`scripts/audition_raid_boss_voices.mjs --set heart`,
+the briefs in `scripts/voices/raid_boss_voice_prompts.mjs` `SMITH_HEART_VOICE_PROMPTS`,
+several candidates a boss), one finalized per speaker (`scripts/finalize_raid_boss_voice.mjs`,
+the ids in `scripts/voices/voice_ids.json`), every line synthesized with its performance
+direction and treated in its vein's colour (`scripts/render_smith_heart_voice_pack.mjs`, the
+directions in `scripts/voices/smith_heart_voice_pack.mjs`, the treatments in
+`raid_boss_voice_processing.mjs` `SMITH_HEART_VOICE_PROCESSING_PRESETS`: quarry grind,
+crystal shimmer, gust, frost crackle, flame flutter, and the Masterless Strength's choir of
+four), published under `public/audio/voice/<voice>/` and listed in the voice manifest by
+`scripts/gen_npc_lines.mjs`. Captain Thessaly keeps the Highwatch captain's voice.
+
+| Speaker | Voice (folder) | Lines |
+|---|---|---|
+| Guardian of the Hammer | `heart_hammer_guardian`, quarry stone | `council_voice.ts` |
+| The Seam Singer | `heart_seam_singer`, amber crystal | `council_voice.ts` |
+| Guardian of the Breath | `heart_breath_guardian`, storm horn | `breath_voice.ts` |
+| Captain Thessaly | `captain_thessaly` | `breath_voice.ts` |
+| Guardian of the Quench | `heart_quench_guardian`, glacial | `quench_voice.ts` |
+| Guardian of the Heat | `heart_heat_guardian`, hearth fire | `heat_voice.ts` |
+| The Masterless Strength | `heart_masterless_strength`, the four veins as one ("we") | `final_voice.ts` |
+
+The story the lines tell: each guardian carries out its last order blindly and, falling,
+gives its strength to the raid ("is yours to carry", "the Quench is yours", "carry it
+well"); the Masterless Strength, the four strengths with no hand to hold them, wakes to find
+them in the raid's blood and wants them back, to finish the Smith's last job and seal the
+mountain over everything that breathes; it dies knowing the hand is never coming back, and
+leaves its last ember (Duskwick) to the raid.
+
+Every line is a boss yell with a stable key (`hudChrome.<boss>.say.<moment>`, English in the
+catalog, the five non-Latin locales filled); the client finds its clip by the English
+(`src/ui/hud_voice_cues.ts` `yellVoiceKey`). The Masterless Strength's voice is an observer
+(`final_voice.ts` `stepFinalVoice`): it reads the fight after each tick and changes nothing;
+its three arrival lines follow the renderer's rebuild (`ARRIVAL_LINE_AT`). A player's fall
+gets a kill line (`voice_slain.ts`: two or three variants in turn, at most one in
+`SLAY_EVERY` seconds a boss); signature barks repeat at most once in their boss's
+`SAY_EVERY`. In the client (`src/ui/voice_events.ts` `voicedYellMix`) a raid line is mastered
+at -15 LUFS and played at 1.2, over the raid's -14 LUFS score at 0.6; it waits for the raid
+line before it instead of cutting it (a stale one is dropped); and it fades with its
+speaker's distance, full within 45 yd, silent at 160 (`SMITH_HEART_VOICE_FADE`). No mechanic's
+timing or number changed. Pinned by `tests/smith_heart_voice.test.ts`.
 
 ## 8. Loot hook (not wired in phase 1)
 
@@ -2223,9 +2308,13 @@ on both difficulties (dungeon rework README, goal 4).
   server snapshot path into the online mirror on the browser's timer wire (the soul and
   its pips, the Echo's and the Endless Song's bars, the song's pulse count, the burst) and
   the cursed pillar and its collider.
-- `scripts/heart_council_raid.mjs`: the council fought by ten bots over a live dev server
-  (two tanks, two healers, six damage dealers; nine and a human with `JOIN`), playing the
-  mechanics from the snapshots and writing a fight log; its positioning
+- `scripts/heart_raid.mjs` (`BOSS=council|breath|quench|heat|final`, run with tsx;
+  `scripts/heart_council_raid.mjs` is the council's alias): every boss fought by ten bots
+  over a live dev server (two tanks, two healers, six damage dealers; nine and a human
+  with `JOIN`), playing the mechanics from the snapshots and writing a fight log
+  (`IGNORE=<key mechanic>` plays the raid that ignores it); the shared raid is
+  `scripts/lib/heart_raid_bots.mjs`, each boss's AI `scripts/lib/heart_raid_<boss>.mjs`
+  (reusing the sim's pure geometry). The council's positioning
   (`scripts/lib/heart_council_tactics.mjs`) is pinned to the server's geometry by
   `tests/smith_heart_council_bot_tactics.test.ts`.
 - Every new Smith's Heart test follows the path pattern `tests/smith_heart_*.test.ts`

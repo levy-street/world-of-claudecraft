@@ -16,6 +16,7 @@
 // no light, no per-frame allocation. The plan's numbers: breath_heart_fx_core.ts.
 
 import * as THREE from 'three';
+import type { BreathKnotHeard } from '../../game/smith_heart_breath_audio';
 import {
   BREATH_CUES,
   knotOf,
@@ -30,6 +31,10 @@ import {
   BURST_SECONDS,
   burstLook,
   HEART_COLORS as C,
+  FLIGHT_LOOK,
+  FLIGHT_TRAIL,
+  flightGhost,
+  flightScale,
   HEART_FLOOR,
   HEART_SIDES,
   type HeartObjectKind,
@@ -47,7 +52,6 @@ import {
   portalLink,
   portalSideLook,
   portalSideOfKind,
-  THROW_ARC,
   throwHeading,
   throwOffset,
 } from './breath_heart_fx_core';
@@ -55,6 +59,8 @@ import {
   BURST_FRAG,
   FACING_FRAG,
   FACING_VERT,
+  FLOOR_FACING_VERT,
+  FLOOR_LETTER_FRAG,
   HEART_RING_FRAG,
   HEART_UV_VERT,
   PORTAL_DISC_FRAG,
@@ -205,18 +211,30 @@ interface LinkSlot {
 }
 
 interface FlightSlot {
-  mesh: THREE.Mesh;
+  /** The ball itself: the Storm Orb's shell, its core, its knot of wind. */
+  shell: THREE.Mesh;
+  core: THREE.Mesh;
+  wind: THREE.Mesh;
+  /** The dark storm halo behind it (normal blending: it reads on a pale sky). */
+  halo: THREE.Mesh;
+  /** The wake, back along its own arc. */
+  ghosts: THREE.Mesh[];
+  turn: number;
   bornAt: number;
   live: boolean;
   x: number;
   y: number;
   z: number;
-  hx: number;
-  hz: number;
+  /** Its heading out of the Cornice (written at launch, read every frame). */
+  heading: { x: number; z: number };
 }
 
 export class BreathHeartFx {
   private readonly knots: KnotSlot[] = [];
+  /** The Knotted Gale the fight's sound hears this frame (the most urgent),
+   *  or null (game/smith_heart_breath_audio.ts). */
+  heard: BreathKnotHeard | null = null;
+  private readonly heardKnot: BreathKnotHeard = { x: 0, y: 0, z: 0, held: false, fuse: 0 };
   /** One slot per side, in side order (A, B, C, D). */
   private readonly portals: PortalSlot[] = [];
   private readonly marks: MarkSlot[] = [];
@@ -228,6 +246,7 @@ export class BreathHeartFx {
   private readonly burstAlpha = { value: 0 };
   private burstBorn = -99;
   private readonly offset = { x: 0, y: 0, z: 0 };
+  private readonly ghostAt = { x: 0, y: 0, z: 0 };
   // The scan's finds (rewritten at the host's scan pace).
   private seenKnots = 0;
   private seenMarks = 0;
@@ -272,14 +291,12 @@ export class BreathHeartFx {
     // Flat on the floor: x/z, uv across the whole square.
     const floorQuad = new THREE.PlaneGeometry(2, 2);
     floorQuad.rotateX(-Math.PI / 2);
-    // Each side's letter, upright (over a marked player) and laid flat (in its mouth).
+    // Each side's letter: upright over a marked player, flat in its mouth (the
+    // mouth's shader lays it on the floor, turned to the camera).
     const letters = {} as Record<HeartPortalSide, THREE.ShapeGeometry>;
-    const floorLetters = {} as Record<HeartPortalSide, THREE.BufferGeometry>;
     for (const side of HEART_SIDES) {
       letters[side] = new THREE.ShapeGeometry(letterShape(side));
-      floorLetters[side] = letters[side].clone();
-      floorLetters[side].rotateX(-Math.PI / 2);
-      h.geometries.push(letters[side], floorLetters[side]);
+      h.geometries.push(letters[side]);
     }
     const orb = new THREE.SphereGeometry(1, 28, 20);
     const orbCore = new THREE.SphereGeometry(0.55, 16, 12);
@@ -362,7 +379,7 @@ export class BreathHeartFx {
 
     for (const tag of HEART_SIDES) {
       const look = portalSideLook(tag);
-      const side = { hex: look.color, floor: floorLetters[tag], tag };
+      const side = { hex: look.color, floor: letters[tag], tag };
       const open = { value: 0 };
       const u = {
         uTime: h.uTime,
@@ -389,16 +406,21 @@ export class BreathHeartFx {
         letter: mk(
           `smithHeartPortalLetter${side.tag}`,
           side.floor,
-          new THREE.MeshBasicMaterial({
-            name: `smithHeartPortalLetter${side.tag}`,
-            // A dark ink in the pair's own cast: deep sea for A and B, deep
-            // plum for C and D, so the letter stays crisp on its bright mouth.
-            color: look.pair === 0 ? 0x06202a : 0x2a0620,
-            transparent: true,
-            depthWrite: false,
-            toneMapped: false,
-            side: THREE.DoubleSide,
-          }),
+          // A dark ink in the pair's own cast: deep sea for A and B, deep plum
+          // for C and D, so the letter stays crisp on its bright mouth; turned
+          // to the camera on the floor so it never reads upside down.
+          shader(
+            `smithHeartPortalLetter${side.tag}`,
+            { uColor: { value: color(look.pair === 0 ? 0x06202a : 0x2a0620) } },
+            FLOOR_FACING_VERT,
+            FLOOR_LETTER_FRAG,
+            {
+              blending: THREE.NormalBlending,
+              depthWrite: false,
+              toneMapped: false,
+              side: THREE.DoubleSide,
+            },
+          ),
           HEART_FLOOR.letter,
         ),
         open,
@@ -476,17 +498,49 @@ export class BreathHeartFx {
       });
     }
 
-    const flightMat = windMat(C.core, 'smithHeartKnotFlight');
+    // The throw flies as the ball the raid carried, at full crackle, cut out of the
+    // Cornice's pale sky by a dark halo and trailing a wake of teal (normal blending:
+    // a mid teal reads darker than the sky and lighter than the rock).
+    const flightU = { uTime: h.uTime, uCrackle: { value: 1 }, uStorm: { value: color(C.storm) } };
+    const flightShell = shader('smithHeartKnotFlightShell', flightU, KIT_UV_VERT, ORB_FRAG);
+    const flightCore = shader('smithHeartKnotFlightCore', flightU, KIT_UV_VERT, ORB_CORE_FRAG);
+    const flightHalo = new THREE.MeshBasicMaterial({
+      name: 'smithHeartKnotFlightHalo',
+      color: 0x161c3c,
+      transparent: true,
+      opacity: 0.62,
+      side: THREE.BackSide,
+      depthWrite: false,
+      toneMapped: false,
+    });
+    h.materials.push(flightHalo);
+    const ghostMats: THREE.MeshBasicMaterial[] = [];
+    for (let g = 0; g < FLIGHT_TRAIL.ghosts; g++) {
+      const m = new THREE.MeshBasicMaterial({
+        name: 'smithHeartKnotFlightWake',
+        color: 0x1fae9c,
+        transparent: true,
+        opacity: flightGhost(g).alpha,
+        depthWrite: false,
+        toneMapped: false,
+      });
+      h.materials.push(m);
+      ghostMats.push(m);
+    }
     for (let i = 0; i < P.flights; i++) {
       this.flights.push({
-        mesh: mk('smithHeartKnotFlight', orb, flightMat),
+        shell: mk('smithHeartKnotFlight', orb, flightShell),
+        core: mk('smithHeartKnotFlightCore', orbCore, flightCore),
+        wind: mk('smithHeartKnotFlightWind', knot, knotWind),
+        halo: mk('smithHeartKnotFlightHalo', orb, flightHalo),
+        ghosts: ghostMats.map((m) => mk('smithHeartKnotFlightWake', orbCore, m)),
+        turn: 0,
         bornAt: -99,
         live: false,
         x: 0,
         y: 0,
         z: 0,
-        hx: 0,
-        hz: 1,
+        heading: { x: 0, z: 1 },
       });
     }
 
@@ -577,7 +631,7 @@ export class BreathHeartFx {
     for (const l of this.links) l.mesh.visible = false;
     this.burstWall.visible = false;
     this.burstFlash.visible = false;
-    for (const f of this.flights) f.mesh.visible = false;
+    for (const f of this.flights) this.hideFlight(f);
   }
 
   // ---- the cues ---------------------------------------------------------------------------
@@ -662,8 +716,16 @@ export class BreathHeartFx {
     f.x = x;
     f.y = y;
     f.z = z;
-    f.hx = heading.x;
-    f.hz = heading.z;
+    f.heading.x = heading.x;
+    f.heading.z = heading.z;
+  }
+
+  private hideFlight(f: FlightSlot): void {
+    f.shell.visible = false;
+    f.core.visible = false;
+    f.wind.visible = false;
+    f.halo.visible = false;
+    for (const g of f.ghosts) g.visible = false;
   }
 
   // ---- the frame --------------------------------------------------------------------------
@@ -671,6 +733,7 @@ export class BreathHeartFx {
   update(world: IWorld, dt: number): void {
     const h = this.h;
     const now = h.uTime.value;
+    this.heard = null;
     for (const k of this.knots) {
       const e = k.id >= 0 ? world.entities.get(k.id) : undefined;
       const of = e ? knotOf(e.templateId) : null;
@@ -686,10 +749,21 @@ export class BreathHeartFx {
         k.template = e.templateId;
         k.changedAt = now;
       }
-      const look = knotLook(liveFuse(of.fuse, now - k.changedAt));
+      const fuse = liveFuse(of.fuse, now - k.changedAt);
+      const look = knotLook(fuse);
       const held = of.state === 'held';
       const eAt = fxAnchor(e);
       const floor = h.groundY(eAt.x, eAt.z);
+      // The ball the sound hears: the one nearest its burst.
+      if (!this.heard || fuse < this.heard.fuse) {
+        const a = this.heardKnot;
+        a.x = eAt.x;
+        a.y = floor;
+        a.z = eAt.z;
+        a.held = held;
+        a.fuse = fuse;
+        this.heard = a;
+      }
       const y = floor + (held ? KNOT_CARRY_Y : KNOT_FLOAT_Y) + 0.15 * Math.sin(now * 3);
       const r = look.radius * (1 + 0.14 * look.throb * Math.sin(now * 14));
       k.crackle.value = look.crackle;
@@ -770,20 +844,44 @@ export class BreathHeartFx {
     // A throw going off into the void, trailing storm.
     for (const f of this.flights) {
       if (!f.live) {
-        f.mesh.visible = false;
+        this.hideFlight(f);
         continue;
       }
       const t = now - f.bornAt;
-      if (!throwOffset(t, { x: f.hx, z: f.hz }, this.offset)) {
+      const heading = f.heading;
+      if (!throwOffset(t, heading, this.offset)) {
         f.live = false;
-        f.mesh.visible = false;
+        this.hideFlight(f);
         continue;
       }
-      f.mesh.visible = true;
-      f.mesh.position.set(f.x + this.offset.x, f.y + this.offset.y, f.z + this.offset.z);
-      f.mesh.scale.setScalar(1 - (0.6 * t) / THROW_ARC.seconds);
+      const r = flightScale(t);
+      f.turn += FLIGHT_LOOK.spin * dt;
+      f.shell.position.set(f.x + this.offset.x, f.y + this.offset.y, f.z + this.offset.z);
+      f.shell.scale.setScalar(r);
+      f.core.position.copy(f.shell.position);
+      f.core.scale.setScalar(r);
+      f.wind.position.copy(f.shell.position);
+      f.wind.scale.setScalar(r);
+      f.wind.rotation.set(f.turn * 0.7, f.turn, f.turn * 0.4);
+      f.halo.position.copy(f.shell.position);
+      f.halo.scale.setScalar(r * FLIGHT_LOOK.halo);
+      f.shell.visible = true;
+      f.core.visible = true;
+      f.wind.visible = true;
+      f.halo.visible = true;
+      for (let g = 0; g < f.ghosts.length; g++) {
+        const ghost = f.ghosts[g];
+        const look = flightGhost(g);
+        if (!throwOffset(t - look.lag, heading, this.ghostAt)) {
+          ghost.visible = false;
+          continue;
+        }
+        ghost.position.set(f.x + this.ghostAt.x, f.y + this.ghostAt.y, f.z + this.ghostAt.z);
+        ghost.scale.setScalar(r * look.scale * 1.8);
+        ghost.visible = true;
+      }
       if (Math.floor(t * 30) !== Math.floor((t - dt) * 30))
-        this.puff(f.mesh.position.x, f.mesh.position.y, f.mesh.position.z, 2, 1.5, TINT.a, 0.6);
+        this.puff(f.shell.position.x, f.shell.position.y, f.shell.position.z, 2, 1.5, TINT.a, 0.6);
     }
     // The burst.
     const burst = burstLook(now - this.burstBorn);

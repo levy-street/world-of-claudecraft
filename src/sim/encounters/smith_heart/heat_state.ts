@@ -11,6 +11,7 @@ import type {
   HeatStage,
   HeatZoneState,
 } from './heat_ids';
+import type { SlainWatch } from './voice_slain';
 
 /** A bar the guardian runs for the fight. */
 export interface HeatBar {
@@ -74,6 +75,9 @@ export interface HeatSeed {
   x: number;
   z: number;
   life: number;
+  /** Seconds of its flight left (HEAT_TUNING.seedFlight at the throw): it
+   *  lands (the seed cue) when this runs out. */
+  flight: number;
 }
 
 /** A Wakefire band warning or burning. */
@@ -157,6 +161,8 @@ export interface HeatSprout {
 export interface HeatFightState {
   kind: 'heat';
   difficulty: HeatDifficulty;
+  /** The boss's pool before its tier's (tier_health.ts), given back at a reset. */
+  basePool?: number;
   /** The guardian has fallen and the end was resolved. */
   finished: boolean;
   /** Seconds since the pull. */
@@ -171,6 +177,10 @@ export interface HeatFightState {
   /** Breath after a bar before the next begins. */
   gap: number;
   fistTimer: number;
+  /** Seconds the due fist has waited out Wakefire (heat_fist.ts
+   *  wakefireHoldsFist): the next one comes that much sooner, so the
+   *  fight keeps its 22 s rhythm round the runs. */
+  fistHeld: number;
   fists: number;
   fist: HeatFist | null;
   swells: HeatSwell[];
@@ -206,4 +216,7 @@ export interface HeatFightState {
   casts: number;
   /** Lines said this pull: `<moment>` to the fight clock. */
   said: Record<string, number>;
+  /** The players seen dead this pull and the pull's deaths (the kill lines'
+   *  watch, voice_slain.ts). */
+  slain: SlainWatch;
 }

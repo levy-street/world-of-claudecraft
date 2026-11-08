@@ -36,6 +36,7 @@ import { heartMountainHeight } from '../src/render/smith_heart/heart_mountain_co
 import {
   HEART_ALTAR_PIECES,
   HEART_ALTAR_RISE,
+  HEART_ALTAR_RISE_HAMMER,
   HEART_KIT_KEELS,
   HEART_KIT_KINDS,
   HEART_KIT_OMIT_TOPS,
@@ -44,6 +45,7 @@ import {
   HEART_ROOT_LIFT,
   HEART_ROOT_OUT,
   heartAltarFrame,
+  heartAltarRise,
   heartBridgeYaw,
   heartRootFrame,
   heartRootPoint,
@@ -245,10 +247,10 @@ describe('Smith Heart Heart kit: the altars', () => {
         let top = 0;
         for (const [x, y, z] of points(piece)) {
           top = Math.max(top, y);
-          if (y > 0.3 && y < 3 / HEART_ALTAR_RISE)
+          if (y > 0.3 && y < 3 / heartAltarRise(vein))
             expect(Math.hypot(x, z), `${piece} at ${y.toFixed(2)}`).toBeLessThanOrEqual(3.12);
         }
-        expect(top * HEART_ALTAR_RISE, piece).toBeGreaterThan(9);
+        expect(top * heartAltarRise(vein), piece).toBeGreaterThan(9);
         expect(points(piece, 'KitGlow').length, piece).toBeGreaterThan(20);
       }
       // The Quench's under its mantle of ice.
@@ -294,7 +296,7 @@ describe('Smith Heart Heart kit: the plan', () => {
       expect(f.rot).toBeCloseTo(p.rot, 9);
       const [altar, root] = planHeartVeinPieces(vein);
       expect(altar.piece).toBe(HEART_ALTAR_PIECES[vein]);
-      expect(altar.rise).toBe(HEART_ALTAR_RISE);
+      expect(altar.rise).toBe(vein === 'hammer' ? HEART_ALTAR_RISE_HAMMER : HEART_ALTAR_RISE);
       expect(root.piece).toBe('Kit_HeartRoot');
       // Phase 2M: the root stands behind the altar, out of its landmark
       // (straight out, but the Hammer's, turned to where the crown stands).

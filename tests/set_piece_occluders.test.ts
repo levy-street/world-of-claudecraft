@@ -528,6 +528,9 @@ describe('everything a player acts on draws below the set piece veil', () => {
     'src/render/spore_burst_visual.ts': /depthTest: false/,
     'src/render/underwater.ts': /depthTest: false/,
     'src/render/drowned_temple/temple_dazzle_veil.ts': /depthTest: false/,
+    // The Smith's Heart's indrawn-breath wind streaks: a clip-space screen
+    // overlay (capped at 60 percent so the floor and its marks still read).
+    'src/render/smith_heart_fx/breath_roar_fx.ts': /depthTest: false/,
   };
 
   function renderSources(dir: string, out: string[] = []): string[] {

@@ -7,6 +7,7 @@ import type { SmithHeartVein } from '../../content/smith_heart_layout';
 import type { HeartQuarterZone } from '../../content/smith_heart_quarters';
 import type { FinalDifficulty, FinalPoolKind } from './final_ids';
 import type { FinalStage } from './final_phase_ids';
+import type { FinalVoiceWatch } from './final_voice';
 
 /** A bar in flight on the boss. */
 export interface FinalBar {
@@ -221,6 +222,8 @@ export interface FinalPhaseState {
 export interface FinalFightState {
   kind: 'final';
   difficulty: FinalDifficulty;
+  /** The boss's pool before its tier's (tier_health.ts), given back at a reset. */
+  basePool?: number;
   finished: boolean;
   clock: number;
   /** The zone the boss stands in now. */
@@ -279,4 +282,6 @@ export interface FinalFightState {
   cleaveSeen: number;
   /** Part 2: the intermissions and the final phase. */
   phase: FinalPhaseState;
+  /** What its voice last saw of the fight (final_voice.ts). */
+  voice: FinalVoiceWatch;
 }

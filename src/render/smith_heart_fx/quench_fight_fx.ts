@@ -219,7 +219,7 @@ varying vec3 vP;
 void main() {
   float r = length(vXY);
   if (r > 1.0) discard;
-  float glow = pow(1.0 - r, 1.6);
+  float glow = pow(max(1.0 - r, 0.0), 1.6);
   float flick = 0.85 + 0.15 * sin(uTime * 5.0 + vP.z * 40.0);
   gl_FragColor = vec4(uWarm * glow * vP.x * flick, glow * vP.x);
   #include <colorspace_fragment>
@@ -263,7 +263,7 @@ void main() {
   vec2 q = vec2(a * 2.0, vL.y * 4.0 - uTime * 1.2);
   float churn = n(q + vP.z * 9.0);
   float foam = smoothstep(0.62, 0.9, n(q * 2.0 + vec2(uTime * 0.5, 0.0))) * smoothstep(0.55, 0.95, vL.y);
-  float fres = pow(1.0 - abs(dot(normalize(vN), normalize(vV))), 1.5);
+  float fres = pow(max(1.0 - abs(dot(normalize(vN), normalize(vV))), 0.0), 1.5);
   vec3 col = mix(uDeep, uLit, churn * 0.6 + fres * 0.3);
   col = mix(col, uFoam, foam);
   float top = 1.0 - smoothstep(0.85, 1.0, vL.y);
@@ -930,18 +930,23 @@ export class QuenchFightFx {
     this.holes.visible = h > 0;
     if (this.holes.instanceColor) this.holes.instanceColor.needsUpdate = true;
     // The slashes' lines, each from its blade along its facing.
-    for (const l of this.lanes) {
+    for (let li = 0; li < this.lanes.length; li++) {
+      const l = this.lanes[li];
       const lane = l.id >= 0 ? world.entities.get(l.id) : undefined;
       const lof = lane ? laneOf(lane.templateId) : null;
       if (!lane || !lof || lof.state !== 'warn') {
         l.lane.group.visible = false;
+        if (!lane) this.audio.noLine(li);
         continue;
       }
+      // Its warning as it is drawn and its lock, at the blade (the sound's).
+      const ly = this.groundY(lane.pos.x, lane.pos.z);
+      this.audio.line(li, l.id, lane.pos.x, ly, lane.pos.z, this.clock - l.born, lof.seconds);
       this.kit.drapeLane(
         l.lane,
         this.groundY,
         lane.pos.x,
-        this.groundY(lane.pos.x, lane.pos.z),
+        ly,
         lane.pos.z,
         lane.facing,
         lof.length,
@@ -1336,6 +1341,7 @@ export class QuenchFightFx {
   dispose(): void {
     if (this.disposed) return;
     this.disposed = true;
+    this.audio.dispose();
     this.root.removeFromParent();
     this.particles.dispose();
     this.frost.dispose();

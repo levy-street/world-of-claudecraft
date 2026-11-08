@@ -2,8 +2,7 @@
 // smith_heart.md section 7.4): yells to every player near the Hearth,
 // carrying their catalog key (`hudChrome.heatGuardian.say.<moment>`) so the
 // client renders them through t(), with the English as the fallback and as
-// the key a future voice clip is found by. The voices are auditions still to
-// come.
+// the key its voice clip is found by (scripts/voices/smith_heart_voice_pack.mjs).
 //
 //   pull       the pull
 //   fist       Basalt Fist (at most once in SAY_EVERY)
@@ -14,6 +13,9 @@
 //   seeds      the Hearthseeds fall (at most once in SAY_EVERY)
 //   zones      Wakefire's first run
 //   cinder     a Rolling Cinder falls (at most once in SAY_EVERY)
+//   wheel      mythic's Wheel of the Hearth (at most once in SAY_EVERY)
+//   slay_*     a player falls: its three kill lines in turn, at most one in
+//              SLAY_EVERY (voice_slain.ts)
 //   wipe       the raid lies still in the Hearth
 //   death      its fall
 //
@@ -22,6 +24,7 @@
 import type { Entity } from '../../types';
 import type { HeatScope } from './heat_scope';
 import { hearthListeners } from './heat_scope';
+import { isSlayMoment, SLAY_EVERY, slayMoment, watchSlain } from './voice_slain';
 
 export type HeatMoment =
   | 'pull'
@@ -33,6 +36,10 @@ export type HeatMoment =
   | 'seeds'
   | 'zones'
   | 'cinder'
+  | 'wheel'
+  | 'slay_a'
+  | 'slay_b'
+  | 'slay_c'
   | 'wipe'
   | 'death';
 
@@ -48,6 +55,10 @@ export const HEAT_LINES: Readonly<Record<HeatMoment, string>> = {
   seeds: 'Every spark I scatter takes root.',
   zones: 'The Hearth wakes beneath your feet.',
   cinder: 'Run, little ember. The flame is hungry.',
+  wheel: 'The Hearth turns! Keep pace with it, or burn!',
+  slay_a: 'Another spark goes home to the flame.',
+  slay_b: 'Burned clean.',
+  slay_c: 'The first flame takes its due.',
   wipe: 'Ash, all of you. The Hearth burns on.',
   death: 'The flame... sinks back... into the stone. Carry it well.',
 };
@@ -60,7 +71,7 @@ export function heatLineKey(moment: HeatMoment): string {
 /** Seconds between two of the repeating lines. */
 export const HEAT_SAY_EVERY = 45;
 
-const REPEATING: ReadonlySet<HeatMoment> = new Set(['fist', 'rise', 'seeds', 'cinder']);
+const REPEATING: ReadonlySet<HeatMoment> = new Set(['fist', 'rise', 'seeds', 'cinder', 'wheel']);
 
 /**
  * The guardian (embodied by `from`) says its `moment` line, if it may now.
@@ -71,11 +82,14 @@ export function heatSay(
   from: Entity,
   moment: HeatMoment,
 ): boolean {
-  const said = s.st.said[moment];
-  if (REPEATING.has(moment)) {
+  const tag = isSlayMoment(moment) ? 'slay' : moment;
+  const said = s.st.said[tag];
+  if (isSlayMoment(moment)) {
+    if (said !== undefined && s.st.clock - said < SLAY_EVERY - 1e-9) return false;
+  } else if (REPEATING.has(moment)) {
     if (said !== undefined && s.st.clock - said < HEAT_SAY_EVERY - 1e-9) return false;
   } else if (said !== undefined) return false;
-  s.st.said[moment] = s.st.clock;
+  s.st.said[tag] = s.st.clock;
   for (const p of hearthListeners(s.ctx, s.inst)) {
     s.ctx.emit({
       type: 'chat',
@@ -89,4 +103,11 @@ export function heatSay(
     });
   }
   return true;
+}
+
+/** Watch the Hearth for a player's fall (called every tick of the fight):
+ *  the guardian says its kill lines in turn. */
+export function watchHeatSlain(s: Pick<HeatScope, 'ctx' | 'inst' | 'st' | 'boss'>): void {
+  if (watchSlain(s.st.slain, hearthListeners(s.ctx, s.inst)) === 0) return;
+  heatSay(s, s.boss, slayMoment(s.st.slain.kills, 3));
 }

@@ -55,6 +55,8 @@ export class HeartOverloadPanel {
     if (!el || !slots) return;
     w.setDisplay(el, 'flex');
     w.setAttr(el, 'aria-label', view.groupAria);
+    // The quarter it drinks, in text too (colour alone never carries state).
+    w.setAttr(el, 'aria-description', view.activeAria);
     w.setText(slots.title, view.title);
     w.toggleClass(el, 'is-frozen', view.frozen);
     w.toggleClass(el, 'is-off', view.barsOff);
@@ -62,10 +64,11 @@ export class HeartOverloadPanel {
       const s = slots.rows[i];
       if (!s) return;
       w.toggleClass(s.row, 'is-active', r.active);
+      w.setAttr(s.row, 'aria-current', r.active ? 'true' : 'false');
       w.toggleClass(s.row, 'is-danger', r.danger);
       w.toggleClass(s.row, 'is-awake', r.awake);
       w.setText(s.label, r.label);
-      w.setText(s.pct, `${r.pct}%`);
+      w.setText(s.pct, r.pctText);
       w.setWidth(s.fill, `${r.pct}%`);
       w.setAttr(s.bar, 'aria-valuenow', String(r.pct));
       w.setAttr(s.bar, 'aria-valuetext', r.aria);

@@ -441,8 +441,20 @@ export function heartKitMeshes(
   return group;
 }
 
+/** The live renderer's compile gate (rift_death_zone.ts lends it), so a kit
+ *  that lands after its room is shown uploads its merged geometry as one
+ *  budgeted unit on the GPU queue, never inside a live frame. */
+type HeartKitCompileGate = (target: THREE.Object3D) => Promise<unknown>;
+let kitCompileGate: HeartKitCompileGate | null = null;
+
+/** Lend (or, with null, take back) the live compile gate. */
+export function setHeartKitCompileGate(gate: HeartKitCompileGate | null): void {
+  kitCompileGate = gate;
+}
+
 /** Swap a group built before a kit landed for the kit's build the moment it
- *  lands (same materials, so no new program). `build` rebuilds it. */
+ *  lands (same materials, so no new program). `build` rebuilds it; the new
+ *  build waits hidden behind the compile gate before it swaps in. */
 export function upgradeWhenHeartKitLands(
   url: string,
   group: THREE.Object3D,
@@ -457,10 +469,31 @@ export function upgradeWhenHeartKitLands(
     let root: THREE.Object3D = parent;
     while (root.parent) root = root.parent;
     if (!(root as THREE.Scene).isScene) return;
-    parent.add(build());
-    group.removeFromParent();
-    group.traverse((o) => {
-      if (o instanceof THREE.InstancedMesh) o.dispose();
-    });
+    const next = build();
+    const swap = (): void => {
+      group.removeFromParent();
+      group.traverse((o) => {
+        if (o instanceof THREE.InstancedMesh) o.dispose();
+      });
+    };
+    const gate = kitCompileGate;
+    if (!gate) {
+      parent.add(next);
+      swap();
+      return;
+    }
+    next.visible = false;
+    parent.add(next);
+    void gate(next)
+      .catch(() => {})
+      .then(() => {
+        // A room retired while the gate ran takes its staged build with it.
+        if (!next.parent || !group.parent) {
+          next.removeFromParent();
+          return;
+        }
+        next.visible = true;
+        swap();
+      });
   });
 }

@@ -49,7 +49,12 @@ import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { sharedUniforms } from '../gfx';
 import { type HeartAirV3, type HeartAirV4, heartQuadGeometry } from './heart_air_quads';
 import { buildHeartCollapse } from './heart_collapse';
-import { heartCollapseView, heartHornT, heartLandmarkFall } from './heart_collapse_core';
+import {
+  heartCollapseView,
+  heartHornT,
+  heartLandmarkFall,
+  heartRootFall,
+} from './heart_collapse_core';
 import type { HeartFallAltar } from './heart_collapse_rig';
 import { heartFloorMaterial, setHeartFloorQuarter } from './heart_floor';
 import {
@@ -342,6 +347,7 @@ const _hornMoved = new THREE.Vector3();
 export function buildHeartQuarters(
   lowGfx: boolean,
   altars: (vein: SmithHeartVein) => HeartFallAltar | null,
+  roots: (vein: SmithHeartVein) => HeartFallAltar | null = () => null,
 ): HeartQuarters {
   const group = new THREE.Group();
   group.name = 'smithHeartQuarters';
@@ -928,6 +934,18 @@ export function buildHeartQuarters(
         );
         const lf = heartLandmarkFall(fallT);
         landmarks.topple(vein, lf.tilt, lf.drop, lf.gone);
+        // Its root tears out of the crown after it (never left hanging).
+        const root = roots(vein);
+        if (root) {
+          const rf = heartRootFall(fallT);
+          if (root.holder.visible === rf.gone) root.holder.visible = !rf.gone;
+          if (!rf.gone && rf.drop !== (root.holder.userData.fallDrop ?? 0)) {
+            root.holder.userData.fallDrop = rf.drop;
+            root.holder.matrix.copy(root.rest);
+            root.holder.matrix.elements[13] -= rf.drop;
+            root.holder.matrixWorldNeedsUpdate = true;
+          }
+        }
       }
       for (let k = 0; k < 4; k++) {
         const [va, vb] = heartRidgeNeighbours(k);

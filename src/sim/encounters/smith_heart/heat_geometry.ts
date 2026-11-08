@@ -140,7 +140,9 @@ export function swellBearings(spot: HPoint): [number, number, number] {
 }
 
 /** Is (x, z) in a wave's wall: `front` yards down its lane, the wall
- *  `T.waveDepth` deep behind it? */
+ *  `T.waveDepth` deep behind it, never behind the lane's start (a wave just
+ *  out of the spot is shallower: it rises out of the crater, so it never
+ *  strikes back past the spot, where the drawn wall does not stand)? */
 export function inWave(
   ox: number,
   oz: number,
@@ -150,7 +152,9 @@ export function inWave(
   z: number,
 ): boolean {
   const f = laneFrame(ox, oz, facing, x, z);
-  return f.across <= T.laneHalf && f.along <= front && f.along >= front - T.waveDepth;
+  return (
+    f.across <= T.laneHalf && f.along >= 0 && f.along <= front && f.along >= front - T.waveDepth
+  );
 }
 
 /** The nearest body to `from` within `range` (the lower id on a tie), or
@@ -174,18 +178,22 @@ export function nearestInReach(
 
 // ---- the posts ------------------------------------------------------------------------
 
-/** Where the Wellspawn climb out at the room's edge (heroic's overflows). */
+/** Where the Wellspawn climb out at the room's edge (heroic's overflows):
+ *  kept on the floor's edge; the well's middle moved 4 yd toward them in
+ *  pass 4, so their feeding reach is measured from the grown lip and the
+ *  walk stays within a few yards of the first pass's. */
 export const WELLSPAWN_SPOTS: readonly HPoint[] = [
-  { x: -178, z: -16 },
-  { x: -178, z: 16 },
-  { x: -198, z: -42 },
-  { x: -198, z: 42 },
+  { x: -175, z: -21 },
+  { x: -175, z: 21 },
+  { x: -194, z: -42.5 },
+  { x: -194, z: 42.5 },
 ];
 
-/** Where heroic's second overflow raises its two Wellkeepers. */
+/** Where heroic's second overflow raises its two Wellkeepers (as far past
+ *  the grown lip as they stood past the first). */
 export const WELLKEEPER_SPOTS: readonly HPoint[] = [
-  { x: -206, z: -16 },
-  { x: -206, z: 16 },
+  { x: -201, z: -17 },
+  { x: -201, z: 17 },
 ];
 
 /** The shore's points (a 6-yard lattice on the floor east of the
