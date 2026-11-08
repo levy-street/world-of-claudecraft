@@ -19103,7 +19103,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.hubLesson.openTabDamage': 'Ouvrez l’onglet Dégâts.',
   'hudChrome.hubLesson.openTabHealing': 'Ouvrez l’onglet Soins.',
   'hudChrome.hubLesson.openWindow': 'Ouvrir {meters}.',
-  'hudChrome.hubLesson.openWindowTouch': 'Ouvrir {menu} → {more} → {meters}.',
+  'hudChrome.hubLesson.openWindowTouch': 'Ouvrir {menu} → {meters}.',
   'hudChrome.hubLesson.readRow': 'Lisez votre ligne, puis appuyez sur Continuer.',
   'hudChrome.hubLesson.readRowDamage':
     'Le total regroupe tous vos dégâts de cette session. Le DPS est le nombre de dégâts par seconde sur la session. Regardez votre ligne, puis continuez.',

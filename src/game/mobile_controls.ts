@@ -337,7 +337,7 @@ export class MobileControls {
   private chatPressTimer: ReturnType<typeof setTimeout> | null = null;
   private chatLongFired = false;
   private chromeFade: ChromeFadeHandle | null = null;
-  /** The touch menu control (the collapsed five-button row), built at start(). */
+  /** The touch menu control, built at start(). */
   private menuControl: MobileMenuControl | null = null;
 
   private canvas = document.getElementById('game-canvas') as HTMLElement | null;
@@ -501,7 +501,9 @@ export class MobileControls {
       if (
         target &&
         typeof target.closest === 'function' &&
-        (target.closest('#mobile-extra-controls') || target.closest('#mobile-more'))
+        (target.closest('#mobile-extra-controls') ||
+          target.closest('#mobile-more') ||
+          target.closest('#mobile-menu-anchor'))
       )
         return;
       this.closeMoreModal();
@@ -528,7 +530,12 @@ export class MobileControls {
     this.bindButton('mobile-menu-bags', () => this.callbacks.onBags());
     this.bindButton('mobile-menu-char', () => this.callbacks.onCharacter());
     this.bindButton('mobile-menu-spellbook', () => this.callbacks.onSpellbook());
-    this.menuControl = buildMobileMenuControl();
+    this.menuControl = buildMobileMenuControl({
+      onAnchorActivate: () => {
+        triggerHaptic(HAPTIC_TAP, this.hapticsOn);
+        this.toggleMoreModal();
+      },
+    });
     this.bindButton('mobile-discord', () => this.callbacks.onDiscord());
     this.bindButton('mobile-donate', () => this.callbacks.onDonate());
     this.bindButton('mobile-wiki', () => this.callbacks.onWiki());
@@ -542,6 +549,12 @@ export class MobileControls {
     this.bindButton('mobile-crafting', () => this.callbacks.onCrafting());
     this.bindButton('mobile-spellbook', () => this.callbacks.onSpellbook());
     this.bindButton('mobile-bar-editor', () => this.callbacks.onBarEditor());
+    // The tray also carries the strip's Settings, Quest Log, and Social entries,
+    // so every action the touch ring offers on either utility page is reachable
+    // from More too. Each routes to the same callback its strip twin uses.
+    this.bindButton('mobile-tray-settings', () => this.callbacks.onMenu());
+    this.bindButton('mobile-tray-quest', () => this.callbacks.onQuestLog());
+    this.bindButton('mobile-tray-social', () => this.callbacks.onSocial());
     this.bindButton('mobile-talents', () => this.callbacks.onTalents());
     this.bindButton('mobile-map', () => this.callbacks.onMap());
     this.bindButton('mobile-leaderboard', () => this.callbacks.onLeaderboard());
@@ -565,26 +578,7 @@ export class MobileControls {
       musicBtn?.classList.toggle('mm-muted', !on);
     });
     this.bindHapticsToggle('mobile-haptics');
-    this.bindButton('mobile-more', () => {
-      const open = !document.body.classList.contains('mobile-more-open');
-      if (!open) {
-        this.closeMoreModal();
-        return;
-      }
-      this.root?.classList.add('expanded');
-      document.body.classList.add('mobile-more-open');
-      if (open) {
-        const modal = document.getElementById('mobile-extra-controls');
-        if (modal) {
-          modal.style.left = '50%';
-          modal.style.top = '50%';
-          modal.style.right = 'auto';
-          modal.style.bottom = 'auto';
-          modal.style.transform = 'translate(-50%, -50%)';
-          delete modal.dataset.windowMoved;
-        }
-      }
-    });
+    this.bindButton('mobile-more', () => this.toggleMoreModal());
   }
 
   private setActive(active: boolean): void {
@@ -682,6 +676,23 @@ export class MobileControls {
   private closeMoreModal(): void {
     document.getElementById('mobile-controls')?.classList.remove('expanded');
     document.body.classList.remove('mobile-more-open');
+  }
+
+  private toggleMoreModal(): void {
+    if (document.body.classList.contains('mobile-more-open')) {
+      this.closeMoreModal();
+      return;
+    }
+    this.root?.classList.add('expanded');
+    document.body.classList.add('mobile-more-open');
+    const modal = document.getElementById('mobile-extra-controls');
+    if (!modal) return;
+    modal.style.left = '50%';
+    modal.style.top = '50%';
+    modal.style.right = 'auto';
+    modal.style.bottom = 'auto';
+    modal.style.transform = 'translate(-50%, -50%)';
+    delete modal.dataset.windowMoved;
   }
 
   /** The haptics button is a stateful toggle, so it bypasses bindButton (no tray

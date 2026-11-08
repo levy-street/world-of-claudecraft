@@ -18930,7 +18930,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.hubLesson.openTabDamage': 'Przełącz na kartę Obrażenia.',
   'hudChrome.hubLesson.openTabHealing': 'Przełącz na kartę Leczenie.',
   'hudChrome.hubLesson.openWindow': 'Otwórz {meters}.',
-  'hudChrome.hubLesson.openWindowTouch': 'Otwórz {menu}, potem {more}, potem {meters}.',
+  'hudChrome.hubLesson.openWindowTouch': 'Otwórz {menu}, potem {meters}.',
   'hudChrome.hubLesson.readRow': 'Przeczytaj swój wiersz, a potem naciśnij Kontynuuj.',
   'hudChrome.hubLesson.readRowDamage':
     'Łącznie to wszystkie twoje obrażenia w tym biegu. DPS to obrażenia na sekundę biegu. Obserwuj swój wiersz, potem Kontynuuj.',

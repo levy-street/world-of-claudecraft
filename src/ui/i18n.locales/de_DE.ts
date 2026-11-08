@@ -19199,7 +19199,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.hubLesson.openTabDamage': 'Wechsle zum Reiter Schaden.',
   'hudChrome.hubLesson.openTabHealing': 'Wechsle zum Reiter Heilung.',
   'hudChrome.hubLesson.openWindow': 'Öffne {meters}.',
-  'hudChrome.hubLesson.openWindowTouch': 'Öffne {menu} → {more} → {meters}.',
+  'hudChrome.hubLesson.openWindowTouch': 'Öffne {menu} → {meters}.',
   'hudChrome.hubLesson.readRow': 'Lies deine Zeile und drücke dann Fortfahren.',
   'hudChrome.hubLesson.readRowDamage':
     'Gesamt ist dein gesamter Schaden in diesem Lauf. DPS ist der Schaden pro Sekunde über den Lauf. Sieh deine Zeile an und drücke dann Fortfahren.',

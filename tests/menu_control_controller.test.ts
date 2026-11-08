@@ -1,17 +1,9 @@
 // @vitest-environment happy-dom
-// Quick Actions' build wiring, and the one thing about it that a gesture test
-// cannot see: the anchor's ACCESSIBLE NAME depends on the MODE.
-//
-// The static name teaches the gesture, because a touch device has no hover to
-// discover it with. Under settings.touchTapMenus the row is opened and chosen
-// from with separate taps, so that sentence teaches a screen-reader user
-// something the control does not do; nothing rewrote it when the setting
-// flipped. The name is re-resolved on the settings broadcast and again after a
-// language switch, since the shell's own translatePage() pass re-stamps the
-// gesture-mode name from data-i18n-aria on every locale change.
+// Quick Actions' build wiring: ordinary activation routes to the More dialog,
+// while the strip remains available through its touch gesture.
 
-import { beforeEach, describe, expect, it } from 'vitest';
-import { SETTINGS_CHANGE_EVENT, Settings } from '../src/game/settings';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { Settings } from '../src/game/settings';
 import {
   buildMobileMenuControl,
   type MobileMenuControl,
@@ -20,8 +12,7 @@ import { MENU_STRIP_ITEMS } from '../src/ui/hud/menu/menu_strip_core';
 import { t } from '../src/ui/i18n';
 import { bindTouchTap } from '../src/ui/touch_tap';
 
-const GESTURE_NAME = t('hudChrome.mobile.quickActionsAria');
-const TAP_NAME = t('hudChrome.mobile.quickActionsAriaTap');
+const ACTIONS_NAME = t('hudChrome.mobile.quickActions');
 
 function mount(): HTMLButtonElement {
   document.body.replaceChildren();
@@ -30,7 +21,7 @@ function mount(): HTMLButtonElement {
   anchor.id = 'mobile-menu-anchor';
   anchor.setAttribute('aria-expanded', 'false');
   // What the shell's data-i18n-aria pass leaves on the element at boot.
-  anchor.setAttribute('aria-label', GESTURE_NAME);
+  anchor.setAttribute('aria-label', ACTIONS_NAME);
   const strip = document.createElement('div');
   strip.id = 'mobile-menu-strip';
   const cancel = document.createElement('button');
@@ -59,37 +50,18 @@ beforeEach(() => {
   setTapMenus(false);
 });
 
-describe('buildMobileMenuControl: the anchor name follows the mode', () => {
-  it('teaches the gesture with the setting off', () => {
+describe('buildMobileMenuControl: ordinary activation opens More', () => {
+  it('uses the localized Quick Actions name', () => {
     const anchor = mount();
     expect(buildMobileMenuControl()).not.toBeNull();
-    expect(anchor.getAttribute('aria-label')).toBe(GESTURE_NAME);
-    expect(GESTURE_NAME).toContain('swipe');
+    expect(anchor.getAttribute('aria-label')).toBe(ACTIONS_NAME);
   });
 
-  it('swaps to the tap-mode name the moment the options row flips', () => {
+  it('keeps an accurate name when touch tap menus are enabled', () => {
     const anchor = mount();
     expect(buildMobileMenuControl()).not.toBeNull();
     setTapMenus(true);
-    expect(anchor.getAttribute('aria-label')).toBe(TAP_NAME);
-    // The gesture sentence is what was wrong under tap mode: there is no swipe
-    // there, the row is opened and chosen from with separate taps.
-    expect(TAP_NAME).not.toBe(GESTURE_NAME);
-    expect(TAP_NAME).not.toContain('swipe');
-
-    setTapMenus(false);
-    expect(anchor.getAttribute('aria-label')).toBe(GESTURE_NAME);
-  });
-
-  it('re-applies the tap-mode name after the shell re-stamps it on a locale switch', () => {
-    const anchor = mount();
-    expect(buildMobileMenuControl()).not.toBeNull();
-    setTapMenus(true);
-    // translatePage() writes data-i18n-aria straight onto the element, outside
-    // any facet, so the correction must not be elided away.
-    anchor.setAttribute('aria-label', GESTURE_NAME);
-    document.dispatchEvent(new CustomEvent('woc:languagechange'));
-    expect(anchor.getAttribute('aria-label')).toBe(TAP_NAME);
+    expect(anchor.getAttribute('aria-label')).toBe(ACTIONS_NAME);
   });
 
   it('builds nothing when the markup is absent, and touches no name', () => {
@@ -97,9 +69,7 @@ describe('buildMobileMenuControl: the anchor name follows the mode', () => {
     expect(buildMobileMenuControl()).toBeNull();
   });
 
-  it('takes no default-action callback: the control runs no action of its own', () => {
-    // It used to be handed MobileControls' chat toggle. Chat is a strip item
-    // now, so a bare tap opens the row and there is nothing left to hand down.
+  it('opens the sticky strip when no ordinary-activation callback is supplied', () => {
     const anchor = mount();
     const control = buildMobileMenuControl();
     expect(control).not.toBeNull();
@@ -119,6 +89,64 @@ describe('buildMobileMenuControl: the anchor name follows the mode', () => {
     expect(anchor.getAttribute('aria-expanded')).toBe('true');
   });
 
+  it('activates the More dialog directly on a touch tap without opening the strip', () => {
+    const anchor = mount();
+    const onAnchorActivate = vi.fn();
+    const control = buildMobileMenuControl({ onAnchorActivate });
+    const pointer = (type: string): Event => {
+      const event = new Event(type, { bubbles: true }) as PointerEvent;
+      Object.defineProperties(event, {
+        pointerType: { value: 'touch' },
+        pointerId: { value: 3 },
+        clientX: { value: 100 },
+        clientY: { value: 100 },
+      });
+      return event;
+    };
+
+    anchor.dispatchEvent(pointer('pointerdown'));
+    anchor.dispatchEvent(pointer('pointerup'));
+    anchor.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+    expect(onAnchorActivate).toHaveBeenCalledTimes(1);
+    expect(control?.gesture.isOpen()).toBe(false);
+  });
+
+  it('routes assistive activation through the More dialog toggle', () => {
+    const anchor = mount();
+    const onAnchorActivate = vi.fn();
+    const control = buildMobileMenuControl({ onAnchorActivate });
+
+    anchor.click();
+
+    expect(onAnchorActivate).toHaveBeenCalledTimes(1);
+    expect(control?.gesture.isOpen()).toBe(false);
+  });
+
+  it('routes touch-tap-menu activation through the More dialog toggle', () => {
+    const anchor = mount();
+    const onAnchorActivate = vi.fn();
+    const control = buildMobileMenuControl({ onAnchorActivate });
+    setTapMenus(true);
+    const pointer = (type: string): Event => {
+      const event = new Event(type, { bubbles: true }) as PointerEvent;
+      Object.defineProperties(event, {
+        pointerType: { value: 'touch' },
+        pointerId: { value: 4 },
+        clientX: { value: 100 },
+        clientY: { value: 100 },
+      });
+      return event;
+    };
+
+    anchor.dispatchEvent(pointer('pointerdown'));
+    anchor.dispatchEvent(pointer('pointerup'));
+    anchor.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+    expect(onAnchorActivate).toHaveBeenCalledTimes(1);
+    expect(control?.gesture.isOpen()).toBe(false);
+  });
+
   it('leaves the anchor open state to the gesture layer, starting closed', () => {
     const anchor = mount();
     const control = buildMobileMenuControl();
@@ -127,15 +155,6 @@ describe('buildMobileMenuControl: the anchor name follows the mode', () => {
     expect(anchor.getAttribute('aria-expanded')).toBe('true');
     control?.gesture.closeSticky();
     expect(anchor.getAttribute('aria-expanded')).toBe('false');
-  });
-});
-
-describe('buildMobileMenuControl: the settings broadcast is the only invalidation', () => {
-  it('answers a bare broadcast without a build having gone stale', () => {
-    const anchor = mount();
-    expect(buildMobileMenuControl()).not.toBeNull();
-    window.dispatchEvent(new Event(SETTINGS_CHANGE_EVENT));
-    expect(anchor.getAttribute('aria-label')).toBe(GESTURE_NAME);
   });
 });
 

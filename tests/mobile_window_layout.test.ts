@@ -403,6 +403,17 @@ describe('mobile window layout CSS', () => {
     expect(indicator?.[1]).toContain('white-space: nowrap;');
     expect(indicator?.[1]).toContain('overflow: hidden;');
     expect(indicator?.[1]).toContain('text-overflow: ellipsis;');
+
+    const utilityToggle = mobileCss.match(
+      /body\.mobile-touch #mobile-utility-page-toggle \{([^}]*)\}/,
+    );
+    expect(utilityToggle?.[1]).toContain('overflow: hidden;');
+    const utilityIndicator = mobileCss.match(
+      /body\.mobile-touch #mobile-utility-page-toggle \.mobile-action-page-indicator \{([^}]*)\}/,
+    );
+    expect(utilityIndicator?.[1]).toContain('white-space: nowrap;');
+    expect(utilityIndicator?.[1]).toContain('overflow: hidden;');
+    expect(utilityIndicator?.[1]).toContain('text-overflow: ellipsis;');
   });
 
   it('resets height on every mobile rule that pins BOTH the top and the bottom edge', () => {

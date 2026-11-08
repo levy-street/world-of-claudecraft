@@ -19007,7 +19007,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.hubLesson.openTabDamage': 'Schakel naar het tabblad Schade.',
   'hudChrome.hubLesson.openTabHealing': 'Schakel naar het tabblad Genezing.',
   'hudChrome.hubLesson.openWindow': 'Open {meters}.',
-  'hudChrome.hubLesson.openWindowTouch': 'Open {menu} → {more} → {meters}.',
+  'hudChrome.hubLesson.openWindowTouch': 'Open {menu} → {meters}.',
   'hudChrome.hubLesson.readRow': 'Lees je rij en druk daarna op Doorgaan.',
   'hudChrome.hubLesson.readRowDamage':
     'Totaal is al je schade in deze sessie. DPS is schade per seconde over de sessie. Bekijk je rij en druk daarna op Doorgaan.',

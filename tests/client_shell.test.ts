@@ -744,7 +744,7 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).toContain(
       'body.mobile-touch.mobile-chat-open #chatlog-wrap,\n  body.mobile-touch.mobile-chat-open #chatlog-tabs,\n  body.mobile-touch.mobile-chat-open #chat-input,\n  body.mobile-touch.mobile-chat-open #mobile-menu-anchor {\n    opacity: 1;',
     );
-    // The menu control (whose tap opens chat) is itself #mobile-combat-controls
+    // The Actions menu control is itself #mobile-combat-controls
     // .mobile-btn, so its full-contrast pin must OUT-SPECIFY the idle fade. The fade
     // carries ONE id (#mobile-combat-controls); the pin carries TWO
     // (#mobile-combat-controls #mobile-menu-anchor), so opacity 1 wins while chat is
@@ -1538,12 +1538,73 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).not.toContain('.mobile-action-slot.drop-target');
   });
 
+  it('leads the More tray with Settings, Edit Bars, Quest Log, Social, and Chat in both entries', () => {
+    // The tray is the complete utility surface: every action the touch ring
+    // offers on either page has a tray twin, led by the setup and social
+    // entries a player looks for first. The three new entries reuse the
+    // catalog keys the strip already localizes, so no new strings ship.
+    for (const [name, entry] of [
+      ['index.html', html],
+      ['play.html', playHtml],
+    ] as const) {
+      const gridStart = entry.indexOf('<div id="mobile-extra-grid">');
+      const gridEnd = entry.indexOf('</div>', gridStart);
+      expect(gridStart, name).toBeGreaterThan(-1);
+      const grid = entry.slice(gridStart, gridEnd);
+      const order = [
+        'id="mobile-tray-settings"',
+        'id="mobile-bar-editor"',
+        'id="mobile-tray-quest"',
+        'id="mobile-tray-social"',
+        'id="mobile-chat"',
+      ];
+      let previous = -1;
+      for (const id of order) {
+        const at = grid.indexOf(id);
+        expect(at, `${name}: ${id} missing or out of order in the More tray`).toBeGreaterThan(
+          previous,
+        );
+        previous = at;
+      }
+      // Labels come from the existing catalog keys, never new literals.
+      expect(grid, name).toContain('data-i18n="hud.core.mobileSettings">Settings<');
+      expect(grid, name).toContain('data-i18n="questUi.log.title">Quest Log<');
+      expect(grid, name).toContain('data-i18n="hud.core.mobileSocial">Social<');
+      // Every utility action on either ring page has a tray twin.
+      for (const id of [
+        'id="mobile-mounts"',
+        'id="mobile-map"',
+        'id="mobile-bags"',
+        'id="mobile-char"',
+        'id="mobile-chat"',
+        'id="mobile-tray-social"',
+        'id="mobile-dfinder"',
+        'id="mobile-spellbook"',
+        'id="mobile-crafting"',
+        'id="mobile-tray-quest"',
+      ]) {
+        expect(grid, `${name}: ${id} missing from the More tray`).toContain(id);
+      }
+    }
+    // The tray twins route to the same callbacks as the strip entries.
+    expect(mobileControlsTs).toContain(
+      "this.bindButton('mobile-tray-settings', () => this.callbacks.onMenu());",
+    );
+    expect(mobileControlsTs).toContain(
+      "this.bindButton('mobile-tray-quest', () => this.callbacks.onQuestLog());",
+    );
+    expect(mobileControlsTs).toContain(
+      "this.bindButton('mobile-tray-social', () => this.callbacks.onSocial());",
+    );
+  });
+
   it('carries identical mobile-action-ring markup in BOTH entries', () => {
     for (const entry of [html, playHtml]) {
       expect(entry).toContain('id="actionbar3"');
       expect(entry).toContain('id="mobile-action-ring"');
       expect(entry).toContain('id="mobile-action-attack"');
       expect(entry).toContain('id="mobile-action-page-toggle"');
+      expect(entry).toContain('id="mobile-utility-page-toggle"');
       // FOUR radial action buttons: each carries a centre tap plus 4 flick
       // directions, so 4 x 5 x 2 pages reaches all 33 configurable slots.
       const slotMatches = [
@@ -1552,6 +1613,40 @@ describe('client HTML shell', () => {
       expect(slotMatches).toHaveLength(4);
       const indices = slotMatches.map((m) => m[1]).sort();
       expect(indices).toEqual(['0', '1', '2', '3']);
+      const ring = entry.slice(
+        entry.indexOf('<div id="mobile-action-ring"'),
+        entry.indexOf('<div id="mobile-action-radial"'),
+      );
+      const utilitySlots = [
+        ...ring.matchAll(
+          /class="mobile-action-slot mobile-utility-action(?: mobile-ring-seat)?"[^>]*data-mobile-index="(\d)"/g,
+        ),
+      ];
+      expect(utilitySlots.map((match) => match[1])).toEqual(['0', '1', '2', '3', '4']);
+      expect(ring).toContain('id="mobile-utility-actions" role="group"');
+      expect(ring).toMatch(
+        /data-mobile-index="2" data-utility-slot="2" data-i18n-title="hud\.keybinds\.actions\.bags"/,
+      );
+      expect(ring).toMatch(
+        /data-mobile-index="3" data-utility-slot="3" data-i18n-title="hud\.keybinds\.actions\.char"/,
+      );
+      expect(ring).toMatch(
+        /data-mobile-index="4" data-utility-slot="4" data-i18n-title="questUi\.tracker\.title"/,
+      );
+      expect(ring).not.toContain('mobile-utility-action-label');
+      expect(ring).not.toContain('class="mobile-action-slot mobile-utility-action mobile-label"');
+      expect(ring).toContain(
+        'class="mobile-action-slot mobile-utility-action mobile-ring-seat" data-mobile-index="4" data-utility-slot="4"',
+      );
+      expect(ring).toContain('id="mobile-action-mode"');
+      // The switch shows the layout a tap leads to, so the static first paint
+      // (combat is the home layout) names Utility. It is a switch, not a
+      // state toggle, so no aria-pressed ships with it.
+      expect(ring).toContain('data-i18n="hudChrome.mobile.actionModeUtility">Utility</span>');
+      expect(ring).not.toContain('id="mobile-action-mode" aria-pressed');
+      // Utility mode reuses the same Interact control; there is no second copy
+      // whose click behavior could drift from the combat-layout handler.
+      expect(ring.match(/id="mobile-interact"/g)).toHaveLength(1);
       // The arc's fifth seat holds the consumables control (pinned in full by the
       // consumables test above); keeping it on the arc is what preserves the
       // equal-chord spacing and the measured thumb reach.
@@ -2419,8 +2514,9 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).toContain('flex-direction: row;');
     expect(hudMobileCss).toContain('body.mobile-touch #mobile-extra-controls .mobile-btn .ui-icon');
     expect(mobileControlsTs).toContain(
-      "const open = !document.body.classList.contains('mobile-more-open');",
+      "this.bindButton('mobile-more', () => this.toggleMoreModal());",
     );
+    expect(mobileControlsTs).toContain('private toggleMoreModal(): void {');
     expect(mobileControlsTs).toContain("this.root?.classList.add('expanded');");
     expect(mobileControlsTs).toContain("document.body.classList.add('mobile-more-open');");
     expect(mainTs).toContain('watchMobileMoreState(document.body, (open) => {');
@@ -2683,17 +2779,16 @@ describe('client HTML shell', () => {
         entry.indexOf('<div id="mobile-action-ring"'),
       );
       // ONE control where five buttons used to be. It wears the OVERFLOW glyph,
-      // not the chat one: a bare tap opens the row now and chat is an item in
-      // it, so a chat icon would name something the control no longer does. It
-      // teaches the gesture in its own accessible name (touch has no hover to
-      // discover it with).
+      // not the chat one: ordinary activation opens More, while the strip stays
+      // available through a gesture.
       expect([...control.matchAll(/<button /g)], name).toHaveLength(1);
       expect(control, name).toContain('id="mobile-menu-anchor"');
       expect(control, name).toContain('data-icon="more"');
       expect(control, `${name}: the anchor still wears the chat icon`).not.toContain(
         'data-icon="chat"',
       );
-      expect(control, name).toContain('data-i18n-aria="hudChrome.mobile.quickActionsAria"');
+      expect(control, name).toContain('data-i18n-aria="hudChrome.mobile.quickActions"');
+      expect(control, name).toContain('aria-haspopup="dialog"');
       expect(control, name).toContain('data-i18n="hudChrome.mobile.quickActionsLabel"');
       // The five old row buttons are GONE from the row itself.
       for (const id of ['id="mobile-chat"', 'id="mobile-social"', 'id="mobile-quest"']) {
@@ -2819,7 +2914,7 @@ describe('client HTML shell', () => {
     );
     // Every strip action routes to the handler its own button already had: four
     // keep the row's bindings, five are promoted out of the More tray onto the
-    // SAME callbacks their tray twins use, and the tap runs the chat toggle.
+    // SAME callbacks their tray twins use.
     expect(mainTs).toContain('onMenu: () => hud.toggleOptionsMenu(),');
     expect(mobileControlsTs).toContain(
       "this.bindButton('mobile-menu', () => this.callbacks.onMenu());",
@@ -2845,11 +2940,9 @@ describe('client HTML shell', () => {
     expect(mobileControlsTs).toContain(
       "this.bindButton('mobile-menu-spellbook', () => this.callbacks.onSpellbook());",
     );
-    expect(mobileControlsTs).toContain(
-      // No default-action callback: the control opens its own row and runs no
-      // action of its own, so the chat toggle moved to the strip's own seat.
-      'this.menuControl = buildMobileMenuControl();',
-    );
+    expect(mobileControlsTs).toContain('this.menuControl = buildMobileMenuControl({');
+    expect(mobileControlsTs).toContain('onAnchorActivate: () => {');
+    expect(mobileControlsTs).toContain('this.toggleMoreModal();');
     expect(mobileControlsTs).toContain(
       "this.bindButton('mobile-menu-chat', () => this.tapChat());",
     );
@@ -3127,6 +3220,7 @@ describe('client HTML shell', () => {
       expect(ring, name).toContain('id="mobile-interact"');
       expect(ring, name).toContain('id="mobile-jump"');
       expect(ring, name).toContain('id="mobile-action-page-toggle"');
+      expect(ring, name).toContain('id="mobile-utility-page-toggle"');
       expect(ring, name).toContain('data-i18n="hudChrome.mobile.targetCycleShort"');
       expect(ring, name).toContain('data-i18n="hud.core.mobileUse"');
       expect(ring, name).toContain('data-i18n="hudChrome.mobile.jump"');
@@ -3196,6 +3290,15 @@ describe('client HTML shell', () => {
       'body.mobile-touch #mobile-action-page-toggle {\n    right: calc(var(--mobile-ring-attack-size) / 2 - var(--mobile-ring-toggle-size) / 2);',
     );
     expect(hudMobileCss).toContain(
+      'body.mobile-touch #mobile-utility-page-toggle {\n    right: calc(var(--mobile-ring-attack-size) / 2 - var(--mobile-ring-toggle-size) / 2);',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #mobile-action-ring[data-action-surface="utility"] #mobile-action-page-toggle,',
+    );
+    expect(hudMobileCss).toMatch(
+      /#mobile-action-ring:not\(\[data-action-surface="utility"\]\)\s+#mobile-utility-page-toggle\s+\{\s+visibility: hidden;\s+pointer-events: none;/,
+    );
+    expect(hudMobileCss).toContain(
       'body.mobile-touch.mobile-left-handed #mobile-target-cycle {\n    left: calc(',
     );
     expect(hudMobileCss).toContain(
@@ -3203,6 +3306,9 @@ describe('client HTML shell', () => {
     );
     expect(hudMobileCss).toContain(
       'body.mobile-touch.mobile-left-handed #mobile-action-page-toggle {\n    left: calc(',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch.mobile-left-handed #mobile-utility-page-toggle {\n    left: calc(',
     );
     // The tier var packs are pinned as WHOLE blocks (selector + every value):
     // a bare-literal pin would still pass if the compact and tablet packs were
@@ -3215,6 +3321,7 @@ describe('client HTML shell', () => {
         '    --mobile-ring-toggle-size: max(40px, calc(46px * var(--mobile-chrome-scale, 1)));\n' +
         '    --mobile-ring-secondary-size: calc(50px * var(--mobile-chrome-scale, 1));\n' +
         '    --mobile-ring-hollow: calc(88px * var(--mobile-chrome-scale, 1));\n' +
+        '    --mobile-mode-inward-shift: 62px;\n' +
         '    right: max(14px, env(safe-area-inset-right));\n' +
         '    bottom: calc(10px + env(safe-area-inset-bottom));\n' +
         '  }',

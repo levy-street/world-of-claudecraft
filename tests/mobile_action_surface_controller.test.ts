@@ -1,0 +1,463 @@
+// @vitest-environment happy-dom
+
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { buildMobileActionSurface } from '../src/ui/hud/action_bar/mobile_action_surface_controller';
+import { MENU_STRIP_ITEMS } from '../src/ui/hud/menu/menu_strip_core';
+import type { PainterHostWriters } from '../src/ui/painter_host';
+import { hydrateIcons } from '../src/ui/ui_icons';
+
+const writers: PainterHostWriters = {
+  setText: vi.fn((el, text) => {
+    el.textContent = text;
+  }),
+  setDisplay: vi.fn((el, display) => {
+    el.style.display = display;
+  }),
+  setTransform: vi.fn(),
+  setWidth: vi.fn(),
+  setStyleProp: vi.fn(),
+  toggleClass: vi.fn(),
+  setAttr: vi.fn((el, attr, value) => {
+    el.setAttribute(attr, value);
+  }),
+};
+
+beforeEach(() => {
+  vi.clearAllMocks();
+  document.body.innerHTML = `
+    <div id="mobile-action-surface">
+      <div id="mobile-action-ring">
+        <button id="mobile-action-mode"><span class="mobile-action-mode-label"></span></button>
+        <button id="mobile-utility-page-toggle"><span class="mobile-action-page-indicator"></span></button>
+        <div id="mobile-utility-actions">
+        ${Array.from(
+          { length: 5 },
+          (_, slot) =>
+            `<button class="mobile-action-slot mobile-utility-action${slot === 4 ? ' mobile-ring-seat' : ''}" data-mobile-index="${slot}" data-utility-slot="${slot}"><span class="mobile-utility-icon"></span></button>`,
+        ).join('')}
+        </div>
+      </div>
+    </div>
+    ${MENU_STRIP_ITEMS.map(
+      ({ elementId, id }) =>
+        `<button id="${elementId}" data-icon="${{ mount: 'mount', chat: 'chat', map: 'map', bags: 'bags', social: 'social', quest: 'questlog', char: 'character', spellbook: 'spellbook', settings: 'menu', more: 'more', dfinder: 'dfinder', crafting: 'crafting' }[id]}"></button>`,
+    ).join('')}
+    <button id="mobile-dfinder" data-icon="dfinder"></button>
+    <button id="mobile-crafting" data-icon="crafting"></button>
+  `;
+  hydrateIcons(document);
+});
+
+describe('mobile action surface controller', () => {
+  it('starts on the combat layout and routes both utility pages through existing buttons', () => {
+    const calls = new Map<string, number>();
+    const showUtilitySurface = vi.fn();
+    for (const { id, elementId } of MENU_STRIP_ITEMS) {
+      document.getElementById(elementId)?.addEventListener('click', () => {
+        calls.set(id, (calls.get(id) ?? 0) + 1);
+      });
+    }
+    for (const id of ['dfinder', 'crafting']) {
+      document.getElementById(`mobile-${id}`)?.addEventListener('click', () => {
+        calls.set(id, (calls.get(id) ?? 0) + 1);
+      });
+    }
+    const controller = buildMobileActionSurface({
+      writers,
+      t: (key, values) =>
+        key === 'hudChrome.mobile.actionPageIndicator' ? `${values?.page}/${values?.count}` : key,
+      consumePeekGuard: vi.fn(),
+      hideTooltip: vi.fn(),
+      clickSfx: vi.fn(),
+      showUtilitySurface,
+    });
+
+    expect(controller).not.toBeNull();
+    controller?.update(false, 1);
+    controller?.update(false, 1);
+    // The combat layout is home: it is what a player leaves a fight on, where
+    // the consumable seat they eat from lives.
+    expect(document.getElementById('mobile-action-ring')?.dataset.actionSurface).toBe('combat');
+    expect(showUtilitySurface).not.toHaveBeenCalled();
+
+    // Utility is one explicit tap away and never arrives on its own.
+    const mode = document.getElementById('mobile-action-mode') as HTMLButtonElement;
+    mode.click();
+    controller?.update(false, 1);
+    expect(document.getElementById('mobile-action-ring')?.dataset.actionSurface).toBe('utility');
+    expect(showUtilitySurface).toHaveBeenCalledTimes(1);
+    expect(
+      document.querySelector('#mobile-utility-page-toggle .mobile-action-page-indicator')
+        ?.textContent,
+    ).toBe('1/2');
+    expect(
+      Array.from(document.querySelectorAll<HTMLButtonElement>('.mobile-utility-action'), (button) =>
+        button.getAttribute('aria-label'),
+      ),
+    ).toEqual([
+      'hudChrome.mounts.mount',
+      'hud.core.mobileMap',
+      'hud.keybinds.actions.bags',
+      'hud.keybinds.actions.char',
+      'questUi.tracker.title',
+    ]);
+    expect(document.querySelector('.mobile-utility-action .mobile-label')).toBeNull();
+
+    for (const button of document.querySelectorAll<HTMLButtonElement>('.mobile-utility-action')) {
+      button.click();
+    }
+    expect([...calls.values()]).toEqual([1, 1, 1, 1, 1]);
+
+    const pageToggle = document.getElementById('mobile-utility-page-toggle') as HTMLButtonElement;
+    pageToggle.click();
+    expect(
+      document.querySelector('#mobile-utility-page-toggle .mobile-action-page-indicator')
+        ?.textContent,
+    ).toBe('2/2');
+    expect(
+      Array.from(
+        document.querySelectorAll<HTMLElement>('.mobile-utility-icon'),
+        (icon) => icon.dataset.icon,
+      ),
+    ).toEqual(['chat', 'social', 'dfinder', 'spellbook', 'crafting']);
+    expect(
+      Array.from(document.querySelectorAll<HTMLButtonElement>('.mobile-utility-action'), (button) =>
+        button.getAttribute('aria-label'),
+      ),
+    ).toEqual([
+      'hud.core.mobileChat',
+      'hud.core.mobileSocial',
+      'hudChrome.finder.title',
+      'abilityUi.spellbook.title',
+      'hudChrome.crafting.title',
+    ]);
+    for (const button of document.querySelectorAll<HTMLButtonElement>('.mobile-utility-action')) {
+      button.click();
+    }
+    expect([...calls.values()]).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+
+    pageToggle.click();
+    expect(
+      Array.from(
+        document.querySelectorAll<HTMLElement>('.mobile-utility-icon'),
+        (icon) => icon.dataset.icon,
+      ),
+    ).toEqual(['mount', 'map', 'bags', 'character', 'questlog']);
+    expect([...calls.values()]).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+
+    controller?.update(true, 1);
+    expect(document.getElementById('mobile-action-ring')?.dataset.actionSurface).toBe('combat');
+    expect(document.getElementById('mobile-action-ring')?.getAttribute('data-action-surface')).toBe(
+      'combat',
+    );
+  });
+
+  it('routes non-primary touch taps through the existing action button', () => {
+    const calls = vi.fn();
+    const character = document.getElementById('mobile-menu-char');
+    character?.addEventListener('click', calls);
+    const controller = buildMobileActionSurface({
+      writers,
+      t: (key) => key,
+      consumePeekGuard: vi.fn(),
+      hideTooltip: vi.fn(),
+      clickSfx: vi.fn(),
+    });
+    controller?.update(false, 1);
+    (document.getElementById('mobile-action-mode') as HTMLButtonElement).click();
+    const shortcut = document.querySelector<HTMLButtonElement>(
+      '.mobile-utility-action[data-utility-slot="3"]',
+    );
+    const pointer = (type: string): Event => {
+      const event = new Event(type, { bubbles: true }) as PointerEvent;
+      Object.defineProperties(event, {
+        pointerType: { value: 'touch' },
+        pointerId: { value: 2 },
+        clientX: { value: 20 },
+        clientY: { value: 30 },
+      });
+      return event;
+    };
+
+    shortcut?.dispatchEvent(pointer('pointerdown'));
+    shortcut?.dispatchEvent(pointer('pointerup'));
+    expect(calls).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps the fixed shortcut icons and accessible names aligned', () => {
+    const controller = buildMobileActionSurface({
+      writers,
+      t: (key) => key,
+      consumePeekGuard: vi.fn(),
+      hideTooltip: vi.fn(),
+      clickSfx: vi.fn(),
+    });
+    controller?.update(false, 1);
+    (document.getElementById('mobile-action-mode') as HTMLButtonElement).click();
+    const buttons = Array.from(
+      document.querySelectorAll<HTMLButtonElement>('.mobile-utility-action'),
+    );
+    expect(
+      buttons.map(
+        (button) => button.querySelector<HTMLElement>('.mobile-utility-icon')?.dataset.icon,
+      ),
+    ).toEqual(['mount', 'map', 'bags', 'character', 'questlog']);
+    expect(buttons.map((button) => button.getAttribute('aria-label'))).toEqual([
+      'hudChrome.mounts.mount',
+      'hud.core.mobileMap',
+      'hud.keybinds.actions.bags',
+      'hud.keybinds.actions.char',
+      'questUi.tracker.title',
+    ]);
+    expect(buttons.map((button) => button.getAttribute('title'))).toEqual([
+      'hudChrome.mounts.mount',
+      'hud.core.mobileMap',
+      'hud.keybinds.actions.bags',
+      'hud.keybinds.actions.char',
+      'questUi.tracker.title',
+    ]);
+    expect(document.querySelector('.mobile-utility-action-label')).toBeNull();
+    expect(buttons[0].querySelector('.mobile-utility-icon > .ui-icon')).not.toBeNull();
+    expect(buttons[1].querySelector('.mobile-utility-icon > .ui-icon')).not.toBeNull();
+  });
+
+  it('toggles the layout and resets it to combat when character identity changes', () => {
+    const controller = buildMobileActionSurface({
+      writers,
+      t: (key) => key,
+      consumePeekGuard: vi.fn(),
+      hideTooltip: vi.fn(),
+      clickSfx: vi.fn(),
+    });
+    const mode = document.getElementById('mobile-action-mode') as HTMLButtonElement;
+    const ring = document.getElementById('mobile-action-ring');
+
+    controller?.update(false, 1);
+    expect(ring?.dataset.actionSurface).toBe('combat');
+    expect(mode.querySelector('.mobile-action-mode-label')?.textContent).toBe(
+      'hudChrome.mobile.actionModeUtility',
+    );
+
+    mode.click();
+    controller?.update(false, 1);
+    expect(ring?.dataset.actionSurface).toBe('utility');
+    expect(mode.querySelector('.mobile-action-mode-label')?.textContent).toBe(
+      'hudChrome.mobile.actionModeCombat',
+    );
+
+    // A different character starts from the home layout again.
+    controller?.update(false, 2);
+    expect(ring?.dataset.actionSurface).toBe('combat');
+  });
+
+  it('names the layout switch by its destination for assistive tech', () => {
+    // The visible caption is the bare destination ("Utility"/"Combat"); the
+    // accessible name has to say what activating the button does, and the
+    // button is not a toggle of state, so it carries no aria-pressed.
+    const controller = buildMobileActionSurface({
+      writers,
+      t: (key, values) => (values?.mode ? `${key} ${values.mode}` : key),
+      consumePeekGuard: vi.fn(),
+      hideTooltip: vi.fn(),
+      clickSfx: vi.fn(),
+    });
+    const mode = document.getElementById('mobile-action-mode') as HTMLButtonElement;
+
+    controller?.update(false, 1);
+    expect(mode.querySelector('.mobile-action-mode-label')?.textContent).toBe(
+      'hudChrome.mobile.actionModeUtility',
+    );
+    expect(mode.getAttribute('aria-label')).toBe(
+      'hudChrome.mobile.actionModeSwitchTo hudChrome.mobile.actionModeUtility',
+    );
+    expect(mode.hasAttribute('aria-pressed')).toBe(false);
+
+    mode.click();
+    controller?.update(false, 1);
+    expect(mode.querySelector('.mobile-action-mode-label')?.textContent).toBe(
+      'hudChrome.mobile.actionModeCombat',
+    );
+    expect(mode.getAttribute('aria-label')).toBe(
+      'hudChrome.mobile.actionModeSwitchTo hudChrome.mobile.actionModeCombat',
+    );
+  });
+
+  it('lets the player return to utility while combat is forcing the combat layout', () => {
+    const controller = buildMobileActionSurface({
+      writers,
+      t: (key) => key,
+      consumePeekGuard: vi.fn(),
+      hideTooltip: vi.fn(),
+      clickSfx: vi.fn(),
+    });
+    const mode = document.getElementById('mobile-action-mode') as HTMLButtonElement;
+    const ring = document.getElementById('mobile-action-ring');
+
+    controller?.update(false, 1);
+    controller?.update(true, 1);
+    expect(ring?.dataset.actionSurface).toBe('combat');
+    expect(mode.querySelector('.mobile-action-mode-label')?.textContent).toBe(
+      'hudChrome.mobile.actionModeUtility',
+    );
+    expect(mode.getAttribute('aria-label')).toBe('hudChrome.mobile.actionModeSwitchTo');
+
+    mode.click();
+    controller?.update(true, 1);
+    expect(ring?.dataset.actionSurface).toBe('utility');
+    expect(mode.querySelector('.mobile-action-mode-label')?.textContent).toBe(
+      'hudChrome.mobile.actionModeCombat',
+    );
+    expect(mode.getAttribute('aria-label')).toBe('hudChrome.mobile.actionModeSwitchTo');
+
+    mode.click();
+    controller?.update(true, 1);
+    expect(ring?.dataset.actionSurface).toBe('combat');
+    expect(mode.querySelector('.mobile-action-mode-label')?.textContent).toBe(
+      'hudChrome.mobile.actionModeUtility',
+    );
+  });
+
+  it('stays on the combat layout when combat ends, so the consumable seat stays reachable', () => {
+    // The eat-after-the-fight loop: food and drink live on the combat layout's
+    // consumable seat, so a finished fight must not flip the ring to utility.
+    const showUtilitySurface = vi.fn();
+    const controller = buildMobileActionSurface({
+      writers,
+      t: (key) => key,
+      consumePeekGuard: vi.fn(),
+      hideTooltip: vi.fn(),
+      clickSfx: vi.fn(),
+      showUtilitySurface,
+    });
+    const ring = document.getElementById('mobile-action-ring');
+    const mode = document.getElementById('mobile-action-mode') as HTMLButtonElement;
+
+    controller?.update(false, 1);
+    expect(ring?.dataset.actionSurface).toBe('combat');
+
+    controller?.update(true, 1);
+    expect(ring?.dataset.actionSurface).toBe('combat');
+
+    controller?.update(false, 1);
+    expect(ring?.dataset.actionSurface, 'a finished fight does not flip the ring').toBe('combat');
+    expect(showUtilitySurface).not.toHaveBeenCalled();
+
+    // The player can still ask for utility; it just never arrives on its own.
+    mode.click();
+    controller?.update(false, 1);
+    expect(ring?.dataset.actionSurface).toBe('utility');
+    expect(showUtilitySurface).toHaveBeenCalledTimes(1);
+  });
+
+  it('switches to the combat layout when a mob is selected on the utility layout', () => {
+    const controller = buildMobileActionSurface({
+      writers,
+      t: (key) => key,
+      consumePeekGuard: vi.fn(),
+      hideTooltip: vi.fn(),
+      clickSfx: vi.fn(),
+    });
+    const ring = document.getElementById('mobile-action-ring');
+    const mode = document.getElementById('mobile-action-mode') as HTMLButtonElement;
+    const liveMob = { hostile: true, dead: false };
+
+    controller?.update(false, 1, null);
+    expect(ring?.dataset.actionSurface).toBe('combat');
+
+    mode.click();
+    controller?.update(false, 1, null);
+    expect(ring?.dataset.actionSurface).toBe('utility');
+
+    controller?.update(false, 1, liveMob);
+    expect(ring?.dataset.actionSurface, 'selecting a mob arms the combat layout').toBe('combat');
+
+    // An explicit choice still holds while the same selection persists.
+    mode.click();
+    controller?.update(false, 1, liveMob);
+    expect(ring?.dataset.actionSurface).toBe('utility');
+
+    // Clearing the selection leaves the player where they are: no auto-return.
+    controller?.update(false, 1, null);
+    expect(ring?.dataset.actionSurface).toBe('utility');
+  });
+
+  it('ignores a dead or friendly selection', () => {
+    const controller = buildMobileActionSurface({
+      writers,
+      t: (key) => key,
+      consumePeekGuard: vi.fn(),
+      hideTooltip: vi.fn(),
+      clickSfx: vi.fn(),
+    });
+    const ring = document.getElementById('mobile-action-ring');
+    const mode = document.getElementById('mobile-action-mode') as HTMLButtonElement;
+
+    controller?.update(false, 1);
+    mode.click();
+    controller?.update(false, 1);
+    expect(ring?.dataset.actionSurface).toBe('utility');
+
+    controller?.update(false, 1, { hostile: true, dead: true });
+    expect(ring?.dataset.actionSurface, 'a corpse is not combat intent').toBe('utility');
+
+    controller?.update(false, 1, { hostile: false, dead: false });
+    expect(ring?.dataset.actionSurface, 'a friendly NPC is not combat intent').toBe('utility');
+  });
+
+  it('stays on the combat layout while combat outlives the selected mob', () => {
+    const controller = buildMobileActionSurface({
+      writers,
+      t: (key) => key,
+      consumePeekGuard: vi.fn(),
+      hideTooltip: vi.fn(),
+      clickSfx: vi.fn(),
+    });
+    const ring = document.getElementById('mobile-action-ring');
+    const liveMob = { hostile: true, dead: false };
+
+    controller?.update(false, 1, liveMob);
+    expect(ring?.dataset.actionSurface).toBe('combat');
+
+    controller?.update(true, 1, liveMob);
+    controller?.update(true, 1, null);
+    expect(ring?.dataset.actionSurface, 'combat still forces the combat layout').toBe('combat');
+
+    controller?.update(false, 1, null);
+    expect(ring?.dataset.actionSurface, 'combat ending does not flip the ring').toBe('combat');
+  });
+
+  it('does not rewrite an unchanged state and can relocalize labels', () => {
+    const setText = vi.fn((el: HTMLElement, text: string) => {
+      el.textContent = text;
+    });
+    const localWriters = { ...writers, setText };
+    const controller = buildMobileActionSurface({
+      writers: localWriters,
+      t: (key) => `localized:${key}`,
+      consumePeekGuard: vi.fn(),
+      hideTooltip: vi.fn(),
+      clickSfx: vi.fn(),
+    });
+
+    const countWrites = (): number =>
+      [
+        localWriters.setText,
+        localWriters.setDisplay,
+        localWriters.setTransform,
+        localWriters.setWidth,
+        localWriters.setStyleProp,
+        localWriters.toggleClass,
+        localWriters.setAttr,
+      ].reduce((total, writer) => total + vi.mocked(writer).mock.calls.length, 0);
+
+    controller?.update(false, 1);
+    const writes = countWrites();
+    controller?.update(false, 1);
+    expect(countWrites()).toBe(writes);
+    controller?.relocalize();
+    expect(countWrites()).toBeGreaterThan(writes);
+    expect(document.querySelector('.mobile-action-mode-label')?.textContent).toBe(
+      'localized:hudChrome.mobile.actionModeUtility',
+    );
+  });
+});

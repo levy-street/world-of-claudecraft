@@ -265,6 +265,7 @@ const FANOUT_ARMS: readonly string[] = [
   'this.guildBoardWindow.relocalize|',
   'this.riftForgeWindow.relocalize|',
   'this.mobileActionRingPainter.relocalize|',
+  'this.mobileActionSurface.relocalize|',
   'this.mountRaceStrip.relocalize|',
   'this.mountRaceControls.relocalize|',
   'this.worldQuestPuzzleWindow.relocalize|',
@@ -487,6 +488,12 @@ const ANSWERED: readonly AnsweredSurface[] = [
     memos: ['lastPage', 'lastPageCount'],
     answer: 'this.mobileActionRingPainter.relocalize',
     why: 'two integers gating the page indicator text and the toggle name (#2529)',
+  },
+  {
+    file: 'hud/action_bar/mobile_action_surface_painter.ts',
+    memos: ['lastSurface', 'lastPreference', 'lastUtilityPage'],
+    answer: 'this.mobileActionSurface.relocalize',
+    why: 'surface, preference and page memoize translated labels, so the HUD fan-out must force a repaint after the locale changes',
   },
   {
     file: 'hud/delve/delve_tracker_controller.ts',

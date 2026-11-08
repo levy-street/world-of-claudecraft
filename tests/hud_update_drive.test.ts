@@ -819,6 +819,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'selects the active source page for the touch action ring; no DOM write',
   },
   {
+    call: 'this.mobileActionSurface.update',
+    band: 'frame',
+    gate: 'this.isMobileLayout() && this.mobileActionRingView && this.mobileActionRingPainter',
+    surface: 'chrome',
+    why: 'updates the touch utility/combat surface and labels through the shared writer facet',
+  },
+  {
     call: 'this.groundAim.activeSlot',
     band: 'frame',
     gate: 'actionBarWorld',
@@ -1974,7 +1981,8 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // chrome 99 -> 100: the dungeon objectives tracker's medium-band paint
       // (hud/dungeon/dungeon_tracker_painter.ts), facet-routed like the deed strip.
       // window 53 -> 54: Lantern Hall's guild window (hud/guild_hall/guild_hall_window.ts).
-    ).toEqual({ window: 55, chrome: 101, none: 21 });
+      // chrome 101 -> 102: the touch utility/combat surface's frame update.
+    ).toEqual({ window: 55, chrome: 102, none: 21 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');

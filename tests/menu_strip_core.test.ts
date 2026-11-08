@@ -66,8 +66,8 @@ describe('the menu strip roster', () => {
   });
 
   it('seats Chat SECOND, on its own strip button rather than the tray one', () => {
-    // The control's bare tap used to open chat; it opens the row now, so chat
-    // needs a seat of its own and it is the shortest gesture after Mount.
+    // The control now opens More directly, so Chat needs a strip seat of its own
+    // and it is the shortest gesture after Mount.
     expect(MENU_STRIP_ITEMS[1].id).toBe('chat');
     // NOT the tray's #mobile-chat: that button carries the press-and-hold log
     // peek on its own pointer handlers, which the strip's synthesized click on

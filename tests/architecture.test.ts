@@ -785,6 +785,8 @@ const UI_PURE_CORES = [
   // The action-bar drag payload, pure over the DataTransfer it is handed.
   'src/ui/hud/action_bar/hotbar_drag.ts',
   'src/ui/hud/action_bar/mobile_action_page_view.ts',
+  'src/ui/hud/action_bar/mobile_action_mode_core.ts',
+  'src/ui/hud/action_bar/utility_action_core.ts',
   'src/ui/hud/action_bar/consumable_bar_view.ts',
   'src/ui/hud/action_bar/consumable_strip_core.ts',
   'src/ui/hud/action_bar/radial_action_core.ts',
@@ -3184,6 +3186,7 @@ const UI_DOM_MODULES = [
   'src/ui/hud/action_bar/bar_editor/bar_editor_window.ts',
   'src/ui/hud/action_bar/consumable_seat_controller.ts',
   'src/ui/hud/action_bar/mobile_action_ring_controller.ts',
+  'src/ui/hud/action_bar/mobile_action_surface_controller.ts',
   'src/ui/hud/action_bar/radial_gesture_controller.ts',
   'src/ui/hud/menu/menu_control_controller.ts',
   // The pet-bar button builder (Hud.renderPetBar's sockets, their touch hold

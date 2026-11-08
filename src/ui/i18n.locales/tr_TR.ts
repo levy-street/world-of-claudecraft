@@ -18794,7 +18794,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.hubLesson.openTabDamage': 'Hasar sekmesine geç.',
   'hudChrome.hubLesson.openTabHealing': 'İyileştirme sekmesine geç.',
   'hudChrome.hubLesson.openWindow': '{meters} aç.',
-  'hudChrome.hubLesson.openWindowTouch': '{menu} → {more} → {meters} aç.',
+  'hudChrome.hubLesson.openWindowTouch': '{menu} → {meters} aç.',
   'hudChrome.hubLesson.readRow': 'Satırını oku, sonra Devam et düğmesine bas.',
   'hudChrome.hubLesson.readRowDamage':
     'Toplam, bu koşudaki tüm hasarındır. DPS, koşu boyunca saniye başına hasardır. Satırını izle, sonra Devam et.',

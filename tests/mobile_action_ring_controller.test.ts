@@ -12,6 +12,7 @@ import {
   sourceSlotForMobileButton,
 } from '../src/ui/hud/action_bar/mobile_action_page_view';
 import { buildMobileActionRing } from '../src/ui/hud/action_bar/mobile_action_ring_controller';
+import { MENU_STRIP_ITEMS } from '../src/ui/hud/menu/menu_strip_core';
 import type { PainterHostWriters } from '../src/ui/painter_host';
 
 vi.mock('../src/game/audio', () => ({ audio: { click: vi.fn() } }));
@@ -69,6 +70,15 @@ beforeEach(() => {
         { length: 4 },
         (_, index) => `<button class="mobile-action-slot" data-mobile-index="${index}"></button>`,
       ).join('')}
+      <button id="mobile-action-mode"><span class="mobile-action-mode-label"></span></button>
+      <button id="mobile-utility-page-toggle"><span class="mobile-action-page-indicator"></span></button>
+      <div id="mobile-utility-actions">
+        ${Array.from(
+          { length: 5 },
+          (_, index) =>
+            `<button class="mobile-action-slot mobile-utility-action" data-mobile-index="${index}" data-utility-slot="${index}"><span class="mobile-utility-icon"></span></button>`,
+        ).join('')}
+      </div>
       <button id="mobile-action-page-toggle"><span class="mobile-action-page-indicator"></span></button>
     </div>
     <div id="mobile-action-radial">
@@ -80,6 +90,9 @@ beforeEach(() => {
         .join('')}
       <button id="mobile-action-radial-cancel"></button>
     </div>
+    ${MENU_STRIP_ITEMS.map(({ elementId }) => `<button id="${elementId}"></button>`).join('')}
+    <button id="mobile-dfinder"></button>
+    <button id="mobile-crafting"></button>
   `;
 });
 
@@ -106,11 +119,15 @@ describe('buildMobileActionRing aiming ownership', () => {
       attackNearest: null,
       attackTapState: () => ({ autoAttack: false, hasLiveHostileTarget: false }),
       hideTooltip: vi.fn(),
-      consumePeekGuard: vi.fn(),
+      consumePeekGuard: () => false,
       bindEmpoweredHold: vi.fn(),
     });
 
     expect(ring).not.toBeNull();
+    expect(ring?.surface).toEqual({
+      update: expect.any(Function),
+      relocalize: expect.any(Function),
+    });
     expect(ring?.view.tick(world(activeAimSlot)).slots.map((slot) => slot.aiming)).toEqual([
       false,
       true,

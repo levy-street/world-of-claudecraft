@@ -5,10 +5,10 @@
 # src/ui/hud/menu/: Quick Actions, the touch menu control
 
 One gesture control replacing the old five-button touch row (Chat, Social,
-Quests, Settings, More). It runs NO action of its own: a tap opens the ten-item
-strip (Mount, Chat, Map, Bags, Social, Quests, Character, Spells, Settings,
-More), a hold or a swipe along the row opens it and picks in one gesture, and the
-next press on the control closes it again.
+Quests, Settings, More). An ordinary activation opens the existing More dialog
+directly, and activating it again toggles the dialog closed. A hold or swipe
+along the row still opens the ten-item strip (Mount, Chat, Map, Bags, Social,
+Quests, Character, Spells, Settings, More) and can pick in one gesture.
 
 ## Load-bearing rules
 
@@ -25,11 +25,12 @@ next press on the control closes it again.
 - **The roster order IS the design.** It is sorted by how often a player reaches
   for it, because swipe distance is the cost. Mount leads it (issue #2739). Do
   not reorder `MENU_STRIP_ITEMS` for tidiness.
-- **Nothing here implements an action, the control least of all.** Every strip
+- **Nothing here reimplements an action.** Every strip
   item is a real `<button>` the touch HUD already binds (`mobile_controls.ts`),
   so a pick activates that button and the existing handler runs. Adding an action
   means adding its button and its binding, never a callback that duplicates the
-  handler. The anchor takes no default-action callback at all.
+  handler. The anchor delegates ordinary activation to the existing `#mobile-more`
+  toggle.
 - **A pick reaches its item through a synthesized `click`.** That is why Chat is
   seated by its own `#mobile-menu-chat` rather than the More tray's
   `#mobile-chat`: the tray button carries the press-and-hold chat-log peek on
@@ -39,17 +40,18 @@ next press on the control closes it again.
   `#tooltip` id scope in `hud.css`. Never ship a second copy of them.
 - **One caption, never ten labels.** Ten 8px captions at this pitch collide and
   clip, and they name nine things the player is not choosing.
-- **The anchor's tap rule is `tap_menu_core.ts`'s, not this directory's.** The
-  control declares `anchorRole: 'toggle'` and the shared table answers what an
-  anchor press means in either mode; a bare tap resolves at RELEASE, which is
-  what leaves the swipe intact with `touchTapMenus` off.
+- **The anchor's gesture rule is `tap_menu_core.ts`'s, not this directory's.**
+  The control declares `anchorRole: 'toggle'`; ordinary activation delegates to
+  More, while swipe and hold gestures remain on the shared strip controller.
+  Pointer-generated clicks are suppressed after a handled gesture so More cannot
+  open twice.
 
 ## Shape
 
 | File | What it is |
 |---|---|
 | `menu_strip_core.ts` | PURE. Roster, release rules, reveal rule, caption clamp. Registered in `UI_PURE_CORES`. |
-| `menu_strip_gesture_controller.ts` | A thin instantiation of the SHARED `../strip_gesture_controller.ts` (pointer capture, the reveal timer, ONE anchor measure per gesture, the window release backstop, `aria-expanded`, the Escape closer, and the sticky path). It supplies only this menu's four parameters: the direction resolved per gesture by `resolveMenuStripDirection`, the ten-item roster, the pitch, and the `anchorRole: 'toggle'` that turns a bare tap into an open. |
+| `menu_strip_gesture_controller.ts` | A thin instantiation of the SHARED `../strip_gesture_controller.ts` (pointer capture, the reveal timer, ONE anchor measure per gesture, the window release backstop, `aria-expanded`, the Escape closer, and the sticky path). It supplies this menu's direction, roster, pitch, `anchorRole: 'toggle'`, and ordinary-activation callback. |
 | `menu_strip_painter.ts` | Thin painter: item seating, live highlight, caption text and position. Takes no layout read. |
 | `menu_control_controller.ts` | Builds it from the static markup and routes picks to the real buttons. |
 

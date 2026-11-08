@@ -18738,7 +18738,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.hubLesson.openTabDamage': 'Skift til fanen Skade.',
   'hudChrome.hubLesson.openTabHealing': 'Skift til fanen Helbredelse.',
   'hudChrome.hubLesson.openWindow': 'Åbn {meters}.',
-  'hudChrome.hubLesson.openWindowTouch': 'Åbn {menu}, derefter {more}, derefter {meters}.',
+  'hudChrome.hubLesson.openWindowTouch': 'Åbn {menu}, derefter {meters}.',
   'hudChrome.hubLesson.readRow': 'Læs din række, og tryk derefter på Fortsæt.',
   'hudChrome.hubLesson.readRowDamage':
     'I alt er al din skade i dette løb. DPS er skade pr. sekund i løbet. Hold øje med din række, og fortsæt derefter.',

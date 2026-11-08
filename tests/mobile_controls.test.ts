@@ -415,12 +415,17 @@ class FakeElement extends EventTarget {
     return this.captured.has(pointerId);
   }
 
+  click(): void {
+    this.dispatchEvent(new Event('click', { bubbles: true, cancelable: true }));
+  }
+
   closest(selector: string): FakeElement | null {
     return this.matchedSelectors.includes(selector) ? this : null;
   }
 
+  querySelectorResult: Element | null = null;
   querySelector(): Element | null {
-    return null;
+    return this.querySelectorResult;
   }
 
   setAttribute(): void {}
@@ -467,9 +472,14 @@ function installMobileControlDom(): {
   wikiButton: FakeElement;
   chatButton: FakeElement;
   barEditorButton: FakeElement;
+  traySettingsButton: FakeElement;
+  trayQuestButton: FakeElement;
+  traySocialButton: FakeElement;
   windowTarget: EventTarget;
 } {
   const autorunTarget = new FakeElement();
+  const menuCaption = new FakeElement();
+  menuCaption.querySelectorResult = new FakeElement() as unknown as Element;
   const elements = new Map<string, FakeElement>([
     [
       'game-canvas',
@@ -486,6 +496,19 @@ function installMobileControlDom(): {
     ['mobile-camera-joystick', new FakeElement()],
     ['mobile-camera-stick', new FakeElement()],
     ['mobile-jump', new FakeElement()],
+    ['mobile-menu-anchor', new FakeElement()],
+    ['mobile-menu-strip', new FakeElement()],
+    ['mobile-menu-cancel', new FakeElement()],
+    ['mobile-menu-caption', menuCaption],
+    ['mobile-menu-mount', new FakeElement()],
+    ['mobile-menu-chat', new FakeElement()],
+    ['mobile-menu-map', new FakeElement()],
+    ['mobile-menu-bags', new FakeElement()],
+    ['mobile-social', new FakeElement()],
+    ['mobile-quest', new FakeElement()],
+    ['mobile-menu-char', new FakeElement()],
+    ['mobile-menu-spellbook', new FakeElement()],
+    ['mobile-menu', new FakeElement()],
     ['mobile-more', new FakeElement()],
     ['mobile-extra-controls', new FakeElement()],
     ['mobile-emote', new FakeElement()],
@@ -495,6 +518,9 @@ function installMobileControlDom(): {
     ['mobile-wiki', new FakeElement()],
     ['mobile-chat', new FakeElement()],
     ['mobile-bar-editor', new FakeElement()],
+    ['mobile-tray-settings', new FakeElement()],
+    ['mobile-tray-quest', new FakeElement()],
+    ['mobile-tray-social', new FakeElement()],
     // The chat composer, so exitChatReply (value clear + blur) is exercised in the
     // fake DOM: the setActive draft-survival test reads its .value.
     ['chat-input', new FakeElement()],
@@ -537,6 +563,9 @@ function installMobileControlDom(): {
     wikiButton: elements.get('mobile-wiki')!,
     chatButton: elements.get('mobile-chat')!,
     barEditorButton: elements.get('mobile-bar-editor')!,
+    traySettingsButton: elements.get('mobile-tray-settings')!,
+    trayQuestButton: elements.get('mobile-tray-quest')!,
+    traySocialButton: elements.get('mobile-tray-social')!,
     windowTarget,
   };
 }
@@ -1289,6 +1318,41 @@ describe('MobileControls pointer lifecycle', () => {
     expect(opens).toBe(1);
   });
 
+  it('routes the More-tray Settings, Quest Log, and Social entries to their callbacks', () => {
+    // The tray mirrors the Quick Actions strip so the same three destinations
+    // are reachable without the swipe or hold gesture.
+    const { traySettingsButton, trayQuestButton, traySocialButton } = installMobileControlDom();
+    const input = {
+      setTouchMove: () => {},
+      clearTouchMove: () => {},
+      setTouchLook: () => {},
+      setTouchLookVector: () => {},
+    } as unknown as Input;
+
+    let settings = 0;
+    let quest = 0;
+    let social = 0;
+    const callbacks = {
+      ...mobileCallbacks(),
+      onMenu: () => {
+        settings += 1;
+      },
+      onQuestLog: () => {
+        quest += 1;
+      },
+      onSocial: () => {
+        social += 1;
+      },
+    };
+    new MobileControls(input, callbacks).start();
+
+    for (const button of [traySettingsButton, trayQuestButton, traySocialButton]) {
+      button.dispatchEvent(new Event('click', { bubbles: true, cancelable: true }));
+    }
+
+    expect([settings, quest, social]).toEqual([1, 1, 1]);
+  });
+
   it('fires the mount callback when the More-tray Mount button is tapped', () => {
     const { mountButton } = installMobileControlDom();
     const input = {
@@ -1434,6 +1498,47 @@ describe('MobileControls pointer lifecycle', () => {
     expect(moreModal.style.right).toBe('auto');
     expect(moreModal.style.bottom).toBe('auto');
     expect(moreModal.style.transform).toBe('translate(-50%, -50%)');
+  });
+
+  it('opens and toggles the More dialog from the Actions anchor', () => {
+    const { moreModal } = installMobileControlDom();
+    const input = {
+      setTouchMove: () => {},
+      clearTouchMove: () => {},
+      setTouchLook: () => {},
+      setTouchLookVector: () => {},
+    } as unknown as Input;
+    new MobileControls(input, mobileCallbacks()).start();
+
+    (document.getElementById('mobile-menu-anchor') as unknown as FakeElement).click();
+
+    expect(document.body.classList.contains('mobile-more-open')).toBe(true);
+
+    (document.getElementById('mobile-menu-anchor') as unknown as FakeElement).click();
+
+    expect(document.body.classList.contains('mobile-more-open')).toBe(false);
+    expect(moreModal.style.transform).toBe('translate(-50%, -50%)');
+  });
+
+  it('does not dismiss More on the Actions pointerdown before the toggle runs', () => {
+    installMobileControlDom();
+    const input = {
+      setTouchMove: () => {},
+      clearTouchMove: () => {},
+      setTouchLook: () => {},
+      setTouchLookVector: () => {},
+    } as unknown as Input;
+    new MobileControls(input, mobileCallbacks()).start();
+    const anchor = document.getElementById('mobile-menu-anchor') as unknown as FakeElement;
+    anchor.matchedSelectors.push('#mobile-menu-anchor');
+    anchor.click();
+
+    const pointerDown = pointerEvent('pointerdown', { pointerId: 33 });
+    Object.defineProperty(pointerDown, 'target', { value: anchor });
+    document.dispatchEvent(pointerDown);
+    anchor.click();
+
+    expect(document.body.classList.contains('mobile-more-open')).toBe(false);
   });
 
   it('fires the Jump callback immediately on pointerdown without double-firing the generated click', () => {

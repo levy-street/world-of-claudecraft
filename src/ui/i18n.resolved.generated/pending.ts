@@ -9,25 +9,100 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.mobile.actionModeCombat",
+    "hudChrome.mobile.actionModeSwitchTo",
+    "hudChrome.mobile.actionModeUtility",
+    "hudChrome.mobile.utilityActions"
+  ],
+  "es_ES": [
+    "hudChrome.mobile.actionModeCombat",
+    "hudChrome.mobile.actionModeSwitchTo",
+    "hudChrome.mobile.actionModeUtility",
+    "hudChrome.mobile.utilityActions"
+  ],
+  "fr_FR": [
+    "hudChrome.mobile.actionModeCombat",
+    "hudChrome.mobile.actionModeSwitchTo",
+    "hudChrome.mobile.actionModeUtility",
+    "hudChrome.mobile.utilityActions"
+  ],
+  "fr_CA": [
+    "hudChrome.mobile.actionModeCombat",
+    "hudChrome.mobile.actionModeSwitchTo",
+    "hudChrome.mobile.actionModeUtility",
+    "hudChrome.mobile.utilityActions"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.mobile.actionModeCombat",
+    "hudChrome.mobile.actionModeSwitchTo",
+    "hudChrome.mobile.actionModeUtility",
+    "hudChrome.mobile.utilityActions"
+  ],
+  "de_DE": [
+    "hudChrome.mobile.actionModeCombat",
+    "hudChrome.mobile.actionModeSwitchTo",
+    "hudChrome.mobile.actionModeUtility",
+    "hudChrome.mobile.utilityActions"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.mobile.actionModeCombat",
+    "hudChrome.mobile.actionModeSwitchTo",
+    "hudChrome.mobile.actionModeUtility",
+    "hudChrome.mobile.utilityActions"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.mobile.actionModeCombat",
+    "hudChrome.mobile.actionModeSwitchTo",
+    "hudChrome.mobile.actionModeUtility",
+    "hudChrome.mobile.utilityActions"
+  ],
+  "nl_NL": [
+    "hudChrome.mobile.actionModeCombat",
+    "hudChrome.mobile.actionModeSwitchTo",
+    "hudChrome.mobile.actionModeUtility",
+    "hudChrome.mobile.utilityActions"
+  ],
+  "pl_PL": [
+    "hudChrome.mobile.actionModeCombat",
+    "hudChrome.mobile.actionModeSwitchTo",
+    "hudChrome.mobile.actionModeUtility",
+    "hudChrome.mobile.utilityActions"
+  ],
+  "id_ID": [
+    "hudChrome.mobile.actionModeCombat",
+    "hudChrome.mobile.actionModeSwitchTo",
+    "hudChrome.mobile.actionModeUtility",
+    "hudChrome.mobile.utilityActions"
+  ],
+  "tr_TR": [
+    "hudChrome.mobile.actionModeCombat",
+    "hudChrome.mobile.actionModeSwitchTo",
+    "hudChrome.mobile.actionModeUtility",
+    "hudChrome.mobile.utilityActions"
+  ],
+  "sv_SE": [
+    "hudChrome.mobile.actionModeCombat",
+    "hudChrome.mobile.actionModeSwitchTo",
+    "hudChrome.mobile.actionModeUtility",
+    "hudChrome.mobile.utilityActions"
+  ],
+  "vi_VN": [
+    "hudChrome.mobile.actionModeCombat",
+    "hudChrome.mobile.actionModeSwitchTo",
+    "hudChrome.mobile.actionModeUtility",
+    "hudChrome.mobile.utilityActions"
+  ],
+  "da_DK": [
+    "hudChrome.mobile.actionModeCombat",
+    "hudChrome.mobile.actionModeSwitchTo",
+    "hudChrome.mobile.actionModeUtility",
+    "hudChrome.mobile.utilityActions"
+  ]
 };
