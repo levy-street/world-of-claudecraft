@@ -6,17 +6,17 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "ce1c6a3e8fa5ac7d53daad7d7176618e5ca69669f1cb84d8a93148db58d59e26",
+  "rendererFingerprint": "c8b28df55bee65a6a82c03517736f619266dbbb088d5fc3625289e538a7d09e9",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
     "arch": "x64",
     "gpuVendor": "Google Inc. (Google)",
     "gpuRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
-    "browserMajor": "156",
-    "browserVersion": "Edg/156.0.4314.58",
+    "browserMajor": "157",
+    "browserVersion": "Edg/157.0.4341.42",
     "requestedBackend": "swiftshader",
-    "fingerprint": "1fa7c946843b473ca28607b5f42b16260be5c23febad302a3d5c6cf1a79c0358"
+    "fingerprint": "93984b9f943895de3c4da131f720f05bcb47c89f02b336b88bda89953a63fc3a"
   },
   "renderer": {
     "trackedFiles": [
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 6950499,
-      "sha256": "b309da50780b934be6509ded0f1808db122bc8c271e82772c3dc5f0e8260f71d",
+      "bytes": 6951324,
+      "sha256": "1134cc273ae31db88a3bc307ed5b9473aeef4020b07ad1c91f86026b02ac9e8f",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -5787,13 +5787,13 @@
       "visualKey": "smith_heart_quench_guardian",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/golelingevolved.glb",
-          "path": "public/models/creatures/golelingevolved.glb",
-          "bytes": 85588,
-          "sha256": "156f4c2dcf93c6e52a738d8a93e09d1988f933fe4f2d1f9d30411b5eae7f2b94"
+          "url": "models/creatures/smith_heart_quench_guardian.glb",
+          "path": "public/models/creatures/smith_heart_quench_guardian.glb",
+          "bytes": 1316400,
+          "sha256": "a277bbab514afc83c1bfd1551710c2149d860d62e391b7d5f6e1771e62351c2e"
         },
-        "idle": "Flying_Idle",
-        "height": 2.3,
+        "idle": "Idle",
+        "height": 3.6,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -5807,11 +5807,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "1fa38c2eddb303ae3406af38ce0d4e273a30a7f20d778c44daa13ccb8b2bc939",
+      "sourceFingerprint": "08cd461503cbfdaf0d4109d2c99133bdd96a6a85d2defa516c811bc483500ab1",
       "output": {
         "path": "public/ui/mobs/heart_quench_guardian.webp",
-        "bytes": 2330,
-        "sha256": "da04f69981b3560b636c0473e89c2a109f8e19bb8b809182e649286d83c8af0d"
+        "bytes": 3206,
+        "sha256": "1d96ae87fb31e7de6e8334b3c1f71a2142f98ec625c58f062b1c488ca48477dd"
       }
     },
     {
