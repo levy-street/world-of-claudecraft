@@ -180,6 +180,7 @@ const AUTHORED_ATLAS_DEFS = [
   'smith_heart_masterless_strength',
   'smith_heart_heat_guardian',
   'smith_heart_breath_guardian',
+  'smith_heart_quench_guardian',
   'mob_hoard_abyssal_maw',
   'mob_hoard_hoarfrost_warden',
   'mob_hoard_emberforge_tyrant',

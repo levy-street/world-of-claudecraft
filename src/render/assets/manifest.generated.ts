@@ -585,6 +585,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/creatures/smith_heart_breath_guardian.glb": "/media/models/creatures/smith_heart_breath_guardian.7531ca1c57ae.glb",
   "models/creatures/smith_heart_heat_guardian.glb": "/media/models/creatures/smith_heart_heat_guardian.1779c45fcacd.glb",
   "models/creatures/smith_heart_masterless_strength.glb": "/media/models/creatures/smith_heart_masterless_strength.fe2c92391de1.glb",
+  "models/creatures/smith_heart_quench_guardian.glb": "/media/models/creatures/smith_heart_quench_guardian.a277bbab514a.glb",
   "models/creatures/spider.glb": "/media/models/creatures/spider.5becf8b6510f.glb",
   "models/creatures/spider_egg_sac.glb": "/media/models/creatures/spider_egg_sac.4a0b3718097e.glb",
   "models/creatures/sporemender_form.glb": "/media/models/creatures/sporemender_form.d6b6dbc77d46.glb",

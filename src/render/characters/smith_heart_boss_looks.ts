@@ -16,6 +16,7 @@ import { BREATH_CASTS, BREATH_TUNING } from '../../sim/encounters/smith_heart/br
 import { ISLE_CASTS } from '../../sim/encounters/smith_heart/breath_isle_ids';
 import { FINAL_CASTS, FINAL_TUNING } from '../../sim/encounters/smith_heart/final_ids';
 import { HEAT_CASTS, HEAT_TUNING } from '../../sim/encounters/smith_heart/heat_ids';
+import { QUENCH_CASTS, QUENCH_TUNING } from '../../sim/encounters/smith_heart/quench_ids';
 import {
   BREATH_BODY_CLIP,
   BREATH_BODY_GESTURES,
@@ -30,6 +31,7 @@ import {
   FINAL_BODY_NODES,
 } from '../smith_heart_fx/final_body_core';
 import { FORGE_FIST_CUE } from '../smith_heart_fx/final_fx_core';
+import { ARC_CLEAVE_ABILITY } from '../smith_heart_fx/hammer_fx_core';
 import {
   HEAT_BODY_CLIP,
   HEAT_BODY_GESTURES,
@@ -37,6 +39,12 @@ import {
   HEAT_BODY_HOVER,
   HEAT_BODY_URL,
 } from '../smith_heart_fx/heat_body_core';
+import {
+  QUENCH_BODY_CLIP,
+  QUENCH_BODY_GESTURES,
+  QUENCH_BODY_HEIGHT,
+  QUENCH_BODY_URL,
+} from '../smith_heart_fx/quench_body_core';
 import type { MeshToggleDef } from './gesture_mesh_toggles';
 import type { ClipMap, VisualDef } from './manifest';
 
@@ -204,6 +212,52 @@ function breathClips(storm: boolean): ClipMap {
 }
 
 const BREATH_CALM = breathClips(false);
+
+// The Guardian of the Quench (the Frozen Lake, design doc 7.3): an ice queen,
+// one rigged mesh, her gown and her hair on their own bone chains (their sway
+// and follow-through baked into every clip). She walks with a slow regal step
+// under the gown; her swings alternate a right backhand and a left hook, the
+// ice bracers leading; Tempering Strike (the swing cleave's windup cue) drives
+// both fists down on the ice; Quenching Breath rears her back through its bar
+// and throws the cold out of her mouth on the bar's end, the exhale playing
+// out; the Blades Wake raises both arms through its 4 s bar and throws them
+// down on its end; the Blades Hunt holds them up. Her taunt at the pull and
+// her commanding point at a slash are gestures. The cold round her is
+// smith_heart_fx/quench_body.ts's; the gesture ids and the clip beats live in
+// smith_heart_fx/quench_body_core.ts.
+const QUENCH_CLIPS: ClipMap = {
+  idle: 'Idle',
+  walk: 'Move',
+  run: 'Move',
+  attack: ['Attack', 'Attack2'],
+  contacts: {
+    Attack: [QUENCH_BODY_CLIP.attack],
+    Attack2: [QUENCH_BODY_CLIP.attack],
+    Strike: [QUENCH_BODY_CLIP.strike],
+  },
+  attackByAbility: {
+    [ARC_CLEAVE_ABILITY]: 'Strike',
+    [QUENCH_BODY_GESTURES.taunt]: 'Taunt',
+    [QUENCH_BODY_GESTURES.slash]: 'Slash',
+  },
+  attackTimeScaleByAbility: {
+    [ARC_CLEAVE_ABILITY]: 1,
+    [QUENCH_BODY_GESTURES.taunt]: 1,
+    [QUENCH_BODY_GESTURES.slash]: 1,
+  },
+  death: 'Death',
+  cast: 'Breath',
+  castByAbility: {
+    [QUENCH_CASTS.breath]: 'Breath',
+    [QUENCH_CASTS.wake]: 'Wake',
+    [QUENCH_CASTS.flurry]: 'WakeHold',
+  },
+  castTimeScaleByAbility: {
+    [QUENCH_CASTS.breath]: onBarEnd(QUENCH_BODY_CLIP.breath, QUENCH_TUNING.breathCast),
+    [QUENCH_CASTS.wake]: onBarEnd(QUENCH_BODY_CLIP.wake, QUENCH_TUNING.wakeCast),
+  },
+  castPlayOut: ['Breath', 'Wake'],
+};
 const BREATH_STORM = breathClips(true);
 
 export const SMITH_HEART_BOSS_LOOKS: Record<string, VisualDef> = {
@@ -241,6 +295,33 @@ export const SMITH_HEART_BOSS_LOOKS: Record<string, VisualDef> = {
     authoredAtlas: true,
     selfIllumination: 0.06,
     clickRadius: 3.4,
+  },
+  smith_heart_quench_guardian: {
+    url: QUENCH_BODY_URL,
+    height: QUENCH_BODY_HEIGHT,
+    clips: QUENCH_CLIPS,
+    castClipSync: [QUENCH_CASTS.breath, QUENCH_CASTS.wake],
+    glowPulses: {
+      // Her eyes, crown, heart and frost cracks flare as the breath is loosed
+      // and the blades are thrown awake.
+      pulses: [
+        { gesture: QUENCH_BODY_GESTURES.flare, rise: 0.12, hold: 0.3, fall: 1.0, peak: 2.0 },
+      ],
+      // Dead, frozen into a statue, her light goes out.
+      deathFade: 3.5,
+    },
+    // A swing never cuts the breath, the wake, the strike, the taunt or a
+    // slash's command.
+    oneShotsHoldAttacks: ['Breath', 'Wake', 'Strike', 'Taunt', 'Slash'],
+    castPlayOutHoldsAttacks: true,
+    // Her slow regal walk: its Move loop read at the template's own speed.
+    walkRef: 7,
+    runRef: 7,
+    attackTimeScale: 1,
+    deathTimeScale: 1,
+    authoredAtlas: true,
+    selfIllumination: 0.07,
+    clickRadius: 2.6,
   },
   smith_heart_heat_guardian: {
     url: HEAT_BODY_URL,

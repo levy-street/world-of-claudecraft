@@ -30,6 +30,7 @@ import {
 import { isHeartSealMarker, observeHeartSealMarker } from './smith_heart/heart_seal_core';
 import { breathObjectKind } from './smith_heart_fx/breath_fight_fx_core';
 import { heatObjectKind } from './smith_heart_fx/heat_fight_fx_core';
+import { quenchObjectKind } from './smith_heart_fx/quench_fight_fx_core';
 import { isTrashEngineObject } from './trash_engine_fx/trash_engine_fx_core';
 
 export interface DungeonGateAnchorPlan {
@@ -93,6 +94,11 @@ export function gateObjectPlan(e: GateEntityLike): GateObjectPlan | null {
   // drawn from the world by ./smith_heart_fx (BreathFightFx), never the loot
   // sparkle (the same star-crossed sun over every strike of the storm).
   if (breathObjectKind(e.templateId) !== null) return { encounterAnchor: true, height: 2 };
+  // The Guardian of the Quench's fight objects (a crack, a hole, a slash's
+  // line, the shore ice): drawn from the world by ./smith_heart_fx
+  // (QuenchFightFx), never the loot sparkle (a star-crossed sun hung over
+  // every huddle's crack).
+  if (quenchObjectKind(e.templateId) !== null) return { encounterAnchor: true, height: 2 };
   if (dungeonGateStateOf(e.templateId) === null || !e.dungeonId) return null;
   const def = DUNGEONS[e.dungeonId];
   if (!def) return null;

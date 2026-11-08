@@ -26,6 +26,11 @@
 
 /** The guardian (template id, frozen: its death lights the Quench vein). */
 export const QUENCH_GUARDIAN = 'heart_quench_guardian';
+/** Her body's radius (yards; the template's bodyRadius): the column of her gown
+ *  round her hips, the crown some eleven yards up since her own model
+ *  (render/smith_heart_fx/quench_body_core.ts). Melee strikes her from this far
+ *  out plus a melee reach, and her own swing settles the tank at its edge. */
+export const QUENCH_BODY_RADIUS = 2;
 
 // ---- casts, auras, objects, cues --------------------------------------------------
 

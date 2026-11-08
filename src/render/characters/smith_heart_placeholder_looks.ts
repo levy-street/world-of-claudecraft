@@ -53,10 +53,10 @@ export const SMITH_HEART_PLACEHOLDER_LOOKS: Record<string, string> = {
   // floating pieces of ancient armor held together by living wind; the wind
   // (and its phase-2 storm) is drawn by smith_heart_fx/breath_body.ts.
   heart_breath_guardian: 'smith_heart_breath_guardian',
-  // The Guardian of the Quench: a bodyless target; its provisional body (an
-  // ice guardian of frost granite and clear lake ice, the lake's cold light
-  // in its heart) is drawn by smith_heart_fx/quench_body.ts. Final: its own
-  // model (the official pipeline), the same joints.
+  // The Guardian of the Quench: her own model (smith_heart_boss_looks.ts),
+  // an ice queen of blue-slate stone in a gown of ice; her cold (the mist off
+  // her hem, her heart's light, the breath, the wake's column, the statue's
+  // frost) is drawn by smith_heart_fx/quench_body.ts.
   heart_quench_guardian: 'smith_heart_quench_guardian',
   // The Guardian of the Heat: its own model (smith_heart_boss_looks.ts), a
   // giant of basalt and lava in the first wellspring; its fire is drawn by

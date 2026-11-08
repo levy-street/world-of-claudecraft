@@ -400,6 +400,11 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   // order 0 on purpose (scene objects, never floor marks), so not strict.
   { file: 'src/render/smith_heart_fx/quench_fight_fx.ts', layer: 'encounter', strict: false },
   { file: 'src/render/smith_heart_fx/quench_frost_fx.ts', layer: 'encounter', strict: false },
+  // The Guardian of the Quench's own body: the rime her steps freeze into the
+  // lake on the band's floor rung, under every telegraph; the Blades Wake's
+  // racing lines on a rung of their own (its column is a body, default order).
+  { file: 'src/render/smith_heart_fx/quench_rime_steps.ts', layer: 'encounter', strict: true },
+  { file: 'src/render/smith_heart_fx/quench_wake_fx.ts', layer: 'encounter', strict: false },
   // The Guardian of the Heat's fight in the Hearth: the same split, its burn
   // sheaths ride the bodies at the default order 0.
   { file: 'src/render/smith_heart_fx/heat_fight_fx.ts', layer: 'encounter', strict: false },
