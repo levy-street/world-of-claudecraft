@@ -111,6 +111,12 @@ export const QUENCH_CUES = {
   /** The fight is over: the shore ice falls and the lake refreezes whole
    *  (spellfx 'nova' on the guardian). */
   thaw: 'heart_quench_thaw',
+  /** Tempering Strike read before it lands (spellfx 'windup' on the guardian):
+   *  her next landed swing is the cleave and it comes in `strikeWindup`
+   *  seconds, so her fists rise over her head now and slam on it. A
+   *  presentation cue only (quench_strike_windup.ts); the cleave's own cue
+   *  stays the template's on the hit. */
+  strikeReady: 'heart_quench_strike_ready',
   /** The rime cracks a player's immunity (an Ice Block's stasis) as they
    *  freeze or shatter: the cold bites through (spellfx 'nova' on them). */
   bite: 'heart_quench_bite',
@@ -283,6 +289,9 @@ export const QUENCH_TUNING = {
   strikeEvery: 4,
   strikeArcDeg: 100,
   strikeRange: 8,
+  /** Seconds before the cleaving swing her wind-up is cued (the body's
+   *  StrikeWind clip slams one second in). */
+  strikeWindup: 1,
   // Phase 2: the deepening cold (the soft enrage).
   deepenEvery: 20,
   deepenStep: 0.1,

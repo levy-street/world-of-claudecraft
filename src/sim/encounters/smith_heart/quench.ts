@@ -92,6 +92,7 @@ import {
 } from './quench_scope';
 import { clearSlashes, startSlashes, stepSlashes } from './quench_slash';
 import type { QuenchFightState } from './quench_state';
+import { watchStrikeWindup } from './quench_strike_windup';
 import { quenchSay, watchQuenchSlain } from './quench_voice';
 import { applyTierHealth, restoreTierHealth, tierPoolMult } from './tier_health';
 import { freshSlainWatch } from './voice_slain';
@@ -365,6 +366,7 @@ export function tickQuenchGuardian(ctx: SimContext, inst: InstanceSlot): void {
   stepDeepening(s);
   watchQuenchSlain(s);
   startBars(s);
+  watchStrikeWindup(s);
 }
 
 // ---- dev ----------------------------------------------------------------------------------
