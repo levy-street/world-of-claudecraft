@@ -527,6 +527,9 @@ export const RETIRED_KEYS = [
   'hudChrome.weeklyRewards.selectionPoolRule',
   'hudChrome.weeklyRewards.previewPoolRule',
   'hudChrome.weeklyRewards.worldPoolRule',
+  // The Vault's read-only mode (the Dungeon Finder's Vault tab) is gone, and
+  // with it the notice that pointed a read-only viewer at the keeper.
+  'hudChrome.weeklyRewards.previewClaimNotice',
 ];
 
 export const RETIRED_KEY_SET = new Set(RETIRED_KEYS);

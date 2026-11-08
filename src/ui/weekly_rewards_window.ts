@@ -1,5 +1,6 @@
-// Bank pane: rebuild only for ledger changes. Its cached countdown node receives
-// one elided text update from the existing bank slow-band refresh, no own driver.
+// The Weekly Vault sheet (the Rewards window's Vault tab): rebuild only for ledger
+// changes. Its cached countdown node receives one elided text update from the
+// slow-band refresh, no own driver.
 import { WEEKLY_BACKLOG_LIMIT } from '../sim/weekly_rewards';
 import type { IWorld } from '../world_api';
 import { chromeIconUrl } from './chrome_icon_art';
@@ -18,25 +19,6 @@ import { buildWeeklyRewardsView, weeklyCountdown } from './weekly_rewards_view';
 
 export const WEEKLY_TAB_ID = 'weekly-rewards-tab';
 export const WEEKLY_PANEL_ID = 'weekly-rewards-panel';
-/** Bind the bank host without losing its callback receiver. */
-export function createWeeklyRewardsTab(
-  host: PainterHostPresentation & {
-    world(): IWorld;
-    onInventoryChanged(): void;
-    hideTooltip(): void;
-  },
-  options?: { readOnly?: boolean },
-): WeeklyRewardsTab {
-  return new WeeklyRewardsTab(
-    {
-      world: () => host.world(),
-      presentation: host,
-      onInventoryChanged: () => host.onInventoryChanged(),
-      hideTooltip: () => host.hideTooltip(),
-    },
-    options,
-  );
-}
 export class WeeklyRewardsTab {
   private timer: HTMLElement | null = null;
   private timerText = '';
@@ -52,9 +34,8 @@ export class WeeklyRewardsTab {
       onInventoryChanged(): void;
       hideTooltip?(): void;
     },
-    private readonly options?: { readOnly?: boolean },
   ) {
-    this.claimFlow = new WeeklyRewardClaimController(deps, options);
+    this.claimFlow = new WeeklyRewardClaimController(deps);
   }
   close(): void {
     this.claimFlow.close();
@@ -91,19 +72,17 @@ export class WeeklyRewardsTab {
   }
   renderInto(parent: HTMLElement): void {
     this.claimFlow.pause();
-    if (!this.options?.readOnly) {
-      // Discard a previously dragged bank's inline insets before using the large sheet.
-      for (const property of ['left', 'top', 'right', 'bottom', 'transform'])
-        parent.style.removeProperty(property);
-      delete parent.dataset.windowMoved;
-    }
+    // Discard a previously dragged window's inline insets before using the large sheet.
+    for (const property of ['left', 'top', 'right', 'bottom', 'transform'])
+      parent.style.removeProperty(property);
+    delete parent.dataset.windowMoved;
     const world = this.deps.world();
     const info = world.weeklyRewardInfo;
     this.timer = null;
     this.timerText = '';
     const panel = document.createElement('section');
     panel.id = WEEKLY_PANEL_ID;
-    panel.className = `weekly-rewards bank-scroll${this.options?.readOnly ? ' weekly-rewards--readonly' : ''}`;
+    panel.className = 'weekly-rewards bank-scroll';
     panel.setAttribute('role', 'region');
     panel.setAttribute('aria-label', t('hudChrome.weeklyRewards.title'));
     if (!info) {
@@ -157,7 +136,7 @@ export class WeeklyRewardsTab {
     const toolbar = document.createElement('div');
     toolbar.className = 'weekly-vault-toolbar';
     toolbar.appendChild(status);
-    if (!this.options?.readOnly) appendWeeklyLootFocus(toolbar, world);
+    appendWeeklyLootFocus(toolbar, world);
     toolbar.appendChild(lootButton);
     panel.append(toolbar, allPools);
     if (info.state.overflowed || info.readyWeeks >= WEEKLY_BACKLOG_LIMIT) {
@@ -217,14 +196,6 @@ export class WeeklyRewardsTab {
     const claimHost = document.createElement('div');
     panel.append(claimHost, tracks);
     parent.appendChild(panel);
-    if (this.options?.readOnly) {
-      this.claimFlow.close();
-      if (info.readyWeeks) {
-        const notice = document.createElement('p');
-        notice.className = 'weekly-preview-notice ui-card';
-        notice.textContent = t('hudChrome.weeklyRewards.previewClaimNotice');
-        claimHost.append(notice);
-      }
-    } else this.claimFlow.renderInto(claimHost, tracks);
+    this.claimFlow.renderInto(claimHost, tracks);
   }
 }

@@ -27565,26 +27565,6 @@
     align-self: flex-start;
     padding: 10px 22px;
   }
-  .weekly-preview-notice {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    padding: 8px 14px;
-    background: var(--color-ink-deep);
-    border: 1px solid var(--color-accent);
-    color: var(--color-accent);
-    font-size: 13px;
-    border-radius: var(--radius-sm);
-  }
-  .weekly-preview-notice-icon {
-    display: inline-flex;
-    align-items: center;
-    color: var(--color-accent);
-  }
-  .weekly-preview-notice-icon .ui-icon {
-    width: 20px;
-    height: 20px;
-  }
   .weekly-claim-tracks {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));

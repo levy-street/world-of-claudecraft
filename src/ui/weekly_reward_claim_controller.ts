@@ -12,7 +12,6 @@ import { esc } from './esc';
 import { captureFocusKey, FOCUS_KEY_ATTR, findFocusKey } from './focus_restore';
 import { formatDateTime, formatNumber, t } from './i18n';
 import type { PainterHostPresentation } from './painter_host';
-import { svgIcon } from './ui_icons';
 import { weeklyLootSpecLabel } from './weekly_reward_loot_focus_controller';
 import { appendWeeklyRewardTablePicker } from './weekly_reward_table_picker_controller';
 import { showWeeklyRewardsReadyPrompt } from './weekly_rewards_ready_prompt';
@@ -52,9 +51,6 @@ export class WeeklyRewardClaimController {
       onInventoryChanged(): void;
       hideTooltip?(): void;
     },
-    private readonly options?: {
-      readOnly?: boolean;
-    },
   ) {}
 
   pause(): void {
@@ -93,7 +89,6 @@ export class WeeklyRewardClaimController {
 
   private current(key: string): boolean {
     return (
-      !this.options?.readOnly &&
       this.owner === this.deps.world() &&
       this.deps.world().weeklyRewardInfo?.canClaim === true &&
       this.identity() === key
@@ -188,21 +183,8 @@ export class WeeklyRewardClaimController {
     host.replaceChildren();
     host.className = 'weekly-claim-flow';
     host.hidden = !batch;
-    progress.hidden = !this.options?.readOnly && !!batch && this.started;
+    progress.hidden = !!batch && this.started;
     if (!batch) return;
-
-    if (this.options?.readOnly) {
-      const notice = document.createElement('div');
-      notice.className = 'weekly-preview-notice ui-card';
-      notice.innerHTML = `<span class="weekly-preview-notice-icon" aria-hidden="true">${svgIcon('chest')}</span><span class="weekly-preview-notice-text">${esc(t('hudChrome.weeklyRewards.previewClaimNotice'))}</span>`;
-      const date = document.createElement('p');
-      date.className = 'weekly-claim-date';
-      date.textContent = t('hudChrome.weeklyRewards.completedWeek', {
-        date: formatDateTime(batch.resetAtMs, { dateStyle: 'medium' }),
-      });
-      host.append(notice, date);
-      return;
-    }
 
     const refresh = (focus?: string) => {
       this.renderInto(host, progress);
