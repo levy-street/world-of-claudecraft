@@ -125,27 +125,23 @@ export interface BreathIsles {
   grace: Record<number, number>;
 }
 
-/** Mythic: one Knotted Gale (instance-local place; held, the carrier's). */
+/** Heroic and Mythic: one Knotted Gale (instance-local place; held, the carrier's). */
 export interface BreathKnot {
   objectId: number;
   x: number;
   z: number;
   fuse: number;
   carrierId: number | null;
-  /** Carried through a portal: only now may it go over a lip (Jose's call of
-   *  2026-11-07, the half-speed walk; it stays loosed if its carrier drops
-   *  it). */
-  loosed: boolean;
 }
 
-/** Mythic: one open portal of the Knotted Gale (instance-local place). */
+/** Heroic and Mythic: one open portal of the Knotted Gale (instance-local place). */
 export interface BreathPortal {
   objectId: number;
   x: number;
   z: number;
 }
 
-/** Mythic: one round of the Knotted Gale (breath_heart.ts). */
+/** Heroic and Mythic: one round of the Knotted Gale (breath_heart.ts). */
 export interface BreathHeart {
   knots: BreathKnot[];
   /** How many pairs of portals this round opens: 1 (A and B, phase 1's one
@@ -242,7 +238,7 @@ export interface BreathFightState {
   cradles: BreathCradle[];
   isles: BreathIsles;
   drawn: BreathDrawn | null;
-  /** Mythic: the Knotted Gale's round, its clock and the rounds so far. */
+  /** Heroic and Mythic: the Knotted Gale's round, its clock and the rounds so far. */
   heart: BreathHeart | null;
   heartTimer: number;
   heartRuns: number;

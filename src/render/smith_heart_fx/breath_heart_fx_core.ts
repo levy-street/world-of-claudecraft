@@ -155,9 +155,10 @@ const RING_START = 9;
 /** The fuse left (seconds) from which the ball throbs. */
 export const KNOT_THROB_AT = 3;
 
-/** The ball at `fuse` seconds left. */
-export function knotLook(fuse: number): KnotLook {
-  const left = Math.max(0, Math.min(1, fuse / T.heartFuse));
+/** The ball at `fuse` seconds left of a `full` second fuse (the tier's: Heroic
+ *  15 s, Mythic 10 s; the ball's template carries both, knotOf). */
+export function knotLook(fuse: number, full: number): KnotLook {
+  const left = Math.max(0, Math.min(1, fuse / Math.max(1e-6, full)));
   const urge = 1 - left;
   return {
     urge,
@@ -166,8 +167,8 @@ export function knotLook(fuse: number): KnotLook {
     spin: 1.2 + 7 * urge * urge,
     ringR: T.heartPickR + (RING_START - T.heartPickR) * left,
     danger: Math.max(0, Math.min(1, (urge - 0.5) * 2)),
-    // The last 3 s (since the fuse was halved to 10 s, 2026-11-07: 5 s throbbed
-    // from the moment the portals opened).
+    // The last 3 s on every tier (since Mythic's fuse was halved to 10 s,
+    // 2026-11-07: 5 s throbbed from the moment the portals opened).
     throb: fuse < KNOT_THROB_AT ? 1 - fuse / KNOT_THROB_AT : 0,
   };
 }

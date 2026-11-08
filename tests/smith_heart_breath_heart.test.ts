@@ -1,4 +1,4 @@
-// The Guardian of the Breath's Knotted Gale (Mythic) over a REAL Sim claim: the ball
+// The Guardian of the Breath's Knotted Gale (Heroic and Mythic) over a REAL Sim claim: the ball
 // and its fuse, the two portals opened at their marked players' feet (the fall too),
 // the carrier's load, the crossing to a portal's partner, the throw at any gap (2 yd
 // from its edge), a dead carrier, phase 2's two balls and two pairs (A to B, C to D,
@@ -16,6 +16,7 @@ import { CORNICE_GAPS } from '../src/sim/content/smith_heart_layout';
 import {
   atGapLip,
   circleClear,
+  edgeWalk,
   gapDistance,
   inBreathArena,
   knotGrid,
@@ -26,11 +27,11 @@ import {
   BREATH_AURAS,
   BREATH_CUES,
   BREATH_DIFFICULTY,
+  BREATH_KNOT,
   BREATH_NAMES,
   BREATH_OBJECTS,
   KNOT_HOP_TEXT,
   KNOT_NOT_AT_LIP_ERROR,
-  KNOT_NOT_LOOSED_ERROR,
   knotOf,
   knotTemplate,
   BREATH_TUNING as T,
@@ -46,11 +47,14 @@ import { localizeSimAuraName, localizeSimText } from '../src/ui/sim_i18n';
 import { type BreathFight, breathFight } from './helpers/breath_fight';
 
 const ticks = (s: number) => Math.round(s * 20);
+/** Each tier's Knotted Gale row (breath_ids.ts BREATH_KNOT). */
+const M = BREATH_KNOT.mythic;
+const H = BREATH_KNOT.heroic;
 
-function mythic(n = 6, seed = 23): BreathFight {
+function mythic(n = 6, seed = 23, tier: 'heroic' | 'mythic' = 'mythic'): BreathFight {
   const f = breathFight(n, seed);
   f.dev('/dev heart breath pull');
-  f.dev('/dev heart breath mythic');
+  f.dev(`/dev heart breath ${tier}`);
   const st = f.state();
   if (!st) throw new Error('no fight');
   // The clocks of everything else, out of the way.
@@ -140,57 +144,49 @@ function carry(f: BreathFight, p: Entity, k = 0) {
   expect(knot.carrierId).toBe(p.id);
   return knot;
 }
-/** Carry ball `k` and loose it, as a walk through a portal does (the tests of
- *  the throw itself; the real crossing is pinned on its own). */
-function carryLoosed(f: BreathFight, p: Entity, k = 0) {
-  const knot = carry(f, p, k);
-  knot.loosed = true;
-  const load = p.auras.find((a) => a.id === BREATH_AURAS.laden);
-  if (load) load.value2 = 1;
-  return knot;
-}
+/** The Heroic fight (its own, softer Knotted Gale). */
+const heroic = (n = 6, seed = 23) => mythic(n, seed, 'heroic');
 
 describe('Knotted Gale: the row', () => {
-  it('is mythic only; every tier else never starts a round', () => {
-    expect(BREATH_DIFFICULTY.mythic.stormHeart).toBe(true);
-    expect(BREATH_DIFFICULTY.heroic.stormHeart).toBe(false);
-    expect(BREATH_DIFFICULTY.normal.stormHeart).toBe(false);
-    for (const tier of ['', 'heroic']) {
-      const f = breathFight(4);
-      f.dev('/dev heart breath pull');
-      if (tier) f.dev(`/dev heart breath ${tier}`);
-      stillAir(f);
-      f.tick(ticks(30));
-      expect(f.state()?.heart).toBeNull();
-      expect(f.state()?.heartRuns).toBe(0);
-      expect(f.objects(BREATH_OBJECTS.knotPrefix)).toHaveLength(0);
-    }
+  it('Heroic and Mythic only, each its own row; Normal never starts a round', () => {
+    expect(BREATH_DIFFICULTY.normal.stormHeart).toBeNull();
+    expect(BREATH_DIFFICULTY.heroic.stormHeart).toBe(H);
+    expect(BREATH_DIFFICULTY.mythic.stormHeart).toBe(M);
+    // Jose's calls: Mythic of 2026-11-07, Heroic (softer) of 2026-11-08.
+    expect(M).toEqual({ fuse: 10, walkMult: 0.5, tailMult: 0.65, windRuns: 3, stormBalls: 2 });
+    expect(H).toEqual({ fuse: 15, walkMult: 0.7, tailMult: 0.85, windRuns: 2, stormBalls: 1 });
+    expect(T.heartMark).toBe(5);
+    const f = breathFight(4);
+    f.dev('/dev heart breath pull');
+    stillAir(f);
+    const st = f.state();
+    if (!st) throw new Error('no fight');
+    st.inhaleTimer = 999;
+    f.tick(ticks(T.heartFirst + 30));
+    expect(st.heart).toBeNull();
+    expect(st.heartRuns).toBe(0);
+    expect(f.objects(BREATH_OBJECTS.knotPrefix)).toHaveLength(0);
   });
 
-  it('the template round-trips; at half speed the walk alone beats the fuse, so the portals gate the throw', () => {
-    expect(knotOf(knotTemplate('held', 12.5))).toEqual({ state: 'held', fuse: 12.5 });
+  it('the template round-trips; on both tiers a walk to the edge beats the fuse, the portals a shortcut', () => {
+    expect(knotOf(knotTemplate('held', 12.5, 15))).toEqual({ state: 'held', fuse: 12.5, full: 15 });
     expect(knotOf('sh_breath_cradle_5')).toBeNull();
-    // Jose's call of 2026-11-07: half a run, a 10 s fuse, the portals at 5 s.
-    expect(T.heartWalkMult).toBe(0.5);
-    expect(T.heartFuse).toBe(10);
-    expect(T.heartMark).toBe(5);
-    // The wind at the back still quickens the load, never slows it.
-    expect(T.heartTailMult).toBeGreaterThan(T.heartWalkMult);
-    const walk = RUN_SPEED * T.heartWalkMult;
     // The farthest ball (23 yd from a lip on today's Cornice) and the nearest
-    // drop (heartFar) both walk to a lip inside the fuse: the clock alone
-    // cannot force the portals, which is why the throw needs a loosed ball.
+    // drop (heartFar) both walk to a lip inside the fuse on either tier,
+    // after a 2 s run to take it up, with time to spare: no portal is needed.
     const far = Math.max(...knotGrid().map((g) => g.far)) - T.heartLipReach;
-    expect(far / walk).toBeLessThan(T.heartFuse);
-    const near = T.heartFar - T.heartLipReach;
-    expect(near / walk).toBeLessThan(T.heartFuse * 0.5);
-    // A well placed pair (Portal A by the ball, B at a lip) throws it soon
-    // after they open: a 2 s run to take it up, 3 yd to A, half a second at
-    // B, at least 3 s to spare.
-    const placed = Math.max(T.heartMark, 2 + 3 / walk) + 0.5;
-    expect(T.heartFuse - placed).toBeGreaterThanOrEqual(3);
-    // A portal 27 yd off the ball is the burst.
-    expect(2 + 27 / walk + 0.5).toBeGreaterThan(T.heartFuse);
+    for (const r of [H, M]) {
+      // The wind at the back still quickens the load, never slows it.
+      expect(r.tailMult).toBeGreaterThan(r.walkMult);
+      const walk = RUN_SPEED * r.walkMult;
+      expect(2 + far / walk + 0.5).toBeLessThan(r.fuse - 1);
+      expect(2 + (T.heartFar - T.heartLipReach) / walk).toBeLessThan(r.fuse - 3);
+    }
+    // Heroic is the softer: a longer fuse and a quicker carrier.
+    expect(H.fuse).toBeGreaterThan(M.fuse);
+    expect(H.walkMult).toBeGreaterThan(M.walkMult);
+    expect(H.windRuns).toBeLessThan(M.windRuns);
+    expect(H.stormBalls).toBe(1);
     // Where a ball really drops is that far.
     for (let salt = 0; salt < 40; salt++) {
       const at = knotSpot(salt * 97);
@@ -217,8 +213,8 @@ describe('Knotted Gale: the round', () => {
     const obj = f.objects(BREATH_OBJECTS.knotPrefix)[0];
     const of = knotOf(obj.templateId);
     expect(of?.state).toBe('free');
-    expect(of?.fuse).toBeGreaterThan(T.heartFuse - 3.6);
-    expect(of?.fuse).toBeLessThanOrEqual(T.heartFuse - 2.5);
+    expect(of?.fuse).toBeGreaterThan(M.fuse - 3.6);
+    expect(of?.fuse).toBeLessThanOrEqual(M.fuse - 2.5);
     expect(obj.scale).toBe(T.heartPickR);
   });
 
@@ -227,7 +223,7 @@ describe('Knotted Gale: the round', () => {
     round(f);
     const gm = f.players[5];
     gm.gm = true;
-    f.tick(ticks(T.heartFuse) - 2);
+    f.tick(ticks(M.fuse) - 2);
     expect(f.players.filter((p) => p.dead)).toHaveLength(0);
     // The ball runs out with no keep-alive and a huge pool.
     for (const p of f.players) {
@@ -309,11 +305,11 @@ describe('Knotted Gale: the round', () => {
     const before = moveSpeedMult(p);
     carry(f, p);
     expect(has(p, BREATH_AURAS.laden)).toBe(true);
-    expect(moveSpeedMult(p)).toBeCloseTo(before * T.heartWalkMult, 5);
+    expect(moveSpeedMult(p)).toBeCloseTo(before * M.walkMult, 5);
     expect(heldFast(p)).toBe(true);
     // Slow immunity does not lift the load: it is not a snare.
     p.auras.push({ ...p.auras[0], id: 'x', kind: 'slow_immunity', remaining: 5, duration: 5 });
-    expect(moveSpeedMult(p)).toBeCloseTo(before * T.heartWalkMult, 5);
+    expect(moveSpeedMult(p)).toBeCloseTo(before * M.walkMult, 5);
     p.auras = p.auras.filter((x) => x.id !== 'x');
     // The wind: no aura through a blow, no throw moves them, and the ball rides along.
     f.dev('/dev heart breath blow 90');
@@ -326,7 +322,7 @@ describe('Knotted Gale: the round', () => {
     expect(Math.hypot(knot.x - at.x, knot.z - at.z)).toBeLessThan(0.01);
     // The aura's bar is the fuse.
     const load = p.auras.find((x) => x.id === BREATH_AURAS.laden);
-    expect(load?.duration).toBe(T.heartFuse);
+    expect(load?.duration).toBe(M.fuse);
     expect(Math.abs((load?.remaining ?? 0) - knot.fuse)).toBeLessThan(0.2);
   });
 
@@ -428,7 +424,7 @@ describe('Knotted Gale: the round', () => {
       const f = mythic(6);
       const h = round(f);
       const p = third(f);
-      const knot = carryLoosed(f, p);
+      const knot = carry(f, p);
       f.put(p, -10, 190);
       f.tick();
       f.sim.interact(p.id);
@@ -455,7 +451,7 @@ describe('Knotted Gale: the round', () => {
       expect(has(p, BREATH_AURAS.laden)).toBe(false);
       expect(f.objects(BREATH_OBJECTS.knotPrefix)).toHaveLength(0);
       expect(f.objects(BREATH_OBJECTS.portalA)).toHaveLength(0);
-      f.tick(ticks(T.heartFuse));
+      f.tick(ticks(M.fuse));
       expect(f.players.filter((e) => e.dead)).toHaveLength(0);
     }
   });
@@ -501,7 +497,7 @@ describe('Knotted Gale: the round', () => {
     const f = mythic();
     round(f);
     const p = third(f);
-    carryLoosed(f, p);
+    carry(f, p);
     const g = CORNICE_GAPS[0];
     const spot = lip(g);
     f.put(p, spot.x, spot.z);
@@ -514,33 +510,104 @@ describe('Knotted Gale: the round', () => {
     expect(f.state()?.heart).toBeNull();
   });
 
-  it('a ball not yet through a portal is refused at the lip, and stays on it over one', () => {
-    const f = mythic();
-    const h = round(f);
-    const p = third(f);
-    const knot = carry(f, p);
-    expect(knot.loosed).toBe(false);
-    expect(p.auras.find((a) => a.id === BREATH_AURAS.laden)?.value2).toBe(0);
-    const g = CORNICE_GAPS[0];
-    const spot = lip(g);
-    f.put(p, spot.x, spot.z);
-    f.tick(1);
-    f.sim.interact(p.id);
-    const evs = f.tick(1);
-    expect(evs.some((e) => e.type === 'error' && e.text === KNOT_NOT_LOOSED_ERROR)).toBe(true);
-    expect(h.knots).toContain(knot);
-    // Over the lip with it: the ball stays where they last stood, ticking.
-    fallOver(f, p, g);
-    const over = f.tick(1);
-    expect(over.some((e) => e.type === 'spellfxAt' && e.ability === BREATH_CUES.knotThrow)).toBe(
-      false,
-    );
-    expect(f.state()?.heart?.knots).toContain(knot);
-    expect(knot.carrierId).toBeNull();
-    expect(gapDistance(knot.x, knot.z)).toBeLessThanOrEqual(T.heartLipReach);
+  it('a ball never carried through a portal goes over a lip on both tiers (no portal rule)', () => {
+    for (const tier of ['heroic', 'mythic'] as const) {
+      const f = mythic(6, 23, tier);
+      const h = round(f);
+      const p = third(f);
+      const knot = carry(f, p);
+      // The pressed throw at the lip, no portal crossed.
+      const g = CORNICE_GAPS[0];
+      const spot = lip(g);
+      f.put(p, spot.x, spot.z);
+      f.tick(1);
+      f.sim.interact(p.id);
+      const evs = f.tick(1);
+      expect(
+        evs.some((e) => e.type === 'error'),
+        tier,
+      ).toBe(false);
+      expect(
+        evs.some((e) => e.type === 'spellfxAt' && e.ability === BREATH_CUES.knotThrow),
+        tier,
+      ).toBe(true);
+      expect(h.knots, tier).not.toContain(knot);
+      expect(f.state()?.heart, tier).toBeNull();
+      // And over the lip with a second round's ball: gone with them, thrown.
+      const h2 = round(f);
+      const q = third(f);
+      carry(f, q);
+      f.put(q, spot.x, spot.z);
+      f.tick(1);
+      fallOver(f, q, g);
+      const over = f.tick(1);
+      expect(
+        over.some((e) => e.type === 'spellfxAt' && e.ability === BREATH_CUES.knotThrow),
+        tier,
+      ).toBe(true);
+      expect(h2.knots, tier).toHaveLength(0);
+    }
   });
 
-  it('carried through a portal it is loosed; a well placed pair throws it with time to spare', () => {
+  it('Heroic: from the farthest drop a plain walk to the edge throws it inside the fuse', () => {
+    const f = heroic();
+    const h = round(f);
+    const knot = h.knots[0];
+    // The farthest floor a ball can sit on (23 yd from any lip): the worst case.
+    const worst = knotGrid().reduce((x, y) => (y.far > x.far ? y : x));
+    const obj = entity(f, knot.objectId);
+    knot.x = worst.x;
+    knot.z = worst.z;
+    const w = f.world(worst.x, worst.z);
+    obj.pos.x = w.x;
+    obj.pos.z = w.z;
+    // Everyone else well away, so no portal is near the walk.
+    const p = third(f);
+    for (const e of f.players) if (e !== p) f.put(e, -10, 190);
+    // A 2 s run to reach the ball, then the walk at the load's own pace.
+    f.tick(ticks(2) - 1);
+    carry(f, p);
+    expect(moveSpeedMult(p)).toBeLessThanOrEqual(H.tailMult + 1e-6);
+    // The walk to the edge: the shortest way over the floor to the nearest
+    // spot a carrier can throw from (the climb's head is walled), then walked
+    // for real (the motion kernel at the load's pace), aimed each tick.
+    const path = edgeWalk(worst.x, worst.z);
+    expect(path.length).toBeGreaterThan(1);
+    let length = 0;
+    for (let i = 1; i < path.length; i++)
+      length += Math.hypot(path[i].x - path[i - 1].x, path[i].z - path[i - 1].z);
+    const meta = f.sim.players.get(p.id);
+    if (!meta) throw new Error('meta');
+    let walked = 0;
+    let next = 0;
+    while (walked < ticks(H.fuse) && !atGapLip(f.local(p).x, f.local(p).z)) {
+      const at = f.local(p);
+      while (next < path.length - 1 && Math.hypot(path[next].x - at.x, path[next].z - at.z) < 0.8)
+        next++;
+      p.facing = Math.atan2(path[next].x - at.x, path[next].z - at.z);
+      meta.moveInput.forward = true;
+      f.tick(1);
+      walked++;
+    }
+    meta.moveInput.forward = false;
+    expect(p.dead).toBe(false);
+    expect(atGapLip(f.local(p).x, f.local(p).z)).toBe(true);
+    // The walk took about its length at the load's pace (never quicker than
+    // the tailwind allows), with time to spare after a 2 s run to the ball.
+    expect(walked / 20).toBeGreaterThan(length / (RUN_SPEED * H.tailMult) - 1.5);
+    expect(2 + walked / 20).toBeLessThan(H.fuse - 4);
+    f.sim.interact(p.id);
+    const evs = f.tick(1);
+    expect(evs.some((e) => e.type === 'spellfxAt' && e.ability === BREATH_CUES.knotThrow)).toBe(
+      true,
+    );
+    expect(f.state()?.heart).toBeNull();
+    // Time to spare: the fuse it still had, and nobody died.
+    expect(knot.fuse).toBeGreaterThan(4);
+    expect(f.players.filter((e) => e.dead)).toHaveLength(0);
+  });
+
+  it('a well placed pair (A by the ball, B at a lip) throws it with time to spare', () => {
     const f = mythic();
     const h = round(f);
     const knot = h.knots[0];
@@ -565,7 +632,7 @@ describe('Knotted Gale: the round', () => {
     for (let k = 0; k < ticks(3) && !crossed; k++) {
       const at = f.local(p);
       if (Math.hypot(at.x - A.x, at.z - A.z) > 0.2) {
-        const step = (RUN_SPEED * T.heartWalkMult) / 20;
+        const step = (RUN_SPEED * M.walkMult) / 20;
         const d = Math.hypot(A.x - at.x, A.z - at.z);
         const u = Math.min(1, step / d);
         f.put(p, at.x + (A.x - at.x) * u, at.z + (A.z - at.z) * u);
@@ -574,8 +641,6 @@ describe('Knotted Gale: the round', () => {
       crossed = Math.hypot(f.local(p).x - spot.x, f.local(p).z - spot.z) < T.heartPortalR;
     }
     expect(crossed).toBe(true);
-    expect(knot.loosed).toBe(true);
-    expect(p.auras.find((x) => x.id === BREATH_AURAS.laden)?.value2).toBe(1);
     f.sim.interact(p.id);
     const evs = f.tick(1);
     expect(evs.some((e) => e.type === 'spellfxAt' && e.ability === BREATH_CUES.knotThrow)).toBe(
@@ -635,17 +700,119 @@ describe('Knotted Gale: when', () => {
     const f2 = mythic();
     const st2 = f2.state();
     if (!st2) throw new Error('no fight');
-    st2.heartRuns = T.heartWindRuns;
+    st2.heartRuns = M.windRuns;
     st2.heartTimer = 0;
     f2.tick(10);
     expect(st2.heart).toBeNull();
+  });
+
+  it('Heroic: its own numbers, a 15 s fuse and a 70 percent walk, two balls at most in phase 1', () => {
+    const f = breathFight(6);
+    f.dev('/dev heart breath pull');
+    f.dev('/dev heart breath heroic');
+    const st = f.state();
+    if (!st) throw new Error('no fight');
+    expect(st.difficulty).toBe('heroic');
+    stillAir(f);
+    st.inhaleTimer = 999;
+    st.circleTimer = 999;
+    f.tick(ticks(T.heartFirst) - 2);
+    expect(st.heart).toBeNull();
+    f.tick(4);
+    const h = st.heart;
+    if (!h) throw new Error('no round');
+    // One ball, one pair, the tier's fuse on the object's template.
+    expect(h.knots).toHaveLength(1);
+    expect(h.pairs).toBe(1);
+    expect(h.knots[0].fuse).toBeGreaterThan(H.fuse - 0.2);
+    expect(knotOf(entity(f, h.knots[0].objectId).templateId)?.fuse).toBeGreaterThan(M.fuse);
+    // The whole fuse rides the template, so a late client still draws its age.
+    expect(knotOf(entity(f, h.knots[0].objectId).templateId)?.full).toBe(H.fuse);
+    expect(has(entity(f, h.markA), BREATH_AURAS.portalA)).toBe(true);
+    expect(has(entity(f, h.markB), BREATH_AURAS.portalB)).toBe(true);
+    // The carrier's load: Heroic's walk, its bar the whole 15 s fuse; the
+    // tooltip names the tier's walk (70 percent).
+    const p = third(f);
+    const before = moveSpeedMult(p);
+    carry(f, p);
+    const load = p.auras.find((a) => a.id === BREATH_AURAS.laden);
+    expect(load?.duration).toBe(H.fuse);
+    expect(load?.value2).toBe(H.walkMult);
+    expect(moveSpeedMult(p)).toBeCloseTo(before * H.walkMult, 5);
+    const d = auraEffectDescriptor({
+      id: BREATH_AURAS.laden,
+      kind: 'internal_cd',
+      value: load?.value ?? 0,
+      value2: load?.value2,
+    });
+    expect(t(d?.key as never, d?.nums as never)).toContain(`${H.walkMult * 100}%`);
+    // Its whole fuse: no burst at Mythic's 10 s, the burst at 15.
+    for (const e of f.players) f.put(e, -10, 190);
+    f.tick(ticks(M.fuse + 1));
+    expect(st.heart).not.toBeNull();
+    expect(f.players.filter((e) => e.dead)).toHaveLength(0);
+    // The clock: the next one about every 45 s, and two was the last.
+    st.heart = null;
+    st.heartRuns = H.windRuns - 1;
+    st.heartTimer = 0;
+    f.tick(2);
+    expect(st.heart).not.toBeNull();
+    expect(st.heartTimer).toBeGreaterThan(T.heartEvery - 1);
+    st.heart = null;
+    expect(st.heartRuns).toBe(H.windRuns);
+    st.heartTimer = 0;
+    f.tick(10);
+    expect(st.heart).toBeNull();
+  });
+
+  it('Heroic phase 2: one ball at a time, one pair of portals (A and B)', () => {
+    const f = mythic(8, 23, 'heroic');
+    const st = f.state();
+    if (!st) throw new Error('no fight');
+    f.dev('/dev heart breath phase2');
+    f.tick(ticks(T.stormCast) + 2);
+    expect(st.half).toBe('storm');
+    f.tick(ticks(T.barrageSeconds) - 4);
+    expect(st.heart).toBeNull();
+    f.tick(ticks(T.heartStormFirst) - 2);
+    expect(st.heart).toBeNull();
+    f.tick(20);
+    const h = st.heart;
+    if (!h) throw new Error('no round');
+    expect(h.knots).toHaveLength(1);
+    expect(h.pairs).toBe(1);
+    expect(h.markC).toBeNull();
+    expect(h.markD).toBeNull();
+    for (const p of f.players) {
+      expect(has(p, BREATH_AURAS.portalC)).toBe(false);
+      expect(has(p, BREATH_AURAS.portalD)).toBe(false);
+    }
+    f.tick(ticks(T.heartMark) + 1);
+    expect(f.objects(BREATH_OBJECTS.portalA)).toHaveLength(1);
+    expect(f.objects(BREATH_OBJECTS.portalB)).toHaveLength(1);
+    expect(f.objects(BREATH_OBJECTS.portalC)).toHaveLength(0);
+    expect(f.objects(BREATH_OBJECTS.portalD)).toHaveLength(0);
+  });
+
+  it('a Normal run: no ball ever, the dev try-out switches it to Mythic, a Heroic run keeps Heroic', () => {
+    const n = breathFight(4);
+    n.dev('/dev heart breath pull');
+    expect(n.state()?.difficulty).toBe('normal');
+    n.dev('/dev heart breath heart');
+    expect(n.state()?.difficulty).toBe('mythic');
+    const hc = breathFight(4);
+    hc.dev('/dev heart breath pull');
+    hc.dev('/dev heart breath heroic');
+    hc.dev('/dev heart breath heart');
+    expect(hc.state()?.difficulty).toBe('heroic');
+    expect(hc.state()?.heart?.knots[0].fuse).toBe(H.fuse);
   });
 
   it('never starts into the indrawn breath, nor a fuse short of it', () => {
     const f = mythic();
     const st = f.state();
     if (!st) throw new Error('no fight');
-    st.inhaleTimer = T.heartFuse - 1;
+    st.inhaleTimer = M.fuse - 1;
     st.heartTimer = 0;
     f.tick(10);
     expect(st.heart).toBeNull();
@@ -711,11 +878,6 @@ describe('Knotted Gale: when', () => {
     for (const e of f.players) if (e !== c1 && e !== c2) f.put(e, aside.x, aside.z);
     if (!held[0]) carry(f, c1, 0);
     if (!held[1]) carry(f, c2, 1);
-    for (const [i, c] of [c1, c2].entries()) {
-      h.knots[i].loosed = true;
-      const load = c.auras.find((a) => a.id === BREATH_AURAS.laden);
-      if (load) load.value2 = 1;
-    }
     f.tick(ticks(T.heartMark));
     for (const o of ['portalA', 'portalB', 'portalC', 'portalD'] as const)
       expect(f.objects(BREATH_OBJECTS[o]), o).toHaveLength(1);
@@ -729,7 +891,7 @@ describe('Knotted Gale: when', () => {
     f.sim.interact(c2.id);
     f.tick(1);
     expect(st.heart).toBeNull();
-    expect(st.heartTimer).toBeGreaterThan(T.heartStormEvery - T.heartFuse - 5);
+    expect(st.heartTimer).toBeGreaterThan(T.heartStormEvery - M.fuse - 5);
   });
 
   it('a wipe or reset clears everything; the next pull starts clean', () => {
@@ -1015,11 +1177,10 @@ describe('Knotted Gale: the player text', () => {
       expect(localizeSimAuraName(n)).toBe(n);
     expect(localizeSimText(KNOT_HOP_TEXT)).toBe(KNOT_HOP_TEXT);
     expect(localizeSimText(KNOT_NOT_AT_LIP_ERROR)).toBe(KNOT_NOT_AT_LIP_ERROR);
-    expect(localizeSimText(KNOT_NOT_LOOSED_ERROR)).toBe(KNOT_NOT_LOOSED_ERROR);
     const f = mythic();
     const h = round(f);
     const p = third(f);
-    carryLoosed(f, p);
+    carry(f, p);
     const spot = lip(CORNICE_GAPS[0]);
     f.put(p, spot.x, spot.z);
     f.sim.interact(p.id);
@@ -1040,10 +1201,10 @@ describe('Knotted Gale: the player text', () => {
       BREATH_AURAS.portalD,
       BREATH_AURAS.laden,
     ]) {
-      const d = auraEffectDescriptor({ id, kind: 'internal_cd', value: T.heartWalkMult });
+      const d = auraEffectDescriptor({ id, kind: 'internal_cd', value: M.walkMult });
       const text = t(d?.key as never, d?.nums as never);
       expect(text).not.toMatch(/\{\w+\}/);
-      if (id === BREATH_AURAS.laden) expect(text).toContain(`${T.heartWalkMult * 100}%`);
+      if (id === BREATH_AURAS.laden) expect(text).toContain(`${M.walkMult * 100}%`);
     }
   });
 
@@ -1076,38 +1237,23 @@ describe('Knotted Gale: the player text', () => {
       ...base,
       auras: [{ id: BREATH_AURAS.laden, remaining: 10, duration: 20 }],
     });
-    // Not yet loosed: no throw key shown.
-    expect(c.visible && c.kind === 'carry' && c.pressable && c.key === '').toBe(true);
-    // Not yet through a portal: walk it into one (even standing at a lip).
+    // No portal rule (Jose's call of 2026-11-08): the throw's key from the
+    // first step, the line names no portal as needed, louder at a lip.
+    expect(c.visible && c.kind === 'carry' && c.pressable && c.key === 'F').toBe(true);
+    if (c.visible) {
+      expect(c.hint).toContain('F');
+      expect(c.line).toContain('edge');
+      expect(c.line).not.toMatch(/only then|before you throw|loosed/i);
+    }
     const g = CORNICE_GAPS[0];
     const spot = lip(g);
     const o = breathFight(1).world(spot.x, spot.z);
-    const atLip = { ...base, pos: { x: o.x, z: o.z } };
-    const tied = buildKnotAlertView({
-      ...atLip,
-      auras: [{ id: BREATH_AURAS.laden, remaining: 5, duration: 10 }],
-    });
-    expect(tied.visible && tied.kind === 'carry').toBe(true);
-    if (tied.visible) {
-      expect(tied.line).toContain('portal');
-      expect(tied.hint).toBe('');
-    }
-    // Loosed: the throw, louder at the lip.
-    const loose = buildKnotAlertView({
-      ...base,
-      auras: [{ id: BREATH_AURAS.laden, remaining: 5, duration: 10, value2: 1 }],
-    });
-    expect(loose.visible && loose.kind === 'carry').toBe(true);
-    if (loose.visible) {
-      expect(loose.line).toContain('loosed');
-      expect(loose.hint).toContain('F');
-      expect(loose.key).toBe('F');
-    }
     const ready = buildKnotAlertView({
-      ...atLip,
-      auras: [{ id: BREATH_AURAS.laden, remaining: 5, duration: 10, value2: 1 }],
+      ...base,
+      pos: { x: o.x, z: o.z },
+      auras: [{ id: BREATH_AURAS.laden, remaining: 5, duration: 15 }],
     });
-    expect(ready.visible && ready.kind === 'lip').toBe(true);
+    expect(ready.visible && ready.kind === 'lip' && ready.key === 'F').toBe(true);
     expect(
       buildKnotAlertView({
         ...base,
@@ -1168,19 +1314,19 @@ describe("Knotted Gale: Jose's playtest of 2026-11-02", () => {
     f.dev('/dev heart breath blow 90');
     p.facing = Math.PI / 2 + 0.5;
     f.tick(2);
-    expect(load()).toBe(T.heartTailMult);
-    expect(moveSpeedMult(p)).toBeCloseTo(free * T.heartTailMult, 5);
+    expect(load()).toBe(M.tailMult);
+    expect(moveSpeedMult(p)).toBeCloseTo(free * M.tailMult, 5);
     expect(has(p, WIND_DRIFT_AURA)).toBe(false);
     p.facing = -Math.PI / 2;
     f.tick(2);
-    expect(load()).toBe(T.heartWalkMult);
+    expect(load()).toBe(M.walkMult);
     p.facing = Math.PI;
     f.tick(2);
-    expect(load()).toBe(T.heartWalkMult);
+    expect(load()).toBe(M.walkMult);
     f.dev('/dev heart breath calm');
     p.facing = Math.PI / 2;
     f.tick(2);
-    expect(load()).toBe(T.heartWalkMult);
+    expect(load()).toBe(M.walkMult);
   });
 });
 

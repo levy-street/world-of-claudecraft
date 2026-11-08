@@ -117,8 +117,11 @@ export const BREATH_OBJECTS = {
   /** The Thunder's Cradle's gather circle under the lifted player
    *  (`<prefix><tenths>` of hold); it also carries them. */
   cradlePrefix: 'sh_breath_cradle_',
-  /** Mythic: a Knotted Gale, `<prefix><free|held>_<tenths of fuse left>`
-   *  (knotTemplate), its radius (the pick-up's) in `scale`. */
+  /** Heroic and Mythic: a Knotted Gale,
+   *  `<prefix><free|held>_<tenths of fuse left>_<tenths of its whole fuse>`
+   *  (knotTemplate: the whole fuse is the tier's, so a client that first sees
+   *  the ball mid-fuse still draws its age), its radius (the pick-up's) in
+   *  `scale`. */
   knotPrefix: 'sh_breath_knot_',
   /** Mythic: the wind portals, their radius in `scale`: A links to B only,
    *  C to D only (C and D open in phase 2's two-ball round alone). */
@@ -210,14 +213,11 @@ export const KNOT_HOP_TEXT = 'The portal tears you across the Cornice, gale and 
 /** The error a throw away from any gap reads (same matcher). */
 export const KNOT_NOT_AT_LIP_ERROR =
   'You must stand at the edge of the Cornice to throw the Knotted Gale.';
-/** The error a throw of a ball not yet carried through a portal reads (same
- *  matcher). */
-export const KNOT_NOT_LOOSED_ERROR =
-  'The Knotted Gale clings to the Cornice: carry it through a portal before you throw it.';
 
 // ---- difficulty -----------------------------------------------------------------------
 
-/** The fight's difficulty. Each tier is one BREATH_DIFFICULTY row; mythic is
+/** The fight's difficulty. Each tier is one BREATH_DIFFICULTY row (its
+ *  Knotted Gale one BREATH_KNOT row, Heroic and Mythic); mythic is
  *  a dev-switched prototype (breath.ts setBreathDevTier) and, for now, the
  *  heroic row whole: a later mythic-only mechanic is one more field here and
  *  its own module, never a branch on a tier's name. */
@@ -254,9 +254,40 @@ export interface BreathDifficultyRules {
   /** Windworn: a body that rode home may not ride again for this long (0:
    *  never worn: the same group may go again). */
   windwornSeconds: number;
-  /** The Knotted Gale (breath_heart.ts): its balls, portals and carriers. */
-  stormHeart: boolean;
+  /** The Knotted Gale (breath_heart.ts): its balls, portals and carriers, or
+   *  null for a tier without it (Normal). */
+  stormHeart: BreathKnotRules | null;
 }
+
+/** One tier's Knotted Gale (Jose's calls of 2026-11-07 and 2026-11-08). No
+ *  rule gates the throw on a portal: a carrier may walk the ball to any lip,
+ *  the portals are the shortcut. */
+export interface BreathKnotRules {
+  /** A ball's fuse (seconds); the portals open `BREATH_TUNING.heartMark`
+   *  into it on every tier. */
+  fuse: number;
+  /** The carrier's walk against a run, and with the wind at their back
+   *  (`BREATH_TUNING.heartTailCone`): above the walk, never below it. */
+  walkMult: number;
+  tailMult: number;
+  /** Phase 1: at most this many balls, one at a time, about every
+   *  `BREATH_TUNING.heartEvery` seconds. */
+  windRuns: number;
+  /** Phase 2: the balls of each round, each with its own pair of portals
+   *  (two: A and B, then C and D). */
+  stormBalls: 1 | 2;
+}
+
+/** The Knotted Gale's numbers, one row per tier that has it (Normal has none).
+ *  The tail walk sits 0.15 above the walk on both, as Mythic's always has. */
+export const BREATH_KNOT: Readonly<Record<'heroic' | 'mythic', BreathKnotRules>> = {
+  // Softer than Mythic's (Jose's call of 2026-11-08): a longer fuse, a quicker
+  // carrier, two balls in phase 1, one ball and one pair of portals in phase 2.
+  heroic: { fuse: 15, walkMult: 0.7, tailMult: 0.85, windRuns: 2, stormBalls: 1 },
+  // Jose's call of 2026-11-07: half a run and a 10 s fuse (a tenth of a run
+  // read as standing still); three balls in phase 1, two at once in phase 2.
+  mythic: { fuse: 10, walkMult: 0.5, tailMult: 0.65, windRuns: 3, stormBalls: 2 },
+};
 
 export const BREATH_DIFFICULTY: Readonly<Record<BreathDifficulty, BreathDifficultyRules>> = {
   normal: {
@@ -273,7 +304,7 @@ export const BREATH_DIFFICULTY: Readonly<Record<BreathDifficulty, BreathDifficul
     isleAt: [0.7],
     isleCount: 1,
     windwornSeconds: 0,
-    stormHeart: false,
+    stormHeart: null,
   },
   heroic: {
     windSpeed: 4.4,
@@ -289,10 +320,10 @@ export const BREATH_DIFFICULTY: Readonly<Record<BreathDifficulty, BreathDifficul
     isleAt: [0.8, 0.6],
     isleCount: 2,
     windwornSeconds: 0,
-    stormHeart: false,
+    stormHeart: BREATH_KNOT.heroic,
   },
-  // Heroic whole (the circle rule included), plus the Knotted Gale and
-  // Windworn (one ride per player per round of isles: two groups).
+  // Heroic whole (the circle rule included), with its own harder Knotted
+  // Gale and Windworn (one ride per player per round of isles: two groups).
   mythic: {
     windSpeed: 4.4,
     gustThrow: 30,
@@ -307,7 +338,7 @@ export const BREATH_DIFFICULTY: Readonly<Record<BreathDifficulty, BreathDifficul
     isleAt: [0.8, 0.6],
     isleCount: 2,
     windwornSeconds: 150,
-    stormHeart: true,
+    stormHeart: BREATH_KNOT.mythic,
   },
 };
 
@@ -453,32 +484,18 @@ export const BREATH_TUNING = {
   barGap: 1.2,
   /** How far below the Cornice a fallen body is dead for sure (yards). */
   voidDepth: 25,
-  // Mythic: the Knotted Gale (breath_heart.ts).
-  /** A ball's fuse, and how long the marks run before their portals open.
-   *  Jose's playtest of 2026-11-07: the carrier walks at half speed and the
-   *  fuse is halved, 20 s to 10 s. The portals open at 5 s, so a portal by
-   *  the ball and one at a lip throw it with about 4 s to spare; a portal
-   *  27 yd or more off the ball (an 8 s walk at half speed, after a 2 s run
-   *  to take it up) is the burst. */
-  heartFuse: 10,
+  // Heroic and Mythic: the Knotted Gale (breath_heart.ts). The numbers that
+  // differ by tier (the fuse, the walk, how many balls) are the tier row's
+  // (BreathDifficultyRules.stormHeart); these are shared.
+  /** How long the marks run before their portals open. */
   heartMark: 5,
-  /** Phase 1: the first ball, the rest, at most this many; a start waits out
-   *  the indrawn breath and any time too short for a whole fuse before it. */
+  /** Phase 1: the first ball, then this often; a start waits out the indrawn
+   *  breath and any time too short for a whole fuse before it. */
   heartFirst: 12,
   heartEvery: 45,
-  heartWindRuns: 3,
-  /** Phase 2 (two balls): seconds after the barrage, then this often. */
+  /** Phase 2: seconds after the barrage, then this often. */
   heartStormFirst: 15,
   heartStormEvery: 60,
-  /** The carrier's walk: half a run (Jose's call of 2026-11-07: a tenth read
-   *  as standing still). At half speed the Cornice is too small for the
-   *  fuse to force the portals (its deepest floor is 23 yd from a lip, a
-   *  6 s walk; the nearest drop, heartFar, a 4 s one), so the portals are
-   *  forced by the rule instead: a ball only goes over a lip once it has
-   *  been carried through a portal (BreathKnot.loosed;
-   *  tests/smith_heart_breath_heart.test.ts pins the walk's length). Before:
-   *  a tenth (2026-11-04), a fifth (2026-11-03), a quarter. */
-  heartWalkMult: 0.5,
   /** How near a ball a player takes it up, and a portal's mouth (yards). */
   heartPickR: 2.5,
   heartPortalR: 2.5,
@@ -494,10 +511,8 @@ export const BREATH_TUNING = {
    *  middle of the Cornice too and still asks a 12 yd crawl. */
   heartFar: 16,
   heartApart: 20,
-  /** The carrier's walk with the wind at their back (facing within
-   *  `heartTailCone` degrees of where it blows): the load rides it a little
-   *  (above heartWalkMult, never below it). */
-  heartTailMult: 0.65,
+  /** The cone (degrees) round the wind's bearing a carrier faces to walk at
+   *  the tier's `tailMult`: the load rides the wind a little. */
   heartTailCone: 60,
 } as const;
 
@@ -647,17 +662,21 @@ export function calmOf(templateId: string): { state: BreathCalmState; seconds: n
 }
 
 /** A Knotted Gale's template: on the floor or carried, and its fuse left. */
-export function knotTemplate(state: 'free' | 'held', fuse: number): string {
-  return `${BREATH_OBJECTS.knotPrefix}${state}_${tenthsOf(fuse)}`;
+export function knotTemplate(state: 'free' | 'held', fuse: number, full: number): string {
+  return `${BREATH_OBJECTS.knotPrefix}${state}_${tenthsOf(fuse)}_${tenthsOf(full)}`;
 }
 
-/** A Knotted Gale template's state and fuse, or null. */
-export function knotOf(templateId: string): { state: 'free' | 'held'; fuse: number } | null {
+/** A Knotted Gale template's state, fuse left and whole fuse, or null. */
+export function knotOf(
+  templateId: string,
+): { state: 'free' | 'held'; fuse: number; full: number } | null {
   if (!templateId.startsWith(BREATH_OBJECTS.knotPrefix)) return null;
-  const [state, tenths] = templateId.slice(BREATH_OBJECTS.knotPrefix.length).split('_');
+  const [state, tenths, whole] = templateId.slice(BREATH_OBJECTS.knotPrefix.length).split('_');
   if (state !== 'free' && state !== 'held') return null;
   const t = Number(tenths);
-  return Number.isInteger(t) && t >= 0 ? { state, fuse: t / 10 } : null;
+  const w = Number(whole);
+  if (!Number.isInteger(t) || t < 0 || !Number.isInteger(w) || w <= 0) return null;
+  return { state, fuse: t / 10, full: w / 10 };
 }
 
 /** A timed spot's template (a strike's warning, charged ground's life, the

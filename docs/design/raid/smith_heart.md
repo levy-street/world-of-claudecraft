@@ -1631,17 +1631,32 @@ table below disagree, this block wins. Every number stays a SKETCH (unmeasured).
   and the personal alerts (the Knotted Gale's marks).
 - **Phase 2** is unchanged (the team plays the new version before "more chaos").
 - **Mythic** keeps the Knotted Gale; its throw is now at any open lip. The carrier walks at half
-  a run (`heartWalkMult` 0.5, Jose's call of 2026-11-07: a tenth, the value since 2026-11-04,
-  read as standing still) and the fuse is halved, 20 s to 10 s (`heartFuse`; the portals still
-  open at 5 s, `heartMark`). At half speed the Cornice is too small for the clock to force the
-  portals: its deepest floor is 23 yd from a lip (a 6 s walk) and the nearest drop, `heartFar`,
-  a 4 s one. So the portals are forced by a rule instead: a ball only goes over a lip once it
-  has been carried through a portal (it is then "loosed"; the press at a lip before that is
-  refused with `KNOT_NOT_LOOSED_ERROR`, and a carrier who goes over the edge with it leaves it
-  on the lip, still ticking). A well placed pair (Portal A by the ball, B at a lip) throws it
-  with about 4 s to spare; a Portal A 27 yd or more off the ball is the burst. Every ball,
-  phase 2's second one too, needs its pair. The ball's throb and the fuse's warning wait for
-  its last 3 s.
+  a run (`BREATH_KNOT.mythic.walkMult` 0.5, Jose's call of 2026-11-07: a tenth, the value since
+  2026-11-04, read as standing still) and the fuse is halved, 20 s to 10 s (`fuse`; the portals
+  still open at 5 s, `heartMark`). Its deepest floor is 23 yd from a lip (a 6 s walk) and the
+  nearest drop, `heartFar`, a 4 s one. The ball's throb and the fuse's warning wait for its last
+  3 s.
+- **No portal rule, and the Knotted Gale on Heroic (Jose's calls of 2026-11-08).** The
+  portal-gated throw of 2026-11-07 (a ball "loosed" only once carried through a portal) is
+  gone on every tier: a carrier may walk the ball to any lip and throw it there, portal or not
+  ("si no hace falta portal para tirarla, no hace falta y punto"); the portals stay as an
+  optional shortcut. Heroic now carries the Knotted Gale too, softer than Mythic's. Each tier
+  is one row of `BREATH_KNOT` (`breath_ids.ts`), read through `BREATH_DIFFICULTY.<tier>.stormHeart`
+  (Normal's is null: no ball):
+
+  | | Heroic | Mythic |
+  |---|---|---|
+  | Fuse | 15 s | 10 s |
+  | Carrier's walk (tailwind) | 70 percent of a run (85) | 50 percent (65) |
+  | Portals | one pair, A and B, both phases | one pair in phase 1, two (A and B, C and D) in phase 2 |
+  | Phase 1 | up to 2 balls, about every 45 s | up to 3 |
+  | Phase 2 | one ball at a time, about every 60 s | two at once |
+
+  The marks still run 5 s before their portals open on both. From the farthest drop (23 yd
+  from a lip) Heroic's walk to the edge takes about 5 s of its 15 s fuse
+  (`tests/smith_heart_breath_heart.test.ts` walks it for real along `edgeWalk`, the floor's
+  shortest way, since the climb's head is walled). A start still waits out the indrawn breath
+  and the Roar after it, and any time to the next one shorter than a whole fuse.
 
 **The third pass of 2026-11-03 (the owner's review of the rework).** Where it and the block
 above disagree, this one wins.
@@ -1710,9 +1725,9 @@ the bots to reuse later).
 | Thunder's Cradle | Phase 2, every 40 s: a 1.5 s bar at a hashed non-tank; they are lifted 5 yd into the storm (carried, an unbreakable stun) over a 6 yd gather circle. 6 s on, the discharge: 2,600 split between everyone under it, the lifted included. Fewer than 4 under it (5 on heroic): each share 60 percent heavier and everyone on the Cornice takes 180 to 220 (Cradle Backlash): lethal for one or two. Then they are set down | `breath_storm.ts` (`cradleShare`) |
 | Drawn Lightning | Phase 2, every 30 s: a 1 s bar at a hashed non-tank; for 10 s a strike falls where they stand every 2 s (a 1.2 s warning, 280 to 320 within 3 yd), each leaving charged ground (3 yd, 60 to 75 every second for 18 s): they walk the edge to keep the floor clean | `breath_storm.ts` |
 | The swelling storm | After the barrage, every 5 s: 35 to 42 nature to everyone on the Cornice, each pulse 8 percent harder than the first, without end (a stack of `heart_breath_swelling_storm` on the guardian): the soft enrage | `breath_storm.ts` (`swellMult`) |
-| Heroic | Every number 25 percent higher, the wind 4.4 yd a second and the Roar's throw 30 yd, the Cradle wants 5, plus: Calm Spent (an anchor that ran out leaves its player unable to take another for 60 s: the raid rotates them); loose gales (three wander the Cornice on deterministic paths for 20 s after each exhale, 120 to 150 and an 11 yd toss to whoever they touch, once per player per gale in 2 s; a toss can carry a body out through a gap); storm gusts (in phase 2, every 24 s: a 2 s telegraph, then a 3.5 s gust toward a bearing, pushing like a blow, no circles). The raid has no heroic tier yet, so a dev run switches it on (`/dev heart breath heroic`) | `breath_ids.ts` (`BREATH_DIFFICULTY`) |
-| Mythic | Heroic whole, plus the Knotted Gale (next row), behind its own dev switch (`/dev heart breath mythic`); `BREATH_DIFFICULTY.mythic.stormHeart`, so Normal and Heroic do not change by one rng draw. |
-| The Knotted Gale (Mythic, `breath_heart.ts`) | A ball of compressed storm drops far from the gaps with a 10 s fuse; out of time it kills the whole raid on the Cornice, whatever shields them. Two non-tanks are marked Portal A and Portal B; after 5 s each portal opens exactly where its player stands (one who fell through a gap opens it at the lip they left). A third player steps on the ball and carries it: half a run (2026-11-07) and no wind, pull, blast or throw moves them. The ball only goes over a lip once it has been carried through a portal (loosed): at half speed anyone could walk it to a gap inside the fuse, so the rule, not the clock, makes the portals the way. Anyone who walks into a portal comes out at its partner, ball or no ball, once per walk in: one portal by the ball and one by a gap lets the carrier go out empty-handed and come back with it (the owner's change of 2026-11-01). The throw is the interact press within 2 yd of a gap's edge (Jose's playtest of 2026-11-02 cut it from 4: the carrier must stand right at the lip). A dead carrier drops it where they fell, still ticking (loosed or not, as it was), free to anyone but the marked; a carrier of a loosed ball who goes over a lip takes it along, which counts as thrown. Phase 1: from 12 s, about every 45 s, three at most, a start waiting out the indrawn breath and any spell too short for a whole fuse before it. Phase 2: two balls and two pairs of portals (the owner's change of 2026-11-02), 15 s after the barrage and then about every 60 s, never during it: four non-tanks are marked, Portal A and Portal B (the first pair, the storm's teal and violet, four arms in the mouth and a soft beam between them) and Portal C and Portal D (the second pair, spring green and rose, three arms turning the other way inside a doubled rim and a braid of two twisting strands between them, riding higher); each opens at its player's feet after the same 5 s, A links to B only and C to D only, never across the pairs, so the raid works both balls at once. The raid warning names all four. Phase 1 keeps its one pair. A group too small for every mark (only a dev run meets it) still plays: a missing Portal B opens at the lip nearest A; a missing Portal D at the lip nearest C (passing over a lip a portal already holds); with nobody for C either, C opens where the second ball fell. The marked never carry while anyone else is free. A ball alive when the storm breaks keeps ticking. Thessaly's circles do not change. |
+| Heroic | Every number 25 percent higher, the wind 4.4 yd a second and the Roar's throw 30 yd, the Cradle wants 5, plus: Calm Spent (an anchor that ran out leaves its player unable to take another for 60 s: the raid rotates them); loose gales (three wander the Cornice on deterministic paths for 20 s after each exhale, 120 to 150 and an 11 yd toss to whoever they touch, once per player per gale in 2 s; a toss can carry a body out through a gap); storm gusts (in phase 2, every 24 s: a 2 s telegraph, then a 3.5 s gust toward a bearing, pushing like a blow, no circles). The raid has no heroic tier yet, so a dev run switches it on (`/dev heart breath heroic`); and the Knotted Gale (2026-11-08), softer than Mythic's: a 15 s fuse, the carrier at 70 percent, one pair of portals, two balls in phase 1 and one at a time in phase 2 (its row below) | `breath_ids.ts` (`BREATH_DIFFICULTY`) |
+| Mythic | Heroic whole with its own harder Knotted Gale (next row) and Windworn, behind its own dev switch (`/dev heart breath mythic`). |
+| The Knotted Gale (Heroic and Mythic, `breath_heart.ts`; each tier one `BREATH_KNOT` row, Normal none, so Normal never changes by one rng draw) | A ball of compressed storm drops far from the gaps with a fuse (Heroic 15 s, Mythic 10 s); out of time it kills the whole raid on the Cornice, whatever shields them. Two non-tanks are marked Portal A and Portal B; after 5 s each portal opens exactly where its player stands (one who fell through a gap opens it at the lip they left). A third player steps on the ball and carries it: Heroic 70 percent of a run, Mythic half (2026-11-07), and no wind, pull, blast or throw moves them. No rule gates the throw on a portal (2026-11-08): the carrier may walk it to any lip inside the fuse, and the portals are a shortcut. Anyone who walks into a portal comes out at its partner, ball or no ball, once per walk in: one portal by the ball and one by a gap lets the carrier go out empty-handed and come back with it (the owner's change of 2026-11-01). The throw is the interact press within 2 yd of a gap's edge (Jose's playtest of 2026-11-02 cut it from 4: the carrier must stand right at the lip). A dead carrier drops it where they fell, still ticking, free to anyone but the marked; a carrier who goes over a lip takes it along, which counts as thrown. Phase 1: from 12 s, about every 45 s, three at most (Heroic two), a start waiting out the indrawn breath and any spell too short for a whole fuse before it. Phase 2 on Mythic: two balls and two pairs of portals (the owner's change of 2026-11-02), 15 s after the barrage and then about every 60 s, never during it: four non-tanks are marked, Portal A and Portal B (the first pair, the storm's teal and violet, four arms in the mouth and a soft beam between them) and Portal C and Portal D (the second pair, spring green and rose, three arms turning the other way inside a doubled rim and a braid of two twisting strands between them, riding higher); each opens at its player's feet after the same 5 s, A links to B only and C to D only, never across the pairs, so the raid works both balls at once. The raid warning names all four. Phase 1 keeps its one pair; Heroic's phase 2 drops one ball at a time with the one pair, A and B, on the same clock. A group too small for every mark (only a dev run meets it) still plays: a missing Portal B opens at the lip nearest A; a missing Portal D at the lip nearest C (passing over a lip a portal already holds); with nobody for C either, C opens where the second ball fell. The marked never carry while anyone else is free. A ball alive when the storm breaks keeps ticking. Thessaly's circles do not change. |
 | One wipe | The fight ends when the guardian stops fighting: the wind still, every circle, anchor, spent mark, pin, vortex, Roar's wave, gale, strike, patch and cradle gone, the lifted set down, the stone body back. Thessaly stays at her post; the gaps are the Cornice's, they stay | `breath.ts` (`resetBreath`) |
 
 **Health (sketch, unmeasured).** 43,000 base (about 99,000 after the elite factor) for a
@@ -2312,7 +2327,7 @@ on both difficulties (dungeon rework README, goal 4).
 | `/dev heart portal` | force the seal's portal open for the run (the hop then works) |
 | `/dev heart seal` | print the `smithHeartProgress` readout (and whether the heart is awake) |
 | `/dev heart arrival` | replay the arrival scene: the heart sleeps a moment and wakes again with a living player in the Heart |
-| `/dev heart breath heart [2]` | a Knotted Gale and the marks now (`2`: phase 2's round, two balls and two pairs of portals); switches the run to mythic |
+| `/dev heart breath heart [2]` | a Knotted Gale and the marks now (`2`: the tier's phase-2 round: Mythic's two balls and two pairs of portals, Heroic's one ball and one pair); switches a Normal run to mythic, a Heroic run keeps Heroic's row |
 | `/dev heart breath heart portal a`, `portal b`, `portal c`, `portal d` | open that portal at your feet now (a mark in the way ends, its player may carry); `c` and `d` only in a two-pair round |
 | `/dev heart breath heart carry` | take a free ball up where you stand (your own mark ends) |
 | `/dev heart breath heart burst` | burst the balls now |

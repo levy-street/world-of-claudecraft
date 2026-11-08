@@ -750,7 +750,7 @@ export class BreathHeartFx {
         k.changedAt = now;
       }
       const fuse = liveFuse(of.fuse, now - k.changedAt);
-      const look = knotLook(fuse);
+      const look = knotLook(fuse, of.full);
       const held = of.state === 'held';
       const eAt = fxAnchor(e);
       const floor = h.groundY(eAt.x, eAt.z);

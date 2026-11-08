@@ -33,6 +33,7 @@ import {
 import { PORTAL_LINK_FRAG, PORTAL_LINK_VERT } from '../src/render/smith_heart_fx/breath_heart_glsl';
 import {
   BREATH_AURAS,
+  BREATH_KNOT,
   BREATH_OBJECTS,
   knotTemplate,
   BREATH_TUNING as T,
@@ -40,7 +41,7 @@ import {
 
 describe('Knotted Gale: the look', () => {
   it('knows its objects and nothing else', () => {
-    expect(heartObjectKind(knotTemplate('held', 3))).toBe('knot');
+    expect(heartObjectKind(knotTemplate('held', 3, 10))).toBe('knot');
     expect(heartObjectKind(BREATH_OBJECTS.portalA)).toBe('portalA');
     expect(heartObjectKind(BREATH_OBJECTS.portalB)).toBe('portalB');
     expect(heartObjectKind(BREATH_OBJECTS.portalC)).toBe('portalC');
@@ -48,31 +49,37 @@ describe('Knotted Gale: the look', () => {
     expect(heartObjectKind(BREATH_OBJECTS.vortex)).toBeNull();
   });
 
-  it('the ring shrinks to the pick-up as the ball grows and rages', () => {
-    const full = knotLook(T.heartFuse);
-    const end = knotLook(0);
-    expect(end.ringR).toBeCloseTo(T.heartPickR, 5);
-    expect(full.ringR).toBeGreaterThan(end.ringR + 4);
-    expect(end.radius).toBeGreaterThan(full.radius);
-    expect(end.crackle).toBeGreaterThan(full.crackle);
-    expect(end.spin).toBeGreaterThan(full.spin);
-    expect(full.danger).toBe(0);
-    expect(end.danger).toBe(1);
-    expect(full.throb).toBe(0);
-    expect(knotLook(1).throb).toBeGreaterThan(0);
-    // The 10 s fuse (2026-11-07): the throb and the fuse's warning wait for
-    // the last 3 s, never the portals opening at 5 s.
+  it('the ring shrinks to the pick-up as the ball grows and rages, over every tier fuse', () => {
+    for (const { fuse: F } of [BREATH_KNOT.heroic, BREATH_KNOT.mythic]) {
+      const full = knotLook(F, F);
+      const end = knotLook(0, F);
+      expect(end.ringR).toBeCloseTo(T.heartPickR, 5);
+      expect(full.ringR).toBeGreaterThan(end.ringR + 4);
+      expect(end.radius).toBeGreaterThan(full.radius);
+      expect(end.crackle).toBeGreaterThan(full.crackle);
+      expect(end.spin).toBeGreaterThan(full.spin);
+      expect(full.danger).toBe(0);
+      expect(end.danger).toBe(1);
+      expect(full.throb).toBe(0);
+      expect(knotLook(1, F).throb).toBeGreaterThan(0);
+      // The throb and the fuse's warning wait for the last 3 s on both tiers,
+      // never the portals opening at 5 s.
+      expect(knotLook(F - T.heartMark, F).throb).toBe(0);
+      expect(knotLook(KNOT_THROB_AT - 0.5, F).throb).toBeGreaterThan(0);
+      let last = Number.POSITIVE_INFINITY;
+      for (let f = F; f >= 0; f -= 1) {
+        const r = knotLook(f, F).ringR;
+        expect(r).toBeLessThan(last);
+        last = r;
+      }
+      // Half the tier's fuse is halfway, whatever the tier.
+      expect(knotLook(F / 2, F).urge).toBeCloseTo(0.5, 6);
+    }
+    // A ball first seen 4 s from a 15 s fuse's end draws its age, not a new ball.
+    expect(knotLook(4, BREATH_KNOT.heroic.fuse).urge).toBeCloseTo(11 / 15, 6);
     expect(KNOT_THROB_AT).toBe(3);
-    expect(knotLook(T.heartFuse - T.heartMark).throb).toBe(0);
-    expect(knotLook(KNOT_THROB_AT - 0.5).throb).toBeGreaterThan(0);
     expect(knotFuseWarnDue(5.05, 4.95)).toBe(false);
     expect(knotFuseWarnDue(3.05, 2.95)).toBe(true);
-    let last = Number.POSITIVE_INFINITY;
-    for (let f = T.heartFuse; f >= 0; f -= 1) {
-      const r = knotLook(f).ringR;
-      expect(r).toBeLessThan(last);
-      last = r;
-    }
     expect(liveFuse(10, 0.25)).toBeCloseTo(9.75, 6);
     expect(liveFuse(0.5, 3)).toBe(0);
   });

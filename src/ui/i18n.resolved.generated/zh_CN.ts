@@ -7351,7 +7351,6 @@ export const zh_CN: EnTranslations = {
       "dLine": "{seconds}秒后在你脚下打开。站在远离传送门B的边缘。",
       "carryTitle": "你正携带结风！",
       "carryLine": "每个传送门都通往另一端：A到B，C到D。在崖台边缘把它扔出去。{seconds}秒后爆裂。",
-      "loosedLine": "The portal has loosed it. Throw it from the edge of the Cornice. It bursts in {seconds} sec.",
       "lipTitle": "现在扔！",
       "lipLine": "你站在边缘。{seconds}秒后爆裂。",
       "throwKey": "在边缘按{key}投掷",

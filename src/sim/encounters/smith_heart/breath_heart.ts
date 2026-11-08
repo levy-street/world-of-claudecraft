@@ -1,32 +1,36 @@
-// The Guardian of the Breath's Mythic mechanic (docs/design/raid/smith_heart.md
-// section 7.2, the row "The Knotted Gale"; the working name was the Storm
-// Heart, hence the ids' `heart`, the `stormHeart` rule and the dev verb):
+// The Guardian of the Breath's Heroic and Mythic mechanic
+// (docs/design/raid/smith_heart.md section 7.2, the row "The Knotted Gale"; the
+// working name was the Storm Heart, hence the ids' `heart`, the `stormHeart`
+// rule and the dev verb). Every number that differs by tier (the fuse, the
+// carrier's walk, how many balls) is the tier row's `stormHeart`
+// (breath_ids.ts BreathKnotRules); Normal's is null, so it never starts:
 //
-//   The ball      a Knotted Gale drops far from the gaps; a 10 s fuse, then it
-//                 bursts and wipes the raid.
+//   The ball      a Knotted Gale drops far from the gaps; its fuse (Heroic 15 s,
+//                 Mythic 10 s), then it bursts and wipes the raid.
 //   The portals   two non-tanks are marked; after 5 s Portal A and Portal B open
 //                 exactly where each stands (a body that fell through a gap
-//                 opens it at the lip it left). No second chance. Phase 2's
-//                 two-ball round marks four: a second pair, Portal C and
-//                 Portal D, opens the same way, so the raid works both balls.
-//   The carrier   a third player walks onto the ball and takes it up: half a
-//                 run, and no wind, pull, blast or throw moves them (heldFast).
+//                 opens it at the lip it left). No second chance. Mythic's
+//                 phase-2 two-ball round marks four: a second pair, Portal C
+//                 and Portal D, opens the same way, so the raid works both
+//                 balls. Heroic keeps the one pair throughout.
+//   The carrier   a third player walks onto the ball and takes it up: the
+//                 tier's walk (Heroic 70 percent of a run, Mythic half), and no
+//                 wind, pull, blast or throw moves them (heldFast).
 //   The crossing  anyone walking into a portal comes out at its partner (A and
 //                 B, C and D; never A to C), ball or no ball: the carrier may go out empty-handed for a far ball
 //                 and come back with it. Once per walk in: a body must step clear
 //                 before it can cross again.
 //   The throw     the interact press at the lip of ANY gap ends that ball (the
-//                 Iron Cage's seam: no new wire command), once the ball has
-//                 been carried through a portal (loosed: at half speed the
-//                 Cornice is too small for the fuse alone to force the
-//                 portals, Jose's call of 2026-11-07). A carrier of a loosed
-//                 ball who goes over a lip takes it with them: that counts
-//                 as thrown; one not yet loosed leaves it on the lip.
+//                 Iron Cage's seam: no new wire command), portal or not: the
+//                 portals are a shortcut, never a gate (Jose's call of
+//                 2026-11-08). A carrier who goes over a lip takes it with
+//                 them: that counts as thrown.
 //   A dead carrier drops it where they fell, still ticking, for anyone but the
 //                 marked to take up.
-//   When          phase 1: up to three times, a start waiting out the indrawn
-//                 breath; phase 2: two balls and two pairs of portals, about
-//                 every 60 s, never during the barrage. Thessaly's circles do
+//   When          phase 1: up to the tier's count (Heroic 2, Mythic 3), a
+//                 start waiting out the indrawn breath; phase 2: the tier's
+//                 balls (Heroic one, Mythic two with two pairs of portals),
+//                 about every 60 s, never during the barrage. Thessaly's circles do
 //                 not change: an anchored player still walks through a portal.
 //
 // A group too small to spare a third player (a dev run alone) may carry on a
@@ -39,8 +43,8 @@
 //
 // Deterministic: zero rng (the picks are hashed). Every visible state rides the
 // wire as it is: the balls and portals are objects, the fuse is in the ball's
-// template, the marks and the load are auras (the load's value2 is 1 once its
-// ball is loosed, for the carrier's alert), and the load's slow is read by
+// template, the marks and the load are auras (the load's value is the pace,
+// its value2 the tier's walk, for the tooltip), and the load's slow is read by
 // the shared motion kernel (player_motion.ts moveSpeedMult), so the online
 // client predicts it; the crossing is the shared displacement, which the
 // server's movement epoch reconciles as a discontinuity.
@@ -58,9 +62,9 @@ import {
   BREATH_CUES,
   BREATH_NAMES,
   BREATH_OBJECTS,
+  type BreathKnotRules,
   KNOT_HOP_TEXT,
   KNOT_NOT_AT_LIP_ERROR,
-  KNOT_NOT_LOOSED_ERROR,
   knotTemplate,
   BREATH_TUNING as T,
 } from './breath_ids';
@@ -138,7 +142,8 @@ function cue(s: BreathScope, ability: string, lx: number, lz: number, r: number)
  *  ball, two pairs for two). Exported for the dev trigger. */
 export function startHeart(s: BreathScope, count: number): boolean {
   const st = s.st;
-  if (st.heart || s.players.length === 0) return false;
+  const rules = s.rules.stormHeart;
+  if (!rules || st.heart || s.players.length === 0) return false;
   st.casts++;
   const busy = new Set<number>();
   for (const c of st.cradles) busy.add(c.playerId);
@@ -177,20 +182,13 @@ export function startHeart(s: BreathScope, count: number): boolean {
     const e = spawnBreathObject(
       s.ctx,
       s.inst,
-      knotTemplate('free', T.heartFuse),
+      knotTemplate('free', rules.fuse, rules.fuse),
       BREATH_NAMES.knot,
       at.x,
       at.z,
       T.heartPickR,
     );
-    heart.knots.push({
-      objectId: e.id,
-      x: at.x,
-      z: at.z,
-      fuse: T.heartFuse,
-      carrierId: null,
-      loosed: false,
-    });
+    heart.knots.push({ objectId: e.id, x: at.x, z: at.z, fuse: rules.fuse, carrierId: null });
     cue(s, BREATH_CUES.knotLand, at.x, at.z, T.heartPickR);
   }
   st.lastKnots = dropped;
@@ -251,9 +249,6 @@ function stepPortals(s: BreathScope, heart: BreathHeart): void {
     if (!to) continue;
     if (heart.crossed.includes(p.id) || !onFloor(p, at) || p.carriedBy !== undefined) continue;
     heart.crossed.push(p.id);
-    // A ball carried through is loosed: from now on it may go over a lip.
-    const held = heart.knots.find((k) => k.carrierId === p.id);
-    if (held) loosen(held, p);
     const o = s.ctx.instanceOriginOf(s.inst);
     displacePlayer(s.ctx, p, { x: o.x + to.x, z: o.z + to.z, facing: p.facing }, KNOT_HOP_TEXT);
     s.ctx.emit({
@@ -351,14 +346,6 @@ function endMarks(s: BreathScope, heart: BreathHeart): void {
 
 // ---- the ball -----------------------------------------------------------------------------
 
-/** The ball is loosed (carried through a portal); its carrier's load says so
- *  (value2 1, the alert's read). */
-function loosen(k: BreathKnot, carrier: Entity): void {
-  k.loosed = true;
-  const load = auraOf(carrier, BREATH_AURAS.laden);
-  if (load) load.value2 = 1;
-}
-
 function freeKnot(s: BreathScope, k: BreathKnot, carrier: Entity | undefined, at?: typeof k): void {
   if (carrier) dropAura(carrier, BREATH_AURAS.laden);
   k.carrierId = null;
@@ -378,13 +365,15 @@ function loseKnot(s: BreathScope, heart: BreathHeart, k: BreathKnot, carrier?: E
   heart.knots = heart.knots.filter((o) => o !== k);
 }
 
-function takeKnot(s: BreathScope, k: BreathKnot, p: Entity): void {
+function takeKnot(s: BreathScope, rules: BreathKnotRules, k: BreathKnot, p: Entity): void {
   k.carrierId = p.id;
+  // value: the pace now (the tailwind's below); value2: the tier's walk, for
+  // the tooltip (the pace changes with the wind, the walk does not).
   const a = putMarker(p, BREATH_AURAS.laden, BREATH_NAMES.laden, k.fuse, s.boss.id, {
-    value: T.heartWalkMult,
-    value2: k.loosed ? 1 : 0,
+    value: rules.walkMult,
+    value2: rules.walkMult,
   });
-  a.duration = T.heartFuse;
+  a.duration = rules.fuse;
   // The load holds from this tick: no wind left over to carry them a step.
   dropAura(p, WIND_DRIFT_AURA);
   dropAura(p, WIND_PULL_AURA);
@@ -396,21 +385,21 @@ function takeKnot(s: BreathScope, k: BreathKnot, p: Entity): void {
  *  little faster (Jose's playtest). The pace rides the load aura's value,
  *  which the wire mirrors and the shared motion kernel reads, so the online
  *  client predicts it. */
-function tailwind(s: BreathScope, p: Entity): void {
+function tailwind(s: BreathScope, rules: BreathKnotRules, p: Entity): void {
   const load = auraOf(p, BREATH_AURAS.laden);
   if (!load) return;
-  let pace: number = T.heartWalkMult;
+  let pace = rules.walkMult;
   if (windBlowing(s.st)) {
     const heading = (s.st.wind.bearing * Math.PI) / 180;
     const off = Math.abs(Math.atan2(Math.sin(p.facing - heading), Math.cos(p.facing - heading)));
-    if (off <= (T.heartTailCone * Math.PI) / 180) pace = T.heartTailMult;
+    if (off <= (T.heartTailCone * Math.PI) / 180) pace = rules.tailMult;
   }
   if (load.value !== pace) load.value = pace;
 }
 
 /** Each carrier's tick: dead, gone or over a lip, else the ball rides with them
  *  (through a portal too: stepPortals has already moved them). */
-function stepCarriers(s: BreathScope, heart: BreathHeart): void {
+function stepCarriers(s: BreathScope, rules: BreathKnotRules, heart: BreathHeart): void {
   for (const k of [...heart.knots]) {
     if (k.carrierId === null) continue;
     const p = s.ctx.entities.get(k.carrierId);
@@ -425,15 +414,14 @@ function stepCarriers(s: BreathScope, heart: BreathHeart): void {
       continue;
     }
     if (!onFloor(p, at)) {
-      // Over a gap's lip with a loosed ball: gone with them, which counts as
-      // thrown. Anywhere else (a hearth, a teleport), or a ball not yet
-      // through a portal, it stays where they last stood.
-      if (k.loosed && gapDistance(at.x, at.z) <= T.heartLipReach) {
+      // Over a gap's lip: gone with them, which counts as thrown. Anywhere
+      // else (a hearth, a teleport) it stays where they last stood.
+      if (gapDistance(at.x, at.z) <= T.heartLipReach) {
         loseKnot(s, heart, k, p);
       } else freeKnot(s, k, p, last ? { ...k, ...last } : undefined);
       continue;
     }
-    tailwind(s, p);
+    tailwind(s, rules, p);
     const now = local(s.ctx, s.inst, p);
     if (now.x !== k.x || now.z !== k.z) {
       k.x = now.x;
@@ -453,10 +441,6 @@ function stepThrows(s: BreathScope, heart: BreathHeart): void {
     const k = heart.knots.find((o) => o.carrierId === id);
     const p = s.ctx.entities.get(id);
     if (!k || !p || p.dead || s.ctx.isStunned(p)) continue;
-    if (!k.loosed) {
-      s.ctx.error(p.id, KNOT_NOT_LOOSED_ERROR);
-      continue;
-    }
     const at = local(s.ctx, s.inst, p);
     if (!atGapLip(at.x, at.z)) {
       s.ctx.error(p.id, KNOT_NOT_AT_LIP_ERROR);
@@ -467,7 +451,7 @@ function stepThrows(s: BreathScope, heart: BreathHeart): void {
 }
 
 /** Anyone free standing on a free ball takes it up, in roster order. */
-function stepPickups(s: BreathScope, heart: BreathHeart): void {
+function stepPickups(s: BreathScope, rules: BreathKnotRules, heart: BreathHeart): void {
   if (heart.knots.every((k) => k.carrierId !== null)) return;
   const carrying = new Set(heart.knots.map((k) => k.carrierId));
   const anyFree = s.players.some(
@@ -481,7 +465,7 @@ function stepPickups(s: BreathScope, heart: BreathHeart): void {
       if (heart.bearers.includes(p.id) && anyFree) continue;
       const at = local(s.ctx, s.inst, p);
       if (Math.hypot(at.x - k.x, at.z - k.z) > T.heartPickR) continue;
-      takeKnot(s, k, p);
+      takeKnot(s, rules, k, p);
       carrying.add(p.id);
       break;
     }
@@ -522,7 +506,7 @@ function burst(s: BreathScope): void {
 
 // ---- the tick -----------------------------------------------------------------------------
 
-function stepLive(s: BreathScope, heart: BreathHeart): void {
+function stepLive(s: BreathScope, rules: BreathKnotRules, heart: BreathHeart): void {
   noteFloorSpots(s, heart);
   if (heart.mark > 0) {
     heart.mark -= DT;
@@ -532,16 +516,20 @@ function stepLive(s: BreathScope, heart: BreathHeart): void {
     }
   }
   stepPortals(s, heart);
-  stepCarriers(s, heart);
+  stepCarriers(s, rules, heart);
   stepThrows(s, heart);
-  stepPickups(s, heart);
+  stepPickups(s, rules, heart);
   let out = false;
   for (const k of heart.knots) {
     k.fuse -= DT;
     if (k.fuse <= 1e-9) out = true;
     // The fuse rides the template in half seconds (the wire's only change).
     const e = s.ctx.entities.get(k.objectId);
-    const shown = knotTemplate(k.carrierId === null ? 'free' : 'held', Math.ceil(k.fuse * 2) / 2);
+    const shown = knotTemplate(
+      k.carrierId === null ? 'free' : 'held',
+      Math.ceil(k.fuse * 2) / 2,
+      rules.fuse,
+    );
     if (e && e.templateId !== shown) e.templateId = shown;
   }
   if (out) {
@@ -553,22 +541,23 @@ function stepLive(s: BreathScope, heart: BreathHeart): void {
 
 /** Phase 1's clock: never into the indrawn breath, nor so near it that a whole
  *  fuse would run into it. */
-function windClear(st: BreathFightState): boolean {
+function windClear(st: BreathFightState, rules: BreathKnotRules): boolean {
   const ph = st.wind.phase;
   if (ph === 'inhale' || ph === 'exhale') return false;
-  return st.inhaleTimer > T.heartFuse + 1 && st.heartRuns < T.heartWindRuns;
+  return st.inhaleTimer > rules.fuse + 1 && st.heartRuns < rules.windRuns;
 }
 
-/** One tick of the Knotted Gale (mythic's row only: every other tier returns at
- *  once, so it never changes by one rng draw). */
+/** One tick of the Knotted Gale (a tier row with `stormHeart`, Heroic and
+ *  Mythic: Normal returns at once, so it never changes by one rng draw). */
 export function stepHeart(s: BreathScope): void {
   const st = s.st;
-  if (!s.rules.stormHeart) {
-    // A dev switch took mythic away mid-round.
+  const rules = s.rules.stormHeart;
+  if (!rules) {
+    // A dev switch took the tier away mid-round.
     if (st.heart) clearHeart(s.ctx, s.inst, st);
     return;
   }
-  if (st.heart) stepLive(s, st.heart);
+  if (st.heart) stepLive(s, rules, st.heart);
   // The storm's break and its barrage hold the clock at its phase-2 start.
   if (st.half === 'break' || st.barrage) {
     st.heartTimer = T.heartStormFirst;
@@ -577,8 +566,8 @@ export function stepHeart(s: BreathScope): void {
   st.heartTimer -= DT;
   if (st.heart || st.heartTimer > 1e-9) return;
   if (st.half === 'wind') {
-    if (windClear(st) && startHeart(s, 1)) st.heartTimer = T.heartEvery;
-  } else if (startHeart(s, 2)) st.heartTimer = T.heartStormEvery;
+    if (windClear(st, rules) && startHeart(s, 1)) st.heartTimer = T.heartEvery;
+  } else if (startHeart(s, rules.stormBalls)) st.heartTimer = T.heartStormEvery;
 }
 
 /** The round off the Cornice: balls, portals, marks, loads (a wipe, the kill,
@@ -625,10 +614,13 @@ export function heartDevTrigger(
 ): string {
   const [step, side] = words;
   const st = s.st;
+  const rules = s.rules.stormHeart;
+  if (!rules) return 'This tier has no Knotted Gale (/dev heart breath heroic or mythic).';
   const me = pid === undefined ? undefined : s.ctx.entities.get(pid);
   if (step === undefined || step === '2' || step === 'two') {
     if (st.heart) clearHeart(s.ctx, s.inst, st);
-    const count = step === undefined ? 1 : 2;
+    // `2`: the tier's phase-2 round (Heroic one ball and one pair, Mythic two).
+    const count = step === undefined ? 1 : rules.stormBalls;
     return startHeart(s, count)
       ? `${count === 1 ? 'A Knotted Gale falls; Portals A and B open' : 'Two Knotted Gales fall; Portals A to D open'} in ${T.heartMark} s.`
       : 'Nobody on the Cornice to mark.';
@@ -666,7 +658,7 @@ export function heartDevTrigger(
       heart[MARK_KEY[which]] = null;
     }
     freeKnot(s, free, undefined, { ...free, ...at });
-    takeKnot(s, free, me);
+    takeKnot(s, rules, free, me);
     return 'You take up the Knotted Gale.';
   }
   return 'heart [2|portal a|b|c|d|carry|burst].';

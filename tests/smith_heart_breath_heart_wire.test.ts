@@ -24,6 +24,7 @@ import { updateMovementOverrideEpochs } from '../server/movement_override_epoch'
 import {
   BREATH_AURAS,
   BREATH_GUARDIAN,
+  BREATH_KNOT,
   BREATH_OBJECTS,
   knotOf,
   BREATH_TUNING as T,
@@ -109,10 +110,14 @@ describe('the Knotted Gale over the wire', () => {
     // The crawl, or the quicker pace with the wind at his back (whichever the
     // server set this tick): the mirror carries the server's value exactly.
     const serverLoad = serverMe.auras.find((x: Any) => x.id === BREATH_AURAS.laden);
-    expect([T.heartWalkMult, T.heartTailMult]).toContain(load.value);
+    // A Normal run's dev carry switches it to Mythic: Mythic's row.
+    const M = BREATH_KNOT.mythic;
+    expect([M.walkMult, M.tailMult]).toContain(load.value);
+    // The tier's walk rides value2 (the tooltip's read), mirrored as it is.
+    expect(load.value2).toBe(M.walkMult);
     expect(load.value).toBe(serverLoad?.value);
     expect(moveSpeedMult(mirror())).toBeCloseTo(moveSpeedMult(serverMe), 6);
-    expect(moveSpeedMult(mirror())).toBeLessThanOrEqual(T.heartTailMult + 1e-6);
+    expect(moveSpeedMult(mirror())).toBeLessThanOrEqual(M.tailMult + 1e-6);
     expect(knotOf(objects(BREATH_OBJECTS.knotPrefix)[0].templateId)?.state).toBe('held');
 
     // The crossing: a discontinuity, so the client's prediction is told to snap.
@@ -134,8 +139,6 @@ describe('the Knotted Gale over the wire', () => {
       1,
     );
 
-    // Through a portal with the ball: loosed, and the mirrored load says so.
-    expect(mirror().auras.find((x: Any) => x.id === BREATH_AURAS.laden)?.value2).toBe(1);
     // The throw is the ordinary interact command; the round leaves the mirror.
     sim.interact(a.pid);
     run(0.2);

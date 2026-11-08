@@ -297,7 +297,7 @@ export function moveSpeedMult(e: Entity, extraSpeedPct = 0): number {
     if (a.id === WORLD_QUEST_DELIVERY_AURA_ID && a.kind === 'world_quest_cargo') {
       cargo = Math.min(cargo, WORLD_QUEST_DELIVERY_SPEED_MULT);
     }
-    // A Knotted Gale's weight (the Guardian of the Breath, Mythic): a load, not
+    // A Knotted Gale's weight (the Guardian of the Breath, Heroic and Mythic): a load, not
     // a snare, so slow immunity never lifts it (like the delivery cargo above).
     if (a.id === BREATH_AURAS.laden) cargo = Math.min(cargo, a.value);
     // Groveheart's Sporemender Form walks 20% slower. A form penalty, not a

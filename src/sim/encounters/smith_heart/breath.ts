@@ -452,8 +452,9 @@ export function breathDevTrigger(
   if (!s) return 'This run holds no living Guardian of the Breath.';
   const st = s.st;
   if (verb === 'heart' || verb === 'portal' || verb === 'carry' || verb === 'burst') {
-    // The Knotted Gale is mythic's alone: the try-out switches the run over.
-    if (st.difficulty !== 'mythic') {
+    // The Knotted Gale is Heroic's and Mythic's: a Normal try-out switches
+    // the run to Mythic (a Heroic run keeps its own, softer row).
+    if (!s.rules.stormHeart) {
       setBreathDevTier(inst, 'mythic', true);
       st.difficulty = 'mythic';
       s.rules = BREATH_DIFFICULTY.mythic;

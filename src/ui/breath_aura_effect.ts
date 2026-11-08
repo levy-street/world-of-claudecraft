@@ -14,6 +14,7 @@
 import {
   BREATH_AURAS,
   BREATH_DIFFICULTY,
+  BREATH_KNOT,
   BREATH_TUNING as T,
 } from '../sim/encounters/smith_heart/breath_ids';
 import { ISLE_AURAS, ISLE_TUNING as IT } from '../sim/encounters/smith_heart/breath_isle_ids';
@@ -24,6 +25,8 @@ import { tierRange, tierValue } from './heart_tier_damage';
 const KEY = 'hudChrome.auraEffect.breathGuardian';
 
 const pct = (frac: number): number => Math.round(Math.abs(frac) * 100);
+/** A load's walk with no tier on it (a stale mirror): Mythic's, the slower. */
+const KNOT_WALK = BREATH_KNOT.mythic.walkMult;
 /** Heroic's damage factor; Mythic shares it (pinned), so one range names both. */
 const HM = BREATH_DIFFICULTY.heroic.damageMult;
 
@@ -70,7 +73,9 @@ export function breathAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescri
     case BREATH_AURAS.portalD:
       return { key: `${KEY}.portalD` };
     case BREATH_AURAS.laden:
-      return { key: `${KEY}.laden`, nums: { walk: pct(T.heartWalkMult) } };
+      // The tier's walk rides the load's value2 (Heroic 70, Mythic 50); its
+      // value is the pace of the moment, quicker with the wind at the back.
+      return { key: `${KEY}.laden`, nums: { walk: pct(a.value2 ?? KNOT_WALK) } };
     case BREATH_AURAS.anchor:
       return { key: `${KEY}.anchor` };
     case BREATH_AURAS.spent:

@@ -1,13 +1,12 @@
-// The Guardian of the Breath's Knotted Gale alert (Mythic,
+// The Guardian of the Breath's Knotted Gale alert (Heroic and Mythic,
 // encounters/smith_heart/breath_heart.ts): the pure, DOM-free view core of the
 // part the fight gives the local player, read off the auras the sim mirrors:
 //  - Portal A / Portal B (and phase 2's second pair, Portal C / Portal D): the
 //    bar is the time until the portal opens at your feet, so stand where it
 //    belongs now; each letter its own kind, so its own colour;
-//  - Gale-Laden: the bar is the ball's fuse; the panel is the throw's button.
-//    Until the ball has been carried through a portal (the load's value2,
-//    breath_heart.ts loosen) it says to walk it into one; once loosed it says
-//    to throw it, and louder at the lip of a gap.
+//  - Gale-Laden: the bar is the ball's fuse; the panel is the throw's button,
+//    and it says so louder at the lip of a gap (a portal is a shortcut, never
+//    needed: Jose's call of 2026-11-08).
 // An ACTION prompt (the hints setting never hides it), on every graphics tier.
 // The painter is the shared encounter alert's (encounter_alert_painter.ts).
 
@@ -81,8 +80,6 @@ interface AlertAura {
   id: string;
   remaining?: number;
   duration?: number;
-  /** The load's: 1 once its ball is loosed (carried through a portal). */
-  value2?: number;
 }
 
 export interface KnotAlertInput {
@@ -142,29 +139,20 @@ export function buildKnotAlertView(input: KnotAlertInput): KnotAlertView {
       buttonAria: title,
     };
   }
-  const loosed = (mark.value2 ?? 0) > 0;
-  const lip = loosed && worldAtLip(input.pos);
+  const lip = worldAtLip(input.pos);
   const key = input.touch ? '' : input.interactKey;
   const title = t(lip ? 'hudChrome.knotAlert.lipTitle' : 'hudChrome.knotAlert.carryTitle');
-  const line = lip
-    ? 'hudChrome.knotAlert.lipLine'
-    : loosed
-      ? 'hudChrome.knotAlert.loosedLine'
-      : 'hudChrome.knotAlert.carryLine';
   return {
     ...base,
     kind: lip ? 'lip' : 'carry',
     title,
-    line: t(line, { seconds }),
-    // The throw's button says so only once the ball can be thrown.
-    hint: !loosed
-      ? ''
-      : input.touch
-        ? t('hudChrome.knotAlert.throwTap')
-        : key
-          ? t('hudChrome.knotAlert.throwKey', { key })
-          : t('hudChrome.knotAlert.throwClick'),
-    key: loosed ? key : '',
+    line: t(lip ? 'hudChrome.knotAlert.lipLine' : 'hudChrome.knotAlert.carryLine', { seconds }),
+    hint: input.touch
+      ? t('hudChrome.knotAlert.throwTap')
+      : key
+        ? t('hudChrome.knotAlert.throwKey', { key })
+        : t('hudChrome.knotAlert.throwClick'),
+    key,
     pressable: true,
     buttonAria: t('hudChrome.knotAlert.throwAria'),
   };

@@ -16112,7 +16112,6 @@ export type TranslationKeyFlat =
   | 'hudChrome.knotAlert.dTitle'
   | 'hudChrome.knotAlert.lipLine'
   | 'hudChrome.knotAlert.lipTitle'
-  | 'hudChrome.knotAlert.loosedLine'
   | 'hudChrome.knotAlert.throwAria'
   | 'hudChrome.knotAlert.throwClick'
   | 'hudChrome.knotAlert.throwKey'

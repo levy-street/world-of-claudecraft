@@ -351,7 +351,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.knotAlert.dTitle",
     "hudChrome.knotAlert.lipLine",
     "hudChrome.knotAlert.lipTitle",
-    "hudChrome.knotAlert.loosedLine",
     "hudChrome.knotAlert.throwAria",
     "hudChrome.knotAlert.throwClick",
     "hudChrome.knotAlert.throwKey",
@@ -728,7 +727,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.knotAlert.dTitle",
     "hudChrome.knotAlert.lipLine",
     "hudChrome.knotAlert.lipTitle",
-    "hudChrome.knotAlert.loosedLine",
     "hudChrome.knotAlert.throwAria",
     "hudChrome.knotAlert.throwClick",
     "hudChrome.knotAlert.throwKey",
@@ -1105,7 +1103,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.knotAlert.dTitle",
     "hudChrome.knotAlert.lipLine",
     "hudChrome.knotAlert.lipTitle",
-    "hudChrome.knotAlert.loosedLine",
     "hudChrome.knotAlert.throwAria",
     "hudChrome.knotAlert.throwClick",
     "hudChrome.knotAlert.throwKey",
@@ -1482,7 +1479,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.knotAlert.dTitle",
     "hudChrome.knotAlert.lipLine",
     "hudChrome.knotAlert.lipTitle",
-    "hudChrome.knotAlert.loosedLine",
     "hudChrome.knotAlert.throwAria",
     "hudChrome.knotAlert.throwClick",
     "hudChrome.knotAlert.throwKey",
@@ -1860,7 +1856,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.knotAlert.dTitle",
     "hudChrome.knotAlert.lipLine",
     "hudChrome.knotAlert.lipTitle",
-    "hudChrome.knotAlert.loosedLine",
     "hudChrome.knotAlert.throwAria",
     "hudChrome.knotAlert.throwClick",
     "hudChrome.knotAlert.throwKey",
@@ -2237,7 +2232,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.knotAlert.dTitle",
     "hudChrome.knotAlert.lipLine",
     "hudChrome.knotAlert.lipTitle",
-    "hudChrome.knotAlert.loosedLine",
     "hudChrome.knotAlert.throwAria",
     "hudChrome.knotAlert.throwClick",
     "hudChrome.knotAlert.throwKey",
@@ -2275,26 +2269,22 @@ export const pending: Record<string, readonly string[]> = {
   "zh_CN": [
     "abilityUi.cast.heart_gale_bolt",
     "abilityUi.cast.heart_rime_bolt",
-    "hudChrome.finalOverload.heat",
-    "hudChrome.knotAlert.loosedLine"
+    "hudChrome.finalOverload.heat"
   ],
   "zh_TW": [
     "abilityUi.cast.heart_gale_bolt",
     "abilityUi.cast.heart_rime_bolt",
-    "hudChrome.finalOverload.heat",
-    "hudChrome.knotAlert.loosedLine"
+    "hudChrome.finalOverload.heat"
   ],
   "ko_KR": [
     "abilityUi.cast.heart_gale_bolt",
     "abilityUi.cast.heart_rime_bolt",
-    "hudChrome.finalOverload.heat",
-    "hudChrome.knotAlert.loosedLine"
+    "hudChrome.finalOverload.heat"
   ],
   "ja_JP": [
     "abilityUi.cast.heart_gale_bolt",
     "abilityUi.cast.heart_rime_bolt",
-    "hudChrome.finalOverload.heat",
-    "hudChrome.knotAlert.loosedLine"
+    "hudChrome.finalOverload.heat"
   ],
   "pt_BR": [
     "abilityUi.cast.heart_bellows_gust",
@@ -2638,7 +2628,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.knotAlert.dTitle",
     "hudChrome.knotAlert.lipLine",
     "hudChrome.knotAlert.lipTitle",
-    "hudChrome.knotAlert.loosedLine",
     "hudChrome.knotAlert.throwAria",
     "hudChrome.knotAlert.throwClick",
     "hudChrome.knotAlert.throwKey",
@@ -2676,8 +2665,7 @@ export const pending: Record<string, readonly string[]> = {
   "ru_RU": [
     "abilityUi.cast.heart_gale_bolt",
     "abilityUi.cast.heart_rime_bolt",
-    "hudChrome.finalOverload.heat",
-    "hudChrome.knotAlert.loosedLine"
+    "hudChrome.finalOverload.heat"
   ],
   "cs_CZ": [
     "abilityUi.cast.heart_bellows_gust",
@@ -3021,7 +3009,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.knotAlert.dTitle",
     "hudChrome.knotAlert.lipLine",
     "hudChrome.knotAlert.lipTitle",
-    "hudChrome.knotAlert.loosedLine",
     "hudChrome.knotAlert.throwAria",
     "hudChrome.knotAlert.throwClick",
     "hudChrome.knotAlert.throwKey",
@@ -3398,7 +3385,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.knotAlert.dTitle",
     "hudChrome.knotAlert.lipLine",
     "hudChrome.knotAlert.lipTitle",
-    "hudChrome.knotAlert.loosedLine",
     "hudChrome.knotAlert.throwAria",
     "hudChrome.knotAlert.throwClick",
     "hudChrome.knotAlert.throwKey",
@@ -3775,7 +3761,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.knotAlert.dTitle",
     "hudChrome.knotAlert.lipLine",
     "hudChrome.knotAlert.lipTitle",
-    "hudChrome.knotAlert.loosedLine",
     "hudChrome.knotAlert.throwAria",
     "hudChrome.knotAlert.throwClick",
     "hudChrome.knotAlert.throwKey",
@@ -4152,7 +4137,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.knotAlert.dTitle",
     "hudChrome.knotAlert.lipLine",
     "hudChrome.knotAlert.lipTitle",
-    "hudChrome.knotAlert.loosedLine",
     "hudChrome.knotAlert.throwAria",
     "hudChrome.knotAlert.throwClick",
     "hudChrome.knotAlert.throwKey",
@@ -4529,7 +4513,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.knotAlert.dTitle",
     "hudChrome.knotAlert.lipLine",
     "hudChrome.knotAlert.lipTitle",
-    "hudChrome.knotAlert.loosedLine",
     "hudChrome.knotAlert.throwAria",
     "hudChrome.knotAlert.throwClick",
     "hudChrome.knotAlert.throwKey",
@@ -4906,7 +4889,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.knotAlert.dTitle",
     "hudChrome.knotAlert.lipLine",
     "hudChrome.knotAlert.lipTitle",
-    "hudChrome.knotAlert.loosedLine",
     "hudChrome.knotAlert.throwAria",
     "hudChrome.knotAlert.throwClick",
     "hudChrome.knotAlert.throwKey",
@@ -5283,7 +5265,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.knotAlert.dTitle",
     "hudChrome.knotAlert.lipLine",
     "hudChrome.knotAlert.lipTitle",
-    "hudChrome.knotAlert.loosedLine",
     "hudChrome.knotAlert.throwAria",
     "hudChrome.knotAlert.throwClick",
     "hudChrome.knotAlert.throwKey",
@@ -5660,7 +5641,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.knotAlert.dTitle",
     "hudChrome.knotAlert.lipLine",
     "hudChrome.knotAlert.lipTitle",
-    "hudChrome.knotAlert.loosedLine",
     "hudChrome.knotAlert.throwAria",
     "hudChrome.knotAlert.throwClick",
     "hudChrome.knotAlert.throwKey",

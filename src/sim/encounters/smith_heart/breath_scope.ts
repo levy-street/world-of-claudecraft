@@ -126,7 +126,7 @@ export function pickMarks(
   busy: ReadonlySet<number> = new Set(),
 ): Entity[] {
   const salt = s.st.casts * 13 + 5;
-  // Mythic: nothing else marks the Knotted Gale's marked or its carriers.
+  // Heroic and Mythic: nothing else marks the Knotted Gale's marked or its carriers.
   const heart = s.st.heart;
   const taken = heart
     ? new Set([

@@ -8,7 +8,7 @@
 //   guardian   the pull, its first blow, each indrawn breath (at most once in
 //              SAY_EVERY), the storm breaking, the cradle and the drawn
 //              lightning (once in SAY_EVERY each), the Summit Roar and
-//              mythic's Knotted Gale (once in SAY_EVERY each), a player's
+//              the Knotted Gale (once in SAY_EVERY each), a player's
 //              fall (its three kill lines in turn, at most one in
 //              SLAY_EVERY: voice_slain.ts), a wipe, its fall
 //   thessaly   the pull, each circle of calm (three lines in turn), the

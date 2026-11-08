@@ -212,6 +212,81 @@ export function knotGrid(): readonly { x: number; z: number; far: number }[] {
   return out;
 }
 
+/** The Cornice's floor on a 1 yd grid for the walk to the edge (built once):
+ *  each cell's index by its rounded spot, and whether it lies at a lip well
+ *  inside the throw's reach (`T.heartLipReach`). */
+let edgeCells: Map<string, { x: number; z: number; lip: boolean }> | null = null;
+/** The floor a cell on the way keeps all round it (yards). */
+const EDGE_BODY = 1.5;
+/** Floor all round (x, z) at `r` yards, eight ways (an open lip counts: the
+ *  walk may run beside one). */
+function floorAround(x: number, z: number, r: number): boolean {
+  for (let k = 0; k < 8; k++) {
+    const a = (k / 8) * Math.PI * 2;
+    const px = x + Math.sin(a) * r;
+    const pz = z + Math.cos(a) * r;
+    if (!inBreathArena(px, pz) && !openLipAt(px, pz)) return false;
+  }
+  return true;
+}
+function edgeGrid(): Map<string, { x: number; z: number; lip: boolean }> {
+  if (edgeCells) return edgeCells;
+  const out = new Map<string, { x: number; z: number; lip: boolean }>();
+  for (let x = Math.floor(C.x - C.rx - 20); x <= C.x + C.rx + 20; x += 1)
+    for (let z = Math.floor(C.z - C.rz - 4); z <= C.z + C.rz + 4; z += 1) {
+      if (!inBreathArena(x, z)) continue;
+      const lip = atGapLip(x, z) && gapDistance(x, z) <= T.heartLipReach - 0.6;
+      // A cell on the way keeps a body's width of floor all round (the
+      // walled edge's wall stands on it); a lip cell is the goal, at the edge.
+      if (lip || floorAround(x, z, EDGE_BODY)) out.set(`${x},${z}`, { x, z, lip });
+    }
+  edgeCells = out;
+  return out;
+}
+
+/** The Knotted Gale's walk to the edge from (x, z): the shortest way over the
+ *  floor (a breadth-first search on its 1 yd grid, eight ways round, never off
+ *  it: the climb's head is walled) to the nearest spot a carrier can throw
+ *  from. The waypoints, first step to last, or empty off the floor. Pure: the
+ *  tests and the raid bots walk it. */
+export function edgeWalk(x: number, z: number): { x: number; z: number }[] {
+  const grid = edgeGrid();
+  const sx = Math.round(x);
+  const sz = Math.round(z);
+  const start = `${sx},${sz}`;
+  if (!grid.has(start)) return [];
+  const from = new Map<string, string | null>([[start, null]]);
+  const queue = [start];
+  for (let i = 0; i < queue.length; i++) {
+    const key = queue[i];
+    const cell = grid.get(key) as { x: number; z: number; lip: boolean };
+    if (cell.lip) {
+      const path: { x: number; z: number }[] = [];
+      for (let k: string | null = key; k !== null; k = from.get(k) ?? null) {
+        const c = grid.get(k) as { x: number; z: number };
+        path.push({ x: c.x, z: c.z });
+      }
+      return path.reverse();
+    }
+    for (let dx = -1; dx <= 1; dx++)
+      for (let dz = -1; dz <= 1; dz++) {
+        if (dx === 0 && dz === 0) continue;
+        const next = `${cell.x + dx},${cell.z + dz}`;
+        if (from.has(next) || !grid.has(next)) continue;
+        // A diagonal step only between two floor cells (no corner cut).
+        if (
+          dx !== 0 &&
+          dz !== 0 &&
+          (!grid.has(`${cell.x + dx},${cell.z}`) || !grid.has(`${cell.x},${cell.z + dz}`))
+        )
+          continue;
+        from.set(next, key);
+        queue.push(next);
+      }
+  }
+  return [];
+}
+
 /** Where a Knotted Gale drops: hashed over the floor at least `T.heartFar`
  *  from every gap (a carry, never a throw where it lands) and `T.heartApart`
  *  from every spot in `avoid` (Thessaly's post and circle, this round's other

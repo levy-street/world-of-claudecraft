@@ -734,12 +734,16 @@ describe('Guardian of the Breath: heroic', () => {
     }
   });
 
-  it('mythic is heroic whole plus the Knotted Gale, behind its own dev switch', () => {
+  it('mythic is heroic whole with its own harder Knotted Gale, behind its own dev switch', () => {
     expect(BREATH_DIFFICULTY.mythic).toEqual({
       ...BREATH_DIFFICULTY.heroic,
-      stormHeart: true,
+      stormHeart: BREATH_DIFFICULTY.mythic.stormHeart,
       windwornSeconds: 150,
     });
+    // Heroic carries the Knotted Gale too (2026-11-08), a different row; Normal none.
+    expect(BREATH_DIFFICULTY.heroic.stormHeart).not.toBeNull();
+    expect(BREATH_DIFFICULTY.heroic.stormHeart).not.toEqual(BREATH_DIFFICULTY.mythic.stormHeart);
+    expect(BREATH_DIFFICULTY.normal.stormHeart).toBeNull();
     const f = pulled(2);
     expect(f.state()?.difficulty).toBe('normal');
     f.dev('/dev heart breath mythic');
