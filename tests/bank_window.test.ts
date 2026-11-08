@@ -749,14 +749,14 @@ describe('bank_window: mobile pairing (hud.mobile.css)', () => {
     // The split must divide the shared --app-vw box by the live scale.
     const split = 'calc(var(--app-vw) / var(--ui-scale, 1) / 2)';
     expect(mobileCss).toContain(
-      `body.mobile-touch.bank-open #bank-window {\n    left: max(10px, env(safe-area-inset-left));\n    right: ${split};`,
+      `body.mobile-touch.bank-open #bank-window {\n    left: max(10px, env(safe-area-inset-left)) !important;\n    right: ${split} !important;`,
     );
     // The bags RIGHT half is shared with the market cluster (the market docks
     // #bags the same way on touch, see market_window.test.ts). Pin against a
     // whitespace-normalized view: biome re-wraps multi-selector lists, so a
     // raw multi-line source pin here would rot on a reformat.
     expect(mobileCss.replace(/\s+/g, ' ')).toContain(
-      `body.mobile-touch.bank-open #bags, body.mobile-touch.market-open #bags { left: ${split}; right: max(10px, env(safe-area-inset-right));`,
+      `body.mobile-touch.bank-open #bags, body.mobile-touch.market-open #bags { left: ${split} !important; right: max(10px, env(safe-area-inset-right)) !important;`,
     );
   });
 

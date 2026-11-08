@@ -1,8 +1,10 @@
 // Pure visibility decision for whether the mobile bottom action bar (the
 // player frame / petbar / meters stack docked under #bottom-bar) is safe to
 // hide entirely. Only windows that are documented and CSS-verified to cover
-// the ENTIRE mobile viewport (src/styles/hud.mobile.css: bags reserves just
-// the 10px safe margin on every edge, char-window pins inset 0) qualify:
+// the player frame (src/styles/hud.mobile.css: bags pins the full viewport
+// height with the 10px safe margin top and bottom, at content width from the
+// edge away from the action ring, covering the bottom-centre frame;
+// char-window pins inset 0 and covers the entire viewport) qualify:
 // hiding the frame there was already an accepted tradeoff before this rule
 // existed (see the "Covering the frame is fine here" comments in
 // hud.mobile.css) because nothing behind them is reachable or visible anyway.

@@ -2414,10 +2414,12 @@
   }
   /* #bottom-bar is not the hotbar (that is already hidden on touch above);
      it docks the player frame / petbar / meters-window / stancebar stack. Only
-     bags and the character sheet are CSS-verified to cover the ENTIRE mobile
-     viewport (10px/0 inset on every edge, see the near-fullscreen block
-     below), matching the existing "covering the frame is fine here" tradeoff
-     already accepted for those two windows specifically. Every other game
+     bags and the character sheet qualify: the character sheet covers the
+     ENTIRE mobile viewport (inset 0 on every edge), and bags pins the full
+     viewport height (10px inset top and bottom) from the edge away from the
+     action ring at content width, so it covers the bottom-centre frame (see
+     its block below). That matches the "covering the frame is fine here"
+     tradeoff accepted for those two windows specifically. Every other game
      window (loot, lockpick, delve-rite, loot-settings, map, quest-log,
      vendor, ...) only pins its edges/top on touch and leaves real screen
      visible below, so hiding the frame there would hide HP/resource while
@@ -5950,19 +5952,25 @@
     /* Divided by the UI scale like the un-split pins above: authored inside
        #ui's zoom, a raw inset shrinks with the scale and stops clearing the
        band it names. */
-    top: calc(max(10px, env(safe-area-inset-top)) / var(--ui-scale, 1));
-    bottom: calc(max(10px, env(safe-area-inset-bottom)) / var(--ui-scale, 1));
-    width: auto;
+    top: calc(max(10px, env(safe-area-inset-top)) / var(--ui-scale, 1)) !important;
+    bottom: calc(max(10px, env(safe-area-inset-bottom)) / var(--ui-scale, 1)) !important;
+    width: auto !important;
     max-width: none;
     max-height: none;
-    height: auto;
-    transform: none;
+    height: auto !important;
+    transform: none !important;
     box-sizing: border-box;
     z-index: 95 !important;
+    /* Docked: the dock geometry above is !important because a window the
+       player dragged on touch keeps its inline left/top/width/height (the
+       standalone spot it returns to once undocked), and inline style beats
+       any un-flagged rule. The marker tells window_drag_handle.ts not to
+       start a drag here, which would overwrite that saved spot. */
+    --window-docked: 1;
   }
   body.mobile-touch.trade-and-bags-open #ui #trade-window {
-    left: calc(max(10px, env(safe-area-inset-left)) / var(--ui-scale, 1));
-    right: calc(var(--app-vw) / var(--ui-scale, 1) / 2);
+    left: calc(max(10px, env(safe-area-inset-left)) / var(--ui-scale, 1)) !important;
+    right: calc(var(--app-vw) / var(--ui-scale, 1) / 2) !important;
     overflow-y: auto;
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
@@ -5971,8 +5979,8 @@
     flex-direction: column;
   }
   body.mobile-touch.trade-and-bags-open #ui #bags {
-    left: calc(var(--app-vw) / var(--ui-scale, 1) / 2);
-    right: calc(max(10px, env(safe-area-inset-right)) / var(--ui-scale, 1));
+    left: calc(var(--app-vw) / var(--ui-scale, 1) / 2) !important;
+    right: calc(max(10px, env(safe-area-inset-right)) / var(--ui-scale, 1)) !important;
     overflow: hidden;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
@@ -5980,17 +5988,20 @@
   }
   /* Issue 1577 round 2 (9): the bags window used to reserve 72px at the bottom to
      keep clear of the player frame below it. The player frame is fine to cover
-     while the (modal, world-input-blocking) bag window is open, so drop the
-     reservation to the plain 10px safe margin and let the grid use the full
-     height. Only #bags changes here: #char-window / #talents-window keep their
-     own layouts, and the vendor-split #bags rule below keeps its reservation. */
+     while the (modal, world-input-blocking) bag window is open, so the sheet
+     pins the full viewport height (the plain 10px safe margin top and bottom)
+     and the grid uses all of it. Standalone, the sheet is content-width
+     (fit-content, about the filter chip row) from the edge AWAY from the action
+     ring, so the ring stays visible beside it as the drop target for a dragged
+     consumable. The companion pairings below restate every edge plus width and
+     max-width, so they are unaffected. */
   body.mobile-touch #bags {
     position: fixed;
     left: max(10px, env(safe-area-inset-left));
-    right: max(10px, env(safe-area-inset-right));
+    right: auto;
     top: max(10px, env(safe-area-inset-top));
     bottom: max(10px, env(safe-area-inset-bottom));
-    width: auto;
+    width: fit-content;
     /* With opposing edges both pinned here, a non-auto height would
        over-constrain the box and the browser would drop `bottom`, so the sheet
        ran off a landscape phone with no way to scroll to its footer. The edge
@@ -5998,17 +6009,24 @@
     height: auto;
     transform: none;
     max-height: none;
-    /* The base .window max-width clamp divides by --window-scale, not --ui-scale,
-       so it under-fills this inset-driven full-screen state below uiScale 1
-       (~83% width at 0.85). Full-screen is the insets' job; drop the clamp, as
-       the paired group rules already do. */
-    max-width: none;
+    /* The base .window max-width clamp divides by --window-scale, not --ui-scale
+       (it under-fills below uiScale 1), so replace it with the app viewport
+       less the two 10px side margins: a long-label locale caps at the screen
+       instead of running off it. */
+    max-width: calc(var(--app-vw) / var(--ui-scale, 1) - 20px);
     box-sizing: border-box;
     overflow: hidden;
     /* Managed windows receive an inline desktop z-index. Bags is a modal sheet
        here, so this scoped override must beat that inline value while leaving
        desktop Need/Greed above its compact Bags window. */
     z-index: 95 !important;
+  }
+  /* Left-handed mode moves the ring to the left edge, so the sheet mirrors to
+     the right edge. Same (1,2,1) specificity as the pairings below, which win
+     by source order. */
+  body.mobile-touch.mobile-left-handed #bags {
+    left: auto;
+    right: max(10px, env(safe-area-inset-right));
   }
   body.mobile-touch #bags .bag-grid {
     min-height: 150px;
@@ -6305,32 +6323,38 @@
   body.mobile-touch.char-bags-paired #char-window,
   body.mobile-touch.char-bags-paired #bags {
     position: fixed;
-    top: max(10px, env(safe-area-inset-top));
-    bottom: calc(72px + env(safe-area-inset-bottom));
-    width: auto;
+    top: max(10px, env(safe-area-inset-top)) !important;
+    bottom: calc(72px + env(safe-area-inset-bottom)) !important;
+    width: auto !important;
     /* The desktop sheet carries a FIXED height now. With opposing edges both
        pinned here, a non-auto height over-constrains the box and the browser
        drops `bottom`, so the sheet would run off a landscape phone with no way
        to scroll to its footer. The edge pin IS the height on touch. */
-    height: auto;
+    height: auto !important;
     max-width: none;
     max-height: none;
-    transform: none;
+    transform: none !important;
     box-sizing: border-box;
     z-index: 95;
+    /* Docked: the dock geometry above is !important because a window the
+       player dragged on touch keeps its inline left/top/width/height (the
+       standalone spot it returns to once undocked), and inline style beats
+       any un-flagged rule. The marker tells window_drag_handle.ts not to
+       start a drag here, which would overwrite that saved spot. */
+    --window-docked: 1;
   }
   /* Sheet LEFT (its own body scrolls), bags RIGHT (the .bag-grid scrolls). */
   body.mobile-touch.char-bags-paired #char-window {
-    left: max(10px, env(safe-area-inset-left));
-    right: calc(var(--app-vw) / var(--ui-scale, 1) / 2);
+    left: max(10px, env(safe-area-inset-left)) !important;
+    right: calc(var(--app-vw) / var(--ui-scale, 1) / 2) !important;
     overflow-y: auto;
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
     border-right-width: 1px;
   }
   body.mobile-touch.char-bags-paired #bags {
-    left: calc(var(--app-vw) / var(--ui-scale, 1) / 2);
-    right: max(10px, env(safe-area-inset-right));
+    left: calc(var(--app-vw) / var(--ui-scale, 1) / 2) !important;
+    right: max(10px, env(safe-area-inset-right)) !important;
     overflow: hidden;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
@@ -6793,27 +6817,33 @@
   body.mobile-touch.vendor-open #vendor-window,
   body.mobile-touch.vendor-open #bags {
     position: fixed;
-    top: max(10px, env(safe-area-inset-top));
-    bottom: calc(72px + env(safe-area-inset-bottom));
-    width: auto;
+    top: max(10px, env(safe-area-inset-top)) !important;
+    bottom: calc(72px + env(safe-area-inset-bottom)) !important;
+    width: auto !important;
     /* The desktop sheet carries a FIXED height now. With opposing edges both
        pinned here, a non-auto height over-constrains the box and the browser
        drops `bottom`, so the sheet would run off a landscape phone with no way
        to scroll to its footer. The edge pin IS the height on touch. */
-    height: auto;
+    height: auto !important;
     max-width: none;
     max-height: none;
-    transform: none;
+    transform: none !important;
     box-sizing: border-box;
     z-index: 95;
+    /* Docked: the dock geometry above is !important because a window the
+       player dragged on touch keeps its inline left/top/width/height (the
+       standalone spot it returns to once undocked), and inline style beats
+       any un-flagged rule. The marker tells window_drag_handle.ts not to
+       start a drag here, which would overwrite that saved spot. */
+    --window-docked: 1;
   }
   /* The 50/50 split point: #ui's zoom multiplies every author length, so a raw
      50vw only lands on the real viewport centre at uiScale 1 (the halves gap
      above 1, overlap below 1). Divide the shared --app-vw box by the live scale
      so both halves tile at any uiScale (the window-shell coordinate model). */
   body.mobile-touch.vendor-open #vendor-window {
-    left: max(10px, env(safe-area-inset-left));
-    right: calc(var(--app-vw) / var(--ui-scale, 1) / 2);
+    left: max(10px, env(safe-area-inset-left)) !important;
+    right: calc(var(--app-vw) / var(--ui-scale, 1) / 2) !important;
     display: block;
     overflow-y: auto;
     border-top-right-radius: 0;
@@ -6821,8 +6851,8 @@
     border-right-width: 1px;
   }
   body.mobile-touch.vendor-open #bags {
-    left: calc(var(--app-vw) / var(--ui-scale, 1) / 2);
-    right: max(10px, env(safe-area-inset-right));
+    left: calc(var(--app-vw) / var(--ui-scale, 1) / 2) !important;
+    right: max(10px, env(safe-area-inset-right)) !important;
     overflow: hidden;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
@@ -6963,27 +6993,33 @@
   body.mobile-touch.market-open #market-window,
   body.mobile-touch.market-open #bags {
     position: fixed;
-    top: max(10px, env(safe-area-inset-top));
-    bottom: calc(72px + env(safe-area-inset-bottom));
-    width: auto;
+    top: max(10px, env(safe-area-inset-top)) !important;
+    bottom: calc(72px + env(safe-area-inset-bottom)) !important;
+    width: auto !important;
     /* The desktop sheet carries a FIXED height now. With opposing edges both
        pinned here, a non-auto height over-constrains the box and the browser
        drops `bottom`, so the sheet would run off a landscape phone with no way
        to scroll to its footer. The edge pin IS the height on touch. */
-    height: auto;
+    height: auto !important;
     max-width: none;
     max-height: none;
-    transform: none;
+    transform: none !important;
     box-sizing: border-box;
     z-index: 95;
+    /* Docked: the dock geometry above is !important because a window the
+       player dragged on touch keeps its inline left/top/width/height (the
+       standalone spot it returns to once undocked), and inline style beats
+       any un-flagged rule. The marker tells window_drag_handle.ts not to
+       start a drag here, which would overwrite that saved spot. */
+    --window-docked: 1;
   }
   /* Bank LEFT: unlike the vendor (a display:block window that scrolls as a whole),
      #bank-window is a flex column whose .bank-scroll region (grid + bonus tail) is
      the internal scroll container, so the panel itself stays overflow:hidden and
      the region scrolls, mirroring #bags. */
   body.mobile-touch.bank-open #bank-window {
-    left: max(10px, env(safe-area-inset-left));
-    right: calc(var(--app-vw) / var(--ui-scale, 1) / 2);
+    left: max(10px, env(safe-area-inset-left)) !important;
+    right: calc(var(--app-vw) / var(--ui-scale, 1) / 2) !important;
     overflow: hidden;
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
@@ -6991,8 +7027,8 @@
   }
   body.mobile-touch.bank-open #bags,
   body.mobile-touch.market-open #bags {
-    left: calc(var(--app-vw) / var(--ui-scale, 1) / 2);
-    right: max(10px, env(safe-area-inset-right));
+    left: calc(var(--app-vw) / var(--ui-scale, 1) / 2) !important;
+    right: max(10px, env(safe-area-inset-right)) !important;
     overflow: hidden;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
@@ -7026,9 +7062,9 @@
      market deliberately leaves bags open), not the cluster's single close
      control like the bank's. */
   body.mobile-touch.market-open #market-window {
-    left: max(10px, env(safe-area-inset-left));
-    right: calc(var(--app-vw) / var(--ui-scale, 1) / 2);
-    height: auto;
+    left: max(10px, env(safe-area-inset-left)) !important;
+    right: calc(var(--app-vw) / var(--ui-scale, 1) / 2) !important;
+    height: auto !important;
     overflow-y: auto;
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
