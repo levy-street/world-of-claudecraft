@@ -14,7 +14,8 @@
 // --force    synthesize the selected lines again (a new take)
 // --review   copy every treated clip to <dir>/<voice>/<NN>_<moment>.mp3
 // --publish  copy every treated clip to public/audio/voice/<voice>/<key>.mp3
-//            and drop the raid voices' clips no line uses any more; then run
+//            (with --only, the selected lines only) and drop a fully
+//            published raid voice's clips no line uses any more; then run
 //            node scripts/gen_npc_lines.mjs --only <no line> to rebuild the
 //            voice manifest from disk.
 //
@@ -230,8 +231,10 @@ if (review) {
 }
 
 if (publish) {
+  // With --only, only the selected lines are published (a voice recast on
+  // its own leaves the others' shipped clips as they are).
   const keep = new Map();
-  for (const line of lines) {
+  for (const line of selected) {
     const processed = path.join(processedDir, line.voiceNpc, `${line.key}.mp3`);
     if (!existsSync(processed)) throw new Error(`Unrendered line: ${line.id}`);
     const dir = path.join(root, 'public', 'audio', 'voice', line.voiceNpc);
@@ -243,7 +246,10 @@ if (publish) {
   // A raid voice's folder holds its pack only (Thessaly's holds her other
   // lines too, so hers is never swept).
   for (const [voiceNpc, files] of keep) {
-    if (!SMITH_HEART_SPEAKERS[voiceNpc]?.audition) continue;
+    // Swept only when every line of the voice was published now.
+    if (lines.some((l) => l.voiceNpc === voiceNpc && !files.has(`${l.key}.mp3`))) continue;
+    const speaker = SMITH_HEART_SPEAKERS[voiceNpc];
+    if (!speaker?.audition && !speaker?.designed) continue;
     const dir = path.join(root, 'public', 'audio', 'voice', voiceNpc);
     for (const file of readdirSync(dir)) {
       if (file.endsWith('.mp3') && !files.has(file)) rmSync(path.join(dir, file));
@@ -253,5 +259,5 @@ if (publish) {
 
 console.log(
   `${selected.length} lines rendered, ${billed} characters billed` +
-    (publish ? `, ${lines.length} clips published` : ''),
+    (publish ? `, ${selected.length} clips published` : ''),
 );

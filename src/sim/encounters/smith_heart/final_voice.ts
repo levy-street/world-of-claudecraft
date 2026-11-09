@@ -82,7 +82,7 @@ export const FINAL_LINES: Readonly<Record<FinalMoment, string>> = {
   arrivalWake: 'Who wakes the heart of the mountain? Warm breath... here, where nothing breathes.',
   arrivalRise: 'Stone, rise. Bind to us. The hand that shaped us is gone, so we shape ourselves.',
   arrivalRoar: "We are the Smith's strength, and we have no master!",
-  pull: 'You carry the four veins in your blood. We will take them back, and seal the mountain over you.',
+  pull: 'You broke the Hammer, the Breath, the Quench and the Heat. You slew every one of our brothers. Good. Their strength did not die with them... it flows to us. We will wear their power, and crush you with it!',
   drinkHeat: 'The first flame fills us!',
   drinkQuench: 'Cold water, harden us!',
   drinkBreath: 'Breathe, bellows! Lift the storm!',
@@ -104,7 +104,7 @@ export const FINAL_LINES: Readonly<Record<FinalMoment, string>> = {
   slay_c: 'One more warmth, sealed in.',
   wipe: 'Sealed. Silent. As he wanted.',
   death:
-    'The hand... was never coming back. One ember still burns... Take it, and let the mountain sleep.',
+    'Useless... all of them. The Guardians... Varkhul... useless, every one. But you cannot kill the elements. Stone, fire, wind and ice do not die... they wait. We will return... and the mountain will remember your names.',
 };
 
 /** The catalog key of a line. */

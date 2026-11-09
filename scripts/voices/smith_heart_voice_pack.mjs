@@ -10,8 +10,11 @@
 
 import { yellKey } from './extra_lines.mjs';
 
-/** Each voice: the audition it was chosen from, its treatment (null: the
- *  clean level-only chain), and the TTS model. */
+/** Each voice: the audition it was chosen from, or the voice design brief it
+ *  was designed from (the Guardians of the Heat and the Quench and the
+ *  Masterless Strength, recast on 2026-11-09 as clones of the picked design
+ *  previews in the account the pack renders with), and its treatment (null:
+ *  the clean level-only chain). */
 export const SMITH_HEART_SPEAKERS = {
   heart_hammer_guardian: {
     audition: { boss: 'heart-guardian', take: 'bedrock-warlord', candidate: 3 },
@@ -27,16 +30,19 @@ export const SMITH_HEART_SPEAKERS = {
   },
   captain_thessaly: { audition: null, preset: null },
   heart_quench_guardian: {
-    audition: { boss: 'heart-quench', take: 'lake-empress', candidate: 1 },
-    preset: 'rime-lake',
+    audition: null,
+    designed: 'regal ancient ice queen, clear, cold, elegant, rising into frightening power',
+    preset: 'rime-queen-clean',
   },
   heart_heat_guardian: {
-    audition: { boss: 'heart-heat', take: 'hearth-titan', candidate: 3 },
-    preset: 'hearth-fire',
+    audition: null,
+    designed: 'arrogant god-like fire lord, imperious, explodes into furious roars',
+    preset: 'hearth-fire-clean',
   },
   heart_masterless_strength: {
-    audition: { boss: 'heart-masterless', take: 'four-vein-chorus', candidate: 1 },
-    preset: 'masterless-heart',
+    audition: null,
+    designed: 'many voices at once, roaring, chaotic rage',
+    preset: 'masterless-clean',
   },
 };
 
@@ -98,62 +104,85 @@ export const SMITH_HEART_DIRECTIONS = {
   'thessaly.victory': '[relieved, proud]',
   'thessaly.wipe': '[steady, encouraging]',
   // The Guardian of the Quench: the frozen lake's keeper.
-  'quench.pull': '[cold, very calm]',
-  'quench.shatter': '[a frozen whisper]',
-  'quench.hole': '[calm, knowing]',
-  'quench.wake': '[a ringing command]',
-  'quench.cross': '[sharp command]',
-  'quench.flurry': '[fierce, rising]',
-  'quench.deepen': '[a slow, cold whisper]',
-  'quench.breath': '[exhaling frost]',
-  'quench.slay_a': '[quiet, final]',
-  'quench.slay_b': '[softly, soothing]',
-  'quench.slay_c': '[cold, calm]',
-  'quench.wipe': '[a frozen whisper]',
-  'quench.death': '[letting go]',
+  'quench.pull': '[regal, cold, elegant]',
+  'quench.shatter': '[icy whisper, then sharp]',
+  'quench.hole': '[calm, knowing, regal]',
+  'quench.wake': '[rising into terrifying power] [commanding]',
+  'quench.cross': '[sharp, imperious command]',
+  'quench.flurry': '[furious, frightening power]',
+  'quench.deepen': '[slow, cold whisper]',
+  'quench.breath': '[exhales slowly] [cold, elegant]',
+  'quench.slay_a': '[cold, final]',
+  'quench.slay_b': '[softly, almost tender]',
+  'quench.slay_c': '[regal, cold]',
+  'quench.wipe': '[cold whisper]',
+  'quench.death': '[gasping, fading, letting go]',
   // The Guardian of the Heat: the first flame's giant.
-  'heat.pull': '[ancient, warm, ominous]',
-  'heat.fist': '[heavy, slow]',
-  'heat.sink': '[a booming roar]',
-  'heat.sinkAgain': '[furious]',
-  'heat.feed': '[satisfied, low]',
-  'heat.rise': '[a booming roar]',
-  'heat.seeds': '[slow, ominous]',
-  'heat.zones': '[a deep rumble]',
-  'heat.cinder': '[mocking]',
-  'heat.wheel': '[rising, commanding]',
-  'heat.slay_a': '[satisfied]',
-  'heat.slay_b': '[a short growl]',
-  'heat.slay_c': '[solemn]',
-  'heat.wipe': '[fierce]',
-  'heat.death': '[sinking, gentle]',
+  'heat.pull': '[arrogant, imperious, god-like]',
+  'heat.fist': '[contemptuous, heavy]',
+  'heat.sink': '[furious roar]',
+  'heat.sinkAgain': '[laughs darkly] [furious]',
+  'heat.feed': '[satisfied, low and hungry]',
+  'heat.rise': '[roaring, triumphant]',
+  'heat.seeds': '[arrogant, slow, ominous]',
+  'heat.zones': '[imperious, menacing]',
+  'heat.cinder': '[laughs darkly] [mocking]',
+  'heat.wheel': '[commanding, building to a roar]',
+  'heat.slay_a': '[contemptuous]',
+  'heat.slay_b': '[a short, scornful growl]',
+  'heat.slay_c': '[imperious, solemn]',
+  'heat.wipe': '[laughs darkly] [triumphant]',
+  'heat.death': '[gasping, sinking, proud to the end]',
   // The Masterless Strength: the mountain's heart, "we".
-  'final.arrivalWake': '[immense, slow, curious]',
-  'final.arrivalRise': '[a grinding command]',
-  'final.arrivalRoar': '[a colossal roar]',
-  'final.pull': '[cold, immense]',
+  'final.arrivalWake': '[immense, slow, curious whisper]',
+  'final.arrivalRise': '[growling, commanding]',
+  'final.arrivalRoar': '[furious roar]',
+  'final.pull': '[proud, rising rage] [shouting]',
   'final.drinkHeat': '[roaring]',
-  'final.drinkQuench': '[a cold command]',
-  'final.drinkBreath': '[booming]',
-  'final.drinkHammer': '[thunderous]',
-  'final.burst': '[exultant]',
-  'final.anvil': '[crushing, slow]',
-  'final.call': '[a commanding roar]',
-  'final.callAgain': '[furious]',
-  'final.shattered': '[wounded, grim]',
-  'final.poured': '[a deep, satisfied rumble]',
-  'final.final': '[a colossal roar]',
-  'final.fury': '[wild, raging]',
-  'final.kneel': '[fading, almost peaceful]',
-  'final.rebirth': '[a sudden roar]',
-  'final.collapse': '[desperate fury]',
-  'final.anvilsEnd': '[hollow, final]',
-  'final.slay_a': '[cold]',
-  'final.slay_b': '[a low rumble]',
+  'final.drinkQuench': '[cold, commanding]',
+  'final.drinkBreath': '[shouting]',
+  'final.drinkHammer': '[furious, thunderous]',
+  'final.burst': '[laughs wildly] [exultant]',
+  'final.anvil': '[crushing, slow, menacing]',
+  'final.call': '[commanding roar]',
+  'final.callAgain': '[furious, shouting]',
+  'final.shattered': '[wounded, seething]',
+  'final.poured': '[satisfied, deep growl]',
+  'final.final': '[enraged roar]',
+  'final.fury': '[chaotic, raging]',
+  'final.kneel': '[gasping, fading, almost peaceful]',
+  'final.rebirth': '[sudden, furious roar]',
+  'final.collapse': '[desperate fury] [shouting]',
+  'final.anvilsEnd': '[hollow, menacing]',
+  'final.slay_a': '[contemptuous]',
+  'final.slay_b': '[low growl]',
   'final.slay_c': '[quiet, satisfied]',
-  'final.wipe': '[cold, quiet]',
-  'final.death': '[fading, almost tender]',
+  'final.wipe': '[cold, quiet, menacing]',
+  'final.death': '[gasping, broken]',
 };
+
+/** Mid-line performance turns (eleven_v3 audio tags), by pack id: each tag
+ *  goes in front of its phrase in the synthesized text only, never the
+ *  game text. */
+export const SMITH_HEART_INLINE_DIRECTIONS = {
+  'final.pull': { 'Good.': '[laughs darkly]', 'We will wear': '[furious roar]' },
+  'final.death': {
+    'But you cannot': '[bitter, defiant]',
+    'We will return': '[low, menacing threat]',
+  },
+  'heat.sinkAgain': { 'Again you burn': '[roaring]' },
+};
+
+/** `text` with its inline tags set before their phrases. Throws on a tag
+ *  whose phrase the line no longer says. */
+function withInlineDirections(id, text) {
+  let out = text;
+  for (const [phrase, tag] of Object.entries(SMITH_HEART_INLINE_DIRECTIONS[id] ?? {})) {
+    if (!out.includes(phrase)) throw new Error(`No "${phrase}" in ${id} for its inline direction`);
+    out = out.replace(phrase, `${tag} ${phrase}`);
+  }
+  return out;
+}
 
 /** A sim line as the pack renders it: its clip key, its voice, treatment and
  *  the text it is synthesized from. Throws on a line with no direction or no
@@ -168,7 +197,7 @@ export function packLine(line) {
     key: yellKey(line.text),
     voiceNpc: line.voiceNpc,
     text: line.text,
-    synthesisText: `${direction} ${line.text}`,
+    synthesisText: `${direction} ${withInlineDirections(line.id, line.text)}`,
     preset: speaker.preset,
   };
 }

@@ -31,3 +31,12 @@ export declare const SMITH_HEART_VOICE_PROCESSING_PRESETS: SmithHeartVoiceProces
 export declare const SMITH_HEART_VOICE_LOUDNESS: string;
 export declare function buildSmithHeartVoiceFilter(presetId: string): string;
 export declare const SMITH_HEART_CLEAN_VOICE_FILTER: string;
+
+export interface SmithHeartCleanVoicePreset {
+  id: string;
+  highpass: number;
+  compressor: { threshold: number; ratio: number; attack: number; release: number };
+  sub: { gain: number; lowpass: number };
+  room: { delays: string; decays: string; wet: number };
+}
+export declare const SMITH_HEART_CLEAN_VOICE_PRESETS: SmithHeartCleanVoicePreset[];
