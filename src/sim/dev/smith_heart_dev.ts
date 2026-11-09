@@ -130,9 +130,9 @@ import {
   replaySmithHeartArrivalForDev,
   SMITH_HEART_AWAKE_BIT,
   setSmithHeartPortalDevOpen,
-  spendHeatIntro,
   smithHeartProgress,
   smithHeartSealMaskOf,
+  spendHeatIntro,
 } from '../encounters/smith_heart';
 import { setTierHealthDevScale } from '../encounters/smith_heart/tier_health';
 import { setDungeonGatesDevOpen } from '../instances/dungeon_gates';
