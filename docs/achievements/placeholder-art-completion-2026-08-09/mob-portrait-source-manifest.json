@@ -6,17 +6,17 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "25f7b58070dac23ff3278ab36a7f55efd9c2915ab295aa616ab40f999ac8fed2",
+  "rendererFingerprint": "5beb163c4439a6dc3af06d487fcda24191c5983361cc21930450d3ab712ceb3b",
   "renderEnv": {
     "schemaVersion": 1,
-    "platform": "win32",
-    "arch": "x64",
+    "platform": "darwin",
+    "arch": "arm64",
     "gpuVendor": "Google Inc. (Google)",
-    "gpuRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+    "gpuRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)",
     "browserMajor": "157",
-    "browserVersion": "Edg/157.0.4341.42",
+    "browserVersion": "Chrome/157.0.8103.38",
     "requestedBackend": "swiftshader",
-    "fingerprint": "93984b9f943895de3c4da131f720f05bcb47c89f02b336b88bda89953a63fc3a"
+    "fingerprint": "293ddb26a9299a15643f6c85fc437fb865f083082a0bb7a69e6e98d0f6c54bf4"
   },
   "renderer": {
     "trackedFiles": [
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 6951468,
-      "sha256": "6dfb35b27ef5fd4b23509d106efef0d76f5cd1093580bcaa4839ef918a49e929",
+      "bytes": 6952998,
+      "sha256": "499fd3dcc6841f1e887ef582376f6baf30e201d8abc66dab33d0875166c8fb4e",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -5405,13 +5405,13 @@
       "id": "heart_hammer_guardian",
       "family": "elemental",
       "finderEncounter": false,
-      "visualKey": "skel_golem",
+      "visualKey": "smith_heart_hammer_guardian",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/skeleton_golem.glb",
-          "path": "public/models/chars/enemies/skeleton_golem.glb",
-          "bytes": 292776,
-          "sha256": "5ea6cd76ee8cfe1380ff056cd226c9403c49f17b5d280a504448efa82990c1f5"
+          "url": "models/creatures/heart_slabwright.glb",
+          "path": "public/models/creatures/heart_slabwright.glb",
+          "bytes": 807792,
+          "sha256": "69e53ce80ad141759492bbfca0a28d4d4e02da8801ec5e8a7f3a0e60ae392356"
         },
         "idle": "Idle",
         "height": 3.4,
@@ -5419,59 +5419,54 @@
         "hover": null,
         "show": null,
         "attach": [],
-        "weaponFix": [
-          {
-            "node": "Skeleton_Golem_Axe",
-            "rotY": 3.141592653589793
-          }
-        ],
-        "tintStrength": 0.25
+        "weaponFix": null,
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#8a6430",
-        "strength": 0.25
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "d9f30fbc3a0b91e15be023a566ca4c58dc9c6c78631087fdf33e0e2d482ce246",
+      "sourceFingerprint": "6cf2f623a6dd61795d373e456731f5df2242d8f54e903dacc75286d2a86c848c",
       "output": {
         "path": "public/ui/mobs/heart_hammer_guardian.webp",
-        "bytes": 3020,
-        "sha256": "cf43bec6f30945c6cd0715a8de6eb8bba19a6faed1a7152842ede607d3a4ad81"
+        "bytes": 3910,
+        "sha256": "fbba35375b2bb097f910cb58f0dc31b9bfae43a5eee3ad11f2a073f7b3a3923b"
       }
     },
     {
       "id": "heart_hammer_warder",
       "family": "elemental",
       "finderEncounter": false,
-      "visualKey": "mob_elemental",
+      "visualKey": "smith_heart_hammer_warder",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/golelingevolved.glb",
-          "path": "public/models/creatures/golelingevolved.glb",
-          "bytes": 85588,
-          "sha256": "156f4c2dcf93c6e52a738d8a93e09d1988f933fe4f2d1f9d30411b5eae7f2b94"
+          "url": "models/creatures/heart_hammer_warder.glb",
+          "path": "public/models/creatures/heart_hammer_warder.glb",
+          "bytes": 409464,
+          "sha256": "127e5201ae053dd26a7eba9766c476c47a17b958925bba9caf7d1aae88adb57c"
         },
-        "idle": "Flying_Idle",
-        "height": 2.2,
+        "idle": "Idle",
+        "height": 2.17,
         "yaw": null,
-        "hover": 0.3,
+        "hover": null,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.4
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#8a6430",
-        "strength": 0.4
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "b3a9acb4f3435047fc043fbeb4ab4c179a0cfa551f6080952d026a661826c194",
+      "sourceFingerprint": "e01ea56be1576e1cee8740b908d4a1810df5c6d7e364fe098d9e910e2e2b62ec",
       "output": {
         "path": "public/ui/mobs/heart_hammer_warder.webp",
-        "bytes": 2310,
-        "sha256": "63e815c81c791c048a19bf03ef698e5f515f693231b49f6db27cd926ce4be716"
+        "bytes": 3994,
+        "sha256": "7d1a2a7d1318ee3dbe029fd59916e5c3fceea4b847e273917da17c01662e0ce1"
       }
     },
     {
@@ -5750,18 +5745,18 @@
       "id": "heart_quench_caller",
       "family": "elemental",
       "finderEncounter": false,
-      "visualKey": "mob_water_elemental",
+      "visualKey": "smith_heart_quench_caller",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/water_elemental.glb",
-          "path": "public/models/creatures/water_elemental.glb",
-          "bytes": 255292,
-          "sha256": "8b02b114d81492d66d4f13791fc9a8945e2bbe48bb2f027afa332ebef6aac9b2"
+          "url": "models/creatures/heart_quench_caller.glb",
+          "path": "public/models/creatures/heart_quench_caller.glb",
+          "bytes": 565608,
+          "sha256": "36e6ff8f6df1237abefc50d59e4eb1017569105c3658b0c9c2de41dc7797c5a0"
         },
         "idle": "Idle",
-        "height": 2.65,
+        "height": 3.6,
         "yaw": null,
-        "hover": 0.12,
+        "hover": null,
         "show": null,
         "attach": [],
         "weaponFix": null,
@@ -5773,11 +5768,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "2fb1fcf255a7121dfc23071eea85ef7178a54bbd0e7cae167e02284fafa873ab",
+      "sourceFingerprint": "47b366af34f2ab626bc86d64c31190559489c447cc8f34080e4387085e69c8a6",
       "output": {
         "path": "public/ui/mobs/heart_quench_caller.webp",
-        "bytes": 2348,
-        "sha256": "e35ea44865cce9303fbd6d4f4573eacfc9dc4cd7821f95bf7273892987c3b24a"
+        "bytes": 4388,
+        "sha256": "ef3a833bae123680546be1b616878714c998375c80d4f760c0b160aa41271175"
       }
     },
     {
@@ -5818,34 +5813,34 @@
       "id": "heart_quench_warder",
       "family": "elemental",
       "finderEncounter": false,
-      "visualKey": "mob_elemental",
+      "visualKey": "smith_heart_quench_warder",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/golelingevolved.glb",
-          "path": "public/models/creatures/golelingevolved.glb",
-          "bytes": 85588,
-          "sha256": "156f4c2dcf93c6e52a738d8a93e09d1988f933fe4f2d1f9d30411b5eae7f2b94"
+          "url": "models/creatures/heart_quench_warder.glb",
+          "path": "public/models/creatures/heart_quench_warder.glb",
+          "bytes": 566860,
+          "sha256": "3343e72579b81653048f4de88e1fa4feaff98388361c5bef43dec92ec52b3405"
         },
-        "idle": "Flying_Idle",
-        "height": 2.2,
+        "idle": "Idle",
+        "height": 3.8,
         "yaw": null,
-        "hover": 0.3,
+        "hover": null,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.4
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#6aa8c8",
-        "strength": 0.4
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "e4c15a7c2f26485b4958ac039968efda2681b17bf4d0a7704a3a77392023917d",
+      "sourceFingerprint": "2bdf391bef1e12ed43da7101dd19dadacd65c8be4112045385b63bfe1e569a39",
       "output": {
         "path": "public/ui/mobs/heart_quench_warder.webp",
-        "bytes": 2196,
-        "sha256": "c4cabd4adc9e7d908f81488d7864adb6e105f2e1cc3cf9ec0765fcb22433c902"
+        "bytes": 5338,
+        "sha256": "5b7e449e8fabca63cd80411e0464d703118c8d6de0fefb664c661d3aca81d052"
       }
     },
     {
@@ -5894,12 +5889,12 @@
       "visualKey": "smith_heart_seam_singer",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/golelingevolved.glb",
-          "path": "public/models/creatures/golelingevolved.glb",
-          "bytes": 85588,
-          "sha256": "156f4c2dcf93c6e52a738d8a93e09d1988f933fe4f2d1f9d30411b5eae7f2b94"
+          "url": "models/creatures/heart_seam_singer.glb",
+          "path": "public/models/creatures/heart_seam_singer.glb",
+          "bytes": 820580,
+          "sha256": "b4e6f8fcd5e4f5fea033d46b44e033c3369df3db480b1b77415d72412b45f7e0"
         },
-        "idle": "Flying_Idle",
+        "idle": "Idle",
         "height": 2.5,
         "yaw": null,
         "hover": null,
@@ -5914,11 +5909,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "d4c1f19fdc77a678cf3bc563dee2afefb0cde3c1b12b9e590a96d5a5c2cf0a3d",
+      "sourceFingerprint": "c59b7084d2e8a52e75f76d2deabfc39d47b405f167ba5a1081c98a79f7b26861",
       "output": {
         "path": "public/ui/mobs/heart_seam_singer.webp",
-        "bytes": 2330,
-        "sha256": "da04f69981b3560b636c0473e89c2a109f8e19bb8b809182e649286d83c8af0d"
+        "bytes": 4006,
+        "sha256": "0538c22001df985db8f54d3a65e569388de34dc93f83f9070eaf9d8afcefcade"
       }
     },
     {
