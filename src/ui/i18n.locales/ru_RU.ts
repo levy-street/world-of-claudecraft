@@ -24676,6 +24676,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Наполовину погружён в свой источник и никогда не двигается. Базальтовый кулак продолжается; Семена Очага падают под рейд и вскоре лопаются, а Пробуждённый огонь поджигает пол вокруг источника кольцо за кольцом. При 40% здоровья он снова погружается, и Очаг переполняется. В героическом режиме урон выше на {heroicPct}%.',
   'hudChrome.auraEffect.heatGuardian.statePhase3':
     'Наполовину погружён в свой источник и никогда не двигается. Базальтовый кулак и Пробуждённый огонь продолжаются, а Катящиеся угли падают и преследуют игроков: удар отбрасывает уголь. В героическом режиме урон выше на {heroicPct}%.',
+  'hudChrome.auraEffect.heatGuardian.intro':
+    'Остывший в своём источнике: его нельзя атаковать или ранить, пока рейд не подойдёт и он не проснётся, вспыхнув.',
   'hudChrome.auraEffect.heatGuardian.stateUnder':
     'Погружён в источник: пока Очаг переполнен, его нельзя атаковать или ранить. Когда переполнение закончится, он поднимется снова.',
   'hudChrome.auraEffect.heatGuardian.scorched':
@@ -24698,6 +24700,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.heatGuardian.say.seeds': 'Каждая искра, что я рассыпаю, пускает корни.',
   'hudChrome.heatGuardian.say.zones': 'Очаг просыпается у вас под ногами.',
   'hudChrome.heatGuardian.say.cinder': 'Беги, маленький уголёк. Пламя голодно.',
+  'hudChrome.heatGuardian.say.intro':
+    'Насекомые. Вы вползаете в первое пламя и надеетесь уйти? Я горел ещё до того, как ваш род узнал огонь. Так горите же вместе с ним!',
   'abilityUi.cast.heart_heat_fist': 'Базальтовый кулак',
   'abilityUi.cast.heart_forge_wrath': 'Гнев горна',
   'abilityUi.cast.heart_forge_pour': 'Литьё горна',

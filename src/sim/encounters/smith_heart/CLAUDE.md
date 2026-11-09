@@ -79,6 +79,8 @@ Quench's, then the Heat's, then the Masterless Strength's, then the seal and the
 | `heat_zones.ts` | Wakefire's runs of bands round the wellspring (phases 2 and 3). |
 | `heat_cinders.ts` | Phase 3's Rolling Cinders: the fall, the hunt, the knockback and Cooling Crust, the burst. |
 | `heat_cinder_ward.ts` | Pure leaf: a Rolling Cinder is a ward (a hit lands one point), hooked at `combat/damage.ts`. |
+| `heat_intro_plan.ts` | Leaf: the entrance's timeline (`HEAT_INTRO`: the wake reach, the line's moment, the hand-back, the dev replay hold, the pull line's quiet) and its aura's stages (`HEAT_INTRO_STAGES`), read by the sim and the renderer alike. Imports nothing. |
+| `heat_intro.ts` | The entrance: cold coal held by the encounter (`encounterHeld`, not hostile, immune) until a living player comes within the wake reach, then the scene held out of reach on the `HEAT_AURAS.intro` clock, the line yelled once, the hand-back; once per guardian (keyed by its body), spent by a fight begun before it woke, replayed by `/dev heart heat intro`. |
 | `heat_voice.ts` | What the guardian SAYS (`hudChrome.heatGuardian.say.*`, `HEAT_LINES` the same English), mythic's Wheel, a player's fall. |
 | `final_voice.ts` | What the Masterless Strength SAYS (`hudChrome.finalBoss.say.*`, `FINAL_LINES` the same English): an observer read after each tick (`stepFinalVoice`: the pull, a new quarter drunk, a burst, the Anvil, each stage, the fury, the hidden phase's falls, a player's fall), the wipe and the fall, and the three arrival lines over the rebuild (`ARRIVAL_LINE_AT`, begun by the seal's arrival bit). Changes nothing in the fight. |
 | `voice_slain.ts` | Leaf, pure: the kill lines' watch every boss shares (`watchSlain`: each new death once, the revived forgotten; `slayMoment`: the variants in turn; `SLAY_EVERY`). |
@@ -140,7 +142,7 @@ Rules:
   `tests/helpers/quench_fight.ts`), `tests/smith_heart_quench_ui.test.ts`,
   `tests/smith_heart_quench_wire.test.ts`, `tests/quench_water_online.test.ts`,
   `tests/smith_heart_quench_rime.test.ts` (Living Rime and Living Warmth); the Heat:
-  `tests/smith_heart_heat.test.ts` (on `tests/helpers/heat_fight.ts`),
+  `tests/smith_heart_heat.test.ts` (on `tests/helpers/heat_fight.ts`), `tests/smith_heart_heat_intro.test.ts` (the entrance),
   `tests/smith_heart_heat_ui.test.ts`, `tests/smith_heart_heat_wire.test.ts`; the Masterless Strength: `tests/smith_heart_final.test.ts` (on `tests/helpers/final_fight.ts`: the rules, the kits per tier, determinism, the headless full fight), `tests/smith_heart_final_ui.test.ts` (warnings, tooltips, the Overload HUD, the alert), `tests/smith_heart_final_wire.test.ts` (the online mirror), `tests/smith_heart_final_dev.test.ts`; part 2: `tests/smith_heart_final_phase.test.ts` (the intermissions, each Splinter, the final phase, the poured elements, determinism, the full fight 100 to 0 per tier), `tests/smith_heart_final_phase_ui.test.ts`, `tests/smith_heart_final_phase_wire.test.ts`; the tier pools: `tests/smith_heart_tier_health.test.ts`; the voices: `tests/smith_heart_voice.test.ts`. A live raid of bots fights every boss over a dev server:
   `scripts/heart_raid.mjs` (`BOSS=council|breath|quench|heat|final`; the shared raid
   `scripts/lib/heart_raid_bots.mjs`, each boss's AI `scripts/lib/heart_raid_<boss>.mjs`, the

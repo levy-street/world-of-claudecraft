@@ -22515,6 +22515,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '湧泉に半身を沈め、決して動かない。玄武岩の拳は続く。炉床の種がレイドの足元に落ちてしばらくして弾け、目覚めの炎が湧泉のまわりの床を帯ごとに燃え上がらせる。体力40%で再び沈み、炉床があふれ出す。ヒロイックでは与えるダメージが{heroicPct}%増える。',
   'hudChrome.auraEffect.heatGuardian.statePhase3':
     '湧泉に半身を沈め、決して動かない。玄武岩の拳と目覚めの炎は続き、転がる燃え殻が落ちてきてプレイヤーを追う：打てば押し返せる。ヒロイックでは与えるダメージが{heroicPct}%増える。',
+  'hudChrome.auraEffect.heatGuardian.intro':
+    '湧泉の中で冷えきっている：レイドが近づいて目覚め、燃え上がるまで、攻撃もダメージも受けない。',
   'hudChrome.auraEffect.heatGuardian.stateUnder':
     '湧泉に沈んでいる：炉床があふれている間は攻撃もダメージも受けない。あふれが終わると再び浮かび上がる。',
   'hudChrome.auraEffect.heatGuardian.scorched':
@@ -22537,6 +22539,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.heatGuardian.say.seeds': '我が撒く火花はどれも根を張る。',
   'hudChrome.heatGuardian.say.zones': '炉床がお前たちの足元で目を覚ます。',
   'hudChrome.heatGuardian.say.cinder': '走れ、小さき燠火よ。炎は飢えている。',
+  'hudChrome.heatGuardian.say.intro':
+    '虫けらどもめ。最初の炎に這い入り、生きて出られると思ったか？お前たちの種族が火を知るより前から、我は燃えていた。ならば共に燃え尽きよ！',
   'abilityUi.cast.heart_heat_fist': '玄武岩の拳',
   'abilityUi.cast.heart_forge_wrath': '炉の怒り',
   'abilityUi.cast.heart_forge_pour': '炉の注ぎ',

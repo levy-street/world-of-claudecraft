@@ -6021,6 +6021,8 @@ export const hudChromeStrings = {
         'Half sunk in its wellspring: it never moves. Basalt Fist goes on; Hearthseeds fall under the raid and burst after a while, and Wakefire ignites the floor round the wellspring band by band. At 40% health it sinks and the Hearth overflows again. Heroic deals {heroicPct}% more damage.',
       statePhase3:
         'Half sunk in its wellspring: it never moves. Basalt Fist and Wakefire go on, and Rolling Cinders fall and hunt players: strike one to knock it back. Heroic deals {heroicPct}% more damage.',
+      intro:
+        'Cold in its wellspring: it cannot be attacked or harmed until the raid comes near and it wakes, burning.',
       stateUnder:
         'Sunk in its wellspring: it cannot be attacked or harmed while the Hearth overflows. It rises again when the overflow ends.',
       scorched:
@@ -10407,9 +10409,12 @@ export const hudChromeStrings = {
   },
   // The Smith's Heart's Guardian of the Heat (encounters/smith_heart/heat*.ts):
   // what the guardian SAYS (heat_voice.ts HEAT_LINES, the same English). Its
-  // fight calls no raid warning banner (the owner's rule of 2026-11-03).
+  // fight calls no raid warning banner (the owner's rule of 2026-11-03). The
+  // entrance's line is wordy (M16): non-Latin fills in the overlays.
   heatGuardian: {
     say: {
+      intro:
+        'Insects. You crawl into the first flame and expect to leave? I was burning before your kind learned fire. Then burn with it!',
       pull: 'You walk into the first flame. Nothing leaves it unchanged.',
       fist: 'Stand where the stone falls, and be part of it.',
       sink: 'The wellspring rises to meet you!',

@@ -69,6 +69,7 @@ import {
   FinalPhaseFx,
   HammerFx,
   HeatBody,
+  HeatEntranceFx,
   HeatFightFx,
   HeatFx,
   QuenchBladesFx,
@@ -220,6 +221,9 @@ export class RiftDeathZoneVisuals {
    *  rivers, the seeds, Wakefire, the cinders, the marks), and its body. */
   private readonly heatFight: HeatFightFx;
   private readonly heatBody: HeatBody;
+  /** Its entrance (cold coal waking into the blast), updated before the
+   *  fight and the body: they read its look. */
+  private readonly heatEntrance: HeatEntranceFx;
   private readonly finalFx: FinalFx;
   private readonly finalKit: FinalKitFx;
   private readonly finalPhase: FinalPhaseFx;
@@ -275,6 +279,15 @@ export class RiftDeathZoneVisuals {
       playGesture,
     );
     this.heatFx = new HeatFx(scene, groundY, world, compileGate, reducedMotion, shake);
+    this.heatEntrance = new HeatEntranceFx(
+      scene,
+      groundY,
+      world,
+      compileGate,
+      reducedMotion,
+      shake,
+      playGesture,
+    );
     this.heatFight = new HeatFightFx(scene, groundY, world, compileGate, reducedMotion, shake);
     this.heatBody = new HeatBody(
       scene,
@@ -649,6 +662,7 @@ export class RiftDeathZoneVisuals {
     this.quenchBlades.update(dt);
     this.quenchBody.update(dt);
     this.heatFx.update(dt);
+    this.heatEntrance.update(dt);
     this.heatFight.update(dt);
     this.heatBody.update(dt);
     this.finalFx.update(dt);
@@ -688,6 +702,7 @@ export class RiftDeathZoneVisuals {
     this.quenchBlades.dispose();
     this.quenchBody.dispose();
     this.heatFx.dispose();
+    this.heatEntrance.dispose();
     this.heatFight.dispose();
     this.heatBody.dispose();
     this.finalFx.dispose();

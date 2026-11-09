@@ -65,6 +65,13 @@ export { heatCinderHitPoints } from './heat_cinder_ward';
 export { FIST_SPAN, wakefireHoldsFist } from './heat_fist';
 export * from './heat_geometry';
 export * from './heat_ids';
+export {
+  type HeatIntroStage,
+  heatIntroState,
+  heatIntroWaker,
+  spendHeatIntro,
+} from './heat_intro';
+export * from './heat_intro_plan';
 export type { HeatFightState } from './heat_state';
 export { HEAT_LINES, heatLineKey } from './heat_voice';
 export {

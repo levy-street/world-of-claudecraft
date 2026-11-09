@@ -118,6 +118,7 @@ export const SMITH_HEART_DIRECTIONS = {
   'quench.wipe': '[cold whisper]',
   'quench.death': '[gasping, fading, letting go]',
   // The Guardian of the Heat: the first flame's giant.
+  'heat.intro': '[contemptuous]',
   'heat.pull': '[arrogant, imperious, god-like]',
   'heat.fist': '[contemptuous, heavy]',
   'heat.sink': '[furious roar]',
@@ -171,6 +172,12 @@ export const SMITH_HEART_INLINE_DIRECTIONS = {
     'We will return': '[low, menacing threat]',
   },
   'heat.sinkAgain': { 'Again you burn': '[roaring]' },
+  // The entrance (heat_intro.ts): contempt, then anger, then the fury it
+  // explodes on (the fx beats ride these three turns).
+  'heat.intro': {
+    'I was burning': '[angrier]',
+    'Then burn with it!': '[furious shout]',
+  },
 };
 
 /** `text` with its inline tags set before their phrases. Throws on a tag

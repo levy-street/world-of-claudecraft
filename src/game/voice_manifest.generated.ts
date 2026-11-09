@@ -584,6 +584,7 @@ export const VOICE_LINES: Record<string, string> =
   "yell__i_rise_with_the_first_fire": "/audio/voice/heart_heat_guardian/yell__i_rise_with_the_first_fire.mp3?v=25e4c4e004ea",
   "yell__i_will_not_lose_it_again": "/audio/voice/nythraxis/yell__i_will_not_lose_it_again.mp3?v=828eac9f4a6c",
   "yell__ignivar_ashcaller_awakens_let_the_world_burn": "/audio/voice/ignivar/yell__ignivar_ashcaller_awakens_let_the_world_burn.mp3?v=f183e17ed4f9",
+  "yell__insects_you_crawl_into_the_first_flame_and_expect_to_leave_i": "/audio/voice/heart_heat_guardian/yell__insects_you_crawl_into_the_first_flame_and_expect_to_leave_i.mp3?v=f9b4934fdd98",
   "yell__into_my_calm_quickly_it_holds_three_no_more": "/audio/voice/captain_thessaly/yell__into_my_calm_quickly_it_holds_three_no_more.mp3?v=0df38f6d9a02",
   "yell__it_is_drawing_breath_get_to_its_sides_never_before_its_mouth": "/audio/voice/captain_thessaly/yell__it_is_drawing_breath_get_to_its_sides_never_before_its_mouth.mp3?v=836c09323156",
   "yell__its_shield_feeds_on_the_isles_ride_the_gale_out_there_cut_th": "/audio/voice/captain_thessaly/yell__its_shield_feeds_on_the_isles_ride_the_gale_out_there_cut_th.mp3?v=327239129347",

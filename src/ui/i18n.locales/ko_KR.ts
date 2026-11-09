@@ -22486,6 +22486,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '샘에 몸을 반쯤 담근 채 결코 움직이지 않습니다. 현무암 주먹은 계속됩니다. 화로 씨앗이 공격대의 발밑에 떨어졌다가 잠시 뒤 터지고, 깨어나는 불이 샘 주위의 바닥을 띠마다 차례로 불태웁니다. 생명력 40%에서 다시 가라앉고 화로가 넘쳐흐릅니다. 영웅 난이도에서는 피해가 {heroicPct}% 더 큽니다.',
   'hudChrome.auraEffect.heatGuardian.statePhase3':
     '샘에 몸을 반쯤 담근 채 결코 움직이지 않습니다. 현무암 주먹과 깨어나는 불은 계속되고, 구르는 잉걸불이 떨어져 플레이어를 쫓습니다: 때리면 밀려납니다. 영웅 난이도에서는 피해가 {heroicPct}% 더 큽니다.',
+  'hudChrome.auraEffect.heatGuardian.intro':
+    '샘 속에서 차갑게 식어 있다: 공격대가 다가와 깨어나 불타오를 때까지 공격하거나 피해를 줄 수 없다.',
   'hudChrome.auraEffect.heatGuardian.stateUnder':
     '샘에 가라앉아 있습니다: 화로가 넘쳐흐르는 동안에는 공격하거나 피해를 줄 수 없습니다. 넘침이 끝나면 다시 떠오릅니다.',
   'hudChrome.auraEffect.heatGuardian.scorched':
@@ -22508,6 +22510,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.heatGuardian.say.seeds': '내가 흩뿌리는 불티마다 뿌리를 내린다.',
   'hudChrome.heatGuardian.say.zones': '화로가 너희 발밑에서 깨어난다.',
   'hudChrome.heatGuardian.say.cinder': '달려라, 작은 불씨야. 불꽃은 굶주렸다.',
+  'hudChrome.heatGuardian.say.intro':
+    '벌레들. 최초의 불꽃 속으로 기어들어 와 놓고 살아 나가길 바라느냐? 너희 족속이 불을 알기 전부터 나는 타오르고 있었다. 그렇다면 함께 타올라라!',
   'abilityUi.cast.heart_heat_fist': '현무암 주먹',
   'abilityUi.cast.heart_forge_wrath': '화로의 분노',
   'abilityUi.cast.heart_forge_pour': '화로 붓기',

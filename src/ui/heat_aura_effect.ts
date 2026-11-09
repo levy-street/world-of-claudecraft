@@ -44,6 +44,9 @@ export function heatAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescript
   switch (a.id) {
     case HEAT_AURAS.state:
       return stateDescriptor(a);
+    // Its entrance's marker (cold, or waking): out of reach until it burns.
+    case HEAT_AURAS.intro:
+      return { key: `${KEY}.intro`, nums: {} };
     case HEAT_AURAS.scorched:
       return {
         key: `${KEY}.scorched`,

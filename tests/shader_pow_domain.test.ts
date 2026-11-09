@@ -322,6 +322,7 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   'src/render/smith_heart_fx/final_phase_glsl.ts': 3,
   'src/render/smith_heart_fx/final_telegraph_glsl.ts': 5,
   'src/render/smith_heart_fx/heat_cinder_fx.ts': 2,
+  'src/render/smith_heart_fx/heat_entrance_fx.ts': 3,
   'src/render/smith_heart_fx/heat_fight_fx.ts': 2,
   'src/render/smith_heart_fx/heat_flame_tongues.ts': 1,
   'src/render/smith_heart_fx/heat_meteor_fx.ts': 1,

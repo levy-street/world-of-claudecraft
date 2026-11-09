@@ -23045,6 +23045,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '半身沉在湧泉之中，從不移動。玄武岩之拳仍在繼續；爐心火種落在團隊腳下，片刻後爆裂，甦醒之火將湧泉周圍的地面一圈接一圈地點燃。生命值降到40%時它會再次沉下，爐心再度滿溢。英雄難度下傷害提高{heroicPct}%。',
   'hudChrome.auraEffect.heatGuardian.statePhase3':
     '半身沉在湧泉之中，從不移動。玄武岩之拳與甦醒之火仍在繼續，滾動餘燼會墜落並追逐玩家：擊中它就能把它打退。英雄難度下傷害提高{heroicPct}%。',
+  'hudChrome.auraEffect.heatGuardian.intro':
+    '在湧泉中冰冷沉寂：在團隊靠近、它甦醒燃起之前，無法被攻擊或傷害。',
   'hudChrome.auraEffect.heatGuardian.stateUnder':
     '沉入湧泉之中：爐心滿溢期間無法被攻擊或傷害。滿溢結束後它會再次升起。',
   'hudChrome.auraEffect.heatGuardian.scorched':
@@ -23066,6 +23068,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.heatGuardian.say.seeds': '我撒下的每一顆火星都會生根。',
   'hudChrome.heatGuardian.say.zones': '爐心在你們腳下甦醒。',
   'hudChrome.heatGuardian.say.cinder': '跑吧，小小的火星。火焰餓了。',
+  'hudChrome.heatGuardian.say.intro':
+    '蟲子們。你們爬進最初之焰，還指望能離開？在你們的族類學會用火之前，我就已在燃燒。那就與它一同燃盡吧！',
   'abilityUi.cast.heart_heat_fist': '玄武岩之拳',
   'abilityUi.cast.heart_forge_wrath': '熔爐之怒',
   'abilityUi.cast.heart_forge_pour': '熔爐傾瀉',

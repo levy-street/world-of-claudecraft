@@ -16,7 +16,7 @@ import {
   floorVfxLayerOf,
   floorVfxRenderOrder,
 } from '../src/render/floor_vfx_layer_core';
-import { HeatBody, HeatFightFx, HeatFx } from '../src/render/smith_heart_fx';
+import { HeatBody, HeatEntranceFx, HeatFightFx, HeatFx } from '../src/render/smith_heart_fx';
 import {
   HEAT_FLOOR,
   type HeatFloorRung,
@@ -82,12 +82,20 @@ function buildHeatRoots(): THREE.Object3D[] {
   const fx = new HeatFx(scene, () => 0);
   const fight = new HeatFightFx(scene, () => 0);
   const body = new HeatBody(scene, () => 0);
-  const names = ['smith-heart-heat-fx', 'smith-heart-heat-fight-fx', 'smith-heart-heat-body'];
+  // The entrance (its floor pieces on its own rungs over the fight's).
+  const entrance = new HeatEntranceFx(scene, () => 0);
+  const names = [
+    'smith-heart-heat-fx',
+    'smith-heart-heat-fight-fx',
+    'smith-heart-heat-body',
+    'smith-heart-heat-entrance',
+  ];
   const roots = names.map((n) => scene.getObjectByName(n));
   expect(roots.every(Boolean)).toBe(true);
   void fx;
   void fight;
   void body;
+  void entrance;
   return roots as THREE.Object3D[];
 }
 
@@ -153,10 +161,10 @@ describe('heat_floor_ladder_core: one untied rung per Heat floor layer', () => {
   });
 
   it("gives each particle owner its own smoke rung and one additive rung, off the engines' defaults", () => {
-    const owners = ['heat_fx', 'heat_fight_fx', 'heat_body'] as const;
+    const owners = ['heat_fx', 'heat_fight_fx', 'heat_body', 'heat_entrance'] as const;
     const smokes = owners.map((o) => heatParticleSteps(o).smoke);
     const sparks = owners.map((o) => heatParticleSteps(o).glow);
-    expect(new Set([...smokes, ...sparks]).size).toBe(6);
+    expect(new Set([...smokes, ...sparks]).size).toBe(8);
     for (const o of owners) {
       const p = heatParticleSteps(o);
       expect(p.ring).toBe(p.glow);
@@ -400,6 +408,7 @@ describe('the Heat modules take every floor step from the ladder', () => {
     'src/render/smith_heart_fx/heat_meteor_fx.ts',
     'src/render/smith_heart_fx/heat_swell_fx.ts',
     'src/render/smith_heart_fx/heat_well_shore.ts',
+    'src/render/smith_heart_fx/heat_entrance_fx.ts',
   ];
   it('passes no literal step to the seam and builds no telegraph straight off the kit', () => {
     const bad: string[] = [];

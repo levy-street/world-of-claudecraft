@@ -4796,6 +4796,7 @@ export const vi_VN: EnTranslations = {
         "statePhase1": "Half sunk in its wellspring: it never moves. Basalt Fist slams a spot on the shore and three Molten Swells roll out from it, and Hearth Flare strikes everyone farther than {reach} yd from the wellspring. At 70% health it sinks and the Hearth overflows. Heroic deals {heroicPct}% more damage.",
         "statePhase2": "Half sunk in its wellspring: it never moves. Basalt Fist goes on; Hearthseeds fall under the raid and burst after a while, and Wakefire ignites the floor round the wellspring band by band. At 40% health it sinks and the Hearth overflows again. Heroic deals {heroicPct}% more damage.",
         "statePhase3": "Half sunk in its wellspring: it never moves. Basalt Fist and Wakefire go on, and Rolling Cinders fall and hunt players: strike one to knock it back. Heroic deals {heroicPct}% more damage.",
+        "intro": "Cold in its wellspring: it cannot be attacked or harmed until the raid comes near and it wakes, burning.",
         "stateUnder": "Sunk in its wellspring: it cannot be attacked or harmed while the Hearth overflows. It rises again when the overflow ends.",
         "scorched": "Takes {pct}% more Fire, Frost, Nature, Shadow and Arcane damage. Every {every} sec, Hearth Flare strikes everyone farther than {reach} yd from the wellspring and renews this.",
         "grip": "Takes {total} Fire damage every second ({per} for each of your {stacks} stacks). Each of the guardian's landed swings adds a stack, up to {most}, and lasts {seconds} sec: swap tanks before it grows too heavy.",
@@ -7413,6 +7414,7 @@ export const vi_VN: EnTranslations = {
     },
     "heatGuardian": {
       "say": {
+        "intro": "Insects. You crawl into the first flame and expect to leave? I was burning before your kind learned fire. Then burn with it!",
         "pull": "You walk into the first flame. Nothing leaves it unchanged.",
         "fist": "Stand where the stone falls, and be part of it.",
         "sink": "The wellspring rises to meet you!",
