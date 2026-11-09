@@ -11,6 +11,7 @@
 // HEART_ROCK_SHADE_FLOOR).
 
 import * as THREE from 'three';
+import { breathEnvRockGlsl, breathEnvWeightGlsl } from './breath_env_plan_core';
 import { breathRockStormGlsl, breathRockStormLiftGlsl } from './breath_rock_storm_core';
 import { hammerEnvDepthGlsl } from './hammer_env_plan_core';
 import {
@@ -20,6 +21,7 @@ import {
 } from './heart_crown_core';
 import { HEART_ROCK_CUT_FAR, HEART_ROCK_CUT_NEAR, HEART_ROCK_STRATA } from './heart_rock_plan_core';
 import { heatSootGlsl } from './heat_soot_core';
+import { quenchEnvRockGlsl, quenchEnvWeightGlsl } from './quench_env_plan_core';
 import { QUENCH_FROST_NOISE_GLSL, quenchFrostGlsl } from './quench_frost_core';
 
 /** The drawn slot's origin (world x, z), for the rock's regional paint (the
@@ -80,6 +82,74 @@ export function heartRockHammerDepthGlsl(): string {
   return `outgoingLight *= mix( vec3( 1.0 ), hammerEnvDepth( length( vViewPosition ) ), uHammerCam );`;
 }
 
+/** The Breath's painted rebuild (breath_env_plan_core.ts): the rock kit's sculpts it keeps
+ *  (the lips, the faces hung under the high walks, any band its kit did not take) wear its
+ *  cliff painting where its weight holds, over the storm granite. Unset until the kit has
+ *  landed, so the vein draws its storm granite as it did. */
+const HEART_ROCK_BREATH_PAINT: { value: THREE.Texture | null } = { value: null };
+const HEART_ROCK_BREATH_PAINTED = { value: 0 };
+
+/** Hand the rock's material the Breath's cliff painting (null: the kit has not landed). */
+export function setHeartRockBreathPaint(paint: THREE.Texture | null): void {
+  HEART_ROCK_BREATH_PAINT.value = paint;
+  HEART_ROCK_BREATH_PAINTED.value = paint ? 1 : 0;
+}
+
+/** The Breath's painted rock's GLSL (after the storm granite: slot space, the vertex
+ *  normal; the gradients taken in the uniform branch, so the per-fragment weight may
+ *  gate nothing). */
+export function heartRockBreathGlsl(): string {
+  return `if ( uBreathPainted > 0.5 ) {
+          vec3 bpP = vRockCutWorld - vec3( uHeartSlot.x, 0.0, uHeartSlot.y );
+          vec3 bpDx = dFdx( bpP );
+          vec3 bpDy = dFdy( bpP );
+          float bpW = breathEnvWeight( bpP.xz ) * ( 1.0 - uHeartCore );
+          // Explicit gradients: the reads may sit behind the per-fragment weight, so rock
+          // outside the Breath samples nothing.
+          if ( bpW > 0.001 ) {
+            vec3 bpRock = breathEnvRock( uBreathPaint, bpP, normalize( vRockCutN ), bpDx, bpDy, diffuseColor.rgb );
+            diffuseColor.rgb = mix( diffuseColor.rgb, bpRock, bpW );
+          }
+        }`;
+}
+
+/** The Quench's painted rebuild (quench_env_plan_core.ts): the rock kit's sculpts it keeps
+ *  (the lips, the faces hung under the walks, any band its kit did not take) wear its
+ *  frozen cliff painting where its weight holds, over the frost. Unset until the kit has
+ *  landed, so the vein draws its frost as it did. */
+const HEART_ROCK_QUENCH_PAINT: { value: THREE.Texture | null } = { value: null };
+const HEART_ROCK_QUENCH_PAINTED = { value: 0 };
+
+/** Hand the rock's material the Quench's cliff painting (null: the kit has not landed). */
+export function setHeartRockQuenchPaint(paint: THREE.Texture | null): void {
+  HEART_ROCK_QUENCH_PAINT.value = paint;
+  HEART_ROCK_QUENCH_PAINTED.value = paint ? 1 : 0;
+}
+
+/** The Quench's painted rock's GLSL (after the frost: slot space, the vertex normal; the
+ *  gradients taken in the uniform branch, so the per-fragment weight may gate nothing).
+ *  The Heart's side fades as the frost's does, by how far the camera is in the Heart. */
+export function heartRockQuenchGlsl(): string {
+  return `if ( uQuenchPainted > 0.5 ) {
+          vec3 qpP = vRockCutWorld - vec3( uHeartSlot.x, 0.0, uHeartSlot.y );
+          vec3 qpDx = dFdx( qpP );
+          vec3 qpDy = dFdy( qpP );
+          float qpW = quenchEnvWeight( qpP.xz, uHeartCore );
+          // Explicit gradients: the reads may sit behind the per-fragment weight, so rock
+          // outside the Quench samples nothing.
+          if ( qpW > 0.001 ) {
+            vec3 qpRock = quenchEnvRock( uQuenchPaint, qpP, normalize( vRockCutN ), qpDx, qpDy, diffuseColor.rgb );
+            diffuseColor.rgb = mix( diffuseColor.rgb, qpRock, qpW );
+          }
+        }`;
+}
+
+/** The uniform holding how far the camera is in the Heart (the frame driver sets it): a
+ *  paint layer on another material that hands the Heart's walls over by it shares it. */
+export function heartRockCoreUniform(): { value: number } {
+  return HEART_ROCK_CORE;
+}
+
 /** Tell the rock's material how far the camera is in the Heart (the frame driver). */
 export function setHeartRockCore(k: number): void {
   HEART_ROCK_CORE.value = k;
@@ -123,7 +193,7 @@ export function heartRockBedGlsl(): string {
         }`;
 }
 
-const KEY = `smith-heart-rock-cutaway|beds2g|storm3b|frost2h|soot2i|crownAaa|hammerSky|hammerFar|${HEART_ROCK_CUT_NEAR}|${HEART_ROCK_CUT_FAR}|${HEART_ROCK_SHADE_FLOOR.join(',')}`;
+const KEY = `smith-heart-rock-cutaway|beds2g|storm3b|breathPaint|frost2h|quenchPaint|soot2i|crownAaa|hammerSky|hammerFar|${HEART_ROCK_CUT_NEAR}|${HEART_ROCK_CUT_FAR}|${HEART_ROCK_SHADE_FLOOR.join(',')}`;
 
 /** Wire the cutaway into a rock material (before any other layer: those
  *  compose with it). */
@@ -135,6 +205,10 @@ export function applyRockCutaway(mat: THREE.Material): void {
     shader.uniforms.uHeartCore = HEART_ROCK_CORE;
     shader.uniforms.uHammerCam = HEART_ROCK_HAMMER;
     shader.uniforms.uHammerPaint = HEART_ROCK_HAMMER_PAINT;
+    shader.uniforms.uBreathPaint = HEART_ROCK_BREATH_PAINT;
+    shader.uniforms.uBreathPainted = HEART_ROCK_BREATH_PAINTED;
+    shader.uniforms.uQuenchPaint = HEART_ROCK_QUENCH_PAINT;
+    shader.uniforms.uQuenchPainted = HEART_ROCK_QUENCH_PAINTED;
     shader.vertexShader = shader.vertexShader
       .replace(
         '#include <common>',
@@ -157,7 +231,7 @@ export function applyRockCutaway(mat: THREE.Material): void {
     shader.fragmentShader = shader.fragmentShader
       .replace(
         '#include <common>',
-        `#include <common>\n${hammerEnvDepthGlsl()}\nvarying vec3 vRockCutWorld;\nvarying vec3 vRockCutN;\nuniform vec2 uHeartSlot;\nuniform float uHeartCore;\nuniform float uHammerCam;\nuniform sampler2D uHammerPaint;\n${QUENCH_FROST_NOISE_GLSL}`,
+        `#include <common>\n${hammerEnvDepthGlsl()}\nvarying vec3 vRockCutWorld;\nvarying vec3 vRockCutN;\nuniform vec2 uHeartSlot;\nuniform float uHeartCore;\nuniform float uHammerCam;\nuniform sampler2D uHammerPaint;\nuniform sampler2D uBreathPaint;\nuniform float uBreathPainted;\nuniform sampler2D uQuenchPaint;\nuniform float uQuenchPainted;\n${breathEnvWeightGlsl()}\n${breathEnvRockGlsl()}\n${quenchEnvWeightGlsl()}\n${quenchEnvRockGlsl()}\n${QUENCH_FROST_NOISE_GLSL}`,
       )
       .replace(
         '#include <clipping_planes_fragment>',
@@ -174,7 +248,9 @@ export function applyRockCutaway(mat: THREE.Material): void {
         `#include <color_fragment>
 ${heartRockBedGlsl()}
 ${breathRockStormGlsl()}
+${heartRockBreathGlsl()}
 ${quenchFrostGlsl()}
+${heartRockQuenchGlsl()}
 ${heatSootGlsl()}
 ${heartCrownColorGlsl()}
 ${heartRockHammerGlsl()}`,

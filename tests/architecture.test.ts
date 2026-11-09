@@ -1108,6 +1108,12 @@ const RENDER_PURE_CORES = [
   // The Hammer vein's Blender kit: the placement record and its plan.
   'src/render/smith_heart/heart_kit_core.ts',
   'src/render/smith_heart/hammer_kit_plan_core.ts',
+  // The Breath vein's painted rebuild: what stands in for what, its paint's share.
+  'src/render/smith_heart/breath_env_plan_core.ts',
+  // The Quench vein's painted rebuild: what stands in for what, its paint's share.
+  'src/render/smith_heart/quench_env_plan_core.ts',
+  // The painted rock's shader both painted veins lay over the rock they keep.
+  'src/render/smith_heart/env_rock_paint_core.ts',
   // The Hammer vein's painted rebuild: what stands in for what, and the new ruins.
   'src/render/smith_heart/hammer_env_plan_core.ts',
   // The mountain's rock kit (phase 2E): its bands and lips, and the Hammer

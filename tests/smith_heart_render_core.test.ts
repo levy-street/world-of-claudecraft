@@ -85,6 +85,7 @@ import {
   observeHeartSealMarker,
 } from '../src/render/smith_heart/heart_seal_core';
 import {
+  breathEnvSolids,
   hammerEnvSolids,
   heartGateSolids,
   heartPropSolids,
@@ -92,6 +93,7 @@ import {
   heartRockSolids,
   heartSightlineHits,
   heartWallSolids,
+  quenchEnvSolids,
 } from '../src/render/smith_heart/heart_sightline_core';
 import {
   CORNICE_WALL_SCALE,
@@ -725,6 +727,10 @@ describe('heart_sightline_core: the raid sees the seal and the portal', () => {
     ...heartRingSolids(),
     // The Hammer vein's painted ruins and lips.
     ...hammerEnvSolids(),
+    // The Breath vein's painted spires on the crest needles.
+    ...breathEnvSolids(),
+    // The Quench vein's painted spires on the crest needles and its great frozen fall.
+    ...quenchEnvSolids(),
   ];
   const seal = { x: HEART_SEAL.x, y: SEAL_DAIS.h + 0.5, z: HEART_SEAL.z };
   const portalEye = { x: HEART_SEAL.x, y: SEAL_DAIS.h + 9, z: HEART_SEAL.z };

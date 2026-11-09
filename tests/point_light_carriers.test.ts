@@ -674,6 +674,9 @@ describe('every point-light producer is a carrier source', () => {
       // The Smith's Heart: one mesh hook, never a scene: the sky dome, the
       // interior's frame driver (the gates, the seal and the light-rivers).
       'render/smith_heart/heart_sky.ts: mesh',
+      // The Breath guardian's wind volume: a mesh hook sorting its billows from the view
+      // camera, never a scene.
+      'render/smith_heart_fx/breath_wind_volume.ts: this.mesh',
       // The sprite buddy's flame meshes step and upload their own uniforms.
       'render/sprites_buddy_flame.ts: mesh',
       // The Sunken Bastion's Fogbeacon beam: a mesh hook turning the beam to

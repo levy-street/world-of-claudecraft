@@ -5,10 +5,11 @@
 // amphitheatre.
 //
 // What it never touches: anything a mechanic moves or hangs on. The Council's
-// pillars and their sockets, the Slab and its frame, the Pit Mouth, the collapse
-// spot's overhang and the colossi round the boss stay the old kit's
-// (`hammerEnvSwap` returns them unchanged). The old kit's pieces also stay in
-// its GLB: the Council's bodies are built from them.
+// pillars and their sockets, the Slab and its frame, the Pit Mouth and the collapse
+// spot's overhang stay the old kit's (`hammerEnvSwap` returns them unchanged). The
+// Quarry's colossi were the owner's next update: the statues from their own file
+// stand on the old colossi's spots. The old kit's pieces also stay in its GLB: the
+// Council's bodies are built from them.
 //
 // Nothing moves: every swapped piece stands where the old plan stood it, its
 // front on the same contour, never wider than its true front past the clearance
@@ -138,9 +139,19 @@ export function hammerEnvFrontClear(x: number, z: number, rot: number, half: num
  *  as tall and as deep, narrowed as far as it takes to keep its whole front clear
  *  of every walk. */
 export function fitHammerEnvRock(old: HeartKitPlacement): HeartKitPlacement {
+  const piece = hammerEnvRockPiece(old);
+  return fitEnvRockAs(old, piece, rockMeasure(piece));
+}
+
+/** The same fit for any painted piece of measures `measure` (the Breath's storm rock
+ *  rides it too: breath_env_plan_core.ts). */
+export function fitEnvRockAs(
+  old: HeartKitPlacement,
+  piece: string,
+  measure: HammerEnvRockPiece,
+): HeartKitPlacement {
   const m = heartRockPieceOf(old.piece);
   const k = old.scale ?? 1;
-  const piece = hammerEnvRockPiece(old);
   const rot = old.rot + (rockHash(old, 23) - 0.5) * 2 * ROCK_TURN;
   let w = 2 * m.half * k * ROCK_WIDEN;
   const clearAt = (width: number, turn: number) =>
@@ -157,7 +168,7 @@ export function fitHammerEnvRock(old: HeartKitPlacement): HeartKitPlacement {
     y: old.y,
     z: old.z,
     rot: used,
-    ...fitBox(rockMeasure(piece), w, m.height * k * (old.rise ?? 1), m.depth * k),
+    ...fitBox(measure, w, m.height * k * (old.rise ?? 1), m.depth * k),
     noShadow: true,
     ...(old.cosmetic ? { cosmetic: true } : {}),
   };
@@ -214,6 +225,11 @@ const KIT_SWAPS: Readonly<Record<string, string>> = {
   Kit_RubblePile: 'Env_RubbleA',
   Kit_FallenBlockA: 'Env_BoulderA',
   Kit_FallenBlockB: 'Env_BoulderB',
+  // The Quarry's colossi, from their own kit (hammer_env_kit.ts SMITH_HEART_HAMMER_COLOSSI_URL):
+  // the Keeper stands in for the Vigil.
+  Kit_ColossusVigil: 'Env_ColossusKeeper',
+  Kit_ColossusWaking: 'Env_ColossusWaking',
+  Kit_ColossusBearer: 'Env_ColossusBearer',
 };
 
 /** The old kit's pieces with no one piece in their place: the great cliffs give
@@ -224,14 +240,12 @@ const KIT_DROPS: ReadonlySet<string> = new Set([
   'Kit_GreatCliffC',
 ]);
 
-/** Pieces a mechanic hangs on or that stand round the boss: never swapped. */
+/** Pieces a mechanic hangs on: never swapped. (The colossi round the pit were frozen too
+ *  until they had painted models of their own.) */
 export const HAMMER_ENV_FROZEN: ReadonlySet<string> = new Set([
   'Kit_PitColumnSocket',
   'Kit_SlabFrame',
   'Kit_CollapseOverhang',
-  'Kit_ColossusVigil',
-  'Kit_ColossusWaking',
-  'Kit_ColossusBearer',
 ]);
 
 /** One aisle down the terraces in this many riser modules. */
@@ -243,8 +257,13 @@ function nearPillar(p: { x: number; z: number }): boolean {
   );
 }
 
-/** The old kit's plan split: `keep` draws as it did, `swap` draws painted. */
-export function hammerEnvSwap(plan: readonly HeartKitPlacement[]): {
+/** The old kit's plan split: `keep` draws as it did, `swap` draws painted. With `has`, a
+ *  swap whose painted piece did not bake keeps the old kit's (the colossi's own kit can fail
+ *  to land on its own). */
+export function hammerEnvSwap(
+  plan: readonly HeartKitPlacement[],
+  has?: (piece: string) => boolean,
+): {
   keep: HeartKitPlacement[];
   swap: HeartKitPlacement[];
 } {
@@ -265,6 +284,10 @@ export function hammerEnvSwap(plan: readonly HeartKitPlacement[]): {
     let piece = to;
     if (to === 'Env_TierA' && ++riser % TIER_AISLE_EVERY === 0) piece = 'Env_TierB';
     if (to === 'Env_RubbleA' && ++rubble % 2) piece = 'Env_RubbleB';
+    if (has && !has(piece)) {
+      keep.push(p);
+      continue;
+    }
     swap.push({ ...p, piece });
     // The arena's floor takes a border of laid stone at its wall's foot: flat, under
     // the telegraphs' lift.

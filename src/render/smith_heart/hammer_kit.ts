@@ -12,6 +12,7 @@ import type * as THREE from 'three';
 import {
   buildHammerEnvFlames,
   ensureHammerEnvKit,
+  hammerEnvHas,
   hammerEnvKitReady,
   instanceHammerEnv,
 } from './hammer_env_kit';
@@ -47,9 +48,9 @@ export function hammerKitReady(): boolean {
 /** The prop kinds the Hammer kit draws in place of their placeholders. */
 export { HAMMER_KIT_KINDS };
 
-/** The vein's kit dressing (instance-local). */
-export function buildHammerKit(lowGfx: boolean): THREE.Group {
-  if (!hammerEnvKitReady()) {
+/** The vein's kit dressing (instance-local), painted or old as `painted` says. */
+export function buildHammerKit(lowGfx: boolean, painted = hammerEnvKitReady()): THREE.Group {
+  if (!painted) {
     return instanceHeartKit(
       SMITH_HEART_HAMMER_KIT_URL,
       planHammerKit(),
@@ -58,7 +59,7 @@ export function buildHammerKit(lowGfx: boolean): THREE.Group {
     );
   }
   // The painted rebuild: what a mechanic hangs on stays the old kit's.
-  const { keep, swap } = hammerEnvSwap(planHammerKit());
+  const { keep, swap } = hammerEnvSwap(planHammerKit(), hammerEnvHas);
   const group = instanceHeartKit(SMITH_HEART_HAMMER_KIT_URL, keep, lowGfx, 'smithHeartHammerKit');
   group.add(
     instanceHammerEnv(
@@ -90,5 +91,10 @@ export function dressHammerVein(
     parent.add(buildHammerKit(lowGfx));
     return;
   }
-  upgradeWhenHeartKitLands(SMITH_HEART_HAMMER_KIT_URL, placeholders, () => buildHammerKit(lowGfx));
+  // The late build keeps the look the interior was built with: paint that landed since
+  // was never prepared behind the curtain (the warmers carry only what had landed).
+  const painted = hammerEnvKitReady();
+  upgradeWhenHeartKitLands(SMITH_HEART_HAMMER_KIT_URL, placeholders, () =>
+    buildHammerKit(lowGfx, painted),
+  );
 }

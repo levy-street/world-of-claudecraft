@@ -6,7 +6,6 @@
 // painting read at two scales turned off the axes so it never lines up into a repeat.
 
 import type * as THREE from 'three';
-import { cloneMaterialWithHooks } from '../material_clone_hooks';
 import { hammerEnvPainting } from './hammer_env_kit';
 import { hammerEnvWeightGlsl } from './hammer_env_plan_core';
 
@@ -17,15 +16,20 @@ const MOSS_TILE = 14;
 /** The painting's value under the vein's strong sun. */
 const ROCK_GAIN = 'vec3( 0.72, 0.71, 0.71 )';
 
+/** A rock material's painted clone (the veins' layers composed on one:
+ *  breath_env_rock_paint.ts composeRockPaints). */
 export type HammerRockPaint = (material: THREE.Material) => THREE.Material;
 
-/** A clone of a rock material wearing the vein's paint; null with no paintings. */
-export function hammerRockPaint(): HammerRockPaint | null {
+/** A rock paint as a layer added in place to a material already cloned for it (so two
+ *  veins' paints stack on one clone: a second clone would drop the first's hook). */
+export type RockPaintLayer = (material: THREE.Material) => void;
+
+/** The vein's paint as a layer (see `RockPaintLayer`); null with no paintings. */
+export function hammerRockPaintLayer(): RockPaintLayer | null {
   const cliff = hammerEnvPainting('cliff');
   const moss = hammerEnvPainting('moss');
   if (!cliff || !moss) return null;
-  return (source) => {
-    const m = cloneMaterialWithHooks(source);
+  return (m) => {
     const prev = m.onBeforeCompile;
     const prevKey = m.customProgramCacheKey.bind(m);
     m.onBeforeCompile = (shader, renderer) => {
@@ -86,7 +90,6 @@ export function hammerRockPaint(): HammerRockPaint | null {
         );
     };
     m.customProgramCacheKey = () => `${prevKey()}|smith-heart-env-rock-paint`;
-    m.name = `${source.name || 'rock'}:hammerPaint`;
-    return m;
+    m.name = `${m.name || 'rock'}:hammerPaint`;
   };
 }

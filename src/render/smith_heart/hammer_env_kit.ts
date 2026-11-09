@@ -13,14 +13,24 @@
 import * as THREE from 'three';
 import { loadGltf, releaseGltf } from '../assets/loader';
 import { GFX, sharedUniforms } from '../gfx';
-import { markSharedGeometry, markSharedMaterial } from '../shared_resource';
+import { markSharedMaterial } from '../shared_resource';
+import {
+  bakeEnvNode,
+  type EnvBaked,
+  type EnvShadowRule,
+  envWarmCarriers,
+  instanceEnvPieces,
+  isEnvPieceNode,
+} from './env_kit_bake';
+import { applyEnvLook } from './env_kit_look';
 import { hammerEnvFlameMesh } from './hammer_env_flames';
 import { HAMMER_ENV_BRAZIER_TOP, planHammerEnvBraziers } from './hammer_env_plan_core';
-import { heartKitPlacementMatrix } from './heart_kit';
 import type { HeartKitPlacement } from './heart_kit_core';
-import { HEART_ROCK_CUT_FAR, HEART_ROCK_CUT_NEAR } from './heart_rock_plan_core';
 
 export const SMITH_HEART_HAMMER_ENV_KIT_URL = '/models/props/smith_heart_hammer_env_kit.glb';
+/** The Quarry's three colossi (Tripo from the vein's turnaround sheets), their own small kit:
+ *  baked into the same pieces and paintings, so a statue draws like the rest of the vein. */
+export const SMITH_HEART_HAMMER_COLOSSI_URL = '/models/props/smith_heart_hammer_colossi.glb';
 
 /** How long the interior waits for the kit before drawing the old look (long: it
  *  is fetched at the raid's door, not at boot). */
@@ -28,10 +38,11 @@ const KIT_WAIT_MS = 20000;
 /** Rock pieces are big and many: wide culling cells, fewer draws. */
 const ENV_CELL = 200;
 
-interface EnvBaked {
-  /** Painting name to its merged geometry. */
-  parts: Map<string, THREE.BufferGeometry>;
-}
+/** The coals' glow takes no shadow; it and the banners' cloth cast none. */
+const HAMMER_ENV_SHADOW: EnvShadowRule = {
+  casts: (painting) => painting !== 'glow' && painting !== 'banner',
+  receives: (painting) => painting !== 'glow',
+};
 
 const baked = new Map<string, EnvBaked>();
 const paintings = new Map<string, THREE.Texture>();
@@ -44,92 +55,41 @@ export function hammerEnvPaintingOf(materialName: string): string {
   return materialName.replace(/^tripo_material_env_/, '').replace(/\.\d+$/, '');
 }
 
-function mergeParts(list: readonly THREE.BufferGeometry[]): THREE.BufferGeometry {
-  let count = 0;
-  let indices = 0;
-  for (const g of list) {
-    count += g.attributes.position.count;
-    indices += g.index ? g.index.count : g.attributes.position.count;
-  }
-  const pos = new Float32Array(count * 3);
-  const nor = new Float32Array(count * 3);
-  const uv = new Float32Array(count * 2);
-  const index = count > 65535 ? new Uint32Array(indices) : new Uint16Array(indices);
-  let o = 0;
-  let io = 0;
-  for (const g of list) {
-    const n = g.attributes.position.count;
-    pos.set(g.attributes.position.array as Float32Array, o * 3);
-    nor.set(g.attributes.normal.array as Float32Array, o * 3);
-    if (g.attributes.uv) uv.set(g.attributes.uv.array as Float32Array, o * 2);
-    if (g.index) {
-      const src = g.index.array;
-      for (let k = 0; k < src.length; k++) index[io++] = src[k] + o;
-    } else {
-      for (let k = 0; k < n; k++) index[io++] = o + k;
-    }
-    o += n;
-  }
-  const out = new THREE.BufferGeometry();
-  out.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-  out.setAttribute('normal', new THREE.BufferAttribute(nor, 3));
-  out.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
-  out.setIndex(new THREE.BufferAttribute(index, 1));
-  out.computeBoundingSphere();
-  return out;
+/** Keep the first map seen for each painting. */
+function keepPainting(painting: string, map: THREE.Texture): void {
+  if (!paintings.has(painting)) paintings.set(painting, map);
 }
 
-function bakeNode(node: THREE.Object3D): EnvBaked {
-  node.updateWorldMatrix(true, true);
-  const groups = new Map<string, THREE.BufferGeometry[]>();
-  node.traverse((child) => {
-    if (!(child instanceof THREE.Mesh)) return;
-    const mat = Array.isArray(child.material) ? child.material[0] : child.material;
-    const painting = hammerEnvPaintingOf(mat?.name ?? '');
-    const map = (mat as THREE.MeshStandardMaterial).map;
-    if (map && !paintings.has(painting)) paintings.set(painting, map);
-    const geometry = new THREE.BufferGeometry();
-    for (const name of ['position', 'normal', 'uv']) {
-      const attr = child.geometry.getAttribute(name);
-      if (!attr) continue;
-      const values = new Float32Array(attr.count * attr.itemSize);
-      for (let i = 0; i < attr.count; i++)
-        for (let j = 0; j < attr.itemSize; j++)
-          values[i * attr.itemSize + j] = attr.getComponent(i, j);
-      geometry.setAttribute(name, new THREE.BufferAttribute(values, attr.itemSize));
-    }
-    if (child.geometry.index) geometry.setIndex(child.geometry.index.clone());
-    geometry.applyMatrix4(child.matrixWorld);
-    if (!geometry.getAttribute('normal')) geometry.computeVertexNormals();
-    const list = groups.get(painting) ?? [];
-    list.push(geometry);
-    groups.set(painting, list);
-  });
-  const parts = new Map<string, THREE.BufferGeometry>();
-  for (const [painting, list] of groups) {
-    parts.set(painting, markSharedGeometry(mergeParts(list)));
-    for (const g of list) g.dispose();
-  }
-  return { parts };
+/** The kits that landed (the colossi's can fail alone and cost only the colossi). */
+const landed = new Set<string>();
+
+function bakeKit(url: string): Promise<void> {
+  return loadGltf(url)
+    .then((gltf) => {
+      // A file landing after the kit settled is dropped: the vein was built without it,
+      // and baking it now would cost a live frame and change what a later build draws.
+      if (!settled) {
+        gltf.scene.traverse((node) => {
+          if (isEnvPieceNode(node) && !baked.has(node.name))
+            baked.set(node.name, bakeEnvNode(node, hammerEnvPaintingOf, keepPainting));
+        });
+        landed.add(url);
+      }
+      releaseGltf(url);
+    })
+    .catch(() => undefined);
 }
 
 function startLoad(): Promise<void> {
-  loading ??= loadGltf(SMITH_HEART_HAMMER_ENV_KIT_URL)
-    .then((gltf) => {
-      gltf.scene.traverse((node) => {
-        if (
-          /^(Env|Tex)_/.test(node.name) &&
-          !/^(Env|Tex)_/.test(node.parent?.name ?? '') &&
-          !baked.has(node.name)
-        )
-          baked.set(node.name, bakeNode(node));
-      });
-      releaseGltf(SMITH_HEART_HAMMER_ENV_KIT_URL);
-    })
-    .catch(() => undefined)
-    .then(() => {
+  if (!loading) {
+    // The kit settles with its own file. The colossi's, a seventh of its size and fetched
+    // beside it, ride along if they landed first and are dropped if they trail it: a slow
+    // statue file costs only the statues, never the vein's paint or its arrival.
+    void bakeKit(SMITH_HEART_HAMMER_COLOSSI_URL);
+    loading = bakeKit(SMITH_HEART_HAMMER_ENV_KIT_URL).then(() => {
       settled = true;
     });
+  }
   return loading;
 }
 
@@ -147,7 +107,42 @@ export function ensureHammerEnvKit(): Promise<void> {
 
 /** Has the painted kit landed with its pieces? */
 export function hammerEnvKitReady(): boolean {
-  return settled && baked.size > 0;
+  return settled && landed.has(SMITH_HEART_HAMMER_ENV_KIT_URL);
+}
+
+/** Has this painted piece baked? A swap whose piece did not keeps the old kit's. */
+export function hammerEnvHas(piece: string): boolean {
+  return baked.has(piece);
+}
+
+/** Hidden carriers of every painting the baked pieces draw, one instanced mesh each (the
+ *  pieces' own variant), built with the interior beside the old kit's slot warmers: when the
+ *  old kit or the rock kit lands after the interior was built, its late build
+ *  (heart_kit.ts upgradeWhenHeartKitLands) brings these paintings into a live frame, and
+ *  their programs and textures were linked and uploaded behind the curtain. The fire bowls'
+ *  flames too, on the tiers that draw them. */
+export function hammerEnvProgramWarmers(lowGfx: boolean): THREE.Group {
+  const group = new THREE.Group();
+  group.name = 'smithHeartHammerEnvWarmers';
+  const drawn = new Set<string>();
+  for (const piece of baked.values())
+    for (const painting of piece.parts.keys()) drawn.add(painting);
+  if (drawn.size === 0) return group;
+  if (!lowGfx) {
+    const flames = hammerEnvFlameMesh([{ x: 0, y: 0, z: 0 }]);
+    flames.visible = false;
+    flames.frustumCulled = false;
+    flames.name = 'smithHeartHammerEnvWarmer:flames';
+    group.add(flames);
+  }
+  for (const mesh of envWarmCarriers(
+    drawn,
+    hammerEnvMaterial,
+    HAMMER_ENV_SHADOW,
+    'smithHeartHammerEnvWarmer',
+  ))
+    group.add(mesh);
+  return group;
 }
 
 // ---- materials ------------------------------------------------------------------
@@ -174,84 +169,6 @@ const ENV_ALBEDO: readonly [number, number, number] = [0.8, 0.79, 0.8];
  *  `mean` is the painting's mean linear value, so the overlay only adds strokes. */
 const ROCK_STROKES = { tileA: 17, tileB: 41, strength: 0.2, mean: 0.16 } as const;
 const STROKED: ReadonlySet<string> = new Set(['cliff_tall', 'cliff_wide', 'outcrop']);
-
-const ROCK_KEY = `smith-heart-env-rock|${HEART_ROCK_CUT_NEAR}|${HEART_ROCK_CUT_FAR}|${ENV_SHADE_FLOOR.join(',')}`;
-const STONE_KEY = `smith-heart-env-stone|${ENV_SHADE_FLOOR.join(',')}`;
-
-function applyEnvShadeFloor(mat: THREE.Material, cutaway: boolean, strokes: boolean): void {
-  mat.onBeforeCompile = (shader) => {
-    if (cutaway) {
-      if (strokes) shader.uniforms.uEnvStrokes = { value: paintings.get('cliff') ?? null };
-      shader.vertexShader = shader.vertexShader
-        .replace(
-          '#include <common>',
-          '#include <common>\nvarying vec3 vEnvCutWorld;\nvarying vec3 vEnvLocal;',
-        )
-        .replace(
-          '#include <project_vertex>',
-          `#include <project_vertex>
-          {
-            vec4 envCut = vec4( transformed, 1.0 );
-            #ifdef USE_INSTANCING
-              envCut = instanceMatrix * envCut;
-            #endif
-            vEnvLocal = envCut.xyz;
-            vEnvCutWorld = ( modelMatrix * envCut ).xyz;
-          }`,
-        );
-      shader.fragmentShader = shader.fragmentShader
-        .replace(
-          '#include <common>',
-          '#include <common>\nvarying vec3 vEnvCutWorld;\nvarying vec3 vEnvLocal;',
-        )
-        .replace(
-          '#include <clipping_planes_fragment>',
-          `#include <clipping_planes_fragment>
-          {
-            float envCut = ( distance( vEnvCutWorld, cameraPosition ) - ${HEART_ROCK_CUT_NEAR.toFixed(1)} )
-              / ${(HEART_ROCK_CUT_FAR - HEART_ROCK_CUT_NEAR).toFixed(1)};
-            float envDither = fract( 52.9829189 * fract( dot( gl_FragCoord.xy, vec2( 0.06711056, 0.00583715 ) ) ) );
-            if ( envCut < envDither ) discard;
-          }`,
-        );
-      if (strokes) {
-        shader.fragmentShader = shader.fragmentShader
-          .replace('#include <common>', '#include <common>\nuniform sampler2D uEnvStrokes;')
-          .replace(
-            '#include <color_fragment>',
-            `#include <color_fragment>
-            {
-              // Slot space: at the slot's world coordinates a derivative normal
-              // quantises and turns the triplanar weights to speckle.
-              vec3 envC = cross( dFdx( vEnvLocal ), dFdy( vEnvLocal ) );
-              vec3 envN = dot( envC, envC ) > 1e-12 ? normalize( envC ) : vec3( 0.0, 1.0, 0.0 );
-              vec3 envB = pow( abs( envN ), vec3( 4.0 ) );
-              envB /= envB.x + envB.y + envB.z;
-              vec3 envA = vEnvLocal / ${ROCK_STROKES.tileA.toFixed(1)};
-              vec3 envZ = vEnvLocal.yzx / ${ROCK_STROKES.tileB.toFixed(1)};
-              const mat2 envTurnA = mat2( 0.8, 0.6, -0.6, 0.8 );
-              const mat2 envTurnB = mat2( 0.38, -0.92, 0.92, 0.38 );
-              vec3 envS = ( texture2D( uEnvStrokes, envTurnA * envA.zy ).rgb * envB.x
-                + texture2D( uEnvStrokes, envTurnA * envA.xz ).rgb * envB.y
-                + texture2D( uEnvStrokes, envTurnA * envA.xy ).rgb * envB.z )
-                * ( texture2D( uEnvStrokes, envTurnB * envZ.xy ).rgb * envB.x
-                + texture2D( uEnvStrokes, envTurnB * envZ.zx ).rgb * envB.y
-                + texture2D( uEnvStrokes, envTurnB * envZ.yz ).rgb * envB.z );
-              float envL = dot( envS, vec3( 0.3333 ) ) / ${(ROCK_STROKES.mean * ROCK_STROKES.mean).toFixed(4)};
-              diffuseColor.rgb *= mix( 1.0, envL, ${ROCK_STROKES.strength.toFixed(2)} );
-            }`,
-          );
-      }
-    }
-    shader.fragmentShader = shader.fragmentShader.replace(
-      '#include <emissivemap_fragment>',
-      `#include <emissivemap_fragment>
-      totalEmissiveRadiance += diffuseColor.rgb * vec3( ${ENV_SHADE_FLOOR.join(', ')} );`,
-    );
-  };
-  const key = `${cutaway ? ROCK_KEY : STONE_KEY}${strokes ? '|strokes' : ''}`;
-  mat.customProgramCacheKey = () => key;
-}
 
 /** The banners stir in the quarry's air (a shallow sway growing down the cloth). */
 function applyBannerSway(mat: THREE.Material): void {
@@ -305,7 +222,13 @@ export function hammerEnvMaterial(painting: string): THREE.Material {
       : new THREE.MeshLambertMaterial(opts);
     // The vein's sun was set for dim vertex paint: full-value paintings clip.
     (m as THREE.MeshStandardMaterial).color.setRGB(...ENV_ALBEDO);
-    applyEnvShadeFloor(m, ROCK_PAINTINGS.has(painting), STROKED.has(painting));
+    applyEnvLook(m, {
+      cutaway: ROCK_PAINTINGS.has(painting),
+      strokes: STROKED.has(painting)
+        ? { map: () => paintings.get('cliff') ?? null, ...ROCK_STROKES }
+        : null,
+      shade: ENV_SHADE_FLOOR,
+    });
     if (banner) applyBannerSway(m);
   }
   markSharedMaterial(m);
@@ -371,8 +294,6 @@ export function hammerEnvSkyTexture(): THREE.Texture | null {
 
 // ---- the instancer --------------------------------------------------------------
 
-const tmp = new THREE.Matrix4();
-
 /** Instance a plan over the kit: one InstancedMesh per piece, cell, shadow class
  *  and painting. */
 export function instanceHammerEnv(
@@ -380,34 +301,15 @@ export function instanceHammerEnv(
   lowGfx: boolean,
   name: string,
 ): THREE.Group {
-  const group = new THREE.Group();
-  group.name = name;
-  const buckets = new Map<string, HeartKitPlacement[]>();
-  for (const p of list) {
-    if (lowGfx && p.cosmetic) continue;
-    if (!baked.has(p.piece)) continue;
-    const key = `${p.piece}|${Math.floor(p.x / ENV_CELL)}|${Math.floor(p.z / ENV_CELL)}|${p.noShadow ? 1 : 0}`;
-    const bucket = buckets.get(key) ?? [];
-    bucket.push(p);
-    buckets.set(key, bucket);
-  }
-  for (const bucket of buckets.values()) {
-    const piece = baked.get(bucket[0].piece);
-    if (!piece) continue;
-    const casts = !lowGfx && !bucket[0].noShadow;
-    for (const [painting, g] of piece.parts) {
-      const mesh = new THREE.InstancedMesh(g, hammerEnvMaterial(painting), bucket.length);
-      mesh.name = `${bucket[0].piece}:${painting}`;
-      for (const [i, p] of bucket.entries()) mesh.setMatrixAt(i, heartKitPlacementMatrix(p, tmp));
-      mesh.instanceMatrix.needsUpdate = true;
-      mesh.castShadow = casts && painting !== 'glow' && painting !== 'banner';
-      mesh.receiveShadow = painting !== 'glow';
-      mesh.computeBoundingSphere();
-      mesh.matrixAutoUpdate = false;
-      group.add(mesh);
-    }
-  }
-  return group;
+  return instanceEnvPieces(
+    baked,
+    hammerEnvMaterial,
+    list,
+    lowGfx,
+    name,
+    ENV_CELL,
+    HAMMER_ENV_SHADOW,
+  );
 }
 
 /** The fire bowls' flames: on every tier the coals, on the rest the flame too. */

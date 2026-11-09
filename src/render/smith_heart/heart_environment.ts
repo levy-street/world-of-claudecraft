@@ -188,26 +188,26 @@ export function smithHeartCameraInQuench(x: number, z: number): boolean {
   return inQuenchLight(x - o.x, z - o.z);
 }
 
-/** The Quench's air (phase 2H): a cold pale-blue mist, thin across a landing
- *  and the lake so a telegraph and the guardian read crisp, the far walls
- *  and the frozen falls softening into it as the vein sinks. */
-export const SMITH_HEART_QUENCH_FOG = { color: 0x8899ac, near: 70, far: 520 } as const;
+/** The Quench's air: the aurora night's deep blue (its painted rebuild, design doc
+ *  section 5.24; phase 2H's pale mist before it), thin across a landing and the lake so a
+ *  telegraph and the guardian read crisp, the far glacier softening into it as the vein
+ *  sinks. Never black: the far walls fade to a lit night blue. */
+export const SMITH_HEART_QUENCH_FOG = { color: 0x34466a, near: 70, far: 520 } as const;
 
-/** The Quench's light rig (phase 2H): a pale cold sun low in the south-east
- *  through a thin overcast (a white a breath toward blue), a pale blue-grey
- *  sky fill over a cool grey ground bounce (the snow's light back up), so
- *  the frost reads pale and every shade a clean cold blue-grey, never navy;
- *  a pale ice-blue rim off the lake on every silhouette. The sky's
- *  reflection a trace. */
+/** The Quench's light rig: the aurora night (its painted rebuild, design doc section
+ *  5.24). A cold blue-white moon low in the south-east (the sky draws it there), a deep
+ *  blue sky fill over a dark ground bounce, so the realm sits darker and more saturated
+ *  than the pale frost guardian and its adds, which stand out against it; an aurora-teal
+ *  rim on every silhouette. The sky's reflection a trace. */
 export const SMITH_HEART_QUENCH_LIGHT = {
-  sun: 2.15,
-  hemi: 1.75,
+  sun: 1.9,
+  hemi: 1.45,
   env: 0.03,
-  rim: 1.35,
-  sunColor: 0xe6eef8,
-  hemiSky: 0x98a8bc,
-  hemiGround: 0x4e5664,
-  rimColor: 0xa8d8f2,
+  rim: 1.5,
+  sunColor: 0xc6d6f2,
+  hemiSky: 0x5a78a6,
+  hemiGround: 0x262e44,
+  rimColor: 0x86e6dc,
   /** Low in the south-east (from the ground toward it): it rakes across the
    *  lake toward the descent, so the blades, the bowls and the guardian
    *  throw long cold shadows north-west, and the frozen falls on the east

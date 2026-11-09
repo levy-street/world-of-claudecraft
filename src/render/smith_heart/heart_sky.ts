@@ -12,7 +12,10 @@
 //   - over the Quench (phase 2H), the sky seen up out of the cold: calm, a
 //     pale overcast thinning to a wash of cold blue overhead, high thin
 //     veils drifting slow, the low pale sun in the south-east behind them
-//     with the ice crystals' ring round it (a 22 degree halo), no storm.
+//     with the ice crystals' ring round it (a 22 degree halo), no storm;
+//     once its painted kit has landed, the painted aurora night (its
+//     ribbons rippling, stars twinkling between them, a haloed moon where
+//     the cold key comes from).
 //   - over the Heat (phase 2I), the sky seen up out of the Hearth's fissure:
 //     the smoke of the first flame rising and drifting east in slow billows,
 //     lit gold from below where the fire catches it, a hazy white-gold sun
@@ -44,6 +47,12 @@ export interface HeartSkyOptions {
   lowGfx: boolean;
   /** The Hammer vein's painted dusk, once the painted kit has landed. */
   hammerSky?: THREE.Texture | null;
+  /** The Breath's painted storm, once its painted kit has landed (the lightning still
+   *  walks it). */
+  breathSky?: THREE.Texture | null;
+  /** The Quench's painted aurora night, once its painted kit has landed (its ribbons
+   *  ripple, stars twinkle over it, a haloed moon where its cold key light comes from). */
+  quenchSky?: THREE.Texture | null;
   /** Called once per drawn frame (the interior's frame driver), with the
    *  camera's world position. */
   onFrame: (camera: THREE.Vector3) => void;
@@ -75,12 +84,16 @@ uniform vec3 uBreathHorizon;
 uniform float uQuench;
 uniform vec3 uQuenchHorizon;
 uniform vec3 uQuenchSun;
+uniform float uQuenchPainted;
+uniform sampler2D uQuenchSky;
 uniform float uHeat;
 uniform vec3 uHeatHorizon;
 uniform vec3 uHeatSun;
 uniform float uHammer;
 uniform sampler2D uHammerSky;
 uniform vec3 uHammerHorizon;
+uniform float uBreathPainted;
+uniform sampler2D uBreathSky;
 float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 float noise(vec2 p) {
   vec2 i = floor(p); vec2 f = fract(p);
@@ -164,7 +177,18 @@ vec3 breathSky(vec3 d, float up) {
   col = mix(uBreathHorizon, col, smoothstep(-0.03, 0.18, up));
   float cloud = 0.0;
   float lit = 0.0;
-  if (up > -0.08) {
+  if (uBreathPainted > 0.5) {
+    // The painted storm wrapped round the dome, streaming with the gale; its low haze
+    // meets the area's fog at the horizon (an explicit level: the wrap's seam has a
+    // jump in u a derivative would turn into a line of the smallest mip). The
+    // lightning below walks it as it walked the procedural deck.
+    float u = atan(d.x, d.z) / 6.2831853 + 0.5 + uTime * 0.0016;
+    // A glTF texture reads top down: v 0 is the painting's top, the zenith's deck.
+    float v = clamp(0.82 - max(up, 0.0) * 1.2, 0.005, 0.995);
+    vec3 painted = textureLod(uBreathSky, vec2(u, v), 0.0).rgb;
+    col = mix(uBreathHorizon, painted, smoothstep(-0.03, 0.09, up));
+    cloud = 0.6;
+  } else if (up > -0.08) {
     vec2 uv = d.xz / (up + 0.14);
     // The deck races in from the north-west, rolling as it comes.
     vec2 wind = vec2(uTime * 0.034, -uTime * 0.03);
@@ -175,13 +199,15 @@ vec3 breathSky(vec3 d, float up) {
     cloud = smoothstep(0.36, 0.7, c) * smoothstep(-0.06, 0.1, up);
     lit = smoothstep(0.55, 0.8, c1 + 0.12) * (1.0 - smoothstep(0.62, 0.9, c));
   }
-  vec3 belly = vec3(0.07, 0.08, 0.095);
-  vec3 top = vec3(0.3, 0.33, 0.37);
-  col = mix(col, mix(belly, top, lit), cloud * 0.94);
-  // The rift where the key breaks through (north-west, high).
-  vec3 key = normalize(vec3(-0.42, 0.8, 0.43));
-  float rift = pow(max(0.0, dot(d, key)), 6.0) * (1.0 - cloud * 0.6);
-  col += vec3(0.42, 0.5, 0.54) * rift * 0.7;
+  if (uBreathPainted < 0.5) {
+    vec3 belly = vec3(0.07, 0.08, 0.095);
+    vec3 top = vec3(0.3, 0.33, 0.37);
+    col = mix(col, mix(belly, top, lit), cloud * 0.94);
+    // The rift where the key breaks through (north-west, high).
+    vec3 key = normalize(vec3(-0.42, 0.8, 0.43));
+    float rift = pow(max(0.0, dot(d, key)), 6.0) * (1.0 - cloud * 0.6);
+    col += vec3(0.42, 0.5, 0.54) * rift * 0.7;
+  }
   // Lightning in the cloud, and the distant bolts below it.
   float ba; float bb;
   float fa = strike(uTime, 5.0, ba);
@@ -195,7 +221,45 @@ vec3 breathSky(vec3 d, float up) {
   col += vec3(0.72, 0.9, 1.0) * bolts;
   return col;
 }
+vec3 quenchPaintedSky(vec3 d, float up) {
+  // The painted aurora night wrapped round the dome, drifting slow; its low haze meets
+  // the area's fog at the horizon. An explicit level: the wrap's seam has a jump in u a
+  // derivative would turn into a line of the smallest mip.
+  float u = atan(d.x, d.z) / 6.2831853 + 0.5 + uTime * 0.0005;
+  // A glTF texture reads top down: v 0 is the painting's top, the deep zenith.
+  float v = clamp(0.84 - max(up, 0.0) * 1.2, 0.005, 0.995);
+  vec3 painted = textureLod(uQuenchSky, vec2(u, v), 0.0).rgb;
+  // The aurora's ribbons (bright, green and blue well past red) breathe along their
+  // length, slow.
+  float ribbon = smoothstep(0.06, 0.24, max(painted.g, painted.b) - painted.r)
+    * smoothstep(0.05, 0.2, dot(painted, vec3(0.3, 0.59, 0.11)));
+  // Whole turns of u (20 and 8 of them): the ripple meets itself where the wrap's u jumps.
+  float ripple = 0.8 + 0.2 * sin(u * 62.8319 + v * 9.0 - uTime * 0.7) * sin(u * 25.1327 + uTime * 0.31);
+  painted *= mix(1.0, ripple, ribbon * uDetail);
+  vec3 col = mix(uQuenchHorizon, painted, smoothstep(-0.03, 0.09, up));
+  if (up > 0.0) {
+    // Stars twinkling in the dark between the ribbons.
+    vec2 sp = d.xz / (up + 0.2);
+    for (int k = 0; k < 2; k++) {
+      float sc = 34.0 + float(k) * 29.0;
+      vec2 cell = floor(sp * sc + float(k) * 13.0);
+      vec2 f = fract(sp * sc + float(k) * 13.0) - 0.5;
+      float h = hash(cell);
+      float star = step(0.988, h) * smoothstep(0.13, 0.0, length(f));
+      float tw = 0.5 + 0.5 * sin(uTime * (0.9 + h * 2.4) + h * 37.0);
+      col += vec3(0.7, 0.82, 1.0) * star * tw * (1.0 - ribbon) * smoothstep(0.06, 0.3, up) * 0.9;
+    }
+  }
+  // The moon where the cold key comes from, and the ice crystals' ring round it.
+  float a = acos(clamp(dot(d, uQuenchSun), -1.0, 1.0));
+  col += vec3(0.78, 0.85, 0.98) * (1.0 - smoothstep(0.024, 0.03, a)) * 1.5;
+  col += vec3(0.16, 0.2, 0.28) * exp(-a * 9.0) * 0.6;
+  float off = (a - 0.384) * 34.0;
+  col += vec3(0.05, 0.07, 0.1) * exp(-off * off) * (0.75 + 0.25 * sin(atan(d.x, d.z) * 3.0));
+  return col;
+}
 vec3 quenchSky(vec3 d, float up) {
+  if (uQuenchPainted > 0.5) return quenchPaintedSky(d, up);
   // A calm cold sky: the pale mist at the rim, a pale overcast band, a wash
   // of cold blue overhead (linear values).
   vec3 zenith = vec3(0.16, 0.22, 0.31);
@@ -342,6 +406,10 @@ export function buildHeartSky(opts: HeartSkyOptions): HeartSky {
       uHeat: { value: 0 },
       uHammer: { value: 0 },
       uHammerSky: { value: opts.hammerSky ?? null },
+      uBreathPainted: { value: opts.breathSky ? 1 : 0 },
+      uBreathSky: { value: opts.breathSky ?? null },
+      uQuenchPainted: { value: opts.quenchSky ? 1 : 0 },
+      uQuenchSky: { value: opts.quenchSky ?? null },
       uHammerHorizon: { value: new THREE.Color(SMITH_HEART_HAMMER_FOG.color) },
       uHeatHorizon: { value: new THREE.Color(SMITH_HEART_HEAT_FOG.color) },
       uHeatSun: {

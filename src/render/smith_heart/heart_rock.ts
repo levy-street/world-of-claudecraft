@@ -10,6 +10,8 @@
 // props'), and the bands past the second shed on the low tier.
 
 import type * as THREE from 'three';
+import { breathEnvKitReady, instanceBreathEnv } from './breath_env_kit';
+import { breathEnvOwnsRock, fitBreathEnvNeedle, fitBreathEnvRock } from './breath_env_plan_core';
 import { hammerEnvKitReady, instanceHammerEnv } from './hammer_env_kit';
 import {
   fitHammerEnvLip,
@@ -27,6 +29,8 @@ import {
 import { planHeartGulfWalls } from './heart_rock_gulf_core';
 import { planHeartHangs, planHeartRockLips, planHeartRockUnder } from './heart_rock_hang_core';
 import { planHeartNeedles, planHeartRock } from './heart_rock_plan_core';
+import { instanceQuenchEnv, quenchEnvKitReady } from './quench_env_kit';
+import { fitQuenchEnvNeedle, fitQuenchEnvRock, quenchEnvOwnsRock } from './quench_env_plan_core';
 
 /** The rock's culling cell (yards). */
 const ROCK_CELL = 200;
@@ -41,8 +45,17 @@ export function heartRockKitReady(): boolean {
   return heartKitLoaded(SMITH_HEART_ROCK_KIT_URL);
 }
 
-/** The mountain's rock (instance-local). */
-export function buildHeartRock(lowGfx: boolean): THREE.Group {
+/** The mountain's rock (instance-local). The Hammer vein's own rock is its painted kit's
+ *  once that has landed (`painted`), and the Breath's and the Quench's bands and needles
+ *  their own painted kits' (`breathPainted`, `quenchPainted`); the lips and the hung faces
+ *  stay the rock kit's sculpts (the Breath's and the Quench's take their paintings on
+ *  through the rock's material, heart_rock_cutaway.ts). */
+export function buildHeartRock(
+  lowGfx: boolean,
+  painted = hammerEnvKitReady(),
+  breathPainted = breathEnvKitReady(),
+  quenchPainted = quenchEnvKitReady(),
+): THREE.Group {
   // The Breath's high walks hang faces from brink to mist (the lips and
   // under-walls they replace left out); the hangs are the Breath's alone.
   // The Wind Bridge gulf's far walls are bands too (the weak-spots pass of 2026-11-04).
@@ -50,12 +63,13 @@ export function buildHeartRock(lowGfx: boolean): THREE.Group {
   const hangs = planHeartHangs();
   const lips = planHeartRockLips();
   const needles = planHeartNeedles();
-  // The Hammer vein's own rock is the painted kit's once it has landed.
-  const painted = hammerEnvKitReady();
-  const old = (p: { x: number; z: number }) => !painted || !hammerEnvOwnsRock(p);
+  const hammer = (p: { x: number; z: number }) => painted && hammerEnvOwnsRock(p);
+  const breath = (p: { x: number; z: number }) => breathPainted && breathEnvOwnsRock(p);
+  const quench = (p: { x: number; z: number }) => quenchPainted && quenchEnvOwnsRock(p);
+  const old = (p: { x: number; z: number }) => !hammer(p) && !breath(p) && !quench(p);
   const group = instanceHeartKit(
     SMITH_HEART_ROCK_KIT_URL,
-    [...rock.filter(old), ...hangs, ...lips.filter(old), ...needles.filter(old)],
+    [...rock.filter(old), ...hangs, ...lips.filter((p) => !hammer(p)), ...needles.filter(old)],
     lowGfx,
     'smithHeartRock',
     ROCK_CELL,
@@ -65,12 +79,36 @@ export function buildHeartRock(lowGfx: boolean): THREE.Group {
     group.add(
       instanceHammerEnv(
         [
-          ...rock.filter(hammerEnvOwnsRock).map(fitHammerEnvRock),
-          ...lips.filter(hammerEnvOwnsRock).map(fitHammerEnvLip),
-          ...needles.filter(hammerEnvOwnsRock).map(fitHammerEnvNeedle),
+          ...rock.filter(hammer).map(fitHammerEnvRock),
+          ...lips.filter(hammer).map(fitHammerEnvLip),
+          ...needles.filter(hammer).map(fitHammerEnvNeedle),
         ],
         lowGfx,
         'smithHeartHammerEnvRock',
+      ),
+    );
+  }
+  if (breathPainted) {
+    group.add(
+      instanceBreathEnv(
+        [
+          ...rock.filter(breath).map(fitBreathEnvRock),
+          ...needles.filter(breath).map(fitBreathEnvNeedle),
+        ],
+        lowGfx,
+        'smithHeartBreathEnvRock',
+      ),
+    );
+  }
+  if (quenchPainted) {
+    group.add(
+      instanceQuenchEnv(
+        [
+          ...rock.filter(quench).map(fitQuenchEnvRock),
+          ...needles.filter(quench).map(fitQuenchEnvNeedle),
+        ],
+        lowGfx,
+        'smithHeartQuenchEnvRock',
       ),
     );
   }
@@ -90,5 +128,11 @@ export function dressHeartMountain(
   }
   const crags = buildCrags();
   parent.add(crags);
-  upgradeWhenHeartKitLands(SMITH_HEART_ROCK_KIT_URL, crags, () => buildHeartRock(lowGfx));
+  // The late build keeps the look the interior was built with (hammer_kit.ts's reason).
+  const painted = hammerEnvKitReady();
+  const breathPainted = breathEnvKitReady();
+  const quenchPainted = quenchEnvKitReady();
+  upgradeWhenHeartKitLands(SMITH_HEART_ROCK_KIT_URL, crags, () =>
+    buildHeartRock(lowGfx, painted, breathPainted, quenchPainted),
+  );
 }

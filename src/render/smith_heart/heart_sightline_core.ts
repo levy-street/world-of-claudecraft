@@ -14,6 +14,7 @@
 import { SMITH_HEART_GATES } from '../../sim/content/smith_heart';
 import { SMITH_HEART_FIELD } from '../../sim/content/smith_heart_layout';
 import { authoredFieldHeight } from '../../sim/instances/authored_field';
+import { BREATH_ENV_ROCK, breathEnvOwnsRock, fitBreathEnvNeedle } from './breath_env_plan_core';
 import {
   fitHammerEnvLip,
   HAMMER_ENV_ARCADE,
@@ -35,6 +36,15 @@ import {
   planHeartUnderCliffs,
 } from './heart_rock_plan_core';
 import { heartWallReach, planHeartWalls } from './heart_walls_core';
+import {
+  fitQuenchEnvNeedle,
+  planQuenchEnvGreatFall,
+  planQuenchEnvRing,
+  QUENCH_ENV_FALL_BOX,
+  QUENCH_ENV_RING,
+  QUENCH_ENV_ROCK,
+  quenchEnvOwnsRock,
+} from './quench_env_plan_core';
 import { planRingEdges, planRingMouths, ringSpireSpots } from './ring_kit_plan_core';
 
 /** An upright cylinder (y0 to y1, radius r) or a box turned by `yaw` about
@@ -310,6 +320,93 @@ export function hammerEnvSolids(): HeartSolid[] {
       hd,
       yaw: p.rot,
       what: `hammer env lip (${p.x.toFixed(1)}, ${p.z.toFixed(1)})`,
+    });
+  }
+  return out;
+}
+
+/** The Breath vein's painted rebuild's spires on the crest needles it takes: as tall as
+ *  the needle and as broad as its foot all the way up, where the needle narrowed (its other
+ *  pieces stand inside the old pieces' own volumes, `heartRockSolids`). */
+export function breathEnvSolids(): HeartSolid[] {
+  const out: HeartSolid[] = [];
+  for (const old of planHeartNeedles()) {
+    if (!breathEnvOwnsRock(old)) continue;
+    const p = fitBreathEnvNeedle(old);
+    const m = BREATH_ENV_ROCK.Env_StormSpire;
+    const k = p.scale ?? 1;
+    const hh = (m.h * k * (p.rise ?? 1)) / 2;
+    const hd = (m.d * k) / 2;
+    out.push({
+      kind: 'box',
+      x: p.x - Math.sin(p.rot) * hd,
+      y: p.y + hh,
+      z: p.z - Math.cos(p.rot) * hd,
+      hw: (m.w * k * (p.stretch ?? 1)) / 2,
+      hh,
+      hd,
+      yaw: p.rot,
+      what: `breath env spire (${old.x.toFixed(1)}, ${old.z.toFixed(1)})`,
+    });
+  }
+  return out;
+}
+
+/** The Quench's painted rebuild's solids past the old volumes: the spires of ice that
+ *  stand on the crest needles' feet (quench_env_plan_core.ts fitQuenchEnvNeedle), the
+ *  great frozen fall on the rock across the lake (planQuenchEnvGreatFall) and the ring of
+ *  bluffs round the basin (planQuenchEnvRing). */
+export function quenchEnvSolids(): HeartSolid[] {
+  const out: HeartSolid[] = [];
+  for (const old of planHeartNeedles()) {
+    if (!quenchEnvOwnsRock(old)) continue;
+    const p = fitQuenchEnvNeedle(old);
+    const m = QUENCH_ENV_ROCK.Env_IceSpires;
+    const k = p.scale ?? 1;
+    const hh = (m.h * k * (p.rise ?? 1)) / 2;
+    const hd = (m.d * k) / 2;
+    out.push({
+      kind: 'box',
+      x: p.x - Math.sin(p.rot) * hd,
+      y: p.y + hh,
+      z: p.z - Math.cos(p.rot) * hd,
+      hw: (m.w * k * (p.stretch ?? 1)) / 2,
+      hh,
+      hd,
+      yaw: p.rot,
+      what: `quench env spires (${old.x.toFixed(1)}, ${old.z.toFixed(1)})`,
+    });
+  }
+  const B = QUENCH_ENV_FALL_BOX;
+  for (const p of planQuenchEnvGreatFall()) {
+    const k = p.scale ?? 1;
+    const cz = ((B.z0 + B.z1) / 2) * k;
+    out.push({
+      kind: 'box',
+      x: p.x + Math.sin(p.rot) * cz,
+      y: p.y + ((B.y0 + B.y1) / 2) * k,
+      z: p.z + Math.cos(p.rot) * cz,
+      hw: B.hw * k,
+      hh: ((B.y1 - B.y0) / 2) * k,
+      hd: ((B.z1 - B.z0) / 2) * k,
+      yaw: p.rot,
+      what: `quench env great fall (${p.x.toFixed(1)}, ${p.z.toFixed(1)})`,
+    });
+  }
+  const W = QUENCH_ENV_ROCK[QUENCH_ENV_RING.piece];
+  for (const p of planQuenchEnvRing()) {
+    const k = p.scale ?? 1;
+    const hd = (W.d * k) / 2;
+    out.push({
+      kind: 'box',
+      x: p.x - Math.sin(p.rot) * hd,
+      y: p.y + (W.h * k) / 2,
+      z: p.z - Math.cos(p.rot) * hd,
+      hw: (W.w * k) / 2,
+      hh: (W.h * k) / 2,
+      hd,
+      yaw: p.rot,
+      what: `quench env ring stack (${p.x.toFixed(1)}, ${p.z.toFixed(1)})`,
     });
   }
   return out;

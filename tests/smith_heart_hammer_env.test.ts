@@ -61,6 +61,8 @@ import {
 import { authoredFieldSurfaceAt } from '../src/sim/instances/authored_field';
 
 const KIT = 'public/models/props/smith_heart_hammer_env_kit.glb';
+/** The Quarry's colossi ride a kit of their own, baked into the same pieces. */
+const COLOSSI = 'public/models/props/smith_heart_hammer_colossi.glb';
 const F = SMITH_HEART_FIELD;
 
 interface Shape {
@@ -89,7 +91,8 @@ beforeAll(async () => {
       view.getUint32(24, true),
     ]);
   }
-  for (const node of doc.getRoot().listNodes()) {
+  const colossi = await io.readBinary(new Uint8Array(readFileSync(COLOSSI)));
+  for (const node of [...doc.getRoot().listNodes(), ...colossi.getRoot().listNodes()]) {
     const name = node.getName();
     if (!/^(Env|Tex)_/.test(name)) continue;
     const min = [Infinity, Infinity, Infinity];
@@ -195,11 +198,9 @@ describe('the look only: what a mechanic hangs on stays', () => {
   const { keep, swap } = hammerEnvSwap(plan);
 
   it('never swaps or drops a frozen piece, and keeps it exactly where it stood', () => {
+    // The colossi left this list when they got painted models of their own.
     expect([...HAMMER_ENV_FROZEN].sort()).toEqual([
       'Kit_CollapseOverhang',
-      'Kit_ColossusBearer',
-      'Kit_ColossusVigil',
-      'Kit_ColossusWaking',
       'Kit_PitColumnSocket',
       'Kit_SlabFrame',
     ]);
@@ -404,8 +405,11 @@ describe('the laid stone', () => {
     expect(hammerEnvDepth(0)).toEqual([1, 1, 1]);
     expect(hammerEnvDepth(D.near)).toEqual([1, 1, 1]);
     // The far wall takes the full fall, and past it nothing falls further.
-    for (const d of [D.far, D.far * 3])
-      hammerEnvDepth(d).forEach((v, i) => expect(v).toBeCloseTo(D.dark[i], 9));
+    for (const d of [D.far, D.far * 3]) {
+      hammerEnvDepth(d).forEach((v, i) => {
+        expect(v).toBeCloseTo(D.dark[i], 9);
+      });
+    }
     for (let d = D.near; d < D.far; d += 6)
       expect(hammerEnvDepth(d + 6)[0]).toBeLessThan(hammerEnvDepth(d)[0]);
     // Darker, never black: a far rock keeps its shape against the sky.
