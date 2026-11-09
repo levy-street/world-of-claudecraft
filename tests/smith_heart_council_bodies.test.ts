@@ -175,7 +175,7 @@ describe('CouncilBodies', () => {
     } as unknown as Entity;
   }
 
-  it('finds the bodies, poses them through their casts, never claims, falls, disposes', () => {
+  it('finds the bodies, plays their casts and deaths, dresses nobody outside, frees, disposes', () => {
     const entities = new Map<number, Entity>();
     const me = { ...body(1, 'warrior', -10), kind: 'player' } as Entity;
     // Two Singers (two rigs of the one kind): one raises, one sings.
@@ -201,16 +201,26 @@ describe('CouncilBodies', () => {
     const shown = () =>
       root?.children.filter((c) => c.name.startsWith('smithHeartCouncilBody:') && c.visible)
         .length ?? 0;
-    expect(shown()).toBe(2);
-    // Outside the raid nobody new is dressed (no walk of the open world).
-    const away = body(9, 'heart_seam_singer', 30);
-    entities.set(away.id, away);
-    me.pos = { x: 0, y: 0, z: 0 };
-    fx.update(0.2);
-    expect(shown()).toBe(2);
-    entities.delete(away.id);
-    me.pos = { x: o.x - 10, y: 0, z: o.z };
-    // A swing, a raise ending in the slam, a song.
+    // The Singer wears its model (COUNCIL_MODELLED): no provisional piece ever shows. What the
+    // module still plays is the dust, rings and shakes of its casts and death, so each step
+    // below proves through the shake that a body was found (or was not).
+    expect(shown()).toBe(0);
+    /** Runs `ability` to the end of its bar on each caster; the shake it caused. */
+    const castThrough = (casters: Entity[], ability: string, bar: number): number => {
+      const before = shaken;
+      for (const c of casters) {
+        c.castingAbility = ability;
+        c.castTotal = bar;
+        c.castRemaining = bar;
+      }
+      for (let i = 0; i < Math.ceil(bar * 30) + 4; i++) {
+        for (const c of casters) c.castRemaining = Math.max(0, c.castRemaining - 1 / 30);
+        fx.update(1 / 30);
+      }
+      for (const c of casters) c.castingAbility = null;
+      fx.update(1 / 30);
+      return shaken - before;
+    };
     const swing = {
       type: 'damage',
       sourceId: slab.id,
@@ -221,28 +231,37 @@ describe('CouncilBodies', () => {
       ability: null,
     } as SimEvent;
     expect(fx.handleEvent(swing)).toBe(false);
-    slab.castingAbility = 'heart_wake_the_stone';
-    slab.castTotal = 1.2;
-    slab.castRemaining = 1.2;
-    singer.castingAbility = 'heart_song_of_the_seam';
-    singer.castTotal = 3;
-    singer.castRemaining = 3;
-    for (let i = 0; i < 40; i++) {
-      slab.castRemaining = Math.max(0, slab.castRemaining - 1 / 30);
-      singer.castRemaining = Math.max(0, singer.castRemaining - 1 / 30);
-      fx.update(1 / 30);
-    }
-    slab.castingAbility = null;
-    fx.update(1 / 30);
-    expect(shaken).toBeGreaterThan(0);
-    // A Singer dies: it stays drawn (as rubble) while its corpse lies.
+    // A raise ending in the slam shakes the ground; the other Singer's song plays beside it.
+    const slam = castThrough([slab], 'heart_wake_the_stone', 1.2);
+    expect(slam).toBeGreaterThan(0);
+    castThrough([singer], 'heart_song_of_the_seam', 3);
+    // Outside the raid nobody new is dressed (no walk of the open world): a Singer raising
+    // its stone beside the player out there shakes nothing.
+    const away = { ...body(9, 'heart_seam_singer', 0) } as Entity;
+    away.pos = { x: 10, y: 0, z: 0 };
+    away.prevPos = { x: 10, y: 0, z: 0 };
+    entities.set(away.id, away);
+    me.pos = { x: 0, y: 0, z: 0 };
+    expect(castThrough([away], 'heart_wake_the_stone', 1.2)).toBe(0);
+    entities.delete(away.id);
+    me.pos = { x: o.x - 10, y: 0, z: o.z };
+    // A Singer dies: its model's own Death clip lays it down, and its threads snap here with a
+    // flash and a shake.
+    const alive = shaken;
     singer.dead = true;
     for (let i = 0; i < 90; i++) fx.update(1 / 30);
-    expect(shown()).toBe(2);
-    // A body leaving the world frees its rig.
+    expect(shaken).toBeGreaterThan(alive);
+    expect(shown()).toBe(0);
+    // A body leaving the world frees its rig: two new Singers both find one (two a kind), so
+    // their slams shake twice as hard as the first.
     entities.delete(slab.id);
+    entities.delete(singer.id);
     fx.update(0.2);
-    expect(shown()).toBe(1);
+    const next = [body(20, 'heart_seam_singer', 0), body(21, 'heart_seam_singer', 0)];
+    for (const e of next) entities.set(e.id, e);
+    fx.update(0.2);
+    expect(castThrough(next, 'heart_wake_the_stone', 1.2)).toBeCloseTo(2 * slam, 5);
+    expect(shown()).toBe(0);
     fx.dispose();
     expect(scene.getObjectByName('smith-heart-council-bodies')).toBeUndefined();
   });

@@ -8,7 +8,9 @@
 // The JOINTS and the TIMELINES (the slots, the arms, the poses, the fall) are
 // kept apart from the PIECES (which kit node sits on which joint, at what
 // size), so the final models from the official pipeline replace the pieces
-// and keep the joints.
+// and keep the joints. Both members wear those models now (COUNCIL_MODELLED,
+// characters/manifest.ts): the pieces are a fallback no member uses, and the
+// joints and timelines still drive the dust, rings and motes it plays.
 //
 // Every size is in yards in the body's own frame: x to its left, y up from
 // its feet, z forward (the sim's facing, 0 = +z). A piece is fitted to its
@@ -35,7 +37,7 @@ export function councilBodyKindOf(templateId: string): CouncilBodyKind | null {
 
 /** The kinds that wear a shipped model now (characters/manifest.ts): their provisional
  *  pieces never build or draw, and the pose still runs for their dust and rings. */
-export const COUNCIL_MODELLED: ReadonlySet<CouncilBodyKind> = new Set<CouncilBodyKind>();
+export const COUNCIL_MODELLED: ReadonlySet<CouncilBodyKind> = new Set<CouncilBodyKind>(['singer']);
 
 /** The kits the pieces come from (render/smith_heart/heart_kit.ts urls). */
 export const COUNCIL_BODY_KITS = {

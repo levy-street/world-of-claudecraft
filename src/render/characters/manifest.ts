@@ -4292,15 +4292,20 @@ export const VISUALS: Record<string, VisualDef> = {
     gaitWindDown: true,
     authoredAtlas: true,
   },
-  // The Slabwright's own body: Tripo P2, one UV island per rock on a painted 1024 atlas in ETC1S,
-  // a stone rig built in Blender (every rock rigid to one bone; the tracks that only hold the
-  // rest pose are dropped at build, see the spec). The Slabwright left the Hammer Council when
-  // the raid made it two bosses, so no template draws this now: the model is kept for reuse.
-  // Melee lands at 1.0 s, inside its 2.8 s swing; its casts come down at 78 percent of their
-  // bars and finish their recovery after; it hovers, so runRef is the old 7 yd/s at 1x.
-  smith_heart_slabwright: {
+  // The Guardian of the Hammer, the Hammer Council's main boss, wears the model first built for the
+  // Slabwright (heart_slabwright.glb): Tripo P2, one UV island per rock on a painted 1024 atlas in
+  // ETC1S, a stone rig built in Blender (every rock rigid to one bone; the tracks that only hold the
+  // rest pose are dropped at build, see the spec), drawn at the Guardian's height (3.4 at its scale
+  // of 3.2). Its melee lands at 1.0 s, inside its 2.6 s swing; Hammerfall (the template's
+  // arcCleave, through its brood_cleave cue) swings the wide Attack2, and Mountain's Rush's wind-up
+  // slams Attack down as the run starts (its 1.0 s contact at the 0.8 s wind-up). Hammer's Weight
+  // slams through CastWake (authored to land at 0.94 s) at the end of its 1.5 s bar, Mountain's
+  // Wrath bursts through CastWrath (at 3 s) at the end of its 4 s bar, both locked to the bar; it
+  // braces through Mountain's Rush's bar. It hovers, so no foot can slide: runRef is the template's
+  // 7 yd/s at 1x.
+  smith_heart_hammer_guardian: {
     url: `${CREATURES}/heart_slabwright.glb`,
-    height: 2.15,
+    height: 3.4,
     clips: {
       idle: 'Idle',
       idleVariants: ['IdleFidget'],
@@ -4310,15 +4315,64 @@ export const VISUALS: Record<string, VisualDef> = {
       walk: 'Walk',
       run: 'Run',
       attack: ['Attack', 'Attack2'],
+      attackByAbility: { brood_cleave: 'Attack2', heart_mountains_rush_windup: 'Attack' },
+      attackTimeScaleByAbility: { heart_mountains_rush_windup: 1.25 },
       contacts: { Attack: [1.0], Attack2: [1.0] },
-      cast: 'CastWake',
+      cast: 'CastWrath',
       castByAbility: {
-        heart_wake_the_stone: 'CastWake',
-        heart_falling_rock: 'CastRock',
-        heart_stone_prison: 'CastPrison',
+        heart_hammers_weight: 'CastWake',
         heart_mountains_wrath: 'CastWrath',
+        heart_mountains_rush: 'CombatIdle',
       },
-      castPlayOut: ['CastWake', 'CastRock', 'CastPrison', 'CastWrath'],
+      castTimeScaleByAbility: { heart_hammers_weight: 0.62, heart_mountains_wrath: 0.75 },
+      castPlayOut: ['CastWake', 'CastWrath'],
+      hit: ['Hit', 'Hit2'],
+      death: 'Death',
+      flourish: 'Awaken',
+    },
+    castClipSync: ['heart_hammers_weight', 'heart_mountains_wrath'],
+    attackTimeScale: 1,
+    deathTimeScale: 1,
+    turnRate: 3,
+    walkRef: 3.5,
+    runRef: 7,
+    gaitWindDown: true,
+    authoredAtlas: true,
+    clickRadius: 2.2,
+  },
+  // The Seam Singer, the Hammer Council's second boss beside the Guardian: Tripo P2 from the
+  // concept sheet, a painted 1024 atlas in ETC1S, a stone rig built in Blender (every piece rigid
+  // to one bone; only the neck and the column, fused in the mesh, blend). Its light melee lands at 0.62 s and 0.66 s, inside its 2.2 s swing. Seam Bolt leaves
+  // its left hand at the end of its 2 s bar, the song's note comes at the end of its 3 s bar,
+  // Mountain's Wrath bursts at the end of the heirs' 3 s bar, and each finishes its recovery after
+  // the bar. It floats, so no foot can slide: runRef is the template's 7 yd/s at 1x.
+  // smith_heart_fx/council_bodies.ts still plays its dust and rings (COUNCIL_MODELLED).
+  smith_heart_seam_singer: {
+    url: `${CREATURES}/heart_seam_singer.glb`,
+    height: 2.5,
+    clips: {
+      idle: 'Idle',
+      idleVariants: ['IdleFidget'],
+      idleVariantCadence: { everySec: 18, jitterSec: 12 },
+      combatIdle: 'CombatIdle',
+      turn: 'Turn',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack', 'Attack2'],
+      contacts: { Attack: [0.62], Attack2: [0.66] },
+      cast: 'CastSong',
+      castByAbility: {
+        heart_seam_bolt: 'CastBolt',
+        heart_song_of_the_seam: 'CastSong',
+        heart_mountains_wrath: 'CastWrath',
+        heart_wake_the_stone: 'CastBolt',
+        heart_falling_rock: 'CastBolt',
+      },
+      // Wake the Stone and Falling Rock (the Singer's since the council became two bosses) throw
+      // through the bolt, timed so its throw (at 2.0 s at 1x) leaves the hand where
+      // smith_heart_fx/council_bodies.ts slams their dust and ring: 78 percent of each bar.
+      castTimeScaleByAbility: { heart_wake_the_stone: 1.03, heart_falling_rock: 2.14 },
+      castPlayOut: ['CastBolt', 'CastSong', 'CastWrath'],
       hit: ['Hit', 'Hit2'],
       death: 'Death',
       flourish: 'Awaken',
@@ -4330,20 +4384,6 @@ export const VISUALS: Record<string, VisualDef> = {
     runRef: 7,
     gaitWindDown: true,
     authoredAtlas: true,
-    clickRadius: 1.4,
-  },
-  // The Hammer Council's Seam Singer (the Smith's Heart's first boss, design
-  // doc 7.1): a bodyless target, its click capsule, nameplate and bars over the
-  // provisional rock-and-crystal body the raid's own effects draw
-  // (smith_heart_fx/council_bodies.ts) until its own model ships. Bound off
-  // the goleling's rig (never seen); height times the template's scale is the
-  // body's (about 2.5 times a player).
-  smith_heart_seam_singer: {
-    url: `${CREATURES}/golelingevolved.glb`,
-    height: 2.5,
-    clips: ELEMENTAL_FLOATING,
-    animUrls: [`${CREATURES}/elemental_ability_anims.glb`],
-    bodyless: true,
     clickRadius: 1.0,
   },
   // The Guardian of the Quench (the Frozen Lake, design doc 7.3): a bodyless

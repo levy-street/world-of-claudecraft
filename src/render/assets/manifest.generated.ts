@@ -529,6 +529,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/creatures/grix.glb": "/media/models/creatures/grix.224bc3592577.glb",
   "models/creatures/grubjaw.glb": "/media/models/creatures/grubjaw.6d109e187a99.glb",
   "models/creatures/heart_hammer_warder.glb": "/media/models/creatures/heart_hammer_warder.127e5201ae05.glb",
+  "models/creatures/heart_seam_singer.glb": "/media/models/creatures/heart_seam_singer.b4e6f8fcd5e4.glb",
   "models/creatures/heart_slabwright.glb": "/media/models/creatures/heart_slabwright.69e53ce80ad1.glb",
   "models/creatures/hoard_abyssal_maw.glb": "/media/models/creatures/hoard_abyssal_maw.4c7f426c6492.glb",
   "models/creatures/hoard_archon_nyxaris.glb": "/media/models/creatures/hoard_archon_nyxaris.8dba339c6eab.glb",

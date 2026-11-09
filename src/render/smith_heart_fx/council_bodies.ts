@@ -1,11 +1,11 @@
-// The Hammer Council's provisional body (plan: council_bodies_core.ts),
-// hosted by ../rift_death_zone.ts beside the raid's other fx. A kind in
-// COUNCIL_MODELLED wears its shipped model and keeps only this module's dust,
-// rings and shakes. The Seam Singer is a bodyless target (characters/manifest.ts
-// smith_heart_seam_singer): its click capsule,
-// nameplates and bars come from the ordinary entity view, and this module
-// draws the bodies over them, read from IWorld (each body's position, facing,
-// cast bar, swings and death), so offline and online look the same:
+// The Hammer Council's provisional body (plan: council_bodies_core.ts), hosted
+// by ../rift_death_zone.ts beside the raid's other fx. A kind in COUNCIL_MODELLED
+// (the Seam Singer, today) wears its shipped model and keeps only this module's
+// dust, rings and shakes. A kind outside it is a bodyless target
+// (characters/manifest.ts): its click capsule, nameplate and bars come from the
+// ordinary entity view, and this module draws the body over it, read from
+// IWorld (each body's position, facing, cast bar, swings and death), so offline
+// and online look the same:
 //  - the bodies: pieces of the Hammer kit's dressed stone and the Heart kit's
 //    rock and crystal, floating round their joints and stitched together by
 //    threads of the vein's ochre light. The Seam Singer is tall and slender, amber geodes breaking out of its

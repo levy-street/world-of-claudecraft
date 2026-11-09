@@ -26,8 +26,8 @@ import {
 } from '../../sim/encounters/smith_heart/council_ids';
 import { COUNCIL_BODY_HEIGHTS } from './council_bodies_core';
 
-/** The borrowed Guardian body's height before its template's scale
- *  (characters/manifest.ts skel_golem). */
+/** The Guardian's model height before its template's scale
+ *  (characters/manifest.ts smith_heart_hammer_guardian). */
 const GUARDIAN_MODEL_HEIGHT = 3.4;
 
 /** Each member's height feet to crown (yards: the model's height times the

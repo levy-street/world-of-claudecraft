@@ -42,12 +42,12 @@ export const SMITH_HEART_PLACEHOLDER_LOOKS: Record<string, string> = {
   // drifting pale light; the fel-green emberkin read wrong.)
   heart_heat_caller: 'mob_glimmerwisp',
   // ---- the four guardians -----------------------------------------------------
-  // Final: a stone titan half-fused with the Pit's floor, a great hammer arm.
-  heart_hammer_guardian: 'skel_golem',
-  // The Hammer Council's other member: a bodyless target; its provisional
-  // body of the Heart kit's rock and crystal is drawn by
-  // smith_heart_fx/council_bodies.ts (the Masterless Strength's pattern).
-  // Final: its own model (the official pipeline), the same joints.
+  // The Guardian of the Hammer, the Hammer Council's main boss: its own model now, the one first
+  // built for the Slabwright (manifest.ts smith_heart_hammer_guardian).
+  heart_hammer_guardian: 'smith_heart_hammer_guardian',
+  // The Hammer Council's other member, the Seam Singer: its own model now
+  // (manifest.ts); smith_heart_fx/council_bodies.ts keeps only its dust and
+  // rings.
   heart_seam_singer: 'smith_heart_seam_singer',
   // The Guardian of the Breath: its own model (smith_heart_boss_looks.ts),
   // floating pieces of ancient armor held together by living wind; the wind

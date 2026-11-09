@@ -353,8 +353,11 @@ const AUTHORED_ATLAS_DEFS = [
   'wildheart_sunbone_dread_totem',
   // the Hammer Vein Warder's body (scripts/assets/specs/heart_hammer_warder.json)
   'smith_heart_hammer_warder',
-  // the Slabwright's body (scripts/assets/specs/heart_slabwright.json)
-  'smith_heart_slabwright',
+  // the Guardian of the Hammer's body, built as the Slabwright's
+  // (scripts/assets/specs/heart_slabwright.json)
+  'smith_heart_hammer_guardian',
+  // the Seam Singer's body (scripts/assets/specs/heart_seam_singer.json)
+  'smith_heart_seam_singer',
 ];
 
 describe('authored surfaces', () => {
