@@ -1,5 +1,6 @@
 import { TALENTS } from '../../src/sim/content/talents';
-import { CLASSES, ZONES } from '../../src/sim/data';
+import { CLASSES, ZONES, zoneContaining } from '../../src/sim/data';
+import { questInteriors } from './dungeon_catalog';
 import type { ArticleTools } from './entity_format';
 
 type Writer = Pick<ArticleTools, 'add' | 'section' | 'bullets' | 'link' | 'titleBy'>;
@@ -48,7 +49,26 @@ export function classHubRows(w: Pick<Writer, 'link' | 'titleBy'>): string[] {
     });
 }
 
+// Quest and exploration interiors (The Last Keep, Dawnhold Castle) are places in a zone,
+// not dungeons, so the Zones hub lists them with the zone their door is in.
+export function interiorRows(w: Pick<Writer, 'link' | 'titleBy'>): string[] {
+  return questInteriors().map((d) => {
+    const zone = zoneContaining(d.doorPos.x, d.doorPos.z);
+    return [
+      w.link(w.titleBy.dungeon.get(d.id)!, d.name),
+      ...(zone ? ['Zone: ' + zone.name] : []),
+      d.guideVisible === false ? 'Unlisted in the in-game Guide' : 'Quest and exploration interior',
+    ].join(' · ');
+  });
+}
+
 export function addZoneAndClassHubs(w: Writer) {
-  w.add('Zones', w.section('Regions by level', w.bullets(zoneHubRows(w))), ['Portals']);
+  const interiors = interiorRows(w);
+  w.add(
+    'Zones',
+    w.section('Regions by level', w.bullets(zoneHubRows(w))) +
+      (interiors.length ? w.section('Interiors', w.bullets(interiors)) : ''),
+    ['Portals'],
+  );
   w.add('Classes', w.section('Playable classes', w.bullets(classHubRows(w))), ['Portals']);
 }

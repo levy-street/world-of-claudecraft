@@ -6,9 +6,9 @@ import { BUILTIN_WORLD, ITEMS, QUESTS, zoneContaining } from '../../src/sim/data
 import { npcRoleFor } from '../../src/sim/npc_role';
 import { type NpcDef, questTurnInNpcIds } from '../../src/sim/types';
 import { npcDisplayTitle } from '../../src/ui/entity_display_core';
-import { t } from '../../src/ui/i18n';
 import { type ArticleTools, ref } from './entity_format';
 import { itemNpcPoints } from './item_npc_route';
+import { npcServiceLabel } from './npc_service';
 import { vendorOfferText } from './vendor_offer';
 
 export function npcArticle(template: NpcDef, w: ArticleTools) {
@@ -36,7 +36,7 @@ export function npcArticle(template: NpcDef, w: ArticleTools) {
     ['Title', npcDisplayTitle(n.id)],
     ['Where to find them', place],
   ];
-  if (role) facts.push(['Service', t(`hudChrome.nameplate.npcRole.${role}`)]);
+  if (role) facts.push(['Service', npcServiceLabel(role)]);
   const links = (ids: string[]) => w.bullets(ids.map((id) => ref(w, 'quest', id)));
   const offers = Object.values(QUESTS)
     .filter((q) => q.giverNpcId === n.id)

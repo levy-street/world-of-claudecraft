@@ -11,10 +11,14 @@ const sections = [
       'Character stats',
       'Specialization and talents',
       'Combat',
-      'Combat pets',
-      'Hunter pets',
       'Death and recovery',
     ],
+  },
+  {
+    title: 'Pets and companions',
+    intro:
+      'Tame or summon a pet that fights for you, hire a delve companion, or collect a cosmetic companion that follows you.',
+    topics: ['Combat pets', 'Hunter pets', 'Delve companions', 'Companions'],
   },
   {
     title: 'Equipment and upgrades',
@@ -47,7 +51,6 @@ const sections = [
       'Dungeon Finder',
       'Heroic difficulty',
       'Delves',
-      'Delve companions',
       'Buried hoards',
       'Hoard encounters',
       'Lockpicking',
@@ -127,14 +130,8 @@ const sections = [
   },
   {
     title: 'Collections and appearances',
-    intro: 'Track deeds and relics, find a companion, or change how your mount or weapon looks.',
-    topics: [
-      'Book of Deeds',
-      'The Reliquary',
-      'Companions',
-      'Mount appearances',
-      'Weapon appearances',
-    ],
+    intro: 'Track deeds and relics, or change how your mount or weapon looks.',
+    topics: ['Book of Deeds', 'The Reliquary', 'Mount appearances', 'Weapon appearances'],
   },
   {
     title: 'Events and minigames',
@@ -162,6 +159,9 @@ const sections = [
   },
 ] as const;
 
+// Directory labels where the page name alone is ambiguous.
+const TOPIC_LABELS: Record<string, string> = { Companions: 'Cosmetic companions' };
+
 /** Topic pages listed under one systems path, minus its overview articles. */
 export function directoryTopics(title: string, skip: readonly string[] = []): string[] {
   return (sections.find((s) => s.title === title)?.topics ?? []).filter((t) => !skip.includes(t));
@@ -178,7 +178,8 @@ export function systemDirectory(groups: ReadonlyMap<string, { title: string }>):
       const page = groups.get(topic);
       if (!page) continue;
       if (!remaining.delete(topic)) throw new Error('Duplicate system directory entry: ' + topic);
-      links.push(page.title === topic ? `* [[${topic}]]` : `* [[${page.title}|${topic}]]`);
+      const label = TOPIC_LABELS[topic] ?? topic;
+      links.push(page.title === label ? `* [[${label}]]` : `* [[${page.title}|${label}]]`);
     }
     if (links.length) body.push(`== ${section.title} ==\n${section.intro}\n\n${links.join('\n')}`);
   }

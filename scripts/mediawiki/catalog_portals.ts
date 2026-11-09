@@ -15,13 +15,13 @@ import { weaponHand } from '../../src/sim/equipment_rules';
 import { npcRoleFor } from '../../src/sim/npc_role';
 import { WORLD_PVP_SKULL_BAG_ITEM_ID } from '../../src/sim/pvp/world_pvp_trophy';
 import { type ItemDef, type MobFamily, questTurnInNpcIds } from '../../src/sim/types';
-import { t } from '../../src/ui/i18n';
 import { abilityIndexGroup, MEMBERSHIP_GROUP } from './ability_access';
 import { type ClassAbilityGroup, classAbilityGroup } from './class_ability_sections';
 import { creatureRole, FRIENDLY_GROUPS, ROLE_SECTIONS } from './creature_role';
 import { raidName, raidRooms } from './dungeon_catalog';
 import { type ArticleTools, words } from './entity_format';
 import { itemPlacement, offhandSection } from './item_catalog_groups';
+import { npcServiceLabel } from './npc_service';
 import { wikiItemKind } from './wiki_item_kind';
 
 type Writer = Pick<ArticleTools, 'add' | 'section' | 'bullets' | 'link' | 'titleBy'> & {
@@ -273,7 +273,7 @@ function npcPortal(w: Writer) {
   for (const [id, title] of w.titleBy.npc) {
     const n = BUILTIN_WORLD.npcs[id] ?? NPCS[id];
     const role = npcRoleFor(n);
-    const service = role ? t(`hudChrome.nameplate.npcRole.${role}`) : 'Other residents';
+    const service = role ? npcServiceLabel(role) : 'Other residents';
     // A system-spawned NPC still stands at its authored post. The origin is the
     // placeholder for NPCs with no post (raid walk-ins, the spirit healer).
     const posted = n.pos.x !== 0 || n.pos.z !== 0;

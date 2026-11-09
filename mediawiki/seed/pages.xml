@@ -687,11 +687,11 @@ Look up a reward, plan a build, or read an encounter before you enter. Each arti
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="447">== Overview ==
+      <text xml:space="preserve" bytes="413">== Overview ==
 The main story follows Brother Aldric from restless bones outside Eastbrook to [[Korzul the Gravewyrm]] beneath Thornpeak.
 
 == Acts ==
-* [[Eastbrook Vale]]: [[Morthen the Gravecaller (Mob)|Morthen the Gravecaller]] and [[The Hollow Crypt]].
+* [[Eastbrook Vale]]: Morthen the Gravecaller and [[The Hollow Crypt]].
 * [[Mirefen Marsh]]: Vael the Fogbinder and [[The Sunken Bastion]].
 * [[Thornpeak Heights]]: Broodsworn zealots, Highwatch, and [[Gravewyrm Sanctum]].
 
@@ -33338,9 +33338,9 @@ Related guide: [[Book of Deeds]].
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="287">&lt;woc-art path=&quot;/ui/deeds/dgn_colossus_mirror.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="258">&lt;woc-art path=&quot;/ui/deeds/dgn_colossus_mirror.webp&quot; /&gt;
 == How to earn ==
-Defeat the [[Tideglass Colossus (Mob)|Tideglass Colossus]] with every Reflection broken within 15 seconds of rising.
+Defeat the Tideglass Colossus with every Reflection broken within 15 seconds of rising.
 
 
 
@@ -33450,9 +33450,9 @@ Related guide: [[Book of Deeds]].
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="280">&lt;woc-art path=&quot;/ui/deeds/dgn_turnkey_cage.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="257">&lt;woc-art path=&quot;/ui/deeds/dgn_turnkey_cage.webp&quot; /&gt;
 == How to earn ==
-Defeat the [[Gaol Turnkey (Mob)|Gaol Turnkey]] without anyone being crushed in an [[Iron Cage (Mob)|Iron Cage]].
+Defeat the Gaol Turnkey without anyone being crushed in an [[Iron Cage (Mob)|Iron Cage]].
 
 
 
@@ -33478,9 +33478,9 @@ Related guide: [[Book of Deeds]].
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="307">&lt;woc-art path=&quot;/ui/deeds/dgn_beastmaster_apart.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="276">&lt;woc-art path=&quot;/ui/deeds/dgn_beastmaster_apart.webp&quot; /&gt;
 == How to earn ==
-Defeat the [[Fanglord Beastmaster (Mob)|Fanglord Beastmaster]] and his Great Jaguar with Pack Bond up for less than 10 seconds in all.
+Defeat the Fanglord Beastmaster and his Great Jaguar with Pack Bond up for less than 10 seconds in all.
 
 
 
@@ -33788,9 +33788,9 @@ Related guide: [[Book of Deeds]].
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="297">&lt;woc-art path=&quot;/ui/deeds/dgn_lady_nobody_hanging.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="265">&lt;woc-art path=&quot;/ui/deeds/dgn_lady_nobody_hanging.webp&quot; /&gt;
 == How to earn ==
-Defeat the [[Lady of the Bonechill (Mob)|Lady of the Bonechill]] without her ever dropping anyone from her Frozen Embrace.
+Defeat the Lady of the Bonechill without her ever dropping anyone from her Frozen Embrace.
 
 
 
@@ -38150,7 +38150,7 @@ Related guide: [[The Reliquary]].
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="4212">Titles earned from the [[Book of Deeds]]. Cosmetic only: never power, drop rate, or pity.
+      <text xml:space="preserve" bytes="4238">Titles earned from the [[Book of Deeds]]. Cosmetic only: never power, drop rate, or pity.
 
 Shelf: horizons.
 
@@ -38162,7 +38162,7 @@ Shelf: horizons.
 * Paragon: [[Paragon (Deed)|Paragon]].
 * Mythic: [[Mythic (Deed)|Mythic]].
 * Eternal: [[Eternal (Deed)|Eternal]].
-* Wyrmfeller: [[Wyrmfeller (Deed)|Wyrmfeller]].
+* [[Wyrmfeller (Contract)|Wyrmfeller]]: [[Wyrmfeller (Deed)|Wyrmfeller]].
 * the Deathless: [[None More Deathless (Deed)|None More Deathless]].
 * Peakbreaker: [[Peakbreaker (Deed)|Peakbreaker]].
 * Bellstiller: [[Bellstiller (Deed)|Bellstiller]].
@@ -39141,7 +39141,7 @@ Related guide: [[Delves]].
   </page>
 
   <page>
-    <title>Sexton Marrow (boss) (Contract)</title>
+    <title>Sexton Marrow (Contract)</title>
     <ns>0</ns>
     <id>1065</id>
     <revision>
@@ -39162,7 +39162,7 @@ Related guide: [[Guild contracts]].
   </page>
 
   <page>
-    <title>Lady of the Bonechill (boss) (Contract)</title>
+    <title>Lady of the Bonechill (Contract)</title>
     <ns>0</ns>
     <id>1066</id>
     <revision>
@@ -39183,7 +39183,7 @@ Related guide: [[Guild contracts]].
   </page>
 
   <page>
-    <title>Cantor Ilvane (boss) (Contract)</title>
+    <title>Cantor Ilvane (Contract)</title>
     <ns>0</ns>
     <id>1067</id>
     <revision>
@@ -39204,7 +39204,7 @@ Related guide: [[Guild contracts]].
   </page>
 
   <page>
-    <title>Morthen the Gravecaller (boss) (Contract)</title>
+    <title>Morthen the Gravecaller (Contract)</title>
     <ns>0</ns>
     <id>1068</id>
     <revision>
@@ -39225,7 +39225,7 @@ Related guide: [[Guild contracts]].
   </page>
 
   <page>
-    <title>Knight-Commander Olen (boss) (Contract)</title>
+    <title>Knight-Commander Olen (Contract)</title>
     <ns>0</ns>
     <id>1069</id>
     <revision>
@@ -39246,7 +39246,7 @@ Related guide: [[Guild contracts]].
   </page>
 
   <page>
-    <title>Gaol Turnkey (boss) (Contract)</title>
+    <title>Gaol Turnkey (Contract)</title>
     <ns>0</ns>
     <id>1070</id>
     <revision>
@@ -39267,7 +39267,7 @@ Related guide: [[Guild contracts]].
   </page>
 
   <page>
-    <title>Gaoler Ossick (boss) (Contract)</title>
+    <title>Gaoler Ossick (Contract)</title>
     <ns>0</ns>
     <id>1071</id>
     <revision>
@@ -39288,7 +39288,7 @@ Related guide: [[Guild contracts]].
   </page>
 
   <page>
-    <title>Vael the Fogbinder (boss) (Contract)</title>
+    <title>Vael the Fogbinder (Contract)</title>
     <ns>0</ns>
     <id>1072</id>
     <revision>
@@ -39309,7 +39309,7 @@ Related guide: [[Guild contracts]].
   </page>
 
   <page>
-    <title>Choirmother Selthe (boss) (Contract)</title>
+    <title>Choirmother Selthe (Contract)</title>
     <ns>0</ns>
     <id>1073</id>
     <revision>
@@ -39330,7 +39330,7 @@ Related guide: [[Guild contracts]].
   </page>
 
   <page>
-    <title>Tideglass Colossus (boss) (Contract)</title>
+    <title>Tideglass Colossus (Contract)</title>
     <ns>0</ns>
     <id>1074</id>
     <revision>
@@ -39351,7 +39351,7 @@ Related guide: [[Guild contracts]].
   </page>
 
   <page>
-    <title>Ysolei, Avatar of the Drowned Moon (boss) (Contract)</title>
+    <title>Ysolei, Avatar of the Drowned Moon (Contract)</title>
     <ns>0</ns>
     <id>1075</id>
     <revision>
@@ -39372,7 +39372,7 @@ Related guide: [[Guild contracts]].
   </page>
 
   <page>
-    <title>Korgath the Bound (boss) (Contract)</title>
+    <title>Korgath the Bound (Contract)</title>
     <ns>0</ns>
     <id>1076</id>
     <revision>
@@ -39393,7 +39393,7 @@ Related guide: [[Guild contracts]].
   </page>
 
   <page>
-    <title>Grand Necromancer Velkhar (boss) (Contract)</title>
+    <title>Grand Necromancer Velkhar (Contract)</title>
     <ns>0</ns>
     <id>1077</id>
     <revision>
@@ -39414,7 +39414,7 @@ Related guide: [[Guild contracts]].
   </page>
 
   <page>
-    <title>Korzul the Gravewyrm (boss) (Contract)</title>
+    <title>Korzul the Gravewyrm (Contract)</title>
     <ns>0</ns>
     <id>1078</id>
     <revision>
@@ -39435,7 +39435,7 @@ Related guide: [[Guild contracts]].
   </page>
 
   <page>
-    <title>Fanglord Beastmaster (boss) (Contract)</title>
+    <title>Fanglord Beastmaster (Contract)</title>
     <ns>0</ns>
     <id>1079</id>
     <revision>
@@ -39456,7 +39456,7 @@ Related guide: [[Guild contracts]].
   </page>
 
   <page>
-    <title>The Gorgebloom (boss) (Contract)</title>
+    <title>The Gorgebloom (Contract)</title>
     <ns>0</ns>
     <id>1080</id>
     <revision>
@@ -39477,7 +39477,7 @@ Related guide: [[Guild contracts]].
   </page>
 
   <page>
-    <title>Zulgar, Voice of the Basin (boss) (Contract)</title>
+    <title>Zulgar, Voice of the Basin (Contract)</title>
     <ns>0</ns>
     <id>1081</id>
     <revision>
@@ -39498,7 +39498,7 @@ Related guide: [[Guild contracts]].
   </page>
 
   <page>
-    <title>Morthen the Gravecaller (heroic) (Contract)</title>
+    <title>Morthen the Gravecaller, Heroic (Contract)</title>
     <ns>0</ns>
     <id>1082</id>
     <revision>
@@ -39519,7 +39519,7 @@ Related guide: [[Guild contracts]].
   </page>
 
   <page>
-    <title>Vael the Fogbinder (heroic) (Contract)</title>
+    <title>Vael the Fogbinder, Heroic (Contract)</title>
     <ns>0</ns>
     <id>1083</id>
     <revision>
@@ -39540,7 +39540,7 @@ Related guide: [[Guild contracts]].
   </page>
 
   <page>
-    <title>Ysolei, Avatar of the Drowned Moon (heroic) (Contract)</title>
+    <title>Ysolei, Avatar of the Drowned Moon, Heroic (Contract)</title>
     <ns>0</ns>
     <id>1084</id>
     <revision>
@@ -39561,7 +39561,7 @@ Related guide: [[Guild contracts]].
   </page>
 
   <page>
-    <title>Korzul the Gravewyrm (heroic) (Contract)</title>
+    <title>Korzul the Gravewyrm, Heroic (Contract)</title>
     <ns>0</ns>
     <id>1085</id>
     <revision>
@@ -39582,7 +39582,7 @@ Related guide: [[Guild contracts]].
   </page>
 
   <page>
-    <title>Zulgar, Voice of the Basin (heroic) (Contract)</title>
+    <title>Zulgar, Voice of the Basin, Heroic (Contract)</title>
     <ns>0</ns>
     <id>1086</id>
     <revision>
@@ -39603,7 +39603,7 @@ Related guide: [[Guild contracts]].
   </page>
 
   <page>
-    <title>No Bones About It (task) (Contract)</title>
+    <title>No Bones About It (Contract)</title>
     <ns>0</ns>
     <id>1087</id>
     <revision>
@@ -39624,7 +39624,7 @@ Related guide: [[Guild contracts]].
   </page>
 
   <page>
-    <title>Sidestep the Reaper (task) (Contract)</title>
+    <title>Sidestep the Reaper (Contract)</title>
     <ns>0</ns>
     <id>1088</id>
     <revision>
@@ -39645,7 +39645,7 @@ Related guide: [[Guild contracts]].
   </page>
 
   <page>
-    <title>No Thrall of Mine (task) (Contract)</title>
+    <title>No Thrall of Mine (Contract)</title>
     <ns>0</ns>
     <id>1089</id>
     <revision>
@@ -39666,7 +39666,7 @@ Related guide: [[Guild contracts]].
   </page>
 
   <page>
-    <title>Every Last Moonspawn (task) (Contract)</title>
+    <title>Every Last Moonspawn (Contract)</title>
     <ns>0</ns>
     <id>1090</id>
     <revision>
@@ -39687,7 +39687,7 @@ Related guide: [[Guild contracts]].
   </page>
 
   <page>
-    <title>Dry Eyes (task) (Contract)</title>
+    <title>Dry Eyes (Contract)</title>
     <ns>0</ns>
     <id>1091</id>
     <revision>
@@ -39708,7 +39708,7 @@ Related guide: [[Guild contracts]].
   </page>
 
   <page>
-    <title>Stay Buried (task) (Contract)</title>
+    <title>Stay Buried (Contract)</title>
     <ns>0</ns>
     <id>1092</id>
     <revision>
@@ -39729,7 +39729,7 @@ Related guide: [[Guild contracts]].
   </page>
 
   <page>
-    <title>Wyrmfeller (task) (Contract)</title>
+    <title>Wyrmfeller (Contract)</title>
     <ns>0</ns>
     <id>1093</id>
     <revision>
@@ -40072,7 +40072,7 @@ Related guide: [[Buried hoards]].
   </page>
 
   <page>
-    <title>eastbrook to nightbloom (Ferry)</title>
+    <title>Eastbrook to Nightbloom (Ferry)</title>
     <ns>0</ns>
     <id>1106</id>
     <revision>
@@ -40084,8 +40084,8 @@ Related guide: [[Buried hoards]].
       <format>text/x-wiki</format>
       <text xml:space="preserve" bytes="192">The ferry waits 60 seconds at each berth and cruises at 19 yards per second.
 
-* eastbrook: x -125, z -54.8.
-* nightbloom: x -520, z 1505.2.
+* Eastbrook: x -125, z -54.8.
+* Nightbloom: x -520, z 1505.2.
 
 Related guide: [[Ferries]].
 
@@ -40096,7 +40096,7 @@ Related guide: [[Ferries]].
   </page>
 
   <page>
-    <title>wickharbor to drakelands (Ferry)</title>
+    <title>Wickharbor to Drakelands (Ferry)</title>
     <ns>0</ns>
     <id>1107</id>
     <revision>
@@ -40108,8 +40108,8 @@ Related guide: [[Ferries]].
       <format>text/x-wiki</format>
       <text xml:space="preserve" bytes="192">The ferry waits 60 seconds at each berth and cruises at 19 yards per second.
 
-* wickharbor: x 487.3, z 385.27.
-* drakelands: x 515, z 1900.
+* Wickharbor: x 487.3, z 385.27.
+* Drakelands: x 515, z 1900.
 
 Related guide: [[Ferries]].
 
@@ -43355,8 +43355,8 @@ S = start · Numbers = walkthrough steps · R = reward or arrival. Overworld map
 
 
 == Entries ==
-* [[eastbrook to nightbloom (Ferry)|eastbrook to nightbloom]]
-* [[wickharbor to drakelands (Ferry)|wickharbor to drakelands]]
+* [[Eastbrook to Nightbloom (Ferry)|Eastbrook to Nightbloom]]
+* [[Wickharbor to Drakelands (Ferry)|Wickharbor to Drakelands]]
 
 
 [[Category:Systems]]
@@ -43713,7 +43713,7 @@ Trade 5 x [[Emberwoven Sheaf]] for [[Emberbristle Broom]]. Thatchgrin also has a
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="5779">Each week the board offers one named-boss contract, one Heroic contract and one encounter-task contract. Every realm uses the same weekly rotation. Rewards go to eligible contributors who have yet to complete that contract for the week.
+      <text xml:space="preserve" bytes="5443">Each week the board offers one named-boss contract, one Heroic contract and one encounter-task contract. Every realm uses the same weekly rotation. Rewards go to eligible contributors who have yet to complete that contract for the week.
 
 == Getting started ==
 
@@ -43738,44 +43738,44 @@ S = start · Numbers = walkthrough steps · R = reward or arrival. Overworld map
 * 3/R · [[Garrick Holt (NPC)|Garrick Holt]] · Spend Lantern Seals / [[Garrick Holt (NPC)|Garrick Holt]] · Collect your chosen purchase (110.9, 715.4)
 &apos;&apos;&apos;[[Eastbrook Vale]]&apos;&apos;&apos;
 &lt;div class=&quot;woc-map&quot; data-zone=&quot;eastbrook_vale&quot; style=&quot;aspect-ratio:360/360;background-size:100% 100%;background-position:0% 0%&quot;&gt;&lt;span class=&quot;woc-landmark&quot; title=&quot;Eastbrook · settlement reference&quot; style=&quot;left:53.889%;top:77.778%&quot;&gt;Eastbrook&lt;/span&gt;&lt;span class=&quot;woc-pin&quot; title=&quot;2 · Enter The Hollow Crypt for Morthen the Gravecaller (80, 90)&quot; style=&quot;left:27.778%;top:25%&quot;&gt;2&lt;/span&gt;&lt;/div&gt;
-* 2 · Enter [[The Hollow Crypt]] for [[Morthen the Gravecaller (Mob)|Morthen the Gravecaller]] (80, 90)
+* 2 · Enter [[The Hollow Crypt]] for [[Morthen the Gravecaller (Contract)|Morthen the Gravecaller]] (80, 90)
 &apos;&apos;&apos;[[The Hollow Crypt]]&apos;&apos;&apos;
 &lt;div class=&quot;woc-map&quot; style=&quot;aspect-ratio:65/39.394&quot;&gt;&lt;span class=&quot;woc-pin&quot; title=&quot;2 · Morthen the Gravecaller (0, 212)&quot; style=&quot;left:50%;top:50%&quot;&gt;2&lt;/span&gt;&lt;/div&gt;
-* 2 · [[Morthen the Gravecaller (Mob)|Morthen the Gravecaller]] (0, 212)
+* 2 · [[Morthen the Gravecaller (Contract)|Morthen the Gravecaller]] (0, 212)
 
 
 
 
 == Entries ==
-* [[Cantor Ilvane (boss) (Contract)|Cantor Ilvane (boss)]]
-* [[Choirmother Selthe (boss) (Contract)|Choirmother Selthe (boss)]]
-* [[Dry Eyes (task) (Contract)|Dry Eyes (task)]]
-* [[Every Last Moonspawn (task) (Contract)|Every Last Moonspawn (task)]]
-* [[Fanglord Beastmaster (boss) (Contract)|Fanglord Beastmaster (boss)]]
-* [[Gaol Turnkey (boss) (Contract)|Gaol Turnkey (boss)]]
-* [[Gaoler Ossick (boss) (Contract)|Gaoler Ossick (boss)]]
-* [[Grand Necromancer Velkhar (boss) (Contract)|Grand Necromancer Velkhar (boss)]]
-* [[Knight-Commander Olen (boss) (Contract)|Knight-Commander Olen (boss)]]
-* [[Korgath the Bound (boss) (Contract)|Korgath the Bound (boss)]]
-* [[Korzul the Gravewyrm (boss) (Contract)|Korzul the Gravewyrm (boss)]]
-* [[Korzul the Gravewyrm (heroic) (Contract)|Korzul the Gravewyrm (heroic)]]
-* [[Lady of the Bonechill (boss) (Contract)|Lady of the Bonechill (boss)]]
-* [[Morthen the Gravecaller (boss) (Contract)|Morthen the Gravecaller (boss)]]
-* [[Morthen the Gravecaller (heroic) (Contract)|Morthen the Gravecaller (heroic)]]
-* [[No Bones About It (task) (Contract)|No Bones About It (task)]]
-* [[No Thrall of Mine (task) (Contract)|No Thrall of Mine (task)]]
-* [[Sexton Marrow (boss) (Contract)|Sexton Marrow (boss)]]
-* [[Sidestep the Reaper (task) (Contract)|Sidestep the Reaper (task)]]
-* [[Stay Buried (task) (Contract)|Stay Buried (task)]]
-* [[The Gorgebloom (boss) (Contract)|The Gorgebloom (boss)]]
-* [[Tideglass Colossus (boss) (Contract)|Tideglass Colossus (boss)]]
-* [[Vael the Fogbinder (boss) (Contract)|Vael the Fogbinder (boss)]]
-* [[Vael the Fogbinder (heroic) (Contract)|Vael the Fogbinder (heroic)]]
-* [[Wyrmfeller (task) (Contract)|Wyrmfeller (task)]]
-* [[Ysolei, Avatar of the Drowned Moon (boss) (Contract)|Ysolei, Avatar of the Drowned Moon (boss)]]
-* [[Ysolei, Avatar of the Drowned Moon (heroic) (Contract)|Ysolei, Avatar of the Drowned Moon (heroic)]]
-* [[Zulgar, Voice of the Basin (boss) (Contract)|Zulgar, Voice of the Basin (boss)]]
-* [[Zulgar, Voice of the Basin (heroic) (Contract)|Zulgar, Voice of the Basin (heroic)]]
+* [[Cantor Ilvane (Contract)|Cantor Ilvane]]
+* [[Choirmother Selthe (Contract)|Choirmother Selthe]]
+* [[Dry Eyes (Contract)|Dry Eyes]]
+* [[Every Last Moonspawn (Contract)|Every Last Moonspawn]]
+* [[Fanglord Beastmaster (Contract)|Fanglord Beastmaster]]
+* [[Gaol Turnkey (Contract)|Gaol Turnkey]]
+* [[Gaoler Ossick (Contract)|Gaoler Ossick]]
+* [[Grand Necromancer Velkhar (Contract)|Grand Necromancer Velkhar]]
+* [[Knight-Commander Olen (Contract)|Knight-Commander Olen]]
+* [[Korgath the Bound (Contract)|Korgath the Bound]]
+* [[Korzul the Gravewyrm (Contract)|Korzul the Gravewyrm]]
+* [[Korzul the Gravewyrm, Heroic (Contract)|Korzul the Gravewyrm, Heroic]]
+* [[Lady of the Bonechill (Contract)|Lady of the Bonechill]]
+* [[Morthen the Gravecaller (Contract)|Morthen the Gravecaller]]
+* [[Morthen the Gravecaller, Heroic (Contract)|Morthen the Gravecaller, Heroic]]
+* [[No Bones About It (Contract)|No Bones About It]]
+* [[No Thrall of Mine (Contract)|No Thrall of Mine]]
+* [[Sexton Marrow (Contract)|Sexton Marrow]]
+* [[Sidestep the Reaper (Contract)|Sidestep the Reaper]]
+* [[Stay Buried (Contract)|Stay Buried]]
+* [[The Gorgebloom (Contract)|The Gorgebloom]]
+* [[Tideglass Colossus (Contract)|Tideglass Colossus]]
+* [[Vael the Fogbinder (Contract)|Vael the Fogbinder]]
+* [[Vael the Fogbinder, Heroic (Contract)|Vael the Fogbinder, Heroic]]
+* [[Wyrmfeller (Contract)|Wyrmfeller]]
+* [[Ysolei, Avatar of the Drowned Moon (Contract)|Ysolei, Avatar of the Drowned Moon]]
+* [[Ysolei, Avatar of the Drowned Moon, Heroic (Contract)|Ysolei, Avatar of the Drowned Moon, Heroic]]
+* [[Zulgar, Voice of the Basin (Contract)|Zulgar, Voice of the Basin]]
+* [[Zulgar, Voice of the Basin, Heroic (Contract)|Zulgar, Voice of the Basin, Heroic]]
 
 
 [[Category:Systems]]
@@ -43988,7 +43988,7 @@ Nodes respawn after 240 seconds.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="5720">Choose the difficulty before your group claims the instance: type /dungeon heroic, or pick Set Dungeon Difficulty on your own portrait menu. On your own you set it yourself; in a group only the leader can, and the choice covers everyone and locks in at the door, so a run stays what it was claimed as.
+      <text xml:space="preserve" bytes="5686">Choose the difficulty before your group claims the instance: type /dungeon heroic, or pick Set Dungeon Difficulty on your own portrait menu. On your own you set it yourself; in a group only the leader can, and the choice covers everyone and locks in at the door, so a run stays what it was claimed as.
 
 == Getting started ==
 
@@ -44012,7 +44012,7 @@ S = start · Numbers = walkthrough steps · R = reward or arrival. Overworld map
 * 2 · Example Heroic entrance: [[The Hollow Crypt]] (80, 90)
 &apos;&apos;&apos;[[The Hollow Crypt]]&apos;&apos;&apos;
 &lt;div class=&quot;woc-map&quot; style=&quot;aspect-ratio:65/39.394&quot;&gt;&lt;span class=&quot;woc-pin&quot; title=&quot;2/R · Final boss spawn: Morthen the Gravecaller / Loot the final boss where it falls (0, 212)&quot; style=&quot;left:50%;top:50%&quot;&gt;2/R&lt;/span&gt;&lt;/div&gt;
-* 2/R · Final boss spawn: [[Morthen the Gravecaller (Mob)|Morthen the Gravecaller]] / Loot the final boss where it falls (0, 212)
+* 2/R · Final boss spawn: Morthen the Gravecaller / Loot the final boss where it falls (0, 212)
 &apos;&apos;&apos;[[Thornpeak Heights]]&apos;&apos;&apos;
 &lt;div class=&quot;woc-map&quot; data-zone=&quot;thornpeak_heights&quot; style=&quot;aspect-ratio:360/360;background-size:100% 100%;background-position:0% 0%&quot;&gt;&lt;span class=&quot;woc-landmark&quot; title=&quot;Highwatch · settlement reference&quot; style=&quot;left:50%;top:66.667%&quot;&gt;Highwatch&lt;/span&gt;&lt;span class=&quot;woc-pin&quot; title=&quot;3 · Quartermaster Vex · Quartermaster Vex: spend your Heroic Marks here (-8, 665)&quot; style=&quot;left:52.222%;top:65.278%&quot;&gt;3&lt;/span&gt;&lt;/div&gt;
 * 3 · [[Quartermaster Vex (NPC)|Quartermaster Vex]] · [[Quartermaster Vex (NPC)|Quartermaster Vex]]: spend your Heroic Marks here (-8, 665)
@@ -46994,7 +46994,7 @@ Defeating the same player again and again pays less each time and soon nothing, 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3730">Choose a system for its starting point, requirements, steps and rewards. Retired activities are listed separately with their former rules.
+      <text xml:space="preserve" bytes="3876">Choose a system for its starting point, requirements, steps and rewards. Retired activities are listed separately with their former rules.
 
 == Character progression and combat ==
 Choose a build, learn how [[Combat|combat]] resolves, and see what happens when you level up or die.
@@ -47004,9 +47004,15 @@ Choose a build, learn how [[Combat|combat]] resolves, and see what happens when 
 * [[Character stats]]
 * [[Specialization and talents]]
 * [[Combat]]
+* [[Death and recovery]]
+
+== Pets and companions ==
+Tame or summon a pet that fights for you, hire a delve companion, or collect a cosmetic companion that follows you.
+
 * [[Combat pets]]
 * [[Hunter pets]]
-* [[Death and recovery]]
+* [[Delve companions]]
+* [[Companions|Cosmetic companions]]
 
 == Equipment and upgrades ==
 Manage your gear, compare set bonuses, and improve pieces you already own.
@@ -47034,7 +47040,6 @@ Find a group, choose a difficulty, or follow a clue to a reward chest.
 * [[Dungeon Finder]]
 * [[Heroic difficulty]]
 * [[Delves]]
-* [[Delve companions]]
 * [[Buried hoards]]
 * [[Hoard encounters]]
 * [[Lockpicking]]
@@ -47111,11 +47116,10 @@ Compare [[Duels|duels]], battles in the open world and queued matches, then chec
 * [[Honor and Warfare gear]]
 
 == Collections and appearances ==
-Track deeds and relics, find a companion, or change how your mount or weapon looks.
+Track deeds and relics, or change how your mount or weapon looks.
 
 * [[Book of Deeds]]
 * [[The Reliquary]]
-* [[Companions]]
 * [[Mount appearances]]
 * [[Weapon appearances]]
 
@@ -60041,7 +60045,10 @@ World quests start when you enter an active objective area. The selection change
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="1852">[[NPCs|Browse npcs]]
+      <text xml:space="preserve" bytes="1871">[[NPCs|Browse npcs]]
+
+== Armorcrafting and Weaponcrafting Trainer ==
+* [[Forgemistress Darva (NPC)|Forgemistress Darva]]
 
 == Arms Dealer ==
 * [[Smith Haldren (NPC)|Smith Haldren]]
@@ -60051,9 +60058,6 @@ World quests start when you enter an active objective area. The selection change
 
 == Banker ==
 * [[Bursar Fernando (NPC)|Bursar Fernando]]
-
-== Blacksmithing Trainer ==
-* [[Forgemistress Darva (NPC)|Forgemistress Darva]]
 
 == Card Master ==
 * [[Card Master (NPC)|Card Master]]
@@ -60730,11 +60734,33 @@ World quests start when you enter an active objective area. The selection change
   </page>
 
   <page>
-    <title>Arms Dealer (NPCs index)</title>
+    <title>Armorcrafting and Weaponcrafting Trainer (NPCs index)</title>
     <ns>0</ns>
     <id>1406</id>
     <revision>
       <id>1406</id>
+      <timestamp>2026-11-05T00:00:01Z</timestamp>
+      <contributor><username>WikiAdmin</username><id>1</id></contributor>
+      <comment>Seed World of Claudecraft wiki content</comment>
+      <model>wikitext</model>
+      <format>text/x-wiki</format>
+      <text xml:space="preserve" bytes="122">[[NPCs|Browse npcs]]
+
+== [[Eastbrook Vale]] ==
+* [[Forgemistress Darva (NPC)|Forgemistress Darva]]
+
+
+[[Category:Portals]]
+</text>
+    </revision>
+  </page>
+
+  <page>
+    <title>Arms Dealer (NPCs index)</title>
+    <ns>0</ns>
+    <id>1407</id>
+    <revision>
+      <id>1407</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -60757,9 +60783,9 @@ World quests start when you enter an active objective area. The selection change
   <page>
     <title>Auctioneer (NPCs index)</title>
     <ns>0</ns>
-    <id>1407</id>
+    <id>1408</id>
     <revision>
-      <id>1407</id>
+      <id>1408</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -60782,9 +60808,9 @@ World quests start when you enter an active objective area. The selection change
   <page>
     <title>Banker (NPCs index)</title>
     <ns>0</ns>
-    <id>1408</id>
+    <id>1409</id>
     <revision>
-      <id>1408</id>
+      <id>1409</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -60803,28 +60829,6 @@ World quests start when you enter an active objective area. The selection change
 
 == [[Thornpeak Heights]] ==
 * [[Bursar Aldous Crane (NPC)|Bursar Aldous Crane]]
-
-
-[[Category:Portals]]
-</text>
-    </revision>
-  </page>
-
-  <page>
-    <title>Blacksmithing Trainer (NPCs index)</title>
-    <ns>0</ns>
-    <id>1409</id>
-    <revision>
-      <id>1409</id>
-      <timestamp>2026-11-05T00:00:01Z</timestamp>
-      <contributor><username>WikiAdmin</username><id>1</id></contributor>
-      <comment>Seed World of Claudecraft wiki content</comment>
-      <model>wikitext</model>
-      <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="122">[[NPCs|Browse npcs]]
-
-== [[Eastbrook Vale]] ==
-* [[Forgemistress Darva (NPC)|Forgemistress Darva]]
 
 
 [[Category:Portals]]
@@ -61558,7 +61562,7 @@ World quests start when you enter an active objective area. The selection change
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2975">Look for the service you need or browse by location. Quest contacts can appear in both the starting and hand-in lists. Friendly creatures covers [[Companions|companions]], pets, practice targets and escorts.
+      <text xml:space="preserve" bytes="3013">Look for the service you need or browse by location. Quest contacts can appear in both the starting and hand-in lists. Friendly creatures covers [[Companions|companions]], pets, practice targets and escorts.
 
 == Zones ==
 * [[Eastbrook Vale (NPCs index)|Eastbrook Vale]] (37)
@@ -61596,10 +61600,10 @@ World quests start when you enter an active objective area. The selection change
 == Services ==
 * [[Alchemy Trainer (NPCs index)|Alchemy Trainer]] (1)
 * [[Armor Vendor (NPCs index)|Armor Vendor]] (1)
+* [[Armorcrafting and Weaponcrafting Trainer (NPCs index)|Armorcrafting and Weaponcrafting Trainer]] (1)
 * [[Arms Dealer (NPCs index)|Arms Dealer]] (2)
 * [[Auctioneer (NPCs index)|Auctioneer]] (2)
 * [[Banker (NPCs index)|Banker]] (4)
-* [[Blacksmithing Trainer (NPCs index)|Blacksmithing Trainer]] (1)
 * [[Card Master (NPCs index)|Card Master]] (1)
 * [[Cooking Trainer (NPCs index)|Cooking Trainer]] (1)
 * [[Crucible Quartermaster (NPCs index)|Crucible Quartermaster]] (1)
@@ -61645,7 +61649,7 @@ World quests start when you enter an active objective area. The selection change
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="4142">Quests are grouped by the earliest level allowed by the quest and its prerequisites. Within a level, prerequisite quests appear before their follow-ups. Each entry names the quest giver.
+      <text xml:space="preserve" bytes="3494">Quests are grouped by the earliest level allowed by the quest and its prerequisites. Within a level, prerequisite quests appear before their follow-ups. Each entry names the quest giver.
 
 == From level 1 ==
 * [[A Trade for Every Hand]] · [[Foreman Odell (NPC)|Foreman Odell]]
@@ -61667,13 +61671,6 @@ World quests start when you enter an active objective area. The selection change
 * [[Loom Work Order]] · [[Weaver Ottilie (NPC)|Weaver Ottilie]] · repeatable
 * [[Toolworks Work Order]] · [[Tinker Gizzel (NPC)|Tinker Gizzel]] · repeatable
 * [[Know Your Numbers]] · [[Drillmaster Hale (NPC)|Drillmaster Hale]]
-* [[Gourdlight Rounds]] · [[Hester Gourdwick (NPC)|Hester Gourdwick]] · daily · seasonal
-* [[Pumpkins from the Patch]] · [[Hester Gourdwick (NPC)|Hester Gourdwick]] · daily · seasonal
-* [[Boo!]] · [[Hester Gourdwick (NPC)|Hester Gourdwick]] · daily · seasonal
-* [[Wicked Wicks]] · [[Hester Gourdwick (NPC)|Hester Gourdwick]] · daily · seasonal
-* [[A Door in Every Town]] · [[Hester Gourdwick (NPC)|Hester Gourdwick]] · daily · seasonal
-* [[Feathers for the Fire]] · [[Hester Gourdwick (NPC)|Hester Gourdwick]] · daily · seasonal
-* [[Baskets for the Neighbours]] · [[Hester Gourdwick (NPC)|Hester Gourdwick]] · daily · seasonal
 * [[The Old Wolf]] · [[Marshal Redbrook (NPC)|Marshal Redbrook]] · after [[Wolves at the Door]]
 * [[Bandits of the Vale]] · [[Marshal Redbrook (NPC)|Marshal Redbrook]] · after [[Wolves at the Door]]
 * [[A Different Pastime]] · [[Smith Haldren (NPC)|Smith Haldren]] · after [[A Trade for Every Hand]] · repeatable
@@ -62560,7 +62557,7 @@ World quests start when you enter an active objective area. The selection change
       <text xml:space="preserve" bytes="1393">Choose a zone to follow its quest chains, or browse by activity. Open a quest for its objectives, route map, turn-in and rewards.
 
 == Quests by zone ==
-* [[Eastbrook Vale quests|Eastbrook Vale]] · 46 quests
+* [[Eastbrook Vale quests|Eastbrook Vale]] · 39 quests
 * [[The Proving Shore quests|The Proving Shore]] · 10 quests
 * [[The Farshore quests|The Farshore]] · 9 quests
 * [[Mirefen Marsh quests|Mirefen Marsh]] · 29 quests
@@ -62605,7 +62602,7 @@ World quests start when you enter an active objective area. The selection change
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="921">== Regions by level ==
+      <text xml:space="preserve" bytes="1104">== Regions by level ==
 * [[The Proving Shore]] · Levels: 1 to 2 · Town: Dawnrest Camp
 * [[Eastbrook Vale]] · Levels: 1 to 7 · Town: Eastbrook
 * [[The Farshore]] · Levels: 3 to 7 · Town: Gullhaven
@@ -62621,6 +62618,10 @@ World quests start when you enter an active objective area. The selection change
 * [[The Nightbloom]] · Level: 20 · Town: Moonrest
 * [[The Palmreach]] · Level: 20 · Town: Drifthaven
 * [[The Wraithwood]] · Level: 20 · Town: Gibbetmere
+
+== Interiors ==
+* [[The Last Keep]] · Zone: [[The Drakelands]] · Quest and exploration interior
+* [[Dawnhold Castle]] · Zone: [[The Evergarden]] · Quest and exploration interior
 
 
 [[Category:Portals]]
@@ -62854,7 +62855,7 @@ S = start · Numbers = walkthrough steps · R = reward or arrival. Overworld map
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="1560">Entrances, boss strategies, routes and rewards for every dungeon and raid.
+      <text xml:space="preserve" bytes="2102">Entrances, boss strategies, routes and rewards for every dungeon and raid.
 
 == Five-player dungeons ==
 The levels below apply to [[Dungeon Finder]]. Heroic matching requires level 20; individual entrance requirements are listed in each guide.
@@ -62871,10 +62872,22 @@ Ten-player encounters with Normal and Heroic difficulties. Each guide covers the
 * [[Nythraxis (Raid)|Nythraxis]] · 10 players · Normal and Heroic · 1 boss encounter
 * [[Crucible of the Last Spring (Raid)|Crucible of the Last Spring]] · 10 players · Normal and Heroic · 2 boss encounters
 
-== Attunement and other interiors ==
+== Attunement adventures ==
 * [[Abandoned Crypt]] · Attunement adventure leading to [[Nythraxis (Raid)]]. Designed for solo play; social listings allow up to 5 players.
-* [[The Last Keep]] · Exploration and quest location.
-* [[Dawnhold Castle]] · Exploration and quest location.
+
+== Delves ==
+Short instanced runs for a small party or a solo player with a companion. See [[Delves]] for rewards and [[Delve companions]] for hired help.
+
+* [[The Collapsed Reliquary (Delve)|The Collapsed Reliquary]] · From level 7 · Up to 2 players
+* [[The Drowned Litany (Delve)|The Drowned Litany]] · From level 12 · Up to 2 players
+
+== Rifts ==
+Ranked portals for level 20 characters, cleared floor by floor. See [[Rifts]] for how to open one.
+
+* [[Rank C (Rift)|Rank C]] · Enemies from level 20
+* [[Rank B (Rift)|Rank B]] · Enemies from level 22
+* [[Rank A (Rift)|Rank A]] · Enemies from level 25
+* [[Rank S (Rift)|Rank S]] · Enemies from level 28
 
 == Before you enter ==
 Use [[Dungeon Finder]] to form a group, check [[Heroic difficulty]] before a Heroic run, and read [[Party loot]] and [[Death and recovery]] for loot and recovery rules.
@@ -62896,7 +62909,7 @@ Use [[Dungeon Finder]] to form a group, check [[Heroic difficulty]] before a Her
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2326">&lt;woc-art path=&quot;/map_bg/eastbrook_vale.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="2154">&lt;woc-art path=&quot;/map_bg/eastbrook_vale.webp&quot; /&gt;
 == Overview ==
 Find [[Marshal Redbrook (NPC)|Marshal Redbrook]] in town - he has work for you.
 
@@ -62995,13 +63008,6 @@ Find [[Marshal Redbrook (NPC)|Marshal Redbrook]] in town - he has work for you.
 * [[Muster at Fenbridge]]
 * [[Know Your Numbers]]
 * [[Numbers That Heal]]
-* [[Gourdlight Rounds]]
-* [[Pumpkins from the Patch]]
-* [[Boo!]]
-* [[Wicked Wicks]]
-* [[A Door in Every Town]]
-* [[Feathers for the Fire]]
-* [[Baskets for the Neighbours]]
 
 
 [[Category:Zones]]
@@ -66989,7 +66995,7 @@ Every deed worth doing is worth writing down twice, adventurer: once for the led
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="668">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="687">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
 == Greeting ==
 The forge answers to me, champion. Bring good ore and it will answer to you too.
 
@@ -67003,7 +67009,7 @@ The forge answers to me, champion. Bring good ore and it will answer to you too.
 | [[Eastbrook Vale]] (-8.17, -120.39)
 |-
 ! Service
-| Blacksmithing Trainer
+| Armorcrafting and Weaponcrafting Trainer
 |}
 
 == Quests offered ==
@@ -77265,7 +77271,7 @@ You give the dead more mercy than their masters ever did. Take this, you have mo
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3497">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3524">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -77318,7 +77324,7 @@ S = start · Numbers = objective steps · H = hand-in. Overworld maps show the f
 * 1 · [[Drowned Dead (Mob)|Drowned Dead]] camp center ([[Mirefen Marsh]]) (115, 450) · 16 yd radius
 
 == Quest dialogue ==
-So you followed me into the mire, adventurer. Good. I have [[The Dawnbound Tome|the Dawnbound Tome]] here, and this drowned ground is where its words belong: nowhere is the veil between life and death thinner than a place where the dead will not stay buried. But the drowned would drag your voice down mid-verse. Clear a space fit for the rite: put 8 of [[The Drowned Dead|the Drowned Dead]] to rest, and we will consecrate it together.
+So you followed me into the mire, adventurer. Good. I have [[The Dawnbound Tome|the Dawnbound Tome]] here, and this drowned ground is where its words belong: nowhere is the veil between life and death thinner than a place where the dead will not [[Stay Buried (Contract)|stay buried]]. But the drowned would drag your voice down mid-verse. Clear a space fit for the rite: put 8 of [[The Drowned Dead|the Drowned Dead]] to rest, and we will consecrate it together.
 
 == On completion ==
 Kneel, adventurer, and read the words aloud. There. Do you feel it? The Light no longer only mends the living in your hands, it can summon back those who have crossed over. Use it wisely. A soul called back to a hopeless fight is a cruelty, not a mercy. Rise, Redeemer.
@@ -86069,7 +86075,7 @@ Six skeins, soft as a held breath. The dead will lie easier in this. Take these 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3095">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3122">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -86121,7 +86127,7 @@ S = start · Numbers = objective steps · H = hand-in. Overworld maps show the f
 * 1 · [[Grave-Candle]] ([[The Wraithwood]]) (340, 1498)
 
 == Quest dialogue ==
-Four boundary stones ring Gibbetmere, adventurer, one on each road out, and a grave-candle burns on every stone. While they burn, the buried stay buried. The drizzle has drowned them, all four, and I am too old to walk the bounds alone. Take my taper and relight them, quickly.
+Four boundary stones ring Gibbetmere, adventurer, one on each road out, and a grave-candle burns on every stone. While they burn, the buried [[Stay Buried (Contract)|stay buried]]. The drizzle has drowned them, all four, and I am too old to walk the bounds alone. Take my taper and relight them, quickly.
 
 == On completion ==
 All four burning? Then breathe, adventurer. You did not hear it, but the whole village did: the bells rang easier the moment the last wick caught.
@@ -113664,7 +113670,7 @@ Overworld camp values include level scaling. Instance values precede room and di
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="1556">&lt;woc-art path=&quot;/ui/mobs/broodsworn_thawcaller.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="1497">&lt;woc-art path=&quot;/ui/mobs/broodsworn_thawcaller.webp&quot; /&gt;
 == Overview ==
 Broodsworn Thawcaller belongs to the humanoid family.
 
@@ -113703,7 +113709,7 @@ Overworld camp values include level scaling. Instance values precede room and di
 * [[Gravewyrm Sanctum]].
 
 == Mechanics ==
-* Trash kit. This encounter uses the following special attacks. mend cast time 2.5 sec, between uses 12 sec, first 4, school shadow, range 30 yd, maximum health restored 30%, below 0.7, exclude [[Sledge Tusker (Mob)|sledge tusker]], [[Korgath the Bound (Mob)|korgath the bound]], [[Grand Necromancer Velkhar (Mob)|grand necromancer velkhar]], [[Korzul the Gravewyrm (Mob)|korzul the gravewyrm]], reanimate cast time 3 sec, between uses 14 sec, first 6, school shadow, range 30 yd, corpses [[Sanctum Boneguard (Mob)|sanctum boneguard]], summon raised bonewalker, hp pct 0.6.
+* Trash kit. This encounter uses the following special attacks. mend cast time 2.5 sec, between uses 12 sec, first 4, school shadow, range 30 yd, maximum health restored 30%, below 0.7, exclude [[Sledge Tusker (Mob)|sledge tusker]], korgath the bound, [[Grand Necromancer Velkhar (Mob)|grand necromancer velkhar]], korzul the gravewyrm, reanimate cast time 3 sec, between uses 14 sec, first 6, school shadow, range 30 yd, corpses [[Sanctum Boneguard (Mob)|sanctum boneguard]], summon raised bonewalker, hp pct 0.6.
 
 == Loot ==
 * 204 to 476 copper (100% base roll).
@@ -137321,7 +137327,7 @@ Numbers match the source sections above. Each location names its starting, objec
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2852">&lt;woc-art path=&quot;/ui/items/gravecaller_blade.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="2784">&lt;woc-art path=&quot;/ui/items/gravecaller_blade.webp&quot; /&gt;
 == Overview ==
 Gravecaller&apos;s Broadblade is a rare-quality weapon.
 
@@ -137368,7 +137374,7 @@ First complete [[The Binding Rite]].
 Choose one copy from the reward cards. It is offered to [[Warrior]], [[Paladin]], [[Shaman]]. Selecting another reward gives no copy of this item.
 
 # Speak to [[Brother Aldric (NPC)|Brother Aldric]], select [[Into the Hollow]] and click Accept.
-# Quest objective 1. [[Morthen the Gravecaller (Mob)|Morthen the Gravecaller]] slain (1 required).
+# Quest objective 1. Morthen the Gravecaller slain (1 required).
 # Return to [[Brother Aldric (NPC)|Brother Aldric]]. Select [[Gravecaller&apos;s Broadblade]] if shown among your reward choices. Click Complete Quest. The reward goes to your bags.
 
 == Acquisition map ==
@@ -137378,7 +137384,7 @@ Numbers match the source sections above. Each location names its starting, objec
 * 1 · Quest reward · [[Into the Hollow]] · start · [[Brother Aldric (NPC)|Brother Aldric]] ([[Eastbrook Vale]]) / Quest reward · [[Into the Hollow]] · collect · [[Brother Aldric (NPC)|Brother Aldric]] ([[Eastbrook Vale]]) (15.012, -110.385)
 &apos;&apos;&apos;[[The Hollow Crypt]]&apos;&apos;&apos;
 &lt;div class=&quot;woc-map&quot; style=&quot;aspect-ratio:65/39.394&quot;&gt;&lt;span class=&quot;woc-pin&quot; title=&quot;1 · Quest reward · Into the Hollow · step 2 · Morthen the Gravecaller (0, 212)&quot; style=&quot;left:50%;top:50%&quot;&gt;1&lt;/span&gt;&lt;/div&gt;
-* 1 · Quest reward · [[Into the Hollow]] · step 2 · [[Morthen the Gravecaller (Mob)|Morthen the Gravecaller]] (0, 212)
+* 1 · Quest reward · [[Into the Hollow]] · step 2 · Morthen the Gravecaller (0, 212)
 
 == Equipment and use ==
 * 9 - 16 Damage Speed 2.4
@@ -137408,7 +137414,7 @@ Numbers match the source sections above. Each location names its starting, objec
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2814">&lt;woc-art path=&quot;/ui/items/widowfang_dirk.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="2746">&lt;woc-art path=&quot;/ui/items/widowfang_dirk.webp&quot; /&gt;
 == Overview ==
 Widowfang Dirk is a rare-quality weapon.
 
@@ -137455,7 +137461,7 @@ First complete [[The Binding Rite]].
 Choose one copy from the reward cards. It is offered to [[Rogue]], [[Hunter]]. Selecting another reward gives no copy of this item.
 
 # Speak to [[Brother Aldric (NPC)|Brother Aldric]], select [[Into the Hollow]] and click Accept.
-# Quest objective 1. [[Morthen the Gravecaller (Mob)|Morthen the Gravecaller]] slain (1 required).
+# Quest objective 1. Morthen the Gravecaller slain (1 required).
 # Return to [[Brother Aldric (NPC)|Brother Aldric]]. Select [[Widowfang Dirk]] if shown among your reward choices. Click Complete Quest. The reward goes to your bags.
 
 == Acquisition map ==
@@ -137465,7 +137471,7 @@ Numbers match the source sections above. Each location names its starting, objec
 * 1 · Quest reward · [[Into the Hollow]] · start · [[Brother Aldric (NPC)|Brother Aldric]] ([[Eastbrook Vale]]) / Quest reward · [[Into the Hollow]] · collect · [[Brother Aldric (NPC)|Brother Aldric]] ([[Eastbrook Vale]]) (15.012, -110.385)
 &apos;&apos;&apos;[[The Hollow Crypt]]&apos;&apos;&apos;
 &lt;div class=&quot;woc-map&quot; style=&quot;aspect-ratio:65/39.394&quot;&gt;&lt;span class=&quot;woc-pin&quot; title=&quot;1 · Quest reward · Into the Hollow · step 2 · Morthen the Gravecaller (0, 212)&quot; style=&quot;left:50%;top:50%&quot;&gt;1&lt;/span&gt;&lt;/div&gt;
-* 1 · Quest reward · [[Into the Hollow]] · step 2 · [[Morthen the Gravecaller (Mob)|Morthen the Gravecaller]] (0, 212)
+* 1 · Quest reward · [[Into the Hollow]] · step 2 · Morthen the Gravecaller (0, 212)
 
 == Equipment and use ==
 * 6 - 10 Damage Speed 1.7
@@ -137495,7 +137501,7 @@ Numbers match the source sections above. Each location names its starting, objec
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2864">&lt;woc-art path=&quot;/ui/items/gravecaller_staff.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="2796">&lt;woc-art path=&quot;/ui/items/gravecaller_staff.webp&quot; /&gt;
 == Overview ==
 Staff of the Hollow is a rare-quality weapon.
 
@@ -137542,7 +137548,7 @@ First complete [[The Binding Rite]].
 Choose one copy from the reward cards. It is offered to [[Mage]], [[Priest]], [[Warlock]], [[Druid]]. Selecting another reward gives no copy of this item.
 
 # Speak to [[Brother Aldric (NPC)|Brother Aldric]], select [[Into the Hollow]] and click Accept.
-# Quest objective 1. [[Morthen the Gravecaller (Mob)|Morthen the Gravecaller]] slain (1 required).
+# Quest objective 1. Morthen the Gravecaller slain (1 required).
 # Return to [[Brother Aldric (NPC)|Brother Aldric]]. Select [[Staff of the Hollow]] if shown among your reward choices. Click Complete Quest. The reward goes to your bags.
 
 == Acquisition map ==
@@ -137552,7 +137558,7 @@ Numbers match the source sections above. Each location names its starting, objec
 * 1 · Quest reward · [[Into the Hollow]] · start · [[Brother Aldric (NPC)|Brother Aldric]] ([[Eastbrook Vale]]) / Quest reward · [[Into the Hollow]] · collect · [[Brother Aldric (NPC)|Brother Aldric]] ([[Eastbrook Vale]]) (15.012, -110.385)
 &apos;&apos;&apos;[[The Hollow Crypt]]&apos;&apos;&apos;
 &lt;div class=&quot;woc-map&quot; style=&quot;aspect-ratio:65/39.394&quot;&gt;&lt;span class=&quot;woc-pin&quot; title=&quot;1 · Quest reward · Into the Hollow · step 2 · Morthen the Gravecaller (0, 212)&quot; style=&quot;left:50%;top:50%&quot;&gt;1&lt;/span&gt;&lt;/div&gt;
-* 1 · Quest reward · [[Into the Hollow]] · step 2 · [[Morthen the Gravecaller (Mob)|Morthen the Gravecaller]] (0, 212)
+* 1 · Quest reward · [[Into the Hollow]] · step 2 · Morthen the Gravecaller (0, 212)
 
 == Equipment and use ==
 * 10 - 17 Damage Speed 3.0
@@ -142954,7 +142960,7 @@ Numbers match the source sections above. Each location names its starting, objec
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="7103">&lt;woc-art path=&quot;/ui/items/wyrmfall_core.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="7069">&lt;woc-art path=&quot;/ui/items/wyrmfall_core.webp&quot; /&gt;
 == Overview ==
 Wyrmfall Core is a rare-quality material.
 
@@ -143002,7 +143008,7 @@ Numbers match the source sections above. Each location names its starting, objec
 * 2 · Eligible endgame completion · start · Example Heroic entrance: [[The Hollow Crypt]] (80, 90)
 &apos;&apos;&apos;[[The Hollow Crypt]]&apos;&apos;&apos;
 &lt;div class=&quot;woc-map&quot; style=&quot;aspect-ratio:65/39.394&quot;&gt;&lt;span class=&quot;woc-pin&quot; title=&quot;2 · Eligible endgame completion · step 2 · Final boss spawn: Morthen the Gravecaller / Eligible endgame completion · step 2 · Loot the final boss where it falls (0, 212)&quot; style=&quot;left:50%;top:50%&quot;&gt;2&lt;/span&gt;&lt;/div&gt;
-* 2 · Eligible endgame completion · step 2 · Final boss spawn: [[Morthen the Gravecaller (Mob)|Morthen the Gravecaller]] / Eligible endgame completion · step 2 · Loot the final boss where it falls (0, 212)
+* 2 · Eligible endgame completion · step 2 · Final boss spawn: Morthen the Gravecaller / Eligible endgame completion · step 2 · Loot the final boss where it falls (0, 212)
 
 == Sources ==
 * Masterwrought crafting catalyst. The raid final boss drops 1 to 3 to each player once per day on each difficulty. Heroic dungeon final bosses each drop 1 to 3 to each player once per day. Your first A or S rank Rift race win of the day grants 1 at A rank or 2 at S rank. The Heroic Quartermaster sells one for Heroic Marks.
@@ -143108,7 +143114,7 @@ Guaranteed yield, with no profession or crafting-station requirement. This can b
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3026">&lt;woc-art path=&quot;/ui/items/makers_ember.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="2992">&lt;woc-art path=&quot;/ui/items/makers_ember.webp&quot; /&gt;
 == Overview ==
 Maker&apos;s Ember is an epic-quality tool.
 
@@ -143146,7 +143152,7 @@ Numbers match the source sections above. Each location names its starting, objec
 * 1 · Eligible endgame completion · start · Example Heroic entrance: [[The Hollow Crypt]] (80, 90)
 &apos;&apos;&apos;[[The Hollow Crypt]]&apos;&apos;&apos;
 &lt;div class=&quot;woc-map&quot; style=&quot;aspect-ratio:65/39.394&quot;&gt;&lt;span class=&quot;woc-pin&quot; title=&quot;1 · Eligible endgame completion · step 2 · Final boss spawn: Morthen the Gravecaller / Eligible endgame completion · step 2 · Loot the final boss where it falls (0, 212)&quot; style=&quot;left:50%;top:50%&quot;&gt;1&lt;/span&gt;&lt;/div&gt;
-* 1 · Eligible endgame completion · step 2 · Final boss spawn: [[Morthen the Gravecaller (Mob)|Morthen the Gravecaller]] / Eligible endgame completion · step 2 · Loot the final boss where it falls (0, 212)
+* 1 · Eligible endgame completion · step 2 · Final boss spawn: Morthen the Gravecaller / Eligible endgame completion · step 2 · Loot the final boss where it falls (0, 212)
 
 == Sources ==
 * Complete the first eligible raid boss, Heroic final boss or [[Rank A (Rift)|rank A]]/S rift of the reset week. Missed weekly grants can accumulate.
@@ -165382,7 +165388,7 @@ Numbers match the source sections above. Each location names its starting, objec
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2877">&lt;woc-art path=&quot;/ui/items/knight_commanders_greaves.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="2813">&lt;woc-art path=&quot;/ui/items/knight_commanders_greaves.webp&quot; /&gt;
 == Overview ==
 Knight-Commander&apos;s Greaves is a rare-quality armor.
 
@@ -165426,7 +165432,7 @@ First complete [[The Sunken Bastion (2)|The Sunken Bastion]].
 Choose one copy from the reward cards. It is offered to every class. Selecting another reward gives no copy of this item.
 
 # Speak to [[Scout Maren (NPC)|Scout Maren]], select [[The Knight-Commander&apos;s Shame]] and click Accept.
-# Quest objective 1. [[Knight-Commander Olen (Mob)|Knight-Commander Olen]] laid to rest (1 required).
+# Quest objective 1. Knight-Commander Olen laid to rest (1 required).
 # Return to [[Scout Maren (NPC)|Scout Maren]]. Select [[Knight-Commander&apos;s Greaves]] if shown among your reward choices. Click Complete Quest. The reward goes to your bags.
 
 == Acquisition map ==
@@ -165436,7 +165442,7 @@ Numbers match the source sections above. Each location names its starting, objec
 * 1 · Quest reward · [[The Knight-Commander&apos;s Shame]] · start · [[Scout Maren (NPC)|Scout Maren]] ([[Mirefen Marsh]]) / Quest reward · [[The Knight-Commander&apos;s Shame]] · collect · [[Scout Maren (NPC)|Scout Maren]] ([[Mirefen Marsh]]) (6.911, 288.074)
 &apos;&apos;&apos;[[The Sunken Bastion (2)|The Sunken Bastion]]&apos;&apos;&apos;
 &lt;div class=&quot;woc-map&quot; style=&quot;aspect-ratio:65/39.394&quot;&gt;&lt;span class=&quot;woc-pin&quot; title=&quot;1 · Quest reward · The Knight-Commander&apos;s Shame · step 2 · Knight-Commander Olen (57, 128)&quot; style=&quot;left:50%;top:50%&quot;&gt;1&lt;/span&gt;&lt;/div&gt;
-* 1 · Quest reward · [[The Knight-Commander&apos;s Shame]] · step 2 · [[Knight-Commander Olen (Mob)|Knight-Commander Olen]] (57, 128)
+* 1 · Quest reward · [[The Knight-Commander&apos;s Shame]] · step 2 · Knight-Commander Olen (57, 128)
 
 == Equipment and use ==
 * 95 Armor
@@ -184752,7 +184758,7 @@ Numbers match the source sections above. Each location names its starting, objec
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="5980">&lt;woc-art path=&quot;/ui/items/drownstep_sabatons.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="5922">&lt;woc-art path=&quot;/ui/items/drownstep_sabatons.webp&quot; /&gt;
 == Overview ==
 Drownstep Sabatons is a rare-quality armor.
 
@@ -184798,7 +184804,7 @@ First complete [[The Drowned Choir]].
 Choose one copy from the reward cards. It is offered to [[Warrior]], [[Paladin]], [[Shaman]]. Selecting another reward gives no copy of this item.
 
 # Speak to [[Ondrel Vane (NPC)|Ondrel Vane]], select [[Silence the Choir]] and click Accept.
-# Quest objective 1. [[Choirmother Selthe (Mob)|Choirmother Selthe]] slain (1 required).
+# Quest objective 1. Choirmother Selthe slain (1 required).
 # Return to [[Ondrel Vane (NPC)|Ondrel Vane]]. Select [[Drownstep Sabatons]] if shown among your reward choices. Click Complete Quest. The reward goes to your bags.
 
 
@@ -184832,7 +184838,7 @@ Numbers match the source sections above. Each location names its starting, objec
 * 1 · Quest reward · [[Silence the Choir]] · start · [[Ondrel Vane (NPC)|Ondrel Vane]] ([[Thornpeak Heights]]) / Quest reward · [[Silence the Choir]] · collect · [[Ondrel Vane (NPC)|Ondrel Vane]] ([[Thornpeak Heights]]) (-66, 786)
 &apos;&apos;&apos;[[The Drowned Temple]]&apos;&apos;&apos;
 &lt;div class=&quot;woc-map&quot; style=&quot;aspect-ratio:65/39.394&quot;&gt;&lt;span class=&quot;woc-pin&quot; title=&quot;1 · Quest reward · Silence the Choir · step 2 · Choirmother Selthe (0, 10)&quot; style=&quot;left:50%;top:50%&quot;&gt;1&lt;/span&gt;&lt;/div&gt;
-* 1 · Quest reward · [[Silence the Choir]] · step 2 · [[Choirmother Selthe (Mob)|Choirmother Selthe]] (0, 10)
+* 1 · Quest reward · [[Silence the Choir]] · step 2 · Choirmother Selthe (0, 10)
 &apos;&apos;&apos;[[Eastbrook Vale]]&apos;&apos;&apos;
 &lt;div class=&quot;woc-map&quot; data-zone=&quot;eastbrook_vale&quot; style=&quot;aspect-ratio:360/360;background-size:100% 100%;background-position:0% 0%&quot;&gt;&lt;span class=&quot;woc-landmark&quot; title=&quot;Eastbrook · settlement reference&quot; style=&quot;left:53.889%;top:77.778%&quot;&gt;Eastbrook&lt;/span&gt;&lt;span class=&quot;woc-pin&quot; title=&quot;2/3/4 · Rotating world-quest equipment · start · Taskmaster Kaelen · Show me the world quest board (-2.8, -96)&quot; style=&quot;left:50.778%;top:76.667%&quot;&gt;2/3/4&lt;/span&gt;&lt;/div&gt;
 * 2/3/4 · Rotating world-quest equipment · start · [[Taskmaster Kaelen (NPC)|Taskmaster Kaelen]] · Show me the world quest board (-2.8, -96)
@@ -184867,7 +184873,7 @@ Numbers match the source sections above. Each location names its starting, objec
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="4285">&lt;woc-art path=&quot;/ui/items/drownstep_slippers.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="4227">&lt;woc-art path=&quot;/ui/items/drownstep_slippers.webp&quot; /&gt;
 == Overview ==
 Drownstep Slippers is a rare-quality armor.
 
@@ -184913,7 +184919,7 @@ First complete [[The Drowned Choir]].
 Choose one copy from the reward cards. It is offered to [[Mage]], [[Priest]], [[Warlock]], [[Druid]]. Selecting another reward gives no copy of this item.
 
 # Speak to [[Ondrel Vane (NPC)|Ondrel Vane]], select [[Silence the Choir]] and click Accept.
-# Quest objective 1. [[Choirmother Selthe (Mob)|Choirmother Selthe]] slain (1 required).
+# Quest objective 1. Choirmother Selthe slain (1 required).
 # Return to [[Ondrel Vane (NPC)|Ondrel Vane]]. Select [[Drownstep Slippers]] if shown among your reward choices. Click Complete Quest. The reward goes to your bags.
 
 
@@ -184931,7 +184937,7 @@ Numbers match the source sections above. Each location names its starting, objec
 * 1 · Quest reward · [[Silence the Choir]] · start · [[Ondrel Vane (NPC)|Ondrel Vane]] ([[Thornpeak Heights]]) / Quest reward · [[Silence the Choir]] · collect · [[Ondrel Vane (NPC)|Ondrel Vane]] ([[Thornpeak Heights]]) (-66, 786)
 &apos;&apos;&apos;[[The Drowned Temple]]&apos;&apos;&apos;
 &lt;div class=&quot;woc-map&quot; style=&quot;aspect-ratio:65/39.394&quot;&gt;&lt;span class=&quot;woc-pin&quot; title=&quot;1 · Quest reward · Silence the Choir · step 2 · Choirmother Selthe (0, 10)&quot; style=&quot;left:50%;top:50%&quot;&gt;1&lt;/span&gt;&lt;/div&gt;
-* 1 · Quest reward · [[Silence the Choir]] · step 2 · [[Choirmother Selthe (Mob)|Choirmother Selthe]] (0, 10)
+* 1 · Quest reward · [[Silence the Choir]] · step 2 · Choirmother Selthe (0, 10)
 &apos;&apos;&apos;[[Eastbrook Vale]]&apos;&apos;&apos;
 &lt;div class=&quot;woc-map&quot; data-zone=&quot;eastbrook_vale&quot; style=&quot;aspect-ratio:360/360;background-size:100% 100%;background-position:0% 0%&quot;&gt;&lt;span class=&quot;woc-landmark&quot; title=&quot;Eastbrook · settlement reference&quot; style=&quot;left:53.889%;top:77.778%&quot;&gt;Eastbrook&lt;/span&gt;&lt;span class=&quot;woc-pin&quot; title=&quot;2 · Rotating world-quest equipment · start · Taskmaster Kaelen · Show me the world quest board (-2.8, -96)&quot; style=&quot;left:50.778%;top:76.667%&quot;&gt;2&lt;/span&gt;&lt;/div&gt;
 * 2 · Rotating world-quest equipment · start · [[Taskmaster Kaelen (NPC)|Taskmaster Kaelen]] · Show me the world quest board (-2.8, -96)
@@ -184965,7 +184971,7 @@ Numbers match the source sections above. Each location names its starting, objec
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="5143">&lt;woc-art path=&quot;/ui/items/drownstep_treads.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="5085">&lt;woc-art path=&quot;/ui/items/drownstep_treads.webp&quot; /&gt;
 == Overview ==
 Drownstep Treads is a rare-quality armor.
 
@@ -185011,7 +185017,7 @@ First complete [[The Drowned Choir]].
 Choose one copy from the reward cards. It is offered to [[Rogue]], [[Hunter]]. Selecting another reward gives no copy of this item.
 
 # Speak to [[Ondrel Vane (NPC)|Ondrel Vane]], select [[Silence the Choir]] and click Accept.
-# Quest objective 1. [[Choirmother Selthe (Mob)|Choirmother Selthe]] slain (1 required).
+# Quest objective 1. Choirmother Selthe slain (1 required).
 # Return to [[Ondrel Vane (NPC)|Ondrel Vane]]. Select [[Drownstep Treads]] if shown among your reward choices. Click Complete Quest. The reward goes to your bags.
 
 
@@ -185037,7 +185043,7 @@ Numbers match the source sections above. Each location names its starting, objec
 * 1 · Quest reward · [[Silence the Choir]] · start · [[Ondrel Vane (NPC)|Ondrel Vane]] ([[Thornpeak Heights]]) / Quest reward · [[Silence the Choir]] · collect · [[Ondrel Vane (NPC)|Ondrel Vane]] ([[Thornpeak Heights]]) (-66, 786)
 &apos;&apos;&apos;[[The Drowned Temple]]&apos;&apos;&apos;
 &lt;div class=&quot;woc-map&quot; style=&quot;aspect-ratio:65/39.394&quot;&gt;&lt;span class=&quot;woc-pin&quot; title=&quot;1 · Quest reward · Silence the Choir · step 2 · Choirmother Selthe (0, 10)&quot; style=&quot;left:50%;top:50%&quot;&gt;1&lt;/span&gt;&lt;/div&gt;
-* 1 · Quest reward · [[Silence the Choir]] · step 2 · [[Choirmother Selthe (Mob)|Choirmother Selthe]] (0, 10)
+* 1 · Quest reward · [[Silence the Choir]] · step 2 · Choirmother Selthe (0, 10)
 &apos;&apos;&apos;[[Eastbrook Vale]]&apos;&apos;&apos;
 &lt;div class=&quot;woc-map&quot; data-zone=&quot;eastbrook_vale&quot; style=&quot;aspect-ratio:360/360;background-size:100% 100%;background-position:0% 0%&quot;&gt;&lt;span class=&quot;woc-landmark&quot; title=&quot;Eastbrook · settlement reference&quot; style=&quot;left:53.889%;top:77.778%&quot;&gt;Eastbrook&lt;/span&gt;&lt;span class=&quot;woc-pin&quot; title=&quot;2/3 · Rotating world-quest equipment · start · Taskmaster Kaelen · Show me the world quest board (-2.8, -96)&quot; style=&quot;left:50.778%;top:76.667%&quot;&gt;2/3&lt;/span&gt;&lt;/div&gt;
 * 2/3 · Rotating world-quest equipment · start · [[Taskmaster Kaelen (NPC)|Taskmaster Kaelen]] · Show me the world quest board (-2.8, -96)
@@ -185071,7 +185077,7 @@ Numbers match the source sections above. Each location names its starting, objec
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="4440">&lt;woc-art path=&quot;/ui/items/drownedmoon_maul.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="4350">&lt;woc-art path=&quot;/ui/items/drownedmoon_maul.webp&quot; /&gt;
 == Overview ==
 Drowned Moon Maul is a rare-quality weapon.
 
@@ -185120,7 +185126,7 @@ First complete [[Silence the Choir]].
 Choose one copy from the reward cards. It is offered to [[Warrior]], [[Paladin]], [[Shaman]]. Selecting another reward gives no copy of this item.
 
 # Speak to [[Ondrel Vane (NPC)|Ondrel Vane]], select [[The Drowned Moon]] and click Accept.
-# Quest objective 1. [[Ysolei, Avatar of the Drowned Moon (Mob)|Ysolei, Avatar of the Drowned Moon]], slain (1 required).
+# Quest objective 1. Ysolei, Avatar of the Drowned Moon, slain (1 required).
 # Return to [[Ondrel Vane (NPC)|Ondrel Vane]]. Select [[Drowned Moon Maul]] if shown among your reward choices. Click Complete Quest. The reward goes to your bags.
 
 
@@ -185138,7 +185144,7 @@ Numbers match the source sections above. Each location names its starting, objec
 * 1 · Quest reward · [[The Drowned Moon]] · start · [[Ondrel Vane (NPC)|Ondrel Vane]] ([[Thornpeak Heights]]) / Quest reward · [[The Drowned Moon]] · collect · [[Ondrel Vane (NPC)|Ondrel Vane]] ([[Thornpeak Heights]]) (-66, 786)
 &apos;&apos;&apos;[[The Drowned Temple]]&apos;&apos;&apos;
 &lt;div class=&quot;woc-map&quot; style=&quot;aspect-ratio:65/39.394&quot;&gt;&lt;span class=&quot;woc-pin&quot; title=&quot;1 · Quest reward · The Drowned Moon · step 2 · Ysolei, Avatar of the Drowned Moon (-26.4, 206)&quot; style=&quot;left:50%;top:50%&quot;&gt;1&lt;/span&gt;&lt;/div&gt;
-* 1 · Quest reward · [[The Drowned Moon]] · step 2 · [[Ysolei, Avatar of the Drowned Moon (Mob)|Ysolei, Avatar of the Drowned Moon]] (-26.4, 206)
+* 1 · Quest reward · [[The Drowned Moon]] · step 2 · Ysolei, Avatar of the Drowned Moon (-26.4, 206)
 &apos;&apos;&apos;[[Eastbrook Vale]]&apos;&apos;&apos;
 &lt;div class=&quot;woc-map&quot; data-zone=&quot;eastbrook_vale&quot; style=&quot;aspect-ratio:360/360;background-size:100% 100%;background-position:0% 0%&quot;&gt;&lt;span class=&quot;woc-landmark&quot; title=&quot;Eastbrook · settlement reference&quot; style=&quot;left:53.889%;top:77.778%&quot;&gt;Eastbrook&lt;/span&gt;&lt;span class=&quot;woc-pin&quot; title=&quot;2 · Rotating world-quest equipment · start · Taskmaster Kaelen · Show me the world quest board (-2.8, -96)&quot; style=&quot;left:50.778%;top:76.667%&quot;&gt;2&lt;/span&gt;&lt;/div&gt;
 * 2 · Rotating world-quest equipment · start · [[Taskmaster Kaelen (NPC)|Taskmaster Kaelen]] · Show me the world quest board (-2.8, -96)
@@ -185172,7 +185178,7 @@ Numbers match the source sections above. Each location names its starting, objec
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="5320">&lt;woc-art path=&quot;/ui/items/drownedmoon_scepter.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="5230">&lt;woc-art path=&quot;/ui/items/drownedmoon_scepter.webp&quot; /&gt;
 == Overview ==
 Drowned Moon Scepter is a rare-quality weapon.
 
@@ -185221,7 +185227,7 @@ First complete [[Silence the Choir]].
 Choose one copy from the reward cards. It is offered to [[Mage]], [[Priest]], [[Warlock]], [[Druid]]. Selecting another reward gives no copy of this item.
 
 # Speak to [[Ondrel Vane (NPC)|Ondrel Vane]], select [[The Drowned Moon]] and click Accept.
-# Quest objective 1. [[Ysolei, Avatar of the Drowned Moon (Mob)|Ysolei, Avatar of the Drowned Moon]], slain (1 required).
+# Quest objective 1. Ysolei, Avatar of the Drowned Moon, slain (1 required).
 # Return to [[Ondrel Vane (NPC)|Ondrel Vane]]. Select [[Drowned Moon Scepter]] if shown among your reward choices. Click Complete Quest. The reward goes to your bags.
 
 
@@ -185247,7 +185253,7 @@ Numbers match the source sections above. Each location names its starting, objec
 * 1 · Quest reward · [[The Drowned Moon]] · start · [[Ondrel Vane (NPC)|Ondrel Vane]] ([[Thornpeak Heights]]) / Quest reward · [[The Drowned Moon]] · collect · [[Ondrel Vane (NPC)|Ondrel Vane]] ([[Thornpeak Heights]]) (-66, 786)
 &apos;&apos;&apos;[[The Drowned Temple]]&apos;&apos;&apos;
 &lt;div class=&quot;woc-map&quot; style=&quot;aspect-ratio:65/39.394&quot;&gt;&lt;span class=&quot;woc-pin&quot; title=&quot;1 · Quest reward · The Drowned Moon · step 2 · Ysolei, Avatar of the Drowned Moon (-26.4, 206)&quot; style=&quot;left:50%;top:50%&quot;&gt;1&lt;/span&gt;&lt;/div&gt;
-* 1 · Quest reward · [[The Drowned Moon]] · step 2 · [[Ysolei, Avatar of the Drowned Moon (Mob)|Ysolei, Avatar of the Drowned Moon]] (-26.4, 206)
+* 1 · Quest reward · [[The Drowned Moon]] · step 2 · Ysolei, Avatar of the Drowned Moon (-26.4, 206)
 &apos;&apos;&apos;[[Eastbrook Vale]]&apos;&apos;&apos;
 &lt;div class=&quot;woc-map&quot; data-zone=&quot;eastbrook_vale&quot; style=&quot;aspect-ratio:360/360;background-size:100% 100%;background-position:0% 0%&quot;&gt;&lt;span class=&quot;woc-landmark&quot; title=&quot;Eastbrook · settlement reference&quot; style=&quot;left:53.889%;top:77.778%&quot;&gt;Eastbrook&lt;/span&gt;&lt;span class=&quot;woc-pin&quot; title=&quot;2/3 · Rotating world-quest equipment · start · Taskmaster Kaelen · Show me the world quest board (-2.8, -96)&quot; style=&quot;left:50.778%;top:76.667%&quot;&gt;2/3&lt;/span&gt;&lt;/div&gt;
 * 2/3 · Rotating world-quest equipment · start · [[Taskmaster Kaelen (NPC)|Taskmaster Kaelen]] · Show me the world quest board (-2.8, -96)
@@ -185283,7 +185289,7 @@ Numbers match the source sections above. Each location names its starting, objec
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="5252">&lt;woc-art path=&quot;/ui/items/drownedmoon_kris.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="5162">&lt;woc-art path=&quot;/ui/items/drownedmoon_kris.webp&quot; /&gt;
 == Overview ==
 Drowned Moon Kris is a rare-quality weapon.
 
@@ -185332,7 +185338,7 @@ First complete [[Silence the Choir]].
 Choose one copy from the reward cards. It is offered to [[Rogue]], [[Hunter]]. Selecting another reward gives no copy of this item.
 
 # Speak to [[Ondrel Vane (NPC)|Ondrel Vane]], select [[The Drowned Moon]] and click Accept.
-# Quest objective 1. [[Ysolei, Avatar of the Drowned Moon (Mob)|Ysolei, Avatar of the Drowned Moon]], slain (1 required).
+# Quest objective 1. Ysolei, Avatar of the Drowned Moon, slain (1 required).
 # Return to [[Ondrel Vane (NPC)|Ondrel Vane]]. Select [[Drowned Moon Kris]] if shown among your reward choices. Click Complete Quest. The reward goes to your bags.
 
 
@@ -185358,7 +185364,7 @@ Numbers match the source sections above. Each location names its starting, objec
 * 1 · Quest reward · [[The Drowned Moon]] · start · [[Ondrel Vane (NPC)|Ondrel Vane]] ([[Thornpeak Heights]]) / Quest reward · [[The Drowned Moon]] · collect · [[Ondrel Vane (NPC)|Ondrel Vane]] ([[Thornpeak Heights]]) (-66, 786)
 &apos;&apos;&apos;[[The Drowned Temple]]&apos;&apos;&apos;
 &lt;div class=&quot;woc-map&quot; style=&quot;aspect-ratio:65/39.394&quot;&gt;&lt;span class=&quot;woc-pin&quot; title=&quot;1 · Quest reward · The Drowned Moon · step 2 · Ysolei, Avatar of the Drowned Moon (-26.4, 206)&quot; style=&quot;left:50%;top:50%&quot;&gt;1&lt;/span&gt;&lt;/div&gt;
-* 1 · Quest reward · [[The Drowned Moon]] · step 2 · [[Ysolei, Avatar of the Drowned Moon (Mob)|Ysolei, Avatar of the Drowned Moon]] (-26.4, 206)
+* 1 · Quest reward · [[The Drowned Moon]] · step 2 · Ysolei, Avatar of the Drowned Moon (-26.4, 206)
 &apos;&apos;&apos;[[Eastbrook Vale]]&apos;&apos;&apos;
 &lt;div class=&quot;woc-map&quot; data-zone=&quot;eastbrook_vale&quot; style=&quot;aspect-ratio:360/360;background-size:100% 100%;background-position:0% 0%&quot;&gt;&lt;span class=&quot;woc-landmark&quot; title=&quot;Eastbrook · settlement reference&quot; style=&quot;left:53.889%;top:77.778%&quot;&gt;Eastbrook&lt;/span&gt;&lt;span class=&quot;woc-pin&quot; title=&quot;2/3 · Rotating world-quest equipment · start · Taskmaster Kaelen · Show me the world quest board (-2.8, -96)&quot; style=&quot;left:50.778%;top:76.667%&quot;&gt;2/3&lt;/span&gt;&lt;/div&gt;
 * 2/3 · Rotating world-quest equipment · start · [[Taskmaster Kaelen (NPC)|Taskmaster Kaelen]] · Show me the world quest board (-2.8, -96)
@@ -193288,7 +193294,7 @@ Numbers match the source sections above. Each location names its starting, objec
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="6791">&lt;woc-art path=&quot;/ui/items/reins_wobbles_slime.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="6723">&lt;woc-art path=&quot;/ui/items/reins_wobbles_slime.webp&quot; /&gt;
 == Overview ==
 Jelly Saddle: Wobbles is an epic-quality mount.
 
@@ -193327,10 +193333,10 @@ Numbers match the source sections above. Each location names its starting, objec
 * 1 · Referral card stamp 5 · step 3 · Referral [[Ferryman Odo (NPC)|Ferryman Odo]] · Stamp 1 · turn in [[Set Sail]] here (-284, -9)
 &apos;&apos;&apos;[[Eastbrook Vale]]&apos;&apos;&apos;
 &lt;div class=&quot;woc-map&quot; data-zone=&quot;eastbrook_vale&quot; style=&quot;aspect-ratio:360/360;background-size:100% 100%;background-position:0% 0%&quot;&gt;&lt;span class=&quot;woc-landmark&quot; title=&quot;Eastbrook · settlement reference&quot; style=&quot;left:53.889%;top:77.778%&quot;&gt;Eastbrook&lt;/span&gt;&lt;span class=&quot;woc-pin&quot; title=&quot;1 · Referral card stamp 5 · step 3 · Referral Enter The Hollow Crypt for Morthen the Gravecaller (80, 90)&quot; style=&quot;left:27.778%;top:25%&quot;&gt;1&lt;/span&gt;&lt;/div&gt;
-* 1 · Referral card stamp 5 · step 3 · Referral Enter [[The Hollow Crypt]] for [[Morthen the Gravecaller (Mob)|Morthen the Gravecaller]] (80, 90)
+* 1 · Referral card stamp 5 · step 3 · Referral Enter [[The Hollow Crypt]] for Morthen the Gravecaller (80, 90)
 &apos;&apos;&apos;[[The Hollow Crypt]]&apos;&apos;&apos;
 &lt;div class=&quot;woc-map&quot; style=&quot;aspect-ratio:65/39.394&quot;&gt;&lt;span class=&quot;woc-pin&quot; title=&quot;1 · Referral card stamp 5 · step 3 · Referral Morthen the Gravecaller (0, 212)&quot; style=&quot;left:50%;top:50%&quot;&gt;1&lt;/span&gt;&lt;/div&gt;
-* 1 · Referral card stamp 5 · step 3 · Referral [[Morthen the Gravecaller (Mob)|Morthen the Gravecaller]] (0, 212)
+* 1 · Referral card stamp 5 · step 3 · Referral Morthen the Gravecaller (0, 212)
 &apos;&apos;&apos;[[Mirefen Marsh]]&apos;&apos;&apos;
 &lt;div class=&quot;woc-map&quot; data-zone=&quot;mirefen_marsh&quot; style=&quot;aspect-ratio:360/360;background-size:100% 100%;background-position:0% 0%&quot;&gt;&lt;span class=&quot;woc-landmark&quot; title=&quot;Fenbridge · settlement reference&quot; style=&quot;left:50%;top:66.667%&quot;&gt;Fenbridge&lt;/span&gt;&lt;span class=&quot;woc-pin&quot; title=&quot;1 · Referral card stamp 5 · step 3 · Referral Enter The Sunken Bastion for Vael the Fogbinder (45, 515)&quot; style=&quot;left:37.5%;top:6.944%&quot;&gt;1&lt;/span&gt;&lt;/div&gt;
 * 1 · Referral card stamp 5 · step 3 · Referral Enter [[The Sunken Bastion]] for Vael the Fogbinder (45, 515)
@@ -193580,7 +193586,7 @@ Numbers match the source sections above. Each location names its starting, objec
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="5296">&lt;woc-art path=&quot;/ui/items/referral_fog_charm.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="5228">&lt;woc-art path=&quot;/ui/items/referral_fog_charm.webp&quot; /&gt;
 == Overview ==
 Awakened Oathkeeper&apos;s Heart is a rare-quality armor.
 
@@ -193631,10 +193637,10 @@ Numbers match the source sections above. Each location names its starting, objec
 * 1 · Referral card stamp 3 · step 3 · Referral [[Ferryman Odo (NPC)|Ferryman Odo]] · Stamp 1 · turn in [[Set Sail]] here (-284, -9)
 &apos;&apos;&apos;[[Eastbrook Vale]]&apos;&apos;&apos;
 &lt;div class=&quot;woc-map&quot; data-zone=&quot;eastbrook_vale&quot; style=&quot;aspect-ratio:360/360;background-size:100% 100%;background-position:0% 0%&quot;&gt;&lt;span class=&quot;woc-landmark&quot; title=&quot;Eastbrook · settlement reference&quot; style=&quot;left:53.889%;top:77.778%&quot;&gt;Eastbrook&lt;/span&gt;&lt;span class=&quot;woc-pin&quot; title=&quot;1 · Referral card stamp 3 · step 3 · Referral Enter The Hollow Crypt for Morthen the Gravecaller (80, 90)&quot; style=&quot;left:27.778%;top:25%&quot;&gt;1&lt;/span&gt;&lt;/div&gt;
-* 1 · Referral card stamp 3 · step 3 · Referral Enter [[The Hollow Crypt]] for [[Morthen the Gravecaller (Mob)|Morthen the Gravecaller]] (80, 90)
+* 1 · Referral card stamp 3 · step 3 · Referral Enter [[The Hollow Crypt]] for Morthen the Gravecaller (80, 90)
 &apos;&apos;&apos;[[The Hollow Crypt]]&apos;&apos;&apos;
 &lt;div class=&quot;woc-map&quot; style=&quot;aspect-ratio:65/39.394&quot;&gt;&lt;span class=&quot;woc-pin&quot; title=&quot;1 · Referral card stamp 3 · step 3 · Referral Morthen the Gravecaller (0, 212)&quot; style=&quot;left:50%;top:50%&quot;&gt;1&lt;/span&gt;&lt;/div&gt;
-* 1 · Referral card stamp 3 · step 3 · Referral [[Morthen the Gravecaller (Mob)|Morthen the Gravecaller]] (0, 212)
+* 1 · Referral card stamp 3 · step 3 · Referral Morthen the Gravecaller (0, 212)
 &apos;&apos;&apos;[[Mirefen Marsh]]&apos;&apos;&apos;
 &lt;div class=&quot;woc-map&quot; data-zone=&quot;mirefen_marsh&quot; style=&quot;aspect-ratio:360/360;background-size:100% 100%;background-position:0% 0%&quot;&gt;&lt;span class=&quot;woc-landmark&quot; title=&quot;Fenbridge · settlement reference&quot; style=&quot;left:50%;top:66.667%&quot;&gt;Fenbridge&lt;/span&gt;&lt;span class=&quot;woc-pin&quot; title=&quot;1 · Referral card stamp 3 · step 3 · Referral Enter The Sunken Bastion for Vael the Fogbinder (45, 515)&quot; style=&quot;left:37.5%;top:6.944%&quot;&gt;1&lt;/span&gt;&lt;/div&gt;
 * 1 · Referral card stamp 3 · step 3 · Referral Enter [[The Sunken Bastion]] for [[Vael the Fogbinder (Mob)|Vael the Fogbinder]] (45, 515)
@@ -317693,7 +317699,7 @@ Numbers match the source sections above. Each location names its starting, objec
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2873">&lt;woc-art path=&quot;/ui/items/cryptbound_tunic.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="2805">&lt;woc-art path=&quot;/ui/items/cryptbound_tunic.webp&quot; /&gt;
 == Overview ==
 Cryptbound Tunic is a rare-quality armor.
 
@@ -317737,7 +317743,7 @@ First complete [[The Binding Rite]].
 Choose one copy from the reward cards. It is offered to [[Warrior]], [[Rogue]], [[Paladin]], [[Hunter]], [[Shaman]], [[Druid]]. Selecting another reward gives no copy of this item.
 
 # Speak to [[Brother Aldric (NPC)|Brother Aldric]], select [[Into the Hollow]] and click Accept.
-# Quest objective 1. [[Morthen the Gravecaller (Mob)|Morthen the Gravecaller]] slain (1 required).
+# Quest objective 1. Morthen the Gravecaller slain (1 required).
 # Return to [[Brother Aldric (NPC)|Brother Aldric]]. Select [[Cryptbound Tunic]] if shown among your reward choices. Click Complete Quest. The reward goes to your bags.
 
 == Acquisition map ==
@@ -317747,7 +317753,7 @@ Numbers match the source sections above. Each location names its starting, objec
 * 1 · Quest reward · [[Into the Hollow]] · start · [[Brother Aldric (NPC)|Brother Aldric]] ([[Eastbrook Vale]]) / Quest reward · [[Into the Hollow]] · collect · [[Brother Aldric (NPC)|Brother Aldric]] ([[Eastbrook Vale]]) (15.012, -110.385)
 &apos;&apos;&apos;[[The Hollow Crypt]]&apos;&apos;&apos;
 &lt;div class=&quot;woc-map&quot; style=&quot;aspect-ratio:65/39.394&quot;&gt;&lt;span class=&quot;woc-pin&quot; title=&quot;1 · Quest reward · Into the Hollow · step 2 · Morthen the Gravecaller (0, 212)&quot; style=&quot;left:50%;top:50%&quot;&gt;1&lt;/span&gt;&lt;/div&gt;
-* 1 · Quest reward · [[Into the Hollow]] · step 2 · [[Morthen the Gravecaller (Mob)|Morthen the Gravecaller]] (0, 212)
+* 1 · Quest reward · [[Into the Hollow]] · step 2 · Morthen the Gravecaller (0, 212)
 
 == Equipment and use ==
 * 73 Armor
@@ -317777,7 +317783,7 @@ Numbers match the source sections above. Each location names its starting, objec
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2815">&lt;woc-art path=&quot;/ui/items/cryptbound_chainmail.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="2747">&lt;woc-art path=&quot;/ui/items/cryptbound_chainmail.webp&quot; /&gt;
 == Overview ==
 Cryptbound Chainmail is a rare-quality armor.
 
@@ -317821,7 +317827,7 @@ First complete [[The Binding Rite]].
 Choose one copy from the reward cards. It is offered to [[Warrior]], [[Paladin]], [[Shaman]]. Selecting another reward gives no copy of this item.
 
 # Speak to [[Brother Aldric (NPC)|Brother Aldric]], select [[Into the Hollow]] and click Accept.
-# Quest objective 1. [[Morthen the Gravecaller (Mob)|Morthen the Gravecaller]] slain (1 required).
+# Quest objective 1. Morthen the Gravecaller slain (1 required).
 # Return to [[Brother Aldric (NPC)|Brother Aldric]]. Select [[Cryptbound Chainmail]] if shown among your reward choices. Click Complete Quest. The reward goes to your bags.
 
 == Acquisition map ==
@@ -317831,7 +317837,7 @@ Numbers match the source sections above. Each location names its starting, objec
 * 1 · Quest reward · [[Into the Hollow]] · start · [[Brother Aldric (NPC)|Brother Aldric]] ([[Eastbrook Vale]]) / Quest reward · [[Into the Hollow]] · collect · [[Brother Aldric (NPC)|Brother Aldric]] ([[Eastbrook Vale]]) (15.012, -110.385)
 &apos;&apos;&apos;[[The Hollow Crypt]]&apos;&apos;&apos;
 &lt;div class=&quot;woc-map&quot; style=&quot;aspect-ratio:65/39.394&quot;&gt;&lt;span class=&quot;woc-pin&quot; title=&quot;1 · Quest reward · Into the Hollow · step 2 · Morthen the Gravecaller (0, 212)&quot; style=&quot;left:50%;top:50%&quot;&gt;1&lt;/span&gt;&lt;/div&gt;
-* 1 · Quest reward · [[Into the Hollow]] · step 2 · [[Morthen the Gravecaller (Mob)|Morthen the Gravecaller]] (0, 212)
+* 1 · Quest reward · [[Into the Hollow]] · step 2 · Morthen the Gravecaller (0, 212)
 
 == Equipment and use ==
 * 110 Armor
@@ -317861,7 +317867,7 @@ Numbers match the source sections above. Each location names its starting, objec
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2884">&lt;woc-art path=&quot;/ui/items/oathbroken_leggings.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="2820">&lt;woc-art path=&quot;/ui/items/oathbroken_leggings.webp&quot; /&gt;
 == Overview ==
 Oathbroken Leggings is a rare-quality armor.
 
@@ -317905,7 +317911,7 @@ First complete [[The Sunken Bastion (2)|The Sunken Bastion]].
 Choose one copy from the reward cards. It is offered to every class. Selecting another reward gives no copy of this item.
 
 # Speak to [[Scout Maren (NPC)|Scout Maren]], select [[The Knight-Commander&apos;s Shame]] and click Accept.
-# Quest objective 1. [[Knight-Commander Olen (Mob)|Knight-Commander Olen]] laid to rest (1 required).
+# Quest objective 1. Knight-Commander Olen laid to rest (1 required).
 # Return to [[Scout Maren (NPC)|Scout Maren]]. Select [[Oathbroken Leggings]] if shown among your reward choices. Click Complete Quest. The reward goes to your bags.
 
 == Acquisition map ==
@@ -317915,7 +317921,7 @@ Numbers match the source sections above. Each location names its starting, objec
 * 1 · Quest reward · [[The Knight-Commander&apos;s Shame]] · start · [[Scout Maren (NPC)|Scout Maren]] ([[Mirefen Marsh]]) / Quest reward · [[The Knight-Commander&apos;s Shame]] · collect · [[Scout Maren (NPC)|Scout Maren]] ([[Mirefen Marsh]]) (6.911, 288.074)
 &apos;&apos;&apos;[[The Sunken Bastion (2)|The Sunken Bastion]]&apos;&apos;&apos;
 &lt;div class=&quot;woc-map&quot; style=&quot;aspect-ratio:65/39.394&quot;&gt;&lt;span class=&quot;woc-pin&quot; title=&quot;1 · Quest reward · The Knight-Commander&apos;s Shame · step 2 · Knight-Commander Olen (57, 128)&quot; style=&quot;left:50%;top:50%&quot;&gt;1&lt;/span&gt;&lt;/div&gt;
-* 1 · Quest reward · [[The Knight-Commander&apos;s Shame]] · step 2 · [[Knight-Commander Olen (Mob)|Knight-Commander Olen]] (57, 128)
+* 1 · Quest reward · [[The Knight-Commander&apos;s Shame]] · step 2 · Knight-Commander Olen (57, 128)
 
 == Equipment and use ==
 * 47 Armor
@@ -317945,7 +317951,7 @@ Numbers match the source sections above. Each location names its starting, objec
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2990">&lt;woc-art path=&quot;/ui/items/oathbroken_breeches.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="2926">&lt;woc-art path=&quot;/ui/items/oathbroken_breeches.webp&quot; /&gt;
 == Overview ==
 Oathbroken Breeches is a rare-quality armor.
 
@@ -317989,7 +317995,7 @@ First complete [[The Sunken Bastion (2)|The Sunken Bastion]].
 Choose one copy from the reward cards. It is offered to [[Warrior]], [[Rogue]], [[Paladin]], [[Hunter]], [[Shaman]], [[Druid]]. Selecting another reward gives no copy of this item.
 
 # Speak to [[Scout Maren (NPC)|Scout Maren]], select [[The Knight-Commander&apos;s Shame]] and click Accept.
-# Quest objective 1. [[Knight-Commander Olen (Mob)|Knight-Commander Olen]] laid to rest (1 required).
+# Quest objective 1. Knight-Commander Olen laid to rest (1 required).
 # Return to [[Scout Maren (NPC)|Scout Maren]]. Select [[Oathbroken Breeches]] if shown among your reward choices. Click Complete Quest. The reward goes to your bags.
 
 == Acquisition map ==
@@ -317999,7 +318005,7 @@ Numbers match the source sections above. Each location names its starting, objec
 * 1 · Quest reward · [[The Knight-Commander&apos;s Shame]] · start · [[Scout Maren (NPC)|Scout Maren]] ([[Mirefen Marsh]]) / Quest reward · [[The Knight-Commander&apos;s Shame]] · collect · [[Scout Maren (NPC)|Scout Maren]] ([[Mirefen Marsh]]) (6.911, 288.074)
 &apos;&apos;&apos;[[The Sunken Bastion (2)|The Sunken Bastion]]&apos;&apos;&apos;
 &lt;div class=&quot;woc-map&quot; style=&quot;aspect-ratio:65/39.394&quot;&gt;&lt;span class=&quot;woc-pin&quot; title=&quot;1 · Quest reward · The Knight-Commander&apos;s Shame · step 2 · Knight-Commander Olen (57, 128)&quot; style=&quot;left:50%;top:50%&quot;&gt;1&lt;/span&gt;&lt;/div&gt;
-* 1 · Quest reward · [[The Knight-Commander&apos;s Shame]] · step 2 · [[Knight-Commander Olen (Mob)|Knight-Commander Olen]] (57, 128)
+* 1 · Quest reward · [[The Knight-Commander&apos;s Shame]] · step 2 · Knight-Commander Olen (57, 128)
 
 == Equipment and use ==
 * 81 Armor
@@ -318028,7 +318034,7 @@ Numbers match the source sections above. Each location names its starting, objec
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3004">&lt;woc-art path=&quot;/ui/items/oathbroken_legwraps.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="2940">&lt;woc-art path=&quot;/ui/items/oathbroken_legwraps.webp&quot; /&gt;
 == Overview ==
 Oathbroken Legwraps is a rare-quality armor.
 
@@ -318072,7 +318078,7 @@ First complete [[The Sunken Bastion (2)|The Sunken Bastion]].
 Choose one copy from the reward cards. It is offered to [[Warrior]], [[Rogue]], [[Paladin]], [[Hunter]], [[Shaman]], [[Druid]]. Selecting another reward gives no copy of this item.
 
 # Speak to [[Scout Maren (NPC)|Scout Maren]], select [[The Knight-Commander&apos;s Shame]] and click Accept.
-# Quest objective 1. [[Knight-Commander Olen (Mob)|Knight-Commander Olen]] laid to rest (1 required).
+# Quest objective 1. Knight-Commander Olen laid to rest (1 required).
 # Return to [[Scout Maren (NPC)|Scout Maren]]. Select [[Oathbroken Legwraps]] if shown among your reward choices. Click Complete Quest. The reward goes to your bags.
 
 == Acquisition map ==
@@ -318082,7 +318088,7 @@ Numbers match the source sections above. Each location names its starting, objec
 * 1 · Quest reward · [[The Knight-Commander&apos;s Shame]] · start · [[Scout Maren (NPC)|Scout Maren]] ([[Mirefen Marsh]]) / Quest reward · [[The Knight-Commander&apos;s Shame]] · collect · [[Scout Maren (NPC)|Scout Maren]] ([[Mirefen Marsh]]) (6.911, 288.074)
 &apos;&apos;&apos;[[The Sunken Bastion (2)|The Sunken Bastion]]&apos;&apos;&apos;
 &lt;div class=&quot;woc-map&quot; style=&quot;aspect-ratio:65/39.394&quot;&gt;&lt;span class=&quot;woc-pin&quot; title=&quot;1 · Quest reward · The Knight-Commander&apos;s Shame · step 2 · Knight-Commander Olen (57, 128)&quot; style=&quot;left:50%;top:50%&quot;&gt;1&lt;/span&gt;&lt;/div&gt;
-* 1 · Quest reward · [[The Knight-Commander&apos;s Shame]] · step 2 · [[Knight-Commander Olen (Mob)|Knight-Commander Olen]] (57, 128)
+* 1 · Quest reward · [[The Knight-Commander&apos;s Shame]] · step 2 · Knight-Commander Olen (57, 128)
 
 == Equipment and use ==
 * 81 Armor
@@ -318112,7 +318118,7 @@ Numbers match the source sections above. Each location names its starting, objec
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2937">&lt;woc-art path=&quot;/ui/items/oathbroken_legguards.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="2873">&lt;woc-art path=&quot;/ui/items/oathbroken_legguards.webp&quot; /&gt;
 == Overview ==
 Oathbroken Legguards is a rare-quality armor.
 
@@ -318156,7 +318162,7 @@ First complete [[The Sunken Bastion (2)|The Sunken Bastion]].
 Choose one copy from the reward cards. It is offered to [[Warrior]], [[Paladin]], [[Shaman]]. Selecting another reward gives no copy of this item.
 
 # Speak to [[Scout Maren (NPC)|Scout Maren]], select [[The Knight-Commander&apos;s Shame]] and click Accept.
-# Quest objective 1. [[Knight-Commander Olen (Mob)|Knight-Commander Olen]] laid to rest (1 required).
+# Quest objective 1. Knight-Commander Olen laid to rest (1 required).
 # Return to [[Scout Maren (NPC)|Scout Maren]]. Select [[Oathbroken Legguards]] if shown among your reward choices. Click Complete Quest. The reward goes to your bags.
 
 == Acquisition map ==
@@ -318166,7 +318172,7 @@ Numbers match the source sections above. Each location names its starting, objec
 * 1 · Quest reward · [[The Knight-Commander&apos;s Shame]] · start · [[Scout Maren (NPC)|Scout Maren]] ([[Mirefen Marsh]]) / Quest reward · [[The Knight-Commander&apos;s Shame]] · collect · [[Scout Maren (NPC)|Scout Maren]] ([[Mirefen Marsh]]) (6.911, 288.074)
 &apos;&apos;&apos;[[The Sunken Bastion (2)|The Sunken Bastion]]&apos;&apos;&apos;
 &lt;div class=&quot;woc-map&quot; style=&quot;aspect-ratio:65/39.394&quot;&gt;&lt;span class=&quot;woc-pin&quot; title=&quot;1 · Quest reward · The Knight-Commander&apos;s Shame · step 2 · Knight-Commander Olen (57, 128)&quot; style=&quot;left:50%;top:50%&quot;&gt;1&lt;/span&gt;&lt;/div&gt;
-* 1 · Quest reward · [[The Knight-Commander&apos;s Shame]] · step 2 · [[Knight-Commander Olen (Mob)|Knight-Commander Olen]] (57, 128)
+* 1 · Quest reward · [[The Knight-Commander&apos;s Shame]] · step 2 · Knight-Commander Olen (57, 128)
 
 == Equipment and use ==
 * 122 Armor
@@ -318196,7 +318202,7 @@ Numbers match the source sections above. Each location names its starting, objec
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2934">&lt;woc-art path=&quot;/ui/items/oathbroken_chausses.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="2870">&lt;woc-art path=&quot;/ui/items/oathbroken_chausses.webp&quot; /&gt;
 == Overview ==
 Oathbroken Chausses is a rare-quality armor.
 
@@ -318240,7 +318246,7 @@ First complete [[The Sunken Bastion (2)|The Sunken Bastion]].
 Choose one copy from the reward cards. It is offered to [[Warrior]], [[Paladin]], [[Shaman]]. Selecting another reward gives no copy of this item.
 
 # Speak to [[Scout Maren (NPC)|Scout Maren]], select [[The Knight-Commander&apos;s Shame]] and click Accept.
-# Quest objective 1. [[Knight-Commander Olen (Mob)|Knight-Commander Olen]] laid to rest (1 required).
+# Quest objective 1. Knight-Commander Olen laid to rest (1 required).
 # Return to [[Scout Maren (NPC)|Scout Maren]]. Select [[Oathbroken Chausses]] if shown among your reward choices. Click Complete Quest. The reward goes to your bags.
 
 == Acquisition map ==
@@ -318250,7 +318256,7 @@ Numbers match the source sections above. Each location names its starting, objec
 * 1 · Quest reward · [[The Knight-Commander&apos;s Shame]] · start · [[Scout Maren (NPC)|Scout Maren]] ([[Mirefen Marsh]]) / Quest reward · [[The Knight-Commander&apos;s Shame]] · collect · [[Scout Maren (NPC)|Scout Maren]] ([[Mirefen Marsh]]) (6.911, 288.074)
 &apos;&apos;&apos;[[The Sunken Bastion (2)|The Sunken Bastion]]&apos;&apos;&apos;
 &lt;div class=&quot;woc-map&quot; style=&quot;aspect-ratio:65/39.394&quot;&gt;&lt;span class=&quot;woc-pin&quot; title=&quot;1 · Quest reward · The Knight-Commander&apos;s Shame · step 2 · Knight-Commander Olen (57, 128)&quot; style=&quot;left:50%;top:50%&quot;&gt;1&lt;/span&gt;&lt;/div&gt;
-* 1 · Quest reward · [[The Knight-Commander&apos;s Shame]] · step 2 · [[Knight-Commander Olen (Mob)|Knight-Commander Olen]] (57, 128)
+* 1 · Quest reward · [[The Knight-Commander&apos;s Shame]] · step 2 · Knight-Commander Olen (57, 128)
 
 == Equipment and use ==
 * 122 Armor
@@ -318280,7 +318286,7 @@ Numbers match the source sections above. Each location names its starting, objec
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3004">&lt;woc-art path=&quot;/ui/items/oathbroken_trousers.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="2940">&lt;woc-art path=&quot;/ui/items/oathbroken_trousers.webp&quot; /&gt;
 == Overview ==
 Oathbroken Trousers is a rare-quality armor.
 
@@ -318324,7 +318330,7 @@ First complete [[The Sunken Bastion (2)|The Sunken Bastion]].
 Choose one copy from the reward cards. It is offered to [[Warrior]], [[Rogue]], [[Paladin]], [[Hunter]], [[Shaman]], [[Druid]]. Selecting another reward gives no copy of this item.
 
 # Speak to [[Scout Maren (NPC)|Scout Maren]], select [[The Knight-Commander&apos;s Shame]] and click Accept.
-# Quest objective 1. [[Knight-Commander Olen (Mob)|Knight-Commander Olen]] laid to rest (1 required).
+# Quest objective 1. Knight-Commander Olen laid to rest (1 required).
 # Return to [[Scout Maren (NPC)|Scout Maren]]. Select [[Oathbroken Trousers]] if shown among your reward choices. Click Complete Quest. The reward goes to your bags.
 
 == Acquisition map ==
@@ -318334,7 +318340,7 @@ Numbers match the source sections above. Each location names its starting, objec
 * 1 · Quest reward · [[The Knight-Commander&apos;s Shame]] · start · [[Scout Maren (NPC)|Scout Maren]] ([[Mirefen Marsh]]) / Quest reward · [[The Knight-Commander&apos;s Shame]] · collect · [[Scout Maren (NPC)|Scout Maren]] ([[Mirefen Marsh]]) (6.911, 288.074)
 &apos;&apos;&apos;[[The Sunken Bastion (2)|The Sunken Bastion]]&apos;&apos;&apos;
 &lt;div class=&quot;woc-map&quot; style=&quot;aspect-ratio:65/39.394&quot;&gt;&lt;span class=&quot;woc-pin&quot; title=&quot;1 · Quest reward · The Knight-Commander&apos;s Shame · step 2 · Knight-Commander Olen (57, 128)&quot; style=&quot;left:50%;top:50%&quot;&gt;1&lt;/span&gt;&lt;/div&gt;
-* 1 · Quest reward · [[The Knight-Commander&apos;s Shame]] · step 2 · [[Knight-Commander Olen (Mob)|Knight-Commander Olen]] (57, 128)
+* 1 · Quest reward · [[The Knight-Commander&apos;s Shame]] · step 2 · Knight-Commander Olen (57, 128)
 
 == Equipment and use ==
 * 81 Armor
@@ -319175,7 +319181,7 @@ Numbers match the source sections above. Each location names its starting, objec
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2836">&lt;woc-art path=&quot;/ui/items/stillhymn_treads.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="2778">&lt;woc-art path=&quot;/ui/items/stillhymn_treads.webp&quot; /&gt;
 == Overview ==
 Stillhymn Treads is a rare-quality armor.
 
@@ -319219,7 +319225,7 @@ First complete [[The Drowned Choir]].
 Choose one copy from the reward cards. It is offered to [[Warrior]], [[Rogue]], [[Paladin]], [[Hunter]], [[Shaman]], [[Druid]]. Selecting another reward gives no copy of this item.
 
 # Speak to [[Ondrel Vane (NPC)|Ondrel Vane]], select [[Silence the Choir]] and click Accept.
-# Quest objective 1. [[Choirmother Selthe (Mob)|Choirmother Selthe]] slain (1 required).
+# Quest objective 1. Choirmother Selthe slain (1 required).
 # Return to [[Ondrel Vane (NPC)|Ondrel Vane]]. Select [[Stillhymn Treads]] if shown among your reward choices. Click Complete Quest. The reward goes to your bags.
 
 == Acquisition map ==
@@ -319229,7 +319235,7 @@ Numbers match the source sections above. Each location names its starting, objec
 * 1 · Quest reward · [[Silence the Choir]] · start · [[Ondrel Vane (NPC)|Ondrel Vane]] ([[Thornpeak Heights]]) / Quest reward · [[Silence the Choir]] · collect · [[Ondrel Vane (NPC)|Ondrel Vane]] ([[Thornpeak Heights]]) (-66, 786)
 &apos;&apos;&apos;[[The Drowned Temple]]&apos;&apos;&apos;
 &lt;div class=&quot;woc-map&quot; style=&quot;aspect-ratio:65/39.394&quot;&gt;&lt;span class=&quot;woc-pin&quot; title=&quot;1 · Quest reward · Silence the Choir · step 2 · Choirmother Selthe (0, 10)&quot; style=&quot;left:50%;top:50%&quot;&gt;1&lt;/span&gt;&lt;/div&gt;
-* 1 · Quest reward · [[Silence the Choir]] · step 2 · [[Choirmother Selthe (Mob)|Choirmother Selthe]] (0, 10)
+* 1 · Quest reward · [[Silence the Choir]] · step 2 · Choirmother Selthe (0, 10)
 
 == Equipment and use ==
 * 70 Armor
@@ -319259,7 +319265,7 @@ Numbers match the source sections above. Each location names its starting, objec
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2769">&lt;woc-art path=&quot;/ui/items/stillhymn_greaves.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="2711">&lt;woc-art path=&quot;/ui/items/stillhymn_greaves.webp&quot; /&gt;
 == Overview ==
 Stillhymn Greaves is a rare-quality armor.
 
@@ -319303,7 +319309,7 @@ First complete [[The Drowned Choir]].
 Choose one copy from the reward cards. It is offered to [[Warrior]], [[Paladin]], [[Shaman]]. Selecting another reward gives no copy of this item.
 
 # Speak to [[Ondrel Vane (NPC)|Ondrel Vane]], select [[Silence the Choir]] and click Accept.
-# Quest objective 1. [[Choirmother Selthe (Mob)|Choirmother Selthe]] slain (1 required).
+# Quest objective 1. Choirmother Selthe slain (1 required).
 # Return to [[Ondrel Vane (NPC)|Ondrel Vane]]. Select [[Stillhymn Greaves]] if shown among your reward choices. Click Complete Quest. The reward goes to your bags.
 
 == Acquisition map ==
@@ -319313,7 +319319,7 @@ Numbers match the source sections above. Each location names its starting, objec
 * 1 · Quest reward · [[Silence the Choir]] · start · [[Ondrel Vane (NPC)|Ondrel Vane]] ([[Thornpeak Heights]]) / Quest reward · [[Silence the Choir]] · collect · [[Ondrel Vane (NPC)|Ondrel Vane]] ([[Thornpeak Heights]]) (-66, 786)
 &apos;&apos;&apos;[[The Drowned Temple]]&apos;&apos;&apos;
 &lt;div class=&quot;woc-map&quot; style=&quot;aspect-ratio:65/39.394&quot;&gt;&lt;span class=&quot;woc-pin&quot; title=&quot;1 · Quest reward · Silence the Choir · step 2 · Choirmother Selthe (0, 10)&quot; style=&quot;left:50%;top:50%&quot;&gt;1&lt;/span&gt;&lt;/div&gt;
-* 1 · Quest reward · [[Silence the Choir]] · step 2 · [[Choirmother Selthe (Mob)|Choirmother Selthe]] (0, 10)
+* 1 · Quest reward · [[Silence the Choir]] · step 2 · Choirmother Selthe (0, 10)
 
 == Equipment and use ==
 * 105 Armor
@@ -319343,7 +319349,7 @@ Numbers match the source sections above. Each location names its starting, objec
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2845">&lt;woc-art path=&quot;/ui/items/stillhymn_moccasins.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="2787">&lt;woc-art path=&quot;/ui/items/stillhymn_moccasins.webp&quot; /&gt;
 == Overview ==
 Stillhymn Moccasins is a rare-quality armor.
 
@@ -319387,7 +319393,7 @@ First complete [[The Drowned Choir]].
 Choose one copy from the reward cards. It is offered to [[Warrior]], [[Rogue]], [[Paladin]], [[Hunter]], [[Shaman]], [[Druid]]. Selecting another reward gives no copy of this item.
 
 # Speak to [[Ondrel Vane (NPC)|Ondrel Vane]], select [[Silence the Choir]] and click Accept.
-# Quest objective 1. [[Choirmother Selthe (Mob)|Choirmother Selthe]] slain (1 required).
+# Quest objective 1. Choirmother Selthe slain (1 required).
 # Return to [[Ondrel Vane (NPC)|Ondrel Vane]]. Select [[Stillhymn Moccasins]] if shown among your reward choices. Click Complete Quest. The reward goes to your bags.
 
 == Acquisition map ==
@@ -319397,7 +319403,7 @@ Numbers match the source sections above. Each location names its starting, objec
 * 1 · Quest reward · [[Silence the Choir]] · start · [[Ondrel Vane (NPC)|Ondrel Vane]] ([[Thornpeak Heights]]) / Quest reward · [[Silence the Choir]] · collect · [[Ondrel Vane (NPC)|Ondrel Vane]] ([[Thornpeak Heights]]) (-66, 786)
 &apos;&apos;&apos;[[The Drowned Temple]]&apos;&apos;&apos;
 &lt;div class=&quot;woc-map&quot; style=&quot;aspect-ratio:65/39.394&quot;&gt;&lt;span class=&quot;woc-pin&quot; title=&quot;1 · Quest reward · Silence the Choir · step 2 · Choirmother Selthe (0, 10)&quot; style=&quot;left:50%;top:50%&quot;&gt;1&lt;/span&gt;&lt;/div&gt;
-* 1 · Quest reward · [[Silence the Choir]] · step 2 · [[Choirmother Selthe (Mob)|Choirmother Selthe]] (0, 10)
+* 1 · Quest reward · [[Silence the Choir]] · step 2 · Choirmother Selthe (0, 10)
 
 == Equipment and use ==
 * 70 Armor
@@ -319427,7 +319433,7 @@ Numbers match the source sections above. Each location names its starting, objec
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2931">&lt;woc-art path=&quot;/ui/items/pearlglow_headguard.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="2841">&lt;woc-art path=&quot;/ui/items/pearlglow_headguard.webp&quot; /&gt;
 == Overview ==
 Pearlglow Headguard is a rare-quality armor.
 
@@ -319471,7 +319477,7 @@ First complete [[Silence the Choir]].
 Choose one copy from the reward cards. It is offered to [[Warrior]], [[Rogue]], [[Paladin]], [[Hunter]], [[Shaman]], [[Druid]]. Selecting another reward gives no copy of this item.
 
 # Speak to [[Ondrel Vane (NPC)|Ondrel Vane]], select [[The Drowned Moon]] and click Accept.
-# Quest objective 1. [[Ysolei, Avatar of the Drowned Moon (Mob)|Ysolei, Avatar of the Drowned Moon]], slain (1 required).
+# Quest objective 1. Ysolei, Avatar of the Drowned Moon, slain (1 required).
 # Return to [[Ondrel Vane (NPC)|Ondrel Vane]]. Select [[Pearlglow Headguard]] if shown among your reward choices. Click Complete Quest. The reward goes to your bags.
 
 == Acquisition map ==
@@ -319481,7 +319487,7 @@ Numbers match the source sections above. Each location names its starting, objec
 * 1 · Quest reward · [[The Drowned Moon]] · start · [[Ondrel Vane (NPC)|Ondrel Vane]] ([[Thornpeak Heights]]) / Quest reward · [[The Drowned Moon]] · collect · [[Ondrel Vane (NPC)|Ondrel Vane]] ([[Thornpeak Heights]]) (-66, 786)
 &apos;&apos;&apos;[[The Drowned Temple]]&apos;&apos;&apos;
 &lt;div class=&quot;woc-map&quot; style=&quot;aspect-ratio:65/39.394&quot;&gt;&lt;span class=&quot;woc-pin&quot; title=&quot;1 · Quest reward · The Drowned Moon · step 2 · Ysolei, Avatar of the Drowned Moon (-26.4, 206)&quot; style=&quot;left:50%;top:50%&quot;&gt;1&lt;/span&gt;&lt;/div&gt;
-* 1 · Quest reward · [[The Drowned Moon]] · step 2 · [[Ysolei, Avatar of the Drowned Moon (Mob)|Ysolei, Avatar of the Drowned Moon]] (-26.4, 206)
+* 1 · Quest reward · [[The Drowned Moon]] · step 2 · Ysolei, Avatar of the Drowned Moon (-26.4, 206)
 
 == Equipment and use ==
 * 101 Armor
@@ -319511,7 +319517,7 @@ Numbers match the source sections above. Each location names its starting, objec
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2845">&lt;woc-art path=&quot;/ui/items/pearlglow_coif.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="2755">&lt;woc-art path=&quot;/ui/items/pearlglow_coif.webp&quot; /&gt;
 == Overview ==
 Pearlglow Coif is a rare-quality armor.
 
@@ -319555,7 +319561,7 @@ First complete [[Silence the Choir]].
 Choose one copy from the reward cards. It is offered to [[Warrior]], [[Paladin]], [[Shaman]]. Selecting another reward gives no copy of this item.
 
 # Speak to [[Ondrel Vane (NPC)|Ondrel Vane]], select [[The Drowned Moon]] and click Accept.
-# Quest objective 1. [[Ysolei, Avatar of the Drowned Moon (Mob)|Ysolei, Avatar of the Drowned Moon]], slain (1 required).
+# Quest objective 1. Ysolei, Avatar of the Drowned Moon, slain (1 required).
 # Return to [[Ondrel Vane (NPC)|Ondrel Vane]]. Select [[Pearlglow Coif]] if shown among your reward choices. Click Complete Quest. The reward goes to your bags.
 
 == Acquisition map ==
@@ -319565,7 +319571,7 @@ Numbers match the source sections above. Each location names its starting, objec
 * 1 · Quest reward · [[The Drowned Moon]] · start · [[Ondrel Vane (NPC)|Ondrel Vane]] ([[Thornpeak Heights]]) / Quest reward · [[The Drowned Moon]] · collect · [[Ondrel Vane (NPC)|Ondrel Vane]] ([[Thornpeak Heights]]) (-66, 786)
 &apos;&apos;&apos;[[The Drowned Temple]]&apos;&apos;&apos;
 &lt;div class=&quot;woc-map&quot; style=&quot;aspect-ratio:65/39.394&quot;&gt;&lt;span class=&quot;woc-pin&quot; title=&quot;1 · Quest reward · The Drowned Moon · step 2 · Ysolei, Avatar of the Drowned Moon (-26.4, 206)&quot; style=&quot;left:50%;top:50%&quot;&gt;1&lt;/span&gt;&lt;/div&gt;
-* 1 · Quest reward · [[The Drowned Moon]] · step 2 · [[Ysolei, Avatar of the Drowned Moon (Mob)|Ysolei, Avatar of the Drowned Moon]] (-26.4, 206)
+* 1 · Quest reward · [[The Drowned Moon]] · step 2 · Ysolei, Avatar of the Drowned Moon (-26.4, 206)
 
 == Equipment and use ==
 * 151 Armor
@@ -320086,7 +320092,7 @@ Numbers match the source sections above. Each location names its starting, objec
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2744">&lt;woc-art path=&quot;/ui/items/fetterbound_leggings.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="2688">&lt;woc-art path=&quot;/ui/items/fetterbound_leggings.webp&quot; /&gt;
 == Overview ==
 Fetterbound Leggings is a rare-quality armor.
 
@@ -320130,7 +320136,7 @@ First complete [[The Sanctum Gate]].
 Choose one copy from the reward cards. It is offered to every class. Selecting another reward gives no copy of this item.
 
 # Speak to [[Scout Maren (NPC) (2)|Scout Maren]], select [[The Bound Guardian]] and click Accept.
-# Quest objective 1. [[Korgath the Bound (Mob)|Korgath the Bound]] slain (1 required).
+# Quest objective 1. Korgath the Bound slain (1 required).
 # Return to [[Scout Maren (NPC) (2)|Scout Maren]]. Select [[Fetterbound Leggings]] if shown among your reward choices. Click Complete Quest. The reward goes to your bags.
 
 == Acquisition map ==
@@ -320140,7 +320146,7 @@ Numbers match the source sections above. Each location names its starting, objec
 * 1 · Quest reward · [[The Bound Guardian]] · start · [[Scout Maren (NPC) (2)|Scout Maren]] ([[Thornpeak Heights]]) / Quest reward · [[The Bound Guardian]] · collect · [[Scout Maren (NPC) (2)|Scout Maren]] ([[Thornpeak Heights]]) (7, 670)
 &apos;&apos;&apos;[[Gravewyrm Sanctum]]&apos;&apos;&apos;
 &lt;div class=&quot;woc-map&quot; style=&quot;aspect-ratio:65/39.394&quot;&gt;&lt;span class=&quot;woc-pin&quot; title=&quot;1 · Quest reward · The Bound Guardian · step 2 · Korgath the Bound (0, -22)&quot; style=&quot;left:50%;top:50%&quot;&gt;1&lt;/span&gt;&lt;/div&gt;
-* 1 · Quest reward · [[The Bound Guardian]] · step 2 · [[Korgath the Bound (Mob)|Korgath the Bound]] (0, -22)
+* 1 · Quest reward · [[The Bound Guardian]] · step 2 · Korgath the Bound (0, -22)
 
 == Equipment and use ==
 * 68 Armor
@@ -320170,7 +320176,7 @@ Numbers match the source sections above. Each location names its starting, objec
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2851">&lt;woc-art path=&quot;/ui/items/fetterbound_breeches.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="2795">&lt;woc-art path=&quot;/ui/items/fetterbound_breeches.webp&quot; /&gt;
 == Overview ==
 Fetterbound Breeches is a rare-quality armor.
 
@@ -320214,7 +320220,7 @@ First complete [[The Sanctum Gate]].
 Choose one copy from the reward cards. It is offered to [[Warrior]], [[Rogue]], [[Paladin]], [[Hunter]], [[Shaman]], [[Druid]]. Selecting another reward gives no copy of this item.
 
 # Speak to [[Scout Maren (NPC) (2)|Scout Maren]], select [[The Bound Guardian]] and click Accept.
-# Quest objective 1. [[Korgath the Bound (Mob)|Korgath the Bound]] slain (1 required).
+# Quest objective 1. Korgath the Bound slain (1 required).
 # Return to [[Scout Maren (NPC) (2)|Scout Maren]]. Select [[Fetterbound Breeches]] if shown among your reward choices. Click Complete Quest. The reward goes to your bags.
 
 == Acquisition map ==
@@ -320224,7 +320230,7 @@ Numbers match the source sections above. Each location names its starting, objec
 * 1 · Quest reward · [[The Bound Guardian]] · start · [[Scout Maren (NPC) (2)|Scout Maren]] ([[Thornpeak Heights]]) / Quest reward · [[The Bound Guardian]] · collect · [[Scout Maren (NPC) (2)|Scout Maren]] ([[Thornpeak Heights]]) (7, 670)
 &apos;&apos;&apos;[[Gravewyrm Sanctum]]&apos;&apos;&apos;
 &lt;div class=&quot;woc-map&quot; style=&quot;aspect-ratio:65/39.394&quot;&gt;&lt;span class=&quot;woc-pin&quot; title=&quot;1 · Quest reward · The Bound Guardian · step 2 · Korgath the Bound (0, -22)&quot; style=&quot;left:50%;top:50%&quot;&gt;1&lt;/span&gt;&lt;/div&gt;
-* 1 · Quest reward · [[The Bound Guardian]] · step 2 · [[Korgath the Bound (Mob)|Korgath the Bound]] (0, -22)
+* 1 · Quest reward · [[The Bound Guardian]] · step 2 · Korgath the Bound (0, -22)
 
 == Equipment and use ==
 * 117 Armor
@@ -320253,7 +320259,7 @@ Numbers match the source sections above. Each location names its starting, objec
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2865">&lt;woc-art path=&quot;/ui/items/fetterbound_legwraps.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="2809">&lt;woc-art path=&quot;/ui/items/fetterbound_legwraps.webp&quot; /&gt;
 == Overview ==
 Fetterbound Legwraps is a rare-quality armor.
 
@@ -320297,7 +320303,7 @@ First complete [[The Sanctum Gate]].
 Choose one copy from the reward cards. It is offered to [[Warrior]], [[Rogue]], [[Paladin]], [[Hunter]], [[Shaman]], [[Druid]]. Selecting another reward gives no copy of this item.
 
 # Speak to [[Scout Maren (NPC) (2)|Scout Maren]], select [[The Bound Guardian]] and click Accept.
-# Quest objective 1. [[Korgath the Bound (Mob)|Korgath the Bound]] slain (1 required).
+# Quest objective 1. Korgath the Bound slain (1 required).
 # Return to [[Scout Maren (NPC) (2)|Scout Maren]]. Select [[Fetterbound Legwraps]] if shown among your reward choices. Click Complete Quest. The reward goes to your bags.
 
 == Acquisition map ==
@@ -320307,7 +320313,7 @@ Numbers match the source sections above. Each location names its starting, objec
 * 1 · Quest reward · [[The Bound Guardian]] · start · [[Scout Maren (NPC) (2)|Scout Maren]] ([[Thornpeak Heights]]) / Quest reward · [[The Bound Guardian]] · collect · [[Scout Maren (NPC) (2)|Scout Maren]] ([[Thornpeak Heights]]) (7, 670)
 &apos;&apos;&apos;[[Gravewyrm Sanctum]]&apos;&apos;&apos;
 &lt;div class=&quot;woc-map&quot; style=&quot;aspect-ratio:65/39.394&quot;&gt;&lt;span class=&quot;woc-pin&quot; title=&quot;1 · Quest reward · The Bound Guardian · step 2 · Korgath the Bound (0, -22)&quot; style=&quot;left:50%;top:50%&quot;&gt;1&lt;/span&gt;&lt;/div&gt;
-* 1 · Quest reward · [[The Bound Guardian]] · step 2 · [[Korgath the Bound (Mob)|Korgath the Bound]] (0, -22)
+* 1 · Quest reward · [[The Bound Guardian]] · step 2 · Korgath the Bound (0, -22)
 
 == Equipment and use ==
 * 117 Armor
@@ -320337,7 +320343,7 @@ Numbers match the source sections above. Each location names its starting, objec
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2797">&lt;woc-art path=&quot;/ui/items/fetterbound_legguards.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="2741">&lt;woc-art path=&quot;/ui/items/fetterbound_legguards.webp&quot; /&gt;
 == Overview ==
 Fetterbound Legguards is a rare-quality armor.
 
@@ -320381,7 +320387,7 @@ First complete [[The Sanctum Gate]].
 Choose one copy from the reward cards. It is offered to [[Warrior]], [[Paladin]], [[Shaman]]. Selecting another reward gives no copy of this item.
 
 # Speak to [[Scout Maren (NPC) (2)|Scout Maren]], select [[The Bound Guardian]] and click Accept.
-# Quest objective 1. [[Korgath the Bound (Mob)|Korgath the Bound]] slain (1 required).
+# Quest objective 1. Korgath the Bound slain (1 required).
 # Return to [[Scout Maren (NPC) (2)|Scout Maren]]. Select [[Fetterbound Legguards]] if shown among your reward choices. Click Complete Quest. The reward goes to your bags.
 
 == Acquisition map ==
@@ -320391,7 +320397,7 @@ Numbers match the source sections above. Each location names its starting, objec
 * 1 · Quest reward · [[The Bound Guardian]] · start · [[Scout Maren (NPC) (2)|Scout Maren]] ([[Thornpeak Heights]]) / Quest reward · [[The Bound Guardian]] · collect · [[Scout Maren (NPC) (2)|Scout Maren]] ([[Thornpeak Heights]]) (7, 670)
 &apos;&apos;&apos;[[Gravewyrm Sanctum]]&apos;&apos;&apos;
 &lt;div class=&quot;woc-map&quot; style=&quot;aspect-ratio:65/39.394&quot;&gt;&lt;span class=&quot;woc-pin&quot; title=&quot;1 · Quest reward · The Bound Guardian · step 2 · Korgath the Bound (0, -22)&quot; style=&quot;left:50%;top:50%&quot;&gt;1&lt;/span&gt;&lt;/div&gt;
-* 1 · Quest reward · [[The Bound Guardian]] · step 2 · [[Korgath the Bound (Mob)|Korgath the Bound]] (0, -22)
+* 1 · Quest reward · [[The Bound Guardian]] · step 2 · Korgath the Bound (0, -22)
 
 == Equipment and use ==
 * 175 Armor
@@ -320421,7 +320427,7 @@ Numbers match the source sections above. Each location names its starting, objec
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2794">&lt;woc-art path=&quot;/ui/items/fetterbound_chausses.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="2738">&lt;woc-art path=&quot;/ui/items/fetterbound_chausses.webp&quot; /&gt;
 == Overview ==
 Fetterbound Chausses is a rare-quality armor.
 
@@ -320465,7 +320471,7 @@ First complete [[The Sanctum Gate]].
 Choose one copy from the reward cards. It is offered to [[Warrior]], [[Paladin]], [[Shaman]]. Selecting another reward gives no copy of this item.
 
 # Speak to [[Scout Maren (NPC) (2)|Scout Maren]], select [[The Bound Guardian]] and click Accept.
-# Quest objective 1. [[Korgath the Bound (Mob)|Korgath the Bound]] slain (1 required).
+# Quest objective 1. Korgath the Bound slain (1 required).
 # Return to [[Scout Maren (NPC) (2)|Scout Maren]]. Select [[Fetterbound Chausses]] if shown among your reward choices. Click Complete Quest. The reward goes to your bags.
 
 == Acquisition map ==
@@ -320475,7 +320481,7 @@ Numbers match the source sections above. Each location names its starting, objec
 * 1 · Quest reward · [[The Bound Guardian]] · start · [[Scout Maren (NPC) (2)|Scout Maren]] ([[Thornpeak Heights]]) / Quest reward · [[The Bound Guardian]] · collect · [[Scout Maren (NPC) (2)|Scout Maren]] ([[Thornpeak Heights]]) (7, 670)
 &apos;&apos;&apos;[[Gravewyrm Sanctum]]&apos;&apos;&apos;
 &lt;div class=&quot;woc-map&quot; style=&quot;aspect-ratio:65/39.394&quot;&gt;&lt;span class=&quot;woc-pin&quot; title=&quot;1 · Quest reward · The Bound Guardian · step 2 · Korgath the Bound (0, -22)&quot; style=&quot;left:50%;top:50%&quot;&gt;1&lt;/span&gt;&lt;/div&gt;
-* 1 · Quest reward · [[The Bound Guardian]] · step 2 · [[Korgath the Bound (Mob)|Korgath the Bound]] (0, -22)
+* 1 · Quest reward · [[The Bound Guardian]] · step 2 · Korgath the Bound (0, -22)
 
 == Equipment and use ==
 * 175 Armor
@@ -320505,7 +320511,7 @@ Numbers match the source sections above. Each location names its starting, objec
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2865">&lt;woc-art path=&quot;/ui/items/fetterbound_trousers.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="2809">&lt;woc-art path=&quot;/ui/items/fetterbound_trousers.webp&quot; /&gt;
 == Overview ==
 Fetterbound Trousers is a rare-quality armor.
 
@@ -320549,7 +320555,7 @@ First complete [[The Sanctum Gate]].
 Choose one copy from the reward cards. It is offered to [[Warrior]], [[Rogue]], [[Paladin]], [[Hunter]], [[Shaman]], [[Druid]]. Selecting another reward gives no copy of this item.
 
 # Speak to [[Scout Maren (NPC) (2)|Scout Maren]], select [[The Bound Guardian]] and click Accept.
-# Quest objective 1. [[Korgath the Bound (Mob)|Korgath the Bound]] slain (1 required).
+# Quest objective 1. Korgath the Bound slain (1 required).
 # Return to [[Scout Maren (NPC) (2)|Scout Maren]]. Select [[Fetterbound Trousers]] if shown among your reward choices. Click Complete Quest. The reward goes to your bags.
 
 == Acquisition map ==
@@ -320559,7 +320565,7 @@ Numbers match the source sections above. Each location names its starting, objec
 * 1 · Quest reward · [[The Bound Guardian]] · start · [[Scout Maren (NPC) (2)|Scout Maren]] ([[Thornpeak Heights]]) / Quest reward · [[The Bound Guardian]] · collect · [[Scout Maren (NPC) (2)|Scout Maren]] ([[Thornpeak Heights]]) (7, 670)
 &apos;&apos;&apos;[[Gravewyrm Sanctum]]&apos;&apos;&apos;
 &lt;div class=&quot;woc-map&quot; style=&quot;aspect-ratio:65/39.394&quot;&gt;&lt;span class=&quot;woc-pin&quot; title=&quot;1 · Quest reward · The Bound Guardian · step 2 · Korgath the Bound (0, -22)&quot; style=&quot;left:50%;top:50%&quot;&gt;1&lt;/span&gt;&lt;/div&gt;
-* 1 · Quest reward · [[The Bound Guardian]] · step 2 · [[Korgath the Bound (Mob)|Korgath the Bound]] (0, -22)
+* 1 · Quest reward · [[The Bound Guardian]] · step 2 · Korgath the Bound (0, -22)
 
 == Equipment and use ==
 * 117 Armor
@@ -320589,7 +320595,7 @@ Numbers match the source sections above. Each location names its starting, objec
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2972">&lt;woc-art path=&quot;/ui/items/shroudcaller_tunic.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="2900">&lt;woc-art path=&quot;/ui/items/shroudcaller_tunic.webp&quot; /&gt;
 == Overview ==
 Shroudcaller Tunic is a rare-quality armor.
 
@@ -320633,7 +320639,7 @@ First complete [[The Sanctum Gate]].
 Choose one copy from the reward cards. It is offered to [[Warrior]], [[Rogue]], [[Paladin]], [[Hunter]], [[Shaman]], [[Druid]]. Selecting another reward gives no copy of this item.
 
 # Speak to [[Brother Aldric (NPC) (3)|Brother Aldric]], select [[The Grand Necromancer]] and click Accept.
-# Quest objective 1. [[Grand Necromancer Velkhar (Mob)|Grand Necromancer Velkhar]] slain (1 required).
+# Quest objective 1. Grand Necromancer Velkhar slain (1 required).
 # Return to [[Brother Aldric (NPC) (3)|Brother Aldric]]. Select [[Shroudcaller Tunic]] if shown among your reward choices. Click Complete Quest. The reward goes to your bags.
 
 == Acquisition map ==
@@ -320643,7 +320649,7 @@ Numbers match the source sections above. Each location names its starting, objec
 * 1 · Quest reward · [[The Grand Necromancer]] · start · [[Brother Aldric (NPC) (3)|Brother Aldric]] ([[Thornpeak Heights]]) / Quest reward · [[The Grand Necromancer]] · collect · [[Brother Aldric (NPC) (3)|Brother Aldric]] ([[Thornpeak Heights]]) (-12.2, 645.16)
 &apos;&apos;&apos;[[Gravewyrm Sanctum]]&apos;&apos;&apos;
 &lt;div class=&quot;woc-map&quot; style=&quot;aspect-ratio:65/39.394&quot;&gt;&lt;span class=&quot;woc-pin&quot; title=&quot;1 · Quest reward · The Grand Necromancer · step 2 · Grand Necromancer Velkhar (0, 107)&quot; style=&quot;left:50%;top:50%&quot;&gt;1&lt;/span&gt;&lt;/div&gt;
-* 1 · Quest reward · [[The Grand Necromancer]] · step 2 · [[Grand Necromancer Velkhar (Mob)|Grand Necromancer Velkhar]] (0, 107)
+* 1 · Quest reward · [[The Grand Necromancer]] · step 2 · Grand Necromancer Velkhar (0, 107)
 
 == Equipment and use ==
 * 130 Armor
@@ -320673,7 +320679,7 @@ Numbers match the source sections above. Each location names its starting, objec
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2914">&lt;woc-art path=&quot;/ui/items/shroudcaller_chainmail.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="2842">&lt;woc-art path=&quot;/ui/items/shroudcaller_chainmail.webp&quot; /&gt;
 == Overview ==
 Shroudcaller Chainmail is a rare-quality armor.
 
@@ -320717,7 +320723,7 @@ First complete [[The Sanctum Gate]].
 Choose one copy from the reward cards. It is offered to [[Warrior]], [[Paladin]], [[Shaman]]. Selecting another reward gives no copy of this item.
 
 # Speak to [[Brother Aldric (NPC) (3)|Brother Aldric]], select [[The Grand Necromancer]] and click Accept.
-# Quest objective 1. [[Grand Necromancer Velkhar (Mob)|Grand Necromancer Velkhar]] slain (1 required).
+# Quest objective 1. Grand Necromancer Velkhar slain (1 required).
 # Return to [[Brother Aldric (NPC) (3)|Brother Aldric]]. Select [[Shroudcaller Chainmail]] if shown among your reward choices. Click Complete Quest. The reward goes to your bags.
 
 == Acquisition map ==
@@ -320727,7 +320733,7 @@ Numbers match the source sections above. Each location names its starting, objec
 * 1 · Quest reward · [[The Grand Necromancer]] · start · [[Brother Aldric (NPC) (3)|Brother Aldric]] ([[Thornpeak Heights]]) / Quest reward · [[The Grand Necromancer]] · collect · [[Brother Aldric (NPC) (3)|Brother Aldric]] ([[Thornpeak Heights]]) (-12.2, 645.16)
 &apos;&apos;&apos;[[Gravewyrm Sanctum]]&apos;&apos;&apos;
 &lt;div class=&quot;woc-map&quot; style=&quot;aspect-ratio:65/39.394&quot;&gt;&lt;span class=&quot;woc-pin&quot; title=&quot;1 · Quest reward · The Grand Necromancer · step 2 · Grand Necromancer Velkhar (0, 107)&quot; style=&quot;left:50%;top:50%&quot;&gt;1&lt;/span&gt;&lt;/div&gt;
-* 1 · Quest reward · [[The Grand Necromancer]] · step 2 · [[Grand Necromancer Velkhar (Mob)|Grand Necromancer Velkhar]] (0, 107)
+* 1 · Quest reward · [[The Grand Necromancer]] · step 2 · Grand Necromancer Velkhar (0, 107)
 
 == Equipment and use ==
 * 195 Armor
@@ -364404,7 +364410,7 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar to detonate it at the 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="140495">== A ==
+      <text xml:space="preserve" bytes="140341">== A ==
 * [[A Borrowed Face (Deed)]]
 * [[A Borrowed Face (World Quest)]]
 * [[A Cart for the Orchard]]
@@ -364531,6 +364537,7 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar to detonate it at the 
 * [[Armor sigils (Items index)]]
 * [[Armor Vendor (NPCs index)]]
 * [[Armorcrafting]]
+* [[Armorcrafting and Weaponcrafting Trainer (NPCs index)]]
 * [[Armorcrafting ingredients (Items index)]]
 * [[Armorer Hode (NPC)]]
 * [[Arms Dealer (NPCs index)]]
@@ -364670,7 +364677,6 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar to detonate it at the 
 * [[Blackmere Shoulderpads]]
 * [[Blackmere Spaulders]]
 * [[Blackrot (Ability)]]
-* [[Blacksmithing Trainer (NPCs index)]]
 * [[Blacktide (Talent)]]
 * [[Blackwater Drift Mantle]]
 * [[Blackwater Vanguard Chestguard]]
@@ -365002,7 +365008,7 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar to detonate it at the 
 * [[Candlewright Acolyte (Mob)]]
 * [[Canopy Silk Hank]]
 * [[Canopy Weaver (Mob)]]
-* [[Cantor Ilvane (boss) (Contract)]]
+* [[Cantor Ilvane (Contract)]]
 * [[Cantor Ilvane (Mob)]]
 * [[Cantor&apos;s Cassock]]
 * [[Cantor&apos;s Drowned Sash]]
@@ -365065,7 +365071,7 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar to detonate it at the 
 * [[Choir-Blessed Spaulders]]
 * [[Choir-Drowned Raiment]]
 * [[Choirmend (Ability)]]
-* [[Choirmother Selthe (boss) (Contract)]]
+* [[Choirmother Selthe (Contract)]]
 * [[Choirmother Selthe (Mob)]]
 * [[Choirmother&apos;s Casque]]
 * [[Choirward Leggings]]
@@ -365540,8 +365546,8 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar to detonate it at the 
 * [[Drownstep Treads]]
 * [[Druid]]
 * [[Druid (Abilities index)]]
+* [[Dry Eyes (Contract)]]
 * [[Dry Eyes (Deed)]]
-* [[Dry Eyes (task) (Contract)]]
 * [[Duelist&apos;s Brand]]
 * [[Duels]]
 * [[Dune Troll (Mob)]]
@@ -365601,7 +365607,7 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar to detonate it at the 
 * [[Eastbrook Ritual Vestments (Recipe)]]
 * [[Eastbrook Root Pottage]]
 * [[Eastbrook Root Pottage (Recipe)]]
-* [[eastbrook to nightbloom (Ferry)]]
+* [[Eastbrook to Nightbloom (Ferry)]]
 * [[Eastbrook Vale]]
 * [[Eastbrook Vale (NPCs index)]]
 * [[Eastbrook Vale quests]]
@@ -365727,8 +365733,8 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar to detonate it at the 
 * [[Every Candle Lit (Deed)]]
 * [[Every Doorstep (Deed)]]
 * [[Every Furrow Filled (Deed)]]
+* [[Every Last Moonspawn (Contract)]]
 * [[Every Last Moonspawn (Deed)]]
-* [[Every Last Moonspawn (task) (Contract)]]
 * [[Every Voice in Tune (Deed)]]
 * [[Eviction Notice (Deed)]]
 * [[Evil Eye (Ability)]]
@@ -365748,7 +365754,7 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar to detonate it at the 
 * [[Fang of Korzul (2)]]
 * [[Fangknife of Zulgar]]
 * [[Fangknife of Zulgar (2)]]
-* [[Fanglord Beastmaster (boss) (Contract)]]
+* [[Fanglord Beastmaster (Contract)]]
 * [[Fanglord Beastmaster (Mob)]]
 * [[Fanglord&apos;s Beastspear]]
 * [[Fanglord&apos;s Beastspear (2)]]
@@ -366029,9 +366035,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar to detonate it at the 
 * [[Gambler&apos;s Die]]
 * [[Game Meat]]
 * [[Gameplay Systems]]
-* [[Gaol Turnkey (boss) (Contract)]]
+* [[Gaol Turnkey (Contract)]]
 * [[Gaol Turnkey (Mob)]]
-* [[Gaoler Ossick (boss) (Contract)]]
+* [[Gaoler Ossick (Contract)]]
 * [[Gaoler Ossick (Mob)]]
 * [[Gaoler&apos;s Chain Girdle]]
 * [[Gaoler&apos;s Iron Key]]
@@ -366156,7 +366162,7 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar to detonate it at the 
 * [[Grand Cauldron]]
 * [[Grand Cauldron (Recipe)]]
 * [[Grand Malediction (Talent)]]
-* [[Grand Necromancer Velkhar (boss) (Contract)]]
+* [[Grand Necromancer Velkhar (Contract)]]
 * [[Grand Necromancer Velkhar (Mob)]]
 * [[Grandmaster Alchemy (Deed)]]
 * [[Grandmaster Armorcrafting (Deed)]]
@@ -366736,25 +366742,25 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar to detonate it at the 
 * [[Knellbound Hauberk (2)]]
 * [[Knellwyrm (Mob)]]
 * [[Knifework (Specialization)]]
-* [[Knight-Commander Olen (boss) (Contract)]]
+* [[Knight-Commander Olen (Contract)]]
 * [[Knight-Commander Olen (Mob)]]
 * [[Knight-Commander&apos;s Greaves]]
 * [[Knight-Commander&apos;s Longsword]]
 * [[Knight-Commander&apos;s Longsword (2)]]
 * [[Know Your Numbers]]
 * [[Knucklebone of Balgath]]
-* [[Korgath the Bound (boss) (Contract)]]
+* [[Korgath the Bound (Contract)]]
 * [[Korgath the Bound (Mob)]]
 * [[Korgath&apos;s Chainwraps]]
 * [[Korgath&apos;s Chainwraps (2)]]
 * [[Korzul the Gravewyrm]]
-* [[Korzul the Gravewyrm (boss) (Contract)]]
-* [[Korzul the Gravewyrm (heroic) (Contract)]]
+* [[Korzul the Gravewyrm (Contract)]]
 * [[Korzul the Gravewyrm (Mob)]]
+* [[Korzul the Gravewyrm, Heroic (Contract)]]
 
 == L ==
 * [[Lacquered Rod (Weapon skin)]]
-* [[Lady of the Bonechill (boss) (Contract)]]
+* [[Lady of the Bonechill (Contract)]]
 * [[Lady of the Bonechill (Mob)]]
 * [[Lagoon Snapper (Mob)]]
 * [[Lamenting Veil]]
@@ -367094,9 +367100,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar to detonate it at the 
 * [[Moor Ram (Mob)]]
 * [[Mooring Stone]]
 * [[More Names Cut into the Crag (Deed)]]
-* [[Morthen the Gravecaller (boss) (Contract)]]
-* [[Morthen the Gravecaller (heroic) (Contract)]]
+* [[Morthen the Gravecaller (Contract)]]
 * [[Morthen the Gravecaller (Mob)]]
+* [[Morthen the Gravecaller, Heroic (Contract)]]
 * [[Morthen&apos;s Cryptforged Hauberk]]
 * [[Morthen&apos;s Grimoire]]
 * [[Moss and Mending]]
@@ -367190,12 +367196,12 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar to detonate it at the 
 * [[Nightwalk Jerkin]]
 * [[Nightweave Tunic]]
 * [[Nightwing Chimaera (Mount)]]
+* [[No Bones About It (Contract)]]
 * [[No Bones About It (Deed)]]
-* [[No Bones About It (task) (Contract)]]
 * [[No Cage Can Hold Us (Deed)]]
 * [[No Rest in the Reeds]]
+* [[No Thrall of Mine (Contract)]]
 * [[No Thrall of Mine (Deed)]]
-* [[No Thrall of Mine (task) (Contract)]]
 * [[Nobody Left Hanging (Deed)]]
 * [[None More Deathless (Deed)]]
 * [[Normal Boss Dummy (Mob)]]
@@ -367897,7 +367903,7 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar to detonate it at the 
 * [[Sethrael the Palecoil (Mob)]]
 * [[Sethrael&apos;s Heartscale]]
 * [[Settle It Outside (Deed)]]
-* [[Sexton Marrow (boss) (Contract)]]
+* [[Sexton Marrow (Contract)]]
 * [[Sexton Marrow (Mob)]]
 * [[Sexton Marrow (NPC)]]
 * [[Sexton&apos;s Burial Spade]]
@@ -367968,8 +367974,8 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar to detonate it at the 
 * [[Shroud of the Reliquary]]
 * [[Shroudcaller Chainmail]]
 * [[Shroudcaller Tunic]]
+* [[Sidestep the Reaper (Contract)]]
 * [[Sidestep the Reaper (Deed)]]
-* [[Sidestep the Reaper (task) (Contract)]]
 * [[Sigils of the Wyrm]]
 * [[Signet of the Last Keep]]
 * [[Silence the Call]]
@@ -368192,8 +368198,8 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar to detonate it at the 
 * [[Starwarden Spaulders]]
 * [[Starwarden Vest]]
 * [[Statue Rubbing]]
+* [[Stay Buried (Contract)]]
 * [[Stay Buried (Deed)]]
-* [[Stay Buried (task) (Contract)]]
 * [[Steadfast Step (Talent)]]
 * [[Steady Custom (Deed)]]
 * [[Steady Hands (Talent)]]
@@ -368523,7 +368529,7 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar to detonate it at the 
 * [[The Glutton]]
 * [[The Glutton, Reckoned (Deed)]]
 * [[The Gold Road Down]]
-* [[The Gorgebloom (boss) (Contract)]]
+* [[The Gorgebloom (Contract)]]
 * [[The Gorgebloom (Mob)]]
 * [[The Gourdlit (Deed)]]
 * [[The Grand Catalogue (Deed)]]
@@ -368789,7 +368795,7 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar to detonate it at the 
 * [[Tidebound Acolyte (Mob)]]
 * [[Tidebound Spaulders]]
 * [[Tidecall (Ability)]]
-* [[Tideglass Colossus (boss) (Contract)]]
+* [[Tideglass Colossus (Contract)]]
 * [[Tideglass Colossus (Mob)]]
 * [[Tideglass Dirk]]
 * [[Tideglass Gauntlets]]
@@ -368953,10 +368959,10 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar to detonate it at the 
 * [[Urgent Prayer (Ability)]]
 
 == V ==
-* [[Vael the Fogbinder (boss) (Contract)]]
-* [[Vael the Fogbinder (heroic) (Contract)]]
+* [[Vael the Fogbinder (Contract)]]
 * [[Vael the Fogbinder (Mob)]]
 * [[Vael the Fogbinder (Mob) (2)]]
+* [[Vael the Fogbinder, Heroic (Contract)]]
 * [[Vael&apos;s Mist-Staff]]
 * [[Vale Apprentice Staff]]
 * [[Vale Arcanist&apos;s Regalia (Deed)]]
@@ -369191,7 +369197,7 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar to detonate it at the 
 * [[Who Trims the Hedges]]
 * [[Wicked Slash (Ability)]]
 * [[Wicked Wicks]]
-* [[wickharbor to drakelands (Ferry)]]
+* [[Wickharbor to Drakelands (Ferry)]]
 * [[Wickmother Sorrel (NPC)]]
 * [[Wickspun Treads]]
 * [[Widening Arc (Ability)]]
@@ -369293,8 +369299,8 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar to detonate it at the 
 * [[Wyrmfall Pendant (Recipe)]]
 * [[Wyrmfang Greatblade]]
 * [[Wyrmfang Greatblade (2)]]
+* [[Wyrmfeller (Contract)]]
 * [[Wyrmfeller (Deed)]]
-* [[Wyrmfeller (task) (Contract)]]
 * [[Wyrmhide Cording]]
 * [[Wyrmhide Cording (Recipe)]]
 * [[Wyrmscale Jerkin]]
@@ -369304,9 +369310,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar to detonate it at the 
 * [[Wyrmwatch Warning Banner]]
 
 == Y ==
-* [[Ysolei, Avatar of the Drowned Moon (boss) (Contract)]]
-* [[Ysolei, Avatar of the Drowned Moon (heroic) (Contract)]]
+* [[Ysolei, Avatar of the Drowned Moon (Contract)]]
 * [[Ysolei, Avatar of the Drowned Moon (Mob)]]
+* [[Ysolei, Avatar of the Drowned Moon, Heroic (Contract)]]
 * [[Ysolei&apos;s Pearl Greaves]]
 * [[Ysolei&apos;s Pearl Greaves (2)]]
 * [[Yumi (Mob)]]
@@ -369324,9 +369330,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar to detonate it at the 
 * [[Zealwing (Ability)]]
 * [[Zense Meridian]]
 * [[Zones]]
-* [[Zulgar, Voice of the Basin (boss) (Contract)]]
-* [[Zulgar, Voice of the Basin (heroic) (Contract)]]
+* [[Zulgar, Voice of the Basin (Contract)]]
 * [[Zulgar, Voice of the Basin (Mob)]]
+* [[Zulgar, Voice of the Basin, Heroic (Contract)]]
 * [[Zyzz&apos;s Deathless Signet]]
 
 

@@ -1,5 +1,12 @@
 import { FINDER_ACTIVITIES, type FinderActivity } from '../../src/sim/content/dungeon_finder';
-import { DUNGEON_LIST, DUNGEONS, MOBS, QUESTS, zoneContaining } from '../../src/sim/data';
+import {
+  DELVE_LIST,
+  DUNGEON_LIST,
+  DUNGEONS,
+  MOBS,
+  QUESTS,
+  zoneContaining,
+} from '../../src/sim/data';
 import { IGNIVAR_LIFT_RIDE_SECONDS } from '../../src/sim/ignivar_forge_lift';
 import {
   IGNIVAR_FORGE_APPROACH_ID,
@@ -8,6 +15,8 @@ import {
   IGNIVAR_RAID_ARENA_ID,
   IGNIVAR_TRASH_AUTOMATON_IDS,
 } from '../../src/sim/ignivar_raid_ids';
+import { RIFT_MIN_LEVEL } from '../../src/sim/rift/portals';
+import { RIFT_RANK_BASE_LEVEL } from '../../src/sim/rift/ranks';
 import type { DungeonDef } from '../../src/sim/types';
 import { activitySceneUrl } from '../../src/ui/dungeon_activity_art';
 import type { ArticleTools } from './entity_format';
@@ -25,6 +34,17 @@ export interface RaidGuide {
 }
 
 /** The name players know a raid by (Nythraxis is named for its boss, not its arena). */
+/** Instances outside the Finder and raids: quest and exploration interiors, listed with zones. */
+export function questInteriors(): DungeonDef[] {
+  const finder = new Set(FINDER_ACTIVITIES.map((a) => a.dungeonId));
+  const raid = new Set(
+    FINDER_ACTIVITIES.filter((a) => a.kind === 'raid').flatMap((a) =>
+      raidRooms(a).map((r) => r.id),
+    ),
+  );
+  return DUNGEON_LIST.filter((d) => !finder.has(d.id) && !raid.has(d.id));
+}
+
 export function raidName(activity: FinderActivity): string {
   return activity.dungeonId === 'nythraxis_boss_arena'
     ? 'Nythraxis'
@@ -222,8 +242,6 @@ export function addDungeonCatalog(w: Writer): Map<string, string> {
   const fivePlayer = FINDER_ACTIVITIES.filter(
     (a) => a.kind === 'dungeon' && a.difficulty === 'normal',
   );
-  const listed = new Set(fivePlayer.map((a) => a.dungeonId));
-  const others = DUNGEON_LIST.filter((d) => !listed.has(d.id) && !parentByRoom.has(d.id));
   w.add(
     'Dungeons',
     'Entrances, boss strategies, routes and rewards for every dungeon and raid.\n\n' +
@@ -248,9 +266,9 @@ export function addDungeonCatalog(w: Writer): Map<string, string> {
           w.bullets(raidRows),
       ) +
       w.section(
-        'Attunement and other interiors',
-        w.bullets([
-          ...FINDER_ACTIVITIES.filter((a) => a.kind === 'solo').map(
+        'Attunement adventures',
+        w.bullets(
+          FINDER_ACTIVITIES.filter((a) => a.kind === 'solo').map(
             (a) =>
               roomLink(DUNGEONS[a.dungeonId]) +
               ' · Attunement adventure leading to ' +
@@ -259,14 +277,36 @@ export function addDungeonCatalog(w: Writer): Map<string, string> {
               a.size +
               ' players.',
           ),
-          ...others.map(
-            (d) =>
-              roomLink(d) +
-              (d.guideVisible === false
-                ? ' · Unlisted in the in-game Guide.'
-                : ' · Exploration and quest location.'),
+        ),
+      ) +
+      w.section(
+        'Delves',
+        'Short instanced runs for a small party or a solo player with a companion. See [[Delves]] for rewards and [[Delve companions]] for hired help.\n\n' +
+          w.bullets(
+            DELVE_LIST.map(
+              (d) =>
+                w.link(d.name + ' (Delve)', d.name) +
+                ' · From level ' +
+                d.minLevel +
+                ' · Up to ' +
+                d.maxPlayers +
+                ' players',
+            ),
           ),
-        ]),
+      ) +
+      w.section(
+        'Rifts',
+        'Ranked portals for level ' +
+          RIFT_MIN_LEVEL +
+          ' characters, cleared floor by floor. See [[Rifts]] for how to open one.\n\n' +
+          w.bullets(
+            (['C', 'B', 'A', 'S'] as const).map(
+              (rank) =>
+                w.link('Rank ' + rank + ' (Rift)', 'Rank ' + rank) +
+                ' · Enemies from level ' +
+                RIFT_RANK_BASE_LEVEL[rank],
+            ),
+          ),
       ) +
       w.section(
         'Before you enter',

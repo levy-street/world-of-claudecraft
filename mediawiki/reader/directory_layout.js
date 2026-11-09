@@ -105,6 +105,8 @@ export function layoutDirectory(view, page, wide = true) {
   if (Object.hasOwn(FEATURE_PAGES, page.title)) {
     view.classList.add('activity-directory');
     for (const list of article.querySelectorAll('.browse-records')) {
+      // Only fully illustrated lists become cards; plain lists (Interiors) stay as records.
+      if (![...list.children].every((row) => row.querySelector(':scope > img'))) continue;
       let heading = list.previousElementSibling;
       while (heading && !heading.matches('h2')) heading = heading.previousElementSibling;
       activityList(list, false, FEATURE_PAGES[page.title]);

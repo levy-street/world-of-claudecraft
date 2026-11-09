@@ -137,6 +137,50 @@ describe('the searchable player encyclopedia', () => {
   });
 });
 
+describe('encyclopedia organization', () => {
+  const page = (title: string) => {
+    const m = xml.match(
+      new RegExp(
+        '<title>' +
+          title.replace(/[()]/g, '\\$&') +
+          '</title>[\\s\\S]*?<text[^>]*>([\\s\\S]*?)</text>',
+      ),
+    );
+    return m ? m[1].replaceAll('&quot;', '"').replaceAll('&amp;', '&') : '';
+  };
+  const titles = () => [...xml.matchAll(/<title>([^<]+)<\/title>/g)].map((m) => m[1]);
+  it('lists delves and rifts on the Dungeons hub and quest interiors on Zones', () => {
+    const dungeons = page('Dungeons');
+    expect(dungeons).toContain('== Delves ==');
+    expect(dungeons).toContain('== Rifts ==');
+    expect(dungeons).toContain('[[The Collapsed Reliquary (Delve)|The Collapsed Reliquary]]');
+    expect(dungeons).toContain('[[Rank S (Rift)|Rank S]]');
+    expect(dungeons).not.toContain('[[The Last Keep]]');
+    const zones = page('Zones');
+    expect(zones).toContain('== Interiors ==');
+    expect(zones).toMatch(/\[\[The Last Keep\]\] · Zone: /);
+  });
+  it('titles contracts and ferries as players read them', () => {
+    const all = titles();
+    expect(all.filter((t) => /\((?:boss|heroic|task)\) \(Contract\)$/.test(t))).toEqual([]);
+    expect(all).toContain('Morthen the Gravecaller, Heroic (Contract)');
+    expect(all).toContain('Eastbrook to Nightbloom (Ferry)');
+    expect(all.filter((t) => t.endsWith('(Ferry)') && /^[a-z]/.test(t))).toEqual([]);
+  });
+  it('names the forge trainer for the trades it teaches and groups pets and companions', () => {
+    // The NPC keeps its in-game title, but the wiki's service label and NPC group name the
+    // professions the forge actually teaches.
+    expect(titles()).not.toContain('Blacksmithing Trainer (NPCs index)');
+    expect(titles()).toContain('Armorcrafting and Weaponcrafting Trainer (NPCs index)');
+    expect(xml).not.toMatch(/! Service\n\| Blacksmithing Trainer/);
+    expect(xml).toMatch(/! Service\n\| Armorcrafting and Weaponcrafting Trainer/);
+    const systems = page('Gameplay Systems');
+    const pets = systems.split('== Pets and companions ==')[1].split('\n== ')[0];
+    for (const topic of ['Combat pets', 'Hunter pets', 'Delve companions', 'Cosmetic companions'])
+      expect(pets, topic).toContain(topic);
+  });
+});
+
 describe('the encyclopedia hover catalog', () => {
   it('maps every item and visible ability to its reserved article title', () => {
     const expected = xml

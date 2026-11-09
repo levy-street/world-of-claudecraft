@@ -44,11 +44,14 @@ describe('quest browsing', () => {
     const { w, pages } = harness();
     const zoneTitles = addQuestDirectory(w);
     const grouped = [...zoneTitles.values()].map((t) => pages.get(t)!).join('\n');
-    for (const quest of Object.values(QUESTS))
-      expect(
-        grouped.split(w.link(w.titleBy.quest.get(quest.id)!, quest.name)).length - 1,
-        quest.id,
-      ).toBe(1);
+    // Event quests sit on the Seasonal quests page, not among a zone's regular quests.
+    const seasonal = pages.get('Seasonal quests')!;
+    for (const quest of Object.values(QUESTS)) {
+      const link = w.link(w.titleBy.quest.get(quest.id)!, quest.name);
+      expect(grouped.split(link).length - 1, quest.id).toBe(quest.seasonalEvent ? 0 : 1);
+      if (quest.seasonalEvent) expect(seasonal, quest.id).toContain(link);
+    }
+    expect(Object.values(QUESTS).some((q) => q.seasonalEvent)).toBe(true);
     const eastbrook = pages.get(zoneTitles.get('Eastbrook Vale')!)!;
     expect(eastbrook.indexOf(w.link('Wolves at the Door'))).toBeLessThan(
       eastbrook.indexOf(w.link('The Old Wolf')),

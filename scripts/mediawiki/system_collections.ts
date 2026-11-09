@@ -292,11 +292,10 @@ export function addExpeditionCollections(w: SystemWriter) {
     );
   }
   for (const c of GUILD_CONTRACTS) {
+    // The page suffix already says Contract; only Heroic needs telling apart.
     const name =
       (c.kind === 'task' ? DEEDS[c.taskDeedId!].name : MOBS[c.mobId].name) +
-      ' (' +
-      words(c.kind) +
-      ')';
+      (c.kind === 'heroic' ? ', Heroic' : '');
     w.article(
       'Guild contracts',
       name,
@@ -412,7 +411,9 @@ export function addExpeditionCollections(w: SystemWriter) {
     );
   }
   for (const route of TRANSPORT_ROUTES) {
-    const berths = route.berths.map((b) => words(b.id));
+    const berths = route.berths.map((b) =>
+      words(b.id).replace(/\b[a-z]/g, (ch) => ch.toUpperCase()),
+    );
     w.article(
       'Ferries',
       berths.join(' to '),
@@ -422,7 +423,7 @@ export function addExpeditionCollections(w: SystemWriter) {
         ' seconds at each berth and cruises at ' +
         route.timings.cruise +
         ' yards per second.',
-      list(route.berths.map((b) => `${words(b.id)}: x ${b.x}, z ${b.z}.`)),
+      list(route.berths.map((b, i) => `${berths[i]}: x ${b.x}, z ${b.z}.`)),
     );
   }
   for (const a of AUGMENTS)

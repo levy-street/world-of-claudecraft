@@ -115,7 +115,11 @@ export function addQuestDirectory(w: Writer) {
   function counted(title: string, label: string, n: number) {
     return w.link(title, label) + ' · ' + n + ' ' + (n === 1 ? 'quest' : 'quests');
   }
-  const byZone = groupBy(entries, (e) => e.zone);
+  // Event quests come and go with the event; they have their own Seasonal quests page.
+  const byZone = groupBy(
+    entries.filter((e) => !e.quest.seasonalEvent),
+    (e) => e.zone,
+  );
   const orderOfZones = new Map(ZONES.map((z, i) => [z.name, i]));
   function zoneRank(name: string) {
     return ZONES.find((z) => z.name === name)?.levelRange[0] ?? Infinity;

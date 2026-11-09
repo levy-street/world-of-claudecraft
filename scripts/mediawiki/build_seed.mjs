@@ -197,7 +197,7 @@ const raidParents = addDungeonCatalog({ ...writer, reserve });
 
 for (const zone of ZONES) {
   const npcs = Object.entries(BUILTIN_WORLD.npcs).filter(([, npc]) => (!npc.dynamic || npc.fixedPost) && zoneContaining(npc.pos.x,npc.pos.z)?.id === zone.id).map(([id]) => titleBy.npc.get(id));
-  const quests = Object.keys(QUESTS).filter((id) => zoneForQuest(id) === zone.name).map((id) => titleBy.quest.get(id));
+  const quests = Object.keys(QUESTS).filter((id) => !QUESTS[id].seasonalEvent && zoneForQuest(id) === zone.name).map((id) => titleBy.quest.get(id));
   add(titleBy.zone.get(zone.id), section('Overview', zone.welcome) + section('Facts', table([
     ['Level range', zone.levelRange[0] + '-' + zone.levelRange[1]], ['Hub', zone.hub.name], ['Biome', zone.biome], ['Graveyard', zone.graveyard.x + ', ' + zone.graveyard.z],
   ])) + section('Points of interest', bullets(zone.pois.map((poi) => poi.label))) + section('NPCs', bullets(npcs.map((title) => link(title)))) + section('Quests starting here', (zoneDirectories.has(zone.name) ? link(zoneDirectories.get(zone.name), 'Browse quests in ' + zone.name) + '\\n\\n' : '') + bullets(quests.map((title) => link(title)))), ['Zones', zone.biome]);
