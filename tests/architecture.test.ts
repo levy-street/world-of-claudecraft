@@ -381,6 +381,8 @@ const UI_PURE_CORES = [
   'src/ui/nonplayer_portrait_core.ts',
   'src/ui/xp_bar.ts',
   'src/ui/absorb_bar.ts',
+  // The heal-absorb overlay (segment edges + healing-left number) on unit frames.
+  'src/ui/heal_absorb_bar_view.ts',
   'src/ui/party_frames.ts',
   'src/ui/party_target_hotkeys_core.ts',
   'src/ui/party_below_target_core.ts',

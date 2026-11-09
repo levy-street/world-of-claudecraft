@@ -47,7 +47,7 @@ import { lootHasGoneFfa } from '../src/sim/loot/loot_ffa';
 import type { MarketQuery } from '../src/sim/market_query';
 import { unequipWornMechChroma } from '../src/sim/mech_chroma_ownership';
 import {
-  partyFrameAbsorb,
+  partyFrameAbsorbs,
   partyFrameAggroTargets,
   partyFrameIncomingHeals,
   partyFrameRole,
@@ -8756,7 +8756,7 @@ export class GameServer {
             z: round2(pos.z),
             inCombat: e.inCombat ? 1 : 0,
             group: party.raidGroups.get(mPid) ?? 1,
-            absorb: partyFrameAbsorb(e.auras),
+            ...partyFrameAbsorbs(e.auras),
             role: partyFrameRole(meta.talentMods.role, meta.cls, e.auras),
             spec: meta.talentMods.spec ?? meta.talents.spec ?? null,
             // Effective health Rewind could currently restore to this member

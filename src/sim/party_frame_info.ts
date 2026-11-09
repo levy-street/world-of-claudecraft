@@ -120,6 +120,26 @@ export function partyFrameAbsorb(auras: readonly Aura[]): number {
   return total;
 }
 
+/** Remaining heal absorb (Living Rime, Stone Shell, the necrotic blights): the
+ *  healing the member must take before their health moves again. */
+export function partyFrameHealAbsorb(auras: readonly Aura[]): number {
+  let total = 0;
+  for (const aura of auras) {
+    if (aura.kind === 'heal_absorb') total += Math.max(0, aura.value);
+  }
+  return total;
+}
+
+/** Both absorb totals a party row draws, in wire shape: the shield total always
+ *  rides, the heal absorb only while one is up (an older client or snapshot
+ *  without it reads "none"). One spread at both hosts' member projection, so the
+ *  offline row and the server party wire can never disagree on either total. */
+export function partyFrameAbsorbs(auras: readonly Aura[]): { absorb: number; healAbsorb?: number } {
+  const absorb = partyFrameAbsorb(auras);
+  const healAbsorb = partyFrameHealAbsorb(auras);
+  return healAbsorb > 0 ? { absorb, healAbsorb } : { absorb };
+}
+
 /** Entity ids currently tanking at least one living hostile mob. */
 export function partyFrameAggroTargets(entities: Iterable<Entity>): Set<number> {
   const targets = new Set<number>();
@@ -209,7 +229,7 @@ export function collectPartyInfo(ctx: SimContext): PartyInfo | null {
               z: e.pos.z,
               inCombat: e.inCombat ? 1 : 0,
               group: party.raidGroups.get(mPid) ?? 1,
-              absorb: partyFrameAbsorb(e.auras),
+              ...partyFrameAbsorbs(e.auras),
               role: partyFrameRole(meta.talentMods.role, meta.cls, e.auras),
               spec: meta.talentMods.spec ?? meta.talents.spec ?? null,
               // Effective health Rewind could currently restore to this member

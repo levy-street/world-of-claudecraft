@@ -357,6 +357,7 @@ import { gatherToolTooltipLines } from './gather_tool_tooltip';
 import { generalChatQuotaView } from './general_chat_quota_view';
 import { craftedLineKey, grantItemToken, grantQtyText } from './grant_line_view';
 import { decideGuildMotdLine } from './guild_motd_login';
+import { mountHealAbsorbOverlay } from './heal_absorb_overlay';
 import {
   healLandingFloatTextKey,
   healLandingLogKey,
@@ -4711,6 +4712,7 @@ export class Hud {
     hpFill: this.pfHpEl,
     hpText: this.pfHpTextEl,
     absorb: this.pfAbsorbEl,
+    healAbsorb: mountHealAbsorbOverlay(this.pfAbsorbEl),
     portraitBorder: this.pfPortraitWrapEl,
     heraldry: {
       nameHeader: $('#pf-name-header'),
@@ -4777,6 +4779,7 @@ export class Hud {
       hpFill: this.targetHpEl,
       hpText: this.targetHpTextEl,
       absorb: this.targetAbsorbEl,
+      healAbsorb: mountHealAbsorbOverlay(this.targetAbsorbEl),
       raidMarker: $('#tf-raid-marker'),
       portraitBorder: this.targetPortraitWrapEl,
       heraldry: {

@@ -494,6 +494,9 @@ export class PartyFramesPainter {
         portraitKey: `${PARTY_CREST_KEY_PREFIX}${m.cls}`,
         absorb:
           config?.showAbsorbs === false ? null : { hp: m.hp, maxHp: m.mhp, total: m.absorb ?? 0 },
+        // Never gated by Show Absorb Shields: the healing a member still needs is
+        // actionable, the shield hatch is decoration.
+        healAbsorb: { hp: m.hp, maxHp: m.mhp, healTotal: m.healAbsorb ?? 0 },
         dead: !!m.dead,
         outOfRange: m.oor,
       }),

@@ -22,6 +22,7 @@ import type { PartyMemberAura } from '../world_api';
 import { AurasPainter, type AurasPainterDeps } from './auras_painter';
 import { type AuraInput, type AurasDeps, createAurasView } from './auras_view';
 import { setCrestImageWithFallback } from './crest_image_fallback';
+import { createHealAbsorbOverlay } from './heal_absorb_overlay';
 import { t } from './i18n';
 import type { PainterHostWriters } from './painter_host';
 import {
@@ -264,7 +265,10 @@ export function createPartyRow(
   incoming.className = 'pfm-incoming';
   const hpText = doc.createElement('span');
   hpText.className = 'pfm-hp-text';
-  hpBar.append(hpFill, incoming, rewind, hpAbsorb, hpText);
+  // The heal-absorb overlay (Living Rime, Stone Shell): an icy hatch over the
+  // health the member cannot regain yet, plus the healing-left number.
+  const healAbsorb = createHealAbsorbOverlay(doc);
+  hpBar.append(hpFill, incoming, rewind, hpAbsorb, healAbsorb.root, hpText);
 
   const resBar = doc.createElement('div');
   resBar.className = 'bar ui-bar';
@@ -341,6 +345,7 @@ export function createPartyRow(
       hpFill,
       hpText,
       absorb: hpAbsorb,
+      healAbsorb,
       resource: { container: resBar, fill: resFill },
     },
     {

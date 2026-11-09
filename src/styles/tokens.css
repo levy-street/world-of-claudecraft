@@ -1318,6 +1318,15 @@
     --color-fct-damage-taken-block: #7ec8e3;
     /* Absorbed damage text keeps the shipped pale blue. */
     --color-fct-absorb: #9fd7ff;
+    /* Heal-absorb overlay on unit-frame health bars (Living Rime, Stone Shell):
+       a dark frost wash over the locked health, thin icy hatching, a bright
+       rime edge where healing bites, and the healing-left number on an ink chip. */
+    --color-heal-absorb-wash: rgba(18, 44, 82, 0.6);
+    --color-heal-absorb-stripe: rgba(196, 234, 255, 0.62);
+    --color-heal-absorb-edge: #d8f3ff;
+    --color-heal-absorb-glow: rgba(120, 196, 255, 0.55);
+    --color-heal-absorb-text: #c8eeff;
+    --color-heal-absorb-chip: rgba(6, 18, 38, 0.8);
     /* Healing combat text keeps the shipped restorative green. */
     --color-fct-heal: #3ce63c;
     /* Experience combat text keeps the shipped violet reward hue. */
