@@ -7,7 +7,7 @@ import { ABILITIES, CLASSES, QUESTS } from '../../src/sim/data';
 import type { ResolvedAbility } from '../../src/sim/resolved_ability';
 import { type AbilityDef, GCD, MAX_LEVEL, MELEE_RANGE, MIN_GCD } from '../../src/sim/types';
 import { abilityDisplayDescription, abilityEffectText } from '../../src/ui/ability_description';
-import { abilityIndexGroup, itemActionSource } from './ability_access';
+import { abilityIndexGroup, itemActionSource, MEMBERSHIP_GROUP } from './ability_access';
 import { referenceAbility, specializationExamples } from './ability_builds';
 import { mediawikiAbilityDescription } from './ability_description';
 import { abilityScalingLines } from './ability_scaling';
@@ -75,7 +75,7 @@ export function abilityArticle(
       ? link(titleBy.ability.get(id)!, ABILITIES[id].name)
       : (ABILITIES[id]?.name ?? clean(id));
   const classGrant =
-    className === 'All classes'
+    className === MEMBERSHIP_GROUP
       ? 'All classes with active membership'
       : link(titleBy.class.get(def.class)!, className);
   const base = referenceAbility(def);

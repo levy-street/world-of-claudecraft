@@ -29,6 +29,7 @@ import { linkArticleMentions } from '../../scripts/mediawiki/article_mentions';
 import { tooltipCatalog } from '../../scripts/mediawiki/tooltip_catalog';
 import { ABILITIES, CLASSES, DUNGEON_LIST, ITEMS, MOBS, NPCS, QUESTS, ZONES, zoneContaining, BUILTIN_WORLD } from '../../src/sim/data';
 import { addCatalogPortals } from '../../scripts/mediawiki/catalog_portals';
+import { addZoneAndClassHubs } from '../../scripts/mediawiki/hub_portals';
 import { addQuestDirectory } from '../../scripts/mediawiki/quest_directory';
 import { subjects } from '../../mediawiki/reader/browse';
 import { abilityIndexGroup } from '../../scripts/mediawiki/ability_access';
@@ -191,9 +192,7 @@ addRotatingQuests({ ...writer, reserve });
 addCatalogPortals({ ...writer, reserve });
 const zoneDirectories = addQuestDirectory({ ...writer, reserve });
 
-const sortedZones = [...ZONES].sort((a,b) => a.levelRange[0]-b.levelRange[0] || a.levelRange[1]-b.levelRange[1] || a.name.localeCompare(b.name,'en'));
-add('Zones', section('Regions by level',bullets(sortedZones.map(z=>link(titleBy.zone.get(z.id)) + ' · '+(z.levelRange[0]===z.levelRange[1]?'Level '+z.levelRange[0]:'Levels '+z.levelRange.join(' to '))+' · '+z.hub.name))),['Portals']);
-add('Classes',section('Playable classes',bullets(Object.keys(CLASSES).sort().map(id=>link(titleBy.class.get(id))))),['Portals']);
+addZoneAndClassHubs({ ...writer, reserve });
 const raidParents = addDungeonCatalog({ ...writer, reserve });
 
 for (const zone of ZONES) {

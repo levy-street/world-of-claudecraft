@@ -24,6 +24,13 @@ export interface RaidGuide {
   rooms: DungeonDef[];
 }
 
+/** The name players know a raid by (Nythraxis is named for its boss, not its arena). */
+export function raidName(activity: FinderActivity): string {
+  return activity.dungeonId === 'nythraxis_boss_arena'
+    ? 'Nythraxis'
+    : DUNGEONS[activity.dungeonId].name;
+}
+
 export function raidRooms(activity: FinderActivity): DungeonDef[] {
   const rooms = new Map<string, DungeonDef>();
   for (const id of [activity.dungeonId, ...(activity.lockoutDungeonIds ?? [])]) {
@@ -45,10 +52,7 @@ export function addDungeonCatalog(w: Writer): Map<string, string> {
   for (const activity of FINDER_ACTIVITIES.filter(
     (a) => a.kind === 'raid' && a.difficulty === 'normal',
   )) {
-    const name =
-      activity.dungeonId === 'nythraxis_boss_arena'
-        ? 'Nythraxis'
-        : DUNGEONS[activity.dungeonId].name;
+    const name = raidName(activity);
     const title = w.reserve(name + ' (Raid)');
     const rooms = raidRooms(activity);
     raidGuides.push({ title, name, activity, rooms });

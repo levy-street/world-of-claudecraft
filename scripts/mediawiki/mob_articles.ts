@@ -24,6 +24,7 @@ import type { LootEntry } from '../../src/sim/types';
 import { WORLD_BOSS_CORPSE_SECONDS, WORLD_BOSSES } from '../../src/sim/world_boss';
 import { WORLD_SEED } from '../../src/sim/world_seed';
 import { companionBossSources, companionByCreature, companionRollText } from './companion_sources';
+import { creatureRole, FRIENDLY_GROUPS } from './creature_role';
 import { journalArticles } from './encounter_articles';
 import { type ArticleTools, append, lines, pct, ref, words } from './entity_format';
 import { mobMechanicLines } from './mob_mechanics';
@@ -125,7 +126,7 @@ export function addMobArticles(w: ArticleTools, itemSources: Map<string, Set<str
             guide +
             ' for how to collect it.',
         ),
-        ['Mobs', 'Companion creatures'],
+        ['Friendly creatures', FRIENDLY_GROUPS.companion],
       );
       continue;
     }
@@ -141,8 +142,7 @@ export function addMobArticles(w: ArticleTools, itemSources: Map<string, Set<str
           m.boss && 'boss',
           m.elite && 'elite',
           m.rare && 'rare',
-          m.dummy && 'training target',
-          m.petRole && 'companion',
+          creatureRole(m.id) !== 'enemy' && creatureRole(m.id),
         ]
           .filter(Boolean)
           .join(', ') || 'ordinary',
@@ -292,6 +292,11 @@ export function addMobArticles(w: ArticleTools, itemSources: Map<string, Set<str
       (journals.get(m.id) ?? '') +
       lines(w, 'Loot', drops) +
       lines(w, 'Quest credit', Array.from(hunted.get(m.id) ?? []));
-    w.add(w.titleBy.mob.get(m.id)!, info, ['Mobs', m.family]);
+    const role = creatureRole(m.id);
+    w.add(
+      w.titleBy.mob.get(m.id)!,
+      info,
+      role === 'enemy' ? ['Mobs', m.family] : ['Friendly creatures', FRIENDLY_GROUPS[role]],
+    );
   }
 }

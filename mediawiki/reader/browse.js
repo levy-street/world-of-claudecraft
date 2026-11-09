@@ -38,6 +38,31 @@ export const subjects = [
   ],
 ];
 
+// The page heading players see. Hub titles stay stable for links; only the label changes.
+const HUB_HEADINGS = { Dungeons: 'Dungeons and raids', Mobs: 'Enemies' };
+export function displayTitle(title) {
+  return (
+    HUB_HEADINGS[title] ??
+    title.replace(/ \((?:Items|Abilities|NPCs|Enemies) index\)(?: \(\d+\))?$/, '')
+  );
+}
+
+// The first few entry names a group page lists, so a tile can say what is inside it.
+export function tilePreview(text, limit = 3) {
+  const names = [];
+  for (const match of text.matchAll(
+    /^\* (?:<woc-art [^>]*\/> )?\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/gm,
+  )) {
+    const name = match[2] ?? match[1];
+    if (!names.includes(name)) names.push(name);
+    if (names.length === limit) break;
+  }
+  return names;
+}
+
+// Hubs built as tables (a class per row); their cells link the pages they index.
+const TABLE_HUBS = new Set(['Specializations', 'Talent choices']);
+
 export function directoryLink(line) {
   const match = /^\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/.exec(line);
   return match ? { title: match[1], label: match[2] ?? match[1] } : null;
@@ -62,8 +87,12 @@ export function isDirectory(page) {
 // Build real return paths from registry-generated directory links. Links embedded in
 // article prose (a reagent, quest reward, etc.) never become a navigational parent.
 export function browseTrails(pages) {
+  // Same hubs as the left navigation, specific collections before the systems hub that
+  // also lists them, so a deed reads Book of Deeds and not Game systems.
   const roots = [
     'Items',
+    'Crafting recipes',
+    'Professions',
     'Quests',
     'Mobs',
     'Abilities',
@@ -71,12 +100,31 @@ export function browseTrails(pages) {
     'Zones',
     'Dungeons',
     'Classes',
+    'Specializations',
+    'Talent choices',
+    'Book of Deeds',
+    'Mounts and riding',
+    'The Reliquary',
     'Gameplay Systems',
   ];
+  const isRaid = (page) => page?.categories.includes('Raids');
+  const childLinks = (page) => {
+    const links = [];
+    for (const line of page.text.split('\n')) {
+      if (line.startsWith('* ')) {
+        const child = directoryLink(line.slice(2));
+        if (child) links.push(child);
+      } else if (TABLE_HUBS.has(page.title) && /^[|!]/.test(line)) {
+        for (const m of line.matchAll(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g))
+          links.push({ title: m[1], label: m[2] ?? m[1] });
+      }
+    }
+    return links;
+  };
   const trails = new Map();
   for (const title of roots) {
     if (!pages.has(title)) continue;
-    const root = { title, label: title === 'Mobs' ? 'Enemies' : title };
+    const root = { title, label: displayTitle(title) };
     const queue = [[root]];
     const visited = new Set();
     for (let i = 0; i < queue.length; i++) {
@@ -85,19 +133,15 @@ export function browseTrails(pages) {
       if (visited.has(here)) continue;
       visited.add(here);
       const page = pages.get(here);
-      for (const line of page.text.split('\n')) {
-        if (!line.startsWith('* ')) continue;
-        const child = directoryLink(line.slice(2));
-        if (
-          !child ||
-          roots.includes(child.title) ||
-          visited.has(child.title) ||
-          !pages.has(child.title)
-        )
+      for (const child of childLinks(page)) {
+        if (roots.includes(child.title) || visited.has(child.title) || !pages.has(child.title))
           continue;
-        if (isCollection(page) && pages.get(child.title).categories[0] !== page.title) continue;
+        const target = pages.get(child.title);
+        if (isCollection(page) && target.categories[0] !== page.title) continue;
+        // A raid page is an article, but its room list is the only way into its rooms.
+        if (isRaid(page) && !target.categories.includes('Dungeons')) continue;
         if (!trails.has(child.title)) trails.set(child.title, trail);
-        if (isDirectory(pages.get(child.title))) queue.push([...trail, child]);
+        if (isDirectory(target) || isRaid(target)) queue.push([...trail, child]);
       }
     }
   }

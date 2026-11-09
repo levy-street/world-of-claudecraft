@@ -162,6 +162,11 @@ const sections = [
   },
 ] as const;
 
+/** Topic pages listed under one systems path, minus its overview articles. */
+export function directoryTopics(title: string, skip: readonly string[] = []): string[] {
+  return (sections.find((s) => s.title === title)?.topics ?? []).filter((t) => !skip.includes(t));
+}
+
 export function systemDirectory(groups: ReadonlyMap<string, { title: string }>): string {
   const remaining = new Set(groups.keys());
   const body = [

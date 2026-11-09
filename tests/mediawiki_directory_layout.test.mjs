@@ -50,3 +50,68 @@ it('preserves dense item catalog rows and their filtering hooks', () => {
   ]);
   expect(view.textContent).toContain('Buy from Vendor.');
 });
+
+it('reads labelled facts for zone and class cards', () => {
+  expect(activityFacts('Levels: 1 to 7 · Town: Eastbrook')).toEqual([
+    ['Levels', '1 to 7'],
+    ['Town', 'Eastbrook'],
+  ]);
+});
+
+it('lays out the zone and class hubs as illustrated feature cards with labelled facts', () => {
+  for (const [title, variant] of [
+    ['Zones', 'activity-grid'],
+    ['Classes', 'activity-emblems'],
+  ]) {
+    const view = document.createElement('main');
+    view.innerHTML =
+      '<article><h2>Regions</h2><ul class="browse-records"><li><img data-game-art="/map_bg/vale.webp"><a href="#Vale">Vale</a> · Levels: 1 to 7 · Town: Eastbrook</li></ul></article>';
+    layoutDirectory(view, { title });
+    const list = view.querySelector('.activity-list');
+    expect(list.classList.contains(variant), title).toBe(true);
+    expect(view.querySelector('.activity-link').getAttribute('href')).toBe('#Vale');
+    expect(view.querySelector('.activity-art').dataset.gameArt).toBe('/map_bg/vale.webp');
+    expect([...view.querySelectorAll('.activity-facts dt')].map((d) => d.textContent)).toEqual([
+      'Levels',
+      'Town',
+    ]);
+    expect(view.querySelector('h2 .section-count').textContent).toBe('1');
+  }
+});
+
+it('frames entry art in record lists without dropping the entry link', () => {
+  const view = document.createElement('main');
+  view.innerHTML =
+    '<article><ul class="browse-records"><li><img data-game-art="/ui/mobs/bat.webp"><a href="#Bat">Bat</a></li></ul></article>';
+  layoutDirectory(view, { title: 'Beasts (Enemies index)' });
+  const frame = view.querySelector('.record-art');
+  expect(frame.querySelector('img').dataset.gameArt).toBe('/ui/mobs/bat.webp');
+  expect(frame.nextElementSibling.querySelector('a.record-name').getAttribute('href')).toBe('#Bat');
+});
+
+it('drops tile art only when every tile in a group would show the same picture', () => {
+  const tile = (name, art) =>
+    '<li><a class="browse-tile" href="#' +
+    name +
+    '"><span class="tile-art"><img data-game-art="' +
+    art +
+    '"></span><span class="tile-copy"><strong>' +
+    name +
+    '</strong></span></a></li>';
+  const view = document.createElement('main');
+  view.innerHTML =
+    '<article><ul class="browse-groups">' +
+    tile('Banker', '/ui/npc.webp') +
+    tile('Cook', '/ui/npc.webp') +
+    tile('Smith', '/ui/npc.webp') +
+    '</ul><ul class="browse-groups">' +
+    tile('Beasts', '/ui/bat.webp') +
+    tile('Undead', '/ui/lich.webp') +
+    tile('Trolls', '/ui/bat.webp') +
+    '</ul></article>';
+  layoutDirectory(view, { title: 'NPCs' });
+  const [same, varied] = view.querySelectorAll('.browse-groups');
+  expect(same.querySelectorAll('.tile-art')).toHaveLength(0);
+  expect(same.querySelectorAll('.browse-tile.no-art')).toHaveLength(3);
+  expect(varied.querySelectorAll('.tile-art')).toHaveLength(3);
+});

@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { abilityIndexGroup } from '../scripts/mediawiki/ability_access';
+import { abilityIndexGroup, MEMBERSHIP_GROUP } from '../scripts/mediawiki/ability_access';
 import { wikiAbilityArtPath } from '../scripts/mediawiki/ability_art_path';
 import { classAbilitySections } from '../scripts/mediawiki/class_ability_sections';
 import type { AbilityPageTools } from '../scripts/mediawiki/talent_articles';
@@ -33,7 +33,7 @@ describe('illustrated class spellbooks', () => {
         .filter(
           (a) =>
             !a.hiddenFromPlayer &&
-            [CLASSES[cls].name, 'All classes'].includes(abilityIndexGroup(a)),
+            [CLASSES[cls].name, MEMBERSHIP_GROUP].includes(abilityIndexGroup(a)),
         )
         .map((a) => a.id);
       expect([...new Set(ids)].sort()).toEqual(expected.sort());

@@ -47,7 +47,8 @@ function contact(
 export function questZoneName(quest: QuestDef | undefined): string {
   const giver = quest && getActiveWorldContent().npcs[quest.giverNpcId];
 
-  if (giver && (!giver.dynamic || giver.fixedPost || giver.id === 'drillmaster_hale')) {
+  // A system-spawned giver still stands at its authored post; the origin marks none.
+  if (giver && (giver.pos.x !== 0 || giver.pos.z !== 0)) {
     const zone = zoneContaining(giver.pos.x, giver.pos.z);
 
     if (zone) return zone.name;

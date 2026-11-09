@@ -17,14 +17,22 @@ export function activityFacts(text) {
       if (value === 'Normal and Heroic') return ['Difficulty', 'Normal / Heroic'];
       if (/^\d+ players$/.test(value)) return ['Group size', value];
       if (/^\d+ (boss )?encounters?$/.test(value)) return ['Bosses', value.split(' ')[0]];
+      const labelled = /^([A-Z][A-Za-z ]{0,24}): (.+)$/.exec(value);
+      if (labelled) return [labelled[1], labelled[2]];
       return ['', value];
     })
     .filter(([, value]) => value);
 }
 
-function activityList(list, raids) {
+// Hubs whose entries are few and illustrated enough to read as feature cards.
+const FEATURE_PAGES = {
+  Zones: ['activity-grid'],
+  Classes: ['activity-grid', 'activity-emblems'],
+};
+
+function activityList(list, raids, variants = []) {
   list.classList.remove('browse-records');
-  list.classList.add('activity-list');
+  list.classList.add('activity-list', ...variants);
   if (raids) list.classList.add('activity-raids');
   for (const row of list.children) {
     const link = row.querySelector('a');
@@ -57,6 +65,13 @@ function activityList(list, raids) {
   }
 }
 
+function countHeading(heading, list) {
+  if (!heading) return;
+  const count = node('span', 'section-count', String(list.children.length));
+  count.setAttribute('aria-label', list.children.length + ' entries');
+  heading.append(count);
+}
+
 export function layoutDirectory(view, page, wide = true) {
   view.classList.add('wiki-directory');
   const article = view.querySelector('article');
@@ -83,18 +98,38 @@ export function layoutDirectory(view, page, wide = true) {
       const section = heading?.textContent;
       if (section === 'Five-player dungeons' || section === 'Raids' || page.title === 'Raids') {
         activityList(list, section === 'Raids' || page.title === 'Raids');
-        if (heading) {
-          const count = node('span', 'section-count', String(list.children.length));
-          count.setAttribute('aria-label', list.children.length + ' entries');
-          heading.append(count);
-        }
+        countHeading(heading, list);
       }
+    }
+  }
+  if (Object.hasOwn(FEATURE_PAGES, page.title)) {
+    view.classList.add('activity-directory');
+    for (const list of article.querySelectorAll('.browse-records')) {
+      let heading = list.previousElementSibling;
+      while (heading && !heading.matches('h2')) heading = heading.previousElementSibling;
+      activityList(list, false, FEATURE_PAGES[page.title]);
+      countHeading(heading, list);
+    }
+  }
+  // One picture repeated on every tile (all NPC services share a portrait) says nothing.
+  for (const list of article.querySelectorAll('.browse-groups')) {
+    const frames = [...list.querySelectorAll('.tile-art')];
+    const art = new Set(frames.map((f) => f.querySelector('img')?.dataset.gameArt));
+    if (frames.length < 3 || art.size > 1) continue;
+    for (const frame of frames) {
+      frame.closest('.browse-tile')?.classList.add('no-art');
+      frame.remove();
     }
   }
   for (const row of article.querySelectorAll('.browse-records > li')) {
     const art = row.querySelector(':scope > img');
     const copy = node('div', 'record-copy');
     for (const child of [...row.childNodes]) if (child !== art) copy.append(child);
+    if (art) {
+      const frame = node('span', 'record-art');
+      art.replaceWith(frame);
+      frame.append(art);
+    }
     const title = copy.querySelector('a');
     if (title) {
       title.classList.add('record-name');

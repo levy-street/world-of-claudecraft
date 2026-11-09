@@ -104,7 +104,11 @@ describe('the searchable player encyclopedia', () => {
     const count = (category: string) =>
       pages.filter((p) => p.includes('[[Category:' + category + ']]'));
     expect(count('Items').length).toBe(Object.keys(ITEMS).length);
-    expect(count('Mobs').length).toBe(Object.keys(MOBS).length);
+    // Every creature is published: enemies under Mobs, the rest as friendly creatures.
+    expect(count('Mobs').length + count('Friendly creatures').length).toBe(
+      Object.keys(MOBS).length,
+    );
+    expect(count('Friendly creatures').length).toBeGreaterThan(20);
     const systemMaps = count('Gameplay Systems').filter((p) => p.includes('== Route map =='));
     expect(systemMaps).toHaveLength(count('Gameplay Systems').length - 6);
     for (const page of systemMaps)

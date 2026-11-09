@@ -126,7 +126,7 @@ export function addQuestDirectory(w: Writer) {
       zoneRank(a) - zoneRank(b) || (orderOfZones.get(a) ?? 999) - (orderOfZones.get(b) ?? 999),
   )) {
     const title = page(
-      name === 'Other locations' ? 'Quests with special starting locations' : name + ' quests',
+      name === 'Other locations' ? 'Raid quests' : name + ' quests',
       items,
       'Quests are grouped by the earliest level allowed by the quest and its prerequisites. Within a level, prerequisite quests appear before their follow-ups. Each entry names the quest giver.',
       'level',
@@ -135,7 +135,7 @@ export function addQuestDirectory(w: Writer) {
     zoneLinks.push(
       counted(
         title,
-        name === 'Other locations' ? 'Special starting locations' : name,
+        name === 'Other locations' ? 'Raid quests (given inside the raid)' : name,
         items.length,
       ),
     );
@@ -167,8 +167,8 @@ export function addQuestDirectory(w: Writer) {
   }
   w.add(
     'Quests',
-    'Choose a starting area to follow its quest chains, or browse by activity. Open a quest for its objectives, route map, turn-in and rewards.\n\n' +
-      w.section('Starting areas', w.bullets(zoneLinks)) +
+    'Choose a zone to follow its quest chains, or browse by activity. Open a quest for its objectives, route map, turn-in and rewards.\n\n' +
+      w.section('Quests by zone', w.bullets(zoneLinks)) +
       w.section('Quest activities', w.bullets(activityLinks)) +
       w.section(
         'Rotating assignments',

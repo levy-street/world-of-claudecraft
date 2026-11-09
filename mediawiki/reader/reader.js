@@ -1,5 +1,13 @@
 import { layoutArticle, sectionRoute } from './article_layout.js';
-import { browseTrails, directoryLink, isCollection, isDirectory, subjects } from './browse.js';
+import {
+  browseTrails,
+  directoryLink,
+  displayTitle,
+  isCollection,
+  isDirectory,
+  subjects,
+  tilePreview,
+} from './browse.js';
 import { directoryArt } from './directory_art.js';
 import { layoutDirectory } from './directory_layout.js';
 import { mountWikiTooltips } from './hover_tooltip.js';
@@ -274,16 +282,23 @@ export async function openReader({ seedUrl, packed, cardsUrl, packedCards, asset
         .slice(row.indexOf(']]') + 2)
         .trim()
         .replace(/^·\s*/, '')
-        .replace(/^\((\d+)\)$/, '$1 articles');
+        .replace(/^\((\d+)\)$/, (_, n) => n + (n === '1' ? ' entry' : ' entries'));
+      const art = pages.get(child.title)?.art || tileArt.get(child.title);
+      const preview = tilePreview(pages.get(child.title)?.text ?? '');
       return (
-        '<a class="browse-tile" href="' +
+        '<a class="browse-tile' +
+        (art ? '' : ' no-art') +
+        '" href="' +
         href(child.title) +
         '">' +
-        image(pages.get(child.title)?.art || tileArt.get(child.title), 'index-icon') +
-        '<span><strong>' +
+        (art ? '<span class="tile-art">' + image(art, 'index-icon') + '</span>' : '') +
+        '<span class="tile-copy"><strong>' +
         escapeHtml(child.label) +
         '</strong>' +
         (note ? '<small>' + inline(note) + '</small>' : '') +
+        (preview.length > 1
+          ? '<span class="tile-preview">' + escapeHtml(preview.join(', ')) + '</span>'
+          : '') +
         '</span></a>'
       );
     };
@@ -392,7 +407,8 @@ export async function openReader({ seedUrl, packed, cardsUrl, packedCards, asset
       view.dataset.article = current;
       const page = pages.get(current);
       document.title =
-        (current === 'Main Page' ? 'Player Encyclopedia' : current) + ' | World of ClaudeCraft';
+        (current === 'Main Page' ? 'Player Encyclopedia' : displayTitle(current)) +
+        ' | World of ClaudeCraft';
       if (!page) {
         view.innerHTML =
           '<h1>Article unavailable</h1><p>' +
@@ -478,18 +494,15 @@ export async function openReader({ seedUrl, packed, cardsUrl, packedCards, asset
           /^\/(?:map_bg|textures\/loading)/.test(page.art) ? 'article-art wide' : 'article-art',
         ) +
         '<h1>' +
-        escapeHtml(
-          current === 'Dungeons'
-            ? 'Dungeons and raids'
-            : current.replace(/ \((?:Items|Abilities|NPCs|Enemies) index\)(?: \(\d+\))?$/, ''),
-        ) +
+        escapeHtml(displayTitle(current)) +
         '</h1></div><div class="tags">' +
         page.categories
-          .filter((c) => c !== 'Portals' && !c.endsWith(' directories'))
+          // Lowercase categories are internal sort keys (biome, family, quality), not topics.
+          .filter((c) => c !== 'Portals' && !c.endsWith(' directories') && !/^[a-z]/.test(c))
           .map((c) =>
             pages.has(c) && c !== current
-              ? '<a class="tag" href="' + href(c) + '">' + escapeHtml(c) + '</a>'
-              : '<span class="tag">' + escapeHtml(c) + '</span>',
+              ? '<a class="tag" href="' + href(c) + '">' + escapeHtml(displayTitle(c)) + '</a>'
+              : '<span class="tag">' + escapeHtml(displayTitle(c)) + '</span>',
           )
           .join('') +
         '</div>' +

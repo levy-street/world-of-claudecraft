@@ -10,8 +10,10 @@ export function itemActionSource(def: AbilityDef) {
   return item?.use?.type === 'shockBomb' ? item : undefined;
 }
 
+export const MEMBERSHIP_GROUP = 'Membership actions';
+
 export function abilityIndexGroup(def: AbilityDef) {
   if (itemActionSource(def)) return 'Item actions';
-  if (membershipIds.has(def.id)) return 'All classes';
+  if (membershipIds.has(def.id)) return MEMBERSHIP_GROUP;
   return CLASSES[def.class].name;
 }

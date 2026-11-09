@@ -21,6 +21,7 @@ import { MAX_LEVEL, PRESTIGE_XP_PER_RANK, xpForLevel } from '../../src/sim/types
 import { guideStrings as guide } from '../../src/ui/i18n.catalog/guide';
 import { addActivityRules } from './system_activities';
 import { addExpeditionCollections } from './system_collections';
+import { directoryTopics } from './system_directory';
 import { addPetAndTravelRules } from './system_pets_travel';
 import { addRecoveryAndFinder } from './system_recovery';
 import { addRiftAndHoardRules } from './system_rifts';
@@ -255,6 +256,26 @@ export function addSystemArticles(ctx: SystemWikiContext): string[] {
     trades.archetypeSwitchBody,
     'Eastbrook has the forge, kitchens, loom and toolworks. Fenbridge has the tannery and Highwatch has the apothecary. Use [[Crafting stations]] for their coordinates. The recipe determines whether you need a bench. You can apply equipment enchants in the field, while Enchanting recipes for gathering-tool charms use the toolworks.',
     trades.provenanceBody,
+    heading(
+      'Crafting professions',
+      list(
+        directoryTopics('Crafting professions', [
+          'Professions',
+          'Crafting recipes',
+          'Crafting stations',
+          'Profession work orders',
+          'Masterwork crafting',
+        ]).map((t) => '[[' + t + ']]'),
+      ),
+    ),
+    heading(
+      'Gathering professions',
+      list(
+        directoryTopics('Gathering and farming', ['Harvesting and gathering', 'Farm crops']).map(
+          (t) => '[[' + t + ']]',
+        ),
+      ),
+    ),
   );
   w.describe(
     'Harvesting and gathering',

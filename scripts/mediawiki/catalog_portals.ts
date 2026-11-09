@@ -1,3 +1,4 @@
+import { FINDER_ACTIVITIES } from '../../src/sim/content/dungeon_finder';
 import {
   ABILITIES,
   ALL_RECIPES,
@@ -15,16 +16,19 @@ import { npcRoleFor } from '../../src/sim/npc_role';
 import { WORLD_PVP_SKULL_BAG_ITEM_ID } from '../../src/sim/pvp/world_pvp_trophy';
 import { type ItemDef, type MobFamily, questTurnInNpcIds } from '../../src/sim/types';
 import { t } from '../../src/ui/i18n';
-import { abilityIndexGroup } from './ability_access';
-import { companionByCreature } from './companion_sources';
+import { abilityIndexGroup, MEMBERSHIP_GROUP } from './ability_access';
+import { type ClassAbilityGroup, classAbilityGroup } from './class_ability_sections';
+import { creatureRole, FRIENDLY_GROUPS, ROLE_SECTIONS } from './creature_role';
+import { raidName, raidRooms } from './dungeon_catalog';
 import { type ArticleTools, words } from './entity_format';
+import { itemPlacement, offhandSection } from './item_catalog_groups';
 import { wikiItemKind } from './wiki_item_kind';
 
 type Writer = Pick<ArticleTools, 'add' | 'section' | 'bullets' | 'link' | 'titleBy'> & {
   reserve(title: string): string;
 };
 type Root = 'Items' | 'Mobs' | 'Abilities' | 'NPCs';
-type Member = { title: string; name: string; section: string };
+type Member = { title: string; name: string; section: string; key?: string };
 
 const display = (value: string) => {
   const s = words(value);
@@ -33,19 +37,23 @@ const display = (value: string) => {
 const rootLabel = (root: Root) => (root === 'Mobs' ? 'Enemies' : root);
 const collate = (a: string, b: string) => a.localeCompare(b, 'en', { numeric: true });
 
-function catalog(w: Writer, root: Root, intro: string) {
+function catalog(w: Writer, root: Root, intro: string, order: string[] = []) {
+  const rank = (facet: string) => {
+    const i = order.indexOf(facet);
+    return i < 0 ? order.length : i;
+  };
   const groups = new Map<string, Map<string, Map<string, Member>>>();
   return {
     file(facet: string, label: string, member: Member) {
       const buckets = groups.get(facet) ?? new Map<string, Map<string, Member>>();
       const entries = buckets.get(label) ?? new Map<string, Member>();
-      entries.set(member.title, member);
+      entries.set(member.key ?? member.title, member);
       buckets.set(label, entries);
       groups.set(facet, buckets);
     },
     publish() {
       const parts = [intro];
-      for (const [facet, buckets] of groups) {
+      for (const [facet, buckets] of [...groups].sort(([a], [b]) => rank(a) - rank(b))) {
         const children: string[] = [];
         for (const [label, members] of [...buckets].sort(([a], [b]) => collate(a, b))) {
           const title = w.reserve(label + ' (' + rootLabel(root) + ' index)');
@@ -89,30 +97,26 @@ const gearSlots: Record<string, string> = {
   offhand: 'Off-hand equipment',
   mainhand: 'Main-hand equipment',
 };
-const kinds: Record<
-  Exclude<ItemDef['kind'], 'weapon' | 'armor' | 'held_offhand'>,
-  [string, string]
-> = {
-  food: ['Consumables', 'Food'],
-  drink: ['Consumables', 'Drinks'],
-  potion: ['Consumables', 'Potions'],
-  elixir: ['Consumables', 'Elixirs'],
-  flask: ['Consumables', 'Flasks'],
-  scroll: ['Consumables', 'Scrolls'],
-  tool: ['Professions and supplies', 'Tools and supplies'],
-  recipe: ['Professions and supplies', 'Crafting patterns'],
-  bag: ['Storage and collections', 'Bags'],
-  mount: ['Storage and collections', 'Mount items'],
-  buddy: ['Storage and collections', 'Companion items'],
-  buddy_cosmetic: ['Storage and collections', 'Companion cosmetics'],
-  quest: ['Adventure and trade', 'Quest items'],
-  junk: ['Adventure and trade', 'Trade goods and junk'],
-};
+// Heroic copies share their Normal item's name; say which one a row is.
+const itemName = (item: ItemDef) =>
+  item.heroicOf || item.heroic ? item.name + ' (Heroic)' : item.name;
+
 function itemPortal(w: Writer) {
   const c = catalog(
     w,
     'Items',
     'Browse gear by the slot you want to fill, find supplies for a profession, or look up an item you can use. Materials also appear under the crafts that consume them.',
+    [
+      'Weapons',
+      'Armor, jewelry and off-hands',
+      'Consumables',
+      'Professions and supplies',
+      'Currencies and tokens',
+      'Collections and appearance',
+      'Bags and travel',
+      'Adventure and trade',
+      'Ingredients by profession',
+    ],
   );
   const ingredients = new Map<string, Set<string>>();
   for (const recipe of ALL_RECIPES)
@@ -123,12 +127,12 @@ function itemPortal(w: Writer) {
     }
   for (const [id, title] of w.titleBy.item) {
     const item = ITEMS[id];
-    const entry = { title, name: item.name, section: display(item.quality ?? 'common') };
+    const entry = { title, name: itemName(item), section: display(item.quality ?? 'common') };
     if (item.kind === 'armor' || item.kind === 'held_offhand') {
       const slot = gearSlots[item.slot ?? 'offhand'];
       c.file('Armor, jewelry and off-hands', slot, {
         ...entry,
-        section: item.armorType ? display(item.armorType) : entry.section,
+        section: offhandSection(item) || (item.armorType ? display(item.armorType) : entry.section),
       });
     } else if (item.kind === 'weapon') {
       const hands = {
@@ -138,13 +142,12 @@ function itemPortal(w: Writer) {
       };
       c.file('Weapons', hands[weaponHand(item) ?? 'onehand'], entry);
     } else {
-      const [section, label] = kinds[item.id === WORLD_PVP_SKULL_BAG_ITEM_ID ? 'bag' : item.kind];
+      const [facet, label] =
+        item.id === WORLD_PVP_SKULL_BAG_ITEM_ID ? ['Bags and travel', 'Bags'] : itemPlacement(item);
       c.file(
-        section,
+        facet,
         label,
-        item.kind === 'junk' && item.id !== WORLD_PVP_SKULL_BAG_ITEM_ID
-          ? { ...entry, section: wikiItemKind(item) }
-          : entry,
+        label === 'Materials' ? { ...entry, section: wikiItemKind(item) } : entry,
       );
     }
     for (const craft of ingredients.get(id) ?? [])
@@ -171,55 +174,79 @@ function enemyPortal(w: Writer) {
   const c = catalog(
     w,
     'Mobs',
-    'Find a creature by family, encounter rank or dungeon. A creature can appear in more than one list.',
+    'Find an enemy by family, encounter rank, dungeon or raid. An enemy can appear in more than one list. Companions, pets, practice targets and escorts are listed with the friendly characters under NPCs.',
+    ['Creature families', 'Encounter rank', 'Dungeon spawn lists', 'Raid spawn lists'],
   );
   for (const [id, title] of w.titleBy.mob) {
+    if (creatureRole(id) !== 'enemy') continue;
     const m = MOBS[id];
     const family = families[m.family];
     const entry = { title, name: m.name, section: family };
-    if (companionByCreature.has(id)) {
-      c.file('Friendly creatures', 'Cosmetic companions', entry);
-      continue;
-    }
     const rank = m.boss
       ? 'Bosses'
       : m.rare
         ? 'Rare enemies'
         : m.elite
           ? 'Elites'
-          : 'Other creatures';
+          : 'Normal enemies';
     c.file('Creature families', family, { ...entry, section: rank });
+    // A boss can also be elite or rare; list it under every rank a player might search.
     if (m.boss) c.file('Encounter rank', 'Bosses', entry);
     if (m.elite) c.file('Encounter rank', 'Elites', entry);
     if (m.rare) c.file('Encounter rank', 'Rare enemies', entry);
-    if (!m.boss && !m.elite && !m.rare) c.file('Encounter rank', 'Other creatures', entry);
+    if (!m.boss && !m.elite && !m.rare) c.file('Encounter rank', 'Normal enemies', entry);
   }
+  // A raid's rooms are one place to a player; list their spawns under the raid.
+  const raidOf = new Map<string, string>();
+  for (const a of FINDER_ACTIVITIES.filter((f) => f.kind === 'raid'))
+    for (const room of raidRooms(a)) raidOf.set(room.id, raidName(a));
   for (const d of DUNGEON_LIST)
     for (const spawn of d.spawns) {
       const m = MOBS[spawn.mobId],
         title = w.titleBy.mob.get(spawn.mobId);
-      if (title && m)
-        c.file('Dungeon spawn lists', d.name, { title, name: m.name, section: families[m.family] });
+      if (!title || !m || creatureRole(spawn.mobId) !== 'enemy') continue;
+      const raid = raidOf.get(d.id);
+      c.file(raid ? 'Raid spawn lists' : 'Dungeon spawn lists', raid ?? d.name, {
+        title,
+        name: m.name,
+        section: raid ? d.name : families[m.family],
+        key: title + '@' + d.id,
+      });
     }
   c.publish();
 }
+
+// Index headings for spellbook entries outside the base kit; same split as the class page.
+const EXTRA_SECTIONS: Record<ClassAbilityGroup, string> = {
+  'Class spellbook': 'Other actions',
+  'Specialization abilities': 'Specialization abilities',
+  'Talent choices': 'Talent abilities',
+  'Quest abilities': 'Quest abilities',
+  'Conditional replacements': 'Conditional replacements',
+  'Additional class actions': 'Other actions',
+  'Membership ability': 'Other actions',
+};
 
 function abilityPortal(w: Writer) {
   const c = catalog(
     w,
     'Abilities',
     'Choose a class for its spellbook, including granted actions. The spell school index groups abilities across all classes. Open an ability for its unlock conditions, ranks, costs and scaling.',
+    ['Class spellbooks', 'Other sources', 'Schools'],
   );
   for (const [id, title] of w.titleBy.ability) {
     const ability = ABILITIES[id];
     const cls = abilityIndexGroup(ability),
       school = display(ability.school);
-    c.file(cls === 'Item actions' ? 'Other sources' : 'Class spellbooks', cls, {
+    const otherSource = cls === 'Item actions' || cls === MEMBERSHIP_GROUP;
+    c.file(otherSource ? 'Other sources' : 'Class spellbooks', cls, {
       title,
       name: ability.name,
-      section: CLASSES[ability.class].abilities.includes(id)
-        ? 'Level ' + ability.learnLevel
-        : 'Additional actions',
+      section: otherSource
+        ? cls
+        : CLASSES[ability.class].abilities.includes(id)
+          ? 'Level ' + ability.learnLevel
+          : EXTRA_SECTIONS[classAbilityGroup(ability)],
     });
     c.file('Schools', school, { title, name: ability.name, section: cls });
   }
@@ -230,7 +257,16 @@ function npcPortal(w: Writer) {
   const c = catalog(
     w,
     'NPCs',
-    'Look for the service you need or browse by location. Quest contacts can appear in both the starting and hand-in lists.',
+    'Look for the service you need or browse by location. Quest contacts can appear in both the starting and hand-in lists. Friendly creatures covers companions, pets, practice targets and escorts.',
+    // Breadcrumbs follow the first section that lists a page, so place comes first.
+    [
+      'Zones',
+      'Dungeons and raids',
+      'Other locations',
+      'Services',
+      'Quest contacts',
+      'Friendly creatures',
+    ],
   );
   const givers = new Set(Object.values(QUESTS).map((q) => q.giverNpcId));
   const recipients = new Set(Object.values(QUESTS).flatMap(questTurnInNpcIds));
@@ -238,19 +274,30 @@ function npcPortal(w: Writer) {
     const n = BUILTIN_WORLD.npcs[id] ?? NPCS[id];
     const role = npcRoleFor(n);
     const service = role ? t(`hudChrome.nameplate.npcRole.${role}`) : 'Other residents';
-    const zone =
-      !n.dynamic || n.fixedPost || n.weeklyEmissary
-        ? zoneContaining(n.pos.x, n.pos.z)?.name
-        : undefined;
+    // A system-spawned NPC still stands at its authored post. The origin is the
+    // placeholder for NPCs with no post (raid walk-ins, the spirit healer).
+    const posted = n.pos.x !== 0 || n.pos.z !== 0;
+    const zone = posted ? zoneContaining(n.pos.x, n.pos.z)?.name : undefined;
     const rooms = DUNGEON_LIST.filter((d) => d.npcs?.some((s) => s.npcId === id)).map(
       (d) => d.name,
     );
-    const areas = zone ? [zone, ...rooms] : rooms.length ? rooms : ['Activity-dependent locations'];
-    const entry = { title, name: n.name, section: areas[0] };
-    for (const location of areas) c.file('Locations', location, { ...entry, section: service });
+    const entry = { title, name: n.name, section: zone ?? rooms[0] ?? 'Activities' };
+    if (zone) c.file('Zones', zone, { ...entry, section: service });
+    for (const room of rooms) c.file('Dungeons and raids', room, { ...entry, section: service });
+    if (!zone && !rooms.length)
+      c.file('Other locations', 'Events and activities', { ...entry, section: service });
     if (role) c.file('Services', service, entry);
     if (givers.has(id)) c.file('Quest contacts', 'Quest givers', entry);
     if (recipients.has(id)) c.file('Quest contacts', 'Quest hand-ins', entry);
+  }
+  for (const [id, title] of w.titleBy.mob) {
+    const role = creatureRole(id);
+    if (role === 'enemy') continue;
+    c.file('Friendly creatures', FRIENDLY_GROUPS[role], {
+      title,
+      name: MOBS[id].name,
+      section: ROLE_SECTIONS[role],
+    });
   }
   c.publish();
 }
