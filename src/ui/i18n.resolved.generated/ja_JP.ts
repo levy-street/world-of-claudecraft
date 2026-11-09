@@ -7351,7 +7351,7 @@ export const ja_JP: EnTranslations = {
       "dLine": "{seconds}秒後に足元に開く。ポータルBから離れた縁に立とう。",
       "carryTitle": "結ばれた疾風を運んでいる！",
       "carryLine": "各ポータルは対へ運ぶ：AからB、CからD。岩棚の縁から投げ込め。{seconds}秒後に炸裂する。",
-      "loosedLine": "The portal has loosed it. Throw it from the edge of the Cornice. It bursts in {seconds} sec.",
+      "loosedLine": "ポータルが解き放った。岩棚の縁から投げ込め。{seconds}秒後に炸裂する。",
       "lipTitle": "今だ、投げろ！",
       "lipLine": "縁に立っている。{seconds}秒後に炸裂する。",
       "throwKey": "縁で{key}を押して投げる",

@@ -26138,6 +26138,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.knotAlert.carryTitle': '얽힌 질풍을 나르는 중!',
   'hudChrome.knotAlert.carryLine':
     '각 포털은 짝으로 데려갑니다: A에서 B, C에서 D. 벼랑 가장자리에서 던지세요. {seconds}초 뒤 터집니다.',
+  'hudChrome.knotAlert.loosedLine':
+    '포털이 그것을 풀어 주었습니다. 벼랑 가장자리에서 던지세요. {seconds}초 뒤 터집니다.',
   'hudChrome.knotAlert.lipTitle': '지금 던지세요!',
   'hudChrome.knotAlert.lipLine': '가장자리에 서 있습니다. {seconds}초 뒤 터집니다.',
   'hudChrome.knotAlert.throwKey': '가장자리에서 {key}를 눌러 던지기',

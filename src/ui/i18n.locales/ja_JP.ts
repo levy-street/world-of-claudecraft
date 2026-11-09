@@ -26113,6 +26113,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.knotAlert.carryTitle': '結ばれた疾風を運んでいる！',
   'hudChrome.knotAlert.carryLine':
     '各ポータルは対へ運ぶ：AからB、CからD。岩棚の縁から投げ込め。{seconds}秒後に炸裂する。',
+  'hudChrome.knotAlert.loosedLine':
+    'ポータルが解き放った。岩棚の縁から投げ込め。{seconds}秒後に炸裂する。',
   'hudChrome.knotAlert.lipTitle': '今だ、投げろ！',
   'hudChrome.knotAlert.lipLine': '縁に立っている。{seconds}秒後に炸裂する。',
   'hudChrome.knotAlert.throwKey': '縁で{key}を押して投げる',

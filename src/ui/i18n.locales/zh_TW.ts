@@ -24781,6 +24781,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.knotAlert.carryTitle': '你正攜帶結風！',
   'hudChrome.knotAlert.carryLine':
     '每個傳送門都通往另一端：A到B，C到D。在崖台邊緣把它扔出去。{seconds}秒後爆裂。',
+  'hudChrome.knotAlert.loosedLine': '傳送門已將它釋放。在崖台邊緣把它扔出去。{seconds}秒後爆裂。',
   'hudChrome.knotAlert.lipTitle': '現在扔！',
   'hudChrome.knotAlert.lipLine': '你站在邊緣。{seconds}秒後爆裂。',
   'hudChrome.knotAlert.throwKey': '在邊緣按{key}投擲',

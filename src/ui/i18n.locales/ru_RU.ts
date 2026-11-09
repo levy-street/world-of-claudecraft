@@ -26540,6 +26540,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.knotAlert.dLine': 'Он откроется у ваших ног через {seconds} сек. Встаньте у края, подальше от Портала B.',
   'hudChrome.knotAlert.carryTitle': 'Вы несёте Узел бури!',
   'hudChrome.knotAlert.carryLine': 'Каждый портал переносит к своей паре: из A в B, из C в D. Бросьте его с края Карниза. Он взорвётся через {seconds} сек.',
+  'hudChrome.knotAlert.loosedLine': 'Портал отпустил его. Бросьте его с края Карниза. Он взорвётся через {seconds} сек.',
   'hudChrome.knotAlert.lipTitle': 'Бросайте сейчас!',
   'hudChrome.knotAlert.lipLine': 'Вы стоите у края. Взрыв через {seconds} сек.',
   'hudChrome.knotAlert.throwKey': 'Нажмите {key} у края, чтобы бросить',

@@ -7351,7 +7351,7 @@ export const ru_RU: EnTranslations = {
       "dLine": "Он откроется у ваших ног через {seconds} сек. Встаньте у края, подальше от Портала B.",
       "carryTitle": "Вы несёте Узел бури!",
       "carryLine": "Каждый портал переносит к своей паре: из A в B, из C в D. Бросьте его с края Карниза. Он взорвётся через {seconds} сек.",
-      "loosedLine": "The portal has loosed it. Throw it from the edge of the Cornice. It bursts in {seconds} sec.",
+      "loosedLine": "Портал отпустил его. Бросьте его с края Карниза. Он взорвётся через {seconds} сек.",
       "lipTitle": "Бросайте сейчас!",
       "lipLine": "Вы стоите у края. Взрыв через {seconds} сек.",
       "throwKey": "Нажмите {key} у края, чтобы бросить",
