@@ -1501,6 +1501,9 @@ export class CharacterVisual {
   private meshToggles: GestureMeshToggles | null = null;
   /** VisualDef.glowPulses: the emissive map flared by gestures (glow_pulse.ts). */
   private glowPulse: GlowPulse | null = null;
+  /** Bound once: the glow pulse's own material test, handed to the glaze. */
+  private readonly glowPulseTakes = (src: THREE.Material): boolean =>
+    this.glowPulse?.takes(src) ?? false;
   /** VisualDef.turnRate / ClipMap.turn: the rooted body's drawn heading
    *  (turn_in_place_core.ts). */
   private readonly turnState = createTurnInPlaceState();
@@ -1901,6 +1904,10 @@ export class CharacterVisual {
     // owns the materials until it ends, and re-applies them itself then).
     if (this.glowPulse?.step(dt, s.dead) && !this.surfaceResponse.active)
       this.applyVisualMaterials();
+    // ...but the surface clones then carry the pulse's level (a dead body's
+    // glow keeps fading under the Quench statue's glaze).
+    if (this.glowPulse && this.surfaceResponse.active)
+      this.surfaceResponse.emissiveScale(this.glowPulse.scale, this.glowPulseTakes);
     // A transparent effect whose clones finished linking: swap them in HERE,
     // on the per-frame path, never in the gate callback (see effectSwapSettled).
     if (this.effectSwapSettled) this.commitPendingEffectSwap();
@@ -5142,7 +5149,7 @@ export class CharacterVisual {
     this.runeTintMaterials.clear();
     this.petrifiedMaterials.clear();
     this.auraGlowMaterials.clear();
-    this.surfaceResponse.materials.clear();
+    this.surfaceResponse.forget();
     this.glowPulse?.forget();
   }
 
@@ -6167,7 +6174,9 @@ export class CharacterVisual {
     this.beginAction(
       a,
       prev,
-      name === this.def.clips.rushArrival ? 0.04 : warriorActionBlend(this.key, name, ONESHOT_FADE),
+      name === this.def.clips.rushArrival
+        ? 0.04
+        : (this.def.clips.oneShotFade?.[name] ?? warriorActionBlend(this.key, name, ONESHOT_FADE)),
     );
     this.current = a;
     this.currentIsOneShot = true;

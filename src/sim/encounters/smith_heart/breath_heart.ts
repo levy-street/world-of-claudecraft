@@ -2,22 +2,26 @@
 // section 7.2, the row "The Knotted Gale"; the working name was the Storm
 // Heart, hence the ids' `heart`, the `stormHeart` rule and the dev verb):
 //
-//   The ball      a Knotted Gale drops far from the gaps; a 20 s fuse, then it
+//   The ball      a Knotted Gale drops far from the gaps; a 10 s fuse, then it
 //                 bursts and wipes the raid.
 //   The portals   two non-tanks are marked; after 5 s Portal A and Portal B open
 //                 exactly where each stands (a body that fell through a gap
 //                 opens it at the lip it left). No second chance. Phase 2's
 //                 two-ball round marks four: a second pair, Portal C and
 //                 Portal D, opens the same way, so the raid works both balls.
-//   The carrier   a third player walks onto the ball and takes it up: a crawl,
-//                 and no wind, pull, blast or throw moves them (heldFast).
+//   The carrier   a third player walks onto the ball and takes it up: half a
+//                 run, and no wind, pull, blast or throw moves them (heldFast).
 //   The crossing  anyone walking into a portal comes out at its partner (A and
 //                 B, C and D; never A to C), ball or no ball: the carrier may go out empty-handed for a far ball
 //                 and come back with it. Once per walk in: a body must step clear
 //                 before it can cross again.
 //   The throw     the interact press at the lip of ANY gap ends that ball (the
-//                 Iron Cage's seam: no new wire command). A carrier who goes
-//                 over a lip takes it with them: that counts as thrown.
+//                 Iron Cage's seam: no new wire command), once the ball has
+//                 been carried through a portal (loosed: at half speed the
+//                 Cornice is too small for the fuse alone to force the
+//                 portals, Jose's call of 2026-11-07). A carrier of a loosed
+//                 ball who goes over a lip takes it with them: that counts
+//                 as thrown; one not yet loosed leaves it on the lip.
 //   A dead carrier drops it where they fell, still ticking, for anyone but the
 //                 marked to take up.
 //   When          phase 1: up to three times, a start waiting out the indrawn
@@ -35,7 +39,8 @@
 //
 // Deterministic: zero rng (the picks are hashed). Every visible state rides the
 // wire as it is: the balls and portals are objects, the fuse is in the ball's
-// template, the marks and the load are auras, and the load's slow is read by
+// template, the marks and the load are auras (the load's value2 is 1 once its
+// ball is loosed, for the carrier's alert), and the load's slow is read by
 // the shared motion kernel (player_motion.ts moveSpeedMult), so the online
 // client predicts it; the crossing is the shared displacement, which the
 // server's movement epoch reconciles as a discontinuity.
@@ -55,6 +60,7 @@ import {
   BREATH_OBJECTS,
   KNOT_HOP_TEXT,
   KNOT_NOT_AT_LIP_ERROR,
+  KNOT_NOT_LOOSED_ERROR,
   knotTemplate,
   BREATH_TUNING as T,
 } from './breath_ids';
@@ -177,7 +183,14 @@ export function startHeart(s: BreathScope, count: number): boolean {
       at.z,
       T.heartPickR,
     );
-    heart.knots.push({ objectId: e.id, x: at.x, z: at.z, fuse: T.heartFuse, carrierId: null });
+    heart.knots.push({
+      objectId: e.id,
+      x: at.x,
+      z: at.z,
+      fuse: T.heartFuse,
+      carrierId: null,
+      loosed: false,
+    });
     cue(s, BREATH_CUES.knotLand, at.x, at.z, T.heartPickR);
   }
   st.lastKnots = dropped;
@@ -238,6 +251,9 @@ function stepPortals(s: BreathScope, heart: BreathHeart): void {
     if (!to) continue;
     if (heart.crossed.includes(p.id) || !onFloor(p, at) || p.carriedBy !== undefined) continue;
     heart.crossed.push(p.id);
+    // A ball carried through is loosed: from now on it may go over a lip.
+    const held = heart.knots.find((k) => k.carrierId === p.id);
+    if (held) loosen(held, p);
     const o = s.ctx.instanceOriginOf(s.inst);
     displacePlayer(s.ctx, p, { x: o.x + to.x, z: o.z + to.z, facing: p.facing }, KNOT_HOP_TEXT);
     s.ctx.emit({
@@ -335,6 +351,14 @@ function endMarks(s: BreathScope, heart: BreathHeart): void {
 
 // ---- the ball -----------------------------------------------------------------------------
 
+/** The ball is loosed (carried through a portal); its carrier's load says so
+ *  (value2 1, the alert's read). */
+function loosen(k: BreathKnot, carrier: Entity): void {
+  k.loosed = true;
+  const load = auraOf(carrier, BREATH_AURAS.laden);
+  if (load) load.value2 = 1;
+}
+
 function freeKnot(s: BreathScope, k: BreathKnot, carrier: Entity | undefined, at?: typeof k): void {
   if (carrier) dropAura(carrier, BREATH_AURAS.laden);
   k.carrierId = null;
@@ -358,6 +382,7 @@ function takeKnot(s: BreathScope, k: BreathKnot, p: Entity): void {
   k.carrierId = p.id;
   const a = putMarker(p, BREATH_AURAS.laden, BREATH_NAMES.laden, k.fuse, s.boss.id, {
     value: T.heartWalkMult,
+    value2: k.loosed ? 1 : 0,
   });
   a.duration = T.heartFuse;
   // The load holds from this tick: no wind left over to carry them a step.
@@ -400,9 +425,10 @@ function stepCarriers(s: BreathScope, heart: BreathHeart): void {
       continue;
     }
     if (!onFloor(p, at)) {
-      // Over a gap's lip: gone with them, which counts as thrown. Anywhere
-      // else (a hearth, a teleport) it stays where they last stood.
-      if (gapDistance(at.x, at.z) <= T.heartLipReach) {
+      // Over a gap's lip with a loosed ball: gone with them, which counts as
+      // thrown. Anywhere else (a hearth, a teleport), or a ball not yet
+      // through a portal, it stays where they last stood.
+      if (k.loosed && gapDistance(at.x, at.z) <= T.heartLipReach) {
         loseKnot(s, heart, k, p);
       } else freeKnot(s, k, p, last ? { ...k, ...last } : undefined);
       continue;
@@ -427,6 +453,10 @@ function stepThrows(s: BreathScope, heart: BreathHeart): void {
     const k = heart.knots.find((o) => o.carrierId === id);
     const p = s.ctx.entities.get(id);
     if (!k || !p || p.dead || s.ctx.isStunned(p)) continue;
+    if (!k.loosed) {
+      s.ctx.error(p.id, KNOT_NOT_LOOSED_ERROR);
+      continue;
+    }
     const at = local(s.ctx, s.inst, p);
     if (!atGapLip(at.x, at.z)) {
       s.ctx.error(p.id, KNOT_NOT_AT_LIP_ERROR);

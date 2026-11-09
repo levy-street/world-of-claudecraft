@@ -27,7 +27,7 @@ export const SMITH_HEART_SPEAKERS = {
   },
   captain_thessaly: { audition: null, preset: null },
   heart_quench_guardian: {
-    audition: { boss: 'heart-quench', take: 'glacier-matron', candidate: 1 },
+    audition: { boss: 'heart-quench', take: 'lake-empress', candidate: 1 },
     preset: 'rime-lake',
   },
   heart_heat_guardian: {

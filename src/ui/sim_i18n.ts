@@ -1636,6 +1636,7 @@ const baseEnTable = {
   'aura.heartPortalD': 'Portal D',
   'log.heartKnotHop': 'The portal tears you across the Cornice, gale and all.',
   'error.heartKnotNotAtLip': 'You must stand at the edge of the Cornice to throw the Knotted Gale.',
+  'error.heartKnotNotLoosed': 'The Knotted Gale clings to the Cornice: carry it through a portal before you throw it.',
   'mechanic.heartLooseGale': 'Loose Gale',
   'mechanic.heartBreakingStorm': 'Breaking Storm',
   'mechanic.heartLeapingBolt': 'Leaping Bolt',

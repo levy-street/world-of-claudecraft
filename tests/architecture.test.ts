@@ -1142,6 +1142,8 @@ const RENDER_PURE_CORES = [
   'src/render/smith_heart/heart_root_look_core.ts',
   'src/render/smith_heart_fx/breath_fx_core.ts',
   'src/render/smith_heart_fx/breath_roar_fx_core.ts',
+  // a thrown body's drawn hop off the floor (thrown_hop.ts, the Summit Roar)
+  'src/render/thrown_hop_core.ts',
   'src/render/smith_heart_fx/breath_heart_fx_core.ts',
   // The Quench vein (phase 2H): its kit's plan, the shared lip walls, its
   // frost on the mountain, its air and weather, its guardian's effects.
@@ -1181,6 +1183,10 @@ const RENDER_PURE_CORES = [
   'src/render/smith_heart_fx/breath_body_core.ts',
   'src/render/smith_heart_fx/breath_fight_fx_core.ts',
   'src/render/smith_heart_fx/quench_body_core.ts',
+  'src/render/smith_heart_fx/quench_wake_core.ts',
+  'src/render/smith_heart_fx/quench_breath_core.ts',
+  'src/render/smith_heart_fx/quench_strike_core.ts',
+  'src/render/smith_heart_fx/quench_strike_windup_core.ts',
   'src/render/smith_heart_fx/quench_fight_fx_core.ts',
   // The risen Quench blade's point continuing its kit piece, and the piece split.
   'src/render/smith_heart_fx/quench_blade_tip_core.ts',

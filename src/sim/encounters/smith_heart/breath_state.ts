@@ -132,6 +132,10 @@ export interface BreathKnot {
   z: number;
   fuse: number;
   carrierId: number | null;
+  /** Carried through a portal: only now may it go over a lip (Jose's call of
+   *  2026-11-07, the half-speed walk; it stays loosed if its carrier drops
+   *  it). */
+  loosed: boolean;
 }
 
 /** Mythic: one open portal of the Knotted Gale (instance-local place). */

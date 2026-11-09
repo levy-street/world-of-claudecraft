@@ -10,6 +10,8 @@ import { BREATH_GUARDIAN } from './smith_heart_fx/breath_body_core';
 import { attachBreathBodySockets } from './smith_heart_fx/breath_body_sockets';
 import { HEAT_GUARDIAN } from './smith_heart_fx/heat_body_core';
 import { attachHeatBodySockets } from './smith_heart_fx/heat_body_sockets';
+import { QUENCH_GUARDIAN } from './smith_heart_fx/quench_body_core';
+import { attachQuenchBodySockets } from './smith_heart_fx/quench_body_sockets';
 import { attachSpritesBuddyFlame } from './sprites_buddy_flame';
 
 const SPRITES_BUDDY_TEMPLATE_ID = buddyTemplateId('sprites');
@@ -29,4 +31,6 @@ export function attachTemplateModelVfx(
   else if (templateId === HEAT_GUARDIAN) attachHeatBodySockets(root);
   // The Guardian of the Breath's wind sockets (read by smith_heart_fx/breath_body.ts).
   else if (templateId === BREATH_GUARDIAN) attachBreathBodySockets(root);
+  // The Guardian of the Quench's cold sockets (read by smith_heart_fx/quench_body.ts).
+  else if (templateId === QUENCH_GUARDIAN) attachQuenchBodySockets(root);
 }

@@ -17,6 +17,7 @@ import {
   hasCharacterEffect,
 } from './character_effects_core';
 import { type QuenchGlaze, quenchGlazeOf, quenchSinkOf } from './smith_heart_fx/quench_glaze_core';
+import { quenchStatueGlazeFor } from './smith_heart_fx/quench_statue_glaze';
 
 export function isAvengingWrathAura(aura: Pick<Aura, 'id' | 'kind'>): boolean {
   return aura.id === 'avenging_wrath' && aura.kind === 'buff_dmg_done';
@@ -179,12 +180,16 @@ const _glaze: QuenchGlaze = { height: 0, glow: 0, bite: 0, alpha: 0 };
 
 /** Every whole-body tint a character's mirrored auras ask for, handed to its
  *  rig each frame: a Thornhollow Fields rune's lean, the Quench's frost glaze
- *  painted on the body's own material and, fallen through its ice, the body
+ *  painted on the body's own material (and the Quench guardian's statue frost
+ *  as she dies) and, fallen through its ice, the body
  *  drawn sunk in the water. `t` is render time in seconds (the glaze's urgent
  *  pulse). */
 export function applyCharacterBodyTints(v: CharacterBodyTintTarget, e: Entity, t: number): void {
   v.setRuneTint(characterRuneTintColor(e));
   const none = e.auras.length === 0;
-  v.setFrostGlaze(none ? null : quenchGlazeOf(e.auras, t, _glaze));
+  // The Guardian of the Quench frozen into a statue as she dies (her effects
+  // hold that glaze), else the fight's cold on a body.
+  const statue = quenchStatueGlazeFor(e.id);
+  v.setFrostGlaze(statue ?? (none ? null : quenchGlazeOf(e.auras, t, _glaze)));
   v.setWaterSink(none ? 0 : quenchSinkOf(e.auras));
 }

@@ -183,8 +183,9 @@ export const quench = {
       const t = mt?.self && !mt.self.dead ? mt.self : null;
       if (!t || !alive(g)) return null;
       // Beside the guardian on ONE side, 41 to 57 degrees off the tank's
-      // line (out of the breath's 70 degree cone) and a stride nearer the
-      // guardian than the tank: the main tank keeps two of them within the
+      // line (out of the breath's 70 degree cone), at the tank's own distance
+      // from her or a stride nearer (her body radius settles the tank at her
+      // gown, 3.5 yards out, the floor here): the main tank keeps two of them within the
       // warmth's 6 yd and each of them two others (on both sides, the main
       // tank's neighbours stood 6 to 7 yd off and he froze).
       const r = Math.max(4, hypot(g, t));

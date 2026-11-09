@@ -4,7 +4,9 @@
 // over the floor at BREATH_TUNING.roarSpeed; as its front reaches each
 // player that player takes the blow and is thrown straight away from the
 // guardian, the throw SLIDING over BREATH_TUNING.roarSlide seconds (the
-// knockback's walker a step each tick), so every client sees the wave travel,
+// knockback's walker a step each tick, eased like a blow: fast off it and
+// settling, breath_shove.ts 'knock'; the renderer lifts the body on a short
+// arc meanwhile, render/thrown_hop.ts), so every client sees the wave travel,
 // hit bodies in turn and fling them, instead of a blink to the edge. A throw
 // that carries a body past an open lip leaves it in the air over the void
 // (throwPlayer), the rest of the throw its flight as it falls. The anchored and the
@@ -86,7 +88,7 @@ export function stepRoar(s: BreathScope): void {
         dz,
         s.rules.gustThrow,
         T.roarSlide,
-        'linear',
+        'knock',
         BREATH_AURAS.thrown,
         BREATH_NAMES.gust,
       );

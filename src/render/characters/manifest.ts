@@ -477,6 +477,11 @@ export interface ClipMap {
    *  are held until the listed contact (attack_swing_core.ts contactDelaySec; the FCT painter
    *  and contact_queue.ts). Absent or unlisted = the effects play at once. */
   contacts?: Readonly<Record<string, readonly number[]>>;
+  /** Seconds a named one-shot crossfades in over, in place of the standard one-shot fade
+   *  (0.1 s). For a blow whose contact is its first frame, played on the event that lands it
+   *  from a pose already low over its mark (the Quench queen's StrikeSlam): a short fade puts
+   *  the fists on the ice on the damage's own frame. Absent = the standard fade. */
+  oneShotFade?: Readonly<Record<string, number>>;
   /** Clips minted at load by cutting a GLB clip in two at `at` seconds, under
    *  the given names, for a cast that must HOLD one half and release the other
    *  (the hunter's timed shots: the aim half is the generic cast clip held at
@@ -4476,20 +4481,6 @@ export const VISUALS: Record<string, VisualDef> = {
     gaitWindDown: true,
     authoredAtlas: true,
     clickRadius: 1.0,
-  },
-  // The Guardian of the Quench (the Frozen Lake, design doc 7.3): a bodyless
-  // target, its click capsule, nameplate and bars over the provisional ice
-  // guardian of frost granite and lake ice the raid's own effects draw
-  // (smith_heart_fx/quench_body.ts) until its own model ships. Height times
-  // the template's scale (3) is the body's crown, about three and a half
-  // players.
-  smith_heart_quench_guardian: {
-    url: `${CREATURES}/golelingevolved.glb`,
-    height: 2.3,
-    clips: ELEMENTAL_FLOATING,
-    animUrls: [`${CREATURES}/elemental_ability_anims.glb`],
-    bodyless: true,
-    clickRadius: 1.6,
   },
   // The Guardian of the Heat's Rolling Cinder (design doc 7.4): a bodyless
   // target, its click capsule, nameplate and bars round the great ball of the

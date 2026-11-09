@@ -72,6 +72,16 @@ export class GlowPulse {
     return true;
   }
 
+  /** The level the clones are written at (1 when no pulse or fade runs). */
+  get scale(): number {
+    return this.active ? this.level : 1;
+  }
+
+  /** Does the pulse flare `src` (its emissive map, or a named glow material)? */
+  takes(src: THREE.Material): boolean {
+    return glowPulseTakes(this.set, src.name, !!(src as Emissive).emissiveMap);
+  }
+
   /** The clone to mount over `src` (an emissive-mapped material glows, and
    *  the set's named untextured glow materials). */
   material(src: THREE.Material): THREE.Material {

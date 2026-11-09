@@ -236,3 +236,66 @@ describe("a loose gale's toss slides", () => {
     expect(has(p, BREATH_AURAS.thrown)).toBe(false);
   });
 });
+
+// Jose's playtest of 2026-11-07: the Summit Roar's throw slid the same step
+// every tick and stopped dead, a sled, not a blow. It is eased like a
+// knockback now ('knock': fast off the blow, settling on the feet), and the
+// renderer lifts the body on a short arc meanwhile (render/thrown_hop_core.ts).
+describe("the Summit Roar's throw is a blow", () => {
+  it('the knock ease: three times the mean pace off the blow, settling to nothing', () => {
+    const n = ticks(T.roarSlide);
+    let sum = 0;
+    let last = Number.POSITIVE_INFINITY;
+    for (let k = 0; k < n; k++) {
+      const step = shoveStep('knock', 30, k, n);
+      expect(step).toBeLessThanOrEqual(last + 1e-12);
+      last = step;
+      sum += step;
+    }
+    expect(sum).toBeCloseTo(30, 6);
+    const mean = 30 / n;
+    expect(shoveStep('knock', 30, 0, n)).toBeGreaterThan(mean * 2.5);
+    expect(shoveStep('knock', 30, n - 1, n)).toBeLessThan(mean * 0.05);
+    // Harder off the blow than a gale's toss, and a real moment of travel.
+    expect(shoveEase('knock', 0.25)).toBeGreaterThan(shoveEase('out', 0.25));
+    expect(T.roarSlide).toBeGreaterThanOrEqual(1);
+  });
+
+  it('a struck body is thrown its whole way, fast first and settling, then lets go', () => {
+    const f = pulled();
+    const b = f.boss();
+    const C = BREATH.cornice;
+    const bw = f.world(C.x, C.z);
+    b.pos.x = bw.x;
+    b.pos.z = bw.z;
+    b.pos.y = f.sim.ctx.groundPos(bw.x, bw.z).y;
+    f.sim.ctx.rebucket(b);
+    const p = f.players[1];
+    f.dev('/dev heart breath roar');
+    const steps: number[] = [];
+    let start: { x: number; z: number } | null = null;
+    let prev = f.local(p);
+    for (let k = 0; k < ticks(T.inhaleCast + T.gustCast + T.roarSlide + 2); k++) {
+      if (!start) f.put(p, C.x + 4, C.z);
+      prev = f.local(p);
+      f.tick(1, true);
+      const sliding = f.state()?.roar?.slides.some((sl) => sl.id === p.id) ?? false;
+      const now = f.local(p);
+      if (sliding || (start && has(p, BREATH_AURAS.thrown))) {
+        start ??= prev;
+        steps.push(Math.hypot(now.x - prev.x, now.z - prev.z));
+      } else if (start) break;
+    }
+    if (!start) throw new Error('never thrown');
+    const thrown = steps.reduce((a, v) => a + v, 0);
+    const end = f.local(p);
+    // Straight away from the guardian, its whole throw (no wall out there).
+    expect(end.x - (start as { x: number }).x).toBeGreaterThan(thrown * 0.95);
+    expect(thrown).toBeGreaterThan(20);
+    const mean = thrown / steps.length;
+    expect(steps[0]).toBeGreaterThan(mean * 2);
+    expect(steps[steps.length - 1]).toBeLessThan(mean * 0.25);
+    // The hold goes the tick the throw settles: no stall on the feet.
+    expect(has(p, BREATH_AURAS.thrown)).toBe(false);
+  });
+});

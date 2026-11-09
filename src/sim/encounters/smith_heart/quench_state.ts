@@ -137,6 +137,9 @@ export interface QuenchFightState {
   flurryDone: boolean;
   /** Mechanic casts started (the deterministic salt of every pick). */
   casts: number;
+  /** Tempering Strike's wind-up already cued for the swing under way
+   *  (quench_strike_windup.ts); absent: never. */
+  strikeWound?: boolean;
   /** Lines said this pull: `<moment>` to the fight clock. */
   said: Record<string, number>;
   /** The players seen dead this pull and the pull's deaths (the kill lines'

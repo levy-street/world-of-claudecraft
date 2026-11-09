@@ -258,10 +258,22 @@ export class RiftDeathZoneVisuals {
       shake,
       playGesture,
     );
-    this.quenchFx = new QuenchFx(scene, groundY, world, compileGate, reducedMotion, shake);
+    // The spikes land with her fists: QuenchBody decides the contact on the
+    // cleave's cue (it handles the event first, below) and QuenchFx reads it.
+    this.quenchFx = new QuenchFx(scene, groundY, world, compileGate, reducedMotion, shake, () =>
+      this.quenchBody.strikeContactNow(),
+    );
     this.quenchFight = new QuenchFightFx(scene, groundY, world, compileGate, reducedMotion, shake);
     this.quenchBlades = new QuenchBladesFx(scene, groundY, world, compileGate, reducedMotion);
-    this.quenchBody = new QuenchBody(scene, groundY, world, compileGate, reducedMotion, shake);
+    this.quenchBody = new QuenchBody(
+      scene,
+      groundY,
+      world,
+      compileGate,
+      reducedMotion,
+      shake,
+      playGesture,
+    );
     this.heatFx = new HeatFx(scene, groundY, world, compileGate, reducedMotion, shake);
     this.heatFight = new HeatFightFx(scene, groundY, world, compileGate, reducedMotion, shake);
     this.heatBody = new HeatBody(
@@ -713,9 +725,9 @@ export class RiftDeathZoneVisuals {
     this.breathFx.handleEvent(event);
     this.breathBody.handleEvent(event);
     const breath = this.breathFight.handleEvent(event);
+    const quenchBody = this.quenchBody.handleEvent(event);
     this.quenchFx.handleEvent(event);
-    this.quenchBody.handleEvent(event);
-    const quench = this.quenchFight.handleEvent(event);
+    const quench = this.quenchFight.handleEvent(event) || quenchBody;
     this.heatFx.handleEvent(event);
     this.heatBody.handleEvent(event);
     const heat = this.heatFight.handleEvent(event);

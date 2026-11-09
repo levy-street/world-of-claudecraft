@@ -147,7 +147,9 @@ export function windPhaseSound(
 export const BREATH_KNOT_SOUNDS = {
   carry: { key: 'heart_breath_knot_carry_loop', gain: 0.7, fadeOut: 0.4 },
   fuse: { key: 'heart_breath_knot_fuse', gain: 1 },
-  fuseWarnAt: 5,
+  /** 3 s since the fuse was halved to 10 s (2026-11-07): at 5 s it rang over
+   *  the portals opening. */
+  fuseWarnAt: 3,
 } as const;
 
 /** The wind past a rider's ears while the gale carries them. */
