@@ -22690,17 +22690,14 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.quenchAlert.coldAria': '냉기 {max} 중 {cold}',
   'hudChrome.quenchAlert.timeAria': '{seconds}초 남음',
   'hudChrome.auraEffect.quenchGuardian.rime':
-    '살아 있는 서리가 다음에 받는 치유를 {left}만큼 흡수합니다(전체 {whole}). 남아 있는 동안 이동 속도가 {slow}% 느려지고 냉기가 {mult}배 빠르게 오르니 무리에서 벗어나십시오. {seconds}초 안에 치유로 깨뜨리면 사라집니다. 깨뜨리지 못하면 즉시 서리에 갇히고, {radius}미터 안의 모두에게 냉기가 터져 냉기 {cold}을 더합니다(영웅과 신화에서는 {heroicCold}). 일반: 1명에게 {normalAbsorb}. 영웅: {heroicTargets}명에게 {heroicAbsorb}, 터지면 가장 가까운 다른 플레이어에게 새 서리가 옮겨 갑니다. 신화: 영웅과 같으며 {mythicTargets}명.',
+    '살아 있는 서리가 다음에 받는 치유를 {left}만큼 흡수합니다(전체 {whole}). 남아 있는 동안 이동 속도가 {slow}% 느려지고 냉기가 {normalMult}배(영웅과 신화에서는 {heroicMult}배) 빠르게 오르니 무리에서 벗어나십시오. {seconds}초 안에 치유로 깨뜨리면 사라집니다. 깨뜨리지 못하면 즉시 서리에 갇히고, {radius}미터 안의 모두에게 냉기가 터져 냉기 {cold}을 더합니다(영웅과 신화에서는 {heroicCold}). 일반: 1명에게 {normalAbsorb}. 영웅: {heroicTargets}명에게 {heroicAbsorb}, 터지면 가장 가까운 다른 플레이어에게 새 서리가 옮겨 갑니다. 신화: 영웅과 같으며 {mythicTargets}명.',
   'hudChrome.auraEffect.quenchGuardian.rimePool':
     '살아 있는 서리: 깨뜨리려면 최대 생명력의 {pct}%만큼 치유가 더 필요합니다. 걸린 뒤 {seconds}초 안에 깨지 못하면 서리에 갇히고 {radius}미터 안의 모두에게 냉기가 터집니다.',
   'hudChrome.auraEffect.quenchGuardian.rimeSlow':
-    '살아 있는 서리로 느려짐: 서리가 치유로 깨지거나 터질 때까지 이동 속도가 {slow}% 느려지고 냉기가 {mult}배 빠르게 오릅니다.',
-  'hudChrome.quenchAlert.rimeTitle':
-    '살아 있는 서리! 무리에서 벗어나십시오',
-  'hudChrome.quenchAlert.rimeBar':
-    '서리 {left} / {whole}',
-  'hudChrome.quenchAlert.rimeAria':
-    '살아 있는 서리: 깨뜨리기까지 치유 {whole} 중 {left} 남음',
+    '살아 있는 서리로 느려짐: 서리가 치유로 깨지거나 터질 때까지 이동 속도가 {slow}% 느려지고 냉기가 {normalMult}배(영웅과 신화에서는 {heroicMult}배) 빠르게 오릅니다.',
+  'hudChrome.quenchAlert.rimeTitle': '살아 있는 서리! 무리에서 벗어나십시오',
+  'hudChrome.quenchAlert.rimeBar': '서리 {left} / {whole}',
+  'hudChrome.quenchAlert.rimeAria': '살아 있는 서리: 깨뜨리기까지 치유 {whole} 중 {left} 남음',
   'hudChrome.heatGuardian.say.pull':
     '너희는 최초의 불꽃 속으로 걸어 들어왔다. 그 무엇도 변하지 않고는 나가지 못한다.',
   'hudChrome.heatGuardian.say.wipe': '재다, 너희 모두. 화로는 계속 타오른다.',

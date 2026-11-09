@@ -23216,17 +23216,14 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.quenchAlert.coldAria': '寒意 {cold}/{max}',
   'hudChrome.quenchAlert.timeAria': '剩余{seconds}秒',
   'hudChrome.auraEffect.quenchGuardian.rime':
-    '活体霜壳吸收你受到的接下来{left}点治疗（共{whole}点）。存在期间你的移动速度降低{slow}%，寒意上升速度变为{mult}倍，所以请离开队伍。在{seconds}秒内用治疗将其击碎即可消失。否则你会立刻被冰霜封住，寒意在{radius}码内爆发，使所有人获得{cold}点寒意（英雄和史诗难度为{heroicCold}点）。普通难度：1名玩家，{normalAbsorb}点。英雄难度：{heroicTargets}名玩家，各{heroicAbsorb}点，爆发后会以新的霜壳跳到最近的另一名玩家身上。史诗难度：同英雄难度，{mythicTargets}名玩家。',
+    '活体霜壳吸收你受到的接下来{left}点治疗（共{whole}点）。存在期间你的移动速度降低{slow}%，寒意上升速度变为{normalMult}倍（英雄和史诗难度为{heroicMult}倍），所以请离开队伍。在{seconds}秒内用治疗将其击碎即可消失。否则你会立刻被冰霜封住，寒意在{radius}码内爆发，使所有人获得{cold}点寒意（英雄和史诗难度为{heroicCold}点）。普通难度：1名玩家，{normalAbsorb}点。英雄难度：{heroicTargets}名玩家，各{heroicAbsorb}点，爆发后会以新的霜壳跳到最近的另一名玩家身上。史诗难度：同英雄难度，{mythicTargets}名玩家。',
   'hudChrome.auraEffect.quenchGuardian.rimePool':
     '活体霜壳：还需要相当于其最大生命值{pct}%的治疗才能击碎。施加后{seconds}秒内未被击碎，其将被冰霜封住，寒意在{radius}码内对所有人爆发。',
   'hudChrome.auraEffect.quenchGuardian.rimeSlow':
-    '被活体霜壳减速：在霜壳被治疗击碎或爆发前，你的移动速度降低{slow}%，寒意上升速度变为{mult}倍。',
-  'hudChrome.quenchAlert.rimeTitle':
-    '活体霜壳！离开队伍',
-  'hudChrome.quenchAlert.rimeBar':
-    '霜壳 {left} / {whole}',
-  'hudChrome.quenchAlert.rimeAria':
-    '活体霜壳：还需{left}/{whole}点治疗才能击碎',
+    '被活体霜壳减速：在霜壳被治疗击碎或爆发前，你的移动速度降低{slow}%，寒意上升速度变为{normalMult}倍（英雄和史诗难度为{heroicMult}倍）。',
+  'hudChrome.quenchAlert.rimeTitle': '活体霜壳！离开队伍',
+  'hudChrome.quenchAlert.rimeBar': '霜壳 {left} / {whole}',
+  'hudChrome.quenchAlert.rimeAria': '活体霜壳：还需{left}/{whole}点治疗才能击碎',
   'hudChrome.heatGuardian.say.pull': '你们走进了最初的火焰。没有什么能毫无改变地离开。',
   'hudChrome.heatGuardian.say.wipe': '都化为灰烬吧。炉心依旧燃烧。',
   'hudChrome.heatGuardian.say.death': '火焰……沉回……岩石之中。好好带着它。',

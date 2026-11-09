@@ -6007,11 +6007,11 @@ export const hudChromeStrings = {
         'You are number {order} of {count}: a blade will fly across the lake down the line through you. Lead the line away from the raid. It locks {lock} sec before the blade flies, so step off then, or take {min} to {max} Frost damage and {cold} cold. Heroic and Mythic: {heroicMin} to {heroicMax} damage.',
       deepening:
         "The lake's cold rises {total}% faster: {step}% more every {every} sec since the blades woke ({stacks} so far).",
-      rime: 'Living Rime absorbs the next {left} healing you receive ({whole} in all). While it holds you move {slow}% slower and your cold rises {mult} times as fast, so leave the group. Heal it through within {seconds} sec and it falls away. If not, you are Encased in Rime at once and the cold bursts on everyone within {radius} yd, adding {cold} cold ({heroicCold} on Heroic and Mythic). Normal: {normalAbsorb} on one player. Heroic: {heroicAbsorb} on {heroicTargets} players, and a burst leaps to the nearest other player with a fresh crust. Mythic: as Heroic, on {mythicTargets} players.',
+      rime: 'Living Rime absorbs the next {left} healing you receive ({whole} in all). While it holds you move {slow}% slower and your cold rises {normalMult} times as fast ({heroicMult} times on Heroic and Mythic), so leave the group. Heal it through within {seconds} sec and it falls away. If not, you are Encased in Rime at once and the cold bursts on everyone within {radius} yd, adding {cold} cold ({heroicCold} on Heroic and Mythic). Normal: {normalAbsorb} on one player. Heroic: {heroicAbsorb} on {heroicTargets} players, and a burst leaps to the nearest other player with a fresh crust. Mythic: as Heroic, on {mythicTargets} players.',
       rimePool:
         'Living Rime: {pct}% of their maximum health in healing still to break it. Not healed through within {seconds} sec of landing, they freeze and the cold bursts on everyone within {radius} yd.',
       rimeSlow:
-        'Slowed by Living Rime: you move {slow}% slower and your cold rises {mult} times as fast until the crust is healed through or bursts.',
+        'Slowed by Living Rime: you move {slow}% slower and your cold rises {normalMult} times as fast ({heroicMult} times on Heroic and Mythic) until the crust is healed through or bursts.',
     },
     // The Smith's Heart's Guardian of the Heat (src/ui/heat_aura_effect.ts).
     heatGuardian: {

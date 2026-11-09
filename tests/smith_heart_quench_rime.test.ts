@@ -4,8 +4,8 @@
 // quench_fight.ts): the per-tier rows (carriers, absorb, the leap, the
 // warmth's rate), the first cast at 12 s and every 25 s, who it never takes
 // (the active tank, the frozen, the trapped, the slash-marked, the rimed), its
-// slow and doubled cold, healed through (nothing happens), not healed through
-// (the freeze and a 6 yd burst), a freeze by the cold itself bursting it at
+// slow and faster cold (x2 Normal, x1.5 Heroic and Mythic), healed through
+// (nothing happens), not healed through (the freeze and a 6 yd burst), a freeze by the cold itself bursting it at
 // once, Heroic's leap to the nearest other player, the wipe clearing it, and
 // healing received lowering the cold (half on Heroic, nothing at full health,
 // nothing a crust drank). Plus the client's reading of it: the tooltip, the
@@ -98,22 +98,26 @@ describe('Living Rime: the rows', () => {
       rimeTargets: 1,
       rimeAbsorb: 600,
       rimeLeap: false,
+      rimeColdMult: 2,
     });
     expect(QUENCH_DIFFICULTY.heroic).toMatchObject({
       rimeTargets: 2,
       rimeAbsorb: 900,
       rimeLeap: true,
+      rimeColdMult: 1.5,
     });
     expect(QUENCH_DIFFICULTY.mythic).toMatchObject({
       rimeTargets: 3,
       rimeAbsorb: 900,
       rimeLeap: true,
+      rimeColdMult: 1.5,
     });
+    // The tooltip names Heroic's rate for Mythic too: they must stay equal.
+    expect(QUENCH_DIFFICULTY.mythic.rimeColdMult).toBe(QUENCH_DIFFICULTY.heroic.rimeColdMult);
     expect(T.rimeFirst).toBe(12);
     expect(T.rimeEvery).toBe(25);
     expect(T.rimeSeconds).toBe(10);
     expect(T.rimeSlow).toBe(0.7);
-    expect(T.rimeColdMult).toBe(2);
     expect(T.rimeBurstR).toBe(6);
   });
 
@@ -197,23 +201,30 @@ describe('Living Rime over a real fight', () => {
     expect(fewer.every((p) => ![tankId, a.id, b.id, c.id, d.id].includes(p.id))).toBe(true);
   });
 
-  it("doubles its carrier's cold rise while it holds", () => {
-    const f = pulled();
-    const [carrier, other] = f.players.filter((p) => p.id !== tank(f));
-    // Both alone, far apart.
-    f.put(carrier, 160, 10);
-    f.put(other, 220, 10);
-    expect(f.dev('/dev heart quench rime', carrier.id)).toBe(true);
-    setCold(f, carrier, 10);
-    setCold(f, other, 10);
-    f.tick(ticks(1));
-    const st = f.state();
-    if (!st) throw new Error('no fight');
-    const rose = st.chill[carrier.id].cold - 10;
-    const plain = st.chill[other.id].cold - 10;
-    expect(plain).toBeCloseTo(coldStep(0), 1);
-    expect(rose).toBeCloseTo(plain * T.rimeColdMult, 1);
-  });
+  for (const [tier, mult] of [
+    ['normal', 2],
+    ['heroic', 1.5],
+    ['mythic', 1.5],
+  ] as const) {
+    it(`${tier}: its carrier's cold rises ${mult} times as fast while it holds`, () => {
+      const f = pulled(tier);
+      const [carrier, other] = f.players.filter((p) => p.id !== tank(f));
+      // Both alone, far apart.
+      f.put(carrier, 160, 10);
+      f.put(other, 220, 10);
+      expect(f.dev('/dev heart quench rime', carrier.id)).toBe(true);
+      setCold(f, carrier, 10);
+      setCold(f, other, 10);
+      f.tick(ticks(1));
+      const st = f.state();
+      if (!st) throw new Error('no fight');
+      const rose = st.chill[carrier.id].cold - 10;
+      const plain = st.chill[other.id].cold - 10;
+      expect(plain).toBeCloseTo(coldStep(0), 1);
+      expect(QUENCH_DIFFICULTY[tier].rimeColdMult).toBe(mult);
+      expect(rose).toBeCloseTo(plain * mult, 1);
+    });
+  }
 
   it('healed through within 10 s: it falls away and nothing else happens', () => {
     const f = pulled();
@@ -517,7 +528,7 @@ describe('Living Rime on the client', () => {
     expect(text).toContain('absorbs the next 420 healing');
     expect(text).toContain('(600 in all)');
     expect(text).toContain('30% slower');
-    expect(text).toContain('2 times as fast');
+    expect(text).toContain('2 times as fast (1.5 times on Heroic and Mythic)');
     expect(text).toContain('within 10 sec');
     expect(text).toContain('within 6 yd');
     expect(text).toContain(`adding ${QUENCH_DIFFICULTY.normal.splashCold} cold`);
@@ -525,7 +536,9 @@ describe('Living Rime on the client', () => {
     expect(text).toContain('Heroic: 900 on 2 players');
     expect(text).toContain('on 3 players');
     const slow = auraEffectDescriptor({ id: QUENCH_AURAS.rimeSlow, kind: 'slow', value: 0.7 });
-    expect(t(slow?.key as never, slow?.nums as never)).toContain('30% slower');
+    const slowText = t(slow?.key as never, slow?.nums as never);
+    expect(slowText).toContain('30% slower');
+    expect(slowText).toContain('2 times as fast (1.5 times on Heroic and Mythic)');
     // The cold's tooltip names Living Warmth's rate per tier.
     const cold = auraEffectDescriptor({ id: QUENCH_AURAS.cold, kind: 'internal_cd', value: 40 });
     const coldText = t(cold?.key as never, cold?.nums as never);

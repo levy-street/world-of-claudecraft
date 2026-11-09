@@ -4788,9 +4788,9 @@ export const zh_CN: EnTranslations = {
         "awake": "铸匠的四把利刃已苏醒。每一轮会有更多玩家被标记，利刃依次沿穿过他们的直线飞出。直线在利刃飞出前{lock}秒锁定，随后对线上的目标造成{min}到{max}点冰霜伤害，增加{cold}点寒冷。英雄和史诗难度：{heroicMin}到{heroicMax}点伤害。",
         "marked": "你是{count}人中的第{order}个：利刃将沿穿过你的直线飞来。把直线引离团队。直线在利刃飞出前{lock}秒锁定，届时请离开，否则将受到{min}到{max}点冰霜伤害和{cold}点寒冷。英雄和史诗难度：{heroicMin}到{heroicMax}点伤害。",
         "deepening": "湖的寒意上升快了{total}%：自刃苏醒后每{every}秒再快{step}%（目前{stacks}次）。",
-        "rime": "活体霜壳吸收你受到的接下来{left}点治疗（共{whole}点）。存在期间你的移动速度降低{slow}%，寒意上升速度变为{mult}倍，所以请离开队伍。在{seconds}秒内用治疗将其击碎即可消失。否则你会立刻被冰霜封住，寒意在{radius}码内爆发，使所有人获得{cold}点寒意（英雄和史诗难度为{heroicCold}点）。普通难度：1名玩家，{normalAbsorb}点。英雄难度：{heroicTargets}名玩家，各{heroicAbsorb}点，爆发后会以新的霜壳跳到最近的另一名玩家身上。史诗难度：同英雄难度，{mythicTargets}名玩家。",
+        "rime": "活体霜壳吸收你受到的接下来{left}点治疗（共{whole}点）。存在期间你的移动速度降低{slow}%，寒意上升速度变为{normalMult}倍（英雄和史诗难度为{heroicMult}倍），所以请离开队伍。在{seconds}秒内用治疗将其击碎即可消失。否则你会立刻被冰霜封住，寒意在{radius}码内爆发，使所有人获得{cold}点寒意（英雄和史诗难度为{heroicCold}点）。普通难度：1名玩家，{normalAbsorb}点。英雄难度：{heroicTargets}名玩家，各{heroicAbsorb}点，爆发后会以新的霜壳跳到最近的另一名玩家身上。史诗难度：同英雄难度，{mythicTargets}名玩家。",
         "rimePool": "活体霜壳：还需要相当于其最大生命值{pct}%的治疗才能击碎。施加后{seconds}秒内未被击碎，其将被冰霜封住，寒意在{radius}码内对所有人爆发。",
-        "rimeSlow": "被活体霜壳减速：在霜壳被治疗击碎或爆发前，你的移动速度降低{slow}%，寒意上升速度变为{mult}倍。"
+        "rimeSlow": "被活体霜壳减速：在霜壳被治疗击碎或爆发前，你的移动速度降低{slow}%，寒意上升速度变为{normalMult}倍（英雄和史诗难度为{heroicMult}倍）。"
       },
       "heatGuardian": {
         "statePhase1": "半身沉在涌泉之中，从不移动。玄武岩之拳砸向岸上的一点，三道熔岩涌浪从那里滚滚而出；炉心闪焰会击中所有距离涌泉超过{reach}码的人。生命值降到70%时它会沉下，炉心随之满溢。英雄难度下伤害提高{heroicPct}%。",

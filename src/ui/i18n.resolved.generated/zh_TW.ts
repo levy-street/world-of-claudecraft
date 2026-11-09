@@ -4788,9 +4788,9 @@ export const zh_TW: EnTranslations = {
         "awake": "鑄匠的四把利刃已甦醒。每一輪會有更多玩家被標記，利刃依次沿穿過他們的直線飛出。直線在利刃飛出前{lock}秒鎖定，隨後對線上的目標造成{min}到{max}點冰霜傷害，增加{cold}點寒冷。英雄和傳奇難度：{heroicMin}到{heroicMax}點傷害。",
         "marked": "你是{count}人中的第{order}個：利刃將沿穿過你的直線飛來。把直線引離團隊。直線在利刃飛出前{lock}秒鎖定，屆時請離開，否則將受到{min}到{max}點冰霜傷害和{cold}點寒冷。英雄和傳奇難度：{heroicMin}到{heroicMax}點傷害。",
         "deepening": "湖的寒意上升快了{total}%：自刃甦醒後每{every}秒再快{step}%（目前{stacks}次）。",
-        "rime": "活體霜殼吸收你受到的接下來{left}點治療（共{whole}點）。存在期間你的移動速度降低{slow}%，寒意上升速度變為{mult}倍，所以請離開隊伍。在{seconds}秒內用治療將其擊碎即可消失。否則你會立刻被冰霜封住，寒意在{radius}碼內爆發，使所有人獲得{cold}點寒意（英雄和傳奇難度為{heroicCold}點）。普通難度：1名玩家，{normalAbsorb}點。英雄難度：{heroicTargets}名玩家，各{heroicAbsorb}點，爆發後會以新的霜殼跳到最近的另一名玩家身上。傳奇難度：同英雄難度，{mythicTargets}名玩家。",
+        "rime": "活體霜殼吸收你受到的接下來{left}點治療（共{whole}點）。存在期間你的移動速度降低{slow}%，寒意上升速度變為{normalMult}倍（英雄和傳奇難度為{heroicMult}倍），所以請離開隊伍。在{seconds}秒內用治療將其擊碎即可消失。否則你會立刻被冰霜封住，寒意在{radius}碼內爆發，使所有人獲得{cold}點寒意（英雄和傳奇難度為{heroicCold}點）。普通難度：1名玩家，{normalAbsorb}點。英雄難度：{heroicTargets}名玩家，各{heroicAbsorb}點，爆發後會以新的霜殼跳到最近的另一名玩家身上。傳奇難度：同英雄難度，{mythicTargets}名玩家。",
         "rimePool": "活體霜殼：還需要相當於其最大生命值{pct}%的治療才能擊碎。施加後{seconds}秒內未被擊碎，其將被冰霜封住，寒意在{radius}碼內對所有人爆發。",
-        "rimeSlow": "被活體霜殼減速：在霜殼被治療擊碎或爆發前，你的移動速度降低{slow}%，寒意上升速度變為{mult}倍。"
+        "rimeSlow": "被活體霜殼減速：在霜殼被治療擊碎或爆發前，你的移動速度降低{slow}%，寒意上升速度變為{normalMult}倍（英雄和傳奇難度為{heroicMult}倍）。"
       },
       "heatGuardian": {
         "statePhase1": "半身沉在湧泉之中，從不移動。玄武岩之拳砸向岸上的一點，三道熔岩湧浪從那裡滾滾而出；爐心閃焰會擊中所有距離湧泉超過{reach}碼的人。生命值降到70%時它會沉下，爐心隨之滿溢。英雄難度下傷害提高{heroicPct}%。",

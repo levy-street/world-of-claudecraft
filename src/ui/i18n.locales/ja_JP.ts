@@ -22710,17 +22710,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.quenchAlert.coldAria': '冷気 {max}中{cold}',
   'hudChrome.quenchAlert.timeAria': '残り{seconds}秒',
   'hudChrome.auraEffect.quenchGuardian.rime':
-    '生ける霧氷が、次に受ける回復を{left}吸収する（全体で{whole}）。残っている間、移動速度が{slow}%低下し、冷気が{mult}倍の速さで上がるので、グループから離れろ。{seconds}秒以内に回復で砕けば消える。砕けなければ即座に霜に閉ざされ、{radius}ヤード以内の全員に冷気が弾けて{cold}を加える（ヒロイックとミシックでは{heroicCold}）。ノーマル：1人に{normalAbsorb}。ヒロイック：{heroicTargets}人に{heroicAbsorb}、弾けると最も近い別のプレイヤーに新たな霧氷が移る。ミシック：ヒロイックと同じで{mythicTargets}人。',
+    '生ける霧氷が、次に受ける回復を{left}吸収する（全体で{whole}）。残っている間、移動速度が{slow}%低下し、冷気が{normalMult}倍の速さで上がる（ヒロイックとミシックでは{heroicMult}倍）ので、グループから離れろ。{seconds}秒以内に回復で砕けば消える。砕けなければ即座に霜に閉ざされ、{radius}ヤード以内の全員に冷気が弾けて{cold}を加える（ヒロイックとミシックでは{heroicCold}）。ノーマル：1人に{normalAbsorb}。ヒロイック：{heroicTargets}人に{heroicAbsorb}、弾けると最も近い別のプレイヤーに新たな霧氷が移る。ミシック：ヒロイックと同じで{mythicTargets}人。',
   'hudChrome.auraEffect.quenchGuardian.rimePool':
     '生ける霧氷：砕くにはあと最大体力の{pct}%分の回復が必要。付与から{seconds}秒以内に砕けなければ、霜に閉ざされ、{radius}ヤード以内の全員に冷気が弾ける。',
   'hudChrome.auraEffect.quenchGuardian.rimeSlow':
-    '生ける霧氷で鈍っている：霧氷が回復で砕けるか弾けるまで、移動速度が{slow}%低下し、冷気が{mult}倍の速さで上がる。',
-  'hudChrome.quenchAlert.rimeTitle':
-    '生ける霧氷！グループから離れろ',
-  'hudChrome.quenchAlert.rimeBar':
-    '霧氷 {left} / {whole}',
-  'hudChrome.quenchAlert.rimeAria':
-    '生ける霧氷：砕くまで残り{left}/{whole}の回復',
+    '生ける霧氷で鈍っている：霧氷が回復で砕けるか弾けるまで、移動速度が{slow}%低下し、冷気が{normalMult}倍の速さで上がる（ヒロイックとミシックでは{heroicMult}倍）。',
+  'hudChrome.quenchAlert.rimeTitle': '生ける霧氷！グループから離れろ',
+  'hudChrome.quenchAlert.rimeBar': '霧氷 {left} / {whole}',
+  'hudChrome.quenchAlert.rimeAria': '生ける霧氷：砕くまで残り{left}/{whole}の回復',
   'hudChrome.heatGuardian.say.pull':
     'お前たちは最初の炎へ踏み込んだ。何ものも変わらずには出られぬ。',
   'hudChrome.heatGuardian.say.wipe': '灰だ、一人残らず。炉床は燃え続ける。',

@@ -21,8 +21,9 @@
 //   Deepening     through phase 2 the cold rises faster every 20 s, without
 //                 end (a stack on the guardian): the soft enrage.
 //   Living Rime   while it holds (quench_rime.ts), its carrier's bar rises
-//                 twice as fast (alone, as the rime sends them); a burst of
-//                 it splashes like a shatter (`splashRound`).
+//                 the tier's rimeColdMult times as fast (twice on Normal,
+//                 half again on Heroic and Mythic; alone, as the rime sends
+//                 them); a burst of it splashes like a shatter (`splashRound`).
 //
 // A player in the water (quench_ice.ts) takes no warmth and gives none, and
 // their bar stops one short of full (the water never freezes them solid). A
@@ -267,9 +268,12 @@ export function stepCold(s: QuenchScope): void {
     }
     // The interphase holds the cold: a huddle still warms, nothing else moves it.
     const rising = coldStep(others, mult);
-    // Living Rime's carrier: the bar rises twice as fast while it holds.
+    // Living Rime's carrier: the bar rises the tier's rimeColdMult times as
+    // fast while it holds.
     const raw =
-      rising > 0 && auraOf(p, QUENCH_AURAS.rime) !== undefined ? rising * T.rimeColdMult : rising;
+      rising > 0 && auraOf(p, QUENCH_AURAS.rime) !== undefined
+        ? rising * s.rules.rimeColdMult
+        : rising;
     const step = st.flurry && raw > 0 ? 0 : raw;
     setWarm(s, p, !trapped && !sealed && others >= T.warmNeed);
     const cap = trapped ? T.coldMax - 1 : T.coldMax;

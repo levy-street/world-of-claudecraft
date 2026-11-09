@@ -9,8 +9,10 @@
 //   The crust    a heal absorb (the `heal_absorb` aura Stone Shell rides,
 //                combat/heal.ts consumeHealAbsorb) of the tier's rimeAbsorb;
 //                while it holds its carrier is slowed 30% and their cold
-//                rises twice as fast (quench_cold.ts). It asks them to LEAVE
-//                the group (its burst splashes the raid) while their cold
+//                rises the tier's rimeColdMult times as fast (twice on
+//                Normal, half again on Heroic and Mythic; quench_cold.ts).
+//                It asks them to LEAVE the group (its burst splashes the
+//                raid) while their cold
 //                climbs alone, so the healers must break it fast.
 //   Healed       within 10 s: it falls away, nothing else.
 //   Not healed   its carrier freezes at once (Encased in Rime, the cold's own

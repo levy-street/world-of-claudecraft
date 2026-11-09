@@ -201,11 +201,13 @@ export interface QuenchDifficultyRules {
   /** The Blades Hunt, the interphase at a quarter health (quench_flurry.ts). */
   flurry: boolean;
   /** Living Rime (quench_rime.ts): how many players it takes at once, the
-   *  healing each must take to break it, and whether a burst leaps to the
-   *  nearest other player with a fresh one. */
+   *  healing each must take to break it, whether a burst leaps to the
+   *  nearest other player with a fresh one, and how many times as fast its
+   *  carrier's cold rises while it holds (quench_cold.ts). */
   rimeTargets: number;
   rimeAbsorb: number;
   rimeLeap: boolean;
+  rimeColdMult: number;
   /** Living Warmth (quench_life_warmth.ts): cold taken off per 1% of the
    *  receiver's maximum health healed (effective healing only). */
   lifeWarmth: number;
@@ -226,6 +228,7 @@ export const QUENCH_DIFFICULTY: Readonly<Record<QuenchDifficulty, QuenchDifficul
     rimeTargets: 1,
     rimeAbsorb: 600,
     rimeLeap: false,
+    rimeColdMult: 2,
     lifeWarmth: 0.5,
   },
   // Contagious cold: a shatter splashes further and harder.
@@ -243,6 +246,9 @@ export const QUENCH_DIFFICULTY: Readonly<Record<QuenchDifficulty, QuenchDifficul
     rimeTargets: 2,
     rimeAbsorb: 900,
     rimeLeap: true,
+    // Two crusts that leap: a carrier's cold climbs half again, not double
+    // (the owner's call of 2026-11-09).
+    rimeColdMult: 1.5,
     lifeWarmth: 0.25,
   },
   // Every round one blade, slash after slash from where the last one ended.
@@ -261,6 +267,7 @@ export const QUENCH_DIFFICULTY: Readonly<Record<QuenchDifficulty, QuenchDifficul
     rimeTargets: 3,
     rimeAbsorb: 900,
     rimeLeap: true,
+    rimeColdMult: 1.5,
     lifeWarmth: 0.25,
   },
 };
@@ -367,14 +374,13 @@ export const QUENCH_TUNING = {
   flurryGapStart: 1.5,
   flurryGapEnd: 1,
   // Living Rime (the owner's review of 2026-11-09): its first, its every, how
-  // long the raid has to heal it through, its slow (a speed multiplier), how
-  // much faster its carrier's cold rises while it holds, and its burst's reach
-  // (the cold it adds is the tier's splashCold).
+  // long the raid has to heal it through, its slow (a speed multiplier) and
+  // its burst's reach (the cold it adds is the tier's splashCold, how much
+  // faster its carrier's cold rises the tier's rimeColdMult).
   rimeFirst: 12,
   rimeEvery: 25,
   rimeSeconds: 10,
   rimeSlow: 0.7,
-  rimeColdMult: 2,
   rimeBurstR: 6,
   // The shore ice.
   rimRise: 2.5,

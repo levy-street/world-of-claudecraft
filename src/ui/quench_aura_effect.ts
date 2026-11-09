@@ -125,7 +125,8 @@ export function quenchAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescri
           nums: { pct: Math.round(a.poolPct), seconds: T.rimeSeconds, radius: T.rimeBurstR },
         };
       // The crust's left rides `value`, its whole `value2`; the burst's cold
-      // is the tier's splash, named per tier (Mythic shares Heroic's).
+      // and the carrier's cold rate are the tier's, named per tier (Mythic
+      // shares Heroic's, pinned in tests/smith_heart_quench_rime.test.ts).
       return {
         key: `${KEY}.rime`,
         nums: {
@@ -133,7 +134,8 @@ export function quenchAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescri
           whole: Math.max(0, Math.round(a.value2 ?? a.value ?? 0)),
           seconds: T.rimeSeconds,
           slow: pct(1 - T.rimeSlow),
-          mult: T.rimeColdMult,
+          normalMult: N.rimeColdMult,
+          heroicMult: H.rimeColdMult,
           radius: T.rimeBurstR,
           cold: N.splashCold,
           heroicCold: H.splashCold,
@@ -146,7 +148,11 @@ export function quenchAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescri
     case QUENCH_AURAS.rimeSlow:
       return {
         key: `${KEY}.rimeSlow`,
-        nums: { slow: pct(1 - T.rimeSlow), mult: T.rimeColdMult },
+        nums: {
+          slow: pct(1 - T.rimeSlow),
+          normalMult: N.rimeColdMult,
+          heroicMult: H.rimeColdMult,
+        },
       };
     case QUENCH_AURAS.deepening:
       return {
