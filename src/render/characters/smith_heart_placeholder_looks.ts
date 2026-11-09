@@ -28,12 +28,10 @@ export const SMITH_HEART_PLACEHOLDER_LOOKS: Record<string, string> = {
   heart_gale_sentinel: 'mob_elemental',
   // Final: a hovering wind caller who mends the guardian's shield.
   heart_gale_mender: 'mob_reedbound_acolyte',
-  // Final: a rime-crusted warder of blue ice and frost-cracked stone. (The
-  // stone goleling tinted ice-blue, like the other veins' warders; never a
-  // Rift-lane hoard body, see the Breath caller.)
-  heart_quench_warder: 'mob_elemental',
-  // Final: a meltwater caller, ice-pale water held in a stone frame.
-  heart_quench_caller: 'mob_water_elemental',
+  // Its own model now: a golem of bright glacier ice over slate joints (manifest.ts).
+  heart_quench_warder: 'smith_heart_quench_warder',
+  // Its own model now: a floating hooded frost caster with an orb over each palm (manifest.ts).
+  heart_quench_caller: 'smith_heart_quench_caller',
   // Final: a smith-fire warder of dark iron with a white-gold core. (The
   // stone goleling, tinted gold by its entity colour: the lava-cracked
   // brute read volcanic, which the Heat must never do.)

@@ -358,6 +358,10 @@ const AUTHORED_ATLAS_DEFS = [
   'smith_heart_hammer_guardian',
   // the Seam Singer's body (scripts/assets/specs/heart_seam_singer.json)
   'smith_heart_seam_singer',
+  // the Quench Vein Warder's and Caller's bodies (scripts/assets/specs/heart_quench_warder.json,
+  // heart_quench_caller.json)
+  'smith_heart_quench_warder',
+  'smith_heart_quench_caller',
 ];
 
 describe('authored surfaces', () => {

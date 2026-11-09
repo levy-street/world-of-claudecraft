@@ -4292,6 +4292,97 @@ export const VISUALS: Record<string, VisualDef> = {
     gaitWindDown: true,
     authoredAtlas: true,
   },
+  // The Quench Vein Warder (the Quench's packs, design doc section 4): the Hammer Vein Warder's body
+  // plan in bright glacier ice that pops against the Quench's night. Tripo P2 from its ChatGPT sheet,
+  // one UV island per ice plate on a 1024 atlas repainted in ChatGPT, a glow map of its own (its crack
+  // lines, eyes and heart crystal hot, the rest of the ice softly lit from inside), and a rig of rigid
+  // plates on one welded skin: every plate on one bone, only the vertices on a seam shared by the two
+  // bones either side, so no seam ever opens into a gap and no plate stretches. Its clips are the
+  // Hammer Warder's body language on this body's joints (contacts at 1.0 s, played at 1x), plus its
+  // own: it creaks as it stands, and it dies on its face, whole. Rime Sweep (the template's arcCleave,
+  // through its brood_cleave cue) swings Cleave and flares its cracks as it lands. walkRef is Walk's
+  // planted-foot speed at its drawn size. It does not run, it skates: low, shoving off side to side on
+  // the ice with the gliding foot planted under it, so its feet slide by design and the stride reads at
+  // any chase speed; runRef plays it at 0.75x at the template's 7.2 yd/s, a heavy body's slow shove. Its
+  // glow goes out as it dies.
+  smith_heart_quench_warder: {
+    url: `${CREATURES}/heart_quench_warder.glb`,
+    // Drawn big (looks only, the template keeps its scale and reach): 3.8 at the template's 1.7 is
+    // about 6.5 yd, some two and a quarter players, still under its guardian.
+    height: 3.8,
+    clips: {
+      idle: 'Idle',
+      idleVariants: ['IdleFidget'],
+      idleVariantCadence: { everySec: 18, jitterSec: 12 },
+      combatIdle: 'CombatIdle',
+      stunned: 'Stunned',
+      turn: 'Turn',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack', 'Attack2'],
+      attackByAbility: { brood_cleave: 'Cleave' },
+      contacts: { Attack: [1.0], Attack2: [1.0], Cleave: [1.0] },
+      hit: ['Hit', 'Hit2'],
+      death: 'Death',
+    },
+    attackTimeScale: 1,
+    deathTimeScale: 1,
+    turnRate: 3,
+    walkRef: 1.97,
+    runRef: 9.6,
+    gait: { runEnter: 2.4, runExit: 1.9 },
+    gaitWindDown: true,
+    authoredAtlas: true,
+    glowPulses: {
+      pulses: [
+        { gesture: 'brood_cleave', delay: 0.8, rise: 0.15, hold: 0.25, fall: 0.8, peak: 2.2 },
+      ],
+      deathFade: 2.5,
+    },
+  },
+  // The Quench Vein Caller (the Quench's packs): a hooded frost caster of glacier ice with a snow
+  // mantle, a crown of ice shards behind its hood and a frost orb floating over each palm (the orbs
+  // modelled in Blender, Tripo dropped the sheet's flat swirls). Tripo P2 from its ChatGPT sheet, a
+  // repainted 1024 atlas and a glow map (the orbs, eyes and cracks hot), rigged like the Warder: rigid
+  // plates on one welded skin, the crown shards and the orbs on their own. It
+  // floats: every clip lifts it a quarter of a yard over the floor on its robe of ice shards, so no
+  // foot can slide (runRef is the template's 7 yd/s at 1x). Its light melee lands at 0.62 s (the left
+  // orb punched out) and 0.66 s (the right claw raked down). Rime Bolt plays CastBolt locked to the
+  // 2 s bar: both orbs leave the palms and orbit into one point of cold between its hands, then are
+  // flung at the bar's end, vanish into the bolt and grow back over its palms as the clip plays out.
+  // Its death throws its head back, drops it, scatters its crown and rolls its orbs away; its glow
+  // goes out as it dies.
+  smith_heart_quench_caller: {
+    url: `${CREATURES}/heart_quench_caller.glb`,
+    // Drawn big (looks only): 3.6 at the template's 1.3 is about 4.7 yd, floating half a yard up.
+    height: 3.6,
+    clips: {
+      idle: 'Idle',
+      idleVariants: ['IdleFidget'],
+      idleVariantCadence: { everySec: 16, jitterSec: 10 },
+      combatIdle: 'CombatIdle',
+      stunned: 'Stunned',
+      turn: 'Turn',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack', 'Attack2'],
+      contacts: { Attack: [0.62], Attack2: [0.66] },
+      cast: 'CastBolt',
+      castByAbility: { heart_rime_bolt: 'CastBolt' },
+      castPlayOut: ['CastBolt'],
+      hit: ['Hit', 'Hit2'],
+      death: 'Death',
+    },
+    castClipSync: ['heart_rime_bolt'],
+    attackTimeScale: 1,
+    deathTimeScale: 1,
+    turnRate: 3,
+    walkRef: 3.5,
+    runRef: 7,
+    gaitWindDown: true,
+    authoredAtlas: true,
+    glowPulses: { pulses: [], deathFade: 2 },
+  },
   // The Guardian of the Hammer, the Hammer Council's main boss, wears the model first built for the
   // Slabwright (heart_slabwright.glb): Tripo P2, one UV island per rock on a painted 1024 atlas in
   // ETC1S, a stone rig built in Blender (every rock rigid to one bone; the tracks that only hold the

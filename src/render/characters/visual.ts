@@ -1612,7 +1612,9 @@ export class CharacterVisual {
       if (this.def.dials?.length) this.dials = new BoneDials(this.model, this.def.dials);
       if (this.def.meshToggles?.length)
         this.meshToggles = new GestureMeshToggles(this.model, this.def.meshToggles);
-      if (this.def.glowPulses?.pulses.length) this.glowPulse = new GlowPulse(this.def.glowPulses);
+      // A set with no gesture pulses still drives its death fade (the Quench trash's light going out).
+      if (this.def.glowPulses?.pulses.length || this.def.glowPulses?.deathFade !== undefined)
+        this.glowPulse = new GlowPulse(this.def.glowPulses);
       if (key === 'form_metamorph') {
         this.metamorphLeftWing = this.model.getObjectByName('metamorph_wing_left_hinge') ?? null;
         this.metamorphRightWing = this.model.getObjectByName('metamorph_wing_right_hinge') ?? null;
@@ -2897,8 +2899,6 @@ export class CharacterVisual {
     return this.currentIsOneShot;
   }
 
-  /** A channel-start event can arrive just before its authoritative entity
-   * snapshot. Enter the looping cast pose immediately and interrupt any short
   /** The rig holds its sleep loop. The renderer keeps presenting it through a death whose
    *  collapse waits for the killing blade (contact_queue.ts heldUntilCollapse): the sim clears
    *  a corpse's sleep on the death tick, which would otherwise read as the wake edge. */
@@ -2906,6 +2906,8 @@ export class CharacterVisual {
     return this.baseState === 'sleep';
   }
 
+  /** A channel-start event can arrive just before its authoritative entity
+   * snapshot. Enter the looping cast pose immediately and interrupt any short
    * projectile one-shot that would otherwise mask the first part of the channel. */
   beginCastChannel(): void {
     if (this.deadLock) return;
@@ -3208,12 +3210,12 @@ export class CharacterVisual {
   }
 
   playHit(): void {
-    if (this.deadLock || this.currentIsOneShot || this.hitCooldown > 0) return;
-    const clips = this.def.clips.hit;
     // A sleeper does not flinch: a blow that wakes a dormant heap reaches the client before
     // (or with) the bit that ends its sleep, and the wake one-shot then blocks it as above.
-    if (!clips || clips.length === 0) return;
+    if (this.deadLock || this.currentIsOneShot || this.hitCooldown > 0) return;
     if (this.baseState === 'sleep') return;
+    const clips = this.def.clips.hit;
+    if (!clips || clips.length === 0) return;
     this.hitCooldown = HIT_REACT_COOLDOWN;
     this.playOneShot(clips[Math.floor(Math.random() * clips.length)], 1.2);
     if (this.def.clips.combatIdle) this.braceUntil = extendBrace(this.braceUntil, this.clock);
@@ -3886,8 +3888,6 @@ export class CharacterVisual {
     this.waterSinkTarget = 0;
     this.entranceFor = undefined;
     this.wasSwimming = false;
-    if (this.glowPulse?.reset() && !this.disposed) this.applyVisualMaterials();
-  }
     // A body parked asleep starts again from its idle, like a fresh build: its next owner's
     // first frame must never read as the sleep-to-awake edge, which would replay the whole
     // wake on a mob already fighting.
@@ -3895,6 +3895,8 @@ export class CharacterVisual {
       this.baseState = 'idle';
       this.fadeTo(this.baseAction(), 0, false);
     }
+    if (this.glowPulse?.reset() && !this.disposed) this.applyVisualMaterials();
+  }
 
   /** Draw the body this far down into water it fell into (the Quench's
    *  holes, smith_heart_fx/quench_glaze_core.ts quenchSinkOf), eased per frame;
