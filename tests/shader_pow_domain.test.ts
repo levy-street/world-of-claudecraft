@@ -296,10 +296,14 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   // The Smith's Heart raid's shaders (every base guarded with max(x, 0.0)
   // where a dot product or a noise ridge can dip below zero).
   'src/render/smith_heart/breath_air.ts': 1,
+  'src/render/smith_heart/env_kit_look.ts': 1,
+  'src/render/smith_heart/env_rock_paint_core.ts': 1,
   'src/render/smith_heart/hammer_air.ts': 1,
+  'src/render/smith_heart/hammer_env_rock_paint.ts': 1,
   'src/render/smith_heart/heart_floor_glsl.ts': 1,
   'src/render/smith_heart/heart_fx_materials.ts': 8,
   'src/render/smith_heart/heart_ice_sheen.ts': 1,
+  'src/render/smith_heart/heart_rock_cutaway.ts': 1,
   'src/render/smith_heart/heart_sky.ts': 1,
   'src/render/smith_heart/quench_air.ts': 1,
   'src/render/smith_heart/quench_lake_ice.ts': 1,
