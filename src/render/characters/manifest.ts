@@ -4252,18 +4252,234 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.4,
   },
-  // The Hammer Council's Seam Singer (the Smith's Heart's first boss, design
-  // doc 7.1): a bodyless target, its click capsule, nameplate and bars over the
-  // provisional rock-and-crystal body the raid's own effects draw
-  // (smith_heart_fx/council_bodies.ts) until its own model ships. Bound off
-  // the goleling's rig (never seen); height times the template's scale is the
-  // body's (about 2.5 times a player).
+  // The Hammer Vein Warder (the Smith's Heart's first trash, design doc section 4), the
+  // raid's first body of its own: Tripo P2 from the concept sheet, one UV island per rock on a
+  // 1024 ETC1S atlas painted over in ChatGPT, and a stone rig built in Blender (every rock rigid to
+  // one bone, the bend kept in the crevices between rocks). Attack is the right fist slammed
+  // into the floor, Attack2 a wide left hook, Cleave (Stone Sweep, the template's arcCleave,
+  // through its brood_cleave cue) both fists swept low across the front. All three land at
+  // 1.0 s, the longest a contact is held (../contact_queue.ts CONTACT_HOLD_MAX_SEC), and play
+  // at 1x. walkRef and runRef are the planted-foot readings of scripts/anim/measure_gait.mjs at
+  // the drawn height and the template's scale of 2.04. The template chases at 4.2 yd/s, which
+  // Run covers at about 1.35x, so the gait lets Run in below the default threshold: that speed
+  // would otherwise play Walk, whose rate cap cannot reach it. Death kneels, then topples, also
+  // at 1x. Height is the measured mid-idle height. It is dormant until the raid reaches it
+  // (src/sim/mob/dormant.ts): Sleep holds the heap of rock that Awaken stands up from (the loop
+  // starts and ends on Awaken's first frame), and Awaken plays once on the asleep-to-awake edge
+  // at 1x, as long as the sim holds its AI. No flourish: it revives asleep, so a respawn goes
+  // straight back to the heap, and standing up belongs to the wake edge alone.
+  smith_heart_hammer_warder: {
+    url: `${CREATURES}/heart_hammer_warder.glb`,
+    height: 2.17,
+    clips: {
+      idle: 'Idle',
+      idleVariants: ['IdleFidget'],
+      idleVariantCadence: { everySec: 18, jitterSec: 12 },
+      combatIdle: 'CombatIdle',
+      stunned: 'Stunned',
+      turn: 'Turn',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack', 'Attack2'],
+      attackByAbility: { brood_cleave: 'Cleave' },
+      contacts: { Attack: [1.0], Attack2: [1.0], Cleave: [1.0] },
+      hit: ['Hit', 'Hit2'],
+      death: 'Death',
+      sleep: 'Sleep',
+      wake: 'Awaken',
+    },
+    attackTimeScale: 1,
+    deathTimeScale: 1,
+    turnRate: 3,
+    walkRef: 1.35,
+    runRef: 3.1,
+    gait: { runEnter: 3.2, runExit: 2.6 },
+    gaitWindDown: true,
+    authoredAtlas: true,
+  },
+  // The Quench Vein Warder (the Quench's packs, design doc section 4): the Hammer Vein Warder's body
+  // plan in bright glacier ice that pops against the Quench's night. Tripo P2 from its ChatGPT sheet,
+  // one UV island per ice plate on a 1024 atlas repainted in ChatGPT, a glow map of its own (its crack
+  // lines, eyes and heart crystal hot, the rest of the ice softly lit from inside), and a rig of rigid
+  // plates on one welded skin: every plate on one bone, only the vertices on a seam shared by the two
+  // bones either side, so no seam ever opens into a gap and no plate stretches. Its clips are the
+  // Hammer Warder's body language on this body's joints (contacts at 1.0 s, played at 1x), plus its
+  // own: it creaks as it stands, and it dies on its face, whole. Rime Sweep (the template's arcCleave,
+  // through its brood_cleave cue) swings Cleave and flares its cracks as it lands. walkRef is Walk's
+  // planted-foot speed at its drawn size. It does not run, it skates: low, shoving off side to side on
+  // the ice with the gliding foot planted under it, so its feet slide by design and the stride reads at
+  // any chase speed; runRef plays it at 0.75x at the template's 7.2 yd/s, a heavy body's slow shove. Its
+  // glow goes out as it dies.
+  smith_heart_quench_warder: {
+    url: `${CREATURES}/heart_quench_warder.glb`,
+    // Drawn big (looks only, the template keeps its scale and reach): 3.8 at the template's 1.7 is
+    // about 6.5 yd, some two and a quarter players, still under its guardian.
+    height: 3.8,
+    clips: {
+      idle: 'Idle',
+      idleVariants: ['IdleFidget'],
+      idleVariantCadence: { everySec: 18, jitterSec: 12 },
+      combatIdle: 'CombatIdle',
+      stunned: 'Stunned',
+      turn: 'Turn',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack', 'Attack2'],
+      attackByAbility: { brood_cleave: 'Cleave' },
+      contacts: { Attack: [1.0], Attack2: [1.0], Cleave: [1.0] },
+      hit: ['Hit', 'Hit2'],
+      death: 'Death',
+    },
+    attackTimeScale: 1,
+    deathTimeScale: 1,
+    turnRate: 3,
+    walkRef: 1.97,
+    runRef: 9.6,
+    gait: { runEnter: 2.4, runExit: 1.9 },
+    gaitWindDown: true,
+    authoredAtlas: true,
+    glowPulses: {
+      pulses: [
+        { gesture: 'brood_cleave', delay: 0.8, rise: 0.15, hold: 0.25, fall: 0.8, peak: 2.2 },
+      ],
+      deathFade: 2.5,
+    },
+  },
+  // The Quench Vein Caller (the Quench's packs): a hooded frost caster of glacier ice with a snow
+  // mantle, a crown of ice shards behind its hood and a frost orb floating over each palm (the orbs
+  // modelled in Blender, Tripo dropped the sheet's flat swirls). Tripo P2 from its ChatGPT sheet, a
+  // repainted 1024 atlas and a glow map (the orbs, eyes and cracks hot), rigged like the Warder: rigid
+  // plates on one welded skin, the crown shards and the orbs on their own. It
+  // floats: every clip lifts it a quarter of a yard over the floor on its robe of ice shards, so no
+  // foot can slide (runRef is the template's 7 yd/s at 1x). Its light melee lands at 0.62 s (the left
+  // orb punched out) and 0.66 s (the right claw raked down). Rime Bolt plays CastBolt locked to the
+  // 2 s bar: both orbs leave the palms and orbit into one point of cold between its hands, then are
+  // flung at the bar's end, vanish into the bolt and grow back over its palms as the clip plays out.
+  // Its death throws its head back, drops it, scatters its crown and rolls its orbs away; its glow
+  // goes out as it dies.
+  smith_heart_quench_caller: {
+    url: `${CREATURES}/heart_quench_caller.glb`,
+    // Drawn big (looks only): 3.6 at the template's 1.3 is about 4.7 yd, floating half a yard up.
+    height: 3.6,
+    clips: {
+      idle: 'Idle',
+      idleVariants: ['IdleFidget'],
+      idleVariantCadence: { everySec: 16, jitterSec: 10 },
+      combatIdle: 'CombatIdle',
+      stunned: 'Stunned',
+      turn: 'Turn',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack', 'Attack2'],
+      contacts: { Attack: [0.62], Attack2: [0.66] },
+      cast: 'CastBolt',
+      castByAbility: { heart_rime_bolt: 'CastBolt' },
+      castPlayOut: ['CastBolt'],
+      hit: ['Hit', 'Hit2'],
+      death: 'Death',
+    },
+    castClipSync: ['heart_rime_bolt'],
+    attackTimeScale: 1,
+    deathTimeScale: 1,
+    turnRate: 3,
+    walkRef: 3.5,
+    runRef: 7,
+    gaitWindDown: true,
+    authoredAtlas: true,
+    glowPulses: { pulses: [], deathFade: 2 },
+  },
+  // The Guardian of the Hammer, the Hammer Council's main boss, wears the model first built for the
+  // Slabwright (heart_slabwright.glb): Tripo P2, one UV island per rock on a painted 1024 atlas in
+  // ETC1S, a stone rig built in Blender (every rock rigid to one bone; the tracks that only hold the
+  // rest pose are dropped at build, see the spec), drawn at the Guardian's height (3.4 at its scale
+  // of 3.2). Its melee lands at 1.0 s, inside its 2.6 s swing; Hammerfall (the template's
+  // arcCleave, through its brood_cleave cue) swings the wide Attack2, and Mountain's Rush's wind-up
+  // slams Attack down as the run starts (its 1.0 s contact at the 0.8 s wind-up). Hammer's Weight
+  // slams through CastWake (authored to land at 0.94 s) at the end of its 1.5 s bar, Mountain's
+  // Wrath bursts through CastWrath (at 3 s) at the end of its 4 s bar, both locked to the bar; it
+  // braces through Mountain's Rush's bar. It hovers, so no foot can slide: runRef is the template's
+  // 7 yd/s at 1x.
+  smith_heart_hammer_guardian: {
+    url: `${CREATURES}/heart_slabwright.glb`,
+    height: 3.4,
+    clips: {
+      idle: 'Idle',
+      idleVariants: ['IdleFidget'],
+      idleVariantCadence: { everySec: 18, jitterSec: 12 },
+      combatIdle: 'CombatIdle',
+      turn: 'Turn',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack', 'Attack2'],
+      attackByAbility: { brood_cleave: 'Attack2', heart_mountains_rush_windup: 'Attack' },
+      attackTimeScaleByAbility: { heart_mountains_rush_windup: 1.25 },
+      contacts: { Attack: [1.0], Attack2: [1.0] },
+      cast: 'CastWrath',
+      castByAbility: {
+        heart_hammers_weight: 'CastWake',
+        heart_mountains_wrath: 'CastWrath',
+        heart_mountains_rush: 'CombatIdle',
+      },
+      castTimeScaleByAbility: { heart_hammers_weight: 0.62, heart_mountains_wrath: 0.75 },
+      castPlayOut: ['CastWake', 'CastWrath'],
+      hit: ['Hit', 'Hit2'],
+      death: 'Death',
+      flourish: 'Awaken',
+    },
+    castClipSync: ['heart_hammers_weight', 'heart_mountains_wrath'],
+    attackTimeScale: 1,
+    deathTimeScale: 1,
+    turnRate: 3,
+    walkRef: 3.5,
+    runRef: 7,
+    gaitWindDown: true,
+    authoredAtlas: true,
+    clickRadius: 2.2,
+  },
+  // The Seam Singer, the Hammer Council's second boss beside the Guardian: Tripo P2 from the
+  // concept sheet, a painted 1024 atlas in ETC1S, a stone rig built in Blender (every piece rigid
+  // to one bone; only the neck and the column, fused in the mesh, blend). Its light melee lands at 0.62 s and 0.66 s, inside its 2.2 s swing. Seam Bolt leaves
+  // its left hand at the end of its 2 s bar, the song's note comes at the end of its 3 s bar,
+  // Mountain's Wrath bursts at the end of the heirs' 3 s bar, and each finishes its recovery after
+  // the bar. It floats, so no foot can slide: runRef is the template's 7 yd/s at 1x.
+  // smith_heart_fx/council_bodies.ts still plays its dust and rings (COUNCIL_MODELLED).
   smith_heart_seam_singer: {
-    url: `${CREATURES}/golelingevolved.glb`,
+    url: `${CREATURES}/heart_seam_singer.glb`,
     height: 2.5,
-    clips: ELEMENTAL_FLOATING,
-    animUrls: [`${CREATURES}/elemental_ability_anims.glb`],
-    bodyless: true,
+    clips: {
+      idle: 'Idle',
+      idleVariants: ['IdleFidget'],
+      idleVariantCadence: { everySec: 18, jitterSec: 12 },
+      combatIdle: 'CombatIdle',
+      turn: 'Turn',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack', 'Attack2'],
+      contacts: { Attack: [0.62], Attack2: [0.66] },
+      cast: 'CastSong',
+      castByAbility: {
+        heart_seam_bolt: 'CastBolt',
+        heart_song_of_the_seam: 'CastSong',
+        heart_mountains_wrath: 'CastWrath',
+        heart_wake_the_stone: 'CastBolt',
+        heart_falling_rock: 'CastBolt',
+      },
+      // Wake the Stone and Falling Rock (the Singer's since the council became two bosses) throw
+      // through the bolt, timed so its throw (at 2.0 s at 1x) leaves the hand where
+      // smith_heart_fx/council_bodies.ts slams their dust and ring: 78 percent of each bar.
+      castTimeScaleByAbility: { heart_wake_the_stone: 1.03, heart_falling_rock: 2.14 },
+      castPlayOut: ['CastBolt', 'CastSong', 'CastWrath'],
+      hit: ['Hit', 'Hit2'],
+      death: 'Death',
+      flourish: 'Awaken',
+    },
+    attackTimeScale: 1,
+    deathTimeScale: 1,
+    turnRate: 3,
+    walkRef: 3.5,
+    runRef: 7,
+    gaitWindDown: true,
+    authoredAtlas: true,
     clickRadius: 1.0,
   },
   // The Guardian of the Heat's Rolling Cinder (design doc 7.4): a bodyless

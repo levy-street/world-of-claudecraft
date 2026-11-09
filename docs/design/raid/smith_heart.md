@@ -37,7 +37,14 @@ Sources of truth, in order:
 | Gate collision and state engine (shared) | `src/sim/instances/dungeon_gates.ts` |
 | Authored open-air field engine (shared) | `src/sim/instances/authored_field/` (see its `CLAUDE.md`) |
 | Placeholder looks (the one list phase 2 replaces) | `src/render/characters/smith_heart_placeholder_looks.ts` |
+| The Hammer Vein Warder's own body, the first row replaced (Tripo P2, a 1024 ETC1S atlas painted over in ChatGPT, a stone rig and clips built in Blender, the tracks that only hold the rest pose dropped at build), its template slowed to the pace that run keeps its feet on the floor at | `public/models/creatures/heart_hammer_warder.glb` from `scripts/assets/specs/heart_hammer_warder.json`, `smith_heart_hammer_warder` in `src/render/characters/manifest.ts`, pinned by `tests/smith_heart_hammer_warder_body.test.ts` |
+| The Hammer Vein Warders lie dormant until the raid reaches them: heaps of stone on their landings (a Sleep loop that starts and ends on Awaken's first frame), still hostile and attackable, that stand up over Awaken when a player comes within their aggro radius, strikes one or pulls its pack, holding still for 3.4 s and taking 95 percent less damage (the Dormant ward) until they are up; an evade home, a rise that finds nobody to fight or an in-place respawn lays them down again, a corpse is never asleep, and a trash kit waits for the rise | `MobTemplate.dormant` on `heart_hammer_warder` in `src/sim/content/smith_heart.ts`, `src/sim/mob/dormant.ts` and `dormant_state.ts`, the `sleep` and `wake` clips in `src/render/characters/manifest.ts`, pinned by `tests/smith_heart_dormant_warder.test.ts`, `tests/smith_heart_dormant_wire.test.ts` and `tests/smith_heart_hammer_warder_body.test.ts` |
+| The Guardian of the Hammer's own body, the model first built for the Slabwright (Tripo P2, a painted 1024 ETC1S atlas, a stone rig and 16 clips built in Blender, the tracks that only hold the rest pose dropped at build), worn by the Council's main boss since the two-boss rework at the borrowed golem's height: Hammerfall and the Rush's wind-up on its swings, Hammer's Weight and Mountain's Wrath striking on their bars' ends | `public/models/creatures/heart_slabwright.glb` from `scripts/assets/specs/heart_slabwright.json`, `smith_heart_hammer_guardian` in `src/render/characters/manifest.ts`, pinned by `tests/smith_heart_hammer_guardian_body.test.ts` |
+| The Seam Singer's own body, the Council's second (Tripo P2 from the concept sheet, a painted 1024 ETC1S atlas, a stone rig and 15 clips built in Blender, Seam Bolt leaving its hand at the end of the bar and the song's note and the Wrath's burst at the end of theirs, the tracks that only hold the rest pose dropped at build), its provisional pieces no longer drawn while their dust and rings still play | `public/models/creatures/heart_seam_singer.glb` from `scripts/assets/specs/heart_seam_singer.json`, `smith_heart_seam_singer` in `src/render/characters/manifest.ts`, `COUNCIL_MODELLED` in `src/render/smith_heart_fx/council_bodies_core.ts`, pinned by `tests/smith_heart_seam_singer_body.test.ts` |
+| The Quench's trash, both its own bodies of bright glacier ice that pop against the Quench's night (ChatGPT turnaround sheets, Tripo P2, the atlases repainted in ChatGPT, a glow map each: the crack lines, eyes, heart crystal and orbs hot, the rest of the ice softly lit, going out as they die). Both rigs are rigid ice plates on one welded skin: every plate on one bone, only the seam vertices shared by the bones either side, so no seam opens into a gap and no plate stretches (pinned on the shipped GLBs). The Quench Vein Warder is the Hammer Warder's body plan and body language on its own joints, with an ice creak in its idle, a death that drops it on its face, Rime Sweep flaring its cracks, and a skating chase (looks only: the template keeps its 7.2 yd/s, the gliding foot slides by design). The Quench Vein Caller floats on a robe of ice shards with a frost orb over each palm (modelled in Blender); Rime Bolt draws both orbs into one point of cold between its hands and flings them at the end of the 2 s bar, locked to it | `public/models/creatures/heart_quench_warder.glb` and `heart_quench_caller.glb` from `scripts/assets/specs/heart_quench_warder.json` and `heart_quench_caller.json`, `smith_heart_quench_warder` and `smith_heart_quench_caller` in `src/render/characters/manifest.ts`, pinned by `tests/smith_heart_quench_warder_body.test.ts` and `tests/smith_heart_quench_caller_body.test.ts` |
 | The Hammer vein's Blender kit (sources, build, plan, painter) | `docs/design/raid/kit/build_smith_heart_hammer_kit.py` (the sculpted quarry rock: `hammer_cliff.py`), `scripts/assets/smith_heart_hammer_kit/build.mjs`, `src/render/smith_heart/hammer_kit_plan_core.ts`, `src/render/smith_heart/heart_kit.ts` |
+| The Hammer vein's painted rebuild (the owner's style guide: the mountain, the risers, the walk, the arena's ruins, the floors and the sky, section 5.22) | `docs/design/raid/kit/build_smith_heart_hammer_env_kit.py` (sources `docs/design/raid/kit/hammer_env_src/`; the Quarry's statues `hammer_colossi_src/`), `scripts/assets/smith_heart_hammer_env_kit/`, `scripts/assets/smith_heart_hammer_colossi/`, `src/render/smith_heart/hammer_env_plan_core.ts`, `hammer_env_kit.ts`, `hammer_env_rock_paint.ts`, pinned by `tests/smith_heart_hammer_env.test.ts` and `tests/smith_heart_hammer_colossi.test.ts` |
+| The Quench vein's painted rebuild (the ice realm from the owner's arena concept: the glacier, the floors, the props, the fight's four swords, the aurora night, section 5.24) | `docs/design/raid/kit/build_smith_heart_quench_env_kit.py` (sources `docs/design/raid/kit/quench_env_src/`), `scripts/assets/smith_heart_quench_env_kit/`, `src/render/smith_heart/quench_env_plan_core.ts`, `quench_env_kit.ts`, `quench_env_rock_paint.ts`, `smith_heart_fx/quench_blades_fx.ts`, pinned by `tests/smith_heart_quench_env.test.ts` and `tests/smith_heart_quench_sword.test.ts` |
 | The Hammer vein's air and light | `src/render/smith_heart/hammer_air_core.ts`, `src/render/smith_heart/heart_environment.ts` (`smithHeartHammer`) |
 | The mountain's rock kit (sources, build, plan, painter) | `docs/design/raid/kit/build_smith_heart_rock_kit.py` (the sculpts: `rock_sculpt.py`), `scripts/assets/smith_heart_rock_kit/build.mjs`, `src/render/smith_heart/heart_rock_plan_core.ts`, `src/render/smith_heart/heart_rock.ts` |
 | The Gallery's walk (paving, kerb, chain rail, fallen blocks) | the `paving` ground (`field_textures.ts` `pavingDetail`), `docs/design/raid/kit/walk_pieces.py`, `src/render/smith_heart/hammer_walk_plan_core.ts`, `sh_fallen_block` in the layout |
@@ -485,7 +492,7 @@ south-west raking the terraces, the realm's blue sky light all but off), the Rin
 | The Cleft | two flanks of ochre granite leaning together to a crack open to the sky, a chockstone jammed in it, the way back to the world cut as a doorway of the Smith's dressed stone (jambs, a lintel with the hammer rune, steps), the vein's glow at its foot | `Kit_CleftGate` on `sh_cleft_mouth` |
 | The Gallery | quarried lips leaning out over the void along every ledge, chain hoists hung off them, the Smith's rough statues on the rims (one standing, one kneeling, scaffold poles), geodes of amber crystal, chips on the landings | the edge plan, `sh_rough_statue`, `sh_geode` |
 | The collapse spot (6.1) | a great flake of rock split from the mountain hanging out over the lower Gallery nine yards up, iron straps across its crack, chains back to the rock, the masons' red warning chevrons, grit trickling steadily onto the walk | `Kit_CollapseOverhang` at `collapseSpot()`, `hammer_air_core.ts` |
-| The Smith's Quarry | three colossi in the Smith's likeness carved out of the terraces (the Vigil kneels with his hammer planted, the Waking heaves himself out of the step on his hands, the Bearer kneels with the hammer on his shoulder), worked quarry faces on every riser and a flat worked rim round the pit floor, a cut-bedrock floor (`quarry` ground), carved columns in square sockets (made to sink: the rising and falling columns of 7.1 stand in them), cut blocks, the derrick, a scaffold against the Vigil, spoil heaps on the steps | `planHammerKit()` |
+| The Smith's Quarry | three colossi in the Smith's likeness carved out of the terraces (the Vigil kneels with his hammer planted, the Waking heaves himself out of the step on his hands, the Bearer kneels with the hammer on his shoulder), worked quarry faces on every riser and a flat worked rim round the pit floor, a cut-bedrock floor (`quarry` ground), carved columns in square sockets (made to sink: the rising and falling columns of 7.1 stand in them), cut blocks, the derrick, a scaffold against the Vigil, spoil heaps on the steps (the colossi drawn now by the painted rebuild's statues, section 5.22) | `planHammerKit()` |
 | The Slab | a frame of dressed monoliths with the Smith's tools and the hammer rune; the slab itself two carved halves with the hammer rune across its split | `Kit_SlabFrame`, `Kit_SlabHalfL`, `Kit_SlabHalfR` |
 | The Balcony | two lookouts, kneeling Smiths on corbels at its sides holding bowls of the vein's coals toward the heart | `Kit_LookoutStatue` |
 | The air | dust in the low sun, grit off the terrace lips and the colossi, a warm haze over the pit, the geodes' halos | `hammer_air.ts` |
@@ -729,8 +736,8 @@ angles and a breath of inner light, so thick ice never reads as blue stone).
 | The vein's walls | Frozen falls hung on the mountain's first band of rock where it climbs well over a Quench walk: fused columns of ice bulging in freeze rings, deep blue in their grooves, an icicle beard, a frozen splash at the foot, a snowy notch of rock at the head | `Kit_FrozenFallA`, `B`, `planQuenchFalls` (`QUENCH_FALL_RULES`) |
 | The vents and the Singing Ice | The shelf's vents are rings of wet dark stone the steam keeps free of frost, pale mineral crust, a faint light down the throat; the Singing Ice takes crack webs and long cracks (flat inlays) and two clusters of blades heaved up through it | `Kit_SteamVent` on `sh_steam_vent`, `Kit_IceCrackA`, `B`, `Kit_IceBlade` on `sh_ice_blade`, `planQuenchDressing` |
 | The rock's frost | The mountain stays calm (2G's big masses): in the Quench its rock, its heightfield and the field's own cliffs take frost in big value groups only, a cold film a value paler and bluer, rime and old snow on every ledge in broad drifts, faint glaze streaks down the faces | `quench_frost_core.ts` (`quenchFrostWeight`, the rock material's `quenchFrostGlsl` from the slot's origin, `quenchCliffPaint`) |
-| The light | Its own state, `smithHeartQuench`: a pale cold sun low in the south-east through a thin overcast, a pale blue-grey sky fill over a cool ground bounce, so the frost reads pale and every shade a clean cold blue-grey, never navy; a pale-blue mist thin across the lake. It holds east of the Ring as soon as the camera is past its rim | `heart_environment.ts` (`SMITH_HEART_QUENCH_LIGHT`, `SMITH_HEART_QUENCH_FOG`, `inQuenchLight`) |
-| The sky | Calm and cold: a pale overcast thinning to a wash of cold blue overhead, high thin veils and cirrus drifting slowly, the low sun behind them with the ice crystals' 22 degree halo round it | `heart_sky.ts` (`setQuench`) |
+| The light | (The aurora night since the painted rebuild, section 5.24.) Its own state, `smithHeartQuench`: a pale cold sun low in the south-east through a thin overcast, a pale blue-grey sky fill over a cool ground bounce, so the frost reads pale and every shade a clean cold blue-grey, never navy; a pale-blue mist thin across the lake. It holds east of the Ring as soon as the camera is past its rim | `heart_environment.ts` (`SMITH_HEART_QUENCH_LIGHT`, `SMITH_HEART_QUENCH_FOG`, `inQuenchLight`) |
+| The sky | (The painted aurora night once the painted kit has landed, section 5.24.) Calm and cold: a pale overcast thinning to a wash of cold blue overhead, high thin veils and cirrus drifting slowly, the low sun behind them with the ice crystals' 22 degree halo round it | `heart_sky.ts` (`setQuench`) |
 | The weather | Snow drifting down over every Quench walk with frost motes glinting in it, steam rising off the vents and out of the rock past the rim, a pale mist lying in the void under the walks; each fire bowl burning a tall flame with embers, a halo that marks it from across the lake and a warm pool on the snow (the one warm thing in the cold) | `quench_air.ts` (`planQuenchAir`) |
 | The Singing Ice | Its set piece's look (section 6.3's mechanic is not built): every few seconds a crack creaks out across the sheet (a dark seam opening under a white-hot line of the vein's light, brightest at its running front) and bursts into frost at its end; the creaks wear the vein's pale light, never a threat colour, and lie under every telegraph | `quench_air.ts` (`quenchCreakAt`, `quenchCreakLook`, `planSingingCracks`) |
 
@@ -888,7 +895,7 @@ The council's effects are `src/render/smith_heart_fx/council_fx.ts` (pure plan
 
 | Moment | Look |
 |---|---|
-| The Seam Singer | Provisional body of the kits' own stone, floating pieces stitched by ochre threads of the vein's light like the Heart's colossus (the Slabwright's broad, blocky body left with it in the two-boss rework): the Seam Singer tall and slender with glowing amber seam crystals; both about 2 to 2.5 times a player. Idle breath, a swing, cast poses (the Slabwright raises its arms and slams for Wake the Stone and the rock; the Singer lifts its arms and its crystals flare with the bar), a hunch and white-gold threads when one holds the Wrath, a fall into rubble. Their joints are kept apart from the pieces, so the official pipeline's models replace the pieces only |
+| The Seam Singer | Provisional body of the kits' own stone, floating pieces stitched by ochre threads of the vein's light like the Heart's colossus (the Slabwright's broad, blocky body left with it in the two-boss rework; its model is the Guardian's body now, and the Singer wears its own, the pieces its fallback): the Seam Singer tall and slender with glowing amber seam crystals; both about 2 to 2.5 times a player. Idle breath, a swing, cast poses (the Slabwright raises its arms and slams for Wake the Stone and the rock; the Singer lifts its arms and its crystals flare with the bar), a hunch and white-gold threads when one holds the Wrath, a fall into rubble. Their joints are kept apart from the pieces, so the official pipeline's models replace the pieces only |
 | The pillars | The quarry's carved columns (the Hammer kit's) and the risen stone (the rock kit's needles), each drawing its integrity on the model: a network of seams cracking open and burning hotter, a growing lean, and its pips round its foot: an arc of light on the floor for each piece it started with and, on it, a carved stone socket holding a gem of the vein's light (a spent one a dark stone; the last one throbs; a flash as one is lost) |
 | A pillar rising | Bursting out of the floor in under a second with a shudder, a ring of dust, shards thrown out and a shock ring at the knockback's reach |
 | A pillar losing a piece | Its seams flash, chips and dust off its face, a short shake |
@@ -998,7 +1005,7 @@ vein's art rule holds: living stone, ice and the cold, no metal, no machinery (t
 | The icy aura (pass of 2026-11-04) | A glaze of rime climbing each cold body with its bar, a bright ragged lip at its front, glints, pulsing past three quarters; breath vapour off every cold body, thicker as it freezes; frost veins biting across it and motes drawn in while the body hides in an immunity (every tier but the vapour and motes; `quench_frost_fx.ts`, pure plan `quench_frost_fx_core.ts`) |
 | Encased in Rime | A faceted crystal of lake ice closed round the frozen player (`quench_encase_fx.ts`): frost fog in its heart, a web of cracks spreading over it toward the shatter, and the countdown in the ice itself (deep blue time left draining down under a band of cold light, throbbing faster to the end); jagged rime spikes bursting out of the ice round its foot, a ring of frost racing out as it slams shut, the shatter's splash ring at its exact radius filling to the shatter (every tier); the shatter's shards, mist, rings and chunks of ice thrown tumbling across the lake; a shard of ice flying to each ally the splash struck (the sim's Rime Splash mark says who), bursting on them and flaring their own glaze; an immunity cracked by the rime bursts in shards |
 | The ice | A crack's footprint at the hole's exact radius (danger) under a web of cracks racing out with light in them; the hole: dark deep water, slush and floes, a thin lip of broken white ice; a trapped player held to the waist in churning water; the plunge's and climb's splashes |
-| The blades | The kit's sunk blades; waking, they tremble, light runs up their fullers, they are wrenched up out of the ice (the lake bursting upward, their points shown) and stand upright floating, a blue light in each, their broad faces turned the way the echoes run with a chevron of light on the ice before them, blazing while an echo is held; a ring of broken ice where each was sunk; flying (heroic) they lean into the flight with a wake of frost |
+| The blades | The kit's sunk blades (the painted rebuild's great sword of ice since, section 5.24); waking, they tremble, light runs up their fullers, they are wrenched up out of the ice (the lake bursting upward, their points shown) and stand upright floating, a blue light in each, their broad faces turned the way the echoes run with a chevron of light on the ice before them, blazing while an echo is held; a ring of broken ice where each was sunk; flying (heroic) they lean into the flight with a wake of frost |
 | The echoes | Each footprint at the echo's own arc and reach at its blade (`echoReach`: wider than the attack it repeats), in danger with a hot edge, filling to its landing; no safe ring is drawn (Jose's playtest: a mint lee beside the danger footprint read alike, so only the danger is drawn and the lee is learned, its rule unchanged); landing, the guardian's own gust or ice over the echo's whole reach |
 | The crossing | The lane between the two blades (danger) through its warning, the flight's wake, then the cracks along it |
 | The shore ice | Slabs of jagged lake ice heaving up round the lake at the pull, standing through the fight, sinking at its end; the lake refreezing in a wave of frost at the guardian's fall |
@@ -1374,6 +1381,142 @@ crowns; the altar drags and Forge Wrath's cover behind them are superseded by th
 design and gone with the sketch kit. The quarter awake and the crossing's shockwave (above)
 now read with the fight: the boss's seams take its quarter's colour, the switch throws a
 shockwave in the four veins' light over the Anvil.
+
+### 5.22 The Hammer vein's painted rebuild
+
+The owner's ask: rebuild the Earth section to the painted style guide (slate-violet
+stacked cliffs with moss caps, a paved walk behind heavy chains, a ruined amphitheatre
+under a painted dusk), low poly with the paintings doing the work, the look only and
+no mechanic moved, and the rock around the mobs a cool foil to their warm ochre stone.
+Nothing here touches `src/sim/`.
+
+**Sources.** ChatGPT painted every texture and a FRONT, LEFT and BACK sheet for each
+big model; Tripo P2 built the four models from those sheets; Blender stands them on the
+kit's frame and builds the rest as low-poly masonry and iron. The Quarry's three statues
+have their own file and sources (`docs/design/raid/kit/hammer_colossi_src/README.md`). The texture sizes follow
+what the eye gets: the floors, the two great cliffs and the arcade at 1024, the
+outcrop and the tiles at 512, the moss and the iron at 256, and nothing past
+1024. Prompts and Tripo task ids: `docs/design/raid/kit/hammer_env_src/README.md`.
+
+| Piece | Now | Stands in for |
+|---|---|---|
+| The mountain | Painted cliff stacks, bluffs and outcrops on the old plan's own spots and contours, brush strokes from the cliff painting laid over each atlas in world space so a sixty yard face stays painted up close | `Kit_Rock*` in the vein (`fitHammerEnvRock`, `fitHammerEnvLip`, `fitHammerEnvNeedle`) |
+| What the kit leaves bare | The heightfield and the field's cliff faces wear the cliff painting and moss, faded by `hammerEnvWeight` so the other veins draw as they did | `hammer_env_rock_paint.ts` |
+| The terraces | Risers as the amphitheatre's seats, a stair down one in nine, the pit's retaining wall coursed cut stone, flush with its lip | `Kit_QuarryFace*`, `Kit_QuarryRim*` |
+| The arena's back | A ring of broken arcades on the top step with banners on their piers, whole and broken columns stepping up the seats, fallen drums, rubble, iron rings, fire bowls | `Kit_GreatCliff*`, `Kit_RubblePile`, `planHammerEnvArena` |
+| The walk | Painted flags on the Gallery, the Cleft and the stairs (`HAMMER_ENV_PAVED`, drawn only: the layout keeps its grounds), a chunky kerb, a heavy rusted chain on iron posts, moss-capped boulders on the fallen blocks' colliders | `Kit_WalkCurb*`, `Kit_WalkRail`, `Kit_FallenBlock*` |
+| The air | The dome wraps the painted dusk in the vein (`inHammerSky`), the fog and fill go cool violet, the sun a paler gold | `heart_sky.ts`, `smithHeartHammer` |
+| The colossi | Three statues from the owner's turnaround sheets, on the old colossi's exact spots: the Keeper with his hammer planted on a plinth with a glowing forge door, the Waking smith half carved out of the quarry rock with molten seams, the Bearer with an anvil across his shoulders. Tripo P2 with the sheets painted on, recoloured in ChatGPT to the cliffs' slate grey and moss, one 1024 painting each (`smith_heart_hammer_colossi.glb`). If the file has not landed the old colossi draw. | `Kit_ColossusVigil`, `Kit_ColossusWaking`, `Kit_ColossusBearer` |
+| The far skyline | The neighbouring veins' rock behind the vein, for a camera in the vein, wears a broad low-contrast paint and loses light with distance (`HEART_ROCK_FAR_PAINT`, `HAMMER_ENV_DEPTH` in `src/render/smith_heart/heart_rock_cutaway.ts`). The vein's own rock, its floors and its fog are untouched. | A busy, evenly lit pattern that sat on one plane with the near rock |
+
+**Frozen.** What a mechanic hangs on stays the old kit's
+(`HAMMER_ENV_FROZEN`): the Council's pillars and sockets, the Slab and its frame, the Pit
+Mouth and the collapse spot's overhang. The owner updates those separately (the colossi
+were first, in the table above).
+The old kit's GLB is unchanged: the Council's bodies are built from its pieces.
+
+**Budget.** A swapped piece is a tenth of what it replaces (a riser 240 triangles from
+2,350, a rail 440 from 2,180, a great cliff gone from 13,000; the colossi, painted where
+they were sculpted, about two thirds: 36,000 triangles from 58,000). The kit is fetched when the
+raid's interior is built, never at boot. If it has not landed in time the old look draws
+until the interior is next built: a slower look, never a missing wall. Readability: the
+floors are low contrast and cool so telegraphs and the warm mobs read over them; every new
+solid stands on a terrace nobody reaches or past a lip, in the sightline pin
+(`hammerEnvSolids`). The low tier sheds the ruins and upper bands, never the floors' paint.
+
+### 5.23 The Breath vein's painted rebuild
+
+The owner's ask: the zone after the Earth section in the same painted style, its element kept.
+The Breath stays the storm on the summit (living granite, crystal and storm, nothing metal), now
+painted: storm granite carved by the gale into leaning blades, bluffs of slanting beds and wind
+arches, sky-blue crystal that glows, pale sea-green lichen, a painted storm sky. The look only:
+no walk, lip, collider or mechanic moves, and nothing here touches `src/sim/`.
+
+**Sources.** ChatGPT painted the floor, the cliff, the masonry and the sky, and a FRONT, LEFT
+and BACK sheet for each big model, each with the Hammer's rebuild's own image of the same
+thing attached as the style; Tripo P2 built four models from the sheets; Blender stands them on
+the kit's frame and builds the walls and shelters as low-poly masonry. The Tripo atlases are
+graded onto the storm's ramp (`scripts/assets/smith_heart_breath_env_kit/prepare_sources.mjs`).
+Textures: the three stacks and the floor at 1024, the stone, cliff, masonry and relief at 512,
+the sky at 1024 by 512. Prompts and Tripo task ids: `docs/design/raid/kit/breath_env_src/README.md`.
+
+| Piece | Now | Stands in for |
+|---|---|---|
+| The mountain | Wind-carved spires, bluffs and arched crags on the old plan's own spots and contours (the Hammer's fit: as tall and as deep, never wider than the old front past the clearance), the cliff painting's strokes over each atlas | `Kit_Rock*` bands in the Breath and facing its walks (`breathEnvOwnsRock`, `fitBreathEnvRock`) |
+| The crest needles and the Cornice's far peaks | Spires on each needle's foot, as tall and as broad | `Kit_RockNeedleA`, `Kit_RockNeedleB` (`fitBreathEnvNeedle`) |
+| The lips and the great hung faces | Kept as the rock kit's sculpts (their brinks tucked under the Cornice's open rim stay exactly where Jose's playtest put them), wearing the cliff painting's hue and a share of its strokes over their own value | painted through the rock's material (`heartRockBreathGlsl`) |
+| What the kit leaves bare | The heightfield and the field's cliff faces wear the same paint, faded by `breathEnvWeight` (where the storm granite held) | `breath_env_rock_paint.ts` |
+| The floors | Every scoured walk painted as storm-scoured slabs with wind streaks and lichen in the cracks, with relief from the painting | the `scoured` top family |
+| The standing stones | A twisted monolith bored by the wind, a chevron band, a crown of glowing crystal, as tall as the old one and inside its collider | `Kit_StormStone` (and the chips of it at the Cornice's gaps) |
+| The low walls and the shelters | Dry-laid storm granite in the masonry painting under pale copings, on the old modules' lip frame | `Kit_BreathWallA`, `Kit_BreathWallB`, `Kit_WindShelter` |
+| The flat inlays | Gone: the painted floor carries its own cracks | `Kit_PlateauCrack*`, `Kit_WindGroove` |
+| The sky | The painted storm wrapped on the dome over the Breath, streaming with the gale; the lightning and the distant bolts still walk it | `heart_sky.ts` `breathSky` |
+
+**Kept.** The Wind Bridge's arch (the field keeps a shallow keel under its deck), the floating
+isles (the fight's own rock) and the Breath's air, light and weather are unchanged. If the kit has
+not landed, the old Breath draws as it did until the interior is next built.
+
+**Budget.** The kit is 4.8 MB, fetched at the raid's door with the old Breath kit, never at boot.
+A stack is under 3,400 triangles near and 1,600 far; the stone 2,700 (the old 2,380); a wall
+module under 400 (the old 730). The stacks are tuned to the Hammer's value range: the storm's
+paintings came back about twice as bright, so their albedo and the floor's gain are brought down,
+the stone a value over the quarry and never white (`BREATH_ENV_ALBEDO`, `BREATH_ENV_FLOOR`).
+The low tier sheds nothing new: no swapped piece is cosmetic past what it replaced.
+
+### 5.24 The Quench vein's painted rebuild
+
+The owner's ask: the ice realm (the whole Quench, from the Ring's mouth down both landings
+and the Singing Ice to the Frozen Lake) in the painted style the Earth section set, every piece
+made again through the same process (ChatGPT, Tripo, compressed), the fight's four swords
+included, the bosses and every mechanic untouched, and the environment contrasting with the
+bosses. First an arena concept in ChatGPT in the earth room's concept's style
+(`docs/design/raid/kit/quench_env_src/concept/`): a dark frozen lake ringed by glacier, frozen
+falls and crystal under an aurora night, the four swords sunk in the lake, the carved fire
+bowls the one warm thing. Nothing here touches `src/sim/`.
+
+**Sources.** ChatGPT painted the lake, the frost-bound flagstones, the frozen cliff, the
+masonry, the snow and the aurora sky, and a FRONT, LEFT and BACK sheet for each of eight models,
+each with the Breath's rebuild's own image as the format and the aurora concept as the look;
+Tripo P2 built the eight (880 credits); Blender stands them on the old kit's frames and builds
+the walls, the vents and the swords' collars and fuller strips as low-poly pieces on the
+paintings. The atlases are graded by what a texel is (rock onto a deep slate ramp, ice richer,
+snow cooled, coals warm: `scripts/assets/smith_heart_quench_env_kit/quench_grade.mjs`); the
+stone paintings, painted a saturated cobalt, are taken toward the slate. Textures: the glacier,
+the sword and the two floors at 1024, the rest at 512, the floors' relief at 256, the sky at
+1024 by 512. Prompts and Tripo task ids: `docs/design/raid/kit/quench_env_src/README.md`.
+
+| Piece | Now | Stands in for |
+|---|---|---|
+| The mountain | Glacier stacks (dark slate under fused columns of ice, frozen falls, icicle beards, crystal crowns), glacier bluffs and spires of ice crystal on the old plan's own spots and contours (the Hammer's fit), the frozen cliff painting's strokes over each atlas; the walls north of the lake too (they stand in the Heart's area but face the Quench: left bare they read as a naked wall round the arena), never rock facing the Heart's own floors | `Kit_Rock*` bands in the Quench and facing its walks, its crest needles (`quenchEnvOwnsRock`, by the floor a piece faces; `fitQuenchEnvRock`, `fitQuenchEnvNeedle`) |
+| The great frozen fall | The concept's centrepiece: the frozen fall two times over, hung on the tall mass across the lake from the way in, its front behind the rock's own; in the sightline plan | new (`planQuenchEnvGreatFall`) |
+| The ring | The concept's near tier (the owner's note: more snowy-topped rock round the outside, closer to the concept): glacier stacks round the basin on the mountain past the shelf, facing the lake, overlapping into one wall of snow-ledged rock and ice, their whole footprint off every walk (the way in down the lake descent stays open), none in front of the great fall; in the sightline plan | new (`planQuenchEnvRing`) |
+| The lips and the hung faces | Kept as the rock kit's sculpts, wearing the cliff painting's hue and a calm share of its strokes over their own value, snow on their ledges | painted through the rock's material (`heartRockQuenchGlsl`) |
+| What the kit leaves bare | The heightfield and the field's cliff faces wear the same paint where the frost held, by the painting's own value (they have no carved form to keep, and their own tint by the Heart is the crown's near-black), yielding to the Hammer's paint on the skyline over its arena and fading toward the Heart only for a camera in it | `quench_env_rock_paint.ts` (`quenchEnvWeight`, `QUENCH_ENV_FIELD_BASE`) |
+| The floors | The mouth, the landings, the stairs and the shelf: dark slate flagstones with snow in their joints, with relief; the Frozen Lake and the Singing Ice: the painted lake (dark teal under pale cracks) as the ice's face, the bubbles and old cracks under its clear ice, the edge snow and the Singing Ice's crazing kept; both read twice, turned, so the repeat never lines up | the `rime` top family (`quenchEnvFloorMaterial`), `lake_ice` (`quench_lake_ice.ts`, painted) |
+| The fire bowls | The Smith's carved bowl: a chevron band, a fluted pedestal, a stepped plinth, a bed of coals the flame burns in (`QUENCH_BRAZIER_FIRE`), inside its collider | `Kit_LakeBrazier` |
+| The standing stones, the Singing Ice's crystal | A chevron monolith with cyan ice in its cracks, as tall as the old stone; a cluster of crystal spires, as tall as the old blades | `Kit_FrostStone`, `Kit_IceBlade` |
+| The heaped ice, the falls, the walls, the vents | Upended plates of lake ice in the old heap's box; frozen falls hung from their heads as far as the old; dry-laid slate a knee high under snow copings, icicles off the outer face, on the old modules' lip frame; rings of wet dark stone round a dark throat | `Kit_IceShelfA`, `B`, `Kit_FrozenFallA`, `B`, `Kit_QuenchWallA`, `B`, `Kit_SteamVent` |
+| The fight's four swords | The painted great sword of ice (horned crossguard, frost-wrapped grip, crystal pommel, the fuller's strips lit per blade) in the old sunk blade's frame, its own point under the ice (the old tip never draws), the painted collar of heaved plates at each home; the fight's motion, sockets, light and timing unchanged | `Kit_SunkBlade` (`smith_heart_fx/quench_blades_fx.ts`) |
+| Gone | The flat crack inlays and the drifts: the painted floors carry their own cracks and snow | `Kit_IceCrackA`, `B`, `Kit_SnowDriftA`, `B` |
+| The light and the sky | The aurora night: a cold moon low in the south-east (the dome draws it, haloed), a deep blue fill, an aurora-teal rim; the painted aurora wrapped on the dome, its ribbons rippling, stars twinkling between them | `smithHeartQuench` (`heart_environment.ts`), `heart_sky.ts` `quenchPaintedSky` |
+
+**The contrast.** The guardian and its adds are pale frost and dark stone; the realm is dark
+slate and dark teal ice, its light a deep blue night, so the pale guardian stands out on the
+lake and the dark adds on the ice. The ice itself is luminous (`env_kit_look.ts`'s ice layer:
+the teal and cyan of every atlas shines past its own colour, the rock never) and the snow on
+every ledge kept bright (its snow layer), the arena concept's look (the owner's note: brighter
+ice, like the concept), and the fire bowls are the one warm thing.
+
+**Kept.** The Quench's air and weather (`quench_air.ts`), the creaks, the guardian's and its
+adds' bodies and every effect of the fight, the shore ice it raises, the blades' sockets and
+light. If the kit has not landed, the old Quench draws as it did until the interior is next
+built.
+
+**Budget.** The kit is 8.4 MB, fetched at the raid's door with the old Quench kit, never at
+boot. A glacier piece is under 3,200 triangles near and 1,600 far; every swapped prop fewer
+than the one it replaces (a bowl 2,718 from 4,694, a heap of ice 2,189 from 6,749, the sword
+4,256 from 5,204). The low tier sheds nothing new: no swapped piece is cosmetic past what it
+replaced.
 
 ## 6. Set pieces (phase 2 specs)
 

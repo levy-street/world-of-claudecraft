@@ -9,6 +9,21 @@
 // stand in (heart_props.ts) and this swaps in for them the moment it lands.
 
 import type * as THREE from 'three';
+import {
+  buildHammerEnvFlames,
+  ensureHammerEnvKit,
+  hammerEnvHas,
+  hammerEnvKitReady,
+  instanceHammerEnv,
+} from './hammer_env_kit';
+import {
+  hammerEnvSwap,
+  planHammerEnvArena,
+  planHammerEnvBraziers,
+  planHammerEnvGallery,
+  planHammerEnvStairs,
+  planHammerEnvWalkLayer,
+} from './hammer_env_plan_core';
 import { HAMMER_KIT_KINDS, planHammerKit } from './hammer_kit_plan_core';
 import {
   ensureHeartKit,
@@ -20,7 +35,9 @@ import {
 
 /** Wait (capped) for the Hammer kit before the interior is built. */
 export function ensureHammerKit(): Promise<void> {
-  return ensureHeartKit(SMITH_HEART_HAMMER_KIT_URL);
+  return Promise.all([ensureHeartKit(SMITH_HEART_HAMMER_KIT_URL), ensureHammerEnvKit()]).then(
+    () => undefined,
+  );
 }
 
 /** Has the Hammer kit landed? */
@@ -31,14 +48,36 @@ export function hammerKitReady(): boolean {
 /** The prop kinds the Hammer kit draws in place of their placeholders. */
 export { HAMMER_KIT_KINDS };
 
-/** The vein's kit dressing (instance-local). */
-export function buildHammerKit(lowGfx: boolean): THREE.Group {
-  return instanceHeartKit(
-    SMITH_HEART_HAMMER_KIT_URL,
-    planHammerKit(),
-    lowGfx,
-    'smithHeartHammerKit',
+/** The vein's kit dressing (instance-local), painted or old as `painted` says. */
+export function buildHammerKit(lowGfx: boolean, painted = hammerEnvKitReady()): THREE.Group {
+  if (!painted) {
+    return instanceHeartKit(
+      SMITH_HEART_HAMMER_KIT_URL,
+      planHammerKit(),
+      lowGfx,
+      'smithHeartHammerKit',
+    );
+  }
+  // The painted rebuild: what a mechanic hangs on stays the old kit's.
+  const { keep, swap } = hammerEnvSwap(planHammerKit(), hammerEnvHas);
+  const group = instanceHeartKit(SMITH_HEART_HAMMER_KIT_URL, keep, lowGfx, 'smithHeartHammerKit');
+  group.add(
+    instanceHammerEnv(
+      [
+        ...swap,
+        ...planHammerEnvArena(),
+        ...planHammerEnvBraziers(),
+        ...planHammerEnvGallery(),
+        ...planHammerEnvStairs(),
+        ...planHammerEnvWalkLayer(),
+      ],
+      lowGfx,
+      'smithHeartHammerEnv',
+    ),
   );
+  const flames = buildHammerEnvFlames(lowGfx);
+  if (flames) group.add(flames);
+  return group;
 }
 
 /** The kit dressing when it has landed; otherwise nothing yet, and the
@@ -52,5 +91,10 @@ export function dressHammerVein(
     parent.add(buildHammerKit(lowGfx));
     return;
   }
-  upgradeWhenHeartKitLands(SMITH_HEART_HAMMER_KIT_URL, placeholders, () => buildHammerKit(lowGfx));
+  // The late build keeps the look the interior was built with: paint that landed since
+  // was never prepared behind the curtain (the warmers carry only what had landed).
+  const painted = hammerEnvKitReady();
+  upgradeWhenHeartKitLands(SMITH_HEART_HAMMER_KIT_URL, placeholders, () =>
+    buildHammerKit(lowGfx, painted),
+  );
 }

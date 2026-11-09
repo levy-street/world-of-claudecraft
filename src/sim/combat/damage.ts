@@ -1537,6 +1537,10 @@ export function handleDeath(
   // Death cannot shed persistent death penalties or encounter-owned unbreakable
   // control. The encounter script remains responsible for releasing its markers.
   e.auras = aurasSurvivingDeath(e.auras);
+  // A dormant mob killed through its ward dies awake: no sleep bit or rise rides its corpse
+  // onto the wire or into the next life (mob/dormant.ts).
+  if (e.asleep) e.asleep = false;
+  if (e.dormantRise) e.dormantRise = 0;
   e.ccDr.clear();
   stopChannelVisual(ctx, e);
   emitRainOfFireStop(ctx, e);

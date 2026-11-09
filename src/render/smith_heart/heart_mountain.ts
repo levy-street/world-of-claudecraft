@@ -13,6 +13,7 @@ import {
   breathStoneBed,
   breathStoneWeight,
 } from './breath_stone_core';
+import type { HammerRockPaint } from './hammer_env_rock_paint';
 import {
   HAMMER_ROCK_GAIN,
   HAMMER_ROCK_MIX,
@@ -67,7 +68,7 @@ function hammerStepShade(step: { k: number; f: number }): number {
 }
 
 /** Build the mountain (instance-local). */
-export function buildHeartMountain(lowGfx: boolean): THREE.Mesh {
+export function buildHeartMountain(lowGfx: boolean, paint?: HammerRockPaint | null): THREE.Mesh {
   const g = heartMountainGrid(lowGfx ? 5 : 3);
   const count = g.nx * g.nz;
   const positions = new Float32Array(count * 3);
@@ -161,14 +162,13 @@ export function buildHeartMountain(lowGfx: boolean): THREE.Mesh {
   geometry.setIndex(index);
   geometry.computeVertexNormals();
   geometry.computeBoundingSphere();
-  const mesh = new THREE.Mesh(
-    geometry,
-    // The dark mass behind the rock kit, smooth and plain: faceted, the grid's
-    // faces turned from the light drew as black slits standing in the crown
-    // (seen through the kit's gaps); with the shared fracture, smooth normals
-    // scribbled black at every grazing angle.
-    surfaceMat({ color: 0xffffff, vertexColors: true, roughness: 0.95 }),
-  );
+  // The dark mass behind the rock kit, smooth and plain: faceted, the grid's
+  // faces turned from the light drew as black slits standing in the crown
+  // (seen through the kit's gaps); with the shared fracture, smooth normals
+  // scribbled black at every grazing angle.
+  const stone = surfaceMat({ color: 0xffffff, vertexColors: true, roughness: 0.95 });
+  // The Hammer vein's stretch of it wears the vein's painted rock.
+  const mesh = new THREE.Mesh(geometry, paint ? paint(stone) : stone);
   mesh.name = 'smithHeartMountain';
   mesh.matrixAutoUpdate = false;
   return mesh;

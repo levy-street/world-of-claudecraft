@@ -119,6 +119,8 @@ import {
   updateMobChargeDash,
 } from './charge';
 import { holdPinnedMob, updateMobCombatProfile } from './combat_profile';
+import { tickDormant } from './dormant';
+import { putDormant } from './dormant_state';
 import { resetDungeonMinibossStomp, updateDungeonMinibossStomp } from './dungeon_miniboss_stomp';
 import { tickEyeWard } from './eye_ward';
 import { idleRng, wanderPause } from './idle_rng';
@@ -362,6 +364,11 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
   // walking home to bed does nothing but walk, and everyone else falls through. Guarded
   // on the template field and the host clock, so every other mob pays one map lookup.
   if (tickSlumber(ctx, mob) !== 'awake') return;
+
+  // Dormant until woken (mob/dormant.ts): a sleeper still runs its idle scan below (that is
+  // what wakes it) and never wanders; a woken one does nothing until it has stood up.
+  // Guarded on the template field, so every other mob pays one map lookup.
+  if (tickDormant(ctx, mob) !== 'awake') return;
 
   const dummyTemplate = MOBS[mob.templateId];
   if (dummyTemplate?.dummy) {
@@ -694,11 +701,12 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
         break;
       }
       // Dormant-until-pulled mobs (the downed forge mechs, and any hand-placed
-      // pack marked per-spawn) never idle-wander, so the formation holds. Drawn
-      // AFTER the aggro scan so proximity still wakes them; skips the wander draw.
+      // pack marked per-spawn) never idle-wander, so the formation holds, and
+      // neither does a sleeping dormant mob (mob/dormant.ts). Drawn AFTER the
+      // aggro scan so proximity still wakes them; skips the wander draw.
       // A synthetic mob whose templateId does not resolve (perf-capture rigs)
       // has no template flag; tolerate that like the hardLeashRadius read does.
-      if (template?.idleStationary || mob.idleStationary) break;
+      if (template?.idleStationary || mob.idleStationary || mob.asleep) break;
       // A dungeon patrol walks its loop instead of wandering (mob/patrol.ts).
       if (updateMobPatrol(ctx, mob)) break;
       mob.wanderTimer -= DT;
@@ -1842,6 +1850,9 @@ export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
   // call unconditionally (unlike the two hooks above, which key on a specific
   // template id).
   clearDelveRaiseDeadChannel(ctx, mob);
+  // A dormant mob home from its pull lies down again, ward on (mob/dormant.ts).
+  const dormant = MOBS[mob.templateId]?.dormant;
+  if (dormant) putDormant(mob, dormant);
 }
 
 // Cowardly mobs panic once per pull at low HP, then recover their nerve and turn to

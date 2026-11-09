@@ -22,15 +22,32 @@ import { buildAuthoredFieldTerrain } from '../authored_field/field_terrain';
 import { sharedUniforms } from '../gfx';
 import type { FireLightSink } from '../point_light_budget';
 import { buildBreathAir } from './breath_air';
+import {
+  breathEnvFloorMaterial,
+  breathEnvKitReady,
+  breathEnvPainting,
+  breathEnvProgramWarmers,
+  breathEnvSkyTexture,
+} from './breath_env_kit';
+import { breathRockPaintLayer, composeRockPaints } from './breath_env_rock_paint';
 import { BREATH_KIT_KINDS, breathKitReady, dressBreath, ensureBreathKit } from './breath_kit';
 import { BREATH_KIT_KEEL, BREATH_KIT_SHALLOW } from './breath_kit_plan_core';
 import { CORNICE_SHEER, CORNICE_SURFACE } from './breath_stone_core';
 import { buildBreathSummit } from './breath_summit';
 import { buildHammerAir } from './hammer_air';
+import {
+  hammerEnvFloorMaterial,
+  hammerEnvKitReady,
+  hammerEnvPainting,
+  hammerEnvProgramWarmers,
+  hammerEnvSkyTexture,
+} from './hammer_env_kit';
+import { HAMMER_ENV_PAVED, HAMMER_ENV_STAIRS, hammerEnvPathUv } from './hammer_env_plan_core';
+import { hammerRockPaintLayer } from './hammer_env_rock_paint';
 import { dressHammerVein, ensureHammerKit, HAMMER_KIT_KINDS, hammerKitReady } from './hammer_kit';
 import { heartCliffPaint } from './heart_cliff_paint_core';
 import { heartCollapseDim, heartCollapseHeartLevel } from './heart_collapse_core';
-import { inBreathLight, inHeatLight, inQuenchLight } from './heart_environment';
+import { inBreathLight, inHammerSky, inHeatLight, inQuenchLight } from './heart_environment';
 import { heartFinalDarkness } from './heart_final_core';
 import { buildHeartGates } from './heart_gates';
 import { ensureHeartKit, heartKitProgramWarmers, SMITH_HEART_GATE_KIT_URL } from './heart_kit';
@@ -47,7 +64,14 @@ import { buildHeartProps, buildHeartWalls } from './heart_props';
 import { buildHeartQuarters } from './heart_quarters';
 import { buildHeartRivers } from './heart_rivers';
 import { dressHeartMountain, ensureHeartRockKit } from './heart_rock';
-import { setHeartRockCore, setHeartRockSlot } from './heart_rock_cutaway';
+import {
+  setHeartRockBreathPaint,
+  setHeartRockCore,
+  setHeartRockHammer,
+  setHeartRockHammerPaint,
+  setHeartRockQuenchPaint,
+  setHeartRockSlot,
+} from './heart_rock_cutaway';
 import { buildHeartRoom } from './heart_room';
 import {
   buildHeartRoomKit,
@@ -70,6 +94,15 @@ import { dressHeat, ensureHeatKit, HEAT_KIT_KINDS, heatKitReady } from './heat_k
 import { HEAT_KIT_SHALLOW } from './heat_kit_plan_core';
 import { buildHeatPour } from './heat_pour';
 import { buildQuenchAir } from './quench_air';
+import {
+  quenchEnvFloorMaterial,
+  quenchEnvKitReady,
+  quenchEnvLakePair,
+  quenchEnvPainting,
+  quenchEnvProgramWarmers,
+  quenchEnvSkyTexture,
+} from './quench_env_kit';
+import { quenchRockPaintLayer } from './quench_env_rock_paint';
 import { dressQuench, ensureQuenchKit, QUENCH_KIT_KINDS, quenchKitReady } from './quench_kit';
 import { lakeIceMaterial } from './quench_lake_ice';
 import {
@@ -122,6 +155,20 @@ export async function buildSmithHeartInterior(
   // The Heart kit draws the platform, the terrace, the bridge and their keels,
   // the altars and the roots (phase 2J); without it the blockout stands.
   const heartReady = heartRoomKitReady();
+  const hammerEnvReady = hammerEnvKitReady();
+  // The Breath's painted rebuild (its kit fetched with the old Breath kit's).
+  const breathEnvReady = breathEnvKitReady();
+  // The Quench's painted rebuild (its kit fetched with the old Quench kit's).
+  const quenchEnvReady = quenchEnvKitReady();
+  // Each painted vein's rock on the heightfield and the field's cliff faces, one clone.
+  const rockPaint = composeRockPaints(
+    hammerEnvReady ? hammerRockPaintLayer() : null,
+    breathEnvReady ? breathRockPaintLayer() : null,
+    quenchEnvReady ? quenchRockPaintLayer() : null,
+  );
+  setHeartRockHammerPaint(hammerEnvReady ? hammerEnvPainting('cliff') : null);
+  setHeartRockBreathPaint(breathEnvReady ? breathEnvPainting('cliff') : null);
+  setHeartRockQuenchPaint(quenchEnvReady ? quenchEnvPainting('cliff') : null);
   const group = new THREE.Group();
   group.name = 'smithHeartField';
   // The rock's regional paint (the Quench's frost) reads this slot from its
@@ -149,11 +196,12 @@ export async function buildSmithHeartInterior(
       sheer: { surfaces: new Set([CORNICE_SURFACE]), depth: CORNICE_SHEER },
       // The Anvil's rock is the kit's own, and a quarter of it can really fall.
       ...(heartReady ? { noSkirt: new Set(HEART_KIT_NO_SKIRT) } : {}),
-      ...(ringReady || heartReady
+      ...(ringReady || heartReady || hammerEnvReady
         ? {
             omitTops: new Set([
               ...(ringReady ? RING_KIT_OMIT_TOPS : []),
               ...(heartReady ? HEART_KIT_OMIT_TOPS : []),
+              ...(hammerEnvReady ? HAMMER_ENV_STAIRS : []),
             ]),
           }
         : {}),
@@ -161,12 +209,33 @@ export async function buildSmithHeartInterior(
       // (phase 2H).
       // The Heat's floors with the fire in their joints (phase 2I).
       topMaterial: {
-        lake_ice: (pair) => lakeIceMaterial(pair, deps.lowGfx),
+        // Painted (the lake painting under the ice's depth) once the Quench's painted
+        // kit has landed.
+        lake_ice: (pair) =>
+          lakeIceMaterial(pair, deps.lowGfx, quenchEnvReady ? quenchEnvLakePair() : null),
         hearth: (pair) => hearthFloorMaterial(pair, deps.lowGfx),
+        // The Hammer vein's painted floors, once the painted kit has landed.
+        ...(hammerEnvReady
+          ? {
+              paving: () => hammerEnvFloorMaterial('paving'),
+              quarry: () => hammerEnvFloorMaterial('quarry'),
+            }
+          : {}),
+        // The Breath's storm-scoured slabs, once its painted kit has landed.
+        ...(breathEnvReady ? { scoured: () => breathEnvFloorMaterial() } : {}),
+        // The Quench's frost-bound flagstones, once its painted kit has landed.
+        ...(quenchEnvReady ? { rime: () => quenchEnvFloorMaterial() } : {}),
       },
+      ...(hammerEnvReady
+        ? {
+            drawnGround: (id, ground) => (HAMMER_ENV_PAVED.has(id) ? 'paving' : ground),
+            drawnUv: hammerEnvPathUv,
+          }
+        : {}),
+      ...(rockPaint ? { cliffMaterial: rockPaint } : {}),
     }),
   );
-  group.add(buildHeartMountain(deps.lowGfx));
+  group.add(buildHeartMountain(deps.lowGfx, rockPaint));
   // The mountain's rock (phase 2E), the loose crags until its kit lands.
   dressHeartMountain(group, () => buildHeartWalls(deps.lowGfx), deps.lowGfx);
   const kitReady = hammerKitReady();
@@ -196,6 +265,11 @@ export async function buildSmithHeartInterior(
   // The kit's slot programs link with the interior even when the kit lands
   // late (the swap then links nothing in a live frame).
   group.add(heartKitProgramWarmers());
+  // The painted kit's too, when the vein is built painted: a kit landing late then brings
+  // no painting into a live frame that the gate has not prepared.
+  if (hammerEnvReady) group.add(hammerEnvProgramWarmers(deps.lowGfx));
+  if (breathEnvReady) group.add(breathEnvProgramWarmers());
+  if (quenchEnvReady) group.add(quenchEnvProgramWarmers());
   group.add(buildHammerAir(deps.lowGfx));
   group.add(buildBreathAir(deps.lowGfx));
   // The Cornice's open sky: the cloud sea under the summit, the far peaks.
@@ -235,10 +309,14 @@ export async function buildSmithHeartInterior(
   let breathBlend = 0;
   let quenchBlend = 0;
   let heatBlend = 0;
+  let hammerBlend = 0;
   let hopAt = -1;
   let hopSide: 'heart' | 'ring' | null = null;
   const sky = buildHeartSky({
     lowGfx: deps.lowGfx,
+    hammerSky: hammerEnvReady ? hammerEnvSkyTexture() : null,
+    breathSky: breathEnvReady ? breathEnvSkyTexture() : null,
+    quenchSky: quenchEnvReady ? quenchEnvSkyTexture() : null,
     onFrame: (camera) => {
       const now = sharedUniforms.uTime.value;
       const dt = lastNow < 0 ? 999 : now - lastNow;
@@ -270,6 +348,9 @@ export async function buildSmithHeartInterior(
       sky.setQuench(quenchBlend);
       heatBlend = heartAreaBlend(heatBlend, inHeatLight(local.x, local.z), dt);
       sky.setHeat(heatBlend);
+      hammerBlend = heartAreaBlend(hammerBlend, inHammerSky(local.x, local.z), dt);
+      sky.setHammer(hammerBlend);
+      setHeartRockHammer(hammerBlend);
       heartSealView(slot, now, view);
       // The heart going dark when the Masterless Strength falls (phase 2J):
       // the core in its bed, the rune rings, the altars, the roots and the

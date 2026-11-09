@@ -33,7 +33,8 @@ export function collapsed(dead: boolean, deathHeld: boolean): boolean {
 /**
  * What a body whose death is held keeps showing of something that death ended. The sim clears
  * those on the tick the death resolves (a rider's mountKey: the mount bolts; a paladin's wing
- * auras: stripped with every buff), a frame before a held collapse shows any of it, so `live`
+ * auras: stripped with every buff; a dormant mob's sleep: a corpse is never asleep, so a body
+ * killed in its sleep keeps its heap), a frame before a held collapse shows any of it, so `live`
  * is already empty when the hold begins. While the death is held the body presents what it
  * presented on the frame before (`last`); from the collapse on, the live value again.
  */

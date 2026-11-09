@@ -132,20 +132,30 @@ describe("the Quench's light", () => {
     expect(inQuenchLight(BREATH.cornice.x, BREATH.cornice.z)).toBe(false);
   });
 
-  it('lights the Quench its own: a pale cold key over a pale blue-grey fill, never navy', () => {
+  it('lights the Quench its own aurora night: a cold moon over a deep blue fill, never black', () => {
     const L = SMITH_HEART_QUENCH_LIGHT;
     const rgb = (c: number) => [(c >> 16) & 255, (c >> 8) & 255, c & 255];
+    // A deep blue sky fill (darker than the pale frost guardian it lights), never black.
     const [r, g, b] = rgb(L.hemiSky);
-    expect(b).toBeGreaterThan(r);
-    expect(b - r).toBeLessThan(50);
-    expect(Math.min(r, g, b)).toBeGreaterThan(130);
-    const [kr, , kb] = rgb(L.sunColor);
+    expect(b).toBeGreaterThan(g);
+    expect(g).toBeGreaterThan(r);
+    expect(Math.max(r, g, b)).toBeLessThan(200);
+    expect(Math.min(r, g, b)).toBeGreaterThan(60);
+    // The moon a cold blue-white, bright enough to read every floor by.
+    const [kr, kg, kb] = rgb(L.sunColor);
     expect(kb).toBeGreaterThanOrEqual(kr);
+    expect(Math.min(kr, kg, kb)).toBeGreaterThan(180);
+    expect(L.sun).toBeGreaterThan(1.5);
+    // The aurora's teal on every silhouette.
+    const [rr, rg, rb] = rgb(L.rimColor);
+    expect(Math.min(rg, rb)).toBeGreaterThan(rr + 60);
     expect(L.env).toBeLessThanOrEqual(0.05);
-    // A pale mist, not a dark storm: the fog's value a light grey-blue.
+    // The night's air: a deep blue, never a black that eats the far walls.
     const [fr, fg, fb] = rgb(SMITH_HEART_QUENCH_FOG.color);
-    expect(fb).toBeGreaterThan(fr);
-    expect(Math.min(fr, fg, fb)).toBeGreaterThan(110);
+    expect(fb).toBeGreaterThan(fg);
+    expect(fg).toBeGreaterThan(fr);
+    expect(Math.min(fr, fg, fb)).toBeGreaterThan(40);
+    expect(Math.max(fr, fg, fb)).toBeLessThan(140);
     // Readable across the lake: the mist starts past the arena's width.
     expect(SMITH_HEART_QUENCH_FOG.near).toBeGreaterThanOrEqual(QUENCH.lake.rx * 1.8);
   });

@@ -9,6 +9,8 @@
 import * as THREE from 'three';
 import { sharedUniforms } from '../gfx';
 import { BREATH_WIND } from './breath_air_core';
+import { breathEnvKitReady, instanceBreathEnv } from './breath_env_kit';
+import { fitBreathEnvNeedle } from './breath_env_plan_core';
 import { BREATH_CLOUD_SEA, planBreathFarPeaks } from './breath_summit_core';
 import {
   heartKitLoaded,
@@ -112,6 +114,17 @@ export function buildBreathSummit(lowGfx: boolean): THREE.Group {
     mesh.renderOrder = 1 - i;
     mesh.frustumCulled = false;
     group.add(mesh);
+  }
+  // The painted rebuild's storm spires stand where the needles stood (breath_env_plan_core.ts).
+  if (breathEnvKitReady()) {
+    group.add(
+      instanceBreathEnv(
+        planBreathFarPeaks().map(fitBreathEnvNeedle),
+        lowGfx,
+        'smithHeartBreathFarPeaks',
+      ),
+    );
+    return group;
   }
   const peaks = (): THREE.Group =>
     instanceHeartKit(

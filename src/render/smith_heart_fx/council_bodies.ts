@@ -1,10 +1,11 @@
-// The Hammer Council's provisional body (plan: council_bodies_core.ts),
-// hosted by ../rift_death_zone.ts beside the raid's other fx. The Seam Singer
-// is a bodyless target (characters/manifest.ts smith_heart_seam_singer): its
-// click capsule,
-// nameplates and bars come from the ordinary entity view, and this module
-// draws the bodies over them, read from IWorld (each body's position, facing,
-// cast bar, swings and death), so offline and online look the same:
+// The Hammer Council's provisional body (plan: council_bodies_core.ts), hosted
+// by ../rift_death_zone.ts beside the raid's other fx. A kind in COUNCIL_MODELLED
+// (the Seam Singer, today) wears its shipped model and keeps only this module's
+// dust, rings and shakes. A kind outside it is a bodyless target
+// (characters/manifest.ts): its click capsule, nameplate and bars come from the
+// ordinary entity view, and this module draws the body over it, read from
+// IWorld (each body's position, facing, cast bar, swings and death), so offline
+// and online look the same:
 //  - the bodies: pieces of the Hammer kit's dressed stone and the Heart kit's
 //    rock and crystal, floating round their joints and stitched together by
 //    threads of the vein's ochre light. The Seam Singer is tall and slender, amber geodes breaking out of its
@@ -56,6 +57,7 @@ import {
   COUNCIL_EMBER_JOINTS,
   COUNCIL_EMBER_SIZE,
   COUNCIL_FALL,
+  COUNCIL_MODELLED,
   COUNCIL_RAISE_SLAM_AT,
   COUNCIL_RIG_JOINTS,
   COUNCIL_SWING_SECONDS,
@@ -324,6 +326,7 @@ export class CouncilBodies {
   private buildRig(rig: Rig): void {
     if (rig.built) return;
     rig.built = true;
+    if (COUNCIL_MODELLED.has(rig.kind)) return;
     rig.plan.pieces.forEach((def, index) => {
       const kit = heartKitMeshes(COUNCIL_BODY_KITS[def.kit], def.node);
       const holder = new THREE.Group();
@@ -479,7 +482,7 @@ export class CouncilBodies {
       rig.swingAt = -99;
       rig.lastAction = 'idle';
       rig.lastFill = 0;
-      rig.group.visible = true;
+      rig.group.visible = !COUNCIL_MODELLED.has(kind);
     }
   }
 

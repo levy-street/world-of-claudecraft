@@ -421,6 +421,12 @@ export interface FieldTopOptions {
    *  tread): neither drawn nor cutting the ground under them, as a hidden
    *  surface's top. Their cliffs are still the field's. */
   omit?: ReadonlySet<string>;
+  /** A surface's ground as it is drawn, where a dungeon paints a floor apart from
+   *  the layout's own (the layout and the sim are never read for it). */
+  drawnGround?: (surfaceId: string, ground: FieldGround) => FieldGround;
+  /** A surface's texture coordinates in yards, where a dungeon lays a floor along its
+   *  walk (null: the world's, as every other floor). */
+  drawnUv?: (surfaceId: string, x: number, z: number) => readonly [number, number] | null;
 }
 
 /** Vertex paint of a walkable top: ground colour, broad mottling, grit. */
@@ -704,7 +710,8 @@ export function planFieldTops(
   const clippers = laterClippers(def, opts.omit);
   def.surfaces.forEach((s, layer) => {
     if (s.hidden || opts.omit?.has(s.id)) return;
-    const ground: FieldGround = s.ground ?? (s.kind === 'path' ? 'flagstone' : 'earth');
+    const authored: FieldGround = s.ground ?? (s.kind === 'path' ? 'flagstone' : 'earth');
+    const ground = opts.drawnGround?.(s.id, authored) ?? authored;
     const batch = out[fieldGroundFamily(ground)];
     const uvScale = fieldFamilyUvScale(fieldGroundFamily(ground));
     const lift = layer * opts.layerLift;
@@ -714,6 +721,11 @@ export function planFieldTops(
       batch.indices.push(
         pushVertex(batch, p[0], y, p[1], topColor(ground, p[0], p[1], onPath), uvScale),
       );
+      const uv = opts.drawnUv?.(s.id, p[0], p[1]);
+      if (uv) {
+        batch.uvs[batch.uvs.length - 2] = uv[0] * uvScale;
+        batch.uvs[batch.uvs.length - 1] = uv[1] * uvScale;
+      }
     };
     const cut = clippers[layer];
     for (const t of surfaceTris(s, opts.maxEdge)) {

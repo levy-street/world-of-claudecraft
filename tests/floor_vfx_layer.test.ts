@@ -448,6 +448,8 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
  * otherwise, so a floor mechanic cannot ship outside the ladder unnoticed.
  */
 const FLOOR_VFX_OUT_OF_SCOPE: readonly string[] = [
+  // the Hammer vein's fire bowls: upright flames over bowls on a terrace, never on a floor
+  'src/render/smith_heart/hammer_env_flames.ts',
   // The Quench's freeze: a crystal of ice round a frozen body, ordered after
   // the body's own frost shell; a body mesh, never a floor mark
   'src/render/smith_heart_fx/quench_encase_fx.ts',

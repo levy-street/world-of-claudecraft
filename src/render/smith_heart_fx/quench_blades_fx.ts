@@ -5,8 +5,9 @@
 // draws all four whatever the fight is doing, read from IWorld (each blade
 // object's state, place and facing, the guardian's awakening bar, a slash's
 // line):
-//  - sunk: the Quench kit's Kit_SunkBlade point first in the lake, as the
-//    vein always showed it;
+//  - sunk: the painted rebuild's sword of ice (quench_env_kit.ts Env_IceSword,
+//    in the old piece's own frame, its own point under the ice) point first in
+//    the lake, or the Quench kit's Kit_SunkBlade until the painted kit lands;
 //  - waking (the guardian's 4 s bar): trembling, light running up its
 //    fuller, then wrenched up out of the ice, the ice bursting upward round
 //    it, its point shown, standing upright; the point continues the piece's
@@ -59,6 +60,12 @@ import {
   SMITH_HEART_QUENCH_KIT_URL as QUENCH_KIT,
 } from '../smith_heart/heart_kit';
 import { heartVeinGlowMaterial } from '../smith_heart/heart_room_kit';
+import {
+  onQuenchEnvKitLanded,
+  quenchEnvKitReady,
+  quenchEnvMaterial,
+  quenchEnvPieceParts,
+} from '../smith_heart/quench_env_kit';
 import { radialGlowTexture } from '../textures';
 import { EngineParticles } from '../trash_engine_fx/engine_particles';
 import { SOCKET_FRAG, SOCKET_VERT } from './quench_blade_socket_glsl';
@@ -106,6 +113,11 @@ interface BladeView {
   /** The lake's heaved plates round its foot (the kit piece's), drawn at its
    *  home whatever the blade does; null until the kit lands. */
   collar: THREE.Group | null;
+  /** The drawn kit piece in the frame (null while the stand-in draws). */
+  piece: THREE.Group | null;
+  /** Does the drawn piece carry its own point (the painted sword)? Then the
+   *  tip never draws. */
+  ownPoint: boolean;
   tip: THREE.Mesh;
   core: THREE.Sprite;
   halo: THREE.Sprite;
@@ -160,6 +172,15 @@ export class QuenchBladesFx {
   /** The claim's origin (world), while the player is in one. */
   private readonly origin = { x: 0, z: 0 };
   private kitBuilt = false;
+  /** Is the painted sword drawn (the old kit's piece then never comes back)? */
+  private paintedBuilt = false;
+  /** The painted fuller strips' own copy with the shade the vein's glow reads. */
+  private paintedGlow: THREE.BufferGeometry | null = null;
+  /** Stop waiting for the painted kit (disposed before it landed). */
+  private stopWaitingForPaint: () => void = () => undefined;
+  /** The best piece a staged swap has put in: 0 the stand-in, 1 the old kit's, 2 the
+   *  painted sword. A swap settling after a better one is dropped (the two gates race). */
+  private drawnLevel = 0;
   /** The kit piece's meshes split into the blade's and the collar's (one
    *  pair per source geometry, shared by the four blades). */
   private readonly splits = new Map<
@@ -245,7 +266,8 @@ export class QuenchBladesFx {
     const socketGeo = new THREE.PlaneGeometry(5.6, 5.6).rotateX(-Math.PI / 2);
     this.geometries.push(socketGeo);
     const iceMat = heartKitSlotMaterial('ice');
-    const kitsIn = heartKitLoaded(QUENCH_KIT);
+    const paintedIn = quenchEnvKitReady() && !!quenchEnvPieceParts('Env_IceSword');
+    const kitsIn = paintedIn || heartKitLoaded(QUENCH_KIT);
     BLADE_HOMES.forEach((home, i) => {
       const holder = new THREE.Group();
       holder.name = `quenchBlade:${i}`;
@@ -254,6 +276,7 @@ export class QuenchBladesFx {
       const fitted = kitsIn ? this.fitKit(i) : null;
       const kit = fitted?.kit ?? null;
       const collar = fitted?.collar ?? null;
+      const ownPoint = fitted?.ownPoint ?? false;
       let standIn: THREE.Mesh | null = null;
       if (kit) frame.add(kit);
       else {
@@ -306,6 +329,8 @@ export class QuenchBladesFx {
         frame,
         standIn,
         collar,
+        piece: kit,
+        ownPoint,
         tip,
         core,
         halo,
@@ -330,22 +355,36 @@ export class QuenchBladesFx {
     });
     this.root.add(heartKitProgramWarmers());
     this.kitBuilt = kitsIn;
+    this.paintedBuilt = paintedIn;
+    this.drawnLevel = paintedIn ? 2 : kitsIn ? 1 : 0;
     this.readyForEntry = attachSceneGroupGated(scene, this.root, compileGate, () => this.disposed)
       .then(() => {})
       .catch(() => {});
-    if (!kitsIn && hasDom)
+    // The old kit's piece the moment it lands, the painted sword the moment its kit does
+    // (each through the gate: nothing links in a live frame).
+    if (!kitsIn)
       void ensureHeartKit(QUENCH_KIT)
         .then(() => {
           if (!this.disposed && heartKitLoaded(QUENCH_KIT)) this.upgradeKit();
         })
         .catch(() => {});
+    // The painted kit is fetched at the raid's door by the interior, never by the fight
+    // (built with the renderer, at boot): the blades only wait for it to land. (Neither
+    // wait needs a page: the old kit's resolves at once under Node, the painted kit's
+    // fetches nothing.)
+    if (!paintedIn)
+      this.stopWaitingForPaint = onQuenchEnvKitLanded(() => {
+        if (!this.disposed) this.upgradeKit();
+      });
   }
 
   /** The kit's sunk blade at its own size (origin at its foot on the ice),
    *  its fuller's light on the blades' own glow; the lake's heaved plates
    *  round its foot split off into their own group (they stay in the lake;
    *  same materials, so no new program). */
-  private fitKit(i: number): { kit: THREE.Group; collar: THREE.Group } | null {
+  private fitKit(i: number): { kit: THREE.Group; collar: THREE.Group; ownPoint: boolean } | null {
+    const painted = this.fitPainted(i);
+    if (painted) return painted;
     const kit = heartKitMeshes(QUENCH_KIT, 'Kit_SunkBlade');
     if (!kit) return null;
     const collar = new THREE.Group();
@@ -366,7 +405,65 @@ export class QuenchBladesFx {
       c.receiveShadow = m.receiveShadow;
       collar.add(c);
     }
-    return { kit, collar };
+    return { kit, collar, ownPoint: false };
+  }
+
+  /** The painted rebuild's sword (quench_env_kit.ts Env_IceSword, in the old piece's
+   *  frame: the lake's face on its y 0, leaning KIT_LEAN toward its +x, its own point
+   *  under the ice) on the kit's shared materials, its fuller strips on the blade's own
+   *  glow, and the lake's heaved plates round its foot (Env_IceCollar). Null until the
+   *  painted kit has landed. */
+  private fitPainted(
+    i: number,
+  ): { kit: THREE.Group; collar: THREE.Group; ownPoint: boolean } | null {
+    const sword = quenchEnvKitReady() ? quenchEnvPieceParts('Env_IceSword') : null;
+    const plates = quenchEnvKitReady() ? quenchEnvPieceParts('Env_IceCollar') : null;
+    if (!sword || !plates) return null;
+    const kit = new THREE.Group();
+    kit.name = `smithHeartQuenchSword:${i}`;
+    for (const [painting, geo] of sword) {
+      if (painting === 'glow') {
+        const m = new THREE.Mesh(this.glowGeometryOf(geo), this.glowMats[i]);
+        m.name = 'Env_IceSword:glow';
+        kit.add(m);
+        continue;
+      }
+      const m = new THREE.Mesh(geo, quenchEnvMaterial(painting));
+      m.name = `Env_IceSword:${painting}`;
+      m.castShadow = true;
+      m.receiveShadow = true;
+      kit.add(m);
+    }
+    const collar = new THREE.Group();
+    collar.name = `smithHeartQuenchBladeCollar:${i}`;
+    for (const [painting, geo] of plates) {
+      const m = new THREE.Mesh(geo, quenchEnvMaterial(painting));
+      m.name = `Env_IceCollar:${painting}`;
+      m.receiveShadow = true;
+      collar.add(m);
+    }
+    return { kit, collar, ownPoint: true };
+  }
+
+  /** The painted fuller strips with the shade the vein's glow reads (a vertex colour,
+   *  brighter up the blade like the old seam's paint): our own copy, built once (the kit
+   *  keeps its source). */
+  private glowGeometryOf(src: THREE.BufferGeometry): THREE.BufferGeometry {
+    if (this.paintedGlow) return this.paintedGlow;
+    const g = src.clone();
+    delete g.userData.sharedRendererResource;
+    const pos = g.getAttribute('position');
+    const col = new Float32Array(pos.count * 3);
+    for (let v = 0; v < pos.count; v++) {
+      const k = 0.72 + 0.28 * Math.min(1, Math.max(0, (pos.getY(v) + 2) / 9));
+      col[v * 3] = k;
+      col[v * 3 + 1] = k;
+      col[v * 3 + 2] = k;
+    }
+    g.setAttribute('color', new THREE.BufferAttribute(col, 3));
+    this.geometries.push(g);
+    this.paintedGlow = g;
+    return g;
   }
 
   /** A kit mesh's triangles parted into the blade's and the collar's
@@ -430,15 +527,24 @@ export class QuenchBladesFx {
     attr.needsUpdate = true;
   }
 
+  /** Swap in the best piece at hand (the painted sword, else the old kit's), staged
+   *  hidden through the compile gate first: the stand-in or the old piece draws until
+   *  its programs link. The two kits' swaps can be in flight at once; whichever settles
+   *  after a better piece is in is dropped, so the old blade never takes the painted
+   *  sword's place. */
   private upgradeKit(): void {
-    if (this.kitBuilt || this.disposed) return;
+    if (this.disposed || this.paintedBuilt) return;
+    const painted = quenchEnvKitReady() && !!quenchEnvPieceParts('Env_IceSword');
+    if (!painted && (this.kitBuilt || !heartKitLoaded(QUENCH_KIT))) return;
     this.kitBuilt = true;
+    if (painted) this.paintedBuilt = true;
+    const level = painted ? 2 : 1;
     const staging = new THREE.Group();
     staging.name = 'smithHeartQuenchBladeStaging';
     staging.visible = false;
-    const fitted: ({ kit: THREE.Group; collar: THREE.Group } | null)[] = [];
+    const fitted: ({ kit: THREE.Group; collar: THREE.Group; ownPoint: boolean } | null)[] = [];
     for (let i = 0; i < this.blades.length; i++) {
-      const kit = this.fitKit(i);
+      const kit = painted ? this.fitPainted(i) : this.fitKit(i);
       fitted.push(kit);
       if (kit) staging.add(kit.kit, kit.collar);
     }
@@ -446,7 +552,8 @@ export class QuenchBladesFx {
     const linked = this.compileGate ? this.compileGate(staging).catch(() => {}) : Promise.resolve();
     void linked.then(() => {
       staging.removeFromParent();
-      if (this.disposed) return;
+      if (this.disposed || this.drawnLevel > level) return;
+      this.drawnLevel = level;
       this.blades.forEach((b, i) => {
         const kit = fitted[i];
         if (!kit) return;
@@ -454,8 +561,13 @@ export class QuenchBladesFx {
           b.frame.remove(b.standIn);
           b.standIn = null;
         }
+        if (b.piece) b.frame.remove(b.piece);
         b.frame.add(kit.kit);
-        kit.collar.visible = false;
+        b.piece = kit.kit;
+        b.ownPoint = kit.ownPoint;
+        const shown = b.collar?.visible ?? false;
+        b.collar?.removeFromParent();
+        kit.collar.visible = shown;
         this.root.add(kit.collar);
         b.collar = kit.collar;
       });
@@ -622,7 +734,7 @@ export class QuenchBladesFx {
     b.frame.position.set(jx, b.lift, jz);
     _e.set(flying ? 0.15 + 0.45 * speed : 0, 0, KIT_LEAN * look.upright + b.bank, 'YXZ');
     b.frame.rotation.copy(_e);
-    b.tip.visible = b.lift > 0.4;
+    b.tip.visible = !b.ownPoint && b.lift > 0.4;
     // Its light: dim sunk, blazing while its line aims.
     const held = state !== 'sunk' && this.lineAimsFrom(world, e.pos.x, e.pos.z);
     const light = Math.min(1.6, look.light + (held ? 0.6 + 0.3 * Math.sin(this.clock * 14) : 0));
@@ -802,6 +914,7 @@ export class QuenchBladesFx {
   dispose(): void {
     if (this.disposed) return;
     this.disposed = true;
+    this.stopWaitingForPaint();
     this.root.removeFromParent();
     this.particles.dispose();
     for (const g of this.geometries) g.dispose();

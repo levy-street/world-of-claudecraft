@@ -28,7 +28,7 @@ export const HAMMER_CLIFF_FLOOR = 0.5;
 /** The Hammer vein's mountain rock (phase 2D): the shared mountain's tint is
  *  pulled toward this mid granite grey and lifted, so the fissure's walls
  *  read as rock in their cool shadow, never a near-black navy. */
-export const HAMMER_ROCK_TONE = 0x6b6a70;
+export const HAMMER_ROCK_TONE = 0x646264;
 /** How far the tint moves toward HAMMER_ROCK_TONE, and the gain on top. */
 export const HAMMER_ROCK_MIX = 0.5;
 export const HAMMER_ROCK_GAIN = 1.08;

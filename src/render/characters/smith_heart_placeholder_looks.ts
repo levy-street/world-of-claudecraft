@@ -13,8 +13,8 @@
 
 export const SMITH_HEART_PLACEHOLDER_LOOKS: Record<string, string> = {
   // ---- trash ---------------------------------------------------------------
-  // Final: a squat stone warder with an ochre vein-glow in its cracks.
-  heart_hammer_warder: 'mob_elemental',
+  // Its own model now, the first row phase 2 replaced (manifest.ts).
+  heart_hammer_warder: 'smith_heart_hammer_warder',
   // Final: a bronze-and-granite forge construct, the Ring's sentinel.
   heart_ring_warder: 'skel_golem',
   // Final: a wind-scoured stone warder trailing storm-blue gusts.
@@ -28,12 +28,10 @@ export const SMITH_HEART_PLACEHOLDER_LOOKS: Record<string, string> = {
   heart_gale_sentinel: 'mob_elemental',
   // Final: a hovering wind caller who mends the guardian's shield.
   heart_gale_mender: 'mob_reedbound_acolyte',
-  // Final: a rime-crusted warder of blue ice and frost-cracked stone. (The
-  // stone goleling tinted ice-blue, like the other veins' warders; never a
-  // Rift-lane hoard body, see the Breath caller.)
-  heart_quench_warder: 'mob_elemental',
-  // Final: a meltwater caller, ice-pale water held in a stone frame.
-  heart_quench_caller: 'mob_water_elemental',
+  // Its own model now: a golem of bright glacier ice over slate joints (manifest.ts).
+  heart_quench_warder: 'smith_heart_quench_warder',
+  // Its own model now: a floating hooded frost caster with an orb over each palm (manifest.ts).
+  heart_quench_caller: 'smith_heart_quench_caller',
   // Final: a smith-fire warder of dark iron with a white-gold core. (The
   // stone goleling, tinted gold by its entity colour: the lava-cracked
   // brute read volcanic, which the Heat must never do.)
@@ -42,12 +40,12 @@ export const SMITH_HEART_PLACEHOLDER_LOOKS: Record<string, string> = {
   // drifting pale light; the fel-green emberkin read wrong.)
   heart_heat_caller: 'mob_glimmerwisp',
   // ---- the four guardians -----------------------------------------------------
-  // Final: a stone titan half-fused with the Pit's floor, a great hammer arm.
-  heart_hammer_guardian: 'skel_golem',
-  // The Hammer Council's other member: a bodyless target; its provisional
-  // body of the Heart kit's rock and crystal is drawn by
-  // smith_heart_fx/council_bodies.ts (the Masterless Strength's pattern).
-  // Final: its own model (the official pipeline), the same joints.
+  // The Guardian of the Hammer, the Hammer Council's main boss: its own model now, the one first
+  // built for the Slabwright (manifest.ts smith_heart_hammer_guardian).
+  heart_hammer_guardian: 'smith_heart_hammer_guardian',
+  // The Hammer Council's other member, the Seam Singer: its own model now
+  // (manifest.ts); smith_heart_fx/council_bodies.ts keeps only its dust and
+  // rings.
   heart_seam_singer: 'smith_heart_seam_singer',
   // The Guardian of the Breath: its own model (smith_heart_boss_looks.ts),
   // floating pieces of ancient armor held together by living wind; the wind

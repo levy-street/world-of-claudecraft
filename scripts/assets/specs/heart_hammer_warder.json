@@ -1,0 +1,30 @@
+{
+  "items": [
+    {
+      "rigSource": "tmp/asset_src/heart_hammer_warder_woc.glb",
+      "src": "tmp/asset_src/heart_hammer_warder_woc.slim.glb",
+      "out": "models/creatures/heart_hammer_warder.glb",
+      "type": "character",
+      "keepClips": [
+        "Idle",
+        "IdleFidget",
+        "CombatIdle",
+        "Walk",
+        "Run",
+        "Turn",
+        "Attack",
+        "Attack2",
+        "Cleave",
+        "Hit",
+        "Hit2",
+        "Stunned",
+        "Sleep",
+        "Awaken",
+        "Death"
+      ],
+      "dropStillChannels": true,
+      "materialName": "heart_hammer_warder",
+      "maxTex": 1024
+    }
+  ]
+}

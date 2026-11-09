@@ -1,0 +1,27 @@
+{
+  "src": "tmp/asset_src/smith_heart_hammer_colossi_src_tripo.glb",
+  "out": "tmp/asset_src/smith_heart_hammer_colossi_src_painted.glb",
+  "work": "tmp/hammer_colossi/bake",
+  "size": 1024,
+  "fallback": 0.04,
+  "statues": [
+    {
+      "node": "Env_ColossusKeeper",
+      "name": "keeper",
+      "views_dir": "tmp/hammer_colossi/keeper/views",
+      "views": ["front", "right", "back", "left"]
+    },
+    {
+      "node": "Env_ColossusWaking",
+      "name": "waking",
+      "views_dir": "tmp/hammer_colossi/waking/views",
+      "views": ["front", "right", "back"]
+    },
+    {
+      "node": "Env_ColossusBearer",
+      "name": "bearer",
+      "views_dir": "tmp/hammer_colossi/bearer/views",
+      "views": ["front", "right", "back", "left"]
+    }
+  ]
+}

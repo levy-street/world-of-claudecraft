@@ -10,6 +10,13 @@
 // this swaps in for them the moment it lands.
 
 import type * as THREE from 'three';
+import {
+  breathEnvHas,
+  breathEnvKitReady,
+  ensureBreathEnvKit,
+  instanceBreathEnv,
+} from './breath_env_kit';
+import { breathEnvSwap } from './breath_env_plan_core';
 import { BREATH_KIT_KINDS, planBreathKit } from './breath_kit_plan_core';
 import {
   ensureHeartKit,
@@ -22,9 +29,11 @@ import {
 /** The Breath's culling cell (yards): the Cornice is one place seen whole. */
 const BREATH_CELL = 100;
 
-/** Wait (capped) for the Breath kit before the interior is built. */
+/** Wait (capped) for the Breath kit and its painted rebuild before the interior is built. */
 export function ensureBreathKit(): Promise<void> {
-  return ensureHeartKit(SMITH_HEART_BREATH_KIT_URL);
+  return Promise.all([ensureHeartKit(SMITH_HEART_BREATH_KIT_URL), ensureBreathEnvKit()]).then(
+    () => undefined,
+  );
 }
 
 /** Has the Breath kit landed? */
@@ -34,15 +43,29 @@ export function breathKitReady(): boolean {
 
 export { BREATH_KIT_KINDS };
 
-/** The Breath's kit dressing (instance-local). */
-export function buildBreathKit(lowGfx: boolean): THREE.Group {
-  return instanceHeartKit(
+/** The Breath's kit dressing (instance-local), painted or old as `painted` says: the
+ *  painted rebuild's walls, shelters and standing stones in the old pieces' places
+ *  (breath_env_plan_core.ts), the rest of the old kit as it was. */
+export function buildBreathKit(lowGfx: boolean, painted = breathEnvKitReady()): THREE.Group {
+  if (!painted) {
+    return instanceHeartKit(
+      SMITH_HEART_BREATH_KIT_URL,
+      planBreathKit(),
+      lowGfx,
+      'smithHeartBreathKit',
+      BREATH_CELL,
+    );
+  }
+  const { keep, swap } = breathEnvSwap(planBreathKit(), breathEnvHas);
+  const group = instanceHeartKit(
     SMITH_HEART_BREATH_KIT_URL,
-    planBreathKit(),
+    keep,
     lowGfx,
     'smithHeartBreathKit',
     BREATH_CELL,
   );
+  group.add(instanceBreathEnv(swap, lowGfx, 'smithHeartBreathEnv'));
+  return group;
 }
 
 /** The kit dressing when it has landed; otherwise nothing yet, and the
@@ -52,5 +75,10 @@ export function dressBreath(parent: THREE.Group, placeholders: THREE.Group, lowG
     parent.add(buildBreathKit(lowGfx));
     return;
   }
-  upgradeWhenHeartKitLands(SMITH_HEART_BREATH_KIT_URL, placeholders, () => buildBreathKit(lowGfx));
+  // The late build keeps the look the interior was built with: paint that landed since
+  // was never prepared behind the curtain (the warmers carry only what had landed).
+  const painted = breathEnvKitReady();
+  upgradeWhenHeartKitLands(SMITH_HEART_BREATH_KIT_URL, placeholders, () =>
+    buildBreathKit(lowGfx, painted),
+  );
 }

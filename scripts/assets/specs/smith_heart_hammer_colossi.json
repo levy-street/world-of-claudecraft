@@ -1,0 +1,10 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/smith_heart_hammer_colossi_src.glb",
+      "out": "models/props/smith_heart_hammer_colossi.glb",
+      "type": "static",
+      "maxTex": 1024
+    }
+  ]
+}
