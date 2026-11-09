@@ -533,7 +533,7 @@ describe('Living Rime on the client', () => {
     expect(coldText).toContain('every 2% of your maximum health healed (4% on Heroic and Mythic)');
   });
 
-  it("the carrier's own alert: leave the group, the healing left, its seconds", () => {
+  it("the carrier's own alert: leave the group and the healing left, no sentence", () => {
     const v = buildQuenchAlertView({
       auras: [crust, { id: QUENCH_AURAS.cold, value: 40, value2: 1 }],
     });
@@ -543,8 +543,8 @@ describe('Living Rime on the client', () => {
     expect(v.title).toContain('Leave the group');
     expect(v.barLabel).toBe('Rime 420 / 600');
     expect(v.progress).toBeCloseTo(0.7, 9);
-    expect(v.line).toContain('7 sec');
-    expect(v.line).toContain('6 yd');
+    // The burst's seconds and reach are the debuff's timer and tooltip.
+    expect(v.line).toBe('');
     // The freeze still comes first.
     const frozen = buildQuenchAlertView({
       auras: [crust, { id: QUENCH_AURAS.frozen, remaining: 3, duration: 6 }],

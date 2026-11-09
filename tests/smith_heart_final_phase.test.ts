@@ -503,7 +503,7 @@ describe('the final phase', () => {
     );
   });
 
-  it('two minutes in, Masterless Fury pulses harder and harder (warned first)', () => {
+  it('two minutes in, Masterless Fury pulses harder and harder (its voice warns first)', () => {
     const f = finalFight(6);
     f.pullIn('heat');
     f.dev('/dev heart final last');
@@ -513,9 +513,14 @@ describe('the final phase', () => {
     f.gather(c.x, c.z, 9);
     const early = f.tick(sec(P.enrageAfter - 1));
     expect(hits(early, N.fury).length).toBe(0);
+    // The boss says it is about to break loose (a yell, never a banner).
     expect(
-      early.some((e) => e.type === 'chat' && e.textKey === 'hudChrome.finalBoss.warn.furySoon'),
+      early.some(
+        (e) =>
+          e.type === 'chat' && e.channel === 'yell' && e.textKey === 'hudChrome.finalBoss.say.fury',
+      ),
     ).toBe(true);
+    expect(early.some((e) => e.type === 'chat' && e.channel === 'raidWarning')).toBe(false);
     const late = f.tick(sec(8));
     const fury = hits(late, N.fury, f.players[2].id);
     expect(fury.length).toBeGreaterThanOrEqual(3);

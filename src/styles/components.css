@@ -19391,6 +19391,50 @@
   #heart-knot-alert.is-lip {
     border-color: var(--color-debuff-fire);
   }
+  #heart-knot-alert .fa-title {
+    font-size: 18px;
+    font-weight: 700;
+  }
+  #heart-knot-alert .fa-hint {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+  }
+  #heart-knot-alert .fa-bar {
+    --bar-h: 12px;
+    --bar-color: var(--color-debuff-frost);
+    width: 100%;
+  }
+  #heart-knot-alert.is-portalB .fa-bar {
+    --bar-color: var(--color-debuff-shadow);
+  }
+  #heart-knot-alert.is-portalC .fa-bar {
+    --bar-color: var(--color-knot-portal-c);
+  }
+  #heart-knot-alert.is-portalD .fa-bar {
+    --bar-color: var(--color-knot-portal-d);
+  }
+  #heart-knot-alert.is-carry .fa-bar {
+    --bar-color: var(--color-gold-300);
+  }
+  #heart-knot-alert.is-lip .fa-bar {
+    --bar-color: var(--color-debuff-fire);
+  }
+  #heart-knot-alert .fa-fill {
+    width: 0;
+    transition: width 80ms linear;
+  }
+  /* The Smith's Heart's short alerts (2026-11-09): a title over the bar and
+     its number, no sentence under it. The number (the seconds left, or a
+     gauge's value) sits under the bar, in steady-width digits. */
+  #heart-council-alert .fa-bar-label,
+  #heart-final-alert .fa-bar-label,
+  #heart-knot-alert .fa-bar-label {
+    font-size: 13px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
   #heart-final-alert {
     position: absolute;
     left: 50%;

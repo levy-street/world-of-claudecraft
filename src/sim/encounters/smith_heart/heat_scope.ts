@@ -144,29 +144,9 @@ export function pickPlayers(
   return pickMarkTargets(s.boss, livePlayers(s), count, salt, busy);
 }
 
-/** A raid warning from `from` to every player near the Hearth (the big
- *  orange line, re-localized client-side by `textKey`). */
-export function raidWarn(
-  s: Pick<HeatScope, 'ctx' | 'inst'>,
-  from: Entity,
-  key: string,
-  text: string,
-  values?: Record<string, string>,
-): void {
-  for (const p of hearthListeners(s.ctx, s.inst)) {
-    s.ctx.emit({
-      type: 'chat',
-      fromPid: from.id,
-      from: from.name,
-      entityId: from.id,
-      text,
-      textKey: `hudChrome.heatGuardian.warn.${key}`,
-      ...(values ? { textValues: values } : {}),
-      channel: 'raidWarning',
-      pid: p.id,
-    });
-  }
-}
+// The fight calls no raid warning banner: every mechanic reads in the world
+// (the owner's rule of 2026-11-03, applied to the whole raid on 2026-11-09).
+// The guardian's voice stays (heat_voice.ts: chat and a speech bubble).
 
 /** A cue at instance-local (x, z). */
 export function cueAt(

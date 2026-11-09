@@ -30,7 +30,6 @@ import {
   fireHit,
   type HeatScope,
   livePlayers,
-  raidWarn,
   roll,
   spawnFightObject,
 } from './heat_scope';
@@ -97,7 +96,6 @@ export function startWheel(s: HeatScope): void {
   st.wheelRuns++;
   beginRound(s, st.wheelSafes[0]);
   st.wheelNext = 1;
-  raidWarn(s, s.boss, 'wheel', 'The Hearth turns! Get to the dark slice!');
   heatSay(s, s.boss, 'wheel');
 }
 

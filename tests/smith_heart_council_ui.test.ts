@@ -69,10 +69,25 @@ describe('Hammer Council alert', () => {
     expect(kind(all.slice(0, 1))).toBe('resonance');
     expect(kind([])).toBeNull();
     const res = buildCouncilAlertView({ auras: [a(COUNCIL_AURAS.resonance, 4, 6)] });
-    expect(res.visible && res.line).toBe(t('hudChrome.council.alert.resonanceLine'));
+    expect(res.visible && res.title).toBe(t('hudChrome.council.alert.resonanceTitle'));
     const v = buildCouncilAlertView({ auras: [a(COUNCIL_AURAS.rockMark, 2.5, 5)] });
     expect(v.visible && v.progress).toBeCloseTo(0.5);
     expect(v.visible && v.title).toBe(t('hudChrome.council.alert.rockTitle'));
+    // A short title over the bar and its seconds, no sentence under it (the
+    // owner's rule of 2026-11-03, kept on 2026-11-09): what a mark asks is
+    // its tooltip's.
+    for (const id of Object.values({
+      rush: COUNCIL_AURAS.rushMark,
+      rock: COUNCIL_AURAS.rockMark,
+      wake: COUNCIL_AURAS.wakeMark,
+      weight: COUNCIL_AURAS.weight,
+      resonance: COUNCIL_AURAS.resonance,
+    })) {
+      const m = buildCouncilAlertView({ auras: [a(id, 2.5, 5)] });
+      expect(m.visible && m.line, id).toBe('');
+      expect(m.visible && m.barLabel, id).toBe('3s');
+      if (m.visible) expect(m.title.split(' ').length, id).toBeLessThanOrEqual(4);
+    }
   });
 });
 

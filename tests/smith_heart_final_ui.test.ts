@@ -23,7 +23,6 @@ import {
   overloadAuraId,
   FINAL_TUNING as T,
 } from '../src/sim/encounters/smith_heart/final_ids';
-import { QUIET_WARNINGS } from '../src/sim/encounters/smith_heart/final_scope';
 import type { Aura, SimEvent } from '../src/sim/types';
 import { WIND_DRIFT_AURA } from '../src/sim/wind_drift';
 import { auraEffectDescriptor } from '../src/ui/aura_effect';
@@ -47,7 +46,7 @@ setLanguage('en');
 type Chat = Extract<SimEvent, { type: 'chat' }>;
 
 describe('The Masterless Strength: what the raid reads', () => {
-  it('every warning resolves its key to the English the sim sent', () => {
+  it('calls no raid warning banner through every mechanic and burst; the boss still speaks', () => {
     const f = finalFight(5);
     const events: SimEvent[] = [];
     f.dev('/dev heart final mythic');
@@ -68,16 +67,19 @@ describe('The Masterless Strength: what the raid reads', () => {
       if (q === 'ring') f.gather(188, 172, 4);
       events.push(...f.tick(30));
     }
-    const warns = events.filter(
-      (e): e is Chat => e.type === 'chat' && e.channel === 'raidWarning' && e.pid === f.pids[0],
+    // The owner's rule (2026-11-03, whole raid 2026-11-09): the quarters,
+    // the marks, the near-full bar, the burst and Heart Unbound read on the
+    // Overload panel, in the world or on a mark's own alert, never a banner.
+    expect(events.filter((e) => e.type === 'chat' && e.channel === 'raidWarning')).toEqual([]);
+    // The run did reach what used to call one: a bar burst, the ring unbound.
+    expect(f.state()?.bursts ?? 0).toBeGreaterThan(0);
+    const yells = events.filter(
+      (e): e is Chat =>
+        e.type === 'chat' &&
+        e.pid === f.pids[0] &&
+        (e.textKey ?? '').startsWith('hudChrome.finalBoss.say.'),
     );
-    const keys = new Set(warns.map((w) => w.textKey));
-    for (const k of ['burstLethal', 'nearFullLethal', 'unbound', 'wind', 'orbs', 'ice', 'anvil'])
-      expect(keys, k).toContain(`hudChrome.finalBoss.warn.${k}`);
-    // What the screen already says (the Overload panel's quarter, a mark's own
-    // alert) never takes the top of the screen.
-    for (const k of QUIET_WARNINGS) expect(keys, k).not.toContain(`hudChrome.finalBoss.warn.${k}`);
-    for (const w of warns) expect(t(w.textKey as never)).toBe(w.text);
+    expect(yells.length).toBeGreaterThan(0);
   });
 
   it("its bars' cast labels read their names, never a raw id", () => {

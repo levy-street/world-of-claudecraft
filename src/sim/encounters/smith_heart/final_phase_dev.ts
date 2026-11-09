@@ -144,9 +144,7 @@ export function finalPhaseDev(
     }
     case 'toll': {
       const h = need('quench');
-      return h && startToll(s, h.a, h.e)
-        ? 'Rime Toll: kick it.'
-        : 'No free Splinter of the Quench.';
+      return h && startToll(h.a, h.e) ? 'Rime Toll: kick it.' : 'No free Splinter of the Quench.';
     }
     case 'ring': {
       const h = need('quench');

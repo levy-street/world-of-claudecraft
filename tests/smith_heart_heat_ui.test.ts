@@ -24,7 +24,7 @@ import { heatFight } from './helpers/heat_fight';
 type Chat = Extract<SimEvent, { type: 'chat' }>;
 
 describe('Guardian of the Heat: what the raid reads', () => {
-  it('every warning and every line resolves its key to the English the sim sent', () => {
+  it('calls no raid warning banner; every boss line resolves its key to the English the sim sent', () => {
     const f = heatFight(5);
     const events: SimEvent[] = [];
     f.dev('/dev heart heat heroic');
@@ -45,14 +45,9 @@ describe('Guardian of the Heat: what the raid reads', () => {
     f.dev('/dev heart heat cinder');
     events.push(...f.tick(20 * 3));
     const mine = events.filter((e): e is Chat => e.type === 'chat' && e.pid === f.pids[0]);
-    const warns = mine.filter((c) => c.channel === 'raidWarning');
-    const keys = new Set(warns.map((w) => w.textKey));
-    for (const k of ['overflow', 'wellspawn', 'keepers', 'seeds', 'zones', 'cinder'])
-      expect(keys, k).toContain(`hudChrome.heatGuardian.warn.${k}`);
-    for (const w of warns) {
-      expect(w.textKey?.startsWith('hudChrome.heatGuardian.warn.')).toBe(true);
-      expect(t(w.textKey as never, w.textValues)).toBe(w.text);
-    }
+    // No banner through any of it (the owner's rule, whole raid 2026-11-09):
+    // every mechanic reads in the world and in the guardian's voice.
+    expect(events.filter((e) => e.type === 'chat' && e.channel === 'raidWarning')).toEqual([]);
     const yells = mine.filter((c) => c.channel === 'yell');
     expect(yells.length).toBeGreaterThanOrEqual(4);
     for (const y of yells) expect(t(y.textKey as never)).toBe(y.text);

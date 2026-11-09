@@ -56,7 +56,6 @@ import {
   onFloor,
   pickPlayers,
   putMarker,
-  raidWarn,
   roll,
   spawnFightObject,
   standingSpot,
@@ -87,7 +86,6 @@ export function gatherWind(s: FinalScope, forced?: number): void {
   );
   obj.facing = heading;
   st.wind = { objectId: obj.id, heading, warn: T.windWarn, blow: T.windBlow, rimTick: T.rimTick };
-  raidWarn(s, 'wind', 'The Breath gathers a gale! Walk into the wind, away from the rim!');
 }
 
 function keepWindOn(s: FinalScope, p: Entity, heading: number): void {
@@ -195,8 +193,6 @@ export function drawLightning(s: FinalScope): Entity[] {
     st.drawn.push({ pid: p.id, left: T.drawnSeconds });
   }
   st.drawnTick = T.drawnTick;
-  if (marked.length > 0)
-    raidWarn(s, 'drawn', 'Drawn Lightning! The marked keep 8 yards from everyone!');
   return marked;
 }
 
@@ -267,7 +263,6 @@ export function raiseOrbs(
     st.orbs.push({ objectId: obj.id, x: spot.x, z: spot.z, left: T.orbLife });
   }
   st.casts++;
-  raidWarn(s, 'orbs', 'Storm Orbs! One player steps on each before it bursts!');
   return count;
 }
 

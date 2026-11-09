@@ -46,7 +46,6 @@ import {
   FINAL_CUES,
   FINAL_NAMES,
   FINAL_ZONE_CODES,
-  type FinalDifficultyRules,
   FINAL_OVERLOAD as O,
   overloadAuraId,
   overloadStep,
@@ -65,7 +64,6 @@ import {
   hit,
   livePlayers,
   putMarker,
-  raidWarn,
   roll,
 } from './final_scope';
 
@@ -104,19 +102,6 @@ export function bossZone(
 export function inFinalPhase(s: Pick<FinalScope, 'boss'>): boolean {
   return heartFinalPhase(s.boss.hp, s.boss.maxHp);
 }
-
-const ENTER_TEXT: Readonly<Record<SmithHeartVein, string>> = {
-  heat: 'The Masterless Strength drinks the Heat! Dodge the fist, the swells and the whirls!',
-  quench: 'The Masterless Strength drinks the Quench! Stay close together or freeze!',
-  breath: 'The Masterless Strength drinks the Breath! Spread out and lean into the wind!',
-  hammer: 'The Masterless Strength drinks the Hammer! Step out of the cracks and share the Anvil!',
-};
-const ENTER_KEY: Readonly<Record<SmithHeartVein, string>> = {
-  heat: 'enterHeat',
-  quench: 'enterQuench',
-  breath: 'enterBreath',
-  hammer: 'enterHammer',
-};
 
 // ---- Taking Root ---------------------------------------------------------------------------
 
@@ -238,49 +223,19 @@ export function enterZone(s: FinalScope, zone: HeartQuarterZone): boolean {
   st.lastQuarter = zone;
   st.pulseTimer = O.pulseEvery;
   takeRoot(s);
-  raidWarn(s, ENTER_KEY[zone], ENTER_TEXT[zone]);
   return true;
 }
 
 // ---- the Overload bars ---------------------------------------------------------------------
-
-type BurstTier = FinalDifficultyRules['burstTier'];
-
-/** Each tier's raid warning as a bar bursts. */
-const BURST_WARN: Readonly<Record<BurstTier, readonly [string, string]>> = {
-  survivable: ['burst', 'Overload! The strength bursts through the Anvil!'],
-  heavy: ['burstHeavy', 'Overload! The strength bursts through the Anvil! Brace and heal!'],
-  lethal: ['burstLethal', 'Overload! The strength bursts through the Anvil! Nothing survives it!'],
-};
-
-/** Each tier's near-full raid warning (once per fill, at FINAL_OVERLOAD's
- *  `warnAt`): what the burst will do, and what to do about it. */
-const NEAR_WARN: Readonly<Record<BurstTier, readonly [string, string]>> = {
-  survivable: [
-    'nearFull',
-    'An Overload bar is nearly full! Drag the Strength on, or heal the raid up before it bursts!',
-  ],
-  heavy: [
-    'nearFullHeavy',
-    'An Overload bar is nearly full! Drag the Strength on: its burst hits hard, heal up and use defensives!',
-  ],
-  lethal: [
-    'nearFullLethal',
-    'An Overload bar is nearly full! Drag the Strength on now: its burst kills the raid!',
-  ],
-};
 
 /** A bar bursts on the whole raid (its tier's numbers, FINAL_OVERLOAD:
  *  the tier's damageMult is already in them); the bar empties. Returns
  *  who. */
 export function burstBar(s: FinalScope, vein: SmithHeartVein): Entity[] {
   s.st.overload[vein] = 0;
-  s.st.overloadWarned[vein] = false;
   s.st.bursts++;
   s.st.pulseTimer = O.pulseEvery;
   cueOn(s, s.boss, FINAL_CUES.burst, 'arcane');
-  const [key, text] = BURST_WARN[s.rules.burstTier];
-  raidWarn(s, key, text);
   const burst = O.burst[s.st.difficulty];
   const own = s.boss.mechanicDamageMult ?? 1;
   const struck: Entity[] = [];
@@ -309,18 +264,11 @@ export function stepOverload(s: FinalScope): void {
   const active = st.zone === 'ring' ? null : st.zone;
   for (const vein of HEART_QUARTER_ORDER) {
     st.overload[vein] = overloadStep(st.overload[vein], vein === active, DT);
-    // Drained well back from the line, it may warn again on its next fill.
-    if (st.overload[vein] < O.warnAt - 0.1) st.overloadWarned[vein] = false;
   }
   if (!active) return;
   if (st.overload[active] >= 1 - 1e-9) {
     burstBar(s, active);
     return;
-  }
-  if (st.overload[active] >= O.warnAt && !st.overloadWarned[active]) {
-    st.overloadWarned[active] = true;
-    const [key, text] = NEAR_WARN[s.rules.burstTier];
-    raidWarn(s, key, text);
   }
   st.pulseTimer -= DT;
   if (st.pulseTimer > 1e-9) return;
@@ -354,8 +302,6 @@ export function stepUnbound(s: FinalScope): void {
   if (st.unboundTimer > 1e-9) return;
   st.unboundTimer = T.unboundEvery;
   st.unbound = Math.min(T.unboundMax, st.unbound + 1);
-  if (st.unbound === 1)
-    raidWarn(s, 'unbound', 'The strength is unbound in the centre! Drag it out!');
   const a = auraOf(b, FINAL_AURAS.unbound);
   if (a) {
     a.stacks = st.unbound;

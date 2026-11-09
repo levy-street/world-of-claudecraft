@@ -40,7 +40,6 @@ import {
   livePlayers,
   pickPlayers,
   putMarker,
-  raidWarn,
   roll,
   spawnFightObject,
 } from './final_scope';
@@ -149,7 +148,6 @@ export function crackIce(s: FinalScope): Entity[] {
     );
     st.cracks.push({ objectId: obj.id, x: q.x, z: q.z, left: T.iceWarn });
   }
-  if (marked.length > 0) raidWarn(s, 'ice', 'The ice groans under you! Step off before it breaks!');
   return marked;
 }
 

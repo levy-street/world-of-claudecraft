@@ -75,7 +75,6 @@ import {
   holdPlanted,
   living,
   putMarker,
-  raidWarn,
 } from './heat_scope';
 import { clearSeeds, dropSeeds, stepSeeds } from './heat_seeds';
 import type { HeatFightState } from './heat_state';
@@ -282,7 +281,6 @@ export function beginOverflow(s: HeatScope, n: 1 | 2): void {
   st.overflows++;
   setWell(s.ctx, s.inst, 'over');
   cueOnBoss(s, HEAT_CUES.sink);
-  raidWarn(s, s.boss, 'overflow', 'The guardian sinks and the Hearth overflows! Dodge the rivers!');
   heatSay(s, s.boss, n === 1 ? 'sink' : 'sinkAgain');
 }
 

@@ -47,7 +47,6 @@ import {
   local,
   pickPlayers,
   putMarker,
-  raidWarn,
   roll,
   spawnFightObject,
   spawnHeatMob,
@@ -70,12 +69,6 @@ export function raiseWellspawn(s: HeatScope): Entity[] {
     out.push(e);
     cueAt(s, HEAT_CUES.spawn, spot.x, spot.z, 2);
   }
-  raidWarn(
-    s,
-    s.boss,
-    'wellspawn',
-    'The Wellspawn climb out! Slow them and kill them before they reach the wellspring!',
-  );
   return out;
 }
 
@@ -144,12 +137,6 @@ export function raiseKeepers(s: HeatScope): Entity[] {
     out.push(e);
     cueAt(s, HEAT_CUES.spawn, spot.x, spot.z, 2.5);
   });
-  raidWarn(
-    s,
-    s.boss,
-    'keepers',
-    'Wellkeepers rise from the wellspring! Tank them, and keep their marks away from the Wellspawn!',
-  );
   return out;
 }
 

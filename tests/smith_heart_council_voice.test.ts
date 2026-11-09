@@ -25,7 +25,7 @@ import {
 } from '../src/sim/encounters/smith_heart/council_voice';
 import type { Entity, SimEvent } from '../src/sim/types';
 import { auraEffectDescriptor } from '../src/ui/aura_effect';
-import { buildCouncilAlertView, CouncilSoulScan } from '../src/ui/hud/dungeon/council_alert_view';
+import { buildCouncilAlertView } from '../src/ui/hud/dungeon/council_alert_view';
 import { t } from '../src/ui/i18n';
 import { type CouncilFight, councilFight } from './helpers/council_fight';
 
@@ -191,43 +191,15 @@ describe('Hammer Council mythic in the player text', () => {
     expect(resText).not.toMatch(/\{\w+\}/);
   });
 
-  it('the alert names the second duty while a soul pillar stands', () => {
-    const scan = new CouncilSoulScan();
-    const soul = { kind: 'object', templateId: 'sh_council_soul_guardian_c_3' };
-    const plain = { kind: 'object', templateId: 'sh_council_pillar_2' };
-    const world = (rows: [number, { kind: string; templateId: string }][]) => ({
-      entities: new Map(rows),
-    });
-    const mark = (id: string, value = 0, value2 = 0) => ({
-      id,
-      remaining: 3,
-      duration: 5,
-      value,
-      value2,
-    });
-    const line = (v: ReturnType<typeof buildCouncilAlertView>) => (v.visible ? v.line : '');
-    const kindOf = (v: ReturnType<typeof buildCouncilAlertView>) => (v.visible ? v.kind : '');
-    const none = world([[7, plain]]);
-    const some = world([
-      [7, plain],
-      [9, soul],
-    ]);
-    const rock = [mark(COUNCIL_AURAS.rockMark)];
-    expect(line(buildCouncilAlertView({ auras: rock, soul: scan.frame(none) }))).toBe(
-      t('hudChrome.council.alert.rockLine'),
-    );
-    expect(line(buildCouncilAlertView({ auras: rock, soul: scan.frame(some) }))).toBe(
-      t('hudChrome.council.alert.rockLineSoul'),
-    );
-    // Resonance keeps its one line (it never touches a pillar).
-    const res = [mark(COUNCIL_AURAS.resonance)];
-    expect(line(buildCouncilAlertView({ auras: res, soul: scan.frame(some) }))).toBe(
-      t('hudChrome.council.alert.resonanceLine'),
-    );
-    expect(kindOf(buildCouncilAlertView({ auras: res, soul: scan.frame(some) }))).toBe('resonance');
-    // Without a world (the old call) nothing changes.
-    expect(line(buildCouncilAlertView({ auras: rock }))).toBe(
-      t('hudChrome.council.alert.rockLine'),
-    );
+  it('the alert stays a short title over its bar whether or not a soul pillar stands', () => {
+    // The soul pillar's second duty (break its soul pips) is the Falling Rock
+    // tooltip's (above) and the world's (the pips on the pillar): the alert
+    // carries no sentence (the owner's rule of 2026-11-03, kept on 2026-11-09).
+    const mark = (id: string) => ({ id, remaining: 3, duration: 5 });
+    for (const id of [COUNCIL_AURAS.rockMark, COUNCIL_AURAS.resonance]) {
+      const v = buildCouncilAlertView({ auras: [mark(id)] });
+      expect(v.visible && v.line, id).toBe('');
+      expect(v.visible && v.barLabel, id).toBe('3s');
+    }
   });
 });

@@ -1221,7 +1221,8 @@ describe('Knotted Gale: the player text', () => {
       auras: [{ id: BREATH_AURAS.portalB, remaining: 2.5, duration: 5 }],
     });
     expect(b.visible && b.kind === 'portalB').toBe(true);
-    // The second pair: its own kinds (its own colours), titles and lines.
+    // The second pair: its own kinds (its own colours) and titles; a short
+    // title over the bar and its seconds, no sentence under it.
     for (const [id, kind, letter] of [
       [BREATH_AURAS.portalC, 'portalC', 'C'],
       [BREATH_AURAS.portalD, 'portalD', 'D'],
@@ -1230,7 +1231,8 @@ describe('Knotted Gale: the player text', () => {
       expect(v.visible && v.kind === kind && !v.pressable).toBe(true);
       if (v.visible) {
         expect(v.title).toBe(`You are Portal ${letter}!`);
-        expect(v.line).not.toMatch(/\{\w+\}/);
+        expect(v.line).toBe('');
+        expect(v.barLabel).toBe('3s');
       }
     }
     const c = buildKnotAlertView({
@@ -1238,12 +1240,13 @@ describe('Knotted Gale: the player text', () => {
       auras: [{ id: BREATH_AURAS.laden, remaining: 10, duration: 20 }],
     });
     // No portal rule (Jose's call of 2026-11-08): the throw's key from the
-    // first step, the line names no portal as needed, louder at a lip.
+    // first step, louder at a lip; no sentence under the title (2026-11-09).
     expect(c.visible && c.kind === 'carry' && c.pressable && c.key === 'F').toBe(true);
     if (c.visible) {
       expect(c.hint).toContain('F');
-      expect(c.line).toContain('edge');
-      expect(c.line).not.toMatch(/only then|before you throw|loosed/i);
+      expect(c.hint).toContain('edge');
+      expect(c.line).toBe('');
+      expect(c.barLabel).toBe('10s');
     }
     const g = CORNICE_GAPS[0];
     const spot = lip(g);

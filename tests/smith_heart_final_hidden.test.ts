@@ -29,6 +29,7 @@ import {
 import { FINAL_OBJECTS } from '../src/sim/encounters/smith_heart/final_ids';
 import {
   FINAL_PHASE_AURAS as A,
+  FINAL_PHASE_CUES,
   FINAL_PHASE_DIFFICULTY,
   hiddenCellGoes,
   hiddenFallenAt,
@@ -207,7 +208,11 @@ describe('the collapse', () => {
     onRing(f, sec(P.fallEvery - P.fallWarn) - 2);
     expect(aura(b, A.hidden)?.value2).toBe(hiddenNextCode('quench'));
     const warned = onRing(f, 4);
-    expect(warned.some((e) => e.type === 'chat' && e.text.includes("Quench's quarter"))).toBe(true);
+    // The cracks warn in the world (no banner since 2026-11-09).
+    expect(
+      warned.some((e) => e.type === 'spellfxAt' && e.ability === FINAL_PHASE_CUES.quarterCrack),
+    ).toBe(true);
+    expect(warned.some((e) => e.type === 'chat' && e.channel === 'raidWarning')).toBe(false);
     // The warning: its floor is still safe.
     expect(fallen()).toBe(0);
     onRing(f, sec(P.fallWarn) - 3);

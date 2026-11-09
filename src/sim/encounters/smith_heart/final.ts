@@ -199,7 +199,6 @@ function freshState(difficulty: FinalDifficulty): FinalFightState {
     rootLeft: 0,
     rootAt: null,
     dragGrace: 0,
-    overloadWarned: { breath: false, quench: false, hammer: false, heat: false },
     shakenLeft: 0,
     switches: 0,
     bursts: 0,

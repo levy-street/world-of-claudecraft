@@ -1,25 +1,25 @@
 // The Smith's Heart's Guardian of the Quench alert: the pure, DOM-free view
 // core of the player's own cold bar, read off the auras the sim already
-// mirrors (encounters/smith_heart/quench*.ts):
-//  - the cold (the bar's aura: its value 0 to 100, its trend): rising, it
-//    says how to warm up; past three quarters it turns urgent; falling in a
-//    huddle, it says the huddle warms and the ice will crack under it;
-//    struck by an ally's shatter a moment ago, its title says the cold it
-//    took; sealed in an immunity (an Ice Block), its line says the cold still
-//    bites (immunities never give warmth: encounters/smith_heart/
-//    quench_bite.ts);
+// mirrors (encounters/smith_heart/quench*.ts). A short title over a bar and
+// its number, and no sentence under it (the owner's rule of 2026-11-03, kept
+// again on 2026-11-09: what each state asks lives in its aura tooltip and the
+// boss journal):
+//  - the cold (the bar's aura: its value 0 to 100, its trend): rising it
+//    reads Cold, past three quarters Freezing!, falling in a huddle Huddled
+//    warmth; struck by an ally's shatter a moment ago, the title says the
+//    cold it took;
 //  - marked for a slash: the player's number in the round, the bar the time
-//    until their slash has landed, the line how to lead it;
-//  - encased in rime (the freeze): the bar is the time to the shatter and
-//    the line tells the raid to step away;
+//    until their slash has landed;
+//  - encased in rime (the freeze): the bar is the time to the shatter;
 //  - under the ice (the water): the bar is the time to the climb out;
 //  - Living Rime on them: the bar is the healing left to break it (it drains
-//    as the healers land), the label the number, the line the seconds before
-//    it bursts and its reach: leave the group.
+//    as the healers land), its label the number; the seconds before it
+//    bursts read on the debuff's own timer.
 // It is a live gauge the player steers by (never advisory: the hints setting
 // does not hide it), shown the whole fight on every graphics tier. Priority:
-// the freeze over the water over Living Rime over the mark over the bar. The painter is the shared encounter
-// alert's (encounter_alert_painter.ts); every decision is here.
+// the freeze over the water over Living Rime over the mark over the bar. The
+// painter is the shared encounter alert's (encounter_alert_painter.ts); every
+// decision is here.
 
 import { QUENCH_AURAS, QUENCH_TUNING as T } from '../../../sim/encounters/smith_heart/quench_ids';
 import { formatNumber, t } from '../../i18n';
@@ -48,7 +48,6 @@ const HIDDEN: EncounterAlertHidden = { visible: false };
 
 interface AlertAura {
   id: string;
-  kind?: string;
   remaining?: number;
   duration?: number;
   value?: number;
@@ -74,20 +73,16 @@ function timed(kind: QuenchAlertKind, title: string, mark: AlertAura): QuenchAle
   const left = Math.max(0, (mark.remaining ?? 0) - pad);
   const total = Math.max(1e-6, (mark.duration ?? 1) - pad);
   const seconds = whole(left);
-  const line =
-    kind === 'frozen'
-      ? t('hudChrome.quenchAlert.frozenLine', { seconds })
-      : t('hudChrome.quenchAlert.waterLine', { seconds });
   return {
     visible: true,
     kind,
     title,
-    line,
+    line: '',
     hint: '',
     key: '',
     progress: Math.max(0, Math.min(1, left / total)),
     progressAria: t('hudChrome.quenchAlert.timeAria', { seconds }),
-    barLabel: '',
+    barLabel: t('hudChrome.quenchAlert.secondsBar', { seconds }),
     pressable: false,
     buttonAria: title,
   };
@@ -106,19 +101,19 @@ function markedView(mark: AlertAura): QuenchAlertLive {
     visible: true,
     kind: 'marked',
     title,
-    line: t('hudChrome.quenchAlert.markedLine'),
+    line: '',
     hint: '',
     key: '',
     progress: Math.max(0, Math.min(1, left / total)),
     progressAria: t('hudChrome.quenchAlert.timeAria', { seconds }),
-    barLabel: '',
+    barLabel: t('hudChrome.quenchAlert.secondsBar', { seconds }),
     pressable: false,
     buttonAria: title,
   };
 }
 
-/** Living Rime on the player: the healing left to break it, the seconds to
- *  its burst. */
+/** Living Rime on the player: the healing left to break it (the bar and its
+ *  number; the seconds to its burst read on the debuff's own timer). */
 function rimeView(rime: AlertAura): QuenchAlertLive {
   const full = Math.max(1, rime.value2 ?? rime.value ?? 1);
   const left = Math.max(0, Math.min(full, rime.value ?? 0));
@@ -128,10 +123,7 @@ function rimeView(rime: AlertAura): QuenchAlertLive {
     visible: true,
     kind: 'rime',
     title,
-    line: t('hudChrome.quenchAlert.rimeLine', {
-      seconds: whole(Math.max(0, rime.remaining ?? 0)),
-      radius: whole(T.rimeBurstR),
-    }),
+    line: '',
     hint: '',
     key: '',
     progress: left / full,
@@ -162,7 +154,6 @@ export function buildQuenchAlertView(input: QuenchAlertInput): QuenchAlertView {
       ? 'freezing'
       : 'cold';
   const splash = auraOf(input.auras, QUENCH_AURAS.splashed);
-  const sealed = input.auras.some((a) => a.kind === 'stasis');
   const title = splash
     ? t('hudChrome.quenchAlert.splashTitle', { cold: whole(splash.value ?? 0) })
     : kind === 'warm'
@@ -170,21 +161,13 @@ export function buildQuenchAlertView(input: QuenchAlertInput): QuenchAlertView {
       : kind === 'freezing'
         ? t('hudChrome.quenchAlert.freezingTitle')
         : t('hudChrome.quenchAlert.coldTitle');
-  const line = sealed
-    ? t('hudChrome.quenchAlert.immuneLine')
-    : kind === 'warm'
-      ? t('hudChrome.quenchAlert.warmLine', { seconds: whole(T.strainLinger) })
-      : t('hudChrome.quenchAlert.coldLine', {
-          radius: whole(T.warmR),
-          others: whole(T.warmNeed),
-        });
   const n = whole(value);
   const max = whole(T.coldMax);
   return {
     visible: true,
     kind,
     title,
-    line,
+    line: '',
     hint: '',
     key: '',
     progress: value / T.coldMax,

@@ -54,7 +54,6 @@ import {
   onFloor,
   pickPlayers,
   putMarker,
-  raidWarn,
   roll,
   spawnFightObject,
 } from './final_scope';
@@ -140,7 +139,6 @@ export function startAnvil(s: FinalScope, forced?: FPoint): boolean {
   );
   st.anvil = { objectId: obj.id, x: spot.x, z: spot.z, angle, left: T.anvilCast };
   beginBar(s, FINAL_CASTS.anvil, T.anvilCast, angle);
-  raidWarn(s, 'anvil', 'Weight of the Anvil! Share it: everyone not Crushed, under the mark!');
   return true;
 }
 

@@ -30,7 +30,6 @@ import {
   pouredAuraId,
   quarterBit,
 } from '../src/sim/encounters/smith_heart/final_phase_ids';
-import { QUIET_WARNINGS } from '../src/sim/encounters/smith_heart/final_scope';
 import type { Aura, SimEvent } from '../src/sim/types';
 import { auraEffectDescriptor } from '../src/ui/aura_effect';
 import { castDisplayName } from '../src/ui/cast_display_name';
@@ -49,7 +48,7 @@ setLanguage('en');
 type Chat = Extract<SimEvent, { type: 'chat' }>;
 
 describe('part 2: what the raid reads', () => {
-  it('every warning resolves its key to the English the sim sent', () => {
+  it('part 2 calls no raid warning banner; the boss still speaks', () => {
     const f = finalFight(6);
     const events: SimEvent[] = [];
     f.dev('/dev heart final mythic');
@@ -65,16 +64,18 @@ describe('part 2: what the raid reads', () => {
     say('/dev heart final endcall');
     say('/dev heart final last', 4);
     say('/dev heart final enrage');
-    const warns = events.filter(
-      (e): e is Chat => e.type === 'chat' && e.channel === 'raidWarning' && e.pid === f.pids[0],
+    // The owner's rule (2026-11-03, whole raid 2026-11-09): every call, the
+    // Splinters, the shield, the final phase and the fury read on the
+    // Overload panel, a cast bar or a mark's own alert, never a banner.
+    expect(events.filter((e) => e.type === 'chat' && e.channel === 'raidWarning')).toEqual([]);
+    const yells = events.filter(
+      (e): e is Chat =>
+        e.type === 'chat' &&
+        e.pid === f.pids[0] &&
+        (e.textKey ?? '').startsWith('hudChrome.finalBoss.say.'),
     );
-    const keys = new Set(warns.map((w) => w.textKey));
-    for (const k of QUIET_WARNINGS) expect(keys, k).not.toContain(`hudChrome.finalBoss.warn.${k}`);
-    for (const k of ['intermission', 'poured', 'release', 'final', 'awaken', 'fury'])
-      expect(keys, k).toContain(`hudChrome.finalBoss.warn.${k}`);
-    for (const w of warns) expect(t(w.textKey as never)).toBe(w.text);
-    // The soon-warning's key exists too (its own test times it).
-    expect(t('hudChrome.finalBoss.warn.furySoon' as never)).toContain('restraint');
+    expect(yells.length).toBeGreaterThan(0);
+    for (const y of yells) expect(y.channel).toBe('yell');
   });
 
   it('its bars, its Splinters and every name read in words, never a raw id', () => {
@@ -249,7 +250,26 @@ describe('part 2: the personal alert', () => {
     expect(w.visible && w.kind).toBe('tether');
   });
 
-  it('a tank near the swap is told to swap', () => {
+  it('every timed mark is a short title over its bar and seconds, no sentence', () => {
+    for (const id of [
+      A.coal,
+      A.tether,
+      FINAL_AURAS.frozen,
+      FINAL_AURAS.ember,
+      FINAL_AURAS.drawn,
+      FINAL_AURAS.crushed,
+    ]) {
+      const v = buildFinalAlertView({ auras: [{ id, remaining: 4.2, duration: 6 }] });
+      expect(v.visible, id).toBe(true);
+      if (!v.visible) continue;
+      expect(v.line, id).toBe('');
+      expect(v.barLabel, id).toBe('5s');
+      expect(v.progress, id).toBeCloseTo(0.7);
+      expect(v.title.split(' ').length, id).toBeLessThanOrEqual(4);
+    }
+  });
+
+  it('a tank near the swap sees the Weight and its stacks', () => {
     const low = buildFinalAlertView({
       auras: [{ id: MOUNTING_WEIGHT_AURA, remaining: 20, duration: 25, stacks: 2 }],
     });
@@ -258,6 +278,11 @@ describe('part 2: the personal alert', () => {
       auras: [{ id: MOUNTING_WEIGHT_AURA, remaining: 20, duration: 25, stacks: P.weightSwap }],
     });
     expect(near.visible && near.kind).toBe('weight');
-    if (near.visible) expect(near.line).toContain(`swap tanks at ${P.weightSwap}`);
+    if (near.visible) {
+      expect(near.title).toContain(String(P.weightSwap));
+      // A short title over the bar and its seconds: no sentence under it.
+      expect(near.line).toBe('');
+      expect(near.barLabel).toBe('20s');
+    }
   });
 });

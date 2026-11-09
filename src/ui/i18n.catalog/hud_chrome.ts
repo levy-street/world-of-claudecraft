@@ -10275,7 +10275,7 @@ export const hudChromeStrings = {
       'The stone jaguar is about to breathe over this half of the terrace. Cross to the other half',
   },
   // The Smith's Heart's Hammer Council (encounters/smith_heart/council*.ts):
-  // what its members say (boss yells) and the personal alert
+  // what its members say (boss yells) and the personal alert's short titles
   // (src/ui/hud/dungeon/council_alert_view.ts). The fight calls no raid
   // warnings: its mechanics read in the world.
   council: {
@@ -10308,38 +10308,24 @@ export const hudChromeStrings = {
     },
     alert: {
       wakeTitle: 'Wake the Stone!',
-      wakeLine: 'A pillar will rise where you stand: move to where the raid needs cover',
       rockTitle: 'Falling Rock!',
-      rockLine: 'Gather at least three allies on you, away from the pillars',
       resonanceTitle: 'Resonance',
-      resonanceLine: 'You hurt every ally near you: move away from the group until it ends',
       rushTitle: "Mountain's Rush!",
-      rushLine: 'The Guardian will charge at you: put the Cursed Pillar between you and him',
-      // Mythic, while a soul pillar stands: the soak has a second duty (break
-      // its soul pips).
-      rockLineSoul: 'Gather at least three allies on you, away from cover and beside a soul pillar',
       weightTitle: "Hammer's Weight",
-      weightLine: 'You take double physical damage: the other tank must take the Guardian',
       timeAria: '{seconds} seconds left',
     },
   },
   // The Smith's Heart's Guardian of the Breath (encounters/smith_heart/
-  // breath*.ts): the raid warnings of its fight and what the guardian and
+  // breath*.ts): the Knotted Gale alert's short titles and its throw prompt
+  // (src/ui/hud/dungeon/knot_alert_view.ts), and what the guardian and
   // Captain Thessaly SAY (breath_voice.ts BREATH_LINES, the same English).
   knotAlert: {
     aTitle: 'You are Portal A!',
-    aLine: 'It opens at your feet in {seconds} sec. Stand near the Knotted Gale.',
     bTitle: 'You are Portal B!',
-    bLine: 'It opens at your feet in {seconds} sec. Stand at the edge of the Cornice.',
     cTitle: 'You are Portal C!',
-    cLine: 'It opens at your feet in {seconds} sec. Stand near the other Knotted Gale.',
     dTitle: 'You are Portal D!',
-    dLine: 'It opens at your feet in {seconds} sec. Stand at the edge, away from Portal B.',
     carryTitle: 'You carry the Knotted Gale!',
-    carryLine:
-      'Throw it from the edge of the Cornice. A portal is a shortcut to its partner. It bursts in {seconds} sec.',
     lipTitle: 'Throw it now!',
-    lipLine: 'You stand at the edge. It bursts in {seconds} sec.',
     throwKey: 'Press {key} at the edge to throw',
     throwTap: 'Tap here at the edge to throw',
     throwClick: 'Click here at the edge to throw',
@@ -10399,44 +10385,30 @@ export const hudChromeStrings = {
     },
   },
   // The Smith's Heart's Guardian of the Quench cold bar (src/ui/hud/dungeon/
-  // quench_alert_view.ts). Wordy (M16): non-Latin fills in the overlays.
+  // quench_alert_view.ts): short titles and the bar's words, no sentence
+  // lines (the owner's rule of 2026-11-03). Wordy (M16): non-Latin fills in
+  // the overlays.
   quenchAlert: {
     markedTitle: 'A blade hunts you! ({order} of {count})',
-    markedLine: 'Lead its line away from the raid, then step off when it locks.',
     coldTitle: 'Cold',
     freezingTitle: 'Freezing!',
     warmTitle: 'Huddled warmth',
     frozenTitle: 'Encased in rime!',
     waterTitle: 'Under the ice!',
-    coldLine: 'Stand within {radius} yd of {others} or more others to warm up',
     splashTitle: 'Rime splash! +{cold} cold',
-    immuneLine: 'Your immunity does not stop the cold: huddle up',
-    warmLine: 'Your cold is falling. Move the huddle within {seconds} sec or the ice cracks',
-    frozenLine: 'The ice shatters in {seconds} sec: everyone close, step away',
-    waterLine: 'Climbing out in {seconds} sec',
     coldBar: 'Cold {cold} / {max}',
     coldAria: 'Cold {cold} of {max}',
     timeAria: '{seconds} seconds left',
+    // The seconds printed on a timed bar (every Smith's Heart alert).
+    secondsBar: '{seconds}s',
     rimeTitle: 'Living Rime! Leave the group',
-    rimeLine: 'Healers must break it in {seconds} sec or you freeze and burst within {radius} yd',
     rimeBar: 'Rime {left} / {whole}',
     rimeAria: 'Living Rime: {left} of {whole} healing left to break it',
   },
   // The Smith's Heart's Guardian of the Heat (encounters/smith_heart/heat*.ts):
-  // the raid warnings of its fight and what the guardian SAYS (heat_voice.ts
-  // HEAT_LINES, the same English).
+  // what the guardian SAYS (heat_voice.ts HEAT_LINES, the same English). Its
+  // fight calls no raid warning banner (the owner's rule of 2026-11-03).
   heatGuardian: {
-    warn: {
-      overflow: 'The guardian sinks and the Hearth overflows! Dodge the rivers!',
-      wellspawn:
-        'The Wellspawn climb out! Slow them and kill them before they reach the wellspring!',
-      keepers:
-        'Wellkeepers rise from the wellspring! Tank them, and keep their marks away from the Wellspawn!',
-      seeds: 'Hearthseeds fall! Drop them together and run!',
-      zones: 'Wakefire! The Hearth ignites band by band: step out!',
-      wheel: 'The Hearth turns! Get to the dark slice!',
-      cinder: 'A Rolling Cinder falls! Strike it back before it reaches its quarry!',
-    },
     say: {
       pull: 'You walk into the first flame. Nothing leaves it unchanged.',
       fist: 'Stand where the stone falls, and be part of it.',
@@ -10456,9 +10428,9 @@ export const hudChromeStrings = {
     },
   },
   // The Smith's Heart's Masterless Strength (encounters/smith_heart/final*.ts):
-  // the raid warnings of its fight (the same English the sim sends) and what
-  // it SAYS (final_voice.ts FINAL_LINES, the same English). Wordy (M16):
-  // non-Latin fills in the overlays.
+  // what it SAYS (final_voice.ts FINAL_LINES, the same English). Its fight
+  // calls no raid warning banner (the owner's rule of 2026-11-03). Wordy
+  // (M16): non-Latin fills in the overlays.
   finalBoss: {
     say: {
       arrivalWake:
@@ -10489,51 +10461,6 @@ export const hudChromeStrings = {
       wipe: 'Sealed. Silent. As he wanted.',
       death:
         'The hand... was never coming back. One ember still burns... Take it, and let the mountain sleep.',
-    },
-    warn: {
-      enterHeat:
-        'The Masterless Strength drinks the Heat! Dodge the fist, the swells and the whirls!',
-      enterQuench: 'The Masterless Strength drinks the Quench! Stay close together or freeze!',
-      enterBreath: 'The Masterless Strength drinks the Breath! Spread out and lean into the wind!',
-      enterHammer:
-        'The Masterless Strength drinks the Hammer! Step out of the cracks and share the Anvil!',
-      burst: 'Overload! The strength bursts through the Anvil!',
-      burstHeavy: 'Overload! The strength bursts through the Anvil! Brace and heal!',
-      burstLethal: 'Overload! The strength bursts through the Anvil! Nothing survives it!',
-      nearFull:
-        'An Overload bar is nearly full! Drag the Strength on, or heal the raid up before it bursts!',
-      nearFullHeavy:
-        'An Overload bar is nearly full! Drag the Strength on: its burst hits hard, heal up and use defensives!',
-      nearFullLethal:
-        'An Overload bar is nearly full! Drag the Strength on now: its burst kills the raid!',
-      unbound: 'The strength is unbound in the centre! Drag it out!',
-      embers: 'Embers fall at the ranged! Stack the marks in one corner, then move out!',
-      ice: 'The ice groans under you! Step off before it breaks!',
-      wind: 'The Breath gathers a gale! Walk into the wind, away from the rim!',
-      drawn: 'Drawn Lightning! The marked keep 8 yards from everyone!',
-      orbs: 'Storm Orbs! One player steps on each before it bursts!',
-      anvil: 'Weight of the Anvil! Share it: everyone not Crushed, under the mark!',
-      // Part 2: the intermissions, the Splinters, the final phase.
-      intermission:
-        'The Masterless Strength gathers its strength in the centre! Its Splinters rise: kill them before the call ends!',
-      toll: 'Rime Toll! Interrupt the Splinter of the Quench!',
-      coal: 'Bursting Coal! The marked carry it out of the group before it bursts!',
-      pounce: 'Gale Pounce! Its quarry drags the Splinter of the Breath out of the group!',
-      poured:
-        'The Splinters pour into the Masterless Strength! Their elements stay with it to the end!',
-      release: 'The shield breaks! Drag the Masterless Strength out of the centre!',
-      final: 'The Masterless Strength strides into the heart of the Anvil!',
-      awaken: 'All four quarters wake! The Masterless Strength drinks every strength at once!',
-      furySoon: 'The Masterless Strength is about to lose all restraint! Burn it down!',
-      fury: 'Masterless Fury! It tears the Anvil apart: kill it now!',
-      rebirth: 'The Heart beats! The Masterless Strength drinks the four quarters and rises again!',
-      unmade:
-        'The Anvil of the World is breaking apart! Kill the Masterless Strength before the last stone falls!',
-      crackHeat: "The Heat's quarter is cracking! Get off it before it falls!",
-      crackQuench: "The Quench's quarter is cracking! Get off it before it falls!",
-      crackBreath: "The Breath's quarter is cracking! Get off it before it falls!",
-      crackHammer: "The Hammer's quarter is cracking! Get off it before it falls!",
-      ringCrack: 'Only the central ring is left, and it is cracking! Kill it now!',
     },
   },
   // The Masterless Strength's raid HUD (src/ui/hud/dungeon/heart_overload_view.ts):
@@ -10569,21 +10496,14 @@ export const hudChromeStrings = {
     pouredTimes: '{quarter} x{times}',
   },
   // The Masterless Strength's personal alert (src/ui/hud/dungeon/final_alert_view.ts):
-  // the cold reuses quenchAlert's lines. Wordy (M16).
+  // short titles only; the cold reuses quenchAlert's. Wordy (M16).
   finalAlert: {
-    frozenLine: 'Free in {seconds} sec: then stand with two or more others',
     emberTitle: 'Ember Mark!',
-    emberLine: 'Embers fall at your feet in {seconds} sec: join the other marked in one corner',
     drawnTitle: 'Drawn Lightning!',
-    drawnLine: 'Keep {reach} yards from everyone for {seconds} sec',
     crushedTitle: 'Crushed',
-    crushedLine: 'Stay out of the next Weight of the Anvil ({seconds} sec)',
     coalTitle: 'Bursting Coal!',
-    coalLine: 'Leave the group: it bursts on everyone within {reach} yards in {seconds} sec',
     tetherTitle: 'Wind-Tethered!',
-    tetherLine: 'The Splinter of the Breath hunts you: drag it away from the group ({seconds} sec)',
     weightTitle: 'Mounting Weight x{stacks}',
-    weightLine: 'Its swings hit you harder each stack: swap tanks at {swap}',
   },
   // The Gravewyrm Sanctum's encounter alert (src/ui/hud/dungeon/sanctum_alert_view.ts).
   // Wordy (M16): non-Latin fills in the overlays.

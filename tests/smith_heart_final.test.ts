@@ -143,19 +143,15 @@ describe('the quarter rules', () => {
   });
 
   for (const tier of ['normal', 'heroic', 'mythic'] as const)
-    it(`a full bar warns near full, then bursts on the whole raid at ${tier}'s numbers and empties`, () => {
+    it(`a full bar bursts on the whole raid at ${tier}'s numbers and empties, with no banner`, () => {
       const f = finalFight(5);
       if (tier !== 'normal') f.dev(`/dev heart final ${tier}`);
       f.pullIn('hammer');
       f.dev('/dev heart final fill hammer 84');
       const near = f.tick(sec(1));
-      const warns = near.filter(
-        (e) => e.type === 'chat' && e.channel === 'raidWarning' && e.pid === f.pids[0],
-      ) as Extract<SimEvent, { type: 'chat' }>[];
-      const nearKey = { normal: 'nearFull', heroic: 'nearFullHeavy', mythic: 'nearFullLethal' }[
-        tier
-      ];
-      expect(warns.map((w) => w.textKey)).toContain(`hudChrome.finalBoss.warn.${nearKey}`);
+      // Near full reads on the Overload panel (a bar three quarters full turns
+      // hostile), never a banner (the owner's rule, whole raid 2026-11-09).
+      expect(near.some((e) => e.type === 'chat' && e.channel === 'raidWarning')).toBe(false);
       f.dev('/dev heart final fill hammer 99');
       const ev = f.tick(sec(1));
       const burst = hits(ev, FINAL_NAMES.burst);
@@ -164,13 +160,7 @@ describe('the quarter rules', () => {
         expect(b.amount).toBeGreaterThanOrEqual(O.burst[tier].min);
         expect(b.amount).toBeLessThanOrEqual(O.burst[tier].max);
       }
-      const burstKey = { normal: 'burst', heroic: 'burstHeavy', mythic: 'burstLethal' }[tier];
-      const lines = (
-        ev.filter(
-          (e) => e.type === 'chat' && e.channel === 'raidWarning' && e.pid === f.pids[0],
-        ) as Extract<SimEvent, { type: 'chat' }>[]
-      ).map((w) => w.textKey);
-      expect(lines).toContain(`hudChrome.finalBoss.warn.${burstKey}`);
+      expect(ev.some((e) => e.type === 'chat' && e.channel === 'raidWarning')).toBe(false);
       expect(f.state()?.overload.hammer).toBeLessThan(0.05);
       expect(f.state()?.bursts).toBe(1);
     });
@@ -216,11 +206,8 @@ describe('the quarter rules', () => {
     expect(aura(f.boss(), FINAL_AURAS.root)).toBeDefined();
     // Normal: no shockwave on the switch.
     expect(hits(ev, FINAL_NAMES.shock).length).toBe(0);
-    const warns = ev.filter(
-      (e) => e.type === 'chat' && e.channel === 'raidWarning' && e.pid === f.pids[0],
-    ) as Extract<SimEvent, { type: 'chat' }>[];
     // The quarter it drinks reads on the Overload panel, not a banner.
-    expect(warns.map((w) => w.textKey)).not.toContain('hudChrome.finalBoss.warn.enterBreath');
+    expect(ev.some((e) => e.type === 'chat' && e.channel === 'raidWarning')).toBe(false);
   });
 
   it('Heroic: a switch shocks the raid and marks it; a switch while marked hits three times as hard', () => {

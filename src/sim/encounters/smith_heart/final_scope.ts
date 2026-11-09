@@ -1,9 +1,9 @@
 // The Masterless Strength's per-tick scope (encounters/smith_heart/final.ts):
 // the claim, the shared state, the boss, the players on the Anvil of the
 // World, the difficulty's rules, and the plumbing every part of the fight
-// shares (the bar, the damage rolls, the hits, the cues, the raid warnings,
-// the hashed picks). A leaf the fight's modules and the coordinator share, so
-// none of them reaches into another. Zero rng but the damage rolls.
+// shares (the bar, the damage rolls, the hits, the cues, the hashed picks).
+// A leaf the fight's modules and the coordinator share, so none of them
+// reaches into another. Zero rng but the damage rolls.
 
 import { HEART_ROOM, SMITH_HEART_HEIGHTS } from '../../content/smith_heart_layout';
 import { HEART_QUARTERS, heartQuarterAt } from '../../content/smith_heart_quarters';
@@ -222,46 +222,10 @@ export function pickPlayers(
   return pickMarkTargets(s.boss, livePlayers(s), count, salt, busy);
 }
 
-/** A raid warning from the boss to every player in the Heart (the big orange
- *  line, re-localized client-side by `textKey`). */
-/** The raid warnings the screen already says elsewhere, so they never take
- *  the top of the screen (the owner's rule of 2026-11-03, few boss banners;
- *  the Heroic readability pass of 2026-11-05 found two banners at once hiding
- *  the marks they named): the quarter the boss drinks (the Overload panel
- *  lights it), the marks with their own alert in the middle of the screen
- *  (Ember Mark, Drawn Lightning, Bursting Coal, Wind-Tethered) and the kick
- *  (the Splinter's cast bar). Their catalog lines stay for the journal. */
-export const QUIET_WARNINGS: ReadonlySet<string> = new Set([
-  'enterHeat',
-  'enterQuench',
-  'enterBreath',
-  'enterHammer',
-  'embers',
-  'drawn',
-  'coal',
-  'pounce',
-  'toll',
-]);
-
-export function raidWarn(
-  s: Pick<FinalScope, 'ctx' | 'inst' | 'boss'>,
-  key: string,
-  text: string,
-): void {
-  if (QUIET_WARNINGS.has(key)) return;
-  for (const p of heartListeners(s.ctx, s.inst)) {
-    s.ctx.emit({
-      type: 'chat',
-      fromPid: s.boss.id,
-      from: s.boss.name,
-      entityId: s.boss.id,
-      text,
-      textKey: `hudChrome.finalBoss.warn.${key}`,
-      channel: 'raidWarning',
-      pid: p.id,
-    });
-  }
-}
+// The fight calls no raid warning banner: every mechanic reads in the world,
+// on the Overload panel, on a cast bar or on the marked player's own alert
+// (the owner's rule of 2026-11-03, applied to the whole raid on 2026-11-09).
+// The boss's voice stays (final_voice.ts: chat and a speech bubble).
 
 /** A cue at instance-local (x, z). */
 export function cueAt(

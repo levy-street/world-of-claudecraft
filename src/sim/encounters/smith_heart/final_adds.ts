@@ -72,7 +72,6 @@ import {
   local,
   pickPlayers,
   putMarker,
-  raidWarn,
   roll,
   spawnFightObject,
 } from './final_scope';
@@ -374,8 +373,6 @@ export function markCoals(s: FinalScope, from: Entity): Entity[] {
     ph.coals.push({ pid: p.id, left: P.coalSeconds, sourceId: from.id });
     beamCue(s, from.id, p.id, Q.coal, 'fire');
   }
-  if (marked.length > 0)
-    raidWarn(s, 'coal', 'Bursting Coal! The marked carry it out of the group before it bursts!');
   return marked;
 }
 
@@ -414,11 +411,10 @@ export function stepCoals(s: FinalScope): void {
 
 /** Begin Rime Toll (never while a kick's lockout holds it). Exported for the
  *  dev verb. */
-export function startToll(s: FinalScope, a: FinalAdd, e: Entity): boolean {
+export function startToll(a: FinalAdd, e: Entity): boolean {
   a.a = P.tollEvery;
   if (isLockedOut(e, 'frost')) return false;
   beginAddBar(e, a, C.toll, P.tollCast, e.facing, null);
-  raidWarn(s, 'toll', 'Rime Toll! Interrupt the Splinter of the Quench!');
   return true;
 }
 
@@ -540,11 +536,6 @@ export function startPounce(s: FinalScope, a: FinalAdd, e: Entity): Entity | nul
     victim.id,
   );
   putMarker(victim, A.tether, N.tether, P.pounceCast + P.tetherSeconds, e.id, { school: 'nature' });
-  raidWarn(
-    s,
-    'pounce',
-    'Gale Pounce! Its quarry drags the Splinter of the Breath out of the group!',
-  );
   return victim;
 }
 
@@ -648,7 +639,7 @@ export function stepAdds(s: FinalScope): void {
     if (a.vein === 'breath' && a.b <= 1e-9) raiseCircles(s, a, e);
     if (!addFree(s, a, e)) continue;
     if (a.shear <= 1e-9 && startShear(s, a, e)) continue;
-    if (a.vein === 'quench' && a.a <= 1e-9) startToll(s, a, e);
+    if (a.vein === 'quench' && a.a <= 1e-9) startToll(a, e);
     else if (a.vein === 'breath' && a.a <= 1e-9 && a.quarry === null) startPounce(s, a, e);
   }
 }

@@ -55,7 +55,6 @@ import {
   hit,
   livePlayers,
   putMarker,
-  raidWarn,
   roll,
 } from './final_scope';
 
@@ -108,18 +107,10 @@ export function beginFinalPhase(s: FinalScope): void {
   ph.fury = 0;
   ph.furyTimer = 0;
   ph.furyWarned = false;
-  for (const v of HEART_QUARTER_ORDER) {
-    st.overload[v] = 0;
-    st.overloadWarned[v] = false;
-  }
+  for (const v of HEART_QUARTER_ORDER) st.overload[v] = 0;
   st.unbound = 0;
   dropShield(s);
   cueAt(s, Q.awaken, HEART_ROOM.x, HEART_ROOM.z, 40, 'arcane');
-  raidWarn(
-    s,
-    'awaken',
-    'All four quarters wake! The Masterless Strength drinks every strength at once!',
-  );
 }
 
 /** One turn of the mix (exported for the tests): true when it began. */
@@ -157,7 +148,6 @@ export function furyPulse(s: FinalScope): void {
       value: ph.fury,
       school: 'arcane',
     });
-    raidWarn(s, 'fury', 'Masterless Fury! It tears the Anvil apart: kill it now!');
   }
   cueOn(s, b, Q.fury, 'arcane');
   for (const p of livePlayers(s))
@@ -178,14 +168,8 @@ export function stepFinal(s: FinalScope): void {
   if (!s.st.bar) pinCentre(s);
   ph.finalClock += DT;
   stepMix(s);
-  if (!ph.furyWarned && ph.finalClock >= P.enrageAfter - P.enrageWarnAt - 1e-9) {
-    ph.furyWarned = true;
-    raidWarn(
-      s,
-      'furySoon',
-      'The Masterless Strength is about to lose all restraint! Burn it down!',
-    );
-  }
+  // Near the enrage the boss says so (final_voice.ts reads the flag).
+  if (ph.finalClock >= P.enrageAfter - P.enrageWarnAt - 1e-9) ph.furyWarned = true;
   if (ph.finalClock < P.enrageAfter - 1e-9) return;
   ph.furyTimer -= DT;
   if (ph.furyTimer > 1e-9) return;

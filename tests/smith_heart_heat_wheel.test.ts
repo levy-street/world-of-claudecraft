@@ -168,8 +168,8 @@ describe('Guardian of the Heat: the Wheel of the Hearth', () => {
     expect(m.objects(HEAT_OBJECTS.wheelPrefix)).toEqual([]);
   });
 
-  it('names itself and warns the raid', () => {
+  it('names itself; the guardian calls it, no banner does', () => {
     expect(localizeSimAuraName(HEAT_NAMES.wheel)).toBe('Wheel of the Hearth');
-    expect(t('hudChrome.heatGuardian.warn.wheel' as never)).toContain('dark slice');
+    expect(t('hudChrome.heatGuardian.say.wheel' as never)).toContain('Hearth turns');
   });
 });

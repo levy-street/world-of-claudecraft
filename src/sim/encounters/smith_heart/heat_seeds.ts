@@ -37,7 +37,6 @@ import {
   liveEntity,
   livePlayers,
   pickPlayers,
-  raidWarn,
   roll,
   spawnFightObject,
   spawnHeatMob,
@@ -75,7 +74,6 @@ export function dropSeeds(s: HeatScope): number {
   }
   if (n > 0) {
     cueOnBoss(s, HEAT_CUES.seedThrow);
-    raidWarn(s, s.boss, 'seeds', 'Hearthseeds fall! Drop them together and run!');
     heatSay(s, s.boss, 'seeds');
   }
   return n;

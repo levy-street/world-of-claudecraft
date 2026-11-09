@@ -59,7 +59,6 @@ import {
   heartListeners,
   overTheVoid,
   putMarker,
-  raidWarn,
 } from './final_scope';
 
 const SCHOOL: Readonly<Record<SmithHeartVein, 'fire' | 'frost' | 'nature' | 'physical'>> = {
@@ -67,22 +66,6 @@ const SCHOOL: Readonly<Record<SmithHeartVein, 'fire' | 'frost' | 'nature' | 'phy
   quench: 'frost',
   breath: 'nature',
   hammer: 'physical',
-};
-
-const CRACK_TEXT: Readonly<Record<SmithHeartVein, { key: string; text: string }>> = {
-  heat: { key: 'crackHeat', text: "The Heat's quarter is cracking! Get off it before it falls!" },
-  quench: {
-    key: 'crackQuench',
-    text: "The Quench's quarter is cracking! Get off it before it falls!",
-  },
-  breath: {
-    key: 'crackBreath',
-    text: "The Breath's quarter is cracking! Get off it before it falls!",
-  },
-  hammer: {
-    key: 'crackHammer',
-    text: "The Hammer's quarter is cracking! Get off it before it falls!",
-  },
 };
 
 /** The second a quarter's fall comes (`n` 0 the first). */
@@ -120,7 +103,6 @@ export function beginKneel(s: FinalScope): void {
   ph.fury = 0;
   for (const v of Object.keys(st.overload) as SmithHeartVein[]) {
     st.overload[v] = 0;
-    st.overloadWarned[v] = false;
   }
   st.unbound = 0;
   st.zone = 'ring';
@@ -148,11 +130,6 @@ function beginRebirth(s: FinalScope): void {
   h.scene = 0;
   h.fromHp = s.boss.hp;
   cueAt(s, Q.rebirth, HEART_ROOM.x, HEART_ROOM.z, 40, 'arcane');
-  raidWarn(
-    s,
-    'rebirth',
-    'The Heart beats! The Masterless Strength drinks the four quarters and rises again!',
-  );
 }
 
 /** The collapse begins, at exactly 20 percent or wherever a dev verb set it.
@@ -167,11 +144,6 @@ export function beginCollapse(s: FinalScope): void {
   b.damageFloorHp = undefined;
   b.hostile = true;
   cueAt(s, Q.unmade, HEART_ROOM.x, HEART_ROOM.z, 40, 'arcane');
-  raidWarn(
-    s,
-    'unmade',
-    'The Anvil of the World is breaking apart! Kill the Masterless Strength before the last stone falls!',
-  );
 }
 
 // ---- the floor falling --------------------------------------------------------------------
@@ -212,7 +184,6 @@ function dropQuarter(s: FinalScope, vein: SmithHeartVein): void {
   cueAt(s, Q.quarterFall, spot.x, spot.z, 30, SCHOOL[vein]);
   if (h.fallen < h.order.length) return;
   cueAt(s, Q.ringCrack, HEART_ROOM.x, HEART_ROOM.z, HEART_QUARTERS.ringR, 'arcane');
-  raidWarn(s, 'ringCrack', 'Only the central ring is left, and it is cracking! Kill it now!');
 }
 
 /** The ring breaks: nothing is left to stand on. */
@@ -239,7 +210,6 @@ function stepCollapse(s: FinalScope): void {
       h.warned = true;
       const spot = heartQuarterSpot(vein);
       cueAt(s, Q.quarterCrack, spot.x, spot.z, 30, SCHOOL[vein]);
-      raidWarn(s, CRACK_TEXT[vein].key, CRACK_TEXT[vein].text);
     }
     if (h.clock >= when - 1e-9) dropQuarter(s, vein);
   } else if (!h.broken && h.clock >= fallAt(h.order.length - 1) + P.ringWarn - 1e-9) {

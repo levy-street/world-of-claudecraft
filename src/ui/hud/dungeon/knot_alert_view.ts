@@ -1,12 +1,17 @@
 // The Guardian of the Breath's Knotted Gale alert (Heroic and Mythic,
 // encounters/smith_heart/breath_heart.ts): the pure, DOM-free view core of the
-// part the fight gives the local player, read off the auras the sim mirrors:
+// part the fight gives the local player, read off the auras the sim mirrors.
+// A short title over a bar and its seconds, and no sentence under it (the
+// owner's rule of 2026-11-03, kept again on 2026-11-09: where each portal
+// belongs and how the Gale is thrown live in the aura tooltips and the boss
+// journal):
 //  - Portal A / Portal B (and phase 2's second pair, Portal C / Portal D): the
-//    bar is the time until the portal opens at your feet, so stand where it
-//    belongs now; each letter its own kind, so its own colour;
+//    bar is the time until the portal opens at your feet; each letter its own
+//    kind, so its own colour;
 //  - Gale-Laden: the bar is the ball's fuse; the panel is the throw's button,
-//    and it says so louder at the lip of a gap (a portal is a shortcut, never
-//    needed: Jose's call of 2026-11-08).
+//    so its one hint is the key (or the tap) that throws, and its title says
+//    so louder at the lip of a gap (a portal is a shortcut, never needed:
+//    Jose's call of 2026-11-08).
 // An ACTION prompt (the hints setting never hides it), on every graphics tier.
 // The painter is the shared encounter alert's (encounter_alert_painter.ts).
 
@@ -30,7 +35,7 @@ export const KNOT_ALERT_KINDS: readonly KnotAlertKind[] = [
   'lip',
 ];
 
-/** Each mark's aura, its kind and its title and line keys. */
+/** Each mark's aura, its kind and its title key. */
 const PORTAL_MARKS: readonly {
   aura: string;
   kind: PortalKind;
@@ -39,35 +44,26 @@ const PORTAL_MARKS: readonly {
     | 'hudChrome.knotAlert.bTitle'
     | 'hudChrome.knotAlert.cTitle'
     | 'hudChrome.knotAlert.dTitle';
-  line:
-    | 'hudChrome.knotAlert.aLine'
-    | 'hudChrome.knotAlert.bLine'
-    | 'hudChrome.knotAlert.cLine'
-    | 'hudChrome.knotAlert.dLine';
 }[] = [
   {
     aura: BREATH_AURAS.portalA,
     kind: 'portalA',
     title: 'hudChrome.knotAlert.aTitle',
-    line: 'hudChrome.knotAlert.aLine',
   },
   {
     aura: BREATH_AURAS.portalB,
     kind: 'portalB',
     title: 'hudChrome.knotAlert.bTitle',
-    line: 'hudChrome.knotAlert.bLine',
   },
   {
     aura: BREATH_AURAS.portalC,
     kind: 'portalC',
     title: 'hudChrome.knotAlert.cTitle',
-    line: 'hudChrome.knotAlert.cLine',
   },
   {
     aura: BREATH_AURAS.portalD,
     kind: 'portalD',
     title: 'hudChrome.knotAlert.dTitle',
-    line: 'hudChrome.knotAlert.dLine',
   },
 ];
 
@@ -124,7 +120,8 @@ export function buildKnotAlertView(input: KnotAlertInput): KnotAlertView {
     visible: true as const,
     progress: Math.max(0, Math.min(1, left / total)),
     progressAria: t('hudChrome.quenchAlert.timeAria', { seconds }),
-    barLabel: '',
+    barLabel: t('hudChrome.quenchAlert.secondsBar', { seconds }),
+    line: '',
   };
   if (portal) {
     const title = t(portal.title);
@@ -132,7 +129,6 @@ export function buildKnotAlertView(input: KnotAlertInput): KnotAlertView {
       ...base,
       kind: portal.kind,
       title,
-      line: t(portal.line, { seconds }),
       hint: '',
       key: '',
       pressable: false,
@@ -146,7 +142,6 @@ export function buildKnotAlertView(input: KnotAlertInput): KnotAlertView {
     ...base,
     kind: lip ? 'lip' : 'carry',
     title,
-    line: t(lip ? 'hudChrome.knotAlert.lipLine' : 'hudChrome.knotAlert.carryLine', { seconds }),
     hint: input.touch
       ? t('hudChrome.knotAlert.throwTap')
       : key

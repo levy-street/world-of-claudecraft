@@ -47,7 +47,6 @@ import {
   livePlayers,
   pickPlayers,
   putMarker,
-  raidWarn,
   roll,
   spawnFightObject,
   spawnHeatMob,
@@ -131,12 +130,6 @@ export function callCinder(s: HeatScope): boolean {
     remaining: T.cinderFallWarn,
     quarry: quarry.id,
   });
-  raidWarn(
-    s,
-    s.boss,
-    'cinder',
-    'A Rolling Cinder falls! Strike it back before it reaches its quarry!',
-  );
   heatSay(s, s.boss, 'cinder');
   return true;
 }

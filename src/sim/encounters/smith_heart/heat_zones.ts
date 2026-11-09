@@ -23,7 +23,6 @@ import {
   fireHit,
   type HeatScope,
   livePlayers,
-  raidWarn,
   roll,
   spawnFightObject,
 } from './heat_scope';
@@ -39,7 +38,6 @@ export function startZones(s: HeatScope): void {
   const st = s.st;
   st.zoneTimer = T.zoneEvery;
   st.zoneRun = { order: [...ZONE_ORDER], next: 0, stepIn: 0 };
-  raidWarn(s, s.boss, 'zones', 'Wakefire! The Hearth ignites band by band: step out!');
   heatSay(s, s.boss, 'zones');
 }
 

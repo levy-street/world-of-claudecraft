@@ -54,7 +54,6 @@ import {
   overTheVoid,
   pickPlayers,
   putMarker,
-  raidWarn,
   roll,
   spawnFightObject,
   standingSpot,
@@ -331,12 +330,6 @@ export function markEmbers(s: FinalScope): Entity[] {
     });
     st.embers.push({ pid: p.id, left: T.emberSeconds });
   }
-  if (st.embers.length > 0)
-    raidWarn(
-      s,
-      'embers',
-      'Embers fall at the ranged! Stack the marks in one corner, then move out!',
-    );
   return marked.filter((p) => ranged.includes(p));
 }
 

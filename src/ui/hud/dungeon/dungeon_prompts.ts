@@ -48,7 +48,7 @@
 import { BASTION_ALERT_KINDS, buildBastionAlertView } from './bastion_alert_view';
 import { type CageEscapeDeps, CageEscapePrompt } from './cage_escape_painter';
 import { buildCageEscapeView } from './cage_escape_view';
-import { buildCouncilAlertView, COUNCIL_ALERT_KINDS, CouncilSoulScan } from './council_alert_view';
+import { buildCouncilAlertView, COUNCIL_ALERT_KINDS } from './council_alert_view';
 import { CryptAlertSceneScan, type CryptSceneEntity } from './crypt_alert_scene_core';
 import {
   buildCryptAlertView,
@@ -161,7 +161,6 @@ export class DungeonPrompts {
   private readonly overloadView = makeOverloadView();
   private readonly finalScan = new HeartFinalScan();
   private readonly cryptScene = new CryptAlertSceneScan();
-  private readonly councilSoul = new CouncilSoulScan();
   private readonly temple: EncounterAlert;
   private readonly templeScene = new TempleAlertSceneScan();
   private readonly kitUse: EncounterAlert;
@@ -324,7 +323,7 @@ export class DungeonPrompts {
       : HINT_HIDDEN;
     const cryptSoft = crypt.visible && CRYPT_SOFT_ALERT_KINDS.has(crypt.kind);
     const council = dungeonPromptEnabled('council', hints)
-      ? buildCouncilAlertView({ auras: p.auras, soul: this.councilSoul.frame(f.world) })
+      ? buildCouncilAlertView({ auras: p.auras })
       : HINT_HIDDEN;
     this.council.paint(council);
     // The cold bar is the player's own gauge: never hidden by the hints.

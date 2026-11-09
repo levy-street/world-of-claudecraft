@@ -158,7 +158,9 @@ describe('Guardian of the Quench: the cold bar over the action bar', () => {
     expect(rising.kind).toBe('cold');
     expect(rising.progress).toBeCloseTo(0.4);
     expect(rising.barLabel).toBe(`Cold 40 / ${T.coldMax}`);
-    expect(rising.line).toContain(`${T.warmR} yd of ${T.warmNeed} or more`);
+    // A short title over the bar and its number: no sentence under it.
+    expect(rising.title).toBe('Cold');
+    expect(rising.line).toBe('');
     const freezing = buildQuenchAlertView({
       auras: [{ id: QUENCH_AURAS.cold, value: QUENCH_FREEZING_AT, value2: 1 }],
     });
@@ -175,7 +177,8 @@ describe('Guardian of the Quench: the cold bar over the action bar', () => {
     });
     if (!frozen.visible) throw new Error('hidden');
     expect(frozen.kind).toBe('frozen');
-    expect(frozen.line).toContain('3 sec');
+    expect(frozen.line).toBe('');
+    expect(frozen.barLabel).toBe('3s');
     expect(frozen.progress).toBeCloseTo(2.2 / T.freezeSeconds);
     const water = buildQuenchAlertView({
       auras: [
@@ -185,7 +188,8 @@ describe('Guardian of the Quench: the cold bar over the action bar', () => {
     });
     if (!water.visible) throw new Error('hidden');
     expect(water.kind).toBe('water');
-    expect(water.line).toContain('2 sec');
+    expect(water.line).toBe('');
+    expect(water.barLabel).toBe('2s');
     expect(
       buildQuenchAlertView({ auras: [{ id: QUENCH_AURAS.cold, value: 9 }], dead: true }).visible,
     ).toBe(false);

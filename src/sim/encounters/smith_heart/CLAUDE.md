@@ -70,7 +70,7 @@ Quench's, then the Heat's, then the Masterless Strength's, then the seal and the
 | `heat_ids.ts` | Leaf: the Guardian of the Heat's cast, aura, object, mob and cue ids, the names (`HEAT_NAMES`), the per-difficulty rules (`HEAT_DIFFICULTY`: the overflows' adds, Seedflames, bolts, the cinder's speed, a quarter more damage; mythic is heroic whole, its `mythicRule` the seam), the phases' kits (`HEAT_PHASE_KIT`, 1 to 3 on every tier), the SKETCH tuning (`HEAT_TUNING`) and the objects' template codecs (`heatTimed`, `swellLaneTemplate`, `riverTemplate`, `zoneTemplate`, `wellTemplate`). |
 | `heat_geometry.ts` | PURE over the layout (no SimContext, for the bots and the renderer to reuse): the Hearth's floor (`inHearthFloor`, `floorReach`), the wellspring (`wellDistance`, `inWell`, `beyondFlare`), Wakefire's bands (`inBand`), the lanes and a wave's wall (`inLane`, `inWave`, `swellBearings`), the posts (`WELLSPAWN_SPOTS`, `WELLKEEPER_SPOTS`, `SHORE_POINTS`). |
 | `heat_state.ts` | Type-only: `HeatFightState` (`Entity.smithHeartHeat` on the guardian). |
-| `heat_scope.ts` | The per-tick scope: the players on the Hearth's floor and its listeners, the bar, the rolls, the fire hit, the cues, the raid warnings (`hudChrome.heatGuardian.warn.*`), the hashed picks, the adds it raises (`spawnHeatMob`). |
+| `heat_scope.ts` | The per-tick scope: the players on the Hearth's floor and its listeners, the bar, the rolls, the fire hit, the cues, the hashed picks (the fight calls NO raid warning banner since 2026-11-09), the adds it raises (`spawnHeatMob`). |
 | `heat_fist.ts` | Basalt Fist (its bar, spot and three lanes) and the Molten Swells rolling down them; a due fist waits out Wakefire (`wakefireHoldsFist`, `FIST_SPAN`), the wait coming off the next one's. |
 | `heat_flare.ts` | Hearth Flare (phase 1 on everyone out of reach, then only on the guardian's own target), Flare-Scorched, the wellspring's own fire. |
 | `heat_overflow.ts` | The overflows' rivers and Falling Cinders. |
@@ -86,7 +86,7 @@ Quench's, then the Heat's, then the Masterless Strength's, then the seal and the
 | `heat.ts` | The coordinator: the pull, the phases and their damage floors, the overflows' stages (sinking, under, rising: the guardian untargetable), the wipe's reset, the fall, the dev tier switch (`setHeatDevTier`) and the `/dev heart heat` triggers and readout. |
 | `final_ids.ts` | Leaf: the Masterless Strength's cast, aura, object and cue ids (its Basalt Fist reuses the Heat guardian's cast and objects), the names (`FINAL_NAMES`, the guardians' reused ones and the IP-checked new ones), the per-difficulty rules (`FINAL_DIFFICULTY`: a row per tier, Heroic's and Mythic's additions as fields), the SKETCH tuning (`FINAL_TUNING`), the pure helpers (`overloadStep`, `pulseScale`, `anvilShare`, `boltScale`, the zone codes) and the objects' template codecs. |
 | `final_state.ts` | Type-only: `FinalFightState` (`Entity.smithHeartFinal` on the boss). |
-| `final_scope.ts` | The per-tick scope: the players on the Anvil and the Heart's listeners, the bar (planted), the rolls, the hits, the raid warnings (`hudChrome.finalBoss.warn.*`), the cues, the hashed picks, `onFloor`. |
+| `final_scope.ts` | The per-tick scope: the players on the Anvil and the Heart's listeners, the bar (planted), the rolls, the hits, the cues (the fight calls NO raid warning banner since 2026-11-09), the hashed picks, `onFloor`. |
 | `final_rules.ts` | The four quarter rules: the zone it stands in (held by `ZONE_HOLD` so a boss swaying on a ridge alone never flickers, crossing at once behind its tank), the drag (`followTank`: a free boss closes on a tank in another zone), Taking Root (a root aura and the hold, only on a NEW quarter), Vein Shock and Vein-Shaken (Heroic), the four Overload bars (fill, drain, pulses, the burst), Heart Unbound in the ring, the base form, and the state written to the boss's auras. |
 | `final_heat.ts` | The Heat quarter: Basalt Fist and its Molten Swells (the Heat guardian's objects and numbers, lanes to the Anvil's rim via `laneReach`), Fire Whirls, Heroic's Ember Marks and their pools, Mythic's Forge Fire off the frontal. |
 | `final_quench.ts` | The Quench quarter: Quenching Cold and Encased in Rime (alone you freeze), Heroic's Groaning Ice and Under the Ice, Mythic's Numbing Frost off the frontal. |
@@ -116,7 +116,9 @@ Rules:
   pillars' collision rides the combat-wall view (`net/combat_wall_wire.ts` online).
 - A new council mechanic lands in its member's module; a new difficulty is a
   `COUNCIL_DIFFICULTY` row, never a branch on a tier's name.
-- Player text: the council calls no raid warnings (its mechanics read in the world; the yells carry `hudChrome.council.say.*`); the
+- Player text: no fight of the raid calls a raid warning banner (the owner's rule of 2026-11-03, made
+  whole on 2026-11-09: its mechanics read in the world; the yells carry the `*.say.*` keys and the
+  marked player's own short alert sits over the action bar); the
   damage and aura names are matched by `src/ui/sim_i18n.ts`.
 - Tests: `tests/smith_heart_checkpoints.test.ts` (the death checkpoints);
   `tests/smith_heart_council.test.ts` (on `tests/helpers/council_fight.ts`),

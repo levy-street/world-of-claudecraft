@@ -865,7 +865,9 @@ describe('Guardian of the Heat: phase 3, the Rolling Cinders', () => {
     f.dev('/dev heart heat phase 3');
     const ev = f.tick(ticks(T.cinderFirst + T.cinderFallWarn + 0.5));
     expect(cues(ev, HEAT_CUES.cinderLand).length).toBe(1);
-    expect(chatKeys(ev)).toContain('hudChrome.heatGuardian.warn.cinder');
+    // The guardian's voice calls it; no banner does (the owner's rule).
+    expect(chatKeys(ev)).toContain('hudChrome.heatGuardian.say.cinder');
+    expect(ev.some((e) => e.type === 'chat' && e.channel === 'raidWarning')).toBe(false);
   });
 });
 

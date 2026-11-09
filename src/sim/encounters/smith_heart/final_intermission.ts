@@ -62,7 +62,6 @@ import {
   type FinalScope,
   livePlayers,
   putMarker,
-  raidWarn,
   roll,
 } from './final_scope';
 import type { FinalPhaseState } from './final_state';
@@ -201,11 +200,6 @@ export function beginIntermission(s: FinalScope, n: 1 | 2): void {
   const ph = s.st.phase;
   ph.intermissions = Math.max(ph.intermissions, n);
   beginStride(s, 'leap');
-  raidWarn(
-    s,
-    'intermission',
-    'The Masterless Strength gathers its strength in the centre! Its Splinters rise: kill them before the call ends!',
-  );
 }
 
 /** The call begins: the Splinters rise, the channel, the shield. Exported
@@ -292,12 +286,6 @@ export function endCall(s: FinalScope): SmithHeartVein[] {
     dropAdd(s, a);
   }
   ph.adds = [];
-  if (poured.length > 0)
-    raidWarn(
-      s,
-      'poured',
-      'The Splinters pour into the Masterless Strength! Their elements stay with it to the end!',
-    );
   release(s);
   return poured;
 }
@@ -313,7 +301,6 @@ export function release(s: FinalScope): void {
   dropShield(s);
   s.st.pulseTimer = Math.max(s.st.pulseTimer, 2);
   cueOn(s, s.boss, Q.release, 'arcane');
-  raidWarn(s, 'release', 'The shield breaks! Drag the Masterless Strength out of the centre!');
 }
 
 // ---- the thresholds ----------------------------------------------------------------------
@@ -336,7 +323,6 @@ export function watchThresholds(s: FinalScope): void {
 export function beginFinalStride(s: FinalScope): void {
   s.st.phase.intermissions = P.intermissionAt.length;
   beginStride(s, 'finalLeap');
-  raidWarn(s, 'final', 'The Masterless Strength strides into the heart of the Anvil!');
 }
 
 // ---- what holds still ---------------------------------------------------------------------

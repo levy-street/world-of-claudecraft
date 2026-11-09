@@ -22500,16 +22500,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '구르는 잉걸불이나 씨불이 당신을 쫓고 있습니다. 구르는 잉걸불에 붙잡히면 죽고 {radius}미터 안의 모두가 불탑니다: 거리를 두고 아군이 때리게 하십시오. 한 번 칠 때마다 {knock}미터 밀려납니다(그 뒤 {crust}초 동안은 밀려나지 않습니다).',
   'hudChrome.auraEffect.heatGuardian.crust':
     '단단하게 식었습니다: 이 효과가 끝날 때까지 때려도 밀려나지 않습니다.',
-  'hudChrome.heatGuardian.warn.overflow':
-    '수호자가 가라앉고 화로가 넘쳐흐른다! 용암 강줄기를 피하라!',
-  'hudChrome.heatGuardian.warn.wellspawn':
-    '샘의 자식들이 기어 나온다! 샘에 닿기 전에 늦추고 쓰러뜨려라!',
-  'hudChrome.heatGuardian.warn.keepers':
-    '샘지기가 샘에서 솟아오른다! 붙잡아 두고 그 표식을 샘의 자식들에게서 떼어 놓아라!',
-  'hudChrome.heatGuardian.warn.seeds': '화로 씨앗이 떨어진다! 한데 모아 떨어뜨리고 달려라!',
-  'hudChrome.heatGuardian.warn.zones': '깨어나는 불! 화로가 띠마다 타오른다: 밖으로 나가라!',
-  'hudChrome.heatGuardian.warn.cinder': '구르는 잉걸불이 떨어진다! 먹잇감에 닿기 전에 쳐내라!',
-  'hudChrome.heatGuardian.warn.wheel': '화로가 돈다! 어두운 조각으로 가라!',
   'hudChrome.heatGuardian.say.fist': '돌이 떨어지는 곳에 서라. 그리고 그 일부가 되어라.',
   'hudChrome.heatGuardian.say.sink': '샘이 너희를 맞으러 솟아오른다!',
   'hudChrome.heatGuardian.say.sinkAgain': '다시 화로가 넘친다. 다시 너희는 타오른다.',
@@ -22530,14 +22520,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.heart_seam_bolt': '광맥 화살',
   'abilityUi.cast.heart_song_of_the_seam': '광맥의 노래',
   'hudChrome.council.alert.wakeTitle': '돌 깨우기!',
-  'hudChrome.council.alert.wakeLine':
-    '서 있는 곳에 기둥이 솟아오릅니다: 공격대에 엄폐물이 필요한 곳으로 이동하세요',
   'hudChrome.council.alert.rockTitle': '낙석!',
-  'hudChrome.council.alert.rockLine': '기둥에서 떨어져 최소 세 명의 아군을 모으세요',
   'hudChrome.council.alert.resonanceTitle': '공명',
   'hudChrome.council.alert.weightTitle': '망치의 무게',
-  'hudChrome.council.alert.weightLine':
-    '받는 물리 피해가 두 배가 됩니다: 다른 탱커가 수호자를 맡아야 합니다',
   'hudChrome.council.alert.timeAria': '{seconds}초 남음',
   'hudChrome.auraEffect.council.wakeMark':
     '효과가 끝나면 서 있는 자리의 바닥에서 기둥이 솟구쳐 {radius}야드 안의 모두에게 {min}에서 {max}의 피해를 주고 밀쳐냅니다. 공격대에 엄폐물이 필요한 곳에 서세요. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해.',
@@ -22548,8 +22533,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   // The Hammer Council's mythic, Soul in the Stone (M16 fills).
   'abilityUi.cast.heart_echo_of_wrath': '분노의 메아리',
   'abilityUi.cast.heart_endless_song': '끝없는 노래',
-  'hudChrome.council.alert.rockLineSoul':
-    '엄폐물에서 떨어져 영혼의 기둥 옆에 아군을 3명 이상 모으세요',
   'hudChrome.council.say.guardian_pull':
     '채석장에 낯선 자들이라. 망치의 힘은 살덩이에 굴하지 않는다.',
   'hudChrome.council.say.guardian_wrath': '산이 내게 응답한다! 돌이 받아 준다면 숨어 보아라!',
@@ -22581,11 +22564,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '채석장이 무너지고 있습니다: {every}초마다 중첩 하나당 {min}에서 {max}의 피해를 받으며, 매번 중첩이 하나씩 쌓입니다. 저주받은 기둥이 부서지면 끝납니다.',
   'hudChrome.auraEffect.council.pillarLimit':
     '기둥 하나는 산의 분노로부터 최대 {limit}명만 지켜 줍니다. 그보다 많이 숨으면 모두가 폭발의 {share}%를 받습니다. 숨지 않은 대상은 일반에서 {min}에서 {max}, 영웅에서 {heroicMin}에서 {heroicMax}, 신화에서 {mythicMin}에서 {mythicMax}의 피해를 받습니다.',
-  'hudChrome.council.alert.resonanceLine':
-    '주변의 모든 아군에게 피해를 줍니다: 효과가 끝날 때까지 무리에서 떨어지세요',
   'hudChrome.council.alert.rushTitle': '산의 돌진!',
-  'hudChrome.council.alert.rushLine':
-    '수호자가 당신에게 돌진합니다: 저주받은 기둥을 당신과 수호자 사이에 두세요',
   'hudChrome.council.say.guardian_rush': '그렇다면 내 길을 막아 보아라. 산은 비켜 가지 않는다.',
   'hudChrome.council.say.singer_wake': '깨어나라, 잠든 돌이여. 그들이 선 곳에서 솟아올라라!',
   'hudChrome.council.say.singer_rock': '위를 봐요, 꼬마들! 산이 무너지고 있어요!',
@@ -22671,7 +22650,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.quenchGuardian.marked':
     '{count}명 중 {order}번째입니다. 칼날이 당신을 지나는 선을 따라 날아옵니다. 선을 공격대에서 멀리 유도하세요. 선은 칼날이 날아가기 {lock}초 전에 고정되니 그때 비켜서세요. 그렇지 않으면 {min}~{max}의 냉기 피해와 냉기 {cold}를 받습니다. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해.',
   'hudChrome.quenchAlert.markedTitle': '칼날이 당신을 노립니다! ({count}명 중 {order}번째)',
-  'hudChrome.quenchAlert.markedLine': '선을 공격대에서 멀리 유도하고, 고정되면 비켜서세요.',
   'abilityUi.cast.heart_quench_blades_hunt': '칼날의 사냥',
   'hudChrome.quenchGuardian.say.flurry':
     '모든 칼날아! 모든 날이여! 내 호수 위에 서 있는 것을 남기지 마라!',
@@ -22695,7 +22673,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.quenchGuardian.splashed':
     '아군의 부서진 얼음이 튀었습니다: 냉기 +{cold}. 자신의 게이지가 가득 차기 전에 무리로 돌아가세요.',
   'hudChrome.quenchAlert.splashTitle': '서리 파편! 냉기 +{cold}',
-  'hudChrome.quenchAlert.immuneLine': '무적 효과로도 냉기는 막을 수 없습니다: 모이세요',
   'hudChrome.auraEffect.quenchGuardian.trapped':
     '얼음을 뚫고 얼어붙은 물에 빠졌습니다: 움직일 수 없고, 매초 {min}~{max}의 냉기 피해를 입으며 냉기가 올라갑니다. {seconds}초 뒤 가장자리로 기어 올라옵니다. 물만으로는 절대 죽지 않습니다. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해.',
   'hudChrome.auraEffect.quenchGuardian.awake':
@@ -22709,12 +22686,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.quenchAlert.warmTitle': '모여서 얻은 온기',
   'hudChrome.quenchAlert.frozenTitle': '서리에 갇힘!',
   'hudChrome.quenchAlert.waterTitle': '얼음 아래!',
-  'hudChrome.quenchAlert.coldLine': '{radius}미터 안에 다른 {others}명 이상과 모여 몸을 녹이세요',
-  'hudChrome.quenchAlert.warmLine':
-    '냉기가 내려가고 있습니다. {seconds}초 안에 무리를 옮기지 않으면 얼음이 갈라집니다',
-  'hudChrome.quenchAlert.frozenLine':
-    '{seconds}초 뒤 얼음이 부서집니다: 가까이 있는 모두 물러나세요',
-  'hudChrome.quenchAlert.waterLine': '{seconds}초 뒤 기어 올라옵니다',
   'hudChrome.quenchAlert.coldBar': '냉기 {cold} / {max}',
   'hudChrome.quenchAlert.coldAria': '냉기 {max} 중 {cold}',
   'hudChrome.quenchAlert.timeAria': '{seconds}초 남음',
@@ -22726,8 +22697,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '살아 있는 서리로 느려짐: 서리가 치유로 깨지거나 터질 때까지 이동 속도가 {slow}% 느려지고 냉기가 {mult}배 빠르게 오릅니다.',
   'hudChrome.quenchAlert.rimeTitle':
     '살아 있는 서리! 무리에서 벗어나십시오',
-  'hudChrome.quenchAlert.rimeLine':
-    '{seconds}초 안에 치유사가 깨뜨리지 못하면 얼어붙어 {radius}미터 안에 터집니다',
   'hudChrome.quenchAlert.rimeBar':
     '서리 {left} / {whole}',
   'hudChrome.quenchAlert.rimeAria':
@@ -25815,34 +25784,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.finalBoss.shell': '다음에 받는 치유 {value}을(를) 흡수합니다.',
   'hudChrome.auraEffect.finalBoss.crushed':
     '{seconds}초 안에 다음 모루의 무게 아래에 서면 분담 피해를 {mult}배로 받습니다. 다른 조에게 맡기세요.',
-  'hudChrome.finalBoss.warn.enterHeat':
-    '주인 없는 힘이 열기를 마셨다! 주먹과 너울과 회오리를 피하라!',
-  'hudChrome.finalBoss.warn.enterQuench':
-    '주인 없는 힘이 담금질을 마셨다! 뭉쳐라, 아니면 얼어붙는다!',
-  'hudChrome.finalBoss.warn.enterBreath':
-    '주인 없는 힘이 숨결을 마셨다! 흩어져서 바람을 거슬러 가라!',
-  'hudChrome.finalBoss.warn.enterHammer':
-    '주인 없는 힘이 망치를 마셨다! 균열에서 벗어나 모루를 나눠 맞아라!',
-  'hudChrome.finalBoss.warn.burst': '과부하! 힘이 모루를 뚫고 터져 나온다!',
-  'hudChrome.finalBoss.warn.burstHeavy':
-    '과부하! 힘이 모루를 뚫고 터져 나옵니다! 대비하고 치유하세요!',
-  'hudChrome.finalBoss.warn.burstLethal':
-    '과부하! 힘이 모루를 뚫고 터져 나옵니다! 아무도 살아남지 못합니다!',
-  'hudChrome.finalBoss.warn.nearFull':
-    '과부하 막대가 거의 찼습니다! 힘을 다음 구역으로 끌고 가거나, 터지기 전에 공격대를 치유하세요!',
-  'hudChrome.finalBoss.warn.nearFullHeavy':
-    '과부하 막대가 거의 찼습니다! 힘을 다음 구역으로 끌고 가세요: 폭발이 강력합니다, 체력을 채우고 생존기를 쓰세요!',
-  'hudChrome.finalBoss.warn.nearFullLethal':
-    '과부하 막대가 거의 찼습니다! 지금 당장 힘을 다음 구역으로 끌고 가세요: 폭발하면 공격대가 전멸합니다!',
-  'hudChrome.finalBoss.warn.unbound': '중앙에서 힘이 풀려났다! 끌어내라!',
-  'hudChrome.finalBoss.warn.embers':
-    '원거리에게 잉걸불이 떨어진다! 표식을 한 구석에 모은 뒤 빠져라!',
-  'hudChrome.finalBoss.warn.ice': '발밑의 얼음이 신음한다! 깨지기 전에 내려서라!',
-  'hudChrome.finalBoss.warn.wind': '숨결이 강풍을 모은다! 바람을 거슬러 가장자리에서 멀어져라!',
-  'hudChrome.finalBoss.warn.drawn': '끌려오는 번개! 표식이 찍힌 사람은 모두에게서 8미터 떨어져라!',
-  'hudChrome.finalBoss.warn.orbs': '폭풍 구슬! 터지기 전에 한 명씩 밟아라!',
-  'hudChrome.finalBoss.warn.anvil':
-    '모루의 무게! 나눠 맞아라: 짓눌리지 않은 사람은 모두 표식 아래로!',
   'hudChrome.finalOverload.title': '과부하',
   'hudChrome.finalOverload.quench': '담금질',
   'hudChrome.finalOverload.breath': '숨결',
@@ -25869,15 +25810,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.heart_final_splinter_hammer.name': '망치의 파편',
   'hudChrome.auraEffect.finalBoss.phaseCall':
     '네 구역의 부름: 파편이 살아 있는 동안 {seconds}초 동안 중앙에서 보호받습니다. 파편 하나마다 {every}초마다 공격대 전체에 {min}~{max}의 피해를 주며, 파동마다 {rise}%씩 강해집니다. 모두 처치하면 보호막이 일찍 깨집니다. 부름이 끝날 때 살아 있는 파편은 전투가 끝날 때까지 그 원소를 우두머리에게 쏟아붓습니다. 영웅: {heroicMin}에서 {heroicMax}의 피해. 신화: {mythicMin}에서 {mythicMax}의 피해.',
-  'hudChrome.finalBoss.warn.rebirth':
-    '심장이 고동친다! 주인 없는 힘이 네 구역을 들이켜고 다시 일어선다!',
-  'hudChrome.finalBoss.warn.unmade':
-    '세계의 모루가 무너져 내린다! 마지막 돌이 떨어지기 전에 주인 없는 힘을 처치하라!',
-  'hudChrome.finalBoss.warn.crackHeat': '열기의 구역에 금이 간다! 무너지기 전에 벗어나라!',
-  'hudChrome.finalBoss.warn.crackQuench': '담금질의 구역에 금이 간다! 무너지기 전에 벗어나라!',
-  'hudChrome.finalBoss.warn.crackBreath': '숨결의 구역에 금이 간다! 무너지기 전에 벗어나라!',
-  'hudChrome.finalBoss.warn.crackHammer': '망치의 구역에 금이 간다! 무너지기 전에 벗어나라!',
-  'hudChrome.finalBoss.warn.ringCrack': '중앙 고리만 남았고, 그마저 갈라지고 있다! 지금 처치하라!',
   'hudChrome.finalOverload.titleUnmade': '무너지는 모루',
   'hudChrome.finalOverload.kneeling': '무릎을 꿇었다',
   'hudChrome.finalOverload.rising': '심장이 고동친다',
@@ -25912,29 +25844,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.finalBoss.weight':
     '매초 {total}의 물리 피해를 입힙니다(중첩당 {per}). 중첩마다 망치의 파편이 당신을 {step}% 더 세게 칩니다(현재 {harder}%). {seconds}초 동안 지속되며, 탱커는 {swap}중첩에서 교대합니다. 중첩당 받는 피해 증가는 영웅에서 {heroicStep}%, 신화에서 {mythicStep}%입니다.',
   'hudChrome.finalAlert.coalTitle': '터지는 석탄!',
-  'hudChrome.finalAlert.coalLine':
-    '무리를 떠나십시오: {seconds}초 후 {reach}미터 안의 모두에게 터집니다',
   'hudChrome.finalAlert.tetherTitle': '바람에 묶임!',
-  'hudChrome.finalAlert.tetherLine':
-    '숨결의 파편이 당신을 쫓습니다: 무리에서 떼어 놓으십시오({seconds}초)',
   'hudChrome.finalAlert.weightTitle': '쌓이는 무게 x{stacks}',
-  'hudChrome.finalAlert.weightLine': '중첩마다 공격이 더 세집니다: {swap}에서 탱커 교대',
-  'hudChrome.finalBoss.warn.awaken':
-    '네 구역이 모두 깨어났다! 주인 없는 힘이 모든 힘을 한꺼번에 마신다!',
-  'hudChrome.finalBoss.warn.coal':
-    '터지는 석탄! 표식이 찍힌 사람은 터지기 전에 무리 밖으로 옮겨라!',
-  'hudChrome.finalBoss.warn.final': '주인 없는 힘이 모루의 심장부로 걸어 들어간다!',
-  'hudChrome.finalBoss.warn.fury': '주인 없는 분노! 모루를 찢어발긴다: 지금 처치하라!',
-  'hudChrome.finalBoss.warn.furySoon':
-    '주인 없는 힘이 모든 절제를 잃으려 한다! 몰아붙여 쓰러뜨려라!',
-  'hudChrome.finalBoss.warn.intermission':
-    '주인 없는 힘이 중앙에서 힘을 모은다! 파편들이 솟아난다: 부름이 끝나기 전에 처치하라!',
-  'hudChrome.finalBoss.warn.pounce':
-    '돌풍 덮치기! 노려진 사람은 숨결의 파편을 무리 밖으로 끌고 가라!',
-  'hudChrome.finalBoss.warn.poured':
-    '파편들이 주인 없는 힘에게 쏟아져 들어간다! 그 원소들은 끝까지 남는다!',
-  'hudChrome.finalBoss.warn.release': '보호막이 깨졌다! 주인 없는 힘을 중앙에서 끌어내라!',
-  'hudChrome.finalBoss.warn.toll': '서리 종소리! 담금질의 파편을 차단하라!',
   'hudChrome.finalOverload.call': '보호막 {seconds}',
   'hudChrome.finalOverload.enrage': '격노까지 {seconds}',
   'hudChrome.finalOverload.fury': '주인 없는 분노 x{stacks}',
@@ -25944,14 +25855,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finalOverload.striding': '중앙으로 이동 중',
   'hudChrome.finalOverload.titleCall': '네 구역의 부름',
   'hudChrome.finalOverload.titleFinal': '모든 구역 각성',
-  'hudChrome.finalAlert.frozenLine': '{seconds}초 후 풀립니다: 그 뒤 다른 두 명 이상과 함께 서세요',
   'hudChrome.finalAlert.emberTitle': '잉걸불 표식!',
-  'hudChrome.finalAlert.emberLine':
-    '{seconds}초 후 발밑에 잉걸불이 떨어집니다: 표식이 찍힌 다른 사람과 같은 구석으로',
   'hudChrome.finalAlert.drawnTitle': '끌려오는 번개!',
-  'hudChrome.finalAlert.drawnLine': '{seconds}초 동안 모두에게서 {reach}미터 떨어지세요',
   'hudChrome.finalAlert.crushedTitle': '짓눌림',
-  'hudChrome.finalAlert.crushedLine': '다음 모루의 무게에서 빠지세요({seconds}초)',
   'hudChrome.auraEffect.seasonalCosmetic': '외형 전용: 전투에 영향 없음',
   'seasonal.event.gourdlight_eve.name': '고드라이트 축제의 밤',
   'seasonal.trickOrTreat.row': '과자 안 주면 장난칠 거야!',
@@ -26141,19 +26047,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.heart_gale_sentinel.name': '질풍 파수병',
   'entities.mobs.heart_gale_mender.name': '질풍 치유사',
   'hudChrome.knotAlert.aTitle': '당신은 포털 A!',
-  'hudChrome.knotAlert.aLine': '{seconds}초 뒤 발밑에 열립니다. 얽힌 질풍 가까이에 서세요.',
   'hudChrome.knotAlert.bTitle': '당신은 포털 B!',
-  'hudChrome.knotAlert.bLine': '{seconds}초 뒤 발밑에 열립니다. 벼랑 가장자리에 서세요.',
   'hudChrome.knotAlert.cTitle': '당신은 포털 C!',
-  'hudChrome.knotAlert.cLine': '{seconds}초 뒤 발밑에 열립니다. 다른 얽힌 질풍 가까이에 서세요.',
   'hudChrome.knotAlert.dTitle': '당신은 포털 D!',
-  'hudChrome.knotAlert.dLine':
-    '{seconds}초 뒤 발밑에 열립니다. 포털 B에서 떨어진 가장자리에 서세요.',
   'hudChrome.knotAlert.carryTitle': '얽힌 질풍을 나르는 중!',
-  'hudChrome.knotAlert.carryLine':
-    '각 포털은 짝으로 데려갑니다: A에서 B, C에서 D. 벼랑 가장자리에서 던지세요. {seconds}초 뒤 터집니다.',
   'hudChrome.knotAlert.lipTitle': '지금 던지세요!',
-  'hudChrome.knotAlert.lipLine': '가장자리에 서 있습니다. {seconds}초 뒤 터집니다.',
   'hudChrome.knotAlert.throwKey': '가장자리에서 {key}를 눌러 던지기',
   'hudChrome.knotAlert.throwTap': '가장자리에서 여기를 탭해 던지기',
   'hudChrome.knotAlert.throwClick': '가장자리에서 여기를 클릭해 던지기',

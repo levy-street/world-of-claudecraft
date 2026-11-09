@@ -24690,18 +24690,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'За вами гонится Катящийся уголь или Огнесемя. Если Катящийся уголь настигнет вас, вы погибнете, а все в пределах {radius} м сгорят: держитесь подальше и пусть союзники бьют его, каждый удар отбрасывает его на {knock} м (после этого {crust} сек его не отбросить).',
   'hudChrome.auraEffect.heatGuardian.crust':
     'Остыл до твёрдости: пока эффект не закончится, удары не отбрасывают его.',
-  'hudChrome.heatGuardian.warn.overflow':
-    'Страж погружается, и Очаг переполняется! Уворачивайтесь от огненных рек!',
-  'hudChrome.heatGuardian.warn.wellspawn':
-    'Порождения источника выбираются наружу! Замедлите и убейте их, пока они не дошли до источника!',
-  'hudChrome.heatGuardian.warn.keepers':
-    'Из источника поднимаются Хранители! Держите их на танках и уводите их метки подальше от Порождений!',
-  'hudChrome.heatGuardian.warn.seeds': 'Падают Семена Очага! Бросьте их вместе и бегите!',
-  'hudChrome.heatGuardian.warn.zones':
-    'Пробуждённый огонь! Очаг загорается кольцо за кольцом: уходите!',
-  'hudChrome.heatGuardian.warn.cinder':
-    'Падает Катящийся уголь! Отбейте его, пока он не настиг свою жертву!',
-  'hudChrome.heatGuardian.warn.wheel': 'Очаг поворачивается! Встаньте на тёмный сектор!',
   'hudChrome.heatGuardian.say.fist': 'Встаньте там, куда падает камень, и станьте его частью.',
   'hudChrome.heatGuardian.say.sink': 'Источник поднимается вам навстречу!',
   'hudChrome.heatGuardian.say.sinkAgain': 'Снова Очаг переполняется. Снова вы горите.',
@@ -24722,15 +24710,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.heart_seam_bolt': 'Стрела жилы',
   'abilityUi.cast.heart_song_of_the_seam': 'Песнь жилы',
   'hudChrome.council.alert.wakeTitle': 'Пробуждение камня!',
-  'hudChrome.council.alert.wakeLine':
-    'Колонна поднимется там, где вы стоите: перейдите туда, где рейду нужно укрытие',
   'hudChrome.council.alert.rockTitle': 'Камнепад!',
-  'hudChrome.council.alert.rockLine':
-    'Соберите рядом с собой хотя бы трёх союзников, подальше от колонн',
   'hudChrome.council.alert.resonanceTitle': 'Резонанс',
   'hudChrome.council.alert.weightTitle': 'Тяжесть Молота',
-  'hudChrome.council.alert.weightLine':
-    'Вы получаете двойной физический урон: другой танк должен забрать Стража',
   'hudChrome.council.alert.timeAria': 'Осталось {seconds} с',
   'hudChrome.auraEffect.council.wakeMark':
     'Когда эффект закончится, из пола под вами вырвется колонна: от {min} до {max} урона всем в пределах {radius} м и отбрасывание. Встаньте там, где рейду нужно укрытие. Героический и мифический режимы: от {heroicMin} до {heroicMax} урона.',
@@ -24741,8 +24723,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   // The Hammer Council's mythic, Soul in the Stone (M16 fills).
   'abilityUi.cast.heart_echo_of_wrath': 'Эхо гнева',
   'abilityUi.cast.heart_endless_song': 'Бесконечная песнь',
-  'hudChrome.council.alert.rockLineSoul':
-    'Соберите рядом хотя бы трёх союзников, подальше от укрытий и у колонны души',
   'hudChrome.council.say.guardian_pull':
     'Чужаки в Каменоломне. Сила Молота не склонится перед плотью.',
   'hudChrome.council.say.guardian_wrath': 'Гора отвечает мне! Прячьтесь, если камень вас примет!',
@@ -24773,11 +24753,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.council.collapse':
     'Каменоломня обрушивается: каждые {every} с вы получаете от {min} до {max} урона за каждый заряд, и каждый раз добавляется новый заряд. Эффект закончится, когда Проклятая колонна разрушится.',
   'hudChrome.auraEffect.council.pillarLimit': 'Каждая колонна защищает от Гнева горы не больше {limit} игроков. Если за ней больше, каждый из них получает {share}% удара. Тот, кто не укрылся, получает от {min} до {max} урона в обычном режиме, от {heroicMin} до {heroicMax} в героическом и от {mythicMin} до {mythicMax} в мифическом.',
-  'hudChrome.council.alert.resonanceLine':
-    'Вы раните всех союзников рядом: отойдите от группы, пока эффект не закончится',
   'hudChrome.council.alert.rushTitle': 'Натиск горы!',
-  'hudChrome.council.alert.rushLine':
-    'Страж бросится на вас: поставьте Проклятую колонну между собой и ним',
   'hudChrome.council.say.guardian_rush': 'Что ж, стойте у меня на пути. Гора не сворачивает.',
   'hudChrome.council.say.singer_wake': 'Проснись, спящий камень. Восстань там, где они стоят!',
   'hudChrome.council.say.singer_rock': 'Посмотрите наверх, малыши! Гора падает!',
@@ -24851,8 +24827,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Вы номер {order} из {count}: клинок полетит вдоль линии через вас. Уведите линию от рейда. Она фиксируется за {lock} сек. до вылета клинка, тогда и сойдите с неё, иначе получите от {min} до {max} ед. урона от магии льда и {cold} холода. Героический и мифический режимы: от {heroicMin} до {heroicMax} урона.',
   'hudChrome.quenchAlert.markedTitle':
     'За вами охотится клинок! ({order} из {count})',
-  'hudChrome.quenchAlert.markedLine':
-    'Уведите линию от рейда и сойдите с неё, когда она зафиксируется.',
   'abilityUi.cast.heart_quench_blades_hunt':
     'Охота клинков',
   'hudChrome.quenchGuardian.say.flurry':
@@ -24879,8 +24853,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Вас задел разлетевшийся лёд союзника: +{cold} холода. Вернитесь в группу, пока ваша шкала не заполнилась.',
   'hudChrome.quenchAlert.splashTitle':
     'Брызги изморози! +{cold} холода',
-  'hudChrome.quenchAlert.immuneLine':
-    'Неуязвимость не спасает от холода: держитесь вместе',
   'hudChrome.auraEffect.quenchGuardian.trapped':
     'Вы провалились сквозь лёд в ледяную воду: вы не можете двигаться, каждую секунду получаете от {min} до {max} ед. урона от магии льда, и ваш холод растёт. Через {seconds} сек вы выбираетесь на край. Сама вода никогда не убивает. Героический и мифический режимы: от {heroicMin} до {heroicMax} урона.',
   'hudChrome.auraEffect.quenchGuardian.awake':
@@ -24894,12 +24866,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.quenchAlert.warmTitle': 'Тепло группы',
   'hudChrome.quenchAlert.frozenTitle': 'Скован инеем!',
   'hudChrome.quenchAlert.waterTitle': 'Подо льдом!',
-  'hudChrome.quenchAlert.coldLine':
-    'Встаньте в пределах {radius} м от {others} или больше других игроков, чтобы согреться',
-  'hudChrome.quenchAlert.warmLine':
-    'Холод спадает. Сдвиньте группу в течение {seconds} сек, иначе лёд треснет',
-  'hudChrome.quenchAlert.frozenLine': 'Лёд разлетится через {seconds} сек: всем рядом отойти',
-  'hudChrome.quenchAlert.waterLine': 'Выберетесь через {seconds} сек',
   'hudChrome.quenchAlert.coldBar': 'Холод {cold} / {max}',
   'hudChrome.quenchAlert.coldAria': 'Холод {cold} из {max}',
   'hudChrome.quenchAlert.timeAria': 'Осталось {seconds} сек',
@@ -24911,8 +24877,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Замедление Живой изморози: вы двигаетесь на {slow}% медленнее, а холод растёт в {mult} раза быстрее, пока корку не пробьют исцелением или она не вырвется.',
   'hudChrome.quenchAlert.rimeTitle':
     'Живая изморозь! Отойдите от группы',
-  'hudChrome.quenchAlert.rimeLine':
-    'Лекарям нужно пробить её за {seconds} сек., иначе вы замёрзнете и холод вырвется на {radius} м',
   'hudChrome.quenchAlert.rimeBar':
     'Изморозь {left} / {whole}',
   'hudChrome.quenchAlert.rimeAria':
@@ -26253,23 +26217,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.finalBoss.drawn': 'Каждую секунду в течение {seconds} с молния бьёт от вас во всех других игроков в пределах {reach} м, нанося каждому от {min} до {max} ед. урона от сил природы. Держитесь в {reach} м от всех. Героический режим: от {heroicMin} до {heroicMax} урона. Мифический режим: от {mythicMin} до {mythicMax} урона.',
   'hudChrome.auraEffect.finalBoss.shell': 'Поглощает следующие {value} ед. исцеления, которые вы получите.',
   'hudChrome.auraEffect.finalBoss.crushed': 'Если в ближайшие {seconds} с вы встанете под следующую Тяжесть наковальни, ваша доля урона будет в {mult} раза больше. Пусть её примет другая группа.',
-  'hudChrome.finalBoss.warn.enterHeat': 'Сила без хозяина пьёт Жар! Уходите от кулака, валов и вихрей!',
-  'hudChrome.finalBoss.warn.enterQuench': 'Сила без хозяина пьёт Закалку! Держитесь вместе, иначе замёрзнете!',
-  'hudChrome.finalBoss.warn.enterBreath': 'Сила без хозяина пьёт Дыхание! Разойдитесь и идите против ветра!',
-  'hudChrome.finalBoss.warn.enterHammer': 'Сила без хозяина пьёт Молот! Выйдите из трещин и разделите наковальню!',
-  'hudChrome.finalBoss.warn.burst': 'Перегрузка! Сила прорывается сквозь наковальню!',
-  'hudChrome.finalBoss.warn.burstHeavy': 'Перегрузка! Сила прорывается сквозь Наковальню! Держитесь и лечите!',
-  'hudChrome.finalBoss.warn.burstLethal': 'Перегрузка! Сила прорывается сквозь Наковальню! Этого не пережить!',
-  'hudChrome.finalBoss.warn.nearFull': 'Шкала перегрузки почти полна! Тащите Силу дальше или подлечите рейд до взрыва!',
-  'hudChrome.finalBoss.warn.nearFullHeavy': 'Шкала перегрузки почти полна! Тащите Силу дальше: взрыв бьёт тяжело, подлечитесь и используйте защиту!',
-  'hudChrome.finalBoss.warn.nearFullLethal': 'Шкала перегрузки почти полна! Тащите Силу дальше немедленно: взрыв убьёт весь рейд!',
-  'hudChrome.finalBoss.warn.unbound': 'Сила освобождается в центре! Выводите её!',
-  'hudChrome.finalBoss.warn.embers': 'Угли падают на бойцов дальнего боя! Сведите метки в один угол и уходите!',
-  'hudChrome.finalBoss.warn.ice': 'Лёд стонет под вами! Сойдите, пока он не треснул!',
-  'hudChrome.finalBoss.warn.wind': 'Дыхание собирает бурю! Идите против ветра, прочь от края!',
-  'hudChrome.finalBoss.warn.drawn': 'Притянутая молния! Отмеченные, держитесь в 8 м от всех!',
-  'hudChrome.finalBoss.warn.orbs': 'Грозовые сферы! По одному игроку на каждую, пока она не взорвалась!',
-  'hudChrome.finalBoss.warn.anvil': 'Тяжесть наковальни! Разделите её: все, кто не раздавлен, под метку!',
   'hudChrome.finalOverload.title': 'Перегрузка',
   'hudChrome.finalOverload.quench': 'Закалка',
   'hudChrome.finalOverload.breath': 'Дыхание',
@@ -26294,13 +26241,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.heart_final_splinter_breath.name': 'Осколок Дыхания',
   'entities.mobs.heart_final_splinter_hammer.name': 'Осколок Молота',
   'hudChrome.auraEffect.finalBoss.phaseCall': 'Зов четвертей: пока живы его осколки, он {seconds} с стоит в центре под щитом. Каждый осколок каждые {every} с наносит всему рейду от {min} до {max} ед. урона, с каждым импульсом на {rise}% больше. Убейте их всех, чтобы разбить щит раньше; осколок, живой к концу зова, вливает свою стихию в босса до конца боя. Героический режим: от {heroicMin} до {heroicMax} урона. Мифический режим: от {mythicMin} до {mythicMax} урона.',
-  'hudChrome.finalBoss.warn.rebirth': "Сердце бьётся! Сила без хозяина выпивает четыре четверти и восстаёт вновь!",
-  'hudChrome.finalBoss.warn.unmade': "Наковальня мира рассыпается! Убейте Силу без хозяина, пока не упал последний камень!",
-  'hudChrome.finalBoss.warn.crackHeat': "Четверть Жара трескается! Уходите с неё, пока она не рухнула!",
-  'hudChrome.finalBoss.warn.crackQuench': "Четверть Закалки трескается! Уходите с неё, пока она не рухнула!",
-  'hudChrome.finalBoss.warn.crackBreath': "Четверть Дыхания трескается! Уходите с неё, пока она не рухнула!",
-  'hudChrome.finalBoss.warn.crackHammer': "Четверть Молота трескается! Уходите с неё, пока она не рухнула!",
-  'hudChrome.finalBoss.warn.ringCrack': "Осталось лишь центральное кольцо, и оно трескается! Убейте его сейчас!",
   'hudChrome.finalOverload.titleUnmade': "Рушащаяся Наковальня",
   'hudChrome.finalOverload.kneeling': "Преклонил колени",
   'hudChrome.finalOverload.rising': "Сердце бьётся",
@@ -26322,21 +26262,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.finalBoss.chill': 'Скорость передвижения снижена на {pct}% на {seconds} с: вы пересекли Кольцо закалки вне его просветов.',
   'hudChrome.auraEffect.finalBoss.weight': 'Наносит {total} ед. физического урона в секунду ({per} за заряд). Каждый заряд заставляет Осколок Молота бить вас на {step}% сильнее (сейчас на {harder}%). Длится {seconds} с; танки меняются на {swap} зарядах. Каждый заряд усиливает удары на {heroicStep}% в героическом режиме и на {mythicStep}% в мифическом.',
   'hudChrome.finalAlert.coalTitle': 'Взрывной уголь!',
-  'hudChrome.finalAlert.coalLine': 'Отойдите от группы: через {seconds} с он взорвётся на всех в пределах {reach} м',
   'hudChrome.finalAlert.tetherTitle': 'Привязан ветром!',
-  'hudChrome.finalAlert.tetherLine': 'Осколок Дыхания охотится на вас: уведите его от группы ({seconds} с)',
   'hudChrome.finalAlert.weightTitle': 'Нарастающая тяжесть x{stacks}',
-  'hudChrome.finalAlert.weightLine': 'С каждым зарядом его удары сильнее: смена танков на {swap}',
-  'hudChrome.finalBoss.warn.awaken': 'Пробудились все четыре четверти! Сила без хозяина пьёт все силы сразу!',
-  'hudChrome.finalBoss.warn.coal': 'Взрывной уголь! Отмеченные уносят его из группы, пока он не взорвался!',
-  'hudChrome.finalBoss.warn.final': 'Сила без хозяина шагает в самое сердце Наковальни!',
-  'hudChrome.finalBoss.warn.fury': 'Ярость без хозяина! Она разрывает Наковальню: убейте её сейчас!',
-  'hudChrome.finalBoss.warn.furySoon': 'Сила без хозяина вот-вот потеряет всякую сдержанность! Добивайте!',
-  'hudChrome.finalBoss.warn.intermission': 'Сила без хозяина собирает мощь в центре! Поднимаются её осколки: убейте их, пока не кончился зов!',
-  'hudChrome.finalBoss.warn.pounce': 'Прыжок шквала! Его добыча уводит Осколок Дыхания от группы!',
-  'hudChrome.finalBoss.warn.poured': 'Осколки вливаются в Силу без хозяина! Их стихии останутся с ней до конца!',
-  'hudChrome.finalBoss.warn.release': 'Щит разбит! Выводите Силу без хозяина из центра!',
-  'hudChrome.finalBoss.warn.toll': 'Звон инея! Прервите Осколок Закалки!',
   'hudChrome.finalOverload.call': 'Щит {seconds}',
   'hudChrome.finalOverload.enrage': 'Ярость через {seconds}',
   'hudChrome.finalOverload.fury': 'Ярость без хозяина x{stacks}',
@@ -26346,13 +26273,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finalOverload.striding': 'Идёт в центр',
   'hudChrome.finalOverload.titleCall': 'Зов четвертей',
   'hudChrome.finalOverload.titleFinal': 'Все четверти пробуждены',
-  'hudChrome.finalAlert.frozenLine': 'Свобода через {seconds} с: затем встаньте с двумя или более другими',
   'hudChrome.finalAlert.emberTitle': 'Метка углей!',
-  'hudChrome.finalAlert.emberLine': 'Угли упадут вам под ноги через {seconds} с: идите в угол к другим отмеченным',
   'hudChrome.finalAlert.drawnTitle': 'Притянутая молния!',
-  'hudChrome.finalAlert.drawnLine': 'Держитесь в {reach} м от всех ещё {seconds} с',
   'hudChrome.finalAlert.crushedTitle': 'Раздавлен',
-  'hudChrome.finalAlert.crushedLine': 'Не вставайте под следующую Тяжесть наковальни ({seconds} с)',
   'hudChrome.auraEffect.seasonalCosmetic': 'Только внешний вид: на бой не влияет',
   'seasonal.event.gourdlight_eve.name': 'Ночь Тыквенных Огней',
   'seasonal.trickOrTreat.row': 'Сладость или гадость!',
@@ -26545,17 +26468,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.heart_gale_sentinel.name': 'Часовой шквала',
   'entities.mobs.heart_gale_mender.name': 'Целитель шквала',
   'hudChrome.knotAlert.aTitle': 'Вы Портал A!',
-  'hudChrome.knotAlert.aLine': 'Он откроется у ваших ног через {seconds} сек. Встаньте рядом с Узлом бури.',
   'hudChrome.knotAlert.bTitle': 'Вы Портал B!',
-  'hudChrome.knotAlert.bLine': 'Он откроется у ваших ног через {seconds} сек. Встаньте у края Карниза.',
   'hudChrome.knotAlert.cTitle': 'Вы Портал C!',
-  'hudChrome.knotAlert.cLine': 'Он откроется у ваших ног через {seconds} сек. Встаньте рядом со вторым Узлом бури.',
   'hudChrome.knotAlert.dTitle': 'Вы Портал D!',
-  'hudChrome.knotAlert.dLine': 'Он откроется у ваших ног через {seconds} сек. Встаньте у края, подальше от Портала B.',
   'hudChrome.knotAlert.carryTitle': 'Вы несёте Узел бури!',
-  'hudChrome.knotAlert.carryLine': 'Каждый портал переносит к своей паре: из A в B, из C в D. Бросьте его с края Карниза. Он взорвётся через {seconds} сек.',
   'hudChrome.knotAlert.lipTitle': 'Бросайте сейчас!',
-  'hudChrome.knotAlert.lipLine': 'Вы стоите у края. Взрыв через {seconds} сек.',
   'hudChrome.knotAlert.throwKey': 'Нажмите {key} у края, чтобы бросить',
   'hudChrome.knotAlert.throwTap': 'Коснитесь здесь у края, чтобы бросить',
   'hudChrome.knotAlert.throwClick': 'Щёлкните здесь у края, чтобы бросить',

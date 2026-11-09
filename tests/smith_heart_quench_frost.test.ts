@@ -487,18 +487,21 @@ describe('Quench frost pass: dev verbs and the own alert', () => {
     expect(f.dev('/dev heart quench splash', f.players[5].id)).toBe(true);
   });
 
-  it("the player's own alert says the splash and that an immunity does not stop the cold", () => {
+  it("the player's own alert says the splash; an immunity leaves the bar as it is", () => {
     const base = [{ id: QUENCH_AURAS.cold, value: 40, value2: 1 }];
     const plain = buildQuenchAlertView({ auras: base });
     const splashed = buildQuenchAlertView({
       auras: [...base, { id: QUENCH_AURAS.splashed, value: 35, value2: 9 }],
     });
-    const sealed = buildQuenchAlertView({ auras: [...base, { id: 'ice_block', kind: 'stasis' }] });
+    const sealed = buildQuenchAlertView({ auras: [...base, { id: 'ice_block' }] });
     if (!plain.visible || !splashed.visible || !sealed.visible) throw new Error('hidden');
     expect(splashed.title).toBe(t('hudChrome.quenchAlert.splashTitle', { cold: '35' }));
     expect(splashed.title).toContain('35');
-    expect(sealed.line).toBe(t('hudChrome.quenchAlert.immuneLine'));
-    expect(plain.line).not.toBe(sealed.line);
+    // No sentence under the bar (the owner's rule of 2026-11-03, kept on
+    // 2026-11-09): that an immunity does not stop the cold is the cold
+    // aura's tooltip; the bar keeps its number.
+    expect(sealed.line).toBe('');
+    expect(sealed.barLabel).toBe(plain.barLabel);
   });
 
   it('the tooltips say the new rules with the live numbers', () => {

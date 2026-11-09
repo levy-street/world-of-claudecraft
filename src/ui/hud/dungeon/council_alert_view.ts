@@ -1,19 +1,16 @@
 // The Smith's Heart's Hammer Council alert: the pure, DOM-free view core. It
-// tells the local player what a council mark asks of them, read off the auras
-// the sim already mirrors (encounters/smith_heart/council*.ts):
-//  - Falling Rock on you: gather three or more, away from the pillars;
-//  - Wake the Stone on you: a pillar rises where you stand, so stand where the
-//    cover should go;
-//  - Mountain's Rush on you: lead the charge into the cursed pillar;
-//  - Hammer's Weight (a tank): the other tank takes the Guardian;
-//  - Resonance (a spread): move away from the group until it ends;
-//  - Mythic, while a soul pillar stands: the rock line says its second duty
-//    (break its soul pips).
-// Every bar is the mark's own time left. Priority: the Rush over the rock
-// over the wake over the Weight over Resonance. The painter is the shared encounter alert's
+// tells the local player which council mark is on them, read off the auras
+// the sim already mirrors (encounters/smith_heart/council*.ts): Mountain's
+// Rush, Falling Rock, Wake the Stone, Hammer's Weight or Resonance. Each is a
+// short title over the mark's own time left (the bar and its seconds), with
+// no sentence under it: what a mark asks lives in its aura tooltip and the
+// boss journal, and the world shows the rest (the owner's rule of 2026-11-03,
+// kept again on 2026-11-09: as little text in the fight as it can bear).
+// Priority: the Rush over the rock over the wake over the Weight over
+// Resonance. The painter is the shared encounter alert's
 // (encounter_alert_painter.ts); every decision is here.
 
-import { COUNCIL_AURAS, councilSoulOf } from '../../../sim/encounters/smith_heart/council_ids';
+import { COUNCIL_AURAS } from '../../../sim/encounters/smith_heart/council_ids';
 import { formatNumber, t } from '../../i18n';
 import type { EncounterAlertHidden, EncounterAlertLive } from './encounter_alert_view';
 
@@ -43,9 +40,6 @@ interface AlertAura {
 
 export interface CouncilAlertInput {
   auras: readonly AlertAura[];
-  /** Mythic: does a soul pillar stand (asked only while a rock mark is on
-   *  the player), and is this entity one? */
-  soul?: { stands(): boolean; is(id: number): boolean };
 }
 
 function auraOf(auras: readonly AlertAura[], id: string): AlertAura | null {
@@ -58,12 +52,7 @@ function timeLeft(a: AlertAura): number {
   return Math.max(0, Math.min(1, a.remaining / a.duration));
 }
 
-function live(
-  kind: CouncilAlertKind,
-  title: string,
-  line: string,
-  mark: AlertAura,
-): CouncilAlertLive {
+function live(kind: CouncilAlertKind, title: string, mark: AlertAura): CouncilAlertLive {
   const seconds = formatNumber(Math.max(0, Math.ceil(mark.remaining ?? 0)), {
     maximumFractionDigits: 0,
   });
@@ -71,96 +60,27 @@ function live(
     visible: true,
     kind,
     title,
-    line,
+    line: '',
     hint: '',
     key: '',
     progress: timeLeft(mark),
     progressAria: t('hudChrome.council.alert.timeAria', { seconds }),
+    barLabel: t('hudChrome.quenchAlert.secondsBar', { seconds }),
     pressable: false,
     buttonAria: title,
   };
 }
 
-/** The world as the soul scan reads it. */
-export interface CouncilSoulWorld {
-  entities: ReadonlyMap<number, { kind?: string; templateId: string }>;
-}
-
-/** Mythic's soul pillars as the alert asks about them: set to the frame's
- *  world, scanned at most once a frame and only when asked (while a rock or a
- *  Resonance mark is on the player). Allocates nothing per frame. */
-export class CouncilSoulScan {
-  private world: CouncilSoulWorld | null = null;
-  private cached: boolean | null = null;
-
-  /** This frame's world (the cached answer forgets the last frame's). */
-  frame(world: CouncilSoulWorld | null | undefined): this {
-    this.world = world ?? null;
-    this.cached = null;
-    return this;
-  }
-
-  stands(): boolean {
-    if (this.cached !== null) return this.cached;
-    let found = false;
-    if (this.world)
-      for (const e of this.world.entities.values())
-        if (e.kind === 'object' && councilSoulOf(e.templateId)) {
-          found = true;
-          break;
-        }
-    this.cached = found;
-    return found;
-  }
-
-  is(id: number): boolean {
-    const e = this.world?.entities.get(id);
-    return !!e && e.kind === 'object' && councilSoulOf(e.templateId) !== null;
-  }
-}
-
 export function buildCouncilAlertView(input: CouncilAlertInput): CouncilAlertView {
   const rush = auraOf(input.auras, COUNCIL_AURAS.rushMark);
-  if (rush)
-    return live(
-      'rush',
-      t('hudChrome.council.alert.rushTitle'),
-      t('hudChrome.council.alert.rushLine'),
-      rush,
-    );
+  if (rush) return live('rush', t('hudChrome.council.alert.rushTitle'), rush);
   const rock = auraOf(input.auras, COUNCIL_AURAS.rockMark);
-  if (rock)
-    return live(
-      'rock',
-      t('hudChrome.council.alert.rockTitle'),
-      input.soul?.stands()
-        ? t('hudChrome.council.alert.rockLineSoul')
-        : t('hudChrome.council.alert.rockLine'),
-      rock,
-    );
+  if (rock) return live('rock', t('hudChrome.council.alert.rockTitle'), rock);
   const wake = auraOf(input.auras, COUNCIL_AURAS.wakeMark);
-  if (wake)
-    return live(
-      'wake',
-      t('hudChrome.council.alert.wakeTitle'),
-      t('hudChrome.council.alert.wakeLine'),
-      wake,
-    );
+  if (wake) return live('wake', t('hudChrome.council.alert.wakeTitle'), wake);
   const weight = auraOf(input.auras, COUNCIL_AURAS.weight);
-  if (weight)
-    return live(
-      'weight',
-      t('hudChrome.council.alert.weightTitle'),
-      t('hudChrome.council.alert.weightLine'),
-      weight,
-    );
+  if (weight) return live('weight', t('hudChrome.council.alert.weightTitle'), weight);
   const res = auraOf(input.auras, COUNCIL_AURAS.resonance);
-  if (res)
-    return live(
-      'resonance',
-      t('hudChrome.council.alert.resonanceTitle'),
-      t('hudChrome.council.alert.resonanceLine'),
-      res,
-    );
+  if (res) return live('resonance', t('hudChrome.council.alert.resonanceTitle'), res);
   return HIDDEN;
 }
