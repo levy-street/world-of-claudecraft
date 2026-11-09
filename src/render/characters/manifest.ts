@@ -4258,7 +4258,11 @@ export const VISUALS: Record<string, VisualDef> = {
   // the drawn height and the template's scale of 2.04. The template chases at 4.2 yd/s, which
   // Run covers at about 1.35x, so the gait lets Run in below the default threshold: that speed
   // would otherwise play Walk, whose rate cap cannot reach it. Death kneels, then topples, also
-  // at 1x. Height is the measured mid-idle height.
+  // at 1x. Height is the measured mid-idle height. It is dormant until the raid reaches it
+  // (src/sim/mob/dormant.ts): Sleep holds the heap of rock that Awaken stands up from (the loop
+  // starts and ends on Awaken's first frame), and Awaken plays once on the asleep-to-awake edge
+  // at 1x, as long as the sim holds its AI. No flourish: it revives asleep, so a respawn goes
+  // straight back to the heap, and standing up belongs to the wake edge alone.
   smith_heart_hammer_warder: {
     url: `${CREATURES}/heart_hammer_warder.glb`,
     height: 2.17,
@@ -4276,7 +4280,8 @@ export const VISUALS: Record<string, VisualDef> = {
       contacts: { Attack: [1.0], Attack2: [1.0], Cleave: [1.0] },
       hit: ['Hit', 'Hit2'],
       death: 'Death',
-      flourish: 'Awaken',
+      sleep: 'Sleep',
+      wake: 'Awaken',
     },
     attackTimeScale: 1,
     deathTimeScale: 1,

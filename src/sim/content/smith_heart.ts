@@ -252,6 +252,11 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
     // Slow stone: the pace its drawn run keeps its feet on the floor at
     // (tests/smith_heart_hammer_warder_body.test.ts).
     moveSpeed: 4.2,
+    // Dormant until the raid reaches it (mob/dormant.ts): a heap of stone on its landing
+    // that stands up over its Awaken clip (3.42 s, settled at 3.25) when a player comes
+    // within its aggro radius, strikes it or pulls its pack, taking 95 percent less damage
+    // until it is up.
+    dormant: { riseSeconds: 3.4, ward: 0.95, auraName: 'Dormant' },
   },
   heart_ring_warder: warder('heart_ring_warder', 'Ring Forge Warder', 'Forge Sweep', 0x6a6460, 1.8),
   heart_breath_warder: warder(

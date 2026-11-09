@@ -32,6 +32,7 @@ import {
   type TrashKitDef,
   type TrashKitState,
 } from '../../types';
+import { dormantHold } from '../dormant_state';
 import { packPeerRank, packStaggerOffset } from '../pack_cast_stagger';
 import { BASTION_KIT_EXTENSION } from './bastion_extension';
 import {
@@ -1019,10 +1020,12 @@ function stepMob(
   if (!kit && mob.perchY === undefined) return;
   // A freed prisoner (bastion_kit.ts) kneels out of the fight, then leaves.
   if (stepUnshackle(ctx, inst, mob, kit)) return;
+  // A dormant mob's kit waits for it to stand up (mob/dormant.ts holds the AI until then).
   const engaged =
     mob.inCombat &&
     mob.aggroTargetId !== null &&
-    (mob.aiState === 'chase' || mob.aiState === 'attack');
+    (mob.aiState === 'chase' || mob.aiState === 'attack') &&
+    !dormantHold(mob);
   if (!engaged || !kit) {
     if (mob.trashKit) endPull(ctx, inst, mob);
     // A split half that outlived its pull gets its pool and size back.

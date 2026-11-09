@@ -2392,6 +2392,24 @@ export interface MobTemplate {
     snapToBed?: boolean;
   };
   /**
+   * Dormant: the mob is born asleep and lies where it spawned until something wakes it
+   * (mob/dormant.ts): a hostile player inside its aggro radius, a blow, or a pull through
+   * its pack. Asleep it stays hostile and attackable (unlike a slumbering boss), wearing a
+   * ward that stops `ward` of every blow, shown on its frame as `auraName`. Woken, it stands
+   * up for `riseSeconds` with its AI held and the ward still on (the renderer plays
+   * ClipMap.wake on the asleep-to-awake edge, so the hold is that clip's length and no step
+   * skates the pose), then the ward lifts and it fights. An evade home puts it back to
+   * sleep. Inert for every mob without it; draws no rng.
+   */
+  dormant?: {
+    /** Seconds the body takes to stand up: the AI is held and the ward stays on. */
+    riseSeconds: number;
+    /** The share of every blow the ward stops, asleep and rising (0.95: 95 percent). */
+    ward: number;
+    /** The ward's name on the frame (localized client-side, sim_i18n.ts). */
+    auraName: string;
+  };
+  /**
    * Seconds of spacing between this mob's boss mechanics, and the opt-in that turns
    * its instant AoEs (`aoePulse`, `stomp`) into TELEGRAPHED ones: a ground ring drawn
    * at the true blast radius, a windup, then the blast measured from the ring's centre
@@ -8634,11 +8652,15 @@ export interface Entity extends ClientMirroredEntityFields {
   warpathPhase?: 'focus' | 'travel' | 'wreck';
   warpathTimer?: number;
   // Slumber state (mob/slumber.ts): true while a `slumber` template sleeps through the
-  // night. Only ever defined on such a mob (the same defined-vs-undefined discipline as
-  // the warpath fields), mirrored to clients so the rig can lie down and wake with him.
+  // night, and while a `dormant` template lies waiting to be woken (mob/dormant.ts). Only
+  // ever defined on such a mob (the same defined-vs-undefined discipline as the warpath
+  // fields), mirrored to clients so the rig can lie down and wake with him.
   asleep?: boolean;
   /** Seconds left in the dawn rise (mob/slumber.ts): the AI is held while it runs. */
   slumberRise?: number;
+  /** Seconds left standing up after a `dormant` template is woken (mob/dormant.ts): the
+   *  AI is held and the ward stays on while it runs. Defined only on such a mob. */
+  dormantRise?: number;
   /** A /dev wake or sleep holding him against the clock until it agrees (mob/slumber.ts). */
   slumberDevHold?: 'awake' | 'asleep';
   /** The facing a `slumber.snapToBed` sleeper is laid down with (his spawn's), so a body

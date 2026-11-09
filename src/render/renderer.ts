@@ -10571,7 +10571,7 @@ export class Renderer {
       applyLocoDirection(st, loco, ghostWolf);
       st.dead = visuallyDead;
       st.casting = characterCasting;
-      st.asleep = e.asleep === true; // in bed (mob/slumber.ts): the sleep loop holds
+      st.asleep = heldUntilCollapse(deathHeld, e.asleep === true && !visuallyDead, active.sleeping);
       // Which ability, so the pose layer can tell a drawn shot from a pet
       // utility cast (tame_beast is a 6s cast; a bow must not sit aimed for it).
       st.castingAbility = characterCasting ? (e.castingAbility ?? null) : null;

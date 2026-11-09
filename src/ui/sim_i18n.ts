@@ -1616,6 +1616,8 @@ const baseEnTable = {
   'aura.heartNarrowShelter': 'Narrow Shelter',
   'aura.heartBondOfTheStone': 'Bond of the Stone',
   'aura.heartShatteredCharge': 'Shattered Charge',
+  // The Hammer Vein Warder's ward while it lies dormant and stands up (mob/dormant.ts).
+  'aura.heartDormant': 'Dormant',
   // The Guardian of the Breath (encounters/smith_heart/breath_ids.ts
   // BREATH_NAMES): its damage and aura names. EXACT through the mechanic
   // reverse map (Bellows Gust keeps its key; Charged Ground shares the Buried
@@ -27154,6 +27156,7 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Narrow Shelter': 'aura.heartNarrowShelter',
   'Bond of the Stone': 'aura.heartBondOfTheStone',
   'Shattered Charge': 'aura.heartShatteredCharge',
+  Dormant: 'aura.heartDormant',
   'Bellows Wind': 'aura.heartBellowsWind',
   'Indrawn Breath': 'aura.heartIndrawnBreath',
   'Pressed to the Rim': 'mechanic.heartPressedToTheRim',

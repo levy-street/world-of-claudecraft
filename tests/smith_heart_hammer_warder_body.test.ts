@@ -72,9 +72,30 @@ describe('the Hammer Vein Warder body', () => {
       ...(clips.hit ?? []),
       clips.death,
       clips.flourish,
+      clips.sleep,
+      clips.wake,
     ].filter((c): c is string => typeof c === 'string');
-    expect(named.length).toBe(14);
+    // 15: no flourish, because a dormant body revives asleep and stands up on the wake edge.
+    expect(clips.flourish).toBeUndefined();
+    expect(named.length).toBe(15);
     for (const clip of named) expect(shipped.has(clip), clip).toBe(true);
+  });
+
+  it('lies dormant on its sleep loop and stands up over the whole rise the sim holds', () => {
+    // src/sim/mob/dormant.ts: asleep the rig holds Sleep (the 'sleep' base state outranks
+    // every other); the wake one-shot plays Awaken at 1x on the edge, and the sim holds the
+    // AI for riseSeconds, so the body is settled (3.25 s into Awaken) before it can step and
+    // the AI never waits past the clip's own end.
+    expect(def.clips.sleep).toBe('Sleep');
+    expect(def.clips.wake).toBe('Awaken');
+    const shipped = clipLengths();
+    const awaken = shipped.get('Awaken') ?? 0;
+    const rise = MOBS[MOB].dormant?.riseSeconds ?? 0;
+    expect(rise).toBeGreaterThanOrEqual(3.25);
+    expect(rise).toBeLessThanOrEqual(awaken + DT);
+    expect(shipped.get('Sleep') ?? 0).toBeGreaterThan(1);
+    const asleep = { asleep: true, moving: true, combat: true } as unknown as AnimState;
+    expect(desiredBaseState(asleep, false)).toBe('sleep');
   });
 
   it('lands every blow inside the longest contact hold, at rate 1, with a recovery after it', () => {

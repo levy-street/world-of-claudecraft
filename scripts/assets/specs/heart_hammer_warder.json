@@ -18,6 +18,7 @@
         "Hit",
         "Hit2",
         "Stunned",
+        "Sleep",
         "Awaken",
         "Death"
       ],
