@@ -5,8 +5,13 @@
 // Shelter's limit, Wake the Stone's marks carried to a spot, the Falling Rock
 // shared by three or four, the Resonance spread, Mountain's Rush led through
 // the cursed pillar and its lane left clear, Bond of the Stone broken by the
-// off-tank dragging the Singer away, and the kicks on Seam Bolt and the Song
-// (never on Wake the Stone). Reads only what the server sends.
+// off-tank dragging the Singer away, the kicks on Seam Bolt and the Song,
+// and on Wake the Stone the cover choice (every risen pillar rings Stone
+// Thrum on the raid: after the pull and after each Wrath the first Wake
+// goes through and the rest are kicked while the standing cover still
+// shelters the raid). On Heroic and Mythic the Wrath kills anyone unhidden, so the
+// Singer's keeper, out in the open with her, braces his defensives through
+// its bar. Reads only what the server sends.
 //
 // IGNORE=cover  the raid never hides from Mountain's Wrath (the key mechanic)
 // ORDER=guardian,singer | singer,guardian  the damage dealers' kill order
@@ -26,6 +31,7 @@ import {
   add,
   alive,
   auraOf,
+  cdReady,
   DIFF,
   fightSec,
   fmtSec,
@@ -84,11 +90,30 @@ const RISE_SPOT = 'sh_council_rise_spot';
 const CURSED = 'sh_council_cursed';
 /** Narrow Shelter: how many one pillar shields (COUNCIL_DIFFICULTY). */
 const SHELTER = { normal: 5, heroic: 4, mythic: 3 }[DIFF];
-/** About what one unhidden Mountain's Wrath deals a cloth body here (the
- *  Guardian's roll times damageMult and wrathMult): Heroic's kills (about
- *  110 percent of a Heroic-geared cloth body), so nobody takes it by choice. */
-const WRATH_HIT = { normal: 480, heroic: 1650, mythic: 600 }[DIFF];
+/** About what one unhidden Mountain's Wrath deals here (the Guardian's roll
+ *  times damageMult and wrathMult, COUNCIL_DIFFICULTY): Heroic's and
+ *  Mythic's kill anyone unhidden (3,465 to 4,095) but a tank under a strong
+ *  defensive, so nobody takes it by choice. */
+const WRATH_HIT = { normal: 480, heroic: 3780, mythic: 3780 }[DIFF];
 const WRATH_LETHAL = WRATH_HIT > 1000;
+/** The Singer's keeper's defensives through a lethal Wrath (protection
+ *  paladin: Ward of Faith, Hallowed Wall's absorb, Bastion Rite's physical
+ *  cut, Sacred Bulwark the last word; a warrior: Raised Guard and Die by the
+ *  Sword), and what the Wrath leaves of him under them. */
+const KEEPER_GUARDS = [
+  'divine_protection',
+  'holy_shield',
+  'bastion_rite',
+  'raised_guard',
+  'die_by_the_sword',
+];
+const KEEPER_LAST = 'sacred_bulwark';
+function keeperHit(me) {
+  if (!WRATH_LETHAL) return WRATH_HIT;
+  // Bastion Rite's 20 percent and the two absorbs (35 and 10 percent of the
+  // pool), roughly what the paladin keeper has every Wrath cycle.
+  return Math.max(0, WRATH_HIT * 0.8 - 0.45 * (me.mhp ?? 0));
+}
 const RUSH_LANE = 2.5 + 1.0; // half width + girth, and a margin
 const BOND_REACH = 20;
 
@@ -251,7 +276,10 @@ export const council = {
   },
   kickables(world) {
     const s = world.mobs.singer;
-    if (!alive(s) || (s.cast !== CAST.bolt && s.cast !== CAST.song)) return [];
+    if (!alive(s)) return [];
+    if (s.cast === CAST.wake && world.kickWake && IGNORE !== 'wake')
+      return [{ mob: s, cast: s.cast }];
+    if (s.cast !== CAST.bolt && s.cast !== CAST.song) return [];
     return [{ mob: s, cast: s.cast }];
   },
   stillFor(world, st) {
@@ -298,6 +326,11 @@ export const council = {
     const rises = st.pillarEvents.filter((e) => e.kind === 'rise').length;
     const falls = st.pillarEvents.filter((e) => e.kind === 'fall').length;
     note(`Pillars: ${rises} risen, ${falls} fallen`);
+    note(`Wake the Stone: ${st.wakeKicks} chosen to kick (Stone Thrum's price on cover)`);
+    const thrum = st.hitsBy?.get('Stone Thrum');
+    note(
+      `Stone Thrum: ${thrum?.n ?? 0} hits, ${thrum?.total ?? 0} damage on the raid (largest ${thrum?.max ?? 0})`,
+    );
     const soaks = st.rocks.filter((r) => r.landedAt);
     note(
       `Falling Rocks: ${soaks.length} (${soaks.map((r) => `${r.who}: ${r.soakHits.length} under${r.tremor ? ', TREMOR' : ''}`).join('; ')})`,
@@ -341,7 +374,24 @@ function init(st) {
     echoNext: new Map(),
     rush: null,
     bondTicks: 0,
+    // Wake the Stone's choice: Wraths landed, Wakes let through since the
+    // last one, and the kicks the raid chose.
+    wrathsLanded: 0,
+    wakesThrough: 0,
+    wakeKicks: 0,
   });
+}
+
+/** Kick this Wake? The pull opens a cycle like a Wrath's landing: the
+ *  first Wake of each cycle goes through (its pillars stand beside the
+ *  raid, where the carved columns do not), and every later one is kicked
+ *  while the standing (and rising) cover still shelters every living player
+ *  under Narrow Shelter's limit. */
+function wakeChoice(world, st) {
+  const cover = coverPillars(world);
+  const rising = st.wakePlan.size;
+  const room = (cover.length + rising) * SHELTER;
+  return st.wakesThrough >= 1 && room >= world.living().length;
 }
 
 // ---- reading the Quarry -----------------------------------------------------------------
@@ -488,13 +538,30 @@ function trackState(world, st) {
     st.pillarEvents.push({ t: fightSec(), kind: 'fall', id });
   }
   st.prevPillars = new Map([...world.pillars].map(([id, p]) => [id, { ...p }]));
+  let newWakeMark = false;
   for (const [pid, p] of world.players) {
     const prev = st.prevAuras.get(pid) ?? new Set();
     const cur = new Set((p.auras ?? []).map((a) => a.id));
     if (cur.has(AURA.resonance) && !prev.has(AURA.resonance))
       st.resonance.push({ t: fightSec(), who: p.name });
+    if (cur.has(AURA.wake) && !prev.has(AURA.wake)) newWakeMark = true;
     st.prevAuras.set(pid, cur);
   }
+  if (newWakeMark && st.engagedAt) {
+    st.wakesThrough++;
+    log(`  WAKE let through (${st.wakesThrough} since the last Wrath)`);
+  }
+  // Wake the Stone's kick, decided as its bar runs (kickables reads it).
+  const singer = world.mobs.singer;
+  world.kickWake = alive(singer) && singer.cast === CAST.wake && wakeChoice(world, st);
+  if (world.kickWake && !st.wakeKickLogged) {
+    st.wakeKicks++;
+    st.wakeKickLogged = true;
+    log(
+      `  WAKE: kick it (${st.wakesThrough} already through ${st.wrathsLanded === 0 ? 'since the pull' : 'since the Wrath'})`,
+    );
+  }
+  if (!(alive(singer) && singer.cast === CAST.wake)) st.wakeKickLogged = false;
   // Bond of the Stone: the time the two spend together.
   const g = world.mobs.guardian;
   const s = world.mobs.singer;
@@ -569,6 +636,8 @@ function castEnded(world, st, key, castId, e) {
   const rec = { t: fightSec(), caster: key, landedAt: Date.now(), hits: [] };
   if (castId === CAST.wrath) {
     if (!alive(e)) return;
+    st.wrathsLanded++;
+    st.wakesThrough = 0;
     // Who stood in the open the last tick before it landed, and how far
     // from his planned spot (the plan's misses, the log's evidence).
     if (st.openAtLand?.length) log(`  in the open as the Wrath lands: ${st.openAtLand.join(', ')}`);
@@ -704,6 +773,21 @@ function planCover(world, st, casts, key, pre = false) {
   const carrying = (p) => hasAura(p, AURA.wake) && st.wakePlan.get(p.pid)?.spot;
   const people = world.living().filter((p) => p.bot && !carrying(p));
   const forbidden = new Set();
+  // A replan in the same bar (a pillar rose or fell under it): whoever
+  // still reaches his spot behind a pillar still standing keeps it (a
+  // late rise, a kicked Wake missed, must never send the hidden back into
+  // the open with a second left).
+  const prev = st.activeCover?.key === key ? st.activeCover.assign : null;
+  if (prev) {
+    const standing = new Set(cover.filter((q) => !q.rising).map((q) => q.id));
+    for (const p of people) {
+      const sp = prev.get(p.pid);
+      if (!sp || !standing.has(sp.pillar.id) || hypot(p, sp) / 7 > remS - 0.3) continue;
+      if ((used.get(sp.pillar.id) ?? 0) >= SHELTER) continue;
+      assign.set(p.pid, sp);
+      used.set(sp.pillar.id, (used.get(sp.pillar.id) ?? 0) + 1);
+    }
+  }
   const rockGroup = rockCover(world, st, cover, sources, remS);
   const soaking = new Set();
   if (rockGroup?.open) {
@@ -1199,6 +1283,35 @@ function keeperSpot(world, st) {
   return st.keeperSpot;
 }
 
+/** The keeper in the open through a lethal Wrath's last breath: every
+ *  defensive he has, one a call (off the GCD), the cheat-death last if the
+ *  Wrath would still take him. */
+function braceForWrath(world, bot) {
+  if (!WRATH_LETHAL) return false;
+  const bar = coverCasts(world).find((c) => c.kind === 'wrath');
+  if (!bar || bar.rem > 1.6) return false;
+  const me = bot.self;
+  for (const id of KEEPER_GUARDS) {
+    if (!bot.kit?.get(id) || !cdReady(bot, id)) continue;
+    if ((me.res ?? 0) < (bot.kit.get(id)?.cost ?? 0)) continue;
+    bot.lastSent[id] = Date.now();
+    bot.cmd({ cmd: 'cast', ability: id });
+    log(`  BRACE: ${bot.name} (${id}) for the Wrath in the open`);
+    return true;
+  }
+  if (
+    (me.hp ?? 0) <= keeperHit(me) * 1.1 &&
+    bot.kit?.get(KEEPER_LAST) &&
+    cdReady(bot, KEEPER_LAST)
+  ) {
+    bot.lastSent[KEEPER_LAST] = Date.now();
+    bot.cmd({ cmd: 'cast', ability: KEEPER_LAST });
+    log(`  BRACE: ${bot.name} (${KEEPER_LAST}) for the Wrath in the open`);
+    return true;
+  }
+  return false;
+}
+
 function keeperDuty(world, st, b, me) {
   const s = world.mobs.singer;
   const g = world.mobs.guardian;
@@ -1223,6 +1336,7 @@ function keeperDuty(world, st, b, me) {
     duty: 'keeper',
     ownThreat: true,
     cast(bot) {
+      if (braceForWrath(world, bot)) return true;
       if (bot.cls !== 'warrior' || holding || hypot(bot.self, s) > 7.5) return false;
       if ((bot.self.cds?.taunt ?? 0) > 0.05 || Date.now() - (bot.lastSent.taunt ?? 0) < 1000)
         return false;
@@ -1243,7 +1357,7 @@ function duty(world, st, b, me) {
     WRATH_LETHAL &&
     !!st.activeCover?.assign.get(b.pid) &&
     coverCasts(world).length > 0 &&
-    me.hp <= WRATH_HIT * 1.2;
+    me.hp <= (keeper(world) === b ? keeperHit(me) : WRATH_HIT) * 1.2;
   const kd = lethalBar ? null : (keeperDuty(world, st, b, me) ?? swapperDuty(world, st, b, me));
   if (kd) {
     // The keeper still dodges the Rush's lane.
@@ -1261,7 +1375,7 @@ function duty(world, st, b, me) {
     (b.tankTarget === 'singer' || keeper(world) === b) &&
     alive(world.mobs.guardian) &&
     alive(world.mobs.singer) &&
-    me.hp > WRATH_HIT * 1.2;
+    me.hp > keeperHit(me) * 1.2;
   // A Resonance carrier rings on everyone near it every second (heroic lets
   // it overlap the Wrath): with health to spare it takes the Wrath in the
   // open, away from the crowded shadows, rather than ring through them.
