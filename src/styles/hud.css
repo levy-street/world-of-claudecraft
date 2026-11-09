@@ -3510,8 +3510,9 @@
      properties; the hatch is clipped to them (paint only, never scaled, so the
      stripes stay crisp at any width) and the number rides a transform. It is
      actionable, so no graphics tier and no Show Absorb Shields option hides it.
-     The root sets no z-index (no stacking context), so the hatch sits UNDER the
-     frame's health text and only the number rides above it. */
+     The root sets no z-index (no stacking context), so the hatch and the
+     carrier frame sit UNDER the frame's health text (z-index 4) and the raid
+     name, and only the number rides above them. */
   .bar-heal-absorb {
     position: absolute;
     inset: 0;
@@ -3520,6 +3521,19 @@
   }
   .bar-heal-absorb.on {
     display: block;
+  }
+  /* The carrier's whole health bar gets a static ice-blue frame while the absorb
+     holds, so a healer scanning a column of frames spots every carrier at once.
+     No animation: it costs nothing per frame and shows on every tier. */
+  .bar-heal-absorb::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    border-radius: inherit;
+    box-shadow:
+      inset 0 0 0 1px var(--color-heal-absorb-glow),
+      inset 0 0 2px var(--color-heal-absorb-glow);
   }
   .bar-heal-absorb-fill {
     position: absolute;
@@ -3534,8 +3548,12 @@
         var(--color-heal-absorb-edge) calc(var(--heal-absorb-start, 0%) + 2px),
         transparent calc(var(--heal-absorb-start, 0%) + 2px)
       ),
-      repeating-linear-gradient(-45deg, var(--color-heal-absorb-stripe) 0 2px, transparent 2px 6px),
-      linear-gradient(to bottom, var(--color-heal-absorb-glow), var(--color-heal-absorb-wash) 70%);
+      repeating-linear-gradient(
+        -45deg,
+        var(--color-heal-absorb-stripe) 0 1.5px,
+        transparent 1.5px 5px
+      ),
+      linear-gradient(to bottom, var(--color-heal-absorb-wash-top), var(--color-heal-absorb-wash));
   }
   .bar-heal-absorb-text {
     position: absolute;
@@ -3556,11 +3574,15 @@
     /* An ink halo instead of a box: legible over the hatch, the bare health
        fill and the frame's own health text alike. */
     text-shadow:
-      0 0 3px var(--color-heal-absorb-chip),
-      1px 1px 0 var(--color-keyline),
-      -1px -1px 0 var(--color-keyline),
-      1px -1px 0 var(--color-keyline),
-      -1px 1px 0 var(--color-keyline);
+      1px 0 0 var(--color-heal-absorb-chip),
+      -1px 0 0 var(--color-heal-absorb-chip),
+      0 1px 0 var(--color-heal-absorb-chip),
+      0 -1px 0 var(--color-heal-absorb-chip),
+      1px 1px 0 var(--color-heal-absorb-chip),
+      -1px -1px 0 var(--color-heal-absorb-chip),
+      1px -1px 0 var(--color-heal-absorb-chip),
+      -1px 1px 0 var(--color-heal-absorb-chip),
+      0 0 3px var(--color-heal-absorb-chip);
   }
   .bar-heal-absorb-text:empty {
     display: none;
@@ -3570,6 +3592,11 @@
   @media (forced-colors: active) {
     .bar-heal-absorb-fill {
       background: Mark;
+    }
+    .bar-heal-absorb::before {
+      box-shadow: none;
+      outline: 1px solid Mark;
+      outline-offset: -1px;
     }
   }
   /* Low-mana/energy warning: the resource fill pulses brighter and a short
@@ -13357,17 +13384,19 @@
      row) and the hatch at the health edge stays fully visible, under the
      percent text (z-index 2). The raid cell's own rule lifts the hatch back
      over its z-index 2 class-colored fill, still under the name. */
-  .party-frame .bar.hp .bar-heal-absorb-fill {
+  .party-frame .bar.hp .bar-heal-absorb-fill,
+  .party-frame .bar.hp .bar-heal-absorb::before {
     z-index: 1;
   }
-  #party-frames.party-style-raid .party-frame .bar.hp .bar-heal-absorb-fill {
+  #party-frames.party-style-raid .party-frame .bar.hp .bar-heal-absorb-fill,
+  #party-frames.party-style-raid .party-frame .bar.hp .bar-heal-absorb::before {
     z-index: 3;
   }
   .party-frame .bar.hp .bar-heal-absorb-text {
     justify-content: flex-start;
     transform: none;
-    padding: 0 0 0 3px;
-    font-size: 8px;
+    padding: 0 0 0 4px;
+    font-size: 9px;
   }
   .party-frame .pfm-rewind {
     position: absolute;

@@ -10,7 +10,8 @@
 // right edge, so the two never share a segment or a look.
 //
 // The segment covers min(remaining, hp) of the bar (it can never cover more
-// health than the unit has); the number on the bar is the FULL remaining
+// health than the unit has), widened to HEAL_ABSORB_MIN_FRAC so a small absorb
+// stays obvious; the number on the bar is the FULL remaining
 // budget, because that is the healing a healer still has to land. The amount is
 // actionable, so it shows on every graphics tier and is never tied to the
 // Show Absorb Shields option (that option hides the decorative shield hatch).
@@ -61,6 +62,11 @@ export interface HealAbsorbBarView {
   textAmount: number;
   textLanguage: string;
 }
+
+/** The narrowest segment drawn (fraction of the bar), so a small absorb on a
+ *  nearly full bar never shrinks to an invisible sliver. Still capped at current
+ *  health; the number carries the exact amount. */
+export const HEAL_ABSORB_MIN_FRAC = 0.1;
 
 const AMOUNT_OPTS: Intl.NumberFormatOptions = { maximumFractionDigits: 0, useGrouping: false };
 
@@ -113,17 +119,18 @@ export function healAbsorbBarViewInto(
   const raw = input ? (input.healTotal ?? healAbsorbTotal(input.auras ?? [])) : 0;
   const total = raw > 0 && Number.isFinite(raw) ? raw : 0;
   const on = total > 0 && hp > 0;
-  const covered = on ? Math.min(total, hp) : 0;
+  const hpFrac = clamp01(hp / max);
+  const covered = on ? Math.min(total, hp) / max : 0;
   out.total = total;
   out.on = on;
-  out.sizeFrac = on ? clamp01(covered / max) : 0;
-  out.startFrac = on ? clamp01((hp - covered) / max) : 0;
+  out.sizeFrac = on ? Math.min(hpFrac, Math.max(covered, HEAL_ABSORB_MIN_FRAC)) : 0;
+  out.startFrac = on ? clamp01(hpFrac - out.sizeFrac) : 0;
   const startTenths = pctTenths(out.startFrac);
   if (startTenths !== out.startTenths) {
     out.startTenths = startTenths;
     out.start = pctString(startTenths);
   }
-  const endTenths = on ? pctTenths(clamp01(hp / max)) : 0;
+  const endTenths = on ? pctTenths(hpFrac) : 0;
   if (endTenths !== out.endTenths) {
     out.endTenths = endTenths;
     out.end = pctString(endTenths);

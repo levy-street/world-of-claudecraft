@@ -9,6 +9,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import type { Aura } from '../src/sim/types';
 import {
+  HEAL_ABSORB_MIN_FRAC,
   HEAL_ABSORB_OFF,
   healAbsorbBarView,
   healAbsorbBarViewInto,
@@ -85,6 +86,18 @@ describe('healAbsorbBarView: the segment and the number', () => {
     expect(v.end).toBe('20.0%');
     // A healer still has to land the whole 900.
     expect(v.text).toBe('900');
+  });
+
+  it('a small absorb keeps a visible minimum width, still capped at current health', () => {
+    // 420 on a 9500 / 10000 bar would be a 4% sliver: drawn at the minimum.
+    const v = healAbsorbBarView({ hp: 9500, maxHp: 10000, auras: [healAbsorb(420)] });
+    expect(v.sizeFrac).toBeCloseTo(HEAL_ABSORB_MIN_FRAC, 9);
+    expect(v.startFrac).toBeCloseTo(0.95 - HEAL_ABSORB_MIN_FRAC, 9);
+    expect(v.text).toBe('420');
+    // Never wider than the health itself.
+    const low = healAbsorbBarView({ hp: 300, maxHp: 10000, auras: [healAbsorb(50)] });
+    expect(low.sizeFrac).toBeCloseTo(0.03, 9);
+    expect(low.startFrac).toBe(0);
   });
 
   it('broken (spent to zero, or gone) and a dead unit: off', () => {
@@ -351,7 +364,9 @@ describe('hud.css: the heal-absorb contract', () => {
   });
 
   it('every heal-absorb color is a token declared in tokens.css', () => {
-    const used = new Set(block.slice(0, 2500).match(/--color-heal-absorb-[a-z]+/g) ?? []);
+    const used = new Set(
+      block.slice(0, block.indexOf('/* Low-mana')).match(/--color-heal-absorb-[a-z-]+/g) ?? [],
+    );
     expect(used.size).toBeGreaterThan(0);
     for (const name of used) expect(tokens).toContain(`${name}:`);
   });
