@@ -1193,7 +1193,12 @@ function healerAct(world, st, b, me, stillFor) {
     deficit: Math.max(0, p.mhp - p.hp),
     tank: p.tank,
     mainTank: p.pid === st.mainTankPid,
-    auras: (p.auras ?? []).map((a) => ({ id: a.id, kind: a.kind, mine: a.src === b.pid })),
+    auras: (p.auras ?? []).map((a) => ({
+      id: a.id,
+      kind: a.kind,
+      mine: a.src === b.pid,
+      value: a.value ?? 0,
+    })),
     near: living.filter((q) => q.pid !== p.pid && hypot(q, p) <= 10 && q.hp < q.mhp * 0.9).length,
   }));
   const h = {

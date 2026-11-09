@@ -356,6 +356,23 @@ export const ROTATIONS = {
 // already on its way; h.since(id) seconds since this healer last pressed id.
 // Returns { id, target? } or null.
 
+/** A member a heal absorb holds (Living Rime, Stone Shell): healing it
+ *  through comes before anything but a dying tank, whatever its health (the
+ *  absorb drinks a heal even at full health). The one with the least left
+ *  first (the nearest to breaking). */
+function crusted(members, h) {
+  const held = members
+    .map((p) => ({
+      p,
+      left: p.auras
+        .filter((a) => a.kind === 'heal_absorb')
+        .reduce((n, a) => n + Math.max(0, a.value ?? 0), 0),
+    }))
+    .filter((x) => x.left > 0 && !h.incoming(x.p.pid));
+  held.sort((x, y) => x.left - y.left || x.p.pid - y.p.pid);
+  return held[0]?.p ?? null;
+}
+
 const byNeed = (members, h) =>
   [...members].sort((x, y) => need(y, h) - need(x, h) || x.pid - y.pid);
 function need(p, h) {
@@ -378,6 +395,15 @@ export const HEALERS = {
     const unvigiled = tanks.find((p) => !p.auras.some((a) => a.id === 'seraphic_vigil'));
     if (!vigilOn && unvigiled && h.ready('seraphic_vigil'))
       return { id: 'seraphic_vigil', target: unvigiled.pid };
+    // A heal absorb on someone (Living Rime): break it now, the fast heal.
+    const crust = crusted(h.members, h);
+    if (crust && !(low.tank && low.frac < 0.3)) {
+      if (h.ready('flash_heal')) return { id: 'flash_heal', target: crust.pid };
+      if (h.ready('heal')) return { id: 'heal', target: crust.pid };
+      // On the move: a Renew's ticks drink at the crust too.
+      if (!crust.auras.some((a) => a.id === 'renew' && a.mine) && h.ready('renew'))
+        return { id: 'renew', target: crust.pid };
+    }
     if (hurtBad >= 4 && h.ready('choir_of_deliverance')) return { id: 'choir_of_deliverance' };
     if (
       low.frac < 0.35 &&
@@ -421,6 +447,12 @@ export const HEALERS = {
     const mainTank = tanks.find((p) => p.mainTank) ?? tanks[0];
     if (mainTank && h.since('stoneward') > 58 && h.ready('stoneward'))
       return { id: 'stoneward', target: mainTank.pid };
+    // A heal absorb on someone (Living Rime): break it now, instant first.
+    const crust = crusted(h.members, h);
+    if (crust && !(low.tank && low.frac < 0.3)) {
+      if (h.ready('tidecall')) return { id: 'tidecall', target: crust.pid };
+      if (h.ready('healing_wave')) return { id: 'healing_wave', target: crust.pid };
+    }
     if (low.frac < 0.45 && h.ready('tidecall')) return { id: 'tidecall', target: low.pid };
     const cluster = list.find((p) => p.frac < 0.8 && p.near >= 2);
     if (hurt.length >= 3 && cluster && h.ready('chain_heal'))

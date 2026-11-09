@@ -5,8 +5,17 @@
 // under them, keeps clear of the holes and the cracks, of a frozen player's
 // splash and of the guardian's breath cone, and each slash's marked player
 // steps out to aim the line clear of the raid, then off it; everyone steps out
-// of a drawn line (and of The Blades Hunt's on Mythic). Reads only what the
-// server sends; the geometry is the sim's own pure module (claim-local).
+// of a drawn line (and of The Blades Hunt's on Mythic). Living Rime's carrier
+// steps out of the group (clear of everyone by its burst's reach, still in the
+// healers' reach) and everyone else keeps out of its ring; the healers break
+// the crust first (scripts/lib/heart_raid_kits.mjs `crusted`). Reads only what
+// the server sends; the geometry is the sim's own pure module (claim-local).
+//
+// IGNORE=rime    Living Rime's carrier stays where it is (the burst's check)
+// RIME=off       the run without Living Rime (the A/B on the same build)
+// RIME_PLAY=late the carrier stays warm in its huddle and steps out only for
+//                the crust's last RIME_LATE_AT seconds (a comparison run; the
+//                default steps out at once)
 //
 // IGNORE=huddle  nobody huddles (the key mechanic: the cold)
 
@@ -41,6 +50,14 @@ import {
 } from './heart_raid_bots.mjs';
 
 const RULES = QUENCH_DIFFICULTY[DIFF];
+const RIME_LATE = process.env.RIME_PLAY === 'late';
+const RIME_LATE_AT = 4;
+/** Is `p`'s crust one its carrier should be out of the group for now? */
+const rimeOut = (p) => {
+  const a = auraOf(p, QUENCH_AURAS.rime);
+  if (!a) return false;
+  return !RIME_LATE || (a.rem ?? 0) <= RIME_LATE_AT;
+};
 const T = QUENCH_TUNING;
 const LINE_HALF = 1.8 + 1.0;
 /** The huddles: who stands with whom (the tank's group by the guardian).
@@ -68,6 +85,8 @@ export const quench = {
     if (diff === 'mythic') out.push('/dev heart quench mythic on');
     else if (diff === 'heroic') out.push('/dev heart quench heroic on');
     else out.push('/dev heart quench heroic off', '/dev heart quench mythic off');
+    // RIME=off: a comparison run without Living Rime (same build, same raid).
+    out.push(`/dev heart quench rime ${process.env.RIME === 'off' ? 'off' : 'on'}`);
     return out;
   },
 
@@ -156,6 +175,10 @@ export const quench = {
     for (const p of world.living())
       if (p.pid !== b.pid && hasAura(p, QUENCH_AURAS.frozen))
         out.push({ x: p.x, z: p.z, r: RULES.splashR + 1 });
+    // Living Rime's carriers: keep out of their burst's ring (a carrier
+    // itself keeps out of the other carriers').
+    for (const p of world.living())
+      if (p.pid !== b.pid && rimeOut(p)) out.push({ x: p.x, z: p.z, r: T.rimeBurstR + 1.5 });
     // The breath cone: non-tanks keep out of the guardian's front.
     const g = world.mobs.guardian;
     if (alive(g) && !me.tank) {
@@ -173,6 +196,7 @@ export const quench = {
   },
   // Every bot's resting spot is its huddle's.
   roleSpot(world, st, b, me) {
+    if (me && rimeOut(me) && IGNORE !== 'rime') return null;
     if (IGNORE === 'huddle') return null;
     const gi = groupOf(b);
     if (gi < 0 || b.spec.key === 'mt') return null;
@@ -214,12 +238,16 @@ export const quench = {
     note(
       `Under the Ice: ${st.plunges}; slash marks ${st.marks}; holes at the end ${world.o?.holes.length ?? 0}; peak cold ${Math.round(st.peakCold)}`,
     );
+    note(
+      `Living Rime: ${st.rimes} set, ${st.rimeBreaks} healed through, ${st.rimeFails} burst (${st.rimeFailLog.map((f) => `${fmtSec(f.t)} ${f.who}`).join(', ') || 'none'})`,
+    );
   },
   row(world, st) {
     init(st);
     return [
       ['Freezes', String(st.freezes.length)],
       ['Under the Ice', String(st.plunges)],
+      ['Living Rime (set / healed / burst)', `${st.rimes} / ${st.rimeBreaks} / ${st.rimeFails}`],
     ];
   },
 };
@@ -235,6 +263,11 @@ function init(st) {
     prevCast: null,
     huddle: [],
     aim: new Map(),
+    rimes: 0,
+    rimeBreaks: 0,
+    rimeFails: 0,
+    rimeFailLog: [],
+    rimeSpot: new Map(),
   });
 }
 
@@ -301,6 +334,35 @@ function track(world, st) {
       st.marks++;
       log(`SLASH MARK on ${p.name}`);
     }
+    if (cur.has(QUENCH_AURAS.rime) && !prev.has(QUENCH_AURAS.rime)) {
+      st.rimes++;
+      log(`LIVING RIME on ${p.name}`);
+    } else if (!cur.has(QUENCH_AURAS.rime) && prev.has(QUENCH_AURAS.rime)) {
+      // Gone: frozen with it is a burst; alive and free, healed through.
+      if (cur.has(QUENCH_AURAS.frozen)) {
+        st.rimeFails++;
+        st.rimeFailLog.push({ t: fightSec(), who: p.name });
+        // Why it was not healed: each healer's distance and state then.
+        const hs = [...world.players.values()]
+          .filter((q) => q.bot?.spec.role === 'healer')
+          .map((q) => {
+            const why = q.dead
+              ? 'dead'
+              : hasAura(q, QUENCH_AURAS.frozen)
+                ? 'frozen'
+                : hasAura(q, QUENCH_AURAS.trapped)
+                  ? 'in the water'
+                  : 'free';
+            return `${q.name} ${Math.round(hypot(q, p))} yd ${why}`;
+          })
+          .join(', ');
+        log(`LIVING RIME BURST on ${p.name} (healers: ${hs})`);
+      } else if (!p.dead) {
+        st.rimeBreaks++;
+        log(`LIVING RIME healed through on ${p.name}`);
+      }
+      st.rimeSpot.delete(p.pid);
+    }
     st.prevAuras.set(p.pid, cur);
     st.peakCold = Math.max(st.peakCold, auraOf(p, QUENCH_AURAS.cold)?.value ?? 0);
   }
@@ -318,6 +380,11 @@ function duty(world, st, b, me) {
   if (hasAura(me, QUENCH_AURAS.trapped) || hasAura(me, QUENCH_AURAS.frozen))
     return { goal: me, hold: true, duty: 'held' };
   const o = world.o;
+  // Living Rime: out of the group (its burst's reach), within the healers'.
+  if (rimeOut(me) && IGNORE !== 'rime') {
+    const spot = rimeSpot(world, st, b, me);
+    if (spot) return { goal: spot, tol: 1, duty: 'rime: out of the group' };
+  }
   // On a groaning crack (or by a hole): off it at once, away from its middle.
   const under = [...o.cracks, ...o.holes].find((h) => hypot(h, me) < h.r);
   if (under)
@@ -361,6 +428,51 @@ function duty(world, st, b, me) {
     if (hypot(me, c) > 4) return { goal: c, tol: 2.5, duty: 'warm up' };
   }
   return null;
+}
+
+/** Where Living Rime's carrier waits: clear of everyone by the burst's reach
+ *  and a stride, within both healers' reach, on sound ice, the nearest such
+ *  spot (re-chosen once someone walks into it). */
+function rimeSpot(world, st, b, me) {
+  const clear = T.rimeBurstR + 2;
+  const others = world.living().filter((p) => p.pid !== b.pid);
+  const healers = others.filter((p) => p.bot?.spec.role === 'healer');
+  const ok = (at) =>
+    quench.onFloor(world, at) &&
+    !quench.bad(world, st, at) &&
+    !world.o.holes.some((h) => hypot(h, at) < h.r + 1) &&
+    others.every((p) => hypot(p, at) >= clear) &&
+    healers.every((h) => hypot(h, at) <= 24);
+  const kept = st.rimeSpot.get(b.pid);
+  if (kept && ok(kept)) return kept;
+  let best = null;
+  for (let r = 0; r <= 20; r += 2) {
+    for (let k = 0; k < 16; k++) {
+      const a = (k / 16) * Math.PI * 2;
+      const at = add(me, { x: Math.sin(a), z: Math.cos(a) }, r);
+      if (!ok(at)) continue;
+      best = at;
+      break;
+    }
+    if (best) break;
+  }
+  // Nothing clear in reach: the spot farthest from the nearest other body.
+  if (!best) {
+    let bestD = -1;
+    for (let r = 4; r <= 16; r += 4)
+      for (let k = 0; k < 16; k++) {
+        const a = (k / 16) * Math.PI * 2;
+        const at = add(me, { x: Math.sin(a), z: Math.cos(a) }, r);
+        if (!quench.onFloor(world, at) || quench.bad(world, st, at)) continue;
+        const d = Math.min(...others.map((p) => hypot(p, at)));
+        if (d > bestD) {
+          bestD = d;
+          best = at;
+        }
+      }
+  }
+  if (best) st.rimeSpot.set(b.pid, best);
+  return best;
 }
 
 /** Where the marked stands so the line from the blade through them misses
