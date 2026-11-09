@@ -1,7 +1,8 @@
 {
   "items": [
     {
-      "src": "tmp/asset_src/heart_slabwright_woc.glb",
+      "rigSource": "tmp/asset_src/heart_slabwright_woc.glb",
+      "src": "tmp/asset_src/heart_slabwright_woc.slim.glb",
       "out": "models/creatures/heart_slabwright.glb",
       "type": "character",
       "keepClips": [

@@ -1,7 +1,8 @@
 {
   "items": [
     {
-      "src": "tmp/asset_src/heart_hammer_warder_woc.glb",
+      "rigSource": "tmp/asset_src/heart_hammer_warder_woc.glb",
+      "src": "tmp/asset_src/heart_hammer_warder_woc.slim.glb",
       "out": "models/creatures/heart_hammer_warder.glb",
       "type": "character",
       "keepClips": [
