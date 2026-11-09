@@ -56,6 +56,9 @@ export const COUNCIL_CUE_SOUNDS: Readonly<Record<string, CouncilSound>> = {
   [COUNCIL_CUES.rockImpact]: S('rock_impact', 1, 'point'),
   // Every standing pillar pulses on the same tick: one soft hum, cooled.
   [COUNCIL_CUES.pulse]: S('pillar_pulse', 0.32, 'source', 1, 1.2),
+  // Stone Thrum: every risen pillar rings the raid on the same tick, a
+  // second off Restless Stone's beat: one brighter hum, cooled the same.
+  [COUNCIL_CUES.risenPulse]: S('pillar_pulse', 0.4, 'source', 1.15, 1.2),
   [COUNCIL_CUES.inherit]: S('soul_take', 0.6, 'target', 0.85, 0.5),
   [COUNCIL_CUES.soulTake]: S('soul_take', 1, 'target'),
   [COUNCIL_CUES.soulPip]: S('soul_pip', 1, 'source'),

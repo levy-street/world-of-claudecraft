@@ -1459,8 +1459,8 @@ still kill it before the soft enrage: the Guardian 54,000, the Seam Singer 46,00
 80,000, the Quench 62,000, the Heat 64,000, the Masterless Strength 72,000. Heroic (the previous
 tier's best gear) aims at 6 to 7 minutes for humans: the Hammer Council 1.85, the Breath 1.65,
 the Quench 2.2, the Heat 1.45, the Masterless Strength 2.1. Heroic's key mechanics kill when
-ignored: Mountain's Wrath lands at about 110 percent of a Heroic-geared cloth body on whoever
-no pillar hides (`wrathMult` 2.8), the Council's soft enrage waits for 8 Wraths (4 on Normal
+ignored: Mountain's Wrath kills whoever no pillar hides (`wrathMult` 6.3 since the owner's
+review of 2026-11-09, section 7.1), the Council's soft enrage waits for 8 Wraths (4 on Normal
 and Mythic), and the Quench's shatter lands twice as hard (`shatterMult` 2). Every number and
 why: the pass's notes (E:/woc/entregas/raid_corazon/heroico/NOTAS.md, "Segunda vuelta",
 outside the repo).
@@ -1484,12 +1484,13 @@ harness.
 | One kill | Complete only when both are dead: the Slab (`the_slab` waits on `SMITH_HEART_COUNCIL`), the heart seal's Hammer vein (`smithHeartVeinWon`), the death checkpoints and every credit wait on both; the risen pillars sink back into the floor and the carved columns stand in their sockets again | `content/smith_heart.ts`, `seal.ts`, `council_pillars.ts` (`settlePillars`) |
 | Pillars | The five carved columns (claim objects at `QUARRY_PILLAR_SPOTS`) plus the risen ones, at most 7 standing (the cursed pillar is outside the cap). A carved column has 2 integrity and a risen pillar 1 (`councilPillarFull`), in its template id; each stands as a round combat wall (`COMBAT_WALL_SHAPES`) that blocks bodies and the Wrath's sight line, offline and online. Cracked to 0 by the rock it falls: rubble lies 8 s and bites 90 to 110 a second. A pillar the Wrath or the Rush takes whole leaves rubble that only looks the part | `council_pillars.ts` |
 | Energy | 0 to 100, full in 55 s; the holder's energy bar is its resource; after the 4th Wrath it fills 2.5 times faster (the soft enrage) | `council_wrath.ts` |
-| Mountain's Wrath | At 100 (cast id kept, `heart_mountains_wrath`): a 4 s bar, then 440 to 520 to everyone in the Quarry (45 yd) the caster can see, and then EVERY pillar in the Quarry shatters, carved columns and risen alike (a mythic soul pillar alone stands). The columns teach the first Wrath; it takes them for the rest of the pull (the columns crumble in the world: from now on only pillars raised by Wake the Stone can shield the raid from Mountain's Wrath; no banner says so, by the owner's rule of 2026-11-03). Each landing brings the next Wake due 6 s later (`wakeAfterWrath`) | `council_wrath.ts` (`landWrath`) |
-| Narrow Shelter (Normal 5, Heroic 4, Mythic 3) | One pillar shields only so many players from the Wrath; with more behind it each of them takes half the blast (`crowdShare`) and the raid is warned. A risen pillar's shadow (2.2 yd round) fits five side by side a stride behind it (pinned per tier). The caster wears the limit through its bar (`heart_narrow_shelter`, `value2`) | `council_wrath.ts`, `council_limit_fx.ts` |
+| Mountain's Wrath | At 100 (cast id kept, `heart_mountains_wrath`): a 4 s bar, then 440 to 520 to everyone in the Quarry (45 yd) the caster can see (Heroic and Mythic: 3,465 to 4,095, `wrathMult` 6.3; see "The lethal Wrath" below), and then EVERY pillar in the Quarry shatters, carved columns and risen alike (a mythic soul pillar alone stands). The columns teach the first Wrath; it takes them for the rest of the pull (the columns crumble in the world: from now on only pillars raised by Wake the Stone can shield the raid from Mountain's Wrath; no banner says so, by the owner's rule of 2026-11-03). Each landing brings the next Wake due 6 s later (`wakeAfterWrath`) | `council_wrath.ts` (`landWrath`) |
+| Narrow Shelter (Normal 5, Heroic 4, Mythic 3) | One pillar shields only so many players from the Wrath; with more behind it each of them takes a share of the blast (each tier's `crowdShare`: half on Normal, a fifth on Heroic and Mythic, 693 to 819, about 50 to 60 percent of a Heroic-geared cloth body: it hurts, it never wipes on its own). A risen pillar's shadow (2.2 yd round) fits five side by side a stride behind it (pinned per tier). The caster wears the limit through its bar (`heart_narrow_shelter`, `value2`) | `council_wrath.ts`, `council_limit_fx.ts` |
 | Hammer's Weight | The Guardian's: every 18 s (first at 10) a 1.5 s bar at the tank, then 2.2 times a swing through armor and +100 percent physical damage taken for 25 s: swap tanks | `council_wrath.ts` |
 | Hammerfall | Kept: the Guardian's frontal arc (110 degrees, 9 yd, 0.7 of a swing, every third swing) | template `arcCleave` |
 | Mountain's Rush and the cursed pillar | The Guardian's charge. Every 24 s (first at 16) a 3 s bar at one player who is no council member's tank (only tanks on the floor: no Rush); the player wears the mark and the lane is drawn from the Guardian. With the mark he raises ONE cursed pillar (if none stands) on a 15 yd ring round the middle. While it stands it pulses on the whole raid every 2 s: 7 to 9 on normal (a reminder; 14 to 18 until the bot raid of 2026-11-04 measured it as a quarter of the healing when the Rush can not reach it), 40 to 48 on heroic and 48 to 56 on mythic before the tier's damage. It shelters nobody from a Wrath (its wall still blocks the sight line), the rock and Resonance never touch it, and only the Rush or a Wrath breaks it. When the bar lands the line is fixed at where the marked player stands; the Guardian plants for a 0.8 s wind-up (`rushWindup`, the `heart_mountains_rush_windup` cue: dust and cracks at his feet, the locked lane still lit) and then charges down it at a heavy run (22 yd a second, `rushSpeed`) and stops at the FIRST pillar on the line: the cursed pillar shatters, the Guardian is stunned 5 s and takes 50 percent more damage for 12 s; a sheltering pillar is taken whole instead and the curse keeps pulsing; a soul pillar stops it and stands. Anyone its body runs through on the way (each once, as it passes) takes 480 to 560 and a 10 yd throw, so a player can still step out of the lane during the wind-up and the run; with no pillar on the line that is the marked player if they stayed on it, and the cursed pillar stays. Mythic only: a miss sets the Quarry collapsing (every 2 s a raid-wide blow of 30 to 36 per stack, one more stack each time, up to 10) until the cursed pillar breaks. The Rush dies with the Guardian, and so does his cursed pillar | `council_rush.ts` |
-| Wake the Stone | The Seam Singer's, and KICKABLE (nature, in `COUNCIL_KICK_SCHOOLS`): every 30 s (first at 20, and 6 s after each Wrath lands) a 2.5 s bar, then 2 players (3 on heroic and mythic, never more than the cap allows; never a tank while anyone else stands) wear a circle for 5 s; a fresh pillar bursts out where each STANDS (nudged to the nearest clear spot), 120 to 150 and a throw to everyone within 3 yd. A kick raises NOTHING (the trap: the raid that kicks by habit loses its cover); the raid is warned as the bar begins and when a kick cuts it. Her kick's silence and lockout hold the Wake too | `council_stone.ts`, `council_pillars.ts` (`raisePillar`) |
+| Wake the Stone | The Seam Singer's, and KICKABLE (nature, in `COUNCIL_KICK_SCHOOLS`): every 30 s (first at 20, and 6 s after each Wrath lands) a 2.5 s bar, then 2 players (3 on heroic and mythic, never more than the cap allows; never a tank while anyone else stands) wear a circle for 5 s; a fresh pillar bursts out where each STANDS (nudged to the nearest clear spot), 120 to 150 and a throw to everyone within 3 yd. A kick raises NOTHING, and every risen pillar left standing rings Stone Thrum on the whole raid (below), so the kick is a CHOICE since the review of 2026-11-09: let through the one Wake the next Wrath needs (Normal 2 pillars of 5, 10 places; Heroic 3 of 4, 12) and kick the rest. Her kick's silence and lockout hold the Wake too | `council_stone.ts`, `council_pillars.ts` (`raisePillar`) |
+| Stone Thrum (the review of 2026-11-09) | Every pillar Wake the Stone raised (hers, or the Guardian's own rises as her heir) that still stands rings on the WHOLE raid every 2 s, per pillar: 14 to 16 on Normal, 19 to 21 before the tier's 1.25 on Heroic and Mythic (about 24 to 26). One hit a player a ring (the pillars summed), its clock a second off Restless Stone's. The five carved columns never ring, the cursed pillar keeps its own pulse, and a soul pillar that was a risen one keeps ringing (the soul adds its behaviour, it takes nothing away). A soft ochre ripple rolls off each ringing pillar on every graphics tier (`council_thrum_fx.ts`, its look `council_thrum_core.ts`); the name is `t()`-matched (`mechanic.heartStoneThrum`) | `council_risen_pulse.ts` |
 | The Wrath guard | Normal only (`floorAvoidsWrath`): Wake the Stone and the Rush are not due while what they put on the floor would still run when the Wrath's bar begins (their floor time plus 2 s, `wrathGuardPad`), nor while that bar runs: they wait for it to land. Heroic and mythic let them overlap | `council_floor.ts` (`clearOfWrath`) |
 | Falling Rock | The Seam Singer's: every 25 s (first at 9) a 1.2 s bar, then one player wears the soak for 5 s; 1,350 split between everyone within 6 yd (fewer than 3 under it: each takes half as much again and the whole raid takes 140 to 170, the Rockfall Tremor); every pillar within 6 yd of its face loses a piece (never the cursed one) | `council_stone.ts` |
 | Seam Bolt | Every 8 s: a 2 s kickable bar at a random player in sight, 300 to 340 nature; it lands only on a player still in sight | `council_song.ts` |
@@ -1497,7 +1498,7 @@ harness.
 | Resonance | A SPREAD (the rock's opposite): 6 s, a 7 yd ring round the player; every second it rings for 150 to 180 nature on every ally inside the ring (never its carrier), so the marked step away from the group until it ends. It never touches a pillar. On heroic and mythic it may overlap a Wrath: a carrier then needs a pillar's shadow away from the others (still counted in its capacity) | `council_song.ts` |
 | Bond of the Stone | Within 20 yd of each other (body to body) both members take 80 percent less damage (the shared `shield_wall` ward), and every 3 s the bond pulses on the whole raid for 40 to 48, 25 percent of the first louder each time (capped at six times). Apart, it lifts and its count starts again. Two ways through: one tank drags the Singer far off alone while the raid kills the Guardian (the safe one: the raid stacks for the Wrath, the Singer's Wake marks walk back to the cover), or the raid splits and kills both at once (faster, riskier: half the raid fights away from the Wrath's cover and the Rush's curse) | `council_bond.ts` |
 | Floor gap | The floor mechanics (the Wrath and its sight field, the Echo of Wrath, Wake the Stone and an heir's rise spots, Mountain's Rush, Falling Rock) never start within 4 s of each other (`floorGap`). Due together they go in a fixed order (the Wrath, the Echo, the Wake, the Rush, the rock: the cover before the Rush that spends it), one per gap, and each still fires. The seconds a mechanic waited come off its next interval (never below one gap); a held Wrath lands with the waited seconds' worth of energy. Seam Bolt, the song and Hammer's Weight paint no floor and keep their clocks. The `/dev heart council wrath`, `wake`, `rush` and `rock` triggers fire at once, past the gap, and stamp it | `council_floor_gap.ts` (pure), `council_floor.ts` |
-| The stone remembers | When one falls, the survivor gains Memory of Stone (+15 percent damage dealt) and takes up a WEAKER form of the fallen one's signature (`JOB_HEIRS`): the Guardian fallen, the Singer casts the Wrath herself, a lighter one (fills in 35 s, a 3 s bar, 380 to 450), keeping her own kickable Wake; Hammer's Weight and the Rush die with him. The Singer fallen, the Guardian raises the pillars himself, less often (his own 45 s clock, `heirWakeEvery`, plus one 6 s after each Wrath), under RANDOM players on a locked spot with a 2 s warning (nobody chooses, nobody kicks); her rock, bolt, song and Resonance die with her | `council_scope.ts` (`jobHolder`), `council.ts`, `council_stone.ts` |
+| The stone remembers | When one falls, the survivor gains Memory of Stone (+15 percent damage dealt) and takes up a WEAKER form of the fallen one's signature (`JOB_HEIRS`): the Guardian fallen, the Singer casts the Wrath herself, a lighter one (fills in 35 s, a 3 s bar, 380 to 450; Heroic and Mythic times their own `heirWrathMult` 2 on top of the 1.25: 950 to 1,125, about 1,090 to 1,295 with her Memory of Stone, a must-shelter that never kills a full Heroic-geared cloth body), keeping her own kickable Wake; Hammer's Weight and the Rush die with him. The Singer fallen, the Guardian raises the pillars himself, less often (his own 45 s clock, `heirWakeEvery`, plus one 6 s after each Wrath), under RANDOM players on a locked spot with a 2 s warning (nobody chooses, nobody kicks), and every one of them rings Stone Thrum while it stands (so killing her first costs the raid its say over the cover); her rock, bolt, song and Resonance die with her | `council_scope.ts` (`jobHolder`), `council.ts`, `council_stone.ts` |
 | Heroic | All the above, plus the Wake and the Rush free to overlap the Wrath, Resonance on its own clock, Wake the Stone marking 3, every standing pillar pulsing 60 to 75 nature on whoever stands within 3 yd of its face every 2 s (Restless Stone), the cursed pillar's heavier pulse, and every council number 25 percent higher. The raid has no heroic tier yet (`HEROIC_DUNGEON_IDS`), so a dev run switches it on (`/dev heart council heroic`) | `council_ids.ts` (`COUNCIL_DIFFICULTY`) |
 | Mythic | A prototype behind a dev switch until the game has a mythic tier: one more `COUNCIL_DIFFICULTY` row (see "Mythic" below) | `council_ids.ts`, `council_soul.ts` |
 
@@ -1510,7 +1511,25 @@ Wrath. One kicked Wake: normal still shelters ten (two pillars of five), heroic 
 (three of four, twelve), mythic leaves someone out (three of three, nine). The Rush spends
 pillars only when it is aimed badly, and the rock only when the soak stands by cover. After
 the soft enrage (the 4th Wrath) the cycle is about 26 s and only the after-Wrath Wake fits:
-the enrage is meant to end the fight.
+the enrage is meant to end the fight. Since the review of 2026-11-09 every risen pillar left standing
+rings Stone Thrum on the raid, so the clean play is the minimum: before the first Wrath the
+carved columns shelter everyone and every Wake can be kicked; after each Wrath let the first
+Wake through (Normal two pillars, ten places; Heroic three, twelve) and kick the one on its
+own clock.
+
+**The lethal Wrath (the owner's review of 2026-11-09).** On Heroic and Mythic an unhidden
+Wrath kills cloth, leather, mail and a tank without a defensive; a tank under a strong
+defensive (40 to 50 percent) lives on a sliver; an immunity (Cold Coffin's stasis, a damage
+immunity) takes none of it, the damage pipeline's own rule, as for every other must-avoid hit.
+Tuned on the bot raid's Heroic gear (`/dev bis`, measured headless): fire mage 1,335, combat
+rogue 1,570, protection warrior 2,732 and paladin 2,658 (Power Word: Fortitude about 3 percent
+more). `wrathMult` 6.3 on 1.25: 3,465 to 4,095. The lowest roll in Defensive Stance (10
+percent less) is 3,119, past a fortified 2,800 tank; the highest under a 40 percent ward in
+stance with Memory of Stone (+15 percent) is 2,543, about 91 percent of it; under Raised
+Guard's 50 percent physical cut 1,843 (66 percent). Mythic shares the factor (it was weaker
+than Heroic before; Narrow Shelter at 3 is its extra edge). Pinned by
+`tests/smith_heart_council_wrath_lethal.test.ts`; Stone Thrum by
+`tests/smith_heart_council_thrum.test.ts`.
 
 **Health (sketch, unmeasured).** Planning raid DPS about 600 (ten players at level 20;
 Varkhul's measured adds DPS was a median of 696 on heroic), a 4.5 minute fight at about 85
@@ -1520,7 +1539,7 @@ proportion, so the fight's length is unchanged. Measured (the bot raid of 2026-1
 `scripts/heart_raid.mjs`): ten kit-geared bots dealt about 300 a second, so the pull ran past
 the soft enrage; cut 15 percent to the Guardian 27,200 and the Seam Singer 23,400. The
 second Heroic pass (2026-11-05, real class kits) raised them to 54,000 and 46,000 (see the
-pools per tier above).
+pools per tier above): together about 230,000 after the elite factor (x2.3) on Normal.
 
 **Damage (sketch, unmeasured).** Anchored to the level-20 cloth reference (about 1,135 to
 1,345 health, `docs/design/class-health-table-2026-09-11.md`) and the dungeon rework's
@@ -1535,9 +1554,12 @@ Wrath on top of her own kit (no more Rush and no more tank swap, but the Wraths 
 a 2 s warning about once a cycle (no more kicks, no more choosing where the cover goes).
 Both orders run to the finish (pinned in `tests/smith_heart_council.test.ts`).
 
-Role jobs: tanks swap on Hammer's Weight and keep the two 20 yd apart (the Bond); healers
-recover after each Wrath, soak, Rush and the cursed pillar's pulse; damage dealers kick the
-Song and the bolt and NEVER the Wake, put the Wake marks where cover is needed, gather
+Role jobs: tanks swap on Hammer's Weight and keep the two 20 yd apart (the Bond); on Heroic
+and Mythic a tank caught in the open by the Wrath (the Singer's keeper) braces a strong
+defensive (40 to 50 percent) or dies; healers recover after each Wrath, soak, Rush, the cursed
+pillar's pulse and Stone Thrum; damage dealers kick the Song and the bolt, and the Wake by
+choice (let through the one the next Wrath needs, kick the rest; before the first Wrath the
+carved columns are the cover), put the Wake marks where cover is needed, gather
 three for the rock away from cover; a Rush mark leads the charge through the cursed pillar;
 Resonance carriers step out of the group.
 
@@ -1549,6 +1571,9 @@ English. IP check (2026-11-03, the two-boss rework): Mountain's Rush and Bond of
 returned no game use on the major wikis (warcraft.wiki.gg, Wowhead, the Fandom wikis; the
 nearest were Hearthstone's Rush keyword and the Pokemon Sand Rush ability, different
 phrases) (CLEAR); Cursed Pillar, Shattered Charge and Quarry Collapse are generic English.
+IP check (2026-11-09, the review): Stone Thrum returned no game use on the major wikis (the
+nearest were Magic: The Gathering's Thrumming Stone card and ESO's Stonethorn, different
+phrases) (CLEAR).
 
 #### Mythic: Soul in the Stone (prototype, behind a dev switch until the game has a mythic tier)
 

@@ -88,8 +88,10 @@ export const COUNCIL_CASTS = {
 
 /** The interruptible ones (spread into mob/healer_channel.ts
  *  SCRIPTED_INTERRUPTIBLE_CHANNELS): the Singer's three. Kicking the bolt or
- *  the song is the play; kicking Wake the Stone loses the raid its cover.
- *  Wrath, Weight, the Rush and the rock are never kicked. */
+ *  the song is the play; Wake the Stone is a choice (a kick raises nothing,
+ *  and every risen pillar left standing rings Stone Thrum on the raid: let
+ *  through the one Wake the next Wrath needs, kick the rest). Wrath, Weight,
+ *  the Rush and the rock are never kicked. */
 export const COUNCIL_KICK_SCHOOLS: Readonly<Record<string, { school: 'nature' }>> = {
   [COUNCIL_CASTS.bolt]: { school: 'nature' },
   [COUNCIL_CASTS.song]: { school: 'nature' },
@@ -179,6 +181,9 @@ export const COUNCIL_CUES = {
   rockImpact: 'heart_falling_rock_impact',
   /** The heroic pillars' pulse (spellfx 'nova' on each standing pillar). */
   pulse: 'heart_council_pillar_pulse',
+  /** Stone Thrum: each pillar Wake the Stone raised rings on the whole raid
+   *  (spellfx 'nova' on each risen pillar that rang; council_risen_pulse.ts). */
+  risenPulse: 'heart_council_stone_thrum',
   /** The stone remembers: light from the fallen to each survivor (spellfx
    *  'beam', source the fallen, target the survivor). */
   inherit: 'heart_council_inherit',
@@ -240,6 +245,7 @@ export const COUNCIL_NAMES = {
   pillarLimit: 'Narrow Shelter',
   rubble: 'Crumbled Stone',
   pulse: 'Restless Stone',
+  risenPulse: 'Stone Thrum',
   echo: 'Echo of Wrath',
   endlessSong: 'Endless Song',
 } as const;
@@ -270,9 +276,27 @@ export interface CouncilDifficultyRules {
    *  (tier_health.ts). */
   healthMult: number;
   /** Mountain's Wrath's hit on whoever no pillar hides (and the crowded
-   *  shelter's share of it), on top of damageMult: Heroic's lands at about
-   *  110 percent of a Heroic-geared cloth body, so ignoring cover kills. */
+   *  shelter's share of it), on top of damageMult. Heroic and Mythic (the
+   *  review of 2026-11-09): 3,465 to 4,095, past every body in the raid,
+   *  a Heroic-geared plate tank (about 2,700 health, in Defensive Stance)
+   *  included; a tank under a 40 to 50 percent cut lives on a sliver (with
+   *  Memory of Stone too), and an immunity takes none of it. */
   wrathMult: number;
+  /** The inherited Wrath's own factor (the Seam Singer's, the Guardian
+   *  fallen), on top of damageMult: a must-shelter, never a sure kill (on
+   *  Heroic about 80 to 95 percent of a Heroic-geared cloth body with her
+   *  Memory of Stone). */
+  heirWrathMult: number;
+  /** Narrow Shelter: the share of the Wrath each player behind a crowded
+   *  pillar takes. Heroic and Mythic: about 50 to 65 percent of a
+   *  Heroic-geared cloth body, hurting but never a wipe by itself. */
+  crowdShare: number;
+  /** Stone Thrum (council_risen_pulse.ts): every pillar Wake the Stone (or
+   *  the Guardian as its heir) raised that still stands rings on the whole
+   *  raid every T.risenPulseEvery seconds, this much per pillar (before
+   *  damageMult). The carved columns never ring. */
+  risenPulseMin: number;
+  risenPulseMax: number;
   /** The soft enrage: after this many Wraths the energy fills much faster
    *  (enrageFillMult). Heroic's Wrath kills the unhidden, so its enrage
    *  comes late enough for a decent raid's 6 to 7 minute kill. */
@@ -309,6 +333,10 @@ export const COUNCIL_DIFFICULTY: Readonly<Record<CouncilDifficulty, CouncilDiffi
     damageMult: 1,
     healthMult: 1,
     wrathMult: 1,
+    heirWrathMult: 1,
+    crowdShare: 0.5,
+    risenPulseMin: 14,
+    risenPulseMax: 16,
     enrageAfterWraths: 4,
     heirRiseWarn: 2,
     heirFillSeconds: 35,
@@ -326,7 +354,11 @@ export const COUNCIL_DIFFICULTY: Readonly<Record<CouncilDifficulty, CouncilDiffi
     pillarPulse: true,
     damageMult: 1.25,
     healthMult: 1.85,
-    wrathMult: 2.8,
+    wrathMult: 6.3,
+    heirWrathMult: 2,
+    crowdShare: 0.2,
+    risenPulseMin: 19,
+    risenPulseMax: 21,
     enrageAfterWraths: 8,
     heirRiseWarn: 2,
     heirFillSeconds: 35,
@@ -345,7 +377,11 @@ export const COUNCIL_DIFFICULTY: Readonly<Record<CouncilDifficulty, CouncilDiffi
     pillarPulse: true,
     damageMult: 1.25,
     healthMult: 1.85,
-    wrathMult: 1,
+    wrathMult: 6.3,
+    heirWrathMult: 2,
+    crowdShare: 0.2,
+    risenPulseMin: 19,
+    risenPulseMax: 21,
     enrageAfterWraths: 4,
     heirRiseWarn: 1.5,
     heirFillSeconds: 30,
@@ -361,9 +397,7 @@ export const COUNCIL_DIFFICULTY: Readonly<Record<CouncilDifficulty, CouncilDiffi
 // ---- tuning (SKETCH, unmeasured) ------------------------------------------------------
 
 export const COUNCIL_TUNING = {
-  // Narrow Shelter: the share of the Wrath everyone behind a crowded pillar takes.
-  crowdShare: 0.5,
-  // The pillars.
+  // The pillars (Narrow Shelter's share is each tier's, COUNCIL_DIFFICULTY).
   pillarCap: 7,
   /** The most integrity any pillar template carries. */
   integrity: 3,
@@ -520,6 +554,11 @@ export const COUNCIL_TUNING = {
   pulseReach: 3,
   pulseMin: 60,
   pulseMax: 75,
+  /** Stone Thrum: its clock (every tier's amount is its row's). The first
+   *  ring a second into the pull, so it never rings on Restless Stone's beat
+   *  (the healers' load and the floor's rings spread). */
+  risenPulseFirst: 1,
+  risenPulseEvery: 2,
   /** Seconds of plain melee after a bar lands before the same body starts
    *  another (nothing chains bar into bar). */
   barGap: 1.2,

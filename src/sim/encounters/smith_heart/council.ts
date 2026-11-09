@@ -70,6 +70,7 @@ import {
   settlePillars,
   stepRubble,
 } from './council_pillars';
+import { stepRisenPulse } from './council_risen_pulse';
 import { clearRush, landRush, startRush, stepCursed, stepRush } from './council_rush';
 import {
   type CouncilScope,
@@ -206,6 +207,7 @@ function freshState(difficulty: CouncilDifficulty): CouncilFightState {
     songTimer: T.songFirst,
     songDue: null,
     pulseTimer: T.pulseEvery,
+    risenPulseTimer: T.risenPulseFirst,
     quiet: 0,
     bars: {},
     gaps: { guardian: 0, singer: 0 },
@@ -577,6 +579,7 @@ export function tickHammerCouncil(ctx: SimContext, inst: InstanceSlot): void {
   stepRock(s);
   stepResonance(s);
   stepSouls(s);
+  stepRisenPulse(s);
   const source = COUNCIL_ROLES.map((r) => bodies[r]).find(living);
   if (source) {
     stepRubble(ctx, inst, st, source, s.players, damageMult(s, source));

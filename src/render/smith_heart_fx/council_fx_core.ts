@@ -448,6 +448,7 @@ export function councilClaims(ability: string | undefined): boolean {
     ability === COUNCIL_CUES.collapse ||
     ability === COUNCIL_CUES.rockImpact ||
     ability === COUNCIL_CUES.pulse ||
+    ability === COUNCIL_CUES.risenPulse ||
     ability === COUNCIL_CUES.inherit ||
     ability === COUNCIL_CUES.settle ||
     ability === COUNCIL_CUES.soulTake ||

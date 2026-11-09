@@ -118,6 +118,8 @@ export interface CouncilFightState {
    *  while no song is owed). */
   songDue: number | null;
   pulseTimer: number;
+  /** Stone Thrum's clock (council_risen_pulse.ts): seconds to its next ring. */
+  risenPulseTimer: number;
   /** The Singer stays silent this long after a kick. */
   quiet: number;
   /** Each member's bar in flight, and its breath after one. */

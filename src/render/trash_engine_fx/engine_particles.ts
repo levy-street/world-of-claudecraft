@@ -271,7 +271,7 @@ export class EngineParticles {
     seconds: number,
     look?: { wake: number; crest: number; strength: number },
   ): void {
-    const slot = this.rings.find((r) => !r.alive) ?? this.rings[0];
+    const slot = this.rings.find((r) => !r.alive) ?? this.oldestRing();
     slot.mat.uniforms.uWake.value = look?.wake ?? 1;
     slot.mat.uniforms.uCrest.value = look?.crest ?? RING_CREST;
     slot.strength = look?.strength ?? 1;
@@ -282,6 +282,21 @@ export class EngineParticles {
     (slot.mat.uniforms.uColor.value as THREE.Color).setHex(color);
     slot.mesh.position.set(x, this.groundY(x, z) + 0.14, z);
     slot.mesh.visible = true;
+  }
+
+  /** Every slot busy: the ring born first gives way (never always slot 0,
+   *  which let a burst of rings on one tick wipe each other out). */
+  private oldestRing(): Ring {
+    let best = this.rings[0];
+    for (const r of this.rings) if (r.born < best.born) best = r;
+    return best;
+  }
+
+  /** Live shock rings (the tests read it). */
+  liveRings(): number {
+    let n = 0;
+    for (const r of this.rings) if (r.alive) n++;
+    return n;
   }
 
   update(clock: number): void {

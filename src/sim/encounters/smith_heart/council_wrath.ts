@@ -5,7 +5,10 @@
 //                     energy bar (its resource: the target frame draws it, and
 //                     it rides the snapshot like any mob's resource).
 //   Mountain's Wrath  at 100: a 4 s bar, then everyone in the Quarry with no
-//                     pillar between them and the caster is struck, and then
+//                     pillar between them and the caster is struck (Normal
+//                     440 to 520; Heroic and Mythic about 3,500 to 4,100:
+//                     only a tank under a strong defensive or an immunity
+//                     lives through it), and then
 //                     EVERY pillar in the Quarry shatters (carved columns and
 //                     risen stone alike; a mythic soul pillar alone stands).
 //                     The carved columns teach the first Wrath; after it the
@@ -128,12 +131,14 @@ function wearPillarLimit(s: CouncilScope, caster: Entity): void {
 }
 
 /** One Wrath hit's roll: the heir's shorter one or the Guardian's, times the
- *  tier's Wrath factor (Heroic's kills an unhidden cloth body). */
+ *  tier's Wrath factor (Heroic's and Mythic's kill anyone unhidden but a
+ *  tank under a strong defensive; an immunity still takes none, the damage
+ *  pipeline's own rule) or its heir's lighter one. */
 function wrathRoll(s: CouncilScope, caster: Entity, heir: boolean): number {
   const amount = heir
     ? roll(s, caster, T.heirWrathMin, T.heirWrathMax)
     : roll(s, caster, T.wrathMin, T.wrathMax);
-  return Math.round(amount * s.rules.wrathMult);
+  return Math.round(amount * (heir ? s.rules.heirWrathMult : s.rules.wrathMult));
 }
 
 /** The Wrath lands: who it strikes (whoever no pillar hides), then every
@@ -182,8 +187,8 @@ export function landWrath(s: CouncilScope, caster: Entity, heir: boolean): numbe
       else shields.set(cover.e.id, [p]);
     }
   }
-  // One too many behind a pillar (Narrow Shelter) and each of them takes a
-  // share of the blast.
+  // One too many behind a pillar (Narrow Shelter) and each of them takes the
+  // tier's share of the blast (it hurts; on its own it never wipes).
   const limit = s.rules.pillarLimit;
   for (const pl of pillars) {
     const behind = shields.get(pl.e.id);
@@ -194,7 +199,7 @@ export function landWrath(s: CouncilScope, caster: Entity, heir: boolean): numbe
         ctx.dealDamage(
           caster,
           p,
-          Math.round(amount * T.crowdShare),
+          Math.round(amount * s.rules.crowdShare),
           false,
           'physical',
           COUNCIL_NAMES.wrath,

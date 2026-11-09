@@ -816,6 +816,7 @@ export class CouncilFx {
     else if (ability === COUNCIL_CUES.resonancePulse) this.resonancePulse(ev.sourceId);
     else if (ability === COUNCIL_CUES.crack) this.pillarsFx.cracked(ev.sourceId);
     else if (ability === COUNCIL_CUES.pulse) this.pillarsFx.pulse(ev.sourceId);
+    else if (ability === COUNCIL_CUES.risenPulse) this.pillarsFx.stoneThrum(ev.sourceId);
     else if (ability === COUNCIL_CUES.inherit) {
       this.startStream(ev.sourceId, ev.targetId, null);
     } else if (ability === COUNCIL_CUES.soulTake) {

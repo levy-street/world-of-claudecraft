@@ -316,9 +316,10 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
   // ---- the four guardians ------------------------------------------------------------
   // The Hammer Council (design doc 7.1, encounters/smith_heart/council.ts):
   // two stone beings sharing the Hammer's strength, one pull, one wipe, one
-  // kill. Every number is a SKETCH (unmeasured): the pools split about 137,000
-  // (after the elite factor) for a 4 to 5 minute fight at a planning raid DPS
-  // of about 600 (the prototype's third member's share went to the two). Each carries the Wrath's declaration (`nova`,
+  // kill. Every number is a SKETCH (bot-measured): the Guardian 54,000 and
+  // the Seam Singer 46,000 base, about 230,000 together after the elite
+  // factor (x2.3) on Normal and x1.85 on Heroic (tier_health.ts), for a 4 to
+  // 5 minute human Normal kill (design doc 7, "Pools per tier"). Each carries the Wrath's declaration (`nova`,
   // encounter-driven: the council casts it, never the trash engine), so the
   // sight field draws for whichever of them holds the Wrath.
   // The Guardian of the Hammer: a stone titan half-fused with the floor, the

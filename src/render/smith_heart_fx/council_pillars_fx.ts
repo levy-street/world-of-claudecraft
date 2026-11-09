@@ -50,6 +50,7 @@ import {
   soulPillarLook,
 } from './council_fx_core';
 import { CouncilPipSockets } from './council_pip_sockets';
+import { paintStoneThrum } from './council_thrum_fx';
 import type { Rubble } from './hammer_fx';
 import { fxHash } from './hammer_fx_core';
 import type { CouncilTelegraphs } from './painted_telegraphs';
@@ -535,6 +536,13 @@ export class CouncilPillarsFx {
       alpha: 0.35,
       radius: s.radius,
     });
+  }
+
+  /** `heart_council_stone_thrum`: a risen pillar rang on the raid. */
+  stoneThrum(id: number): void {
+    const s = this.pillars.find((p) => p.id === id);
+    if (s?.state !== 'standing') return;
+    paintStoneThrum(this.h, s);
   }
 
   update(dt: number): void {

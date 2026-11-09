@@ -1605,6 +1605,8 @@ const baseEnTable = {
   'mechanic.heartSongOfTheSeam': 'Song of the Seam',
   'mechanic.heartCrumbledStone': 'Crumbled Stone',
   'mechanic.heartRestlessStone': 'Restless Stone',
+  // Stone Thrum: every risen pillar rings on the raid (council_risen_pulse.ts).
+  'mechanic.heartStoneThrum': 'Stone Thrum',
   // Mythic: Soul in the Stone (encounters/smith_heart/council_soul.ts).
   'mechanic.heartEchoOfWrath': 'Echo of Wrath',
   'mechanic.heartEndlessSong': 'Endless Song',
@@ -27144,6 +27146,7 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Song of the Seam': 'mechanic.heartSongOfTheSeam',
   'Crumbled Stone': 'mechanic.heartCrumbledStone',
   'Restless Stone': 'mechanic.heartRestlessStone',
+  'Stone Thrum': 'mechanic.heartStoneThrum',
   'Echo of Wrath': 'mechanic.heartEchoOfWrath',
   'Endless Song': 'mechanic.heartEndlessSong',
   "Mountain's Rush": 'mechanic.heartMountainsRush',

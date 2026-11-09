@@ -7,9 +7,11 @@
 //                   the cap allows) wear a ground circle for 5 s; when it runs
 //                   out a fresh pillar bursts out of the floor where each one
 //                   STANDS (the players choose where the cover goes), throwing
-//                   back anyone within 3 yd. A kick raises NOTHING: the raid
-//                   that kicks it by habit loses its cover (her bolt and her
-//                   song are the casts to kick). Normal: its marks never run
+//                   back anyone within 3 yd. A kick raises NOTHING, and every
+//                   pillar a Wake lets up rings Stone Thrum on the whole raid
+//                   while it stands (council_risen_pulse.ts): let through the
+//                   one Wake the next Wrath needs, kick the rest. Normal: its
+//                   marks never run
 //                   into a Wrath (council_floor.ts holds it until it lands).
 //   Falling Rock    every 25 s a short bar, then one player wears the soak
 //                   circle for 5 s; the rock lands on them and its blow is
@@ -20,7 +22,8 @@
 //   Heir            the Singer fallen, the Guardian raises the pillars itself,
 //                   less often (its own 45 s clock; a Wrath's landing still
 //                   brings one due), under RANDOM players with only a 2 s
-//                   warning on a locked spot (nobody chooses, nobody kicks);
+//                   warning on a locked spot (nobody chooses, nobody kicks;
+//                   they ring Stone Thrum like hers);
 //                   the rock stops with her. Mythic: a 1.5 s warning, and the
 //                   Guardian keeps the rock too (it is all that breaks a soul
 //                   pillar).

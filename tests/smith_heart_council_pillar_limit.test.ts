@@ -87,7 +87,9 @@ describe('Hammer Council: Narrow Shelter', () => {
     for (const p of six) {
       const hits = wrathOn(ev6, p);
       expect(hits.length).toBe(1);
-      expect(hits[0].amount).toBeLessThanOrEqual(Math.ceil(T.wrathMax * T.crowdShare));
+      expect(hits[0].amount).toBeLessThanOrEqual(
+        Math.ceil(T.wrathMax * COUNCIL_DIFFICULTY.normal.crowdShare),
+      );
     }
   });
 
@@ -145,8 +147,14 @@ describe('Hammer Council: Narrow Shelter', () => {
     for (const p of behind) {
       const hits = wrathOn(ev, p);
       expect(hits.length).toBe(1);
-      expect(hits[0].amount).toBeLessThanOrEqual(Math.ceil(T.wrathMax * mult * T.crowdShare));
+      expect(hits[0].amount).toBeLessThanOrEqual(
+        Math.ceil(T.wrathMax * mult * COUNCIL_DIFFICULTY.heroic.crowdShare),
+      );
       expect(hits[0].amount).toBeGreaterThan(0);
+      // It hurts, about half a Heroic-geared cloth body (1,335), and never
+      // kills one on its own (the review of 2026-11-09: no accidental wipe).
+      expect(hits[0].amount).toBeGreaterThan(1335 * 0.5);
+      expect(hits[0].amount).toBeLessThan(1335 * 0.65);
     }
     expect(ev.some((e) => e.type === 'chat' && e.channel === 'raidWarning')).toBe(false);
   });
@@ -219,7 +227,17 @@ describe('Hammer Council: Narrow Shelter', () => {
     });
     const text = t(d?.key as never, d?.nums as never);
     expect(text).toContain('4');
-    expect(text).toContain(`${Math.round(T.crowdShare * 100)}%`);
+    expect(text).toContain(`${Math.round(COUNCIL_DIFFICULTY.heroic.crowdShare * 100)}%`);
+    // Normal's own share on Normal's limit.
+    const n = auraEffectDescriptor({
+      id: COUNCIL_AURAS.pillarLimit,
+      kind: 'vulnerability',
+      value: 0,
+      value2: 5,
+    });
+    expect(t(n?.key as never, n?.nums as never)).toContain(
+      `${Math.round(COUNCIL_DIFFICULTY.normal.crowdShare * 100)}%`,
+    );
     expect(localizeSimAuraName('Narrow Shelter')).toBe('Narrow Shelter');
   });
 });

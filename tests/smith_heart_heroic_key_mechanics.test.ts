@@ -1,8 +1,9 @@
 // The Smith's Heart Heroic key mechanics must matter (the second Heroic pass,
 // E:/woc/entregas/raid_corazon/heroico/NOTAS.md "Segunda vuelta"): an unhidden
-// Mountain's Wrath on Heroic kills a Heroic-geared cloth body (about 110
-// percent of its health), and the Quench's shatter lands twice as hard on
-// Heroic. Normal and Mythic keep their numbers. Over REAL Sim claims.
+// Mountain's Wrath on Heroic kills a Heroic-geared cloth body (since the
+// review of 2026-11-09 anyone unhidden but a defended tank), and the
+// Quench's shatter lands twice as hard on Heroic. Normal keeps its numbers.
+// Over REAL Sim claims.
 
 import { describe, expect, it } from 'vitest';
 import { HAMMER_PIT } from '../src/sim/content/smith_heart_layout';
@@ -70,17 +71,17 @@ function openWrath(f: CouncilFight): { ev: SimEvent[]; open: Entity[] } {
 }
 
 describe("Smith's Heart Heroic: Mountain's Wrath kills whoever does not hide", () => {
-  it('the tier factor: Heroic 2.8, Normal and Mythic untouched', () => {
+  it('the tier factor: Heroic and Mythic 6.3 (past any unhidden body), Normal untouched', () => {
     expect(COUNCIL_DIFFICULTY.normal.wrathMult).toBe(1);
-    expect(COUNCIL_DIFFICULTY.heroic.wrathMult).toBe(2.8);
-    expect(COUNCIL_DIFFICULTY.mythic.wrathMult).toBe(1);
+    expect(COUNCIL_DIFFICULTY.heroic.wrathMult).toBe(6.3);
+    expect(COUNCIL_DIFFICULTY.mythic.wrathMult).toBeGreaterThanOrEqual(
+      COUNCIL_DIFFICULTY.heroic.wrathMult,
+    );
     const H = COUNCIL_DIFFICULTY.heroic;
     const lo = COUNCIL_TUNING.wrathMin * H.damageMult * H.wrathMult;
-    const hi = COUNCIL_TUNING.wrathMax * H.damageMult * H.wrathMult;
-    // About 110 percent of the cloth body, its lowest roll still past it.
-    expect(lo).toBeGreaterThan(HEROIC_CLOTH * 0.95);
-    expect((lo + hi) / 2).toBeGreaterThan(HEROIC_CLOTH * 1.05);
-    expect((lo + hi) / 2).toBeLessThan(HEROIC_CLOTH * 1.2);
+    // Its lowest roll is more than twice the cloth body (the tanks' side:
+    // tests/smith_heart_council_wrath_lethal.test.ts).
+    expect(lo).toBeGreaterThan(HEROIC_CLOTH * 2);
   });
 
   it('Heroic: an unhidden cloth body dies to the landed Wrath', () => {

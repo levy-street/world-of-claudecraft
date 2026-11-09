@@ -95,16 +95,19 @@ describe("Smith's Heart tooltips: resolved damage per difficulty", () => {
     expect(collapse).toContain(
       `${tierValue(CT.collapseMin, m)} to ${tierValue(CT.collapseMax, m)} damage for each stack`,
     );
-    // The Wrath: Heroic's x1.25 damage times its x2.8 Wrath factor kills an
-    // unhidden cloth; Mythic keeps the plain x1.25.
+    // The Wrath: each tier's x1.25 damage times its x6.3 Wrath factor kills
+    // anyone unhidden on Heroic and Mythic (the review of 2026-11-09).
+    expect(COUNCIL_DIFFICULTY.heroic.wrathMult).toBe(6.3);
+    const mw = COUNCIL_DIFFICULTY.mythic.wrathMult;
     const limit = say({
       id: COUNCIL_AURAS.pillarLimit,
       kind: 'vulnerability',
       value2: COUNCIL_DIFFICULTY.heroic.pillarLimit ?? 0,
     });
     expect(limit).toContain(
-      `${CT.wrathMin} to ${CT.wrathMax} damage on Normal, 1540 to 1820 on Heroic and ` +
-        `${tierValue(CT.wrathMin, m)} to ${tierValue(CT.wrathMax, m)} on Mythic.`,
+      `${CT.wrathMin} to ${CT.wrathMax} damage on Normal, 3465 to 4095 on Heroic and ` +
+        `${tierValue(tierValue(CT.wrathMin, m), mw)} to ` +
+        `${tierValue(tierValue(CT.wrathMax, m), mw)} on Mythic.`,
     );
   });
 

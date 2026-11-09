@@ -31,6 +31,17 @@ const wrath = (value: number, tier: 'heroic' | 'mythic'): number =>
     COUNCIL_DIFFICULTY[tier].wrathMult,
   );
 
+/** Narrow Shelter's crowded share on the tier the aura was worn on: the
+ *  aura carries its tier's limit (value2), and every tier's limit is its own
+ *  (pinned in tests/smith_heart_council_pillar_limit.test.ts), so the limit
+ *  names the row; an unknown one says Normal's. */
+function crowdShareFor(limit: number | undefined): number {
+  for (const tier of ['normal', 'heroic', 'mythic'] as const) {
+    if (COUNCIL_DIFFICULTY[tier].pillarLimit === limit) return COUNCIL_DIFFICULTY[tier].crowdShare;
+  }
+  return COUNCIL_DIFFICULTY.normal.crowdShare;
+}
+
 /** The council aura's descriptor, or null when `a` is not one of them. */
 export function councilAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor | null {
   switch (a.id) {
@@ -117,10 +128,11 @@ export function councilAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescr
       return {
         key: `${KEY}.pillarLimit`,
         // The Guardian's Wrath on whoever no pillar hides: the tier's damage
-        // factor times its own Wrath factor (Heroic's kills an unhidden cloth).
+        // factor times its own Wrath factor (Heroic's and Mythic's kill anyone
+        // unhidden short of a tank's strong defensive or an immunity).
         nums: {
           limit: a.value2 ?? 0,
-          share: pct(T.crowdShare),
+          share: pct(crowdShareFor(a.value2)),
           min: T.wrathMin,
           max: T.wrathMax,
           heroicMin: wrath(T.wrathMin, 'heroic'),
